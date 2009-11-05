@@ -55,7 +55,7 @@ StackDropResult::Pointer ReplaceDragHandler::DragOver(QWidget* currentControl,
     // tab position.
     if (titleArea.contains(point) && tabFolder->GetItemCount() > 0)
     {
-      int dragOverIndex = tabFolder->GetItemCount();
+      int dragOverIndex = static_cast<int>(tabFolder->GetItemCount());
       AbstractTabItem* lastTab = tabFolder->GetItem(dragOverIndex - 1);
 
       // Can't drag to end unless you can see the end
@@ -130,11 +130,11 @@ int ReplaceDragHandler::GetInsertionPosition(Object::Pointer cookie)
 {
   if (cookie.Cast<DragCookie>() != 0)
   {
-    return std::min<int>(tabFolder->GetItemCount(),
+    return std::min<int>(static_cast<int>(tabFolder->GetItemCount()),
         cookie.Cast<DragCookie>()->insertPosition);
   }
 
-  return tabFolder->GetItemCount();
+  return static_cast<int>(tabFolder->GetItemCount());
 }
 
 }

@@ -240,7 +240,7 @@ private:
    * Answer the number of editors.
    */
 public:
-  int GetEditorCount();
+  std::size_t GetEditorCount();
 
   /*
    * Answer the editor registry.

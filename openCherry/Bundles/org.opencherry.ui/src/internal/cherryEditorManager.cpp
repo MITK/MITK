@@ -394,7 +394,7 @@ void EditorManager::FindEditors(
 //  }
 }
 
-int EditorManager::GetEditorCount()
+std::size_t EditorManager::GetEditorCount()
 {
   return page->GetEditorReferences().size();
 }

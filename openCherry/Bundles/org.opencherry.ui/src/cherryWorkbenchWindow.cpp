@@ -1595,7 +1595,7 @@ bool WorkbenchWindow::PageList::Remove(IWorkbenchPage::Pointer object)
     active = 0;
   }
   pagesInActivationOrder.remove(object);
-  unsigned int origSize = pagesInCreationOrder.size();
+  std::size_t origSize = pagesInCreationOrder.size();
   pagesInCreationOrder.remove(object);
   return origSize != pagesInCreationOrder.size();
 }

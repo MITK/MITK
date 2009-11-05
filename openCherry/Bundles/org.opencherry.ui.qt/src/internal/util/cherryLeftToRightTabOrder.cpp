@@ -30,7 +30,7 @@ LeftToRightTabOrder::LeftToRightTabOrder(IPresentablePartList* _list) :
 
 void LeftToRightTabOrder::Add(IPresentablePart::Pointer newPart)
 {
-  list->Insert(newPart, list->Size());
+  list->Insert(newPart, static_cast<int>(list->Size()));
 }
 
 void LeftToRightTabOrder::AddInitial(IPresentablePart::Pointer newPart)

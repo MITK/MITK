@@ -42,7 +42,7 @@ private:
   IIntroSite::Pointer introSite;
 
   IPropertyChangeListener::Pointer propChangeListener;
-  friend class PropertyChangeIntAdapter<EditorIntroAdapterPart> ;
+  friend struct PropertyChangeIntAdapter<EditorIntroAdapterPart> ;
 
   void PropertyChange(Object::Pointer source, int propId);
 

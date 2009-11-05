@@ -65,7 +65,7 @@ public:
   int Open()
   {
     msgBox.exec();
-    return mapButtonToIndex[msgBox.clickedButton()];
+    return static_cast<int>(mapButtonToIndex[msgBox.clickedButton()]);
   }
 };
 

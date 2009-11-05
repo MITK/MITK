@@ -164,7 +164,7 @@ public:
    */
   virtual int IndexOf(AbstractTabItem* item);
 
-  virtual int GetItemCount();
+  virtual std::size_t GetItemCount();
 
   /**
    * Sets the current state for the folder

@@ -117,7 +117,7 @@ int AbstractTabFolder::IndexOf(AbstractTabItem* item)
   return -1;
 }
 
-int AbstractTabFolder::GetItemCount()
+std::size_t AbstractTabFolder::GetItemCount()
 {
   return this->GetItems().size();
 }

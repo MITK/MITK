@@ -41,7 +41,7 @@ private:
   IIntroSite::Pointer introSite;
 
   IPropertyChangeListener::Pointer propChangeListener;
-  friend class PropertyChangeIntAdapter<ViewIntroAdapterPart> ;
+  friend struct PropertyChangeIntAdapter<ViewIntroAdapterPart> ;
 
   void PropertyChange(Object::Pointer source, int propId);
 

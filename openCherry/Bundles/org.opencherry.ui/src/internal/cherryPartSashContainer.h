@@ -627,8 +627,8 @@ protected:
   virtual void DerefPart(StackablePart::Pointer sourcePart);
 
 protected:
-  virtual int GetVisibleChildrenCount(IStackableContainer::Pointer container);
-  virtual int GetVisibleChildrenCount(ILayoutContainer::Pointer container);
+  virtual std::size_t GetVisibleChildrenCount(IStackableContainer::Pointer container);
+  virtual std::size_t GetVisibleChildrenCount(ILayoutContainer::Pointer container);
 
 protected:
   virtual float

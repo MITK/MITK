@@ -37,7 +37,7 @@ struct IPresentablePartList
 
   virtual void Move(IPresentablePart::Pointer part, int newIndex) = 0;
 
-  virtual int Size() = 0;
+  virtual std::size_t Size() = 0;
 
   virtual void Select(IPresentablePart::Pointer part) = 0;
 

@@ -32,7 +32,7 @@ PresentationSerializer::PresentationSerializer(
 
 std::string PresentationSerializer::GetId(IPresentablePart::Pointer part)
 {
-  int index = std::find(parts.begin(), parts.end(), part) - parts.begin();
+  std::size_t index = std::find(parts.begin(), parts.end(), part) - parts.begin();
 
   return "" + index; //$NON-NLS-1$
 }

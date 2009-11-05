@@ -165,7 +165,7 @@ public:
   /**
    * Returns the number of parts in this folder
    */
-  int Size();
+  std::size_t Size();
 
   void SetBounds(const QRect& bounds);
 

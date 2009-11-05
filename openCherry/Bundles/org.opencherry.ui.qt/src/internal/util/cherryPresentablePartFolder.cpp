@@ -252,7 +252,7 @@ void PresentablePartFolder::Insert(IPresentablePart::Pointer part, int idx)
     return;
   }
 
-  idx = std::min<int>(idx, folder->GetItemCount());
+  idx = std::min<int>(idx, static_cast<int>(folder->GetItemCount()));
 
   AbstractTabItem* item = 0;
 
@@ -301,7 +301,7 @@ void PresentablePartFolder::Move(IPresentablePart::Pointer part, int newIndex)
   }
 }
 
-int PresentablePartFolder::Size()
+std::size_t PresentablePartFolder::Size()
 {
   return folder->GetItemCount();
 }

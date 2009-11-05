@@ -172,7 +172,6 @@ void IntroPart::SetInitializationData(IConfigurationElement::Pointer cfig,
   // Icon.
   std::string strIcon;
   if (!cfig->GetAttribute(WorkbenchRegistryConstants::ATT_ICON, strIcon))
-    ;
   {
     return;
   }

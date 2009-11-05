@@ -132,12 +132,12 @@ void QtControlWidget::closeEvent(QCloseEvent* event)
   {
     (*listener)->Execute(shellEvent);
     if (!shellEvent->doit) {
-      event->accept();
+      //event->accept();
       return;
     }
   }
 
-  QFrame::closeEvent(event);
+  event->accept();
 }
 
 void QtControlWidget::moveEvent(QMoveEvent* event)

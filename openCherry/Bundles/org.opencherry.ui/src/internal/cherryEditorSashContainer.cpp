@@ -227,7 +227,7 @@ std::list<PartStack::Pointer> EditorSashContainer::GetEditorWorkbooks()
   return editorWorkbooks;
 }
 
-int EditorSashContainer::GetEditorWorkbookCount()
+std::size_t EditorSashContainer::GetEditorWorkbookCount()
 {
   return editorWorkbooks.size();
 }

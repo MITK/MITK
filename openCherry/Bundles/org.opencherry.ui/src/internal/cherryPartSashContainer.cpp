@@ -1122,7 +1122,7 @@ void PartSashContainer::DerefPart(StackablePart::Pointer sourcePart)
   }
 }
 
-int PartSashContainer::GetVisibleChildrenCount(
+std::size_t PartSashContainer::GetVisibleChildrenCount(
     IStackableContainer::Pointer container)
 {
   // Treat null as an empty container
@@ -1133,7 +1133,7 @@ int PartSashContainer::GetVisibleChildrenCount(
 
   IStackableContainer::ChildrenType children = container->GetChildren();
 
-  int count = 0;
+  std::size_t count = 0;
   for (IStackableContainer::ChildrenType::iterator iter = children.begin(); iter
       != children.end(); ++iter)
   {
@@ -1146,7 +1146,7 @@ int PartSashContainer::GetVisibleChildrenCount(
   return count;
 }
 
-int PartSashContainer::GetVisibleChildrenCount(
+std::size_t PartSashContainer::GetVisibleChildrenCount(
     ILayoutContainer::Pointer container)
 {
   // Treat null as an empty container

@@ -181,7 +181,7 @@ public:
   /**
    * Return the all the editor workbooks.
    */
-  int GetEditorWorkbookCount();
+  std::size_t GetEditorWorkbookCount();
 
   /**
    * Find the sashes around the specified part.

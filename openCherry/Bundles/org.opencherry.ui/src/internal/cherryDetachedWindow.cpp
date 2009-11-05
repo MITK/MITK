@@ -39,9 +39,14 @@ DetachedWindow::ShellListener::ShellListener(DetachedWindow* wnd) :
 
 void DetachedWindow::ShellListener::ShellClosed(ShellEvent::Pointer e)
 {
+  // hold on to a reference of the DetachedWindow instance
+  // (otherwise, wnd->HandleClose() woulde delete the DetachedWindow
+  // instance too early, trying to write to members afterwards)
+  DetachedWindow::Pointer wnd(window);
+
   // only continue to close if the handleClose
   // wasn't canceled
-  e->doit = window->HandleClose();
+  e->doit = wnd->HandleClose();
 }
 
 DetachedWindow::ShellControlListener::ShellControlListener(DetachedWindow* wnd) :
@@ -429,7 +434,7 @@ bool DetachedWindow::HandleClose()
     std::list<PartPane::Pointer> views;
     this->CollectViewPanes(views, this->GetChildren());
 
-    // Save any drty views
+    // Save any dirty views
     if (!this->HandleSaves(views))
     {
       return false; // User canceled the save

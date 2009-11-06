@@ -188,10 +188,18 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   // Otsu filter does not work properly, remove it temporarily
   imageDataTreeNodeDescriptor->AddAction(m_OtsuFilterAction);
 
-  QGridLayout* _ParentLayout = new QGridLayout;
-  _ParentLayout->addWidget(m_NodeTreeView, 0, 0);
+  QGridLayout* _DndFrameWidgetLayout = new QGridLayout;
+  _DndFrameWidgetLayout->addWidget(m_NodeTreeView, 0, 0);
+  _DndFrameWidgetLayout->setContentsMargins(0,0,0,0);
 
-  m_Parent->setLayout(_ParentLayout);
+  m_DndFrameWidget = new QmitkDnDFrameWidget(m_Parent);
+  m_DndFrameWidget->setLayout(_DndFrameWidgetLayout);
+
+  QVBoxLayout* layout = new QVBoxLayout(parent);
+  layout->addWidget(m_DndFrameWidget);
+  layout->setContentsMargins(0,0,0,0);
+
+  m_Parent->setLayout(layout);
 
   // call preferences changed to enable initial single click editing or not
   this->OnPreferencesChanged(m_DataManagerPreferencesNode.GetPointer());

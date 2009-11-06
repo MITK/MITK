@@ -1,4 +1,5 @@
 SET(SRC_CPP_FILES
+  QmitkDnDFrameWidget.cpp
   QmitkDataTreeNodeSelectionProvider.cpp
   QmitkFileOpenAction.cpp
   QmitkFileExitAction.cpp
@@ -12,7 +13,6 @@ SET(SRC_CPP_FILES
 
 SET(INTERNAL_CPP_FILES
   QmitkDataTreeNodeSelection.cpp
-  QmitkDnDFrameWidget.cpp
   QmitkCommonActivator.cpp
 )
 
@@ -21,7 +21,7 @@ SET(MOC_H_FILES
   src/QmitkFileExitAction.h
   src/QmitkProgressBar.h
   src/QmitkPreferencesDialog.h
-  src/internal/QmitkDnDFrameWidget.h
+  src/QmitkDnDFrameWidget.h
 )
 
 # todo: add some qt style sheet resources

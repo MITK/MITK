@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <cherryIPartListener.h>
 
 #include <QmitkStdMultiWidget.h>
-#include <internal/QmitkDnDFrameWidget.h>
+#include <QmitkDnDFrameWidget.h>
 
 #include "mitkQtCommonDll.h"
 

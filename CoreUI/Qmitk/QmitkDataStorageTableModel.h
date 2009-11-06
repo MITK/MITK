@@ -57,25 +57,25 @@ class QMITK_EXPORT QmitkDataStorageTableModel : public QAbstractTableModel
     /// Overridden from QAbstractTableModel. Returns the header data at section
     /// for given orientation and role. 
     ///
-    QVariant headerData(int section, Qt::Orientation orientation,
+    virtual QVariant headerData(int section, Qt::Orientation orientation,
       int role) const;
     ///
     /// Overridden from QAbstractTableModel. Returns what can be done
     /// with an item.
     ///
-    Qt::ItemFlags flags(const QModelIndex &index) const;
+    virtual Qt::ItemFlags flags(const QModelIndex &index) const;
     ///
     /// Overridden from QAbstractTableModel. Returns the node count.
     ///
-    int rowCount(const QModelIndex &parent) const;
+    virtual int rowCount(const QModelIndex &parent) const;
     ///
     /// Overridden from QAbstractTableModel. Returns the number of features (columns) to display.
     ///
-    int columnCount(const QModelIndex &parent) const;
+    virtual int columnCount(const QModelIndex &parent) const;
     ///
     /// Overridden from QAbstractTableModel. Returns the data at index for given role.
     ///
-    QVariant data(const QModelIndex &index, int role) const;
+    virtual QVariant data(const QModelIndex &index, int role) const;
 
   //# Public SETTERS
   public:

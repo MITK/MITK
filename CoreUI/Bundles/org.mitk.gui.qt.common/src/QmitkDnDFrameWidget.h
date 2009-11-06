@@ -26,12 +26,13 @@ PURPOSE.  See the above copyright notices for more information.
 #endif
 
 #include <QWidget>
+#include "mitkQtCommonDll.h"
 //drag&drop
 class QDragEnterEvent;
 class QDropEvent;
 class QMouseEvent;
 
-class QmitkDnDFrameWidget : public QWidget
+class MITK_QT_COMMON QmitkDnDFrameWidget : public QWidget
 {
   Q_OBJECT
 

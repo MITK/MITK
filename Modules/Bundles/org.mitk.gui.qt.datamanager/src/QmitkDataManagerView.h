@@ -12,6 +12,7 @@
 /// Qmitk
 #include <QmitkFunctionality.h>
 #include <QmitkDataTreeNodeSelectionProvider.h>
+#include <QmitkDnDFrameWidget.h>
 // #include "QmitkStandardViews.h"
 #include "mitkQtDataManagerDll.h"
 
@@ -128,6 +129,8 @@ protected:
   ///
   void FileOpen( const char * fileName, mitk::DataTreeNode* parentNode );
 protected:
+  QmitkDnDFrameWidget* m_DndFrameWidget;
+
   ///
   /// \brief A plain widget as the base pane.
   ///

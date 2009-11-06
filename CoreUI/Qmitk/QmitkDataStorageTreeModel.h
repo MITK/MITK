@@ -183,7 +183,6 @@ protected:
     ///
     void Delete();
   protected:
-  protected:
     TreeItem* m_Parent;
     std::vector<TreeItem*> m_Children;
     mitk::DataTreeNode::Pointer m_DataTreeNode;

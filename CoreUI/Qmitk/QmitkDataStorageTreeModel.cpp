@@ -150,6 +150,8 @@ bool QmitkDataStorageTreeModel::dropMimeData(const QMimeData *data,
     TreeItem* draggedItem = static_cast<TreeItem *>((void*)val);
     TreeItem* dropItem = this->TreeItemFromIndex(parent);
     TreeItem* parentItem = dropItem->GetParent();
+    if(dropItem == m_Root) // item was dropped onto empty space 
+      parentItem = m_Root;
 
     if(draggedItem->GetParent() == parentItem) // dragging is only allowed within the same parent
     {
@@ -164,6 +166,8 @@ bool QmitkDataStorageTreeModel::dropMimeData(const QMimeData *data,
 
       // now insert it again at the drop item position
       int index = parentItem->IndexOfChild(dropItem);
+      if(dropItem == m_Root)
+        index = parentItem->GetChildCount();
 
       beginInsertRows(parentModelIndex, index, index);
 
@@ -327,10 +331,10 @@ void QmitkDataStorageTreeModel::AddNode( const mitk::DataTreeNode* node )
     index = this->createIndex(parentTreeItem->GetIndex(), 0, parentTreeItem);
   }
   // emit beginInsertRows event
-  beginInsertRows(index, parentTreeItem->GetChildCount(), parentTreeItem->GetChildCount());
+  beginInsertRows(index, 0, 0);
 
   // add node
-  new TreeItem(const_cast<mitk::DataTreeNode*>(node), parentTreeItem);
+  parentTreeItem->InsertChild(new TreeItem(const_cast<mitk::DataTreeNode*>(node)), 0);
 
   // emit endInsertRows event
   endInsertRows();

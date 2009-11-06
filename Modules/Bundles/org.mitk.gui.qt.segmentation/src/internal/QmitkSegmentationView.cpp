@@ -174,6 +174,12 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
   
   // call preferences changed for initialization
   this->OnPreferencesChanged(m_SegmentationPreferencesNode.GetPointer());
+  
+  //# m_SelectionProvider
+  m_SelectionProvider = new mitk::SegmentationSelectionProvider();
+  //m_SelectionProvider->SetItemSelectionModel(m_NodeTreeView->selectionModel());
+  this->GetSite()->SetSelectionProvider(m_SelectionProvider);
+
 }
 
 void QmitkSegmentationView::SetFocus()
@@ -757,7 +763,8 @@ void QmitkSegmentationView::SendSelectedEvent( mitk::DataTreeNode* referenceNode
   if (referenceNode) nodes.push_back( referenceNode );
   if (workingNode)   nodes.push_back( workingNode );
 
-  mitk::DataTreeNodeSelection selection( nodes );
+  
+  m_SelectionProvider->SetSelection( cherry::ISelection::Pointer(new mitk::DataTreeNodeSelection(nodes)) );
 }
 
 void QmitkSegmentationView::OnSurfaceCalculationDone()

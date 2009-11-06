@@ -12,6 +12,8 @@
 #include <cherryIStructuredSelection.h>
 #include <cherryICherryPreferences.h>
 
+#include "mitkSegmentationSelectionProvider.h"
+
 /**
  * \ingroup org_mitk_gui_qt_segmentation_internal
  */
@@ -115,6 +117,8 @@ protected:
 
     bool m_ShowSegmentationsAsOutline;
     bool m_ShowSegmentationsAsVolumeRendering;
+
+    mitk::SegmentationSelectionProvider::Pointer m_SelectionProvider;
 
   /// from QmitkSegmentation
 

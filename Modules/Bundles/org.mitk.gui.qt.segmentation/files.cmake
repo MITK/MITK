@@ -5,6 +5,7 @@ SET(SRC_CPP_FILES
 SET(INTERNAL_CPP_FILES
   QmitkSegmentationView.cpp
   QmitkSegmentationPerspective.cpp
+  mitkSegmentationSelectionProvider.cpp
 )
 
 SET(UI_FILES

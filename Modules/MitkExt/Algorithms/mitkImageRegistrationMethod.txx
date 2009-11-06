@@ -54,7 +54,7 @@ namespace mitk {
     typename ImageMaskType::Pointer movingImageMask;
     if(m_MovingMask.IsNotNull())
     {
-      MovingImageType::Pointer movingMask = MovingImageType::New();
+      typename MovingImageType::Pointer movingMask = MovingImageType::New();
       mitk::CastToItkImage(m_MovingMask, movingMask); 
       typename itk::CastImageFilter<MovingImageType, MaskImageType>::Pointer maskImageCaster = itk::CastImageFilter<MovingImageType, MaskImageType>::New();
       maskImageCaster->SetInput(movingMask);
@@ -75,7 +75,7 @@ namespace mitk {
     typename ImageMaskType::Pointer fixedImageMask;
     if(m_FixedMask.IsNotNull())
     {
-      FixedImageType::Pointer fixedMask = FixedImageType::New();  
+      typename FixedImageType::Pointer fixedMask = FixedImageType::New();  
       mitk::CastToItkImage(m_FixedMask, fixedMask); 
       typename itk::CastImageFilter<FixedImageType, MaskImageType>::Pointer maskImageCaster = itk::CastImageFilter<FixedImageType, MaskImageType>::New();
       maskImageCaster->SetInput(fixedMask);
@@ -124,7 +124,7 @@ namespace mitk {
       // the metric
       typename MetricFactoryType::Pointer metFac = MetricFactoryType::New();
       metFac->SetMetricParameters(m_MetricParameters);
-      MetricFactoryType::MetricPointer metric = metFac->GetMetric();
+      typename MetricFactoryType::MetricPointer metric = metFac->GetMetric();
       if(movingImageMask.IsNotNull())
         metric->SetMovingImageMask(movingImageMask);
       if(fixedImageMask.IsNotNull())
@@ -283,7 +283,7 @@ namespace mitk {
       // the metric
       typename MetricFactoryType::Pointer metFac = MetricFactoryType::New();
       metFac->SetMetricParameters(m_MetricParameters);
-      MetricFactoryType::MetricPointer metric = metFac->GetMetric();
+      typename MetricFactoryType::MetricPointer metric = metFac->GetMetric();
       if(movingImageMask.IsNotNull())
         metric->SetMovingImageMask(movingImageMask);
       if(fixedImageMask.IsNotNull())

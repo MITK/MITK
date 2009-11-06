@@ -31,7 +31,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QmitkStdMultiWidgetEditor.h>
 #include <mitkPointSetInteractor.h>
 
-class QmitkDataStorageTableModel;
+class QmitkPlanarFiguresTableModel;
 class QGridLayout;
 class QMainWindow;
 class QToolBar;
@@ -55,8 +55,6 @@ class QmitkMeasurement : public QObject, public QmitkFunctionality
 
   public:
     void CreateQtPartControl(QWidget* parent);
-    virtual void Activated();
-    virtual void Deactivated();
     virtual void Visible();
     virtual void Hidden();
 
@@ -77,7 +75,9 @@ class QmitkMeasurement : public QObject, public QmitkFunctionality
     void ActionDrawPolygonTriggered( bool checked = false );
     void ActionDrawArrowTriggered( bool checked = false );
     void ActionDrawTextTriggered( bool checked = false ); 
-  // fields
+    void CopyToClipboard( bool checked = false ); 
+    void PlanarFigureTableModelRowsInserted( const QModelIndex & parent, int start, int end );
+    // fields
   protected:
     ///
     /// Interactor for performing the measurements.
@@ -90,27 +90,31 @@ class QmitkMeasurement : public QObject, public QmitkFunctionality
     mitk::DataTreeNode::Pointer m_CurrentPointSetNode;
 
   // widgets
-  protected:
-    QLabel* m_SelectedImage;
-    QPushButton* m_CopyToClipboard;
-    QMainWindow* m_MainWindow;
-    QGridLayout* m_Layout;
-    QToolBar* m_DrawActionsToolBar;
-    QToolBar* m_DrawActionsMainWindowToolBar;
-    QTableView* m_PlanarFiguresTable;
-    QmitkDataStorageTableModel* m_PlanarFiguresModel;
+protected:
+  QGridLayout* m_Layout;
+  QLabel* m_SelectedImage;
+  QToolBar* m_DrawActionsToolBar;
+  QTableView* m_PlanarFiguresTable;
+  QmitkPlanarFiguresTableModel* m_PlanarFiguresModel;
+  QPushButton* m_CopyToClipboard;
 
-    /// cherry::SelectionChangedAdapter<QmitkPropertyListView> must be a friend to call
-    friend struct cherry::SelectionChangedAdapter<QmitkMeasurement>;
+  /// cherry::SelectionChangedAdapter<QmitkPropertyListView> must be a friend to call
+  friend struct cherry::SelectionChangedAdapter<QmitkMeasurement>;
 
+  // Selection service
+  cherry::IStructuredSelection::ConstPointer m_CurrentSelection;
+  cherry::ISelectionListener::Pointer m_SelectionListener;
 
-    // Selection service
-    cherry::IStructuredSelection::ConstPointer m_CurrentSelection;
-    cherry::ISelectionListener::Pointer m_SelectionListener;
+  // Selected image on which measurements will be performed
+  mitk::DataTreeNode::Pointer m_SelectedImageNode;
 
-
-    // Selected image on which measurements will be performed
-    mitk::DataTreeNode::Pointer m_SelectedImageNode;
+  unsigned int m_LineCounter;
+  unsigned int m_PathCounter;
+  unsigned int m_AngleCounter;
+  unsigned int m_FourPointAngleCounter;
+  unsigned int m_EllipseCounter;
+  unsigned int m_RectangleCounter;
+  unsigned int m_PolygonCounter;
 
 };
 

@@ -35,6 +35,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkPlanarLine.h"
 #include "mitkPlanarFourPointAngle.h"
 #include "mitkPlanarFigureInteractor.h"
+#include "QmitkPlanarFiguresTableModel.h"
 
 #include "QmitkMeasurement.h"
 
@@ -43,6 +44,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QToolBar>
 #include <QLabel>
 #include <QTableView>
+#include <QClipboard>
 #include <QmitkDataStorageTableModel.h>
 #include "mitkNodePredicateDataType.h"
 #include "mitkPlanarFigure.h"
@@ -50,70 +52,70 @@ PURPOSE.  See the above copyright notices for more information.
 QmitkMeasurement::QmitkMeasurement()
 : m_PointSetInteractor(0)
 , m_CurrentPointSetNode(0)
-, m_MainWindow(0)
 , m_Layout(0)
 , m_DrawActionsToolBar(0)
+, m_LineCounter(0)
+, m_PathCounter(0)
+, m_AngleCounter(0)
+, m_FourPointAngleCounter(0)
+, m_EllipseCounter(0)
+, m_RectangleCounter(0)
+, m_PolygonCounter(0)
 {
 }
 
 QmitkMeasurement::~QmitkMeasurement()
 {
   this->Deactivated();
-
-  if(m_MainWindow && m_DrawActionsToolBar)
-  {
-    m_MainWindow->removeToolBar(m_DrawActionsToolBar);
-  }
 }
 
 void QmitkMeasurement::CreateQtPartControl( QWidget* parent )
 {
   m_DrawActionsToolBar = new QToolBar;
-  m_DrawActionsMainWindowToolBar = new QToolBar;
 
   //# add actions
   QAction* currentAction = m_DrawActionsToolBar->addAction(QIcon(":/measurement/line.png"), "Draw Line");
-  m_DrawActionsMainWindowToolBar->addAction(currentAction);
+  m_DrawActionsToolBar->addAction(currentAction);
   QObject::connect( currentAction, SIGNAL( triggered(bool) )
     , this, SLOT( ActionDrawLineTriggered(bool) ) );
 
   currentAction = m_DrawActionsToolBar->addAction(QIcon(":/measurement/path.png"), "Draw Path");
-  m_DrawActionsMainWindowToolBar->addAction(currentAction);
+  m_DrawActionsToolBar->addAction(currentAction);
   QObject::connect( currentAction, SIGNAL( triggered(bool) )
     , this, SLOT( ActionDrawPathTriggered(bool) ) );
 
   currentAction = m_DrawActionsToolBar->addAction(QIcon(":/measurement/angle.png"), "Draw Angle");
-  m_DrawActionsMainWindowToolBar->addAction(currentAction);
+  m_DrawActionsToolBar->addAction(currentAction);
   QObject::connect( currentAction, SIGNAL( triggered(bool) )
     , this, SLOT( ActionDrawAngleTriggered(bool) ) );
 
   currentAction = m_DrawActionsToolBar->addAction(QIcon(":/measurement/four-point-angle.png"), "Draw Four Point Angle");
-  m_DrawActionsMainWindowToolBar->addAction(currentAction);
+  m_DrawActionsToolBar->addAction(currentAction);
   QObject::connect( currentAction, SIGNAL( triggered(bool) )
     , this, SLOT( ActionDrawFourPointAngleTriggered(bool) ) );
 
   currentAction = m_DrawActionsToolBar->addAction(QIcon(":/measurement/circle.png"), "Draw Ellipse");
-  m_DrawActionsMainWindowToolBar->addAction(currentAction);
+  m_DrawActionsToolBar->addAction(currentAction);
   QObject::connect( currentAction, SIGNAL( triggered(bool) )
     , this, SLOT( ActionDrawEllipseTriggered(bool) ) );
 
   currentAction = m_DrawActionsToolBar->addAction(QIcon(":/measurement/rectangle.png"), "Draw Rectangle");
-  m_DrawActionsMainWindowToolBar->addAction(currentAction);
+  m_DrawActionsToolBar->addAction(currentAction);
   QObject::connect( currentAction, SIGNAL( triggered(bool) )
     , this, SLOT( ActionDrawRectangleTriggered(bool) ) );
 
   currentAction = m_DrawActionsToolBar->addAction(QIcon(":/measurement/polygon.png"), "Draw Polygon");
-  m_DrawActionsMainWindowToolBar->addAction(currentAction);
+  m_DrawActionsToolBar->addAction(currentAction);
   QObject::connect( currentAction, SIGNAL( triggered(bool) )
     , this, SLOT( ActionDrawPolygonTriggered(bool) ) );
 
   currentAction = m_DrawActionsToolBar->addAction(QIcon(":/measurement/arrow.png"), "Draw Arrow");
-  m_DrawActionsMainWindowToolBar->addAction(currentAction);
+  m_DrawActionsToolBar->addAction(currentAction);
   QObject::connect( currentAction, SIGNAL( triggered(bool) )
     , this, SLOT( ActionDrawArrowTriggered(bool) ) );
 
   currentAction = m_DrawActionsToolBar->addAction(QIcon(":/measurement/text.png"), "Draw Text");
-  m_DrawActionsMainWindowToolBar->addAction(currentAction);
+  m_DrawActionsToolBar->addAction(currentAction);
   QObject::connect( currentAction, SIGNAL( triggered(bool) )
     , this, SLOT( ActionDrawTextTriggered(bool) ) );
 
@@ -129,70 +131,53 @@ void QmitkMeasurement::CreateQtPartControl( QWidget* parent )
   mitk::NodePredicateAND::Pointer dataIsPlanarFigureAndIsNotHelperObject = mitk::NodePredicateAND::New(isPlanarFigure,
     isNotHelperObject);
 
-  m_PlanarFiguresModel = new QmitkDataStorageTableModel(this->GetDefaultDataStorage(), dataIsPlanarFigureAndIsNotHelperObject);
+  m_PlanarFiguresModel = new QmitkPlanarFiguresTableModel(this->GetDefaultDataStorage(), dataIsPlanarFigureAndIsNotHelperObject);
+  QObject::connect( m_PlanarFiguresModel, SIGNAL(rowsInserted (const QModelIndex&, int, int))
+    , this, SLOT(PlanarFigureTableModelRowsInserted ( const QModelIndex&, int, int )) );
 
   QLabel* selectedImageLabel = new QLabel("Selected Image: ");
-  m_SelectedImage = new QLabel("None selected!");
+  m_SelectedImage = new QLabel("None selected. Please select an image!");
 
   //# m_PlanarFiguresTable
   m_PlanarFiguresTable = new QTableView;
   //m_PlanarFiguresTable->setContextMenuPolicy(Qt::CustomContextMenu);
   m_PlanarFiguresTable->setSelectionMode( QAbstractItemView::ExtendedSelection );
   m_PlanarFiguresTable->setSelectionBehavior( QAbstractItemView::SelectRows );
-  m_PlanarFiguresTable->horizontalHeader()->setStretchLastSection(true);
+  //m_PlanarFiguresTable->horizontalHeader()->setStretchLastSection(true);
   m_PlanarFiguresTable->setAlternatingRowColors(true);
   m_PlanarFiguresTable->setSortingEnabled(true);
+  m_PlanarFiguresTable->horizontalHeader()->setResizeMode(QHeaderView::ResizeToContents);
   m_PlanarFiguresTable->setModel(m_PlanarFiguresModel);
+
+  m_CopyToClipboard = new QPushButton("Copy to Clipboard");
+  QObject::connect( m_CopyToClipboard, SIGNAL( clicked(bool) )
+    , this, SLOT( CopyToClipboard(bool) ) );
 
   m_Layout = new QGridLayout;
   //m_Layout->addWidget(m_DrawActionsToolBar, 0, 0, 1, 1);
   m_Layout->addWidget(selectedImageLabel, 0, 0, 1, 1);
   m_Layout->addWidget(m_SelectedImage, 0, 1, 1, 1);
-  m_Layout->addWidget(m_PlanarFiguresTable, 1, 0, 1, 2);
+  m_Layout->addWidget(m_DrawActionsToolBar, 1, 0, 1, 2);
+  m_Layout->addWidget(m_PlanarFiguresTable, 2, 0, 1, 2);
+  m_Layout->addWidget(m_CopyToClipboard, 3, 0, 1, 2);
   m_Layout->setRowStretch(0, 1);
-  m_Layout->setRowStretch(1, 10);
+  m_Layout->setRowStretch(1, 1);
+  m_Layout->setRowStretch(2, 10);
+  m_Layout->setRowStretch(3, 1);
+  m_Layout->setContentsMargins(0,0,0,0);
 
   parent->setLayout(m_Layout);
-
-  m_MainWindow = qobject_cast<QMainWindow*> ( QApplication::activeWindow() );
-
-  if(m_MainWindow)
-  {
-    m_MainWindow->addToolBar(Qt::LeftToolBarArea, m_DrawActionsMainWindowToolBar);
-    m_DrawActionsMainWindowToolBar->setFloatable(false);
-    m_DrawActionsMainWindowToolBar->setMovable(false);
-  }
 
   // Initialize selection listener mechanism
   m_SelectionListener = cherry::ISelectionListener::Pointer(
     new cherry::SelectionChangedAdapter< QmitkMeasurement >(
       this, &QmitkMeasurement::SelectionChanged) );
-  this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddPostSelectionListener(/*"org.mitk.views.datamanager",*/ m_SelectionListener);
+  this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddPostSelectionListener(m_SelectionListener);
   cherry::ISelection::ConstPointer selection( this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection());
   m_CurrentSelection = selection.Cast< const cherry::IStructuredSelection >();
   this->SelectionChanged(cherry::SmartPointer<IWorkbenchPart>(NULL), selection);
 
 }
-
-void QmitkMeasurement::Activated()
-{
-  m_PointSetInteractor = 0;
-  m_CurrentPointSetNode = 0;
-}
-
-void QmitkMeasurement::Deactivated()
-{
-//   if (m_PointSetInteractor.IsNotNull())
-//   {
-//     mitk::GlobalInteraction::GetInstance()->RemoveInteractor(m_PointSetInteractor);
-//   }
-// 
-//   if (m_CurrentPointSetNode.IsNotNull() && static_cast<mitk::PointSet*>(m_CurrentPointSetNode->GetData())->IsEmpty(0u))
-//   {
-//     this->GetDataStorage()->Remove(m_CurrentPointSetNode);
-//   }
-}
-
 
 void QmitkMeasurement::SelectionChanged( cherry::IWorkbenchPart::Pointer sourcepart, 
   cherry::ISelection::ConstPointer selection )
@@ -253,6 +238,7 @@ void QmitkMeasurement::ActionDrawLineTriggered( bool  /*checked*/ )
   figure->SetGeometry2D( planeGeometry );
 
   mitk::DataTreeNode::Pointer figureNode = mitk::DataTreeNode::New();
+  figureNode->SetName(QString("line%1").arg(++m_LineCounter).toStdString());
   figureNode->SetData( figure );
 
   this->GetDataStorage()->Add( figureNode, m_SelectedImageNode );
@@ -281,6 +267,7 @@ void QmitkMeasurement::ActionDrawPathTriggered( bool  /*checked*/ )
   figure->SetGeometry2D( planeGeometry );
 
   mitk::DataTreeNode::Pointer figureNode = mitk::DataTreeNode::New();
+  figureNode->SetName(QString("path%1").arg(++m_PathCounter).toStdString());
   figureNode->SetData( figure );
 
   this->GetDataStorage()->Add( figureNode, m_SelectedImageNode );
@@ -308,6 +295,7 @@ void QmitkMeasurement::ActionDrawAngleTriggered( bool  /*checked*/ )
   figure->SetGeometry2D( planeGeometry );
 
   mitk::DataTreeNode::Pointer figureNode = mitk::DataTreeNode::New();
+  figureNode->SetName(QString("angle%1").arg(++m_AngleCounter).toStdString());
   figureNode->SetData( figure );
 
   this->GetDataStorage()->Add( figureNode, m_SelectedImageNode );
@@ -361,6 +349,7 @@ void QmitkMeasurement::ActionDrawEllipseTriggered( bool  /*checked*/ )
   figure->SetGeometry2D( planeGeometry );
 
   mitk::DataTreeNode::Pointer figureNode = mitk::DataTreeNode::New();
+  figureNode->SetName(QString("ellipse%1").arg(++m_EllipseCounter).toStdString());
   figureNode->SetData( figure );
 
   this->GetDataStorage()->Add( figureNode, m_SelectedImageNode );
@@ -397,6 +386,7 @@ void QmitkMeasurement::ActionDrawPolygonTriggered( bool  /*checked*/ )
   figure->SetGeometry2D( planeGeometry );
 
   mitk::DataTreeNode::Pointer figureNode = mitk::DataTreeNode::New();
+  figureNode->SetName(QString("polygon%1").arg(++m_PolygonCounter).toStdString());
   figureNode->SetData( figure );
 
   this->GetDataStorage()->Add( figureNode, m_SelectedImageNode );
@@ -429,26 +419,76 @@ void QmitkMeasurement::ActionDrawTextTriggered( bool  /*checked*/ )
 
 void QmitkMeasurement::Visible()
 {
-
-
   this->GetActiveStdMultiWidget()->SetWidgetPlanesVisibility(false);
   this->GetActiveStdMultiWidget()->changeLayoutToWidget1();
-
-  if(m_MainWindow)
-  {
-    m_DrawActionsMainWindowToolBar->setVisible(true);
-  }
 }
 
 void QmitkMeasurement::Hidden()
 {
-
   this->GetActiveStdMultiWidget()->SetWidgetPlanesVisibility(true);
   this->GetActiveStdMultiWidget()->changeLayoutToDefault();
+}
 
-  if(m_MainWindow)
-  {
-    m_DrawActionsMainWindowToolBar->setVisible(false);
-  }
 
+void QmitkMeasurement::PlanarFigureTableModelRowsInserted( const QModelIndex & parent, int start, int end )
+{
+    m_PlanarFiguresTable->horizontalHeader()->resizeSections(QHeaderView::ResizeToContents);
+}
+
+void QmitkMeasurement::CopyToClipboard( bool checked /*= false */ )
+{
+    std::vector<mitk::DataTreeNode*> nodes = m_PlanarFiguresModel->GetNodeSet();
+    std::vector<QString> headerRow;
+    std::vector< std::vector<QString> > rows;
+    QString featureName;
+    QString featureQuantity;
+    std::vector<QString> newRow;
+    headerRow.push_back("Name");
+
+    for(std::vector<mitk::DataTreeNode*>::iterator it=nodes.begin(); it!=nodes.end(); ++it)
+    {
+      mitk::PlanarFigure* planarFigure = dynamic_cast<mitk::PlanarFigure*>((*it)->GetData());
+      if(!planarFigure)
+        continue;
+  
+      newRow.clear();
+      newRow.push_back(QString::fromStdString((*it)->GetName()));
+      newRow.resize(headerRow.size());
+      for(int i=0; i<planarFigure->GetNumberOfFeatures(); ++i)
+      {
+        featureName = planarFigure->GetFeatureName(i);
+        featureName.append(QString(" [%1]").arg(planarFigure->GetFeatureUnit(i)));
+        std::vector<QString>::iterator itColumn = std::find(headerRow.begin(), headerRow.end(), featureName);
+  
+        featureQuantity = QString("%1").arg(planarFigure->GetQuantity(i)).replace( QChar('.'), "," );
+        if(itColumn == headerRow.end())
+        {
+          headerRow.push_back(featureName);
+          newRow.push_back(featureQuantity);
+        }
+        else
+        {
+          newRow[std::distance(headerRow.begin(), itColumn)] = featureQuantity;
+        }
+
+      }    
+      rows.push_back(newRow);
+    }
+
+    QString clipboardText;
+    for(std::vector<QString>::iterator it=headerRow.begin(); it!=headerRow.end(); ++it)
+      clipboardText.append(QString("%1 \t").arg(*it));        
+
+    for(std::vector<std::vector<QString> >::iterator it=rows.begin(); it!=rows.end(); ++it)
+    {
+      clipboardText.append("\n");
+      for(std::vector<QString>::iterator it2=(*it).begin(); it2!=(*it).end(); ++it2)
+      {
+        clipboardText.append(QString("%1 \t").arg(*it2));    
+      }
+    }
+
+    QApplication::clipboard()->setText( clipboardText, QClipboard::Clipboard);
+
+  
 }

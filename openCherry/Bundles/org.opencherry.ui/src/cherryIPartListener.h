@@ -42,6 +42,22 @@ struct CHERRY_UI IPartListener : public virtual Object {
 
   struct Events {
 
+    enum Type {
+      NONE           = 0x00000000,
+      ACTIVATED      = 0x00000001,
+      BROUGHT_TO_TOP = 0x00000002,
+      CLOSED         = 0x00000004,
+      DEACTIVATED    = 0x00000008,
+      OPENED         = 0x00000010,
+      HIDDEN         = 0x00000020,
+      VISIBLE        = 0x00000040,
+      INPUT_CHANGED  = 0x00000080,
+
+      ALL            = 0xffffffff
+    };
+
+    CHERRY_DECLARE_FLAGS(Types, Type)
+
     typedef Message1<IWorkbenchPartReference::Pointer> PartEvent;
 
     PartEvent partActivated;
@@ -59,6 +75,8 @@ struct CHERRY_UI IPartListener : public virtual Object {
   private:
     typedef MessageDelegate1<IPartListener, IWorkbenchPartReference::Pointer> Delegate;
   };
+
+  virtual Events::Types GetPartEventTypes() const = 0;
 
     /**
      * Notifies this listener that the given part has been activated.
@@ -140,5 +158,7 @@ struct CHERRY_UI IPartListener : public virtual Object {
 };
 
 }  // namespace cherry
+
+CHERRY_DECLARE_OPERATORS_FOR_FLAGS(cherry::IPartListener::Events::Types)
 
 #endif /*CHERRYIPARTLISTENER_H_*/

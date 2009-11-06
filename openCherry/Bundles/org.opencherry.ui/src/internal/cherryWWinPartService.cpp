@@ -31,6 +31,11 @@ struct WWinListener: public IPartListener
   {
   }
 
+  Events::Types GetPartEventTypes() const
+  {
+    return Events::ALL;
+  }
+
   void PartActivated(IWorkbenchPartReference::Pointer  /*ref*/)
   {
     wwps->UpdateActivePart();

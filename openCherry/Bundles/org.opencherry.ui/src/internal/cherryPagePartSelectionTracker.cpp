@@ -31,6 +31,11 @@ public:
   : tracker(tracker)
   {}
 
+  Events::Types GetPartEventTypes() const
+  {
+    return Events::CLOSED | Events::OPENED;
+  }
+
   void PartClosed(IWorkbenchPartReference::Pointer partRef)
   {
     if (tracker->GetPartId(partRef->GetPart(false))

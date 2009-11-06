@@ -417,7 +417,7 @@ struct CHERRY_UI IWorkbenchPage : public IPartService, public ISelectionService,
    *
    * @return the input for this page, or <code>null</code> if none
    */
-  //virtual IAdaptable* GetInput();
+  virtual IAdaptable* GetInput() = 0;
 
   /**
    * Returns the page label. This will be a unique identifier within the

@@ -61,7 +61,7 @@ bool QtDisplay::InDisplayThread()
     char** argv;
     int& argc = Platform::GetRawApplicationArgs(argv);
 
-    QApplication* app = new QApplication(argc, argv);
+    QApplication* app = QApplication::instance() ? qApp : new QApplication(argc, argv);
 
     this->connect(this, SIGNAL(NewAsyncRunnable(Poco::Runnable*)), this, SLOT(ExecuteRunnable(Poco::Runnable*)));
     this->connect(this, SIGNAL(NewSyncRunnable(Poco::Runnable*)), this, SLOT(ExecuteRunnable(Poco::Runnable*)), Qt::BlockingQueuedConnection);

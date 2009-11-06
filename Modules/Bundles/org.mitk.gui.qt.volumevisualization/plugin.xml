@@ -12,4 +12,12 @@
       class="QmitkVolumeVisualizationView" 
       icon="resources/icon.xpm" />
   </extension>
+
+  <extension point="org.opencherry.ui.perspectives">
+     <perspective name="Volume Visualization"
+       class="mitkVolumeVisualizationPerspective"
+       id="org.mitk.extapp.volumevisualization">
+     </perspective>
+  </extension>
+
 </plugin>

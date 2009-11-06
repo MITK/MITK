@@ -31,7 +31,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkMetricParameters.h"
 
 #include "itkImageMaskSpatialObject.h"
-#include "mitkRigidRegistrationPreset.h"
+#include "mitkRigidRegistrationTestPreset.h"
 
 
 
@@ -115,7 +115,7 @@ namespace mitk
     itkSetMacro(FixedSchedule, itk::Array2D<unsigned int>);
     itkSetMacro(MovingSchedule, itk::Array2D<unsigned int>);
     itkSetMacro(MatchHistograms, bool);
-    itkGetMacro(Preset, mitk::RigidRegistrationPreset*);
+    itkGetMacro(Preset, mitk::RigidRegistrationTestPreset*);
     itkSetMacro(BlurFixedImage, bool);
     itkSetMacro(BlurMovingImage, bool);
    
@@ -142,7 +142,7 @@ namespace mitk
     MetricParameters::Pointer m_MetricParameters;
 
     std::vector<std::string> m_Presets;
-    mitk::RigidRegistrationPreset* m_Preset;
+    mitk::RigidRegistrationTestPreset* m_Preset;
     
     // Schedules
     itk::Array2D<unsigned int> m_FixedSchedule;

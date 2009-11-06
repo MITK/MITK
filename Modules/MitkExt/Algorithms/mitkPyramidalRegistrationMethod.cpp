@@ -30,7 +30,7 @@ namespace mitk {
     m_MovingMask = Image::New();
     m_FixedMask = Image::New();
 
-    m_Preset = new mitk::RigidRegistrationPreset();
+    m_Preset = new mitk::RigidRegistrationTestPreset();
 
     bool succeed = m_Preset->LoadPreset();
     if(!succeed)

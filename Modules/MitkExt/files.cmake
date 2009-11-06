@@ -48,6 +48,7 @@ SET(CPP_FILES
   Algorithms/mitkRegistrationBase.cpp
   Algorithms/mitkRigidRegistrationObserver.cpp
   Algorithms/mitkRigidRegistrationPreset.cpp
+  Algorithms/mitkRigidRegistrationTestPreset.cpp
   Algorithms/mitkSegmentationSink.cpp
   Algorithms/mitkShapeBasedInterpolationAlgorithm.cpp
   Algorithms/mitkShowSegmentationAsSurface.cpp

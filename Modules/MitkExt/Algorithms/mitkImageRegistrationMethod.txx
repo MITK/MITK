@@ -131,9 +131,18 @@ namespace mitk {
         itk::Array<double> zeroInitial;
         zeroInitial.set_size(transform->GetNumberOfParameters());
         zeroInitial.fill(0.0);
-        zeroInitial[0] = 1.0;
-        zeroInitial[4] = 1.0;
-        zeroInitial[8] = 1.0;
+        if (zeroInitial.size() >= 1)
+        {
+          zeroInitial[0] = 1.0;
+        }
+        if (zeroInitial.size() >= 5)
+        {
+          zeroInitial[4] = 1.0;
+        }
+        if (zeroInitial.size() >= 9)
+        {
+          zeroInitial[8] = 1.0;
+        }
         registration->SetInitialTransformParameters( zeroInitial );   
         optimizer->SetInitialPosition( zeroInitial );
         

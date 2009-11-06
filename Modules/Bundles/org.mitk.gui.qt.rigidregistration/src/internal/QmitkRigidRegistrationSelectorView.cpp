@@ -33,6 +33,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkLoadPresetDialog.h"
 #include <itkArray.h>
 #include "mitkRigidRegistrationPreset.h"
+#include "mitkRigidRegistrationTestPreset.h"
 
 #include "QmitkRigidRegistrationSelectorView.h"
 #include "mitkPyramidalRegistrationMethod.h"
@@ -65,6 +66,8 @@ m_GeometryWorldToItkPhysicalTransform(NULL), m_MovingGeometry(NULL), m_ImageGeom
 
   m_Preset = new mitk::RigidRegistrationPreset();
   m_Preset->LoadPreset();
+  m_TestPreset = new mitk::RigidRegistrationTestPreset();
+  m_TestPreset->LoadPreset();
 
   /// for optimizer
   QValidator* validatorLineEditInput = new QIntValidator(0, 20000000, this);
@@ -419,7 +422,7 @@ void QmitkRigidRegistrationSelectorView::CalculateTransformation(unsigned int ti
 
       // We need this information about the type of transform later in the SetOptimizerValue method
       // to see which type of transform we have to update in the moving image geometry.
-      mitk::RigidRegistrationPreset* preset = registration->GetPreset();
+      mitk::RigidRegistrationTestPreset* preset = registration->GetPreset();
       itk::Array<double> transformValues = preset->getTransformValues(presets[0]);  
       m_TransformParameters->SetTransform(transformValues[0]);
 
@@ -2239,7 +2242,26 @@ void QmitkRigidRegistrationSelectorView::SetSimplexDeltaVisible()
 
 void QmitkRigidRegistrationSelectorView::LoadRigidRegistrationParameter()
 {
-  std::map<std::string, itk::Array<double> > existingPresets = m_Preset->getTransformValuesPresets();
+  this->DoLoadRigidRegistrationParameter(false);
+}
+
+void QmitkRigidRegistrationSelectorView::LoadRigidRegistrationTestParameter()
+{
+  this->DoLoadRigidRegistrationParameter(true);
+}
+
+void QmitkRigidRegistrationSelectorView::DoLoadRigidRegistrationParameter(bool testPreset)
+{
+  std::map<std::string, itk::Array<double> > existingPresets;
+  if (testPreset)
+  {
+    existingPresets = m_TestPreset->getTransformValuesPresets(); 
+  }
+  else
+  {
+    existingPresets = m_Preset->getTransformValuesPresets();
+  }
+   
   std::map<std::string, itk::Array<double> >::iterator iter;
   std::list<std::string> presets;
   for( iter = existingPresets.begin(); iter != existingPresets.end(); iter++ ) 
@@ -2666,13 +2688,31 @@ void QmitkRigidRegistrationSelectorView::LoadRigidRegistrationParameter()
 
 void QmitkRigidRegistrationSelectorView::SaveRigidRegistrationParameter()
 {
+  this->DoSaveRigidRegistrationParameter(false);
+}
+
+void QmitkRigidRegistrationSelectorView::SaveRigidRegistrationTestParameter()
+{
+  this->DoSaveRigidRegistrationParameter(true);
+}
+
+void QmitkRigidRegistrationSelectorView::DoSaveRigidRegistrationParameter(bool testPreset)
+{
   bool ok;
   QString text = QInputDialog::getText(this, 
     "Save Parameter Preset", "Enter name for preset:", QLineEdit::Normal,
     QString::null, &ok );
   if ( ok )
   {
-    std::map<std::string, itk::Array<double> > existingPresets = m_Preset->getTransformValuesPresets();
+    std::map<std::string, itk::Array<double> > existingPresets;
+    if (testPreset)
+    {
+      existingPresets = m_TestPreset->getTransformValuesPresets();
+    }
+    else
+    {
+      existingPresets = m_Preset->getTransformValuesPresets();
+    }
     std::map<std::string, itk::Array<double> >::iterator iter = existingPresets.find(std::string((const char*)text.toLatin1()));
     if (iter != existingPresets.end())
     {
@@ -2914,7 +2954,15 @@ void QmitkRigidRegistrationSelectorView::SaveRigidRegistrationParameter()
       transformValues[10] = m_Controls.m_CenterForInitializerCenteredSimilarity2D->isChecked();
       transformValues[11] = m_Controls.m_MomentsCenteredSimilarity2D->isChecked();
     }
-    std::map<std::string, itk::Array<double> > transformMap = m_Preset->getTransformValuesPresets();
+    std::map<std::string, itk::Array<double> > transformMap;
+    if (testPreset)
+    {
+      transformMap = m_TestPreset->getTransformValuesPresets();
+    }
+    else
+    {
+      transformMap = m_Preset->getTransformValuesPresets();
+    }
     transformMap[std::string((const char*)text.toLatin1())] = transformValues;
 
     itk::Array<double> metricValues;
@@ -2962,7 +3010,15 @@ void QmitkRigidRegistrationSelectorView::SaveRigidRegistrationParameter()
       metricValues[7] = m_Controls.m_MovingSmootherVarianceMutualInformation->text().toFloat();
     }
 
-    std::map<std::string, itk::Array<double> > metricMap = m_Preset->getMetricValuesPresets();
+    std::map<std::string, itk::Array<double> > metricMap;
+    if (testPreset)
+    {
+      metricMap = m_TestPreset->getMetricValuesPresets();
+    }
+    else
+    {
+      metricMap = m_Preset->getMetricValuesPresets();
+    }
     metricMap[std::string((const char*)text.toLatin1())] = metricValues;
 
     itk::Array<double> optimizerValues;
@@ -3071,7 +3127,15 @@ void QmitkRigidRegistrationSelectorView::SaveRigidRegistrationParameter()
       optimizerValues[5] = m_Controls.m_IterationsVersorRigid3DTransform->text().toInt();*/
     }
 
-    std::map<std::string, itk::Array<double> > optimizerMap = m_Preset->getOptimizerValuesPresets();
+    std::map<std::string, itk::Array<double> > optimizerMap;
+    if (testPreset)
+    {
+      optimizerMap = m_TestPreset->getOptimizerValuesPresets();
+    }
+    else
+    {
+      optimizerMap = m_Preset->getOptimizerValuesPresets();
+    }
     optimizerMap[std::string((const char*)text.toLatin1())] = optimizerValues;
 
     itk::Array<double> interpolatorValues;
@@ -3079,10 +3143,25 @@ void QmitkRigidRegistrationSelectorView::SaveRigidRegistrationParameter()
     interpolatorValues.fill(0);
     interpolatorValues[0] = m_Controls.m_InterpolatorBox->currentIndex();
 
-    std::map<std::string, itk::Array<double> > interpolatorMap = m_Preset->getInterpolatorValuesPresets();
+    std::map<std::string, itk::Array<double> > interpolatorMap;
+    if (testPreset)
+    {
+      interpolatorMap = m_TestPreset->getInterpolatorValuesPresets();
+    }
+    else
+    {
+      interpolatorMap = m_Preset->getInterpolatorValuesPresets();
+    }
     interpolatorMap[std::string((const char*)text.toLatin1())] = interpolatorValues;
 
-    m_Preset->newPresets(transformMap, metricMap, optimizerMap, interpolatorMap);
+    if (testPreset)
+    {
+      m_TestPreset->newPresets(transformMap, metricMap, optimizerMap, interpolatorMap);
+    }
+    else
+    {
+      m_Preset->newPresets(transformMap, metricMap, optimizerMap, interpolatorMap);
+    }
   }
   else 
   {

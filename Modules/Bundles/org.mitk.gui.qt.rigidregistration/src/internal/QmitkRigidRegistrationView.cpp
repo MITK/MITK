@@ -222,6 +222,8 @@ void QmitkRigidRegistrationView::CreateConnections()
   connect(m_Controls.m_ZRotSlider, SIGNAL(valueChanged(int)), this, SLOT(zRot_valueChanged(int)));
   connect(m_Controls.m_LoadRigidRegistrationParameter, SIGNAL(clicked()), m_Controls.qmitkRigidRegistrationSelector1, SLOT(LoadRigidRegistrationParameter()));
   connect(m_Controls.m_SaveRigidRegistrationParameter, SIGNAL(clicked()), m_Controls.qmitkRigidRegistrationSelector1, SLOT(SaveRigidRegistrationParameter()));
+  connect(m_Controls.m_LoadRigidRegistrationTestParameter, SIGNAL(clicked()), m_Controls.qmitkRigidRegistrationSelector1, SLOT(LoadRigidRegistrationTestParameter()));
+  connect(m_Controls.m_SaveRigidRegistrationTestParameter, SIGNAL(clicked()), m_Controls.qmitkRigidRegistrationSelector1, SLOT(SaveRigidRegistrationTestParameter()));
   connect(m_Controls.qmitkRigidRegistrationSelector1,SIGNAL(OptimizerChanged(double)),this,SLOT(SetOptimizerValue( double )));
   connect(m_Controls.qmitkRigidRegistrationSelector1,SIGNAL(TransformChanged()),this,SLOT(CheckCalculateEnabled()));
   connect(m_Controls.qmitkRigidRegistrationSelector1,SIGNAL(AddNewTransformationToUndoList()),this,SLOT(AddNewTransformationToUndoList()));
@@ -795,12 +797,16 @@ void QmitkRigidRegistrationView::Calculate()
     m_Controls.qmitkRigidRegistrationSelector1->SetFixedMaskNode(NULL);
     m_Controls.qmitkRigidRegistrationSelector1->SetMovingMaskNode(NULL);
   }
-  m_Controls.frame4->setEnabled(false);
+  m_Controls.frame_2->setEnabled(false);
+  m_Controls.frame_3->setEnabled(false);
+  m_Controls.m_CalculateTransformation->setEnabled(false);
   m_Controls.m_StopOptimization->setEnabled(true);
   m_Controls.qmitkRigidRegistrationSelector1->CalculateTransformation(((QmitkSliderNavigatorWidget*)m_Controls.timeSlider)->GetPos());
   m_Controls.m_StopOptimization->setEnabled(false);
+  m_Controls.frame_2->setEnabled(true);
+  m_Controls.frame_3->setEnabled(true);
+  m_Controls.m_CalculateTransformation->setEnabled(true);
   m_Controls.qmitkRigidRegistrationSelector1->StopOptimization(false);
-  m_Controls.frame4->setEnabled(true);
 }
 
 void QmitkRigidRegistrationView::SetOptimizerValue( double value )

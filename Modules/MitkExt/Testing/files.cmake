@@ -11,6 +11,7 @@ SET(MODULE_TESTS
   mitkPlaneFitTest.cpp
   mitkPointLocatorTest.cpp
   # mitkRigidRegistrationPresetTest.cpp
+  # mitkRigidRegistrationTestPresetTest.cpp
   # mitkSegmentationInterpolationTest.cpp
   mitkSymmetricForcesDemonsRegistrationTest.cpp
   # mitkTestTemplate.cpp

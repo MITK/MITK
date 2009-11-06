@@ -60,7 +60,7 @@ namespace mitk {
       else
       {
         // Load presets and make a new optimizer if that succeeds
-        mitk::RigidRegistrationPreset *preset = new mitk::RigidRegistrationPreset();
+        mitk::RigidRegistrationTestPreset *preset = new mitk::RigidRegistrationTestPreset();
 
         if( preset->LoadPreset() )
         {          

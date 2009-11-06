@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkDataTreeNode.h"
 #include "mitkDataStorage.h"
 #include "ui_QmitkRigidRegistrationSelector.h"
+#include "mitkRigidRegistrationTestPreset.h"
 #include "qobject.h"
 #include "../RigidregistrationDll.h"
 
@@ -94,6 +95,10 @@ public:
     void SetSimplexDeltaVisible();
     void LoadRigidRegistrationParameter();
     void SaveRigidRegistrationParameter();
+    void LoadRigidRegistrationTestParameter();
+    void SaveRigidRegistrationTestParameter();
+    void DoLoadRigidRegistrationParameter(bool testPreset);
+    void DoSaveRigidRegistrationParameter(bool testPreset);
 
 protected:
 
@@ -109,6 +114,7 @@ protected:
   int m_MovingDimension;
   bool m_StopOptimization;
   mitk::RigidRegistrationPreset* m_Preset;
+  mitk::RigidRegistrationTestPreset* m_TestPreset;
   mitk::Geometry3D::TransformType::Pointer m_GeometryItkPhysicalToWorldTransform;
   mitk::Geometry3D::TransformType::Pointer m_GeometryWorldToItkPhysicalTransform;
   mitk::Geometry3D* m_MovingGeometry;

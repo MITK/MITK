@@ -51,12 +51,12 @@ namespace mitk {
     typedef typename itk::Image< unsigned char, VImageDimension >  MaskImageType;
     typedef typename itk::ImageMaskSpatialObject< VImageDimension > ImageMaskType;
 
-    ImageMaskType::Pointer movingImageMask;
+    typename ImageMaskType::Pointer movingImageMask;
     if(m_MovingMask.IsNotNull())
     {
       MovingImageType::Pointer movingMask = MovingImageType::New();
       mitk::CastToItkImage(m_MovingMask, movingMask); 
-      itk::CastImageFilter<MovingImageType, MaskImageType>::Pointer maskImageCaster = itk::CastImageFilter<MovingImageType, MaskImageType>::New();
+      typename itk::CastImageFilter<MovingImageType, MaskImageType>::Pointer maskImageCaster = itk::CastImageFilter<MovingImageType, MaskImageType>::New();
       maskImageCaster->SetInput(movingMask);
       try
       {
@@ -72,12 +72,12 @@ namespace mitk {
       movingImageMask->SetImage(maskImageCaster->GetOutput());		
     }
 
-    ImageMaskType::Pointer fixedImageMask;
+    typename ImageMaskType::Pointer fixedImageMask;
     if(m_FixedMask.IsNotNull())
     {
       FixedImageType::Pointer fixedMask = FixedImageType::New();  
       mitk::CastToItkImage(m_FixedMask, fixedMask); 
-      itk::CastImageFilter<FixedImageType, MaskImageType>::Pointer maskImageCaster = itk::CastImageFilter<FixedImageType, MaskImageType>::New();
+      typename itk::CastImageFilter<FixedImageType, MaskImageType>::Pointer maskImageCaster = itk::CastImageFilter<FixedImageType, MaskImageType>::New();
       maskImageCaster->SetInput(fixedMask);
       try
       {

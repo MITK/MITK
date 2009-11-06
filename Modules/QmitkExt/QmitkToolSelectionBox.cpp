@@ -300,6 +300,9 @@ void QmitkToolSelectionBox::SetGUIEnabledAccordingToToolManagerState()
                                                                                            << " isVisible() " << isVisible();
 
   bool enabled = true;
+  // Workaround for disabled tools
+  m_Enabled=true;
+  
   switch ( m_EnabledMode )
   {
     default:

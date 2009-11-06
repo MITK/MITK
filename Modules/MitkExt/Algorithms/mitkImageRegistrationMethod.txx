@@ -39,21 +39,63 @@ PURPOSE.  See the above copyright notices for more information.
 #include "itkNormalizeImageFilter.h"
 #include "itkDiscreteGaussianImageFilter.h"
 
-
-
-
 namespace mitk {
 
- 
   template<typename TPixel, unsigned int VImageDimension>
   void ImageRegistrationMethod::GenerateData2(itk::Image<TPixel, VImageDimension>* itkImage1)
   {    
-   
+
+    //convert mitk masks to itk masks
+    typedef typename itk::Image<TPixel, VImageDimension> FixedImageType;
+    typedef typename itk::Image<TPixel, VImageDimension> MovingImageType;      
+    typedef typename itk::Image< unsigned char, VImageDimension >  MaskImageType;
+    typedef typename itk::ImageMaskSpatialObject< VImageDimension > ImageMaskType;
+
+    ImageMaskType::Pointer movingImageMask;
+    if(m_MovingMask.IsNotNull())
+    {
+      MovingImageType::Pointer movingMask = MovingImageType::New();
+      mitk::CastToItkImage(m_MovingMask, movingMask); 
+      itk::CastImageFilter<MovingImageType, MaskImageType>::Pointer maskImageCaster = itk::CastImageFilter<MovingImageType, MaskImageType>::New();
+      maskImageCaster->SetInput(movingMask);
+      try
+      {
+        maskImageCaster->UpdateLargestPossibleRegion();
+      } 
+      catch ( itk::ExceptionObject & err ) 
+      {
+        std::cout<<"ExceptionObject caught";
+        std::cout<<err.GetDescription();
+        return;
+      }
+      movingImageMask = ImageMaskType::New();
+      movingImageMask->SetImage(maskImageCaster->GetOutput());		
+    }
+
+    ImageMaskType::Pointer fixedImageMask;
+    if(m_FixedMask.IsNotNull())
+    {
+      FixedImageType::Pointer fixedMask = FixedImageType::New();  
+      mitk::CastToItkImage(m_FixedMask, fixedMask); 
+      itk::CastImageFilter<FixedImageType, MaskImageType>::Pointer maskImageCaster = itk::CastImageFilter<FixedImageType, MaskImageType>::New();
+      maskImageCaster->SetInput(fixedMask);
+      try
+      {
+        maskImageCaster->UpdateLargestPossibleRegion();
+      } 
+      catch ( itk::ExceptionObject & err ) 
+      {
+        std::cout<<"ExceptionObject caught";			
+        std::cout<<err.GetDescription();
+        return;
+      }		
+      fixedImageMask = ImageMaskType::New();
+      fixedImageMask->SetImage(maskImageCaster->GetOutput());		
+    }	  
 
     if (m_MetricParameters->GetMetric() != mitk::MetricParameters::MUTUALINFORMATIONIMAGETOIMAGEMETRIC 
-    || m_MetricParameters->GetUseNormalizerAndSmootherMutualInformation() == false)
+      || m_MetricParameters->GetUseNormalizerAndSmootherMutualInformation() == false)
     {
-
       // typedefs
       typedef typename itk::Image<TPixel, VImageDimension> FixedImageType;
       typedef typename itk::Image<TPixel, VImageDimension> MovingImageType;
@@ -82,11 +124,11 @@ namespace mitk {
       // the metric
       typename MetricFactoryType::Pointer metFac = MetricFactoryType::New();
       metFac->SetMetricParameters(m_MetricParameters);
-      if(movingMask.IsNotNull() && fixedMask.IsNotNull() )
-      {
-        metFac->SetMovingImageMask(movingMask);
-  	    metFac->SetFixedImageMask(fixedMask);
-      }
+      MetricFactoryType::MetricPointer metric = metFac->GetMetric();
+      if(movingImageMask.IsNotNull())
+        metric->SetMovingImageMask(movingImageMask);
+      if(fixedImageMask.IsNotNull())
+        metric->SetFixedImageMask(fixedImageMask);
 
       // the transform
       typename TransformFactoryType::Pointer transFac = TransformFactoryType::New();
@@ -121,7 +163,7 @@ namespace mitk {
       registration->SetFixedImage(fixedImage);
       registration->SetMovingImage(movingImage);
       registration->SetFixedImageRegion(fixedImage->GetBufferedRegion());
-     
+
       if(transFac->GetTransformParameters()->GetInitialParameters().size())
       {
         registration->SetInitialTransformParameters( transFac->GetTransformParameters()->GetInitialParameters() );
@@ -145,7 +187,7 @@ namespace mitk {
         }
         registration->SetInitialTransformParameters( zeroInitial );   
         optimizer->SetInitialPosition( zeroInitial );
-        
+
       }
 
       if (m_Interpolator == LINEARINTERPOLATOR)
@@ -187,18 +229,16 @@ namespace mitk {
       {
         m_Observer->SetRemainingProgress(5);
       }
-      
     }
     else
     {
-
       // typedefs
       typedef   float     InternalPixelType;
       typedef itk::Image< InternalPixelType,  VImageDimension> InternalImageType;
       typedef typename itk::Image<TPixel, VImageDimension> FixedImageType;
       typedef typename itk::Image<TPixel, VImageDimension> MovingImageType;
       typedef typename itk::Image<InternalPixelType, VImageDimension> FixedMaskType;
-   	  typedef typename itk::Image<InternalPixelType, VImageDimension> MovingMaskType;
+      typedef typename itk::Image<InternalPixelType, VImageDimension> MovingMaskType;
       typedef typename itk::Transform<double, VImageDimension, VImageDimension> TransformType;
       typedef typename itk::LinearInterpolateImageFunction<InternalImageType, double> InterpolatorType;
       typedef itk::NearestNeighborInterpolateImageFunction<InternalImageType, double> InterpolatorType2;
@@ -216,7 +256,7 @@ namespace mitk {
       if(m_MovingMask.IsNotNull() && m_FixedMask.IsNotNull() )
       {
         mitk::CastToItkImage(m_MovingMask, movingMask); 
-  	    mitk::CastToItkImage(m_FixedMask, fixedMask);
+        mitk::CastToItkImage(m_FixedMask, fixedMask);
       }
 
       // normalize moving image
@@ -243,11 +283,11 @@ namespace mitk {
       // the metric
       typename MetricFactoryType::Pointer metFac = MetricFactoryType::New();
       metFac->SetMetricParameters(m_MetricParameters);
-      if(m_MovingMask.IsNotNull() && m_FixedMask.IsNotNull() )
-      {
-        metFac->SetMovingImageMask(movingMask);
-    	  metFac->SetFixedImageMask(fixedMask);
-      }
+      MetricFactoryType::MetricPointer metric = metFac->GetMetric();
+      if(movingImageMask.IsNotNull())
+        metric->SetMovingImageMask(movingImageMask);
+      if(fixedImageMask.IsNotNull())
+        metric->SetFixedImageMask(fixedImageMask);
 
       // the transform
       typename TransformFactoryType::Pointer transFac = TransformFactoryType::New();
@@ -324,13 +364,6 @@ namespace mitk {
       {
         m_Observer->SetRemainingProgress(5);
       }
-
-
     }
-     
-
   } 
-
-
-
 } // end namespace

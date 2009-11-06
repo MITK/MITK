@@ -76,10 +76,6 @@ namespace mitk {
       m_MetricParameters = metricParameters;
     }
 
-    void SetMovingImageMask( MovingImageType* movingMaskImage );
-    
-    void SetFixedImageMask( FixedImageType* fixedMaskImage );
-
     /**
     \brief Returns the instance to the metric parameters class which holds all parameters for the new metric.
     */

@@ -124,14 +124,11 @@ public:
   void HandleException( const char* str, QWidget* parent = NULL, bool showDialog = true ) const;
 
   // IPartListener
+  Events::Types GetPartEventTypes() const;
   virtual void PartActivated (cherry::IWorkbenchPartReference::Pointer partRef);
-  virtual void PartBroughtToTop (cherry::IWorkbenchPartReference::Pointer partRef);
   virtual void PartClosed (cherry::IWorkbenchPartReference::Pointer partRef);
-  virtual void PartDeactivated (cherry::IWorkbenchPartReference::Pointer partRef);
-  virtual void PartOpened (cherry::IWorkbenchPartReference::Pointer partRef);
   virtual void PartHidden (cherry::IWorkbenchPartReference::Pointer partRef);
   virtual void PartVisible (cherry::IWorkbenchPartReference::Pointer partRef);
-  virtual void PartInputChanged (cherry::IWorkbenchPartReference::Pointer partRef);
 
   // Convenient methods to set and reset a wait/busy cursor ("hourglass")
   void WaitCursorOn();

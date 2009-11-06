@@ -103,6 +103,11 @@ void QmitkStdMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
   }
 }
 
+cherry::IPartListener::Events::Types QmitkStdMultiWidgetEditor::GetPartEventTypes() const
+{
+  return Events::CLOSED | Events::HIDDEN | Events::VISIBLE;
+}
+
 void QmitkStdMultiWidgetEditor::PartClosed( cherry::IWorkbenchPartReference::Pointer partRef )
 {
   if (partRef->GetId() == QmitkStdMultiWidgetEditor::EDITOR_ID)

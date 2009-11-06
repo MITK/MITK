@@ -154,6 +154,11 @@ void QmitkFunctionality::StdMultiWidgetNotAvailable()
 {
 }
 
+cherry::IPartListener::Events::Types QmitkFunctionality::GetPartEventTypes() const
+{
+  return Events::ACTIVATED | Events::CLOSED | Events::HIDDEN | Events::VISIBLE;
+}
+
 void QmitkFunctionality::PartActivated( cherry::IWorkbenchPartReference::Pointer partRef )
 {
 
@@ -181,11 +186,6 @@ void QmitkFunctionality::PartActivated( cherry::IWorkbenchPartReference::Pointer
   }
 }
 
-void QmitkFunctionality::PartBroughtToTop( cherry::IWorkbenchPartReference::Pointer  /*partRef*/ )
-{
-
-}
-
 void QmitkFunctionality::PartClosed( cherry::IWorkbenchPartReference::Pointer partRef )
 {
   if (partRef->GetId() == QmitkStdMultiWidgetEditor::EDITOR_ID)
@@ -197,14 +197,6 @@ void QmitkFunctionality::PartClosed( cherry::IWorkbenchPartReference::Pointer pa
     if(this->GetActiveStdMultiWidget() == 0)
       this->StdMultiWidgetNotAvailable();
   }
-}
-
-void QmitkFunctionality::PartDeactivated( cherry::IWorkbenchPartReference::Pointer  /*partRef*/ )
-{
-}
-
-void QmitkFunctionality::PartOpened( cherry::IWorkbenchPartReference::Pointer  /*partRef*/ )
-{
 }
 
 void QmitkFunctionality::PartHidden( cherry::IWorkbenchPartReference::Pointer partRef )
@@ -221,10 +213,6 @@ void QmitkFunctionality::PartVisible( cherry::IWorkbenchPartReference::Pointer  
   {
     this->Visible();
   }
-}
-
-void QmitkFunctionality::PartInputChanged( cherry::IWorkbenchPartReference::Pointer  /*partRef*/ )
-{
 }
 
 void QmitkFunctionality::NodeAddedProxy( const mitk::DataTreeNode* node )

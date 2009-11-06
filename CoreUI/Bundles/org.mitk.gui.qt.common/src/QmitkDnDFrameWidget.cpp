@@ -1,5 +1,5 @@
 
-#include <internal/QmitkDnDFrameWidget.h>
+#include <QmitkDnDFrameWidget.h>
 #include <QtGui>
 
 

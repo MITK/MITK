@@ -20,6 +20,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QFileDialog>
 #include <mitkDataTreeNodeFactory.h>
 
+#include "mitkSceneIO.h"
+#include "mitkProgressBar.h"
+
 #include <mitkCoreObjectFactory.h>
 #include <mitkDataStorageEditorInput.h>
 #include <cherryIEditorPart.h>
@@ -76,25 +79,37 @@ void QmitkFileOpenAction::Run()
   for (QStringList::Iterator fileName = fileNames.begin();
     fileName != fileNames.end(); ++fileName)
   {
-    mitk::DataTreeNodeFactory::Pointer nodeReader = mitk::DataTreeNodeFactory::New();
-    try
+    if ( fileName->right(5) == ".mitk" ) 
     {
-      nodeReader->SetFileName(fileName->toStdString());
-      nodeReader->Update();
-      for ( unsigned int i = 0 ; i < nodeReader->GetNumberOfOutputs( ); ++i )
+      mitk::SceneIO::Pointer sceneIO = mitk::SceneIO::New();
+
+      bool clearDataStorageFirst(false);
+      mitk::ProgressBar::GetInstance()->AddStepsToDo(2);
+      dataStorage = sceneIO->LoadScene( fileName->toLocal8Bit().constData(), dataStorage, clearDataStorageFirst );
+      mitk::ProgressBar::GetInstance()->Progress(2);
+    }
+    else
+    {
+      mitk::DataTreeNodeFactory::Pointer nodeReader = mitk::DataTreeNodeFactory::New();
+      try
       {
-        mitk::DataTreeNode::Pointer node;
-        node = nodeReader->GetOutput(i);
-        if ( node->GetData() != NULL )
-        {  
-          dataStorage->Add(node);
-          dsmodified = true;
+        nodeReader->SetFileName(fileName->toStdString());
+        nodeReader->Update();
+        for ( unsigned int i = 0 ; i < nodeReader->GetNumberOfOutputs( ); ++i )
+        {
+          mitk::DataTreeNode::Pointer node;
+          node = nodeReader->GetOutput(i);
+          if ( node->GetData() != NULL )
+          {  
+            dataStorage->Add(node);
+            dsmodified = true;
+          }
         }
       }
-    }
-    catch(...)
-    {
+      catch(...)
+      {
 
+      }
     }
   }
   

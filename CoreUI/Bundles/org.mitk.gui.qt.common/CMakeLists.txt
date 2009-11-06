@@ -1,1 +1,1 @@
-MACRO_CREATE_MITK_PLUGIN(Qmitk)
+MACRO_CREATE_MITK_PLUGIN(Qmitk SceneSerialization)

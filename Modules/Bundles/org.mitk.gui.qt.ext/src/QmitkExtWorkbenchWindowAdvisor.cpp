@@ -36,6 +36,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <internal/cherryQtOpenPerspectiveAction.h>
 
 #include <QmitkFileOpenAction.h>
+#include <QmitkFileSaveProjectAction.h>
 #include <QmitkFileExitAction.h>
 #include <QmitkStatusBar.h>
 #include <QmitkProgressBar.h>
@@ -85,6 +86,7 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
   QMenu* fileMenu = menuBar->addMenu("&File");
 
   fileMenu->addAction(new QmitkFileOpenAction(window));
+  fileMenu->addAction(new QmitkFileSaveProjectAction(window));
   fileMenu->addSeparator();
   fileMenu->addAction(new QmitkFileExitAction(window));
 

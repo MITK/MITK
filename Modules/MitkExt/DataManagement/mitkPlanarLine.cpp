@@ -70,6 +70,11 @@ void mitk::PlanarLine::GeneratePolyLine()
   m_PolyLines->ElementAt( 0 )->ElementAt( 1 ) = m_ControlPoints->ElementAt( 1 );
 }
 
+void mitk::PlanarLine::GenerateHelperPolyLine(double mmPerDisplayUnit, unsigned int displayHeight)
+{
+  // A line does not require a helper object
+}
+
   
 void mitk::PlanarLine::EvaluateFeaturesInternal()
 {

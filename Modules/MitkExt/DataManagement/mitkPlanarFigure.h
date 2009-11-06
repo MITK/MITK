@@ -46,6 +46,7 @@ public:
 
   typedef itk::VectorContainer< unsigned long, mitk::Point2D > VertexContainerType;
   typedef itk::SmartPointerVectorContainer< unsigned long, VertexContainerType> VertexContainerVectorType;
+  typedef itk::VectorContainer< unsigned long, bool>  BoolContainerType;
 
 
   /** \brief True if the planar figure is closed. Must be implemented in
@@ -146,6 +147,9 @@ public:
    * (for rendering, measurements, etc.). */
   const VertexContainerType *GetPolyLine(unsigned int index);
 
+    /** \brief Returns the polyline that should be drawn the same size at every scale
+   * (for text, angles, etc.). */
+  const VertexContainerType *GetHelperPolyLine(unsigned int index, double mmPerDisplayUnit, unsigned int displayHeight);
 
   /** \brief Returns the number of features available for this PlanarFigure
    * (such as, radius, area, ...). */
@@ -187,6 +191,12 @@ public:
   /**  Returns the current number of polylines  */
   virtual unsigned short GetPolyLinesSize();
 
+  /**  Returns the current number of helperpolylines  */
+  virtual unsigned short GetHelperPolyLinesSize();
+
+  /**  Returns wether a helper polyline should be painted or not */
+  virtual bool IsHelperToBePainted(unsigned int index);
+
 protected:
   PlanarFigure();
   virtual ~PlanarFigure();
@@ -203,6 +213,10 @@ protected:
    * Must be implemented in sub-classes. */
   virtual void GeneratePolyLine() = 0;
 
+    /** \brief Generates the poly-lines that should be drawn the same size regardless of zoom.
+   * Must be implemented in sub-classes. */
+  virtual void GenerateHelperPolyLine(double mmPerDisplayUnit, unsigned int displayHeight) = 0;
+
   /** \brief Calculates quantities of all features of this planar figure.
    * Must be implemented in sub-classes. */
   virtual void EvaluateFeaturesInternal() = 0;
@@ -218,6 +232,7 @@ protected:
 
   VertexContainerVectorType::Pointer m_PolyLines;
   VertexContainerVectorType::Pointer m_HelperPolyLines;
+  BoolContainerType::Pointer         m_HelperPolyLinesToBePainted;
 
 
   bool m_FigurePlaced;

@@ -29,6 +29,7 @@ mitk::PlanarFigure::PlanarFigure()
   m_ControlPoints = VertexContainerType::New();
   m_PolyLines = VertexContainerVectorType::New();
   m_HelperPolyLines = VertexContainerVectorType::New();
+  m_HelperPolyLinesToBePainted = BoolContainerType::New();
 
   // Currently only single-time-step geometries are supported
   this->InitializeTimeSlicedGeometry( 1 );
@@ -218,6 +219,17 @@ mitk::PlanarFigure::GetPolyLine(unsigned int index)
 }
 
 
+const mitk::PlanarFigure::VertexContainerType *
+mitk::PlanarFigure::GetHelperPolyLine(unsigned int index, double mmPerDisplayUnit, unsigned int displayHeight)
+{
+  if ((m_HelperPolyLines->ElementAt( index )) && (m_HelperPolyLines->ElementAt( index )->GetMTime() < m_ControlPoints->GetMTime()) )
+  {
+    this->GenerateHelperPolyLine(mmPerDisplayUnit, displayHeight);
+  }
+
+  return m_HelperPolyLines->ElementAt( index );
+}
+
 /** \brief Returns the number of features available for this PlanarFigure
 * (such as, radius, area, ...). */
 unsigned int mitk::PlanarFigure::GetNumberOfFeatures() const
@@ -372,4 +384,14 @@ void mitk::PlanarFigure::PrintSelf( std::ostream& os, itk::Indent indent) const
 unsigned short mitk::PlanarFigure::GetPolyLinesSize()
 {
   return m_PolyLines->size();
+}
+
+unsigned short mitk::PlanarFigure::GetHelperPolyLinesSize()
+{
+  return m_HelperPolyLines->size();
+}
+
+bool mitk::PlanarFigure::IsHelperToBePainted(unsigned int index)
+{
+  return m_HelperPolyLinesToBePainted->GetElement( index );
 }

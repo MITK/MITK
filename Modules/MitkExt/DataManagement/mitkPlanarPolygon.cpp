@@ -73,6 +73,10 @@ void mitk::PlanarPolygon::GeneratePolyLine()
   }
 }
 
+void mitk::PlanarPolygon::GenerateHelperPolyLine(double mmPerDisplayUnit, unsigned int displayHeight)
+{
+  // A polygon does not require helper objects
+}
 
 void mitk::PlanarPolygon::EvaluateFeaturesInternal()
 {

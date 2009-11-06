@@ -58,6 +58,11 @@ void mitk::PlanarFourPointAngle::GeneratePolyLine()
   }
 }
 
+void mitk::PlanarFourPointAngle::GenerateHelperPolyLine(double mmPerDisplayUnit, unsigned int displayHeight)
+{
+  // Generate helper-poly-line for an four point angle
+  // Need to discuss a sensible implementation
+}
   
 void mitk::PlanarFourPointAngle::EvaluateFeaturesInternal()
 {
@@ -73,12 +78,6 @@ void mitk::PlanarFourPointAngle::EvaluateFeaturesInternal()
   v0.Normalize();
   v1.Normalize();
   double angle = acos( v0 * v1 );
-  /*
-  if (angle > 3.14159265358979323846) //pi ~ 3.14159265358979323846
-  {
-    if (
-    angle = acos( -1 * (v0 * v1) );
-  }*/
 
   this->SetQuantity( FEATURE_ID_ANGLE, angle );
 }

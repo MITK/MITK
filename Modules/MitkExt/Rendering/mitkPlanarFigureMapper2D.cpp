@@ -138,6 +138,33 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
   }
 
   glLineWidth( 1.0 );
+
+  // Draw helper objects
+  for(unsigned int loop = 0; loop < planarFigure->GetHelperPolyLinesSize(); ++loop)
+  {    
+    const VertexContainerType *polyLine = planarFigure->GetHelperPolyLine(loop, displayGeometry->GetScaleFactorMMPerDisplayUnit(), displayGeometry->GetDisplayHeight());
+    //Check if the current helper objects is to be painted
+    if ( !planarFigure->IsHelperToBePainted( loop ))
+    {
+      continue;
+    }
+    // Angles can be drawn open
+    glBegin( GL_LINE_STRIP ); 
+
+    for ( it = polyLine->Begin(); it != polyLine->End(); ++it )
+    {
+      // Draw this 2D point as OpenGL vertex
+
+      mitk::Point2D displayPoint;
+      this->TransformObjectToDisplay( it->Value(), displayPoint,
+        planarFigureGeometry2D, rendererGeometry2D, displayGeometry );
+
+      glVertex2f( displayPoint[0], displayPoint[1] );
+
+    }
+
+    glEnd();
+  }
 }
 
 void mitk::PlanarFigureMapper2D::TransformObjectToDisplay(

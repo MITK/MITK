@@ -82,6 +82,10 @@ void mitk::PlanarCircle::GeneratePolyLine()
   }
 }
 
+void mitk::PlanarCircle::GenerateHelperPolyLine(double mmPerDisplayUnit, unsigned int displayHeight)
+{
+  // A circle does not require a helper object
+}
 
 void mitk::PlanarCircle::EvaluateFeaturesInternal()
 {

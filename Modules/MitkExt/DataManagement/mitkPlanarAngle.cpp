@@ -26,6 +26,8 @@ mitk::PlanarAngle::PlanarAngle()
   // Start with two control points
   m_ControlPoints->Reserve( 2 );
   m_PolyLines->InsertElement( 0, VertexContainerType::New());
+  m_HelperPolyLines->InsertElement( 0, VertexContainerType::New());
+  m_HelperPolyLinesToBePainted->InsertElement( 0, false );
 }
 
 
@@ -69,6 +71,96 @@ void mitk::PlanarAngle::GeneratePolyLine()
   for ( unsigned int i = 0; i < m_ControlPoints->Size(); ++i )
   {
     m_PolyLines->ElementAt( 0 )->ElementAt( i ) = m_ControlPoints->ElementAt( i );
+  }
+}
+
+void mitk::PlanarAngle::GenerateHelperPolyLine(double mmPerDisplayUnit, unsigned int displayHeight)
+{
+  // Generate helper-poly-line for angle
+  if ( m_ControlPoints->Size() < 3)
+  {
+    m_HelperPolyLinesToBePainted->SetElement(0, false);
+    return; //We do not need to draw an angle as there are no two arms yet
+  }
+  m_HelperPolyLines->ElementAt( 0 )->Reserve( 3 );
+  const Point2D &centerPoint = m_ControlPoints->ElementAt( 1 );
+  const Point2D &boundaryPointOne = m_ControlPoints->ElementAt( 0 );
+  const Point2D &boundaryPointTwo = m_ControlPoints->ElementAt( 2 );
+
+  double radius = centerPoint.EuclideanDistanceTo( boundaryPointOne );
+  if ( radius > centerPoint.EuclideanDistanceTo( boundaryPointTwo ) )
+  {
+    radius = centerPoint.EuclideanDistanceTo( boundaryPointTwo );
+  }
+
+  //Fixed size radius depending on screen size for the angle
+  double nonScalingRadius = displayHeight * mmPerDisplayUnit * 0.05;
+
+  if (nonScalingRadius > radius)
+  {
+    m_HelperPolyLinesToBePainted->SetElement(0, false);
+    return; //if the arc has a radius that is longer than the shortest arm it should not be painted
+  }
+
+  m_HelperPolyLinesToBePainted->SetElement(0, true);
+  radius = nonScalingRadius;
+
+  double angle = this->GetQuantity( FEATURE_ID_ANGLE );
+
+  //Determine from which arm the angle should be drawn
+
+  Vector2D v0 = boundaryPointOne - centerPoint;
+  Vector2D v1 = boundaryPointTwo - centerPoint;
+  Vector2D v2;
+  v2[0] = 1.0;
+  v2[1] = 0.0;
+
+  v0[0] = v0[0] * cos( 0.001 ) - v0[1] * sin( 0.001 ); //rotate one arm a bit
+  v0[1] = v0[0] * sin( 0.001 ) + v0[1] * cos( 0.001 );
+  v0.Normalize();
+  v1.Normalize();
+  double testAngle = acos( v0 * v1 );
+  //if the rotated arm is closer to the other arm than before it is the one from which we start drawing
+  //else we start drawing from the other arm (we want to draw in the mathematically positive direction)
+  if( angle > testAngle )
+  {
+    v1[0] = v0[0] * cos( -0.001 ) - v0[1] * sin( -0.001 ); 
+    v1[1] = v0[0] * sin( -0.001 ) + v0[1] * cos( -0.001 );
+
+    //We determine if the arm is mathematically forward or backward
+    //assuming we rotate between -pi and pi
+    if ( acos( v0 * v2 ) > acos ( v1 * v2 ))
+    {
+      testAngle = acos( v1 * v2 );
+    }
+    else
+    {
+      testAngle = -acos( v1 * v2 );
+    }
+  }
+  else
+  {
+    v0[0] = v1[0] * cos( -0.001 ) - v1[1] * sin( -0.001 ); 
+    v0[1] = v1[0] * sin( -0.001 ) + v1[1] * cos( -0.001 );
+    //We determine if the arm is mathematically forward or backward
+    //assuming we rotate between -pi and pi
+    if ( acos( v0 * v2 ) < acos ( v1 * v2 ))
+    {
+      testAngle = acos( v1 * v2 );
+    }
+    else
+    {
+      testAngle = -acos( v1 * v2 );
+    }
+  }
+  // Generate poly-line with 16 segments
+  m_HelperPolyLines->ElementAt( 0 )->Reserve( 16 );
+  for ( int t = 0; t < 16; ++t )
+  {
+    double alpha = (double) t * angle / 15.0 + testAngle;
+
+    m_HelperPolyLines->ElementAt( 0 )->ElementAt( t )[0] = centerPoint[0] + radius * cos( alpha );
+    m_HelperPolyLines->ElementAt( 0 )->ElementAt( t )[1] = centerPoint[1] + radius * sin( alpha );
   }
 }
 

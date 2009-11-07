@@ -148,6 +148,19 @@ public:
 
   virtual Point ComputeSize(int wHint, int hHint, bool changed) = 0;
 
+  /**
+   * Returns the receiver's text, which is the string that the
+   * window manager will typically display as the receiver's title.
+   * If the text has not previously been set, returns an empty string.
+   *
+   * @return the text
+   */
+  virtual std::string GetText() const = 0;
+
+  /**
+   * Sets the receiver's text, which is the string that the window manager
+   * will typically display as the receiver's title, to the argument.
+   */
   virtual void SetText(const std::string& text) = 0;
 
   virtual bool IsVisible() = 0;

@@ -78,6 +78,11 @@ Point QtShell::ComputeSize(int  /*wHint*/, int  /*hHint*/, bool changed)
   return point;
 }
 
+std::string QtShell::GetText() const
+{
+  return widget->windowTitle().toStdString();
+}
+
 void QtShell::SetText(const std::string& text)
 {
   QString title(QString::fromStdString(text));

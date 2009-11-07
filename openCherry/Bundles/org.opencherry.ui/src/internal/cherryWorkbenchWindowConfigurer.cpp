@@ -81,23 +81,23 @@ std::string WorkbenchWindowConfigurer::BasicGetTitle()
 
 std::string WorkbenchWindowConfigurer::GetTitle()
 {
-//  Shell shell = window.getShell();
-//  if (shell != null)
-//  {
-//    // update the cached title
-//    windowTitle = shell.getText();
-//  }
+  Shell::Pointer shell = window.Lock()->GetShell();
+  if (shell)
+  {
+    // update the cached title
+    windowTitle = shell->GetText();
+  }
   return windowTitle;
 }
 
 void WorkbenchWindowConfigurer::SetTitle(const std::string& title)
 {
   windowTitle = title;
-//  Shell shell = window.getShell();
-//  if (shell != null && !shell.isDisposed())
-//  {
-//    shell.setText(TextProcessor.process(title, WorkbenchWindow.TEXT_DELIMITERS));
-//  }
+  Shell::Pointer shell = window.Lock()->GetShell();
+  if (shell)
+  {
+    shell->SetText(title);
+  }
 }
 
 bool WorkbenchWindowConfigurer::GetShowMenuBar()

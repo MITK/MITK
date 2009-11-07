@@ -34,7 +34,7 @@ cherry::WorkbenchWindowAdvisor*
 QmitkExtAppWorkbenchAdvisor::CreateWorkbenchWindowAdvisor(
         cherry::IWorkbenchWindowConfigurer::Pointer configurer)
 {
-  return new QmitkExtWorkbenchWindowAdvisor(configurer);
+  return new QmitkExtWorkbenchWindowAdvisor(this, configurer);
 }
 
 std::string QmitkExtAppWorkbenchAdvisor::GetInitialWindowPerspectiveId()

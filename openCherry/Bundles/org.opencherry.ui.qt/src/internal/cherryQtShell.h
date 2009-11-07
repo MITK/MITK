@@ -45,6 +45,7 @@ public:
 
   Point ComputeSize(int wHint, int hHint, bool changed);
 
+  std::string GetText() const;
   void SetText(const std::string& text);
 
   bool IsVisible();

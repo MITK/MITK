@@ -20,24 +20,66 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <cherryWorkbenchWindowAdvisor.h>
 
+#include <cherryIPartListener.h>
+#include <cherryIEditorPart.h>
+#include <cherryIWorkbenchPage.h>
+#include <cherryWorkbenchAdvisor.h>
+
 #include "mitkQtCommonExtDll.h"
 
 class MITK_QT_COMMON_EXT_EXPORT QmitkExtWorkbenchWindowAdvisor : public cherry::WorkbenchWindowAdvisor
 {
 public:
 
-    QmitkExtWorkbenchWindowAdvisor(cherry::IWorkbenchWindowConfigurer::Pointer configurer);
+    QmitkExtWorkbenchWindowAdvisor(cherry::WorkbenchAdvisor* wbAdvisor,
+        cherry::IWorkbenchWindowConfigurer::Pointer configurer);
 
     cherry::ActionBarAdvisor::Pointer CreateActionBarAdvisor(
         cherry::IActionBarConfigurer::Pointer configurer);
 
     void PostWindowCreate();
 
+    void PreWindowOpen();
+
     void ShowViewToolbar(bool show);
 
 private:
 
-    bool showViewToolbar;
+  /**
+   * Hooks the listeners needed on the window
+   *
+   * @param configurer
+   */
+  void HookTitleUpdateListeners(cherry::IWorkbenchWindowConfigurer::Pointer configurer);
+
+  std::string ComputeTitle();
+
+  void RecomputeTitle();
+
+  /**
+   * Updates the window title. Format will be: [pageInput -]
+   * [currentPerspective -] [editorInput -] [workspaceLocation -] productName
+   * @param editorHidden TODO
+   */
+  void UpdateTitle(bool editorHidden);
+
+  void PropertyChange(cherry::Object::Pointer source, int propId);
+
+  cherry::IPartListener::Pointer titlePartListener;
+  cherry::IPerspectiveListener::Pointer titlePerspectiveListener;
+  cherry::IPropertyChangeListener::Pointer editorPropertyListener;
+  friend class cherry::PropertyChangeIntAdapter<QmitkExtWorkbenchWindowAdvisor>;
+  friend class PartListenerForTitle;
+  friend class PerspectiveListenerForTitle;
+
+  cherry::IEditorPart::WeakPtr lastActiveEditor;
+  cherry::IPerspectiveDescriptor::WeakPtr lastPerspective;
+  cherry::IWorkbenchPage::WeakPtr lastActivePage;
+  std::string lastEditorTitle;
+  cherry::IAdaptable* lastInput;
+
+  cherry::WorkbenchAdvisor* wbAdvisor;
+  bool showViewToolbar;
 };
 
 #endif /*QMITKEXTWORKBENCHWINDOWADVISOR_H_*/

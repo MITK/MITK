@@ -41,6 +41,7 @@ SET(MODULE_TESTS
   mitkTransitionTest.cpp
   mitkUndoControllerTest.cpp
   mitkVtkWidgetRenderingTest.cpp
+  mitkWeakPointerTest.cpp
   mitkTransferFunctionTest.cpp
   #mitkAbstractTransformGeometryTest.cpp
   #mitkPicFileIOTest.cpp

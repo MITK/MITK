@@ -71,7 +71,8 @@ public:
 
   /** Constructor to pointer p.  */
   WeakPointer (ObjectType *p)
-    : m_DeleteObserverTag(0),
+    : m_DeleteObserverTag(-1),
+      m_ModifiedObserverTag(-1),
       m_Pointer(p) 
   {
     this->AddDeleteAndModifiedObserver();
@@ -157,7 +158,7 @@ public:
   ///
   void OnObjectDelete( const itk::Object *caller, const itk::EventObject & )
   {
-    // do not unsubsribe from this object. this would invalidate the itterator of the
+    // do not unsubscribe from this object. this would invalidate the iterator of the
     // event listener vector (in itk::Object) and would lead to a crash
     // instead: do nothing->object is going to be dead soon...
     //this->RemoveDeleteAndModifiedObserver();
@@ -207,7 +208,7 @@ private:
   long m_DeleteObserverTag;
   long m_ModifiedObserverTag;
 
-  /** The pointer to the object referrred to by this smart pointer. */
+  /** The pointer to the object referred to by this smart pointer. */
   ObjectType* m_Pointer;
 };
 

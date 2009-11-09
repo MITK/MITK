@@ -925,7 +925,7 @@ void QmitkSegmentationView::ApplyDisplayOptions(mitk::DataTreeNode* node)
   node->SetProperty( "outline binary", mitk::BoolProperty::New( m_ShowSegmentationsAsOutline ) );
   node->SetProperty( "outline width", mitk::FloatProperty::New( 2.0 ) );
   node->SetProperty( "opacity", mitk::FloatProperty::New( m_ShowSegmentationsAsOutline ? 1.0 : 0.3 ) );
-  node->SetProperty( "volumerendering", mitk::BoolProperty::New( m_ShowSegmentationsAsOutline ) );
+  node->SetProperty( "volumerendering", mitk::BoolProperty::New( m_ShowSegmentationsAsVolumeRendering ) );
 }
 
 void QmitkSegmentationView::OnPreferencesChanged(const cherry::ICherryPreferences* prefs )

@@ -27,8 +27,9 @@ class QWidget;
 class QCheckBox;
 class QRadioButton;
 
-class MITK_QT_SEGMENTATION QmitkSegmentationPreferencePage : public cherry::IQtPreferencePage
+class MITK_QT_SEGMENTATION QmitkSegmentationPreferencePage : public QObject, public cherry::IQtPreferencePage
 {
+  Q_OBJECT
 
 public:
 
@@ -55,12 +56,18 @@ public:
   ///
   virtual void Update();
 
+protected slots:
+
+  void OnVolumeRenderingCheckboxChecked(int);
+
 protected:
 
   QWidget* m_MainControl;
   QRadioButton* m_RadioOutline;
   QRadioButton* m_RadioOverlay;
   QCheckBox* m_VolumeRenderingCheckBox;
+
+  bool m_Initializing;
 
   cherry::IPreferences::Pointer m_SegmentationPreferencesNode;
 };

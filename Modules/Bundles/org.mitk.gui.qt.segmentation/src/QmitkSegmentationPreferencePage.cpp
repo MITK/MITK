@@ -23,12 +23,14 @@
 #include <QCheckBox>
 #include <QGroupBox>
 #include <QRadioButton>
+#include <QMessageBox>
 
 #include <cherryIPreferencesService.h>
 #include <cherryPlatform.h>
 
 QmitkSegmentationPreferencePage::QmitkSegmentationPreferencePage()
 : m_MainControl(0)
+, m_Initializing(false)
 {
 
 }
@@ -40,6 +42,7 @@ void QmitkSegmentationPreferencePage::Init(cherry::IWorkbench::Pointer )
 
 void QmitkSegmentationPreferencePage::CreateQtControl(QWidget* parent)
 {
+  m_Initializing = true;
   cherry::IPreferencesService::Pointer prefService 
     = cherry::Platform::GetServiceRegistry()
     .GetServiceById<cherry::IPreferencesService>(cherry::IPreferencesService::ID);
@@ -59,9 +62,11 @@ void QmitkSegmentationPreferencePage::CreateQtControl(QWidget* parent)
 
   m_VolumeRenderingCheckBox = new QCheckBox( "Show as volume rendering", m_MainControl );
   formLayout->addRow( "3D display", m_VolumeRenderingCheckBox );
+  connect( m_VolumeRenderingCheckBox, SIGNAL(stateChanged(int)), this, SLOT(OnVolumeRenderingCheckboxChecked(int)) );
   
   m_MainControl->setLayout(formLayout);
   this->Update();
+  m_Initializing = false;
 }
 
 QWidget* QmitkSegmentationPreferencePage::GetQtControl() const
@@ -96,3 +101,15 @@ void QmitkSegmentationPreferencePage::Update()
   m_VolumeRenderingCheckBox->setChecked( m_SegmentationPreferencesNode->GetBool("volume rendering", true) );
 }
 
+void QmitkSegmentationPreferencePage::OnVolumeRenderingCheckboxChecked(int state)
+{
+  if (m_Initializing) return;
+
+  if ( state != Qt::Unchecked )
+  {
+    QMessageBox::information(NULL,
+                             "Memory warning", 
+                             "Turning on volume rendering of segmentations will make the application more memory intensive (and potentially prone to crashes).\n\n"
+                             "If you encounter out-of-memory problems, try turning off volume rendering again.");
+  }
+}

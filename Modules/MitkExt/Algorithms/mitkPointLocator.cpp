@@ -112,6 +112,39 @@ void mitk::PointLocator::SetPoints( mitk::PointSet* points )
 }
 
 
+void mitk::PointLocator::SetPoints( ITKPointSet* pointSet )
+{
+  if ( pointSet == NULL )
+  {
+    itkWarningMacro("Points are NULL!");  
+    return;
+  }
+  //itk::PointType::PointsContainer* points = pointSet->GetPoints();
+
+  size_t size = pointSet->GetNumberOfPoints();
+  if ( m_ANNDataPoints != NULL )
+    delete[] m_ANNDataPoints;
+  m_ANNDataPoints = annAllocPts( size, m_ANNDimension );
+  m_IndexToPointIdContainer.clear();
+  m_IndexToPointIdContainer.resize( size );
+  size_t counter = 0;
+  ITKPointSet::PointsContainerConstPointer pointsContainer = pointSet->GetPoints();
+  ITKPointSet::PointsContainer::ConstIterator it;    
+  ITKPointSet::PointType currentPoint;
+  ITKPointSet::PointsContainer::ElementIdentifier currentId;
+  for( it = pointsContainer->Begin(); it != pointsContainer->End(); ++it, ++counter )
+  {
+    currentPoint = it->Value();
+    currentId = it->Index();
+    (m_ANNDataPoints[counter])[0] = currentPoint[0];
+    (m_ANNDataPoints[counter])[1] = currentPoint[1];
+    (m_ANNDataPoints[counter])[2] = currentPoint[2];
+    m_IndexToPointIdContainer[counter] = currentId;
+  }
+  InitANN();
+}
+
+
 
 mitk::PointLocator::IdType mitk::PointLocator::FindClosestPoint( const vtkFloatingPointType point[3] )
 {

@@ -52,6 +52,7 @@ public:
   
   typedef int IdType;
   typedef float DistanceType;
+  typedef itk::PointSet<DistanceType, 3>  ITKPointSet;
 
   /**
    * Sets the point which will be used for nearest-neighbour searches. Note
@@ -66,6 +67,14 @@ public:
    * @param points the point set containing points for nearest neighbours searches.
    */
   void SetPoints( mitk::PointSet* points );
+
+  /**
+  * Sets the point which will be used for nearest-neighbour searches. Note
+  * there must be at least one point in the point set.
+  * @param points the point set containing points for nearest neighbours searches.
+  */
+  void SetPoints( ITKPointSet* pointSet );
+
   
   /**
    * Finds the nearest neighbour in the point set previously defined by SetPoints().

@@ -19,7 +19,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <cherryIViewPart.h>
 #include "src/internal/QmitkSegmentationView.h"
-#include "src/internal/QmitkSegmentationPerspective.h"
 #include "src/QmitkSegmentationPreferencePage.h"
 
 
@@ -31,6 +30,3 @@ POCO_BEGIN_NAMED_MANIFEST(cherryIPreferencePage, cherry::IPreferencePage)
   POCO_EXPORT_CLASS(QmitkSegmentationPreferencePage)
 POCO_END_MANIFEST
 
-POCO_BEGIN_NAMED_MANIFEST(cherryIPerspectiveFactory, cherry::IPerspectiveFactory)
-  POCO_EXPORT_CLASS(QmitkSegmentationPerspective)
-POCO_END_MANIFEST

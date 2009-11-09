@@ -24,8 +24,4 @@
     <keyword id="org.mitk.gui.qt.application.SegmentationPreferencePageKeywords" label="data manager"></keyword>
   </extension>
 
-  <extension point="org.opencherry.ui.perspectives">
-  <perspective id="org.mitk.extapp.segmentationperspective" name="Segmentation" class="QmitkSegmentationPerspective" icon="resources/segmentation.png" />
-  </extension>
- 
 </plugin>

@@ -4,7 +4,6 @@ SET(SRC_CPP_FILES
 
 SET(INTERNAL_CPP_FILES
   QmitkVolumeVisualizationView.cpp
-  mitkVolumeVisualizationPerspective.cpp
 
 )
 

@@ -57,9 +57,12 @@ void EditorIntroAdapterPart::CreatePartControl(void* parent)
 EditorIntroAdapterPart::~EditorIntroAdapterPart()
 {
   //setBarVisibility(true);
-  introPart->RemovePropertyListener(propChangeListener);
-  GetSite()->GetWorkbenchWindow()->GetWorkbench()->GetIntroManager()->CloseIntro(
+  if(introPart)
+  {
+    introPart->RemovePropertyListener(propChangeListener);
+    GetSite()->GetWorkbenchWindow()->GetWorkbench()->GetIntroManager()->CloseIntro(
       introPart);
+  }
 }
 
 void* EditorIntroAdapterPart::GetTitleImage()

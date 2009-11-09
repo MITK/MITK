@@ -407,10 +407,13 @@ void QmitkStdMultiWidget::RemovePlanesFromDataStorage()
 {
   if (m_PlaneNode1.IsNotNull() && m_PlaneNode2.IsNotNull() && m_PlaneNode3.IsNotNull() && m_Node.IsNotNull())
   {
-    m_DataStorage->Remove(m_PlaneNode1);
-    m_DataStorage->Remove(m_PlaneNode2);
-    m_DataStorage->Remove(m_PlaneNode3);
-    m_DataStorage->Remove(m_Node);
+    if(m_DataStorage.IsNotNull())
+    {
+      m_DataStorage->Remove(m_PlaneNode1);
+      m_DataStorage->Remove(m_PlaneNode2);
+      m_DataStorage->Remove(m_PlaneNode3);
+      m_DataStorage->Remove(m_Node);
+    }
   }
 }
 

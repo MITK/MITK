@@ -29,6 +29,18 @@ QmitkDataStorageComboBox::QmitkDataStorageComboBox( mitk::DataStorage* _DataStor
 
 QmitkDataStorageComboBox::~QmitkDataStorageComboBox()
 {
+  // if there was an old storage, remove listeners
+  if(m_DataStorage.IsNotNull())
+  {
+    this->m_DataStorage->AddNodeEvent.RemoveListener( mitk::MessageDelegate1<QmitkDataStorageComboBox
+      , const mitk::DataTreeNode*>( this, &QmitkDataStorageComboBox::AddNode ) );
+
+    this->m_DataStorage->RemoveNodeEvent.RemoveListener( mitk::MessageDelegate1<QmitkDataStorageComboBox
+      , const mitk::DataTreeNode*>( this, &QmitkDataStorageComboBox::RemoveNode ) );
+  }
+  //we have lots of observers to nodes and their name properties, this get's ugly if nodes live longer than the box
+  while(m_Nodes.size() > 0)
+    RemoveNode(0);
 }
 
 //#PUBLIC GETTER

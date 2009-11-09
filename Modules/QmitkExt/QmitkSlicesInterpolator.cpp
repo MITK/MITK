@@ -173,12 +173,14 @@ void QmitkSlicesInterpolator::Initialize(mitk::ToolManager* toolManager, QmitkSt
       {
       itk::MemberCommand<QmitkSlicesInterpolator>::Pointer command = itk::MemberCommand<QmitkSlicesInterpolator>::New();
       command->SetCallbackFunction( this, &QmitkSlicesInterpolator::OnTransversalTimeChanged );
+      slicer->RemoveObserver(TTimeObserverTag);
       TTimeObserverTag = slicer->AddObserver( mitk::SliceNavigationController::GeometryTimeEvent(NULL, 0), command );
       }
 
       {
       itk::ReceptorMemberCommand<QmitkSlicesInterpolator>::Pointer command = itk::ReceptorMemberCommand<QmitkSlicesInterpolator>::New();
       command->SetCallbackFunction( this, &QmitkSlicesInterpolator::OnTransversalSliceChanged );
+      slicer->RemoveObserver(TSliceObserverTag);
       TSliceObserverTag = slicer->AddObserver( mitk::SliceNavigationController::GeometrySliceEvent(NULL, 0), command );
       }
 
@@ -188,12 +190,14 @@ void QmitkSlicesInterpolator::Initialize(mitk::ToolManager* toolManager, QmitkSt
       {
       itk::MemberCommand<QmitkSlicesInterpolator>::Pointer command = itk::MemberCommand<QmitkSlicesInterpolator>::New();
       command->SetCallbackFunction( this, &QmitkSlicesInterpolator::OnSagittalTimeChanged );
+      slicer->RemoveObserver(STimeObserverTag);
       STimeObserverTag = slicer->AddObserver( mitk::SliceNavigationController::GeometryTimeEvent(NULL, 0), command );
       }
 
       {
       itk::ReceptorMemberCommand<QmitkSlicesInterpolator>::Pointer command = itk::ReceptorMemberCommand<QmitkSlicesInterpolator>::New();
       command->SetCallbackFunction( this, &QmitkSlicesInterpolator::OnSagittalSliceChanged );
+      slicer->RemoveObserver(SSliceObserverTag);
       SSliceObserverTag = slicer->AddObserver( mitk::SliceNavigationController::GeometrySliceEvent(NULL, 0), command );
       }
 
@@ -203,12 +207,14 @@ void QmitkSlicesInterpolator::Initialize(mitk::ToolManager* toolManager, QmitkSt
       {
       itk::MemberCommand<QmitkSlicesInterpolator>::Pointer command = itk::MemberCommand<QmitkSlicesInterpolator>::New();
       command->SetCallbackFunction( this, &QmitkSlicesInterpolator::OnFrontalTimeChanged );
+      slicer->RemoveObserver(FTimeObserverTag);
       FTimeObserverTag = slicer->AddObserver( mitk::SliceNavigationController::GeometryTimeEvent(NULL, 0), command );
       }
 
       {
       itk::ReceptorMemberCommand<QmitkSlicesInterpolator>::Pointer command = itk::ReceptorMemberCommand<QmitkSlicesInterpolator>::New();
       command->SetCallbackFunction( this, &QmitkSlicesInterpolator::OnFrontalSliceChanged );
+      slicer->RemoveObserver(FSliceObserverTag);
       FSliceObserverTag = slicer->AddObserver( mitk::SliceNavigationController::GeometrySliceEvent(NULL, 0), command );
       }
     }
@@ -218,7 +224,29 @@ void QmitkSlicesInterpolator::Initialize(mitk::ToolManager* toolManager, QmitkSt
 }
 
 QmitkSlicesInterpolator::~QmitkSlicesInterpolator()
-{
+{ 
+  if (m_MultiWidget)
+  {
+    mitk::SliceNavigationController* slicer;
+    if(m_MultiWidget->mitkWidget1 != NULL)
+    {
+      slicer = m_MultiWidget->mitkWidget1->GetSliceNavigationController();
+      slicer->RemoveObserver( TSliceObserverTag );
+      slicer->RemoveObserver( TTimeObserverTag );
+    }
+    if(m_MultiWidget->mitkWidget2 != NULL)
+    {
+      slicer = m_MultiWidget->mitkWidget2->GetSliceNavigationController();
+      slicer->RemoveObserver( SSliceObserverTag );
+      slicer->RemoveObserver( STimeObserverTag );
+    }
+    if(m_MultiWidget->mitkWidget3 != NULL)
+    {
+      slicer = m_MultiWidget->mitkWidget3->GetSliceNavigationController();
+      slicer->RemoveObserver( FSliceObserverTag );
+      slicer->RemoveObserver( FTimeObserverTag );
+    }
+  }
 }
 
 void QmitkSlicesInterpolator::OnToolManagerWorkingDataModified()
@@ -314,7 +342,7 @@ bool QmitkSlicesInterpolator::TranslateAndInterpolateChangedSlice(const itk::Eve
     const mitk::SliceNavigationController::GeometrySliceEvent& event = dynamic_cast<const mitk::SliceNavigationController::GeometrySliceEvent&>(e);
 
     mitk::TimeSlicedGeometry* tsg = event.GetTimeSlicedGeometry();
-    if (tsg)
+    if (tsg && m_TimeStep.size() > windowID)
     {
       mitk::SlicedGeometry3D* slicedGeometry = dynamic_cast<mitk::SlicedGeometry3D*>(tsg->GetGeometry3D(m_TimeStep[windowID]));
       if (slicedGeometry)
@@ -322,7 +350,7 @@ bool QmitkSlicesInterpolator::TranslateAndInterpolateChangedSlice(const itk::Eve
         mitk::PlaneGeometry* plane = dynamic_cast<mitk::PlaneGeometry*>(slicedGeometry->GetGeometry2D( event.GetPos() ));
         Interpolate( plane, m_TimeStep[windowID] );
         return true;
-      }
+      }    
     }
   }
   catch(std::bad_cast)

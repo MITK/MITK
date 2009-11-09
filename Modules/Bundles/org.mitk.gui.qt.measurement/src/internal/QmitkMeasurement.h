@@ -38,6 +38,7 @@ class QToolBar;
 class QLabel;
 class QTableView;
 
+
 /*!
 \brief Measurement
 Allows to measure distances, angles, etc.

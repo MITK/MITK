@@ -221,6 +221,22 @@ bool mitk::PlanarFigureInteractor
 
   case AcADD:
     {
+      // Use Geometry2D of the renderer clicked on for this PlanarFigure
+      mitk::PlaneGeometry *planeGeometry = const_cast< mitk::PlaneGeometry * >(
+        dynamic_cast< const mitk::PlaneGeometry * >(
+          renderer->GetSliceNavigationController()->GetCurrentPlaneGeometry() ) );
+      if ( planeGeometry != NULL )
+      {
+        LOG_INFO << "SETTING PLANEGEOMETRY";
+        planarFigureGeometry = planeGeometry;
+        planarFigure->SetGeometry2D( planeGeometry );
+      }
+      else
+      {
+        ok = false;
+        break;
+      }
+
       // Extract point in 2D index coordinates (relative to Geometry2D of
       // PlanarFigure)
       Point2D indexPoint2D;

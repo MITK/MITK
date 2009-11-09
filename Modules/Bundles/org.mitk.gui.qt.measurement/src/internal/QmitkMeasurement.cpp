@@ -231,11 +231,7 @@ void QmitkMeasurement::ActionDrawLineTriggered( bool  /*checked*/ )
     return;
   }
 
-  mitk::PlaneGeometry *planeGeometry = const_cast< mitk::PlaneGeometry * >(
-    this->GetActiveStdMultiWidget()->GetRenderWindow1()->GetSliceNavigationController()->GetCurrentPlaneGeometry() );
-
   mitk::PlanarLine::Pointer figure = mitk::PlanarLine::New();
-  figure->SetGeometry2D( planeGeometry );
 
   mitk::DataTreeNode::Pointer figureNode = mitk::DataTreeNode::New();
   figureNode->SetName(QString("line%1").arg(++m_LineCounter).toStdString());
@@ -259,12 +255,8 @@ void QmitkMeasurement::ActionDrawPathTriggered( bool  /*checked*/ )
     return;
   }
 
-  mitk::PlaneGeometry *planeGeometry = const_cast< mitk::PlaneGeometry * >(
-    this->GetActiveStdMultiWidget()->GetRenderWindow1()->GetSliceNavigationController()->GetCurrentPlaneGeometry() );
-
   mitk::PlanarPolygon::Pointer figure = mitk::PlanarPolygon::New();
   figure->ClosedOff();
-  figure->SetGeometry2D( planeGeometry );
 
   mitk::DataTreeNode::Pointer figureNode = mitk::DataTreeNode::New();
   figureNode->SetName(QString("path%1").arg(++m_PathCounter).toStdString());
@@ -288,11 +280,7 @@ void QmitkMeasurement::ActionDrawAngleTriggered( bool  /*checked*/ )
     return;
   }
 
-  mitk::PlaneGeometry *planeGeometry = const_cast< mitk::PlaneGeometry * >(
-    this->GetActiveStdMultiWidget()->GetRenderWindow1()->GetSliceNavigationController()->GetCurrentPlaneGeometry() );
-
   mitk::PlanarAngle::Pointer figure = mitk::PlanarAngle::New();
-  figure->SetGeometry2D( planeGeometry );
 
   mitk::DataTreeNode::Pointer figureNode = mitk::DataTreeNode::New();
   figureNode->SetName(QString("angle%1").arg(++m_AngleCounter).toStdString());
@@ -315,11 +303,7 @@ void QmitkMeasurement::ActionDrawFourPointAngleTriggered( bool  /*checked*/ )
   {
     return;
   }
-  mitk::PlaneGeometry *planeGeometry = const_cast< mitk::PlaneGeometry * >(
-    this->GetActiveStdMultiWidget()->GetRenderWindow1()->GetSliceNavigationController()->GetCurrentPlaneGeometry() );
-
   mitk::PlanarFourPointAngle::Pointer figure = mitk::PlanarFourPointAngle::New();
-  figure->SetGeometry2D( planeGeometry );
 
   mitk::DataTreeNode::Pointer figureNode = mitk::DataTreeNode::New();
   figureNode->SetData( figure );
@@ -342,11 +326,7 @@ void QmitkMeasurement::ActionDrawEllipseTriggered( bool  /*checked*/ )
     return;
   }
 
-  mitk::PlaneGeometry *planeGeometry = const_cast< mitk::PlaneGeometry * >(
-    this->GetActiveStdMultiWidget()->GetRenderWindow1()->GetSliceNavigationController()->GetCurrentPlaneGeometry() );
-
   mitk::PlanarCircle::Pointer figure = mitk::PlanarCircle::New();
-  figure->SetGeometry2D( planeGeometry );
 
   mitk::DataTreeNode::Pointer figureNode = mitk::DataTreeNode::New();
   figureNode->SetName(QString("ellipse%1").arg(++m_EllipseCounter).toStdString());
@@ -378,12 +358,8 @@ void QmitkMeasurement::ActionDrawPolygonTriggered( bool  /*checked*/ )
     return;
   }
 
-  mitk::PlaneGeometry *planeGeometry = const_cast< mitk::PlaneGeometry * >(
-    this->GetActiveStdMultiWidget()->GetRenderWindow1()->GetSliceNavigationController()->GetCurrentPlaneGeometry() );
-
   mitk::PlanarPolygon::Pointer figure = mitk::PlanarPolygon::New();
   figure->ClosedOn();
-  figure->SetGeometry2D( planeGeometry );
 
   mitk::DataTreeNode::Pointer figureNode = mitk::DataTreeNode::New();
   figureNode->SetName(QString("polygon%1").arg(++m_PolygonCounter).toStdString());

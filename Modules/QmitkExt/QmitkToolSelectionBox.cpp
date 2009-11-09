@@ -32,7 +32,6 @@ PURPOSE.  See the above copyright notices for more information.
 QmitkToolSelectionBox::QmitkToolSelectionBox(QWidget* parent, mitk::DataStorage* storage)
 :QWidget(parent),
  m_SelfCall(false),
- m_Enabled(true),
  m_DisplayedGroups("default"),
  m_LayoutColumns(2),
  m_ShowNames(true),
@@ -281,13 +280,6 @@ void QmitkToolSelectionBox::OnToolManagerWorkingDataModified()
 
 /**
  Implementes the logic, which decides, when tools are activated/deactivated.
-
- Tools are activated when
-   - a reference and a working image is available
-   - some GUI element called setEnabled(true)
-  or
-   - some GUI element called SetAlwaysEnabled(true), which might
-     be done when some tools do not need e.g. a working image
 */
 void QmitkToolSelectionBox::SetGUIEnabledAccordingToToolManagerState()
 {
@@ -296,27 +288,24 @@ void QmitkToolSelectionBox::SetGUIEnabledAccordingToToolManagerState()
 
   LOG_DEBUG << this->name() << ": SetGUIEnabledAccordingToToolManagerState: referenceNode " << (void*)referenceNode 
                                                                                            << " workingNode " << (void*)workingNode 
-                                                                                           << " m_Enabled " << m_Enabled
                                                                                            << " isVisible() " << isVisible();
 
   bool enabled = true;
-  // Workaround for disabled tools
-  m_Enabled=true;
   
   switch ( m_EnabledMode )
   {
     default:
     case EnabledWithReferenceAndWorkingData:
-      enabled = referenceNode && workingNode && m_Enabled && isVisible();
+      enabled = referenceNode && workingNode && isVisible();
       break;
     case EnabledWithReferenceData:
-      enabled = referenceNode && m_Enabled && isVisible();
+      enabled = referenceNode && isVisible();
       break;
     case EnabledWithWorkingData:
-      enabled = workingNode && m_Enabled && isVisible();
+      enabled = workingNode && isVisible();
       break;
     case AlwaysEnabled:
-      enabled = m_Enabled && isVisible();
+      enabled = isVisible();
       break;
   }
 
@@ -345,8 +334,7 @@ void QmitkToolSelectionBox::SetGUIEnabledAccordingToToolManagerState()
 */
 void QmitkToolSelectionBox::setEnabled( bool enable )
 {
-  m_Enabled = enable;
-
+  QWidget::setEnabled(enable);
   SetGUIEnabledAccordingToToolManagerState();
 }
 

@@ -120,8 +120,6 @@ class QMITKEXT_EXPORT QmitkToolSelectionBox : public QWidget
 
     bool m_SelfCall;
 
-    bool m_Enabled;
-
     std::string m_DisplayedGroups;
 
     /// stores relationship between button IDs of the Qt widget and tool IDs of ToolManager

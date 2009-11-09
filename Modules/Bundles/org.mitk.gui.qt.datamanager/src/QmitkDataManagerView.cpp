@@ -10,6 +10,7 @@
 #include "mitkCoreObjectFactory.h"
 #include "mitkPACSPlugin.h"
 #include "mitkDataTreeNodeFactory.h"
+#include "mitkColorProperty.h"
 #include "mitkCommon.h"
 #include "mitkDelegateManager.h"
 #include "mitkNodePredicateData.h"
@@ -58,6 +59,9 @@
 #include <QMessageBox>
 #include <QToolBar>
 #include <QKeyEvent>
+#include <QColor>
+#include <QColorDialog>
+#include <QSizePolicy>
 #include "mitkDataTreeNodeObject.h"
 
 QmitkDataManagerView::QmitkDataManagerView()
@@ -143,7 +147,7 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   m_OpacitySlider->setMaximum(100);
   m_OpacitySlider->setOrientation(Qt::Horizontal);
   QObject::connect( m_OpacitySlider, SIGNAL( valueChanged(int) )
-    , this, SLOT( OpactiyChanged(int) ) );
+    , this, SLOT( OpacityChanged(int) ) );
 
   QLabel* _OpacityLabel = new QLabel("Opacity: ");
   QHBoxLayout* _OpacityWidgetLayout = new QHBoxLayout;
@@ -155,8 +159,28 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   m_OpacityAction = new QWidgetAction(this);
   m_OpacityAction->setDefaultWidget(_OpacityWidget);
   QObject::connect( m_OpacityAction, SIGNAL( changed() )
-    , this, SLOT( OpactiyActionChanged() ) );
+    , this, SLOT( OpacityActionChanged() ) );
   unknownDataTreeNodeDescriptor->AddAction(m_OpacityAction, false);
+
+  m_ColorButton = new QPushButton;
+  m_ColorButton->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Minimum);
+  //m_ColorButton->setText("Change color");
+  QObject::connect( m_ColorButton, SIGNAL( clicked() )
+    , this, SLOT( ColorChanged() ) );
+
+  QLabel* _ColorLabel = new QLabel("Color: ");
+  _ColorLabel->setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Minimum);
+  QHBoxLayout* _ColorWidgetLayout = new QHBoxLayout;
+  _ColorWidgetLayout->addWidget(_ColorLabel);
+  _ColorWidgetLayout->addWidget(m_ColorButton);
+  QWidget* _ColorWidget = new QWidget;
+  _ColorWidget->setLayout(_ColorWidgetLayout);
+
+  m_ColorAction = new QWidgetAction(this);
+  m_ColorAction->setDefaultWidget(_ColorWidget);
+  QObject::connect( m_ColorAction, SIGNAL( changed() )
+    , this, SLOT( ColorActionChanged() ) );
+  unknownDataTreeNodeDescriptor->AddAction(m_ColorAction, false);
 
   m_ShowOnlySelectedNodes 
     = new QAction(QIcon(":/datamanager/data-type-image-mask-visible-24.png")
@@ -251,7 +275,7 @@ void QmitkDataManagerView::NodeTableViewContextMenuRequested( const QPoint & pos
   }
 }
 
-void QmitkDataManagerView::OpactiyChanged(int value)
+void QmitkDataManagerView::OpacityChanged(int value)
 {
   mitk::DataTreeNode* node = m_NodeTreeModel->GetNode(m_NodeTreeView->selectionModel()->currentIndex());
   if(node)
@@ -264,7 +288,7 @@ void QmitkDataManagerView::OpactiyChanged(int value)
   LOG_INFO << "slider changed";
 }
 
-void QmitkDataManagerView::OpactiyActionChanged()
+void QmitkDataManagerView::OpacityActionChanged()
 {
   mitk::DataTreeNode* node = m_NodeTreeModel->GetNode(m_NodeTreeView->selectionModel()->currentIndex());
   if(node)
@@ -274,6 +298,42 @@ void QmitkDataManagerView::OpactiyActionChanged()
     {
       m_OpacitySlider->setValue(static_cast<int>(opacity*100));
     }
+  }
+  LOG_INFO << "changed";
+}
+
+void QmitkDataManagerView::ColorChanged()
+{
+  mitk::DataTreeNode* node = m_NodeTreeModel->GetNode(m_NodeTreeView->selectionModel()->currentIndex());
+  if(node)
+  {
+    QColor color = QColorDialog::getColor();
+    m_ColorButton->setAutoFillBackground(true);
+    node->SetProperty("color",mitk::ColorProperty::New(color.red()/255.0,color.green()/255.0,color.blue()/255.0));
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  }
+
+  LOG_INFO << "slider changed";
+}
+
+void QmitkDataManagerView::ColorActionChanged()
+{
+  mitk::DataTreeNode* node = m_NodeTreeModel->GetNode(m_NodeTreeView->selectionModel()->currentIndex());
+  if(node)
+  {
+    mitk::Color color;
+    mitk::ColorProperty::Pointer colorProp;
+    node->GetProperty(colorProp,"color");
+    color = colorProp->GetValue();
+
+    QString styleSheet = "background-color:rgb(";
+    styleSheet.append(QString::number(color[0]*255));
+    styleSheet.append(",");
+    styleSheet.append(QString::number(color[1]*255));
+    styleSheet.append(",");
+    styleSheet.append(QString::number(color[2]*255));
+    styleSheet.append(")");
+    m_ColorButton->setStyleSheet(styleSheet);
   }
   LOG_INFO << "changed";
 }

@@ -19,6 +19,7 @@
 // Forward declarations
 class QMenu;
 class QAction;
+class QComboBox;
 class QWidgetAction;
 class QSlider;
 class QModelIndex;
@@ -56,12 +57,20 @@ public slots:
   ///
   /// Invoked when the opacity slider changed
   ///
-  void OpactiyChanged(int value);
+  void OpacityChanged(int value);
   ///
   /// Invoked when the opacity action changed
   /// In this function the the opacity slider is set to the selected nodes opacity value
   ///
-  void OpactiyActionChanged();
+  void OpacityActionChanged();
+  ///
+  /// Invoked when the color button is pressed
+  ///
+  void ColorChanged();
+  ///
+  /// Invoked when the color action changed
+  ///
+  void ColorActionChanged();
   ///
   /// \brief Shows a node context menu.
   ///
@@ -165,6 +174,10 @@ protected:
   QSlider* m_OpacitySlider;
   /// Opacity action
   QWidgetAction* m_OpacityAction;
+  /// button to change the color of a node
+  QPushButton* m_ColorButton;
+  /// Color action
+  QWidgetAction* m_ColorAction;
   /// Show only selected nodes
   QAction* m_ShowOnlySelectedNodes;
   /// Toggles visibility of selected nodes

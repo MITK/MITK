@@ -534,7 +534,7 @@ void DebugUtil::RestoreState()
 
     doc->release();
   }
-  catch (Poco::XML::SAXParseException& e)
+  catch (Poco::Exception& e)
   {
     CHERRY_WARN << e.displayText();
   }

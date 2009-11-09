@@ -379,7 +379,18 @@ void QmitkRigidRegistrationView::AddNewTransformationToUndoList()
 {
   mitk::BaseData::Pointer movingData = m_MovingNode->GetData();
   m_UndoGeometryList.push_back(static_cast<mitk::Geometry3D *>(movingData->GetGeometry(0)->Clone().GetPointer()));
+  unsigned long size;
+  mitk::DataStorage::SetOfObjects::ConstPointer children = this->GetDataStorage()->GetDerivations(m_MovingNode);
+  size = children->Size();
+  mitk::DataTreeNode::Pointer childNode;
+  std::map<mitk::DataTreeNode::Pointer, mitk::Geometry3D*> childGeometries;
+  for (unsigned long i = 0; i < size; ++i)
+  {
+    childGeometries.insert(std::pair<mitk::DataTreeNode::Pointer, mitk::Geometry3D*>(children->GetElement(i), children->GetElement(i)->GetData()->GetGeometry()));
+  }
+  m_UndoChildGeometryList.push_back(childGeometries);
   m_RedoGeometryList.clear();
+  m_RedoChildGeometryList.clear();
   this->SetUndoEnabled(true);
   this->SetRedoEnabled(false);
 }
@@ -390,8 +401,29 @@ void QmitkRigidRegistrationView::UndoTransformation()
   {
     mitk::BaseData::Pointer movingData = m_MovingNode->GetData();
     m_RedoGeometryList.push_back(static_cast<mitk::Geometry3D *>(movingData->GetGeometry(0)->Clone().GetPointer()));
+    unsigned long size;
+    mitk::DataStorage::SetOfObjects::ConstPointer children = this->GetDataStorage()->GetDerivations(m_MovingNode);
+    size = children->Size();
+    mitk::DataTreeNode::Pointer childNode;
+    std::map<mitk::DataTreeNode::Pointer, mitk::Geometry3D*> childGeometries;
+    for (unsigned long i = 0; i < size; ++i)
+    {
+      childGeometries.insert(std::pair<mitk::DataTreeNode::Pointer, mitk::Geometry3D*>(children->GetElement(i), children->GetElement(i)->GetData()->GetGeometry()));
+    }
+    m_RedoChildGeometryList.push_back(childGeometries);
+
     movingData->SetGeometry(m_UndoGeometryList.back());
     m_UndoGeometryList.pop_back();
+    std::map<mitk::DataTreeNode::Pointer, mitk::Geometry3D*> oldChildGeometries;
+    oldChildGeometries = m_UndoChildGeometryList.back();
+    m_UndoChildGeometryList.pop_back();
+    std::map<mitk::DataTreeNode::Pointer, mitk::Geometry3D*>::iterator iter;
+    for (unsigned long j = 0; j < size; ++j)
+    {
+      iter = oldChildGeometries.find(children->GetElement(j));
+      children->GetElement(j)->GetData()->SetGeometry((*iter).second);
+    }
+
     //\FIXME when geometry is substituted the matrix referenced by the actor created by the mapper
     //is still pointing to the old one. Workaround: delete mapper
     m_MovingNode->SetMapper(1, NULL);
@@ -418,8 +450,30 @@ void QmitkRigidRegistrationView::RedoTransformation()
   {
     mitk::BaseData::Pointer movingData = m_MovingNode->GetData();
     m_UndoGeometryList.push_back(static_cast<mitk::Geometry3D *>(movingData->GetGeometry(0)->Clone().GetPointer()));
+    unsigned long size;
+    mitk::DataStorage::SetOfObjects::ConstPointer children = this->GetDataStorage()->GetDerivations(m_MovingNode);
+    size = children->Size();
+    mitk::DataTreeNode::Pointer childNode;
+    std::map<mitk::DataTreeNode::Pointer, mitk::Geometry3D*> childGeometries;
+    for (unsigned long i = 0; i < size; ++i)
+    {
+      childGeometries.insert(std::pair<mitk::DataTreeNode::Pointer, mitk::Geometry3D*>(children->GetElement(i), children->GetElement(i)->GetData()->GetGeometry()));
+    }
+    m_UndoChildGeometryList.push_back(childGeometries);
+
     movingData->SetGeometry(m_RedoGeometryList.back());
     m_RedoGeometryList.pop_back();
+
+    std::map<mitk::DataTreeNode::Pointer, mitk::Geometry3D*> oldChildGeometries;
+    oldChildGeometries = m_RedoChildGeometryList.back();
+    m_RedoChildGeometryList.pop_back();
+    std::map<mitk::DataTreeNode::Pointer, mitk::Geometry3D*>::iterator iter;
+    for (unsigned long j = 0; j < size; ++j)
+    {
+      iter = oldChildGeometries.find(children->GetElement(j));
+      children->GetElement(j)->GetData()->SetGeometry((*iter).second);
+    }
+
     //\FIXME when geometry is substituted the matrix referenced by the actor created by the mapper
     //is still pointing to the old one. Workaround: delete mapper
     m_MovingNode->SetMapper(1, NULL);
@@ -487,7 +541,9 @@ void QmitkRigidRegistrationView::ClearTransformationLists()
   this->SetUndoEnabled(false);
   this->SetRedoEnabled(false);
   m_UndoGeometryList.clear();
+  m_UndoChildGeometryList.clear();
   m_RedoGeometryList.clear();
+  m_RedoChildGeometryList.clear();
 }
 
 void QmitkRigidRegistrationView::Translate(int* translateVector)

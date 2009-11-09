@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>226</width>
-    <height>424</height>
+    <height>252</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -32,7 +32,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+      <sizepolicy hsizetype="MinimumExpanding" vsizetype="Maximum">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
@@ -94,7 +94,7 @@ Or save and load your own created transferfunctions in a folder in XML format.</
              <bool>true</bool>
             </property>
             <property name="sizePolicy">
-             <sizepolicy hsizetype="Minimum" vsizetype="Maximum">
+             <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
@@ -133,6 +133,12 @@ Or save and load your own created transferfunctions in a folder in XML format.</
        </item>
        <item>
         <widget class="QFrame" name="frame_4">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="frameShape">
           <enum>QFrame::StyledPanel</enum>
          </property>
@@ -188,7 +194,7 @@ Or save and load your own created transferfunctions in a folder in XML format.</
           <item>
            <widget class="QPushButton" name="m_LoadPreset">
             <property name="sizePolicy">
-             <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+             <sizepolicy hsizetype="Maximum" vsizetype="Minimum">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
@@ -211,7 +217,7 @@ The load includes all transferfunctions: grayvalue, color and gradient.</string>
           <item>
            <widget class="QPushButton" name="m_SavePreset">
             <property name="sizePolicy">
-             <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+             <sizepolicy hsizetype="Maximum" vsizetype="Minimum">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
@@ -313,8 +319,8 @@ Move the mouse to the right and the function moves to the right. </string>
          </property>
          <property name="minimumSize">
           <size>
-           <width>50</width>
-           <height>50</height>
+           <width>0</width>
+           <height>0</height>
           </size>
          </property>
          <property name="font">
@@ -403,6 +409,12 @@ Move the mouse to the  right and the center of the bell moves to the right.</str
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>0</height>
+          </size>
          </property>
          <property name="font">
           <font>

@@ -110,6 +110,10 @@ void QmitkIsoSurface::DataStorageChanged()
 
 void QmitkIsoSurface::ImageSelected(const mitk::DataTreeNode* item)
 {
+  // nothing selected (NULL selection)
+  if( item == 0  || item->GetData() == 0 )
+    return;
+
   m_MitkImage = dynamic_cast<mitk::Image*> (item->GetData());
 }
 

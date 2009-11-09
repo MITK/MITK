@@ -18,6 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkFileOpenAction.h"
 
 #include <QFileDialog>
+#include <QFileInfo>
 #include <mitkDataTreeNodeFactory.h>
 
 #include "mitkSceneIO.h"
@@ -44,6 +45,11 @@ QmitkFileOpenAction::QmitkFileOpenAction(cherry::IWorkbenchWindow::Pointer windo
 
 void QmitkFileOpenAction::Run()
 {
+  /**
+   * @brief stores the last path of last opened file
+   */
+  static QString m_LastPath; 
+
   //QFileDialog dialog(static_cast<QWidget*>(m_Window->GetShell()->GetControl()));
   //dialog.setFileMode(QFileDialog::ExistingFiles);
   //QStringList filters;
@@ -52,7 +58,7 @@ void QmitkFileOpenAction::Run()
   //  << "MITK Pointset (*.mps)"
   //  << "All Files (*.*)";
   //dialog.setFilters(filters);
-  QStringList fileNames = QFileDialog::getOpenFileNames(NULL,"Open","/",mitk::CoreObjectFactory::GetInstance()->GetFileExtensions());
+  QStringList fileNames = QFileDialog::getOpenFileNames(NULL,"Open",m_LastPath,mitk::CoreObjectFactory::GetInstance()->GetFileExtensions());
 
   //if (dialog.exec())
   //  fileNames = dialog.selectedFiles();
@@ -60,6 +66,9 @@ void QmitkFileOpenAction::Run()
   if (fileNames.empty()) 
     return;
 
+  QFileInfo info(fileNames.at(0));
+  m_LastPath = info.filePath();
+  
   mitk::DataStorageEditorInput::Pointer editorInput;
   mitk::DataStorage::Pointer dataStorage;
   QmitkStdMultiWidgetEditor::Pointer multiWidgetEditor;

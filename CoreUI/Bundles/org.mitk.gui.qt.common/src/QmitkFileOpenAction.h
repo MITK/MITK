@@ -36,7 +36,6 @@ class MITK_QT_COMMON QmitkFileOpenAction : public QAction
   Q_OBJECT
 
 public:
-
   QmitkFileOpenAction(cherry::IWorkbenchWindow::Pointer window);
 
 protected slots:
@@ -44,7 +43,6 @@ protected slots:
   void Run();
 
 private:
-
   cherry::IWorkbenchWindow::Pointer m_Window;
 };
 

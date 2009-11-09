@@ -9,11 +9,11 @@ SET(BUILD_SHARED_LIBS ON)
 SET(BUILD_TESTING OFF)
 SET(BUILD_EXAMPLES OFF)
 
-# these are optional 
-SET(MITK_ITK_SOURCE_DIR "" CACHE PATH "An ITK source tree to be used for integrated build with MITK")
-SET(MITK_VTK_SOURCE_DIR "" CACHE PATH "An VTK source tree to be used for integrated build with MITK")
-MARK_AS_ADVANCED(MITK_ITK_SOURCE_DIR)
-MARK_AS_ADVANCED(MITK_VTK_SOURCE_DIR)
+# these are very advanced... Please set in CMake Cache, not in GUI. 
+#SET(MITK_ITK_SOURCE_DIR "" CACHE PATH "An ITK source tree to be used for integrated build with MITK")
+#SET(MITK_VTK_SOURCE_DIR "" CACHE PATH "An VTK source tree to be used for integrated build with MITK")
+#MARK_AS_ADVANCED(MITK_ITK_SOURCE_DIR)
+#MARK_AS_ADVANCED(MITK_VTK_SOURCE_DIR)
 IF(EXISTS "${MITK_ITK_SOURCE_DIR}")
   ADD_SUBDIRECTORY("${MITK_ITK_SOURCE_DIR}" itk-bin)
   SET(ITK_DIR "${CMAKE_CURRENT_BINARY_DIR}/itk-bin" CACHE PATH "ITK for MITK binary dir")

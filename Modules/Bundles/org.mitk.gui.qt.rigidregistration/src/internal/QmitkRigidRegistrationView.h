@@ -244,9 +244,9 @@ class RIGIDREGISTRATION_EXPORT QmitkRigidRegistrationView : public QObject, publ
     mitk::DataTreeNode::Pointer m_FixedNode;
     mitk::DataTreeNode::Pointer m_FixedMaskNode;
     std::list<mitk::Geometry3D::Pointer> m_UndoGeometryList;
-    std::list<std::map<mitk::DataTreeNode::Pointer, mitk::Geometry3D*>> m_UndoChildGeometryList;
+    std::list<std::map<mitk::DataTreeNode::Pointer, mitk::Geometry3D*> > m_UndoChildGeometryList;
     std::list<mitk::Geometry3D::Pointer> m_RedoGeometryList;
-    std::list<std::map<mitk::DataTreeNode::Pointer, mitk::Geometry3D*>> m_RedoChildGeometryList;
+    std::list<std::map<mitk::DataTreeNode::Pointer, mitk::Geometry3D*> > m_RedoChildGeometryList;
     bool m_ShowRedGreen;
     float m_Opacity;
     float m_OriginalOpacity;

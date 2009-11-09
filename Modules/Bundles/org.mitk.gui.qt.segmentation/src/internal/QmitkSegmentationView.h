@@ -34,10 +34,7 @@ protected:
 
   void CreateQtPartControl(QWidget* parent);
 
-// QmitkSegmentation
   public:
-
-    virtual void CreateConnections();
 
     virtual void Activated();
 
@@ -91,6 +88,8 @@ protected:
     void CreateASurface(bool smoothed);
 
     void ApplyDisplayOptions(mitk::DataTreeNode* node);
+
+    void UpdateFromCurrentDataManagerSelection();
   
     cherry::ICherryPreferences::Pointer m_SegmentationPreferencesNode;
 

@@ -373,6 +373,9 @@
        </item>
        <item>
         <widget class="QToolButton" name="btnNewSegmentation">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
          <property name="sizePolicy">
           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
            <horstretch>1</horstretch>
@@ -476,8 +479,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>223</width>
-        <height>202</height>
+        <width>96</width>
+        <height>30</height>
        </rect>
       </property>
       <attribute name="label">
@@ -530,8 +533,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>223</width>
-        <height>202</height>
+        <width>96</width>
+        <height>30</height>
        </rect>
       </property>
       <attribute name="label">

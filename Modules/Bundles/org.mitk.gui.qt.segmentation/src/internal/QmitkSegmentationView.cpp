@@ -56,6 +56,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QmitkDataStorageListModel.h>
 
 #include <QmitkStdMultiWidgetEditor.h>
+#include <cherryQtItemSelection.h>
 
 #include <cherryIEditorPart.h>
 #include <cherryIWorkbenchPage.h>
@@ -126,9 +127,8 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
   // register as listener for openCherry selection events (mainly from DataManager)
   m_SelectionListener = cherry::ISelectionListener::Pointer(new cherry::SelectionChangedAdapter<QmitkSegmentationView>(this, &QmitkSegmentationView::SelectionChanged));
   this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddPostSelectionListener(/*"org.mitk.views.datamanager",*/ m_SelectionListener);
-  cherry::ISelection::ConstPointer selection( this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection());
-  m_CurrentSelection = selection.Cast<const cherry::IStructuredSelection>();
-  this->SelectionChanged(cherry::SmartPointer<IWorkbenchPart>(NULL), selection);
+
+  UpdateFromCurrentDataManagerSelection();
 
   // register a couple of additional actions for DataManager's context menu
   QmitkNodeDescriptor* imageDataTreeNodeDescriptor = 
@@ -221,10 +221,6 @@ QmitkSegmentationView::~QmitkSegmentationView()
   delete m_Controls;
 }
 
-void QmitkSegmentationView::CreateConnections()
-{
-}
-
 void QmitkSegmentationView::CreateNewSegmentation()
 {
   mitk::DataTreeNode::Pointer node = m_Controls->m_ManualToolSelectionBox->GetToolManager()->GetReferenceData(0);
@@ -233,7 +229,6 @@ void QmitkSegmentationView::CreateNewSegmentation()
     mitk::Image::Pointer image = dynamic_cast<mitk::Image*>( node->GetData() );
     if (image.IsNotNull())
     {
-
       // ask about the name and organ type of the new segmentation
       QmitkNewSegmentationDialog dialog( m_Parent ); // needs a QWidget as parent, "this" is not QWidget
       int dialogReturnValue = dialog.exec();
@@ -261,6 +256,9 @@ void QmitkSegmentationView::CreateNewSegmentation()
         m_Controls->m_ManualToolSelectionBox->GetToolManager()->SetWorkingData( emptySegmentation );
       }
     }
+  }
+  {
+    LOG_ERROR << "'Create new segmentation' button should never be clickable unless a patient image is selected...";
   }
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
@@ -394,6 +392,8 @@ void QmitkSegmentationView::OnReferenceNodeSelected(const mitk::DataTreeNode* no
   {
     m_Controls->lblReferenceImageSelectionWarning->show();
   }
+    
+  m_Controls->btnNewSegmentation->setEnabled(node != NULL);
 
   // check, wheter image is aligned like render windows. Otherwise display a visible warning (because 2D tools will probably not work)
   CheckImageAlignment();
@@ -430,7 +430,14 @@ void QmitkSegmentationView::OnWorkingDataSelectionChanged(const mitk::DataTreeNo
   }
   else
   {
-    m_Controls->lblWorkingImageSelectionWarning->show();
+    if ( toolManager->GetReferenceData(0) )
+    {
+      m_Controls->lblWorkingImageSelectionWarning->show();
+    }
+    else
+    {
+      m_Controls->lblWorkingImageSelectionWarning->hide();
+    }
   }
 
   m_Controls->m_SlicesInterpolator->EnableInterpolation( m_Controls->widgetStack->currentWidget() == m_Controls->pageManual );
@@ -476,6 +483,9 @@ void QmitkSegmentationView::SelectionChanged(cherry::IWorkbenchPart::Pointer sou
   if ( sourcepart == this ||  // prevents being notified by own selection events
        !selection.Cast<const cherry::IStructuredSelection>() ) // checks that the selection is a IStructuredSelection and not NULL
   {
+    std::cout << "Ignore this selection event:";
+    std::cout << " sourcepart == this " << (sourcepart == this);
+    std::cout << " selection == NULL" << (selection == NULL) << std::endl;
     return; // otherwise we get "null selection" events each time the view is activated/focussed
   }
 
@@ -923,9 +933,14 @@ void QmitkSegmentationView::OnPreferencesChanged(const cherry::ICherryPreference
   m_ShowSegmentationsAsOutline = m_SegmentationPreferencesNode->GetBool("draw outline", true);
   m_ShowSegmentationsAsVolumeRendering = m_SegmentationPreferencesNode->GetBool("volume rendering", true);
   
-  cherry::ISelection::ConstPointer selection( this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection());
-  m_CurrentSelection = selection.Cast<const cherry::IStructuredSelection>();
-  this->SelectionChanged(cherry::SmartPointer<IWorkbenchPart>(NULL), selection);
+  UpdateFromCurrentDataManagerSelection();
+}
 
+void QmitkSegmentationView::UpdateFromCurrentDataManagerSelection()
+{
+  LOG_INFO << "Update selection from DataManager";
+  cherry::ISelection::ConstPointer selection( this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection("org.mitk.views.datamanager"));
+  m_CurrentSelection = selection.Cast<const cherry::IStructuredSelection>();
+  this->SelectionChanged(cherry::SmartPointer<IWorkbenchPart>(NULL), m_CurrentSelection);
 }
 

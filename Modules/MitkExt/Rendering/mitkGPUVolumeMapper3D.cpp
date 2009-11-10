@@ -83,28 +83,38 @@ mitk::GPUVolumeMapper3D::GPUVolumeMapper3D()
 {
   GPU_LOG << "Instantiating GPUVolumeMapper3D";
   
-  m_T2DMapper =  vtkMitkOpenGLVolumeTextureMapper3D::New();
+  m_T2DMapper = vtkMitkOpenGLVolumeTextureMapper3D::New();
   m_T2DMapper->SetUseCompressedTexture(true);
   m_T2DMapper->SetPreferredMethodToFragmentProgram();
   m_T2DMapper->SetSampleDistance(1.0); 
  
+  m_MapperCPU = vtkFixedPointVolumeRayCastMapper::New();
+  m_MapperCPU->SetSampleDistance(0.5); // 4 rays for every pixel
+  m_MapperCPU->IntermixIntersectingGeometryOn();
+  m_MapperCPU->SetNumberOfThreads( itk::MultiThreader::GetGlobalDefaultNumberOfThreads() );
+ 
   m_VolumePropertyLow = vtkVolumeProperty::New();
 
   m_VolumePropertyLow->ShadeOn();
-  m_VolumePropertyLow->SetAmbient (0.05f);
-  m_VolumePropertyLow->SetDiffuse (0.45f);
-  m_VolumePropertyLow->SetSpecular(0.50f);
+  m_VolumePropertyLow->SetAmbient (0.10f); //0.05f
+  m_VolumePropertyLow->SetDiffuse (0.50f); //0.45f
+  m_VolumePropertyLow->SetSpecular(0.40f); //0.50f
   m_VolumePropertyLow->SetSpecularPower(6.0f);
   m_VolumePropertyLow->SetInterpolationTypeToLinear();
     
   m_VolumeLOD = vtkVolume::New();
   m_VolumeLOD->SetMapper(   m_T2DMapper );
   m_VolumeLOD->SetProperty(m_VolumePropertyLow );
+  
+  m_VolumeCPU = vtkVolume::New();
+  m_VolumeCPU->SetMapper(   m_MapperCPU );
+  m_VolumeCPU->SetProperty(m_VolumePropertyLow );
                     
   m_UnitSpacingImageFilter = vtkImageChangeInformation::New();
   m_UnitSpacingImageFilter->SetOutputSpacing( 1.0, 1.0, 1.0 );
 
   m_T2DMapper->SetInput( this->m_UnitSpacingImageFilter->GetOutput() );//m_Resampler->GetOutput());
+  m_MapperCPU->SetInput( this->m_UnitSpacingImageFilter->GetOutput() );//m_Resampler->GetOutput());
 
   CreateDefaultTransferFunctions();
 }
@@ -126,16 +136,23 @@ mitk::GPUVolumeMapper3D::~GPUVolumeMapper3D()
   m_BinaryGradientTransferFunction->Delete();
 }
 
-vtkProp *mitk::GPUVolumeMapper3D::GetVtkProp(mitk::BaseRenderer * /*renderer*/)
+vtkProp *mitk::GPUVolumeMapper3D::GetVtkProp(mitk::BaseRenderer *renderer)
 {
-  return m_VolumeLOD;
+  return IsGPUEnabled( renderer ) ? m_VolumeLOD : m_VolumeCPU;
 }
-
 
 
 void mitk::GPUVolumeMapper3D::GenerateData( mitk::BaseRenderer *renderer )
 {
-  GPU_LOG << "GenerateData";
+  if(IsGPUEnabled(renderer))
+    GenerateDataGPU(renderer);
+  else
+    GenerateDataCPU(renderer);
+}
+
+void mitk::GPUVolumeMapper3D::GenerateDataGPU( mitk::BaseRenderer *renderer )
+{
+  GPU_LOG << "GenerateDataGPU";
   
   mitk::Image *input = const_cast< mitk::Image * >( this->GetInput() );
   
@@ -206,6 +223,78 @@ void mitk::GPUVolumeMapper3D::GenerateData( mitk::BaseRenderer *renderer )
               
    UpdateTransferFunctions( renderer );
 }
+
+
+void mitk::GPUVolumeMapper3D::GenerateDataCPU( mitk::BaseRenderer *renderer )
+{
+  GPU_LOG << "GenerateDataCPU";
+  
+  mitk::Image *input = const_cast< mitk::Image * >( this->GetInput() );
+  
+  if ( !input || !input->IsInitialized() )
+    return;
+
+  vtkRenderWindow* renderWindow = renderer->GetRenderWindow();
+
+  if (this->IsVisible(renderer)==false ||
+      this->GetDataTreeNode() == NULL ||
+      dynamic_cast<mitk::BoolProperty*>(GetDataTreeNode()->GetProperty("volumerendering",renderer))==NULL ||
+      dynamic_cast<mitk::BoolProperty*>(GetDataTreeNode()->GetProperty("volumerendering",renderer))->GetValue() == false
+    )
+  {
+    m_VolumeCPU->VisibilityOff();
+    return;
+  }
+
+  m_VolumeCPU->VisibilityOn();
+  
+  const TimeSlicedGeometry* inputtimegeometry = input->GetTimeSlicedGeometry();
+  assert(inputtimegeometry!=NULL);
+
+  const Geometry3D* worldgeometry = renderer->GetCurrentWorldGeometry();
+  if(worldgeometry==NULL)
+  {
+    LOG_WARN << "no world geometry found, turning off volumerendering for data node " << GetDataTreeNode()->GetName();
+    GetDataTreeNode()->SetProperty("volumerendering",mitk::BoolProperty::New(false));
+    m_VolumeCPU->VisibilityOff();
+    return;
+  }
+
+  if(IsLODEnabled(renderer))
+  {
+    switch ( mitk::RenderingManager::GetInstance()->GetNextLOD( renderer ) )
+    {
+      case 0:
+        m_MapperCPU->SetSampleDistance(2.0); 
+        break;
+
+      default: case 1:
+        m_MapperCPU->SetSampleDistance(1.0); 
+        break;
+    }
+  }
+  else
+  {
+    m_MapperCPU->SetSampleDistance(1.0); 
+  }
+
+  int timestep=0;
+  ScalarType time = worldgeometry->GetTimeBounds()[0];
+  if (time> ScalarTypeNumericTraits::NonpositiveMin())
+    timestep = inputtimegeometry->MSToTimeStep(time);
+
+  if (inputtimegeometry->IsValidTime(timestep)==false)
+    return;
+
+  vtkImageData *inputData = input->GetVtkImageData(timestep);
+  if(inputData==NULL)
+    return;
+
+  m_UnitSpacingImageFilter->SetInput( inputData );
+              
+  UpdateTransferFunctions( renderer );
+}
+
 
 
 void mitk::GPUVolumeMapper3D::CreateDefaultTransferFunctions()
@@ -297,7 +386,8 @@ void mitk::GPUVolumeMapper3D::SetDefaultProperties(mitk::DataTreeNode* node, mit
   GPU_LOG << "SetDefaultProperties";
 
   node->AddProperty( "volumerendering", mitk::BoolProperty::New( false ), renderer, overwrite );
-  node->AddProperty( "volumerendering.uselod", mitk::BoolProperty::New( false ), renderer, overwrite );
+  node->AddProperty( "volumerendering.uselod", mitk::BoolProperty::New( true ), renderer, overwrite );
+  node->AddProperty( "volumerendering.usegpu", mitk::BoolProperty::New( true ), renderer, overwrite );
   node->AddProperty( "binary", mitk::BoolProperty::New( false ), renderer, overwrite );
  
   mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
@@ -331,5 +421,14 @@ bool mitk::GPUVolumeMapper3D::IsLODEnabled( mitk::BaseRenderer * renderer ) cons
     dynamic_cast<mitk::BoolProperty*>(GetDataTreeNode()->GetProperty("volumerendering.uselod",renderer)) != NULL &&
     dynamic_cast<mitk::BoolProperty*>(GetDataTreeNode()->GetProperty("volumerendering.uselod",renderer))->GetValue() == true;
 }
+
+
+bool mitk::GPUVolumeMapper3D::IsGPUEnabled( mitk::BaseRenderer * renderer ) const
+{
+  return
+    dynamic_cast<mitk::BoolProperty*>(GetDataTreeNode()->GetProperty("volumerendering.usegpu",renderer)) != NULL &&
+    dynamic_cast<mitk::BoolProperty*>(GetDataTreeNode()->GetProperty("volumerendering.usegpu",renderer))->GetValue() == true;
+}
+
 
 

@@ -92,7 +92,7 @@ char *vtkMitkVolumeTextureMapper3D_OneComponentShadeFP =
 "RSQ temp, temp4.x;\n"
 "MUL normal, normal, temp;\n"
 
-"MUL sampleColor.w,sampleColor.w,temp4.x;\n"
+//"MUL sampleColor.w,sampleColor.w,temp4.x;\n"
 
 //# Take the dot product of the light
 //# direction and the normal
@@ -119,7 +119,7 @@ char *vtkMitkVolumeTextureMapper3D_OneComponentShadeFP =
 "LIT lightResult, lightInfo;\n"
 
 //# COLOR FIX
-"MUL lightResult, lightResult, 4.0;\n"
+"MUL lightResult, lightResult, 6.0;\n"
 
 //# This is the ambient contribution	
 "MUL finalColor, coefficient.x, sampleColor;\n"

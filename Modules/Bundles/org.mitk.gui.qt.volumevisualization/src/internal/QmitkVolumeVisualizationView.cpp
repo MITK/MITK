@@ -211,7 +211,11 @@ void QmitkVolumeVisualizationView::OnEnableLOD(bool state)
 
 void QmitkVolumeVisualizationView::OnEnableGPU(bool state) 
 {
-  //not implemented yet
+  if(m_SelectedNode.IsNull())
+    return;
+
+  m_SelectedNode->SetProperty("volumerendering.usegpu",mitk::BoolProperty::New(state));
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkVolumeVisualizationView::SetFocus()

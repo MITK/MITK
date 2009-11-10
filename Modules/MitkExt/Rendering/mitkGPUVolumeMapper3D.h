@@ -81,6 +81,7 @@ public:
    * This reflects whether this Mapper currently invokes StartEvent, EndEvent, and
    * ProgressEvent on BaseRenderer. */
   virtual bool IsLODEnabled( BaseRenderer *renderer = NULL ) const;
+  bool IsGPUEnabled( BaseRenderer *renderer = NULL ) const;
   
   virtual void MitkRenderVolumetricGeometry(mitk::BaseRenderer* renderer);
 
@@ -96,8 +97,12 @@ protected:
 
   vtkImageChangeInformation* m_UnitSpacingImageFilter;
   vtkVolumeProperty* m_VolumePropertyLow;
+ 
   vtkMitkVolumeTextureMapper3D* m_T2DMapper;
+  vtkFixedPointVolumeRayCastMapper* m_MapperCPU;
+ 
   vtkVolume * m_VolumeLOD;
+  vtkVolume * m_VolumeCPU;
   
   vtkPiecewiseFunction *m_DefaultOpacityTransferFunction;
   vtkPiecewiseFunction *m_DefaultGradientTransferFunction;
@@ -106,6 +111,10 @@ protected:
   vtkPiecewiseFunction *m_BinaryOpacityTransferFunction;
   vtkPiecewiseFunction *m_BinaryGradientTransferFunction;
   vtkColorTransferFunction *m_BinaryColorTransferFunction;
+
+  void GenerateDataGPU(mitk::BaseRenderer* renderer);
+  void GenerateDataCPU(mitk::BaseRenderer* renderer);
+
 };
 
 } // namespace mitk

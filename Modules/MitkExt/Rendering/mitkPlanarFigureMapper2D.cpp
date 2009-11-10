@@ -24,6 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkColorProperty.h"
 #include "mitkProperties.h"
 #include "mitkGL.h"
+#include "mitkVtkPropRenderer.h"
 
 
 mitk::PlanarFigureMapper2D::PlanarFigureMapper2D()
@@ -101,6 +102,15 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
   typedef mitk::PlanarFigure::VertexContainerType VertexContainerType;
   VertexContainerType::ConstIterator it;
 
+  const mitk::DataTreeNode* node=this->GetDataTreeNode();
+  bool isSelected = false;
+  if(node && node->GetBoolProperty("selected", isSelected))
+  {
+    if(isSelected)
+    glColor3f(1.0f, 0.0f, 0.0f);
+  }
+
+  mitk::Point2D firstPoint;
   for(unsigned short loop = 0; loop < planarFigure->GetPolyLinesSize(); ++loop)
   {
     if ( planarFigure->IsClosed() )
@@ -113,7 +123,6 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
     }
     
     const VertexContainerType *polyLine = planarFigure->GetPolyLine(loop);
-  
     for ( it = polyLine->Begin(); it != polyLine->End(); ++it )
     {
       // Draw this 2D point as OpenGL vertex
@@ -121,12 +130,28 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
       this->TransformObjectToDisplay( it->Value(), displayPoint,
         planarFigureGeometry2D, rendererGeometry2D, displayGeometry );
 
+      if(it == polyLine->Begin())
+        firstPoint = displayPoint;
+
       glVertex2f( displayPoint[0], displayPoint[1] );
 
     }
 
     glEnd();
   }
+  // revert color again
+  if(isSelected)
+    glColor3f(1.0f, 1.0f, 1.0f);
+
+  // draw name near the first point
+  std::string name = node->GetName();
+  if(!name.empty())
+  {
+    mitk::VtkPropRenderer* OpenGLrenderer = dynamic_cast<mitk::VtkPropRenderer*>( renderer );
+    if(OpenGLrenderer)
+      OpenGLrenderer->WriteSimpleText(name, firstPoint[0]+5, firstPoint[1]+5);
+  }
+
 
   // Draw markers at control points (selected control point will be colored)
   const VertexContainerType *controlPoints = planarFigure->GetControlPoints();

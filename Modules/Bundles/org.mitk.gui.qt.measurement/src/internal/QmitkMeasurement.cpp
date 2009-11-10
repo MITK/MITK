@@ -149,6 +149,11 @@ void QmitkMeasurement::CreateQtPartControl( QWidget* parent )
   m_PlanarFiguresTable->horizontalHeader()->setResizeMode(QHeaderView::ResizeToContents);
   m_PlanarFiguresTable->setModel(m_PlanarFiguresModel);
 
+  QObject::connect( m_PlanarFiguresTable->selectionModel()
+    , SIGNAL( selectionChanged ( const QItemSelection &, const QItemSelection & ) )
+    , this
+    , SLOT( PlanarFigureSelectionChanged ( const QItemSelection &, const QItemSelection & ) ) );
+
   m_CopyToClipboard = new QPushButton("Copy to Clipboard");
   QObject::connect( m_CopyToClipboard, SIGNAL( clicked(bool) )
     , this, SLOT( CopyToClipboard(bool) ) );
@@ -164,7 +169,7 @@ void QmitkMeasurement::CreateQtPartControl( QWidget* parent )
   m_Layout->setRowStretch(1, 1);
   m_Layout->setRowStretch(2, 10);
   m_Layout->setRowStretch(3, 1);
-  m_Layout->setContentsMargins(0,0,0,0);
+  m_Layout->setContentsMargins(2,2,2,2);
 
   parent->setLayout(m_Layout);
 
@@ -306,6 +311,8 @@ void QmitkMeasurement::ActionDrawFourPointAngleTriggered( bool  /*checked*/ )
   mitk::PlanarFourPointAngle::Pointer figure = mitk::PlanarFourPointAngle::New();
 
   mitk::DataTreeNode::Pointer figureNode = mitk::DataTreeNode::New();
+  figureNode->SetName(QString("line%1").arg(++m_FourPointAngleCounter).toStdString());
+
   figureNode->SetData( figure );
 
   this->GetDataStorage()->Add( figureNode, m_SelectedImageNode );
@@ -465,6 +472,30 @@ void QmitkMeasurement::CopyToClipboard( bool checked /*= false */ )
     }
 
     QApplication::clipboard()->setText( clipboardText, QClipboard::Clipboard);
+ 
+}
 
-  
+void QmitkMeasurement::PlanarFigureSelectionChanged( const QItemSelection & selected, const QItemSelection & deselected )
+{
+  QModelIndexList indexesOfSelectedRows = deselected.indexes();
+  mitk::DataTreeNode* node = 0;
+
+  for (QModelIndexList::iterator it = indexesOfSelectedRows.begin()
+    ; it != indexesOfSelectedRows.end(); it++)
+  {
+    node = m_PlanarFiguresModel->GetNode(*it);
+    if ( node )
+      node->SetBoolProperty("selected", false);
+  }
+
+  indexesOfSelectedRows = selected.indexes();
+  for (QModelIndexList::iterator it = indexesOfSelectedRows.begin()
+    ; it != indexesOfSelectedRows.end(); it++)
+  {
+    node = m_PlanarFiguresModel->GetNode(*it);
+    if ( node )
+      node->SetBoolProperty("selected", true);
+  }
+
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll(); 
 }

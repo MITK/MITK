@@ -78,6 +78,7 @@ class QmitkMeasurement : public QObject, public QmitkFunctionality
     void ActionDrawTextTriggered( bool checked = false ); 
     void CopyToClipboard( bool checked = false ); 
     void PlanarFigureTableModelRowsInserted( const QModelIndex & parent, int start, int end );
+    void PlanarFigureSelectionChanged ( const QItemSelection & selected, const QItemSelection & deselected );
     // fields
   protected:
     ///

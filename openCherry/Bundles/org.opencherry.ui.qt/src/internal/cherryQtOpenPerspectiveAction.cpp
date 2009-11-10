@@ -20,6 +20,7 @@
 #include <cherryIWorkbenchPage.h>
 
 #include <QWidget>
+#include <QMessageBox>
 
 namespace cherry
 {
@@ -45,9 +46,16 @@ QtOpenPerspectiveAction::QtOpenPerspectiveAction(
 
 void QtOpenPerspectiveAction::Run()
 {
-  if (window->GetActivePage()->GetPerspective() != descr)
+  try
   {
-    window->GetActivePage()->SetPerspective(descr);
+    if (window->GetActivePage()->GetPerspective() != descr)
+    {
+      window->GetActivePage()->SetPerspective(descr);
+    }
+  }
+  catch (...)
+  {
+    QMessageBox::critical(0, "Opening Perspective Failed", QString::fromStdString("The perspective \"" + descr->GetLabel() + "\" could not be opened.\nSee the log for details."));
   }
 }
 

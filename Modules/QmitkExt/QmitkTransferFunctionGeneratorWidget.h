@@ -51,5 +51,7 @@ class QMITKEXT_EXPORT QmitkTransferFunctionGeneratorWidget : public QWidget, pub
     
     QString presetFileName;
     
+    std::string ReduceFileName(std::string fileNameLong );
+    
 };
 #endif

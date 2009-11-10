@@ -241,19 +241,26 @@ void QmitkSegmentationView::CreateNewSegmentation()
       mitk::Tool* firstTool = toolManager->GetToolById(0);
       if (firstTool)
       {
-        mitk::DataTreeNode::Pointer emptySegmentation =
-          firstTool->CreateEmptySegmentationNode( image, dialog.GetSegmentationName(), dialog.GetColorProperty() );
+        try
+        {
+          mitk::DataTreeNode::Pointer emptySegmentation =
+            firstTool->CreateEmptySegmentationNode( image, dialog.GetSegmentationName(), dialog.GetColorProperty() );
 
-        if (!emptySegmentation) return; // could be aborted by user
+          if (!emptySegmentation) return; // could be aborted by user
 
-        ApplyDisplayOptions(emptySegmentation);
+          ApplyDisplayOptions(emptySegmentation);
 
-        this->GetDefaultDataStorage()->Add( emptySegmentation, node ); // add as a child, because the segmentation "derives" from the original
+          this->GetDefaultDataStorage()->Add( emptySegmentation, node ); // add as a child, because the segmentation "derives" from the original
 
-        // TODO select this new segmentation in data manager
-        SendSelectedEvent( node, emptySegmentation );
+          // TODO select this new segmentation in data manager
+          SendSelectedEvent( node, emptySegmentation );
 
-        m_Controls->m_ManualToolSelectionBox->GetToolManager()->SetWorkingData( emptySegmentation );
+          m_Controls->m_ManualToolSelectionBox->GetToolManager()->SetWorkingData( emptySegmentation );
+        }
+        catch (std::bad_alloc)
+        {
+          QMessageBox::warning(NULL,"Create new segmentation","Could not allocate memory for new segmentation");
+        }
       }
     }
   }

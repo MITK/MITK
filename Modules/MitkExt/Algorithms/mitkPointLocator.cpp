@@ -20,18 +20,16 @@ PURPOSE.  See the above copyright notices for more information.
 #include <ANN/ANN.h>
 
 
-mitk::PointLocator::PointLocator()
+mitk::PointLocator::PointLocator() :
+  m_SearchTreeInitialized(false),
+  m_VtkPoints(NULL), m_MitkPoints(NULL),
+  m_ItkPoints(NULL),
+  m_ANNK(1), m_ANNDimension(3),
+  m_ANNEpsilon(0), m_ANNDataPoints(NULL),
+  m_ANNQueryPoint(NULL), m_ANNPointIndexes(NULL),
+  m_ANNDistances(NULL), m_ANNTree(NULL)
 {
-  m_SearchTreeInitialized = false;
-  m_VtkPoints = NULL;
-  m_ANNK = 1; 
-  m_ANNDimension = 3;
-  m_ANNEpsilon = 0;
-  m_ANNDataPoints = NULL;
-  m_ANNQueryPoint = NULL;
-  m_ANNPointIndexes = NULL;
-  m_ANNDistances = NULL;
-  m_ANNTree = NULL;
+
 }
 
 
@@ -88,6 +86,16 @@ void mitk::PointLocator::SetPoints( mitk::PointSet* points )
      itkWarningMacro("Points are NULL!");  
      return;
   }
+
+  if(m_MitkPoints)
+  {
+    if ( (m_MitkPoints == points) && (m_MitkPoints->GetMTime() == points->GetMTime()) )
+    {
+      return; //no need to recalculate search tree
+    }
+  }
+  m_MitkPoints = points;
+
   size_t size = points->GetSize();
   if ( m_ANNDataPoints != NULL )
     delete[] m_ANNDataPoints;
@@ -119,7 +127,15 @@ void mitk::PointLocator::SetPoints( ITKPointSet* pointSet )
     itkWarningMacro("Points are NULL!");  
     return;
   }
-  //itk::PointType::PointsContainer* points = pointSet->GetPoints();
+
+  if(m_ItkPoints)
+  {
+    if ( (m_ItkPoints == pointSet) && (m_ItkPoints->GetMTime() == pointSet->GetMTime()) )
+    {
+      return; //no need to recalculate search tree
+    }
+  }
+  m_ItkPoints = pointSet;
 
   size_t size = pointSet->GetNumberOfPoints();
   if ( m_ANNDataPoints != NULL )

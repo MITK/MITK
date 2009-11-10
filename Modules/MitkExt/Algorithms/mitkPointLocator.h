@@ -52,7 +52,12 @@ public:
   
   typedef int IdType;
   typedef float DistanceType;
-  typedef itk::PointSet<DistanceType, 3>  ITKPointSet;
+
+  typedef float   PixelType;
+  typedef double  CoordRepType;
+  typedef itk::DefaultStaticMeshTraits<PixelType, 3, 2, CoordRepType, 
+    CoordRepType, PixelType>                       MeshTraits;
+  typedef itk::PointSet<PixelType, 3, MeshTraits>  ITKPointSet;
 
   /**
    * Sets the point which will be used for nearest-neighbour searches. Note
@@ -117,7 +122,7 @@ public:
    * Please note, that there is no case, in which
    * no point is found, since as a precondition at least one point has to be contained
    * in the point set.
-   * @param point the query point, for whom the minimal distancew will be determined
+   * @param point the query point, for whom the minimal distance will be determined
    * @returns the distance in world coordinates between the nearest point in point set and the given point
    */
   DistanceType GetMinimalDistance( mitk::PointSet::PointType point );
@@ -128,7 +133,7 @@ public:
   * Please note, that there is no case, in which
   * no point is found, since as a precondition at least one point has to be contained
   * in the point set.
-  * @param point the query point, for whom the minimal distancew will be determined
+  * @param point the query point, for whom the minimal distance will be determined
   * @returns the index of and distance (in world coordinates) between the nearest point in point set and the given point
   */
   bool FindClosestPointAndDistance( mitk::PointSet::PointType point, IdType* id, DistanceType* dist);
@@ -198,6 +203,8 @@ protected:
   IdVectorType m_IndexToPointIdContainer;
 
   vtkPoints*       m_VtkPoints;
+  mitk::PointSet*  m_MitkPoints;
+  ITKPointSet*     m_ItkPoints;
   
   
   //

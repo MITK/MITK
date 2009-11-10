@@ -69,7 +69,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkSobelEdgeDetectionImageFilter.h>
 
 // Resampling
-#include <itkBSplineDownsampleImageFilter.h>
+#include <itkResampleImageFilter.h>
+#include <itkNearestNeighborInterpolateImageFunction.h>
 
 // Image Arithmetics
 #include <itkAddImageFilter.h>
@@ -80,7 +81,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 // Convenient Definitions
 typedef itk::Image<short, 3>                                                            ImageType;
-typedef itk::Image<float, 3>                                                            FloatImageType;
+typedef itk::Image<double, 3>                                                           FloatImageType;
 typedef itk::Image<itk::Vector<float,3>, 3>                                             VectorImageType;
 
 typedef itk::BinaryBallStructuringElement<ImageType::PixelType, 3>                      BallType;
@@ -100,7 +101,7 @@ typedef itk::GradientMagnitudeRecursiveGaussianImageFilter< ImageType, ImageType
 typedef itk::LaplacianImageFilter< FloatImageType, FloatImageType >                     LaplacianFilterType;
 typedef itk::SobelEdgeDetectionImageFilter< FloatImageType, FloatImageType >            SobelFilterType;
 
-typedef itk::BSplineDownsampleImageFilter< ImageType, ImageType >			                  DownsamplerType;
+typedef itk::ResampleImageFilter< ImageType, FloatImageType >                           ResampleImageFilterType;
 
 typedef itk::AddImageFilter< ImageType, ImageType, ImageType >                          AddFilterType;
 typedef itk::SubtractImageFilter< ImageType, ImageType, ImageType >                     SubtractFilterType;
@@ -403,6 +404,12 @@ void QmitkBasicImageProcessing::SelectAction(int action)
   case 16:
     {
       m_SelectedAction = DOWNSAMPLING;
+      m_Controls->tlParam1->setEnabled(true);
+      m_Controls->sbParam1->setEnabled(true);
+      text1 = "Downsampling by Factor:";
+      m_Controls->sbParam1->setMinimum( 0 );
+      m_Controls->sbParam1->setMaximum( 100 );
+      m_Controls->sbParam1->setValue( 2 );
       break;
     }
 
@@ -640,11 +647,32 @@ void QmitkBasicImageProcessing::StartButtonClicked()
 
   case DOWNSAMPLING:
     {
-      DownsamplerType::Pointer downsampleFilter = DownsamplerType::New();
-      downsampleFilter->SetInput ( itkImage );
-      downsampleFilter->Update();
-      newImage = mitk::ImportItkImage(downsampleFilter->GetOutput());
-      nameAddition << "_Downsampled";
+      ResampleImageFilterType::Pointer downsampler = ResampleImageFilterType::New();
+      downsampler->SetInput( itkImage );
+
+      typedef itk::NearestNeighborInterpolateImageFunction< ImageType, double > InterpolatorType;
+      InterpolatorType::Pointer interpolator = InterpolatorType::New();
+      downsampler->SetInterpolator( interpolator );
+
+      downsampler->SetDefaultPixelValue( 0 );
+
+      ResampleImageFilterType::SpacingType spacing = itkImage->GetSpacing();
+      spacing *= (double) param1;
+      downsampler->SetOutputSpacing( spacing );
+
+      downsampler->SetOutputOrigin( itkImage->GetOrigin() );
+      downsampler->SetOutputDirection( itkImage->GetDirection() );
+
+      ResampleImageFilterType::SizeType size = itkImage->GetLargestPossibleRegion().GetSize();
+      for ( int i = 0; i < 3; ++i )
+      {
+        size[i] /= param1;
+      }
+      downsampler->SetSize( size );
+      downsampler->UpdateLargestPossibleRegion();
+
+      newImage = mitk::ImportItkImage(downsampler->GetOutput());
+      nameAddition << "_Downsampled_by_" << param1;
       std::cout << "Downsampling successful." << std::endl;
       break;
     }

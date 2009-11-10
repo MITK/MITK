@@ -218,7 +218,7 @@
         </item>
         <item>
          <property name="text">
-          <string>Downsampling by 2</string>
+          <string>Downsampling</string>
          </property>
         </item>
        </widget>

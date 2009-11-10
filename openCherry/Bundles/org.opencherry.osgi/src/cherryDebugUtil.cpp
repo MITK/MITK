@@ -534,7 +534,15 @@ void DebugUtil::RestoreState()
 
     doc->release();
   }
-  catch (Poco::Exception& e)
+  catch (Poco::XML::SAXParseException& e)
+  {
+    CHERRY_WARN << e.displayText();
+  }
+  catch (Poco::FileNotFoundException&)
+  {
+
+  }
+  catch (Poco::FileException& e)
   {
     CHERRY_WARN << e.displayText();
   }

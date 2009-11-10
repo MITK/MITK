@@ -324,6 +324,8 @@ void QmitkDataManagerView::ColorActionChanged()
     mitk::Color color;
     mitk::ColorProperty::Pointer colorProp;
     node->GetProperty(colorProp,"color");
+    if(colorProp.IsNull())
+      return;
     color = colorProp->GetValue();
 
     QString styleSheet = "background-color:rgb(";
@@ -632,4 +634,27 @@ void QmitkDataManagerView::OtsuFilter( bool checked /*= false */ )
 void QmitkDataManagerView::NodeTreeViewRowsInserted( const QModelIndex & parent, int start, int end )
 {
   m_NodeTreeView->setExpanded(parent, true);
+}
+
+void QmitkDataManagerView::NodeSelectionChanged( const QItemSelection & selected, const QItemSelection & deselected )
+{
+  QModelIndexList indexesOfSelectedRows = deselected.indexes();
+  mitk::DataTreeNode* node = 0;
+
+  for (QModelIndexList::iterator it = indexesOfSelectedRows.begin()
+    ; it != indexesOfSelectedRows.end(); it++)
+  {
+    node = m_NodeTreeModel->GetNode(*it);
+    if ( node )
+      node->SetBoolProperty("selected", false);
+  }
+
+  indexesOfSelectedRows = selected.indexes();
+  for (QModelIndexList::iterator it = indexesOfSelectedRows.begin()
+    ; it != indexesOfSelectedRows.end(); it++)
+  {
+    node = m_NodeTreeModel->GetNode(*it);
+    if ( node )
+      node->SetBoolProperty("selected", true);
+  }
 }

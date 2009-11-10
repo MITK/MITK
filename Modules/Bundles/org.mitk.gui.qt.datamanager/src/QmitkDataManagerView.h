@@ -128,6 +128,9 @@ public slots:
   /// When rows are inserted auto expand them
   void NodeTreeViewRowsInserted ( const QModelIndex & parent, int start, int end );
 
+  /// Whenever the selection changes set the "selected" property respectively
+  void NodeSelectionChanged( const QItemSelection & selected, const QItemSelection & deselected );
+
 protected:
   ///
   /// \brief Create the view here.

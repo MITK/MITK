@@ -43,6 +43,7 @@ SET(INTERNAL_CPP_FILES
   cherryQtOpenPerspectiveAction.cpp
   cherryQtPerspectiveSwitcher.cpp
   cherryQtPluginActivator.cpp
+  cherryQtSafeApplication.cpp
   cherryQtSash.cpp
   cherryQtShell.cpp
   cherryQtShowViewAction.cpp

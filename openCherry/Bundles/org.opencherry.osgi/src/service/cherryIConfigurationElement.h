@@ -62,10 +62,10 @@ public:
 
         return cl;
       }
-      catch (Poco::Exception* e)
+      catch (Poco::Exception& e)
       {
-        CHERRY_ERROR << "Error loading class: " << e->displayText() << std::endl;
-        exit(1);
+        CHERRY_ERROR << "Error loading class: " << e.displayText() << std::endl;
+        throw e;
       }
     }
 

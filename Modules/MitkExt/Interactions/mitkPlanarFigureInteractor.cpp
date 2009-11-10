@@ -227,7 +227,6 @@ bool mitk::PlanarFigureInteractor
           renderer->GetSliceNavigationController()->GetCurrentPlaneGeometry() ) );
       if ( planeGeometry != NULL )
       {
-        LOG_INFO << "SETTING PLANEGEOMETRY";
         planarFigureGeometry = planeGeometry;
         planarFigure->SetGeometry2D( planeGeometry );
       }
@@ -253,6 +252,12 @@ bool mitk::PlanarFigureInteractor
       // Re-evaluate features
       planarFigure->EvaluateFeatures();
       this->LogPrintPlanarFigureQuantities( planarFigure );
+
+      // Set a bool property indicating that the figure has been placed in
+      // the current RenderWindow. This is required so that the same render
+      // window can be re-aligned to the Geometry2D of the PlanarFigure later
+      // on in an application.
+      m_DataTreeNode->SetBoolProperty( "PlanarFigureInitializedWindow", true, renderer );
 
       // Update rendered scene
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();

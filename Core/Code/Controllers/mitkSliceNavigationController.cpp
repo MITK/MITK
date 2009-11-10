@@ -580,8 +580,8 @@ SliceNavigationController::ExecuteOperation( Operation *operation )
   }
 }
 
-// Relict from the old times, when automous descisions were accepted
-// behaviour. Remains in here, because some RenderWindows do exist outide
+// Relict from the old times, when automous decisions were accepted
+// behavior. Remains in here, because some RenderWindows do exist outside
 // of StdMultiWidgets.
 bool
 SliceNavigationController
@@ -655,8 +655,8 @@ SliceNavigationController
                 if(image3D.IsNotNull())
                 {
                   image3D->GetGeometry()->WorldToIndex(worldposition, p);
-                  stream<<"Position: <"<<p[0] << ", " << p[1] << ", " << p[2] << "> Pixel";
-                  stream<<"; <"<<worldposition[0] << ", " << worldposition[1] << ", " << worldposition[2] << "> mm";
+                  stream<<"Position: <"<<worldposition[0] << ", " << worldposition[1] << ", " << worldposition[2] << "> mm";
+                  stream<<"; Index: <"<<floor(p[0]) << ", " << floor(p[1]) << ", " << floor(p[2]) << "> ";
                   stream<<"; Time: " << baseRenderer->GetTime() << " ms; Pixelvalue: "<<image3D->GetPixelValue(p, baseRenderer->GetTimeStep())<<"  ";
                 }
                 else

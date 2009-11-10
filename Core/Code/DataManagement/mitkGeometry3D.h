@@ -323,11 +323,7 @@ virtual void SetBounds(const BoundsArrayType& bounds);
       dim=3;
     }
     for(i=0;i<dim;++i){
-      if(pt_units[i]<0)
-        pt_units[i]-=0.5;
-      else
-        pt_units[i]+=0.5;
-      index[i]=(typename IndexType::IndexValueType)pt_units[i];
+      index[i]=(typename IndexType::IndexValueType)(floor(pt_units[i]));
     }
   }
 

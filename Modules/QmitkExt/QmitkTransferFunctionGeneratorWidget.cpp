@@ -6,12 +6,9 @@
 #include <QFileDialog>
 
 #include <SceneSerializationExports.h>
-namespace mitk
-{
-extern bool SceneSerialization_EXPORT SerializeTransferFunction( const char * , TransferFunction::Pointer  );
-extern TransferFunction::Pointer  SceneSerialization_EXPORT DeserializeTransferFunction( const char * );
- };
- 
+#include <mitkTransferFunctionPropertySerializer.h>
+#include <mitkTransferFunctionPropertyDeserializer.h>
+
 
 static char* presetNames[] = {  "choose an internal transferfunction preset",
                               "CT Generic",
@@ -75,7 +72,7 @@ void QmitkTransferFunctionGeneratorWidget::OnSavePreset( )
  
   LOG_INFO << "Saving Transferfunction under path: " << fileName;
 
-  if ( mitk::SerializeTransferFunction( fileName.c_str(),  tf ))
+  if ( mitk::TransferFunctionPropertySerializer::SerializeTransferFunction( fileName.c_str(),  tf ))
     m_InfoPreset->setText( QString( (std::string("saved ")+ fileName).c_str() ) );
   else
     m_InfoPreset->setText( QString( std::string("saving failed").c_str() ) );
@@ -143,7 +140,7 @@ void QmitkTransferFunctionGeneratorWidget::OnLoadPreset( )
 
   LOG_INFO << "Loading Transferfunction from path: " << fileName;
 
-  mitk::TransferFunction::Pointer tf = mitk::DeserializeTransferFunction(fileName.c_str());
+  mitk::TransferFunction::Pointer tf = mitk::TransferFunctionPropertyDeserializer::DeserializeTransferFunction(fileName.c_str());
 
   if(tf.IsNotNull())
   {

@@ -108,6 +108,7 @@ void InternalPlatform::Initialize(int& argc, char** argv, Poco::Util::AbstractCo
   
   try
   {
+    userFile.createDirectory();
     userFile.canWrite();
   }
   catch(const Poco::IOException& e)
@@ -117,8 +118,6 @@ void InternalPlatform::Initialize(int& argc, char** argv, Poco::Util::AbstractCo
     m_UserPath.pushDirectory("." + this->commandName());
     userFile = m_UserPath;
   }
-  
-  userFile.createDirectory();  
    
   m_BaseStatePath = m_UserPath;
   m_BaseStatePath.pushDirectory(".metadata");

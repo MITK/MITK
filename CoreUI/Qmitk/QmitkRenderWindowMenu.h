@@ -77,6 +77,9 @@ public:
   is activated.*/
   void MoveWidgetToCorrectPos();
 
+  /*! Update Crosshair mode in contex menu. */
+  void UpdateCrosshairState( bool state ) ;
+
 
 protected:
 
@@ -194,6 +197,8 @@ public:
 protected:
 
   QPushButton*        m_CrosshairModeButton;
+
+  QAction*            m_ShowHideCrosshairVisibilityAction;
 
   /*! QPushButton for activating/deactivating full-screen mode*/
   QPushButton*        m_FullScreenButton;

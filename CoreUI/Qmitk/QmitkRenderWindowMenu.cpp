@@ -85,12 +85,12 @@ void QmitkRenderWindowMenu::CreateMenuWidget()
   {
     crosshairModesMenu = new QMenu(NULL); // is shared by all menubars TODO should be deleted somehow
     
-    QAction* showHideCrosshairVisibilityAction = new QAction(crosshairModesMenu);
-    showHideCrosshairVisibilityAction->setText("Show crosshair");
-    showHideCrosshairVisibilityAction->setCheckable(true);
-    showHideCrosshairVisibilityAction->setChecked(true); // TODO observe current status
-    connect( showHideCrosshairVisibilityAction, SIGNAL(toggled(bool)), this, SIGNAL(ShowCrosshair(bool)));
-    crosshairModesMenu->addAction( showHideCrosshairVisibilityAction );
+    m_ShowHideCrosshairVisibilityAction = new QAction(crosshairModesMenu);
+    m_ShowHideCrosshairVisibilityAction->setText("Show crosshair");
+    m_ShowHideCrosshairVisibilityAction->setCheckable(true);
+    m_ShowHideCrosshairVisibilityAction->setChecked(true); // TODO observe current status
+    connect( m_ShowHideCrosshairVisibilityAction, SIGNAL(toggled(bool)), this, SIGNAL(ShowCrosshair(bool)));
+    crosshairModesMenu->addAction( m_ShowHideCrosshairVisibilityAction );
 
     QAction* resetViewAction = new QAction(crosshairModesMenu);
     resetViewAction->setText("Reset view");
@@ -656,5 +656,11 @@ void QmitkRenderWindowMenu::OnCrosshairRotationModeSelected(QAction* action)
 {
   emit ChangeCrosshairRotationMode( action->data().toInt() );
   emit SetCrosshairRotationLinked( action->text().contains("Coupled") );
+}
+
+void QmitkRenderWindowMenu::UpdateCrosshairState( bool state )
+{
+  if( m_ShowHideCrosshairVisibilityAction->isChecked() != state )
+    m_ShowHideCrosshairVisibilityAction->setChecked(state);
 }
 

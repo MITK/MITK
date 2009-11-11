@@ -126,6 +126,10 @@ protected slots:
 
   void OnChangeLayoutDesign(int layoutDesignIndex);
 
+  /*! slot for activating/deactivating crosshair mode in MenuWidget. The slot is connected to the WidgetPlanesVisibilityChanged() 
+  event of the StdMultiWidget.  */
+  void OnUpdateCrosshairState( bool state );
+
 private:
   
   mitk::VtkPropRenderer::Pointer m_Renderer;

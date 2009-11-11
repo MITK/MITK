@@ -310,3 +310,9 @@ void QmitkRenderWindow::HideMenuWidget()
   if( m_MenuWidget )
     m_MenuWidget->hide();
 }
+
+void QmitkRenderWindow::OnUpdateCrosshairState( bool state )
+{
+  if( m_MenuWidget )
+    m_MenuWidget->UpdateCrosshairState( state );
+}

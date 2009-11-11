@@ -146,6 +146,7 @@ m_Node(NULL)
   connect( mitkWidget4, SIGNAL( SignalLayoutDesignChanged(int) ), this, SLOT( OnLayoutDesignChanged(int) ) );
   
   connect( mitkWidget1, SIGNAL( ShowCrosshair(bool) ), this, SLOT( SetWidgetPlanesVisibility(bool) ) );
+  connect( this, SIGNAL( WidgetPlanesVisibilityChanged(bool) ), mitkWidget1, SLOT( OnUpdateCrosshairState(bool) ) );
   connect( mitkWidget1, SIGNAL( ResetView() ), this, SLOT( ResetCrosshair() ) );
   connect( mitkWidget1, SIGNAL( ChangeCrosshairRotationMode(int) ), this, SLOT( SetWidgetPlaneMode(int) ) );
   connect( mitkWidget1, SIGNAL( SetCrosshairRotationLinked(bool) ), this, SLOT( SetWidgetPlanesRotationLinked(bool) ) );
@@ -1639,7 +1640,7 @@ void QmitkStdMultiWidget::SetWidgetPlanesVisibility(bool visible, mitk::BaseRend
   SetWidgetPlaneVisibility("widget3Plane", visible, renderer);
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-
+  
   emit WidgetPlanesVisibilityChanged(visible);
 }
 

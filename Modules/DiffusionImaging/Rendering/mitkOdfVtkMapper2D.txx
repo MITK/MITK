@@ -313,9 +313,10 @@ void  mitk::OdfVtkMapper2D<T,N>
 
   itk::Point<double,3> p(point);
   Point3D origin = pfilter->GetGeometry()->GetOrigin();
-  p[0] += origin[0];
-  p[1] += origin[1];
-  p[2] += origin[2];
+  Vector3D spacing = pfilter->GetGeometry()->GetSpacing();
+  p[0] += origin[0]+spacing[0]*0.5;
+  p[1] += origin[1]+spacing[1]*0.5;
+  p[2] += origin[2]+spacing[2]*0.5;
   mitk::Point3D p2;
   pfilter->GetGeometry()->ItkPhysicalPointToWorld( p, p2 );
   point[0] = p2[0];

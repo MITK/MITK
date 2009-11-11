@@ -145,9 +145,13 @@ public:
 
   /** \brief Returns the polyline representing the planar figure
    * (for rendering, measurements, etc.). */
-  const VertexContainerType *GetPolyLine(unsigned int index);
+  VertexContainerType *GetPolyLine(unsigned int index);
 
-    /** \brief Returns the polyline that should be drawn the same size at every scale
+  /** \brief Returns the polyline representing the planar figure
+   * (for rendering, measurements, etc.). */
+  const VertexContainerType *GetPolyLine(unsigned int index) const;
+
+  /** \brief Returns the polyline that should be drawn the same size at every scale
    * (for text, angles, etc.). */
   const VertexContainerType *GetHelperPolyLine(unsigned int index, double mmPerDisplayUnit, unsigned int displayHeight);
 

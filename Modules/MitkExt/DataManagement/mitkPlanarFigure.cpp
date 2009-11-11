@@ -213,7 +213,7 @@ mitk::Point2D mitk::PlanarFigure::GetWorldControlPoint2D( unsigned int index ) c
 }
 
 
-const mitk::PlanarFigure::VertexContainerType *
+mitk::PlanarFigure::VertexContainerType *
 mitk::PlanarFigure::GetPolyLine(unsigned int index)
 {
   if ((m_PolyLines->ElementAt( index )) && (m_PolyLines->ElementAt( index )->GetMTime() < m_ControlPoints->GetMTime()) )
@@ -221,6 +221,13 @@ mitk::PlanarFigure::GetPolyLine(unsigned int index)
     this->GeneratePolyLine();
   }
 
+  return m_PolyLines->ElementAt( index );
+}
+
+
+const mitk::PlanarFigure::VertexContainerType *
+mitk::PlanarFigure::GetPolyLine(unsigned int index) const
+{
   return m_PolyLines->ElementAt( index );
 }
 

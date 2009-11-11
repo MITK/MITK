@@ -109,6 +109,10 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
     , this, SLOT(NodeTableViewContextMenuRequested(const QPoint&)) );
   QObject::connect( m_NodeTreeModel, SIGNAL(rowsInserted (const QModelIndex&, int, int))
     , this, SLOT(NodeTreeViewRowsInserted ( const QModelIndex&, int, int )) );
+  QObject::connect( m_NodeTreeView->selectionModel()
+    , SIGNAL( selectionChanged ( const QItemSelection &, const QItemSelection & ) )
+    , this
+    , SLOT( NodeSelectionChanged ( const QItemSelection &, const QItemSelection & ) ) );
 
   //# m_NodeMenu
   m_NodeMenu = new QMenu(m_NodeTreeView);
@@ -151,6 +155,7 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
 
   QLabel* _OpacityLabel = new QLabel("Opacity: ");
   QHBoxLayout* _OpacityWidgetLayout = new QHBoxLayout;
+  _OpacityWidgetLayout->setContentsMargins(0,0,0,0);
   _OpacityWidgetLayout->addWidget(_OpacityLabel);
   _OpacityWidgetLayout->addWidget(m_OpacitySlider);
   QWidget* _OpacityWidget = new QWidget;
@@ -171,6 +176,7 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   QLabel* _ColorLabel = new QLabel("Color: ");
   _ColorLabel->setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Minimum);
   QHBoxLayout* _ColorWidgetLayout = new QHBoxLayout;
+  _ColorWidgetLayout->setContentsMargins(0,0,0,0);
   _ColorWidgetLayout->addWidget(_ColorLabel);
   _ColorWidgetLayout->addWidget(m_ColorButton);
   QWidget* _ColorWidget = new QWidget;
@@ -230,6 +236,10 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
 
   m_SelectionListener = new cherry::SelectionChangedAdapter<QmitkDataManagerView>
     (this, &QmitkDataManagerView::SelectionChanged);
+
+  cherry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
+  s->AddSelectionListener(m_SelectionListener);
+
 }
 
 
@@ -552,6 +562,8 @@ std::vector<mitk::DataTreeNode*> QmitkDataManagerView::GetSelectedNodes() const
 
 void QmitkDataManagerView::SelectionChanged( cherry::IWorkbenchPart::Pointer part , cherry::ISelection::ConstPointer selection )
 {
+  if(part.GetPointer() == this)
+    return;
   mitk::DataTreeNodeSelection::ConstPointer _DataTreeNodeSelection 
     = selection.Cast<const mitk::DataTreeNodeSelection>();
 
@@ -657,4 +669,5 @@ void QmitkDataManagerView::NodeSelectionChanged( const QItemSelection & selected
     if ( node )
       node->SetBoolProperty("selected", true);
   }
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }

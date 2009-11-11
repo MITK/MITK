@@ -38,6 +38,10 @@ void QmitkPropertyListView::CreateQtPartControl( QWidget* parent )
   if(s)
     s->AddSelectionListener(m_SelectionListener);
 
+  cherry::ISelection::ConstPointer selection( this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection("org.mitk.views.datamanager"));
+  if(selection.IsNotNull())
+    this->SelectionChanged(cherry::IWorkbenchPart::Pointer(0), selection);
+
 }
 
 void QmitkPropertyListView::SelectionChanged( cherry::IWorkbenchPart::Pointer, cherry::ISelection::ConstPointer selection )

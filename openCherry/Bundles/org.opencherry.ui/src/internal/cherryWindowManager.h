@@ -111,7 +111,7 @@ public:
      * @return the number of windows
      * @since 3.0
      */
-    int GetWindowCount();
+    std::size_t GetWindowCount();
 
     /**
      * Returns this window manager's set of windows.

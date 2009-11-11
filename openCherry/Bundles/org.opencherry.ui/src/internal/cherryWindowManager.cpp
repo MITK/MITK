@@ -81,7 +81,7 @@ bool WindowManager::Close()
   return true;
 }
 
-int WindowManager::GetWindowCount()
+std::size_t WindowManager::GetWindowCount()
 {
   return windows.size();
 }

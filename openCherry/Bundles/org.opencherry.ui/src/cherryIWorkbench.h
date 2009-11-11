@@ -200,7 +200,7 @@ struct CHERRY_UI IWorkbench : public IServiceLocator {
    * @return the number of open windows
    * @since 3.0
    */
-  virtual int GetWorkbenchWindowCount() = 0;
+  virtual std::size_t GetWorkbenchWindowCount() = 0;
 
   /**
    * Returns a list of the open main windows associated with this workbench.

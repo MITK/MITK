@@ -402,7 +402,7 @@ bool WorkbenchWindow::BusyClose()
     // Only do the check if it is OK to close if we are not closing
     // via the workbench as the workbench will check this itself.
     Workbench* workbench = this->GetWorkbenchImpl();
-    int count = workbench->GetWorkbenchWindowCount();
+    std::size_t count = workbench->GetWorkbenchWindowCount();
 
     std::cout << "workbench is starting: " << workbench->IsStarting()
         << std::endl;

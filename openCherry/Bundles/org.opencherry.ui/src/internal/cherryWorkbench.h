@@ -172,7 +172,7 @@ public:
   IEditorRegistry* GetEditorRegistry();
   IPerspectiveRegistry* GetPerspectiveRegistry();
 
-  int GetWorkbenchWindowCount();
+  std::size_t GetWorkbenchWindowCount();
   std::vector<IWorkbenchWindow::Pointer> GetWorkbenchWindows();
   IWorkbenchWindow::Pointer OpenWorkbenchWindow(const std::string& perspectiveId,
         IAdaptable* input);

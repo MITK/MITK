@@ -1075,7 +1075,7 @@ IWorkbenchWindow::Pointer Workbench::GetActiveWorkbenchWindow()
   return win;
 }
 
-int Workbench::GetWorkbenchWindowCount()
+std::size_t Workbench::GetWorkbenchWindowCount()
 {
   return windowManager.GetWindowCount();
 }

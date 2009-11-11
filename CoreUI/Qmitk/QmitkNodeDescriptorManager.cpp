@@ -49,9 +49,13 @@ void QmitkNodeDescriptorManager::Initialize()
   mitk::NodePredicateDataType::Pointer isPlanarCircle = mitk::NodePredicateDataType::New("PlanarCircle");
   this->AddDescriptor(new QmitkNodeDescriptor(tr("PlanarCircle"), QString(":/Qmitk/data-type-circle.png"), isPlanarCircle, this));
 
-  // Adding "PlanarLine"
+  // Adding "PlanarAngle"
   mitk::NodePredicateDataType::Pointer isPlanarAngle = mitk::NodePredicateDataType::New("PlanarAngle");
   this->AddDescriptor(new QmitkNodeDescriptor(tr("PlanarAngle"), QString(":/Qmitk/data-type-angle.png"), isPlanarAngle, this));
+
+  // Adding "PlanarFourPointAngle"
+  mitk::NodePredicateDataType::Pointer isPlanarFourPointAngle = mitk::NodePredicateDataType::New("PlanarFourPointAngle");
+  this->AddDescriptor(new QmitkNodeDescriptor(tr("PlanarFourPointAngle"), QString(":/Qmitk/data-type-four-point-angle.png"), isPlanarFourPointAngle, this));
 
   // Adding "PlanarLine"
   mitk::NodePredicateDataType::Pointer isPlanarPolygon = mitk::NodePredicateDataType::New("PlanarPolygon");

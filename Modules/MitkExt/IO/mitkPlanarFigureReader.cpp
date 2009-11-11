@@ -126,6 +126,7 @@ void mitk::PlanarFigureReader::GenerateData()
       continue;
     }
     TiXmlElement* cpElement = pfElement->FirstChildElement("ControlPoints");
+    bool first = true;
     if (cpElement != NULL)      
       for( TiXmlElement* vertElement = cpElement->FirstChildElement("Vertex"); vertElement != NULL; vertElement = vertElement->NextSiblingElement("Vertex"))
       {
@@ -143,31 +144,30 @@ void mitk::PlanarFigureReader::GenerateData()
         Point2D p;
         p.SetElement(0, x);
         p.SetElement(1, y);
+        if (first == true)  // needed to set m_FigurePlaced to true
+        {
+          pf->PlaceFigure(p);
+          first = false;
+        }
         pf->SetControlPoint(id, p, true);
       }
     TiXmlElement* geoElement = pfElement->FirstChildElement("Geometry");
     if (geoElement != NULL)
     {
-      TiXmlElement* originElement = pfElement->FirstChildElement("Origin");
-      TiXmlElement* normalElement = pfElement->FirstChildElement("Normal");
-      TiXmlElement* spacingElement = pfElement->FirstChildElement("Spacing");
-      if ((originElement != NULL) && (normalElement != NULL) && (spacingElement != NULL))
+      try
       {
-        try
-        {
-          Point3D origin = this->GetPointFromXMLNode(originElement);
-          Vector3D normal = this->GetVectorFromXMLNode(normalElement);
-          Vector3D spacing = this->GetVectorFromXMLNode(spacingElement);
-          mitk::PlaneGeometry::Pointer planeGeo = mitk::PlaneGeometry::New();
-          planeGeo->InitializePlane(origin, normal); // initialize with normal vector and origin
-          planeGeo->SetExtentInMM(0, spacing.GetElement(0));  // \TODO Does this make sense? How do we use the spacing?
-          planeGeo->SetExtentInMM(1, spacing.GetElement(1));
-          planeGeo->SetExtentInMM(2, spacing.GetElement(2));
-          pf->SetGeometry2D(planeGeo);
-        }
-        catch (...)
-        {        	
-        }
+        Point3D origin = this->GetPointFromXMLNode(pfElement->FirstChildElement("Origin"));
+        Vector3D normal = this->GetVectorFromXMLNode(pfElement->FirstChildElement("Normal"));
+        Vector3D spacing = this->GetVectorFromXMLNode(pfElement->FirstChildElement("Spacing"));
+        mitk::PlaneGeometry::Pointer planeGeo = mitk::PlaneGeometry::New();
+        planeGeo->InitializePlane(origin, normal); // initialize with normal vector and origin
+        planeGeo->SetExtentInMM(0, spacing.GetElement(0));  // \TODO Does this make sense? How do we use the spacing?
+        planeGeo->SetExtentInMM(1, spacing.GetElement(1));
+        planeGeo->SetExtentInMM(2, spacing.GetElement(2));
+        pf->SetGeometry2D(planeGeo);
+      }
+      catch (...)
+      {        	
       }
     }
       // \TODO: what about m_FigurePlaced and m_SelectedControlPoint ??
@@ -178,6 +178,8 @@ void mitk::PlanarFigureReader::GenerateData()
 
 mitk::Point3D mitk::PlanarFigureReader::GetPointFromXMLNode(TiXmlElement* e)
 {
+  if (e == NULL)
+    throw std::invalid_argument("node invalid"); // TODO: can we do a better error handling?
   mitk::Point3D point;
   mitk::ScalarType p;
   if (e->QueryFloatAttribute("x", &p) == TIXML_WRONG_TYPE)
@@ -195,6 +197,8 @@ mitk::Point3D mitk::PlanarFigureReader::GetPointFromXMLNode(TiXmlElement* e)
 
 mitk::Vector3D mitk::PlanarFigureReader::GetVectorFromXMLNode(TiXmlElement* e)
 {
+  if (e == NULL)
+    throw std::invalid_argument("node invalid"); // TODO: can we do a better error handling?
   mitk::Vector3D vector;
   mitk::ScalarType p;
   if (e->QueryFloatAttribute("x", &p) == TIXML_WRONG_TYPE)

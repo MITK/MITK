@@ -57,7 +57,9 @@ rotation around the x-, y- and z-Axis. Additionally you can automatically allign
 \image html Tab2.png "The Advanced Mode tab"
 
 In the "Advanced Mode" tab you can choose a transform, a metric, an optimizer and an interpolator and you have to set the corresponding parameters to specify the registration 
-method you want to perform.
+method you want to perform. With the topmost button you can also load testpresets. These presets contain all parametersets which were saved using the "Save as Testpreset" button. The "Save as 
+Preset" button makes the preset available from the "Automatic Registration" tab. This button should be used when a preset is not intended for finding good parameters anymore but can be used as 
+standard preset.
 
 To show the current transform and its parameters for the registration process, the Transform checkbox has to be checked. Currently, the following transforms are implemented 
 (for detailed information see [1] and [2]):
@@ -121,7 +123,7 @@ calculated.
 
 \li <b>MattesMutualInformation</b>[4, 5]</b>:</b> The method of Mattes et al. is used to compute the mutual information between two images to be registered.
 
-\li <b>MeanReciprocalSquareDifference:</b> Computes pixel-wise differences and adds them after passing them through a bell-shaped function 1 / (1+x²).
+\li <b>MeanReciprocalSquareDifference:</b> Computes pixel-wise differences and adds them after passing them through a bell-shaped function 1 / (1+x^2).
 
 \li <b>MutualInformation</b>[6]</b>:</b> Computes the mutual information between image A and image B.
 
@@ -169,8 +171,8 @@ To show the current interpolator for the registration process, the Interpolator 
 
 \li <b>NearestNeighbor:</b> Uses the intensity of the nearest grid position.
 
-You can show and hide the parameters for the selection by checking or unchecking the corresponding area. You can save the current sets of parameters with the "Save Rigid Registration Parameter" 
-button.
+You can show and hide the parameters for the selection by checking or unchecking the corresponding area. You can save the current sets of parameters with the "Save as Testpreset" or "Save as 
+Preset" buttons.
 
 \section QmitkRigidRegistrationUserManualReferences References:
 

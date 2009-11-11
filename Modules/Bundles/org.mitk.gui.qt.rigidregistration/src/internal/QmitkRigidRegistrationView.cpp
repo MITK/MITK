@@ -603,7 +603,10 @@ void QmitkRigidRegistrationView::Rotate(int* rotateVector)
     translationMatrix->Invert();
 
     m_MovingNode->GetData()->GetGeometry()->Compose( translationMatrix );
-    m_MovingMaskNode->GetData()->GetGeometry()->Compose( translationMatrix );
+    if (m_MovingMaskNode.IsNotNull())
+    {
+      m_MovingMaskNode->GetData()->GetGeometry()->Compose( translationMatrix );
+    }
 
     double radianX = rotateVec[0] * vnl_math::pi / 180;
     double radianY = rotateVec[1] * vnl_math::pi / 180;
@@ -632,7 +635,10 @@ void QmitkRigidRegistrationView::Rotate(int* rotateVector)
     }
 
     m_MovingNode->GetData()->GetGeometry()->Compose( rotationMatrix );
-    m_MovingMaskNode->GetData()->GetGeometry()->Compose( rotationMatrix );
+    if (m_MovingMaskNode.IsNotNull())
+    {
+      m_MovingMaskNode->GetData()->GetGeometry()->Compose( rotationMatrix );
+    }
     
     translationMatrix->Invert();
 

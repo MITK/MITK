@@ -21,6 +21,7 @@ SET(CPP_FILES
   Algorithms/mitkHeightFieldSurfaceClipImageFilter.cpp
   Algorithms/mitkHistogramMatching.cpp
   Algorithms/mitkImageRegistrationMethod.cpp
+  Algorithms/mitkImageStatisticsCalculator.cpp
   Algorithms/mitkImageToLookupTableFilter.cpp
   Algorithms/mitkImageToSurfaceFilter.cpp
   Algorithms/mitkInterpolateLinesFilter.cpp

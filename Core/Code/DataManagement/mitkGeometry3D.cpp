@@ -337,28 +337,7 @@ void mitk::Geometry3D::BackTransform(const mitk::Point3D &in, mitk::Point3D& out
     temp[j] = in[j] - offset[j];
   }
 
-  // in GetInverseMatrix geht was schief
-  TransformType::Pointer invertedTransform = TransformType::New();
-  if (!m_IndexToWorldTransform->GetInverse( invertedTransform.GetPointer() ))
-  {
-    itkExceptionMacro(   "Internal ITK matrix inversion error, cannot proceed." );
-  }
-
-  const TransformType::MatrixType& inverse = invertedTransform->GetMatrix();
-  unsigned int nans(0);
-  for (i = 0; i < 3; i++)
-  {
-    out[i] = 0.0;
-    for (j = 0; j < 3; j++)
-    {
-      out[i] += inverse[i][j]*temp[j];
-    }
-
-    if (inverse[i][j] != inverse[i][j] ) // this is only true for NaN
-    {
-      ++nans;
-    }
-  }
+  MultiplyWithWorldToIndexTransform(temp, out);
 
   if(m_ImageGeometry)
   {
@@ -367,19 +346,44 @@ void mitk::Geometry3D::BackTransform(const mitk::Point3D &in, mitk::Point3D& out
       out[i] += 0.5;
     }
   }
-  
-  if (nans > 0)
-  {
-    itkExceptionMacro(   "Internal ITK matrix inversion error, cannot proceed. Matrix was: " << std::endl 
-                      << m_IndexToWorldTransform << "Suggested inverted matrix is:" << std::endl
-                      << inverse );
-  }
 }
 
 void mitk::Geometry3D::BackTransform(const mitk::Point3D &/*at*/, const mitk::Vector3D &in, mitk::Vector3D& out) const
 {
-  const TransformType::MatrixType& inverse = m_IndexToWorldTransform->GetInverseMatrix();
-  out = inverse * in;
+  MultiplyWithWorldToIndexTransform(in, out);
+}
+
+void mitk::Geometry3D::MultiplyWithWorldToIndexTransform(const FixedArrayType& in, FixedArrayType& out) const
+{
+  TransformType::Pointer invertedTransform = TransformType::New();
+  if (!m_IndexToWorldTransform->GetInverse( invertedTransform.GetPointer() ))
+  {
+    itkExceptionMacro(   "Internal ITK matrix inversion error, cannot proceed." );
+  }
+
+  unsigned int i, j;
+
+  const TransformType::MatrixType& inverse = invertedTransform->GetMatrix();
+  unsigned int nans(0);
+  for (i = 0; i < 3; i++)
+  {
+    out[i] = 0.0;
+    for (j = 0; j < 3; j++)
+    {
+      out[i] += inverse[i][j]*in[j];
+      if (inverse[i][j] != inverse[i][j] ) // this is only true for NaN
+      {
+        ++nans;
+      }
+    }
+  }
+
+  if (nans > 0)
+  {
+    itkExceptionMacro(   "Internal ITK matrix inversion error, cannot proceed. Matrix was: " << std::endl 
+      << m_IndexToWorldTransform << "Suggested inverted matrix is:" << std::endl
+      << inverse );
+  }
 }
 
 const float* mitk::Geometry3D::GetFloatSpacing() const

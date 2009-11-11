@@ -42,7 +42,8 @@ typedef itk::BoundingBox<unsigned long, 3, ScalarType>   BoundingBox;
 
 //##Documentation
 //## @brief Standard typedef for time-bounds
-typedef itk::FixedArray<ScalarType,2> TimeBounds;
+typedef itk::FixedArray<ScalarType,2>  TimeBounds;
+typedef itk::FixedArray<ScalarType, 3> FixedArrayType;
 
 typedef itk::AffineGeometryFrame<ScalarType, 3> AffineGeometryFrame3D;
 
@@ -572,6 +573,8 @@ protected:
 
   virtual void BackTransform(const mitk::Point3D &in, mitk::Point3D& out) const;
   virtual void BackTransform(const mitk::Point3D &at, const mitk::Vector3D &in, mitk::Vector3D& out) const;
+
+  virtual void MultiplyWithWorldToIndexTransform(const FixedArrayType& in, FixedArrayType& out) const;
 
   //##Documentation
   //## @brief Set the parametric bounds

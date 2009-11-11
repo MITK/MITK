@@ -86,6 +86,8 @@ SET(CPP_FILES
 
  QmitkHistogram.cpp
  QmitkHistogramWidget.cpp
+ QmitkVtkHistogramWidget.cpp
+ 
  QmitkPlotWidget.cpp
  QmitkPlotDialog.cpp
  QmitkPointListModel.cpp
@@ -154,6 +156,7 @@ SET(MOC_H_FILES
  QmitkPointListView.h
  QmitkPointListWidget.h
  QmitkHistogramWidget.h
+ QmitkVtkHistogramWidget.h
  QmitkVideoBackground.h
 )
 

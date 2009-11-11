@@ -28,6 +28,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkNodePredicateProperty.h>
 #include <mitkNodePredicateNOT.h>
 #include <mitkNodePredicateAND.h>
+#include <mitkDataTreeNodeSelection.h>
 
 #include "mitkPlanarCircle.h"
 #include "mitkPlanarPolygon.h"
@@ -35,9 +36,11 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkPlanarLine.h"
 #include "mitkPlanarFourPointAngle.h"
 #include "mitkPlanarFigureInteractor.h"
+#include <mitkPlaneGeometry.h>
 #include "QmitkPlanarFiguresTableModel.h"
 
 #include "QmitkMeasurement.h"
+#include <QmitkRenderWindow.h>
 
 #include <QGridLayout>
 #include <QMainWindow>
@@ -66,7 +69,8 @@ QmitkMeasurement::QmitkMeasurement()
 
 QmitkMeasurement::~QmitkMeasurement()
 {
-  this->Deactivated();
+
+  this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->RemovePostSelectionListener(m_SelectionListener);
 }
 
 void QmitkMeasurement::CreateQtPartControl( QWidget* parent )
@@ -75,41 +79,49 @@ void QmitkMeasurement::CreateQtPartControl( QWidget* parent )
 
   //# add actions
   QAction* currentAction = m_DrawActionsToolBar->addAction(QIcon(":/measurement/line.png"), "Draw Line");
+  m_DrawLine = currentAction;
+  m_DrawLine->setCheckable(true);
   m_DrawActionsToolBar->addAction(currentAction);
   QObject::connect( currentAction, SIGNAL( triggered(bool) )
     , this, SLOT( ActionDrawLineTriggered(bool) ) );
 
   currentAction = m_DrawActionsToolBar->addAction(QIcon(":/measurement/path.png"), "Draw Path");
+  m_DrawPath = currentAction;
   m_DrawActionsToolBar->addAction(currentAction);
   QObject::connect( currentAction, SIGNAL( triggered(bool) )
     , this, SLOT( ActionDrawPathTriggered(bool) ) );
 
   currentAction = m_DrawActionsToolBar->addAction(QIcon(":/measurement/angle.png"), "Draw Angle");
+  m_DrawAngle = currentAction;
   m_DrawActionsToolBar->addAction(currentAction);
   QObject::connect( currentAction, SIGNAL( triggered(bool) )
     , this, SLOT( ActionDrawAngleTriggered(bool) ) );
 
   currentAction = m_DrawActionsToolBar->addAction(QIcon(":/measurement/four-point-angle.png"), "Draw Four Point Angle");
+  m_DrawFourPointAngle = currentAction;
   m_DrawActionsToolBar->addAction(currentAction);
   QObject::connect( currentAction, SIGNAL( triggered(bool) )
     , this, SLOT( ActionDrawFourPointAngleTriggered(bool) ) );
 
   currentAction = m_DrawActionsToolBar->addAction(QIcon(":/measurement/circle.png"), "Draw Ellipse");
+  m_DrawEllipse = currentAction;
   m_DrawActionsToolBar->addAction(currentAction);
   QObject::connect( currentAction, SIGNAL( triggered(bool) )
     , this, SLOT( ActionDrawEllipseTriggered(bool) ) );
 
   currentAction = m_DrawActionsToolBar->addAction(QIcon(":/measurement/rectangle.png"), "Draw Rectangle");
+  m_DrawRectangle = currentAction;
   m_DrawActionsToolBar->addAction(currentAction);
   QObject::connect( currentAction, SIGNAL( triggered(bool) )
     , this, SLOT( ActionDrawRectangleTriggered(bool) ) );
 
   currentAction = m_DrawActionsToolBar->addAction(QIcon(":/measurement/polygon.png"), "Draw Polygon");
+  m_DrawPolygon = currentAction;
   m_DrawActionsToolBar->addAction(currentAction);
   QObject::connect( currentAction, SIGNAL( triggered(bool) )
     , this, SLOT( ActionDrawPolygonTriggered(bool) ) );
 
-  currentAction = m_DrawActionsToolBar->addAction(QIcon(":/measurement/arrow.png"), "Draw Arrow");
+  /*currentAction = m_DrawActionsToolBar->addAction(QIcon(":/measurement/arrow.png"), "Draw Arrow");
   m_DrawActionsToolBar->addAction(currentAction);
   QObject::connect( currentAction, SIGNAL( triggered(bool) )
     , this, SLOT( ActionDrawArrowTriggered(bool) ) );
@@ -117,7 +129,7 @@ void QmitkMeasurement::CreateQtPartControl( QWidget* parent )
   currentAction = m_DrawActionsToolBar->addAction(QIcon(":/measurement/text.png"), "Draw Text");
   m_DrawActionsToolBar->addAction(currentAction);
   QObject::connect( currentAction, SIGNAL( triggered(bool) )
-    , this, SLOT( ActionDrawTextTriggered(bool) ) );
+    , this, SLOT( ActionDrawTextTriggered(bool) ) );*/
 
   //# m_NodeTableModel
   mitk::NodePredicateProperty::Pointer isHelperObject = mitk::NodePredicateProperty::New("helper object"
@@ -179,8 +191,13 @@ void QmitkMeasurement::CreateQtPartControl( QWidget* parent )
       this, &QmitkMeasurement::SelectionChanged) );
   this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddPostSelectionListener(m_SelectionListener);
   cherry::ISelection::ConstPointer selection( this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection());
+
   m_CurrentSelection = selection.Cast< const cherry::IStructuredSelection >();
   this->SelectionChanged(cherry::SmartPointer<IWorkbenchPart>(NULL), selection);
+
+  m_SelectionProvider = new mitk::MeasurementSelectionProvider();
+  //m_SelectionProvider->SetItemSelectionModel(m_NodeTreeView->selectionModel());
+  //this->GetSite()->SetSelectionProvider(m_SelectionProvider);
 
 }
 
@@ -229,17 +246,18 @@ void QmitkMeasurement::SelectionChanged( cherry::IWorkbenchPart::Pointer sourcep
 }
 
 
-void QmitkMeasurement::ActionDrawLineTriggered( bool  /*checked*/ )
+void QmitkMeasurement::ActionDrawLineTriggered( bool  checked )
 {
-  if ( m_SelectedImageNode.IsNull() )
+  if ( m_SelectedImageNode.IsNull() || !checked)
   {
+    m_DrawLine->setChecked(false);
     return;
   }
 
   mitk::PlanarLine::Pointer figure = mitk::PlanarLine::New();
 
   mitk::DataTreeNode::Pointer figureNode = mitk::DataTreeNode::New();
-  figureNode->SetName(QString("line%1").arg(++m_LineCounter).toStdString());
+  figureNode->SetName(QString("Line%1").arg(++m_LineCounter).toStdString());
   figureNode->SetData( figure );
 
   this->GetDataStorage()->Add( figureNode, m_SelectedImageNode );
@@ -249,14 +267,16 @@ void QmitkMeasurement::ActionDrawLineTriggered( bool  /*checked*/ )
   mitk::GlobalInteraction::GetInstance()->AddInteractor( interactor );
 
   LOG_INFO << "PlanarLine initialized...";
+  m_DrawLine->setChecked(false);
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll(); 
 }
 
-void QmitkMeasurement::ActionDrawPathTriggered( bool  /*checked*/ )
+void QmitkMeasurement::ActionDrawPathTriggered( bool  checked )
 {
-  if ( m_SelectedImageNode.IsNull() )
+  if ( m_SelectedImageNode.IsNull() || !checked)
   {
+    m_DrawPath->setChecked(false);
     return;
   }
 
@@ -264,7 +284,7 @@ void QmitkMeasurement::ActionDrawPathTriggered( bool  /*checked*/ )
   figure->ClosedOff();
 
   mitk::DataTreeNode::Pointer figureNode = mitk::DataTreeNode::New();
-  figureNode->SetName(QString("path%1").arg(++m_PathCounter).toStdString());
+  figureNode->SetName(QString("Path%1").arg(++m_PathCounter).toStdString());
   figureNode->SetData( figure );
 
   this->GetDataStorage()->Add( figureNode, m_SelectedImageNode );
@@ -273,22 +293,24 @@ void QmitkMeasurement::ActionDrawPathTriggered( bool  /*checked*/ )
     mitk::PlanarFigureInteractor::New( "PlanarFigureInteractor", figureNode );
   mitk::GlobalInteraction::GetInstance()->AddInteractor( interactor );
 
-  LOG_INFO << "PlanarPolygon initialized...";
+  LOG_INFO << "PlanarPath initialized...";
+  m_DrawPath->setChecked(false);
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll(); 
 }
 
-void QmitkMeasurement::ActionDrawAngleTriggered( bool  /*checked*/ )
+void QmitkMeasurement::ActionDrawAngleTriggered( bool  checked )
 {
-  if ( m_SelectedImageNode.IsNull() )
+  if ( m_SelectedImageNode.IsNull() || !checked )
   {
+    m_DrawAngle->setChecked(false);
     return;
   }
 
   mitk::PlanarAngle::Pointer figure = mitk::PlanarAngle::New();
 
   mitk::DataTreeNode::Pointer figureNode = mitk::DataTreeNode::New();
-  figureNode->SetName(QString("angle%1").arg(++m_AngleCounter).toStdString());
+  figureNode->SetName(QString("Angle%1").arg(++m_AngleCounter).toStdString());
   figureNode->SetData( figure );
 
   this->GetDataStorage()->Add( figureNode, m_SelectedImageNode );
@@ -298,20 +320,21 @@ void QmitkMeasurement::ActionDrawAngleTriggered( bool  /*checked*/ )
   mitk::GlobalInteraction::GetInstance()->AddInteractor( interactor );
 
   LOG_INFO << "PlanarAngle initialized...";
+  m_DrawAngle->setChecked(false);
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll(); 
 }
 
-void QmitkMeasurement::ActionDrawFourPointAngleTriggered( bool  /*checked*/ )
+void QmitkMeasurement::ActionDrawFourPointAngleTriggered( bool  checked )
 {
-  if ( m_SelectedImageNode.IsNull() )
+  if ( m_SelectedImageNode.IsNull() || !checked )
   {
     return;
   }
   mitk::PlanarFourPointAngle::Pointer figure = mitk::PlanarFourPointAngle::New();
 
   mitk::DataTreeNode::Pointer figureNode = mitk::DataTreeNode::New();
-  figureNode->SetName(QString("line%1").arg(++m_FourPointAngleCounter).toStdString());
+  figureNode->SetName(QString("Four Point Angle%1").arg(++m_FourPointAngleCounter).toStdString());
 
   figureNode->SetData( figure );
 
@@ -322,21 +345,23 @@ void QmitkMeasurement::ActionDrawFourPointAngleTriggered( bool  /*checked*/ )
   mitk::GlobalInteraction::GetInstance()->AddInteractor( interactor );
 
   LOG_INFO << "PlanarFourPointAngle initialized...";
+  m_DrawFourPointAngle->setChecked(false);
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-void QmitkMeasurement::ActionDrawEllipseTriggered( bool  /*checked*/ )
+void QmitkMeasurement::ActionDrawEllipseTriggered( bool  checked )
 {
-  if ( m_SelectedImageNode.IsNull() )
+  if ( m_SelectedImageNode.IsNull() || !checked )
   {
+    m_DrawEllipse->setChecked(false);
     return;
   }
 
   mitk::PlanarCircle::Pointer figure = mitk::PlanarCircle::New();
 
   mitk::DataTreeNode::Pointer figureNode = mitk::DataTreeNode::New();
-  figureNode->SetName(QString("ellipse%1").arg(++m_EllipseCounter).toStdString());
+  figureNode->SetName(QString("Ellipse%1").arg(++m_EllipseCounter).toStdString());
   figureNode->SetData( figure );
 
   this->GetDataStorage()->Add( figureNode, m_SelectedImageNode );
@@ -346,22 +371,24 @@ void QmitkMeasurement::ActionDrawEllipseTriggered( bool  /*checked*/ )
   mitk::GlobalInteraction::GetInstance()->AddInteractor( interactor );
 
   LOG_INFO << "PlanarCircle initialized...";
+  m_DrawEllipse->setChecked(false);
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll(); 
 }
 
-void QmitkMeasurement::ActionDrawRectangleTriggered( bool  /*checked*/ )
+void QmitkMeasurement::ActionDrawRectangleTriggered( bool  checked )
 {
-  if ( m_SelectedImageNode.IsNull() )
+  if ( m_SelectedImageNode.IsNull() || !checked )
   {
     return;
   }
 }
 
-void QmitkMeasurement::ActionDrawPolygonTriggered( bool  /*checked*/ )
+void QmitkMeasurement::ActionDrawPolygonTriggered( bool  checked )
 {
-  if ( m_SelectedImageNode.IsNull() )
+  if ( m_SelectedImageNode.IsNull() || !checked )
   {
+    m_DrawPolygon->setChecked(false);
     return;
   }
 
@@ -379,22 +406,23 @@ void QmitkMeasurement::ActionDrawPolygonTriggered( bool  /*checked*/ )
   mitk::GlobalInteraction::GetInstance()->AddInteractor( interactor );
 
   LOG_INFO << "PlanarPolygon initialized...";
+  m_DrawPolygon->setChecked(false);
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll(); 
 }
 
 
-void QmitkMeasurement::ActionDrawArrowTriggered( bool  /*checked*/ )
+void QmitkMeasurement::ActionDrawArrowTriggered( bool  checked )
 {
-  if ( m_SelectedImageNode.IsNull() )
+  if ( m_SelectedImageNode.IsNull() || !checked )
   {
     return;
   }
 }
 
-void QmitkMeasurement::ActionDrawTextTriggered( bool  /*checked*/ )
+void QmitkMeasurement::ActionDrawTextTriggered( bool  checked )
 {
-  if ( m_SelectedImageNode.IsNull() )
+  if ( m_SelectedImageNode.IsNull() || !checked )
   {
     return;
   }
@@ -403,13 +431,13 @@ void QmitkMeasurement::ActionDrawTextTriggered( bool  /*checked*/ )
 void QmitkMeasurement::Visible()
 {
   this->GetActiveStdMultiWidget()->SetWidgetPlanesVisibility(false);
-  this->GetActiveStdMultiWidget()->changeLayoutToWidget1();
+  //this->GetActiveStdMultiWidget()->changeLayoutToWidget1();
 }
 
 void QmitkMeasurement::Hidden()
 {
   this->GetActiveStdMultiWidget()->SetWidgetPlanesVisibility(true);
-  this->GetActiveStdMultiWidget()->changeLayoutToDefault();
+  //this->GetActiveStdMultiWidget()->changeLayoutToDefault();
 }
 
 
@@ -488,13 +516,61 @@ void QmitkMeasurement::PlanarFigureSelectionChanged( const QItemSelection & sele
       node->SetBoolProperty("selected", false);
   }
 
+  std::vector<mitk::DataTreeNode::Pointer > nodes;
+
   indexesOfSelectedRows = selected.indexes();
+  int i = 1;
+
   for (QModelIndexList::iterator it = indexesOfSelectedRows.begin()
-    ; it != indexesOfSelectedRows.end(); it++)
+    ; it != indexesOfSelectedRows.end(); ++it,++i)
   {
     node = m_PlanarFiguresModel->GetNode(*it);
     if ( node )
+    {
+      nodes.push_back(node);
       node->SetBoolProperty("selected", true);
+      if(i == indexesOfSelectedRows.size())
+      {
+        mitk::PlanarFigure* _PlanarFigure = dynamic_cast<mitk::PlanarFigure*>( node->GetData() );
+        if(!_PlanarFigure)
+          continue;
+        const mitk::PlaneGeometry* _PlaneGeometry = dynamic_cast<const mitk::PlaneGeometry*>( _PlanarFigure->GetGeometry2D() );
+        if(!_PlaneGeometry)
+          continue;
+
+        QmitkRenderWindow* RenderWindow1 = this->GetActiveStdMultiWidget()->GetRenderWindow1();
+        QmitkRenderWindow* RenderWindow2 = this->GetActiveStdMultiWidget()->GetRenderWindow2();
+        QmitkRenderWindow* RenderWindow3 = this->GetActiveStdMultiWidget()->GetRenderWindow3();
+        QmitkRenderWindow* RenderWindow4 = this->GetActiveStdMultiWidget()->GetRenderWindow4();
+        QmitkRenderWindow* selectedRenderWindow = 0;
+        bool PlanarFigureInitializedWindow = false;
+
+        // find initialized renderwindow
+        if(node->GetBoolProperty("PlanarFigureInitializedWindow", PlanarFigureInitializedWindow
+            , RenderWindow1->GetRenderer()))
+          selectedRenderWindow = RenderWindow1;
+        if(!selectedRenderWindow && node->GetBoolProperty("PlanarFigureInitializedWindow", PlanarFigureInitializedWindow
+            , RenderWindow2->GetRenderer()))
+          selectedRenderWindow = RenderWindow2;
+        if(!selectedRenderWindow && node->GetBoolProperty("PlanarFigureInitializedWindow", PlanarFigureInitializedWindow
+            , RenderWindow3->GetRenderer()))
+          selectedRenderWindow = RenderWindow3;
+        if(!selectedRenderWindow && node->GetBoolProperty("PlanarFigureInitializedWindow", PlanarFigureInitializedWindow
+            , RenderWindow4->GetRenderer()))
+          selectedRenderWindow = RenderWindow4;
+
+        // make node visible
+        if(selectedRenderWindow)
+        {
+          mitk::Point3D centerP = _PlaneGeometry->GetCenter();
+          centerP += (_PlaneGeometry->GetSpacing() * 0.5);
+          //selectedRenderWindow->GetSliceNavigationController()->ReorientSlices( centerP,_PlaneGeometry->GetNormal() );
+          selectedRenderWindow->GetSliceNavigationController()->SelectSliceByPoint(centerP);
+        }
+      }
+    }
+
+    m_SelectionProvider->SetSelection( cherry::ISelection::Pointer(new mitk::DataTreeNodeSelection(nodes)) );
   }
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll(); 

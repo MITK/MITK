@@ -30,6 +30,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QmitkStandardViews.h>
 #include <QmitkStdMultiWidgetEditor.h>
 #include <mitkPointSetInteractor.h>
+#include "mitkMeasurementSelectionProvider.h"
 
 class QmitkPlanarFiguresTableModel;
 class QGridLayout;
@@ -95,6 +96,13 @@ class QmitkMeasurement : public QObject, public QmitkFunctionality
 protected:
   QGridLayout* m_Layout;
   QLabel* m_SelectedImage;
+  QAction* m_DrawLine;
+  QAction* m_DrawPath;
+  QAction* m_DrawAngle;
+  QAction* m_DrawFourPointAngle;
+  QAction* m_DrawEllipse;
+  QAction* m_DrawRectangle;
+  QAction* m_DrawPolygon;
   QToolBar* m_DrawActionsToolBar;
   QTableView* m_PlanarFiguresTable;
   QmitkPlanarFiguresTableModel* m_PlanarFiguresModel;
@@ -106,6 +114,7 @@ protected:
   // Selection service
   cherry::IStructuredSelection::ConstPointer m_CurrentSelection;
   cherry::ISelectionListener::Pointer m_SelectionListener;
+  mitk::MeasurementSelectionProvider::Pointer m_SelectionProvider;
 
   // Selected image on which measurements will be performed
   mitk::DataTreeNode::Pointer m_SelectedImageNode;

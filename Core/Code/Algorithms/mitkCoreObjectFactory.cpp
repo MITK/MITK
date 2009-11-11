@@ -262,7 +262,7 @@ mitk::Mapper::Pointer mitk::CoreObjectFactory::CreateMapper(mitk::DataTreeNode* 
     else if((dynamic_cast<PointSet*>(data)!=NULL))
     {
       newMapper = mitk::PointSetVtkMapper3D::New();
-      //newMapper = mitk::EnhancedPointSetVtkMapper3D::New(); // <-- use this if you want to try the new work in progres point set mapper
+      //newMapper = mitk::EnhancedPointSetVtkMapper3D::New(); // <-- use this if you want to try the new work in progress point set mapper
       newMapper->SetDataTreeNode(node);
     }
   }
@@ -270,15 +270,16 @@ mitk::Mapper::Pointer mitk::CoreObjectFactory::CreateMapper(mitk::DataTreeNode* 
 }
 
 #define EXTERNAL_FILE_EXTENSIONS \
-    "All known formats(*.dcm *.DCM *.dc3 *.DC3 *.gdcm *.ima *.mhd *.mps *.pic *.pic.gz *.bmp *.png *.jpg *.tiff *.pvtk *.stl *.vtk *.vtp *.vtu *.obj *.vti *.hdr);;" \
+    "All known formats(*.dcm *.DCM *.dc3 *.DC3 *.gdcm *.ima *.mhd *.mps *.nii *.pic *.pic.gz *.bmp *.png *.jpg *.tiff *.pvtk *.stl *.vtk *.vtp *.vtu *.obj *.vti *.hdr);;" \
     "DICOM files(*.dcm *.DCM *.dc3 *.DC3 *.gdcm);;" \
     "DKFZ Pic (*.seq *.pic *.pic.gz *.seq.gz);;" \
     "Point sets (*.mps);;" \
     "Sets of 2D slices (*.pic *.pic.gz *.bmp *.png *.dcm *.gdcm *.ima *.tiff);;" \
-    "Surface files (*.stl *.vtk *.vtp *.obj)"
+    "Surface files (*.stl *.vtk *.vtp *.obj);;" \
+    "NIfTI format (*.nii)"
 
 #define INTERNAL_FILE_EXTENSIONS \
-    "all (*.seq *.mps *.pic *.pic.gz *.seq.gz *.pvtk *.stl *.vtk *.vtp *.vtu *.obj *.vti *.ves " \
+    "all (*.seq *.mps *.nii *.pic *.pic.gz *.seq.gz *.pvtk *.stl *.vtk *.vtp *.vtu *.obj *.vti *.ves " \
          "*.uvg *.dvg *.par *.dcm *.dc3 *.gdcm *.ima *.mhd *.hdr hpsonos.db HPSONOS.DB *.ssm *msm *.bmp *.png *.jpg *.tiff *.mitk);;" \
     "Project files(*.mitk);;" \
     "DKFZ Pic (*.seq *.pic *.pic.gz *.seq.gz);;" \
@@ -290,7 +291,8 @@ mitk::Mapper::Pointer mitk::CoreObjectFactory::CreateMapper(mitk::DataTreeNode* 
     "vessel files (*.ves *.uvg *.dvg);;" \
     "par/rec files (*.par);;" \
     "DSR files (hpsonos.db HPSONOS.DB);;" \
-    "DICOM files (*.dcm *.gdcm *.dc3 *.ima)"
+    "DICOM files (*.dcm *.gdcm *.dc3 *.ima);;" \
+    "NIfTI format (*.nii)"
 
 #define SAVE_FILE_EXTENSIONS "all (*.pic *.mhd *.vtk *.vti *.hdr *.png *.tiff *.jpg *.hdr *.bmp *.dcm *.gipl *.nii *.nrrd *.spr *.lsm)"
 

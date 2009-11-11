@@ -135,7 +135,6 @@ namespace mitk
         outputForCache->SetVectorImage(img);
         outputForCache->SetB_Value(m_B_Value);
         outputForCache->SetDirections(m_DiffusionVectors);
-        outputForCache->InitializeFromVectorImage();
 
         // Since we have already read the tree, we can store it in a cache variable
         // so that it can be assigned to the DataObject in GenerateData();

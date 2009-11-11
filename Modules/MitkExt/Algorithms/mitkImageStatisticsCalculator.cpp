@@ -414,7 +414,7 @@ template < typename TPixel, unsigned int VImageDimension >
 void ImageStatisticsCalculator::InternalCalculateStatisticsUnmasked(
   const itk::Image< TPixel, VImageDimension > *image,
   Statistics &statistics,
-  HistogramType::ConstPointer *histogram )
+  typename HistogramType::ConstPointer *histogram )
 {
   typedef itk::Image< TPixel, VImageDimension > ImageType;
   typedef itk::Image< unsigned short, VImageDimension > MaskImageType;
@@ -423,7 +423,7 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsUnmasked(
   typedef itk::Statistics::ScalarImageToHistogramGenerator< ImageType >
     HistogramGeneratorType;
 
-  HistogramGeneratorType::Pointer histogramGenerator = HistogramGeneratorType::New();
+  typename HistogramGeneratorType::Pointer histogramGenerator = HistogramGeneratorType::New();
   histogramGenerator->SetInput( image );
   histogramGenerator->SetMarginalScale( 100 ); // Defines y-margin width of histogram
   histogramGenerator->SetNumberOfBins( 384 );
@@ -434,7 +434,7 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsUnmasked(
   *histogram = histogramGenerator->GetOutput(); 
 
   typedef itk::StatisticsImageFilter< ImageType > StatisticsFilterType;
-  StatisticsFilterType::Pointer statisticsFilter = StatisticsFilterType::New();
+  typename StatisticsFilterType::Pointer statisticsFilter = StatisticsFilterType::New();
   statisticsFilter->SetInput( image );
   statisticsFilter->Update();
 
@@ -454,7 +454,7 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
   const itk::Image< TPixel, VImageDimension > *image,
   itk::Image< unsigned short, VImageDimension > *maskImage,
   Statistics &statistics,
-  HistogramType::ConstPointer *histogram )
+  typename HistogramType::ConstPointer *histogram )
 {
   typedef itk::Image< TPixel, VImageDimension > ImageType;
   typedef itk::Image< unsigned short, VImageDimension > MaskImageType;
@@ -463,7 +463,7 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
   typedef itk::LabelStatisticsImageFilter< ImageType, MaskImageType >
     LabelStatisticsFilterType;
 
-  LabelStatisticsFilterType::Pointer labelStatisticsFilter;
+  typename LabelStatisticsFilterType::Pointer labelStatisticsFilter;
   unsigned int i;
 
   bool maskNonEmpty = false;
@@ -518,7 +518,7 @@ void ImageStatisticsCalculator::InternalCalculateMaskFromPlanarFigure(
 
   // Generate mask image as new image with same header as input image and
   // initialize with "1".
-  CastFilterType::Pointer castFilter = CastFilterType::New();
+  typename CastFilterType::Pointer castFilter = CastFilterType::New();
   castFilter->SetInput( image );
   castFilter->Update();
   castFilter->GetOutput()->FillBuffer( 1 );
@@ -528,7 +528,7 @@ void ImageStatisticsCalculator::InternalCalculateMaskFromPlanarFigure(
   // that the extrusion filter, which afterwards elevates all points by +0.5
   // in z-direction, creates a 3D object which is cut by the the plane z=0)
   const mitk::Geometry2D *planarFigureGeometry2D = m_PlanarFigure->GetGeometry2D();
-  const PlanarFigure::VertexContainerType *planarFigurePolyline = m_PlanarFigure->GetPolyLine( 0 );
+  const typename PlanarFigure::VertexContainerType *planarFigurePolyline = m_PlanarFigure->GetPolyLine( 0 );
   const mitk::Geometry3D *imageGeometry3D = m_Image->GetGeometry( 0 );
 
   vtkPolyData *polyline = vtkPolyData::New();
@@ -557,7 +557,7 @@ void ImageStatisticsCalculator::InternalCalculateMaskFromPlanarFigure(
   // Create VTK polydata object of polyline contour
   bool outOfBounds = false;
   vtkPoints *points = vtkPoints::New();
-  PlanarFigure::VertexContainerType::ConstIterator it;
+  typename PlanarFigure::VertexContainerType::ConstIterator it;
   for ( it = planarFigurePolyline->Begin();
         it != planarFigurePolyline->End();
         ++it )
@@ -617,7 +617,7 @@ void ImageStatisticsCalculator::InternalCalculateMaskFromPlanarFigure(
   typedef itk::VTKImageImport< MaskImage2DType > ImageImportType;
   typedef itk::VTKImageExport< MaskImage2DType > ImageExportType;
 
-  ImageExportType::Pointer itkExporter = ImageExportType::New();
+  typename ImageExportType::Pointer itkExporter = ImageExportType::New();
   itkExporter->SetInput( castFilter->GetOutput() );
 
   vtkImageImport *vtkImporter = vtkImageImport::New();
@@ -639,7 +639,7 @@ void ImageStatisticsCalculator::InternalCalculateMaskFromPlanarFigure(
   vtkExporter->SetInput( imageStencilFilter->GetOutput() );
   vtkExporter->Update();
 
-  ImageImportType::Pointer itkImporter = ImageImportType::New();
+  typename ImageImportType::Pointer itkImporter = ImageImportType::New();
   this->ConnectPipelines( vtkExporter, itkImporter );
   itkImporter->Update();
 

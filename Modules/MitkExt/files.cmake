@@ -36,6 +36,7 @@ SET(CPP_FILES
   Algorithms/mitkOptimizerParameters.cpp
   Algorithms/mitkOverwriteSliceImageFilter.cpp
   Algorithms/mitkPadImageFilter.cpp
+  Algorithms/mitkPlanarFigureSource.cpp
   Algorithms/mitkPlaneCutFilter.cpp
   Algorithms/mitkPlaneFit.cpp
   Algorithms/mitkPlanesPerpendicularToLinesFilter.cpp
@@ -114,6 +115,10 @@ SET(CPP_FILES
   IO/mitkPACSPlugin.cpp
   IO/mitkParRecFileIOFactory.cpp
   IO/mitkParRecFileReader.cpp
+  IO/mitkPlanarFigureIOFactory.cpp
+  IO/mitkPlanarFigureReader.cpp
+  IO/mitkPlanarFigureWriter.cpp
+  IO/mitkPlanarFigureWriterFactory.cpp
   IO/mitkStlVolumeTimeSeriesIOFactory.cpp
   IO/mitkStlVolumeTimeSeriesReader.cpp
   IO/mitkUnstructuredGridVtkWriter.cpp

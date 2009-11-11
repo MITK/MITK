@@ -26,6 +26,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkVtkUnstructuredGridIOFactory.h"
 #include "mitkStlVolumeTimeSeriesIOFactory.h"
 #include "mitkVtkVolumeTimeSeriesIOFactory.h"
+#include "mitkPlanarFigureIOFactory.h"
+#include "mitkPlanarFigureWriterFactory.h"
 
 #include "mitkCone.h"
 #include "mitkContour.h"
@@ -65,6 +67,9 @@ mitk::CoreExtObjectFactory::CoreExtObjectFactory(bool registerSelf)
     itk::ObjectFactoryBase::RegisterFactory( VtkUnstructuredGridIOFactory::New() );
     itk::ObjectFactoryBase::RegisterFactory( StlVolumeTimeSeriesIOFactory::New() );
     itk::ObjectFactoryBase::RegisterFactory( VtkVolumeTimeSeriesIOFactory::New() );
+    itk::ObjectFactoryBase::RegisterFactory( PlanarFigureIOFactory::New() );
+
+    PlanarFigureWriterFactory::RegisterOneFactory();
 
     alreadyDone = true;
   }
@@ -193,7 +198,7 @@ const char* mitk::CoreExtObjectFactory::GetFileExtensions()
 
 const char* mitk::CoreExtObjectFactory::GetSaveFileExtensions() 
 { 
-  return Superclass::GetSaveFileExtensions();
+  return ";;Planar Figures (*.pf)";  // for mitk::PlanarFigure and derived classes
 };
 
 void mitk::CoreExtObjectFactory::RegisterIOFactories() 

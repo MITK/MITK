@@ -3258,11 +3258,11 @@
         <action ID="33" />
       </transition>
     </state>
-    <state NAME="ControlPointSelected" ID="47" X_POS="513" Y_POS="223" WIDTH="100" HEIGHT="50">
-      <transition NAME="name" EVENT_ID="520" NEXT_STATE_ID="47">
+    <state NAME="ControlPointSelected" ID="47" X_POS="394" Y_POS="228" WIDTH="100" HEIGHT="50">
+      <transition NAME="name" EVENT_ID="530" NEXT_STATE_ID="47">
         <action ID="90" />
       </transition>
-      <transition NAME="name" EVENT_ID="1" NEXT_STATE_ID="52">
+      <transition NAME="name" EVENT_ID="505" NEXT_STATE_ID="52">
         <action ID="76" />
       </transition>
     </state>

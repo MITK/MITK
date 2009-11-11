@@ -23,6 +23,9 @@
 
 #include <mitkDiffusionImagingDll.h>
 
+//#include <QSlider>
+//#include <QObject>
+
 namespace mitk
 {
 
@@ -34,8 +37,11 @@ namespace mitk
  * When the plug-in is started by the framework, it initialzes sandbox
  * specific things.
  */
-class ORG_MITK_DIFFUSIONIMAGING_EXPORT DiffusionImagingActivator : public cherry::Plugin
+class ORG_MITK_DIFFUSIONIMAGING_EXPORT DiffusionImagingActivator : 
+  /*public QObject, */public cherry::Plugin
 {
+
+  //Q_OBJECT
 
 public:
 
@@ -43,6 +49,15 @@ public:
    * Registers sandbox core object factories.
    */
   void Start(cherry::IBundleContext::Pointer context);
+
+  //void OpactiyChanged(int value);
+  //void OpactiyActionChanged();
+
+  //void CreateQtPartControl(QWidget *){}
+
+private:
+
+  //QSlider* m_OpacitySlider;
 
 };
 

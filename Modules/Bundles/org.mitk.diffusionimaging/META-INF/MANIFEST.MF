@@ -3,6 +3,6 @@ Bundle-Name: MBI DiffusionImaging
 Bundle-SymbolicName: org.mitk.diffusionimaging 
 Bundle-Version: 0.1
 Bundle-Vendor: DKFZ, Medical and Biological Informatics
-Require-Bundle: org.opencherry.osgi
+Require-Bundle: org.opencherry.osgi, org.opencherry.ui, org.mitk.gui.common
 Bundle-Activator: mitk::DiffusionImagingActivator
 Bundle-ActivationPolicy: eager

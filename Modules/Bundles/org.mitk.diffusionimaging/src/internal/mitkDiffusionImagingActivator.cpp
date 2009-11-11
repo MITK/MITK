@@ -1,25 +1,115 @@
 /*=========================================================================
 
- Program:   openCherry Platform
- Language:  C++
- Date:      $Date: 2009-05-18 17:57:41 +0200 (Mo, 18 Mai 2009) $
- Version:   $Revision: 17020 $
+Program:   openCherry Platform
+Language:  C++
+Date:      $Date: 2009-05-18 17:57:41 +0200 (Mo, 18 Mai 2009) $
+Version:   $Revision: 17020 $
 
- Copyright (c) German Cancer Research Center, Division of Medical and
- Biological Informatics. All rights reserved.
- See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
+Copyright (c) German Cancer Research Center, Division of Medical and
+Biological Informatics. All rights reserved.
+See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
 
- This software is distributed WITHOUT ANY WARRANTY; without even
- the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
- PURPOSE.  See the above copyright notices for more information.
+This software is distributed WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.  See the above copyright notices for more information.
 
- =========================================================================*/
+=========================================================================*/
 
 #include "mitkDiffusionImagingActivator.h"
 #include "mitkDiffusionImagingObjectFactory.h"
+
+//#include "QmitkNodeDescriptorManager.h"
+//#include "mitkNodePredicateDataType.h"
+//#include "mitkDataTreeNodeObject.h"
+//
+//#include "cherryISelectionService.h"
+//#include "cherryIStructuredSelection.h"
+//#include "cherryPlatformUI.h"
+//
+//#include <QLabel>
+//#include <QHBoxLayout>
 
 void
 mitk::DiffusionImagingActivator::Start(cherry::IBundleContext::Pointer /*context*/)
 {
   RegisterDiffusionImagingObjectFactory();
+
+  //QmitkNodeDescriptorManager* manager = 
+  //  QmitkNodeDescriptorManager::GetInstance();
+
+  //mitk::NodePredicateDataType::Pointer isDiffusionImage = mitk::NodePredicateDataType::New("DiffusionImage");
+  //m_OpacitySlider = new QSlider;
+  //m_OpacitySlider->setMinimum(0);
+  //m_OpacitySlider->setMaximum(100);
+  //m_OpacitySlider->setOrientation(Qt::Horizontal);
+  //QObject::connect( m_OpacitySlider, SIGNAL( valueChanged(int) )
+  //  , this, SLOT( OpactiyChanged(int) ),Qt::AutoConnection );
+
+  //QLabel* _OpacityLabel = new QLabel("Channel: ");
+  //QHBoxLayout* _OpacityWidgetLayout = new QHBoxLayout;
+  //_OpacityWidgetLayout->addWidget(_OpacityLabel);
+  //_OpacityWidgetLayout->addWidget(m_OpacitySlider);
+  //QWidget* _OpacityWidget = new QWidget;
+  //_OpacityWidget->setLayout(_OpacityWidgetLayout);
+
+  //QWidgetAction* m_OpacityAction = new QWidgetAction(this);
+  //m_OpacityAction->setDefaultWidget(_OpacityWidget);
+  //QObject::connect( m_OpacityAction, SIGNAL( changed() )
+  //  , this, SLOT( OpactiyActionChanged() ) );
+
+  //QmitkNodeDescriptor* desc = new QmitkNodeDescriptor(QObject::tr("DiffusionImage"), QString(":/QmitkQBallReconstructionView/dwi.png"), isDiffusionImage, manager);
+  //desc->AddAction(m_OpacityAction, false);
+  //manager->AddDescriptor(desc);
+
+  //mitk::NodePredicateDataType::Pointer isTensorImage = mitk::NodePredicateDataType::New("TensorImage");
+  //manager->AddDescriptor(new QmitkNodeDescriptor(QObject::tr("TensorImage"), QString(":/QmitkQBallReconstructionView/tensor.png"), isTensorImage, manager));
+
+  //mitk::NodePredicateDataType::Pointer isQBallImage = mitk::NodePredicateDataType::New("QBallImage");
+  //manager->AddDescriptor(new QmitkNodeDescriptor(QObject::tr("QBallImage"), QString(":/QmitkQBallReconstructionView/qball.png"), isQBallImage, manager));
+
 }
+
+//void mitk::DiffusionImagingActivator::OpactiyChanged(int value)
+//{
+//  cherry::ISelection::ConstPointer sel(
+//    cherry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetSelectionService()->GetSelection("org.mitk.views.datamanager"));
+//  cherry::IStructuredSelection::ConstPointer ssel = sel.Cast<const cherry::IStructuredSelection>();
+//
+//  if (ssel)
+//  {
+//    if (mitk::DataTreeNodeObject::Pointer nodeObj = ssel->Begin()->Cast<mitk::DataTreeNodeObject>())
+//    {
+//      mitk::DataTreeNode::Pointer node = nodeObj->GetDataTreeNode();
+//      if(QString("DiffusionImage").compare(node->GetData()->GetNameOfClass())==0)
+//      {
+//        node->SetIntProperty("DisplayChannel", value);
+//        mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+//      }
+//    }
+//  }
+//}
+//
+//void mitk::DiffusionImagingActivator::OpactiyActionChanged()
+//{
+//  cherry::ISelection::ConstPointer sel(
+//    cherry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetSelectionService()->GetSelection("org.mitk.views.datamanager"));
+//  cherry::IStructuredSelection::ConstPointer ssel = sel.Cast<const cherry::IStructuredSelection>();
+// 
+//  if (ssel)
+//  {
+//    if (mitk::DataTreeNodeObject::Pointer nodeObj = ssel->Begin()->Cast<mitk::DataTreeNodeObject>())
+//    {
+//      mitk::DataTreeNode::Pointer node = nodeObj->GetDataTreeNode();
+//      if(QString("DiffusionImage").compare(node->GetData()->GetNameOfClass())==0)
+//      {
+//        int displayChannel = 0.0;
+//        if(node->GetIntProperty("DisplayChannel", displayChannel))
+//        {
+//          m_OpacitySlider->setValue(displayChannel);
+//        }
+//      }
+//    }
+//  }
+//
+//  LOG_INFO << "changed";
+//}

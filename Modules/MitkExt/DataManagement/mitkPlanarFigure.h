@@ -87,7 +87,7 @@ public:
 
   virtual bool AddControlPoint( const Point2D &point );
 
-  virtual bool SetControlPoint( unsigned int index, const Point2D &point );
+  virtual bool SetControlPoint( unsigned int index, const Point2D &point, bool createIfDoesNotExist = false);
 
   virtual bool SetCurrentControlPoint( const Point2D &point );
 

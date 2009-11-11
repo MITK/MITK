@@ -88,9 +88,15 @@ bool mitk::PlanarFigure::AddControlPoint( const mitk::Point2D &point )
 }
 
 
-bool mitk::PlanarFigure::SetControlPoint( unsigned int index, const Point2D &point )
+bool mitk::PlanarFigure::SetControlPoint( unsigned int index, const Point2D &point, bool createIfDoesNotExist )
 {
-  if ( index < m_ControlPoints->Size() )
+  if (createIfDoesNotExist)
+  {
+    m_ControlPoints->CreateIndex(index);
+    m_ControlPoints->CreateElementAt(index) = point;
+    return true;
+  }
+  else if ( index < m_ControlPoints->Size() )
   {
     m_ControlPoints->ElementAt( index ) = point;
     return true;
@@ -296,6 +302,7 @@ void mitk::PlanarFigure::UpdateOutputInformation()
 {
   // Bounds are NOT calculated here, since the Geometry2D defines a fixed
   // frame (= bounds) for the planar figure.
+  Superclass::UpdateOutputInformation();
   this->GetTimeSlicedGeometry()->UpdateInformation();
 }
 

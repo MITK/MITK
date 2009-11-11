@@ -68,7 +68,7 @@ private:
   cherry::IPartListener::Pointer titlePartListener;
   cherry::IPerspectiveListener::Pointer titlePerspectiveListener;
   cherry::IPropertyChangeListener::Pointer editorPropertyListener;
-  friend class cherry::PropertyChangeIntAdapter<QmitkExtWorkbenchWindowAdvisor>;
+  friend struct cherry::PropertyChangeIntAdapter<QmitkExtWorkbenchWindowAdvisor>;
   friend class PartListenerForTitle;
   friend class PerspectiveListenerForTitle;
 

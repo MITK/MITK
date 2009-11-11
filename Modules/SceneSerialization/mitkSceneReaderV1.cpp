@@ -21,6 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkDataTreeNodeFactory.h"
 #include "mitkBaseRenderer.h"
 #include "mitkPropertyListDeserializer.h"
+#include "Poco/Path.h"
 
 MITK_REGISTER_SERIALIZER(SceneReaderV1)
     
@@ -173,7 +174,7 @@ mitk::DataTreeNode::Pointer mitk::SceneReaderV1::LoadBaseDataFromDataTag( TiXmlE
     if ( filename )
     {
       DataTreeNodeFactory::Pointer factory = DataTreeNodeFactory::New();
-      factory->SetFileName( workingDirectory + "/" + filename );
+      factory->SetFileName( workingDirectory + Poco::Path::separator() + filename );
       
       try
       {

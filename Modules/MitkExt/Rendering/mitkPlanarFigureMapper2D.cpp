@@ -244,3 +244,8 @@ void mitk::PlanarFigureMapper2D::DrawMarker(
     glEnd();
   }
 }
+
+void mitk::PlanarFigureMapper2D::SetDefaultProperties( mitk::DataTreeNode* node, mitk::BaseRenderer* renderer, bool overwrite )
+{
+  node->AddProperty( "visible", mitk::BoolProperty::New(true), renderer, overwrite );
+}

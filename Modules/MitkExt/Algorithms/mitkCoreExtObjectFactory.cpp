@@ -189,6 +189,17 @@ mitk::Mapper::Pointer mitk::CoreExtObjectFactory::CreateMapper(mitk::DataTreeNod
 void mitk::CoreExtObjectFactory::SetDefaultProperties(mitk::DataTreeNode* node)
 {
   Superclass::SetDefaultProperties(node);
+
+  if(node==NULL)
+    return;
+
+  mitk::DataTreeNode::Pointer nodePointer = node;
+
+  mitk::PlanarFigure::Pointer pf = dynamic_cast<mitk::PlanarFigure*>(node->GetData());
+  if(pf.IsNotNull())
+  {
+    mitk::PlanarFigureMapper2D::SetDefaultProperties(node);
+  }
 }
 
 const char* mitk::CoreExtObjectFactory::GetFileExtensions() 

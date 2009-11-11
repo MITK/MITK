@@ -140,8 +140,8 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
     glEnd();
   }
   // revert color again
-  if(isSelected)
-    glColor3f(1.0f, 1.0f, 1.0f);
+  // if(isSelected)
+    // glColor3f(1.0f, 1.0f, 1.0f);
 
   // draw name near the first point
   std::string name = node->GetName();
@@ -162,6 +162,8 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
       planarFigureGeometry2D, rendererGeometry2D, displayGeometry );
   }
 
+  if(isSelected)
+    glColor3f(1.0f, 0.0f, 0.0f);
   glLineWidth( 1.0 );
 
   // Draw helper objects

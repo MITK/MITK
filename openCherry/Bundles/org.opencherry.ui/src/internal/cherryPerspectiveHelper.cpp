@@ -48,13 +48,13 @@ IDropTarget::Pointer PerspectiveHelper::DragOverListener::Drag(
   if (draggedObject.Cast<PartPane>() != 0)
   {
     PartPane::Pointer part = draggedObject.Cast<PartPane>();
-	if (part->GetContainer().Cast<PartStack>()->GetAppearance() != PresentationFactoryUtil::ROLE_VIEW)
-	  return IDropTarget::Pointer(0);
+	  if (part->GetContainer().Cast<PartStack>()->GetAppearance() == PresentationFactoryUtil::ROLE_EDITOR)
+	    return IDropTarget::Pointer(0);
 	  
-	// Views that haven't been shown yet have no 'control' which causes
-	// 'GetWorkbenchWindow' to return 'null' so check explicitly
-	if (part->GetPage() != perspHelper->page)
-	  return IDropTarget::Pointer(0);
+	  // Views that haven't been shown yet have no 'control' which causes
+	  // 'GetWorkbenchWindow' to return 'null' so check explicitly
+	  if (part->GetPage() != perspHelper->page)
+	    return IDropTarget::Pointer(0);
     else if (part->GetWorkbenchWindow() != perspHelper->page->GetWorkbenchWindow())
       return IDropTarget::Pointer(0);
 
@@ -66,8 +66,8 @@ IDropTarget::Pointer PerspectiveHelper::DragOverListener::Drag(
   else if (draggedObject.Cast<PartStack>() != 0)
   {
     PartStack::Pointer stack = draggedObject.Cast<PartStack>();
-	if (stack->GetAppearance() != PresentationFactoryUtil::ROLE_VIEW)
-	  return IDropTarget::Pointer(0);
+	  if (stack->GetAppearance() == PresentationFactoryUtil::ROLE_EDITOR)
+	    return IDropTarget::Pointer(0);
 	  
     if (stack->GetWorkbenchWindow() != perspHelper->page->GetWorkbenchWindow())
       return IDropTarget::Pointer(0);
@@ -77,7 +77,6 @@ IDropTarget::Pointer PerspectiveHelper::DragOverListener::Drag(
     else
       perspHelper->dropTarget->SetTarget(stack, dragRectangle);
   }
-  //else return IDropTarget::Pointer(0);
 
   return perspHelper->dropTarget;
 }

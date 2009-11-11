@@ -1064,7 +1064,7 @@ void PartStack::SetVisible(bool makeVisible)
 bool PartStack::SaveState(IMemento::Pointer memento)
 {
 
-  if (GetAppearance() == PresentationFactoryUtil::ROLE_VIEW)
+  if (GetAppearance() != PresentationFactoryUtil::ROLE_EDITOR)
   {
     // Save the active tab.
     if (requestedCurrent)
@@ -1513,8 +1513,8 @@ void PartStack::PaneDragStart(PartPane::Pointer pane, Point& initialLocation,
         float ypct = (initialLocation.y - bounds.y) / (float)(bounds.height);
 
         // Only restore if we're dragging views/view stacks
-        if (this->GetAppearance() == PresentationFactoryUtil::ROLE_VIEW)
-        this->SetState(IStackPresentationSite::STATE_RESTORED);
+        if (this->GetAppearance() != PresentationFactoryUtil::ROLE_EDITOR)
+          this->SetState(IStackPresentationSite::STATE_RESTORED);
 
         // Now, adjust the initial location to be within the bounds of the restored rect
         bounds = Geometry::ToDisplay(this->GetParent(),
@@ -1539,8 +1539,8 @@ void PartStack::PaneDragStart(PartPane::Pointer pane, Point& initialLocation,
       float ypct = (initialLocation.y - bounds.y) / (float)(bounds.height);
 
       // Only restore if we're dragging views/view stacks
-      if (this->GetAppearance() == PresentationFactoryUtil::ROLE_VIEW)
-      this->SetState(IStackPresentationSite::STATE_RESTORED);
+      if (this->GetAppearance() != PresentationFactoryUtil::ROLE_EDITOR)
+        this->SetState(IStackPresentationSite::STATE_RESTORED);
 
       // Now, adjust the initial location to be within the bounds of the restored rect
       // See bug 100908

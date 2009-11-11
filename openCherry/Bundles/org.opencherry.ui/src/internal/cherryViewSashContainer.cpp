@@ -191,7 +191,7 @@ bool ViewSashContainer::IsStackType(IStackableContainer::Pointer toTest)
     return false;
 
   return (toTest.Cast<PartStack> ()->GetAppearance()
-      == PresentationFactoryUtil::ROLE_VIEW);
+      != PresentationFactoryUtil::ROLE_EDITOR);
 }
 
 bool ViewSashContainer::IsPaneType(StackablePart::Pointer toTest)

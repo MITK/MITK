@@ -23,6 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkFileWriter.h>
 #include <mitkPlanarFigure.h>
 
+class TiXmlElement;
 namespace mitk
 {
 
@@ -159,6 +160,15 @@ namespace mitk
     */
     virtual void ResizeInputs( const unsigned int& num );
 
+    /**Documentation
+    * \brief creates a TinyXML element that contains x, y, and z values
+    *
+    * \param[in] name the name of the XML element
+    * \param[in] v the vector or point that contains the x, y and z values
+    * \return returns a TiXmlElement named name and three attributes x, y and z.
+    */
+    TiXmlElement* CreateXMLVectorElement(const char* name, itk::FixedArray<mitk::ScalarType, 3> v);
+
     std::string m_FileName;
     std::string m_FilePrefix;
     std::string m_FilePattern;
@@ -167,4 +177,5 @@ namespace mitk
     bool m_Success;
   };
 }
+
 #endif

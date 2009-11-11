@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkPlanarFigureSource.h>
 #include <mitkFileReader.h>
 
+class TiXmlElement;
 namespace mitk
 {
 /**
@@ -122,6 +123,20 @@ protected:
      *          or false otherwise.
      */
     virtual int CanReadFile (const char *name);
+
+    /**
+    * \brief parses the element for the attributes x,y,z and returns a mitk::Vector3D filled with these values
+    * \param[in] e the TiXmlElement that will be parsed
+    * \return returns a mitk::Vector3D with the values x,y,z
+    */
+    mitk::Vector3D GetVectorFromXMLNode(TiXmlElement* e);
+
+    /**
+    * \brief parses the element for the attributes x,y,z and returns a mitk::Point3D filled with these values
+    * \param[in] e the TiXmlElement that will be parsed
+    * \return returns a mitk::Point3D with the values x,y,z
+    */
+    mitk::Point3D GetPointFromXMLNode(TiXmlElement* e);
 
     std::string m_FileName;
     std::string m_FilePrefix;

@@ -76,6 +76,18 @@ void mitk::PlanarFigureWriter::GenerateData()
       vElement->SetDoubleAttribute("y", it->Value().GetElement(1));
       controlPointsElement->LinkEndChild(vElement);
     }
+    TiXmlElement* geoElement = new TiXmlElement("Geometry");
+    const PlaneGeometry* planeGeo = dynamic_cast<const PlaneGeometry*>(pf->GetGeometry2D());
+    if (planeGeo != NULL)
+    {
+      Point3D origin = planeGeo->GetOrigin();
+      Vector3D normal = planeGeo->GetNormal();
+      Vector3D spacing = planeGeo->GetSpacing();
+      geoElement->LinkEndChild(this->CreateXMLVectorElement("Origin", origin));
+      geoElement->LinkEndChild(this->CreateXMLVectorElement("Normal", normal));
+      geoElement->LinkEndChild(this->CreateXMLVectorElement("Spacing", spacing));
+      pfElement->LinkEndChild(geoElement);
+    }
   }
 
   if (document.SaveFile( m_FileName) == false)
@@ -84,6 +96,16 @@ void mitk::PlanarFigureWriter::GenerateData()
     throw std::ios_base::failure("Error during writing of planar figure xml file.");
   }
   m_Success = true;
+}
+
+
+TiXmlElement* mitk::PlanarFigureWriter::CreateXMLVectorElement(const char* name, itk::FixedArray<mitk::ScalarType, 3> v)
+{
+  TiXmlElement* vElement = new TiXmlElement(name);
+  vElement->SetDoubleAttribute("x", v.GetElement(0));
+  vElement->SetDoubleAttribute("y", v.GetElement(1));
+  vElement->SetDoubleAttribute("z", v.GetElement(2));
+  return vElement;
 }
 
 

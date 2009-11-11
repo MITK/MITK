@@ -24,6 +24,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkPlanarPolygon.h"
 #include "mitkPlanarFourPointAngle.h"
 #include "itksys/SystemTools.hxx"
+#include "mitkPlaneGeometry.h"
+
 
 mitk::PlanarFigureReader::PlanarFigureReader() : PlanarFigureSource(), FileReader(),
 m_FileName(""), m_FilePrefix(""), m_FilePattern(""), m_Success(false)
@@ -143,10 +145,68 @@ void mitk::PlanarFigureReader::GenerateData()
         p.SetElement(1, y);
         pf->SetControlPoint(id, p, true);
       }
+    TiXmlElement* geoElement = pfElement->FirstChildElement("Geometry");
+    if (geoElement != NULL)
+    {
+      TiXmlElement* originElement = pfElement->FirstChildElement("Origin");
+      TiXmlElement* normalElement = pfElement->FirstChildElement("Normal");
+      TiXmlElement* spacingElement = pfElement->FirstChildElement("Spacing");
+      if ((originElement != NULL) && (normalElement != NULL) && (spacingElement != NULL))
+      {
+        try
+        {
+          Point3D origin = this->GetPointFromXMLNode(originElement);
+          Vector3D normal = this->GetVectorFromXMLNode(normalElement);
+          Vector3D spacing = this->GetVectorFromXMLNode(spacingElement);
+          mitk::PlaneGeometry::Pointer planeGeo = mitk::PlaneGeometry::New();
+          planeGeo->InitializePlane(origin, normal); // initialize with normal vector and origin
+          planeGeo->SetExtentInMM(0, spacing.GetElement(0));  // \TODO Does this make sense? How do we use the spacing?
+          planeGeo->SetExtentInMM(1, spacing.GetElement(1));
+          planeGeo->SetExtentInMM(2, spacing.GetElement(2));
+          pf->SetGeometry2D(planeGeo);
+        }
+        catch (...)
+        {        	
+        }
+      }
+    }
       // \TODO: what about m_FigurePlaced and m_SelectedControlPoint ??
       this->SetNthOutput( this->GetNumberOfOutputs(), pf );  // add pf as new output of this filter
   }
   m_Success = true;
+}
+
+mitk::Point3D mitk::PlanarFigureReader::GetPointFromXMLNode(TiXmlElement* e)
+{
+  mitk::Point3D point;
+  mitk::ScalarType p;
+  if (e->QueryFloatAttribute("x", &p) == TIXML_WRONG_TYPE)
+    throw std::invalid_argument("node malformatted"); // TODO: can we do a better error handling?
+  point.SetElement(0, p);
+  if (e->QueryFloatAttribute("y", &p) == TIXML_WRONG_TYPE)
+    throw std::invalid_argument("node malformatted"); // TODO: can we do a better error handling?
+  point.SetElement(1, p);
+  if (e->QueryFloatAttribute("z", &p) == TIXML_WRONG_TYPE)
+    throw std::invalid_argument("node malformatted"); // TODO: can we do a better error handling?
+  point.SetElement(2, p);
+  return point;
+}
+
+
+mitk::Vector3D mitk::PlanarFigureReader::GetVectorFromXMLNode(TiXmlElement* e)
+{
+  mitk::Vector3D vector;
+  mitk::ScalarType p;
+  if (e->QueryFloatAttribute("x", &p) == TIXML_WRONG_TYPE)
+    throw std::invalid_argument("node malformatted"); // TODO: can we do a better error handling?
+  vector.SetElement(0, p);
+  if (e->QueryFloatAttribute("y", &p) == TIXML_WRONG_TYPE)
+    throw std::invalid_argument("node malformatted"); // TODO: can we do a better error handling?
+  vector.SetElement(1, p);
+  if (e->QueryFloatAttribute("z", &p) == TIXML_WRONG_TYPE)
+    throw std::invalid_argument("node malformatted"); // TODO: can we do a better error handling?
+  vector.SetElement(2, p);
+  return vector;
 }
 
 

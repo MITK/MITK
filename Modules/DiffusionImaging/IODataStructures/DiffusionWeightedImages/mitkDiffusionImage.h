@@ -81,6 +81,7 @@ namespace mitk
     GradientDirectionContainerType::Pointer   m_Directions;
     float                                     m_B_Value;
     typename AdaptorType::Pointer             m_VectorImageAdaptor;
+    int                                       m_DisplayIndex;
 
   };
 

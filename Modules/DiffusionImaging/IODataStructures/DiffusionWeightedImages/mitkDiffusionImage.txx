@@ -52,7 +52,7 @@ void mitk::DiffusionImage<TPixelType>
     if(g[0] == 0 && g[3] == 0 && g[2] == 0 )
       break;
   }
-  
+
   typedef itk::Image<TPixelType,3> ImgType;
   typename ImgType::Pointer img = ImgType::New();
   img->SetSpacing( m_VectorImage->GetSpacing() );   // Set the image spacing
@@ -65,8 +65,8 @@ void mitk::DiffusionImage<TPixelType>
   int vecLength = m_VectorImage->GetVectorLength();
   InitializeByItk( img.GetPointer(), 1, vecLength );
 
-  for(int i=0; i<vecLength; i++)
-  {
+  //for(int i=0; i<vecLength; i++)
+  //{
     itk::ImageRegionIterator<ImgType> itw (img, img->GetLargestPossibleRegion() );
     itw = itw.Begin();
 
@@ -75,16 +75,17 @@ void mitk::DiffusionImage<TPixelType>
 
     while(!itr.IsAtEnd())
     {
-      itw.Set(itr.Get().GetElement(i));
+      itw.Set(itr.Get().GetElement(firstZeroIndex));
       ++itr;
       ++itw;
     }
 
     // init
-    SetImportVolume(img->GetBufferPointer(), i, 0, CopyMemory);
+    SetImportVolume(img->GetBufferPointer());//, 0, 0, CopyMemory);
     //SetVolume( img->GetBufferPointer(), i );
-  }
+  //}
 
+  m_DisplayIndex = firstZeroIndex;
   std::cout << "Image initialized." << std::endl;
 
 }
@@ -93,22 +94,29 @@ template<typename TPixelType>
 void mitk::DiffusionImage<TPixelType>
 ::SetDisplayIndexForRendering(int displayIndex)
 {
-  typedef itk::Image<TPixelType,3> ImgType;
-  typename ImgType::Pointer img = ImgType::New();
-  CastToItkImage<ImgType>(this, img);
 
-  itk::ImageRegionIterator<ImgType> itw (img, img->GetLargestPossibleRegion() );
-  itw = itw.Begin();
-
-  itk::ImageRegionConstIterator<ImageType> itr (m_VectorImage, m_VectorImage->GetLargestPossibleRegion() );
-  itr = itr.Begin();
-
-  while(!itr.IsAtEnd())
+  int index = displayIndex;
+  int vecLength = m_VectorImage->GetVectorLength();
+  index = index > vecLength-1 ? vecLength-1 : index;
+  if( m_DisplayIndex != index )
   {
-    itw.Set(itr.Get().GetElement(displayIndex));
-    ++itr;
-    ++itw;
-  }
+    typedef itk::Image<TPixelType,3> ImgType;
+    typename ImgType::Pointer img = ImgType::New();
+    CastToItkImage<ImgType>(this, img);
+
+    itk::ImageRegionIterator<ImgType> itw (img, img->GetLargestPossibleRegion() );
+    itw = itw.Begin();
+
+    itk::ImageRegionConstIterator<ImageType> itr (m_VectorImage, m_VectorImage->GetLargestPossibleRegion() );
+    itr = itr.Begin();
+
+    while(!itr.IsAtEnd())
+    {
+      itw.Set(itr.Get().GetElement(index));
+      ++itr;
+      ++itw;
+    }
+  }  
 }
 
 

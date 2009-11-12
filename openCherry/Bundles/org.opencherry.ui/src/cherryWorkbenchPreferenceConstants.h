@@ -24,7 +24,7 @@ namespace cherry
 {
 
 /**
- * Preference ids exposed by the Eclipse Platform User Interface. These
+ * Preference ids exposed by the openCherry Platform User Interface. These
  * preference settings can be obtained from the UI plug-in's preference store.
  * <p>
  * <b>Note:</b>This interface should not be implemented or extended.
@@ -146,6 +146,16 @@ struct WorkbenchPreferenceConstants
    * @since 3.0
    */
   static const std::string INITIAL_FAST_VIEW_BAR_LOCATION; // "initialFastViewBarLocation";
+
+  /**
+   * A named preference indicating the preferred layout direction of parts
+   * inside a sash container. The default value (when this preference is not set)
+   * is <code>LEFT</code>.
+   * <p>
+   * This preference may be one of the following values: {@link #LEFT} or {@link #RIGHT}.
+   * </p>
+   */
+  static const std::string PREFERRED_SASH_LAYOUT; // "preferredSashLayout";
 
   /**
    * Constant to be used when referring to the top right of the workbench

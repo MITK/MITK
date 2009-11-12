@@ -42,6 +42,8 @@ const std::string WorkbenchPreferenceConstants::PERSPECTIVE_BAR_SIZE =
     "PERSPECTIVE_BAR_SIZE";
 const std::string WorkbenchPreferenceConstants::INITIAL_FAST_VIEW_BAR_LOCATION =
     "initialFastViewBarLocation";
+const std::string WorkbenchPreferenceConstants::PREFERRED_SASH_LAYOUT =
+    "preferredSashLayout";
 const std::string WorkbenchPreferenceConstants::TOP_RIGHT = "topRight";
 const std::string WorkbenchPreferenceConstants::TOP_LEFT = "topLeft";
 const std::string WorkbenchPreferenceConstants::LEFT = "left";

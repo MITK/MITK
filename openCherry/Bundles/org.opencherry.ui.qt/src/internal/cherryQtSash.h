@@ -31,12 +31,12 @@ class QtSash : public QWidget
     Q_OBJECT
 
 public:
-    QtSash(Qt::Orientation o, QWidget* parent = 0, bool opaque = true);
+    QtSash(Qt::Orientation o, QWidget* parent = 0, bool smooth = true);
     ~QtSash();
 
     //void setOrientation(Qt::Orientation o);
     Qt::Orientation GetOrientation() const;
-    bool OpaqueResize() const;
+    bool SmoothResize() const;
 
     void AddSelectionListener(GuiTk::ISelectionListener::Pointer listener);
     void RemoveSelectionListener(GuiTk::ISelectionListener::Pointer listener);
@@ -58,7 +58,7 @@ protected:
 
 private:
 
-  bool opaque;
+  bool smooth;
   Qt::Orientation orientation;
 
   QRubberBand* rubberBand;

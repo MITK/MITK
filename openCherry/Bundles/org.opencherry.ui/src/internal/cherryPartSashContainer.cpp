@@ -24,7 +24,9 @@
 #include "cherryPerspective.h"
 #include "cherryPerspectiveHelper.h"
 #include "cherryDragUtil.h"
+#include "cherryWorkbenchPlugin.h"
 
+#include "../cherryWorkbenchPreferenceConstants.h"
 #include "../cherryGeometry.h"
 #include "../cherryPartPane.h"
 
@@ -34,6 +36,8 @@
 
 namespace cherry
 {
+
+bool PartSashContainer::leftToRight = true;
 
 PartSashContainer::ControlListener::ControlListener(
     PartSashContainer* container) :
@@ -212,6 +216,14 @@ PartSashContainer::PartSashContainer(const std::string& id,
       false), layoutDirty(false)
 {
   resizeListener = new ControlListener(this);
+
+  std::string layout = WorkbenchPlugin::GetDefault()->GetPreferencesService()->
+      GetSystemPreferences()->Get(WorkbenchPreferenceConstants::PREFERRED_SASH_LAYOUT,
+          WorkbenchPreferenceConstants::LEFT);
+  if (layout == WorkbenchPreferenceConstants::RIGHT)
+  {
+    leftToRight = false;
+  }
 }
 
 std::vector<PartPane::Pointer> PartSashContainer::GetVisibleParts(

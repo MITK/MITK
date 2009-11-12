@@ -29,10 +29,10 @@ namespace cherry
 {
 
 /*!
- Creates a QtSash with the given orientation, parent, and opaqueness.
+ Creates a QtSash with the given orientation, parent, and smoothness.
  */
-QtSash::QtSash(Qt::Orientation orientation, QWidget *parent, bool opaque) :
-  QWidget(parent), opaque(opaque), orientation(orientation), rubberBand(0),
+QtSash::QtSash(Qt::Orientation orientation, QWidget *parent, bool smooth) :
+  QWidget(parent), smooth(smooth), orientation(orientation), rubberBand(0),
       lastX(0), lastY(0)
 {
   if (orientation == Qt::Horizontal)
@@ -65,12 +65,12 @@ Qt::Orientation QtSash::GetOrientation() const
 }
 
 /*!
- Returns true if widgets are resized dynamically (opaquely), otherwise
+ Returns true if widgets are resized dynamically (smoothly), otherwise
  returns false.
  */
-bool QtSash::OpaqueResize() const
+bool QtSash::SmoothResize() const
 {
-  return opaque;
+  return smooth;
 }
 
 /*!
@@ -171,7 +171,7 @@ void QtSash::mouseMoveEvent(QMouseEvent *e)
   event->y = newY;
   event->width = width;
   event->height = height;
-  if (!opaque)
+  if (!smooth)
   {
     event->detail = Constants::DRAG;
   }
@@ -184,7 +184,7 @@ void QtSash::mouseMoveEvent(QMouseEvent *e)
 
   //parent.update (true, (style & SWT.SMOOTH) == 0);
   drawRubberBand(lastX, lastY, width, height);
-  if (opaque)
+  if (smooth)
   {
     setGeometry(lastX, lastY, width, height);
     // widget could be disposed at this point
@@ -212,7 +212,7 @@ void QtSash::mousePressEvent(QMouseEvent *e)
     event->y = lastY;
     event->width = startRect.width();
     event->height = startRect.height();
-    if (!opaque)
+    if (!smooth)
     {
       event->detail = Constants::DRAG;
     }
@@ -225,7 +225,7 @@ void QtSash::mousePressEvent(QMouseEvent *e)
       lastY = event->y;
       //parent.update (true, (style & SWT.SMOOTH) == 0);
       drawRubberBand(lastX, lastY, startRect.width(), startRect.height());
-      if (opaque)
+      if (smooth)
       {
         this->setGeometry(lastX, lastY, startRect.width(), startRect.height());
         // widget could be disposed at this point
@@ -258,7 +258,7 @@ void QtSash::mouseReleaseEvent(QMouseEvent *e)
     selectionEvents.selected(event);
     if (event->doit)
     {
-      if (opaque)
+      if (smooth)
       {
         this->setGeometry(event->x, event->y, width, height);
         // widget could be disposed at this point
@@ -269,7 +269,7 @@ void QtSash::mouseReleaseEvent(QMouseEvent *e)
 
 void QtSash::drawRubberBand(int x, int y, int width, int height)
 {
-  if (opaque)
+  if (smooth)
     return;
 
   if (x < 0 || y < 0)

@@ -65,6 +65,13 @@ private:
   void* parentWidget;
   //LayoutPart::Pointer zoomedPart;
 
+  /* Indicates if the children of a sash container should be aligned from left to right
+   * or the other way around. This is important if one child does
+   * not occupy all of the available space. Then the empty space
+   * is either on the left, or on the right side.
+   */
+  bool static leftToRight;
+
 protected:
 
   struct ControlListener : public GuiTk::IControlListener

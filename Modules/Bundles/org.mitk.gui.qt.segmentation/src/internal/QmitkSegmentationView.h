@@ -29,6 +29,8 @@ public:
   virtual ~QmitkSegmentationView();
     
   void OnSurfaceCalculationDone();
+    
+  void OnNewNodesGenerated();
 
 protected:
 

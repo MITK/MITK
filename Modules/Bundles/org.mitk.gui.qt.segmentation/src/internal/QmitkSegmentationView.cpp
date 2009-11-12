@@ -113,6 +113,8 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
   m_Controls->m_LesionToolSelectionBox->SetToolGUIArea( m_Controls->m_LesionToolGUIContainer );
   m_Controls->m_LesionToolSelectionBox->SetDisplayedToolGroups("'Lymph Node' 'Lymph Node Correction' 'Homogeneous Tumor' 'Tumor Correction'");
   m_Controls->m_LesionToolSelectionBox->SetEnabledMode( QmitkToolSelectionBox::EnabledWithReferenceData );
+    
+  toolManager->NewNodesGenerated += mitk::MessageDelegate<QmitkSegmentationView>( this, &QmitkSegmentationView::OnNewNodesGenerated );          // update the list of segmentations
 
   if(this->GetActiveStdMultiWidget())
   {
@@ -950,4 +952,11 @@ void QmitkSegmentationView::UpdateFromCurrentDataManagerSelection()
   m_CurrentSelection = selection.Cast<const cherry::IStructuredSelection>();
   this->SelectionChanged(cherry::SmartPointer<IWorkbenchPart>(NULL), m_CurrentSelection);
 }
+
+void QmitkSegmentationView::OnNewNodesGenerated()
+{
+  UpdateFromCurrentDataManagerSelection();
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
 

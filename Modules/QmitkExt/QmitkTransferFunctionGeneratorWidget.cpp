@@ -375,10 +375,10 @@ void QmitkTransferFunctionGeneratorWidget::OnDeltaThreshold(int dx, int dy)   //
 
 std::string QmitkTransferFunctionGeneratorWidget::ReduceFileName(std::string fileNameLong )
 {
-  if (fileNameLong.length()< 20)
+  if (fileNameLong.length()< 40)
     return fileNameLong;
   
-  LOG_INFO <<" fileName > 20 ";
+  //LOG_INFO <<" fileName > 20 ";
   
   std::string fileNameShort;
   std::string fileNameRevert;
@@ -400,10 +400,24 @@ std::string QmitkTransferFunctionGeneratorWidget::ReduceFileName(std::string fil
   for(int i=fileNameLong.length()-1; i>= 0; i--)
   {
     std::string x=std::string("")+fileNameLong[i];
-    fileNameRevert= x+ fileNameRevert;
-
-    if ( x.compare("/")==0)
+    
+    if ( x.compare("/")==0 || x.compare("\\")==0)
+    {
+      fileNameRevert= "/" + fileNameRevert;
       break;
+    }
+      
+    if (i>=fileNameLong.length()-24)
+    {
+      fileNameRevert= x+ fileNameRevert;
+      LOG_INFO <<" fileNameRevert: " << fileNameRevert.c_str();
+    }
+    else
+    {
+      fileNameRevert= "/..." + fileNameRevert;
+      break;
+    }
+   
   }
   
   return fileNameShort+fileNameRevert;
@@ -447,6 +461,8 @@ void QmitkTransferFunctionGeneratorWidget::SetDataTreeNode(mitk::DataTreeNode* n
   else
   {
     tfpToChange = 0;
+    m_InfoPreset->setText( QString( "" ) );
+    
   }
 }
 

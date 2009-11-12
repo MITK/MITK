@@ -46,8 +46,8 @@ ImageType::Pointer GenerateTestImage()
   // spacing
   ImageType::SpacingType spacing;
   spacing[0] = 1;
-  spacing[0] = 1;
-  spacing[0] = 1;
+  spacing[1] = 1;
+  spacing[2] = 1;
   image->SetSpacing(spacing);
 
   // extent
@@ -82,8 +82,8 @@ VectorImageType::Pointer GenerateVectorTestImage()
   // spacing
   VectorImageType::SpacingType spacing;
   spacing[0] = 1;
-  spacing[0] = 1;
-  spacing[0] = 1;
+  spacing[1] = 1;
+  spacing[2] = 1;
   image->SetSpacing(spacing);
 
   // extent

@@ -246,10 +246,10 @@ void mitk::PixelType::Initialize( const std::type_info& aTypeId, int numberOfCom
      N_VEC(162)
      N_VEC(252)
      N_VEC(362)
-     //N_VEC(492)
-     //N_VEC(642)
-     //N_VEC(812)
-     //N_VEC(1002)
+     N_VEC(492)
+     N_VEC(642)
+     N_VEC(812)
+     N_VEC(1002)
 
      if(!found)
        itkExceptionMacro( "Pixel type currently not supported." );

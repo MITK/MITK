@@ -29,7 +29,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkNrrdQBallImageIOFactory.h"
 #include "mitkNrrdQBallImageWriterFactory.h"
 #include "mitkNrrdQBallImageWriter.h"
-//#include "mitkQBallImage.h"
 
 #include "mitkNrrdTensorImageIOFactory.h"
 #include "mitkNrrdTensorImageWriterFactory.h"
@@ -66,11 +65,11 @@ mitk::DiffusionImagingObjectFactory::DiffusionImagingObjectFactory(bool register
     mitk::NrrdQBallImageWriterFactory::RegisterOneFactory();
     mitk::NrrdTensorImageWriterFactory::RegisterOneFactory();
 
-    //m_FileWriters.push_back( NrrdDiffusionImageWriter<DiffusionPixelType>::New().GetPointer() );
-    //m_FileWriters.push_back( NrrdQBallImageWriter::New().GetPointer() );
-    //m_FileWriters.push_back( NrrdTensorImageWriter::New().GetPointer() );
+    m_FileWriters.push_back( NrrdDiffusionImageWriter<DiffusionPixelType>::New().GetPointer() );
+    m_FileWriters.push_back( NrrdQBallImageWriter::New().GetPointer() );
+    m_FileWriters.push_back( NrrdTensorImageWriter::New().GetPointer() );
 
-    //mitk::CoreObjectFactory::GetInstance()->RegisterExtraFactory(this);
+    mitk::CoreObjectFactory::GetInstance()->RegisterExtraFactory(this);
     
     alreadyDone = true;
   }
@@ -91,15 +90,6 @@ mitk::DiffusionImagingObjectFactory::DiffusionImagingObjectFactory(bool register
 itk::Object::Pointer mitk::DiffusionImagingObjectFactory::CreateCoreObject( const std::string&  /*className*/ )
 {
   itk::Object::Pointer pointer;
-  /*
-  if ( className == "" )
-    return NULL;
-    CREATE_ITK( DiffusionImageShort, "DiffusionImage" )
-    CREATE_ITK( QBallImage, "QBallImage" )
-//  CREATE_ITK( UnstructuredGridVtkMapper3D, "UnstructuredGridVtkMapper3D" )
-  else
-    pointer = Superclass::CreateCoreObject( className );
-*/
   return pointer;
 }
 
@@ -122,12 +112,12 @@ mitk::Mapper::Pointer mitk::DiffusionImagingObjectFactory::CreateMapper(mitk::Da
       newMapper = mitk::CompositeMapper::New();
       newMapper->SetDataTreeNode(node);
     }
-    //classname = "DiffusionImage";
-    //if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
-    //{
-    //  newMapper = mitk::DiffusionImageMapper<short>::New();
-    //  newMapper->SetDataTreeNode(node);
-    //}
+    classname = "DiffusionImage";
+    if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
+    {
+      newMapper = mitk::DiffusionImageMapper<short>::New();
+      newMapper->SetDataTreeNode(node);
+    }
   }
   else if ( id == mitk::BaseRenderer::Standard3D )
   {
@@ -151,11 +141,11 @@ void mitk::DiffusionImagingObjectFactory::SetDefaultProperties(mitk::DataTreeNod
     mitk::CompositeMapper::SetDefaultProperties(node);
   }
 
-  //std::string classname("DiffusionImage");
-  //if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
-  //{
-  //  mitk::DiffusionImageMapper<short>::SetDefaultProperties(node);
-  //}
+  classname = "DiffusionImage";
+  if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
+  {
+    mitk::DiffusionImageMapper<short>::SetDefaultProperties(node);
+  }
 }
 
 const char* mitk::DiffusionImagingObjectFactory::GetFileExtensions() 

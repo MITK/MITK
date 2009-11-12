@@ -96,11 +96,12 @@ SET(CPP_FILES
 )
 
 IF ( NOT ${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.${VTK_BUILD_VERSION} VERSION_LESS 5.4.0 )
-  SET(MOC_H_FILES
-    ${MOC_H_FILES}
+  SET(CPP_FILES
+    ${CPP_FILES}
     QmitkVtkHistogramWidget.cpp
   )
 ENDIF()
+
 
 
 QT4_ADD_RESOURCES(CPP_FILES resources/QmitkResources.qrc)
@@ -167,11 +168,12 @@ SET(MOC_H_FILES
 )
 
 IF ( NOT ${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.${VTK_BUILD_VERSION} VERSION_LESS 5.4.0 )
-  SET(CPP_FILES
-    ${CPP_FILES}
+  SET(MOC_H_FILES
+    ${MOC_H_FILES}
     QmitkVtkHistogramWidget.h
   )
 ENDIF()
+
 
 SET(UI_FILES
   QmitkSliderNavigator.ui

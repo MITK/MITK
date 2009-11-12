@@ -96,6 +96,9 @@ class RIGIDREGISTRATION_EXPORT QmitkRigidRegistrationView : public QObject, publ
     */
     virtual void Deactivated();
 
+    virtual void Visible();
+    virtual void Hidden();
+
   signals:
 
   protected slots:  

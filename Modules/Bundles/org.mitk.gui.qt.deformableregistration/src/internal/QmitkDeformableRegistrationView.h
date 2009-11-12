@@ -94,6 +94,10 @@ class DEFORMABLEREGISTRATION_EXPORT QmitkDeformableRegistrationView : public QOb
     */
     virtual void Deactivated();
 
+    virtual void Visible();
+
+    virtual void Hidden();
+
   signals:
 
     /*!  

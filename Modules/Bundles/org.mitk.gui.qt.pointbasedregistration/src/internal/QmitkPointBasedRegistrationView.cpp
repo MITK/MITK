@@ -147,6 +147,11 @@ struct SelListenerPointBasedRegistration : ISelectionListener
         }
       }
     }
+    else if (m_View->m_FixedNode.IsNull() || m_View->m_MovingNode.IsNull())
+    {
+      m_View->m_Controls.m_StatusLabel->setText("You have to select two images from Datamanager for Registration!");
+      m_View->m_Controls.m_StatusLabel->show();
+    }
   }
 
   void SelectionChanged(IWorkbenchPart::Pointer part, ISelection::ConstPointer selection)
@@ -180,9 +185,13 @@ m_OldFixedLabel(""), m_OldMovingLabel(""), m_Deactivated (false), m_CurrentFixed
 
 QmitkPointBasedRegistrationView::~QmitkPointBasedRegistrationView()
 {
-  cherry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
-  if(s)
-    s->RemovePostSelectionListener(m_SelListener);
+  if(m_SelListener.IsNotNull())
+  {
+    cherry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
+    if(s)
+      s->RemovePostSelectionListener(m_SelListener);
+    m_SelListener = NULL;
+  }
   if (m_FixedPointSetNode.IsNotNull())
   {
     m_Controls.m_FixedPointListWidget->DeactivateInteractor(true);
@@ -214,13 +223,6 @@ void QmitkPointBasedRegistrationView::CreateQtPartControl(QWidget* parent)
   m_Controls.m_OpacityLabel->hide();
   m_Controls.m_OpacitySlider->hide();
   m_Controls.m_ShowRedGreenValues->setEnabled(false);
-
-  m_SelListener = cherry::ISelectionListener::Pointer(new SelListenerPointBasedRegistration(this));
-  this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddPostSelectionListener(/*"org.mitk.views.datamanager",*/ m_SelListener);
-  cherry::ISelection::ConstPointer sel(
-    this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection());
-  m_CurrentSelection = sel.Cast<const IStructuredSelection>();
-  m_SelListener.Cast<SelListenerPointBasedRegistration>()->DoSelectionChanged(sel);
 
   this->CreateConnections();
 
@@ -266,14 +268,101 @@ void QmitkPointBasedRegistrationView::CreateConnections()
 
 void QmitkPointBasedRegistrationView::Activated()
 {
+  /*
+  m_Deactivated = false;
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    QmitkFunctionality::Activated();
+    this->clearTransformationLists();
+    if (m_SelListener.IsNull())
+    {
+      m_SelListener = cherry::ISelectionListener::Pointer(new SelListenerPointBasedRegistration(this));
+      this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddPostSelectionListener(/ *"org.mitk.views.datamanager",* / m_SelListener);
+      cherry::ISelection::ConstPointer sel(
+        this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection("org.mitk.views.datamanager"));
+      m_CurrentSelection = sel.Cast<const IStructuredSelection>();
+      m_SelListener.Cast<SelListenerPointBasedRegistration>()->DoSelectionChanged(sel);
+    }
+    this->OpacityUpdate(m_Controls.m_OpacitySlider->value());
+    this->showRedGreen(m_Controls.m_ShowRedGreenValues->isChecked());*/
+  
+}
+
+void QmitkPointBasedRegistrationView::Visible()
+{
   m_Deactivated = false;
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   QmitkFunctionality::Activated();
   this->clearTransformationLists();
-  this->OpacityUpdate(m_Opacity);
+  if (m_SelListener.IsNull())
+  {
+    m_SelListener = cherry::ISelectionListener::Pointer(new SelListenerPointBasedRegistration(this));
+    this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddPostSelectionListener(/*"org.mitk.views.datamanager",*/ m_SelListener);
+    cherry::ISelection::ConstPointer sel(
+      this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection("org.mitk.views.datamanager"));
+    m_CurrentSelection = sel.Cast<const IStructuredSelection>();
+    m_SelListener.Cast<SelListenerPointBasedRegistration>()->DoSelectionChanged(sel);
+  }
+  this->OpacityUpdate(m_Controls.m_OpacitySlider->value());
+  this->showRedGreen(m_Controls.m_ShowRedGreenValues->isChecked());
 }
 
 void QmitkPointBasedRegistrationView::Deactivated()
+{
+  /*
+  m_Deactivated = true;
+    if (m_FixedPointSetNode.IsNotNull())
+      m_FixedPointSetNode->SetProperty("label", mitk::StringProperty::New(m_OldFixedLabel));
+    m_Controls.m_FixedPointListWidget->SetPointSetNode(NULL);
+    m_Controls.m_FixedPointListWidget->DeactivateInteractor(true);
+    if (m_MovingPointSetNode.IsNotNull())
+      m_MovingPointSetNode->SetProperty("label", mitk::StringProperty::New(m_OldMovingLabel));
+    m_Controls.m_MovingPointListWidget->SetPointSetNode(NULL);
+    m_Controls.m_MovingPointListWidget->DeactivateInteractor(true);
+    this->setImageColor(false);
+    if (m_MovingNode.IsNotNull())
+    {
+      m_MovingNode->SetOpacity(m_OriginalOpacity);
+    }
+    this->clearTransformationLists();
+    if (m_FixedPointSetNode.IsNotNull() && m_FixedLandmarks.IsNotNull() && m_FixedLandmarks->GetSize() == 0)
+    {
+      this->GetDataStorage()->Remove(m_FixedPointSetNode);
+    }
+    if (m_MovingPointSetNode.IsNotNull() && m_MovingLandmarks.IsNotNull() && m_MovingLandmarks->GetSize() == 0)
+    {
+      this->GetDataStorage()->Remove(m_MovingPointSetNode);
+    }
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    m_FixedNode = NULL;
+    m_MovingNode = NULL;
+    if(m_FixedLandmarks.IsNotNull())
+      m_FixedLandmarks->RemoveObserver(m_CurrentFixedLandmarksObserverID);
+    m_FixedLandmarks = NULL;
+    if(m_MovingLandmarks.IsNotNull())
+      m_MovingLandmarks->RemoveObserver(m_CurrentMovingLandmarksObserverID);
+    m_MovingLandmarks = NULL;
+    m_FixedPointSetNode = NULL;
+    m_MovingPointSetNode = NULL;
+    m_Controls.m_FixedLabel->hide();
+    m_Controls.TextLabelFixed->hide();
+    m_Controls.line2->hide();
+    m_Controls.m_FixedPointListWidget->hide();
+    m_Controls.m_MovingLabel->hide();
+    m_Controls.TextLabelMoving->hide();
+    m_Controls.line1->hide();
+    m_Controls.m_MovingPointListWidget->hide();
+    m_Controls.m_OpacityLabel->hide();
+    m_Controls.m_OpacitySlider->hide();
+    cherry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
+    if(s)
+      s->RemovePostSelectionListener(m_SelListener);
+    m_SelListener = NULL;
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    QmitkFunctionality::Deactivated();*/
+  
+}
+
+void QmitkPointBasedRegistrationView::Hidden()
 {
   m_Deactivated = true;
   if (m_FixedPointSetNode.IsNotNull())
@@ -309,8 +398,22 @@ void QmitkPointBasedRegistrationView::Deactivated()
   m_MovingLandmarks = NULL;
   m_FixedPointSetNode = NULL;
   m_MovingPointSetNode = NULL;
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-  QmitkFunctionality::Deactivated();
+  m_Controls.m_FixedLabel->hide();
+  m_Controls.TextLabelFixed->hide();
+  m_Controls.line2->hide();
+  m_Controls.m_FixedPointListWidget->hide();
+  m_Controls.m_MovingLabel->hide();
+  m_Controls.TextLabelMoving->hide();
+  m_Controls.line1->hide();
+  m_Controls.m_MovingPointListWidget->hide();
+  m_Controls.m_OpacityLabel->hide();
+  m_Controls.m_OpacitySlider->hide();
+  cherry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
+  if(s)
+    s->RemovePostSelectionListener(m_SelListener);
+  m_SelListener = NULL;
+  //mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  //QmitkFunctionality::Deactivated();
 }
 
 void QmitkPointBasedRegistrationView::FixedSelected(mitk::DataTreeNode::Pointer fixedImage)

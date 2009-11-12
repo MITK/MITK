@@ -95,6 +95,8 @@ public:
 
   virtual void Activated();
   virtual void Deactivated();
+  virtual void Visible();
+  virtual void Hidden();
 
   // 
   //     #ifdef BUILD_TESTING

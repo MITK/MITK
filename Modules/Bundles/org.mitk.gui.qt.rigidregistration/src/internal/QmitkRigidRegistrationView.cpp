@@ -113,6 +113,11 @@ struct SelListenerRigidRegistration : ISelectionListener
         }
       }
     }
+    else if (m_View->m_FixedNode.IsNull() || m_View->m_MovingNode.IsNull())
+    {
+      m_View->m_Controls.m_StatusLabel->setText("You have to select two images from Datamanager for Registration!");
+      m_View->m_Controls.m_StatusLabel->show();
+    }
   }
 
   void SelectionChanged(IWorkbenchPart::Pointer part, ISelection::ConstPointer selection)
@@ -151,9 +156,13 @@ QmitkRigidRegistrationView::QmitkRigidRegistrationView(QObject * /*parent*/, con
 
 QmitkRigidRegistrationView::~QmitkRigidRegistrationView()
 {
-  cherry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
-  if(s)
-    s->RemovePostSelectionListener(m_SelListener);
+  if(m_SelListener.IsNotNull())
+  {
+    cherry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
+    if(s)
+      s->RemovePostSelectionListener(m_SelListener);
+    m_SelListener = NULL;
+  }
 }
 
 void QmitkRigidRegistrationView::CreateQtPartControl(QWidget* parent)
@@ -179,14 +188,9 @@ void QmitkRigidRegistrationView::CreateQtPartControl(QWidget* parent)
   }
   m_Controls.m_ManualFrame->setEnabled(false);
   m_Parent->setEnabled(false);
+  
   this->CreateConnections();
   this->CheckCalculateEnabled();
-  m_SelListener = cherry::ISelectionListener::Pointer(new SelListenerRigidRegistration(this));
-  this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddPostSelectionListener(/*"org.mitk.views.datamanager",*/ m_SelListener);
-  cherry::ISelection::ConstPointer sel(
-    this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection());
-  m_CurrentSelection = sel.Cast<const IStructuredSelection>();
-  m_SelListener.Cast<SelListenerRigidRegistration>()->DoSelectionChanged(sel);
 }
 
 void QmitkRigidRegistrationView::StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget)
@@ -231,23 +235,76 @@ void QmitkRigidRegistrationView::CreateConnections()
 
 void QmitkRigidRegistrationView::Activated()
 {
+  /*
+  m_Deactivated = false;
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    QmitkFunctionality::Activated();
+    if (m_SelListener.IsNull())
+    {
+      m_SelListener = cherry::ISelectionListener::Pointer(new SelListenerRigidRegistration(this));
+      this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddPostSelectionListener(/ *"org.mitk.views.datamanager",* / m_SelListener);
+      cherry::ISelection::ConstPointer sel(
+        this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection("org.mitk.views.datamanager"));
+      m_CurrentSelection = sel.Cast<const IStructuredSelection>();
+      m_SelListener.Cast<SelListenerRigidRegistration>()->DoSelectionChanged(sel);
+    }
+    this->OpacityUpdate(m_Controls.m_OpacitySlider->value());
+    this->ShowRedGreen(m_Controls.m_ShowRedGreenValues->isChecked());
+    this->ClearTransformationLists();
+    this->CheckCalculateEnabled();*/
+  
+}
+
+void QmitkRigidRegistrationView::Visible()
+{
   m_Deactivated = false;
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   QmitkFunctionality::Activated();
-  this->OpacityUpdate(m_Opacity);
+  if (m_SelListener.IsNull())
+  {
+    m_SelListener = cherry::ISelectionListener::Pointer(new SelListenerRigidRegistration(this));
+    this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddPostSelectionListener(/*"org.mitk.views.datamanager",*/ m_SelListener);
+    cherry::ISelection::ConstPointer sel(
+      this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection("org.mitk.views.datamanager"));
+    m_CurrentSelection = sel.Cast<const IStructuredSelection>();
+    m_SelListener.Cast<SelListenerRigidRegistration>()->DoSelectionChanged(sel);
+  }
+  this->OpacityUpdate(m_Controls.m_OpacitySlider->value());
+  this->ShowRedGreen(m_Controls.m_ShowRedGreenValues->isChecked());
   this->ClearTransformationLists();
   this->CheckCalculateEnabled();
 }
 
 void QmitkRigidRegistrationView::Deactivated()
 {
+  /*
+  m_Deactivated = true;
+    this->SetImageColor(false);
+    m_FixedNode = NULL;
+    m_MovingNode = NULL;
+    this->ClearTransformationLists();
+    cherry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
+    if(s)
+      s->RemovePostSelectionListener(m_SelListener);
+    m_SelListener = NULL;
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    QmitkFunctionality::Deactivated();*/
+  
+}
+
+void QmitkRigidRegistrationView::Hidden()
+{
   m_Deactivated = true;
   this->SetImageColor(false);
   m_FixedNode = NULL;
   m_MovingNode = NULL;
   this->ClearTransformationLists();
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-  QmitkFunctionality::Deactivated();
+  cherry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
+  if(s)
+    s->RemovePostSelectionListener(m_SelListener);
+  m_SelListener = NULL;
+  //mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  //QmitkFunctionality::Deactivated();
 }
 
 void QmitkRigidRegistrationView::FixedSelected(mitk::DataTreeNode::Pointer fixedImage)

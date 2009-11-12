@@ -38,10 +38,6 @@ protected:
 
   public:
 
-    virtual void Activated();
-
-    virtual void Deactivated();
-
     ///
     /// Called when a StdMultiWidget is available.
     ///

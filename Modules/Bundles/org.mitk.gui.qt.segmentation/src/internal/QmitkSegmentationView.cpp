@@ -279,13 +279,16 @@ void QmitkSegmentationView::CreateNewSegmentation()
 
 void QmitkSegmentationView::OnToolSelected(int id)
 {
-  if (id >= 0)
+  if (m_MultiWidget)
   {
-    m_MultiWidget->DisableNavigationControllerEventListening();
-  }
-  else
-  {
-    m_MultiWidget->EnableNavigationControllerEventListening();
+    if (id >= 0)
+    {
+      m_MultiWidget->DisableNavigationControllerEventListening();
+    }
+    else
+    {
+      m_MultiWidget->EnableNavigationControllerEventListening();
+    }
   }
 }
 
@@ -458,7 +461,7 @@ void QmitkSegmentationView::OnWorkingDataSelectionChanged(const mitk::DataTreeNo
 
 void QmitkSegmentationView::StdMultiWidgetAvailable( QmitkStdMultiWidget& stdMultiWidget )
 {
-  if(m_MultiWidget == 0)
+  if(!m_MultiWidget)
   {
     m_Parent->setEnabled(true);
     // save the actual multiwidget as the working widget
@@ -481,14 +484,7 @@ void QmitkSegmentationView::StdMultiWidgetNotAvailable()
 
 void QmitkSegmentationView::StdMultiWidgetClosed( QmitkStdMultiWidget& stdMultiWidget )
 {
-  if(&stdMultiWidget == m_MultiWidget)
-    m_MultiWidget = 0;
-  // set new multi widget to the one that is available
-  m_MultiWidget = this->GetActiveStdMultiWidget();
-
-  // tell the interpolation about toolmanager and multiwidget
-  if(m_MultiWidget)
-    m_Controls->m_SlicesInterpolator->Initialize( m_Controls->m_ManualToolSelectionBox->GetToolManager(), m_MultiWidget );
+  m_MultiWidget = 0;
 }
 
 void QmitkSegmentationView::SelectionChanged(cherry::IWorkbenchPart::Pointer sourcepart, cherry::ISelection::ConstPointer selection)
@@ -665,14 +661,6 @@ void QmitkSegmentationView::PartVisible(cherry::IWorkbenchPartReference::Pointer
     m_Controls->m_OrganToolSelectionBox->setEnabled( true );
     m_Controls->m_LesionToolSelectionBox->setEnabled( true );
   }
-}
-
-void QmitkSegmentationView::Activated()
-{
-}
-
-void QmitkSegmentationView::Deactivated()
-{
 }
 
 void QmitkSegmentationView::CreateSmoothedSurface(bool)

@@ -156,6 +156,8 @@ class QMITKEXT_EXPORT QmitkSlicesInterpolator : public QWidget
     */
     void OnInterpolationActivated(bool);
 
+    void OnMultiWidgetDeleted(QObject*);
+
   protected:
 
     const std::map<QAction*, unsigned int> createActionToSliceDimension();

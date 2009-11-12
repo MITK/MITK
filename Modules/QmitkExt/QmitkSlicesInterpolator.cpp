@@ -140,6 +140,7 @@ void QmitkSlicesInterpolator::Initialize(mitk::ToolManager* toolManager, QmitkSt
 
     if (m_MultiWidget)
     {
+      disconnect( m_MultiWidget, SIGNAL(destroyed(QObject*)), this, SLOT(OnMultiWidgetDeleted(QObject*)) );
       mitk::SliceNavigationController* slicer = m_MultiWidget->mitkWidget1->GetSliceNavigationController();
       slicer->RemoveObserver( TSliceObserverTag );
       slicer = m_MultiWidget->mitkWidget2->GetSliceNavigationController();
@@ -152,6 +153,9 @@ void QmitkSlicesInterpolator::Initialize(mitk::ToolManager* toolManager, QmitkSt
   }
 
   m_MultiWidget = multiWidget;
+
+  connect( m_MultiWidget, SIGNAL(destroyed(QObject*)), this, SLOT(OnMultiWidgetDeleted(QObject*)) );
+
   m_ToolManager = toolManager;
 
   if (m_ToolManager)
@@ -667,5 +671,13 @@ bool QmitkSlicesInterpolator::GetSliceForWindowsID(unsigned windowID, int& slice
   }
 
   return false;
+}
+
+void QmitkSlicesInterpolator::OnMultiWidgetDeleted(QObject*)
+{
+  if (m_MultiWidget)
+  {
+    m_MultiWidget = NULL;
+  }
 }
 

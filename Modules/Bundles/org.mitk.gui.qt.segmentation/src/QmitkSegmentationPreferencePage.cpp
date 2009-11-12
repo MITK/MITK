@@ -98,7 +98,7 @@ void QmitkSegmentationPreferencePage::Update()
     m_RadioOverlay->setChecked( true );
   }
 
-  m_VolumeRenderingCheckBox->setChecked( m_SegmentationPreferencesNode->GetBool("volume rendering", true) );
+  m_VolumeRenderingCheckBox->setChecked( m_SegmentationPreferencesNode->GetBool("volume rendering", false) );
 }
 
 void QmitkSegmentationPreferencePage::OnVolumeRenderingCheckboxChecked(int state)

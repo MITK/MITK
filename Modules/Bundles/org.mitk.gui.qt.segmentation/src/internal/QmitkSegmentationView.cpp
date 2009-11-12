@@ -69,7 +69,7 @@ PURPOSE.  See the above copyright notices for more information.
 QmitkSegmentationView::QmitkSegmentationView()
 :m_MultiWidget(NULL)
 ,m_ShowSegmentationsAsOutline(true)
-,m_ShowSegmentationsAsVolumeRendering(true)
+,m_ShowSegmentationsAsVolumeRendering(false)
 {
 }
 
@@ -945,7 +945,7 @@ void QmitkSegmentationView::ApplyDisplayOptions(mitk::DataTreeNode* node)
 void QmitkSegmentationView::OnPreferencesChanged(const cherry::ICherryPreferences* prefs )
 {
   m_ShowSegmentationsAsOutline = m_SegmentationPreferencesNode->GetBool("draw outline", true);
-  m_ShowSegmentationsAsVolumeRendering = m_SegmentationPreferencesNode->GetBool("volume rendering", true);
+  m_ShowSegmentationsAsVolumeRendering = m_SegmentationPreferencesNode->GetBool("volume rendering", false);
   
   UpdateFromCurrentDataManagerSelection();
 }

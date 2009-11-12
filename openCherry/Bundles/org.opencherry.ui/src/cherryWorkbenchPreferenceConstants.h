@@ -19,6 +19,7 @@
 #define CHERRYWORKBENCHPREFERENCECONSTANTS_H_
 
 #include <string>
+#include "cherryUiDll.h"
 
 namespace cherry
 {
@@ -33,7 +34,7 @@ namespace cherry
  * @see PlatformUI#PLUGIN_ID
  * @noextend This class is not intended to be extended by clients.
  */
-struct WorkbenchPreferenceConstants
+struct CHERRY_UI WorkbenchPreferenceConstants
 {
 
   /**

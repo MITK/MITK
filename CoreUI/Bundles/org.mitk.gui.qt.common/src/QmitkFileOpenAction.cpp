@@ -95,6 +95,7 @@ void QmitkFileOpenAction::Run()
       bool clearDataStorageFirst(false);
       mitk::ProgressBar::GetInstance()->AddStepsToDo(2);
       dataStorage = sceneIO->LoadScene( fileName->toLocal8Bit().constData(), dataStorage, clearDataStorageFirst );
+      dsmodified = true;
       mitk::ProgressBar::GetInstance()->Progress(2);
     }
     else

@@ -517,7 +517,6 @@ LayoutTreeNode::ChildSizes LayoutTreeNode::ComputeChildSizes(int width, int heig
     idealLeft = std::max<int>(idealLeft, leftMinimum);
   }
 
-  std::cout << "idealLeft: " << idealLeft << " idealRight: " << idealRight << std::endl;
   return ChildSizes(idealLeft, idealRight, leftMaximum> leftMinimum
       && rightMaximum> rightMinimum
       && leftMinimum + rightMinimum < width);

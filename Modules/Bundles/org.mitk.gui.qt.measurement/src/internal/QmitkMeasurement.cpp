@@ -87,36 +87,42 @@ void QmitkMeasurement::CreateQtPartControl( QWidget* parent )
 
   currentAction = m_DrawActionsToolBar->addAction(QIcon(":/measurement/path.png"), "Draw Path");
   m_DrawPath = currentAction;
+  m_DrawPath->setCheckable(true);
   m_DrawActionsToolBar->addAction(currentAction);
   QObject::connect( currentAction, SIGNAL( triggered(bool) )
     , this, SLOT( ActionDrawPathTriggered(bool) ) );
 
   currentAction = m_DrawActionsToolBar->addAction(QIcon(":/measurement/angle.png"), "Draw Angle");
   m_DrawAngle = currentAction;
+  m_DrawAngle->setCheckable(true);
   m_DrawActionsToolBar->addAction(currentAction);
   QObject::connect( currentAction, SIGNAL( triggered(bool) )
     , this, SLOT( ActionDrawAngleTriggered(bool) ) );
 
   currentAction = m_DrawActionsToolBar->addAction(QIcon(":/measurement/four-point-angle.png"), "Draw Four Point Angle");
   m_DrawFourPointAngle = currentAction;
+  m_DrawFourPointAngle->setCheckable(true);
   m_DrawActionsToolBar->addAction(currentAction);
   QObject::connect( currentAction, SIGNAL( triggered(bool) )
     , this, SLOT( ActionDrawFourPointAngleTriggered(bool) ) );
 
   currentAction = m_DrawActionsToolBar->addAction(QIcon(":/measurement/circle.png"), "Draw Ellipse");
   m_DrawEllipse = currentAction;
+  m_DrawEllipse->setCheckable(true);
   m_DrawActionsToolBar->addAction(currentAction);
   QObject::connect( currentAction, SIGNAL( triggered(bool) )
     , this, SLOT( ActionDrawEllipseTriggered(bool) ) );
 
   currentAction = m_DrawActionsToolBar->addAction(QIcon(":/measurement/rectangle.png"), "Draw Rectangle");
   m_DrawRectangle = currentAction;
+  m_DrawRectangle->setCheckable(true);
   m_DrawActionsToolBar->addAction(currentAction);
   QObject::connect( currentAction, SIGNAL( triggered(bool) )
     , this, SLOT( ActionDrawRectangleTriggered(bool) ) );
 
   currentAction = m_DrawActionsToolBar->addAction(QIcon(":/measurement/polygon.png"), "Draw Polygon");
   m_DrawPolygon = currentAction;
+  m_DrawPolygon->setCheckable(true);
   m_DrawActionsToolBar->addAction(currentAction);
   QObject::connect( currentAction, SIGNAL( triggered(bool) )
     , this, SLOT( ActionDrawPolygonTriggered(bool) ) );
@@ -378,6 +384,7 @@ void QmitkMeasurement::ActionDrawEllipseTriggered( bool  checked )
 
 void QmitkMeasurement::ActionDrawRectangleTriggered( bool  checked )
 {
+  LOG_WARN << "PlanarRectangle is not implemented yet";
   if ( m_SelectedImageNode.IsNull() || !checked )
   {
     return;

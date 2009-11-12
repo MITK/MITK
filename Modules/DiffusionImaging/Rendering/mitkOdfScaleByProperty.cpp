@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   Medical Imaging & Interaction Toolkit
 Language:  C++
 Date:      $Date: 2009-05-12 19:31:16 +0200 (Di, 12 Mai 2009) $
 Version:   $Revision: $
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #include "mitkOdfScaleByProperty.h"
@@ -65,6 +65,20 @@ void mitk::OdfScaleByProperty::AddInterpolationTypes()
   AddEnum( "Principal Curvature", static_cast<IdType>( ODFSB_PC ) );
 }
 
+void mitk::OdfScaleByProperty::SetScaleByNothing()
+{
+  SetValue(ODFSB_NONE);
+}
+
+void mitk::OdfScaleByProperty::SetScaleByGFA()
+{
+  SetValue(ODFSB_GFA);
+}
+
+void mitk::OdfScaleByProperty::SetScaleByPrincipalCurvature()
+{
+  SetValue(ODFSB_PC);
+}
 
 bool mitk::OdfScaleByProperty::AddEnum( const std::string& name, const IdType& id )
 {

@@ -122,6 +122,10 @@ itk::Object::Pointer mitk::CoreObjectFactory::CreateCoreObject( const std::strin
 
   return pointer;
 }
+void mitk::CoreObjectFactory::RegisterExtraFactory(CoreObjectFactoryBase::Pointer factory) {
+  LOG_INFO << "Registering extra factory: " << factory->GetNameOfClass();
+  m_ExtraFactories.push_back(factory);  
+}
 
 mitk::CoreObjectFactory::Pointer mitk::CoreObjectFactory::GetInstance() {
   static mitk::CoreObjectFactory::Pointer instance;
@@ -185,6 +189,9 @@ void mitk::CoreObjectFactory::SetDefaultProperties(mitk::DataTreeNode* node)
     mitk::PointSetMapper2D::SetDefaultProperties(node);
     mitk::PointSetVtkMapper3D::SetDefaultProperties(node);
   }
+  for (ExtraFactoriesList::iterator it = m_ExtraFactories.begin(); it != m_ExtraFactories.end() ; it++ ) {
+    (*it)->SetDefaultProperties(node);
+  }
 }
 
 mitk::CoreObjectFactory::CoreObjectFactory()
@@ -214,75 +221,88 @@ mitk::CoreObjectFactory::CoreObjectFactory()
 mitk::Mapper::Pointer mitk::CoreObjectFactory::CreateMapper(mitk::DataTreeNode* node, MapperSlotId id)
 {
   mitk::Mapper::Pointer newMapper = NULL;
-  mitk::BaseData *data = node->GetData();
+  
+  // check wether extra factories provide mapper
+  for (ExtraFactoriesList::iterator it = m_ExtraFactories.begin(); it != m_ExtraFactories.end() ; it++ ) {
+    newMapper = (*it)->CreateMapper(node,id);
+  }
 
-  if ( id == mitk::BaseRenderer::Standard2D )
+  if (newMapper.IsNull()) 
   {
-    if((dynamic_cast<Image*>(data)!=NULL))
+
+    mitk::BaseData *data = node->GetData();
+
+    if ( id == mitk::BaseRenderer::Standard2D )
     {
-      mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(data);
-      newMapper = mitk::ImageMapper2D::New();
-      newMapper->SetDataTreeNode(node);
+      if((dynamic_cast<Image*>(data)!=NULL))
+      {
+        mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(data);
+        newMapper = mitk::ImageMapper2D::New();
+        newMapper->SetDataTreeNode(node);
+      }
+      else if((dynamic_cast<Geometry2DData*>(data)!=NULL))
+      {
+        newMapper = mitk::Geometry2DDataMapper2D::New();
+        newMapper->SetDataTreeNode(node);
+      }
+      else if((dynamic_cast<Surface*>(data)!=NULL))
+      {
+        newMapper = mitk::SurfaceMapper2D::New();
+        // cast because SetDataTreeNode is not virtual
+        mitk::SurfaceMapper2D *castedMapper = dynamic_cast<mitk::SurfaceMapper2D*>(newMapper.GetPointer());
+        castedMapper->SetDataTreeNode(node);
+      }
+      else if((dynamic_cast<PointSet*>(data)!=NULL))
+      {
+        newMapper = mitk::PointSetMapper2D::New();
+        newMapper->SetDataTreeNode(node);
+      }
     }
-    else if((dynamic_cast<Geometry2DData*>(data)!=NULL))
+    else if ( id == mitk::BaseRenderer::Standard3D )
     {
-      newMapper = mitk::Geometry2DDataMapper2D::New();
-      newMapper->SetDataTreeNode(node);
-    }
-    else if((dynamic_cast<Surface*>(data)!=NULL))
-    {
-      newMapper = mitk::SurfaceMapper2D::New();
-      // cast because SetDataTreeNode is not virtual
-      mitk::SurfaceMapper2D *castedMapper = (mitk::SurfaceMapper2D*)newMapper.GetPointer();
-      castedMapper->SetDataTreeNode(node);
-    }
-    else if((dynamic_cast<PointSet*>(data)!=NULL))
-    {
-      newMapper = mitk::PointSetMapper2D::New();
-      newMapper->SetDataTreeNode(node);
+      if((dynamic_cast<Image*>(data) != NULL))
+      {
+        newMapper = mitk::VolumeDataVtkMapper3D::New();
+        newMapper->SetDataTreeNode(node);
+      }
+      else if((dynamic_cast<Geometry2DData*>(data)!=NULL))
+      {
+        newMapper = mitk::Geometry2DDataVtkMapper3D::New();
+        newMapper->SetDataTreeNode(node);
+      }
+      else if((dynamic_cast<Surface*>(data)!=NULL))
+      {
+        newMapper = mitk::SurfaceVtkMapper3D::New();
+        newMapper->SetDataTreeNode(node);
+      }
+      else if((dynamic_cast<PointSet*>(data)!=NULL))
+      {
+        newMapper = mitk::PointSetVtkMapper3D::New();
+        //newMapper = mitk::EnhancedPointSetVtkMapper3D::New(); // <-- use this if you want to try the new work in progres point set mapper
+        newMapper->SetDataTreeNode(node);
+      }
     }
   }
-  else if ( id == mitk::BaseRenderer::Standard3D )
-  {
-    if((dynamic_cast<Image*>(data) != NULL))
-    {
-      newMapper = mitk::VolumeDataVtkMapper3D::New();
-      newMapper->SetDataTreeNode(node);
-    }
-    else if((dynamic_cast<Geometry2DData*>(data)!=NULL))
-    {
-      newMapper = mitk::Geometry2DDataVtkMapper3D::New();
-      newMapper->SetDataTreeNode(node);
-    }
-    else if((dynamic_cast<Surface*>(data)!=NULL))
-    {
-      newMapper = mitk::SurfaceVtkMapper3D::New();
-      newMapper->SetDataTreeNode(node);
-    }
-    else if((dynamic_cast<PointSet*>(data)!=NULL))
-    {
-      newMapper = mitk::PointSetVtkMapper3D::New();
-      //newMapper = mitk::EnhancedPointSetVtkMapper3D::New(); // <-- use this if you want to try the new work in progress point set mapper
-      newMapper->SetDataTreeNode(node);
-    }
-  }
+
   return newMapper;
 }
 
 #define EXTERNAL_FILE_EXTENSIONS \
-    "All known formats(*.dcm *.DCM *.dc3 *.DC3 *.gdcm *.ima *.mhd *.mps *.nii *.pic *.pic.gz *.bmp *.png *.jpg *.tiff *.pvtk *.stl *.vtk *.vtp *.vtu *.obj *.vti *.hdr);;" \
+    "All known formats(*.dcm *.DCM *.dc3 *.DC3 *.gdcm *.ima *.mhd *.mps *.nii *.pic *.pic.gz *.bmp *.png *.jpg *.tiff *.pvtk *.stl *.vtk *.vtp *.vtu *.obj *.vti *.hdr *.nrrd *.nhdr );;" \
     "DICOM files(*.dcm *.DCM *.dc3 *.DC3 *.gdcm);;" \
     "DKFZ Pic (*.seq *.pic *.pic.gz *.seq.gz);;" \
+    "NRRD Vector Images (*.nrrd *.nhdr);;" \
     "Point sets (*.mps);;" \
     "Sets of 2D slices (*.pic *.pic.gz *.bmp *.png *.dcm *.gdcm *.ima *.tiff);;" \
     "Surface files (*.stl *.vtk *.vtp *.obj);;" \
     "NIfTI format (*.nii)"
 
 #define INTERNAL_FILE_EXTENSIONS \
-    "all (*.seq *.mps *.nii *.pic *.pic.gz *.seq.gz *.pvtk *.stl *.vtk *.vtp *.vtu *.obj *.vti *.ves " \
+    "all (*.seq *.mps *.nii *.pic *.pic.gz *.seq.gz *.pvtk *.stl *.vtk *.vtp *.vtu *.obj *.vti *.ves *.nrrd *.nhdr " \
          "*.uvg *.dvg *.par *.dcm *.dc3 *.gdcm *.ima *.mhd *.hdr hpsonos.db HPSONOS.DB *.ssm *msm *.bmp *.png *.jpg *.tiff *.mitk);;" \
     "Project files(*.mitk);;" \
     "DKFZ Pic (*.seq *.pic *.pic.gz *.seq.gz);;" \
+    "NRRD Vector Images (*.nrrd *.nhdr);;" \
     "Point sets (*.mps);;" \
     "surface files (*.stl *.vtk *.vtp *.obj);;" \
     "stl files (*.stl);;" \
@@ -294,19 +314,35 @@ mitk::Mapper::Pointer mitk::CoreObjectFactory::CreateMapper(mitk::DataTreeNode* 
     "DICOM files (*.dcm *.gdcm *.dc3 *.ima);;" \
     "NIfTI format (*.nii)"
 
-#define SAVE_FILE_EXTENSIONS "all (*.pic *.mhd *.vtk *.vti *.hdr *.png *.tiff *.jpg *.hdr *.bmp *.dcm *.gipl *.nii *.nrrd *.spr *.lsm)"
+#define SAVE_FILE_EXTENSIONS "all (*.pic *.mhd *.vtk *.vti *.hdr *.png *.tiff *.jpg *.hdr *.bmp *.dcm *.gipl *.nii *.nrrd *.nhdr *.spr *.lsm *.dwi *.hdwi *.qbi *.hqbi)"
 
 const char* mitk::CoreObjectFactory::GetFileExtensions()
 {
-  return EXTERNAL_FILE_EXTENSIONS;
+  std::string fileExtensions(EXTERNAL_FILE_EXTENSIONS);
+
+  for (ExtraFactoriesList::iterator it = m_ExtraFactories.begin(); it != m_ExtraFactories.end() ; it++ ) {
+    fileExtensions.append(";;").append((*it)->GetFileExtensions());
+  }
+  return fileExtensions.c_str();
 };
 
 const char* mitk::CoreObjectFactory::GetSaveFileExtensions() {
-  return SAVE_FILE_EXTENSIONS;
+  std::string fileExtensions(SAVE_FILE_EXTENSIONS);
+
+  for (ExtraFactoriesList::iterator it = m_ExtraFactories.begin(); it != m_ExtraFactories.end() ; it++ ) {
+    fileExtensions.append(";;").append((*it)->GetFileExtensions());
+  }
+  return fileExtensions.c_str();
+
 };
 
 mitk::CoreObjectFactory::FileWriterList mitk::CoreObjectFactory::GetFileWriters() {
-  return m_FileWriters;
+  FileWriterList allWriters = m_FileWriters;
+  for (ExtraFactoriesList::iterator it = m_ExtraFactories.begin(); it != m_ExtraFactories.end() ; it++ ) {
+    FileWriterList list2 = (*it)->GetFileWriters();
+    allWriters.merge(list2);
+  }
+  return allWriters;
 }
 void mitk::CoreObjectFactory::MapEvent(const mitk::Event*, const int) {
 

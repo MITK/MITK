@@ -32,7 +32,6 @@ class MITK_CORE_EXPORT CoreObjectFactory : public CoreObjectFactoryBase
   public:
     mitkClassMacro(CoreObjectFactory,CoreObjectFactoryBase);
     itkFactorylessNewMacro(CoreObjectFactory);
-    typedef std::list<mitk::FileWriterWithInformation::Pointer> FileWriterList;
     virtual Mapper::Pointer CreateMapper(mitk::DataTreeNode* node, MapperSlotId slotId);
     virtual void SetDefaultProperties(mitk::DataTreeNode* node);
     virtual const char* GetFileExtensions();
@@ -40,10 +39,12 @@ class MITK_CORE_EXPORT CoreObjectFactory : public CoreObjectFactoryBase
     virtual FileWriterList GetFileWriters();
     virtual itk::Object::Pointer CreateCoreObject( const std::string& className );
     virtual void MapEvent(const mitk::Event* event, const int eventID);
+    virtual void RegisterExtraFactory(CoreObjectFactoryBase::Pointer factory);
     static Pointer GetInstance();
   protected:
     CoreObjectFactory(); 
-    
+    typedef std::list<mitk::CoreObjectFactoryBase::Pointer> ExtraFactoriesList;
+    ExtraFactoriesList m_ExtraFactories;
     static FileWriterList m_FileWriters;
 };
 

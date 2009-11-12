@@ -21,6 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkMapper.h"
 #include <itkObjectFactoryBase.h>
 #include <itkVersion.h>
+#include "mitkFileWriterWithInformation.h"
 
 namespace mitk {
 
@@ -31,11 +32,13 @@ class DataTreeNode;
 //## This interface can be implemented by factories which add new mapper classes or extend the
 //## data tree deserialization mechanism.
 
-class MITK_CORE_EXPORT CoreObjectFactoryBase : public itk::ObjectFactoryBase
+class CoreObjectFactoryBase : public itk::ObjectFactoryBase
 {
   public:
+    typedef std::list<mitk::FileWriterWithInformation::Pointer> FileWriterList;
     mitkClassMacro(CoreObjectFactoryBase,itk::ObjectFactoryBase);
     virtual Mapper::Pointer CreateMapper(mitk::DataTreeNode* node, MapperSlotId slotId) = 0;
+    virtual void SetDefaultProperties(mitk::DataTreeNode* node) = 0;
     virtual itk::Object::Pointer CreateCoreObject( const std::string& className ) = 0;
     virtual const char* GetFileExtensions() = 0;
     virtual const char* GetSaveFileExtensions() = 0;
@@ -47,6 +50,11 @@ class MITK_CORE_EXPORT CoreObjectFactoryBase : public itk::ObjectFactoryBase
     {
       return "Core Object Factory";
     }
+    FileWriterList GetFileWriters() {
+      return m_FileWriters;
+    }
+  protected:
+     FileWriterList m_FileWriters;
 };
 
 template <class T>

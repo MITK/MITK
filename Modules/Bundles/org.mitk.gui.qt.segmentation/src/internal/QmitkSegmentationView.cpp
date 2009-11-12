@@ -190,6 +190,10 @@ void QmitkSegmentationView::SetFocus()
 
 QmitkSegmentationView::~QmitkSegmentationView()
 {
+  cherry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
+  if(s)
+    s->RemoveSelectionListener(m_SelectionListener);
+
   // unregister a couple of additional actions for DataManager's context menu
   QmitkNodeDescriptor* imageDataTreeNodeDescriptor = 
     QmitkNodeDescriptorManager::GetInstance()->GetDescriptor("Image");
@@ -500,7 +504,7 @@ void QmitkSegmentationView::SelectionChanged(cherry::IWorkbenchPart::Pointer sou
 
   std::cout << "selection changed" << std::endl;
   // save current selection in member variable
-  m_CurrentSelection = selection.Cast<const cherry::IStructuredSelection>();
+  m_CurrentSelection = selection.Cast<const mitk::DataTreeNodeSelection>();
 
   mitk::DataTreeNode::Pointer workingData;
   mitk::DataTreeNode::Pointer referenceData;
@@ -511,7 +515,7 @@ void QmitkSegmentationView::SelectionChanged(cherry::IWorkbenchPart::Pointer sou
   {
 
     // iterate selection
-    for (cherry::IStructuredSelection::iterator i = m_CurrentSelection->Begin(); !tooManySelection && (i != m_CurrentSelection->End()); ++i)
+    for (mitk::DataTreeNodeSelection::iterator i = m_CurrentSelection->Begin(); !tooManySelection && (i != m_CurrentSelection->End()); ++i)
     {
       // extract datatree node
       if (mitk::DataTreeNodeObject::Pointer nodeObj = i->Cast<mitk::DataTreeNodeObject>())
@@ -758,8 +762,9 @@ QmitkSegmentationView::NodeList QmitkSegmentationView::GetSelectedNodes() const
   NodeList result;
   if (m_CurrentSelection)
   {
+
     // iterate selection
-    for (cherry::IStructuredSelection::iterator i = m_CurrentSelection->Begin(); i != m_CurrentSelection->End(); ++i)
+    for (mitk::DataTreeNodeSelection::iterator i = m_CurrentSelection->Begin(); i != m_CurrentSelection->End(); ++i)
     {
       // extract datatree node
       if (mitk::DataTreeNodeObject::Pointer nodeObj = i->Cast<mitk::DataTreeNodeObject>())
@@ -949,7 +954,7 @@ void QmitkSegmentationView::UpdateFromCurrentDataManagerSelection()
 {
   LOG_INFO << "Update selection from DataManager";
   cherry::ISelection::ConstPointer selection( this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection("org.mitk.views.datamanager"));
-  m_CurrentSelection = selection.Cast<const cherry::IStructuredSelection>();
+  m_CurrentSelection = selection.Cast<const mitk::DataTreeNodeSelection>();
   this->SelectionChanged(cherry::SmartPointer<IWorkbenchPart>(NULL), m_CurrentSelection);
 }
 

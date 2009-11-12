@@ -9,7 +9,7 @@
 
 #include "ui_QmitkSegmentationControls.h"
 #include <cherryISelectionListener.h>
-#include <cherryIStructuredSelection.h>
+#include "mitkDataTreeNodeSelection.h"
 #include <cherryICherryPreferences.h>
 
 #include "mitkSegmentationSelectionProvider.h"
@@ -103,7 +103,7 @@ protected:
     unsigned long m_ObserverTag;
     mitk::DataStorage::Pointer m_DataStorage;
 
-    cherry::IStructuredSelection::ConstPointer m_CurrentSelection;
+    mitk::DataTreeNodeSelection::ConstPointer m_CurrentSelection;
     cherry::ISelectionListener::Pointer m_SelectionListener;
     friend class cherry::SelectionChangedAdapter<QmitkSegmentationView>;
   

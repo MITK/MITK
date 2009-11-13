@@ -23,6 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <cherryPlatformEvent.h>
 
 #include "cherryRuntimeDll.h"
+#include "internal/cherryPreferencesService.h"
 
 namespace cherry {
 
@@ -33,7 +34,9 @@ public:
   static const std::string PLUGIN_ID;
   
   void Start(IBundleContext::Pointer context);
-  
+  void Stop(IBundleContext::Pointer context);
+protected:
+  PreferencesService::Pointer m_PreferencesService;
 };
 
 }

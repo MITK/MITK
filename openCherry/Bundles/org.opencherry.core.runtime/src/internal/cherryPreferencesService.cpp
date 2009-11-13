@@ -68,15 +68,7 @@ cherry::PreferencesService::PreferencesService(string _PreferencesDir)
 
 cherry::PreferencesService::~PreferencesService()
 {
-  // flush all preferences
-  for (map<string, AbstractPreferencesStorage::Pointer>::const_iterator it = m_PreferencesStorages.begin()
-    ; it != m_PreferencesStorages.end(); ++it)
-  {
-    // the preferences storage may be 0 if the corresponding file was never loaded
-    if(it->second != 0)
-      it->second->GetRoot()->Flush();
-  }
-
+  this->ShutDown();
 }
 
 cherry::IPreferences::Pointer cherry::PreferencesService::GetSystemPreferences()
@@ -153,6 +145,19 @@ void cherry::PreferencesService::ImportPreferences( Poco::File f, std::string na
   if(rootOfImportedPrefs.IsNotNull())
   {
     this->ImportNode(rootOfImportedPrefs, rootOfOldPrefs);
+  }
+
+}
+
+void cherry::PreferencesService::ShutDown()
+{
+  // flush all preferences
+  for (map<string, AbstractPreferencesStorage::Pointer>::const_iterator it = m_PreferencesStorages.begin()
+    ; it != m_PreferencesStorages.end(); ++it)
+  {
+    // the preferences storage may be 0 if the corresponding file was never loaded
+    if(it->second != 0)
+      it->second->GetRoot()->Flush();
   }
 }
 

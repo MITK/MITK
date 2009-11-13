@@ -70,6 +70,11 @@ namespace cherry
     /// \see IPreferencesService::ExportPreferences()
     ///
     virtual void ExportPreferences(Poco::File f, std::string name="");
+
+    ///
+    /// flushes all preferences
+    ///
+    virtual void ShutDown();
   protected:
     ///
     /// Helper func for ImportPreferences(). Imports all nodes of an IPreferences tree recursively

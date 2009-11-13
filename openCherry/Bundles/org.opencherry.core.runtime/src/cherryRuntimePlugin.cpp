@@ -20,7 +20,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "cherryPlatform.h"
 #include "service/cherryIExtensionPointService.h"
 #include "event/cherryPlatformEvents.h"
-#include "internal/cherryPreferencesService.h"
 
 #include "Poco/Delegate.h"
 
@@ -38,9 +37,19 @@ RuntimePlugin::Start(IBundleContext::Pointer context)
   //Platform::GetEvents().platformStarted += 
   //  Poco::Delegate<RuntimePlugin, PlatformEvent>(this, &RuntimePlugin::onPlatformStarted);
 
-  PreferencesService::Pointer _PreferencesService(new PreferencesService());
-  context->RegisterService(IPreferencesService::ID, _PreferencesService);
+  m_PreferencesService = new PreferencesService();
+  context->RegisterService(IPreferencesService::ID, m_PreferencesService);
 }
 
+void
+RuntimePlugin::Stop(IBundleContext::Pointer context)
+{
+  //CHERRY_INFO << "Runtime plugin activated!\n";
+
+  //Platform::GetEvents().platformStarted +=
+  //  Poco::Delegate<RuntimePlugin, PlatformEvent>(this, &RuntimePlugin::onPlatformStarted);
+
+  m_PreferencesService->ShutDown();
+}
 
 }

@@ -38,6 +38,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <fstream>
 #include <sstream>
+
+#include "itksys/SystemTools.hxx"
     
 mitk::SceneIO::SceneIO()
 :m_WorkingDirectory(""),
@@ -274,6 +276,7 @@ bool mitk::SceneIO::SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNode
       {
         TiXmlElement* nodeElement = new TiXmlElement("node");
         std::string filenameHint( node->GetName() );
+        filenameHint = itksys::SystemTools::MakeCindentifier(filenameHint.c_str()); // escape filename <-- only allow [A-Za-z0-9_], replace everything else with _
           
         // store dependencies
         UIDMapType::iterator searchUIDIter = nodeUIDs.find(node);
@@ -300,7 +303,7 @@ bool mitk::SceneIO::SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNode
         // store basedata
         if ( BaseData* data = node->GetData() )
         {
-          std::string filenameHint( node->GetName() );
+          //std::string filenameHint( node->GetName() );
           bool error(false);
           TiXmlElement* dataElement( SaveBaseData( data, filenameHint, error ) ); // returns a reference to a file
           if (error)

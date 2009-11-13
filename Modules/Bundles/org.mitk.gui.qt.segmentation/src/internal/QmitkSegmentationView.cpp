@@ -812,7 +812,6 @@ void QmitkSegmentationView::SendSelectedEvent( mitk::DataTreeNode* referenceNode
   if (workingNode)   nodes.push_back( workingNode );
 
   m_SelectionProvider->SetSelection( cherry::ISelection::Pointer(new mitk::DataTreeNodeSelection(nodes)) );
-  m_SelectionProvider->SetSelection( cherry::ISelection::Pointer(new mitk::DataTreeNodeSelection(nodes)) );
 }
 
 void QmitkSegmentationView::OnSurfaceCalculationDone()

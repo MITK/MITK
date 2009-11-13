@@ -29,6 +29,12 @@ PURPOSE.  See the above copyright notices for more information.
 #include <cherryIEditorPart.h>
 #include <cherryIWorkbenchPage.h>
 
+#include "mitkProperties.h"
+#include "mitkNodePredicateData.h"
+#include "mitkNodePredicateNOT.h"
+#include "mitkNodePredicateProperty.h"
+
+
 #include "QmitkStdMultiWidgetEditor.h"
 
 QmitkFileOpenAction::QmitkFileOpenAction(cherry::IWorkbenchWindow::Pointer window)
@@ -135,30 +141,16 @@ void QmitkFileOpenAction::Run()
 
   if(dsmodified)
   {
-    mitk::TimeSlicedGeometry::Pointer geometry = dataStorage->ComputeBoundingGeometry3D();
+    // get all nodes that have not set "includeInBoundingBox" to false
+    mitk::NodePredicateNOT::Pointer pred 
+      = mitk::NodePredicateNOT::New(mitk::NodePredicateProperty::New("includeInBoundingBox"
+      , mitk::BoolProperty::New(false)));
 
-    //if ( geometry.IsNotNull() )
-    //{
-    //  // let's see if we have data with a limited live-span ...
-    //  mitk::TimeBounds timebounds = geometry->GetTimeBounds();
-    //  if ( timebounds[1] < mitk::ScalarTypeNumericTraits::max() )
-    //  {
-    //    mitk::ScalarType duration = timebounds[1]-timebounds[0];
-
-    //    mitk::TimeSlicedGeometry::Pointer timegeometry =
-    //      mitk::TimeSlicedGeometry::New();
-    //    timegeometry->InitializeEvenlyTimed(
-    //      geometry, (unsigned int) duration );
-    //    timegeometry->SetTimeBounds( timebounds );
-
-    //    timebounds[1] = timebounds[0] + 1.0;
-    //    geometry->SetTimeBounds( timebounds );
-
-    //    geometry = timegeometry;
-    //  }
-    //}
-    mitk::RenderingManager::GetInstance()->InitializeViews(geometry);
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    mitk::DataStorage::SetOfObjects::ConstPointer rs = dataStorage->GetSubset(pred);
+    // calculate bounding geometry of these nodes
+    mitk::TimeSlicedGeometry::Pointer bounds = dataStorage->ComputeBoundingGeometry3D(rs);
+    // initialize the views to the bounding geometry
+    mitk::RenderingManager::GetInstance()->InitializeViews(bounds);
   }
 
  

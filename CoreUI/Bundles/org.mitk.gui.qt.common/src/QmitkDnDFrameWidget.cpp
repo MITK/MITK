@@ -11,6 +11,11 @@
 #include "mitkDataStorageEditorInput.h"
 #include "mitkRenderingManager.h"
 
+#include "mitkProperties.h"
+#include "mitkNodePredicateData.h"
+#include "mitkNodePredicateNOT.h"
+#include "mitkNodePredicateProperty.h"
+
 
 #include "mitkSceneIO.h"
 #include "mitkProgressBar.h"
@@ -77,9 +82,18 @@ void QmitkDnDFrameWidget::dropEvent( QDropEvent * event )
       }
     }
   }
+  
   if(dsmodified)
   {
-    mitk::RenderingManager::GetInstance()->InitializeViews(ds->ComputeBoundingGeometry3D());
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    // get all nodes that have not set "includeInBoundingBox" to false
+    mitk::NodePredicateNOT::Pointer pred 
+      = mitk::NodePredicateNOT::New(mitk::NodePredicateProperty::New("includeInBoundingBox"
+      , mitk::BoolProperty::New(false)));
+
+    mitk::DataStorage::SetOfObjects::ConstPointer rs = ds->GetSubset(pred);
+    // calculate bounding geometry of these nodes
+    mitk::TimeSlicedGeometry::Pointer bounds = ds->ComputeBoundingGeometry3D(rs);
+    // initialize the views to the bounding geometry
+    mitk::RenderingManager::GetInstance()->InitializeViews(bounds);
   }
 }

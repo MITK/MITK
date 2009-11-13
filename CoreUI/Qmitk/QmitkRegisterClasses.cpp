@@ -29,7 +29,7 @@ void QmitkRegisterClasses()
   static bool alreadyDone = false;
   if (!alreadyDone)
   {
-    std::cout << "QmitkRegisterClasses()" << std::endl;
+    LOG_INFO << "QmitkRegisterClasses()";
 
 
     //We have to put this in a file containing a class that is directly used

@@ -377,7 +377,7 @@ void mitk::VolumeDataVtkMapper3D::GenerateData( mitk::BaseRenderer *renderer )
 
     mitk::RenderingManager::GetInstance()->SetShading( true, 0 );
     mitk::RenderingManager::GetInstance()->SetShading( true, 1 );
-    mitk::RenderingManager::GetInstance()->SetShading( true, 2 );
+    //mitk::RenderingManager::GetInstance()->SetShading( true, 2 );
 
     mitk::RenderingManager::GetInstance()->SetShadingValues(
       m_VolumePropertyHigh->GetAmbient(),
@@ -506,6 +506,7 @@ void mitk::VolumeDataVtkMapper3D::SetPreferences()
   }
 
   //LOD 2
+  /*
   if(mitk::RenderingManager::GetInstance()->GetShading(2))
   {
     m_VolumePropertyHigh->ShadeOn();
@@ -519,6 +520,7 @@ void mitk::VolumeDataVtkMapper3D::SetPreferences()
   {
     m_VolumePropertyHigh->ShadeOff();
   }
+  */
 
 }
 

@@ -142,13 +142,7 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
     
   toolManager->NewNodesGenerated += mitk::MessageDelegate<QmitkSegmentationView>( this, &QmitkSegmentationView::OnNewNodesGenerated );          // update the list of segmentations
   toolManager->NewNodeObjectsGenerated += mitk::MessageDelegate1<QmitkSegmentationView, mitk::ToolManager::DataVectorType*>( this, &QmitkSegmentationView::OnNewNodeObjectsGenerated );          // update the list of segmentations
-
-  if(this->GetActiveStdMultiWidget())
-  {
-    m_Controls->m_SlicesInterpolator->Initialize( toolManager, this->GetActiveStdMultiWidget() );
-    m_Controls->m_SlicesInterpolator->SetDataStorage( *m_DataStorage );
-  }
-
+  
   // create signal/slot connections
   connect( m_Controls->btnNewSegmentation, SIGNAL(clicked()), this, SLOT(CreateNewSegmentation()) );
   connect( m_Controls->m_ManualToolSelectionBox, SIGNAL(ToolSelected(int)), this, SLOT(OnToolSelected(int)) );
@@ -998,6 +992,11 @@ void QmitkSegmentationView::OnNewNodeObjectsGenerated(mitk::ToolManager::DataVec
       toolManager->SetWorkingData( *iter );
       SendSelectedEvent( toolManager->GetReferenceData(0), *iter );
       break;
+    }
+
+    if (nodes->empty())
+    {
+      QMessageBox::warning(m_Parent, "Lymph node segmentation", "The algorithm could could not find a lymph node. \nIf this is persistent, please report to http://bugs.mitk.org");
     }
   }
 }

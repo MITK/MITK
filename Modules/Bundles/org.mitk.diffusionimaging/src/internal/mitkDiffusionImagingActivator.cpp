@@ -18,8 +18,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkDiffusionImagingActivator.h"
 #include "mitkDiffusionImagingObjectFactory.h"
 
-//#include "QmitkNodeDescriptorManager.h"
-//#include "mitkNodePredicateDataType.h"
+#include "QmitkNodeDescriptorManager.h"
+#include "mitkNodePredicateDataType.h"
 //#include "mitkDataTreeNodeObject.h"
 //
 //#include "cherryISelectionService.h"
@@ -34,16 +34,25 @@ mitk::DiffusionImagingActivator::Start(cherry::IBundleContext::Pointer /*context
 {
   RegisterDiffusionImagingObjectFactory();
 
-  //QmitkNodeDescriptorManager* manager = 
-  //  QmitkNodeDescriptorManager::GetInstance();
+  QmitkNodeDescriptorManager* manager = 
+    QmitkNodeDescriptorManager::GetInstance();
 
-  //mitk::NodePredicateDataType::Pointer isDiffusionImage = mitk::NodePredicateDataType::New("DiffusionImage");
+  mitk::NodePredicateDataType::Pointer isDiffusionImage = mitk::NodePredicateDataType::New("DiffusionImage");
+  QmitkNodeDescriptor* desc = new QmitkNodeDescriptor(QObject::tr("DiffusionImage"), QString(":/QmitkDiffusionImaging/dwi.png"), isDiffusionImage, manager);
+  manager->AddDescriptor(desc);
+
+  mitk::NodePredicateDataType::Pointer isTensorImage = mitk::NodePredicateDataType::New("TensorImage");
+  manager->AddDescriptor(new QmitkNodeDescriptor(QObject::tr("TensorImage"), QString(":/QmitkDiffusionImaging/tensor.png"), isTensorImage, manager));
+
+  mitk::NodePredicateDataType::Pointer isQBallImage = mitk::NodePredicateDataType::New("QBallImage");
+  manager->AddDescriptor(new QmitkNodeDescriptor(QObject::tr("QBallImage"), QString(":/QmitkDiffusionImaging/qball.png"), isQBallImage, manager));
+
   //m_OpacitySlider = new QSlider;
   //m_OpacitySlider->setMinimum(0);
   //m_OpacitySlider->setMaximum(100);
   //m_OpacitySlider->setOrientation(Qt::Horizontal);
   //QObject::connect( m_OpacitySlider, SIGNAL( valueChanged(int) )
-  //  , this, SLOT( OpactiyChanged(int) ),Qt::AutoConnection );
+  //  , this, SLOT( OpactiyChanged(int) ) );
 
   //QLabel* _OpacityLabel = new QLabel("Channel: ");
   //QHBoxLayout* _OpacityWidgetLayout = new QHBoxLayout;
@@ -57,15 +66,7 @@ mitk::DiffusionImagingActivator::Start(cherry::IBundleContext::Pointer /*context
   //QObject::connect( m_OpacityAction, SIGNAL( changed() )
   //  , this, SLOT( OpactiyActionChanged() ) );
 
-  //QmitkNodeDescriptor* desc = new QmitkNodeDescriptor(QObject::tr("DiffusionImage"), QString(":/QmitkQBallReconstructionView/dwi.png"), isDiffusionImage, manager);
-  //desc->AddAction(m_OpacityAction, false);
-  //manager->AddDescriptor(desc);
-
-  //mitk::NodePredicateDataType::Pointer isTensorImage = mitk::NodePredicateDataType::New("TensorImage");
-  //manager->AddDescriptor(new QmitkNodeDescriptor(QObject::tr("TensorImage"), QString(":/QmitkQBallReconstructionView/tensor.png"), isTensorImage, manager));
-
-  //mitk::NodePredicateDataType::Pointer isQBallImage = mitk::NodePredicateDataType::New("QBallImage");
-  //manager->AddDescriptor(new QmitkNodeDescriptor(QObject::tr("QBallImage"), QString(":/QmitkQBallReconstructionView/qball.png"), isQBallImage, manager));
+  //  desc->AddAction(m_OpacityAction, false);
 
 }
 

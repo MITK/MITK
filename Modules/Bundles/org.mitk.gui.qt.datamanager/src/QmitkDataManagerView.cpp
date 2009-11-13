@@ -132,17 +132,17 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
     , this, SLOT( GlobalReinit(bool) ) );
   unknownDataTreeNodeDescriptor->AddAction(m_GlobalReinitAction);
 
-  m_SaveAction = new QAction(QIcon(":/datamanager/save.xpm"), "Save selected nodes", this);
+  m_SaveAction = new QAction(QIcon(":/datamanager/save.xpm"), "Save...", this);
   QObject::connect( m_SaveAction, SIGNAL( triggered(bool) )
     , this, SLOT( SaveSelectedNodes(bool) ) );
   unknownDataTreeNodeDescriptor->AddAction(m_SaveAction);
 
-  m_RemoveAction = new QAction(QIcon(":/datamanager/remove.xpm"), "Remove selected nodes", this);
+  m_RemoveAction = new QAction(QIcon(":/datamanager/remove.xpm"), "Delete", this);
   QObject::connect( m_RemoveAction, SIGNAL( triggered(bool) )
     , this, SLOT( RemoveSelectedNodes(bool) ) );
   unknownDataTreeNodeDescriptor->AddAction(m_RemoveAction);
 
-  m_ReinitAction = new QAction(QIcon(":/datamanager/refresh.xpm"), "Reinit selected nodes", this);
+  m_ReinitAction = new QAction(QIcon(":/datamanager/refresh.xpm"), "Reinit", this);
   QObject::connect( m_ReinitAction, SIGNAL( triggered(bool) )
     , this, SLOT( ReinitSelectedNodes(bool) ) );
   unknownDataTreeNodeDescriptor->AddAction(m_ReinitAction);
@@ -156,7 +156,7 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
 
   QLabel* _OpacityLabel = new QLabel("Opacity: ");
   QHBoxLayout* _OpacityWidgetLayout = new QHBoxLayout;
-  _OpacityWidgetLayout->setContentsMargins(0,0,0,0);
+  _OpacityWidgetLayout->setContentsMargins(4,4,4,4);
   _OpacityWidgetLayout->addWidget(_OpacityLabel);
   _OpacityWidgetLayout->addWidget(m_OpacitySlider);
   QWidget* _OpacityWidget = new QWidget;
@@ -177,7 +177,7 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   QLabel* _ColorLabel = new QLabel("Color: ");
   _ColorLabel->setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Minimum);
   QHBoxLayout* _ColorWidgetLayout = new QHBoxLayout;
-  _ColorWidgetLayout->setContentsMargins(0,0,0,0);
+  _ColorWidgetLayout->setContentsMargins(4,4,4,4);
   _ColorWidgetLayout->addWidget(_ColorLabel);
   _ColorWidgetLayout->addWidget(m_ColorButton);
   QWidget* _ColorWidget = new QWidget;
@@ -198,14 +198,14 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
 
   m_ToggleSelectedVisibility 
     = new QAction(QIcon(":/datamanager/data-type-image-mask-invisible-24.png")
-    , "Toggle visibility of selected nodes", this);
+    , "Toggle visibility", this);
   QObject::connect( m_ToggleSelectedVisibility, SIGNAL( triggered(bool) )
     , this, SLOT( ToggleVisibilityOfSelectedNodes(bool) ) );
   unknownDataTreeNodeDescriptor->AddAction(m_ToggleSelectedVisibility);
 
   m_ActionShowInfoDialog 
     = new QAction(QIcon(":/datamanager/show-data-info.png")
-    , "Show additional information for selected nodes", this);
+    , "Details...", this);
   QObject::connect( m_ActionShowInfoDialog, SIGNAL( triggered(bool) )
     , this, SLOT( ShowInfoDialogForSelectedNodes(bool) ) );
   unknownDataTreeNodeDescriptor->AddAction(m_ActionShowInfoDialog);

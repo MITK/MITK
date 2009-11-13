@@ -90,6 +90,12 @@ QmitkVtkHistogramWidget::QmitkVtkHistogramWidget( QWidget *parent )
   vtkQtChartAxisLayer *axisLayer = area->getAxisLayer();
   vtkQtChartAxis *xAxis = axisLayer->getAxis(vtkQtChartAxis::Bottom);
   xAxis->getOptions()->setGridVisible(false);
+  xAxis->getOptions()->setPrecision( 1 );
+  xAxis->getOptions()->setNotation( vtkQtChartAxisOptions::Standard );
+  
+  vtkQtChartAxis *yAxis = axisLayer->getAxis(vtkQtChartAxis::Left);
+  yAxis->getOptions()->setPrecision( 1 );
+  yAxis->getOptions()->setNotation( vtkQtChartAxisOptions::Standard );
 
   // Set up the model for the bar chart.
   m_ItemModel = new QStandardItemModel( m_BarChart );

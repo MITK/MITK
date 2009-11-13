@@ -132,7 +132,7 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
 
   m_Controls->m_OrganToolSelectionBox->SetToolManager( *toolManager );
   m_Controls->m_OrganToolSelectionBox->SetToolGUIArea( m_Controls->m_OrganToolGUIContainer );
-  m_Controls->m_OrganToolSelectionBox->SetDisplayedToolGroups("organ_segmentation");
+  m_Controls->m_OrganToolSelectionBox->SetDisplayedToolGroups("'Hippocampus left' 'Hippocampus right' 'Lung left' 'Lung right' 'Liver' 'Heart LV' 'Endocard LV' 'Epicard LV'");
   m_Controls->m_OrganToolSelectionBox->SetEnabledMode( QmitkToolSelectionBox::EnabledWithReferenceData );
 
   m_Controls->m_LesionToolSelectionBox->SetToolManager( *toolManager );

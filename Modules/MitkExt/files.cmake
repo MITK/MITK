@@ -101,6 +101,7 @@ SET(CPP_FILES
   DataManagement/mitkPlanarFourPointAngle.cpp
   DataManagement/mitkPlanarLine.cpp
   DataManagement/mitkPlanarPolygon.cpp
+  DataManagement/mitkPlanarRectangle.cpp
   DataManagement/mitkPlane.cpp
   DataManagement/mitkPointData.cpp
   DataManagement/mitkPropertyManager.cpp

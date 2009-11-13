@@ -115,8 +115,7 @@ bool mitk::PlanarFigure::SetCurrentControlPoint( const Point2D &point )
     return false;
   }
 
-  m_ControlPoints->ElementAt( m_SelectedControlPoint ) = point;
-  return true;
+  return this->SetControlPoint(m_SelectedControlPoint, point, false);
 }
 
 

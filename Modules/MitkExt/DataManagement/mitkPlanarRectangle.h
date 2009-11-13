@@ -2,7 +2,7 @@
 
 Program:   Medical Imaging & Interaction Toolkit
 Language:  C++
-Date:      $Date$
+Date:      $Date: 2009-11-06 14:14:29 +0100 (Fri, 06 Nov 2009) $
 Version:   $Revision: 17258 $
 
 Copyright (c) German Cancer Research Center, Division of Medical and
@@ -16,10 +16,10 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 
-#ifndef _MITK_PLANAR_ANGLE_H_
-#define _MITK_PLANAR_ANGLE_H_
+#ifndef _MITK_PLANAR_RECTANGLE_H_
+#define _MITK_PLANAR_RECTANGLE_H_
 
-#include "mitkPlanarFigure.h"
+#include "mitkPlanarPolygon.h"
 
 
 namespace mitk 
@@ -28,24 +28,18 @@ namespace mitk
 class Geometry2D;
 
 /**
- * \brief Implementation of PlanarFigure to display an angle
- * through three control points
+ * \brief Implementation of PlanarFigure representing a polygon
+ * with two or more control points
  */
-class MITKEXT_CORE_EXPORT PlanarAngle : public PlanarFigure
+class MITKEXT_CORE_EXPORT PlanarRectangle : public PlanarFigure
 {
 public:
-  mitkClassMacro( PlanarAngle, PlanarFigure );
+  mitkClassMacro( PlanarRectangle, PlanarFigure );
 
   itkNewMacro( Self );
-public:
-  // Feature identifiers
-  const unsigned int FEATURE_ID_ANGLE;
-  const unsigned int GetFeatureIdAngle()
-  {
-    return FEATURE_ID_ANGLE;
-  }
 
-  virtual bool IsClosed() const { return false; };
+
+  virtual bool IsClosed() const { return true; };
 
   /** \brief Place figure in its minimal configuration (a point at least)
    * onto the given 2D geometry.
@@ -53,23 +47,26 @@ public:
    * Must be implemented in sub-classes.
    */
   //virtual void Initialize();
+  virtual void PlaceFigure( const Point2D &point );
 
-  /** \brief Angle has 3 control points per definition. */
-  unsigned int GetMinimumNumberOfControlPoints() const
+  /** \brief Polygon has 2 control points per definition. */
+  virtual unsigned int GetMinimumNumberOfControlPoints() const
   {
-    return 3;
+    return 4;
   }
 
 
-  /** \brief Angle has 3 control points per definition. */
-  unsigned int GetMaximumNumberOfControlPoints() const
+  /** \brief Polygon maximum number of control points is principally not limited. */
+  virtual unsigned int GetMaximumNumberOfControlPoints() const
   {
-    return 3;
+    return 4;
   }
+
+  virtual bool SetControlPoint( unsigned int index, const Point2D &point, bool createIfDoesNotExist = false);
   
 protected:
-  PlanarAngle();
-  virtual ~PlanarAngle();
+  PlanarRectangle();
+  virtual ~PlanarRectangle();
 
   /** \brief Generates the poly-line representation of the planar figure. */
   virtual void GeneratePolyLine();
@@ -82,10 +79,16 @@ protected:
 
   virtual void PrintSelf( std::ostream &os, itk::Indent indent ) const;
 
+  const unsigned int FEATURE_ID_CIRCUMFERENCE;
+  const unsigned int FEATURE_ID_AREA;
+
+
+  bool m_Closed;
+
 private:
 
 };
 
 } // namespace mitk
 
-#endif //_MITK_PLANAR_ANGLE_H_
+#endif //_MITK_PLANAR_POLYGON_H_

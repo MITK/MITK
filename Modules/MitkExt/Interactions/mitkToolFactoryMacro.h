@@ -80,7 +80,7 @@ class CLASS_NAME ## RegistrationMethod \
  \
     CLASS_NAME ## RegistrationMethod() \
     { \
-      std::cout << "(II) Register " #CLASS_NAME << std::endl; \
+      LOG_INFO << "Register " #CLASS_NAME; \
       itk::ObjectFactoryBase::RegisterFactory( CLASS_NAME ## Factory::New() ); \
     } \
   }; \

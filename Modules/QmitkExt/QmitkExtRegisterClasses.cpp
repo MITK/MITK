@@ -34,16 +34,16 @@ void QmitkExtRegisterClasses()
   static bool alreadyDone = false;
   if (!alreadyDone)
   {
-    std::cout << "QmitkExtRegisterClasses()" << std::endl;
-  
-  itk::ObjectFactoryBase::RegisterFactory( QmitkBinaryThresholdToolGUIFactory::New() );
-  itk::ObjectFactoryBase::RegisterFactory( QmitkCalculateGrayValueStatisticsToolGUIFactory::New() );
-  itk::ObjectFactoryBase::RegisterFactory( QmitkDrawPaintbrushToolGUIFactory::New() );
-  itk::ObjectFactoryBase::RegisterFactory( QmitkErasePaintbrushToolGUIFactory::New() );
+    LOG_INFO << "QmitkExtRegisterClasses()";
+    
+    itk::ObjectFactoryBase::RegisterFactory( QmitkBinaryThresholdToolGUIFactory::New() );
+    itk::ObjectFactoryBase::RegisterFactory( QmitkCalculateGrayValueStatisticsToolGUIFactory::New() );
+    itk::ObjectFactoryBase::RegisterFactory( QmitkDrawPaintbrushToolGUIFactory::New() );
+    itk::ObjectFactoryBase::RegisterFactory( QmitkErasePaintbrushToolGUIFactory::New() );
 
-  static QmitkCallbackFromGUIThread globalQmitkCallbackFromGUIThread;  
+    static QmitkCallbackFromGUIThread globalQmitkCallbackFromGUIThread;  
 
-  alreadyDone = true;
+    alreadyDone = true;
   }
 }
 

@@ -114,9 +114,7 @@ void LayoutPartSash::DoCreateControl()
     Tweaklets::Get(GuiWidgetsTweaklet::KEY)->AddSelectionListener(sash, selectionListener);
     Tweaklets::Get(GuiWidgetsTweaklet::KEY)->SetEnabled(sash, enabled);
     Tweaklets::Get(GuiWidgetsTweaklet::KEY)->SetBounds(sash, bounds);
-    //sash.addSelectionListener(selectionListener);
-    //sash.setEnabled(enabled);
-    //sash.setBounds(bounds);
+    Tweaklets::Get(GuiWidgetsTweaklet::KEY)->SetVisible(sash, isVisible);
   }
 }
 
@@ -162,7 +160,6 @@ void LayoutPartSash::Dispose()
     Tweaklets::Get(GuiWidgetsTweaklet::KEY)->Dispose(sash);
   }
   sash = 0;
-  isVisible = false;
 }
 
 Rectangle LayoutPartSash::GetBounds()

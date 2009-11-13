@@ -66,6 +66,30 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "itkTreeChangeEvent.h"
 
+//const std::map<std::string, QColor> QmitkSegmentationView::ORGAN_COLOR_LIST =  QmitkSegmentationView::CreateOrganColorList();
+const std::string QmitkSegmentationView::ORGAN_COLOR_LIST = QmitkSegmentationView::CreateOrganColorList();
+
+std::string QmitkSegmentationView::CreateOrganColorList()
+{
+  std::string m;
+  m="Liver;255;0;0;";
+  m+="Kidney;0;255;0);";
+  m+="Heart;0;0;255);";
+
+  return m;
+}
+
+//std::map<std::string, QColor> QmitkSegmentationView::CreateOrganColorList()
+//{
+//  std::map<std::string, QColor> m;
+//  QColor testcolor;
+//  std::string listColorOrgan;
+//  listColorOrgan="Liver;255;0;0;";
+//  m.insert(std::pair<std::string,QColor>(listColorOrgan,testcolor);
+//
+//  return m;
+//}
+
 QmitkSegmentationView::QmitkSegmentationView()
 :m_MultiWidget(NULL)
 ,m_ShowSegmentationsAsOutline(true)
@@ -83,8 +107,10 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
 
   m_SegmentationPreferencesNode = (prefService->GetSystemPreferences()->Node("/Segmentation")).Cast<cherry::ICherryPreferences>();
   if(m_SegmentationPreferencesNode.IsNotNull())
+  {
     m_SegmentationPreferencesNode->OnChanged
       .AddListener(cherry::MessageDelegate1<QmitkSegmentationView, const cherry::ICherryPreferences*>(this, &QmitkSegmentationView::OnPreferencesChanged));
+  }
 
   // setup the basic GUI of this view
 
@@ -238,6 +264,13 @@ void QmitkSegmentationView::CreateNewSegmentation()
     {
       // ask about the name and organ type of the new segmentation
       QmitkNewSegmentationDialog dialog( m_Parent ); // needs a QWidget as parent, "this" is not QWidget
+      
+      std::string colorAndOrgan;
+      organ = QString::fromStdString(ORGAN_COLOR_LIST);
+
+      QStringList organlist = organ.split(";");
+
+      dialog.SetSuggestionList(organlist);
       int dialogReturnValue = dialog.exec();
 
       if ( dialogReturnValue == QDialog::Rejected ) return; // user clicked cancel or pressed Esc or something similar

@@ -22,6 +22,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <qdialog.h>
 
+#include <QCompleter>
+
 class QLabel;
 class QLineEdit;
 class Q3ListBox;
@@ -54,6 +56,9 @@ class QMITKEXT_EXPORT QmitkNewSegmentationDialog : public QDialog
     const char* GetOrganType();
     mitk::Color GetColorProperty();
 
+    void SetSuggestion(const QString& organ);
+    void SetSuggestionList(QStringList organColorList);
+
   signals:
 
   public slots:
@@ -68,6 +73,7 @@ class QMITKEXT_EXPORT QmitkNewSegmentationDialog : public QDialog
     void onOrganSelected(int index);
     void onNewOrganNameChanged(const QString&);
     void onColorBtnClicked();
+    void onColorChange();
 
   protected:
 
@@ -85,6 +91,10 @@ class QMITKEXT_EXPORT QmitkNewSegmentationDialog : public QDialog
     bool newOrganEntry;
 
     QColor color;
+
+    QString suggestedOrgan;
+
+    QCompleter* completer;
 };
 
 #endif

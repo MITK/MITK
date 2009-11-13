@@ -27,6 +27,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qlayout.h>
 #include <qlabel.h>
 #include <QColorDialog>
+#include <QStringListModel>
+#include <QAbstractItemModel>
 
 QmitkNewSegmentationDialog::QmitkNewSegmentationDialog(QWidget* parent)
 :QDialog(parent), // true, modal
@@ -46,7 +48,7 @@ QmitkNewSegmentationDialog::QmitkNewSegmentationDialog(QWidget* parent)
   verticalLayout->addWidget( lblPrompt );
 
   // to choose a color
-  btnColor = new QPushButton( tr(""), this, "btnColor" );
+  btnColor = new QPushButton( tr(""), this, "btnColor" );  //wieder raus
   btnColor->setFixedWidth(25);
   btnColor->setAutoFillBackground(true);
   btnColor->setStyleSheet("background-color:rgb(255,0,0)");
@@ -54,6 +56,12 @@ QmitkNewSegmentationDialog::QmitkNewSegmentationDialog(QWidget* parent)
   connect( btnColor, SIGNAL(clicked()), this, SLOT(onColorBtnClicked()) );
 
   edtName = new QLineEdit( "", this, "edtName" );
+  //QStringList wordList;
+  //wordList << "";
+  //completer = new QCompleter(wordList);
+  //edtName->setCompleter(completer);
+
+ // connect( completer, SIGNAL(activated("")), this, SLOT(onColorChange()) );
 
   QBoxLayout * horizontalLayout2 = new QHBoxLayout(verticalLayout);
   horizontalLayout2->addWidget( btnColor );
@@ -183,4 +191,47 @@ mitk::Color QmitkNewSegmentationDialog::GetColorProperty()
     colorProperty.SetBlue(color.blueF());
   }
   return colorProperty;
+}
+
+void QmitkNewSegmentationDialog::SetSuggestion(const QString& organ)
+{
+  suggestedOrgan = organ;
+  QStringList wordList;
+  wordList << suggestedOrgan << "test";
+  QCompleter *completer = new QCompleter(wordList);
+  edtName->setCompleter(completer);
+
+}
+
+void QmitkNewSegmentationDialog::SetSuggestionList(QStringList organColorList)
+{
+  QStringList organList;
+  QStringList colorList;
+  for (int i = 0; i < organColorList.size()/4; i++)
+  {
+    organList.push_back(organColorList.at(4*i));
+    colorList.push_back(organColorList.at(4*i+1));
+    colorList.push_back(organColorList.at(4*i+2));
+    colorList.push_back(organColorList.at(4*i+3));
+  }
+//  QStringListModel* completeModel = static_cast<QStringListModel*> (completer->completionModel());
+//  completeModel->setStringList(organList);
+////  completer->setModel(static_cast<QAbstractItemModel*> (completeModel));
+
+  completer = new QCompleter(organList);
+  edtName->setCompleter(completer);
+
+//  connect( completer, SIGNAL(actived("Heart")), this, SLOT(onColorChange()) );
+}
+
+void QmitkNewSegmentationDialog::onColorChange()
+{
+  //if (organList.contains(edtName->text().ascii()))
+  //{
+  //  int j = organList.indexOf(edtName->text().ascii());
+  //  color.setRed(colorList.at(3*j).toInt());
+  //  color.setGreen(colorList.at(3*j+1).toInt());
+  //  color.setBlue(colorList.at(3*j+2).toInt());
+  //  btnColor->setStyleSheet(QString("background-color:rgb(%1,%2, %3)").arg(color.red()).arg(color.green()).arg(color.blue()));
+  //}
 }

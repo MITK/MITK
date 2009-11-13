@@ -104,18 +104,4 @@ void mitk::PlanarCircle::EvaluateFeaturesInternal()
 void mitk::PlanarCircle::PrintSelf( std::ostream& os, itk::Indent indent) const
 {
   Superclass::PrintSelf( os, indent );
-
-  os << indent << "Number of control points: " << this->GetNumberOfControlPoints() << std::endl;
-
-  os << indent << "Control points:" << std::endl;
-
-  mitk::PlanarFigure::VertexContainerType::ConstIterator it;
-
-  unsigned int i;
-  for ( it = m_ControlPoints->Begin(), i = 0;
-    it != m_ControlPoints->End();
-    ++it, ++i )
-  {
-    os << indent << indent << i << ": " << it.Value() << std::endl;
-  }
 }

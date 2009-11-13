@@ -42,7 +42,7 @@ public:
   virtual bool IsClosed() const { return m_Closed; };
 
   itkSetMacro( Closed, bool );
-  itkGetMacro( Closed, bool );
+  itkGetConstMacro( Closed, bool );
   itkBooleanMacro( Closed );
 
 

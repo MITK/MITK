@@ -92,7 +92,7 @@ QVariant QmitkPlanarFiguresTableModel::data( const QModelIndex &index, int role 
         //std::ostringstream s; s.precision(2); s << featureQuantity;
         info.append(QString("%1: %2 %3")
           .arg(QString(planarFigure->GetFeatureName(i)))
-          .arg(featureQuantity, 0, 'E', 2)
+          .arg(featureQuantity, 0, 'f', 2)
           .arg(QString(planarFigure->GetFeatureUnit(i))));
         if((i+1) != planarFigure->GetNumberOfFeatures())
           info.append(", ");

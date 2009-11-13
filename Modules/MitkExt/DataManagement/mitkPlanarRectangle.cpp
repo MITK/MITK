@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 mitk::PlanarRectangle::PlanarRectangle()
 : FEATURE_ID_CIRCUMFERENCE( this->AddFeature( "Circumference", "mm" ) ),
-  FEATURE_ID_AREA( this->AddFeature( "Area", "mm^2" ) ),
+  FEATURE_ID_AREA( this->AddFeature( "Area", "mm²" ) ),
   m_Closed( true )
 {
   // Polygon has at least two control points
@@ -72,17 +72,14 @@ bool mitk::PlanarRectangle::SetControlPoint( unsigned int index, const Point2D &
   // the upper left point (index=0) is left untouched
   bool set = false;
 
-  Point2D oldPoint;
   if (createIfDoesNotExist)
   {
     m_ControlPoints->CreateIndex(index);
     m_ControlPoints->CreateElementAt(index) = point;
-    oldPoint = point;
     set = true;
   }
   else if ( index < m_ControlPoints->Size() )
   {
-    oldPoint = m_ControlPoints->ElementAt( index );
     m_ControlPoints->ElementAt( index ) = point;
     set = true;
   }

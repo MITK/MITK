@@ -32,6 +32,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkPointSetInteractor.h>
 #include "mitkMeasurementSelectionProvider.h"
 
+class vtkRenderer;
+class vtkCornerAnnotation;
+
 class QmitkPlanarFiguresTableModel;
 class QGridLayout;
 class QMainWindow;
@@ -82,6 +85,7 @@ class QmitkMeasurement : public QObject, public QmitkFunctionality
     void PlanarFigureSelectionChanged ( const QItemSelection & selected, const QItemSelection & deselected );
     // fields
   protected:
+    void setMeasurementInfo(const QString& text, QmitkRenderWindow* _RenderWindow);
     ///
     /// Interactor for performing the measurements.
     ///
@@ -107,6 +111,8 @@ protected:
   QTableView* m_PlanarFiguresTable;
   QmitkPlanarFiguresTableModel* m_PlanarFiguresModel;
   QPushButton* m_CopyToClipboard;
+  vtkRenderer * m_MeasurementInfoRenderer;
+  vtkCornerAnnotation *m_MeasurementInfoAnnotation;
 
   /// cherry::SelectionChangedAdapter<QmitkPropertyListView> must be a friend to call
   friend struct cherry::SelectionChangedAdapter<QmitkMeasurement>;

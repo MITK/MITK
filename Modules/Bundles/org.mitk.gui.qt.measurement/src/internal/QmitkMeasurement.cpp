@@ -53,6 +53,11 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkNodePredicateDataType.h"
 #include "mitkPlanarFigure.h"
 
+#include <vtkTextProperty.h>
+#include <vtkRenderer.h>
+#include <vtkCornerAnnotation.h>
+#include <mitkVtkLayerController.h>
+
 QmitkMeasurement::QmitkMeasurement()
 : m_PointSetInteractor(0)
 , m_CurrentPointSetNode(0)
@@ -65,17 +70,30 @@ QmitkMeasurement::QmitkMeasurement()
 , m_EllipseCounter(0)
 , m_RectangleCounter(0)
 , m_PolygonCounter(0)
+, m_MeasurementInfoRenderer(0)
+, m_MeasurementInfoAnnotation(0)
 {
+
 }
 
 QmitkMeasurement::~QmitkMeasurement()
 {
 
   this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->RemovePostSelectionListener(m_SelectionListener);
+  m_MeasurementInfoRenderer->Delete();
 }
 
 void QmitkMeasurement::CreateQtPartControl( QWidget* parent )
 {
+  m_MeasurementInfoRenderer = vtkRenderer::New();
+  m_MeasurementInfoAnnotation = vtkCornerAnnotation::New();
+  vtkTextProperty *textProp = vtkTextProperty::New();
+
+  m_MeasurementInfoAnnotation->SetMaximumFontSize(12);
+  textProp->SetColor( 1.0, 1.0, 1.0 );
+  m_MeasurementInfoAnnotation->SetTextProperty( textProp );
+
+  m_MeasurementInfoRenderer->AddActor(m_MeasurementInfoAnnotation);
   m_DrawActionsToolBar = new QToolBar;
 
   //# add actions
@@ -162,10 +180,10 @@ void QmitkMeasurement::CreateQtPartControl( QWidget* parent )
   //m_PlanarFiguresTable->setContextMenuPolicy(Qt::CustomContextMenu);
   m_PlanarFiguresTable->setSelectionMode( QAbstractItemView::ExtendedSelection );
   m_PlanarFiguresTable->setSelectionBehavior( QAbstractItemView::SelectRows );
-  //m_PlanarFiguresTable->horizontalHeader()->setStretchLastSection(true);
+  m_PlanarFiguresTable->horizontalHeader()->setStretchLastSection(true);
   m_PlanarFiguresTable->setAlternatingRowColors(true);
   m_PlanarFiguresTable->setSortingEnabled(true);
-  m_PlanarFiguresTable->horizontalHeader()->setResizeMode(QHeaderView::ResizeToContents);
+  //m_PlanarFiguresTable->horizontalHeader()->setResizeMode(QHeaderView::ResizeToContents);
   m_PlanarFiguresTable->setModel(m_PlanarFiguresModel);
 
   QObject::connect( m_PlanarFiguresTable->selectionModel()
@@ -465,6 +483,7 @@ void QmitkMeasurement::Hidden()
 {
   this->GetActiveStdMultiWidget()->SetWidgetPlanesVisibility(true);
   this->GetActiveStdMultiWidget()->changeLayoutToDefault();
+  this->setMeasurementInfo("", 0);
 }
 
 
@@ -546,8 +565,14 @@ void QmitkMeasurement::PlanarFigureSelectionChanged( const QItemSelection & sele
   std::vector<mitk::DataTreeNode::Pointer > nodes;
 
   indexesOfSelectedRows = selected.indexes();
+  if(indexesOfSelectedRows.size() == 0)
+    this->setMeasurementInfo("", 0);
+
   QModelIndex lastIndex;
   int i = 1;
+  QmitkRenderWindow* selectedRenderWindow = 0;
+  const mitk::PlaneGeometry* _PlaneGeometry = 0;
+  mitk::PlanarFigure* _PlanarFigure = 0;
 
   for (QModelIndexList::iterator it = indexesOfSelectedRows.begin()
     ; it != indexesOfSelectedRows.end(); ++it,++i)
@@ -560,10 +585,10 @@ void QmitkMeasurement::PlanarFigureSelectionChanged( const QItemSelection & sele
       node->SetBoolProperty("selected", true);
       if(i == indexesOfSelectedRows.size())
       {
-        mitk::PlanarFigure* _PlanarFigure = dynamic_cast<mitk::PlanarFigure*>( node->GetData() );
+        _PlanarFigure = dynamic_cast<mitk::PlanarFigure*>( node->GetData() );
         if(!_PlanarFigure)
           continue;
-        const mitk::PlaneGeometry* _PlaneGeometry = dynamic_cast<const mitk::PlaneGeometry*>( _PlanarFigure->GetGeometry2D() );
+        _PlaneGeometry = dynamic_cast<const mitk::PlaneGeometry*>( _PlanarFigure->GetGeometry2D() );
         if(!_PlaneGeometry)
           continue;
 
@@ -571,7 +596,6 @@ void QmitkMeasurement::PlanarFigureSelectionChanged( const QItemSelection & sele
         QmitkRenderWindow* RenderWindow2 = this->GetActiveStdMultiWidget()->GetRenderWindow2();
         QmitkRenderWindow* RenderWindow3 = this->GetActiveStdMultiWidget()->GetRenderWindow3();
         QmitkRenderWindow* RenderWindow4 = this->GetActiveStdMultiWidget()->GetRenderWindow4();
-        QmitkRenderWindow* selectedRenderWindow = 0;
         bool PlanarFigureInitializedWindow = false;
 
         // find initialized renderwindow
@@ -601,8 +625,29 @@ void QmitkMeasurement::PlanarFigureSelectionChanged( const QItemSelection & sele
 
     m_SelectionProvider->SetSelection( cherry::ISelection::Pointer(new mitk::DataTreeNodeSelection(nodes)) );
   }
-  // now paint infos also on renderwindow
-  QVariant measurementInfo = m_PlanarFiguresModel->data(lastIndex, Qt::DisplayRole);
+
+  if(lastIndex.isValid() && selectedRenderWindow && node && _PlaneGeometry)
+  {
+    // now paint infos also on renderwindow
+    QString measurementInfo = (m_PlanarFiguresModel->data(lastIndex, Qt::DisplayRole)).toString();
+    measurementInfo.prepend(": ");
+    measurementInfo.prepend(QString::fromStdString(node->GetName()));
+    this->setMeasurementInfo(measurementInfo, selectedRenderWindow);
+  }
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll(); 
+}
+
+void QmitkMeasurement::setMeasurementInfo(const QString& text, QmitkRenderWindow* _RenderWindow)
+{
+  static QmitkRenderWindow* lastRenderWindow = _RenderWindow;
+  if(!text.isEmpty())
+  {
+    m_MeasurementInfoAnnotation->SetText(1, text.toLatin1().data());
+    mitk::VtkLayerController::GetInstance(_RenderWindow->GetRenderWindow())->InsertForegroundRenderer(m_MeasurementInfoRenderer,true);
+  }
+  else
+  {
+    mitk::VtkLayerController::GetInstance(lastRenderWindow->GetRenderWindow())->RemoveRenderer(m_MeasurementInfoRenderer);
+  }
 }

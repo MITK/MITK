@@ -335,6 +335,7 @@ void QmitkMeasurement::ActionDrawFourPointAngleTriggered( bool  checked )
 {
   if ( m_SelectedImageNode.IsNull() || !checked )
   {
+    m_DrawFourPointAngle->setChecked(false);
     return;
   }
   mitk::PlanarFourPointAngle::Pointer figure = mitk::PlanarFourPointAngle::New();

@@ -115,6 +115,7 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
   m_Controls->m_LesionToolSelectionBox->SetEnabledMode( QmitkToolSelectionBox::EnabledWithReferenceData );
     
   toolManager->NewNodesGenerated += mitk::MessageDelegate<QmitkSegmentationView>( this, &QmitkSegmentationView::OnNewNodesGenerated );          // update the list of segmentations
+  toolManager->NewNodeObjectsGenerated += mitk::MessageDelegate1<QmitkSegmentationView, mitk::ToolManager::DataVectorType*>( this, &QmitkSegmentationView::OnNewNodeObjectsGenerated );          // update the list of segmentations
 
   if(this->GetActiveStdMultiWidget())
   {
@@ -270,6 +271,7 @@ void QmitkSegmentationView::CreateNewSegmentation()
       }
     }
   }
+  else
   {
     LOG_ERROR << "'Create new segmentation' button should never be clickable unless a patient image is selected...";
   }
@@ -490,7 +492,7 @@ void QmitkSegmentationView::StdMultiWidgetClosed( QmitkStdMultiWidget& stdMultiW
 void QmitkSegmentationView::SelectionChanged(cherry::IWorkbenchPart::Pointer sourcepart, cherry::ISelection::ConstPointer selection)
 {
   if ( sourcepart == this ||  // prevents being notified by own selection events
-       !selection.Cast<const cherry::IStructuredSelection>() ) // checks that the selection is a IStructuredSelection and not NULL
+       !selection.Cast<const mitk::DataTreeNodeSelection>() ) // checks that the selection is a IStructuredSelection and not NULL
   {
     std::cout << "Ignore this selection event:";
     std::cout << " sourcepart == this " << (sourcepart == this);
@@ -775,7 +777,6 @@ void QmitkSegmentationView::SendSelectedEvent( mitk::DataTreeNode* referenceNode
   if (referenceNode) nodes.push_back( referenceNode );
   if (workingNode)   nodes.push_back( workingNode );
 
-  
   m_SelectionProvider->SetSelection( cherry::ISelection::Pointer(new mitk::DataTreeNodeSelection(nodes)) );
 }
 
@@ -952,4 +953,19 @@ void QmitkSegmentationView::OnNewNodesGenerated()
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
+void QmitkSegmentationView::OnNewNodeObjectsGenerated(mitk::ToolManager::DataVectorType* nodes)
+{
+  UpdateFromCurrentDataManagerSelection(); // for display options
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  if (nodes)
+  {
+    mitk::ToolManager* toolManager = m_Controls->m_ManualToolSelectionBox->GetToolManager();
+    for (mitk::ToolManager::DataVectorType::iterator iter = nodes->begin(); iter != nodes->end(); ++iter)
+    {
+      toolManager->SetWorkingData( *iter );
+      SendSelectedEvent( toolManager->GetReferenceData(0), *iter );
+      break;
+    }
+  }
+}
 

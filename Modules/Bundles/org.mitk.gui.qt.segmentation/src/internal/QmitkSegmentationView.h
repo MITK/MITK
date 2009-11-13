@@ -31,6 +31,7 @@ public:
   void OnSurfaceCalculationDone();
     
   void OnNewNodesGenerated();
+  void OnNewNodeObjectsGenerated(mitk::ToolManager::DataVectorType*);
 
 protected:
 

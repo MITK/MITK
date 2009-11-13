@@ -92,6 +92,7 @@ class MITKEXT_CORE_EXPORT ToolManager : public itk::Object
 
     Message<> NodePropertiesChanged;
     Message<> NewNodesGenerated;
+    Message1<DataVectorType*> NewNodeObjectsGenerated;
 
     Message<> ActiveToolChanged;
     Message<> ReferenceDataChanged;

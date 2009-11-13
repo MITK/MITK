@@ -118,6 +118,8 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
 
   m_Controls = new Ui::QmitkSegmentationControls;
   m_Controls->setupUi(parent);
+  m_Controls->lblWorkingImageSelectionWarning->hide();
+  m_Controls->lblAlignmentWarning->hide();
 
   m_DataStorage = this->GetDefaultDataStorage();
 
@@ -518,7 +520,7 @@ void QmitkSegmentationView::StdMultiWidgetClosed( QmitkStdMultiWidget& stdMultiW
 
 void QmitkSegmentationView::SelectionChanged(cherry::IWorkbenchPart::Pointer sourcepart, cherry::ISelection::ConstPointer selection)
 {
-  if ( sourcepart == this )  // prevents being notified by own selection events
+  if ( sourcepart == this || selection.IsNull() )  // prevents being notified by own selection events
   {
     std::cout << "Ignore this selection event:";
     std::cout << " sourcepart == this " << (sourcepart == this);
@@ -806,9 +808,10 @@ void QmitkSegmentationView::SendSelectedEvent( mitk::DataTreeNode* referenceNode
   LOG_INFO << "Marking as selected: reference node '" << (referenceNode ? referenceNode->GetName() : "NULL") << " and working node " << (workingNode ? workingNode->GetName() : "NULL");
 
   std::vector<mitk::DataTreeNode::Pointer > nodes;
-  if (referenceNode) nodes.push_back( referenceNode );
+  //if (referenceNode) nodes.push_back( referenceNode );
   if (workingNode)   nodes.push_back( workingNode );
 
+  m_SelectionProvider->SetSelection( cherry::ISelection::Pointer(new mitk::DataTreeNodeSelection(nodes)) );
   m_SelectionProvider->SetSelection( cherry::ISelection::Pointer(new mitk::DataTreeNodeSelection(nodes)) );
 }
 
@@ -819,21 +822,7 @@ void QmitkSegmentationView::OnSurfaceCalculationDone()
 
 void QmitkSegmentationView::ImageStatistics(bool)
 {
-  LOG_INFO << "Statistics for all these nodes:";
-
-  NodeList selection = this->GetSelectedNodes();
-
-  for ( NodeList::iterator iter = selection.begin(); iter != selection.end(); ++iter )
-  {
-    mitk::DataTreeNode* node = *iter;
-
-    if (node)
-    {
-      LOG_INFO << "   " << (*iter)->GetName();
-
-      // TODO: do something to display a statisics/histogram dialog
-    }
-  }
+  this->GetSite()->GetWorkbenchWindow()->GetActivePage()->ShowView("org.mitk.views.imagestatistics");
 }
 
 void QmitkSegmentationView::AutocropSelected(bool)

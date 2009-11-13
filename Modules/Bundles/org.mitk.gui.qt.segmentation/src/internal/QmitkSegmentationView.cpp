@@ -137,7 +137,7 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
 
   m_Controls->m_LesionToolSelectionBox->SetToolManager( *toolManager );
   m_Controls->m_LesionToolSelectionBox->SetToolGUIArea( m_Controls->m_LesionToolGUIContainer );
-  m_Controls->m_LesionToolSelectionBox->SetDisplayedToolGroups("'Lymph Node' 'Lymph Node Correction' 'Homogeneous Tumor' 'Tumor Correction'");
+  m_Controls->m_LesionToolSelectionBox->SetDisplayedToolGroups("'Lymph Node' 'Lymph Node Correction'");
   m_Controls->m_LesionToolSelectionBox->SetEnabledMode( QmitkToolSelectionBox::EnabledWithReferenceData );
     
   toolManager->NewNodesGenerated += mitk::MessageDelegate<QmitkSegmentationView>( this, &QmitkSegmentationView::OnNewNodesGenerated );          // update the list of segmentations

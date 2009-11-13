@@ -321,7 +321,7 @@ void ImageStatisticsCalculator::ExtractImageAndMask()
 
   case MASKING_MODE_IMAGE:
     {
-      if ( m_InternalImageMask3D.IsNotNull() )
+      if ( m_ImageMask.IsNotNull() )
       {
         m_InternalImage = m_Image;
         CastToItkImage( m_ImageMask, m_InternalImageMask3D );

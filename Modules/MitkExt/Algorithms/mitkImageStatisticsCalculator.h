@@ -166,14 +166,14 @@ protected:
   void InternalCalculateStatisticsUnmasked(
     const itk::Image< TPixel, VImageDimension > *image,
     Statistics &statistics,
-    HistogramType::ConstPointer *histogram );
+    typename HistogramType::ConstPointer *histogram );
 
   template < typename TPixel, unsigned int VImageDimension >
   void InternalCalculateStatisticsMasked(
     const itk::Image< TPixel, VImageDimension > *image,
     itk::Image< unsigned short, VImageDimension > *maskImage,
     Statistics &statistics,
-    HistogramType::ConstPointer *histogram );
+    typename HistogramType::ConstPointer *histogram );
 
   template < typename TPixel, unsigned int VImageDimension >
   void InternalCalculateMaskFromPlanarFigure(

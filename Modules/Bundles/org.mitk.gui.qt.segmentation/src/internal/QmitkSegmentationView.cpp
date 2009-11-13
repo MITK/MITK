@@ -673,22 +673,28 @@ void QmitkSegmentationView::SelectionChanged(cherry::IWorkbenchPart::Pointer sou
   }
 }
 
-void QmitkSegmentationView::PartHidden(cherry::IWorkbenchPartReference::Pointer)
-{
-  m_Controls->m_ManualToolSelectionBox->setEnabled( false );
-  m_Controls->m_OrganToolSelectionBox->setEnabled( false );
-  m_Controls->m_LesionToolSelectionBox->setEnabled( false );
-}
-
-void QmitkSegmentationView::PartVisible(cherry::IWorkbenchPartReference::Pointer)
+void QmitkSegmentationView::Visible()
 {
   if(m_MultiWidget)
-  {
     m_MultiWidget->SetWidgetPlanesVisibility(false);
 
+  if( m_Controls )
+  {
     m_Controls->m_ManualToolSelectionBox->setEnabled( true );
     m_Controls->m_OrganToolSelectionBox->setEnabled( true );
     m_Controls->m_LesionToolSelectionBox->setEnabled( true );
+  }
+}
+
+void QmitkSegmentationView::Hidden()
+{
+  this->GetActiveStdMultiWidget()->SetWidgetPlanesVisibility(true);
+
+  if( m_Controls )
+  {
+    m_Controls->m_ManualToolSelectionBox->setEnabled( false );
+    m_Controls->m_OrganToolSelectionBox->setEnabled( false );
+    m_Controls->m_LesionToolSelectionBox->setEnabled( false );
   }
 }
 

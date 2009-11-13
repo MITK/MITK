@@ -17,10 +17,10 @@
 /**
  * \ingroup org_mitk_gui_qt_segmentation_internal
  */
-class QmitkSegmentationView : public QObject
-  , public QmitkFunctionality
+class QmitkSegmentationView : public QObject, public QmitkFunctionality
 {
   Q_OBJECT
+
 public:
 //  static const std::map<std::string, QColor> ORGAN_COLOR_LIST;
   static const std::string ORGAN_COLOR_LIST;
@@ -35,6 +35,9 @@ public:
     
   void OnNewNodesGenerated();
   void OnNewNodeObjectsGenerated(mitk::ToolManager::DataVectorType*);
+
+  virtual void Visible();
+  virtual void Hidden();
 
 protected:
 
@@ -68,9 +71,6 @@ protected:
     void OnToolSelected(int id);
     void OnReferenceNodeSelected(const mitk::DataTreeNode*);
     void OnWorkingDataSelectionChanged(const mitk::DataTreeNode*);
-
-    void PartHidden(cherry::IWorkbenchPartReference::Pointer);
-    void PartVisible(cherry::IWorkbenchPartReference::Pointer);
 
     void SendSelectedEvent( mitk::DataTreeNode* referenceNode, mitk::DataTreeNode* workingNode );
 

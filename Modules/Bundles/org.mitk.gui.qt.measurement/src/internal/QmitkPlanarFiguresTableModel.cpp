@@ -1,5 +1,6 @@
 #include "QmitkPlanarFiguresTableModel.h"
 #include <mitkPlanarFigure.h>
+#include <mitkPlanarAngle.h>
 #include <QmitkNodeDescriptorManager.h>
 
 QmitkPlanarFiguresTableModel::QmitkPlanarFiguresTableModel( mitk::DataStorage::Pointer _DataStorage, mitk::NodePredicateBase* _Predicate, QObject* parent )
@@ -79,12 +80,19 @@ QVariant QmitkPlanarFiguresTableModel::data( const QModelIndex &index, int role 
       mitk::PlanarFigure* planarFigure = dynamic_cast<mitk::PlanarFigure*>(node->GetData());
       if(!planarFigure)
         return data;
-
-      for(int i=0; i<planarFigure->GetNumberOfFeatures(); ++i)
+      
+      mitk::PlanarAngle* planarAngle = dynamic_cast<mitk::PlanarAngle*>(planarFigure);
+      double featureQuantity;
+      for(unsigned int i=0; i<planarFigure->GetNumberOfFeatures(); ++i)
       {
+        featureQuantity = planarFigure->GetQuantity(i);
+        if(planarAngle && i == planarAngle->FEATURE_ID_ANGLE)
+          featureQuantity = featureQuantity * 180 / vnl_math::pi;
+
+        //std::ostringstream s; s.precision(2); s << featureQuantity;
         info.append(QString("%1: %2 %3")
           .arg(QString(planarFigure->GetFeatureName(i)))
-          .arg(planarFigure->GetQuantity(i), 0, 'g', 2)
+          .arg(featureQuantity, 0, 'E', 2)
           .arg(QString(planarFigure->GetFeatureUnit(i))));
         if((i+1) != planarFigure->GetNumberOfFeatures())
           info.append(", ");

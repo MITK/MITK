@@ -33,6 +33,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkPlanarCircle.h"
 #include "mitkPlanarPolygon.h"
 #include "mitkPlanarAngle.h"
+#include "mitkPlanarRectangle.h"
 #include "mitkPlanarLine.h"
 #include "mitkPlanarFourPointAngle.h"
 #include "mitkPlanarFigureInteractor.h"
@@ -388,8 +389,26 @@ void QmitkMeasurement::ActionDrawRectangleTriggered( bool  checked )
   LOG_WARN << "PlanarRectangle is not implemented yet";
   if ( m_SelectedImageNode.IsNull() || !checked )
   {
+    m_DrawRectangle->setChecked(false);
     return;
   }
+
+  mitk::PlanarRectangle::Pointer figure = mitk::PlanarRectangle::New();
+
+  mitk::DataTreeNode::Pointer figureNode = mitk::DataTreeNode::New();
+  figureNode->SetName(QString("Rectangle%1").arg(++m_RectangleCounter).toStdString());
+  figureNode->SetData( figure );
+
+  this->GetDataStorage()->Add( figureNode, m_SelectedImageNode );
+
+  mitk::PlanarFigureInteractor::Pointer interactor  =
+    mitk::PlanarFigureInteractor::New( "PlanarFigureInteractor", figureNode );
+  mitk::GlobalInteraction::GetInstance()->AddInteractor( interactor );
+
+  LOG_INFO << "PlanarRectangle initialized...";
+  m_DrawRectangle->setChecked(false);
+
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkMeasurement::ActionDrawPolygonTriggered( bool  checked )
@@ -404,7 +423,7 @@ void QmitkMeasurement::ActionDrawPolygonTriggered( bool  checked )
   figure->ClosedOn();
 
   mitk::DataTreeNode::Pointer figureNode = mitk::DataTreeNode::New();
-  figureNode->SetName(QString("polygon%1").arg(++m_PolygonCounter).toStdString());
+  figureNode->SetName(QString("Polygon%1").arg(++m_PolygonCounter).toStdString());
   figureNode->SetData( figure );
 
   this->GetDataStorage()->Add( figureNode, m_SelectedImageNode );
@@ -439,13 +458,13 @@ void QmitkMeasurement::ActionDrawTextTriggered( bool  checked )
 void QmitkMeasurement::Visible()
 {
   this->GetActiveStdMultiWidget()->SetWidgetPlanesVisibility(false);
-  //this->GetActiveStdMultiWidget()->changeLayoutToWidget1();
+  this->GetActiveStdMultiWidget()->changeLayoutToWidget1();
 }
 
 void QmitkMeasurement::Hidden()
 {
   this->GetActiveStdMultiWidget()->SetWidgetPlanesVisibility(true);
-  //this->GetActiveStdMultiWidget()->changeLayoutToDefault();
+  this->GetActiveStdMultiWidget()->changeLayoutToDefault();
 }
 
 
@@ -527,11 +546,13 @@ void QmitkMeasurement::PlanarFigureSelectionChanged( const QItemSelection & sele
   std::vector<mitk::DataTreeNode::Pointer > nodes;
 
   indexesOfSelectedRows = selected.indexes();
+  QModelIndex lastIndex;
   int i = 1;
 
   for (QModelIndexList::iterator it = indexesOfSelectedRows.begin()
     ; it != indexesOfSelectedRows.end(); ++it,++i)
   {
+    lastIndex = *it;
     node = m_PlanarFiguresModel->GetNode(*it);
     if ( node )
     {
@@ -580,6 +601,8 @@ void QmitkMeasurement::PlanarFigureSelectionChanged( const QItemSelection & sele
 
     m_SelectionProvider->SetSelection( cherry::ISelection::Pointer(new mitk::DataTreeNodeSelection(nodes)) );
   }
+  // now paint infos also on renderwindow
+  QVariant measurementInfo = m_PlanarFiguresModel->data(lastIndex, Qt::DisplayRole);
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll(); 
 }

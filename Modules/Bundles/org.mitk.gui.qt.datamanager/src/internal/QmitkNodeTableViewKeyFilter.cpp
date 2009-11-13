@@ -38,47 +38,47 @@ bool QmitkNodeTableViewKeyFilter::eventFilter( QObject *obj, QEvent *event )
     if(_KeySequence == _MakeAllInvisible)
     {
       // trigger deletion of selected node(s)
-      _DataManagerView->MakeAllNodesInvisible(false);
+      _DataManagerView->MakeAllNodesInvisible(true);
       // return true: this means the delete key event is not send to the table
       return true;
     }    
     else if(_KeySequence == _DeleteSelectedNodes)
     {
       // trigger deletion of selected node(s)
-      _DataManagerView->RemoveSelectedNodes(false);
+      _DataManagerView->RemoveSelectedNodes(true);
       // return true: this means the delete key event is not send to the table
       return true;
     }    
     else if(_KeySequence == _ToggleVisibility)
     {
       // trigger deletion of selected node(s)
-      _DataManagerView->ToggleVisibilityOfSelectedNodes(false);
+      _DataManagerView->ToggleVisibilityOfSelectedNodes(true);
       // return true: this means the delete key event is not send to the table
       return true;
     }    
     else if(_KeySequence == _Reinit)
     {
-      _DataManagerView->ReinitSelectedNodes(false);
+      _DataManagerView->ReinitSelectedNodes(true);
       return true;
     }    
     else if(_KeySequence == _GlobalReinit)
     {
-      _DataManagerView->GlobalReinit(false);
+      _DataManagerView->GlobalReinit(true);
       return true;
     }    
     else if(_KeySequence == _Save)
     {
-      _DataManagerView->SaveSelectedNodes(false);
+      _DataManagerView->SaveSelectedNodes(true);
       return true;
     }    
     else if(_KeySequence == _Load)
     {
-      _DataManagerView->Load(false);
+      _DataManagerView->Load(true);
       return true;
     }
     else if(_KeySequence == _ShowInfo)
     {
-      _DataManagerView->ShowInfoDialogForSelectedNodes(false);
+      _DataManagerView->ShowInfoDialogForSelectedNodes(true);
       return true;
     }
   }

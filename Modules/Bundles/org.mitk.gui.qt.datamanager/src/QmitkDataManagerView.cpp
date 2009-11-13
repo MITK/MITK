@@ -105,6 +105,7 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   m_NodeTreeView->setAcceptDrops(true);
   m_NodeTreeView->setContextMenuPolicy(Qt::CustomContextMenu);
   m_NodeTreeView->setModel(m_NodeTreeModel);
+  m_NodeTreeView->installEventFilter(new QmitkNodeTableViewKeyFilter(this));
   QObject::connect( m_NodeTreeView, SIGNAL(customContextMenuRequested(const QPoint&))
     , this, SLOT(NodeTableViewContextMenuRequested(const QPoint&)) );
   QObject::connect( m_NodeTreeModel, SIGNAL(rowsInserted (const QModelIndex&, int, int))
@@ -582,7 +583,7 @@ void QmitkDataManagerView::SelectionChanged( cherry::IWorkbenchPart::Pointer par
         _DataTreeNode = _DataTreeNodeObject->GetDataTreeNode();
       QModelIndex treeIndex = m_NodeTreeModel->GetIndex(_DataTreeNode);
       if(treeIndex.isValid())
-        m_NodeTreeView->selectionModel()->select(treeIndex, QItemSelectionModel::Select | QItemSelectionModel::Current);
+        m_NodeTreeView->selectionModel()->select(treeIndex, QItemSelectionModel::Select);
     }
   }
 }

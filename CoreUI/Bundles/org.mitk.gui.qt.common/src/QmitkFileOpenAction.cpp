@@ -28,6 +28,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkDataStorageEditorInput.h>
 #include <cherryIEditorPart.h>
 #include <cherryIWorkbenchPage.h>
+#include <cherryIPreferencesService.h>
+#include <cherryPlatform.h>
 
 #include "mitkProperties.h"
 #include "mitkNodePredicateData.h"
@@ -40,11 +42,27 @@ PURPOSE.  See the above copyright notices for more information.
 QmitkFileOpenAction::QmitkFileOpenAction(cherry::IWorkbenchWindow::Pointer window)
 : QAction(0)
 {
+  this->init(window);
+}
+
+QmitkFileOpenAction::QmitkFileOpenAction(const QIcon & icon, cherry::IWorkbenchWindow::Pointer window)
+: QAction(0)
+{
+  this->setIcon(icon);
+
+  this->init(window);
+}
+
+void QmitkFileOpenAction::init(cherry::IWorkbenchWindow::Pointer window)
+{
   m_Window = window;
   this->setParent(static_cast<QWidget*>(m_Window->GetShell()->GetControl()));
   this->setText("&Open...");
 
-  m_Window = window;
+  cherry::IPreferencesService::Pointer prefService
+    = cherry::Platform::GetServiceRegistry()
+    .GetServiceById<cherry::IPreferencesService>(cherry::IPreferencesService::ID);
+  m_GeneralPreferencesNode = prefService->GetSystemPreferences()->Node("/General");
 
   this->connect(this, SIGNAL(triggered(bool)), this, SLOT(Run()));
 }
@@ -54,7 +72,14 @@ void QmitkFileOpenAction::Run()
   /**
    * @brief stores the last path of last opened file
    */
-  static QString m_LastPath; 
+  static QString m_LastPath;
+
+  if(m_GeneralPreferencesNode.Lock().IsNotNull())
+  {
+    if(m_LastPath.isEmpty())
+      m_LastPath = QString::fromStdString(m_GeneralPreferencesNode.Lock()->Get("LastFileOpenPath", ""));
+  }
+
 
   //QFileDialog dialog(static_cast<QWidget*>(m_Window->GetShell()->GetControl()));
   //dialog.setFileMode(QFileDialog::ExistingFiles);
@@ -74,7 +99,12 @@ void QmitkFileOpenAction::Run()
 
   QFileInfo info(fileNames.at(0));
   m_LastPath = info.filePath();
-  
+  if(m_GeneralPreferencesNode.Lock().IsNotNull())
+  {
+    m_GeneralPreferencesNode.Lock()->Put("LastFileOpenPath", m_LastPath.toStdString());
+    m_GeneralPreferencesNode.Lock()->Flush();
+  }
+
   mitk::DataStorageEditorInput::Pointer editorInput;
   mitk::DataStorage::Pointer dataStorage;
   QmitkStdMultiWidgetEditor::Pointer multiWidgetEditor;

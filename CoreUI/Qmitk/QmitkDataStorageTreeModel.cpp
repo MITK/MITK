@@ -153,7 +153,7 @@ bool QmitkDataStorageTreeModel::dropMimeData(const QMimeData *data,
     if(dropItem == m_Root) // item was dropped onto empty space 
       parentItem = m_Root;
 
-    if(draggedItem->GetParent() == parentItem) // dragging is only allowed within the same parent
+    if(draggedItem != dropItem && draggedItem->GetParent() == parentItem) // dragging is only allowed within the same parent
     {
       QModelIndex parentModelIndex = this->IndexFromTreeItem(parentItem);
 

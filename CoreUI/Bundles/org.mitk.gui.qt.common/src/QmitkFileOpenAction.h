@@ -26,10 +26,12 @@ PURPOSE.  See the above copyright notices for more information.
 #endif
 
 #include <QAction>
+#include <QIcon>
 
 #include "mitkQtCommonDll.h"
 
 #include <cherryIWorkbenchWindow.h>
+#include <cherryIPreferences.h>
 
 class MITK_QT_COMMON QmitkFileOpenAction : public QAction
 {
@@ -37,13 +39,16 @@ class MITK_QT_COMMON QmitkFileOpenAction : public QAction
 
 public:
   QmitkFileOpenAction(cherry::IWorkbenchWindow::Pointer window);
+  QmitkFileOpenAction(const QIcon & icon, cherry::IWorkbenchWindow::Pointer window);
 
 protected slots:
 
   void Run();
 
 private:
+  void init ( cherry::IWorkbenchWindow::Pointer window );
   cherry::IWorkbenchWindow::Pointer m_Window;
+  cherry::IPreferences::WeakPtr m_GeneralPreferencesNode;
 };
 
 

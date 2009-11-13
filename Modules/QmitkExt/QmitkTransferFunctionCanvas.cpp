@@ -173,6 +173,7 @@ void QmitkTransferFunctionCanvas::PaintHistogram(QPainter &p)
   if (m_Histogram.IsNotNull())
   {
     p.save();
+    
     p.setPen(Qt::gray);
         
     //float scaleFactor = (float) () / contentsRect().width();
@@ -212,8 +213,6 @@ void QmitkTransferFunctionCanvas::PaintHistogram(QPainter &p)
     }
     
     p.restore();
-    
-    
   }
 }
 

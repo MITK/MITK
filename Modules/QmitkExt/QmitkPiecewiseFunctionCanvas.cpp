@@ -41,15 +41,11 @@ void QmitkPiecewiseFunctionCanvas::paintEvent(QPaintEvent*)
   {
     painter.setPen(Qt::gray);
     painter.drawRect(0, 0, contentsRect().width()+1, contentsRect().height()+1);
-
     return;
   }
  
   PaintHistogram(painter);
 
-  painter.save();
-
-  
   if (m_Title.size()>0)
   {
     painter.setPen(Qt::black);
@@ -139,12 +135,6 @@ void QmitkPiecewiseFunctionCanvas::paintEvent(QPaintEvent*)
     
     painter.setBrush(Qt::NoBrush);
   }
-  else
-  {
-    //painter.setPen(Qt::red);
-    //painter.drawRect(1, 1, contentsRect.width()-1, contentsRect.height()-1);
-  }
-  painter.restore();
 }
 
 int QmitkPiecewiseFunctionCanvas::GetNearHandle(int x, int y,

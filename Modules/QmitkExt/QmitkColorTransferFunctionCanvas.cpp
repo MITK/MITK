@@ -37,9 +37,7 @@ void QmitkColorTransferFunctionCanvas::SetTitle(std::string title)
 
 void QmitkColorTransferFunctionCanvas::paintEvent(QPaintEvent*)
 {
-
   QPainter painter(this);
-  painter.save();
 
   // Render gray background
   QRect contentsRect = this->contentsRect();
@@ -97,8 +95,6 @@ void QmitkColorTransferFunctionCanvas::paintEvent(QPaintEvent*)
   painter.setPen(Qt::white);
   painter.drawText(QPoint(x,y  ),qs_max);
   
-  
-  
   if (m_ColorTransferFunction)
   {
     // now paint the handles
@@ -126,7 +122,6 @@ void QmitkColorTransferFunctionCanvas::paintEvent(QPaintEvent*)
       
     }
   }
-  painter.restore();
 }
 
 int QmitkColorTransferFunctionCanvas::GetNearHandle(int x, int /*y*/,

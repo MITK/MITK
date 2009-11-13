@@ -21,6 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkSurfaceVtkWriter.h"
 
 #include <vtkXMLPolyDataWriter.h>
+#include "Poco/Path.h"
 
 MITK_REGISTER_SERIALIZER(SurfaceSerializer)
 
@@ -54,7 +55,7 @@ std::cout << "creating file " << filename << " in " << m_WorkingDirectory << std
   filename += ".vtp";
 
   std::string fullname(m_WorkingDirectory);
-  fullname += "/";
+  fullname += Poco::Path::separator();
   fullname += filename;
 
   try

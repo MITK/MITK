@@ -228,7 +228,7 @@ bool mitk::SceneReaderV1::DecorateNodeWithProperties(DataTreeNode* node, TiXmlEl
       // use deserializer to construct new properties
       PropertyListDeserializer::Pointer deserializer = PropertyListDeserializer::New();
       
-      deserializer->SetFilename(workingDirectory + "/" + propertiesfile);
+      deserializer->SetFilename(workingDirectory + Poco::Path::separator() + propertiesfile);
       error |= deserializer->Deserialize();
       PropertyList::Pointer readProperties = deserializer->GetOutput();
 

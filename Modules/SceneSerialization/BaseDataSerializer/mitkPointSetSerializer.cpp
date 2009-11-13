@@ -18,6 +18,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkPointSetSerializer.h"
 #include "mitkPointSetWriter.h"
+#include "Poco/Path.h"
+
 
 MITK_REGISTER_SERIALIZER(PointSetSerializer)
 
@@ -51,7 +53,7 @@ std::string mitk::PointSetSerializer::Serialize()
   filename += ".mps";
 
   std::string fullname(m_WorkingDirectory);
-  fullname += "/";
+  fullname += Poco::Path::separator();
   fullname += filename;
 
   try

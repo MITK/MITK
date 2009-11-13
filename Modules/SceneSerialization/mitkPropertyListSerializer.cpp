@@ -56,7 +56,7 @@ std::string mitk::PropertyListSerializer::Serialize()
   filename += ".prop";
 
   std::string fullname(m_WorkingDirectory);
-  fullname += "/";
+  fullname += Poco::Path::separator();
   fullname += filename;
 
   TiXmlDocument document;

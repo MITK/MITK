@@ -201,7 +201,7 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
   const std::vector<cherry::IViewDescriptor::Pointer>& viewDescriptors =
       viewRegistry->GetViews();
 
-  // another bad hack to get an edit/undo menu... 
+  // another bad hack to get an edit/undo menu...
   QMenu* editMenu = menuBar->addMenu("&Edit");
   QAction* undoAction = editMenu->addAction("&Undo",
       QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onUndo()),
@@ -283,8 +283,8 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
 
   // ===== Help menu ====================================
   QMenu* helpMenu = menuBar->addMenu("Help");
-  QAction* welcomeAction = helpMenu->addAction("&Welcome",
-      QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onIntro()));
+  QAction* welcomeAction = helpMenu->addAction("&Welcome",QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onIntro()));
+  QAction* helpAction = helpMenu->addAction("&Active Bundle (F1)",QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onHelp()));
   QAction* aboutAction = helpMenu->addAction("&About",QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onIntro()));
   // =====================================================
 
@@ -328,7 +328,7 @@ void QmitkExtWorkbenchWindowAdvisor::PreWindowOpen()
 }
 
 //--------------------------------------------------------------------------------
-// Ugly hack from here on. Feel free to delete when command framework 
+// Ugly hack from here on. Feel free to delete when command framework
 // and undo buttons are done.
 //--------------------------------------------------------------------------------
 
@@ -425,6 +425,11 @@ void QmitkExtWorkbenchWindowAdvisorHack::onIntro()
         cherry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow(), false);
   }
 }
+
+void QmitkExtWorkbenchWindowAdvisorHack::onHelp()
+	{
+	//call help method here
+	}
 
 void QmitkExtWorkbenchWindowAdvisor::HookTitleUpdateListeners(
     cherry::IWorkbenchWindowConfigurer::Pointer configurer)

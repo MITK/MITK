@@ -518,8 +518,7 @@ void QmitkSegmentationView::StdMultiWidgetClosed( QmitkStdMultiWidget& stdMultiW
 
 void QmitkSegmentationView::SelectionChanged(cherry::IWorkbenchPart::Pointer sourcepart, cherry::ISelection::ConstPointer selection)
 {
-  if ( sourcepart == this ||  // prevents being notified by own selection events
-       !selection.Cast<const mitk::DataTreeNodeSelection>() ) // checks that the selection is a IStructuredSelection and not NULL
+  if ( sourcepart == this )  // prevents being notified by own selection events
   {
     std::cout << "Ignore this selection event:";
     std::cout << " sourcepart == this " << (sourcepart == this);

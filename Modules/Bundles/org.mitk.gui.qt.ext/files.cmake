@@ -24,7 +24,7 @@ SET(RESOURCE_FILES
 
 SET(RES_FILES
 # uncomment the following line if you want to use Qt resources
-#  resources/.qrc
+ resources/org_mitk_gui_qt_ext.qrc
 )
 
 SET(CPP_FILES manifest.cpp)

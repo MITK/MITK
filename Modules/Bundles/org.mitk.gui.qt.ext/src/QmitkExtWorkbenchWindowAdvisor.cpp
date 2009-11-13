@@ -191,8 +191,11 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
 
   QMenu* fileMenu = menuBar->addMenu("&File");
 
-  fileMenu->addAction(new QmitkFileOpenAction(window));
-  fileMenu->addAction(new QmitkFileSaveProjectAction(window));
+  QAction* fileOpenAction = new QmitkFileOpenAction(QIcon(":/org.mitk.gui.qt.ext/document-new.png"), window);
+  fileMenu->addAction(fileOpenAction);
+  QAction* fileSaveProjectAction = new QmitkFileSaveProjectAction(window);
+  fileSaveProjectAction->setIcon(QIcon(":/org.mitk.gui.qt.ext/document-save.png"));
+  fileMenu->addAction(fileSaveProjectAction);
   fileMenu->addSeparator();
   fileMenu->addAction(new QmitkFileExitAction(window));
 
@@ -203,12 +206,23 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
 
   // another bad hack to get an edit/undo menu...
   QMenu* editMenu = menuBar->addMenu("&Edit");
-  QAction* undoAction = editMenu->addAction("&Undo",
+  QAction* undoAction = editMenu->addAction(QIcon(":/org.mitk.gui.qt.ext/edit-undo.png"),
+      "&Undo",
       QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onUndo()),
       QKeySequence("CTRL+Z"));
-  QAction* redoAction = editMenu->addAction("&Redo",
+  QAction* redoAction = editMenu->addAction(QIcon(":/org.mitk.gui.qt.ext/edit-redo.png")
+      , "&Redo",
       QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onRedo()),
       QKeySequence("CTRL+Y"));
+
+  // toolbar for showing file open, undo, redo and other main actions
+  QToolBar* mainActionsToolBar = new QToolBar;
+  mainActionsToolBar->setToolButtonStyle ( Qt::ToolButtonTextBesideIcon );
+  mainActionsToolBar->addAction(fileOpenAction);
+  mainActionsToolBar->addAction(fileSaveProjectAction);
+  mainActionsToolBar->addAction(undoAction);
+  mainActionsToolBar->addAction(redoAction);
+  mainWindow->addToolBar(mainActionsToolBar);
 
   // ==== Window Menu ==========================
   QMenu* windowMenu = menuBar->addMenu("Window");
@@ -312,7 +326,7 @@ void QmitkExtWorkbenchWindowAdvisor::PreWindowOpen()
 
   // show the shortcut bar and progress indicator, which are hidden by
   // default
-  configurer->SetShowPerspectiveBar(true);
+  //configurer->SetShowPerspectiveBar(true);
   //configurer->SetShowFastViewBars(true);
   //configurer->SetShowProgressIndicator(true);
 

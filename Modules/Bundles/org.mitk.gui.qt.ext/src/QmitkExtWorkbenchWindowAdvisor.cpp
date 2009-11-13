@@ -191,7 +191,7 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
 
   QMenu* fileMenu = menuBar->addMenu("&File");
 
-  QAction* fileOpenAction = new QmitkFileOpenAction(QIcon(":/org.mitk.gui.qt.ext/document-new.png"), window);
+  QAction* fileOpenAction = new QmitkFileOpenAction(QIcon(":/org.mitk.gui.qt.ext/document-open.png"), window);
   fileMenu->addAction(fileOpenAction);
   QAction* fileSaveProjectAction = new QmitkFileSaveProjectAction(window);
   fileSaveProjectAction->setIcon(QIcon(":/org.mitk.gui.qt.ext/document-save.png"));

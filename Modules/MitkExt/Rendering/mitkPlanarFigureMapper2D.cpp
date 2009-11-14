@@ -68,20 +68,23 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
   // Get current world 2D geometry from renderer
   const mitk::Geometry2D *rendererGeometry2D = renderer->GetCurrentWorldGeometry2D();
 
-  // If the PlanarFigure geometry is a plane geometry, check if 2D world
-  // geometry and planar figure geometry describe the same plane (otherwise,
-  // nothing is displayed)
+  // If the PlanarFigure geometry is a plane geometry, check if current
+  // world plane is parallel to and within the planar figure geometry bounds
+  // (otherwise, display nothing)
   mitk::PlaneGeometry *planarFigurePlaneGeometry = 
     dynamic_cast< PlaneGeometry * >( planarFigureGeometry2D );
   const mitk::PlaneGeometry *rendererPlaneGeometry = 
     dynamic_cast< const PlaneGeometry * >( rendererGeometry2D );
-  
-  bool planeGeometry = false;
+
   if ( (planarFigurePlaneGeometry != NULL) && (rendererPlaneGeometry != NULL) )
   {
-    planeGeometry = true;
-    if ( !planarFigurePlaneGeometry->IsOnPlane( rendererPlaneGeometry ) )
+    double planeThickness = planarFigurePlaneGeometry->GetExtentInMM( 2 );
+    if ( !planarFigurePlaneGeometry->IsParallel( rendererPlaneGeometry )
+      || !(planarFigurePlaneGeometry->DistanceFromPlane( 
+           rendererPlaneGeometry ) < planeThickness / 2.0) )
     {
+      // Planes are not parallel or renderer plane is not within PlanarFigure
+      // geometry bounds --> exit
       return;
     }
   }

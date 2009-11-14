@@ -615,8 +615,7 @@ void QmitkMeasurement::PlanarFigureSelectionChanged( const QItemSelection & sele
         // make node visible
         if(selectedRenderWindow)
         {
-          mitk::Point3D centerP = _PlaneGeometry->GetCenter();
-          centerP += (_PlaneGeometry->GetSpacing() * 0.5);
+          mitk::Point3D centerP = _PlaneGeometry->GetOrigin();
           //selectedRenderWindow->GetSliceNavigationController()->ReorientSlices( centerP,_PlaneGeometry->GetNormal() );
           selectedRenderWindow->GetSliceNavigationController()->SelectSliceByPoint(centerP);
         }

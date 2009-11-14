@@ -23,6 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkPlanarCircle.h"
 #include "mitkPlanarPolygon.h"
 #include "mitkPlanarFourPointAngle.h"
+#include "mitkPlanarRectangle.h"
 #include "itksys/SystemTools.hxx"
 #include "mitkPlaneGeometry.h"
 
@@ -118,6 +119,10 @@ void mitk::PlanarFigureReader::GenerateData()
     else if (type == "PlanarFourPointAngle")
     {
       pf = mitk::PlanarFourPointAngle::New();
+    }
+    else if (type == "PlanarRectangle")
+    {
+      pf = mitk::PlanarRectangle::New();
     }
     else 
     {

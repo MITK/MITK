@@ -88,6 +88,11 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
       return;
     }
   }
+  else
+  {
+    // Plane is not valid (curved reformations are not possible yet)
+    return;
+  }
 
 
   // Get display geometry

@@ -80,12 +80,15 @@ void mitk::PlanarFigureWriter::GenerateData()
     const PlaneGeometry* planeGeo = dynamic_cast<const PlaneGeometry*>(pf->GetGeometry2D());
     if (planeGeo != NULL)
     {
-      Point3D origin = planeGeo->GetOrigin();
-      Vector3D normal = planeGeo->GetNormal();
+      Vector3D xVector = planeGeo->GetAxisVector( 0 );
+      Vector3D yVector = planeGeo->GetAxisVector( 1 );
       Vector3D spacing = planeGeo->GetSpacing();
-      geoElement->LinkEndChild(this->CreateXMLVectorElement("Origin", origin));
-      geoElement->LinkEndChild(this->CreateXMLVectorElement("Normal", normal));
+      Point3D origin = planeGeo->GetOrigin();
+
+      geoElement->LinkEndChild(this->CreateXMLVectorElement("xVector", xVector));
+      geoElement->LinkEndChild(this->CreateXMLVectorElement("yVector", yVector));
       geoElement->LinkEndChild(this->CreateXMLVectorElement("Spacing", spacing));
+      geoElement->LinkEndChild(this->CreateXMLVectorElement("Origin", origin));
       pfElement->LinkEndChild(geoElement);
     }
   }

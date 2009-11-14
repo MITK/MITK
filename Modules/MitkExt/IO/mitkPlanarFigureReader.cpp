@@ -156,22 +156,28 @@ void mitk::PlanarFigureReader::GenerateData()
     {
       try
       {
-        Point3D origin = this->GetPointFromXMLNode(pfElement->FirstChildElement("Origin"));
-        Vector3D normal = this->GetVectorFromXMLNode(pfElement->FirstChildElement("Normal"));
-        Vector3D spacing = this->GetVectorFromXMLNode(pfElement->FirstChildElement("Spacing"));
+        Vector3D xVector = this->GetVectorFromXMLNode(geoElement->FirstChildElement("xVector"));
+        Vector3D yVector = this->GetVectorFromXMLNode(geoElement->FirstChildElement("yVector"));
+        Vector3D spacing = this->GetVectorFromXMLNode(geoElement->FirstChildElement("Spacing"));
+        Point3D origin = this->GetPointFromXMLNode(geoElement->FirstChildElement("Origin"));
+
         mitk::PlaneGeometry::Pointer planeGeo = mitk::PlaneGeometry::New();
-        planeGeo->InitializePlane(origin, normal); // initialize with normal vector and origin
-        planeGeo->SetExtentInMM(0, spacing.GetElement(0));  // \TODO Does this make sense? How do we use the spacing?
-        planeGeo->SetExtentInMM(1, spacing.GetElement(1));
-        planeGeo->SetExtentInMM(2, spacing.GetElement(2));
+        planeGeo->InitializeStandardPlane( xVector, yVector, &spacing );
+        planeGeo->SetOrigin( origin );
         pf->SetGeometry2D(planeGeo);
       }
       catch (...)
       {        	
       }
     }
-      // \TODO: what about m_FigurePlaced and m_SelectedControlPoint ??
-      this->SetNthOutput( this->GetNumberOfOutputs(), pf );  // add pf as new output of this filter
+    // Calculate feature quantities of this PlanarFigure
+    pf->EvaluateFeatures();
+
+    // Make sure that no control point is currently selected
+    pf->DeselectControlPoint();
+
+    // \TODO: what about m_FigurePlaced and m_SelectedControlPoint ??
+    this->SetNthOutput( this->GetNumberOfOutputs(), pf );  // add pf as new output of this filter
   }
   m_Success = true;
 }

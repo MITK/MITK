@@ -66,18 +66,66 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "itkTreeChangeEvent.h"
 
-//const std::map<std::string, QColor> QmitkSegmentationView::ORGAN_COLOR_LIST =  QmitkSegmentationView::CreateOrganColorList();
-const std::string QmitkSegmentationView::ORGAN_COLOR_LIST = QmitkSegmentationView::CreateOrganColorList();
+const std::string QmitkSegmentationView::ORGAN_COLOR_STRING = QmitkSegmentationView::CreateOrganColorString();
 
-std::string QmitkSegmentationView::CreateOrganColorList()
+std::string QmitkSegmentationView::CreateOrganColorString()
 {
   std::string m;
-  m="Liver;255;0;0;";
-  m+="Kidney;0;255;0);";
-  m+="Heart;0;0;255);";
-
+  m="ankle;277;134;134;";
+  m+="appendix;277;134;134;";
+  m+="blood vessels;255;49;49;";
+  m+="bronchial tree;49;104;255;";
+  m+="bone;213;213;213;";
+  m+="brain;255;156;202;";
+  m+="coccyx;277;134;134;";
+  m+="colon;277;134;134;";
+  m+="cyst;277;134;134;";
+  m+="elbow;277;134;134;";
+  m+="eye;277;134;134;";
+  m+="fallopian tube;277;134;134;";
+  m+="fat;255;43;238;";
+  m+="hand;277;134;134;";
+  m+="gall bladder;86;127;24;";
+  m+="heart;235;29;50;";
+  m+="hip;277;134;134;";
+  m+="kidney;211;63;0;";
+  m+="knee;277;134;134;";
+  m+="larynx;277;134;134;";
+  m+="liver;255;204;61;";
+  m+="lung;107;220;255;";
+  m+="lymph node;255;0;0;";
+  m+="muscle;255;69;106;";
+  m+="nerve;255;234;79;";
+  m+="nose;277;134;134;";
+  m+="oesophagus;277;134;134;";
+  m+="ovaries;277;134;134;";
+  m+="pancreas;249;171;61;";
+  m+="pelvis;277;134;134;";
+  m+="penis;277;134;134;";
+  m+="pharynx;277;134;134;";
+  m+="prostate;277;134;134;";
+  m+="rectum;277;134;134;";
+  m+="sacrum;277;134;134;";
+  m+="seminal vesicle;277;134;134;";
+  m+="shoulder;277;134;134;";
+  m+="spinal cord;245;249;61;";
+  m+="spleen;249;108;61;";
+  m+="stomach;249;108;61;";
+  m+="teeth;255;252;216;";
+  m+="testicles;277;134;134;";
+  m+="thyroid;255;246;148;";
+  m+="tongue;277;134;134;";
+  m+="tumor;147;112;17;";
+  m+="urethra;248;255;50;";
+  m+="urinary bladder;248;255;50;";
+  m+="uterus;277;134;134;";
+  m+="vagina;277;134;134;";
+  m+="vertebra;277;134;134;";
+  m+="wrist;277;134;134;";
   return m;
 }
+
+//const std::map<std::string, QColor> QmitkSegmentationView::ORGAN_COLOR_LIST =  QmitkSegmentationView::CreateOrganColorList();
 
 //std::map<std::string, QColor> QmitkSegmentationView::CreateOrganColorList()
 //{
@@ -261,12 +309,11 @@ void QmitkSegmentationView::CreateNewSegmentation()
       // ask about the name and organ type of the new segmentation
       QmitkNewSegmentationDialog dialog( m_Parent ); // needs a QWidget as parent, "this" is not QWidget
       
-      std::string colorAndOrgan;
-      organ = QString::fromStdString(ORGAN_COLOR_LIST);
+      QString organColorQString = QString::fromStdString(ORGAN_COLOR_STRING);
 
-      QStringList organlist = organ.split(";");
+      QStringList organColorList = organColorQString.split(";");
 
-      dialog.SetSuggestionList(organlist);
+      dialog.SetSuggestionList(organColorList);
       int dialogReturnValue = dialog.exec();
 
       if ( dialogReturnValue == QDialog::Rejected ) return; // user clicked cancel or pressed Esc or something similar

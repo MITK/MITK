@@ -56,7 +56,7 @@ class QMITKEXT_EXPORT QmitkNewSegmentationDialog : public QDialog
     const char* GetOrganType();
     mitk::Color GetColorProperty();
 
-    void SetSuggestion(const QString& organ);
+    void AddSuggestion(const QStringList organColor);
     void SetSuggestionList(QStringList organColorList);
 
   signals:
@@ -73,7 +73,7 @@ class QMITKEXT_EXPORT QmitkNewSegmentationDialog : public QDialog
     void onOrganSelected(int index);
     void onNewOrganNameChanged(const QString&);
     void onColorBtnClicked();
-    void onColorChange();
+    void onColorChange(const QString& completedWord);
 
   protected:
 
@@ -92,9 +92,10 @@ class QMITKEXT_EXPORT QmitkNewSegmentationDialog : public QDialog
 
     QColor color;
 
-    QString suggestedOrgan;
-
     QCompleter* completer;
+
+    QStringList organList;
+    QStringList colorList;
 };
 
 #endif

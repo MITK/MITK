@@ -30,6 +30,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QStringListModel>
 #include <QAbstractItemModel>
 
+#include <mitkDataTreeNodeFactory.h>
+
 QmitkNewSegmentationDialog::QmitkNewSegmentationDialog(QWidget* parent)
 :QDialog(parent), // true, modal
  selectedOrgan("undefined"),
@@ -56,12 +58,13 @@ QmitkNewSegmentationDialog::QmitkNewSegmentationDialog(QWidget* parent)
   connect( btnColor, SIGNAL(clicked()), this, SLOT(onColorBtnClicked()) );
 
   edtName = new QLineEdit( "", this, "edtName" );
-  //QStringList wordList;
-  //wordList << "";
-  //completer = new QCompleter(wordList);
-  //edtName->setCompleter(completer);
+  QStringList completionList;
+  completionList << "";
+  completer = new QCompleter(completionList);
+  completer->setCaseSensitivity(Qt::CaseInsensitive);
+  edtName->setCompleter(completer);
 
- // connect( completer, SIGNAL(activated("")), this, SLOT(onColorChange()) );
+  connect( completer, SIGNAL(activated(const QString&)), this, SLOT(onColorChange(const QString&)) );
 
   QBoxLayout * horizontalLayout2 = new QHBoxLayout(verticalLayout);
   horizontalLayout2->addWidget( btnColor );
@@ -193,20 +196,13 @@ mitk::Color QmitkNewSegmentationDialog::GetColorProperty()
   return colorProperty;
 }
 
-void QmitkNewSegmentationDialog::SetSuggestion(const QString& organ)
+void QmitkNewSegmentationDialog::AddSuggestion(const QStringList organColor)
 {
-  suggestedOrgan = organ;
-  QStringList wordList;
-  wordList << suggestedOrgan << "test";
-  QCompleter *completer = new QCompleter(wordList);
-  edtName->setCompleter(completer);
-
+  SetSuggestionList(organColor);
 }
 
 void QmitkNewSegmentationDialog::SetSuggestionList(QStringList organColorList)
 {
-  QStringList organList;
-  QStringList colorList;
   for (int i = 0; i < organColorList.size()/4; i++)
   {
     organList.push_back(organColorList.at(4*i));
@@ -214,24 +210,18 @@ void QmitkNewSegmentationDialog::SetSuggestionList(QStringList organColorList)
     colorList.push_back(organColorList.at(4*i+2));
     colorList.push_back(organColorList.at(4*i+3));
   }
-//  QStringListModel* completeModel = static_cast<QStringListModel*> (completer->completionModel());
-//  completeModel->setStringList(organList);
-////  completer->setModel(static_cast<QAbstractItemModel*> (completeModel));
-
-  completer = new QCompleter(organList);
-  edtName->setCompleter(completer);
-
-//  connect( completer, SIGNAL(actived("Heart")), this, SLOT(onColorChange()) );
+  QStringListModel* completeModel = static_cast<QStringListModel*> (completer->model());
+  completeModel->setStringList(organList);
 }
 
-void QmitkNewSegmentationDialog::onColorChange()
+void QmitkNewSegmentationDialog::onColorChange(const QString& completedWord)
 {
-  //if (organList.contains(edtName->text().ascii()))
-  //{
-  //  int j = organList.indexOf(edtName->text().ascii());
-  //  color.setRed(colorList.at(3*j).toInt());
-  //  color.setGreen(colorList.at(3*j+1).toInt());
-  //  color.setBlue(colorList.at(3*j+2).toInt());
-  //  btnColor->setStyleSheet(QString("background-color:rgb(%1,%2, %3)").arg(color.red()).arg(color.green()).arg(color.blue()));
-  //}
+  if (organList.contains(completedWord))
+  {
+    int j = organList.indexOf(completedWord);
+    color.setRed(colorList.at(3*j).toInt());
+    color.setGreen(colorList.at(3*j+1).toInt());
+    color.setBlue(colorList.at(3*j+2).toInt());
+    btnColor->setStyleSheet(QString("background-color:rgb(%1,%2, %3)").arg(color.red()).arg(color.green()).arg(color.blue()));
+  }
 }

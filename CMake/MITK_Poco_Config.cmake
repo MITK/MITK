@@ -2,7 +2,12 @@ SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/openCherry/CMak
 SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/mitk/openCherry/CMake)
 FIND_PACKAGE(Poco)
 LIST(APPEND ALL_INCLUDE_DIRECTORIES ${Poco_INCLUDE_DIRS})
-LIST(APPEND ALL_LIBRARIES ${Poco_LIBRARIES})
+LIST(APPEND ALL_LIBRARIES optimized PocoFoundation 
+                          debug PocoFoundationd 
+                          optimized PocoUtil 
+                          debug PocoUtild
+                          optimized PocoXML
+                          debug PocoXMLd)
 link_directories(${Poco_LIBRARY_DIRS})
 
  

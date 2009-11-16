@@ -346,9 +346,14 @@ void QmitkExtWorkbenchWindowAdvisor::PreWindowOpen()
 // and undo buttons are done.
 //--------------------------------------------------------------------------------
 
-QmitkExtWorkbenchWindowAdvisorHack::QmitkExtWorkbenchWindowAdvisorHack() :
-  QObject()
+QmitkExtWorkbenchWindowAdvisorHack::QmitkExtWorkbenchWindowAdvisorHack() : QObject()
 {
+  m_HelpHandler = new QmitkHelpHandler();
+}
+
+QmitkExtWorkbenchWindowAdvisorHack::~QmitkExtWorkbenchWindowAdvisorHack()
+{
+  delete m_HelpHandler;
 }
 
 void QmitkExtWorkbenchWindowAdvisorHack::onUndo()

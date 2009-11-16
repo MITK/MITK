@@ -5,6 +5,7 @@ SET(SRC_CPP_FILES
 
 SET(INTERNAL_CPP_FILES
   QmitkCommonExtPlugin.cpp
+  QmitkHelpHandler.cpp
 )
 
 SET(UI_FILES
@@ -13,6 +14,7 @@ SET(UI_FILES
 
 SET(MOC_H_FILES
   src/internal/QmitkExtWorkbenchWindowAdvisorHack.h
+  src/internal/QmitkHelpHandler.h
 )
 
 SET(RESOURCE_FILES
@@ -36,4 +38,3 @@ endforeach(file ${SRC_CPP_FILES})
 foreach(file ${INTERNAL_CPP_FILES})
   SET(CPP_FILES ${CPP_FILES} src/internal/${file})
 endforeach(file ${INTERNAL_CPP_FILES})
-

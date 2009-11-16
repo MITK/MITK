@@ -1,5 +1,5 @@
 #include <QObject>
-#include <QKeyEvent>
+#include "QmitkHelpHandler.h"
 
 class QmitkPreferencesDialog;
 
@@ -27,9 +27,12 @@ class QmitkExtWorkbenchWindowAdvisorHack : public QObject
   public:
 
     QmitkExtWorkbenchWindowAdvisorHack();
+    ~QmitkExtWorkbenchWindowAdvisorHack();
 
     static QmitkExtWorkbenchWindowAdvisorHack* undohack;
+
+  private:
+
+    QmitkHelpHandler* m_HelpHandler;
     
-  protected:
-   void keyPressEvent(QKeyEvent * event);
 };

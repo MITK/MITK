@@ -72,8 +72,8 @@ protected:
   virtual bool ExecuteAction( Action *action, 
     mitk::StateEvent const *stateEvent );
 
-  bool TransformPositionEventToIndex( const StateEvent *stateEvent,
-    Point2D &indexPoint2D,
+  bool TransformPositionEventToPoint2D( const StateEvent *stateEvent,
+    Point2D &point2D,
     const Geometry2D *planarFigureGeometry );
 
   int IsPositionInsideMarker(

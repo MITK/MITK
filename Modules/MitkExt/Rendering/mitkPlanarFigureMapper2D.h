@@ -56,7 +56,7 @@ protected:
   virtual ~PlanarFigureMapper2D();
 
   void TransformObjectToDisplay(
-    const mitk::Point2D &point,
+    const mitk::Point2D &point2D,
     mitk::Point2D &displayPoint,
     const mitk::Geometry2D *objectGeometry,
     const mitk::Geometry2D *rendererGeometry,

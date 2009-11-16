@@ -161,30 +161,25 @@ mitk::PlanarFigure::GetControlPoints()
 
 mitk::Point2D mitk::PlanarFigure::GetControlPoint( unsigned int index ) const
 {
-  Point2D point2D;
-
   if ( index < m_ControlPoints->Size() )
   {
-    point2D = m_ControlPoints->ElementAt( index );
+    return m_ControlPoints->ElementAt( index );
   }
   else
   {
+    Point2D point2D;
     point2D.Fill( 0.0 );
+    return point2D;
   }
-
-  return point2D;
 }
 
 
 mitk::Point3D mitk::PlanarFigure::GetWorldControlPoint( unsigned int index ) const
 {
   Point3D point3D;
-
   if ( (m_Geometry2D != NULL) && (index < m_ControlPoints->Size()) )
   {
-    Point2D point2D;
-    m_Geometry2D->IndexToWorld( m_ControlPoints->ElementAt( index ), point2D );
-    m_Geometry2D->Map( point2D, point3D );
+    m_Geometry2D->Map( m_ControlPoints->ElementAt( index ), point3D );
   }
   else
   {
@@ -192,23 +187,6 @@ mitk::Point3D mitk::PlanarFigure::GetWorldControlPoint( unsigned int index ) con
   }
 
   return point3D;
-}
-
-
-mitk::Point2D mitk::PlanarFigure::GetWorldControlPoint2D( unsigned int index ) const
-{
-  Point2D point2D;
-
-  if ( (m_Geometry2D != NULL) && (index < m_ControlPoints->Size()) )
-  {
-    m_Geometry2D->IndexToWorld( m_ControlPoints->ElementAt( index ), point2D );
-  }
-  else
-  {
-    point2D.Fill( 0.0 );
-  }
-
-  return point2D;
 }
 
 

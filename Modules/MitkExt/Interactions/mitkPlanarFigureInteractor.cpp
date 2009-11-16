@@ -236,10 +236,10 @@ bool mitk::PlanarFigureInteractor
         break;
       }
 
-      // Extract point in 2D index coordinates (relative to Geometry2D of
+      // Extract point in 2D world coordinates (relative to Geometry2D of
       // PlanarFigure)
-      Point2D indexPoint2D;
-      if ( !this->TransformPositionEventToIndex( stateEvent, indexPoint2D,
+      Point2D point2D;
+      if ( !this->TransformPositionEventToPoint2D( stateEvent, point2D,
         planarFigureGeometry ) )
       {
         ok = false;
@@ -247,7 +247,7 @@ bool mitk::PlanarFigureInteractor
       }
 
       // Place PlanarFigure at this point
-      planarFigure->PlaceFigure( indexPoint2D );
+      planarFigure->PlaceFigure( point2D );
 
       // Re-evaluate features
       planarFigure->EvaluateFeatures();
@@ -268,10 +268,10 @@ bool mitk::PlanarFigureInteractor
 
   case AcMOVEPOINT:
     {
-      // Extract point in 2D index coordinates (relative to Geometry2D of
+      // Extract point in 2D world coordinates (relative to Geometry2D of
       // PlanarFigure)
-      Point2D indexPoint2D;
-      if ( !this->TransformPositionEventToIndex( stateEvent, indexPoint2D,
+      Point2D point2D;
+      if ( !this->TransformPositionEventToPoint2D( stateEvent, point2D,
         planarFigureGeometry ) )
       {
         ok = false;
@@ -279,7 +279,7 @@ bool mitk::PlanarFigureInteractor
       }
 
       // Move current control point to this point
-      planarFigure->SetCurrentControlPoint( indexPoint2D );
+      planarFigure->SetCurrentControlPoint( point2D );
 
       // Re-evaluate features
       planarFigure->EvaluateFeatures();
@@ -344,10 +344,10 @@ bool mitk::PlanarFigureInteractor
 
   case AcADDPOINT:
     {
-      // Extract point in 2D index coordinates (relative to Geometry2D of
+      // Extract point in 2D world coordinates (relative to Geometry2D of
       // PlanarFigure)
-      Point2D indexPoint2D;
-      if ( !this->TransformPositionEventToIndex( stateEvent, indexPoint2D,
+      Point2D point2D;
+      if ( !this->TransformPositionEventToPoint2D( stateEvent, point2D,
         planarFigureGeometry ) )
       {
         ok = false;
@@ -355,7 +355,7 @@ bool mitk::PlanarFigureInteractor
       }
 
       // Add point as new control point
-      planarFigure->AddControlPoint( indexPoint2D );
+      planarFigure->AddControlPoint( point2D );
 
       // Re-evaluate features
       planarFigure->EvaluateFeatures();
@@ -439,8 +439,8 @@ bool mitk::PlanarFigureInteractor
   return ok;
 }
 
-bool mitk::PlanarFigureInteractor::TransformPositionEventToIndex(
-  const StateEvent *stateEvent, Point2D &indexPoint2D,
+bool mitk::PlanarFigureInteractor::TransformPositionEventToPoint2D(
+  const StateEvent *stateEvent, Point2D &point2D,
   const Geometry2D *planarFigureGeometry )
 {
   // Extract world position, and from this position on geometry, if
@@ -461,9 +461,7 @@ bool mitk::PlanarFigureInteractor::TransformPositionEventToIndex(
   }
 
   // Project point onto plane of this PlanarFigure
-  planarFigureGeometry->Map( worldPoint3D, indexPoint2D );
-  planarFigureGeometry->WorldToIndex( indexPoint2D, indexPoint2D );
-
+  planarFigureGeometry->Map( worldPoint3D, point2D );
   return true;
 }
 
@@ -501,8 +499,7 @@ int mitk::PlanarFigureInteractor::IsPositionInsideMarker(
   VertexContainerType::ConstIterator it;
   for ( it = controlPoints->Begin(); it != controlPoints->End(); ++it )
   {
-    planarFigureGeometry->IndexToWorld( it->Value(), worldPoint2D );
-    planarFigureGeometry->Map( worldPoint2D, worldPoint3D );
+    planarFigureGeometry->Map( it->Value(), worldPoint3D );
 
     // TODO: proper handling of distance tolerance
     if ( displayGeometry->Distance( worldPoint3D ) < 0.1 )

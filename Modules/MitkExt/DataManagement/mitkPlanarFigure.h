@@ -134,14 +134,13 @@ public:
   VertexContainerType *GetControlPoints();
 
 
-  /** \brief Returns specified control point in (2D) index coordinates. */
+  /** \brief Returns specified control point in 2D world coordinates. */
   Point2D GetControlPoint( unsigned int index ) const;
+
 
   /** \brief Returns specified control point in world coordinates. */
   Point3D GetWorldControlPoint( unsigned int index ) const;
 
-  /** \brief Returns specified control point in 2D world coordinates. */
-  Point2D GetWorldControlPoint2D( unsigned int index ) const;
 
   /** \brief Returns the polyline representing the planar figure
    * (for rendering, measurements, etc.). */

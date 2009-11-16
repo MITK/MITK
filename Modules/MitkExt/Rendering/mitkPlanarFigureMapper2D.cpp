@@ -103,6 +103,10 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
   // Apply visual appearance properties from the PropertyList
   this->ApplyProperties( renderer );
 
+  // Enable line antialiasing
+  glEnable( GL_LINE_SMOOTH );
+  glHint( GL_LINE_SMOOTH_HINT, GL_NICEST );
+
 
   //if (dynamic_cast<mitk::FloatProperty *>(this->GetDataTreeNode()->GetProperty("Width")) != NULL)
   //  lineWidth = dynamic_cast<mitk::FloatProperty*>(this->GetDataTreeNode()->GetProperty("Width"))->GetValue();
@@ -161,15 +165,6 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
   }
 
 
-  // Draw markers at control points (selected control point will be colored)
-  const VertexContainerType *controlPoints = planarFigure->GetControlPoints();
-  for ( it = controlPoints->Begin(); it != controlPoints->End(); ++it )
-  {
-    this->DrawMarker( it->Value(),
-      (it->Index() == planarFigure->GetSelectedControlPoint()),
-      planarFigureGeometry2D, rendererGeometry2D, displayGeometry );
-  }
-
   if(isSelected)
     glColor3f(1.0f, 0.0f, 0.0f);
   glLineWidth( 1.0 );
@@ -197,23 +192,33 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
       glVertex2f( displayPoint[0], displayPoint[1] );
 
     }
-
     glEnd();
   }
+
+  // Disable line antialiasing
+  glDisable( GL_LINE_SMOOTH );
+
+  // Draw markers at control points (selected control point will be colored)
+  const VertexContainerType *controlPoints = planarFigure->GetControlPoints();
+  for ( it = controlPoints->Begin(); it != controlPoints->End(); ++it )
+  {
+    this->DrawMarker( it->Value(),
+      (it->Index() == planarFigure->GetSelectedControlPoint()),
+      planarFigureGeometry2D, rendererGeometry2D, displayGeometry );
+  }
+
 }
 
 void mitk::PlanarFigureMapper2D::TransformObjectToDisplay(
-  const mitk::Point2D &point,
+  const mitk::Point2D &point2D,
   mitk::Point2D &displayPoint,
   const mitk::Geometry2D *objectGeometry,
   const mitk::Geometry2D *rendererGeometry,
   const mitk::DisplayGeometry *displayGeometry )
 {
-  mitk::Point2D point2D;
   mitk::Point3D point3D;
 
   // Map circle point from local 2D geometry into 3D world space
-  objectGeometry->IndexToWorld( point, point2D );
   objectGeometry->Map( point2D, point3D );
 
   // Project 3D world point onto display geometry

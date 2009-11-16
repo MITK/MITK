@@ -167,8 +167,8 @@ void mitk::PlanarRectangle::EvaluateFeaturesInternal()
   {
     for ( i = 0; i < numberOfControlPoints; ++i )
     {
-      Point2D p0 = this->GetWorldControlPoint2D( i );
-      Point2D p1 = this->GetWorldControlPoint2D( (i + 1) % numberOfControlPoints );
+      Point2D p0 = this->GetControlPoint( i );
+      Point2D p1 = this->GetControlPoint( (i + 1) % numberOfControlPoints );
 
       area += p0[0] * p1[1] - p1[0] * p0[1];
     }

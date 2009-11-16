@@ -72,12 +72,20 @@ IF(OPENCHERRY_USE_QT AND DESIRED_QT_VERSION EQUAL 4)
                    QT_COLLECTIONGENERATOR_EXECUTABLE
                    QT_ASSISTANT_EXECUTABLE)
   
+  SET(_doxygen_too_old 1)
   IF(OPENCHERRY_USE_QT_HELP)
     FIND_PACKAGE(Doxygen)
+    IF(DOXYGEN_FOUND)
+      EXECUTE_PROCESS(COMMAND ${DOXYGEN_EXECUTABLE} --version
+                      OUTPUT_VARIABLE _doxygen_version)
+      IF(${_doxygen_version} VERSION_GREATER 1.5.7)
+        SET(_doxygen_too_old 0)
+      ENDIF() 
+    ENDIF()
   ENDIF()
   
-  IF (OPENCHERRY_USE_QT_HELP AND NOT DOXYGEN_FOUND)
-    MESSAGE("Doxygen was not found, but is needed if OPENCHERRY_USE_QT_HELP is ON")
+  IF (OPENCHERRY_USE_QT_HELP AND _doxygen_too_old)
+    MESSAGE("Doxygen was not found or is too old. Version 1.5.8 or later is needed if OPENCHERRY_USE_QT_HELP is ON")
     SET(OPENCHERRY_USE_QT_HELP OFF CACHE BOOL "Enable support for integrating bundle documentation into Qt Help" FORCE)
   ENDIF()
   

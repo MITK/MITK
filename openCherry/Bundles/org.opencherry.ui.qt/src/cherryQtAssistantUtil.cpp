@@ -31,7 +31,10 @@ QProcess* QtAssistantUtil::assistantProcess = 0;
 
 void QtAssistantUtil::OpenAssistant(const QString& collectionFile, const QString& startPage)
 {
-
+  QFileInfo assistantFile(QT_ASSISTANT_EXECUTABLE);
+  QString assistantExec = assistantFile.fileName();
+  QProcess* process = new QProcess;
+  process->start(assistantExec, NULL);
 }
 
 bool QtAssistantUtil::RegisterQCHFiles(const QString& collectionFile,

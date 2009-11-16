@@ -2,6 +2,8 @@
 #include <QApplication>
 #include <QKeyEvent>
 
+#include "cherryQtAssistantUtil.h"
+
 
 QmitkHelpHandler::QmitkHelpHandler() : QObject()
   {
@@ -15,10 +17,15 @@ bool QmitkHelpHandler::eventFilter(QObject *obj, QEvent *event)
     QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
     if (keyEvent->key()==16777264) //if the F1-key is pressed...
       {
-      printf("F1 pressed");
+      this->OpenHelpPage();
       return true;
       }
     }
   // standard event processing
   return QObject::eventFilter(obj, event);
+  }
+
+void QmitkHelpHandler::OpenHelpPage()
+  {
+  cherry::QtAssistantUtil::OpenAssistant("","");
   }

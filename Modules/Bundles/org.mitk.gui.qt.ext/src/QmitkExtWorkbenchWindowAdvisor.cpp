@@ -447,7 +447,7 @@ void QmitkExtWorkbenchWindowAdvisorHack::onIntro()
 
 void QmitkExtWorkbenchWindowAdvisorHack::onHelp()
 	{
-	//call help method here
+  this->m_HelpHandler->OpenHelpPage();
 	}
 
 void QmitkExtWorkbenchWindowAdvisor::HookTitleUpdateListeners(

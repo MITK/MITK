@@ -32,7 +32,7 @@ both datasets will be displayed in greyvalues.
 
 \image html RegistrationDeformable.png "The Registration area for Demons based registration"
 
-In the "Registration" area you have the choice between different deformable registration algorithms. On the first tab called "Demons" there are available:
+In the "Registration" area you have the choice between different Demonsbased deformable registration algorithms. There are available:
 
 \li <b>Demons Registration</b>
 
@@ -46,14 +46,6 @@ For the registration method itself you have to specify the "Number of Iterations
 
 If all this is done, you can perform the registration by clicking the "Calculate Transformation" button. Finally, you will be asked where you want the result image and the resulting deformation field 
 to be saved. Therefore you have to select the folder and enter a filename.
-
-\image html RegistrationDeformable2.png "The Registration area for B-Spline registration"
-
-On the second tab called "B-Spline" there is a:
-
-\li <b>B-Spline Registration</b>
-
-
 
 The results will be added in the DataStorage and can be saved in the Data Manager.
 

@@ -298,7 +298,10 @@ bool mitk::PlanarFigureInteractor
       if ( planarFigure->GetNumberOfControlPoints() >=
            planarFigure->GetMaximumNumberOfControlPoints() )
       {
+        // Initial placement finished: deselect control point and send an
+        // InitializeEvent to notify application listeners
         planarFigure->DeselectControlPoint();
+        planarFigure->InvokeEvent( itk::InitializeEvent() );
         this->HandleEvent( new mitk::StateEvent( EIDYES, stateEvent->GetEvent() ) );
       }
       else

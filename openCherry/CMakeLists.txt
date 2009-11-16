@@ -10,6 +10,7 @@ INCLUDE(cherryPluginHelpers)
 INCLUDE(MacroCollectPlugins)
 INCLUDE(MacroParseManifest)
 INCLUDE(MacroCreatePlugin)
+INCLUDE(MacroCreateQtHelp)
 INCLUDE(MacroInstallPlugin)
 
 
@@ -39,6 +40,49 @@ IF(OPENCHERRY_USE_QT AND DESIRED_QT_VERSION EQUAL 4)
   SET(QT_MT_REQUIRED 1)
   SET(BUILD_QT_PLUGINS 1)
   FIND_PACKAGE(Qt REQUIRED)
+  
+  IF(QT_QMAKE_CHANGED)
+    SET(QT_HELPGENERATOR_EXECUTABLE NOTFOUND)
+    SET(QT_COLLECTIONGENERATOR_EXECUTABLE NOTFOUND)
+    SET(QT_ASSISTANT_EXECUTABLE NOTFOUND)
+  ENDIF()
+  
+  FIND_PROGRAM(QT_HELPGENERATOR_EXECUTABLE
+    NAMES qhelpgenerator qhelpgenerator-qt4 qhelpgenerator4
+    PATHS ${QT_BINARY_DIR}
+    NO_DEFAULT_PATH
+  )
+  
+  FIND_PROGRAM(QT_COLLECTIONGENERATOR_EXECUTABLE
+    NAMES qcollectiongenerator qcollectiongenerator-qt4 qcollectiongenerator4
+    PATHS ${QT_BINARY_DIR}
+    NO_DEFAULT_PATH
+  )
+  
+  FIND_PROGRAM(QT_ASSISTANT_EXECUTABLE
+    NAMES assistant-qt4 assistant4 assistant
+    PATHS ${QT_BINARY_DIR}
+    NO_DEFAULT_PATH
+  )
+  
+  OPTION(OPENCHERRY_USE_QT_HELP "Enable support for integrating bundle documentation into Qt Help" ON)
+  
+  MARK_AS_ADVANCED(OPENCHERRY_USE_QT_HELP 
+                   QT_HELPGENERATOR_EXECUTABLE 
+                   QT_COLLECTIONGENERATOR_EXECUTABLE
+                   QT_ASSISTANT_EXECUTABLE)
+  
+  IF(OPENCHERRY_USE_QT_HELP)
+    FIND_PACKAGE(Doxygen)
+  ENDIF()
+  
+  IF (OPENCHERRY_USE_QT_HELP AND NOT DOXYGEN_FOUND)
+    MESSAGE(SEND_ERROR "Doxygen was not found, but is needed if OPENCHERRY_USE_QT_HELP is ON")
+  ENDIF()
+  
+  IF(OPENCHERRY_USE_QT_HELP AND NOT QT_QHELPGENERATOR)
+    MESSAGE(SEND_ERROR "You have enable Qt Help support, but QT_QHELPGENERATOR is empty")
+  ENDIF()
   
   INCLUDE(${QT_USE_FILE})
 ENDIF()

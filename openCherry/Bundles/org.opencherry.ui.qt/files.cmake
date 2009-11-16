@@ -1,6 +1,7 @@
 SET(SRC_CPP_FILES
   cherryIQtPreferencePage.cpp
   cherryIQtStyleManager.cpp
+  cherryQtAssistantUtil.cpp
   cherryQModelIndexObject.cpp
   cherryQtEditorPart.cpp
   cherryQtItemSelection.cpp

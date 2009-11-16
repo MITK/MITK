@@ -40,10 +40,6 @@ public:
 public:
   // Feature identifiers
   const unsigned int FEATURE_ID_ANGLE;
-  const unsigned int GetFeatureIdAngle()
-  {
-    return FEATURE_ID_ANGLE;
-  }
 
   virtual bool IsClosed() const { return false; };
 

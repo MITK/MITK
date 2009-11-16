@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 mitk::PlanarFourPointAngle::PlanarFourPointAngle()
-: FEATURE_ID_ANGLE( this->AddFeature( "Angle", "°" ) )
+: FEATURE_ID_ANGLE( this->AddFeature( "Angle", "\xB0" ) )
 {
   // Four point angle has two control points
   m_ControlPoints->Reserve( 2 );

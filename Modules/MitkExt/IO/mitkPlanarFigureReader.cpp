@@ -242,7 +242,7 @@ int mitk::PlanarFigureReader::CanReadFile ( const char *name )
   //return (document.FirstChildElement("PlanarFigure") != NULL);
 }
 
-bool mitk::PlanarFigureReader::CanReadFile(const std::string filename, const std::string filePrefix, const std::string filePattern) 
+bool mitk::PlanarFigureReader::CanReadFile(const std::string filename, const std::string, const std::string)
 {
   if (filename.empty())
     return false;

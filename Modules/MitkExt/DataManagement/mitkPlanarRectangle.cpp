@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 mitk::PlanarRectangle::PlanarRectangle()
 : FEATURE_ID_CIRCUMFERENCE( this->AddFeature( "Circumference", "mm" ) ),
-  FEATURE_ID_AREA( this->AddFeature( "Area", "mm²" ) ),
+  FEATURE_ID_AREA( this->AddFeature( "Area", "mm\xB2" ) ),
   m_Closed( true )
 {
   // Polygon has at least two control points
@@ -86,9 +86,6 @@ bool mitk::PlanarRectangle::SetControlPoint( unsigned int index, const Point2D &
 
   if(set)
   {
-    unsigned int x = point[0];
-    unsigned int y = point[1];
-
     // can be made better ...
     unsigned int horizontalCorrespondingPointIndex = 1;
     unsigned int verticalCorrespondingPointIndex = 3;
@@ -108,8 +105,8 @@ bool mitk::PlanarRectangle::SetControlPoint( unsigned int index, const Point2D &
       verticalCorrespondingPointIndex = 0;
     }
 
-    m_ControlPoints->ElementAt( verticalCorrespondingPointIndex ).SetElement(0, x);
-    m_ControlPoints->ElementAt( horizontalCorrespondingPointIndex ).SetElement(1, y);
+    m_ControlPoints->ElementAt( verticalCorrespondingPointIndex ).SetElement(0, point[0]);
+    m_ControlPoints->ElementAt( horizontalCorrespondingPointIndex ).SetElement(1, point[1]);
   }
 
   return set;

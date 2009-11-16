@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 mitk::PlanarAngle::PlanarAngle()
-: FEATURE_ID_ANGLE( this->AddFeature( "Angle", "°" ) )
+: FEATURE_ID_ANGLE( this->AddFeature( "Angle", "\xB0" ) )
 {
   // Start with two control points
   m_ControlPoints->Reserve( 2 );

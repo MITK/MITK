@@ -1,10 +1,10 @@
 MACRO(_MACRO_CREATE_QT_COMPRESSED_HELP qch_file)
-  
+   
   CONFIGURE_FILE(${openCherry_SOURCE_DIR}/CMake/cherryQtHelpDoxygen.conf.in
                  ${PLUGIN_DOXYGEN_OUTPUT_DIR}/doxygen.conf
                  )
 
-  SET(_generated_qch_file "${PLUGIN_DOXYGEN_OUTPUT_DIR}/qch/${BUNDLE-SYMBOLICNAME}.qch")
+  SET(_generated_qch_file "${PLUGIN_DOXYGEN_OUTPUT_DIR}/qch/${BUNDLE-NAME}.qch")
   SET(${qch_file} "${PLUGIN_OUTPUT_DIR}/resources/${BUNDLE-SYMBOLICNAME}.qch")
 
   FILE(GLOB _file_dependencies "${PLUGIN_DOXYGEN_INPUT_DIR}/*.dox")

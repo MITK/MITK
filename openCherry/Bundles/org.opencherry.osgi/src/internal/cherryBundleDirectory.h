@@ -41,7 +41,7 @@ public:
   virtual ~BundleDirectory();
 
   std::istream* GetResource(const std::string& path) const;
-  void List(const std::string& path, std::vector<std::string>& files) const;
+  void List(const std::string& path, std::vector<std::string>& files, bool quiet = true) const;
   bool IsDirectory(const std::string& path) const;
   Path GetPath() const;
 

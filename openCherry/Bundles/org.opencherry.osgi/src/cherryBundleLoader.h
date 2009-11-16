@@ -73,6 +73,7 @@ private:
   IBundleActivator* LoadActivator(BundleInfo& bundleInfo);
 
   friend class InternalPlatform;
+  friend class BundleContext;
   void StartSystemBundle(SmartPointer<SystemBundle> bundle);
 
 public:

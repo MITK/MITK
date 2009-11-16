@@ -64,7 +64,8 @@ BundleDirectory::GetResource(const std::string& path) const
 }
 
 void
-BundleDirectory::List(const std::string& path, std::vector<std::string>& files) const
+BundleDirectory::List(const std::string& path, std::vector<std::string>& files,
+    bool quiet) const
 {
   try
   {
@@ -75,11 +76,19 @@ BundleDirectory::List(const std::string& path, std::vector<std::string>& files) 
   }
   catch (Poco::FileNotFoundException& exc)
   {
-    CHERRY_WARN << "Warning: " << exc.displayText() << std::endl;
+    if (!quiet)
+    {
+      CHERRY_WARN << "Warning: " << exc.displayText() << std::endl;
+      throw exc;
+    }
   }
   catch (const Poco::PathNotFoundException& exc)
   {
-    CHERRY_WARN << "Warning: " << exc.displayText() << std::endl;
+    if (!quiet)
+    {
+      CHERRY_WARN << "Warning: " << exc.displayText() << std::endl;
+      throw exc;
+    }
   }
 }
 

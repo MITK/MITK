@@ -33,7 +33,7 @@ struct CHERRY_OSGI IBundleStorage : public Object
   cherryInterfaceMacro(IBundleStorage, cherry);
 
   virtual std::istream* GetResource(const std::string& path) const = 0;
-  virtual void List(const std::string& path, std::vector<std::string>& files) const = 0;
+  virtual void List(const std::string& path, std::vector<std::string>& files, bool quiet=true) const = 0;
   virtual bool IsDirectory(const std::string& path) const = 0;
   virtual Poco::Path GetPath() const = 0;
 

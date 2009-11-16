@@ -66,9 +66,16 @@ BundleContext::FindBundle(const std::string& name) const
 }
 
 void
-BundleContext::ListBundles(std::vector<IBundle::Pointer>& /*bundles*/) const
+BundleContext::ListBundles(std::vector<IBundle::Pointer>& bundles) const
 {
-  throw Poco::NotImplementedException("BundleContext::ListBundles() not implemented yet");
+  for (BundleLoader::BundleMap::const_iterator i = m_BundleLoader.m_BundleMap.begin();
+      i != m_BundleLoader.m_BundleMap.end(); ++i)
+  {
+    if (i->second.m_Bundle)
+    {
+      bundles.push_back(i->second.m_Bundle);
+    }
+  }
 }
 
 Poco::Logger&

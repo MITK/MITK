@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 mitk::PlanarPolygon::PlanarPolygon()
 : FEATURE_ID_CIRCUMFERENCE( this->AddFeature( "Circumference", "mm" ) ),
-  FEATURE_ID_AREA( this->AddFeature( "Area", "mm^2" ) ),
+  FEATURE_ID_AREA( this->AddFeature( "Area", "mm\xB2" ) ),
   m_Closed( true )
 {
   // Polygon has at least two control points

@@ -38,7 +38,9 @@ public:
   mitkClassMacro( PlanarFourPointAngle, PlanarFigure );
 
   itkNewMacro( Self );
-
+public:
+  // Feature identifiers
+  const unsigned int FEATURE_ID_ANGLE;
 
   virtual bool IsClosed() const { return false; };
 
@@ -79,9 +81,6 @@ protected:
 
 
   virtual void PrintSelf( std::ostream &os, itk::Indent indent ) const;
-
-  // Feature identifiers
-  const unsigned int FEATURE_ID_ANGLE;
 
 
 private:

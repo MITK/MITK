@@ -31,8 +31,7 @@ QProcess* QtAssistantUtil::assistantProcess = 0;
 
 void QtAssistantUtil::OpenAssistant(const QString& collectionFile, const QString& startPage)
 {
-  QFileInfo assistantFile(QT_ASSISTANT_EXECUTABLE);
-  QString assistantExec = assistantFile.fileName();
+  QString assistantExec = GetAssistantExecutable();
   QProcess* process = new QProcess;
   process->start(assistantExec, NULL);
 }
@@ -40,8 +39,7 @@ void QtAssistantUtil::OpenAssistant(const QString& collectionFile, const QString
 bool QtAssistantUtil::RegisterQCHFiles(const QString& collectionFile,
     const std::vector<IBundle::Pointer>& bundles)
 {
-  QFileInfo assistantFile(QT_ASSISTANT_EXECUTABLE);
-  QString assistantExec = assistantFile.fileName();
+  QString assistantExec = GetAssistantExecutable();
 
   QList<QStringList> argsVector;
 
@@ -69,6 +67,11 @@ bool QtAssistantUtil::RegisterQCHFiles(const QString& collectionFile,
   QProgressDialog progress("Registering help files...", "Abort Registration", 0, argsVector.size());
   progress.setWindowModality(Qt::WindowModal);
 
+  if (argsVector.isEmpty())
+  {
+    CHERRY_WARN << "No .qch files found. Help contents will not be available.";
+  }
+
   for (std::size_t i = 0; i < argsVector.size(); ++i)
   {
     const QStringList& args = argsVector[i];
@@ -93,6 +96,12 @@ bool QtAssistantUtil::RegisterQCHFiles(const QString& collectionFile,
   progress.setValue(argsVector.size());
 
   return success;
+}
+
+QString QtAssistantUtil::GetAssistantExecutable()
+{
+  QFileInfo assistantFile(QT_ASSISTANT_EXECUTABLE);
+  return assistantFile.fileName();
 }
 
 }

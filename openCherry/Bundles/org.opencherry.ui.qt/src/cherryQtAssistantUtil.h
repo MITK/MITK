@@ -42,6 +42,8 @@ private:
 
   static QProcess* assistantProcess;
 
+  static QString GetAssistantExecutable();
+
 };
 
 }

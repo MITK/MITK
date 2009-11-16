@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>287</width>
-    <height>373</height>
+    <height>375</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -416,6 +416,10 @@
         <property name="text">
          <string>Register</string>
         </property>
+        <property name="icon">
+         <iconset resource="../../resources/QmitkPointBasedRegistrationView.qrc">
+          <normaloff>:/QmitkPointBasedRegistrationView/PointBasedRegistration.xpm</normaloff>:/QmitkPointBasedRegistrationView/PointBasedRegistration.xpm</iconset>
+        </property>
        </widget>
       </item>
       <item>
@@ -503,6 +507,10 @@
           <property name="text">
            <string>Undo Transformation</string>
           </property>
+          <property name="icon">
+           <iconset resource="../../../org.mitk.gui.qt.ext/resources/org_mitk_gui_qt_ext.qrc">
+            <normaloff>:/org.mitk.gui.qt.ext/edit-undo.png</normaloff>:/org.mitk.gui.qt.ext/edit-undo.png</iconset>
+          </property>
          </widget>
         </item>
         <item>
@@ -524,6 +532,10 @@
           </property>
           <property name="text">
            <string>Redo Transformation</string>
+          </property>
+          <property name="icon">
+           <iconset resource="../../../org.mitk.gui.qt.ext/resources/org_mitk_gui_qt_ext.qrc">
+            <normaloff>:/org.mitk.gui.qt.ext/edit-redo.png</normaloff>:/org.mitk.gui.qt.ext/edit-redo.png</iconset>
           </property>
          </widget>
         </item>
@@ -566,6 +578,7 @@
  </includes>
  <resources>
   <include location="../../resources/QmitkPointBasedRegistrationView.qrc"/>
+  <include location="../../../org.mitk.gui.qt.ext/resources/org_mitk_gui_qt_ext.qrc"/>
  </resources>
  <connections/>
 </ui>

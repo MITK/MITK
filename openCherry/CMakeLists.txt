@@ -78,12 +78,12 @@ IF(OPENCHERRY_USE_QT AND DESIRED_QT_VERSION EQUAL 4)
   
   IF (OPENCHERRY_USE_QT_HELP AND NOT DOXYGEN_FOUND)
     MESSAGE("Doxygen was not found, but is needed if OPENCHERRY_USE_QT_HELP is ON")
-    SET(OPENCHERRY_USE_QT_HELP OFF CACHE "Enable support for integrating bundle documentation into Qt Help" FORCE)
+    SET(OPENCHERRY_USE_QT_HELP OFF CACHE BOOL "Enable support for integrating bundle documentation into Qt Help" FORCE)
   ENDIF()
   
   IF(OPENCHERRY_USE_QT_HELP AND NOT QT_HELPGENERATOR_EXECUTABLE)
     MESSAGE("You have enabled Qt Help support, but QT_HELPGENERATOR_EXECUTABLE is empty")
-    SET(OPENCHERRY_USE_QT_HELP OFF CACHE "Enable support for integrating bundle documentation into Qt Help" FORCE)
+    SET(OPENCHERRY_USE_QT_HELP OFF CACHE BOOL "Enable support for integrating bundle documentation into Qt Help" FORCE)
   ENDIF()
   
   INCLUDE(${QT_USE_FILE})

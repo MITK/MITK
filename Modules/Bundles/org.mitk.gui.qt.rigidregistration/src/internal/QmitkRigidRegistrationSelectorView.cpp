@@ -44,7 +44,8 @@ m_FixedDimension(0), m_MovingDimension(0), m_StopOptimization(false), m_Geometry
 m_GeometryWorldToItkPhysicalTransform(NULL), m_MovingGeometry(NULL), m_ImageGeometry(NULL)
 {
   m_Controls.setupUi(parent);
-
+  m_Controls.m_PyramidGroup->hide();
+  m_Controls.m_PreprocessingGroup->hide();
 
 
   //// create connections

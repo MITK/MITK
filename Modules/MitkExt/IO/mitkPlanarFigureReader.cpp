@@ -98,6 +98,7 @@ void mitk::PlanarFigureReader::GenerateData()
   {
     if (pfElement == NULL)
       continue;
+    std::string closed = pfElement->Attribute("closed");
     std::string type = pfElement->Attribute("type");
     mitk::PlanarFigure::Pointer pf = NULL;
     if (type == "PlanarAngle")
@@ -114,7 +115,9 @@ void mitk::PlanarFigureReader::GenerateData()
     }
     else if (type == "PlanarPolygon")
     {
-      pf = mitk::PlanarPolygon::New();
+      mitk::PlanarPolygon::Pointer polygon = mitk::PlanarPolygon::New();
+      polygon->SetClosed( closed == "true" );
+      pf = polygon;
     }
     else if (type == "PlanarFourPointAngle")
     {

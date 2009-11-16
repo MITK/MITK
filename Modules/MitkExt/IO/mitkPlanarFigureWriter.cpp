@@ -62,6 +62,14 @@ void mitk::PlanarFigureWriter::GenerateData()
       continue;
     TiXmlElement* pfElement = new TiXmlElement("PlanarFigure");
     pfElement->SetAttribute("type", pf->GetNameOfClass());
+    if ( pf->IsClosed() )
+    {
+      pfElement->SetAttribute( "closed", "true" );
+    }
+    else
+    {
+      pfElement->SetAttribute( "closed", "false" );
+    }
     document.LinkEndChild(pfElement);
     PlanarFigure::VertexContainerType* vertices = pf->GetControlPoints();
     if (vertices == NULL)

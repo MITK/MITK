@@ -439,7 +439,6 @@ void QmitkRigidRegistrationView::AddNewTransformationToUndoList()
   unsigned long size;
   mitk::DataStorage::SetOfObjects::ConstPointer children = this->GetDataStorage()->GetDerivations(m_MovingNode);
   size = children->Size();
-  mitk::DataTreeNode::Pointer childNode;
   std::map<mitk::DataTreeNode::Pointer, mitk::Geometry3D*> childGeometries;
   for (unsigned long i = 0; i < size; ++i)
   {
@@ -461,7 +460,6 @@ void QmitkRigidRegistrationView::UndoTransformation()
     unsigned long size;
     mitk::DataStorage::SetOfObjects::ConstPointer children = this->GetDataStorage()->GetDerivations(m_MovingNode);
     size = children->Size();
-    mitk::DataTreeNode::Pointer childNode;
     std::map<mitk::DataTreeNode::Pointer, mitk::Geometry3D*> childGeometries;
     for (unsigned long i = 0; i < size; ++i)
     {
@@ -510,7 +508,6 @@ void QmitkRigidRegistrationView::RedoTransformation()
     unsigned long size;
     mitk::DataStorage::SetOfObjects::ConstPointer children = this->GetDataStorage()->GetDerivations(m_MovingNode);
     size = children->Size();
-    mitk::DataTreeNode::Pointer childNode;
     std::map<mitk::DataTreeNode::Pointer, mitk::Geometry3D*> childGeometries;
     for (unsigned long i = 0; i < size; ++i)
     {
@@ -607,6 +604,7 @@ void QmitkRigidRegistrationView::Translate(int* translateVector)
 { 
   if (m_MovingNode.IsNotNull())
   {
+    
     mitk::Vector3D translateVec; 
 
     translateVec[0] = translateVector[0] - m_TranslateSliderPos[0];
@@ -617,14 +615,31 @@ void QmitkRigidRegistrationView::Translate(int* translateVector)
     m_TranslateSliderPos[1] = translateVector[1];
     m_TranslateSliderPos[2] = translateVector[2];
 
-    m_MovingNode->GetData()->GetGeometry()->Translate( translateVec );
-    if (m_MovingMaskNode.IsNotNull())
-    {
-      m_MovingMaskNode->GetData()->GetGeometry()->Translate( translateVec );
-      m_MovingMaskNode->GetData()->Modified();
-    }
+    vtkMatrix4x4* translationMatrix = vtkMatrix4x4::New();
+    translationMatrix->Identity();
+
+    double (*transMatrix)[4] = translationMatrix->Element;
+
+    transMatrix[0][3] = -translateVec[0];
+    transMatrix[1][3] = -translateVec[1];
+    transMatrix[2][3] = -translateVec[2];
+
+    translationMatrix->Invert();
+
+    m_MovingNode->GetData()->GetGeometry()->Compose( translationMatrix );
     m_MovingNode->GetData()->Modified();
+    mitk::DataStorage::SetOfObjects::ConstPointer children = this->GetDataStorage()->GetDerivations(m_MovingNode);
+    unsigned long size;
+    size = children->Size();
+    mitk::DataTreeNode::Pointer childNode;
+    for (unsigned long i = 0; i < size; ++i)
+    {
+      childNode = children->GetElement(i);
+      childNode->GetData()->GetGeometry()->Compose( translationMatrix );
+      childNode->GetData()->Modified();
+    }
     m_RedoGeometryList.clear();
+
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
 }
@@ -660,9 +675,15 @@ void QmitkRigidRegistrationView::Rotate(int* rotateVector)
     translationMatrix->Invert();
 
     m_MovingNode->GetData()->GetGeometry()->Compose( translationMatrix );
-    if (m_MovingMaskNode.IsNotNull())
+    mitk::DataStorage::SetOfObjects::ConstPointer children = this->GetDataStorage()->GetDerivations(m_MovingNode);
+    unsigned long size;
+    size = children->Size();
+    mitk::DataTreeNode::Pointer childNode;
+    for (unsigned long i = 0; i < size; ++i)
     {
-      m_MovingMaskNode->GetData()->GetGeometry()->Compose( translationMatrix );
+      childNode = children->GetElement(i);
+      childNode->GetData()->GetGeometry()->Compose( translationMatrix );
+      childNode->GetData()->Modified();
     }
 
     double radianX = rotateVec[0] * vnl_math::pi / 180;
@@ -692,18 +713,21 @@ void QmitkRigidRegistrationView::Rotate(int* rotateVector)
     }
 
     m_MovingNode->GetData()->GetGeometry()->Compose( rotationMatrix );
-    if (m_MovingMaskNode.IsNotNull())
+    for (unsigned long i = 0; i < size; ++i)
     {
-      m_MovingMaskNode->GetData()->GetGeometry()->Compose( rotationMatrix );
+      childNode = children->GetElement(i);
+      childNode->GetData()->GetGeometry()->Compose( rotationMatrix );
+      childNode->GetData()->Modified();
     }
     
     translationMatrix->Invert();
 
     m_MovingNode->GetData()->GetGeometry()->Compose( translationMatrix );
-    if (m_MovingMaskNode.IsNotNull())
+    for (unsigned long i = 0; i < size; ++i)
     {
-      m_MovingMaskNode->GetData()->GetGeometry()->Compose( translationMatrix );
-      m_MovingMaskNode->GetData()->Modified();
+      childNode = children->GetElement(i);
+      childNode->GetData()->GetGeometry()->Compose( rotationMatrix );
+      childNode->GetData()->Modified();
     }
     m_MovingNode->GetData()->Modified();
     m_RedoGeometryList.clear();
@@ -772,10 +796,6 @@ void QmitkRigidRegistrationView::xTrans_valueChanged( int v )
     translationParams[0]=v;
     translationParams[1]=m_Controls.m_YTransSlider->value();
     translationParams[2]=m_Controls.m_ZTransSlider->value();
-    m_Controls.m_XTransSlider->setToolTip("");
-    char str[33];
-    sprintf(str,"%d",v);    
-    m_Controls.m_XTransSlider->setToolTip( tr( str ) );
     Translate(translationParams);
   }
   else
@@ -791,10 +811,6 @@ void QmitkRigidRegistrationView::yTrans_valueChanged( int v )
     translationParams[0]=m_Controls.m_XTransSlider->value();
     translationParams[1]=v;
     translationParams[2]=m_Controls.m_ZTransSlider->value();
-    m_Controls.m_YTransSlider->setToolTip("");
-    char str[33];
-    sprintf(str,"%d",v);    
-    m_Controls.m_YTransSlider->setToolTip( tr( str ) );
     Translate(translationParams);
   }
   else
@@ -810,10 +826,6 @@ void QmitkRigidRegistrationView::zTrans_valueChanged( int v )
     translationParams[0]=m_Controls.m_XTransSlider->value();
     translationParams[1]=m_Controls.m_YTransSlider->value();
     translationParams[2]=v;
-    m_Controls.m_ZTransSlider->setToolTip("");
-    char str[33];
-    sprintf(str,"%d",v);    
-    m_Controls.m_ZTransSlider->setToolTip( tr( str ) );
     Translate(translationParams);
   }
   else
@@ -829,10 +841,6 @@ void QmitkRigidRegistrationView::xRot_valueChanged( int v )
     rotationParams[0]=v;
     rotationParams[1]=m_Controls.m_YRotSlider->value();
     rotationParams[2]=m_Controls.m_ZRotSlider->value();
-    m_Controls.m_XRotSlider->setToolTip("");
-    char str[33];
-    sprintf(str,"%d",v);    
-    m_Controls.m_XRotSlider->setToolTip( tr( str ) );
     Rotate(rotationParams);
   }
   else
@@ -848,10 +856,6 @@ void QmitkRigidRegistrationView::yRot_valueChanged( int v )
     rotationParams[0]=m_Controls.m_XRotSlider->value();
     rotationParams[1]=v;
     rotationParams[2]=m_Controls.m_ZRotSlider->value();
-    m_Controls.m_YRotSlider->setToolTip("");
-    char str[33];
-    sprintf(str,"%d",v);    
-    m_Controls.m_YRotSlider->setToolTip( tr( str ) );
     Rotate(rotationParams);
   }
   else
@@ -867,10 +871,6 @@ void QmitkRigidRegistrationView::zRot_valueChanged( int v )
     rotationParams[0]=m_Controls.m_XRotSlider->value();
     rotationParams[1]=m_Controls.m_YRotSlider->value();
     rotationParams[2]=v;
-    m_Controls.m_ZRotSlider->setToolTip("");
-    char str[33];
-    sprintf(str,"%d",v);    
-    m_Controls.m_ZRotSlider->setToolTip( tr( str ) );
     Rotate(rotationParams);
   }
   else

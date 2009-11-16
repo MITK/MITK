@@ -1,5 +1,4 @@
 #include <QObject>
-#include "QmitkHelpHandler.h"
 
 class QmitkPreferencesDialog;
 
@@ -30,9 +29,5 @@ class QmitkExtWorkbenchWindowAdvisorHack : public QObject
     ~QmitkExtWorkbenchWindowAdvisorHack();
 
     static QmitkExtWorkbenchWindowAdvisorHack* undohack;
-
-  private:
-
-    QmitkHelpHandler* m_HelpHandler;
     
 };

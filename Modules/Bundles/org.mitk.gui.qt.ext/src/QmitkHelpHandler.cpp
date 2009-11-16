@@ -1,14 +1,14 @@
 #include "QmitkHelpHandler.h"
-#include <QApplication>
+
 #include <QKeyEvent>
 
 #include "cherryQtAssistantUtil.h"
 
 
-QmitkHelpHandler::QmitkHelpHandler() : QObject()
-  {
-  qApp->installEventFilter(this);               
-  }
+QmitkHelpHandler::QmitkHelpHandler(QObject* parent) : QObject(parent)
+{
+
+}
 
 bool QmitkHelpHandler::eventFilter(QObject *obj, QEvent *event)
   {

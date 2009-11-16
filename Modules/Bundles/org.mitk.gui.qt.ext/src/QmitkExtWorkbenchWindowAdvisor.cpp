@@ -31,6 +31,7 @@
 #include <cherryIPerspectiveRegistry.h>
 #include <cherryIPerspectiveDescriptor.h>
 #include <cherryIWorkbenchPartConstants.h>
+#include <cherryQtAssistantUtil.h>
 
 #include <internal/cherryQtShowViewAction.h>
 #include <internal/cherryQtOpenPerspectiveAction.h>
@@ -348,12 +349,12 @@ void QmitkExtWorkbenchWindowAdvisor::PreWindowOpen()
 
 QmitkExtWorkbenchWindowAdvisorHack::QmitkExtWorkbenchWindowAdvisorHack() : QObject()
 {
-  m_HelpHandler = new QmitkHelpHandler();
+
 }
 
 QmitkExtWorkbenchWindowAdvisorHack::~QmitkExtWorkbenchWindowAdvisorHack()
 {
-  delete m_HelpHandler;
+
 }
 
 void QmitkExtWorkbenchWindowAdvisorHack::onUndo()
@@ -446,9 +447,9 @@ void QmitkExtWorkbenchWindowAdvisorHack::onIntro()
 }
 
 void QmitkExtWorkbenchWindowAdvisorHack::onHelp()
-	{
-  this->m_HelpHandler->OpenHelpPage();
-	}
+{
+  cherry::QtAssistantUtil::OpenAssistant("","");
+}
 
 void QmitkExtWorkbenchWindowAdvisor::HookTitleUpdateListeners(
     cherry::IWorkbenchWindowConfigurer::Pointer configurer)

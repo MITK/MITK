@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>260</width>
-    <height>213</height>
+    <height>565</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -263,22 +263,6 @@
       <attribute name="title">
        <string>Demons</string>
       </attribute>
-      <widget class="QmitkDemonsRegistrationView" name="m_QmitkDemonsRegistrationViewControls" native="true">
-       <property name="geometry">
-        <rect>
-         <x>9</x>
-         <y>9</y>
-         <width>308</width>
-         <height>220</height>
-        </rect>
-       </property>
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Ignored" vsizetype="Ignored">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-      </widget>
      </widget>
      <widget class="QWidget" name="BSpline">
       <attribute name="title">
@@ -304,6 +288,32 @@
     </widget>
    </item>
    <item>
+    <widget class="QFrame" name="frame">
+     <property name="frameShape">
+      <enum>QFrame::StyledPanel</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
+     <widget class="QmitkDemonsRegistrationView" name="m_QmitkDemonsRegistrationViewControls" native="true">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>0</y>
+        <width>242</width>
+        <height>10</height>
+       </rect>
+      </property>
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Ignored" vsizetype="Ignored">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+     </widget>
+    </widget>
+   </item>
+   <item>
     <widget class="QPushButton" name="m_CalculateTransformation">
      <property name="enabled">
       <bool>true</bool>
@@ -322,6 +332,10 @@
      </property>
      <property name="text">
       <string>Calculate Transformation</string>
+     </property>
+     <property name="icon">
+      <iconset resource="../../resources/QmitkDeformableRegistrationView.qrc">
+       <normaloff>:/QmitkDeformableRegistrationView/DeformableRegistration.xpm</normaloff>:/QmitkDeformableRegistrationView/DeformableRegistration.xpm</iconset>
      </property>
      <property name="default">
       <bool>false</bool>
@@ -366,6 +380,8 @@
   <include location="local">mitkDataTree.h</include>
   <include location="local">mitkBaseData.h</include>
  </includes>
- <resources/>
+ <resources>
+  <include location="../../resources/QmitkDeformableRegistrationView.qrc"/>
+ </resources>
  <connections/>
 </ui>

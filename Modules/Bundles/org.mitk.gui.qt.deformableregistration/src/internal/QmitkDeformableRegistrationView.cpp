@@ -176,6 +176,7 @@ void QmitkDeformableRegistrationView::CreateQtPartControl(QWidget* parent)
   m_Controls.m_OpacityLabel->setEnabled(false);
   m_Controls.m_OpacitySlider->setEnabled(false);
   m_Controls.m_ShowRedGreenValues->setEnabled(false);
+  m_Controls.m_DeformableTransform->hide();
   if (m_Controls.m_DeformableTransform->currentIndex() == 0)
   {
     m_Controls.m_QmitkDemonsRegistrationViewControls->show();
@@ -521,6 +522,7 @@ void QmitkDeformableRegistrationView::Calculate()
       resultDeformationFieldNode->SetStringProperty("name", "DeformableRegistrationResultDeformationField");
       mitk::VectorImageMapper2D::Pointer mapper = mitk::VectorImageMapper2D::New();
       resultDeformationFieldNode->SetMapper(1, mapper);
+      resultDeformationFieldNode->SetVisibility(false);
       this->GetDataStorage()->Add(resultDeformationFieldNode, m_MovingNode);
     }
   }

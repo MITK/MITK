@@ -139,6 +139,7 @@ namespace mitk {
       warper->SetInterpolator( interpolator );
       warper->SetOutputSpacing( fixedImage->GetSpacing() );
       warper->SetOutputOrigin( fixedImage->GetOrigin() );
+      warper->SetOutputDirection( fixedImage->GetDirection());
       warper->SetDeformationField( filter->GetOutput() );
       warper->Update();
       Image::Pointer outputImage = this->GetOutput();

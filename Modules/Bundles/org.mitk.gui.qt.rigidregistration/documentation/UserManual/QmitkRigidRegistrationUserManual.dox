@@ -3,6 +3,7 @@
 
 Available sections:
   - \ref QmitkRigidRegistrationUserManualOverview 
+  - \ref QmitkRigidRegistrationUserManualIssues 
   - \ref QmitkRigidRegistrationUserManualDetails
   - \ref QmitkRigidRegistrationUserManualReferences 
 
@@ -16,6 +17,11 @@ directly be applied to the Moving Image. Also binary images as image masks can b
 
 This document will tell you how to use this module, but it is assumed that you already know how to navigate through the slices of an image using the
 multi-widget. Please read \ref QmitkStdMultiWidgetUserManual for more information.
+
+\section QmitkRigidRegistrationUserManualIssues Known Issues
+
+Depending on your system the registration can fail to allocate memory for calculating the gradient image for registration. In this case you can try to select another optimizer which is not based 
+on a gradient image and uncheck the checkbox for "Compute Gradient".
 
 \section QmitkRigidRegistrationUserManualDetails Details
 

@@ -98,6 +98,7 @@ public:
     void LoadRigidRegistrationTestParameter();
     void SaveRigidRegistrationTestParameter();
     void DoLoadRigidRegistrationParameter(bool testPreset);
+    void DoLoadRigidRegistrationPreset(std::string presetName);
     void DoSaveRigidRegistrationParameter(bool testPreset);
 
 protected:

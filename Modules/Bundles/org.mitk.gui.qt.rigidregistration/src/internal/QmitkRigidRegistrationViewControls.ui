@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>270</width>
-    <height>516</height>
+    <width>292</width>
+    <height>518</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -325,6 +325,10 @@
               <property name="text">
                <string>Register</string>
               </property>
+              <property name="icon">
+               <iconset resource="../../resources/QmitkRigidRegistrationView.qrc">
+                <normaloff>:/QmitkRigidRegistrationView/RigidRegistration.xpm</normaloff>:/QmitkRigidRegistrationView/RigidRegistration.xpm</iconset>
+              </property>
               <property name="default">
                <bool>false</bool>
               </property>
@@ -400,6 +404,10 @@
                  <property name="text">
                   <string>Undo Transformation</string>
                  </property>
+                 <property name="icon">
+                  <iconset resource="../../../org.mitk.gui.qt.ext/resources/org_mitk_gui_qt_ext.qrc">
+                   <normaloff>:/org.mitk.gui.qt.ext/edit-undo.png</normaloff>:/org.mitk.gui.qt.ext/edit-undo.png</iconset>
+                 </property>
                 </widget>
                </item>
                <item>
@@ -415,6 +423,10 @@
                  </property>
                  <property name="text">
                   <string>Redo Transformation</string>
+                 </property>
+                 <property name="icon">
+                  <iconset resource="../../../org.mitk.gui.qt.ext/resources/org_mitk_gui_qt_ext.qrc">
+                   <normaloff>:/org.mitk.gui.qt.ext/edit-redo.png</normaloff>:/org.mitk.gui.qt.ext/edit-redo.png</iconset>
                  </property>
                 </widget>
                </item>
@@ -815,6 +827,9 @@
   <include location="local">mitkDataTree.h</include>
   <include location="local">mitkBaseData.h</include>
  </includes>
- <resources/>
+ <resources>
+  <include location="../../resources/QmitkRigidRegistrationView.qrc"/>
+  <include location="../../../org.mitk.gui.qt.ext/resources/org_mitk_gui_qt_ext.qrc"/>
+ </resources>
  <connections/>
 </ui>

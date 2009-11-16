@@ -16,7 +16,11 @@
  =========================================================================*/
 
 #include <QObject>
-
+ 
+/** \class QmitkHelpHandler
+ *  \brief An object of this class will, once initialized, catch an event if the F1-key is pressed by the user.
+ *         It will open the mitk-help if it isn't already open and redirect to the help page of the currently active bundle.
+ */
  class QmitkHelpHandler : public QObject
  	{
       Q_OBJECT

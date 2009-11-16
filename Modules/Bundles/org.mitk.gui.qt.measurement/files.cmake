@@ -14,7 +14,6 @@ SET(UI_FILES
 SET(MOC_H_FILES
   src/internal/QmitkMeasurement.h
   src/internal/QmitkPlanarFiguresTableModel.h
-  src/internal/mitkMeasurementSelectionProvider.h
 )
 
 SET(RESOURCE_FILES

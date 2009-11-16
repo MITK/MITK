@@ -48,7 +48,7 @@ Qt::ItemFlags QmitkPlanarFiguresTableModel::flags( const QModelIndex &index ) co
     return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
 }
 
-int QmitkPlanarFiguresTableModel::columnCount( const QModelIndex &parent ) const
+int QmitkPlanarFiguresTableModel::columnCount( const QModelIndex & ) const
 {
   return 2;
 }

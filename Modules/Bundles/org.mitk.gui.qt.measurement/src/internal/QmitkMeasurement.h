@@ -26,14 +26,12 @@ PURPOSE.  See the above copyright notices for more information.
 #include <cherryISelectionListener.h>
 #include <cherryIStructuredSelection.h>
 
+#include <mitkPlanarFigure.h>
+#include "internal/mitkMeasurementSelectionProvider.h"
+
 #include <QmitkFunctionality.h>
 #include <QmitkStandardViews.h>
 #include <QmitkStdMultiWidgetEditor.h>
-#include <mitkPointSetInteractor.h>
-#include "mitkMeasurementSelectionProvider.h"
-
-class vtkRenderer;
-class vtkCornerAnnotation;
 
 class QmitkPlanarFiguresTableModel;
 class QGridLayout;
@@ -41,6 +39,10 @@ class QMainWindow;
 class QToolBar;
 class QLabel;
 class QTableView;
+class QTextBrowser;
+
+class vtkRenderer;
+class vtkCornerAnnotation;
 
 
 /*!
@@ -55,6 +57,8 @@ class QmitkMeasurement : public QObject, public QmitkFunctionality
   Q_OBJECT
 
   public:
+    typedef std::vector<mitk::DataTreeNode::Pointer> DataTreeNodes;
+
     QmitkMeasurement();
     virtual ~QmitkMeasurement();
 
@@ -69,8 +73,8 @@ class QmitkMeasurement : public QObject, public QmitkFunctionality
     virtual void SelectionChanged(cherry::IWorkbenchPart::Pointer part
       , cherry::ISelection::ConstPointer selection);
   
-    ///# draw actions
   protected slots:
+    ///# draw actions
     void ActionDrawLineTriggered( bool checked = false );
     void ActionDrawPathTriggered( bool checked = false );
     void ActionDrawAngleTriggered( bool checked = false );
@@ -81,21 +85,16 @@ class QmitkMeasurement : public QObject, public QmitkFunctionality
     void ActionDrawArrowTriggered( bool checked = false );
     void ActionDrawTextTriggered( bool checked = false ); 
     void CopyToClipboard( bool checked = false ); 
-    void PlanarFigureTableModelRowsInserted( const QModelIndex & parent, int start, int end );
-    void PlanarFigureSelectionChanged ( const QItemSelection & selected, const QItemSelection & deselected );
     // fields
   protected:
+    /// Changes the m_SelectedPlanarFiguresLabel. Selects the last PlanarFigure in the selection
+    ///
+    void PlanarFigureSelectionChanged();
+    /// Draws a string on the bottom left side of the render window
+    ///
     void setMeasurementInfo(const QString& text, QmitkRenderWindow* _RenderWindow);
-    ///
-    /// Interactor for performing the measurements.
-    ///
-    mitk::PointSetInteractor::Pointer m_PointSetInteractor;
 
-    ///
-    /// Node representing the PointSet last created. It is used to delete unused point sets.
-    ///
-    mitk::DataTreeNode::Pointer m_CurrentPointSetNode;
-
+    void NewNodeInserted(mitk::DataTreeNode::Pointer node);
   // widgets
 protected:
   QGridLayout* m_Layout;
@@ -108,23 +107,27 @@ protected:
   QAction* m_DrawRectangle;
   QAction* m_DrawPolygon;
   QToolBar* m_DrawActionsToolBar;
-  QTableView* m_PlanarFiguresTable;
-  QmitkPlanarFiguresTableModel* m_PlanarFiguresModel;
+  QTextBrowser* m_SelectedPlanarFiguresText;
   QPushButton* m_CopyToClipboard;
   vtkRenderer * m_MeasurementInfoRenderer;
   vtkCornerAnnotation *m_MeasurementInfoAnnotation;
 
+  // Selection service
   /// cherry::SelectionChangedAdapter<QmitkPropertyListView> must be a friend to call
   friend struct cherry::SelectionChangedAdapter<QmitkMeasurement>;
-
-  // Selection service
-  cherry::IStructuredSelection::ConstPointer m_CurrentSelection;
   cherry::ISelectionListener::Pointer m_SelectionListener;
   mitk::MeasurementSelectionProvider::Pointer m_SelectionProvider;
 
-  // Selected image on which measurements will be performed
+  /// Holds all selected Planar figures
+  ///
+  DataTreeNodes m_SelectedPlanarFigures;
+
+  /// Selected image on which measurements will be performed
+  ///
   mitk::DataTreeNode::Pointer m_SelectedImageNode;
 
+  /// Counter variables to give a newly created Figure a unique name.
+  ///
   unsigned int m_LineCounter;
   unsigned int m_PathCounter;
   unsigned int m_AngleCounter;

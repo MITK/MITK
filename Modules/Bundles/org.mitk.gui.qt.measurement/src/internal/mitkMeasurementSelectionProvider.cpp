@@ -25,6 +25,7 @@ namespace mitk
 
 
 MeasurementSelectionProvider::MeasurementSelectionProvider()
+: m_CurrentSelection(new DataTreeNodeSelection)
 {
 }
 
@@ -32,7 +33,6 @@ MeasurementSelectionProvider::MeasurementSelectionProvider()
 void MeasurementSelectionProvider::AddSelectionChangedListener(cherry::ISelectionChangedListener::Pointer listener)
 {
   m_RegisteredListeners.AddListener(listener);
-  //LOG_INFO << "jemand hat sich registriert!";
 }
 
 void MeasurementSelectionProvider::RemoveSelectionChangedListener(cherry::ISelectionChangedListener::Pointer listener)
@@ -43,13 +43,28 @@ void MeasurementSelectionProvider::RemoveSelectionChangedListener(cherry::ISelec
 
 cherry::ISelection::ConstPointer MeasurementSelectionProvider::GetSelection() const
 {
-  return (cherry::ISelection::ConstPointer)0;
+  return m_CurrentSelection;
 }
+
 
 void MeasurementSelectionProvider::SetSelection(cherry::ISelection::Pointer selection)
 {
-  cherry::SelectionChangedEvent::Pointer event(new cherry::SelectionChangedEvent(cherry::ISelectionProvider::Pointer(this), selection));
-  m_RegisteredListeners.selectionChanged(event);
+}
+
+void MeasurementSelectionProvider::FireSelectionChanged(DataTreeNodeSelection::Pointer selection)
+{
+  if(selection.IsNotNull())
+  {
+    m_CurrentSelection = selection;
+    cherry::SelectionChangedEvent::Pointer event(
+        new cherry::SelectionChangedEvent(cherry::ISelectionProvider::Pointer(this), m_CurrentSelection));
+    m_RegisteredListeners.selectionChanged(event);
+  }
+}
+
+void MeasurementSelectionProvider::FireSelectionChanged(DataTreeNode::Pointer selectedNode)
+{
+  this->FireSelectionChanged(DataTreeNodeSelection::Pointer(new DataTreeNodeSelection(selectedNode)));
 }
 
 }

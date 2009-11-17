@@ -673,24 +673,27 @@ void QmitkDataManagerView::SelectionChanged( cherry::IWorkbenchPart::Pointer par
   mitk::DataTreeNodeSelection::ConstPointer _DataTreeNodeSelection 
     = selection.Cast<const mitk::DataTreeNodeSelection>();
 
-  if(_DataTreeNodeSelection.IsNotNull())
-  {
-    std::vector<mitk::DataTreeNode*> selectedNodes;
-    mitk::DataTreeNodeObject* _DataTreeNodeObject = 0;
-    mitk::DataTreeNode* _DataTreeNode = 0;
+  if(_DataTreeNodeSelection.IsNull())
+    return;
 
-    m_NodeTreeView->selectionModel()->clear();
-    for(mitk::DataTreeNodeSelection::iterator it = _DataTreeNodeSelection->Begin();
-      it != _DataTreeNodeSelection->End(); ++it)
-    {
-      _DataTreeNodeObject = dynamic_cast<mitk::DataTreeNodeObject*>((*it).GetPointer());
-      if(_DataTreeNodeObject)
-        _DataTreeNode = _DataTreeNodeObject->GetDataTreeNode();
-      QModelIndex treeIndex = m_NodeTreeModel->GetIndex(_DataTreeNode);
-      if(treeIndex.isValid())
-        m_NodeTreeView->selectionModel()->select(treeIndex, QItemSelectionModel::Select);
-    }
+  std::vector<mitk::DataTreeNode*> selectedNodes;
+  mitk::DataTreeNodeObject* _DataTreeNodeObject = 0;
+  mitk::DataTreeNode* _DataTreeNode = 0;
+  QItemSelection newSelection;
+
+  m_NodeTreeView->selectionModel()->reset();
+
+  for(mitk::DataTreeNodeSelection::iterator it = _DataTreeNodeSelection->Begin();
+    it != _DataTreeNodeSelection->End(); ++it)
+  {
+    _DataTreeNodeObject = dynamic_cast<mitk::DataTreeNodeObject*>((*it).GetPointer());
+    if(_DataTreeNodeObject)
+      _DataTreeNode = _DataTreeNodeObject->GetDataTreeNode();
+    QModelIndex treeIndex = m_NodeTreeModel->GetIndex(_DataTreeNode);
+    if(treeIndex.isValid())
+      newSelection.select(treeIndex, treeIndex);
   }
+  m_NodeTreeView->selectionModel()->select(newSelection, QItemSelectionModel::SelectCurrent);
 }
 
 void QmitkDataManagerView::OtsuFilter( bool )

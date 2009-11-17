@@ -1,1 +1,0 @@
-createFunctionalityLib(QmitkPointBasedRegistration)

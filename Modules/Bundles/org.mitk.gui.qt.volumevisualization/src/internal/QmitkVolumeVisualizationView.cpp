@@ -39,6 +39,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <QToolTip>
 #include <qxtspanslider.h>
+#include <mitkProgressBar.h>
 
 QmitkVolumeVisualizationView::QmitkVolumeVisualizationView()
 : QmitkFunctionality(), 
@@ -57,6 +58,7 @@ QmitkVolumeVisualizationView::~QmitkVolumeVisualizationView()
 
 void QmitkVolumeVisualizationView::CreateQtPartControl(QWidget* parent)
 {
+   
   if (!m_Controls)
   {
     m_Controls = new Ui::QmitkVolumeVisualizationViewControls;
@@ -73,6 +75,7 @@ void QmitkVolumeVisualizationView::CreateQtPartControl(QWidget* parent)
     m_Controls->m_EnableGPU->setEnabled(false);
     m_Controls->m_TransferFunctionWidget->setEnabled(false);
     m_Controls->m_TransferFunctionGeneratorWidget->setEnabled(false);
+    m_Controls->m_SelectedImageLabel->hide();
     
     
     
@@ -87,7 +90,7 @@ void QmitkVolumeVisualizationView::CreateQtPartControl(QWidget* parent)
 
 
 void QmitkVolumeVisualizationView::SelectionChanged( cherry::IWorkbenchPart::Pointer, cherry::ISelection::ConstPointer selection )
-{
+{ 
   mitk::DataTreeNodeSelection::ConstPointer _DataTreeNodeSelection 
     = selection.Cast<const mitk::DataTreeNodeSelection>();
 
@@ -115,21 +118,28 @@ void QmitkVolumeVisualizationView::SelectionChanged( cherry::IWorkbenchPart::Poi
 
     if( node.IsNotNull() )
     {
+      m_Controls->m_NoSelectedImageLabel->hide();
+      m_Controls->m_SelectedImageLabel->show();
+      
       std::string  infoText;
       
       if (node->GetName().empty())
         infoText = std::string("Selected Image: [currently selected image has no name]");
       else
         infoText = std::string("Selected Image: ") + node->GetName();
-       
+      
       m_Controls->m_SelectedImageLabel->setText( QString( infoText.c_str() ) );
+      
+      
+       
       m_SelectedNode = node;
     }
     else
     {
-      std::string infoText = "Selected Image: [none]";
+      m_Controls->m_SelectedImageLabel->hide();
+      m_Controls->m_NoSelectedImageLabel->show();
       m_SelectedNode = 0;
-      m_Controls->m_SelectedImageLabel->setText( QString( infoText.c_str() ) );
+     
     }
 
     UpdateInterface();
@@ -214,8 +224,15 @@ void QmitkVolumeVisualizationView::OnEnableGPU(bool state)
   if(m_SelectedNode.IsNull())
     return;
 
+  LOG_INFO << "Progressbar add Steps: 10";
+  mitk::ProgressBar::GetInstance()->AddStepsToDo(10);
+
+  
   m_SelectedNode->SetProperty("volumerendering.usegpu",mitk::BoolProperty::New(state));
+   mitk::ProgressBar::GetInstance()->Progress(3);
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+   mitk::ProgressBar::GetInstance()->Progress(2);
+ 
 }
 
 void QmitkVolumeVisualizationView::SetFocus()

@@ -1731,7 +1731,7 @@ WorkbenchWindow::ControlResizeListener::ControlResizeListener(WorkbenchWindow* w
 
 GuiTk::IControlListener::Events::Types WorkbenchWindow::ControlResizeListener::GetEventTypes() const
 {
-  return Events::MOVED & Events::RESIZED;
+  return Events::MOVED | Events::RESIZED;
 }
 
 void WorkbenchWindow::

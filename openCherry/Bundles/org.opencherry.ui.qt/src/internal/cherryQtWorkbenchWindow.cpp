@@ -45,6 +45,7 @@ void* QtWorkbenchWindow::CreatePageComposite(void* p)
 
   // we have to enable visibility to get a proper layout (see bug #1654)
   pageArea->setVisible(true);
+  parent->setVisible(true);
 
   pageComposite = pageArea;
   return pageArea;

@@ -351,12 +351,6 @@ Shell::Pointer QtWidgetsTweakletImpl::CreateShell(Shell::Pointer parent, int sty
       || (style & Constants::SYSTEM_MODAL)) qtshell->GetWidget()->setWindowModality(Qt::ApplicationModal);
   if (style & Constants::PRIMARY_MODAL) qtshell->GetWidget()->setWindowModality(Qt::WindowModal);
 
-  // we have to enable visibility for main windows to get a proper layout (see bug #1654)
-  if (parentWidget == 0 || qtFlags.testFlag(Qt::Window))
-  {
-    qtshell->SetVisible(true);
-  }
-
   return shell;
 }
 

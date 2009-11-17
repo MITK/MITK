@@ -1,5 +1,5 @@
 /**
-\page QmitkBasicImageProcessingUserManual The Basic Image Processing Module in MITK
+\page QmitkBasicImageProcessingUserManual The Basic Image Processing Module
 
 \image html Lena_64_64.png "Icon of the Module"
 
@@ -24,7 +24,7 @@ This document will tell you how to use this functionality, but it is assumed tha
 
 This section will not describe the fundamental functioning of the single filters in detail, though.
 If you want to know more about a single filter, please have a look at http://www.itk.org/Doxygen316/html/classes.html 
-or in any good digital image processing book.
+or in any good digital image processing book. For total denoising filter, please see Tony F. Chan et al., "The digital TV filter and nonlinear denoising".
 
 Available filters are:
 
@@ -56,7 +56,7 @@ Available filters are:
 <li><b>Other</b></li>
   <ul>
   <li> Image Inversion</li>
-  <li> Downsampling (isotropic, factor 2)</li>  
+  <li> Downsampling (isotropic)</li>  
   </ul>
 </ul>
   
@@ -77,18 +77,19 @@ Available filters are:
 All you have to do to use a filter is to:
 <ul>
 <li> Load an image into MITK</li>
+<li> Select it in data manager
 <li> Select which filter you want to use via the drop down list</li>
 <li> Press the execute button</li>
 </ul>
 A busy cursor appeares; when it vanishes, the operation is completed. Your filtered image is displayed and selected for further processing.
-(If the  checkbox "Hide original image" is not selected, you will maybe not se the filter result imideately, 
-because your filtered image is supposedly hidden by the original.)
+(If the  checkbox "Hide original image" is not selected, you will maybe not see the filter result imideately, 
+because your filtered image is possibly hidden by the original.)
 
-For two image operations, please make sure that the correct second image is selected in the drop down menu, and the direction of the operation is correct.
-For sure, direction only plays a role for image subtraction and division. 
+For two image operations, please make sure that the correct second image is selected in the drop down menu, and the image order is correct.
+For sure, image oeder only plays a role for image subtraction and division. These are conducted (Image1 - Image2) or (Image1 / Image2), respectively.
 
 Please Note: When you select a 4D image, you can select the time step for the filter to work on via the time slider at the top of the GUI.
-The 3D image at this time step is extracted and processed. The result is also a 3D image.
+The 3D image at this time step is extracted and processed. The result will also be a 3D image.
 This means, a true 4D filtering is not supported by now.
  
 */

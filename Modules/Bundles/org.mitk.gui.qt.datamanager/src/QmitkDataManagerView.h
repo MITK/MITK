@@ -72,6 +72,22 @@ public slots:
   ///
   void ColorActionChanged();
   ///
+  /// Invoked when the color button is pressed
+  ///
+  void TextureInterpolationChanged();
+  ///
+  /// Invoked when the color action changed
+  ///
+  void TextureInterpolationToggled ( bool checked );
+  ///
+  /// SurfaceRepresentationActionToggled
+  ///
+  void SurfaceRepresentationMenuAboutToShow ();
+  ///
+  /// SurfaceRepresentationActionToggled
+  ///
+  void SurfaceRepresentationActionToggled ( bool checked );
+  ///
   /// \brief Shows a node context menu.
   ///
   void NodeTableViewContextMenuRequested( const QPoint & index );
@@ -181,6 +197,10 @@ protected:
   QPushButton* m_ColorButton;
   /// Color action
   QWidgetAction* m_ColorAction;
+  /// TextureInterpolation action
+  QAction* m_TextureInterpolation;
+  /// TextureInterpolation action
+  QAction* m_SurfaceRepresentation;
   /// Show only selected nodes
   QAction* m_ShowOnlySelectedNodes;
   /// Toggles visibility of selected nodes

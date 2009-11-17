@@ -1,5 +1,4 @@
 static const char * mitkDrawPaintbrushTool_xpm[] = {
-static char *Paint___[] = {
 /* columns rows colors chars-per-pixel */
 "40 24 51 1",
 "  c #2E3436",

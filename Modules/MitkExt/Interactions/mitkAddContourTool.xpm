@@ -1,5 +1,4 @@
 static const char * mitkAddContourTool_xpm[] = {
-static char *Lasso___[] = {
 /* columns rows colors chars-per-pixel */
 "40 24 232 2",
 "   c #2E3436",

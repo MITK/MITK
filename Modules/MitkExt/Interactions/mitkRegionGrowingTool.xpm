@@ -1,5 +1,4 @@
 static const char * mitkRegionGrowingTool_xpm[] = {
-static char *RegionGrower___[] = {
 /* columns rows colors chars-per-pixel */
 "40 24 49 1",
 "  c #2E3436",

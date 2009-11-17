@@ -1,5 +1,4 @@
 static const char * mitkEraseRegionTool_xpm[] = {
-static char *Erease___[] = {
 /* columns rows colors chars-per-pixel */
 "40 24 107 2",
 "   c #2E3436",

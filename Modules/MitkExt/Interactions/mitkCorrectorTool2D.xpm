@@ -1,5 +1,4 @@
 static const char * mitkCorrectorTool2D_xpm[] = {
-static char *Correct___[] = {
 /* columns rows colors chars-per-pixel */
 "40 24 61 1",
 "  c #2E3436",

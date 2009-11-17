@@ -1,5 +1,4 @@
 static const char * mitkFillRegionTool_xpm[] = {
-static char *Fill___[] = {
 /* columns rows colors chars-per-pixel */
 "40 24 142 2",
 "   c #3A2F35",

@@ -574,8 +574,6 @@ protected:
   virtual void BackTransform(const mitk::Point3D &in, mitk::Point3D& out) const;
   virtual void BackTransform(const mitk::Point3D &at, const mitk::Vector3D &in, mitk::Vector3D& out) const;
 
-  virtual void MultiplyWithWorldToIndexTransform(const FixedArrayType& in, FixedArrayType& out) const;
-
   //##Documentation
   //## @brief Set the parametric bounds
   //## 

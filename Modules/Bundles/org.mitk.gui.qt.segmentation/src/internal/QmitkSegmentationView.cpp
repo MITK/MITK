@@ -1036,7 +1036,7 @@ void QmitkSegmentationView::OnNewNodeObjectsGenerated(mitk::ToolManager::DataVec
 
     if (nodes->empty())
     {
-      QMessageBox::warning(m_Parent, "Lymph node segmentation", "The algorithm could could not find a lymph node. \nIf this is persistent, please report to http://bugs.mitk.org");
+      QMessageBox::warning(m_Parent, "Lymph node segmentation", "The algorithm could not find a lymph node. \nIf this is persistent, please report to http://bugs.mitk.org");
     }
   }
 }

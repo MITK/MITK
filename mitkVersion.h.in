@@ -1,0 +1,7 @@
+/*
+  mitkVersion.h
+  this file is generated. Do not change!
+*/
+
+#define MITK_SVN_REVISION "@MITK_SVN_REVISION@"
+

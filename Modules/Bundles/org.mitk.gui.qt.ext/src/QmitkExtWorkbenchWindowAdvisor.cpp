@@ -46,6 +46,7 @@
 
 #include <itkConfigure.h>
 #include <vtkConfigure.h>
+#include <mitkVersion.h>
 
 // UGLYYY
 #include "internal/QmitkExtWorkbenchWindowAdvisorHack.h"
@@ -502,7 +503,7 @@ std::string QmitkExtWorkbenchWindowAdvisor::ComputeTitle()
       = cherry::Platform::GetConfiguration().getString("application.baseName");
 
   // add version informatioin
-  QString mitkRevision("$Rev$");
+  QString mitkRevision(MITK_SVN_REVISION);
   mitkRevision.replace( QRegExp("[^0-9]+(\\d+).*"), "\\1");
   QString versions = QString(" (ITK %1.%2.%3  VTK %4.%5.%6 Qt %7 MITK %8)")
     .arg(ITK_VERSION_MAJOR).arg(ITK_VERSION_MINOR).arg(ITK_VERSION_PATCH)

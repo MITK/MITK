@@ -154,8 +154,16 @@ ENDIF(MITK_USE_QT)
 
 FIND_PACKAGE(Subversion)
 IF(Subversion_FOUND AND MITK_USE_SUBVERSION)
-  Subversion_WC_INFO(${PROJECT_SOURCE_DIR} SVN_INFO)
+  IF(EXISTS ${mitk-all_SOURCE_DIR})
+    Subversion_WC_INFO(${mitk-all_SOURCE_DIR} SVN_INFO)
+  ELSE(EXISTS ${mitk-all_SOURCE_DIR})
+    Subversion_WC_INFO(${PROJECT_SOURCE_DIR} SVN_INFO)
+  ENDIF(EXISTS ${mitk-all_SOURCE_DIR})
+  SET(MITK_SVN_REVISION ${SVN_INFO_WC_REVISION})
+ELSE(Subversion_FOUND AND MITK_USE_SUBVERSION)
+  SET(MITK_SVN_REVISION "n/a")
 ENDIF(Subversion_FOUND AND MITK_USE_SUBVERSION)
+CONFIGURE_FILE(mitkVersion.h.in ${PROJECT_BINARY_DIR}/mitkVersion.h)
 
 # TODO: check what could be moved to subdirectories
 #### mitkConfig.h ####

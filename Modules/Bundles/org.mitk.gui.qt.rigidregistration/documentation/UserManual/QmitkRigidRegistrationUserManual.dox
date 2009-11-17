@@ -183,20 +183,30 @@ Preset" buttons.
 \section QmitkRigidRegistrationUserManualReferences References:
 
 1. L. Ibanez, W. Schroeder and K. Ng, The ITK Software Guide, Kitware Inc, New York, 2005.
+
 2. http://www.itk.org/Doxygen/
+
 3. Albert C.S. Chung, William M. Wells III, Alexander Norbash, and W. Eric L. Grimson, Multi-modal Image Registration by Minimising Kullback-Leibler Distance, In Medical Image Computing and 
 Computer-Assisted Intervention - MICCAI 2002, LNCS 2489, pp. 525 - 532.
+
 4. D. Mattes, D. R. Haynor, H. Vesselle, T. Lewellen and W. Eubank, "Nonrigid multimodality image registration", Medical Imaging 2001: Image Processing, 2001, pp. 1609-1620.
+
 5. D. Mattes, D. R. Haynor, H. Vesselle, T. Lewellen and W. Eubank, "PET-CT Image Registration in the Chest Using Free-form Deformations", IEEE Transactions in Medical Imaging. 
 Vol.22, No.1, January 2003, pp.120-128.
+
 6. Viola, P. and Wells III, W. (1997). "Alignment by Maximization of Mutual Information" International Journal of Computer Vision, 24(2):137-154.
+
 7. AP Zijdenbos, BM Dawant, RA Margolin , AC Palmer, Morphometric analysis of white matter lesions in MR images: Method and validation, IEEE Transactions on Medical Imaging, 
-13(4):716–724, Dec. 1994.
+13(4):716-724, Dec. 1994.
+
 8. R. H. Byrd, P. Lu and J. Nocedal. A Limited Memory Algorithm for Bound Constrained Optimization, (1995), SIAM Journal on Scientific and Statistical Computing , 16, 5, pp. 1190-1208.
+
 9. C. Zhu, R. H. Byrd and J. Nocedal. L-BFGS-B: Algorithm 778: L-BFGS-B, FORTRAN routines for large scale bound constrained optimization (1997), ACM Transactions on Mathematical Software, 
 Vol 23, Num. 4, pp. 550 - 560. 
+
 10. Martin Styner, G. Gerig, Christian Brechbuehler, Gabor Szekely, "Parametric estimate of intensity inhomogeneities applied to MRI", IEEE TRANSACTIONS ON MEDICAL IMAGING; 19(3), pp. 153-165,
  2000.
+
 11. Spall, J.C. (1998), "An Overview of the Simultaneous Perturbation Method for Efficient Optimization," Johns Hopkins APL Technical Digest, vol. 19, pp. 482-492.
 
 */

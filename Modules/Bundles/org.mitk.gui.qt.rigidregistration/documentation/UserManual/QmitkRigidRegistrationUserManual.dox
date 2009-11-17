@@ -16,7 +16,7 @@ directly be applied to the Moving Image. Also binary images as image masks can b
 \image html RigidRegistration_small.png "MITK with the QmitkRigidRegistration module"
 
 This document will tell you how to use this module, but it is assumed that you already know how to navigate through the slices of an image using the
-multi-widget. Please read \ref QmitkStdMultiWidgetUserManual for more information.
+multi-widget.
 
 \section QmitkRigidRegistrationUserManualIssues Known Issues
 
@@ -116,7 +116,7 @@ To show the current metric and its parameters for the registration process, the 
 
 \li <b>GradientDifference:</b> Evaluates the difference in the derivatives of the moving and fixed images.
 
-\li <b>KullbackLeiblerCompareHistogram</b>[3]</b>:</b> Measures the relative entropy between two discrete probability distributions.
+\li <b>KullbackLeiblerCompareHistogram</b>[3]<b>:</b> Measures the relative entropy between two discrete probability distributions.
 
 \li <b>CorrelationCoefficientHistogram:</b> Computes the cross correlation coefficient between the intensities.
 
@@ -127,15 +127,15 @@ calculated.
 
 \li <b>NormalizedMutualInformationHistogram:</b> Computes the mutual information between image A and image B.
 
-\li <b>MattesMutualInformation</b>[4, 5]</b>:</b> The method of Mattes et al. is used to compute the mutual information between two images to be registered.
+\li <b>MattesMutualInformation</b>[4, 5]<b>:</b> The method of Mattes et al. is used to compute the mutual information between two images to be registered.
 
 \li <b>MeanReciprocalSquareDifference:</b> Computes pixel-wise differences and adds them after passing them through a bell-shaped function 1 / (1+x^2).
 
-\li <b>MutualInformation</b>[6]</b>:</b> Computes the mutual information between image A and image B.
+\li <b>MutualInformation</b>[6]<b>:</b> Computes the mutual information between image A and image B.
 
 \li <b>MatchCardinality:</b> Computes cardinality of the set of pixels that match exactly between the moving and fixed images.
 
-\li <b>KappaStatistic</b>[7]</b>:</b> Computes spatial intersection of two binary images.
+\li <b>KappaStatistic</b>[7]<b>:</b> Computes spatial intersection of two binary images.
 
 The desired metric can be chosen from a combo box. All parameters defining the selected metric have to be specified within the line edits and checkboxes underneath the metric combo box.
 To show the current optimizer and its parameters for the registration process, the Optimizer checkbox has to be checked. Currently, the following optimizers are implemented 
@@ -147,9 +147,9 @@ To show the current optimizer and its parameters for the registration process, t
 
 \li <b>QuaternionRigidTransformGradientDescent:</b> Variant of a gradient descent optimizer.
 
-\li <b>LBFGSB</b>[8, 9]</b>:</b> Limited memory Broyden Fletcher Goldfarb Shannon minimization with simple bounds.
+\li <b>LBFGSB</b>[8, 9]<b>:</b> Limited memory Broyden Fletcher Goldfarb Shannon minimization with simple bounds.
 
-\li <b>OnePlusOneEvolutionary</b>[10]</b>:</b> 1+1 evolutionary strategy.
+\li <b>OnePlusOneEvolutionary</b>[10]<b>:</b> 1+1 evolutionary strategy.
 
 \li <b>Powell:</b> Implements Powell optimization using Brent line search.
 
@@ -165,7 +165,7 @@ To show the current optimizer and its parameters for the registration process, t
 
 \li <b>LBFGS:</b> Limited memory Broyden Fletcher Goldfarb Shannon minimization.
 
-\li <b>SPSA</b>[11]</b>:</b> Based on simultaneous perturbation.
+\li <b>SPSA</b>[11]<b>:</b> Based on simultaneous perturbation.
 
 \li <b>VersorRigid3DTransform:</b> Variant of a gradient descent optimizer for the VersorRigid3DTransform parameter space.
 

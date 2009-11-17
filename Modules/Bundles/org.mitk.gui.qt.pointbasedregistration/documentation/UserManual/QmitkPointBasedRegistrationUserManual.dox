@@ -15,7 +15,7 @@ performed on the points to align them, will be performed on the moving data as w
 \image html PointBasedRegistration_small.png "MITK with the QmitkPointBasedRegistration module"
 
 This document will tell you how to use this module, but it is assumed that you already know how to navigate through 
-the slices of a dataset using the multi-widget. Please read \ref QmitkStdMultiWidgetUserManual for more information.
+the slices of a dataset using the multi-widget.
 
 \section QmitkPointBasedRegistrationUserManualDetails Details
 

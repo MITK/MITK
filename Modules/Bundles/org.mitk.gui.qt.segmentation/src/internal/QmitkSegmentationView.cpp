@@ -854,11 +854,12 @@ void QmitkSegmentationView::SendSelectedEvent( mitk::DataTreeNode* referenceNode
   // should select both nodes and also make them visible (expand tree view if necessary)
   LOG_INFO << "Marking as selected: reference node '" << (referenceNode ? referenceNode->GetName() : "NULL") << " and working node " << (workingNode ? workingNode->GetName() : "NULL");
 
-  std::vector<mitk::DataTreeNode::Pointer > nodes;
+  //std::vector<mitk::DataTreeNode::Pointer > nodes;
   //if (referenceNode) nodes.push_back( referenceNode );
-  if (workingNode)   nodes.push_back( workingNode );
+  //if (workingNode)   nodes.push_back( workingNode );
 
-  m_SelectionProvider->SetSelection( cherry::ISelection::Pointer(new mitk::DataTreeNodeSelection(nodes)) );
+  //m_SelectionProvider->SetSelection( cherry::ISelection::Pointer(new mitk::DataTreeNodeSelection(nodes)) );
+  m_SelectionProvider->FireSelectionChanged(workingNode);
 }
 
 void QmitkSegmentationView::OnSurfaceCalculationDone()
@@ -1029,8 +1030,9 @@ void QmitkSegmentationView::OnNewNodeObjectsGenerated(mitk::ToolManager::DataVec
     mitk::ToolManager* toolManager = m_Controls->m_ManualToolSelectionBox->GetToolManager();
     for (mitk::ToolManager::DataVectorType::iterator iter = nodes->begin(); iter != nodes->end(); ++iter)
     {
-      toolManager->SetWorkingData( *iter );
+      GetSite()->GetWorkbenchWindow()->GetActivePage()->ShowView("org.mitk.views.segmentation" ,"", cherry::IWorkbenchPage::VIEW_ACTIVATE);
       SendSelectedEvent( toolManager->GetReferenceData(0), *iter );
+      toolManager->SetWorkingData( *iter );
       break;
     }
 

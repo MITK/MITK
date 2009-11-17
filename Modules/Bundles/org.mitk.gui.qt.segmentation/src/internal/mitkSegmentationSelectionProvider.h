@@ -24,12 +24,14 @@
 #include <cherryISelectionProvider.h>
 #include <cherryISelectionChangedListener.h>
 #include <cherryISelectionListener.h>
+#include <mitkDataTreeNodeSelection.h>
 
 /*
 #include <QItemSelectionModel>
 #include <QItemSelection>
 #include <QObject>
 */
+
 namespace mitk
 {
 
@@ -50,6 +52,9 @@ public:
   cherry::ISelection::ConstPointer GetSelection() const;
   
   void SetSelection(cherry::ISelection::Pointer selection);
+  
+  void FireSelectionChanged(mitk::DataTreeNodeSelection::Pointer selection);
+  void FireSelectionChanged(mitk::DataTreeNode::Pointer selectedNode);
 
   //QItemSelection GetQItemSelection() const;
   
@@ -61,13 +66,8 @@ public:
 
   protected:
 
-    cherry::ISelectionChangedListener::Events m_RegisteredListeners;
-  
- // QItemSelectionModel* qSelectionModel;
-
-
-//virtual void FireSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
-
+   DataTreeNodeSelection::Pointer m_CurrentSelection;
+   cherry::ISelectionChangedListener::Events m_RegisteredListeners;
 };
 
 }

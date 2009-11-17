@@ -19,12 +19,14 @@
 #include <mitkDataTreeNodeSelection.h>
 #include "cherrySelectionChangedEvent.h"
 
+
 namespace mitk
 {
 
 
-
 SegmentationSelectionProvider::SegmentationSelectionProvider()
+: m_CurrentSelection(new DataTreeNodeSelection)
+
 {
 }
 
@@ -32,24 +34,38 @@ SegmentationSelectionProvider::SegmentationSelectionProvider()
 void SegmentationSelectionProvider::AddSelectionChangedListener(cherry::ISelectionChangedListener::Pointer listener)
 {
   m_RegisteredListeners.AddListener(listener);
-  //LOG_INFO << "jemand hat sich registriert!";
 }
 
 void SegmentationSelectionProvider::RemoveSelectionChangedListener(cherry::ISelectionChangedListener::Pointer listener)
 {
   m_RegisteredListeners.RemoveListener(listener);
- 
 }
 
 cherry::ISelection::ConstPointer SegmentationSelectionProvider::GetSelection() const
 {
-  return (cherry::ISelection::ConstPointer)0;
+ return m_CurrentSelection;
 }
 
 void SegmentationSelectionProvider::SetSelection(cherry::ISelection::Pointer selection)
 {
-  cherry::SelectionChangedEvent::Pointer event(new cherry::SelectionChangedEvent(cherry::ISelectionProvider::Pointer(this), selection));
-  m_RegisteredListeners.selectionChanged(event);
 }
+
+void SegmentationSelectionProvider::FireSelectionChanged(DataTreeNodeSelection::Pointer selection)
+{
+  if(selection.IsNotNull())
+  {
+    LOG_INFO << "bin reingelaufen";
+  
+    m_CurrentSelection = selection;
+    cherry::SelectionChangedEvent::Pointer event(new cherry::SelectionChangedEvent(cherry::ISelectionProvider::Pointer(this), m_CurrentSelection));
+    m_RegisteredListeners.selectionChanged(event);
+  }
+}
+
+void SegmentationSelectionProvider::FireSelectionChanged(DataTreeNode::Pointer selectedNode)
+{
+  this->FireSelectionChanged(DataTreeNodeSelection::Pointer(new DataTreeNodeSelection(selectedNode)));
+}
+
 
 }

@@ -17,15 +17,10 @@ bool QmitkHelpHandler::eventFilter(QObject *obj, QEvent *event)
     QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
     if (keyEvent->key()==16777264) //if the F1-key is pressed...
       {
-      this->OpenHelpPage();
+      cherry::QtAssistantUtil::OpenHelpPage();
       return true;
       }
     }
   // standard event processing
   return QObject::eventFilter(obj, event);
-  }
-
-void QmitkHelpHandler::OpenHelpPage()
-  {
-  cherry::QtAssistantUtil::OpenAssistant("","");
   }

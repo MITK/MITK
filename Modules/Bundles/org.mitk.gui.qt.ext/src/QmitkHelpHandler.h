@@ -30,12 +30,6 @@ class MITK_QT_COMMON_EXT_EXPORT QmitkHelpHandler: public QObject
   public:
     QmitkHelpHandler(QObject* parent = 0);
 
-    /**
-     * @brief With this method you can open the help-page of the active bundle manually. The same will occure as if the
-     *        user presses F1.
-     */
-    void OpenHelpPage();
-
   protected:
     bool eventFilter(QObject *obj, QEvent *event);
 };

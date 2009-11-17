@@ -448,7 +448,7 @@ void QmitkExtWorkbenchWindowAdvisorHack::onIntro()
 
 void QmitkExtWorkbenchWindowAdvisorHack::onHelp()
 {
-  cherry::QtAssistantUtil::OpenAssistant("","");
+  cherry::QtAssistantUtil::OpenHelpPage();
 }
 
 void QmitkExtWorkbenchWindowAdvisor::HookTitleUpdateListeners(

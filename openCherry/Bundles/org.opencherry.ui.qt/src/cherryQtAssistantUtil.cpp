@@ -29,11 +29,28 @@ namespace cherry
 
 QProcess* QtAssistantUtil::assistantProcess = 0;
 
+QString* QtAssistantUtil::HelpCollectionFile = new QString("");
+
+void QtAssistantUtil::SetHelpColletionFile(QString* file)
+{
+HelpCollectionFile = file;
+}
+
+void QtAssistantUtil::OpenHelpPage()
+{
+if (assistantProcess!=0) assistantProcess->kill();
+OpenAssistant(*HelpCollectionFile,"");
+}
+
 void QtAssistantUtil::OpenAssistant(const QString& collectionFile, const QString& startPage)
 {
   QString assistantExec = GetAssistantExecutable();
-  QProcess* process = new QProcess;
-  process->start(assistantExec, NULL);
+  assistantProcess = new QProcess;
+  QStringList thisCollection;
+  thisCollection << QLatin1String("-collectionFile") 
+                 << QLatin1String(collectionFile.toLatin1())
+                 << QLatin1String("-enableRemoteControl");
+  assistantProcess->start(assistantExec, thisCollection);
 }
 
 bool QtAssistantUtil::RegisterQCHFiles(const QString& collectionFile,

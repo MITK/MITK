@@ -36,13 +36,22 @@ public:
 
   static void OpenAssistant(const QString& collectionFile, const QString& startPage);
 
+   /**
+     * @brief With this method you can open the help-page of the active bundle. 
+     */
+  static void OpenHelpPage();
+
   static bool RegisterQCHFiles(const QString& collectionFile, const std::vector<IBundle::Pointer>& bundles);
+
+  static void SetHelpColletionFile(QString* file);
 
 private:
 
   static QProcess* assistantProcess;
 
   static QString GetAssistantExecutable();
+
+  static QString* HelpCollectionFile;
 
 };
 

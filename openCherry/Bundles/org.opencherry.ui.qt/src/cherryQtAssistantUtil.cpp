@@ -16,10 +16,13 @@
  =========================================================================*/
 
 #include "cherryQtAssistantUtil.h"
-
+#include <cherryPlatformUI.h>
 #include <cherryConfig.h>
 #include <cherryLog.h>
 #include <cherryIBundleStorage.h>
+#include <cherryIWorkbench.h>
+#include <cherryIWorkbenchPage.h>
+#include <cherryIWorkbenchPart.h>
 
 #include <QFileInfo>
 #include <QProgressDialog>
@@ -39,7 +42,28 @@ HelpCollectionFile = file;
 void QtAssistantUtil::OpenHelpPage()
 {
 if (assistantProcess!=0) assistantProcess->kill();
-OpenAssistant(*HelpCollectionFile,"");
+
+QString pluginID = "org.mitk.gui.qt.common";
+
+//Get Plugin-ID
+cherry::IWorkbench* currentWorkbench = cherry::PlatformUI::GetWorkbench();
+if (currentWorkbench!=NULL) 
+  {
+  cherry::IWorkbenchWindow::Pointer currentWorkbenchWindow = currentWorkbench->GetActiveWorkbenchWindow();
+  if (currentWorkbenchWindow!=NULL)
+    {
+    cherry::IWorkbenchPage::Pointer currentPage = currentWorkbenchWindow->GetActivePage();
+    if (currentPage!=NULL)
+      {
+      cherry::IWorkbenchPart::Pointer currentPart = currentPage->GetActivePart();
+      if (currentPart.IsNotNull()) pluginID = QString(currentPart->GetSite()->GetPluginId().c_str());
+      }
+    }
+  }
+
+//End get Plugin-ID
+
+OpenAssistant(*HelpCollectionFile,"qthelp://"+pluginID+"/bundle/index.html");
 }
 
 void QtAssistantUtil::OpenAssistant(const QString& collectionFile, const QString& startPage)
@@ -49,7 +73,9 @@ void QtAssistantUtil::OpenAssistant(const QString& collectionFile, const QString
   QStringList thisCollection;
   thisCollection << QLatin1String("-collectionFile") 
                  << QLatin1String(collectionFile.toLatin1())
-                 << QLatin1String("-enableRemoteControl");
+                 << QLatin1String("-enableRemoteControl")
+                 << QLatin1String("-showUrl")
+                 << QLatin1String(startPage.toLatin1());
   assistantProcess->start(assistantExec, thisCollection);
 }
 

@@ -18,9 +18,12 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <org.opencherry.osgi/src/application/cherryStarter.h>
 #include <Poco/Util/MapConfiguration.h>
+#include <mitkCoreExtObjectFactory.h>
 
 int main(int argc, char** argv)
 {
+  
+  RegisterCoreExtObjectFactory();
   // These paths replace the .ini file and are tailored for installation
   // packages created with CPack. If a .ini file is presented, it will
   // overwrite the settings in MapConfiguration

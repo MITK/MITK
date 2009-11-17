@@ -2,10 +2,14 @@ SET(MITK_USE_OPENCHERRY 1)
 SET(MITK_USE_EXT 1)
 FIND_PACKAGE(MITK)
 
+# TODO: this can be removed after resolving factory issues, it's only necessary for the registration call in main()
+MITK_USE_MODULE(MitkExt)
+
 INCLUDE_DIRECTORIES(
   ${OPENCHERRY_PLUGIN_SOURCE_DIRS} 
   ${org.opencherry.osgi_BIN_DIR} # needed for generated cherryConfig.h 
   ${Poco_INCLUDE_DIRS}
+  ${ALL_INCLUDE_DIRECTORIES}
 )
 LINK_DIRECTORIES(${Poco_LIBRARY_DIRS})
   
@@ -14,7 +18,8 @@ ADD_EXECUTABLE(ExtApp ExtApp.cpp)
 TARGET_LINK_LIBRARIES(ExtApp 
                       optimized PocoFoundation      debug PocoFoundationd 
                       optimized PocoUtil            debug PocoUtild 
-                      optimized org_opencherry_osgi debug org_opencherry_osgi${OPENCHERRY_DEBUG_POSTFIX})
+                      optimized org_opencherry_osgi debug org_opencherry_osgi${OPENCHERRY_DEBUG_POSTFIX}
+                      ${ALL_LIBRARIES})
 
 SET(_plugin_deps ${OPENCHERRY_ENABLED_PLUGINS} ${MITK_CORE_ENABLED_PLUGINS} ${MITK_MODULES_ENABLED_PLUGINS})
 

@@ -129,7 +129,7 @@ void QmitkMeasurement::CreateQtPartControl(QWidget* parent)
       , this, SLOT( ActionDrawFourPointAngleTriggered(bool) ) );
 
   currentAction = m_DrawActionsToolBar->addAction(QIcon(
-      ":/measurement/circle.png"), "Draw Ellipse");
+      ":/measurement/circle.png"), "Draw Circle");
   m_DrawEllipse = currentAction;
   m_DrawEllipse->setCheckable(true);
   m_DrawActionsToolBar->addAction(currentAction);

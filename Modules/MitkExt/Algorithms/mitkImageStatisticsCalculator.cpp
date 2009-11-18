@@ -53,16 +53,14 @@ namespace mitk
 {
 
 ImageStatisticsCalculator::ImageStatisticsCalculator()
-: m_MaskingMode( MASKING_MODE_NONE ),
-  m_TriggerImageStatisticsCalculation( false ),
-  m_TriggerMaskedImageStatisticsCalculation( false ),
-  m_TriggerPlanarFigureStatisticsCalculation( false )
-{
-  m_InputTimeSelector = ImageTimeSelector::New();
+: m_MaskingMode( MASKING_MODE_NONE )
+{ 
   m_EmptyHistogram = HistogramType::New();
   HistogramType::SizeType histogramSize;
   histogramSize.Fill( 256 ); 
   m_EmptyHistogram->Initialize( histogramSize );
+
+  m_EmptyStatistics.Reset();
 }
 
 
@@ -77,32 +75,78 @@ void ImageStatisticsCalculator::SetImage( const mitk::Image *image )
   {
     m_Image = image;
     this->Modified();
-    m_ImageStatisticsTimeStamp.Modified();
-    m_TriggerImageStatisticsCalculation = true;
+
+    unsigned int numberOfTimeSteps = image->GetTimeSteps();
+
+    // Initialize vectors to time-size of this image
+    m_ImageHistogramVector.resize( numberOfTimeSteps );
+    m_MaskedImageHistogramVector.resize( numberOfTimeSteps );
+    m_PlanarFigureHistogramVector.resize( numberOfTimeSteps );
+
+    m_ImageStatisticsVector.resize( numberOfTimeSteps );
+    m_MaskedImageStatisticsVector.resize( numberOfTimeSteps );
+    m_PlanarFigureStatisticsVector.resize( numberOfTimeSteps );
+
+    m_ImageStatisticsTimeStampVector.resize( numberOfTimeSteps );
+    m_MaskedImageStatisticsTimeStampVector.resize( numberOfTimeSteps );
+    m_PlanarFigureStatisticsTimeStampVector.resize( numberOfTimeSteps );
+
+    m_ImageStatisticsCalculationTriggerVector.resize( numberOfTimeSteps );
+    m_MaskedImageStatisticsCalculationTriggerVector.resize( numberOfTimeSteps );
+    m_PlanarFigureStatisticsCalculationTriggerVector.resize( numberOfTimeSteps );
+
+    for ( unsigned int t = 0; t < image->GetTimeSteps(); ++t )
+    {
+      m_ImageStatisticsTimeStampVector[t].Modified();
+      m_ImageStatisticsCalculationTriggerVector[t] = true;
+    }
   }
 }
 
 
 void ImageStatisticsCalculator::SetImageMask( const mitk::Image *imageMask )
 {
+  if ( m_Image.IsNull() )
+  {
+    itkExceptionMacro( << "Image needs to be set first!" );
+  }
+
+  if ( m_Image->GetTimeSteps() != imageMask->GetTimeSteps() )
+  {
+    itkExceptionMacro( << "Image and image mask need to have equal number of time steps!" );
+  }
+
   if ( m_ImageMask != imageMask )
   {
     m_ImageMask = imageMask;
     this->Modified();
-    m_MaskedImageStatisticsTimeStamp.Modified();
-    m_TriggerMaskedImageStatisticsCalculation = true;
+
+    for ( unsigned int t = 0; t < m_Image->GetTimeSteps(); ++t )
+    {
+      m_MaskedImageStatisticsTimeStampVector[t].Modified();
+      m_MaskedImageStatisticsCalculationTriggerVector[t] = true;
+    }
   }
 }
 
 
 void ImageStatisticsCalculator::SetPlanarFigure( const mitk::PlanarFigure *planarFigure )
 {
+  if ( m_Image.IsNull() )
+  {
+    itkExceptionMacro( << "Image needs to be set first!" );
+  }
+
   if ( m_PlanarFigure != planarFigure )
   {
     m_PlanarFigure = planarFigure;
     this->Modified();
-    m_PlanarFigureStatisticsTimeStamp.Modified();
-    m_TriggerPlanarFigureStatisticsCalculation = true;
+
+    for ( unsigned int t = 0; t < m_Image->GetTimeSteps(); ++t )
+    {
+      m_PlanarFigureStatisticsTimeStampVector[t].Modified();
+      m_PlanarFigureStatisticsCalculationTriggerVector[t] = true;
+    }
   }
 }
 
@@ -138,40 +182,38 @@ void ImageStatisticsCalculator::SetMaskingModeToPlanarFigure()
 
 
 
-void ImageStatisticsCalculator::ComputeStatistics()
+bool ImageStatisticsCalculator::ComputeStatistics( unsigned int timeStep )
 {
   if ( m_Image.IsNull() )
   {
     itkExceptionMacro( << "Image not set!" );
-    return;
   }
 
-  unsigned long imageMTime = m_ImageStatisticsTimeStamp.GetMTime();
-  unsigned long maskedImageMTime = m_MaskedImageStatisticsTimeStamp.GetMTime();
-  unsigned long planarFigureMTime = m_PlanarFigureStatisticsTimeStamp.GetMTime();
+  if ( timeStep >= m_Image->GetTimeSteps() )
+  {
+    throw std::runtime_error( "Error: invalid time step!" );
+  }
 
-  if ( ((m_MaskingMode != MASKING_MODE_NONE) || (imageMTime > m_Image->GetMTime() && !m_TriggerImageStatisticsCalculation))
-    && ((m_MaskingMode != MASKING_MODE_IMAGE) || (maskedImageMTime > m_ImageMask->GetMTime() && !m_TriggerMaskedImageStatisticsCalculation))
-    && ((m_MaskingMode != MASKING_MODE_PLANARFIGURE) || (planarFigureMTime > m_PlanarFigure->GetMTime() && !m_TriggerPlanarFigureStatisticsCalculation)) )
+  unsigned long imageMTime = m_ImageStatisticsTimeStampVector[timeStep].GetMTime();
+  unsigned long maskedImageMTime = m_MaskedImageStatisticsTimeStampVector[timeStep].GetMTime();
+  unsigned long planarFigureMTime = m_PlanarFigureStatisticsTimeStampVector[timeStep].GetMTime();
+
+  bool imageStatisticsCalculationTrigger = m_ImageStatisticsCalculationTriggerVector[timeStep];
+  bool maskedImageStatisticsCalculationTrigger = m_MaskedImageStatisticsCalculationTriggerVector[timeStep];
+  bool planarFigureStatisticsCalculationTrigger = m_PlanarFigureStatisticsCalculationTriggerVector[timeStep];
+
+  if ( ((m_MaskingMode != MASKING_MODE_NONE) || (imageMTime > m_Image->GetMTime() && !imageStatisticsCalculationTrigger))
+    && ((m_MaskingMode != MASKING_MODE_IMAGE) || (maskedImageMTime > m_ImageMask->GetMTime() && !maskedImageStatisticsCalculationTrigger))
+    && ((m_MaskingMode != MASKING_MODE_PLANARFIGURE) || (planarFigureMTime > m_PlanarFigure->GetMTime() && !planarFigureStatisticsCalculationTrigger)) )
   {
     // Statistics is up to date!
-    return;
+    return false;
   }
 
   // Depending on masking mode, extract and/or generate the required image
   // and mask data from the user input
-  this->ExtractImageAndMask();
+  this->ExtractImageAndMask( timeStep );
 
-
-  m_InputTimeSelector->SetInput( m_InternalImage );
-
-  //const TimeSlicedGeometry *timeSlicedGeometry = m_Image->GetTimeSlicedGeometry();
-  //for( unsigned int t = 0; t < timeSlicedGeometry->GetTimeSteps(); ++t )
-  //{
-  m_InputTimeSelector->SetTimeNr( 0 );
-  m_InputTimeSelector->UpdateLargestPossibleRegion();
-
-  mitk::Image *timeSliceImage = m_InputTimeSelector->GetOutput();
 
   Statistics *statistics;
   HistogramType::ConstPointer *histogram;
@@ -179,28 +221,37 @@ void ImageStatisticsCalculator::ComputeStatistics()
   {
   case MASKING_MODE_NONE:
   default:
-    statistics = &m_ImageStatistics;
-    histogram = &m_ImageHistogram;
+    statistics = &m_ImageStatisticsVector[timeStep];
+    histogram = &m_ImageHistogramVector[timeStep];
+
+    m_ImageStatisticsTimeStampVector[timeStep].Modified();
+    m_ImageStatisticsCalculationTriggerVector[timeStep] = false;
     break;
 
   case MASKING_MODE_IMAGE:
-    statistics = &m_MaskedImageStatistics;
-    histogram = &m_MaskedImageHistogram;
+    statistics = &m_MaskedImageStatisticsVector[timeStep];
+    histogram = &m_MaskedImageHistogramVector[timeStep];
+
+    m_MaskedImageStatisticsTimeStampVector[timeStep].Modified();
+    m_MaskedImageStatisticsCalculationTriggerVector[timeStep] = false;
     break;
 
   case MASKING_MODE_PLANARFIGURE:
-    statistics = &m_PlanarFigureStatistics;
-    histogram = &m_PlanarFigureHistogram;
+    statistics = &m_PlanarFigureStatisticsVector[timeStep];
+    histogram = &m_PlanarFigureHistogramVector[timeStep];
+
+    m_PlanarFigureStatisticsTimeStampVector[timeStep].Modified();
+    m_PlanarFigureStatisticsCalculationTriggerVector[timeStep] = false;
     break;
   }
 
   // Calculate statistics and histogram(s)
-  if ( timeSliceImage->GetDimension() == 3 )
+  if ( m_InternalImage->GetDimension() == 3 )
   {
     if ( m_MaskingMode == MASKING_MODE_NONE )
     {
       AccessFixedDimensionByItk_2( 
-        timeSliceImage,
+        m_InternalImage,
         InternalCalculateStatisticsUnmasked,
         3,
         *statistics,
@@ -209,7 +260,7 @@ void ImageStatisticsCalculator::ComputeStatistics()
     else
     {
       AccessFixedDimensionByItk_3( 
-        timeSliceImage,
+        m_InternalImage,
         InternalCalculateStatisticsMasked,
         3,
         m_InternalImageMask3D.GetPointer(),
@@ -217,12 +268,12 @@ void ImageStatisticsCalculator::ComputeStatistics()
         histogram );
     }
   }
-  else if ( timeSliceImage->GetDimension() == 2 )
+  else if ( m_InternalImage->GetDimension() == 2 )
   {
     if ( m_MaskingMode == MASKING_MODE_NONE )
     {
       AccessFixedDimensionByItk_2( 
-        timeSliceImage,
+        m_InternalImage,
         InternalCalculateStatisticsUnmasked,
         2,
         *statistics,
@@ -231,7 +282,7 @@ void ImageStatisticsCalculator::ComputeStatistics()
     else
     {
       AccessFixedDimensionByItk_3( 
-        timeSliceImage,
+        m_InternalImage,
         InternalCalculateStatisticsMasked,
         2,
         m_InternalImageMask2D.GetPointer(),
@@ -244,76 +295,80 @@ void ImageStatisticsCalculator::ComputeStatistics()
     LOG_ERROR << "ImageStatistics: Image dimension not supported!";
   }
 
-
-  switch ( m_MaskingMode )
-  {
-  case MASKING_MODE_NONE:
-  default:
-    m_ImageStatisticsTimeStamp.Modified();
-    m_TriggerImageStatisticsCalculation = false;
-    break;
-
-  case MASKING_MODE_IMAGE:
-    m_MaskedImageStatisticsTimeStamp.Modified();
-    m_TriggerImageStatisticsCalculation = false;
-    break;
-
-  case MASKING_MODE_PLANARFIGURE:
-    m_PlanarFigureStatisticsTimeStamp.Modified();
-    m_TriggerImageStatisticsCalculation = false;
-    break;
-  }
+  return true;
 }
 
 
 const ImageStatisticsCalculator::HistogramType *
-ImageStatisticsCalculator::GetHistogram() const
+ImageStatisticsCalculator::GetHistogram( unsigned int timeStep ) const
 {
+  if ( m_Image.IsNull() || (timeStep >= m_Image->GetTimeSteps()) )
+  {
+    return NULL;
+  }
+
   switch ( m_MaskingMode )
   {
   case MASKING_MODE_NONE:
   default:
-    return m_ImageHistogram;
+    return m_ImageHistogramVector[timeStep];
 
   case MASKING_MODE_IMAGE:
-    return m_MaskedImageHistogram;
+    return m_MaskedImageHistogramVector[timeStep];
 
   case MASKING_MODE_PLANARFIGURE:
-    return m_PlanarFigureHistogram;
+    return m_PlanarFigureHistogramVector[timeStep];
   }
 }
 
 
 const ImageStatisticsCalculator::Statistics &
-ImageStatisticsCalculator::GetStatistics() const
+ImageStatisticsCalculator::GetStatistics( unsigned int timeStep ) const
 {
+  if ( m_Image.IsNull() || (timeStep >= m_Image->GetTimeSteps()) )
+  {
+    return m_EmptyStatistics;
+  }
+
   switch ( m_MaskingMode )
   {
   case MASKING_MODE_NONE:
   default:
-    return m_ImageStatistics;
+    return m_ImageStatisticsVector[timeStep];
 
   case MASKING_MODE_IMAGE:
-    return m_MaskedImageStatistics;
+    return m_MaskedImageStatisticsVector[timeStep];
 
   case MASKING_MODE_PLANARFIGURE:
-    return m_PlanarFigureStatistics;
+    return m_PlanarFigureStatisticsVector[timeStep];
   }
 }
 
 
-void ImageStatisticsCalculator::ExtractImageAndMask()
+void ImageStatisticsCalculator::ExtractImageAndMask( unsigned int timeStep )
 {
   if ( m_Image.IsNull() )
   {
     throw std::runtime_error( "Error: image empty!" );
   }
 
+  if ( timeStep >= m_Image->GetTimeSteps() )
+  {
+    throw std::runtime_error( "Error: invalid time step!" );
+  }
+
+  ImageTimeSelector::Pointer imageTimeSelector = ImageTimeSelector::New();
+  imageTimeSelector->SetInput( m_Image );
+  imageTimeSelector->SetTimeNr( timeStep );
+  imageTimeSelector->UpdateLargestPossibleRegion();
+  mitk::Image *timeSliceImage = imageTimeSelector->GetOutput();
+
+
   switch ( m_MaskingMode )
   {
   case MASKING_MODE_NONE:
     {
-      m_InternalImage = m_Image;
+      m_InternalImage = timeSliceImage;
       m_InternalImageMask2D = NULL;
       m_InternalImageMask3D = NULL;
       break;
@@ -323,14 +378,27 @@ void ImageStatisticsCalculator::ExtractImageAndMask()
     {
       if ( m_ImageMask.IsNotNull() )
       {
-        m_InternalImage = m_Image;
-        CastToItkImage( m_ImageMask, m_InternalImageMask3D );
-        break;
+        if ( timeStep < m_ImageMask->GetTimeSteps() )
+        {
+          ImageTimeSelector::Pointer maskedImageTimeSelector = ImageTimeSelector::New();
+          maskedImageTimeSelector->SetInput( m_ImageMask );
+          maskedImageTimeSelector->SetTimeNr( timeStep );
+          maskedImageTimeSelector->UpdateLargestPossibleRegion();
+          mitk::Image *timeSliceMaskedImage = maskedImageTimeSelector->GetOutput();
+
+          m_InternalImage = timeSliceImage;
+          CastToItkImage( timeSliceMaskedImage, m_InternalImageMask3D );
+        }
+        else
+        {
+          throw std::runtime_error( "Error: image mask has not enough time steps!" );
+        }
       }
       else
       {
         throw std::runtime_error( "Error: image mask empty!" );
       }
+      break;
     }
 
   case MASKING_MODE_PLANARFIGURE:
@@ -346,7 +414,7 @@ void ImageStatisticsCalculator::ExtractImageAndMask()
         throw std::runtime_error( "Masking not possible for non-closed figures" );
       }
 
-      const Geometry3D *imageGeometry = m_Image->GetGeometry();
+      const Geometry3D *imageGeometry = timeSliceImage->GetGeometry();
       const PlaneGeometry *planarFigureGeometry = 
         dynamic_cast< const PlaneGeometry * >( m_PlanarFigure->GetGeometry() );
       if ( planarFigureGeometry == NULL )
@@ -372,7 +440,7 @@ void ImageStatisticsCalculator::ExtractImageAndMask()
 
       // Extract slice with given position and direction from image
       ExtractImageFilter::Pointer imageExtractor = ExtractImageFilter::New();
-      imageExtractor->SetInput( m_Image );
+      imageExtractor->SetInput( timeSliceImage );
       imageExtractor->SetSliceDimension( axis );
       imageExtractor->SetSliceIndex( slice );
       imageExtractor->Update();
@@ -426,7 +494,7 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsUnmasked(
   typename HistogramGeneratorType::Pointer histogramGenerator = HistogramGeneratorType::New();
   histogramGenerator->SetInput( image );
   histogramGenerator->SetMarginalScale( 100 ); // Defines y-margin width of histogram
-  histogramGenerator->SetNumberOfBins( 384 );
+  histogramGenerator->SetNumberOfBins( 768 ); // CT range [-1024, +2048] --> bin size 4 values
   histogramGenerator->SetHistogramMin( -1024.0 );
   histogramGenerator->SetHistogramMax( 2048.0 );
   histogramGenerator->Compute();

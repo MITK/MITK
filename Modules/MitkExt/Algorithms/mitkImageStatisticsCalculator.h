@@ -125,19 +125,28 @@ public:
   /** \brief Compute statistics (together with histogram) for the current
    * masking mode.
    *
-   * Computation is not executed if statistics is already up to date. */
-  virtual void ComputeStatistics();
+   * Computation is not executed if statistics is already up to date. In this
+   * case, false is returned; otherwise, true.*/
+  virtual bool ComputeStatistics( unsigned int timeStep = 0 );
 
 
   /** \brief Retrieve the histogram depending on the current masking mode. */
-  const HistogramType *GetHistogram() const;
+  const HistogramType *GetHistogram(  unsigned int timeStep = 0 ) const;
 
   /** \brief Retrieve statistics depending on the current masking mode. */
-  const Statistics &GetStatistics() const;
+  const Statistics &GetStatistics( unsigned int timeStep = 0 ) const;
 
 
   
 protected:
+  typedef std::vector< HistogramType::ConstPointer > HistogramVectorType;
+  typedef std::vector< Statistics > StatisticsVectorType;
+
+  typedef std::vector< itk::TimeStamp > TimeStampVectorType;
+  typedef std::vector< bool > BoolVectorType;
+
+
+
   typedef itk::Image< unsigned short, 3 > MaskImage3DType;
   typedef itk::Image< unsigned short, 2 > MaskImage2DType;
 
@@ -153,7 +162,7 @@ protected:
    * corresponding to the PlanarFigure will be extracted from the original
    * image. If masking is disabled, the original image is simply passed
    * through. */
-  void ExtractImageAndMask();
+  void ExtractImageAndMask( unsigned int timeStep = 0 );
 
 
   /** \brief If the passed vector matches any of the three principal axes
@@ -224,26 +233,24 @@ protected:
 
 
 
-
-  ImageTimeSelector::Pointer m_InputTimeSelector;
-
-
-
   Image::ConstPointer m_Image;
 
   mitk::Image::ConstPointer m_ImageMask;
 
   mitk::PlanarFigure::ConstPointer m_PlanarFigure;
 
-  HistogramType::ConstPointer m_ImageHistogram;
-  HistogramType::ConstPointer m_MaskedImageHistogram;
-  HistogramType::ConstPointer m_PlanarFigureHistogram;
+  HistogramVectorType m_ImageHistogramVector;
+  HistogramVectorType m_MaskedImageHistogramVector;
+  HistogramVectorType m_PlanarFigureHistogramVector;
 
   HistogramType::Pointer m_EmptyHistogram;
 
-  Statistics m_ImageStatistics;
-  Statistics m_MaskedImageStatistics;
-  Statistics m_PlanarFigureStatistics;
+
+  StatisticsVectorType m_ImageStatisticsVector;
+  StatisticsVectorType m_MaskedImageStatisticsVector;
+  StatisticsVectorType m_PlanarFigureStatisticsVector;
+
+  Statistics m_EmptyStatistics;
 
   unsigned int m_MaskingMode;
 
@@ -253,13 +260,13 @@ protected:
   MaskImage3DType::Pointer m_InternalImageMask3D;
   MaskImage2DType::Pointer m_InternalImageMask2D;
 
-  itk::TimeStamp m_ImageStatisticsTimeStamp;
-  itk::TimeStamp m_MaskedImageStatisticsTimeStamp;
-  itk::TimeStamp m_PlanarFigureStatisticsTimeStamp;
+  TimeStampVectorType m_ImageStatisticsTimeStampVector;
+  TimeStampVectorType m_MaskedImageStatisticsTimeStampVector;
+  TimeStampVectorType m_PlanarFigureStatisticsTimeStampVector;
 
-  bool m_TriggerImageStatisticsCalculation;
-  bool m_TriggerMaskedImageStatisticsCalculation;
-  bool m_TriggerPlanarFigureStatisticsCalculation;
+  BoolVectorType m_ImageStatisticsCalculationTriggerVector;
+  BoolVectorType m_MaskedImageStatisticsCalculationTriggerVector;
+  BoolVectorType m_PlanarFigureStatisticsCalculationTriggerVector;
 
 };
 

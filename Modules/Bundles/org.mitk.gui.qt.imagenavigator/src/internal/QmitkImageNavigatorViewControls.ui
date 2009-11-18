@@ -21,7 +21,20 @@
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="0">
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>Transversal</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1">
     <widget class="QmitkSliderNavigatorWidget" name="m_SliceNavigatorTransversal" native="true">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="minimumSize">
       <size>
        <width>0</width>
@@ -31,15 +44,57 @@
     </widget>
    </item>
    <item row="1" column="0">
-    <widget class="QmitkSliderNavigatorWidget" name="m_SliceNavigatorSagittal" native="true"/>
+    <widget class="QLabel" name="label_2">
+     <property name="text">
+      <string>Sagittal</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <widget class="QmitkSliderNavigatorWidget" name="m_SliceNavigatorSagittal" native="true">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+    </widget>
    </item>
    <item row="2" column="0">
-    <widget class="QmitkSliderNavigatorWidget" name="m_SliceNavigatorFrontal" native="true"/>
+    <widget class="QLabel" name="label_3">
+     <property name="text">
+      <string>Frontal</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1">
+    <widget class="QmitkSliderNavigatorWidget" name="m_SliceNavigatorFrontal" native="true">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+    </widget>
    </item>
    <item row="3" column="0">
-    <widget class="QmitkSliderNavigatorWidget" name="m_SliceNavigatorTime" native="true"/>
+    <widget class="QLabel" name="label_4">
+     <property name="text">
+      <string>Time</string>
+     </property>
+    </widget>
    </item>
-   <item row="4" column="0">
+   <item row="3" column="1">
+    <widget class="QmitkSliderNavigatorWidget" name="m_SliceNavigatorTime" native="true">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="1">
     <spacer name="verticalSpacer">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -47,7 +102,7 @@
      <property name="sizeHint" stdset="0">
       <size>
        <width>20</width>
-       <height>429</height>
+       <height>413</height>
       </size>
      </property>
     </spacer>

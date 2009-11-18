@@ -27,6 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <cherryIStructuredSelection.h>
 
 #include <mitkPlanarFigure.h>
+#include <mitkDataStorageSelection.h>
 #include "internal/mitkMeasurementSelectionProvider.h"
 
 #include <QmitkFunctionality.h>
@@ -52,7 +53,7 @@ Allows to measure distances, angles, etc.
 \sa QmitkFunctionality
 \ingroup org_mitk_gui_qt_measurement_internal
 */
-class QmitkMeasurement : public QObject, public QmitkFunctionality
+class QmitkMeasurement : public QObject, public QmitkFunctionality, public mitk::DataStorageSelection::Listener
 {
   Q_OBJECT
 
@@ -63,16 +64,41 @@ class QmitkMeasurement : public QObject, public QmitkFunctionality
     virtual ~QmitkMeasurement();
 
   public:
+
     void CreateQtPartControl(QWidget* parent);
     virtual void Visible();
     virtual void Hidden();
+    virtual void NodeChanged(const mitk::DataTreeNode* node);
+    virtual void NodeRemoved(const mitk::DataTreeNode* node);
+    virtual void NodeAddedInDataStorage(const mitk::DataTreeNode* node);
+    virtual void PlanarFigureInitialized();
+    virtual void AddFigureToDataStorage(mitk::PlanarFigure* figure, const QString& name);
 
     ///
-    /// Invoked when the DataManager selection changed
+    /// Invoked when the DataManager selection changed.
+    /// If an image is in the selection this will be set as the selected one for measurement,
+    /// If a planarfigure is in the selection its parent image will be set as the selected one for measurement.
+    /// All selected planarfigures will be added to m_SelectedPlanarFigures.
+    /// Then PlanarFigureSelectionChanged is called
     ///
     virtual void SelectionChanged(cherry::IWorkbenchPart::Pointer part
       , cherry::ISelection::ConstPointer selection);
-  
+
+
+  protected:
+    ///
+    /// Prints all features of the selected PlanarFigures into the TextBrowser.
+    /// For the last figure in the selection list:
+    ///  - Go to the corresponding slice and show figure
+    ///  - Draw info text on the bottom right side of the corresponding renderwindow
+    ///
+    void PlanarFigureSelectionChanged();
+    /// Draws a string on the bottom left side of the render window
+    ///
+    void SetMeasurementInfoToRenderWindow(const QString& text, QmitkRenderWindow* _RenderWindow);
+
+    bool AssertDrawingIsPossible(bool checked) const;
+
   protected slots:
     ///# draw actions
     void ActionDrawLineTriggered( bool checked = false );
@@ -86,15 +112,6 @@ class QmitkMeasurement : public QObject, public QmitkFunctionality
     void ActionDrawTextTriggered( bool checked = false ); 
     void CopyToClipboard( bool checked = false ); 
     // fields
-  protected:
-    /// Changes the m_SelectedPlanarFiguresLabel. Selects the last PlanarFigure in the selection
-    ///
-    void PlanarFigureSelectionChanged();
-    /// Draws a string on the bottom left side of the render window
-    ///
-    void setMeasurementInfo(const QString& text, QmitkRenderWindow* _RenderWindow);
-
-    void NewNodeInserted(mitk::DataTreeNode::Pointer node);
   // widgets
 protected:
   QGridLayout* m_Layout;
@@ -118,13 +135,11 @@ protected:
   cherry::ISelectionListener::Pointer m_SelectionListener;
   mitk::MeasurementSelectionProvider::Pointer m_SelectionProvider;
 
-  /// Holds all selected Planar figures
-  ///
-  DataTreeNodes m_SelectedPlanarFigures;
-
+  mitk::DataStorageSelection::Pointer m_SelectedPlanarFigures;
   /// Selected image on which measurements will be performed
   ///
   mitk::DataTreeNode::Pointer m_SelectedImageNode;
+  mitk::DataTreeNode::Pointer m_CurrentFigureNode;
 
   /// Counter variables to give a newly created Figure a unique name.
   ///
@@ -135,6 +150,7 @@ protected:
   unsigned int m_EllipseCounter;
   unsigned int m_RectangleCounter;
   unsigned int m_PolygonCounter;
+  unsigned int m_InitializedObserverTag;
 
 };
 

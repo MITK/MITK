@@ -81,6 +81,7 @@ SET(CPP_FILES
   DataManagement/mitkContourSet.cpp
   DataManagement/mitkCuboid.cpp
   DataManagement/mitkCylinder.cpp
+  DataManagement/mitkDataStorageSelection.cpp
   DataManagement/mitkDelegateManager.cpp
   DataManagement/mitkDrawOperation.cpp
   DataManagement/mitkEllipsoid.cpp

@@ -415,8 +415,19 @@ void ImageStatisticsCalculator::ExtractImageAndMask( unsigned int timeStep )
       }
 
       const Geometry3D *imageGeometry = timeSliceImage->GetGeometry();
+      if ( imageGeometry == NULL )
+      {
+        throw std::runtime_error( "Image geometry invalid!" );
+      }
+
+      const Geometry2D *planarFigureGeometry2D = m_PlanarFigure->GetGeometry2D();
+      if ( planarFigureGeometry2D == NULL )
+      {
+        throw std::runtime_error( "Planar-Figure not yet initialized!" );
+      }
+
       const PlaneGeometry *planarFigureGeometry = 
-        dynamic_cast< const PlaneGeometry * >( m_PlanarFigure->GetGeometry() );
+        dynamic_cast< const PlaneGeometry * >( planarFigureGeometry2D );
       if ( planarFigureGeometry == NULL )
       {
         throw std::runtime_error( "Non-planar planar figures not supported!" );
@@ -630,13 +641,11 @@ void ImageStatisticsCalculator::InternalCalculateMaskFromPlanarFigure(
         it != planarFigurePolyline->End();
         ++it )
   {
-    Point2D point2D;
     Point3D point3D;
 
-    // Convert index point to world coordinates and back to the local index
-    // coordinates of the selected image
-    planarFigureGeometry2D->IndexToWorld( it->Value(), point2D );
-    planarFigureGeometry2D->Map( point2D, point3D );
+    // Convert 2D point back to the local index coordinates of the selected
+    // image
+    planarFigureGeometry2D->Map( it->Value(), point3D );
 
     // Polygons (partially) outside of the image bounds can not be processed
     // further due to a bug in vtkPolyDataToImageStencil

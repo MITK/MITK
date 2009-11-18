@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define _QMITKIMAGENAVIGATORVIEW_H_INCLUDED
 
 #include <QmitkFunctionality.h>
+#include "QmitkStepperAdapter.h"
 
 #include <string>
 
@@ -69,6 +70,10 @@ protected:
   Ui::QmitkImageNavigatorViewControls m_Controls;
 
   QmitkStdMultiWidget* m_MultiWidget;
+  QmitkStepperAdapter* m_TransversalStepper;
+  QmitkStepperAdapter* m_SagittalStepper;
+  QmitkStepperAdapter* m_FrontalStepper;
+  QmitkStepperAdapter* m_TimeStepper;
 };
 
 

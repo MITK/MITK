@@ -22,7 +22,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "QmitkDataStorageComboBox.h"
 #include "QmitkStdMultiWidget.h"
-#include "QmitkStepperAdapter.h"
 
 #include <QMessageBox>
 
@@ -38,6 +37,10 @@ QmitkImageNavigatorView::QmitkImageNavigatorView()
 
 QmitkImageNavigatorView::~QmitkImageNavigatorView()
 {
+  delete m_TransversalStepper;
+  delete m_SagittalStepper;
+  delete m_FrontalStepper;
+  delete m_TimeStepper;
 }
 
 void QmitkImageNavigatorView::CreateQtPartControl(QWidget *parent)
@@ -52,10 +55,10 @@ void QmitkImageNavigatorView::StdMultiWidgetAvailable (QmitkStdMultiWidget &stdM
 {
   m_MultiWidget = &stdMultiWidget;
 
-  new QmitkStepperAdapter(m_Controls.m_SliceNavigatorTransversal, m_MultiWidget->mitkWidget1->GetSliceNavigationController()->GetSlice(), "sliceNavigatorTransversalFromSimpleExample");
-  new QmitkStepperAdapter(m_Controls.m_SliceNavigatorSagittal, m_MultiWidget->mitkWidget2->GetSliceNavigationController()->GetSlice(), "sliceNavigatorSagittalFromSimpleExample");
-  new QmitkStepperAdapter(m_Controls.m_SliceNavigatorFrontal, m_MultiWidget->mitkWidget3->GetSliceNavigationController()->GetSlice(), "sliceNavigatorFrontalFromSimpleExample");
-  new QmitkStepperAdapter(m_Controls.m_SliceNavigatorTime, m_MultiWidget->GetTimeNavigationController()->GetTime(), "sliceNavigatorTimeFromSimpleExample");
+  m_TransversalStepper = new QmitkStepperAdapter(m_Controls.m_SliceNavigatorTransversal, m_MultiWidget->mitkWidget1->GetSliceNavigationController()->GetSlice(), "sliceNavigatorTransversalFromSimpleExample");
+  m_SagittalStepper = new QmitkStepperAdapter(m_Controls.m_SliceNavigatorSagittal, m_MultiWidget->mitkWidget2->GetSliceNavigationController()->GetSlice(), "sliceNavigatorSagittalFromSimpleExample");
+  m_FrontalStepper = new QmitkStepperAdapter(m_Controls.m_SliceNavigatorFrontal, m_MultiWidget->mitkWidget3->GetSliceNavigationController()->GetSlice(), "sliceNavigatorFrontalFromSimpleExample");
+  m_TimeStepper = new QmitkStepperAdapter(m_Controls.m_SliceNavigatorTime, m_MultiWidget->GetTimeNavigationController()->GetTime(), "sliceNavigatorTimeFromSimpleExample");
 }
 
 void QmitkImageNavigatorView::StdMultiWidgetNotAvailable()

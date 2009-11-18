@@ -26,7 +26,7 @@ QmitkStepperAdapter::QmitkStepperAdapter( QObject * navigator, mitk::Stepper * s
   emit SendStepper(stepper);
 
   m_ItkEventListener = new ItkEventListener(this);
-  m_Stepper->AddObserver(itk::ModifiedEvent(), m_ItkEventListener);
+  m_ObserverTag = m_Stepper->AddObserver(itk::ModifiedEvent(), m_ItkEventListener);
 
   emit Refetch();
 }
@@ -34,5 +34,6 @@ QmitkStepperAdapter::QmitkStepperAdapter( QObject * navigator, mitk::Stepper * s
 QmitkStepperAdapter::~QmitkStepperAdapter()
 {
   m_ItkEventListener->Delete();
+  m_Stepper->RemoveObserver(m_ObserverTag);
 }
 

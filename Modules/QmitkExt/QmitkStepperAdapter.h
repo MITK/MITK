@@ -77,6 +77,7 @@ signals:
 
 protected:
   mitk::Stepper::Pointer m_Stepper;
+  long m_ObserverTag;
   friend class QmitkStepperAdapter::ItkEventListener;
 
   ItkEventListener::Pointer m_ItkEventListener;

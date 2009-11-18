@@ -403,7 +403,7 @@ namespace cherry
       ostringstream s; s << "Illegal // in m_Path m_Name '" << pathName << "'";
       throw invalid_argument(s.str());
     }
-    int strLength = pathName.length();
+    string::size_type strLength = pathName.length();
     if(pathName.length() > 1 && pathName[strLength-1] == '/')
     {
       ostringstream s; s << "Trailing / in m_Path m_Name '" << pathName << "'";

@@ -296,7 +296,7 @@ void QmitkSegmentationView::CreateNewSegmentation()
       // ask about the name and organ type of the new segmentation
       QmitkNewSegmentationDialog dialog( m_Parent ); // needs a QWidget as parent, "this" is not QWidget
 
-      std::string organlist_prefs = QString::fromStdString(m_SegmentationPreferencesNode->GetByteArray("Organ-Color-List",""));
+      std::string organlist_prefs = m_SegmentationPreferencesNode->GetByteArray("Organ-Color-List","");
       if (QString::fromStdString(organlist_prefs).contains(QString::fromStdString(ORGAN_COLOR_STRING)))
         ORGAN_COLOR_STRING=m_SegmentationPreferencesNode->GetByteArray("Organ-Color-List","");
 

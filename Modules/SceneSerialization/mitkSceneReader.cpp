@@ -15,8 +15,7 @@ bool mitk::SceneReader::LoadScene( TiXmlDocument& document, const std::string& w
   
   std::stringstream sceneReaderClassName;
   sceneReaderClassName << "SceneReaderV" << fileVersion;
-  LOG_INFO << "Trying to instantiate reader '" << sceneReaderClassName.str() << "'" << std::endl;
-  
+
   std::list<itk::LightObject::Pointer> sceneReaders = itk::ObjectFactoryBase::CreateAllInstance(sceneReaderClassName.str().c_str());
   if (sceneReaders.size() < 1)
   {
@@ -44,7 +43,5 @@ bool mitk::SceneReader::LoadScene( TiXmlDocument& document, const std::string& w
       }
     }
   }
-
   return false;
 }
-

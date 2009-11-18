@@ -38,11 +38,6 @@ std::string mitk::PropertyListSerializer::Serialize()
 {
   m_FailedProperties = PropertyList::New();
 
-  LOG_INFO << this->GetNameOfClass() 
-           << " is asked to serialize a property list " << (void*) this->m_PropertyList
-           << " into a directory " << m_WorkingDirectory
-           << " using a filename hint " << m_FilenameHint;
-
   if ( m_PropertyList.IsNull() && m_PropertyList->IsEmpty() )
   {
     LOG_ERROR << "Not serializing NULL or empty PropertyList";
@@ -163,4 +158,3 @@ mitk::PropertyList* mitk::PropertyListSerializer::GetFailedProperties()
     return NULL;
   }
 }
-

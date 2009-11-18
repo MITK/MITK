@@ -33,11 +33,6 @@ mitk::ImageSerializer::~ImageSerializer()
 
 std::string mitk::ImageSerializer::Serialize()
 {
-  LOG_INFO << this->GetNameOfClass() 
-           << " is asked to serialize an object " << (const void*) this->m_Data
-           << " into a directory '" << m_WorkingDirectory
-           << "' using a filename hint '" << m_FilenameHint << "'";
-
   const Image* image = dynamic_cast<const Image*>( m_Data.GetPointer() );
   if (!image)
   {

@@ -33,7 +33,6 @@ bool mitk::PropertyListDeserializer::Deserialize()
 {
   bool error(false);
 
-  LOG_INFO << "Reading " << m_Filename;
   TiXmlDocument document( m_Filename );
   if (!document.LoadFile())
   {
@@ -54,8 +53,7 @@ bool mitk::PropertyListDeserializer::Deserialize()
   
   std::stringstream propertyListDeserializerClassName;
   propertyListDeserializerClassName << "PropertyListDeserializerV" << fileVersion;
-  LOG_INFO << "Trying to instantiate reader '" << propertyListDeserializerClassName.str() << "'" << std::endl;
-  
+
   std::list<itk::LightObject::Pointer> readers = itk::ObjectFactoryBase::CreateAllInstance(propertyListDeserializerClassName.str().c_str());
   if (readers.size() < 1)
   {

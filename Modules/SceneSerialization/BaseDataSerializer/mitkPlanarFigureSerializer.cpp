@@ -37,11 +37,6 @@ mitk::PlanarFigureSerializer::~PlanarFigureSerializer()
 
 std::string mitk::PlanarFigureSerializer::Serialize()
 {
-  LOG_INFO << this->GetNameOfClass() 
-           << " is asked to serialize an object " << (const void*) this->m_Data
-           << " into a directory " << m_WorkingDirectory
-           << " using a filename hint " << m_FilenameHint;
-
   const PlanarFigure* pf = dynamic_cast<const PlanarFigure*>( m_Data.GetPointer() );
   if (pf == NULL)
   {
@@ -51,7 +46,6 @@ std::string mitk::PlanarFigureSerializer::Serialize()
   }
 
   std::string filename( this->GetUniqueFilenameInWorkingDirectory() );
-  LOG_INFO << "creating file " << filename << " in " << m_WorkingDirectory << std::endl;
   filename += "_";
   filename += m_FilenameHint;
   filename += ".pf";

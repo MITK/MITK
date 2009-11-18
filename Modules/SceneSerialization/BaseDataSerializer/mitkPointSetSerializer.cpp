@@ -33,11 +33,6 @@ mitk::PointSetSerializer::~PointSetSerializer()
 
 std::string mitk::PointSetSerializer::Serialize()
 {
-  LOG_INFO << this->GetNameOfClass() 
-           << " is asked to serialize an object " << (const void*) this->m_Data
-           << " into a directory " << m_WorkingDirectory
-           << " using a filename hint " << m_FilenameHint;
-
   const PointSet* ps = dynamic_cast<const PointSet *>( m_Data.GetPointer() );
   if (ps == NULL)
   {
@@ -47,7 +42,6 @@ std::string mitk::PointSetSerializer::Serialize()
   }
 
   std::string filename( this->GetUniqueFilenameInWorkingDirectory() );
-  LOG_INFO << "creating file " << filename << " in " << m_WorkingDirectory << std::endl;
   filename += "_";
   filename += m_FilenameHint;
   filename += ".mps";

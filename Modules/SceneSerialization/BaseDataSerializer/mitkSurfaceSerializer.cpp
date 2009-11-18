@@ -35,11 +35,6 @@ mitk::SurfaceSerializer::~SurfaceSerializer()
 
 std::string mitk::SurfaceSerializer::Serialize()
 {
-  LOG_INFO << this->GetNameOfClass() 
-           << " is asked to serialize an object " << (const void*) this->m_Data
-           << " into a directory " << m_WorkingDirectory
-           << " using a filename hint " << m_FilenameHint;
-
   const Surface* surface = dynamic_cast<const Surface*>( m_Data.GetPointer() );
   if (!surface)
   {
@@ -49,7 +44,6 @@ std::string mitk::SurfaceSerializer::Serialize()
   }
 
   std::string filename( this->GetUniqueFilenameInWorkingDirectory() );
-std::cout << "creating file " << filename << " in " << m_WorkingDirectory << std::endl;
   filename += "_";
   filename += m_FilenameHint;
   filename += ".vtp";

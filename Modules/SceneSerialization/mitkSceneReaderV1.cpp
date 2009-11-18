@@ -32,8 +32,6 @@ bool mitk::SceneReaderV1::LoadScene( TiXmlDocument& document, const std::string&
 
   // TODO prepare to detect errors (such as cycles) from wrongly written or edited xml files
 
-  LOG_INFO << "Reading objects for MITK scene from '" << workingDirectory << "'";
-
   // iterate all nodes
   // first level nodes should be <node> elements
   for( TiXmlElement* element = document.FirstChildElement("node"); element != NULL; element = element->NextSiblingElement("node") )
@@ -82,8 +80,6 @@ bool mitk::SceneReaderV1::LoadScene( TiXmlDocument& document, const std::string&
     error |= DecorateNodeWithProperties(node, element, workingDirectory);
   } // end for all <node>
     
-  LOG_INFO << "Recreating nodes hierarchy in DataStorage.";
-  
   // remove all unknown parent UIDs
   for (NodesAndParentsMapType::iterator nodesIter = m_Nodes.begin();
        nodesIter != m_Nodes.end();

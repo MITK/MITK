@@ -117,7 +117,6 @@ mitk::DataStorage::Pointer mitk::SceneIO::LoadScene( const std::string& filename
     LOG_ERROR << "Could not create temporary directory. Cannot open scene files.";
     return NULL;
   }
-  LOG_INFO << "Unzipping scene file to " << m_WorkingDirectory;
 
   // unzip all filenames contents to temp dir
   m_UnzipErrors = 0;
@@ -135,7 +134,6 @@ mitk::DataStorage::Pointer mitk::SceneIO::LoadScene( const std::string& filename
 
   // test if index.xml exists
   // parse index.xml with TinyXML
-  LOG_INFO << "Reading " << m_WorkingDirectory << Poco::Path::separator() + "index.xml" << std::endl;
   TiXmlDocument document( m_WorkingDirectory + Poco::Path::separator() + "index.xml" );
   if (!document.LoadFile())
   {
@@ -425,10 +423,6 @@ TiXmlElement* mitk::SceneIO::SaveBaseData( BaseData* data, const std::string& fi
   {
     LOG_ERROR << "No serializer found for " << data->GetNameOfClass() << ". Skipping object";
   }
-  if (thingsThatCanSerializeThis.size() > 1)
-  {
-    LOG_INFO << "Multiple serializers found for " << data->GetNameOfClass() << "Using arbitrary first one.";
-  }
 
   for ( std::list<itk::LightObject::Pointer>::iterator iter = thingsThatCanSerializeThis.begin();
         iter != thingsThatCanSerializeThis.end();
@@ -507,5 +501,5 @@ void mitk::SceneIO::OnUnzipError(const void*  /*pSender*/, std::pair<const Poco:
 
 void mitk::SceneIO::OnUnzipOk(const void*  /*pSender*/, std::pair<const Poco::Zip::ZipLocalFileHeader, const Poco::Path>& info)
 {
-  LOG_INFO << "Unzipped ok: " << info.second.toString();
+  // LOG_INFO << "Unzipped ok: " << info.second.toString();
 }

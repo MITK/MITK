@@ -38,7 +38,6 @@ bool mitk::PropertyListDeserializerV1::Deserialize()
 
   m_PropertyList = PropertyList::New();
 
-  LOG_INFO << "Reading " << m_Filename;
   TiXmlDocument document( m_Filename );
   if (!document.LoadFile())
   {
@@ -54,13 +53,10 @@ bool mitk::PropertyListDeserializerV1::Deserialize()
     const char* typea = propertyElement->Attribute("type");
     std::string type( typea ? typea : "");
 
-    LOG_INFO << "Parsing a property called '" << key << "' of type " << type;
-
     // hand propertyElement to specific reader
     std::stringstream propertyDeserializerClassName;
     propertyDeserializerClassName << type << "Deserializer";
-    LOG_INFO << "Trying to instantiate reader '" << propertyDeserializerClassName.str() << "'" << std::endl;
-    
+
     std::list<itk::LightObject::Pointer> readers = itk::ObjectFactoryBase::CreateAllInstance(propertyDeserializerClassName.str().c_str());
     if (readers.size() < 1)
     {
@@ -92,7 +88,5 @@ bool mitk::PropertyListDeserializerV1::Deserialize()
       }
     }
   }
-
   return !error;
 }
-

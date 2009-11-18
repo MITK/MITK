@@ -119,18 +119,12 @@ mitk::TransferFunction::Pointer mitk::TransferFunctionPropertyDeserializer::Dese
     {
       LOG_WARN << "Transferfunction file " << filePath << " does not contain version information! Trying version 1 format.";
     }
-    else
-    {
-      LOG_INFO << "Transferfunction file " << filePath << " is of version " << fileVersion;
-    }
   }
   
   TiXmlElement* input =  document.FirstChildElement("TransferFunction");
   
-  TransferFunctionPropertyDeserializer::Pointer tfpd=TransferFunctionPropertyDeserializer::New();
-  
+  TransferFunctionPropertyDeserializer::Pointer tfpd = TransferFunctionPropertyDeserializer::New();
   BaseProperty::Pointer bp = tfpd->Deserialize(input);
-  
   TransferFunctionProperty::Pointer tfp = dynamic_cast<TransferFunctionProperty*>(bp.GetPointer());
   
   if(tfp.IsNotNull())
@@ -138,14 +132,9 @@ mitk::TransferFunction::Pointer mitk::TransferFunctionPropertyDeserializer::Dese
     TransferFunction::Pointer tf = tfp->GetValue();
     return tf;
   }
-
-  LOG_WARN << "Can't deserialize transferfunction";
-  
+  LOG_WARN << "Can't deserialize transferfunction"; 
   return NULL;
 }
-
 } // namespace
-
 // important to put this into the GLOBAL namespace (because it starts with 'namespace mitk')
 MITK_REGISTER_SERIALIZER(TransferFunctionPropertyDeserializer);
-

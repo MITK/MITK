@@ -39,6 +39,7 @@
 #include <QmitkFileOpenAction.h>
 #include <QmitkFileSaveProjectAction.h>
 #include <QmitkFileExitAction.h>
+#include <QmitkCloseProjectAction.h>
 #include <QmitkStatusBar.h>
 #include <QmitkProgressBar.h>
 #include <QmitkMemoryUsageIndicatorView.h>
@@ -198,6 +199,9 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
   QAction* fileSaveProjectAction = new QmitkFileSaveProjectAction(window);
   fileSaveProjectAction->setIcon(QIcon(":/org.mitk.gui.qt.ext/document-save.png"));
   fileMenu->addAction(fileSaveProjectAction);
+  QAction* closeProjectAction = new QmitkCloseProjectAction(window);
+  closeProjectAction->setIcon(QIcon(":/org.mitk.gui.qt.ext/document-new.png"));
+  fileMenu->addAction(closeProjectAction);
   fileMenu->addSeparator();
   fileMenu->addAction(new QmitkFileExitAction(window));
 
@@ -212,16 +216,18 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
       "&Undo",
       QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onUndo()),
       QKeySequence("CTRL+Z"));
+  
   QAction* redoAction = editMenu->addAction(QIcon(":/org.mitk.gui.qt.ext/edit-redo.png")
       , "&Redo",
       QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onRedo()),
       QKeySequence("CTRL+Y"));
-
+  
   // toolbar for showing file open, undo, redo and other main actions
   QToolBar* mainActionsToolBar = new QToolBar;
   mainActionsToolBar->setToolButtonStyle ( Qt::ToolButtonTextBesideIcon );
   mainActionsToolBar->addAction(fileOpenAction);
   mainActionsToolBar->addAction(fileSaveProjectAction);
+  mainActionsToolBar->addAction(closeProjectAction);  
   mainActionsToolBar->addAction(undoAction);
   mainActionsToolBar->addAction(redoAction);
   mainWindow->addToolBar(mainActionsToolBar);

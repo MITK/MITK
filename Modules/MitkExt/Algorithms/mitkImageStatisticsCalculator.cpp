@@ -53,7 +53,8 @@ namespace mitk
 {
 
 ImageStatisticsCalculator::ImageStatisticsCalculator()
-: m_MaskingMode( MASKING_MODE_NONE )
+: m_MaskingMode( MASKING_MODE_NONE ),
+  m_MaskingModeChanged( false )
 { 
   m_EmptyHistogram = HistogramType::New();
   HistogramType::SizeType histogramSize;
@@ -151,11 +152,23 @@ void ImageStatisticsCalculator::SetPlanarFigure( const mitk::PlanarFigure *plana
 }
 
 
+void ImageStatisticsCalculator::SetMaskingMode( unsigned int mode )
+{
+  if ( m_MaskingMode != mode )
+  {
+    m_MaskingMode = mode;
+    m_MaskingModeChanged = true;
+    this->Modified();
+  }
+}
+
+
 void ImageStatisticsCalculator::SetMaskingModeToNone()
 {
   if ( m_MaskingMode != MASKING_MODE_NONE )
   {
     m_MaskingMode = MASKING_MODE_NONE;
+    m_MaskingModeChanged = true;
     this->Modified();
   }
 }
@@ -166,6 +179,7 @@ void ImageStatisticsCalculator::SetMaskingModeToImage()
   if ( m_MaskingMode != MASKING_MODE_IMAGE )
   {
     m_MaskingMode = MASKING_MODE_IMAGE;
+    m_MaskingModeChanged = true;
     this->Modified();
   }
 }
@@ -176,6 +190,7 @@ void ImageStatisticsCalculator::SetMaskingModeToPlanarFigure()
   if ( m_MaskingMode != MASKING_MODE_PLANARFIGURE )
   {
     m_MaskingMode = MASKING_MODE_PLANARFIGURE;
+    m_MaskingModeChanged = true;
     this->Modified();
   }
 }
@@ -207,8 +222,20 @@ bool ImageStatisticsCalculator::ComputeStatistics( unsigned int timeStep )
     && ((m_MaskingMode != MASKING_MODE_PLANARFIGURE) || (planarFigureMTime > m_PlanarFigure->GetMTime() && !planarFigureStatisticsCalculationTrigger)) )
   {
     // Statistics is up to date!
-    return false;
+    if ( m_MaskingModeChanged )
+    {
+      m_MaskingModeChanged = false;
+      return true;
+    }
+    else
+    {
+      return false;
+    }
   }
+
+  // Reset state changed flag
+  m_MaskingModeChanged = false;
+
 
   // Depending on masking mode, extract and/or generate the required image
   // and mask data from the user input

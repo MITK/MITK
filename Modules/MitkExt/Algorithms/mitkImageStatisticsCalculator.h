@@ -106,7 +106,7 @@ public:
 
 
   /** \brief Set/Get operation mode for masking */
-  itkSetMacro( MaskingMode, unsigned int );
+  void SetMaskingMode( unsigned int mode );
 
   /** \brief Set/Get operation mode for masking */
   itkGetMacro( MaskingMode, unsigned int );
@@ -253,6 +253,7 @@ protected:
   Statistics m_EmptyStatistics;
 
   unsigned int m_MaskingMode;
+  bool m_MaskingModeChanged;
 
   
   mitk::Image::ConstPointer m_InternalImage;

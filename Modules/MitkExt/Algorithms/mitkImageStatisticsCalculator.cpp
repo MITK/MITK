@@ -202,11 +202,19 @@ bool ImageStatisticsCalculator::ComputeStatistics( unsigned int timeStep )
   bool maskedImageStatisticsCalculationTrigger = m_MaskedImageStatisticsCalculationTriggerVector[timeStep];
   bool planarFigureStatisticsCalculationTrigger = m_PlanarFigureStatisticsCalculationTriggerVector[timeStep];
 
+  std::cout << "PF TRIGGER: " << planarFigureStatisticsCalculationTrigger << std::endl;
+  if ( m_PlanarFigure.IsNotNull() )
+  {
+    std::cout << "PF MTIME: " << m_PlanarFigure->GetMTime() << std::endl;
+  }
+
+
   if ( ((m_MaskingMode != MASKING_MODE_NONE) || (imageMTime > m_Image->GetMTime() && !imageStatisticsCalculationTrigger))
     && ((m_MaskingMode != MASKING_MODE_IMAGE) || (maskedImageMTime > m_ImageMask->GetMTime() && !maskedImageStatisticsCalculationTrigger))
     && ((m_MaskingMode != MASKING_MODE_PLANARFIGURE) || (planarFigureMTime > m_PlanarFigure->GetMTime() && !planarFigureStatisticsCalculationTrigger)) )
   {
     // Statistics is up to date!
+    std::cout << "STATS UP TO DATE!" << std::endl;
     return false;
   }
 
@@ -591,6 +599,7 @@ template < typename TPixel, unsigned int VImageDimension >
 void ImageStatisticsCalculator::InternalCalculateMaskFromPlanarFigure(
   const itk::Image< TPixel, VImageDimension > *image, unsigned int axis )
 {
+  std::cout << "RECALCULATING PLANARFIGURE STATS" << std::endl;
   typedef itk::Image< TPixel, VImageDimension > ImageType;
 
   typedef itk::CastImageFilter< ImageType, MaskImage2DType > CastFilterType;

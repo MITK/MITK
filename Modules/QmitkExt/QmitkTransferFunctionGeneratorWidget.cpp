@@ -36,7 +36,7 @@ QmitkTransferFunctionGeneratorWidget::QmitkTransferFunctionGeneratorWidget(QWidg
   // Threshold Tab
   {
     connect( m_CrossThreshold, SIGNAL( SignalDeltaMove( int, int ) ), this, SLOT( OnDeltaThreshold( int, int ) ) );
-    thDelta = 1;
+    thDelta = 100;
   }
    
   // Presets Tab

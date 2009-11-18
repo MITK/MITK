@@ -282,7 +282,7 @@ void QmitkMeasurement::SelectionChanged(
   else
   {
     m_SelectedImage->setText(
-        "None selected. Please select an image.");
+        "None. Please select an image.");
 
     m_DrawActionsToolBar->setEnabled(false);
   }

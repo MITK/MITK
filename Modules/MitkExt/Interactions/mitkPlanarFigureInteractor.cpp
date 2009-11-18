@@ -300,8 +300,10 @@ bool mitk::PlanarFigureInteractor
       {
         // Initial placement finished: deselect control point and send an
         // InitializeEvent to notify application listeners
+        planarFigure->Modified();
         planarFigure->DeselectControlPoint();
         planarFigure->InvokeEvent( itk::InitializeEvent() );
+        planarFigure->InvokeEvent( itk::EndEvent() );
         this->HandleEvent( new mitk::StateEvent( EIDYES, stateEvent->GetEvent() ) );
       }
       else
@@ -372,6 +374,10 @@ bool mitk::PlanarFigureInteractor
   case AcDESELECTPOINT:
     {
       planarFigure->DeselectControlPoint();
+
+      // Issue event so that listeners may update themselves
+      planarFigure->Modified();
+      planarFigure->InvokeEvent( itk::EndEvent() );
 
       // falls through
     }

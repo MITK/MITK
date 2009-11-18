@@ -185,27 +185,33 @@ void QmitkInteractiveSegmentationView::CreateNewSegmentation()
     mitk::Image::Pointer image = dynamic_cast<mitk::Image*>( node->GetData() );
     if (image.IsNotNull())
     {
-
-      // ask about the name and organ type of the new segmentation
-      QmitkNewSegmentationDialog dialog( m_Parent ); // needs a QWidget as parent, "this" is not QWidget
-      int dialogReturnValue = dialog.exec();
-
-      if ( dialogReturnValue == QDialog::Rejected ) return; // user clicked cancel or pressed Esc or something similar
-
-      // ask the user about an organ type and name, add this information to the image's (!) propertylist
-      // create a new image of the same dimensions and smallest possible pixel type
-      mitk::ToolManager* toolManager = m_Controls->m_ToolReferenceDataSelectionBox->GetToolManager();
-      mitk::Tool* firstTool = toolManager->GetToolById(0);
-      if (firstTool)
+      if (image->GetDimension()>2)
       {
-        mitk::DataTreeNode::Pointer emptySegmentation =
-          firstTool->CreateEmptySegmentationNode( image, dialog.GetSegmentationName(), dialog.GetColorProperty() );
+        // ask about the name and organ type of the new segmentation
+        QmitkNewSegmentationDialog dialog( m_Parent ); // needs a QWidget as parent, "this" is not QWidget
+        int dialogReturnValue = dialog.exec();
 
-        if (!emptySegmentation) return; // could be aborted by user
+        if ( dialogReturnValue == QDialog::Rejected ) return; // user clicked cancel or pressed Esc or something similar
 
-        this->GetDefaultDataStorage()->Add( emptySegmentation, node ); // add as a child, because the segmentation "derives" from the original
+        // ask the user about an organ type and name, add this information to the image's (!) propertylist
+        // create a new image of the same dimensions and smallest possible pixel type
+        mitk::ToolManager* toolManager = m_Controls->m_ToolReferenceDataSelectionBox->GetToolManager();
+        mitk::Tool* firstTool = toolManager->GetToolById(0);
+        if (firstTool)
+        {
+          mitk::DataTreeNode::Pointer emptySegmentation =
+            firstTool->CreateEmptySegmentationNode( image, dialog.GetSegmentationName(), dialog.GetColorProperty() );
 
-        m_Controls->m_ToolReferenceDataSelectionBox->GetToolManager()->SetWorkingData( emptySegmentation );
+          if (!emptySegmentation) return; // could be aborted by user
+
+          this->GetDefaultDataStorage()->Add( emptySegmentation, node ); // add as a child, because the segmentation "derives" from the original
+
+          m_Controls->m_ToolReferenceDataSelectionBox->GetToolManager()->SetWorkingData( emptySegmentation );
+        }
+      }
+      else
+      {
+        QMessageBox::information(NULL,"Segmentation","Currently 2D images are not supported for segmentation");
       }
     }
   }

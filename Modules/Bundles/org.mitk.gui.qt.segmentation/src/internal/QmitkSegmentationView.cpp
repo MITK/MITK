@@ -293,53 +293,60 @@ void QmitkSegmentationView::CreateNewSegmentation()
     mitk::Image::Pointer image = dynamic_cast<mitk::Image*>( node->GetData() );
     if (image.IsNotNull())
     {
-      // ask about the name and organ type of the new segmentation
-      QmitkNewSegmentationDialog dialog( m_Parent ); // needs a QWidget as parent, "this" is not QWidget
-
-      std::string organlist_prefs = m_SegmentationPreferencesNode->GetByteArray("Organ-Color-List","");
-      if (QString::fromStdString(organlist_prefs).contains(QString::fromStdString(ORGAN_COLOR_STRING)))
-        ORGAN_COLOR_STRING=m_SegmentationPreferencesNode->GetByteArray("Organ-Color-List","");
-
-      QString organColorQString = QString::fromStdString(ORGAN_COLOR_STRING);
-
-      organColorList = organColorQString.split(";");
-
-      dialog.SetSuggestionList(organColorList);
-      int dialogReturnValue = dialog.exec();
-
-      if ( dialogReturnValue == QDialog::Rejected ) return; // user clicked cancel or pressed Esc or something similar
-
-      // ask the user about an organ type and name, add this information to the image's (!) propertylist
-      // create a new image of the same dimensions and smallest possible pixel type
-      mitk::ToolManager* toolManager = m_Controls->m_ManualToolSelectionBox->GetToolManager();
-      mitk::Tool* firstTool = toolManager->GetToolById(0);
-      if (firstTool)
+      if (image->GetDimension()>2)
       {
-        try
+        // ask about the name and organ type of the new segmentation
+        QmitkNewSegmentationDialog dialog( m_Parent ); // needs a QWidget as parent, "this" is not QWidget
+
+        std::string organlist_prefs = m_SegmentationPreferencesNode->GetByteArray("Organ-Color-List","");
+        if (QString::fromStdString(organlist_prefs).contains(QString::fromStdString(ORGAN_COLOR_STRING)))
+          ORGAN_COLOR_STRING=m_SegmentationPreferencesNode->GetByteArray("Organ-Color-List","");
+
+        QString organColorQString = QString::fromStdString(ORGAN_COLOR_STRING);
+
+        organColorList = organColorQString.split(";");
+
+        dialog.SetSuggestionList(organColorList);
+        int dialogReturnValue = dialog.exec();
+
+        if ( dialogReturnValue == QDialog::Rejected ) return; // user clicked cancel or pressed Esc or something similar
+
+        // ask the user about an organ type and name, add this information to the image's (!) propertylist
+        // create a new image of the same dimensions and smallest possible pixel type
+        mitk::ToolManager* toolManager = m_Controls->m_ManualToolSelectionBox->GetToolManager();
+        mitk::Tool* firstTool = toolManager->GetToolById(0);
+        if (firstTool)
         {
-          mitk::DataTreeNode::Pointer emptySegmentation =
-            firstTool->CreateEmptySegmentationNode( image, dialog.GetSegmentationName(), dialog.GetColorProperty() );
+          try
+          {
+            mitk::DataTreeNode::Pointer emptySegmentation =
+              firstTool->CreateEmptySegmentationNode( image, dialog.GetSegmentationName(), dialog.GetColorProperty() );
 
-          ExtendOrganList(dialog.GetSegmentationName(),dialog.GetColorProperty());
+            ExtendOrganList(dialog.GetSegmentationName(),dialog.GetColorProperty());
 
-          m_SegmentationPreferencesNode->PutByteArray("Organ-Color-List",ORGAN_COLOR_STRING);
-          m_SegmentationPreferencesNode->Flush();
+            m_SegmentationPreferencesNode->PutByteArray("Organ-Color-List",ORGAN_COLOR_STRING);
+            m_SegmentationPreferencesNode->Flush();
 
-          if (!emptySegmentation) return; // could be aborted by user
+            if (!emptySegmentation) return; // could be aborted by user
 
-          ApplyDisplayOptions(emptySegmentation);
+            ApplyDisplayOptions(emptySegmentation);
 
-          this->GetDefaultDataStorage()->Add( emptySegmentation, node ); // add as a child, because the segmentation "derives" from the original
+            this->GetDefaultDataStorage()->Add( emptySegmentation, node ); // add as a child, because the segmentation "derives" from the original
 
-          // TODO select this new segmentation in data manager
-          SendSelectedEvent( node, emptySegmentation );
+            // TODO select this new segmentation in data manager
+            SendSelectedEvent( node, emptySegmentation );
 
-          m_Controls->m_ManualToolSelectionBox->GetToolManager()->SetWorkingData( emptySegmentation );
+            m_Controls->m_ManualToolSelectionBox->GetToolManager()->SetWorkingData( emptySegmentation );
+          }
+          catch (std::bad_alloc)
+          {
+            QMessageBox::warning(NULL,"Create new segmentation","Could not allocate memory for new segmentation");
+          }
         }
-        catch (std::bad_alloc)
-        {
-          QMessageBox::warning(NULL,"Create new segmentation","Could not allocate memory for new segmentation");
-        }
+      }
+      else
+      {
+        QMessageBox::information(NULL,"Segmentation","Segmentation is currently not supported for 2D images");
       }
     }
   }

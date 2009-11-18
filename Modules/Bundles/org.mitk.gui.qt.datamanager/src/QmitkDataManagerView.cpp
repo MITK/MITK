@@ -759,18 +759,18 @@ void QmitkDataManagerView::NodeTreeViewRowsInserted( const QModelIndex & parent,
 
 void QmitkDataManagerView::NodeSelectionChanged( const QItemSelection & selected, const QItemSelection & deselected )
 {
-  QModelIndexList indexesOfSelectedRows = deselected.indexes();
+  std::vector<mitk::DataTreeNode*> nodes = m_NodeTreeModel->GetNodeSet();
   mitk::DataTreeNode* node = 0;
 
-  for (QModelIndexList::iterator it = indexesOfSelectedRows.begin()
-    ; it != indexesOfSelectedRows.end(); it++)
+  for (std::vector<mitk::DataTreeNode*>::iterator it = nodes.begin()
+    ; it != nodes.end(); it++)
   {
-    node = m_NodeTreeModel->GetNode(*it);
+    node = *it;
     if ( node )
       node->SetBoolProperty("selected", false);
   }
 
-  indexesOfSelectedRows = selected.indexes();
+  QModelIndexList indexesOfSelectedRows = selected.indexes();
   for (QModelIndexList::iterator it = indexesOfSelectedRows.begin()
     ; it != indexesOfSelectedRows.end(); it++)
   {

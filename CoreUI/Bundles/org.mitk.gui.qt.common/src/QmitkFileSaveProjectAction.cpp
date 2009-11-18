@@ -22,6 +22,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkSceneIO.h"
 #include "mitkProgressBar.h"
+#include <mitkNodePredicateNOT.h>
+#include <mitkNodePredicateProperty.h>
+#include <mitkProperties.h>
 
 #include <mitkCoreObjectFactory.h>
 #include <mitkDataStorageEditorInput.h>
@@ -36,7 +39,7 @@ QmitkFileSaveProjectAction::QmitkFileSaveProjectAction(cherry::IWorkbenchWindow:
   m_Window = window;
   this->setParent(static_cast<QWidget*>(m_Window->GetShell()->GetControl()));
   this->setText("&Save Project...");
-
+  this->setToolTip("Save content of Data Manager as a .mitk project file");
   m_Window = window;
 
   this->connect(this, SIGNAL(triggered(bool)), this, SLOT(Run()));
@@ -72,7 +75,13 @@ void QmitkFileSaveProjectAction::Run()
     }
 
     mitk::ProgressBar::GetInstance()->AddStepsToDo(2);
-    if ( !sceneIO->SaveScene( storage->GetAll(), storage, fileName.toLocal8Bit().constData() ) )
+
+    /* Build list of nodes that should be saved */
+    
+    mitk::NodePredicateNOT::Pointer isNotHelperObject = mitk::NodePredicateNOT::New(mitk::NodePredicateProperty::New("helper object", mitk::BoolProperty::New(true)));
+
+    mitk::DataStorage::SetOfObjects::ConstPointer nodesToBeSaved = storage->GetSubset(isNotHelperObject);
+    if ( !sceneIO->SaveScene( nodesToBeSaved, storage, fileName.toLocal8Bit().constData() ) )
     {
       QMessageBox::information(NULL,
         "Scene saving",

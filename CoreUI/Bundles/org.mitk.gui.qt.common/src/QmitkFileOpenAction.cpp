@@ -58,6 +58,7 @@ void QmitkFileOpenAction::init(cherry::IWorkbenchWindow::Pointer window)
   m_Window = window;
   this->setParent(static_cast<QWidget*>(m_Window->GetShell()->GetControl()));
   this->setText("&Open...");
+  this->setToolTip("Open data files (images, surfaces,...) and project files (.mitk)");
 
   cherry::IPreferencesService::Pointer prefService
     = cherry::Platform::GetServiceRegistry()

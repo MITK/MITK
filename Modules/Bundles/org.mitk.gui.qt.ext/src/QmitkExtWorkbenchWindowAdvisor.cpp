@@ -216,12 +216,12 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
       "&Undo",
       QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onUndo()),
       QKeySequence("CTRL+Z"));
-  
+  undoAction->setToolTip("Undo the last action (not supported by all modules)");
   QAction* redoAction = editMenu->addAction(QIcon(":/org.mitk.gui.qt.ext/edit-redo.png")
       , "&Redo",
       QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onRedo()),
       QKeySequence("CTRL+Y"));
-  
+  redoAction->setToolTip("execute the last action that was undone again (not supported by all modules)");
   // toolbar for showing file open, undo, redo and other main actions
   QToolBar* mainActionsToolBar = new QToolBar;
   mainActionsToolBar->setToolButtonStyle ( Qt::ToolButtonTextBesideIcon );

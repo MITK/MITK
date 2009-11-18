@@ -316,3 +316,9 @@ void QmitkRenderWindow::OnUpdateCrosshairState( bool state )
   if( m_MenuWidget )
     m_MenuWidget->UpdateCrosshairState( state );
 }
+
+void QmitkRenderWindow::FullScreenMode(bool state)
+{
+  if( m_MenuWidget )
+    m_MenuWidget->ChangeFullScreenMode( state );
+}

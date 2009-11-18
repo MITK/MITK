@@ -250,6 +250,10 @@ void QmitkRenderWindowMenu::SetLayoutIndex( unsigned int layoutIndex )
   m_Layout = layoutIndex;
 }
 
+void QmitkRenderWindowMenu::ChangeFullScreenMode( bool state )
+{
+  this->OnFullScreenButton( state );
+}
 /// \brief
 void QmitkRenderWindowMenu::OnFullScreenButton( bool  /*checked*/ )
 {

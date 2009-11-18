@@ -80,6 +80,8 @@ public:
   /*! Update Crosshair mode in contex menu. */
   void UpdateCrosshairState( bool state ) ;
 
+  void ChangeFullScreenMode( bool state );
+
 
 protected:
 

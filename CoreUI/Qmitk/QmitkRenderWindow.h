@@ -89,6 +89,8 @@ public:
   bool GetActivateMenuWidgetFlag()
   {  return m_MenuWidgetActivated; }
 
+  void FullScreenMode( bool state );
+
 protected:
 
     // overloaded resize handler

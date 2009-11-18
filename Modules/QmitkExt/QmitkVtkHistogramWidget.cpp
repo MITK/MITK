@@ -168,13 +168,40 @@ void QmitkVtkHistogramWidget::UpdateItemModelFromHistogram()
     return;
   }
 
-  m_ItemModel->setRowCount( m_DerivedHistogram->Size() );
-
+  // Determine non-zero range of histogram
+  unsigned int startIndex = 0, endIndex = 0, i = 0;
+  HistogramConstIteratorType startIt = m_DerivedHistogram->End();
+  HistogramConstIteratorType endIt = m_DerivedHistogram->End();
   HistogramConstIteratorType it;
-  unsigned int i;
-  for ( it = m_DerivedHistogram->Begin(), i = 0;
-        it != m_DerivedHistogram->End();
-        ++it, ++i )
+  bool firstNonEmptyBinFound = false;
+  for ( it = m_DerivedHistogram->Begin(); it != m_DerivedHistogram->End(); ++it, ++i )
+  {
+    if ( it.GetFrequency() > 0.0 )
+    {
+      endIt = it;
+      endIndex = i;
+      if ( !firstNonEmptyBinFound )
+      {
+        firstNonEmptyBinFound = true;
+        startIt = it;
+        startIndex = i;
+      }
+    }
+  }
+  ++endIt;
+
+  // For empty image / mask: clear histogram
+  if ( startIt == m_DerivedHistogram->End() )
+  {
+    this->ClearItemModel();
+    return;
+  }
+
+  // Allocate data in item model
+  m_ItemModel->setRowCount( endIndex + 1 - startIndex );
+
+  // Fill item model with histogram data
+  for ( it = startIt, i = 0; it != endIt; ++it, ++i )
   {
     const float &frequency = it.GetFrequency();
     const double &measurement = it.GetMeasurementVector()[0];

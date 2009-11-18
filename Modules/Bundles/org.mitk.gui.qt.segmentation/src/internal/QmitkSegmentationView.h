@@ -22,9 +22,7 @@ class QmitkSegmentationView : public QObject, public QmitkFunctionality
   Q_OBJECT
 
 public:
-//  static const std::map<std::string, QColor> ORGAN_COLOR_LIST;
-  static const std::string ORGAN_COLOR_STRING;
-//  static std::map<std::string, QColor> CreateOrganColorList();
+  static std::string ORGAN_COLOR_STRING;
   static std::string CreateOrganColorString();
   void SetFocus();
 
@@ -92,6 +90,8 @@ protected:
     void ApplyDisplayOptions(mitk::DataTreeNode* node);
 
     void UpdateFromCurrentDataManagerSelection();
+
+    void ExtendOrganList(std::string organname,mitk::Color colorname);
   
     cherry::ICherryPreferences::Pointer m_SegmentationPreferencesNode;
 
@@ -120,6 +120,8 @@ protected:
     bool m_ShowSegmentationsAsVolumeRendering;
 
     mitk::SegmentationSelectionProvider::Pointer m_SelectionProvider;
+
+    QStringList organColorList;
 
   /// from QmitkSegmentation
 

@@ -66,77 +66,65 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "itkTreeChangeEvent.h"
 
-const std::string QmitkSegmentationView::ORGAN_COLOR_STRING = QmitkSegmentationView::CreateOrganColorString();
+std::string QmitkSegmentationView::ORGAN_COLOR_STRING = QmitkSegmentationView::CreateOrganColorString();
 
 std::string QmitkSegmentationView::CreateOrganColorString()
 {
   std::string m;
-  m="ankle;277;134;134;";
-  m+="appendix;277;134;134;";
-  m+="blood vessels;255;49;49;";
-  m+="bronchial tree;49;104;255;";
-  m+="bone;213;213;213;";
-  m+="brain;255;156;202;";
-  m+="coccyx;277;134;134;";
-  m+="colon;277;134;134;";
-  m+="cyst;277;134;134;";
-  m+="elbow;277;134;134;";
-  m+="eye;277;134;134;";
-  m+="fallopian tube;277;134;134;";
-  m+="fat;255;43;238;";
-  m+="hand;277;134;134;";
-  m+="gall bladder;86;127;24;";
-  m+="heart;235;29;50;";
-  m+="hip;277;134;134;";
-  m+="kidney;211;63;0;";
-  m+="knee;277;134;134;";
-  m+="larynx;277;134;134;";
-  m+="liver;255;204;61;";
-  m+="lung;107;220;255;";
-  m+="lymph node;255;0;0;";
-  m+="muscle;255;69;106;";
-  m+="nerve;255;234;79;";
-  m+="nose;277;134;134;";
-  m+="oesophagus;277;134;134;";
-  m+="ovaries;277;134;134;";
-  m+="pancreas;249;171;61;";
-  m+="pelvis;277;134;134;";
-  m+="penis;277;134;134;";
-  m+="pharynx;277;134;134;";
-  m+="prostate;277;134;134;";
-  m+="rectum;277;134;134;";
-  m+="sacrum;277;134;134;";
-  m+="seminal vesicle;277;134;134;";
-  m+="shoulder;277;134;134;";
-  m+="spinal cord;245;249;61;";
-  m+="spleen;249;108;61;";
-  m+="stomach;249;108;61;";
-  m+="teeth;255;252;216;";
-  m+="testicles;277;134;134;";
-  m+="thyroid;255;246;148;";
-  m+="tongue;277;134;134;";
-  m+="tumor;147;112;17;";
-  m+="urethra;248;255;50;";
-  m+="urinary bladder;248;255;50;";
-  m+="uterus;277;134;134;";
-  m+="vagina;277;134;134;";
-  m+="vertebra;277;134;134;";
-  m+="wrist;277;134;134;";
+  m="Ankle;255;0;0;";
+  m+="Appendix;255;0;0;";
+  m+="Blood vessels;255;49;49;";
+  m+="Bronchial tree;49;104;255;";
+  m+="Bone;213;213;213;";
+  m+="Brain;255;156;202;";
+  m+="Coccyx;255;0;0;";
+  m+="Colon;255;0;0;";
+  m+="Cyst;255;0;0;";
+  m+="Elbow;255;0;0;";
+  m+="Eye;255;0;0;";
+  m+="Fallopian tube;255;0;0;";
+  m+="Fat;255;43;238;";
+  m+="Hand;255;0;0;";
+  m+="Gall Bladder;86;127;24;";
+  m+="Heart;235;29;50;";
+  m+="Hip;255;0;0;";
+  m+="Kidney;211;63;0;";
+  m+="Knee;255;0;0;";
+  m+="Larynx;255;0;0;";
+  m+="Liver;255;204;61;";
+  m+="Lung;107;220;255;";
+  m+="Lymph node;255;0;0;";
+  m+="Muscle;255;69;106;";
+  m+="Nerve;255;234;79;";
+  m+="Nose;255;0;0;";
+  m+="Oesophagus;255;0;0;";
+  m+="Ovaries;255;0;0;";
+  m+="Pancreas;249;171;61;";
+  m+="Pelvis;255;0;0;";
+  m+="Penis;255;0;0;";
+  m+="Pharynx;255;0;0;";
+  m+="Prostate;255;0;0;";
+  m+="Rectum;255;0;0;";
+  m+="Sacrum;255;0;0;";
+  m+="Seminal vesicle;255;0;0;";
+  m+="Shoulder;255;0;0;";
+  m+="Spinal cord;245;249;61;";
+  m+="Spleen;249;108;61;";
+  m+="Stomach;249;108;61;";
+  m+="Teeth;255;252;216;";
+  m+="Testicles;255;0;0;";
+  m+="Thyroid;255;246;148;";
+  m+="Tongue;255;0;0;";
+  m+="Tumor;147;112;17;";
+  m+="Urethra;248;255;50;";
+  m+="Urinary bladder;248;255;50;";
+  m+="Uterus;255;0;0;";
+  m+="Vagina;255;0;0;";
+  m+="Vertebra;255;0;0;";
+  m+="Wrist;255;0;0";
   return m;
 }
 
-//const std::map<std::string, QColor> QmitkSegmentationView::ORGAN_COLOR_LIST =  QmitkSegmentationView::CreateOrganColorList();
-
-//std::map<std::string, QColor> QmitkSegmentationView::CreateOrganColorList()
-//{
-//  std::map<std::string, QColor> m;
-//  QColor testcolor;
-//  std::string listColorOrgan;
-//  listColorOrgan="Liver;255;0;0;";
-//  m.insert(std::pair<std::string,QColor>(listColorOrgan,testcolor);
-//
-//  return m;
-//}
 
 QmitkSegmentationView::QmitkSegmentationView()
 :m_MultiWidget(NULL)
@@ -252,7 +240,6 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
   m_SelectionProvider = new mitk::SegmentationSelectionProvider();
   //m_SelectionProvider->SetItemSelectionModel(m_NodeTreeView->selectionModel());
   this->GetSite()->SetSelectionProvider(m_SelectionProvider);
-
 }
 
 void QmitkSegmentationView::SetFocus()
@@ -308,10 +295,14 @@ void QmitkSegmentationView::CreateNewSegmentation()
     {
       // ask about the name and organ type of the new segmentation
       QmitkNewSegmentationDialog dialog( m_Parent ); // needs a QWidget as parent, "this" is not QWidget
-      
+
+      std::string organlist_prefs = QString::fromStdString(m_SegmentationPreferencesNode->GetByteArray("Organ-Color-List",""));
+      if (QString::fromStdString(organlist_prefs).contains(QString::fromStdString(ORGAN_COLOR_STRING)))
+        ORGAN_COLOR_STRING=m_SegmentationPreferencesNode->GetByteArray("Organ-Color-List","");
+
       QString organColorQString = QString::fromStdString(ORGAN_COLOR_STRING);
 
-      QStringList organColorList = organColorQString.split(";");
+      organColorList = organColorQString.split(";");
 
       dialog.SetSuggestionList(organColorList);
       int dialogReturnValue = dialog.exec();
@@ -328,6 +319,11 @@ void QmitkSegmentationView::CreateNewSegmentation()
         {
           mitk::DataTreeNode::Pointer emptySegmentation =
             firstTool->CreateEmptySegmentationNode( image, dialog.GetSegmentationName(), dialog.GetColorProperty() );
+
+          ExtendOrganList(dialog.GetSegmentationName(),dialog.GetColorProperty());
+
+          m_SegmentationPreferencesNode->PutByteArray("Organ-Color-List",ORGAN_COLOR_STRING);
+          m_SegmentationPreferencesNode->Flush();
 
           if (!emptySegmentation) return; // could be aborted by user
 
@@ -1040,6 +1036,34 @@ void QmitkSegmentationView::OnNewNodeObjectsGenerated(mitk::ToolManager::DataVec
     {
       QMessageBox::warning(m_Parent, "Lymph node segmentation", "The algorithm could not find a lymph node. \nIf this is persistent, please report to http://bugs.mitk.org");
     }
+  }
+}
+
+void QmitkSegmentationView::ExtendOrganList(std::string organname,mitk::Color colorname)
+{
+  if (!organColorList.contains(QString::fromStdString(organname),Qt::CaseInsensitive))
+  {
+    ORGAN_COLOR_STRING+=";";
+    ORGAN_COLOR_STRING+=organname;
+    ORGAN_COLOR_STRING+=";";
+
+    std::stringstream red;
+    red << colorname.GetRed()*255;
+    std::string temp;
+    red >> temp;
+    ORGAN_COLOR_STRING+=temp;
+    ORGAN_COLOR_STRING+=";";
+
+    std::stringstream green;
+    green << colorname.GetGreen()*255;
+    green >> temp;
+    ORGAN_COLOR_STRING+=temp;
+    ORGAN_COLOR_STRING+=";";
+
+    std::stringstream blue;
+    blue << colorname.GetBlue()*255;
+    blue >> temp;
+    ORGAN_COLOR_STRING+=temp;
   }
 }
 

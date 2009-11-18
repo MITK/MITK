@@ -106,7 +106,7 @@ void ImageStatisticsCalculator::SetImage( const mitk::Image *image )
 
 void ImageStatisticsCalculator::SetImageMask( const mitk::Image *imageMask )
 {
-  if ( m_Image.IsNull() )
+  if ( m_Image == NULL )
   {
     itkExceptionMacro( << "Image needs to be set first!" );
   }
@@ -132,7 +132,7 @@ void ImageStatisticsCalculator::SetImageMask( const mitk::Image *imageMask )
 
 void ImageStatisticsCalculator::SetPlanarFigure( const mitk::PlanarFigure *planarFigure )
 {
-  if ( m_Image.IsNull() )
+  if ( m_Image == NULL )
   {
     itkExceptionMacro( << "Image needs to be set first!" );
   }
@@ -184,7 +184,7 @@ void ImageStatisticsCalculator::SetMaskingModeToPlanarFigure()
 
 bool ImageStatisticsCalculator::ComputeStatistics( unsigned int timeStep )
 {
-  if ( m_Image.IsNull() )
+  if ( m_Image == NULL )
   {
     itkExceptionMacro( << "Image not set!" );
   }
@@ -202,19 +202,11 @@ bool ImageStatisticsCalculator::ComputeStatistics( unsigned int timeStep )
   bool maskedImageStatisticsCalculationTrigger = m_MaskedImageStatisticsCalculationTriggerVector[timeStep];
   bool planarFigureStatisticsCalculationTrigger = m_PlanarFigureStatisticsCalculationTriggerVector[timeStep];
 
-  std::cout << "PF TRIGGER: " << planarFigureStatisticsCalculationTrigger << std::endl;
-  if ( m_PlanarFigure.IsNotNull() )
-  {
-    std::cout << "PF MTIME: " << m_PlanarFigure->GetMTime() << std::endl;
-  }
-
-
   if ( ((m_MaskingMode != MASKING_MODE_NONE) || (imageMTime > m_Image->GetMTime() && !imageStatisticsCalculationTrigger))
     && ((m_MaskingMode != MASKING_MODE_IMAGE) || (maskedImageMTime > m_ImageMask->GetMTime() && !maskedImageStatisticsCalculationTrigger))
     && ((m_MaskingMode != MASKING_MODE_PLANARFIGURE) || (planarFigureMTime > m_PlanarFigure->GetMTime() && !planarFigureStatisticsCalculationTrigger)) )
   {
     // Statistics is up to date!
-    std::cout << "STATS UP TO DATE!" << std::endl;
     return false;
   }
 
@@ -303,6 +295,11 @@ bool ImageStatisticsCalculator::ComputeStatistics( unsigned int timeStep )
     LOG_ERROR << "ImageStatistics: Image dimension not supported!";
   }
 
+
+  // Release unused image smart pointers to free memory
+  m_InternalImage = mitk::Image::ConstPointer();
+  m_InternalImageMask3D = MaskImage3DType::Pointer();
+  m_InternalImageMask2D = MaskImage2DType::Pointer();
   return true;
 }
 
@@ -310,7 +307,7 @@ bool ImageStatisticsCalculator::ComputeStatistics( unsigned int timeStep )
 const ImageStatisticsCalculator::HistogramType *
 ImageStatisticsCalculator::GetHistogram( unsigned int timeStep ) const
 {
-  if ( m_Image.IsNull() || (timeStep >= m_Image->GetTimeSteps()) )
+  if ( (m_Image == NULL) || (timeStep >= m_Image->GetTimeSteps()) )
   {
     return NULL;
   }
@@ -333,7 +330,7 @@ ImageStatisticsCalculator::GetHistogram( unsigned int timeStep ) const
 const ImageStatisticsCalculator::Statistics &
 ImageStatisticsCalculator::GetStatistics( unsigned int timeStep ) const
 {
-  if ( m_Image.IsNull() || (timeStep >= m_Image->GetTimeSteps()) )
+  if ( (m_Image == NULL) || (timeStep >= m_Image->GetTimeSteps()) )
   {
     return m_EmptyStatistics;
   }
@@ -355,7 +352,7 @@ ImageStatisticsCalculator::GetStatistics( unsigned int timeStep ) const
 
 void ImageStatisticsCalculator::ExtractImageAndMask( unsigned int timeStep )
 {
-  if ( m_Image.IsNull() )
+  if ( m_Image == NULL )
   {
     throw std::runtime_error( "Error: image empty!" );
   }
@@ -384,7 +381,7 @@ void ImageStatisticsCalculator::ExtractImageAndMask( unsigned int timeStep )
 
   case MASKING_MODE_IMAGE:
     {
-      if ( m_ImageMask.IsNotNull() )
+      if ( m_ImageMask != NULL )
       {
         if ( timeStep < m_ImageMask->GetTimeSteps() )
         {
@@ -599,7 +596,6 @@ template < typename TPixel, unsigned int VImageDimension >
 void ImageStatisticsCalculator::InternalCalculateMaskFromPlanarFigure(
   const itk::Image< TPixel, VImageDimension > *image, unsigned int axis )
 {
-  std::cout << "RECALCULATING PLANARFIGURE STATS" << std::endl;
   typedef itk::Image< TPixel, VImageDimension > ImageType;
 
   typedef itk::CastImageFilter< ImageType, MaskImage2DType > CastFilterType;

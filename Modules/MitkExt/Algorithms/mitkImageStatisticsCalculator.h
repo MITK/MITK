@@ -233,9 +233,9 @@ protected:
 
 
 
-  Image::ConstPointer m_Image;
+  const mitk::Image *m_Image;
 
-  mitk::Image::ConstPointer m_ImageMask;
+  const mitk::Image *m_ImageMask;
 
   mitk::PlanarFigure::ConstPointer m_PlanarFigure;
 
@@ -256,7 +256,6 @@ protected:
 
   
   mitk::Image::ConstPointer m_InternalImage;
-
   MaskImage3DType::Pointer m_InternalImageMask3D;
   MaskImage2DType::Pointer m_InternalImageMask2D;
 

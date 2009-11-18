@@ -88,6 +88,15 @@ namespace mitk
     virtual bool CloseConnection();
 
     /**
+    * \brief TestConnection() tries to connect to a NDI tracking device on the current port/device and returns which device it has found
+    *
+    * TestConnection() tries to connect to a NDI tracking device on the current port/device. 
+    * \return It returns the type of the device that
+    * answers at the port/device or mitk::TrackingSystemNotSpecified if no NDI tracking device is available at that port
+    */
+    virtual mitk::TrackingDeviceType TestConnection();
+
+    /**
     * \brief Start the tracking.
     *
     * A new thread is created, which continuously reads the position and orientation information of each tool and stores them inside the tools.

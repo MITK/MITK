@@ -631,6 +631,77 @@ bool mitk::NDITrackingDevice::OpenConnection()
 }
 
 
+mitk::TrackingDeviceType mitk::NDITrackingDevice::TestConnection()
+{
+  if (this->GetMode() != Setup)
+  {
+    return mitk::TrackingSystemNotSpecified;
+  }
+
+  m_SerialCommunication = mitk::SerialCommunication::New();
+  //m_DeviceProtocol =  mitk::NDIProtocol::New();
+  //m_DeviceProtocol->SetTrackingDevice(this);
+  //m_DeviceProtocol->UseCRCOn();
+  /* init local com port to standard com settings for a NDI tracking device:
+  9600 baud, 8 data bits, no parity, 1 stop bit, no hardware handshake
+  */
+  if (m_DeviceName.empty())
+    m_SerialCommunication->SetPortNumber(m_PortNumber);
+  else
+    m_SerialCommunication->SetDeviceName(m_DeviceName);
+
+  m_SerialCommunication->SetBaudRate(mitk::SerialCommunication::BaudRate9600);
+  m_SerialCommunication->SetDataBits(mitk::SerialCommunication::DataBits8);
+  m_SerialCommunication->SetParity(mitk::SerialCommunication::None);
+  m_SerialCommunication->SetStopBits(mitk::SerialCommunication::StopBits1);
+  m_SerialCommunication->SetSendTimeout(5000);
+  m_SerialCommunication->SetReceiveTimeout(5000);
+  if (m_SerialCommunication->OpenConnection() == 0) // error
+  {
+    m_SerialCommunication = NULL;
+    return mitk::TrackingSystemNotSpecified;
+  }
+
+  /* Reset Tracking device by sending a serial break for 500ms */
+  m_SerialCommunication->SendBreak(400);
+
+  /* Read answer from tracking device (RESETBE6F) */
+  static const std::string reset("RESETBE6F\r");
+  std::string answer = "";
+  this->Receive(&answer, reset.length());  // read answer (should be RESETBE6F)
+  this->ClearReceiveBuffer();     // flush the receive buffer of all remaining data (carriage return, strings other than reset
+  if (reset.compare(answer) != 0)  // check for RESETBE6F
+  {
+    this->SetErrorMessage("Hardware Reset of tracking device did not work");
+    m_SerialCommunication->CloseConnection();
+    m_SerialCommunication = NULL;
+    return mitk::TrackingSystemNotSpecified;
+  }
+
+  /* Now the tracking device is reset, start initialization */
+  NDIErrorCode returnvalue;
+
+  /* initialize the tracking device */
+  //returnvalue = m_DeviceProtocol->INIT();
+  //if (returnvalue != NDIOKAY)
+  //{
+  //  this->SetErrorMessage("Could not initialize the tracking device");
+  //  return mitk::TrackingSystemNotSpecified;
+  //}
+
+  
+    mitk::TrackingDeviceType deviceType;
+    returnvalue = m_DeviceProtocol->VER(deviceType);
+    if ((returnvalue != NDIOKAY) || (deviceType == mitk::TrackingSystemNotSpecified))
+    {
+      m_SerialCommunication = NULL;
+      return mitk::TrackingSystemNotSpecified;
+    }
+    m_SerialCommunication = NULL;
+    return deviceType;
+}
+
+
 bool mitk::NDITrackingDevice::CloseConnection()
 {
   if (this->GetMode() != Setup)

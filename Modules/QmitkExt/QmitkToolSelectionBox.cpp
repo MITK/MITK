@@ -165,7 +165,11 @@ void QmitkToolSelectionBox::SetOrUnsetButtonForActiveTool()
 {
   // we want to emit a signal in any case, whether we selected ourselves or somebody else changes "our" tool manager. --> emit before check on m_SelfCall
   int id = m_ToolManager->GetActiveToolID();
-  emit ToolSelected(id);
+
+  mitk::Tool* tool = m_ToolManager->GetActiveTool();
+  if(tool != NULL)
+    if(std::string(tool->GetGroup()) != "organ_segmentation")
+      emit ToolSelected(id);
 
   // delete old GUI (if any)
   if ( m_LastToolGUI && m_ToolGUIWidget )
@@ -190,7 +194,7 @@ void QmitkToolSelectionBox::SetOrUnsetButtonForActiveTool()
   }
 
   QToolButton* toolButton(NULL);
-  mitk::Tool* tool = m_ToolManager->GetActiveTool();
+  //mitk::Tool* tool = m_ToolManager->GetActiveTool();
 
   if (m_ButtonIDForToolID.find(id) != m_ButtonIDForToolID.end()) // if this tool is in our box
   {

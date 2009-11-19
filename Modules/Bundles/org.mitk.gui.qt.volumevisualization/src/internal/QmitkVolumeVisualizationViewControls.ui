@@ -126,7 +126,7 @@
       </palette>
      </property>
      <property name="text">
-      <string>Select an image!</string>
+      <string>Please select a volume image!</string>
      </property>
     </widget>
    </item>
@@ -191,7 +191,7 @@
       <item>
        <widget class="QCheckBox" name="m_EnableGPU">
         <property name="toolTip">
-         <string>If enabeld, use hardware-accelerated rendering (GPU) instead of software-rendering (CPU)</string>
+         <string>Use hardware-accelerated rendering (GPU) instead of software rendering (CPU).</string>
         </property>
         <property name="text">
          <string>GPU</string>

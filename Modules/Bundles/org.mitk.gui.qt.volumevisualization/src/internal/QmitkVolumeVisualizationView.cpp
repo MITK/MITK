@@ -105,13 +105,14 @@ void QmitkVolumeVisualizationView::SelectionChanged( cherry::IWorkbenchPart::Poi
       {
         mitk::DataTreeNode::Pointer node = _DataTreeNodeObject->GetDataTreeNode();
       
-        if( node.IsNotNull() && dynamic_cast<mitk::Image*>(node->GetData()) )
+        if( node.IsNotNull() && dynamic_cast<mitk::Image*>(node->GetData()) 
+          && dynamic_cast<mitk::Image*>(node->GetData())->GetDimension()==3  )
           selectedNodes.push_back( node );
       }
     }
 
     mitk::DataTreeNode::Pointer node;
-
+   
     if(selectedNodes.size() > 0)
       node=selectedNodes.front();
 

@@ -304,7 +304,7 @@ bool mitk::PlanarFigureInteractor
         planarFigure->DeselectControlPoint();
         planarFigure->InvokeEvent( itk::InitializeEvent() );
         planarFigure->InvokeEvent( itk::EndEvent() );
-        planarFigure->InvokeEvent( itk::ModifiedEvent() );
+        m_DataTreeNode->Modified();
         this->HandleEvent( new mitk::StateEvent( EIDYES, stateEvent->GetEvent() ) );
       }
       else
@@ -335,6 +335,7 @@ bool mitk::PlanarFigureInteractor
         planarFigure->DeselectControlPoint();
         planarFigure->InvokeEvent( itk::InitializeEvent() );
         planarFigure->InvokeEvent( itk::EndEvent() );
+        m_DataTreeNode->Modified();
         this->HandleEvent( new mitk::StateEvent( EIDYES, NULL ) );
       }
       else
@@ -384,6 +385,7 @@ bool mitk::PlanarFigureInteractor
       // Issue event so that listeners may update themselves
       planarFigure->Modified();
       planarFigure->InvokeEvent( itk::EndEvent() );
+      m_DataTreeNode->Modified();
 
       // falls through
     }

@@ -39,7 +39,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <QToolTip>
 #include <qxtspanslider.h>
-#include <mitkProgressBar.h>
 
 QmitkVolumeVisualizationView::QmitkVolumeVisualizationView()
 : QmitkFunctionality(), 
@@ -224,14 +223,9 @@ void QmitkVolumeVisualizationView::OnEnableGPU(bool state)
   if(m_SelectedNode.IsNull())
     return;
 
-  LOG_INFO << "Progressbar add Steps: 10";
-  mitk::ProgressBar::GetInstance()->AddStepsToDo(10);
-
-  
   m_SelectedNode->SetProperty("volumerendering.usegpu",mitk::BoolProperty::New(state));
-   mitk::ProgressBar::GetInstance()->Progress(3);
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-   mitk::ProgressBar::GetInstance()->Progress(2);
+
  
 }
 

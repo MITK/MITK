@@ -98,7 +98,7 @@ int mitkNavigationDataPlayerTest(int /* argc */, char* /*argv*/[])
   for ( int i=0;i<5;i++ )
   {
     std::cout << "ref: " << refTimes[i] << "  /  time elapsed: " << times[i] << std::endl;
-    MITK_TEST_CONDITION_REQUIRED( (times[i]>refTimes[i]-10 && times[i]<refTimes[i]+10), "checking for more or less correct time-line"  );
+    MITK_TEST_CONDITION_REQUIRED( (times[i]>refTimes[i]-15 && times[i]<refTimes[i]+15), "checking for more or less correct time-line"  );
   }
 
 

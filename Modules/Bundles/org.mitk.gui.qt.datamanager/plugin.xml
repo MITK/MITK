@@ -9,7 +9,7 @@
       id="org.mitk.views.datamanager" 
       name="Datamanager" 
       category="org.mitk.views.general"
-      icon="resources/datamanager.xpm"
+      icon="resources/DataManager_48.png"
       class="QmitkDataManagerView" />
   </extension>
   

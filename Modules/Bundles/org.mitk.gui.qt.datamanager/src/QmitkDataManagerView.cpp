@@ -134,22 +134,22 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   QmitkNodeDescriptor* surfaceDataTreeNodeDescriptor =
     QmitkNodeDescriptorManager::GetInstance()->GetDescriptor("Surface");
 
-  m_GlobalReinitAction = new QAction(QIcon(":/datamanager/refresh.xpm"), "Global Reinit", this);
+  m_GlobalReinitAction = new QAction(QIcon(":/org.mitk.gui.qt.datamanager/Refresh_48.png"), "Global Reinit", this);
   QObject::connect( m_GlobalReinitAction, SIGNAL( triggered(bool) )
     , this, SLOT( GlobalReinit(bool) ) );
   unknownDataTreeNodeDescriptor->AddAction(m_GlobalReinitAction);
 
-  m_SaveAction = new QAction(QIcon(":/datamanager/save.xpm"), "Save...", this);
+  m_SaveAction = new QAction(QIcon(":/org.mitk.gui.qt.datamanager/Save_48.png"), "Save...", this);
   QObject::connect( m_SaveAction, SIGNAL( triggered(bool) )
     , this, SLOT( SaveSelectedNodes(bool) ) );
   unknownDataTreeNodeDescriptor->AddAction(m_SaveAction);
 
-  m_RemoveAction = new QAction(QIcon(":/datamanager/remove.xpm"), "Delete", this);
+  m_RemoveAction = new QAction(QIcon(":/org.mitk.gui.qt.datamanager/Remove_48.png"), "Delete", this);
   QObject::connect( m_RemoveAction, SIGNAL( triggered(bool) )
     , this, SLOT( RemoveSelectedNodes(bool) ) );
   unknownDataTreeNodeDescriptor->AddAction(m_RemoveAction);
 
-  m_ReinitAction = new QAction(QIcon(":/datamanager/refresh.xpm"), "Reinit", this);
+  m_ReinitAction = new QAction(QIcon(":/org.mitk.gui.qt.datamanager/Refresh_48.png"), "Reinit", this);
   QObject::connect( m_ReinitAction, SIGNAL( triggered(bool) )
     , this, SLOT( ReinitSelectedNodes(bool) ) );
   unknownDataTreeNodeDescriptor->AddAction(m_ReinitAction);
@@ -212,21 +212,21 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   surfaceDataTreeNodeDescriptor->AddAction(m_SurfaceRepresentation, false);
 
   m_ShowOnlySelectedNodes 
-    = new QAction(QIcon(":/datamanager/data-type-image-mask-visible-24.png")
+    = new QAction(QIcon(":/org.mitk.gui.qt.datamanager/ShowSelectedNode_48.png")
     , "Show only selected nodes", this);
   QObject::connect( m_ShowOnlySelectedNodes, SIGNAL( triggered(bool) )
     , this, SLOT( ShowOnlySelectedNodes(bool) ) );
   unknownDataTreeNodeDescriptor->AddAction(m_ShowOnlySelectedNodes);
 
   m_ToggleSelectedVisibility 
-    = new QAction(QIcon(":/datamanager/data-type-image-mask-invisible-24.png")
+    = new QAction(QIcon(":/org.mitk.gui.qt.datamanager/InvertShowSelectedNode_48.png")
     , "Toggle visibility", this);
   QObject::connect( m_ToggleSelectedVisibility, SIGNAL( triggered(bool) )
     , this, SLOT( ToggleVisibilityOfSelectedNodes(bool) ) );
   unknownDataTreeNodeDescriptor->AddAction(m_ToggleSelectedVisibility);
 
   m_ActionShowInfoDialog 
-    = new QAction(QIcon(":/datamanager/show-data-info.png")
+    = new QAction(QIcon(":/org.mitk.gui.qt.datamanager/ShowDataInfo_48.png")
     , "Details...", this);
   QObject::connect( m_ActionShowInfoDialog, SIGNAL( triggered(bool) )
     , this, SLOT( ShowInfoDialogForSelectedNodes(bool) ) );
@@ -236,7 +236,7 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   QObject::connect( m_OtsuFilterAction, SIGNAL( triggered(bool) )
     , this, SLOT( OtsuFilter(bool) ) );
   // Otsu filter does not work properly, remove it temporarily
-  imageDataTreeNodeDescriptor->AddAction(m_OtsuFilterAction);
+  // imageDataTreeNodeDescriptor->AddAction(m_OtsuFilterAction);
 
   QGridLayout* _DndFrameWidgetLayout = new QGridLayout;
   _DndFrameWidgetLayout->addWidget(m_NodeTreeView, 0, 0);

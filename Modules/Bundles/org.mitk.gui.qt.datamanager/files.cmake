@@ -22,7 +22,7 @@ SET(MOC_H_FILES
 SET(CPP_FILES manifest.cpp)
 
 SET(RESOURCE_FILES
-  resources/datamanager.xpm
+  resources/DataManager_48.png
   resources/propertylist.png
 )
 

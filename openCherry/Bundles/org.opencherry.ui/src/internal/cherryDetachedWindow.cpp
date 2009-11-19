@@ -118,7 +118,7 @@ void DetachedWindow::Create()
 
   // Force the rect into the current display
   Rectangle dispBounds =
-      Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetScreenSize();
+      Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetAvailableScreenSize();
   if (bounds.width > dispBounds.width)
     bounds.width = dispBounds.width;
   if (bounds.height > dispBounds.height)

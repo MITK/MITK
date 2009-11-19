@@ -16,6 +16,7 @@
  =========================================================================*/
 
 #include "cherryQtWorkbenchAdvisor.h"
+#include "cherryQtAssistantUtil.h"
 #include "../internal/cherryQtGlobalEventFilter.h"
 #include "../cherryQtPreferences.h"
 
@@ -48,6 +49,12 @@ void QtWorkbenchAdvisor::Initialize(IWorkbenchConfigurer::Pointer configurer)
 
   QObject* eventFilter = new QtGlobalEventFilter(qApp);
   qApp->installEventFilter(eventFilter);
+}
+
+bool QtWorkbenchAdvisor::PreShutdown()
+{
+  cherry::QtAssistantUtil::CloseAssistant();
+  return true;
 }
 
 }

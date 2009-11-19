@@ -35,6 +35,7 @@ class CHERRY_UI_QT QtAssistantUtil
 public:
 
   static void OpenAssistant(const QString& startPage = "");
+  static void CloseAssistant();
 
    /**
      * @brief With this method you can open the help-page of the active bundle. 

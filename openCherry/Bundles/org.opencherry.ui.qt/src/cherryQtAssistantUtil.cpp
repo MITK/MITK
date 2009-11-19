@@ -96,6 +96,15 @@ void QtAssistantUtil::OpenAssistant(const QString& startPage)
 
 }
 
+void QtAssistantUtil::CloseAssistant()
+{
+  if (assistantProcess && (assistantProcess->state() != QProcess::NotRunning))
+  {
+    assistantProcess->close();
+  }
+  delete assistantProcess;
+}
+
 bool QtAssistantUtil::RegisterQCHFiles(const QString& collectionFile,
     const std::vector<IBundle::Pointer>& bundles)
 {

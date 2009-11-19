@@ -24,7 +24,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <itkStatisticsImageFilter.h>
 #include <itkLabelStatisticsImageFilter.h>
-#include <itkStatisticsImageFilter.h>
 
 #include <itkCastImageFilter.h>
 #include <itkImageFileWriter.h>
@@ -107,7 +106,7 @@ void ImageStatisticsCalculator::SetImage( const mitk::Image *image )
 
 void ImageStatisticsCalculator::SetImageMask( const mitk::Image *imageMask )
 {
-  if ( m_Image == NULL )
+  if ( m_Image.IsNull() )
   {
     itkExceptionMacro( << "Image needs to be set first!" );
   }
@@ -133,7 +132,7 @@ void ImageStatisticsCalculator::SetImageMask( const mitk::Image *imageMask )
 
 void ImageStatisticsCalculator::SetPlanarFigure( const mitk::PlanarFigure *planarFigure )
 {
-  if ( m_Image == NULL )
+  if ( m_Image.IsNull() )
   {
     itkExceptionMacro( << "Image needs to be set first!" );
   }
@@ -199,9 +198,15 @@ void ImageStatisticsCalculator::SetMaskingModeToPlanarFigure()
 
 bool ImageStatisticsCalculator::ComputeStatistics( unsigned int timeStep )
 {
-  if ( m_Image == NULL )
+  if ( m_Image.IsNull() )
   {
     itkExceptionMacro( << "Image not set!" );
+  }
+
+  if ( m_Image->GetReferenceCount() == 1 )
+  {
+    // Image no longer valid; we are the only ones to still hold a reference on it
+    return false;
   }
 
   if ( timeStep >= m_Image->GetTimeSteps() )
@@ -209,6 +214,15 @@ bool ImageStatisticsCalculator::ComputeStatistics( unsigned int timeStep )
     throw std::runtime_error( "Error: invalid time step!" );
   }
 
+  // If a mask was set but we are the only ones to still hold a reference on
+  // it, delete it.
+  if ( m_ImageMask.IsNotNull() && (m_ImageMask->GetReferenceCount() == 1) )
+  {
+    m_ImageMask = NULL;
+  }
+
+
+  // Check if statistics is already up-to-date
   unsigned long imageMTime = m_ImageStatisticsTimeStampVector[timeStep].GetMTime();
   unsigned long maskedImageMTime = m_MaskedImageStatisticsTimeStampVector[timeStep].GetMTime();
   unsigned long planarFigureMTime = m_PlanarFigureStatisticsTimeStampVector[timeStep].GetMTime();
@@ -334,7 +348,7 @@ bool ImageStatisticsCalculator::ComputeStatistics( unsigned int timeStep )
 const ImageStatisticsCalculator::HistogramType *
 ImageStatisticsCalculator::GetHistogram( unsigned int timeStep ) const
 {
-  if ( (m_Image == NULL) || (timeStep >= m_Image->GetTimeSteps()) )
+  if ( m_Image.IsNull() || (timeStep >= m_Image->GetTimeSteps()) )
   {
     return NULL;
   }
@@ -357,7 +371,7 @@ ImageStatisticsCalculator::GetHistogram( unsigned int timeStep ) const
 const ImageStatisticsCalculator::Statistics &
 ImageStatisticsCalculator::GetStatistics( unsigned int timeStep ) const
 {
-  if ( (m_Image == NULL) || (timeStep >= m_Image->GetTimeSteps()) )
+  if ( m_Image.IsNull() || (timeStep >= m_Image->GetTimeSteps()) )
   {
     return m_EmptyStatistics;
   }
@@ -379,7 +393,7 @@ ImageStatisticsCalculator::GetStatistics( unsigned int timeStep ) const
 
 void ImageStatisticsCalculator::ExtractImageAndMask( unsigned int timeStep )
 {
-  if ( m_Image == NULL )
+  if ( m_Image.IsNull() )
   {
     throw std::runtime_error( "Error: image empty!" );
   }
@@ -408,7 +422,7 @@ void ImageStatisticsCalculator::ExtractImageAndMask( unsigned int timeStep )
 
   case MASKING_MODE_IMAGE:
     {
-      if ( m_ImageMask != NULL )
+      if ( m_ImageMask.IsNotNull() && (m_ImageMask->GetReferenceCount() > 1) )
       {
         if ( timeStep < m_ImageMask->GetTimeSteps() )
         {
@@ -534,6 +548,23 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsUnmasked(
   typedef itk::Statistics::ScalarImageToHistogramGenerator< ImageType >
     HistogramGeneratorType;
 
+  // Progress listening...
+  typedef itk::SimpleMemberCommand< ImageStatisticsCalculator > ITKCommandType;
+  ITKCommandType::Pointer progressListener;
+  progressListener = ITKCommandType::New();
+  progressListener->SetCallbackFunction( this,
+    &ImageStatisticsCalculator::UnmaskedStatisticsProgressUpdate );
+
+
+  // Issue 100 artificial progress events since ScalarIMageToHistogramGenerator
+  // does not (yet?) support progress reporting
+  this->InvokeEvent( itk::StartEvent() );
+  for ( unsigned int i = 0; i < 100; ++i )
+  {
+    this->UnmaskedStatisticsProgressUpdate();
+  }
+
+  // Calculate histogram
   typename HistogramGeneratorType::Pointer histogramGenerator = HistogramGeneratorType::New();
   histogramGenerator->SetInput( image );
   histogramGenerator->SetMarginalScale( 100 ); // Defines y-margin width of histogram
@@ -541,13 +572,16 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsUnmasked(
   histogramGenerator->SetHistogramMin( -1024.0 );
   histogramGenerator->SetHistogramMax( 2048.0 );
   histogramGenerator->Compute();
+  *histogram = histogramGenerator->GetOutput();
 
-  *histogram = histogramGenerator->GetOutput(); 
-
+  // Calculate statistics (separate filter)
   typedef itk::StatisticsImageFilter< ImageType > StatisticsFilterType;
   typename StatisticsFilterType::Pointer statisticsFilter = StatisticsFilterType::New();
   statisticsFilter->SetInput( image );
+  statisticsFilter->AddObserver( itk::ProgressEvent(), progressListener );
   statisticsFilter->Update();
+
+  this->InvokeEvent( itk::EndEvent() );
 
   statistics.N = image->GetBufferedRegion().GetNumberOfPixels();
   statistics.Min = statisticsFilter->GetMinimum();
@@ -575,18 +609,32 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
     LabelStatisticsFilterType;
 
   typename LabelStatisticsFilterType::Pointer labelStatisticsFilter;
-  unsigned int i;
 
+  unsigned int i;
   bool maskNonEmpty = false;
   if ( maskImage != NULL )
   {
+    // Initialize Filter
     labelStatisticsFilter = LabelStatisticsFilterType::New();
-
     labelStatisticsFilter->SetInput( image );
     labelStatisticsFilter->SetLabelInput( maskImage );
     labelStatisticsFilter->UseHistogramsOn();
     labelStatisticsFilter->SetHistogramParameters( 384, -1024.0, 2048.0);
+
+    // Add progress listening
+    typedef itk::SimpleMemberCommand< ImageStatisticsCalculator > ITKCommandType;
+    ITKCommandType::Pointer progressListener;
+    progressListener = ITKCommandType::New();
+    progressListener->SetCallbackFunction( this,
+      &ImageStatisticsCalculator::MaskedStatisticsProgressUpdate );
+    labelStatisticsFilter->AddObserver( itk::ProgressEvent(), progressListener );
+
+
+    // Execute filter
+    this->InvokeEvent( itk::StartEvent() );
     labelStatisticsFilter->Update();
+    this->InvokeEvent( itk::EndEvent() );
+
 
     // Find label of mask (other than 0)
     for ( i = 1; i < 4096; ++i )
@@ -773,5 +821,24 @@ void ImageStatisticsCalculator::InternalCalculateMaskFromPlanarFigure(
   //vtkExporter->Delete(); // TODO: crashes when outcommented; memory leak??
   delete[] ptIds;
 }
+
+
+void ImageStatisticsCalculator::UnmaskedStatisticsProgressUpdate()
+{
+  // Need to throw away every second progress event to reach a final count of
+  // 100 since two consecutive filters are used in this case
+  static int updateCounter = 0;
+  if ( updateCounter++ % 2 == 0 )
+  {
+    this->InvokeEvent( itk::ProgressEvent() );
+  }
+}
+
+
+void ImageStatisticsCalculator::MaskedStatisticsProgressUpdate()
+{
+  this->InvokeEvent( itk::ProgressEvent() );
+}
+
 
 }

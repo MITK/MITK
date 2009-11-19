@@ -232,10 +232,15 @@ protected:
   }
 
 
+  void UnmaskedStatisticsProgressUpdate();
 
-  const mitk::Image *m_Image;
+  void MaskedStatisticsProgressUpdate();
 
-  const mitk::Image *m_ImageMask;
+
+
+  mitk::Image::ConstPointer m_Image;
+
+  mitk::Image::ConstPointer m_ImageMask;
 
   mitk::PlanarFigure::ConstPointer m_PlanarFigure;
 

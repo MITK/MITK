@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Dialog</class>
+ <widget class="QDialog" name="Dialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>750</width>
+    <height>428</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Dialog</string>
+  </property>
+  <widget class="QScrollArea" name="scrollArea">
+   <property name="geometry">
+    <rect>
+     <x>100</x>
+     <y>130</y>
+     <width>531</width>
+     <height>171</height>
+    </rect>
+   </property>
+   <property name="widgetResizable">
+    <bool>true</bool>
+   </property>
+   <widget class="QWidget" name="scrollAreaWidgetContents">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>529</width>
+      <height>169</height>
+     </rect>
+    </property>
+    <widget class="QLabel" name="m_PropsLabel">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>511</width>
+       <height>41</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Ich bin ein ContributorIch bin ein ContributorIch bin ein ContributorIch bin ein ContributorIch bin ein ContributorIch bin ein ContributorIch bin ein ContributorIch bin ein ContributorIch bin ein ContributorIch bin ein ContributorIch bin ein ContributorIch bin ein ContributorIch bin ein ContributorIch bin ein ContributorIch bin ein ContributorIch bin ein ContributorIch bin ein ContributorIch bin ein ContributorIch bin ein ContributorIch bin ein ContributorIch bin ein ContributorIch bin ein ContributorIch bin ein ContributorIch bin ein ContributorIch bin ein ContributorIch bin ein ContributorIch bin ein ContributorIch bin ein ContributorIch bin ein ContributorIch bin ein ContributorIch bin ein ContributorIch bin ein ContributorIch bin ein ContributorIch bin ein ContributorIch bin ein ContributorIch bin ein ContributorIch bin ein ContributorIch bin ein ContributorIch bin ein ContributorIch bin ein ContributorIch bin ein ContributorIch bin ein ContributorIch bin ein ContributorIch bin ein ContributorIch bin ein ContributorIch bin ein ContributorIch bin ein Contributor</string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </widget>
+  </widget>
+  <widget class="QGraphicsView" name="graphicsView">
+   <property name="geometry">
+    <rect>
+     <x>280</x>
+     <y>20</y>
+     <width>201</width>
+     <height>91</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QGraphicsView" name="graphicsView_2">
+   <property name="geometry">
+    <rect>
+     <x>520</x>
+     <y>320</y>
+     <width>201</width>
+     <height>91</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QGraphicsView" name="graphicsView_3">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>320</y>
+     <width>201</width>
+     <height>91</height>
+    </rect>
+   </property>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

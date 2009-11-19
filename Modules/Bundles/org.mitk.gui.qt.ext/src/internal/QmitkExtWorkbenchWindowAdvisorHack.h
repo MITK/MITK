@@ -22,6 +22,11 @@ class QmitkExtWorkbenchWindowAdvisorHack : public QObject
      * @brief This slot is called if the user klicks the menu "item help->active bundle" or presses F1. In this case a new window is opened which shows a help page.
      */
     void onHelp();
+    
+    /**
+     * @brief This slot is called if the user clicks in help menu the about button
+     */
+    void onAbout();
 
   public:
 

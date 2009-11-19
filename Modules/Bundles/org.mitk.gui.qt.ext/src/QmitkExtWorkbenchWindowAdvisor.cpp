@@ -55,6 +55,7 @@
 #include "mitkVerboseLimitedLinearUndo.h"
 #include <QToolBar>
 #include <QMessageBox>
+#include <QmitkAboutDialog/QmitkAboutDialog.h>
 
 QmitkExtWorkbenchWindowAdvisorHack
     * QmitkExtWorkbenchWindowAdvisorHack::undohack =
@@ -314,7 +315,7 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
   QMenu* helpMenu = menuBar->addMenu("Help");
   QAction* welcomeAction = helpMenu->addAction("&Welcome",QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onIntro()));
   QAction* helpAction = helpMenu->addAction("&Help Contents",QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onHelp()), QKeySequence(QKeySequence::HelpContents));
-  QAction* aboutAction = helpMenu->addAction("&About",QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onIntro()));
+  QAction* aboutAction = helpMenu->addAction("&About",QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onAbout()));
   // =====================================================
 
 
@@ -463,6 +464,12 @@ void QmitkExtWorkbenchWindowAdvisorHack::onIntro()
 void QmitkExtWorkbenchWindowAdvisorHack::onHelp()
 {
   cherry::QtAssistantUtil::OpenActivePartHelp();
+}
+
+void QmitkExtWorkbenchWindowAdvisorHack::onAbout()
+{
+  QmitkAboutDialog* aboutDialog = new QmitkAboutDialog(NULL,NULL);
+  aboutDialog->show();
 }
 
 void QmitkExtWorkbenchWindowAdvisor::HookTitleUpdateListeners(

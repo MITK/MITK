@@ -11,6 +11,7 @@ SET(CPP_FILES
 
  #QmitkAlgorithmFunctionalityComponent.cpp
  #QmitkBaseAlgorithmComponent.cpp
+ QmitkAboutDialog/QmitkAboutDialog.cpp
  QmitkBaseComponent.cpp
  QmitkBaseFunctionalityComponent.cpp
  QmitkFunctionalityComponentContainer.cpp
@@ -165,6 +166,8 @@ SET(MOC_H_FILES
  QmitkPointListWidget.h
  QmitkHistogramWidget.h
  QmitkVideoBackground.h
+ 
+ QmitkAboutDialog/QmitkAboutDialog.h
 )
 
 IF ( NOT ${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.${VTK_BUILD_VERSION} VERSION_LESS 5.4.0 )
@@ -187,4 +190,5 @@ SET(UI_FILES
   QmitkPrimitiveMovieNavigatorWidget.ui
   QmitkFunctionalityComponentContainerControls.ui
   QmitkFunctionalityComponents/QmitkThresholdComponentControls.ui
+  QmitkAboutDialog/QmitkAboutDialogGUI.ui
 )

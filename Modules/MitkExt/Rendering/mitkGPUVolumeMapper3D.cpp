@@ -192,7 +192,7 @@ void mitk::GPUVolumeMapper3D::GenerateDataGPU( mitk::BaseRenderer *renderer )
     switch ( mitk::RenderingManager::GetInstance()->GetNextLOD( renderer ) )
     {
       case 0:
-        m_T2DMapper->SetSampleDistance(2.0); 
+        m_T2DMapper->SetSampleDistance(3.0); 
         break;
 
       default: case 1:
@@ -265,7 +265,7 @@ void mitk::GPUVolumeMapper3D::GenerateDataCPU( mitk::BaseRenderer *renderer )
     switch ( mitk::RenderingManager::GetInstance()->GetNextLOD( renderer ) )
     {
       case 0:
-        m_MapperCPU->SetSampleDistance(2.0); 
+        m_MapperCPU->SetSampleDistance(4.0); 
         break;
 
       default: case 1:
@@ -387,7 +387,7 @@ void mitk::GPUVolumeMapper3D::SetDefaultProperties(mitk::DataTreeNode* node, mit
 
   node->AddProperty( "volumerendering", mitk::BoolProperty::New( false ), renderer, overwrite );
   node->AddProperty( "volumerendering.uselod", mitk::BoolProperty::New( true ), renderer, overwrite );
-  node->AddProperty( "volumerendering.usegpu", mitk::BoolProperty::New( true ), renderer, overwrite );
+  node->AddProperty( "volumerendering.usegpu", mitk::BoolProperty::New( false ), renderer, overwrite );
   node->AddProperty( "binary", mitk::BoolProperty::New( false ), renderer, overwrite );
  
   mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());

@@ -200,6 +200,15 @@ void mitk::CoreExtObjectFactory::SetDefaultProperties(mitk::DataTreeNode* node)
   {
     mitk::PlanarFigureMapper2D::SetDefaultProperties(node);
   }
+  
+  mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
+  if(image.IsNotNull() && image->IsInitialized())
+  {
+    mitk::GPUVolumeMapper3D::SetDefaultProperties(node);
+  }
+
+
+  
 }
 
 const char* mitk::CoreExtObjectFactory::GetFileExtensions() 

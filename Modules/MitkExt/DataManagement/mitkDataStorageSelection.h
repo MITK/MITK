@@ -14,40 +14,24 @@ namespace mitk
 
   class MITKEXT_CORE_EXPORT DataStorageSelection: public itk::Object
   {
-    public:
-      struct Listener
-      {
-        virtual void NodeChanged(const mitk::DataTreeNode* node)
-        {
+  public:
+    typedef std::vector<mitk::DataTreeNode*> Nodes;
+    typedef Message1<const mitk::DataTreeNode*> DataTreeNodeEvent;
 
-        }
-        virtual void PropertyChanged(const mitk::BaseProperty* _BaseProperty)
-        {
-
-        }
-        virtual void NodeAdded(const mitk::DataTreeNode* node)
-        {
-
-        }
-        virtual void NodeRemoved(const mitk::DataTreeNode* node)
-        {
-
-        }
-
-      };
-      typedef std::vector<mitk::DataTreeNode*> Nodes;
+    DataTreeNodeEvent NodeChanged;
+    DataTreeNodeEvent NodeAdded;
+    DataTreeNodeEvent NodeRemoved;
+    Message2<const mitk::DataTreeNode*, const mitk::BaseProperty*> PropertyChanged;
 
     mitkClassMacro(DataStorageSelection, itk::Object);
 
-    itkFactorylessNewMacro(DataStorageSelection);
-    mitkNewMacro1Param(DataStorageSelection, DataStorage*);
-    mitkNewMacro2Param(DataStorageSelection, DataStorage*, NodePredicateBase*);
+    mitkNewMacro2Param(DataStorageSelection, DataStorage*, bool);
+    mitkNewMacro3Param(DataStorageSelection, DataStorage*, NodePredicateBase*, bool);
 
     protected:
-      DataStorageSelection();
-      DataStorageSelection(mitk::DataStorage* _DataStorage);
+      DataStorageSelection(mitk::DataStorage* _DataStorage, bool _AutoAddNodes);
       DataStorageSelection(mitk::DataStorage* _DataStorage
-        , mitk::NodePredicateBase* _Predicate);
+        , mitk::NodePredicateBase* _Predicate, bool _AutoAddNodes);
 
     public:
       virtual ~DataStorageSelection();
@@ -69,18 +53,26 @@ namespace mitk
       ///
       mitk::DataTreeNode::Pointer GetNode(unsigned int index) const;
       ///
+      /// Returns the first node, same as calling GetNode(0)
+      ///
+      mitk::DataTreeNode::Pointer GetNode() const;
+      ///
       /// Returns a copy of the node-vector
       ///
       std::vector<mitk::DataTreeNode*> GetNodes() const;
+      ///
+      /// \see m_AutoAddNodes
+      ///
+      bool DoesAutoAddNodes() const;
     public:
       ///
-      /// Implement this method if you want to know when a node changed
+      /// Removes all nodes, sets node as new first element
       ///
-      virtual void AddListener(DataStorageSelection::Listener* listener);
+      DataStorageSelection& operator=(mitk::DataTreeNode* node);
       ///
-      /// Implement this method if you want to know when a specific property changed
+      /// Removes all nodes, sets node as new first element
       ///
-      virtual void RemoveListener(DataStorageSelection::Listener* listener);
+      DataStorageSelection& operator=(mitk::DataTreeNode::Pointer node);
       ///
       /// Sets the DataStorage.
       ///
@@ -130,10 +122,6 @@ namespace mitk
       void AddListener(mitk::DataTreeNode* node);
     protected:
       ///
-      /// Holds all listener
-      ///
-      std::set<Listener*> m_Listener;
-      ///
       /// Pointer to the DataStorage from which the nodes are selected
       ///
       mitk::DataStorage* m_DataStorage;
@@ -174,6 +162,10 @@ namespace mitk
       /// If set to true no event processing will be performed
       ///
       bool m_SelfCall;
+      ///
+      /// Saves if new nodes are automatically added to this selection
+      ///
+      bool m_AutoAddNodes;
   };
 
 }

@@ -26,6 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <cherryISelectionListener.h>
 #include <cherryIStructuredSelection.h>
 
+#include <mitkWeakPointer.h>
 #include <mitkPlanarFigure.h>
 #include <mitkDataStorageSelection.h>
 #include "internal/mitkMeasurementSelectionProvider.h"
@@ -53,7 +54,7 @@ Allows to measure distances, angles, etc.
 \sa QmitkFunctionality
 \ingroup org_mitk_gui_qt_measurement_internal
 */
-class QmitkMeasurement : public QObject, public QmitkFunctionality, public mitk::DataStorageSelection::Listener
+class QmitkMeasurement : public QObject, public QmitkFunctionality
 {
   Q_OBJECT
 
@@ -138,8 +139,8 @@ protected:
   mitk::DataStorageSelection::Pointer m_SelectedPlanarFigures;
   /// Selected image on which measurements will be performed
   ///
-  mitk::DataTreeNode::Pointer m_SelectedImageNode;
-  mitk::DataTreeNode::Pointer m_CurrentFigureNode;
+  mitk::DataStorageSelection::Pointer m_SelectedImageNode;
+  mitk::WeakPointer<mitk::DataTreeNode> m_CurrentFigureNode;
 
   /// Counter variables to give a newly created Figure a unique name.
   ///
@@ -151,6 +152,7 @@ protected:
   unsigned int m_RectangleCounter;
   unsigned int m_PolygonCounter;
   unsigned int m_InitializedObserverTag;
+  bool m_Visible;
 
 };
 

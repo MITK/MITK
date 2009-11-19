@@ -770,13 +770,16 @@ void QmitkDataManagerView::NodeSelectionChanged( const QItemSelection & selected
       node->SetBoolProperty("selected", false);
   }
 
-  QModelIndexList indexesOfSelectedRows = selected.indexes();
-  for (QModelIndexList::iterator it = indexesOfSelectedRows.begin()
-    ; it != indexesOfSelectedRows.end(); it++)
+  nodes.clear();
+  nodes = this->GetSelectedNodes();
+
+  for (std::vector<mitk::DataTreeNode*>::iterator it = nodes.begin()
+    ; it != nodes.end(); it++)
   {
-    node = m_NodeTreeModel->GetNode(*it);
+    node = *it;
     if ( node )
       node->SetBoolProperty("selected", true);
   }
+
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }

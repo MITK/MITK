@@ -61,6 +61,30 @@ mitk::PlanarCircle::~PlanarCircle()
 //  boundaryPoint[1] = centerPoint[1];
 //}
 
+bool mitk::PlanarCircle::SetControlPoint( unsigned int index, const Point2D &point, bool createIfDoesNotExist )
+{
+  // moving center point
+  if(index == 0)
+  {
+    const Point2D &centerPoint = m_ControlPoints->ElementAt( 0 );
+    Point2D boundaryPoint = m_ControlPoints->ElementAt( 1 );
+    vnl_vector<float> vec = (point.GetVnlVector() - centerPoint.GetVnlVector());
+
+    boundaryPoint[0] += vec[0];
+    boundaryPoint[1] += vec[1];
+    m_ControlPoints->ElementAt( 0 ) = point;
+    m_ControlPoints->ElementAt( 1 ) = boundaryPoint;
+  }
+  else if ( index == 1 )
+  {
+    m_ControlPoints->ElementAt( index ) = point;
+    return true;
+  }
+  else
+  {
+    return false;
+  }
+}
 
 void mitk::PlanarCircle::GeneratePolyLine()
 {

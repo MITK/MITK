@@ -304,6 +304,7 @@ bool mitk::PlanarFigureInteractor
         planarFigure->DeselectControlPoint();
         planarFigure->InvokeEvent( itk::InitializeEvent() );
         planarFigure->InvokeEvent( itk::EndEvent() );
+        planarFigure->InvokeEvent( itk::ModifiedEvent() );
         this->HandleEvent( new mitk::StateEvent( EIDYES, stateEvent->GetEvent() ) );
       }
       else

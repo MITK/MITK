@@ -48,6 +48,7 @@ public:
    */
   //virtual void Initialize();
 
+  bool SetControlPoint( unsigned int index, const Point2D &point, bool createIfDoesNotExist );
 
   /** \brief Circle has 2 control points per definition. */
   unsigned int GetMinimumNumberOfControlPoints() const

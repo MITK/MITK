@@ -281,9 +281,6 @@ IF(WIN32)
     INSTALL(FILES ${qtdebugdlls} DESTINATION bin CONFIGURATIONS Debug)
     INSTALL(FILES ${qtreleasedlls} DESTINATION bin CONFIGURATIONS Release)
     
-    # install assistant.exe, needed for the Qt Help system
-    INSTALL(PROGRAMS ${QT_ASSISTANT_EXECUTABLE} DESTINATION bin OPTIONAL)
-  
   ENDIF(MITK_USE_QT)
  
   #VTK DLLs install target

@@ -78,6 +78,15 @@ void QmitkDemonsRegistrationView::CalculateTransformation()
   {
     mitk::Image::Pointer fimage = dynamic_cast<mitk::Image*>(m_FixedNode->GetData());
     mitk::Image::Pointer mimage = dynamic_cast<mitk::Image*>(m_MovingNode->GetData());
+    // workaround to ensure that fimage covers a bigger region than mimage
+    mitk::Image::RegionType fimageRegion = fimage->GetLargestPossibleRegion();
+    mitk::Image::RegionType mimageRegion = mimage->GetLargestPossibleRegion();
+    if (!((fimageRegion.GetSize(0)>=mimageRegion.GetSize(0))&&(fimageRegion.GetSize(1)>=mimageRegion.GetSize(1))
+        &&(fimageRegion.GetSize(2)>=mimageRegion.GetSize(2))))
+    {
+      QMessageBox::information(NULL,"Registration","Fixed image must be equal or bigger in size than moving image");
+      return;
+    }
     if ( m_Controls.m_RegistrationSelection->currentIndex() == 0)
     {
       mitk::DemonsRegistration::Pointer registration = mitk::DemonsRegistration::New();
@@ -116,6 +125,7 @@ void QmitkDemonsRegistrationView::CalculateTransformation()
       catch (itk::ExceptionObject& excpt)
       {
         QMessageBox::information( this, "Registration exception", excpt.GetDescription(), QMessageBox::Ok );
+        return;
       }
       m_ResultImage = registration->GetOutput();
       typedef itk::Image<itk::Vector<float,3>, 3> VectorImageType;

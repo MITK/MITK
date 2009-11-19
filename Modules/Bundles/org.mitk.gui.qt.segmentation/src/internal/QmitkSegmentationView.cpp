@@ -184,6 +184,7 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
   // create signal/slot connections
   connect( m_Controls->btnNewSegmentation, SIGNAL(clicked()), this, SLOT(CreateNewSegmentation()) );
   connect( m_Controls->m_ManualToolSelectionBox, SIGNAL(ToolSelected(int)), this, SLOT(OnToolSelected(int)) );
+  connect( m_Controls->widgetStack, SIGNAL(currentChanged(int)), this, SLOT(OnSegmentationMethodSelected(int)) );
 
   // register as listener for openCherry selection events (mainly from DataManager)
   m_SelectionListener = cherry::ISelectionListener::Pointer(new cherry::SelectionChangedAdapter<QmitkSegmentationView>(this, &QmitkSegmentationView::SelectionChanged));
@@ -369,6 +370,34 @@ void QmitkSegmentationView::OnToolSelected(int id)
     else
     {
       m_MultiWidget->EnableNavigationControllerEventListening();
+    }
+  }
+}
+
+void QmitkSegmentationView::OnSegmentationMethodSelected(int id)
+{
+  if (id==0) //manual
+  {
+
+  }
+  else if (id==1) // organs
+  {
+
+  }
+  else if (id==2) // lesions
+  {
+    mitk::DataTreeNode::Pointer node = m_Controls->m_ManualToolSelectionBox->GetToolManager()->GetReferenceData(0);
+    if (node.IsNotNull())
+    {
+      mitk::Image::Pointer image = dynamic_cast<mitk::Image*>( node->GetData() );
+      if (image.IsNotNull())
+      {
+        if (image->GetDimension()>3)
+        {
+          m_Controls->widgetStack->setCurrentIndex(0);
+          QMessageBox::information(NULL,"Segmentation","Lesion segmentation is currently not supported for 4D images");
+        }
+      }
     }
   }
 }

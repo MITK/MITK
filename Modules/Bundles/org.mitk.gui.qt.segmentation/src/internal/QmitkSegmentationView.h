@@ -67,6 +67,7 @@ protected:
     void CreateNewSegmentation();
 
     void OnToolSelected(int id);
+    void OnSegmentationMethodSelected(int id);
     void OnReferenceNodeSelected(const mitk::DataTreeNode*);
     void OnWorkingDataSelectionChanged(const mitk::DataTreeNode*);
 

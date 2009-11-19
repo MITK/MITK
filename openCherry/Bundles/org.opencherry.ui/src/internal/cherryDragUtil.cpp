@@ -158,7 +158,7 @@ void DragUtil::RemoveDragTarget(void* control,
 {
   if (control == 0)
   {
-    defaultTargets.push_back(target);
+    defaultTargets.remove(target);
   }
   else
   {

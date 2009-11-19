@@ -420,15 +420,13 @@ bool QmitkDataStorageTreeModel::setData( const QModelIndex &index, const QVarian
   }
   else if(role == Qt::CheckStateRole)
   {
-    // workaround for Qt bug: the checkbox was always set to true
-    // suppose when the checkbox was clicked the user wants to toggle
-    // the visibility
-    bool isVisible = true;
-    if(dataNode->GetBoolProperty("visible", isVisible))
-    {
-      dataNode->SetVisibility(!isVisible);
-    }
-
+    // Please note: value.toInt() returns 2, independentely from the actual checkstate of the index element. 
+	// Therefore the checkstate is being estimated again here. 
+    
+	QVariant qcheckstate = index.data(Qt::CheckStateRole);
+	int checkstate = qcheckstate.toInt();
+    bool isVisible = bool(checkstate);
+	dataNode->SetVisibility(!isVisible);
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
   // inform listeners about changes

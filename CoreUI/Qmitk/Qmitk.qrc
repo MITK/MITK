@@ -1,17 +1,16 @@
-<!DOCTYPE RCC><RCC version="1.0">
- <qresource prefix="/Qmitk"> 
-    <file>data-type-angle.png</file>
-    <file>data-type-arrow.png</file>
-    <file>data-type-circle.png</file>
-    <file>data-type-four-point-angle.png</file>
-    <file>data-type-image-24.png</file>
-    <file>data-type-image-mask-24.png</file>
-    <file>data-type-line.png</file>
-    <file>data-type-mesh-24.png</file>
-    <file>data-type-path.png</file>
-    <file>data-type-pointset-24.png</file>
-    <file>data-type-polygon.png</file>
-    <file>data-type-rectangle.png</file>
-    <file>data-type-unknown-24.png</file>
- </qresource>
- </RCC>
+<RCC>
+    <qresource prefix="/Qmitk" >
+        <file>Binaerbilder_48.png</file>
+        <file>Images_48.png</file>
+        <file>PlanarAngle_48.png</file>
+        <file>PlanarFourPointAngle_48.png</file>
+        <file>PlanarLine_48.png</file>
+        <file>PlanarPath_48.png</file>
+        <file>PlanarPolygon_48.png</file>
+        <file>PlanarRectangle_48.png</file>
+        <file>PointSet_48.png</file>
+        <file>Segmentation_48.png</file>
+        <file>Surface_48.png</file>
+        <file>PlanarCircle_48.png</file>
+    </qresource>
+</RCC>

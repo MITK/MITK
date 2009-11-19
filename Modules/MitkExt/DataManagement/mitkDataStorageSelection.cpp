@@ -72,6 +72,7 @@ namespace mitk
   DataStorageSelection& DataStorageSelection::operator=(mitk::DataTreeNode::Pointer node)
   {
     *this = node.GetPointer();
+    return *this;
   }
 
   void DataStorageSelection::SetDataStorage(mitk::DataStorage* _DataStorage)

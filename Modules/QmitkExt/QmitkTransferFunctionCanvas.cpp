@@ -23,6 +23,97 @@
 #include <QPainter>
 #include <QMouseEvent>
 
+void mitk::SimpleHistogram::ComputeFromImage( Image::Pointer source )
+{
+  valid = false;
+  
+  LOG_INFO << "SimpleHistogram: ComputeFromImage started";
+  
+  if(source->GetDimension() != 3)
+  {
+    LOG_WARN << "only works on 3D-Images";
+    return;
+  }
+
+  // signed short histogram
+  {
+    first=-32768;  last=32767;
+
+    if(histogram)
+      delete histogram;
+      
+    histogram = new CountType[last-first+1];
+    memset(histogram,0,sizeof(CountType)*(last-first+1));
+    highest = 0;
+    max = first - 1;
+    min = last + 1;
+    
+    // converting mitk image -> itk image
+    CTImage::Pointer work = CTImage::New();
+    CastToItkImage( source, work );
+    CTIteratorIndexType workIt( work, work->GetRequestedRegion() );
+    
+    workIt.GoToBegin();
+
+    while ( ! workIt.IsAtEnd() )
+    {
+      int value = workIt.Get();
+
+      if(value >= first && value <= last)
+      {
+        if(value < min) min = value;
+        if(value > max) max = value;
+        CountType tmp = ++histogram[value-first];
+        if(tmp > highest) highest = tmp;
+      }
+      
+      ++workIt;
+    }
+  }
+  
+  invLogHighest = 1.0/log(double(highest));
+  valid = true;
+}
+
+
+float mitk::SimpleHistogram::GetRelativeBin( float left, float right )
+{
+  if( !valid )
+    return 0.0f;
+    
+  int iLeft = floorf(left);
+  int iRight = ceilf(right);
+
+ /*
+  double sum = 0;
+
+  for( int r = 0 ; r < 256 ; r++)
+  {
+    int pos = left + (right-left) * r/255.0;
+    int posInArray = floorf(pos+0.5f) - first;
+    sum += float(log(double(histogram[posInArray])));
+  }
+
+  sum /= 256.0;
+  return float(sum*invLogHighest); 
+ */
+
+  CountType maximum = 0;
+  
+  for( int i = iLeft; i <= iRight ; i++)   
+  {
+    int posInArray = i - first;
+    if( histogram[posInArray] > maximum ) maximum = histogram[posInArray];
+  }
+  
+  return float(log(double(maximum))*invLogHighest);  
+
+
+   
+
+}
+
+  
 QmitkTransferFunctionCanvas::QmitkTransferFunctionCanvas(QWidget * parent,
     Qt::WindowFlags f) :
   QWidget(parent, f), m_GrabbedHandle(-1), m_Lower(0.0f), m_Upper(1.0f), m_Min(
@@ -170,46 +261,33 @@ void QmitkTransferFunctionCanvas::mouseReleaseEvent(QMouseEvent*)
 
 void QmitkTransferFunctionCanvas::PaintHistogram(QPainter &p)
 {
-  if (m_Histogram.IsNotNull())
+  if(m_Histogram)
   {
     p.save();
     
     p.setPen(Qt::gray);
         
-    //float scaleFactor = (float) () / contentsRect().width();
-    float scaleFactor = (float) (m_Upper-m_Lower) / contentsRect().width();
-    
-    //LOG_INFO << "m_Upper: " << m_Upper << ", m_Lower: " << m_Lower;
-    
-    float histoMin = m_Histogram->GetBinMin(0,0);
-    float histoMax = m_Histogram->GetBinMax(0, m_Histogram->Size()-1);
+    int displayWidth = contentsRect().width();
+    int displayHeight = contentsRect().height();
+  
+    int windowLeft = m_Lower;
+    int windowRight = m_Upper;
 
-    //LOG_INFO << "histo min: " << histoMin << " " << histoMax;
-    
-    float maxFreqLog = vcl_log(mitk::HistogramGenerator::CalculateMaximumFrequency(this->GetHistogram()));
-        
-    for (int x = 0; x < contentsRect().width(); x++)
+    double step = (windowRight-windowLeft)/double(displayWidth);
+  
+    double pos = windowLeft;
+  
+    for (int x = 0; x < displayWidth; x++)
     {
-      float grayvalue = x *scaleFactor + m_Lower;
+      float left = pos;
+      float right = pos + step;
       
-      if(grayvalue >= histoMin && grayvalue <= histoMax)
-      {
-        float posInHistogramm = ((grayvalue-histoMin)*m_Histogram->GetSize()[0])/(histoMax-histoMin);
+      float height = m_Histogram->GetRelativeBin( left , right );
 
-        int tfIndex = static_cast<int> (posInHistogramm );
-        float tfFractional = posInHistogramm-tfIndex;
-        
-        float freqA = this->GetHistogram()->GetFrequency(tfIndex);
-        float freqB = this->GetHistogram()->GetFrequency(tfIndex+1);
-
-        float freq = freqA * (1-tfFractional) + freqB * tfFractional;
-
-        if (freq > 0)
-        {
-          int y = static_cast<int> ((1 - vcl_log(freq) / maxFreqLog) * contentsRect().height());
-          p.drawLine(x, contentsRect().height(), x, y);
-        }
-      }
+      if (height >= 0)
+        p.drawLine(x, displayHeight*(1-height), x, displayHeight);
+      
+      pos += step;
     }
     
     p.restore();

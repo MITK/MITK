@@ -152,9 +152,11 @@ void QmitkTransferFunctionGeneratorWidget::OnLoadPreset( )
 
   if(tf.IsNotNull())
   {
+    /*
     if( histoGramm )
       tf->InitializeByItkHistogram( histoGramm );
-
+    */
+    
     tfpToChange->SetValue( tf );
    
     m_InfoPreset->setText( QString( (std::string("loaded ")+ fileNameOutput).c_str() ) );
@@ -451,12 +453,14 @@ void QmitkTransferFunctionGeneratorWidget::SetDataTreeNode(mitk::DataTreeNode* n
     mitk::TransferFunction::Pointer tf = tfpToChange->GetValue();
 
     if( mitk::Image* image = dynamic_cast<mitk::Image*>( node->GetData() ) )
-      tf->InitializeByItkHistogram( histoGramm = image->GetScalarHistogram() );
-                  
-    thPos = ( tf->GetMin() + tf->GetMax() ) / 2; 
+    {
+//      tf->InitializeByItkHistogram( histoGramm = image->GetScalarHistogram() );
+      histoMinimum= image->GetScalarValueMin();
+      histoMaximum= image->GetScalarValueMax();
+    }
+            
+    thPos = ( histoMinimum + histoMaximum ) / 2; 
     
-    histoMinimum = tf->GetMin();
-    histoMaximum = tf->GetMax();
   }
   else
   {

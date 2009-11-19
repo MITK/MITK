@@ -14,6 +14,8 @@
 #include <QSlider>
 #include <QPushButton>
 
+#include <QmitkTransferFunctionWidget.h>
+
 
 class QMITKEXT_EXPORT QmitkTransferFunctionWidget : public QWidget, public Ui::QmitkTransferFunctionWidget
 {
@@ -48,6 +50,8 @@ class QMITKEXT_EXPORT QmitkTransferFunctionWidget : public QWidget, public Ui::Q
     
     int m_RangeSliderMin;
     int m_RangeSliderMax;
+
+    mitk::SimpleHistogramCache histogramCache;
     
 };
 #endif

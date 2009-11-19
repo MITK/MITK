@@ -27,6 +27,178 @@
 #include <vtkPiecewiseFunction.h>
 
 #include <mitkCommon.h>
+#include <mitkImage.h>
+#include "mitkImageCast.h"
+#include <mitkWeakPointer.h>
+
+
+namespace mitk {
+
+class QMITKEXT_EXPORT SimpleHistogram
+{
+  public:
+  
+  SimpleHistogram()
+  {
+    valid=false;
+    histogram=0;
+  }
+  
+  ~SimpleHistogram()
+  {
+    if(histogram)
+      delete histogram;
+  }
+  
+  typedef itk::Image<short, 3>          CTImage;
+  typedef itk::ImageRegionIterator< CTImage  > CTIteratorType;
+  typedef itk::ImageRegionIteratorWithIndex< CTImage  > CTIteratorIndexType;
+  
+  typedef itk::Image<unsigned char, 3> BinImage;
+  typedef itk::ImageRegionIterator< BinImage > BinIteratorType;
+  typedef itk::ImageRegionIteratorWithIndex< BinImage > BinIteratorIndexType;
+
+  typedef unsigned long CountType;
+
+  protected:
+
+  CountType *histogram;
+
+  bool valid;
+  
+  int first;
+  int last;
+  int min;
+  int max;
+  CountType highest;
+  double invLogHighest;
+  
+  public:
+  
+  int GetFirst()
+  {
+    if(!valid)
+      return 0;
+      
+    return first;
+  }
+  
+  int GetLast()
+  {
+    if(!valid)
+      return 0;
+      
+    return last;
+  }
+  
+  void ComputeFromImage( Image::Pointer source );
+  float GetRelativeBin( float start, float end );
+  
+};
+
+class QMITKEXT_EXPORT SimpleHistogramCache
+{
+  public:
+  
+    static const int maxCacheSize = 64;
+
+  protected:
+
+    class Element
+    {
+      public:
+        mitk::WeakPointer<mitk::Image> image;
+        itk::TimeStamp m_LastUpdateTime;
+        SimpleHistogram histogram;
+    };
+
+    typedef std::list<Element*> CacheContainer;
+    
+    CacheContainer cache;
+    
+  public:
+  
+    SimpleHistogramCache()
+    {
+      
+    }
+    
+    ~SimpleHistogramCache()
+    {
+      TrimCache(true);
+    }
+
+    SimpleHistogram *operator[](mitk::Image::Pointer sp_Image)
+    {
+      mitk::Image *p_Image = sp_Image.GetPointer();
+
+      if(!p_Image)
+      {
+        LOG_WARN << "SimpleHistogramCache::operator[] with null image called";
+        return 0;
+      }
+      
+      Element *elementToUpdate = 0;
+      
+      bool first = true;
+      
+      for(CacheContainer::iterator iter = cache.begin(); iter != cache.end(); iter++)
+      {
+        Element *e = *iter;
+        mitk::Image *p_tmp = e->image.GetPointer();
+
+        if(p_tmp == p_Image)
+        {
+          if(!first)
+          {
+            cache.erase(iter);
+            cache.push_front(e);
+          }
+          if( p_Image->GetMTime() > e->m_LastUpdateTime.GetMTime())
+            goto recomputeElement;
+          
+          LOG_INFO << "using a cached histogram";
+          
+          return &e->histogram;
+        }
+          
+        first = false;
+      }
+
+      elementToUpdate = new Element();
+      elementToUpdate->image = p_Image;
+      cache.push_front(elementToUpdate);
+      TrimCache();
+
+      recomputeElement:
+
+      LOG_INFO << "computing a new histogram";
+
+      elementToUpdate->histogram.ComputeFromImage(p_Image);
+      elementToUpdate->m_LastUpdateTime.Modified();
+      return &elementToUpdate->histogram;
+    }
+    
+  protected:
+ 
+    void TrimCache(bool full=false)
+    {
+      int targetSize = full?0:maxCacheSize;
+      
+      while(cache.size()>targetSize)
+      {
+        delete cache.back();
+        cache.pop_back();
+      }
+            
+    }
+    
+};
+
+
+
+}
+
 
 class QMITKEXT_EXPORT QmitkTransferFunctionCanvas : public QWidget
 {
@@ -37,12 +209,12 @@ public:
 
   QmitkTransferFunctionCanvas( QWidget * parent=0, Qt::WindowFlags f = 0 );
 
-  mitk::HistogramGenerator::HistogramType::ConstPointer GetHistogram()
+  mitk::SimpleHistogram* GetHistogram()
   {
     return m_Histogram;
   }
 
-  void SetHistogram(const mitk::HistogramGenerator::HistogramType* histogram)
+  void SetHistogram(mitk::SimpleHistogram *histogram)
   {
     m_Histogram = histogram;
   }
@@ -113,7 +285,10 @@ public:
     
   std::pair<int,int> FunctionToCanvas(std::pair<vtkFloatingPointType,vtkFloatingPointType>);
   std::pair<vtkFloatingPointType,vtkFloatingPointType> CanvasToFunction(std::pair<int,int>);
-  mitk::HistogramGenerator::HistogramType::ConstPointer m_Histogram;
+
+
+  mitk::SimpleHistogram *m_Histogram;
+
   void keyPressEvent ( QKeyEvent * e );
 
   void SetImmediateUpdate(bool state);

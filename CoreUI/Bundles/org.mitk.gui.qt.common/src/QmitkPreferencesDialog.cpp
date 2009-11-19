@@ -224,6 +224,18 @@ QmitkPreferencesDialog::~QmitkPreferencesDialog()
 {
 }
 
+void QmitkPreferencesDialog::SetSelectedPage(const std::string& id)
+{
+  for(vector<PrefPage>::iterator it = m_PrefPages.begin();
+    it != m_PrefPages.end(); ++it)
+  {
+    if(it->id == id)
+    {
+      m_PreferencesTree->setCurrentItem(it->treeWidgetItem);
+      break;
+    }
+  }
+}
 
 void QmitkPreferencesDialog::OnImportButtonClicked( bool  /*triggered*/ )
 {  

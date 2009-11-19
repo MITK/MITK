@@ -47,6 +47,7 @@ class MITK_QT_COMMON QmitkPreferencesDialog : public QDialog
 public:
     QmitkPreferencesDialog(QWidget * parent = 0, Qt::WindowFlags f = 0);
     ~QmitkPreferencesDialog();    
+    void SetSelectedPage(const std::string& id);
 
 protected slots:
   void OnImportButtonClicked(bool triggered=false);

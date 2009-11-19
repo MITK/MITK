@@ -220,11 +220,13 @@ namespace mitk
       }
     }
 
-    if(node)
+    if(prop && node)
+    {
+      PropertyChanged.Send(node, prop);
+    }
+    else if(node)
     {
       NodeChanged.Send(node);
-      if(prop)
-        PropertyChanged.Send(node, prop);
     }
   }
 

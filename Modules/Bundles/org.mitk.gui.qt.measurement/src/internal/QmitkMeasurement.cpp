@@ -319,6 +319,7 @@ void QmitkMeasurement::PlanarFigureSelectionChanged()
   if (m_SelectedPlanarFigures->GetSize() == 0)
     this->SetMeasurementInfoToRenderWindow("", 0);
 
+
   unsigned int j = 1;
   mitk::PlanarFigure* _PlanarFigure = 0;
   mitk::PlanarAngle* planarAngle = 0;
@@ -431,6 +432,9 @@ void QmitkMeasurement::PlanarFigureSelectionChanged()
       this->SetMeasurementInfoToRenderWindow(plainInfoText, selectedRenderWindow);
     }
   }
+  // no last planarfigure
+  else
+    this->SetMeasurementInfoToRenderWindow("", 0);
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
@@ -752,15 +756,19 @@ void QmitkMeasurement::CopyToClipboard(bool)
 void QmitkMeasurement::SetMeasurementInfoToRenderWindow(const QString& text,
     QmitkRenderWindow* _RenderWindow)
 {
-  static QmitkRenderWindow* lastRenderWindow = _RenderWindow;
+  static QmitkRenderWindow* lastRenderWindow = 0;
+  if(_RenderWindow != 0)
+    lastRenderWindow = _RenderWindow;
+
   if (!text.isEmpty())
   {
     m_MeasurementInfoAnnotation->SetText(1, text.toLatin1().data());
     mitk::VtkLayerController::GetInstance(_RenderWindow->GetRenderWindow())->InsertForegroundRenderer(
         m_MeasurementInfoRenderer, true);
-  } else
+  }
+  else
   {
-    if (_RenderWindow != 0 && mitk::VtkLayerController::GetInstance(
+    if (lastRenderWindow != 0 && mitk::VtkLayerController::GetInstance(
         lastRenderWindow->GetRenderWindow()) ->IsRendererInserted(
         m_MeasurementInfoRenderer))
       mitk::VtkLayerController::GetInstance(lastRenderWindow->GetRenderWindow())->RemoveRenderer(

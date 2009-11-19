@@ -1,9 +1,9 @@
-<!DOCTYPE RCC><RCC version="1.0">
- <qresource prefix="/org.mitk.gui.qt.ext">
-     <file>edit-undo.png</file>
-     <file>edit-redo.png</file>
-     <file>document-new.png</file>
-     <file>document-open.png</file>
-     <file>document-save.png</file>
- </qresource>
- </RCC>
+<RCC>
+    <qresource prefix="/org.mitk.gui.qt.ext" >
+        <file>Load_48.png</file>
+        <file>Redo_48.png</file>
+        <file>Save_48.png</file>
+        <file>Undo_48.png</file>
+        <file>Remove_48.png</file>
+    </qresource>
+</RCC>

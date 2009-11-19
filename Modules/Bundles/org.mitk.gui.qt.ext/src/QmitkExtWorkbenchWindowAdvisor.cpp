@@ -189,18 +189,25 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
   QMainWindow* mainWindow =
       static_cast<QMainWindow*> (window->GetShell()->GetControl());
 
+  /*mainWindow->setStyleSheet("color: white;"
+      "background-color: #808080;"
+      "selection-color: #659EC7;"
+      "selection-background-color: #808080;"
+      " QMenuBar {"
+      "background-color: #808080; }");*/
+
   // ==== Application menu ============================
   QMenuBar* menuBar = mainWindow->menuBar();
 
   QMenu* fileMenu = menuBar->addMenu("&File");
 
-  QAction* fileOpenAction = new QmitkFileOpenAction(QIcon(":/org.mitk.gui.qt.ext/document-open.png"), window);
+  QAction* fileOpenAction = new QmitkFileOpenAction(QIcon(":/org.mitk.gui.qt.ext/Load_48.png"), window);
   fileMenu->addAction(fileOpenAction);
   QAction* fileSaveProjectAction = new QmitkFileSaveProjectAction(window);
-  fileSaveProjectAction->setIcon(QIcon(":/org.mitk.gui.qt.ext/document-save.png"));
+  fileSaveProjectAction->setIcon(QIcon(":/org.mitk.gui.qt.ext/Save_48.png"));
   fileMenu->addAction(fileSaveProjectAction);
   QAction* closeProjectAction = new QmitkCloseProjectAction(window);
-  closeProjectAction->setIcon(QIcon(":/org.mitk.gui.qt.ext/document-new.png"));
+  closeProjectAction->setIcon(QIcon(":/org.mitk.gui.qt.ext/Remove_48.png"));
   fileMenu->addAction(closeProjectAction);
   fileMenu->addSeparator();
   fileMenu->addAction(new QmitkFileExitAction(window));
@@ -212,12 +219,12 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
 
   // another bad hack to get an edit/undo menu...
   QMenu* editMenu = menuBar->addMenu("&Edit");
-  QAction* undoAction = editMenu->addAction(QIcon(":/org.mitk.gui.qt.ext/edit-undo.png"),
+  QAction* undoAction = editMenu->addAction(QIcon(":/org.mitk.gui.qt.ext/Undo_48.png"),
       "&Undo",
       QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onUndo()),
       QKeySequence("CTRL+Z"));
-  undoAction->setToolTip("Undo the last action (not supported by all modules)");
-  QAction* redoAction = editMenu->addAction(QIcon(":/org.mitk.gui.qt.ext/edit-redo.png")
+ undoAction->setToolTip("Undo the last action (not supported by all modules)");
+ QAction* redoAction = editMenu->addAction(QIcon(":/org.mitk.gui.qt.ext/Redo_48.png")
       , "&Redo",
       QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onRedo()),
       QKeySequence("CTRL+Y"));

@@ -1036,6 +1036,7 @@ void QmitkSegmentationView::OnNewNodeObjectsGenerated(mitk::ToolManager::DataVec
       GetSite()->GetWorkbenchWindow()->GetActivePage()->ShowView("org.mitk.views.segmentation" ,"", cherry::IWorkbenchPage::VIEW_ACTIVATE);
       SendSelectedEvent( toolManager->GetReferenceData(0), *iter );
       toolManager->SetWorkingData( *iter );
+      OnWorkingDataSelectionChanged( *iter );
       break;
     }
 

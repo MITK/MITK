@@ -181,7 +181,8 @@ IIntroPart::Pointer WorkbenchIntroManager::ShowIntro(SmartPointer<
       }
       else
       {
-        page->OpenEditor(IEditorInput::Pointer(0), IntroConstants::INTRO_EDITOR_ID);
+        IEditorInput::Pointer input(new NullEditorInput());
+        page->OpenEditor(input, IntroConstants::INTRO_EDITOR_ID);
       }
     } catch (PartInitException& e)
     {

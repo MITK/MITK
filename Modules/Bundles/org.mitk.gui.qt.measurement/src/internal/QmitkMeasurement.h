@@ -70,6 +70,7 @@ class QmitkMeasurement : public QObject, public QmitkFunctionality
     virtual void Visible();
     virtual void Hidden();
     virtual void NodeChanged(const mitk::DataTreeNode* node);
+    virtual void PropertyChanged(const mitk::DataTreeNode* node, const mitk::BaseProperty* prop);
     virtual void NodeRemoved(const mitk::DataTreeNode* node);
     virtual void NodeAddedInDataStorage(const mitk::DataTreeNode* node);
     virtual void PlanarFigureInitialized();

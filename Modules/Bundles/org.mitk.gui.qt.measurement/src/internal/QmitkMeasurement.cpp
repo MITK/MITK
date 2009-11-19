@@ -84,11 +84,17 @@ QmitkMeasurement::~QmitkMeasurement()
   m_SelectedPlanarFigures->NodeRemoved.RemoveListener( mitk::MessageDelegate1<QmitkMeasurement
     , const mitk::DataTreeNode*>( this, &QmitkMeasurement::NodeRemoved ) );
 
+  m_SelectedPlanarFigures->PropertyChanged.RemoveListener( mitk::MessageDelegate2<QmitkMeasurement
+    , const mitk::DataTreeNode*, const mitk::BaseProperty*>( this, &QmitkMeasurement::PropertyChanged ) );
+
   m_SelectedImageNode->NodeChanged.RemoveListener( mitk::MessageDelegate1<QmitkMeasurement
     , const mitk::DataTreeNode*>( this, &QmitkMeasurement::NodeChanged ) );
 
   m_SelectedImageNode->NodeRemoved.RemoveListener( mitk::MessageDelegate1<QmitkMeasurement
     , const mitk::DataTreeNode*>( this, &QmitkMeasurement::NodeRemoved ) );
+
+  m_SelectedImageNode->PropertyChanged.RemoveListener( mitk::MessageDelegate2<QmitkMeasurement
+    , const mitk::DataTreeNode*, const mitk::BaseProperty*>( this, &QmitkMeasurement::PropertyChanged ) );
 }
 
 void QmitkMeasurement::CreateQtPartControl(QWidget* parent)
@@ -193,7 +199,13 @@ void QmitkMeasurement::CreateQtPartControl(QWidget* parent)
   m_SelectedPlanarFigures->NodeRemoved.AddListener( mitk::MessageDelegate1<QmitkMeasurement
     , const mitk::DataTreeNode*>( this, &QmitkMeasurement::NodeRemoved ) );
 
+  m_SelectedPlanarFigures->PropertyChanged.AddListener( mitk::MessageDelegate2<QmitkMeasurement
+    , const mitk::DataTreeNode*, const mitk::BaseProperty*>( this, &QmitkMeasurement::PropertyChanged ) );
+
   m_SelectedImageNode = mitk::DataStorageSelection::New(this->GetDefaultDataStorage(), false);
+
+  m_SelectedImageNode->PropertyChanged.AddListener( mitk::MessageDelegate2<QmitkMeasurement
+    , const mitk::DataTreeNode*, const mitk::BaseProperty*>( this, &QmitkMeasurement::PropertyChanged ) );
 
   m_SelectedImageNode->NodeChanged.AddListener( mitk::MessageDelegate1<QmitkMeasurement
     , const mitk::DataTreeNode*>( this, &QmitkMeasurement::NodeChanged ) );
@@ -357,9 +369,9 @@ void QmitkMeasurement::PlanarFigureSelectionChanged()
     double featureQuantity;
     for (unsigned int i = 0; i < _PlanarFigure->GetNumberOfFeatures(); ++i)
     {
+      featureQuantity = _PlanarFigure->GetQuantity(i);
       if(featureQuantity == 0)
         continue;
-      featureQuantity = _PlanarFigure->GetQuantity(i);
       if ((planarAngle && i == planarAngle->FEATURE_ID_ANGLE)
           || (planarFourPointAngle && i == planarFourPointAngle->FEATURE_ID_ANGLE))
         featureQuantity = featureQuantity * 180 / vnl_math::pi;
@@ -676,11 +688,16 @@ void QmitkMeasurement::Hidden()
   m_Visible = false;
 }
 
-void QmitkMeasurement::NodeChanged(const mitk::DataTreeNode* node)
+
+void QmitkMeasurement::PropertyChanged(const mitk::DataTreeNode* node, const mitk::BaseProperty* prop)
 {
   this->PlanarFigureSelectionChanged();
 }
 
+void QmitkMeasurement::NodeChanged(const mitk::DataTreeNode* node)
+{
+  this->PlanarFigureSelectionChanged();
+}
 
 void QmitkMeasurement::NodeRemoved(const mitk::DataTreeNode* node)
 {

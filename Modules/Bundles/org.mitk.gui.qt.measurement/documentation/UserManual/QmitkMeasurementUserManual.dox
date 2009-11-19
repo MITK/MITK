@@ -1,19 +1,84 @@
 /**
 \image html MeasurementIcon.png 
-\page QmitkMeasurementUserManual Measurement
+\page QmitkMeasurementUserManual Measurement 
 
-Available sections:
+
+Table of content:
   - \ref QmitkMeasurementUserManualOverview 
   - \ref QmitkMeasurementUserManualFeatures 
   - \ref QmitkMeasurementUserManualUsage 
 
 \section QmitkMeasurementUserManualOverview Overview
 
-Measurement is a is a program module that allows to measure distances, angels and pathes on a dataset.
+The Measurement module enables the user to interact with 2D images or single slices of 3D image stacks and planar figure data types. It allows to measure distances, angels, pathes and several geometric figures on a dataset. The workflow to use this module is:
+
+\image html Workflow.png
+
+The workflow is repeatedly useable with the same or different measurement figures, which are correlated to the choosen image and can be saved together with it for future use. The standard working plane is "Transversal" but the other standard viewplanes ("Saggital" and "Coronal") are also valid for measurements.
+Once the measurement module is started the programm's basic appearance is as follows (displayed with the components description):
+
+\image html Basic_Screen_edited.png
+
+In the following section the different measurement figures are explained by using an 3D MRI image stack of the pelvis.
+
 
 \section QmitkMeasurementUserManualFeatures Features
 
-<ul>
+This Section is subdivided into four subsections:
+<ol>
+    <li><b>Add an image</b>
+    <li><b>Work with measurement figures</b>
+    <li><b>Save the image with measurement information</b>
+	<li><b>Remove measurement figures or image</b>
+</ol>
+
+Let's start with subsection 1
+\subsection One Add an image
+
+There are two possible ways to add an image to the programm. One is to grap the image with left mouse click from your prefered file browser and simply drag&drop it to the View Plane field. The other way is to use the 
+\image html OpenButton.png
+button in the upper left corner of the application. A dialog window appears showing the file tree of the computer. Navigate to the wanted file and select it with the left mouse click. Afterwards just use the dialog's open button.  
+
+The wanted image appears in the View Plane and in the Data Manager the images name appears as a new tree node. Now the image is loaded it can be adjusted in the usual way ( zoom in/out: right mouse button + moving the mouse up and down, moving the image: press mouse wheel and move the mouse to the wished direction, scroll through the slices( only on 3D images): scroll mouse wheel up and down).
+
+\subsection Two Work with measurement figures
+The measurement module comes with seven measurement figures(see picture below), that can be applied to the images. The results of the measurement with each of these figures is shown in the statistics window and in the lower right corner of the view plane. 
+
+\image html MeasurementFigureButtonline.png
+
+From left to right the buttons are connected with the following functions:
+
+\subsubsection SubOne Draw Line
+Draws a line between two set points and returns the distance between these points.
+
+\subsubsection SubTwo Draw Path
+Draws a path between several set points (two and more) and calculates the circumference, that is all line's length summed up. 
+
+\subsubsection SubThree Draw Angle
+Draws two lines from three set points connected in the second set point and returns the inner angle at the second point. 
+
+\subsubsection SubFour Draw Four Point Angle
+Draws two lines that may but must not intersect from four set points. The returned angle is the one depicted in the icon.
+
+\subsubsection SubFive Draw Circle
+Draws a circle by setting two points, whereas the first set point is the center and the second the radius of the circle. The measured values are the radius and the included area.
+
+\subsubsection SubSix Draw Rectangle
+Draws a recangle by setting two points at the opposing edges of the rectangle starting with the upper left edge. The measured values are the circumference and the included area. 
+
+\subsubsection SubSeven Draw Polygon
+Draws a polygon by setting three or more points. The measured values are the circumference and the included area. 
+
+\subsection Three Save the image with measurement information
+After applying the wanted measurement figures the entire scene consisting of the image and the measurement figures can be saved for future use. Therefore just click the right mouse button and choose the item "Save" in the opening item list. Following to that a save dialog appears where the path to the save folder can be set. Afterwards just accept your choice with the save button.
+\subsection Four Remove measurement figures or image
+If the single measurement figures or the image is not needed any longer, it can be removed solely or as an entire group. To do so just select the wanted items in the data manager list by left-click on it or if several items wanted to be removed left click on all wanted by simultaniously holding the ctrl-button pressed.
+    
+\section QmitkMeasurementUserManualUsage Usage
+
+
+
+<!-- <ul>
   <li> The Measurement Module is able to measure:
   <ul>
     <li> Distances between two points
@@ -37,7 +102,7 @@ What the different modes mean and how to use them:
   <li> c) Path: Distances and angles along a path can be measured by setting at least two (for distance) or three (for angles) or more (for longer pathes) points. The distance and the angles for each part will be displayed next to the path.
 </ul>
 
-\image html MeasurementGUI.png Graphical User Interface of Measurement
+\image html MeasurementGUI.png Graphical User Interface of Measurement -->
 
 */
 

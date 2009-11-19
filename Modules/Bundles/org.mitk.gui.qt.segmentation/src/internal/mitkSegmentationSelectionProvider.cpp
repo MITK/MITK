@@ -54,7 +54,6 @@ void SegmentationSelectionProvider::FireSelectionChanged(DataTreeNodeSelection::
 {
   if(selection.IsNotNull())
   {
-    LOG_INFO << "bin reingelaufen";
   
     m_CurrentSelection = selection;
     cherry::SelectionChangedEvent::Pointer event(new cherry::SelectionChangedEvent(cherry::ISelectionProvider::Pointer(this), m_CurrentSelection));

@@ -31,52 +31,69 @@ namespace cherry
 {
 
 QProcess* QtAssistantUtil::assistantProcess = 0;
+QString QtAssistantUtil::helpCollectionFile;
 
-QString* QtAssistantUtil::HelpCollectionFile = new QString("");
-
-void QtAssistantUtil::SetHelpColletionFile(QString* file)
+void QtAssistantUtil::SetHelpColletionFile(const QString& file)
 {
-HelpCollectionFile = file;
+  helpCollectionFile = file;
 }
 
-void QtAssistantUtil::OpenHelpPage()
+void QtAssistantUtil::OpenActivePartHelp()
 {
-if (assistantProcess!=0) assistantProcess->kill();
-
-QString pluginID = "org.mitk.gui.qt.common";
-
-//Get Plugin-ID
-cherry::IWorkbench* currentWorkbench = cherry::PlatformUI::GetWorkbench();
-if (currentWorkbench!=NULL) 
+  //Get Plugin-ID
+  QString pluginID;
+  cherry::IWorkbench* currentWorkbench = cherry::PlatformUI::GetWorkbench();
+  if (currentWorkbench) 
   {
-  cherry::IWorkbenchWindow::Pointer currentWorkbenchWindow = currentWorkbench->GetActiveWorkbenchWindow();
-  if (currentWorkbenchWindow!=NULL)
+    cherry::IWorkbenchWindow::Pointer currentWorkbenchWindow = currentWorkbench->GetActiveWorkbenchWindow();
+    if (currentWorkbenchWindow)
     {
-    cherry::IWorkbenchPage::Pointer currentPage = currentWorkbenchWindow->GetActivePage();
-    if (currentPage!=NULL)
+      cherry::IWorkbenchPage::Pointer currentPage = currentWorkbenchWindow->GetActivePage();
+      if (currentPage)
       {
-      cherry::IWorkbenchPart::Pointer currentPart = currentPage->GetActivePart();
-      if (currentPart.IsNotNull()) pluginID = QString(currentPart->GetSite()->GetPluginId().c_str());
+        cherry::IWorkbenchPart::Pointer currentPart = currentPage->GetActivePart();
+        if (currentPart) pluginID = QString::fromStdString(currentPart->GetSite()->GetPluginId());
       }
     }
   }
+  //End get Plugin-ID
 
-//End get Plugin-ID
-
-OpenAssistant(*HelpCollectionFile,"qthelp://"+pluginID+"/bundle/index.html");
+  QString helpUrl = GetDefaultHelpUrl();
+  if (!pluginID.isEmpty()) helpUrl = "qthelp://"+pluginID+"/bundle/index.html";
+  OpenAssistant(helpUrl);
 }
 
-void QtAssistantUtil::OpenAssistant(const QString& collectionFile, const QString& startPage)
+void QtAssistantUtil::OpenAssistant(const QString& startPage)
 {
-  QString assistantExec = GetAssistantExecutable();
-  assistantProcess = new QProcess;
-  QStringList thisCollection;
-  thisCollection << QLatin1String("-collectionFile") 
-                 << QLatin1String(collectionFile.toLatin1())
-                 << QLatin1String("-enableRemoteControl")
-                 << QLatin1String("-showUrl")
-                 << QLatin1String(startPage.toLatin1());
-  assistantProcess->start(assistantExec, thisCollection);
+  QString startUrl = startPage;
+  if (startUrl.isEmpty()) startUrl = GetDefaultHelpUrl();
+
+  if (assistantProcess == 0)
+  {
+    assistantProcess = new QProcess;
+  }
+
+  if (assistantProcess->state() == QProcess::NotRunning)
+  {
+    QStringList assistantArgs;
+    if (!helpCollectionFile.isEmpty())
+    {
+      assistantArgs << QLatin1String("-collectionFile") 
+                     << QLatin1String(helpCollectionFile.toLatin1());
+    }
+
+    assistantArgs << QLatin1String("-enableRemoteControl")
+                   << QLatin1String("-showUrl")
+                   << QLatin1String(startUrl.toLatin1());
+    assistantProcess->start(GetAssistantExecutable(), assistantArgs);
+  }
+  else
+  {
+    QByteArray ba;
+    ba.append("setSource ").append(startUrl.toLatin1()).append('\0');
+    assistantProcess->write(ba);
+  }
+
 }
 
 bool QtAssistantUtil::RegisterQCHFiles(const QString& collectionFile,
@@ -146,6 +163,11 @@ QString QtAssistantUtil::GetAssistantExecutable()
 {
   QFileInfo assistantFile(QT_ASSISTANT_EXECUTABLE);
   return assistantFile.fileName();
+}
+
+QString QtAssistantUtil::GetDefaultHelpUrl()
+{
+  return QString("qthelp://org.mitk.gui.qt.3m3application/bundle/index.html");
 }
 
 }

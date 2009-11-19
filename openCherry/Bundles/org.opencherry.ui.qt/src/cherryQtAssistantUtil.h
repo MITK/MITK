@@ -34,24 +34,24 @@ class CHERRY_UI_QT QtAssistantUtil
 
 public:
 
-  static void OpenAssistant(const QString& collectionFile, const QString& startPage);
+  static void OpenAssistant(const QString& startPage = "");
 
    /**
      * @brief With this method you can open the help-page of the active bundle. 
      */
-  static void OpenHelpPage();
+  static void OpenActivePartHelp();
 
   static bool RegisterQCHFiles(const QString& collectionFile, const std::vector<IBundle::Pointer>& bundles);
 
-  static void SetHelpColletionFile(QString* file);
+  static void SetHelpColletionFile(const QString& file);
 
 private:
 
   static QProcess* assistantProcess;
+  static QString helpCollectionFile;
 
   static QString GetAssistantExecutable();
-
-  static QString* HelpCollectionFile;
+  static QString GetDefaultHelpUrl();
 
 };
 

@@ -313,7 +313,7 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
   // ===== Help menu ====================================
   QMenu* helpMenu = menuBar->addMenu("Help");
   QAction* welcomeAction = helpMenu->addAction("&Welcome",QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onIntro()));
-  QAction* helpAction = helpMenu->addAction("&Active Bundle (F1)",QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onHelp()));
+  QAction* helpAction = helpMenu->addAction("&Help Contents",QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onHelp()), QKeySequence(QKeySequence::HelpContents));
   QAction* aboutAction = helpMenu->addAction("&About",QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onIntro()));
   // =====================================================
 
@@ -462,7 +462,7 @@ void QmitkExtWorkbenchWindowAdvisorHack::onIntro()
 
 void QmitkExtWorkbenchWindowAdvisorHack::onHelp()
 {
-  cherry::QtAssistantUtil::OpenHelpPage();
+  cherry::QtAssistantUtil::OpenActivePartHelp();
 }
 
 void QmitkExtWorkbenchWindowAdvisor::HookTitleUpdateListeners(

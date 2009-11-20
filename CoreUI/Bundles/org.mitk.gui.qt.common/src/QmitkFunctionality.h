@@ -126,6 +126,7 @@ public:
   // IPartListener
   Events::Types GetPartEventTypes() const;
   virtual void PartActivated (cherry::IWorkbenchPartReference::Pointer partRef);
+  virtual void PartDeactivated (cherry::IWorkbenchPartReference::Pointer partRef);
   virtual void PartClosed (cherry::IWorkbenchPartReference::Pointer partRef);
   virtual void PartHidden (cherry::IWorkbenchPartReference::Pointer partRef);
   virtual void PartVisible (cherry::IWorkbenchPartReference::Pointer partRef);
@@ -159,10 +160,6 @@ private:
   /// Saves if this class is currently working on DataStorage changes.
   /// This is a protector variable to avoid recursive calls on event listener functions.
   bool m_InDataStorageChanged;
-  ///
-  /// Saves if this view is the currently active one.
-  ///
-  bool m_IsActive;
 
   ///
   /// The Preferences Service to retrieve and store preferences.

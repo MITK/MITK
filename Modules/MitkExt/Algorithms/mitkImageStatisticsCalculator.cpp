@@ -578,8 +578,13 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsUnmasked(
   typedef itk::StatisticsImageFilter< ImageType > StatisticsFilterType;
   typename StatisticsFilterType::Pointer statisticsFilter = StatisticsFilterType::New();
   statisticsFilter->SetInput( image );
-  statisticsFilter->AddObserver( itk::ProgressEvent(), progressListener );
+  unsigned long observerTag = statisticsFilter->AddObserver( 
+    itk::ProgressEvent(), progressListener );
+
   statisticsFilter->Update();
+
+  statisticsFilter->RemoveObserver( observerTag );
+
 
   this->InvokeEvent( itk::EndEvent() );
 
@@ -627,13 +632,18 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
     progressListener = ITKCommandType::New();
     progressListener->SetCallbackFunction( this,
       &ImageStatisticsCalculator::MaskedStatisticsProgressUpdate );
-    labelStatisticsFilter->AddObserver( itk::ProgressEvent(), progressListener );
+    unsigned long observerTag = labelStatisticsFilter->AddObserver( 
+      itk::ProgressEvent(), progressListener );
 
 
     // Execute filter
     this->InvokeEvent( itk::StartEvent() );
+
     labelStatisticsFilter->Update();
+
     this->InvokeEvent( itk::EndEvent() );
+
+    labelStatisticsFilter->RemoveObserver( observerTag );
 
 
     // Find label of mask (other than 0)

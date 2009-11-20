@@ -266,7 +266,7 @@ double mitk::PlanarFigure::GetQuantity( unsigned int index ) const
   }
   else
   {
-    return NULL;
+    return 0.0;
   }
 }
 

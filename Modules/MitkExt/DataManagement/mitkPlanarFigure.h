@@ -248,7 +248,7 @@ private:
 
   struct Feature
   {
-    Feature( const char *name, const char *unit ) : Name( name ), Unit( unit)
+    Feature( const char *name, const char *unit ) : Name( name ), Unit( unit), Quantity(0.0)
     {
     };
 

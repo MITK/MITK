@@ -330,7 +330,7 @@ bool
 RenderingManager
 ::InitializeViews( const Geometry3D * dataGeometry, RequestType type, bool preserveRoughOrientationInWorldSpace )
 {
-  LOG_INFO << "initializing views";
+  LOG_DEBUG << "initializing views";
 
   bool boundingBoxInitialized = false;
 

@@ -15,6 +15,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
+#define SMW_INFO LOG_INFO("widget.stdmulti")
+
 #include "QmitkStdMultiWidget.h"
 
 #include <QHBoxLayout>
@@ -437,7 +439,7 @@ void QmitkStdMultiWidget::AddPlanesToDataStorage()
 
 void QmitkStdMultiWidget::changeLayoutTo2DImagesUp()
 {
-  std::cout << "changing layout to 2D images up... " << std::endl;
+  SMW_INFO << "changing layout to 2D images up... " << std::endl;
 
   //Hide all Menu Widgets
   this->HideAllWidgetToolbars();
@@ -510,7 +512,7 @@ void QmitkStdMultiWidget::changeLayoutTo2DImagesUp()
 
 void QmitkStdMultiWidget::changeLayoutTo2DImagesLeft()
 {
-  std::cout << "changing layout to 2D images left... " << std::endl;
+  SMW_INFO << "changing layout to 2D images left... " << std::endl;
 
   //Hide all Menu Widgets
   this->HideAllWidgetToolbars();
@@ -579,7 +581,7 @@ void QmitkStdMultiWidget::changeLayoutTo2DImagesLeft()
 
 void QmitkStdMultiWidget::changeLayoutToDefault()
 {
-  std::cout << "changing layout to default... " << std::endl;
+  SMW_INFO << "changing layout to default... " << std::endl;
 
   //Hide all Menu Widgets
   this->HideAllWidgetToolbars();
@@ -642,7 +644,7 @@ void QmitkStdMultiWidget::changeLayoutToDefault()
 
 void QmitkStdMultiWidget::changeLayoutToBig3D()
 {
-  std::cout << "changing layout to big 3D ..." << std::endl;
+  SMW_INFO << "changing layout to big 3D ..." << std::endl;
 
   //Hide all Menu Widgets
   this->HideAllWidgetToolbars();
@@ -685,7 +687,7 @@ void QmitkStdMultiWidget::changeLayoutToBig3D()
 
 void QmitkStdMultiWidget::changeLayoutToWidget1()
 {
-  std::cout << "changing layout to big Widget1 ..." << std::endl;
+  SMW_INFO << "changing layout to big Widget1 ..." << std::endl;
 
   //Hide all Menu Widgets
   this->HideAllWidgetToolbars();
@@ -728,7 +730,7 @@ void QmitkStdMultiWidget::changeLayoutToWidget1()
 
 void QmitkStdMultiWidget::changeLayoutToWidget2()
 {
-  std::cout << "changing layout to big Widget2 ..." << std::endl;
+  SMW_INFO << "changing layout to big Widget2 ..." << std::endl;
 
   //Hide all Menu Widgets
   this->HideAllWidgetToolbars();
@@ -771,7 +773,7 @@ void QmitkStdMultiWidget::changeLayoutToWidget2()
 
 void QmitkStdMultiWidget::changeLayoutToWidget3()
 {
-  std::cout << "changing layout to big Widget3 ..." << std::endl;
+  SMW_INFO << "changing layout to big Widget3 ..." << std::endl;
 
   //Hide all Menu Widgets
   this->HideAllWidgetToolbars();
@@ -814,7 +816,7 @@ void QmitkStdMultiWidget::changeLayoutToWidget3()
 
 void QmitkStdMultiWidget::changeLayoutToRowWidget3And4()
 {
-  std::cout << "changing layout to Widget3 and 4 in a Row..." << std::endl;
+  SMW_INFO << "changing layout to Widget3 and 4 in a Row..." << std::endl;
 
   //Hide all Menu Widgets
   this->HideAllWidgetToolbars();
@@ -868,7 +870,7 @@ void QmitkStdMultiWidget::changeLayoutToRowWidget3And4()
 
 void QmitkStdMultiWidget::changeLayoutToColumnWidget3And4()
 {
-  std::cout << "changing layout to Widget3 and 4 in one Column..." << std::endl;
+  SMW_INFO << "changing layout to Widget3 and 4 in one Column..." << std::endl;
 
   //Hide all Menu Widgets
   this->HideAllWidgetToolbars();
@@ -922,7 +924,7 @@ void QmitkStdMultiWidget::changeLayoutToColumnWidget3And4()
 
 void QmitkStdMultiWidget::changeLayoutToRowWidgetSmall3andBig4()
 {
-  std::cout << "changing layout to Widget3 and 4 in a Row..." << std::endl;
+  SMW_INFO << "changing layout to Widget3 and 4 in a Row..." << std::endl;
 
   this->changeLayoutToRowWidget3And4();
 
@@ -932,7 +934,7 @@ void QmitkStdMultiWidget::changeLayoutToRowWidgetSmall3andBig4()
 
 void QmitkStdMultiWidget::changeLayoutToSmallUpperWidget2Big3and4()
 {
-  std::cout << "changing layout to Widget3 and 4 in a Row..." << std::endl;
+  SMW_INFO << "changing layout to Widget3 and 4 in a Row..." << std::endl;
 
   //Hide all Menu Widgets
   this->HideAllWidgetToolbars();
@@ -997,7 +999,7 @@ void QmitkStdMultiWidget::changeLayoutToSmallUpperWidget2Big3and4()
 
 void QmitkStdMultiWidget::changeLayoutTo2x2Dand3DWidget()
 {
-  std::cout << "changing layout to 2 x 2D and 3D Widget" << std::endl;
+  SMW_INFO << "changing layout to 2 x 2D and 3D Widget" << std::endl;
 
   //Hide all Menu Widgets
   this->HideAllWidgetToolbars();
@@ -1058,7 +1060,7 @@ void QmitkStdMultiWidget::changeLayoutTo2x2Dand3DWidget()
 
 void QmitkStdMultiWidget::changeLayoutToLeft2Dand3DRight2D()
 {
-  std::cout << "changing layout to 2D and 3D left, 2D right Widget" << std::endl;
+  SMW_INFO << "changing layout to 2D and 3D left, 2D right Widget" << std::endl;
 
   //Hide all Menu Widgets
   this->HideAllWidgetToolbars();
@@ -1119,7 +1121,7 @@ void QmitkStdMultiWidget::changeLayoutToLeft2Dand3DRight2D()
 
 void QmitkStdMultiWidget::changeLayoutTo2DUpAnd3DDown()
 {
-  std::cout << "changing layout to 2D up and 3D down" << std::endl;
+  SMW_INFO << "changing layout to 2D up and 3D down" << std::endl;
 
   //Hide all Menu Widgets
   this->HideAllWidgetToolbars();

@@ -228,7 +228,7 @@ namespace mitk {
          */
         virtual void ClearLocalStorage(mitk::BaseRenderer *renderer,bool unregisterFromBaseRenderer=true )
         {
-          LOG_INFO << "deleting a localstorage on a mapper request";
+          //LOG_INFO << "deleting a localstorage on a mapper request";
           if(unregisterFromBaseRenderer)
             renderer->UnregisterLocalStorageHandler( this );
           L *l = m_BaseRenderer2LS[renderer];
@@ -245,7 +245,7 @@ namespace mitk {
           L *l = m_BaseRenderer2LS[ forRenderer ];
           if(!l)
           {
-            LOG_INFO << "creating new localstorage";
+            //LOG_INFO << "creating new localstorage";
             l = new L;
             m_BaseRenderer2LS[ forRenderer ] = l;
             forRenderer->RegisterLocalStorageHandler( this );

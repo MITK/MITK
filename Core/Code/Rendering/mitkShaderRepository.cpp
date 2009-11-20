@@ -15,6 +15,10 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
+#define SR_INFO LOG_INFO("shader.repository")
+#define SR_WARN LOG_WARN("shader.repository")
+#define SR_ERROR LOG_ERROR("shader.repository")
+
 #include "mitkShaderRepository.h"
 #include "mitkShaderEnumProperty.h"
 #include "mitkProperties.h"
@@ -65,7 +69,7 @@ void mitk::ShaderRepository::LoadShaders()
     // we found the default shader
     dirPath = itksys::SystemTools::GetFilenamePath( mitkLighting );
     
-    LOG_INFO << "shader repository found default mitk shader at '" << dirPath << "'";
+    SR_INFO << "found default mitk shader at '" << dirPath << "'";
   }
   
   
@@ -86,7 +90,7 @@ void mitk::ShaderRepository::LoadShaders()
         element->name = itksys::SystemTools::GetFilenameWithoutExtension(filename);
         element->path = dirPath + std::string("/") + element->name + std::string(".xml");
         
-        LOG_INFO << "found shader '" << element->name << "'";
+        SR_INFO << "found shader '" << element->name << "'";
         
         element->LoadPropertiesFromPath();
         
@@ -180,7 +184,7 @@ mitk::ShaderRepository::Shader *mitk::ShaderRepository::GetShader(const char *id
 
 void mitk::ShaderRepository::Shader::Uniform::LoadFromXML(vtkXMLDataElement *y)
 {
-  LOG_INFO << "found uniform '" << y->GetAttribute("name") << "' type=" << y->GetAttribute("type");// << " default=" << y->GetAttribute("value");          
+  //LOG_INFO << "found uniform '" << y->GetAttribute("name") << "' type=" << y->GetAttribute("type");// << " default=" << y->GetAttribute("value");          
 
   name = y->GetAttribute("name");
   
@@ -205,7 +209,7 @@ void mitk::ShaderRepository::Shader::Uniform::LoadFromXML(vtkXMLDataElement *y)
   else
   {
     type=glsl_none;
-    printf("shader repository: unknown type for uniform!!!\n");
+    SR_WARN << "unknown type for uniform '" << name << "'" ;
   }
               
               

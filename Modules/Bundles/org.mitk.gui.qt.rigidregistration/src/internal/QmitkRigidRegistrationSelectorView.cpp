@@ -513,8 +513,9 @@ void QmitkRigidRegistrationSelectorView::CalculateTransformation(unsigned int ti
       }
       catch (itk::ExceptionObject e)
       {
-        std::cout<<"Caught exception: "<<e<<std::endl;
         LOG_INFO << "Caught exception: "<<e;
+        QMessageBox::critical(NULL, "Error during registration", QString("An error occurred during registration: %1\nAborting registration process."));
+
       }
 
       time += clock() - tstart;
@@ -523,10 +524,6 @@ void QmitkRigidRegistrationSelectorView::CalculateTransformation(unsigned int ti
       //printOut of the Time
       LOG_INFO << "Registration Time: " << time;
     }
-
-
-
-
 
     m_Observer->RemoveObserver(observer);
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();

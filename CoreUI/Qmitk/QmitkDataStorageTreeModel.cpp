@@ -414,7 +414,7 @@ bool QmitkDataStorageTreeModel::setData( const QModelIndex &index, const QVarian
   if(!dataNode)
     return false;
 
-  if(role == Qt::EditRole)
+  if(role == Qt::EditRole && !value.toString().isEmpty())
   {
     dataNode->SetStringProperty("name", value.toString().toStdString().c_str());
   }

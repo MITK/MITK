@@ -20,6 +20,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkCommand.h>
 #include "mitkInteractionConst.h"
 #include "mitkPointOperation.h"
+#include "mitkRenderingManager.h"
+
 
 QmitkPointListModel::QmitkPointListModel( mitk::PointSet* pointSet, int t, QObject* parent )
 :QAbstractListModel(parent),
@@ -250,6 +252,7 @@ void QmitkPointListModel::MoveSelectedPointUp()
   selectedID = m_PointSet->SearchSelectedPoint(m_TimeStep);
   mitk::PointOperation* doOp = new mitk::PointOperation(mitk::OpMOVEPOINTUP, m_PointSet->GetPoint(selectedID, m_TimeStep), selectedID, true);
   m_PointSet->ExecuteOperation(doOp);
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll(); // Workaround for update problem in Pointset/Mapper
 }
 
 
@@ -262,6 +265,7 @@ void QmitkPointListModel::MoveSelectedPointDown()
   selectedID = m_PointSet->SearchSelectedPoint(m_TimeStep);
   mitk::PointOperation* doOp = new mitk::PointOperation(mitk::OpMOVEPOINTDOWN, m_PointSet->GetPoint(selectedID, m_TimeStep), selectedID, true);
   m_PointSet->ExecuteOperation(doOp);
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll(); // Workaround for update problem in Pointset/Mapper
 }
 
 
@@ -274,4 +278,5 @@ void QmitkPointListModel::RemoveSelectedPoint()
   selectedID = m_PointSet->SearchSelectedPoint(m_TimeStep);
   mitk::PointOperation* doOp = new mitk::PointOperation(mitk::OpREMOVE, m_PointSet->GetPoint(selectedID, m_TimeStep), selectedID, true);
   m_PointSet->ExecuteOperation(doOp);
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll(); // Workaround for update problem in Pointset/Mapper
 }

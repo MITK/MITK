@@ -72,6 +72,8 @@ void SegmentationSink::InsertBelowGroupNode(mitk::DataTreeNode* node)
 
   if (m_DataStorage.IsNotNull())
   {
+    if (node)
+      node->GetData()->DisconnectPipeline();
     m_DataStorage->Add( node, groupNode );
   }
     

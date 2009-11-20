@@ -230,6 +230,11 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
       QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onRedo()),
       QKeySequence("CTRL+Y"));
   redoAction->setToolTip("execute the last action that was undone again (not supported by all modules)");
+
+  QAction* imageNavigatorAction = editMenu->addAction(QIcon(":/org.mitk.gui.qt.ext/Slider_48.png"), "&Image Navigator", 
+    QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onImageNavigator()),NULL);
+  imageNavigatorAction->setToolTip("Open image navigator for navigating through image");
+
   // toolbar for showing file open, undo, redo and other main actions
   QToolBar* mainActionsToolBar = new QToolBar;
   mainActionsToolBar->setToolButtonStyle ( Qt::ToolButtonTextBesideIcon );
@@ -238,6 +243,7 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
   mainActionsToolBar->addAction(closeProjectAction);  
   mainActionsToolBar->addAction(undoAction);
   mainActionsToolBar->addAction(redoAction);
+  mainActionsToolBar->addAction(imageNavigatorAction);
   mainWindow->addToolBar(mainActionsToolBar);
 
   // ==== Window Menu ==========================
@@ -402,7 +408,7 @@ void QmitkExtWorkbenchWindowAdvisorHack::onRedo()
     if (mitk::VerboseLimitedLinearUndo* verboseundo = dynamic_cast<mitk::VerboseLimitedLinearUndo*>( model ))
     {
       mitk::VerboseLimitedLinearUndo::StackDescription descriptions =
-          verboseundo->GetRedoDescriptions();
+        verboseundo->GetRedoDescriptions();
       if (descriptions.size() >= 1)
       {
         LOG_INFO << "Redo " << descriptions.front().second;
@@ -414,6 +420,11 @@ void QmitkExtWorkbenchWindowAdvisorHack::onRedo()
   {
     LOG_ERROR << "No undo model instantiated";
   }
+}
+
+void QmitkExtWorkbenchWindowAdvisorHack::onImageNavigator()
+{
+  cherry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->ShowView("org.mitk.views.imagenavigator");
 }
 
 void QmitkExtWorkbenchWindowAdvisorHack::onEditPreferences()

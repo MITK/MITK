@@ -80,7 +80,7 @@ class CLASS_NAME ## RegistrationMethod \
  \
     CLASS_NAME ## RegistrationMethod() \
     { \
-      LOG_INFO << "Register " #CLASS_NAME; \
+      LOG_INFO("tools") << "Registered " #CLASS_NAME; \
       itk::ObjectFactoryBase::RegisterFactory( CLASS_NAME ## Factory::New() ); \
     } \
   }; \

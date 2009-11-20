@@ -16,8 +16,8 @@
 #include "vtkMitkOpenGLVolumeTextureMapper3D.h"
 #include "mitkCommon.h"
 
-#define GPU_LOG LOG_INFO(false)("VR")
-
+#define GPU_INFO LOG_INFO("mapper.vr")
+#define GPU_WARN LOG_WARN("mapper.vr")
 
 #include "vtkImageData.h"
 #include "vtkMatrix4x4.h"
@@ -231,7 +231,7 @@ vtkStandardNewMacro(vtkMitkOpenGLVolumeTextureMapper3D);
 
 vtkMitkOpenGLVolumeTextureMapper3D::vtkMitkOpenGLVolumeTextureMapper3D()
 {
-  GPU_LOG << "vtkMitkOpenGLVolumeTextureMapper3D";
+  //GPU_INFO << "vtkMitkOpenGLVolumeTextureMapper3D";
 
   this->Initialized                  =  0;
   this->Volume1Index                 =  0;
@@ -245,14 +245,14 @@ vtkMitkOpenGLVolumeTextureMapper3D::vtkMitkOpenGLVolumeTextureMapper3D()
 
 vtkMitkOpenGLVolumeTextureMapper3D::~vtkMitkOpenGLVolumeTextureMapper3D()
 {
-  GPU_LOG << "~vtkMitkOpenGLVolumeTextureMapper3D";
+  //GPU_INFO << "~vtkMitkOpenGLVolumeTextureMapper3D";
 }
 
 // Release the graphics resources used by this texture.  
 void vtkMitkOpenGLVolumeTextureMapper3D::ReleaseGraphicsResources(vtkWindow 
                                                                 *renWin)
 {
-  GPU_LOG << "ReleaseGraphicsResources";
+  //GPU_INFO << "ReleaseGraphicsResources";
 
   if (( this->Volume1Index || this->Volume2Index || 
         this->Volume3Index || this->ColorLookupIndex) && renWin)
@@ -280,7 +280,7 @@ void vtkMitkOpenGLVolumeTextureMapper3D::ReleaseGraphicsResources(vtkWindow
 
 void vtkMitkOpenGLVolumeTextureMapper3D::Render(vtkRenderer *ren, vtkVolume *vol)
 {  
-  GPU_LOG << "Render";
+  //GPU_INFO << "Render";
 
   ren->GetRenderWindow()->MakeCurrent();
   
@@ -408,7 +408,7 @@ void vtkMitkOpenGLVolumeTextureMapper3D::Render(vtkRenderer *ren, vtkVolume *vol
 void vtkMitkOpenGLVolumeTextureMapper3D::RenderFP(vtkRenderer *ren,
                                               vtkVolume *vol)
 {
-  GPU_LOG << "RenderFP";
+  //GPU_INFO << "RenderFP";
 
   glAlphaFunc (GL_GREATER, static_cast<GLclampf>(0));
   glEnable (GL_ALPHA_TEST);
@@ -468,7 +468,7 @@ void vtkMitkOpenGLVolumeTextureMapper3D::RenderFP(vtkRenderer *ren,
 
 void vtkMitkOpenGLVolumeTextureMapper3D::RenderNV( vtkRenderer *ren, vtkVolume *vol )
 {
-  GPU_LOG << "RenderNV";
+  //GPU_INFO << "RenderNV";
 
   glAlphaFunc (GL_GREATER, static_cast<GLclampf>(0));
   glEnable (GL_ALPHA_TEST);
@@ -532,7 +532,7 @@ void vtkMitkOpenGLVolumeTextureMapper3D::RenderNV( vtkRenderer *ren, vtkVolume *
 
 void vtkMitkOpenGLVolumeTextureMapper3D::DeleteTextureIndex( GLuint *index )
 {
-  GPU_LOG << "DeleteTextureIndex";
+  //GPU_INFO << "DeleteTextureIndex";
 
   if (glIsTexture(*index))
     {
@@ -545,7 +545,7 @@ void vtkMitkOpenGLVolumeTextureMapper3D::DeleteTextureIndex( GLuint *index )
 
 void vtkMitkOpenGLVolumeTextureMapper3D::CreateTextureIndex( GLuint *index )
 {
-  GPU_LOG << "CreateTextureIndex";
+  //GPU_INFO << "CreateTextureIndex";
 
   GLuint tempIndex=0;    
   glGenTextures(1, &tempIndex);
@@ -556,7 +556,7 @@ void vtkMitkOpenGLVolumeTextureMapper3D::RenderPolygons( vtkRenderer *ren,
                                                        vtkVolume *vol,
                                                        int stages[4] )
 {
-  GPU_LOG << "RenderPolygons";
+  //GPU_INFO << "RenderPolygons";
 
   vtkRenderWindow *renWin = ren->GetRenderWindow();
   
@@ -741,7 +741,7 @@ void vtkMitkOpenGLVolumeTextureMapper3D::RenderPolygons( vtkRenderer *ren,
 
 void vtkMitkOpenGLVolumeTextureMapper3D::Setup3DTextureParameters( bool linear )
 {
-  GPU_LOG << "Setup3DTextureParameters";
+  //GPU_INFO << "Setup3DTextureParameters";
   
   if( linear )
   {
@@ -854,7 +854,7 @@ void vtkMitkOpenGLVolumeTextureMapper3D::SetupRegisterCombinersNoShadeNV( vtkRen
                   vtkVolume *vtkNotUsed(vol), 
                   int components )
 {
-  GPU_LOG << "SetupRegisterCombinersNoShadeNV";
+  //GPU_INFO << "SetupRegisterCombinersNoShadeNV";
 
   if ( components < 3 )
     {
@@ -899,7 +899,7 @@ void vtkMitkOpenGLVolumeTextureMapper3D::SetupRegisterCombinersShadeNV( vtkRende
                       vtkVolume *vol,
                       int components )
 {
-  GPU_LOG << "SetupRegisterCombinersShadeNV";
+  //GPU_INFO << "SetupRegisterCombinersShadeNV";
 
   if ( components == 1 )
     {
@@ -1154,7 +1154,7 @@ void vtkMitkOpenGLVolumeTextureMapper3D::RenderOneIndependentNoShadeNV(
   vtkRenderer *ren,
   vtkVolume *vol )
 {
-  GPU_LOG << "RenderOneIndependentNoShadeNV";
+  //GPU_INFO << "RenderOneIndependentNoShadeNV";
 
   this->SetupOneIndependentTextures( ren, vol );
 
@@ -1172,7 +1172,7 @@ void vtkMitkOpenGLVolumeTextureMapper3D::RenderOneIndependentShadeNV(
   vtkRenderer *ren,
   vtkVolume *vol )
 {
-  GPU_LOG << "RenderOneIndependentShadeNV";
+  //GPU_INFO << "RenderOneIndependentShadeNV";
 
   this->SetupOneIndependentTextures( ren, vol );
   
@@ -1307,7 +1307,7 @@ void vtkMitkOpenGLVolumeTextureMapper3D::RenderTwoDependentNoShadeNV(
   vtkRenderer *ren,
   vtkVolume *vol )
 {
-  GPU_LOG << "RenderTwoDependentNoShadeNV";
+  //GPU_INFO << "RenderTwoDependentNoShadeNV";
 
   this->SetupTwoDependentTextures(ren, vol);
   
@@ -1324,7 +1324,7 @@ void vtkMitkOpenGLVolumeTextureMapper3D::RenderTwoDependentShadeNV(
   vtkRenderer *ren,
   vtkVolume *vol )
 {
-  GPU_LOG << "RenderTwoDependentShadeNV";
+  //GPU_INFO << "RenderTwoDependentShadeNV";
  
   this->SetupTwoDependentTextures( ren, vol );
   
@@ -1455,7 +1455,7 @@ void vtkMitkOpenGLVolumeTextureMapper3D::RenderFourDependentNoShadeNV(
   vtkRenderer *ren,
   vtkVolume *vol )
 {
-  GPU_LOG << "RenderFourDependentNoShadeNV";
+  //GPU_INFO << "RenderFourDependentNoShadeNV";
 
   this->SetupFourDependentTextures(ren, vol);
   
@@ -1472,7 +1472,7 @@ void vtkMitkOpenGLVolumeTextureMapper3D::RenderFourDependentShadeNV(
   vtkRenderer *ren,
   vtkVolume *vol )
 {
-  GPU_LOG << "RenderFourDependentShadeNV";
+  //GPU_INFO << "RenderFourDependentShadeNV";
 
   this->SetupFourDependentTextures( ren, vol );
   
@@ -1489,7 +1489,7 @@ void vtkMitkOpenGLVolumeTextureMapper3D::RenderOneIndependentNoShadeFP(
   vtkRenderer *ren,
   vtkVolume *vol )
 {
-  GPU_LOG << "RenderOneIndependentNoShadeFP";
+  //GPU_INFO << "RenderOneIndependentNoShadeFP";
 
   glEnable( vtkgl::FRAGMENT_PROGRAM_ARB );
 
@@ -1521,7 +1521,7 @@ void vtkMitkOpenGLVolumeTextureMapper3D::RenderOneIndependentShadeFP(
   vtkRenderer *ren,
   vtkVolume *vol )
 {
-  GPU_LOG << "RenderOneIndependentShadeFP";
+  //GPU_INFO << "RenderOneIndependentShadeFP";
 
   glEnable( vtkgl::FRAGMENT_PROGRAM_ARB );
 
@@ -1554,7 +1554,7 @@ void vtkMitkOpenGLVolumeTextureMapper3D::RenderTwoDependentNoShadeFP(
   vtkRenderer *ren,
   vtkVolume *vol )
 {
-  GPU_LOG << "RenderTwoDependentNoShadeFP";
+  //GPU_INFO << "RenderTwoDependentNoShadeFP";
 
   glEnable( vtkgl::FRAGMENT_PROGRAM_ARB );
 
@@ -1586,7 +1586,7 @@ void vtkMitkOpenGLVolumeTextureMapper3D::RenderTwoDependentShadeFP(
   vtkRenderer *ren,
   vtkVolume *vol )
 {
-  GPU_LOG << "RenderTwoDependentShadeFP";
+  //GPU_INFO << "RenderTwoDependentShadeFP";
 
   glEnable( vtkgl::FRAGMENT_PROGRAM_ARB );
 
@@ -1618,7 +1618,7 @@ void vtkMitkOpenGLVolumeTextureMapper3D::RenderFourDependentNoShadeFP(
   vtkRenderer *ren,
   vtkVolume *vol )
 {
-  GPU_LOG << "RenderFourDependentNoShadeFP";
+  //GPU_INFO << "RenderFourDependentNoShadeFP";
 
   glEnable( vtkgl::FRAGMENT_PROGRAM_ARB );
 
@@ -1649,7 +1649,7 @@ void vtkMitkOpenGLVolumeTextureMapper3D::RenderFourDependentShadeFP(
   vtkRenderer *ren,
   vtkVolume *vol )
 {
-  GPU_LOG << "RenderFourDependentShadeFP";
+  //GPU_INFO << "RenderFourDependentShadeFP";
 
   glEnable( vtkgl::FRAGMENT_PROGRAM_ARB );
 
@@ -1687,7 +1687,7 @@ void vtkMitkOpenGLVolumeTextureMapper3D::GetLightInformation(
   GLfloat halfwayVector[2][4],
   GLfloat ambientColor[4] )
 {
-  GPU_LOG << "GetLightInformation";
+  //GPU_INFO << "GetLightInformation";
 
 
   float ambient = vol->GetProperty()->GetAmbient();
@@ -1810,7 +1810,7 @@ void vtkMitkOpenGLVolumeTextureMapper3D::SetupProgramLocalsForShadingFP(
   vtkRenderer *ren,
   vtkVolume *vol )
 {
-  GPU_LOG << "SetupProgramLocalsForShadingFP";
+  //GPU_INFO << "SetupProgramLocalsForShadingFP";
 
   GLfloat lightDirection[2][4];
   GLfloat lightDiffuseColor[2][4];
@@ -1973,7 +1973,7 @@ void vtkMitkOpenGLVolumeTextureMapper3D::SetupProgramLocalsForShadingFP(
 int  vtkMitkOpenGLVolumeTextureMapper3D::IsRenderSupported(
   vtkVolumeProperty *property )
 {
-  GPU_LOG << "IsRenderSupported";
+  //GPU_INFO << "IsRenderSupported";
 
   if ( !this->Initialized )
     {
@@ -2001,7 +2001,7 @@ int  vtkMitkOpenGLVolumeTextureMapper3D::IsRenderSupported(
 
 void vtkMitkOpenGLVolumeTextureMapper3D::Initialize()
 {
-  GPU_LOG << "Initialize";
+  //GPU_INFO << "Initialize";
 
   this->Initialized = 1;
   vtkOpenGLExtensionManager * extensions = vtkOpenGLExtensionManager::New();
@@ -2049,7 +2049,7 @@ void vtkMitkOpenGLVolumeTextureMapper3D::Initialize()
       }
     }
     
-  GPU_LOG(this->SupportsCompressedTexture) << "supporting compressed textures";
+  //GPU_INFO(this->SupportsCompressedTexture) << "supporting compressed textures";
   
   const char *gl_version=
     reinterpret_cast<const char *>(glGetString(GL_VERSION));
@@ -2066,7 +2066,7 @@ void vtkMitkOpenGLVolumeTextureMapper3D::Initialize()
         extensions->ExtensionSupported("GL_VERSION_2_0")
         || extensions->ExtensionSupported("GL_ARB_texture_non_power_of_two");
 
-  GPU_LOG << "np2: " << (this->SupportsNonPowerOfTwoTextures?1:0);
+  //GPU_INFO << "np2: " << (this->SupportsNonPowerOfTwoTextures?1:0);
   
   bool brokenMesa=false;
   
@@ -2165,7 +2165,7 @@ void vtkMitkOpenGLVolumeTextureMapper3D::Initialize()
       std::string errString = "no gpu-acceleration possible cause following extensions/methods are missing or unsupported:";
             
       if(!supports_texture3D) errString += " EXT_TEXTURE3D";
-      if(!supports_multitexture) errString += " EXT_MULTITEXTUR";
+      if(!supports_multitexture) errString += " EXT_MULTITEXTURE";
       if(!supports_GL_ARB_fragment_program) errString += " ARB_FRAGMENT_PROGRAM";
       if(!supports_GL_ARB_vertex_program) errString += " ARB_VERTEX_PROGRAM";
       if(!vtkgl::TexImage3D) errString += " glTexImage3D";
@@ -2177,7 +2177,7 @@ void vtkMitkOpenGLVolumeTextureMapper3D::Initialize()
       if(!vtkgl::ProgramStringARB) errString += " glProgramStringARB";
       if(!vtkgl::ProgramLocalParameter4fARB) errString += " glProgramLocalParameter4fARB";
   
-      LOG_WARN << errString;
+      GPU_WARN << errString;
     };
   
   /*
@@ -2225,7 +2225,7 @@ void vtkMitkOpenGLVolumeTextureMapper3D::Initialize()
 int vtkMitkOpenGLVolumeTextureMapper3D::IsTextureSizeSupported(int size[3],
                                                            int components)
 {
-  GPU_LOG << "IsTextureSizeSupported";
+  //GPU_INFO << "IsTextureSizeSupported";
 
   GLint maxSize;
   glGetIntegerv(vtkgl::MAX_3D_TEXTURE_SIZE,&maxSize);

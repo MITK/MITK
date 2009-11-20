@@ -15,7 +15,8 @@
 #include "vtkMitkVolumeTextureMapper3D.h"
 #include "mitkCommon.h"
 
-#define GPU_LOG LOG_INFO(false)("VR")
+#define GPU_INFO LOG_INFO("mapper.vr")
+#define GPU_WARN LOG_WARN("mapper.vr")
 
 #include "vtkCamera.h"
 #include "vtkColorTransferFunction.h"
@@ -69,7 +70,7 @@ void vtkVolumeTextureMapper3DComputeScalars( T *dataPtr,
                                                unsigned char *volume1,
                                                unsigned char *volume2)
 {
-  GPU_LOG << "vtkVolumeTextureMapper3DComputeScalars";
+  //GPU_INFO << "vtkVolumeTextureMapper3DComputeScalars";
 
   T              *inPtr;
   unsigned char  *outPtr, *outPtr2;
@@ -80,12 +81,12 @@ void vtkVolumeTextureMapper3DComputeScalars( T *dataPtr,
   double inputSpacing[3];
   vtkImageData *input = me->GetInput();
 
-  GPU_LOG << input->GetMTime();
+  //GPU_INFO << input->GetMTime();
 
   input->GetDimensions( inputDimensions );
   input->GetSpacing( inputSpacing );
 
-  GPU_LOG << input->GetMTime();
+  //GPU_INFO << input->GetMTime();
 
   int   outputDimensions[3];
   float outputSpacing[3];
@@ -94,7 +95,7 @@ void vtkVolumeTextureMapper3DComputeScalars( T *dataPtr,
 
   int components = input->GetNumberOfScalarComponents();
 
-  GPU_LOG << input->GetMTime();
+  //GPU_INFO << input->GetMTime();
 
 
   double wx, wy, wz;
@@ -116,7 +117,7 @@ void vtkVolumeTextureMapper3DComputeScalars( T *dataPtr,
     inPtr = dataPtr;
     if ( components == 1 )
       {
-      GPU_LOG << "copying 1 component to volume1";
+      //GPU_INFO << "copying 1 component to volume1";
       outPtr = volume1;
       if ( scale == 1.0 )
         {
@@ -139,7 +140,7 @@ void vtkVolumeTextureMapper3DComputeScalars( T *dataPtr,
       }
     else if ( components == 2 )
       {
-      GPU_LOG << "copying 2 component to volume1";
+      //GPU_INFO << "copying 2 component to volume1";
 
       outPtr = volume1;
       if ( scale == 1.0 )
@@ -171,7 +172,7 @@ void vtkVolumeTextureMapper3DComputeScalars( T *dataPtr,
       }
     else if ( components == 4 )
       {
-      GPU_LOG << "copying 4 component to volume1/2";
+      //GPU_INFO << "copying 4 component to volume1/2";
 
       outPtr = volume1;
       outPtr2 = volume2;
@@ -212,7 +213,7 @@ void vtkVolumeTextureMapper3DComputeScalars( T *dataPtr,
   // The sizes are different and interpolation is required
   else
     {
-      GPU_LOG << "interpolating";
+      //GPU_INFO << "interpolating";
 
     
     outPtr  = volume1;
@@ -415,7 +416,7 @@ void vtkVolumeTextureMapper3DComputeScalars( T *dataPtr,
 
 
              
-  GPU_LOG << input->GetMTime();
+  //GPU_INFO << input->GetMTime();
 
 }
 
@@ -429,7 +430,7 @@ void vtkVolumeTextureMapper3DComputeGradients( T *dataPtr,
                                                  unsigned char *volume2,
                                                  unsigned char *volume3)
 {
-  GPU_LOG << "vtkVolumeTextureMapper3DComputeGradients";
+  //GPU_INFO << "vtkVolumeTextureMapper3DComputeGradients";
 
 
   int                 x, y, z;
@@ -459,11 +460,11 @@ void vtkVolumeTextureMapper3DComputeGradients( T *dataPtr,
   double spacing[3];
   vtkImageData *input = me->GetInput();
 
-  GPU_LOG << input->GetMTime();
+  //GPU_INFO << input->GetMTime();
 
   input->GetSpacing( spacing );
 
-  GPU_LOG << input->GetMTime();
+  //GPU_INFO << input->GetMTime();
 
   double sampleRate[3];
   sampleRate[0] = outputSpacing[0] / static_cast<double>(spacing[0]);
@@ -514,7 +515,7 @@ void vtkVolumeTextureMapper3DComputeGradients( T *dataPtr,
   y_limit = (y_limit>dim[1])?(outputDim[1]):(y_limit);
   z_limit = (z_limit>dim[2])?(outputDim[2]):(z_limit);
 
-  GPU_LOG << input->GetMTime();
+  //GPU_INFO << input->GetMTime();
 
 
   if ( components == 1 || components == 2 )
@@ -673,14 +674,14 @@ void vtkVolumeTextureMapper3DComputeGradients( T *dataPtr,
 //  me->InvokeEvent( vtkEvent::VolumeMapperComputeGradientsEndEvent, NULL );
 
 
-  GPU_LOG << input->GetMTime();
+  //GPU_INFO << input->GetMTime();
 }
 
 
 //-----------------------------------------------------------------------------
 vtkMitkVolumeTextureMapper3D::vtkMitkVolumeTextureMapper3D()
 {
-  GPU_LOG << "vtkMitkVolumeTextureMapper3D";
+  //GPU_INFO << "vtkMitkVolumeTextureMapper3D";
 
   this->PolygonBuffer                 = NULL;
   this->IntersectionBuffer            = NULL;
@@ -721,13 +722,13 @@ vtkMitkVolumeTextureMapper3D::vtkMitkVolumeTextureMapper3D()
   this->UseCompressedTexture          = false;
   this->SupportsNonPowerOfTwoTextures = false;
 
-  GPU_LOG << "np2: " << (this->SupportsNonPowerOfTwoTextures?1:0);
+  //GPU_INFO << "np2: " << (this->SupportsNonPowerOfTwoTextures?1:0);
 }
 
 //-----------------------------------------------------------------------------
 vtkMitkVolumeTextureMapper3D::~vtkMitkVolumeTextureMapper3D()
 {
-  GPU_LOG << "~vtkMitkVolumeTextureMapper3D";
+  //GPU_INFO << "~vtkMitkVolumeTextureMapper3D";
 
   delete [] this->PolygonBuffer;
   delete [] this->IntersectionBuffer;
@@ -740,7 +741,7 @@ vtkMitkVolumeTextureMapper3D::~vtkMitkVolumeTextureMapper3D()
 //-----------------------------------------------------------------------------
 vtkMitkVolumeTextureMapper3D *vtkMitkVolumeTextureMapper3D::New()
 {
-  GPU_LOG << "New";
+  //GPU_INFO << "New";
  
    // First try to create the object from the vtkObjectFactory
   vtkObject* ret = 
@@ -753,7 +754,7 @@ void vtkMitkVolumeTextureMapper3D::ComputePolygons( vtkRenderer *ren,
                                                 vtkVolume *vol,
                                                 double inBounds[6] )
 {
-  GPU_LOG << "ComputePolygons";
+  //GPU_INFO << "ComputePolygons";
 
   // Get the camera position and focal point
   double focalPoint[4], position[4];
@@ -1068,7 +1069,7 @@ void vtkMitkVolumeTextureMapper3D::UpdateMTime()
 //-----------------------------------------------------------------------------
 int vtkMitkVolumeTextureMapper3D::UpdateVolumes(vtkVolume *vtkNotUsed(vol))
 {
-  GPU_LOG << "UpdateVolumes";
+  //GPU_INFO << "UpdateVolumes";
 
   int needToUpdate = 0;
 
@@ -1076,16 +1077,16 @@ int vtkMitkVolumeTextureMapper3D::UpdateVolumes(vtkVolume *vtkNotUsed(vol))
   vtkImageData *input = this->GetInput();
   input->Update();
  
-  GPU_LOG << "saved texture mtime " << this->SavedTextureMTime.GetMTime();
-  GPU_LOG << "input mtime " << input->GetMTime();
+  //GPU_INFO << "saved texture mtime " << this->SavedTextureMTime.GetMTime();
+  //GPU_INFO << "input mtime " << input->GetMTime();
   
  
   // Has the volume changed in some way?
   if ( this->SavedTextureInput != input ||
        this->SavedTextureMTime.GetMTime() < input->GetMTime() )
     {
-      GPU_LOG(this->SavedTextureInput != input) << "Update forced 1";
-      GPU_LOG(this->SavedTextureMTime.GetMTime() < input->GetMTime()) << "Update forced 2";
+      //GPU_INFO(this->SavedTextureInput != input) << "Update forced 1";
+      //GPU_INFO(this->SavedTextureMTime.GetMTime() < input->GetMTime()) << "Update forced 2";
     
     
     needToUpdate = 1;
@@ -1108,11 +1109,11 @@ int vtkMitkVolumeTextureMapper3D::UpdateVolumes(vtkVolume *vtkNotUsed(vol))
   
   int powerOfTwoDim[3];
 
-  GPU_LOG << "np2: " << (this->SupportsNonPowerOfTwoTextures?1:0);
+  //GPU_INFO << "np2: " << (this->SupportsNonPowerOfTwoTextures?1:0);
   
   if(this->SupportsNonPowerOfTwoTextures)
     {
-      GPU_LOG << "Using NP2 partly...";
+      //GPU_INFO << "Using NP2 partly...";
     
     
      for ( int i = 0; i < 3; i++ )
@@ -1130,7 +1131,7 @@ int vtkMitkVolumeTextureMapper3D::UpdateVolumes(vtkVolume *vtkNotUsed(vol))
     }
   else
     {
-      GPU_LOG << "Using P2";
+      //GPU_INFO << "Using P2";
 
     for ( int i = 0; i < 3; i++ )
       {
@@ -1144,7 +1145,7 @@ int vtkMitkVolumeTextureMapper3D::UpdateVolumes(vtkVolume *vtkNotUsed(vol))
  
   while ( ! this->IsTextureSizeSupported( powerOfTwoDim,components ) )
     {
-      GPU_LOG << "Downsampling";
+      //GPU_INFO << "Downsampling";
 
     if ( powerOfTwoDim[0] >= powerOfTwoDim[1] &&
          powerOfTwoDim[0] >= powerOfTwoDim[2] )
@@ -1162,7 +1163,7 @@ int vtkMitkVolumeTextureMapper3D::UpdateVolumes(vtkVolume *vtkNotUsed(vol))
       }
     }
  
-    GPU_LOG << "ALLOCATING TEXTURE VOLUMEs " << powerOfTwoDim[0] << "/" << powerOfTwoDim[1] << "/" << powerOfTwoDim[2];
+    //GPU_INFO << "ALLOCATING TEXTURE VOLUMEs " << powerOfTwoDim[0] << "/" << powerOfTwoDim[1] << "/" << powerOfTwoDim[2];
 
   int neededSize = powerOfTwoDim[0] * powerOfTwoDim[1] * powerOfTwoDim[2];
  
@@ -1170,7 +1171,7 @@ int vtkMitkVolumeTextureMapper3D::UpdateVolumes(vtkVolume *vtkNotUsed(vol))
   double spacing[3];
   input->GetSpacing(spacing);
 
-  GPU_LOG << input->GetMTime();
+  //GPU_INFO << input->GetMTime();
  
   // Is it the right size? If not, allocate it.
   if ( this->VolumeSize != neededSize ||
@@ -1182,20 +1183,20 @@ int vtkMitkVolumeTextureMapper3D::UpdateVolumes(vtkVolume *vtkNotUsed(vol))
     switch (components)
       {
       case 1:
-        GPU_LOG << "allocate 1";
+        //GPU_INFO << "allocate 1";
         this->Volume1 = new unsigned char [2*neededSize];
         this->Volume2 = new unsigned char [3*neededSize];
         this->Volume3 = NULL;
         break;
       case 2:
-        GPU_LOG << "allocate 2";
+        //GPU_INFO << "allocate 2";
         this->Volume1 = new unsigned char [3*neededSize];
         this->Volume2 = new unsigned char [3*neededSize];
         this->Volume3 = NULL;
         break;
       case 3:
       case 4:
-        GPU_LOG << "allocate 3/4";
+        //GPU_INFO << "allocate 3/4";
         this->Volume1 = new unsigned char [3*neededSize];
         this->Volume2 = new unsigned char [2*neededSize];
         this->Volume3 = new unsigned char [3*neededSize];
@@ -1281,7 +1282,7 @@ int vtkMitkVolumeTextureMapper3D::UpdateVolumes(vtkVolume *vtkNotUsed(vol))
         this->Volume3));
     }
 
-  GPU_LOG << input->GetMTime();
+  //GPU_INFO << input->GetMTime();
 
   this->SavedTextureMTime.Modified();
 
@@ -1292,7 +1293,7 @@ int vtkMitkVolumeTextureMapper3D::UpdateVolumes(vtkVolume *vtkNotUsed(vol))
 //-----------------------------------------------------------------------------
 int vtkMitkVolumeTextureMapper3D::UpdateColorLookup( vtkVolume *vol )
 {
-  GPU_LOG << "UpdateColorLookup";
+  //GPU_INFO << "UpdateColorLookup";
 
   int needToUpdate = 0;
 

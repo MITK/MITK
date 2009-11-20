@@ -27,11 +27,11 @@ void mitk::SimpleHistogram::ComputeFromImage( Image::Pointer source )
 {
   valid = false;
   
-  LOG_INFO << "SimpleHistogram: ComputeFromImage started";
+  //LOG_INFO << "SimpleHistogram: ComputeFromImage started";
   
   if(source->GetDimension() != 3)
   {
-    LOG_WARN << "only works on 3D-Images";
+    LOG_WARN << "SimpleHistogram only works on 3D-Images";
     return;
   }
 

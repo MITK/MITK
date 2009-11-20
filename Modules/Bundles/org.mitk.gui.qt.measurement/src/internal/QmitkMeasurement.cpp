@@ -296,6 +296,8 @@ void QmitkMeasurement::SelectionChanged(
     else if ((selectedImage = dynamic_cast<mitk::Image *> (_BaseData)))
     {
       *m_SelectedImageNode = _DataTreeNode;
+      mitk::RenderingManager::GetInstance()->InitializeViews(
+        selectedImage->GetTimeSlicedGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
     }
   } // end for
 
@@ -366,7 +368,7 @@ void QmitkMeasurement::PlanarFigureSelectionChanged()
     if(!_PlanarFigure)
       continue;
 
-    double featureQuantity;
+    double featureQuantity = 0.0;
     for (unsigned int i = 0; i < _PlanarFigure->GetNumberOfFeatures(); ++i)
     {
       featureQuantity = _PlanarFigure->GetQuantity(i);
@@ -507,11 +509,9 @@ void QmitkMeasurement::AddFigureToDataStorage(mitk::PlanarFigure* figure, const 
 
   this->GetDataStorage()->Add(newNode, m_SelectedImageNode->GetNode());
 
-  m_SelectedPlanarFigures->RemoveAllNodes();
-  m_SelectedPlanarFigures->AddNode(m_CurrentFigureNode);
+  *m_SelectedPlanarFigures = m_CurrentFigureNode;
   m_SelectionProvider->FireSelectionChanged(
       mitk::DataTreeNodeSelection::Pointer(new mitk::DataTreeNodeSelection(m_CurrentFigureNode.GetPointer())));
-  this->PlanarFigureSelectionChanged();
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }

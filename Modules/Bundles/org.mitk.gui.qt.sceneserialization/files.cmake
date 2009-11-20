@@ -20,6 +20,7 @@ SET(RESOURCE_FILES
 # system without loading the plug-ins shared library,
 # for example the icon used in the menu and tabs for the
 # plug-in views in the workbench
+  resources/icon_sceneserialization.png
 )
 
 SET(RES_FILES

@@ -11,7 +11,8 @@
     <perspective
       id="org.mitk.extapp.defaultperspective"
       name="Research"
-      class="QmitkExtDefaultPerspective">
+      class="QmitkExtDefaultPerspective
+	  icon="resources/icon_research.xpm"">
     </perspective>
   </extension>
 </plugin>

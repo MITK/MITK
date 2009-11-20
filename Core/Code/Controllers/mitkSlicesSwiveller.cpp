@@ -37,11 +37,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkSlicedGeometry3D.h"
 #include "mitkTimeSlicedGeometry.h"
 
-#include "mitkApplicationCursor.h"
-
 #include <math.h>
 
-//#include "swivel_cursor.xpm"
 
 namespace mitk {
 
@@ -388,14 +385,10 @@ bool SlicesSwiveller
     }
     case AcROTATESTART:
     {
-      // Local cursor will be implemented within new MITK rendering framework
-      //ApplicationCursor::GetInstance()->PushCursor(swivel_cursor_xpm, 0, 0);
       break;
     }
     case AcROTATEEND:
     {
-      // Local cursor will be implemented within new MITK rendering framework
-      //ApplicationCursor::GetInstance()->PopCursor();
       break;
     }
     default:

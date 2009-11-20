@@ -36,8 +36,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkSlicedGeometry3D.h>
 #include <mitkTimeSlicedGeometry.h>
 
-#include <mitkApplicationCursor.h>
-
 #include <vtkLinearTransform.h>
 
 #include <math.h>
@@ -559,12 +557,12 @@ bool SlicesRotator::ExecuteAction(Action* action, StateEvent const* stateEvent)
     }
     case AcROTATESTART:
     {
-      ApplicationCursor::GetInstance()->PushCursor(rotate_cursor_xpm, 0, 0);
+      this->SetMouseCursor( rotate_cursor_xpm, 0, 0 );
       break;
     }
     case AcROTATEEND:
     {
-      ApplicationCursor::GetInstance()->PopCursor();
+      this->ResetMouseCursor();
       break;
     }
     default:

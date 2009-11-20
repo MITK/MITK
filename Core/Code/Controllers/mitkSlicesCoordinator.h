@@ -70,12 +70,26 @@ public:
   itkGetMacro( LinkPlanes, bool );
   itkBooleanMacro( LinkPlanes );
 
+  /** \brief Resets the mouse cursor (if modified by the SlicesCoordinator)
+   * to its original state.
+   *
+   * Should be used by subclasses and from external application instead
+   * of using QmitkApplicationCursor directly to avoid conflicts. */
+  void ResetMouseCursor();
+
+
 protected:
   /** \brief Default Constructor */
   SlicesCoordinator(const char* machine);
   
   /** clear list of controllers */
   virtual ~SlicesCoordinator();
+
+  /** \brief Sets the specified mouse cursor.
+   *
+   * Use this in subclasses instead of using QmitkApplicationCursor directly.
+   */
+  void SetMouseCursor( const char *xpm[], int hotspotX, int hotspotY );
 
   /** for implementation in subclasses */
   virtual void OnSliceControllerAdded(SliceNavigationController* snc);
@@ -89,6 +103,8 @@ protected:
   SNCVector m_SliceNavigationControllers;
 
   bool m_LinkPlanes;
+
+  bool m_MouseCursorSet;
 
 };
 

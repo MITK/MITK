@@ -1560,10 +1560,12 @@ void QmitkStdMultiWidget::DisableNavigationControllerEventListening()
     break;
 
   case PLANE_MODE_ROTATION:
+    m_SlicesRotator->ResetMouseCursor();
     gi->RemoveListener( m_SlicesRotator );
     break;
 
   case PLANE_MODE_SWIVEL:
+    m_SlicesSwiveller->ResetMouseCursor();
     gi->RemoveListener( m_SlicesSwiveller );
     break;
   }
@@ -1703,6 +1705,7 @@ void QmitkStdMultiWidget::SetWidgetPlaneMode( int mode )
     // Notify MainTemplate GUI that this mode has been deselected
     emit WidgetPlaneModeRotation( false );
 
+    m_SlicesRotator->ResetMouseCursor();
     gi->RemoveListener( m_SlicesRotator );
     break;
 
@@ -1710,6 +1713,7 @@ void QmitkStdMultiWidget::SetWidgetPlaneMode( int mode )
     // Notify MainTemplate GUI that this mode has been deselected
     emit WidgetPlaneModeSwivel( false );
 
+    m_SlicesSwiveller->ResetMouseCursor();
     gi->RemoveListener( m_SlicesSwiveller );
     break;
   }

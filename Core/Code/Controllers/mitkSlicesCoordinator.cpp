@@ -17,21 +17,16 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <mitkSlicesCoordinator.h>
 
+#include <mitkApplicationCursor.h>
+
+
 namespace mitk {
 
-//SlicesCoordinator::Pointer SlicesCoordinator::New()
-//{
-//  // from itkNewMacro()
-//  Pointer smartPtr;
-//  SlicesCoordinator* rawPtr = new SlicesCoordinator("slices-coordinator");
-//  smartPtr = rawPtr;
-//  rawPtr->UnRegister();
-//  return smartPtr;
-//}
 
 SlicesCoordinator::SlicesCoordinator(const char* machine)
 : StateMachine(machine),
-  m_LinkPlanes( true )
+  m_LinkPlanes( true ),
+  m_MouseCursorSet( false )
 {
 }
 
@@ -65,6 +60,28 @@ void SlicesCoordinator::RemoveSliceController(SliceNavigationController* snc)
     OnSliceControllerRemoved(snc);
   }
 }
+
+void SlicesCoordinator::ResetMouseCursor()
+{
+  if ( m_MouseCursorSet )
+  {
+    ApplicationCursor::GetInstance()->PopCursor();
+    m_MouseCursorSet = false;
+  }
+}
+
+void SlicesCoordinator::SetMouseCursor( const char *xpm[], int hotspotX, int hotspotY )
+{
+  // Remove previously set mouse cursor
+  if ( m_MouseCursorSet )
+  {
+    ApplicationCursor::GetInstance()->PopCursor();
+  }
+
+  ApplicationCursor::GetInstance()->PushCursor( xpm, hotspotX, hotspotY );
+  m_MouseCursorSet = true;
+}
+
 
 void SlicesCoordinator::OnSliceControllerAdded(SliceNavigationController*)
 {

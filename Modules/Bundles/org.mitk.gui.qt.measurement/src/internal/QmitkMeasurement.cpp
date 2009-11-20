@@ -516,7 +516,7 @@ void QmitkMeasurement::AddFigureToDataStorage(mitk::PlanarFigure* figure, const 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-bool QmitkMeasurement::AssertDrawingIsPossible(bool checked) const
+bool QmitkMeasurement::AssertDrawingIsPossible(bool checked)
 {
   if (m_SelectedImageNode->GetNode().IsNull())
   {
@@ -525,6 +525,9 @@ bool QmitkMeasurement::AssertDrawingIsPossible(bool checked) const
     m_DrawLine->setChecked(false);
     return false;
   }
+
+  this->GetActiveStdMultiWidget()->SetWidgetPlanesVisibility(false);
+  //this->GetActiveStdMultiWidget()->GetRenderWindow1()->FullScreenMode(true);
 
   return checked;
 }
@@ -728,7 +731,7 @@ void QmitkMeasurement::CopyToClipboard(bool)
     newRow.resize(headerRow.size());
     for (unsigned int i = 0; i < planarFigure->GetNumberOfFeatures(); ++i)
     {
-      if(featureQuantity == 0)
+      if(planarFigure->GetQuantity(i) == 0)
         continue;
       featureName = planarFigure->GetFeatureName(i);
       featureName.append(QString(" [%1]").arg(planarFigure->GetFeatureUnit(i)));

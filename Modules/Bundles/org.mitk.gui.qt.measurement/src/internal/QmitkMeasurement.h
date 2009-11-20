@@ -99,7 +99,7 @@ class QmitkMeasurement : public QObject, public QmitkFunctionality
     ///
     void SetMeasurementInfoToRenderWindow(const QString& text, QmitkRenderWindow* _RenderWindow);
 
-    bool AssertDrawingIsPossible(bool checked) const;
+    bool AssertDrawingIsPossible(bool checked);
 
   protected slots:
     ///# draw actions

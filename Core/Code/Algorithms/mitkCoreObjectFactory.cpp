@@ -318,21 +318,22 @@ mitk::Mapper::Pointer mitk::CoreObjectFactory::CreateMapper(mitk::DataTreeNode* 
 
 const char* mitk::CoreObjectFactory::GetFileExtensions()
 {
-  std::string fileExtensions(EXTERNAL_FILE_EXTENSIONS);
+  m_FileExtensions = EXTERNAL_FILE_EXTENSIONS;
 
   for (ExtraFactoriesList::iterator it = m_ExtraFactories.begin(); it != m_ExtraFactories.end() ; it++ ) {
-    fileExtensions.append(";;").append((*it)->GetFileExtensions());
+    m_FileExtensions.append(";;").append((*it)->GetFileExtensions());
   }
-  return fileExtensions.c_str();
+
+  return m_FileExtensions.c_str();
 };
 
 const char* mitk::CoreObjectFactory::GetSaveFileExtensions() {
-  std::string fileExtensions(SAVE_FILE_EXTENSIONS);
+  m_SaveFileExtensions = SAVE_FILE_EXTENSIONS;
 
   for (ExtraFactoriesList::iterator it = m_ExtraFactories.begin(); it != m_ExtraFactories.end() ; it++ ) {
-    fileExtensions.append(";;").append((*it)->GetFileExtensions());
+    m_SaveFileExtensions.append(";;").append((*it)->GetFileExtensions());
   }
-  return fileExtensions.c_str();
+  return m_SaveFileExtensions.c_str();
 
 };
 

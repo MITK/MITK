@@ -73,6 +73,8 @@ protected:
   cherry::ISelectionListener::Pointer m_SelectionListener;
 
   Ui::QmitkVolumeVisualizationViewControls* m_Controls;
+  
+  void UpdateFromCurrentDataManagerSelection();
 
 private:
 

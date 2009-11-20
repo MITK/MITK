@@ -336,6 +336,7 @@ void QmitkSegmentationView::CreateNewSegmentation()
 
             // TODO select this new segmentation in data manager
             SendSelectedEvent( node, emptySegmentation );
+            UpdateFromCurrentDataManagerSelection();
 
             m_Controls->m_ManualToolSelectionBox->GetToolManager()->SetWorkingData( emptySegmentation );
           }

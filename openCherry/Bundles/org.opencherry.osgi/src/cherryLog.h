@@ -20,11 +20,11 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <mbilog.h>
 
-#define CHERRY_INFO LOG_INFO("openCherry")
-#define CHERRY_WARN LOG_WARN("openCherry")
-#define CHERRY_ERROR LOG_ERROR("openCherry")
-#define CHERRY_FATAL LOG_FATAL("openCherry")
+#define CHERRY_INFO LOG_INFO("BlueBerry")
+#define CHERRY_WARN LOG_WARN("BlueBerry")
+#define CHERRY_ERROR LOG_ERROR("BlueBerry")
+#define CHERRY_FATAL LOG_FATAL("BlueBerry")
 
-#define CHERRY_DEBUG LOG_DEBUG("openCherry")
+#define CHERRY_DEBUG LOG_DEBUG("BlueBerry")
 
 #endif /*__CHERRY_LOG_H__*/

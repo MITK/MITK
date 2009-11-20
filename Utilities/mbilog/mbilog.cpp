@@ -104,8 +104,8 @@ void mbilog::BackendCout::FormatSmart(std::ostream &out, const LogMessage &l,int
       break;
 
     case mbilog::Debug:
-      c_open='(';
-      c_close=')';
+      c_open='#';
+      c_close='#';
       break;
   }
 
@@ -130,6 +130,11 @@ void mbilog::BackendCout::FormatSmart(std::ostream &out, const LogMessage &l,int
    */
   out << c_close << " ";
   
+  if(!l.category.empty())
+  {
+    out << "[" << l.category << "] ";
+  }
+ 
   switch(l.level)
   {
     case mbilog::Info:

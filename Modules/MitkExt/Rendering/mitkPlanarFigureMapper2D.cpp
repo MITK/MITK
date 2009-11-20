@@ -116,11 +116,13 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
 
   const mitk::DataTreeNode* node=this->GetDataTreeNode();
   bool isSelected = false;
-  if(node && node->GetBoolProperty("selected", isSelected))
-  {
-    if(isSelected)
+  if(node)
+    node->GetBoolProperty("selected", isSelected);
+
+  if(isSelected)
     glColor3f(1.0f, 0.0f, 0.0f);
-  }
+  else
+    glColor3f(0.0f, 1.0f, 0.0f);
 
   mitk::Point2D firstPoint;
   for(unsigned short loop = 0; loop < planarFigure->GetPolyLinesSize(); ++loop)
@@ -167,6 +169,9 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
 
   if(isSelected)
     glColor3f(1.0f, 0.0f, 0.0f);
+  else
+    glColor3f(0.0f, 1.0f, 0.0f);
+
   glLineWidth( 1.0 );
 
   // Draw helper objects

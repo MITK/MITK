@@ -94,7 +94,7 @@ void QmitkVolumeVisualizationView::SelectionChanged( cherry::IWorkbenchPart::Poi
 { 
   mitk::DataTreeNodeSelection::ConstPointer _DataTreeNodeSelection 
     = selection.Cast<const mitk::DataTreeNodeSelection>();
-  LOG_INFO << "got selection changed";
+
   if(_DataTreeNodeSelection.IsNotNull())
   {
     std::vector<mitk::DataTreeNode*> selectedNodes;
@@ -151,7 +151,7 @@ void QmitkVolumeVisualizationView::SelectionChanged( cherry::IWorkbenchPart::Poi
 
 void QmitkVolumeVisualizationView::UpdateFromCurrentDataManagerSelection()
 {
-  LOG_INFO << "Update selection from DataManager";
+  //LOG_INFO << "Update selection from DataManager";
   cherry::ISelection::ConstPointer selection( this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection("org.mitk.views.datamanager"));
   this->SelectionChanged(cherry::SmartPointer<IWorkbenchPart>(NULL), selection);
 }

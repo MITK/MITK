@@ -90,18 +90,25 @@ protected:
   GPUVolumeMapper3D();
   virtual ~GPUVolumeMapper3D();
 
+
+  void InitCPU();
+  void InitGPU();
+  void DeinitCPU();
+  void DeinitGPU();
+
   virtual void GenerateData(mitk::BaseRenderer* renderer);
 
   void CreateDefaultTransferFunctions();
   void UpdateTransferFunctions( mitk::BaseRenderer *renderer );
 
   vtkImageChangeInformation* m_UnitSpacingImageFilter;
-  vtkVolumeProperty* m_VolumePropertyLow;
+  vtkVolumeProperty* m_VolumePropertyCPU;
+  vtkVolumeProperty* m_VolumePropertyGPU;
  
-  vtkMitkVolumeTextureMapper3D* m_T2DMapper;
+  vtkMitkVolumeTextureMapper3D* m_MapperGPU;
   vtkFixedPointVolumeRayCastMapper* m_MapperCPU;
  
-  vtkVolume * m_VolumeLOD;
+  vtkVolume * m_VolumeGPU;
   vtkVolume * m_VolumeCPU;
   
   vtkPiecewiseFunction *m_DefaultOpacityTransferFunction;
@@ -114,6 +121,11 @@ protected:
 
   void GenerateDataGPU(mitk::BaseRenderer* renderer);
   void GenerateDataCPU(mitk::BaseRenderer* renderer);
+  
+  bool gpuInitialized;
+  bool cpuInitialized;
+  
+  bool gpuSupported;
 
 };
 

@@ -119,7 +119,7 @@ char *vtkMitkVolumeTextureMapper3D_OneComponentShadeFP =
 "LIT lightResult, lightInfo;\n"
 
 //# COLOR FIX
-"MUL lightResult, lightResult, 6.0;\n"
+"MUL lightResult, lightResult, 4.0;\n"
 
 //# This is the ambient contribution	
 "MUL finalColor, coefficient.x, sampleColor;\n"
@@ -370,6 +370,7 @@ void vtkMitkOpenGLVolumeTextureMapper3D::Render(vtkRenderer *ren, vtkVolume *vol
     }
   
   vtkGraphicErrorMacro(ren->GetRenderWindow(),"Before actual render method");
+  
   switch ( this->RenderMethod )
     {
     case vtkMitkVolumeTextureMapper3D::NVIDIA_METHOD:
@@ -2159,7 +2160,27 @@ void vtkMitkOpenGLVolumeTextureMapper3D::Initialize()
     {    
     canDoFP = 1;
     }
+    else
+    {
+      std::string errString = "no gpu-acceleration possible cause following extensions/methods are missing or unsupported:";
+            
+      if(!supports_texture3D) errString += " EXT_TEXTURE3D";
+      if(!supports_multitexture) errString += " EXT_MULTITEXTUR";
+      if(!supports_GL_ARB_fragment_program) errString += " ARB_FRAGMENT_PROGRAM";
+      if(!supports_GL_ARB_vertex_program) errString += " ARB_VERTEX_PROGRAM";
+      if(!vtkgl::TexImage3D) errString += " glTexImage3D";
+      if(!vtkgl::ActiveTexture) errString += " glActiveTexture";
+      if(!vtkgl::MultiTexCoord3fv) errString += " glMultiTexCoord3fv";
+      if(!vtkgl::GenProgramsARB) errString += " glGenProgramsARB";
+      if(!vtkgl::DeleteProgramsARB) errString += " glDeleteProgramsARB";
+      if(!vtkgl::BindProgramARB) errString += " glBindProgramARB";
+      if(!vtkgl::ProgramStringARB) errString += " glProgramStringARB";
+      if(!vtkgl::ProgramLocalParameter4fARB) errString += " glProgramLocalParameter4fARB";
   
+      LOG_WARN << errString;
+    };
+  
+  /*
   if ( !brokenMesa &&
        supports_texture3D          &&
        supports_multitexture       &&
@@ -2177,7 +2198,7 @@ void vtkMitkOpenGLVolumeTextureMapper3D::Initialize()
     {
     canDoNV = 1;
     }
-
+    */
   // can't do either
   if ( !canDoFP && !canDoNV )
     {

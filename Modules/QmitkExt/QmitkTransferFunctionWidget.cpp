@@ -66,10 +66,10 @@ void QmitkTransferFunctionWidget::SetDataTreeNode(mitk::DataTreeNode* node)
 
     if( mitk::Image* image = dynamic_cast<mitk::Image*>( node->GetData() ) )
     {
-      m_RangeSliderMin= image->GetScalarValueMin();
-      m_RangeSliderMax= image->GetScalarValueMax();
-      //tf->InitializeByItkHistogram( image->GetScalarHistogram() );
       mitk::SimpleHistogram *h = histogramCache[image];
+
+      m_RangeSliderMin= h->GetMin();
+      m_RangeSliderMax= h->GetMax();
          
       m_ScalarOpacityFunctionCanvas->SetHistogram( h );
       m_GradientOpacityCanvas->SetHistogram( h );

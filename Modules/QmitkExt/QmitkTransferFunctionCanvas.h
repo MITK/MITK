@@ -75,20 +75,20 @@ class QMITKEXT_EXPORT SimpleHistogram
   
   public:
   
-  int GetFirst()
+  int GetMin()
   {
     if(!valid)
       return 0;
       
-    return first;
+    return min;
   }
   
-  int GetLast()
+  int GetMax()
   {
     if(!valid)
       return 0;
       
-    return last;
+    return max;
   }
   
   void ComputeFromImage( Image::Pointer source );

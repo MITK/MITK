@@ -1,6 +1,6 @@
 /*=========================================================================
 
-Program:   mbilog - logging for mitk / openCherry
+Program:   mbilog - logging for mitk / BlueBerry
 
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
@@ -16,6 +16,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <ctime>
 #include <string>
 #include <iomanip>
+#include <vector>
 
 #include "mbilog.h"
 
@@ -203,6 +204,174 @@ void mbilog::BackendCout::FormatFull(std::ostream &out,const LogMessage &l,int t
 static HANDLE g_hConsole;
 static bool g_init=false;
 
+class AutoCategorize
+{
+  protected:
+
+    std::vector<std::string> path;
+
+    std::string current;
+
+    int pos;
+
+    void flush()
+    {
+      if(current.size()>0)
+      {
+        if(current.compare("..")==0)
+        {
+          if(path.size()>0)
+            path.pop_back();
+        }
+        else
+        {
+          path.push_back(current);
+        }
+        current="";
+      }
+    }
+
+    bool search2p1(char *a,char *b)
+    {
+      int size = path.size() - 2;
+      for(int r=0;r<size;r++)
+        if(path[r].compare(a)==0 && path[r+1].compare(b)==0)
+        {
+          pos = r+2;
+          return true;
+        }
+      return false;
+    }
+
+    bool search1p1(char *a)
+    {
+      int size = path.size() - 1;
+      for(int r=0;r<size;r++)
+        if(path[r].compare(a)==0)
+        {
+          pos = r+1;
+          return true;
+        }
+      return false;
+    }
+    
+    std::string stripBundle(std::string x)
+    {
+      static char *strip[] =
+      {
+        "org.opencherry.",
+        "org.mitk.gui.qt.",
+        "org.mitk."
+      };
+      
+      int xs=x.size();
+      
+      for(int r=0; r < sizeof(strip)/sizeof(char*); r++)
+      {
+        int s=strlen(strip[r]);
+        if(xs>s)
+          if(strncmp(strip[r],x.c_str(),s)==0)
+            return x.substr(s,xs-s);
+      }
+      return x;
+    }
+
+  public:
+  
+    AutoCategorize( const mbilog::LogMessage &l )
+    {
+      int size =strlen(l.filePath);
+
+      current="";
+
+      for(int r=0;r<size;r++)
+      {
+        char c=l.filePath[r];
+        if(c=='\\' || c=='/')
+          flush();
+        else 
+          current+=tolower(c);
+      }
+
+      flush();
+    }
+    
+    std::string GetCategory()
+    {
+      if(search2p1("modules","mitkext"))
+        return "ext." + path[pos];
+
+      if(search2p1("modules","qmitkext"))
+        return "ext.ui";
+
+      if(search2p1("mbi-sb","core"))
+        return "sb." + path[pos];
+    
+      if(search2p1("mbi-sb","q4mitk"))
+        return "sb.ui";
+    
+      if(search2p1("mbi-sb","q4applications"))
+        return "sb.app." + path[pos];
+
+      if(search2p1("mbi-sb","utilities"))
+        return "sb.util." + path[pos];
+    
+      if(search2p1("mbi-sb","bundles"))
+        return "sb.bun." + stripBundle(path[pos]);   
+    
+      if(search2p1("mbi-sb","bundlesqt"))
+        return "sb.bun." + stripBundle(path[pos]);   
+    
+      if(search2p1("mbi-qm","core"))
+        return "qm." + path[pos];
+        
+      if(search2p1("mbi-qm","utilities"))
+        return "qm.util." + path[pos];
+    
+      if(search2p1("mbi","modules"))
+        return "sb.mod." + path[pos];
+        
+      if(search2p1("core","code"))
+        return path[pos];
+    
+      if(search2p1("coreui","bundles"))
+        return "bun." + stripBundle(path[pos]);       
+    
+      if(search2p1("modules","bundles"))
+        return "ext.bun." + stripBundle(path[pos]);       
+    
+      if(search2p1("coreui","qmitk"))
+        return "ui";
+    
+      if(search2p1("opencherry","bundles"))
+        return "blueberry." + stripBundle(path[pos]);     
+    
+      if(search1p1("modules"))
+        return "mod." + path[pos];
+    
+      if(search1p1("utilities"))
+        return "util." + path[pos];
+    
+      return "";
+      
+    /*
+      std::string result("");
+      
+      for (std::vector<std::string>::iterator it = path.begin(); it != path.end(); ++it)
+      {
+        if(result.empty())
+          result+=*it;
+        else
+          result+="/"+*it;
+      }
+      
+      return result;
+    */
+    }
+    
+};
+
+
 static void FormatSmartWindows(const mbilog::LogMessage &l,int /*threadID*/)
 {
   int colorNormal = FOREGROUND_RED|FOREGROUND_GREEN|FOREGROUND_BLUE;
@@ -277,17 +446,30 @@ static void FormatSmartWindows(const mbilog::LogMessage &l,int /*threadID*/)
   std::cout << std::fixed << std::setw(6) << std::setprecision(2) << ((double)std::clock())/CLOCKS_PER_SEC << std::flush;
   ChangeColor( colorTime );
   std::cout << c_close << " " << std::flush;
-
-  if(!l.category.empty())
-  {
-    ChangeColor( FOREGROUND_BLUE | FOREGROUND_INTENSITY );
-    std::cout << "{" << std::flush;
-    ChangeColor( FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_INTENSITY );
-    std::cout << l.category << std::flush;
-    ChangeColor( FOREGROUND_BLUE | FOREGROUND_INTENSITY );
-    std::cout << "} " << std::flush;
-  }
   
+  {
+    AutoCategorize ac(l);
+    std::string cat=ac.GetCategory();
+    if(!cat.empty())
+    {
+      ChangeColor( FOREGROUND_BLUE | FOREGROUND_INTENSITY );
+      std::cout << "{" << std::flush;
+      ChangeColor( FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_INTENSITY );
+      std::cout << cat << std::flush;
+      ChangeColor( FOREGROUND_BLUE | FOREGROUND_INTENSITY );
+      std::cout << "} " << std::flush;
+    }
+    else if(!l.category.empty())
+    {
+      ChangeColor( FOREGROUND_BLUE | FOREGROUND_INTENSITY );
+      std::cout << "(" << std::flush;
+      ChangeColor( FOREGROUND_BLUE | FOREGROUND_RED );
+      std::cout << l.category << std::flush;
+      ChangeColor( FOREGROUND_BLUE | FOREGROUND_INTENSITY );
+      std::cout << ") " << std::flush;
+    }
+  }
+
   switch(l.level)
   {
     case mbilog::Info:

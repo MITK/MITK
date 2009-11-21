@@ -200,35 +200,44 @@ void mbilog::BackendCout::FormatFull(std::ostream &out,const LogMessage &l,int t
 
 #ifdef USE_WIN32COLOREDCONSOLE
 
-static int g_LastColor;
 static HANDLE g_hConsole;
 static bool g_init=false;
 
-static inline void ChangeColor(int c)
-{
-  if(g_LastColor == c) return;
-  SetConsoleTextAttribute(g_hConsole,c);
-  g_LastColor=c;  
-}
-
 static void FormatSmartWindows(const mbilog::LogMessage &l,int /*threadID*/)
 {
+  int colorNormal = FOREGROUND_RED|FOREGROUND_BLUE;
+
+  int lastColor = colorNormal;
+  #define ChangeColor( col ) if(lastColor != (col)) { SetConsoleTextAttribute(g_hConsole, (col) ); lastColor=(col); }
+
   if(!g_init)
   {
     g_hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
     g_init=true;
+
+    std::string title = "MITK - Log";
+    
+    SetConsoleTitle( title.c_str() );
+    
+    /*
+    ChangeColor( FOREGROUND_GREEN|FOREGROUND_BLUE|BACKGROUND_BLUE );
+    std::cout << " <<< " << std::flush;
+    ChangeColor( FOREGROUND_RED|FOREGROUND_GREEN|FOREGROUND_BLUE|FOREGROUND_INTENSITY|BACKGROUND_BLUE );
+    std::cout << title << std::flush;
+    ChangeColor( FOREGROUND_GREEN|FOREGROUND_BLUE|BACKGROUND_BLUE );
+    std::cout << " >>> " << std::flush;
+    ChangeColor( colorNormal );
+    std::cout << std::endl;
+    */
   }
 
   char c_open='[';
   char c_close=']';
 
-  int colorNormal = FOREGROUND_RED|FOREGROUND_BLUE;
-
   int colorTime = FOREGROUND_GREEN;
   int colorText = FOREGROUND_RED|FOREGROUND_GREEN|FOREGROUND_BLUE;
   
-  g_LastColor = colorNormal;
-
+  
   switch(l.level)
   {
     case mbilog::Info:

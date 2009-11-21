@@ -205,10 +205,10 @@ static bool g_init=false;
 
 static void FormatSmartWindows(const mbilog::LogMessage &l,int /*threadID*/)
 {
-  int colorNormal = FOREGROUND_RED|FOREGROUND_BLUE;
+  int colorNormal = FOREGROUND_RED|FOREGROUND_GREEN|FOREGROUND_BLUE;
 
   int lastColor = colorNormal;
-  #define ChangeColor( col ) if(lastColor != (col)) { SetConsoleTextAttribute(g_hConsole, (col) ); lastColor=(col); }
+  #define ChangeColor( _col ) { int col=(_col); if(lastColor != (col)) { SetConsoleTextAttribute(g_hConsole, (col) ); lastColor=(col); } }
 
   if(!g_init)
   {
@@ -219,7 +219,7 @@ static void FormatSmartWindows(const mbilog::LogMessage &l,int /*threadID*/)
     
     SetConsoleTitle( title.c_str() );
     
-    /*
+    /* Title rendering
     ChangeColor( FOREGROUND_GREEN|FOREGROUND_BLUE|BACKGROUND_BLUE );
     std::cout << " <<< " << std::flush;
     ChangeColor( FOREGROUND_RED|FOREGROUND_GREEN|FOREGROUND_BLUE|FOREGROUND_INTENSITY|BACKGROUND_BLUE );
@@ -236,7 +236,6 @@ static void FormatSmartWindows(const mbilog::LogMessage &l,int /*threadID*/)
 
   int colorTime = FOREGROUND_GREEN;
   int colorText = FOREGROUND_RED|FOREGROUND_GREEN|FOREGROUND_BLUE;
-  
   
   switch(l.level)
   {
@@ -265,8 +264,8 @@ static void FormatSmartWindows(const mbilog::LogMessage &l,int /*threadID*/)
       break;
 
     case mbilog::Debug:
-      c_open='{';
-      c_close='}';
+      c_open='(';
+      c_close=')';
       colorTime = FOREGROUND_BLUE|FOREGROUND_INTENSITY;
       colorText |= FOREGROUND_INTENSITY;
       break;
@@ -282,13 +281,13 @@ static void FormatSmartWindows(const mbilog::LogMessage &l,int /*threadID*/)
   if(!l.category.empty())
   {
     ChangeColor( FOREGROUND_BLUE | FOREGROUND_INTENSITY );
-    std::cout << "(" << std::flush;
+    std::cout << "{" << std::flush;
     ChangeColor( FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_INTENSITY );
     std::cout << l.category << std::flush;
     ChangeColor( FOREGROUND_BLUE | FOREGROUND_INTENSITY );
-    std::cout << ") " << std::flush;
+    std::cout << "} " << std::flush;
   }
- 
+  
   switch(l.level)
   {
     case mbilog::Info:
@@ -300,8 +299,8 @@ static void FormatSmartWindows(const mbilog::LogMessage &l,int /*threadID*/)
       break;
 
     case mbilog::Error:
-       ChangeColor( colorTime );
-     std::cout << "ERROR: " << std::flush;
+      ChangeColor( colorTime );
+      std::cout << "ERROR: " << std::flush;
       break;
 
     case mbilog::Fatal:
@@ -316,11 +315,9 @@ static void FormatSmartWindows(const mbilog::LogMessage &l,int /*threadID*/)
   }
       
   ChangeColor( colorText );
-
   std::cout << l.message << std::endl;
   
   ChangeColor( colorNormal );
-
 }
 
 #endif

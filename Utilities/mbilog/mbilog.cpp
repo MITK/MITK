@@ -201,35 +201,31 @@ void mbilog::BackendCout::FormatFull(std::ostream &out,const LogMessage &l,int t
 #ifdef USE_WIN32COLOREDCONSOLE
 
 static int g_LastColor;
+static HANDLE g_hConsole;
+static bool g_init=false;
 
-static void ChangeColor(int c)
+static inline void ChangeColor(int c)
 {
-  if(g_LastColor == c)
-    return;
-    
-  static HANDLE hConsole;
-
-  static bool init=false;
-  if(!init)
-  {
-    hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-    init=true;
-  }
-
-  SetConsoleTextAttribute(hConsole,c);
-  
+  if(g_LastColor == c) return;
+  SetConsoleTextAttribute(g_hConsole,c);
   g_LastColor=c;  
 }
 
 static void FormatSmartWindows(const mbilog::LogMessage &l,int /*threadID*/)
 {
+  if(!g_init)
+  {
+    g_hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+    g_init=true;
+  }
+
   char c_open='[';
   char c_close=']';
 
-  int colorNormal = FOREGROUND_RED|FOREGROUND_GREEN|FOREGROUND_BLUE;
+  int colorNormal = FOREGROUND_RED|FOREGROUND_BLUE;
 
   int colorTime = FOREGROUND_GREEN;
-  int colorText = colorNormal;
+  int colorText = FOREGROUND_RED|FOREGROUND_GREEN|FOREGROUND_BLUE;
   
   g_LastColor = colorNormal;
 
@@ -241,22 +237,22 @@ static void FormatSmartWindows(const mbilog::LogMessage &l,int /*threadID*/)
     case mbilog::Warn:
       c_open='!';
       c_close='!';
-      colorTime = FOREGROUND_RED|FOREGROUND_GREEN;
-      colorText |= FOREGROUND_INTENSITY;
+      colorTime = FOREGROUND_RED|FOREGROUND_GREEN|FOREGROUND_INTENSITY;
+      colorText = FOREGROUND_RED|FOREGROUND_GREEN;
       break;
 
     case mbilog::Error:
       c_open='#';
       c_close='#';
       colorTime = FOREGROUND_RED|FOREGROUND_INTENSITY;
-      colorText |= FOREGROUND_INTENSITY;
+      colorText = FOREGROUND_RED;
       break;
 
     case mbilog::Fatal:
       c_open='*';
       c_close='*';
-      colorTime = FOREGROUND_RED|FOREGROUND_INTENSITY;
-      colorText |= FOREGROUND_INTENSITY;
+      colorTime = FOREGROUND_RED|FOREGROUND_BLUE|FOREGROUND_INTENSITY;
+      colorText = FOREGROUND_RED|FOREGROUND_BLUE|FOREGROUND_INTENSITY;
       break;
 
     case mbilog::Debug:
@@ -277,11 +273,11 @@ static void FormatSmartWindows(const mbilog::LogMessage &l,int /*threadID*/)
   if(!l.category.empty())
   {
     ChangeColor( FOREGROUND_BLUE | FOREGROUND_INTENSITY );
-    std::cout << "[" << std::flush;
-    ChangeColor( FOREGROUND_BLUE | FOREGROUND_GREEN );
+    std::cout << "(" << std::flush;
+    ChangeColor( FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_INTENSITY );
     std::cout << l.category << std::flush;
     ChangeColor( FOREGROUND_BLUE | FOREGROUND_INTENSITY );
-    std::cout << "] " << std::flush;
+    std::cout << ") " << std::flush;
   }
  
   switch(l.level)

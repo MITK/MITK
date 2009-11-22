@@ -602,13 +602,12 @@ void QmitkSegmentationView::SelectionChanged(cherry::IWorkbenchPart::Pointer sou
 {
   if ( sourcepart == this || selection.IsNull() )  // prevents being notified by own selection events
   {
-    std::cout << "Ignore this selection event:";
-    std::cout << " sourcepart == this " << (sourcepart == this);
-    std::cout << " selection == NULL" << (selection == NULL) << std::endl;
+    LOG_INFO << "Ignore this selection event:"
+             << " sourcepart == this " << (sourcepart == this)
+             << " selection == NULL" << (selection == NULL);
     return; // otherwise we get "null selection" events each time the view is activated/focussed
   }
 
-  std::cout << "selection changed" << std::endl;
   // save current selection in member variable
   m_CurrentSelection = selection.Cast<const mitk::DataTreeNodeSelection>();
 

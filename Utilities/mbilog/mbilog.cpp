@@ -210,7 +210,7 @@ class AutoCategorize
 
     std::vector<std::string> path;
 
-    std::string current;
+    std::string current,category;
 
     int pos;
 
@@ -231,6 +231,201 @@ class AutoCategorize
       }
     }
 
+    std::string simplify(std::string x)
+    {
+      static char *replace[] =
+      {
+        ".cpp",                "",
+        ".cxx",                "",
+        ".txx",                "",
+        ".h",                  "",
+        ".hpp",                "",
+        ".hxx",                "",
+        ".c",                  "",
+        
+        "org.opencherry.",     "",
+        "org.mitk.gui.qt.",    "",
+        "org.mitk.",           "",
+
+        "qmitk",               "",
+        "mitk",                "",
+        "cherry",              "",
+        "itk",                 "",
+        "vtk",                 "",
+        "qt",                  "",
+       
+        "object",              "obj",
+        "factory",             "fac",
+        "classes",             "cls",
+        "plugin",              "plg",
+        "widget",              "wg",
+        "interface",           "itf",
+        "service",             "svc",
+        "register",            "reg",
+        "perspective",         "prs",
+
+        "contour",             "",
+        "tools",               "",
+        "tool",                "",
+      
+        "application",        "app",
+        "calculate",          "calc",
+        "subtract",           "sub",
+        "region",             "reg",
+        "tumor",              "tum",
+        "growing",            "grw",
+        "segmentation",       "seg",
+        "statistics",         "stat",
+    
+        "imaging",            "img",
+        "image",              "img",
+    
+        "diffusion",          "dif",
+        "registration",       "reg",
+        "navigation",         "nav",
+        "generation",         "gen",
+        "paintbrush",         "pb",
+        "volumetry",          "vol",
+        "volume",             "vol",
+        "mapper",             "map",
+        "filter",             "fil",
+        "surface",            "sfc",
+        "point",              "pnt",
+        "organ",              "org",
+        "multiple",           "mul",
+   
+        "corrector",          "cor",
+        "correction",         "cor",
+    
+        "sandbox",            "sb",
+        "texture",            "tex",
+        "opengl",             "ogl",
+        "vessel",             "vsl",
+        "value",              "val",
+        "analysis",           "ana",
+        "based",              "bsd",
+
+        "patient",            "pat",
+        "body",               "body",
+        "diagnosis",          "diag",
+        "mesh",               "msh",
+        "radial",             "rad",
+        "simple",             "sim",
+        "algorithms",         "alg",
+        "controllers",        "con",
+        "control",            "con",
+        "interactive",        "ia",
+        "interactions",       "ia",
+        "planning",           "pln", 
+      
+        "processing",         "pro", 
+        "process",            "pro", 
+      
+        "rendering",          "rnd", 
+        "renderer",           "rnd", 
+        "render",             "rnd", 
+
+        "datamanagement",     "dat",
+        "management",         "mng",
+        "manager",            "mng", 
+        "data",               "dat",
+
+        "anatomy",            "ana", 
+        "neuro",              "neo", 
+        "automatic",          "auto", 
+    
+        "optimizer",          "opt", 
+        "optimize",           "opt", 
+
+        "binary",             "bin", 
+        "liver",              "liv", 
+        "lymph",              "lym", 
+        "node",               "nd", 
+        "homogeneous",        "homogen", 
+        "shape",              "shp", 
+        "model",              "mdl", 
+        "extension",          "ext", 
+        "activator",          "act", 
+        "view",               "vw", 
+        
+        "workbench",          "wb",
+        "common",             "com",
+        "resection",          "rsc",
+        "plane",              "pln",
+        "translation",        "trl",
+        "rotation",           "rot",
+        "deformation",        "dfm",
+        
+        "2d",                 "2d",
+        "3d",                 "3d",
+        ".",                  "." 
+        
+      };
+      
+      bool redo;
+      
+      std::string lft(""),rgt("");
+      
+      do
+      {
+        redo=false;
+
+        for(int r=0; r < sizeof(replace)/sizeof(char*); r+=2)
+        {
+          int s=strlen(replace[r]);
+          int xs=x.size();
+
+          if(xs==s)
+          {
+            if( replace[r+1][0] || !lft.empty() || !rgt.empty() )
+              if(x.compare(replace[r])==0)
+                x=replace[r+1];
+          }
+          else if(xs>s)
+          {
+            if(strncmp(replace[r],&x.c_str()[xs-s],s)==0)
+            {
+              std::string rp = replace[r+1];
+              if(!rp.empty()) rp[0]=toupper(rp[0]);
+              x = x.substr(0,xs-s);
+              rgt = rp + rgt;
+              redo=true;
+            }
+            else if(strncmp(replace[r],x.c_str(),s)==0)
+            {
+              std::string rp = replace[r+1];
+              if(!rp.empty()) rp[0]=toupper(rp[0]);
+              x=x.substr(s,xs-s);
+              lft = lft + rp; 
+              redo=true;
+            }
+          }
+        }
+      }
+      while(redo);
+      
+      x[0]=toupper(x[0]);
+      
+      x=lft+x+rgt;
+      
+      x[0]=tolower(x[0]);
+
+      return x;
+    }
+    
+    bool search2p2(char *a,char *b)
+    {
+      int size = path.size() - 3;
+      for(int r=0;r<size;r++)
+        if(path[r].compare(a)==0 && path[r+1].compare(b)==0)
+        {
+          pos = r+2;
+          category = simplify(path[pos]) + "." + simplify(path[path.size()-1]);
+          return true;
+        }
+      return false;
+    }
+
     bool search2p1(char *a,char *b)
     {
       int size = path.size() - 2;
@@ -238,44 +433,25 @@ class AutoCategorize
         if(path[r].compare(a)==0 && path[r+1].compare(b)==0)
         {
           pos = r+2;
+          category = simplify(path[pos]);
           return true;
         }
       return false;
     }
 
-    bool search1p1(char *a)
+    bool search1p2(char *a)
     {
-      int size = path.size() - 1;
+      int size = path.size() - 2;
       for(int r=0;r<size;r++)
         if(path[r].compare(a)==0)
         {
           pos = r+1;
+          category = simplify(path[pos]) + "." + simplify(path[path.size()-1]);
           return true;
         }
       return false;
     }
     
-    std::string stripBundle(std::string x)
-    {
-      static char *strip[] =
-      {
-        "org.opencherry.",
-        "org.mitk.gui.qt.",
-        "org.mitk."
-      };
-      
-      int xs=x.size();
-      
-      for(int r=0; r < sizeof(strip)/sizeof(char*); r++)
-      {
-        int s=strlen(strip[r]);
-        if(xs>s)
-          if(strncmp(strip[r],x.c_str(),s)==0)
-            return x.substr(s,xs-s);
-      }
-      return x;
-    }
-
   public:
   
     AutoCategorize( const mbilog::LogMessage &l )
@@ -296,77 +472,34 @@ class AutoCategorize
       flush();
     }
     
+    std::string GetPrefix()
+    {
+      category="";
+      if(search2p2("modules","mitkext"))        return "ext.";
+      if(search2p1("modules","qmitkext"))       return "ext.ui.";
+      if(search2p2("mbi-sb","core"))            return "sb.";
+      if(search2p1("mbi-sb","q4mitk"))          return "sb.ui.";
+      if(search2p2("mbi-sb","q4applications"))  return "sb.app.";
+      if(search2p2("mbi-sb","utilities"))       return "sb.utl.";
+      if(search2p2("mbi-sb","bundles"))         return "sb.bun.";   
+      if(search2p2("mbi-sb","bundlesqt"))       return "sb.bun.";   
+      if(search2p2("mbi-qm","core"))            return "qm.";
+      if(search2p2("mbi-qm","utilities"))       return "qm.utl.";
+      if(search2p2("mbi","modules"))            return "sb.mod.";
+      if(search2p2("core","code"))              return "";
+      if(search2p2("coreui","bundles"))         return "bun.";       
+      if(search2p2("modules","bundles"))        return "ext.bun.";       
+      if(search2p1("coreui","qmitk"))           return "ui.";
+      if(search2p2("opencherry","bundles"))     return "bb.";     
+      if(search1p2("modules"))                  return "mod.";
+      if(search1p2("utilities"))                return "utl.";
+      if(search1p2("applications"))             return "app.";
+      return "";
+    }
+    
     std::string GetCategory()
     {
-      if(search2p1("modules","mitkext"))
-        return "ext." + path[pos];
-
-      if(search2p1("modules","qmitkext"))
-        return "ext.ui";
-
-      if(search2p1("mbi-sb","core"))
-        return "sb." + path[pos];
-    
-      if(search2p1("mbi-sb","q4mitk"))
-        return "sb.ui";
-    
-      if(search2p1("mbi-sb","q4applications"))
-        return "sb.app." + path[pos];
-
-      if(search2p1("mbi-sb","utilities"))
-        return "sb.util." + path[pos];
-    
-      if(search2p1("mbi-sb","bundles"))
-        return "sb.bun." + stripBundle(path[pos]);   
-    
-      if(search2p1("mbi-sb","bundlesqt"))
-        return "sb.bun." + stripBundle(path[pos]);   
-    
-      if(search2p1("mbi-qm","core"))
-        return "qm." + path[pos];
-        
-      if(search2p1("mbi-qm","utilities"))
-        return "qm.util." + path[pos];
-    
-      if(search2p1("mbi","modules"))
-        return "sb.mod." + path[pos];
-        
-      if(search2p1("core","code"))
-        return path[pos];
-    
-      if(search2p1("coreui","bundles"))
-        return "bun." + stripBundle(path[pos]);       
-    
-      if(search2p1("modules","bundles"))
-        return "ext.bun." + stripBundle(path[pos]);       
-    
-      if(search2p1("coreui","qmitk"))
-        return "ui";
-    
-      if(search2p1("opencherry","bundles"))
-        return "blueberry." + stripBundle(path[pos]);     
-    
-      if(search1p1("modules"))
-        return "mod." + path[pos];
-    
-      if(search1p1("utilities"))
-        return "util." + path[pos];
-    
-      return "";
-      
-    /*
-      std::string result("");
-      
-      for (std::vector<std::string>::iterator it = path.begin(); it != path.end(); ++it)
-      {
-        if(result.empty())
-          result+=*it;
-        else
-          result+="/"+*it;
-      }
-      
-      return result;
-    */
+      return category;
     }
     
 };
@@ -400,11 +533,11 @@ static void FormatSmartWindows(const mbilog::LogMessage &l,int /*threadID*/)
     */
   }
 
-  char c_open='[';
-  char c_close=']';
-
   int colorTime = FOREGROUND_GREEN;
   int colorText = FOREGROUND_RED|FOREGROUND_GREEN|FOREGROUND_BLUE;
+  int colorPre = FOREGROUND_BLUE | FOREGROUND_GREEN;
+  int colorCat = FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_INTENSITY;
+  bool showColon = true;
   
   switch(l.level)
   {
@@ -412,61 +545,88 @@ static void FormatSmartWindows(const mbilog::LogMessage &l,int /*threadID*/)
       break;
 
     case mbilog::Warn:
-      c_open='!';
-      c_close='!';
       colorTime = FOREGROUND_RED|FOREGROUND_GREEN|FOREGROUND_INTENSITY;
       colorText = FOREGROUND_RED|FOREGROUND_GREEN;
+      colorPre = FOREGROUND_BLUE | FOREGROUND_RED;
+      colorCat = FOREGROUND_BLUE | FOREGROUND_RED | FOREGROUND_INTENSITY;
+      showColon = false;
       break;
 
     case mbilog::Error:
-      c_open='#';
-      c_close='#';
       colorTime = FOREGROUND_RED|FOREGROUND_INTENSITY;
       colorText = FOREGROUND_RED;
+      colorPre = FOREGROUND_BLUE | FOREGROUND_RED;
+      colorCat = FOREGROUND_BLUE | FOREGROUND_RED | FOREGROUND_INTENSITY;
+      showColon = false;
       break;
 
     case mbilog::Fatal:
-      c_open='*';
-      c_close='*';
       colorTime = FOREGROUND_RED|FOREGROUND_BLUE|FOREGROUND_INTENSITY;
       colorText = FOREGROUND_RED|FOREGROUND_BLUE|FOREGROUND_INTENSITY;
+      colorPre = FOREGROUND_BLUE | FOREGROUND_RED;
+      colorCat = FOREGROUND_BLUE | FOREGROUND_RED | FOREGROUND_INTENSITY;
+      showColon = false;
       break;
 
     case mbilog::Debug:
-      c_open='(';
-      c_close=')';
       colorTime = FOREGROUND_BLUE|FOREGROUND_INTENSITY;
       colorText |= FOREGROUND_INTENSITY;
+      showColon = false;
       break;
   }
 
-  ChangeColor( colorTime );
-  std::cout << c_open << std::flush;
   ChangeColor( colorTime | FOREGROUND_INTENSITY);
-  std::cout << std::fixed << std::setw(6) << std::setprecision(2) << ((double)std::clock())/CLOCKS_PER_SEC << std::flush;
-  ChangeColor( colorTime );
-  std::cout << c_close << " " << std::flush;
+  std::cout << std::fixed << /*std::setw(6) <<*/ std::setprecision(2) << ((double)std::clock())/CLOCKS_PER_SEC << " " << std::flush;
   
   {
     AutoCategorize ac(l);
+    std::string pre=ac.GetPrefix();
     std::string cat=ac.GetCategory();
-    if(!cat.empty())
+    if( (!pre.empty()) || (!cat.empty()) )
     {
-      ChangeColor( FOREGROUND_BLUE | FOREGROUND_INTENSITY );
-      std::cout << "{" << std::flush;
-      ChangeColor( FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_INTENSITY );
-      std::cout << cat << std::flush;
-      ChangeColor( FOREGROUND_BLUE | FOREGROUND_INTENSITY );
-      std::cout << "} " << std::flush;
+      if( !pre.empty() )
+      {
+        ChangeColor( colorPre );
+        std::cout << pre << std::flush;
+      }
+      if( !cat.empty() )
+      {
+        int s=cat.size();
+        for(int r=0;r<s;r++)
+        {
+          char c=cat[r];
+          if(isupper(c))
+          {
+            ChangeColor( colorCat );
+            std::cout << (char)tolower(c) << std::flush;
+          }
+          else
+          {
+            ChangeColor( colorPre );
+            std::cout << c << std::flush;
+          }
+        }
+      }
+    
+      if(showColon)
+      {
+        ChangeColor( FOREGROUND_BLUE | FOREGROUND_INTENSITY );
+        std::cout << ": " << std::flush;
+      }
+      else
+        std::cout << " ";
     }
     else if(!l.category.empty())
     {
-      ChangeColor( FOREGROUND_BLUE | FOREGROUND_INTENSITY );
-      std::cout << "(" << std::flush;
-      ChangeColor( FOREGROUND_BLUE | FOREGROUND_RED );
+      ChangeColor( colorCat );
       std::cout << l.category << std::flush;
-      ChangeColor( FOREGROUND_BLUE | FOREGROUND_INTENSITY );
-      std::cout << ") " << std::flush;
+      if(showColon)
+      {
+        ChangeColor( FOREGROUND_BLUE | FOREGROUND_INTENSITY );
+        std::cout << ": " << std::flush;
+      }
+      else
+        std::cout << " ";
     }
   }
 

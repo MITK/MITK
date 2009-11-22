@@ -153,11 +153,11 @@ ExtensionPointService::AddContribution(std::istream& istr,
   }
   catch(Poco::Exception* exc)
   {
-    std::cerr << exc->displayText() << std::endl;
+    CHERRY_ERROR << exc->displayText() << std::endl;
   }
   catch(...)
   {
-    std::cerr << "Exception while parsing plugin.xml from " << contributor << std::endl;
+    CHERRY_ERROR << "Exception while parsing plugin.xml from " << contributor << std::endl;
   }
 }
 

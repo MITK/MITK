@@ -1048,7 +1048,7 @@ bool Workbench::SaveMementoToFile(XMLMemento::Pointer memento)
   {
     return false;
   }
-  std::cout << "Saving state to: " << stateFile.path() << std::endl;
+  CHERRY_INFO << "Saving state to: " << stateFile.path() << std::endl;
   try
   {
     Poco::FileOutputStream stream(stateFile.path());

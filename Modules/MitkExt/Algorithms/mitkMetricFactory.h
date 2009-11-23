@@ -21,6 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "itkImageToImageMetric.h"
 #include "itkImage.h"
+#include "mitkMetricParameters.h"
 #include "itkImageMaskSpatialObject.h"
 
 namespace mitk {

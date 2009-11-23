@@ -258,15 +258,25 @@ class AutoCategorize
         "factory",             "fac",
         "classes",             "cls",
         "plugin",              "plg",
-        "widget",              "wid",
+        "widget",              "wdgt",
         "interface",           "itf",
         "service",             "svc",
         "register",            "reg",
         "perspective",         "prs",
+        
+        "assessor",            "ase",
+        
+        "atrophy",             "atr",
+        
+        "bias",                "bias",
+        
+        "field",               "fld",
+        
+        "multi",               "multi",
 
-        "contour",             "",
-        "tools",               "",
-        "tool",                "",
+        "contour",             "ct",
+        "tools",               "tls",
+        "tool",                "tool",
       
         "application",        "app",
         "calculate",          "calc",
@@ -300,6 +310,24 @@ class AutoCategorize
         "corrector",          "cor",
         "correction",         "cor",
     
+        "batch",              "bat",
+        
+        "window",             "wnd",
+        
+        "advisor",            "adv",
+        
+        "editor",             "edt",
+        
+        "material",           "mat",
+        
+        "visualization",      "vis",
+        
+        "measurement",        "mes",
+        
+        "scene",              "scn",
+        
+        "serialization",      "ser",
+    
         "sandbox",            "sb",
         "texture",            "tex",
         "opengl",             "ogl",
@@ -312,7 +340,7 @@ class AutoCategorize
         "diagnosis",          "diag",
         "mesh",               "mesh",
         "radial",             "rad",
-        "simple",             "sim",
+        "simple",             "smp",
         "algorithms",         "alg",
         "controllers",        "con",
         "control",            "con",
@@ -353,11 +381,31 @@ class AutoCategorize
         "model",              "mdl", 
         "extension",          "ext", 
         "activator",          "act", 
+
+        "dicom",              "dicom",
+        
+        "browser",            "brwr",
+        
+        "viewer",             "view",
         "view",               "view", 
         
         "finder",             "fnd",
+        
         "indexer",            "idx",
+        "index",              "idx",
+        
         "rapid",              "rpd",
+        
+        "gui",                "gui",
+        
+        "slices",             "slc",
+        "slice",              "slc",
+
+        "about",              "abt",
+
+        "interpolator",       "inp",
+        
+        "switcher",           "swtch",
 
         "planning",           "plan",         
         "planner",            "plan",
@@ -379,6 +427,14 @@ class AutoCategorize
         "core",               "core",
         "manual",             "man",
         "leaf",               "leaf",
+        "internal",           "int",
+        "external",           "ext",
+        "platform",           "pltfrm",
+        "method",             "mthd",
+        "pyramidal",          "pyra",
+        
+        "bspline",            "bspl",
+        "spline",             "spl",
         
         "2d",                 "2d",
         "3d",                 "3d",
@@ -522,13 +578,13 @@ class AutoCategorize
       if(search2p1("mbi-sb","q4mitk"))          return "sb.ui.";
       if(search2p2("mbi","applications"))       return "sb.app.";
       if(search2p2("mbi-sb","q4applications"))  return "sb.app.";
-      if(search2p2("mbi-sb","utilities"))       return "sb.utl.";
+      if(search2p2("mbi-sb","utilities"))       return "sb.util.";
       if(search2p2("mbi-sb","bundles"))         return "sb.bun.";   
       if(search2p2("mbi-sb","bundlesqt"))       return "sb.bun.";   
       if(search2p2("mbi","modules"))            return "sb.mod.";
 
       if(search2p2("mbi-qm","core",false))      return "qm.";
-      if(search2p2("mbi-qm","utilities"))       return "qm.utl.";
+      if(search2p2("mbi-qm","utilities"))       return "qm.util.";
 
       if(search2p2("modules","mitkext",false))  return "ext.";
       if(search2p1("modules","qmitkext"))       return "ext.ui.";
@@ -542,7 +598,7 @@ class AutoCategorize
        
       // following must come last:      
       if(search1p2("modules"))                  return "core.mod.";
-      if(search1p2("utilities"))                return "core.utl.";
+      if(search1p2("utilities"))                return "core.util.";
       if(search1p2("applications"))             return "core.app.";
       
       return "";

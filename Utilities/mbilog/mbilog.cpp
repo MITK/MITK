@@ -258,7 +258,7 @@ class AutoCategorize
         "factory",             "fac",
         "classes",             "cls",
         "plugin",              "plg",
-        "widget",              "wg",
+        "widget",              "wid",
         "interface",           "itf",
         "service",             "svc",
         "register",            "reg",
@@ -273,7 +273,7 @@ class AutoCategorize
         "subtract",           "sub",
         "region",             "reg",
         "tumor",              "tum",
-        "growing",            "grw",
+        "growing",            "grow",
         "segmentation",       "seg",
         "statistics",         "stat",
     
@@ -283,12 +283,15 @@ class AutoCategorize
         "diffusion",          "dif",
         "registration",       "reg",
         "navigation",         "nav",
+
         "generation",         "gen",
+        "generator",          "gen",
+
         "paintbrush",         "pb",
         "volumetry",          "vol",
         "volume",             "vol",
         "mapper",             "map",
-        "filter",             "fil",
+        "filter",             "flt",
         "surface",            "sfc",
         "point",              "pnt",
         "organ",              "org",
@@ -303,12 +306,11 @@ class AutoCategorize
         "vessel",             "vsl",
         "value",              "val",
         "analysis",           "ana",
-        "based",              "bsd",
 
         "patient",            "pat",
         "body",               "body",
         "diagnosis",          "diag",
-        "mesh",               "msh",
+        "mesh",               "mesh",
         "radial",             "rad",
         "simple",             "sim",
         "algorithms",         "alg",
@@ -316,7 +318,6 @@ class AutoCategorize
         "control",            "con",
         "interactive",        "ia",
         "interactions",       "ia",
-        "planning",           "pln", 
       
         "processing",         "pro", 
         "process",            "pro", 
@@ -325,10 +326,10 @@ class AutoCategorize
         "renderer",           "rnd", 
         "render",             "rnd", 
 
-        "datamanagement",     "dat",
+        "datamanagement",     "data",
         "management",         "mng",
         "manager",            "mng", 
-        "data",               "dat",
+        "data",               "data",
 
         "anatomy",            "ana", 
         "neuro",              "neo", 
@@ -340,21 +341,44 @@ class AutoCategorize
         "binary",             "bin", 
         "liver",              "liv", 
         "lymph",              "lym", 
-        "node",               "nd", 
+        "node",               "node", 
+        "tree",               "tree", 
         "homogeneous",        "homogen", 
+        "threshold",          "tsh", 
+
+        "shapebased",         "shp", 
+        "based",              "bsd",
         "shape",              "shp", 
+
         "model",              "mdl", 
         "extension",          "ext", 
         "activator",          "act", 
-        "view",               "vw", 
+        "view",               "view", 
         
-        "workbench",          "wb",
+        "finder",             "fnd",
+        "indexer",            "idx",
+        "rapid",              "rpd",
+
+        "planning",           "plan",         
+        "planner",            "plan",
+        "plane",              "pln",
+        "plan",               "plan",
+        
+        "workbench",          "wrkbnch",
         "common",             "com",
         "resection",          "rsc",
-        "plane",              "pln",
         "translation",        "trl",
         "rotation",           "rot",
-        "deformation",        "dfm",
+        "deformation",        "dfrm",
+        "shader",             "shd",
+        "repository",         "rep",
+        "initializer",        "ini",
+        "dialog",             "dlg",
+        "download",           "down",
+        "upload",             "up",
+        "core",               "core",
+        "manual",             "man",
+        "leaf",               "leaf",
         
         "2d",                 "2d",
         "3d",                 "3d",
@@ -413,14 +437,33 @@ class AutoCategorize
       return x;
     }
     
-    bool search2p2(char *a,char *b)
+    std::string concat(std::string a,std::string b,bool opt)
+    {
+      int as=a.size();
+      int bs=b.size();
+      if(opt && as<=bs)
+      {
+        if(as==bs && a.compare(b)==0)
+          return a;
+        
+        if(strncmp(a.c_str(),b.c_str(),as)==0)
+        {
+          b=b.substr(as,bs-as);
+          b[0]=tolower(b[0]);
+        }
+      }
+      
+      return a+"."+b;
+    }
+    
+    bool search2p2(char *a,char *b,bool optimize=true)
     {
       int size = path.size() - 3;
       for(int r=0;r<size;r++)
         if(path[r].compare(a)==0 && path[r+1].compare(b)==0)
         {
           pos = r+2;
-          category = simplify(path[pos]) + "." + simplify(path[path.size()-1]);
+          category = concat(simplify(path[pos]),simplify(path[path.size()-1]),optimize);
           return true;
         }
       return false;
@@ -433,20 +476,20 @@ class AutoCategorize
         if(path[r].compare(a)==0 && path[r+1].compare(b)==0)
         {
           pos = r+2;
-          category = simplify(path[pos]);
+          category = simplify(path[path.size()-1]);
           return true;
         }
       return false;
     }
 
-    bool search1p2(char *a)
+    bool search1p2(char *a,bool optimize=true)
     {
       int size = path.size() - 2;
       for(int r=0;r<size;r++)
         if(path[r].compare(a)==0)
         {
           pos = r+1;
-          category = simplify(path[pos]) + "." + simplify(path[path.size()-1]);
+          category = concat(simplify(path[pos]),simplify(path[path.size()-1]),optimize);
           return true;
         }
       return false;
@@ -475,25 +518,33 @@ class AutoCategorize
     std::string GetPrefix()
     {
       category="";
-      if(search2p2("modules","mitkext"))        return "ext.";
-      if(search2p1("modules","qmitkext"))       return "ext.ui.";
-      if(search2p2("mbi-sb","core"))            return "sb.";
+      if(search2p2("mbi-sb","core",false))      return "sb.";
       if(search2p1("mbi-sb","q4mitk"))          return "sb.ui.";
+      if(search2p2("mbi","applications"))       return "sb.app.";
       if(search2p2("mbi-sb","q4applications"))  return "sb.app.";
       if(search2p2("mbi-sb","utilities"))       return "sb.utl.";
       if(search2p2("mbi-sb","bundles"))         return "sb.bun.";   
       if(search2p2("mbi-sb","bundlesqt"))       return "sb.bun.";   
-      if(search2p2("mbi-qm","core"))            return "qm.";
-      if(search2p2("mbi-qm","utilities"))       return "qm.utl.";
       if(search2p2("mbi","modules"))            return "sb.mod.";
-      if(search2p2("core","code"))              return "";
-      if(search2p2("coreui","bundles"))         return "bun.";       
+
+      if(search2p2("mbi-qm","core",false))      return "qm.";
+      if(search2p2("mbi-qm","utilities"))       return "qm.utl.";
+
+      if(search2p2("modules","mitkext",false))  return "ext.";
+      if(search2p1("modules","qmitkext"))       return "ext.ui.";
       if(search2p2("modules","bundles"))        return "ext.bun.";       
-      if(search2p1("coreui","qmitk"))           return "ui.";
-      if(search2p2("opencherry","bundles"))     return "bb.";     
-      if(search1p2("modules"))                  return "mod.";
-      if(search1p2("utilities"))                return "utl.";
-      if(search1p2("applications"))             return "app.";
+
+      if(search2p2("opencherry","bundles"))     return "blueberry.";     
+
+      if(search2p2("core","code",false))        return "core.";
+      if(search2p1("coreui","qmitk"))           return "core.ui.";
+      if(search2p2("coreui","bundles"))         return "core.bun.";
+       
+      // following must come last:      
+      if(search1p2("modules"))                  return "core.mod.";
+      if(search1p2("utilities"))                return "core.utl.";
+      if(search1p2("applications"))             return "core.app.";
+      
       return "";
     }
     
@@ -535,8 +586,7 @@ static void FormatSmartWindows(const mbilog::LogMessage &l,int /*threadID*/)
 
   int colorTime = FOREGROUND_GREEN;
   int colorText = FOREGROUND_RED|FOREGROUND_GREEN|FOREGROUND_BLUE;
-  int colorPre = FOREGROUND_BLUE | FOREGROUND_GREEN;
-  int colorCat = FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_INTENSITY;
+  int colorCat = FOREGROUND_BLUE | FOREGROUND_RED;
   bool showColon = true;
   
   switch(l.level)
@@ -547,7 +597,6 @@ static void FormatSmartWindows(const mbilog::LogMessage &l,int /*threadID*/)
     case mbilog::Warn:
       colorTime = FOREGROUND_RED|FOREGROUND_GREEN|FOREGROUND_INTENSITY;
       colorText = FOREGROUND_RED|FOREGROUND_GREEN;
-      colorPre = FOREGROUND_BLUE | FOREGROUND_RED;
       colorCat = FOREGROUND_BLUE | FOREGROUND_RED | FOREGROUND_INTENSITY;
       showColon = false;
       break;
@@ -555,7 +604,6 @@ static void FormatSmartWindows(const mbilog::LogMessage &l,int /*threadID*/)
     case mbilog::Error:
       colorTime = FOREGROUND_RED|FOREGROUND_INTENSITY;
       colorText = FOREGROUND_RED;
-      colorPre = FOREGROUND_BLUE | FOREGROUND_RED;
       colorCat = FOREGROUND_BLUE | FOREGROUND_RED | FOREGROUND_INTENSITY;
       showColon = false;
       break;
@@ -563,7 +611,6 @@ static void FormatSmartWindows(const mbilog::LogMessage &l,int /*threadID*/)
     case mbilog::Fatal:
       colorTime = FOREGROUND_RED|FOREGROUND_BLUE|FOREGROUND_INTENSITY;
       colorText = FOREGROUND_RED|FOREGROUND_BLUE|FOREGROUND_INTENSITY;
-      colorPre = FOREGROUND_BLUE | FOREGROUND_RED;
       colorCat = FOREGROUND_BLUE | FOREGROUND_RED | FOREGROUND_INTENSITY;
       showColon = false;
       break;
@@ -575,8 +622,8 @@ static void FormatSmartWindows(const mbilog::LogMessage &l,int /*threadID*/)
       break;
   }
 
-  ChangeColor( colorTime | FOREGROUND_INTENSITY);
-  std::cout << std::fixed << /*std::setw(6) <<*/ std::setprecision(2) << ((double)std::clock())/CLOCKS_PER_SEC << " " << std::flush;
+  ChangeColor( colorTime );
+  std::cout << std::fixed << std::setprecision(2) << ((double)std::clock())/CLOCKS_PER_SEC << " " << std::flush;
   
   {
     AutoCategorize ac(l);
@@ -586,26 +633,13 @@ static void FormatSmartWindows(const mbilog::LogMessage &l,int /*threadID*/)
     {
       if( !pre.empty() )
       {
-        ChangeColor( colorPre );
+        ChangeColor( colorCat );
         std::cout << pre << std::flush;
       }
       if( !cat.empty() )
       {
-        int s=cat.size();
-        for(int r=0;r<s;r++)
-        {
-          char c=cat[r];
-          if(isupper(c))
-          {
-            ChangeColor( colorCat );
-            std::cout << (char)tolower(c) << std::flush;
-          }
-          else
-          {
-            ChangeColor( colorPre );
-            std::cout << c << std::flush;
-          }
-        }
+        ChangeColor( colorCat );
+        std::cout << cat << std::flush;
       }
     
       if(showColon)

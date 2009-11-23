@@ -276,7 +276,7 @@ class AutoCategorize
 
         "contour",             "ct",
         "tools",               "tls",
-        "tool",                "tool",
+        "tool",                "tl",
       
         "application",        "app",
         "calculate",          "calc",

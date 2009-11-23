@@ -85,7 +85,7 @@ const std::size_t CountExpression::HASH_INITIAL = Poco::Hash<std::string>()("che
   CountExpression::Evaluate(IEvaluationContext* context)
   {
     Object::Pointer var(context->GetDefaultVariable());
-    int size;
+    ObjectVector<Object::Pointer>::size_type size;
 
     if(ObjectVector<Object::Pointer>::Pointer coll = var.Cast<ObjectVector<Object::Pointer> >())
     {

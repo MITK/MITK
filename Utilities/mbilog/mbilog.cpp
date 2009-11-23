@@ -212,7 +212,7 @@ class AutoCategorize
 
     std::string current,category;
 
-    int pos;
+    std::size_t pos;
 
     void flush()
     {
@@ -396,8 +396,8 @@ class AutoCategorize
 
         for(int r=0; r < sizeof(replace)/sizeof(char*); r+=2)
         {
-          int s=strlen(replace[r]);
-          int xs=x.size();
+          std::size_t s = strlen(replace[r]);
+          std::size_t xs = x.size();
 
           if(xs==s)
           {
@@ -439,11 +439,11 @@ class AutoCategorize
     
     std::string concat(std::string a,std::string b,bool opt)
     {
-      int as=a.size();
-      int bs=b.size();
-      if(opt && as<=bs)
+      std::size_t as = a.size();
+      std::size_t bs = b.size();
+      if(opt && as <= bs)
       {
-        if(as==bs && a.compare(b)==0)
+        if (as==bs && a.compare(b)==0)
           return a;
         
         if(strncmp(a.c_str(),b.c_str(),as)==0)
@@ -458,8 +458,8 @@ class AutoCategorize
     
     bool search2p2(char *a,char *b,bool optimize=true)
     {
-      int size = path.size() - 3;
-      for(int r=0;r<size;r++)
+      std::size_t size = path.size() - 3;
+      for(std::size_t r=0;r<size;r++)
         if(path[r].compare(a)==0 && path[r+1].compare(b)==0)
         {
           pos = r+2;
@@ -471,8 +471,8 @@ class AutoCategorize
 
     bool search2p1(char *a,char *b)
     {
-      int size = path.size() - 2;
-      for(int r=0;r<size;r++)
+      std::size_t size = path.size() - 2;
+      for(std::size_t r=0;r<size;r++)
         if(path[r].compare(a)==0 && path[r+1].compare(b)==0)
         {
           pos = r+2;
@@ -484,8 +484,8 @@ class AutoCategorize
 
     bool search1p2(char *a,bool optimize=true)
     {
-      int size = path.size() - 2;
-      for(int r=0;r<size;r++)
+      std::size_t size = path.size() - 2;
+      for(std::size_t r=0;r<size;r++)
         if(path[r].compare(a)==0)
         {
           pos = r+1;
@@ -499,11 +499,11 @@ class AutoCategorize
   
     AutoCategorize( const mbilog::LogMessage &l )
     {
-      int size =strlen(l.filePath);
+      std::size_t size = strlen(l.filePath);
 
-      current="";
+      current = "";
 
-      for(int r=0;r<size;r++)
+      for(std::size_t r = 0;r<size;r++)
       {
         char c=l.filePath[r];
         if(c=='\\' || c=='/')

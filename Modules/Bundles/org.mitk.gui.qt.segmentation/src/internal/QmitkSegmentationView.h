@@ -106,7 +106,7 @@ protected:
 
     mitk::DataTreeNodeSelection::ConstPointer m_CurrentSelection;
     cherry::ISelectionListener::Pointer m_SelectionListener;
-    friend class cherry::SelectionChangedAdapter<QmitkSegmentationView>;
+    friend struct cherry::SelectionChangedAdapter<QmitkSegmentationView>;
   
     QAction* m_CreateSurfaceAction;
     QAction* m_CreateSmoothSurfaceAction;

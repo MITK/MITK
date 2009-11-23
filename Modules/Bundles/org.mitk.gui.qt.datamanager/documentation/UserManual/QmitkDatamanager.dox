@@ -1,6 +1,8 @@
 /**
 
-\mainpage
+\mainpage The DataManager
+
+\section QmitkDataManagerOverview Overview
 
 The Datamanager is the central componenent to manage medical datas like images, surfaces, etc.. 
 After loading one or more datas into the Datamanager the datas are shown in the four-view window, the so called Standard View.
@@ -9,16 +11,16 @@ The user can now start working on the datas by just clicking  into the standard 
 \image html Overview.png ""
 
 
-\page QmitkDataManager The Datamanager
+\page QmitkDataManager Details
 
 Available sections:
-  - \ref QmitkDataManagerOverview 
+  - \ref QmitkDataManagerIntroduction 
   - \ref QmitkDataManagerLoading
   - \ref QmitkDataManagerSaving
   - \ref QmitkDataManagerProperties
 
 
-\section QmitkDataManagerOverview Overview
+\section QmitkDataManagerIntroduction Introduction
 
 The Datamanager is the central componenent to manage medical datas like images, surfaces, etc.. 
 After loading one or more datas into the Datamanager the datas are shown in the four-view window, the so called Standard View.

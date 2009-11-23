@@ -159,10 +159,6 @@ namespace mitk
     mitk::OptimizerParameters::Pointer ParseOptimizerParameters(itk::Array<double> optimizerValues);    
   
     
-    template < typename T, unsigned int Dim >
-      void MatchHistograms(itk::Image<T, Dim> *referenceImage, itk::Image<T, Dim> *inputImage);
-
-
   };
 }
 

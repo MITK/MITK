@@ -47,8 +47,7 @@ namespace mitk
 
   \ingroup RigidRegistration
 
-  \author Daniel Stein
-  */
+  \author Thomas van Bruggen  */
   class MITKEXT_CORE_EXPORT PyramidalRegistrationMethod : public ImageToImageFilter
   {
 

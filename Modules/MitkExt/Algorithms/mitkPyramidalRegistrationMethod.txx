@@ -45,6 +45,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkHistogramMatchingImageFilter.h>
 #include <itkCastImageFilter.h>
 
+#include <itkStatisticsImageFilter.h>
+#include <itkIntensityWindowingImageFilter.h>
 
 namespace mitk {
 
@@ -102,6 +104,10 @@ namespace mitk {
     // The fixed and the moving image
 		typename InternalImageType::Pointer fixedImage = InternalImageType::New();
     typename InternalImageType::Pointer movingImage = InternalImageType::New();
+
+  
+
+
 		mitk::CastToItkImage(m_ReferenceImage, fixedImage); 
 
      // Blur the moving image        
@@ -109,7 +115,9 @@ namespace mitk {
     {
       typename GaussianFilterType::Pointer gaussianFilter = GaussianFilterType::New();
       gaussianFilter->SetInput(itkImage1);
-      gaussianFilter->SetVariance(6.0);        
+      gaussianFilter->SetVariance(6.0);
+      gaussianFilter->SetMaximumError( 0.1 );
+      //gaussianFilter->SetMaximumKernelWidth ( 3 );
       gaussianFilter->Update();
       movingImage = gaussianFilter->GetOutput();
     } else{
@@ -121,11 +129,45 @@ namespace mitk {
     
     if(m_MatchHistograms)
     {
-      MatchHistograms(movingImage.GetPointer(), fixedImage.GetPointer());
+      typedef itk::RescaleIntensityImageFilter<InternalImageType,InternalImageType> FilterType;   
+      typedef itk::HistogramMatchingImageFilter<InternalImageType,InternalImageType> HEFilterType;
+
+      typename FilterType::Pointer inputRescaleFilter = FilterType::New();  
+      typename FilterType::Pointer referenceRescaleFilter = FilterType::New();  
+
+      referenceRescaleFilter->SetInput(fixedImage);
+      inputRescaleFilter->SetInput(movingImage);
+
+      const float desiredMinimum =  0.0;
+      const float desiredMaximum =  255.0;
+      
+      referenceRescaleFilter->SetOutputMinimum( desiredMinimum );
+      referenceRescaleFilter->SetOutputMaximum( desiredMaximum );
+      referenceRescaleFilter->UpdateLargestPossibleRegion();  
+      inputRescaleFilter->SetOutputMinimum( desiredMinimum );
+      inputRescaleFilter->SetOutputMaximum( desiredMaximum );
+      inputRescaleFilter->UpdateLargestPossibleRegion();
+
+      // Histogram match the images
+      typename HEFilterType::Pointer intensityEqualizeFilter = HEFilterType::New();
+
+      intensityEqualizeFilter->SetReferenceImage( inputRescaleFilter->GetOutput() );
+      intensityEqualizeFilter->SetInput( referenceRescaleFilter->GetOutput() );
+      intensityEqualizeFilter->SetNumberOfHistogramLevels( 64 );
+      intensityEqualizeFilter->SetNumberOfMatchPoints( 12 );
+      intensityEqualizeFilter->ThresholdAtMeanIntensityOn();
+      intensityEqualizeFilter->Update();
+
+      //fixedImage = referenceRescaleFilter->GetOutput();
+      //movingImage = IntensityEqualizeFilter->GetOutput();
+
+      fixedImage = intensityEqualizeFilter->GetOutput();
+      movingImage = inputRescaleFilter->GetOutput();
+     
     }
+  
     
- 
-   
+    
     typename TransformFactoryType::Pointer transFac = TransformFactoryType::New();
     transFac->SetTransformParameters(m_TransformParameters);
     transFac->SetFixedImage(fixedImage);
@@ -251,41 +293,90 @@ namespace mitk {
     // First scale both histograms to values [0, 255]
     // Then align the quantiles of the inputImage histogram with the corresponding quantiles of
     // the reference Image
-    typedef itk::Image<T, Dim>  ImageType;
-    typedef itk::RescaleIntensityImageFilter<ImageType,ImageType> FilterType;
    
-    typedef itk::HistogramMatchingImageFilter<ImageType,ImageType> HEFilterType;
+    //typedef itk::RescaleIntensityImageFilter<ImageType,ImageType> FilterType;
+   
+    //typedef itk::HistogramMatchingImageFilter<ImageType,ImageType> HEFilterType;
 
-    typename FilterType::Pointer inputRescalefilter = FilterType::New();  
-    typename FilterType::Pointer referenceRescalefilter = FilterType::New();  
+    //typename FilterType::Pointer inputRescalefilter = FilterType::New();  
+    //typename FilterType::Pointer referenceRescalefilter = FilterType::New();  
 
-    referenceRescalefilter->SetInput(referenceImage);
-    inputRescalefilter->SetInput(inputImage);
+    //referenceRescalefilter->SetInput(referenceImage);
+    //inputRescalefilter->SetInput(inputImage);
 
-    const float desiredMinimum =  0.0;
-    const float desiredMaximum =  255.0;
+    //const float desiredMinimum =  0.0;
+    //const float desiredMaximum =  255.0;
+    //
+    //referenceRescalefilter->SetOutputMinimum( desiredMinimum );
+    //referenceRescalefilter->SetOutputMaximum( desiredMaximum );
+    //referenceRescalefilter->UpdateLargestPossibleRegion();  
+    //inputRescalefilter->SetOutputMinimum( desiredMinimum );
+    //inputRescalefilter->SetOutputMaximum( desiredMaximum );
+    //inputRescalefilter->UpdateLargestPossibleRegion();
+
+    //// Histogram match the images
+
+    //typename HEFilterType::Pointer IntensityEqualizeFilter = HEFilterType::New();
+
+    //IntensityEqualizeFilter->SetReferenceImage( referenceRescalefilter->GetOutput() );
+    //IntensityEqualizeFilter->SetInput( inputRescalefilter->GetOutput() );
+    //IntensityEqualizeFilter->SetNumberOfHistogramLevels( 64 );
+    //IntensityEqualizeFilter->SetNumberOfMatchPoints( 12 );
+    //IntensityEqualizeFilter->ThresholdAtMeanIntensityOn();
+    //IntensityEqualizeFilter->Update();
+
+    //referenceImage = referenceRescalefilter->GetOutput();
+    //inputImage = IntensityEqualizeFilter->GetOutput();
+
+
+    //referenceImage = referenceRescalefilter->GetOutput();
+    //inputImage = inputRescalefilter->GetOutput();
+
+
+
+    typedef itk::StatisticsImageFilter< ImageType >	StatisticsImageFilterType;
+    typedef itk::IntensityWindowingImageFilter<ImageType,ImageType>   ScalerType; 
     
-    referenceRescalefilter->SetOutputMinimum( desiredMinimum );
-    referenceRescalefilter->SetOutputMaximum( desiredMaximum );
-    referenceRescalefilter->UpdateLargestPossibleRegion();  
-    inputRescalefilter->SetOutputMinimum( desiredMinimum );
-    inputRescalefilter->SetOutputMaximum( desiredMaximum );
-    inputRescalefilter->UpdateLargestPossibleRegion();
+    StatisticsImageFilterType::Pointer stat = StatisticsImageFilterType::New();
+    stat->SetInput(referenceImage);
+    stat->Update();
+    float maxWin = stat->GetMaximum();
+    float minWin = stat->GetMinimum();  
 
-    // Histogram match the images
-    
-    typename HEFilterType::Pointer IntensityEqualizeFilter = HEFilterType::New();
+    ScalerType::Pointer rescaler = ScalerType::New(); 
+    rescaler->SetInput(referenceImage);
+    rescaler->SetOutputMinimum( 0 );
+    rescaler->SetOutputMaximum( 255 );
+    rescaler->SetWindowMaximum( maxWin );
+    rescaler->SetWindowMinimum( minWin );
+    rescaler->UpdateLargestPossibleRegion(); 
 
-    IntensityEqualizeFilter->SetReferenceImage( referenceRescalefilter->GetOutput() );
-    IntensityEqualizeFilter->SetInput( inputRescalefilter->GetOutput() );
-    IntensityEqualizeFilter->SetNumberOfHistogramLevels( 64 );
-    IntensityEqualizeFilter->SetNumberOfMatchPoints( 12 );
-    IntensityEqualizeFilter->ThresholdAtMeanIntensityOn();
-    IntensityEqualizeFilter->Update();
+    referenceImage = rescaler->GetOutput();
 
-    referenceImage = referenceRescalefilter->GetOutput();
-    inputImage = IntensityEqualizeFilter->GetOutput();
+    stat->SetInput(referenceImage);
+    stat->Update();
+    maxWin = stat->GetMaximum();
+    minWin = stat->GetMinimum();  
 
+
+    stat->SetInput(inputImage);
+    stat->Update();
+    maxWin = stat->GetMaximum();
+    minWin = stat->GetMinimum();  
+
+    rescaler->SetInput(inputImage);
+    rescaler->SetOutputMinimum( 0 );
+    rescaler->SetOutputMaximum( 255 );
+    rescaler->SetWindowMaximum( maxWin );
+    rescaler->SetWindowMinimum( minWin );
+    rescaler->UpdateLargestPossibleRegion(); 
+
+    inputImage = rescaler->GetOutput();
+
+    stat->SetInput(inputImage);
+    stat->Update();
+    maxWin = stat->GetMaximum();
+    minWin = stat->GetMinimum();  
 
   }
 

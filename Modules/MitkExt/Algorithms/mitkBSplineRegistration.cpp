@@ -30,6 +30,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include "itkBSplineDeformableTransformInitializer.h"
 
 #include "mitkOptimizerFactory.h"
+#include "mitkMetricFactory.h"
+
+#include <itkRescaleIntensityImageFilter.h>
+#include <itkHistogramMatchingImageFilter.h>
 
 
 namespace mitk {
@@ -40,9 +44,11 @@ namespace mitk {
     m_ResultName("deformedImage.mhd"),   
     m_SaveResult(true),
     m_SaveDeformationField(false),
+    m_Metric(0),
+    m_MatchHistograms(true),    
     m_UpdateInputImage(false)
   {
-
+    m_Observer = mitk::RigidRegistrationObserver::New();
   }
 
   BSplineRegistration::~BSplineRegistration()
@@ -63,6 +69,8 @@ namespace mitk {
   {
     m_ResultName = resultName;
   }
+
+
   
 
   template < typename TPixel, unsigned int VImageDimension >
@@ -71,10 +79,8 @@ namespace mitk {
     std::cout << "start bspline registration" << std::endl;
     
     // Typedefs
-    typedef typename itk::Image< TPixel, VImageDimension >  FixedImageType;
-    typedef typename itk::Image< TPixel, VImageDimension >  MovingImageType;
-
-   
+    typedef typename itk::Image< TPixel, VImageDimension >  InternalImageType;
+       
     typedef typename itk::Vector< float, VImageDimension >    VectorPixelType;
     typedef typename itk::Image<  VectorPixelType, VImageDimension > DeformationFieldType;
 
@@ -84,28 +90,33 @@ namespace mitk {
                                 3 >                         TransformType;
 
     typedef typename TransformType::ParametersType          ParametersType;
+
+
+
     
     //typedef itk::LBFGSOptimizer                             OptimizerType;
     typedef itk::SingleValuedNonLinearOptimizer             OptimizerType;
-    typedef itk::MattesMutualInformationImageToImageMetric<
-                                FixedImageType,
-                                MovingImageType >           MetricType;
+    //typedef itk::SingleValuedCostFunction                   MetricType;
 
-    /*typedef itk::MeanSquaresImageToImageMetric<
-                                FixedImageType,
-                                MovingImageType >           MetricType;*/
+    typedef itk::MattesMutualInformationImageToImageMetric<
+                                InternalImageType,
+                                InternalImageType >           MetricType;
+
+    typedef itk::MeanSquaresImageToImageMetric<
+                                InternalImageType,
+                                InternalImageType >           MetricTypeMS;
 
     typedef itk::LinearInterpolateImageFunction<
-                                MovingImageType,
+                                InternalImageType,
                                 double >                    InterpolatorType;
 
     typedef itk::ImageRegistrationMethod<
-                                FixedImageType,
-                                MovingImageType >           RegistrationType;
+                                InternalImageType,
+                                InternalImageType >           RegistrationType;
 
     typedef typename itk::WarpImageFilter<
-                            MovingImageType, 
-                            MovingImageType,
+                            InternalImageType, 
+                            InternalImageType,
                             DeformationFieldType  >         WarperType;
 
     typedef typename TransformType::SpacingType                      SpacingType;
@@ -113,16 +124,16 @@ namespace mitk {
     typedef typename TransformType::OriginType                       OriginType;
 
     typedef itk::ResampleImageFilter< 
-                                MovingImageType, 
-                                FixedImageType >            ResampleFilterType;
+                                InternalImageType, 
+                                InternalImageType >            ResampleFilterType;
 
     typedef itk::Image< TPixel, VImageDimension >           OutputImageType;
   
 
     // Sample new image with the same image type as the fixed image
     typedef itk::CastImageFilter< 
-                                FixedImageType,
-                                FixedImageType >            CastFilterType;
+                                InternalImageType,
+                                InternalImageType >            CastFilterType;
                     
     
     typedef itk::Vector< float, VImageDimension >           VectorType;
@@ -131,30 +142,87 @@ namespace mitk {
 
     typedef itk::BSplineDeformableTransformInitializer <
                                 TransformType,
-                                FixedImageType >            InitializerType;
+                                InternalImageType >            InitializerType;
     
 
     typename InterpolatorType::Pointer   interpolator  = InterpolatorType::New();
     typename RegistrationType::Pointer   registration  = RegistrationType::New();   
     typename InitializerType::Pointer    initializer   = InitializerType::New();
     typename TransformType::Pointer      transform     = TransformType::New();
-    typename MetricType::Pointer         metric        = MetricType::New();
     
-    metric->SetNumberOfHistogramBins( 24);
-    metric->SetNumberOfSpatialSamples(10000);
+    
+    if(m_Metric==0 || m_Metric==1)
+    {
+      typename MetricType::Pointer metric = MetricType::New();
+      metric->SetNumberOfHistogramBins( 32);
+      metric->SetNumberOfSpatialSamples(90000);
+      registration->SetMetric(          metric       );
+    }
+    else{
+      typename MetricTypeMS::Pointer metric = MetricTypeMS::New();  
+      registration->SetMetric(          metric       );
+    }
      
     typename OptimizerFactory::Pointer optFac = OptimizerFactory::New();
     optFac->SetOptimizerParameters(m_OptimizerParameters);
     optFac->SetNumberOfTransformParameters(transform->GetNumberOfParameters());
     OptimizerType::Pointer optimizer = optFac->GetOptimizer();    
 
-    typename FixedImageType::Pointer fixedImage = FixedImageType::New();
-    mitk::CastToItkImage(m_ReferenceImage, fixedImage);    
-    typename MovingImageType::Pointer movingImage = itkImage1;
-    typename FixedImageType::RegionType fixedRegion = fixedImage->GetBufferedRegion();
-    typename MovingImageType::RegionType movingRegion = movingImage->GetBufferedRegion();
+    optimizer->AddObserver(itk::AnyEvent(), m_Observer);
+    
+    //typedef mitk::MetricFactory <TPixel, VImageDimension> MetricFactoryType;
+    //typename MetricFactoryType::Pointer metricFac = MetricFactoryType::New();
+    //metricFac->SetMetricParameters(m_MetricParameters);
+    ////MetricType::Pointer metric = metricFac->GetMetric();
 
-    registration->SetMetric(          metric        );
+
+    typename InternalImageType::Pointer fixedImage = InternalImageType::New();
+    mitk::CastToItkImage(m_ReferenceImage, fixedImage);    
+    typename InternalImageType::Pointer movingImage = itkImage1;
+    typename InternalImageType::RegionType fixedRegion = fixedImage->GetBufferedRegion();
+    typename InternalImageType::RegionType movingRegion = movingImage->GetBufferedRegion();
+
+    
+    if(m_MatchHistograms)
+    {
+      typedef itk::RescaleIntensityImageFilter<InternalImageType,InternalImageType> FilterType;   
+      typedef itk::HistogramMatchingImageFilter<InternalImageType,InternalImageType> HEFilterType;
+
+      typename FilterType::Pointer inputRescaleFilter = FilterType::New();  
+      typename FilterType::Pointer referenceRescaleFilter = FilterType::New();  
+
+      referenceRescaleFilter->SetInput(fixedImage);
+      inputRescaleFilter->SetInput(movingImage);
+
+      const float desiredMinimum =  0.0;
+      const float desiredMaximum =  255.0;
+      
+      referenceRescaleFilter->SetOutputMinimum( desiredMinimum );
+      referenceRescaleFilter->SetOutputMaximum( desiredMaximum );
+      referenceRescaleFilter->UpdateLargestPossibleRegion();  
+      inputRescaleFilter->SetOutputMinimum( desiredMinimum );
+      inputRescaleFilter->SetOutputMaximum( desiredMaximum );
+      inputRescaleFilter->UpdateLargestPossibleRegion();
+
+      // Histogram match the images
+      typename HEFilterType::Pointer intensityEqualizeFilter = HEFilterType::New();
+
+      intensityEqualizeFilter->SetReferenceImage( inputRescaleFilter->GetOutput() );
+      intensityEqualizeFilter->SetInput( referenceRescaleFilter->GetOutput() );
+      intensityEqualizeFilter->SetNumberOfHistogramLevels( 64 );
+      intensityEqualizeFilter->SetNumberOfMatchPoints( 12 );
+      intensityEqualizeFilter->ThresholdAtMeanIntensityOn();
+      intensityEqualizeFilter->Update();
+
+      //fixedImage = referenceRescaleFilter->GetOutput();
+      //movingImage = IntensityEqualizeFilter->GetOutput();
+
+      fixedImage = intensityEqualizeFilter->GetOutput();
+      movingImage = inputRescaleFilter->GetOutput();
+    }
+
+
+    //
     registration->SetOptimizer(       optimizer     );
     registration->SetInterpolator(    interpolator  );  
     registration->SetFixedImage(      fixedImage    );
@@ -265,7 +333,7 @@ namespace mitk {
     warper->SetDeformationField( field );
     warper->Update();
 
-    typename MovingImageType::Pointer result = warper->GetOutput();    
+    typename InternalImageType::Pointer result = warper->GetOutput();    
 
     if(m_UpdateInputImage)
     {   

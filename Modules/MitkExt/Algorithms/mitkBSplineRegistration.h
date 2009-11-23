@@ -24,8 +24,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkRegistrationBase.h"
 #include "mitkImageAccessByItk.h"
 #include <mitkOptimizerParameters.h>
-
-
+//#include <mitkMetricParameters.h>
+#include "mitkRigidRegistrationObserver.h"
 
 namespace mitk
 {
@@ -90,15 +90,33 @@ namespace mitk
     /*!
     \brief Set the optimizer parameters
     */
+
+
     void SetOptimizerParameters(mitk::OptimizerParameters::Pointer optimizerParameters)
     {
       m_OptimizerParameters = optimizerParameters;
     }
 
+   /* void SetMetricParameters(mitk::MetricParameters::Pointer metricParameters)
+    {
+      m_MetricParameters = metricParameters;
+    }*/
+
+
+   /* void SetParameters(mitk::OptimizerParameters::Pointer optimizerParameters, mitk::MetricParameters::Pointer metricParameters)
+    {
+      m_OptimizerParameters = optimizerParameters;
+      m_MetricParameters = metricParameters;
+    }*/
+
     itkSetMacro(NumberOfGridPoints, int);
     itkSetMacro(SaveDeformationField, bool);
     itkSetMacro(UpdateInputImage, bool);
     itkSetMacro(DeformationFileName, std::string);
+    itkSetMacro(Metric, int);
+    itkSetMacro(MatchHistograms, bool);
+   
+    
     
   protected:
 
@@ -123,12 +141,18 @@ namespace mitk
     bool m_SaveResult;    
 
     mitk::OptimizerParameters::Pointer m_OptimizerParameters;
+    //mitk::MetricParameters::Pointer m_MetricParameters;
+
     int m_NumberOfGridPoints;
     bool m_SaveDeformationField;
     bool m_UpdateInputImage;
     std::string m_DeformationFileName;
 
+    bool m_MatchHistograms;
 
+    int m_Metric;
+
+    RigidRegistrationObserver::Pointer m_Observer;
 
   };
 }

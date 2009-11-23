@@ -589,33 +589,35 @@ void QmitkSlicesInterpolator::EnableInterpolation(bool on)
 
 void QmitkSlicesInterpolator::UpdateVisibleSuggestion()
 {
-  // determine which one is the current view, try to do an initial interpolation
-  mitk::BaseRenderer* renderer = mitk::GlobalInteraction::GetInstance()->GetFocus();
-  if (renderer && renderer->GetMapperID() == mitk::BaseRenderer::Standard2D)
+  if (m_InterpolationEnabled)
   {
-    const mitk::TimeSlicedGeometry* timeSlicedGeometry = dynamic_cast<const mitk::TimeSlicedGeometry*>( renderer->GetWorldGeometry() );
-    if (timeSlicedGeometry)
+    // determine which one is the current view, try to do an initial interpolation
+    mitk::BaseRenderer* renderer = mitk::GlobalInteraction::GetInstance()->GetFocus();
+    if (renderer && renderer->GetMapperID() == mitk::BaseRenderer::Standard2D)
     {
-      mitk::SliceNavigationController::GeometrySliceEvent event( const_cast<mitk::TimeSlicedGeometry*>(timeSlicedGeometry), renderer->GetSlice() );
-
-      std::string s;
-      if ( renderer->GetCurrentWorldGeometry2DNode() && renderer->GetCurrentWorldGeometry2DNode()->GetName(s) )
+      const mitk::TimeSlicedGeometry* timeSlicedGeometry = dynamic_cast<const mitk::TimeSlicedGeometry*>( renderer->GetWorldGeometry() );
+      if (timeSlicedGeometry)
       {
-             if (s == "widget1Plane")
+        mitk::SliceNavigationController::GeometrySliceEvent event( const_cast<mitk::TimeSlicedGeometry*>(timeSlicedGeometry), renderer->GetSlice() );
+
+        std::string s;
+        if ( renderer->GetCurrentWorldGeometry2DNode() && renderer->GetCurrentWorldGeometry2DNode()->GetName(s) )
         {
-          TranslateAndInterpolateChangedSlice( event, 2 );
-        }
-        else if (s == "widget2Plane")
-        {
-          TranslateAndInterpolateChangedSlice( event, 0 );
-        }
-        else if (s == "widget3Plane")
-        {
-          TranslateAndInterpolateChangedSlice( event, 1 );
+	       if (s == "widget1Plane")
+	  {
+	    TranslateAndInterpolateChangedSlice( event, 2 );
+	  }
+	  else if (s == "widget2Plane")
+	  {
+	    TranslateAndInterpolateChangedSlice( event, 0 );
+	  }
+	  else if (s == "widget3Plane")
+	  {
+	    TranslateAndInterpolateChangedSlice( event, 1 );
+	  }
         }
       }
     }
-
   }
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();

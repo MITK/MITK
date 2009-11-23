@@ -600,6 +600,9 @@ void QmitkSegmentationView::StdMultiWidgetClosed( QmitkStdMultiWidget& stdMultiW
 
 void QmitkSegmentationView::SelectionChanged(cherry::IWorkbenchPart::Pointer sourcepart, cherry::ISelection::ConstPointer selection)
 {
+  if (!m_Parent || !m_Parent->isVisible() )
+    return;
+
   if ( sourcepart == this || selection.IsNull() )  // prevents being notified by own selection events
   {
     LOG_INFO << "Ignore this selection event:"
@@ -763,6 +766,8 @@ void QmitkSegmentationView::Visible()
     m_Controls->m_ManualToolSelectionBox->setEnabled( true );
     m_Controls->m_OrganToolSelectionBox->setEnabled( true );
     m_Controls->m_LesionToolSelectionBox->setEnabled( true );
+  
+    m_Controls->m_SlicesInterpolator->EnableInterpolation( m_Controls->widgetStack->currentWidget() == m_Controls->pageManual );
   }
 }
 
@@ -775,6 +780,8 @@ void QmitkSegmentationView::Hidden()
     m_Controls->m_ManualToolSelectionBox->setEnabled( false );
     m_Controls->m_OrganToolSelectionBox->setEnabled( false );
     m_Controls->m_LesionToolSelectionBox->setEnabled( false );
+  
+    m_Controls->m_SlicesInterpolator->EnableInterpolation( false );
   }
 }
 

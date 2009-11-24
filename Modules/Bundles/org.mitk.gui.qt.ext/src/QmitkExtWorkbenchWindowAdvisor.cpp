@@ -233,6 +233,18 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
 
   QAction* imageNavigatorAction = editMenu->addAction(QIcon(":/org.mitk.gui.qt.ext/Slider_48.png"), "&Image Navigator", 
     QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onImageNavigator()),NULL);
+  imageNavigatorAction->setCheckable(true);
+  cherry::IViewPart::Pointer imageNavigatorView = 
+    cherry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->FindView("org.mitk.views.imagenavigator");
+  bool isImageNavigatorVisible = cherry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->IsPartVisible(imageNavigatorView);
+  if (isImageNavigatorVisible)
+  {
+    imageNavigatorAction->setChecked(true);
+  }
+  else
+  {
+    imageNavigatorAction->setChecked(false);
+  }
   imageNavigatorAction->setToolTip("Open image navigator for navigating through image");
 
   // toolbar for showing file open, undo, redo and other main actions
@@ -424,7 +436,18 @@ void QmitkExtWorkbenchWindowAdvisorHack::onRedo()
 
 void QmitkExtWorkbenchWindowAdvisorHack::onImageNavigator()
 {
-  cherry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->ShowView("org.mitk.views.imagenavigator");
+  // get ImageNavigatorView
+  cherry::IViewPart::Pointer imageNavigatorView = 
+    cherry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->FindView("org.mitk.views.imagenavigator");
+  bool isImageNavigatorVisible = cherry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->IsPartVisible(imageNavigatorView);
+  if (isImageNavigatorVisible)
+  {
+    cherry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->HideView(imageNavigatorView);
+  }
+  else
+  {
+    cherry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->ShowView("org.mitk.views.imagenavigator");
+  }
 }
 
 void QmitkExtWorkbenchWindowAdvisorHack::onEditPreferences()

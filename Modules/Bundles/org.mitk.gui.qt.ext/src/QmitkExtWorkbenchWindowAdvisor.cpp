@@ -236,14 +236,17 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
   imageNavigatorAction->setCheckable(true);
   cherry::IViewPart::Pointer imageNavigatorView = 
     cherry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->FindView("org.mitk.views.imagenavigator");
-  bool isImageNavigatorVisible = cherry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->IsPartVisible(imageNavigatorView);
-  if (isImageNavigatorVisible)
+  if (imageNavigatorView)
   {
-    imageNavigatorAction->setChecked(true);
-  }
-  else
-  {
-    imageNavigatorAction->setChecked(false);
+    bool isImageNavigatorVisible = cherry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->IsPartVisible(imageNavigatorView);
+    if (isImageNavigatorVisible)
+    {
+      imageNavigatorAction->setChecked(true);
+    }
+    else
+    {
+      imageNavigatorAction->setChecked(false);
+    }
   }
   imageNavigatorAction->setToolTip("Open image navigator for navigating through image");
 
@@ -440,13 +443,16 @@ void QmitkExtWorkbenchWindowAdvisorHack::onImageNavigator()
   cherry::IViewPart::Pointer imageNavigatorView = 
     cherry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->FindView("org.mitk.views.imagenavigator");
   bool isImageNavigatorVisible = cherry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->IsPartVisible(imageNavigatorView);
-  if (isImageNavigatorVisible)
+  if (imageNavigatorView)
   {
-    cherry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->HideView(imageNavigatorView);
-  }
-  else
-  {
-    cherry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->ShowView("org.mitk.views.imagenavigator");
+    if (isImageNavigatorVisible)
+    {
+      cherry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->HideView(imageNavigatorView);
+    }
+    else
+    {
+      cherry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->ShowView("org.mitk.views.imagenavigator");
+    }
   }
 }
 

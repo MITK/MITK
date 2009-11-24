@@ -18,18 +18,26 @@ target_link_libraries( ${LIBNAME} PocoUtil PocoXML PocoFoundation)
 #	SOVERSION ${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH})
 #target_link_libraries( ${LIBNAMED} PocoUtild PocoXMLd PocoFoundationd)
 
-install(
-    DIRECTORY include/Poco
-    DESTINATION include
-    PATTERN ".svn" EXCLUDE
-    )
+#install(
+#    DIRECTORY include/Poco
+#    DESTINATION include
+#    PATTERN ".svn" EXCLUDE
+#    )
     
-install(
+if (WIN32)
+  install(
     TARGETS ${LIBNAME} #${LIBNAMED}
     RUNTIME DESTINATION bin
-    LIBRARY DESTINATION lib
-    ARCHIVE DESTINATION lib
+#    LIBRARY DESTINATION lib
+#    ARCHIVE DESTINATION lib
     )
+else ()
+  install(TARGETS ${LIBNAME}
+          RUNTIME DESTINATION bin
+          LIBRARY DESTINATION lib
+          ARCHIVE DESTINATION lib
+  )
+endif ()
 
 #add_subdirectory(samples)
 #add_subdirectory(testsuite)

@@ -17,7 +17,7 @@
 
 #include "cherryQtDisplay.h"
 
-#include "cherryQtSafeApplication.h""
+#include "cherryQtSafeApplication.h"
 
 namespace cherry {
 

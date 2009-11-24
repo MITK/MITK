@@ -34,7 +34,7 @@ typedef QValueList<double> QwtValueList;
 
 #include <qlist.h>
 
-#if defined(QWT_TEMPLATEDLL)
+#if defined(QWT_TEMPLATEDLL) && QT_VERSION < 0x040600
 
 #if QT_VERSION < 0x040300
 // Some compilers have problems, 

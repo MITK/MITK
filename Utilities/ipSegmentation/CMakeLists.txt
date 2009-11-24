@@ -21,3 +21,7 @@ TARGET_LINK_LIBRARIES(ipSegmentation ann mitkIpPic)
 MITK_CREATE_MODULE_CONF(ipSegmentation
   DEPENDS mitkIpPic ann
 )
+
+IF(NOT MITK_WIN32_FORCE_STATIC)
+  MITK_INSTALL_TARGETS(ipSegmentation)
+ENDIF()

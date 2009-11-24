@@ -148,7 +148,10 @@ MACRO(MACRO_CREATE_PLUGIN)
   ENDFOREACH(_linklib)
   
   TARGET_LINK_LIBRARIES(${PLUGIN_TARGET} ${_debug_linklibs})
-  TARGET_LINK_LIBRARIES(${PLUGIN_TARGET} optimized "PocoFoundation" debug "PocoFoundation${OPENCHERRY_DEBUG_POSTFIX}")
+  TARGET_LINK_LIBRARIES(${PLUGIN_TARGET}
+                        optimized "PocoFoundation" debug "PocoFoundation${OPENCHERRY_DEBUG_POSTFIX}"
+                        optimized "PocoUtil" debug "PocoUtil${OPENCHERRY_DEBUG_POSTFIX}"
+                        optimized "PocoXML" debug "PocoXML${OPENCHERRY_DEBUG_POSTFIX}")
 
   #SET_TARGET_PROPERTIES(${PLUGIN_TARGET} PROPERTIES PREFIX lib IMPORT_PREFIX lib)
   SET_TARGET_PROPERTIES(${PLUGIN_TARGET} PROPERTIES PREFIX lib)

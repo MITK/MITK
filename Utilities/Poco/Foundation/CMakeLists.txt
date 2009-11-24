@@ -213,17 +213,24 @@ target_link_libraries( ${LIBNAME} ${SYSLIBS})
 #endif (${CMAKE_CXX_COMPILER_ID} MATCHES "SunPro")
 #target_link_libraries( ${LIBNAMED} ${SYSLIBS})
 
-install(
-    DIRECTORY include/Poco
-    DESTINATION include
-    PATTERN ".svn" EXCLUDE
-    )
-    
-install(
+# This is needed for a "SDK" install
+#install(
+#    DIRECTORY include/Poco
+#    DESTINATION include
+#    PATTERN ".svn" EXCLUDE
+#    )
+   
+if (WIN32)
+  install(
     TARGETS ${LIBNAME} #${LIBNAMED}
     RUNTIME DESTINATION bin
-    LIBRARY DESTINATION lib
-    ARCHIVE DESTINATION lib
+#    LIBRARY DESTINATION lib
+#    ARCHIVE DESTINATION lib
     )
-
-
+else ()
+  install(TARGETS ${LIBNAME}
+          RUNTIME DESTINATION bin
+          LIBRARY DESTINATION lib
+          ARCHIVE DESTINATION lib
+  )
+endif ()

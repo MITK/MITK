@@ -54,10 +54,8 @@ IF(NOT UNIX AND NOT MINGW)
 ENDIF()
 
 # we need to define a Windows version
-IF(CMAKE_CROSSCOMPILING)
-  IF(CMAKE_SYSTEM_NAME STREQUAL "Windows")
-    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_WIN32_WINNT=0x0500")
-  ENDIF()
+IF(MINGW)
+  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D_WIN32_WINNT=0x0500")
 ENDIF()
 
 ADD_SUBDIRECTORY(Utilities)
@@ -321,10 +319,17 @@ IF(WIN32)
   #MinGW dll
   IF(MINGW)
     FIND_LIBRARY(MINGW_RUNTIME_DLL "mingwm10.dll" HINTS ${CMAKE_FIND_ROOT_PATH}/sys-root/mingw/bin)
-    IF (MINGW_RUNTIME_DLL)
+	IF (MINGW_RUNTIME_DLL)
       INSTALL(FILES ${MINGW_RUNTIME_DLL} DESTINATION bin)
     ELSE()
       MESSAGE(SEND_ERROR "Could not find mingwm10.dll which is needed for a proper install")
+    ENDIF()
+	
+	FIND_LIBRARY(MINGW_GCC_RUNTIME_DLL "libgcc_s_dw2-1.dll" HINTS ${CMAKE_FIND_ROOT_PATH}/sys-root/mingw/bin)
+	IF (MINGW_GCC_RUNTIME_DLL)
+      INSTALL(FILES ${MINGW_GCC_RUNTIME_DLL} DESTINATION bin)
+    ELSE()
+      MESSAGE(SEND_ERROR "Could not find libgcc_s_dw2-1.dll which is needed for a proper install")
     ENDIF()
   ENDIF()
 

@@ -97,6 +97,15 @@ namespace mitk
     virtual mitk::TrackingDeviceType TestConnection();
 
     /**
+    * \brief retrieves all wired tools from the tracking device
+    *
+    * This method queries the tracking device for all wired tools, initializes them and creates TrackingTool representation objects
+    * for them
+    * \return true if no error occured, false if an error occured. Check GetErrorMessage() in case of error.
+    */
+    bool DiscoverWiredTools();
+
+    /**
     * \brief Start the tracking.
     *
     * A new thread is created, which continuously reads the position and orientation information of each tool and stores them inside the tools.
@@ -182,7 +191,19 @@ namespace mitk
 
     /* Methods for NDIProtocol friend class */
     virtual void InvalidateAll();             ///< invalidate all tools
-    NDIPassiveTool* GetInternalTool(std::string handle); ///< returns the tool object that has been assigned the handle or NULL if no tool can be found
+    NDIPassiveTool* GetInternalTool(std::string portHandle); ///< returns the tool object that has been assigned the port handle or NULL if no tool can be found
+    
+    /**
+    * \brief free all port handles that need to be freed
+    *
+    * This method retrieves a list of all port handles that need to be freed (e.g. tool got disconnected)
+    * and frees the handles at the tracking device and it removes the tools from the internal tool list
+    * \warning This method can remove TrackingTools from the tool list! After calling this method, GetTool(i) could return 
+    *          a different tool, because tool indices could have changed.
+    * \return returns NDIOKAY if everything was sucessfull, returns an error code otherwise
+    */
+    NDIErrorCode FreePortHandles();
+
     NDIErrorCode Send(const std::string* message, bool addCRC = true);      ///< Send message to tracking device
     NDIErrorCode Receive(std::string* answer, unsigned int numberOfBytes);  ///< receive numberOfBytes bytes from tracking device
     NDIErrorCode ReceiveByte(char* answer);   ///< lightweight receive function, that reads just one byte
@@ -192,8 +213,6 @@ namespace mitk
     const std::string CalcCRC(const std::string* input);  ///< returns the CRC16 for input as a std::string
 
 public://TODO
-    NDITrackingDevice();          ///< Constructor
-    virtual ~NDITrackingDevice(); ///< Destructor
 
     /**
     * \brief TrackTools() continuously polls serial interface for new 6d tool positions until StopTracking is called.
@@ -232,6 +251,9 @@ public://TODO
     */
     itkSetStringMacro(ErrorMessage);
   protected:
+    NDITrackingDevice();          ///< Constructor
+    virtual ~NDITrackingDevice(); ///< Destructor
+
     std::string m_DeviceName;///< Device Name
     PortNumber m_PortNumber; ///< COM Port Number
     BaudRate m_BaudRate;     ///< COM Port Baud Rate

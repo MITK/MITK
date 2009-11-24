@@ -366,7 +366,7 @@ bool mitk::NDITrackingDevice::OpenConnection()
     return false;
   }
 
-  MutexLockHolder lock(*m_ModeMutex); // lock and unlock the mutex
+  //
 
   m_SerialCommunication = mitk::SerialCommunication::New();
 
@@ -491,38 +491,17 @@ bool mitk::NDITrackingDevice::OpenConnection()
   * now add tools to the tracking system
   **/
 
-  /* POLARIS: first search for port handles that need to be freed: e.g. because of a reset of the tracking system */
-  std::string portHandle;
-  returnvalue = m_DeviceProtocol->PHSR(FREED, &portHandle);
-  if (returnvalue != NDIOKAY)
-  {
-    this->SetErrorMessage("Could not obtain a list of port handles that need to be freed");
-    return false;     // ToDo: Is this a fatal error?
-  }
-
-  /* if there are port handles that need to be freed, free them */
-  if (portHandle.empty() == false)
-  {
-    std::string ph;
-    for (unsigned int i = 0; i < portHandle.size(); i += 2)
-    {
-      ph = portHandle.substr(i, 2);
-      returnvalue = m_DeviceProtocol->PHF(&ph);
-      // What to do if port handle could not be freed? This seems to be a non critical error
-      if (returnvalue != NDIOKAY)
-      {
-        this->SetErrorMessage("Could not free all Port Handles");
-        //        return false; // could not free all Handles
-      }
-    }
-  }
+  /* First, check if the tracking device has port handles that need to be freed and free them */
+  returnvalue = FreePortHandles();
+  // non-critical, therefore no error handling
 
   /**
   * POLARIS: initialize the tools that were added manually
   **/
   {
+    
     MutexLockHolder toolsMutexLockHolder(*m_ToolsMutex); // lock and unlock the mutex
-    portHandle.clear();
+    std::string portHandle;
     Tool6DContainerType::iterator endIt = m_6DTools.end();
     for(Tool6DContainerType::iterator it = m_6DTools.begin(); it != endIt; ++it)
     {
@@ -561,58 +540,10 @@ bool mitk::NDITrackingDevice::OpenConnection()
     }  
   } // end of toolsmutexlockholder scope
 
-  /**
-  * Polaris active tools or Aurora sensors: get the list of all ports/sensors that are connected and have to be initialized
-  **/
-  portHandle.clear();
-  returnvalue = m_DeviceProtocol->PHSR(OCCUPIED, &portHandle);
+  /* check for wired tools and add them too */
+  if (this->DiscoverWiredTools() == false)  // query the tracking device for wired tools and add them to our tool list
+    return false; // \TODO: could we continue anyways?
 
-  if (returnvalue != NDIOKAY)
-  {
-    this->SetErrorMessage("Could not obtain a list of port handles that are connected");
-    return false;     // ToDo: Is this a fatal error?
-  }
-
-  /* if there are port handles that need to be initialized, initialize them. Furthermore instantiate tools for each handle that has no tool yet. */
-  std::string ph;
-  for (unsigned int i = 0; i < portHandle.size(); i += 2)
-  {
-    ph = portHandle.substr(i, 2);
-    //instantiate an object for each tool that is connected
-    mitk::NDIPassiveTool::Pointer newTool = mitk::NDIPassiveTool::New();
-    newTool->SetPortHandle(ph.c_str());
-    newTool->SetTrackingPriority(mitk::NDIPassiveTool::Dynamic);
-    //newTool->SetDataValid(false); not valid by default so doesn't have to be set
-
-    //set a name for identification
-    std::string sumString = std::string("Port ") + ph;
-    newTool->SetToolName(sumString.c_str());
-
-    returnvalue = m_DeviceProtocol->PINIT(&ph);
-    if (returnvalue != NDIINITIALIZATIONFAILED)//if the initialization failed (AURORA) it doesn't have to be enabled. But still return true to be able to set the SROM File
-    {
-      if (returnvalue != NDIOKAY)
-      {
-        this->SetErrorMessage((std::string("Could not initialize port '") + ph +
-          std::string("' for tool '")+ newTool->GetToolName() + std::string("'")).c_str());
-        return false;
-      }
-      /* enable the port handle */
-      returnvalue = m_DeviceProtocol->PENA(&ph, newTool->GetTrackingPriority()); // Enable tool
-      if (returnvalue != NDIOKAY)
-      {
-        this->SetErrorMessage((std::string("Could not enable port '") + ph +
-          std::string("' for tool '")+ newTool->GetToolName() + std::string("'")).c_str());
-        return false;
-      }
-    }
-
-    //we have to temporarily unlock m_ModeMutex here to avoid a deadlock with another lock inside InternalAddTool() 
-    m_ModeMutex->Unlock();
-    if (this->InternalAddTool(newTool) == false)
-      this->SetErrorMessage("Error while adding new tool");
-    m_ModeMutex->Lock();
-  }
 
   /*POLARIS: set the illuminator activation rate */
   if (this->m_Type == NDIPolaris)
@@ -909,12 +840,12 @@ mitk::TrackingTool* mitk::NDITrackingDevice::GetTool(unsigned int toolNumber) co
 }
 
 
-mitk::NDIPassiveTool* mitk::NDITrackingDevice::GetInternalTool(std::string handle)
+mitk::NDIPassiveTool* mitk::NDITrackingDevice::GetInternalTool(std::string portHandle)
 {
   MutexLockHolder toolsMutexLockHolder(*m_ToolsMutex); // lock and unlock the mutex
   Tool6DContainerType::iterator end = m_6DTools.end();
   for (Tool6DContainerType::iterator iterator = m_6DTools.begin(); iterator != end; ++iterator)
-    if (handle.compare((*iterator)->GetPortHandle()) == 0)
+    if (portHandle.compare((*iterator)->GetPortHandle()) == 0)
       return *iterator;
   return NULL;
 }
@@ -1095,4 +1026,104 @@ bool mitk::NDITrackingDevice::GetMarkerPositions(MarkerPointContainerType* marke
   *markerpositions = m_MarkerPoints;  // copy the internal vector to the one provided
   m_MarkerPointsMutex->Unlock();
   return (markerpositions->size() != 0)  ;
+}
+
+
+bool mitk::NDITrackingDevice::DiscoverWiredTools()
+{
+  /* First, check for disconnected tools and remove them */
+  this->FreePortHandles();
+  
+  /* check for new tools, add and initialize them */
+  NDIErrorCode returnvalue;
+  std::string portHandle;
+  returnvalue = m_DeviceProtocol->PHSR(OCCUPIED, &portHandle);
+
+  if (returnvalue != NDIOKAY)
+  {
+    this->SetErrorMessage("Could not obtain a list of port handles that are connected");
+    return false;     // ToDo: Is this a fatal error?
+  }
+
+  /* if there are port handles that need to be initialized, initialize them. Furthermore instantiate tools for each handle that has no tool yet. */
+  std::string ph;
+  for (unsigned int i = 0; i < portHandle.size(); i += 2)
+  {
+    ph = portHandle.substr(i, 2);
+    if (this->GetInternalTool(ph) != NULL) // if we already have a tool with this handle
+      continue;                            // then skip the initialization
+    //instantiate an object for each tool that is connected
+    mitk::NDIPassiveTool::Pointer newTool = mitk::NDIPassiveTool::New();
+    newTool->SetPortHandle(ph.c_str());
+    newTool->SetTrackingPriority(mitk::NDIPassiveTool::Dynamic);
+    //newTool->SetDataValid(false); not valid by default so doesn't have to be set
+
+    //set a name for identification
+    newTool->SetToolName((std::string("Port ") + ph).c_str());
+
+    returnvalue = m_DeviceProtocol->PINIT(&ph);
+    if (returnvalue != NDIINITIALIZATIONFAILED) //if the initialization failed (AURORA) it can not be enabled. A srom file will have to be specified manually first. Still return true to be able to continue
+    {
+      if (returnvalue != NDIOKAY)
+      {
+        this->SetErrorMessage((std::string("Could not initialize port '") + ph +
+          std::string("' for tool '")+ newTool->GetToolName() + std::string("'")).c_str());
+        return false;
+      }
+      /* enable the port handle */
+      returnvalue = m_DeviceProtocol->PENA(&ph, newTool->GetTrackingPriority()); // Enable tool
+      if (returnvalue != NDIOKAY)
+      {
+        this->SetErrorMessage((std::string("Could not enable port '") + ph +
+          std::string("' for tool '")+ newTool->GetToolName() + std::string("'")).c_str());
+        return false;
+      }
+    }
+    //we have to temporarily unlock m_ModeMutex here to avoid a deadlock with another lock inside InternalAddTool() 
+    if (this->InternalAddTool(newTool) == false)
+      this->SetErrorMessage("Error while adding new tool");
+  }
+  return true;
+}
+
+
+mitk::NDIErrorCode mitk::NDITrackingDevice::FreePortHandles()
+{
+  /*  first search for port handles that need to be freed: e.g. because of a reset of the tracking system */
+  NDIErrorCode returnvalue = NDIOKAY;
+  std::string portHandle;
+  returnvalue = m_DeviceProtocol->PHSR(FREED, &portHandle);
+  if (returnvalue != NDIOKAY)
+  {
+    this->SetErrorMessage("Could not obtain a list of port handles that need to be freed");
+    return returnvalue;     // ToDo: Is this a fatal error?
+  }
+
+  /* if there are port handles that need to be freed, free them */
+  if (portHandle.empty() == true)
+    return returnvalue;
+
+  std::string ph;
+  for (unsigned int i = 0; i < portHandle.size(); i += 2)
+  {
+    ph = portHandle.substr(i, 2);
+
+    mitk::NDIPassiveTool* t = this->GetInternalTool(ph);
+    if (t != NULL)  // if we have a tool for the port handle that needs to be freed
+    {
+      if (this->RemoveTool(t) == false)  // remove it (this will free the port too)
+        returnvalue = NDIERROR;
+    }
+    else  // we don't have a tool, the port handle exists only in the tracking device
+    {
+      returnvalue = m_DeviceProtocol->PHF(&ph);  // free it there
+      // What to do if port handle could not be freed? This seems to be a non critical error
+      if (returnvalue != NDIOKAY)
+      {
+        this->SetErrorMessage("Could not free all port handles");
+        //        return false; // could not free all Handles
+      }
+    }
+  }
+  return returnvalue;
 }

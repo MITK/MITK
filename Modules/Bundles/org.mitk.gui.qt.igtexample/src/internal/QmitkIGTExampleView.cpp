@@ -512,7 +512,7 @@ mitk::TrackingDevice::Pointer QmitkIGTExampleView::ConfigureTrackingDevice()
     || (selectedDevice == "NDI Aurora"))
   {
     mitk::NDITrackingDevice::Pointer trackerNDI = mitk::NDITrackingDevice::New();
-    trackerNDI->SetDeviceName(m_Controls->m_Port->text().toLatin1());
+    trackerNDI->SetDeviceName(m_Controls->m_Port->text().toStdString());
     trackerNDI->SetBaudRate(mitk::SerialCommunication::BaudRate115200);
     out->append(QString("creating NDI Tracker on ") + m_Controls->m_Port->text() + QString(" with 115200 Baud"));
     tracker = trackerNDI;

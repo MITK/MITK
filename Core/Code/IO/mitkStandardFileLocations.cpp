@@ -155,6 +155,8 @@ std::string mitk::StandardFileLocations::FindFile(const char* filename, const ch
   directoryPath = itksys::SystemTools::GetCurrentWorkingDirectory();
   AddDirectoryForSearch(directoryPath.c_str());
 
+  std::string directoryBinPath = directoryPath + "/bin"; 
+  AddDirectoryForSearch(directoryBinPath.c_str());
   // 4. use a source tree location from compile time
   directoryPath = MITK_ROOT;
   if (pathInSourceDir)

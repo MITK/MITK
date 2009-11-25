@@ -83,16 +83,15 @@ void mitk::GPUVolumeMapper3D::InitGPU()
   if(gpuInitialized)
     return;
   
-  //GPU_INFO << "initializing GPU mapper";
+  GPU_INFO << "initializing hardware-accelerated renderer";
     
   m_MapperGPU = vtkMitkOpenGLVolumeTextureMapper3D::New();
   m_MapperGPU->SetUseCompressedTexture(true);
-  m_MapperGPU->SetPreferredMethodToFragmentProgram();
   m_MapperGPU->SetSampleDistance(1.0); 
  
   m_VolumePropertyGPU = vtkVolumeProperty::New();
   m_VolumePropertyGPU->ShadeOn();
-  m_VolumePropertyGPU->SetAmbient (0.10f); //0.05f
+  m_VolumePropertyGPU->SetAmbient (0.25f); //0.05f
   m_VolumePropertyGPU->SetDiffuse (0.50f); //0.45f
   m_VolumePropertyGPU->SetSpecular(0.40f); //0.50f
   m_VolumePropertyGPU->SetSpecularPower(16.0f);
@@ -117,7 +116,7 @@ void mitk::GPUVolumeMapper3D::InitCPU()
   if(cpuInitialized)
     return;
 
-  //GPU_INFO << "initializing CPU mapper";
+  GPU_INFO << "initializing software renderer";
 
   m_MapperCPU = vtkFixedPointVolumeRayCastMapper::New();
   m_MapperCPU->SetSampleDistance(1.0); // 4 rays for every pixel
@@ -308,6 +307,25 @@ void mitk::GPUVolumeMapper3D::GenerateDataGPU( mitk::BaseRenderer *renderer )
    m_UnitSpacingImageFilter->SetInput( inputData );
               
    UpdateTransferFunctions( renderer );
+   
+   // Updating shadings
+   {
+      float val;
+      mitk::FloatProperty *fp;
+      
+      fp=dynamic_cast<mitk::FloatProperty*>(GetDataTreeNode()->GetProperty("volumerendering.gpu.ambient",renderer)); 
+      if(fp) m_VolumePropertyGPU->SetAmbient(fp->GetValue());
+      
+      fp=dynamic_cast<mitk::FloatProperty*>(GetDataTreeNode()->GetProperty("volumerendering.gpu.diffuse",renderer)); 
+      if(fp) m_VolumePropertyGPU->SetDiffuse(fp->GetValue());
+      
+      fp=dynamic_cast<mitk::FloatProperty*>(GetDataTreeNode()->GetProperty("volumerendering.gpu.specular",renderer)); 
+      if(fp) m_VolumePropertyGPU->SetSpecular(fp->GetValue());
+
+      fp=dynamic_cast<mitk::FloatProperty*>(GetDataTreeNode()->GetProperty("volumerendering.gpu.specular.power",renderer)); 
+      if(fp) m_VolumePropertyGPU->SetSpecularPower(fp->GetValue());
+   }
+   
 }
 
 
@@ -377,6 +395,24 @@ void mitk::GPUVolumeMapper3D::GenerateDataCPU( mitk::BaseRenderer *renderer )
   m_UnitSpacingImageFilter->SetInput( inputData );
               
   UpdateTransferFunctions( renderer );
+
+   // Updating shadings
+   {
+      float val;
+      mitk::FloatProperty *fp;
+      
+      fp=dynamic_cast<mitk::FloatProperty*>(GetDataTreeNode()->GetProperty("volumerendering.cpu.ambient",renderer)); 
+      if(fp) m_VolumePropertyCPU->SetAmbient(fp->GetValue());
+      
+      fp=dynamic_cast<mitk::FloatProperty*>(GetDataTreeNode()->GetProperty("volumerendering.cpu.diffuse",renderer)); 
+      if(fp) m_VolumePropertyCPU->SetDiffuse(fp->GetValue());
+      
+      fp=dynamic_cast<mitk::FloatProperty*>(GetDataTreeNode()->GetProperty("volumerendering.cpu.specular",renderer)); 
+      if(fp) m_VolumePropertyCPU->SetSpecular(fp->GetValue());
+  
+      fp=dynamic_cast<mitk::FloatProperty*>(GetDataTreeNode()->GetProperty("volumerendering.cpu.specular.power",renderer)); 
+      if(fp) m_VolumePropertyCPU->SetSpecularPower(fp->GetValue());
+   }
 }
 
 
@@ -482,6 +518,17 @@ void mitk::GPUVolumeMapper3D::SetDefaultProperties(mitk::DataTreeNode* node, mit
   node->AddProperty( "volumerendering", mitk::BoolProperty::New( false ), renderer, overwrite );
   node->AddProperty( "volumerendering.uselod", mitk::BoolProperty::New( true ), renderer, overwrite );
   node->AddProperty( "volumerendering.usegpu", mitk::BoolProperty::New( false ), renderer, overwrite );
+
+  node->AddProperty( "volumerendering.gpu.ambient",  mitk::FloatProperty::New( 0.25f ), renderer, overwrite );
+  node->AddProperty( "volumerendering.gpu.diffuse",  mitk::FloatProperty::New( 0.50f ), renderer, overwrite );
+  node->AddProperty( "volumerendering.gpu.specular", mitk::FloatProperty::New( 0.40f ), renderer, overwrite );
+  node->AddProperty( "volumerendering.gpu.specular.power", mitk::FloatProperty::New( 16.0f ), renderer, overwrite );
+
+  node->AddProperty( "volumerendering.cpu.ambient",  mitk::FloatProperty::New( 0.10f ), renderer, overwrite );
+  node->AddProperty( "volumerendering.cpu.diffuse",  mitk::FloatProperty::New( 0.50f ), renderer, overwrite );
+  node->AddProperty( "volumerendering.cpu.specular", mitk::FloatProperty::New( 0.40f ), renderer, overwrite );
+  node->AddProperty( "volumerendering.cpu.specular.power", mitk::FloatProperty::New( 16.0f ), renderer, overwrite );
+
   node->AddProperty( "binary", mitk::BoolProperty::New( false ), renderer, overwrite );
  
   mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());

@@ -75,6 +75,8 @@ public:
 protected:
   vtkMitkOpenGLVolumeTextureMapper3D();
   ~vtkMitkOpenGLVolumeTextureMapper3D();
+  
+  bool RenderPossible;
 
 //BTX  
 
@@ -107,7 +109,6 @@ protected:
   
   void Initialize();
 
-  virtual void RenderNV(vtkRenderer *ren, vtkVolume *vol);
   virtual void RenderFP(vtkRenderer *ren, vtkVolume *vol);
 
   void RenderOneIndependentNoShadeFP( vtkRenderer *ren,
@@ -118,24 +119,9 @@ protected:
   void RenderFourDependentNoShadeFP( vtkRenderer *ren, vtkVolume *vol );
   void RenderFourDependentShadeFP( vtkRenderer *ren, vtkVolume *vol );
 
-  void RenderOneIndependentNoShadeNV( vtkRenderer *ren, vtkVolume *vol );
-  void RenderOneIndependentShadeNV( vtkRenderer *ren, vtkVolume *vol );
-  void RenderTwoDependentNoShadeNV( vtkRenderer *ren, vtkVolume *vol );
-  void RenderTwoDependentShadeNV( vtkRenderer *ren, vtkVolume *vol );
-  void RenderFourDependentNoShadeNV( vtkRenderer *ren, vtkVolume *vol );
-  void RenderFourDependentShadeNV( vtkRenderer *ren, vtkVolume *vol );
-  
   void SetupOneIndependentTextures( vtkRenderer *ren, vtkVolume *vol );
   void SetupTwoDependentTextures( vtkRenderer *ren, vtkVolume *vol );
   void SetupFourDependentTextures( vtkRenderer *ren, vtkVolume *vol );
-
-  void SetupRegisterCombinersNoShadeNV( vtkRenderer *ren,
-                                        vtkVolume *vol,
-                                        int components );
-
-  void SetupRegisterCombinersShadeNV( vtkRenderer *ren,
-                                      vtkVolume *vol,
-                                      int components );
 
   void DeleteTextureIndex( GLuint *index );
   void CreateTextureIndex( GLuint *index );

@@ -289,7 +289,7 @@ void vtkMitkOpenGLVolumeTextureMapper3D::Render(vtkRenderer *ren, vtkVolume *vol
     this->Initialize();
     }
   
-  if ( this->RenderMethod == vtkMitkVolumeTextureMapper3D::NO_METHOD )
+  if ( !this->RenderPossible )
     {
     vtkErrorMacro( "required extensions not supported" );
     return;
@@ -355,32 +355,29 @@ void vtkMitkOpenGLVolumeTextureMapper3D::Render(vtkRenderer *ren, vtkVolume *vol
   glDisable( GL_LIGHTING );
   
   if(this->UseCompressedTexture && SupportsCompressedTexture)
-    {
+  {
+    //LOG_INFO << "using compressed textures";
+    #define myGL_COMPRESSED_RGB_S3TC_DXT1_EXT                   0x83F0
+    #define myGL_COMPRESSED_LUMINANCE_ALPHA_LATC2_EXT           0x8C72
+    #define myGL_COMPRESSED_RGBA_S3TC_DXT5_EXT                  0x83F3
     this->InternalAlpha=vtkgl::COMPRESSED_ALPHA;
-    this->InternalLA=vtkgl::COMPRESSED_LUMINANCE_ALPHA;
-    this->InternalRGB=vtkgl::COMPRESSED_RGB;
-    this->InternalRGBA=vtkgl::COMPRESSED_RGBA;
-    }
+    this->InternalLA=myGL_COMPRESSED_LUMINANCE_ALPHA_LATC2_EXT; //vtkgl::COMPRESSED_LUMINANCE_ALPHA;
+    this->InternalRGB=myGL_COMPRESSED_RGB_S3TC_DXT1_EXT; //vtkgl::COMPRESSED_RGB;
+    this->InternalRGBA=myGL_COMPRESSED_RGBA_S3TC_DXT5_EXT; //vtkgl::COMPRESSED_RGBA;
+  }
   else
-    {
+  {
+    //LOG_INFO << "using uncompressed textures";
     this->InternalAlpha=GL_ALPHA8;
     this->InternalLA=GL_LUMINANCE8_ALPHA8;
     this->InternalRGB=GL_RGB8;
     this->InternalRGBA=GL_RGBA8;
-    }
+  }
   
   vtkGraphicErrorMacro(ren->GetRenderWindow(),"Before actual render method");
   
-  switch ( this->RenderMethod )
-    {
-    case vtkMitkVolumeTextureMapper3D::NVIDIA_METHOD:
-      this->RenderNV(ren,vol);
-      break;
-    case vtkMitkVolumeTextureMapper3D::FRAGMENT_PROGRAM_METHOD:
-      this->RenderFP(ren,vol);
-      break;
-    }
-
+  this->RenderFP(ren,vol);
+  
   // pop transformation matrix
   glMatrixMode( GL_MODELVIEW );
   glPopMatrix();
@@ -464,70 +461,6 @@ void vtkMitkOpenGLVolumeTextureMapper3D::RenderFP(vtkRenderer *ren,
   vtkgl::ActiveTexture( vtkgl::TEXTURE0);
   glDisable( GL_TEXTURE_2D );
   glDisable( vtkgl::TEXTURE_3D );  
-}
-
-void vtkMitkOpenGLVolumeTextureMapper3D::RenderNV( vtkRenderer *ren, vtkVolume *vol )
-{
-  //GPU_INFO << "RenderNV";
-
-  glAlphaFunc (GL_GREATER, static_cast<GLclampf>(0));
-  glEnable (GL_ALPHA_TEST);
-  
-  glEnable( GL_BLEND );
-  glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-
-  int components = this->GetInput()->GetNumberOfScalarComponents();   
-  switch ( components )
-    {
-    case 1:
-      if ( !vol->GetProperty()->GetShade() )
-        {
-        this->RenderOneIndependentNoShadeNV(ren,vol);
-        }
-      else
-        {
-        this->RenderOneIndependentShadeNV(ren,vol);
-        }
-      break;
-      
-    case 2:
-      if ( !vol->GetProperty()->GetShade() )
-        {
-        this->RenderTwoDependentNoShadeNV(ren,vol);
-        }
-      else
-        {
-        this->RenderTwoDependentShadeNV(ren,vol);
-        }
-      break;
-      
-    case 3:
-    case 4:
-      if ( !vol->GetProperty()->GetShade() )
-        {
-        this->RenderFourDependentNoShadeNV(ren,vol);
-        }
-      else
-        {
-        this->RenderFourDependentShadeNV(ren,vol);
-        }
-    }
-  
-  vtkgl::ActiveTexture( vtkgl::TEXTURE2 );
-  glDisable( GL_TEXTURE_2D );
-  glDisable( vtkgl::TEXTURE_3D );
-  
-  vtkgl::ActiveTexture( vtkgl::TEXTURE1 );
-  glDisable( GL_TEXTURE_2D );
-  glDisable( vtkgl::TEXTURE_3D );
-  
-  vtkgl::ActiveTexture( vtkgl::TEXTURE0 );
-  glDisable( GL_TEXTURE_2D );
-  glDisable( vtkgl::TEXTURE_3D );
-  
-  glDisable( vtkgl::TEXTURE_SHADER_NV );
-
-  glDisable(vtkgl::REGISTER_COMBINERS_NV);    
 }
 
 void vtkMitkOpenGLVolumeTextureMapper3D::DeleteTextureIndex( GLuint *index )
@@ -766,49 +699,41 @@ void vtkMitkOpenGLVolumeTextureMapper3D::SetupOneIndependentTextures( vtkRendere
   vtkgl::ActiveTexture( vtkgl::TEXTURE0 );
   glDisable( GL_TEXTURE_2D );
   glEnable( vtkgl::TEXTURE_3D );
-  if ( this->RenderMethod == vtkMitkVolumeTextureMapper3D::NVIDIA_METHOD )
-    {
-    glEnable( vtkgl::TEXTURE_SHADER_NV );
-    glTexEnvi(vtkgl::TEXTURE_SHADER_NV, vtkgl::SHADER_OPERATION_NV, vtkgl::TEXTURE_3D);
-    }
 
   vtkgl::ActiveTexture( vtkgl::TEXTURE2 );
   glDisable( GL_TEXTURE_2D );
   glEnable( vtkgl::TEXTURE_3D );
-  if ( this->RenderMethod == vtkMitkVolumeTextureMapper3D::NVIDIA_METHOD )
-    {
-    glEnable( vtkgl::TEXTURE_SHADER_NV );  
-    glTexEnvi(vtkgl::TEXTURE_SHADER_NV, vtkgl::SHADER_OPERATION_NV, vtkgl::TEXTURE_3D);
-    }
 
   // Update the volume containing the 2 byte scalar / gradient magnitude
   if ( this->UpdateVolumes( vol ) || !this->Volume1Index || !this->Volume2Index )
-    {    
+  {    
     int dim[3];
     this->GetVolumeDimensions(dim);
     this->DeleteTextureIndex(&this->Volume3Index);
+
+    LOG_INFO << "uploading volume1";
     
     vtkgl::ActiveTexture( vtkgl::TEXTURE0 );
     glBindTexture(vtkgl::TEXTURE_3D,0);
     this->DeleteTextureIndex(&this->Volume1Index);
     this->CreateTextureIndex(&this->Volume1Index);
     glBindTexture(vtkgl::TEXTURE_3D, this->Volume1Index);
-    
-    
     vtkgl::TexImage3D(vtkgl::TEXTURE_3D,0,this->InternalLA,dim[0],dim[1],
                       dim[2],0,GL_LUMINANCE_ALPHA,GL_UNSIGNED_BYTE,
                       this->Volume1);
                       
+    LOG_INFO << "uploading volume1 finished, uploading volume2";
+    
     vtkgl::ActiveTexture( vtkgl::TEXTURE2 );
     glBindTexture(vtkgl::TEXTURE_3D,0);
     this->DeleteTextureIndex(&this->Volume2Index);
     this->CreateTextureIndex(&this->Volume2Index);
     glBindTexture(vtkgl::TEXTURE_3D, this->Volume2Index);
-    
     vtkgl::TexImage3D(vtkgl::TEXTURE_3D,0,this->InternalRGB,dim[0],dim[1],
                       dim[2],0,GL_RGB,GL_UNSIGNED_BYTE,this->Volume2);
 
-    }
+    LOG_INFO << "uploading volume2 finished";
+  }
   
   vtkgl::ActiveTexture( vtkgl::TEXTURE0 );
   glBindTexture(vtkgl::TEXTURE_3D, this->Volume1Index);   
@@ -821,12 +746,6 @@ void vtkMitkOpenGLVolumeTextureMapper3D::SetupOneIndependentTextures( vtkRendere
   vtkgl::ActiveTexture( vtkgl::TEXTURE1 );
   glEnable( GL_TEXTURE_2D );
   glDisable( vtkgl::TEXTURE_3D );
-  if ( this->RenderMethod == vtkMitkVolumeTextureMapper3D::NVIDIA_METHOD )
-    {
-    glTexEnvf ( vtkgl::TEXTURE_SHADER_NV, vtkgl::SHADER_OPERATION_NV, 
-                vtkgl::DEPENDENT_AR_TEXTURE_2D_NV );  
-    glTexEnvi(vtkgl::TEXTURE_SHADER_NV, vtkgl::PREVIOUS_TEXTURE_INPUT_NV, vtkgl::TEXTURE0);
-    }
 
   // Update the dependent 2D color table mapping scalar value and
   // gradient magnitude to RGBA
@@ -843,346 +762,13 @@ void vtkMitkOpenGLVolumeTextureMapper3D::SetupOneIndependentTextures( vtkRendere
     glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP );
     glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP );
 
+    //LOG_INFO << "uploading transferfunction";
+
     glTexImage2D( GL_TEXTURE_2D, 0,this->InternalRGBA, 256, 256, 0,
                   GL_RGBA, GL_UNSIGNED_BYTE, this->ColorLookup );    
     }
   
   glBindTexture(GL_TEXTURE_2D, this->ColorLookupIndex);
-}
-
-void vtkMitkOpenGLVolumeTextureMapper3D::SetupRegisterCombinersNoShadeNV( vtkRenderer *vtkNotUsed(ren),
-                  vtkVolume *vtkNotUsed(vol), 
-                  int components )
-{
-  //GPU_INFO << "SetupRegisterCombinersNoShadeNV";
-
-  if ( components < 3 )
-    {
-    vtkgl::ActiveTexture(vtkgl::TEXTURE2);
-    glTexEnvi(vtkgl::TEXTURE_SHADER_NV, vtkgl::SHADER_OPERATION_NV, GL_NONE);
-  
-    if ( components == 1 )
-      {
-      vtkgl::ActiveTexture(vtkgl::TEXTURE3);
-      glTexEnvi(vtkgl::TEXTURE_SHADER_NV, vtkgl::SHADER_OPERATION_NV, GL_NONE);
-      }
-    }
-  
-  
-  glEnable(vtkgl::REGISTER_COMBINERS_NV);    
-  vtkgl::CombinerParameteriNV(vtkgl::NUM_GENERAL_COMBINERS_NV, 1);
-  vtkgl::CombinerParameteriNV(vtkgl::COLOR_SUM_CLAMP_NV, GL_TRUE);
-    
-  vtkgl::FinalCombinerInputNV(vtkgl::VARIABLE_A_NV, GL_ZERO,         vtkgl::UNSIGNED_IDENTITY_NV, GL_RGB  );
-  vtkgl::FinalCombinerInputNV(vtkgl::VARIABLE_B_NV, GL_ZERO,         vtkgl::UNSIGNED_IDENTITY_NV, GL_RGB  );
-  vtkgl::FinalCombinerInputNV(vtkgl::VARIABLE_C_NV, GL_ZERO,         vtkgl::UNSIGNED_IDENTITY_NV, GL_RGB  );
-  if ( components < 3 )
-    {
-    vtkgl::FinalCombinerInputNV(vtkgl::VARIABLE_D_NV, vtkgl::TEXTURE1, vtkgl::UNSIGNED_IDENTITY_NV, GL_RGB  );
-    }
-  else
-    {
-    vtkgl::FinalCombinerInputNV(vtkgl::VARIABLE_D_NV, vtkgl::TEXTURE0, vtkgl::UNSIGNED_IDENTITY_NV, GL_RGB  );
-    }
-  
-  if ( components == 1 )
-    {
-    vtkgl::FinalCombinerInputNV(vtkgl::VARIABLE_G_NV, vtkgl::TEXTURE1, vtkgl::UNSIGNED_IDENTITY_NV, GL_ALPHA);
-    }
-  else
-    {
-    vtkgl::FinalCombinerInputNV(vtkgl::VARIABLE_G_NV, vtkgl::TEXTURE3, vtkgl::UNSIGNED_IDENTITY_NV, GL_ALPHA);
-    }
-}
-
-void vtkMitkOpenGLVolumeTextureMapper3D::SetupRegisterCombinersShadeNV( vtkRenderer *ren,
-                      vtkVolume *vol,
-                      int components )
-{
-  //GPU_INFO << "SetupRegisterCombinersShadeNV";
-
-  if ( components == 1 )
-    {
-    vtkgl::ActiveTexture(vtkgl::TEXTURE3);
-    glTexEnvi(vtkgl::TEXTURE_SHADER_NV, vtkgl::SHADER_OPERATION_NV, GL_NONE);
-    }
-    
-  GLfloat white[4] = {1,1,1,1};
-    
-  GLfloat lightDirection[2][4];
-  GLfloat lightDiffuseColor[2][4];
-  GLfloat lightSpecularColor[2][4];
-  GLfloat halfwayVector[2][4];
-  GLfloat ambientColor[4];
-
-  // Gather information about the light sources. Although we gather info for multiple light sources,
-  // in this case we will only use the first one, and will duplicate it (in opposite direction) to
-  // approximate two-sided lighting.
-  this->GetLightInformation( ren, vol, lightDirection, lightDiffuseColor, 
-                             lightSpecularColor, halfwayVector, ambientColor );
-  
-  float specularPower = vol->GetProperty()->GetSpecularPower();
-  
-  glEnable(vtkgl::REGISTER_COMBINERS_NV);    
-  glEnable( vtkgl::PER_STAGE_CONSTANTS_NV );
-  vtkgl::CombinerParameteriNV(vtkgl::NUM_GENERAL_COMBINERS_NV, 8);
-  vtkgl::CombinerParameteriNV(vtkgl::COLOR_SUM_CLAMP_NV, GL_TRUE);
-  
-  // Stage 0
-  //
-  //  N dot L is computed into vtkgl::SPARE0_NV
-  // -N dot L is computed into vtkgl::SPARE1_NV
-  //
-  vtkgl::CombinerStageParameterfvNV( vtkgl::COMBINER0_NV, vtkgl::CONSTANT_COLOR0_NV, lightDirection[0] );
-  
-  vtkgl::CombinerInputNV( vtkgl::COMBINER0_NV, GL_RGB, vtkgl::VARIABLE_A_NV, 
-                          vtkgl::CONSTANT_COLOR0_NV, vtkgl::EXPAND_NORMAL_NV, GL_RGB );
-  vtkgl::CombinerInputNV( vtkgl::COMBINER0_NV, GL_RGB, vtkgl::VARIABLE_B_NV, 
-                          vtkgl::TEXTURE2,       vtkgl::EXPAND_NORMAL_NV, GL_RGB );
-  vtkgl::CombinerInputNV( vtkgl::COMBINER0_NV, GL_RGB, vtkgl::VARIABLE_C_NV, 
-                          vtkgl::CONSTANT_COLOR0_NV, vtkgl::EXPAND_NORMAL_NV, GL_RGB );
-  vtkgl::CombinerInputNV( vtkgl::COMBINER0_NV, GL_RGB, vtkgl::VARIABLE_D_NV, 
-                          vtkgl::TEXTURE2,       vtkgl::EXPAND_NEGATE_NV, GL_RGB );
-  
-  vtkgl::CombinerOutputNV( vtkgl::COMBINER0_NV, GL_RGB, vtkgl::SPARE0_NV, vtkgl::SPARE1_NV, vtkgl::DISCARD_NV, 
-                            GL_NONE, GL_NONE, GL_TRUE, GL_TRUE, GL_FALSE );
-  
-  // Stage 1
-  //
-  // lightColor * max( 0, (N dot L)) + lightColor * max( 0, (-N dot L)) is computed into vtkgl::SPARE0_NV
-  // 
-  vtkgl::CombinerStageParameterfvNV( vtkgl::COMBINER1_NV, vtkgl::CONSTANT_COLOR0_NV, lightDiffuseColor[0] );
-  
-  vtkgl::CombinerInputNV( vtkgl::COMBINER1_NV, GL_RGB, vtkgl::VARIABLE_A_NV, 
-                          vtkgl::SPARE0_NV,          vtkgl::UNSIGNED_IDENTITY_NV, GL_RGB );
-  vtkgl::CombinerInputNV( vtkgl::COMBINER1_NV, GL_RGB, vtkgl::VARIABLE_B_NV, 
-                          vtkgl::CONSTANT_COLOR0_NV, vtkgl::UNSIGNED_IDENTITY_NV, GL_RGB );
-  vtkgl::CombinerInputNV( vtkgl::COMBINER1_NV, GL_RGB, vtkgl::VARIABLE_C_NV, 
-                          vtkgl::SPARE1_NV,          vtkgl::UNSIGNED_IDENTITY_NV, GL_RGB );
-  vtkgl::CombinerInputNV( vtkgl::COMBINER1_NV, GL_RGB, vtkgl::VARIABLE_D_NV, 
-                          vtkgl::CONSTANT_COLOR0_NV, vtkgl::UNSIGNED_IDENTITY_NV, GL_RGB );
-  
-  vtkgl::CombinerOutputNV( vtkgl::COMBINER1_NV, GL_RGB, vtkgl::DISCARD_NV, vtkgl::DISCARD_NV,
-                           vtkgl::SPARE0_NV, GL_NONE, GL_NONE, GL_FALSE, GL_FALSE, GL_FALSE );
-  
-  // Stage 2
-  //
-  // result from Stage 1 is added to the ambient color and stored in vtkgl::PRIMARY_COLOR_NV
-  //
-  vtkgl::CombinerStageParameterfvNV( vtkgl::COMBINER2_NV, vtkgl::CONSTANT_COLOR0_NV, white );
-  vtkgl::CombinerStageParameterfvNV( vtkgl::COMBINER2_NV, vtkgl::CONSTANT_COLOR1_NV, ambientColor );    
-  
-  vtkgl::CombinerInputNV( vtkgl::COMBINER2_NV, GL_RGB, vtkgl::VARIABLE_A_NV, 
-                          vtkgl::SPARE0_NV,          vtkgl::UNSIGNED_IDENTITY_NV, GL_RGB );
-  vtkgl::CombinerInputNV( vtkgl::COMBINER2_NV, GL_RGB, vtkgl::VARIABLE_B_NV, 
-                          vtkgl::CONSTANT_COLOR0_NV, vtkgl::UNSIGNED_IDENTITY_NV, GL_RGB );
-  vtkgl::CombinerInputNV( vtkgl::COMBINER2_NV, GL_RGB, vtkgl::VARIABLE_C_NV, 
-                          vtkgl::CONSTANT_COLOR0_NV, vtkgl::UNSIGNED_IDENTITY_NV, GL_RGB );
-  vtkgl::CombinerInputNV( vtkgl::COMBINER2_NV, GL_RGB, vtkgl::VARIABLE_D_NV, 
-                          vtkgl::CONSTANT_COLOR1_NV, vtkgl::UNSIGNED_IDENTITY_NV, GL_RGB );
-  
-  vtkgl::CombinerOutputNV( vtkgl::COMBINER2_NV, GL_RGB, vtkgl::DISCARD_NV, vtkgl::DISCARD_NV, 
-                           vtkgl::PRIMARY_COLOR_NV, GL_NONE, GL_NONE, GL_FALSE, GL_FALSE, GL_FALSE );
-  
-  // Stage 3
-  // 
-  //  N dot H is computed into vtkgl::SPARE0_NV
-  // -N dot H is computed into vtkgl::SPARE1_NV
-  //
-  vtkgl::CombinerStageParameterfvNV( vtkgl::COMBINER3_NV, vtkgl::CONSTANT_COLOR0_NV, halfwayVector[0] );
-  
-  vtkgl::CombinerInputNV( vtkgl::COMBINER3_NV, GL_RGB, vtkgl::VARIABLE_A_NV, 
-                          vtkgl::CONSTANT_COLOR0_NV, vtkgl::EXPAND_NORMAL_NV, GL_RGB );
-  vtkgl::CombinerInputNV( vtkgl::COMBINER3_NV, GL_RGB, vtkgl::VARIABLE_B_NV, 
-                          vtkgl::TEXTURE2, vtkgl::EXPAND_NORMAL_NV, GL_RGB );
-  vtkgl::CombinerInputNV( vtkgl::COMBINER3_NV, GL_RGB, vtkgl::VARIABLE_C_NV, 
-                          vtkgl::CONSTANT_COLOR0_NV, vtkgl::EXPAND_NORMAL_NV, GL_RGB );
-  vtkgl::CombinerInputNV( vtkgl::COMBINER3_NV, GL_RGB, vtkgl::VARIABLE_D_NV, 
-                          vtkgl::TEXTURE2, vtkgl::EXPAND_NEGATE_NV, GL_RGB );
-  
-  vtkgl::CombinerOutputNV( vtkgl::COMBINER3_NV, GL_RGB, vtkgl::SPARE0_NV, vtkgl::SPARE1_NV, 
-                           vtkgl::DISCARD_NV, GL_NONE, GL_NONE, GL_TRUE, GL_TRUE, GL_FALSE );
-  
-  // Stage 4
-  //
-  // if the specular power is greater than 1, then
-  //
-  //  N dot H squared is computed into vtkgl::SPARE0_NV
-  // -N dot H squared is computed into vtkgl::SPARE1_NV
-  //
-  // otherwise these registers are simply multiplied by white
-  vtkgl::CombinerStageParameterfvNV( vtkgl::COMBINER4_NV, vtkgl::CONSTANT_COLOR0_NV, white );
-  
-  vtkgl::CombinerInputNV( vtkgl::COMBINER4_NV, GL_RGB, vtkgl::VARIABLE_A_NV, 
-                          vtkgl::SPARE0_NV, vtkgl::UNSIGNED_IDENTITY_NV, GL_RGB );
-  vtkgl::CombinerInputNV( vtkgl::COMBINER4_NV, GL_RGB, vtkgl::VARIABLE_C_NV, 
-                          vtkgl::SPARE1_NV, vtkgl::UNSIGNED_IDENTITY_NV, GL_RGB );
-  if ( specularPower > 1.0 )
-    {
-    vtkgl::CombinerInputNV( vtkgl::COMBINER4_NV, GL_RGB, vtkgl::VARIABLE_B_NV, 
-                            vtkgl::SPARE0_NV, vtkgl::UNSIGNED_IDENTITY_NV, GL_RGB );
-    vtkgl::CombinerInputNV( vtkgl::COMBINER4_NV, GL_RGB, vtkgl::VARIABLE_D_NV, 
-                            vtkgl::SPARE1_NV, vtkgl::UNSIGNED_IDENTITY_NV, GL_RGB );
-    }
-  else
-    {
-    vtkgl::CombinerInputNV( vtkgl::COMBINER4_NV, GL_RGB, vtkgl::VARIABLE_B_NV, 
-                            vtkgl::CONSTANT_COLOR0_NV, vtkgl::UNSIGNED_IDENTITY_NV, GL_RGB );
-    vtkgl::CombinerInputNV( vtkgl::COMBINER4_NV, GL_RGB, vtkgl::VARIABLE_D_NV, 
-                            vtkgl::CONSTANT_COLOR0_NV, vtkgl::UNSIGNED_IDENTITY_NV, GL_RGB );
-    }
-  
-  vtkgl::CombinerOutputNV( vtkgl::COMBINER4_NV, GL_RGB, vtkgl::SPARE0_NV, vtkgl::SPARE1_NV, vtkgl::DISCARD_NV, 
-                            GL_NONE, GL_NONE, GL_FALSE, GL_FALSE, GL_FALSE );
-
-  // Stage 5
-  //
-  // if the specular power is greater than 3, then
-  //
-  //  N dot H to the fourth is computed into vtkgl::SPARE0_NV
-  // -N dot H to the fourth is computed into vtkgl::SPARE1_NV
-  //
-  // otherwise these registers are simply multiplied by white
-  vtkgl::CombinerStageParameterfvNV( vtkgl::COMBINER5_NV, vtkgl::CONSTANT_COLOR0_NV, white );
-  
-  vtkgl::CombinerInputNV( vtkgl::COMBINER5_NV, GL_RGB, vtkgl::VARIABLE_A_NV, 
-                          vtkgl::SPARE0_NV,  vtkgl::UNSIGNED_IDENTITY_NV, GL_RGB );
-  vtkgl::CombinerInputNV( vtkgl::COMBINER5_NV, GL_RGB, vtkgl::VARIABLE_C_NV, 
-                          vtkgl::SPARE1_NV,  vtkgl::UNSIGNED_IDENTITY_NV, GL_RGB );
-  if ( specularPower > 3.0 )
-    {
-    vtkgl::CombinerInputNV( vtkgl::COMBINER5_NV, GL_RGB, vtkgl::VARIABLE_B_NV, 
-                            vtkgl::SPARE0_NV, vtkgl::UNSIGNED_IDENTITY_NV, GL_RGB );
-    vtkgl::CombinerInputNV( vtkgl::COMBINER5_NV, GL_RGB, vtkgl::VARIABLE_D_NV, 
-                            vtkgl::SPARE1_NV, vtkgl::UNSIGNED_IDENTITY_NV, GL_RGB );
-    }
-  else
-    {
-    vtkgl::CombinerInputNV( vtkgl::COMBINER5_NV, GL_RGB, vtkgl::VARIABLE_B_NV, 
-                            vtkgl::CONSTANT_COLOR0_NV, vtkgl::UNSIGNED_IDENTITY_NV, GL_RGB );
-    vtkgl::CombinerInputNV( vtkgl::COMBINER5_NV, GL_RGB, vtkgl::VARIABLE_D_NV, 
-                            vtkgl::CONSTANT_COLOR0_NV, vtkgl::UNSIGNED_IDENTITY_NV, GL_RGB );
-    }
-  
-  vtkgl::CombinerOutputNV( vtkgl::COMBINER5_NV, GL_RGB, vtkgl::SPARE0_NV, vtkgl::SPARE1_NV, vtkgl::DISCARD_NV, 
-                            GL_NONE, GL_NONE, GL_FALSE, GL_FALSE, GL_FALSE );
-
-  // Stage 6
-  //
-  // if the specular power is greater than 6, then
-  //
-  //  N dot H to the eighth is computed into vtkgl::SPARE0_NV
-  // -N dot H to the eighth is computed into vtkgl::SPARE1_NV
-  //
-  // otherwise these registers are simply multiplied by white
-  vtkgl::CombinerStageParameterfvNV( vtkgl::COMBINER6_NV, vtkgl::CONSTANT_COLOR0_NV, white );
-  
-  vtkgl::CombinerInputNV( vtkgl::COMBINER6_NV, GL_RGB, vtkgl::VARIABLE_A_NV, 
-                          vtkgl::SPARE0_NV, vtkgl::UNSIGNED_IDENTITY_NV, GL_RGB );
-  vtkgl::CombinerInputNV( vtkgl::COMBINER6_NV, GL_RGB, vtkgl::VARIABLE_C_NV, 
-                          vtkgl::SPARE1_NV, vtkgl::UNSIGNED_IDENTITY_NV, GL_RGB );
-
-  if ( specularPower > 6.0 )
-    {
-    vtkgl::CombinerInputNV( vtkgl::COMBINER6_NV, GL_RGB, vtkgl::VARIABLE_B_NV, 
-                            vtkgl::SPARE0_NV, vtkgl::UNSIGNED_IDENTITY_NV, GL_RGB );
-    vtkgl::CombinerInputNV( vtkgl::COMBINER6_NV, GL_RGB, vtkgl::VARIABLE_D_NV, 
-                            vtkgl::SPARE1_NV, vtkgl::UNSIGNED_IDENTITY_NV, GL_RGB );
-    }
-  else
-    {
-    vtkgl::CombinerInputNV( vtkgl::COMBINER6_NV, GL_RGB, vtkgl::VARIABLE_B_NV, 
-                            vtkgl::CONSTANT_COLOR0_NV, vtkgl::UNSIGNED_IDENTITY_NV, GL_RGB );
-    vtkgl::CombinerInputNV( vtkgl::COMBINER6_NV, GL_RGB, vtkgl::VARIABLE_D_NV, 
-                            vtkgl::CONSTANT_COLOR0_NV, vtkgl::UNSIGNED_IDENTITY_NV, GL_RGB );
-    }
-  
-  vtkgl::CombinerOutputNV( vtkgl::COMBINER6_NV, GL_RGB, vtkgl::SPARE0_NV, vtkgl::SPARE1_NV, 
-                           vtkgl::DISCARD_NV, GL_NONE, GL_NONE, GL_FALSE, GL_FALSE, GL_FALSE );
-
-  
-  // Stage 7
-  //
-  // Add the two specular contributions and multiply each by the specular color.
-  vtkgl::CombinerStageParameterfvNV( vtkgl::COMBINER7_NV, vtkgl::CONSTANT_COLOR0_NV, lightSpecularColor[0] );
-  vtkgl::CombinerStageParameterfvNV( vtkgl::COMBINER7_NV, vtkgl::CONSTANT_COLOR1_NV, lightSpecularColor[1] );    
-  
-  vtkgl::CombinerInputNV( vtkgl::COMBINER7_NV, GL_RGB, vtkgl::VARIABLE_A_NV, 
-                          vtkgl::SPARE0_NV, vtkgl::UNSIGNED_IDENTITY_NV, GL_RGB );
-  vtkgl::CombinerInputNV( vtkgl::COMBINER7_NV, GL_RGB, vtkgl::VARIABLE_B_NV, 
-                          vtkgl::CONSTANT_COLOR0_NV, vtkgl::UNSIGNED_IDENTITY_NV, GL_RGB );
-  vtkgl::CombinerInputNV( vtkgl::COMBINER7_NV, GL_RGB, vtkgl::VARIABLE_C_NV, 
-                          vtkgl::SPARE1_NV, vtkgl::UNSIGNED_IDENTITY_NV, GL_RGB );
-  vtkgl::CombinerInputNV( vtkgl::COMBINER7_NV, GL_RGB, vtkgl::VARIABLE_D_NV, 
-                          vtkgl::CONSTANT_COLOR1_NV, vtkgl::UNSIGNED_IDENTITY_NV, GL_RGB );
-  
-  vtkgl::CombinerOutputNV( vtkgl::COMBINER7_NV, GL_RGB, vtkgl::DISCARD_NV, 
-                           vtkgl::DISCARD_NV, vtkgl::SPARE0_NV, 
-                            GL_NONE, GL_NONE, GL_FALSE, GL_FALSE, GL_FALSE );
-
-  vtkgl::FinalCombinerInputNV(vtkgl::VARIABLE_A_NV, vtkgl::PRIMARY_COLOR_NV, 
-                              vtkgl::UNSIGNED_IDENTITY_NV, GL_RGB  );
-  if ( components < 3 )
-    {
-    vtkgl::FinalCombinerInputNV(vtkgl::VARIABLE_B_NV, vtkgl::TEXTURE1, 
-                                vtkgl::UNSIGNED_IDENTITY_NV, GL_RGB  );
-    }
-  else
-    {
-    vtkgl::FinalCombinerInputNV(vtkgl::VARIABLE_B_NV, vtkgl::TEXTURE0, 
-                                vtkgl::UNSIGNED_IDENTITY_NV, GL_RGB  );
-    }
-  vtkgl::FinalCombinerInputNV(vtkgl::VARIABLE_C_NV, GL_ZERO, 
-                              vtkgl::UNSIGNED_IDENTITY_NV, GL_RGB  );
-  vtkgl::FinalCombinerInputNV(vtkgl::VARIABLE_D_NV, vtkgl::SPARE0_NV, 
-                              vtkgl::UNSIGNED_IDENTITY_NV, GL_RGB  );
-  
-  if ( components == 1 )
-    {
-    vtkgl::FinalCombinerInputNV(vtkgl::VARIABLE_G_NV, vtkgl::TEXTURE1, 
-                                vtkgl::UNSIGNED_IDENTITY_NV, GL_ALPHA);
-    }
-  else
-    {
-    vtkgl::FinalCombinerInputNV(vtkgl::VARIABLE_G_NV, vtkgl::TEXTURE3, 
-                                vtkgl::UNSIGNED_IDENTITY_NV, GL_ALPHA);
-    }
-  
-}
-
-void vtkMitkOpenGLVolumeTextureMapper3D::RenderOneIndependentNoShadeNV(
-  vtkRenderer *ren,
-  vtkVolume *vol )
-{
-  //GPU_INFO << "RenderOneIndependentNoShadeNV";
-
-  this->SetupOneIndependentTextures( ren, vol );
-
-  // Start the timer now
-  this->Timer->StartTimer();
-  
-  this->SetupRegisterCombinersNoShadeNV( ren, vol, 1 );
-  
-  int stages[4] = {1,0,0,0};
-  this->RenderPolygons( ren, vol, stages );  
-}
-
-
-void vtkMitkOpenGLVolumeTextureMapper3D::RenderOneIndependentShadeNV(
-  vtkRenderer *ren,
-  vtkVolume *vol )
-{
-  //GPU_INFO << "RenderOneIndependentShadeNV";
-
-  this->SetupOneIndependentTextures( ren, vol );
-  
-  // Start the timer now
-  this->Timer->StartTimer();
-  
-  this->SetupRegisterCombinersShadeNV( ren, vol, 1 );
-  
-  int stages[4] = {1,0,1,0};
-  this->RenderPolygons( ren, vol, stages );  
 }
 
 
@@ -1195,20 +781,10 @@ void vtkMitkOpenGLVolumeTextureMapper3D::SetupTwoDependentTextures(
   vtkgl::ActiveTexture( vtkgl::TEXTURE0 );
   glDisable( GL_TEXTURE_2D );
   glEnable( vtkgl::TEXTURE_3D );
-  if ( this->RenderMethod == vtkMitkVolumeTextureMapper3D::NVIDIA_METHOD )
-    {
-    glEnable( vtkgl::TEXTURE_SHADER_NV );
-    glTexEnvi(vtkgl::TEXTURE_SHADER_NV, vtkgl::SHADER_OPERATION_NV, vtkgl::TEXTURE_3D);
-    }
 
   vtkgl::ActiveTexture( vtkgl::TEXTURE2 );
   glDisable( GL_TEXTURE_2D );
   glEnable( vtkgl::TEXTURE_3D );
-  if ( this->RenderMethod == vtkMitkVolumeTextureMapper3D::NVIDIA_METHOD )
-    {
-    glEnable( vtkgl::TEXTURE_SHADER_NV );  
-    glTexEnvi(vtkgl::TEXTURE_SHADER_NV, vtkgl::SHADER_OPERATION_NV, vtkgl::TEXTURE_3D);
-    }
 
   // Update the volume containing the 3 byte scalars / gradient magnitude
   if ( this->UpdateVolumes( vol ) || !this->Volume1Index || !this->Volume2Index )
@@ -1245,22 +821,10 @@ void vtkMitkOpenGLVolumeTextureMapper3D::SetupTwoDependentTextures(
   vtkgl::ActiveTexture( vtkgl::TEXTURE1 );
   glEnable( GL_TEXTURE_2D );
   glDisable( vtkgl::TEXTURE_3D );
-  if ( this->RenderMethod == vtkMitkVolumeTextureMapper3D::NVIDIA_METHOD )
-    {
-    glTexEnvf ( vtkgl::TEXTURE_SHADER_NV, vtkgl::SHADER_OPERATION_NV, 
-                vtkgl::DEPENDENT_AR_TEXTURE_2D_NV );
-    glTexEnvi(vtkgl::TEXTURE_SHADER_NV, vtkgl::PREVIOUS_TEXTURE_INPUT_NV, vtkgl::TEXTURE0);
-    }
 
   vtkgl::ActiveTexture( vtkgl::TEXTURE3 );
   glEnable( GL_TEXTURE_2D );
   glDisable( vtkgl::TEXTURE_3D );
-  if ( this->RenderMethod == vtkMitkVolumeTextureMapper3D::NVIDIA_METHOD )
-    {
-    glTexEnvf ( vtkgl::TEXTURE_SHADER_NV, vtkgl::SHADER_OPERATION_NV, 
-                vtkgl::DEPENDENT_GB_TEXTURE_2D_NV );
-    glTexEnvi(vtkgl::TEXTURE_SHADER_NV, vtkgl::PREVIOUS_TEXTURE_INPUT_NV, vtkgl::TEXTURE0);
-    }
 
   // Update the dependent 2D color table mapping scalar value and
   // gradient magnitude to RGBA
@@ -1278,6 +842,8 @@ void vtkMitkOpenGLVolumeTextureMapper3D::SetupTwoDependentTextures(
     glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP );
     glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP );
 
+    //LOG_INFO << "uploading transferfunction / scalar";
+
     glTexImage2D(GL_TEXTURE_2D,0,this->InternalRGB, 256, 256, 0,
                  GL_RGB, GL_UNSIGNED_BYTE, this->ColorLookup );    
       
@@ -1292,6 +858,8 @@ void vtkMitkOpenGLVolumeTextureMapper3D::SetupTwoDependentTextures(
     glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP );
     glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP );
 
+    //LOG_INFO << "uploading transferfunction / gradient";
+
     glTexImage2D(GL_TEXTURE_2D, 0,this->InternalAlpha, 256, 256, 0,
                  GL_ALPHA, GL_UNSIGNED_BYTE, this->AlphaLookup );      
     }
@@ -1303,39 +871,6 @@ void vtkMitkOpenGLVolumeTextureMapper3D::SetupTwoDependentTextures(
   glBindTexture(GL_TEXTURE_2D, this->AlphaLookupIndex);   
 }
 
-void vtkMitkOpenGLVolumeTextureMapper3D::RenderTwoDependentNoShadeNV(
-  vtkRenderer *ren,
-  vtkVolume *vol )
-{
-  //GPU_INFO << "RenderTwoDependentNoShadeNV";
-
-  this->SetupTwoDependentTextures(ren, vol);
-  
-  // Start the timer now
-  this->Timer->StartTimer();
-  
-  this->SetupRegisterCombinersNoShadeNV( ren, vol, 2 );
-  
-  int stages[4] = {1,0,0,0};
-  this->RenderPolygons( ren, vol, stages );  
-}
-
-void vtkMitkOpenGLVolumeTextureMapper3D::RenderTwoDependentShadeNV(
-  vtkRenderer *ren,
-  vtkVolume *vol )
-{
-  //GPU_INFO << "RenderTwoDependentShadeNV";
- 
-  this->SetupTwoDependentTextures( ren, vol );
-  
-  // Start the timer now
-  this->Timer->StartTimer();
-  
-  this->SetupRegisterCombinersShadeNV( ren, vol, 2 );
-  
-  int stages[4] = {1,0,1,0};
-  this->RenderPolygons( ren, vol, stages );  
-}
 
 void vtkMitkOpenGLVolumeTextureMapper3D::SetupFourDependentTextures(
   vtkRenderer *vtkNotUsed(ren),
@@ -1346,29 +881,14 @@ void vtkMitkOpenGLVolumeTextureMapper3D::SetupFourDependentTextures(
   vtkgl::ActiveTexture( vtkgl::TEXTURE0 );
   glDisable( GL_TEXTURE_2D );
   glEnable( vtkgl::TEXTURE_3D );
-  if ( this->RenderMethod == vtkMitkVolumeTextureMapper3D::NVIDIA_METHOD )
-    {
-    glEnable( vtkgl::TEXTURE_SHADER_NV );
-    glTexEnvi(vtkgl::TEXTURE_SHADER_NV, vtkgl::SHADER_OPERATION_NV, vtkgl::TEXTURE_3D);
-    }
 
   vtkgl::ActiveTexture( vtkgl::TEXTURE1 );
   glDisable( GL_TEXTURE_2D );
   glEnable( vtkgl::TEXTURE_3D );
-  if ( this->RenderMethod == vtkMitkVolumeTextureMapper3D::NVIDIA_METHOD )
-    {
-    glEnable( vtkgl::TEXTURE_SHADER_NV );
-    glTexEnvi(vtkgl::TEXTURE_SHADER_NV, vtkgl::SHADER_OPERATION_NV, vtkgl::TEXTURE_3D);
-    }
 
   vtkgl::ActiveTexture( vtkgl::TEXTURE2 );
   glDisable( GL_TEXTURE_2D );
   glEnable( vtkgl::TEXTURE_3D );
-  if ( this->RenderMethod == vtkMitkVolumeTextureMapper3D::NVIDIA_METHOD )
-    {
-    glEnable( vtkgl::TEXTURE_SHADER_NV );  
-    glTexEnvi(vtkgl::TEXTURE_SHADER_NV, vtkgl::SHADER_OPERATION_NV, vtkgl::TEXTURE_3D);
-    }
 
   // Update the volume containing the 3 byte scalars / gradient magnitude
   if ( this->UpdateVolumes( vol ) || !this->Volume1Index || 
@@ -1418,13 +938,6 @@ void vtkMitkOpenGLVolumeTextureMapper3D::SetupFourDependentTextures(
   vtkgl::ActiveTexture( vtkgl::TEXTURE3 );
   glEnable( GL_TEXTURE_2D );
   glDisable( vtkgl::TEXTURE_3D );
-  if ( this->RenderMethod == vtkMitkVolumeTextureMapper3D::NVIDIA_METHOD )
-    {
-    glTexEnvf ( vtkgl::TEXTURE_SHADER_NV, vtkgl::SHADER_OPERATION_NV, 
-                vtkgl::DEPENDENT_AR_TEXTURE_2D_NV );
-    glTexEnvi(vtkgl::TEXTURE_SHADER_NV, vtkgl::PREVIOUS_TEXTURE_INPUT_NV,
-              vtkgl::TEXTURE1);
-    }
 
   // Update the dependent 2D table mapping scalar value and
   // gradient magnitude to opacity
@@ -1443,46 +956,14 @@ void vtkMitkOpenGLVolumeTextureMapper3D::SetupFourDependentTextures(
     glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP );
     glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP );
 
+    //LOG_INFO << "uploading transferfunction";
+
     glTexImage2D(GL_TEXTURE_2D,0,this->InternalAlpha, 256, 256, 0,
                  GL_ALPHA, GL_UNSIGNED_BYTE, this->AlphaLookup );      
     }
 
   vtkgl::ActiveTexture( vtkgl::TEXTURE3 );
   glBindTexture(GL_TEXTURE_2D, this->AlphaLookupIndex);   
-}
-
-void vtkMitkOpenGLVolumeTextureMapper3D::RenderFourDependentNoShadeNV(
-  vtkRenderer *ren,
-  vtkVolume *vol )
-{
-  //GPU_INFO << "RenderFourDependentNoShadeNV";
-
-  this->SetupFourDependentTextures(ren, vol);
-  
-  // Start the timer now
-  this->Timer->StartTimer();
-  
-  this->SetupRegisterCombinersNoShadeNV( ren, vol, 4 );
-  
-  int stages[4] = {1,1,0,0};
-  this->RenderPolygons( ren, vol, stages );  
-}
-
-void vtkMitkOpenGLVolumeTextureMapper3D::RenderFourDependentShadeNV(
-  vtkRenderer *ren,
-  vtkVolume *vol )
-{
-  //GPU_INFO << "RenderFourDependentShadeNV";
-
-  this->SetupFourDependentTextures( ren, vol );
-  
-  // Start the timer now
-  this->Timer->StartTimer();
-  
-  this->SetupRegisterCombinersShadeNV( ren, vol, 4 );
-  
-  int stages[4] = {1,1,1,0};
-  this->RenderPolygons( ren, vol, stages );  
 }
 
 void vtkMitkOpenGLVolumeTextureMapper3D::RenderOneIndependentNoShadeFP(
@@ -1980,7 +1461,7 @@ int  vtkMitkOpenGLVolumeTextureMapper3D::IsRenderSupported(
     this->Initialize();
     }
   
-  if ( this->RenderMethod == vtkMitkVolumeTextureMapper3D::NO_METHOD )
+  if ( !this->RenderPossible )
     {
     return 0;
     }
@@ -2179,46 +1660,9 @@ void vtkMitkOpenGLVolumeTextureMapper3D::Initialize()
   
       GPU_WARN << errString;
     };
-  
-  /*
-  if ( !brokenMesa &&
-       supports_texture3D          &&
-       supports_multitexture       &&
-       supports_GL_NV_texture_shader2     &&
-       supports_GL_NV_register_combiners2 &&
-       supports_GL_NV_register_combiners  &&
-       vtkgl::TexImage3D               &&
-       vtkgl::ActiveTexture            &&
-       vtkgl::MultiTexCoord3fv         &&
-       vtkgl::CombinerParameteriNV        &&
-       vtkgl::CombinerStageParameterfvNV  &&
-       vtkgl::CombinerInputNV             &&
-       vtkgl::CombinerOutputNV            &&
-       vtkgl::FinalCombinerInputNV )
-    {
-    canDoNV = 1;
-    }
-    */
-  // can't do either
-  if ( !canDoFP && !canDoNV )
-    {
-    this->RenderMethod = vtkMitkVolumeTextureMapper3D::NO_METHOD;
-    }
-  // can only do FragmentProgram
-  else if ( canDoFP && !canDoNV )
-    {
-    this->RenderMethod = vtkMitkVolumeTextureMapper3D::FRAGMENT_PROGRAM_METHOD;  
-    }
-  // can only do NVidia method
-  else if ( !canDoFP && canDoNV )
-    {
-    this->RenderMethod = vtkMitkVolumeTextureMapper3D::NVIDIA_METHOD;
-    }
-  // can do both - pick the preferred one
-  else
-    {
-    this->RenderMethod = this->PreferredRenderMethod;
-    }
+
+  this->RenderPossible=canDoFP;  
+
 }
 
 // ----------------------------------------------------------------------------

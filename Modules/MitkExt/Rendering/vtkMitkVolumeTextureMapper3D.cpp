@@ -81,12 +81,8 @@ void vtkVolumeTextureMapper3DComputeScalars( T *dataPtr,
   double inputSpacing[3];
   vtkImageData *input = me->GetInput();
 
-  //GPU_INFO << input->GetMTime();
-
   input->GetDimensions( inputDimensions );
   input->GetSpacing( inputSpacing );
-
-  //GPU_INFO << input->GetMTime();
 
   int   outputDimensions[3];
   float outputSpacing[3];
@@ -94,9 +90,6 @@ void vtkVolumeTextureMapper3DComputeScalars( T *dataPtr,
   me->GetVolumeSpacing( outputSpacing );
 
   int components = input->GetNumberOfScalarComponents();
-
-  //GPU_INFO << input->GetMTime();
-
 
   double wx, wy, wz;
   double fx, fy, fz;
@@ -107,132 +100,126 @@ void vtkVolumeTextureMapper3DComputeScalars( T *dataPtr,
   sampleRate[1] = outputSpacing[1] / static_cast<double>(inputSpacing[1]);
   sampleRate[2] = outputSpacing[2] / static_cast<double>(inputSpacing[2]);
 
-  // This is the case where no interpolation is needed
-  if ( inputDimensions[0] == outputDimensions[0] &&
-       inputDimensions[1] == outputDimensions[1] &&
-       inputDimensions[2] == outputDimensions[2] )
+  int fullX = outputDimensions[0];
+  int fullY = outputDimensions[1];
+  int fullZ = outputDimensions[2];
+
+  int sizeX = inputDimensions[0];
+  int sizeY = inputDimensions[1];
+  int sizeZ = inputDimensions[2];
+
+  inPtr = dataPtr;
+
+  if ( components == 1 )
+  {
+    LOG_INFO << "converting image data (1 component)";
+    
+    outPtr = volume1;
+
+    for(z=0;z<sizeZ;z++)
     {
-    int size = outputDimensions[0] * outputDimensions[1] * outputDimensions[2];
-
-    inPtr = dataPtr;
-    if ( components == 1 )
+      for(y=0;y<sizeY;y++)
       {
-      //GPU_INFO << "copying 1 component to volume1";
-      outPtr = volume1;
-      if ( scale == 1.0 )
+        for(x=0;x<sizeX;x++)
         {
-        for ( i = 0; i < size; i++ )
-          {
-          idx = static_cast<int>(*(inPtr++) + offset);
-          *(outPtr++) = 0;
-          *(outPtr++) = idx;
-          }
-        }
-      else
-        {
-        for ( i = 0; i < size; i++ )
-          {
           idx = static_cast<int>((*(inPtr++) + offset) * scale);
           *(outPtr++) = 0;
           *(outPtr++) = idx;
-          }
+        }
+        for(   ;x<fullX;x++)
+        {
+          *(outPtr++) = 0;
+          *(outPtr++) = 0;
         }
       }
-    else if ( components == 2 )
+      for(   ;y<fullY;y++)
       {
-      //GPU_INFO << "copying 2 component to volume1";
-
-      outPtr = volume1;
-      if ( scale == 1.0 )
+        for(x=0;x<fullX;x++)
         {
-        for ( i = 0; i < size; i++ )
-          {
-          idx = static_cast<int>(*(inPtr++) + offset);
-          *(outPtr++) = idx;
-
           *(outPtr++) = 0;
-
-          idx = static_cast<int>(*(inPtr++) + offset);
-          *(outPtr++) = idx;
-          }
-        }
-      else
-        {
-        for ( i = 0; i < size; i++ )
-          {
-          idx = static_cast<int>((*(inPtr++) + offset) * scale);
-          *(outPtr++) = idx;
-
           *(outPtr++) = 0;
-
-          idx = static_cast<int>((*(inPtr++) + offset) * scale);
-          *(outPtr++) = idx;
-          }
-        }
-      }
-    else if ( components == 4 )
-      {
-      //GPU_INFO << "copying 4 component to volume1/2";
-
-      outPtr = volume1;
-      outPtr2 = volume2;
-      if ( scale == 1.0 )
-        {
-        for ( i = 0; i < size; i++ )
-          {
-          idx = static_cast<int>(*(inPtr++) + offset);
-          *(outPtr++) = idx;
-          idx = static_cast<int>(*(inPtr++) + offset);
-          *(outPtr++) = idx;
-          idx = static_cast<int>(*(inPtr++) + offset);
-          *(outPtr++) = idx;
-
-          *(outPtr2++) = 0;
-          idx = static_cast<int>(*(inPtr++) + offset);
-          *(outPtr2++) = idx;
-          }
-        }
-      else
-        {
-        for ( i = 0; i < size; i++ )
-          {
-          idx = static_cast<int>((*(inPtr++) + offset) * scale);
-          *(outPtr++) = idx;
-          idx = static_cast<int>((*(inPtr++) + offset) * scale);
-          *(outPtr++) = idx;
-          idx = static_cast<int>((*(inPtr++) + offset) * scale);
-          *(outPtr++) = idx;
-
-          *(outPtr2++) = 0;
-          idx = static_cast<int>((*(inPtr++) + offset) * scale);
-          *(outPtr2++) = idx;
-          }
         }
       }
     }
+    for(   ;z<fullZ;z++)
+    {
+      for(y=0;y<fullY;y++)
+      {
+        for(x=0;x<fullX;x++)
+        {
+          *(outPtr++) = 0;
+          *(outPtr++) = 0;
+        }
+      }
+    }
+
+    LOG_INFO << "converting finished";
+  }
+    
+  
+    /*
+    if ( components == 2 )
+    {
+      LOG_INFO << "converting image data (2 components)";
+      outPtr = volume1;
+      for ( i = 0; i < size; i++ )
+        {
+        idx = static_cast<int>((*(inPtr++) + offset) * scale);
+        *(outPtr++) = idx;
+
+        *(outPtr++) = 0;
+
+        idx = static_cast<int>((*(inPtr++) + offset) * scale);
+        *(outPtr++) = idx;
+        }
+      }
+    }
+    else if ( components == 4 )
+    {
+      LOG_INFO << "converting image data (4 components)";
+
+      outPtr = volume1;
+      outPtr2 = volume2;
+
+      for ( i = 0; i < size; i++ )
+        {
+        idx = static_cast<int>((*(inPtr++) + offset) * scale);
+        *(outPtr++) = idx;
+        idx = static_cast<int>((*(inPtr++) + offset) * scale);
+        *(outPtr++) = idx;
+        idx = static_cast<int>((*(inPtr++) + offset) * scale);
+        *(outPtr++) = idx;
+
+        *(outPtr2++) = 0;
+        idx = static_cast<int>((*(inPtr++) + offset) * scale);
+        *(outPtr2++) = idx;
+        }
+        }
+      }
+    }
+    
   // The sizes are different and interpolation is required
   else
-    {
-      //GPU_INFO << "interpolating";
-
+  {
+    LOG_INFO << "rescaling image data (" << components << " components)";
     
     outPtr  = volume1;
     outPtr2 = volume2;
  
     for ( k = 0; k < outputDimensions[2]; k++ )
-      {
+    {
       fz = k * sampleRate[2];
       fz = (fz >= inputDimensions[2]-1)?(inputDimensions[2]-1.001):(fz);
       z  = vtkMath::Floor( fz );
       wz = fz - z;
       for ( j = 0; j < outputDimensions[1]; j++ )
-        {
+      {
         fy = j * sampleRate[1];
         fy = (fy >= inputDimensions[1]-1)?(inputDimensions[1]-1.001):(fy);
         y  = vtkMath::Floor( fy );
         wy = fy - y;
         for ( i = 0; i < outputDimensions[0]; i++ )
-          {
+        {
           fx = i * sampleRate[0];
           fx = (fx >= inputDimensions[0]-1)?(inputDimensions[0]-1.001):(fx);
           x  = vtkMath::Floor( fx );
@@ -244,7 +231,7 @@ void vtkVolumeTextureMapper3DComputeScalars( T *dataPtr,
                                      x );
           
           if ( components == 1 )
-            {
+          {
             float A, B, C, D, E, F, G, H;
             A = static_cast<float>(*(inPtr));
             B = static_cast<float>(*(inPtr+1));
@@ -318,9 +305,9 @@ void vtkVolumeTextureMapper3DComputeScalars( T *dataPtr,
 
             idx = static_cast<int>((val2 + offset) * scale);
             *(outPtr++) = idx;
-            }
+          }
           else 
-            {
+          {
             float Ar, Br, Cr, Dr, Er, Fr, Gr, Hr;
             float Ag, Bg, Cg, Dg, Eg, Fg, Gg, Hg;
             float Ab, Bb, Cb, Db, Eb, Fb, Gb, Hb;
@@ -412,11 +399,13 @@ void vtkVolumeTextureMapper3DComputeScalars( T *dataPtr,
           }
         }
       }
+    
+    
+    
     }
 
 
-             
-  //GPU_INFO << input->GetMTime();
+                */
 
 }
 
@@ -451,20 +440,13 @@ void vtkVolumeTextureMapper3DComputeGradients( T *dataPtr,
   double              floc[3];
   int                 loc[3];
 
-//  me->InvokeEvent( vtkEvent::VolumeMapperComputeGradientsStartEvent, NULL );
-
-
   float outputSpacing[3];
   me->GetVolumeSpacing( outputSpacing );
 
   double spacing[3];
   vtkImageData *input = me->GetInput();
 
-  //GPU_INFO << input->GetMTime();
-
   input->GetSpacing( spacing );
-
-  //GPU_INFO << input->GetMTime();
 
   double sampleRate[3];
   sampleRate[0] = outputSpacing[0] / static_cast<double>(spacing[0]);
@@ -515,9 +497,6 @@ void vtkVolumeTextureMapper3DComputeGradients( T *dataPtr,
   y_limit = (y_limit>dim[1])?(outputDim[1]):(y_limit);
   z_limit = (z_limit>dim[2])?(outputDim[2]):(z_limit);
 
-  //GPU_INFO << input->GetMTime();
-
-
   if ( components == 1 || components == 2 )
     {
     normals = volume2;
@@ -534,6 +513,8 @@ void vtkVolumeTextureMapper3DComputeGradients( T *dataPtr,
     }
 
   double wx, wy, wz;
+
+  LOG_INFO << "computing gradient";
 
   // Loop through all the data and compute the encoded normal and
   // gradient magnitude for each scalar location
@@ -673,8 +654,7 @@ void vtkVolumeTextureMapper3DComputeGradients( T *dataPtr,
     }
 //  me->InvokeEvent( vtkEvent::VolumeMapperComputeGradientsEndEvent, NULL );
 
-
-  //GPU_INFO << input->GetMTime();
+  LOG_INFO << "computing gradient finished";
 }
 
 
@@ -714,10 +694,6 @@ vtkMitkVolumeTextureMapper3D::vtkMitkVolumeTextureMapper3D()
   
   this->SampleDistance                = 1.0;
   this->ActualSampleDistance          = 1.0;
-  
-  this->RenderMethod                  = vtkMitkVolumeTextureMapper3D::NO_METHOD;
-  this->PreferredRenderMethod         =
-    vtkMitkVolumeTextureMapper3D::FRAGMENT_PROGRAM_METHOD;
   
   this->UseCompressedTexture          = false;
   this->SupportsNonPowerOfTwoTextures = false;
@@ -1112,36 +1088,25 @@ int vtkMitkVolumeTextureMapper3D::UpdateVolumes(vtkVolume *vtkNotUsed(vol))
   //GPU_INFO << "np2: " << (this->SupportsNonPowerOfTwoTextures?1:0);
   
   if(this->SupportsNonPowerOfTwoTextures)
-    {
-      //GPU_INFO << "Using NP2 partly...";
-    
-    
-     for ( int i = 0; i < 3; i++ )
-       {
-       powerOfTwoDim[i]=(dim[i]+3)&~3;
-       }
-    
-  
-    
-  //    powerOfTwoDim[0] = 32; while ( powerOfTwoDim[0] < dim[0] ) powerOfTwoDim[0] *= 2;
-  //    powerOfTwoDim[1] = 32; while ( powerOfTwoDim[1] < dim[1] ) powerOfTwoDim[1] *= 2;
- //     powerOfTwoDim[2] = 32; while ( powerOfTwoDim[2] < dim[2] ) powerOfTwoDim[2] *= 2;
-    
-    
-    }
-  else
-    {
-      //GPU_INFO << "Using P2";
-
+  {
+    LOG_INFO << "using non-power-two textures";
+     
     for ( int i = 0; i < 3; i++ )
-      {
+    {
+      powerOfTwoDim[i]=(dim[i]+1)&~1;
+    }
+  }
+  else
+  {
+    for ( int i = 0; i < 3; i++ )
+    {
       powerOfTwoDim[i] = 32;
       while ( powerOfTwoDim[i] < dim[i] )
-        {
         powerOfTwoDim[i] *= 2;
-        }
-      }
     }
+
+    LOG_INFO << "using power-two textures (" << (1.0-double(dim[0]*dim[1]*dim[2])/double(powerOfTwoDim[0]*powerOfTwoDim[1]*powerOfTwoDim[2])) * 100.0 << "% memory wasted)";
+  }
  
   while ( ! this->IsTextureSizeSupported( powerOfTwoDim,components ) )
     {
@@ -1582,8 +1547,6 @@ void vtkMitkVolumeTextureMapper3D::PrintSelf(ostream& os, vtkIndent indent)
   this->Superclass::PrintSelf(os,indent);
 
   os << indent << "Sample Distance: " << this->SampleDistance << endl;
-  os << indent << "Render Method: " << this->RenderMethod << endl;
-  os << indent << "Preferred Render Method: " << this->PreferredRenderMethod << endl;
   os << indent << "NumberOfPolygons: " << this->NumberOfPolygons << endl;
   os << indent << "ActualSampleDistance: " 
      << this->ActualSampleDistance << endl;

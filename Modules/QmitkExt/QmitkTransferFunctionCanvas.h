@@ -86,7 +86,7 @@ class QMITKEXT_EXPORT SimpleHistogram
   int GetMax()
   {
     if(!valid)
-      return 0;
+      return 1;
       
     return max;
   }

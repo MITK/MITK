@@ -26,6 +26,14 @@
 void mitk::SimpleHistogram::ComputeFromImage( Image::Pointer source )
 {
   valid = false;
+
+  // dummy histogram
+  {
+    min=0;
+    max=1;
+    first=0;
+    last=1;
+  }
   
   //LOG_INFO << "SimpleHistogram: ComputeFromImage started";
   

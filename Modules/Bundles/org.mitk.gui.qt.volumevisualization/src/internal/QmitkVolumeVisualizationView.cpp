@@ -108,7 +108,7 @@ void QmitkVolumeVisualizationView::SelectionChanged( cherry::IWorkbenchPart::Poi
       {
         mitk::DataTreeNode::Pointer node = _DataTreeNodeObject->GetDataTreeNode();
       
-        if( node.IsNotNull() && dynamic_cast<mitk::Image*>(node->GetData())&&dynamic_cast<mitk::Image*>(node->GetData())->GetDimension()==3   )
+        if( node.IsNotNull() && dynamic_cast<mitk::Image*>(node->GetData())&&dynamic_cast<mitk::Image*>(node->GetData())->GetDimension()>=3   )
          {
           selectedNodes.push_back( node );
          }
@@ -118,10 +118,10 @@ void QmitkVolumeVisualizationView::SelectionChanged( cherry::IWorkbenchPart::Poi
           m_Controls->m_ErrorImageLabel->show();
      
           std::string  infoText;
-            
+          /* 
           if (dynamic_cast<mitk::Image*>(node->GetData())->GetDimension()>3 )
             infoText = std::string("4D images are not supported");
-          else
+          else    */
             infoText = std::string("2D images are not supported");
            
           m_Controls->m_ErrorImageLabel->setText( QString( infoText.c_str() ) ); 

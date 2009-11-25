@@ -1,5 +1,5 @@
 Manifest-Version: 1.0
-Bundle-Name: QmitkRigidRegistration 
+Bundle-Name: RigidRegistration 
 Bundle-SymbolicName: org.mitk.gui.qt.rigidregistration 
 Bundle-Version: 0.1
 Bundle-Vendor: DKFZ, Medical and Biological Informatics

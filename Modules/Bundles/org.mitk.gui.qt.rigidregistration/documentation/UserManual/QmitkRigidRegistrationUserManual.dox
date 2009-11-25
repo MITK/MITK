@@ -1,13 +1,5 @@
 /**
-\page QmitkRigidRegistrationUserManual The Rigid Registration Module
-
-Available sections:
-  - \ref QmitkRigidRegistrationUserManualOverview 
-  - \ref QmitkRigidRegistrationUserManualIssues 
-  - \ref QmitkRigidRegistrationUserManualDetails
-  - \ref QmitkRigidRegistrationUserManualReferences 
-
-\section QmitkRigidRegistrationUserManualOverview Overview
+\mainpage RigidRegistrationUserManual The Rigid Registration Module
 
 This module allows you to register 2D as well as 3D images in a rigid manner. If the Moving Image is an image with multiple timesteps you can select one timestep for registration. 
 Register means to align two images, so that they become as similar as possible. Therefore you can select from different transforms, metrics and optimizers. Registration results will 
@@ -16,7 +8,14 @@ directly be applied to the Moving Image. Also binary images as image masks can b
 \image html RigidRegistration_small.png "MITK with the QmitkRigidRegistration module"
 
 This document will tell you how to use this module, but it is assumed that you already know how to navigate through the slices of an image using the
-multi-widget.
+multi-widget. See \ref QmitkRigidRegistrationUserManual for more information.
+
+Available sections:
+  - \ref QmitkRigidRegistrationUserManualIssues 
+  - \ref QmitkRigidRegistrationUserManualDetails
+  - \ref QmitkRigidRegistrationUserManualReferences 
+
+\page QmitkRigidRegistrationUserManual User Manual
 
 \section QmitkRigidRegistrationUserManualIssues Known Issues
 

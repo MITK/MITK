@@ -1,21 +1,20 @@
 /**
-\page QmitkDeformableRegistrationUserManual The Deformable Registration Module
-
-Available sections:
-  - \ref QmitkDeformableRegistrationUserManualOverview 
-  - \ref QmitkDeformableRegistrationUserManualDetails 
-
-\section QmitkDeformableRegistrationUserManualOverview Overview
+\mainpage The Deformable Image Registration Module
 
 This module allows you to register 2D as well as 3D images in a deformable manner. Register means to align two images, so that they become as similar as
 possible. Registration results will directly be applied to the Moving Image.
 
-\image html QmitkDeformableRegistration_small.png "MITK with the QmitkDeformableRegistration module"
+\image html QmitkDeformableRegistration_small.png "MITK with the DeformableRegistration module"
 
 This document will tell you how to use this module, but it is assumed that you already know how to navigate through the slices of an image using the
-multi-widget.
+multi-widget. See \ref DeformableRegistrationUserManual for more information.
 
-\section QmitkDeformableRegistrationUserManualDetails Details
+Available sections:
+  - \ref DeformableRegistrationUserManualDetails
+
+\page DeformableRegistrationUserManual User Manual
+
+\section DeformableRegistrationUserManualDetails Details
 
 First of all you have to open the data sets which you want to register and select them in the Data Manager. You have to select exactly 2 images for registration. The image which was selected 
 first will become the fixed image, the other one the moving image. The two selected images will remain for registration until exactly two images were selected in the Data Manager again. While 

@@ -335,7 +335,7 @@ void QmitkDeformableRegistrationView::Deactivated()
   cherry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
   if(s)
     s->RemovePostSelectionListener(m_SelListener);
-  
+  m_SelListener = NULL;
 }
 
 void QmitkDeformableRegistrationView::Hidden()

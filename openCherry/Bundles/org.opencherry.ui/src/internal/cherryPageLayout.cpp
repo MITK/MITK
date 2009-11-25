@@ -607,7 +607,7 @@ void PageLayout::AddStandaloneViewPlaceholder(const std::string& viewId,
   }
 
   // Create the folder.
-  ContainerPlaceholder::Pointer folder(new ContainerPlaceholder(viewId));
+  ContainerPlaceholder::Pointer folder(new ContainerPlaceholder(""));
   folder->SetContainer(rootLayoutContainer);
   int appearance = PresentationFactoryUtil::ROLE_STANDALONE;
   if (!showTitle)

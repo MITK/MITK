@@ -56,9 +56,9 @@ namespace Functor {
       vnl_vector_fixed<double,3> dir = OdfType::GetDirection(pd);
       
       const float fa = odf.GetGeneralizedFractionalAnisotropy();
-      float r = abs(dir[0]) * fa;
-      float g = abs(dir[1]) * fa;
-      float b = abs(dir[2]) * fa;
+      float r = fabs(dir[0]) * fa;
+      float g = fabs(dir[1]) * fa;
+      float b = fabs(dir[2]) * fa;
 
       __IMG_DAT_ITEM__CEIL_ZERO_ONE__(r);
       __IMG_DAT_ITEM__CEIL_ZERO_ONE__(g);

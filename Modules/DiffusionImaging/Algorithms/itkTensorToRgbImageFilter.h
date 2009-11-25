@@ -58,9 +58,9 @@ namespace Functor {
         index = 1;
 
       const float fa = x.GetFractionalAnisotropy();
-      float r = abs(eigenvectors(index,0)) * fa;
-      float g = abs(eigenvectors(index,1)) * fa;
-      float b = abs(eigenvectors(index,2)) * fa;
+      float r = fabs(eigenvectors(index,0)) * fa;
+      float g = fabs(eigenvectors(index,1)) * fa;
+      float b = fabs(eigenvectors(index,2)) * fa;
 
       __IMG_DAT_ITEM__CEIL_ZERO_ONE__(r);
       __IMG_DAT_ITEM__CEIL_ZERO_ONE__(g);

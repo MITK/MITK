@@ -296,8 +296,8 @@ void QmitkMeasurement::SelectionChanged(
     else if ((selectedImage = dynamic_cast<mitk::Image *> (_BaseData)))
     {
       *m_SelectedImageNode = _DataTreeNode;
-      mitk::RenderingManager::GetInstance()->InitializeViews(
-        selectedImage->GetTimeSlicedGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
+      /*mitk::RenderingManager::GetInstance()->InitializeViews(
+        selectedImage->GetTimeSlicedGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );*/
     }
   } // end for
 
@@ -510,8 +510,8 @@ void QmitkMeasurement::AddFigureToDataStorage(mitk::PlanarFigure* figure, const 
   this->GetDataStorage()->Add(newNode, m_SelectedImageNode->GetNode());
 
   *m_SelectedPlanarFigures = m_CurrentFigureNode;
-  m_SelectionProvider->FireSelectionChanged(
-      mitk::DataTreeNodeSelection::Pointer(new mitk::DataTreeNodeSelection(m_CurrentFigureNode.GetPointer())));
+  //m_SelectionProvider->FireSelectionChanged(
+      //mitk::DataTreeNodeSelection::Pointer(new mitk::DataTreeNodeSelection(m_CurrentFigureNode.GetPointer())));
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
@@ -633,7 +633,7 @@ void QmitkMeasurement::ActionDrawTextTriggered(bool checked)
 void QmitkMeasurement::Activated()
 {
   this->GetActiveStdMultiWidget()->SetWidgetPlanesVisibility(false);
-  this->GetActiveStdMultiWidget()->GetRenderWindow1()->FullScreenMode(true);
+  //this->GetActiveStdMultiWidget()->GetRenderWindow1()->FullScreenMode(true);
 
   mitk::TNodePredicateDataType<mitk::PlanarFigure>::Pointer isPlanarFigure
     = mitk::TNodePredicateDataType<mitk::PlanarFigure>::New();
@@ -666,7 +666,7 @@ void QmitkMeasurement::Activated()
 void QmitkMeasurement::Deactivated()
 {
   this->GetActiveStdMultiWidget()->SetWidgetPlanesVisibility(true);
-  this->GetActiveStdMultiWidget()->GetRenderWindow1()->FullScreenMode(false);
+  //this->GetActiveStdMultiWidget()->GetRenderWindow1()->FullScreenMode(false);
   this->SetMeasurementInfoToRenderWindow("", 0);
 
   mitk::DataStorage::SetOfObjects::ConstPointer _NodeSet = this->GetDefaultDataStorage()->GetAll();

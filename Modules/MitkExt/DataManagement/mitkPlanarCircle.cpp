@@ -96,11 +96,11 @@ void mitk::PlanarCircle::GeneratePolyLine()
 
   double radius = centerPoint.EuclideanDistanceTo( boundaryPoint );
 
-  // Generate poly-line with 256 segments
-  m_PolyLines->ElementAt( 0 )->Reserve( 256 );
-  for ( int t = 0; t < 256; ++t )
+  // Generate poly-line with 64 segments
+  m_PolyLines->ElementAt( 0 )->Reserve( 64 );
+  for ( int t = 0; t < 64; ++t )
   {
-    double alpha = (double) t * vnl_math::pi / 128.0;
+    double alpha = (double) t * vnl_math::pi / 32.0;
 
     m_PolyLines->ElementAt( 0 )->ElementAt( t )[0] = centerPoint[0] + radius * cos( alpha );
     m_PolyLines->ElementAt( 0 )->ElementAt( t )[1] = centerPoint[1] + radius * sin( alpha );

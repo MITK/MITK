@@ -42,10 +42,10 @@ QmitkImageNavigatorView::QmitkImageNavigatorView()
 
 QmitkImageNavigatorView::~QmitkImageNavigatorView()
 {
-  delete m_TransversalStepper;
-  delete m_SagittalStepper;
-  delete m_FrontalStepper;
-  delete m_TimeStepper;
+  //delete m_TransversalStepper;
+  //delete m_SagittalStepper;
+  //delete m_FrontalStepper;
+  //delete m_TimeStepper;
 }
 
 void QmitkImageNavigatorView::CreateQtPartControl(QWidget *parent)

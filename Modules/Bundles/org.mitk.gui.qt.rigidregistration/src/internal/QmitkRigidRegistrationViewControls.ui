@@ -256,6 +256,13 @@
                 </widget>
                </item>
                <item>
+                <widget class="QLabel" name="label">
+                 <property name="text">
+                  <string>0%</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
                 <widget class="QSlider" name="m_OpacitySlider">
                  <property name="sizePolicy">
                   <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
@@ -271,6 +278,13 @@
                  </property>
                  <property name="orientation">
                   <enum>Qt::Horizontal</enum>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLabel" name="label_2">
+                 <property name="text">
+                  <string>100%</string>
                  </property>
                 </widget>
                </item>

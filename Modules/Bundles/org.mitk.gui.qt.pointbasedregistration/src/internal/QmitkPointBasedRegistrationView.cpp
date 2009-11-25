@@ -90,6 +90,8 @@ struct SelListenerPointBasedRegistration : ISelectionListener
           m_View->m_Controls.m_MovingPointListWidget->hide();
           m_View->m_Controls.m_OpacityLabel->hide();
           m_View->m_Controls.m_OpacitySlider->hide();
+          m_View->m_Controls.label->hide();
+          m_View->m_Controls.label_2->hide();
           m_View->m_Controls.m_SwitchImages->hide();
           m_View->m_Controls.m_ShowRedGreenValues->setEnabled(false);
         }
@@ -223,6 +225,8 @@ void QmitkPointBasedRegistrationView::CreateQtPartControl(QWidget* parent)
   m_Controls.m_MovingPointListWidget->hide();
   m_Controls.m_OpacityLabel->hide();
   m_Controls.m_OpacitySlider->hide();
+  m_Controls.label->hide();
+  m_Controls.label_2->hide();
   m_Controls.m_SwitchImages->hide();
   m_Controls.m_ShowRedGreenValues->setEnabled(false);
 
@@ -358,6 +362,8 @@ void QmitkPointBasedRegistrationView::Deactivated()
   m_Controls.m_MovingPointListWidget->hide();
   m_Controls.m_OpacityLabel->hide();
   m_Controls.m_OpacitySlider->hide();
+  m_Controls.label->hide();
+  m_Controls.label_2->hide();
   m_Controls.m_SwitchImages->hide();
   cherry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
   if(s)
@@ -413,6 +419,8 @@ void QmitkPointBasedRegistrationView::Hidden()
   m_Controls.m_MovingPointListWidget->hide();
   m_Controls.m_OpacityLabel->hide();
   m_Controls.m_OpacitySlider->hide();
+  m_Controls.label->hide();
+  m_Controls.label_2->hide();
   m_Controls.m_SwitchImages->hide();
   cherry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
   if(s)
@@ -542,6 +550,8 @@ void QmitkPointBasedRegistrationView::MovingSelected(mitk::DataTreeNode::Pointer
       m_Controls.m_MovingPointListWidget->show();
       m_Controls.m_OpacityLabel->show();
       m_Controls.m_OpacitySlider->show();
+      m_Controls.label->show();
+      m_Controls.label_2->show();
       mitk::ColorProperty::Pointer colorProperty;
       colorProperty = dynamic_cast<mitk::ColorProperty*>(m_MovingNode->GetProperty("color"));
       if ( colorProperty.IsNotNull() )
@@ -599,6 +609,8 @@ void QmitkPointBasedRegistrationView::MovingSelected(mitk::DataTreeNode::Pointer
     m_Controls.m_MovingPointListWidget->hide();
     m_Controls.m_OpacityLabel->hide();
     m_Controls.m_OpacitySlider->hide();
+    m_Controls.label->hide();
+    m_Controls.label_2->hide();
   }
   if(m_MovingLandmarks.IsNotNull())
     m_CurrentMovingLandmarksObserverID = m_MovingLandmarks->AddObserver(itk::ModifiedEvent(), m_MovingLandmarksChangedCommand);

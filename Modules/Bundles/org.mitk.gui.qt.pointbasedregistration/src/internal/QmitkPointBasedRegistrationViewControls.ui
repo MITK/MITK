@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>287</width>
-    <height>375</height>
+    <height>404</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -221,6 +221,19 @@
          </widget>
         </item>
         <item>
+         <widget class="QLabel" name="label">
+          <property name="font">
+           <font>
+            <weight>50</weight>
+            <bold>false</bold>
+           </font>
+          </property>
+          <property name="text">
+           <string>0%</string>
+          </property>
+         </widget>
+        </item>
+        <item>
          <widget class="QSlider" name="m_OpacitySlider">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
@@ -236,6 +249,19 @@
           </property>
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_2">
+          <property name="font">
+           <font>
+            <weight>50</weight>
+            <bold>false</bold>
+           </font>
+          </property>
+          <property name="text">
+           <string>100%</string>
           </property>
          </widget>
         </item>

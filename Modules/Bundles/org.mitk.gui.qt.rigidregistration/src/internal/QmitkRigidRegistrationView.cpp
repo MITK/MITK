@@ -69,6 +69,8 @@ struct SelListenerRigidRegistration : ISelectionListener
           m_View->m_Controls.m_MovingLabel->hide();
           m_View->m_Controls.m_OpacityLabel->setEnabled(false);
           m_View->m_Controls.m_OpacitySlider->setEnabled(false);
+          m_View->m_Controls.label->setEnabled(false);
+          m_View->m_Controls.label_2->setEnabled(false);
           m_View->m_Controls.m_ShowRedGreenValues->setEnabled(false);
           m_View->m_Controls.m_SwitchImages->hide();
         }
@@ -101,6 +103,8 @@ struct SelListenerRigidRegistration : ISelectionListener
                 m_View->MovingSelected(node);
                 m_View->m_Controls.m_OpacityLabel->setEnabled(true);
                 m_View->m_Controls.m_OpacitySlider->setEnabled(true);
+                m_View->m_Controls.label->setEnabled(true);
+                m_View->m_Controls.label_2->setEnabled(true);
                 m_View->m_Controls.m_ShowRedGreenValues->setEnabled(true);
               }
             }
@@ -178,6 +182,8 @@ void QmitkRigidRegistrationView::CreateQtPartControl(QWidget* parent)
   m_Controls.m_UseImageMasks->hide();
   m_Controls.m_OpacityLabel->setEnabled(false);
   m_Controls.m_OpacitySlider->setEnabled(false);
+  m_Controls.label->setEnabled(false);
+  m_Controls.label_2->setEnabled(false);
   m_Controls.m_ShowRedGreenValues->setEnabled(false);
   m_Controls.m_SwitchImages->hide();
   if (m_Controls.m_RigidTransform->currentIndex() == 1)

@@ -80,6 +80,8 @@ struct SelListenerDeformableRegistration : ISelectionListener
         m_View->m_Controls.m_MovingLabel->hide();
         m_View->m_Controls.m_OpacityLabel->setEnabled(false);
         m_View->m_Controls.m_OpacitySlider->setEnabled(false);
+        m_View->m_Controls.label->setEnabled(false);
+        m_View->m_Controls.label_2->setEnabled(false);
         m_View->m_Controls.m_ShowRedGreenValues->setEnabled(false);
       }
       else
@@ -110,6 +112,8 @@ struct SelListenerDeformableRegistration : ISelectionListener
                 m_View->MovingSelected(node);
                 m_View->m_Controls.m_OpacityLabel->setEnabled(true);
                 m_View->m_Controls.m_OpacitySlider->setEnabled(true);
+                m_View->m_Controls.label->setEnabled(true);
+                m_View->m_Controls.label_2->setEnabled(true);
                 m_View->m_Controls.m_ShowRedGreenValues->setEnabled(true);
               }
             }
@@ -175,6 +179,8 @@ void QmitkDeformableRegistrationView::CreateQtPartControl(QWidget* parent)
   m_Controls.m_MovingLabel->hide();
   m_Controls.m_OpacityLabel->setEnabled(false);
   m_Controls.m_OpacitySlider->setEnabled(false);
+  m_Controls.label->setEnabled(false);
+  m_Controls.label_2->setEnabled(false);
   m_Controls.m_ShowRedGreenValues->setEnabled(false);
   m_Controls.m_DeformableTransform->hide();
   if (m_Controls.m_DeformableTransform->currentIndex() == 0)

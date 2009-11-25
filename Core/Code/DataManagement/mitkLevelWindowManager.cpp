@@ -23,6 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkNodePredicateProperty.h"
 #include "mitkNodePredicateDataType.h"
 #include "mitkNodePredicateAND.h"
+#include "mitkNodePredicateOR.h"
 #include "mitkNodePredicateNOT.h"
 #include "mitkProperties.h"
 #include "mitkMessage.h"
@@ -264,12 +265,22 @@ mitk::DataStorage::SetOfObjects::ConstPointer mitk::LevelWindowManager::GetRelev
   mitk::NodePredicateProperty::Pointer isVisible = mitk::NodePredicateProperty::New("visible", mitk::BoolProperty::New(true));
   mitk::NodePredicateProperty::Pointer notBinary = mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(false));
   mitk::NodePredicateProperty::Pointer hasLevelWindow = mitk::NodePredicateProperty::New("levelwindow", NULL);
+  
   mitk::NodePredicateDataType::Pointer isImage = mitk::NodePredicateDataType::New("Image");
+  mitk::NodePredicateDataType::Pointer isDImage = mitk::NodePredicateDataType::New("DiffusionImage");
+  mitk::NodePredicateDataType::Pointer isTImage = mitk::NodePredicateDataType::New("TensorImage");
+  mitk::NodePredicateDataType::Pointer isQImage = mitk::NodePredicateDataType::New("QBallImage");
+  mitk::NodePredicateOR::Pointer predicateTypes = mitk::NodePredicateOR::New();
+  predicateTypes->AddPredicate(isImage);
+  predicateTypes->AddPredicate(isDImage);
+  predicateTypes->AddPredicate(isTImage);
+  predicateTypes->AddPredicate(isQImage);
+  
   mitk::NodePredicateAND::Pointer predicate = mitk::NodePredicateAND::New();
   predicate->AddPredicate(isVisible);
   predicate->AddPredicate(notBinary);
   predicate->AddPredicate(hasLevelWindow); 
-  predicate->AddPredicate(isImage);
+  predicate->AddPredicate(predicateTypes);
 
   mitk::DataStorage::SetOfObjects::ConstPointer relevantNodes = m_DataStorage->GetSubset( predicate );
   return relevantNodes; 

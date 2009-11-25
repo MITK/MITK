@@ -58,16 +58,7 @@ namespace mitk {
       mitk::CastToItkImage(m_MovingMask, movingMask); 
       typename itk::CastImageFilter<MovingImageType, MaskImageType>::Pointer maskImageCaster = itk::CastImageFilter<MovingImageType, MaskImageType>::New();
       maskImageCaster->SetInput(movingMask);
-      try
-      {
-        maskImageCaster->UpdateLargestPossibleRegion();
-      } 
-      catch ( itk::ExceptionObject & err ) 
-      {
-        std::cout<<"ExceptionObject caught";
-        std::cout<<err.GetDescription();
-        return;
-      }
+      maskImageCaster->UpdateLargestPossibleRegion();
       movingImageMask = ImageMaskType::New();
       movingImageMask->SetImage(maskImageCaster->GetOutput());		
     }
@@ -79,16 +70,7 @@ namespace mitk {
       mitk::CastToItkImage(m_FixedMask, fixedMask); 
       typename itk::CastImageFilter<FixedImageType, MaskImageType>::Pointer maskImageCaster = itk::CastImageFilter<FixedImageType, MaskImageType>::New();
       maskImageCaster->SetInput(fixedMask);
-      try
-      {
-        maskImageCaster->UpdateLargestPossibleRegion();
-      } 
-      catch ( itk::ExceptionObject & err ) 
-      {
-        std::cout<<"ExceptionObject caught";			
-        std::cout<<err.GetDescription();
-        return;
-      }		
+      maskImageCaster->UpdateLargestPossibleRegion();	
       fixedImageMask = ImageMaskType::New();
       fixedImageMask->SetImage(maskImageCaster->GetOutput());		
     }	  
@@ -209,15 +191,7 @@ namespace mitk {
         registration->AddObserver(itk::AnyEvent(), m_Observer);
         transform->AddObserver(itk::AnyEvent(), m_Observer);
       }
-      try 
-      {
-        registration->Update();
-      } 
-      catch(itk::ExceptionObject & err) 
-      { 
-        std::cerr << "ExceptionObject caught!" << std::endl; 
-        std::cerr << err << std::endl; 
-      }
+      registration->Update();
       if (m_Observer.IsNotNull())
       {
         optimizer->RemoveAllObservers();
@@ -344,15 +318,7 @@ namespace mitk {
         registration->AddObserver(itk::AnyEvent(), m_Observer);
         transform->AddObserver(itk::AnyEvent(), m_Observer);
       }
-      try 
-      {
-        registration->Update(); 
-      } 
-      catch(itk::ExceptionObject & err) 
-      { 
-        std::cerr << "ExceptionObject caught!" << std::endl; 
-        std::cerr << err << std::endl; 
-      }
+      registration->Update();
       if (m_Observer.IsNotNull())
       {
         optimizer->RemoveAllObservers();

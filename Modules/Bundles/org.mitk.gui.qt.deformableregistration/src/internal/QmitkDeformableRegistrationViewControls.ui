@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>260</width>
-    <height>565</height>
+    <height>230</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -331,7 +331,7 @@
       </size>
      </property>
      <property name="text">
-      <string>Calculate Transformation</string>
+      <string>Register</string>
      </property>
      <property name="icon">
       <iconset resource="../../resources/QmitkDeformableRegistrationView.qrc">

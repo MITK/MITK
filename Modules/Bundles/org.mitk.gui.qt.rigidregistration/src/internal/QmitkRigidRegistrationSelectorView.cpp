@@ -34,6 +34,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkArray.h>
 #include "mitkRigidRegistrationPreset.h"
 #include "mitkRigidRegistrationTestPreset.h"
+#include "mitkProgressBar.h"
 
 #include "QmitkRigidRegistrationSelectorView.h"
 #include "mitkPyramidalRegistrationMethod.h"
@@ -469,8 +470,9 @@ void QmitkRigidRegistrationSelectorView::CalculateTransformation(unsigned int ti
       }
       catch (itk::ExceptionObject e)
       {
-        std::cout<<"Caught exception: "<<e<<std::endl;
-        LOG_INFO << "Caught exception: "<<e;
+        LOG_INFO << "Caught exception: "<<e.GetDescription();
+        QMessageBox::information( this, "Registration exception", e.GetDescription());
+        mitk::ProgressBar::GetInstance()->Progress(20);
       }
 
       time += clock() - tstart;
@@ -513,9 +515,9 @@ void QmitkRigidRegistrationSelectorView::CalculateTransformation(unsigned int ti
       }
       catch (itk::ExceptionObject e)
       {
-        LOG_INFO << "Caught exception: "<<e;
-        QMessageBox::critical(NULL, "Error during registration", QString("An error occurred during registration: %1\nAborting registration process."));
-
+        LOG_INFO << "Caught exception: "<<e.GetDescription();
+        QMessageBox::information( this, "Registration exception", e.GetDescription());
+        mitk::ProgressBar::GetInstance()->Progress(20);
       }
 
       time += clock() - tstart;

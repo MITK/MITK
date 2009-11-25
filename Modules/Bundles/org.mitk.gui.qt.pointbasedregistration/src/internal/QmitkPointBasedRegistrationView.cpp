@@ -1029,7 +1029,7 @@ void QmitkPointBasedRegistrationView::calculateLandmarkbased()
       || (!(determinant <= 0) && !(determinant > 0)))
     {
       QMessageBox msgBox;
-      msgBox.setText("Suspicious determinant of matrix calculated by ICP.\n"
+      msgBox.setText("Suspicious determinant of matrix calculated.\n"
         "Please select more points or other points!" );
       msgBox.exec();
       return;

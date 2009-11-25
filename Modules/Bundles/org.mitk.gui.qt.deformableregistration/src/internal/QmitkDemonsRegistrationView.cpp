@@ -28,6 +28,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkDemonsRegistrationView.h"
 #include "ui_QmitkDemonsRegistrationViewControls.h"
 #include "mitkITKImageImport.h"
+#include "mitkProgressBar.h"
 
 QmitkDemonsRegistrationView::QmitkDemonsRegistrationView(QWidget* parent, Qt::WindowFlags f ) : QWidget( parent, f ),
 m_FixedNode(NULL), m_MovingNode(NULL), m_ResultImage(NULL), m_ResultDeformationField(NULL)
@@ -84,7 +85,7 @@ void QmitkDemonsRegistrationView::CalculateTransformation()
     if (!((fimageRegion.GetSize(0)>=mimageRegion.GetSize(0))&&(fimageRegion.GetSize(1)>=mimageRegion.GetSize(1))
         &&(fimageRegion.GetSize(2)>=mimageRegion.GetSize(2))))
     {
-      QMessageBox::information(NULL,"Registration","Fixed image must be equal or bigger in size than moving image");
+      QMessageBox::information(NULL,"Registration","Fixed image must be equal or bigger in size than moving image.");
       return;
     }
     if ( m_Controls.m_RegistrationSelection->currentIndex() == 0)
@@ -125,6 +126,7 @@ void QmitkDemonsRegistrationView::CalculateTransformation()
       catch (itk::ExceptionObject& excpt)
       {
         QMessageBox::information( this, "Registration exception", excpt.GetDescription(), QMessageBox::Ok );
+        mitk::ProgressBar::GetInstance()->Progress(4);
         return;
       }
       m_ResultImage = registration->GetOutput();
@@ -170,6 +172,8 @@ void QmitkDemonsRegistrationView::CalculateTransformation()
       catch (itk::ExceptionObject& excpt)
       {
         QMessageBox::information( this, "Registration exception", excpt.GetDescription(), QMessageBox::Ok );
+        mitk::ProgressBar::GetInstance()->Progress(4);
+        return;
       }
       m_ResultImage = registration->GetOutput();
       typedef itk::Image<itk::Vector<float,3>, 3> VectorImageType;

@@ -45,7 +45,22 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QDockWidget>
 #include <QVBoxLayout>
 #include <QAbstractItemView>
-#include <QMessageBox>
+#include <QMessageBox>  /*
+  m_Deactivated = false;
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    QmitkFunctionality::Activated();
+    this->clearTransformationLists();
+    if (m_SelListener.IsNull())
+    {
+      m_SelListener = cherry::ISelectionListener::Pointer(new SelListenerPointBasedRegistration(this));
+      this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddPostSelectionListener(/ *"org.mitk.views.datamanager",* / m_SelListener);
+      cherry::ISelection::ConstPointer sel(
+        this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection("org.mitk.views.datamanager"));
+      m_CurrentSelection = sel.Cast<const IStructuredSelection>();
+      m_SelListener.Cast<SelListenerPointBasedRegistration>()->DoSelectionChanged(sel);
+    }
+    this->OpacityUpdate(m_Controls.m_OpacitySlider->value());
+    this->showRedGreen(m_Controls.m_ShowRedGreenValues->isChecked());*/
 
 #include <mitkDataStorageEditorInput.h>
 #include <mitkIDataStorageReference.h>
@@ -756,7 +771,7 @@ void QmitkSegmentationView::SelectionChanged(cherry::IWorkbenchPart::Pointer sou
   }
 }
 
-void QmitkSegmentationView::Visible()
+void QmitkSegmentationView::Activated()
 {
   if(m_MultiWidget)
     m_MultiWidget->SetWidgetPlanesVisibility(false);
@@ -771,7 +786,7 @@ void QmitkSegmentationView::Visible()
   }
 }
 
-void QmitkSegmentationView::Hidden()
+void QmitkSegmentationView::Deactivated()
 {
   this->GetActiveStdMultiWidget()->SetWidgetPlanesVisibility(true);
 

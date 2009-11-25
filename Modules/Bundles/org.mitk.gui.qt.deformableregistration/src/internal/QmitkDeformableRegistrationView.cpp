@@ -278,26 +278,6 @@ void QmitkDeformableRegistrationView::CreateConnections()
 
 void QmitkDeformableRegistrationView::Activated()
 {
-  /*
-  m_Deactivated = false;
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-    QmitkFunctionality::Activated();
-    if (m_SelListener.IsNull())
-    {
-      m_SelListener = cherry::ISelectionListener::Pointer(new SelListenerDeformableRegistration(this));
-      this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddPostSelectionListener(/ *"org.mitk.views.datamanager",* / m_SelListener);
-      cherry::ISelection::ConstPointer sel(
-        this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection("org.mitk.views.datamanager"));
-      m_CurrentSelection = sel.Cast<const IStructuredSelection>();
-      m_SelListener.Cast<SelListenerDeformableRegistration>()->DoSelectionChanged(sel);
-    }
-    this->OpacityUpdate(m_Controls.m_OpacitySlider->value());
-    this->ShowRedGreen(m_Controls.m_ShowRedGreenValues->isChecked());*/
-  
-}
-
-void QmitkDeformableRegistrationView::Visible()
-{
   m_Deactivated = false;
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   QmitkFunctionality::Activated();
@@ -314,27 +294,26 @@ void QmitkDeformableRegistrationView::Visible()
   this->ShowRedGreen(m_Controls.m_ShowRedGreenValues->isChecked());
 }
 
-void QmitkDeformableRegistrationView::Deactivated()
+void QmitkDeformableRegistrationView::Visible()
 {
   /*
-  m_Deactivated = true;
-    this->SetImageColor(false);
-    if (m_MovingNode.IsNotNull())
-    {
-      m_MovingNode->SetOpacity(m_OriginalOpacity);
-    }
-    m_FixedNode = NULL;
-    m_MovingNode = NULL;
-    cherry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
-    if(s)
-      s->RemovePostSelectionListener(m_SelListener);
-    m_SelListener = NULL;
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-    QmitkFunctionality::Deactivated();*/
-  
+  m_Deactivated = false;
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  QmitkFunctionality::Activated();
+  if (m_SelListener.IsNull())
+  {
+    m_SelListener = cherry::ISelectionListener::Pointer(new SelListenerDeformableRegistration(this));
+    this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddPostSelectionListener(/*"org.mitk.views.datamanager",* / m_SelListener);
+    cherry::ISelection::ConstPointer sel(
+      this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection("org.mitk.views.datamanager"));
+    m_CurrentSelection = sel.Cast<const IStructuredSelection>();
+    m_SelListener.Cast<SelListenerDeformableRegistration>()->DoSelectionChanged(sel);
+  }
+  this->OpacityUpdate(m_Controls.m_OpacitySlider->value());
+  this->ShowRedGreen(m_Controls.m_ShowRedGreenValues->isChecked());*/
 }
 
-void QmitkDeformableRegistrationView::Hidden()
+void QmitkDeformableRegistrationView::Deactivated()
 {
   m_Deactivated = true;
   this->SetImageColor(false);
@@ -347,7 +326,24 @@ void QmitkDeformableRegistrationView::Hidden()
   cherry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
   if(s)
     s->RemovePostSelectionListener(m_SelListener);
-  m_SelListener = NULL;
+  
+}
+
+void QmitkDeformableRegistrationView::Hidden()
+{
+  /*
+  m_Deactivated = true;
+  this->SetImageColor(false);
+  if (m_MovingNode.IsNotNull())
+  {
+    m_MovingNode->SetOpacity(m_OriginalOpacity);
+  }
+  m_FixedNode = NULL;
+  m_MovingNode = NULL;
+  cherry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
+  if(s)
+    s->RemovePostSelectionListener(m_SelListener);
+  m_SelListener = NULL;*/
   //mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   //QmitkFunctionality::Deactivated();
 }

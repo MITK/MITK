@@ -34,8 +34,8 @@ public:
   void OnNewNodesGenerated();
   void OnNewNodeObjectsGenerated(mitk::ToolManager::DataVectorType*);
 
-  virtual void Visible();
-  virtual void Hidden();
+  virtual void Activated();
+  virtual void Deactivated();
 
 protected:
 

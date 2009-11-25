@@ -75,6 +75,7 @@ void QmitkVolumeVisualizationView::CreateQtPartControl(QWidget* parent)
     m_Controls->m_TransferFunctionWidget->setEnabled(false);
     m_Controls->m_TransferFunctionGeneratorWidget->setEnabled(false);
     m_Controls->m_SelectedImageLabel->hide();
+    m_Controls->m_ErrorImageLabel->hide();
     
     
     
@@ -107,20 +108,48 @@ void QmitkVolumeVisualizationView::SelectionChanged( cherry::IWorkbenchPart::Poi
       {
         mitk::DataTreeNode::Pointer node = _DataTreeNodeObject->GetDataTreeNode();
       
-        if( node.IsNotNull() && dynamic_cast<mitk::Image*>(node->GetData()) 
-          && dynamic_cast<mitk::Image*>(node->GetData())->GetDimension()==3  )
+        if( node.IsNotNull() && dynamic_cast<mitk::Image*>(node->GetData())&&dynamic_cast<mitk::Image*>(node->GetData())->GetDimension()==3   )
+         {
           selectedNodes.push_back( node );
+         }
+         else
+         {
+          m_Controls->m_NoSelectedImageLabel->hide();
+          m_Controls->m_ErrorImageLabel->show();
+     
+          std::string  infoText;
+            
+          if (dynamic_cast<mitk::Image*>(node->GetData())->GetDimension()>3 )
+            infoText = std::string("4D images are not supported");
+          else
+            infoText = std::string("2D images are not supported");
+           
+          m_Controls->m_ErrorImageLabel->setText( QString( infoText.c_str() ) ); 
+          return;
+         }  
       }
     }
 
     mitk::DataTreeNode::Pointer node;
-   
+    
     if(selectedNodes.size() > 0)
       node=selectedNodes.front();
+    
+   
+    /*
+    if (dynamic_cast<mitk::Image*>(node->GetData())->GetDimension()==3 )
+    {
+      LOG_INFO << "falsches Bild ausgewählt!";
+      //std::string  infoText= std::string("Error! Please select a 3D image");
+      //m_Controls->m_SelectedImageLabel->setText( QString( infoText.c_str() ) );
+      return;
+    }*/
+   
 
     if( node.IsNotNull() )
     {
       m_Controls->m_NoSelectedImageLabel->hide();
+      m_Controls->m_ErrorImageLabel->hide();
       m_Controls->m_SelectedImageLabel->show();
       
       std::string  infoText;
@@ -132,13 +161,12 @@ void QmitkVolumeVisualizationView::SelectionChanged( cherry::IWorkbenchPart::Poi
       
       m_Controls->m_SelectedImageLabel->setText( QString( infoText.c_str() ) );
       
-      
-       
       m_SelectedNode = node;
     }
     else
     {
       m_Controls->m_SelectedImageLabel->hide();
+      m_Controls->m_ErrorImageLabel->hide();
       m_Controls->m_NoSelectedImageLabel->show();
       m_SelectedNode = 0;
      

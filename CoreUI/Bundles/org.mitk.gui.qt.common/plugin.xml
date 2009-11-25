@@ -8,14 +8,4 @@
       class="QmitkStdMultiWidgetEditor">
     </editor>
   </extension>
-  
-  <extension point="org.opencherry.ui.preferencePages">
-	  <page id="org.mitk.gui.qt.common.GeneralPreferencePage" name="General" class="QmitkGeneralPreferencePage">
-      <keywordreference id="org.mitk.gui.qt.common.GeneralPreferencePageKeywords"></keywordreference>
-    </page>
-  </extension>
-
-  <extension point="org.opencherry.ui.keywords">
-    <keyword id="org.mitk.gui.qt.common.GeneralPreferencePageKeywords" label="general preferences store"></keyword>
-  </extension>
 </plugin>

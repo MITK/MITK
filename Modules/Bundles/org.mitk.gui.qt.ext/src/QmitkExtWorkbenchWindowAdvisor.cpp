@@ -234,14 +234,21 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
   QAction* imageNavigatorAction = editMenu->addAction(QIcon(":/org.mitk.gui.qt.ext/Slider_48.png"), "&Image Navigator", 
     QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onImageNavigator()),NULL);
   imageNavigatorAction->setCheckable(true);
-  cherry::IViewPart::Pointer imageNavigatorView = 
-    cherry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->FindView("org.mitk.views.imagenavigator");
-  imageNavigatorAction->setChecked(false);
-  if (imageNavigatorView)
+
+
+  cherry::IWorkbenchWindow::Pointer win =
+      cherry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow();
+  if(win.IsNotNull())
   {
-    bool isImageNavigatorVisible = cherry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->IsPartVisible(imageNavigatorView);
-    if (isImageNavigatorVisible)
-      imageNavigatorAction->setChecked(true);
+    cherry::IViewPart::Pointer imageNavigatorView =
+      win->GetActivePage()->FindView("org.mitk.views.imagenavigator");
+    imageNavigatorAction->setChecked(false);
+    if (imageNavigatorView)
+    {
+      bool isImageNavigatorVisible = cherry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->IsPartVisible(imageNavigatorView);
+      if (isImageNavigatorVisible)
+        imageNavigatorAction->setChecked(true);
+    }
   }
   imageNavigatorAction->setToolTip("Open image navigator for navigating through image");
 

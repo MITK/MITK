@@ -227,6 +227,8 @@ class RIGIDREGISTRATION_EXPORT QmitkRigidRegistrationView : public QObject, publ
 
     void TabChanged(int index);
 
+    void SwitchImages();
+
   protected:
 
     cherry::ISelectionListener::Pointer m_SelListener;

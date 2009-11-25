@@ -90,6 +90,7 @@ struct SelListenerPointBasedRegistration : ISelectionListener
           m_View->m_Controls.m_MovingPointListWidget->hide();
           m_View->m_Controls.m_OpacityLabel->hide();
           m_View->m_Controls.m_OpacitySlider->hide();
+          m_View->m_Controls.m_SwitchImages->hide();
           m_View->m_Controls.m_ShowRedGreenValues->setEnabled(false);
         }
       }
@@ -222,6 +223,7 @@ void QmitkPointBasedRegistrationView::CreateQtPartControl(QWidget* parent)
   m_Controls.m_MovingPointListWidget->hide();
   m_Controls.m_OpacityLabel->hide();
   m_Controls.m_OpacitySlider->hide();
+  m_Controls.m_SwitchImages->hide();
   m_Controls.m_ShowRedGreenValues->setEnabled(false);
 
   this->CreateConnections();
@@ -257,6 +259,7 @@ void QmitkPointBasedRegistrationView::CreateConnections()
   connect( (QObject*)(m_Controls.m_FixedPointListWidget), SIGNAL(PointListChanged()), this, SLOT(updateFixedLandmarksList()));
   connect( (QObject*)(m_Controls.m_MovingPointListWidget), SIGNAL(PointListChanged()), this, SLOT(updateMovingLandmarksList()));
   connect((QObject*)(m_Controls.m_Calculate),SIGNAL(clicked()),this,SLOT(calculate()));
+  connect((QObject*)(m_Controls.m_SwitchImages),SIGNAL(clicked()),this,SLOT(SwitchImages()));
   connect((QObject*)(m_Controls.m_UndoTransformation),SIGNAL(clicked()),this,SLOT(UndoTransformation()));
   connect((QObject*)(m_Controls.m_RedoTransformation),SIGNAL(clicked()),this,SLOT(RedoTransformation()));
   connect((QObject*)(m_Controls.m_ShowRedGreenValues),SIGNAL(toggled(bool)),this,SLOT(showRedGreen(bool)));
@@ -319,6 +322,8 @@ void QmitkPointBasedRegistrationView::Deactivated()
   m_Controls.m_MovingPointListWidget->SetPointSetNode(NULL);
   m_Controls.m_MovingPointListWidget->DeactivateInteractor(true);
   this->setImageColor(false);
+  if (m_FixedNode.IsNotNull())
+    m_FixedNode->SetOpacity(1.0);
   if (m_MovingNode.IsNotNull())
   {
     m_MovingNode->SetOpacity(m_OriginalOpacity);
@@ -353,6 +358,7 @@ void QmitkPointBasedRegistrationView::Deactivated()
   m_Controls.m_MovingPointListWidget->hide();
   m_Controls.m_OpacityLabel->hide();
   m_Controls.m_OpacitySlider->hide();
+  m_Controls.m_SwitchImages->hide();
   cherry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
   if(s)
     s->RemovePostSelectionListener(m_SelListener);
@@ -407,6 +413,7 @@ void QmitkPointBasedRegistrationView::Hidden()
   m_Controls.m_MovingPointListWidget->hide();
   m_Controls.m_OpacityLabel->hide();
   m_Controls.m_OpacitySlider->hide();
+  m_Controls.m_SwitchImages->hide();
   cherry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
   if(s)
     s->RemovePostSelectionListener(m_SelListener);
@@ -427,6 +434,7 @@ void QmitkPointBasedRegistrationView::FixedSelected(mitk::DataTreeNode::Pointer 
       if (m_FixedNode.IsNotNull())
       {
         this->setImageColor(false);
+        m_FixedNode->SetOpacity(1.0);
         if (m_FixedPointSetNode.IsNotNull())
         {
           m_FixedPointSetNode->SetProperty("label", mitk::StringProperty::New(m_OldFixedLabel));
@@ -434,9 +442,11 @@ void QmitkPointBasedRegistrationView::FixedSelected(mitk::DataTreeNode::Pointer 
       }
       // get selected node
       m_FixedNode = fixedImage;
+      m_FixedNode->SetOpacity(0.5);
       m_FixedNode->SetVisibility(true);
       m_Controls.m_FixedLabel->setText(QString::fromStdString(m_FixedNode->GetName()));
       m_Controls.m_FixedLabel->show();
+      m_Controls.m_SwitchImages->show();
       m_Controls.TextLabelFixed->show();
       m_Controls.line2->show();
       m_Controls.m_FixedPointListWidget->show();
@@ -492,6 +502,7 @@ void QmitkPointBasedRegistrationView::FixedSelected(mitk::DataTreeNode::Pointer 
     m_Controls.TextLabelFixed->hide();
     m_Controls.line2->hide();
     m_Controls.m_FixedPointListWidget->hide();
+    m_Controls.m_SwitchImages->hide();
   }
   if(m_FixedLandmarks.IsNotNull())
     m_CurrentFixedLandmarksObserverID = m_FixedLandmarks->AddObserver(itk::ModifiedEvent(), m_FixedLandmarksChangedCommand);
@@ -508,6 +519,8 @@ void QmitkPointBasedRegistrationView::MovingSelected(mitk::DataTreeNode::Pointer
       if (m_MovingNode.IsNotNull())
       {
         m_MovingNode->SetOpacity(m_OriginalOpacity);
+        if (m_FixedNode == m_MovingNode)
+          m_FixedNode->SetOpacity(0.5);
         this->setImageColor(false);
         if (m_MovingNode != m_FixedNode)
         {
@@ -1229,6 +1242,14 @@ void QmitkPointBasedRegistrationView::SetImagesVisible(cherry::ISelection::Const
       }
     }
   }
+}
+
+void QmitkPointBasedRegistrationView::SwitchImages()
+{
+  mitk::DataTreeNode::Pointer newMoving = m_FixedNode;
+  mitk::DataTreeNode::Pointer newFixed = m_MovingNode;
+  this->FixedSelected(newFixed);
+  this->MovingSelected(newMoving);
 }
 
 

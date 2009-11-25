@@ -269,6 +269,7 @@ void QmitkDeformableRegistrationView::CreateConnections()
   connect(m_Controls.m_DeformableTransform, SIGNAL(currentChanged(int)), this, SLOT(TabChanged(int)));
   connect(m_Controls.m_OpacitySlider, SIGNAL(sliderMoved(int)), this, SLOT(OpacityUpdate(int)));
   connect(m_Controls.m_CalculateTransformation, SIGNAL(clicked()), this, SLOT(Calculate()));
+  connect((QObject*)(m_Controls.m_SwitchImages),SIGNAL(clicked()),this,SLOT(SwitchImages()));
   connect(this,SIGNAL(calculateBSplineRegistration()),m_Controls.m_QmitkBSplineRegistrationViewControls,SLOT(CalculateTransformation()));
   connect( (QObject*)(m_Controls.m_QmitkBSplineRegistrationViewControls->m_Controls.m_ApplyDeformationField),
     SIGNAL(clicked()), 
@@ -317,6 +318,8 @@ void QmitkDeformableRegistrationView::Deactivated()
 {
   m_Deactivated = true;
   this->SetImageColor(false);
+  if (m_FixedNode.IsNotNull())
+    m_FixedNode->SetOpacity(1.0);
   if (m_MovingNode.IsNotNull())
   {
     m_MovingNode->SetOpacity(m_OriginalOpacity);
@@ -358,14 +361,17 @@ void QmitkDeformableRegistrationView::FixedSelected(mitk::DataTreeNode::Pointer 
       if (m_FixedNode.IsNotNull())
       {
         this->SetImageColor(false);
+        m_FixedNode->SetOpacity(1.0);
         m_FixedNode->SetVisibility(false);
         m_FixedNode->SetProperty("selectedFixedImage", mitk::BoolProperty::New(false));
       }
       // get selected node
       m_FixedNode = fixedImage;
+      m_FixedNode->SetOpacity(0.5);
       m_Controls.TextLabelFixed->setText(QString::fromStdString(m_FixedNode->GetName()));
       m_Controls.m_FixedLabel->show();
       m_Controls.TextLabelFixed->show();
+      m_Controls.m_SwitchImages->show();
       mitk::ColorProperty::Pointer colorProperty;
       colorProperty = dynamic_cast<mitk::ColorProperty*>(m_FixedNode->GetProperty("color"));
       if ( colorProperty.IsNotNull() )
@@ -395,6 +401,8 @@ void QmitkDeformableRegistrationView::MovingSelected(mitk::DataTreeNode::Pointer
       if (m_MovingNode.IsNotNull())
       {
         m_MovingNode->SetOpacity(m_OriginalOpacity);
+        if (m_FixedNode == m_MovingNode)
+          m_FixedNode->SetOpacity(0.5);
         this->SetImageColor(false);
       }
       m_MovingNode = movingImage;
@@ -573,4 +581,12 @@ void QmitkDeformableRegistrationView::TabChanged(int index)
     m_Controls.m_QmitkDemonsRegistrationViewControls->hide();
     m_Controls.m_QmitkBSplineRegistrationViewControls->show();
   }
+}
+
+void QmitkDeformableRegistrationView::SwitchImages()
+{
+  mitk::DataTreeNode::Pointer newMoving = m_FixedNode;
+  mitk::DataTreeNode::Pointer newFixed = m_MovingNode;
+  this->FixedSelected(newFixed);
+  this->MovingSelected(newMoving);
 }

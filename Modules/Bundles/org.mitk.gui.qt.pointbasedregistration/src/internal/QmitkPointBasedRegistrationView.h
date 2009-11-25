@@ -251,6 +251,8 @@ public:
 
     void SetImagesVisible(cherry::ISelection::ConstPointer selection);
 
+    void SwitchImages();
+
 protected:
 
   cherry::ISelectionListener::Pointer m_SelListener;

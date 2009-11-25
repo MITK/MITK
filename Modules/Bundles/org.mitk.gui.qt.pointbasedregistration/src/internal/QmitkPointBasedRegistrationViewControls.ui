@@ -71,6 +71,13 @@
     </widget>
    </item>
    <item>
+    <widget class="QPushButton" name="m_SwitchImages">
+     <property name="text">
+      <string>Switch fixed and moving image</string>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QGroupBox" name="m_FixedData">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -508,7 +515,7 @@
            <string>Undo Transformation</string>
           </property>
           <property name="icon">
-           <iconset resource="../../../org.mitk.gui.qt.ext/resources/org_mitk_gui_qt_ext.qrc">
+           <iconset>
             <normaloff>:/org.mitk.gui.qt.ext/edit-undo.png</normaloff>:/org.mitk.gui.qt.ext/edit-undo.png</iconset>
           </property>
          </widget>
@@ -534,7 +541,7 @@
            <string>Redo Transformation</string>
           </property>
           <property name="icon">
-           <iconset resource="../../../org.mitk.gui.qt.ext/resources/org_mitk_gui_qt_ext.qrc">
+           <iconset>
             <normaloff>:/org.mitk.gui.qt.ext/edit-redo.png</normaloff>:/org.mitk.gui.qt.ext/edit-redo.png</iconset>
           </property>
          </widget>

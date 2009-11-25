@@ -70,6 +70,7 @@ struct SelListenerRigidRegistration : ISelectionListener
           m_View->m_Controls.m_OpacityLabel->setEnabled(false);
           m_View->m_Controls.m_OpacitySlider->setEnabled(false);
           m_View->m_Controls.m_ShowRedGreenValues->setEnabled(false);
+          m_View->m_Controls.m_SwitchImages->hide();
         }
       }
       else
@@ -178,6 +179,7 @@ void QmitkRigidRegistrationView::CreateQtPartControl(QWidget* parent)
   m_Controls.m_OpacityLabel->setEnabled(false);
   m_Controls.m_OpacitySlider->setEnabled(false);
   m_Controls.m_ShowRedGreenValues->setEnabled(false);
+  m_Controls.m_SwitchImages->hide();
   if (m_Controls.m_RigidTransform->currentIndex() == 1)
   {
     m_Controls.frame->show();
@@ -209,6 +211,7 @@ void QmitkRigidRegistrationView::StdMultiWidgetNotAvailable()
 void QmitkRigidRegistrationView::CreateConnections()
 {
   connect( m_Controls.m_ManualRegistrationCheckbox, SIGNAL(toggled(bool)), this, SLOT(ShowManualRegistrationFrame(bool)));
+  connect((QObject*)(m_Controls.m_SwitchImages),SIGNAL(clicked()),this,SLOT(SwitchImages()));
   connect(m_Controls.m_ShowRedGreenValues, SIGNAL(toggled(bool)), this, SLOT(ShowRedGreen(bool)));
   connect(m_Controls.m_UseImageMasks, SIGNAL(toggled(bool)), this, SLOT(UseMaskImagesChecked(bool)));
   connect(m_Controls.m_RigidTransform, SIGNAL(currentChanged(int)), this, SLOT(TabChanged(int)));
@@ -296,6 +299,8 @@ void QmitkRigidRegistrationView::Deactivated()
 {
   m_Deactivated = true;
   this->SetImageColor(false);
+  if (m_FixedNode.IsNotNull())
+    m_FixedNode->SetOpacity(1.0);
   m_FixedNode = NULL;
   m_MovingNode = NULL;
   this->ClearTransformationLists();
@@ -338,14 +343,17 @@ void QmitkRigidRegistrationView::FixedSelected(mitk::DataTreeNode::Pointer fixed
   if (m_FixedNode.IsNotNull())
   {
     this->SetImageColor(false);
+    m_FixedNode->SetOpacity(1.0);
   }
   m_FixedNode = fixedImage;
   if (m_FixedNode.IsNotNull())
   {
+    m_FixedNode->SetOpacity(0.5);
     m_FixedNode->SetVisibility(true);
     m_Controls.TextLabelFixed->setText(QString::fromStdString(m_FixedNode->GetName()));
     m_Controls.m_FixedLabel->show();
     m_Controls.TextLabelFixed->show();
+    m_Controls.m_SwitchImages->show();
     mitk::ColorProperty::Pointer colorProperty;
     colorProperty = dynamic_cast<mitk::ColorProperty*>(m_FixedNode->GetProperty("color"));
     if ( colorProperty.IsNotNull() )
@@ -386,6 +394,7 @@ void QmitkRigidRegistrationView::FixedSelected(mitk::DataTreeNode::Pointer fixed
   {
     m_Controls.m_FixedLabel->hide();
     m_Controls.TextLabelFixed->hide();
+    m_Controls.m_SwitchImages->hide();
   }
   this->CheckCalculateEnabled();
   if(this->GetActiveStdMultiWidget())
@@ -400,6 +409,8 @@ void QmitkRigidRegistrationView::MovingSelected(mitk::DataTreeNode::Pointer movi
   if (m_MovingNode.IsNotNull())
   {
     m_MovingNode->SetOpacity(m_OriginalOpacity);
+    if (m_FixedNode == m_MovingNode)
+      m_FixedNode->SetOpacity(0.5);
     this->SetImageColor(false);
   }
   m_MovingNode = movingImage;
@@ -1047,4 +1058,12 @@ void QmitkRigidRegistrationView::TabChanged(int index)
   {
     m_Controls.frame->show();
   }
+}
+
+void QmitkRigidRegistrationView::SwitchImages()
+{
+  mitk::DataTreeNode::Pointer newMoving = m_FixedNode;
+  mitk::DataTreeNode::Pointer newFixed = m_MovingNode;
+  this->FixedSelected(newFixed);
+  this->MovingSelected(newMoving);
 }

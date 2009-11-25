@@ -36,7 +36,7 @@ m_DataBits(mitk::SerialCommunication::DataBits8), m_Parity(mitk::SerialCommunica
 m_HardwareHandshake(mitk::SerialCommunication::HardwareHandshakeOff), m_NDITrackingVolume(Standard),
 m_IlluminationActivationRate(Hz20), m_DataTransferMode(TX), m_6DTools(), m_ToolsMutex(NULL), 
 m_SerialCommunication(NULL), m_SerialCommunicationMutex(NULL), m_DeviceProtocol(NULL),
-m_ErrorMessage(""), m_MultiThreader(NULL), m_ThreadID(0), m_OperationMode(ToolTracking6D), m_MarkerPointsMutex(NULL), m_MarkerPoints()
+m_MultiThreader(NULL), m_ThreadID(0), m_OperationMode(ToolTracking6D), m_MarkerPointsMutex(NULL), m_MarkerPoints()
 {
   this->m_Type = TrackingSystemNotSpecified; //NDIPolaris;          //  = 0; //set the type = 0 (=Polaris, default)
   m_6DTools.clear();
@@ -126,7 +126,7 @@ void mitk::NDITrackingDevice::SetPortNumber(const PortNumber _arg)
 }
 
 
-void mitk::NDITrackingDevice::SetDeviceName( const char* _arg )
+void mitk::NDITrackingDevice::SetDeviceName(std::string _arg)
 {
   if (this->GetMode() != Setup)
     return;
@@ -383,7 +383,13 @@ bool mitk::NDITrackingDevice::OpenConnection()
   m_SerialCommunication->SetStopBits(mitk::SerialCommunication::StopBits1);
   m_SerialCommunication->SetSendTimeout(5000);
   m_SerialCommunication->SetReceiveTimeout(5000);
-  m_SerialCommunication->OpenConnection();
+  if (m_SerialCommunication->OpenConnection() == 0) // 0 == ERROR_VALUE
+  {
+    this->SetErrorMessage("Can not open serial port");
+    m_SerialCommunication->CloseConnection();
+    m_SerialCommunication = NULL;
+    return false;
+  }
 
   /* Reset Tracking device by sending a serial break for 500ms */
   m_SerialCommunication->SendBreak(400);

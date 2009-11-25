@@ -152,7 +152,7 @@ namespace mitk
 
     virtual void SetPortNumber(const PortNumber _arg); ///< set port number for serial communication
     itkGetConstMacro(PortNumber, PortNumber);          ///< returns the port number for serial communication
-    virtual void SetDeviceName(const char* devName);   ///< set device name (e.g. COM1, /dev/ttyUSB0). If this is set, PortNumber will be ignored
+    virtual void SetDeviceName(std::string _arg);      ///< set device name (e.g. COM1, /dev/ttyUSB0). If this is set, PortNumber will be ignored
     itkGetStringMacro(DeviceName);                     ///< returns the device name for serial communication
     virtual void SetBaudRate(const BaudRate _arg);     ///< set baud rate for serial communication
     itkGetConstMacro(BaudRate, BaudRate);              ///< returns the baud rate for serial communication
@@ -246,10 +246,6 @@ public://TODO
     */
     static ITK_THREAD_RETURN_TYPE ThreadStartTracking(void* data);
 
-    /**
-    * \brief set current error message
-    */
-    itkSetStringMacro(ErrorMessage);
   protected:
     NDITrackingDevice();          ///< Constructor
     virtual ~NDITrackingDevice(); ///< Destructor
@@ -271,7 +267,6 @@ public://TODO
     itk::FastMutexLock::Pointer m_SerialCommunicationMutex; ///< mutex for coordinated access of serial communication interface
     NDIProtocol::Pointer m_DeviceProtocol;    ///< create and parse NDI protocol strings
 
-    std::string m_ErrorMessage;     ///< contains error message in case of error (as indicated by return value of member functions)
     itk::MultiThreader::Pointer m_MultiThreader;      ///< creates tracking thread that continuously polls serial interface for new tracking data
     int m_ThreadID;                 ///< ID of tracking thread
     OperationMode m_OperationMode;  ///< tracking mode (6D tool tracking, 3D marker tracking,...)

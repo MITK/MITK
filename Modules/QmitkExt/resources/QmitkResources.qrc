@@ -1,10 +1,11 @@
 <RCC>
   <qresource prefix="/qmitk" >
+    <file>Logo_mbiATdkfz_small.png</file>
     <file>cross.png</file>
     <file>QmitkStandardViewsDialogBar.xpm</file>
     <file>play.xpm</file>
     <file>stop.xpm</file>
-	<file>logo_mint-medical.png</file>
-	<file>Logo_mbiATdkfz_gross.png</file>
+    <file>logo_mint-medical.png</file>
+    <file>Logo_mbiATdkfz_gross.png</file>
   </qresource>
 </RCC>

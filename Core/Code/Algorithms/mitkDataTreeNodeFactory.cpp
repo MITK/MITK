@@ -253,8 +253,6 @@ void mitk::DataTreeNodeFactory::OnITKProgressEvent(itk::Object *source, const it
   //  m_mitkProgressBar->hide();
   //}
 
-
-  std::cout << "progress" << std::endl;
 }
 
 void mitk::DataTreeNodeFactory::ReadFileSeriesTypeDCM()

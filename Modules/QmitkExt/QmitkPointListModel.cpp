@@ -31,6 +31,8 @@ m_PointSetDeletedObserverTag(0),
 m_TimeStep(t)
 {
   ObserveNewPointset( pointSet );
+
+  
 }
 
 
@@ -242,6 +244,18 @@ bool QmitkPointListModel::GetModelIndexForPointID(mitk::PointSet::PointIdentifie
   return false; // nothing found
 }
 
+
+void QmitkPointListModel::SelectSelectedPoint()
+{
+  if(m_PointSet == NULL)
+    return;
+
+  mitk::PointSet::PointIdentifier selectedID; 
+  selectedID = m_PointSet->SearchSelectedPoint(m_TimeStep);
+  mitk::PointOperation* doOp = new mitk::PointOperation(mitk::OpSELECTPOINT, m_PointSet->GetPoint(selectedID, m_TimeStep), selectedID, true);
+  m_PointSet->ExecuteOperation(doOp);
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll(); // Workaround for update problem in Pointset/Mapper
+}
 
 void QmitkPointListModel::MoveSelectedPointUp()
 {

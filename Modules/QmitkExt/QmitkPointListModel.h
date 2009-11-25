@@ -95,6 +95,7 @@ class QMITKEXT_EXPORT QmitkPointListModel : public QAbstractListModel
     void MoveSelectedPointUp();
       void MoveSelectedPointDown();
       void RemoveSelectedPoint();
+      void SelectSelectedPoint(); //workaround for selection problem
   signals:
 
     /// emitted, when views should update their selection status

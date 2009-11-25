@@ -46,8 +46,10 @@ QmitkPointListView::QmitkPointListView( QWidget* parent )
   this->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
 
   connect( m_PointListModel, SIGNAL(UpdateSelection()), this, SLOT(OnPointSetSelectionChanged()) );
+  
   connect( QListView::selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)),
            this, SLOT(OnListViewSelectionChanged(const QItemSelection& , const QItemSelection&)) );
+  
 }
 
 QmitkPointListView::~QmitkPointListView()
@@ -144,6 +146,9 @@ void QmitkPointListView::OnListViewSelectionChanged(const QItemSelection& select
   }
   m_SelfCall = false;
   emit PointSelectionChanged();
+
+  m_PointListModel->SelectSelectedPoint();
+
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 

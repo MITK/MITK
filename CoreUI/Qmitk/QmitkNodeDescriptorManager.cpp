@@ -39,7 +39,7 @@ void QmitkNodeDescriptorManager::Initialize()
 
   // Adding "Surface"
   mitk::NodePredicateDataType::Pointer isSurface = mitk::NodePredicateDataType::New("Surface");
-  this->AddDescriptor(new QmitkNodeDescriptor(tr("Surface"), QString(":/Qmitk/Surface_48.png.png"), isSurface, this));
+  this->AddDescriptor(new QmitkNodeDescriptor(tr("Surface"), QString(":/Qmitk/Surface_48.png"), isSurface, this));
 
   // Adding "PlanarLine"
   mitk::NodePredicateDataType::Pointer isPlanarLine = mitk::NodePredicateDataType::New("PlanarLine");

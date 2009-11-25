@@ -19,7 +19,10 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef _QMITKIMAGENAVIGATORVIEW_H_INCLUDED
 #define _QMITKIMAGENAVIGATORVIEW_H_INCLUDED
 
-#include <QmitkFunctionality.h>
+#include <cherryQtViewPart.h>
+#include <QmitkDataTreeNodeSelectionProvider.h>
+#include <QmitkDnDFrameWidget.h>
+#include <QmitkStdMultiWidgetEditor.h>
 #include "QmitkStepperAdapter.h"
 
 #include <string>
@@ -37,7 +40,7 @@ PURPOSE.  See the above copyright notices for more information.
  *
  * \sa QmitkFunctionality
  */
-class QmitkImageNavigatorView : public QObject, public QmitkFunctionality
+class QmitkImageNavigatorView : public QObject, public cherry::QtViewPart
 {
 
   // this is needed for all Qt objects that should have a MOC object (everything that derives from QObject)
@@ -52,16 +55,9 @@ class QmitkImageNavigatorView : public QObject, public QmitkFunctionality
 
   virtual void CreateQtPartControl(QWidget *parent);
 
-  /// \brief Creation of the connections of main and control widget
-  virtual void CreateConnections();
+  QmitkStdMultiWidget* GetActiveStdMultiWidget();
 
-  /// \brief Called when the functionality is activated
-  virtual void Activated();
-
-  virtual void Deactivated();
-
-  virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget);
-  virtual void StdMultiWidgetNotAvailable();
+  void SetFocus();
 
 protected slots:
 

@@ -23,6 +23,12 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkDataStorageComboBox.h"
 #include "QmitkStdMultiWidget.h"
 
+#include "mitkDataStorageEditorInput.h"
+
+// cherry Includes
+#include <cherryPlatform.h>
+#include <cherryIWorkbenchPage.h>
+
 #include <QMessageBox>
 
 
@@ -30,8 +36,7 @@ PURPOSE.  See the above copyright notices for more information.
 const std::string QmitkImageNavigatorView::VIEW_ID = "org.mitk.views.imagenavigator";
 
 QmitkImageNavigatorView::QmitkImageNavigatorView()
-: QmitkFunctionality(),
-  m_MultiWidget(NULL)
+: m_MultiWidget(NULL)
 {
 }
 
@@ -48,12 +53,7 @@ void QmitkImageNavigatorView::CreateQtPartControl(QWidget *parent)
 
   // create GUI widgets
   m_Controls.setupUi(parent);
-  this->CreateConnections();
-}
-
-void QmitkImageNavigatorView::StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget)
-{
-  m_MultiWidget = &stdMultiWidget;
+  m_MultiWidget = this->GetActiveStdMultiWidget();
 
   m_TransversalStepper = new QmitkStepperAdapter(m_Controls.m_SliceNavigatorTransversal, m_MultiWidget->mitkWidget1->GetSliceNavigationController()->GetSlice(), "sliceNavigatorTransversalFromSimpleExample");
   m_SagittalStepper = new QmitkStepperAdapter(m_Controls.m_SliceNavigatorSagittal, m_MultiWidget->mitkWidget2->GetSliceNavigationController()->GetSlice(), "sliceNavigatorSagittalFromSimpleExample");
@@ -61,21 +61,28 @@ void QmitkImageNavigatorView::StdMultiWidgetAvailable (QmitkStdMultiWidget &stdM
   m_TimeStepper = new QmitkStepperAdapter(m_Controls.m_SliceNavigatorTime, m_MultiWidget->GetTimeNavigationController()->GetTime(), "sliceNavigatorTimeFromSimpleExample");
 }
 
-void QmitkImageNavigatorView::StdMultiWidgetNotAvailable()
+void QmitkImageNavigatorView::SetFocus ()
 {
-  m_MultiWidget = NULL;
+
 }
 
-void QmitkImageNavigatorView::CreateConnections()
+QmitkStdMultiWidget* QmitkImageNavigatorView::GetActiveStdMultiWidget()
 {
-}
+  QmitkStdMultiWidget* activeStdMultiWidget = 0;
+  cherry::IEditorPart::Pointer editor =
+    this->GetSite()->GetPage()->GetActiveEditor();
 
-void QmitkImageNavigatorView::Activated()
-{
-  QmitkFunctionality::Activated();
-}
+  if (editor.Cast<QmitkStdMultiWidgetEditor>().IsNotNull())
+  {
+    activeStdMultiWidget = editor.Cast<QmitkStdMultiWidgetEditor>()->GetStdMultiWidget();
+  }
+  else
+  {
+    mitk::DataStorageEditorInput::Pointer editorInput;
+    editorInput = new mitk::DataStorageEditorInput();
+    cherry::IEditorPart::Pointer editor = this->GetSite()->GetPage()->OpenEditor(editorInput, QmitkStdMultiWidgetEditor::EDITOR_ID);
+    activeStdMultiWidget = editor.Cast<QmitkStdMultiWidgetEditor>()->GetStdMultiWidget();
+  }
 
-void QmitkImageNavigatorView::Deactivated()
-{
-  QmitkFunctionality::Deactivated();
+  return activeStdMultiWidget;
 }

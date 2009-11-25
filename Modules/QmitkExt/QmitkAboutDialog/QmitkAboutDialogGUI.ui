@@ -27,7 +27,7 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>455</width>
+        <width>447</width>
         <height>620</height>
        </rect>
       </property>
@@ -116,21 +116,6 @@ p, li { white-space: pre-wrap; }
      </property>
     </spacer>
    </item>
-   <item row="0" column="2">
-    <widget class="QLabel" name="label">
-     <property name="font">
-      <font>
-       <family>MS Sans Serif</family>
-       <pointsize>48</pointsize>
-       <weight>75</weight>
-       <bold>true</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string>MITK 3M</string>
-     </property>
-    </widget>
-   </item>
    <item row="2" column="1">
     <widget class="QLabel" name="m_DKFZLogo">
      <property name="maximumSize">
@@ -182,9 +167,28 @@ p, li { white-space: pre-wrap; }
      </property>
     </spacer>
    </item>
+   <item row="0" column="1" colspan="3">
+    <widget class="QLabel" name="label">
+     <property name="font">
+      <font>
+       <family>MS Sans Serif</family>
+       <pointsize>48</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>MITK 3M3</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
  <resources>
+  <include location="../resources/QmitkResources.qrc"/>
   <include location="../resources/QmitkResources.qrc"/>
   <include location="../resources/QmitkResources.qrc"/>
   <include location="../resources/QmitkResources.qrc"/>

@@ -236,17 +236,12 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
   imageNavigatorAction->setCheckable(true);
   cherry::IViewPart::Pointer imageNavigatorView = 
     cherry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->FindView("org.mitk.views.imagenavigator");
+  imageNavigatorAction->setChecked(false);
   if (imageNavigatorView)
   {
     bool isImageNavigatorVisible = cherry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->IsPartVisible(imageNavigatorView);
     if (isImageNavigatorVisible)
-    {
       imageNavigatorAction->setChecked(true);
-    }
-    else
-    {
-      imageNavigatorAction->setChecked(false);
-    }
   }
   imageNavigatorAction->setToolTip("Open image navigator for navigating through image");
 
@@ -441,18 +436,16 @@ void QmitkExtWorkbenchWindowAdvisorHack::onImageNavigator()
   // get ImageNavigatorView
   cherry::IViewPart::Pointer imageNavigatorView = 
     cherry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->FindView("org.mitk.views.imagenavigator");
-  bool isImageNavigatorVisible = cherry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->IsPartVisible(imageNavigatorView);
   if (imageNavigatorView)
   {
+    bool isImageNavigatorVisible = cherry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->IsPartVisible(imageNavigatorView);
     if (isImageNavigatorVisible)
     {
       cherry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->HideView(imageNavigatorView);
-    }
-    else
-    {
-      cherry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->ShowView("org.mitk.views.imagenavigator");
+      return;
     }
   }
+  cherry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->ShowView("org.mitk.views.imagenavigator");
 }
 
 void QmitkExtWorkbenchWindowAdvisorHack::onEditPreferences()

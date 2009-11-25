@@ -320,7 +320,7 @@ void TransferFunction::SetTransferFunctionMode( int mode )
   switch( mode )
   {
   case ( TF_CT_DEFAULT ):
-   
+   /*
     // grayvalue->opacity 
     {
       vtkPiecewiseFunction *f=m_ScalarOpacityFunction;
@@ -349,6 +349,31 @@ void TransferFunction::SetTransferFunctionMode( int mode )
       f->AddRGBPoint( 930.838475,1.000000,1.000000,1.000000);
       f->AddRGBPoint(1073.558984,1.000000,0.839216,0.423529);
       f->AddRGBPoint(1220.604356,1.000000,0.772549,0.490196);
+    }
+      */
+     // grayvalue->opacity 
+    {
+      vtkPiecewiseFunction *f=m_ScalarOpacityFunction;
+      f->AddPoint(132.108911,0.000000);
+      f->AddPoint(197.063492,0.041333);
+      f->AddPoint(1087.917989,0.700000);
+    }
+    
+    // gradient at grayvalue->opacity 
+    {
+      vtkPiecewiseFunction *f=m_GradientOpacityFunction;
+      f->AddPoint(560.695000,1.000000);
+    }
+    
+    // grayvalue->color 
+    {
+      vtkColorTransferFunction *f=m_ColorTransferFunction;
+      f->AddRGBPoint(176.881890,0.650980,0.000000,0.000000);
+      f->AddRGBPoint(239.427822,0.933333,0.000000,0.000000);
+      f->AddRGBPoint(301.973753,1.000000,0.800000,0.062745);
+      f->AddRGBPoint(495.866142,1.000000,0.905882,0.666667);
+      f->AddRGBPoint(677.249344,1.000000,0.882353,0.215686);
+      f->AddRGBPoint(808.595801,1.000000,1.000000,1.000000);
     }
     
     break;

@@ -20,6 +20,7 @@
 #include "mitkProperties.h"
 #include <mitkNodePredicateAND.h>
 #include <mitkITKImageImport.h>
+#include <mitkIDataStorageService.h>
 //## Qmitk
 #include <QmitkStdMultiWidget.h>
 #include <QmitkDataStorageTableModel.h>
@@ -83,6 +84,7 @@ QmitkDataManagerView::~QmitkDataManagerView()
 
 void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
 {
+  m_Parent = parent;
   //# Preferences
   cherry::IPreferencesService::Pointer prefService 
     = cherry::Platform::GetServiceRegistry()
@@ -262,20 +264,25 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
 
 }
 
+void QmitkDataManagerView::SetFocus()
+{
+}
+
+mitk::DataStorage::Pointer QmitkDataManagerView::GetDataStorage() const
+{
+  mitk::IDataStorageService::Pointer service =
+    cherry::Platform::GetServiceRegistry().GetServiceById<mitk::IDataStorageService>(mitk::IDataStorageService::ID);
+
+  if (service.IsNotNull())
+  {
+    return service->GetDefaultDataStorage()->GetDataStorage();
+  }
+
+  return 0;
+}
 
 void QmitkDataManagerView::OnPreferencesChanged(const cherry::ICherryPreferences* )
 {
-  m_NodeTreeView->setEditTriggers(QAbstractItemView::DoubleClicked | QAbstractItemView::EditKeyPressed);
-
-  /*if(prefs->GetBool("Single click property editing", true))
-  {
-    m_NodeTreeView->setEditTriggers(QAbstractItemView::DoubleClicked | QAbstractItemView::SelectedClicked | 
-      QAbstractItemView::EditKeyPressed);
-  }
-  else
-  {
-    m_NodeTreeView->setEditTriggers(QAbstractItemView::DoubleClicked | QAbstractItemView::EditKeyPressed);
-  }*/
 }
 
 void QmitkDataManagerView::NodeTableViewContextMenuRequested( const QPoint & pos )
@@ -755,6 +762,12 @@ void QmitkDataManagerView::OtsuFilter( bool )
 void QmitkDataManagerView::NodeTreeViewRowsInserted( const QModelIndex & parent, int, int )
 {
   m_NodeTreeView->setExpanded(parent, true);
+  std::vector<mitk::DataTreeNode*> nodes = m_NodeTreeModel->GetNodeSet();
+  if(nodes.size() == 1)
+  {
+    QModelIndex treeIndex = m_NodeTreeModel->GetIndex(nodes.front());
+    m_NodeTreeView->selectionModel()->select(treeIndex, QItemSelectionModel::SelectCurrent);
+  }
 }
 
 void QmitkDataManagerView::NodeSelectionChanged( const QItemSelection & selected, const QItemSelection & deselected )

@@ -10,10 +10,16 @@
 #include <cherryISelectionListener.h>
 
 /// Qmitk
-#include <QmitkFunctionality.h>
+#include <cherryQtViewPart.h>
 #include <QmitkDataTreeNodeSelectionProvider.h>
 #include <QmitkDnDFrameWidget.h>
-// #include "QmitkStandardViews.h"
+
+#include <cherryIWorkbenchPartReference.h>
+#include <cherryIPartListener.h>
+#include <cherryIPreferencesService.h>
+
+#include <mitkDataStorage.h>
+#include "mitkQtCommonDll.h"
 #include "mitkQtDataManagerDll.h"
 
 // Forward declarations
@@ -36,7 +42,7 @@ class QmitkDataStorageTreeModel;
 ///
 /// \TODO: complete PACS support, in save dialog show regular filename
 ///
-class MITK_QT_DATAMANAGER QmitkDataManagerView : public QObject, public QmitkFunctionality
+class MITK_QT_DATAMANAGER QmitkDataManagerView : public QObject, public cherry::QtViewPart
 {
   Q_OBJECT
 
@@ -83,7 +89,7 @@ public slots:
   /// SurfaceRepresentationActionToggled
   ///
   void SurfaceRepresentationMenuAboutToShow ();
-  ///
+  ///public
   /// SurfaceRepresentationActionToggled
   ///
   void SurfaceRepresentationActionToggled ( bool checked );
@@ -151,12 +157,15 @@ protected:
   ///
   /// \brief Create the view here.
   ///
-  void CreateQtPartControl(QWidget* parent);
+  virtual void CreateQtPartControl(QWidget* parent);
+  void SetFocus();
+  mitk::DataStorage::Pointer GetDataStorage() const;
   ///
   /// \brief Shows a file open dialog.
   ///
   void FileOpen( const char * fileName, mitk::DataTreeNode* parentNode );
 protected:
+  QWidget* m_Parent;
   QmitkDnDFrameWidget* m_DndFrameWidget;
 
   ///

@@ -260,6 +260,7 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
   mainActionsToolBar->addAction(closeProjectAction);  
   mainActionsToolBar->addAction(undoAction);
   mainActionsToolBar->addAction(redoAction);
+  mainActionsToolBar->addAction(imageNavigatorAction);
   mainWindow->addToolBar(mainActionsToolBar);
 
   // ==== Window Menu ==========================

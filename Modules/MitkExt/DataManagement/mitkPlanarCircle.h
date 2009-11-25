@@ -83,6 +83,7 @@ protected:
 
   // Feature identifiers
   const unsigned int FEATURE_ID_RADIUS;
+  const unsigned int FEATURE_ID_DIAMETER;
   const unsigned int FEATURE_ID_AREA;
 
 private:

@@ -175,7 +175,7 @@ void mitk::PlanarRectangle::EvaluateFeaturesInternal()
     area /= 2.0;
   }
   
-  this->SetQuantity( FEATURE_ID_AREA, area );
+  this->SetQuantity( FEATURE_ID_AREA, abs(area) );
 
 }
 

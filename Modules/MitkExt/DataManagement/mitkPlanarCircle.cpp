@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 mitk::PlanarCircle::PlanarCircle()
 : FEATURE_ID_RADIUS( this->AddFeature( "Radius", "mm" ) ),
+  FEATURE_ID_DIAMETER( this->AddFeature( "Diameter", "mm\xB2" ) ),
   FEATURE_ID_AREA( this->AddFeature( "Area", "mm\xB2" ) )
 {
   // Circle has two control points
@@ -121,6 +122,7 @@ void mitk::PlanarCircle::EvaluateFeaturesInternal()
   double area = vnl_math::pi * radius * radius;
 
   this->SetQuantity( FEATURE_ID_RADIUS, radius );
+  this->SetQuantity( FEATURE_ID_DIAMETER, 2*radius );
   this->SetQuantity( FEATURE_ID_AREA, area );
 }
 

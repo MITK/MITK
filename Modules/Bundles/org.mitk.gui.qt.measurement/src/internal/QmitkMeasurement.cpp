@@ -630,7 +630,7 @@ void QmitkMeasurement::ActionDrawTextTriggered(bool checked)
   LOG_WARN << "Draw Text not implemented yet.";
 }
 
-void QmitkMeasurement::Visible()
+void QmitkMeasurement::Activated()
 {
   this->GetActiveStdMultiWidget()->SetWidgetPlanesVisibility(false);
   this->GetActiveStdMultiWidget()->GetRenderWindow1()->FullScreenMode(true);
@@ -663,7 +663,7 @@ void QmitkMeasurement::Visible()
 
 }
 
-void QmitkMeasurement::Hidden()
+void QmitkMeasurement::Deactivated()
 {
   this->GetActiveStdMultiWidget()->SetWidgetPlanesVisibility(true);
   this->GetActiveStdMultiWidget()->GetRenderWindow1()->FullScreenMode(false);

@@ -47,28 +47,54 @@ class vtkRenderer;
 class vtkCornerAnnotation;
 
 
-/*!
-\brief Measurement
-Allows to measure distances, angles, etc.
-
-\sa QmitkFunctionality
-\ingroup org_mitk_gui_qt_measurement_internal
-*/
+///
+/// A view for doing measurements in digital images by means of
+/// mitk::Planarfigures which can represent drawing primitives (Lines, circles, ...).
+/// The view consists of only three main elements:
+/// 1. A toolbar for activating PlanarFigure drawing
+/// 2. A textbrowser which shows details for the selected PlanarFigures
+/// 3. A button for copying all details to the clipboard
+///
 class QmitkMeasurement : public QObject, public QmitkFunctionality
 {
   Q_OBJECT
 
   public:
+    ///
+    /// Just a shortcut
+    ///
     typedef std::vector<mitk::DataTreeNode::Pointer> DataTreeNodes;
 
+    ///
+    /// Initialize pointers to 0. The rest is done in CreateQtPartControl()
+    ///
     QmitkMeasurement();
+    ///
+    /// Remove all event listener from DataStorage, DataStorageSelection, Selection Service
+    ///
     virtual ~QmitkMeasurement();
 
   public:
-
+    ///
+    /// Initializes all variables.
+    /// Builds up GUI.
+    ///
     void CreateQtPartControl(QWidget* parent);
-    virtual void Visible();
-    virtual void Hidden();
+    ///
+    /// Set widget planes visibility to false.
+    /// Show only transversal view.
+    /// Add an interactor to all PlanarFigures in the DataStorage (if they dont have one yet).
+    /// Add their interactor to the global interaction.
+    ///
+    virtual void Activated();
+    ///
+    /// Show widget planes and all renderwindows again.
+    /// Remove all planar figure interactors from the global interaction.
+    ///
+    virtual void Deactivated();
+    ///
+    /// Invoked from a DataStorage selection
+    ///
     virtual void NodeChanged(const mitk::DataTreeNode* node);
     virtual void PropertyChanged(const mitk::DataTreeNode* node, const mitk::BaseProperty* prop);
     virtual void NodeRemoved(const mitk::DataTreeNode* node);
@@ -78,7 +104,7 @@ class QmitkMeasurement : public QObject, public QmitkFunctionality
 
     ///
     /// Invoked when the DataManager selection changed.
-    /// If an image is in the selection this will be set as the selected one for measurement,
+    /// If an image is in the selection it will be set as the selected one for measurement,
     /// If a planarfigure is in the selection its parent image will be set as the selected one for measurement.
     /// All selected planarfigures will be added to m_SelectedPlanarFigures.
     /// Then PlanarFigureSelectionChanged is called

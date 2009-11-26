@@ -1,5 +1,5 @@
 Manifest-Version: 1.0
-Bundle-Name: MITK Volume Visualization
+Bundle-Name: Volume Visualization
 Bundle-SymbolicName: org.mitk.gui.qt.volumevisualization
 Bundle-Version: 1.0.0
 Bundle-Vendor: DKFZ, Medical and Biological Informatics

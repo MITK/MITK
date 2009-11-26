@@ -1,13 +1,47 @@
 /**
-\page QmitkVolumeVisualizationUserManual The Volume Visualization Functionality
 
-Available sections:
-  - \ref QmitkVolumeVisualizationUserManualOverview 
-
+\mainpage The Volume Visualization Module
 
 \section QmitkVolumeVisualizationUserManualOverview Overview
 
-A functionality to create and edit piecewise linear transfer functions for direct volume rendering,
-including color, scalar and gradient opacity functions.
+The <b> Volume Visualization Module </b> is a basic tool for visualizing three dimensional medical images. 
+MITK provides presets for transfer functions. 
+These functions, that map the gray-value to color and opacity, can be interactively edited. 
+Additionally, there are controls to quickly generate common used transfer function shapes 
+like the threshold and bell curve to help identify a range of gray-values.
 
-*/
+Please see \ref QmitkVolumeVisualizationUserManual for more detailed information.
+
+\image html Overview.png ""
+
+\page QmitkVolumeVisualizationUserManual Details
+
+Available sections:
+  - \ref QmitkVolumeVisualizationIntroduction 
+  - \ref QmitkVolumeVisualizationPreset
+  - \ref QmitkVolumeVisualizationSaving
+  - \ref QmitkVolumeVisualizationProperties
+
+
+\section QmitkVolumeVisualizationIntroduction Introduction
+
+The <b> Volume Visualization Module </b> is a basic tool for visualizing three dimensional medical images. 
+MITK provides presets for transfer functions. 
+These functions, that map the gray-value to color and opacity, can be interactively edited. 
+Additionally, there are controls to quickly generate common used transfer function shapes 
+like the threshold and bell curve to help identify a range of gray-values.
+
+
+\section QmitkVolumeVisualizationLoading Start Volume Visualization Module
+
+<ol>
+    <li>Load an image into MITK
+	<li>open Volume Visualization perspective
+    <li>Select image in data manager
+    <li>Enable Volumerendering
+</ol>
+
+\section QmitkVolumeVisualizationPreset load presets
+
+
+

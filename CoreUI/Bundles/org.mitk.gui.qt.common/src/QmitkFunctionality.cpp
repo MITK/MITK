@@ -43,6 +43,7 @@ QmitkFunctionality::QmitkFunctionality()
  : m_Parent(0)
  , m_HandlesMultipleDataStorages(false)
  , m_InDataStorageChanged(false)
+ , m_IsActivated(false)
 {
   m_PreferencesService = 
     cherry::Platform::GetServiceRegistry().GetServiceById<cherry::IPreferencesService>(cherry::IPreferencesService::ID);
@@ -166,14 +167,16 @@ void QmitkFunctionality::PartActivated( cherry::IWorkbenchPartReference::Pointer
   {
     if (m_DeactivatedFunctionality)
     {
+      m_DeactivatedFunctionality->m_IsActivated = false;
       m_DeactivatedFunctionality->Deactivated();
     }
     m_DeactivatedFunctionality = 0;
+    m_IsActivated = true;
     this->Activated();
   }
   else
   {
-    if (partRef->GetId() == QmitkStdMultiWidgetEditor::EDITOR_ID)
+    if (partRef->GetId() == QmitkStdMultiWidgetEditor::EDITOR_ID && m_IsActivated == true)
     {
       this->StdMultiWidgetAvailable(*(partRef->GetPart(false).Cast<QmitkStdMultiWidgetEditor>()->GetStdMultiWidget()));
     }
@@ -203,21 +206,26 @@ void QmitkFunctionality::PartClosed( cherry::IWorkbenchPartReference::Pointer pa
 
 void QmitkFunctionality::PartHidden( cherry::IWorkbenchPartReference::Pointer partRef )
 {
-  m_VisibleFunctionalities.erase(partRef->GetId());
+  if(partRef->GetPart(false).Cast<QmitkFunctionality>())
+	  m_VisibleFunctionalities.erase(partRef->GetId());
+
   if(partRef->GetPart(false) == this)
   {
     this->Hidden();
   }
+  else
+    this->ActivateLastVisibleFunctionality();
 }
 
 void QmitkFunctionality::PartVisible( cherry::IWorkbenchPartReference::Pointer  partRef )
 {
-  m_VisibleFunctionalities.insert(partRef->GetId());
+  if(partRef->GetPart(false).Cast<QmitkFunctionality>())
+    m_VisibleFunctionalities.insert(partRef->GetId());
+
   if(partRef->GetPart(false) == this)
   {
     this->Visible();
-    if(m_VisibleFunctionalities.size() == 1)
-      this->GetSite()->GetPage()->Activate(this->GetSite()->GetPage()->FindView(partRef->GetId()));
+    this->ActivateLastVisibleFunctionality();
   }
 }
 
@@ -357,4 +365,12 @@ void QmitkFunctionality::Visible()
 void QmitkFunctionality::Hidden()
 {
 
+}
+
+void QmitkFunctionality::ActivateLastVisibleFunctionality()
+{
+  if(m_VisibleFunctionalities.size() == 1)
+  {    
+    this->GetSite()->GetPage()->Activate(this->GetSite()->GetPage()->FindView((*m_VisibleFunctionalities.begin())));
+  }
 }

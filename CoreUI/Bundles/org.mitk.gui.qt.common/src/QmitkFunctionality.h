@@ -140,6 +140,7 @@ public:
   void RestoreOverrideCursor();
 
 protected:
+  void ActivateLastVisibleFunctionality();
   ///
   /// Returns an IPreferences for this Functionality. The path for the is "/<this->GetViewSite()->GetId()>"
   ///
@@ -167,6 +168,8 @@ private:
 
   /// saves all visible functionalities
   std::set<std::string> m_VisibleFunctionalities;
+
+  bool m_IsActivated;
 
   ///
   /// The Preferences Service to retrieve and store preferences.

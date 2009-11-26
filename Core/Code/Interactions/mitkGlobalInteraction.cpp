@@ -39,7 +39,7 @@ mitk::GlobalInteraction::~GlobalInteraction()
 {
   //s_GlobalInteraction doesn't have to be set = NULL;
 
-  m_FocusManager = NULL;
+  
 
   // StateMachineFactory and EventMapper have to be deleted explicitly, as they inherit from Vtk
   if (this->IsInitialized())
@@ -49,6 +49,11 @@ mitk::GlobalInteraction::~GlobalInteraction()
     m_EventMapper->Delete();
     m_EventMapper = NULL;
   }
+  m_ListenerList.clear();
+  m_InteractorList.clear();
+  m_SelectedList.clear();
+  m_JurisdictionMap.clear();
+  m_FocusManager = NULL;
 }
 
 

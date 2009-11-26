@@ -1,5 +1,5 @@
 Manifest-Version: 1.0
-Bundle-Name: MITK Measurement Plugin
+Bundle-Name: Measurement
 Bundle-SymbolicName: org.mitk.gui.qt.measurement
 Bundle-Version: 1.0.0
 Bundle-Vendor: DKFZ, Medical and Biological Informatics

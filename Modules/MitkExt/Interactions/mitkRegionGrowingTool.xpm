@@ -1,5 +1,5 @@
 /* XPM */
-static char * mitkRegionGrowingTool_xpm[] = {
+static const char * mitkRegionGrowingTool_xpm[] = {
 "48 48 31 1",
 " 	c None",
 ".	c #4D4D4D",

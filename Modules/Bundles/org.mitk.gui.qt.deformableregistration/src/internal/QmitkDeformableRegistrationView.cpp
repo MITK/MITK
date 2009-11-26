@@ -75,6 +75,7 @@ struct SelListenerDeformableRegistration : ISelectionListener
         m_View->m_Controls.m_StatusLabel->setText("You have to select two images from Datamanager for Registration!");
         m_View->m_Controls.m_StatusLabel->show();
         m_View->m_Controls.TextLabelFixed->hide();
+        m_Controls.m_SwitchImages->hide();
         m_View->m_Controls.m_FixedLabel->hide();
         m_View->m_Controls.TextLabelMoving->hide();
         m_View->m_Controls.m_MovingLabel->hide();
@@ -174,6 +175,7 @@ void QmitkDeformableRegistrationView::CreateQtPartControl(QWidget* parent)
   m_Parent->setEnabled(false);
   this->CreateConnections(); 
   m_Controls.TextLabelFixed->hide();
+  m_Controls.m_SwitchImages->hide();
   m_Controls.m_FixedLabel->hide();
   m_Controls.TextLabelMoving->hide();
   m_Controls.m_MovingLabel->hide();
@@ -394,6 +396,7 @@ void QmitkDeformableRegistrationView::FixedSelected(mitk::DataTreeNode::Pointer 
     m_FixedNode = fixedImage;
     m_Controls.m_FixedLabel->hide();
     m_Controls.TextLabelFixed->hide();
+    m_Controls.m_SwitchImages->hide();
   }
   this->CheckCalculateEnabled();
 }

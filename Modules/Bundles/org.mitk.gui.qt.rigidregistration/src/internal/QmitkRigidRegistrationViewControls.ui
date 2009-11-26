@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>292</width>
+    <width>378</width>
     <height>587</height>
    </rect>
   </property>
@@ -20,6 +20,9 @@
    <string>RigidRegistrationControls</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_11">
+   <property name="spacing">
+    <number>0</number>
+   </property>
    <property name="margin">
     <number>0</number>
    </property>
@@ -170,8 +173,11 @@
                  <pointsize>8</pointsize>
                 </font>
                </property>
+               <property name="toolTip">
+                <string/>
+               </property>
                <property name="text">
-                <string>You have to select two images from Datamanager!</string>
+                <string>You have to select two images from Data Manager using CTRL + left click!</string>
                </property>
               </widget>
              </item>

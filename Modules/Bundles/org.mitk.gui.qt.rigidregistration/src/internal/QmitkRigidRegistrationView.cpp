@@ -61,7 +61,6 @@ struct SelListenerRigidRegistration : ISelectionListener
       {
         if (m_View->m_FixedNode.IsNull() || m_View->m_MovingNode.IsNull())
         {
-          m_View->m_Controls.m_StatusLabel->setText("You have to select two images from Datamanager for Registration!");
           m_View->m_Controls.m_StatusLabel->show();
           m_View->m_Controls.TextLabelFixed->hide();
           m_View->m_Controls.m_FixedLabel->hide();
@@ -93,7 +92,6 @@ struct SelListenerRigidRegistration : ISelectionListener
             {
               if (dynamic_cast<mitk::Image*>(node->GetData())->GetDimension() == 4)
               {
-                m_View->m_Controls.m_StatusLabel->setText("You have to select two images from Datamanager for Registration!");
                 m_View->m_Controls.m_StatusLabel->show();
                 QMessageBox::information( NULL, "RigidRegistration", "Only 2D or 3D images can be processed.", QMessageBox::Ok );
                 return;
@@ -122,7 +120,6 @@ struct SelListenerRigidRegistration : ISelectionListener
             }
             else
             {
-              m_View->m_Controls.m_StatusLabel->setText("You have to select two images from Datamanager for Registration!");
               m_View->m_Controls.m_StatusLabel->show();
               return;
             }
@@ -132,7 +129,6 @@ struct SelListenerRigidRegistration : ISelectionListener
     }
     else if (m_View->m_FixedNode.IsNull() || m_View->m_MovingNode.IsNull())
     {
-      m_View->m_Controls.m_StatusLabel->setText("You have to select two images from Datamanager for Registration!");
       m_View->m_Controls.m_StatusLabel->show();
     }
   }

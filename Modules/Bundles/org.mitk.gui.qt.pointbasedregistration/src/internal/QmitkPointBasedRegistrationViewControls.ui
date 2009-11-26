@@ -65,8 +65,11 @@
        </disabled>
       </palette>
      </property>
+     <property name="toolTip">
+      <string/>
+     </property>
      <property name="text">
-      <string>You have to select two images from Datamanager!</string>
+      <string>You have to select two images from Data Manager using CTRL + left click!</string>
      </property>
     </widget>
    </item>

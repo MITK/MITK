@@ -1,5 +1,4 @@
 /**
-
 \mainpage The Volume Visualization Module
 
 \section QmitkVolumeVisualizationUserManualOverview Overview
@@ -45,3 +44,4 @@ like the threshold and bell curve to help identify a range of gray-values.
 
 
 
+*/

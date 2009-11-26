@@ -8,26 +8,23 @@ The Measurement module enables the user to interact with 2D images or single sli
 
 \image html Workflow.png
 
-The workflow is repeatedly useable with the same or different measurement figures, which are correlated to the choosen image and can be saved together with it for future use. The standard working plane is "Transversal" but the other standard viewplanes ("Saggital" and "Coronal") are also valid for measurements.
-Once the measurement module is started the programm's basic appearance is as follows (displayed with the components description):
+The workflow is repeatedly useable with the same or different measurement figures, which are correlated to the choosen image and can be saved together with it for future use. On pressing the Measurement icon (see picture below the page title) in the view button line the basic appearance of the bundle is as follws.
 
 \image html Basic_Screen_edited.jpg
 
-In the following section the different measurement figures are explained by using an 3D MRI image stack of the pelvis.
+The standard working plane is "Transversal" but the other standard viewplanes ("Saggital" and "Coronal") are also valid for measurements. To swap between the view planes refer to 3M Application Bundle User Manual.
 
-Table of content:
-- \ref QmitkMeasurementUserManualUsage
 - \ref QmitkMeasurementUserManualFeatures 
+- \ref QmitkMeasurementUserManualUsage
+
 
 
 \page Features  
 \section QmitkMeasurementUserManualFeatures Features
 
-The measurement bundle offers the following features to perform measurements on images:
-
-\image html MeasurementFigureButtonline.jpg
-
-From left to right the buttons are connected with the following functions:
+The bundle as it is depicted below offers the following features in the order of apperance on the image from top to bottom: 
+\image html Measurement_View.jpg
+The first information is the selected image's name (here: DICOM-MRI-Image) followed by the measurement figures button line with the seven measurement figures. From left to right the buttons are connected with the following functions:
 
 \subsection SubOne Draw Line
 Draws a line between two set points and returns the distance between these points.
@@ -48,7 +45,13 @@ Draws a circle by setting two points, whereas the first set point is the center 
 Draws a recangle by setting two points at the opposing edges of the rectangle starting with the upper left edge. The measured values are the circumference and the included area. 
 
 \subsection SubSeven Draw Polygon
-Draws a polygon by setting three or more points. The measured values are the circumference and the included area. 
+Draws a polygon by setting three or more points. The measured values are the circumference and the included area.
+
+Below the buttonline the statistics window is situated, it displays the results of the actual measurements from the selected measurement figures. The content of the statistics window can be copied to the clipboard with the correspondig button for further use in a table calculation programm (e.g. Open Office Calc etc.). 
+
+\image html  Image_processed.jpg
+
+The last row contains again a button line to swap from the measurement bundle (activated in the image) to other supported MITK 3M3 bundles.
 
 - \ref QmitkMeasurementUserManualOverview 
 - \ref QmitkMeasurementUserManualUsage
@@ -86,10 +89,12 @@ The results of the measurement with each of these figures is shown in the statis
 When applying more then one measurement figure to the image the actual measurement figure is depicted in red and the displayed values belong to this measurement figure. All measurement figures become part of the Data Manager as a node of the image tree.
 
 \subsection Three Save the image with measurement information
-After applying the wanted measurement figures the entire scene consisting of the image and the measurement figures can be saved for future use. Therefore just click the right mouse button and choose the item "Save" in the opening item list. Following to that a save dialog appears where the path to the save folder can be set. Afterwards just accept your choice with the save button.
+After applying the wanted measurement figures the entire scene consisting of the image and the measurement figures can be saved for future use. Therefore just click the right mouse button when over the image item in the Data Manager and choose the item "Save" in the opening item list. Following to that a save dialog appears where the path to the save folder can be set. Afterwards just accept your choice with the save button.
 
 \subsection Four Remove measurement figures or image
-If the single measurement figures or the image is not needed any longer, it can be removed solely or as an entire group. To do so just select the wanted items in the data manager list by left-click on it or if several items wanted to be removed left click on all wanted by simultaniously holding the ctrl-button pressed.
+If the single measurement figures or the image is not needed any longer, it can be removed solely or as an entire group. The image can't be removed without simultaneously remove all the dependent measurement figures that belongt the image tree in the Data Manager. To remove just select the wanted items in the data manager list by left-click on it or if several items wanted to be removed left click on all wanted by simultaneously holding the ctrl-button pressed.
+
+For more detailed usage of the save/remove functionality refer to the Data Manager User Manual.
 - \ref QmitkMeasurementUserManualOverview
 - \ref QmitkMeasurementUserManualFeatures 
 

@@ -1,5 +1,5 @@
 /**
-\mainpage PointBasedRegistrationUserManual The Point Based Registration Module
+\mainpage The Point Based Registration Module
 
 This module allows you to register two datasets in a rigid and deformable manner via corresponding 
 PointSets. Register means to align two datasets, so that they become as similar as possible. 

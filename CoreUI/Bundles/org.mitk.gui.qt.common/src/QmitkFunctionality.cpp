@@ -37,11 +37,12 @@
 #include <QScrollArea>
 #include <QVBoxLayout>
 
+QmitkFunctionality* QmitkFunctionality::m_DeactivatedFunctionality = 0;
+
 QmitkFunctionality::QmitkFunctionality()
  : m_Parent(0)
  , m_HandlesMultipleDataStorages(false)
  , m_InDataStorageChanged(false)
- , m_IsActive(false)
 {
   m_PreferencesService = 
     cherry::Platform::GetServiceRegistry().GetServiceById<cherry::IPreferencesService>(cherry::IPreferencesService::ID);
@@ -156,33 +157,34 @@ void QmitkFunctionality::StdMultiWidgetNotAvailable()
 
 cherry::IPartListener::Events::Types QmitkFunctionality::GetPartEventTypes() const
 {
-  return Events::ACTIVATED | Events::CLOSED | Events::HIDDEN | Events::VISIBLE;
+  return Events::ACTIVATED | Events::DEACTIVATED | Events::CLOSED | Events::HIDDEN | Events::VISIBLE;
 }
 
 void QmitkFunctionality::PartActivated( cherry::IWorkbenchPartReference::Pointer partRef )
 {
-
-  // if this QmitkFunctionality was activated call Activated() here
-  if(partRef->GetPart(false) == this &&  m_IsActive != true)
+  if (partRef->GetPart(false) == this && m_DeactivatedFunctionality != this)
   {
-    m_IsActive = true;
+    if (m_DeactivatedFunctionality)
+    {
+      m_DeactivatedFunctionality->Deactivated();
+    }
+    m_DeactivatedFunctionality = 0;
     this->Activated();
   }
-  // another QmitkFunctionality was activated
-  else if(partRef->GetPart(false) != this && partRef->GetPart(false).Cast<QmitkFunctionality>() && m_IsActive == true)
+  else
   {
-    m_IsActive = false;
-    this->Deactivated();
-  }
-  else 
-  {
-    QmitkStdMultiWidgetEditor::Pointer stdMultiWidgetEditor = partRef->GetPart(false).Cast<QmitkStdMultiWidgetEditor>();
-
-    // inform ViewPart that multi widget is available now
-    if (stdMultiWidgetEditor.IsNotNull())
+    if (partRef->GetId() == QmitkStdMultiWidgetEditor::EDITOR_ID)
     {
-      this->StdMultiWidgetAvailable(*(stdMultiWidgetEditor->GetStdMultiWidget()));
+      this->StdMultiWidgetAvailable(*(partRef->GetPart(false).Cast<QmitkStdMultiWidgetEditor>()->GetStdMultiWidget()));
     }
+  }
+}
+
+void QmitkFunctionality::PartDeactivated(cherry::IWorkbenchPartReference::Pointer partRef)
+{
+  if (partRef->GetPart(false) == this)
+  {
+    m_DeactivatedFunctionality = partRef->GetPart(false).Cast<QmitkFunctionality>().GetPointer();
   }
 }
 
@@ -201,6 +203,7 @@ void QmitkFunctionality::PartClosed( cherry::IWorkbenchPartReference::Pointer pa
 
 void QmitkFunctionality::PartHidden( cherry::IWorkbenchPartReference::Pointer partRef )
 {
+  m_VisibleFunctionalities.erase(partRef->GetId());
   if(partRef->GetPart(false) == this)
   {
     this->Hidden();
@@ -209,9 +212,12 @@ void QmitkFunctionality::PartHidden( cherry::IWorkbenchPartReference::Pointer pa
 
 void QmitkFunctionality::PartVisible( cherry::IWorkbenchPartReference::Pointer  partRef )
 {
+  m_VisibleFunctionalities.insert(partRef->GetId());
   if(partRef->GetPart(false) == this)
   {
     this->Visible();
+    if(m_VisibleFunctionalities.size() == 1)
+      this->GetSite()->GetPage()->Activate(this->GetSite()->GetPage()->FindView(partRef->GetId()));
   }
 }
 

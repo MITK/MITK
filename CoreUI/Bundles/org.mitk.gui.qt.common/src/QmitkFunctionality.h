@@ -126,10 +126,11 @@ public:
   // IPartListener
   Events::Types GetPartEventTypes() const;
   virtual void PartActivated (cherry::IWorkbenchPartReference::Pointer partRef);
+  virtual void PartDeactivated(cherry::IWorkbenchPartReference::Pointer partRef);
   virtual void PartClosed (cherry::IWorkbenchPartReference::Pointer partRef);
   virtual void PartHidden (cherry::IWorkbenchPartReference::Pointer partRef);
   virtual void PartVisible (cherry::IWorkbenchPartReference::Pointer partRef);
-
+  
   // Convenient methods to set and reset a wait/busy cursor ("hourglass")
   void WaitCursorOn();
   void BusyCursorOn();
@@ -162,7 +163,10 @@ private:
   ///
   /// Saves if this view is the currently active one.
   ///
-  bool m_IsActive;
+  static QmitkFunctionality* m_DeactivatedFunctionality;
+
+  /// saves all visible functionalities
+  std::set<std::string> m_VisibleFunctionalities;
 
   ///
   /// The Preferences Service to retrieve and store preferences.

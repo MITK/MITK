@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <cherryUIException.h>
 #include <cherryIWorkbenchPage.h>
+#include <cherryIPreferencesService.h>
 
 #include <QWidget>
 
@@ -100,6 +101,18 @@ void QmitkStdMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
         m_StdMultiWidget->GetMoveAndZoomInteractor()
       );
     this->GetSite()->GetPage()->AddPartListener(cherry::IPartListener::Pointer(this));
+
+    // enable change of logo
+    cherry::IPreferencesService::Pointer prefService
+      = cherry::Platform::GetServiceRegistry()
+      .GetServiceById<cherry::IPreferencesService>(cherry::IPreferencesService::ID);
+
+    cherry::IPreferences::Pointer logoPref = prefService->GetSystemPreferences()->Node("DepartmentLogo");
+    std::string departmentLogoLocation = logoPref->Get("DepartmentLogo","");
+
+    m_StdMultiWidget->SetDepartmentLogoPath(departmentLogoLocation.c_str());
+    m_StdMultiWidget->DisableDepartmentLogo();
+    m_StdMultiWidget->EnableDepartmentLogo();
   }
 }
 

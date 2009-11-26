@@ -72,18 +72,21 @@ struct SelListenerDeformableRegistration : ISelectionListener
     {
       if (m_View->m_CurrentSelection->Size() != 2)
       {
-        m_View->m_Controls.m_StatusLabel->setText("You have to select two images from Datamanager for Registration!");
-        m_View->m_Controls.m_StatusLabel->show();
-        m_View->m_Controls.TextLabelFixed->hide();
-        m_View->m_Controls.m_SwitchImages->hide();
-        m_View->m_Controls.m_FixedLabel->hide();
-        m_View->m_Controls.TextLabelMoving->hide();
-        m_View->m_Controls.m_MovingLabel->hide();
-        m_View->m_Controls.m_OpacityLabel->setEnabled(false);
-        m_View->m_Controls.m_OpacitySlider->setEnabled(false);
-        m_View->m_Controls.label->setEnabled(false);
-        m_View->m_Controls.label_2->setEnabled(false);
-        m_View->m_Controls.m_ShowRedGreenValues->setEnabled(false);
+        if (m_View->m_FixedNode.IsNull() || m_View->m_MovingNode.IsNull())
+        {
+          m_View->m_Controls.m_StatusLabel->setText("You have to select two images from Datamanager for Registration!");
+          m_View->m_Controls.m_StatusLabel->show();
+          m_View->m_Controls.TextLabelFixed->hide();
+          m_View->m_Controls.m_SwitchImages->hide();
+          m_View->m_Controls.m_FixedLabel->hide();
+          m_View->m_Controls.TextLabelMoving->hide();
+          m_View->m_Controls.m_MovingLabel->hide();
+          m_View->m_Controls.m_OpacityLabel->setEnabled(false);
+          m_View->m_Controls.m_OpacitySlider->setEnabled(false);
+          m_View->m_Controls.label->setEnabled(false);
+          m_View->m_Controls.label_2->setEnabled(false);
+          m_View->m_Controls.m_ShowRedGreenValues->setEnabled(false);
+        }
       }
       else
       {
@@ -101,6 +104,13 @@ struct SelListenerDeformableRegistration : ISelectionListener
             // only look at interesting types
             if(QString("Image").compare(node->GetData()->GetNameOfClass())==0)
             {
+              if (dynamic_cast<mitk::Image*>(node->GetData())->GetDimension() == 4)
+              {
+                m_View->m_Controls.m_StatusLabel->setText("You have to select two images from Datamanager for Registration!");
+                m_View->m_Controls.m_StatusLabel->show();
+                QMessageBox::information( NULL, "DeformableRegistration", "Only 2D or 3D images can be processed.", QMessageBox::Ok );
+                return;
+              }
               if (foundFixedImage == false)
               {
                 fixedNode = node;
@@ -111,6 +121,12 @@ struct SelListenerDeformableRegistration : ISelectionListener
                 m_View->SetImagesVisible(selection);
                 m_View->FixedSelected(fixedNode);
                 m_View->MovingSelected(node);
+                m_View->m_Controls.m_StatusLabel->hide();
+                m_View->m_Controls.TextLabelFixed->show();
+                m_View->m_Controls.m_SwitchImages->show();
+                m_View->m_Controls.m_FixedLabel->show();
+                m_View->m_Controls.TextLabelMoving->show();
+                m_View->m_Controls.m_MovingLabel->show();
                 m_View->m_Controls.m_OpacityLabel->setEnabled(true);
                 m_View->m_Controls.m_OpacitySlider->setEnabled(true);
                 m_View->m_Controls.label->setEnabled(true);
@@ -508,7 +524,15 @@ void QmitkDeformableRegistrationView::Calculate()
   {
     m_Controls.m_QmitkDemonsRegistrationViewControls->SetFixedNode(m_FixedNode);
     m_Controls.m_QmitkDemonsRegistrationViewControls->SetMovingNode(m_MovingNode);
-    m_Controls.m_QmitkDemonsRegistrationViewControls->CalculateTransformation();
+    try
+    {
+      m_Controls.m_QmitkDemonsRegistrationViewControls->CalculateTransformation();
+    }
+    catch (itk::ExceptionObject& excpt)
+    {
+      QMessageBox::information( NULL, "Registration exception", excpt.GetDescription(), QMessageBox::Ok );
+      return;
+    }
     mitk::Image::Pointer resultImage = m_Controls.m_QmitkDemonsRegistrationViewControls->GetResultImage();
     mitk::Image::Pointer resultDeformationField = m_Controls.m_QmitkDemonsRegistrationViewControls->GetResultDeformationfield();   
     if (resultImage.IsNotNull())

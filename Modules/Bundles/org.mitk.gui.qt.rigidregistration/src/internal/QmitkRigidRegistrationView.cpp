@@ -91,6 +91,13 @@ struct SelListenerRigidRegistration : ISelectionListener
             // only look at interesting types
             if(QString("Image").compare(node->GetData()->GetNameOfClass())==0)
             {
+              if (dynamic_cast<mitk::Image*>(node->GetData())->GetDimension() == 4)
+              {
+                m_View->m_Controls.m_StatusLabel->setText("You have to select two images from Datamanager for Registration!");
+                m_View->m_Controls.m_StatusLabel->show();
+                QMessageBox::information( NULL, "RigidRegistration", "Only 2D or 3D images can be processed.", QMessageBox::Ok );
+                return;
+              }
               if (foundFixedImage == false)
               {
                 fixedNode = node;
@@ -101,6 +108,11 @@ struct SelListenerRigidRegistration : ISelectionListener
                 m_View->SetImagesVisible(selection);
                 m_View->FixedSelected(fixedNode);
                 m_View->MovingSelected(node);
+                m_View->m_Controls.m_StatusLabel->hide();
+                m_View->m_Controls.TextLabelFixed->show();
+                m_View->m_Controls.m_FixedLabel->show();
+                m_View->m_Controls.TextLabelMoving->show();
+                m_View->m_Controls.m_MovingLabel->show();
                 m_View->m_Controls.m_OpacityLabel->setEnabled(true);
                 m_View->m_Controls.m_OpacitySlider->setEnabled(true);
                 m_View->m_Controls.label->setEnabled(true);

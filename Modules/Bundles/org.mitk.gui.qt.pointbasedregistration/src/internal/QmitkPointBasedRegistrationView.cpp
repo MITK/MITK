@@ -127,6 +127,13 @@ struct SelListenerPointBasedRegistration : ISelectionListener
             {
               if(nodeIt->Value().GetPointer() == node.GetPointer())
               {
+                if (dynamic_cast<mitk::Image*>(node->GetData())->GetDimension() == 4)
+                {
+                  m_View->m_Controls.m_StatusLabel->setText("You have to select two images from Datamanager for Registration!");
+                  m_View->m_Controls.m_StatusLabel->show();
+                  QMessageBox::information( NULL, "PointBasedRegistration", "Only 2D or 3D images can be processed.", QMessageBox::Ok );
+                  return;
+                }
                 if (foundFixedImage == false)
                 {
                   fixedNode = node;
@@ -137,6 +144,20 @@ struct SelListenerPointBasedRegistration : ISelectionListener
                   m_View->SetImagesVisible(selection);
                   m_View->FixedSelected(fixedNode);
                   m_View->MovingSelected(node);
+                  m_View->m_Controls.m_StatusLabel->hide();
+                  m_View->m_Controls.TextLabelFixed->show();
+                  m_View->m_Controls.m_FixedLabel->show();
+                  m_View->m_Controls.line2->show();
+                  m_View->m_Controls.m_FixedPointListWidget->show();
+                  m_View->m_Controls.TextLabelMoving->show();
+                  m_View->m_Controls.m_MovingLabel->show();
+                  m_View->m_Controls.line1->show();
+                  m_View->m_Controls.m_MovingPointListWidget->show();
+                  m_View->m_Controls.m_OpacityLabel->show();
+                  m_View->m_Controls.m_OpacitySlider->show();
+                  m_View->m_Controls.label->show();
+                  m_View->m_Controls.label_2->show();
+                  m_View->m_Controls.m_SwitchImages->show();
                   m_View->m_Controls.m_ShowRedGreenValues->setEnabled(true);
                 }
               }

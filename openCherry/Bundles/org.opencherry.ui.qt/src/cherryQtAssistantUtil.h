@@ -45,14 +45,17 @@ public:
   static bool RegisterQCHFiles(const QString& collectionFile, const std::vector<IBundle::Pointer>& bundles);
 
   static void SetHelpColletionFile(const QString& file);
+  static void SetDefaultHelpUrl(const QString& defaultUrl);
 
 private:
 
   static QProcess* assistantProcess;
   static QString helpCollectionFile;
+  static QString defaultHelpUrl;
+
+  static QStringList registeredBundles;
 
   static QString GetAssistantExecutable();
-  static QString GetDefaultHelpUrl();
 
 };
 

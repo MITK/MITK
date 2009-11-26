@@ -32,6 +32,8 @@ namespace cherry
 
 QProcess* QtAssistantUtil::assistantProcess = 0;
 QString QtAssistantUtil::helpCollectionFile;
+QString QtAssistantUtil::defaultHelpUrl;
+QStringList QtAssistantUtil::registeredBundles;
 
 void QtAssistantUtil::SetHelpColletionFile(const QString& file)
 {
@@ -58,15 +60,17 @@ void QtAssistantUtil::OpenActivePartHelp()
   }
   //End get Plugin-ID
 
-  QString helpUrl = GetDefaultHelpUrl();
-  if (!pluginID.isEmpty()) helpUrl = "qthelp://"+pluginID+"/bundle/index.html";
+  QString helpUrl = defaultHelpUrl;
+  if (!pluginID.isEmpty() && registeredBundles.contains(pluginID))
+    helpUrl = "qthelp://"+pluginID+"/bundle/index.html";
+
   OpenAssistant(helpUrl);
 }
 
 void QtAssistantUtil::OpenAssistant(const QString& startPage)
 {
   QString startUrl = startPage;
-  if (startUrl.isEmpty()) startUrl = GetDefaultHelpUrl();
+  if (startUrl.isEmpty()) startUrl = defaultHelpUrl;
 
   if (assistantProcess == 0)
   {
@@ -116,11 +120,13 @@ bool QtAssistantUtil::RegisterQCHFiles(const QString& collectionFile,
   {
     std::vector<std::string> resourceFiles;
     bundles[i]->GetStorage().List("resources", resourceFiles);
+    bool qchFileFound = false;
     for (std::size_t j = 0; j < resourceFiles.size(); ++j)
     {
       QString resource = QString::fromStdString(resourceFiles[j]);
       if (resource.endsWith(".qch"))
       {
+        qchFileFound = true;
         QStringList args;
         args << QLatin1String("-collectionFile") << collectionFile;
         Poco::Path qchPath = bundles[i]->GetPath();
@@ -130,6 +136,11 @@ bool QtAssistantUtil::RegisterQCHFiles(const QString& collectionFile,
         args << QLatin1String("-quiet");
         argsVector.push_back(args);
       }
+    }
+
+    if (qchFileFound)
+    {
+      registeredBundles.push_back(QString::fromStdString(bundles[i]->GetSymbolicName()));
     }
   }
 
@@ -174,9 +185,9 @@ QString QtAssistantUtil::GetAssistantExecutable()
   return assistantFile.fileName();
 }
 
-QString QtAssistantUtil::GetDefaultHelpUrl()
+void QtAssistantUtil::SetDefaultHelpUrl(const QString& defaultUrl)
 {
-  return QString("qthelp://org.mitk.gui.qt.3m3application/bundle/index.html");
+  defaultHelpUrl = defaultUrl;
 }
 
 }

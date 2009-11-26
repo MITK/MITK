@@ -166,10 +166,14 @@ void QmitkToolSelectionBox::SetOrUnsetButtonForActiveTool()
   // we want to emit a signal in any case, whether we selected ourselves or somebody else changes "our" tool manager. --> emit before check on m_SelfCall
   int id = m_ToolManager->GetActiveToolID();
 
+  // don't emit signal for shape model tools
+  bool emitSignal = true;
   mitk::Tool* tool = m_ToolManager->GetActiveTool();
-  if(tool != NULL)
-    if(std::string(tool->GetGroup()) != "organ_segmentation")
-      emit ToolSelected(id);
+  if(tool && std::string(tool->GetGroup()) == "organ_segmentation")
+    emitSignal = false;
+
+  if(emitSignal)
+    emit ToolSelected(id);
 
   // delete old GUI (if any)
   if ( m_LastToolGUI && m_ToolGUIWidget )

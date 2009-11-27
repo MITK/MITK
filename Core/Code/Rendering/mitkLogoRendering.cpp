@@ -163,6 +163,9 @@ void mitk::LogoRendering::Enable()
     {
       m_PngReader->Update();
       m_Actor->SetInput(m_PngReader->GetOutput());
+      // attention! needs to be computed somehow
+      m_ZoomFactor = 3.0;
+      //m_LogoPosition  = mitk::LogoRendering::UpperLeft;
     }
     else // either logo file not found or logo renderer is forced to show the MBI logo
     {
@@ -240,7 +243,14 @@ void mitk::LogoRendering::SetupCamera()
 
   for ( unsigned int cc = 0; cc < 3; cc++)
   {
-    focalPoint[cc] = origin[cc] + ( spacing[cc] * dimensions[cc] ) / 2.0;
+    if (cc==0)
+    {
+      focalPoint[cc] = origin[cc];// + ( spacing[cc] * dimensions[cc] ) /*/ 2.0*/;
+    }
+    else
+    {
+      focalPoint[cc] = origin[cc] + ( spacing[cc] * dimensions[cc] )/ 2.0;
+    }
     position[cc]   = focalPoint[cc];
   }
 

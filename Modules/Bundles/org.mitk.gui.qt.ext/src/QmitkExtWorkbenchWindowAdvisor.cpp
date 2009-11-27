@@ -304,8 +304,9 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
   windowMenu->addSeparator();
   QAction* resetPerspectiveAction = windowMenu->addAction("&Reset Perspective",
       QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onResetPerspective()));
-  QAction* closePerspectiveAction = windowMenu->addAction("&Close Perspective",
-      QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onClosePerspective()));
+  // Close perspective does not work yet
+  //QAction* closePerspectiveAction = windowMenu->addAction("&Close Perspective",
+  //    QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onClosePerspective()));
   windowMenu->addSeparator();
   QAction* preferencesAction = windowMenu->addAction("&Preferences...",
       QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onEditPreferences()),

@@ -93,6 +93,9 @@ void QmitkVolumeVisualizationView::CreateQtPartControl(QWidget* parent)
 
 void QmitkVolumeVisualizationView::SelectionChanged( cherry::IWorkbenchPart::Pointer, cherry::ISelection::ConstPointer selection )
 { 
+  if(!this->m_IsVisible)
+    return;
+
   mitk::DataTreeNodeSelection::ConstPointer _DataTreeNodeSelection 
     = selection.Cast<const mitk::DataTreeNodeSelection>();
 

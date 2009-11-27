@@ -44,6 +44,7 @@ QmitkFunctionality::QmitkFunctionality()
  , m_HandlesMultipleDataStorages(false)
  , m_InDataStorageChanged(false)
  , m_IsActivated(false)
+ , m_IsVisible(false)
 {
   m_PreferencesService = 
     cherry::Platform::GetServiceRegistry().GetServiceById<cherry::IPreferencesService>(cherry::IPreferencesService::ID);
@@ -137,6 +138,12 @@ void QmitkFunctionality::AfterCreateQtPartControl()
     this->StdMultiWidgetNotAvailable();
 }
 
+
+bool QmitkFunctionality::IsVisible() const
+{
+  return m_IsVisible;
+}
+
 void QmitkFunctionality::SetFocus()
 {
 }
@@ -211,6 +218,7 @@ void QmitkFunctionality::PartHidden( cherry::IWorkbenchPartReference::Pointer pa
 
   if(partRef->GetPart(false) == this)
   {
+    m_IsVisible = false;
     this->Hidden();
   }
   else
@@ -224,6 +232,7 @@ void QmitkFunctionality::PartVisible( cherry::IWorkbenchPartReference::Pointer  
 
   if(partRef->GetPart(false) == this)
   {
+    m_IsVisible = true;
     this->Visible();
     this->ActivateLastVisibleFunctionality();
   }

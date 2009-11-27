@@ -615,7 +615,7 @@ void QmitkSegmentationView::StdMultiWidgetClosed( QmitkStdMultiWidget& stdMultiW
 
 void QmitkSegmentationView::SelectionChanged(cherry::IWorkbenchPart::Pointer sourcepart, cherry::ISelection::ConstPointer selection)
 {
-  if (!m_Parent || !m_Parent->isVisible() )
+  if (!m_Parent || !m_Parent->isVisible() || !this->m_IsVisible)
     return;
 
   if ( sourcepart == this || selection.IsNull() )  // prevents being notified by own selection events

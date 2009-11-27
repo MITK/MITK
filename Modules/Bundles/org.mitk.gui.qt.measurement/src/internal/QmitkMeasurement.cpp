@@ -238,7 +238,7 @@ void QmitkMeasurement::SelectionChanged(
     cherry::IWorkbenchPart::Pointer sourcepart,
     cherry::ISelection::ConstPointer selection)
 {
-  if (sourcepart.GetPointer() == this)
+  if ( !this->m_Visible || sourcepart.GetPointer() == this)
     return;
 
   mitk::DataTreeNodeSelection::ConstPointer _DataTreeNodeSelection =

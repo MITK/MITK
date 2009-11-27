@@ -762,12 +762,12 @@ void QmitkDataManagerView::OtsuFilter( bool )
 void QmitkDataManagerView::NodeTreeViewRowsInserted( const QModelIndex & parent, int, int )
 {
   m_NodeTreeView->setExpanded(parent, true);
-  std::vector<mitk::DataTreeNode*> nodes = m_NodeTreeModel->GetNodeSet();
+  /*std::vector<mitk::DataTreeNode*> nodes = m_NodeTreeModel->GetNodeSet();
   if(nodes.size() == 1)
   {
     QModelIndex treeIndex = m_NodeTreeModel->GetIndex(nodes.front());
     m_NodeTreeView->selectionModel()->select(treeIndex, QItemSelectionModel::SelectCurrent);
-  }
+  }*/
 }
 
 void QmitkDataManagerView::NodeSelectionChanged( const QItemSelection & selected, const QItemSelection & deselected )

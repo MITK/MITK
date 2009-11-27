@@ -113,6 +113,7 @@ public:
   ///
   virtual void DataStorageChanged();
 
+  virtual bool IsVisible() const;
   ///
   /// Outputs an error message to the console and displays a message box containing
   /// the exception description.
@@ -155,6 +156,14 @@ protected:
   virtual QmitkStdMultiWidget* GetActiveStdMultiWidget();
 
   QWidget* m_Parent;
+  ///
+  /// Saves if this view is the currently active one.
+  ///
+  bool m_IsActive;
+  ///
+  /// Saves if this view is visible
+  ///
+  bool m_IsVisible;
 private:
   bool m_HandlesMultipleDataStorages;
   ///

@@ -55,6 +55,9 @@
 #include "mitkVerboseLimitedLinearUndo.h"
 #include <QToolBar>
 #include <QMessageBox>
+#include <QNetworkAccessManager>
+#include <QUrl>
+#include <QNetworkReply>
 #include <QmitkAboutDialog/QmitkAboutDialog.h>
 
 QmitkExtWorkbenchWindowAdvisorHack
@@ -230,6 +233,12 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
   fileMenu->addAction(fileSaveProjectAction);
   QAction* closeProjectAction = new QmitkCloseProjectAction(window);
   closeProjectAction->setIcon(QIcon(":/org.mitk.gui.qt.ext/Remove_48.png"));
+  QAction* updateAction = new QAction(mainWindow);
+  updateAction->setText("&Check for updates");
+  updateAction->setIcon(QIcon(":/org.mitk.gui.qt.ext/Refresh_48.png"));
+  updateAction->setToolTip("Check for updates");
+  QObject::connect(updateAction, SIGNAL(triggered(bool)), QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onUpdate(bool)));
+
   fileMenu->addAction(closeProjectAction);
   fileMenu->addSeparator();
   fileMenu->addAction(new QmitkFileExitAction(window));
@@ -282,6 +291,7 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
   mainActionsToolBar->addAction(undoAction);
   mainActionsToolBar->addAction(redoAction);
   mainActionsToolBar->addAction(imageNavigatorAction);
+  mainActionsToolBar->addAction(updateAction);
   mainWindow->addToolBar(mainActionsToolBar);
 
   // ==== Window Menu ==========================
@@ -360,6 +370,7 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
   QAction* welcomeAction = helpMenu->addAction("&Welcome",QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onIntro()));
   QAction* helpAction = helpMenu->addAction("&Help Contents",QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onHelp()), QKeySequence(QKeySequence::HelpContents));
   QAction* aboutAction = helpMenu->addAction("&About",QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onAbout()));
+  helpMenu->addAction(updateAction);
   // =====================================================
 
 
@@ -413,6 +424,63 @@ QmitkExtWorkbenchWindowAdvisorHack::QmitkExtWorkbenchWindowAdvisorHack() : QObje
 
 QmitkExtWorkbenchWindowAdvisorHack::~QmitkExtWorkbenchWindowAdvisorHack()
 {
+
+}
+
+void QmitkExtWorkbenchWindowAdvisorHack::onUpdateFinished(QNetworkReply* reply)
+{
+
+  if(!reply)
+    return; //throw std::logic_error("No reply!");
+
+//   LOG_INFO << "reply error: " << reply->error();  	
+//   LOG_INFO << "http status code: " << reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+//   LOG_INFO << "http sttus: " << reply->attribute(QNetworkRequest::HttpReasonPhraseAttribute).toString().toStdString();
+//   LOG_INFO << "reply content: '" << reply->readAll().constData() << "'";
+  QString errorMessage;
+  if(reply->error() == QNetworkReply::NoError)
+  {
+    QMessageBox m;
+    m.setTextFormat(Qt::RichText);
+    m.setWindowTitle("Update available");
+    m.setText("New update available. Please visit: <a href=http://3m3.mitk.org>http://3m3.mitk.org</a>");
+    m.setWindowModality(Qt::ApplicationModal);
+    m.setStandardButtons(QMessageBox::Ok);
+    m.exec();
+  }
+  else if(reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt() == 404)
+  {
+    QMessageBox::information(QApplication::activeWindow(), "No updates available", "There are currently no updates for MITK 3M3 available. Please check again later. ");
+  }
+  else
+  {
+    QMessageBox::warning(QApplication::activeWindow(), "No updates available", "No updates found. Please check your online connection. ");
+  }
+}
+
+void QmitkExtWorkbenchWindowAdvisorHack::onUpdate(bool)
+{
+  try
+  {
+    QString urlStr = QString("http://www.mitk.org/data/3m3updates/%1").arg(MITK_SVN_REVISION);
+    
+    //QString urlStr("http://qt.nokia.com/doc/4.5/qmenu.html");
+    //LOG_INFO << "Checking '" << urlStr.toStdString() << "' for updates.";
+    QUrl url(urlStr);
+    if(url.isValid())
+    {
+      QNetworkAccessManager *manager = new QNetworkAccessManager(this);
+      connect(manager, SIGNAL(finished(QNetworkReply*)),  this, SLOT(onUpdateFinished(QNetworkReply*)));
+      manager->get(QNetworkRequest(QUrl(urlStr)));
+    }
+    else
+      throw std::logic_error("Url not valid!");
+  }
+  catch (std::exception& e)
+  {
+    LOG_WARN << e.what();  	
+  }
+
 
 }
 

@@ -1,6 +1,7 @@
 #include <QObject>
 
 class QmitkPreferencesDialog;
+class QNetworkReply;
 
 class QmitkExtWorkbenchWindowAdvisorHack : public QObject
 {
@@ -18,7 +19,8 @@ class QmitkExtWorkbenchWindowAdvisorHack : public QObject
     void onClosePerspective();
     void onNewWindow();
     void onIntro();
-    
+    void onUpdate(bool checked);
+    void onUpdateFinished(QNetworkReply* reply);
     /**
      * @brief This slot is called if the user klicks the menu "item help->active bundle" or presses F1. In this case a new window is opened which shows a help page.
      */
@@ -33,7 +35,7 @@ class QmitkExtWorkbenchWindowAdvisorHack : public QObject
 
     QmitkExtWorkbenchWindowAdvisorHack();
     ~QmitkExtWorkbenchWindowAdvisorHack();
-
+   
     static QmitkExtWorkbenchWindowAdvisorHack* undohack;
     
 };

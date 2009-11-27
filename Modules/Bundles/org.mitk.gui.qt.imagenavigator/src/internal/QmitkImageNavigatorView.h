@@ -28,7 +28,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <string>
 
 #include "ui_QmitkImageNavigatorViewControls.h"
-
+#include "cherryISizeProvider.h"
 
 
 /*!
@@ -40,7 +40,7 @@ PURPOSE.  See the above copyright notices for more information.
  *
  * \sa QmitkFunctionality
  */
-class QmitkImageNavigatorView : public QObject, public cherry::QtViewPart
+class QmitkImageNavigatorView : public QObject, public cherry::QtViewPart, public cherry::ISizeProvider
 {
 
   // this is needed for all Qt objects that should have a MOC object (everything that derives from QObject)
@@ -58,6 +58,9 @@ class QmitkImageNavigatorView : public QObject, public cherry::QtViewPart
   QmitkStdMultiWidget* GetActiveStdMultiWidget();
 
   void SetFocus();
+
+  virtual int GetSizeFlags(bool width);
+  virtual int ComputePreferredSize(bool width, int availableParallel, int availablePerpendicular, int preferredResult);
 
 protected slots:
 

@@ -47,6 +47,7 @@ public:
 
     //TODO should be removed when product support is here
     void SetProductName(const std::string& product);
+    void SetWindowIcon(const std::string& wndIcon);
 
 private:
 
@@ -87,6 +88,7 @@ private:
   bool showViewToolbar;
   bool showVersionInfo;
   std::string productName;
+  std::string windowIcon;
 };
 
 #endif /*QMITKEXTWORKBENCHWINDOWADVISOR_H_*/

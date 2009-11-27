@@ -193,6 +193,11 @@ void QmitkExtWorkbenchWindowAdvisor::SetProductName(const std::string& product)
   productName = product;
 }
 
+void QmitkExtWorkbenchWindowAdvisor::SetWindowIcon(const std::string& wndIcon)
+{
+  windowIcon = wndIcon;
+}
+
 void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
 {
   // very bad hack...
@@ -200,6 +205,11 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
       this->GetWindowConfigurer()->GetWindow();
   QMainWindow* mainWindow =
       static_cast<QMainWindow*> (window->GetShell()->GetControl());
+
+  if (!windowIcon.empty())
+  {
+    mainWindow->setWindowIcon(QIcon(QString::fromStdString(windowIcon)));
+  }
 
   /*mainWindow->setStyleSheet("color: white;"
       "background-color: #808080;"

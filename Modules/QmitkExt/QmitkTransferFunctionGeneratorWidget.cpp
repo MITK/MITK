@@ -412,7 +412,7 @@ std::string QmitkTransferFunctionGeneratorWidget::ReduceFileName(std::string fil
     if (i>=fileNameLong.length()-24)
     {
       fileNameRevert= x+ fileNameRevert;
-      LOG_INFO <<" fileNameRevert: " << fileNameRevert.c_str();
+      //LOG_INFO <<" fileNameRevert: " << fileNameRevert.c_str();
     }
     else
     {

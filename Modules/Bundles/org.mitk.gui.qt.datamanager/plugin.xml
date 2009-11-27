@@ -13,6 +13,7 @@
       class="QmitkDataManagerView" />
   </extension>
   
+  <!--
   <extension point="org.opencherry.ui.views">
     <view 
       id="org.mitk.views.propertylistview" 
@@ -20,6 +21,7 @@
       icon="resources/propertylist.png"
       class="QmitkPropertyListView" />
   </extension>
+  -->
 
   <extension point="org.opencherry.ui.preferencePages">
     <page id="org.mitk.gui.qt.application.DataManagerPreferencePage" name="DataManager" class="QmitkDataManagerPreferencePage">

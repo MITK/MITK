@@ -109,7 +109,7 @@ void QmitkPointListView::OnPointSetSelectionChanged()
   bool modelIndexOkay = m_PointListModel->GetModelIndexForPointID(selectedIndex, index);
   if (modelIndexOkay == true)
     QListView::selectionModel()->select( m_PointListModel->index( selectedIndex ), QItemSelectionModel::SelectCurrent );
-  
+ 
   emit PointSelectionChanged();
   m_SelfCall = false;
 }
@@ -139,15 +139,14 @@ void QmitkPointListView::OnListViewSelectionChanged(const QItemSelection& select
     {
       pointSet->SetSelectInfo(it->Index(), true, m_PointListModel->GetTimeStep());
       if ( m_MultiWidget != NULL)
-        m_MultiWidget->MoveCrossToPosition(pointSet->GetPoint(it->Index(), m_PointListModel->GetTimeStep()));
+        m_MultiWidget->MoveCrossToPosition(pointSet->GetPoint(it->Index(), m_PointListModel->GetTimeStep()));        
+     
     }
     else
       pointSet->SetSelectInfo(it->Index(), false, m_PointListModel->GetTimeStep());
   }
   m_SelfCall = false;
   emit PointSelectionChanged();
-
-  m_PointListModel->SelectSelectedPoint();
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }

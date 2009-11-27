@@ -230,6 +230,7 @@ void QmitkVolumeVisualizationView::UpdateInterface()
   m_Controls->m_EnableLOD->setChecked(enabled);
     
   enabled=false;
+  m_SelectedNode->GetBoolProperty("volumerendering.usegpu",enabled);
   m_Controls->m_EnableGPU->setEnabled(true);
   m_Controls->m_EnableGPU->setChecked(enabled);
 

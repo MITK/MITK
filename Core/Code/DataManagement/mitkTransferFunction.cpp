@@ -305,10 +305,12 @@ void TransferFunction::SetTransferFunctionMode( int mode )
   //Define Transfer Function
   enum TransferFunctionMode{
     TF_CT_DEFAULT, 
-    TF_CT_BLACK_WHITE, 
-    TF_CT_CARDIAC, 
+    TF_CT_BLACK_WHITE,
+    TF_CT_THORAX_LARGE,
+    TF_CT_THORAX_SMALL, 
     TF_CT_BONE, 
     TF_CT_BONE_GRADIENT,
+    TF_CT_CARDIAC, 
     TF_MR_GENERIC 
   };
 
@@ -395,6 +397,59 @@ void TransferFunction::SetTransferFunctionMode( int mode )
    
     break;
 
+  case ( TF_CT_THORAX_LARGE ):
+
+    // grayvalue->opacity 
+    {
+      vtkPiecewiseFunction *f=m_ScalarOpacityFunction;
+      f->AddPoint(76.721239,0.000000);
+      f->AddPoint(139.524336,0.000000);
+      f->AddPoint(274.458333,0.228650);
+      f->AddPoint(638.420139,0.721763);
+    }
+   
+    // gradient at grayvalue->opacity 
+    {
+      vtkPiecewiseFunction *f=m_GradientOpacityFunction;
+      f->AddPoint(560.695000,1.000000);
+    }
+    // grayvalue->color 
+    {
+      vtkColorTransferFunction *f=m_ColorTransferFunction;
+      f->AddRGBPoint( 85.382743,0.478431,0.000000,0.000000);
+      f->AddRGBPoint( 198.201327,0.933333,0.000000,0.000000);
+      f->AddRGBPoint( 254.610619,1.000000,0.800000,0.062745);
+      f->AddRGBPoint( 336.0907085,1.000000,0.905882,0.666667);
+      f->AddRGBPoint( 630.672566,1.000000,1.000000,1.000000);
+    }    
+    break;
+    
+   case ( TF_CT_THORAX_SMALL ):
+   
+    // grayvalue->opacity 
+    {
+      vtkPiecewiseFunction *f=m_ScalarOpacityFunction;
+      f->AddPoint(147.216912,0.000000);
+      f->AddPoint(274.458333,0.228650);
+      f->AddPoint(430.330882,0.675532);
+    }
+    
+    // gradient at grayvalue->opacity 
+    {
+      vtkPiecewiseFunction *f=m_GradientOpacityFunction;
+      f->AddPoint(560.695000,1.000000);
+    }
+    
+    // grayvalue->color 
+    {
+      vtkColorTransferFunction *f=m_ColorTransferFunction;
+      f->AddRGBPoint( 129.607774,0.478431,0.000000,0.000000);
+      f->AddRGBPoint( 213.812721,0.933333,0.000000,0.000000);
+      f->AddRGBPoint( 348.540636,1.000000,0.800000,0.062745);
+      f->AddRGBPoint( 500.419118,1.000000,0.898039,0.776471);
+      f->AddRGBPoint( 579.268382,1.000000,1.000000,1.000000);
+    }    
+    break;
 
   case ( TF_CT_BONE ):
 

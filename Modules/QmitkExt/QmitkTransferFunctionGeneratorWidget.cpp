@@ -13,9 +13,11 @@
 static char* presetNames[] = {  "choose an internal transferfunction preset",
                               "CT Generic",
                               "CT Black & White",
-                              "CT Cardiac",
+                              "CT Thorax large",
+                              "CT Thorax small",
                               "CT Bone",
                               "CT Bone (with Gradient)",
+                              "CT Cardiac",
                               "MR Generic" };
 
 static int numPresetNames = sizeof( presetNames ) / sizeof( char * );

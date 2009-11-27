@@ -516,8 +516,8 @@ void mitk::GPUVolumeMapper3D::SetDefaultProperties(mitk::DataTreeNode* node, mit
   //GPU_INFO << "SetDefaultProperties";
 
   node->AddProperty( "volumerendering", mitk::BoolProperty::New( false ), renderer, overwrite );
-  node->AddProperty( "volumerendering.uselod", mitk::BoolProperty::New( true ), renderer, overwrite );
-  node->AddProperty( "volumerendering.usegpu", mitk::BoolProperty::New( false ), renderer, overwrite );
+  node->AddProperty( "volumerendering.uselod", mitk::BoolProperty::New( false ), renderer, overwrite );
+  node->AddProperty( "volumerendering.usegpu", mitk::BoolProperty::New( true ), renderer, overwrite );
 
   node->AddProperty( "volumerendering.gpu.ambient",  mitk::FloatProperty::New( 0.25f ), renderer, overwrite );
   node->AddProperty( "volumerendering.gpu.diffuse",  mitk::FloatProperty::New( 0.50f ), renderer, overwrite );

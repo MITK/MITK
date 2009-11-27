@@ -170,7 +170,7 @@ void QmitkBasicImageProcessing::Activated()
 
 void QmitkBasicImageProcessing::SelectionChanged( cherry::IWorkbenchPart::Pointer, cherry::ISelection::ConstPointer selection )
 {
-  if ( !this->m_IsVisible || selection == NULL) return;
+  if ( selection == NULL) return;
 
   // reset GUI
   this->ResetOneImageOpPanel();

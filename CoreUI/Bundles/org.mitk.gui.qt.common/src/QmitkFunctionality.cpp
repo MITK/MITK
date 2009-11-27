@@ -43,7 +43,7 @@ QmitkFunctionality::QmitkFunctionality()
  : m_Parent(0)
  , m_HandlesMultipleDataStorages(false)
  , m_InDataStorageChanged(false)
- , m_IsActivated(false)
+ , m_IsActive(false)
  , m_IsVisible(false)
 {
   m_PreferencesService = 
@@ -174,16 +174,16 @@ void QmitkFunctionality::PartActivated( cherry::IWorkbenchPartReference::Pointer
   {
     if (m_DeactivatedFunctionality)
     {
-      m_DeactivatedFunctionality->m_IsActivated = false;
+      m_DeactivatedFunctionality->m_IsActive = false;
       m_DeactivatedFunctionality->Deactivated();
     }
     m_DeactivatedFunctionality = 0;
-    m_IsActivated = true;
+    m_IsActive = true;
     this->Activated();
   }
   else
   {
-    if (partRef->GetId() == QmitkStdMultiWidgetEditor::EDITOR_ID && m_IsActivated == true)
+    if (partRef->GetId() == QmitkStdMultiWidgetEditor::EDITOR_ID && m_IsActive == true)
     {
       this->StdMultiWidgetAvailable(*(partRef->GetPart(false).Cast<QmitkStdMultiWidgetEditor>()->GetStdMultiWidget()));
     }

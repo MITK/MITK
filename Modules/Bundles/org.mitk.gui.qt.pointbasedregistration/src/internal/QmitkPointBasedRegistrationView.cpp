@@ -68,8 +68,8 @@ struct SelListenerPointBasedRegistration : ISelectionListener
 
   void DoSelectionChanged(ISelection::ConstPointer selection)
   {
-    if(!m_View->IsVisible())
-      return;
+//    if(!m_View->IsVisible())
+//      return;
     // save current selection in member variable
     m_View->m_CurrentSelection = selection.Cast<const IStructuredSelection>();
 

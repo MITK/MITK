@@ -178,8 +178,6 @@ private:
   /// saves all visible functionalities
   std::set<std::string> m_VisibleFunctionalities;
 
-  bool m_IsActivated;
-
   ///
   /// The Preferences Service to retrieve and store preferences.
   ///

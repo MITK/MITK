@@ -93,8 +93,8 @@ void QmitkVolumeVisualizationView::CreateQtPartControl(QWidget* parent)
 
 void QmitkVolumeVisualizationView::SelectionChanged( cherry::IWorkbenchPart::Pointer, cherry::ISelection::ConstPointer selection )
 { 
-  if(!this->m_IsVisible)
-    return;
+  //if(!this->m_IsVisible)
+    //return;
 
   mitk::DataTreeNodeSelection::ConstPointer _DataTreeNodeSelection 
     = selection.Cast<const mitk::DataTreeNodeSelection>();
@@ -142,7 +142,7 @@ void QmitkVolumeVisualizationView::SelectionChanged( cherry::IWorkbenchPart::Poi
     /*
     if (dynamic_cast<mitk::Image*>(node->GetData())->GetDimension()==3 )
     {
-      LOG_INFO << "falsches Bild ausgewählt!";
+      LOG_INFO << "falsches Bild ausgewï¿½hlt!";
       //std::string  infoText= std::string("Error! Please select a 3D image");
       //m_Controls->m_SelectedImageLabel->setText( QString( infoText.c_str() ) );
       return;

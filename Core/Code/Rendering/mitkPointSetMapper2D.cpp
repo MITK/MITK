@@ -325,7 +325,7 @@ void mitk::PointSetMapper2D::Paint( mitk::BaseRenderer *renderer )
           std::string l = pointLabel;
           if (input->GetSize()>1)
           {
-            sprintf(buffer,"%d",j+1);
+            sprintf(buffer,"%d",it->Index());
             l.append(buffer);
           }
           if (unselectedColor != NULL)

@@ -43,6 +43,11 @@ public:
 
     void ShowViewToolbar(bool show);
 
+    void ShowVersionInfo(bool show);
+
+    //TODO should be removed when product support is here
+    void SetProductName(const std::string& product);
+
 private:
 
   /**
@@ -80,6 +85,8 @@ private:
 
   cherry::WorkbenchAdvisor* wbAdvisor;
   bool showViewToolbar;
+  bool showVersionInfo;
+  std::string productName;
 };
 
 #endif /*QMITKEXTWORKBENCHWINDOWADVISOR_H_*/

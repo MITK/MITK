@@ -164,9 +164,10 @@ QmitkExtWorkbenchWindowAdvisor::QmitkExtWorkbenchWindowAdvisor(
   cherry::WorkbenchWindowAdvisor(configurer),
   lastInput(0),
   wbAdvisor(wbAdvisor),
-  showViewToolbar(true)
+  showViewToolbar(true),
+  showVersionInfo(true)
 {
-
+  productName = cherry::Platform::GetConfiguration().getString("application.baseName");
 }
 
 cherry::ActionBarAdvisor::Pointer QmitkExtWorkbenchWindowAdvisor::CreateActionBarAdvisor(
@@ -180,6 +181,16 @@ cherry::ActionBarAdvisor::Pointer QmitkExtWorkbenchWindowAdvisor::CreateActionBa
 void QmitkExtWorkbenchWindowAdvisor::ShowViewToolbar(bool show)
 {
   showViewToolbar = show;
+}
+
+void QmitkExtWorkbenchWindowAdvisor::ShowVersionInfo(bool show)
+{
+  showVersionInfo = show;
+}
+
+void QmitkExtWorkbenchWindowAdvisor::SetProductName(const std::string& product)
+{
+  productName = product;
 }
 
 void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
@@ -558,20 +569,22 @@ std::string QmitkExtWorkbenchWindowAdvisor::ComputeTitle()
   //    if (product != null) {
   //      title = product.getName();
   //    }
-  // instead of the product name, we use the executable name for now
-  title
-      = cherry::Platform::GetConfiguration().getString("application.baseName");
+  // instead of the product name, we use a custom variable for now
+  title = productName + " " + MITK_VERSION_STRING;
 
-  // add version informatioin
-  QString mitkRevision(MITK_SVN_REVISION);
-  mitkRevision.replace( QRegExp("[^0-9]+(\\d+).*"), "\\1");
-  QString versions = QString(" (ITK %1.%2.%3  VTK %4.%5.%6 Qt %7 MITK %8)")
-    .arg(ITK_VERSION_MAJOR).arg(ITK_VERSION_MINOR).arg(ITK_VERSION_PATCH)
-    .arg(VTK_MAJOR_VERSION).arg(VTK_MINOR_VERSION).arg(VTK_BUILD_VERSION)
-    .arg(QT_VERSION_STR)
-    .arg(mitkRevision);
+  if (showVersionInfo)
+  {
+    // add version informatioin
+    QString mitkRevision(MITK_SVN_REVISION);
+    mitkRevision.replace( QRegExp("[^0-9]+(\\d+).*"), "\\1");
+    QString versions = QString(" (ITK %1.%2.%3  VTK %4.%5.%6 Qt %7 MITK %8)")
+      .arg(ITK_VERSION_MAJOR).arg(ITK_VERSION_MINOR).arg(ITK_VERSION_PATCH)
+      .arg(VTK_MAJOR_VERSION).arg(VTK_MINOR_VERSION).arg(VTK_BUILD_VERSION)
+      .arg(QT_VERSION_STR)
+      .arg(mitkRevision);
 
-  title += versions.toStdString();
+    title += versions.toStdString();
+  }
 
   if (currentPage)
   {
@@ -598,6 +611,8 @@ std::string QmitkExtWorkbenchWindowAdvisor::ComputeTitle()
       title = label + " - " + title;
     }
   }
+
+  title += " (Not for use in diagnosis or treatment of patients)";
 
   return title;
 }

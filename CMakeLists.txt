@@ -285,6 +285,11 @@ IF(WIN32)
   IF(MINGW)
     FILE(GLOB vtkreleasedlllist ${VTK_RUNTIME_LIBRARY_DIRS}/*.dll)
     FILE(GLOB vtkdebugdlllist ${VTK_RUNTIME_LIBRARY_DIRS}/*.dll)
+	
+	# VTKs freetype library is buggy when used with gcc, need freetype > 2.3.9
+	IF(VTK_FREETYPE_LIBRARIES)
+	  INSTALL(FILES ${VTK_FREETYPE_LIBRARIES} DESTINATION bin)
+	ENDIF()
   ELSE()
     FILE(GLOB vtkreleasedlllist ${VTK_RUNTIME_LIBRARY_DIRS}/release/*.dll)
     FILE(GLOB vtkdebugdlllist ${VTK_RUNTIME_LIBRARY_DIRS}/debug/*.dll)
@@ -304,6 +309,19 @@ IF(WIN32)
   
   INSTALL(FILES ${itkdebugdlllist} DESTINATION bin CONFIGURATIONS Debug)
   INSTALL(FILES ${itkreleasedlllist} DESTINATION bin CONFIGURATIONS Release)
+  
+  #DCMTK Dlls install target (shared libs on gcc only)
+  IF(MINGW AND DCMTK_ofstd_LIBRARY)
+    SET(_dcmtk_libs
+	    ${DCMTK_dcmdata_LIBRARY}
+		${DCMTK_dcmimgle_LIBRARY}
+		${DCMTK_dcmnet_LIBRARY}
+		${DCMTK_ofstd_LIBRARY}
+    )
+	FOREACH(_dcmtk_lib ${_dcmtk_libs})
+	  INSTALL(FILES ${_dcmtk_lib} DESTINATION bin)
+	ENDFOREACH()
+  ENDIF()
   
   #OpenCherry
   IF(MITK_USE_OPENCHERRY)

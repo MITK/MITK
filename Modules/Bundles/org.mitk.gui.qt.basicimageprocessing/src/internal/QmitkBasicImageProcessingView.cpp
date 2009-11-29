@@ -199,6 +199,12 @@ void QmitkBasicImageProcessing::SelectionChanged( cherry::IWorkbenchPart::Pointe
       return;
     }
 
+    if( tempImage->GetDimension() < 3)
+    {
+      m_Controls->leImage1->setText("2D images are not supported.");
+      return;
+    }
+
     m_Controls->leImage1->setText(QString(m_SelectedImageNode->GetName().c_str()));
 
     // button coding

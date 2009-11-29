@@ -26,6 +26,7 @@
 
 #include <QFileInfo>
 #include <QProgressDialog>
+#include <QMessageBox>
 
 namespace cherry
 {
@@ -154,6 +155,7 @@ bool QtAssistantUtil::RegisterQCHFiles(const QString& collectionFile,
     CHERRY_WARN << "No .qch files found. Help contents will not be available.";
   }
 
+  QString errorString;
   for (std::size_t i = 0; i < argsVector.size(); ++i)
   {
     const QStringList& args = argsVector[i];
@@ -174,8 +176,21 @@ bool QtAssistantUtil::RegisterQCHFiles(const QString& collectionFile,
       success = false;
       CHERRY_ERROR << "Registering compressed help file" << args[3].toStdString() << " failed";
     }
+
+    if (process->error() != QProcess::UnknownError)
+    {
+      errorString = process->errorString();
+      success = false;
+    }
   }
   progress.setValue(argsVector.size());
+
+  if (!errorString.isEmpty())
+  {
+    QString errText = "Registering one or more help files failed. The last error was: ";
+    errText += errorString;
+    QMessageBox::warning(0, "Help System Error", errText);
+  }
 
   return success;
 }

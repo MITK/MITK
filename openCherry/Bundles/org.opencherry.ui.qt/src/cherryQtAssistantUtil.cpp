@@ -134,7 +134,7 @@ bool QtAssistantUtil::RegisterQCHFiles(const QString& collectionFile,
         qchPath.setFileName(resourceFiles[j]);
         args << QLatin1String("-register") << QString::fromStdString(qchPath.toString());
         //args << QLatin1String("-quiet");
-	    std::cout << "Registering " << qchPath.toString() << " with " << collectionFile;
+	    CHERRY_INFO << "Registering " << qchPath.toString() << " with " << collectionFile.toStdString();
         argsVector.push_back(args);
       }
     }

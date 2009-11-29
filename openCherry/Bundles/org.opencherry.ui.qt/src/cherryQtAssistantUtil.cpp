@@ -27,6 +27,7 @@
 #include <QFileInfo>
 #include <QProgressDialog>
 #include <QMessageBox>
+#include <QDir>
 
 namespace cherry
 {
@@ -156,6 +157,7 @@ bool QtAssistantUtil::RegisterQCHFiles(const QString& collectionFile,
   }
 
   QString errorString;
+  int exitCode = 0;
   for (std::size_t i = 0; i < argsVector.size(); ++i)
   {
     const QStringList& args = argsVector[i];
@@ -182,13 +184,23 @@ bool QtAssistantUtil::RegisterQCHFiles(const QString& collectionFile,
       errorString = process->errorString();
       success = false;
     }
+
+    if (process->exitCode() != 0)
+      exitCode = process->exitCode();
   }
   progress.setValue(argsVector.size());
 
-  if (!errorString.isEmpty())
+  if (!errorString.isEmpty() || exitCode)
   {
-    QString errText = "Registering one or more help files failed. The last error was: ";
-    errText += errorString;
+    QString errText = "Registering one or more help files failed.";
+    if (errorString.isEmpty())
+    {
+      errText += "\nYou may not have write permissions in " + QDir::toNativeSeparators(QDir::homePath());
+    }
+    else
+    {
+      errText += " The last error was: " + errorString;
+    }
     QMessageBox::warning(0, "Help System Error", errText);
   }
 

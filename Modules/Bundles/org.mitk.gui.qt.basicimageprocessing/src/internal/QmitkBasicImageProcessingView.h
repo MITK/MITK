@@ -149,7 +149,8 @@ private:
     CLOSING,
     GRADIENT,
     LAPLACIAN,
-    SOBEL,	
+    SOBEL,
+    THRESHOLD,
     INVERSION,
     DOWNSAMPLING,
   } m_SelectedAction; 
@@ -158,7 +159,10 @@ private:
     ADD,
     SUBTRACT,
     MULTIPLY,
-    DIVIDE
+    DIVIDE,
+    AND,
+    OR,
+    XOR
   } m_SelectedOperation;
 
 };

@@ -60,6 +60,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkDiscreteGaussianImageFilter.h> 
 #include <itkTotalVariationDenoisingImageFilter.h>
 
+// Threshold
+#include <itkBinaryThresholdImageFilter.h>
+
 // Inversion
 #include <itkInvertIntensityImageFilter.h>
 
@@ -78,6 +81,11 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkMultiplyImageFilter.h>
 #include <itkDivideImageFilter.h>
 
+// Boolean operations
+#include <itkOrImageFilter.h>
+#include <itkAndImageFilter.h>
+#include <itkXorImageFilter.h>
+
 
 // Convenient Definitions
 typedef itk::Image<short, 3>                                                            ImageType;
@@ -95,6 +103,7 @@ typedef itk::DiscreteGaussianImageFilter< ImageType, ImageType>							          
 typedef itk::TotalVariationDenoisingImageFilter<FloatImageType, FloatImageType>         TotalVariationFilterType;
 typedef itk::TotalVariationDenoisingImageFilter<VectorImageType, VectorImageType>       VectorTotalVariationFilterType;
 
+typedef itk::BinaryThresholdImageFilter< ImageType, ImageType >                         ThresholdFilterType;
 typedef itk::InvertIntensityImageFilter< ImageType, ImageType >                         InversionFilterType;
 
 typedef itk::GradientMagnitudeRecursiveGaussianImageFilter< ImageType, ImageType >      GradientFilterType;
@@ -107,6 +116,10 @@ typedef itk::AddImageFilter< ImageType, ImageType, ImageType >                  
 typedef itk::SubtractImageFilter< ImageType, ImageType, ImageType >                     SubtractFilterType;
 typedef itk::MultiplyImageFilter< ImageType, ImageType, ImageType >                     MultiplyFilterType;
 typedef itk::DivideImageFilter< ImageType, ImageType, FloatImageType >                  DivideFilterType;
+
+typedef itk::OrImageFilter< ImageType, ImageType >                                      OrImageFilterType;
+typedef itk::AndImageFilter< ImageType, ImageType >                                     AndImageFilterType;
+typedef itk::XorImageFilter< ImageType, ImageType >                                     XorImageFilterType;
 
 
 QmitkBasicImageProcessing::QmitkBasicImageProcessing()
@@ -403,11 +416,29 @@ void QmitkBasicImageProcessing::SelectAction(int action)
 
   case 15: 
     {
+      m_SelectedAction = THRESHOLD;
+      m_Controls->tlParam1->setEnabled(true);
+      m_Controls->sbParam1->setEnabled(true);
+      m_Controls->tlParam2->setEnabled(true);
+      m_Controls->sbParam2->setEnabled(true);
+      text1 = "Lower threshold:";
+      text2 = "Upper threshold:";
+      m_Controls->sbParam1->setMinimum( -100000 );
+      m_Controls->sbParam1->setMaximum( 100000 );
+      m_Controls->sbParam1->setValue( 0 );
+      m_Controls->sbParam2->setMinimum( -100000 );
+      m_Controls->sbParam2->setMaximum( 100000 );
+      m_Controls->sbParam2->setValue( 300 );
+      break;
+    }
+
+  case 16: 
+    {
       m_SelectedAction = INVERSION;
       break;
     }
 
-  case 16:
+  case 17:
     {
       m_SelectedAction = DOWNSAMPLING;
       m_Controls->tlParam1->setEnabled(true);
@@ -638,6 +669,21 @@ void QmitkBasicImageProcessing::StartButtonClicked()
       break;
     }
 
+  case THRESHOLD:
+    {
+      ThresholdFilterType::Pointer thFilter = ThresholdFilterType::New();
+      thFilter->SetLowerThreshold(param1);
+      thFilter->SetUpperThreshold(param2);
+      thFilter->SetInsideValue(1);
+      thFilter->SetOutsideValue(0);
+      thFilter->SetInput(itkImage);
+      thFilter->UpdateLargestPossibleRegion();
+      newImage = mitk::ImportItkImage(thFilter->GetOutput());
+      nameAddition << "_Threshold";
+      std::cout << "Thresholding successful." << std::endl;
+      break;
+    }
+
   case INVERSION:
     {
       InversionFilterType::Pointer invFilter = InversionFilterType::New();
@@ -737,17 +783,26 @@ void QmitkBasicImageProcessing::SelectAction2(int operation)
   // check which operation the user has selected and set parameters and GUI accordingly
   switch (operation)
   {
-  case 1:
+  case 2:
     m_SelectedOperation = ADD;
     break;
-  case 2:
+  case 3:
     m_SelectedOperation = SUBTRACT;
     break;
-  case 3:
+  case 4:
     m_SelectedOperation = MULTIPLY;
     break;
-  case 4: 
+  case 5: 
     m_SelectedOperation = DIVIDE;
+    break;
+  case 7: 
+    m_SelectedOperation = AND;
+    break;
+  case 8: 
+    m_SelectedOperation = OR;
+    break;
+  case 9: 
+    m_SelectedOperation = XOR;
     break;
   default: 
     this->ResetTwoImageOpPanel();
@@ -853,6 +908,39 @@ void QmitkBasicImageProcessing::StartButton2Clicked()
       nameAddition = "_Divided";
     }
     break;
+
+  case AND:
+    {
+      AndImageFilterType::Pointer andFilter = AndImageFilterType::New();
+      andFilter->SetInput1( itkImage1 );
+      andFilter->SetInput2( itkImage2 );
+      andFilter->UpdateLargestPossibleRegion();
+      newImage1 = mitk::ImportItkImage(andFilter->GetOutput());
+      nameAddition = "_AND";
+      break;
+    }
+
+  case OR:
+    {
+      OrImageFilterType::Pointer orFilter = OrImageFilterType::New();
+      orFilter->SetInput1( itkImage1 );
+      orFilter->SetInput2( itkImage2 );
+      orFilter->UpdateLargestPossibleRegion();
+      newImage1 = mitk::ImportItkImage(orFilter->GetOutput());
+      nameAddition = "_OR";
+      break;
+    }
+
+  case XOR:
+    {
+      XorImageFilterType::Pointer xorFilter = XorImageFilterType::New();
+      xorFilter->SetInput1( itkImage1 );
+      xorFilter->SetInput2( itkImage2 );
+      xorFilter->UpdateLargestPossibleRegion();
+      newImage1 = mitk::ImportItkImage(xorFilter->GetOutput());
+      nameAddition = "_XOR";
+      break;
+    }
 
   default: 
     std::cout << "Something went wrong..." << std::endl;

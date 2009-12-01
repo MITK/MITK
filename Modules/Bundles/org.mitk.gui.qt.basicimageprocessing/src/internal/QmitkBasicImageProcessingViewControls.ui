@@ -404,7 +404,7 @@
         </item>
         <item>
          <property name="text">
-          <string>Arithmetric operations</string>
+          <string>--- Arithmetric operations ---</string>
          </property>
         </item>
         <item>
@@ -429,7 +429,7 @@
         </item>
         <item>
          <property name="text">
-          <string>Boolean operations</string>
+          <string>--- Boolean operations ---</string>
          </property>
         </item>
         <item>

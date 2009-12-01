@@ -99,6 +99,8 @@ void QmitkVolumeVisualizationView::SelectionChanged( cherry::IWorkbenchPart::Poi
   mitk::DataTreeNodeSelection::ConstPointer _DataTreeNodeSelection 
     = selection.Cast<const mitk::DataTreeNodeSelection>();
 
+  bool weHadAnImageButItsNotThreeDeeOrFourDee = false;
+   
   if(_DataTreeNodeSelection.IsNotNull())
   {
     std::vector<mitk::DataTreeNode*> selectedNodes;
@@ -111,43 +113,22 @@ void QmitkVolumeVisualizationView::SelectionChanged( cherry::IWorkbenchPart::Poi
       {
         mitk::DataTreeNode::Pointer node = _DataTreeNodeObject->GetDataTreeNode();
       
-        if( node.IsNotNull() && dynamic_cast<mitk::Image*>(node->GetData())&&dynamic_cast<mitk::Image*>(node->GetData())->GetDimension()>=3   )
-         {
-          selectedNodes.push_back( node );
-         }
-         else
-         {
-          m_Controls->m_NoSelectedImageLabel->hide();
-          m_Controls->m_ErrorImageLabel->show();
-     
-          std::string  infoText;
-          /* 
-          if (dynamic_cast<mitk::Image*>(node->GetData())->GetDimension()>3 )
-            infoText = std::string("4D images are not supported");
-          else    */
-            infoText = std::string("2D images are not supported");
-           
-          m_Controls->m_ErrorImageLabel->setText( QString( infoText.c_str() ) ); 
-          return;
-         }  
+        if( node.IsNotNull() && dynamic_cast<mitk::Image*>(node->GetData()) )
+        {
+          if( dynamic_cast<mitk::Image*>(node->GetData())->GetDimension()>=3 )
+            selectedNodes.push_back( node );
+          else
+            weHadAnImageButItsNotThreeDeeOrFourDee = true;
+        } 
       }
     }
+
+    m_SelectedNode = 0;
 
     mitk::DataTreeNode::Pointer node;
     
     if(selectedNodes.size() > 0)
       node=selectedNodes.front();
-    
-   
-    /*
-    if (dynamic_cast<mitk::Image*>(node->GetData())->GetDimension()==3 )
-    {
-      LOG_INFO << "falsches Bild ausgew�hlt!";
-      //std::string  infoText= std::string("Error! Please select a 3D image");
-      //m_Controls->m_SelectedImageLabel->setText( QString( infoText.c_str() ) );
-      return;
-    }*/
-   
 
     if( node.IsNotNull() )
     {
@@ -168,11 +149,20 @@ void QmitkVolumeVisualizationView::SelectionChanged( cherry::IWorkbenchPart::Poi
     }
     else
     {
-      m_Controls->m_SelectedImageLabel->hide();
-      m_Controls->m_ErrorImageLabel->hide();
-      m_Controls->m_NoSelectedImageLabel->show();
-      m_SelectedNode = 0;
-     
+      if(weHadAnImageButItsNotThreeDeeOrFourDee)
+      {
+        m_Controls->m_NoSelectedImageLabel->hide();
+        m_Controls->m_ErrorImageLabel->show();
+        std::string  infoText;
+        infoText = std::string("only 3D or 4D images are supported");
+        m_Controls->m_ErrorImageLabel->setText( QString( infoText.c_str() ) ); 
+      }
+      else
+      {
+        m_Controls->m_SelectedImageLabel->hide();
+        m_Controls->m_ErrorImageLabel->hide();
+        m_Controls->m_NoSelectedImageLabel->show();
+      }
     }
 
     UpdateInterface();

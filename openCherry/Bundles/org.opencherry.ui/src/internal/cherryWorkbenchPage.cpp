@@ -965,8 +965,6 @@ void WorkbenchPage::BusyResetPerspective()
   // This describes the working layout of the page and differs from
   // the original template.
   Perspective::Pointer oldPersp = this->GetActivePerspective();
-  if (oldPersp.IsNull())
-    return;
 
   // Map the current perspective to the original template.
   // If the original template cannot be found then it has been deleted.
@@ -1869,8 +1867,6 @@ void WorkbenchPage::DisposePerspective(Perspective::Pointer persp, bool notify)
 Perspective::Pointer WorkbenchPage::FindPerspective(
     IPerspectiveDescriptor::Pointer desc)
 {
-  if (desc.IsNull())
-    return Perspective::Pointer(0);
   for (PerspectiveList::iterator itr = perspList.Begin(); itr
       != perspList.End(); ++itr)
   {

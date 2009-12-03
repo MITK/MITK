@@ -44,9 +44,9 @@ public:
   void SetMultiWidget(QmitkStdMultiWidget* multiWidget); ///< Set the default stdMultiWidget (needed for the PointListwidget)
 
   void SetImageFiducialsNode(mitk::DataTreeNode::Pointer imageFiducialsNode); ///< specify data tree node for the image fiducials
-  void SetTrackerFiducialsNode(mitk::DataTreeNode::Pointer trackerFiducialsNode); ///< specify data tree node for the tracker fiducials
-  itkGetMacro(ImageFiducialsNode, mitk::DataTreeNode::Pointer); ///< returns data tree node for the image fiducials
-  itkGetMacro(TrackerFiducialsNode, mitk::DataTreeNode::Pointer); ///< returns data tree node for the tracker fiducials
+  void SetTrackerFiducialsNode(mitk::DataTreeNode::Pointer trackerFiducialsNode); ///< specify data tree node for the tracker fiducials  
+  mitk::DataTreeNode::Pointer GetImageFiducialsNode(); ///< returns data tree node for the image fiducials
+  mitk::DataTreeNode::Pointer GetTrackerFiducialsNode(); ///< returns data tree node for the tracker fiducials
 
   void SetQualityDisplayText(QString text); ///< sets specific text on the UI (useful to display FRE/TRE...)
   bool UseICPIsChecked(); ///< returns true if automatic correspondences search is activated else false

@@ -111,3 +111,13 @@ void QmitkFiducialRegistrationWidget::SetMultiWidget( QmitkStdMultiWidget* multi
 {
   m_MultiWidget=multiWidget;
 }
+
+mitk::DataTreeNode::Pointer QmitkFiducialRegistrationWidget::GetImageFiducialsNode()
+{
+  return m_ImageFiducialsNode;
+}
+
+mitk::DataTreeNode::Pointer QmitkFiducialRegistrationWidget::GetTrackerFiducialsNode()
+{
+  return m_TrackerFiducialsNode;
+}

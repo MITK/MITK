@@ -192,7 +192,10 @@ mitk::TrackingDevice::Pointer QmitkTrackingDeviceConfigurationWidget::ConfigureN
 mitk::TrackingDevice::Pointer QmitkTrackingDeviceConfigurationWidget::ConfigureNDI6DTrackingDevice()
   {
   mitk::NDITrackingDevice::Pointer tempTrackingDevice = mitk::NDITrackingDevice::New();
-  tempTrackingDevice->SetPortNumber(static_cast<mitk::SerialCommunication::PortNumber>(m_Controls->m_comPortSpinBoxPolaris->value())); //set the com port
+  int comPort = 0;
+  if (m_Controls->m_trackingDeviceChooser->currentIndex()==1) comPort = m_Controls->m_comPortSpinBoxAurora->value();
+  else comPort = m_Controls->m_comPortSpinBoxPolaris->value();
+  tempTrackingDevice->SetPortNumber(static_cast<mitk::SerialCommunication::PortNumber>(comPort)); //set the com port
   mitk::TrackingDevice::Pointer returnValue = static_cast<mitk::TrackingDevice*>(tempTrackingDevice);
   return returnValue;
   }

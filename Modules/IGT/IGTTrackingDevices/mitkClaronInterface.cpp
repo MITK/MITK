@@ -64,7 +64,7 @@ bool mitk::ClaronInterface::StartTracking()
     MTC( Markers_LoadTemplates(markerDir) ); //Path to directory where the marker templates are
     printf("Loaded %d marker templates\n",Markers_TemplatesCount());
 
-    //Step 3: Wait a 20 frames
+    //Step 3: Wait for 20 frames
     for (int i=0; i<20; i++)//the first 20 frames are auto-adjustment frames, we ignore them
     {
       MTC( Cameras_GrabFrame(NULL) ); //Grab a frame (all cameras together)

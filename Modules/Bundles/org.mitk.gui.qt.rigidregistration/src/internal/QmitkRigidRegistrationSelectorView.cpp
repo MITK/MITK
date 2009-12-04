@@ -302,7 +302,7 @@ m_GeometryWorldToItkPhysicalTransform(NULL), m_MovingGeometry(NULL), m_ImageGeom
   m_Controls.m_OptimizerBox->setCurrentIndex(0);
   this->OptimizerSelected(m_Controls.m_OptimizerBox->currentIndex());
   
-  this->DoLoadRigidRegistrationPreset("AffineMutualInformationGradientDescent");
+  this->DoLoadRigidRegistrationPreset("AffineMutualInformationGradientDescent", false);
 }
 
 QmitkRigidRegistrationSelectorView::~QmitkRigidRegistrationSelectorView()
@@ -2282,12 +2282,20 @@ void QmitkRigidRegistrationSelectorView::DoLoadRigidRegistrationParameter(bool t
   int dialogReturnValue = dialog.exec();
   if ( dialogReturnValue == QDialog::Rejected ) return; // user clicked cancel or pressed Esc or something similar
 
-  this->DoLoadRigidRegistrationPreset(dialog.GetPresetName());
+  this->DoLoadRigidRegistrationPreset(dialog.GetPresetName(), testPreset);
 }
 
-void QmitkRigidRegistrationSelectorView::DoLoadRigidRegistrationPreset(std::string presetName)
+void QmitkRigidRegistrationSelectorView::DoLoadRigidRegistrationPreset(std::string presetName, bool testPreset)
 {
-  itk::Array<double> transformValues = m_Preset->getTransformValues(presetName);
+  itk::Array<double> transformValues;
+  if (testPreset)
+  {
+    transformValues = m_TestPreset->getTransformValues(presetName);
+  }
+  else
+  {
+    transformValues = m_Preset->getTransformValues(presetName);
+  }
   m_Controls.m_TransformGroup->setChecked(true);
   m_Controls.m_TransformFrame->setVisible(true);
   m_Controls.m_TransformBox->setCurrentIndex((int)transformValues[0]);
@@ -2532,7 +2540,15 @@ void QmitkRigidRegistrationSelectorView::DoLoadRigidRegistrationPreset(std::stri
     m_Controls.m_GeometryCenteredSimilarity2D->setChecked(!transformValues[11]);
   }
 
-  itk::Array<double> metricValues = m_Preset->getMetricValues(presetName);
+  itk::Array<double> metricValues;
+  if (testPreset)
+  {
+    metricValues = m_TestPreset->getMetricValues(presetName);
+  }
+  else
+  {
+    metricValues = m_Preset->getMetricValues(presetName);
+  }
   m_Controls.m_MetricGroup->setChecked(true);
   m_Controls.m_MetricFrame->setVisible(true);
   m_Controls.m_MetricBox->setCurrentIndex((int)metricValues[0]);
@@ -2579,7 +2595,15 @@ void QmitkRigidRegistrationSelectorView::DoLoadRigidRegistrationPreset(std::stri
     m_Controls.m_MovingSmootherVarianceMutualInformation->setText(QString::number(metricValues[7]));
   }
 
-  itk::Array<double> optimizerValues = m_Preset->getOptimizerValues(presetName);
+  itk::Array<double> optimizerValues;
+  if (testPreset)
+  {
+    optimizerValues = m_TestPreset->getOptimizerValues(presetName);
+  }
+  else
+  {
+    optimizerValues = m_Preset->getOptimizerValues(presetName);
+  }
   m_Controls.m_OptimizerGroup->setChecked(true);
   m_Controls.m_OptimizerFrame->setVisible(true);
   m_Controls.m_OptimizerBox->setCurrentIndex((int)optimizerValues[0]);
@@ -2688,7 +2712,15 @@ void QmitkRigidRegistrationSelectorView::DoLoadRigidRegistrationPreset(std::stri
     m_Controls.m_IterationsVersorRigid3DTransform->setText(QString::number(optimizerValues[5]));*/
   }
 
-  itk::Array<double> interpolatorValues = m_Preset->getInterpolatorValues(presetName);
+  itk::Array<double> interpolatorValues;
+  if (testPreset)
+  {
+    interpolatorValues = m_TestPreset->getInterpolatorValues(presetName);
+  }
+  else
+  {
+    interpolatorValues = m_Preset->getInterpolatorValues(presetName);
+  }
   m_Controls.m_InterpolatorGroup->setChecked(true);
   m_Controls.m_InterpolatorFrame->setVisible(true);
   m_Controls.m_InterpolatorBox->setCurrentIndex((int)interpolatorValues[0]);

@@ -46,7 +46,7 @@ void mbilog::DistributeToBackends(mbilog::LogMessage &l)
 
   // Crop Message
   {
-    std::size_t i = l.message.find_last_not_of(" \t\f\v\n\r");
+    int i = static_cast<int>( l.message.find_last_not_of(" \t\f\v\n\r") );
     l.message = (i != std::string::npos) ? l.message.substr(0, i+1) : "";
   }
   
@@ -195,7 +195,6 @@ void mbilog::BackendCout::FormatFull(std::ostream &out,const LogMessage &l,int t
     out << "|" << l.category;
   }
 
-
   out << "\n" << l.message << std::endl;
 }
 
@@ -212,7 +211,7 @@ class AutoCategorize
 
     std::string current,category;
 
-    std::size_t pos;
+    int pos;
 
     void flush()
     {
@@ -272,9 +271,9 @@ class AutoCategorize
         
         "field",               "fld",
         
-        "multi",               "multi",
+        "multi",               "mlt",
 
-        "contour",             "ct",
+        "contour",             "cntr",
         "tools",               "tls",
         "tool",                "tl",
       
@@ -297,7 +296,8 @@ class AutoCategorize
         "generation",         "gen",
         "generator",          "gen",
 
-        "paintbrush",         "pb",
+        "paint",              "pnt",
+        "brush",              "brsh",
         "volumetry",          "vol",
         "volume",             "vol",
         "mapper",             "map",
@@ -305,7 +305,7 @@ class AutoCategorize
         "surface",            "sfc",
         "point",              "pnt",
         "organ",              "org",
-        "multiple",           "mul",
+        "multiple",           "mlt",
    
         "corrector",          "cor",
         "correction",         "cor",
@@ -327,6 +327,8 @@ class AutoCategorize
         "scene",              "scn",
         
         "serialization",      "ser",
+        "deserializer",       "dser",
+        "serializer",         "ser",
     
         "sandbox",            "sb",
         "texture",            "tex",
@@ -371,10 +373,10 @@ class AutoCategorize
         "lymph",              "lym", 
         "node",               "node", 
         "tree",               "tree", 
-        "homogeneous",        "homogen", 
+        "homogeneous",        "hmgn", 
         "threshold",          "tsh", 
 
-        "shapebased",         "shp", 
+     //   "shapebased",         "shp", 
         "based",              "bsd",
         "shape",              "shp", 
 
@@ -405,22 +407,22 @@ class AutoCategorize
 
         "interpolator",       "inp",
         
-        "switcher",           "swtch",
+        "switcher",           "swh",
 
         "planning",           "plan",         
         "planner",            "plan",
         "plane",              "pln",
         "plan",               "plan",
         
-        "workbench",          "wrkbnch",
+        "workbench",          "wrkbnc",
         "common",             "com",
         "resection",          "rsc",
-        "translation",        "trl",
+        "translation",        "trnsl",
         "rotation",           "rot",
         "deformation",        "dfrm",
         "shader",             "shd",
         "repository",         "rep",
-        "initializer",        "ini",
+        "initializer",        "init",
         "dialog",             "dlg",
         "download",           "down",
         "upload",             "up",
@@ -429,12 +431,22 @@ class AutoCategorize
         "leaf",               "leaf",
         "internal",           "int",
         "external",           "ext",
-        "platform",           "pltfrm",
+        "platform",           "pltfm",
         "method",             "mthd",
-        "pyramidal",          "pyra",
+        "pyramidal",          "prmdl",
+        "tracking",           "trck",
+        "track",              "trck",
         
         "bspline",            "bspl",
         "spline",             "spl",
+        
+        "create",             "crt",
+        "erase",              "ers",
+        
+        "auto",               "auto",
+        "crop",               "crop",
+        "file",               "file",
+        "io",                 "io",
         
         "2d",                 "2d",
         "3d",                 "3d",
@@ -452,8 +464,8 @@ class AutoCategorize
 
         for(int r=0; r < sizeof(replace)/sizeof(char*); r+=2)
         {
-          std::size_t s = strlen(replace[r]);
-          std::size_t xs = x.size();
+          int s  = static_cast<int>( strlen(replace[r]) );
+          int xs = static_cast<int>( x.size() );
 
           if(xs==s)
           {
@@ -495,8 +507,8 @@ class AutoCategorize
     
     std::string concat(std::string a,std::string b,bool opt)
     {
-      std::size_t as = a.size();
-      std::size_t bs = b.size();
+      int as = static_cast<int>( a.size() );
+      int bs = static_cast<int>( b.size() );
       if(opt && as <= bs)
       {
         if (as==bs && a.compare(b)==0)
@@ -514,8 +526,8 @@ class AutoCategorize
     
     bool search2p2(char *a,char *b,bool optimize=true)
     {
-      std::size_t size = path.size() - 3;
-      for(std::size_t r=0;r<size;r++)
+      int size = static_cast<int>( path.size() ) - 3;
+      for(int r=0;r<size;r++)
         if(path[r].compare(a)==0 && path[r+1].compare(b)==0)
         {
           pos = r+2;
@@ -527,8 +539,8 @@ class AutoCategorize
 
     bool search2p1(char *a,char *b)
     {
-      std::size_t size = path.size() - 2;
-      for(std::size_t r=0;r<size;r++)
+      int size = static_cast<int>( path.size() ) - 2;
+      for(int r=0;r<size;r++)
         if(path[r].compare(a)==0 && path[r+1].compare(b)==0)
         {
           pos = r+2;
@@ -540,8 +552,8 @@ class AutoCategorize
 
     bool search1p2(char *a,bool optimize=true)
     {
-      std::size_t size = path.size() - 2;
-      for(std::size_t r=0;r<size;r++)
+      int size = static_cast<int>( path.size() ) - 2;
+      for(int r=0;r<size;r++)
         if(path[r].compare(a)==0)
         {
           pos = r+1;
@@ -555,11 +567,11 @@ class AutoCategorize
   
     AutoCategorize( const mbilog::LogMessage &l )
     {
-      std::size_t size = strlen(l.filePath);
+      int size = static_cast<int>( strlen(l.filePath) );
 
       current = "";
 
-      for(std::size_t r = 0;r<size;r++)
+      for(int r = 0;r<size;r++)
       {
         char c=l.filePath[r];
         if(c=='\\' || c=='/')
@@ -624,7 +636,7 @@ static void FormatSmartWindows(const mbilog::LogMessage &l,int /*threadID*/)
     g_hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
     g_init=true;
 
-    std::string title = "MITK - Log";
+    std::string title = "mbilog";
     
     SetConsoleTitle( title.c_str() );
     
@@ -644,6 +656,7 @@ static void FormatSmartWindows(const mbilog::LogMessage &l,int /*threadID*/)
   int colorText = FOREGROUND_RED|FOREGROUND_GREEN|FOREGROUND_BLUE;
   int colorCat = FOREGROUND_BLUE | FOREGROUND_RED;
   bool showColon = true;
+  bool forceCat = false;
   
   switch(l.level)
   {
@@ -655,6 +668,7 @@ static void FormatSmartWindows(const mbilog::LogMessage &l,int /*threadID*/)
       colorText = FOREGROUND_RED|FOREGROUND_GREEN;
       colorCat = FOREGROUND_BLUE | FOREGROUND_RED | FOREGROUND_INTENSITY;
       showColon = false;
+      forceCat = true;
       break;
 
     case mbilog::Error:
@@ -662,6 +676,7 @@ static void FormatSmartWindows(const mbilog::LogMessage &l,int /*threadID*/)
       colorText = FOREGROUND_RED;
       colorCat = FOREGROUND_BLUE | FOREGROUND_RED | FOREGROUND_INTENSITY;
       showColon = false;
+      forceCat = true;
       break;
 
     case mbilog::Fatal:
@@ -669,6 +684,7 @@ static void FormatSmartWindows(const mbilog::LogMessage &l,int /*threadID*/)
       colorText = FOREGROUND_RED|FOREGROUND_BLUE|FOREGROUND_INTENSITY;
       colorCat = FOREGROUND_BLUE | FOREGROUND_RED | FOREGROUND_INTENSITY;
       showColon = false;
+      forceCat = true;
       break;
 
     case mbilog::Debug:
@@ -681,35 +697,29 @@ static void FormatSmartWindows(const mbilog::LogMessage &l,int /*threadID*/)
   ChangeColor( colorTime );
   std::cout << std::fixed << std::setprecision(2) << ((double)std::clock())/CLOCKS_PER_SEC << " " << std::flush;
   
+  // category
   {
     AutoCategorize ac(l);
     std::string pre=ac.GetPrefix();
     std::string cat=ac.GetCategory();
-    if( (!pre.empty()) || (!cat.empty()) )
-    {
-      if( !pre.empty() )
-      {
-        ChangeColor( colorCat );
-        std::cout << pre << std::flush;
-      }
-      if( !cat.empty() )
-      {
-        ChangeColor( colorCat );
-        std::cout << cat << std::flush;
-      }
     
-      if(showColon)
-      {
-        ChangeColor( FOREGROUND_BLUE | FOREGROUND_INTENSITY );
-        std::cout << ": " << std::flush;
-      }
-      else
-        std::cout << " ";
-    }
-    else if(!l.category.empty())
+    cat = pre + cat;
+    
+    if(cat.empty())
+      cat = l.category;
+    
+    if(!cat.empty())
     {
       ChangeColor( colorCat );
-      std::cout << l.category << std::flush;
+//      static std::string lastCat;
+  //    if(forceCat||lastCat.compare(cat))
+      {
+        std::cout << cat << std::flush;
+    //    lastCat = cat;
+      }
+    //  else
+    //    std::cout << "..." << std::flush;
+        
       if(showColon)
       {
         ChangeColor( FOREGROUND_BLUE | FOREGROUND_INTENSITY );
@@ -727,22 +737,30 @@ static void FormatSmartWindows(const mbilog::LogMessage &l,int /*threadID*/)
 
     case mbilog::Warn:
       ChangeColor( colorTime );
-      std::cout << "WARNING: " << std::flush;
+      std::cout << "WARNING" << std::flush;
+      ChangeColor( FOREGROUND_BLUE | FOREGROUND_INTENSITY );
+      std::cout << ": " << std::flush;
       break;
 
     case mbilog::Error:
       ChangeColor( colorTime );
-      std::cout << "ERROR: " << std::flush;
+      std::cout << "ERROR" << std::flush;
+      ChangeColor( FOREGROUND_BLUE | FOREGROUND_INTENSITY );
+      std::cout << ": " << std::flush;
       break;
 
     case mbilog::Fatal:
       ChangeColor( colorTime );
-      std::cout << "FATAL: " << std::flush;
+      std::cout << "FATAL" << std::flush;
+      ChangeColor( FOREGROUND_BLUE | FOREGROUND_INTENSITY );
+      std::cout << ": " << std::flush;
       break;
 
     case mbilog::Debug:
       ChangeColor( colorTime );
-      std::cout << "DEBUG: " << std::flush;
+      std::cout << "DBG" << std::flush;
+      ChangeColor( FOREGROUND_BLUE | FOREGROUND_INTENSITY );
+      std::cout << ": " << std::flush;
       break;
   }
       

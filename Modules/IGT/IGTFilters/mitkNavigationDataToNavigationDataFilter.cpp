@@ -49,7 +49,10 @@ void mitk::NavigationDataToNavigationDataFilter::SetInput( unsigned int idx, con
 
 const mitk::NavigationData* mitk::NavigationDataToNavigationDataFilter::GetInput( void ) const
 {
-  return this->GetInput(0);
+  if (this->GetNumberOfInputs() < 1)
+    return NULL;
+
+  return static_cast<const NavigationData*>(this->ProcessObject::GetInput(0));
 }
 
 
@@ -59,6 +62,26 @@ const mitk::NavigationData* mitk::NavigationDataToNavigationDataFilter::GetInput
     return NULL;
 
   return static_cast<const NavigationData*>(this->ProcessObject::GetInput(idx));
+}
+
+
+const mitk::NavigationData* mitk::NavigationDataToNavigationDataFilter::GetInput(std::string navDataName) const
+{
+  const DataObjectPointerArray& inputs = const_cast<Self*>(this)->GetInputs();
+  for (DataObjectPointerArray::const_iterator it = inputs.begin(); it != inputs.end(); ++it)
+    if (std::string(navDataName) == (static_cast<NavigationData*>(it->GetPointer()))->GetName())
+      return static_cast<NavigationData*>(it->GetPointer());
+  return NULL;
+}
+
+
+itk::ProcessObject::DataObjectPointerArraySizeType mitk::NavigationDataToNavigationDataFilter::GetInputIndex( std::string navDataName )
+{
+  DataObjectPointerArray& outputs = this->GetInputs();
+  for (DataObjectPointerArray::size_type i = 0; i < outputs.size(); ++i)
+    if (navDataName == (static_cast<NavigationData*>(outputs.at(i).GetPointer()))->GetName())
+      return i;
+  throw std::invalid_argument("output name does not exist");
 }
 
 

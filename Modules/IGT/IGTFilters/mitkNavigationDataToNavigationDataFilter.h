@@ -73,6 +73,18 @@ namespace mitk
     */
     const NavigationData* GetInput(unsigned int idx) const;
 
+    /**
+    * \brief Get the input with name navDataName of this filter
+    */
+    const NavigationData* GetInput(std::string navDataName) const;
+
+    /** 
+    *\brief return the index of the input with name navDataName, throw std::invalid_argument exception if that name was not found
+    *
+    * \warning if a subclass has inputs that have different data type than mitk::NavigationData, they have to overwrite this method
+    */
+    DataObjectPointerArraySizeType GetInputIndex(std::string navDataName);
+
   protected:
     NavigationDataToNavigationDataFilter();
     virtual ~NavigationDataToNavigationDataFilter();

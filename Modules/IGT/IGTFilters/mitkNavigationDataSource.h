@@ -58,6 +58,8 @@ namespace mitk {
 
     /** 
     *\brief return the index of the output with name navDataName, -1 if no output with that name was found
+    *
+    * \warning if a subclass has outputs that have different data type than mitk::NavigationData, they have to overwrite this method
     */
     DataObjectPointerArraySizeType GetOutputIndex(std::string navDataName);
 

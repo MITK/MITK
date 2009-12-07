@@ -26,6 +26,13 @@ SET(CPP_FILES
   IGTTrackingDevices/mitkTrackingTool.cpp
   IGTTrackingDevices/mitkTrackingVolume.cpp
   IGTTrackingDevices/mitkVirtualTrackingDevice.cpp
+  
+  IGTToolManagement/mitkNavigationToolStorage.cpp
+  IGTToolManagement/mitkNavigationToolStorageSerializer.cpp
+  IGTToolManagement/mitkNavigationToolStorageDeserializer.cpp
+  IGTToolManagement/mitkNavigationTool.cpp
+  IGTToolManagement/mitkNavigationToolReader.cpp
+  IGTToolManagement/mitkNavigationToolWriter.cpp
 )
 
 IF(MITK_USE_MICRON_TRACKER)
@@ -38,9 +45,8 @@ IF(MITK_USE_MICROBIRD_TRACKER)
   SET(CPP_FILES ${CPP_FILES} IGTTrackingDevices/mitkMicroBirdTrackingDevice.cpp)
 ENDIF(MITK_USE_MICROBIRD_TRACKER)
 
-IF(WIN32) 
+IF(WIN32)
   SET(CPP_FILES ${CPP_FILES} IGTFilters/mitkWindowsRealTimeClock.cpp)
 ELSE()
   SET(CPP_FILES ${CPP_FILES} IGTFilters/mitkLinuxRealTimeClock.cpp)
 ENDIF(WIN32)
-

@@ -23,7 +23,11 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
   /**Documentation
-  * \brief TODO: Documentation
+  * \brief An object of this class represents a navigation tool in the view of the software.
+  *        A few informations like an identifier, a toolname, a surface and a itk spatial
+  *        object are stored in such an object. The classes NavigationToolReader and
+  *        are availiable to write/read tools to/from the harddisc. If you need a collection
+  *        of navigation tools the class NavigationToolStorage could be used.
   *
   * \ingroup IGT
   */  class MitkIGT_EXPORT NavigationTool

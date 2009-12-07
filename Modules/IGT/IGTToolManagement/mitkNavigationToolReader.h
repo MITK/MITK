@@ -23,7 +23,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
   /**Documentation
-  * \brief TODO: Documentation
+  * \brief This class offers methods to read objects of the class NavigationTool from the
+  *        harddisc. The tools have to be saved in a special format by the class NavigationToolWriter
+  *        to be loadable.
   *
   * \ingroup IGT
   */  class MitkIGT_EXPORT NavigationToolReader

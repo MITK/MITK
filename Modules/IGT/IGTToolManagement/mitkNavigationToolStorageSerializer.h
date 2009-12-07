@@ -23,7 +23,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
   /**Documentation
-  * \brief TODO: Documentation
+  * \brief This class offers methods to save an object of the class NavigationToolStorage
+  *        to the harddisc.
   *
   * \ingroup IGT
   */  class MitkIGT_EXPORT NavigationToolStorageSerializer

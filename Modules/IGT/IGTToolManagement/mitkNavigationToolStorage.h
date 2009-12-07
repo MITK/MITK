@@ -23,12 +23,15 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
   /**Documentation
-  * \brief TODO: Documentation
+  * \brief An object of this class represents a collection of navigation tools.
+  *        You may add/delete navigation tools or store/load the whole collection
+  *        to/from the harddisc by using the class NavigationToolStorageSerializer
+  *        and NavigationToolStorageDeserializer.
   *
   * \ingroup IGT
   */  class MitkIGT_EXPORT NavigationToolStorage
   {
- 
+
   };
 } // namespace mitk
 #endif //NAVIGATIONTOOLSTORAGE

@@ -63,7 +63,7 @@ itk::ProcessObject::DataObjectPointerArraySizeType mitk::NavigationDataSource::G
   for (DataObjectPointerArray::size_type i = 0; i < outputs.size(); ++i)
     if (navDataName == (static_cast<NavigationData*>(outputs.at(i).GetPointer()))->GetName())
       return i;
-  return -1;
+  throw std::invalid_argument("output name does not exist");
 }
 
 void mitk::NavigationDataSource::GraftOutput(itk::DataObject *graft)

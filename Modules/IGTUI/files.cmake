@@ -3,7 +3,9 @@ SET(CPP_FILES
   Qmitk/QmitkTrackingDeviceConfigurationWidget.cpp
   Qmitk/QmitkNDIConfigurationWidget.cpp
   Qmitk/QmitkFiducialRegistrationWidget.cpp
+  Qmitk/QmitkNDIToolDelegate.cpp
 )
+
 SET(UI_FILES
   Qmitk/QmitkTrackingDeviceConfigurationWidgetControls.ui
   Qmitk/QmitkNDIConfigurationWidget.ui
@@ -15,4 +17,6 @@ SET(MOC_H_FILES
   Qmitk/QmitkTrackingDeviceConfigurationWidget.h
   Qmitk/QmitkNDIConfigurationWidget.h
   Qmitk/QmitkFiducialRegistrationWidget.h
+  Qmitk/QmitkNDIToolDelegate.h
 )
+

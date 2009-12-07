@@ -136,5 +136,4 @@ void mitk::NavigationData::SetOrientationAccuracy(mitk::ScalarType error)
       m_CovErrorMatrix[ i ][ j + 3 ] = 0;
     }
   m_CovErrorMatrix[3][3] = m_CovErrorMatrix[4][4] = m_CovErrorMatrix[5][5] = error * error;
-}^
-
+}

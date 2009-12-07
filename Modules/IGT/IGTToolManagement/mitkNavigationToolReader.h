@@ -19,6 +19,11 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef NAVIGATIONTOOLREADER_H_INCLUDED
 #define NAVIGATIONTOOLREADER_H_INCLUDED
 
+//itk headers
+#include <itkObjectFactory.h>
+
+//mitk headers
+#include <mitkCommon.h>
 #include <MitkIGTExports.h>
 
 namespace mitk {
@@ -28,8 +33,16 @@ namespace mitk {
   *        to be loadable.
   *
   * \ingroup IGT
-  */  class MitkIGT_EXPORT NavigationToolReader
+  */  
+  class MitkIGT_EXPORT NavigationToolReader : public itk::Object
   {
+  public:
+    mitkClassMacro(NavigationToolReader,itk::Object);
+    itkNewMacro(Self);
+    
+  protected:
+    NavigationToolReader();
+    ~NavigationToolReader();
 
   };
 } // namespace mitk

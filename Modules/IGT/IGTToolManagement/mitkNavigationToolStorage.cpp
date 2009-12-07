@@ -17,3 +17,13 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include "mitkNavigationToolStorage.h"
+
+mitk::NavigationToolStorage::NavigationToolStorage()
+  {
+
+  }
+
+mitk::NavigationToolStorage::~NavigationToolStorage()
+  {
+
+  }

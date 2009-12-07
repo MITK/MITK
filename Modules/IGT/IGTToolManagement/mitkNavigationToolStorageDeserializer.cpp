@@ -17,3 +17,13 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include "mitkNavigationToolStorageDeserializer.h"
+
+mitk::NavigationToolStorageDeserializer::NavigationToolStorageDeserializer()
+  {
+
+  }
+
+mitk::NavigationToolStorageDeserializer::~NavigationToolStorageDeserializer()
+  {
+
+  }

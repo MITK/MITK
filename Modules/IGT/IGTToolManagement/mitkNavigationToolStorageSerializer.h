@@ -19,6 +19,11 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef NAVIGATIONTOOLSTORAGESERIALIZER_H_INCLUDED
 #define NAVIGATIONTOOLSTORAGESERIALIZER_H_INCLUDED
 
+//itk headers
+#include <itkObjectFactory.h>
+
+//mitk headers
+#include <mitkCommon.h>
 #include <MitkIGTExports.h>
 
 namespace mitk {
@@ -27,8 +32,16 @@ namespace mitk {
   *        to the harddisc.
   *
   * \ingroup IGT
-  */  class MitkIGT_EXPORT NavigationToolStorageSerializer
+  */  
+  class MitkIGT_EXPORT NavigationToolStorageSerializer : public itk::Object
   {
+  public:
+    mitkClassMacro(NavigationToolStorageSerializer,itk::Object);
+    itkNewMacro(Self);
+    
+  protected:
+    NavigationToolStorageSerializer();
+    ~NavigationToolStorageSerializer();
 
   };
 } // namespace mitk

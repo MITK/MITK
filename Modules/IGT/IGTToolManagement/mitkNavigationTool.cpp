@@ -17,3 +17,13 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include "mitkNavigationTool.h"
+
+mitk::NavigationTool::NavigationTool()
+  {
+
+  }
+ 
+mitk::NavigationTool::~NavigationTool()
+  {
+
+  }

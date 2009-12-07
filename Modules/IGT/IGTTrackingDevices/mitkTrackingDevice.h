@@ -83,6 +83,15 @@ namespace mitk {
        * tools are numbered from 0 to GetToolCount() - 1.
        */ 
       virtual TrackingTool* GetTool(unsigned int toolNumber) const = 0;
+      
+      /**
+      * \brief Returns the tool with the given tool name 
+      * 
+      * Note: subclasses can and should implement optimized versions of this method
+      * \return the given tool or NULL if no tool with that name exists
+      */ 
+      virtual mitk::TrackingTool* GetToolByName(std::string name) const;
+      
       /**
        * \brief Returns number of tracking tools
        */

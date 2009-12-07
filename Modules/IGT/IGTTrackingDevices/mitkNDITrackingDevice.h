@@ -120,6 +120,7 @@ namespace mitk
     */
     virtual TrackingTool* GetTool(unsigned int toolNumber) const;
 
+    virtual mitk::TrackingTool* GetToolByName(std::string name) const;
     /**
     * \brief return current number of tools
     */
@@ -249,7 +250,7 @@ public://TODO
   protected:
     NDITrackingDevice();          ///< Constructor
     virtual ~NDITrackingDevice(); ///< Destructor
-
+   
     std::string m_DeviceName;///< Device Name
     PortNumber m_PortNumber; ///< COM Port Number
     BaudRate m_BaudRate;     ///< COM Port Baud Rate

@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkTrackingDevice.h"
 #include "mitkTimeStamp.h"
-
+#include "mitkTrackingTool.h"
 
 mitk::TrackingDevice::TrackingDevice() :
   m_Type(TrackingSystemNotSpecified),
@@ -73,3 +73,14 @@ bool mitk::TrackingDevice::StopTracking()
   }
   return true;
 }
+
+
+mitk::TrackingTool* mitk::TrackingDevice::GetToolByName( std::string name ) const
+{
+  unsigned int toolCount = this->GetToolCount();
+  for (unsigned int i = 0; i < toolCount; ++i)
+    if (name == this->GetTool(i)->GetToolName())
+      return this->GetTool(i);
+  return NULL;
+}
+

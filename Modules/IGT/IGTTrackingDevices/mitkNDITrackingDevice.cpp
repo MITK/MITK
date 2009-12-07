@@ -846,6 +846,17 @@ mitk::TrackingTool* mitk::NDITrackingDevice::GetTool(unsigned int toolNumber) co
 }
 
 
+mitk::TrackingTool* mitk::NDITrackingDevice::GetToolByName(std::string name) const
+{
+  MutexLockHolder toolsMutexLockHolder(*m_ToolsMutex); // lock and unlock the mutex
+  Tool6DContainerType::const_iterator end = m_6DTools.end();
+  for (Tool6DContainerType::const_iterator iterator = m_6DTools.begin(); iterator != end; ++iterator)
+    if (name.compare((*iterator)->GetToolName()) == 0)
+      return *iterator;
+  return NULL;
+}
+
+
 mitk::NDIPassiveTool* mitk::NDITrackingDevice::GetInternalTool(std::string portHandle)
 {
   MutexLockHolder toolsMutexLockHolder(*m_ToolsMutex); // lock and unlock the mutex

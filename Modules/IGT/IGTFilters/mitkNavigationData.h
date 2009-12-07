@@ -59,6 +59,8 @@ namespace mitk {
       itkGetConstMacro(HasOrientation, bool);             ///< gets the HasOrientation flag of the NavigationData object
       itkSetMacro(CovErrorMatrix, CovarianceMatrixType);  ///< sets the 6x6 Error Covariance Matrix of the NavigationData object
       itkGetConstMacro(CovErrorMatrix, CovarianceMatrixType);  ///< gets the 6x6 Error Covariance Matrix of the NavigationData object
+      itkSetStringMacro(Name);                            ///< set the name of the NavigationData object
+      itkGetStringMacro(Name);                            ///< returns the name of the NavigationData object
 
       /** 
       * \brief Graft the data and information from one NavigationData to another. 
@@ -115,6 +117,7 @@ namespace mitk {
       bool m_HasOrientation;  ///< defines if orientation part of m_CovErrorMatrix is valid
       bool m_DataValid;       ///< defines if the object contains valid values
       TimeStampType m_TimeStamp;  ///< contains the time at which the tracking data was recorded
+      std::string m_Name;       ///< name of the navigation data
     };
 } // namespace mitk
 #endif /* MITKNAVIGATIONDATA_H_HEADER_INCLUDED_ */

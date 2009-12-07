@@ -21,7 +21,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 mitk::NavigationData::NavigationData() : itk::DataObject(), 
 m_Position(), m_Orientation(0.0, 0.0, 0.0, 0.0), m_CovErrorMatrix(),
-m_HasPosition(true), m_HasOrientation(true), m_DataValid(false), m_TimeStamp(0.0)
+m_HasPosition(true), m_HasOrientation(true), m_DataValid(false), m_TimeStamp(0.0),
+m_Name()
 {
   m_Position.Fill(0.0);
   m_CovErrorMatrix.SetIdentity();
@@ -135,4 +136,5 @@ void mitk::NavigationData::SetOrientationAccuracy(mitk::ScalarType error)
       m_CovErrorMatrix[ i ][ j + 3 ] = 0;
     }
   m_CovErrorMatrix[3][3] = m_CovErrorMatrix[4][4] = m_CovErrorMatrix[5][5] = error * error;
-}
+}^
+

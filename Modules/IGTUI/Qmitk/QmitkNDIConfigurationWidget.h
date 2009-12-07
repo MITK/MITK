@@ -24,6 +24,14 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkTrackingDeviceSource.h"
 #include "QStringList"
 #include "MitkIGTUIExports.h"
+#include "mitkNodePredicateBase.h"
+
+class QmitkNDIToolDelegate;
+namespace mitk
+{
+  class DataStorage;
+};
+
 /*!
   \brief Heidelberg Minimally Invasive Navigation Device
 
@@ -43,6 +51,12 @@ public:
 
   std::string GetDeviceName() const;
   mitk::NDITrackingDevice* GetTracker() const;
+  mitk::DataStorage* GetDataStorage() const;
+  mitk::NodePredicateBase* GetPredicate() const; 
+  const QStringList& GetToolTypes() const;
+  void SetToolTypes(const QStringList& types);       ///< set types list for type editor combobox
+  void SetDataStorage(mitk::DataStorage* ds);    ///< set datastorage for organ node editor
+  void SetPredicate(mitk::NodePredicateBase::Pointer p); ///< set predicate for organ node editor
 
   signals:
     void ToolsAdded(QStringList tools);
@@ -50,7 +64,6 @@ public:
     void Disconnected();
   public slots:
     void SetDeviceName(const char* dev);  ///< set the device name (e.g. "COM1", "/dev/ttyS0") that will be used to connect to the tracking device
-
   protected slots:
     void OnConnect();
     void OnDisconnect();
@@ -84,5 +97,6 @@ protected:
   Ui::QmitkNDIConfigurationWidget* m_Controls;  ///< gui widgets
   mitk::NDITrackingDevice::Pointer m_Tracker;   ///< tracking device object
   mitk::TrackingDeviceSource::Pointer m_Source;
+  QmitkNDIToolDelegate* m_Delegate;
 };
 #endif // _QmitkNDIConfigurationWidget_H_INCLUDED

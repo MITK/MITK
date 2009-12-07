@@ -33,11 +33,14 @@
       <item>
        <widget class="QTableWidget" name="m_ToolTable">
         <property name="editTriggers">
-         <set>QAbstractItemView::NoEditTriggers</set>
+         <set>QAbstractItemView::AllEditTriggers</set>
+        </property>
+        <property name="alternatingRowColors">
+         <bool>true</bool>
         </property>
         <column>
          <property name="text">
-          <string>ID</string>
+          <string>Index</string>
          </property>
         </column>
         <column>
@@ -47,12 +50,22 @@
         </column>
         <column>
          <property name="text">
-          <string>Status</string>
+          <string>SROM File</string>
          </property>
         </column>
         <column>
          <property name="text">
           <string>Type</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Status</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Node</string>
          </property>
         </column>
        </widget>

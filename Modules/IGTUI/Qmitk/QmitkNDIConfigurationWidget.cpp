@@ -19,14 +19,20 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkNDIConfigurationWidget.h"
 #include <QTableWidget>
 #include <QMessageBox>
-#include <QtConcurrentMap>
+#include <QFileDialog>
+#include <QInputDialog>
+#include <QDir>
+#include <QFileInfo>
 
+//#include <QtConcurrentMap>
+#include "QmitkNDIToolDelegate.h"
 
 /* VIEW MANAGEMENT */
 QmitkNDIConfigurationWidget::QmitkNDIConfigurationWidget(QWidget* parent)  
-: QWidget(parent), m_Controls(NULL), m_Tracker(NULL), m_Source(NULL)
+: QWidget(parent), m_Controls(NULL), m_Tracker(NULL), m_Source(NULL),
+m_Delegate(NULL)
 {
-  CreateQtPartControl(this);
+  this->CreateQtPartControl(this);
 }
 
 
@@ -52,6 +58,11 @@ void QmitkNDIConfigurationWidget::CreateQtPartControl(QWidget *parent)
     comPorts << "/dev/ttyS1" << "/dev/ttyS2" << "/dev/ttyS3" << "/dev/ttyS4" << "/dev/ttyS5" << "/dev/ttyUSB0" << "/dev/ttyUSB1" << "/dev/ttyUSB2" << "/dev/ttyUSB3";
 #endif
     m_Controls->m_ComPortSelector->addItems(comPorts);
+    m_Delegate = new QmitkNDIToolDelegate(m_Controls->m_ToolTable);
+    m_Delegate->SetDataStorage(NULL);  //needs to be set later using the setter methods
+    m_Delegate->SetPredicate(NULL);
+    m_Delegate->SetTypes(QStringList());
+    m_Controls->m_ToolTable->setItemDelegate(m_Delegate);
     this->CreateConnections();
   }
 }
@@ -177,7 +188,20 @@ void QmitkNDIConfigurationWidget::OnDiscoverTools()
 
 void QmitkNDIConfigurationWidget::OnAddPassiveTool()
 {
-  
+  if (m_Tracker.IsNull())
+    this->CreateTracker();
+
+  QString filename = QFileDialog::getOpenFileName(this, "Select NDI SROM file", QDir::currentPath(),"NDI SROM files (*.rom)");
+  if (filename.isEmpty())
+    return;
+  bool ok = false;
+  QString toolName = QInputDialog::getText(this, "Enter a name for the tool", "Name of the tool: ", QLineEdit::Normal, QFileInfo(filename).baseName(), &ok);
+  if (ok == false || toolName.isEmpty())
+    return;
+
+  m_Tracker->AddTool(toolName.toLatin1(), filename.toLatin1());
+  emit ToolsAdded(this->GetToolNamesList());
+  this->UpdateToolTable();
 }
 
 
@@ -208,7 +232,7 @@ void QmitkNDIConfigurationWidget::SetDeviceName( const char* dev )
 {
   if (m_Controls == NULL)
     return;
-  m_Controls->m_ComPortSelector->setEditText(dev);
+  m_Controls->m_ComPortSelector->setCurrentIndex(m_Controls->m_ComPortSelector->findText(dev));
 }
 
 
@@ -225,16 +249,28 @@ void QmitkNDIConfigurationWidget::UpdateToolTable()
     mitk::TrackingTool* t = m_Tracker->GetTool(i);
     if (t == NULL)
     {
-      m_Controls->m_ToolTable->setItem(i, 0, new QTableWidgetItem("INVALID")); // ID
+      m_Controls->m_ToolTable->setItem(i, 0, new QTableWidgetItem("INVALID"));                    // Index
       continue;
     }
-    m_Controls->m_ToolTable->setItem(i, 0, new QTableWidgetItem(QString::number(i))); // ID
-    m_Controls->m_ToolTable->setItem(i, 1, new QTableWidgetItem(t->GetToolName())); // Name
-    if (t->IsEnabled())
-      m_Controls->m_ToolTable->setItem(i, 2, new QTableWidgetItem("Enabled")); // Status
+    m_Controls->m_ToolTable->setItem(i, 0, new QTableWidgetItem(QString::number(i)));             // Index
+    m_Controls->m_ToolTable->setItem(i, 1, new QTableWidgetItem(t->GetToolName()));               // Name    
+    if (dynamic_cast<mitk::NDIPassiveTool*>(t)->GetSROMDataLength() > 0)
+      m_Controls->m_ToolTable->setItem(i, 2, new QTableWidgetItem("SROM file loaded"));           // SROM file
     else
-      m_Controls->m_ToolTable->setItem(i, 2, new QTableWidgetItem("Disabled")); // Status
-    m_Controls->m_ToolTable->setItem(i, 3, new QTableWidgetItem("unknown")); // Type
+      m_Controls->m_ToolTable->setItem(i, 2, new QTableWidgetItem("<click to load SROM file>"));  // SROM file
+    m_Controls->m_ToolTable->setItem(i, 3, new QTableWidgetItem("<click to set type>"));          // Type
+    if (t->IsEnabled())
+      m_Controls->m_ToolTable->setItem(i, 4, new QTableWidgetItem("Enabled"));                    // Status
+    else
+      m_Controls->m_ToolTable->setItem(i, 4, new QTableWidgetItem("Disabled"));                   // Status
+    m_Controls->m_ToolTable->setItem(i, 5, new QTableWidgetItem("<click to select node>"));       // Node
+    
+    m_Controls->m_ToolTable->item(i, 0)->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsDragEnabled);                         // Index
+    m_Controls->m_ToolTable->item(i, 1)->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable   | Qt::ItemIsSelectable | Qt::ItemIsDragEnabled);  // Name
+    m_Controls->m_ToolTable->item(i, 2)->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable   | Qt::ItemIsSelectable | Qt::ItemIsDragEnabled);  // SROM file
+    m_Controls->m_ToolTable->item(i, 3)->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable   | Qt::ItemIsSelectable | Qt::ItemIsDragEnabled);  // Type
+    m_Controls->m_ToolTable->item(i, 4)->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsDragEnabled);                         // Status
+    m_Controls->m_ToolTable->item(i, 5)->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable   | Qt::ItemIsSelectable | Qt::ItemIsDragEnabled);  // Node
   }
   m_Controls->m_ToolTable->resizeColumnsToContents();
 }
@@ -285,13 +321,13 @@ mitk::TrackingDeviceType QmitkNDIConfigurationWidget::ScanPort(QString port)
 
 void QmitkNDIConfigurationWidget::ScanPortsForNDITrackingDevices( PortDeviceMap& portsAndDevices )
 {
+  // Iterative scanning:
+  for (PortDeviceMap::iterator it = portsAndDevices.begin(); it != portsAndDevices.end(); ++it)
+    it.value() = this->ScanPort(it.key());
+  
+  // \Todo: use parallel scanning
   //QtConcurrent::blockingMap( portsAndDevices.begin(), portsAndDevices.end(), ScanPort );
   //LOG_INFO << portsAndDevices;
-  for (PortDeviceMap::iterator it = portsAndDevices.begin(); it != portsAndDevices.end(); ++it)
-  {
-    it.value() = this->ScanPort(it.key());
-  }
-  return;
 }
 
 
@@ -314,4 +350,22 @@ QStringList QmitkNDIConfigurationWidget::GetToolNamesList()
 mitk::NDITrackingDevice* QmitkNDIConfigurationWidget::GetTracker() const
 {
   return m_Tracker.GetPointer();
+}
+
+
+void QmitkNDIConfigurationWidget::SetToolTypes(const QStringList& types)
+{
+  m_Delegate->SetTypes(types);
+}
+
+
+void QmitkNDIConfigurationWidget::SetDataStorage(mitk::DataStorage* ds)
+{
+  m_Delegate->SetDataStorage(ds);
+}
+
+
+void QmitkNDIConfigurationWidget::SetPredicate(mitk::NodePredicateBase::Pointer p)
+{
+  m_Delegate->SetPredicate(p);
 }

@@ -52,6 +52,16 @@ namespace mitk {
     NavigationData* GetOutput(unsigned int idx);
 
     /** 
+    *\brief return the output with name navDataName of the filter
+    */
+    NavigationData* GetOutput(std::string navDataName);
+
+    /** 
+    *\brief return the index of the output with name navDataName, -1 if no output with that name was found
+    */
+    DataObjectPointerArraySizeType GetOutputIndex(std::string navDataName);
+
+    /** 
     *\brief Graft the specified DataObject onto this ProcessObject's output.
     * 
     * See itk::ImageSource::GraftNthOutput for details

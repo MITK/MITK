@@ -48,6 +48,24 @@ mitk::NavigationData* mitk::NavigationDataSource::GetOutput(unsigned int idx)
 }
 
 
+mitk::NavigationData* mitk::NavigationDataSource::GetOutput(std::string navDataName)
+{
+  DataObjectPointerArray& outputs = this->GetOutputs();
+  for (DataObjectPointerArray::iterator it = outputs.begin(); it != outputs.end(); ++it)
+    if (navDataName == (static_cast<NavigationData*>(it->GetPointer()))->GetName())
+      return static_cast<NavigationData*>(it->GetPointer());
+  return NULL;
+}
+
+itk::ProcessObject::DataObjectPointerArraySizeType mitk::NavigationDataSource::GetOutputIndex( std::string navDataName )
+{
+  DataObjectPointerArray& outputs = this->GetOutputs();
+  for (DataObjectPointerArray::size_type i = 0; i < outputs.size(); ++i)
+    if (navDataName == (static_cast<NavigationData*>(outputs.at(i).GetPointer()))->GetName())
+      return i;
+  return -1;
+}
+
 void mitk::NavigationDataSource::GraftOutput(itk::DataObject *graft)
 {
   this->GraftNthOutput(0, graft);

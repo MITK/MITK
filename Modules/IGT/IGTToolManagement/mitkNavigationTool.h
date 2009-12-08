@@ -27,6 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkCommon.h>
 #include <mitkDataTreeNode.h>
 #include <mitkTrackingTool.h>
+#include "mitkTrackingTypes.h"
 #include <MitkIGTExports.h>
 
 namespace mitk {
@@ -70,6 +71,9 @@ namespace mitk {
     //SerialNumber:
     itkGetMacro(SerialNumber,std::string);
     itkSetMacro(SerialNumber,std::string);
+    //TrackingDeviceType:
+    itkGetMacro(TrackingDeviceType,mitk::TrackingDeviceType);
+    itkSetMacro(TrackingDeviceType,mitk::TrackingDeviceType);
     //#######################
 
   protected:
@@ -88,10 +92,11 @@ namespace mitk {
     mitk::TrackingTool::Pointer m_TrackingTool;
     /** @brief The path to the calibration file of the tool. */
     std::string m_CalibrationFile;
-    /** @brief   A unique serial number of the tool which is needed to identify the tool correctly. This is very important
-      *          in case of the NDI Aurora System.
-      */
+    /** @brief A unique serial number of the tool which is needed to identify the tool correctly. This is very important
+      *        in case of the NDI Aurora System. */
     std::string m_SerialNumber;
+    /** @brief   This member holds the tracking device type of the tool. */
+    mitk::TrackingDeviceType m_TrackingDeviceType;
     //#################################################
 
   };

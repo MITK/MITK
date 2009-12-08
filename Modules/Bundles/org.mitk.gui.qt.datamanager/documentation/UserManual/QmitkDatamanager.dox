@@ -1,6 +1,6 @@
 /**
 
-\mainpage The DataManager
+\bundlemainpage{org.datamanager} The DataManager
 
 \section QmitkDataManagerOverview Overview
 

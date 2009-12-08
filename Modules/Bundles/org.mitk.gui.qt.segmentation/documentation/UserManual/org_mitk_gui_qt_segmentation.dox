@@ -1,5 +1,5 @@
 /**
-\mainpage The Segmentation Module
+\bundlemainpage{org.segment} The Segmentation Module
 
 \section org_mitk_gui_qt_segmentationUserManualOverview Overview
 

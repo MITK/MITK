@@ -1,5 +1,5 @@
 /**
-\mainpage The Rigid Registration Module
+\bundlemainpage{org.rigid.regis} The Rigid Registration Module
 
 This module allows you to register 2D as well as 3D images in a rigid manner. If the Moving Image is an image with multiple timesteps you can select one timestep for registration. 
 Register means to align two images, so that they become as similar as possible. Therefore you can select from different transforms, metrics and optimizers. Registration results will 

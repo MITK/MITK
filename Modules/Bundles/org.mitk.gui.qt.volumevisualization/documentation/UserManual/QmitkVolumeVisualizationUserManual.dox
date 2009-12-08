@@ -1,5 +1,5 @@
 /**
-\mainpage The Volume Visualization Module
+\bundlemainpage{org.volvis} The Volume Visualization Module
 
 \section QVV_MainPageOverview Overview
 
@@ -11,27 +11,19 @@ like the threshold and bell curve to help identify a range of gray-values.
 
 \image html vroverview.png ""
 
-Click \ref QVV_UserManual for more detailed information.
+Click \subpage QVV_UserManual for more detailed information.
 
 \page QVV_UserManual User Manual
 
 
 \section QVV_UserManualOverview Overview
 
-The <b> Volume Visualization Module </b> is a basic tool for visualizing three dimensional medical images. 
-MITK provides presets for transfer functions. 
-These functions, that map the gray-value to color and opacity, can be interactively edited. 
-Additionally, there are controls to quickly generate common used transfer function shapes 
-like the threshold and bell curve to help identify a range of gray-values.
-
-\image html vroverview.png ""
-
 Available sections:
 <ul>
-<li> \ref QVV_EnableVRPage
-<li> \ref QVV_PresetPage
-<li> \ref QVV_ThresholdBell
-<li> \ref QVV_Editing
+<li> \subpage QVV_EnableVRPage
+<li> \subpage QVV_PresetPage
+<li> \subpage QVV_ThresholdBell
+<li> \subpage QVV_Editing
 </ul>
 
 \page QVV_EnableVRPage Enable Volume Rendering

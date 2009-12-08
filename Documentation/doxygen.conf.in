@@ -42,6 +42,7 @@ GENERATE_DEPRECATEDLIST= YES
 ALIASES                = "FIXME=\par Fix Me's:\n" \
 						 "openCherry=\if OPENCHERRY" \
 						 "endopenCherry=\endif"
+ALIASES                += bundlemainpage{1}=\mainpage 
 ENABLED_SECTIONS       = @MITK_DOXYGEN_ENABLED_SECTIONS@
 MAX_INITIALIZER_LINES  = 30
 OPTIMIZE_OUTPUT_FOR_C  = NO

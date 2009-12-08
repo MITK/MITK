@@ -95,6 +95,10 @@ protected:
   GLuint           Volume3Index;
   GLuint           ColorLookupIndex;
   GLuint           AlphaLookupIndex;
+  
+  GLuint prgOneComponentShade;
+
+  
   vtkRenderWindow *RenderWindow;
   
   bool SupportsCompressedTexture;
@@ -111,17 +115,15 @@ protected:
 
   virtual void RenderFP(vtkRenderer *ren, vtkVolume *vol);
 
-  void RenderOneIndependentNoShadeFP( vtkRenderer *ren,
-                                      vtkVolume *vol );
+  void SetupOneIndependentTextures( vtkRenderer *ren, vtkVolume *vol );
   void RenderOneIndependentShadeFP( vtkRenderer *ren, vtkVolume *vol );
-  void RenderTwoDependentNoShadeFP( vtkRenderer *ren, vtkVolume *vol );
+
+  void SetupTwoDependentTextures( vtkRenderer *ren, vtkVolume *vol );
   void RenderTwoDependentShadeFP( vtkRenderer *ren, vtkVolume *vol );
-  void RenderFourDependentNoShadeFP( vtkRenderer *ren, vtkVolume *vol );
+
+  void SetupFourDependentTextures( vtkRenderer *ren, vtkVolume *vol );
   void RenderFourDependentShadeFP( vtkRenderer *ren, vtkVolume *vol );
 
-  void SetupOneIndependentTextures( vtkRenderer *ren, vtkVolume *vol );
-  void SetupTwoDependentTextures( vtkRenderer *ren, vtkVolume *vol );
-  void SetupFourDependentTextures( vtkRenderer *ren, vtkVolume *vol );
 
   void DeleteTextureIndex( GLuint *index );
   void CreateTextureIndex( GLuint *index );
@@ -140,6 +142,10 @@ protected:
   // Description:
   // Common code for setting up interpolation / clamping on 3D textures
   void Setup3DTextureParameters( bool linear );
+  
+  bool NeedUpdateVolumes();
+
+  int UpdateVolumes( vtkVolume * );
 
 private:
   vtkMitkOpenGLVolumeTextureMapper3D(const vtkMitkOpenGLVolumeTextureMapper3D&);  // Not implemented.

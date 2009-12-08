@@ -153,11 +153,16 @@ protected:
   int                       NumberOfPolygons;
   int                       BufferSize;
   
+  /*
   unsigned char            *Volume1;
   unsigned char            *Volume2;
   unsigned char            *Volume3;
+  */
+  /*
   int                       VolumeSize;
   int                       VolumeComponents;
+  */
+  
   int                       VolumeDimensions[3];
   float                     VolumeSpacing[3];
   
@@ -200,7 +205,6 @@ protected:
   // Description:
   // Update the internal RGBA representation of the volume. Return 1 if
   // anything change, 0 if nothing changed.
-  int    UpdateVolumes( vtkVolume * );
   int    UpdateColorLookup( vtkVolume * );
 
   // Description:

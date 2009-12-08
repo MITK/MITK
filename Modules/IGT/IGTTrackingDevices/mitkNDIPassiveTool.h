@@ -59,6 +59,9 @@ namespace mitk
     itkGetStringMacro(PortHandle);    ///< set port handle under which the tool is registered in the tracking device
     itkSetMacro(TrackingPriority, TrackingPriority);      ///< set tracking priority that the ndi tracking device should use
     itkGetConstMacro(TrackingPriority, TrackingPriority); ///< get tracking priority that the ndi tracking device should use
+    itkSetStringMacro(SerialNumber);  ///< set serial number of the tool
+    itkGetStringMacro(SerialNumber);  ///< get serial number of the tool
+
   protected:
     itkNewMacro(Self);  // only the friend class NDITrackingDevice is allowed to instantiate NDIPassiveTools
     NDIPassiveTool();
@@ -68,6 +71,7 @@ namespace mitk
     unsigned int m_SROMDataLength;        ///< length of the  srom tool description file
     TrackingPriority m_TrackingPriority;  ///< priority for this tool
     std::string m_PortHandle;             ///< port handle for this tool
+    std::string m_SerialNumber;           ///< serial number for this tool
   };
 } // namespace mitk
 #endif /* MITKNDIPASSIVETOOL_H_HEADER_INCLUDED_ */

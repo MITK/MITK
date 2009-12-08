@@ -20,10 +20,41 @@ PURPOSE.  See the above copyright notices for more information.
 
 mitk::NavigationToolStorage::NavigationToolStorage()
   {
-
+  m_ToolCollection = std::vector<mitk::NavigationTool::Pointer>();
   }
 
 mitk::NavigationToolStorage::~NavigationToolStorage()
   {
 
+  }
+
+bool mitk::NavigationToolStorage::AddTool(mitk::NavigationTool::Pointer tool)
+  {
+  if (GetTool(tool->GetIdentifier()).IsNotNull()) return false;
+  else
+    {
+    m_ToolCollection.push_back(tool);
+    return true;
+    }
+  }
+
+mitk::NavigationTool::Pointer mitk::NavigationToolStorage::GetTool(int number)
+  {
+  return m_ToolCollection.at(number);
+  }
+
+mitk::NavigationTool::Pointer mitk::NavigationToolStorage::GetTool(std::string identifier)
+  {
+  for (int i=0; i<GetToolCount(); i++) if ((GetTool(i)->GetIdentifier())==identifier) return GetTool(i);
+  return NULL;
+  }
+    
+int mitk::NavigationToolStorage::GetToolCount()
+  {
+  return m_ToolCollection.size();
+  }
+    
+bool mitk::NavigationToolStorage::isEmpty()
+  {
+  return m_ToolCollection.empty();
   }

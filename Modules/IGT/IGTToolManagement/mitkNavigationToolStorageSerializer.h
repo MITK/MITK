@@ -24,6 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 //mitk headers
 #include <mitkCommon.h>
+#include "mitkNavigationToolStorage.h"
 #include <MitkIGTExports.h>
 
 namespace mitk {
@@ -38,10 +39,20 @@ namespace mitk {
   public:
     mitkClassMacro(NavigationToolStorageSerializer,itk::Object);
     itkNewMacro(Self);
+
+    /**
+     * @brief  Saves a mitk navigation tool storage to a file. 
+     * @return Returns true if the file was saved successfully. False if not.
+     */
+    bool Serialize(std::string filename, mitk::NavigationToolStorage::Pointer storage);
     
+    itkGetMacro(ErrorMessage,std::string);
+
   protected:
     NavigationToolStorageSerializer();
     ~NavigationToolStorageSerializer();
+
+    std::string m_ErrorMessage;
 
   };
 } // namespace mitk

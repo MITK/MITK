@@ -27,3 +27,8 @@ mitk::NavigationToolReader::~NavigationToolReader()
   {
 
   }
+mitk::NavigationTool::Pointer mitk::NavigationToolReader::DoRead(std::string filename)
+  {
+  m_ErrorMessage = "Error, NavigationToolReader is not implemented yet!";
+  return NULL;
+  }

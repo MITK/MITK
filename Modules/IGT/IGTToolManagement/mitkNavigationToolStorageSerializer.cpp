@@ -27,3 +27,9 @@ mitk::NavigationToolStorageSerializer::~NavigationToolStorageSerializer()
   {
 
   }
+
+bool mitk::NavigationToolStorageSerializer::Serialize(std::string filename, mitk::NavigationToolStorage::Pointer storage)
+  {
+  m_ErrorMessage = "Error, NavigationToolStorageSerializer is not implemented yet!";
+  return NULL;
+  }

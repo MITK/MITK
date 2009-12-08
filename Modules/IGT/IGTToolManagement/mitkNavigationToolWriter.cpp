@@ -27,3 +27,9 @@ mitk::NavigationToolWriter::~NavigationToolWriter()
   {
 
   }
+
+bool mitk::NavigationToolWriter::DoWrite(std::string FileName,mitk::NavigationTool::Pointer Tool)
+  {
+  m_ErrorMessage = "Error, NavigationToolWriter is not implemented yet!";
+  return false;
+  }

@@ -27,3 +27,9 @@ mitk::NavigationToolStorageDeserializer::~NavigationToolStorageDeserializer()
   {
 
   }
+
+mitk::NavigationToolStorage::Pointer mitk::NavigationToolStorageDeserializer::Deserialize(std::string filename)
+  {
+  m_ErrorMessage = "Error, NavigationToolStorageDeserializer is not implemented yet!";
+  return NULL;
+  }

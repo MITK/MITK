@@ -24,6 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 //mitk headers
 #include <mitkCommon.h>
+#include "mitkNavigationTool.h"
 #include <MitkIGTExports.h>
 
 namespace mitk {
@@ -39,10 +40,23 @@ namespace mitk {
   public:
     mitkClassMacro(NavigationToolReader,itk::Object);
     itkNewMacro(Self);
+
+    /**
+     * @brief          This method reads a navigation tool from a file.
+     * @param filename The filename where the tool is stored, "C:\temp\myTool.igtTool" for example.
+     * @return         Returns a pointer to the tool which was read. Returns NULL, if something went
+     *                 wrong and no tool was read. In this case you may also want the error message which is availiable
+     *                 from the method GetErrorMessage().
+     */
+    mitk::NavigationTool::Pointer DoRead(std::string filename);
     
+    itkGetMacro(ErrorMessage,std::string);
+
   protected:
     NavigationToolReader();
     ~NavigationToolReader();
+
+    std::string m_ErrorMessage;
 
   };
 } // namespace mitk

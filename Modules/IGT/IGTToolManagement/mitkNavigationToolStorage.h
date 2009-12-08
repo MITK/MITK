@@ -25,6 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 //mitk headers
 #include <mitkCommon.h>
 #include <MitkIGTExports.h>
+#include "mitkNavigationTool.h"
 
 namespace mitk {
   /**Documentation
@@ -41,9 +42,44 @@ namespace mitk {
     mitkClassMacro(NavigationToolStorage,itk::Object);
     itkNewMacro(Self);
     
+    /**
+     * @brief  Adds a tool to the storage. Be sure that the tool has a unique 
+     *         identifier which is not already part of this storage.
+     * @return Returns true if the tool was added to the storage, false if not
+     *         (false can be returned if the identifier already exists in this storage
+     *         for example).
+     */
+    bool AddTool(mitk::NavigationTool::Pointer tool);
+    
+    /**
+     * @return Returns the tracking tool at the position "number"
+     *         in the storage. Returns NULL if there is no
+     *         tracking tool at this position.
+     */
+    mitk::NavigationTool::Pointer GetTool(int number);
+    
+    /**
+     * @return Returns the tracking tool with the given identifier.
+     *         Returns NULL if there is no
+     *         tracking tool with this identifier in the storage.
+     */
+    mitk::NavigationTool::Pointer GetTool(std::string identifier);
+    
+    /**
+     * @return Returns the number of tools stored in the storage.
+     */
+    int GetToolCount();
+
+    /**
+     * @return Returns true if the storage is empty, false if not.
+     */
+    bool isEmpty();
+    
   protected:
     NavigationToolStorage();
     ~NavigationToolStorage();
+    
+    std::vector<mitk::NavigationTool::Pointer> m_ToolCollection;
 
   };
 } // namespace mitk

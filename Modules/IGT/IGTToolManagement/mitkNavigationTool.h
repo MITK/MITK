@@ -64,6 +64,12 @@ namespace mitk {
     //TrackingTool:
     itkGetMacro(TrackingTool,mitk::TrackingTool::Pointer);
     itkSetMacro(TrackingTool,mitk::TrackingTool::Pointer);
+    //CalibrationFile:
+    itkGetMacro(CalibrationFile,std::string);
+    itkSetMacro(CalibrationFile,std::string);
+    //SerialNumber:
+    itkGetMacro(SerialNumber,std::string);
+    itkSetMacro(SerialNumber,std::string);
     //#######################
 
   protected:
@@ -80,6 +86,12 @@ namespace mitk {
     itk::SpatialObject<3>::Pointer m_SpatialObject;
     /** @brief This member variable holds a pointer to the corresponting tracking tool in the hardware. */
     mitk::TrackingTool::Pointer m_TrackingTool;
+    /** @brief The path to the calibration file of the tool. */
+    std::string m_CalibrationFile;
+    /** @brief   A unique serial number of the tool which is needed to identify the tool correctly. This is very important
+      *          in case of the NDI Aurora System.
+      */
+    std::string m_SerialNumber;
     //#################################################
 
   };

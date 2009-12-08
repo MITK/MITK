@@ -504,9 +504,17 @@ mitk::NDIErrorCode mitk::NDIProtocol::PENA(std::string* portHandle, TrackingPrio
 }
 
 
-mitk::NDIErrorCode mitk::NDIProtocol::PHINF(std::string* portHandle)
+mitk::NDIErrorCode mitk::NDIProtocol::PHINF(std::string portHandle, std::string* portInfo)
 {
-  return this->GenericCommand("PHINF", portHandle);
+  std::string command;
+  if (m_UseCRC) command = "PHINF:" + portHandle;
+  else command = "PHINF " + portHandle;
+  mitk::NDIErrorCode returnValue = m_TrackingDevice->Send(&command, m_UseCRC); 
+  if (returnValue==NDIOKAY)
+    {
+    m_TrackingDevice->Receive(portInfo, 33);
+    }
+  return returnValue;
 }
 
 
@@ -1422,7 +1430,7 @@ mitk::NDIErrorCode mitk::NDIProtocol::GenericCommand(const std::string command, 
   /* read and parse the reply from tracking device */
   // the reply for a generic command can be OKAY or ERROR##    
   // so we can use the generic parse method for these replies
-  returnValue = this->ParseOkayError();
+  this->ParseOkayError();
   return returnValue;
 }
 

@@ -53,12 +53,9 @@ namespace mitk
     typedef mitk::SerialCommunication::HardwareHandshake HardwareHandshake; ///< Hardware handshake mode of the serial connection
     typedef mitk::NDIPassiveTool::TrackingPriority TrackingPriority; ///< Tracking priority used for tracking a tool
     /** 
-    * \brief Detects and initializes active tools which are wired to the tracking device.
-    *  
-    * \return Returns a string-vector of the port handles of the active tools which have been detected.
-    *  Returns an empty vector if no tool was detected or if there was an error.
+    * \brief Gives information about the tool which is assosiated with the port handle. Writes portInfo to the string.
     */
-    NDIErrorCode PHINF(std::string* portHandle);
+    NDIErrorCode PHINF(std::string portHandle, std::string* portInfo);
     NDIErrorCode PSOUT(std::string portHandle, std::string state); ///< Set GPIO Output (Aurora)
     NDIErrorCode COMM(mitk::SerialCommunication::BaudRate baudRate, mitk::SerialCommunication::DataBits dataBits, mitk::SerialCommunication::Parity parity, mitk::SerialCommunication::StopBits stopBits, mitk::SerialCommunication::HardwareHandshake hardwareHandshake); ///< Change Serial Communication Parameters
     NDIErrorCode INIT();    ///< Initialize the Measurement System

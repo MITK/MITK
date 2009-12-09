@@ -475,6 +475,7 @@ void QmitkExtWorkbenchWindowAdvisorHack::onImageNavigator()
     }
   }
   cherry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->ShowView("org.mitk.views.imagenavigator");
+  cherry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->ResetPerspective();
 }
 
 void QmitkExtWorkbenchWindowAdvisorHack::onEditPreferences()

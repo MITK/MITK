@@ -38,10 +38,10 @@ mitk::NodePredicateProperty::~NodePredicateProperty()
 bool mitk::NodePredicateProperty::CheckNode(const mitk::DataTreeNode* node) const
 {
   if (node == NULL)
-    throw 1;  // Insert Exception Handling here
-
-  if (m_ValidPropertyName.size() == 0)
-    throw 1;  // does it make sense to search a property without giving a name?
+    throw std::invalid_argument("NodePredicateProperty: invalid node");
+  
+  if (m_ValidPropertyName.empty())
+    throw std::invalid_argument("NodePredicateProperty: invalid property name");
 
   // check, if any of the properties of node are equal to m_ValidProperty.
   if (m_ValidProperty.IsNull())

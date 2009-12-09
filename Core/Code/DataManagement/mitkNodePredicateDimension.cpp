@@ -41,7 +41,7 @@ mitk::NodePredicateDimension::~NodePredicateDimension()
 bool mitk::NodePredicateDimension::CheckNode(const mitk::DataTreeNode* node) const
 {
   if (node == NULL)
-    throw 1;  // Insert Exception Handling here
+    throw std::invalid_argument("NodePredicateDimension: invalid node");
 
   mitk::Image *image = dynamic_cast<mitk::Image *>( node->GetData() );
   if (image != NULL)

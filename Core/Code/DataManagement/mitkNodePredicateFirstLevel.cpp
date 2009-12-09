@@ -29,14 +29,13 @@ mitk::NodePredicateFirstLevel::~NodePredicateFirstLevel()
 
 bool mitk::NodePredicateFirstLevel::CheckNode(const mitk::DataTreeNode* node) const
 {
-  if (!node)
-    throw 1;  // Insert Exception Handling here
+  if (node == NULL)
+    throw std::invalid_argument("NodePredicateFirstLevel: invalid node");
+
 
   if(m_DataStorage.IsNull())
-    throw 1;
+    throw std::invalid_argument("NodePredicateFirstLevel: DataStorage is invalid");
 
-  mitk::DataStorage::SetOfObjects::ConstPointer list = 
-    m_DataStorage->GetSources(node, NULL, true);
-
-  return list->Size() == 0;
+  mitk::DataStorage::SetOfObjects::ConstPointer list = m_DataStorage->GetSources(node, NULL, true);
+  return (list->Size() == 0);
 }

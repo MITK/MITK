@@ -24,7 +24,8 @@ mitk::NodePredicateDataType::NodePredicateDataType(const char* datatype)
 : NodePredicateBase()
 {
   if (datatype == NULL)
-    throw 1;  // Insert Exception Handling here
+    throw std::invalid_argument("NodePredicateDataType: invalid datatype");
+
 
   m_ValidDataType = datatype;
 }
@@ -37,7 +38,8 @@ mitk::NodePredicateDataType::~NodePredicateDataType()
 bool mitk::NodePredicateDataType::CheckNode(const mitk::DataTreeNode* node) const
 {
   if (node == NULL)
-    throw 1;  // Insert Exception Handling here
+    throw std::invalid_argument("NodePredicateDataType: invalid node");
+
 
   mitk::BaseData* data = node->GetData();
 

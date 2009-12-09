@@ -35,7 +35,7 @@ mitk::NodePredicateData::~NodePredicateData()
 bool mitk::NodePredicateData::CheckNode(const mitk::DataTreeNode* node) const
 {
   if (node == NULL)
-    throw 1;  // Insert Exception Handling here
+    throw std::invalid_argument("NodePredicateData: invalid node");
 
   return (node->GetData() == m_DataObject);
 }

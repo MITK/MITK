@@ -6,6 +6,7 @@
 #include <qwt_plot_curve.h>
 #include <vector>
 #include "mitkCommon.h"
+#include <qwt_symbol.h>
 
 /** 
 * Provides a convenient interface for plotting curves using qwt.
@@ -133,14 +134,14 @@ public:
   * or with the data points marked with a symbol;
   * @param: style A QwtPlotCurve::CurveStyle
   */
-  void SetCurveStyle( unsigned int curveId, const QwtPlotCurve::CurveStyle* style );
+  void SetCurveStyle( unsigned int curveId, const QwtPlotCurve::CurveStyle style );
 
   /** 
   * Sets the style data points are drawn for the curve; like, a line,
   * or dots; 
   * @param: symbol A QwtSymbol
   */
-  void SetCurveSymbol( unsigned int curveId, const QwtSymbol* symbol );
+  void SetCurveSymbol( unsigned int curveId, QwtSymbol* symbol );
 
   /**
   * Sets the title of the given curve. The title will be shown in the legend of

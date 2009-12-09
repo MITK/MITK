@@ -87,12 +87,12 @@ void QmitkPlotWidget::SetCurveTitle( unsigned int  /*curveId*/, const char* titl
   m_Plot->setTitle( title );
 }
 
-void QmitkPlotWidget::SetCurveStyle( unsigned int curveId, const QwtPlotCurve::CurveStyle* style )
+void QmitkPlotWidget::SetCurveStyle( unsigned int curveId, const QwtPlotCurve::CurveStyle style )
 {
-  m_PlotCurveVector[curveId]->setStyle(*style);
+  m_PlotCurveVector[curveId]->setStyle(style);
 }
 
-void QmitkPlotWidget::SetCurveSymbol( unsigned int curveId, const QwtSymbol* symbol )
+void QmitkPlotWidget::SetCurveSymbol( unsigned int curveId, QwtSymbol* symbol )
 {
   m_PlotCurveVector[curveId]->setSymbol(*symbol);
 }

@@ -135,6 +135,13 @@ public:
   */
   void SetCurveStyle( unsigned int curveId, const QwtPlotCurve::CurveStyle* style );
 
+  /** 
+  * Sets the style data points are drawn for the curve; like, a line,
+  * or dots; 
+  * @param: symbol A QwtSymbol
+  */
+  void SetCurveSymbol( unsigned int curveId, const QwtSymbol* symbol );
+
   /**
   * Sets the title of the given curve. The title will be shown in the legend of
   * the QwtPlot.

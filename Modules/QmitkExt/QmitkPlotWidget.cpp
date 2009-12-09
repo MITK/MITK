@@ -92,6 +92,11 @@ void QmitkPlotWidget::SetCurveStyle( unsigned int curveId, const QwtPlotCurve::C
   m_PlotCurveVector[curveId]->setStyle(*style);
 }
 
+void QmitkPlotWidget::SetCurveSymbol( unsigned int curveId, const QwtSymbol* symbol )
+{
+  m_PlotCurveVector[curveId]->setSymbol(*symbol);
+}
+
 void QmitkPlotWidget::Replot()
 {
   m_Plot->replot();

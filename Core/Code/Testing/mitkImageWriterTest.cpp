@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <iostream>
 
 /**
-*  Simple example for a test for the (non-existent) class "ImageWriter".
+*  test for "ImageWriter".
 *  
 *  argc and argv are the command line parameters which were passed to 
 *  the ADD_TEST command in the CMakeLists.txt file. For the automatic
@@ -46,57 +46,52 @@ int mitkImageWriterTest(int  argc , char* argv[])
     // do not write to std::cout and do not return from this function yourself!
 
     // load image
-    std::cout << "Loading file: " << std::flush;
-  if(argc==0)
-  {
-    std::cout<<"no file specified [FAILED]"<<std::endl;
-    return EXIT_FAILURE;
-  }
+    
+  MITK_TEST_CONDITION_REQUIRED(argc != 0, "File to load has been specified");
+
+
   mitk::Image::Pointer image = NULL;
   mitk::DataTreeNodeFactory::Pointer factory = mitk::DataTreeNodeFactory::New();
+
   try
   {
-    std::cout<<argv[1]<<std::endl;
+    MITK_TEST_OUTPUT(<< "Loading file: " << argv[1]);
     factory->SetFileName( argv[1] );
     factory->Update();
-
-    if(factory->GetNumberOfOutputs()<1)
-    {
-      std::cout<<"file could not be loaded [FAILED]"<<std::endl;
-      return EXIT_FAILURE;
-    }
+    MITK_TEST_CONDITION_REQUIRED(factory->GetNumberOfOutputs() > 0, "file loaded");
+    
     mitk::DataTreeNode::Pointer node = factory->GetOutput( 0 );
     image = dynamic_cast<mitk::Image*>(node->GetData());
     if(image.IsNull())
     {
-      std::cout<<"file "<< argv[1]<< "is not an image - test will not be applied [PASSED]"<<std::endl;
+      std::cout<<"file "<< argv[1]<< "is not an image - test will not be applied."<<std::endl;
       std::cout<<"[TEST DONE]"<<std::endl;
       return EXIT_SUCCESS;
-    }
+    }  
   }
-  catch ( itk::ExceptionObject & ex )
+  catch (itk::ExceptionObject & ex)
   {
-    std::cout << "Exception: " << ex << "[FAILED]" << std::endl;
-    return EXIT_FAILURE;
+    MITK_TEST_FAILED_MSG(<< "Exception during file loading: " << ex.GetDescription());
   }
+
 
   MITK_TEST_CONDITION_REQUIRED(image.IsNotNull(),"loaded image not NULL")
 
-    try{  
-      // test for exception handling
-      MITK_TEST_FOR_EXCEPTION_BEGIN(itk::ExceptionObject)
-      myImageWriter->SetInput(image);
-      myImageWriter->SetFileName("/usr/bin");
-      myImageWriter->Update(); 
-      MITK_TEST_FOR_EXCEPTION_END(itk::ExceptionObject)
+
+  // test for exception handling
+  try
+  {
+    MITK_TEST_FOR_EXCEPTION_BEGIN(itk::ExceptionObject)
+    myImageWriter->SetInput(image);
+    myImageWriter->SetFileName("/usr/bin");
+    myImageWriter->Update(); 
+    MITK_TEST_FOR_EXCEPTION_END(itk::ExceptionObject)
   }
   catch(...) {
     //this means that a wrong exception (i.e. no itk:Exception) has been thrown 
-    std::cout << "Wrong exception (i.e. no itk:Exception) caught during write [FAILED]" << std::endl;
-    return EXIT_FAILURE;
+    MITK_TEST_FAILED_MSG(<< "Wrong exception (i.e. no itk:Exception) caught during write");
   }
 
   // always end with this!
-  MITK_TEST_END()
+  MITK_TEST_END();
 }
-

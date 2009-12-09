@@ -44,7 +44,6 @@ namespace mitk
 
   public:
     
-  
 
     mitkClassMacro(BSplineRegistration, RegistrationBase);
 
@@ -52,17 +51,12 @@ namespace mitk
     * \brief Method for creation through the object factory. 
     */
     itkNewMacro(Self);
-
-  
-
-
    
 
     /*!  
     * \brief Sets the number of iterations which will be performed during the registration process. 
     */
     void SetNumberOfIterations(int iterations);
-
      
 
     /*!  
@@ -77,7 +71,7 @@ namespace mitk
 
    
     /*!  
-    * \brief Starts the demons registration. 
+    * \brief Starts the B-Spline registration. 
     */
     virtual void GenerateData()
     {

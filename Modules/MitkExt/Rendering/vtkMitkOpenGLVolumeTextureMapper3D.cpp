@@ -1038,9 +1038,9 @@ void vtkVolumeTextureMapper3DComputeScalars( T *dataPtr,
   //GPU_INFO << "vtkVolumeTextureMapper3DComputeScalars";
 
   T              *inPtr;
-  unsigned char  *outPtr, *outPtr2;
-  int             i, j, k;
-  int             idx;
+  // unsigned char  *outPtr, *outPtr2;
+  // int             i, j, k;
+  // int             idx;
 
   int   inputDimensions[3];
   double inputSpacing[3];
@@ -1056,9 +1056,9 @@ void vtkVolumeTextureMapper3DComputeScalars( T *dataPtr,
 
   int components = input->GetNumberOfScalarComponents();
 
-  double wx, wy, wz;
-  double fx, fy, fz;
-  int x, y, z;
+  // double wx, wy, wz;
+  // double fx, fy, fz;
+  // int x, y, z;
 
   double sampleRate[3];
   sampleRate[0] = outputSpacing[0] / static_cast<double>(inputSpacing[0]);

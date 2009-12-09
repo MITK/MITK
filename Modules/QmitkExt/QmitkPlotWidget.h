@@ -128,6 +128,13 @@ public:
   */
   void SetCurveBrush( unsigned int curveId, const QBrush& brush);
 
+  /** 
+  * Sets the style how the line is drawn for the curve; like, plain line,
+  * or with the data points marked with a symbol;
+  * @param: style A QwtPlotCurve::CurveStyle
+  */
+  void SetCurveStyle( unsigned int curveId, const QwtPlotCurve::CurveStyle* style );
+
   /**
   * Sets the title of the given curve. The title will be shown in the legend of
   * the QwtPlot.

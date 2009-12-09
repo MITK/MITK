@@ -70,7 +70,6 @@ bool QmitkPlotWidget::SetCurveData( unsigned int curveId, const QmitkPlotWidget:
   return true;
 }
 
-
 void QmitkPlotWidget::SetCurvePen( unsigned int curveId, const QPen& pen )
 {
   m_PlotCurveVector[curveId]->setPen( pen );
@@ -88,6 +87,10 @@ void QmitkPlotWidget::SetCurveTitle( unsigned int  /*curveId*/, const char* titl
   m_Plot->setTitle( title );
 }
 
+void QmitkPlotWidget::SetCurveStyle( unsigned int curveId, const QwtPlotCurve::CurveStyle* style )
+{
+  m_PlotCurveVector[curveId]->setStyle(*style);
+}
 
 void QmitkPlotWidget::Replot()
 {

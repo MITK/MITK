@@ -98,18 +98,9 @@ protected:
   
   GLuint prgOneComponentShade;
 
-  
   vtkRenderWindow *RenderWindow;
   
   bool SupportsCompressedTexture;
- // bool SupportsNonPowerOfTwoTextures;
-  
-  // Actual internal texture format (uncompressed vs compressed)
-  // Computed in Render()
-  int InternalAlpha; // GLint
-  int InternalLA; // GLint
-  int InternalRGB; // GLint
-  int InternalRGBA; // GLint
   
   void Initialize();
 
@@ -118,34 +109,23 @@ protected:
   void SetupOneIndependentTextures( vtkRenderer *ren, vtkVolume *vol );
   void RenderOneIndependentShadeFP( vtkRenderer *ren, vtkVolume *vol );
 
-  void SetupTwoDependentTextures( vtkRenderer *ren, vtkVolume *vol );
-  void RenderTwoDependentShadeFP( vtkRenderer *ren, vtkVolume *vol );
-
   void SetupFourDependentTextures( vtkRenderer *ren, vtkVolume *vol );
   void RenderFourDependentShadeFP( vtkRenderer *ren, vtkVolume *vol );
-
 
   void DeleteTextureIndex( GLuint *index );
   void CreateTextureIndex( GLuint *index );
   
-  void RenderPolygons( vtkRenderer *ren,
-                       vtkVolume *vol,
-                       int stages[4] );
+  void RenderPolygons( vtkRenderer *ren, vtkVolume *vol, int stages[4] );
 
   void SetupProgramLocalsForShadingFP( vtkRenderer *ren, vtkVolume *vol );
   
-  // Description:
-  // Check if we can support this texture size for the number of components.
-  int IsTextureSizeSupported(int size[3],
-                             int components);
-
-  // Description:
-  // Common code for setting up interpolation / clamping on 3D textures
   void Setup3DTextureParameters( bool linear );
   
-  bool NeedUpdateVolumes();
+  void ComputeVolumeDimensions();
 
-  int UpdateVolumes( vtkVolume * );
+  bool UpdateVolumes( vtkVolume * );
+
+  bool UpdateVolumesRGBA( vtkVolume * );
 
 private:
   vtkMitkOpenGLVolumeTextureMapper3D(const vtkMitkOpenGLVolumeTextureMapper3D&);  // Not implemented.

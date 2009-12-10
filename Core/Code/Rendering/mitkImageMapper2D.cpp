@@ -910,18 +910,28 @@ mitk::ImageMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
 
   if ( binary )
   {
+   
     image->setExtrema(0, 1);
     image->setBinary(true);
 
     bool binaryOutline = false;
-    if (this->GetDataTreeNode()->GetBoolProperty( "outline binary", binaryOutline, renderer ))
+    if ( this->GetInput()->GetPixelType().GetBpe() <= 8 )
     {
-      image->setOutline(binaryOutline);
-      float binaryOutlineWidth(1.0);
-      if (this->GetDataTreeNode()->GetFloatProperty( "outline width", binaryOutlineWidth, renderer ))
+      if (this->GetDataTreeNode()->GetBoolProperty( "outline binary", binaryOutline, renderer ))
       {
-        image->setOutlineWidth(binaryOutlineWidth);
+        image->setOutline(binaryOutline);
+        float binaryOutlineWidth(1.0);
+        if (this->GetDataTreeNode()->GetFloatProperty( "outline width", binaryOutlineWidth, renderer ))
+        {
+          image->setOutlineWidth(binaryOutlineWidth);
+        }
       }
+    }
+    else
+    { 
+      //set opacity
+      rgba[3] = 0.3;
+      LOG_WARN << "Type of all binary images should be (un)signed char. Outline does not work on other pixel types!";
     }
   }
   else 

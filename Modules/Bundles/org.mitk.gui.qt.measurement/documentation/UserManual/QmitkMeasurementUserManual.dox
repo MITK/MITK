@@ -4,7 +4,25 @@
 
 \section QmitkMeasurementUserManualOverview Overview
 
-The Measurement module enables the user to interact with 2D images or single slices of 3D image stacks and planar figure data types. It allows to measure distances, angels, pathes and several geometric figures on a dataset. The workflow to use this module is:
+The Measurement module enables the user to interact with 2D images or single slices of 3D image stacks and planar figure data types. It allows to measure distances, angels, pathes and several geometric figures on a dataset. 
+
+Available Sections:
+- \ref QmitkMeasurementUserManualOverview
+- \ref QmitkMeasurementUserManualFeatures
+	- \ref SubOne
+	- \ref SubTwo
+	- \ref SubThree
+	- \ref SubFour
+	- \ref SubFive
+	- \ref SubSix
+	- \ref SubSeven
+- \ref QmitkMeasurementUserManualUsage
+	- \ref One
+	- \ref Two
+	- \ref Three
+	- \ref Four
+
+The workflow to use this module is:
 
 \image html Workflow.png
 
@@ -14,12 +32,6 @@ The workflow is repeatedly useable with the same or different measurement figure
 
 The standard working plane is "Transversal" but the other standard viewplanes ("Saggital" and "Coronal") are also valid for measurements. To swap between the view planes refer to 3M Application Bundle User Manual.
 
-- \ref QmitkMeasurementUserManualFeatures 
-- \ref QmitkMeasurementUserManualUsage
-
-
-
-\page Features  
 \section QmitkMeasurementUserManualFeatures Features
 
 The bundle as it is depicted below offers the following features in the order of apperance on the image from top to bottom: 
@@ -52,12 +64,7 @@ Below the buttonline the statistics window is situated, it displays the results 
 \image html  Image_processed.jpg
 
 The last row contains again a button line to swap from the measurement bundle (activated in the image) to other supported MITK 3M3 bundles.
-
-- \ref QmitkMeasurementUserManualOverview 
-- \ref QmitkMeasurementUserManualUsage
-
   
-\page Usage
 \section QmitkMeasurementUserManualUsage Usage
 
 This Section is subdivided into four subsections:
@@ -95,9 +102,6 @@ After applying the wanted measurement figures the entire scene consisting of the
 If the single measurement figures or the image is not needed any longer, it can be removed solely or as an entire group. The image can't be removed without simultaneously remove all the dependent measurement figures that belongt the image tree in the Data Manager. To remove just select the wanted items in the data manager list by left-click on it or if several items wanted to be removed left click on all wanted by simultaneously holding the ctrl-button pressed.
 
 For more detailed usage of the save/remove functionality refer to the Data Manager User Manual.
-- \ref QmitkMeasurementUserManualOverview
-- \ref QmitkMeasurementUserManualFeatures 
-
 
 <!-- <ul>
   <li> The Measurement Module is able to measure:

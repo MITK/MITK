@@ -756,7 +756,7 @@ void ImageStatisticsCalculator::InternalCalculateMaskFromPlanarFigure(
     imageGeometry3D->WorldToIndex( point3D, point3D );
 
     // Add point to polyline array
-    points->InsertNextPoint( point3D[i0], point3D[i1], -0.5 );
+    points->InsertNextPoint( point3D[i0] - 0.5, point3D[i1] - 0.5, -0.5 );
   }
   polyline->SetPoints( points );
   points->Delete();

@@ -1,6 +1,12 @@
 /**
 \bundlemainpage{org.deform.registration} The Deformable Image Registration Module
 
+Available sections:
+  - \ref DeformableRegistrationUserManualOverview
+  - \ref DeformableRegistrationUserManualDetails
+
+\section DeformableRegistrationUserManualOverview Overview
+
 This module allows you to register 2D as well as 3D images in a deformable manner. Register means to align two images, so that they become as similar as
 possible. Registration results will directly be applied to the Moving Image.
 
@@ -8,11 +14,6 @@ possible. Registration results will directly be applied to the Moving Image.
 
 This document will tell you how to use this module, but it is assumed that you already know how to navigate through the slices of an image using the
 multi-widget. See \ref DeformableRegistrationUserManual for more information.
-
-Available sections:
-  - \ref DeformableRegistrationUserManualDetails
-
-\page DeformableRegistrationUserManual Deformable Registration User Manual
 
 \section DeformableRegistrationUserManualDetails Details
 

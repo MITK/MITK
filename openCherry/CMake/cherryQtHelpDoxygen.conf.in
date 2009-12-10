@@ -38,6 +38,8 @@ GENERATE_TESTLIST      = NO
 GENERATE_BUGLIST       = NO
 GENERATE_DEPRECATEDLIST= NO
 ALIASES                = bundlemainpage{1}=\mainpage 
+ALIASES               += isHtml="\if NO_SUCH_THING"
+ALIASES               += isHtmlend="\endif"
 ENABLED_SECTIONS       = 
 MAX_INITIALIZER_LINES  = 30
 OPTIMIZE_OUTPUT_FOR_C  = NO

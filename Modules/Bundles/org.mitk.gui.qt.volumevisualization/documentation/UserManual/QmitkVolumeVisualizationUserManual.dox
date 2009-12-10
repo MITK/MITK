@@ -1,34 +1,28 @@
 /**
 \bundlemainpage{org.volvis} The Volume Visualization Module
 
-\section QVV_MainPageOverview Overview
+Available sections:
+<ul>
+<li> \ref QVV_Overview
+<li> \ref QVV_EnableVRPage
+<li> \ref QVV_PresetPage
+<li> \ref QVV_ThresholdBell
+<li> \ref QVV_Editing
+</ul>
+
+\section QVV_Overview Overview
 
 The <b> Volume Visualization Module </b> is a basic tool for visualizing three dimensional medical images. 
-MITK provides presets for transfer functions. 
+MITK provides generic transfer function presets for medical CT data. 
 These functions, that map the gray-value to color and opacity, can be interactively edited. 
 Additionally, there are controls to quickly generate common used transfer function shapes 
 like the threshold and bell curve to help identify a range of gray-values.
 
 \image html vroverview.png ""
 
-Click \subpage QVV_UserManual for more detailed information.
+\section QVV_EnableVRPage Enable Volume Rendering
 
-\page QVV_UserManual User Manual
-
-
-\section QVV_UserManualOverview Overview
-
-Available sections:
-<ul>
-<li> \subpage QVV_EnableVRPage
-<li> \subpage QVV_PresetPage
-<li> \subpage QVV_ThresholdBell
-<li> \subpage QVV_Editing
-</ul>
-
-\page QVV_EnableVRPage Enable Volume Rendering
-
-\section QVV_LoadingImage Loading an image into the application
+\subsection QVV_LoadingImage Loading an image into the application
 
 Load an image into the application by
 
@@ -46,29 +40,28 @@ Volume Visualization imposes following restrictions on images:
      Very large images may not work, unless you use the 64bit version.
 </ul>
 
-\section QVV_EnableVR Enable Volumerendering
+\subsection QVV_EnableVR Enable Volumerendering
 
 \image html checkboxen.png ""
 
 Select an image in datamanager and click on the checkbox left of "Volumerendering".
 Please be patient, while the image is prepared for rendering, which can take up to a half minute.
 
-\section QVV_LODGPU The LOD & GPU checkboxes
+\subsection QVV_LODGPU The LOD & GPU checkboxes
 
 Volume Rendering requires a lot of computing resources including processor, memory and graphics card.
 
 To run volume rendering on smaller platforms,
 enable the LOD checkbox (level-of-detail rendering).
 Level-of-detail first renders a lower quality preview to increase interactivity.
-and then if the user stops to interact a normal quality rendering is issued.
+If the user stops to interact a normal quality rendering is issued.
 
 The GPU checkbox tries to use computing resources on the graphics card to accelerate volume rendering.
 It requires a powerful graphics card and OpenGL hardware support for shaders, but achieves much higher frame rates than software-rendering.
 
-\page QVV_PresetPage Applying premade presets
+\section QVV_PresetPage Applying premade presets
 
-
-\section QVV_Preset Internal presets
+\subsection QVV_Preset Internal presets
 
 There are some internal presets given, that can be used with normal CT data (given in Houndsfield units).
 A large set of medical data has been tested with that presets, but it may not suit on some special cases.
@@ -86,13 +79,13 @@ Click on the "Preset" tab for using internal or custom presets.
 <li> "MR Generic" is the default transferfunction that we use on MRT data (which is not normalized like CT data).  
 </ul>
 
-\section QVV_CustomPreset Saving and loading custom presets
+\subsection QVV_CustomPreset Saving and loading custom presets
 
 After creating or editing a transferfunction (see \ref QVV_Editing or \ref QVV_ThresholdBell), 
 the custom transferfunction can be stored and later retrieved on the filesystem.
 Click "Save" (respectively "Load") button to save (load) the threshold-, color- and gradient function combined in a single .xml file.
 
-\page QVV_ThresholdBell Interactively create transferfunctions
+\section QVV_ThresholdBell Interactively create transferfunctions
 
 Beside the possibility to directly edit the transferfunctions (\ref QVV_Editing),
 a one-click generation of two commonly known shapes is given.
@@ -103,21 +96,21 @@ The first parameter "center" (controlled by horizontal movement of the mouse) sp
 
 The second parameter "width" (controlled by vertical movement of the mouse) specifies the width (or steepness) of the shape.
 
-\section Threshold
+\subsection Threshold
 
 Click on the "Threshold" tab to active the threshold function generator.
 \image html threshold.png ""
 A threshold shape begins with zero and raises to one across the "center" parameter. Lower widths results in steeper threshold functions.
 
-\section Bell
+\subsection Bell
 
 Click on the "Bell" tab to active the threshold function generator.
 \image html bell.png ""
 A threshold shape begins with zero and raises to one at the "center" parameter and the lowers agains to zero. The "width" parameter correspondens to the width of the bell.
 
-\page QVV_Editing Customize transferfunctions in detail
+\section QVV_Editing Customize transferfunctions in detail
 
-\section QVV_Navigate Choosing grayvalue interval to edit
+\subsection QVV_Navigate Choosing grayvalue interval to edit
 
 \image html slider.png ""
 To navigate across the grayvalue range or to zoom in some ranges use the "range"-slider.
@@ -135,23 +128,19 @@ All three function editors have in common following:
 
 There are three transferfunctions to customize:
 
-\section QVV_GO Grayvalue -> Opacity
+\subsection QVV_GO Grayvalue -> Opacity
 
 \image html opacity.png "grayvalues will be mapped to opacity." 
 An opacity of 0 means total transparent, an opacity of 1 means total opaque.  
 
-\section QVV_GC Grayvalue -> Color
+\subsection QVV_GC Grayvalue -> Color
 
 \image html color.png "grayvalues will be mapped to color." 
 The color transferfunction editor also allows by double-clicking a point to change its color.
 
-\section QVV_GGO Grayvalue and Gradient -> Opacity
+\subsection QVV_GGO Grayvalue and Gradient -> Opacity
 
 \image html gradient.png ""
 Here the influence of the gradient is controllable at specific grayvalues. 
-
-
-
-
 
 */

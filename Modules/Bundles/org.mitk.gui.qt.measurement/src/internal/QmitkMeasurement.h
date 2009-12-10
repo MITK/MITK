@@ -100,7 +100,8 @@ class QmitkMeasurement : public QObject, public QmitkFunctionality
     virtual void NodeRemoved(const mitk::DataTreeNode* node);
     virtual void NodeAddedInDataStorage(const mitk::DataTreeNode* node);
     virtual void PlanarFigureInitialized();
-    virtual void AddFigureToDataStorage(mitk::PlanarFigure* figure, const QString& name);
+    virtual void AddFigureToDataStorage(mitk::PlanarFigure* figure, const QString& name,
+      const char *propertyKey = NULL, mitk::BaseProperty *property = NULL );
 
     ///
     /// Invoked when the DataManager selection changed.

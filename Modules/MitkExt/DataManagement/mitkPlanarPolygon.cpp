@@ -36,6 +36,29 @@ mitk::PlanarPolygon::~PlanarPolygon()
 }
 
 
+void mitk::PlanarPolygon::SetClosed( bool closed )
+{
+  if ( m_Closed != closed )
+  {
+    m_Closed = closed;
+    this->Modified();
+
+    if ( !closed )
+    {
+      // For non-closed polygons: use "Length" as feature name; disable area
+      this->SetFeatureName( FEATURE_ID_CIRCUMFERENCE, "Length" );
+      this->DeactivateFeature( FEATURE_ID_AREA );
+    }
+    else
+    {
+      // For closed polygons: use "Circumference" as feature name; enable area
+      this->SetFeatureName( FEATURE_ID_CIRCUMFERENCE, "Circumference" );
+      this->ActivateFeature( FEATURE_ID_AREA );
+    }
+  }
+}
+
+
 //void mitk::PlanarPolygon::Initialize()
 //{
 //  // Default initialization of circle control points

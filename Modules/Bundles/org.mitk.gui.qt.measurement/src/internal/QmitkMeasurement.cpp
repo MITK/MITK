@@ -371,9 +371,9 @@ void QmitkMeasurement::PlanarFigureSelectionChanged()
     double featureQuantity = 0.0;
     for (unsigned int i = 0; i < _PlanarFigure->GetNumberOfFeatures(); ++i)
     {
+      if ( !_PlanarFigure->IsFeatureActive( i ) ) continue;
+
       featureQuantity = _PlanarFigure->GetQuantity(i);
-      if(featureQuantity == 0)
-        continue;
       if ((planarAngle && i == planarAngle->FEATURE_ID_ANGLE)
           || (planarFourPointAngle && i == planarFourPointAngle->FEATURE_ID_ANGLE))
         featureQuantity = featureQuantity * 180 / vnl_math::pi;
@@ -487,7 +487,8 @@ void QmitkMeasurement::PlanarFigureInitialized()
   m_DrawPolygon->setChecked(false);
 }
 
-void QmitkMeasurement::AddFigureToDataStorage(mitk::PlanarFigure* figure, const QString& name)
+void QmitkMeasurement::AddFigureToDataStorage(mitk::PlanarFigure* figure, const QString& name,
+  const char *propertyKey, mitk::BaseProperty *property )
 {
   if(m_CurrentFigureNode.IsNotNull())
     m_CurrentFigureNode->GetData()->RemoveObserver(m_InitializedObserverTag);
@@ -496,6 +497,12 @@ void QmitkMeasurement::AddFigureToDataStorage(mitk::PlanarFigure* figure, const 
   m_CurrentFigureNode = newNode;
   m_CurrentFigureNode->SetName(name.toStdString());
   m_CurrentFigureNode->SetData(figure);
+
+  // Add custom property, if available
+  if ( (propertyKey != NULL) && (property != NULL) )
+  {
+    m_CurrentFigureNode->AddProperty( propertyKey, property );
+  }
 
   typedef itk::SimpleMemberCommand< QmitkMeasurement > ITKCommandType;
   ITKCommandType::Pointer initializationCommand;
@@ -550,9 +557,9 @@ void QmitkMeasurement::ActionDrawPathTriggered(bool checked)
   mitk::PlanarPolygon::Pointer figure = mitk::PlanarPolygon::New();
   figure->ClosedOff();
 
-  this->AddFigureToDataStorage(figure, QString("Path%1").arg(++m_PathCounter));
-  if(m_CurrentFigureNode.IsNotNull())
-    m_CurrentFigureNode->SetBoolProperty("ClosedPlanarPolygon", false);
+  mitk::BoolProperty::Pointer closedProperty = mitk::BoolProperty::New( false );
+  this->AddFigureToDataStorage(figure, QString("Path%1").arg(++m_PathCounter),
+    "ClosedPlanarPolygon", closedProperty);
 
   LOG_INFO << "PlanarPath initialized...";
 }
@@ -731,8 +738,8 @@ void QmitkMeasurement::CopyToClipboard(bool)
     newRow.resize(headerRow.size());
     for (unsigned int i = 0; i < planarFigure->GetNumberOfFeatures(); ++i)
     {
-      if(planarFigure->GetQuantity(i) == 0)
-        continue;
+      if ( !planarFigure->IsFeatureActive( i ) ) continue;
+
       featureName = planarFigure->GetFeatureName(i);
       featureName.append(QString(" [%1]").arg(planarFigure->GetFeatureUnit(i)));
       std::vector<QString>::iterator itColumn = std::find(headerRow.begin(),

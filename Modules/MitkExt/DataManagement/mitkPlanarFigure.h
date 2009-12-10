@@ -171,6 +171,12 @@ public:
    * area, ... ) */
   double GetQuantity( unsigned int index ) const;
 
+  
+  /** \brief Returns true if the feature with the specified index exists and
+  * is active (an inactive feature may e.g. be the area of a non-closed
+  * polygon. */
+  bool IsFeatureActive( unsigned int index ) const;
+
 
   /** \brief Calculates quantities of all features of this planar figure. */
   virtual void EvaluateFeatures();
@@ -209,8 +215,20 @@ protected:
    * Should be called in sub-class constructors. */
   virtual unsigned int AddFeature( const char *featureName, const char *unitName );
 
+  /** Sets the name of the specified feature. INTERNAL METHOD. */
+  void SetFeatureName( unsigned int index, const char *featureName );
+
+  /** Sets the physical unit of the specified feature. INTERNAL METHOD. */
+  void SetFeatureUnit( unsigned int index, const char *unitName );
+
   /** Sets quantity of the specified feature. INTERNAL METHOD. */
   void SetQuantity( unsigned int index, double quantity );
+
+  /** Sets the specified feature as active. INTERAL METHOD. */
+  void ActivateFeature( unsigned int index );
+
+  /** Sets the specified feature as active. INTERAL METHOD. */
+  void DeactivateFeature( unsigned int index );
 
   /** \brief Generates the poly-line representation of the planar figure.
    * Must be implemented in sub-classes. */
@@ -248,13 +266,15 @@ private:
 
   struct Feature
   {
-    Feature( const char *name, const char *unit ) : Name( name ), Unit( unit), Quantity(0.0)
+    Feature( const char *name, const char *unit ) 
+    : Name( name ), Unit( unit ), Quantity( 0.0 ), Active( true )
     {
     };
 
     std::string Name;
     std::string Unit;
     double Quantity;
+    bool Active;
   };
 
   Geometry2D *m_Geometry2D;

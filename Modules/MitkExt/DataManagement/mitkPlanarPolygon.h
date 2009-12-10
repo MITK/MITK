@@ -41,9 +41,10 @@ public:
 
   virtual bool IsClosed() const { return m_Closed; };
 
-  itkSetMacro( Closed, bool );
+  virtual void SetClosed( bool closed );
+
   itkGetConstMacro( Closed, bool );
-  itkBooleanMacro( Closed );
+  itkBooleanMacro( Closed ); // Calls SetClosed(); no need to re-implement
 
 
   /** \brief Place figure in its minimal configuration (a point at least)

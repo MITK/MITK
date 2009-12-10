@@ -228,7 +228,6 @@ unsigned int mitk::PlanarFigure::GetNumberOfFeatures() const
 }
 
 
-/** \brief Returns the name (identifier) of the specified features. */
 const char *mitk::PlanarFigure::GetFeatureName( unsigned int index ) const
 {
   if ( index < m_Features.size() )
@@ -242,7 +241,6 @@ const char *mitk::PlanarFigure::GetFeatureName( unsigned int index ) const
 }
 
 
-/** \brief Returns the physical unit of the specified features. */
 const char *mitk::PlanarFigure::GetFeatureUnit( unsigned int index ) const
 {
   if ( index < m_Features.size() )
@@ -256,8 +254,6 @@ const char *mitk::PlanarFigure::GetFeatureUnit( unsigned int index ) const
 }
 
 
-/** Returns quantity of the specified feature (e.g., length, radius,
-* area, ... ) */
 double mitk::PlanarFigure::GetQuantity( unsigned int index ) const
 {
   if ( index < m_Features.size() )
@@ -267,6 +263,19 @@ double mitk::PlanarFigure::GetQuantity( unsigned int index ) const
   else
   {
     return 0.0;
+  }
+}
+
+
+bool mitk::PlanarFigure::IsFeatureActive( unsigned int index ) const
+{
+  if ( index < m_Features.size() )
+  {
+    return m_Features[index].Active;
+  }
+  else
+  {
+    return false;
   }
 }
 
@@ -325,11 +334,47 @@ unsigned int mitk::PlanarFigure::AddFeature( const char *featureName, const char
 }
 
 
+void mitk::PlanarFigure::SetFeatureName( unsigned int index, const char *featureName )
+{
+  if ( index < m_Features.size() )
+  {
+    m_Features[index].Name = featureName;
+  }
+}
+
+
+void mitk::PlanarFigure::SetFeatureUnit( unsigned int index, const char *unitName )
+{
+  if ( index < m_Features.size() )
+  {
+    m_Features[index].Unit = unitName;
+  }
+}
+
+
 void mitk::PlanarFigure::SetQuantity( unsigned int index, double quantity )
 {
   if ( index < m_Features.size() )
   {
     m_Features[index].Quantity = quantity;
+  }
+}
+
+
+void mitk::PlanarFigure::ActivateFeature( unsigned int index )
+{
+  if ( index < m_Features.size() )
+  {
+    m_Features[index].Active = true;
+  }
+}
+
+
+void mitk::PlanarFigure::DeactivateFeature( unsigned int index )
+{
+  if ( index < m_Features.size() )
+  {
+    m_Features[index].Active = false;
   }
 }
 

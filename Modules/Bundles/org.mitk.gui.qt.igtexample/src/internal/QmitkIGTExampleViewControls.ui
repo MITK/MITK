@@ -21,11 +21,11 @@
   </property>
   <layout class="QVBoxLayout">
    <item>
-    <widget class="Q3GroupBox" name="m_TrackingDeviceContainer">
+    <widget class="QGroupBox" name="groupBox">
      <property name="title">
       <string>Select Tracking Device</string>
      </property>
-     <layout class="QVBoxLayout">
+     <layout class="QVBoxLayout" name="verticalLayout">
       <item>
        <widget class="QComboBox" name="m_TrackingDevice">
         <item>
@@ -118,53 +118,25 @@
     </widget>
    </item>
    <item>
-    <widget class="Q3GroupBox" name="groupBox1">
+    <widget class="QTextEdit" name="m_TextOutput"/>
+   </item>
+   <item>
+    <widget class="QmitkPlotWidget" name="m_ErrorPlot" native="true">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
      <property name="sizePolicy">
-      <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
-     <property name="title">
-      <string>IGT Output</string>
+     <property name="minimumSize">
+      <size>
+       <width>80</width>
+       <height>60</height>
+      </size>
      </property>
-     <layout class="QVBoxLayout">
-      <item>
-       <widget class="Q3TextEdit" name="m_TextOutput">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="MinimumExpanding">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>100</height>
-         </size>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QmitkPlotWidget" name="m_ErrorPlot" native="true">
-        <property name="enabled">
-         <bool>false</bool>
-        </property>
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>80</width>
-          <height>60</height>
-         </size>
-        </property>
-       </widget>
-      </item>
-     </layout>
     </widget>
    </item>
    <item>
@@ -270,7 +242,14 @@
       </widget>
      </item>
      <item>
-      <widget class="Q3ProgressBar" name="m_ErrorBar"/>
+      <widget class="QProgressBar" name="m_ErrorBar">
+       <property name="value">
+        <number>0</number>
+       </property>
+       <property name="textVisible">
+        <bool>false</bool>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>
@@ -278,28 +257,6 @@
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
-  <customwidget>
-   <class>Q3GroupBox</class>
-   <extends>QGroupBox</extends>
-   <header>Qt3Support/Q3GroupBox</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>Q3Frame</class>
-   <extends>QFrame</extends>
-   <header>Qt3Support/Q3Frame</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>Q3TextEdit</class>
-   <extends>Q3Frame</extends>
-   <header>q3textedit.h</header>
-  </customwidget>
-  <customwidget>
-   <class>Q3ProgressBar</class>
-   <extends>QFrame</extends>
-   <header>Qt3Support/Q3ProgressBar</header>
-  </customwidget>
   <customwidget>
    <class>QmitkPlotWidget</class>
    <extends>QWidget</extends>

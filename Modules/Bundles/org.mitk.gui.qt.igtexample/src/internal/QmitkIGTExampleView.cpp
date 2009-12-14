@@ -46,17 +46,16 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <QProgressBar>
 
-#include <QAction>
-#include <QComboBox>
+//#include <QAction>
+//#include <QComboBox>
 #include <QPushButton>
 #include <QTextEdit>
 #include <QTimer>
 #include <QLabel>
 #include <QLineEdit>
-#include <QCheckBox>
+//#include <QCheckBox>
 
-#include <QColor>
-#include <QWindowsstyle>
+//#include <QColor>
 #include <QFileDialog>
 
 

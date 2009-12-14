@@ -88,7 +88,7 @@ namespace mitk {
     mitk::DataTreeNode::Pointer m_DataTreeNode;
     /** @brief This member variable holds a mathamatical description of the tool */
     itk::SpatialObject<3>::Pointer m_SpatialObject;
-    /** @brief This member variable holds a pointer to the corresponting tracking tool in the hardware. */
+    /** @brief This member variable holds a pointer to the corresponding tracking tool in the hardware. */
     mitk::TrackingTool::Pointer m_TrackingTool;
     /** @brief The path to the calibration file of the tool. */
     std::string m_CalibrationFile;

@@ -16,7 +16,7 @@ directly be applied to the Moving Image. Also binary images as image masks can b
 \image html RigidRegistration_small.png "MITK with the QmitkRigidRegistration module"
 
 This document will tell you how to use this module, but it is assumed that you already know how to navigate through the slices of an image using the
-multi-widget. See \ref QmitkRigidRegistrationUserManual for more information.
+multi-widget.
 
 \section QmitkRigidRegistrationUserManualIssues Known Issues
 

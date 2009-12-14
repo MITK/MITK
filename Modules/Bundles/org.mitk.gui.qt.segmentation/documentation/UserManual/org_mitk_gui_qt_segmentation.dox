@@ -47,7 +47,7 @@ Creating this distinction between foreground and background is called <i>segment
 The Segmentation perspective of MITKApp uses a voxel based approach to segmentation, i.e. each voxel of an image must be completely assigned to either foreground or background. 
 This is in contrast to some other applications which might use an approach based on contours, where the border of a structure might cut a voxel into two %parts.
 
-The remainder of this document (see \ref org_mitk_gui_qt_segmentationUserManual) will summarize the features of the Segmentation perspective and how they are used.
+The remainder of this document will summarize the features of the Segmentation perspective and how they are used.
 
 \section org_mitk_gui_qt_segmentationUserManualTechnical Technical issues
 

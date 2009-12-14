@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkKullbackLeiblerCompareHistogramImageToImageMetric.h>
 #include "mitkImageAccessByItk.h"
 
-#include "qvalidator.h"
+#include "QValidator"
 
 QmitkKullbackLeiblerCompareHistogramMetricView::QmitkKullbackLeiblerCompareHistogramMetricView(QWidget* parent, Qt::WindowFlags f ) : QmitkRigidRegistrationMetricsGUIBase (parent, f)
 {

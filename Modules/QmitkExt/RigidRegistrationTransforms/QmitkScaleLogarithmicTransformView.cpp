@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkScaleLogarithmicTransformView.h"
 #include "mitkImageAccessByItk.h"
 #include <itkScaleLogarithmicTransform.h>
-#include <qvalidator>
+#include <QValidator>
 
 QmitkScaleLogarithmicTransformView::QmitkScaleLogarithmicTransformView(QWidget* parent, Qt::WindowFlags f ) : QmitkRigidRegistrationTransformsGUIBase(parent, f)
 {

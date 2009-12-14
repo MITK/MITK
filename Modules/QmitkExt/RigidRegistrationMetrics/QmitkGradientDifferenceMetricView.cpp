@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkGradientDifferenceImageToImageMetric.h>
 #include "mitkImageAccessByItk.h"
 
-#include "qvalidator.h"
+#include "QValidator"
 
 QmitkGradientDifferenceMetricView::QmitkGradientDifferenceMetricView(QWidget* parent, Qt::WindowFlags f ) : QmitkRigidRegistrationMetricsGUIBase (parent, f)
 {

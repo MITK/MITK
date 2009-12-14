@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkImageAccessByItk.h"
 #include <itkVersorTransform.h>
 #include <itkCenteredTransformInitializer.h>
-#include <qvalidator>
+#include <QValidator>
 
 QmitkVersorTransformView::QmitkVersorTransformView(QWidget* parent, Qt::WindowFlags f ) : QmitkRigidRegistrationTransformsGUIBase(parent, f), 
 m_CenterX(0), m_CenterY(0), m_CenterZ(0)

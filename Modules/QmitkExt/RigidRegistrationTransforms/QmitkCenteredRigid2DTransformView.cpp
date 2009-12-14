@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkImageAccessByItk.h"
 #include <itkCenteredRigid2DTransform.h>
 #include <itkCenteredTransformInitializer.h>
-#include <qvalidator>
+#include <QValidator>
 
 QmitkCenteredRigid2DTransformView::QmitkCenteredRigid2DTransformView(QWidget* parent, Qt::WindowFlags f ) : QmitkRigidRegistrationTransformsGUIBase(parent, f), 
 m_CenterX(0), m_CenterY(0), m_CenterZ(0)

@@ -17,7 +17,7 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include "mitkImageTimeSelector.h"
-#include <qvalidator.h>
+#include <QValidator>
 #include <vtkTransform.h>
 #include <vtkMatrix4x4.h>
 #include "mitkMatrixConvert.h"

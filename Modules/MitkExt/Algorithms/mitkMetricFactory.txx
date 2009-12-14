@@ -37,8 +37,6 @@ namespace mitk {
   template < class TPixelType, unsigned int VImageDimension >
   MetricFactory<TPixelType, VImageDimension>::MetricFactory() : m_MetricParameters(NULL)
   {
-    m_movingMask = MovingImageMaskType::New();
-    m_fixedMask = FixedImageMaskType::New();
   }
 
   template < class TPixelType, unsigned int VImageDimension >
@@ -47,13 +45,7 @@ namespace mitk {
     ::GetMetric( )
   {
     int metric = m_MetricParameters->GetMetric();
-    if (metric == MetricParameters::MEANSQUARESIMAGETOIMAGEMETRIC)
-    {
-      typename itk::MeanSquaresImageToImageMetric<FixedImageType, MovingImageType>::Pointer MetricPointer = itk::MeanSquaresImageToImageMetric<FixedImageType, MovingImageType>::New();
-      MetricPointer->SetComputeGradient(m_MetricParameters->GetComputeGradient());
-      return MetricPointer.GetPointer();
-    }
-    else if (metric == MetricParameters::NORMALIZEDCORRELATIONIMAGETOIMAGEMETRIC)
+    if (metric == MetricParameters::NORMALIZEDCORRELATIONIMAGETOIMAGEMETRIC)
     {
       typename itk::NormalizedCorrelationImageToImageMetric<FixedImageType, MovingImageType>::Pointer MetricPointer = itk::NormalizedCorrelationImageToImageMetric<FixedImageType, MovingImageType>::New();
       MetricPointer->SetComputeGradient(m_MetricParameters->GetComputeGradient());
@@ -81,17 +73,6 @@ namespace mitk {
       typename itk::CorrelationCoefficientHistogramImageToImageMetric<FixedImageType, MovingImageType>::Pointer MetricPointer = itk::CorrelationCoefficientHistogramImageToImageMetric<FixedImageType, MovingImageType>::New();
       unsigned int nBins = m_MetricParameters->GetNumberOfHistogramBinsCorrelationCoefficientHistogram();
       typename itk::CorrelationCoefficientHistogramImageToImageMetric<FixedImageType, MovingImageType>::HistogramType::SizeType histogramSize;
-      histogramSize[0] = nBins;
-      histogramSize[1] = nBins;
-      MetricPointer->SetHistogramSize(histogramSize);
-      MetricPointer->SetComputeGradient(m_MetricParameters->GetComputeGradient());
-      return MetricPointer.GetPointer();
-    }
-    else if (metric == MetricParameters::MEANSQUARESHISTOGRAMIMAGETOIMAGEMETRIC)
-    {
-      typename itk::MeanSquaresHistogramImageToImageMetric<FixedImageType, MovingImageType>::Pointer MetricPointer = itk::MeanSquaresHistogramImageToImageMetric<FixedImageType, MovingImageType>::New();
-      unsigned int nBins = m_MetricParameters->GetNumberOfHistogramBinsMeanSquaresHistogram();
-      typename itk::MeanSquaresHistogramImageToImageMetric<FixedImageType, MovingImageType>::HistogramType::SizeType histogramSize;
       histogramSize[0] = nBins;
       histogramSize[1] = nBins;
       MetricPointer->SetHistogramSize(histogramSize);

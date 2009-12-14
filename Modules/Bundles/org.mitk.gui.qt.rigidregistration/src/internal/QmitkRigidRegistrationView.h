@@ -223,7 +223,9 @@ class RIGIDREGISTRATION_EXPORT QmitkRigidRegistrationView : public QObject, publ
 
     void CheckForMaskImages();
 
-    void UseMaskImagesChecked(bool checked);
+    void UseFixedMaskImageChecked(bool checked);
+
+    void UseMovingMaskImageChecked(bool checked);
 
     void TabChanged(int index);
 

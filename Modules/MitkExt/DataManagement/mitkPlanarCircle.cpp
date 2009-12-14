@@ -81,10 +81,7 @@ bool mitk::PlanarCircle::SetControlPoint( unsigned int index, const Point2D &poi
     m_ControlPoints->ElementAt( index ) = point;
     return true;
   }
-  else
-  {
-    return false;
-  }
+  return false;
 }
 
 void mitk::PlanarCircle::GeneratePolyLine()

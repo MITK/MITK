@@ -25,9 +25,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkRigidRegistrationTestPreset.h"
 #include "qobject.h"
 #include "../RigidregistrationDll.h"
-#include "src/internal/RigidRegistrationTransforms/QmitkRigidRegistrationTransformsGUIBase.h"
-#include "src/internal/RigidRegistrationMetrics/QmitkRigidRegistrationMetricsGUIBase.h"
-#include "src/internal/RigidRegistrationOptimizer/QmitkRigidRegistrationOptimizerGUIBase.h"
+#include "QmitkRigidRegistrationTransformsGUIBase.h"
+#include "QmitkRigidRegistrationMetricsGUIBase.h"
+#include "QmitkRigidRegistrationOptimizerGUIBase.h"
 
 
 /*!

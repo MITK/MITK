@@ -45,7 +45,13 @@ namespace mitk {
     ::GetMetric( )
   {
     int metric = m_MetricParameters->GetMetric();
-    if (metric == MetricParameters::NORMALIZEDCORRELATIONIMAGETOIMAGEMETRIC)
+    if (metric == MetricParameters::MEANSQUARESIMAGETOIMAGEMETRIC) 	   
+    { 	 
+      typename itk::MeanSquaresImageToImageMetric<FixedImageType, MovingImageType>::Pointer MetricPointer = itk::MeanSquaresImageToImageMetric<FixedImageType, MovingImageType>::New(); 	 
+      MetricPointer->SetComputeGradient(m_MetricParameters->GetComputeGradient()); 	 
+      return MetricPointer.GetPointer(); 	 
+    } 	 
+    else if (metric == MetricParameters::NORMALIZEDCORRELATIONIMAGETOIMAGEMETRIC)
     {
       typename itk::NormalizedCorrelationImageToImageMetric<FixedImageType, MovingImageType>::Pointer MetricPointer = itk::NormalizedCorrelationImageToImageMetric<FixedImageType, MovingImageType>::New();
       MetricPointer->SetComputeGradient(m_MetricParameters->GetComputeGradient());
@@ -75,6 +81,17 @@ namespace mitk {
       typename itk::CorrelationCoefficientHistogramImageToImageMetric<FixedImageType, MovingImageType>::HistogramType::SizeType histogramSize;
       histogramSize[0] = nBins;
       histogramSize[1] = nBins;
+      MetricPointer->SetHistogramSize(histogramSize);
+      MetricPointer->SetComputeGradient(m_MetricParameters->GetComputeGradient()); 	 
+      return MetricPointer.GetPointer(); 	 
+    } 	 
+    else if (metric == MetricParameters::MEANSQUARESHISTOGRAMIMAGETOIMAGEMETRIC) 	 
+    { 	 
+      typename itk::MeanSquaresHistogramImageToImageMetric<FixedImageType, MovingImageType>::Pointer MetricPointer = itk::MeanSquaresHistogramImageToImageMetric<FixedImageType, MovingImageType>::New(); 	 
+      unsigned int nBins = m_MetricParameters->GetNumberOfHistogramBinsMeanSquaresHistogram(); 	 
+      typename itk::MeanSquaresHistogramImageToImageMetric<FixedImageType, MovingImageType>::HistogramType::SizeType histogramSize; 	 
+      histogramSize[0] = nBins; 	 
+      histogramSize[1] = nBins; 	 
       MetricPointer->SetHistogramSize(histogramSize);
       MetricPointer->SetComputeGradient(m_MetricParameters->GetComputeGradient());
       return MetricPointer.GetPointer();

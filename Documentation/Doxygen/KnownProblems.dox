@@ -8,4 +8,6 @@
 \li During automated testing in dartclients (ctest) some graphical tests do not 
     close Qt messageboxes properly. Affects e.g. InteractiveSegmentation. We did
     not find a way to get this working. Seems to be a problem with ctest or Xvfb (was bug #1152)
+\li MITK CHILI plugin has limitations when working with DICOMDIR data sources (bug #1756)
+
 */

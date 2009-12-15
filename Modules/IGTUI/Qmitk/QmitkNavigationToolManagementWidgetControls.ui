@@ -41,6 +41,17 @@ p, li { white-space: pre-wrap; }
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout" >
          <item>
+          <widget class="QLabel" name="label_10" >
+           <property name="text" >
+            <string>&lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
+p, li { white-space: pre-wrap; }
+&lt;/style>&lt;/head>&lt;body style=" font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;">
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">&lt;span style=" font-size:8pt; font-weight:600;">Filename:&lt;/span>&lt;/p>&lt;/body>&lt;/html></string>
+           </property>
+          </widget>
+         </item>
+         <item>
           <widget class="QLabel" name="m_StorageName" >
            <property name="text" >
             <string>&lt;NO NAME></string>
@@ -64,6 +75,17 @@ p, li { white-space: pre-wrap; }
        </item>
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_4" >
+         <item>
+          <widget class="QLabel" name="label_11" >
+           <property name="text" >
+            <string>&lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
+p, li { white-space: pre-wrap; }
+&lt;/style>&lt;/head>&lt;body style=" font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;">
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">&lt;span style=" font-size:8pt; font-weight:600;">Tools:&lt;/span>&lt;/p>&lt;/body>&lt;/html></string>
+           </property>
+          </widget>
+         </item>
          <item>
           <spacer name="horizontalSpacer_4" >
            <property name="orientation" >
@@ -92,42 +114,16 @@ p, li { white-space: pre-wrap; }
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="m_ShowDetails" >
+          <widget class="QPushButton" name="m_EditTool" >
            <property name="text" >
-            <string>Show Details</string>
+            <string>Edit</string>
            </property>
           </widget>
          </item>
         </layout>
        </item>
        <item>
-        <widget class="QTableWidget" name="m_ToolTable" >
-         <column>
-          <property name="text" >
-           <string>Name</string>
-          </property>
-         </column>
-         <column>
-          <property name="text" >
-           <string>Identifier</string>
-          </property>
-         </column>
-         <column>
-          <property name="text" >
-           <string>Serial Number</string>
-          </property>
-         </column>
-         <column>
-          <property name="text" >
-           <string>Type</string>
-          </property>
-         </column>
-         <column>
-          <property name="text" >
-           <string>Tracking Device</string>
-          </property>
-         </column>
-        </widget>
+        <widget class="QListWidget" name="m_ToolList" />
        </item>
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_2" >
@@ -299,8 +295,14 @@ p, li { white-space: pre-wrap; }
           <widget class="QComboBox" name="m_TrackingDeviceTypeChooser" >
            <property name="minimumSize" >
             <size>
-             <width>100</width>
+             <width>150</width>
              <height>0</height>
+            </size>
+           </property>
+           <property name="maximumSize" >
+            <size>
+             <width>150</width>
+             <height>16777215</height>
             </size>
            </property>
            <item>
@@ -354,8 +356,14 @@ p, li { white-space: pre-wrap; }
           <widget class="QComboBox" name="m_ToolTypeChooser" >
            <property name="minimumSize" >
             <size>
-             <width>100</width>
+             <width>150</width>
              <height>0</height>
+            </size>
+           </property>
+           <property name="maximumSize" >
+            <size>
+             <width>150</width>
+             <height>16777215</height>
             </size>
            </property>
            <item>
@@ -415,6 +423,12 @@ p, li { white-space: pre-wrap; }
          </item>
          <item>
           <widget class="QPushButton" name="m_LoadCalibrationFile" >
+           <property name="maximumSize" >
+            <size>
+             <width>40</width>
+             <height>16777215</height>
+            </size>
+           </property>
            <property name="text" >
             <string>Load</string>
            </property>
@@ -441,8 +455,14 @@ p, li { white-space: pre-wrap; }
           <widget class="QmitkDataStorageComboBox" name="m_SurfaceChooser" >
            <property name="minimumSize" >
             <size>
-             <width>100</width>
+             <width>150</width>
              <height>0</height>
+            </size>
+           </property>
+           <property name="maximumSize" >
+            <size>
+             <width>150</width>
+             <height>16777215</height>
             </size>
            </property>
           </widget>
@@ -462,6 +482,12 @@ p, li { white-space: pre-wrap; }
          </item>
          <item>
           <widget class="QPushButton" name="m_LoadSurface" >
+           <property name="maximumSize" >
+            <size>
+             <width>40</width>
+             <height>16777215</height>
+            </size>
+           </property>
            <property name="text" >
             <string>Load</string>
            </property>

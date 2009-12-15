@@ -1,5 +1,25 @@
 /**
-\mainpage The Segmentation Module
+\bundlemainpage{org.segment} The Segmentation Module
+
+<i>Some of the below described features are not available in the open-source part of the MITK-3M3-Application.</i>
+
+Available sections:
+
+ - \ref org_mitk_gui_qt_segmentationUserManualOverview
+ - \ref org_mitk_gui_qt_segmentationUserManualTechnical
+ - \ref org_mitk_gui_qt_segmentationUserManualImageSelection
+ - \ref org_mitk_gui_qt_segmentationUserManualManualKringeling
+   - \ref org_mitk_gui_qt_segmentationUserManualManualKringeling1
+   - \ref org_mitk_gui_qt_segmentationUserManualManualKringeling2
+   - \ref org_mitk_gui_qt_segmentationUserManualManualKringeling3
+   - \ref org_mitk_gui_qt_segmentationUserManualManualKringeling4
+ - \ref org_mitk_gui_qt_segmentationUserManualManualKringeling5
+ - \ref org_mitk_gui_qt_segmentationUserManualOrganSegmentation
+   - \ref org_mitk_gui_qt_segmentationUserManualOrganSegmentation1
+   - \ref org_mitk_gui_qt_segmentationUserManualOrganSegmentation2
+   - \ref org_mitk_gui_qt_segmentationUserManualOrganSegmentation99
+ - \ref org_mitk_gui_qt_segmentationUserManualLesionSegmentation
+ - \ref org_mitk_gui_qt_segmentationUserManualPostprocessing
 
 \section org_mitk_gui_qt_segmentationUserManualOverview Overview
 
@@ -27,31 +47,7 @@ Creating this distinction between foreground and background is called <i>segment
 The Segmentation perspective of MITKApp uses a voxel based approach to segmentation, i.e. each voxel of an image must be completely assigned to either foreground or background. 
 This is in contrast to some other applications which might use an approach based on contours, where the border of a structure might cut a voxel into two %parts.
 
-The remainder of this document (see \ref org_mitk_gui_qt_segmentationUserManual) will summarize the features of the Segmentation perspective and how they are used.
-
-
-\page org_mitk_gui_qt_segmentationUserManual Details
-
-<i>Some of the below described features are not available in the open-source part of the MITK-3M3-Application.</i>
-
-Available sections:
-
- - \ref org_mitk_gui_qt_segmentationUserManualOverview
- - \ref org_mitk_gui_qt_segmentationUserManualTechnical
- - \ref org_mitk_gui_qt_segmentationUserManualImageSelection
- - \ref org_mitk_gui_qt_segmentationUserManualManualKringeling
-   - \ref org_mitk_gui_qt_segmentationUserManualManualKringeling1
-   - \ref org_mitk_gui_qt_segmentationUserManualManualKringeling2
-   - \ref org_mitk_gui_qt_segmentationUserManualManualKringeling3
-   - \ref org_mitk_gui_qt_segmentationUserManualManualKringeling4
- - \ref org_mitk_gui_qt_segmentationUserManualManualKringeling5
- - \ref org_mitk_gui_qt_segmentationUserManualOrganSegmentation
-   - \ref org_mitk_gui_qt_segmentationUserManualOrganSegmentation1
-   - \ref org_mitk_gui_qt_segmentationUserManualOrganSegmentation2
-   - \ref org_mitk_gui_qt_segmentationUserManualOrganSegmentation99
- - \ref org_mitk_gui_qt_segmentationUserManualLesionSegmentation
- - \ref org_mitk_gui_qt_segmentationUserManualPostprocessing
-
+The remainder of this document will summarize the features of the Segmentation perspective and how they are used.
 
 \section org_mitk_gui_qt_segmentationUserManualTechnical Technical issues
 

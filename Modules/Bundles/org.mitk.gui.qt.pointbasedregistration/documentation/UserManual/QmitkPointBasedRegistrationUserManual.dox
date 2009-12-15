@@ -1,5 +1,11 @@
 /**
-\mainpage The Point Based Registration Module
+\bundlemainpage{org.pointbased.reg} The Point Based Registration Module
+
+Available sections:
+  - \ref PointBasedRegistrationUserManualOverview 
+  - \ref PointBasedRegistrationUserManualDetails 
+
+\section PointBasedRegistrationUserManualOverview Overview
 
 This module allows you to register two datasets in a rigid and deformable manner via corresponding 
 PointSets. Register means to align two datasets, so that they become as similar as possible. 
@@ -9,12 +15,7 @@ performed on the points to align them, will be performed on the moving data as w
 \image html PointBasedRegistration_small.png "MITK with the PointBasedRegistration module"
 
 This document will tell you how to use this module, but it is assumed that you already know how to navigate through 
-the slices of a dataset using the multi-widget. See \ref PointBasedRegistrationUserManual for more information.
-
-Available sections:
-  - \ref PointBasedRegistrationUserManualDetails 
-
-\page PointBasedRegistrationUserManual User Manual
+the slices of a dataset using the multi-widget.
 
 \section PointBasedRegistrationUserManualDetails Details
 

@@ -1,5 +1,5 @@
 /**
-\mainpage The Basic Image Processing Module
+\bundlemainpage{org.basicimageprocessing} The Basic Image Processing Module
 
 \image html ImageProcessing_48.png "Icon of the Module"
 

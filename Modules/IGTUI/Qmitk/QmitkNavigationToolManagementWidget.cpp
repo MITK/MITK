@@ -190,7 +190,9 @@ void QmitkNavigationToolManagementWidget::OnLoadStorage()
 void QmitkNavigationToolManagementWidget::OnSaveStorage()
   {
     mitk::NavigationToolStorageSerializer::Pointer mySerializer = mitk::NavigationToolStorageSerializer::New();
-    if (!mySerializer->Serialize(QFileDialog::getSaveFileName(NULL,tr("Save Navigation Tool"), "/", "*.*").toAscii().data(),m_NavigationToolStorage)) MessageBox("Error: " + mySerializer->GetErrorMessage());
+    std::string filename = QFileDialog::getSaveFileName(NULL,tr("Save Navigation Tool"), "/", "*.*").toAscii().data();
+    if (!mySerializer->Serialize(filename,m_NavigationToolStorage)) MessageBox("Error: " + mySerializer->GetErrorMessage());
+    else m_Controls->m_StorageName->setText(QString(filename.c_str()));
   }
 
 

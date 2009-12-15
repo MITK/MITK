@@ -44,18 +44,19 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <itksys/SystemTools.hxx>
 
-#include <qaction.h>
-#include <qcombobox.h>
-#include <qpushbutton.h>
-#include <qtextedit.h>
-#include <qtimer.h>
-#include <qlabel.h>
-#include <qlineedit.h>
-#include <qcheckbox.h>
-#include <qprogressbar.h>
-#include <qcolor.h>
-#include <qwindowsstyle.h>
-#include <qfiledialog.h>
+#include <QProgressBar>
+
+//#include <QAction>
+//#include <QComboBox>
+#include <QPushButton>
+#include <QTextEdit>
+#include <QTimer>
+#include <QLabel>
+#include <QLineEdit>
+//#include <QCheckBox>
+
+//#include <QColor>
+#include <QFileDialog>
 
 
 QmitkIGTExampleView::QmitkIGTExampleView(QObject * /*parent*/, const char * /*name*/)
@@ -89,7 +90,7 @@ void QmitkIGTExampleView::CreateQtPartControl(QWidget *parent)
     m_Controls = new Ui::QmitkIGTExampleControls;
     m_Controls->setupUi(parent);
 
-    m_Controls->m_TextOutput->setTextFormat(Qt::PlainText);
+    //m_Controls->m_TextOutput->setTextFormat(Qt::PlainText);
     out = m_Controls->m_TextOutput;
     
     CreateConnections();
@@ -705,10 +706,10 @@ void QmitkIGTExampleView::OnShowErrorPlot()
   m_Controls->m_ErrorPlot->setEnabled(true);
   m_Controls->m_ErrorPlot->show();
 
-  m_Controls->m_ErrorBar->setTotalSteps(100); // needs to be set to meaningful values depending on tracking device and application requirements
-  m_Controls->m_ErrorBar->setPercentageVisible(false);
-  m_Controls->m_ErrorBar->setCenterIndicator(true);
-  m_Controls->m_ErrorBar->setStyle(new QWindowsStyle()); // to be able to use custom colors
+  m_Controls->m_ErrorBar->setMinimum(0); // needs to be set to meaningful values depending on tracking device and application requirements
+  m_Controls->m_ErrorBar->setMaximum(100);
+  m_Controls->m_ErrorBar->setTextVisible (false);
+  //m_Controls->m_ErrorBar->setStyle(new QWindowsStyle()); // to be able to use custom colors
   m_Controls->m_ErrorBar->reset();
   
   /*set up IGT pipeline -> GUI connection */
@@ -740,9 +741,11 @@ void QmitkIGTExampleView::OnErrorValueChanged(mitk::NavigationData::CovarianceMa
   const mitk::ScalarType errorThreshold = 0.8; // needs to be set to meaningful value depending on application requirements
   
   mitk::ScalarType progressClampError = (errorValue < 1.0) ? errorValue* 100 : 100;// use primitive mapping of error values to the progress bar range of 0..100. needs to be adjusted to meaningful values
-  m_Controls->m_ErrorBar->setProgress(progressClampError); 
+  m_Controls->m_ErrorBar->setValue(progressClampError); 
 
 }
+
+
 void QmitkIGTExampleView::OnTrackingDeviceTextChanged( const QString & )
 {
   if (m_Controls->m_TrackingDevice->currentText() == "NDI Polaris")

@@ -29,8 +29,9 @@ mitk::NodePredicateNOT::~NodePredicateNOT()
 
 bool mitk::NodePredicateNOT::CheckNode(const mitk::DataTreeNode* node) const
 {
-  if (!node)
-    throw 1;  // Insert Exception Handling here
+  if (node == NULL)
+    throw std::invalid_argument("NodePredicateNOT: invalid node");
+
 
   // return the negation of the child predicate
   return !m_ChildPredicates.front()->CheckNode(node);

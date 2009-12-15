@@ -49,10 +49,10 @@ mitk::NodePredicateAND::~NodePredicateAND()
 bool mitk::NodePredicateAND::CheckNode(const mitk::DataTreeNode* node) const
 {
   if (m_ChildPredicates.empty())
-    throw 1;  // Insert Exception Handling here
+    throw std::invalid_argument("NodePredicateAND: no child predicates available");
 
   if (node == NULL)
-    throw 1;  // Insert Exception Handling here
+    throw std::invalid_argument("NodePredicateAND: invalid node");
 
   // return the conjunction of the child predicate. If any predicate returns false, we return false too
   for (ChildPredicates::const_iterator it = m_ChildPredicates.begin();  ( it != m_ChildPredicates.end() ); ++it)

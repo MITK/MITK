@@ -40,10 +40,10 @@ mitk::NodePredicateOR::~NodePredicateOR()
 bool mitk::NodePredicateOR::CheckNode(const DataTreeNode* node) const
 {
   if (m_ChildPredicates.empty())
-    throw 1;  // Insert Exception Handling here
+    throw std::invalid_argument("NodePredicateOR: no child predicates available");
 
   if (node == NULL)
-    throw 1;  // Insert Exception Handling here
+    throw std::invalid_argument("NodePredicateOR: invalid node");
 
   /* return the disjunction of the child predicate. If any predicate returns true, we return true too. Return false only if all child predicates return false */
   for (ChildPredicates::const_iterator it = m_ChildPredicates.begin(); it != m_ChildPredicates.end(); ++it)

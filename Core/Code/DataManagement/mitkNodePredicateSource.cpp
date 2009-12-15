@@ -29,20 +29,5 @@ mitk::NodePredicateSource::~NodePredicateSource()
 
 bool mitk::NodePredicateSource::CheckNode(const mitk::DataTreeNode* node) const
 {
-  if (!node)
-    throw 1;  // Insert Exception Handling here
-
-  if(m_DataStorage.IsNull())
-    throw 1;
-
-  // check, if any of the source objects of m_BaseNode are equal to node.
-  if (m_SearchAllSources)
-    ;   // also search recursivly in sources of sources
-  else
-  {
-    //mitk::DataStorage::SetOfObjects parents = m_DataStorage->GetSubset();
-  }
-    ;   // only search in direct sources
-
-  return true;
+  throw std::logic_error("NodePredicateSourceis not implemented");
 }

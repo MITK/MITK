@@ -248,7 +248,7 @@ protected:
 
   QmitkPlotWidget::DataVector m_XValues; ///< X-Values of the error plot (timestamp of navigation data)
   QmitkPlotWidget::DataVector m_YValues; ///< Y-Values of the error plot (error value of navigation data
-  Q3TextEdit* out;   ///< pointer to output widget 
+  QTextEdit* out;   ///< pointer to output widget 
 
   QTimer* m_Timer; ///< timer for continuous tracking update
   QTimer* m_RecordingTimer; ///< timer for continuous recording

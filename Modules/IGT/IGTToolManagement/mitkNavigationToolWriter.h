@@ -26,6 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkCommon.h>
 #include "mitkNavigationTool.h"
 #include <MitkIGTExports.h>
+#include <mitkSceneIO.h>
 
 namespace mitk 
 {

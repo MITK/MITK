@@ -139,6 +139,8 @@ void QmitkNavigationToolManagementWidget::OnEditTool()
               m_Controls->m_TrackingDeviceTypeChooser->setCurrentIndex(1);break;
       case mitk::ClaronMicron:
               m_Controls->m_TrackingDeviceTypeChooser->setCurrentIndex(2);break;
+      default:
+              m_Controls->m_TrackingDeviceTypeChooser->setCurrentIndex(0);
       }
     m_Controls->m_CalibrationFileName->setText(QString(selectedTool->GetCalibrationFile().c_str()));
     switch(selectedTool->GetType())
@@ -187,7 +189,8 @@ void QmitkNavigationToolManagementWidget::OnLoadStorage()
 
 void QmitkNavigationToolManagementWidget::OnSaveStorage()
   {
-
+    mitk::NavigationToolStorageSerializer::Pointer mySerializer = mitk::NavigationToolStorageSerializer::New();
+    if (!mySerializer->Serialize(QFileDialog::getSaveFileName(NULL,tr("Save Navigation Tool"), "/", "*.*").toAscii().data(),m_NavigationToolStorage)) MessageBox("Error: " + mySerializer->GetErrorMessage());
   }
 
 

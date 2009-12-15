@@ -153,7 +153,7 @@ SET(CPP_FILES
  QmitkBaseFunctionalityComponent.cpp
  QmitkFunctionalityComponentContainer.cpp
  QmitkFunctionalityComponents/QmitkThresholdComponent.cpp
- QmitkToolWorkingDataSelectionBox.cpp
+ #QmitkToolWorkingDataSelectionBox.cpp
  )
 ENDIF()
 
@@ -231,7 +231,7 @@ SET(MOC_H_FILES
  QmitkBaseFunctionalityComponent.h
  QmitkFunctionalityComponentContainer.h
  QmitkFunctionalityComponents/QmitkThresholdComponent.h
- QmitkToolWorkingDataSelectionBox.h
+ #QmitkToolWorkingDataSelectionBox.h
 )
 ENDIF()
 

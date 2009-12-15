@@ -454,8 +454,12 @@ void QmitkFunctionalityComponentContainer::CreateNavigationButtons()
 {
   //QBoxLayout * buttonLayout = new QHBoxLayout(GetImageContent()->layout());
   QWidget* funcWidget = (QWidget*)m_FunctionalityComponentContainerGUI;
-  QLayout *layoutTemp = funcWidget->layout();
-  QBoxLayout * buttonLayout = new QHBoxLayout((QWidget *) (new QHBoxLayout(layoutTemp)));
+  QLayout *functionalityLayout = funcWidget->layout();
+  QBoxLayout * buttonLayout = new QHBoxLayout(funcWidget);
+  if ( QBoxLayout* boxLayout = dynamic_cast<QBoxLayout*>(functionalityLayout) )
+  {
+    boxLayout->addLayout( buttonLayout );
+  }
   //if(m_BackButton==NULL)
   //{
   //  m_BackButton = new QPushButton("<<", GetImageContent());
@@ -484,7 +488,7 @@ void QmitkFunctionalityComponentContainer::CreateNavigationButtons()
 //  connect( (QObject*)(m_NextButton),  SIGNAL(pressed()), (QObject*) this, SLOT(NextButtonPressed())); 
 //  connect( (QObject*)(m_BackButton),  SIGNAL(pressed()), (QObject*) this, SLOT(BackButtonPressed())); 
 
-  m_FunctionalityComponentContainerGUI->m_WidgetStack->setCurrentPage(1);
+  m_FunctionalityComponentContainerGUI->m_WidgetStack->setCurrentIndex(1);
   SetWizardText("");
   GetImageContent()->updateGeometry();
   if(m_Spacer != NULL)

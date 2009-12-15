@@ -36,6 +36,7 @@ namespace mitk {
   */  
   class MitkIGT_EXPORT NavigationToolStorageSerializer : public itk::Object
   {
+
   public:
     mitkClassMacro(NavigationToolStorageSerializer,itk::Object);
     itkNewMacro(Self);

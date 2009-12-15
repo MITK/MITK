@@ -25,8 +25,9 @@ PURPOSE.  See the above copyright notices for more information.
 //mitk headers
 #include <mitkCommon.h>
 #include "mitkNavigationTool.h"
+#include "mitkNavigationToolStorageSerializer.h"
 #include <MitkIGTExports.h>
-#include <mitkSceneIO.h>
+
 
 namespace mitk 
 {
@@ -39,6 +40,8 @@ namespace mitk
   */  
   class MitkIGT_EXPORT NavigationToolWriter : public itk::Object
   {
+  friend class mitk::NavigationToolStorageSerializer;
+
   public:
     mitkClassMacro(NavigationToolWriter,itk::Object);
     itkNewMacro(Self);
@@ -58,6 +61,8 @@ namespace mitk
     NavigationToolWriter();
     ~NavigationToolWriter();
     std::string m_ErrorMessage;
+    mitk::DataTreeNode::Pointer ConvertToDataTreeNode(mitk::NavigationTool::Pointer Tool);
+    std::string ReadFile(std::string filename);
   };
 } // namespace mitk
 #endif //NAVIGATIONTOOLWRITER

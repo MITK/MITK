@@ -10,7 +10,7 @@
 #include <mitkTransferFunctionPropertyDeserializer.h>
 
 
-static char* presetNames[] = {  "choose an internal transferfunction preset",
+static const char* presetNames[] = {  "choose an internal transferfunction preset",
                               "CT Generic",
                               "CT Black & White",
                               "CT Thorax large",
@@ -44,7 +44,7 @@ QmitkTransferFunctionGeneratorWidget::QmitkTransferFunctionGeneratorWidget(QWidg
   // Presets Tab
   {
     for(int r=0; r< numPresetNames; r++)
-        m_TransferFunctionComboBox->insertItem( presetNames[r]);
+        m_TransferFunctionComboBox->addItem( QString::fromLocal8Bit(presetNames[r]));
     
     
     connect( m_TransferFunctionComboBox, SIGNAL( activated( int ) ), this, SLOT( OnMitkInternalPreset( int ) ) );
@@ -73,7 +73,7 @@ void QmitkTransferFunctionGeneratorWidget::OnSavePreset( )
   presetFileName = QFileDialog::getSaveFileName( this,"Choose a filename to save the transferfunction",presetFileName, "Transferfunction (*.xml)" );
   
 
-  fileName=presetFileName.ascii();
+  fileName=presetFileName.toLocal8Bit().constData();
  
   LOG_INFO << "Saving Transferfunction under path: " << fileName;
   
@@ -144,7 +144,7 @@ void QmitkTransferFunctionGeneratorWidget::OnLoadPreset( )
 
   presetFileName = QFileDialog::getOpenFileName( this,"Choose a file to open the transferfunction from",presetFileName, "Transferfunction (*.xml)"  );
 
-  fileName=presetFileName.ascii();
+  fileName=presetFileName.toLocal8Bit().constData();
 
   LOG_INFO << "Loading Transferfunction from path: " << fileName;
   

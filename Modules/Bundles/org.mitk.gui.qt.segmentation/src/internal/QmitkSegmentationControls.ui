@@ -608,7 +608,6 @@
   <include location="global">QmitkToolReferenceDataSelectionBox.h</include>
   <include location="global">QmitkToolGUIArea.h</include>
   <include location="global">QmitkToolSelectionBox.h</include>
-  <include location="global">QmitkToolWorkingDataSelectionBox.h</include>
   <include location="global">QmitkSlicesInterpolator.h</include>
  </includes>
  <resources>

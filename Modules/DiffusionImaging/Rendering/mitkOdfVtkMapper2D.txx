@@ -60,7 +60,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "itkFixedArray.h"
 
-#include <GL/gl.h>
+#include <mitkGL.h>
 #include "vtkOpenGLRenderer.h"
 
 template<class T, int N>

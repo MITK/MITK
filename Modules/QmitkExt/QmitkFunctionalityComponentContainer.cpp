@@ -37,6 +37,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vector>
 #include <qwidget.h>
 
+#include <QBoxLayout>
+
 
 const QSizePolicy preferred(QSizePolicy::Preferred, QSizePolicy::Preferred);
 
@@ -403,18 +405,19 @@ void QmitkFunctionalityComponentContainer::AddComponent(QmitkFunctionalityCompon
     if(m_MaximumWidgedStackSize < stackPage)
     {
       QWidget* w = new QWidget(m_FunctionalityComponentContainerGUI->m_WidgetStack);
-      m_FunctionalityComponentContainerGUI->m_WidgetStack->insertTab(w, label, stackPage);
+      m_FunctionalityComponentContainerGUI->m_WidgetStack->insertTab(stackPage, w, label);
       m_MaximumWidgedStackSize++;
-      m_FunctionalityComponentContainerGUI->m_WidgetStack->setCurrentPage(stackPage);
+      m_FunctionalityComponentContainerGUI->m_WidgetStack->setCurrentIndex(stackPage);
       visibleWidget = m_FunctionalityComponentContainerGUI->m_WidgetStack->currentWidget();
       idVisibleWidget = m_FunctionalityComponentContainerGUI->m_WidgetStack->indexOf(visibleWidget);
-      new QVBoxLayout(visibleWidget, QBoxLayout::TopToBottom);
+      new QVBoxLayout(visibleWidget);
+	  // QT3: new QVBoxLayout(visibleWidget, QBoxLayout::TopToBottom);
     }
 
     QLayout* layout;
     if(m_FunctionalityComponentContainerGUI->m_WidgetStack->layout() == 0)
     {
-      layout = new QVBoxLayout((QWidget*)(m_FunctionalityComponentContainerGUI->m_WidgetStack), QBoxLayout::TopToBottom);
+		layout = new QVBoxLayout( (QWidget*)(m_FunctionalityComponentContainerGUI->m_WidgetStack));
     }
     else 
     {
@@ -451,7 +454,8 @@ void QmitkFunctionalityComponentContainer::CreateNavigationButtons()
 {
   //QBoxLayout * buttonLayout = new QHBoxLayout(GetImageContent()->layout());
   QWidget* funcWidget = (QWidget*)m_FunctionalityComponentContainerGUI;
-  QBoxLayout * buttonLayout = new QHBoxLayout(funcWidget->layout());
+  QLayout *layoutTemp = funcWidget->layout();
+  QBoxLayout * buttonLayout = new QHBoxLayout((QWidget *) (new QHBoxLayout(layoutTemp)));
   //if(m_BackButton==NULL)
   //{
   //  m_BackButton = new QPushButton("<<", GetImageContent());

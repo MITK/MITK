@@ -294,9 +294,7 @@ void QmitkToolSelectionBox::SetGUIEnabledAccordingToToolManagerState()
   mitk::DataTreeNode* referenceNode = m_ToolManager->GetReferenceData(0);
   mitk::DataTreeNode* workingNode = m_ToolManager->GetWorkingData(0);
 
-  LOG_DEBUG << this->name() << ": SetGUIEnabledAccordingToToolManagerState: referenceNode " << (void*)referenceNode 
-                                                                                           << " workingNode " << (void*)workingNode 
-                                                                                           << " isVisible() " << isVisible();
+  //LOG_DEBUG << this->name() << ": SetGUIEnabledAccordingToToolManagerState: referenceNode " << (void*)referenceNode << " workingNode " << (void*)workingNode << " isVisible() " << isVisible();
 
   bool enabled = true;
   

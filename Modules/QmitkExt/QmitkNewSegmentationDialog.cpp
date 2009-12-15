@@ -21,7 +21,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <itkRGBPixel.h>
 
-#include <Q3ListBox>
 #include <qlineedit.h>
 #include <qpushbutton.h>
 #include <qlayout.h>
@@ -50,14 +49,14 @@ QmitkNewSegmentationDialog::QmitkNewSegmentationDialog(QWidget* parent)
   verticalLayout->addWidget( lblPrompt );
 
   // to choose a color
-  btnColor = new QPushButton( tr(""), this, "btnColor" );  //wieder raus
+  btnColor = new QPushButton( "", this );
   btnColor->setFixedWidth(25);
   btnColor->setAutoFillBackground(true);
   btnColor->setStyleSheet("background-color:rgb(255,0,0)");
 
   connect( btnColor, SIGNAL(clicked()), this, SLOT(onColorBtnClicked()) );
 
-  edtName = new QLineEdit( "", this, "edtName" );
+  edtName = new QLineEdit( "", this );
   QStringList completionList;
   completionList << "";
   completer = new QCompleter(completionList);
@@ -66,21 +65,23 @@ QmitkNewSegmentationDialog::QmitkNewSegmentationDialog(QWidget* parent)
 
   connect( completer, SIGNAL(activated(const QString&)), this, SLOT(onColorChange(const QString&)) );
 
-  QBoxLayout * horizontalLayout2 = new QHBoxLayout(verticalLayout);
+  QBoxLayout * horizontalLayout2 = new QHBoxLayout(this);
+  verticalLayout->addLayout(horizontalLayout2);
   horizontalLayout2->addWidget( btnColor );
   horizontalLayout2->addWidget( edtName );
 
 
 
   // buttons for closing the dialog
-  btnOk = new QPushButton( tr("Ok"), this, "btnOk" );
+  btnOk = new QPushButton( tr("Ok"), this );
   btnOk->setDefault(true);
   connect( btnOk, SIGNAL(clicked()), this, SLOT(accept()) );
 
-  QPushButton* btnCancel = new QPushButton( tr("Cancel"), this, "btnCancel" );
+  QPushButton* btnCancel = new QPushButton( tr("Cancel"), this );
   connect( btnCancel, SIGNAL(clicked()), this, SLOT(reject()) );
 
-  QBoxLayout * horizontalLayout = new QHBoxLayout( verticalLayout );
+  QBoxLayout * horizontalLayout = new QHBoxLayout(this);
+  verticalLayout->addLayout( horizontalLayout );
   horizontalLayout->setSpacing(5);
   horizontalLayout->addStretch();
   horizontalLayout->addWidget( btnOk );
@@ -95,53 +96,12 @@ QmitkNewSegmentationDialog::~QmitkNewSegmentationDialog()
 
 const char* QmitkNewSegmentationDialog::GetSegmentationName()
 {
-  return edtName->text().ascii();
-}
-
-void QmitkNewSegmentationDialog::onOrganSelected(const QString& organ)
-{
-  selectedOrgan = organ;
-  edtName->setText( organ );
-}
-
-void QmitkNewSegmentationDialog::onOrganImmediatelySelected(const QString& organ)
-{
-  selectedOrgan = organ;
-  edtName->setText( organ );
-
-  if ( (signed)(lstOrgans->currentItem()) != (signed)(lstOrgans->count()-1) )
-  {
-    accept(); // close
-  }
-  else
-  {
-    // dont close
-  }
-}
-
-
-void QmitkNewSegmentationDialog::onOrganSelected(int index)
-{
-  if ( index == (signed)(lstOrgans->count()-1) )
-  {
-    // "Other organ..." selected, we shouldn't close the dialog now
-    newOrganEntry = true;
-
-    edtNewOrgan->show();
-    btnOk->setEnabled( false );
-  }
-  else
-  {
-    newOrganEntry = false;
-    
-    edtNewOrgan->hide();
-    btnOk->setEnabled( true );
-  }
+  return edtName->text().toLocal8Bit().constData();
 }
 
 const char* QmitkNewSegmentationDialog::GetOrganType()
 {
-  return selectedOrgan.ascii();
+  return selectedOrgan.toLocal8Bit().constData();
 }
 
 

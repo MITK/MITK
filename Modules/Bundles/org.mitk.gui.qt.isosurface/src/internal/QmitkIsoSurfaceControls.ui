@@ -42,7 +42,7 @@
     </spacer>
    </item>
    <item>
-    <widget class="Q3GroupBox" name="groupBox3" >
+    <widget class="QGroupBox" name="groupBox3" >
      <property name="title" >
       <string>IsoSurface</string>
      </property>
@@ -54,7 +54,7 @@
        <number>3</number>
       </property>
       <item>
-       <widget class="Q3GroupBox" name="treeNodeSelectorGroupBox" >
+       <widget class="QGroupBox" name="treeNodeSelectorGroupBox" >
         <property name="sizePolicy" >
          <sizepolicy vsizetype="Preferred" hsizetype="Preferred" >
           <horstretch>0</horstretch>
@@ -72,7 +72,7 @@
        </widget>
       </item>
       <item>
-       <widget class="Q3GroupBox" name="createSurfaceGroupBox" >
+       <widget class="QGroupBox" name="createSurfaceGroupBox" >
         <property name="sizePolicy" >
          <sizepolicy vsizetype="Preferred" hsizetype="Preferred" >
           <horstretch>0</horstretch>
@@ -155,12 +155,6 @@
  </widget>
  <layoutdefault spacing="6" margin="11" />
  <customwidgets>
-  <customwidget>
-   <class>Q3GroupBox</class>
-   <extends>QGroupBox</extends>
-   <header>Qt3Support/Q3GroupBox</header>
-   <container>1</container>
-  </customwidget>
   <customwidget>
    <class>QmitkDataStorageComboBox</class>
    <extends>QComboBox</extends>

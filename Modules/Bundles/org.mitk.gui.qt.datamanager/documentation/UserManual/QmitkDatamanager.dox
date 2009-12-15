@@ -87,7 +87,7 @@ There are different types of representations how to show the Data-Element inside
 </ul>
 
 \image html Image_properties.bmp "Screenshot2: Properties for images"
-\image html Surface_properties.bmp "Screenshot3: Properties for surfaces"
+\image html Surface_Properties.bmp "Screenshot3: Properties for surfaces"
 
 
 \subsection QmitkDataManagerPropertiesPreferences Preferences

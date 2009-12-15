@@ -28,14 +28,14 @@ The workflow to use this module is:
 
 The workflow is repeatedly useable with the same or different measurement figures, which are correlated to the choosen image and can be saved together with it for future use. On pressing the Measurement icon (see picture below the page title) in the view button line the basic appearance of the bundle is as follws.
 
-\image html Basic_Screen_edited.jpg
+\image html Basic_Screen_edited.JPG
 
 The standard working plane is "Transversal" but the other standard viewplanes ("Saggital" and "Coronal") are also valid for measurements. To swap between the view planes refer to 3M Application Bundle User Manual.
 
 \section QmitkMeasurementUserManualFeatures Features
 
 The bundle as it is depicted below offers the following features in the order of apperance on the image from top to bottom: 
-\image html Measurement_View.jpg
+\image html Measurement_View.JPG
 The first information is the selected image's name (here: DICOM-MRI-Image) followed by the measurement figures button line with the seven measurement figures. From left to right the buttons are connected with the following functions:
 
 \subsection SubOne Draw Line
@@ -61,7 +61,7 @@ Draws a polygon by setting three or more points. The measured values are the cir
 
 Below the buttonline the statistics window is situated, it displays the results of the actual measurements from the selected measurement figures. The content of the statistics window can be copied to the clipboard with the correspondig button for further use in a table calculation programm (e.g. Open Office Calc etc.). 
 
-\image html  Image_processed.jpg
+\image html  Image_processed.JPG
 
 The last row contains again a button line to swap from the measurement bundle (activated in the image) to other supported MITK 3M3 bundles.
   
@@ -84,7 +84,7 @@ button in the upper left corner of the application. A dialog window appears show
 
 The wanted image appears in the View Plane and in the Data Manager the images name appears as a new tree node. Now the image is loaded it can be adjusted in the usual way ( zoom in/out: right mouse button + moving the mouse up and down, moving the image: press mouse wheel and move the mouse to the wished direction, scroll through the slices( only on 3D images): scroll mouse wheel up and down).
 
-\image html Image_Loaded_Screen.jpg
+\image html Image_Loaded_Screen.JPG
 
 After the image is loaded the image's name appears in the Data Manager. By left-clicking on the image name the buttonline becomes activated. 
 
@@ -92,7 +92,7 @@ After the image is loaded the image's name appears in the Data Manager. By left-
 The measurement module comes with seven measurement figures(see picture below), that can be applied to the images. 
 \image html MeasurementFigureButtonline.jpg
 The results of the measurement with each of these figures is shown in the statistics window and in the lower right corner of the view plane. 
-\image html Image_processed_Screen.jpg
+\image html Image_processed_Screen.JPG
 When applying more then one measurement figure to the image the actual measurement figure is depicted in red and the displayed values belong to this measurement figure. All measurement figures become part of the Data Manager as a node of the image tree.
 
 \subsection Three Save the image with measurement information

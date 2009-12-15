@@ -26,6 +26,8 @@
 
 #include <QFileInfo>
 #include <QProgressDialog>
+#include <QMessageBox>
+#include <QDir>
 
 namespace cherry
 {
@@ -134,6 +136,7 @@ bool QtAssistantUtil::RegisterQCHFiles(const QString& collectionFile,
         qchPath.setFileName(resourceFiles[j]);
         args << QLatin1String("-register") << QString::fromStdString(qchPath.toString());
         args << QLatin1String("-quiet");
+	    //CHERRY_INFO << "Registering " << qchPath.toString() << " with " << collectionFile.toStdString();
         argsVector.push_back(args);
       }
     }
@@ -153,6 +156,8 @@ bool QtAssistantUtil::RegisterQCHFiles(const QString& collectionFile,
     CHERRY_WARN << "No .qch files found. Help contents will not be available.";
   }
 
+  QString errorString;
+  int exitCode = 0;
   for (std::size_t i = 0; i < argsVector.size(); ++i)
   {
     const QStringList& args = argsVector[i];
@@ -173,8 +178,31 @@ bool QtAssistantUtil::RegisterQCHFiles(const QString& collectionFile,
       success = false;
       CHERRY_ERROR << "Registering compressed help file" << args[3].toStdString() << " failed";
     }
+
+    if (process->error() != QProcess::UnknownError)
+    {
+      errorString = process->errorString();
+      success = false;
+    }
+
+    if (process->exitCode() != 0)
+      exitCode = process->exitCode();
   }
   progress.setValue(argsVector.size());
+
+  if (!errorString.isEmpty() || exitCode)
+  {
+    QString errText = "Registering one or more help files failed.";
+    if (errorString.isEmpty())
+    {
+      errText += "\nYou may not have write permissions in " + QDir::toNativeSeparators(QDir::homePath());
+    }
+    else
+    {
+      errText += " The last error was: " + errorString;
+    }
+    QMessageBox::warning(0, "Help System Error", errText);
+  }
 
   return success;
 }

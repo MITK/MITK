@@ -28,6 +28,7 @@ PURPOSE.  See the above copyright notices for more information.
 // cherry Includes
 #include <cherryPlatform.h>
 #include <cherryIWorkbenchPage.h>
+#include <cherryConstants.h>
 
 #include <QMessageBox>
 
@@ -85,4 +86,28 @@ QmitkStdMultiWidget* QmitkImageNavigatorView::GetActiveStdMultiWidget()
   }
 
   return activeStdMultiWidget;
+}
+
+int QmitkImageNavigatorView::GetSizeFlags(bool width)
+{
+  if(!width)
+  {
+    return cherry::Constants::MIN | cherry::Constants::MAX | cherry::Constants::FILL;
+  }
+  else
+  {
+    return 0;
+  }
+}
+
+int QmitkImageNavigatorView::ComputePreferredSize(bool width, int availableParallel, int availablePerpendicular, int preferredResult)
+{
+  if(width==false)
+  {
+    return 180;
+  }
+  else
+  {
+    return preferredResult;
+  }
 }

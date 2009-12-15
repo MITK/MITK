@@ -65,6 +65,12 @@ namespace mitk {
      */
     mitk::NavigationTool::Pointer GetTool(std::string identifier);
     
+
+    /**
+     * @brief Deletes a tool from the collection.
+     */
+    void DeleteTool(int number);
+
     /**
      * @return Returns the number of tools stored in the storage.
      */

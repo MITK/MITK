@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 mitk::NavigationTool::NavigationTool()
   {
-    m_Type = mitk::NavigationTool::Unkown;
+    m_Type = mitk::NavigationTool::Unknown;
     m_Identifier = "None";
   }
  

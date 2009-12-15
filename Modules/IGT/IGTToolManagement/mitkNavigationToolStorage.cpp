@@ -28,6 +28,12 @@ mitk::NavigationToolStorage::~NavigationToolStorage()
 
   }
 
+void mitk::NavigationToolStorage::DeleteTool(int number)
+  {
+    std::vector<mitk::NavigationTool::Pointer>::iterator it = m_ToolCollection.begin() + number;
+    m_ToolCollection.erase(it);
+  }
+
 bool mitk::NavigationToolStorage::AddTool(mitk::NavigationTool::Pointer tool)
   {
   if (GetTool(tool->GetIdentifier()).IsNotNull()) return false;

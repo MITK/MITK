@@ -30,7 +30,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <string>
 
 #include "ui_QmitkImageNavigatorViewControls.h"
-
+#include "cherryISizeProvider.h"
 
 
 /*!

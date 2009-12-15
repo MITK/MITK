@@ -111,3 +111,4 @@ int QmitkImageNavigatorView::ComputePreferredSize(bool width, int availableParal
     return preferredResult;
   }
 }
+

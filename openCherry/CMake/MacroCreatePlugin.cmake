@@ -154,6 +154,12 @@ MACRO(MACRO_CREATE_PLUGIN)
                         optimized "PocoUtil" debug "PocoUtil${OPENCHERRY_DEBUG_POSTFIX}"
                         optimized "PocoXML" debug "PocoXML${OPENCHERRY_DEBUG_POSTFIX}")
 
+  # Fix a "bug" in CMake, which does not include all transitive link libraries for a given target
+  LIST(FIND PLUGIN_LINK_LIBRARIES org_opencherry_test _is_unittest_plugin)
+  IF(NOT _is_unittest_plugin EQUAL -1)
+    TARGET_LINK_LIBRARIES(${PLUGIN_TARGET} optimized CppUnit debug CppUnitd)
+  ENDIF()
+
   #SET_TARGET_PROPERTIES(${PLUGIN_TARGET} PROPERTIES PREFIX lib IMPORT_PREFIX lib)
   SET_TARGET_PROPERTIES(${PLUGIN_TARGET} PROPERTIES PREFIX lib)
   

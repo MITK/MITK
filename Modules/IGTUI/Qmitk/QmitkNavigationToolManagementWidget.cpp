@@ -185,6 +185,7 @@ void QmitkNavigationToolManagementWidget::OnLoadStorage()
     mitk::NavigationToolStorage::Pointer tempStorage = myDeserializer->Deserialize(QFileDialog::getOpenFileName(NULL,tr("Open Navigation Tool"), "/", "*.*").toAscii().data());
     if (tempStorage.IsNull()) MessageBox("Error" + myDeserializer->GetErrorMessage());
     else m_NavigationToolStorage = tempStorage;
+    UpdateToolTable();
   }
 
 void QmitkNavigationToolManagementWidget::OnSaveStorage()

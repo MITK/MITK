@@ -69,7 +69,7 @@ namespace mitk {
     /**
      * @brief Deletes a tool from the collection.
      */
-    void DeleteTool(int number);
+    bool DeleteTool(int number);
 
     /**
      * @return Returns the number of tools stored in the storage.

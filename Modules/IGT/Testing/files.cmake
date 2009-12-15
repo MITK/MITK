@@ -1,5 +1,5 @@
-SET(MODULE_TESTS    
-   mitkCameraVisualizationTest.cpp 
+SET(MODULE_TESTS
+   mitkCameraVisualizationTest.cpp
    mitkClaronInterfaceTest.cpp
    mitkClaronToolTest.cpp
    mitkClaronTrackingDeviceTest.cpp
@@ -11,7 +11,7 @@ SET(MODULE_TESTS
    mitkNavigationDataToMessageFilterTest.cpp
    mitkNavigationDataToNavigationDataFilterTest.cpp
    mitkNavigationDataToPointSetFilterTest.cpp
-   mitkNavigationDataTransformFilterTest.cpp  
+   mitkNavigationDataTransformFilterTest.cpp
    mitkNDIPassiveToolTest.cpp
    mitkNDIProtocolTest.cpp
    mitkNDITrackingDeviceTest.cpp
@@ -21,6 +21,7 @@ SET(MODULE_TESTS
    #mitkTrackingDeviceTest.cpp
    mitkTrackingToolTest.cpp
    mitkNavigationDataRecorderTest.cpp
+   mitkNavigationToolStorageTest.cpp
    # deactivated, see bug 3073
    # mitkNavigationDataPlayerTest.cpp
 )

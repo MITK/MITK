@@ -24,6 +24,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkSurface.h>
 #include <mitkNavigationToolReader.h>
 #include <mitkNavigationToolWriter.h>
+#include <mitkNavigationToolStorage.h>
+#include <mitkNavigationToolStorageDeserializer.h>
+#include <mitkNavigationToolStorageSerializer.h>
 
 //qt headers
 #include <qfiledialog.h>
@@ -176,7 +179,10 @@ void QmitkNavigationToolManagementWidget::OnSaveSingleTool()
 
 void QmitkNavigationToolManagementWidget::OnLoadStorage()
   {
-
+    mitk::NavigationToolStorageDeserializer::Pointer myDeserializer = mitk::NavigationToolStorageDeserializer::New();
+    mitk::NavigationToolStorage::Pointer tempStorage = myDeserializer->Deserialize(QFileDialog::getOpenFileName(NULL,tr("Open Navigation Tool"), "/", "*.*").toAscii().data());
+    if (tempStorage.IsNull()) MessageBox("Error" + myDeserializer->GetErrorMessage());
+    else m_NavigationToolStorage = tempStorage;
   }
 
 void QmitkNavigationToolManagementWidget::OnSaveStorage()
@@ -242,7 +248,7 @@ void QmitkNavigationToolManagementWidget::OnAddToolCancel()
 
 void QmitkNavigationToolManagementWidget::OnLoadSurface()
   {
-    std::string filename = QFileDialog::getOpenFileName(NULL,tr("Open Surface"), "/", "*.stl").toLatin1();
+    std::string filename = QFileDialog::getOpenFileName(NULL,tr("Open Surface"), "/", "*.stl").toLatin1().data();
     mitk::STLFileReader::Pointer stlReader = mitk::STLFileReader::New();
     try
       {

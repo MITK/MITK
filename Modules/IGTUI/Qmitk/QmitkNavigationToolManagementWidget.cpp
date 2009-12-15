@@ -23,6 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkSTLFileReader.h>
 #include <mitkSurface.h>
 #include <mitkNavigationToolReader.h>
+#include <mitkNavigationToolWriter.h>
 
 //qt headers
 #include <qfiledialog.h>
@@ -63,7 +64,11 @@ void QmitkNavigationToolManagementWidget::CreateConnections()
       connect( (QObject*)(m_Controls->m_AddTool), SIGNAL(clicked()), this, SLOT(OnAddTool()) );
       connect( (QObject*)(m_Controls->m_DeleteTool), SIGNAL(clicked()), this, SLOT(OnDeleteTool()) );
       connect( (QObject*)(m_Controls->m_EditTool), SIGNAL(clicked()), this, SLOT(OnEditTool()) );
-      
+      connect( (QObject*)(m_Controls->m_LoadSingleTool), SIGNAL(clicked()), this, SLOT(OnLoadSingleTool()) );
+      connect( (QObject*)(m_Controls->m_SaveSingleTool), SIGNAL(clicked()), this, SLOT(OnSaveSingleTool()) );
+      connect( (QObject*)(m_Controls->m_LoadStorage), SIGNAL(clicked()), this, SLOT(OnLoadStorage()) );
+      connect( (QObject*)(m_Controls->m_SaveStorage), SIGNAL(clicked()), this, SLOT(OnSaveStorage()) );
+          
       //widget page "add tool":
       connect( (QObject*)(m_Controls->m_AddToolCancel), SIGNAL(clicked()), this, SLOT(OnAddToolCancel()) );
       connect( (QObject*)(m_Controls->m_AddToolSave), SIGNAL(clicked()), this, SLOT(OnAddToolSave()) );
@@ -150,7 +155,7 @@ void QmitkNavigationToolManagementWidget::OnEditTool()
 void QmitkNavigationToolManagementWidget::OnLoadSingleTool()
   {
     mitk::NavigationToolReader::Pointer myReader = mitk::NavigationToolReader::New();
-    mitk::NavigationTool::Pointer readTool = myReader->DoRead(std::string(QFileDialog::getOpenFileName(NULL,tr("Open Navigation Tool"), "/", "*.*").toLatin1()));
+    mitk::NavigationTool::Pointer readTool = myReader->DoRead(QFileDialog::getOpenFileName(NULL,tr("Open Navigation Tool"), "/", "*.*").toAscii().data());
     if (readTool.IsNull()) MessageBox("Error: " + myReader->GetErrorMessage());
     else 
       { 
@@ -161,7 +166,12 @@ void QmitkNavigationToolManagementWidget::OnLoadSingleTool()
 
 void QmitkNavigationToolManagementWidget::OnSaveSingleTool()
   {
+    //if no item is selected, show error message:
+    if (m_Controls->m_ToolList->currentItem() == NULL) {MessageBox("Error: Please select tool first!");return;}
 
+    mitk::NavigationToolWriter::Pointer myWriter = mitk::NavigationToolWriter::New();
+    if (!myWriter->DoWrite(QFileDialog::getSaveFileName(NULL,tr("Save Navigation Tool"), "/", "*.*").toAscii().data(),m_NavigationToolStorage->GetTool(m_Controls->m_ToolList->currentIndex().column()))) 
+      MessageBox("Error: "+ myWriter->GetErrorMessage());
   }
 
 void QmitkNavigationToolManagementWidget::OnLoadStorage()
@@ -204,9 +214,9 @@ void QmitkNavigationToolManagementWidget::OnAddToolSave()
       }
 
     //fill NavigationTool object
-    workTool->SetCalibrationFile(std::string(m_Controls->m_CalibrationFileName->text().toLatin1()));
-    workTool->SetIdentifier(std::string(m_Controls->m_IdentifierEdit->text().toLatin1()));
-    workTool->SetSerialNumber(std::string(m_Controls->m_SerialNumberEdit->text().toLatin1()));
+    workTool->SetCalibrationFile(m_Controls->m_CalibrationFileName->text().toAscii().data());
+    workTool->SetIdentifier(m_Controls->m_IdentifierEdit->text().toAscii().data());
+    workTool->SetSerialNumber(m_Controls->m_SerialNumberEdit->text().toAscii().data());
     //Tracking Device
     if (m_Controls->m_TrackingDeviceTypeChooser->currentText()=="NDI Aurora") workTool->SetTrackingDeviceType(mitk::NDIAurora);
     else if (m_Controls->m_TrackingDeviceTypeChooser->currentText()=="NDI Polaris") workTool->SetTrackingDeviceType(mitk::NDIPolaris);

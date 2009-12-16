@@ -929,8 +929,10 @@ mitk::ImageMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
     }
     else
     { 
+      //this->GetDataTreeNode()->SetBoolProperty( "outline binary", false, renderer );
+      //this->GetDataTreeNode()->SetFloatProperty( "opacity", 0.3, renderer );
       //set opacity
-      rgba[3] = 0.3;
+      //rgba[3] = 0.3;
       LOG_WARN << "Type of all binary images should be (un)signed char. Outline does not work on other pixel types!";
     }
   }

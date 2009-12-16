@@ -32,8 +32,14 @@ mitk::TrackingDeviceSource::TrackingDeviceSource()
 
 mitk::TrackingDeviceSource::~TrackingDeviceSource()
 {
-  StopTracking();
-  Disconnect();
+  if (m_TrackingDevice->GetMode()==mitk::TrackingDevice::Tracking)
+  {
+    StopTracking();
+  }
+  if (m_TrackingDevice->GetMode()==mitk::TrackingDevice::Ready)
+  {
+    Disconnect();
+  }
   m_TrackingDevice = NULL;
 }
 

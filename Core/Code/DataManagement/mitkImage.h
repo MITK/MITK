@@ -100,10 +100,16 @@ public:
   //## use one of the SubImageSelector classes.
   virtual void* GetData();
 
+  //## @brief Get the pixel value at one specific index position.
   //## @brief Get the pixel value at one specific position.
   //##
   //## The pixel type is always being converted to double.
-  double GetPixelValue(const mitk::Point3D &position, unsigned int timestep = 0);
+  double GetPixelValueByIndex(const mitk::Point3D &position, unsigned int timestep = 0);
+
+  //## @brief Get the pixel value at one specific world position.
+  //##
+  //## The pixel type is always being converted to double.
+  double GetPixelValueByWorldCoordinate(const mitk::Point3D &position, unsigned int timestep = 0);
 
   //##Documentation
   //## @brief Get a volume at a specific time @a t of channel @a n as a vtkImageData.

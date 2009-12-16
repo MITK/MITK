@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkImageDataItem.h"
 #include <fstream>
 #include <itkSmartPointerForwardReference.txx>
+#include <mitkDataTreeNodeFactory.h>
 
 
 int mitkImageTest(int /*argc*/, char* /*argv*/[])
@@ -357,6 +358,47 @@ int mitkImageTest(int /*argc*/, char* /*argv*/[])
   //vecImg->Initialize(PixelType(typeid(float), 6, itk::ImageIOBase::SYMMETRICSECONDRANKTENSOR), *imgMem->GetGeometry(), 2 /* #channels */, 0 /*tDim*/, false /*shiftBoundingBoxMinimumToZero*/ );
   //vecImg->Initialize(PixelType(typeid(itk::Vector<float,6>)), *imgMem->GetGeometry(), 2 /* #channels */, 0 /*tDim*/, false /*shiftBoundingBoxMinimumToZero*/ );
 
+
+  // testing access by index coordinates and by world coordinates
+  
+  mitk::DataTreeNode::Pointer node;      
+  mitk::DataTreeNodeFactory::Pointer nodeReader = mitk::DataTreeNodeFactory::New();
+  try
+  {
+    nodeReader->SetFileName("C:/MITK-QT4/mitk_source3m/mitk/Core/Code/Testing/Data/brain.mhd");
+    nodeReader->Update();
+    node = nodeReader->GetOutput();      
+  }
+  catch(...) {
+    LOG_ERROR << "Could not read file";
+    return NULL;
+  }  
+
+  mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
+  
+  mitk::Point3D point;
+  
+  // test by index coordinates
+  mitk::FillVector3D(point, 55, 39, 50);
+  double val = image->GetPixelValueByIndex(point);
+
+  // there is always a small rounding error
+  if(abs(112.225 - val) > 1.0){
+    std::cout << "[FAILED]"; 
+    EXIT_FAILURE;
+  }
+  
+  //test by world coordinates
+  mitk::FillVector3D(point, -5.93752, 18.7199, 6.74218);
+  val = image->GetPixelValueByWorldCoordinate(point);
+
+  if(abs(94.4562 - val) > 1.0){
+    std::cout << "[FAILED]"; 
+    EXIT_FAILURE;
+  }
+
   std::cout<<"[TEST DONE]"<<std::endl;
   return EXIT_SUCCESS;
+
 }
+

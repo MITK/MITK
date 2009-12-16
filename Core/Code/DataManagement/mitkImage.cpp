@@ -99,7 +99,7 @@ void* mitk::Image::GetData()
   return m_CompleteData->GetData();
 }
 
-double mitk::Image::GetPixelValue(const mitk::Point3D &position, unsigned int timestep)
+double mitk::Image::GetPixelValueByIndex(const mitk::Point3D &position, unsigned int timestep)
 {
   mitkIpPicDescriptor* pic = this->GetPic();
   double value = 0;
@@ -111,6 +111,24 @@ double mitk::Image::GetPixelValue(const mitk::Point3D &position, unsigned int ti
   return value;
 }
 
+double mitk::Image::GetPixelValueByWorldCoordinate(const mitk::Point3D &position, unsigned int timestep)
+{
+  mitkIpPicDescriptor* pic = this->GetPic();
+  double value = 0;
+  if (this->GetTimeSteps() < timestep)
+  {
+    timestep = this->GetTimeSteps();
+  }
+
+  itk::Index<3> itkIndex;
+  this->GetGeometry()->WorldToIndex(position,itkIndex);
+  Point3D mitkPointIndex;
+  mitkPointIndex[0]=itkIndex[0];
+  mitkPointIndex[1]=itkIndex[1];
+  mitkPointIndex[2]=itkIndex[2];
+  mitkIpPicTypeMultiplex3(AccessPixel, pic, mitkPointIndex, value, timestep);
+  return value;
+}
 
 vtkImageData* mitk::Image::GetVtkImageData(int t, int n)
 {

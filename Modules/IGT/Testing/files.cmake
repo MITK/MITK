@@ -16,7 +16,7 @@ SET(MODULE_TESTS
    mitkNDIProtocolTest.cpp
    mitkNDITrackingDeviceTest.cpp
    mitkTimeStampTest.cpp
-   #mitkTrackingDeviceSourceTest.cpp
+   mitkTrackingDeviceSourceTest.cpp
    mitkTrackingVolumeTest.cpp
    mitkTrackingDeviceTest.cpp
    mitkTrackingToolTest.cpp

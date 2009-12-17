@@ -127,18 +127,21 @@ m_Node(NULL)
   mitkWidget2->setMaximumSize(2000,2000);
   mitkWidget2->setEnabled( TRUE );
   mitkWidget2->SetLayoutIndex( SAGITTAL );
+  mitkWidget2->SetCrossHairMenu( mitkWidget1->GetCrossHairMenu() );
   mitkWidgetLayout2->addWidget(mitkWidget2); 
 
   //Create RenderWindows 3
   mitkWidget3 = new QmitkRenderWindow(mitkWidget3Container, "stdmulti.widget3");
   mitkWidget3->setMaximumSize(2000,2000);
   mitkWidget3->SetLayoutIndex( CORONAL );
+  mitkWidget3->SetCrossHairMenu( mitkWidget1->GetCrossHairMenu() );
   mitkWidgetLayout3->addWidget(mitkWidget3); 
 
   //Create RenderWindows 4
   mitkWidget4 = new QmitkRenderWindow(mitkWidget4Container, "stdmulti.widget4");
   mitkWidget4->setMaximumSize(2000,2000);
   mitkWidget4->SetLayoutIndex( THREE_D );
+  mitkWidget4->SetCrossHairMenu( mitkWidget1->GetCrossHairMenu() );
   mitkWidgetLayout4->addWidget(mitkWidget4); 
 
   //create SignalSlot Connection
@@ -404,6 +407,12 @@ void QmitkStdMultiWidget::InitializeWidget()
   m_RectangleRendering4->SetRenderWindow(
     mitkWidget4->GetRenderWindow() );
   m_RectangleRendering4->Enable(1.0,1.0,0.0);
+}
+  
+QmitkStdMultiWidget::~QmitkStdMultiWidget()
+{
+  DisablePositionTracking();
+  DisableNavigationControllerEventListening();
 }
 
 void QmitkStdMultiWidget::RemovePlanesFromDataStorage()
@@ -1544,7 +1553,6 @@ void QmitkStdMultiWidget::EnableNavigationControllerEventListening()
 
   gi->AddListener( m_TimeNavigationController );
 }
-
 
 void QmitkStdMultiWidget::DisableNavigationControllerEventListening()
 {

@@ -52,6 +52,9 @@ public:
   virtual mitk::BaseController * GetController();
   virtual mitk::VtkPropRenderer* GetRenderer();
 
+  QMenu* GetCrossHairMenu();
+  void SetCrossHairMenu(QMenu* menu);
+
   /**
    * \brief Whether Qt events should be passed to parent (default: true)
    *

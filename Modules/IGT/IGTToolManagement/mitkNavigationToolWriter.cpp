@@ -66,9 +66,18 @@ mitk::DataTreeNode::Pointer mitk::NavigationToolWriter::ConvertToDataTreeNode(mi
     thisTool->AddProperty("tracking device type",mitk::IntProperty::New(Tool->GetTrackingDeviceType()));
   //Tool Type
     thisTool->AddProperty("tracking tool type",mitk::IntProperty::New(Tool->GetType()));
+  //Calibration File Name
+    thisTool->AddProperty("toolfileName",mitk::StringProperty::New(GetFileWithoutPath(Tool->GetCalibrationFile())));
   //Calibration File
     thisTool->AddProperty("toolfile",mitk::StringProperty::New(ReadFile(Tool->GetCalibrationFile()).c_str()));
   //Surface
     thisTool->SetData(Tool->GetDataTreeNode()->GetData());
   return thisTool;
+  }
+
+std::string mitk::NavigationToolWriter::GetFileWithoutPath(std::string FileWithPath)
+  {
+  std::string returnValue = "";
+  returnValue = FileWithPath.substr(FileWithPath.rfind("/"), FileWithPath.length());
+  return returnValue;
   }

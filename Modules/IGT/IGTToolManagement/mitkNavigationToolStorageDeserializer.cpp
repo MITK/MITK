@@ -17,10 +17,12 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include "mitkNavigationToolStorageDeserializer.h"
+#include <mitkSceneIO.h>
+#include "mitkNavigationToolReader.h"
 
-mitk::NavigationToolStorageDeserializer::NavigationToolStorageDeserializer()
+mitk::NavigationToolStorageDeserializer::NavigationToolStorageDeserializer(mitk::DataStorage::Pointer dataStorage)
   {
-
+  m_DataStorage = dataStorage;
   }
 
 mitk::NavigationToolStorageDeserializer::~NavigationToolStorageDeserializer()
@@ -30,6 +32,21 @@ mitk::NavigationToolStorageDeserializer::~NavigationToolStorageDeserializer()
 
 mitk::NavigationToolStorage::Pointer mitk::NavigationToolStorageDeserializer::Deserialize(std::string filename)
   {
-  m_ErrorMessage = "Error, NavigationToolStorageDeserializer is not implemented yet!";
-  return NULL;
+  mitk::NavigationToolReader::Pointer myReader = mitk::NavigationToolReader::New(m_DataStorage);
+  mitk::SceneIO::Pointer mySceneIO = mitk::SceneIO::New();
+  mitk::DataStorage::Pointer readStorage = mySceneIO->LoadScene(filename);
+  if (readStorage.IsNull()) {m_ErrorMessage = "Error: invalid filename!"; return NULL;}
+  mitk::NavigationToolStorage::Pointer returnValue = mitk::NavigationToolStorage::New();
+
+  for(int i=0; i<readStorage->GetAll()->Size(); i++)
+    {
+    mitk::NavigationTool::Pointer newTool = myReader->ConvertDataTreeNodeToNavigationTool(readStorage->GetAll()->ElementAt(i));
+    if (!returnValue->AddTool(newTool))
+      {
+      m_ErrorMessage = "Error can't parse data storage!";
+      return NULL;
+      }
+    }
+
+  return returnValue;
   }

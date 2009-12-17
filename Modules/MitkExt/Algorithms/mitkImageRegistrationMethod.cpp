@@ -21,24 +21,11 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
 
-  ImageRegistrationMethod::ImageRegistrationMethod() : m_Observer(NULL), m_Interpolator(0), m_MovingMask(NULL), m_FixedMask(NULL)
+  ImageRegistrationMethod::ImageRegistrationMethod() : m_Observer(NULL), m_Interpolator(0), m_MovingMask(NULL), m_FixedMask(NULL),
+    m_Transform(NULL), m_Metric(NULL), m_Optimizer(NULL)
   {
-    m_OptimizerParameters = OptimizerParameters::New();
-    m_TransformParameters = TransformParameters::New();
-    m_MetricParameters = MetricParameters::New();
     m_ReferenceImage = Image::New();
-
-    m_Preset = new mitk::RigidRegistrationPreset();
-
-    bool succeed = m_Preset->LoadPreset();
-    if(!succeed)
-    {
-       std::cout << "RigidRegistrationParameters.xml is empty or does not exist. There are no presets to select." << std::endl;
-       return;
-    }
-    
-    m_UseMask = false;
-
+    m_OptimizerScales.clear();
   }
 
   ImageRegistrationMethod::~ImageRegistrationMethod()
@@ -84,4 +71,25 @@ namespace mitk {
     SetNthInput(4, m_FixedMask);
     Modified();
   }
+
+  void ImageRegistrationMethod::SetTransform(itk::Object::Pointer transform)
+  {
+    m_Transform = transform;
+  }
+  
+  void ImageRegistrationMethod::SetMetric(itk::Object::Pointer metric)
+  {
+    m_Metric = metric;
+  }
+
+  void ImageRegistrationMethod::SetOptimizer(itk::Object::Pointer optimizer)
+  {
+    m_Optimizer = optimizer;
+  }
+
+  void ImageRegistrationMethod::SetOptimizerScales(itk::Array<double> scales)
+  {
+    m_OptimizerScales = scales;
+  }
+
 } // end namespace

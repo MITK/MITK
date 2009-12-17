@@ -189,7 +189,8 @@ void QmitkRigidRegistrationView::CreateQtPartControl(QWidget* parent)
   m_Controls.m_FixedLabel->hide();
   m_Controls.TextLabelMoving->hide();
   m_Controls.m_MovingLabel->hide();
-  m_Controls.m_UseImageMasks->hide();
+  m_Controls.m_UseFixedImageMask->hide();
+  m_Controls.m_UseMovingImageMask->hide();
   m_Controls.m_OpacityLabel->setEnabled(false);
   m_Controls.m_OpacitySlider->setEnabled(false);
   m_Controls.label->setEnabled(false);
@@ -229,7 +230,8 @@ void QmitkRigidRegistrationView::CreateConnections()
   connect( m_Controls.m_ManualRegistrationCheckbox, SIGNAL(toggled(bool)), this, SLOT(ShowManualRegistrationFrame(bool)));
   connect((QObject*)(m_Controls.m_SwitchImages),SIGNAL(clicked()),this,SLOT(SwitchImages()));
   connect(m_Controls.m_ShowRedGreenValues, SIGNAL(toggled(bool)), this, SLOT(ShowRedGreen(bool)));
-  connect(m_Controls.m_UseImageMasks, SIGNAL(toggled(bool)), this, SLOT(UseMaskImagesChecked(bool)));
+  connect(m_Controls.m_UseFixedImageMask, SIGNAL(toggled(bool)), this, SLOT(UseFixedMaskImageChecked(bool)));
+  connect(m_Controls.m_UseMovingImageMask, SIGNAL(toggled(bool)), this, SLOT(UseMovingMaskImageChecked(bool)));
   connect(m_Controls.m_RigidTransform, SIGNAL(currentChanged(int)), this, SLOT(TabChanged(int)));
   connect(m_Controls.m_OpacitySlider, SIGNAL(sliderMoved(int)), this, SLOT(OpacityUpdate(int)));
   connect(m_Controls.m_CalculateTransformation, SIGNAL(clicked()), this, SLOT(Calculate()));
@@ -959,14 +961,20 @@ void QmitkRigidRegistrationView::Calculate()
 {
   m_Controls.qmitkRigidRegistrationSelector1->SetFixedNode(m_FixedNode);
   m_Controls.qmitkRigidRegistrationSelector1->SetMovingNode(m_MovingNode);
-  if (m_FixedMaskNode.IsNotNull() && m_MovingMaskNode.IsNotNull() && m_Controls.m_UseImageMasks->isChecked())
+  if (m_FixedMaskNode.IsNotNull() && m_Controls.m_UseFixedImageMask->isChecked())
   {
     m_Controls.qmitkRigidRegistrationSelector1->SetFixedMaskNode(m_FixedMaskNode);
-    m_Controls.qmitkRigidRegistrationSelector1->SetMovingMaskNode(m_MovingMaskNode);
   }
   else
   {
     m_Controls.qmitkRigidRegistrationSelector1->SetFixedMaskNode(NULL);
+  }
+  if (m_MovingMaskNode.IsNotNull() && m_Controls.m_UseMovingImageMask->isChecked())
+  {
+    m_Controls.qmitkRigidRegistrationSelector1->SetMovingMaskNode(m_MovingMaskNode);
+  }
+  else
+  {    
     m_Controls.qmitkRigidRegistrationSelector1->SetMovingMaskNode(NULL);
   }
   m_Controls.frame_2->setEnabled(false);
@@ -1040,26 +1048,44 @@ void QmitkRigidRegistrationView::SetImagesVisible(cherry::ISelection::ConstPoint
 
 void QmitkRigidRegistrationView::CheckForMaskImages()
 {
-  if (m_FixedMaskNode.IsNotNull() && m_MovingMaskNode.IsNotNull())
+  if (m_FixedMaskNode.IsNotNull())
   {
-    m_Controls.m_UseImageMasks->show();
+    m_Controls.m_UseFixedImageMask->show();
   }
   else
   {
-    m_Controls.m_UseImageMasks->hide();
+    m_Controls.m_UseFixedImageMask->hide();
+  }
+  if (m_MovingMaskNode.IsNotNull())
+  {
+    m_Controls.m_UseMovingImageMask->show();
+  }
+  else
+  {
+    m_Controls.m_UseMovingImageMask->hide();
   }
 }
 
-void QmitkRigidRegistrationView::UseMaskImagesChecked(bool checked)
+void QmitkRigidRegistrationView::UseFixedMaskImageChecked(bool checked)
 {
   if (checked)
   {
     m_FixedMaskNode->SetVisibility(true);
-    m_MovingMaskNode->SetVisibility(true);
   }
   else
   {
     m_FixedMaskNode->SetVisibility(false);
+  }
+}
+
+void QmitkRigidRegistrationView::UseMovingMaskImageChecked(bool checked)
+{
+  if (checked)
+  {
+    m_MovingMaskNode->SetVisibility(true);
+  }
+  else
+  {
     m_MovingMaskNode->SetVisibility(false);
   }
 }

@@ -25,12 +25,15 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkRigidRegistrationTestPreset.h"
 #include "qobject.h"
 #include "../RigidregistrationDll.h"
+#include "QmitkRigidRegistrationTransformsGUIBase.h"
+#include "QmitkRigidRegistrationMetricsGUIBase.h"
+#include "QmitkRigidRegistrationOptimizerGUIBase.h"
 
 
 /*!
-* \brief Widget for deformable demons registration
+* \brief Widget for rigid registration
 *
-* Displays options for demons registration.
+* Displays options for rigid registration.
 */
 class RIGIDREGISTRATION_EXPORT QmitkRigidRegistrationSelectorView : public QWidget
 {
@@ -59,12 +62,6 @@ public:
     void StopOptimization(bool stopOptimization);
 
   protected slots:
-    /// method to make all TransformFrames invisible
-    void hideAllTransformFrames();
-    /// method to make all OptimizerFrames invisible
-    void hideAllOptimizerFrames();
-    /// method to make all MetricFrames invisible
-    void hideAllMetricFrames();
     // this is a callback function that retrieves the current transformation
     // parameters after every step of progress in the optimizer.
     // depending on the choosen transformation, we construct a vtktransform
@@ -74,32 +71,23 @@ public:
     /// this method is called whenever the combobox with the selectable transforms changes
     /// responsible for showing the selected transformparameters
     void TransformSelected( int transform );
-    /// this method is called whenever the combobox with the selectable optimizers changes
-    /// responsible for showing the selected optimizerparameters
-    void OptimizerSelected( int optimizer );
     /// this method is called whenever the combobox with the selectable metrics changes
     /// responsible for showing the selected metricparameters
     void MetricSelected( int metric );
-    /// this method writes the transform parameters from the selected transform into mitkTransformParameters class
-    /// so that the desired transform can be build up with these parameters
-    void setTransformParameters();
-    /// this method writes the optimizer parameters from the selected optimizer into mitkOptimizerParameters class
-    /// so that the desired optimizer can be build up with these parameters
-    void setOptimizerParameters();
-    /// this method writes the metric parameters from the selected metric into mitkMetricParameters class
-    /// so that the desired metric can be build up with these parameters
-    void setMetricParameters();
-    /// this method is needed because the Amoeba optimizer needs a simplex delta parameter, which defines the search range for each transform parameter
-    /// every transform has its own set of parameters, so this method looks for every time showing the correct number of simplex delta input fields for the
-    /// Amoeba optimizer
-    void SetSimplexDeltaVisible();
+    /// this method is called whenever the combobox with the selectable optimizer changes
+    /// responsible for showing the selected optimizerparameters
+    void OptimizerSelected( int optimizer );
+
     void LoadRigidRegistrationParameter();
     void SaveRigidRegistrationParameter();
     void LoadRigidRegistrationTestParameter();
     void SaveRigidRegistrationTestParameter();
     void DoLoadRigidRegistrationParameter(bool testPreset);
-    void DoLoadRigidRegistrationPreset(std::string presetName);
+    void DoLoadRigidRegistrationPreset(std::string presetName, bool testPreset);
     void DoSaveRigidRegistrationParameter(bool testPreset);
+    void AddTransform(QmitkRigidRegistrationTransformsGUIBase* transform);
+    void AddMetric(QmitkRigidRegistrationMetricsGUIBase* metric);
+    void AddOptimizer(QmitkRigidRegistrationOptimizerGUIBase* optimizer);
 
 protected:
 
@@ -108,9 +96,6 @@ protected:
   mitk::DataTreeNode::Pointer m_FixedMaskNode;
   mitk::DataTreeNode::Pointer m_MovingNode;
   mitk::DataTreeNode::Pointer m_MovingMaskNode;
-  mitk::OptimizerParameters::Pointer m_OptimizerParameters;
-  mitk::TransformParameters::Pointer m_TransformParameters;
-  mitk::MetricParameters::Pointer m_MetricParameters;
   int m_FixedDimension;
   int m_MovingDimension;
   bool m_StopOptimization;
@@ -124,10 +109,6 @@ protected:
   mitk::DataStorage::SetOfObjects::ConstPointer m_MovingNodeChildren;
   std::map<mitk::DataTreeNode::Pointer, mitk::Geometry3D*> m_ChildNodes;
   std::map<mitk::DataTreeNode::Pointer, mitk::AffineGeometryFrame3D::Pointer> m_ChildNodes2;
-
-  itk::Array2D<unsigned int> ParseSchedule(std::string s);
-  void Tokenize(const std::string& str, std::vector<std::string>& tokens, const std::string& delimiters = " ");
-
 };
 
 #endif

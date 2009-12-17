@@ -26,24 +26,14 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkImageAccessByItk.h"
 #include "mitkRigidRegistrationObserver.h"
 #include "mitkCommon.h"
-#include "mitkOptimizerParameters.h"
-#include "mitkTransformParameters.h"
-#include "mitkMetricParameters.h"
 
 #include "itkImageMaskSpatialObject.h"
 #include "mitkRigidRegistrationPreset.h"
 
-
-
 namespace mitk
 {
-
-
   /*!
   \brief Main class for the rigid registration pipeline.
-
-
-
 
   \ingroup RigidRegistration
 
@@ -57,15 +47,12 @@ namespace mitk
     typedef itk::SingleValuedNonLinearOptimizer         OptimizerType;
     typedef itk::ImageMaskSpatialObject< 3 >            MaskType;
 
-
     mitkClassMacro(ImageRegistrationMethod, ImageToImageFilter);
 
     itkNewMacro(Self);
 
     static const int LINEARINTERPOLATOR = 0;
     static const int NEARESTNEIGHBORINTERPOLATOR = 1;
-
-
 
     void SetObserver(RigidRegistrationObserver::Pointer observer);
 
@@ -77,48 +64,15 @@ namespace mitk
 
     virtual void SetFixedMask( Image::Pointer fixedMask);
 
-    virtual void SetMovingMask( Image::Pointer movingMask);
+    virtual void SetMovingMask( Image::Pointer movingMask);    
 
-    void SetOptimizerParameters(OptimizerParameters::Pointer optimizerParameters)
-    {
-      m_OptimizerParameters = optimizerParameters;
-    }
+    void SetOptimizerScales(itk::Array<double> scales); 
 
-    OptimizerParameters::Pointer GetOptimizerParameters()
-    {
-      return m_OptimizerParameters;
-    }
+    void SetTransform(itk::Object::Pointer transform);
 
-    void SetTransformParameters(TransformParameters::Pointer transformParameters)
-    {
-      m_TransformParameters = transformParameters;      
-    }
+    void SetMetric(itk::Object::Pointer metric);
 
-    TransformParameters::Pointer GetTransformParameters()
-    {
-      return m_TransformParameters;
-    }
-
-    void SetMetricParameters(MetricParameters::Pointer metricParameters)
-    {
-      m_MetricParameters = metricParameters;
-    }
-
-    MetricParameters::Pointer GetMetricParameters()
-    {
-      return m_MetricParameters;
-    }   
-
-    void SetPresets(std::vector<std::string> presets)
-    {
-      m_Presets = presets;
-    }
-
-
-    itkSetMacro(MatchHistograms, bool);
-    itkGetMacro(Preset, mitk::RigidRegistrationPreset*);
-
-
+    void SetOptimizer(itk::Object::Pointer optimizer);
 
   protected:
     ImageRegistrationMethod();
@@ -136,19 +90,10 @@ namespace mitk
     virtual void GenerateOutputInformation(){};
 
   private:
-    OptimizerParameters::Pointer m_OptimizerParameters;
-    TransformParameters::Pointer m_TransformParameters;
-    MetricParameters::Pointer m_MetricParameters;
-
-    std::vector<std::string> m_Presets;
-    mitk::RigidRegistrationPreset* m_Preset;
-
-
-    bool m_UseMask;   
-    bool m_MatchHistograms;
-    MaskType::Pointer m_BrainMask;
-
-
+    itk::Object::Pointer m_Transform;
+    itk::Object::Pointer m_Metric;
+    itk::Object::Pointer m_Optimizer;
+    itk::Array<double> m_OptimizerScales;
   };
 }
 

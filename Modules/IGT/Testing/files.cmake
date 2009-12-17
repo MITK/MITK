@@ -7,7 +7,8 @@ SET(MODULE_TESTS
    mitkNavigationDataDisplacementFilterTest.cpp
    mitkNavigationDataLandmarkTransformFilterTest.cpp
    mitkNavigationDataObjectVisualizationFilterTest.cpp
-   mitkNavigationDataSourceTest.cpp
+   #mitkNavigationDataSourceTest.cpp   # deactivated because of  bug #2323
+   mitkNavigationDataTest.cpp
    mitkNavigationDataToMessageFilterTest.cpp
    mitkNavigationDataToNavigationDataFilterTest.cpp
    mitkNavigationDataToPointSetFilterTest.cpp

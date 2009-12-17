@@ -167,11 +167,11 @@ static void TestSwapPointPositionDownwardsNotPossible(mitk::PointSet * /*pointSe
   int id = 0;
   mitk::Point3D point;
   point.Fill(1);
-  pointSet2->SetPoint(0,point);
+  pointSet2->SetPoint(id, point);
 
 
   //Check SwapPointPosition downwards not possible
-  MITK_TEST_CONDITION(!pointSet2->SwapPointPosition(0, false), "check SwapPointPosition downwards not possible" )
+  MITK_TEST_CONDITION(!pointSet2->SwapPointPosition(id, false), "check SwapPointPosition downwards not possible" )
 
     /*
     if(pointSet->SwapPointPosition(1, false))
@@ -216,11 +216,9 @@ static void TestPointOperationOpRemove(mitk::PointSet *pointSet)
   mitk::Point3D tempPoint;
 
   point = pointSet->GetPoint(id);
-  int size = pointSet->GetSize();
   mitk::PointOperation* doOp = new mitk::PointOperation(mitk::OpREMOVE, point, id);
   pointSet->ExecuteOperation(doOp);
   tempPoint = pointSet->GetPoint(id);
-  int tempSize = pointSet->GetSize();
 
   MITK_TEST_CONDITION(!pointSet->IndexExists(id) , "check PointOperation OpREMOVE " )
     delete doOp;

@@ -19,11 +19,11 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef QmitkRigidRegistrationOptimizerGUIBaseH
 #define QmitkRigidRegistrationOptimizerGUIBaseH
 
-#include <qwidget>
+#include <QWidget>
 #include <itkArray.h>
 #include <itkObject.h>
 #include "mitkImage.h"
-#include <qstring>
+#include <QString>
 
 /*!
 * \brief Widget for rigid registration

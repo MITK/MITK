@@ -19,11 +19,11 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef QmitkRigidRegistrationTransformsGUIBaseH
 #define QmitkRigidRegistrationTransformsGUIBaseH
 
-#include <qwidget>
+#include <QWidget>
 #include <itkArray.h>
 #include <itkObject.h>
 #include "mitkImage.h"
-#include <qstring>
+#include <QString>
 #include <vtkTransform.h>
 #include <vtkMatrix4x4.h>
 

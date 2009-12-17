@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkCorrelationCoefficientHistogramImageToImageMetric.h>
 #include "mitkImageAccessByItk.h"
 
-#include "qvalidator.h"
+#include "QValidator"
 
 QmitkCorrelationCoefficientHistogramMetricView::QmitkCorrelationCoefficientHistogramMetricView(QWidget* parent, Qt::WindowFlags f ) : QmitkRigidRegistrationMetricsGUIBase (parent, f)
 {

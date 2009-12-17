@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkTranslationTransformView.h"
 #include "mitkImageAccessByItk.h"
 #include <itkTranslationTransform.h>
-#include <qvalidator>
+#include <QValidator>
 
 QmitkTranslationTransformView::QmitkTranslationTransformView(QWidget* parent, Qt::WindowFlags f ) : QmitkRigidRegistrationTransformsGUIBase(parent, f)
 {

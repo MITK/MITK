@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkScaleTransformView.h"
 #include "mitkImageAccessByItk.h"
 #include <itkScaleTransform.h>
-#include <qvalidator>
+#include <QValidator>
 
 QmitkScaleTransformView::QmitkScaleTransformView(QWidget* parent, Qt::WindowFlags f ) : QmitkRigidRegistrationTransformsGUIBase(parent, f)
 {

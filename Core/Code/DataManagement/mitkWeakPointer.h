@@ -163,6 +163,8 @@ public:
     // instead: do nothing->object is going to be dead soon...
     //this->RemoveDeleteAndModifiedObserver();
     m_Pointer = 0;
+    m_DeleteObserverTag = -1;
+    m_ModifiedObserverTag = -1;
     ObjectDelete.Send(caller);
 
   }

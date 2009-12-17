@@ -527,37 +527,33 @@ bool
 PlaneGeometry::IntersectionLine( 
   const PlaneGeometry* plane, Line3D& crossline ) const
 {
-  VnlVector direction;
+  Vector3D normal = this->GetNormal();
+  normal.Normalize();
 
-  Vector3D normal, planenormal;
-  normal = GetNormal();
-  planenormal = plane->GetNormal();
+  Vector3D planeNormal = plane->GetNormal();
+  planeNormal.Normalize();
 
-  direction = vnl_cross_3d(normal.Get_vnl_vector(), 
-    planenormal.Get_vnl_vector());
+  Vector3D direction = itk::CrossProduct( normal, planeNormal );
 
-  if ( direction.squared_magnitude() < eps )
+  if ( direction.GetSquaredNorm() < eps )
     return false; 
 
-  Vector3D itkdirection;
-  itkdirection.Set_vnl_vector(direction);
-  crossline.SetDirection(itkdirection);
+  crossline.SetDirection( direction );
 
-  double N1sq = normal.GetSquaredNorm();
-  double N2sq = planenormal.GetSquaredNorm();
-  double N1dN2 = normal*planenormal;
+  double N1dN2 = normal * planeNormal;
+  double determinant = 1.0 - N1dN2 * N1dN2;
 
-  double determinant = N1sq * N2sq - N1dN2*N1dN2;
+  Vector3D origin = this->GetOrigin().GetVectorFromOrigin();
+  Vector3D planeOrigin = plane->GetOrigin().GetVectorFromOrigin();
 
-  double d1=dot_product(normal.Get_vnl_vector(),GetOriginVnl());
-  double d2=dot_product(planenormal.Get_vnl_vector(),plane->GetOriginVnl());
+  double d1 = normal * origin;
+  double d2 = planeNormal * planeOrigin;
 
-  double c1 = ( d1*N2sq - d2*N1dN2 ) / determinant;
-  double c2 = ( d2*N1sq - d1*N1dN2) / determinant ;
+  double c1 = ( d1 - d2 * N1dN2 ) / determinant;
+  double c2 = ( d2 - d1 * N1dN2 ) / determinant;
 
-  Vector3D vpoint;
-  vpoint = normal*((ScalarType)c1)+planenormal*((ScalarType)c2);
-  crossline.GetPoint().Get_vnl_vector()=vpoint.Get_vnl_vector();
+  Vector3D p = normal * c1 + planeNormal * c2;
+  crossline.GetPoint().Get_vnl_vector() = p.Get_vnl_vector();
 
   return true;
 }
@@ -567,20 +563,15 @@ unsigned int
 PlaneGeometry::IntersectWithPlane2D(
   const PlaneGeometry* plane, Point2D& lineFrom, Point2D &lineTo ) const
 {
-  VnlVector ptest;
-  ptest = vnl_cross_3d(GetNormalVnl(), plane->GetNormalVnl());
-  if(ptest.squared_magnitude()<vnl_math::float_sqrteps)
-    return 0;
-
   Line3D crossline;
-  if (IntersectionLine( plane, crossline ) == false)
+  if ( this->IntersectionLine( plane, crossline ) == false )
     return 0;
 
   Point2D  point2; 
   Vector2D direction2; 
 
-  Map(crossline.GetPoint(), point2);
-  Map(crossline.GetPoint(), crossline.GetDirection(), direction2);
+  this->Map( crossline.GetPoint(), point2 );
+  this->Map( crossline.GetPoint(), crossline.GetDirection(), direction2 );
 
   return 
     Line3D::RectangleLineIntersection( 
@@ -605,22 +596,23 @@ double PlaneGeometry::Angle( const Line3D &line ) const
 bool PlaneGeometry::IntersectionPoint( 
   const Line3D &line, Point3D &intersectionPoint ) const
 {
-  Vector3D normal;
-  normal.Set_vnl_vector(GetMatrixColumn(2));
+  Vector3D planeNormal = this->GetNormal();
+  planeNormal.Normalize();
 
-  double t = normal*line.GetDirection();
+  Vector3D lineDirection = line.GetDirection();
+  lineDirection.Normalize();
 
-  if ( fabs(t) < eps )
+  double t = planeNormal * lineDirection;
+  if ( fabs( t ) < eps )
   {
     return false;
   }
 
   Vector3D diff;
-  diff = GetOrigin() - line.GetPoint();
-  t = (normal*diff) / t;
+  diff = this->GetOrigin() - line.GetPoint();
+  t = ( planeNormal * diff ) / t;
 
-  intersectionPoint = line.GetPoint()+line.GetDirection()*t;
-
+  intersectionPoint = line.GetPoint() + line.GetDirection() * t;
   return true;
 }
 
@@ -628,20 +620,22 @@ bool PlaneGeometry::IntersectionPoint(
 bool
 PlaneGeometry::IntersectionPointParam( const Line3D &line, double &t ) const
 {
-  Vector3D normal;
-  normal.Set_vnl_vector(GetMatrixColumn(2));
+  Vector3D planeNormal = this->GetNormal();
+  planeNormal.Normalize();
 
-  t = normal*line.GetDirection();
+  Vector3D lineDirection = line.GetDirection();
+  lineDirection.Normalize();
 
-  if ( fabs(t) < eps )
+  t = planeNormal * lineDirection;
+
+  if ( fabs( t ) < eps )
   {
     return false;
   }
 
   Vector3D diff;
-  diff = GetOrigin() - line.GetPoint();
-  t = (normal*diff) / t;
-
+  diff = this->GetOrigin() - line.GetPoint();
+  t = ( planeNormal * diff  ) / t;
   return true;
 }
 

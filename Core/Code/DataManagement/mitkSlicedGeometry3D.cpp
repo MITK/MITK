@@ -581,10 +581,10 @@ void
 mitk::SlicedGeometry3D
 ::SetDirectionVector( const mitk::Vector3D& directionVector ) 
 {
-  VnlVector diff = m_DirectionVector.Get_vnl_vector()
-    - directionVector.Get_vnl_vector();
+  Vector3D diff = m_DirectionVector - directionVector;
 
-  if ( diff.squared_magnitude()>=vnl_math::float_sqrteps )
+  if ( (m_DirectionVector.GetSquaredNorm() == 0.0)
+    || (diff.GetNorm() >= vnl_math::float_eps) )
   {
     m_DirectionVector = directionVector;
     m_DirectionVector.Normalize();

@@ -376,6 +376,8 @@ void Geometry2DDataVtkMapper3D::GenerateData(BaseRenderer* renderer)
       m_SurfaceCreator->SetYResolution(res);
     }
 
+    double tubeRadius = 1.0; // Radius of tubular edge surrounding plane
+
     // Clip the Geometry2D with the reference geometry bounds (if available)
     if ( input->GetGeometry2D()->HasReferenceGeometry() )
     {
@@ -401,6 +403,8 @@ void Geometry2DDataVtkMapper3D::GenerateData(BaseRenderer* renderer)
       m_SurfaceCreatorBoundingBox->ComputeBoundingBox();
 
       m_SurfaceCreator->SetBoundingBox( m_SurfaceCreatorBoundingBox );
+
+      tubeRadius = referenceGeometry->GetDiagonalLength() / 450.0;
     }
     else
     {
@@ -409,6 +413,8 @@ void Geometry2DDataVtkMapper3D::GenerateData(BaseRenderer* renderer)
       if (m_DataStorage.IsNotNull())
       {
         m_SurfaceCreator->SetBoundingBox(m_DataStorage->ComputeVisibleBoundingBox(NULL, "includeInBoundingBox"));
+
+        tubeRadius = sqrt( m_SurfaceCreator->GetBoundingBox()->GetDiagonalLength2() ) / 450.0;
       }
     }
 
@@ -529,8 +535,9 @@ void Geometry2DDataVtkMapper3D::GenerateData(BaseRenderer* renderer)
     if ( extent < extentZ ) 
       extent = extentZ;
 
+
     // Adjust the radius according to extent
-    m_EdgeTuber->SetRadius( extent / 450.0 );
+    m_EdgeTuber->SetRadius( tubeRadius );
 
     // Get the plane's color and set the tube properties accordingly
     ColorProperty::Pointer colorProperty;

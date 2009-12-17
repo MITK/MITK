@@ -45,22 +45,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QDockWidget>
 #include <QVBoxLayout>
 #include <QAbstractItemView>
-#include <QMessageBox>  /*
-  m_Deactivated = false;
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-    QmitkFunctionality::Activated();
-    this->clearTransformationLists();
-    if (m_SelListener.IsNull())
-    {
-      m_SelListener = cherry::ISelectionListener::Pointer(new SelListenerPointBasedRegistration(this));
-      this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddPostSelectionListener(/ *"org.mitk.views.datamanager",* / m_SelListener);
-      cherry::ISelection::ConstPointer sel(
-        this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection("org.mitk.views.datamanager"));
-      m_CurrentSelection = sel.Cast<const IStructuredSelection>();
-      m_SelListener.Cast<SelListenerPointBasedRegistration>()->DoSelectionChanged(sel);
-    }
-    this->OpacityUpdate(m_Controls.m_OpacitySlider->value());
-    this->showRedGreen(m_Controls.m_ShowRedGreenValues->isChecked());*/
+#include <QMessageBox> 
 
 #include <mitkDataStorageEditorInput.h>
 #include <mitkIDataStorageReference.h>
@@ -598,14 +583,12 @@ void QmitkSegmentationView::StdMultiWidgetAvailable( QmitkStdMultiWidget& stdMul
     // tell the interpolation about toolmanager and multiwidget
     m_Controls->m_SlicesInterpolator->SetDataStorage( *m_DataStorage );
     m_Controls->m_SlicesInterpolator->Initialize( toolManager, m_MultiWidget );
-    this->Activated();
   }
 }
 
 void QmitkSegmentationView::StdMultiWidgetNotAvailable()
 {
   m_Parent->setEnabled(false);
-  this->Deactivated();
 }
 
 void QmitkSegmentationView::StdMultiWidgetClosed( QmitkStdMultiWidget& stdMultiWidget )
@@ -773,9 +756,7 @@ void QmitkSegmentationView::SelectionChanged(cherry::IWorkbenchPart::Pointer sou
 
 void QmitkSegmentationView::Activated()
 {
-  if(m_MultiWidget)
-    m_MultiWidget->SetWidgetPlanesVisibility(false);
-
+  // should be moved to ::BecomesVisible() or similar
   if( m_Controls )
   {
     m_Controls->m_ManualToolSelectionBox->setEnabled( true );
@@ -788,8 +769,6 @@ void QmitkSegmentationView::Activated()
 
 void QmitkSegmentationView::Deactivated()
 {
-  this->GetActiveStdMultiWidget()->SetWidgetPlanesVisibility(true);
-
   if( m_Controls )
   {
     m_Controls->m_ManualToolSelectionBox->setEnabled( false );

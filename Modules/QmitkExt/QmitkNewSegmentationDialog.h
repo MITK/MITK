@@ -68,9 +68,6 @@ class QMITKEXT_EXPORT QmitkNewSegmentationDialog : public QDialog
   
   protected slots:
 
-    void onOrganImmediatelySelected(const QString& organ);
-    void onOrganSelected(const QString& organ);
-    void onOrganSelected(int index);
     void onNewOrganNameChanged(const QString&);
     void onColorBtnClicked();
     void onColorChange(const QString& completedWord);

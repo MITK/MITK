@@ -12,11 +12,6 @@ SET(CPP_FILES
  #QmitkAlgorithmFunctionalityComponent.cpp
  #QmitkBaseAlgorithmComponent.cpp
  QmitkAboutDialog/QmitkAboutDialog.cpp
- QmitkBaseComponent.cpp
- QmitkBaseFunctionalityComponent.cpp
- QmitkFunctionalityComponentContainer.cpp
-
- QmitkFunctionalityComponents/QmitkThresholdComponent.cpp
 				#QmitkFunctionalityComponents/QmitkSurfaceCreatorComponent.cpp
 							#QmitkFunctionalityComponents/QmitkPixelGreyValueManipulatorComponent.cpp
 								#QmitkFunctionalityComponents/QmitkConnectivityFilterComponent.cpp
@@ -72,7 +67,6 @@ SET(CPP_FILES
  QmitkSelectableGLWidget.cpp
  QmitkToolReferenceDataSelectionBox.cpp
  QmitkToolGUIArea.cpp
- QmitkToolWorkingDataSelectionBox.cpp
  QmitkToolSelectionBox.cpp
  # QmitkPropertyListPopup.cpp
  QmitkToolGUI.cpp
@@ -152,7 +146,16 @@ IF ( NOT ${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.${VTK_BUILD_VERSION} VERSION_
   )
 ENDIF()
 
-
+IF (NOT APPLE)
+SET(CPP_FILES
+  ${CPP_FILES}
+ QmitkBaseComponent.cpp
+ QmitkBaseFunctionalityComponent.cpp
+ QmitkFunctionalityComponentContainer.cpp
+ QmitkFunctionalityComponents/QmitkThresholdComponent.cpp
+ #QmitkToolWorkingDataSelectionBox.cpp
+ )
+ENDIF()
 
 QT4_ADD_RESOURCES(CPP_FILES resources/QmitkResources.qrc)
 
@@ -172,7 +175,6 @@ SET(MOC_H_FILES
  QmitkPropertyObservers/QmitkStringPropertyView.h
  QmitkPropertyObservers/QmitkNumberPropertySlider.h
 
- QmitkFunctionalityComponents/QmitkThresholdComponent.h
 							# QmitkFunctionalityComponents/QmitkSurfaceCreatorComponent.h
 											#QmitkFunctionalityComponents/QmitkPixelGreyValueManipulatorComponent.h
 									# QmitkFunctionalityComponents/QmitkConnectivityFilterComponent.h
@@ -185,9 +187,6 @@ SET(MOC_H_FILES
 
  #QmitkAlgorithmFunctionalityComponent.h
  #QmitkBaseAlgorithmComponent.h
- QmitkBaseComponent.h
- QmitkBaseFunctionalityComponent.h
- QmitkFunctionalityComponentContainer.h
  QmitkStandardViews.h
  QmitkStepperAdapter.h
  QmitkSliderNavigatorWidget.h
@@ -204,7 +203,6 @@ SET(MOC_H_FILES
  QmitkToolReferenceDataSelectionBox.h
  QmitkToolSelectionBox.h
  # QmitkPropertyListPopup.h
- QmitkToolWorkingDataSelectionBox.h
  #QmitkSelectableGLWidget.h
  QmitkNewSegmentationDialog.h
  QmitkPaintbrushToolGUI.h
@@ -226,6 +224,16 @@ IF ( NOT ${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.${VTK_BUILD_VERSION} VERSION_
   )
 ENDIF()
 
+IF (NOT APPLE)
+SET(MOC_H_FILES
+  ${MOC_H_FILES}
+ QmitkBaseComponent.h
+ QmitkBaseFunctionalityComponent.h
+ QmitkFunctionalityComponentContainer.h
+ QmitkFunctionalityComponents/QmitkThresholdComponent.h
+ #QmitkToolWorkingDataSelectionBox.h
+)
+ENDIF()
 
 SET(UI_FILES
   QmitkSliderNavigator.ui

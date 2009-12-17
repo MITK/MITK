@@ -37,6 +37,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vector>
 #include <qwidget.h>
 
+#include <QBoxLayout>
+
 
 const QSizePolicy preferred(QSizePolicy::Preferred, QSizePolicy::Preferred);
 
@@ -403,18 +405,19 @@ void QmitkFunctionalityComponentContainer::AddComponent(QmitkFunctionalityCompon
     if(m_MaximumWidgedStackSize < stackPage)
     {
       QWidget* w = new QWidget(m_FunctionalityComponentContainerGUI->m_WidgetStack);
-      m_FunctionalityComponentContainerGUI->m_WidgetStack->insertTab(w, label, stackPage);
+      m_FunctionalityComponentContainerGUI->m_WidgetStack->insertTab(stackPage, w, label);
       m_MaximumWidgedStackSize++;
-      m_FunctionalityComponentContainerGUI->m_WidgetStack->setCurrentPage(stackPage);
+      m_FunctionalityComponentContainerGUI->m_WidgetStack->setCurrentIndex(stackPage);
       visibleWidget = m_FunctionalityComponentContainerGUI->m_WidgetStack->currentWidget();
       idVisibleWidget = m_FunctionalityComponentContainerGUI->m_WidgetStack->indexOf(visibleWidget);
-      new QVBoxLayout(visibleWidget, QBoxLayout::TopToBottom);
+      new QVBoxLayout(visibleWidget);
+	  // QT3: new QVBoxLayout(visibleWidget, QBoxLayout::TopToBottom);
     }
 
     QLayout* layout;
     if(m_FunctionalityComponentContainerGUI->m_WidgetStack->layout() == 0)
     {
-      layout = new QVBoxLayout((QWidget*)(m_FunctionalityComponentContainerGUI->m_WidgetStack), QBoxLayout::TopToBottom);
+		layout = new QVBoxLayout( (QWidget*)(m_FunctionalityComponentContainerGUI->m_WidgetStack));
     }
     else 
     {
@@ -451,7 +454,12 @@ void QmitkFunctionalityComponentContainer::CreateNavigationButtons()
 {
   //QBoxLayout * buttonLayout = new QHBoxLayout(GetImageContent()->layout());
   QWidget* funcWidget = (QWidget*)m_FunctionalityComponentContainerGUI;
-  QBoxLayout * buttonLayout = new QHBoxLayout(funcWidget->layout());
+  QLayout *functionalityLayout = funcWidget->layout();
+  QBoxLayout * buttonLayout = new QHBoxLayout(funcWidget);
+  if ( QBoxLayout* boxLayout = dynamic_cast<QBoxLayout*>(functionalityLayout) )
+  {
+    boxLayout->addLayout( buttonLayout );
+  }
   //if(m_BackButton==NULL)
   //{
   //  m_BackButton = new QPushButton("<<", GetImageContent());
@@ -480,7 +488,7 @@ void QmitkFunctionalityComponentContainer::CreateNavigationButtons()
 //  connect( (QObject*)(m_NextButton),  SIGNAL(pressed()), (QObject*) this, SLOT(NextButtonPressed())); 
 //  connect( (QObject*)(m_BackButton),  SIGNAL(pressed()), (QObject*) this, SLOT(BackButtonPressed())); 
 
-  m_FunctionalityComponentContainerGUI->m_WidgetStack->setCurrentPage(1);
+  m_FunctionalityComponentContainerGUI->m_WidgetStack->setCurrentIndex(1);
   SetWizardText("");
   GetImageContent()->updateGeometry();
   if(m_Spacer != NULL)

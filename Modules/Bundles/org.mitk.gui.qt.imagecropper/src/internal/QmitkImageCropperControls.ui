@@ -140,15 +140,9 @@
     </widget>
    </item>
    <item>
-    <widget class="Q3GroupBox" name="groupInfo" >
+    <widget class="QGroupBox" name="groupInfo" >
      <property name="title" >
       <string/>
-     </property>
-     <property name="frameShape" >
-      <enum>Q3GroupBox::NoFrame</enum>
-     </property>
-     <property name="frameShadow" >
-      <enum>Q3GroupBox::Plain</enum>
      </property>
      <layout class="QVBoxLayout" >
       <item>
@@ -350,12 +344,6 @@ The original image will not be modified, it will only be hidden.</string>
  </widget>
  <layoutdefault spacing="6" margin="11" />
  <customwidgets>
-  <customwidget>
-   <class>Q3GroupBox</class>
-   <extends>QGroupBox</extends>
-   <header>Qt3Support/Q3GroupBox</header>
-   <container>1</container>
-  </customwidget>
   <customwidget>
    <class>QmitkDataStorageComboBox</class>
    <extends>QComboBox</extends>

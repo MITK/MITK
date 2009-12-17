@@ -509,8 +509,8 @@ void mitk::PointSet::ExecuteOperation( Operation* operation )
       //transfer from world to index coordinates 
       this->GetGeometry( timeStep )->WorldToIndex(pt, pt);
 
-      m_PointSetSeries[timeStep]->SetPoint(pointOp->GetIndex(), pt);
-
+      m_PointSetSeries[timeStep]->SetPoint(pointOp->GetIndex(), pt);  // \TODO: does this make sense?
+      m_PointSetSeries[timeStep]->SetPointData(pointOp->GetIndex(), PointDataType());  // insert a default point data object to keep the containers in sync.
       this->OnPointSetChange();
 
       this->Modified();

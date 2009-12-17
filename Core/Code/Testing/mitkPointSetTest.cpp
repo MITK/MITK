@@ -504,6 +504,22 @@ static void TestOpMovePointUpOnFirstPoint(mitk::PointSet *pointSet)
     std::cout<<"[PASSED]"<<std::endl;
     */
 }
+static void TestPointContainerPointDataContainer(mitk::PointSet* ps)
+{
+  mitk::PointSet::PointsContainer* pc = ps->GetPointSet()->GetPoints();
+  mitk::PointSet::PointDataContainer* pd = ps->GetPointSet()->GetPointData();
+  MITK_TEST_CONDITION_REQUIRED(pc->Size() == pd->Size(), "PointContainer and PointDataContainer have same size");
+  mitk::PointSet::PointsContainer::ConstIterator pIt = pc->Begin();
+  mitk::PointSet::PointDataContainer::ConstIterator dIt = pd->Begin();
+  bool failed = false;
+  for (; pIt != pc->End(); ++pIt, ++dIt)
+    if (pIt->Index() != dIt->Index())
+    {
+      failed = true;
+      break;
+    }
+  MITK_TEST_CONDITION(failed == false, "Indices in PointContainer and PointDataContainer are equal");
+}
 };
 
 
@@ -552,10 +568,39 @@ int mitkPointSetTest(int /*argc*/, char* /*argv*/[])
   mitkPointSetTestClass::TestCreateHoleInThePointIDs(pointSet);
   mitkPointSetTestClass::TestOpMovePointUpOnFirstPoint(pointSet);
 
+  MITK_TEST_OUTPUT(<< "Test InsertPoint(), SetPoint() and SwapPointPosition()");
+  mitk::PointSet::PointType point;
+  mitk::FillVector3D(point, 2.2, 3.3, -4.4);
+  /* call everything that might modify PointContainer and PointDataContainer */
+  pointSet->InsertPoint(17, point);
+  pointSet->SetPoint(4, point);
+  pointSet->SetPoint(7, point);
+  pointSet->SetPoint(2, point);
+  pointSet->SwapPointPosition(7, true);
+  pointSet->SwapPointPosition(3, true);
+  pointSet->SwapPointPosition(2, false);
+  mitkPointSetTestClass::TestPointContainerPointDataContainer(pointSet);
+  
+  MITK_TEST_OUTPUT(<< "Test OpREMOVE");
+  mitk::PointOperation op1(mitk::OpREMOVE, mitk::Point3D(), 2); // existing index
+  pointSet->ExecuteOperation(&op1);
+  mitk::PointOperation op1b(mitk::OpREMOVE, mitk::Point3D(), 112); // non existing index
+  pointSet->ExecuteOperation(&op1b);
+  mitkPointSetTestClass::TestPointContainerPointDataContainer(pointSet);
 
-  //well done!!! Passed!
-  std::cout<<"[TEST DONE]"<<std::endl;
-  return EXIT_SUCCESS;
+  MITK_TEST_OUTPUT(<< "Test OpMove");
+  mitk::PointOperation op2(mitk::OpMOVE, mitk::Point3D(), 4);  // existing index
+  pointSet->ExecuteOperation(&op2);
+  mitk::PointOperation op3(mitk::OpMOVE, mitk::Point3D(), 34);  // non existing index
+  pointSet->ExecuteOperation(&op3);
+  mitkPointSetTestClass::TestPointContainerPointDataContainer(pointSet);
 
-  MITK_TEST_END()
+  MITK_TEST_OUTPUT(<< "Test OpINSERT");
+  mitk::PointOperation op4(mitk::OpINSERT, mitk::Point3D(), 38);  // non existing index
+  pointSet->ExecuteOperation(&op4);
+  mitk::PointOperation op5(mitk::OpINSERT, mitk::Point3D(), 17);  // existing index
+  pointSet->ExecuteOperation(&op5);  
+  mitkPointSetTestClass::TestPointContainerPointDataContainer(pointSet);
+
+  MITK_TEST_END();
 }

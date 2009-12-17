@@ -35,7 +35,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkRenderWindowMenu.h"
 
 QmitkRenderWindow::QmitkRenderWindow(QWidget *parent, QString name, mitk::VtkPropRenderer* renderer)
-: QVTKWidget(parent), m_Renderer(renderer), m_ResendQtEvents(true), m_MenuWidgetActivated(false)
+: QVTKWidget(parent), m_Renderer(renderer), m_ResendQtEvents(true), m_MenuWidgetActivated(false), m_MenuWidget(NULL)
 {
   if(m_Renderer.IsNull())
   {
@@ -322,3 +322,20 @@ void QmitkRenderWindow::FullScreenMode(bool state)
   if( m_MenuWidget )
     m_MenuWidget->ChangeFullScreenMode( state );
 }
+  
+QMenu* QmitkRenderWindow::GetCrossHairMenu()
+{
+  if (m_MenuWidget)
+  {
+    return m_MenuWidget->GetCrossHairMenu();
+  }
+}
+  
+void QmitkRenderWindow::SetCrossHairMenu(QMenu* menu)
+{
+  if (m_MenuWidget)
+  {
+    m_MenuWidget->SetCrossHairMenu( menu );
+  }
+}
+

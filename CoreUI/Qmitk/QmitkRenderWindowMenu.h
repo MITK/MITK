@@ -196,7 +196,12 @@ public:
   };
 
 
+  QMenu* GetCrossHairMenu();
+  void SetCrossHairMenu(QMenu* menu);
+
 protected:
+
+  QMenu* CreateCrosshairMenu();
 
   QPushButton*        m_CrosshairModeButton;
 
@@ -247,6 +252,8 @@ protected:
 
   /*! QMenu containg all layout direction and layout design settings.*/
   QMenu*              m_Settings;
+  
+  QMenu*              m_CrosshairMenu;
 
   /*! Index of layout direction. 0: transversal; 1: saggital; 2: coronal; 3: threeD */
   unsigned int        m_Layout;

@@ -49,6 +49,7 @@ class QMITK_EXPORT QmitkStdMultiWidget : public QWidget
 public:
 
   QmitkStdMultiWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
+  virtual ~QmitkStdMultiWidget();
 
   mitk::SliceNavigationController*
   GetTimeNavigationController();

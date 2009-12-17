@@ -64,6 +64,7 @@ void mitk::NavigationData::Graft( const DataObject *data )
   this->SetHasPosition(nd->GetHasPosition());
   this->SetHasOrientation(nd->GetHasOrientation());
   this->SetCovErrorMatrix(nd->GetCovErrorMatrix());
+  this->SetName(nd->GetName());
 }
 
 

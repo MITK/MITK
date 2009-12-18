@@ -5,7 +5,8 @@
   <extension point="org.opencherry.ui.views">
     <view id="objectbrowser"
           name="Object Browser"
-          class="cherry::ObjectBrowserView" />
+          class="cherry::ObjectBrowserView"
+		  icon="resources/ObjectBrowser.png" />
   </extension>
 
 </plugin>

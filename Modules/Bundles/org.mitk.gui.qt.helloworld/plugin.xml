@@ -11,6 +11,7 @@
       id="org.mitk.views.helloworld" 
       name="Hello World" 
       category="org.mitk.views.general" 
+      icon="resources/HelloWorld.png"
       class="QmitkHelloWorldView" />
   </extension>
   

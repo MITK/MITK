@@ -20,7 +20,7 @@ SET(RES_FILES
 )
 
 SET(RESOURCE_FILES
-  resources/igt-tutorial-icon.png
+  resources/ImageGuidedTherapy.png
 )
 
 SET(CPP_FILES manifest.cpp)

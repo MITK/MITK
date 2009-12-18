@@ -8,8 +8,403 @@ of release notes for the next release.
 
 ======== New stuff only in the SVN trunk ========
 
-- more flexible GUI presentation of renderwindows
 
+======== Changes in Release 0.14 ========
+ - MinGW support (see "http://www.mitk.org/wiki/MinGW Instructions" for details)
+ - build system refactoring. MITK has now a small Core and multiple add-on modules
+ - Diffusion Imaging module
+ - Scene Serialization module that is able to serialize a DataStorage including all data objects and the properties into a file
+ - New GPGPU module for GPU-accelerated image processing (Experimental, still work in progress)
+ - new logging system 'mbilog'
+ 
+Application Framework:
+ - Qmitk is now Qt4 based
+ - Official support for the application framework openCherry (see http://www.mitk.org/wiki/OpenCherry and http://www.blueberry-project.org)
+ - New extensible application based on Qt4 and openCherry, called ExtApp
+ - Support for "Perspectives", "Intros", "Sticky Views", and more
+ - PlanarFigure framework to represent 2D geometric planar figures (lines, circles, polygons, ...)
+ - DataTree is deprecated. The ExtApp uses only the DataStorage. All other components (rendering,...) also use the DataStorage
+ - more flexible GUI presentation of renderwindows
+ 
+IGT:
+ - Virtual Tracking Device class that moves virtual tools on random spline paths
+ - Improved handling of wired tools for NDI Aurora
+ - Improvements for NavigationDataLandmarkTransformFilter
+ - New filter: NavigationDataToMessageFilter throws events if NavigationData properties change
+ - Many new unit tests
+ - Improved IGT Example view, 
+ - Tutorials and examples are ported to new openCherry based ExtApp
+ 
+ 
+ 
+The following bug reports were resolved since release 0.12.2:
+
+Application modules:
+	"Global Reinit" Button in RigidRegistration does not work
+	"New segmentation" not disabled when no image is selected.
+	"Reinit" warning visible too long
+	3M-Application crashes upon closing, when segmentation bundle was active
+	BasicImageProcessing has unneccessary dependencies
+	Change Layout of DeformableRegistration
+	Change Layout of PointBasedRegistration
+	Change Layout of RigidRegistration
+	Changes in PointListWidget are not immediately shown in render windows
+	Crash in Deformable Registration upon Calculate Transformation
+	Crash in Rigid Registration - Deformable Registration when out of memory
+	Crash when open new segmentation dialog
+	Crash when opening Isosurface plugin
+	Create view for position and time sliders
+	Data Manager Behaviour when deleting multiple Objects
+	Data Manager: layer change by moving images does not work as expected
+	Datamanager property editing
+	DICOM Browser Widget / View
+	Do not allow 4D data for registration modules
+	Documentation of Segmentation Module
+	Enable volume rendering for segmentations
+	File open dialog should remember last path
+	Filename escaping?
+	Handle out-of-memory situations
+	icon of Volumen Visualization perspective is not display
+	ImageNavigator does not show up correctly
+	Improve handling of QCH files in the help system
+	InteractiveSegmentation: Surface tool doesn't produce result
+	Line-edits shrink too much when there is not enough space
+	Link to feedback form on welcome view and help pages
+	Manual contouring of 2D images not working
+	Manual Registration is not considered for later automatic registration
+	Measurement view: can not activate tools other than line
+	Mouse pointer for crosshair rotation is wrong
+	Organize shape models distribution
+	Perspective for Registration
+	Points unknown to bundle after loading PointSet
+	Polygons do not throw initialized event
+	Problems when activating Pointbased Registration after deactivation.
+	QmitkBasicImageProcessing bundle
+	QmitkSlicesInterpolator: existence of multi-widget not guaranteed anymore
+	Registration: GUI layout
+	Registration: progress bar
+	RenderWindows are not shown properly after splash screen
+	Rigid Registration bundle crashes constantly
+	Save 3D+t Data in Chili-Plug-In destroys the data in the data tree
+	Segmentation bundle: Lymph Node shapemodel segmentation spams an error message
+	Segmentation module 
+	Segmentation tools are disabled
+	Segmentation View: GUI improvements
+	Segmentation View: new Lymph Lesion is not automatically selected in the datamanager
+	Segmentation view: new lymph node is not visible after creation
+	Segmentation View: progress bar for long running algorithms
+	Serialization of Planar Figures
+	Show only selected reference image for segmentation module
+	TotalVariationFilter used in BasicImageProcessing is internal
+	Use ImageMasks for RigidRegistration
+	Which models to integrate for release?
+	DataManager
+	After changing the "DataStorageSelection", properties not changable
+	Auto-expand tree node if new child is added
+	Crash when closing PropertyList view
+	Data Name should not be changed if selected node clicked once
+	DataManager Documentation
+	Default answer in remove dialog to yes
+	delete-key removes the name of the node
+	Global reinit does not reduce the geometry extend
+	global reinit when visibility toggled
+	No icon appears in front of surfaces inside the Datamanager
+	No limits for specific properties
+	Offer 'segmentation postprocessing' via context menu
+	renderWindows not updated when visibility toggled
+	Restore "Info" Button in DataManager
+	Save button triggers series of questions
+	Show relevant properties and make them editable in DataManager context menu
+	4D support for Segmentation bundle: Lymph node part;
+	4D support for Segmentation bundle: Shape Model part
+	Doxygen user manual for org.mitk.gui.qt.segmentation
+	Enable slice interactor while shape model placement
+	Fix 0.5-pixel offset issues
+	Initialize shape model matrix by image
+	MITK crashes on close after some Bundles have been closed
+	New icons for segmentation tools
+	org.mitk.gui.qt.segmentation should not ask for organ type, but for a name/color combination
+	org.mitk.gui.qt.segmentation should send openCherry selection events for segmentations
+	Possible varible overflow in region growing
+	screen-size should not be a limit during region growing in InteractiveSegmentation
+	Severe memory leak in Segmentation: Shape Model part
+	Shape Model disappeares when selecting it in data manager
+	Shape model part: Abort button crashes
+	Statistics / Histogram tool for segmentations
+	Use binary shape models always
+
+
+Build System:
+	assistant.exe not included in installer
+	Comment out misleading options MITK_ITK_SOURCE_DIR for CMake GUI
+	Doxygen is not generated correctly.
+	License in installer is wrapped too often
+	Qt Module build system does not allow Qt Resource files
+	vtkQtChart classes (for new vtk based Histogram) are only available for VTK >= 5.4
+
+Core Application
+	MainApp starts above desktop boundary
+	Add menu entry and shortcut for help pages
+	Add quick&dirty toolbar for undo, crosshair visibility etc.
+	Application Frame: Buttons for File Open, Save Project, Undo-Redo
+	Application Frame: StartView when launching the application the first time
+	Application Frame: Uniform button / icon design
+	BasicImageProcessing Documentation
+	Calling SwapPointPosition in PointSet deletes one of the points
+	Core App Home Button behaves unexpexted
+	CPack Installer System for QT4 Applications
+	Drag and drop file loading for Qt4 application
+	Enable 4D images in RigidRegistration
+	Extend information shown on surfaces
+	Fail to start App with generated Batch files
+	It is not possible to use mouse wheel events in interactors
+	LevelWindow widget does not show up on CoreApp
+	Measurement documentation
+	Measurement: The area of polygon figure is negative
+	Memory consumption should be shown in status bar
+	MITK can open *.nii images but it is not selectable from open dialog
+	mitkPointSetWriterTest
+	Neuro module 
+	No version number in MainApp?
+	Preferences store
+	Registration module documentation
+	Rework Build Instruction Documentation of MITK
+	Segmentation documentation
+	Segmentation of tubular structures
+	Segmentation of tubular structures documentation
+	Show standard file open dialog
+	View are not initialized correctly when loading a dataset
+	Volume visualisation documentation
+
+MITK Core
+	Tutorial steps 4 to 8 do not build
+	CopyInformation of mitk::BaseData missing
+	Redesign PrintSelf() Methods of the Geometries
+	Image interpolation failing in rotated images
+	Correctly initialize data objects (and reinitialize after clear)
+	Clean up basic data classes from unnecessary header includes...
+	Controlled initialization of EventMapper and StateMachines
+	PrintSelf of emtpy surfaces crashes
+	Add SetPoints() method to mitkPointLocator which takes itk PointSets
+	BackTransform in Geometry3D still uses the unstable ITK Matirx inversion
+	Test for mitkLookupTable
+	Add missing Pixel access Method to mitk::Image
+	DICOM loading issues
+	mitk::WeakPointer conditional jump depends on uninitialized variable
+	DataTreeNode should raise modified event whenever the Node`s property list was modified
+	RGB images are reduced to grayscale in 3D views
+	Cleanup and document mitk::Transferfunction
+	Create unit test for mitk::TransferFunction
+	Implement conversion of time steps between TimeSlicedGeometry objects
+	Basic interface for object picking
+	MITK crashes at startup on a remote X window server
+	GPGPU support via GLSL in Mitk
+	printf and sprintf header not included in some code
+	Global Reinit behaviour
+	Volume rendering takes huge amount of memory
+	CopyInformation of mitk::Surface missing
+	mitk::SurfaceToSurfaceFilter modified if nothing really changed
+	Extending the MITK Factory Mechanism
+	Diffusion-Tensor Pixeltype
+	Clean up ImageDataItem
+	Additional vector lengths should be allow by Pixeltype
+	Volume Calculater Filter doesn't work on 4D series
+	Extend NavigationDataToMessageFilter to be able to have multiple inputs
+	Enable Poco TestRunners on all platforms
+	add PrintSelf() method to mitk::PointSet
+	Extend mitk::GenericLookupTable
+	allow 3 parameters for AccessByItk macros
+	PointContainer and PointDataContainer get asynchron when mitk::PointSet::SetPoint() or mitk::PointSet::InsertPoint() are called
+	mitk::PointSet::GetPoint( int position, int t = 0 ); is misleading
+	OpMOVEPOINTUP and OpMOVEPOINTDOWN operations are broken in mitk::PointSet
+	Fix GenericLookupTable and GenericLoopupTableProperty
+	Throw meaningful exceptions in DataStorage
+	fix == operator of properties that use smartpointers
+	Geometry2D::PrintSelf() should call PrintSelf of its superclass
+	GlobalInteraction destructor can cause application crash
+	Unable to change surface color through DataManager
+	impropriate way of using std::vector
+	Check cyclic reference problem in the state machine
+	Maximize button for renderwindows in multiwidget
+	ITK 3.16 compatibility needs changes in MITK code
+	Check if all fopen calls are followed by fclose
+	ImageMapper2D should support line width property
+	Check CMake changes to use ITK Review Statistics
+	Change progress bar default assumption on threading
+	Clean implementation of mitk::ProgressBar
+	Geometry is not returned as TimeSlicedGeometry in DataStorage::ComputeBoundingGeometry3D
+	enhanced StateMachine.xml for seedpoints and boundingbox interaction
+
+Core UI
+	Adapt QmitkStdMultiWidgetEditor to change in IPartListener
+	Add convenient method for busy cursor to QmitkFunctionality
+	Add names for the render windows
+	Add tooltips to icons in toolbar
+	Allow File/Open for scene serializations
+	Application crash when closing StdMultiWidget
+	Button to switch back to 4-window layout sometimes does not work
+	Close Project Button
+	Crosshair flag in the context menu is not updated
+	Enable Save/Load from scene files in the main menu
+	Enlarge StdMultiWidget when the level window is not visible
+	File open should allow the generation of multiple DataTreeNodes
+	Loading a scene file with drag and drop
+	Loading a scene/project file does not reinit the views
+	move QmitkPointListWidget and related classes from CoreUI to QmitkExt
+	New (slot) method in QmitkDataStorageComboBox
+	QmitkDataStorageComboBox does not emit a signal when last node is removed
+	QmitkFunctionality and QmitkStdMultiWidgetEditor have buggy destructors
+	QmitkFunctionality methods need to be virtual
+	QmitkStdMultiWidget cannot be initialized
+	LevelWindow uses deprecated signals of QLineEdit
+	Range slider for two values
+	Re-enable options for crosshair (show/hide, rotation)
+	Remove not working buttons of the Menu Widget and show the menu just in a defined region
+	Segmentation fault when adding a PointData in the DataStorage
+	StatusBar and ProgressBar is missing in new ExtApp
+	StatusBar should show pixel values when clicking into render window
+	View change does not work correctly
+	Wrong position of the MenuWidget
+
+Diffusion Imaging
+	Add extensions *.qbi, dwi and dti to Open Dialog
+	After closing all tabs, diffusion imaging becomes unusable
+	Custom Property Editor for Controlling ODF-Visualization
+	DicomImport statusbar support verbessern
+	Reinit nach import der dicom daten
+
+IGT
+	Adapt the unit test for the NavigationDataLandmarkTransformFilter
+	Autodetect if Polaris or Aurora is connected
+	Create a new module IGTUI
+	Enable unit testing for IGT module
+	error in calculation of orientation in NavigationDataLandmarkTransformFilter
+	fix code in TrackingDeviceConfigurationWidget
+	Implement new widget QmitkTrackingDeviceWidget
+	mitk::TimeStamp needs a method to retrieve relative timespan
+	NavigationDataObjectVisualizationFilter does not set the vtkMatrix of the representation object geometry
+	Open dialog filter error
+	Port IGT-Example to OpenCherry
+	Remove BUILD_IGT variable; always enable IGT Modules
+	remove dependency to atlstr.h
+	rename and improve RandomTrackingDevice
+	TrackingDeviceSource should report its state
+	unit test for mitk tracking base classes
+	unit test for NDI tracking classes
+	unit tests for navigation data player & recorder filters
+	use export macro mechanism correctly
+	Use splines for random/virtual tracking device
+	Wrong delete operator in NDIPassiveTool destructor
+
+MITK Ext
+	"Closed" state of PlanarPolygon is not correctly restored when loading
+	Add .zip support to POCO
+	Add 3D+t support to ImageStatistics module
+	Allow PlanarFigur representations to consist of multiple PolyLine
+	Correct initialization of PlanarFigures
+	Create scene serialization prototype
+	Extend PlanarFigure interface to allow retrieval of feature measurements
+	Fix MitkExt tests
+	Fix warnings in VolumeVisualizationImagePreprocessor
+	Generate output image with same pixel type as reference input image in mitk::SurfaceToImageFilter
+	Imlement PlanarFourPointAngle
+	Implement class for calculating volumes and centroids of labeled image
+	Implement interactors for object transformation in 3D windows
+	Implement volume clipping by means of height-field surface
+	Issue notification when PlanarFigure changes
+	Make sure that PlanarFigures can be re-discovered in a scene
+	mitk::SurfaceToImageFilter fails for non-time-resolved reference Images
+	mitk::SurfaceToImageFilter fails for unsigned / char images
+	PlanarCircles are distorted in anisotropic images
+	PlanarFigureMapper should create default properties
+	PrintSelf() of PlanarFigure subclasses repeats information
+	Redesign of UnstructedGridWriterTest
+	Refactore the mitkKeyEvent class
+	remove mitk::DelegateProperty
+	Squash moccing warning
+	Statistics: Progress events are still being sent long after calculation has been finished
+	unit tests of MitkExt don't run
+	Use different default color for PlanarFigure lines and markers?
+
+openCherry
+	Add save/restore program state capability
+	Add sticky view support
+	Cherry crash after failed library load
+	Closing detached windows crashes on Windows
+	Crash in cherryInternalPlatform.cpp when OPENCHERRY_DEBUG_SMARTPOINTER is activated
+	Crash of Preference Service while reading illegal .xml
+	Dragging editor out of the WorkbenchWindow should not be possible
+	Enable a way to execute code in the UI thread
+	enable scrolling for Bundles
+	ExtApp/CoreApp do not start, if %homedrive% is unavailable
+	FindViewReference is called wrong in cherryWorkbenchPage
+	Help support in the workbench
+	Implement a "Exit" Menu Item (Hack)
+	ISelectionService::GetSelection (const std::string &partId) crashes
+	Modules in the Show View menu should be sorted
+	Move Log View and related classes in a separate plug-in
+	Non-existing "bin" directory in bundles aborts the whole startup process
+	openCherry Intro support
+	openCherry.application command line argument not honoured
+	Opening and closing a second workbench window crashes
+	Plugin org.opencherry.ui, extension org.opencherry.ui.views, id org.opencherry.ui.internal.introview: Unknown extension tag found: stickyView
+	QtMissingImageDescriptor does not create the an image
+	Restructure the org.mitk.gui.qt.application Bundle
+	ExtApp crashes during closing
+	SelectionService is zero when referenced in parts during workbench restore
+	Shell activation events not sent
+	Size grips are not available after switching perspectives
+	Standalone views are not layed out correctly
+	Support size hints from workbench parts
+	The modules Visible() method is called before the other modules Hidden() method
+	Unit-Testing infrastructure for openCherry
+	WorkbenchPart instances are not destroyed
+	Zero - check for introPart is missing in Destructor of cherryEditorIntroAdapter
+
+QmitkExt
+	Make volume visualization more user friendly and usable
+	Volumen Visualization-> GPU checkbox is added
+	add .h file for save and load transferfunctions
+	add QxtSlider in Volume Visualization Bundle
+	App crashes when loading an image after closing ImageNavigator
+	Change icon of VolumeVisualization bundle
+	crash if you rotate
+	Crosshair stuck when using Segmentation perspective
+	Crosshair switches to not shown on every perspective change
+	Implement new general purpose histogram widget
+	painter.restore is missing
+	Perspective for Volume Visualization Bundle
+	PointlistWidget does not support deleting points
+	PointlistWidget should emit a signal if point selection changes
+	Port Qmitk/QmitkExt to Qt4 without QT3SUPPORT
+	QmitkMovieMaker stop button
+	Red green flag doesn't work in all circumstances
+	The user manual is not generated anymore
+	Toggling Image selector and toggling it again leads to crash
+	User interface documentation
+
+Rendering
+	Error when activating VolumeRendering with mr dataset
+	High Resolution Screenshots
+	mitk::PointSetVtkMapper3D does not notice, if points are deleted from pointset
+	MPR displays pixel brightness mismatch
+	some binary image do not show up in 3D planes
+	Volume Rendering not working for 2D images
+
+Testing
+	Create a test file for unstructured grid data
+	Fix mitkSceneIOTest
+	Point Operation deleted twice in PointSetTest
+	Register MITK-Logging backend in Testdriver
+	Write Unit test for mitkToolManager class
+
+Utilities
+	Remove Annoying mbilog warnings
+	Bundle generator should create view icon declaration
+	Enabling MBILOG_ENABLE_DEBUG_MESSAGES in CMake leads to errors
+
+
+	
 ======== Changes in release 0.12.2 (2009-Jun-12) ========
 
 0.12.2 is a bugfix release for 0.12. Issues fixed:

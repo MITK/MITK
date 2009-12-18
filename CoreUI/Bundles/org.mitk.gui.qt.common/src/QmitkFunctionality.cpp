@@ -177,7 +177,7 @@ void QmitkFunctionality::PartActivated( cherry::IWorkbenchPartReference::Pointer
       m_DeactivatedFunctionality->m_IsActive = false;
       m_DeactivatedFunctionality->Deactivated();
     }
-    m_DeactivatedFunctionality = 0;
+
     m_IsActive = true;
     this->Activated();
   }
@@ -208,6 +208,13 @@ void QmitkFunctionality::PartClosed( cherry::IWorkbenchPartReference::Pointer pa
     // if no other multi widget is available inform plugins bout that
     if(this->GetActiveStdMultiWidget() == 0)
       this->StdMultiWidgetNotAvailable();
+  }
+  else if(partRef->GetPart(false) == m_DeactivatedFunctionality)
+  {
+    m_DeactivatedFunctionality->Deactivated();
+    m_DeactivatedFunctionality = 0;
+    m_VisibleFunctionalities.erase(partRef->GetId());
+    this->ActivateLastVisibleFunctionality();
   }
 }
 

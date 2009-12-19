@@ -4,7 +4,8 @@
   <extension point="org.opencherry.ui.views">
     <view id="org.mitk.views.simpleexample"
           name="Simple Example"
-          class="::QmitkSimpleExampleView" />
+          class="::QmitkSimpleExampleView"
+		  icon="resources/SimpleExample.png" />
   </extension>
 
 </plugin>

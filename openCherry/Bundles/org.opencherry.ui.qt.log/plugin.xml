@@ -9,6 +9,7 @@
       id="org.opencherry.views.logview"
       name="Log View"
       category="org.opencherry.views.general"
-      class="cherry::LogView" />
+      class="cherry::LogView"
+	  icon="resources/LogView.png" />
   </extension>
 </plugin>

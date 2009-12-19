@@ -16,6 +16,7 @@ SET(MOC_H_FILES
 )
 
 SET(RESOURCE_FILES
+  resources/SimpleExample.png
 # list of resource files which can be used by the plug-in
 # system without loading the plug-ins shared library,
 # for example the icon used in the menu and tabs for the

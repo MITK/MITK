@@ -17,6 +17,10 @@ SET(MOC_H_FILES
   src/internal/cherryQtObjectTableModel.h
 )
 
+SET(RESOURCE_FILES
+  resources/ObjectBrowser.png
+)
+
 SET(RES_FILES
   resources/opencherry_ui_qt_objectinspector.qrc
 )

@@ -16,10 +16,6 @@ SET(MOC_H_FILES
   src/internal/cherryQtPlatformLogModel.h
 )
 
-SET(RESOURCE_FILES
-  resources/LogView.png
-)
-
 SET(UI_FILES
   src/internal/cherryQtLogView.ui
 )

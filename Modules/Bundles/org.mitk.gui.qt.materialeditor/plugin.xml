@@ -4,8 +4,7 @@
   <extension point="org.opencherry.ui.views">
     <view id="org.mitk.views.mitksurfacematerialeditor"
           name="Surface Material Editor"
-          class="::QmitkMITKSurfaceMaterialEditorView"
-          icon="resources/SurfaceMaterialEditor.png" />
+          class="::QmitkMITKSurfaceMaterialEditorView" />
   </extension>
 
 </plugin>

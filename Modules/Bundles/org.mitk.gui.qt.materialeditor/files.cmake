@@ -15,10 +15,6 @@ SET(MOC_H_FILES
   src/internal/QmitkMITKSurfaceMaterialEditorView.h
 )
 
-SET(RESOURCE_FILES
-  resources/SurfaceMaterialEditor.png
-)
-
 SET(RES_FILES
   resources/QmitkMITKSurfaceMaterialEditorView.qrc
 )

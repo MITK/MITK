@@ -10,7 +10,7 @@
       id="org.mitk.views.simplemeasurement" 
       name="SimpleMeasurement" 
       category="org.mitk.views.general" 
-      icon="resources/SimpleMeasurement.png"
+      icon="resources/icon.xpm"
       class="QmitkSimpleMeasurement" />
   </extension>
   

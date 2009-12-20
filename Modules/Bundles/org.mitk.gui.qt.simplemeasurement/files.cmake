@@ -15,7 +15,7 @@ SET(MOC_H_FILES
 )
 
 SET(RESOURCE_FILES
-  resources/SimpleMeasurement.png
+  resources/icon.xpm
 )
 
 SET(RES_FILES

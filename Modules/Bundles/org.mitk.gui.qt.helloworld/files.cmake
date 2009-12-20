@@ -10,10 +10,6 @@ SET(INTERNAL_CPP_FILES
  
 )
 
-SET(RESOURCE_FILES
-  resources/HelloWorld.png
-)
-
 SET(CPP_FILES manifest.cpp)
 
 foreach(file ${SRC_CPP_FILES})

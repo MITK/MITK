@@ -6,7 +6,7 @@
     <view id="org.mitk.views.igtexample"
           name="IGT Example"
           class="::QmitkIGTExampleView" 
-		  icon="resources/ImageGuidedTherapy.png"/>
+		  icon="resources/icon.xpm"/>
   </extension>
 
 </plugin>

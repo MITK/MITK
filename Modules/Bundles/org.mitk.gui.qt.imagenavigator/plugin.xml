@@ -6,7 +6,7 @@
     <view id="org.mitk.views.imagenavigator"
           name="Image Navigator"
           class="::QmitkImageNavigatorView" 
-          icon="resources/Slider.png" />
+          icon="resources/icon.xpm" />
   </extension>
 
 </plugin>

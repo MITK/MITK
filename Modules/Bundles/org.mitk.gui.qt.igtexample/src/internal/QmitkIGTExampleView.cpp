@@ -16,7 +16,7 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 #include "QmitkIGTExampleView.h"
 //#include "QmitkIGTExampleViewControls.h"
-#include "resources/icon.xpm"
+//#include "resources/icon.xpm"
 
 #include "QmitkStdMultiWidget.h"
 //#include "QmitkTreeNodeSelector.h"

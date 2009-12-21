@@ -23,11 +23,14 @@ void QmitkExtDefaultPerspective::CreateInitialLayout(cherry::IPageLayout::Pointe
 {
   std::string editorArea = layout->GetEditorArea();
 
-  layout->AddStandaloneView("org.mitk.views.datamanager", 
-    false, cherry::IPageLayout::LEFT, 0.3f, editorArea);
+  layout->AddView("org.mitk.views.datamanager", 
+    cherry::IPageLayout::LEFT, 0.3f, editorArea);
 
-  layout->AddStandaloneView("org.mitk.views.imagenavigator", 
-    false, cherry::IPageLayout::BOTTOM, 0.5f, "org.mitk.views.datamanager");
+  cherry::IViewLayout::Pointer lo = layout->GetViewLayout("org.mitk.views.datamanager");
+  lo->SetCloseable(false);
+
+  layout->AddView("org.mitk.views.imagenavigator", 
+    cherry::IPageLayout::BOTTOM, 0.5f, "org.mitk.views.datamanager");
 
   cherry::IFolderLayout::Pointer bottomFolder = layout->CreateFolder("bottom", cherry::IPageLayout::BOTTOM, 0.7f, editorArea);
   bottomFolder->AddView("org.mitk.views.propertylistview");

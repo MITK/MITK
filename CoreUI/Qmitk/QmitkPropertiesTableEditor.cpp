@@ -108,11 +108,12 @@ void QmitkPropertiesTableEditor::init()
 
   _PropertyFilterKeyWordPane->setLayout(_PropertyFilterKeyWordLayout);
   
-  _PropertyFilterKeyWordLayout->setMargin(0);
+  _PropertyFilterKeyWordLayout->setContentsMargins(2, 0, 0, 0);
   _PropertyFilterKeyWordLayout->addWidget(_LabelPropertyFilterKeyWord);
   _PropertyFilterKeyWordLayout->addWidget(m_TxtPropertyFilterKeyWord);
 
   _NodePropertiesLayout->setMargin(0);
+  _NodePropertiesLayout->setSpacing(2);
   _NodePropertiesLayout->addWidget(_PropertyFilterKeyWordPane);
   _NodePropertiesLayout->addWidget(m_NodePropertiesTableView);
 

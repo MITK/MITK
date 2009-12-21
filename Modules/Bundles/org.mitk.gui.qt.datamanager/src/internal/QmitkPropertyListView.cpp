@@ -28,6 +28,7 @@ void QmitkPropertyListView::CreateQtPartControl( QWidget* parent )
   m_NodePropertiesTableEditor = new QmitkPropertiesTableEditor;
 
   QVBoxLayout* layout = new QVBoxLayout;
+  layout->setContentsMargins(0, 1, 0, 0);
   layout->addWidget(m_NodePropertiesTableEditor);
 
   parent->setLayout(layout);

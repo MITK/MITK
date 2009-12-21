@@ -1064,6 +1064,10 @@ bool mitk::NDITrackingDevice::DiscoverWiredTools()
 
   /* if there are port handles that need to be initialized, initialize them. Furthermore instantiate tools for each handle that has no tool yet. */
   std::string ph;
+  
+  /* we need to rember the ports which are occupied to be able to readout the serial numbers of the connected tools later*/
+  std::vector<int> occupiedPorts;
+
   for (unsigned int i = 0; i < portHandle.size(); i += 2)
   {
     ph = portHandle.substr(i, 2);
@@ -1101,13 +1105,19 @@ bool mitk::NDITrackingDevice::DiscoverWiredTools()
     //we have to temporarily unlock m_ModeMutex here to avoid a deadlock with another lock inside InternalAddTool() 
     if (this->InternalAddTool(newTool) == false)
       this->SetErrorMessage("Error while adding new tool");
-
-    //get serial number of tool
+    else occupiedPorts.push_back(i);
+  }
+  
+  
+  //after initialization readout serial numbers of tools
+  for (unsigned int i = 0; i < this->GetToolCount(); i += 2)
+    {
+    ph = portHandle.substr(occupiedPorts.at(i), 2);
     std::string portInfo;
     NDIErrorCode returnvaluePort = m_DeviceProtocol->PHINF(ph, &portInfo);
-    if ((returnvaluePort==NDIOKAY) && (portInfo.size()>31)) newTool->SetSerialNumber(portInfo.substr(23,8));
- 
-  }
+    if ((returnvaluePort==NDIOKAY) && (portInfo.size()>31)) dynamic_cast<mitk::NDIPassiveTool*>(this->GetTool(i))->SetSerialNumber(portInfo.substr(23,8));
+    }
+
   return true;
 }
 

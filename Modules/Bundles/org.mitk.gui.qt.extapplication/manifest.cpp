@@ -18,7 +18,12 @@ PURPOSE.  See the above copyright notices for more information.
 #include <Poco/ClassLibrary.h>
 
 #include "src/QmitkExtApplication.h"
+#include "src/internal/QmitkExtApplicationPlugin.h"
 #include "src/internal/QmitkExtDefaultPerspective.h"
+
+POCO_BEGIN_MANIFEST(cherry::IBundleActivator)
+  POCO_EXPORT_CLASS(QmitkExtApplicationPlugin)
+POCO_END_MANIFEST
 
 POCO_BEGIN_NAMED_MANIFEST(cherryIApplication, cherry::IApplication)
   POCO_EXPORT_CLASS(QmitkExtApplication)

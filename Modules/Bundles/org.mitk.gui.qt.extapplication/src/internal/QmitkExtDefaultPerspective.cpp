@@ -32,7 +32,8 @@ void QmitkExtDefaultPerspective::CreateInitialLayout(cherry::IPageLayout::Pointe
   layout->AddView("org.mitk.views.imagenavigator", 
     cherry::IPageLayout::BOTTOM, 0.5f, "org.mitk.views.datamanager");
 
-  cherry::IFolderLayout::Pointer bottomFolder = layout->CreateFolder("bottom", cherry::IPageLayout::BOTTOM, 0.7f, editorArea);
-  bottomFolder->AddView("org.mitk.views.propertylistview");
-  bottomFolder->AddView("org.opencherry.views.logview");
+  cherry::IPlaceholderFolderLayout::Pointer bottomPlaceholderFolder =
+      layout->CreatePlaceholderFolder("bottom", cherry::IPageLayout::BOTTOM, 0.7f, editorArea);
+  bottomPlaceholderFolder->AddPlaceholder("org.mitk.views.propertylistview");
+  bottomPlaceholderFolder->AddPlaceholder("org.opencherry.views.logview");
 }

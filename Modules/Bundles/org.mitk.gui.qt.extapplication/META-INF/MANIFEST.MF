@@ -3,4 +3,5 @@ Bundle-Name: MITK Ext Application
 Bundle-SymbolicName: org.mitk.gui.qt.extapplication
 Bundle-Version: 1.0.0
 Bundle-Vendor: DKFZ, Medical and Biological Informatics
+Bundle-Activator: QmitkExtApplicationPlugin
 Require-Bundle: org.mitk.gui.qt.ext

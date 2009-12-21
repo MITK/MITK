@@ -221,8 +221,10 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
     binaryImageDataTreeNodeDescriptor->AddAction(m_CreateSmoothSurfaceAction);
     connect( m_CreateSmoothSurfaceAction, SIGNAL( triggered(bool) ) , this, SLOT( CreateSmoothedSurface(bool) ) );
 
-    m_StatisticsAction = new QAction("Statistics", parent);
-    binaryImageDataTreeNodeDescriptor->AddAction(m_StatisticsAction);
+	m_StatisticsAction = new QAction("Statistics", parent);
+	// muellerm, 21.12.09:
+	// changed for 0.14 release: imagestatistics is not open source and thus not available
+    // binaryImageDataTreeNodeDescriptor->AddAction(m_StatisticsAction);
     connect( m_StatisticsAction, SIGNAL( triggered(bool) ) , this, SLOT( ImageStatistics(bool) ) );
    
     m_AutocropAction = new QAction("Autocrop", parent);

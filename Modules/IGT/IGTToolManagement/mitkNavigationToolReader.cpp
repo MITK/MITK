@@ -78,7 +78,7 @@ mitk::NavigationTool::Pointer mitk::NavigationToolReader::ConvertDataTreeNodeToN
   //Calibration File Name
   std::string calibration_filename;
   node->GetStringProperty("toolfileName",calibration_filename);
-  std::string calibration_filename_with_path = mitk::StandardFileLocations::GetInstance()->GetOptionDirectory() + calibration_filename;
+  std::string calibration_filename_with_path = mitk::StandardFileLocations::GetInstance()->GetOptionDirectory() + "\\" + calibration_filename;
   returnValue->SetCalibrationFile(calibration_filename_with_path);
   
   //Calibration File 

@@ -78,6 +78,6 @@ mitk::DataTreeNode::Pointer mitk::NavigationToolWriter::ConvertToDataTreeNode(mi
 std::string mitk::NavigationToolWriter::GetFileWithoutPath(std::string FileWithPath)
   {
   std::string returnValue = "";
-  returnValue = FileWithPath.substr(FileWithPath.rfind("/"), FileWithPath.length());
+  returnValue = FileWithPath.substr(FileWithPath.rfind("/")+1, FileWithPath.length());
   return returnValue;
   }

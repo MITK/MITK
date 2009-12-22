@@ -253,9 +253,20 @@ INSTALL(FILES ${PROJECT_SOURCE_DIR}/Config/mitkRigidRegistrationTestPresets.xml 
 IF(WIN32)
   #QT
   IF(MITK_USE_QT)
-    SET(QT_USE_QTSVG 1)
-	SET(QT_USE_QTOPENGL 1)
+ 	  SET(QT_USE_QTSVG 1)
+	  SET(QT_USE_QTOPENGL 1)
     SET(QT_USE_QT3SUPPORT 1)
+	  SET(QT_USE_QTASSISTANT 1)
+	  SET(QT_USE_QTHELP 1)
+	  SET(QT_USE_QTWEBKIT 1)
+	  IF (QT_PHONON_FOUND)
+	    SET(QT_USE_PHONON 1)
+	  ENDIF()
+	 
+	  IF (QT_QTXMLPATTERNS_FOUND)
+	    SET(QT_USE_QTXMLPATTERNS 1)
+	  ENDIF()
+	
     INCLUDE(${QT_USE_FILE})
     
     SET(qtdebugdlls)
@@ -271,17 +282,28 @@ IF(WIN32)
         LIST(APPEND qtdebugdlls "${QT_INCLUDE_DIR}/../bin/${qtdllname}.dll")
       ELSE()
         STRING(REGEX MATCH ".*4" releasematch ${qtdllname})
-      IF(releasematch)
-        LIST(APPEND qtreleasedlls "${QT_INCLUDE_DIR}/../bin/${qtdllname}.dll")
+        IF(releasematch)
+          LIST(APPEND qtreleasedlls "${QT_INCLUDE_DIR}/../bin/${qtdllname}.dll")
+        ENDIF()
       ENDIF()
-    ENDIF()
     ENDFOREACH(qtlib)
-  
+	
+  	IF(QT_PLUGINS_DIR)
+  	  # install imageformat plugins
+  	  SET(_img_formats qgif qico qjpeg qsvg qtiff)
+  	  FOREACH(_img_format ${_img_formats})
+  	    IF(EXISTS ${QT_PLUGINS_DIR}/imageformats/${_img_format}4.dll)
+  	      INSTALL(FILES ${QT_PLUGINS_DIR}/imageformats/${_img_format}4.dll DESTINATION bin/imageformats CONFIGURATIONS Release)
+  	      INSTALL(FILES ${QT_PLUGINS_DIR}/imageformats/${_img_format}d4.dll DESTINATION bin/imageformats CONFIGURATIONS Debug)
+  		  ENDIF()
+  	  ENDFOREACH()
+  	ENDIF()
+    
     INSTALL(FILES ${qtdebugdlls} DESTINATION bin CONFIGURATIONS Debug)
     INSTALL(FILES ${qtreleasedlls} DESTINATION bin CONFIGURATIONS Release)
-    
-    INSTALL(FILES "${QT_INCLUDE_DIR}/../bin/assistant.exe" DESTINATION bin)
-  
+  	
+  	INSTALL(FILES "${QT_INCLUDE_DIR}/../bin/assistant.exe" DESTINATION bin)
+
   ENDIF(MITK_USE_QT)
  
   #VTK DLLs install target

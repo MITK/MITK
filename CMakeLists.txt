@@ -280,6 +280,8 @@ IF(WIN32)
     INSTALL(FILES ${qtdebugdlls} DESTINATION bin CONFIGURATIONS Debug)
     INSTALL(FILES ${qtreleasedlls} DESTINATION bin CONFIGURATIONS Release)
     
+    INSTALL(FILES "${QT_INCLUDE_DIR}/../bin/assistant.exe" DESTINATION bin)
+  
   ENDIF(MITK_USE_QT)
  
   #VTK DLLs install target

@@ -18,6 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 //Poco headers
 #include "Poco/Zip/Decompress.h"
+#include "Poco/Path.h"
 
 #include "mitkNavigationToolStorageDeserializer.h"
 #include <mitkSceneIO.h>
@@ -44,19 +45,19 @@ mitk::NavigationToolStorage::Pointer mitk::NavigationToolStorageDeserializer::De
     return NULL;
     }
   mitk::NavigationToolReader::Pointer myReader = mitk::NavigationToolReader::New(m_DataStorage);
-  std::string tempDirectory = mitk::StandardFileLocations::GetInstance()->GetOptionDirectory() + "\\" + myReader->GetFileWithoutPath(filename);
+  std::string tempDirectory = mitk::StandardFileLocations::GetInstance()->GetOptionDirectory() + Poco::Path::separator() + myReader->GetFileWithoutPath(filename);
   Poco::Zip::Decompress unzipper( file, Poco::Path( tempDirectory ) );
   unzipper.decompressAllFiles();
 
 
   //create DataTreeNodes using the decomressed storage
   mitk::SceneIO::Pointer mySceneIO = mitk::SceneIO::New();
-  mitk::DataStorage::Pointer readStorage = mySceneIO->LoadScene(tempDirectory + "\\" + myReader->GetFileWithoutPath(filename) + ".storage");
+  mitk::DataStorage::Pointer readStorage = mySceneIO->LoadScene(tempDirectory + Poco::Path::separator() + myReader->GetFileWithoutPath(filename) + ".storage");
   mitk::NavigationToolStorage::Pointer returnValue = mitk::NavigationToolStorage::New();
 
   for(int i=0; i<readStorage->GetAll()->Size(); i++)
     {
-    mitk::NavigationTool::Pointer newTool = myReader->ConvertDataTreeNodeToNavigationTool(readStorage->GetAll()->ElementAt(i));
+    mitk::NavigationTool::Pointer newTool = myReader->ConvertDataTreeNodeToNavigationTool(readStorage->GetAll()->ElementAt(i),tempDirectory);
     if (!returnValue->AddTool(newTool))
       {
       m_ErrorMessage = "Error can't parse data storage!";
@@ -65,7 +66,7 @@ mitk::NavigationToolStorage::Pointer mitk::NavigationToolStorageDeserializer::De
     }
 
   //delete decompressed storage which is not needed any more
-  std::remove((std::string(tempDirectory + "\\" + myReader->GetFileWithoutPath(filename) + ".storage")).c_str());
+  std::remove((std::string(tempDirectory + Poco::Path::separator() + myReader->GetFileWithoutPath(filename) + ".storage")).c_str());
 
   return returnValue;
   }

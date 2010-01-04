@@ -18,6 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 //Poco headers
 #include "Poco/Zip/Decompress.h"
+#include "Poco/Path.h"
 
 //mitk headers
 #include "mitkNavigationToolReader.h"
@@ -53,7 +54,7 @@ mitk::NavigationTool::Pointer mitk::NavigationToolReader::DoRead(std::string fil
   
   //use SceneSerialization to load the DataStorage
   mitk::SceneIO::Pointer mySceneIO = mitk::SceneIO::New();
-  mitk::DataStorage::Pointer loadedStorage = mySceneIO->LoadScene(tempDirectory + "\\" + GetFileWithoutPath(filename) + ".storage");
+  mitk::DataStorage::Pointer loadedStorage = mySceneIO->LoadScene(tempDirectory + Poco::Path::separator() + GetFileWithoutPath(filename) + ".storage");
 
   if (loadedStorage->GetAll()->size()==0 || loadedStorage.IsNull())
     {
@@ -63,15 +64,15 @@ mitk::NavigationTool::Pointer mitk::NavigationToolReader::DoRead(std::string fil
   
   //convert the DataStorage back to a NavigationTool-Object
   mitk::DataTreeNode::Pointer myNode = loadedStorage->GetAll()->ElementAt(0);
-  mitk::NavigationTool::Pointer returnValue = ConvertDataTreeNodeToNavigationTool(myNode);
+  mitk::NavigationTool::Pointer returnValue = ConvertDataTreeNodeToNavigationTool(myNode, tempDirectory);
   
   //delete the data-storage file which is not needed any more. The toolfile must be left in the temporary directory becauses it is linked in the datatreenode of the tool
-  std::remove((std::string(tempDirectory + "\\" + GetFileWithoutPath(filename) + ".storage")).c_str());
+  std::remove((std::string(tempDirectory + Poco::Path::separator() + GetFileWithoutPath(filename) + ".storage")).c_str());
 
   return returnValue;
   }
 
-mitk::NavigationTool::Pointer mitk::NavigationToolReader::ConvertDataTreeNodeToNavigationTool(mitk::DataTreeNode::Pointer node)
+mitk::NavigationTool::Pointer mitk::NavigationToolReader::ConvertDataTreeNodeToNavigationTool(mitk::DataTreeNode::Pointer node, std::string toolPath)
   {
   mitk::NavigationTool::Pointer returnValue = mitk::NavigationTool::New();
   
@@ -105,7 +106,7 @@ mitk::NavigationTool::Pointer mitk::NavigationToolReader::ConvertDataTreeNodeToN
   //Calibration File Name
   std::string calibration_filename;
   node->GetStringProperty("toolfileName",calibration_filename);
-  std::string calibration_filename_with_path = mitk::StandardFileLocations::GetInstance()->GetOptionDirectory() + "\\" + calibration_filename;
+  std::string calibration_filename_with_path = toolPath + Poco::Path::separator() + calibration_filename;
   returnValue->SetCalibrationFile(calibration_filename_with_path);
   
   return returnValue;

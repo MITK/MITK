@@ -16,14 +16,16 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
+//Poco headers
+#include "Poco/Zip/Decompress.h"
+
 //mitk headers
 #include "mitkNavigationToolReader.h"
 #include "mitkTrackingTypes.h"
 #include <mitkStandardFileLocations.h>
 #include <mitkSceneIO.h>
 
-//Poco headers
-#include "Poco/Zip/Decompress.h"
+
 
 mitk::NavigationToolReader::NavigationToolReader(mitk::DataStorage::Pointer dataStorage)
   {

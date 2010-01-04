@@ -16,6 +16,10 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
+//Poco headers
+#include "Poco/Zip/Compress.h"
+
+//mitk headers
 #include "mitkNavigationToolWriter.h"
 #include <mitkStandaloneDataStorage.h>
 #include <mitkProperties.h>
@@ -24,9 +28,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 //std headers
 #include <stdio.h>
-
-//Poco headers
-#include "Poco/Zip/Compress.h"
 
 mitk::NavigationToolWriter::NavigationToolWriter()
   {

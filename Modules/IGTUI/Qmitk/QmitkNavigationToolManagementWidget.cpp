@@ -154,6 +154,8 @@ void QmitkNavigationToolManagementWidget::OnEditTool()
       case mitk::NavigationTool::Unknown:
         m_Controls->m_ToolTypeChooser->setCurrentIndex(3); break;
       }
+
+    m_Controls->m_SurfaceChooser->SetSelectedNode(selectedTool->GetDataTreeNode());
     m_edit = true;
   }
 

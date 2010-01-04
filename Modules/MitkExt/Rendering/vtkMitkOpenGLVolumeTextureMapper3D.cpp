@@ -12,6 +12,9 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
+
+#include <omp.h>
+
 #include "vtkWindows.h"
 #include "vtkMitkOpenGLVolumeTextureMapper3D.h"
 #include "mitkCommon.h"
@@ -80,6 +83,14 @@ char *vtkMitkVolumeTextureMapper3D_FourDependentShadeFP =
 "DP3 temp4, normal, normal;\n"
 "RSQ temp, temp4.x;\n"
 "MUL normal, normal, temp;\n"
+
+
+//"RCP temp4,temp.x;\n"
+
+//"MUL temp2.w,temp2.w,temp4.x;\n"
+
+//"MUL_SAT temp2.w,temp2.w,6.0;\n"
+
 
 "TEX sampleColor, tex0, texture[1], 3D;\n"
 
@@ -997,11 +1008,15 @@ class ScalarGradientCompute
   
   inline void fillSlices(int currentChunkStart,int currentChunkEnd)
   {
-    int z;
-
     offZ=currentChunkStart;
 
-    for(z=currentChunkStart;z<=currentChunkEnd;z++)
+/*
+    int num = omp_get_num_procs();
+    LOG_INFO << "omp uses " << num << " processors";
+*/
+
+    #pragma omp parallel for
+    for(int z=currentChunkStart;z<=currentChunkEnd;z++)
     {
       if(z==0 || z==sizeZ-1)
         computeClamp2D(z);
@@ -1058,7 +1073,7 @@ void vtkVolumeTextureMapper3DComputeScalars( T *dataPtr,
   int sizeY = inputDimensions[1];
   int sizeZ = inputDimensions[2];
 
-  int chunkSize = 32;
+  int chunkSize = 64;
   
   if(fullZ < chunkSize) chunkSize=fullZ;
 
@@ -1077,7 +1092,7 @@ void vtkVolumeTextureMapper3DComputeScalars( T *dataPtr,
 
     while(currentChunk < numChunks)
     {
-      LOG_INFO << "processing chunk " << currentChunk;
+//      LOG_INFO << "processing chunk " << currentChunk;
       
       int currentChunkStart = currentChunk * chunkSize;
       int currentChunkEnd   = currentChunkStart + chunkSize - 1 ;
@@ -1242,26 +1257,22 @@ class RGBACompute
 
   inline void compute1D(int y,int z)
   {
-    int x;
+    int x=0;
     
-    x=0;
     computeClamp(x,y,z);
     x++;
     
-    while(x<sizeX-1)
-    {
+    while(x<sizeX-1) {
       compute(x,y,z);     
       x++;
     }
     
-    if(x<sizeX)
-    {
+    if(x<sizeX) {
       computeClamp(x,y,z);
       x++;
     }
 
-    while(x<fullX)
-    {
+    while(x<fullX) {
       fill(x,y,z);
       x++;
     }
@@ -1269,11 +1280,9 @@ class RGBACompute
 
   inline void fill1D(int y,int z)
   {
-    int x;
+    int x=0;
     
-    x=0;
-    while(x<fullX)
-    {
+    while(x<fullX) {
       fill(x,y,z);
       x++;
     }
@@ -1282,18 +1291,14 @@ class RGBACompute
 
   inline void computeClamp1D(int y,int z)
   {
-    int x;
+    int x=0;
     
-    x=0;
-    
-    while(x<sizeX)
-    {
+    while(x<sizeX) {
       computeClamp(x,y,z);     
       x++;
     }
 
-    while(x<fullX)
-    {
+    while(x<fullX) {
       fill(x,y,z);
       x++;
     }
@@ -1301,18 +1306,14 @@ class RGBACompute
         
   inline void computeClamp2D(int z)
   {
-    int y;
+    int y=0;
 
-    y=0;
-
-    while(y<sizeY)
-    {
+    while(y<sizeY) {
       computeClamp1D(y,z);     
       y++;
     }
     
-    while(y<fullY)
-    {
+    while(y<fullY) {
       fill1D(y,z);
       y++;
     }      
@@ -1320,26 +1321,22 @@ class RGBACompute
   
   inline void compute2D(int z)
   {
-    int y;
-
-    y=0;
+    int y=0;
+    
     computeClamp1D(y,z);     
     y++;
     
-    while(y<sizeY-1)
-    {
+    while(y<sizeY-1) {
       compute1D(y,z);     
       y++;
     }
     
-    if(y<sizeY)
-    {
+    if(y<sizeY) {
       computeClamp1D(y,z);
       y++;
     }
 
-    while(y<fullY)
-    {
+    while(y<fullY) {
       fill1D(y,z);
       y++;
     }      
@@ -1347,11 +1344,9 @@ class RGBACompute
   
   inline void fill2D(int z)
   {
-    int y;
-
-    y=0;
-    while(y<fullY)
-    {
+    int y=0;
+    
+    while(y<fullY) {
       fill1D(y,z);
       y++;
     }      
@@ -1359,18 +1354,14 @@ class RGBACompute
   
   inline void fillSlices(int currentChunkStart,int currentChunkEnd)
   {
-    int z;
-
     offZ=currentChunkStart;
 
-    for(z=currentChunkStart;z<=currentChunkEnd;z++)
+    #pragma omp parallel for
+    for(int z=currentChunkStart;z<=currentChunkEnd;z++)
     {
-      if(z==0 || z==sizeZ-1)
-        computeClamp2D(z);
-      else if(z>=sizeZ)
-        fill2D(z);
-      else
-        compute2D(z);
+      if(z==0 || z==sizeZ-1) computeClamp2D(z);
+      else if(z>=sizeZ)      fill2D(z);
+      else                   compute2D(z);
     }
   }    
 };
@@ -1419,7 +1410,7 @@ void vtkVolumeTextureMapper3DComputeRGBA( unsigned char *dataPtr,
   int sizeY = inputDimensions[1];
   int sizeZ = inputDimensions[2];
 
-  int chunkSize = 32;
+  int chunkSize = 64;
   
   if(fullZ < chunkSize) chunkSize=fullZ;
 
@@ -1438,7 +1429,7 @@ void vtkVolumeTextureMapper3DComputeRGBA( unsigned char *dataPtr,
 
     while(currentChunk < numChunks)
     {
-      LOG_INFO << "processing chunk " << currentChunk;
+//      LOG_INFO << "processing chunk " << currentChunk;
       
       int currentChunkStart = currentChunk * chunkSize;
       int currentChunkEnd   = currentChunkStart + chunkSize - 1 ;

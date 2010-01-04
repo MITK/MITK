@@ -86,7 +86,7 @@ void mitk::GPUVolumeMapper3D::InitGPU()
   GPU_INFO << "initializing hardware-accelerated renderer";
     
   m_MapperGPU = vtkMitkOpenGLVolumeTextureMapper3D::New();
-  m_MapperGPU->SetUseCompressedTexture(true);
+  m_MapperGPU->SetUseCompressedTexture(false);
   m_MapperGPU->SetSampleDistance(1.0); 
  
   m_VolumePropertyGPU = vtkVolumeProperty::New();
@@ -261,6 +261,16 @@ void mitk::GPUVolumeMapper3D::GenerateDataGPU( mitk::BaseRenderer *renderer )
   }
 
   m_VolumeGPU->VisibilityOn();
+
+  bool useCompression = false;
+
+  if( dynamic_cast<mitk::BoolProperty*>(GetDataTreeNode()->GetProperty("volumerendering.gpu.usetexturecompression",renderer)) != NULL
+   && dynamic_cast<mitk::BoolProperty*>(GetDataTreeNode()->GetProperty("volumerendering.gpu.usetexturecompression",renderer))->GetValue() == true )
+  {
+    useCompression = true;
+  }
+  
+  m_MapperGPU->SetUseCompressedTexture(useCompression);
   
   const TimeSlicedGeometry* inputtimegeometry = input->GetTimeSlicedGeometry();
   assert(inputtimegeometry!=NULL);
@@ -519,10 +529,11 @@ void mitk::GPUVolumeMapper3D::SetDefaultProperties(mitk::DataTreeNode* node, mit
   node->AddProperty( "volumerendering.uselod", mitk::BoolProperty::New( false ), renderer, overwrite );
   node->AddProperty( "volumerendering.usegpu", mitk::BoolProperty::New( true ), renderer, overwrite );
 
-  node->AddProperty( "volumerendering.gpu.ambient",  mitk::FloatProperty::New( 0.25f ), renderer, overwrite );
-  node->AddProperty( "volumerendering.gpu.diffuse",  mitk::FloatProperty::New( 0.50f ), renderer, overwrite );
-  node->AddProperty( "volumerendering.gpu.specular", mitk::FloatProperty::New( 0.40f ), renderer, overwrite );
-  node->AddProperty( "volumerendering.gpu.specular.power", mitk::FloatProperty::New( 16.0f ), renderer, overwrite );
+  node->AddProperty( "volumerendering.gpu.ambient",               mitk::FloatProperty::New( 0.25f ), renderer, overwrite );
+  node->AddProperty( "volumerendering.gpu.diffuse",               mitk::FloatProperty::New( 0.50f ), renderer, overwrite );
+  node->AddProperty( "volumerendering.gpu.specular",              mitk::FloatProperty::New( 0.40f ), renderer, overwrite );
+  node->AddProperty( "volumerendering.gpu.specular.power",        mitk::FloatProperty::New( 16.0f ), renderer, overwrite );
+  node->AddProperty( "volumerendering.gpu.usetexturecompression", mitk::BoolProperty ::New( false ), renderer, overwrite );
 
   node->AddProperty( "volumerendering.cpu.ambient",  mitk::FloatProperty::New( 0.10f ), renderer, overwrite );
   node->AddProperty( "volumerendering.cpu.diffuse",  mitk::FloatProperty::New( 0.50f ), renderer, overwrite );

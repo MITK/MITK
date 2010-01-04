@@ -47,7 +47,7 @@ mitk::NavigationTool::Pointer mitk::NavigationToolReader::DoRead(std::string fil
     return NULL;
     }
 
-  std::string tempDirectory = mitk::StandardFileLocations::GetInstance()->GetOptionDirectory();
+  std::string tempDirectory = mitk::StandardFileLocations::GetInstance()->GetOptionDirectory() + "\\" +GetFileWithoutPath(filename);
   Poco::Zip::Decompress unzipper( file, Poco::Path( tempDirectory ) );
   unzipper.decompressAllFiles();
   
@@ -66,7 +66,7 @@ mitk::NavigationTool::Pointer mitk::NavigationToolReader::DoRead(std::string fil
   mitk::NavigationTool::Pointer returnValue = ConvertDataTreeNodeToNavigationTool(myNode);
   
   //delete the data-storage file which is not needed any more. The toolfile must be left in the temporary directory becauses it is linked in the datatreenode of the tool
-  //TODO!
+  std::remove((std::string(tempDirectory + "\\" + GetFileWithoutPath(filename) + ".storage")).c_str());
 
   return returnValue;
   }

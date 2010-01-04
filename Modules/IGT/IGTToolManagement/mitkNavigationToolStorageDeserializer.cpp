@@ -43,14 +43,13 @@ mitk::NavigationToolStorage::Pointer mitk::NavigationToolStorageDeserializer::De
     m_ErrorMessage = "Cannot open '" + filename + "' for reading";
     return NULL;
     }
-
-  std::string tempDirectory = mitk::StandardFileLocations::GetInstance()->GetOptionDirectory();
+  mitk::NavigationToolReader::Pointer myReader = mitk::NavigationToolReader::New(m_DataStorage);
+  std::string tempDirectory = mitk::StandardFileLocations::GetInstance()->GetOptionDirectory() + "\\" + myReader->GetFileWithoutPath(filename);
   Poco::Zip::Decompress unzipper( file, Poco::Path( tempDirectory ) );
   unzipper.decompressAllFiles();
 
 
   //create DataTreeNodes using the decomressed storage
-  mitk::NavigationToolReader::Pointer myReader = mitk::NavigationToolReader::New(m_DataStorage);
   mitk::SceneIO::Pointer mySceneIO = mitk::SceneIO::New();
   mitk::DataStorage::Pointer readStorage = mySceneIO->LoadScene(tempDirectory + "\\" + myReader->GetFileWithoutPath(filename) + ".storage");
   mitk::NavigationToolStorage::Pointer returnValue = mitk::NavigationToolStorage::New();
@@ -66,7 +65,7 @@ mitk::NavigationToolStorage::Pointer mitk::NavigationToolStorageDeserializer::De
     }
 
   //delete decompressed storage which is not needed any more
-  //TODO!
+  std::remove((std::string(tempDirectory + "\\" + myReader->GetFileWithoutPath(filename) + ".storage")).c_str());
 
   return returnValue;
   }

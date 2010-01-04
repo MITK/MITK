@@ -52,6 +52,7 @@ int mitkSurfaceToSurfaceFilterTest(int /*argc*/, char* /*argv*/[])
     return EXIT_FAILURE;
   }
 
+
   std::cout << "Testing if GetInput returns the right Input : " << std::endl;
   if ( filter->GetInput() != surface )
   {
@@ -60,12 +61,14 @@ int mitkSurfaceToSurfaceFilterTest(int /*argc*/, char* /*argv*/[])
   }
   std::cout << "[SUCCESS] : input correct" << std::endl;
 
+
   if ( filter->GetInput(5) != NULL )
   {
     std::cout<<"[FAILED] : GetInput returns inputs that were not set. "<<std::endl;
     return EXIT_FAILURE;
   }
   std::cout << "[SUCCESS] : Input nr.5 was not set -> is NULL" << std::endl;
+
 
   std::cout << "Testing whether Output is created correctly : " << std::endl;
   if ( filter->GetNumberOfOutputs() != filter->GetNumberOfInputs() )
@@ -75,14 +78,26 @@ int mitkSurfaceToSurfaceFilterTest(int /*argc*/, char* /*argv*/[])
   }
   std::cout << "[SUCCESS] : number of inputs == number of outputs." << std::endl;
 
-  filter->Update();
+
   mitk::Surface::Pointer outputSurface = filter->GetOutput(0);
+  if ( outputSurface->GetVtkPolyData()->GetNumberOfPolys() != surface->GetVtkPolyData()->GetNumberOfPolys() )
+  {
+    std::cout << "[FAILED] : number of Polys in PolyData of output != number of Polys in PolyData of input" << std::endl;
+    return EXIT_FAILURE;
+  }
+  std::cout << "[SUCCESS] : number of Polys in PolyData of input and output are identical." << std::endl;
+
+
+
+  filter->Update();
+  outputSurface = filter->GetOutput(0);
   if ( outputSurface->GetSizeOfPolyDataSeries() != surface->GetSizeOfPolyDataSeries() )
   {
     std::cout << "[FAILED] : number of PolyDatas in PolyDataSeries of output != number of PolyDatas of input" << std::endl;
     return EXIT_FAILURE;
   }
   std::cout << "[SUCCESS] : Size of PolyDataSeries of input and output are identical." << std::endl;
+
 
   std::cout << "Testing removeInputs() : " << std::endl;
   unsigned int numOfInputs = filter->GetNumberOfInputs();
@@ -100,6 +115,8 @@ int mitkSurfaceToSurfaceFilterTest(int /*argc*/, char* /*argv*/[])
     return EXIT_FAILURE; 
   }
   std::cout << "[SUCCESS] : existing input was removed correctly." << std::endl;
+
+
   
   std::cout<<"[TEST DONE]"<<std::endl;
   return EXIT_SUCCESS;

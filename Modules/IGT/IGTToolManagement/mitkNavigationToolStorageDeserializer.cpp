@@ -16,8 +16,12 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
+//Poco headers
+#include "Poco/Zip/Decompress.h"
+
 #include "mitkNavigationToolStorageDeserializer.h"
 #include <mitkSceneIO.h>
+#include <mitkStandardFileLocations.h>
 #include "mitkNavigationToolReader.h"
 
 mitk::NavigationToolStorageDeserializer::NavigationToolStorageDeserializer(mitk::DataStorage::Pointer dataStorage)
@@ -32,10 +36,23 @@ mitk::NavigationToolStorageDeserializer::~NavigationToolStorageDeserializer()
 
 mitk::NavigationToolStorage::Pointer mitk::NavigationToolStorageDeserializer::Deserialize(std::string filename)
   {
+  //decomress zip file into temporary directory
+  std::ifstream file( filename.c_str(), std::ios::binary );
+  if (!file.good())
+    {
+    m_ErrorMessage = "Cannot open '" + filename + "' for reading";
+    return NULL;
+    }
+
+  std::string tempDirectory = mitk::StandardFileLocations::GetInstance()->GetOptionDirectory();
+  Poco::Zip::Decompress unzipper( file, Poco::Path( tempDirectory ) );
+  unzipper.decompressAllFiles();
+
+
+  //create DataTreeNodes using the decomressed storage
   mitk::NavigationToolReader::Pointer myReader = mitk::NavigationToolReader::New(m_DataStorage);
   mitk::SceneIO::Pointer mySceneIO = mitk::SceneIO::New();
-  mitk::DataStorage::Pointer readStorage = mySceneIO->LoadScene(filename);
-  if (readStorage.IsNull()) {m_ErrorMessage = "Error: invalid filename!"; return NULL;}
+  mitk::DataStorage::Pointer readStorage = mySceneIO->LoadScene(tempDirectory + "\\" + myReader->GetFileWithoutPath(filename) + ".storage");
   mitk::NavigationToolStorage::Pointer returnValue = mitk::NavigationToolStorage::New();
 
   for(int i=0; i<readStorage->GetAll()->Size(); i++)
@@ -47,6 +64,9 @@ mitk::NavigationToolStorage::Pointer mitk::NavigationToolStorageDeserializer::De
       return NULL;
       }
     }
+
+  //delete decompressed storage which is not needed any more
+  //TODO!
 
   return returnValue;
   }

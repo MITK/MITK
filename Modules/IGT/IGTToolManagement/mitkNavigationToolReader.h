@@ -65,7 +65,8 @@ namespace mitk {
 
     mitk::NavigationTool::Pointer ConvertDataTreeNodeToNavigationTool(mitk::DataTreeNode::Pointer node);
 
-    void WriteFile(std::string filename, std::string content);
+    //################### protected help methods ########################
+    std::string GetFileWithoutPath(std::string FileWithPath);
 
   };
 } // namespace mitk

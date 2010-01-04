@@ -16,10 +16,14 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
+//mitk headers
 #include "mitkNavigationToolReader.h"
 #include "mitkTrackingTypes.h"
 #include <mitkStandardFileLocations.h>
 #include <mitkSceneIO.h>
+
+//Poco headers
+#include "Poco/Zip/Decompress.h"
 
 mitk::NavigationToolReader::NavigationToolReader(mitk::DataStorage::Pointer dataStorage)
   {
@@ -33,13 +37,34 @@ mitk::NavigationToolReader::~NavigationToolReader()
 
 mitk::NavigationTool::Pointer mitk::NavigationToolReader::DoRead(std::string filename)
   {
+  //decompress all files into a temporary directory
+  std::ifstream file( filename.c_str(), std::ios::binary );
+  if (!file.good())
+    {
+    m_ErrorMessage = "Cannot open '" + filename + "' for reading";
+    return NULL;
+    }
+
+  std::string tempDirectory = mitk::StandardFileLocations::GetInstance()->GetOptionDirectory();
+  Poco::Zip::Decompress unzipper( file, Poco::Path( tempDirectory ) );
+  unzipper.decompressAllFiles();
+  
   //use SceneSerialization to load the DataStorage
   mitk::SceneIO::Pointer mySceneIO = mitk::SceneIO::New();
-  mitk::DataStorage::Pointer loadedStorage = mySceneIO->LoadScene(filename);
+  mitk::DataStorage::Pointer loadedStorage = mySceneIO->LoadScene(tempDirectory + "\\" + GetFileWithoutPath(filename) + ".storage");
 
+  if (loadedStorage->GetAll()->size()==0 || loadedStorage.IsNull())
+    {
+    m_ErrorMessage = "Invalid file: cannot parse tool data.";
+    return NULL;
+    }
+  
   //convert the DataStorage back to a NavigationTool-Object
   mitk::DataTreeNode::Pointer myNode = loadedStorage->GetAll()->ElementAt(0);
   mitk::NavigationTool::Pointer returnValue = ConvertDataTreeNodeToNavigationTool(myNode);
+  
+  //delete the data-storage file which is not needed any more. The toolfile must be left in the temporary directory becauses it is linked in the datatreenode of the tool
+  //TODO!
 
   return returnValue;
   }
@@ -81,19 +106,14 @@ mitk::NavigationTool::Pointer mitk::NavigationToolReader::ConvertDataTreeNodeToN
   std::string calibration_filename_with_path = mitk::StandardFileLocations::GetInstance()->GetOptionDirectory() + "\\" + calibration_filename;
   returnValue->SetCalibrationFile(calibration_filename_with_path);
   
-  //Calibration File 
-  std::string calibration_file;
-  node->GetStringProperty("toolfile",calibration_file);
-  WriteFile(calibration_filename_with_path,calibration_file);
-  
   return returnValue;
   }
 
-void mitk::NavigationToolReader::WriteFile(std::string filename, std::string content)
+std::string mitk::NavigationToolReader::GetFileWithoutPath(std::string FileWithPath)
   {
-  /** @brief The log file for the logging method */
-  std::fstream logFile;
-  logFile.open(filename.c_str(), std::ios::out);
-  logFile << content;
-  logFile.close();
+  std::string returnValue = "";
+  returnValue = FileWithPath.substr(FileWithPath.rfind("/")+1, FileWithPath.length());
+  //dirty hack: Windows path seperators
+  if (returnValue.size() == FileWithPath.size()) returnValue = FileWithPath.substr(FileWithPath.rfind("\\")+1, FileWithPath.length());
+  return returnValue;
   }

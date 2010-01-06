@@ -310,7 +310,7 @@ bool mitk::RegionGrowingTool::OnMousePressedOutside(Action* itkNotUsed( action )
       FeedbackContourTool::SetFeedbackContourVisible(true);
       mitk::RenderingManager::GetInstance()->RequestUpdate(positionEvent->GetSender()->GetRenderWindow());
         
-      m_FillFeedbackContour = true;
+        m_FillFeedbackContour = true;
     }
   }
 
@@ -331,28 +331,17 @@ bool mitk::RegionGrowingTool::OnMouseMoved   (Action* action, const StateEvent* 
       const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
       if (positionEvent) 
       {
-        // 1. Calculate new region growing parameters
-        // To fix the problem in  Bug #1540, we implemented a magnification factor for the widening/narrowing of
-        // the threshold window. The magnification factor is "velocityscaling" and has three "gears": factor 1,2 and 5
-        // The factor is being adapted to the mouse movement speed, faster movement means higher magnification.
-
         float screenYDifference = positionEvent->GetDisplayPosition()[1] - m_ScreenYPositionAtStart;
-        int velocityScaling = 1;
-        if(abs(screenYDifference) > 50)
-        {
-          velocityScaling = 2;
-          if(abs(screenYDifference) > 150)
-          {
-            velocityScaling = 5;
-          }
-        }
 
-        m_LowerThreshold = m_LowerThreshold + static_cast<int>( screenYDifference * velocityScaling * m_MouseDistanceScaleFactor );
+        m_LowerThreshold = m_InitialLowerThreshold + static_cast<int>( screenYDifference * m_MouseDistanceScaleFactor );
         if (m_LowerThreshold < 0) m_LowerThreshold = 0;
-        if (m_LowerThreshold > m_DefaultWindow) m_LowerThreshold = m_DefaultWindow;
-        m_UpperThreshold = m_LowerThreshold;
+        if (m_LowerThreshold > m_VisibleWindow / 2) m_LowerThreshold = m_VisibleWindow / 2;
+        
+        m_UpperThreshold = m_InitialUpperThreshold + static_cast<int>( screenYDifference * m_MouseDistanceScaleFactor );
+        if (m_UpperThreshold < 0) m_UpperThreshold = 0;
+        if (m_UpperThreshold > m_VisibleWindow / 2) m_UpperThreshold = m_VisibleWindow / 2;
 
-        // LOG_INFO << "new interval: l " << m_LowerThreshold << " u " << m_UpperThreshold << std::endl;
+        LOG_INFO << "new interval: l " << m_LowerThreshold << " u " << m_UpperThreshold << std::endl;
         
         // 2. Perform region growing again and show the result
         mitkIpPicDescriptor* result = PerformRegionGrowingAndUpdateContour();

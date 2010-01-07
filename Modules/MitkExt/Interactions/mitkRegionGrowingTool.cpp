@@ -21,6 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkBaseRenderer.h"
 #include "mitkRenderingManager.h"
+#include "mitkApplicationCursor.h"
 
 #include "ipSegmentation.h"
 
@@ -38,7 +39,7 @@ mitk::RegionGrowingTool::RegionGrowingTool()
  m_UpperThreshold(200),
  m_InitialLowerThreshold(200),
  m_InitialUpperThreshold(200),
- m_ScreenYPositionAtStart(0),
+ m_ScreenYDifference(0),
  m_OriginalPicSlice(NULL),
  m_SeedPointMemoryOffset(0),
  m_VisibleWindow(0),
@@ -264,8 +265,9 @@ bool mitk::RegionGrowingTool::OnMousePressedOutside(Action* itkNotUsed( action )
     LOG_INFO << "OnMousePressed: point " << positionEvent->GetWorldPosition() << " (index coordinates " << mprojectedPointIn2D << ") IS in reference slice" << std::endl;
 
     // 3.2.1 Remember Y cursor position and initial seed point
-    m_ScreenYPositionAtStart = static_cast<int>(positionEvent->GetDisplayPosition()[1]);
-
+    //m_ScreenYPositionAtStart = static_cast<int>(positionEvent->GetDisplayPosition()[1]);
+    m_LastScreenPosition = ApplicationCursor::GetInstance()->GetCursorPosition();
+    m_ScreenYDifference = 0;
    
     m_SeedPointMemoryOffset = projectedPointIn2D[1] * m_OriginalPicSlice->n[0] + projectedPointIn2D[0];
     m_LastWorkingSeed = m_SeedPointMemoryOffset; // remember for skeletonization
@@ -331,17 +333,20 @@ bool mitk::RegionGrowingTool::OnMouseMoved   (Action* action, const StateEvent* 
       const PositionEvent* positionEvent = dynamic_cast<const PositionEvent*>(stateEvent->GetEvent());
       if (positionEvent) 
       {
-        float screenYDifference = positionEvent->GetDisplayPosition()[1] - m_ScreenYPositionAtStart;
+        ApplicationCursor* cursor = ApplicationCursor::GetInstance();
+        if (!cursor) return false;
+        m_ScreenYDifference += cursor->GetCursorPosition()[1] - m_LastScreenPosition[1];
+        cursor->SetCursorPosition( m_LastScreenPosition );
 
-        m_LowerThreshold = m_InitialLowerThreshold + static_cast<int>( screenYDifference * m_MouseDistanceScaleFactor );
-        if (m_LowerThreshold < 0) m_LowerThreshold = 0;
+        m_LowerThreshold = m_InitialLowerThreshold + static_cast<int>( m_ScreenYDifference * m_MouseDistanceScaleFactor );
+        if (m_LowerThreshold < 1) m_LowerThreshold = 1;
         if (m_LowerThreshold > m_VisibleWindow / 2) m_LowerThreshold = m_VisibleWindow / 2;
         
-        m_UpperThreshold = m_InitialUpperThreshold + static_cast<int>( screenYDifference * m_MouseDistanceScaleFactor );
-        if (m_UpperThreshold < 0) m_UpperThreshold = 0;
+        m_UpperThreshold = m_InitialUpperThreshold + static_cast<int>( m_ScreenYDifference * m_MouseDistanceScaleFactor );
+        if (m_UpperThreshold < 1) m_UpperThreshold = 1;
         if (m_UpperThreshold > m_VisibleWindow / 2) m_UpperThreshold = m_VisibleWindow / 2;
 
-        LOG_INFO << "new interval: l " << m_LowerThreshold << " u " << m_UpperThreshold << std::endl;
+        //LOG_INFO << "new interval: l " << m_LowerThreshold << " u " << m_UpperThreshold << std::endl;
         
         // 2. Perform region growing again and show the result
         mitkIpPicDescriptor* result = PerformRegionGrowingAndUpdateContour();

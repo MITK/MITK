@@ -35,6 +35,9 @@ class QMITK_EXPORT QmitkApplicationCursor : public mitk::ApplicationCursorImplem
   
     virtual void PushCursor(const char* XPM[], int hotspotX, int hotspotY);
     virtual void PopCursor();
+    virtual const mitk::Point2I GetCursorPosition();
+    virtual void SetCursorPosition(const mitk::Point2I&);
+
 
   protected:
   private:

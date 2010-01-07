@@ -52,6 +52,7 @@ void ApplicationCursor::PushCursor(const char* XPM[], int hotspotX, int hotspotY
   else
   {
     LOG_ERROR << "in mitk::ApplicationCursor::PushCursor(): no implementation registered." << std::endl;
+    throw std::logic_error("No implementation registered for mitk::ApplicationCursor.");
   }
 }
 
@@ -64,6 +65,33 @@ void ApplicationCursor::PopCursor()
   else
   {
     LOG_ERROR << "in mitk::ApplicationCursor::PopCursor(): no implementation registered." << std::endl;
+    throw std::logic_error("No implementation registered for mitk::ApplicationCursor.");
+  }
+}
+    
+const Point2I ApplicationCursor::GetCursorPosition()
+{
+  if (m_Implementation)
+  {
+    return m_Implementation->GetCursorPosition();
+  }
+  else
+  {
+    LOG_ERROR << "in mitk::ApplicationCursor::GetCursorPosition(): no implementation registered." << std::endl;
+    throw std::logic_error("No implementation registered for mitk::ApplicationCursor.");
+  }
+}
+    
+void ApplicationCursor::SetCursorPosition(const Point2I& p)
+{
+  if (m_Implementation)
+  {
+    m_Implementation->SetCursorPosition(p);
+  }
+  else
+  {
+    LOG_ERROR << "in mitk::ApplicationCursor::SetCursorPosition(): no implementation registered." << std::endl;
+    throw std::logic_error("No implementation registered for mitk::ApplicationCursor.");
   }
 }
 

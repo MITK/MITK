@@ -39,4 +39,19 @@ void QmitkApplicationCursor::PopCursor()
 {
   QApplication::restoreOverrideCursor();
 }
+    
+const mitk::Point2I QmitkApplicationCursor::GetCursorPosition()
+{
+  mitk::Point2I mp;
+  QPoint qp = QCursor::pos();
+  mp[0] = qp.x();
+  mp[1] = qp.y();
+  return mp;
+}
+
+void QmitkApplicationCursor::SetCursorPosition(const mitk::Point2I& p)
+{
+  QCursor::setPos( p[0], p[1] );
+}
+
 

@@ -45,7 +45,7 @@ SET(MODULE_TESTS
   mitkTransferFunctionTest.cpp
   #mitkAbstractTransformGeometryTest.cpp
   #mitkPicFileIOTest.cpp
-  #mitkStepperTest.cpp
+  mitkStepperTest.cpp
   itkTotalVariationDenoisingImageFilterTest.cpp
 )
 

@@ -6,6 +6,7 @@ SET(MODULE_TESTS
   mitkExternalToolsTest.cpp
   mitkHistogramMatchingTest.cpp
   mitkMeshTest.cpp
+  mitkMultiStepperTest.cpp
   mitkOrganTypePropertyTest.cpp
   mitkPipelineSmartPointerCorrectnessTest.cpp
   mitkPlaneFitTest.cpp

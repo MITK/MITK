@@ -60,9 +60,19 @@ public:
   virtual void SetPos(unsigned int pos) 
   { 
     // copied from itkMacro.h, itkSetClampMacro(...)
-    if (this->m_Pos != (pos > m_Steps-1 ? m_Steps-1 : pos)) 
+	unsigned int newPos;
+	if ( m_Steps != 0 )
+	{
+		newPos = (pos > m_Steps-1 ? m_Steps-1 : pos);
+	}
+	else
+	{
+		newPos = 0;
+	}
+
+    if (this->m_Pos != newPos ) 
     {
-      this->m_Pos = pos > m_Steps-1 ? m_Steps-1 : pos ;
+      this->m_Pos = newPos ;
       this->Modified();
     }
   }

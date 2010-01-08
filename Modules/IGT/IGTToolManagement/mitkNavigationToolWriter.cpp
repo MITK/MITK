@@ -18,6 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 //Poco headers
 #include "Poco/Zip/Compress.h"
+#include "Poco/Path.h"
 
 //mitk headers
 #include "mitkNavigationToolWriter.h"
@@ -47,7 +48,7 @@ bool mitk::NavigationToolWriter::DoWrite(std::string FileName,mitk::NavigationTo
   saveStorage->Add(thisTool);
 
   //use SceneSerialization to save the DataStorage
-  std::string DataStorageFileName = mitk::StandardFileLocations::GetInstance()->GetOptionDirectory() + "\\" + GetFileWithoutPath(FileName) + ".storage";
+  std::string DataStorageFileName = mitk::StandardFileLocations::GetInstance()->GetOptionDirectory() + Poco::Path::separator() + GetFileWithoutPath(FileName) + ".storage";
   mitk::SceneIO::Pointer mySceneIO = mitk::SceneIO::New();
   mySceneIO->SaveScene(saveStorage->GetAll(),saveStorage,DataStorageFileName);
 
@@ -86,6 +87,10 @@ mitk::DataTreeNode::Pointer mitk::NavigationToolWriter::ConvertToDataTreeNode(mi
     thisTool->AddProperty("toolfileName",mitk::StringProperty::New(GetFileWithoutPath(Tool->GetCalibrationFile())));
   //Surface
     thisTool->SetData(Tool->GetDataTreeNode()->GetData());
+
+  //Material is not needed, to avoid errors in scene serialization we have to do this:
+    //thisTool->ReplaceProperty("material",NULL);
+
   return thisTool;
   }
 

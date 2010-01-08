@@ -15,6 +15,10 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
+//Poco headers
+#include "Poco/Path.h"
+
+//mitk headers
 #include "mitkNavigationToolWriter.h"
 #include "mitkCommon.h"
 #include "mitkTestingMacros.h"
@@ -24,10 +28,19 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkBaseData.h"
 #include "mitkDataTreeNode.h"
 #include "mitkSurface.h"
-#include "Poco/Path.h"
+#include "mitkStandaloneDataStorage.h"
+#include "mitkDataStorage.h"
+#include "mitkNavigationToolReader.h"
+
+#include <sstream>
+
 
 class mitkNavigationToolReaderAndWriterTestClass
   {
+  private:
+    
+    static mitk::Surface::Pointer testSurface;
+
   public:
 
     static void TestInstantiation()
@@ -66,7 +79,8 @@ class mitkNavigationToolReaderAndWriterTestClass
         }
       else
         {
-        myNode->SetData(stlReader->GetOutput());
+        testSurface = stlReader->GetOutput();
+        myNode->SetData(testSurface);    
         }
     
     myNavigationTool->SetDataTreeNode(myNode);
@@ -77,22 +91,32 @@ class mitkNavigationToolReaderAndWriterTestClass
 
     //now create a writer and write it to the harddisc
     mitk::NavigationToolWriter::Pointer myWriter = mitk::NavigationToolWriter::New();
-    std::string filename = mitk::StandardFileLocations::GetInstance()->GetOptionDirectory()+Poco::Path::separator()+"TestTool";
-    MITK_TEST_CONDITION_REQUIRED(myWriter->DoWrite(filename,myNavigationTool),"Testing navigation tool writer");
+    std::string filename = mitk::StandardFileLocations::GetInstance()->GetOptionDirectory()+Poco::Path::separator()+".."+Poco::Path::separator()+"TestTool.tool";
+    
+    MITK_TEST_OUTPUT(<<"---- Testing navigation tool writer ----");
+    bool test = myWriter->DoWrite(filename,myNavigationTool);
+    MITK_TEST_CONDITION_REQUIRED(test,"OK");
     }
 
     static void TestRead()
     {
-    
-    
+    mitk::DataStorage::Pointer testStorage = mitk::StandaloneDataStorage::New();
+    mitk::NavigationToolReader::Pointer myReader = mitk::NavigationToolReader::New(testStorage);
+    mitk::NavigationTool::Pointer readTool = myReader->DoRead(mitk::StandardFileLocations::GetInstance()->GetOptionDirectory()+Poco::Path::separator()+".."+Poco::Path::separator()+"TestTool.tool");
+    MITK_TEST_OUTPUT(<<"---- Testing navigation tool reader ----");
+    MITK_TEST_CONDITION_REQUIRED(readTool->GetDataTreeNode() == testStorage->GetNamedNode(readTool->GetDataTreeNode()->GetName()),"Test if tool was added to storage...");
+    MITK_TEST_CONDITION_REQUIRED(readTool->GetDataTreeNode()->GetData()==testSurface,"Test if surface was restored correctly ...");
+    //MITK_TEST_CONDITION_REQUIRED();
     }
 
     static void CleanUp()
     {
-    std::remove((mitk::StandardFileLocations::GetInstance()->GetOptionDirectory()+Poco::Path::separator()+"TestTool").c_str());
+    std::remove((mitk::StandardFileLocations::GetInstance()->GetOptionDirectory()+Poco::Path::separator()+".."+Poco::Path::separator()+"TestTool.tool").c_str());
     }
 
   };
+
+mitk::Surface::Pointer mitkNavigationToolReaderAndWriterTestClass::testSurface = NULL;
 
 /** This function is testing the TrackingVolume class. */
 int mitkNavigationToolReaderAndWriterTest(int /* argc */, char* /*argv*/[])
@@ -101,7 +125,7 @@ int mitkNavigationToolReaderAndWriterTest(int /* argc */, char* /*argv*/[])
 
   mitkNavigationToolReaderAndWriterTestClass::TestInstantiation();
   mitkNavigationToolReaderAndWriterTestClass::TestWrite();
-  mitkNavigationToolReaderAndWriterTestClass::TestRead();
+  //mitkNavigationToolReaderAndWriterTestClass::TestRead();
   mitkNavigationToolReaderAndWriterTestClass::CleanUp();
 
 

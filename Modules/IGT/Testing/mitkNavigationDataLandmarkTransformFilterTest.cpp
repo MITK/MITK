@@ -89,8 +89,18 @@ int mitkNavigationDataLandmarkTransformFilterTest(int /* argc */, char* /*argv*/
   mitk::NavigationData* output1 = myFilter->GetOutput(0);
   MITK_TEST_CONDITION_REQUIRED(output1 != NULL, "Testing GetOutput() ND1");
 
+  MITK_TEST_CONDITION(myFilter->IsInitialized() == false, "Testing IsInitialized() before setting source points");
+
   myFilter->SetSourcePoints(sourcePoints);
+  MITK_TEST_CONDITION(myFilter->IsInitialized() == false, "Testing IsInitialized() after setting source points and before setting target points");
+
+  mitk::PointSet::Pointer zeroTargetPoints = mitk::PointSet::New();
+  
+  MITK_TEST_FOR_EXCEPTION(itk::ExceptionObject, myFilter->SetTargetPoints(zeroTargetPoints));
+  MITK_TEST_CONDITION(myFilter->IsInitialized() == false, "Testing IsInitialized() after setting target pointset with insufficient points");
+
   myFilter->SetTargetPoints(targetPoints);
+  MITK_TEST_CONDITION(myFilter->IsInitialized() == true, "Testing IsInitialized() after setting source& target points");
   
   //------------------------landmark transform should be initialized at this point------------------------
   output1->Update();

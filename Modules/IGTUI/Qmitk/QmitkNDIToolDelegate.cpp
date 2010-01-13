@@ -33,22 +33,12 @@ PURPOSE.  See the above copyright notices for more information.
 
 Q_DECLARE_METATYPE(mitk::NDIPassiveTool*)
 
-namespace mitk
-{
-  enum NDIItemDataRole
-  {
-    NDIToolRole  = 70,
-    ToolIndexRole,
-    FileNameRole,
-    OrganNodeRole,
-    TypeRole
-  };
-}
 
 QmitkNDIToolDelegate::QmitkNDIToolDelegate(QObject * parent) : QStyledItemDelegate(parent), 
-m_Types(), m_DataStorage(NULL), m_Predicate(NULL)
+m_Types(), m_DataStorage(NULL), m_Predicate(NULL), m_TagProperty(NULL), m_TagPropertyName()
 {
 }
+
 
 QWidget* QmitkNDIToolDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
@@ -154,9 +144,11 @@ void QmitkNDIToolDelegate::setModelData(QWidget *editor, QAbstractItemModel* mod
       QmitkDataStorageComboBox* dsc = qobject_cast<QmitkDataStorageComboBox*>(editor);
       if (dsc->GetSelectedNode().IsNotNull())
       {
-        //model->setData(index, qVariantFromValue(dsc->GetSelectedNode()), mitk::OrganNodeRole);
+        model->setData(index, qVariantFromValue(dsc->GetSelectedNode()), OrganNodeRole);
         //model->setData(index, QString::fromStdString(dsc->GetSelectedNode()->GetName()), Qt::DisplayRole);  
         model->setData(index, QString::fromStdString(dsc->GetSelectedNode()->GetName()));
+        if ((m_TagProperty.IsNotNull()) && (m_TagPropertyName.empty() == false))  // tag this node as selected
+          dsc->GetSelectedNode()->SetProperty(m_TagPropertyName.c_str(), m_TagProperty);
       }
     }
     return;
@@ -210,4 +202,15 @@ void QmitkNDIToolDelegate::SetDataStorage(mitk::DataStorage* ds)
 void QmitkNDIToolDelegate::SetPredicate(mitk::NodePredicateBase::Pointer p)
 {
   m_Predicate = p;
+}
+
+
+void QmitkNDIToolDelegate::SetTagProperty(mitk::BaseProperty::Pointer prop)
+{
+  m_TagProperty = prop;
+}
+
+void QmitkNDIToolDelegate::SetTagPropertyName( const std::string& name )
+{
+  m_TagPropertyName = name;
 }

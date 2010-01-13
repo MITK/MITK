@@ -4,7 +4,7 @@
 /// Own includes.
 #include "MitkIGTUIExports.h"
 #include "mitkNodePredicateBase.h"
-
+#include "mitkBaseProperty.h"
 /// Toolkit includes.
 #include <QStyledItemDelegate>
 
@@ -13,6 +13,7 @@ namespace mitk
 {
   class DataStorage;
   class NodePredicateBase;
+  class BaseProperty;
 };
 
 /// 
@@ -39,10 +40,21 @@ class MitkIGTUI_EXPORT QmitkNDIToolDelegate : public QStyledItemDelegate
       StatusCol,
       NodeCol
     };  ///< columns in tool table
+    enum NDIItemDataRole
+    {
+      NDIToolRole  = 70,
+      ToolIndexRole,
+      FileNameRole,
+      OrganNodeRole,
+      TypeRole
+    }; ///< item data roles for qt model
 
-    void SetTypes(const QStringList& types);       ///< set types list for type editor combobox
-    void SetDataStorage(mitk::DataStorage* ds);    ///< set datastorage for organ node editor
+
+    void SetTypes(const QStringList& types);               ///< set types list for type editor combobox
+    void SetDataStorage(mitk::DataStorage* ds);            ///< set datastorage for organ node editor
     void SetPredicate(mitk::NodePredicateBase::Pointer p); ///< set predicate for organ node editor
+    void SetTagPropertyName(const std::string& name);      ///< set name of the property that is used to tag selected nodes
+    void SetTagProperty(mitk::BaseProperty::Pointer prop);   ///< set the property that is used to tag selected nodes
 
     ///
     /// Renders a specific property  (overwritten from QItemDelegate)
@@ -84,5 +96,7 @@ private:
     QStringList m_Types;
     mitk::DataStorage* m_DataStorage;
     mitk::NodePredicateBase::Pointer m_Predicate;
+    mitk::BaseProperty::Pointer m_TagProperty;
+    std::string m_TagPropertyName;
 };
 #endif /* QmitkNDIToolDelegate_h */

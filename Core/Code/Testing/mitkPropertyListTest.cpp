@@ -18,6 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkPropertyList.h"
 #include "mitkProperties.h"
+#include "mitkLookupTables.h"
 #include "mitkStringProperty.h"
 #include <iostream>
 
@@ -279,6 +280,27 @@ int mitkPropertyListTest(int /*argc*/, char* /*argv*/[])
   else
   {
     std::cout << "[FAILED]" << std::endl;
+    return EXIT_FAILURE;
+  }
+
+  std::cout << "Testing GetPropertyValue(BoolLookupTable): ";
+  mitk::BoolLookupTable blt;
+  blt.SetTableValue(17, true);
+  propList->SetProperty("blutprop", mitk::BoolLookupTableProperty::New(blt));
+  try
+  {
+    mitk::BoolLookupTable blut;
+    if ((propList->GetPropertyValue<mitk::BoolLookupTable>("blutprop", blut) == true) && (blut.GetTableValue(17) == true))
+      std::cout << "[PASSED]" << std::endl;
+    else
+    {
+      std::cout << "[FAILED]" << std::endl;
+      return EXIT_FAILURE;
+    }
+  }
+  catch(...)
+  {
+    std::cout << "Exception thrown! [FAILED]" << std::endl;
     return EXIT_FAILURE;
   }
 

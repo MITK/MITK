@@ -81,7 +81,7 @@ void mitk::NavigationDataLandmarkTransformFilter::SetSourcePoints(mitk::PointSet
     itkExceptionMacro("SourcePointSet must contain at least 3 points");
   }
 
-  if ((m_SourcePoints.size() >= 3) && (m_TargetPoints.size() >= 3))
+  if (this->IsInitialized())
     this->InitializeLandmarkTransform(m_SourcePoints, m_TargetPoints);
 }
 
@@ -102,7 +102,7 @@ void mitk::NavigationDataLandmarkTransformFilter::SetTargetPoints(mitk::PointSet
     itkExceptionMacro("TargetPointSet must contain at least 3 points");
   }
 
-  if ((m_SourcePoints.size() >= 3) && (m_TargetPoints.size() >= 3))
+  if (this->IsInitialized())
     this->InitializeLandmarkTransform(m_SourcePoints, m_TargetPoints);
 }
 
@@ -423,6 +423,7 @@ bool mitk::NavigationDataLandmarkTransformFilter::FindCorrespondentLandmarks(Lan
   sources = sortedSources;
   return true;
 }
+
 
 void mitk::NavigationDataLandmarkTransformFilter::UpdateLandmarkTransform(const LandmarkPointContainer &sources,  const LandmarkPointContainer &targets)
 {

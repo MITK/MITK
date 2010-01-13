@@ -45,7 +45,6 @@ class MitkIGTUI_EXPORT QmitkNDIConfigurationWidget : public QWidget
 {  
   Q_OBJECT // this is needed for all Qt objects that should have a MOC object (everything that derives from QObject)
 public: 
-
   QmitkNDIConfigurationWidget(QWidget* parent);
   virtual ~QmitkNDIConfigurationWidget();
 
@@ -57,6 +56,13 @@ public:
   void SetToolTypes(const QStringList& types);       ///< set types list for type editor combobox
   void SetDataStorage(mitk::DataStorage* ds);    ///< set datastorage for organ node editor
   void SetPredicate(mitk::NodePredicateBase::Pointer p); ///< set predicate for organ node editor
+  void SetTagPropertyName(const std::string& name);      ///< set name of the property that is used to tag selected nodes
+  void SetTagProperty(mitk::BaseProperty::Pointer prop);   ///< set the property that is used to tag selected nodes
+
+  const QString GetToolType(unsigned int index) const;
+  QMap<QString, unsigned int> GetToolAndTypes() const;
+  QList<unsigned int> GetToolsByToolType(QString toolType) const;
+  mitk::DataTreeNode* GetNode(unsigned int index) const;
 
   signals:
     void ToolsAdded(QStringList tools);

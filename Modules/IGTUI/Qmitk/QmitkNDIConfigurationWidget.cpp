@@ -24,6 +24,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QDir>
 #include <QFileInfo>
 
+#include "QmitkCustomVariants.h"
+
 //#include <QtConcurrentMap>
 #include "QmitkNDIToolDelegate.h"
 
@@ -249,28 +251,28 @@ void QmitkNDIConfigurationWidget::UpdateToolTable()
     mitk::TrackingTool* t = m_Tracker->GetTool(i);
     if (t == NULL)
     {
-      m_Controls->m_ToolTable->setItem(i, 0, new QTableWidgetItem("INVALID"));                    // Index
+      m_Controls->m_ToolTable->setItem(i, QmitkNDIToolDelegate::IndexCol, new QTableWidgetItem("INVALID"));                   // Index
       continue;
     }
-    m_Controls->m_ToolTable->setItem(i, 0, new QTableWidgetItem(QString::number(i)));             // Index
-    m_Controls->m_ToolTable->setItem(i, 1, new QTableWidgetItem(t->GetToolName()));               // Name    
+    m_Controls->m_ToolTable->setItem(i, QmitkNDIToolDelegate::IndexCol, new QTableWidgetItem(QString::number(i)));            // Index
+    m_Controls->m_ToolTable->setItem(i, QmitkNDIToolDelegate::NameCol, new QTableWidgetItem(t->GetToolName()));               // Name    
     if (dynamic_cast<mitk::NDIPassiveTool*>(t)->GetSROMDataLength() > 0)
-      m_Controls->m_ToolTable->setItem(i, 2, new QTableWidgetItem("SROM file loaded"));           // SROM file
+      m_Controls->m_ToolTable->setItem(i, QmitkNDIToolDelegate::SROMCol, new QTableWidgetItem("SROM file loaded"));           // SROM file
     else
-      m_Controls->m_ToolTable->setItem(i, 2, new QTableWidgetItem("<click to load SROM file>"));  // SROM file
-    m_Controls->m_ToolTable->setItem(i, 3, new QTableWidgetItem("<click to set type>"));          // Type
+      m_Controls->m_ToolTable->setItem(i, QmitkNDIToolDelegate::SROMCol, new QTableWidgetItem("<click to load SROM file>"));  // SROM file
+    m_Controls->m_ToolTable->setItem(i, QmitkNDIToolDelegate::TypeCol, new QTableWidgetItem("<click to set type>"));          // Type
     if (t->IsEnabled())
-      m_Controls->m_ToolTable->setItem(i, 4, new QTableWidgetItem("Enabled"));                    // Status
+      m_Controls->m_ToolTable->setItem(i, QmitkNDIToolDelegate::StatusCol, new QTableWidgetItem("Enabled"));                  // Status
     else
-      m_Controls->m_ToolTable->setItem(i, 4, new QTableWidgetItem("Disabled"));                   // Status
-    m_Controls->m_ToolTable->setItem(i, 5, new QTableWidgetItem("<click to select node>"));       // Node
-    
-    m_Controls->m_ToolTable->item(i, 0)->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsDragEnabled);                         // Index
-    m_Controls->m_ToolTable->item(i, 1)->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable   | Qt::ItemIsSelectable | Qt::ItemIsDragEnabled);  // Name
-    m_Controls->m_ToolTable->item(i, 2)->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable   | Qt::ItemIsSelectable | Qt::ItemIsDragEnabled);  // SROM file
-    m_Controls->m_ToolTable->item(i, 3)->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable   | Qt::ItemIsSelectable | Qt::ItemIsDragEnabled);  // Type
-    m_Controls->m_ToolTable->item(i, 4)->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsDragEnabled);                         // Status
-    m_Controls->m_ToolTable->item(i, 5)->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable   | Qt::ItemIsSelectable | Qt::ItemIsDragEnabled);  // Node
+      m_Controls->m_ToolTable->setItem(i, QmitkNDIToolDelegate::StatusCol, new QTableWidgetItem("Disabled"));                 // Status
+    m_Controls->m_ToolTable->setItem(i, QmitkNDIToolDelegate::NodeCol, new QTableWidgetItem("<click to select node>"));       // Node
+    /* set read-only/editable flags */
+    m_Controls->m_ToolTable->item(i, QmitkNDIToolDelegate::IndexCol)->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsDragEnabled);                        // Index
+    m_Controls->m_ToolTable->item(i, QmitkNDIToolDelegate::NodeCol)->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable   | Qt::ItemIsSelectable | Qt::ItemIsDragEnabled);  // Name
+    m_Controls->m_ToolTable->item(i, QmitkNDIToolDelegate::SROMCol)->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable   | Qt::ItemIsSelectable | Qt::ItemIsDragEnabled);  // SROM file
+    m_Controls->m_ToolTable->item(i, QmitkNDIToolDelegate::TypeCol)->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable   | Qt::ItemIsSelectable | Qt::ItemIsDragEnabled);  // Type
+    m_Controls->m_ToolTable->item(i, QmitkNDIToolDelegate::StatusCol)->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsDragEnabled);                       // Status
+    m_Controls->m_ToolTable->item(i, QmitkNDIToolDelegate::NodeCol)->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable   | Qt::ItemIsSelectable | Qt::ItemIsDragEnabled);  // Node
   }
   m_Controls->m_ToolTable->resizeColumnsToContents();
 }
@@ -368,4 +370,96 @@ void QmitkNDIConfigurationWidget::SetDataStorage(mitk::DataStorage* ds)
 void QmitkNDIConfigurationWidget::SetPredicate(mitk::NodePredicateBase::Pointer p)
 {
   m_Delegate->SetPredicate(p);
+}
+
+
+void QmitkNDIConfigurationWidget::SetTagPropertyName( const std::string& name )
+{
+  m_Delegate->SetTagPropertyName(name);
+}
+
+
+void QmitkNDIConfigurationWidget::SetTagProperty( mitk::BaseProperty::Pointer prop )
+{
+  m_Delegate->SetTagProperty(prop);
+}
+
+
+//void QmitkNDIConfigurationWidget::UpdateTrackerFromToolTable()
+//{
+//  if (m_Tracker.IsNull())
+//    return;
+//  QAbstractItemModel* model = m_Controls->m_ToolTable->model();
+//  for (unsigned int i = 0; i < m_Controls->m_ToolTable->rowCount(), ++i)
+//  {
+//    mitk::NDIPassiveTool* t = dynamic_cast<mitk::NDIPassiveTool*>(m_Tracker->GetTool(i));
+//    if (t == NULL)
+//      continue;
+//    t->SetToolName(model->data(model->index(i, 1)).toString().toLatin1());
+//    QString romfile = model->data(model->index(i, QmitkNDIToolDelegate::SROMCol)).toString();
+//    if (QFileInfo(romfile).exists())
+//      t->LoadSROMFile(.toLatin1());
+//
+//  }
+//}
+
+
+const QString QmitkNDIConfigurationWidget::GetToolType( unsigned int index ) const
+{
+  if (m_Controls == NULL)
+    return QString("");
+
+  QAbstractItemModel* model = m_Controls->m_ToolTable->model();
+  QModelIndex modelIndex = model->index(index, QmitkNDIToolDelegate::TypeCol);
+  if (modelIndex.isValid() == false)
+    return QString("");
+
+  return model->data(modelIndex).toString();
+}
+
+
+QMap<QString, unsigned int> QmitkNDIConfigurationWidget::GetToolAndTypes() const
+{
+  QMap<QString, unsigned int> map;
+  if (m_Controls == NULL)
+    return map;
+  QAbstractItemModel* model = m_Controls->m_ToolTable->model();
+  for (unsigned int i = 0; i < model->rowCount(); ++i)
+  {
+    QModelIndex indexIndex = model->index(i, QmitkNDIToolDelegate::IndexCol);
+    QModelIndex typeIndex = model->index(i, QmitkNDIToolDelegate::TypeCol);
+    if ((indexIndex.isValid() == false) || (typeIndex.isValid() == false))
+      continue;
+    map.insert(model->data(typeIndex).toString(), model->data(indexIndex).toUInt());
+  }
+  return map;
+}
+
+
+QList<unsigned int> QmitkNDIConfigurationWidget::GetToolsByToolType( QString toolType ) const
+{
+  QList<unsigned int> list;
+  if (m_Controls == NULL)
+      return list;
+  QAbstractItemModel* model = m_Controls->m_ToolTable->model();
+  for (unsigned int i = 0; i < model->rowCount(); ++i)
+  {
+    QModelIndex indexIndex = model->index(i, QmitkNDIToolDelegate::IndexCol);
+    QModelIndex typeIndex = model->index(i, QmitkNDIToolDelegate::TypeCol);
+    if ((indexIndex.isValid() == false) || (typeIndex.isValid() == false))
+      continue;
+    if (model->data(typeIndex).toString() == toolType)
+      list.append(model->data(indexIndex).toUInt());
+  }
+  return list;
+}
+
+mitk::DataTreeNode* QmitkNDIConfigurationWidget::GetNode( unsigned int index ) const
+{
+  
+  if (m_Controls == NULL)
+    return NULL;
+  QAbstractItemModel* model = m_Controls->m_ToolTable->model();
+  QVariant data = model->data(model->index(index, QmitkNDIToolDelegate::NodeCol), QmitkNDIToolDelegate::OrganNodeRole);
+  return data.value<mitk::DataTreeNode*>();
 }

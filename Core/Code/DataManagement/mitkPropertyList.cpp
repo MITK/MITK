@@ -261,6 +261,13 @@ template bool mitk::PropertyList::GetPropertyValue<mitk::Vector3D>(char const*, 
 template bool mitk::PropertyList::GetPropertyValue<mitk::Point3D>(char const*, mitk::Point3D&) const;
 template bool mitk::PropertyList::GetPropertyValue<mitk::Point4D>(char const*, mitk::Point4D&) const;
 template bool mitk::PropertyList::GetPropertyValue<mitk::Point3I>(char const*, mitk::Point3I&) const;
+
+template bool mitk::PropertyList::GetPropertyValue<mitk::FloatLookupTable>(char const*, mitk::FloatLookupTable&) const;
+template bool mitk::PropertyList::GetPropertyValue<mitk::BoolLookupTable>(char const*, mitk::BoolLookupTable&) const;
+template bool mitk::PropertyList::GetPropertyValue<mitk::IntLookupTable>(char const*, mitk::IntLookupTable&) const;
+template bool mitk::PropertyList::GetPropertyValue<mitk::StringLookupTable>(char const*, mitk::StringLookupTable&) const;
+
+
 #endif
 
 

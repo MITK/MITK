@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>379</width>
-    <height>291</height>
+    <width>352</width>
+    <height>227</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -73,20 +73,6 @@
      </layout>
     </widget>
    </item>
-   <item row="5" column="4">
-    <widget class="QPushButton" name="m_AddToolBtn">
-     <property name="text">
-      <string>Add passive tool</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="3" colspan="2">
-    <widget class="QPushButton" name="m_Connect">
-     <property name="text">
-      <string>Connect</string>
-     </property>
-    </widget>
-   </item>
    <item row="0" column="0" colspan="5">
     <widget class="QLabel" name="m_DeviceStatus">
      <property name="enabled">
@@ -107,6 +93,23 @@ p, li { white-space: pre-wrap; }
      </property>
     </widget>
    </item>
+   <item row="1" column="1">
+    <widget class="QComboBox" name="m_ComPortSelector"/>
+   </item>
+   <item row="5" column="4">
+    <widget class="QPushButton" name="m_AddToolBtn">
+     <property name="text">
+      <string>Add passive tool</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="3" colspan="2">
+    <widget class="QPushButton" name="m_Connect">
+     <property name="text">
+      <string>Connect</string>
+     </property>
+    </widget>
+   </item>
    <item row="5" column="3">
     <widget class="QPushButton" name="m_DiscoverToolsBtn">
      <property name="text">
@@ -120,9 +123,6 @@ p, li { white-space: pre-wrap; }
       <string>Discover Devices</string>
      </property>
     </widget>
-   </item>
-   <item row="1" column="1">
-    <widget class="QComboBox" name="m_ComPortSelector"/>
    </item>
   </layout>
  </widget>

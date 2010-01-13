@@ -71,7 +71,17 @@ namespace mitk {
     *         if no BaseData was found.
     */
     const BaseData* GetBaseData(unsigned int idx);
-  
+
+    virtual void SetTransformPosition(unsigned int index, bool applyTransform); ///< if set to true, the filter will use the position part of the input navigation data at the given index to transform the representation object. If set to false, it will not. If no value is set, it defaults to true.
+    virtual bool GetTransformPosition(unsigned int index) const; ///< returns whether position part of the input navigation data at the given index is used for the transformation of the representation object.
+    virtual void TransformPositionOn(unsigned int index);  ///< sets the TransformPosition flag to true for the given index
+    virtual void TransformPositionOff(unsigned int index); ///< sets the TransformPosition flag to false for the given index
+
+    virtual void SetTransformOrientation(unsigned int index, bool applyTransform); ///< if set to true, the filter will use the orientation part of the input navigation data at the given index to transform the representation object. If set to false, it will not. If no value is set, it defaults to true.
+    virtual bool GetTransformOrientation(unsigned int index) const; ///< returns whether orientation part of the input navigation data at the given index is used for the transformation of the representation object.
+    virtual void TransformOrientationOn(unsigned int index);  ///< sets the TransformOrientation flag to true for the given index
+    virtual void TransformOrientationOff(unsigned int index); ///< sets the TransformOrientation flag to false for the given index
+
     /** 
     *\brief Get the number of added BaseData associated to NavigationData 
     * \return Returns the size of the internal map
@@ -88,6 +98,8 @@ namespace mitk {
 
 
   protected:
+    typedef std::map<itk::ProcessObject::DataObjectPointerArraySizeType, bool> BooleanInputMap;
+
     /**
     * \brief Constructor
     **/
@@ -102,6 +114,8 @@ namespace mitk {
     * \brief An array of the BaseData which represent the tools. 
     */
     RepresentationPointerMap m_RepresentationList;
+    BooleanInputMap m_TransformPosition;    ///< if set to true, the filter will use the position part of the input navigation data at the given index for the calculation of the transform. If no entry for the index exists, it defaults to true.
+    BooleanInputMap m_TransformOrientation; ///< if set to true, the filter will use the orientation part of the input navigation data at the given index for the calculation of the transform. If no entry for the index exists, it defaults to true.
   };
 } // namespace mitk
 #endif /* MITKNAVIGATIONDATAOBJECTVISUALIZATIONFILTER_H_HEADER_INCLUDED_ */

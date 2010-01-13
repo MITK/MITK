@@ -114,7 +114,7 @@ namespace mitk {
     itkGetMacro(UseICPInitialization, bool); ///< If set to true, source and target point correspondences are established with iterative closest point optimization
     itkBooleanMacro(UseICPInitialization);   ///< If set to true, source and target point correspondences are established with iterative closest point optimization
 
-    itkGetConstObjectMacro(LandmarkTransform, LandmarkTransformType);
+    itkGetConstObjectMacro(LandmarkTransform, LandmarkTransformType);  ///< returns the current landmark transform
 
   protected:
     typedef itk::Image< signed short, 3>  ImageType;       // only because itk::LandmarkBasedTransformInitializer must be templated over two imagetypes

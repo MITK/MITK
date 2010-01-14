@@ -97,6 +97,7 @@ namespace mitk
     LevelWindowProperty::Pointer m_LevelWindowProperty; ///< pointer to the LevelWindowProperty of the current image
     typedef std::map<unsigned long, mitk::BaseProperty::Pointer> ObserverToPropertyMap;
     ObserverToPropertyMap        m_PropObserverToNode; ///< map to hold observer ID큦 to every visible property of DataTreeNode큦 BaseProperty
+    ObserverToPropertyMap        m_PropObserverToNode2; ///< map to hold observer ID큦 to every layer property of DataTreeNode큦 BaseProperty
     bool                         m_AutoTopMost;
     unsigned long                m_ObserverTag;
     bool                         m_IsObserverTagSet;

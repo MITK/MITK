@@ -36,7 +36,7 @@ bool mitk::PropertyListDeserializer::Deserialize()
   TiXmlDocument document( m_Filename );
   if (!document.LoadFile())
   {
-    LOG_ERROR << "Could not open/read/parse " << m_Filename << "\nTinyXML reports: " << document.ErrorDesc() << std::endl;
+    MITK_ERROR << "Could not open/read/parse " << m_Filename << "\nTinyXML reports: " << document.ErrorDesc() << std::endl;
     return false;
   }
 
@@ -47,7 +47,7 @@ bool mitk::PropertyListDeserializer::Deserialize()
   {
     if ( versionObject->QueryIntAttribute( "FileVersion", &fileVersion ) != TIXML_SUCCESS )
     {
-      LOG_ERROR << "Property file " << m_Filename << " does not contain version information! Trying version 1 format." << std::endl;
+      MITK_ERROR << "Property file " << m_Filename << " does not contain version information! Trying version 1 format." << std::endl;
     }
   }
   
@@ -57,11 +57,11 @@ bool mitk::PropertyListDeserializer::Deserialize()
   std::list<itk::LightObject::Pointer> readers = itk::ObjectFactoryBase::CreateAllInstance(propertyListDeserializerClassName.str().c_str());
   if (readers.size() < 1)
   {
-    LOG_ERROR << "No property list reader found for file version " << fileVersion;
+    MITK_ERROR << "No property list reader found for file version " << fileVersion;
   }
   if (readers.size() > 1)
   {
-    LOG_WARN << "Multiple property list readers found for file version " << fileVersion << ". Using arbitrary first one.";
+    MITK_WARN << "Multiple property list readers found for file version " << fileVersion << ". Using arbitrary first one.";
   }
 
   for ( std::list<itk::LightObject::Pointer>::iterator iter = readers.begin();
@@ -76,7 +76,7 @@ bool mitk::PropertyListDeserializer::Deserialize()
       
       if ( error )
       {
-        LOG_ERROR << "There were errors while loding property list file " << m_Filename << ". Your data may be corrupted";
+        MITK_ERROR << "There were errors while loding property list file " << m_Filename << ". Your data may be corrupted";
       }
       break;
     }

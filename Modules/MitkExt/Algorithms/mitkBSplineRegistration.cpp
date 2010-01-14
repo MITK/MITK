@@ -263,7 +263,7 @@ namespace mitk {
       registration->StartRegistration();    
       double time = clock() - tstart;
       time = time / CLOCKS_PER_SEC;
-      LOG_INFO << "Registration time: " << time;
+      MITK_INFO << "Registration time: " << time;
     } 
     catch( itk::ExceptionObject & err ) 
     { 

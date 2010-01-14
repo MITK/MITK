@@ -318,7 +318,7 @@ void QmitkRigidRegistrationSelectorView::CalculateTransformation(unsigned int ti
     }
     catch (itk::ExceptionObject e)
     {
-      LOG_INFO << "Caught exception: "<<e.GetDescription();
+      MITK_INFO << "Caught exception: "<<e.GetDescription();
       QMessageBox::information( this, "Registration exception", e.GetDescription());
       mitk::ProgressBar::GetInstance()->Progress(20);
     }
@@ -327,7 +327,7 @@ void QmitkRigidRegistrationSelectorView::CalculateTransformation(unsigned int ti
     time = time / CLOCKS_PER_SEC;
 
     //printOut of the Time
-    LOG_INFO << "Registration Time: " << time;
+    MITK_INFO << "Registration Time: " << time;
 
     m_Observer->RemoveObserver(observer);
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();

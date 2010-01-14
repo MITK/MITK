@@ -15,9 +15,9 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
-#define SR_INFO LOG_INFO("shader.repository")
-#define SR_WARN LOG_WARN("shader.repository")
-#define SR_ERROR LOG_ERROR("shader.repository")
+#define SR_INFO MITK_INFO("shader.repository")
+#define SR_WARN MITK_WARN("shader.repository")
+#define SR_ERROR MITK_ERROR("shader.repository")
 
 #include "mitkShaderRepository.h"
 #include "mitkShaderEnumProperty.h"
@@ -184,7 +184,7 @@ mitk::ShaderRepository::Shader *mitk::ShaderRepository::GetShader(const char *id
 
 void mitk::ShaderRepository::Shader::Uniform::LoadFromXML(vtkXMLDataElement *y)
 {
-  //LOG_INFO << "found uniform '" << y->GetAttribute("name") << "' type=" << y->GetAttribute("type");// << " default=" << y->GetAttribute("value");          
+  //MITK_INFO << "found uniform '" << y->GetAttribute("name") << "' type=" << y->GetAttribute("type");// << " default=" << y->GetAttribute("value");          
 
   name = y->GetAttribute("name");
   
@@ -317,7 +317,7 @@ void mitk::ShaderRepository::ApplyProperties(mitk::DataTreeNode* node, vtkActor 
   {
     if(shader.compare("fixed")==0)
     {
-      //LOG_INFO << "disabling shader";
+      //MITK_INFO << "disabling shader";
       property->ShadingOff();
     }
     else
@@ -325,7 +325,7 @@ void mitk::ShaderRepository::ApplyProperties(mitk::DataTreeNode* node, vtkActor 
       Shader *s=GetShader(shader.c_str());
       if(s)
       {
-        //LOG_INFO << "enabling shader";
+        //MITK_INFO << "enabling shader";
         property->ShadingOn(); 
         property->LoadMaterial(s->path.c_str());
       }
@@ -346,7 +346,7 @@ void mitk::ShaderRepository::ApplyProperties(mitk::DataTreeNode* node, vtkActor 
     {
       std::string propertyName = "shader." + s->name + "." + (*j)->name;
 
-    //  LOG_INFO << "querying property: " << propertyName;
+    //  MITK_INFO << "querying property: " << propertyName;
       
     //  mitk::BaseProperty *p = node->GetProperty( propertyName.c_str(), renderer );
       
@@ -354,7 +354,7 @@ void mitk::ShaderRepository::ApplyProperties(mitk::DataTreeNode* node, vtkActor 
       {
         float fval[4];
         
-       // LOG_INFO << "copying property " << propertyName << " ->->- " << (*j)->name << " type=" << (*j)->type ;
+       // MITK_INFO << "copying property " << propertyName << " ->->- " << (*j)->name << " type=" << (*j)->type ;
         
                
         switch( (*j)->type )

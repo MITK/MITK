@@ -113,7 +113,7 @@ void QmitkFileSaveProjectAction::Run()
         ss << " contained in node '" << (*iter)->GetName() << "'" << std::endl;
       }
 
-      LOG_WARN << ss.str();
+      MITK_WARN << ss.str();
     }
 
     mitk::PropertyList::ConstPointer failedProperties = sceneIO->GetFailedProperties();
@@ -129,11 +129,11 @@ void QmitkFileSaveProjectAction::Run()
         ss << " - " << iter->second.first->GetNameOfClass() << " associated to key '" << iter->first << "'" << std::endl;
       }
 
-      LOG_WARN << ss.str();
+      MITK_WARN << ss.str();
     }
   }
   catch (std::exception& e)
   {
-    LOG_ERROR << "Exception caught during scene saving: " << e.what();
+    MITK_ERROR << "Exception caught during scene saving: " << e.what();
   }
 }

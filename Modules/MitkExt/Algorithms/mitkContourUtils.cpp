@@ -50,11 +50,11 @@ mitk::Contour::Pointer mitk::ContourUtils::ProjectContourTo2DSlice(Image* slice,
     Point3D projectedPointIn2D;
     projectedPointIn2D.Fill(0.5);
     sliceGeometry->WorldToIndex( currentPointIn3D, projectedPointIn2D );
-    LOG_DEBUG << "world point " << currentPointIn3D << " in index is " << projectedPointIn2D;
+    MITK_DEBUG << "world point " << currentPointIn3D << " in index is " << projectedPointIn2D;
 
     if ( !sliceGeometry->IsIndexInside( projectedPointIn2D ) && constrainToInside )
     {
-      LOG_INFO << "**" << currentPointIn3D << " is " << projectedPointIn2D << " --> correct it (TODO)" << std::endl;
+      MITK_INFO << "**" << currentPointIn3D << " is " << projectedPointIn2D << " --> correct it (TODO)" << std::endl;
     }
 
     projectedContour->AddVertex( projectedPointIn2D );
@@ -82,7 +82,7 @@ mitk::Contour::Pointer mitk::ContourUtils::BackProjectContourFrom2DSlice(Image* 
     Point3D worldPointIn3D;
     worldPointIn3D.Fill(0.0);
     sliceGeometry->IndexToWorld( currentPointIn2D, worldPointIn3D );
-    LOG_DEBUG << "index " << currentPointIn2D << " world " << worldPointIn3D << std::endl;
+    MITK_DEBUG << "index " << currentPointIn2D << " world " << worldPointIn3D << std::endl;
 
     worldContour->AddVertex( worldPointIn3D );
   }
@@ -107,7 +107,7 @@ void mitk::ContourUtils::FillContourInSlice( Contour* projectedContour, Image* s
   {
     picContour[ 2 * index + 0 ] = static_cast<mitkIpInt4_t>( (*iter)[0] );
     picContour[ 2 * index + 1 ] = static_cast<mitkIpInt4_t>( (*iter)[1] );
-    LOG_DEBUG << "mitk 2d [" << (*iter)[0] << ", " << (*iter)[1] << "]  pic [" << picContour[ 2*index+0] << ", " << picContour[ 2*index+1] << "]";
+    MITK_DEBUG << "mitk 2d [" << (*iter)[0] << ", " << (*iter)[1] << "]  pic [" << picContour[ 2*index+0] << ", " << picContour[ 2*index+1] << "]";
   }
 
   assert( sliceImage->GetSliceData() );

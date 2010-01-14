@@ -45,7 +45,7 @@ mitk::PlanarCircle::~PlanarCircle()
 //
 //  if ( geometry2D == NULL )
 //  {
-//    LOG_ERROR << "Missing Geometry2D for PlanarCircle";
+//    MITK_ERROR << "Missing Geometry2D for PlanarCircle";
 //    return;
 //  }
 //

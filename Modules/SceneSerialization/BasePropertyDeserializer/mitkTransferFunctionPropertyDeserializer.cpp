@@ -106,7 +106,7 @@ mitk::TransferFunction::Pointer mitk::TransferFunctionPropertyDeserializer::Dese
   
   if (!document.LoadFile())
   {
-    LOG_ERROR << "Could not open/read/parse " << filePath << "\nTinyXML reports: " << document.ErrorDesc() << std::endl;
+    MITK_ERROR << "Could not open/read/parse " << filePath << "\nTinyXML reports: " << document.ErrorDesc() << std::endl;
     return NULL;
   }
       
@@ -117,7 +117,7 @@ mitk::TransferFunction::Pointer mitk::TransferFunctionPropertyDeserializer::Dese
   {
     if ( versionObject->QueryIntAttribute( "TransferfunctionVersion", &fileVersion ) != TIXML_SUCCESS )
     {
-      LOG_WARN << "Transferfunction file " << filePath << " does not contain version information! Trying version 1 format.";
+      MITK_WARN << "Transferfunction file " << filePath << " does not contain version information! Trying version 1 format.";
     }
   }
   
@@ -132,7 +132,7 @@ mitk::TransferFunction::Pointer mitk::TransferFunctionPropertyDeserializer::Dese
     TransferFunction::Pointer tf = tfp->GetValue();
     return tf;
   }
-  LOG_WARN << "Can't deserialize transferfunction"; 
+  MITK_WARN << "Can't deserialize transferfunction"; 
   return NULL;
 }
 } // namespace

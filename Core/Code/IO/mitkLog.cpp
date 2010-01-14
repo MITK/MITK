@@ -71,7 +71,7 @@ void mitk::LogBackend::SetLogFile(const char *file)
   logMutex.Lock();
   if(logFile)
   {
-    LOG_INFO << "closing logfile";
+    MITK_INFO << "closing logfile";
     logFile->close();
     delete logFile;
     logFile = 0;
@@ -83,12 +83,12 @@ void mitk::LogBackend::SetLogFile(const char *file)
     if(*logFile)
     {
       std::cout << "opening logfile '" << file << "' for writing failed";
-      LOG_INFO << "logging to '" << file << "'";
+      MITK_INFO << "logging to '" << file << "'";
     }
     else
     {
       std::cerr << "opening logfile '" << file << "' for writing failed";
-      LOG_ERROR << "opening logfile '" << file << "' for writing failed";
+      MITK_ERROR << "opening logfile '" << file << "' for writing failed";
       delete logFile;
       logFile = 0;
     }
@@ -108,7 +108,7 @@ void mitk::LogBackend::CatchLogFileCommandLineParameter(int &argc,char **argv)
       if(r+1>=argc)
       {
         --argc;
-        LOG_ERROR << "--logfile parameter found, but no file given";
+        MITK_ERROR << "--logfile parameter found, but no file given";
         return;
       }
 

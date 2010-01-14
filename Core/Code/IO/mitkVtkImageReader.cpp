@@ -34,7 +34,7 @@ void mitk::VtkImageReader::GenerateData()
 {
   if( m_FileName != "")
   {
-    LOG_INFO << "Loading " << m_FileName << " as vtk" << std::endl;
+    MITK_INFO << "Loading " << m_FileName << " as vtk" << std::endl;
 
     ///We create a Generic Reader to test de .vtk/
     vtkDataReader *chooser=vtkDataReader::New();
@@ -43,7 +43,7 @@ void mitk::VtkImageReader::GenerateData()
     if(chooser->IsFileStructuredPoints())
     {
       ///StructuredPoints/
-      LOG_INFO << "StructuredPoints"<< std::endl;
+      MITK_INFO << "StructuredPoints"<< std::endl;
       vtkStructuredPointsReader *reader=vtkStructuredPointsReader::New();
       reader->SetFileName(m_FileName.c_str());
       reader->Update();
@@ -58,7 +58,7 @@ void mitk::VtkImageReader::GenerateData()
     }
     else
     {
-      LOG_ERROR << " ... sorry, this .vtk format is not supported yet."<<std::endl;
+      MITK_ERROR << " ... sorry, this .vtk format is not supported yet."<<std::endl;
     }
     chooser->Delete();
   }

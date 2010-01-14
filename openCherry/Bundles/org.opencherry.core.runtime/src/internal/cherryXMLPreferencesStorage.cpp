@@ -1,8 +1,8 @@
 #include "cherryXMLPreferencesStorage.h"
 #include "cherryPreferences.h"
 
-#include "mbilog.h"
-#define WARNMSG LOG_WARN("XMLPreferencesStorage")
+#include "cherryLog.h"
+#define WARNMSG CHERRY_WARN("XMLPreferencesStorage")
 
 #include "Poco/File.h"
 #include "Poco/DOM/DOMParser.h"
@@ -54,10 +54,10 @@ namespace cherry
     catch (Poco::XML::SAXParseException& exc)
     {
       const std::string tempString = _File.path()+".backup";
-      LOG_INFO << exc.what();
-      LOG_INFO << "Preferences could not be loaded."; 
-      LOG_INFO << "Creating " << tempString; 
-      LOG_INFO << "and resetting to default values.";
+      CHERRY_INFO << exc.what();
+      CHERRY_INFO << "Preferences could not be loaded."; 
+      CHERRY_INFO << "Creating " << tempString; 
+      CHERRY_INFO << "and resetting to default values.";
       _File.copyTo(tempString);
       this->m_Root = NULL;
     }

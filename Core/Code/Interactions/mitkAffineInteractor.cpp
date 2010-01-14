@@ -266,7 +266,7 @@ bool mitk::AffineInteractor::ExecuteAction(Action* action, mitk::StateEvent cons
       if (b != NULL)
       {
         m_DataTreeNode->GetPropertyList()->SetProperty("volume", FloatProperty::New(b->GetVolume()));
-        //LOG_INFO << "Volume of Boundingobject is " << b->GetVolume()/1000.0 << " ml" << std::endl;
+        //MITK_INFO << "Volume of Boundingobject is " << b->GetVolume()/1000.0 << " ml" << std::endl;
       }
       */
       ok = true;

@@ -44,7 +44,7 @@ QmitkTransferFunctionWidget::~QmitkTransferFunctionWidget()
 void QmitkTransferFunctionWidget::SetDataTreeNode(mitk::DataTreeNode* node)
 {
 
-  //LOG_INFO << "TransW called with" << (1&&node);
+  //MITK_INFO << "TransW called with" << (1&&node);
   
 
   if (node)
@@ -55,7 +55,7 @@ void QmitkTransferFunctionWidget::SetDataTreeNode(mitk::DataTreeNode* node)
     {
       if (! dynamic_cast<mitk::Image*>(node->GetData()))
       {
-        LOG_WARN << "QmitkTransferFunctionWidget::SetDataTreeNode called with non-image node";
+        MITK_WARN << "QmitkTransferFunctionWidget::SetDataTreeNode called with non-image node";
         goto turnOff;
       }
       
@@ -151,7 +151,7 @@ void QmitkTransferFunctionWidget::UpdateRanges()
   int lower =  m_RangeSlider->lowerValue();
   int upper =  m_RangeSlider->upperValue();
 
-  //LOG_INFO << "UpdateRanges: lower: " << lower << " upper: " << upper;
+  //MITK_INFO << "UpdateRanges: lower: " << lower << " upper: " << upper;
 
   m_ScalarOpacityFunctionCanvas->SetMin(lower);
   m_ScalarOpacityFunctionCanvas->SetMax(upper);
@@ -166,7 +166,7 @@ void QmitkTransferFunctionWidget::UpdateRanges()
 
 void QmitkTransferFunctionWidget::OnSpanChanged(int lower, int upper) 
 {
-  //LOG_INFO << "OnSpanChanged, m_RangeSlider: lowerValue: " << lower << "upperValue: " << upper;
+  //MITK_INFO << "OnSpanChanged, m_RangeSlider: lowerValue: " << lower << "upperValue: " << upper;
 
   UpdateRanges();
   

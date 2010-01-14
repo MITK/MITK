@@ -543,7 +543,7 @@ void QmitkThresholdComponent::CreateThresholdSegmentation()
   }
   else
   {
-    LOG_INFO<<"Original image does not have a 'Time sliced geometry'! Cannot create a segmentation.";
+    MITK_INFO<<"Original image does not have a 'Time sliced geometry'! Cannot create a segmentation.";
     return ;
   }
 
@@ -566,7 +566,7 @@ void QmitkThresholdComponent::CreateThresholdSegmentation()
       }
       catch(...)
       {
-        LOG_INFO<<"Error accessing single time steps of the original image. Cannot create segmentation.";
+        MITK_INFO<<"Error accessing single time steps of the original image. Cannot create segmentation.";
       }
     }
 

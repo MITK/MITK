@@ -339,13 +339,13 @@ bool SlicesRotator::ExecuteAction(Action* action, StateEvent const* stateEvent)
 
         DisplayGeometry *displayGeometry = renderer->GetDisplayGeometry();
 
-        // LOG_INFO << i << ":" << std::endl;
+        // MITK_INFO << i << ":" << std::endl;
 
         Point2D point2DWorld, point2DDisplayPre, point2DDisplayPost;
         displayGeometry->Map( m_CenterOfRotation, point2DWorld );
         displayGeometry->WorldToDisplay( point2DWorld, point2DDisplayPre );
 
-        // LOG_INFO << "  WorldPre: " << point2DWorld << " / DisplayPre: " << point2DDisplayPre << std::endl;
+        // MITK_INFO << "  WorldPre: " << point2DWorld << " / DisplayPre: " << point2DDisplayPre << std::endl;
 
         const Geometry3D* geometry3D = (*iter)->GetCreatedWorldGeometry();
         const TimeSlicedGeometry* timeSlicedGeometry = dynamic_cast<const TimeSlicedGeometry*>(geometry3D);
@@ -393,16 +393,16 @@ bool SlicesRotator::ExecuteAction(Action* action, StateEvent const* stateEvent)
         Vector2D vector2DDisplayDiff = point2DDisplayPost - point2DDisplayPre;
 
         Vector2D origin = displayGeometry->GetOriginInMM();
-        // LOG_INFO << "  WorldPost: " << point2DWorld << " / DisplayPost: " << point2DDisplayPost << std::endl;
-        // LOG_INFO << "  Diff   - " << vector2DDisplayDiff << std::endl;
-        // LOG_INFO << "  Origin - " << origin << std::endl;
+        // MITK_INFO << "  WorldPost: " << point2DWorld << " / DisplayPost: " << point2DDisplayPost << std::endl;
+        // MITK_INFO << "  Diff   - " << vector2DDisplayDiff << std::endl;
+        // MITK_INFO << "  Origin - " << origin << std::endl;
         ++i;
 
         displayGeometry->MoveBy( vector2DDisplayDiff );
 
         (*iter)->SendCreatedWorldGeometryUpdate();
       } 
-      // LOG_INFO << "--------------------------------" << std::endl;
+      // MITK_INFO << "--------------------------------" << std::endl;
 
       
       
@@ -416,10 +416,10 @@ bool SlicesRotator::ExecuteAction(Action* action, StateEvent const* stateEvent)
       //displayGeometry->Map( m_CenterOfRotation, point2DWorld );
       //displayGeometry->WorldToDisplay( point2DWorld, point2DDisplay );
 
-      //LOG_INFO << "RotationCenter: " << m_CenterOfRotation << std::endl;
-      //LOG_INFO << "PointWorld:     " << point2DWorld << std::endl;
-      //LOG_INFO << "PointDisplay:   " << point2DDisplay << std::endl;
-      //LOG_INFO << "--------------------------------------------" << std::endl;
+      //MITK_INFO << "RotationCenter: " << m_CenterOfRotation << std::endl;
+      //MITK_INFO << "PointWorld:     " << point2DWorld << std::endl;
+      //MITK_INFO << "PointDisplay:   " << point2DDisplay << std::endl;
+      //MITK_INFO << "--------------------------------------------" << std::endl;
 
 
 
@@ -547,7 +547,7 @@ bool SlicesRotator::ExecuteAction(Action* action, StateEvent const* stateEvent)
 
       }
 
-      if (!newStateEvent) LOG_ERROR << "rotation would be nice but is impossible... " << std::endl;
+      if (!newStateEvent) MITK_ERROR << "rotation would be nice but is impossible... " << std::endl;
       
       this->HandleEvent( newStateEvent );
       delete newStateEvent;

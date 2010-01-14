@@ -62,7 +62,7 @@ namespace mitk {
     if ( !vtkXMLParser::Parse() )
     {
   #ifdef INTERDEBUG
-      LOG_INFO<<"RigidRegistrationPreset::LoadPreset xml file cannot parse!"<<std::endl;
+      MITK_INFO<<"RigidRegistrationPreset::LoadPreset xml file cannot parse!"<<std::endl;
   #endif
     }
 

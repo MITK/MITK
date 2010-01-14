@@ -116,7 +116,7 @@ bool mitk::ContourTool::OnMouseReleased(Action* action, const StateEvent* stateE
 
     if ( slice.IsNull() )
     {
-      LOG_ERROR << "Unable to extract slice." << std::endl;
+      MITK_ERROR << "Unable to extract slice." << std::endl;
       return false;
     }
 
@@ -140,7 +140,7 @@ bool mitk::ContourTool::OnMouseReleased(Action* action, const StateEvent* stateE
       Point3D inbtw = projectedContour->GetPoints()->ElementAt(idx);
       Point3D after = back->GetPoints()->ElementAt(idx);
 
-      LOG_DEBUG << "before " << before << " zwischen " << inbtw << " after " << after;
+      MITK_DEBUG << "before " << before << " zwischen " << inbtw << " after " << after;
     }
   */
 

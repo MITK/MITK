@@ -24,7 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <mitkMemoryUtilities.h>
 
-#define VVP_INFO LOG_INFO << "Mem Usage: " << mitk::MemoryUtilities::GetProcessMemoryUsage() << " "
+#define VVP_INFO MITK_INFO << "Mem Usage: " << mitk::MemoryUtilities::GetProcessMemoryUsage() << " "
 
 namespace mitk
 {

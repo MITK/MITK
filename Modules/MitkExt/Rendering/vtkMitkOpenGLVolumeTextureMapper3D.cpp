@@ -19,8 +19,8 @@
 #include "vtkMitkOpenGLVolumeTextureMapper3D.h"
 #include "mitkCommon.h"
 
-#define GPU_INFO LOG_INFO("mapper.vr")
-#define GPU_WARN LOG_WARN("mapper.vr")
+#define GPU_INFO MITK_INFO("mapper.vr")
+#define GPU_WARN MITK_WARN("mapper.vr")
 
 #include "vtkImageData.h"
 #include "vtkMatrix4x4.h"
@@ -851,7 +851,7 @@ class ScalarGradientCompute
 /*
     if( z == fullZ/2 )
     if( y == fullY/2 )
-      LOG_INFO << x << " " << y << " " << z << " : " << iGrayValue << " : " << iGradient;
+      MITK_INFO << x << " " << y << " " << z << " : " << iGrayValue << " : " << iGradient;
   */  
   }
   
@@ -1012,7 +1012,7 @@ class ScalarGradientCompute
 
 /*
     int num = omp_get_num_procs();
-    LOG_INFO << "omp uses " << num << " processors";
+    MITK_INFO << "omp uses " << num << " processors";
 */
 
     #pragma omp parallel for
@@ -1092,7 +1092,7 @@ void vtkVolumeTextureMapper3DComputeScalars( T *dataPtr,
 
     while(currentChunk < numChunks)
     {
-//      LOG_INFO << "processing chunk " << currentChunk;
+//      MITK_INFO << "processing chunk " << currentChunk;
       
       int currentChunkStart = currentChunk * chunkSize;
       int currentChunkEnd   = currentChunkStart + chunkSize - 1 ;
@@ -1217,7 +1217,7 @@ class RGBACompute
 /*
     if( z == fullZ/2 )
     if( y == fullY/2 )
-      LOG_INFO << x << " " << y << " " << z << " : " << iGrayValue << " : " << iGradient;
+      MITK_INFO << x << " " << y << " " << z << " : " << iGrayValue << " : " << iGradient;
   */  
   }
   
@@ -1391,7 +1391,7 @@ void vtkVolumeTextureMapper3DComputeRGBA( unsigned char *dataPtr,
 
   int components = input->GetNumberOfScalarComponents();
 
-  LOG_INFO << "components are " << components;
+  MITK_INFO << "components are " << components;
 
   double wx, wy, wz;
   double fx, fy, fz;
@@ -1429,7 +1429,7 @@ void vtkVolumeTextureMapper3DComputeRGBA( unsigned char *dataPtr,
 
     while(currentChunk < numChunks)
     {
-//      LOG_INFO << "processing chunk " << currentChunk;
+//      MITK_INFO << "processing chunk " << currentChunk;
       
       int currentChunkStart = currentChunk * chunkSize;
       int currentChunkEnd   = currentChunkStart + chunkSize - 1 ;
@@ -1473,7 +1473,7 @@ void vtkMitkOpenGLVolumeTextureMapper3D::ComputeVolumeDimensions()
     for ( int i = 0; i < 3; i++ )
       powerOfTwoDim[i]=(dim[i]+1)&~1;
 
-    // LOG_INFO << "using non-power-two even textures (" << (1.0-double(dim[0]*dim[1]*dim[2])/double(powerOfTwoDim[0]*powerOfTwoDim[1]*powerOfTwoDim[2])) * 100.0 << "% memory wasted)";
+    // MITK_INFO << "using non-power-two even textures (" << (1.0-double(dim[0]*dim[1]*dim[2])/double(powerOfTwoDim[0]*powerOfTwoDim[1]*powerOfTwoDim[2])) * 100.0 << "% memory wasted)";
   }
   else
   {
@@ -1484,7 +1484,7 @@ void vtkMitkOpenGLVolumeTextureMapper3D::ComputeVolumeDimensions()
         powerOfTwoDim[i] *= 2;
     }
 
-    LOG_WARN << "using power-two textures (" << (1.0-double(dim[0]*dim[1]*dim[2])/double(powerOfTwoDim[0]*powerOfTwoDim[1]*powerOfTwoDim[2])) * 100.0 << "% memory wasted)";
+    MITK_WARN << "using power-two textures (" << (1.0-double(dim[0]*dim[1]*dim[2])/double(powerOfTwoDim[0]*powerOfTwoDim[1]*powerOfTwoDim[2])) * 100.0 << "% memory wasted)";
   }
   
   // Save the volume size
@@ -1574,7 +1574,7 @@ bool vtkMitkOpenGLVolumeTextureMapper3D::UpdateVolumes(vtkVolume *vtkNotUsed(vol
     
     vtkgl::ActiveTexture( vtkgl::TEXTURE0 );
 
-    LOG_INFO << "allocating volume on gpu";
+    MITK_INFO << "allocating volume on gpu";
     
     GLint gradientScalarTextureFormat = GL_RGBA8;
     
@@ -1626,7 +1626,7 @@ bool vtkMitkOpenGLVolumeTextureMapper3D::UpdateVolumesRGBA(vtkVolume *vtkNotUsed
   if(!needUpdate)
     return true;
 
-  LOG_INFO << "updating rgba volume";
+  MITK_INFO << "updating rgba volume";
 
   ComputeVolumeDimensions();
                                    
@@ -1642,7 +1642,7 @@ bool vtkMitkOpenGLVolumeTextureMapper3D::UpdateVolumesRGBA(vtkVolume *vtkNotUsed
 
     int dim[3]; this->GetVolumeDimensions(dim);
     
-    LOG_INFO << "allocating volume on gpu";
+    MITK_INFO << "allocating volume on gpu";
     
     GLint gradientScalarTextureFormat = GL_RGBA8;
     GLint colorTextureFormat = GL_RGB8;
@@ -1714,7 +1714,7 @@ void vtkMitkOpenGLVolumeTextureMapper3D::SetupOneIndependentTextures( vtkRendere
     glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP );
     glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP );
 
-    //LOG_INFO << "uploading transferfunction";
+    //MITK_INFO << "uploading transferfunction";
 
     GLint colorLookupTextureFormat = GL_RGBA8;
 
@@ -1733,7 +1733,7 @@ void vtkMitkOpenGLVolumeTextureMapper3D::SetupFourDependentTextures(
   vtkRenderer *vtkNotUsed(ren),
   vtkVolume *vol )
 {
-  LOG_INFO << "SetupFourDependentTextures";
+  MITK_INFO << "SetupFourDependentTextures";
   
   this->UpdateVolumesRGBA(vol);
   
@@ -1817,7 +1817,7 @@ void vtkMitkOpenGLVolumeTextureMapper3D::SetupFourDependentTextures(
     glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP );
     glTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP );
 
-    //LOG_INFO << "uploading transferfunction";
+    //MITK_INFO << "uploading transferfunction";
 
     glTexImage2D(GL_TEXTURE_2D,0,this->InternalAlpha, 256, 256, 0,
                  GL_ALPHA, GL_UNSIGNED_BYTE, this->AlphaLookup );      

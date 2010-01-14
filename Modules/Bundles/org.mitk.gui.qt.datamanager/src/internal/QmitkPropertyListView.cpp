@@ -5,7 +5,7 @@
 #include "QmitkPropertyListView.h"
 #include <QmitkPropertiesTableEditor.h>
 #include <mitkDataTreeNodeObject.h>
-#include <mbilog.h>
+#include <mitkLogMacros.h>
 #include <QVBoxLayout>
 
 const std::string QmitkPropertyListView::VIEW_ID = "org.mitk.views.propertylistview";

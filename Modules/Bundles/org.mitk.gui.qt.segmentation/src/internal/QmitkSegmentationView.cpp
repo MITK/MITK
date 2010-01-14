@@ -204,7 +204,7 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
   }
   else
   {
-    LOG_WARN << "Could not get datamanager's node descriptor for 'ImageMask'";
+    MITK_WARN << "Could not get datamanager's node descriptor for 'ImageMask'";
   }
 
   // register a couple of additional actions for DataManager's context menu
@@ -231,7 +231,7 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
   }
   else
   {
-    LOG_WARN << "Could not get datamanager's node descriptor for 'ImageMask'";
+    MITK_WARN << "Could not get datamanager's node descriptor for 'ImageMask'";
   }
   
   // call preferences changed for initialization
@@ -263,7 +263,7 @@ QmitkSegmentationView::~QmitkSegmentationView()
   }
   else
   {
-    LOG_WARN << "Could not get datamanager's node descriptor for 'Image'";
+    MITK_WARN << "Could not get datamanager's node descriptor for 'Image'";
   }
 
   // unregister a couple of additional actions for DataManager's context menu
@@ -279,7 +279,7 @@ QmitkSegmentationView::~QmitkSegmentationView()
   }
   else
   {
-    LOG_WARN << "Could not get datamanager's node descriptor for 'ImageMask'";
+    MITK_WARN << "Could not get datamanager's node descriptor for 'ImageMask'";
   }
 
   this->Deactivated();
@@ -354,7 +354,7 @@ void QmitkSegmentationView::CreateNewSegmentation()
   }
   else
   {
-    LOG_ERROR << "'Create new segmentation' button should never be clickable unless a patient image is selected...";
+    MITK_ERROR << "'Create new segmentation' button should never be clickable unless a patient image is selected...";
   }
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
@@ -405,7 +405,7 @@ void QmitkSegmentationView::OnSegmentationMethodSelected(int id)
 
 void QmitkSegmentationView::CheckImageAlignment()
 {
-  LOG_INFO << "Updating alignment warning";
+  MITK_INFO << "Updating alignment warning";
 
   bool wrongAlignment(false);
   mitk::DataTreeNode::Pointer node = m_Controls->m_ManualToolSelectionBox->GetToolManager()->GetReferenceData(0);
@@ -483,7 +483,7 @@ void QmitkSegmentationView::CheckImageAlignment()
 
 void QmitkSegmentationView::OnReferenceNodeSelected(const mitk::DataTreeNode* node)
 {
-  LOG_DEBUG << "OnReferenceNodeSelected(" << (void*)node << ")";
+  MITK_DEBUG << "OnReferenceNodeSelected(" << (void*)node << ")";
   mitk::ToolManager* toolManager = m_Controls->m_ManualToolSelectionBox->GetToolManager();
   toolManager->SetReferenceData(const_cast<mitk::DataTreeNode*>(node));
 
@@ -528,7 +528,7 @@ void QmitkSegmentationView::OnReferenceNodeSelected(const mitk::DataTreeNode* no
 
 void QmitkSegmentationView::OnWorkingDataSelectionChanged(const mitk::DataTreeNode* node)
 {
-  LOG_DEBUG << "OnWorkingDataSelectionChanged(" << (void*)node << ")";
+  MITK_DEBUG << "OnWorkingDataSelectionChanged(" << (void*)node << ")";
   mitk::ToolManager* toolManager = m_Controls->m_ManualToolSelectionBox->GetToolManager();
   toolManager->SetWorkingData(const_cast<mitk::DataTreeNode*>(node));
 
@@ -603,7 +603,7 @@ void QmitkSegmentationView::SelectionChanged(cherry::IWorkbenchPart::Pointer sou
 
   if ( sourcepart == this || selection.IsNull() )  // prevents being notified by own selection events
   {
-    LOG_INFO << "Ignore this selection event:"
+    MITK_INFO << "Ignore this selection event:"
              << " sourcepart == this " << (sourcepart == this)
              << " selection == NULL" << (selection == NULL);
     return; // otherwise we get "null selection" events each time the view is activated/focussed
@@ -627,7 +627,7 @@ void QmitkSegmentationView::SelectionChanged(cherry::IWorkbenchPart::Pointer sou
       if (mitk::DataTreeNodeObject::Pointer nodeObj = i->Cast<mitk::DataTreeNodeObject>())
       {
         mitk::DataTreeNode::Pointer node = nodeObj->GetDataTreeNode();
-        LOG_INFO << "Node '" << node->GetName() << "' selected";
+        MITK_INFO << "Node '" << node->GetName() << "' selected";
 
         bool isImage(false);
         if (node->GetData())
@@ -645,7 +645,7 @@ void QmitkSegmentationView::SelectionChanged(cherry::IWorkbenchPart::Pointer sou
             if (workingData.IsNull())
             {
               // first selected binary image
-              LOG_INFO << "Working image '" << node->GetName() << "' selected";
+              MITK_INFO << "Working image '" << node->GetName() << "' selected";
               workingData = node;
             }
             else
@@ -659,7 +659,7 @@ void QmitkSegmentationView::SelectionChanged(cherry::IWorkbenchPart::Pointer sou
             if ( referenceData.IsNull() )
             {
               // first selected image
-              LOG_INFO << "Reference image '" << node->GetName() << "' selected";
+              MITK_INFO << "Reference image '" << node->GetName() << "' selected";
               referenceData = node;
             }
             else
@@ -676,7 +676,7 @@ void QmitkSegmentationView::SelectionChanged(cherry::IWorkbenchPart::Pointer sou
   if (tooManySelection)
   {
     // TODO visible warning when two images are selected
-    LOG_WARN << "WARNING: No image or too many (>2) were selected.";
+    MITK_WARN << "WARNING: No image or too many (>2) were selected.";
     referenceData = NULL;
     workingData = NULL;
   }
@@ -684,7 +684,7 @@ void QmitkSegmentationView::SelectionChanged(cherry::IWorkbenchPart::Pointer sou
   // if only a segmentation is selected, try to find its parent and use it as reference node
   if ( workingData.IsNotNull() && referenceData.IsNull() )
   {
-    LOG_DEBUG << "Finding segmentation's parent";
+    MITK_DEBUG << "Finding segmentation's parent";
     // try to find a "normal image" parent, select this as reference image
     mitk::TNodePredicateDataType<mitk::Image>::Pointer isImage = mitk::TNodePredicateDataType<mitk::Image>::New();
     mitk::NodePredicateProperty::Pointer isBinary = mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true));
@@ -698,23 +698,23 @@ void QmitkSegmentationView::SelectionChanged(cherry::IWorkbenchPart::Pointer sou
       if (possibleParents->size() > 1)
       {
         // TODO visible warning for this rare case
-        LOG_INFO << "Selected binary image has multiple parents. Using arbitrary first one for segmentation.";
+        MITK_INFO << "Selected binary image has multiple parents. Using arbitrary first one for segmentation.";
       }
 
       mitk::DataTreeNode::Pointer referenceNode = (*possibleParents)[0];
-      LOG_INFO << "Reference image '" << referenceNode->GetName() << "' selected";
+      MITK_INFO << "Reference image '" << referenceNode->GetName() << "' selected";
       referenceData = referenceNode;
     }
   }
 
-  LOG_INFO << "Reference " << (void*)referenceData.GetPointer() << " Working " << (void*)workingData.GetPointer();
+  MITK_INFO << "Reference " << (void*)referenceData.GetPointer() << " Working " << (void*)workingData.GetPointer();
   // update image selections for our toolmanagers
   OnReferenceNodeSelected(referenceData);
   OnWorkingDataSelectionChanged(workingData);
 
   if ( referenceData.IsNull() && workingData.IsNull() )
   {
-    LOG_INFO << "Nothing selected, re-show all segmentations";
+    MITK_INFO << "Nothing selected, re-show all segmentations";
     // if nothing is chosen all segmentations are visible
     mitk::NodePredicateAND::Pointer and_predicate = mitk::NodePredicateAND::New(
         mitk::TNodePredicateDataType<mitk::Image>::New(),
@@ -732,7 +732,7 @@ void QmitkSegmentationView::SelectionChanged(cherry::IWorkbenchPart::Pointer sou
   // if an normal image is chosen without a segmentation, all child segmentations are visible
   if (referenceData.IsNotNull() && workingData.IsNull())
   {
-    LOG_INFO << "Only reference selected, re-show all its child segmentations";
+    MITK_INFO << "Only reference selected, re-show all its child segmentations";
     mitk::NodePredicateAND::Pointer and_predicate = mitk::NodePredicateAND::New(
         mitk::TNodePredicateDataType<mitk::Image>::New(),
         mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true)));
@@ -791,7 +791,7 @@ void QmitkSegmentationView::CreateSurface(bool)
 
 void QmitkSegmentationView::CreateASurface(bool smoothed)
 {
-  LOG_INFO << "CreateSurface for:";
+  MITK_INFO << "CreateSurface for:";
 
   NodeList selection = this->GetSelectedNodes();
 
@@ -801,7 +801,7 @@ void QmitkSegmentationView::CreateASurface(bool smoothed)
 
     if (node)
     {
-      LOG_INFO << "   " << (*iter)->GetName();
+      MITK_INFO << "   " << (*iter)->GetName();
 
       mitk::Image::Pointer image = dynamic_cast<mitk::Image*>( node->GetData() );
       if (image.IsNull()) return;
@@ -851,12 +851,12 @@ void QmitkSegmentationView::CreateASurface(bool smoothed)
       }
       catch(...)
       {
-        LOG_ERROR << "surface creation filter had an error";
+        MITK_ERROR << "surface creation filter had an error";
       }
     }
     else
     {
-      LOG_INFO << "   a NULL node selected";
+      MITK_INFO << "   a NULL node selected";
     }
   }
 }
@@ -885,7 +885,7 @@ QmitkSegmentationView::NodeList QmitkSegmentationView::GetSelectedNodes() const
 void QmitkSegmentationView::SendSelectedEvent( mitk::DataTreeNode* referenceNode, mitk::DataTreeNode* workingNode )
 {
   // should select both nodes and also make them visible (expand tree view if necessary)
-  LOG_INFO << "Marking as selected: reference node '" << (referenceNode ? referenceNode->GetName() : "NULL") << " and working node " << (workingNode ? workingNode->GetName() : "NULL");
+  MITK_INFO << "Marking as selected: reference node '" << (referenceNode ? referenceNode->GetName() : "NULL") << " and working node " << (workingNode ? workingNode->GetName() : "NULL");
 
   //std::vector<mitk::DataTreeNode::Pointer > nodes;
   //if (referenceNode) nodes.push_back( referenceNode );
@@ -907,7 +907,7 @@ void QmitkSegmentationView::ImageStatistics(bool)
 
 void QmitkSegmentationView::AutocropSelected(bool)
 {
-  LOG_INFO << "Autocrop for:";
+  MITK_INFO << "Autocrop for:";
 
   NodeList selection = this->GetSelectedNodes();
 
@@ -917,7 +917,7 @@ void QmitkSegmentationView::AutocropSelected(bool)
 
     if (node)
     {
-      LOG_INFO << "   " << (*iter)->GetName();
+      MITK_INFO << "   " << (*iter)->GetName();
 
       mitk::Image::Pointer image = dynamic_cast<mitk::Image*>( node->GetData() );
       if (image.IsNull()) return;
@@ -942,20 +942,20 @@ void QmitkSegmentationView::AutocropSelected(bool)
       }
       catch(...)
       {
-        LOG_ERROR << "Cropping image failed...";
+        MITK_ERROR << "Cropping image failed...";
       }
       mitk::ProgressBar::GetInstance()->Progress(8);
     }
     else
     {
-      LOG_INFO << "   a NULL node selected";
+      MITK_INFO << "   a NULL node selected";
     }
   }
 }
 
 void QmitkSegmentationView::ThresholdImage(bool)
 {
-  LOG_INFO << "Thresholding all this node:";
+  MITK_INFO << "Thresholding all this node:";
 
   NodeList selection = this->GetSelectedNodes();
 
@@ -992,7 +992,7 @@ void QmitkSegmentationView::ThresholdImage(bool)
 
     if (node)
     {
-      LOG_INFO << "   " << (*iter)->GetName();
+      MITK_INFO << "   " << (*iter)->GetName();
 
       m_ThresholdingToolManager->SetReferenceData( node );
       m_ThresholdingToolManager->ActivateTool( m_ThresholdingToolManager->GetToolIdByToolType<mitk::BinaryThresholdTool>() );
@@ -1002,7 +1002,7 @@ void QmitkSegmentationView::ThresholdImage(bool)
 
 void QmitkSegmentationView::ThresholdingDone(int)
 {
-  LOG_INFO << "Thresholding done, cleaning up";
+  MITK_INFO << "Thresholding done, cleaning up";
   m_ThresholdingDialog->deleteLater();
   m_ThresholdingDialog = NULL;
   m_ThresholdingToolManager = NULL;
@@ -1014,7 +1014,7 @@ void QmitkSegmentationView::OnThresholdingToolManagerToolModified()
 {
   if ( m_ThresholdingToolManager.IsNull() ) return;
 
-  LOG_INFO << "Not got tool " << m_ThresholdingToolManager->GetActiveToolID();
+  MITK_INFO << "Not got tool " << m_ThresholdingToolManager->GetActiveToolID();
 
   if ( m_ThresholdingToolManager->GetActiveToolID() < 0)
   {
@@ -1042,7 +1042,7 @@ void QmitkSegmentationView::OnPreferencesChanged(const cherry::ICherryPreference
 
 void QmitkSegmentationView::UpdateFromCurrentDataManagerSelection()
 {
-  LOG_INFO << "Update selection from DataManager";
+  MITK_INFO << "Update selection from DataManager";
   cherry::ISelection::ConstPointer selection( this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection("org.mitk.views.datamanager"));
   m_CurrentSelection = selection.Cast<const mitk::DataTreeNodeSelection>();
   this->SelectionChanged(cherry::SmartPointer<IWorkbenchPart>(NULL), m_CurrentSelection);

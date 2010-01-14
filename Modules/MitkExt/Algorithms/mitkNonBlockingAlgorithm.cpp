@@ -88,7 +88,7 @@ void NonBlockingAlgorithm::UnDefineTriggerParameter(const char* parameter)
   {
     BaseProperty* value = m_Parameters->GetProperty( parameter );
     
-    LOG_ERROR(!value) << "NonBlockingAlgorithm::UnDefineTriggerProperty() in bad state." << std::endl; ;
+    MITK_ERROR(!value) << "NonBlockingAlgorithm::UnDefineTriggerProperty() in bad state." << std::endl; ;
 
     value->RemoveObserver( m_TriggerPropertyConnections[parameter] );
     m_TriggerPropertyConnections.erase(iter);

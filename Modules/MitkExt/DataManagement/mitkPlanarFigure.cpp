@@ -71,10 +71,10 @@ bool mitk::PlanarFigure::AddControlPoint( const mitk::Point2D &point )
 {
   int currentNumberOfControlPoints = m_ControlPoints->Size();
 
-  LOG_INFO << "AddControlPoint()";
-  LOG_INFO << "currentNumberOfControlPoints: " << currentNumberOfControlPoints;
-  LOG_INFO << "maxNumber: " << this->GetMaximumNumberOfControlPoints();
-  LOG_INFO << "selected point: " << m_SelectedControlPoint;
+  MITK_INFO << "AddControlPoint()";
+  MITK_INFO << "currentNumberOfControlPoints: " << currentNumberOfControlPoints;
+  MITK_INFO << "maxNumber: " << this->GetMaximumNumberOfControlPoints();
+  MITK_INFO << "selected point: " << m_SelectedControlPoint;
   if ( currentNumberOfControlPoints < this->GetMaximumNumberOfControlPoints() )
   {
     m_ControlPoints->InsertElement( currentNumberOfControlPoints, point );

@@ -36,7 +36,7 @@ std::string mitk::ImageSerializer::Serialize()
   const Image* image = dynamic_cast<const Image*>( m_Data.GetPointer() );
   if (!image)
   {
-    LOG_ERROR << " Object at " << (const void*) this->m_Data
+    MITK_ERROR << " Object at " << (const void*) this->m_Data
               << " is not an mitk::Image. Cannot serialize as image.";
     return "";
   }
@@ -61,7 +61,7 @@ std::cout << "creating file " << filename << " in " << m_WorkingDirectory << std
   }
   catch (std::exception& e)
   {
-    LOG_ERROR << " Error serializing object at " << (const void*) this->m_Data
+    MITK_ERROR << " Error serializing object at " << (const void*) this->m_Data
               << " to " 
               << fullname 
               << ": " 

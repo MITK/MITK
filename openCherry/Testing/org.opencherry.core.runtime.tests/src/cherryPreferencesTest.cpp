@@ -23,7 +23,7 @@
 #include <CppUnit/TestSuite.h>
 #include <CppUnit/TestCaller.h>
 
-#include "mbilog.h"
+#include "cherryLog.h"
 
 #include "Poco/File.h"
 #include "Poco/Path.h"
@@ -99,7 +99,7 @@ namespace cherry
     // Preferences::ChildrenNames() 
     // Preferences::RemoveNode() 
     {
-      LOG_INFO << "testing Preferences::Node(), Preferences::NodeExists(), Preferences::Parent(), " 
+      CHERRY_INFO << "testing Preferences::Node(), Preferences::NodeExists(), Preferences::Parent(), " 
         "Preferences::ChildrenNames(), Preferences::RemoveNode()";
 
       cherry::IPreferences::Pointer editorsNode(0);
@@ -140,7 +140,7 @@ namespace cherry
     // Preferences::put*() 
     // Preferences::get*()
     {
-      LOG_INFO << "testing Preferences::put*(), Preferences::get*()";
+      CHERRY_INFO << "testing Preferences::put*(), Preferences::get*()";
       
       assert(root->NodeExists("/editors/general"));
       cherry::IPreferences::Pointer editorsGeneralNode = root->Node("/editors/general");

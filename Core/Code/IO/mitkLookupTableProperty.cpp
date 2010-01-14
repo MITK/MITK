@@ -48,7 +48,7 @@ bool mitk::LookupTableProperty::operator==(const BaseProperty& property) const
 
 void mitk::LookupTableProperty::SetLookupTable(const mitk::LookupTable::Pointer aLookupTable)
 {
-//    LOG_INFO << "setting LUT property ... " << std::endl;
+//    MITK_INFO << "setting LUT property ... " << std::endl;
    
     if((m_LookupTable != aLookupTable) || (*m_LookupTable != *aLookupTable))
     {
@@ -56,5 +56,5 @@ void mitk::LookupTableProperty::SetLookupTable(const mitk::LookupTable::Pointer 
         Modified();
     }
           
-//    LOG_INFO << "setting LUT property OK! " << std::endl;    
+//    MITK_INFO << "setting LUT property OK! " << std::endl;    
 }

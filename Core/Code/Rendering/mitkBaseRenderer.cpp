@@ -702,7 +702,7 @@ void mitk::BaseRenderer::KeyPressEvent(mitk::KeyEvent *ke)
 
 void mitk::BaseRenderer::DrawOverlayMouse(mitk::Point2D& itkNotUsed(p2d))
 {
-  LOG_INFO<<"BaseRenderer::DrawOverlayMouse()- should be inconcret implementation OpenGLRenderer."<<std::endl;
+  MITK_INFO<<"BaseRenderer::DrawOverlayMouse()- should be inconcret implementation OpenGLRenderer."<<std::endl;
 }
 
 void mitk::BaseRenderer::RequestUpdate()
@@ -759,7 +759,7 @@ void mitk::BaseRenderer::SetCameraController(CameraController* cameraController)
 {
   mitk::VtkInteractorCameraController::Pointer vtkInteractorCameraController = dynamic_cast<mitk::VtkInteractorCameraController*>(cameraController);
   if (vtkInteractorCameraController.IsNotNull())
-    LOG_INFO<<"!!!WARNING!!!: RenderWindow interaction events are no longer handled via CameraController (See Bug #954)."<<std::endl;
+    MITK_INFO<<"!!!WARNING!!!: RenderWindow interaction events are no longer handled via CameraController (See Bug #954)."<<std::endl;
   m_CameraController->SetRenderer(NULL);
   m_CameraController = NULL;
   m_CameraController = cameraController;

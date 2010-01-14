@@ -229,15 +229,15 @@ namespace mbilog {
 }
 
 
-#define LOG_INFO mbilog::PseudoStream(mbilog::Info,__FILE__,__LINE__,__FUNCTION__)
-#define LOG_WARN mbilog::PseudoStream(mbilog::Warn,__FILE__,__LINE__,__FUNCTION__)
-#define LOG_ERROR mbilog::PseudoStream(mbilog::Error,__FILE__,__LINE__,__FUNCTION__)
-#define LOG_FATAL mbilog::PseudoStream(mbilog::Fatal,__FILE__,__LINE__,__FUNCTION__)
+#define MBI_INFO mbilog::PseudoStream(mbilog::Info,__FILE__,__LINE__,__FUNCTION__)
+#define MBI_WARN mbilog::PseudoStream(mbilog::Warn,__FILE__,__LINE__,__FUNCTION__)
+#define MBI_ERROR mbilog::PseudoStream(mbilog::Error,__FILE__,__LINE__,__FUNCTION__)
+#define MBI_FATAL mbilog::PseudoStream(mbilog::Fatal,__FILE__,__LINE__,__FUNCTION__)
 
 #ifdef MBILOG_ENABLE_DEBUG
-#define LOG_DEBUG mbilog::PseudoStream(mbilog::Debug,__FILE__,__LINE__,__FUNCTION__)
+#define MBI_DEBUG mbilog::PseudoStream(mbilog::Debug,__FILE__,__LINE__,__FUNCTION__)
 #else
-#define LOG_DEBUG true ? mbilog::NullStream() : mbilog::NullStream()
+#define MBI_DEBUG true ? mbilog::NullStream() : mbilog::NullStream()
 #endif
 
 

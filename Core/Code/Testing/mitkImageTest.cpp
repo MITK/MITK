@@ -370,7 +370,7 @@ int mitkImageTest(int /*argc*/, char* /*argv*/[])
     node = nodeReader->GetOutput();      
   }
   catch(...) {
-    LOG_ERROR << "Could not read file";
+    MITK_ERROR << "Could not read file";
     return NULL;
   }  
 

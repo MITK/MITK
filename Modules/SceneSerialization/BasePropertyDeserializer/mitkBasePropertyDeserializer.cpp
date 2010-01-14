@@ -28,7 +28,7 @@ mitk::BasePropertyDeserializer::~BasePropertyDeserializer()
 
 mitk::BaseProperty::Pointer mitk::BasePropertyDeserializer::Deserialize(TiXmlElement*  /*element*/)
 {
-  LOG_ERROR << this->GetNameOfClass() << " is asked to deserialize an object but has no implementation. This is bad.";
+  MITK_ERROR << this->GetNameOfClass() << " is asked to deserialize an object but has no implementation. This is bad.";
   return NULL; 
 }
 

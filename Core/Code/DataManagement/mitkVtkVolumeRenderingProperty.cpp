@@ -35,7 +35,7 @@ mitk::VtkVolumeRenderingProperty::VtkVolumeRenderingProperty( const IdType& valu
     this->SetValue( value ) ;
   }
   else
-    LOG_INFO << "Warning: invalid rendering configuration" << std::endl;
+    MITK_INFO << "Warning: invalid rendering configuration" << std::endl;
 }
 
 mitk::VtkVolumeRenderingProperty::VtkVolumeRenderingProperty( const std::string& value )
@@ -46,7 +46,7 @@ mitk::VtkVolumeRenderingProperty::VtkVolumeRenderingProperty( const std::string&
     this->SetValue( value );
   }
   else
-    LOG_INFO << "Warning: invalid rendering configuration" << std::endl;
+    MITK_INFO << "Warning: invalid rendering configuration" << std::endl;
 }
 
 

@@ -141,7 +141,7 @@ bool mitk::SegTool2D::DetermineAffectedImageSlice( const Image* image, const Pla
 
   imageGeometry->WorldToIndex( projectedPoint, indexPoint );
   affectedSlice = ROUND( indexPoint[affectedDimension]-0.5 );
-  LOG_DEBUG << "indexPoint " << indexPoint << " affectedDimension " << affectedDimension << " affectedSlice " << affectedSlice;
+  MITK_DEBUG << "indexPoint " << indexPoint << " affectedDimension " << affectedDimension << " affectedSlice " << affectedSlice;
 
   // check if this index is still within the image
   if ( affectedSlice < 0 || affectedSlice >= static_cast<int>(image->GetDimension(affectedDimension)) ) return false;
@@ -216,7 +216,7 @@ mitk::Image::Pointer mitk::SegTool2D::GetAffectedReferenceSlice(const PositionEv
 
 void mitk::SegTool2D::InteractiveSegmentationBugMessage( const std::string& message )
 {
-  LOG_ERROR << "********************************************************************************" << std::endl
+  MITK_ERROR << "********************************************************************************" << std::endl
             << " " << message << std::endl
             << "********************************************************************************" << std::endl
             << "  " << std::endl

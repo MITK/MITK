@@ -66,7 +66,7 @@ namespace mitk {
     size += 2*sizeof(long);
 
     sendCounter();
-    // LOG_INFO << "Open Connection file name: " << m_FileName << std::endl;
+    // MITK_INFO << "Open Connection file name: " << m_FileName << std::endl;
     SocketClient::GetInstance()->send( OPEN_CONNECTION, size, m_Buffer );
   }
 
@@ -95,7 +95,7 @@ namespace mitk {
     size += 2*sizeof(long);
 
     sendCounter();
-    // LOG_INFO << "NEW_STATE_MACHINE: instance: " << (unsigned int) stateMachine << " Type: " << name << std::endl;
+    // MITK_INFO << "NEW_STATE_MACHINE: instance: " << (unsigned int) stateMachine << " Type: " << name << std::endl;
     return SocketClient::GetInstance()->send( NEW_STATE_MACHINE, size, m_Buffer );
   }
 
@@ -118,7 +118,7 @@ namespace mitk {
       *((unsigned long*) wb) = EventId;
       
       sendCounter();
-      // LOG_INFO << "EVENT: instance: " << (unsigned int) stateMachine << " EventId: " << EventId << std::endl;
+      // MITK_INFO << "EVENT: instance: " << (unsigned int) stateMachine << " EventId: " << EventId << std::endl;
       return SocketClient::GetInstance()->send( EVENT, 2*sizeof(long), m_Buffer );
     }
     return true;
@@ -149,7 +149,7 @@ namespace mitk {
     size += 2*sizeof(long);
     
     //sendCounter();
-    //LOG_INFO << "TRANSITION: instance: " << (unsigned int) stateMachine << " size: " << size << " transitionName: " << transitionName << std::endl;  
+    //MITK_INFO << "TRANSITION: instance: " << (unsigned int) stateMachine << " size: " << size << " transitionName: " << transitionName << std::endl;  
     return SocketClient::GetInstance()->send( TRANSITION, size, m_Buffer );
   }
 
@@ -182,7 +182,7 @@ namespace mitk {
     size += 3*sizeof(long);
 
     sendCounter();
-    // LOG_INFO << "ACTION: instance: " << (unsigned int) stateMachine << " size: " << size << "action: " << action << " transitionName " << transitionName << std::endl;
+    // MITK_INFO << "ACTION: instance: " << (unsigned int) stateMachine << " size: " << size << "action: " << action << " transitionName " << transitionName << std::endl;
     return SocketClient::GetInstance()->send( ACTION, size, m_Buffer );
   }
 
@@ -199,7 +199,7 @@ namespace mitk {
     *((unsigned long*) wb) = (unsigned long) stateMachine;
 
     sendCounter();
-    // LOG_INFO << "DELETE_STATE_MACHINE: instance: << (unsigned int) stateMachine" << std::endl;
+    // MITK_INFO << "DELETE_STATE_MACHINE: instance: << (unsigned int) stateMachine" << std::endl;
     return SocketClient::GetInstance()->send( DELETE_STATE_MACHINE, sizeof(long), m_Buffer );
   }
 
@@ -236,7 +236,7 @@ namespace mitk {
     bool success = SocketClient::GetInstance()->send( 7, sizeof(long), wb );
     if (success)
     {
-      LOG_INFO << "Counter: " <<  m_Counter << std::endl;
+      MITK_INFO << "Counter: " <<  m_Counter << std::endl;
     }
   }
 

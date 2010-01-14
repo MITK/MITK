@@ -83,13 +83,13 @@ void mitk::HistogramGenerator::ComputeHistogram()
 
 // debug code
   /*
-    LOG_INFO << "Histogram modfied 1" << m_Histogram->GetMTime() << std::endl;
+    MITK_INFO << "Histogram modfied 1" << m_Histogram->GetMTime() << std::endl;
     m_Histogram->Modified();
-    LOG_INFO << "Histogram modfied 2" << m_Histogram->GetMTime() << std::endl;
-    LOG_INFO << "Image modfied" << m_Image->GetMTime() << std::endl;
+    MITK_INFO << "Histogram modfied 2" << m_Histogram->GetMTime() << std::endl;
+    MITK_INFO << "Image modfied" << m_Image->GetMTime() << std::endl;
   const unsigned int histogramSize = m_Histogram->Size();
 
-  LOG_INFO << "Histogram size " << histogramSize << std::endl;
+  MITK_INFO << "Histogram size " << histogramSize << std::endl;
   
   HistogramType::ConstIterator itr = GetHistogram()->Begin();
   HistogramType::ConstIterator end = GetHistogram()->End();
@@ -97,8 +97,8 @@ void mitk::HistogramGenerator::ComputeHistogram()
   int bin = 0;
   while( itr != end )
     {
-    LOG_INFO << "bin = " << GetHistogram()->GetBinMin(0,bin) << "--" << GetHistogram()->GetBinMax(0,bin) << " frequency = ";
-    LOG_INFO << itr.GetFrequency() << std::endl;
+    MITK_INFO << "bin = " << GetHistogram()->GetBinMin(0,bin) << "--" << GetHistogram()->GetBinMax(0,bin) << " frequency = ";
+    MITK_INFO << itr.GetFrequency() << std::endl;
     ++itr;
     ++bin;
     }

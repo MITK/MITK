@@ -98,7 +98,7 @@ bool ShowSegmentationAsSurface::ThreadedUpdateFunction()
   float reductionRate(0.8);
   GetParameter("Decimation rate", reductionRate );
 
-  LOG_INFO << "Creating polygon model with smoothing " << smooth << " gaussianSD " << gaussianSD 
+  MITK_INFO << "Creating polygon model with smoothing " << smooth << " gaussianSD " << gaussianSD 
                                          << " median " << applyMedian << " median kernel " << medianKernelSize 
                                          << " mesh reduction " << decimateMesh << " reductionRate " << reductionRate;
 

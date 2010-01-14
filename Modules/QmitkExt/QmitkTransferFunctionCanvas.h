@@ -134,7 +134,7 @@ class QMITKEXT_EXPORT SimpleHistogramCache
 
       if(!p_Image)
       {
-        LOG_WARN << "SimpleHistogramCache::operator[] with null image called";
+        MITK_WARN << "SimpleHistogramCache::operator[] with null image called";
         return 0;
       }
       
@@ -157,7 +157,7 @@ class QMITKEXT_EXPORT SimpleHistogramCache
           if( p_Image->GetMTime() > e->m_LastUpdateTime.GetMTime())
             goto recomputeElement;
           
-          //LOG_INFO << "using a cached histogram";
+          //MITK_INFO << "using a cached histogram";
           
           return &e->histogram;
         }
@@ -172,7 +172,7 @@ class QMITKEXT_EXPORT SimpleHistogramCache
 
       recomputeElement:
 
-      //LOG_INFO << "computing a new histogram";
+      //MITK_INFO << "computing a new histogram";
 
       elementToUpdate->histogram.ComputeFromImage(p_Image);
       elementToUpdate->m_LastUpdateTime.Modified();

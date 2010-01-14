@@ -75,13 +75,13 @@ void mitk::DopplerToStrainRateFilter::GenerateData()
     m_Origin = pointProp->GetValue();
   }
 
-  LOG_INFO << "compute Strain Rate Image .... " << std::endl
+  MITK_INFO << "compute Strain Rate Image .... " << std::endl
            << "  origin[0]=" << m_Origin[0] << " origin[1]=" << m_Origin[1] << " origin[2]=" << m_Origin[2] << std::endl
            << "  distance=" << m_Distance << std::endl
            << "  NoStrainIntervall=" << m_NoStrainInterval << std::endl;
 
   const Vector3D & spacing = input->GetSlicedGeometry()->GetSpacing();
-  //  LOG_INFO << "   in: xres=" << spacing[0] << " yres=" << spacing[1] << " zres=" << spacing[2] << std::endl;
+  //  MITK_INFO << "   in: xres=" << spacing[0] << " yres=" << spacing[1] << " zres=" << spacing[2] << std::endl;
 
 
   mitk::ImageTimeSelector::Pointer timeSelector=mitk::ImageTimeSelector::New();
@@ -124,22 +124,22 @@ void mitk::DopplerToStrainRateFilter::GenerateData()
 
   t = output->GetRequestedRegion().GetIndex(3);
   n = output->GetRequestedRegion().GetIndex(4);
-  LOG_INFO << "t = " <<t << " n = " << n << std::endl;
+  MITK_INFO << "t = " <<t << " n = " << n << std::endl;
 
   tmax = t + output->GetRequestedRegion().GetSize(3);
   nmax = n + output->GetRequestedRegion().GetSize(4);
-  LOG_INFO << "tmax = "<< tmax << " nmax = " << nmax << std::endl;
+  MITK_INFO << "tmax = "<< tmax << " nmax = " << nmax << std::endl;
 
   if (m_Distance<1) m_Distance=1;
 
   for(;n<nmax;n++)//output->GetNumberOfChannels();++n)
   {
     timeSelector->SetChannelNr(n);
-    LOG_INFO << "computing chanel n = " << n << std::endl;
+    MITK_INFO << "computing chanel n = " << n << std::endl;
 
     for(t=0;t<tmax;t++)
     {
-      LOG_INFO << "computing time slot t = " << t << std::endl;
+      MITK_INFO << "computing time slot t = " << t << std::endl;
       timeSelector->SetTimeNr(t);
       timeSelector->Update();
 
@@ -263,7 +263,7 @@ void mitk::DopplerToStrainRateFilter::GenerateData()
 
               if (strainRate<0 ) {
                 //strainRate = -strainRate;
-                LOG_INFO << " error: neg. strainRate ... exit() " << std::endl
+                MITK_INFO << " error: neg. strainRate ... exit() " << std::endl
                          << " x=" << x << " y=" << y << " z=" << z << std::endl
                          << " v1=" << v1 << " v2=" << v2 << " dist=" << m_Distance << std::endl
                          << " sr=" << strainRate  << std::endl;
@@ -326,7 +326,7 @@ void mitk::DopplerToStrainRateFilter::GenerateData()
       mitkIpPicPut(const_cast<char *>(filename.c_str()),picStrainRate);
 #endif
 
-  LOG_INFO << "Strain Rate Image computed.... " << std::endl
+  MITK_INFO << "Strain Rate Image computed.... " << std::endl
            << "  minStrainRate: " << minStrainRate << std::endl
            << "  maxStrainRate: " << maxStrainRate << std::endl;
 }

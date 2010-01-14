@@ -38,6 +38,8 @@
 
 #include <algorithm>
 
+#include <mitkLogMacros.h>
+
 using namespace std;
 
 QmitkPreferencesDialog::QmitkPreferencesDialog(QWidget * parent, Qt::WindowFlags f)
@@ -267,7 +269,7 @@ void QmitkPreferencesDialog::OnImportButtonClicked( bool  /*triggered*/ )
             if(prefPage)
               prefPage->Update();
 
-            LOG_INFO("QmitkPreferencesDialog") << "Preferences successfully imported from " << f.path();
+            MITK_INFO("QmitkPreferencesDialog") << "Preferences successfully imported from " << f.path();
           }
         }
       }
@@ -276,12 +278,12 @@ void QmitkPreferencesDialog::OnImportButtonClicked( bool  /*triggered*/ )
   catch (Poco::Exception& pe)
   {
     QMessageBox::critical(this, "Error Importing", pe.message().c_str());
-    LOG_ERROR("QmitkPreferencesDialog") << pe.what();
+    MITK_ERROR("QmitkPreferencesDialog") << pe.what();
   }
   catch (std::exception& e)
   {
     QMessageBox::critical(this, "Error Importing", e.what());
-    LOG_ERROR("QmitkPreferencesDialog") << e.what();
+    MITK_ERROR("QmitkPreferencesDialog") << e.what();
   }
 }
 
@@ -306,7 +308,7 @@ void QmitkPreferencesDialog::OnExportButtonClicked( bool  /*triggered*/ )
           {
             Poco::File f(fileNames.at(0).toStdString());
             cherryPrefService->ExportPreferences(f, "");
-            LOG_INFO("QmitkPreferencesDialog") << "Preferences successfully exported to " << f.path();
+            MITK_INFO("QmitkPreferencesDialog") << "Preferences successfully exported to " << f.path();
           }
         }
       }
@@ -315,12 +317,12 @@ void QmitkPreferencesDialog::OnExportButtonClicked( bool  /*triggered*/ )
   catch (Poco::Exception& pe)
   {
     QMessageBox::critical(this, "Error Exporting", pe.message().c_str());
-    LOG_ERROR("QmitkPreferencesDialog") << pe.what();
+    MITK_ERROR("QmitkPreferencesDialog") << pe.what();
   }
   catch (std::exception& e)
   {
     QMessageBox::critical(this, "Error Exporting", e.what());
-    LOG_ERROR("QmitkPreferencesDialog") << e.what();
+    MITK_ERROR("QmitkPreferencesDialog") << e.what();
   }
 }
 

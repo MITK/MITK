@@ -169,7 +169,7 @@ void QmitkSliceWidget::SetData(mitk::DataTreeNode::Pointer treeNode,
 			}
 
 			if (noVisibleImage)
-				LOG_INFO << " No image visible!";
+				MITK_INFO << " No image visible!";
 
 			GetRenderer()->SetDataStorage(m_DataStorage);
 		}

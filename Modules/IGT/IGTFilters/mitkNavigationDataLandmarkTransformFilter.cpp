@@ -382,12 +382,12 @@ bool mitk::NavigationDataLandmarkTransformFilter::FindCorrespondentLandmarks(Lan
   }
   catch( itk::ExceptionObject & e )
   {
-    LOG_INFO << "Exception caught during ICP optimization: " << e;
+    MITK_INFO << "Exception caught during ICP optimization: " << e;
     return false;
     //throw e;
   }
-  LOG_INFO << "ICP successful: Solution = " << transform->GetParameters() << std::endl;
-  LOG_INFO << "Metric value: " << metric->GetValue(transform->GetParameters());
+  MITK_INFO << "ICP successful: Solution = " << transform->GetParameters() << std::endl;
+  MITK_INFO << "Metric value: " << metric->GetValue(transform->GetParameters());
 
   /* find point correspondences */
   //mitk::PointLocator::Pointer pointLocator = mitk::PointLocator::New();  // <<- use mitk::PointLocator instead of searching manually?
@@ -406,7 +406,7 @@ bool mitk::NavigationDataLandmarkTransformFilter::FindCorrespondentLandmarks(Lan
     {
       TransformInitializerType::LandmarkPointType transformedSource = transform->TransformPoint(*sourcesIt);
       double dist = targetsIt->EuclideanDistanceTo(transformedSource);
-      LOG_INFO << "target: " << *targetsIt << ", source: " << *sourcesIt << ", transformed source: " << transformedSource << ", dist: " << dist;
+      MITK_INFO << "target: " << *targetsIt << ", source: " << *sourcesIt << ", transformed source: " << transformedSource << ", dist: " << dist;
       if (dist < minDistance )
       {
         minDistanceIterator = sourcesIt;
@@ -415,7 +415,7 @@ bool mitk::NavigationDataLandmarkTransformFilter::FindCorrespondentLandmarks(Lan
     }
     if (minDistanceIterator == sources.end())
       return false;
-    LOG_INFO << "minimum distance point is: " << *minDistanceIterator << " (dist: " << targetsIt->EuclideanDistanceTo(transform->TransformPoint(*minDistanceIterator)) << ", minDist: " << minDistance << ")";
+    MITK_INFO << "minimum distance point is: " << *minDistanceIterator << " (dist: " << targetsIt->EuclideanDistanceTo(transform->TransformPoint(*minDistanceIterator)) << ", minDist: " << minDistance << ")";
     sortedSources.push_back(*minDistanceIterator); // this point is assigned
     sources.erase(minDistanceIterator); // erase it from sources to avoid duplicate assigns
   }

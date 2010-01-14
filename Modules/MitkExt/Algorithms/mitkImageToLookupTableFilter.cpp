@@ -130,7 +130,7 @@ void mitk::ImageToLookupTableFilter::GenerateData()
                 minValue = std::min(norm, minValue);
                 maxValue = std::max(norm, maxValue);
             }
-            LOG_INFO << "Range of vector magnitudes: [" << minValue << ", "<< maxValue << "]." << std::endl;
+            MITK_INFO << "Range of vector magnitudes: [" << minValue << ", "<< maxValue << "]." << std::endl;
             vtkLut->SetRange(minValue, maxValue);      
         }
         else 

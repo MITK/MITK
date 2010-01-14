@@ -114,13 +114,13 @@ mitk::ImageMapper2D::Paint( mitk::BaseRenderer *renderer )
   //GLdouble eqn0[4] = {  1.0,  0.0,  0.0, 0.0 };
   //GLdouble eqn1[4] = {  -1.0,  0.0,  0.0, rendererInfo.m_Extent[0]
   //  + 2.0 * rendererInfo.m_Overlap[0]/* - rendererInfo.m_PixelsPerMM[0]*/ };
-  //LOG_INFO << "X: " << rendererInfo.m_Extent[0]
+  //MITK_INFO << "X: " << rendererInfo.m_Extent[0]
   //  + 2.0 * rendererInfo.m_Overlap[0] - rendererInfo.m_PixelsPerMM[0] << std::endl;
 
   //GLdouble eqn2[4] = {  0.0,  1.0,  0.0, 0.0 };
   //GLdouble eqn3[4] = {  0.0, -1.0,  0.0, rendererInfo.m_Extent[1]
   //  + 2.0 * rendererInfo.m_Overlap[1]/* - rendererInfo.m_PixelsPerMM[1]*/ };
-  //LOG_INFO << "Y:" << rendererInfo.m_Extent[1]
+  //MITK_INFO << "Y:" << rendererInfo.m_Extent[1]
   //  + 2.0 * rendererInfo.m_Overlap[1] - rendererInfo.m_PixelsPerMM[1] << std::endl;
 
   // IW commented out the previous lines and reverted to rev. 9358
@@ -933,7 +933,7 @@ mitk::ImageMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
       //this->GetDataTreeNode()->SetFloatProperty( "opacity", 0.3, renderer );
       //set opacity
       //rgba[3] = 0.3;
-      LOG_WARN << "Type of all binary images should be (un)signed char. Outline does not work on other pixel types!";
+      MITK_WARN << "Type of all binary images should be (un)signed char. Outline does not work on other pixel types!";
     }
   }
   else 

@@ -167,7 +167,7 @@ bool AffineInteractor3D
   BaseData *data = m_DataTreeNode->GetData();
   if ( data == NULL )
   {
-    LOG_ERROR << "No data object present!";
+    MITK_ERROR << "No data object present!";
     return ok;
   }
 

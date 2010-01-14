@@ -151,7 +151,7 @@ void mitk::SegmentationInterpolationController::SetReferenceVolume( const Image*
        || m_Segmentation->GetPixelType().GetNumberOfComponents() != 1
      )
   {
-    LOG_ERROR << "original patient image does not match segmentation, ignoring patient image" << std::endl;
+    MITK_ERROR << "original patient image does not match segmentation, ignoring patient image" << std::endl;
     m_ReferenceImage = NULL;
     return;
   }
@@ -159,7 +159,7 @@ void mitk::SegmentationInterpolationController::SetReferenceVolume( const Image*
   for (unsigned int dim = 0; dim < m_Segmentation->GetDimension(); ++dim)
     if ( m_ReferenceImage->GetDimension(dim) != m_Segmentation->GetDimension(dim) )
     {
-      LOG_ERROR << "original patient image does not match segmentation (different extent in dimension " << dim 
+      MITK_ERROR << "original patient image does not match segmentation (different extent in dimension " << dim 
                 << "), ignoring patient image" << std::endl;
       m_ReferenceImage = NULL;
       return;
@@ -252,7 +252,7 @@ void mitk::SegmentationInterpolationController::ScanChangedSlice( itk::Image<DAT
   assert ( (signed) m_SegmentationCountInSlice[timeStep][sliceDimension][sliceIndex] + numberOfPixels >= 0 );
   m_SegmentationCountInSlice[timeStep][sliceDimension][sliceIndex] += numberOfPixels;
   
-  //LOG_INFO << "scan t=" << timeStep << " from (0,0) to (" << dim0max << "," << dim1max << ") (" << pixelData << "-" << pixelData+dim0max*dim1max-1 <<  ") in slice " << sliceIndex << " found " << numberOfPixels << " pixels" << std::endl;
+  //MITK_INFO << "scan t=" << timeStep << " from (0,0) to (" << dim0max << "," << dim1max << ") (" << pixelData << "-" << pixelData+dim0max*dim1max-1 <<  ") in slice " << sliceIndex << " found " << numberOfPixels << " pixels" << std::endl;
 }
 
 
@@ -328,57 +328,57 @@ void mitk::SegmentationInterpolationController::PrintStatus()
 {
   unsigned int timeStep(0); // if needed, put a loop over time steps around everyting, but beware, output will be long
 
-  LOG_INFO << "Interpolator status (timestep 0): dimensions " 
+  MITK_INFO << "Interpolator status (timestep 0): dimensions " 
            << m_SegmentationCountInSlice[timeStep][0].size() << " " 
            << m_SegmentationCountInSlice[timeStep][1].size() << " "
            << m_SegmentationCountInSlice[timeStep][2].size() << std::endl;
     
-  LOG_INFO << "Slice 0: " <<  m_SegmentationCountInSlice[timeStep][2][0] << std::endl;
+  MITK_INFO << "Slice 0: " <<  m_SegmentationCountInSlice[timeStep][2][0] << std::endl;
 
   // row "x"
   for (unsigned int index = 0; index < m_SegmentationCountInSlice[timeStep][0].size(); ++index)
   {
     if ( m_SegmentationCountInSlice[timeStep][0][index] > 0 )
-      LOG_INFO << "O";
+      MITK_INFO << "O";
     else
-      LOG_INFO << ".";
+      MITK_INFO << ".";
   }
-  LOG_INFO << std::endl;
+  MITK_INFO << std::endl;
  
   // rows "y" and "z" (diagonal)
   for (unsigned int index = 1; index < m_SegmentationCountInSlice[timeStep][1].size(); ++index)
   {
     if ( m_SegmentationCountInSlice[timeStep][1][index] > 0 )
-      LOG_INFO << "O";
+      MITK_INFO << "O";
     else
-      LOG_INFO << ".";
+      MITK_INFO << ".";
 
     if ( m_SegmentationCountInSlice[timeStep][2].size() > index ) // if we also have a z value here, then print it, too
     {
       for (unsigned int indent = 1; indent < index; ++indent)
-        LOG_INFO << " ";
+        MITK_INFO << " ";
 
       if ( m_SegmentationCountInSlice[timeStep][2][index] > 0 )
-        LOG_INFO << m_SegmentationCountInSlice[timeStep][2][index];//"O";
+        MITK_INFO << m_SegmentationCountInSlice[timeStep][2][index];//"O";
       else
-        LOG_INFO << ".";
+        MITK_INFO << ".";
     }
 
-    LOG_INFO << std::endl;
+    MITK_INFO << std::endl;
   }
 
   // z indices that are larger than the biggest y index
   for (unsigned int index = m_SegmentationCountInSlice[timeStep][1].size(); index < m_SegmentationCountInSlice[timeStep][2].size(); ++index)
   {
     for (unsigned int indent = 0; indent < index; ++indent)
-    LOG_INFO << " ";
+    MITK_INFO << " ";
 
     if ( m_SegmentationCountInSlice[timeStep][2][index] > 0 )
-      LOG_INFO << m_SegmentationCountInSlice[timeStep][2][index];//"O";
+      MITK_INFO << m_SegmentationCountInSlice[timeStep][2][index];//"O";
     else
-      LOG_INFO << ".";
+      MITK_INFO << ".";
     
-    LOG_INFO << std::endl;
+    MITK_INFO << std::endl;
   }
 }
 
@@ -424,7 +424,7 @@ mitk::Image::Pointer mitk::SegmentationInterpolationController::Interpolate( uns
   if (!bounds) return NULL;
  
   // ok, we have found two neighboring slices with segmentations (and we made sure that the current slice does NOT contain anything
-  //LOG_INFO << "Interpolate in timestep " << timeStep << ", dimension " << sliceDimension << ": estimate slice " << sliceIndex << " from slices " << lowerBound << " and " << upperBound << std::endl;
+  //MITK_INFO << "Interpolate in timestep " << timeStep << ", dimension " << sliceDimension << ": estimate slice " << sliceIndex << " from slices " << lowerBound << " and " << upperBound << std::endl;
 
   mitk::Image::Pointer lowerMITKSlice;
   mitk::Image::Pointer upperMITKSlice;

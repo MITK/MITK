@@ -151,7 +151,7 @@ mitk::Geometry3D::Pointer mitk::DataTree::ComputeBoundingGeometry3D(mitk::DataTr
         }
         catch(itk::ExceptionObject e)
         {
-          LOG_ERROR << e << std::endl;
+          MITK_ERROR << e << std::endl;
         }
       }
     }

@@ -81,7 +81,7 @@ void mitk::vtkPointSetXMLParser::EndElement ( const char *name )
     //
     if ( m_ParseStack.top() != currentElement )
     {
-        LOG_ERROR << "Top of parse stack ( " << m_ParseStack.top() << " ) is != currentEndElement ( " << currentElement << " )!" << std::endl;
+        MITK_ERROR << "Top of parse stack ( " << m_ParseStack.top() << " ) is != currentEndElement ( " << currentElement << " )!" << std::endl;
     }
     m_ParseStack.pop();
 

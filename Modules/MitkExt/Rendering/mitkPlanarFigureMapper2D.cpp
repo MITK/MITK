@@ -61,7 +61,7 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
     dynamic_cast< Geometry2D * >( planarFigure->GetGeometry( 0 ) );
   if ( planarFigureGeometry2D == NULL )
   {
-    LOG_ERROR << "PlanarFigure does not have valid Geometry2D!";
+    MITK_ERROR << "PlanarFigure does not have valid Geometry2D!";
     return;
   }
 

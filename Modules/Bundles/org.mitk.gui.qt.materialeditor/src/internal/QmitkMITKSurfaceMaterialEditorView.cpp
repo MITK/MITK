@@ -159,14 +159,14 @@ void QmitkMITKSurfaceMaterialEditorView::RefreshPropertiesList()
       observerAllocated=true;
     } 
     
-    LOG_INFO << "PROPERTIES SCAN BEGIN";
+    MITK_INFO << "PROPERTIES SCAN BEGIN";
 
     for(mitk::PropertyList::PropertyMap::const_iterator it=SrcPL->GetMap()->begin(); it!=SrcPL->GetMap()->end(); it++)
     {
       std::string name=it->first;
       mitk::BaseProperty *p=it->second.first;
 
-      // LOG_INFO << "property '" << name << "' found";
+      // MITK_INFO << "property '" << name << "' found";
       
       if(shaderState.compare("fixed")==0)
       {
@@ -184,7 +184,7 @@ void QmitkMITKSurfaceMaterialEditorView::RefreshPropertiesList()
       }
     }      
    
-    LOG_INFO << "PROPERTIES SCAN END";
+    MITK_INFO << "PROPERTIES SCAN END";
   }      
 
   m_Controls->m_ShaderPropertyList->SetPropertyList( DstPL );
@@ -337,7 +337,7 @@ void QmitkMITKSurfaceMaterialEditorView::timerEvent( QTimerEvent *e )
 {
   if(usedTimer!=e->timerId())
   {
-    LOG_ERROR << "INTERNAL ERROR: usedTimer[" << usedTimer << "] != timerId[" << e->timerId() << "]";
+    MITK_ERROR << "INTERNAL ERROR: usedTimer[" << usedTimer << "] != timerId[" << e->timerId() << "]";
   }
 
   if(usedTimer)

@@ -15,8 +15,8 @@
 #include "vtkMitkVolumeTextureMapper3D.h"
 #include "mitkCommon.h"
 
-#define GPU_INFO LOG_INFO("mapper.vr")
-#define GPU_WARN LOG_WARN("mapper.vr")
+#define GPU_INFO MITK_INFO("mapper.vr")
+#define GPU_WARN MITK_WARN("mapper.vr")
 
 #include "vtkCamera.h"
 #include "vtkColorTransferFunction.h"

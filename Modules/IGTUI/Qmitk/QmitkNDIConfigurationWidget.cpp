@@ -329,7 +329,7 @@ void QmitkNDIConfigurationWidget::ScanPortsForNDITrackingDevices( PortDeviceMap&
   
   // \Todo: use parallel scanning
   //QtConcurrent::blockingMap( portsAndDevices.begin(), portsAndDevices.end(), ScanPort );
-  //LOG_INFO << portsAndDevices;
+  //MITK_INFO << portsAndDevices;
 }
 
 

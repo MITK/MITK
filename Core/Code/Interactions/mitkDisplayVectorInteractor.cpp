@@ -37,9 +37,9 @@ void mitk::DisplayVectorInteractor::ExecuteOperation(Operation* itkNotUsed( oper
     m_StartDisplayCoordinate=dcOperation->GetStartDisplayCoordinate();
     m_LastDisplayCoordinate=dcOperation->GetLastDisplayCoordinate();
     m_CurrentDisplayCoordinate=dcOperation->GetCurrentDisplayCoordinate();
-//    LOG_INFO << m_CurrentDisplayCoordinate << std::endl;
+//    MITK_INFO << m_CurrentDisplayCoordinate << std::endl;
     
-    LOG_INFO<<"Message from DisplayVectorInteractor.cpp::ExecuteOperation() : "
+    MITK_INFO<<"Message from DisplayVectorInteractor.cpp::ExecuteOperation() : "
       << "StartDisplayCoordinate:" <<     m_StartDisplayCoordinate 
       << "LastDisplayCoordinate:" <<      m_LastDisplayCoordinate 
       << "CurrentDisplayCoordinate:" <<   m_CurrentDisplayCoordinate 
@@ -135,7 +135,7 @@ bool mitk::DisplayVectorInteractor::ExecuteAction(Action* action, mitk::StateEve
       //make Operation
       m_LastDisplayCoordinate=m_CurrentDisplayCoordinate;
       m_CurrentDisplayCoordinate=posEvent->GetDisplayPosition();
-      //LOG_INFO << m_CurrentDisplayCoordinate << std::endl;
+      //MITK_INFO << m_CurrentDisplayCoordinate << std::endl;
       
       //execute the Operation
       m_Destination->ExecuteOperation(doOp);

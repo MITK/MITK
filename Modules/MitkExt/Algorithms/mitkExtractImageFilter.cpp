@@ -40,7 +40,7 @@ void mitk::ExtractImageFilter::GenerateData()
 
    if ( (input->GetDimension() > 4) || (input->GetDimension() < 2) )
    {
-     LOG_ERROR << "mitk::ExtractImageFilter:GenerateData works only with 3D and 3D+t images, sorry." << std::endl;
+     MITK_ERROR << "mitk::ExtractImageFilter:GenerateData works only with 3D and 3D+t images, sorry." << std::endl;
      itkExceptionMacro("mitk::ExtractImageFilter works only with 3D and 3D+t images, sorry.");
      return;
    }
@@ -62,7 +62,7 @@ void mitk::ExtractImageFilter::GenerateData()
 
   if ( m_SliceDimension >= input->GetDimension() )
   {
-    LOG_ERROR << "mitk::ExtractImageFilter:GenerateData  m_SliceDimension == " << m_SliceDimension << " makes no sense with an " << input->GetDimension() << "D image." << std::endl;
+    MITK_ERROR << "mitk::ExtractImageFilter:GenerateData  m_SliceDimension == " << m_SliceDimension << " makes no sense with an " << input->GetDimension() << "D image." << std::endl;
     itkExceptionMacro("This is not a sensible value for m_SliceDimension.");
     return;
   }
@@ -73,7 +73,7 @@ void mitk::ExtractImageFilter::GenerateData()
   Geometry3D* inputImageGeometry = ImageToImageFilter::GetInput(0)->GetGeometry();
   if (!inputImageGeometry)
   {
-    LOG_ERROR << "In ExtractImageFilter::ItkImageProcessing: Input image has no geometry!" << std::endl;
+    MITK_ERROR << "In ExtractImageFilter::ItkImageProcessing: Input image has no geometry!" << std::endl;
     return;
   }
 
@@ -200,7 +200,7 @@ void mitk::ExtractImageFilter::GenerateOutputInformation()
 
  if ( m_SliceDimension >= input->GetDimension() && input->GetDimension() != 2 )
  {
-   LOG_ERROR << "mitk::ExtractImageFilter:GenerateOutputInformation  m_SliceDimension == " << m_SliceDimension << " makes no sense with an " << input->GetDimension() << "D image." << std::endl;
+   MITK_ERROR << "mitk::ExtractImageFilter:GenerateOutputInformation  m_SliceDimension == " << m_SliceDimension << " makes no sense with an " << input->GetDimension() << "D image." << std::endl;
    itkExceptionMacro("This is not a sensible value for m_SliceDimension.");
    return;
  }

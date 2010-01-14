@@ -98,7 +98,7 @@ bool mitk::TransferFunctionPropertySerializer::SerializeTransferFunction( const 
    
   if(!s)
   {
-    LOG_ERROR << "cant serialize transfer function";
+    MITK_ERROR << "cant serialize transfer function";
     return false;
   }
    
@@ -114,7 +114,7 @@ bool mitk::TransferFunctionPropertySerializer::SerializeTransferFunction( const 
   
   if ( !document.SaveFile( filename ) )
   {
-    LOG_ERROR << "Could not write scene to " << filename << "\nTinyXML reports '" << document.ErrorDesc() << "'";
+    MITK_ERROR << "Could not write scene to " << filename << "\nTinyXML reports '" << document.ErrorDesc() << "'";
     return false;
   }
   return true;

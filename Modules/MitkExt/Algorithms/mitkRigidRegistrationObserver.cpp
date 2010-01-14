@@ -44,7 +44,7 @@ void mitk::RigidRegistrationObserver::Execute(itk::Object *caller, const itk::Ev
     if (ExhaustiveOptimizer != NULL)
     {
       m_OptimizerValue = ExhaustiveOptimizer->GetValue(ExhaustiveOptimizer->GetCurrentPosition());
-      LOG_INFO << ExhaustiveOptimizer->GetValue(ExhaustiveOptimizer->GetCurrentPosition()) << "   "
+      MITK_INFO << ExhaustiveOptimizer->GetValue(ExhaustiveOptimizer->GetCurrentPosition()) << "   "
                << ExhaustiveOptimizer->GetCurrentPosition() << std::endl;
       m_Params = ExhaustiveOptimizer->GetCurrentPosition();
       if(m_StopOptimization)
@@ -57,7 +57,7 @@ void mitk::RigidRegistrationObserver::Execute(itk::Object *caller, const itk::Ev
     else if (GradientDescentOptimizer != NULL)
     {
       m_OptimizerValue = GradientDescentOptimizer->GetValue();
-      LOG_INFO << GradientDescentOptimizer->GetCurrentIteration() << "   "
+      MITK_INFO << GradientDescentOptimizer->GetCurrentIteration() << "   "
                << GradientDescentOptimizer->GetValue() << "   "
                << GradientDescentOptimizer->GetCurrentPosition() << std::endl;
       m_Params = GradientDescentOptimizer->GetCurrentPosition();
@@ -71,7 +71,7 @@ void mitk::RigidRegistrationObserver::Execute(itk::Object *caller, const itk::Ev
     else if (QuaternionRigidTransformGradientDescentOptimizer != NULL)
     {
       m_OptimizerValue = QuaternionRigidTransformGradientDescentOptimizer->GetValue();
-      LOG_INFO << QuaternionRigidTransformGradientDescentOptimizer->GetCurrentIteration() << "   "
+      MITK_INFO << QuaternionRigidTransformGradientDescentOptimizer->GetCurrentIteration() << "   "
                << QuaternionRigidTransformGradientDescentOptimizer->GetValue() << "   "
                << QuaternionRigidTransformGradientDescentOptimizer->GetCurrentPosition() << std::endl;
       m_Params = QuaternionRigidTransformGradientDescentOptimizer->GetCurrentPosition();
@@ -85,7 +85,7 @@ void mitk::RigidRegistrationObserver::Execute(itk::Object *caller, const itk::Ev
     else if (LBFGSBOptimizer != NULL)
     {
       m_OptimizerValue = LBFGSBOptimizer->GetValue();
-      LOG_INFO << LBFGSBOptimizer->GetCurrentIteration() << "   "
+      MITK_INFO << LBFGSBOptimizer->GetCurrentIteration() << "   "
                << LBFGSBOptimizer->GetValue() << "   "
                << LBFGSBOptimizer->GetCurrentPosition() << std::endl;
       m_Params = LBFGSBOptimizer->GetCurrentPosition();
@@ -99,7 +99,7 @@ void mitk::RigidRegistrationObserver::Execute(itk::Object *caller, const itk::Ev
     else if (OnePlusOneEvolutionaryOptimizer != NULL)
     {
       m_OptimizerValue = OnePlusOneEvolutionaryOptimizer->GetValue();
-      LOG_INFO << OnePlusOneEvolutionaryOptimizer->GetCurrentIteration() << "   "
+      MITK_INFO << OnePlusOneEvolutionaryOptimizer->GetCurrentIteration() << "   "
                << OnePlusOneEvolutionaryOptimizer->GetValue() << "   "
                << OnePlusOneEvolutionaryOptimizer->GetCurrentPosition() << std::endl;
       m_Params = OnePlusOneEvolutionaryOptimizer->GetCurrentPosition();
@@ -113,7 +113,7 @@ void mitk::RigidRegistrationObserver::Execute(itk::Object *caller, const itk::Ev
     else if (PowellOptimizer != NULL)
     {
       m_OptimizerValue = PowellOptimizer->GetValue();
-      LOG_INFO << PowellOptimizer->GetCurrentIteration() << "   "
+      MITK_INFO << PowellOptimizer->GetCurrentIteration() << "   "
                << PowellOptimizer->GetValue() << "   "
                << PowellOptimizer->GetCurrentPosition() << std::endl;
       m_Params = PowellOptimizer->GetCurrentPosition();
@@ -127,7 +127,7 @@ void mitk::RigidRegistrationObserver::Execute(itk::Object *caller, const itk::Ev
     else if (FRPROptimizer != NULL)
     {
       m_OptimizerValue = FRPROptimizer->GetValue();
-      LOG_INFO << FRPROptimizer->GetCurrentIteration() << "   "
+      MITK_INFO << FRPROptimizer->GetCurrentIteration() << "   "
                << FRPROptimizer->GetValue() << "   "
                << FRPROptimizer->GetCurrentPosition() << std::endl;
       m_Params = FRPROptimizer->GetCurrentPosition();
@@ -141,7 +141,7 @@ void mitk::RigidRegistrationObserver::Execute(itk::Object *caller, const itk::Ev
     else if (RegularStepGradientDescentOptimizer != NULL)
     {
       m_OptimizerValue = RegularStepGradientDescentOptimizer->GetValue();
-      LOG_INFO << RegularStepGradientDescentOptimizer->GetCurrentIteration() << "   "
+      MITK_INFO << RegularStepGradientDescentOptimizer->GetCurrentIteration() << "   "
                << RegularStepGradientDescentOptimizer->GetValue() << "   "
                << RegularStepGradientDescentOptimizer->GetCurrentPosition() << std::endl;
       m_Params = RegularStepGradientDescentOptimizer->GetCurrentPosition();
@@ -155,7 +155,7 @@ void mitk::RigidRegistrationObserver::Execute(itk::Object *caller, const itk::Ev
     else if (VersorRigid3DTransformOptimizer != NULL)
     {
       m_OptimizerValue = VersorRigid3DTransformOptimizer->GetValue();
-      LOG_INFO << VersorRigid3DTransformOptimizer->GetCurrentIteration() << "   "
+      MITK_INFO << VersorRigid3DTransformOptimizer->GetCurrentIteration() << "   "
                << VersorRigid3DTransformOptimizer->GetValue() << "   "
                << VersorRigid3DTransformOptimizer->GetCurrentPosition() << std::endl;
       m_Params = VersorRigid3DTransformOptimizer->GetCurrentPosition();
@@ -169,7 +169,7 @@ void mitk::RigidRegistrationObserver::Execute(itk::Object *caller, const itk::Ev
     else if (VersorTransformOptimizer != NULL)
     {
       m_OptimizerValue = VersorTransformOptimizer->GetValue();
-      LOG_INFO << VersorTransformOptimizer->GetCurrentIteration() << "   "
+      MITK_INFO << VersorTransformOptimizer->GetCurrentIteration() << "   "
                << VersorTransformOptimizer->GetValue() << "   "
                << VersorTransformOptimizer->GetCurrentPosition() << std::endl;
       m_Params = VersorTransformOptimizer->GetCurrentPosition();
@@ -183,7 +183,7 @@ void mitk::RigidRegistrationObserver::Execute(itk::Object *caller, const itk::Ev
     else if (AmoebaOptimizer != NULL)
     {
       m_OptimizerValue = AmoebaOptimizer->GetCachedValue();
-      LOG_INFO << AmoebaOptimizer->GetCachedValue() << "   "
+      MITK_INFO << AmoebaOptimizer->GetCachedValue() << "   "
                << AmoebaOptimizer->GetCachedCurrentPosition() << std::endl;
       m_Params = AmoebaOptimizer->GetCurrentPosition();
       if(m_StopOptimization)
@@ -196,7 +196,7 @@ void mitk::RigidRegistrationObserver::Execute(itk::Object *caller, const itk::Ev
     else if (ConjugateGradientOptimizer != NULL)
     {
       m_OptimizerValue = ConjugateGradientOptimizer->GetValue();
-      LOG_INFO << ConjugateGradientOptimizer->GetCurrentIteration() << "   "
+      MITK_INFO << ConjugateGradientOptimizer->GetCurrentIteration() << "   "
                << ConjugateGradientOptimizer->GetValue() << "   "
                << ConjugateGradientOptimizer->GetCurrentPosition() << std::endl;
       m_Params = ConjugateGradientOptimizer->GetCurrentPosition();
@@ -215,15 +215,15 @@ void mitk::RigidRegistrationObserver::Execute(itk::Object *caller, const itk::Ev
         m_StopOptimization = false;
       }
       //m_OptimizerValue = LBFGSOptimizer->GetValue();
-      /*LOG_INFO << LBFGSOptimizer->GetCurrentIteration() << "   ";
-      LOG_INFO << LBFGSOptimizer->GetValue() << "   ";
-      LOG_INFO << LBFGSOptimizer->GetInfinityNormOfProjectedGradient() << std::endl;*/
+      /*MITK_INFO << LBFGSOptimizer->GetCurrentIteration() << "   ";
+      MITK_INFO << LBFGSOptimizer->GetValue() << "   ";
+      MITK_INFO << LBFGSOptimizer->GetInfinityNormOfProjectedGradient() << std::endl;*/
       InvokeEvent(itk::ModifiedEvent());
     }
     else if (SPSAOptimizer != NULL)
     {
       m_OptimizerValue = SPSAOptimizer->GetValue();
-      LOG_INFO << SPSAOptimizer->GetCurrentIteration() << "   "
+      MITK_INFO << SPSAOptimizer->GetCurrentIteration() << "   "
                << SPSAOptimizer->GetValue() << "   "
                << SPSAOptimizer->GetCurrentPosition() << std::endl;
       m_Params = SPSAOptimizer->GetCurrentPosition();
@@ -242,7 +242,7 @@ void mitk::RigidRegistrationObserver::Execute(itk::Object *caller, const itk::Ev
     if (AmoebaOptimizer != NULL)
     {
       m_OptimizerValue = AmoebaOptimizer->GetCachedValue();
-      LOG_INFO << AmoebaOptimizer->GetCachedValue() << "   "
+      MITK_INFO << AmoebaOptimizer->GetCachedValue() << "   "
                << AmoebaOptimizer->GetCachedCurrentPosition() << std::endl;
       m_Params = AmoebaOptimizer->GetCachedCurrentPosition();
       if(m_StopOptimization)

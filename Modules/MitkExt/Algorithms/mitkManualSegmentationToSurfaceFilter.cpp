@@ -60,7 +60,7 @@ void mitk::ManualSegmentationToSurfaceFilter::GenerateData()
     vtkSmartPointer<vtkImageData> vtkimage = image->GetVtkImageData(t);
 
     // Median -->smooth 3D 
-    LOG_INFO << (m_MedianFilter3D ? "Applying median..." : "No median filtering");
+    MITK_INFO << (m_MedianFilter3D ? "Applying median..." : "No median filtering");
     if(m_MedianFilter3D)
     {
       vtkImageMedian3D *median = vtkImageMedian3D::New();
@@ -75,7 +75,7 @@ void mitk::ManualSegmentationToSurfaceFilter::GenerateData()
     ProgressBar::GetInstance()->Progress();
 
     //Interpolate image spacing 
-    LOG_INFO << (m_Interpolation ? "Resampling..." : "No resampling");
+    MITK_INFO << (m_Interpolation ? "Resampling..." : "No resampling");
     if(m_Interpolation)
     {
       vtkImageResample * imageresample = vtkImageResample::New();
@@ -92,7 +92,7 @@ void mitk::ManualSegmentationToSurfaceFilter::GenerateData()
     }
     ProgressBar::GetInstance()->Progress();
 
-    LOG_INFO << (m_UseGaussianImageSmooth ? "Applying gaussian smoothing..." : "No gaussian smoothing");
+    MITK_INFO << (m_UseGaussianImageSmooth ? "Applying gaussian smoothing..." : "No gaussian smoothing");
     if(m_UseGaussianImageSmooth)//gauss
     {
       vtkImageThreshold* vtkimagethreshold = vtkImageThreshold::New();

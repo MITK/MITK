@@ -28,7 +28,7 @@ mitk::BasePropertySerializer::~BasePropertySerializer()
 
 TiXmlElement* mitk::BasePropertySerializer::Serialize()
 {
-  LOG_INFO << this->GetNameOfClass() 
+  MITK_INFO << this->GetNameOfClass() 
            << " is asked to serialize an object " << (const void*) this->m_Property;
 
   return NULL; 

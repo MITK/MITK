@@ -97,7 +97,7 @@ bool mitk::PointSetReader::CanReadFile(const std::string filename, const std::st
   // First check the extension
   if(  filename == "" )
   {
-      //LOG_INFO<<"No filename specified."<<std::endl;
+      //MITK_INFO<<"No filename specified."<<std::endl;
     return false;
   }
 
@@ -122,7 +122,7 @@ bool mitk::PointSetReader::CanReadFile(const std::string filename, const std::st
 
   if( !extensionFound )
     {
-      //LOG_INFO<<"The filename extension is not recognized."<<std::endl;
+      //MITK_INFO<<"The filename extension is not recognized."<<std::endl;
     return false;
     }
 

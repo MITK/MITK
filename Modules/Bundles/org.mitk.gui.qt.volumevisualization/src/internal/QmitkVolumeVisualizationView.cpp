@@ -172,7 +172,7 @@ void QmitkVolumeVisualizationView::SelectionChanged( cherry::IWorkbenchPart::Poi
 
 void QmitkVolumeVisualizationView::UpdateFromCurrentDataManagerSelection()
 {
-  //LOG_INFO << "Update selection from DataManager";
+  //MITK_INFO << "Update selection from DataManager";
   cherry::ISelection::ConstPointer selection( this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection("org.mitk.views.datamanager"));
   this->SelectionChanged(cherry::SmartPointer<IWorkbenchPart>(NULL), selection);
 }

@@ -1,6 +1,6 @@
 /*=========================================================================
 
-Program:   openCherry Platform
+Program:   openMITK Platform
 Language:  C++
 Date:      $Date: 2009-03-06 01:07:35 +0100 (Fri, 06 Mar 2009) $
 Version:   $Revision: 16492 $
@@ -15,16 +15,15 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#ifndef __CHERRY_LOG_H__
-#define __CHERRY_LOG_H__
+#ifndef __MITK_LOG_H__
+#define __MITK_LOG_H__
 
 #include <mbilog.h>
 
-#define CHERRY_INFO MBI_INFO("BlueBerry")
-#define CHERRY_WARN MBI_WARN("BlueBerry")
-#define CHERRY_ERROR MBI_ERROR("BlueBerry")
-#define CHERRY_FATAL MBI_FATAL("BlueBerry")
+#define MITK_INFO MBI_INFO
+#define MITK_WARN MBI_WARN
+#define MITK_ERROR MBI_ERROR
+#define MITK_FATAL MBI_FATAL
+#define MITK_DEBUG MBI_DEBUG
 
-#define CHERRY_DEBUG MBI_DEBUG("BlueBerry")
-
-#endif /*__CHERRY_LOG_H__*/
+#endif /*__MITK_LOG_H__*/

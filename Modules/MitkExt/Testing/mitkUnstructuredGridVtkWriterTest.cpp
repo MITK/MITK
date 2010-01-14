@@ -48,7 +48,7 @@ int mitkUnstructuredGridVtkWriterTest(int argc , char* argv[])
 
   if (argc<1)
   {
-    LOG_INFO<<"Command line argument missing";
+    MITK_INFO<<"Command line argument missing";
     return 0;
   }
   // create contour by reading the file given in argv[1]
@@ -62,7 +62,7 @@ int mitkUnstructuredGridVtkWriterTest(int argc , char* argv[])
   }
   catch (itk::ExceptionObject e)
   {
-    LOG_INFO<<e.GetDescription();
+    MITK_INFO<<e.GetDescription();
     return 0;
   }
 
@@ -77,7 +77,7 @@ int mitkUnstructuredGridVtkWriterTest(int argc , char* argv[])
   }
   catch(...) {
     //this means that a wrong exception (i.e. no itk:Exception) has been thrown 
-    LOG_INFO << "Wrong exception (i.e. no itk:Exception) caught during write [FAILED]" << std::endl;
+    MITK_INFO << "Wrong exception (i.e. no itk:Exception) caught during write [FAILED]" << std::endl;
     return EXIT_FAILURE;
   }
 

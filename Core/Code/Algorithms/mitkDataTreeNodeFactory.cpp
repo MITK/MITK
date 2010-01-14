@@ -130,7 +130,7 @@ void mitk::DataTreeNodeFactory::GenerateData()
       {
         std::string message("File does not exist, or cannot be read. Filename = ");
         message += m_FileName;
-        LOG_ERROR << message;
+        MITK_ERROR << message;
         itkExceptionMacro( << message );
       }
     }
@@ -257,7 +257,7 @@ void mitk::DataTreeNodeFactory::OnITKProgressEvent(itk::Object *source, const it
 
 void mitk::DataTreeNodeFactory::ReadFileSeriesTypeDCM()
 {
-  LOG_INFO << "loading image series with prefix " << m_FilePrefix << " and pattern " << m_FilePattern << " as DICOM..." << std::endl;
+  MITK_INFO << "loading image series with prefix " << m_FilePrefix << " and pattern " << m_FilePattern << " as DICOM..." << std::endl;
 
   typedef itk::Image<short, 3> ImageType;
   typedef itk::ImageSeriesReader< ImageType > ReaderType;
@@ -288,10 +288,10 @@ void mitk::DataTreeNodeFactory::ReadFileSeriesTypeDCM()
   StringContainer::const_iterator seriesItr = seriesUIDs.begin();
   StringContainer::const_iterator seriesEnd = seriesUIDs.end();
 
-  LOG_INFO << "The directory " << dir << " contains the following DICOM Series: " << std::endl;
+  MITK_INFO << "The directory " << dir << " contains the following DICOM Series: " << std::endl;
   while ( seriesItr != seriesEnd )
   {
-    LOG_INFO << *seriesItr << std::endl;
+    MITK_INFO << *seriesItr << std::endl;
     seriesItr++;
   }
 
@@ -300,13 +300,13 @@ void mitk::DataTreeNodeFactory::ReadFileSeriesTypeDCM()
 
   for ( unsigned int i = 0 ; i < size ; ++i )
   {
-    LOG_INFO << "Reading series #" << i << ": " << seriesUIDs[ i ] << std::endl;
+    MITK_INFO << "Reading series #" << i << ": " << seriesUIDs[ i ] << std::endl;
     StringContainer fileNames = nameGenerator->GetFileNames( seriesUIDs[ i ] );
     StringContainer::const_iterator fnItr = fileNames.begin();
     StringContainer::const_iterator fnEnd = fileNames.end();
     while ( fnItr != fnEnd )
     {
-      LOG_INFO << *fnItr << std::endl;
+      MITK_INFO << *fnItr << std::endl;
       ++fnItr;
     }
 
@@ -326,7 +326,7 @@ void mitk::DataTreeNodeFactory::ReadFileSeriesTypeDCM()
 
       if(reader->GetOutput() == NULL)
       {
-        LOG_INFO << "no image returned by reader for series #" << i << std::endl;
+        MITK_INFO << "no image returned by reader for series #" << i << std::endl;
         continue;
       }
 
@@ -350,7 +350,7 @@ void mitk::DataTreeNodeFactory::ReadFileSeriesTypeDCM()
     catch ( const std::exception & e )
     {
       itkWarningMacro( << e.what() );
-      LOG_ERROR << "skipping series #" << i << " due to exception" << std::endl;
+      MITK_ERROR << "skipping series #" << i << " due to exception" << std::endl;
       reader->ResetPipeline();
     }
   }

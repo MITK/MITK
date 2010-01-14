@@ -76,7 +76,7 @@ void ImageStatisticsCalculator::SetImage( const mitk::Image *image )
     classname.compare("QBallImage")==0 ||
     classname.compare("DiffusionImage")==0)
   {
-    LOG_ERROR << "mitk::ImageStatisticsCalculator::ComputeStatistics does not work on " << classname << ", sorry." << std::endl;
+    MITK_ERROR << "mitk::ImageStatisticsCalculator::ComputeStatistics does not work on " << classname << ", sorry." << std::endl;
     return;
   }
 
@@ -342,7 +342,7 @@ bool ImageStatisticsCalculator::ComputeStatistics( unsigned int timeStep )
   }
   else
   {
-    LOG_ERROR << "ImageStatistics: Image dimension not supported!";
+    MITK_ERROR << "ImageStatistics: Image dimension not supported!";
   }
 
 

@@ -54,13 +54,13 @@ mitk::ConferenceEventMapper::MapEvent(signed int mitkEventID, const char* sender
   {
     //calculate position of the real inner widget
     br->GetDisplayGeometry()->WorldToDisplay( p2d_mm, pos_unit);
-    //LOG_INFO<<p2d_mm[0]<<", "<<p2d_mm[1]<<", U: "<<pos_unit[0]<<", "<<pos_unit[1]<<" p3d ( "<<p3d[0]<<p3d[1]<<p3d[2]<<" ) "<<std::endl;
+    //MITK_INFO<<p2d_mm[0]<<", "<<p2d_mm[1]<<", U: "<<pos_unit[0]<<", "<<pos_unit[1]<<" p3d ( "<<p3d[0]<<p3d[1]<<p3d[2]<<" ) "<<std::endl;
     br->DrawOverlayMouse(pos_unit); //TEST
     //mitk::RenderingManager::GetInstance()->RequestOverlayUpdateAll();
   }
 
 
-  //LOG_INFO<<"mitkEventMapper::MapEvent(): "<<br->GetSizeX()<<" * "<<p1<<" =X (("<<p2d[0]<<"))   UND "<<br->GetSizeY()<<" * "<< p2 <<" =Y (("<<p2d[1]<<"))"<<std::endl;
+  //MITK_INFO<<"mitkEventMapper::MapEvent(): "<<br->GetSizeX()<<" * "<<p1<<" =X (("<<p2d[0]<<"))   UND "<<br->GetSizeY()<<" * "<< p2 <<" =Y (("<<p2d[1]<<"))"<<std::endl;
   
   //ONlY 3D Widget
   if( br->GetMapperID() == 2 )
@@ -123,7 +123,7 @@ mitk::ConferenceEventMapper::MapEvent(const char* sender, float w1, float w2, fl
   {
     //calculate position of the real inner widget
     br->GetDisplayGeometry()->WorldToDisplay( p2d_mm, pos_unit);
-    //LOG_INFO<<p2d_mm[0]<<", "<<p2d_mm[1]<<", U: "<<pos_unit[0]<<", "<<pos_unit[1]<<" p3d ( "<<p3d[0]<<p3d[1]<<p3d[2]<<" ) "<<std::endl;
+    //MITK_INFO<<p2d_mm[0]<<", "<<p2d_mm[1]<<", U: "<<pos_unit[0]<<", "<<pos_unit[1]<<" p3d ( "<<p3d[0]<<p3d[1]<<p3d[2]<<" ) "<<std::endl;
     br->DrawOverlayMouse(pos_unit); //TEST
     //mitk::RenderingManager::GetInstance()->RequestOverlayUpdateAll();
   }

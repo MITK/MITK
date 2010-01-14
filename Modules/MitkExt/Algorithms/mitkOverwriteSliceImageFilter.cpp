@@ -108,7 +108,7 @@ void mitk::OverwriteSliceImageFilter::GenerateData()
     m_SliceDifferenceImage->Initialize( pixelType, 2, m_SliceImage->GetDimensions() );
   }
 
-  //LOG_INFO << "Overwriting slice " << m_SliceIndex << " in dimension " << m_SliceDimension << " at time step " << m_TimeStep << std::endl;
+  //MITK_INFO << "Overwriting slice " << m_SliceIndex << " in dimension " << m_SliceDimension << " at time step " << m_TimeStep << std::endl;
   // this will do a long long if/else to find out both pixel types
   AccessFixedDimensionByItk( input3D, ItkImageSwitch, 3 );
 

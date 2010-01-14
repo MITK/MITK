@@ -98,12 +98,12 @@ mitk::PixelType::PixelType( const mitkIpPicDescriptor* pic ) : m_NumberOfCompone
 
 bool mitk::PixelType::operator==(const mitk::PixelType& rhs) const
 {
-  LOG_INFO << "operator==" << std::endl;
+  MITK_INFO << "operator==" << std::endl;
 
-LOG_INFO << "m_Type = " << m_Type << " " << rhs.m_Type << std::endl;
-LOG_INFO << "m_Bpe = " << m_Bpe << " " << rhs.m_Bpe << std::endl;
-LOG_INFO << "m_NumberOfComponents = " << m_NumberOfComponents << " " << rhs.m_NumberOfComponents << std::endl;
-LOG_INFO << "m_BitsPerComponent = " << m_BitsPerComponent << " " << rhs.m_BitsPerComponent << std::endl;
+MITK_INFO << "m_Type = " << m_Type << " " << rhs.m_Type << std::endl;
+MITK_INFO << "m_Bpe = " << m_Bpe << " " << rhs.m_Bpe << std::endl;
+MITK_INFO << "m_NumberOfComponents = " << m_NumberOfComponents << " " << rhs.m_NumberOfComponents << std::endl;
+MITK_INFO << "m_BitsPerComponent = " << m_BitsPerComponent << " " << rhs.m_BitsPerComponent << std::endl;
 
    return (
      *(this->m_TypeId) == *(rhs.m_TypeId)

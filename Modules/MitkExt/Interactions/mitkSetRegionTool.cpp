@@ -63,7 +63,7 @@ bool mitk::SetRegionTool::OnMousePressed (Action* action, const StateEvent* stat
   sliceGeometry->WorldToIndex( positionEvent->GetWorldPosition(), mprojectedPointIn2D );
   if ( !sliceGeometry->IsIndexInside( mprojectedPointIn2D ) )
   {
-    LOG_ERROR << "point apparently not inside segmentation slice" << std::endl;
+    MITK_ERROR << "point apparently not inside segmentation slice" << std::endl;
     return false; // can't use that as a seed point
   }
   itk::Index<2> projectedPointIn2D;
@@ -97,7 +97,7 @@ bool mitk::SetRegionTool::OnMousePressed (Action* action, const StateEvent* stat
   if ( m_SeedPointMemoryOffset >= static_cast<int>( originalPicSlice->n[0] * originalPicSlice->n[1] ) ||
        m_SeedPointMemoryOffset < 0 )
   {
-    LOG_ERROR << "Memory offset calculation if mitk::SetRegionTool has some serious flaw! Aborting.." << std::endl;
+    MITK_ERROR << "Memory offset calculation if mitk::SetRegionTool has some serious flaw! Aborting.." << std::endl;
     return false;
   }
   
@@ -155,7 +155,7 @@ bool mitk::SetRegionTool::OnMousePressed (Action* action, const StateEvent* stat
   }
   else
   {
-    LOG_ERROR << "Fill/Erase was never intended to work with other than binary images." << std::endl;
+    MITK_ERROR << "Fill/Erase was never intended to work with other than binary images." << std::endl;
     m_FillContour = false;
     return false;
   }
@@ -168,10 +168,10 @@ bool mitk::SetRegionTool::OnMousePressed (Action* action, const StateEvent* stat
   
   int numberOfContourPoints( 0 );
   int newBufferSize( 0 );
-  //LOG_INFO << "getting contour from offset " << oneContourOffset << " ("<<oneContourOffset%originalPicSlice->n[0]<<","<<oneContourOffset/originalPicSlice->n[0]<<")"<<std::endl;
+  //MITK_INFO << "getting contour from offset " << oneContourOffset << " ("<<oneContourOffset%originalPicSlice->n[0]<<","<<oneContourOffset/originalPicSlice->n[0]<<")"<<std::endl;
   float* contourPoints = ipMITKSegmentationGetContour8N( originalPicSlice, oneContourOffset, numberOfContourPoints, newBufferSize ); // memory allocated with malloc
   
-  //LOG_INFO << "contourPoints " << contourPoints << " (N="<<numberOfContourPoints<<")"<<std::endl;
+  //MITK_INFO << "contourPoints " << contourPoints << " (N="<<numberOfContourPoints<<")"<<std::endl;
   assert(contourPoints == NULL || numberOfContourPoints > 0);
     
   bool cursorInsideContour = ipMITKSegmentationIsInsideContour( contourPoints, numberOfContourPoints, projectedPointIn2D[0], projectedPointIn2D[1]);
@@ -264,7 +264,7 @@ bool mitk::SetRegionTool::OnMouseReleased(Action* action, const StateEvent* stat
 
     if ( slice.IsNull() )
     {
-      LOG_ERROR << "Unable to extract slice." << std::endl;
+      MITK_ERROR << "Unable to extract slice." << std::endl;
       return false;
     }
       
@@ -291,7 +291,7 @@ bool mitk::SetRegionTool::OnMouseReleased(Action* action, const StateEvent* stat
   }
   else
   {
-    LOG_ERROR << "FeedbackContourTool could not determine which slice of the image you are drawing on." << std::endl;
+    MITK_ERROR << "FeedbackContourTool could not determine which slice of the image you are drawing on." << std::endl;
   }
 
   m_WholeImageContourInWorldCoordinates = NULL;

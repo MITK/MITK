@@ -134,7 +134,7 @@ void mitk::CalculateGrayValueStatisticsTool::FinishProcessingAllData()
 
   // show/send results
   StatisticsCompleted.Send();
-  //LOG_INFO << m_CompleteReport.str() << std::endl;
+  //MITK_INFO << m_CompleteReport.str() << std::endl;
 }
 
 #define ROUND_P(x) ((int)((x)+0.5))

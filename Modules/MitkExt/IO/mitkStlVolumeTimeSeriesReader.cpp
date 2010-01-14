@@ -30,12 +30,12 @@ void mitk::StlVolumeTimeSeriesReader::GenerateData()
   }
 
   mitk::Surface::Pointer surface = this->GetOutput();
-  LOG_INFO << "prefix: "<< m_FilePrefix << ", pattern: " <<m_FilePattern << std::endl;
+  MITK_INFO << "prefix: "<< m_FilePrefix << ", pattern: " <<m_FilePattern << std::endl;
   surface->Expand(m_MatchedFileNames.size());
   for ( unsigned int i = 0 ; i < m_MatchedFileNames.size(); ++i )
   {
     std::string fileName = m_MatchedFileNames[i];
-    LOG_INFO << "Loading " << fileName << " as stl..." << std::endl;
+    MITK_INFO << "Loading " << fileName << " as stl..." << std::endl;
 
     STLFileReader::Pointer stlReader = STLFileReader::New();
     stlReader->SetFileName( fileName.c_str() );

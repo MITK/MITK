@@ -322,7 +322,7 @@ void QmitkDataManagerView::OpacityChanged(int value)
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
 
-  LOG_INFO << "slider changed";
+  MITK_INFO << "slider changed";
 }
 
 void QmitkDataManagerView::OpacityActionChanged()
@@ -336,7 +336,7 @@ void QmitkDataManagerView::OpacityActionChanged()
       m_OpacitySlider->setValue(static_cast<int>(opacity*100));
     }
   }
-  LOG_INFO << "changed";
+  MITK_INFO << "changed";
 }
 
 void QmitkDataManagerView::ColorChanged()
@@ -350,7 +350,7 @@ void QmitkDataManagerView::ColorChanged()
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
 
-  LOG_INFO << "slider changed";
+  MITK_INFO << "slider changed";
 }
 
 void QmitkDataManagerView::ColorActionChanged()
@@ -374,7 +374,7 @@ void QmitkDataManagerView::ColorActionChanged()
     styleSheet.append(")");
     m_ColorButton->setStyleSheet(styleSheet);
   }
-  LOG_INFO << "changed";
+  MITK_INFO << "changed";
 }
 
 void QmitkDataManagerView::TextureInterpolationChanged()
@@ -753,7 +753,7 @@ void QmitkDataManagerView::OtsuFilter( bool )
     }
     catch( std::exception& err )
     {
-      LOG_ERROR(this->GetClassName()) << err.what();
+      MITK_ERROR(this->GetClassName()) << err.what();
     }
 
   }

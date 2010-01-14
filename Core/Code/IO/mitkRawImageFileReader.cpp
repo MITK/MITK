@@ -67,7 +67,7 @@ void mitk::RawImageFileReader::GenerateData()
   
   if (this->GetOutput()==NULL)
   {
-    LOG_INFO << "Error" << std::endl;
+    MITK_INFO << "Error" << std::endl;
   }
 
   // Check to see if we can read the file given the name or prefix
@@ -90,7 +90,7 @@ void mitk::RawImageFileReader::GenerateData()
     else if (m_PixelType == DOUBLE) TypedGenerateData<double, 2 >();
     else
     {
-      LOG_INFO << "Error while reading raw file: Dimensionality or pixel type not supported or not properly set" << std::endl;
+      MITK_INFO << "Error while reading raw file: Dimensionality or pixel type not supported or not properly set" << std::endl;
       return;
     }
    }
@@ -106,18 +106,18 @@ void mitk::RawImageFileReader::GenerateData()
     else if (m_PixelType == DOUBLE) TypedGenerateData<double, 3 >();
     else
     {
-      LOG_INFO << "Error while reading raw file: Dimensionality or pixel type not supported or not properly set" << std::endl;
+      MITK_INFO << "Error while reading raw file: Dimensionality or pixel type not supported or not properly set" << std::endl;
       return;
     }
   }  
   else
   {
-    LOG_INFO << "Error while reading raw file: Dimensionality not supported" << std::endl;
+    MITK_INFO << "Error while reading raw file: Dimensionality not supported" << std::endl;
     return;
       
   }   
       
-  LOG_INFO << "...reading raw finished!" << std::endl;
+  MITK_INFO << "...reading raw finished!" << std::endl;
 }
 
 template < typename TPixel, unsigned int VImageDimensions >
@@ -127,10 +127,10 @@ void mitk::RawImageFileReader::TypedGenerateData()
   
   if (this->GetOutput()==NULL)
   {
-    LOG_INFO << "Error" << std::endl;
+    MITK_INFO << "Error" << std::endl;
   }
   
-  LOG_INFO << "loading " << m_FileName << " via itk::ImageIOFactory... " << std::endl;
+  MITK_INFO << "loading " << m_FileName << " via itk::ImageIOFactory... " << std::endl;
 
   // Check to see if we can read the file given the name or prefix
   if ( m_FileName == "" )
@@ -163,7 +163,7 @@ void mitk::RawImageFileReader::TypedGenerateData()
   }
   else
   {
-    LOG_INFO << "Warning: endianity not properly set. Resulting image might be incorrect";
+    MITK_INFO << "Warning: endianity not properly set. Resulting image might be incorrect";
   }
 
   reader->SetImageIO( io );
@@ -175,8 +175,8 @@ void mitk::RawImageFileReader::TypedGenerateData()
   }
   catch( itk::ExceptionObject & err )
   {
-    LOG_ERROR <<"An error occurred during the raw image reading process: ";
-    LOG_INFO << err << std::endl;
+    MITK_ERROR <<"An error occurred during the raw image reading process: ";
+    MITK_INFO << err << std::endl;
   }
 
   mitk::Image::Pointer image = mitk::Image::New();

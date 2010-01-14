@@ -30,7 +30,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <ctime>
 #include <sstream>
 
-#include "mbilog.h"
+#include "cherryLog.h"
 
 #include <QMutex>
 

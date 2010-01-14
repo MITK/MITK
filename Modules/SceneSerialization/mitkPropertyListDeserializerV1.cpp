@@ -41,7 +41,7 @@ bool mitk::PropertyListDeserializerV1::Deserialize()
   TiXmlDocument document( m_Filename );
   if (!document.LoadFile())
   {
-    LOG_ERROR << "Could not open/read/parse " << m_Filename << "\nTinyXML reports: " << document.ErrorDesc() << std::endl;
+    MITK_ERROR << "Could not open/read/parse " << m_Filename << "\nTinyXML reports: " << document.ErrorDesc() << std::endl;
     return false;
   }
 
@@ -60,12 +60,12 @@ bool mitk::PropertyListDeserializerV1::Deserialize()
     std::list<itk::LightObject::Pointer> readers = itk::ObjectFactoryBase::CreateAllInstance(propertyDeserializerClassName.str().c_str());
     if (readers.size() < 1)
     {
-      LOG_ERROR << "No property reader found for " << type;
+      MITK_ERROR << "No property reader found for " << type;
       error = true;
     }
     if (readers.size() > 1)
     {
-      LOG_WARN << "Multiple property readers found for " << type << ". Using arbitrary first one.";
+      MITK_WARN << "Multiple property readers found for " << type << ". Using arbitrary first one.";
     }
 
     for ( std::list<itk::LightObject::Pointer>::iterator iter = readers.begin();
@@ -81,7 +81,7 @@ bool mitk::PropertyListDeserializerV1::Deserialize()
         }
         else
         {
-          LOG_ERROR << "There were errors while loding property '" << key << "' of type " << type << ". Your data may be corrupted";
+          MITK_ERROR << "There were errors while loding property '" << key << "' of type " << type << ". Your data may be corrupted";
           error = true;
         }
         break;

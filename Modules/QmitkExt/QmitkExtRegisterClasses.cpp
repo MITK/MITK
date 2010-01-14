@@ -34,7 +34,7 @@ void QmitkExtRegisterClasses()
   static bool alreadyDone = false;
   if (!alreadyDone)
   {
-    LOG_INFO << "QmitkExtRegisterClasses()";
+    MITK_INFO << "QmitkExtRegisterClasses()";
     
     itk::ObjectFactoryBase::RegisterFactory( QmitkBinaryThresholdToolGUIFactory::New() );
     itk::ObjectFactoryBase::RegisterFactory( QmitkCalculateGrayValueStatisticsToolGUIFactory::New() );

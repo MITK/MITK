@@ -18,7 +18,7 @@
 #include "QmitkFunctionality.h"
 
 // other includes
-#include "mbilog.h"
+#include "mitkLogMacros.h"
 
 // mitk Includes
 #include "mitkMessage.h"
@@ -322,7 +322,7 @@ QmitkStdMultiWidget* QmitkFunctionality::GetActiveStdMultiWidget()
 void QmitkFunctionality::HandleException( const char* str, QWidget* parent, bool showDialog ) const
 {
   //itkGenericOutputMacro( << "Exception caught: " << str );
-  LOG_ERROR << str;
+  MITK_ERROR << str;
   if ( showDialog )
   {
     QMessageBox::critical ( parent, "Exception caught!", str );

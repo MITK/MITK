@@ -15,7 +15,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#define SMW_INFO LOG_INFO("widget.stdmulti")
+#define SMW_INFO MITK_INFO("widget.stdmulti")
 
 #include "QmitkStdMultiWidget.h"
 
@@ -1687,7 +1687,7 @@ void QmitkStdMultiWidget::SetWidgetPlanesRotationLinked( bool link )
 
 void QmitkStdMultiWidget::SetWidgetPlaneMode( int mode )
 {
-  LOG_INFO << "Changing crosshair mode to " << mode;
+  MITK_INFO << "Changing crosshair mode to " << mode;
 
   // Do nothing if mode didn't change
   if ( m_PlaneMode == mode )

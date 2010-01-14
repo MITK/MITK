@@ -238,7 +238,7 @@ void QmitkDataStorageComboBox::SetSelectedNode(mitk::DataTreeNode::Pointer item)
   int index = this->Find(item);
   if (index == -1)
   {
-    LOG_INFO << "QmitkDataStorageComboBox: item not available";
+    MITK_INFO << "QmitkDataStorageComboBox: item not available";
   }
   else
   {

@@ -80,7 +80,7 @@ void mitk::CompressedImageContainer::SetImage( Image* image )
     if (itk::Object::GetDebug())
     {
     // compress image here into a buffer
-      LOG_INFO << "Using ZLib version: '" << zlibVersion() << "'" << std::endl
+      MITK_INFO << "Using ZLib version: '" << zlibVersion() << "'" << std::endl
                << "Attempting to compress " << m_OneTimeStepImageSizeInBytes << " image bytes into a buffer of size " << bufferSize << std::endl;
     }
 
@@ -93,20 +93,20 @@ void mitk::CompressedImageContainer::SetImage( Image* image )
     {
       if (zlibRetVal == Z_OK)
       {
-        LOG_INFO << "Success, using " << destLen << " bytes of the buffer (ratio " << ((double)destLen / (double)sourceLen) << ")" << std::endl;
+        MITK_INFO << "Success, using " << destLen << " bytes of the buffer (ratio " << ((double)destLen / (double)sourceLen) << ")" << std::endl;
       }
       else
       {
         switch ( zlibRetVal )
         {
           case Z_MEM_ERROR:
-            LOG_ERROR << "not enough memory" << std::endl;
+            MITK_ERROR << "not enough memory" << std::endl;
             break;
           case Z_BUF_ERROR:
-            LOG_ERROR << "output buffer too small" << std::endl;
+            MITK_ERROR << "output buffer too small" << std::endl;
             break;
           default:
-            LOG_ERROR << "other, unspecified error" << std::endl;
+            MITK_ERROR << "other, unspecified error" << std::endl;
             break;
         }
       }
@@ -115,7 +115,7 @@ void mitk::CompressedImageContainer::SetImage( Image* image )
     // only use the neccessary amount of memory, realloc the buffer!
     byteBuffer = (unsigned char*) realloc( byteBuffer, destLen );
     bufferSize = destLen;
-    //LOG_INFO << "Using " << bufferSize << " bytes to store compressed image (" << destLen << " needed)" << std::endl;
+    //MITK_INFO << "Using " << bufferSize << " bytes to store compressed image (" << destLen << " needed)" << std::endl;
   
     m_ByteBuffers.push_back( std::pair<unsigned char*, unsigned long>( byteBuffer, bufferSize ) );
   }
@@ -147,23 +147,23 @@ mitk::Image::Pointer mitk::CompressedImageContainer::GetImage()
     {
       if (zlibRetVal == Z_OK)
       {
-        LOG_INFO << "Success, destLen now " << destLen << " bytes" << std::endl;
+        MITK_INFO << "Success, destLen now " << destLen << " bytes" << std::endl;
       }
       else
       {
         switch ( zlibRetVal )
         {
           case Z_DATA_ERROR:
-            LOG_ERROR << "compressed data corrupted" << std::endl;
+            MITK_ERROR << "compressed data corrupted" << std::endl;
             break;
           case Z_MEM_ERROR:
-            LOG_ERROR << "not enough memory" << std::endl;
+            MITK_ERROR << "not enough memory" << std::endl;
             break;
           case Z_BUF_ERROR:
-            LOG_ERROR << "output buffer too small" << std::endl;
+            MITK_ERROR << "output buffer too small" << std::endl;
             break;
           default:
-            LOG_ERROR << "other, unspecified error" << std::endl;
+            MITK_ERROR << "other, unspecified error" << std::endl;
             break;
         }
       }

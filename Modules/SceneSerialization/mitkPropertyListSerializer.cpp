@@ -40,7 +40,7 @@ std::string mitk::PropertyListSerializer::Serialize()
 
   if ( m_PropertyList.IsNull() && m_PropertyList->IsEmpty() )
   {
-    LOG_ERROR << "Not serializing NULL or empty PropertyList";
+    MITK_ERROR << "Not serializing NULL or empty PropertyList";
     return "";
   }
 
@@ -87,7 +87,7 @@ std::string mitk::PropertyListSerializer::Serialize()
   // save XML file
   if ( !document.SaveFile( fullname ) )
   {
-    LOG_ERROR << "Could not write PropertyList to " << fullname << "\nTinyXML reports '" << document.ErrorDesc() << "'";
+    MITK_ERROR << "Could not write PropertyList to " << fullname << "\nTinyXML reports '" << document.ErrorDesc() << "'";
     return "";
   }
 
@@ -107,12 +107,12 @@ TiXmlElement* mitk::PropertyListSerializer::SerializeOneProperty( const std::str
   std::list<itk::LightObject::Pointer> allSerializers = itk::ObjectFactoryBase::CreateAllInstance(serializername.c_str());
   if (allSerializers.size() < 1)
   {
-    LOG_ERROR << "No serializer found for " << property->GetNameOfClass() << ". Skipping object";
+    MITK_ERROR << "No serializer found for " << property->GetNameOfClass() << ". Skipping object";
     m_FailedProperties->ReplaceProperty( key, const_cast<BaseProperty*>(property) );
   }
   if (allSerializers.size() > 1)
   {
-    LOG_WARN << "Multiple serializers found for " << property->GetNameOfClass() << "Using arbitrarily the first one.";
+    MITK_WARN << "Multiple serializers found for " << property->GetNameOfClass() << "Using arbitrarily the first one.";
   }
 
   for ( std::list<itk::LightObject::Pointer>::iterator iter = allSerializers.begin();
@@ -137,7 +137,7 @@ TiXmlElement* mitk::PropertyListSerializer::SerializeOneProperty( const std::str
       }
       catch (std::exception& e)
       {
-        LOG_ERROR << "Serializer " << serializer->GetNameOfClass() << " failed: " << e.what();
+        MITK_ERROR << "Serializer " << serializer->GetNameOfClass() << " failed: " << e.what();
         m_FailedProperties->ReplaceProperty( key, const_cast<BaseProperty*>(property) );
         // \TODO: log only if all potential serializers fail?
       }

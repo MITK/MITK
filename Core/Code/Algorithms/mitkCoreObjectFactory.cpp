@@ -118,12 +118,12 @@ itk::Object::Pointer mitk::CoreObjectFactory::CreateCoreObject( const std::strin
     CREATE_ITK( PointSetVtkMapper3D, "PointSetVtkMapper3D" )
 
   else
-    LOG_ERROR << "ObjectFactory::CreateObject: unknown class: " << className << std::endl;
+    MITK_ERROR << "ObjectFactory::CreateObject: unknown class: " << className << std::endl;
 
   return pointer;
 }
 void mitk::CoreObjectFactory::RegisterExtraFactory(CoreObjectFactoryBase::Pointer factory) {
-  LOG_INFO << "Registering extra factory: " << factory->GetNameOfClass();
+  MITK_INFO << "Registering extra factory: " << factory->GetNameOfClass();
   m_ExtraFactories.push_back(factory);  
 }
 
@@ -155,7 +155,7 @@ mitk::CoreObjectFactory::Pointer mitk::CoreObjectFactory::GetInstance() {
     if (instance.IsNull()) {
       instance = mitk::CoreObjectFactory::New();
     }
-    LOG_INFO << "CoreObjectFactory: created instance of " << instance->GetNameOfClass() << std::endl;
+    MITK_INFO << "CoreObjectFactory: created instance of " << instance->GetNameOfClass() << std::endl;
   }
   return instance;
 }
@@ -199,7 +199,7 @@ mitk::CoreObjectFactory::CoreObjectFactory()
   static bool alreadyDone = false;
   if (!alreadyDone)
   {
-    LOG_INFO << "CoreObjectFactory c'tor" << std::endl;
+    MITK_INFO << "CoreObjectFactory c'tor" << std::endl;
 
     itk::ObjectFactoryBase::RegisterFactory( PicFileIOFactory::New() );
     itk::ObjectFactoryBase::RegisterFactory( PointSetIOFactory::New() );

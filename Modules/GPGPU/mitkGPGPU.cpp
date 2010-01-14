@@ -21,9 +21,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <iostream>
 
-#define GPGPU_INFO LOG_INFO("mitk.gpgpu")
-#define GPGPU_ERROR LOG_ERROR("mitk.gpgpu")
-#define GPGPU_CHECKGLERR LOG_ERROR(glGetError()!=GL_NO_ERROR)("mitk.gpgpu") << "GL ERROR @ "
+#define GPGPU_INFO MITK_INFO("mitk.gpgpu")
+#define GPGPU_ERROR MITK_ERROR("mitk.gpgpu")
+#define GPGPU_CHECKGLERR MITK_ERROR(glGetError()!=GL_NO_ERROR)("mitk.gpgpu") << "GL ERROR @ "
 
 
 #define OPERATING_TEXTURE GL_TEXTURE15

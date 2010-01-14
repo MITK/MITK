@@ -198,7 +198,7 @@ void HeightFieldSurfaceClipImageFilter::_InternalComputeClippedImage(
   // clipping poly data at this point by means of vtkCellLocator. The
   // clipping data x/y bounds are used for converting from poly data space to
   // image (height-field) space.
-  LOG_INFO << "Calculating Height Field..." << std::endl;
+  MITK_INFO << "Calculating Height Field..." << std::endl;
   for ( unsigned int y = 0; y < m_HeightFieldResolutionY; ++y )
   {
     for ( unsigned int x = 0; x < m_HeightFieldResolutionX; ++x )
@@ -229,7 +229,7 @@ void HeightFieldSurfaceClipImageFilter::_InternalComputeClippedImage(
 
   // Walk through entire input image and for each point determine its distance
   // from the x/y plane.
-  LOG_INFO << "Performing clipping..." << std::endl;
+  MITK_INFO << "Performing clipping..." << std::endl;
 
   TPixel factor = static_cast< TPixel >( clipImageFilter->m_MultiplicationFactor );
   TPixel clippingConstant = clipImageFilter->m_ClippingConstant;
@@ -326,7 +326,7 @@ void HeightFieldSurfaceClipImageFilter::_InternalComputeClippedImage(
     }
   }
 
-  LOG_INFO << "DONE!" << std::endl;
+  MITK_INFO << "DONE!" << std::endl;
 
 
   // Clean-up
@@ -342,7 +342,7 @@ void HeightFieldSurfaceClipImageFilter::GenerateData()
 
   const Image *outputImage = this->GetOutput();
 
-  LOG_INFO << "Clipping: Start\n";
+  MITK_INFO << "Clipping: Start\n";
 
   if ( !outputImage->IsInitialized() || inputSurface == NULL )
     return;
@@ -387,7 +387,7 @@ void HeightFieldSurfaceClipImageFilter::GenerateData()
       inputTimeGeometry->GetGeometry3D( t )->GetIndexToWorldTransform() );
     imageToPlaneTransform->Compose( planeWorldToIndexTransform );
 
-    LOG_INFO << "Accessing ITK function...\n";
+    MITK_INFO << "Accessing ITK function...\n";
     AccessByItk_3( 
       m_InputTimeSelector->GetOutput(),
       _InternalComputeClippedImage,

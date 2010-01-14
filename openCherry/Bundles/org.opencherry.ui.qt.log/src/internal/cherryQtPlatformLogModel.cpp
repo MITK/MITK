@@ -33,7 +33,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <iomanip>
 
 #include <Poco/Message.h>
-#include "mbilog.h"
+#include "cherryLog.h"
 #include <QTimer>
 
 namespace cherry {

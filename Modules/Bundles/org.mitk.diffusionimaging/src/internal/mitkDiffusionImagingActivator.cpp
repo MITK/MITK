@@ -112,5 +112,5 @@ mitk::DiffusionImagingActivator::Start(cherry::IBundleContext::Pointer /*context
 //    }
 //  }
 //
-//  LOG_INFO << "changed";
+//  MITK_INFO << "changed";
 //}

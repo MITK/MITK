@@ -36,7 +36,7 @@ std::string mitk::PointSetSerializer::Serialize()
   const PointSet* ps = dynamic_cast<const PointSet *>( m_Data.GetPointer() );
   if (ps == NULL)
   {
-    LOG_ERROR << " Object at " << (const void*) this->m_Data
+    MITK_ERROR << " Object at " << (const void*) this->m_Data
               << " is not an mitk::PointSet. Cannot serialize as pointset.";
     return "";
   }
@@ -59,7 +59,7 @@ std::string mitk::PointSetSerializer::Serialize()
   }
   catch (std::exception& e)
   {
-    LOG_ERROR << " Error serializing object at " << (const void*) this->m_Data
+    MITK_ERROR << " Error serializing object at " << (const void*) this->m_Data
               << " to " 
               << fullname 
               << ": " 

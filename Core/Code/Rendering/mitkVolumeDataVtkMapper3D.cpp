@@ -272,7 +272,7 @@ void mitk::VolumeDataVtkMapper3D::GenerateData( mitk::BaseRenderer *renderer )
                 vtkVolumeRayCastMIPFunction* mipFunction = vtkVolumeRayCastMIPFunction::New();
                 m_HiResMapper->SetVolumeRayCastFunction(mipFunction);
                 mipFunction->Delete();
-                LOG_INFO <<"in switch" <<std::endl;
+                MITK_INFO <<"in switch" <<std::endl;
                 break;
             }
             
@@ -285,7 +285,7 @@ void mitk::VolumeDataVtkMapper3D::GenerateData( mitk::BaseRenderer *renderer )
                 break;
             }
             default:
-                LOG_ERROR <<"Warning: invalid volume rendering option.  " << std::endl;
+                MITK_ERROR <<"Warning: invalid volume rendering option.  " << std::endl;
 
         }
     m_VolumeLOD->VisibilityOn();

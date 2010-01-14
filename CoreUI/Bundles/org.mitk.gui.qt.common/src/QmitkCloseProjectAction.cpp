@@ -80,7 +80,7 @@ void QmitkCloseProjectAction::Run()
   }
   catch (std::exception& e)
   {
-    LOG_ERROR << "Exception caught during scene saving: " << e.what();
+    MITK_ERROR << "Exception caught during scene saving: " << e.what();
     QMessageBox::warning(NULL, "Error", QString("An error occurred during Close Project: %1").arg(e.what()));
   }
 }

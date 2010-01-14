@@ -55,7 +55,7 @@ bool mitk::SceneReaderV1::LoadScene( TiXmlDocument& document, const std::string&
     }
     else
     {
-      LOG_ERROR << "No UID found for current node. Node will have no parents.";
+      MITK_ERROR << "No UID found for current node. Node will have no parents.";
       error = true;
     }
 
@@ -91,7 +91,7 @@ bool mitk::SceneReaderV1::LoadScene( TiXmlDocument& document, const std::string&
       if (m_NodeForID.find( *parentsIter ) == m_NodeForID.end())
       {
         parentsIter = nodesIter->second.erase( parentsIter );
-        LOG_WARN << "Found a DataTreeNode with unknown parents. Will add it to DataStorage without any parent objects.";
+        MITK_WARN << "Found a DataTreeNode with unknown parents. Will add it to DataStorage without any parent objects.";
         error = true;
       }
       else
@@ -153,7 +153,7 @@ bool mitk::SceneReaderV1::LoadScene( TiXmlDocument& document, const std::string&
        ++nodesIter)
   {
     storage->Add( nodesIter->first );
-    LOG_WARN << "Encountered node that is not part of a directed graph structure. Will be added to DataStorage without parents.";
+    MITK_WARN << "Encountered node that is not part of a directed graph structure. Will be added to DataStorage without parents.";
     error = true;
   }
 
@@ -179,13 +179,13 @@ mitk::DataTreeNode::Pointer mitk::SceneReaderV1::LoadBaseDataFromDataTag( TiXmlE
       }
       catch (std::exception& e)
       {
-        LOG_ERROR << "Error during attempt to read '" << filename << "'. Exception says: " << e.what();
+        MITK_ERROR << "Error during attempt to read '" << filename << "'. Exception says: " << e.what();
         error = true;
       }
 
       if (node.IsNull())
       {
-        LOG_ERROR << "Error during attempt to read '" << filename << "'. Factory returned NULL object.";
+        MITK_ERROR << "Error during attempt to read '" << filename << "'. Factory returned NULL object.";
         error = true;
       }
     }
@@ -234,13 +234,13 @@ bool mitk::SceneReaderV1::DecorateNodeWithProperties(DataTreeNode* node, TiXmlEl
       }
       else
       {
-        LOG_ERROR << "Property list reader did not return a property list. This is an implementation error. Please tell your developer.";
+        MITK_ERROR << "Property list reader did not return a property list. This is an implementation error. Please tell your developer.";
         error = true;
       }
     }
     else
     {
-      LOG_ERROR << "Found properties for renderer " << renderwindow << " but there is no such renderer in current application. Ignoring those properties";
+      MITK_ERROR << "Found properties for renderer " << renderwindow << " but there is no such renderer in current application. Ignoring those properties";
       error = true;
     }
   }

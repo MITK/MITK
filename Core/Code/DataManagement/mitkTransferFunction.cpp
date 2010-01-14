@@ -257,7 +257,7 @@ void TransferFunction::InitializeByItkHistogram(
   m_ColorTransferFunction->AddRGBPoint(m_Min,1,0,0);
   m_ColorTransferFunction->AddRGBPoint(m_Max,1,1,0);  
   m_ColorTransferFunction->SetColorSpaceToHSV();
-  LOG_INFO << "min/max in tf-c'tor:" << m_Min << "/" << m_Max << std::endl;
+  MITK_INFO << "min/max in tf-c'tor:" << m_Min << "/" << m_Max << std::endl;
   */
 }
 
@@ -285,7 +285,7 @@ void TransferFunction::InitializeByMitkImage( const Image * image )
   m_ColorTransferFunction->AddRGBPoint(m_Min,1,0,0);
   m_ColorTransferFunction->AddRGBPoint(m_Max,1,1,0);  
   m_ColorTransferFunction->SetColorSpaceToHSV();
-  //LOG_INFO << "min/max in tf-c'tor:" << m_Min << "/" << m_Max << std::endl;
+  //MITK_INFO << "min/max in tf-c'tor:" << m_Min << "/" << m_Max << std::endl;
 }
 
 

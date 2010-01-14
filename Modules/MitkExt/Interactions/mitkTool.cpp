@@ -92,7 +92,7 @@ itk::Object::Pointer mitk::Tool::GetGUI(const std::string& toolkitPrefix, const 
     }
     else
     {
-      LOG_ERROR << "There is more than one GUI for " << classname << " (several factories claim ability to produce a " << guiClassname << " ) " << std::endl;
+      MITK_ERROR << "There is more than one GUI for " << classname << " (several factories claim ability to produce a " << guiClassname << " ) " << std::endl;
       return NULL; // people should see and fix this error
     }
   }

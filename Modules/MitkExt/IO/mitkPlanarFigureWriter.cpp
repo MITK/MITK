@@ -39,7 +39,7 @@ void mitk::PlanarFigureWriter::GenerateData()
 
   if (m_FileName.empty())
   {
-    LOG_ERROR << "Could not write planar figures. File name is invalid";
+    MITK_ERROR << "Could not write planar figures. File name is invalid";
     throw std::invalid_argument("file name is empty");
   }
  
@@ -103,7 +103,7 @@ void mitk::PlanarFigureWriter::GenerateData()
 
   if (document.SaveFile( m_FileName) == false)
   {
-    LOG_ERROR << "Could not write planar figures to " << m_FileName << "\nTinyXML reports '" << document.ErrorDesc() << "'";
+    MITK_ERROR << "Could not write planar figures to " << m_FileName << "\nTinyXML reports '" << document.ErrorDesc() << "'";
     throw std::ios_base::failure("Error during writing of planar figure xml file.");
   }
   m_Success = true;

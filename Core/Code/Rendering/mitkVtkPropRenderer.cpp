@@ -498,7 +498,7 @@ void mitk::VtkPropRenderer::PickWorldPoint(const mitk::Point2D& displayPoint, mi
        TNodePredicateDataType<Surface> isSurface;
 
        DataStorage::SetOfObjects::ConstPointer allSurfaces = dataStorage->GetSubset( isSurface );
-       LOG_INFO << "in picking: got " << allSurfaces->size() << " surfaces." << std::endl;
+       MITK_INFO << "in picking: got " << allSurfaces->size() << " surfaces." << std::endl;
 
        for (DataStorage::SetOfObjects::const_iterator iter = allSurfaces->begin();
             iter != allSurfaces->end();
@@ -511,13 +511,13 @@ void mitk::VtkPropRenderer::PickWorldPoint(const mitk::Point2D& displayPoint, mi
            vtkActor* actor = dynamic_cast<vtkActor*>( baseVtkMapper3D->GetViewProp() );
            if (actor)
            {
-             LOG_INFO << "a" << std::flush;
+             MITK_INFO << "a" << std::flush;
              pickingRenderer->AddActor( actor );
            }
          }
        }
 
-       LOG_INFO << ";" << std::endl;
+       MITK_INFO << ";" << std::endl;
        */
        m_PointPicker->Pick(displayPoint[0], displayPoint[1], 0, m_VtkRenderer);
        vtk2itk(m_PointPicker->GetPickPosition(), worldPoint);
@@ -766,10 +766,10 @@ void mitk::VtkPropRenderer::checkState()
       
       if (glWorkAroundGlobalCount == 2)
       {
-        LOG_INFO << "Multiple 3D Renderwindows active...: turning Immediate Rendering ON for legacy mappers";
+        MITK_INFO << "Multiple 3D Renderwindows active...: turning Immediate Rendering ON for legacy mappers";
 //          vtkMapper::GlobalImmediateModeRenderingOn();
       }
-      //LOG_INFO << "GLOBAL 3D INCREASE " << glWorkAroundGlobalCount << "\n";
+      //MITK_INFO << "GLOBAL 3D INCREASE " << glWorkAroundGlobalCount << "\n";
       
     }
   }
@@ -781,10 +781,10 @@ void mitk::VtkPropRenderer::checkState()
       glWorkAroundGlobalCount--;
       if(glWorkAroundGlobalCount==1)
       {
-        LOG_INFO << "Single 3D Renderwindow active...: turning Immediate Rendering OFF for legacy mappers";
+        MITK_INFO << "Single 3D Renderwindow active...: turning Immediate Rendering OFF for legacy mappers";
 //        vtkMapper::GlobalImmediateModeRenderingOff();
       }
-      //LOG_INFO << "GLOBAL 3D DECREASE " << glWorkAroundGlobalCount << "\n";
+      //MITK_INFO << "GLOBAL 3D DECREASE " << glWorkAroundGlobalCount << "\n";
     }
    }
 }

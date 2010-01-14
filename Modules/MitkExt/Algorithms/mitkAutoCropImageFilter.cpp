@@ -47,7 +47,7 @@ void mitk::AutoCropImageFilter::ITKCrop3DImage( itk::Image< TPixel, VImageDimens
   if (inputItkImage == NULL)
   {
     mitk::StatusBar::GetInstance()->DisplayErrorText ("An internal error occurred. Can't convert Image. Please report to bugs@mitk.org");
-    LOG_ERROR << "image is NULL...returning" << std::endl;
+    MITK_ERROR << "image is NULL...returning" << std::endl;
     return;
   }
 
@@ -79,7 +79,7 @@ void mitk::AutoCropImageFilter::GenerateOutputInformation()
   mitk::Image::Pointer input = const_cast< mitk::Image * > ( this->GetInput() );
   if(input->GetDimension() <= 2)
   {
-    LOG_ERROR << "Only 3D any 4D images are supported." << std::endl;
+    MITK_ERROR << "Only 3D any 4D images are supported." << std::endl;
     return;
   }
   ComputeNewImageBounds();
@@ -168,7 +168,7 @@ void mitk::AutoCropImageFilter::GenerateData()
 
   if(input->GetDimension() <= 2)
   {
-    LOG_ERROR << "Only 3D and 4D images supported";
+    MITK_ERROR << "Only 3D and 4D images supported";
     return;
   }
 

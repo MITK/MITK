@@ -18,7 +18,7 @@
 #include "cherryPreferencesServiceTest.h"
 #include <internal/cherryPreferencesService.h>
 
-#include "mbilog.h"
+#include "cherryLog.h"
 
 #include <CppUnit/TestSuite.h>
 #include <CppUnit/TestCaller.h>

@@ -85,7 +85,7 @@ void mitk::PaintbrushTool::UpdateContour(const StateEvent* stateEvent)
 
   if ( stupidClone->n[0] <= pixelWidth || stupidClone->n[1] <= pixelHeight )
   {
-    LOG_INFO << "Brush size is bigger than your working image. Reconsider this...\n"
+    MITK_INFO << "Brush size is bigger than your working image. Reconsider this...\n"
                 "(Or tell your progammer until (s)he fixes this message.)" << std::endl;
     mitkIpPicFree( stupidClone );
     return;
@@ -139,7 +139,7 @@ void mitk::PaintbrushTool::UpdateContour(const StateEvent* stateEvent)
     newPoint[0] = contourPoints[ 2 * index + 0 ] - circleCenterX; // master contour should be centered around (0,0)
     newPoint[1] = contourPoints[ 2 * index + 1] - circleCenterY;
     newPoint[2] = 0.0;
-    LOG_DEBUG << "(" << newPoint[0] << ", " << newPoint[1] << ")" << std::endl;
+    MITK_DEBUG << "(" << newPoint[0] << ", " << newPoint[1] << ")" << std::endl;
 
     contourInImageIndexCoordinates->AddVertex( newPoint + 0.5 );
   }
@@ -208,8 +208,8 @@ bool mitk::PaintbrushTool::OnMouseMoved   (Action* itkNotUsed(action), const Sta
   Point3D worldCoordinates = positionEvent->GetWorldPosition();
   Point3D indexCoordinates;
   image->GetGeometry()->WorldToIndex( worldCoordinates, indexCoordinates );
-  LOG_DEBUG << "Mouse at W " << worldCoordinates << std::endl;
-  LOG_DEBUG << "Mouse at I " << indexCoordinates << std::endl;
+  MITK_DEBUG << "Mouse at W " << worldCoordinates << std::endl;
+  MITK_DEBUG << "Mouse at I " << indexCoordinates << std::endl;
 
   unsigned int firstDimension(0);
   unsigned int secondDimension(1);
@@ -255,11 +255,11 @@ bool mitk::PaintbrushTool::OnMouseMoved   (Action* itkNotUsed(action), const Sta
   }
   else
   {
-    LOG_DEBUG << "." << std::flush;
+    MITK_DEBUG << "." << std::flush;
     return false;
   }
     
-  LOG_DEBUG << "Mouse at C " << indexCoordinates;
+  MITK_DEBUG << "Mouse at C " << indexCoordinates;
 
   Contour::Pointer contour = Contour::New();
   contour->Initialize();
@@ -269,7 +269,7 @@ bool mitk::PaintbrushTool::OnMouseMoved   (Action* itkNotUsed(action), const Sta
     point[0] += indexCoordinates[ firstDimension ];
     point[1] += indexCoordinates[ secondDimension ];
 
-    LOG_DEBUG << "Contour point " << point;
+    MITK_DEBUG << "Contour point " << point;
     contour->AddVertex( point );
   }
   

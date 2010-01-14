@@ -92,7 +92,7 @@ class MITKEXT_CORE_EXPORT NonBlockingAlgorithm : public itk::Object
     template <typename T>
     void SetParameter(const char* parameter, const T& value)
     {
-      //LOG_INFO << "SetParameter(" << parameter << ") " << typeid(T).name() << std::endl;
+      //MITK_INFO << "SetParameter(" << parameter << ") " << typeid(T).name() << std::endl;
       //m_ParameterListMutex->Lock();
       m_Parameters->SetProperty(parameter, GenericProperty<T>::New(value) );
       //m_ParameterListMutex->Unlock();
@@ -102,7 +102,7 @@ class MITKEXT_CORE_EXPORT NonBlockingAlgorithm : public itk::Object
     template <typename T>
     void SetPointerParameter(const char* parameter, const itk::SmartPointer<T>& value)
     {
-      //LOG_INFO << this << "->SetParameter smartpointer(" << parameter << ") " << typeid(itk::SmartPointer<T>).name() << std::endl;
+      //MITK_INFO << this << "->SetParameter smartpointer(" << parameter << ") " << typeid(itk::SmartPointer<T>).name() << std::endl;
       m_ParameterListMutex->Lock();
       m_Parameters->SetProperty(parameter, SmartPointerProperty::New(value.GetPointer()) );
       m_ParameterListMutex->Unlock();
@@ -118,7 +118,7 @@ class MITKEXT_CORE_EXPORT NonBlockingAlgorithm : public itk::Object
     template <typename TPixel, unsigned int VImageDimension>
     void SetItkImageAsMITKImagePointerParameter(const char* parameter, itk::Image<TPixel, VImageDimension>* itkImage)
     {
-      //LOG_INFO << "SetParameter ITK image(" << parameter << ") " << typeid(itk::Image<TPixel, VImageDimension>).name() << std::endl;
+      //MITK_INFO << "SetParameter ITK image(" << parameter << ") " << typeid(itk::Image<TPixel, VImageDimension>).name() << std::endl;
       // create an MITK image for that
       mitk::Image::Pointer mitkImage = mitk::Image::New();
       mitkImage = ImportItkImage( itkImage );
@@ -129,7 +129,7 @@ class MITKEXT_CORE_EXPORT NonBlockingAlgorithm : public itk::Object
     template <typename TPixel, unsigned int VImageDimension>
     void SetItkImageAsMITKImagePointerParameter(const char* parameter, const itk::SmartPointer<itk::Image<TPixel, VImageDimension> >& itkImage)
     {
-      //LOG_INFO << "SetParameter ITK image(" << parameter << ") " << typeid(itk::SmartPointer<itk::Image<TPixel, VImageDimension> >).name() << std::endl;
+      //MITK_INFO << "SetParameter ITK image(" << parameter << ") " << typeid(itk::SmartPointer<itk::Image<TPixel, VImageDimension> >).name() << std::endl;
       // create an MITK image for that
       mitk::Image::Pointer mitkImage = mitk::Image::New();
       mitkImage = ImportItkImage( itkImage );
@@ -141,7 +141,7 @@ class MITKEXT_CORE_EXPORT NonBlockingAlgorithm : public itk::Object
     template <typename T>
     void GetParameter(const char* parameter, T& value) const
     {
-      //LOG_INFO << "GetParameter normal(" << parameter << ") " << typeid(T).name() << std::endl;
+      //MITK_INFO << "GetParameter normal(" << parameter << ") " << typeid(T).name() << std::endl;
       //m_ParameterListMutex->Lock();
       BaseProperty* p = m_Parameters->GetProperty(parameter);
       GenericProperty<T>* gp = dynamic_cast< GenericProperty<T>* >( p );
@@ -162,7 +162,7 @@ class MITKEXT_CORE_EXPORT NonBlockingAlgorithm : public itk::Object
     template <typename T>
     void GetPointerParameter(const char* parameter, itk::SmartPointer<T>& value) const
     {
-      //LOG_INFO << this << "->GetParameter smartpointer(" << parameter << ") " << typeid(itk::SmartPointer<T>).name() << std::endl;
+      //MITK_INFO << this << "->GetParameter smartpointer(" << parameter << ") " << typeid(itk::SmartPointer<T>).name() << std::endl;
       //m_ParameterListMutex->Lock();
       BaseProperty* p = m_Parameters->GetProperty(parameter);
       if (p)

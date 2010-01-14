@@ -35,7 +35,7 @@ void mitk::STLFileReader::GenerateData()
 
   if( m_FileName != "")
   {
-    LOG_INFO << "Loading " << m_FileName << " as stl..." << std::endl;
+    MITK_INFO << "Loading " << m_FileName << " as stl..." << std::endl;
     vtkSTLReader* stlReader = vtkSTLReader::New();
     stlReader->SetFileName( m_FileName.c_str() );
 
@@ -58,7 +58,7 @@ bool mitk::STLFileReader::CanReadFile(const std::string filename, const std::str
   // First check the extension
   if(  filename == "" )
     {
-      //LOG_INFO<<"No filename specified."<<std::endl;
+      //MITK_INFO<<"No filename specified."<<std::endl;
     return false;
     }
 
@@ -79,7 +79,7 @@ bool mitk::STLFileReader::CanReadFile(const std::string filename, const std::str
 
   if( !extensionFound )
     {
-      //LOG_INFO<<"The filename extension is not recognized."<<std::endl;
+      //MITK_INFO<<"The filename extension is not recognized."<<std::endl;
     return false;
     }
 

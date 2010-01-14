@@ -334,7 +334,7 @@ mitk::TimeSlicedGeometry::Pointer mitk::DataStorage::ComputeBoundingGeometry3D( 
         }
         catch(itk::ExceptionObject e)
         {
-          LOG_ERROR << e << std::endl;
+          MITK_ERROR << e << std::endl;
         }
       }
     }

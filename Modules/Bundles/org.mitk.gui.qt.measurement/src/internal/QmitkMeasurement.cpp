@@ -546,7 +546,7 @@ void QmitkMeasurement::ActionDrawLineTriggered(bool checked)
   mitk::PlanarLine::Pointer figure = mitk::PlanarLine::New();
   this->AddFigureToDataStorage(figure, QString("Line%1").arg(++m_LineCounter));
 
-  LOG_INFO << "PlanarLine initialized...";
+  MITK_INFO << "PlanarLine initialized...";
 }
 
 void QmitkMeasurement::ActionDrawPathTriggered(bool checked)
@@ -561,7 +561,7 @@ void QmitkMeasurement::ActionDrawPathTriggered(bool checked)
   this->AddFigureToDataStorage(figure, QString("Path%1").arg(++m_PathCounter),
     "ClosedPlanarPolygon", closedProperty);
 
-  LOG_INFO << "PlanarPath initialized...";
+  MITK_INFO << "PlanarPath initialized...";
 }
 
 void QmitkMeasurement::ActionDrawAngleTriggered(bool checked)
@@ -572,7 +572,7 @@ void QmitkMeasurement::ActionDrawAngleTriggered(bool checked)
   mitk::PlanarAngle::Pointer figure = mitk::PlanarAngle::New();
   this->AddFigureToDataStorage(figure, QString("Angle%1").arg(++m_AngleCounter));
 
-  LOG_INFO << "PlanarAngle initialized...";
+  MITK_INFO << "PlanarAngle initialized...";
 }
 
 void QmitkMeasurement::ActionDrawFourPointAngleTriggered(bool checked)
@@ -584,7 +584,7 @@ void QmitkMeasurement::ActionDrawFourPointAngleTriggered(bool checked)
       mitk::PlanarFourPointAngle::New();
   this->AddFigureToDataStorage(figure, QString("Four Point Angle%1").arg(++m_FourPointAngleCounter));
 
-  LOG_INFO << "PlanarFourPointAngle initialized...";
+  MITK_INFO << "PlanarFourPointAngle initialized...";
 }
 
 void QmitkMeasurement::ActionDrawEllipseTriggered(bool checked)
@@ -595,7 +595,7 @@ void QmitkMeasurement::ActionDrawEllipseTriggered(bool checked)
   mitk::PlanarCircle::Pointer figure = mitk::PlanarCircle::New();
   this->AddFigureToDataStorage(figure, QString("Circle%1").arg(++m_EllipseCounter));
 
-  LOG_INFO << "PlanarCircle initialized...";
+  MITK_INFO << "PlanarCircle initialized...";
 }
 
 void QmitkMeasurement::ActionDrawRectangleTriggered(bool checked)
@@ -606,7 +606,7 @@ void QmitkMeasurement::ActionDrawRectangleTriggered(bool checked)
   mitk::PlanarRectangle::Pointer figure = mitk::PlanarRectangle::New();
   this->AddFigureToDataStorage(figure, QString("Rectangle%1").arg(++m_RectangleCounter));
 
-  LOG_INFO << "PlanarRectangle initialized...";
+  MITK_INFO << "PlanarRectangle initialized...";
 }
 
 void QmitkMeasurement::ActionDrawPolygonTriggered(bool checked)
@@ -618,7 +618,7 @@ void QmitkMeasurement::ActionDrawPolygonTriggered(bool checked)
   figure->ClosedOn();
   this->AddFigureToDataStorage(figure, QString("Polygon%1").arg(++m_PolygonCounter));
 
-  LOG_INFO << "PlanarPolygon initialized...";
+  MITK_INFO << "PlanarPolygon initialized...";
 }
 
 void QmitkMeasurement::ActionDrawArrowTriggered(bool checked)
@@ -626,7 +626,7 @@ void QmitkMeasurement::ActionDrawArrowTriggered(bool checked)
   if(!this->AssertDrawingIsPossible(checked))
     return;
 
-  LOG_WARN << "Draw Arrow not implemented yet.";
+  MITK_WARN << "Draw Arrow not implemented yet.";
 }
 
 void QmitkMeasurement::ActionDrawTextTriggered(bool checked)
@@ -634,7 +634,7 @@ void QmitkMeasurement::ActionDrawTextTriggered(bool checked)
   if(!this->AssertDrawingIsPossible(checked))
     return;
 
-  LOG_WARN << "Draw Text not implemented yet.";
+  MITK_WARN << "Draw Text not implemented yet.";
 }
 
 void QmitkMeasurement::Activated()

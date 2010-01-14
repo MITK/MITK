@@ -9,7 +9,7 @@ bool mitk::SceneReader::LoadScene( TiXmlDocument& document, const std::string& w
   {
     if ( versionObject->QueryIntAttribute( "FileVersion", &fileVersion ) != TIXML_SUCCESS )
     {
-      LOG_ERROR << "Scene file " << workingDirectory + "/index.xml" << " does not contain version information! Trying version 1 format." << std::endl;
+      MITK_ERROR << "Scene file " << workingDirectory + "/index.xml" << " does not contain version information! Trying version 1 format." << std::endl;
     }
   }
   
@@ -19,11 +19,11 @@ bool mitk::SceneReader::LoadScene( TiXmlDocument& document, const std::string& w
   std::list<itk::LightObject::Pointer> sceneReaders = itk::ObjectFactoryBase::CreateAllInstance(sceneReaderClassName.str().c_str());
   if (sceneReaders.size() < 1)
   {
-    LOG_ERROR << "No scene reader found for scene file version " << fileVersion;
+    MITK_ERROR << "No scene reader found for scene file version " << fileVersion;
   }
   if (sceneReaders.size() > 1)
   {
-    LOG_WARN << "Multiple scene readers found for scene file version " << fileVersion << ". Using arbitrary first one.";
+    MITK_WARN << "Multiple scene readers found for scene file version " << fileVersion << ". Using arbitrary first one.";
   }
 
   for ( std::list<itk::LightObject::Pointer>::iterator iter = sceneReaders.begin();
@@ -34,7 +34,7 @@ bool mitk::SceneReader::LoadScene( TiXmlDocument& document, const std::string& w
     {
       if ( !reader->LoadScene( document, workingDirectory, storage ) )
       {
-        LOG_ERROR << "There were errors while loding scene file " << workingDirectory + "/index.xml. Your data may be corrupted";
+        MITK_ERROR << "There were errors while loding scene file " << workingDirectory + "/index.xml. Your data may be corrupted";
         return false;
       }
       else

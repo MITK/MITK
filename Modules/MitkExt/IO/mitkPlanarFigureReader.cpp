@@ -69,7 +69,7 @@ void mitk::PlanarFigureReader::GenerateData()
   TiXmlDocument document( m_FileName);
   if (!document.LoadFile())
   {
-    LOG_ERROR << "Could not open/read/parse " << m_FileName << ". TinyXML reports: '" << document.ErrorDesc() << "'. "
+    MITK_ERROR << "Could not open/read/parse " << m_FileName << ". TinyXML reports: '" << document.ErrorDesc() << "'. "
               << "The error occurred in row " << document.ErrorRow() << ", column " << document.ErrorCol() << ".";
     return;
   }
@@ -79,16 +79,16 @@ void mitk::PlanarFigureReader::GenerateData()
   {
     if ( versionObject->QueryIntAttribute( "FileVersion", &fileVersion ) != TIXML_SUCCESS )
     {
-      LOG_WARN << m_FileName << " does not contain version information! Trying version 1 format." << std::endl;
+      MITK_WARN << m_FileName << " does not contain version information! Trying version 1 format." << std::endl;
     }
   }
   else
   {
-    LOG_WARN << m_FileName << " does not contain version information! Trying version 1 format." << std::endl;
+    MITK_WARN << m_FileName << " does not contain version information! Trying version 1 format." << std::endl;
   }
   if (fileVersion != 1)  // add file version selection and version specific file parsing here, if newer file versions are created
   {
-    LOG_WARN << "File version > 1 is not supported by this reader.";
+    MITK_WARN << "File version > 1 is not supported by this reader.";
       return;
   }
 
@@ -130,7 +130,7 @@ void mitk::PlanarFigureReader::GenerateData()
     else 
     {
       // unknown type
-      LOG_WARN << "encountered unknown planar figure type '" << type << "'. Skipping this element.";
+      MITK_WARN << "encountered unknown planar figure type '" << type << "'. Skipping this element.";
       continue;
     }
     TiXmlElement* cpElement = pfElement->FirstChildElement("ControlPoints");

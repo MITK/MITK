@@ -38,7 +38,7 @@ std::string mitk::SurfaceSerializer::Serialize()
   const Surface* surface = dynamic_cast<const Surface*>( m_Data.GetPointer() );
   if (!surface)
   {
-    LOG_ERROR << " Object at " << (const void*) this->m_Data
+    MITK_ERROR << " Object at " << (const void*) this->m_Data
               << " is not an mitk::Surface. Cannot serialize as surface.";
     return "";
   }
@@ -62,7 +62,7 @@ std::string mitk::SurfaceSerializer::Serialize()
   }
   catch (std::exception& e)
   {
-    LOG_ERROR << " Error serializing object at " << (const void*) this->m_Data
+    MITK_ERROR << " Error serializing object at " << (const void*) this->m_Data
               << " to " 
               << fullname 
               << ": " 

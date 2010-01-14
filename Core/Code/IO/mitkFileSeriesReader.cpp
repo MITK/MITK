@@ -33,7 +33,7 @@ bool mitk::FileSeriesReader::GenerateFileList()
     {
       throw itk::ImageFileReaderException( __FILE__, __LINE__, "FileName must be non-empty" );
     }
-    //LOG_INFO << "FileName: "<< m_FileName <<", FilePrefix: "<< m_FilePrefix << ", FilePattern: "<< m_FilePattern << std::endl;
+    //MITK_INFO << "FileName: "<< m_FileName <<", FilePrefix: "<< m_FilePrefix << ", FilePattern: "<< m_FilePattern << std::endl;
     
     // determine begin and end idexes of the last digit sequence in the 
     // filename from the sample file name
@@ -104,15 +104,15 @@ bool mitk::FileSeriesReader::GenerateFileList()
     // print debug information
     //
     /*
-    LOG_INFO << "digitBegin      : " << digitBegin << std::endl;
-    LOG_INFO << "digitEnd        : " << digitEnd << std::endl;
-    LOG_INFO << "number of digits: " << numberLength << std::endl;
-    LOG_INFO << "prefixBegin     : " << prefixBegin << std::endl;
-    LOG_INFO << "prefixLength    : " << prefixLength << std::endl;
-    LOG_INFO << "prefix          : " << prefix << std::endl;
-    LOG_INFO << "extensionBegin  : " << extensionBegin << std::endl;
-    LOG_INFO << "extensionLength : " << extensionLength << std::endl;
-    LOG_INFO << "extension       : " << extension << std::endl;
+    MITK_INFO << "digitBegin      : " << digitBegin << std::endl;
+    MITK_INFO << "digitEnd        : " << digitEnd << std::endl;
+    MITK_INFO << "number of digits: " << numberLength << std::endl;
+    MITK_INFO << "prefixBegin     : " << prefixBegin << std::endl;
+    MITK_INFO << "prefixLength    : " << prefixLength << std::endl;
+    MITK_INFO << "prefix          : " << prefix << std::endl;
+    MITK_INFO << "extensionBegin  : " << extensionBegin << std::endl;
+    MITK_INFO << "extensionLength : " << extensionLength << std::endl;
+    MITK_INFO << "extension       : " << extension << std::endl;
     */
     if( (prefixLength + extensionLength + numberLength) != basename.length() )
     {
@@ -237,7 +237,7 @@ bool mitk::FileSeriesReader::GenerateFileList()
     for ( SortedStringContainer::iterator it = sortedFiles.begin() ; it != sortedFiles.end() ; ++it, ++index )
     {
         m_MatchedFileNames[ index ] = it->second ;
-        LOG_INFO << "Added " << it->second << " to the set of matched files!" << std::endl;
+        MITK_INFO << "Added " << it->second << " to the set of matched files!" << std::endl;
     }
     return true;
 }

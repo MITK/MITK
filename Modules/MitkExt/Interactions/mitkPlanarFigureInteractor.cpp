@@ -537,10 +537,10 @@ int mitk::PlanarFigureInteractor::IsPositionInsideMarker(
 void mitk::PlanarFigureInteractor::LogPrintPlanarFigureQuantities( 
   const PlanarFigure *planarFigure )
 {
-  LOG_INFO << "PlanarFigure: " << planarFigure->GetNameOfClass();
+  MITK_INFO << "PlanarFigure: " << planarFigure->GetNameOfClass();
   for ( unsigned int i = 0; i < planarFigure->GetNumberOfFeatures(); ++i )
   {
-    LOG_INFO << "* " << planarFigure->GetFeatureName( i ) << ": "
+    MITK_INFO << "* " << planarFigure->GetFeatureName( i ) << ": "
       << planarFigure->GetQuantity( i ) << " " << planarFigure->GetFeatureUnit( i );
   }
 }

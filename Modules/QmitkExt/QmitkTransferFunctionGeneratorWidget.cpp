@@ -75,7 +75,7 @@ void QmitkTransferFunctionGeneratorWidget::OnSavePreset( )
 
   fileName=presetFileName.toLocal8Bit().constData();
  
-  LOG_INFO << "Saving Transferfunction under path: " << fileName;
+  MITK_INFO << "Saving Transferfunction under path: " << fileName;
   
   fileNameOutput= ReduceFileName(fileName);
 
@@ -129,7 +129,7 @@ void QmitkTransferFunctionGeneratorWidget::OnSavePreset( )
   
   fclose(f);
   
-  LOG_INFO << "saved under C:\\temp.txt";
+  MITK_INFO << "saved under C:\\temp.txt";
                                              */
 }
 
@@ -146,7 +146,7 @@ void QmitkTransferFunctionGeneratorWidget::OnLoadPreset( )
 
   fileName=presetFileName.toLocal8Bit().constData();
 
-  LOG_INFO << "Loading Transferfunction from path: " << fileName;
+  MITK_INFO << "Loading Transferfunction from path: " << fileName;
   
   fileNameOutput= ReduceFileName(fileName);
 
@@ -169,7 +169,7 @@ void QmitkTransferFunctionGeneratorWidget::OnLoadPreset( )
     vtkFloatingPointType* dp = tf->GetScalarOpacityFunction()->GetDataPointer();
     for (int i = 0; i < tf->GetScalarOpacityFunction()->GetSize(); i++)
     {
-      LOG_INFO << "x: " << dp[i * 2] << " y: " << dp[i * 2 + 1];
+      MITK_INFO << "x: " << dp[i * 2] << " y: " << dp[i * 2 + 1];
     }
     */
   }
@@ -323,9 +323,9 @@ void QmitkTransferFunctionGeneratorWidget::OnDeltaThreshold(int dx, int dy)   //
   if(thPos > histoMaximum)
     thPos = histoMaximum;
           /*
-  LOG_INFO << "threshold pos: " << thPos << " delta: " << thDelta;
+  MITK_INFO << "threshold pos: " << thPos << " delta: " << thDelta;
 
-  LOG_INFO << "histoMinimum: " << histoMinimum << " max: " << histoMaximum;
+  MITK_INFO << "histoMinimum: " << histoMinimum << " max: " << histoMaximum;
             */
  
 
@@ -382,7 +382,7 @@ std::string QmitkTransferFunctionGeneratorWidget::ReduceFileName(std::string fil
   if (fileNameLong.length()< 40)
     return fileNameLong;
   
-  //LOG_INFO <<" fileName > 20 ";
+  //MITK_INFO <<" fileName > 20 ";
   
   std::string fileNameShort;
   std::string fileNameRevert;
@@ -400,7 +400,7 @@ std::string QmitkTransferFunctionGeneratorWidget::ReduceFileName(std::string fil
       break;
     }
   }
-  //LOG_INFO <<" fileNameShort: " << fileNameShort.c_str();
+  //MITK_INFO <<" fileNameShort: " << fileNameShort.c_str();
   for(int i=fileNameLong.length()-1; i>= 0; i--)
   {
     std::string x=std::string("")+fileNameLong[i];
@@ -414,7 +414,7 @@ std::string QmitkTransferFunctionGeneratorWidget::ReduceFileName(std::string fil
     if (i>=fileNameLong.length()-24)
     {
       fileNameRevert= x+ fileNameRevert;
-      //LOG_INFO <<" fileNameRevert: " << fileNameRevert.c_str();
+      //MITK_INFO <<" fileNameRevert: " << fileNameRevert.c_str();
     }
     else
     {
@@ -444,7 +444,7 @@ void QmitkTransferFunctionGeneratorWidget::SetDataTreeNode(mitk::DataTreeNode* n
     {
       if (! dynamic_cast<mitk::Image*>(node->GetData()))
       {
-        LOG_WARN << "QmitkTransferFunctionGeneratorWidget::SetDataTreeNode called with non-image node";
+        MITK_WARN << "QmitkTransferFunctionGeneratorWidget::SetDataTreeNode called with non-image node";
         return;
       }
       

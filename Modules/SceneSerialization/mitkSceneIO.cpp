@@ -59,13 +59,13 @@ std::string mitk::SceneIO::CreateEmptyTempDirectory()
   {
     if (!tempdir.createDirectory())
     {
-      LOG_ERROR << "Could not create temporary directory " << uniquename;
+      MITK_ERROR << "Could not create temporary directory " << uniquename;
       return "";
     }
   }
   catch( std::exception& e )
   {
-      LOG_ERROR << "Could not create temporary directory " << uniquename << ":" << e.what();
+      MITK_ERROR << "Could not create temporary directory " << uniquename << ":" << e.what();
       return "";
   }
       
@@ -91,14 +91,14 @@ mitk::DataStorage::Pointer mitk::SceneIO::LoadScene( const std::string& filename
     }
     catch(...)
     {
-      LOG_ERROR << "DataStorage cannot be cleared properly.";
+      MITK_ERROR << "DataStorage cannot be cleared properly.";
     }
   }
 
   // test input filename
   if ( filename.empty() )
   {
-    LOG_ERROR << "No filename given. Not possible to load scene.";
+    MITK_ERROR << "No filename given. Not possible to load scene.";
     return NULL;
   }
   
@@ -106,7 +106,7 @@ mitk::DataStorage::Pointer mitk::SceneIO::LoadScene( const std::string& filename
   std::ifstream file( filename.c_str(), std::ios::binary );
   if (!file.good())
   {
-    LOG_ERROR << "Cannot open '" << filename << "' for reading";
+    MITK_ERROR << "Cannot open '" << filename << "' for reading";
     return NULL;
   }
   
@@ -114,7 +114,7 @@ mitk::DataStorage::Pointer mitk::SceneIO::LoadScene( const std::string& filename
   m_WorkingDirectory = CreateEmptyTempDirectory();
   if (m_WorkingDirectory.empty())
   {
-    LOG_ERROR << "Could not create temporary directory. Cannot open scene files.";
+    MITK_ERROR << "Could not create temporary directory. Cannot open scene files.";
     return NULL;
   }
 
@@ -129,7 +129,7 @@ mitk::DataStorage::Pointer mitk::SceneIO::LoadScene( const std::string& filename
 
   if ( m_UnzipErrors )
   {
-    LOG_ERROR << "There were " << m_UnzipErrors << " errors unzipping '" << filename << "'. Will attempt to read whatever could be unzipped.";
+    MITK_ERROR << "There were " << m_UnzipErrors << " errors unzipping '" << filename << "'. Will attempt to read whatever could be unzipped.";
   }
 
   // test if index.xml exists
@@ -137,14 +137,14 @@ mitk::DataStorage::Pointer mitk::SceneIO::LoadScene( const std::string& filename
   TiXmlDocument document( m_WorkingDirectory + Poco::Path::separator() + "index.xml" );
   if (!document.LoadFile())
   {
-    LOG_ERROR << "Could not open/read/parse " << m_WorkingDirectory << Poco::Path::separator() + "index.xml\nTinyXML reports: " << document.ErrorDesc() << std::endl;
+    MITK_ERROR << "Could not open/read/parse " << m_WorkingDirectory << Poco::Path::separator() + "index.xml\nTinyXML reports: " << document.ErrorDesc() << std::endl;
     return NULL;
   }
       
   SceneReader::Pointer reader = SceneReader::New();
   if ( !reader->LoadScene( document, m_WorkingDirectory, storage ) )
   {
-    LOG_ERROR << "There were errors while loding scene file " << filename << ". Your data may be corrupted";
+    MITK_ERROR << "There were errors while loding scene file " << filename << ". Your data may be corrupted";
   }
 
   // delete temp directory
@@ -155,7 +155,7 @@ mitk::DataStorage::Pointer mitk::SceneIO::LoadScene( const std::string& filename
   }
   catch(...)
   {
-    LOG_ERROR << "Could not delete temporary directory " << m_WorkingDirectory;
+    MITK_ERROR << "Could not delete temporary directory " << m_WorkingDirectory;
   }
 
   // return new data storage, even if empty or uncomplete (return as much as possible but notify calling method)
@@ -168,18 +168,18 @@ bool mitk::SceneIO::SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNode
 {
   if (!sceneNodes) 
   {
-    LOG_ERROR << "No set of nodes given. Not possible to save scene.";
+    MITK_ERROR << "No set of nodes given. Not possible to save scene.";
     return false;
   }
   if (!storage) 
   {
-    LOG_ERROR << "No data storage given. Not possible to save scene.";  // \TODO: Technically, it would be possible to save the nodes without their relation
+    MITK_ERROR << "No data storage given. Not possible to save scene.";  // \TODO: Technically, it would be possible to save the nodes without their relation
     return false;
   }
 
   if ( filename.empty() )
   {
-    LOG_ERROR << "No filename given. Not possible to save scene.";
+    MITK_ERROR << "No filename given. Not possible to save scene.";
     return false;
   }
 
@@ -201,21 +201,21 @@ bool mitk::SceneIO::SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNode
 
   if ( sceneNodes.IsNull() )
   {
-    LOG_WARN << "Saving empty scene to " << filename;
+    MITK_WARN << "Saving empty scene to " << filename;
   }
   else
   {
     if ( sceneNodes->size() == 0 )
     {
-      LOG_WARN << "Saving empty scene to " << filename;
+      MITK_WARN << "Saving empty scene to " << filename;
     }
 
-    LOG_INFO << "Storing scene with " << sceneNodes->size() << " objects to " << filename;
+    MITK_INFO << "Storing scene with " << sceneNodes->size() << " objects to " << filename;
   
     m_WorkingDirectory = CreateEmptyTempDirectory();
     if (m_WorkingDirectory.empty())
     {
-      LOG_ERROR << "Could not create temporary directory. Cannot create scene files.";
+      MITK_ERROR << "Could not create temporary directory. Cannot create scene files.";
       return false;
     }
    
@@ -351,7 +351,7 @@ bool mitk::SceneIO::SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNode
       }
       else
       {
-        LOG_WARN << "Ignoring NULL node during scene serialization.";
+        MITK_WARN << "Ignoring NULL node during scene serialization.";
       }
         
       ProgressBar::GetInstance()->Progress();
@@ -361,7 +361,7 @@ bool mitk::SceneIO::SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNode
 
   if ( !document.SaveFile( m_WorkingDirectory + Poco::Path::separator() + "index.xml" ) )
   {
-    LOG_ERROR << "Could not write scene to " << m_WorkingDirectory << Poco::Path::separator() << "index.xml" << "\nTinyXML reports '" << document.ErrorDesc() << "'";
+    MITK_ERROR << "Could not write scene to " << m_WorkingDirectory << Poco::Path::separator() << "index.xml" << "\nTinyXML reports '" << document.ErrorDesc() << "'";
     return false;
   }
   else
@@ -372,7 +372,7 @@ bool mitk::SceneIO::SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNode
       std::ofstream file( filename.c_str(), std::ios::binary | std::ios::out);
       if (!file.good())
       {
-        LOG_ERROR << "Could not open a zip file for writing: '" << filename << "'";
+        MITK_ERROR << "Could not open a zip file for writing: '" << filename << "'";
       }
       else
       {
@@ -388,13 +388,13 @@ bool mitk::SceneIO::SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNode
       }
       catch(...)
       {
-        LOG_ERROR << "Could not delete temporary directory " << m_WorkingDirectory;
+        MITK_ERROR << "Could not delete temporary directory " << m_WorkingDirectory;
         return true; // ok?
       }
     }
     catch(std::exception& /*e*/)
     {
-      LOG_ERROR << "Could not create ZIP file from " << m_WorkingDirectory;
+      MITK_ERROR << "Could not create ZIP file from " << m_WorkingDirectory;
       return false;
     }
     return true;
@@ -421,7 +421,7 @@ TiXmlElement* mitk::SceneIO::SaveBaseData( BaseData* data, const std::string& fi
   std::list<itk::LightObject::Pointer> thingsThatCanSerializeThis = itk::ObjectFactoryBase::CreateAllInstance(serializername.c_str());
   if (thingsThatCanSerializeThis.size() < 1)
   {
-    LOG_ERROR << "No serializer found for " << data->GetNameOfClass() << ". Skipping object";
+    MITK_ERROR << "No serializer found for " << data->GetNameOfClass() << ". Skipping object";
   }
 
   for ( std::list<itk::LightObject::Pointer>::iterator iter = thingsThatCanSerializeThis.begin();
@@ -441,7 +441,7 @@ TiXmlElement* mitk::SceneIO::SaveBaseData( BaseData* data, const std::string& fi
       }
       catch (std::exception& e)
       {
-        LOG_ERROR << "Serializer " << serializer->GetNameOfClass() << " failed: " << e.what();
+        MITK_ERROR << "Serializer " << serializer->GetNameOfClass() << " failed: " << e.what();
       }
       break;
     }
@@ -476,7 +476,7 @@ TiXmlElement* mitk::SceneIO::SavePropertyList( PropertyList* propertyList, const
   }
   catch (std::exception& e)
   {
-    LOG_ERROR << "Serializer " << serializer->GetNameOfClass() << " failed: " << e.what();
+    MITK_ERROR << "Serializer " << serializer->GetNameOfClass() << " failed: " << e.what();
   }
     
   return element;
@@ -496,10 +496,10 @@ const mitk::PropertyList* mitk::SceneIO::GetFailedProperties()
 void mitk::SceneIO::OnUnzipError(const void*  /*pSender*/, std::pair<const Poco::Zip::ZipLocalFileHeader, const std::string>& info)
 {
   ++m_UnzipErrors;
-  LOG_ERROR << "Error while unzipping: " << info.second;
+  MITK_ERROR << "Error while unzipping: " << info.second;
 }
 
 void mitk::SceneIO::OnUnzipOk(const void*  /*pSender*/, std::pair<const Poco::Zip::ZipLocalFileHeader, const Poco::Path>& info)
 {
-  // LOG_INFO << "Unzipped ok: " << info.second.toString();
+  // MITK_INFO << "Unzipped ok: " << info.second.toString();
 }

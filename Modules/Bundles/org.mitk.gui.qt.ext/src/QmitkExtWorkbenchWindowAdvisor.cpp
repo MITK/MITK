@@ -427,14 +427,14 @@ void QmitkExtWorkbenchWindowAdvisorHack::onUndo()
           verboseundo->GetUndoDescriptions();
       if (descriptions.size() >= 1)
       {
-        LOG_INFO << "Undo " << descriptions.front().second;
+        MITK_INFO << "Undo " << descriptions.front().second;
       }
     }
     model->Undo();
   }
   else
   {
-    LOG_ERROR << "No undo model instantiated";
+    MITK_ERROR << "No undo model instantiated";
   }
 }
 
@@ -449,14 +449,14 @@ void QmitkExtWorkbenchWindowAdvisorHack::onRedo()
         verboseundo->GetRedoDescriptions();
       if (descriptions.size() >= 1)
       {
-        LOG_INFO << "Redo " << descriptions.front().second;
+        MITK_INFO << "Redo " << descriptions.front().second;
       }
     }
     model->Redo();
   }
   else
   {
-    LOG_ERROR << "No undo model instantiated";
+    MITK_ERROR << "No undo model instantiated";
   }
 }
 

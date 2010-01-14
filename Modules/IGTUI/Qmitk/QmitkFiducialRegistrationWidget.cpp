@@ -19,9 +19,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkFiducialRegistrationWidget.h"
 
 
-#define FRW_LOG LOG_INFO("Fiducial Registration Widget")
-#define FRW_WARN LOG_WARN("Fiducial Registration Widget")
-#define FRW_DEBUG LOG_DEBUG("Fiducial Registration Widget")
+#define FRW_LOG MITK_INFO("Fiducial Registration Widget")
+#define FRW_WARN MITK_WARN("Fiducial Registration Widget")
+#define FRW_DEBUG MITK_DEBUG("Fiducial Registration Widget")
 
 /* VIEW MANAGEMENT */
 QmitkFiducialRegistrationWidget::QmitkFiducialRegistrationWidget(QWidget* parent)  

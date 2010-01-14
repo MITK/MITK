@@ -218,7 +218,7 @@ class MeshUtil
       unsigned long num = t->GetNumberOfVertices();
       vtkIdType vtkCellId = -1;
       if (num > 4096) {
-        LOG_ERROR << "Problem in mitkMeshUtil: Polygon with more than maximum number of vertices encountered." << std::endl;
+        MITK_ERROR << "Problem in mitkMeshUtil: Polygon with more than maximum number of vertices encountered." << std::endl;
       }
       else if (num > 3) {
         for (PointIdIterator it=t->PointIdsBegin(); it!=t->PointIdsEnd(); it++) pts[i++] = *it;
@@ -706,7 +706,7 @@ public:
         for(unsigned int i=0; i < numPoints; ++i)
         {
           vtkpoints->GetPoint(i, vtkpoint);
-          //LOG_INFO << "next point: " << test[0]<< "," << test[1] << "," << test[2] << std::endl;
+          //MITK_INFO << "next point: " << test[0]<< "," << test[1] << "," << test[2] << std::endl;
           //typename MeshType::PixelType* apoint = (typename MeshType::PixelType*) vtkpoints->GetPoint(i);
           mitk::vtk2itk(vtkpoint, itkPhysicalPoint);
           output->SetPoint( i, itkPhysicalPoint );
@@ -717,7 +717,7 @@ public:
         for(unsigned int i=0; i < numPoints; ++i)
         {
           vtkpoints->GetPoint(i, vtkpoint);
-          //LOG_INFO << "next point: " << test[0]<< "," << test[1] << "," << test[2] << std::endl;
+          //MITK_INFO << "next point: " << test[0]<< "," << test[1] << "," << test[2] << std::endl;
           //typename MeshType::PixelType* apoint = (typename MeshType::PixelType*) vtkpoints->GetPoint(i);
           mitk::Point3D mitkWorldPoint;
           mitk::vtk2itk(vtkpoint, mitkWorldPoint);
@@ -735,7 +735,7 @@ public:
         for(unsigned int i=0; i < numPoints; ++i)
         {
           vtkpoints->GetPoint(i, vtkpoint);
-          //LOG_INFO << "next point: " << test[0]<< "," << test[1] << "," << test[2] << std::endl;
+          //MITK_INFO << "next point: " << test[0]<< "," << test[1] << "," << test[2] << std::endl;
           //typename MeshType::PixelType* apoint = (typename MeshType::PixelType*) vtkpoints->GetPoint(i);
           mitk::vtk2itk(vtkpoint, mitkWorldPoint);
           geometryFrame->WorldToItkPhysicalPoint(mitkWorldPoint, itkPhysicalPoint);
@@ -747,7 +747,7 @@ public:
         for(unsigned int i=0; i < numPoints; ++i)
         {
           vtkpoints->GetPoint(i, vtkpoint);
-          //LOG_INFO << "next point: " << test[0]<< "," << test[1] << "," << test[2] << std::endl;
+          //MITK_INFO << "next point: " << test[0]<< "," << test[1] << "," << test[2] << std::endl;
           //typename MeshType::PixelType* apoint = (typename MeshType::PixelType*) vtkpoints->GetPoint(i);
           mitk::vtk2itk(vtkpoint, mitkWorldPoint);
           polyDataGeometryFrame->IndexToWorld(mitkWorldPoint, mitkWorldPoint);
@@ -835,7 +835,7 @@ public:
         {
           if (npts != 3) 
           {
-            LOG_ERROR << "Only empty triangle cell supported by now..." << std::endl; // skip non-triangle empty cells;
+            MITK_ERROR << "Only empty triangle cell supported by now..." << std::endl; // skip non-triangle empty cells;
             continue;
           }
           unsigned long pointIds[3];
@@ -881,7 +881,7 @@ public:
       case VTK_PARAMETRIC_CURVE:
       case VTK_PARAMETRIC_SURFACE:
       default:
-        LOG_WARN << "Warning, unhandled cell type " 
+        MITK_WARN << "Warning, unhandled cell type " 
           << vtkCellTypes[cellId] << std::endl;
       }
     }
@@ -905,7 +905,7 @@ public:
       {
         if (vtkCellTypes[stripId] != VTK_TRIANGLE_STRIP) 
         {
-          LOG_ERROR << "Only triangle strips supported!" << std::endl;
+          MITK_ERROR << "Only triangle strips supported!" << std::endl;
           continue;
         }
         stripId++;
@@ -1008,7 +1008,7 @@ public:
     if(numPoints == 0)
     {
       //mesh->Print(std::cerr);
-      LOG_FATAL << "no points in Grid " << std::endl;
+      MITK_FATAL << "no points in Grid " << std::endl;
       exit(-1);
     }
     // Create a vtkUnstructuredGrid
@@ -1170,7 +1170,7 @@ public:
 
     pointScalars->Delete();
     cellScalars->Delete();
-    //LOG_INFO << "meshToUnstructuredGrid end" << std::endl;
+    //MITK_INFO << "meshToUnstructuredGrid end" << std::endl;
     return vgrid;
   }
 
@@ -1227,7 +1227,7 @@ public:
     if(numPoints == 0)
     {
       //mesh->Print(std::cerr);
-      LOG_ERROR << "no points in Grid " << std::endl;
+      MITK_ERROR << "no points in Grid " << std::endl;
     }
     // Create a vtkPolyData
     if(polydata == NULL)
@@ -1393,7 +1393,7 @@ public:
     vpoints->Delete();
     scalars->Delete();
 
-    //LOG_INFO << "meshToPolyData end" << std::endl;
+    //MITK_INFO << "meshToPolyData end" << std::endl;
     return polydata;
   }
 

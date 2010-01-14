@@ -98,8 +98,8 @@ void mitk::SurfaceVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
     ls->m_Actor->VisibilityOff();
     return;
   }
-//  LOG_INFO << "time: "<< time << std::endl;
-//  LOG_INFO << "timestep: "<<timestep << std::endl;
+//  MITK_INFO << "time: "<< time << std::endl;
+//  MITK_INFO << "timestep: "<<timestep << std::endl;
   
   //
   // set the input-object at time t for the mapper

@@ -404,7 +404,7 @@ mitk::UnstructuredGridMapper2D
   
   /*
 
-  //LOG_INFO << "GETVTKABSTRACTMAPPER3D\n";
+  //MITK_INFO << "GETVTKABSTRACTMAPPER3D\n";
   mitk::DataTreeNode::ConstPointer node = this->GetDataTreeNode();
   if ( node.IsNull() )
     return 0;
@@ -439,7 +439,7 @@ vtkPointSet*
 mitk::UnstructuredGridMapper2D
 ::GetVtkPointSet(mitk::BaseRenderer* renderer)
 {
-  //LOG_INFO << "GETVTKPOINTSET\n";
+  //MITK_INFO << "GETVTKPOINTSET\n";
   vtkAbstractMapper3D * abstractMapper = GetVtkAbstractMapper3D(renderer);
   if ( abstractMapper == 0 )
   {
@@ -475,7 +475,7 @@ mitk::UnstructuredGridMapper2D
 
 vtkScalarsToColors* mitk::UnstructuredGridMapper2D::GetVtkLUT(mitk::BaseRenderer* renderer)
 {
-  //LOG_INFO << "GETVTKLUT\n";
+  //MITK_INFO << "GETVTKLUT\n";
   vtkMapper * mapper = dynamic_cast<vtkMapper*>(GetVtkAbstractMapper3D(renderer));
   if (mapper)
     return mapper->GetLookupTable();
@@ -488,7 +488,7 @@ vtkScalarsToColors* mitk::UnstructuredGridMapper2D::GetVtkLUT(mitk::BaseRenderer
     mitk::BaseVtkMapper3D::Pointer mitkMapper = dynamic_cast< mitk::BaseVtkMapper3D* > ( node->GetMapper( 2 ) );
     if ( mitkMapper.IsNull() )
     {
-      //LOG_INFO << "mitkMapper is null\n";
+      //MITK_INFO << "mitkMapper is null\n";
       return 0;
     }
 
@@ -497,19 +497,19 @@ vtkScalarsToColors* mitk::UnstructuredGridMapper2D::GetVtkLUT(mitk::BaseRenderer
     vtkVolume* volume = dynamic_cast<vtkVolume*>( mitkMapper->GetVtkProp(renderer) );
     if (volume)
     {
-      //LOG_INFO << "found volume prop\n";
+      //MITK_INFO << "found volume prop\n";
       return static_cast<vtkScalarsToColors*>(volume->GetProperty()->GetRGBTransferFunction());
     }
     
     vtkAssembly* assembly = dynamic_cast<vtkAssembly*>(mitkMapper->GetVtkProp(renderer));
     if (assembly)
     {
-      //LOG_INFO << "found assembly prop\n";
+      //MITK_INFO << "found assembly prop\n";
       mitk::TransferFunctionProperty::Pointer transferFuncProp;
       node->GetProperty(transferFuncProp, "TransferFunction", 0);
       if (transferFuncProp.IsNotNull())
       {
-        LOG_INFO << "return colortransferfunction\n";
+        MITK_INFO << "return colortransferfunction\n";
         return static_cast<vtkScalarsToColors*>(transferFuncProp->GetValue()->GetColorTransferFunction());
       }
     }

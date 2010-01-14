@@ -129,7 +129,7 @@ void QmitkToolSelectionBox::toolButtonClicked(int id)
 {
   if ( !QWidget::isEnabled() ) return; // this method could be triggered from the constructor, when we are still disabled
 
-  LOG_DEBUG << "toolButtonClicked(" << id << "): id translates to tool ID " << m_ToolIDForButtonID[id];
+  MITK_DEBUG << "toolButtonClicked(" << id << "): id translates to tool ID " << m_ToolIDForButtonID[id];
 
   //QToolButton* toolButton = dynamic_cast<QToolButton*>( Q3ButtonGroup::find(id) );
   QToolButton* toolButton = dynamic_cast<QToolButton*>( m_ToolButtonGroup->buttons().at(id) );
@@ -272,7 +272,7 @@ void QmitkToolSelectionBox::OnToolManagerReferenceDataModified()
 {
   if (m_SelfCall) return;
 
-  LOG_DEBUG << "OnToolManagerReferenceDataModified()";
+  MITK_DEBUG << "OnToolManagerReferenceDataModified()";
 
   SetGUIEnabledAccordingToToolManagerState();
 }
@@ -281,7 +281,7 @@ void QmitkToolSelectionBox::OnToolManagerWorkingDataModified()
 {
   if (m_SelfCall) return;
   
-  LOG_DEBUG << "OnToolManagerWorkingDataModified()";
+  MITK_DEBUG << "OnToolManagerWorkingDataModified()";
 
   SetGUIEnabledAccordingToToolManagerState();
 }
@@ -294,7 +294,7 @@ void QmitkToolSelectionBox::SetGUIEnabledAccordingToToolManagerState()
   mitk::DataTreeNode* referenceNode = m_ToolManager->GetReferenceData(0);
   mitk::DataTreeNode* workingNode = m_ToolManager->GetWorkingData(0);
 
-  //LOG_DEBUG << this->name() << ": SetGUIEnabledAccordingToToolManagerState: referenceNode " << (void*)referenceNode << " workingNode " << (void*)workingNode << " isVisible() " << isVisible();
+  //MITK_DEBUG << this->name() << ": SetGUIEnabledAccordingToToolManagerState: referenceNode " << (void*)referenceNode << " workingNode " << (void*)workingNode << " isVisible() " << isVisible();
 
   bool enabled = true;
   
@@ -413,23 +413,23 @@ void QmitkToolSelectionBox::RecreateButtons()
   }
 
   // step two: sort tools according to previously found positions in m_DisplayedGroups
-  LOG_DEBUG << "Sorting order of tools (lower number --> earlier in button group)";
+  MITK_DEBUG << "Sorting order of tools (lower number --> earlier in button group)";
   while ( !toolPositions.empty() )
   {
     SortPairType thisPair = toolPositions.top();
-    LOG_DEBUG << "Position " << thisPair.first << " : " << thisPair.second->GetName();
+    MITK_DEBUG << "Position " << thisPair.first << " : " << thisPair.second->GetName();
     
     allTools.push_back( thisPair.second );
     toolPositions.pop();
   }
   std::reverse( allTools.begin(), allTools.end() );
 
-  LOG_DEBUG << "Sorted tools:";
+  MITK_DEBUG << "Sorted tools:";
   for ( mitk::ToolManager::ToolVectorTypeConst::const_iterator iter = allTools.begin();
         iter != allTools.end();
         ++iter)
   {
-    LOG_DEBUG << (*iter)->GetName();
+    MITK_DEBUG << (*iter)->GetName();
   }
 
   // try to change layout... bad?
@@ -449,7 +449,7 @@ void QmitkToolSelectionBox::RecreateButtons()
   m_ToolIDForButtonID.clear();
   QToolButton* button = 0;
 
-  LOG_DEBUG << "Creating buttons for tools";
+  MITK_DEBUG << "Creating buttons for tools";
   // fill group box with buttons
   for ( mitk::ToolManager::ToolVectorTypeConst::const_iterator iter = allTools.begin();
         iter != allTools.end();
@@ -469,10 +469,10 @@ void QmitkToolSelectionBox::RecreateButtons()
     button = new QToolButton;
     button->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred));
     // add new button to the group
-    LOG_DEBUG << "Adding button with ID " << currentToolID;
+    MITK_DEBUG << "Adding button with ID " << currentToolID;
     m_ToolButtonGroup->addButton(button, currentButtonID);
     // ... and to the layout
-    LOG_DEBUG << "Adding button in row/column " << row << "/" << column;
+    MITK_DEBUG << "Adding button in row/column " << row << "/" << column;
     m_ButtonLayout->addWidget(button, row, column);
 
     if (m_LayoutColumns == 1)
@@ -499,7 +499,7 @@ void QmitkToolSelectionBox::RecreateButtons()
     }
     label += tool->GetName();
     QString tooltip = tool->GetName();
-    LOG_DEBUG << tool->GetName() << ", " << label.toLocal8Bit().constData() << ", '" << tooltip.toLocal8Bit().constData();
+    MITK_DEBUG << tool->GetName() << ", " << label.toLocal8Bit().constData() << ", '" << tooltip.toLocal8Bit().constData();
 
     if ( m_ShowNames )
     {
@@ -532,8 +532,8 @@ void QmitkToolSelectionBox::RecreateButtons()
     m_ButtonIDForToolID[currentToolID] = currentButtonID;
     m_ToolIDForButtonID[currentButtonID] = currentToolID;
 
-    LOG_DEBUG << "m_ButtonIDForToolID[" << currentToolID << "] == " << currentButtonID;
-    LOG_DEBUG << "m_ToolIDForButtonID[" << currentButtonID << "] == " << currentToolID;
+    MITK_DEBUG << "m_ButtonIDForToolID[" << currentToolID << "] == " << currentButtonID;
+    MITK_DEBUG << "m_ToolIDForButtonID[" << currentButtonID << "] == " << currentToolID;
 
     tool->GUIProcessEventsMessage += mitk::MessageDelegate<QmitkToolSelectionBox>( this, &QmitkToolSelectionBox::OnToolGUIProcessEventsMessage ); // will never add a listener twice, so we don't have to check here
     tool->ErrorMessage += mitk::MessageDelegate1<QmitkToolSelectionBox, std::string>( this, &QmitkToolSelectionBox::OnToolErrorMessage ); // will never add a listener twice, so we don't have to check here
@@ -570,10 +570,10 @@ void QmitkToolSelectionBox::SetDisplayedToolGroups(const std::string& toolGroups
     QString q_DisplayedGroups = toolGroups.c_str();
     // quote all unquoted single words
     q_DisplayedGroups = q_DisplayedGroups.replace( QRegExp("\\b(\\w+)\\b|'([^']+)'"), "'\\1\\2'" );
-    LOG_DEBUG << "m_DisplayedGroups was \"" << toolGroups << "\"";
+    MITK_DEBUG << "m_DisplayedGroups was \"" << toolGroups << "\"";
 
     m_DisplayedGroups = q_DisplayedGroups.toLocal8Bit().constData();
-    LOG_DEBUG << "m_DisplayedGroups is \"" << m_DisplayedGroups << "\"";
+    MITK_DEBUG << "m_DisplayedGroups is \"" << m_DisplayedGroups << "\"";
 
     RecreateButtons();
     SetOrUnsetButtonForActiveTool();

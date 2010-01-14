@@ -45,7 +45,7 @@ mitk::PlanarAngle::~PlanarAngle()
 //
 //  if ( geometry2D == NULL )
 //  {
-//    LOG_ERROR << "Missing Geometry2D for PlanarLine";
+//    MITK_ERROR << "Missing Geometry2D for PlanarLine";
 //    return;
 //  }
 //

@@ -282,6 +282,16 @@ IF(WIN32)
     
   ENDIF(MITK_USE_QT)
  
+  IF(MITK_USE_OPEN_CV)
+	INCLUDE(MITK_OpenCV_Config)
+    FILE(GLOB opencvdebuglllist "${OPENCV_DIR}/bin/Debug/*.dll")
+    FILE(GLOB opencvreleasedlllist "${OPENCV_DIR}/bin/Release/*.dll")
+  
+    INSTALL(FILES ${opencvdebuglllist} DESTINATION bin CONFIGURATIONS Debug)
+    INSTALL(FILES ${opencvreleasedlllist} DESTINATION bin CONFIGURATIONS Release)
+  ENDIF(MITK_USE_OPEN_CV)
+ 
+ 
   #VTK DLLs install target
   IF(MINGW)
     FILE(GLOB vtkreleasedlllist ${VTK_RUNTIME_LIBRARY_DIRS}/*.dll)

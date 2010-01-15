@@ -1,0 +1,7 @@
+Manifest-Version: 1.0
+Bundle-Name: BlueBerry Jobs Mechanism
+Bundle-SymbolicName: org.blueberry.core.jobs
+Bundle-Version: 0.1
+Bundle-Vendor: DKFZ, Medical and Biological Informatics
+Require-Bundle: org.blueberry.osgi, org.blueberry.solstice.common
+Bundle-Activator:

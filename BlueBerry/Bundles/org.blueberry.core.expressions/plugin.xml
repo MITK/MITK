@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?openCherry version="0.1"?>
+
+<plugin>
+  <extension-point id="propertyTesters" name="Property Tester Extension-Point" schema="schema/propertyTesters.exsd"/>
+  <extension-point id="definitions" name="Defintions Extension-Point" schema="schema/definitions.exsd"/>
+</plugin>

@@ -1,0 +1,7 @@
+Manifest-Version: 1.0
+Bundle-Name: BlueBerry Automated Testing 
+Bundle-SymbolicName: org.blueberry.test 
+Bundle-Version: 0.9
+Bundle-Vendor: DKFZ, Medical and Biological Informatics
+Require-Bundle: org.blueberry.osgi
+Bundle-Activator: 

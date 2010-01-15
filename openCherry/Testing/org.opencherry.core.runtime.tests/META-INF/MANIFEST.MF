@@ -1,7 +1,0 @@
-Manifest-Version: 1.0
-Bundle-Name: Core Runtime Test Bundle
-Bundle-SymbolicName: org.opencherry.core.runtime.tests
-Bundle-Version: 0.9
-Bundle-Vendor: DKFZ, Medical and Biological Informatics
-Require-Bundle: org.opencherry.test, org.opencherry.core.runtime
-Bundle-Activator: 

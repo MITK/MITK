@@ -1,8 +1,0 @@
-Manifest-Version: 1.0
-Bundle-Name: openCherry Core Runtime Plugin
-Bundle-SymbolicName: org.opencherry.core.runtime
-Bundle-Version: 1.0.0
-Bundle-Vendor: DKFZ, Medical and Biological Informatics
-Bundle-Activator: cherry::RuntimePlugin
-Require-Bundle: org.opencherry.osgi
-Bundle-ActivationPolicy: eager

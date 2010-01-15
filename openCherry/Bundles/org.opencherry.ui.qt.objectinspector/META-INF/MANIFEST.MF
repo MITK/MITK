@@ -1,7 +1,0 @@
-Manifest-Version: 1.0
-Bundle-Name: Object Inspector 
-Bundle-SymbolicName: org.opencherry.ui.qt.objectinspector 
-Bundle-Version: 0.1
-Bundle-Vendor: DKFZ, Medical and Biological Informatics
-Require-Bundle: org.opencherry.ui.qt
-Bundle-Activator: 

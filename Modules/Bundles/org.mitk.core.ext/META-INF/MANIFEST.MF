@@ -3,5 +3,5 @@ Bundle-Name: MBI Sandbox
 Bundle-SymbolicName: org.mitk.core.ext 
 Bundle-Version: 0.1
 Bundle-Vendor: DKFZ, Medical and Biological Informatics
-Require-Bundle: org.opencherry.osgi
+Require-Bundle: org.blueberry.osgi
 Bundle-Activator: mitk::CoreExtActivator

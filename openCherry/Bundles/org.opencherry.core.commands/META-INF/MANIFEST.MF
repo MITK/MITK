@@ -1,6 +1,0 @@
-Manifest-Version: 1.0
-Bundle-Name: openCherry Core Commands Plugin
-Bundle-SymbolicName: org.opencherry.core.commands
-Bundle-Version: 1.0.0
-Require-Bundle: org.opencherry.osgi
-Bundle-Vendor: DKFZ, Medical and Biological Informatics

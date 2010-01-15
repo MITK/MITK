@@ -1,0 +1,7 @@
+Manifest-Version: 1.0
+Bundle-Name: BlueBerry Qt User Interface Plugin
+Bundle-SymbolicName: org.blueberry.ui.qt
+Bundle-Version: 1.0.0
+Bundle-Vendor: DKFZ, Medical and Biological Informatics
+Bundle-Activator: cherry::QtPluginActivator
+Require-Bundle: org.blueberry.ui

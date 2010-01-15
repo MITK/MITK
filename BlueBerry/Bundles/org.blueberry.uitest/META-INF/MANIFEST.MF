@@ -1,0 +1,7 @@
+Manifest-Version: 1.0
+Bundle-Name: BlueBerry Automated UI Testing 
+Bundle-SymbolicName: org.blueberry.uitest 
+Bundle-Version: 0.9
+Bundle-Vendor: DKFZ, Medical and Biological Informatics
+Require-Bundle: org.blueberry.test, org.blueberry.ui
+Bundle-Activator: 

@@ -3,5 +3,5 @@ Bundle-Name: Common MITK Qt classes
 Bundle-SymbolicName: org.mitk.gui.qt.common
 Bundle-Version: 1.0.0
 Bundle-Vendor: DKFZ, Medical and Biological Informatics
-Require-Bundle: org.mitk.gui.common, org.opencherry.ui.qt
+Require-Bundle: org.mitk.gui.common, org.blueberry.ui.qt
 Bundle-Activator: QmitkCommonActivator

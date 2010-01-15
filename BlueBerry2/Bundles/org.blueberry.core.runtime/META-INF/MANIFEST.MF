@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+Bundle-Name: BlueBerry Core Runtime Plugin
+Bundle-SymbolicName: org.blueberry.core.runtime
+Bundle-Version: 1.0.0
+Bundle-Vendor: DKFZ, Medical and Biological Informatics
+Bundle-Activator: cherry::RuntimePlugin
+Require-Bundle: org.blueberry.osgi
+Bundle-ActivationPolicy: eager

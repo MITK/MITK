@@ -1,0 +1,6 @@
+Manifest-Version: 1.0
+Bundle-Name: BlueBerry Core Commands Plugin
+Bundle-SymbolicName: org.blueberry.core.commands
+Bundle-Version: 1.0.0
+Require-Bundle: org.blueberry.osgi
+Bundle-Vendor: DKFZ, Medical and Biological Informatics

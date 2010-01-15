@@ -3,5 +3,5 @@ Bundle-Name: MITK Job Bundle
 Bundle-SymbolicName: org.mitk.core.jobs 
 Bundle-Version: 0.1
 Bundle-Vendor: DKFZ, Medical and Biological Informatics
-Require-Bundle: org.opencherry.core.jobs
+Require-Bundle: org.blueberry.core.jobs
 Bundle-Activator: 

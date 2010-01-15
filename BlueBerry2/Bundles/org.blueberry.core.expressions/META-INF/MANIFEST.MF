@@ -1,0 +1,6 @@
+Manifest-Version: 1.0
+Bundle-Name: BlueBerry Core Expressions Plugin
+Bundle-SymbolicName: org.blueberry.core.expressions
+Bundle-Version: 1.0.0
+Require-Bundle: org.blueberry.solstice.common
+Bundle-Vendor: DKFZ, Medical and Biological Informatics

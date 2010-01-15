@@ -1,0 +1,7 @@
+Manifest-Version: 1.0
+Bundle-Name: Common BlueBerry Runtime
+Bundle-SymbolicName: org.blueberry.solstice.common
+Bundle-Version: 1.0.0
+Bundle-Vendor: DKFZ, Medical and Biological Informatics
+Require-Bundle: org.blueberry.osgi
+Bundle-ActivationPolicy: lazy

@@ -3,4 +3,4 @@ Bundle-Name: MITK Qt User Interface Plugin
 Bundle-SymbolicName: org.mitk.gui.common
 Bundle-Version: 1.0.0
 Bundle-Vendor: DKFZ, Medical and Biological Informatics
-Require-Bundle: org.opencherry.ui,org.mitk.core.services
+Require-Bundle: org.blueberry.ui,org.mitk.core.services

@@ -1,0 +1,90 @@
+/*=========================================================================
+
+Program:   openCherry Platform
+Language:  C++
+Date:      $Date$
+Version:   $Revision$
+
+Copyright (c) German Cancer Research Center, Division of Medical and
+Biological Informatics. All rights reserved.
+See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
+
+This software is distributed WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.  See the above copyright notices for more information.
+
+=========================================================================*/
+
+#ifndef OSGI_FRAMEWORK_BUNDLE_H_
+#define OSGI_FRAMEWORK_BUNDLE_H_
+
+#include <Poco/Path.h>
+#include <Poco/Mutex.h>
+
+#include "Macros.h"
+
+#include "IBundleManifest.h"
+
+namespace osgi {
+
+namespace framework {
+
+struct IBundleStorage;
+struct IBundleActivator;
+struct BundleEvents;
+
+struct CHERRY_OSGI IBundle : public Object
+{
+
+  osgiInterfaceMacro(osgi::framework::IBundle);
+
+public:
+
+  enum State { BUNDLE_INSTALLED, BUNDLE_UNINSTALLED, BUNDLE_RESOLVED,
+                BUNDLE_STARTING, BUNDLE_ACTIVE, BUNDLE_STOPPING };
+
+
+  virtual ~IBundle() {};
+
+  virtual IBundleActivator* GetActivator() const = 0;
+  virtual const std::string& GetActivatorClass() const = 0;
+  virtual const std::string& GetActivatorLibrary() const = 0;
+
+  virtual const std::string& GetCopyright() const = 0;
+  virtual const std::string& GetVendor() const = 0;
+
+  virtual IBundleManifest::ActivationPolicy GetActivationPolicy() const = 0;
+  virtual bool IsSystemBundle() const = 0;
+
+  virtual std::istream* GetLocalizedResource(const std::string& name) const = 0;
+  virtual std::istream* GetResource(const std::string& name) const = 0;
+
+  virtual bool IsActive() const = 0;
+  virtual bool IsResolved() const = 0;
+  virtual bool IsStarted() const = 0;
+
+  virtual const IBundleManifest& GetManifest() const = 0;
+  virtual const std::string& GetName() const = 0;
+  virtual const Poco::Path GetPath() const = 0;
+  virtual IBundleStorage& GetStorage() = 0;
+  // const Version& GetVersion() const;
+
+  virtual const IBundleManifest::Dependencies& GetRequiredBundles() const = 0;
+
+  virtual void Resolve() = 0;
+
+  virtual void Start() = 0;
+  virtual void Stop() = 0;
+
+  virtual State GetState() const = 0;
+  virtual std::string GetStateString() const = 0;
+
+  virtual BundleEvents& GetEvents() = 0;
+
+  virtual const std::string& GetSymbolicName() const = 0;
+
+};
+
+} } // namespace
+
+#endif /*OSGI_FRAMEWORK_BUNDLE_H_*/

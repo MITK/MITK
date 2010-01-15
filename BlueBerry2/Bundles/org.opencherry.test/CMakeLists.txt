@@ -1,0 +1,4 @@
+
+MACRO_CREATE_PLUGIN()
+
+TARGET_LINK_LIBRARIES(${PLUGIN_TARGET} optimized CppUnit debug CppUnitd)

@@ -1,0 +1,7 @@
+Manifest-Version: 1.0
+Bundle-Name: openCherry Automated UI Testing 
+Bundle-SymbolicName: org.opencherry.uitest 
+Bundle-Version: 0.9
+Bundle-Vendor: DKFZ, Medical and Biological Informatics
+Require-Bundle: org.opencherry.test, org.opencherry.ui
+Bundle-Activator: 

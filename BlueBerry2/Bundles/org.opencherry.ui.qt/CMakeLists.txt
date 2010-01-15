@@ -1,0 +1,3 @@
+MACRO_CREATE_QT_PLUGIN()
+
+

@@ -1,0 +1,336 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Schema file written by PDE -->
+<schema targetNamespace="org.eclipse.ui">
+<annotation>
+      <appInfo>
+         <meta.schema plugin="org.eclipse.ui" id="editors" name="Internal and External Editors"/>
+      </appInfo>
+      <documentation>
+         This extension point is used to add new editors to the 
+workbench.  A editor is a visual component within a 
+workbench page. It is typically used to edit or browse 
+a document or input object.  To open an editor, the user 
+will typically invoke &quot;Open&quot; on an &lt;samp&gt;IFile&lt;/samp&gt;.  
+When this action is performed the workbench registry 
+is consulted to determine an appropriate editor for 
+the file type and then a new instance of the editor 
+type is created.  The actual result depends on the 
+type of the editor.  The workbench provides support 
+for the creation of internal editors, which are tightly 
+integrated into the workbench, and external editors, 
+which are launched in a separate frame window.  
+There are also various level of integration between 
+these extremes. 
+&lt;p&gt;
+In the case of an internal editor tight integration can 
+be achieved between the workbench window and the editor 
+part.  The workbench menu and toolbar are pre-loaded 
+with a number of common actions, such as cut, copy, and 
+paste.  The active part, view or editor, is expected to 
+provide the implementation for these actions. An internal 
+editor may also define new actions which appear in the 
+workbench window.  These actions only appear when the 
+editor is active. 
+&lt;p&gt;
+The integration between the workbench and external
+editors is more tenuous.  In this case the workbench 
+may launch an editor but after has no way of determining
+the state of the external editor or collaborating 
+with it by any means except through the file system.
+      </documentation>
+   </annotation>
+
+   <element name="extension">
+      <complexType>
+         <sequence>
+            <element ref="editor" minOccurs="0" maxOccurs="unbounded"/>
+         </sequence>
+         <attribute name="point" type="string" use="required">
+            <annotation>
+               <documentation>
+                  a fully qualified identifier of the target extension point
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="id" type="string">
+            <annotation>
+               <documentation>
+                  an optional identifier of the extension instance
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string">
+            <annotation>
+               <documentation>
+                  an optional name of the extension instance
+               </documentation>
+               <appInfo>
+                  <meta.attribute translatable="true"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="editor">
+      <annotation>
+         <appInfo>
+            <meta.element labelAttribute="name" icon="icon"/>
+         </appInfo>
+      </annotation>
+      <complexType>
+         <sequence>
+            <element ref="contentTypeBinding" minOccurs="0" maxOccurs="unbounded"/>
+         </sequence>
+         <attribute name="id" type="string" use="required">
+            <annotation>
+               <documentation>
+                  a unique name that will be used to identify this editor
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string" use="required">
+            <annotation>
+               <documentation>
+                  a translatable name that will be used in the UI for this editor
+               </documentation>
+               <appInfo>
+                  <meta.attribute translatable="true"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+         <attribute name="icon" type="string">
+            <annotation>
+               <documentation>
+                  A relative name of the icon that will be used for all resources that match the specified extensions. Editors should provide an icon to make it easy for users to distinguish between different editor types. If you specify a command rather than a class, an icon is not needed. In that case, the workbench 
+will use the icon provided by the operating system.
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="resource"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+         <attribute name="extensions" type="string">
+            <annotation>
+               <documentation>
+                  an optional field containing the list of file types understood by the editor.  This is a string containing comma separate file extensions.  For instance, an editor which understands hypertext documents may register for &quot;htm, html&quot;.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="class" type="string">
+            <annotation>
+               <documentation>
+                  the name of a class that implements &lt;samp&gt;org.eclipse.ui.IEditorPart&lt;/samp&gt;. The attributes &lt;samp&gt;class&lt;/samp&gt;, &lt;samp&gt;command&lt;/samp&gt;, and &lt;samp&gt;launcher&lt;/samp&gt; are mutually exclusive. If this attribute is defined then &lt;samp&gt;contributorClass&lt;/samp&gt; should also be defined.
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="java" basedOn="org.eclipse.ui.part.EditorPart"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+         <attribute name="command" type="string">
+            <annotation>
+               <documentation>
+                  a command to run in order to launch an external editor. The executable command must be located on the system path or in the plug-in&apos;s directory. The attributes &lt;samp&gt;class&lt;/samp&gt;, &lt;samp&gt;command&lt;/samp&gt;, and &lt;samp&gt;launcher&lt;/samp&gt; are mutually exclusive.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="launcher" type="string">
+            <annotation>
+               <documentation>
+                  the name of a class which that implements &lt;samp&gt;org.eclipse.ui.IEditorLauncher&lt;/samp&gt;. 
+A launcher will open an external editor. The attributes &lt;samp&gt;class&lt;/samp&gt;, &lt;samp&gt;command&lt;/samp&gt;, and &lt;samp&gt;launcher&lt;/samp&gt; are mutually exclusive.
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="java" basedOn="org.eclipse.ui.IEditorLauncher"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+         <attribute name="contributorClass" type="string">
+            <annotation>
+               <documentation>
+                  the name of a class that implements &lt;samp&gt;org.eclipse.ui.IEditorActionBarContributor&lt;/samp&gt;. This attribute should only be defined if the &lt;samp&gt;class&lt;/samp&gt; attribute is defined. This class is used to add new actions to the workbench menu and tool bar which reflect the features of the editor type.
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="java" basedOn="org.eclipse.ui.part.EditorActionBarContributor"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+         <attribute name="default" type="boolean" use="default" value="false">
+            <annotation>
+               <documentation>
+                  if true, this editor will be used as the default editor for the
+type. This is only relevant in a case where more than one editor
+is registered for the same type. If an editor is not the default
+for the type, it can still be launched using &quot;Open with...&quot;
+submenu for the selected resource.
+&lt;p&gt;
+Please note that this attribute is only honored for filename and extension associations at this time.  It will not be honored for content type bindings.  Content type-based resolution will occur on a first come, first serve basis and is not explicitly specified.&lt;/p&gt;
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="filenames" type="string">
+            <annotation>
+               <documentation>
+                  an optional field containing the list of file names 
+understood by the editor.  This is a string 
+containing comma separate file names.  For instance, 
+an editor which understands specific hypertext 
+documents may register for &quot;ejb.htm, ejb.html&quot;.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="symbolicFontName" type="string">
+            <annotation>
+               <documentation>
+                  the symbolic name of a font. The symbolic font name must be the id of a defined font (see org.eclipse.ui.fontDefinitions). If this attribute is missing or invalid then the font name is the value of &quot;org.eclipse.jface.textfont&quot; in the editor&apos;s preferences store. If there is no preference store or the key is not defined then the JFace text font will be used. The editor implementation decides if it uses this symbolic font name to set the font.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="matchingStrategy" type="string">
+            <annotation>
+               <documentation>
+                  the name of a class that implements &lt;samp&gt;org.eclipse.ui.IEditorMatchingStrategy&lt;/samp&gt;. This attribute should only be defined if the &lt;samp&gt;class&lt;/samp&gt; attribute is defined. This allows the editor extension to provide its own algorithm for matching the input of one of its editors to a given editor input.
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="java" basedOn="org.eclipse.ui.IEditorMatchingStrategy"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="contentTypeBinding">
+      <annotation>
+         <appInfo>
+            <meta.element labelAttribute="contentTypeId"/>
+         </appInfo>
+         <documentation>
+            Advertises that the containing editor understands the given content type and is suitable for editing files of that type.
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="contentTypeId" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The content type identifier. This is an ID defined by the &apos;org.eclipse.core.runtime.contentTypes&apos; extension point.
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+
+   <annotation>
+      <appInfo>
+         <meta.section type="examples"/>
+      </appInfo>
+      <documentation>
+         The following is an example 
+of an internal editor extension definition: 
+&lt;p&gt;
+&lt;pre&gt;
+   &lt;extension point=&quot;org.eclipse.ui.editors&quot;&gt; 
+      &lt;editor 
+         id=&quot;com.xyz.XMLEditor&quot; 
+         name=&quot;Fancy XYZ XML editor&quot; 
+         icon=&quot;./icons/XMLEditor.gif&quot; 
+         extensions=&quot;xml&quot; 
+         class=&quot;com.xyz.XMLEditor&quot; 
+         contributorClass=&quot;com.xyz.XMLEditorContributor&quot; 
+         symbolicFontName=&quot;org.eclipse.jface.textfont&quot;
+         default=&quot;false&quot;&gt; 
+      &lt;/editor&gt; 
+   &lt;/extension&gt; 
+&lt;/pre&gt;
+&lt;/p&gt;
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="apiInfo"/>
+      </appInfo>
+      <documentation>
+         If the command attribute is used, it will be treated 
+as an external program command line that will be executed
+ in a platform-dependent manner. 
+&lt;p&gt;
+If the launcher attribute is used the editor will also 
+be treated as an external program.  In this case the 
+specified class must implement 
+&lt;samp&gt;org.eclipse.ui.IEditorLauncher&lt;/samp&gt;. 
+The launcher will be instantiated and then 
+&lt;samp&gt;open(IPath path)&lt;/samp&gt; will be invoked to 
+launch the editor on the provided local file system path. 
+&lt;p&gt;
+If the class attribute is used, the workbench will 
+assume that it is an internal editor and the specified 
+class must implement &lt;samp&gt;org.eclipse.ui.IEditorPart&lt;/samp&gt;.
+It is common practice to 
+&lt;samp&gt;subclass org.eclipse.ui.EditorPart&lt;/samp&gt; when 
+defining a new editor type.  It is also necessary to 
+define a &lt;samp&gt;contributorClass&lt;/samp&gt; attribute.  
+The specified class must implement 
+&lt;samp&gt;org.eclipse.ui.IEditorActionBarContributor&lt;/samp&gt;, 
+and is used to add new actions to the workbench 
+menu and tool bar which reflect the features of the 
+editor type. 
+&lt;p&gt;
+Within the workbench there may be more than one open 
+editor of a particular type.  For instance, there may 
+be one or more open Java Editors.  To avoid the creation
+of duplicate actions and action images the editor 
+concept has been split into two.  An 
+&lt;samp&gt;IEditorActionBarContributor&lt;/samp&gt; is responsible
+for the creation of actions.  The editor is responsible 
+for action implementation.  Furthermore, the contributor 
+is shared by each open editor.  As a result of this 
+design there is only one set of actions for one or 
+more open editors. 
+&lt;p&gt;
+The contributor will add new actions to the workbench 
+menu and toolbar which reflect the editor type.  These 
+actions are shared and, when invoked, act upon the 
+active editor.  The active editor is passed to the 
+contributor by invoking 
+&lt;samp&gt;IEditorActionBarContributor.setActiveEditor&lt;/samp&gt;.  
+The identifiers for actions and major groups within 
+the workbench window are defined in 
+&lt;samp&gt;org.eclipse.ui.IWorkbenchActionConstants&lt;/samp&gt;.  
+These should be used as a reference point for the 
+addition of new actions.   Top level menus are created 
+by using the following values for the path attribute: 
+&lt;ul&gt;
+&lt;li&gt;
+additions - represents a group to the left of the Window menu. 
+&lt;/li&gt;
+&lt;/ul&gt;
+Actions and menus added into these paths will only be 
+shown while the associated editor is active. When the 
+editor is closed, menus and actions will be removed.
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="implementation"/>
+      </appInfo>
+      <documentation>
+         The workbench provides a &quot;Default Text Editor&quot;. The end user product may contain other editors as part of the shipping bundle. In that case, editors will be registered as extensions using the syntax described above.
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="copyright"/>
+      </appInfo>
+      <documentation>
+         Copyright (c) 2002, 2007 IBM Corporation and others.&lt;br&gt;
+All rights reserved. This program and the accompanying materials are made
+available under the terms of the Eclipse Public License v1.0 which accompanies
+this distribution, and is available at &lt;a 
+href=&quot;http://www.eclipse.org/legal/epl-v10.html&quot;&gt;http://www.eclipse.org/legal/epl-v10.html&lt;/a&gt;
+      </documentation>
+   </annotation>
+
+</schema>

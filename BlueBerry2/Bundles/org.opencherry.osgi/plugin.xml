@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?openCherry version="0.1"?>
+<plugin>
+   <extension-point id="org.opencherry.osgi.applications" name="Applications" schema="schema/applications.exsd"/>
+</plugin>

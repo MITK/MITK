@@ -1,0 +1,7 @@
+Manifest-Version: 1.0
+Bundle-Name: @PLUGIN_NAME@ 
+Bundle-SymbolicName: @PLUGIN_ID@ 
+Bundle-Version: @PLUGIN_VERSION@
+Bundle-Vendor: @PLUGIN_VENDOR@
+Require-Bundle: @REQUIRED_PLUGINS_MF@
+Bundle-Activator: @FQ_ACTIVATOR_CLASS@

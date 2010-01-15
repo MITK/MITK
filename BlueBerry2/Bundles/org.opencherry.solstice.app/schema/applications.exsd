@@ -1,0 +1,237 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Schema file written by PDE -->
+<schema targetNamespace="org.opencherry.core.runtime">
+<annotation>
+      <appInfo>
+         <meta.schema plugin="org.opencherry.core.runtime" id="applications" name="Applications"/>
+      </appInfo>
+      <documentation>
+         Platform runtime supports plug-ins which would like to 
+declare main entry points.  That is, programs which 
+would like to run using the platform runtime but yet 
+control all aspects of execution can declare themselves 
+as an application.  Declared applications can be run 
+directly from the main platform launcher by specifying 
+the &lt;i&gt;-application&lt;/i&gt; argument where the parameter 
+is the id of an extension supplied to the 
+applications extension point described here.  
+This application is instantiated and run by the platform.  
+Platform clients can also use the platform to lookup and 
+run multiple applications.
+      </documentation>
+   </annotation>
+
+   <element name="extension">
+      <complexType>
+         <sequence>
+            <element ref="application"/>
+         </sequence>
+         <attribute name="point" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="id" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+               <appInfo>
+                  <meta.attribute translatable="true"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="application">
+      <complexType>
+         <sequence>
+            <element ref="run" minOccurs="0" maxOccurs="1"/>
+         </sequence>
+         <attribute name="visible" type="boolean" use="default" value="true">
+            <annotation>
+               <documentation>
+                  Specifies whether the application should be visible for the user.  For example, some applications may provide features to other applications but nothing directly to the user. In this case the application should not be revealed to the user to start it individually. The default value is set to true.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="cardinality" use="default" value="singleton-global">
+            <annotation>
+               <documentation>
+                  Specifies the cardinality of the application.  The cardinality controls the number of applications that may be running at the same time in the Platform.  The following cardinality types are allowed
+&lt;dl&gt;
+&lt;dt&gt;singleton-global&lt;/dt&gt;
+&lt;dd&gt;This application must be the only application running.  No other types of
+ applications can start while this application is active&lt;/dd&gt;
+&lt;dt&gt;singleton-scoped&lt;/dt&gt;
+&lt;dd&gt;This application must be the only scoped application running.  No other applications that use the singleton-scoped cardinality can start while this application is active&lt;/dd&gt;
+&lt;dt&gt;integer&lt;/dt&gt;
+&lt;dd&gt;An integer indicates the maximum number of active instances allowed for this application.  Other applications are allowed to start while this application is active, except for singleton-global applications&lt;/dd&gt;
+&lt;dt&gt;*&lt;/dt&gt;
+&lt;dd&gt;A value of &quot;*&quot; indicates there is no maximum on the number of active instances allowed for this application.  Other applications are allowed to start while this application is active, except for singleton-global applications&lt;/dd&gt;
+&lt;/dl&gt;
+The default value is &quot;singleton-global&quot;.
+               </documentation>
+            </annotation>
+            <simpleType>
+               <restriction base="string">
+                  <enumeration value="singleton-global">
+                  </enumeration>
+                  <enumeration value="singleton-scoped">
+                  </enumeration>
+                  <enumeration value="1">
+                  </enumeration>
+                  <enumeration value="2">
+                  </enumeration>
+                  <enumeration value="3">
+                  </enumeration>
+                  <enumeration value="4">
+                  </enumeration>
+                  <enumeration value="5">
+                  </enumeration>
+                  <enumeration value="*">
+                  </enumeration>
+               </restriction>
+            </simpleType>
+         </attribute>
+         <attribute name="thread" use="default" value="main">
+            <annotation>
+               <documentation>
+                  Specifies the thread the application must run on.  The following thread types are allowed.
+&lt;dl&gt;
+&lt;dt&gt;main&lt;/dt&gt;
+&lt;dd&gt;This application must run on the main thread.&lt;/dd&gt;
+&lt;dt&gt;any&lt;/dt&gt;
+&lt;dd&gt;This application may run on any thread.&lt;/dd&gt;
+&lt;/dl&gt;
+The default value is &quot;main&quot;.
+               </documentation>
+            </annotation>
+            <simpleType>
+               <restriction base="string">
+                  <enumeration value="main">
+                  </enumeration>
+                  <enumeration value="any">
+                  </enumeration>
+               </restriction>
+            </simpleType>
+         </attribute>
+         <attribute name="icon" type="string">
+            <annotation>
+               <documentation>
+                  Path to a resource that should be used as the application icon.  The path may be translated to provide a different icon according to the locale.
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="resource"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="run">
+      <complexType>
+         <sequence>
+            <element ref="parameter" minOccurs="0" maxOccurs="unbounded"/>
+         </sequence>
+         <attribute name="class" type="string" use="required">
+            <annotation>
+               <documentation>
+                  the fully-qualified name of a class which implements &lt;samp&gt;org.eclipse.equinox.application.IApplication&lt;/samp&gt;.
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="java" basedOn="org.eclipse.equinox.app.IApplication"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="parameter">
+      <annotation>
+         <appInfo>
+            <meta.element labelAttribute="name"/>
+         </appInfo>
+      </annotation>
+      <complexType>
+         <attribute name="name" type="string" use="required">
+            <annotation>
+               <documentation>
+                  the name of this parameter made available to instances of the specified application class
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="value" type="string" use="required">
+            <annotation>
+               <documentation>
+                  the value of this parameter made available to instances of the specified application class
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="examples"/>
+      </appInfo>
+      <documentation>
+         Following is an example of an application declaration: 
+&lt;p&gt;
+&lt;pre&gt;
+   &lt;extension id=&quot;coolApplication&quot; point=&quot;org.eclipse.core.runtime.applications&quot;&gt; 
+      &lt;application&gt; 
+         &lt;run class=&quot;com.xyz.applications.Cool&quot;&gt; 
+            &lt;parameter name=&quot;optimize&quot; value=&quot;true&quot;/&gt; 
+         &lt;/run&gt; 
+      &lt;/application&gt; 
+   &lt;/extension&gt; 
+&lt;/pre&gt;
+&lt;/p&gt;
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="apiInfo"/>
+      </appInfo>
+      <documentation>
+         The value of the class attribute must represent an implementor of &lt;samp&gt;org.eclipse.equinox.application.IApplication&lt;/samp&gt;.
+The interface &lt;samp&gt;org.eclipse.core.runtime.IPlatformRunnable&lt;/samp&gt; has been deprecated and replaced by the &lt;samp&gt;org.eclipse.equinox.application.IApplication&lt;/samp&gt; interface.  The &lt;samp&gt;org.eclipse.core.runtime.IPlatformRunnable&lt;/samp&gt; interface is supported only for backwards compatibility.
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="implementation"/>
+      </appInfo>
+      <documentation>
+         The platform supplies a number of applications including the platform workbench itself.
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="copyright"/>
+      </appInfo>
+      <documentation>
+         Copyright (c) 2004, 2007 IBM Corporation and others.&lt;br&gt;
+All rights reserved. This program and the accompanying materials are made 
+available under the terms of the Eclipse Public License v1.0 which 
+accompanies 
+this distribution, and is available at 
+&lt;a href=&quot;http://www.eclipse.org/legal/epl-v10.html&quot;&gt;http://www.eclipse.org/legal/epl-v10.html&lt;/a&gt;
+      </documentation>
+   </annotation>
+
+</schema>

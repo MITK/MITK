@@ -1,0 +1,48 @@
+/*!
+
+\page PlatformBuildsystemOverviewPage Overview
+\ingroup PlatformBuildsystem
+
+\section BuildSystemIntro Introduction
+The build system of the openCherry platform is based on <a href="http://www.cmake.org">CMake</a>, a cross-platform build-system generator. This article will explain how you can build openCherry itself and how you can use and extend the CMake macros from openCherry to build an integrate your own plug-ins.
+
+\section BuildSystemOpenCherry Building openCherry
+
+\par Requirements
+openCherry makes use of the <a href="http://www.pocoproject.org">POCO C++ libraries</a>. You have three options for optaining the libraries:
+\li If you are using Linux, your distribution might provide the libraries as a package already.
+\li Download the source from their website (you only need the economy package) and follow their build instructions.
+\li Checkout out the sources from http://svn.mitk.org/trunk/mitk/Utilities/Poco . This will always be updated to contain the parts of Poco required for the openCherry platform. Further, you can build the sources with CMake.
+
+\par Getting the sources
+We recommend to use subversion to get the most recent version of openCherry, since it is under active development. Because it is developed in the same group who also developes MITK, you can check the MITK <a href="http://my.cdash.org/index.php?project=MITK">dashboard</a> at Kitware to see if the code is in a stable state. Look at build names containing the "openCherry" string. If the build tree is not clean, you can specify an older revision for the checkout.
+
+\par
+To checkout the current subversion repository do:
+
+\par
+<tt>
+svn co http://svn.mitk.org/trunk/mitk/Utilities/openCherry openCherry
+</tt>
+
+\par
+or use your preferred graphical subversion client.
+
+\par Setting up your binary tree
+Linux:
+Create a new directory for your binary tree and cd into it, and call CMake (adapt the paths to your needs):
+
+\par
+<tt>
+mkdir openCherry-bin<br/>
+cd openCherry-bin</br>
+ccmake ../openCherry</br>
+make
+</tt>
+
+\par 
+Windows: Start the CMake GUI and enter the location of the source and of the binary tree. Depending on the generator you choose, CMake will then generate the appropriate project files in the root of your binary tree.
+
+\par CMake variables
+
+*/

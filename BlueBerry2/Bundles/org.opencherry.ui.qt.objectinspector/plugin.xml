@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?openCherry version="0.1"?>
+<plugin>
+  
+  <extension point="org.opencherry.ui.views">
+    <view id="objectbrowser"
+          name="Object Browser"
+          class="cherry::ObjectBrowserView"
+		  icon="resources/ObjectBrowser.png" />
+  </extension>
+
+</plugin>

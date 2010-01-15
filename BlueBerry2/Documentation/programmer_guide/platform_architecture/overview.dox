@@ -1,0 +1,13 @@
+/*!
+
+\page PlatfromArchitectureOverviewPage Overview
+\ingroup PlatformArchitecture
+
+<p>
+The openCherry platform is structured around the concept of <b>plug-ins</b>. Plug-ins are structured bundles of code and/or data that contribute function to the system. Function can be contributed in the form of code libraries (exported C/C++ code in shared libraries), platform <b>extensions</b>, or even documentation. Plug-ins can define <b>extension-points</b>, well-defined places where other plug-ins can add functionality.
+</p>
+
+<p>
+Each subsystem in the platform is itself structured as a set of plug-ins that implement some key function. Some plug-ins add visible features to the platform using the extension model. Others supply shared libraries that can be used to implement system extensions.
+</p>
+*/

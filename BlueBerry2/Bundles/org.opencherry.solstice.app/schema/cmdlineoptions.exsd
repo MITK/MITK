@@ -1,0 +1,189 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Schema file written by PDE -->
+<schema targetNamespace="org.opencherry.core.runtime" xmlns="http://www.w3.org/2001/XMLSchema">
+<annotation>
+      <appinfo>
+         <meta.schema plugin="org.opencherry.core.runtime" id="cmdlineoptions" name="Command Line Options"/>
+      </appinfo>
+      <documentation>
+         Platform runtime supports plug-ins which would like to 
+declare additional command line options.
+      </documentation>
+   </annotation>
+
+   <element name="extension">
+      <annotation>
+         <appinfo>
+            <meta.element />
+         </appinfo>
+      </annotation>
+      <complexType>
+         <sequence>
+            <element ref="option"/>
+         </sequence>
+         <attribute name="point" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="id" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+               <appinfo>
+                  <meta.attribute translatable="true"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="option">
+      <complexType>
+         <sequence minOccurs="0" maxOccurs="1">
+            <element ref="argument"/>
+         </sequence>
+         <attribute name="fullname" type="string" use="required">
+            <annotation>
+               <documentation>
+                  Specifies the full name of the option without leading dashes or slashes.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="shortname" type="string">
+            <annotation>
+               <documentation>
+                  Optional short name of the option.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="description" type="string" use="required">
+            <annotation>
+               <documentation>
+                  A description of the option which can be used when printing the usage information.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="group" type="string">
+            <annotation>
+               <documentation>
+                  The group this option belongs to. Grouped options are mutually exclusive.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="required" type="boolean" use="default" value="false">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="repeatable" type="boolean" use="default" value="false">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="callback" type="string">
+            <annotation>
+               <documentation>
+                  If specified an instance of the given class will be created and its &quot;Option&quot; method will be invoked.
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="java" basedOn=":cherryICommandLineCallback"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="argument">
+      <complexType>
+         <attribute name="name" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="required" type="boolean" use="default" value="true">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="examples"/>
+      </appinfo>
+      <documentation>
+         Following is an example of a command line option declaration: 
+&lt;p&gt;
+&lt;pre&gt;
+   &lt;extension id=&quot;portOption&quot; point=&quot;org.opencherry.core.runtime.cmdlineoptions&quot;&gt; 
+      &lt;option fullname=&quot;port&quot; shortname=&quot;p&quot; description=&quot;Specify the port on which the application should be listening&quot;&gt; 
+         &lt;argument name=&quot;portValue&quot; required=&quot;true&quot;/&gt;
+      &lt;/option&gt; 
+   &lt;/extension&gt; 
+&lt;/pre&gt;
+&lt;/p&gt;
+
+The application &lt;code&gt;app&lt;/code&gt; can then be invoked with
+&lt;p&gt;
+&lt;pre&gt;
+app --port=8080
+&lt;/pre&gt;
+&lt;/p&gt;
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="apiInfo"/>
+      </appinfo>
+      <documentation>
+         The value of the callback attribute must represent an implementor of &lt;samp&gt;cherry::ICommandLineCallback&lt;/samp&gt;.
+
+      </documentation>
+   </annotation>
+
+
+   <annotation>
+      <appinfo>
+         <meta.section type="implementation"/>
+      </appinfo>
+      <documentation>
+         The platform supplies a number of command line options which can be listed by supplying the command line option &lt;code&gt;--help&lt;/code&gt; to the application.
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="copyright"/>
+      </appinfo>
+      <documentation>
+         Copyright (c) 2004, 2007 IBM Corporation and others.&lt;br&gt;
+All rights reserved. This program and the accompanying materials are made 
+available under the terms of the Eclipse Public License v1.0 which 
+accompanies 
+this distribution, and is available at 
+&lt;a href=&quot;http://www.eclipse.org/legal/epl-v10.html&quot;&gt;http://www.eclipse.org/legal/epl-v10.html&lt;/a&gt;
+      </documentation>
+   </annotation>
+
+</schema>

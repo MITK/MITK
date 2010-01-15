@@ -1,0 +1,12 @@
+/*!
+
+\defgroup ProgrammersGuide Programmer's Guide
+
+\defgroup PlatformArchitecture Platform architecture
+\ingroup ProgrammersGuide
+
+\defgroup PlatformBuildsystem Platform build system
+\ingroup ProgrammersGuide
+
+
+*/

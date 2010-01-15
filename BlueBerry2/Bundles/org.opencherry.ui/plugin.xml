@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?openCherry version="0.1"?>
+<plugin>
+   <extension-point id="commands" name="Commands" schema="schema/commands.exsd"/>
+   <extension-point id="editors" name="Editors" schema="schema/editors.exsd"/>
+   <extension-point id="handlers" name="Handlers" schema="schema/handlers.exsd"/>
+   <extension-point id="intro" name="Introduction Extensions" schema="schema/intro.exsd"/>
+   <extension-point id="preferencePages" name="Preference Pages" schema="schema/preferencePages.exsd"/>
+   <extension-point id="views" name="Views" schema="schema/views.exsd"/>
+   <extension-point id="keywords" name="keywords" schema="schema/keywords.exsd"/>
+   <extension-point id="tweaklets" name="Tweaklets" schema="schema/tweaklets.exsd"/>
+   <extension-point id="perspectives" name="Perspectives" schema="schema/perspectives.exsd"/>
+   <extension-point id="presentationFactories" name="Presentation Factories" schema="schema/presentationFactories.exsd"/>
+   <extension-point id="services" name="Services" schema="schema/services.exsd"/>
+   
+   <extension
+         point="org.eclipse.ui.services">
+      <serviceFactory
+            factoryClass="org.eclipse.ui.internal.WorkbenchSupportFactory">
+         <service
+               serviceClass="org.eclipse.ui.progress.IProgressService">
+         </service>
+         <service
+               serviceClass="org.eclipse.ui.progress.IWorkbenchSiteProgressService">
+         </service>
+         <service
+               serviceClass="org.eclipse.ui.IPartService">
+         </service>
+         <service
+               serviceClass="org.eclipse.ui.IPageService">
+         </service>
+         <service
+               serviceClass="org.eclipse.ui.ISelectionService">
+         </service>
+      </serviceFactory>
+   </extension>
+   
+   <extension
+   	point="org.opencherry.ui.commands">
+   	<command
+    	name="Show View"
+      	description="Shows a particular view"
+      	id="org.opencherry.ui.views.showView"
+      	defaultHandler="cherry::ShowViewHandler">
+      	<commandParameter
+      		id="org.eclipse.ui.views.showView.viewId"
+      		name="%command.showView.viewIdParameter"
+      		values="org.eclipse.ui.internal.registry.ViewParameterValues" />
+    </command>
+   </extension>
+   
+   <extension
+         point="org.opencherry.ui.views">
+      <category
+            name="General"
+            id="org.opencherry.ui">
+      </category>
+      <view
+            class="cherry::ViewIntroAdapterPart"
+            category="org.opencherry.ui"
+            name="Welcome"
+            id="org.opencherry.ui.internal.introview">
+      </view>
+      <stickyView
+      		location="RIGHT"
+            id="org.opencherry.ui.internal.introview">
+      </stickyView>
+   </extension>
+   
+   <extension
+         point="org.opencherry.ui.editors">
+      <editor
+            class="cherry::EditorIntroAdapterPart"
+            name="Welcome"
+            id="org.opencherry.ui.internal.introeditor">
+      </editor>
+   </extension>
+</plugin>

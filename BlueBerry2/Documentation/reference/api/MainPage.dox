@@ -1,0 +1,13 @@
+/**
+
+\mainpage  openCherry
+
+\section intro Introduction
+
+openCherry is modular, cross-platform, C++ application framwork based on ideas 
+from OSGi and the Eclipse RCP.
+
+\ref ExtPointsIndex
+*/
+
+

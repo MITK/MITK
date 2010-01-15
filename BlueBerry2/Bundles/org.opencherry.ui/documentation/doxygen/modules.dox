@@ -1,0 +1,17 @@
+/**
+  \defgroup org_opencherry_ui org.opencherry.ui Plugin
+  \ingroup openCherryPlugins
+
+  \brief This is the user interface plugin. It provides a GUI-Toolkit independent framework
+  to build an openCherry workbench.
+  
+*/
+
+/**
+  \defgroup org_opencherry_ui_internal Internal
+  \ingroup org_opencherry_ui
+
+  \brief This subcategory includes the internal classes of the org.opencherry.ui plugin. Other
+  plugins must not rely on these classes. They contain implementation details and their interface
+  may change at any time. We mean it.
+*/

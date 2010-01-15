@@ -16,7 +16,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#include <org.opencherry.osgi/src/application/cherryStarter.h>
+#include <org.blueberry.osgi/src/application/cherryStarter.h>
 #include <Poco/Util/MapConfiguration.h>
 
 int main(int argc, char** argv)

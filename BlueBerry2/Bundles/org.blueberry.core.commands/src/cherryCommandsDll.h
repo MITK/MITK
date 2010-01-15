@@ -28,7 +28,7 @@ PURPOSE.  See the above copyright notices for more information.
 // defined with this macro as being exported.
 //
 #if defined(_WIN32) && !defined(CHERRY_STATIC)
-  #if defined(org_opencherry_core_commands_EXPORTS)
+  #if defined(org_blueberry_core_commands_EXPORTS)
     #define CHERRY_COMMANDS __declspec(dllexport)
   #else
     #define CHERRY_COMMANDS __declspec(dllimport)  

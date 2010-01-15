@@ -21,14 +21,14 @@
 
 //
 // The following block is the standard way of creating macros which make exporting
-// from a DLL simpler. All files within this DLL are compiled with the org_opencherry_solstice_common_EXPORTS
+// from a DLL simpler. All files within this DLL are compiled with the org_blueberry_solstice_common_EXPORTS
 // symbol defined on the command line. this symbol should not be defined on any project
 // that uses this DLL. This way any other project whose source files include this file see
-// org_opencherry_solstice_common_EXPORTS functions as being imported from a DLL, wheras this DLL sees symbols
+// org_blueberry_solstice_common_EXPORTS functions as being imported from a DLL, wheras this DLL sees symbols
 // defined with this macro as being exported.
 //
 #if defined(_WIN32) && !defined(CHERRY_STATIC)
-  #if defined(org_opencherry_solstice_common_EXPORTS)
+  #if defined(org_blueberry_solstice_common_EXPORTS)
     #define CHERRY_COMMON_RUNTIME __declspec(dllexport)
   #else
     #define CHERRY_COMMON_RUNTIME __declspec(dllimport)

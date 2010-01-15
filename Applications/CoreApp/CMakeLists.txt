@@ -3,7 +3,7 @@ FIND_PACKAGE(MITK)
 
 INCLUDE_DIRECTORIES(
   ${OPENCHERRY_PLUGIN_SOURCE_DIRS}
-  ${org.opencherry.osgi_BIN_DIR} # needed for generated cherryConfig.h
+  ${org.blueberry.osgi_BIN_DIR} # needed for generated cherryConfig.h
   ${Poco_INCLUDE_DIRS}
 )
 LINK_DIRECTORIES(${Poco_LIBRARY_DIRS})
@@ -13,7 +13,7 @@ ADD_EXECUTABLE(CoreApp CoreApp.cpp)
 TARGET_LINK_LIBRARIES(CoreApp 
                       optimized PocoFoundation      debug PocoFoundationd 
                       optimized PocoUtil            debug PocoUtild 
-                      optimized org_opencherry_osgi debug org_opencherry_osgi${OPENCHERRY_DEBUG_POSTFIX})
+                      optimized org_blueberry_osgi debug org_blueberry_osgi${OPENCHERRY_DEBUG_POSTFIX})
 
 SET(_plugin_deps ${OPENCHERRY_ENABLED_PLUGINS} ${MITK_CORE_ENABLED_PLUGINS})
 

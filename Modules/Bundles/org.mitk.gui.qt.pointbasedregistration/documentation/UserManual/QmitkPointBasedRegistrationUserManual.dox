@@ -70,22 +70,22 @@ possibility for undo and redo, and a display to show how good the landmarks corr
 You can select between different kinds of transformations from a combobox: <b>Rigid</b>, <b>Similarity</b>, <b>Affine</b> and <b>LandmarkWarping</b>. An additional specifier for the first three 
 options can be set via the checkbox "Use ICP", which leads to the following possibilities for registration: 
 
-\li <b>Rigid with ICP</b> means only translation. The order of your landmarks will not be taken into account. E. g. landmark one in the fixed data can be mapped on landmark three in the moving data. You 
+\li <b>Rigid with ICP</b> means only translation and rotation. The order of your landmarks will not be taken into account. E. g. landmark one in the fixed data can be mapped on landmark three in the moving data. You 
 have to set at least one landmark in each dataset to enable the Register button which performs the transformation.
 
-\li <b>Similarity with ICP</b> means only translation and scaling. The order of your landmarks will not be taken into account. E. g. landmark one in the fixed data can be mapped on landmark three in the 
+\li <b>Similarity with ICP</b> means only translation, scaling and rotation. The order of your landmarks will not be taken into account. E. g. landmark one in the fixed data can be mapped on landmark three in the 
 moving data. You have to set at least one landmark in each dataset to enable the Register button which performs the transformation.
 
-\li <b>Affine with ICP</b> means only translation, scaling and shearing. The order of your landmarks will not be taken into account. E. g. landmark one in the fixed data can be mapped on landmark three in 
+\li <b>Affine with ICP</b> means only translation, scaling, rotation and shearing. The order of your landmarks will not be taken into account. E. g. landmark one in the fixed data can be mapped on landmark three in 
 the moving data. You have to set at least one landmark in each dataset to enable the Register button which performs the transformation.
 
-\li <b>Rigid</b> means only translation. The order of your landmarks will be taken into account. E. g. landmark one in the fixed data will be mapped on landmark one in the moving data. You have to set 
+\li <b>Rigid</b> means only translation and rotation. The order of your landmarks will be taken into account. E. g. landmark one in the fixed data will be mapped on landmark one in the moving data. You have to set 
 at least one landmark and the same number of landmarks in each dataset to enable the Register button which performs the transformation.
 
-\li <b>Similarity</b> means only translation and scaling. The order of your landmarks will be taken into account. E. g. landmark one in the fixed data will be mapped on landmark one in the moving data. 
+\li <b>Similarity</b> means only translation, scaling and rotation. The order of your landmarks will be taken into account. E. g. landmark one in the fixed data will be mapped on landmark one in the moving data. 
 You have to set at least one landmark and the same number of landmarks in each dataset to enable the Register button which performs the transformation.
 
-\li <b>Affine</b> means only translation, scaling and shearing. The order of your landmarks will be taken into account. E. g. landmark one in the fixed data will be mapped on landmark one in the moving 
+\li <b>Affine</b> means only translation, scaling, rotation and shearing. The order of your landmarks will be taken into account. E. g. landmark one in the fixed data will be mapped on landmark one in the moving 
 data. You have to set at least one landmark and the same number of landmarks in each dataset to enable the Register button which performs the transformation.
 
 \li <b>LandmarkWarping</b> means a freeform deformation of the moving image, so that afterwards the landmarks are exactly aligned. The order of your landmarks will be taken into account. 

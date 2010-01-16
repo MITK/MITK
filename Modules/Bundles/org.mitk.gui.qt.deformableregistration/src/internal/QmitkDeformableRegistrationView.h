@@ -25,8 +25,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "../DeformableregistrationDll.h"
 
-#include "cherryISelectionListener.h"
-#include "cherryIStructuredSelection.h"
+#include "berryISelectionListener.h"
+#include "berryIStructuredSelection.h"
 
 /*!
 \brief The DeformableRegistration functionality is used to perform deformable registration.
@@ -172,7 +172,7 @@ class DEFORMABLEREGISTRATION_EXPORT QmitkDeformableRegistrationView : public QOb
      */
     void ApplyDeformationField();
 
-    void SetImagesVisible(cherry::ISelection::ConstPointer selection);
+    void SetImagesVisible(berry::ISelection::ConstPointer selection);
 
     void TabChanged(int index);
 
@@ -180,8 +180,8 @@ class DEFORMABLEREGISTRATION_EXPORT QmitkDeformableRegistrationView : public QOb
 
   protected:
 
-    cherry::ISelectionListener::Pointer m_SelListener;
-    cherry::IStructuredSelection::ConstPointer m_CurrentSelection;
+    berry::ISelectionListener::Pointer m_SelListener;
+    berry::IStructuredSelection::ConstPointer m_CurrentSelection;
 
     /*!  
     * default main widget containing 4 windows showing 3   

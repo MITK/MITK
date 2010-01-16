@@ -1,18 +1,18 @@
 SET(SRC_CPP_FILES
-  cherryIAdaptable.cpp
-  cherryIAdapterManager.cpp
-  cherryIPreferencesService.cpp
-  cherryPlatformObject.cpp
-  cherryRuntime.cpp
-  cherryRuntimePlugin.cpp
-  cherryBackingStoreException.cpp
+  berryIAdaptable.cpp
+  berryIAdapterManager.cpp
+  berryIPreferencesService.cpp
+  berryPlatformObject.cpp
+  berryRuntime.cpp
+  berryRuntimePlugin.cpp
+  berryBackingStoreException.cpp
 )
 
 SET(INTERNAL_CPP_FILES
-  cherryPreferencesService.cpp
-  cherryAbstractPreferencesStorage.cpp  
-  cherryPreferences.cpp
-  cherryXMLPreferencesStorage.cpp
+  berryPreferencesService.cpp
+  berryAbstractPreferencesStorage.cpp  
+  berryPreferences.cpp
+  berryXMLPreferencesStorage.cpp
 )
 
 SET(CPP_FILES manifest.cpp)

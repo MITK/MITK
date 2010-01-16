@@ -1,6 +1,6 @@
 /*=========================================================================
 
- Program:   openCherry Platform
+ Program:   BlueBerry Platform
  Language:  C++
  Date:      $Date$
  Version:   $Revision$
@@ -19,13 +19,13 @@
 #ifndef OSGI_FRAMEWORK_FLAGS_H_
 #define OSGI_FRAMEWORK_FLAGS_H_
 
-#include "../../cherryOSGiDll.h"
+#include "../../berryOSGiDll.h"
 
 namespace osgi {
 
 namespace framework {
 
-class CHERRY_OSGI Flag
+class BERRY_OSGI Flag
 {
     int i;
 public:
@@ -35,7 +35,7 @@ public:
 
 inline Flag::Flag(int ai) : i(ai) {}
 
-class CHERRY_OSGI IncompatibleFlag
+class BERRY_OSGI IncompatibleFlag
 {
     int i;
 public:

@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.0"?>
 <plugin>
-  <extension point="org.opencherry.osgi.applications">
+  <extension point="org.blueberry.osgi.applications">
     <application id="org.mitk.qt.application">
       <run class="QmitkApplication"/>
     </application>
   </extension>
   
-  <extension point="org.opencherry.ui.perspectives">
+  <extension point="org.blueberry.ui.perspectives">
     <perspective
       id="org.mitk.coreapp.defaultperspective"
       name="Core App Home"

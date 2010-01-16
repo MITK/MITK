@@ -17,9 +17,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <Poco/ClassLibrary.h>
 
-#include <cherryIBundleActivator.h>
+#include <berryIBundleActivator.h>
 #include "src/internal/mitkDiffusionImagingActivator.h"
 
-POCO_BEGIN_MANIFEST(cherry::IBundleActivator)
+POCO_BEGIN_MANIFEST(berry::IBundleActivator)
 POCO_EXPORT_CLASS(mitk::DiffusionImagingActivator)
 POCO_END_MANIFEST

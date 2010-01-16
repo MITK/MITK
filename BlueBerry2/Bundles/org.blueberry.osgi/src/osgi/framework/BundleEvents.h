@@ -1,6 +1,6 @@
 /*=========================================================================
  
-Program:   openCherry Platform
+Program:   BlueBerry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef OSGI_FRAMEWORK_BUNDLEEVENTS_H_
 #define OSGI_FRAMEWORK_BUNDLEEVENTS_H_
 
-#include "cherryOSGiDll.h"
+#include "berryOSGiDll.h"
 
 #include "Message.h"
 
@@ -28,7 +28,7 @@ namespace osgi {
 
 namespace framework {
 
-struct CHERRY_OSGI BundleEvents
+struct BERRY_OSGI BundleEvents
 {
   Message1<const BundleEvent&> bundleInstalled;
   Message1<const BundleEvent&> bundleLoaded;

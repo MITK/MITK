@@ -25,8 +25,8 @@
 #include <QRadioButton>
 #include <QMessageBox>
 
-#include <cherryIPreferencesService.h>
-#include <cherryPlatform.h>
+#include <berryIPreferencesService.h>
+#include <berryPlatform.h>
 
 QmitkSegmentationPreferencePage::QmitkSegmentationPreferencePage()
 : m_MainControl(0)
@@ -35,7 +35,7 @@ QmitkSegmentationPreferencePage::QmitkSegmentationPreferencePage()
 
 }
 
-void QmitkSegmentationPreferencePage::Init(cherry::IWorkbench::Pointer )
+void QmitkSegmentationPreferencePage::Init(berry::IWorkbench::Pointer )
 {
 
 }
@@ -43,9 +43,9 @@ void QmitkSegmentationPreferencePage::Init(cherry::IWorkbench::Pointer )
 void QmitkSegmentationPreferencePage::CreateQtControl(QWidget* parent)
 {
   m_Initializing = true;
-  cherry::IPreferencesService::Pointer prefService 
-    = cherry::Platform::GetServiceRegistry()
-    .GetServiceById<cherry::IPreferencesService>(cherry::IPreferencesService::ID);
+  berry::IPreferencesService::Pointer prefService 
+    = berry::Platform::GetServiceRegistry()
+    .GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
 
   m_SegmentationPreferencesNode = prefService->GetSystemPreferences()->Node("/Segmentation");
 

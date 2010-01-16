@@ -1,6 +1,6 @@
 /*=========================================================================
 
- Program:   openCherry Platform
+ Program:   BlueBerry Platform
  Language:  C++
  Date:      $Date: 2009-05-26 13:47:06 +0200 (Di, 26 Mai 2009) $
  Version:   $Revision: 17408 $
@@ -18,12 +18,12 @@
 #ifndef MITKMeasurementSelectionProvider_H_
 #define MITKMeasurementSelectionProvider_H_
 
-//#include "cherryUiQtDll.h"
+//#include "berryUiQtDll.h"
 
-#include <cherryISelection.h>
-#include <cherryISelectionProvider.h>
-#include <cherryISelectionChangedListener.h>
-#include <cherryISelectionListener.h>
+#include <berryISelection.h>
+#include <berryISelectionProvider.h>
+#include <berryISelectionChangedListener.h>
+#include <berryISelectionListener.h>
 #include <mitkDataTreeNodeSelection.h>
 
 /*
@@ -34,23 +34,23 @@
 namespace mitk
 {
 
-class MeasurementSelectionProvider: public cherry::ISelectionProvider
+class MeasurementSelectionProvider: public berry::ISelectionProvider
 {
   
 
 public:
 
-  cherryObjectMacro(MeasurementSelectionProvider)
+  berryObjectMacro(MeasurementSelectionProvider)
 
   MeasurementSelectionProvider();
 
-  void AddSelectionChangedListener(cherry::ISelectionChangedListener::Pointer listener);
+  void AddSelectionChangedListener(berry::ISelectionChangedListener::Pointer listener);
 
-  void RemoveSelectionChangedListener(cherry::ISelectionChangedListener::Pointer listener);
+  void RemoveSelectionChangedListener(berry::ISelectionChangedListener::Pointer listener);
 
-  cherry::ISelection::ConstPointer GetSelection() const;
+  berry::ISelection::ConstPointer GetSelection() const;
   
-  void SetSelection(cherry::ISelection::Pointer selection);
+  void SetSelection(berry::ISelection::Pointer selection);
 
   void FireSelectionChanged(DataTreeNodeSelection::Pointer selection);
   
@@ -58,7 +58,7 @@ public:
 
   protected:
     DataTreeNodeSelection::Pointer m_CurrentSelection;
-    cherry::ISelectionChangedListener::Events m_RegisteredListeners;
+    berry::ISelectionChangedListener::Events m_RegisteredListeners;
   
 
 };

@@ -23,18 +23,18 @@
 #include <QMainWindow>
 #include <QStatusBar>
 
-#include <cherryPlatform.h>
-#include <cherryPlatformUI.h>
-#include <cherryIWorkbenchWindow.h>
-#include <cherryIWorkbenchPage.h>
-#include <cherryIPreferencesService.h>
-#include <cherryIPerspectiveRegistry.h>
-#include <cherryIPerspectiveDescriptor.h>
-#include <cherryIWorkbenchPartConstants.h>
-#include <cherryQtAssistantUtil.h>
+#include <berryPlatform.h>
+#include <berryPlatformUI.h>
+#include <berryIWorkbenchWindow.h>
+#include <berryIWorkbenchPage.h>
+#include <berryIPreferencesService.h>
+#include <berryIPerspectiveRegistry.h>
+#include <berryIPerspectiveDescriptor.h>
+#include <berryIWorkbenchPartConstants.h>
+#include <berryQtAssistantUtil.h>
 
-#include <internal/cherryQtShowViewAction.h>
-#include <internal/cherryQtOpenPerspectiveAction.h>
+#include <internal/berryQtShowViewAction.h>
+#include <internal/berryQtOpenPerspectiveAction.h>
 
 #include <QmitkFileOpenAction.h>
 #include <QmitkFileSaveProjectAction.h>
@@ -61,7 +61,7 @@ QmitkExtWorkbenchWindowAdvisorHack
     * QmitkExtWorkbenchWindowAdvisorHack::undohack =
         new QmitkExtWorkbenchWindowAdvisorHack();
 
-class PartListenerForTitle: public cherry::IPartListener
+class PartListenerForTitle: public berry::IPartListener
 {
 public:
 
@@ -76,28 +76,28 @@ public:
         | Events::HIDDEN | Events::VISIBLE;
   }
 
-  void PartActivated(cherry::IWorkbenchPartReference::Pointer ref)
+  void PartActivated(berry::IWorkbenchPartReference::Pointer ref)
   {
-    if (ref.Cast<cherry::IEditorReference> ())
+    if (ref.Cast<berry::IEditorReference> ())
     {
       windowAdvisor->UpdateTitle(false);
     }
   }
 
-  void PartBroughtToTop(cherry::IWorkbenchPartReference::Pointer ref)
+  void PartBroughtToTop(berry::IWorkbenchPartReference::Pointer ref)
   {
-    if (ref.Cast<cherry::IEditorReference> ())
+    if (ref.Cast<berry::IEditorReference> ())
     {
       windowAdvisor->UpdateTitle(false);
     }
   }
 
-  void PartClosed(cherry::IWorkbenchPartReference::Pointer ref)
+  void PartClosed(berry::IWorkbenchPartReference::Pointer ref)
   {
     windowAdvisor->UpdateTitle(false);
   }
 
-  void PartHidden(cherry::IWorkbenchPartReference::Pointer ref)
+  void PartHidden(berry::IWorkbenchPartReference::Pointer ref)
   {
     if (!windowAdvisor->lastActiveEditor.Expired() &&
         ref->GetPart(false) == windowAdvisor->lastActiveEditor.Lock())
@@ -106,7 +106,7 @@ public:
     }
   }
 
-  void PartVisible(cherry::IWorkbenchPartReference::Pointer ref)
+  void PartVisible(berry::IWorkbenchPartReference::Pointer ref)
   {
     if (!windowAdvisor->lastActiveEditor.Expired() &&
         ref->GetPart(false) == windowAdvisor->lastActiveEditor.Lock())
@@ -120,7 +120,7 @@ private:
 
 };
 
-class PerspectiveListenerForTitle: public cherry::IPerspectiveListener
+class PerspectiveListenerForTitle: public berry::IPerspectiveListener
 {
 public:
 
@@ -134,21 +134,21 @@ public:
     return Events::ACTIVATED | Events::SAVED_AS | Events::DEACTIVATED;
   }
 
-  void PerspectiveActivated(cherry::IWorkbenchPage::Pointer page,
-      cherry::IPerspectiveDescriptor::Pointer perspective)
+  void PerspectiveActivated(berry::IWorkbenchPage::Pointer page,
+      berry::IPerspectiveDescriptor::Pointer perspective)
   {
     windowAdvisor->UpdateTitle(false);
   }
 
-  void PerspectiveSavedAs(cherry::IWorkbenchPage::Pointer page,
-      cherry::IPerspectiveDescriptor::Pointer oldPerspective,
-      cherry::IPerspectiveDescriptor::Pointer newPerspective)
+  void PerspectiveSavedAs(berry::IWorkbenchPage::Pointer page,
+      berry::IPerspectiveDescriptor::Pointer oldPerspective,
+      berry::IPerspectiveDescriptor::Pointer newPerspective)
   {
     windowAdvisor->UpdateTitle(false);
   }
 
-  void PerspectiveDeactivated(cherry::IWorkbenchPage::Pointer page,
-      cherry::IPerspectiveDescriptor::Pointer perspective)
+  void PerspectiveDeactivated(berry::IWorkbenchPage::Pointer page,
+      berry::IPerspectiveDescriptor::Pointer perspective)
   {
     windowAdvisor->UpdateTitle(false);
   }
@@ -159,21 +159,21 @@ private:
 
 
 QmitkExtWorkbenchWindowAdvisor::QmitkExtWorkbenchWindowAdvisor(
-    cherry::WorkbenchAdvisor* wbAdvisor,
-    cherry::IWorkbenchWindowConfigurer::Pointer configurer) :
-  cherry::WorkbenchWindowAdvisor(configurer),
+    berry::WorkbenchAdvisor* wbAdvisor,
+    berry::IWorkbenchWindowConfigurer::Pointer configurer) :
+  berry::WorkbenchWindowAdvisor(configurer),
   lastInput(0),
   wbAdvisor(wbAdvisor),
   showViewToolbar(true),
   showVersionInfo(true)
 {
-  productName = cherry::Platform::GetConfiguration().getString("application.baseName");
+  productName = berry::Platform::GetConfiguration().getString("application.baseName");
 }
 
-cherry::ActionBarAdvisor::Pointer QmitkExtWorkbenchWindowAdvisor::CreateActionBarAdvisor(
-    cherry::IActionBarConfigurer::Pointer configurer)
+berry::ActionBarAdvisor::Pointer QmitkExtWorkbenchWindowAdvisor::CreateActionBarAdvisor(
+    berry::IActionBarConfigurer::Pointer configurer)
 {
-  cherry::ActionBarAdvisor::Pointer actionBarAdvisor(
+  berry::ActionBarAdvisor::Pointer actionBarAdvisor(
       new QmitkExtActionBarAdvisor(configurer));
   return actionBarAdvisor;
 }
@@ -201,7 +201,7 @@ void QmitkExtWorkbenchWindowAdvisor::SetWindowIcon(const std::string& wndIcon)
 void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
 {
   // very bad hack...
-  cherry::IWorkbenchWindow::Pointer window =
+  berry::IWorkbenchWindow::Pointer window =
       this->GetWindowConfigurer()->GetWindow();
   QMainWindow* mainWindow =
       static_cast<QMainWindow*> (window->GetShell()->GetControl());
@@ -234,9 +234,9 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
   fileMenu->addSeparator();
   fileMenu->addAction(new QmitkFileExitAction(window));
 
-  cherry::IViewRegistry* viewRegistry =
-      cherry::PlatformUI::GetWorkbench()->GetViewRegistry();
-  const std::vector<cherry::IViewDescriptor::Pointer>& viewDescriptors =
+  berry::IViewRegistry* viewRegistry =
+      berry::PlatformUI::GetWorkbench()->GetViewRegistry();
+  const std::vector<berry::IViewDescriptor::Pointer>& viewDescriptors =
       viewRegistry->GetViews();
 
   // another bad hack to get an edit/undo menu...
@@ -257,16 +257,16 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
   imageNavigatorAction->setCheckable(true);
 
 
-  cherry::IWorkbenchWindow::Pointer win =
-      cherry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow();
+  berry::IWorkbenchWindow::Pointer win =
+      berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow();
   if(win.IsNotNull())
   {
-    cherry::IViewPart::Pointer imageNavigatorView =
+    berry::IViewPart::Pointer imageNavigatorView =
       win->GetActivePage()->FindView("org.mitk.views.imagenavigator");
     imageNavigatorAction->setChecked(false);
     if (imageNavigatorView)
     {
-      bool isImageNavigatorVisible = cherry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->IsPartVisible(imageNavigatorView);
+      bool isImageNavigatorVisible = berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->IsPartVisible(imageNavigatorView);
       if (isImageNavigatorVisible)
         imageNavigatorAction->setChecked(true);
     }
@@ -302,29 +302,29 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
       QKeySequence("CTRL+P"));
 
   // fill perspective menu
-  cherry::IPerspectiveRegistry* perspRegistry =
+  berry::IPerspectiveRegistry* perspRegistry =
       window->GetWorkbench()->GetPerspectiveRegistry();
   QActionGroup* perspGroup = new QActionGroup(menuBar);
 
-  std::vector<cherry::IPerspectiveDescriptor::Pointer> perspectives(
+  std::vector<berry::IPerspectiveDescriptor::Pointer> perspectives(
       perspRegistry->GetPerspectives());
-  for (std::vector<cherry::IPerspectiveDescriptor::Pointer>::iterator perspIt =
+  for (std::vector<berry::IPerspectiveDescriptor::Pointer>::iterator perspIt =
       perspectives.begin(); perspIt != perspectives.end(); ++perspIt)
   {
-    QAction* perspAction = new cherry::QtOpenPerspectiveAction(window,
+    QAction* perspAction = new berry::QtOpenPerspectiveAction(window,
         *perspIt, perspGroup);
   }
   perspMenu->addActions(perspGroup->actions());
 
   // sort elements (converting vector to map...)
-  std::vector<cherry::IViewDescriptor::Pointer>::const_iterator iter;
-  std::map<std::string, cherry::IViewDescriptor::Pointer> VDMap;
+  std::vector<berry::IViewDescriptor::Pointer>::const_iterator iter;
+  std::map<std::string, berry::IViewDescriptor::Pointer> VDMap;
 
   for (iter = viewDescriptors.begin(); iter != viewDescriptors.end(); ++iter)
   {
-    if ((*iter)->GetId() == "org.opencherry.ui.internal.introview")
+    if ((*iter)->GetId() == "org.blueberry.ui.internal.introview")
       continue;
-    std::pair<std::string, cherry::IViewDescriptor::Pointer> p(
+    std::pair<std::string, berry::IViewDescriptor::Pointer> p(
         (*iter)->GetLabel(), (*iter));
     VDMap.insert(p);
   }
@@ -333,11 +333,11 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
   // ==== View Toolbar ==================================
   QToolBar* qToolbar = new QToolBar;
 
-  std::map<std::string, cherry::IViewDescriptor::Pointer>::const_iterator
+  std::map<std::string, berry::IViewDescriptor::Pointer>::const_iterator
       MapIter;
   for (MapIter = VDMap.begin(); MapIter != VDMap.end(); ++MapIter)
   {
-    cherry::QtShowViewAction* viewAction = new cherry::QtShowViewAction(window,
+    berry::QtShowViewAction* viewAction = new berry::QtShowViewAction(window,
         (*MapIter).second);
     //m_ViewActions.push_back(viewAction);
     viewMenu->addAction(viewAction);
@@ -382,7 +382,7 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
 
 void QmitkExtWorkbenchWindowAdvisor::PreWindowOpen()
 {
-  cherry::IWorkbenchWindowConfigurer::Pointer configurer = GetWindowConfigurer();
+  berry::IWorkbenchWindowConfigurer::Pointer configurer = GetWindowConfigurer();
 
   // show the shortcut bar and progress indicator, which are hidden by
   // default
@@ -463,19 +463,19 @@ void QmitkExtWorkbenchWindowAdvisorHack::onRedo()
 void QmitkExtWorkbenchWindowAdvisorHack::onImageNavigator()
 {
   // get ImageNavigatorView
-  cherry::IViewPart::Pointer imageNavigatorView = 
-    cherry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->FindView("org.mitk.views.imagenavigator");
+  berry::IViewPart::Pointer imageNavigatorView = 
+    berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->FindView("org.mitk.views.imagenavigator");
   if (imageNavigatorView)
   {
-    bool isImageNavigatorVisible = cherry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->IsPartVisible(imageNavigatorView);
+    bool isImageNavigatorVisible = berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->IsPartVisible(imageNavigatorView);
     if (isImageNavigatorVisible)
     {
-      cherry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->HideView(imageNavigatorView);
+      berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->HideView(imageNavigatorView);
       return;
     }
   }
-  cherry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->ShowView("org.mitk.views.imagenavigator");
-  cherry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->ResetPerspective();
+  berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->ShowView("org.mitk.views.imagenavigator");
+  berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->ResetPerspective();
 }
 
 void QmitkExtWorkbenchWindowAdvisorHack::onEditPreferences()
@@ -486,31 +486,31 @@ void QmitkExtWorkbenchWindowAdvisorHack::onEditPreferences()
 
 void QmitkExtWorkbenchWindowAdvisorHack::onQuit()
 {
-  cherry::PlatformUI::GetWorkbench()->Close();
+  berry::PlatformUI::GetWorkbench()->Close();
 }
 
 void QmitkExtWorkbenchWindowAdvisorHack::onResetPerspective()
 {
-  cherry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->ResetPerspective();
+  berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->ResetPerspective();
 }
 
 void QmitkExtWorkbenchWindowAdvisorHack::onClosePerspective()
 {
-  cherry::IWorkbenchPage::Pointer
+  berry::IWorkbenchPage::Pointer
       page =
-          cherry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage();
+          berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage();
   page->ClosePerspective(page->GetPerspective(), true, true);
 }
 
 void QmitkExtWorkbenchWindowAdvisorHack::onNewWindow()
 {
-  cherry::PlatformUI::GetWorkbench()->OpenWorkbenchWindow(0);
+  berry::PlatformUI::GetWorkbench()->OpenWorkbenchWindow(0);
 }
 
 void QmitkExtWorkbenchWindowAdvisorHack::onIntro()
 {
   bool hasIntro =
-      cherry::PlatformUI::GetWorkbench()->GetIntroManager()->HasIntro();
+      berry::PlatformUI::GetWorkbench()->GetIntroManager()->HasIntro();
   if (!hasIntro)
   {
     QMessageBox::information(0, "No Welcome Content Found",
@@ -518,14 +518,14 @@ void QmitkExtWorkbenchWindowAdvisorHack::onIntro()
   }
   else
   {
-    cherry::PlatformUI::GetWorkbench()->GetIntroManager()->ShowIntro(
-        cherry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow(), false);
+    berry::PlatformUI::GetWorkbench()->GetIntroManager()->ShowIntro(
+        berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow(), false);
   }
 }
 
 void QmitkExtWorkbenchWindowAdvisorHack::onHelp()
 {
-  cherry::QtAssistantUtil::OpenActivePartHelp();
+  berry::QtAssistantUtil::OpenActivePartHelp();
 }
 
 void QmitkExtWorkbenchWindowAdvisorHack::onAbout()
@@ -535,12 +535,12 @@ void QmitkExtWorkbenchWindowAdvisorHack::onAbout()
 }
 
 void QmitkExtWorkbenchWindowAdvisor::HookTitleUpdateListeners(
-    cherry::IWorkbenchWindowConfigurer::Pointer configurer)
+    berry::IWorkbenchWindowConfigurer::Pointer configurer)
 {
   // hook up the listeners to update the window title
   titlePartListener = new PartListenerForTitle(this);
   titlePerspectiveListener = new PerspectiveListenerForTitle(this);
-  editorPropertyListener = new cherry::PropertyChangeIntAdapter<
+  editorPropertyListener = new berry::PropertyChangeIntAdapter<
       QmitkExtWorkbenchWindowAdvisor>(this,
       &QmitkExtWorkbenchWindowAdvisor::PropertyChange);
 
@@ -564,11 +564,11 @@ void QmitkExtWorkbenchWindowAdvisor::HookTitleUpdateListeners(
 
 std::string QmitkExtWorkbenchWindowAdvisor::ComputeTitle()
 {
-  cherry::IWorkbenchWindowConfigurer::Pointer configurer =
+  berry::IWorkbenchWindowConfigurer::Pointer configurer =
       GetWindowConfigurer();
-  cherry::IWorkbenchPage::Pointer currentPage =
+  berry::IWorkbenchPage::Pointer currentPage =
       configurer->GetWindow()->GetActivePage();
-  cherry::IEditorPart::Pointer activeEditor;
+  berry::IEditorPart::Pointer activeEditor;
   if (currentPage)
   {
     activeEditor = lastActiveEditor.Lock();
@@ -605,14 +605,14 @@ std::string QmitkExtWorkbenchWindowAdvisor::ComputeTitle()
       if (!lastEditorTitle.empty())
         title = lastEditorTitle + " - " + title;
     }
-    cherry::IPerspectiveDescriptor::Pointer persp =
+    berry::IPerspectiveDescriptor::Pointer persp =
         currentPage->GetPerspective();
     std::string label = "";
     if (persp)
     {
       label = persp->GetLabel();
     }
-    cherry::IAdaptable* input = currentPage->GetInput();
+    berry::IAdaptable* input = currentPage->GetInput();
     if (input && input != wbAdvisor->GetDefaultPageInput())
     {
       label = currentPage->GetLabel();
@@ -630,7 +630,7 @@ std::string QmitkExtWorkbenchWindowAdvisor::ComputeTitle()
 
 void QmitkExtWorkbenchWindowAdvisor::RecomputeTitle()
 {
-  cherry::IWorkbenchWindowConfigurer::Pointer configurer =
+  berry::IWorkbenchWindowConfigurer::Pointer configurer =
       GetWindowConfigurer();
   std::string oldTitle = configurer->GetTitle();
   std::string newTitle = ComputeTitle();
@@ -642,13 +642,13 @@ void QmitkExtWorkbenchWindowAdvisor::RecomputeTitle()
 
 void QmitkExtWorkbenchWindowAdvisor::UpdateTitle(bool editorHidden)
 {
-  cherry::IWorkbenchWindowConfigurer::Pointer configurer =
+  berry::IWorkbenchWindowConfigurer::Pointer configurer =
       GetWindowConfigurer();
-  cherry::IWorkbenchWindow::Pointer window = configurer->GetWindow();
-  cherry::IEditorPart::Pointer activeEditor;
-  cherry::IWorkbenchPage::Pointer currentPage = window->GetActivePage();
-  cherry::IPerspectiveDescriptor::Pointer persp;
-  cherry::IAdaptable* input = 0;
+  berry::IWorkbenchWindow::Pointer window = configurer->GetWindow();
+  berry::IEditorPart::Pointer activeEditor;
+  berry::IWorkbenchPage::Pointer currentPage = window->GetActivePage();
+  berry::IPerspectiveDescriptor::Pointer persp;
+  berry::IAdaptable* input = 0;
 
   if (currentPage)
   {
@@ -687,9 +687,9 @@ void QmitkExtWorkbenchWindowAdvisor::UpdateTitle(bool editorHidden)
   RecomputeTitle();
 }
 
-void QmitkExtWorkbenchWindowAdvisor::PropertyChange(cherry::Object::Pointer source, int propId)
+void QmitkExtWorkbenchWindowAdvisor::PropertyChange(berry::Object::Pointer source, int propId)
   {
-    if (propId == cherry::IWorkbenchPartConstants::PROP_TITLE)
+    if (propId == berry::IWorkbenchPartConstants::PROP_TITLE)
     {
       if (!lastActiveEditor.Expired())
       {

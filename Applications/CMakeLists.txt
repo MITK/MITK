@@ -1,6 +1,6 @@
 IF(MITK_USE_QT AND QT4_FOUND)
   
-  IF(MITK_USE_OPENCHERRY)
+  IF(MITK_USE_BLUEBERRY)
     IF(MITK_BUILD_org.mitk.gui.qt.application)
       ADD_SUBDIRECTORY(CoreApp)
     ENDIF()

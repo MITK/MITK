@@ -18,18 +18,18 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef QMITKSTDMULTIWIDGETEDITOR_H_
 #define QMITKSTDMULTIWIDGETEDITOR_H_
 
-#include <cherryQtEditorPart.h>
-#include <cherryIPartListener.h>
+#include <berryQtEditorPart.h>
+#include <berryIPartListener.h>
 
 #include <QmitkStdMultiWidget.h>
 #include <QmitkDnDFrameWidget.h>
 
 #include "mitkQtCommonDll.h"
 
-class MITK_QT_COMMON QmitkStdMultiWidgetEditor : public cherry::QtEditorPart, virtual public cherry::IPartListener
+class MITK_QT_COMMON QmitkStdMultiWidgetEditor : public berry::QtEditorPart, virtual public berry::IPartListener
 {
 public:
-  cherryObjectMacro(QmitkStdMultiWidgetEditor);
+  berryObjectMacro(QmitkStdMultiWidgetEditor);
 
   static const std::string EDITOR_ID;
 
@@ -38,7 +38,7 @@ public:
 
   QmitkStdMultiWidget* GetStdMultiWidget();
 
-  void Init(cherry::IEditorSite::Pointer site, cherry::IEditorInput::Pointer input);
+  void Init(berry::IEditorSite::Pointer site, berry::IEditorInput::Pointer input);
 
   void SetFocus();
 
@@ -52,9 +52,9 @@ protected:
   void CreateQtPartControl(QWidget* parent);
   // IPartListener
   Events::Types GetPartEventTypes() const;
-  virtual void PartClosed (cherry::IWorkbenchPartReference::Pointer partRef);
-  virtual void PartHidden (cherry::IWorkbenchPartReference::Pointer partRef);
-  virtual void PartVisible (cherry::IWorkbenchPartReference::Pointer partRef);
+  virtual void PartClosed (berry::IWorkbenchPartReference::Pointer partRef);
+  virtual void PartHidden (berry::IWorkbenchPartReference::Pointer partRef);
+  virtual void PartVisible (berry::IWorkbenchPartReference::Pointer partRef);
 
 private:
 

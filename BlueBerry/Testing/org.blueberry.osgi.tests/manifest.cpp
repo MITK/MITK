@@ -1,6 +1,6 @@
 /*=========================================================================
  
- Program:   openCherry Platform
+ Program:   BlueBerry Platform
  Language:  C++
  Date:      $Date$
  Version:   $Revision$
@@ -17,8 +17,8 @@
 
 #include <Poco/ClassLibrary.h>
 
-#include "src/cherryOSGiCoreTestSuite.h"
+#include "src/berryOSGiCoreTestSuite.h"
 
 POCO_BEGIN_NAMED_MANIFEST(CppUnitTest, CppUnit::Test)
-  POCO_EXPORT_CLASS(cherry::OSGiCoreTestSuite)
+  POCO_EXPORT_CLASS(berry::OSGiCoreTestSuite)
 POCO_END_MANIFEST

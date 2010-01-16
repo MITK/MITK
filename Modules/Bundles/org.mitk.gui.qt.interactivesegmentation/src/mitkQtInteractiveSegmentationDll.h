@@ -26,7 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 // MITK_QT_APP functions as being imported from a DLL, wheras this DLL sees symbols
 // defined with this macro as being exported.
 //
-#if defined(_WIN32) && !defined(CHERRY_STATIC)
+#if defined(_WIN32) && !defined(BERRY_STATIC)
   #if defined(org_mitk_gui_qt_interactivesegmentation_EXPORTS)
     #define MITK_QT_INTERACTIVESEGMENTATION __declspec(dllexport)
   #else

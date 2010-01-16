@@ -24,12 +24,12 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QMainWindow>
 #include <QStatusBar>
 
-#include <cherryPlatform.h>
-#include <cherryPlatformUI.h>
-#include <cherryIWorkbenchWindow.h>
-#include <cherryIPreferencesService.h>
+#include <berryPlatform.h>
+#include <berryPlatformUI.h>
+#include <berryIWorkbenchWindow.h>
+#include <berryIPreferencesService.h>
 
-#include <internal/cherryQtShowViewAction.h>
+#include <internal/berryQtShowViewAction.h>
 
 #include <QmitkFileOpenAction.h>
 #include <QmitkFileExitAction.h>
@@ -39,24 +39,24 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <QToolBar>
 
-QmitkWorkbenchWindowAdvisor::QmitkWorkbenchWindowAdvisor(cherry::IWorkbenchWindowConfigurer::Pointer configurer)
-: cherry::WorkbenchWindowAdvisor(configurer)
+QmitkWorkbenchWindowAdvisor::QmitkWorkbenchWindowAdvisor(berry::IWorkbenchWindowConfigurer::Pointer configurer)
+: berry::WorkbenchWindowAdvisor(configurer)
 {
 
 }
 
-cherry::ActionBarAdvisor::Pointer
+berry::ActionBarAdvisor::Pointer
 QmitkWorkbenchWindowAdvisor::CreateActionBarAdvisor(
-  cherry::IActionBarConfigurer::Pointer configurer)
+  berry::IActionBarConfigurer::Pointer configurer)
 {
-  cherry::ActionBarAdvisor::Pointer actionBarAdvisor(new QmitkActionBarAdvisor(configurer));
+  berry::ActionBarAdvisor::Pointer actionBarAdvisor(new QmitkActionBarAdvisor(configurer));
   return actionBarAdvisor;
 }
 
 void QmitkWorkbenchWindowAdvisor::PostWindowCreate()
 {
   // very bad hack...
-  cherry::IWorkbenchWindow::Pointer window = this->GetWindowConfigurer()->GetWindow();
+  berry::IWorkbenchWindow::Pointer window = this->GetWindowConfigurer()->GetWindow();
   QMainWindow* mainWindow = static_cast<QMainWindow*>(window->GetShell()->GetControl());
 
   QMenuBar* menuBar = mainWindow->menuBar();
@@ -67,27 +67,27 @@ void QmitkWorkbenchWindowAdvisor::PostWindowCreate()
   fileMenu->addSeparator();
   fileMenu->addAction(new QmitkFileExitAction(window));
 
-  cherry::IViewRegistry* viewRegistry = cherry::PlatformUI::GetWorkbench()->GetViewRegistry();
-  const std::vector<cherry::IViewDescriptor::Pointer>& viewDescriptors = viewRegistry->GetViews();
+  berry::IViewRegistry* viewRegistry = berry::PlatformUI::GetWorkbench()->GetViewRegistry();
+  const std::vector<berry::IViewDescriptor::Pointer>& viewDescriptors = viewRegistry->GetViews();
 
   QMenu* viewMenu = menuBar->addMenu("Show &View");
 
   // sort elements (converting vector to map...)
-  std::vector<cherry::IViewDescriptor::Pointer>::const_iterator iter;
-  std::map<std::string, cherry::IViewDescriptor::Pointer> VDMap;
+  std::vector<berry::IViewDescriptor::Pointer>::const_iterator iter;
+  std::map<std::string, berry::IViewDescriptor::Pointer> VDMap;
 
   for (iter = viewDescriptors.begin(); iter != viewDescriptors.end(); ++iter)
   {
-    std::pair<std::string, cherry::IViewDescriptor::Pointer> p((*iter)->GetLabel(), (*iter)); 
+    std::pair<std::string, berry::IViewDescriptor::Pointer> p((*iter)->GetLabel(), (*iter)); 
     VDMap.insert(p);
   }
 
   QToolBar* qToolbar = new QToolBar;
   
-  std::map<std::string, cherry::IViewDescriptor::Pointer>::const_iterator MapIter;
+  std::map<std::string, berry::IViewDescriptor::Pointer>::const_iterator MapIter;
   for (MapIter = VDMap.begin(); MapIter != VDMap.end(); ++MapIter)
   {
-    cherry::QtShowViewAction* viewAction = new cherry::QtShowViewAction(window, (*MapIter).second);
+    berry::QtShowViewAction* viewAction = new berry::QtShowViewAction(window, (*MapIter).second);
     //m_ViewActions.push_back(viewAction);
     viewMenu->addAction(viewAction);
     qToolbar->addAction(viewAction);

@@ -60,16 +60,16 @@ ENDIF()
 
 ADD_SUBDIRECTORY(Utilities)
 
-OPTION(MITK_USE_OPENCHERRY "Build the openCherry platform" ON)
-IF(MITK_USE_OPENCHERRY)
+OPTION(MITK_USE_BLUEBERRY "Build the BlueBerry platform" ON)
+IF(MITK_USE_BLUEBERRY)
   SET(mbilog_DIR "${mbilog_BINARY_DIR}")
   ADD_SUBDIRECTORY(BlueBerry)
-  SET(openCherry_DIR ${CMAKE_CURRENT_BINARY_DIR}/BlueBerry CACHE PATH "The directory containing a CMake configuration file for openCherry" FORCE)
-  INCLUDE(${openCherry_DIR}/openCherryConfig.cmake)
+  SET(BlueBerry_DIR ${CMAKE_CURRENT_BINARY_DIR}/BlueBerry CACHE PATH "The directory containing a CMake configuration file for BlueBerry" FORCE)
+  INCLUDE(${BlueBerry_DIR}/BlueBerryConfig.cmake)
   INCLUDE(CMake/MITKPluginHelpers.cmake)
   
-  SET(OPENCHERRY_USE_QT ${MITK_USE_QT} CACHE BOOL "Use the Qt GUI toolkit" FORCE)
-ENDIF(MITK_USE_OPENCHERRY)
+  SET(BLUEBERRY_USE_QT ${MITK_USE_QT} CACHE BOOL "Use the Qt GUI toolkit" FORCE)
+ENDIF(MITK_USE_BLUEBERRY)
 
 IF(EXISTS ${CMAKE_CURRENT_BINARY_DIR}/Utilities/itk-bin)
   SET(ITK_DIR "${CMAKE_CURRENT_BINARY_DIR}/Utilities/itk-bin")
@@ -183,7 +183,7 @@ CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/CMake/ToolExtensionITKFactory.cpp.in ${PROJ
 CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/CMake/ToolExtensionITKFactoryLoader.cpp.in ${PROJECT_BINARY_DIR}/ToolExtensionITKFactoryLoader.cpp.in COPYONLY)
 CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/CMake/ToolGUIExtensionITKFactory.cpp.in ${PROJECT_BINARY_DIR}/ToolGUIExtensionITKFactory.cpp.in COPYONLY)
 
-IF(MITK_USE_OPENCHERRY)
+IF(MITK_USE_BLUEBERRY)
   OPTION(MITK_BUILD_ALL_PLUGINS "Build all MITK plugins (overriding selection)" OFF)
   MARK_AS_ADVANCED(MITK_BUILD_ALL_PLUGINS)
   
@@ -334,14 +334,14 @@ IF(WIN32)
 	ENDFOREACH()
   ENDIF()
   
-  #OpenCherry
-  IF(MITK_USE_OPENCHERRY)
+  #BlueBerry
+  IF(MITK_USE_BLUEBERRY)
     IF(MINGW)
-      INSTALL(FILES ${OPENCHERRY_PLUGINS_OUTPUT_DIR}/org.opencherry.osgi/bin/liborg_opencherry_osgid.dll DESTINATION bin CONFIGURATIONS Debug)
-      INSTALL(FILES ${OPENCHERRY_PLUGINS_OUTPUT_DIR}/org.opencherry.osgi/bin/liborg_opencherry_osgi.dll DESTINATION bin CONFIGURATIONS Release)
+      INSTALL(FILES ${BLUEBERRY_PLUGINS_OUTPUT_DIR}/org.blueberry.osgi/bin/liborg_blueberry_osgid.dll DESTINATION bin CONFIGURATIONS Debug)
+      INSTALL(FILES ${BLUEBERRY_PLUGINS_OUTPUT_DIR}/org.blueberry.osgi/bin/liborg_blueberry_osgi.dll DESTINATION bin CONFIGURATIONS Release)
     ELSE()
-      INSTALL(FILES ${OPENCHERRY_PLUGINS_OUTPUT_DIR}/org.opencherry.osgi/bin/debug/liborg_opencherry_osgid.dll DESTINATION bin CONFIGURATIONS Debug)
-      INSTALL(FILES ${OPENCHERRY_PLUGINS_OUTPUT_DIR}/org.opencherry.osgi/bin/release/liborg_opencherry_osgi.dll DESTINATION bin CONFIGURATIONS Release)
+      INSTALL(FILES ${BLUEBERRY_PLUGINS_OUTPUT_DIR}/org.blueberry.osgi/bin/debug/liborg_blueberry_osgid.dll DESTINATION bin CONFIGURATIONS Debug)
+      INSTALL(FILES ${BLUEBERRY_PLUGINS_OUTPUT_DIR}/org.blueberry.osgi/bin/release/liborg_blueberry_osgi.dll DESTINATION bin CONFIGURATIONS Release)
     ENDIF()
   ENDIF()
   

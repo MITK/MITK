@@ -1,6 +1,6 @@
 /*=========================================================================
  
- Program:   openCherry Platform
+ Program:   BlueBerry Platform
  Language:  C++
  Date:      $Date$
  Version:   $Revision$
@@ -16,8 +16,8 @@
  =========================================================================*/
 
 
-#ifndef CHERRYFILTER_H_
-#define CHERRYFILTER_H_
+#ifndef BERRYFILTER_H_
+#define BERRYFILTER_H_
 
 #include "Object.h"
 #include "Macros.h"
@@ -146,4 +146,4 @@ struct Filter : public Object {
 }
 }
 
-#endif /* CHERRYFILTER_H_ */
+#endif /* BERRYFILTER_H_ */

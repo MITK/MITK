@@ -30,25 +30,25 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkQtCommonDll.h"
 
-#include <cherryIWorkbenchWindow.h>
-#include <cherryIPreferences.h>
+#include <berryIWorkbenchWindow.h>
+#include <berryIPreferences.h>
 
 class MITK_QT_COMMON QmitkFileOpenAction : public QAction
 {
   Q_OBJECT
 
 public:
-  QmitkFileOpenAction(cherry::IWorkbenchWindow::Pointer window);
-  QmitkFileOpenAction(const QIcon & icon, cherry::IWorkbenchWindow::Pointer window);
+  QmitkFileOpenAction(berry::IWorkbenchWindow::Pointer window);
+  QmitkFileOpenAction(const QIcon & icon, berry::IWorkbenchWindow::Pointer window);
 
 protected slots:
 
   void Run();
 
 private:
-  void init ( cherry::IWorkbenchWindow::Pointer window );
-  cherry::IWorkbenchWindow::Pointer m_Window;
-  cherry::IPreferences::WeakPtr m_GeneralPreferencesNode;
+  void init ( berry::IWorkbenchWindow::Pointer window );
+  berry::IWorkbenchWindow::Pointer m_Window;
+  berry::IPreferences::WeakPtr m_GeneralPreferencesNode;
 };
 
 

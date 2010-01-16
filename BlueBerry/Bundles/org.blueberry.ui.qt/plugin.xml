@@ -1,68 +1,68 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?openCherry version="0.1"?>
+<?BlueBerry version="0.1"?>
 <plugin>
    
-   <extension point="org.opencherry.ui.tweaklets"> 
+   <extension point="org.blueberry.ui.tweaklets"> 
       <tweaklet 
-         id="org.opencherry.ui.qt.tweaklets.WorkbenchTweaklet" 
+         id="org.blueberry.ui.qt.tweaklets.WorkbenchTweaklet" 
          name="Qt Workbench Tweaklet" 
          description="Qt specific Workbench tweaks" 
-         definition="cherryWorkbenchTweaklet" 
-         implementation="cherry::QtWorkbenchTweaklet" />
+         definition="berryWorkbenchTweaklet" 
+         implementation="berry::QtWorkbenchTweaklet" />
          
       <tweaklet 
-         id="org.opencherry.ui.qt.tweaklets.WorkbenchPageTweaklet" 
+         id="org.blueberry.ui.qt.tweaklets.WorkbenchPageTweaklet" 
          name="Qt WorkbenchPage Tweaklet" 
          description="Qt specific WorkbenchPage tweaks" 
-         definition="cherryWorkbenchPageTweaklet" 
-         implementation="cherry::QtWorkbenchPageTweaklet" />
+         definition="berryWorkbenchPageTweaklet" 
+         implementation="berry::QtWorkbenchPageTweaklet" />
          
       <tweaklet 
-         id="org.opencherry.ui.qt.tweaklets.GuiWidgetsTweaklet" 
+         id="org.blueberry.ui.qt.tweaklets.GuiWidgetsTweaklet" 
          name="Qt Widgets Tweaklet" 
          description="Qt specific widget tweaks" 
-         definition="cherryGuiWidgetsTweaklet" 
-         implementation="cherry::QtWidgetsTweaklet" />
+         definition="berryGuiWidgetsTweaklet" 
+         implementation="berry::QtWidgetsTweaklet" />
          
        <tweaklet 
-         id="org.opencherry.ui.qt.tweaklets.DnDTweaklet" 
+         id="org.blueberry.ui.qt.tweaklets.DnDTweaklet" 
          name="Qt DnD Tweaklet" 
          description="Qt specific DnD tweaks" 
-         definition="cherryDnDTweaklet" 
-         implementation="cherry::QtDnDTweaklet" />
+         definition="berryDnDTweaklet" 
+         implementation="berry::QtDnDTweaklet" />
          
        <tweaklet 
-         id="org.opencherry.ui.qt.tweaklets.ImageTweaklet" 
+         id="org.blueberry.ui.qt.tweaklets.ImageTweaklet" 
          name="Qt Image Tweaklet" 
          description="Qt specific image tweaks" 
-         definition="cherryImageTweaklet" 
-         implementation="cherry::QtImageTweaklet" />
+         definition="berryImageTweaklet" 
+         implementation="berry::QtImageTweaklet" />
          
        <tweaklet 
-         id="org.opencherry.ui.qt.tweaklets.MessageDialogTweaklet" 
+         id="org.blueberry.ui.qt.tweaklets.MessageDialogTweaklet" 
          name="Qt Message Dialog Tweaklet" 
          description="Qt specific message dialogs" 
-         definition="cherryMessageDialogTweaklet" 
-         implementation="cherry::QtMessageDialogTweaklet" />
+         definition="berryMessageDialogTweaklet" 
+         implementation="berry::QtMessageDialogTweaklet" />
    </extension>
    
    <extension
-         point="org.opencherry.ui.presentationFactories">
+         point="org.blueberry.ui.presentationFactories">
       <factory
             name="Default"
-            class="cherry::QtWorkbenchPresentationFactory"
-            id="org.opencherry.ui.presentations.default">
+            class="berry::QtWorkbenchPresentationFactory"
+            id="org.blueberry.ui.presentations.default">
       </factory>
    </extension>
    
-   <extension point="org.opencherry.ui.preferencePages">
-     <page id="org.opencherry.ui.qt.stylepreferencepage" name="Themes" class="cherry::QtStylePreferencePage">
-       <keywordreference id="org.opencherry.ui.qt.styleprefpagekeywords"/>
+   <extension point="org.blueberry.ui.preferencePages">
+     <page id="org.blueberry.ui.qt.stylepreferencepage" name="Themes" class="berry::QtStylePreferencePage">
+       <keywordreference id="org.blueberry.ui.qt.styleprefpagekeywords"/>
      </page>
    </extension>
 
-   <extension point="org.opencherry.ui.keywords">
-     <keyword id="org.opencherry.ui.qt.styleprefpagekeywords" label="theme skin style"></keyword>
+   <extension point="org.blueberry.ui.keywords">
+     <keyword id="org.blueberry.ui.qt.styleprefpagekeywords" label="theme skin style"></keyword>
    </extension>
   
 </plugin>

@@ -17,7 +17,7 @@
 
 #include "mitkMeasurementSelectionProvider.h"
 #include <mitkDataTreeNodeSelection.h>
-#include "cherrySelectionChangedEvent.h"
+#include "berrySelectionChangedEvent.h"
 
 namespace mitk
 {
@@ -30,24 +30,24 @@ MeasurementSelectionProvider::MeasurementSelectionProvider()
 }
 
 
-void MeasurementSelectionProvider::AddSelectionChangedListener(cherry::ISelectionChangedListener::Pointer listener)
+void MeasurementSelectionProvider::AddSelectionChangedListener(berry::ISelectionChangedListener::Pointer listener)
 {
   m_RegisteredListeners.AddListener(listener);
 }
 
-void MeasurementSelectionProvider::RemoveSelectionChangedListener(cherry::ISelectionChangedListener::Pointer listener)
+void MeasurementSelectionProvider::RemoveSelectionChangedListener(berry::ISelectionChangedListener::Pointer listener)
 {
   m_RegisteredListeners.RemoveListener(listener);
  
 }
 
-cherry::ISelection::ConstPointer MeasurementSelectionProvider::GetSelection() const
+berry::ISelection::ConstPointer MeasurementSelectionProvider::GetSelection() const
 {
   return m_CurrentSelection;
 }
 
 
-void MeasurementSelectionProvider::SetSelection(cherry::ISelection::Pointer selection)
+void MeasurementSelectionProvider::SetSelection(berry::ISelection::Pointer selection)
 {
 }
 
@@ -56,8 +56,8 @@ void MeasurementSelectionProvider::FireSelectionChanged(DataTreeNodeSelection::P
   if(selection.IsNotNull())
   {
     m_CurrentSelection = selection;
-    cherry::SelectionChangedEvent::Pointer event(
-        new cherry::SelectionChangedEvent(cherry::ISelectionProvider::Pointer(this), m_CurrentSelection));
+    berry::SelectionChangedEvent::Pointer event(
+        new berry::SelectionChangedEvent(berry::ISelectionProvider::Pointer(this), m_CurrentSelection));
     m_RegisteredListeners.selectionChanged(event);
   }
 }

@@ -17,18 +17,18 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "QmitkApplication.h"
 
-#include <cherryPlatformUI.h>
+#include <berryPlatformUI.h>
 
 #include "QmitkWorkbenchAdvisor.h"
 
 int QmitkApplication::Start()
 {
-  cherry::Display* display = cherry::PlatformUI::CreateDisplay();
+  berry::Display* display = berry::PlatformUI::CreateDisplay();
 
-  int code = cherry::PlatformUI::CreateAndRunWorkbench(display, new QmitkWorkbenchAdvisor());
+  int code = berry::PlatformUI::CreateAndRunWorkbench(display, new QmitkWorkbenchAdvisor());
   
   // exit the application with an appropriate return code
-  return code == cherry::PlatformUI::RETURN_RESTART
+  return code == berry::PlatformUI::RETURN_RESTART
               ? EXIT_RESTART : EXIT_OK;
 }
 

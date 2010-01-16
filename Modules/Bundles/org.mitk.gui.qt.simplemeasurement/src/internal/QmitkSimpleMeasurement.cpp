@@ -26,9 +26,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkStringProperty.h>
 #include <mitkIDataStorageService.h>
 
-#include <cherryIEditorPart.h>
-#include <cherryIWorkbenchPage.h>
-#include <cherryPlatform.h>
+#include <berryIEditorPart.h>
+#include <berryIWorkbenchPage.h>
+#include <berryPlatform.h>
 /*
 QmitkSimpleMeasurement::QmitkSimpleMeasurement(QObject *parent, const char *name, QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIteratorBase* it)
   : QmitkFunctionality(parent, name, it) , m_MultiWidget(mitkStdMultiWidget), m_Controls(NULL)

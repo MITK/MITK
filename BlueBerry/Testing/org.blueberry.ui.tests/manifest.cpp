@@ -1,6 +1,6 @@
 /*=========================================================================
  
- Program:   openCherry Platform
+ Program:   BlueBerry Platform
  Language:  C++
  Date:      $Date$
  Version:   $Revision$
@@ -17,16 +17,16 @@
 
 #include <Poco/ClassLibrary.h>
 
-#include "src/cherryUiTestSuite.h"
+#include "src/berryUiTestSuite.h"
 
-#include "src/api/cherryMockViewPart.h"
-#include "src/api/cherrySaveableMockViewPart.h"
+#include "src/api/berryMockViewPart.h"
+#include "src/api/berrySaveableMockViewPart.h"
 
 POCO_BEGIN_NAMED_MANIFEST(CppUnitTest, CppUnit::Test)
-  POCO_EXPORT_CLASS(cherry::UiTestSuite)
+  POCO_EXPORT_CLASS(berry::UiTestSuite)
 POCO_END_MANIFEST
 
-POCO_BEGIN_NAMED_MANIFEST(cherryIViewPart, cherry::IViewPart)
-  POCO_EXPORT_CLASS(cherry::MockViewPart)
-  POCO_EXPORT_CLASS(cherry::SaveableMockViewPart)
+POCO_BEGIN_NAMED_MANIFEST(berryIViewPart, berry::IViewPart)
+  POCO_EXPORT_CLASS(berry::MockViewPart)
+  POCO_EXPORT_CLASS(berry::SaveableMockViewPart)
 POCO_END_MANIFEST

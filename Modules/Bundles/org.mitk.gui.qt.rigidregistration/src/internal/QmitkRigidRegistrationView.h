@@ -23,8 +23,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkFunctionality.h"
 #include "ui_QmitkRigidRegistrationViewControls.h"
 
-#include "cherryISelectionListener.h"
-#include "cherryIStructuredSelection.h"
+#include "berryISelectionListener.h"
+#include "berryIStructuredSelection.h"
 
 #include "../RigidregistrationDll.h"
 
@@ -219,7 +219,7 @@ class RIGIDREGISTRATION_EXPORT QmitkRigidRegistrationView : public QObject, publ
 
     void UpdateTimestep();
 
-    void SetImagesVisible(cherry::ISelection::ConstPointer selection);
+    void SetImagesVisible(berry::ISelection::ConstPointer selection);
 
     void CheckForMaskImages();
 
@@ -233,8 +233,8 @@ class RIGIDREGISTRATION_EXPORT QmitkRigidRegistrationView : public QObject, publ
 
   protected:
 
-    cherry::ISelectionListener::Pointer m_SelListener;
-    cherry::IStructuredSelection::ConstPointer m_CurrentSelection;
+    berry::ISelectionListener::Pointer m_SelListener;
+    berry::IStructuredSelection::ConstPointer m_CurrentSelection;
 
     /*!  
     * default main widget containing 4 windows showing 3   

@@ -1,21 +1,21 @@
 #ifndef MITKCORESERVICESPLUGIN_H_
 #define MITKCORESERVICESPLUGIN_H_
 
-#include <cherryPlugin.h>
-#include <cherryIBundleContext.h>
+#include <berryPlugin.h>
+#include <berryIBundleContext.h>
 
 #include "mitkCoreServicesPluginDll.h"
 
 namespace mitk
 {
 
-class MITK_CORE_SERVICES_PLUGIN CoreServicesPlugin : public cherry::Plugin
+class MITK_CORE_SERVICES_PLUGIN CoreServicesPlugin : public berry::Plugin
 {
 public:
   
   static const std::string PLUGIN_ID;
   
-  void Start(cherry::IBundleContext::Pointer context);
+  void Start(berry::IBundleContext::Pointer context);
   
 };
 

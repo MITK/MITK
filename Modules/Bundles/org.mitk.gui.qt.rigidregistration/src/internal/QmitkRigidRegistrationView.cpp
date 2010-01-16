@@ -32,17 +32,17 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkDataTreeNodeObject.h"
 
-#include "cherryIWorkbenchWindow.h"
-#include "cherryISelectionService.h"
+#include "berryIWorkbenchWindow.h"
+#include "berryISelectionService.h"
 
 
 const std::string QmitkRigidRegistrationView::VIEW_ID = "org.mitk.views.rigidregistration";
 
-using namespace cherry;
+using namespace berry;
 
 struct SelListenerRigidRegistration : ISelectionListener
 {
-  cherryObjectMacro(SelListenerRigidRegistration);
+  berryObjectMacro(SelListenerRigidRegistration);
 
   SelListenerRigidRegistration(QmitkRigidRegistrationView* view)
   {
@@ -173,7 +173,7 @@ QmitkRigidRegistrationView::~QmitkRigidRegistrationView()
 {
   if(m_SelListener.IsNotNull())
   {
-    cherry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
+    berry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
     if(s)
       s->RemovePostSelectionListener(m_SelListener);
     m_SelListener = NULL;
@@ -261,9 +261,9 @@ void QmitkRigidRegistrationView::Activated()
   QmitkFunctionality::Activated();
   if (m_SelListener.IsNull())
   {
-    m_SelListener = cherry::ISelectionListener::Pointer(new SelListenerRigidRegistration(this));
+    m_SelListener = berry::ISelectionListener::Pointer(new SelListenerRigidRegistration(this));
     this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddPostSelectionListener(/*"org.mitk.views.datamanager",*/ m_SelListener);
-    cherry::ISelection::ConstPointer sel(
+    berry::ISelection::ConstPointer sel(
       this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection("org.mitk.views.datamanager"));
     m_CurrentSelection = sel.Cast<const IStructuredSelection>();
     m_SelListener.Cast<SelListenerRigidRegistration>()->DoSelectionChanged(sel);
@@ -278,9 +278,9 @@ void QmitkRigidRegistrationView::Activated()
     QmitkFunctionality::Activated();
     if (m_SelListener.IsNull())
     {
-      m_SelListener = cherry::ISelectionListener::Pointer(new SelListenerRigidRegistration(this));
+      m_SelListener = berry::ISelectionListener::Pointer(new SelListenerRigidRegistration(this));
       this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddPostSelectionListener(/ *"org.mitk.views.datamanager",* / m_SelListener);
-      cherry::ISelection::ConstPointer sel(
+      berry::ISelection::ConstPointer sel(
         this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection("org.mitk.views.datamanager"));
       m_CurrentSelection = sel.Cast<const IStructuredSelection>();
       m_SelListener.Cast<SelListenerRigidRegistration>()->DoSelectionChanged(sel);
@@ -300,9 +300,9 @@ void QmitkRigidRegistrationView::Visible()
   QmitkFunctionality::Activated();
   if (m_SelListener.IsNull())
   {
-    m_SelListener = cherry::ISelectionListener::Pointer(new SelListenerRigidRegistration(this));
+    m_SelListener = berry::ISelectionListener::Pointer(new SelListenerRigidRegistration(this));
     this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddPostSelectionListener(/*"org.mitk.views.datamanager",* / m_SelListener);
-    cherry::ISelection::ConstPointer sel(
+    berry::ISelection::ConstPointer sel(
       this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection("org.mitk.views.datamanager"));
     m_CurrentSelection = sel.Cast<const IStructuredSelection>();
     m_SelListener.Cast<SelListenerRigidRegistration>()->DoSelectionChanged(sel);
@@ -322,7 +322,7 @@ void QmitkRigidRegistrationView::Deactivated()
   m_FixedNode = NULL;
   m_MovingNode = NULL;
   this->ClearTransformationLists();
-  cherry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
+  berry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
   if(s)
     s->RemovePostSelectionListener(m_SelListener);
   m_SelListener = NULL;
@@ -332,7 +332,7 @@ void QmitkRigidRegistrationView::Deactivated()
     m_FixedNode = NULL;
     m_MovingNode = NULL;
     this->ClearTransformationLists();
-    cherry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
+    berry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
     if(s)
       s->RemovePostSelectionListener(m_SelListener);
     m_SelListener = NULL;
@@ -348,7 +348,7 @@ void QmitkRigidRegistrationView::Hidden()
   m_FixedNode = NULL;
   m_MovingNode = NULL;
   this->ClearTransformationLists();
-  cherry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
+  berry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
   if(s)
     s->RemovePostSelectionListener(m_SelListener);
   m_SelListener = NULL;
@@ -1016,7 +1016,7 @@ void QmitkRigidRegistrationView::ShowManualRegistrationFrame(bool show)
   }
 }
 
-void QmitkRigidRegistrationView::SetImagesVisible(cherry::ISelection::ConstPointer selection)
+void QmitkRigidRegistrationView::SetImagesVisible(berry::ISelection::ConstPointer selection)
 {
   if (this->m_CurrentSelection->Size() == 0)
   {

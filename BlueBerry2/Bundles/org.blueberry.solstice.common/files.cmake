@@ -1,12 +1,12 @@
 SET(SRC_CPP_FILES
-  cherryMultiStatus.cpp
-  cherrySafeRunner.cpp
-  cherrySolsticeExceptions.cpp
-  cherryStatus.cpp
+  berryMultiStatus.cpp
+  berrySafeRunner.cpp
+  berrySolsticeExceptions.cpp
+  berryStatus.cpp
 )
 
 SET(INTERNAL_CPP_FILES
-  cherryIRuntimeConstants.cpp
+  berryIRuntimeConstants.cpp
 )
 
 #SET(CPP_FILES manifest.cpp)

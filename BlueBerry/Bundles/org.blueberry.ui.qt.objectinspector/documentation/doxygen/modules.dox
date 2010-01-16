@@ -1,16 +1,16 @@
 /**
-  \defgroup org_opencherry_ui_qt_objectinspector org.opencherry.ui.qt.objectinspector Plugin
-  \ingroup openCherryPlugins
+  \defgroup org_blueberry_ui_qt_objectinspector org.blueberry.ui.qt.objectinspector Plugin
+  \ingroup BlueBerryPlugins
 
   \brief Describe your plugin here.
   
 */
 
 /**
-  \defgroup org_opencherry_ui_qt_objectinspector_internal Internal
-  \ingroup org_opencherry_ui_qt_objectinspector
+  \defgroup org_blueberry_ui_qt_objectinspector_internal Internal
+  \ingroup org_blueberry_ui_qt_objectinspector
 
-  \brief This subcategory includes the internal classes of the org.opencherry.ui.qt.objectinspector plugin. Other
+  \brief This subcategory includes the internal classes of the org.blueberry.ui.qt.objectinspector plugin. Other
   plugins must not rely on these classes. They contain implementation details and their interface
   may change at any time. We mean it.
 */

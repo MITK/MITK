@@ -25,7 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "QmitkStepperAdapter.h"
 
-#include <cherryISelectionListener.h>
+#include <berryISelectionListener.h>
 
 
 /*!
@@ -81,8 +81,8 @@ public:
   /*!  
   \brief Invoked when the DataManager selection changed
   */
-  virtual void SelectionChanged(cherry::IWorkbenchPart::Pointer part
-    , cherry::ISelection::ConstPointer selection);
+  virtual void SelectionChanged(berry::IWorkbenchPart::Pointer part
+    , berry::ISelection::ConstPointer selection);
 
 
   protected slots:  
@@ -137,7 +137,7 @@ private:
   mitk::DataTreeNode*       m_SelectedImageNode;
   QmitkStepperAdapter*      m_TimeStepperAdapter;
 
-  cherry::ISelectionListener::Pointer m_SelectionListener;
+  berry::ISelectionListener::Pointer m_SelectionListener;
 
   enum ActionType {
     GAUSSIAN,

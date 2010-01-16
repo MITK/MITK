@@ -18,8 +18,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkExtActionBarAdvisor.h"
 
 
-QmitkExtActionBarAdvisor::QmitkExtActionBarAdvisor(cherry::IActionBarConfigurer::Pointer configurer)
- : cherry::ActionBarAdvisor(configurer)
+QmitkExtActionBarAdvisor::QmitkExtActionBarAdvisor(berry::IActionBarConfigurer::Pointer configurer)
+ : berry::ActionBarAdvisor(configurer)
 {
 
 }

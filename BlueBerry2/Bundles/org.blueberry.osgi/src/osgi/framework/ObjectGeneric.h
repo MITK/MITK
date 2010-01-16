@@ -1,6 +1,6 @@
 /*=========================================================================
 
- Program:   openCherry Platform
+ Program:   BlueBerry Platform
  Language:  C++
  Date:      $Date$
  Version:   $Revision$
@@ -20,7 +20,7 @@
 #define OSGI_FRAMEWORK_OBJECTGENERIC_H_
 
 #include <sstream>
-#include "../../cherryOSGiDll.h"
+#include "../../berryOSGiDll.h"
 #include "osgi/framework/Macros.h"
 #include "osgi/framework/Object.h"
 
@@ -29,7 +29,7 @@ namespace osgi {
 namespace framework {
 
 template <typename T>
-class CHERRY_OSGI ObjectGeneric : public Object
+class BERRY_OSGI ObjectGeneric : public Object
 {
   public:
 
@@ -99,14 +99,14 @@ class CHERRY_OSGI ObjectGeneric : public Object
 } // namespace
 
 /**
- * Generates a specialized subclass of cherry::ObjectGeneric.
+ * Generates a specialized subclass of berry::ObjectGeneric.
  * This way, GetClassName() returns the value provided by ObjectName.
  * Please see osgi/framework/Objects.h for examples
  * @param ObjectName the name of the instantiation of ObjectGeneric
  * @param Type the value type
  */
 #define osgiSpecializeGenericObject(ns,ObjectName,Type,DefaultValue)  \
-class CHERRY_OSGI ObjectName: public ::osgi::framework::ObjectGeneric< Type >           \
+class BERRY_OSGI ObjectName: public ::osgi::framework::ObjectGeneric< Type >           \
 {                                                                    \
 public:                                                              \
   osgiObjectMacro(ns::ObjectName);                                      \

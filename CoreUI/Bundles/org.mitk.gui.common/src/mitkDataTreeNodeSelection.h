@@ -19,19 +19,19 @@
 #ifndef MITKDATATREENODESELECTION_H_
 #define MITKDATATREENODESELECTION_H_
 
-#include <cherryIStructuredSelection.h>
+#include <berryIStructuredSelection.h>
 #include <mitkDataTreeNode.h>
 #include "mitkGUICommonPluginDll.h"
 
 
 namespace mitk {
 
-class MITK_GUI_COMMON_PLUGIN DataTreeNodeSelection : public virtual cherry::IStructuredSelection
+class MITK_GUI_COMMON_PLUGIN DataTreeNodeSelection : public virtual berry::IStructuredSelection
 {
 
 public:
 
-  cherryObjectMacro(DataTreeNodeSelection);
+  berryObjectMacro(DataTreeNodeSelection);
 
   DataTreeNodeSelection();
   DataTreeNodeSelection(DataTreeNode::Pointer node);
@@ -46,11 +46,11 @@ public:
   virtual ContainerType::Pointer ToVector() const;
 
   /**
-   * @see cherry::ISelection::IsEmpty()
+   * @see berry::ISelection::IsEmpty()
    */
   bool IsEmpty() const;
 
-  bool operator==(const cherry::Object* obj) const;
+  bool operator==(const berry::Object* obj) const;
 
 protected:
 

@@ -1,6 +1,6 @@
 /*=========================================================================
 
-Program:   openCherry Platform
+Program:   BlueBerry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision: 17020 $
@@ -24,7 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 void
-QmitkCommonActivator::Start(cherry::IBundleContext::Pointer)
+QmitkCommonActivator::Start(berry::IBundleContext::Pointer)
 { 
   QFile file(":/org.mitk.gui.qt.common/StateMachine.xml");
   if(file.exists() && file.open(QIODevice::ReadOnly | QIODevice::Text) )

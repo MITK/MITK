@@ -1,6 +1,6 @@
 /*=========================================================================
 
-Program:   openCherry Platform
+Program:   BlueBerry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
@@ -23,7 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <Poco/Path.h>
 #include <Poco/Logger.h>
 
-#include "service/cherryService.h"
+#include "service/berryService.h"
 
 namespace osgi {
 
@@ -32,9 +32,9 @@ namespace framework {
 struct BundleEvents;
 struct IBundle;
 
-using namespace cherry;
+using namespace berry;
 
-struct CHERRY_OSGI IBundleContext : public virtual Object
+struct BERRY_OSGI IBundleContext : public virtual Object
 {
 
   osgiInterfaceMacro(osgi::framework::IBundleContext);

@@ -1,14 +1,14 @@
 SET(SRC_CPP_FILES
-  cherryUITestApplication.cpp
+  berryUITestApplication.cpp
   
-  harness/cherryUITestCase.cpp
+  harness/berryUITestCase.cpp
   
-  util/cherryEmptyPerspective.cpp
+  util/berryEmptyPerspective.cpp
 )
 
 SET(INTERNAL_CPP_FILES
-  cherryUITestWorkbenchAdvisor.cpp
-  cherryUITestWorkbenchWindowAdvisor.cpp
+  berryUITestWorkbenchAdvisor.cpp
+  berryUITestWorkbenchWindowAdvisor.cpp
 )
 
 SET(CPP_FILES manifest.cpp)

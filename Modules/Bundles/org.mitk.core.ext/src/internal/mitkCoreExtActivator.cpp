@@ -1,6 +1,6 @@
 /*=========================================================================
 
- Program:   openCherry Platform
+ Program:   BlueBerry Platform
  Language:  C++
  Date:      $Date$
  Version:   $Revision: 17020 $
@@ -23,7 +23,7 @@ namespace mitk
 {
 
 void
-CoreExtActivator::Start(cherry::IBundleContext::Pointer /*context*/)
+CoreExtActivator::Start(berry::IBundleContext::Pointer /*context*/)
 {
   RegisterCoreExtObjectFactory();
 }

@@ -28,12 +28,12 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <mitkCoreObjectFactory.h>
 #include <mitkDataStorageEditorInput.h>
-#include <cherryIEditorPart.h>
-#include <cherryIWorkbenchPage.h>
+#include <berryIEditorPart.h>
+#include <berryIWorkbenchPage.h>
 
 #include "QmitkStdMultiWidgetEditor.h"
 
-QmitkFileSaveProjectAction::QmitkFileSaveProjectAction(cherry::IWorkbenchWindow::Pointer window)
+QmitkFileSaveProjectAction::QmitkFileSaveProjectAction(berry::IWorkbenchWindow::Pointer window)
 : QAction(0)
 {
   m_Window = window;
@@ -62,7 +62,7 @@ void QmitkFileSaveProjectAction::Run()
     mitk::DataStorageEditorInput::Pointer editorInput;
     mitk::DataStorage::Pointer storage;
     QmitkStdMultiWidgetEditor::Pointer multiWidgetEditor;
-    cherry::IEditorPart::Pointer editor = m_Window->GetActivePage()->GetActiveEditor();
+    berry::IEditorPart::Pointer editor = m_Window->GetActivePage()->GetActiveEditor();
     if (editor.Cast<QmitkStdMultiWidgetEditor>().IsNull())
     {
       editorInput = new mitk::DataStorageEditorInput();

@@ -1,6 +1,6 @@
 /*=========================================================================
 
- Program:   openCherry Platform
+ Program:   BlueBerry Platform
  Language:  C++
  Date:      $Date$
  Version:   $Revision$
@@ -21,13 +21,13 @@
 #include <iostream>
 #include <stdexcept>
 
-#include "../../cherryOSGiDll.h"
+#include "../../berryOSGiDll.h"
 #include "Exceptions.h"
 
-#include <cherryConfig.h>
+#include <berryConfig.h>
 
-#if defined(OPENCHERRY_DEBUG_SMARTPOINTER)
-#include "cherryDebugUtil.h"
+#if defined(BLUEBERRY_DEBUG_SMARTPOINTER)
+#include "berryDebugUtil.h"
 #include <Poco/Mutex.h>
 #endif
 
@@ -72,7 +72,7 @@ public:
   SmartPointer() :
     m_Pointer(0)
   {
-#if defined(OPENCHERRY_DEBUG_SMARTPOINTER)
+#if defined(BLUEBERRY_DEBUG_SMARTPOINTER)
     DebugInitSmartPointer();
 #endif
 
@@ -85,7 +85,7 @@ public:
     if (m_Pointer)
       this->Register();
 
-#if defined(OPENCHERRY_DEBUG_SMARTPOINTER)
+#if defined(BLUEBERRY_DEBUG_SMARTPOINTER)
     DebugInitSmartPointer();
 #endif
   }
@@ -96,7 +96,7 @@ public:
     _atomic_cas(m_Pointer, m_Pointer, p.m_Pointer);
     this->Register();
 
-#if defined(OPENCHERRY_DEBUG_SMARTPOINTER)
+#if defined(BLUEBERRY_DEBUG_SMARTPOINTER)
     DebugInitSmartPointer();
 #endif
   }
@@ -108,7 +108,7 @@ public:
     if (m_Pointer)
       this->Register();
 
-#if defined(OPENCHERRY_DEBUG_SMARTPOINTER)
+#if defined(BLUEBERRY_DEBUG_SMARTPOINTER)
     DebugInitSmartPointer();
 #endif
   }
@@ -121,7 +121,7 @@ public:
       _atomic_cas(m_Pointer, m_Pointer, wp.m_Pointer);
       this->Register();
 
-      #if defined(OPENCHERRY_DEBUG_SMARTPOINTER)
+      #if defined(BLUEBERRY_DEBUG_SMARTPOINTER)
         DebugInitSmartPointer();
       #endif
     }
@@ -134,7 +134,7 @@ public:
   /** Destructor  */
   ~SmartPointer()
   {
-#if defined(OPENCHERRY_DEBUG_SMARTPOINTER)
+#if defined(BLUEBERRY_DEBUG_SMARTPOINTER)
     if (m_Pointer) DebugRemoveSmartPointer();
 #endif
 
@@ -288,7 +288,7 @@ public:
   {
     if (m_Pointer != r)
     {
-#if defined(OPENCHERRY_DEBUG_SMARTPOINTER)
+#if defined(BLUEBERRY_DEBUG_SMARTPOINTER)
       DebugAssignSmartPointer(r, m_Pointer);
 #endif
       ObjectType* tmp = m_Pointer; //avoid recursive unregisters by retaining temporarily
@@ -331,7 +331,7 @@ private:
     }
   }
 
-#if defined(OPENCHERRY_DEBUG_SMARTPOINTER)
+#if defined(BLUEBERRY_DEBUG_SMARTPOINTER)
 
   unsigned int m_Id;
   Poco::FastMutex m_Mutex;

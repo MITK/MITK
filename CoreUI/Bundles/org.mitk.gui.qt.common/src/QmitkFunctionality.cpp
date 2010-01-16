@@ -25,9 +25,9 @@
 #include "mitkIDataStorageService.h"
 #include "mitkDataStorageEditorInput.h"
 
-// cherry Includes
-#include <cherryPlatform.h>
-#include <cherryIWorkbenchPage.h>
+// berry Includes
+#include <berryPlatform.h>
+#include <berryIWorkbenchPage.h>
 
 // Qmitk Includes
 #include <QmitkStdMultiWidgetEditor.h>
@@ -47,7 +47,7 @@ QmitkFunctionality::QmitkFunctionality()
  , m_IsVisible(false)
 {
   m_PreferencesService = 
-    cherry::Platform::GetServiceRegistry().GetServiceById<cherry::IPreferencesService>(cherry::IPreferencesService::ID);
+    berry::Platform::GetServiceRegistry().GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
 }
   
 void QmitkFunctionality::SetHandleMultipleDataStorages(bool multiple)
@@ -64,7 +64,7 @@ mitk::DataStorage::Pointer
 QmitkFunctionality::GetDataStorage() const
 {
   mitk::IDataStorageService::Pointer service = 
-    cherry::Platform::GetServiceRegistry().GetServiceById<mitk::IDataStorageService>(mitk::IDataStorageService::ID);
+    berry::Platform::GetServiceRegistry().GetServiceById<mitk::IDataStorageService>(mitk::IDataStorageService::ID);
   
   if (service.IsNotNull())
   {
@@ -81,7 +81,7 @@ QmitkFunctionality::GetDataStorage() const
 mitk::DataStorage::Pointer QmitkFunctionality::GetDefaultDataStorage() const
 {
   mitk::IDataStorageService::Pointer service = 
-    cherry::Platform::GetServiceRegistry().GetServiceById<mitk::IDataStorageService>(mitk::IDataStorageService::ID);
+    berry::Platform::GetServiceRegistry().GetServiceById<mitk::IDataStorageService>(mitk::IDataStorageService::ID);
 
   return service->GetDefaultDataStorage()->GetDataStorage();
 }
@@ -124,7 +124,7 @@ void QmitkFunctionality::CreatePartControl(void* parent)
 
 void QmitkFunctionality::AfterCreateQtPartControl()
 {
-  this->GetSite()->GetPage()->AddPartListener(cherry::IPartListener::Pointer(this));
+  this->GetSite()->GetPage()->AddPartListener(berry::IPartListener::Pointer(this));
   this->GetDefaultDataStorage()->AddNodeEvent.AddListener( mitk::MessageDelegate1<QmitkFunctionality, const mitk::DataTreeNode*>
     ( this, &QmitkFunctionality::NodeAddedProxy ) );
   this->GetDefaultDataStorage()->RemoveNodeEvent.AddListener( mitk::MessageDelegate1<QmitkFunctionality, const mitk::DataTreeNode*>
@@ -163,12 +163,12 @@ void QmitkFunctionality::StdMultiWidgetNotAvailable()
 {
 }
 
-cherry::IPartListener::Events::Types QmitkFunctionality::GetPartEventTypes() const
+berry::IPartListener::Events::Types QmitkFunctionality::GetPartEventTypes() const
 {
   return Events::ACTIVATED | Events::DEACTIVATED | Events::CLOSED | Events::HIDDEN | Events::VISIBLE;
 }
 
-void QmitkFunctionality::PartActivated( cherry::IWorkbenchPartReference::Pointer partRef )
+void QmitkFunctionality::PartActivated( berry::IWorkbenchPartReference::Pointer partRef )
 {
   if (partRef->GetPart(false) == this && m_DeactivatedFunctionality != this)
   {
@@ -190,7 +190,7 @@ void QmitkFunctionality::PartActivated( cherry::IWorkbenchPartReference::Pointer
   }
 }
 
-void QmitkFunctionality::PartDeactivated(cherry::IWorkbenchPartReference::Pointer partRef)
+void QmitkFunctionality::PartDeactivated(berry::IWorkbenchPartReference::Pointer partRef)
 {
   if (partRef->GetPart(false) == this)
   {
@@ -198,7 +198,7 @@ void QmitkFunctionality::PartDeactivated(cherry::IWorkbenchPartReference::Pointe
   }
 }
 
-void QmitkFunctionality::PartClosed( cherry::IWorkbenchPartReference::Pointer partRef )
+void QmitkFunctionality::PartClosed( berry::IWorkbenchPartReference::Pointer partRef )
 {
   if (partRef->GetId() == QmitkStdMultiWidgetEditor::EDITOR_ID)
   {
@@ -218,7 +218,7 @@ void QmitkFunctionality::PartClosed( cherry::IWorkbenchPartReference::Pointer pa
   }
 }
 
-void QmitkFunctionality::PartHidden( cherry::IWorkbenchPartReference::Pointer partRef )
+void QmitkFunctionality::PartHidden( berry::IWorkbenchPartReference::Pointer partRef )
 {
   if(partRef->GetPart(false).Cast<QmitkFunctionality>())
 	  m_VisibleFunctionalities.erase(partRef->GetId());
@@ -232,7 +232,7 @@ void QmitkFunctionality::PartHidden( cherry::IWorkbenchPartReference::Pointer pa
     this->ActivateLastVisibleFunctionality();
 }
 
-void QmitkFunctionality::PartVisible( cherry::IWorkbenchPartReference::Pointer  partRef )
+void QmitkFunctionality::PartVisible( berry::IWorkbenchPartReference::Pointer  partRef )
 {
   if(partRef->GetPart(false).Cast<QmitkFunctionality>())
     m_VisibleFunctionalities.insert(partRef->GetId());
@@ -288,7 +288,7 @@ void QmitkFunctionality::DataStorageChanged()
 QmitkFunctionality::~QmitkFunctionality()
 {
   this->Register();
-  this->GetSite()->GetPage()->RemovePartListener(cherry::IPartListener::Pointer(this));
+  this->GetSite()->GetPage()->RemovePartListener(berry::IPartListener::Pointer(this));
   this->UnRegister(false);
 
   this->GetDefaultDataStorage()->AddNodeEvent.RemoveListener( mitk::MessageDelegate1<QmitkFunctionality, const mitk::DataTreeNode*>
@@ -301,7 +301,7 @@ QmitkFunctionality::~QmitkFunctionality()
 QmitkStdMultiWidget* QmitkFunctionality::GetActiveStdMultiWidget()
 {
   QmitkStdMultiWidget* activeStdMultiWidget = 0;
-  cherry::IEditorPart::Pointer editor =
+  berry::IEditorPart::Pointer editor =
     this->GetSite()->GetPage()->GetActiveEditor();
 
   if (editor.Cast<QmitkStdMultiWidgetEditor>().IsNotNull())
@@ -312,7 +312,7 @@ QmitkStdMultiWidget* QmitkFunctionality::GetActiveStdMultiWidget()
   {
     mitk::DataStorageEditorInput::Pointer editorInput;
     editorInput = new mitk::DataStorageEditorInput();
-    cherry::IEditorPart::Pointer editor = this->GetSite()->GetPage()->OpenEditor(editorInput, QmitkStdMultiWidgetEditor::EDITOR_ID);
+    berry::IEditorPart::Pointer editor = this->GetSite()->GetPage()->OpenEditor(editorInput, QmitkStdMultiWidgetEditor::EDITOR_ID);
     activeStdMultiWidget = editor.Cast<QmitkStdMultiWidgetEditor>()->GetStdMultiWidget();
   }
 
@@ -365,12 +365,12 @@ void QmitkFunctionality::RestoreOverrideCursor()
   QApplication::restoreOverrideCursor();
 }
 
-cherry::IPreferences::Pointer QmitkFunctionality::GetPreferences() const
+berry::IPreferences::Pointer QmitkFunctionality::GetPreferences() const
 {
-  cherry::IPreferencesService::Pointer prefService = m_PreferencesService.Lock();
+  berry::IPreferencesService::Pointer prefService = m_PreferencesService.Lock();
   // const_cast workaround for bad programming: const uncorrectness this->GetViewSite() should be const
   std::string id = "/" + (const_cast<QmitkFunctionality*>(this))->GetViewSite()->GetId();
-  return prefService.IsNotNull() ? prefService->GetSystemPreferences()->Node(id): cherry::IPreferences::Pointer(0);
+  return prefService.IsNotNull() ? prefService->GetSystemPreferences()->Node(id): berry::IPreferences::Pointer(0);
 }
 
 void QmitkFunctionality::Visible()

@@ -17,7 +17,7 @@ sophisticated generator available.
 \par Prerequisites
 We will use MITK as a SDK, which we have to set up first. Since there is no SDK package available 
 yet which you could download and install, we have to follow the steps in
- <a href="http://www.mitk.org/wiki/SetupMitkQt4OpenCherry">SetupMitkQt4OpenCherry</a>. 
+ <a href="http://www.mitk.org/wiki/SetupMitkQt4BlueBerry">SetupMitkQt4BlueBerry</a>. 
 This will set up a binary MITK tree which we can be used later on to link our plug-ins to. 
 
 \par
@@ -48,8 +48,8 @@ your new project. The generator uses the CMake GUI for configuration.
 \li Press "Configure" again and you will get the following screen:
 
 \image html BundleGenerator2.png
-\li ACTIVATOR_CLASS (optional): The name of a class (without namespaces) which can be used to react to lifecycle events of your plug-in. See cherry::IBundleActivator .
-\li CUSTOM_PROJECT_EXECUTABLE (optional/required): If you supplied a CUSTOM_PROJECT_NAME, this variable will hold the name of your executable which will start an openCherry Workbench.
+\li ACTIVATOR_CLASS (optional): The name of a class (without namespaces) which can be used to react to lifecycle events of your plug-in. See berry::IBundleActivator .
+\li CUSTOM_PROJECT_EXECUTABLE (optional/required): If you supplied a CUSTOM_PROJECT_NAME, this variable will hold the name of your executable which will start an BlueBerry Workbench.
 \li PLUGIN_VENDOR: The person or institution from which this plug-in comes from. Change to your needs.
 \li PLUGIN_VERSION: The version number of your plug-in. This will be used by the platform for managing plug-in dependencies.
 \li REQUIRED_PLUGINS: The ids of plug-ins your plug-in directly depends on. Usually you won't need to change something.

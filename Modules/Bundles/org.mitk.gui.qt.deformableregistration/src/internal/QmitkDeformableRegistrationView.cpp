@@ -41,8 +41,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkDataTreeNodeObject.h"
 
-#include "cherryIWorkbenchWindow.h"
-#include "cherryISelectionService.h"
+#include "berryIWorkbenchWindow.h"
+#include "berryISelectionService.h"
 
 typedef itk::Vector< float, 3 >       VectorType;
 typedef itk::Image< VectorType, 3 >   DeformationFieldType;
@@ -51,11 +51,11 @@ typedef itk::ImageFileReader< DeformationFieldType > ImageReaderType;
 
 const std::string QmitkDeformableRegistrationView::VIEW_ID = "org.mitk.views.deformableregistration";
 
-using namespace cherry;
+using namespace berry;
 
 struct SelListenerDeformableRegistration : ISelectionListener
 {
-  cherryObjectMacro(SelListenerDeformableRegistration);
+  berryObjectMacro(SelListenerDeformableRegistration);
 
   SelListenerDeformableRegistration(QmitkDeformableRegistrationView* view)
   {
@@ -176,7 +176,7 @@ QmitkDeformableRegistrationView::~QmitkDeformableRegistrationView()
 {
   if (m_SelListener.IsNotNull())
   {
-    cherry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
+    berry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
     if(s)
       s->RemovePostSelectionListener(m_SelListener);
     m_SelListener = NULL;
@@ -306,9 +306,9 @@ void QmitkDeformableRegistrationView::Activated()
   QmitkFunctionality::Activated();
   if (m_SelListener.IsNull())
   {
-    m_SelListener = cherry::ISelectionListener::Pointer(new SelListenerDeformableRegistration(this));
+    m_SelListener = berry::ISelectionListener::Pointer(new SelListenerDeformableRegistration(this));
     this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddPostSelectionListener(/*"org.mitk.views.datamanager",*/ m_SelListener);
-    cherry::ISelection::ConstPointer sel(
+    berry::ISelection::ConstPointer sel(
       this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection("org.mitk.views.datamanager"));
     m_CurrentSelection = sel.Cast<const IStructuredSelection>();
     m_SelListener.Cast<SelListenerDeformableRegistration>()->DoSelectionChanged(sel);
@@ -325,9 +325,9 @@ void QmitkDeformableRegistrationView::Visible()
   QmitkFunctionality::Activated();
   if (m_SelListener.IsNull())
   {
-    m_SelListener = cherry::ISelectionListener::Pointer(new SelListenerDeformableRegistration(this));
+    m_SelListener = berry::ISelectionListener::Pointer(new SelListenerDeformableRegistration(this));
     this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddPostSelectionListener(/*"org.mitk.views.datamanager",* / m_SelListener);
-    cherry::ISelection::ConstPointer sel(
+    berry::ISelection::ConstPointer sel(
       this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection("org.mitk.views.datamanager"));
     m_CurrentSelection = sel.Cast<const IStructuredSelection>();
     m_SelListener.Cast<SelListenerDeformableRegistration>()->DoSelectionChanged(sel);
@@ -348,7 +348,7 @@ void QmitkDeformableRegistrationView::Deactivated()
   }
   m_FixedNode = NULL;
   m_MovingNode = NULL;
-  cherry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
+  berry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
   if(s)
     s->RemovePostSelectionListener(m_SelListener);
   m_SelListener = NULL;
@@ -365,7 +365,7 @@ void QmitkDeformableRegistrationView::Hidden()
   }
   m_FixedNode = NULL;
   m_MovingNode = NULL;
-  cherry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
+  berry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
   if(s)
     s->RemovePostSelectionListener(m_SelListener);
   m_SelListener = NULL;*/
@@ -570,7 +570,7 @@ void QmitkDeformableRegistrationView::Calculate()
   }
 }
 
-void QmitkDeformableRegistrationView::SetImagesVisible(cherry::ISelection::ConstPointer selection)
+void QmitkDeformableRegistrationView::SetImagesVisible(berry::ISelection::ConstPointer selection)
 {
   if (this->m_CurrentSelection->Size() == 0)
   {

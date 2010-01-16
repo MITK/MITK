@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?openCherry version="0.1"?>
+<?BlueBerry version="0.1"?>
 <plugin>
    <extension-point id="commands" name="Commands" schema="schema/commands.exsd"/>
    <extension-point id="editors" name="Editors" schema="schema/editors.exsd"/>
@@ -36,12 +36,12 @@
    </extension>
    
    <extension
-   	point="org.opencherry.ui.commands">
+   	point="org.blueberry.ui.commands">
    	<command
     	name="Show View"
       	description="Shows a particular view"
-      	id="org.opencherry.ui.views.showView"
-      	defaultHandler="cherry::ShowViewHandler">
+      	id="org.blueberry.ui.views.showView"
+      	defaultHandler="berry::ShowViewHandler">
       	<commandParameter
       		id="org.eclipse.ui.views.showView.viewId"
       		name="%command.showView.viewIdParameter"
@@ -50,29 +50,29 @@
    </extension>
    
    <extension
-         point="org.opencherry.ui.views">
+         point="org.blueberry.ui.views">
       <category
             name="General"
-            id="org.opencherry.ui">
+            id="org.blueberry.ui">
       </category>
       <view
-            class="cherry::ViewIntroAdapterPart"
-            category="org.opencherry.ui"
+            class="berry::ViewIntroAdapterPart"
+            category="org.blueberry.ui"
             name="Welcome"
-            id="org.opencherry.ui.internal.introview">
+            id="org.blueberry.ui.internal.introview">
       </view>
       <stickyView
       		location="RIGHT"
-            id="org.opencherry.ui.internal.introview">
+            id="org.blueberry.ui.internal.introview">
       </stickyView>
    </extension>
    
    <extension
-         point="org.opencherry.ui.editors">
+         point="org.blueberry.ui.editors">
       <editor
-            class="cherry::EditorIntroAdapterPart"
+            class="berry::EditorIntroAdapterPart"
             name="Welcome"
-            id="org.opencherry.ui.internal.introeditor">
+            id="org.blueberry.ui.internal.introeditor">
       </editor>
    </extension>
 </plugin>

@@ -1,41 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?openCherry version="0.1"?>
+<?BlueBerry version="0.1"?>
 <plugin>
-  <extension point="org.opencherry.tests">
-    <test id="UiTestSuite" class="cherry::UiTestSuite" uitest="true"/>
+  <extension point="org.blueberry.tests">
+    <test id="UiTestSuite" class="berry::UiTestSuite" uitest="true"/>
   </extension>
   
-  <extension point="org.opencherry.ui.views">
+  <extension point="org.blueberry.ui.views">
   
       <view
             name="Mock View 1"
             icon="icons\view.gif"
-            class="cherry::MockViewPart"
-            id="org.opencherry.ui.tests.api.MockViewPart">
+            class="berry::MockViewPart"
+            id="org.blueberry.ui.tests.api.MockViewPart">
       </view>
       <view
             name="Mock View 2"
             icon="icons\view.gif"
-            class="cherry::MockViewPart"
-            id="org.opencherry.ui.tests.api.MockViewPart2">
+            class="berry::MockViewPart"
+            id="org.blueberry.ui.tests.api.MockViewPart2">
       </view>
       <view
             name="Mock View 3"
             icon="icons\view.gif"
-            class="cherry::MockViewPart"
-            id="org.opencherry.ui.tests.api.MockViewPart3">
+            class="berry::MockViewPart"
+            id="org.blueberry.ui.tests.api.MockViewPart3">
       </view>
       <view
             name="Mock View 4"
             icon="icons\view.gif"
-            class="cherry::MockViewPart"
-            id="org.opencherry.ui.tests.api.MockViewPart4">
+            class="berry::MockViewPart"
+            id="org.blueberry.ui.tests.api.MockViewPart4">
       </view>
       <view
             name="Saveable Mock View"
             icon="icons\view.gif"
-            class="cherry::SaveableMockViewPart"
-            id="org.opencherry.ui.tests.api.SaveableMockViewPart">
+            class="berry::SaveableMockViewPart"
+            id="org.blueberry.ui.tests.api.SaveableMockViewPart">
       </view>
    </extension>
 </plugin>

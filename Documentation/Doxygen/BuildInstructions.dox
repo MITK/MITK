@@ -65,7 +65,7 @@ REM Choose toolkit versions
 @SET ITK_DIR=V:\windows\x32\ITK-3.14.0_VC9.0_Bin
 @SET QT_DIR=V:\windows\x32\QT-4.5.1_VC9.0_Bin
 REM @SET BOOST_DIR=V:\windows\x32\boost REM Only needed by MBI members
-@SET OSGI_RUNTIME=%MITK_DIR%\bin\openCherry\org.opencherry.osgi
+@SET OSGI_RUNTIME=%MITK_DIR%\bin\BlueBerry\org.blueberry.osgi
 @SET CMAKE_DIR="C:\Program Files (x86)\CMake 2.6\bin"
 
 REM ----------- Setup configuration ---------------
@@ -119,7 +119,7 @@ To configure MITK do:
   - press <B>Configure</B>
   - make sure ITK_DIR, VTK_DIR and DESIRED_QT_VERSION fit your system
   - press <B>Configure</B>
-  - disable MITK_USE_OPENCHERRY if you want to use MITK as a toolkit without the application framework
+  - disable MITK_USE_BLUEBERRY if you want to use MITK as a toolkit without the application framework
   - press <B>Configure</B> twice
   - press <B>Generate</B>
   - start Visual Studio from the called command line \code C:\svn\mitkBinary>%start%  \endcode
@@ -137,7 +137,7 @@ To configure MITK do:
 
 If you have the <a href="http://www.doxygen.org">Doxygen</a> documentation tool installed, you get  a new project (Visual Studio) or "make" target named "doc". You can build this to generate the HTML documentation of MITK in the Documentation/Doxygen directory of your binary tree or in the MITK_DOXYGEN_OUTPUT_DIR if specified. See below.
 
-\section BISix Extend MITK on your own (using the application framework openCherry)
+\section BISix Extend MITK on your own (using the application framework BlueBerry)
 
 \ref NewPluginPage
 

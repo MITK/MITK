@@ -242,13 +242,13 @@ class AutoCategorize
         ".hxx",                "",
         ".c",                  "",
         
-        "org.opencherry.",     "",
+        "org.blueberry.",     "",
         "org.mitk.gui.qt.",    "",
         "org.mitk.",           "",
 
         "qmitk",               "",
         "mitk",                "",
-        "cherry",              "",
+        "berry",              "",
         "itk",                 "",
         "vtk",                 "",
         "qt",                  "",
@@ -602,7 +602,7 @@ class AutoCategorize
       if(search2p1("modules","qmitkext"))       return "ext.ui.";
       if(search2p2("modules","bundles"))        return "ext.bun.";       
 
-      if(search2p2("opencherry","bundles"))     return "blueberry.";     
+      if(search2p2("blueberry","bundles"))     return "blueberry.";     
 
       if(search2p2("core","code",false))        return "core.";
       if(search2p1("coreui","qmitk"))           return "core.ui.";

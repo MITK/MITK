@@ -19,7 +19,7 @@
 #ifndef QMITKCOMMONACTIVATOR_H_
 #define QMITKCOMMONACTIVATOR_H_
 
-#include <cherryPlugin.h>
+#include <berryPlugin.h>
 
 /**
  * \ingroup org_mitk_core_ext_internal
@@ -29,7 +29,7 @@
  * When the plug-in is started by the framework, it initializes StateMachine
  * specific things.
  */
-class QmitkCommonActivator : public cherry::Plugin
+class QmitkCommonActivator : public berry::Plugin
 {
 
 public:
@@ -37,7 +37,7 @@ public:
   /**
    * Sets default StateMachine to EventMapper.
    */
-  void Start(cherry::IBundleContext::Pointer context);
+  void Start(berry::IBundleContext::Pointer context);
 
 };
 

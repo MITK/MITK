@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?openCherry version="0.1"?>
+<?BlueBerry version="0.1"?>
 <plugin>
-  <extension point="org.opencherry.tests">
-    <test id="OSGiCoreTestSuite" class="cherry::OSGiCoreTestSuite" />
+  <extension point="org.blueberry.tests">
+    <test id="OSGiCoreTestSuite" class="berry::OSGiCoreTestSuite" />
   </extension>
 </plugin>

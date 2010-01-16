@@ -1,16 +1,16 @@
 /**
-  \defgroup org_opencherry_test org.opencherry.test Plugin
-  \ingroup openCherryPlugins
+  \defgroup org_blueberry_test org.blueberry.test Plugin
+  \ingroup BlueBerryPlugins
 
   \brief Describe your plugin here.
   
 */
 
 /**
-  \defgroup org_opencherry_test_internal Internal
-  \ingroup org_opencherry_test
+  \defgroup org_blueberry_test_internal Internal
+  \ingroup org_blueberry_test
 
-  \brief This subcategory includes the internal classes of the org.opencherry.test plugin. Other
+  \brief This subcategory includes the internal classes of the org.blueberry.test plugin. Other
   plugins must not rely on these classes. They contain implementation details and their interface
   may change at any time. We mean it.
 */

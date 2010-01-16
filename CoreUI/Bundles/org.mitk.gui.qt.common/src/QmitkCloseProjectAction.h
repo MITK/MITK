@@ -29,20 +29,20 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkQtCommonDll.h"
 
-#include <cherryIWorkbenchWindow.h>
+#include <berryIWorkbenchWindow.h>
 
 class MITK_QT_COMMON QmitkCloseProjectAction : public QAction
 {
   Q_OBJECT
 
 public:
-  QmitkCloseProjectAction(cherry::IWorkbenchWindow::Pointer window);
-  QmitkCloseProjectAction(const QIcon & icon, cherry::IWorkbenchWindow::Pointer window);
+  QmitkCloseProjectAction(berry::IWorkbenchWindow::Pointer window);
+  QmitkCloseProjectAction(const QIcon & icon, berry::IWorkbenchWindow::Pointer window);
 protected slots:
   void Run();
 
 private:
-  void init(cherry::IWorkbenchWindow::Pointer window);
-  cherry::IWorkbenchWindow::Pointer m_Window;
+  void init(berry::IWorkbenchWindow::Pointer window);
+  berry::IWorkbenchWindow::Pointer m_Window;
 };
 #endif /*QmitkCloseProjectAction_H_*/

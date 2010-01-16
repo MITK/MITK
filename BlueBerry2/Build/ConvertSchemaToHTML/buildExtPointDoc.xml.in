@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="openCherry Extension-Point Documentation" default="all"  basedir="." >
+<project name="BlueBerry Extension-Point Documentation" default="all"  basedir="." >
 
 	<path id="convertSchema-classpath">  
-	    <fileset dir="@OPENCHERRY_DOC_TOOLS_DIR@/plugins" >  
+	    <fileset dir="@BLUEBERRY_DOC_TOOLS_DIR@/plugins" >  
 	        <include name="*.jar"/>  
 	        <include name="org.eclipse.pde.build*/*.jar"/>
 	    </fileset>
-	    <fileset dir="@OPENCHERRY_DOC_TOOLS_DIR@/configuration/org.eclipse.osgi/bundles/207/1/.cp/ant_tasks" >  
+	    <fileset dir="@BLUEBERRY_DOC_TOOLS_DIR@/configuration/org.eclipse.osgi/bundles/207/1/.cp/ant_tasks" >  
 	        <include name="*.jar"/>  
 	    </fileset>
 	</path> 
@@ -23,7 +23,7 @@
 
 	<target name="convertSchemaToHtml">
 		<property name="dest" value="@XP_DOC_DESTINATION@" />
-		<!--<property name="source" value="/home/zelzer/svn/mbi/MITK_INSRC/trunk/mitk/Utilities/openCherry/Bundles" />-->
+		<!--<property name="source" value="/home/zelzer/svn/mbi/MITK_INSRC/trunk/mitk/Utilities/BlueBerry/Bundles" />-->
 		
 		<record name="${basedir}/schema_convert.txt" action="start"/>
 		

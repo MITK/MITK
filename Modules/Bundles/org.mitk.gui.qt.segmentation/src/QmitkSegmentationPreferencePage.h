@@ -19,15 +19,15 @@
 #ifndef QmitkSegmentationPreferencePage_h_included
 #define QmitkSegmentationPreferencePage_h_included
 
-#include "cherryIQtPreferencePage.h"
+#include "berryIQtPreferencePage.h"
 #include "mitkQtSegmentationDll.h"
-#include <cherryIPreferences.h>
+#include <berryIPreferences.h>
 
 class QWidget;
 class QCheckBox;
 class QRadioButton;
 
-class MITK_QT_SEGMENTATION QmitkSegmentationPreferencePage : public QObject, public cherry::IQtPreferencePage
+class MITK_QT_SEGMENTATION QmitkSegmentationPreferencePage : public QObject, public berry::IQtPreferencePage
 {
   Q_OBJECT
 
@@ -35,7 +35,7 @@ public:
 
   QmitkSegmentationPreferencePage();
 
-  void Init(cherry::IWorkbench::Pointer workbench);
+  void Init(berry::IWorkbench::Pointer workbench);
 
   void CreateQtControl(QWidget* widget);
 
@@ -69,7 +69,7 @@ protected:
 
   bool m_Initializing;
 
-  cherry::IPreferences::Pointer m_SegmentationPreferencesNode;
+  berry::IPreferences::Pointer m_SegmentationPreferencesNode;
 };
 
 #endif /* QMITKDATAMANAGERPREFERENCEPAGE_H_ */

@@ -8,7 +8,7 @@ QmitkNodeTableViewKeyFilter::QmitkNodeTableViewKeyFilter( QObject* _DataManagerV
 : QObject(_DataManagerView)
 {
   m_PreferencesService = 
-    cherry::Platform::GetServiceRegistry().GetServiceById<cherry::IPreferencesService>(cherry::IPreferencesService::ID);
+    berry::Platform::GetServiceRegistry().GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
 }
 
 bool QmitkNodeTableViewKeyFilter::eventFilter( QObject *obj, QEvent *event )
@@ -16,8 +16,8 @@ bool QmitkNodeTableViewKeyFilter::eventFilter( QObject *obj, QEvent *event )
   QmitkDataManagerView* _DataManagerView = qobject_cast<QmitkDataManagerView*>(this->parent());
   if (event->type() == QEvent::KeyPress && _DataManagerView) 
   {
-    cherry::IPreferencesService::Pointer prefService = m_PreferencesService.Lock();
-    cherry::IPreferences::Pointer nodeTableKeyPrefs = prefService->GetSystemPreferences()->Node("/DataManager/Hotkeys");
+    berry::IPreferencesService::Pointer prefService = m_PreferencesService.Lock();
+    berry::IPreferences::Pointer nodeTableKeyPrefs = prefService->GetSystemPreferences()->Node("/DataManager/Hotkeys");
 
     QKeySequence _MakeAllInvisible = QKeySequence(QString::fromStdString(nodeTableKeyPrefs->Get("Make all nodes invisible", "Ctrl+, V")));
     QKeySequence _ToggleVisibility = QKeySequence(QString::fromStdString(nodeTableKeyPrefs->Get("Toggle visibility of selected nodes", "V")));

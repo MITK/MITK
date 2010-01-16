@@ -3,18 +3,18 @@ SET(SRC_CPP_FILES
 )
 
 SET(INTERNAL_CPP_FILES
-  cherryObjectBrowserView.cpp
-  cherryObjectItem.cpp
-  cherryQtObjectTableModel.cpp
+  berryObjectBrowserView.cpp
+  berryObjectItem.cpp
+  berryQtObjectTableModel.cpp
 )
 
 SET(UI_FILES
-  src/internal/cherryQtObjectBrowserView.ui
+  src/internal/berryQtObjectBrowserView.ui
 )
 
 SET(MOC_H_FILES
-  src/internal/cherryObjectBrowserView.h
-  src/internal/cherryQtObjectTableModel.h
+  src/internal/berryObjectBrowserView.h
+  src/internal/berryQtObjectTableModel.h
 )
 
 SET(RESOURCE_FILES
@@ -22,7 +22,7 @@ SET(RESOURCE_FILES
 )
 
 SET(RES_FILES
-  resources/opencherry_ui_qt_objectinspector.qrc
+  resources/blueberry_ui_qt_objectinspector.qrc
 )
 
 SET(CPP_FILES manifest.cpp)

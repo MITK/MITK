@@ -68,9 +68,9 @@ Under-the-hood changes:
   - Added properties for annotating and clipping datasets in 3D windows
 - several bug fixes, more testing and minor improvements
 - EXPERIMENTAL: Qt4 based application platform based on OSGi and the Eclipse RCP,
-    called openCherry. If you want to build modular, service oriented applications
-    you can use openCherry as your application platform. Build the platform by
-    setting "BUILD_OPENCHERRY=TRUE" (default is FALSE). You are strongly advised
+    called BlueBerry. If you want to build modular, service oriented applications
+    you can use BlueBerry as your application platform. Build the platform by
+    setting "BUILD_BLUEBERRY=TRUE" (default is FALSE). You are strongly advised
     to regularly update to the SVN HEAD revision since the platform is
     experimental and is being intensively worked on. Use the mitk mailinglist for
     questions - tutorials and documentation will be provided in the near future.

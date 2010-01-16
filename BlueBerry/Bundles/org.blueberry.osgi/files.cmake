@@ -1,48 +1,48 @@
 SET(EVENT_CPP_FILES
-  cherryBundleEvent.cpp
-  cherryPlatformEvent.cpp
+  berryBundleEvent.cpp
+  berryPlatformEvent.cpp
 )
 
 SET(INTERNAL_CPP_FILES
-  cherryBundle.cpp
-  cherryBundleContext.cpp
-  cherryBundleDirectory.cpp
-  cherryBundleManifest.cpp
-  cherryCodeCache.cpp
-  cherryDefaultActivator.cpp
-  cherryConfigurationElement.cpp
-  cherryExtension.cpp
-  cherryExtensionPoint.cpp
-  cherryExtensionPointService.cpp
-  cherryInternalPlatform.cpp
-  cherryPlatformLogChannel.cpp
-  cherrySystemBundle.cpp
-  cherrySystemBundleActivator.cpp
+  berryBundle.cpp
+  berryBundleContext.cpp
+  berryBundleDirectory.cpp
+  berryBundleManifest.cpp
+  berryCodeCache.cpp
+  berryDefaultActivator.cpp
+  berryConfigurationElement.cpp
+  berryExtension.cpp
+  berryExtensionPoint.cpp
+  berryExtensionPointService.cpp
+  berryInternalPlatform.cpp
+  berryPlatformLogChannel.cpp
+  berrySystemBundle.cpp
+  berrySystemBundleActivator.cpp
 )
 
 SET(SERVICE_CPP_FILES
-  cherryIExtensionPointService.cpp
-  cherryService.cpp
-  cherryServiceRegistry.cpp
+  berryIExtensionPointService.cpp
+  berryService.cpp
+  berryServiceRegistry.cpp
 )
 
 SET(SRC_CPP_FILES
-  cherryDebugBreakpointManager.cpp
-  cherryException.cpp
-  cherryIBundleManifest.cpp
-  cherryIDebugObjectListener.cpp
-  cherryBundleLoader.cpp
-  cherryDebugUtil.cpp
-  cherryObject.cpp
-  cherryObjects.cpp
-  cherryPlatform.cpp
-  cherryPlatformException.cpp
-  cherryPlugin.cpp
-  cherryStackTrace.cpp
+  berryDebugBreakpointManager.cpp
+  berryException.cpp
+  berryIBundleManifest.cpp
+  berryIDebugObjectListener.cpp
+  berryBundleLoader.cpp
+  berryDebugUtil.cpp
+  berryObject.cpp
+  berryObjects.cpp
+  berryPlatform.cpp
+  berryPlatformException.cpp
+  berryPlugin.cpp
+  berryStackTrace.cpp
   
   # application
-  application/cherryIApplication.cpp
-  application/cherryStarter.cpp
+  application/berryIApplication.cpp
+  application/berryStarter.cpp
 )
 
 SET(CPP_FILES manifest.cpp)

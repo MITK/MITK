@@ -1,6 +1,6 @@
 MACRO(_MACRO_CREATE_QT_COMPRESSED_HELP qch_file)
    
-  CONFIGURE_FILE(${openCherry_SOURCE_DIR}/CMake/cherryQtHelpDoxygen.conf.in
+  CONFIGURE_FILE(${BlueBerry_SOURCE_DIR}/CMake/berryQtHelpDoxygen.conf.in
                  ${PLUGIN_DOXYGEN_OUTPUT_DIR}/doxygen.conf
                  )
 

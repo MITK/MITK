@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?openCherry version="0.1"?>
+<?BlueBerry version="0.1"?>
 <plugin>
-  <extension-point id="org.opencherry.tests" name="Unit Tests" schema="schema/tests.exsd"/>
+  <extension-point id="org.blueberry.tests" name="Unit Tests" schema="schema/tests.exsd"/>
   
-  <extension point="org.opencherry.osgi.applications">
+  <extension point="org.blueberry.osgi.applications">
     <application id="coretestapplication">
-      <run class="cherry::CoreTestApplication"/>
+      <run class="berry::CoreTestApplication"/>
     </application>
   </extension>
   </plugin>

@@ -18,24 +18,24 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef QMITKEXTWORKBENCHWINDOWADVISOR_H_
 #define QMITKEXTWORKBENCHWINDOWADVISOR_H_
 
-#include <cherryWorkbenchWindowAdvisor.h>
+#include <berryWorkbenchWindowAdvisor.h>
 
-#include <cherryIPartListener.h>
-#include <cherryIEditorPart.h>
-#include <cherryIWorkbenchPage.h>
-#include <cherryWorkbenchAdvisor.h>
+#include <berryIPartListener.h>
+#include <berryIEditorPart.h>
+#include <berryIWorkbenchPage.h>
+#include <berryWorkbenchAdvisor.h>
 
 #include "mitkQtCommonExtDll.h"
 
-class MITK_QT_COMMON_EXT_EXPORT QmitkExtWorkbenchWindowAdvisor : public cherry::WorkbenchWindowAdvisor
+class MITK_QT_COMMON_EXT_EXPORT QmitkExtWorkbenchWindowAdvisor : public berry::WorkbenchWindowAdvisor
 {
 public:
 
-    QmitkExtWorkbenchWindowAdvisor(cherry::WorkbenchAdvisor* wbAdvisor,
-        cherry::IWorkbenchWindowConfigurer::Pointer configurer);
+    QmitkExtWorkbenchWindowAdvisor(berry::WorkbenchAdvisor* wbAdvisor,
+        berry::IWorkbenchWindowConfigurer::Pointer configurer);
 
-    cherry::ActionBarAdvisor::Pointer CreateActionBarAdvisor(
-        cherry::IActionBarConfigurer::Pointer configurer);
+    berry::ActionBarAdvisor::Pointer CreateActionBarAdvisor(
+        berry::IActionBarConfigurer::Pointer configurer);
 
     void PostWindowCreate();
 
@@ -56,7 +56,7 @@ private:
    *
    * @param configurer
    */
-  void HookTitleUpdateListeners(cherry::IWorkbenchWindowConfigurer::Pointer configurer);
+  void HookTitleUpdateListeners(berry::IWorkbenchWindowConfigurer::Pointer configurer);
 
   std::string ComputeTitle();
 
@@ -69,22 +69,22 @@ private:
    */
   void UpdateTitle(bool editorHidden);
 
-  void PropertyChange(cherry::Object::Pointer source, int propId);
+  void PropertyChange(berry::Object::Pointer source, int propId);
 
-  cherry::IPartListener::Pointer titlePartListener;
-  cherry::IPerspectiveListener::Pointer titlePerspectiveListener;
-  cherry::IPropertyChangeListener::Pointer editorPropertyListener;
-  friend struct cherry::PropertyChangeIntAdapter<QmitkExtWorkbenchWindowAdvisor>;
+  berry::IPartListener::Pointer titlePartListener;
+  berry::IPerspectiveListener::Pointer titlePerspectiveListener;
+  berry::IPropertyChangeListener::Pointer editorPropertyListener;
+  friend struct berry::PropertyChangeIntAdapter<QmitkExtWorkbenchWindowAdvisor>;
   friend class PartListenerForTitle;
   friend class PerspectiveListenerForTitle;
 
-  cherry::IEditorPart::WeakPtr lastActiveEditor;
-  cherry::IPerspectiveDescriptor::WeakPtr lastPerspective;
-  cherry::IWorkbenchPage::WeakPtr lastActivePage;
+  berry::IEditorPart::WeakPtr lastActiveEditor;
+  berry::IPerspectiveDescriptor::WeakPtr lastPerspective;
+  berry::IWorkbenchPage::WeakPtr lastActivePage;
   std::string lastEditorTitle;
-  cherry::IAdaptable* lastInput;
+  berry::IAdaptable* lastInput;
 
-  cherry::WorkbenchAdvisor* wbAdvisor;
+  berry::WorkbenchAdvisor* wbAdvisor;
   bool showViewToolbar;
   bool showVersionInfo;
   std::string productName;

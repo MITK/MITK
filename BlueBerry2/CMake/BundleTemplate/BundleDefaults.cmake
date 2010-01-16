@@ -1,17 +1,17 @@
-SET(BUNDLE_NAMESPACE "cherry")
-SET(DEFAULT_REQUIRED_BUNDLES "org.opencherry.osgi")
-SET(DEFAULT_REQUIRED_BUNDLES_FOR_GUI "org.opencherry.ui.qt")
-SET(DEFAULT_VIEW_BASE_CLASS "cherry::QtViewPart")#qt
-SET(DEFAULT_VIEW_BASE_CLASS_H "cherryQtViewPart.h")#qt)
-SET(PROJECT_STATIC_VAR "CHERRY_STATIC")
-SET(DOXYGEN_INGROUP "openCherryPlugins")
+SET(BUNDLE_NAMESPACE "berry")
+SET(DEFAULT_REQUIRED_BUNDLES "org.blueberry.osgi")
+SET(DEFAULT_REQUIRED_BUNDLES_FOR_GUI "org.blueberry.ui.qt")
+SET(DEFAULT_VIEW_BASE_CLASS "berry::QtViewPart")#qt
+SET(DEFAULT_VIEW_BASE_CLASS_H "berryQtViewPart.h")#qt)
+SET(PROJECT_STATIC_VAR "BERRY_STATIC")
+SET(DOXYGEN_INGROUP "BlueBerryPlugins")
 
 SET(DEFAULT_CREATE_PLUGIN_MACRO "MACRO_CREATE_PLUGIN()")
 SET(DEFAULT_CREATE_GUI_PLUGIN_MACRO "MACRO_CREATE_QT_PLUGIN()")
 
 SET(PLUGIN_COPYRIGHT "/*=========================================================================
  
-Program:   openCherry Platform
+Program:   BlueBerry Platform
 Language:  C++
 Date:      $Date: 2008-06-13 21:02:28 +0200 (Fr, 13 Jun 2008) $
 Version:   $Revision: 14620 $

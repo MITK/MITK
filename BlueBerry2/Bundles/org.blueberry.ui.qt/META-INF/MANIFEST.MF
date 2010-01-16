@@ -3,5 +3,5 @@ Bundle-Name: BlueBerry Qt User Interface Plugin
 Bundle-SymbolicName: org.blueberry.ui.qt
 Bundle-Version: 1.0.0
 Bundle-Vendor: DKFZ, Medical and Biological Informatics
-Bundle-Activator: cherry::QtPluginActivator
+Bundle-Activator: berry::QtPluginActivator
 Require-Bundle: org.blueberry.ui

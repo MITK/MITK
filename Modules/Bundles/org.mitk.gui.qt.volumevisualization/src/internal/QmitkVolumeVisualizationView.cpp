@@ -19,10 +19,10 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <QComboBox>
 
-#include <cherryISelectionProvider.h>
-#include <cherryISelectionService.h>
-#include <cherryIWorkbenchWindow.h>
-//#include <cherryISelectionService.h>
+#include <berryISelectionProvider.h>
+#include <berryISelectionService.h>
+#include <berryIWorkbenchWindow.h>
+//#include <berryISelectionService.h>
 #include <mitkDataTreeNodeObject.h>
 
 #include <mitkProperties.h>
@@ -48,7 +48,7 @@ QmitkVolumeVisualizationView::QmitkVolumeVisualizationView()
 
 QmitkVolumeVisualizationView::~QmitkVolumeVisualizationView()
 {
-  cherry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
+  berry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
   if(s)
     s->RemoveSelectionListener(m_SelectionListener);
 
@@ -81,9 +81,9 @@ void QmitkVolumeVisualizationView::CreateQtPartControl(QWidget* parent)
     
   }
   
-  m_SelectionListener = cherry::ISelectionListener::Pointer(new cherry::SelectionChangedAdapter<QmitkVolumeVisualizationView>
+  m_SelectionListener = berry::ISelectionListener::Pointer(new berry::SelectionChangedAdapter<QmitkVolumeVisualizationView>
     (this, &QmitkVolumeVisualizationView::SelectionChanged));
-  cherry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
+  berry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
   if(s)
     s->AddSelectionListener(m_SelectionListener);
     
@@ -91,7 +91,7 @@ void QmitkVolumeVisualizationView::CreateQtPartControl(QWidget* parent)
 }
 
 
-void QmitkVolumeVisualizationView::SelectionChanged( cherry::IWorkbenchPart::Pointer, cherry::ISelection::ConstPointer selection )
+void QmitkVolumeVisualizationView::SelectionChanged( berry::IWorkbenchPart::Pointer, berry::ISelection::ConstPointer selection )
 { 
   //if(!this->m_IsVisible)
     //return;
@@ -173,8 +173,8 @@ void QmitkVolumeVisualizationView::SelectionChanged( cherry::IWorkbenchPart::Poi
 void QmitkVolumeVisualizationView::UpdateFromCurrentDataManagerSelection()
 {
   //MITK_INFO << "Update selection from DataManager";
-  cherry::ISelection::ConstPointer selection( this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection("org.mitk.views.datamanager"));
-  this->SelectionChanged(cherry::SmartPointer<IWorkbenchPart>(NULL), selection);
+  berry::ISelection::ConstPointer selection( this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection("org.mitk.views.datamanager"));
+  this->SelectionChanged(berry::SmartPointer<IWorkbenchPart>(NULL), selection);
 }
 
 void QmitkVolumeVisualizationView::UpdateInterface()

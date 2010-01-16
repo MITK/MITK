@@ -39,7 +39,7 @@ ELSE()
   SET(MITK_SVN_REVISION "")
 ENDIF()
 
-IF (OPENCHERRY_USE_QT_HELP)
+IF (BLUEBERRY_USE_QT_HELP)
   SET(_plugin_qhcp_input "${CMAKE_CURRENT_SOURCE_DIR}/documentation/MitkExtQtHelpCollectionProject.qhcp")
   SET(_plugin_qhcp_output "${PLUGIN_OUTPUT_DIR}/resources/MitkExtQtHelpCollection${MITK_SVN_REVISION}.qhc")
   ADD_CUSTOM_COMMAND(OUTPUT ${_plugin_qhcp_output}

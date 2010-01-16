@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?openCherry version="0.1"?>
+<?BlueBerry version="0.1"?>
 <plugin>
-  <extension point="org.opencherry.osgi.applications">
+  <extension point="org.blueberry.osgi.applications">
     <application id="uitestapplication">
-      <run class="cherry::UITestApplication"/>
+      <run class="berry::UITestApplication"/>
     </application>
   </extension>
   
-  <extension point="org.opencherry.ui.perspectives">
+  <extension point="org.blueberry.ui.perspectives">
       <perspective
             name="Performance Empty Perspective"
-            class="cherry::EmptyPerspective"
-            id="org.opencherry.uitest.util.EmptyPerspective">
+            class="berry::EmptyPerspective"
+            id="org.blueberry.uitest.util.EmptyPerspective">
       </perspective>
       <perspective
             name="Performance Empty Perspective 2"
-            class="cherry::EmptyPerspective"
-            id="org.opencherry.uitest.util.EmptyPerspective2">
+            class="berry::EmptyPerspective"
+            id="org.blueberry.uitest.util.EmptyPerspective2">
       </perspective>
 	</extension>
 </plugin>

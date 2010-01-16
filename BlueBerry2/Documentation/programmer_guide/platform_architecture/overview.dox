@@ -4,7 +4,7 @@
 \ingroup PlatformArchitecture
 
 <p>
-The openCherry platform is structured around the concept of <b>plug-ins</b>. Plug-ins are structured bundles of code and/or data that contribute function to the system. Function can be contributed in the form of code libraries (exported C/C++ code in shared libraries), platform <b>extensions</b>, or even documentation. Plug-ins can define <b>extension-points</b>, well-defined places where other plug-ins can add functionality.
+The BlueBerry platform is structured around the concept of <b>plug-ins</b>. Plug-ins are structured bundles of code and/or data that contribute function to the system. Function can be contributed in the form of code libraries (exported C/C++ code in shared libraries), platform <b>extensions</b>, or even documentation. Plug-ins can define <b>extension-points</b>, well-defined places where other plug-ins can add functionality.
 </p>
 
 <p>

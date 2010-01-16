@@ -22,8 +22,8 @@
 #include <QFormLayout>
 #include <QCheckBox>
 
-#include <cherryIPreferencesService.h>
-#include <cherryPlatform.h>
+#include <berryIPreferencesService.h>
+#include <berryPlatform.h>
 
 QmitkDataManagerPreferencePage::QmitkDataManagerPreferencePage()
 : m_MainControl(0)
@@ -31,16 +31,16 @@ QmitkDataManagerPreferencePage::QmitkDataManagerPreferencePage()
 
 }
 
-void QmitkDataManagerPreferencePage::Init(cherry::IWorkbench::Pointer )
+void QmitkDataManagerPreferencePage::Init(berry::IWorkbench::Pointer )
 {
 
 }
 
 void QmitkDataManagerPreferencePage::CreateQtControl(QWidget* parent)
 {
-  cherry::IPreferencesService::Pointer prefService 
-    = cherry::Platform::GetServiceRegistry()
-    .GetServiceById<cherry::IPreferencesService>(cherry::IPreferencesService::ID);
+  berry::IPreferencesService::Pointer prefService 
+    = berry::Platform::GetServiceRegistry()
+    .GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
 
   m_DataManagerPreferencesNode = prefService->GetSystemPreferences()->Node("/DataManager");
 

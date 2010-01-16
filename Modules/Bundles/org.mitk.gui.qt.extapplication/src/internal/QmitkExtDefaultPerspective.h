@@ -19,12 +19,12 @@
 #ifndef QMITKEXTDEFAULTPERSPECTIVE_H_
 #define QMITKEXTDEFAULTPERSPECTIVE_H_
 
-#include <cherryIPerspectiveFactory.h>
+#include <berryIPerspectiveFactory.h>
 
-struct QmitkExtDefaultPerspective : public cherry::IPerspectiveFactory
+struct QmitkExtDefaultPerspective : public berry::IPerspectiveFactory
 {
 
-  void CreateInitialLayout(cherry::IPageLayout::Pointer layout);
+  void CreateInitialLayout(berry::IPageLayout::Pointer layout);
 
 };
 

@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkQtCommonDll.h"
 
-#include <cherryIWorkbenchWindow.h>
+#include <berryIWorkbenchWindow.h>
 
 class MITK_QT_COMMON QmitkFileExitAction : public QAction
 {
@@ -30,7 +30,7 @@ class MITK_QT_COMMON QmitkFileExitAction : public QAction
 
 public:
 
-  QmitkFileExitAction(cherry::IWorkbenchWindow::Pointer window);
+  QmitkFileExitAction(berry::IWorkbenchWindow::Pointer window);
 
 protected slots:
 
@@ -38,7 +38,7 @@ protected slots:
 
 private:
 
-  cherry::IWorkbenchWindow::Pointer m_Window;
+  berry::IWorkbenchWindow::Pointer m_Window;
 };
 
 

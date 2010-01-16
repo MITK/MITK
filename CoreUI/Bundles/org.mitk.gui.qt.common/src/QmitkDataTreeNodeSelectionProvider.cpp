@@ -19,12 +19,12 @@
 #include "internal/QmitkDataTreeNodeSelection.h"
 
 QmitkDataTreeNodeSelectionProvider::QmitkDataTreeNodeSelectionProvider()
- : cherry::QtSelectionProvider()
+ : berry::QtSelectionProvider()
 {
 
 }
 
-cherry::ISelection::ConstPointer QmitkDataTreeNodeSelectionProvider::GetSelection() const
+berry::ISelection::ConstPointer QmitkDataTreeNodeSelectionProvider::GetSelection() const
 {
   return this->GetDataTreeNodeSelection();
 }
@@ -45,8 +45,8 @@ QmitkDataTreeNodeSelectionProvider::GetDataTreeNodeSelection() const
 void QmitkDataTreeNodeSelectionProvider::FireSelectionChanged(
     const QItemSelection&  /*selected*/, const QItemSelection&  /*deselected*/)
 {
-  cherry::ISelection::ConstPointer sel(this->GetDataTreeNodeSelection());
-  cherry::SelectionChangedEvent::Pointer event(new cherry::SelectionChangedEvent(
-      cherry::ISelectionProvider::Pointer(this), sel));
+  berry::ISelection::ConstPointer sel(this->GetDataTreeNodeSelection());
+  berry::SelectionChangedEvent::Pointer event(new berry::SelectionChangedEvent(
+      berry::ISelectionProvider::Pointer(this), sel));
   selectionEvents.selectionChanged(event);
 }

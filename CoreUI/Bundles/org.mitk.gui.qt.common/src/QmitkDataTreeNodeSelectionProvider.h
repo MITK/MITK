@@ -21,18 +21,18 @@
 
 #include "mitkQtCommonDll.h"
 
-#include <cherryQtSelectionProvider.h>
+#include <berryQtSelectionProvider.h>
 #include <mitkDataTreeNodeSelection.h>
 
-class MITK_QT_COMMON QmitkDataTreeNodeSelectionProvider : public cherry::QtSelectionProvider
+class MITK_QT_COMMON QmitkDataTreeNodeSelectionProvider : public berry::QtSelectionProvider
 {
 public:
 
-  cherryObjectMacro(QmitkDataTreeNodeSelectionProvider)
+  berryObjectMacro(QmitkDataTreeNodeSelectionProvider)
 
   QmitkDataTreeNodeSelectionProvider();
 
-  cherry::ISelection::ConstPointer GetSelection() const;
+  berry::ISelection::ConstPointer GetSelection() const;
 
 protected:
 

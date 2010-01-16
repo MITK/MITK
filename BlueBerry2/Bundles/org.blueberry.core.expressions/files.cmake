@@ -1,38 +1,38 @@
 SET(SRC_CPP_FILES
-  cherryElementHandler.cpp
-  cherryEvaluationContext.cpp
-  cherryEvaluationResult.cpp
-  cherryExpression.cpp
-  cherryExpressionConverter.cpp
-  cherryExpressionInfo.cpp
-  cherryExpressionTagNames.cpp
-  cherryPropertyTester.cpp
+  berryElementHandler.cpp
+  berryEvaluationContext.cpp
+  berryEvaluationResult.cpp
+  berryExpression.cpp
+  berryExpressionConverter.cpp
+  berryExpressionInfo.cpp
+  berryExpressionTagNames.cpp
+  berryPropertyTester.cpp
 )
 
 SET(INTERNAL_CPP_FILES
-  cherryAdaptExpression.cpp
-  cherryAndExpression.cpp
-  cherryCompositeExpression.cpp
-  cherryCountExpression.cpp
-  cherryDefaultVariable.cpp
-  cherryDefinitionRegistry.cpp
-  cherryEnablementExpression.cpp
-  cherryEqualsExpression.cpp
-  cherryExpressions.cpp
-  cherryInstanceofExpression.cpp
-  cherryIterateExpression.cpp
-  cherryNotExpression.cpp
-  cherryOrExpression.cpp
-  cherryProperty.cpp
-  cherryPropertyTesterDescriptor.cpp
-  cherryReferenceExpression.cpp
-  cherryResolveExpression.cpp
-  cherryStandardElementHandler.cpp
-  cherrySystemTestExpression.cpp
-  cherryTestExpression.cpp
-  cherryTypeExtension.cpp
-  cherryTypeExtensionManager.cpp
-  cherryWithExpression.cpp
+  berryAdaptExpression.cpp
+  berryAndExpression.cpp
+  berryCompositeExpression.cpp
+  berryCountExpression.cpp
+  berryDefaultVariable.cpp
+  berryDefinitionRegistry.cpp
+  berryEnablementExpression.cpp
+  berryEqualsExpression.cpp
+  berryExpressions.cpp
+  berryInstanceofExpression.cpp
+  berryIterateExpression.cpp
+  berryNotExpression.cpp
+  berryOrExpression.cpp
+  berryProperty.cpp
+  berryPropertyTesterDescriptor.cpp
+  berryReferenceExpression.cpp
+  berryResolveExpression.cpp
+  berryStandardElementHandler.cpp
+  berrySystemTestExpression.cpp
+  berryTestExpression.cpp
+  berryTypeExtension.cpp
+  berryTypeExtensionManager.cpp
+  berryWithExpression.cpp
 )
 
 foreach(file ${SRC_CPP_FILES})

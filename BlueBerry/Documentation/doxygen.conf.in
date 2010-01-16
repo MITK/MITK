@@ -3,9 +3,9 @@
 #---------------------------------------------------------------------------
 # General configuration options
 #---------------------------------------------------------------------------
-PROJECT_NAME           = openCherry
-PROJECT_NUMBER         = @OPENCHERRY_VERSION_STRING@
-OUTPUT_DIRECTORY       = @OPENCHERRY_DOXYGEN_OUTPUT_DIR@
+PROJECT_NAME           = BlueBerry
+PROJECT_NUMBER         = @BLUEBERRY_VERSION_STRING@
+OUTPUT_DIRECTORY       = @BLUEBERRY_DOXYGEN_OUTPUT_DIR@
 OUTPUT_LANGUAGE        = English
 EXTRACT_ALL            = YES
 EXTRACT_PRIVATE        = NO
@@ -58,7 +58,7 @@ WARN_LOGFILE           =
 # configuration options related to the input files
 #---------------------------------------------------------------------------
 INPUT                  = ./ \
-                         @OPENCHERRY_SOURCE_DIR@/Documentation/ \
+                         @BLUEBERRY_SOURCE_DIR@/Documentation/ \
                          @_doxygen_bundles@ \
                          @_doxygen_qt4bundles@ \
                          @_doxygen_binary_bundles@ \
@@ -76,7 +76,7 @@ EXCLUDE_PATTERNS       = moc_* \
 EXAMPLE_PATH           = 
 EXAMPLE_PATTERNS       = 
 EXAMPLE_RECURSIVE      = NO
-IMAGE_PATH             = @OPENCHERRY_SOURCE_DIR@ 
+IMAGE_PATH             = @BLUEBERRY_SOURCE_DIR@ 
 INPUT_FILTER           = 
 FILTER_SOURCE_FILES    = NO
 #---------------------------------------------------------------------------
@@ -192,7 +192,7 @@ SKIP_FUNCTION_MACROS   = YES
 # Configuration::additions related to external references   
 #---------------------------------------------------------------------------
 TAGFILES               = 
-GENERATE_TAGFILE       = @OPENCHERRY_DOXYGEN_OUTPUT_DIR@/openCherry.tag
+GENERATE_TAGFILE       = @BLUEBERRY_DOXYGEN_OUTPUT_DIR@/BlueBerry.tag
 ALLEXTERNALS           = NO
 EXTERNAL_GROUPS        = YES
 PERL_PATH              = /usr/bin/perl

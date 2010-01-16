@@ -1,5 +1,5 @@
 SET(SRC_CPP_FILES
-  cherrySingleNodeSelection.cpp
+  berrySingleNodeSelection.cpp
   QmitkDataManagerView.cpp 
   QmitkDataManagerPreferencePage.cpp
   QmitkDataManagerHotkeysPrefPage.cpp

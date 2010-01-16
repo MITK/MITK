@@ -1,6 +1,6 @@
 /*=========================================================================
  
- Program:   openCherry Platform
+ Program:   BlueBerry Platform
  Language:  C++
  Date:      $Date: 2009-09-07 12:05:58 +0200 (Mo, 07 Sep 2009) $
  Version:   $Revision: 18832 $
@@ -17,8 +17,8 @@
 
 #include <Poco/ClassLibrary.h>
 
-#include "src/cherryCoreRuntimeTestSuite.h"
+#include "src/berryCoreRuntimeTestSuite.h"
 
 POCO_BEGIN_NAMED_MANIFEST(CppUnitTest, CppUnit::Test)
-  POCO_EXPORT_CLASS(cherry::CoreRuntimeTestSuite)
+  POCO_EXPORT_CLASS(berry::CoreRuntimeTestSuite)
 POCO_END_MANIFEST

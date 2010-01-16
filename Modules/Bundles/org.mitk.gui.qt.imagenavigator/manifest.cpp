@@ -22,6 +22,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "src/internal/QmitkImageNavigatorView.h"
 
-POCO_BEGIN_NAMED_MANIFEST(cherryIViewPart, cherry::IViewPart)
+POCO_BEGIN_NAMED_MANIFEST(berryIViewPart, berry::IViewPart)
   POCO_EXPORT_CLASS(::QmitkImageNavigatorView)
 POCO_END_MANIFEST

@@ -1,6 +1,6 @@
 /*=========================================================================
  
-Program:   openCherry Platform
+Program:   BlueBerry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
@@ -30,7 +30,7 @@ const std::string IBundleManifest::BUNDLE_SYMBOLICNAME = "Bundle-SymbolicName";
 const std::string IBundleManifest::BUNDLE_VENDOR = "Bundle-Vendor";
 const std::string IBundleManifest::BUNDLE_VERSION = "Bundle-Version";
 const std::string IBundleManifest::MANIFEST_VERSION = "Manifest-Version";
-const std::string IBundleManifest::SYSTEM_BUNDLE = "Cherry-SystemBundle";
+const std::string IBundleManifest::SYSTEM_BUNDLE = "Berry-SystemBundle";
 const std::string IBundleManifest::REQUIRE_BUNDLE = "Require-Bundle";
 
  

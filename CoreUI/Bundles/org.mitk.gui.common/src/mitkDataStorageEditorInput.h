@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKDATASTORAGEEDITORINPUT_H_
 #define MITKDATASTORAGEEDITORINPUT_H_
 
-#include <cherryIEditorInput.h>
+#include <berryIEditorInput.h>
 #include <mitkIDataStorageReference.h>
 
 #include "mitkGUICommonPluginDll.h"
@@ -26,10 +26,10 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk
 {
 
-class MITK_GUI_COMMON_PLUGIN DataStorageEditorInput : public cherry::IEditorInput
+class MITK_GUI_COMMON_PLUGIN DataStorageEditorInput : public berry::IEditorInput
 {
 public:
-  cherryObjectMacro(DataStorageEditorInput);
+  berryObjectMacro(DataStorageEditorInput);
 
   bool Exists() const;
   std::string GetName() const;
@@ -37,7 +37,7 @@ public:
 
   IDataStorageReference::Pointer GetDataStorageReference();
 
-  bool operator==(const cherry::Object*) const;
+  bool operator==(const berry::Object*) const;
 
 private:
 

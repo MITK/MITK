@@ -1,4 +1,4 @@
-PROJECT(openCherry)
+PROJECT(BlueBerry)
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
 SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/CMake/")
@@ -6,7 +6,7 @@ SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/CMake/")
 INCLUDE(MacroParseArguments)
 INCLUDE(MacroConvertSchema)
 INCLUDE(MacroOrganizeSources)
-INCLUDE(cherryPluginHelpers)
+INCLUDE(berryPluginHelpers)
 INCLUDE(MacroCollectPlugins)
 INCLUDE(MacroParseManifest)
 INCLUDE(MacroCreatePlugin)
@@ -25,18 +25,18 @@ ENDIF ()
 FIND_PACKAGE(mbilog REQUIRED)
 INCLUDE_DIRECTORIES(${mbilog_INCLUDE_DIRS})
 
-OPTION(OPENCHERRY_USE_QT "Use the Qt GUI toolkit" OFF)
+OPTION(BLUEBERRY_USE_QT "Use the Qt GUI toolkit" OFF)
 
 IF(NOT DESIRED_QT_VERSION)
   SET(DESIRED_QT_VERSION 4 CACHE STRING "Desired Qt version" FORCE)
   MARK_AS_ADVANCED(DESIRED_QT_VERSION)
 ENDIF()
 
-IF(OPENCHERRY_USE_QT AND NOT DESIRED_QT_VERSION EQUAL 4)
-  MESSAGE("Attention: Qt4 is required to build the openCherry Qt plug-ins.")
+IF(BLUEBERRY_USE_QT AND NOT DESIRED_QT_VERSION EQUAL 4)
+  MESSAGE("Attention: Qt4 is required to build the BlueBerry Qt plug-ins.")
 ENDIF()
 
-IF(OPENCHERRY_USE_QT AND DESIRED_QT_VERSION EQUAL 4)
+IF(BLUEBERRY_USE_QT AND DESIRED_QT_VERSION EQUAL 4)
   SET(QT_MT_REQUIRED 1)
   SET(BUILD_QT_PLUGINS 1)
   FIND_PACKAGE(Qt REQUIRED)
@@ -65,15 +65,15 @@ IF(OPENCHERRY_USE_QT AND DESIRED_QT_VERSION EQUAL 4)
     NO_DEFAULT_PATH
   )
   
-  OPTION(OPENCHERRY_USE_QT_HELP "Enable support for integrating bundle documentation into Qt Help" ON)
+  OPTION(BLUEBERRY_USE_QT_HELP "Enable support for integrating bundle documentation into Qt Help" ON)
   
-  MARK_AS_ADVANCED(OPENCHERRY_USE_QT_HELP 
+  MARK_AS_ADVANCED(BLUEBERRY_USE_QT_HELP 
                    QT_HELPGENERATOR_EXECUTABLE 
                    QT_COLLECTIONGENERATOR_EXECUTABLE
                    QT_ASSISTANT_EXECUTABLE)
   
   SET(_doxygen_too_old 1)
-  IF(OPENCHERRY_USE_QT_HELP)
+  IF(BLUEBERRY_USE_QT_HELP)
     FIND_PACKAGE(Doxygen)
     IF(DOXYGEN_FOUND)
       EXECUTE_PROCESS(COMMAND ${DOXYGEN_EXECUTABLE} --version
@@ -84,64 +84,64 @@ IF(OPENCHERRY_USE_QT AND DESIRED_QT_VERSION EQUAL 4)
     ENDIF()
   ENDIF()
   
-  IF (OPENCHERRY_USE_QT_HELP AND _doxygen_too_old)
-    MESSAGE("Doxygen was not found or is too old. Version 1.5.8 or later is needed if OPENCHERRY_USE_QT_HELP is ON")
-    SET(OPENCHERRY_USE_QT_HELP OFF CACHE BOOL "Enable support for integrating bundle documentation into Qt Help" FORCE)
+  IF (BLUEBERRY_USE_QT_HELP AND _doxygen_too_old)
+    MESSAGE("Doxygen was not found or is too old. Version 1.5.8 or later is needed if BLUEBERRY_USE_QT_HELP is ON")
+    SET(BLUEBERRY_USE_QT_HELP OFF CACHE BOOL "Enable support for integrating bundle documentation into Qt Help" FORCE)
   ENDIF()
   
-  IF(OPENCHERRY_USE_QT_HELP AND NOT QT_HELPGENERATOR_EXECUTABLE)
+  IF(BLUEBERRY_USE_QT_HELP AND NOT QT_HELPGENERATOR_EXECUTABLE)
     MESSAGE("You have enabled Qt Help support, but QT_HELPGENERATOR_EXECUTABLE is empty")
-    SET(OPENCHERRY_USE_QT_HELP OFF CACHE BOOL "Enable support for integrating bundle documentation into Qt Help" FORCE)
+    SET(BLUEBERRY_USE_QT_HELP OFF CACHE BOOL "Enable support for integrating bundle documentation into Qt Help" FORCE)
   ENDIF()
   
   INCLUDE(${QT_USE_FILE})
 ENDIF()
 
-OPTION(OPENCHERRY_BUILD_ALL_PLUGINS "Build all openCherry plugins (overriding selection)" OFF)
-MARK_AS_ADVANCED(BUILD_ALL_OPENCHERRY_PLUGINS)
+OPTION(BLUEBERRY_BUILD_ALL_PLUGINS "Build all BlueBerry plugins (overriding selection)" OFF)
+MARK_AS_ADVANCED(BUILD_ALL_BLUEBERRY_PLUGINS)
 
-IF(OPENCHERRY_BUILD_ALL_PLUGINS)
-  SET(OPENCHERRY_BUILD_ALL_PLUGINS_OPTION "FORCE_BUILD_ALL")
+IF(BLUEBERRY_BUILD_ALL_PLUGINS)
+  SET(BLUEBERRY_BUILD_ALL_PLUGINS_OPTION "FORCE_BUILD_ALL")
 ENDIF()
 
-OPTION(OPENCHERRY_STATIC "Build all plugins as static libraries" OFF)
-MARK_AS_ADVANCED(OPENCHERRY_STATIC)
+OPTION(BLUEBERRY_STATIC "Build all plugins as static libraries" OFF)
+MARK_AS_ADVANCED(BLUEBERRY_STATIC)
 
-OPTION(OPENCHERRY_DEBUG_SMARTPOINTER "Enable code for debugging smart pointers" OFF)
-MARK_AS_ADVANCED(OPENCHERRY_DEBUG_SMARTPOINTER)
+OPTION(BLUEBERRY_DEBUG_SMARTPOINTER "Enable code for debugging smart pointers" OFF)
+MARK_AS_ADVANCED(BLUEBERRY_DEBUG_SMARTPOINTER)
 
 FIND_PACKAGE(Poco REQUIRED)
 FIND_PACKAGE(Ant)
 FIND_PACKAGE(Eclipse)
 
-SET(OPENCHERRY_SOURCE_DIR ${openCherry_SOURCE_DIR})
-SET(OPENCHERRY_BINARY_DIR ${openCherry_BINARY_DIR})
+SET(BLUEBERRY_SOURCE_DIR ${BlueBerry_SOURCE_DIR})
+SET(BLUEBERRY_BINARY_DIR ${BlueBerry_BINARY_DIR})
 
-SET(OPENCHERRY_PLUGINS_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Bundles)
-SET(OPENCHERRY_PLUGINS_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/Bundles)
+SET(BLUEBERRY_PLUGINS_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Bundles)
+SET(BLUEBERRY_PLUGINS_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/Bundles)
 
 SET(OSGI_APP solstice)
 
 # Force should be removed after everybody has configured their old binary tree
-SET(OPENCHERRY_PLUGINS_OUTPUT_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/openCherry CACHE PATH "Directory where to build the openCherry Bundles" FORCE)
-MARK_AS_ADVANCED(OPENCHERRY_PLUGINS_OUTPUT_DIR)
+SET(BLUEBERRY_PLUGINS_OUTPUT_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/BlueBerry CACHE PATH "Directory where to build the BlueBerry Bundles" FORCE)
+MARK_AS_ADVANCED(BLUEBERRY_PLUGINS_OUTPUT_DIR)
 
-SET(OPENCHERRY_TEST_PLUGINS_OUTPUT_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/openCherryTests CACHE PATH "Directory where to build the openCherry test bundles")
-MARK_AS_ADVANCED(OPENCHERRY_TEST_PLUGINS_OUTPUT_DIR)
+SET(BLUEBERRY_TEST_PLUGINS_OUTPUT_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/BlueBerryTests CACHE PATH "Directory where to build the BlueBerry test bundles")
+MARK_AS_ADVANCED(BLUEBERRY_TEST_PLUGINS_OUTPUT_DIR)
 
 # Clear the cache variables
-SET(OPENCHERRY_PLUGIN_SOURCE_DIRS "" CACHE INTERNAL "List of base plugin source directories" FORCE)
-SET(OPENCHERRY_PLUGIN_BINARY_DIRS "" CACHE INTERNAL "List of base plugin binary directories" FORCE)
+SET(BLUEBERRY_PLUGIN_SOURCE_DIRS "" CACHE INTERNAL "List of base plugin source directories" FORCE)
+SET(BLUEBERRY_PLUGIN_BINARY_DIRS "" CACHE INTERNAL "List of base plugin binary directories" FORCE)
 
 IF (Eclipse_DIR)
-  SET(OPENCHERRY_DOC_TOOLS_DIR "${Eclipse_DIR}" CACHE PATH "Directory containing additional tools needed for generating the documentation")
+  SET(BLUEBERRY_DOC_TOOLS_DIR "${Eclipse_DIR}" CACHE PATH "Directory containing additional tools needed for generating the documentation")
 ELSE ()
-  SET(OPENCHERRY_DOC_TOOLS_DIR "" CACHE PATH "Directory containing additional tools needed for generating the documentation")
+  SET(BLUEBERRY_DOC_TOOLS_DIR "" CACHE PATH "Directory containing additional tools needed for generating the documentation")
 ENDIF ()
 
-SET(OPENCHERRY_DEBUG_POSTFIX d)
+SET(BLUEBERRY_DEBUG_POSTFIX d)
 
-CONFIGURE_FILE(openCherryConfig.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/openCherryConfig.cmake @ONLY)
+CONFIGURE_FILE(BlueBerryConfig.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/BlueBerryConfig.cmake @ONLY)
 
 ADD_SUBDIRECTORY(Bundles)
 
@@ -150,7 +150,7 @@ ADD_SUBDIRECTORY(Documentation)
 
 # Testing options
 
-OPTION(OPENCHERRY_BUILD_TESTING "Build the openCherry tests." OFF)
+OPTION(BLUEBERRY_BUILD_TESTING "Build the BlueBerry tests." OFF)
 
 IF(WIN32)
   SET(_gui_testing_default "ON")
@@ -158,10 +158,10 @@ ELSE()
   SET(_gui_testing_default "OFF")
 ENDIF()
 
-OPTION(OPENCHERRY_ENABLE_GUI_TESTING "Enable the openCherry GUI tests" ${_gui_testing_default})
-MARK_AS_ADVANCED(OPENCHERRY_ENABLE_GUI_TESTING)
+OPTION(BLUEBERRY_ENABLE_GUI_TESTING "Enable the BlueBerry GUI tests" ${_gui_testing_default})
+MARK_AS_ADVANCED(BLUEBERRY_ENABLE_GUI_TESTING)
 
-IF(OPENCHERRY_BUILD_TESTING)
+IF(BLUEBERRY_BUILD_TESTING)
   ENABLE_TESTING()
   ADD_SUBDIRECTORY(Testing)
 ENDIF()

@@ -22,13 +22,13 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <mitkCoreObjectFactory.h>
 #include <mitkDataStorageEditorInput.h>
-#include <cherryIEditorPart.h>
-#include <cherryIWorkbenchPage.h>
+#include <berryIEditorPart.h>
+#include <berryIWorkbenchPage.h>
 
 #include "QmitkStdMultiWidgetEditor.h"
-#include <cherryPlatformUI.h>
+#include <berryPlatformUI.h>
 
-QmitkFileExitAction::QmitkFileExitAction(cherry::IWorkbenchWindow::Pointer window)
+QmitkFileExitAction::QmitkFileExitAction(berry::IWorkbenchWindow::Pointer window)
 : QAction(0)
 {
   m_Window = window;
@@ -42,5 +42,5 @@ QmitkFileExitAction::QmitkFileExitAction(cherry::IWorkbenchWindow::Pointer windo
 
 void QmitkFileExitAction::Run()
 {
-  cherry::PlatformUI::GetWorkbench()->Close();
+  berry::PlatformUI::GetWorkbench()->Close();
 }

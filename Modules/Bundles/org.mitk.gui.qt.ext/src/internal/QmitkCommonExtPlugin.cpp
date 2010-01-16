@@ -1,6 +1,6 @@
 /*=========================================================================
  
- Program:   openCherry Platform
+ Program:   BlueBerry Platform
  Language:  C++
  Date:      $Date$
  Version:   $Revision$
@@ -19,7 +19,7 @@
 
 #include <QmitkExtRegisterClasses.h>
 
-void QmitkCommonExtPlugin::Start(cherry::IBundleContext::Pointer context)
+void QmitkCommonExtPlugin::Start(berry::IBundleContext::Pointer context)
 {
    QmitkExtRegisterClasses();
 }

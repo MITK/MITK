@@ -1,6 +1,6 @@
 /*=========================================================================
  
-Program:   openCherry Platform
+Program:   BlueBerry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef OSGI_FRAMEWORK_BUNDLEEVENT_H_
 #define OSGI_FRAMEWORK_BUNDLEEVENT_H_
 
-#include "cherryOSGiDll.h"
+#include "berryOSGiDll.h"
 
 #include "SmartPointer.h"
 
@@ -28,7 +28,7 @@ namespace framework {
 
 struct IBundle;
 
-class CHERRY_OSGI BundleEvent
+class BERRY_OSGI BundleEvent
 { 
 public:
   enum EventKind { EV_BUNDLE_INSTALLED, EV_BUNDLE_LOADED, EV_BUNDLE_RESOLVING,

@@ -1,12 +1,12 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!-- Schema file written by PDE -->
-<schema targetNamespace="org.opencherry.osgi" xmlns="http://www.w3.org/2001/XMLSchema">
+<schema targetNamespace="org.blueberry.osgi" xmlns="http://www.w3.org/2001/XMLSchema">
 <annotation>
       <appinfo>
-         <meta.schema plugin="org.opencherry.osgi" id="applications" name="Applications"/>
+         <meta.schema plugin="org.blueberry.osgi" id="applications" name="Applications"/>
       </appinfo>
       <documentation>
-         The applications extension point allows plugins to contribute applications to the Cherry Platform.
+         The applications extension point allows plugins to contribute applications to the Berry Platform.
       </documentation>
    </annotation>
 
@@ -98,7 +98,7 @@
          Following is an example of an application declaration.
 &lt;p&gt;
    &lt;pre&gt;
-      &lt;extension id=&quot;sampleApplication&quot; point=&quot;org.opencherry.core.runtime.applications&quot;&gt;
+      &lt;extension id=&quot;sampleApplication&quot; point=&quot;org.blueberry.core.runtime.applications&quot;&gt;
          &lt;application&gt;
          &lt;run class=&quot;com.xyz.applications.sample&quot;/&gt;
          &lt;/application&gt;
@@ -113,7 +113,7 @@
          <meta.section type="apiInfo"/>
       </appinfo>
       <documentation>
-         Application classes must subclass &lt;code&gt;cherry::IApplication&lt;/code&gt;.
+         Application classes must subclass &lt;code&gt;berry::IApplication&lt;/code&gt;.
       </documentation>
    </annotation>
 

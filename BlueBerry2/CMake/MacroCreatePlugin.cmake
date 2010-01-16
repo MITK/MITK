@@ -84,7 +84,7 @@ MACRO(MACRO_CREATE_PLUGIN)
   #------------------ Qt Help support -------------------------#
   
   SET(PLUGIN_GENERATED_QCH_FILES )
-  IF (OPENCHERRY_USE_QT_HELP AND
+  IF (BLUEBERRY_USE_QT_HELP AND
       EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/documentation/UserManual")
     SET(PLUGIN_DOXYGEN_INPUT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/documentation/UserManual")
     SET(PLUGIN_DOXYGEN_OUTPUT_DIR "${CMAKE_CURRENT_BINARY_DIR}/documentation/UserManual")
@@ -130,7 +130,7 @@ MACRO(MACRO_CREATE_PLUGIN)
     RUNTIME_OUTPUT_DIRECTORY "${PLUGIN_OUTPUT_DIR}/bin"
     LIBRARY_OUTPUT_DIRECTORY "${PLUGIN_OUTPUT_DIR}/bin"
     ARCHIVE_OUTPUT_DIRECTORY "${PLUGIN_OUTPUT_DIR}/bin"
-    DEBUG_POSTFIX ${OPENCHERRY_DEBUG_POSTFIX})
+    DEBUG_POSTFIX ${BLUEBERRY_DEBUG_POSTFIX})
 
   IF(mbilog_FOUND)
     TARGET_LINK_LIBRARIES(${PLUGIN_TARGET} mbilog)
@@ -145,17 +145,17 @@ MACRO(MACRO_CREATE_PLUGIN)
   # to lib1, instead of lib1d in debug configurations
   SET(_debug_linklibs "")
   FOREACH(_linklib ${PLUGIN_LINK_LIBRARIES})
-    SET(_debug_linklibs ${_debug_linklibs} optimized "${_linklib}" debug "${_linklib}${OPENCHERRY_DEBUG_POSTFIX}")
+    SET(_debug_linklibs ${_debug_linklibs} optimized "${_linklib}" debug "${_linklib}${BLUEBERRY_DEBUG_POSTFIX}")
   ENDFOREACH(_linklib)
   
   TARGET_LINK_LIBRARIES(${PLUGIN_TARGET} ${_debug_linklibs})
   TARGET_LINK_LIBRARIES(${PLUGIN_TARGET}
-                        optimized "PocoFoundation" debug "PocoFoundation${OPENCHERRY_DEBUG_POSTFIX}"
-                        optimized "PocoUtil" debug "PocoUtil${OPENCHERRY_DEBUG_POSTFIX}"
-                        optimized "PocoXML" debug "PocoXML${OPENCHERRY_DEBUG_POSTFIX}")
+                        optimized "PocoFoundation" debug "PocoFoundation${BLUEBERRY_DEBUG_POSTFIX}"
+                        optimized "PocoUtil" debug "PocoUtil${BLUEBERRY_DEBUG_POSTFIX}"
+                        optimized "PocoXML" debug "PocoXML${BLUEBERRY_DEBUG_POSTFIX}")
 
   # Fix a "bug" in CMake, which does not include all transitive link libraries for a given target
-  LIST(FIND PLUGIN_LINK_LIBRARIES org_opencherry_test _is_unittest_plugin)
+  LIST(FIND PLUGIN_LINK_LIBRARIES org_blueberry_test _is_unittest_plugin)
   IF(NOT _is_unittest_plugin EQUAL -1)
     TARGET_LINK_LIBRARIES(${PLUGIN_TARGET} optimized CppUnit debug CppUnitd)
   ENDIF()

@@ -16,7 +16,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#include <org.blueberry.osgi/src/application/cherryStarter.h>
+#include <org.blueberry.osgi/src/application/berryStarter.h>
 #include <Poco/Util/MapConfiguration.h>
 
 int main(int argc, char** argv)
@@ -27,16 +27,16 @@ int main(int argc, char** argv)
   Poco::Path basePath(argv[0]);
   basePath.setFileName("");
   
-  Poco::Path openCherryPath(basePath);
-  openCherryPath.pushDirectory("openCherry");
+  Poco::Path BlueBerryPath(basePath);
+  BlueBerryPath.pushDirectory("BlueBerry");
 
   Poco::Path corePath(basePath);
   corePath.pushDirectory("CoreBundles");
 
-  std::string pluginDirs = openCherryPath.toString() + ";" + corePath.toString();
+  std::string pluginDirs = BlueBerryPath.toString() + ";" + corePath.toString();
 
   Poco::Util::MapConfiguration* coreConfig(new Poco::Util::MapConfiguration());
-  coreConfig->setString(cherry::Platform::ARG_PLUGIN_DIRS, pluginDirs);
-  coreConfig->setString(cherry::Platform::ARG_APPLICATION, "org.mitk.qt.application");
-  return cherry::Starter::Run(argc, argv, coreConfig);
+  coreConfig->setString(berry::Platform::ARG_PLUGIN_DIRS, pluginDirs);
+  coreConfig->setString(berry::Platform::ARG_APPLICATION, "org.mitk.qt.application");
+  return berry::Starter::Run(argc, argv, coreConfig);
 }

@@ -17,7 +17,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkDataStorageEditorInput.h"
 
-#include <cherryPlatform.h>
+#include <berryPlatform.h>
 #include <mitkIDataStorageService.h>
 
 namespace mitk
@@ -38,7 +38,7 @@ std::string DataStorageEditorInput::GetToolTipText() const
   return "";
 }
 
-bool DataStorageEditorInput::operator==(const cherry::Object* o) const
+bool DataStorageEditorInput::operator==(const berry::Object* o) const
 {
   if (const DataStorageEditorInput* input = dynamic_cast<const DataStorageEditorInput*>(o))
     return this->GetName() == input->GetName();
@@ -51,7 +51,7 @@ DataStorageEditorInput::GetDataStorageReference()
 {
   if (m_DataStorageRef.IsNull())
   {
-    cherry::ServiceRegistry& serviceRegistry = cherry::Platform::GetServiceRegistry();
+    berry::ServiceRegistry& serviceRegistry = berry::Platform::GetServiceRegistry();
     IDataStorageService::Pointer dataService = serviceRegistry.GetServiceById<IDataStorageService>(IDataStorageService::ID);
     if (!dataService) return IDataStorageReference::Pointer(0);
     m_DataStorageRef = dataService->GetDefaultDataStorage();

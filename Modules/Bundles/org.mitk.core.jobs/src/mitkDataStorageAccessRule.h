@@ -1,6 +1,6 @@
 /*=========================================================================
 
- Program:   openCherry Platform
+ Program:   BlueBerry Platform
  Language:  C++
  Date:      $Date$
  Version:   $Revision: 15350 $
@@ -18,8 +18,8 @@
 #ifndef MITKDATASTORAGEACCESSRULE_H_HEADER_INCLUDED_ 
 #define MITKDATASTORAGEACCESSRULE_H_HEADER_INCLUDED_ 
 
-#include "cherryISchedulingRule.h"
-#include "cherryObject.h"
+#include "berryISchedulingRule.h"
+#include "berryObject.h"
 #include "mitkJobsDll.h"
 #include "mitkDataTreeNode.h"
 #include "mitkDataStorage.h"
@@ -82,7 +82,7 @@ namespace mitk {
 
 
 
-  class MITK_JOBS_EXPORT DataStorageAccessRule : public cherry::ISchedulingRule {
+  class MITK_JOBS_EXPORT DataStorageAccessRule : public berry::ISchedulingRule {
 
   public:
 
@@ -91,13 +91,13 @@ namespace mitk {
 
   RuleType m_Rule;
 
-  cherryObjectMacro(DataStorageAccessRule)
+  berryObjectMacro(DataStorageAccessRule)
 
   DataStorageAccessRule (mitk::DataStorage::Pointer myDataStorage, mitk::DataTreeNode::Pointer myDataTreeNode,    
                          DataStorageAccessRule::RuleType myRule) ;  
 
-  bool Contains (cherry::ISchedulingRule::Pointer otherISchedulingRule) ;
-  bool IsConflicting (cherry::ISchedulingRule::Pointer otherISchedulingRule) ;
+  bool Contains (berry::ISchedulingRule::Pointer otherISchedulingRule) ;
+  bool IsConflicting (berry::ISchedulingRule::Pointer otherISchedulingRule) ;
 
     
 

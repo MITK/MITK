@@ -1,6 +1,6 @@
 /*=========================================================================
 
-Program:   openCherry Platform
+Program:   BlueBerry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
@@ -33,7 +33,7 @@ struct IBundleStorage;
 struct IBundleActivator;
 struct BundleEvents;
 
-struct CHERRY_OSGI IBundle : public Object
+struct BERRY_OSGI IBundle : public Object
 {
 
   osgiInterfaceMacro(osgi::framework::IBundle);

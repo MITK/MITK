@@ -18,11 +18,11 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef QMITKEXTAPPLICATION_H_
 #define QMITKEXTAPPLICATION_H_
 
-#include <cherryIApplication.h>
+#include <berryIApplication.h>
 
 #include "mitkQtExtAppDll.h"
 
-class MITK_QT_EXTAPP QmitkExtApplication : public cherry::IApplication
+class MITK_QT_EXTAPP QmitkExtApplication : public berry::IApplication
 {
 public:
   

@@ -15,9 +15,9 @@
 
  =========================================================================*/
 
-#include <cherryIEditorPart.h>
-#include <cherryIWorkbenchPage.h>
-#include <cherryPlatform.h>
+#include <berryIEditorPart.h>
+#include <berryIWorkbenchPage.h>
+#include <berryPlatform.h>
 
 #include "mitkGlobalInteraction.h"
 #include "mitkPointSet.h"
@@ -214,17 +214,17 @@ void QmitkMeasurement::CreateQtPartControl(QWidget* parent)
     , const mitk::DataTreeNode*>( this, &QmitkMeasurement::NodeRemoved ) );
 
   // Initialize selection listener mechanism
-  m_SelectionListener = cherry::ISelectionListener::Pointer(
-      new cherry::SelectionChangedAdapter<QmitkMeasurement>(this,
+  m_SelectionListener = berry::ISelectionListener::Pointer(
+      new berry::SelectionChangedAdapter<QmitkMeasurement>(this,
           &QmitkMeasurement::SelectionChanged));
   this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddPostSelectionListener(
       m_SelectionListener);
-  cherry::ISelection::ConstPointer
+  berry::ISelection::ConstPointer
       selection(
           this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection(
               "org.mitk.views.datamanager"));
   if (selection.IsNotNull())
-    this->SelectionChanged(cherry::IWorkbenchPart::Pointer(0), selection);
+    this->SelectionChanged(berry::IWorkbenchPart::Pointer(0), selection);
 
   m_SelectionProvider = new mitk::MeasurementSelectionProvider;
 
@@ -235,8 +235,8 @@ void QmitkMeasurement::CreateQtPartControl(QWidget* parent)
 }
 
 void QmitkMeasurement::SelectionChanged(
-    cherry::IWorkbenchPart::Pointer sourcepart,
-    cherry::ISelection::ConstPointer selection)
+    berry::IWorkbenchPart::Pointer sourcepart,
+    berry::ISelection::ConstPointer selection)
 {
   if ( sourcepart.GetPointer() == this)
     return;

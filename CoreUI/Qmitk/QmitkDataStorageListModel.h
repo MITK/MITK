@@ -96,7 +96,7 @@ protected:
   mitk::NodePredicateBase::Pointer m_NodePredicate;
 
   ///
-  /// Pointer to the DataStorage from which the nodes are selected (remember: in OpenCherry there
+  /// Pointer to the DataStorage from which the nodes are selected (remember: in BlueBerry there
   /// might be more than one DataStorage).
   ///
   mitk::DataStorage* m_DataStorage;

@@ -1,6 +1,6 @@
 /*=========================================================================
  
-Program:   openCherry Platform
+Program:   BlueBerry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef OSGI_FRAMEWORK_PLATFORMEXCEPTION_H_
 #define OSGI_FRAMEWORK_PLATFORMEXCEPTION_H_
 
-#include "../../cherryOSGiDll.h"
+#include "../../berryOSGiDll.h"
 #include "Poco/Exception.h"
 
 namespace osgi {
@@ -48,13 +48,13 @@ struct StatusExceptionCode {
 
 
 
-POCO_DECLARE_EXCEPTION(CHERRY_OSGI, BadWeakPointerException, Poco::Exception)
+POCO_DECLARE_EXCEPTION(BERRY_OSGI, BadWeakPointerException, Poco::Exception)
 
-POCO_DECLARE_EXCEPTION(CHERRY_OSGI, IllegalArgumentException, Poco::LogicException)
+POCO_DECLARE_EXCEPTION(BERRY_OSGI, IllegalArgumentException, Poco::LogicException)
 
-POCO_DECLARE_EXCEPTION(CHERRY_OSGI, UnsupportedOperationException, Poco::RuntimeException);
-POCO_DECLARE_EXCEPTION(CHERRY_OSGI, IllegalStateException, Poco::RuntimeException);
-POCO_DECLARE_EXCEPTION(CHERRY_OSGI, PlatformException, Poco::RuntimeException);
+POCO_DECLARE_EXCEPTION(BERRY_OSGI, UnsupportedOperationException, Poco::RuntimeException);
+POCO_DECLARE_EXCEPTION(BERRY_OSGI, IllegalStateException, Poco::RuntimeException);
+POCO_DECLARE_EXCEPTION(BERRY_OSGI, PlatformException, Poco::RuntimeException);
 
 /**
  * A service exception used to indicate that a service problem occurred.
@@ -74,7 +74,7 @@ POCO_DECLARE_EXCEPTION(CHERRY_OSGI, PlatformException, Poco::RuntimeException);
  * @version $Revision$
  * @since 1.5
  */
-POCO_DECLARE_EXCEPTION(CHERRY_OSGI, ServiceException, Poco::RuntimeException);
+POCO_DECLARE_EXCEPTION(BERRY_OSGI, ServiceException, Poco::RuntimeException);
 
 struct ServiceExceptionCode {
 
@@ -106,15 +106,15 @@ struct ServiceExceptionCode {
 
 };
 
-POCO_DECLARE_EXCEPTION(CHERRY_OSGI, ManifestException, PlatformException);
-POCO_DECLARE_EXCEPTION(CHERRY_OSGI, BundleException, PlatformException);
-POCO_DECLARE_EXCEPTION(CHERRY_OSGI, BundleStateException, PlatformException);
-POCO_DECLARE_EXCEPTION(CHERRY_OSGI, BundleVersionConflictException, PlatformException);
-POCO_DECLARE_EXCEPTION(CHERRY_OSGI, BundleLoadException, PlatformException);
-POCO_DECLARE_EXCEPTION(CHERRY_OSGI, BundleResolveException, PlatformException);
+POCO_DECLARE_EXCEPTION(BERRY_OSGI, ManifestException, PlatformException);
+POCO_DECLARE_EXCEPTION(BERRY_OSGI, BundleException, PlatformException);
+POCO_DECLARE_EXCEPTION(BERRY_OSGI, BundleStateException, PlatformException);
+POCO_DECLARE_EXCEPTION(BERRY_OSGI, BundleVersionConflictException, PlatformException);
+POCO_DECLARE_EXCEPTION(BERRY_OSGI, BundleLoadException, PlatformException);
+POCO_DECLARE_EXCEPTION(BERRY_OSGI, BundleResolveException, PlatformException);
 
-POCO_DECLARE_EXCEPTION(CHERRY_OSGI, CoreException, PlatformException);
-POCO_DECLARE_EXCEPTION(CHERRY_OSGI, InvalidServiceObjectException, CoreException);
+POCO_DECLARE_EXCEPTION(BERRY_OSGI, CoreException, PlatformException);
+POCO_DECLARE_EXCEPTION(BERRY_OSGI, InvalidServiceObjectException, CoreException);
 
 /**
  * A Framework exception used to indicate that a filter string has an invalid

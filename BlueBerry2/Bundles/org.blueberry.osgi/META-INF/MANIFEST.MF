@@ -3,5 +3,5 @@ Bundle-Name: BlueBerry OSGi System Bundle
 Bundle-SymbolicName: org.blueberry.osgi
 Bundle-Version: 1.0.0
 Bundle-Vendor: DKFZ, Medical and Biological Informatics
-Bundle-Activator: cherry::SystemBundleActivator
-Cherry-SystemBundle: true
+Bundle-Activator: berry::SystemBundleActivator
+Berry-SystemBundle: true

@@ -18,13 +18,13 @@ PURPOSE.  See the above copyright notices for more information.
 #if !defined(QMITK_MEASUREMENT_H__INCLUDED)
 #define QMITK_MEASUREMENT_H__INCLUDED
 
-#include <cherryIPartListener.h>
-#include <cherryISelection.h>
-#include <cherryISelectionProvider.h>
-#include <cherryIPreferencesService.h>
-#include <cherryICherryPreferences.h>
-#include <cherryISelectionListener.h>
-#include <cherryIStructuredSelection.h>
+#include <berryIPartListener.h>
+#include <berryISelection.h>
+#include <berryISelectionProvider.h>
+#include <berryIPreferencesService.h>
+#include <berryIBerryPreferences.h>
+#include <berryISelectionListener.h>
+#include <berryIStructuredSelection.h>
 
 #include <mitkWeakPointer.h>
 #include <mitkPlanarFigure.h>
@@ -110,8 +110,8 @@ class QmitkMeasurement : public QObject, public QmitkFunctionality
     /// All selected planarfigures will be added to m_SelectedPlanarFigures.
     /// Then PlanarFigureSelectionChanged is called
     ///
-    virtual void SelectionChanged(cherry::IWorkbenchPart::Pointer part
-      , cherry::ISelection::ConstPointer selection);
+    virtual void SelectionChanged(berry::IWorkbenchPart::Pointer part
+      , berry::ISelection::ConstPointer selection);
 
 
   protected:
@@ -159,9 +159,9 @@ protected:
   vtkCornerAnnotation *m_MeasurementInfoAnnotation;
 
   // Selection service
-  /// cherry::SelectionChangedAdapter<QmitkPropertyListView> must be a friend to call
-  friend struct cherry::SelectionChangedAdapter<QmitkMeasurement>;
-  cherry::ISelectionListener::Pointer m_SelectionListener;
+  /// berry::SelectionChangedAdapter<QmitkPropertyListView> must be a friend to call
+  friend struct berry::SelectionChangedAdapter<QmitkMeasurement>;
+  berry::ISelectionListener::Pointer m_SelectionListener;
   mitk::MeasurementSelectionProvider::Pointer m_SelectionProvider;
 
   mitk::DataStorageSelection::Pointer m_SelectedPlanarFigures;

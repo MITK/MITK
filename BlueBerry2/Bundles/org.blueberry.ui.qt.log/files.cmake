@@ -3,17 +3,17 @@ SET(SRC_CPP_FILES
 )
 
 SET(INTERNAL_CPP_FILES
-  cherryLogView.cpp
-  cherryQtLogPlugin.cpp
-  cherryQtLogView.cpp
-  cherryQtPlatformLogModel.cpp
+  berryLogView.cpp
+  berryQtLogPlugin.cpp
+  berryQtLogView.cpp
+  berryQtPlatformLogModel.cpp
 )
 
 SET(CPP_FILES manifest.cpp)
 
 SET(MOC_H_FILES
-  src/internal/cherryQtLogView.h
-  src/internal/cherryQtPlatformLogModel.h
+  src/internal/berryQtLogView.h
+  src/internal/berryQtPlatformLogModel.h
 )
 
 SET(RESOURCE_FILES
@@ -21,7 +21,7 @@ SET(RESOURCE_FILES
 )
 
 SET(UI_FILES
-  src/internal/cherryQtLogView.ui
+  src/internal/berryQtLogView.ui
 )
 
 foreach(file ${SRC_CPP_FILES})

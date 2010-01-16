@@ -1,6 +1,6 @@
 /*=========================================================================
  
- Program:   openCherry Platform
+ Program:   BlueBerry Platform
  Language:  C++
  Date:      $Date$
  Version:   $Revision$
@@ -17,16 +17,16 @@
 
 #include "Poco/ClassLibrary.h"
 
-#include <cherryIBundleActivator.h>
-#include "src/internal/cherryQtLogPlugin.h"
+#include <berryIBundleActivator.h>
+#include "src/internal/berryQtLogPlugin.h"
 
-#include <cherryIViewPart.h>
-#include "src/internal/cherryLogView.h"
+#include <berryIViewPart.h>
+#include "src/internal/berryLogView.h"
 
-POCO_BEGIN_MANIFEST(cherry::IBundleActivator)
-  POCO_EXPORT_CLASS(cherry::QtLogPlugin)
+POCO_BEGIN_MANIFEST(berry::IBundleActivator)
+  POCO_EXPORT_CLASS(berry::QtLogPlugin)
 POCO_END_MANIFEST
 
-POCO_BEGIN_NAMED_MANIFEST(cherryIViewPart, cherry::IViewPart)
-  POCO_EXPORT_CLASS(cherry::LogView)
+POCO_BEGIN_NAMED_MANIFEST(berryIViewPart, berry::IViewPart)
+  POCO_EXPORT_CLASS(berry::LogView)
 POCO_END_MANIFEST

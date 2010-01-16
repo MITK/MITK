@@ -26,10 +26,10 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <mitkCoreObjectFactory.h>
 #include <mitkDataStorageEditorInput.h>
-#include <cherryIEditorPart.h>
-#include <cherryIWorkbenchPage.h>
-#include <cherryIPreferencesService.h>
-#include <cherryPlatform.h>
+#include <berryIEditorPart.h>
+#include <berryIWorkbenchPage.h>
+#include <berryIPreferencesService.h>
+#include <berryPlatform.h>
 
 #include "mitkProperties.h"
 #include "mitkNodePredicateData.h"
@@ -39,13 +39,13 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "QmitkStdMultiWidgetEditor.h"
 
-QmitkFileOpenAction::QmitkFileOpenAction(cherry::IWorkbenchWindow::Pointer window)
+QmitkFileOpenAction::QmitkFileOpenAction(berry::IWorkbenchWindow::Pointer window)
 : QAction(0)
 {
   this->init(window);
 }
 
-QmitkFileOpenAction::QmitkFileOpenAction(const QIcon & icon, cherry::IWorkbenchWindow::Pointer window)
+QmitkFileOpenAction::QmitkFileOpenAction(const QIcon & icon, berry::IWorkbenchWindow::Pointer window)
 : QAction(0)
 {
   this->setIcon(icon);
@@ -53,16 +53,16 @@ QmitkFileOpenAction::QmitkFileOpenAction(const QIcon & icon, cherry::IWorkbenchW
   this->init(window);
 }
 
-void QmitkFileOpenAction::init(cherry::IWorkbenchWindow::Pointer window)
+void QmitkFileOpenAction::init(berry::IWorkbenchWindow::Pointer window)
 {
   m_Window = window;
   this->setParent(static_cast<QWidget*>(m_Window->GetShell()->GetControl()));
   this->setText("&Open...");
   this->setToolTip("Open data files (images, surfaces,...) and project files (.mitk)");
 
-  cherry::IPreferencesService::Pointer prefService
-    = cherry::Platform::GetServiceRegistry()
-    .GetServiceById<cherry::IPreferencesService>(cherry::IPreferencesService::ID);
+  berry::IPreferencesService::Pointer prefService
+    = berry::Platform::GetServiceRegistry()
+    .GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
   m_GeneralPreferencesNode = prefService->GetSystemPreferences()->Node("/General");
 
   this->connect(this, SIGNAL(triggered(bool)), this, SLOT(Run()));
@@ -109,7 +109,7 @@ void QmitkFileOpenAction::Run()
   mitk::DataStorageEditorInput::Pointer editorInput;
   mitk::DataStorage::Pointer dataStorage;
   QmitkStdMultiWidgetEditor::Pointer multiWidgetEditor;
-  cherry::IEditorPart::Pointer editor = m_Window->GetActivePage()->GetActiveEditor();
+  berry::IEditorPart::Pointer editor = m_Window->GetActivePage()->GetActiveEditor();
   if (editor.Cast<QmitkStdMultiWidgetEditor>().IsNull())
   {
     editorInput = new mitk::DataStorageEditorInput();
@@ -162,7 +162,7 @@ void QmitkFileOpenAction::Run()
   
   if (multiWidgetEditor.IsNull())
   {
-    cherry::IEditorPart::Pointer editor = m_Window->GetActivePage()->OpenEditor(editorInput, QmitkStdMultiWidgetEditor::EDITOR_ID);
+    berry::IEditorPart::Pointer editor = m_Window->GetActivePage()->OpenEditor(editorInput, QmitkStdMultiWidgetEditor::EDITOR_ID);
     multiWidgetEditor = editor.Cast<QmitkStdMultiWidgetEditor>();
   }
   else

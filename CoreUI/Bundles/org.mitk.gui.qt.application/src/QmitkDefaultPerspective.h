@@ -19,14 +19,14 @@
 #ifndef QMITKDEFAULTPERSPECTIVE_H_
 #define QMITKDEFAULTPERSPECTIVE_H_
 
-#include <cherryIPerspectiveFactory.h>
+#include <berryIPerspectiveFactory.h>
 
 #include "mitkQtAppDll.h"
 
-struct MITK_QT_APP QmitkDefaultPerspective : public cherry::IPerspectiveFactory
+struct MITK_QT_APP QmitkDefaultPerspective : public berry::IPerspectiveFactory
 {
 
-  void CreateInitialLayout(cherry::IPageLayout::Pointer layout);
+  void CreateInitialLayout(berry::IPageLayout::Pointer layout);
 
 };
 

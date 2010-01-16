@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!-- Schema file written by PDE -->
-<schema targetNamespace="org.opencherry.ui" xmlns="http://www.w3.org/2001/XMLSchema">
+<schema targetNamespace="org.blueberry.ui" xmlns="http://www.w3.org/2001/XMLSchema">
 <annotation>
       <appinfo>
-         <meta.schema plugin="org.opencherry.ui" id="intro" name="Intro Part"/>
+         <meta.schema plugin="org.blueberry.ui" id="intro" name="Intro Part"/>
       </appinfo>
       <documentation>
          &lt;p&gt;This extension point is used to register implementations of special workbench parts, called intro parts, that are responsible for introducing a product to new users. An intro part is typically shown the first time a product is started up. Rules for associating an intro part implementation with particular products are also contributed via this extension point.
@@ -91,22 +91,22 @@ The life cycle is as follows:
          <attribute name="class" type="string" use="required">
             <annotation>
                <documentation>
-                  a fully qualified name of the class implementing the &lt;code&gt;cherry::IIntroPart&lt;/code&gt; interface.  A common practice 
-is to subclass &lt;samp&gt;cherry::IntroPart&lt;/samp&gt; 
+                  a fully qualified name of the class implementing the &lt;code&gt;berry::IIntroPart&lt;/code&gt; interface.  A common practice 
+is to subclass &lt;samp&gt;berry::IntroPart&lt;/samp&gt; 
 in order to inherit the default functionality.  This class implements the introduction.
                </documentation>
                <appinfo>
-                  <meta.attribute kind="java" basedOn=":cherryIIntroPart"/>
+                  <meta.attribute kind="java" basedOn=":berryIIntroPart"/>
                </appinfo>
             </annotation>
          </attribute>
          <attribute name="contentDetector" type="string">
             <annotation>
                <documentation>
-                  a fully qualified name of a class extending &lt;code&gt;cherry::IntroContentDetector&lt;/code&gt;.  This optional class is used to detect newly added introduction content.  If new content is available, the view showing the introduction will be opened again.
+                  a fully qualified name of a class extending &lt;code&gt;berry::IntroContentDetector&lt;/code&gt;.  This optional class is used to detect newly added introduction content.  If new content is available, the view showing the introduction will be opened again.
                </documentation>
                <appinfo>
-                  <meta.attribute kind="java" basedOn=":cherryIntroContentDetector"/>
+                  <meta.attribute kind="java" basedOn=":berryIntroContentDetector"/>
                </appinfo>
             </annotation>
          </attribute>

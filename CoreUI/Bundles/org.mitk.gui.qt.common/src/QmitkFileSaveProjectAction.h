@@ -29,7 +29,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkQtCommonDll.h"
 
-#include <cherryIWorkbenchWindow.h>
+#include <berryIWorkbenchWindow.h>
 
 class MITK_QT_COMMON QmitkFileSaveProjectAction : public QAction
 {
@@ -37,7 +37,7 @@ class MITK_QT_COMMON QmitkFileSaveProjectAction : public QAction
 
 public:
 
-  QmitkFileSaveProjectAction(cherry::IWorkbenchWindow::Pointer window);
+  QmitkFileSaveProjectAction(berry::IWorkbenchWindow::Pointer window);
 
 protected slots:
 
@@ -45,7 +45,7 @@ protected slots:
 
 private:
 
-  cherry::IWorkbenchWindow::Pointer m_Window;
+  berry::IWorkbenchWindow::Pointer m_Window;
 };
 
 

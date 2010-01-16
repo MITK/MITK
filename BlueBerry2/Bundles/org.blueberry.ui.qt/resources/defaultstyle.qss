@@ -1,4 +1,4 @@
-cherry--QCTabBar::tab { 
+berry--QCTabBar::tab { 
     background: palette(window); 
     min-height: 24px; 
     border-top: 1px solid palette(mid); 
@@ -7,42 +7,42 @@ cherry--QCTabBar::tab {
     margin-top: -1px; 
 }
 
-cherry--QCTabBar::tab:only-one { 
+berry--QCTabBar::tab:only-one { 
     border-top-left-radius: 8px; 
     border-top-right-radius: 8px; 
     min-height: 25px; 
     margin-left: -1px 
 }
 
-cherry--QCTabBar::tab:first { 
+berry--QCTabBar::tab:first { 
     margin-left: -1px;
     border-left: 0px; 
     border-top-left-radius: 8px; 
 }
 
-cherry--QCTabBar::tab:last { 
+berry--QCTabBar::tab:last { 
     border-right: 1px solid palette(mid); 
     border-top-right-radius: 8px 
 }
 
-cherry--QCTabBar::tab:previous-selected { 
+berry--QCTabBar::tab:previous-selected { 
     border-left: 0px 
 }
 
-cherry--QCTabBar::tab:selected { 
+berry--QCTabBar::tab:selected { 
     border-right: 1px solid palette(Mid); 
     border-bottom: 0px; 
     border-top-left-radius: 8px; 
     border-top-right-radius: 8px; 
 }
 
-cherry--QCTabBar QToolButton {
+berry--QCTabBar QToolButton {
     border: 1px solid palette(window); 
     max-height: 22px; 
     background: palette(window);
 }
 
-cherry--QCTabBar QToolButton#TabCloseButton 
+berry--QCTabBar QToolButton#TabCloseButton 
 {
     border: none; 
     background: none; 

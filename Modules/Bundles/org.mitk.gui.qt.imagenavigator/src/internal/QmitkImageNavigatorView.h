@@ -19,8 +19,8 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef _QMITKIMAGENAVIGATORVIEW_H_INCLUDED
 #define _QMITKIMAGENAVIGATORVIEW_H_INCLUDED
 
-#include <cherryQtViewPart.h>
-#include "cherryISizeProvider.h"
+#include <berryQtViewPart.h>
+#include "berryISizeProvider.h"
 
 #include <QmitkDataTreeNodeSelectionProvider.h>
 #include <QmitkDnDFrameWidget.h>
@@ -30,7 +30,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <string>
 
 #include "ui_QmitkImageNavigatorViewControls.h"
-#include "cherryISizeProvider.h"
+#include "berryISizeProvider.h"
 
 
 /*!
@@ -42,7 +42,7 @@ PURPOSE.  See the above copyright notices for more information.
  *
  * \sa QmitkFunctionality
  */
-class QmitkImageNavigatorView : public QObject, public cherry::QtViewPart, public cherry::ISizeProvider
+class QmitkImageNavigatorView : public QObject, public berry::QtViewPart, public berry::ISizeProvider
 {
 
   // this is needed for all Qt objects that should have a MOC object (everything that derives from QObject)

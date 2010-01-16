@@ -78,7 +78,7 @@ void QmitkIsoSurface::CreateQtPartControl(QWidget *parent)
     m_Controls->m_ImageSelector->SetDataStorage(this->GetDefaultDataStorage());
     m_Controls->m_ImageSelector->SetPredicate(mitk::NodePredicateDataType::New("Image"));
 
-    cherry::IPreferences::Pointer prefs = this->GetPreferences();
+    berry::IPreferences::Pointer prefs = this->GetPreferences();
     if(prefs.IsNotNull())
       m_Controls->thresholdLineEdit->setText(QString::fromStdString(prefs->Get("defaultThreshold", "0")));
   }
@@ -234,7 +234,7 @@ void QmitkIsoSurface::StdMultiWidgetNotAvailable()
 QmitkIsoSurface::~QmitkIsoSurface()
 {
 
-  cherry::IPreferences::Pointer prefs = this->GetPreferences();
+  berry::IPreferences::Pointer prefs = this->GetPreferences();
   if(prefs.IsNotNull())
     prefs->Put("defaultThreshold", m_Controls->thresholdLineEdit->text().toStdString());
 }

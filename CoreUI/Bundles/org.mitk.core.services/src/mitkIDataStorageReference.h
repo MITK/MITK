@@ -1,8 +1,8 @@
 #ifndef MITKIDATASTORAGEREFERENCE_H_
 #define MITKIDATASTORAGEREFERENCE_H_
 
-#include <cherryObject.h>
-#include <cherryMacros.h>
+#include <berryObject.h>
+#include <berryMacros.h>
 
 #include "mitkCoreServicesPluginDll.h"
 
@@ -11,9 +11,9 @@
 namespace mitk
 {
 
-struct MITK_CORE_SERVICES_PLUGIN IDataStorageReference : public cherry::Object
+struct MITK_CORE_SERVICES_PLUGIN IDataStorageReference : public berry::Object
 {
-  cherryInterfaceMacro(IDataStorageReference, mitk);
+  berryInterfaceMacro(IDataStorageReference, mitk);
 
 
   virtual DataStorage::Pointer GetDataStorage() const = 0;

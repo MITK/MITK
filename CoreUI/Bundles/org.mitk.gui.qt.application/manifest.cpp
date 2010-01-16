@@ -17,15 +17,15 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <Poco/ClassLibrary.h>
 
-#include <cherryIApplication.h>
+#include <berryIApplication.h>
 
 #include "src/QmitkApplication.h"
 #include "src/QmitkDefaultPerspective.h"
 
-POCO_BEGIN_NAMED_MANIFEST(cherryIApplication, cherry::IApplication)
+POCO_BEGIN_NAMED_MANIFEST(berryIApplication, berry::IApplication)
   POCO_EXPORT_CLASS(QmitkApplication)
 POCO_END_MANIFEST
 
-POCO_BEGIN_NAMED_MANIFEST(cherryIPerspectiveFactory, cherry::IPerspectiveFactory)
+POCO_BEGIN_NAMED_MANIFEST(berryIPerspectiveFactory, berry::IPerspectiveFactory)
   POCO_EXPORT_CLASS(QmitkDefaultPerspective)
 POCO_END_MANIFEST

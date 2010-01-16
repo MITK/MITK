@@ -25,16 +25,16 @@ PURPOSE.  See the above copyright notices for more information.
 const std::string QmitkWorkbenchAdvisor::DEFAULT_PERSPECTIVE_ID = "org.mitk.coreapp.defaultperspective";
 
 void
-QmitkWorkbenchAdvisor::Initialize(cherry::IWorkbenchConfigurer::Pointer configurer)
+QmitkWorkbenchAdvisor::Initialize(berry::IWorkbenchConfigurer::Pointer configurer)
 {
-  cherry::QtWorkbenchAdvisor::Initialize(configurer);
+  berry::QtWorkbenchAdvisor::Initialize(configurer);
 
   configurer->SetSaveAndRestore(true);
 }
 
-cherry::WorkbenchWindowAdvisor*
+berry::WorkbenchWindowAdvisor*
 QmitkWorkbenchAdvisor::CreateWorkbenchWindowAdvisor(
-        cherry::IWorkbenchWindowConfigurer::Pointer configurer)
+        berry::IWorkbenchWindowConfigurer::Pointer configurer)
 {
   return new QmitkWorkbenchWindowAdvisor(configurer);
 }

@@ -50,8 +50,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <QmitkStdMultiWidgetEditor.h>
 
-#include <cherryIEditorPart.h>
-#include <cherryIWorkbenchPage.h>
+#include <berryIEditorPart.h>
+#include <berryIWorkbenchPage.h>
 #include <mitkIDataStorageService.h>
 
 #include "itkTreeChangeEvent.h"

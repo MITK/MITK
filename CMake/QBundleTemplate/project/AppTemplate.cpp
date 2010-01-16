@@ -1,6 +1,6 @@
-#include <org.opencherry.osgi/src/application/cherryStarter.h>
+#include <org.blueberry.osgi/src/application/berryStarter.h>
 
 int main(int argc, char** argv)
 {
-  return cherry::Starter::Run(argc, argv);
+  return berry::Starter::Run(argc, argv);
 }

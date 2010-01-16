@@ -18,10 +18,10 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <Poco/ClassLibrary.h>
 
-#include <cherryIViewPart.h>
+#include <berryIViewPart.h>
 #include "src/internal/QmitkVolumetryView.h"
 
 
-POCO_BEGIN_NAMED_MANIFEST(cherryIViewPart, cherry::IViewPart)
+POCO_BEGIN_NAMED_MANIFEST(berryIViewPart, berry::IViewPart)
   POCO_EXPORT_CLASS(::QmitkVolumetryView)
 POCO_END_MANIFEST

@@ -56,10 +56,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QmitkDataStorageListModel.h>
 
 #include <QmitkStdMultiWidgetEditor.h>
-#include <cherryQtItemSelection.h>
+#include <berryQtItemSelection.h>
 
-#include <cherryIEditorPart.h>
-#include <cherryIWorkbenchPage.h>
+#include <berryIEditorPart.h>
+#include <berryIWorkbenchPage.h>
 #include "mitkIDataStorageService.h"
 #include "mitkDataTreeNodeSelection.h"
 #include "mitkDataTreeNodeObject.h"
@@ -137,15 +137,15 @@ QmitkSegmentationView::QmitkSegmentationView()
 void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
 {
   //# Preferences
-  cherry::IPreferencesService::Pointer prefService 
-    = cherry::Platform::GetServiceRegistry()
-    .GetServiceById<cherry::IPreferencesService>(cherry::IPreferencesService::ID);
+  berry::IPreferencesService::Pointer prefService 
+    = berry::Platform::GetServiceRegistry()
+    .GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
 
-  m_SegmentationPreferencesNode = (prefService->GetSystemPreferences()->Node("/Segmentation")).Cast<cherry::ICherryPreferences>();
+  m_SegmentationPreferencesNode = (prefService->GetSystemPreferences()->Node("/Segmentation")).Cast<berry::IBerryPreferences>();
   if(m_SegmentationPreferencesNode.IsNotNull())
   {
     m_SegmentationPreferencesNode->OnChanged
-      .AddListener(cherry::MessageDelegate1<QmitkSegmentationView, const cherry::ICherryPreferences*>(this, &QmitkSegmentationView::OnPreferencesChanged));
+      .AddListener(berry::MessageDelegate1<QmitkSegmentationView, const berry::IBerryPreferences*>(this, &QmitkSegmentationView::OnPreferencesChanged));
   }
 
   // setup the basic GUI of this view
@@ -186,8 +186,8 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
   connect( m_Controls->m_ManualToolSelectionBox, SIGNAL(ToolSelected(int)), this, SLOT(OnToolSelected(int)) );
   connect( m_Controls->widgetStack, SIGNAL(currentChanged(int)), this, SLOT(OnSegmentationMethodSelected(int)) );
 
-  // register as listener for openCherry selection events (mainly from DataManager)
-  m_SelectionListener = cherry::ISelectionListener::Pointer(new cherry::SelectionChangedAdapter<QmitkSegmentationView>(this, &QmitkSegmentationView::SelectionChanged));
+  // register as listener for BlueBerry selection events (mainly from DataManager)
+  m_SelectionListener = berry::ISelectionListener::Pointer(new berry::SelectionChangedAdapter<QmitkSegmentationView>(this, &QmitkSegmentationView::SelectionChanged));
   this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddPostSelectionListener(/*"org.mitk.views.datamanager",*/ m_SelectionListener);
 
   UpdateFromCurrentDataManagerSelection();
@@ -249,7 +249,7 @@ void QmitkSegmentationView::SetFocus()
 
 QmitkSegmentationView::~QmitkSegmentationView()
 {
-  cherry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
+  berry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
   if(s)
     s->RemoveSelectionListener(m_SelectionListener);
 
@@ -596,7 +596,7 @@ void QmitkSegmentationView::StdMultiWidgetClosed( QmitkStdMultiWidget& stdMultiW
   m_MultiWidget = 0;
 }
 
-void QmitkSegmentationView::SelectionChanged(cherry::IWorkbenchPart::Pointer sourcepart, cherry::ISelection::ConstPointer selection)
+void QmitkSegmentationView::SelectionChanged(berry::IWorkbenchPart::Pointer sourcepart, berry::ISelection::ConstPointer selection)
 {
   if (!m_Parent || !m_Parent->isVisible())
     return;
@@ -891,7 +891,7 @@ void QmitkSegmentationView::SendSelectedEvent( mitk::DataTreeNode* referenceNode
   //if (referenceNode) nodes.push_back( referenceNode );
   //if (workingNode)   nodes.push_back( workingNode );
 
-  //m_SelectionProvider->SetSelection( cherry::ISelection::Pointer(new mitk::DataTreeNodeSelection(nodes)) );
+  //m_SelectionProvider->SetSelection( berry::ISelection::Pointer(new mitk::DataTreeNodeSelection(nodes)) );
   m_SelectionProvider->FireSelectionChanged(workingNode);
 }
 
@@ -1032,7 +1032,7 @@ void QmitkSegmentationView::ApplyDisplayOptions(mitk::DataTreeNode* node)
   node->SetProperty( "volumerendering", mitk::BoolProperty::New( m_ShowSegmentationsAsVolumeRendering ) );
 }
 
-void QmitkSegmentationView::OnPreferencesChanged(const cherry::ICherryPreferences* prefs )
+void QmitkSegmentationView::OnPreferencesChanged(const berry::IBerryPreferences* prefs )
 {
   m_ShowSegmentationsAsOutline = m_SegmentationPreferencesNode->GetBool("draw outline", true);
   m_ShowSegmentationsAsVolumeRendering = m_SegmentationPreferencesNode->GetBool("volume rendering", false);
@@ -1043,9 +1043,9 @@ void QmitkSegmentationView::OnPreferencesChanged(const cherry::ICherryPreference
 void QmitkSegmentationView::UpdateFromCurrentDataManagerSelection()
 {
   MITK_INFO << "Update selection from DataManager";
-  cherry::ISelection::ConstPointer selection( this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection("org.mitk.views.datamanager"));
+  berry::ISelection::ConstPointer selection( this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection("org.mitk.views.datamanager"));
   m_CurrentSelection = selection.Cast<const mitk::DataTreeNodeSelection>();
-  this->SelectionChanged(cherry::SmartPointer<IWorkbenchPart>(NULL), m_CurrentSelection);
+  this->SelectionChanged(berry::SmartPointer<IWorkbenchPart>(NULL), m_CurrentSelection);
 }
 
 void QmitkSegmentationView::OnNewNodesGenerated()
@@ -1063,7 +1063,7 @@ void QmitkSegmentationView::OnNewNodeObjectsGenerated(mitk::ToolManager::DataVec
     mitk::ToolManager* toolManager = m_Controls->m_ManualToolSelectionBox->GetToolManager();
     for (mitk::ToolManager::DataVectorType::iterator iter = nodes->begin(); iter != nodes->end(); ++iter)
     {
-      GetSite()->GetWorkbenchWindow()->GetActivePage()->ShowView("org.mitk.views.segmentation" ,"", cherry::IWorkbenchPage::VIEW_ACTIVATE);
+      GetSite()->GetWorkbenchWindow()->GetActivePage()->ShowView("org.mitk.views.segmentation" ,"", berry::IWorkbenchPage::VIEW_ACTIVATE);
       SendSelectedEvent( toolManager->GetReferenceData(0), *iter );
       toolManager->SetWorkingData( *iter );
       OnWorkingDataSelectionChanged( *iter );

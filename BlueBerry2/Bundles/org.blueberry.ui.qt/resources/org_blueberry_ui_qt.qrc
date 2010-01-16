@@ -1,0 +1,18 @@
+<!DOCTYPE RCC><RCC version="1.0">
+ <qresource prefix="/org.blueberry.ui.qt">
+     <file>cursor_bottom.xpm</file>
+     <file>cursor_center.xpm</file>
+     <file>cursor_left.xpm</file>
+     <file>cursor_offscreen.xpm</file>
+     <file>cursor_right.xpm</file>
+     <file>cursor_top.xpm</file>
+     <file>dialog-error.svg</file>
+     <file>icon_missing.png</file>
+     <file>tab_close_icon.png</file>
+     <file>tab_close_icon-active.png</file>
+     
+     <file>defaultstyle.qss</file>
+     <file>defaultstyle-activetab.qss</file>
+     <file>defaultstyle-tab.qss</file>
+ </qresource>
+ </RCC>

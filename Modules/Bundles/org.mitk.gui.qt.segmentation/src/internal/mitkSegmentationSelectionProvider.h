@@ -1,6 +1,6 @@
 /*=========================================================================
 
- Program:   openCherry Platform
+ Program:   BlueBerry Platform
  Language:  C++
  Date:      $Date: 2009-05-26 13:47:06 +0200 (Di, 26 Mai 2009) $
  Version:   $Revision: 17408 $
@@ -18,12 +18,12 @@
 #ifndef MITKSEGMENTATIONSELECTIONPROVIDER_H_
 #define MITKSEGMENTATIONSELECTIONPROVIDER_H_
 
-//#include "cherryUiQtDll.h"
+//#include "berryUiQtDll.h"
 
-#include <cherryISelection.h>
-#include <cherryISelectionProvider.h>
-#include <cherryISelectionChangedListener.h>
-#include <cherryISelectionListener.h>
+#include <berryISelection.h>
+#include <berryISelectionProvider.h>
+#include <berryISelectionChangedListener.h>
+#include <berryISelectionListener.h>
 #include <mitkDataTreeNodeSelection.h>
 
 /*
@@ -35,23 +35,23 @@
 namespace mitk
 {
 
-class SegmentationSelectionProvider: public cherry::ISelectionProvider
+class SegmentationSelectionProvider: public berry::ISelectionProvider
 {
   
 
 public:
 
-  cherryObjectMacro(SegmentationSelectionProvider)
+  berryObjectMacro(SegmentationSelectionProvider)
 
   SegmentationSelectionProvider();
 
-  void AddSelectionChangedListener(cherry::ISelectionChangedListener::Pointer listener);
+  void AddSelectionChangedListener(berry::ISelectionChangedListener::Pointer listener);
 
-  void RemoveSelectionChangedListener(cherry::ISelectionChangedListener::Pointer listener);
+  void RemoveSelectionChangedListener(berry::ISelectionChangedListener::Pointer listener);
 
-  cherry::ISelection::ConstPointer GetSelection() const;
+  berry::ISelection::ConstPointer GetSelection() const;
   
-  void SetSelection(cherry::ISelection::Pointer selection);
+  void SetSelection(berry::ISelection::Pointer selection);
   
   void FireSelectionChanged(mitk::DataTreeNodeSelection::Pointer selection);
   void FireSelectionChanged(mitk::DataTreeNode::Pointer selectedNode);
@@ -67,7 +67,7 @@ public:
   protected:
 
    DataTreeNodeSelection::Pointer m_CurrentSelection;
-   cherry::ISelectionChangedListener::Events m_RegisteredListeners;
+   berry::ISelectionChangedListener::Events m_RegisteredListeners;
 };
 
 }

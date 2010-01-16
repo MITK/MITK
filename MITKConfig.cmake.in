@@ -39,12 +39,12 @@ INCLUDE("@MITK_SOURCE_DIR@/CMake/ToolExtensionHelpers.cmake")
 APPLY_VTK_FLAGS()
 
 
-IF (MITK_USE_OPENCHERRY)
+IF (MITK_USE_BLUEBERRY)
 
-  SET(openCherry_DIR "@MITK_BINARY_DIR@/BlueBerry")
+  SET(BlueBerry_DIR "@MITK_BINARY_DIR@/BlueBerry")
 
   # There is no PocoConfig.cmake, so we set Poco specific CMake variables
-  # here. This way the call to FIND_PACKAGE(Poco) in openCherryConfig.cmake
+  # here. This way the call to FIND_PACKAGE(Poco) in BlueBerryConfig.cmake
   # finds the Poco distribution supplied by MITK
   SET(Poco_INCLUDE_DIR
     "@MITK_SOURCE_DIR@/Utilities/Poco"
@@ -65,11 +65,11 @@ IF (MITK_USE_OPENCHERRY)
     ENDIF()
   ENDIF(NOT MITK_SKIP_BUNDLELIST)
   
-  FIND_PACKAGE(openCherry)
+  FIND_PACKAGE(BlueBerry)
 
-  IF(NOT openCherry_FOUND)
-    MESSAGE(SEND_ERROR "MITK does not seem to be configured with openCherry support. Set MITK_USE_OPENCHERRY to ON in your MITK build configuration.")
-  ENDIF(NOT openCherry_FOUND)
+  IF(NOT BlueBerry_FOUND)
+    MESSAGE(SEND_ERROR "MITK does not seem to be configured with BlueBerry support. Set MITK_USE_BLUEBERRY to ON in your MITK build configuration.")
+  ENDIF(NOT BlueBerry_FOUND)
 
   SET(MITK_PLUGIN_SOURCE_DIRS "@MITK_SOURCE_DIR@/Bundles")
   
@@ -82,4 +82,4 @@ IF (MITK_USE_OPENCHERRY)
   SET(MITK_VTK_LIBRARY_DIRS "@VTK_LIBRARY_DIRS@")
   SET(MITK_ITK_LIBRARY_DIRS "@ITK_LIBRARY_DIRS@")
 
-ENDIF(MITK_USE_OPENCHERRY)
+ENDIF(MITK_USE_BLUEBERRY)

@@ -1,9 +1,9 @@
 SET(SRC_CPP_FILES
-  cherryMessageTest.cpp
-  cherryObjectTest.cpp
-  cherryOSGiCoreTestSuite.cpp
-  cherrySmartPointerTest.cpp
-  cherryWeakPointerTest.cpp
+  berryMessageTest.cpp
+  berryObjectTest.cpp
+  berryOSGiCoreTestSuite.cpp
+  berrySmartPointerTest.cpp
+  berryWeakPointerTest.cpp
 )
 
 SET(INTERNAL_CPP_FILES

@@ -19,7 +19,7 @@
 #ifndef MBICOREEXTACTIVATOR_H_ 
 #define MBICOREEXTACTIVATOR_H_ 
 
-#include <cherryPlugin.h>
+#include <berryPlugin.h>
 
 #include <mitkCoreExtDll.h>
 
@@ -34,7 +34,7 @@ namespace mitk
  * When the plug-in is started by the framework, it initializes CoreExt
  * specific things.
  */
-class MITKCOREEXT_EXPORT CoreExtActivator : public cherry::Plugin
+class MITKCOREEXT_EXPORT CoreExtActivator : public berry::Plugin
 {
 
 public:
@@ -42,7 +42,7 @@ public:
   /**
    * Registers sandbox core object factories.
    */
-  void Start(cherry::IBundleContext::Pointer context);
+  void Start(berry::IBundleContext::Pointer context);
 
 };
 

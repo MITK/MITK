@@ -3,5 +3,5 @@ Bundle-Name: BlueBerry Qt Logging Plug-in
 Bundle-SymbolicName: org.blueberry.ui.qt.log
 Bundle-Version: 1.0.0
 Bundle-Vendor: DKFZ, Medical and Biological Informatics
-Bundle-Activator: cherry::QtLogPlugin
+Bundle-Activator: berry::QtLogPlugin
 Require-Bundle: org.blueberry.ui.qt

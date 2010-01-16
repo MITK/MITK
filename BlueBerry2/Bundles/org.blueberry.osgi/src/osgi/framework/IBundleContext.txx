@@ -1,6 +1,6 @@
 /*=========================================================================
 
-Program:   openCherry Platform
+Program:   BlueBerry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
@@ -18,8 +18,8 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef OSGI_FRAMEWORK_IBUNDLECONTEXT_TXX_
 #define OSGI_FRAMEWORK_IBUNDLECONTEXT_TXX_
 
-#include "cherryPlatform.h"
-#include "service/cherryServiceRegistry.h"
+#include "berryPlatform.h"
+#include "service/berryServiceRegistry.h"
 
 namespace osgi {
 
@@ -28,7 +28,7 @@ namespace framework {
 template<class S>
 SmartPointer<S> IBundleContext::GetService(const std::string& id) const
 {
-  return cherry::Platform::GetServiceRegistry().GetServiceById<S>(id);
+  return berry::Platform::GetServiceRegistry().GetServiceById<S>(id);
 }
 
 } }

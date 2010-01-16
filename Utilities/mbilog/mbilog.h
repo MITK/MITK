@@ -1,6 +1,6 @@
 /*=========================================================================
 
-Program:   mbilog - logging for mitk / openCherry
+Program:   mbilog - logging for mitk / BlueBerry
 
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.

@@ -1,6 +1,6 @@
 /*=========================================================================
 
- Program:   openCherry Platform
+ Program:   BlueBerry Platform
  Language:  C++
  Date:      $Date: 2009-07-08 13:02:46 +0200 (Mi, 08 Jul 2009) $
  Version:   $Revision: 18037 $
@@ -17,11 +17,11 @@
 
 #include "QmitkPreferencesDialog.h"
 
-#include "cherryPlatform.h"
-#include "cherryIPreferencePage.h"
-#include "cherryIConfigurationElement.h"
-#include "cherryIExtensionPointService.h"
-#include "cherryIExtension.h"
+#include "berryPlatform.h"
+#include "berryIPreferencePage.h"
+#include "berryIConfigurationElement.h"
+#include "berryIExtensionPointService.h"
+#include "berryIExtension.h"
 
 #include <QGridLayout>
 #include <QLineEdit>
@@ -47,21 +47,21 @@ QmitkPreferencesDialog::QmitkPreferencesDialog(QWidget * parent, Qt::WindowFlags
 {
   // m_PreferencesService
   m_PreferencesService = 
-    cherry::Platform::GetServiceRegistry().GetServiceById<cherry::IPreferencesService>(cherry::IPreferencesService::ID);
+    berry::Platform::GetServiceRegistry().GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
 
   // m_PrefPages
-  cherry::IExtensionPointService::Pointer extensionPointService = cherry::Platform::GetExtensionPointService();
-  cherry::IConfigurationElement::vector prefPages(extensionPointService->GetConfigurationElementsFor("org.opencherry.ui.preferencePages"));
-  cherry::IConfigurationElement::vector keywordExts(extensionPointService->GetConfigurationElementsFor("org.opencherry.ui.keywords"));      
-  cherry::IConfigurationElement::vector::iterator prefPagesIt;
+  berry::IExtensionPointService::Pointer extensionPointService = berry::Platform::GetExtensionPointService();
+  berry::IConfigurationElement::vector prefPages(extensionPointService->GetConfigurationElementsFor("org.blueberry.ui.preferencePages"));
+  berry::IConfigurationElement::vector keywordExts(extensionPointService->GetConfigurationElementsFor("org.blueberry.ui.keywords"));      
+  berry::IConfigurationElement::vector::iterator prefPagesIt;
   std::string id;
   std::string name;
   std::string category;
   std::string className;
   std::vector<std::string> keywords;
-  vector<cherry::IConfigurationElement::Pointer> keywordRefs;
-  cherry::IConfigurationElement::vector::iterator keywordRefsIt;
-  cherry::IConfigurationElement::vector::iterator keywordExtsIt;
+  vector<berry::IConfigurationElement::Pointer> keywordRefs;
+  berry::IConfigurationElement::vector::iterator keywordRefsIt;
+  berry::IConfigurationElement::vector::iterator keywordExtsIt;
   string keywordRefId;
   string keywordId;
   string keywordLabels;
@@ -103,7 +103,7 @@ QmitkPreferencesDialog::QmitkPreferencesDialog(QWidget * parent, Qt::WindowFlags
       }
 
       // add information as PrefPage
-      m_PrefPages.push_back(PrefPage(id, name, category, className, keywordLabels, cherry::IConfigurationElement::Pointer(*prefPagesIt)));
+      m_PrefPages.push_back(PrefPage(id, name, category, className, keywordLabels, berry::IConfigurationElement::Pointer(*prefPagesIt)));
     }
     
   }
@@ -248,12 +248,12 @@ void QmitkPreferencesDialog::OnImportButtonClicked( bool  /*triggered*/ )
 
   try
   { 
-    cherry::IPreferencesService::Pointer prefService = m_PreferencesService.Lock();
+    berry::IPreferencesService::Pointer prefService = m_PreferencesService.Lock();
     if(prefService.IsNotNull())
     {
-      cherry::ICherryPreferencesService::Pointer cherryPrefService
-        = prefService.Cast<cherry::ICherryPreferencesService>();
-      if(cherryPrefService != 0)
+      berry::IBerryPreferencesService::Pointer berryPrefService
+        = prefService.Cast<berry::IBerryPreferencesService>();
+      if(berryPrefService != 0)
       {
         QFileDialog fd(this, "Choose file to import preferences", "", "XML files (*.xml)" );
         fd.setFileMode(QFileDialog::ExistingFile);
@@ -264,8 +264,8 @@ void QmitkPreferencesDialog::OnImportButtonClicked( bool  /*triggered*/ )
           if(fileNames.size()>0)
           {
             Poco::File f(fileNames.at(0).toStdString());
-            cherryPrefService->ImportPreferences(f, "");
-            cherry::IQtPreferencePage* prefPage = m_PrefPages[m_CurrentPage].prefPage;
+            berryPrefService->ImportPreferences(f, "");
+            berry::IQtPreferencePage* prefPage = m_PrefPages[m_CurrentPage].prefPage;
             if(prefPage)
               prefPage->Update();
 
@@ -291,12 +291,12 @@ void QmitkPreferencesDialog::OnExportButtonClicked( bool  /*triggered*/ )
 {
   try
   { 
-    cherry::IPreferencesService::Pointer prefService = m_PreferencesService.Lock();
+    berry::IPreferencesService::Pointer prefService = m_PreferencesService.Lock();
     if(prefService.IsNotNull())
     {
-      cherry::ICherryPreferencesService::Pointer cherryPrefService
-        = prefService.Cast<cherry::ICherryPreferencesService>();
-      if(cherryPrefService != 0)
+      berry::IBerryPreferencesService::Pointer berryPrefService
+        = prefService.Cast<berry::IBerryPreferencesService>();
+      if(berryPrefService != 0)
       {
         QFileDialog fd(this, "Choose file to import preferences", "", "XML files (*.xml)" );
         fd.setFileMode(QFileDialog::AnyFile);
@@ -307,7 +307,7 @@ void QmitkPreferencesDialog::OnExportButtonClicked( bool  /*triggered*/ )
           if(fileNames.size()>0)
           {
             Poco::File f(fileNames.at(0).toStdString());
-            cherryPrefService->ExportPreferences(f, "");
+            berryPrefService->ExportPreferences(f, "");
             MITK_INFO("QmitkPreferencesDialog") << "Preferences successfully exported to " << f.path();
           }
         }
@@ -328,7 +328,7 @@ void QmitkPreferencesDialog::OnExportButtonClicked( bool  /*triggered*/ )
 
 void QmitkPreferencesDialog::OnApplyButtonClicked( bool  /*triggered*/ )
 {  
-  cherry::IQtPreferencePage* prefPage = 0;
+  berry::IQtPreferencePage* prefPage = 0;
 
   for(vector<PrefPage>::iterator it = m_PrefPages.begin();
     it != m_PrefPages.end(); ++it, ++m_CurrentPage)
@@ -343,7 +343,7 @@ void QmitkPreferencesDialog::OnApplyButtonClicked( bool  /*triggered*/ )
 
 void QmitkPreferencesDialog::OnCloseButtonClicked( bool  /*triggered*/ )
 {
-  cherry::IQtPreferencePage* prefPage = m_PrefPages[m_CurrentPage].prefPage;
+  berry::IQtPreferencePage* prefPage = m_PrefPages[m_CurrentPage].prefPage;
   if(prefPage)
     prefPage->PerformCancel();
 
@@ -398,7 +398,7 @@ void QmitkPreferencesDialog::OnPreferencesTreeItemSelectionChanged()
         m_Headline->setText(QString::fromStdString(it->name));
         if(it->prefPage == 0)
         {
-          it->prefPage = dynamic_cast<cherry::IQtPreferencePage*>(it->confElem->CreateExecutableExtension<cherry::IPreferencePage>("class"));
+          it->prefPage = dynamic_cast<berry::IQtPreferencePage*>(it->confElem->CreateExecutableExtension<berry::IPreferencePage>("class"));
           it->prefPage->CreateQtControl(m_PreferencesPanel);
           m_PreferencesPanel->addWidget(it->prefPage->GetQtControl());
         }
@@ -489,7 +489,7 @@ bool QmitkPreferencesDialog::PrefPage::operator<( const PrefPage& other )
 
 QmitkPreferencesDialog::PrefPage::PrefPage( std::string _id, std::string _name, std::string _category
                                            , std::string _className, std::string _keywords
-                                           , cherry::IConfigurationElement::Pointer _confElem )
+                                           , berry::IConfigurationElement::Pointer _confElem )
 : id(_id)
 , name(_name)
 , category(_category)

@@ -1,6 +1,6 @@
 /*=========================================================================
 
-Program:   openCherry Platform
+Program:   BlueBerry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
@@ -17,9 +17,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "Poco/ClassLibrary.h"
 
-#include <cherryIBundleActivator.h>
-#include "src/cherryRuntimePlugin.h"
+#include <berryIBundleActivator.h>
+#include "src/berryRuntimePlugin.h"
 
-POCO_BEGIN_MANIFEST(cherry::IBundleActivator)
-  POCO_EXPORT_CLASS(cherry::RuntimePlugin)
+POCO_BEGIN_MANIFEST(berry::IBundleActivator)
+  POCO_EXPORT_CLASS(berry::RuntimePlugin)
 POCO_END_MANIFEST

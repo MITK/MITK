@@ -1,6 +1,6 @@
 /*=========================================================================
  
-Program:   openCherry Platform
+Program:   BlueBerry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef OSGI_FRAMEWORK_IBUNDLEACTIVATOR_
 #define OSGI_FRAMEWORK_IBUNDLEACTIVATOR_
 
-#include "cherryOSGiDll.h"
+#include "berryOSGiDll.h"
 
 #include "SmartPointer.h"
 
@@ -28,7 +28,7 @@ namespace framework {
 
 struct IBundleContext;
 
-struct CHERRY_OSGI IBundleActivator
+struct BERRY_OSGI IBundleActivator
 {
   virtual void Start(SmartPointer<IBundleContext> context) = 0;
   virtual void Stop(SmartPointer<IBundleContext> context) = 0;

@@ -1,6 +1,6 @@
 /*=========================================================================
  
- Program:   openCherry Platform
+ Program:   BlueBerry Platform
  Language:  C++
  Date:      $Date$
  Version:   $Revision$
@@ -17,9 +17,9 @@
 
 #include "Poco/ClassLibrary.h"
 
-#include <cherryIApplication.h>
-#include "src/cherryCoreTestApplication.h"
+#include <berryIApplication.h>
+#include "src/berryCoreTestApplication.h"
 
-POCO_BEGIN_NAMED_MANIFEST(cherryIApplication, cherry::IApplication)
-  POCO_EXPORT_CLASS(cherry::CoreTestApplication)
+POCO_BEGIN_NAMED_MANIFEST(berryIApplication, berry::IApplication)
+  POCO_EXPORT_CLASS(berry::CoreTestApplication)
 POCO_END_MANIFEST

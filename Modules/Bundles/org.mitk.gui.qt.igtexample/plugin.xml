@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?openCherry version="0.1"?>
+<?BlueBerry version="0.1"?>
 <plugin>
   
-  <extension point="org.opencherry.ui.views">
+  <extension point="org.blueberry.ui.views">
     <view id="org.mitk.views.igtexample"
           name="IGT Example"
           class="::QmitkIGTExampleView" 

@@ -3,15 +3,15 @@
 #ifndef (@GENERATE_VIEW_CLASS@_H_INCLUDED)
 #define @GENERATE_VIEW_CLASS@_H_INCLUDED
 
-#include <cherryPlugin.h>
-#include <cherryIBundleContext.h>
-#include <event/cherryPlatformEvent.h>
+#include <berryPlugin.h>
+#include <berryIBundleContext.h>
+#include <event/berryPlatformEvent.h>
 
-#include "cherryRuntimeDll.h"
+#include "berryRuntimeDll.h"
 
-namespace cherry {
+namespace berry {
 
-class CHERRY_RUNTIME @GENERATE_VIEW_CLASS@ : public Plugin
+class BERRY_RUNTIME @GENERATE_VIEW_CLASS@ : public Plugin
 {
 public:
 

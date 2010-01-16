@@ -1,6 +1,6 @@
 /*=========================================================================
 
-Program:   openCherry Platform
+Program:   BlueBerry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision: 14645 $
@@ -17,9 +17,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <Poco/ClassLibrary.h>
 
-#include <cherryIViewPart.h>
+#include <berryIViewPart.h>
 #include "src/internal/QmitkImageCropper.h"
 
-POCO_BEGIN_NAMED_MANIFEST(cherryIViewPart, cherry::IViewPart)
+POCO_BEGIN_NAMED_MANIFEST(berryIViewPart, berry::IViewPart)
   POCO_EXPORT_CLASS(QmitkImageCropper)
 POCO_END_MANIFEST

@@ -25,20 +25,20 @@
 #include <windows.h>
 #endif
 
-#include <cherryQtWorkbenchAdvisor.h>
+#include <berryQtWorkbenchAdvisor.h>
 
 #include "mitkQtExtAppDll.h"
 
-class MITK_QT_EXTAPP QmitkExtAppWorkbenchAdvisor: public cherry::QtWorkbenchAdvisor
+class MITK_QT_EXTAPP QmitkExtAppWorkbenchAdvisor: public berry::QtWorkbenchAdvisor
 {
 public:
 
   static const std::string DEFAULT_PERSPECTIVE_ID; // = "org.mitk.extapp.defaultperspective"
 
-  void Initialize(cherry::IWorkbenchConfigurer::Pointer configurer);
+  void Initialize(berry::IWorkbenchConfigurer::Pointer configurer);
 
-  cherry::WorkbenchWindowAdvisor* CreateWorkbenchWindowAdvisor(
-      cherry::IWorkbenchWindowConfigurer::Pointer configurer);
+  berry::WorkbenchWindowAdvisor* CreateWorkbenchWindowAdvisor(
+      berry::IWorkbenchWindowConfigurer::Pointer configurer);
 
   std::string GetInitialWindowPerspectiveId();
 

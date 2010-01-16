@@ -21,14 +21,14 @@ PURPOSE.  See the above copyright notices for more information.
 #include "src/internal/QmitkExtApplicationPlugin.h"
 #include "src/internal/QmitkExtDefaultPerspective.h"
 
-POCO_BEGIN_MANIFEST(cherry::IBundleActivator)
+POCO_BEGIN_MANIFEST(berry::IBundleActivator)
   POCO_EXPORT_CLASS(QmitkExtApplicationPlugin)
 POCO_END_MANIFEST
 
-POCO_BEGIN_NAMED_MANIFEST(cherryIApplication, cherry::IApplication)
+POCO_BEGIN_NAMED_MANIFEST(berryIApplication, berry::IApplication)
   POCO_EXPORT_CLASS(QmitkExtApplication)
 POCO_END_MANIFEST
 
-POCO_BEGIN_NAMED_MANIFEST(cherryIPerspectiveFactory, cherry::IPerspectiveFactory)
+POCO_BEGIN_NAMED_MANIFEST(berryIPerspectiveFactory, berry::IPerspectiveFactory)
   POCO_EXPORT_CLASS(QmitkExtDefaultPerspective)
 POCO_END_MANIFEST

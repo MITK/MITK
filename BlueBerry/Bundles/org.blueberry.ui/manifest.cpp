@@ -1,6 +1,6 @@
 /*=========================================================================
  
-Program:   openCherry Platform
+Program:   BlueBerry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
@@ -17,21 +17,21 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "Poco/ClassLibrary.h"
 
-#include <cherryIBundleActivator.h>
-#include "src/internal/cherryWorkbenchPlugin.h"
+#include <berryIBundleActivator.h>
+#include "src/internal/berryWorkbenchPlugin.h"
 
-POCO_BEGIN_MANIFEST(cherry::IBundleActivator)
-  POCO_EXPORT_CLASS(cherry::WorkbenchPlugin)
+POCO_BEGIN_MANIFEST(berry::IBundleActivator)
+  POCO_EXPORT_CLASS(berry::WorkbenchPlugin)
 POCO_END_MANIFEST
 
-#include "src/internal/intro/cherryViewIntroAdapterPart.h"
+#include "src/internal/intro/berryViewIntroAdapterPart.h"
 
-POCO_BEGIN_NAMED_MANIFEST(cherryIViewPart, cherry::IViewPart)
-  POCO_EXPORT_CLASS(cherry::ViewIntroAdapterPart)
+POCO_BEGIN_NAMED_MANIFEST(berryIViewPart, berry::IViewPart)
+  POCO_EXPORT_CLASS(berry::ViewIntroAdapterPart)
 POCO_END_MANIFEST
 
-#include "src/internal/intro/cherryEditorIntroAdapterPart.h"
+#include "src/internal/intro/berryEditorIntroAdapterPart.h"
 
-POCO_BEGIN_NAMED_MANIFEST(cherryIEditorPart, cherry::IEditorPart)
-  POCO_EXPORT_CLASS(cherry::EditorIntroAdapterPart)
+POCO_BEGIN_NAMED_MANIFEST(berryIEditorPart, berry::IEditorPart)
+  POCO_EXPORT_CLASS(berry::EditorIntroAdapterPart)
 POCO_END_MANIFEST

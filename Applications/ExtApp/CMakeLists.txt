@@ -1,4 +1,4 @@
-SET(MITK_USE_OPENCHERRY 1)
+SET(MITK_USE_BLUEBERRY 1)
 SET(MITK_USE_EXT 1)
 FIND_PACKAGE(MITK)
 
@@ -6,8 +6,8 @@ FIND_PACKAGE(MITK)
 MITK_USE_MODULE(MitkExt)
 
 INCLUDE_DIRECTORIES(
-  ${OPENCHERRY_PLUGIN_SOURCE_DIRS} 
-  ${org.blueberry.osgi_BIN_DIR} # needed for generated cherryConfig.h 
+  ${BLUEBERRY_PLUGIN_SOURCE_DIRS} 
+  ${org.blueberry.osgi_BIN_DIR} # needed for generated berryConfig.h 
   ${Poco_INCLUDE_DIRS}
   ${ALL_INCLUDE_DIRECTORIES}
 )
@@ -18,7 +18,7 @@ ADD_EXECUTABLE(ExtApp ExtApp.cpp)
 TARGET_LINK_LIBRARIES(ExtApp 
                       optimized PocoFoundation      debug PocoFoundationd 
                       optimized PocoUtil            debug PocoUtild 
-                      optimized org_blueberry_osgi debug org_blueberry_osgi${OPENCHERRY_DEBUG_POSTFIX}
+                      optimized org_blueberry_osgi debug org_blueberry_osgi${BLUEBERRY_DEBUG_POSTFIX}
                       ${ALL_LIBRARIES})
 
 					  
@@ -34,14 +34,14 @@ ENDFOREACH()
 
 #MESSAGE(STATUS ${MITK_MODULES_ENABLED_PLUGINS})
 					  
-SET(_plugin_deps ${OPENCHERRY_ENABLED_PLUGINS} ${MITK_CORE_ENABLED_PLUGINS} ${MITK_MODULES_ENABLED_PLUGINS})
+SET(_plugin_deps ${BLUEBERRY_ENABLED_PLUGINS} ${MITK_CORE_ENABLED_PLUGINS} ${MITK_MODULES_ENABLED_PLUGINS})
 
 IF(_plugin_deps)
   # Make sure all enabled plug-ins are up to date
   ADD_DEPENDENCIES(ExtApp ${_plugin_deps})
 ENDIF()
 
-SET(OPENCHERRY_PLUGIN_CACHE_DIR "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/plugin_cache")
+SET(BLUEBERRY_PLUGIN_CACHE_DIR "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/plugin_cache")
 
 CONFIGURE_FILE(ExtApp.ini
                ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/ExtApp.ini)

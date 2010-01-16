@@ -1,6 +1,6 @@
 /*=========================================================================
  
- Program:   openCherry Platform
+ Program:   BlueBerry Platform
  Language:  C++
  Date:      $Date$
  Version:   $Revision$
@@ -33,12 +33,12 @@ QmitkExtApplicationPlugin* QmitkExtApplicationPlugin::GetDefault()
   return inst;
 }
 
-void QmitkExtApplicationPlugin::Start(cherry::IBundleContext::Pointer context)
+void QmitkExtApplicationPlugin::Start(berry::IBundleContext::Pointer context)
 {
   this->context = context;
 }
 
-cherry::IBundleContext::Pointer QmitkExtApplicationPlugin::GetBundleContext() const
+berry::IBundleContext::Pointer QmitkExtApplicationPlugin::GetBundleContext() const
 {
   return context;
 }

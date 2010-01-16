@@ -3,8 +3,8 @@
 #include <QtGui>
 
 
-// cherry Includes
-#include <cherryPlatform.h>
+// berry Includes
+#include <berryPlatform.h>
 
 #include <mitkDataTreeNodeFactory.h>
 #include "mitkIDataStorageService.h"
@@ -34,7 +34,7 @@ void QmitkDnDFrameWidget::dropEvent( QDropEvent * event )
 { //open dragged files
   
   mitk::IDataStorageService::Pointer service = 
-    cherry::Platform::GetServiceRegistry().GetServiceById<mitk::IDataStorageService>(mitk::IDataStorageService::ID);
+    berry::Platform::GetServiceRegistry().GetServiceById<mitk::IDataStorageService>(mitk::IDataStorageService::ID);
   
   mitk::DataStorage::Pointer ds;
   if (service.IsNotNull())

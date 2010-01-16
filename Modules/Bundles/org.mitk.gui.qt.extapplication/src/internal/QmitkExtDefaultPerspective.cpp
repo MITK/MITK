@@ -16,23 +16,23 @@
  =========================================================================*/
 
 #include "QmitkExtDefaultPerspective.h"
-#include "cherryIViewLayout.h"
+#include "berryIViewLayout.h"
 
 
-void QmitkExtDefaultPerspective::CreateInitialLayout(cherry::IPageLayout::Pointer layout)
+void QmitkExtDefaultPerspective::CreateInitialLayout(berry::IPageLayout::Pointer layout)
 {
   std::string editorArea = layout->GetEditorArea();
 
   layout->AddView("org.mitk.views.datamanager", 
-    cherry::IPageLayout::LEFT, 0.3f, editorArea);
+    berry::IPageLayout::LEFT, 0.3f, editorArea);
 
-  cherry::IViewLayout::Pointer lo = layout->GetViewLayout("org.mitk.views.datamanager");
+  berry::IViewLayout::Pointer lo = layout->GetViewLayout("org.mitk.views.datamanager");
   lo->SetCloseable(false);
 
   layout->AddView("org.mitk.views.imagenavigator", 
-    cherry::IPageLayout::BOTTOM, 0.5f, "org.mitk.views.datamanager");
+    berry::IPageLayout::BOTTOM, 0.5f, "org.mitk.views.datamanager");
 
-  cherry::IFolderLayout::Pointer bottomFolder = layout->CreateFolder("bottom", cherry::IPageLayout::BOTTOM, 0.7f, editorArea);
+  berry::IFolderLayout::Pointer bottomFolder = layout->CreateFolder("bottom", berry::IPageLayout::BOTTOM, 0.7f, editorArea);
   bottomFolder->AddView("org.mitk.views.propertylistview");
-  bottomFolder->AddView("org.opencherry.views.logview");
+  bottomFolder->AddView("org.blueberry.views.logview");
 }

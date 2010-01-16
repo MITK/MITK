@@ -19,7 +19,7 @@
 #ifndef MITKDIFFUSIONIMAGINGACTIVATOR_H_ 
 #define MITKDIFFUSIONIMAGINGACTIVATOR_H_ 
 
-#include <cherryPlugin.h>
+#include <berryPlugin.h>
 
 #include <mitkDiffusionImagingDll.h>
 
@@ -38,7 +38,7 @@ namespace mitk
  * specific things.
  */
 class ORG_MITK_DIFFUSIONIMAGING_EXPORT DiffusionImagingActivator : 
-  /*public QObject, */public cherry::Plugin
+  /*public QObject, */public berry::Plugin
 {
 
   //Q_OBJECT
@@ -48,7 +48,7 @@ public:
   /**
    * Registers sandbox core object factories.
    */
-  void Start(cherry::IBundleContext::Pointer context);
+  void Start(berry::IBundleContext::Pointer context);
 
   //void OpactiyChanged(int value);
   //void OpactiyActionChanged();

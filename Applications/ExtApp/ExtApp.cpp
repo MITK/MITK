@@ -16,7 +16,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#include <org.blueberry.osgi/src/application/cherryStarter.h>
+#include <org.blueberry.osgi/src/application/berryStarter.h>
 #include <Poco/Util/MapConfiguration.h>
 #include <mitkCoreExtObjectFactory.h>
 
@@ -30,8 +30,8 @@ int main(int argc, char** argv)
   Poco::Path basePath(argv[0]);
   basePath.setFileName("");
   
-  Poco::Path openCherryPath(basePath);
-  openCherryPath.pushDirectory("openCherry");
+  Poco::Path BlueBerryPath(basePath);
+  BlueBerryPath.pushDirectory("BlueBerry");
 
   Poco::Path corePath(basePath);
   corePath.pushDirectory("CoreBundles");
@@ -39,10 +39,10 @@ int main(int argc, char** argv)
   Poco::Path extPath(basePath);
   extPath.pushDirectory("ExtBundles");
 
-  std::string pluginDirs = openCherryPath.toString() + ";" + corePath.toString() + ";" + extPath.toString();
+  std::string pluginDirs = BlueBerryPath.toString() + ";" + corePath.toString() + ";" + extPath.toString();
 
   Poco::Util::MapConfiguration* extConfig(new Poco::Util::MapConfiguration());
-  extConfig->setString(cherry::Platform::ARG_PLUGIN_DIRS, pluginDirs);
-  extConfig->setString(cherry::Platform::ARG_APPLICATION, "org.mitk.qt.extapplication");
-  return cherry::Starter::Run(argc, argv, extConfig);
+  extConfig->setString(berry::Platform::ARG_PLUGIN_DIRS, pluginDirs);
+  extConfig->setString(berry::Platform::ARG_APPLICATION, "org.mitk.qt.extapplication");
+  return berry::Starter::Run(argc, argv, extConfig);
 }

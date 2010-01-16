@@ -1,21 +1,21 @@
 SET(SRC_CPP_FILES
 
-  cherryUiTestSuite.cpp
+  berryUiTestSuite.cpp
 
   # API Tests
-  api/cherryIPageLayoutTest.cpp
-  api/cherryIViewPartTest.cpp
-  api/cherryIWorkbenchPartTest.cpp
-  api/cherryMockSelectionProvider.cpp
-  api/cherryMockViewPart.cpp
-  api/cherryMockWorkbenchPart.cpp
-  api/cherrySaveableMockViewPart.cpp
-  api/cherryUiApiTestSuite.cpp
-  api/cherryXMLMementoTest.cpp
+  api/berryIPageLayoutTest.cpp
+  api/berryIViewPartTest.cpp
+  api/berryIWorkbenchPartTest.cpp
+  api/berryMockSelectionProvider.cpp
+  api/berryMockViewPart.cpp
+  api/berryMockWorkbenchPart.cpp
+  api/berrySaveableMockViewPart.cpp
+  api/berryUiApiTestSuite.cpp
+  api/berryXMLMementoTest.cpp
   
   
   # Utility classes
-  util/cherryCallHistory.cpp
+  util/berryCallHistory.cpp
 )
 
 SET(INTERNAL_CPP_FILES

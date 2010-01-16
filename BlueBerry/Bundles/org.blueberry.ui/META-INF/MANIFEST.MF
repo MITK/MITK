@@ -4,4 +4,4 @@ Bundle-SymbolicName: org.blueberry.ui
 Bundle-Version: 1.0.0
 Bundle-Vendor: DKFZ, Medical and Biological Informatics
 Require-Bundle: org.blueberry.solstice.common, org.blueberry.core.commands, org.blueberry.core.expressions
-Bundle-Activator: cherry::WorkbenchPlugin
+Bundle-Activator: berry::WorkbenchPlugin

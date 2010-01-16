@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!-- Schema file written by PDE -->
-<schema targetNamespace="org.opencherry.core.runtime">
+<schema targetNamespace="org.blueberry.core.runtime">
 <annotation>
       <appInfo>
-         <meta.schema plugin="org.opencherry.core.runtime" id="applications" name="Applications"/>
+         <meta.schema plugin="org.blueberry.core.runtime" id="applications" name="Applications"/>
       </appInfo>
       <documentation>
          Platform runtime supports plug-ins which would like to 

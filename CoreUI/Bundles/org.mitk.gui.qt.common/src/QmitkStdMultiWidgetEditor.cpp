@@ -17,9 +17,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "QmitkStdMultiWidgetEditor.h"
 
-#include <cherryUIException.h>
-#include <cherryIWorkbenchPage.h>
-#include <cherryIPreferencesService.h>
+#include <berryUIException.h>
+#include <berryIWorkbenchPage.h>
+#include <berryIPreferencesService.h>
 
 #include <QWidget>
 
@@ -41,7 +41,7 @@ QmitkStdMultiWidgetEditor::~QmitkStdMultiWidgetEditor()
   // register/unregister block to prevent infinite recursion
   // due to the destruction of temporary smartpointer to this
   this->Register();
-  this->GetSite()->GetPage()->RemovePartListener(cherry::IPartListener::Pointer(this));
+  this->GetSite()->GetPage()->RemovePartListener(berry::IPartListener::Pointer(this));
   this->UnRegister(false);
 }
 
@@ -50,10 +50,10 @@ QmitkStdMultiWidget* QmitkStdMultiWidgetEditor::GetStdMultiWidget()
   return m_StdMultiWidget;
 }
 
-void QmitkStdMultiWidgetEditor::Init(cherry::IEditorSite::Pointer site, cherry::IEditorInput::Pointer input)
+void QmitkStdMultiWidgetEditor::Init(berry::IEditorSite::Pointer site, berry::IEditorInput::Pointer input)
 {
   if (input.Cast<mitk::DataStorageEditorInput>().IsNull())
-     throw cherry::PartInitException("Invalid Input: Must be IFileEditorInput");
+     throw berry::PartInitException("Invalid Input: Must be IFileEditorInput");
 
   this->SetSite(site);
   this->SetInput(input);
@@ -100,14 +100,14 @@ void QmitkStdMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
     mitk::GlobalInteraction::GetInstance()->AddListener(
         m_StdMultiWidget->GetMoveAndZoomInteractor()
       );
-    this->GetSite()->GetPage()->AddPartListener(cherry::IPartListener::Pointer(this));
+    this->GetSite()->GetPage()->AddPartListener(berry::IPartListener::Pointer(this));
 
     // enable change of logo
-    cherry::IPreferencesService::Pointer prefService
-      = cherry::Platform::GetServiceRegistry()
-      .GetServiceById<cherry::IPreferencesService>(cherry::IPreferencesService::ID);
+    berry::IPreferencesService::Pointer prefService
+      = berry::Platform::GetServiceRegistry()
+      .GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
 
-    cherry::IPreferences::Pointer logoPref = prefService->GetSystemPreferences()->Node("DepartmentLogo");
+    berry::IPreferences::Pointer logoPref = prefService->GetSystemPreferences()->Node("DepartmentLogo");
     std::string departmentLogoLocation = logoPref->Get("DepartmentLogo","");
 
     m_StdMultiWidget->SetDepartmentLogoPath(departmentLogoLocation.c_str());
@@ -116,12 +116,12 @@ void QmitkStdMultiWidgetEditor::CreateQtPartControl(QWidget* parent)
   }
 }
 
-cherry::IPartListener::Events::Types QmitkStdMultiWidgetEditor::GetPartEventTypes() const
+berry::IPartListener::Events::Types QmitkStdMultiWidgetEditor::GetPartEventTypes() const
 {
   return Events::CLOSED | Events::HIDDEN | Events::VISIBLE;
 }
 
-void QmitkStdMultiWidgetEditor::PartClosed( cherry::IWorkbenchPartReference::Pointer partRef )
+void QmitkStdMultiWidgetEditor::PartClosed( berry::IWorkbenchPartReference::Pointer partRef )
 {
   if (partRef->GetId() == QmitkStdMultiWidgetEditor::EDITOR_ID)
   {
@@ -134,7 +134,7 @@ void QmitkStdMultiWidgetEditor::PartClosed( cherry::IWorkbenchPartReference::Poi
   }
 }
 
-void QmitkStdMultiWidgetEditor::PartVisible( cherry::IWorkbenchPartReference::Pointer partRef )
+void QmitkStdMultiWidgetEditor::PartVisible( berry::IWorkbenchPartReference::Pointer partRef )
 {
   if (partRef->GetId() == QmitkStdMultiWidgetEditor::EDITOR_ID)
   {
@@ -147,7 +147,7 @@ void QmitkStdMultiWidgetEditor::PartVisible( cherry::IWorkbenchPartReference::Po
   }
 }
 
-void QmitkStdMultiWidgetEditor::PartHidden( cherry::IWorkbenchPartReference::Pointer partRef )
+void QmitkStdMultiWidgetEditor::PartHidden( berry::IWorkbenchPartReference::Pointer partRef )
 {
   if (partRef->GetId() == QmitkStdMultiWidgetEditor::EDITOR_ID)
   {

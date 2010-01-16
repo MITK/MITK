@@ -26,9 +26,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qgroupbox.h>
 #include <qradiobutton.h>
 
-// Cherry includes (selection service)
-#include <cherryISelectionService.h>
-#include <cherryIWorkbenchWindow.h>
+// Berry includes (selection service)
+#include <berryISelectionService.h>
+#include <berryIWorkbenchWindow.h>
 
 // MITK includes (GUI)
 #include "QmitkStdMultiWidget.h"
@@ -133,7 +133,7 @@ QmitkBasicImageProcessing::QmitkBasicImageProcessing()
 
 QmitkBasicImageProcessing::~QmitkBasicImageProcessing()
 {
-  cherry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
+  berry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
   if(s)
     s->RemoveSelectionListener(m_SelectionListener);
 }
@@ -149,9 +149,9 @@ void QmitkBasicImageProcessing::CreateQtPartControl(QWidget *parent)
     m_Controls->m_ImageSelector2->SetDataStorage(this->GetDefaultDataStorage());
     m_Controls->m_ImageSelector2->SetPredicate(mitk::NodePredicateDataType::New("Image"));
   }
-  m_SelectionListener = new cherry::SelectionChangedAdapter<QmitkBasicImageProcessing>
+  m_SelectionListener = new berry::SelectionChangedAdapter<QmitkBasicImageProcessing>
     (this, &QmitkBasicImageProcessing::SelectionChanged);
-  cherry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
+  berry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
   if(s)
     s->AddSelectionListener(m_SelectionListener);
 
@@ -181,7 +181,7 @@ void QmitkBasicImageProcessing::Activated()
   QmitkFunctionality::Activated();
 }
 
-void QmitkBasicImageProcessing::SelectionChanged( cherry::IWorkbenchPart::Pointer, cherry::ISelection::ConstPointer selection )
+void QmitkBasicImageProcessing::SelectionChanged( berry::IWorkbenchPart::Pointer, berry::ISelection::ConstPointer selection )
 {
   if ( selection == NULL) return;
 

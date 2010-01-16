@@ -17,21 +17,21 @@
 
 #include <Poco/ClassLibrary.h>
 
-#include <cherryIEditorPart.h>
-#include <cherryIBundleActivator.h>
+#include <berryIEditorPart.h>
+#include <berryIBundleActivator.h>
 
 #include "src/QmitkStdMultiWidgetEditor.h"
 #include "src/internal/QmitkCommonActivator.h"
 #include "src/QmitkGeneralPreferencePage.h"
 
-POCO_BEGIN_NAMED_MANIFEST(cherryIEditorPart, cherry::IEditorPart)
+POCO_BEGIN_NAMED_MANIFEST(berryIEditorPart, berry::IEditorPart)
   POCO_EXPORT_CLASS(QmitkStdMultiWidgetEditor)
 POCO_END_MANIFEST
 
-POCO_BEGIN_MANIFEST(cherry::IBundleActivator)
+POCO_BEGIN_MANIFEST(berry::IBundleActivator)
   POCO_EXPORT_CLASS(QmitkCommonActivator)
 POCO_END_MANIFEST
 
-POCO_BEGIN_NAMED_MANIFEST(cherryIPreferencePage, cherry::IPreferencePage)
+POCO_BEGIN_NAMED_MANIFEST(berryIPreferencePage, berry::IPreferencePage)
   POCO_EXPORT_CLASS(QmitkGeneralPreferencePage)
 POCO_END_MANIFEST

@@ -1,92 +1,92 @@
 SET(SRC_CPP_FILES
-  cherryIQtPreferencePage.cpp
-  cherryIQtStyleManager.cpp
-  cherryQtAssistantUtil.cpp
-  cherryQModelIndexObject.cpp
-  cherryQtEditorPart.cpp
-  cherryQtItemSelection.cpp
-  cherryQtIntroPart.cpp
-  cherryQtPreferences.cpp
-  cherryQtSelectionProvider.cpp
-  cherryQtViewPart.cpp
+  berryIQtPreferencePage.cpp
+  berryIQtStyleManager.cpp
+  berryQtAssistantUtil.cpp
+  berryQModelIndexObject.cpp
+  berryQtEditorPart.cpp
+  berryQtItemSelection.cpp
+  berryQtIntroPart.cpp
+  berryQtPreferences.cpp
+  berryQtSelectionProvider.cpp
+  berryQtViewPart.cpp
   
   # application
-  application/cherryQtWorkbenchAdvisor.cpp
+  application/berryQtWorkbenchAdvisor.cpp
 )
 
 SET(INTERNAL_CPP_FILES
 
-  defaultpresentation/cherryEmptyTabFolder.cpp
-  defaultpresentation/cherryEmptyTabItem.cpp
-  defaultpresentation/cherryNativeTabFolder.cpp
-  defaultpresentation/cherryNativeTabItem.cpp
-  defaultpresentation/cherryQCTabBar.cpp
-  defaultpresentation/cherryQtWorkbenchPresentationFactory.cpp
+  defaultpresentation/berryEmptyTabFolder.cpp
+  defaultpresentation/berryEmptyTabItem.cpp
+  defaultpresentation/berryNativeTabFolder.cpp
+  defaultpresentation/berryNativeTabItem.cpp
+  defaultpresentation/berryQCTabBar.cpp
+  defaultpresentation/berryQtWorkbenchPresentationFactory.cpp
   
-  util/cherryAbstractTabFolder.cpp
-  util/cherryLeftToRightTabOrder.cpp
-  util/cherryPartInfo.cpp
-  util/cherryPresentablePartFolder.cpp
-  util/cherryReplaceDragHandler.cpp
-  util/cherryTabbedStackPresentation.cpp
-  util/cherryTabFolderEvent.cpp
+  util/berryAbstractTabFolder.cpp
+  util/berryLeftToRightTabOrder.cpp
+  util/berryPartInfo.cpp
+  util/berryPresentablePartFolder.cpp
+  util/berryReplaceDragHandler.cpp
+  util/berryTabbedStackPresentation.cpp
+  util/berryTabFolderEvent.cpp
   
-  cherryQtControlWidget.cpp
-  cherryQtDisplay.cpp
-  cherryQtDnDTweaklet.cpp
-  cherryQtFileImageDescriptor.cpp
-  cherryQtGlobalEventFilter.cpp
-  cherryQtIconImageDescriptor.cpp
-  cherryQtImageTweaklet.cpp
-  cherryQtMainWindowControl.cpp
-  cherryQtMessageDialogTweaklet.cpp
-  cherryQtMissingImageDescriptor.cpp
-  cherryQtOpenPerspectiveAction.cpp
-  cherryQtPerspectiveSwitcher.cpp
-  cherryQtPluginActivator.cpp
-  cherryQtSafeApplication.cpp
-  cherryQtSash.cpp
-  cherryQtShell.cpp
-  cherryQtShowViewAction.cpp
-  cherryQtShowViewDialog.cpp
-  cherryQtStyleManager.cpp
-  cherryQtStylePreferencePage.cpp
-  cherryQtTracker.cpp
-  cherryQtWidgetController.cpp
-  cherryQtWidgetsTweaklet.cpp
-  cherryQtWidgetsTweakletImpl.cpp
-  cherryQtWorkbenchPageTweaklet.cpp
-  cherryQtWorkbenchTweaklet.cpp
-  cherryQtWorkbenchWindow.cpp
+  berryQtControlWidget.cpp
+  berryQtDisplay.cpp
+  berryQtDnDTweaklet.cpp
+  berryQtFileImageDescriptor.cpp
+  berryQtGlobalEventFilter.cpp
+  berryQtIconImageDescriptor.cpp
+  berryQtImageTweaklet.cpp
+  berryQtMainWindowControl.cpp
+  berryQtMessageDialogTweaklet.cpp
+  berryQtMissingImageDescriptor.cpp
+  berryQtOpenPerspectiveAction.cpp
+  berryQtPerspectiveSwitcher.cpp
+  berryQtPluginActivator.cpp
+  berryQtSafeApplication.cpp
+  berryQtSash.cpp
+  berryQtShell.cpp
+  berryQtShowViewAction.cpp
+  berryQtShowViewDialog.cpp
+  berryQtStyleManager.cpp
+  berryQtStylePreferencePage.cpp
+  berryQtTracker.cpp
+  berryQtWidgetController.cpp
+  berryQtWidgetsTweaklet.cpp
+  berryQtWidgetsTweakletImpl.cpp
+  berryQtWorkbenchPageTweaklet.cpp
+  berryQtWorkbenchTweaklet.cpp
+  berryQtWorkbenchWindow.cpp
 )
 
 SET(MOC_H_FILES
-  src/cherryQtSelectionProvider.h
+  src/berryQtSelectionProvider.h
   
-  src/internal/defaultpresentation/cherryNativeTabFolder.h
-  src/internal/defaultpresentation/cherryNativeTabItem.h
-  src/internal/defaultpresentation/cherryQCTabBar.h
+  src/internal/defaultpresentation/berryNativeTabFolder.h
+  src/internal/defaultpresentation/berryNativeTabItem.h
+  src/internal/defaultpresentation/berryQCTabBar.h
   
-  src/internal/cherryQtDisplay.h
-  src/internal/cherryQtGlobalEventFilter.h
-  src/internal/cherryQtMainWindowControl.h
-  src/internal/cherryQtOpenPerspectiveAction.h
-  src/internal/cherryQtPerspectiveSwitcher.h
-  src/internal/cherryQtSash.h
-  src/internal/cherryQtShowViewAction.h
-  src/internal/cherryQtStylePreferencePage.h
-  src/internal/cherryQtTracker.h
-  src/internal/cherryQtWidgetsTweakletImpl.h
+  src/internal/berryQtDisplay.h
+  src/internal/berryQtGlobalEventFilter.h
+  src/internal/berryQtMainWindowControl.h
+  src/internal/berryQtOpenPerspectiveAction.h
+  src/internal/berryQtPerspectiveSwitcher.h
+  src/internal/berryQtSash.h
+  src/internal/berryQtShowViewAction.h
+  src/internal/berryQtStylePreferencePage.h
+  src/internal/berryQtTracker.h
+  src/internal/berryQtWidgetsTweakletImpl.h
 )
 
 SET(UI_FILES
-  src/internal/cherryQtShowViewDialog.ui
-  src/internal/cherryQtStylePreferencePage.ui
-  src/internal/cherryQtStatusPart.ui
+  src/internal/berryQtShowViewDialog.ui
+  src/internal/berryQtStylePreferencePage.ui
+  src/internal/berryQtStatusPart.ui
 )
 
 SET(RES_FILES
-  resources/org_opencherry_ui_qt.qrc
+  resources/org_blueberry_ui_qt.qrc
 )
 
 SET(CPP_FILES manifest.cpp)

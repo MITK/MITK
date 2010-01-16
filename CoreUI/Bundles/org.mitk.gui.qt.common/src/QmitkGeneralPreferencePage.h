@@ -27,12 +27,12 @@
 #endif
 
 
-#include "cherryIQtPreferencePage.h"
+#include "berryIQtPreferencePage.h"
 #include "mitkQtCommonDll.h"
 
 //class QCheckBox;
 
-struct MITK_QT_COMMON QmitkGeneralPreferencePage : public cherry::IQtPreferencePage
+struct MITK_QT_COMMON QmitkGeneralPreferencePage : public berry::IQtPreferencePage
 {
 
 public:
@@ -42,7 +42,7 @@ public:
   /**
    * \see IPreferencePage::Init(IWorkbench::Pointer)
    */
-  virtual void Init(cherry::IWorkbench::Pointer workbench);
+  virtual void Init(berry::IWorkbench::Pointer workbench);
 
   /**
    * \see IQtPreferencePage::CreateQtControl(Qwidget*)
@@ -69,7 +69,7 @@ public:
   ///
   virtual void Update();
 protected:
-  cherry::IPreferences::WeakPtr m_GeneralPreferencesNode;
+  berry::IPreferences::WeakPtr m_GeneralPreferencesNode;
   //QCheckBox* m_StartMaximized;
 
   QWidget* m_MainControl;

@@ -19,7 +19,7 @@
 #ifndef QMITKDATAMANAGERHOTKEYSPREFPAGE_H_
 #define QMITKDATAMANAGERHOTKEYSPREFPAGE_H_
 
-#include "cherryIQtPreferencePage.h"
+#include "berryIQtPreferencePage.h"
 #include "mitkQtDataManagerDll.h"
 
 #include <map>
@@ -27,13 +27,13 @@
 
 class QmitkHotkeyLineEdit;
 
-struct MITK_QT_DATAMANAGER QmitkDataManagerHotkeysPrefPage : public cherry::IQtPreferencePage
+struct MITK_QT_DATAMANAGER QmitkDataManagerHotkeysPrefPage : public berry::IQtPreferencePage
 {
 
 public:
   QmitkDataManagerHotkeysPrefPage();
 
-  void Init(cherry::IWorkbench::Pointer workbench);
+  void Init(berry::IWorkbench::Pointer workbench);
 
   void CreateQtControl(QWidget* parent);
 
@@ -57,7 +57,7 @@ protected:
   ///
   /// The node from which the properties are taken (will be catched from the preferences service in ctor)
   ///
-  cherry::IPreferences::WeakPtr m_DataManagerHotkeysPreferencesNode;
+  berry::IPreferences::WeakPtr m_DataManagerHotkeysPreferencesNode;
 
   ///
   /// Maps a label to hotkey lineedit, e.g. "Toggle Visibility of selected nodes" => QmitkHotkeyLineEdit

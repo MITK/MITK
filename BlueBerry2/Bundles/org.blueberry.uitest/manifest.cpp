@@ -1,6 +1,6 @@
 /*=========================================================================
  
- Program:   openCherry Platform
+ Program:   BlueBerry Platform
  Language:  C++
  Date:      $Date$
  Version:   $Revision$
@@ -17,16 +17,16 @@
 
 #include "Poco/ClassLibrary.h"
 
-#include <cherryIApplication.h>
-#include "src/cherryUITestApplication.h"
+#include <berryIApplication.h>
+#include "src/berryUITestApplication.h"
 
-#include <cherryIPerspectiveFactory.h>
-#include "src/util/cherryEmptyPerspective.h"
+#include <berryIPerspectiveFactory.h>
+#include "src/util/berryEmptyPerspective.h"
 
-POCO_BEGIN_NAMED_MANIFEST(cherryIApplication, cherry::IApplication)
-  POCO_EXPORT_CLASS(cherry::UITestApplication)
+POCO_BEGIN_NAMED_MANIFEST(berryIApplication, berry::IApplication)
+  POCO_EXPORT_CLASS(berry::UITestApplication)
 POCO_END_MANIFEST
 
-POCO_BEGIN_NAMED_MANIFEST(cherryIPerspectiveFactory, cherry::IPerspectiveFactory)
-  POCO_EXPORT_CLASS(cherry::EmptyPerspective)
+POCO_BEGIN_NAMED_MANIFEST(berryIPerspectiveFactory, berry::IPerspectiveFactory)
+  POCO_EXPORT_CLASS(berry::EmptyPerspective)
 POCO_END_MANIFEST

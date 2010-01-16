@@ -1,13 +1,13 @@
 SET(SRC_CPP_FILES
-  cherryCoreTestApplication.cpp
-  cherryOpenCherryTestDriver.cpp
+  berryCoreTestApplication.cpp
+  berryBlueBerryTestDriver.cpp
   
-  harness/cherryTestCase.cpp
+  harness/berryTestCase.cpp
 )
 
 SET(INTERNAL_CPP_FILES
-  cherryTestDescriptor.cpp
-  cherryTestRegistry.cpp
+  berryTestDescriptor.cpp
+  berryTestRegistry.cpp
 )
 
 SET(CPP_FILES manifest.cpp)

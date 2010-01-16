@@ -172,7 +172,7 @@ protected:
   //#Protected MEMBER VARIABLES
   protected:
     ///
-    /// Pointer to the DataStorage from which the nodes are selected (remember: in OpenCherry there
+    /// Pointer to the DataStorage from which the nodes are selected (remember: in BlueBerry there
     /// might be more than one DataStorage).
     /// Store it in a weak pointer. This is a GUI class which should not hold a strong reference
     /// to any non-GUI Object.

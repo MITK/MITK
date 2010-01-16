@@ -2,17 +2,17 @@
 
 #include "@GENERATE_VIEW_CLASS@.h"
 
-#include "cherryPlatform.h"
-#include "service/cherryIExtensionPointService.h"
-#include "event/cherryPlatformEvents.h"
+#include "berryPlatform.h"
+#include "service/berryIExtensionPointService.h"
+#include "event/berryPlatformEvents.h"
 
 #include "Poco/Delegate.h"
 
 #include <iostream>
 
-namespace cherry {
+namespace berry {
 
-const std::string RuntimePlugin::@PLUGIN_ID@ = "org.opencherry.core.runtime";
+const std::string RuntimePlugin::@PLUGIN_ID@ = "org.blueberry.core.runtime";
 
 void
 RuntimePlugin::Start(IBundleContext::Pointer /*context*/)

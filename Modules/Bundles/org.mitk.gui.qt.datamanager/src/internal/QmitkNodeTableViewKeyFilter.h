@@ -1,7 +1,7 @@
 #ifndef QMITKNODETABLEVIEWKEYFILTER_H_
 #define QMITKNODETABLEVIEWKEYFILTER_H_
 
-#include "cherryIPreferencesService.h"
+#include "berryIPreferencesService.h"
 
 #include <QObject>
 
@@ -20,7 +20,7 @@ protected:
   ///
   /// The Preferences Service to retrieve and store preferences.
   ///
-  cherry::IPreferencesService::WeakPtr m_PreferencesService;
+  berry::IPreferencesService::WeakPtr m_PreferencesService;
 };
 
 #endif // QMITKNODETABLEVIEWKEYFILTER_H_

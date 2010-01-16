@@ -19,20 +19,20 @@
 #ifndef QMITKDATAMANAGERPREFERENCEPAGE_H_
 #define QMITKDATAMANAGERPREFERENCEPAGE_H_
 
-#include "cherryIQtPreferencePage.h"
+#include "berryIQtPreferencePage.h"
 #include "mitkQtDataManagerDll.h"
-#include <cherryIPreferences.h>
+#include <berryIPreferences.h>
 
 class QWidget;
 class QCheckBox;
 
-struct MITK_QT_DATAMANAGER QmitkDataManagerPreferencePage : public cherry::IQtPreferencePage
+struct MITK_QT_DATAMANAGER QmitkDataManagerPreferencePage : public berry::IQtPreferencePage
 {
 
 public:
   QmitkDataManagerPreferencePage();
 
-  void Init(cherry::IWorkbench::Pointer workbench);
+  void Init(berry::IWorkbench::Pointer workbench);
 
   void CreateQtControl(QWidget* widget);
 
@@ -55,7 +55,7 @@ public:
 protected:
   QWidget* m_MainControl;
   QCheckBox* m_EnableSingleEditing;
-  cherry::IPreferences::Pointer m_DataManagerPreferencesNode;
+  berry::IPreferences::Pointer m_DataManagerPreferencesNode;
 };
 
 #endif /* QMITKDATAMANAGERPREFERENCEPAGE_H_ */

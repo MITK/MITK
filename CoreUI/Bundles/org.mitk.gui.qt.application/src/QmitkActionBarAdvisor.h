@@ -18,15 +18,15 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef QMITKACTIONBARADVISOR_H_
 #define QMITKACTIONBARADVISOR_H_
 
-#include <cherryActionBarAdvisor.h>
+#include <berryActionBarAdvisor.h>
 
 #include "mitkQtAppDll.h"
 
-class MITK_QT_APP QmitkActionBarAdvisor : public cherry::ActionBarAdvisor
+class MITK_QT_APP QmitkActionBarAdvisor : public berry::ActionBarAdvisor
 {
 public:
 
-  QmitkActionBarAdvisor(cherry::IActionBarConfigurer::Pointer configurer);
+  QmitkActionBarAdvisor(berry::IActionBarConfigurer::Pointer configurer);
 
 protected:
 

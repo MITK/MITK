@@ -4,12 +4,12 @@
 
 @BEGIN_NAMESPACE@
 
-void @ACTIVATOR_CLASS@::Start(cherry::IBundleContext::Pointer context)
+void @ACTIVATOR_CLASS@::Start(berry::IBundleContext::Pointer context)
 {
 
 }
 
-void @ACTIVATOR_CLASS@::Stop(cherry::IBundleContext::Pointer context)
+void @ACTIVATOR_CLASS@::Stop(berry::IBundleContext::Pointer context)
 {
 
 }

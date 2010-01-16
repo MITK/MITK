@@ -1,6 +1,6 @@
 /*=========================================================================
 
-Program:   openCherry Platform
+Program:   BlueBerry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
@@ -82,9 +82,9 @@ inline osgi::framework::IncompatibleFlag operator|(_Flags::enum_type f1, int f2)
 #endif
 
 #define OSGI_DECLARE_OPERATORS_FOR_FLAGS(_Flags) \
-inline cherry::Flags<_Flags::enum_type> operator|(_Flags::enum_type f1, _Flags::enum_type f2) \
-{ return cherry::Flags<_Flags::enum_type>(f1) | f2; } \
-inline cherry::Flags<_Flags::enum_type> operator|(_Flags::enum_type f1, cherry::Flags<_Flags::enum_type> f2) \
+inline berry::Flags<_Flags::enum_type> operator|(_Flags::enum_type f1, _Flags::enum_type f2) \
+{ return berry::Flags<_Flags::enum_type>(f1) | f2; } \
+inline berry::Flags<_Flags::enum_type> operator|(_Flags::enum_type f1, berry::Flags<_Flags::enum_type> f2) \
 { return f2 | f1; } OSGI_DECLARE_INCOMPATIBLE_FLAGS(_Flags)
 
 #else /* OSGI_NO_TYPESAFE_FLAGS */

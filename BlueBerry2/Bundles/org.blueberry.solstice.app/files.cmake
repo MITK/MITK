@@ -1,5 +1,5 @@
 SET(SRC_CPP_FILES
-  cherryIApplication.cpp
+  berryIApplication.cpp
 )
 
 SET(INTERNAL_CPP_FILES

@@ -26,7 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 // MITK_QT_VOLUMEVISUALIZATION functions as being imported from a DLL, wheras this DLL sees symbols
 // defined with this macro as being exported.
 //
-#if defined(_WIN32) && !defined(CHERRY_STATIC)
+#if defined(_WIN32) && !defined(BERRY_STATIC)
   #if defined(org_mitk_gui_qt_volumevisualization_EXPORTS)
     #define MITK_QT_VOLUMEVISUALIZATION __declspec(dllexport)
   #else

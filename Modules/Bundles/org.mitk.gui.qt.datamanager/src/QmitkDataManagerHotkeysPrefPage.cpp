@@ -18,8 +18,8 @@
 #include "QmitkDataManagerHotkeysPrefPage.h"
 #include "QmitkHotkeyLineEdit.h"
 
-#include "cherryIPreferencesService.h"
-#include "cherryPlatform.h"
+#include "berryIPreferencesService.h"
+#include "berryPlatform.h"
 
 #include <QLabel>
 #include <QPushButton>
@@ -30,7 +30,7 @@
 
 #include <map>
 
-using namespace cherry;
+using namespace berry;
 
 QmitkDataManagerHotkeysPrefPage::QmitkDataManagerHotkeysPrefPage()
 : m_MainControl(0)
@@ -38,7 +38,7 @@ QmitkDataManagerHotkeysPrefPage::QmitkDataManagerHotkeysPrefPage()
 
 }
 
-void QmitkDataManagerHotkeysPrefPage::Init(cherry::IWorkbench::Pointer )
+void QmitkDataManagerHotkeysPrefPage::Init(berry::IWorkbench::Pointer )
 {
 
 }
@@ -46,7 +46,7 @@ void QmitkDataManagerHotkeysPrefPage::Init(cherry::IWorkbench::Pointer )
 void QmitkDataManagerHotkeysPrefPage::CreateQtControl(QWidget* parent)
 {
   IPreferencesService::Pointer prefService = Platform::GetServiceRegistry().GetServiceById<IPreferencesService>(IPreferencesService::ID);
-  cherry::IPreferences::Pointer _DataManagerHotkeysPreferencesNode = prefService->GetSystemPreferences()->Node("/DataManager/Hotkeys");
+  berry::IPreferences::Pointer _DataManagerHotkeysPreferencesNode = prefService->GetSystemPreferences()->Node("/DataManager/Hotkeys");
   m_DataManagerHotkeysPreferencesNode = _DataManagerHotkeysPreferencesNode;
 
   m_HotkeyEditors["Make all nodes invisible"] = new QmitkHotkeyLineEdit("Ctrl+, V");

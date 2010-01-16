@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!-- Schema file written by PDE -->
-<schema targetNamespace="org.opencherry.core.runtime" xmlns="http://www.w3.org/2001/XMLSchema">
+<schema targetNamespace="org.blueberry.core.runtime" xmlns="http://www.w3.org/2001/XMLSchema">
 <annotation>
       <appinfo>
-         <meta.schema plugin="org.opencherry.core.runtime" id="cmdlineoptions" name="Command Line Options"/>
+         <meta.schema plugin="org.blueberry.core.runtime" id="cmdlineoptions" name="Command Line Options"/>
       </appinfo>
       <documentation>
          Platform runtime supports plug-ins which would like to 
@@ -101,7 +101,7 @@ declare additional command line options.
                   If specified an instance of the given class will be created and its &quot;Option&quot; method will be invoked.
                </documentation>
                <appinfo>
-                  <meta.attribute kind="java" basedOn=":cherryICommandLineCallback"/>
+                  <meta.attribute kind="java" basedOn=":berryICommandLineCallback"/>
                </appinfo>
             </annotation>
          </attribute>
@@ -135,7 +135,7 @@ declare additional command line options.
          Following is an example of a command line option declaration: 
 &lt;p&gt;
 &lt;pre&gt;
-   &lt;extension id=&quot;portOption&quot; point=&quot;org.opencherry.core.runtime.cmdlineoptions&quot;&gt; 
+   &lt;extension id=&quot;portOption&quot; point=&quot;org.blueberry.core.runtime.cmdlineoptions&quot;&gt; 
       &lt;option fullname=&quot;port&quot; shortname=&quot;p&quot; description=&quot;Specify the port on which the application should be listening&quot;&gt; 
          &lt;argument name=&quot;portValue&quot; required=&quot;true&quot;/&gt;
       &lt;/option&gt; 
@@ -157,7 +157,7 @@ app --port=8080
          <meta.section type="apiInfo"/>
       </appinfo>
       <documentation>
-         The value of the callback attribute must represent an implementor of &lt;samp&gt;cherry::ICommandLineCallback&lt;/samp&gt;.
+         The value of the callback attribute must represent an implementor of &lt;samp&gt;berry::ICommandLineCallback&lt;/samp&gt;.
 
       </documentation>
    </annotation>

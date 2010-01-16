@@ -21,8 +21,8 @@ class @ACTIVATOR_CLASS@ : public @ACTIVATOR_BASE_CLASS@
 
   public:
 
-    void Start(cherry::IBundleContext::Pointer context);
-    void Stop(cherry::IBundleContext::Pointer context);
+    void Start(berry::IBundleContext::Pointer context);
+    void Stop(berry::IBundleContext::Pointer context);
 
 };
 

@@ -2,21 +2,21 @@
 #define QMITKDATAMANAGERVIEW_H_
 
 // Own includes
-#include <cherryIPartListener.h>
-#include <cherryISelection.h>
-#include <cherryISelectionProvider.h>
-#include <cherryIPreferencesService.h>
-#include <cherryICherryPreferences.h>
-#include <cherryISelectionListener.h>
+#include <berryIPartListener.h>
+#include <berryISelection.h>
+#include <berryISelectionProvider.h>
+#include <berryIPreferencesService.h>
+#include <berryIBerryPreferences.h>
+#include <berryISelectionListener.h>
 
 /// Qmitk
-#include <cherryQtViewPart.h>
+#include <berryQtViewPart.h>
 #include <QmitkDataTreeNodeSelectionProvider.h>
 #include <QmitkDnDFrameWidget.h>
 
-#include <cherryIWorkbenchPartReference.h>
-#include <cherryIPartListener.h>
-#include <cherryIPreferencesService.h>
+#include <berryIWorkbenchPartReference.h>
+#include <berryIPartListener.h>
+#include <berryIPreferencesService.h>
 
 #include <mitkDataStorage.h>
 #include "mitkQtCommonDll.h"
@@ -42,7 +42,7 @@ class QmitkDataStorageTreeModel;
 ///
 /// \TODO: complete PACS support, in save dialog show regular filename
 ///
-class MITK_QT_DATAMANAGER QmitkDataManagerView : public QObject, public cherry::QtViewPart
+class MITK_QT_DATAMANAGER QmitkDataManagerView : public QObject, public berry::QtViewPart
 {
   Q_OBJECT
 
@@ -136,13 +136,13 @@ public slots:
   ///
   /// Invoked when the preferences were changed
   ///
-  void OnPreferencesChanged(const cherry::ICherryPreferences*);
+  void OnPreferencesChanged(const berry::IBerryPreferences*);
 
   ///
   /// Invoked when the DataManager selection changed
   ///
-  virtual void SelectionChanged(cherry::IWorkbenchPart::Pointer part
-    , cherry::ISelection::ConstPointer selection);
+  virtual void SelectionChanged(berry::IWorkbenchPart::Pointer part
+    , berry::ISelection::ConstPointer selection);
 
   /// Invoked when the median action is invoked
   void OtsuFilter( bool checked = false );
@@ -173,13 +173,13 @@ protected:
   ///
   QmitkDataStorageTreeModel* m_NodeTreeModel;
   ///
-  /// \brief The openCherry selection provider
+  /// \brief The BlueBerry selection provider
   ///
   QmitkDataTreeNodeSelectionProvider::Pointer m_SelectionProvider;
   ///
   /// Holds the preferences for the datamanager. 
   ///
-  cherry::ICherryPreferences::Pointer m_DataManagerPreferencesNode;
+  berry::IBerryPreferences::Pointer m_DataManagerPreferencesNode;
   ///
   /// \brief The Table view to show the selected nodes.
   ///
@@ -220,9 +220,9 @@ protected:
   /// Special filter action for images
   QAction* m_OtsuFilterAction;
   /// A selection listener for datatreenode events
-  cherry::ISelectionListener::Pointer m_SelectionListener;
-  /// cherry::SelectionChangedAdapter<QmitkPropertyListView> must be a friend to call
-  friend struct cherry::SelectionChangedAdapter<QmitkDataManagerView>;
+  berry::ISelectionListener::Pointer m_SelectionListener;
+  /// berry::SelectionChangedAdapter<QmitkPropertyListView> must be a friend to call
+  friend struct berry::SelectionChangedAdapter<QmitkDataManagerView>;
 
 };
 

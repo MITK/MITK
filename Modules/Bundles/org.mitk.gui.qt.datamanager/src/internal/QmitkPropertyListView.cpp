@@ -1,7 +1,7 @@
-#include <cherryISelectionProvider.h>
-#include <cherryISelectionService.h>
-#include <cherryIWorkbenchWindow.h>
-#include <cherryISelectionService.h>
+#include <berryISelectionProvider.h>
+#include <berryISelectionService.h>
+#include <berryIWorkbenchWindow.h>
+#include <berryISelectionService.h>
 #include "QmitkPropertyListView.h"
 #include <QmitkPropertiesTableEditor.h>
 #include <mitkDataTreeNodeObject.h>
@@ -17,7 +17,7 @@ QmitkPropertyListView::QmitkPropertyListView()
 
 QmitkPropertyListView::~QmitkPropertyListView()
 {
-  cherry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
+  berry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
   if(s)
     s->RemoveSelectionListener(m_SelectionListener);
 
@@ -32,19 +32,19 @@ void QmitkPropertyListView::CreateQtPartControl( QWidget* parent )
 
   parent->setLayout(layout);
 
-  m_SelectionListener = new cherry::SelectionChangedAdapter<QmitkPropertyListView>
+  m_SelectionListener = new berry::SelectionChangedAdapter<QmitkPropertyListView>
     (this, &QmitkPropertyListView::SelectionChanged);
-  cherry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
+  berry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
   if(s)
     s->AddSelectionListener(m_SelectionListener);
 
-  cherry::ISelection::ConstPointer selection( this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection("org.mitk.views.datamanager"));
+  berry::ISelection::ConstPointer selection( this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection("org.mitk.views.datamanager"));
   if(selection.IsNotNull())
-    this->SelectionChanged(cherry::IWorkbenchPart::Pointer(0), selection);
+    this->SelectionChanged(berry::IWorkbenchPart::Pointer(0), selection);
 
 }
 
-void QmitkPropertyListView::SelectionChanged( cherry::IWorkbenchPart::Pointer, cherry::ISelection::ConstPointer selection )
+void QmitkPropertyListView::SelectionChanged( berry::IWorkbenchPart::Pointer, berry::ISelection::ConstPointer selection )
 {
   mitk::DataTreeNodeSelection::ConstPointer _DataTreeNodeSelection 
     = selection.Cast<const mitk::DataTreeNodeSelection>();

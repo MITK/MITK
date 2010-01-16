@@ -25,10 +25,10 @@
 #include <windows.h>
 #endif
 
-#include <cherryQtViewPart.h>
-#include <cherryIWorkbenchPartReference.h>
-#include <cherryIPartListener.h>
-#include <cherryIPreferencesService.h>
+#include <berryQtViewPart.h>
+#include <berryIWorkbenchPartReference.h>
+#include <berryIPartListener.h>
+#include <berryIPreferencesService.h>
 
 #include <mitkDataStorage.h>
 #include "mitkQtCommonDll.h"
@@ -37,12 +37,12 @@
 class QmitkStdMultiWidget;
 class QScrollArea;
 
-class MITK_QT_COMMON QmitkFunctionality : public cherry::QtViewPart, virtual public cherry::IPartListener
+class MITK_QT_COMMON QmitkFunctionality : public berry::QtViewPart, virtual public berry::IPartListener
 {
 
 
 public:
-  cherryObjectMacro(QmitkFunctionality)
+  berryObjectMacro(QmitkFunctionality)
 
   QmitkFunctionality();
   virtual ~QmitkFunctionality();
@@ -126,11 +126,11 @@ public:
 
   // IPartListener
   Events::Types GetPartEventTypes() const;
-  virtual void PartActivated (cherry::IWorkbenchPartReference::Pointer partRef);
-  virtual void PartDeactivated(cherry::IWorkbenchPartReference::Pointer partRef);
-  virtual void PartClosed (cherry::IWorkbenchPartReference::Pointer partRef);
-  virtual void PartHidden (cherry::IWorkbenchPartReference::Pointer partRef);
-  virtual void PartVisible (cherry::IWorkbenchPartReference::Pointer partRef);
+  virtual void PartActivated (berry::IWorkbenchPartReference::Pointer partRef);
+  virtual void PartDeactivated(berry::IWorkbenchPartReference::Pointer partRef);
+  virtual void PartClosed (berry::IWorkbenchPartReference::Pointer partRef);
+  virtual void PartHidden (berry::IWorkbenchPartReference::Pointer partRef);
+  virtual void PartVisible (berry::IWorkbenchPartReference::Pointer partRef);
   
   // Convenient methods to set and reset a wait/busy cursor ("hourglass")
   void WaitCursorOn();
@@ -145,7 +145,7 @@ protected:
   ///
   /// Returns an IPreferences for this Functionality. The path for the is "/<this->GetViewSite()->GetId()>"
   ///
-  cherry::IPreferences::Pointer GetPreferences() const;
+  berry::IPreferences::Pointer GetPreferences() const;
 
   void SetHandleMultipleDataStorages(bool multiple);
   bool HandlesMultipleDataStorages() const;
@@ -181,7 +181,7 @@ private:
   ///
   /// The Preferences Service to retrieve and store preferences.
   ///
-  cherry::IPreferencesService::WeakPtr m_PreferencesService;
+  berry::IPreferencesService::WeakPtr m_PreferencesService;
 };
 
 #endif /*QMITKFUNCTIONALITY_H_*/

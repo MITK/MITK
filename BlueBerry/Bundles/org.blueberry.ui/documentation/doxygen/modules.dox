@@ -1,17 +1,17 @@
 /**
-  \defgroup org_opencherry_ui org.opencherry.ui Plugin
-  \ingroup openCherryPlugins
+  \defgroup org_blueberry_ui org.blueberry.ui Plugin
+  \ingroup BlueBerryPlugins
 
   \brief This is the user interface plugin. It provides a GUI-Toolkit independent framework
-  to build an openCherry workbench.
+  to build an BlueBerry workbench.
   
 */
 
 /**
-  \defgroup org_opencherry_ui_internal Internal
-  \ingroup org_opencherry_ui
+  \defgroup org_blueberry_ui_internal Internal
+  \ingroup org_blueberry_ui
 
-  \brief This subcategory includes the internal classes of the org.opencherry.ui plugin. Other
+  \brief This subcategory includes the internal classes of the org.blueberry.ui plugin. Other
   plugins must not rely on these classes. They contain implementation details and their interface
   may change at any time. We mean it.
 */

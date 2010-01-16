@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!-- Schema file written by PDE -->
-<schema targetNamespace="org.opencherry.ui" xmlns="http://www.w3.org/2001/XMLSchema">
+<schema targetNamespace="org.blueberry.ui" xmlns="http://www.w3.org/2001/XMLSchema">
 <annotation>
       <appinfo>
-         <meta.schema plugin="org.opencherry.ui" id="views" name="Views"/>
+         <meta.schema plugin="org.blueberry.ui" id="views" name="Views"/>
       </appinfo>
       <documentation>
          This extension point is used to define additional views 
@@ -84,7 +84,7 @@ In order to reduce the visual clutter in the Show View Dialog, views should be g
 allows the creation of a hierarchy of categories.
                </documentation>
                <appinfo>
-                  <meta.attribute kind="identifier" basedOn="org.opencherry.ui.views/category/@id"/>
+                  <meta.attribute kind="identifier" basedOn="org.blueberry.ui.views/category/@id"/>
                </appinfo>
             </annotation>
          </attribute>
@@ -120,7 +120,7 @@ allows the creation of a hierarchy of categories.
 by &apos;/&apos;. Each referenced category must be declared in a corresponding category element.
                </documentation>
                <appinfo>
-                  <meta.attribute kind="identifier" basedOn="org.opencherry.ui.views/category/@id"/>
+                  <meta.attribute kind="identifier" basedOn="org.blueberry.ui.views/category/@id"/>
                </appinfo>
             </annotation>
          </attribute>
@@ -128,12 +128,12 @@ by &apos;/&apos;. Each referenced category must be declared in a corresponding c
             <annotation>
                <documentation>
                   a fully qualified name of the class that implements 
-&lt;samp&gt;cherry::IViewPart&lt;/samp&gt;. A common practice 
-is to subclass &lt;samp&gt;cherry::ViewPart&lt;/samp&gt; or &lt;samp&gt;cherry::QtViewPart&lt;/samp&gt;
+&lt;samp&gt;berry::IViewPart&lt;/samp&gt;. A common practice 
+is to subclass &lt;samp&gt;berry::ViewPart&lt;/samp&gt; or &lt;samp&gt;berry::QtViewPart&lt;/samp&gt;
 in order to inherit the default functionality.
                </documentation>
                <appinfo>
-                  <meta.attribute kind="java" basedOn="cherryViewPart:"/>
+                  <meta.attribute kind="java" basedOn="berryViewPart:"/>
                </appinfo>
             </annotation>
          </attribute>
@@ -198,7 +198,7 @@ If no value is supplied, a default ratio will be used.
                   the id of the view to be made sticky.
                </documentation>
                <appinfo>
-                  <meta.attribute kind="identifier" basedOn="org.opencherry.ui.views/view/@id"/>
+                  <meta.attribute kind="identifier" basedOn="org.blueberry.ui.views/view/@id"/>
                </appinfo>
             </annotation>
          </attribute>
@@ -246,7 +246,7 @@ If no value is supplied, a default ratio will be used.
          The following is an example of the extension point: 
 &lt;p&gt;
 &lt;pre&gt;
-   &lt;extension point=&quot;org.opencherry.ui.views&quot;&gt; 
+   &lt;extension point=&quot;org.blueberry.ui.views&quot;&gt; 
       &lt;category 
          id=&quot;com.xyz.views.XYZviews&quot; 
          name=&quot;XYZ&quot;/&gt; 
@@ -262,7 +262,7 @@ If no value is supplied, a default ratio will be used.
 The following is an example of a sticky view declaration:
 &lt;p&gt;
 &lt;pre&gt;
-   &lt;extension point=&quot;org.opencherry.ui.views&quot;&gt; 
+   &lt;extension point=&quot;org.blueberry.ui.views&quot;&gt; 
       &lt;stickyView
          id=&quot;com.xyz.views.XYZView&quot; /&gt;
    &lt;/extension&gt; 
@@ -278,9 +278,9 @@ The following is an example of a sticky view declaration:
       <documentation>
          The value of the &lt;samp&gt;class&lt;/samp&gt; attribute must be a 
 fully qualified name of the class that implements 
-&lt;samp&gt;cherry::IViewPart&lt;/samp&gt;.  It is common 
-practice to subclass &lt;samp&gt;cherry::ViewPart&lt;/samp&gt;
-or &lt;samp&gt;cherry::QtViewPart&lt;samp&gt; when developing a new view.
+&lt;samp&gt;berry::IViewPart&lt;/samp&gt;.  It is common 
+practice to subclass &lt;samp&gt;berry::ViewPart&lt;/samp&gt;
+or &lt;samp&gt;berry::QtViewPart&lt;samp&gt; when developing a new view.
       </documentation>
    </annotation>
 
@@ -290,7 +290,7 @@ or &lt;samp&gt;cherry::QtViewPart&lt;samp&gt; when developing a new view.
          <meta.section type="implementation"/>
       </appinfo>
       <documentation>
-         The openCherry Platform provides a number of standard views. From the user point of view, these views are no different from any other view provided by the plug-ins. All the views can be shown from the &quot;Show View&quot; submenu of the &quot;Window&quot; menu. The position of a view is persistent: it is saved when the view is closed and restored when the view is reopened in a single session.  The position is also persisted between workbench sessions.
+         The BlueBerry Platform provides a number of standard views. From the user point of view, these views are no different from any other view provided by the plug-ins. All the views can be shown from the &quot;Show View&quot; submenu of the &quot;Window&quot; menu. The position of a view is persistent: it is saved when the view is closed and restored when the view is reopened in a single session.  The position is also persisted between workbench sessions.
       </documentation>
    </annotation>
 

@@ -1,6 +1,6 @@
 /*=========================================================================
 
- Program:   openCherry Platform
+ Program:   BlueBerry Platform
  Language:  C++
  Date:      $Date$
  Version:   $Revision$
@@ -45,20 +45,20 @@ DataTreeNodeSelection::DataTreeNodeSelection(const std::vector<DataTreeNode::Poi
   }
 }
 
-cherry::Object::Pointer DataTreeNodeSelection::GetFirstElement() const
+berry::Object::Pointer DataTreeNodeSelection::GetFirstElement() const
 {
   if (m_Selection->empty())
-    return cherry::Object::Pointer();
+    return berry::Object::Pointer();
 
   return *(m_Selection->begin());
 }
 
-cherry::IStructuredSelection::iterator DataTreeNodeSelection::Begin() const
+berry::IStructuredSelection::iterator DataTreeNodeSelection::Begin() const
 {
   return m_Selection->begin();
 }
 
-cherry::IStructuredSelection::iterator DataTreeNodeSelection::End() const
+berry::IStructuredSelection::iterator DataTreeNodeSelection::End() const
 {
   return m_Selection->end();
 }
@@ -68,7 +68,7 @@ int DataTreeNodeSelection::Size() const
   return m_Selection->size();
 }
 
-cherry::IStructuredSelection::ContainerType::Pointer DataTreeNodeSelection::ToVector() const
+berry::IStructuredSelection::ContainerType::Pointer DataTreeNodeSelection::ToVector() const
 {
   return m_Selection;
 }
@@ -78,9 +78,9 @@ bool DataTreeNodeSelection::IsEmpty() const
   return m_Selection->empty();
 }
 
-bool DataTreeNodeSelection::operator==(const cherry::Object* obj) const
+bool DataTreeNodeSelection::operator==(const berry::Object* obj) const
 {
-  if (const cherry::IStructuredSelection* other = dynamic_cast<const cherry::IStructuredSelection*>(obj))
+  if (const berry::IStructuredSelection* other = dynamic_cast<const berry::IStructuredSelection*>(obj))
   {
     return m_Selection == other->ToVector();
   }

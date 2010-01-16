@@ -1,8 +1,8 @@
 SET(SRC_CPP_FILES
-  cherryCoreRuntimeTestSuite.cpp
-  cherryPreferencesServiceTest.cpp
-  cherryPreferencesTest.cpp
-  cherryXMLPreferencesStorageTest.cpp
+  berryCoreRuntimeTestSuite.cpp
+  berryPreferencesServiceTest.cpp
+  berryPreferencesTest.cpp
+  berryXMLPreferencesStorageTest.cpp
 )
 
 SET(INTERNAL_CPP_FILES

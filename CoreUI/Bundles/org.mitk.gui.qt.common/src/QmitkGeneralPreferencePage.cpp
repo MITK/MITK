@@ -17,15 +17,15 @@
 
 #include "QmitkGeneralPreferencePage.h"
 
-#include "cherryIPreferencesService.h"
-#include "cherryPlatform.h"
+#include "berryIPreferencesService.h"
+#include "berryPlatform.h"
 
 #include <QLabel>
 //#include <QCheckBox>
 #include <QGridLayout>
 #include <QSpacerItem>
 
-using namespace cherry;
+using namespace berry;
 
 QmitkGeneralPreferencePage::QmitkGeneralPreferencePage()
 : m_MainControl(0)
@@ -41,7 +41,7 @@ void QmitkGeneralPreferencePage::Init(IWorkbench::Pointer )
 void QmitkGeneralPreferencePage::CreateQtControl(QWidget* parent)
 {
   IPreferencesService::Pointer prefService = Platform::GetServiceRegistry().GetServiceById<IPreferencesService>(IPreferencesService::ID);
-  cherry::IPreferences::Pointer _GeneralPreferencesNode = prefService->GetSystemPreferences()->Node("/General");
+  berry::IPreferences::Pointer _GeneralPreferencesNode = prefService->GetSystemPreferences()->Node("/General");
   m_GeneralPreferencesNode = _GeneralPreferencesNode;
 
 //   m_StartMaximized = new QCheckBox("Start Main Window &Maximized", this);

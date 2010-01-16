@@ -29,7 +29,7 @@ QmitkDataTreeNodeSelection::QmitkDataTreeNodeSelection()
 
 QmitkDataTreeNodeSelection::QmitkDataTreeNodeSelection(
     const QItemSelection& sel) :
-  mitk::DataTreeNodeSelection(), cherry::QtItemSelection(sel)
+  mitk::DataTreeNodeSelection(), berry::QtItemSelection(sel)
 {
   QModelIndexList indexes = sel.indexes();
   for (QModelIndexList::const_iterator index = indexes.constBegin(); index
@@ -40,13 +40,13 @@ QmitkDataTreeNodeSelection::QmitkDataTreeNodeSelection(
         data.value<mitk::DataTreeNode::Pointer> ();
     if (node.IsNotNull())
     {
-      cherry::Object::Pointer obj(new mitk::DataTreeNodeObject(node));
+      berry::Object::Pointer obj(new mitk::DataTreeNodeObject(node));
       mitk::DataTreeNodeSelection::m_Selection->push_back(obj);
     }
   }
 }
 
-cherry::Object::Pointer QmitkDataTreeNodeSelection::GetFirstElement() const
+berry::Object::Pointer QmitkDataTreeNodeSelection::GetFirstElement() const
 {
   return mitk::DataTreeNodeSelection::GetFirstElement();
 }
@@ -76,7 +76,7 @@ bool QmitkDataTreeNodeSelection::IsEmpty() const
   return mitk::DataTreeNodeSelection::IsEmpty();
 }
 
-bool QmitkDataTreeNodeSelection::operator==(const cherry::Object* obj) const
+bool QmitkDataTreeNodeSelection::operator==(const berry::Object* obj) const
 {
   return mitk::DataTreeNodeSelection::operator==(obj);
 }

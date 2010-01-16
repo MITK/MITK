@@ -18,20 +18,20 @@
 #include <mitkDataTreeNodeSelection.h>
 #include <mitkDataTreeNode.h>
 
-#include <cherryQtItemSelection.h>
+#include <berryQtItemSelection.h>
 
 #include <vector>
 
-class QmitkDataTreeNodeSelection: public mitk::DataTreeNodeSelection, public cherry::QtItemSelection
+class QmitkDataTreeNodeSelection: public mitk::DataTreeNodeSelection, public berry::QtItemSelection
 {
 public:
 
-  cherryObjectMacro(QmitkDataTreeNodeSelection);
+  berryObjectMacro(QmitkDataTreeNodeSelection);
 
   QmitkDataTreeNodeSelection();
   QmitkDataTreeNodeSelection(const QItemSelection& sel);
 
-  virtual cherry::Object::Pointer GetFirstElement() const;
+  virtual berry::Object::Pointer GetFirstElement() const;
   virtual iterator Begin() const;
   virtual iterator End() const;
 
@@ -40,10 +40,10 @@ public:
   virtual ContainerType::Pointer ToVector() const;
 
   /**
-   * @see cherry::ISelection::IsEmpty()
+   * @see berry::ISelection::IsEmpty()
    */
   bool IsEmpty() const;
 
-  bool operator==(const cherry::Object* obj) const;
+  bool operator==(const berry::Object* obj) const;
 
 };

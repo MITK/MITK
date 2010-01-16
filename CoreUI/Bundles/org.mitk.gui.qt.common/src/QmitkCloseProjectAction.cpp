@@ -19,26 +19,26 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <mitkCoreObjectFactory.h>
 #include <mitkDataStorageEditorInput.h>
-#include <cherryIEditorPart.h>
-#include <cherryIWorkbenchPage.h>
+#include <berryIEditorPart.h>
+#include <berryIWorkbenchPage.h>
 #include "QmitkStdMultiWidgetEditor.h"
 
 #include <QMessageBox>
 
-QmitkCloseProjectAction::QmitkCloseProjectAction(cherry::IWorkbenchWindow::Pointer window)
+QmitkCloseProjectAction::QmitkCloseProjectAction(berry::IWorkbenchWindow::Pointer window)
 : QAction(0)
 {
   this->init(window);
 }
 
-QmitkCloseProjectAction::QmitkCloseProjectAction(const QIcon & icon, cherry::IWorkbenchWindow::Pointer window)
+QmitkCloseProjectAction::QmitkCloseProjectAction(const QIcon & icon, berry::IWorkbenchWindow::Pointer window)
 : QAction(0)
 {
   this->setIcon(icon);
   this->init(window);
 }
 
-void QmitkCloseProjectAction::init(cherry::IWorkbenchWindow::Pointer window)
+void QmitkCloseProjectAction::init(berry::IWorkbenchWindow::Pointer window)
 {
   m_Window = window;
   this->setParent(static_cast<QWidget*>(m_Window->GetShell()->GetControl()));
@@ -60,7 +60,7 @@ void QmitkCloseProjectAction::Run()
     mitk::DataStorageEditorInput::Pointer editorInput;
     mitk::DataStorage::Pointer storage;
     QmitkStdMultiWidgetEditor::Pointer multiWidgetEditor;
-    cherry::IEditorPart::Pointer editor = m_Window->GetActivePage()->GetActiveEditor();
+    berry::IEditorPart::Pointer editor = m_Window->GetActivePage()->GetActiveEditor();
     if (editor.Cast<QmitkStdMultiWidgetEditor>().IsNull())
     {
       editorInput = new mitk::DataStorageEditorInput();

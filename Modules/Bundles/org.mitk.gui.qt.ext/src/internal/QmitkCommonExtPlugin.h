@@ -1,6 +1,6 @@
 /*=========================================================================
  
- Program:   openCherry Platform
+ Program:   BlueBerry Platform
  Language:  C++
  Date:      $Date$
  Version:   $Revision$
@@ -19,13 +19,13 @@
 #ifndef QMITKCOMMONEXTPLUGIN_H_
 #define QMITKCOMMONEXTPLUGIN_H_
 
-#include <cherryPlugin.h>
+#include <berryPlugin.h>
 
-class QmitkCommonExtPlugin : public cherry::Plugin
+class QmitkCommonExtPlugin : public berry::Plugin
 {
 public:
 
-  void Start(cherry::IBundleContext::Pointer context);
+  void Start(berry::IBundleContext::Pointer context);
 
 };
 

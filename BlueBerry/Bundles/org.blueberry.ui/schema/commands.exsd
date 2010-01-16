@@ -1,13 +1,13 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!-- Schema file written by PDE -->
-<schema targetNamespace="org.opencherry.ui" xmlns="http://www.w3.org/2001/XMLSchema">
+<schema targetNamespace="org.blueberry.ui" xmlns="http://www.w3.org/2001/XMLSchema">
 <annotation>
       <appinfo>
-         <meta.schema plugin="org.opencherry.ui" id="commands" name="Commands"/>
+         <meta.schema plugin="org.blueberry.ui" id="commands" name="Commands"/>
       </appinfo>
       <documentation>
          &lt;p&gt;
-The &lt;code&gt;org.opencherry.ui.commands&lt;/code&gt; extension point is used to declare commands and command categories, using the &lt;code&gt;command&lt;/code&gt; and &lt;code&gt;category&lt;/code&gt; elements. A command is an abstract representation of some semantic behaviour, but not it&apos;s actual implementation.  This allows different developers to contribute specific behaviour for their individual parts.  For example, there might be a &quot;paste&quot; command with one implementation in an editor and a different implementation in an explorer widget.  These implementations are called handlers.  Commands can also be viewed as declarative function pointers, or signal handlers.
+The &lt;code&gt;org.blueberry.ui.commands&lt;/code&gt; extension point is used to declare commands and command categories, using the &lt;code&gt;command&lt;/code&gt; and &lt;code&gt;category&lt;/code&gt; elements. A command is an abstract representation of some semantic behaviour, but not it&apos;s actual implementation.  This allows different developers to contribute specific behaviour for their individual parts.  For example, there might be a &quot;paste&quot; command with one implementation in an editor and a different implementation in an explorer widget.  These implementations are called handlers.  Commands can also be viewed as declarative function pointers, or signal handlers.
 &lt;/p&gt;
       </documentation>
    </annotation>
@@ -55,7 +55,7 @@ The &lt;code&gt;org.opencherry.ui.commands&lt;/code&gt; extension point is used 
       <annotation>
          <documentation>
             &lt;p&gt;
-This element is used to define commands. A command represents an request from the user that can be handled by an action, and should be semantically unique among other commands. Do not define a command if there is already one defined with the same meaning. If more than one of these elements exist with the same &lt;code&gt;id&lt;/code&gt; attribute, only the last declared element (in order of reading the plugin registry) is considered valid. See the extension points &lt;a href=&quot;org_opencherry_ui_actionSets.html&quot;&gt;org.opencherry.ui.actionSets&lt;/a&gt; and &lt;a href=&quot;org_opencherry_ui_editorActions.html&quot;&gt;org.opencherry.ui.editorActions&lt;/a&gt; to understand how actions are connected to commands.
+This element is used to define commands. A command represents an request from the user that can be handled by an action, and should be semantically unique among other commands. Do not define a command if there is already one defined with the same meaning. If more than one of these elements exist with the same &lt;code&gt;id&lt;/code&gt; attribute, only the last declared element (in order of reading the plugin registry) is considered valid. See the extension points &lt;a href=&quot;org_blueberry_ui_actionSets.html&quot;&gt;org.blueberry.ui.actionSets&lt;/a&gt; and &lt;a href=&quot;org_blueberry_ui_editorActions.html&quot;&gt;org.blueberry.ui.editorActions&lt;/a&gt; to understand how actions are connected to commands.
 &lt;/p&gt;
          </documentation>
       </annotation>
@@ -102,7 +102,7 @@ This element is used to define commands. A command represents an request from th
          <attribute name="defaultHandler" type="string">
             <annotation>
                <documentation>
-                  The default handler for this command (see the &lt;a href=&quot;org_opencherry_ui_handlers.html&quot;&gt;org.opencherry.ui.handlers&lt;/a&gt; extension point).  If no other handler is active, this handler will be active.  This handler will conflict with other handler definitions that specify no &lt;code&gt;activeWhen&lt;/code&gt; conditions.  If you are creating an &lt;code&gt;IExecutableExtension&lt;/code&gt;, you can use the &lt;code&gt;defaultHandler&lt;/code&gt; element instead.
+                  The default handler for this command (see the &lt;a href=&quot;org_blueberry_ui_handlers.html&quot;&gt;org.blueberry.ui.handlers&lt;/a&gt; extension point).  If no other handler is active, this handler will be active.  This handler will conflict with other handler definitions that specify no &lt;code&gt;activeWhen&lt;/code&gt; conditions.  If you are creating an &lt;code&gt;IExecutableExtension&lt;/code&gt;, you can use the &lt;code&gt;defaultHandler&lt;/code&gt; element instead.
                </documentation>
                <appinfo>
                   <meta.attribute kind="java" basedOn="org.eclipse.core.commands.IHandler"/>
@@ -201,10 +201,10 @@ Defines a parameter that a command should understand.  A parameter is a way to p
          <attribute name="values" type="string">
             <annotation>
                <documentation>
-                  The class providing a list of parameter values for the user to select.  This class should implement &lt;code&gt;org.opencherry.core.commands.IParameterValues&lt;/code&gt;.  If this class is not specified, you must specify the more verbose &lt;code&gt;values&lt;/code&gt; element.  Please see &lt;code&gt;org.opencherry.osgi.IExecutableExtension&lt;/code&gt;.
+                  The class providing a list of parameter values for the user to select.  This class should implement &lt;code&gt;org.blueberry.core.commands.IParameterValues&lt;/code&gt;.  If this class is not specified, you must specify the more verbose &lt;code&gt;values&lt;/code&gt; element.  Please see &lt;code&gt;org.blueberry.osgi.IExecutableExtension&lt;/code&gt;.
                </documentation>
                <appinfo>
-                  <meta.attribute kind="java" basedOn=":org.opencherry.core.commands.IParameterValues"/>
+                  <meta.attribute kind="java" basedOn=":org.blueberry.core.commands.IParameterValues"/>
                </appinfo>
             </annotation>
          </attribute>
@@ -229,7 +229,7 @@ Defines a parameter that a command should understand.  A parameter is a way to p
       <annotation>
          <documentation>
             &lt;p&gt;
-Defines the object type of a commandParameter and may specify an &lt;code&gt;org.opencherry.core.commands.AbstractParameterValueConverter&lt;/code&gt; subclass to convert between string parameter values and objects.
+Defines the object type of a commandParameter and may specify an &lt;code&gt;org.blueberry.core.commands.AbstractParameterValueConverter&lt;/code&gt; subclass to convert between string parameter values and objects.
 &lt;/p&gt;
          </documentation>
       </annotation>
@@ -244,7 +244,7 @@ Defines the object type of a commandParameter and may specify an &lt;code&gt;org
          <attribute name="type" type="string">
             <annotation>
                <documentation>
-                  The fully qualified name of a class to use as the type of this command parameter.  This attribute is optional, however if omitted, &lt;code&gt;org.opencherry.osgi.Object&lt;/code&gt; will be used as the parameter type.
+                  The fully qualified name of a class to use as the type of this command parameter.  This attribute is optional, however if omitted, &lt;code&gt;org.blueberry.osgi.Object&lt;/code&gt; will be used as the parameter type.
                </documentation>
                <appinfo>
                   <meta.attribute kind="java"/>
@@ -254,7 +254,7 @@ Defines the object type of a commandParameter and may specify an &lt;code&gt;org
          <attribute name="converter" type="string">
             <annotation>
                <documentation>
-                  The class for converting between objects and string representations of objects for command parameter values.  This class should extend &lt;code&gt;org.opencherry.core.commands.AbstractParameterValueConverter&lt;/code&gt;. The converter should produce and consume objects of the type indicated in the &lt;code&gt;type&lt;/code&gt; attribute. If this class is not specified, this facility to convert between string and object values for this parameter type will not be available (the &lt;code&gt;GetValueConverter()&lt;/code&gt; on class &lt;code&gt;ParameterType&lt;/code&gt; will return &lt;code&gt;null&lt;/code&gt;).
+                  The class for converting between objects and string representations of objects for command parameter values.  This class should extend &lt;code&gt;org.blueberry.core.commands.AbstractParameterValueConverter&lt;/code&gt;. The converter should produce and consume objects of the type indicated in the &lt;code&gt;type&lt;/code&gt; attribute. If this class is not specified, this facility to convert between string and object values for this parameter type will not be available (the &lt;code&gt;GetValueConverter()&lt;/code&gt; on class &lt;code&gt;ParameterType&lt;/code&gt; will return &lt;code&gt;null&lt;/code&gt;).
                </documentation>
                <appinfo>
                   <meta.attribute kind="java" basedOn="org.eclipse.core.commands.AbstractParameterValueConverter"/>
@@ -282,7 +282,7 @@ The more verbose version of the &lt;code&gt;values&lt;/code&gt; attribute on the
          <attribute name="class" type="string" use="required">
             <annotation>
                <documentation>
-                  The class providing a list of parameter values for the user to select.  This class should implement &lt;code&gt;org.opencherry.core.commands.IParameterValues&lt;/code&gt;.  If this class is not specified, you must specify the more verbose &lt;code&gt;values&lt;/code&gt; element.  Please see &lt;code&gt;org.opencherry.osgi.IExecutableExtension&lt;/code&gt;.
+                  The class providing a list of parameter values for the user to select.  This class should implement &lt;code&gt;org.blueberry.core.commands.IParameterValues&lt;/code&gt;.  If this class is not specified, you must specify the more verbose &lt;code&gt;values&lt;/code&gt; element.  Please see &lt;code&gt;org.blueberry.osgi.IExecutableExtension&lt;/code&gt;.
                </documentation>
                <appinfo>
                   <meta.attribute kind="java" basedOn="org.eclipse.core.commands.IParameterValues"/>
@@ -339,7 +339,7 @@ The default handler for this command.  If no other handler is active, this handl
          <attribute name="class" type="string" use="required">
             <annotation>
                <documentation>
-                  The class which implements &lt;code&gt;org.opencherry.core.commands.IHandler&lt;/code&gt;.
+                  The class which implements &lt;code&gt;org.blueberry.core.commands.IHandler&lt;/code&gt;.
                </documentation>
                <appinfo>
                   <meta.attribute kind="java" basedOn="org.eclipse.core.commands.IHandler"/>
@@ -367,7 +367,7 @@ State information shared between all handlers, and potentially persisted between
          <attribute name="class" type="string">
             <annotation>
                <documentation>
-                  The class that can be loaded to store the state of this command.  State is shared amongst handlers, and can be persisted between sessions.  This class must implement &lt;code&gt;org.opencherry.core.commands.State&lt;/code&gt;.  Please see API Information.
+                  The class that can be loaded to store the state of this command.  State is shared amongst handlers, and can be persisted between sessions.  This class must implement &lt;code&gt;org.blueberry.core.commands.State&lt;/code&gt;.  Please see API Information.
                </documentation>
                <appinfo>
                   <meta.attribute kind="java"/>
@@ -377,7 +377,7 @@ State information shared between all handlers, and potentially persisted between
          <attribute name="id" type="string" use="required">
             <annotation>
                <documentation>
-                  A unique identifier for this state.  This is used for persisting the state between sessions (if the state is an instance of &lt;code&gt;org.opencherry.core.commands.PersistentState&lt;/code&gt;).  Certain common identifiers (see &lt;code&gt;org.opencherry.ui.menus.IMenuStateIds&lt;/code&gt;) are understood when the command is being rendered in the menus or tool bars.  The identifier only needs to be unique within the command defining the state.
+                  A unique identifier for this state.  This is used for persisting the state between sessions (if the state is an instance of &lt;code&gt;org.blueberry.core.commands.PersistentState&lt;/code&gt;).  Certain common identifiers (see &lt;code&gt;org.blueberry.ui.menus.IMenuStateIds&lt;/code&gt;) are understood when the command is being rendered in the menus or tool bars.  The identifier only needs to be unique within the command defining the state.
                </documentation>
             </annotation>
          </attribute>
@@ -391,7 +391,7 @@ State information shared between all handlers, and potentially persisted between
          </appinfo>
          <documentation>
             &lt;p&gt;
-The class that can be loaded to store the state of this command.  This element is used if you wish to pass multiple parameters to an &lt;code&gt;org.opencherry.osgi.IExecutableExtension&lt;/code&gt;.
+The class that can be loaded to store the state of this command.  This element is used if you wish to pass multiple parameters to an &lt;code&gt;org.blueberry.osgi.IExecutableExtension&lt;/code&gt;.
 &lt;/p&gt;
          </documentation>
       </annotation>
@@ -402,7 +402,7 @@ The class that can be loaded to store the state of this command.  This element i
          <attribute name="class" type="string" use="required">
             <annotation>
                <documentation>
-                  The class that can be loaded to store the state of this command.  State is shared amongst handlers, and can be persisted between sessions.  This class must implement &lt;code&gt;org.opencherry.core.commands.State&lt;/code&gt;.  Please see API Information.
+                  The class that can be loaded to store the state of this command.  State is shared amongst handlers, and can be persisted between sessions.  This class must implement &lt;code&gt;org.blueberry.core.commands.State&lt;/code&gt;.  Please see API Information.
                </documentation>
                <appinfo>
                   <meta.attribute kind="java"/>
@@ -429,7 +429,7 @@ The class that can be loaded to store the state of this command.  This element i
       </appinfo>
       <documentation>
          &lt;p&gt;
-The &lt;code&gt;plugin.xml&lt;/code&gt; file in the &lt;code&gt;org.opencherry.ui&lt;/code&gt; plugin makes extensive use of the &lt;code&gt;org.opencherry.ui.commands&lt;/code&gt; extension point.
+The &lt;code&gt;plugin.xml&lt;/code&gt; file in the &lt;code&gt;org.blueberry.ui&lt;/code&gt; plugin makes extensive use of the &lt;code&gt;org.blueberry.ui.commands&lt;/code&gt; extension point.
 &lt;/p&gt;
       </documentation>
    </annotation>
@@ -440,10 +440,10 @@ The &lt;code&gt;plugin.xml&lt;/code&gt; file in the &lt;code&gt;org.opencherry.u
       </appinfo>
       <documentation>
          &lt;p&gt;
-Handlers can be registered with commands using the &lt;code&gt;org.opencherry.ui.handlers.IHandlerService&lt;/code&gt;. This can be retrieved from various workbench components (e.g., workbench, workbench window, part site, etc.) by calling &lt;code&gt;GetService(IHandlerService::ID)&lt;/code&gt;.
+Handlers can be registered with commands using the &lt;code&gt;org.blueberry.ui.handlers.IHandlerService&lt;/code&gt;. This can be retrieved from various workbench components (e.g., workbench, workbench window, part site, etc.) by calling &lt;code&gt;GetService(IHandlerService::ID)&lt;/code&gt;.
 &lt;/p&gt;
 &lt;p&gt;
-In general, it is preferrably to declare all commands statically (in &lt;code&gt;plugin.xml&lt;/code&gt;).  This is so that users can attach key bindings to the commands.  However, it is possible to declare commands at run-time.  To do this, retrieve the &lt;code&gt;org.opencherry.ui.commands.ICommandService&lt;/code&gt; from a workbench component, call &lt;code&gt;GetCommand(yourCommandID)&lt;/code&gt; and then call &lt;code&gt;Command::Define(...)&lt;/code&gt;.
+In general, it is preferrably to declare all commands statically (in &lt;code&gt;plugin.xml&lt;/code&gt;).  This is so that users can attach key bindings to the commands.  However, it is possible to declare commands at run-time.  To do this, retrieve the &lt;code&gt;org.blueberry.ui.commands.ICommandService&lt;/code&gt; from a workbench component, call &lt;code&gt;GetCommand(yourCommandID)&lt;/code&gt; and then call &lt;code&gt;Command::Define(...)&lt;/code&gt;.
 Commands defined programmatically must be cleaned up by the plugin if it is unloaded.
 &lt;/p&gt;
 &lt;p&gt;

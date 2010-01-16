@@ -1,6 +1,6 @@
 /*=========================================================================
 
-Program:   openCherry Platform
+Program:   BlueBerry Platform
 Language:  C++
 Date:      $Date: 2009-05-18 17:57:41 +0200 (Mo, 18 Mai 2009) $
 Version:   $Revision: 17020 $
@@ -22,15 +22,15 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkNodePredicateDataType.h"
 //#include "mitkDataTreeNodeObject.h"
 //
-//#include "cherryISelectionService.h"
-//#include "cherryIStructuredSelection.h"
-//#include "cherryPlatformUI.h"
+//#include "berryISelectionService.h"
+//#include "berryIStructuredSelection.h"
+//#include "berryPlatformUI.h"
 //
 //#include <QLabel>
 //#include <QHBoxLayout>
 
 void
-mitk::DiffusionImagingActivator::Start(cherry::IBundleContext::Pointer /*context*/)
+mitk::DiffusionImagingActivator::Start(berry::IBundleContext::Pointer /*context*/)
 {
   RegisterDiffusionImagingObjectFactory();
 
@@ -72,9 +72,9 @@ mitk::DiffusionImagingActivator::Start(cherry::IBundleContext::Pointer /*context
 
 //void mitk::DiffusionImagingActivator::OpactiyChanged(int value)
 //{
-//  cherry::ISelection::ConstPointer sel(
-//    cherry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetSelectionService()->GetSelection("org.mitk.views.datamanager"));
-//  cherry::IStructuredSelection::ConstPointer ssel = sel.Cast<const cherry::IStructuredSelection>();
+//  berry::ISelection::ConstPointer sel(
+//    berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetSelectionService()->GetSelection("org.mitk.views.datamanager"));
+//  berry::IStructuredSelection::ConstPointer ssel = sel.Cast<const berry::IStructuredSelection>();
 //
 //  if (ssel)
 //  {
@@ -92,9 +92,9 @@ mitk::DiffusionImagingActivator::Start(cherry::IBundleContext::Pointer /*context
 //
 //void mitk::DiffusionImagingActivator::OpactiyActionChanged()
 //{
-//  cherry::ISelection::ConstPointer sel(
-//    cherry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetSelectionService()->GetSelection("org.mitk.views.datamanager"));
-//  cherry::IStructuredSelection::ConstPointer ssel = sel.Cast<const cherry::IStructuredSelection>();
+//  berry::ISelection::ConstPointer sel(
+//    berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetSelectionService()->GetSelection("org.mitk.views.datamanager"));
+//  berry::IStructuredSelection::ConstPointer ssel = sel.Cast<const berry::IStructuredSelection>();
 // 
 //  if (ssel)
 //  {

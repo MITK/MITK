@@ -1,6 +1,6 @@
 /*=========================================================================
  
- Program:   openCherry Platform
+ Program:   BlueBerry Platform
  Language:  C++
  Date:      $Date$
  Version:   $Revision$
@@ -19,11 +19,11 @@
 #ifndef QMITKEXTAPPLICATIONPLUGIN_H_
 #define QMITKEXTAPPLICATIONPLUGIN_H_
 
-#include <cherryAbstractUIPlugin.h>
+#include <berryAbstractUIPlugin.h>
 
 #include <QString>
 
-class QmitkExtApplicationPlugin : public cherry::AbstractUIPlugin
+class QmitkExtApplicationPlugin : public berry::AbstractUIPlugin
 {
 public:
 
@@ -31,9 +31,9 @@ public:
 
   static QmitkExtApplicationPlugin* GetDefault();
 
-  cherry::IBundleContext::Pointer GetBundleContext() const;
+  berry::IBundleContext::Pointer GetBundleContext() const;
 
-  void Start(cherry::IBundleContext::Pointer);
+  void Start(berry::IBundleContext::Pointer);
 
   QString GetQtHelpCollectionFile() const;
 
@@ -41,7 +41,7 @@ private:
 
   static QmitkExtApplicationPlugin* inst;
 
-  cherry::IBundleContext::Pointer context;
+  berry::IBundleContext::Pointer context;
 };
 
 #endif /* QMITKEXTAPPLICATIONPLUGIN_H_ */

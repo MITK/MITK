@@ -25,10 +25,10 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkDataStorageEditorInput.h"
 
-// cherry Includes
-#include <cherryPlatform.h>
-#include <cherryIWorkbenchPage.h>
-#include <cherryConstants.h>
+// berry Includes
+#include <berryPlatform.h>
+#include <berryIWorkbenchPage.h>
+#include <berryConstants.h>
 
 #include <QMessageBox>
 
@@ -70,7 +70,7 @@ void QmitkImageNavigatorView::SetFocus ()
 QmitkStdMultiWidget* QmitkImageNavigatorView::GetActiveStdMultiWidget()
 {
   QmitkStdMultiWidget* activeStdMultiWidget = 0;
-  cherry::IEditorPart::Pointer editor =
+  berry::IEditorPart::Pointer editor =
     this->GetSite()->GetPage()->GetActiveEditor();
 
   if (editor.Cast<QmitkStdMultiWidgetEditor>().IsNotNull())
@@ -81,7 +81,7 @@ QmitkStdMultiWidget* QmitkImageNavigatorView::GetActiveStdMultiWidget()
   {
     mitk::DataStorageEditorInput::Pointer editorInput;
     editorInput = new mitk::DataStorageEditorInput();
-    cherry::IEditorPart::Pointer editor = this->GetSite()->GetPage()->OpenEditor(editorInput, QmitkStdMultiWidgetEditor::EDITOR_ID);
+    berry::IEditorPart::Pointer editor = this->GetSite()->GetPage()->OpenEditor(editorInput, QmitkStdMultiWidgetEditor::EDITOR_ID);
     activeStdMultiWidget = editor.Cast<QmitkStdMultiWidgetEditor>()->GetStdMultiWidget();
   }
 
@@ -92,7 +92,7 @@ int QmitkImageNavigatorView::GetSizeFlags(bool width)
 {
   if(!width)
   {
-    return cherry::Constants::MIN | cherry::Constants::MAX | cherry::Constants::FILL;
+    return berry::Constants::MIN | berry::Constants::MAX | berry::Constants::FILL;
   }
   else
   {

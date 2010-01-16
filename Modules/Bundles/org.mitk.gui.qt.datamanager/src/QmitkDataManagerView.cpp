@@ -32,11 +32,11 @@
 #include <QmitkCustomVariants.h>
 #include "src/internal/QmitkNodeTableViewKeyFilter.h"
 #include "src/internal/QmitkInfoDialog.h"
-//## Cherry
-#include <cherryIEditorPart.h>
-#include <cherryIWorkbenchPage.h>
-#include <cherryIPreferencesService.h>
-#include <cherryPlatform.h>
+//## Berry
+#include <berryIEditorPart.h>
+#include <berryIWorkbenchPage.h>
+#include <berryIPreferencesService.h>
+#include <berryPlatform.h>
 
 //# Toolkit Includes
 #include <QTableView>
@@ -75,9 +75,9 @@ QmitkDataManagerView::~QmitkDataManagerView()
 {
   if(m_DataManagerPreferencesNode.IsNotNull())
     m_DataManagerPreferencesNode->OnChanged
-    .RemoveListener(cherry::MessageDelegate1<QmitkDataManagerView, const cherry::ICherryPreferences*>(this, &QmitkDataManagerView::OnPreferencesChanged));
+    .RemoveListener(berry::MessageDelegate1<QmitkDataManagerView, const berry::IBerryPreferences*>(this, &QmitkDataManagerView::OnPreferencesChanged));
 
-  cherry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
+  berry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
   if(s)
     s->RemoveSelectionListener(m_SelectionListener);
 }
@@ -86,14 +86,14 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
 {
   m_Parent = parent;
   //# Preferences
-  cherry::IPreferencesService::Pointer prefService 
-    = cherry::Platform::GetServiceRegistry()
-    .GetServiceById<cherry::IPreferencesService>(cherry::IPreferencesService::ID);
+  berry::IPreferencesService::Pointer prefService 
+    = berry::Platform::GetServiceRegistry()
+    .GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
 
-  m_DataManagerPreferencesNode = (prefService->GetSystemPreferences()->Node("/DataManager")).Cast<cherry::ICherryPreferences>();
+  m_DataManagerPreferencesNode = (prefService->GetSystemPreferences()->Node("/DataManager")).Cast<berry::IBerryPreferences>();
   if(m_DataManagerPreferencesNode.IsNotNull())
     m_DataManagerPreferencesNode->OnChanged
-      .AddListener(cherry::MessageDelegate1<QmitkDataManagerView, const cherry::ICherryPreferences*>(this, &QmitkDataManagerView::OnPreferencesChanged));
+      .AddListener(berry::MessageDelegate1<QmitkDataManagerView, const berry::IBerryPreferences*>(this, &QmitkDataManagerView::OnPreferencesChanged));
 
   //# GUI
   m_NodeTreeModel = new QmitkDataStorageTreeModel(this->GetDataStorage());
@@ -256,10 +256,10 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   // call preferences changed to enable initial single click editing or not
   this->OnPreferencesChanged(m_DataManagerPreferencesNode.GetPointer());
 
-  m_SelectionListener = new cherry::SelectionChangedAdapter<QmitkDataManagerView>
+  m_SelectionListener = new berry::SelectionChangedAdapter<QmitkDataManagerView>
     (this, &QmitkDataManagerView::SelectionChanged);
 
-  cherry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
+  berry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
   s->AddSelectionListener(m_SelectionListener);
 
 }
@@ -271,7 +271,7 @@ void QmitkDataManagerView::SetFocus()
 mitk::DataStorage::Pointer QmitkDataManagerView::GetDataStorage() const
 {
   mitk::IDataStorageService::Pointer service =
-    cherry::Platform::GetServiceRegistry().GetServiceById<mitk::IDataStorageService>(mitk::IDataStorageService::ID);
+    berry::Platform::GetServiceRegistry().GetServiceById<mitk::IDataStorageService>(mitk::IDataStorageService::ID);
 
   if (service.IsNotNull())
   {
@@ -281,7 +281,7 @@ mitk::DataStorage::Pointer QmitkDataManagerView::GetDataStorage() const
   return 0;
 }
 
-void QmitkDataManagerView::OnPreferencesChanged(const cherry::ICherryPreferences* )
+void QmitkDataManagerView::OnPreferencesChanged(const berry::IBerryPreferences* )
 {
 }
 
@@ -673,7 +673,7 @@ std::vector<mitk::DataTreeNode*> QmitkDataManagerView::GetSelectedNodes() const
   return selectedNodes;
 }
 
-void QmitkDataManagerView::SelectionChanged( cherry::IWorkbenchPart::Pointer part , cherry::ISelection::ConstPointer selection )
+void QmitkDataManagerView::SelectionChanged( berry::IWorkbenchPart::Pointer part , berry::ISelection::ConstPointer selection )
 {
   if(part.GetPointer() == this)
     return;

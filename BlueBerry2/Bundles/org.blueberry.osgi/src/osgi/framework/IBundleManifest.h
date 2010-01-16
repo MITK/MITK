@@ -1,6 +1,6 @@
 /*=========================================================================
 
-Program:   openCherry Platform
+Program:   BlueBerry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
@@ -28,7 +28,7 @@ namespace osgi {
 namespace framework {
 
 
-struct CHERRY_OSGI IBundleManifest : public Object
+struct BERRY_OSGI IBundleManifest : public Object
 {
   osgiInterfaceMacro(osgi::framework::IBundleManifest);
 

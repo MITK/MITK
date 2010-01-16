@@ -1,6 +1,6 @@
 /*=========================================================================
 
-Program:   openCherry Platform
+Program:   BlueBerry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
@@ -1077,6 +1077,6 @@ public:
 
   };
 
-} // namespace cherry
+} // namespace berry
 
 #endif /*OSGI_FRAMEWORK_MESSAGE_H_*/

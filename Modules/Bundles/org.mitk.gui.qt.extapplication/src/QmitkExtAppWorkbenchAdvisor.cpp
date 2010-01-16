@@ -18,36 +18,36 @@
 #include "QmitkExtAppWorkbenchAdvisor.h"
 #include "internal/QmitkExtApplicationPlugin.h"
 
-#include <cherryQtAssistantUtil.h>
+#include <berryQtAssistantUtil.h>
 #include <QmitkExtWorkbenchWindowAdvisor.h>
 
 const std::string QmitkExtAppWorkbenchAdvisor::DEFAULT_PERSPECTIVE_ID =
     "org.mitk.extapp.defaultperspective";
 
 void
-QmitkExtAppWorkbenchAdvisor::Initialize(cherry::IWorkbenchConfigurer::Pointer configurer)
+QmitkExtAppWorkbenchAdvisor::Initialize(berry::IWorkbenchConfigurer::Pointer configurer)
 {
-  cherry::QtWorkbenchAdvisor::Initialize(configurer);
+  berry::QtWorkbenchAdvisor::Initialize(configurer);
 
   configurer->SetSaveAndRestore(true);
 
   QString collectionFile = QmitkExtApplicationPlugin::GetDefault()->GetQtHelpCollectionFile();
   if (!collectionFile.isEmpty())
   {
-    cherry::IBundleContext::Pointer context = QmitkExtApplicationPlugin::GetDefault()->GetBundleContext();
-    typedef std::vector<cherry::IBundle::Pointer> BundleContainer;
+    berry::IBundleContext::Pointer context = QmitkExtApplicationPlugin::GetDefault()->GetBundleContext();
+    typedef std::vector<berry::IBundle::Pointer> BundleContainer;
     BundleContainer bundles;
     context->ListBundles(bundles);
-    cherry::QtAssistantUtil::RegisterQCHFiles(collectionFile, bundles);
+    berry::QtAssistantUtil::RegisterQCHFiles(collectionFile, bundles);
   }
 
-  cherry::QtAssistantUtil::SetHelpColletionFile(collectionFile);
-  cherry::QtAssistantUtil::SetDefaultHelpUrl("qthelp://org.mitk.gui.qt.extapplication/bundle/index.html");
+  berry::QtAssistantUtil::SetHelpColletionFile(collectionFile);
+  berry::QtAssistantUtil::SetDefaultHelpUrl("qthelp://org.mitk.gui.qt.extapplication/bundle/index.html");
 }
 
-cherry::WorkbenchWindowAdvisor*
+berry::WorkbenchWindowAdvisor*
 QmitkExtAppWorkbenchAdvisor::CreateWorkbenchWindowAdvisor(
-        cherry::IWorkbenchWindowConfigurer::Pointer configurer)
+        berry::IWorkbenchWindowConfigurer::Pointer configurer)
 {
   return new QmitkExtWorkbenchWindowAdvisor(this, configurer);
 }

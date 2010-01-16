@@ -37,7 +37,7 @@ DataTreeNode::Pointer DataTreeNodeObject::GetDataTreeNode() const
   return m_Node;
 }
 
-bool DataTreeNodeObject::operator==(const cherry::Object* obj) const
+bool DataTreeNodeObject::operator==(const berry::Object* obj) const
 {
   if (const DataTreeNodeObject* other = dynamic_cast<const DataTreeNodeObject*>(obj))
   {

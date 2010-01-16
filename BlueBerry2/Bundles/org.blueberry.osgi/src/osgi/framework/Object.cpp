@@ -1,6 +1,6 @@
 /*=========================================================================
 
-Program:   openCherry Platform
+Program:   BlueBerry Platform
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
@@ -17,10 +17,10 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "Object.h"
 
-#include "../../cherryLog.h"
+#include "../../berryLog.h"
 
-#ifdef OPENCHERRY_DEBUG_SMARTPOINTER
-#include "../../cherryDebugUtil.h"
+#ifdef BLUEBERRY_DEBUG_SMARTPOINTER
+#include "../../berryDebugUtil.h"
 #endif
 
 #include <list>
@@ -153,7 +153,7 @@ Object::operator==(const Object* o) const
   return this == o;
 }
 
-#ifdef OPENCHERRY_DEBUG_SMARTPOINTER
+#ifdef BLUEBERRY_DEBUG_SMARTPOINTER
 unsigned int Object::GetTraceId() const
 {
   return m_TraceId;
@@ -168,7 +168,7 @@ unsigned int& Object::GetTraceIdCounter() const
 
 Object::Object()
 {
-#ifdef OPENCHERRY_DEBUG_SMARTPOINTER
+#ifdef BLUEBERRY_DEBUG_SMARTPOINTER
   unsigned int& id = GetTraceIdCounter();
   m_TraceId = ++id;
   DebugUtil::RegisterObject(this);
@@ -189,7 +189,7 @@ Object
     // this point anyway.  Also this is the least-derived class so the
     // whole object has been destroyed by this point anyway.  Just
     // issue a warning.
-    CHERRY_WARN << "WARNING: In " __FILE__ ", line " << __LINE__ << "\n"
+    BERRY_WARN << "WARNING: In " __FILE__ ", line " << __LINE__ << "\n"
       << this->GetClassName() << " (" << this << "): Trying to delete object with non-zero reference count.";
 
     }
@@ -199,7 +199,7 @@ Object
     */
     m_DestroyMessage.Send();
 
-#ifdef OPENCHERRY_DEBUG_SMARTPOINTER
+#ifdef BLUEBERRY_DEBUG_SMARTPOINTER
   DebugUtil::UnregisterObject(this);
 #endif
 }

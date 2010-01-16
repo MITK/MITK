@@ -1,6 +1,6 @@
 /*=========================================================================
  
- Program:   openCherry Platform
+ Program:   BlueBerry Platform
  Language:  C++
  Date:      $Date$
  Version:   $Revision$
@@ -19,6 +19,6 @@
 
 #include "src/internal/QmitkCommonExtPlugin.h"
 
-POCO_BEGIN_MANIFEST(cherry::IBundleActivator)
+POCO_BEGIN_MANIFEST(berry::IBundleActivator)
   POCO_EXPORT_CLASS(QmitkCommonExtPlugin)
 POCO_END_MANIFEST

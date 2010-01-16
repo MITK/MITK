@@ -17,7 +17,7 @@
 
 #include "mitkSegmentationSelectionProvider.h"
 #include <mitkDataTreeNodeSelection.h>
-#include "cherrySelectionChangedEvent.h"
+#include "berrySelectionChangedEvent.h"
 
 
 namespace mitk
@@ -31,22 +31,22 @@ SegmentationSelectionProvider::SegmentationSelectionProvider()
 }
 
 
-void SegmentationSelectionProvider::AddSelectionChangedListener(cherry::ISelectionChangedListener::Pointer listener)
+void SegmentationSelectionProvider::AddSelectionChangedListener(berry::ISelectionChangedListener::Pointer listener)
 {
   m_RegisteredListeners.AddListener(listener);
 }
 
-void SegmentationSelectionProvider::RemoveSelectionChangedListener(cherry::ISelectionChangedListener::Pointer listener)
+void SegmentationSelectionProvider::RemoveSelectionChangedListener(berry::ISelectionChangedListener::Pointer listener)
 {
   m_RegisteredListeners.RemoveListener(listener);
 }
 
-cherry::ISelection::ConstPointer SegmentationSelectionProvider::GetSelection() const
+berry::ISelection::ConstPointer SegmentationSelectionProvider::GetSelection() const
 {
  return m_CurrentSelection;
 }
 
-void SegmentationSelectionProvider::SetSelection(cherry::ISelection::Pointer selection)
+void SegmentationSelectionProvider::SetSelection(berry::ISelection::Pointer selection)
 {
 }
 
@@ -56,7 +56,7 @@ void SegmentationSelectionProvider::FireSelectionChanged(DataTreeNodeSelection::
   {
   
     m_CurrentSelection = selection;
-    cherry::SelectionChangedEvent::Pointer event(new cherry::SelectionChangedEvent(cherry::ISelectionProvider::Pointer(this), m_CurrentSelection));
+    berry::SelectionChangedEvent::Pointer event(new berry::SelectionChangedEvent(berry::ISelectionProvider::Pointer(this), m_CurrentSelection));
     m_RegisteredListeners.selectionChanged(event);
   }
 }

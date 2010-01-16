@@ -1,6 +1,6 @@
 /*=========================================================================
 
- Program:   openCherry Platform
+ Program:   BlueBerry Platform
  Language:  C++
  Date:      $Date: 2009-02-22 15:57:29 +0100 (So, 22 Feb 2009) $
  Version:   $Revision: 16375 $
@@ -16,12 +16,12 @@
  =========================================================================*/
 
 
-#ifndef CHERRYQMITKPREFERENCESDIALOG_H_
-#define CHERRYQMITKPREFERENCESDIALOG_H_
+#ifndef BERRYQMITKPREFERENCESDIALOG_H_
+#define BERRYQMITKPREFERENCESDIALOG_H_
 
-#include <cherryICherryPreferencesService.h>
-#include <cherryIQtPreferencePage.h>
-#include <cherryIConfigurationElement.h>
+#include <berryIBerryPreferencesService.h>
+#include <berryIQtPreferencePage.h>
+#include <berryIConfigurationElement.h>
 #include "mitkQtCommonDll.h"
 
 #include <QDialog>
@@ -65,7 +65,7 @@ protected:
   struct PrefPage
   {
     PrefPage(std::string _id, std::string _name, std::string _category
-      , std::string _className, std::string _keywords, cherry::IConfigurationElement::Pointer _confElem);
+      , std::string _className, std::string _keywords, berry::IConfigurationElement::Pointer _confElem);
     bool operator==(const PrefPage& other);
     bool operator<(const PrefPage& other);
 
@@ -74,8 +74,8 @@ protected:
     std::string category;
     std::string className;
     std::string keywords;
-    cherry::IQtPreferencePage* prefPage;
-    cherry::IConfigurationElement::Pointer confElem;
+    berry::IQtPreferencePage* prefPage;
+    berry::IConfigurationElement::Pointer confElem;
     QTreeWidgetItem* treeWidgetItem;
   };
 
@@ -85,7 +85,7 @@ protected:
   ///
   /// The Preferences Service to retrieve and store preferences.
   ///
-  cherry::IPreferencesService::WeakPtr m_PreferencesService;
+  berry::IPreferencesService::WeakPtr m_PreferencesService;
 
   ///
   /// Saves all treewidgetitems in a map, the key is the id of the preferencepage.
@@ -114,4 +114,4 @@ protected:
 
 };
 
-#endif /* CHERRYQMITKPREFERENCESDIALOG_H_ */
+#endif /* BERRYQMITKPREFERENCESDIALOG_H_ */

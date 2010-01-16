@@ -1,7 +1,7 @@
 #ifndef MITKIDATASTORAGESERVICE_H_
 #define MITKIDATASTORAGESERVICE_H_
 
-#include <cherryService.h>
+#include <berryService.h>
 
 #include "mitkCoreServicesPluginDll.h"
 #include "mitkIDataStorageReference.h"
@@ -11,9 +11,9 @@
 namespace mitk
 {
 
-struct MITK_CORE_SERVICES_PLUGIN IDataStorageService : public cherry::Service
+struct MITK_CORE_SERVICES_PLUGIN IDataStorageService : public berry::Service
 {
-  cherryInterfaceMacro(IDataStorageService, cherry);
+  berryInterfaceMacro(IDataStorageService, berry);
 
   static const std::string ID;
 

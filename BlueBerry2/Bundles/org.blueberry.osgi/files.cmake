@@ -1,43 +1,43 @@
 SET(INTERNAL_CPP_FILES
-  cherryBundle.cpp
-  cherryBundleContext.cpp
-  cherryBundleDirectory.cpp
-  cherryBundleManifest.cpp
-  cherryCodeCache.cpp
-  cherryDefaultActivator.cpp
-  cherryConfigurationElement.cpp
-  cherryExtension.cpp
-  cherryExtensionPoint.cpp
-  cherryExtensionPointService.cpp
-  cherryInternalPlatform.cpp
-  cherryPlatformLogChannel.cpp
-  cherrySystemBundle.cpp
-  cherrySystemBundleActivator.cpp
+  berryBundle.cpp
+  berryBundleContext.cpp
+  berryBundleDirectory.cpp
+  berryBundleManifest.cpp
+  berryCodeCache.cpp
+  berryDefaultActivator.cpp
+  berryConfigurationElement.cpp
+  berryExtension.cpp
+  berryExtensionPoint.cpp
+  berryExtensionPointService.cpp
+  berryInternalPlatform.cpp
+  berryPlatformLogChannel.cpp
+  berrySystemBundle.cpp
+  berrySystemBundleActivator.cpp
   
   # osgi.framework
-  osgi.framework/eventmgr/cherryEventManager.cpp
-  osgi.framework/eventmgr/cherryListenerQueue.cpp
-  #osgi.framework/cherryBundleContextImpl.cpp
-  #osgi.framework/cherryBundleHost.cpp
-  osgi.framework/cherryFilterImpl.cpp
-  osgi.framework/cherryFramework.cpp
+  osgi.framework/eventmgr/berryEventManager.cpp
+  osgi.framework/eventmgr/berryListenerQueue.cpp
+  #osgi.framework/berryBundleContextImpl.cpp
+  #osgi.framework/berryBundleHost.cpp
+  osgi.framework/berryFilterImpl.cpp
+  osgi.framework/berryFramework.cpp
   
   # osgi.serviceregistry
-  osgi.serviceregistry/cherryFilteredServiceListener.cpp
-  osgi.serviceregistry/cherryServiceProperties.cpp
-  osgi.serviceregistry/cherryServiceReferenceImpl.cpp
-  osgi.serviceregistry/cherryServiceRegistrationImpl.cpp
-  osgi.serviceregistry/cherryServiceRegistry.cpp
-  osgi.serviceregistry/cherryServiceUse.cpp
+  osgi.serviceregistry/berryFilteredServiceListener.cpp
+  osgi.serviceregistry/berryServiceProperties.cpp
+  osgi.serviceregistry/berryServiceReferenceImpl.cpp
+  osgi.serviceregistry/berryServiceRegistrationImpl.cpp
+  osgi.serviceregistry/berryServiceRegistry.cpp
+  osgi.serviceregistry/berryServiceUse.cpp
   
   # supplement
-  supplement/cherryStackTrace.cpp
+  supplement/berryStackTrace.cpp
 )
 
 SET(SRC_CPP_FILES
   
   # event
-  event/cherryPlatformEvent.cpp
+  event/berryPlatformEvent.cpp
   
   # osgi/framework
   osgi/framework/BundleEvent.cpp
@@ -52,21 +52,21 @@ SET(SRC_CPP_FILES
   # osgi/util
   osgi/util/Headers.cpp
   
-  cherryBundleLoader.cpp
-  cherryDebugUtil.cpp
-  cherryPlatform.cpp
-  cherryPlugin.cpp
+  berryBundleLoader.cpp
+  berryDebugUtil.cpp
+  berryPlatform.cpp
+  berryPlugin.cpp
   
-  #openCherryAdapter
-  openCherryAdapter/runtime/cherryStarter.cpp
+  #BlueBerryAdapter
+  BlueBerryAdapter/runtime/berryStarter.cpp
   
   #service
-  service/cherryIExtensionPointService.cpp
-  service/cherryService.cpp
-  service/cherryServiceRegistry.cpp
+  service/berryIExtensionPointService.cpp
+  service/berryService.cpp
+  service/berryServiceRegistry.cpp
   
   # supplement/framework.debug
-  supplement/framework.debug/cherryDebug.cpp
+  supplement/framework.debug/berryDebug.cpp
   
 )
 

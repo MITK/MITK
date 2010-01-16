@@ -17,7 +17,7 @@
 
 #include "QmitkDefaultPerspective.h"
 
-void QmitkDefaultPerspective::CreateInitialLayout(cherry::IPageLayout::Pointer layout)
+void QmitkDefaultPerspective::CreateInitialLayout(berry::IPageLayout::Pointer layout)
 {
 
 }

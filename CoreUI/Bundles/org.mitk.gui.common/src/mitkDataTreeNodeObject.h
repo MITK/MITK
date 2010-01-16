@@ -19,8 +19,8 @@
 #ifndef MITKDATATREENODEOBJECT_H_
 #define MITKDATATREENODEOBJECT_H_
 
-#include <cherryObject.h>
-#include <cherryMacros.h>
+#include <berryObject.h>
+#include <berryMacros.h>
 
 #include "mitkGUICommonPluginDll.h"
 
@@ -29,19 +29,19 @@
 namespace mitk
 {
 
-class MITK_GUI_COMMON_PLUGIN DataTreeNodeObject : public cherry::Object
+class MITK_GUI_COMMON_PLUGIN DataTreeNodeObject : public berry::Object
 {
 
 public:
 
-  cherryObjectMacro(mitk::DataTreeNodeObject)
+  berryObjectMacro(mitk::DataTreeNodeObject)
 
   DataTreeNodeObject();
   DataTreeNodeObject(DataTreeNode::Pointer node);
 
   DataTreeNode::Pointer GetDataTreeNode() const;
 
-  bool operator==(const cherry::Object* obj) const;
+  bool operator==(const berry::Object* obj) const;
 
 private:
 

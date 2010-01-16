@@ -1,16 +1,16 @@
 #ifndef QMITKsegmentationVIEW_H_
 #define QMITKsegmentationVIEW_H_
 
-#include <cherryIPartListener.h>
+#include <berryIPartListener.h>
 
 #include <QmitkFunctionality.h>
 #include <QmitkStandardViews.h>
 #include <QmitkStdMultiWidgetEditor.h>
 
 #include "ui_QmitkSegmentationControls.h"
-#include <cherryISelectionListener.h>
+#include <berryISelectionListener.h>
 #include "mitkDataTreeNodeSelection.h"
-#include <cherryICherryPreferences.h>
+#include <berryIBerryPreferences.h>
 
 #include "mitkSegmentationSelectionProvider.h"
 
@@ -59,10 +59,10 @@ protected:
 
     void OnThresholdingToolManagerToolModified();
   
-    void OnPreferencesChanged(const cherry::ICherryPreferences*);
+    void OnPreferencesChanged(const berry::IBerryPreferences*);
   protected slots:
 
-    void SelectionChanged(cherry::IWorkbenchPart::Pointer sourcepart, cherry::ISelection::ConstPointer selection);
+    void SelectionChanged(berry::IWorkbenchPart::Pointer sourcepart, berry::ISelection::ConstPointer selection);
 
     void CreateNewSegmentation();
 
@@ -94,7 +94,7 @@ protected:
 
     void ExtendOrganList(std::string organname,mitk::Color colorname);
   
-    cherry::ICherryPreferences::Pointer m_SegmentationPreferencesNode;
+    berry::IBerryPreferences::Pointer m_SegmentationPreferencesNode;
 
     QmitkStdMultiWidget * m_MultiWidget;
 
@@ -105,8 +105,8 @@ protected:
     mitk::DataStorage::Pointer m_DataStorage;
 
     mitk::DataTreeNodeSelection::ConstPointer m_CurrentSelection;
-    cherry::ISelectionListener::Pointer m_SelectionListener;
-    friend struct cherry::SelectionChangedAdapter<QmitkSegmentationView>;
+    berry::ISelectionListener::Pointer m_SelectionListener;
+    friend struct berry::SelectionChangedAdapter<QmitkSegmentationView>;
   
     QAction* m_CreateSurfaceAction;
     QAction* m_CreateSmoothSurfaceAction;

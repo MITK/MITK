@@ -1,7 +1,7 @@
 #ifndef QMITKINTERACTIVESEGMENTATIONVIEW_H_
 #define QMITKINTERACTIVESEGMENTATIONVIEW_H_
 
-#include <cherryIPartListener.h>
+#include <berryIPartListener.h>
 
 #include <QmitkFunctionality.h>
 #include <QmitkStandardViews.h>

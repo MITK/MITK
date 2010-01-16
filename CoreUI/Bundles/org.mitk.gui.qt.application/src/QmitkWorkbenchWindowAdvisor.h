@@ -18,18 +18,18 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef QMITKWORKBENCHWINDOWADVISOR_H_
 #define QMITKWORKBENCHWINDOWADVISOR_H_
 
-#include <cherryWorkbenchWindowAdvisor.h>
+#include <berryWorkbenchWindowAdvisor.h>
 
 #include "mitkQtAppDll.h"
 
-class MITK_QT_APP QmitkWorkbenchWindowAdvisor : public cherry::WorkbenchWindowAdvisor
+class MITK_QT_APP QmitkWorkbenchWindowAdvisor : public berry::WorkbenchWindowAdvisor
 {
 public:
 
-    QmitkWorkbenchWindowAdvisor(cherry::IWorkbenchWindowConfigurer::Pointer configurer);
+    QmitkWorkbenchWindowAdvisor(berry::IWorkbenchWindowConfigurer::Pointer configurer);
 
-    cherry::ActionBarAdvisor::Pointer CreateActionBarAdvisor(
-        cherry::IActionBarConfigurer::Pointer configurer);
+    berry::ActionBarAdvisor::Pointer CreateActionBarAdvisor(
+        berry::IActionBarConfigurer::Pointer configurer);
 
     void PostWindowCreate();
 };

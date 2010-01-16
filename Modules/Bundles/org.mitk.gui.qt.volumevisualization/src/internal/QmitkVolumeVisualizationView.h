@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <QmitkFunctionality.h>
 
-#include <cherryISelectionListener.h>
+#include <berryISelectionListener.h>
 #include <mitkDataTreeNodeSelection.h>
 
 #include <mitkWeakPointer.h>
@@ -55,7 +55,7 @@ public:
   ///
   /// Invoked when the DataManager selection changed
   ///
-  virtual void SelectionChanged(cherry::IWorkbenchPart::Pointer part, cherry::ISelection::ConstPointer selection);
+  virtual void SelectionChanged(berry::IWorkbenchPart::Pointer part, berry::ISelection::ConstPointer selection);
 
 
 protected slots:
@@ -70,7 +70,7 @@ protected:
   ///
   /// A selection listener for datatreenode events
   ///
-  cherry::ISelectionListener::Pointer m_SelectionListener;
+  berry::ISelectionListener::Pointer m_SelectionListener;
 
   Ui::QmitkVolumeVisualizationViewControls* m_Controls;
   

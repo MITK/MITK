@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?openCherry version="0.1"?>
+<?BlueBerry version="0.1"?>
 <plugin>
   
-  <extension point="org.opencherry.ui.views">
+  <extension point="org.blueberry.ui.views">
     <view id="objectbrowser"
           name="Object Browser"
-          class="cherry::ObjectBrowserView"
+          class="berry::ObjectBrowserView"
 		  icon="resources/ObjectBrowser.png" />
   </extension>
 

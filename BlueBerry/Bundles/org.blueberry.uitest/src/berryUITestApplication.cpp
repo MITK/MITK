@@ -17,7 +17,7 @@
 
 #include "berryUITestApplication.h"
 
-#include <berryIBlueBerryTestDriver.h>
+#include <berryBlueBerryTestDriver.h>
 #include <berryPlatformUI.h>
 #include <berryIExtensionPointService.h>
 #include <berryStarter.h>

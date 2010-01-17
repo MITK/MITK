@@ -20,7 +20,7 @@
 #include <berryPlatform.h>
 #include <berryLog.h>
 
-#include "berryIBlueBerryTestDriver.h"
+#include "berryBlueBerryTestDriver.h"
 
 namespace berry {
 

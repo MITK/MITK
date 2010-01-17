@@ -15,7 +15,7 @@
  
  =========================================================================*/
 
-#include "berryIBlueBerryTestDriver.h"
+#include "berryBlueBerryTestDriver.h"
 
 #include "internal/berryTestRegistry.h"
 

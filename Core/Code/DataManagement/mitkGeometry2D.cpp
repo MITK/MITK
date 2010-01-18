@@ -65,7 +65,6 @@ mitk::Geometry2D::Map(
   const mitk::Point3D &pt3d_mm, mitk::Point2D &pt2d_mm) const
 {
   assert(m_BoundingBox.IsNotNull());
-  BoundingBox::BoundsArrayType bounds = m_BoundingBox->GetBounds();
 
   Point3D pt3d_units;
   BackTransform(pt3d_mm, pt3d_units);
@@ -79,9 +78,6 @@ mitk::Geometry2D::Map(
 void 
 mitk::Geometry2D::Map(const mitk::Point2D &pt2d_mm, mitk::Point3D &pt3d_mm) const
 {
-  assert(m_BoundingBox.IsNotNull());
-  BoundingBox::BoundsArrayType bounds = m_BoundingBox->GetBounds();
-
   Point3D pt3d_units;
   pt3d_units[0]=pt2d_mm[0]/m_ScaleFactorMMPerUnitX;
   pt3d_units[1]=pt2d_mm[1]/m_ScaleFactorMMPerUnitY;
@@ -94,13 +90,9 @@ void
 mitk::Geometry2D::IndexToWorld(
   const mitk::Point2D &pt_units, mitk::Point2D &pt_mm) const
 {
-  assert(m_BoundingBox.IsNotNull());
-  BoundingBox::BoundsArrayType bounds = m_BoundingBox->GetBounds();
-  mitk::Point3D pt3d;
-  FillVector3D(pt3d, pt_units[0], pt_units[1], 0);
-  pt3d = GetParametricTransform()->TransformPoint(pt3d);
-  pt_mm[0]=pt3d[0];
-  pt_mm[1]=pt3d[1];
+  itkExceptionMacro(<< "No general transform possible (only affine) ==> no general" \
+    " IndexToWorld(const mitk::Point2D &pt_mm, mitk::Point2D &pt_units)" \
+    " possible. Has to be implemented in sub-class.");
 }
 
 
@@ -108,13 +100,9 @@ void
 mitk::Geometry2D::WorldToIndex(
   const mitk::Point2D &pt_mm, mitk::Point2D &pt_units) const
 {
-  itkExceptionMacro(<< "No BackTransform in itk::Transform ==> no general" \
+  itkExceptionMacro(<< "No general back transform possible (only affine) ==> no general" \
     " WorldToIndex(const mitk::Point2D &pt_mm, mitk::Point2D &pt_units)" \
     " possible. Has to be implemented in sub-class.");
-  assert(m_BoundingBox.IsNotNull());
-  BoundingBox::BoundsArrayType bounds = m_BoundingBox->GetBounds();
-  pt_units[0]=pt_mm[0]/m_ScaleFactorMMPerUnitX;
-  pt_units[1]=pt_mm[1]/m_ScaleFactorMMPerUnitY;
 }
 
 
@@ -122,13 +110,9 @@ void
 mitk::Geometry2D::IndexToWorld(const mitk::Point2D &/*atPt2d_units*/, 
   const mitk::Vector2D &vec_units, mitk::Vector2D &vec_mm) const
 {
-  assert(m_BoundingBox.IsNotNull());
-  BoundingBox::BoundsArrayType bounds = m_BoundingBox->GetBounds();
-  mitk::Vector3D vec3d;
-  FillVector3D(vec3d, vec_units[0], vec_units[1], 0);
-  vec3d = GetParametricTransform()->TransformVector(vec3d);
-  vec_mm[0]=vec3d[0];
-  vec_mm[1]=vec3d[1];
+  itkExceptionMacro(<< "No general transform possible (only affine) ==> no general" \
+    " IndexToWorld(const mitk::Vector2D &vec_mm, mitk::Vector2D &vec_units)" \
+    " possible. Has to be implemented in sub-class.");
 }
 
 
@@ -136,13 +120,9 @@ void
 mitk::Geometry2D::WorldToIndex(const mitk::Point2D &/*atPt2d_mm*/,
   const mitk::Vector2D &vec_mm, mitk::Vector2D &vec_units) const
 {
-  itkExceptionMacro(<< "No BackTransform in itk::Transform ==> no general" \
+  itkExceptionMacro(<< "No general back transform possible (only affine) ==> no general" \
     " WorldToIndex(const mitk::Vector2D &vec_mm, mitk::Vector2D &vec_units)" \
     " possible. Has to be implemented in sub-class.");
-  assert(m_BoundingBox.IsNotNull());
-  BoundingBox::BoundsArrayType bounds = m_BoundingBox->GetBounds();
-  vec_units[0]=vec_mm[0]/m_ScaleFactorMMPerUnitX;
-  vec_units[1]=vec_mm[1]/m_ScaleFactorMMPerUnitY;
 }
 
 void 

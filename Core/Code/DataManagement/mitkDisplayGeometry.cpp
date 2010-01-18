@@ -66,6 +66,7 @@ void mitk::DisplayGeometry::Map(const mitk::Point2D &pt2d_mm, mitk::Point3D &pt3
   m_WorldGeometry->Map(pt2d_mm, pt3d_mm);    
 }
 
+/*
 void mitk::DisplayGeometry::IndexToWorld(const mitk::Point2D &pt_units, mitk::Point2D &pt_mm) const
 {
   if(m_WorldGeometry.IsNull()) return;
@@ -89,6 +90,7 @@ void mitk::DisplayGeometry::WorldToIndex(const mitk::Point2D &atPt2d_mm, const m
   if(m_WorldGeometry.IsNull()) return;
   m_WorldGeometry->WorldToIndex(atPt2d_mm, vec_mm, vec_units);
 }
+*/
 
 void mitk::DisplayGeometry::DisplayToWorld(const mitk::Point2D &pt_display, mitk::Point2D &pt_mm) const
 {

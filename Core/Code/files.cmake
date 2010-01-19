@@ -93,6 +93,7 @@ SET(CPP_FILES
   DataManagement/mitkNodePredicateProperty.cpp
   DataManagement/mitkNodePredicateSource.cpp
   DataManagement/mitkPlaneDecorationProperty.cpp
+  DataManagement/mitkPlaneGeometry.cpp
   DataManagement/mitkPlaneOperation.cpp
   DataManagement/mitkPointOperation.cpp
   DataManagement/mitkPointSet.cpp
@@ -161,7 +162,6 @@ SET(CPP_FILES
   IO/mitkPicVolumeTimeSeriesIOFactory.cpp
   IO/mitkPicVolumeTimeSeriesReader.cpp
   IO/mitkPixelType.cpp
-  IO/mitkPlaneGeometry.cpp
   IO/mitkPointSetIOFactory.cpp
   IO/mitkPointSetReader.cpp
   IO/mitkPointSetWriter.cpp

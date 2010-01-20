@@ -60,6 +60,10 @@
 
 #include "qapplication.h"
 
+#include "vtkImageWriter.h"
+#include "vtkJPEGWriter.h"
+#include "vtkPNGWriter.h"
+#include "vtkRenderLargeImage.h"
 #include "vtkRenderWindowInteractor.h"
 #include "vtkRenderer.h"
 #include "vtkTestUtilities.h"
@@ -179,6 +183,8 @@ void QmitkMovieMaker::CreateConnections()
 
     connect((QObject*) m_Controls->btnScreenshot, SIGNAL(clicked()), this, SLOT(
         GenerateScreenshot()));
+    connect((QObject*) m_Controls->m_HRScreenshot, SIGNAL(clicked()), this, SLOT(
+        GenerateHR3DScreenshot()));
 
     // blocking of ui elements during movie generation
     connect((QObject*) this, SIGNAL(StartBlockControls()), (QObject*) this, SLOT(BlockControls()));
@@ -502,8 +508,30 @@ void QmitkMovieMaker::GenerateScreenshot()
 {
   emit StartBlockControls();
 
-  CommonFunctionality::SaveScreenshot(
-      mitk::GlobalInteraction::GetInstance()->GetFocus()->GetRenderWindow());
+  QString fileName = QFileDialog::getSaveFileName(NULL, "Save screenshot to...", QDir::currentPath(), "JPEG file (*.jpg);;PNG file (*.png)");
+  
+  vtkRenderer* renderer = mitk::GlobalInteraction::GetInstance()->GetFocus()->GetVtkRenderer();
+  if (renderer == NULL)
+    return;
+  this->TakeScreenshot(renderer, 1, fileName);
+
+  if (m_movieGenerator.IsNotNull())
+    emit EndBlockControls();
+  else
+    emit EndBlockControlsMovieDeactive();
+}
+
+void QmitkMovieMaker::GenerateHR3DScreenshot()
+{
+  emit StartBlockControls();
+
+  QString fileName = QFileDialog::getSaveFileName(NULL, "Save screenshot to...", QDir::currentPath(), "JPEG file (*.jpg);;PNG file (*.png)");
+  
+  // only works correctly for 3D RenderWindow
+  vtkRenderer* renderer = m_MultiWidget->mitkWidget4->GetRenderer()->GetVtkRenderer();
+  if (renderer == NULL)
+    return;
+  this->TakeScreenshot(renderer, 4, fileName);
 
   if (m_movieGenerator.IsNotNull())
     emit EndBlockControls();
@@ -642,12 +670,67 @@ void QmitkMovieMaker::BlockControls(bool blocked)
   m_Controls->btnScreenshot->setEnabled(!blocked);
 }
 
-void QmitkMovieMaker::StdMultiWidgetAvailable(QmitkStdMultiWidget&  /*stdMultiWidget*/)
+void QmitkMovieMaker::StdMultiWidgetAvailable(QmitkStdMultiWidget&  stdMultiWidget)
 {
+  m_MultiWidget = &stdMultiWidget;
   m_Parent->setEnabled(true);
 }
 
 void QmitkMovieMaker::StdMultiWidgetNotAvailable()
 {
+  m_MultiWidget = NULL;
   m_Parent->setEnabled(false);
 }
+
+void QmitkMovieMaker::TakeScreenshot(vtkRenderer* renderer, unsigned int magnificationFactor, QString fileName)
+{
+  if ((renderer == NULL) ||(magnificationFactor < 1) || fileName.isEmpty())
+    return;
+
+  bool doubleBuffering( renderer->GetRenderWindow()->GetDoubleBuffer() );
+  renderer->GetRenderWindow()->DoubleBufferOff();
+
+  vtkImageWriter* fileWriter;
+
+  QFileInfo fi(fileName);
+  QString suffix = fi.suffix();
+  if (suffix.compare("png", Qt::CaseInsensitive) == 0)
+  {
+    fileWriter = vtkPNGWriter::New();
+  }
+  else  // default is jpeg
+  {
+    vtkJPEGWriter* w = vtkJPEGWriter::New();
+    w->SetQuality(100);
+    w->ProgressiveOff();
+    fileWriter = w;
+  }
+  vtkRenderLargeImage* magnifier = vtkRenderLargeImage::New();
+  magnifier->SetInput(renderer);
+  magnifier->SetMagnification(magnificationFactor);
+  //magnifier->Update();
+  fileWriter->SetInput(magnifier->GetOutput());
+  fileWriter->SetFileName(fileName.toLatin1());
+
+  // vtkRenderLargeImage has problems with different layers, therefore we have to 
+  // temporarily deactivate all other layers.
+  // we set the background to white, because it is nicer than black...
+  double oldBackground[3];
+  renderer->GetBackground(oldBackground);
+  double white[] = {1.0, 1.0, 1.0};
+  renderer->SetBackground(white);
+  m_MultiWidget->DisableColoredRectangles();
+  m_MultiWidget->DisableDepartmentLogo();
+  m_MultiWidget->DisableGradientBackground();
+
+  fileWriter->Write();  
+  fileWriter->Delete();  
+
+  m_MultiWidget->EnableColoredRectangles();
+  m_MultiWidget->EnableDepartmentLogo();
+  m_MultiWidget->EnableGradientBackground();
+  renderer->SetBackground(oldBackground);
+  
+  renderer->GetRenderWindow()->SetDoubleBuffer(doubleBuffering);
+}
+

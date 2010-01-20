@@ -224,6 +224,7 @@ protected slots:
   void GenerateMovie();
 
   void GenerateScreenshot();
+  void GenerateHR3DScreenshot();
   void RBTNForward();
   void RBTNBackward();
   void RBTNPingPong();
@@ -246,6 +247,7 @@ protected:
 
   QObject *parentWidget;
   QVTKWidget * widget;
+  QmitkStdMultiWidget* m_MultiWidget;
   vtkEventQtSlotConnect * connections;
   vtkRenderWindow * renderWindow;
   mitk::VtkPropRenderer::Pointer m_PropRenderer;
@@ -264,6 +266,13 @@ private:
   void UpdateGUI();
 
   mitk::Stepper* GetAspectStepper();
+
+  /*!
+  \brief taking a screenshot "from" the specified renderer
+  \param magnificationFactor specifying the quality of the screenshot (the magnification of the actual RenderWindow size)
+  \param fileName file location and name where the screenshot should be saved
+  */
+  void TakeScreenshot(vtkRenderer* renderer, unsigned int magnificationFactor, QString fileName);
 
   QmitkStepperAdapter* m_StepperAdapter;
 

@@ -226,11 +226,8 @@ void QmitkSimpleExampleView::OnTakeHighResolutionScreenshot()
 {
   QString fileName = QFileDialog::getSaveFileName(NULL, "Save screenshot to...", QDir::currentPath(), "JPEG file (*.jpg);;PNG file (*.png)");
 
-  QmitkRenderWindow* renWin = this->GetMovieRenderWindow();
-  if (renWin == NULL)
-    return;
-
-  vtkRenderer* renderer = renWin->GetRenderer()->GetVtkRenderer();
+  // only works correctly for 3D RenderWindow
+  vtkRenderer* renderer = m_MultiWidget->mitkWidget4->GetRenderer()->GetVtkRenderer();
   if (renderer == NULL)
     return;
   this->TakeScreenshot(renderer, 4, fileName);

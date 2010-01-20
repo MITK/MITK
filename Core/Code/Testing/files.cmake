@@ -4,6 +4,7 @@ SET(MODULE_TESTS
   mitkPointSetWriterTest.cpp
   mitkMaterialPropertyTest.cpp
   mitkDataTreeNodeTest.cpp
+  mitkDataTreeNodeFactoryTest.cpp
   mitkActionTest.cpp
   mitkDataStorageTest.cpp
   mitkEnumerationPropertyTest.cpp

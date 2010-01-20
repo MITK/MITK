@@ -40,37 +40,6 @@
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="groupBox_ImageViewSelect">
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>16</height>
-      </size>
-     </property>
-     <property name="baseSize">
-      <size>
-       <width>0</width>
-       <height>16</height>
-      </size>
-     </property>
-     <property name="title">
-      <string>Surface</string>
-     </property>
-     <layout class="QVBoxLayout" name="verticalLayout_2">
-      <item>
-       <widget class="QmitkDataStorageComboBox" name="m_ImageSelector">
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>8</height>
-         </size>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item>
     <widget class="QGroupBox" name="groupBox_ShaderSelect">
      <property name="title">
       <string>Properties</string>
@@ -86,11 +55,6 @@
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
-  <customwidget>
-   <class>QmitkDataStorageComboBox</class>
-   <extends>QComboBox</extends>
-   <header>QmitkDataStorageComboBox.h</header>
-  </customwidget>
   <customwidget>
    <class>QmitkRenderWindow</class>
    <extends>QListView</extends>

@@ -20,7 +20,8 @@ PURPOSE.  See the above copyright notices for more information.
 #define _QMITKMITKSURFACEMATERIALEDITORVIEW_H_INCLUDED
 
 #include <QmitkFunctionality.h>
-
+#include <berryISelectionListener.h>
+#include <berryIStructuredSelection.h>
 #include <string>
 
 #include "ui_QmitkMITKSurfaceMaterialEditorViewControls.h"
@@ -83,7 +84,8 @@ class QmitkMITKSurfaceMaterialEditorView : public QObject, public QmitkFunctiona
   virtual void StdMultiWidgetNotAvailable();
 
 protected slots:  
-  
+
+  void SelectionChanged(berry::IWorkbenchPart::Pointer sourcepart, berry::ISelection::ConstPointer selection);  
   void SurfaceSelected();
 
 protected:  
@@ -92,12 +94,13 @@ protected:
 
   QmitkStdMultiWidget* m_MultiWidget;
 
-public:
+private:
 
   mitk::MaterialProperty::Pointer m_MaterialProperty;
   mitk::Surface::Pointer m_Surface;
   mitk::DataStorage::Pointer m_DataTree;
   mitk::DataTreeNode::Pointer m_DataTreeNode;
+  mitk::DataTreeNode::Pointer m_SelectedDataTreeNode;
   
   std::list<std::string> fixedProperties;
   std::list<std::string> shaderProperties;
@@ -118,7 +121,8 @@ public:
   
   void shaderEnumChange(const itk::Object *caller, const itk::EventObject &event);
 
-  
+  berry::IStructuredSelection::ConstPointer m_CurrentSelection;
+	berry::ISelectionListener::Pointer m_SelectionListener;
 };
 
 

@@ -21,6 +21,11 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkBaseRenderer.h"
 #include "mitkNodePredicateDataType.h"
 #include "mitkProperties.h"
+#include "mitkIDataStorageService.h"
+#include "mitkDataTreeNodeObject.h"
+
+#include "berryIEditorPart.h"
+#include "berryIWorkbenchPage.h"
 
 #include "mitkShaderEnumProperty.h"
 #include "mitkShaderRepository.h"
@@ -88,9 +93,6 @@ QmitkMITKSurfaceMaterialEditorView::~QmitkMITKSurfaceMaterialEditorView()
 
 void QmitkMITKSurfaceMaterialEditorView::InitPreviewWindow()
 { 
-  
-         
-
   usedTimer=0;
   
   m_MaterialProperty = mitk::MaterialProperty::New();
@@ -116,19 +118,16 @@ void QmitkMITKSurfaceMaterialEditorView::InitPreviewWindow()
   m_Controls->m_PreviewRenderWindow->GetRenderer()->SetMapperID( mitk::BaseRenderer::Standard3D );
   
   sphereSource->Delete();
-
-  //m_DataTreeNode->GetPropertyList();
-
-  //m_Controls->m_ShaderPropertyList->setNode( m_DataTreeNode );
 }
 
 
 void QmitkMITKSurfaceMaterialEditorView::RefreshPropertiesList()
 { 
-  mitk::DataTreeNode* SrcND = m_Controls->m_ImageSelector->GetSelectedNode();
+  mitk::DataTreeNode* SrcND = m_SelectedDataTreeNode;
   mitk::DataTreeNode* DstND = m_DataTreeNode;
 
   mitk::PropertyList* DstPL = DstND->GetPropertyList();
+
 
   m_Controls->m_ShaderPropertyList->SetPropertyList( 0 );
 
@@ -188,6 +187,7 @@ void QmitkMITKSurfaceMaterialEditorView::RefreshPropertiesList()
   }      
 
   m_Controls->m_ShaderPropertyList->SetPropertyList( DstPL );
+  //m_Controls->m_PreviewRenderWindow->GetRenderer()->GetVtkRenderer()->ResetCameraClippingRange();
 }
 
     /*
@@ -245,14 +245,25 @@ void QmitkMITKSurfaceMaterialEditorView::CreateQtPartControl(QWidget *parent)
     this->CreateConnections();
 
     // define data type for combobox
-    m_Controls->m_ImageSelector->SetDataStorage( this->GetDefaultDataStorage() );
+   /* m_Controls->m_ImageSelector->SetDataStorage( this->GetDefaultDataStorage() );
     m_Controls->m_ImageSelector->SetPredicate( mitk::NodePredicateDataType::New("Surface") );
   
 	  InitPreviewWindow();
 	  
 	  connect( m_Controls->m_ImageSelector, SIGNAL( OnSelectionChanged(const mitk::DataTreeNode::Pointer) ), this, SLOT( SurfaceSelected() ) );
 	  
-    RefreshPropertiesList(); 
+    RefreshPropertiesList(); */
+
+    InitPreviewWindow();
+
+    // listener for selected entry in the data manager
+    m_SelectionListener = berry::ISelectionListener::Pointer(new berry::SelectionChangedAdapter<QmitkMITKSurfaceMaterialEditorView>(this, &QmitkMITKSurfaceMaterialEditorView::SelectionChanged));
+    this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddPostSelectionListener(/*"org.mitk.views.datamanager",*/ m_SelectionListener);
+    berry::ISelection::ConstPointer selection( this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection());
+    m_CurrentSelection = selection.Cast<const berry::IStructuredSelection>();
+    this->SelectionChanged(berry::SmartPointer<IWorkbenchPart>(NULL), selection);
+    
+    RefreshPropertiesList();
 
   }
 }
@@ -285,6 +296,42 @@ void QmitkMITKSurfaceMaterialEditorView::Deactivated()
   QmitkFunctionality::Deactivated();
 }
 
+
+void QmitkMITKSurfaceMaterialEditorView::SelectionChanged(berry::IWorkbenchPart::Pointer sourcepart, berry::ISelection::ConstPointer selection)
+{
+  if ( sourcepart == this ||  // prevents being notified by own selection events
+	       !selection.Cast<const berry::IStructuredSelection>() ) // checks that the selection is a IStructuredSelection and not NULL
+	  {
+	    return; // otherwise we get "null selection" events each time the view is activated/focussed
+	  }
+
+	  MITK_INFO << "selection changed";
+	  // save current selection in member variable
+	  m_CurrentSelection = selection.Cast<const berry::IStructuredSelection>();
+
+	  //bool newReferenceImageSelected(false);
+
+	  // TODO warning when two images are selected
+	  // do something with the selected items
+	  if(m_CurrentSelection)
+	  {
+	    // iterate selection
+	    for (berry::IStructuredSelection::iterator i = m_CurrentSelection->Begin(); i != m_CurrentSelection->End(); ++i)
+	    {
+	      // extract datatree node
+	      if (mitk::DataTreeNodeObject::Pointer nodeObj = i->Cast<mitk::DataTreeNodeObject>())
+	      {
+	        m_SelectedDataTreeNode = nodeObj->GetDataTreeNode();
+          MITK_INFO << "Node '" << m_SelectedDataTreeNode->GetName() << "' selected";
+
+          SurfaceSelected();
+          return;
+	      }
+	    }
+	  }
+	  //TODO: warning if m_InputImageNode is NULL
+}
+
 void QmitkMITKSurfaceMaterialEditorView::SurfaceSelected()
 {
   postRefresh();
@@ -294,36 +341,6 @@ void QmitkMITKSurfaceMaterialEditorView::shaderEnumChange(const itk::Object * /*
 {
   postRefresh();
 }
-
-
-/*
-  mitk::DataTreeNode* node = m_Controls->m_ImageSelector->GetSelectedNode();
-  if (!node)
-  {
-    // Nothing selected. Inform the user and return
-    QMessageBox::information( NULL, "Template functionality", "Please load and select an image before starting some action.");
-    return;
-  }
-
-  // here we have a valid mitk::DataTreeNode
-
-  // a node itself is not very useful, we need its data item (the image)
-  mitk::BaseData* data = node->GetData();
-  if (data)
-  {
-    // test if this data item is really an image or not (could also be a surface or something totally different)
-    mitk::Image* image = dynamic_cast<mitk::Image*>( data );
-    if (image)
-    {
-      std::string name("(no name)");
-      node->GetName(name);
-
-      QMessageBox::information( NULL, "Image processing",
-                                QString( "Doing something to '%1'" ).arg(name.c_str()) );
-
-      // at this point anything can be done using the mitk::Image image.
-    }
-  }*/
 
 void QmitkMITKSurfaceMaterialEditorView::postRefresh()
 {

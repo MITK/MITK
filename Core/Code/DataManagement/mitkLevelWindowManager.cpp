@@ -41,7 +41,7 @@ mitk::LevelWindowManager::~LevelWindowManager()
   if (m_DataStorage.IsNotNull())
   {
     m_DataStorage->AddNodeEvent.RemoveListener(MessageDelegate1<LevelWindowManager, const mitk::DataTreeNode*>( this, &LevelWindowManager::DataStorageChanged ));
-    m_DataStorage->RemoveNodeEvent.RemoveListener(MessageDelegate1<LevelWindowManager, const mitk::DataTreeNode*>( this, &LevelWindowManager::DataStorageChanged ));
+    m_DataStorage->RemoveNodeEvent.RemoveListener(MessageDelegate1<LevelWindowManager, const mitk::DataTreeNode*>( this, &LevelWindowManager::DataStorageRemovedNode ));
     m_DataStorage = NULL;
   }
   if (m_IsPropertyModifiedTagSet && m_LevelWindowProperty.IsNotNull())
@@ -67,12 +67,12 @@ void mitk::LevelWindowManager::SetDataStorage( mitk::DataStorage* ds )
   if (m_DataStorage.IsNotNull())
   {
     m_DataStorage->AddNodeEvent.RemoveListener(MessageDelegate1<LevelWindowManager, const mitk::DataTreeNode*>( this, &LevelWindowManager::DataStorageChanged ));
-    m_DataStorage->RemoveNodeEvent.RemoveListener(MessageDelegate1<LevelWindowManager, const mitk::DataTreeNode*>( this, &LevelWindowManager::DataStorageChanged ));
+    m_DataStorage->RemoveNodeEvent.RemoveListener(MessageDelegate1<LevelWindowManager, const mitk::DataTreeNode*>( this, &LevelWindowManager::DataStorageRemovedNode ));
   }
   /* register listener for new DataStorage */
   m_DataStorage = ds;  // register 
   m_DataStorage->AddNodeEvent.AddListener(MessageDelegate1<LevelWindowManager, const mitk::DataTreeNode*>( this, &LevelWindowManager::DataStorageChanged ));
-  m_DataStorage->RemoveNodeEvent.AddListener(MessageDelegate1<LevelWindowManager, const mitk::DataTreeNode*>( this, &LevelWindowManager::DataStorageChanged ));
+  m_DataStorage->RemoveNodeEvent.AddListener(MessageDelegate1<LevelWindowManager, const mitk::DataTreeNode*>( this, &LevelWindowManager::DataStorageRemovedNode ));
   this->DataStorageChanged(); // update us with new DataStorage
 }
 
@@ -83,7 +83,7 @@ void mitk::LevelWindowManager::OnPropertyModified(const itk::EventObject& )
 }
 
 
-void mitk::LevelWindowManager::SetAutoTopMostImage(bool autoTopMost)
+void mitk::LevelWindowManager::SetAutoTopMostImage(bool autoTopMost, const mitk::DataTreeNode* removedNode)
 {
   m_AutoTopMost = autoTopMost;
   if (m_AutoTopMost == false)
@@ -106,7 +106,7 @@ void mitk::LevelWindowManager::SetAutoTopMostImage(bool autoTopMost)
   for (mitk::DataStorage::SetOfObjects::ConstIterator it = all->Begin(); it != all->End(); ++it)
   {
     mitk::DataTreeNode::Pointer node = it->Value();
-    if (node.IsNull())
+    if (node.IsNull() || (removedNode != NULL && node == removedNode))
       continue;
     if (node->IsVisible(NULL) == false)
       continue;
@@ -184,8 +184,11 @@ void mitk::LevelWindowManager::SetLevelWindow(const mitk::LevelWindow& levelWind
   this->Modified();
 }
 
-
-void mitk::LevelWindowManager::DataStorageChanged( const mitk::DataTreeNode* itkNotUsed(n) )
+void mitk::LevelWindowManager::DataStorageChanged( const mitk::DataTreeNode* )
+{
+  this->DataStorageRemovedNode();
+}
+void mitk::LevelWindowManager::DataStorageRemovedNode( const mitk::DataTreeNode* removedNode )
 {
   /* remove old observers */
   for (ObserverToPropertyMap::iterator iter = m_PropObserverToNode.begin(); iter != m_PropObserverToNode.end(); iter++ ) 
@@ -228,13 +231,13 @@ void mitk::LevelWindowManager::DataStorageChanged( const mitk::DataTreeNode* itk
 
   /* search image than belongs to the property */
   if (m_LevelWindowProperty.IsNull())
-    SetAutoTopMostImage(true);
+    SetAutoTopMostImage(true, removedNode);
   else
   {
     mitk::NodePredicateProperty::Pointer p2 = mitk::NodePredicateProperty::New("levelwindow", m_LevelWindowProperty);
     mitk::DataTreeNode* n = m_DataStorage->GetNode(p2);
     if (n == NULL || m_AutoTopMost) // if node was deleted, change our behaviour to AutoTopMost, if AutoTopMost is true change level window to topmost node
-      SetAutoTopMostImage(true);
+      SetAutoTopMostImage(true, removedNode);
    }
 }
 

@@ -52,7 +52,8 @@ namespace mitk
     mitk::DataStorage* GetDataStorage();  ///< returns the datastorage
     
     /// if autoTopMost == true: sets the topmost layer image to be affected by changes
-    void SetAutoTopMostImage(bool autoTopMost);
+    /// if removedNode != NULL a node was removed from DataStorage
+    void SetAutoTopMostImage(bool autoTopMost, const mitk::DataTreeNode* removedNode = NULL);
 
     void Update(const itk::EventObject& e);  ///< gets called if a visible property changes
 
@@ -77,6 +78,9 @@ namespace mitk
   
     /// Change notifications from DataStorage
     void DataStorageChanged(const mitk::DataTreeNode* n = NULL);
+
+    /// Node removal notifications from DataStorage
+    void DataStorageRemovedNode(const mitk::DataTreeNode* removedNode = NULL);
 
     /// change notifications from mitkLevelWindowProperty
     void OnPropertyModified(const itk::EventObject& e);

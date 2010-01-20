@@ -76,7 +76,8 @@ protected:
     void CreateSurface(bool);
     void CreateSmoothedSurface(bool);
     void ImageStatistics(bool);
-    void AutocropSelected(bool);
+    void AutocropSelected(bool);    
+    
     void ThresholdImage(bool);
     void ThresholdingDone(int);
 
@@ -93,6 +94,8 @@ protected:
     void UpdateFromCurrentDataManagerSelection();
 
     void ExtendOrganList(std::string organname,mitk::Color colorname);
+
+    mitk::Image::Pointer IncreaseCroppedImageSize( mitk::Image::Pointer image );
   
     berry::IBerryPreferences::Pointer m_SegmentationPreferencesNode;
 

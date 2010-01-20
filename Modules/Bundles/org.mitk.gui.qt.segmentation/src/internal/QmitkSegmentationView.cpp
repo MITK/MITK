@@ -65,6 +65,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkDataTreeNodeObject.h"
 
 #include "itkTreeChangeEvent.h"
+#include <itkConstantPadImageFilter.h>
 
 std::string QmitkSegmentationView::ORGAN_COLOR_STRING = QmitkSegmentationView::CreateOrganColorString();
 
@@ -935,9 +936,10 @@ void QmitkSegmentationView::AutocropSelected(bool)
         cropFilter->Update();
 
         image = cropFilter->GetOutput();
+        
         if (image.IsNotNull())
         {
-          node->SetData( image );
+          node->SetData( this->IncreaseCroppedImageSize(image) ); // bug fix 3145
         }
       }
       catch(...)
@@ -1105,3 +1107,46 @@ void QmitkSegmentationView::ExtendOrganList(std::string organname,mitk::Color co
   }
 }
 
+mitk::Image::Pointer QmitkSegmentationView::IncreaseCroppedImageSize( mitk::Image::Pointer image )
+{
+  typedef itk::Image< short, 3 > ImageType;
+  typedef itk::Image< unsigned char, 3 > PADOutputImageType;
+  ImageType::Pointer itkTransformImage = ImageType::New();
+  mitk::CastToItkImage( image, itkTransformImage );
+
+  typedef itk::ConstantPadImageFilter< ImageType, PADOutputImageType > PadFilterType;
+  PadFilterType::Pointer padFilter = PadFilterType::New();
+
+  unsigned long upperPad[3];
+  unsigned long lowerPad[3];
+  int borderLiner = 6;
+
+  mitk::Point3D mitkOriginPoint;
+  double origin[3];
+  origin[0]=0;
+  origin[1]=0;
+  origin[2]=0;
+  itkTransformImage->SetOrigin(origin);
+
+  lowerPad[0]=borderLiner/2;
+  lowerPad[1]=borderLiner/2;
+  lowerPad[2]=borderLiner/2;
+
+  upperPad[0]=borderLiner/2;
+  upperPad[1]=borderLiner/2;
+  upperPad[2]=borderLiner/2;
+
+  padFilter->SetInput(itkTransformImage);
+  padFilter->SetConstant(0);
+  padFilter->SetPadUpperBound(upperPad);
+  padFilter->SetPadLowerBound(lowerPad);
+  padFilter->UpdateLargestPossibleRegion();
+
+
+  mitk::Image::Pointer segmentationImage = mitk::Image::New();
+  mitk::CastToMitkImage(padFilter->GetOutput(), segmentationImage);
+
+  segmentationImage->SetGeometry(image->GetGeometry());
+
+  return segmentationImage;
+}

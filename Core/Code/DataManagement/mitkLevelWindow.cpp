@@ -238,6 +238,7 @@ void mitk::LevelWindow::SetAuto(const mitk::Image* image, bool tryPicTags, bool 
   ScalarType minValue = 0.0;
   ScalarType maxValue = 0.0;
   ScalarType min2ndValue = 0.0; 
+  ScalarType max2ndValue = 0.0;
   mitk::ImageSliceSelector::Pointer sliceSelector = mitk::ImageSliceSelector::New();
   if ( guessByCentralSlice )
   {
@@ -250,21 +251,39 @@ void mitk::LevelWindow::SetAuto(const mitk::Image* image, bool tryPicTags, bool 
     minValue    = image->GetScalarValueMin();
     maxValue    = image->GetScalarValueMaxNoRecompute();
     min2ndValue = image->GetScalarValue2ndMinNoRecompute(); 
+    max2ndValue = image->GetScalarValue2ndMaxNoRecompute();
     if ( minValue == maxValue )
     {
       // guessByCentralSlice seems to have failed, lets look at all data
       image       = wholeImage;
       minValue    = image->GetScalarValueMin();                   
       maxValue    = image->GetScalarValueMaxNoRecompute();
-      min2ndValue = image->GetScalarValue2ndMinNoRecompute();      
+      min2ndValue = image->GetScalarValue2ndMinNoRecompute();
+      max2ndValue = image->GetScalarValue2ndMaxNoRecompute();
     }
   }
   else
   {
     const_cast<Image*>(image)->Update();
-    minValue    = image->GetScalarValueMin();
-    maxValue    = image->GetScalarValueMaxNoRecompute();
-    min2ndValue = image->GetScalarValue2ndMinNoRecompute(); 
+    minValue    = image->GetScalarValueMin(0);
+    maxValue    = image->GetScalarValueMaxNoRecompute(0);
+    min2ndValue = image->GetScalarValue2ndMinNoRecompute(0);
+    max2ndValue = image->GetScalarValue2ndMaxNoRecompute(0);
+    for (int i = 1; i < image->GetDimension(3); i++)
+    {
+      ScalarType minValueTemp = image->GetScalarValueMin(i);
+      if (minValue > minValueTemp)
+        minValue    = minValueTemp;
+      ScalarType maxValueTemp = image->GetScalarValueMaxNoRecompute(i);
+      if (maxValue < maxValueTemp)
+        maxValue = maxValueTemp;
+      ScalarType min2ndValueTemp = image->GetScalarValue2ndMinNoRecompute(i);
+      if (min2ndValue > min2ndValueTemp)
+        min2ndValue = min2ndValueTemp; 
+      ScalarType max2ndValueTemp = image->GetScalarValue2ndMaxNoRecompute(i);
+      if (max2ndValue > max2ndValueTemp)
+        max2ndValue = max2ndValueTemp; 
+    }
   }
 
   // Fix for bug# 344 Level Window wird bei Eris Cut bildern nicht richtig gesetzt
@@ -293,7 +312,7 @@ void mitk::LevelWindow::SetAuto(const mitk::Image* image, bool tryPicTags, bool 
     }
   }
    
-  ScalarType max2ndValue = image->GetScalarValue2ndMaxNoRecompute();  
+   
   unsigned int numPixelsInDataset = image->GetDimensions()[0];
   for ( unsigned int k=0;  k<image->GetDimension();  ++k ) numPixelsInDataset *= image->GetDimensions()[k];
   unsigned int minCount = image->GetCountOfMinValuedVoxelsNoRecompute();

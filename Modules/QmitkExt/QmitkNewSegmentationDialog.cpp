@@ -75,7 +75,7 @@ QmitkNewSegmentationDialog::QmitkNewSegmentationDialog(QWidget* parent)
   // buttons for closing the dialog
   btnOk = new QPushButton( tr("Ok"), this );
   btnOk->setDefault(true);
-  connect( btnOk, SIGNAL(clicked()), this, SLOT(accept()) );
+  connect( btnOk, SIGNAL(clicked()), this, SLOT(onAcceptClicked()) );
 
   QPushButton* btnCancel = new QPushButton( tr("Cancel"), this );
   connect( btnCancel, SIGNAL(clicked()), this, SLOT(reject()) );
@@ -94,9 +94,15 @@ QmitkNewSegmentationDialog::~QmitkNewSegmentationDialog()
 {
 }
 
-const char* QmitkNewSegmentationDialog::GetSegmentationName()
+void QmitkNewSegmentationDialog::onAcceptClicked()
 {
-  return edtName->text().toLocal8Bit().constData();
+  m_SegmentationName = edtName->text();
+  this->accept();
+}
+
+const std::string QmitkNewSegmentationDialog::GetSegmentationName()
+{
+  return m_SegmentationName.toStdString();
 }
 
 const char* QmitkNewSegmentationDialog::GetOrganType()
@@ -113,7 +119,8 @@ void QmitkNewSegmentationDialog::onNewOrganNameChanged(const QString& newText)
   }
 
   selectedOrgan = newText;
-  edtName->setText( newText );
+  this->setSegmentationName( newText );
+
 }
 
 void QmitkNewSegmentationDialog::onColorBtnClicked()
@@ -136,6 +143,7 @@ void QmitkNewSegmentationDialog::setPrompt( const QString& prompt )
 void QmitkNewSegmentationDialog::setSegmentationName( const QString& name )
 {
   edtName->setText( name );
+  m_SegmentationName = name;
 }
 
 mitk::Color QmitkNewSegmentationDialog::GetColorProperty()

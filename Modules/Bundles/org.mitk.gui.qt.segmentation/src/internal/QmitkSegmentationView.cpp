@@ -298,7 +298,7 @@ void QmitkSegmentationView::CreateNewSegmentation()
       if (image->GetDimension()>2)
       {
         // ask about the name and organ type of the new segmentation
-        QmitkNewSegmentationDialog dialog( m_Parent ); // needs a QWidget as parent, "this" is not QWidget
+        QmitkNewSegmentationDialog* dialog = new QmitkNewSegmentationDialog( m_Parent ); // needs a QWidget as parent, "this" is not QWidget
 
         std::string organlist_prefs = m_SegmentationPreferencesNode->GetByteArray("Organ-Color-List","");
         if (QString::fromStdString(organlist_prefs).contains(QString::fromStdString(ORGAN_COLOR_STRING)))
@@ -308,8 +308,8 @@ void QmitkSegmentationView::CreateNewSegmentation()
 
         organColorList = organColorQString.split(";");
 
-        dialog.SetSuggestionList(organColorList);
-        int dialogReturnValue = dialog.exec();
+        dialog->SetSuggestionList(organColorList);
+        int dialogReturnValue = dialog->exec();
 
         if ( dialogReturnValue == QDialog::Rejected ) return; // user clicked cancel or pressed Esc or something similar
 
@@ -322,9 +322,9 @@ void QmitkSegmentationView::CreateNewSegmentation()
           try
           {
             mitk::DataTreeNode::Pointer emptySegmentation =
-              firstTool->CreateEmptySegmentationNode( image, dialog.GetSegmentationName(), dialog.GetColorProperty() );
+              firstTool->CreateEmptySegmentationNode( image, dialog->GetSegmentationName(), dialog->GetColorProperty() );
 
-            ExtendOrganList(dialog.GetSegmentationName(),dialog.GetColorProperty());
+            ExtendOrganList(dialog->GetSegmentationName(),dialog->GetColorProperty());
 
             m_SegmentationPreferencesNode->PutByteArray("Organ-Color-List",ORGAN_COLOR_STRING);
             m_SegmentationPreferencesNode->Flush();

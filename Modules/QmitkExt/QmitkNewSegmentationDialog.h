@@ -50,9 +50,10 @@ class QMITKEXT_EXPORT QmitkNewSegmentationDialog : public QDialog
   public:
     
     QmitkNewSegmentationDialog(QWidget* parent = 0);
+
     virtual ~QmitkNewSegmentationDialog();
 
-    const char* GetSegmentationName();
+    const std::string GetSegmentationName();
     const char* GetOrganType();
     mitk::Color GetColorProperty();
 
@@ -68,6 +69,7 @@ class QMITKEXT_EXPORT QmitkNewSegmentationDialog : public QDialog
   
   protected slots:
 
+    void onAcceptClicked(); 
     void onNewOrganNameChanged(const QString&);
     void onColorBtnClicked();
     void onColorChange(const QString& completedWord);
@@ -90,6 +92,8 @@ class QMITKEXT_EXPORT QmitkNewSegmentationDialog : public QDialog
     QColor color;
 
     QCompleter* completer;
+
+    QString m_SegmentationName;
 
     QStringList organList;
     QStringList colorList;

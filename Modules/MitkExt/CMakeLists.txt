@@ -1,6 +1,6 @@
-IF(WIN32)
-  OPTION(MITK_USE_TD_MOUSE "Enable support for 3D Connexion SpaceNavigator" OFF)
-ENDIF(WIN32)
+#IF(WIN32)
+#  OPTION(MITK_USE_TD_MOUSE "Enable support for 3D Connexion SpaceNavigator" OFF)
+#ENDIF(WIN32)
 
 MITK_GENERATE_TOOLS_LIBRARY()
 

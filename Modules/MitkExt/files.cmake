@@ -201,15 +201,15 @@ IF(WIN32 AND NOT MINGW)
   )
 ENDIF(WIN32 AND NOT MINGW)
 
-IF(MITK_USE_TD_MOUSE)
-  SET(CPP_FILES 
-      Controllers/mitkTDMouseVtkCameraController.cpp
-      Interactions/mitkSpaceNavigatorDriver.cpp
-      Interactions/mitkTDMouseEvent.cpp
-      Interactions/mitkTDMouseEventThrower.cpp
-      ${CPP_FILES}  
-     )
-ENDIF(MITK_USE_TD_MOUSE)
+#IF(MITK_USE_TD_MOUSE)
+#  SET(CPP_FILES 
+#      Controllers/mitkTDMouseVtkCameraController.cpp
+#      Interactions/mitkSpaceNavigatorDriver.cpp
+#      Interactions/mitkTDMouseEvent.cpp
+#      Interactions/mitkTDMouseEventThrower.cpp
+#      ${CPP_FILES}  
+#     )
+#ENDIF(MITK_USE_TD_MOUSE)
 
 MITK_MULTIPLEX_PICTYPE( Algorithms/mitkImageRegistrationMethod-TYPE.cpp ) 
 MITK_MULTIPLEX_PICTYPE( Algorithms/mitkPyramidalRegistrationMethod-TYPE.cpp ) 

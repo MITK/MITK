@@ -53,12 +53,16 @@ int mitkDataTreeNodeFactoryTest(int argc, char* argv[])
 
     MITK_TEST_CONDITION_REQUIRED(strcmp(pathProp->GetValue(),filePath.c_str())==0,"Test for file path");
 
-    //std::string fileName = factory->GetFileName();
-    //if (fileName.substr(fileName.size()-3) == ".gz")
-    //   fileName = fileName.substr( 0, fileName.length()-3 );
-    //mitk::StringProperty::Pointer nameProp = dynamic_cast<mitk::StringProperty*>(node->GetProperty("name"));
-    //const char* name = nameProp->GetValue();
-    //MITK_TEST_CONDITION_REQUIRED(strcmp(nameProp->GetValue(),fileName.c_str())==0,"Test for file name");
+    std::string fileName = factory->GetFileName();
+    std::string fileExtension = itksys::SystemTools::GetFilenameExtension(fileName);
+    if (fileName.substr(fileName.size()-3) == ".gz")
+       fileName = fileName.substr( 0, fileName.length()-3 );
+    int length = fileExtension.length();
+    fileName = fileName.substr(0,fileName.length()-fileExtension.length());
+    fileName = fileName.substr(filePath.length()+1, fileName.length());
+    mitk::StringProperty::Pointer nameProp = dynamic_cast<mitk::StringProperty*>(node->GetProperty("name"));
+    const char* name = nameProp->GetValue();
+    MITK_TEST_CONDITION_REQUIRED(strcmp(nameProp->GetValue(),fileName.c_str())==0,"Test for file name");
 
     mitk::BoolProperty::Pointer visibleProp = dynamic_cast<mitk::BoolProperty*>(node->GetProperty("visible"));
     MITK_TEST_CONDITION_REQUIRED(visibleProp->GetValue()==true,"Test for visibility");

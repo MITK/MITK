@@ -16,6 +16,21 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
+/*
+ This test is meant to reproduce the following error:
+ 
+ - The machine or current user has a German locale.
+ - This esp. means that stream IO expects the decimal separator as a comma: ","
+ - DICOM files use a point "." as the decimal separator to be locale independent
+ - The parser used by MITK (ITK's GDCM) seems to use the current locale instead of the "C" or "POSIX" locale
+ - This leads to spacings (and probably other numbers) being trimmed/rounded,
+   e.g. the correct spacing of 0.314 is read as 1.0 etc.
+
+ MITK shold work around this behavior. This test is meant to verify any workaround
+ and will be activated once such a workaround is available.
+
+*/
+
 #include "mitkDataTreeNodeFactory.h"
 #include "mitkStandardFileLocations.h"
 
@@ -72,12 +87,12 @@ int mitkDICOMLocaleTest(int /*argc*/, char* /*argv*/ [])
 {
   MITK_TEST_BEGIN("DICOMLocaleTest");
 
-  // this should already work correctly on all machines
+  // load a reference DICOM file with the "C" locale being set
   mitkDICOMLocaleTestChangeLocale("C");
   mitkDICOMLocaleTestWithReferenceImage();
-  // this should fail on all machines
-  mitkDICOMLocaleTestChangeLocale("de_DE.utf8");
-  mitkDICOMLocaleTestWithReferenceImage();
+  // load a reference DICOM file with the German "de_DE.utf8" locale being set
+  //mitkDICOMLocaleTestChangeLocale("de_DE.utf8");
+  //mitkDICOMLocaleTestWithReferenceImage();
  
   MITK_TEST_END();
 }

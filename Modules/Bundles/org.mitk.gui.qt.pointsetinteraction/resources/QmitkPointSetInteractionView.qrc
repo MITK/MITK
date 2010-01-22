@@ -1,0 +1,6 @@
+<!DOCTYPE RCC>
+<RCC version="1.0">
+    <qresource prefix="/QmitkPointSetInteractionView" >
+        <file>pointset_interaction.png</file>
+    </qresource>
+</RCC>

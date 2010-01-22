@@ -1,0 +1,43 @@
+/**
+\page QmitkPointSetInteractionUserManual The PointSetInteraction Functionality
+
+Available sections:
+  - \ref QmitkPointSetInteractionUserManualOverview 
+  - \ref QmitkPointSetInteractionUserManualDetails 
+
+\section QmitkPointSetInteractionUserManualOverview Overview
+
+This functionality allows you to define multiple sets of points, to fill them with points and to save them in so called PointSets.
+
+\image html QmitkPointSetInteraction.png "MITK with the QmitkPointSetInteraction functionality"
+
+This document will tell you how to use this functionality, but it is assumed that you already know how to navigate through the slices of an image using the
+multi-widget. Please read \ref QmitkStdMultiWidgetUserManual for more information.
+
+\section QmitkPointSetInteractionUserManualDetails Details
+
+First of all you have to select a PointSet to use this functionality. Therefore you have to select the point set in the "Current PointSet" combo-box. Within this combo-box all point sets are shown 
+which are currently in the data tree. If there are currently no point sets in the data tree you have to first add a new point set to the data tree. This is done by clicking the "Add pointset..." 
+button.
+
+\image html AddPointSet.png "The Add pointset... dialog"
+
+In the pop-up dialog you have to specify a name for the new point set. this is also the node for the new data tree item.
+
+Underneath the "Add pointset..." button is the "Remove current pointset..." button. If you click this button and confirm, that you are sure to remove the current point set, the point set will be deleted 
+and also removed from the data tree. All unsaved points within this point set will be lost.
+
+\image html CurrentPointSetArea.png "The Current pointset area"
+
+The "Current pointset" area contains a QmitkPointListWidget. Within this widget, all points for the current point set node are listed. The label above this list shows the number of points that 
+are already set. To set points you have to toggle the "Set Points"  button, the leftmost under the QmitkPointListWidget. Points can 
+be defined by performing a left mousebutton click while holding the "Shift"-key pressed in the QmitkStdMultiWidget. You can remove the interactor which listens for left mousebutton click while 
+holding the "Shift"-key pressed by detoggle the "Set Points" button. The next button, "Clear Point Set", is for deleting all specified points from this dataset. The user is prompted to confirm 
+the decision. With the third button a previously saved point set can be loaded and all of its points are shown in the QmitkPointListWidget and in the QmitkStdMultiWidget. The user is prompted 
+to select the file to be loaded. The file extension is ".mps". On the right of this button is the save button. With this function all points specified for this dataset and shown in the 
+QmitkPointListWidget are saved to harddisk. The user is prompted to select a filename. Pointsets were saved in XML fileformat but have to have a ".mps" file extension. You can select points 
+in the render window with a left mouse button click on them. If you keep the mouse button pressed you can move the points to an other position by moving the mouse and then release the mouse 
+button. With the delete key you can remove the selected points. You can also select points by a double click on a point within the QmitkPointListWidget. The QmitkStdMultiWidget changes 
+its view to show the position of the point.
+
+*/

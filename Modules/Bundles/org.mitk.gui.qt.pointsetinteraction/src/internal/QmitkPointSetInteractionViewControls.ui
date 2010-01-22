@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>QmitkPointSetInteractionControls</class>
+ <widget class="QWidget" name="QmitkPointSetInteractionControls">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>376</width>
+    <height>477</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>0</width>
+    <height>0</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>QmitkPointSetInteractionView</string>
+  </property>
+  <layout class="QVBoxLayout">
+   <item>
+    <layout class="QHBoxLayout">
+     <property name="spacing">
+      <number>5</number>
+     </property>
+     <property name="margin">
+      <number>5</number>
+     </property>
+     <item>
+      <widget class="QLabel" name="textLabel1">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>Current PointSet</string>
+       </property>
+       <property name="wordWrap">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="m_CurrentPointSetLabel">
+       <property name="text">
+        <string>No point set selected ...</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QVBoxLayout">
+     <property name="spacing">
+      <number>5</number>
+     </property>
+     <property name="margin">
+      <number>6</number>
+     </property>
+     <item>
+      <widget class="QPushButton" name="m_PbAddPointSet">
+       <property name="text">
+        <string>Add pointset...</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
+      <string>Current pointset</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <item>
+       <widget class="QmitkPointListWidget" name="m_PointListWidget" native="true">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>0</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>QmitkPointListWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">QmitkPointListWidget.h</header>
+  </customwidget>
+ </customwidgets>
+ <includes>
+  <include location="global">mitkDataTreeNode.h</include>
+  <include location="global">mitkDataTree.h</include>
+  <include location="global">mitkPointSet.h</include>
+  <include location="global">mitkPointSetInteractor.h</include>
+ </includes>
+ <resources/>
+ <connections/>
+</ui>

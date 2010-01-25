@@ -50,7 +50,7 @@ void mitkDICOMLocaleTestChangeLocale(const std::string& locale)
   }
   catch(...)
   {
-    MITK_TEST_FAILED_MSG(<< "Could not activate locale " << locale);
+    MITK_TEST_OUTPUT(<< "Could not activate locale " << locale);
   }
 
 }
@@ -90,7 +90,9 @@ int mitkDICOMLocaleTest(int /*argc*/, char* /*argv*/ [])
   // load a reference DICOM file with the "C" locale being set
   mitkDICOMLocaleTestChangeLocale("C");
   mitkDICOMLocaleTestWithReferenceImage();
-  // load a reference DICOM file with the German "de_DE.utf8" locale being set
+  // load a reference DICOM file with German locales being set
+  mitkDICOMLocaleTestChangeLocale("de_DE");
+  mitkDICOMLocaleTestWithReferenceImage();
   mitkDICOMLocaleTestChangeLocale("de_DE.utf8");
   mitkDICOMLocaleTestWithReferenceImage();
  

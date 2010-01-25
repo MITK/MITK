@@ -23,12 +23,14 @@ PURPOSE.  See the above copyright notices for more information.
 
 // C-Standard library includes
 #include <stdlib.h>
+#include <locale.h>
 
 // STL-related includes
 #include <vector>
 #include <map>
 #include <istream>
 #include <cstdlib>
+#include <locale>
 
 
 // VTK-related includes
@@ -84,7 +86,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkVtkResliceInterpolationProperty.h"
 #include "mitkProgressBar.h"
 
-bool mitk::DataTreeNodeFactory::m_TextureInterpolationActive = true;    // default value for texture interpolation if nothing is defined in global options (see QmitkMainTemplate.ui.h)
+bool mitk::DataTreeNodeFactory::m_TextureInterpolationActive = false;    // default value for texture interpolation if nothing is defined in global options (see QmitkMainTemplate.ui.h)
 
 mitk::DataTreeNodeFactory::DataTreeNodeFactory()
 : m_UseSeriesDetails(true)
@@ -258,6 +260,12 @@ void mitk::DataTreeNodeFactory::OnITKProgressEvent(itk::Object *source, const it
 void mitk::DataTreeNodeFactory::ReadFileSeriesTypeDCM()
 {
   MITK_INFO << "loading image series with prefix " << m_FilePrefix << " and pattern " << m_FilePattern << " as DICOM..." << std::endl;
+    
+  char* previousCLocale = setlocale(LC_NUMERIC, NULL);
+  setlocale(LC_NUMERIC, "C");
+  std::locale previousCppLocale( std::cin.getloc() );
+  std::locale l( "C" );
+  std::cin.imbue(l);
 
   typedef itk::Image<short, 3> ImageType;
   typedef itk::ImageSeriesReader< ImageType > ReaderType;
@@ -354,6 +362,9 @@ void mitk::DataTreeNodeFactory::ReadFileSeriesTypeDCM()
       reader->ResetPipeline();
     }
   }
+
+  setlocale(LC_NUMERIC, previousCLocale);
+  std::cin.imbue(previousCppLocale);
 }
 
 

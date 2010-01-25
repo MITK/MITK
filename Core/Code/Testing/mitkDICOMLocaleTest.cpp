@@ -91,8 +91,8 @@ int mitkDICOMLocaleTest(int /*argc*/, char* /*argv*/ [])
   mitkDICOMLocaleTestChangeLocale("C");
   mitkDICOMLocaleTestWithReferenceImage();
   // load a reference DICOM file with the German "de_DE.utf8" locale being set
-  //mitkDICOMLocaleTestChangeLocale("de_DE.utf8");
-  //mitkDICOMLocaleTestWithReferenceImage();
+  mitkDICOMLocaleTestChangeLocale("de_DE.utf8");
+  mitkDICOMLocaleTestWithReferenceImage();
  
   MITK_TEST_END();
 }

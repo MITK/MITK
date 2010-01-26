@@ -36,6 +36,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkTestingMacros.h"
 
+#include <list>
 #include <locale>
 #include <locale.h>
   
@@ -43,7 +44,7 @@ bool mitkDICOMLocaleTestChangeLocale(const std::string& locale)
 {
   try
   {
-    MITK_TEST_OUTPUT(<< " ** Changing locale to '" << locale << "'");
+    MITK_TEST_OUTPUT(<< " ** Changing locale from " << setlocale(LC_ALL, NULL) << " to '" << locale << "'");
     setlocale(LC_ALL, locale.c_str());
     std::locale l( locale.c_str() );
     std::cin.imbue(l);
@@ -93,18 +94,25 @@ int mitkDICOMLocaleTest(int /*argc*/, char* /*argv*/ [])
   mitkDICOMLocaleTestChangeLocale("C");
   mitkDICOMLocaleTestWithReferenceImage();
   // load a reference DICOM file with German locales being set
+  typedef std::list<std::string> StringList;
+  StringList alllocales;
+  alllocales.push_back("de_DE");
+  alllocales.push_back("de_DE.utf8");
+  alllocales.push_back("de_DE@euro");
+
   unsigned int numberOfTestedGermanLocales(0);
-  if ( mitkDICOMLocaleTestChangeLocale("de_DE") )
+
+  for (StringList::iterator iter = alllocales.begin();
+       iter != alllocales.end();
+       ++iter)
   {
-    ++numberOfTestedGermanLocales;
-    mitkDICOMLocaleTestWithReferenceImage();
+    if ( mitkDICOMLocaleTestChangeLocale(*iter) )
+    {
+      ++numberOfTestedGermanLocales;
+      mitkDICOMLocaleTestWithReferenceImage();
+    }
   }
-  if ( mitkDICOMLocaleTestChangeLocale("de_DE.utf8") )
-  {
-    ++numberOfTestedGermanLocales;
-    mitkDICOMLocaleTestWithReferenceImage();
-  }
-  
+
   MITK_TEST_CONDITION_REQUIRED( numberOfTestedGermanLocales > 0, "Verify that at least one German locale has been tested.");
  
   MITK_TEST_END();

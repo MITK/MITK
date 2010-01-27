@@ -41,36 +41,6 @@ void QmitkNodeDescriptorManager::Initialize()
   mitk::NodePredicateDataType::Pointer isSurface = mitk::NodePredicateDataType::New("Surface");
   this->AddDescriptor(new QmitkNodeDescriptor(tr("Surface"), QString(":/Qmitk/Surface_48.png"), isSurface, this));
 
-  // Adding "PlanarLine"
-  mitk::NodePredicateDataType::Pointer isPlanarLine = mitk::NodePredicateDataType::New("PlanarLine");
-  this->AddDescriptor(new QmitkNodeDescriptor(tr("PlanarLine"), QString(":/Qmitk/PlanarLine_48.png"), isPlanarLine, this));
-
-  // Adding "PlanarCircle"
-  mitk::NodePredicateDataType::Pointer isPlanarCircle = mitk::NodePredicateDataType::New("PlanarCircle");
-  this->AddDescriptor(new QmitkNodeDescriptor(tr("PlanarCircle"), QString(":/Qmitk/PlanarCircle_48.png"), isPlanarCircle, this));
-
-  // Adding "PlanarAngle"
-  mitk::NodePredicateDataType::Pointer isPlanarAngle = mitk::NodePredicateDataType::New("PlanarAngle");
-  this->AddDescriptor(new QmitkNodeDescriptor(tr("PlanarAngle"), QString(":/Qmitk/PlanarAngle_48.png"), isPlanarAngle, this));
-
-  // Adding "PlanarFourPointAngle"
-  mitk::NodePredicateDataType::Pointer isPlanarFourPointAngle = mitk::NodePredicateDataType::New("PlanarFourPointAngle");
-  this->AddDescriptor(new QmitkNodeDescriptor(tr("PlanarFourPointAngle"), QString(":/Qmitk/PlanarFourPointAngle_48.png"), isPlanarFourPointAngle, this));
-
-  // Adding "PlanarRectangle"
-  mitk::NodePredicateDataType::Pointer isPlanarRectangle = mitk::NodePredicateDataType::New("PlanarRectangle");
-  this->AddDescriptor(new QmitkNodeDescriptor(tr("PlanarRectangle"), QString(":/Qmitk/PlanarRectangle_48.png"), isPlanarRectangle, this));
-
-  // Adding "PlanarPolygon"
-  mitk::NodePredicateDataType::Pointer isPlanarPolygon = mitk::NodePredicateDataType::New("PlanarPolygon");
-  this->AddDescriptor(new QmitkNodeDescriptor(tr("PlanarPolygon"), QString(":/Qmitk/PlanarPolygon_48.png"), isPlanarPolygon, this));
-
-  // Adding "PlanarPath"
-  mitk::NodePredicateProperty::Pointer isNotClosedPolygon
-    = mitk::NodePredicateProperty::New("ClosedPlanarPolygon", mitk::BoolProperty::New(false));
-  mitk::NodePredicateAND::Pointer isPlanarPath = mitk::NodePredicateAND::New(isNotClosedPolygon, isPlanarPolygon);
-  this->AddDescriptor(new QmitkNodeDescriptor(tr("PlanarPath"), QString(":/Qmitk/PlanarPath_48.png"), isPlanarPath, this));
-
 }
 
 void QmitkNodeDescriptorManager::AddDescriptor( QmitkNodeDescriptor* _Descriptor )

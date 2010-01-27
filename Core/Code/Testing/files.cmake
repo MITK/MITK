@@ -1,6 +1,7 @@
 
 # tests with no extra command line parameter
 SET(MODULE_TESTS
+  
   mitkPointSetWriterTest.cpp
   mitkMaterialPropertyTest.cpp
   mitkDataTreeNodeTest.cpp
@@ -24,6 +25,7 @@ SET(MODULE_TESTS
   mitkLevelWindowTest.cpp
   mitkMessageTest.cpp
   #mitkPipelineSmartPointerCorrectnessTest.cpp
+  #mitkPixelTypeTest.cpp
   mitkPlaneGeometryTest.cpp
   mitkPointSetFileIOTest.cpp
   mitkPointSetTest.cpp

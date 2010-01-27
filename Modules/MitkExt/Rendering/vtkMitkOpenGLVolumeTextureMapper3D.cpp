@@ -13,7 +13,10 @@
 
 =========================================================================*/
 
-#include <omp.h>
+
+#ifdef _OPENMP
+  #include <omp.h>
+#endif
 
 #include "vtkWindows.h"
 #include "vtkMitkOpenGLVolumeTextureMapper3D.h"

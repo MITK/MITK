@@ -295,3 +295,7 @@ SET(UI_FILES
   RigidRegistrationTransforms/QmitkSimilarity2DTransformControls.ui
   RigidRegistrationTransforms/QmitkCenteredSimilarity2DTransformControls.ui
 )
+
+SET(QRC_FILES
+  QmitkExt.qrc  
+)

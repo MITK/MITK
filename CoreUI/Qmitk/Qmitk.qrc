@@ -2,15 +2,8 @@
     <qresource prefix="/Qmitk" >
         <file>Binaerbilder_48.png</file>
         <file>Images_48.png</file>
-        <file>PlanarAngle_48.png</file>
-        <file>PlanarFourPointAngle_48.png</file>
-        <file>PlanarLine_48.png</file>
-        <file>PlanarPath_48.png</file>
-        <file>PlanarPolygon_48.png</file>
-        <file>PlanarRectangle_48.png</file>
         <file>PointSet_48.png</file>
         <file>Segmentation_48.png</file>
         <file>Surface_48.png</file>
-        <file>PlanarCircle_48.png</file>
     </qresource>
 </RCC>

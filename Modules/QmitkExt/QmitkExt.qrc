@@ -1,0 +1,11 @@
+<RCC>
+    <qresource prefix="/QmitkExt" >
+        <file>PlanarAngle_48.png</file>
+        <file>PlanarFourPointAngle_48.png</file>
+        <file>PlanarLine_48.png</file>
+        <file>PlanarPath_48.png</file>
+        <file>PlanarPolygon_48.png</file>
+        <file>PlanarRectangle_48.png</file>
+        <file>PlanarCircle_48.png</file>
+    </qresource>
+</RCC>

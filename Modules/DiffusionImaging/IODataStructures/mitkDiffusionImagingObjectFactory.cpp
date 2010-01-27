@@ -43,13 +43,13 @@ typedef mitk::DiffusionImage<DiffusionPixelType> DiffusionImageShort;
 mitk::DiffusionImagingObjectFactory::DiffusionImagingObjectFactory(bool registerSelf) 
 :CoreObjectFactoryBase()
 {
-  m_ExternalFileExtensions.append(";;Diffusion Weighted Images (*.dwi *.hdwi)");
-  m_ExternalFileExtensions.append(";;Q-Ball Images (*.qbi *.hqbi)");
-  m_ExternalFileExtensions.append(";;Tensor Images (*.dti *.hdti)");
+  m_ExternalFileExtensions.append("Diffusion Weighted Images (*.dwi *.hdwi)");
+  m_ExternalFileExtensions.append("Q-Ball Images (*.qbi *.hqbi)");
+  m_ExternalFileExtensions.append("Tensor Images (*.dti *.hdti)");
   
-  m_SaveFileExtensions.append(";;Diffusion Weighted Images (*.dwi *.hdwi)");
-  m_SaveFileExtensions.append(";;Q-Ball Images (*.qbi *.hqbi)");
-  m_SaveFileExtensions.append(";;Tensor Images (*.dti *.hdti)");
+  m_SaveFileExtensions.append("Diffusion Weighted Images (*.dwi *.hdwi)");
+  m_SaveFileExtensions.append("Q-Ball Images (*.qbi *.hqbi)");
+  m_SaveFileExtensions.append("Tensor Images (*.dti *.hdti)");
 
   static bool alreadyDone = false;
   if (!alreadyDone)

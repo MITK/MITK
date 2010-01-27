@@ -22,3 +22,13 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/../include
  ${CMAKE_CURRENT_SOURCE_DIR}/../../CppUnit/include
 )
 
+SET(_zipdata_files
+  data.zip
+  doc.zip
+  java.zip
+  test.zip
+)
+
+FOREACH(_zipdata ${_zipdata_files})
+  CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/data/${_zipdata}" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/data/${_zipdata}" COPYONLY)
+ENDFOREACH()

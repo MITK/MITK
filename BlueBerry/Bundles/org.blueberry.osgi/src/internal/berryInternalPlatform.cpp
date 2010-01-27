@@ -134,7 +134,9 @@ void InternalPlatform::Initialize(int& argc, char** argv, Poco::Util::AbstractCo
   }
   catch (Poco::NotFoundException&)
   {
-    m_CodeCache = new CodeCache(m_UserPath.append(Poco::Path("plugin_cache")).toString());
+    Poco::Path cachePath(m_UserPath);
+    cachePath.pushDirectory("plugin_cache");
+    m_CodeCache = new CodeCache(cachePath.toString());
   }
   m_BundleLoader = new BundleLoader(m_CodeCache, *m_PlatformLogger);
 

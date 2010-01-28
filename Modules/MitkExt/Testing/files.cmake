@@ -3,6 +3,7 @@ SET(MODULE_TESTS
   mitkContourMapper2DTest.cpp
   mitkContourTest.cpp
   mitkDemonsRegistrationTest.cpp
+  mitkDataTreeNodeExtTest.cpp
   mitkExternalToolsTest.cpp
   mitkHistogramMatchingTest.cpp
   mitkMeshTest.cpp

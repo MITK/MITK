@@ -16,11 +16,13 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include "QmitkProgressBar.h"
+
+#include "mitkProgressBar.h"
+#include "mitkRenderingManager.h"
+
 #include <qprogressbar.h>
-#include <mitkProgressBar.h>
-//#include <qmainwindow.h>
 #include <qapplication.h>
-//#include <itkObjectFactory.h>
+
 
 /**
  * Reset the progress bar. The progress bar "rewinds" and shows no progress.
@@ -88,7 +90,10 @@ void QmitkProgressBar::SlotProgress(unsigned int steps)
   if (m_Progress >= m_TotalSteps)
     Reset();
 
-  qApp->processEvents();
+  // Update views if repaint has been requested in the meanwhile
+  // (because Qt event loop is not reached while progress bar is updating,
+  // unless the application is threaded)
+  mitk::RenderingManager::GetInstance()->UpdateCallback();
 }
 
 void QmitkProgressBar::SlotAddStepsToDo(unsigned int steps)
@@ -100,7 +105,11 @@ void QmitkProgressBar::SlotAddStepsToDo(unsigned int steps)
   {
     this->show();
   }
-  qApp->processEvents();
+
+  // Update views if repaint has been requested in the meanwhile
+  // (because Qt event loop is not reached while progress bar is updating,
+  // unless the application is threaded)
+  mitk::RenderingManager::GetInstance()->UpdateCallback();
 }
 
 void QmitkProgressBar::SlotSetPercentageVisible(bool visible)

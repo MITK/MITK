@@ -25,6 +25,7 @@
 #define _vtkQtBarChart_h
 
 #include "vtkQtChartExport.h"
+#include "QmitkExtExports.h"
 #include "vtkQtChartSeriesLayer.h"
 
 class vtkQtBarChartInternal;

@@ -28,7 +28,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "itkCommand.h"
 
 namespace mitk {
-  MITK_TOOL_MACRO(MITKEXT_CORE_EXPORT, CreateSurfaceTool, "Surface creation tool");
+  MITK_TOOL_MACRO(MitkExt_EXPORT, CreateSurfaceTool, "Surface creation tool");
 }
 
 mitk::CreateSurfaceTool::CreateSurfaceTool()

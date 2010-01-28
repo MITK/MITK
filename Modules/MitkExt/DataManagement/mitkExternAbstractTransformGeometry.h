@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKEXTERNABSTRACTTRANSFORMPLANEGEOMETRY_H_HEADER_INCLUDED_C1C68A2C
 
 #include "mitkCommon.h"
+#include "MitkExtExports.h"
 #include "mitkAbstractTransformGeometry.h"
 
 namespace mitk {
@@ -34,7 +35,7 @@ namespace mitk {
 //## @note The bounds of the PlaneGeometry are used as the parametric bounds.
 //## @sa AbstractTransformGeometry
 //## @ingroup Geometry
-class MITKEXT_CORE_EXPORT ExternAbstractTransformGeometry : public AbstractTransformGeometry
+class MitkExt_EXPORT ExternAbstractTransformGeometry : public AbstractTransformGeometry
 {
 public:
   mitkClassMacro(ExternAbstractTransformGeometry, AbstractTransformGeometry);

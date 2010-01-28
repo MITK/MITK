@@ -2,6 +2,7 @@
 #define mitkDataStorageSelection_h
 
 #include <mitkDataStorage.h>
+#include "MitkExtExports.h"
 #include <mitkNodePredicateBase.h>
 #include <itkEventObject.h>
 #include <mitkCommon.h>
@@ -12,7 +13,7 @@ namespace mitk
   class BaseProperty;
   class PropertyList;
 
-  class MITKEXT_CORE_EXPORT DataStorageSelection: public itk::Object
+  class MitkExt_EXPORT DataStorageSelection: public itk::Object
   {
   public:
     typedef std::vector<mitk::DataTreeNode*> Nodes;

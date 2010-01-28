@@ -25,6 +25,7 @@
 #define _vtkQtStackedChartOptions_h
 
 #include "vtkQtChartExport.h"
+#include "QmitkExtExports.h"
 #include <QObject>
 #include "vtkQtChartLayer.h" // needed for enum
 

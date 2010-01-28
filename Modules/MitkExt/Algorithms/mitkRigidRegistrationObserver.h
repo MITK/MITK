@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKRIGIDREGISTRATIONOBSERVER_H
 
 #include "itkSingleValuedNonLinearOptimizer.h"
+#include "MitkExtExports.h"
 #include <itkExhaustiveOptimizer.h>
 #include <itkGradientDescentOptimizer.h>
 #include <itkQuaternionRigidTransformGradientDescentOptimizer.h>
@@ -59,7 +60,7 @@ namespace mitk {
   *
   * \author Daniel Stein
   */
-  class MITKEXT_CORE_EXPORT RigidRegistrationObserver : public itk::Command
+  class MitkExt_EXPORT RigidRegistrationObserver : public itk::Command
   {
     public:
       typedef  RigidRegistrationObserver   Self;

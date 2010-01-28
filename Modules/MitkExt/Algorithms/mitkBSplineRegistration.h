@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkRegistrationBase.h"
+#include "MitkExtExports.h"
 #include "mitkImageAccessByItk.h"
 #include <mitkOptimizerParameters.h>
 //#include <mitkMetricParameters.h>
@@ -39,7 +40,7 @@ namespace mitk
   */
 
   
-  class MITKEXT_CORE_EXPORT BSplineRegistration : public RegistrationBase
+  class MitkExt_EXPORT BSplineRegistration : public RegistrationBase
   {
 
   public:

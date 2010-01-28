@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKDISPLAYPOINTSETINTERACTOR_H_HEADER_INCLUDED_C11202FF
 
 #include "mitkCommon.h"
+#include "MitkExtExports.h"
 #include "mitkVector.h"
 #include <mitkInteractor.h>
 #include "mitkPointSetInteractor.h"
@@ -35,7 +36,7 @@ namespace mitk
    * Points can be added, removed and moved.
    * \ingroup Interaction
    */
-  class MITKEXT_CORE_EXPORT DisplayPointSetInteractor : public PointSetInteractor
+  class MitkExt_EXPORT DisplayPointSetInteractor : public PointSetInteractor
   {
   public:
     mitkClassMacro(DisplayPointSetInteractor, PointSetInteractor);

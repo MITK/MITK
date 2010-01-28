@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKCYLINDRICTOCARTESIANFILTER_H_HEADER_INCLUDED_C1F48A22
 
 #include "mitkCommon.h"
+#include "MitkExtExports.h"
 #include "mitkImageToImageFilter.h"
 
 #ifndef M_PI
@@ -35,7 +36,7 @@ namespace mitk {
 //## @todo tag with transducer position not yet transformed.
 //## @todo the line limiting the sector is assumed to be available as a pic tag. Is this ok?
 //## @ingroup Process
-class MITKEXT_CORE_EXPORT CylindricToCartesianFilter : public ImageToImageFilter
+class MitkExt_EXPORT CylindricToCartesianFilter : public ImageToImageFilter
 {
 public:
   mitkClassMacro(CylindricToCartesianFilter, ImageToImageFilter);

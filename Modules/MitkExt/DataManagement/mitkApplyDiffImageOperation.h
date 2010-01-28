@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define mitkApplyDiffImageIIncluded
 
 #include "mitkOperation.h"
+#include "MitkExtExports.h"
 #include "mitkCompressedImageContainer.h"
 
 namespace mitk {
@@ -41,7 +42,7 @@ namespace mitk {
  @ingroup Undo
  @ingroup Reliver
 */
-class MITKEXT_CORE_EXPORT ApplyDiffImageOperation : public Operation
+class MitkExt_EXPORT ApplyDiffImageOperation : public Operation
 {
   protected:
   

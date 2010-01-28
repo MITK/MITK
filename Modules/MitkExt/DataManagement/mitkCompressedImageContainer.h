@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define mitkCompressedImageContainer_h_Included
 
 #include "mitkCommon.h"
+#include "MitkExtExports.h"
 #include "mitkImage.h"
 #include "mitkGeometry3D.h"
 #include "mitkImageDataItem.h"
@@ -37,7 +38,7 @@ namespace mitk
 
   $Author$
 */
-class MITKEXT_CORE_EXPORT CompressedImageContainer : public itk::Object
+class MitkExt_EXPORT CompressedImageContainer : public itk::Object
 {
   public:
     

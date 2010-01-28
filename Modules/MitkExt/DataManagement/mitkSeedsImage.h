@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKSEEDSIMAGE_H_HEADER_INCLUDED_C1C2FCD2
 
 #include "mitkImage.h"
+#include "MitkExtExports.h"
 
 #include <itkImage.h>
 #include <itkNeighborhood.h>
@@ -35,7 +36,7 @@ namespace mitk
 //##
 //## Handles operations for drawing seeds. 
 //## @ingroup Data
-class MITKEXT_CORE_EXPORT SeedsImage : public Image
+class MitkExt_EXPORT SeedsImage : public Image
 {
 
 public:

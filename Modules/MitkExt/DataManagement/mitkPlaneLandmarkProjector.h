@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKPLANELANDMARKPROJECTOR_H_HEADER_INCLUDED_C1C68A2C
 
 #include "mitkLandmarkProjector.h"
+#include "MitkExtExports.h"
 #include "mitkPointSet.h"
 
 namespace mitk {
@@ -28,7 +29,7 @@ namespace mitk {
 //## @brief Thin-plate-spline-based landmark-based curved geometry
 //## 
 //## @ingroup Geometry
-class MITKEXT_CORE_EXPORT PlaneLandmarkProjector : public LandmarkProjector
+class MitkExt_EXPORT PlaneLandmarkProjector : public LandmarkProjector
 {
 public:
   mitkClassMacro(PlaneLandmarkProjector, LandmarkProjector);

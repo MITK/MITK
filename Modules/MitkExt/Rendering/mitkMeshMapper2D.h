@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKMESHMAPPER2D_H_HEADER_INCLUDED
 
 #include "mitkCommon.h"
+#include "MitkExtExports.h"
 #include "mitkGLMapper2D.h"
 
 namespace mitk {
@@ -33,7 +34,7 @@ class Mesh;
  * \todo implement for AbstractTransformGeometry.
  * \ingroup Mapper
  */
-class MITKEXT_CORE_EXPORT MeshMapper2D : public GLMapper2D
+class MitkExt_EXPORT MeshMapper2D : public GLMapper2D
 {
 public:
   mitkClassMacro(MeshMapper2D, Mapper2D);

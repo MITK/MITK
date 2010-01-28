@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define mitkAutoSegmentationTool_h_Included
 
 #include "mitkCommon.h"
+#include "MitkExtExports.h"
 #include "mitkTool.h"
 
 namespace mitk
@@ -30,7 +31,7 @@ namespace mitk
 
   This class is undocumented. Ask the creator ($Author$) to supply useful comments.
 */
-class MITKEXT_CORE_EXPORT AutoSegmentationTool : public Tool
+class MitkExt_EXPORT AutoSegmentationTool : public Tool
 {
   public:
     

@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKLOOKUPTABLESOURCE_H_HEADER_INCLUDED
 
 #include "mitkLookupTable.h"
+#include "MitkExtExports.h"
 #include "mitkCommon.h"
 #include "mitkBaseProcess.h"
 
@@ -36,7 +37,7 @@ namespace mitk
  * possible region.
  * @ingroup Process
  */
-class MITKEXT_CORE_EXPORT LookupTableSource : public itk::ProcessObject
+class MitkExt_EXPORT LookupTableSource : public itk::ProcessObject
 {
 public:
 

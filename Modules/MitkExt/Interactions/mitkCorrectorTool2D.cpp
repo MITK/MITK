@@ -26,7 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkCorrectorTool2D.xpm"
 
 namespace mitk {
-  MITK_TOOL_MACRO(MITKEXT_CORE_EXPORT, CorrectorTool2D, "Correction tool");
+  MITK_TOOL_MACRO(MitkExt_EXPORT, CorrectorTool2D, "Correction tool");
 }
 
 mitk::CorrectorTool2D::CorrectorTool2D(int paintingPixelValue)

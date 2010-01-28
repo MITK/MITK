@@ -25,6 +25,7 @@
 #define _vtkQtChartGridLayer_h
 
 #include "vtkQtChartExport.h"
+#include "QmitkExtExports.h"
 #include "vtkQtChartLayer.h"
 
 class vtkQtChartAxis;

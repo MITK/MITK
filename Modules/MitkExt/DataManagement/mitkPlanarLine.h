@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define _MITK_PLANAR_LINE_H_
 
 #include "mitkPlanarFigure.h"
+#include "MitkExtExports.h"
 
 
 namespace mitk 
@@ -31,7 +32,7 @@ class Geometry2D;
  * \brief Implementation of PlanarFigure representing a line
  * through two control points
  */
-class MITKEXT_CORE_EXPORT PlanarLine : public PlanarFigure
+class MitkExt_EXPORT PlanarLine : public PlanarFigure
 {
 public:
   mitkClassMacro( PlanarLine, PlanarFigure );

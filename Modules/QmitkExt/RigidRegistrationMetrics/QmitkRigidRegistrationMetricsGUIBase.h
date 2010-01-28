@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define QmitkRigidRegistrationMetricsGUIBaseH
 
 #include <QWidget>
+#include "QmitkExtExports.h"
 #include <itkArray.h>
 #include <itkObject.h>
 #include "mitkImage.h"
@@ -30,7 +31,7 @@ PURPOSE.  See the above copyright notices for more information.
 *
 * Displays options for rigid registration.
 */
-class QMITKEXT_EXPORT QmitkRigidRegistrationMetricsGUIBase : public QWidget
+class QmitkExt_EXPORT QmitkRigidRegistrationMetricsGUIBase : public QWidget
 {
 
 public:

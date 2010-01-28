@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKCHILIPLUGIN_H_HEADER_INCLUDED_C1EBD0AD
 
 #include "mitkDataStorage.h"
+#include "MitkExtExports.h"
 
 namespace mitk {
 
@@ -33,12 +34,12 @@ namespace mitk {
 
   \todo The PatientInformation, StudyInformation, SeriesInformation structures should be classes able to contain any kind of tags
 */
-class MITKEXT_CORE_EXPORT PACSPlugin : public itk::Object
+class MitkExt_EXPORT PACSPlugin : public itk::Object
 {
   public:
 
     /** This struct contain the plugin capabilities. */
-    struct MITKEXT_CORE_EXPORT PACSPluginCapability
+    struct MitkExt_EXPORT PACSPluginCapability
     {
       bool IsPACSFunctional;  // is there actually a real PACS connectivity implemented, configured and working right now?
       bool HasLoadCapability; // can the current implementation load data from a PACS?
@@ -46,7 +47,7 @@ class MITKEXT_CORE_EXPORT PACSPlugin : public itk::Object
     };
 
     /** Information about a patient in the PACS. Fields should correspond to DICOM PS 3.4-2008 Annex C.6.1.1.2 **/
-    class MITKEXT_CORE_EXPORT PatientInformation
+    class MitkExt_EXPORT PatientInformation
     {
       public:
         std::string UID; // application specific
@@ -61,7 +62,7 @@ class MITKEXT_CORE_EXPORT PACSPlugin : public itk::Object
     typedef std::list<PatientInformation> PatientInformationList;
 
     /** Information about a study in the PACS. Fields should correspond to DICOM PS 3.4-2008 Annex C.6.1.1.3 **/
-    class MITKEXT_CORE_EXPORT StudyInformation
+    class MitkExt_EXPORT StudyInformation
     {
       public:
         std::string StudyInstanceUID;   // tag 0020,000D
@@ -77,7 +78,7 @@ class MITKEXT_CORE_EXPORT PACSPlugin : public itk::Object
     typedef std::list<StudyInformation> StudyInformationList;
 
     /** Information about a study in the PACS. Fields should correspond to DICOM PS 3.4-2008 Annex C.6.1.1.4 **/
-    class MITKEXT_CORE_EXPORT SeriesInformation
+    class MitkExt_EXPORT SeriesInformation
     {
       public:
         std::string SeriesInstanceUID;  // tag 0020,000E
@@ -105,7 +106,7 @@ class MITKEXT_CORE_EXPORT PACSPlugin : public itk::Object
     typedef std::list<SeriesInformation> SeriesInformationList;
 
     /** Information about a document in a series. Very roughly corresponds to DICOM PS 3.3-2008 Annex C.24 */
-    class MITKEXT_CORE_EXPORT DocumentInformation
+    class MitkExt_EXPORT DocumentInformation
     {
       public:
         std::string SeriesInstanceUID;  // tag 0020,000E

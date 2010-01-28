@@ -20,10 +20,11 @@ PURPOSE.  See the above copyright notices for more information.
 #define QMITK_POINTLIST_MODEL_H_INCLUDED
 
 #include <QAbstractListModel>
+#include "QmitkExtExports.h"
 
 #include "mitkPointSet.h"
 
-class QMITKEXT_EXPORT QmitkPointListModel : public QAbstractListModel
+class QmitkExt_EXPORT QmitkPointListModel : public QAbstractListModel
 {
   Q_OBJECT
 

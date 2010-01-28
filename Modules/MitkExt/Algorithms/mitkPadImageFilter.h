@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKPADIMAGEFILTER_H_HEADER_INCLUDED
 
 #include "mitkCommon.h"
+#include "MitkExtExports.h"
 #include "mitkImageToImageFilter.h"
 #include "mitkImageTimeSelector.h"
 
@@ -36,7 +37,7 @@ namespace mitk {
  *
  * \ingroup Process
  */
-class MITKEXT_CORE_EXPORT PadImageFilter : public ImageToImageFilter
+class MitkExt_EXPORT PadImageFilter : public ImageToImageFilter
 {
 public:    
   mitkClassMacro(PadImageFilter, ImageToImageFilter);

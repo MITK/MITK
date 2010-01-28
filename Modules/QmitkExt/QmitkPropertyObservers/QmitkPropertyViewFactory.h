@@ -16,10 +16,11 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include <mitkProperties.h>
+#include "QmitkExtExports.h"
 
 class QWidget;
 
-class QMITKEXT_EXPORT QmitkPropertyViewFactory
+class QmitkExt_EXPORT QmitkPropertyViewFactory
 {
   public:
 

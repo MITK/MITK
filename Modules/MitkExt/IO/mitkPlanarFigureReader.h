@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define _MITK_PlanarFigureReader__H_
 
 #include <mitkPlanarFigureSource.h>
+#include "MitkExtExports.h"
 #include <mitkFileReader.h>
 
 class TiXmlElement;
@@ -33,7 +34,7 @@ namespace mitk
  * these are assigned to multiple outputs of the filter. 
  * @ingroup IO
 */
-class MITKEXT_CORE_EXPORT PlanarFigureReader: public PlanarFigureSource, public FileReader
+class MitkExt_EXPORT PlanarFigureReader: public PlanarFigureSource, public FileReader
 {
 public:
 

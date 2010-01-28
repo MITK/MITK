@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkEraseRegionTool.xpm"
 
 namespace mitk {
-  MITK_TOOL_MACRO(MITKEXT_CORE_EXPORT, EraseRegionTool, "Erase tool");
+  MITK_TOOL_MACRO(MitkExt_EXPORT, EraseRegionTool, "Erase tool");
 }
 
 mitk::EraseRegionTool::EraseRegionTool()

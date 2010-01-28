@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKLINEVTKMAPPER3D_H_HEADER_INCLUDED
 
 #include "mitkCommon.h"
+#include "MitkExtExports.h"
 #include "mitkPointSetVtkMapper3D.h"
 #include "mitkPointSet.h"
 #include "mitkBaseRenderer.h"
@@ -49,7 +50,7 @@ namespace mitk {
 //## @brief Vtk-based mapper to draw Lines from PointSet
 //##
 //## @ingroup Mapper
-class MITKEXT_CORE_EXPORT LineVtkMapper3D : public PointSetVtkMapper3D
+class MitkExt_EXPORT LineVtkMapper3D : public PointSetVtkMapper3D
 {
   public:
 

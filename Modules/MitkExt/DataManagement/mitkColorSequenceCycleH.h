@@ -18,6 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKCOLORSEQUENCE_H_DEFG2390JKD
 
 #include <mitkColorSequence.h>
+#include "MitkExtExports.h"
 
 namespace mitk
 {
@@ -35,7 +36,7 @@ namespace mitk
   Finally repeat colors.
   
 */
-class MITKEXT_CORE_EXPORT ColorSequenceCycleH : public ColorSequence
+class MitkExt_EXPORT ColorSequenceCycleH : public ColorSequence
 {
   public:
     

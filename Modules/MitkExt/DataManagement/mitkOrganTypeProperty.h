@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define mitkOrganTypeProperty_h_Included
 
 #include "mitkCommon.h"
+#include "MitkExtExports.h"
 #include "mitkEnumerationProperty.h"
 #include <itkObjectFactory.h>
 
@@ -34,7 +35,7 @@ namespace mitk
 
   Last contributor $Author$
 */
-class MITKEXT_CORE_EXPORT OrganTypeProperty : public EnumerationProperty
+class MitkExt_EXPORT OrganTypeProperty : public EnumerationProperty
 {
   public:
     

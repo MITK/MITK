@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define QMITK_FUNCTIONALITYCOMPONENTCONTAINER_H
 
 #include "QmitkBaseFunctionalityComponent.h"
+#include "QmitkExtExports.h"
  
 #include <qwidget.h>
  #include <qstackedwidget.h>
@@ -52,7 +53,7 @@ PURPOSE.  See the above copyright notices for more information.
 */
 
 
-class QMITKEXT_EXPORT QmitkFunctionalityComponentContainer : public QmitkBaseFunctionalityComponent
+class QmitkExt_EXPORT QmitkFunctionalityComponentContainer : public QmitkBaseFunctionalityComponent
 {
   Q_OBJECT
 

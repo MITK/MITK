@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define BOUNDINGOBJECTGROUP_H_HEADER_INCLUDED
 
 #include <mitkBoundingObject.h>
+#include "MitkExtExports.h"
 
 namespace mitk {
 
@@ -28,7 +29,7 @@ namespace mitk {
 //##
 //## Calculates a bounding box that contains all sub-bounding boxes.
 //## @ingroup Data
-class MITKEXT_CORE_EXPORT BoundingObjectGroup : public mitk::BoundingObject
+class MitkExt_EXPORT BoundingObjectGroup : public mitk::BoundingObject
 {
 public:
   typedef itk::VectorContainer<unsigned int, mitk::BoundingObject::Pointer> BoundingObjectContainer;

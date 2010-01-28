@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define _MITK_PLANAR_CIRCLE_H_
 
 #include "mitkPlanarFigure.h"
+#include "MitkExtExports.h"
 
 
 namespace mitk 
@@ -31,7 +32,7 @@ class Geometry2D;
  * \brief Implementation of PlanarFigure representing a circle
  * through two control points
  */
-class MITKEXT_CORE_EXPORT PlanarCircle : public PlanarFigure
+class MitkExt_EXPORT PlanarCircle : public PlanarFigure
 {
 public:
   mitkClassMacro( PlanarCircle, PlanarFigure );

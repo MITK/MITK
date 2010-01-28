@@ -19,13 +19,14 @@ PURPOSE.  See the above copyright notices for more information.
 #define QMITK_CALLBACK_WITHIN_GUI_TREAD_H_INCLUDGEWQ
 
 #include "mitkCallbackFromGUIThread.h"
+#include "QmitkExtExports.h"
 
 #include <QObject>
 
 /*!
   \brief Qt specific implementation of mitk::CallbackFromGUIThreadImplementation
 */
-class QMITKEXT_EXPORT QmitkCallbackFromGUIThread : public QObject, public mitk::CallbackFromGUIThreadImplementation
+class QmitkExt_EXPORT QmitkCallbackFromGUIThread : public QObject, public mitk::CallbackFromGUIThreadImplementation
 {
 
   Q_OBJECT

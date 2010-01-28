@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkErasePaintbrushTool.xpm"
 
 namespace mitk {
-  MITK_TOOL_MACRO(MITKEXT_CORE_EXPORT, ErasePaintbrushTool, "Paintbrush erasing tool");
+  MITK_TOOL_MACRO(MitkExt_EXPORT, ErasePaintbrushTool, "Paintbrush erasing tool");
 }
 
 mitk::ErasePaintbrushTool::ErasePaintbrushTool()

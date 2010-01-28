@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define mitkSegTool2D_h_Included
 
 #include "mitkCommon.h"
+#include "MitkExtExports.h"
 #include "mitkTool.h"
 #include "mitkImage.h"
 
@@ -51,7 +52,7 @@ class BaseRenderer;
 
   $Author$
 */
-class MITKEXT_CORE_EXPORT SegTool2D : public Tool
+class MitkExt_EXPORT SegTool2D : public Tool
 {
   public:
     

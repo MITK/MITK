@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define mitkDiffImageApplier_h_Included
 
 #include "mitkCommon.h"
+#include "MitkExtExports.h"
 #include "mitkOperationActor.h"
 #include "mitkImage.h"
 
@@ -36,7 +37,7 @@ namespace mitk
 
   $Author: maleike $
 */
-class MITKEXT_CORE_EXPORT DiffImageApplier : public itk::Object, public OperationActor
+class MitkExt_EXPORT DiffImageApplier : public itk::Object, public OperationActor
 {
   public:
     

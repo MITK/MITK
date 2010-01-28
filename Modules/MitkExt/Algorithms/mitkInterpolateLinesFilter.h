@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKINTERPOLATELINESFILTER_H_HEADER_INCLUDED_C10B22CD
 
 #include "mitkCommon.h"
+#include "MitkExtExports.h"
 #include "mitkSurfaceSource.h"
 #include "mitkMesh.h"
 #include "mitkGeometry2D.h"
@@ -42,7 +43,7 @@ namespace mitk {
 //## in 2D between them, and map them back via the 
 //## Geometry2D in the 3D-world. 
 //## @ingroup Process
-class MITKEXT_CORE_EXPORT InterpolateLinesFilter : public SurfaceSource
+class MitkExt_EXPORT InterpolateLinesFilter : public SurfaceSource
 {
 public:
   mitkClassMacro(InterpolateLinesFilter, SurfaceSource);

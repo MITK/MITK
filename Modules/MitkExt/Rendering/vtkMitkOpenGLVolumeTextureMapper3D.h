@@ -25,6 +25,7 @@
 #define __vtkMitkOpenGLVolumeTextureMapper3D_h
 
 #include "vtkMitkVolumeTextureMapper3D.h"
+#include "MitkExtExports.h"
 
 #ifndef VTK_IMPLEMENT_MESA_CXX
 # include "vtkOpenGL.h" // GLfloat type is used in some method signatures.
@@ -36,7 +37,7 @@ class vtkVolumeProperty;
 
 #include "mitkCommon.h"
 
-class MITKEXT_CORE_EXPORT vtkMitkOpenGLVolumeTextureMapper3D : public vtkMitkVolumeTextureMapper3D
+class MitkExt_EXPORT vtkMitkOpenGLVolumeTextureMapper3D : public vtkMitkVolumeTextureMapper3D
 {
 public:
   vtkTypeRevisionMacro(vtkMitkOpenGLVolumeTextureMapper3D,vtkMitkVolumeTextureMapper3D);

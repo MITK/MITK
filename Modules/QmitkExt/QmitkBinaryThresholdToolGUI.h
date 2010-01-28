@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define QmitkBinaryThresholdToolGUI_h_Included
 
 #include "QmitkToolGUI.h"
+#include "QmitkExtExports.h"
 #include "mitkBinaryThresholdTool.h"
 
 class QSlider;
@@ -32,7 +33,7 @@ class QSlider;
 
   Last contributor: $Author$
 */
-class QMITKEXT_EXPORT QmitkBinaryThresholdToolGUI : public QmitkToolGUI
+class QmitkExt_EXPORT QmitkBinaryThresholdToolGUI : public QmitkToolGUI
 {
   Q_OBJECT
 

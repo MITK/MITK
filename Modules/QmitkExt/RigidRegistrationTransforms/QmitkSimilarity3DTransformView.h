@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define QmitkSimilarity3DTransformViewWidgetHIncluded
 
 #include "ui_QmitkSimilarity3DTransformControls.h"
+#include "QmitkExtExports.h"
 #include "QmitkRigidRegistrationTransformsGUIBase.h"
 #include <itkImage.h>
 
@@ -28,7 +29,7 @@ PURPOSE.  See the above copyright notices for more information.
 *
 * Displays options for rigid registration.
 */
-class QMITKEXT_EXPORT QmitkSimilarity3DTransformView : public QmitkRigidRegistrationTransformsGUIBase
+class QmitkExt_EXPORT QmitkSimilarity3DTransformView : public QmitkRigidRegistrationTransformsGUIBase
 {
 
 public:

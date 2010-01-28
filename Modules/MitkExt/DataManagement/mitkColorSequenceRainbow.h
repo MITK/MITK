@@ -18,11 +18,12 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKCOLORSEQUENCERAINBOW_H_URTESEINDEUTIGEKENNUNG_02
 
 #include "mitkColorSequence.h"
+#include "MitkExtExports.h"
 
 namespace mitk
 {
 
-class MITKEXT_CORE_EXPORT ColorSequenceRainbow : public ColorSequence
+class MitkExt_EXPORT ColorSequenceRainbow : public ColorSequence
 {
 public:
   ColorSequenceRainbow();

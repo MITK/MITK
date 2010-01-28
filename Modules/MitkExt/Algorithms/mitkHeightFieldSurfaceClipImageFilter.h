@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKHEIGHTFIELDSURFACECLIPIMAGEFILTER_H_HEADER_INCLUDED
 
 #include "mitkCommon.h"
+#include "MitkExtExports.h"
 #include "mitkImageToImageFilter.h"
 #include "mitkImageTimeSelector.h"
 #include "mitkSurface.h"
@@ -44,7 +45,7 @@ namespace mitk {
  *
  * \ingroup Process
  */
-class MITKEXT_CORE_EXPORT HeightFieldSurfaceClipImageFilter : public ImageToImageFilter
+class MitkExt_EXPORT HeightFieldSurfaceClipImageFilter : public ImageToImageFilter
 {
 public:
   mitkClassMacro(HeightFieldSurfaceClipImageFilter, ImageToImageFilter);

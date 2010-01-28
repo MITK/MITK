@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define QmitkNewSegmentationDialog_h_Included
 
 #include "mitkColorProperty.h"
+#include "QmitkExtExports.h"
 
 #include <qdialog.h>
 
@@ -43,7 +44,7 @@ class QPushButton;
 
   Last contribution by $Author: maleike $.
 */
-class QMITKEXT_EXPORT QmitkNewSegmentationDialog : public QDialog
+class QmitkExt_EXPORT QmitkNewSegmentationDialog : public QDialog
 {
   Q_OBJECT
 

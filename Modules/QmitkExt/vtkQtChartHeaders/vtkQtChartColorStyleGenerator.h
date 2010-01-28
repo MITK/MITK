@@ -25,6 +25,7 @@
 #define _vtkQtChartColorStyleGenerator_h
 
 #include "vtkQtChartExport.h"
+#include "QmitkExtExports.h"
 #include "vtkQtChartStyleGenerator.h"
 #include "vtkQtChartColors.h" // Needed for enum.
 

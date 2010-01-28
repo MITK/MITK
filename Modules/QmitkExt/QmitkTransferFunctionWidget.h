@@ -3,6 +3,7 @@
 #define QMITKTRANSFERFUNCTIONWIDGET_H
 
 #include "ui_QmitkTransferFunctionWidget.h"
+#include "QmitkExtExports.h"
 
 #include <mitkCommon.h>
 
@@ -17,7 +18,7 @@
 #include <QmitkTransferFunctionWidget.h>
 
 
-class QMITKEXT_EXPORT QmitkTransferFunctionWidget : public QWidget, public Ui::QmitkTransferFunctionWidget
+class QmitkExt_EXPORT QmitkTransferFunctionWidget : public QWidget, public Ui::QmitkTransferFunctionWidget
 {
 
   Q_OBJECT

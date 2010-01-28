@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKPLANE_H_HEADER_INCLUDED
 
 #include "mitkBoundingObject.h"
+#include "MitkExtExports.h"
 
 
 class vtkPlaneSource;
@@ -34,7 +35,7 @@ namespace mitk {
  *
  * \ingroup Data
  */
-class MITKEXT_CORE_EXPORT Plane : public BoundingObject
+class MitkExt_EXPORT Plane : public BoundingObject
 {
 public:
   mitkClassMacro(Plane, BoundingObject);  

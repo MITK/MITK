@@ -18,9 +18,10 @@ PURPOSE.  See the above copyright notices for more information.
 #define QMITK_BOOLPROPERTYEDITOR_H_INCLUDED
 
 #include "QmitkBoolPropertyView.h"
+#include "QmitkExtExports.h"
 
 /// @ingroup Widgets
-class QMITKEXT_EXPORT QmitkBoolPropertyEditor : public QmitkBoolPropertyView
+class QmitkExt_EXPORT QmitkBoolPropertyEditor : public QmitkBoolPropertyView
 {
   Q_OBJECT
 

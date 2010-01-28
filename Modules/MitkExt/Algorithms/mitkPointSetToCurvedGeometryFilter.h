@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define _MITK_POINT_SET_TO_CURVED_GEOMETRY_FILTER_H__
 
 #include "mitkPointSetToGeometryDataFilter.h"
+#include "MitkExtExports.h"
 #include <mitkPlaneGeometry.h>
 #include <mitkSphereLandmarkProjector.h>
 #include <mitkPlaneLandmarkProjector.h>
@@ -29,7 +30,7 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk
 {
 
-class MITKEXT_CORE_EXPORT PointSetToCurvedGeometryFilter : public PointSetToGeometryDataFilter
+class MitkExt_EXPORT PointSetToCurvedGeometryFilter : public PointSetToGeometryDataFilter
 {
 public:
   /**

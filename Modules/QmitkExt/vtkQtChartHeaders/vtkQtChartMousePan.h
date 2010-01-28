@@ -26,6 +26,7 @@
 
 
 #include "vtkQtChartExport.h"
+#include "QmitkExtExports.h"
 #include "vtkQtChartMouseFunction.h"
 
 class vtkQtChartContentsSpace;

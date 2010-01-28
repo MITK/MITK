@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define _MITK_UNSTRUCTURED_GRID_DATA_SOURCE_H_HEADER_
 
 #include "mitkBaseProcess.h"
+#include "MitkExtExports.h"
 
 namespace mitk {
 class UnstructuredGrid;
@@ -33,7 +34,7 @@ class UnstructuredGrid;
 //## DataObject. This is also true for subclasses of mitk::BaseProcess and thus
 //## for mitk::UnstructuredGridSource.
 //## @ingroup Process
-class MITKEXT_CORE_EXPORT UnstructuredGridSource : public BaseProcess
+class MitkExt_EXPORT UnstructuredGridSource : public BaseProcess
 {
 public:
   mitkClassMacro(UnstructuredGridSource, BaseProcess);

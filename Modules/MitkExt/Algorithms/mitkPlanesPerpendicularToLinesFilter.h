@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKPLANESPERPENDICULARTOLINES_H_HEADER_INCLUDED_C10B22CD
 
 #include "mitkGeometryDataSource.h"
+#include "MitkExtExports.h"
 #include "mitkMesh.h"
 #include "mitkGeometryData.h"
 #include "mitkPlaneGeometry.h"
@@ -46,7 +47,7 @@ namespace mitk {
 
 
 //## @ingroup Process
-class MITKEXT_CORE_EXPORT PlanesPerpendicularToLinesFilter : public GeometryDataSource
+class MitkExt_EXPORT PlanesPerpendicularToLinesFilter : public GeometryDataSource
 {
 public:
   mitkClassMacro(PlanesPerpendicularToLinesFilter, GeometryDataSource);

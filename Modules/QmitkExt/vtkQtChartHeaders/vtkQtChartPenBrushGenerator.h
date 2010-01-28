@@ -25,6 +25,7 @@
 #define _vtkQtChartPenBrushGenerator_h
 
 #include "vtkQtChartExport.h"
+#include "QmitkExtExports.h"
 #include "vtkQtChartStyleGenerator.h"
 
 class vtkQtChartColors;

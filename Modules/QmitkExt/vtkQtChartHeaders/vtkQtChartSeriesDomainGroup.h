@@ -25,6 +25,7 @@
 #define _vtkQtChartSeriesDomainGroup_h
 
 #include "vtkQtChartExport.h"
+#include "QmitkExtExports.h"
 #include <QList> // needed for return type
 
 

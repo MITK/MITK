@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKPROBEFILTER_H_HEADER_INCLUDED_C10B22CD
 
 #include "mitkCommon.h"
+#include "MitkExtExports.h"
 #include "mitkSurfaceSource.h"
 
 class vtkPlaneSource;
@@ -34,7 +35,7 @@ class Image;
 //## @brief Adapter for vtkProbeFilter, making it a 3D+t filter
 //## 
 //## @ingroup Process
-class MITKEXT_CORE_EXPORT ProbeFilter : public SurfaceSource
+class MitkExt_EXPORT ProbeFilter : public SurfaceSource
 {
 public:
   mitkClassMacro(ProbeFilter, SurfaceSource);

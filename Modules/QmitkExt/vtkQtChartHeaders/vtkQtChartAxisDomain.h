@@ -25,6 +25,7 @@
 #define _vtkQtChartAxisDomain_h
 
 #include "vtkQtChartExport.h"
+#include "QmitkExtExports.h"
 #include "vtkQtChartAxis.h" // needed for enum
 #include <QList>            // needed for parameter
 #include <QVariant>         // needed for parameter/enum

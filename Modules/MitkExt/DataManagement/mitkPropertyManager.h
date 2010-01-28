@@ -19,11 +19,12 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKPROPERTYMANAGER_H_HEADER_INCLUDED
 #define MITKPROPERTYMANAGER_H_HEADER_INCLUDED
 #include "mitkPropertyList.h"
+#include "MitkExtExports.h"
 #include <set>
 #include <map>
 
 namespace mitk {
-  class MITKEXT_CORE_EXPORT PropertyManager {
+  class MitkExt_EXPORT PropertyManager {
 
     public:
       typedef std::set<std::string> PropertyNameSet;

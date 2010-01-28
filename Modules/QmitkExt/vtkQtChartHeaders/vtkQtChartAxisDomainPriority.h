@@ -25,6 +25,7 @@
 #define _vtkQtChartAxisDomainPriority_h
 
 #include "vtkQtChartExport.h"
+#include "QmitkExtExports.h"
 #include <QList> // Needed for parameter and return type.
 
 

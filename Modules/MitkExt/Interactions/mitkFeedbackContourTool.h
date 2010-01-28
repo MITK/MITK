@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define mitkFeedbackContourTool_h_Included
 
 #include "mitkCommon.h"
+#include "MitkExtExports.h"
 #include "mitkSegTool2D.h"
 #include "mitkContour.h"
 #include "mitkContourUtils.h"
@@ -51,7 +52,7 @@ namespace mitk
 
   $Author: nolden $
 */
-class MITKEXT_CORE_EXPORT FeedbackContourTool : public SegTool2D
+class MitkExt_EXPORT FeedbackContourTool : public SegTool2D
 {
   public:
     

@@ -25,6 +25,7 @@
 #define _vtkQtChartAxisLayer_h
 
 #include "vtkQtChartExport.h"
+#include "QmitkExtExports.h"
 #include "vtkQtChartLayer.h"
 #include "vtkQtChartAxis.h" // Needed for enum
 

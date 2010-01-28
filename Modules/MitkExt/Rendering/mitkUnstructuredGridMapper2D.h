@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define MitkPointSetSliceLMapper2D_H
 
 #include "mitkCommon.h"
+#include "MitkExtExports.h"
 #include "mitkGLMapper2D.h"
 #include "mitkTransferFunction.h"
 #include "mitkProperties.h"
@@ -45,7 +46,7 @@ class BaseRenderer;
  * normally a line. This class can be added to any data object, which is 
  * rendered in 3D via a vtkPolyData.
  */
-class MITKEXT_CORE_EXPORT UnstructuredGridMapper2D : public GLMapper2D
+class MitkExt_EXPORT UnstructuredGridMapper2D : public GLMapper2D
 {
 public:
 

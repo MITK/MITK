@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define QMITKSLICEWIDGET_H_
 
 #include "ui_QmitkSliceWidget.h"
+#include "QmitkExtExports.h"
 
 #include "QmitkRenderWindow.h"
 #include "mitkSliceNavigationController.h"
@@ -27,7 +28,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <QWidget>
 
-class QMITKEXT_EXPORT QmitkSliceWidget : public QWidget, public Ui::QmitkSliceWidgetUi
+class QmitkExt_EXPORT QmitkSliceWidget : public QWidget, public Ui::QmitkSliceWidgetUi
 {
   Q_OBJECT
 

@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkFillRegionTool.xpm"
 
 namespace mitk {
-  MITK_TOOL_MACRO(MITKEXT_CORE_EXPORT, FillRegionTool, "Fill tool");
+  MITK_TOOL_MACRO(MitkExt_EXPORT, FillRegionTool, "Fill tool");
 }
 
 mitk::FillRegionTool::FillRegionTool()

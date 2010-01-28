@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define mitkEraseRegionTool_h_Included
 
 #include "mitkSetRegionTool.h"
+#include "MitkExtExports.h"
 
 namespace mitk
 {
@@ -38,7 +39,7 @@ namespace mitk
 
   $Author$
 */
-class MITKEXT_CORE_EXPORT EraseRegionTool : public SetRegionTool
+class MitkExt_EXPORT EraseRegionTool : public SetRegionTool
 {
   public:
     

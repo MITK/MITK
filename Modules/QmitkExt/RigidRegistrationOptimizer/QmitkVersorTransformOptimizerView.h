@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define QmitkVersorTransformOptimizerViewWidgetHIncluded
 
 #include "ui_QmitkVersorTransformOptimizerControls.h"
+#include "QmitkExtExports.h"
 #include "QmitkRigidRegistrationOptimizerGUIBase.h"
 #include <itkArray.h>
 #include <itkObject.h>
@@ -30,7 +31,7 @@ PURPOSE.  See the above copyright notices for more information.
 *
 * Displays options for rigid registration.
 */
-class QMITKEXT_EXPORT QmitkVersorTransformOptimizerView : public QmitkRigidRegistrationOptimizerGUIBase
+class QmitkExt_EXPORT QmitkVersorTransformOptimizerView : public QmitkRigidRegistrationOptimizerGUIBase
 {
 
 public:

@@ -20,13 +20,14 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKSOCKETCLIENTIMPLEMENTATION_H
 
 #include "mitkCommon.h"
+#include "MitkExtExports.h"
    
 namespace mitk 
 {
 
   //##Documentation
   //## @brief GUI indepentent Interface for all Gui depentent implementations of a ProgressBar.
-  class MITKEXT_CORE_EXPORT SocketClientImplementation
+  class MitkExt_EXPORT SocketClientImplementation
   {
 
   public:

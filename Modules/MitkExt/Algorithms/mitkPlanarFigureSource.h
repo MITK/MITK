@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKPlanarFigureSOURCE_H_HEADER_INCLUDED
 
 #include "mitkPlanarFigure.h"
+#include "MitkExtExports.h"
 #include "mitkCommon.h"
 #include "mitkBaseProcess.h"
 
@@ -35,7 +36,7 @@ namespace mitk
  * possible region.
  * @ingroup Process
  */
-  class MITKEXT_CORE_EXPORT PlanarFigureSource : public mitk::BaseProcess
+  class MitkExt_EXPORT PlanarFigureSource : public mitk::BaseProcess
 {
 public:
     mitkClassMacro( PlanarFigureSource, BaseProcess );

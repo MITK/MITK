@@ -19,10 +19,11 @@ PURPOSE.  See the above copyright notices for more information.
 #define QMITKPRIMITIVEMOVIENAVIGATORWIDGET_H_
 
 #include <ui_QmitkPrimitiveMovieNavigatorWidget.h>
+#include "QmitkExtExports.h"
 #include <QWidget>
 #include <QTimer>
 
-class QMITKEXT_EXPORT QmitkPrimitiveMovieNavigatorWidget : public QWidget//, public Ui::QmitkPrimitiveMovieNavigator
+class QmitkExt_EXPORT QmitkPrimitiveMovieNavigatorWidget : public QWidget//, public Ui::QmitkPrimitiveMovieNavigator
 {
     Q_OBJECT
 

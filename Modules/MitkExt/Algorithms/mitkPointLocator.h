@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define _MITK_POINT_LOCATOR__H__
 
 #include <itkObject.h>
+#include "MitkExtExports.h"
 
 #include "mitkPointSet.h"
 
@@ -42,7 +43,7 @@ namespace mitk
  * NOTE: At least 1 point must be contained in the point set.
  */
 
-class MITKEXT_CORE_EXPORT PointLocator : public itk::Object
+class MitkExt_EXPORT PointLocator : public itk::Object
 {
 public:
     

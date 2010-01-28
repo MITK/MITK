@@ -76,6 +76,7 @@ void ITK_EXPORT GenerateTimeInInputRegion(const TOutputData* output, TInputData*
 
 //#ifndef ITK_MANUAL_INSTANTIATION
 //#include "mitkTimeHelper.txx"
+#include "MitkExtExports.h"
 //#endif
 
 #endif // MITKTIMEHELPER_H_HEADER_INCLUDED_C1C2FCD2

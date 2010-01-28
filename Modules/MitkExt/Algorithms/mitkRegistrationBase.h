@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKREGISTRATIONBASE_H
 
 #include "mitkImageToImageFilter.h"
+#include "MitkExtExports.h"
 
 namespace mitk {
 
@@ -32,7 +33,7 @@ namespace mitk {
   \author Daniel Stein
   */
 
-  class MITKEXT_CORE_EXPORT RegistrationBase : public ImageToImageFilter
+  class MitkExt_EXPORT RegistrationBase : public ImageToImageFilter
   {
   public:
     mitkClassMacro(RegistrationBase, ImageToImageFilter);

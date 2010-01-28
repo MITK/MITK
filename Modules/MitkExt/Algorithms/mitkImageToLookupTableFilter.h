@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define _MITK_IMAGE_TO_LOOKUP_TABLE_FILTER__H_
 
 #include <mitkLookupTableSource.h>
+#include "MitkExtExports.h"
 #include <mitkImage.h>
 
 namespace mitk
@@ -28,7 +29,7 @@ namespace mitk
 * Creates a mitk::LookupTable from an image. This may be used to 
 * create a default coloring scheme for vector images...
 */
-class MITKEXT_CORE_EXPORT ImageToLookupTableFilter : public LookupTableSource
+class MitkExt_EXPORT ImageToLookupTableFilter : public LookupTableSource
 {
 public:
 

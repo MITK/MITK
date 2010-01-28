@@ -41,12 +41,13 @@ PURPOSE.  See the above copyright notices for more information.
 */
 
 #include <qobject.h>
+#include "QmitkExtExports.h"
 #include "QmitkBaseComponent.h"
 #include "mitkDataTreeNode.h"
 #include <mitkDataStorage.h>
 
 
-class QMITKEXT_EXPORT QmitkBaseFunctionalityComponent : public QmitkBaseComponent
+class QmitkExt_EXPORT QmitkBaseFunctionalityComponent : public QmitkBaseComponent
 {
   Q_OBJECT
 

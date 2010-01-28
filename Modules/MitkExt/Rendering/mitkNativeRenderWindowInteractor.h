@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKNATIVERENDERWINDOWINTERACTOR_H_HEADER_INCLUDED_C1C53722
 
 #include "mitkCommon.h"
+#include "MitkExtExports.h"
 #include "itkObject.h"
 #include "itkObjectFactory.h"
 
@@ -29,7 +30,7 @@ class vtkRenderWindowInteractor;
 namespace mitk
 {
 
-class MITKEXT_CORE_EXPORT NativeRenderWindowInteractor : public itk::Object
+class MitkExt_EXPORT NativeRenderWindowInteractor : public itk::Object
 {
 public:
   mitkClassMacro(NativeRenderWindowInteractor, itk::Object);

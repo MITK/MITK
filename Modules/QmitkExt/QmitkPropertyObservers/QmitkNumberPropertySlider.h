@@ -18,11 +18,12 @@ PURPOSE.  See the above copyright notices for more information.
 #define QmitkNumberPropertySliderhincludecd
 
 #include <mitkPropertyObserver.h>
+#include "QmitkExtExports.h"
 #include <mitkProperties.h>
 #include <qslider.h>
 
 /// @ingroup Widgets
-class QMITKEXT_EXPORT QmitkNumberPropertySlider : public QSlider, public mitk::PropertyEditor
+class QmitkExt_EXPORT QmitkNumberPropertySlider : public QSlider, public mitk::PropertyEditor
 {
   Q_OBJECT
   Q_PROPERTY( short decimalPlaces READ getDecimalPlaces WRITE setDecimalPlaces )

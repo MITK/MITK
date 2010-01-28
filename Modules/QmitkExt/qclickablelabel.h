@@ -21,6 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define qclickablelabelhincluded
 
 #include <QLabel>
+#include "QmitkExtExports.h"
 
 #include <vector>
 #include <map>
@@ -33,7 +34,7 @@ PURPOSE.  See the above copyright notices for more information.
   Specially useful in connection with a pixmap.
   Stretched images should be avoided, because the hotspots will not be adjusted in any way.
 */
-class QMITKEXT_EXPORT QClickableLabel : public QLabel
+class QmitkExt_EXPORT QClickableLabel : public QLabel
 {
   Q_OBJECT
 

@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKOPTIMIZERPARAMETERS_H
 
 #include <itkArray.h>
+#include "MitkExtExports.h"
 #include <itkObjectFactory.h>
 #include "mitkCommon.h"
 
@@ -39,7 +40,7 @@ namespace mitk {
 
   \author Daniel Stein
   */
-  class MITKEXT_CORE_EXPORT OptimizerParameters : public ::itk::Object
+  class MitkExt_EXPORT OptimizerParameters : public ::itk::Object
   {
   public:
 

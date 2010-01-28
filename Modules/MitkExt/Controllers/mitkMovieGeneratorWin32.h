@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define MovieGeneratorWin32WIN32_H_HEADER_INCLUDED
 
 #include "mitkMovieGenerator.h"
+#include "MitkExtExports.h"
 #include <comdef.h>
 #include <memory.h>
 #include <tchar.h>
@@ -32,7 +33,7 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk {
 
 
-class MITKEXT_CORE_EXPORT MovieGeneratorWin32 : public MovieGenerator
+class MitkExt_EXPORT MovieGeneratorWin32 : public MovieGenerator
 {
 
 public:

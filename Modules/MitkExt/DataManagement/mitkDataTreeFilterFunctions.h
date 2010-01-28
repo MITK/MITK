@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITK_DATATREEFILTERFUNCTOINS_H_INCLUDED
 
 #include <mitkDataTreeNode.h>
+#include "MitkExtExports.h"
 
 #include <mitkProperties.h>
 #include <mitkDataStorage.h>
@@ -33,7 +34,7 @@ namespace mitk
     the object, and the NodeMatches() method. NodeMatches() will receive a
     mitk::DataTreeNode* everytime it is called, and should return true. <b>This pointer can be NULL</b>. 
   */
-   class MITKEXT_CORE_EXPORT DataTreeFilterFunction
+   class MitkExt_EXPORT DataTreeFilterFunction
   {
     public:
       virtual ~DataTreeFilterFunction() {}
@@ -196,7 +197,7 @@ namespace mitk
      treeFilter->SetFilter( mitk::IsBaseDataTypeWithoutProperty<mitk::Image>("segmentation") );
     \endcode
   */
-  class MITKEXT_CORE_EXPORT IsDataTreeNode : public DataTreeFilterFunction
+  class MitkExt_EXPORT IsDataTreeNode : public DataTreeFilterFunction
   {
     public:
       virtual ~IsDataTreeNode() {}
@@ -211,7 +212,7 @@ namespace mitk
      treeFilter->SetFilter( mitk::IsBaseDataTypeWithoutProperty<mitk::Image>("segmentation") );
     \endcode
   */
-  class MITKEXT_CORE_EXPORT IsGoodDataTreeNode : public DataTreeFilterFunction
+  class MitkExt_EXPORT IsGoodDataTreeNode : public DataTreeFilterFunction
   {
     public:
       virtual ~IsGoodDataTreeNode() {}
@@ -226,7 +227,7 @@ namespace mitk
      treeFilter->SetFilter( mitk::IsBaseDataTypeWithoutProperty<mitk::Image>("segmentation") );
     \endcode
   */
-  class MITKEXT_CORE_EXPORT IsInResultSet : public DataTreeFilterFunction
+  class MitkExt_EXPORT IsInResultSet : public DataTreeFilterFunction
   {
     public:
       IsInResultSet( std::set<const DataTreeNode*> rs )

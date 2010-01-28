@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKMESH_H_HEADER_INCLUDED
 
 #include "mitkPointSet.h"
+#include "MitkExtExports.h"
 
 #include <vtkCellArray.h>
 #include <vtkFloatArray.h>
@@ -56,7 +57,7 @@ namespace mitk {
  *
  * \ingroup Data
  */
-class MITKEXT_CORE_EXPORT Mesh : public PointSet
+class MitkExt_EXPORT Mesh : public PointSet
 {
 public:
   mitkClassMacro(Mesh, PointSet);

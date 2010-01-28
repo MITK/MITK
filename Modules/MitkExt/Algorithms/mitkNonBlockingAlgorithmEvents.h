@@ -19,12 +19,13 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITK_NON_BLOCKING_ALGORHITHMS_ENVETS_H_INCLDUED
 
 #include <itkEventObject.h>
+#include "MitkExtExports.h"
 
 namespace mitk {
 
   class NonBlockingAlgorithm;
 
-  class MITKEXT_CORE_EXPORT NonBlockingAlgorithmEvent : public itk::AnyEvent
+  class MitkExt_EXPORT NonBlockingAlgorithmEvent : public itk::AnyEvent
   { 
   public: 
     typedef NonBlockingAlgorithmEvent Self; 
@@ -66,7 +67,7 @@ namespace mitk {
   };
 
 
-  class MITKEXT_CORE_EXPORT ResultAvailable : public NonBlockingAlgorithmEvent
+  class MitkExt_EXPORT ResultAvailable : public NonBlockingAlgorithmEvent
   {
     public:
 
@@ -80,7 +81,7 @@ namespace mitk {
       }
   };
 
-  class MITKEXT_CORE_EXPORT ProcessingError : public NonBlockingAlgorithmEvent
+  class MitkExt_EXPORT ProcessingError : public NonBlockingAlgorithmEvent
   {
     public:
 

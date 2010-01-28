@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKLINEOPERATION_H_INCLUDED
 
 #include "mitkCommon.h"
+#include "MitkExtExports.h"
 #include "mitkCellOperation.h"
 
 
@@ -30,7 +31,7 @@ namespace mitk {
   //##
   //## Stores everything for de-/ selecting, inserting , moving and removing a line.
   //## @ingroup Undo
-  class MITKEXT_CORE_EXPORT LineOperation : public mitk::CellOperation
+  class MitkExt_EXPORT LineOperation : public mitk::CellOperation
   {
   public:
     mitkClassMacro(LineOperation, CellOperation);

@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define _VTKPOINTSETSLICER_H_
 
 #include <iostream>
+#include "MitkExtExports.h"
 
 #include "vtkVersion.h"
 
@@ -33,10 +34,11 @@ class vtkPointData;
 class vtkCellData;
 
 #include "mitkCommon.h"
+#include "MitkExtExports.h"
 
 #include "vtkPolyDataAlgorithm.h"
 
-class MITKEXT_CORE_EXPORT vtkPointSetSlicer : public vtkPolyDataAlgorithm
+class MitkExt_EXPORT vtkPointSetSlicer : public vtkPolyDataAlgorithm
 {
 public:
   vtkTypeMacro(vtkPointSetSlicer,vtkPolyDataAlgorithm);

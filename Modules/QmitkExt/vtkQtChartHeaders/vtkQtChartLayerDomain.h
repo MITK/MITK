@@ -25,6 +25,7 @@
 #define _vtkQtChartLayerDomain_h
 
 #include "vtkQtChartExport.h"
+#include "QmitkExtExports.h"
 #include "vtkQtChartLayer.h" // needed for enum
 
 class vtkQtChartAxisCornerDomain;

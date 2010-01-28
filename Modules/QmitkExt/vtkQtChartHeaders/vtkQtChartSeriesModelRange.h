@@ -25,6 +25,7 @@
 #define _vtkQtChartSeriesModelRange_h
 
 #include "vtkQtChartExport.h"
+#include "QmitkExtExports.h"
 #include <QObject>
 #include <QList>    // Needed for return type.
 #include <QVariant> // Needed for return type.

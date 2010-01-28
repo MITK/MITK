@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define QmitkCalculateGrayValueStatisticsToolGUI_h_Included
 
 #include "QmitkToolGUI.h"
+#include "QmitkExtExports.h"
 
 #include "mitkCalculateGrayValueStatisticsTool.h"
 
@@ -31,7 +32,7 @@ PURPOSE.  See the above copyright notices for more information.
 
   Last contributor: $Author$
 */
-class QMITKEXT_EXPORT QmitkCalculateGrayValueStatisticsToolGUI : public QmitkToolGUI
+class QmitkExt_EXPORT QmitkCalculateGrayValueStatisticsToolGUI : public QmitkToolGUI
 {
   Q_OBJECT
 

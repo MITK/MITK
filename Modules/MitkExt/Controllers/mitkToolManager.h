@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define mitkToolManager_h_Included
 
 #include "mitkTool.h"
+#include "MitkExtExports.h"
 #include "mitkDataTreeNode.h"
 #include "mitkDataStorage.h"
 #include "mitkWeakPointer.h"
@@ -81,7 +82,7 @@ class PlaneGeometry;
 
   $Author$
 */
-class MITKEXT_CORE_EXPORT ToolManager : public itk::Object
+class MitkExt_EXPORT ToolManager : public itk::Object
 {
   public:
 

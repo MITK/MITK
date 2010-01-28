@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKCELLOPERATION_H_INCLUDED
 
 #include "mitkCommon.h"
+#include "MitkExtExports.h"
 #include "mitkOperation.h"
 #include "mitkVector.h"
 
@@ -29,7 +30,7 @@ namespace mitk {
 //## @brief Operation, that holds everything necessary for an operation on a cell.
 //##
 //## @ingroup Undo
-class MITKEXT_CORE_EXPORT CellOperation : public Operation
+class MitkExt_EXPORT CellOperation : public Operation
 {
   public:
     mitkClassMacro(CellOperation, Operation);

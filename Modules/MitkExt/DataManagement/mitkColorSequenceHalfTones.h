@@ -18,10 +18,11 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKCOLORSEQUENCEHALFTONES_H_URTESEINDEUTIGEKENNUNG_03
 
 #include "mitkColorSequence.h"
+#include "MitkExtExports.h"
 
 namespace mitk
 {
-  class MITKEXT_CORE_EXPORT ColorSequenceHalfTones : public ColorSequence
+  class MitkExt_EXPORT ColorSequenceHalfTones : public ColorSequence
   {
     public:
     ColorSequenceHalfTones();

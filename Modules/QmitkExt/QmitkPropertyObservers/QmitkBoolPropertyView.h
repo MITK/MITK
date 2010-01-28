@@ -18,11 +18,12 @@ PURPOSE.  See the above copyright notices for more information.
 #define QMITK_BOOLPROPERTYVIEW_H_INCLUDED
 
 #include <mitkPropertyObserver.h>
+#include "QmitkExtExports.h"
 #include <mitkProperties.h>
 #include <QCheckBox>
 
 /// @ingroup Widgets
-class QMITKEXT_EXPORT QmitkBoolPropertyView : public QCheckBox, public mitk::PropertyView
+class QmitkExt_EXPORT QmitkBoolPropertyView : public QCheckBox, public mitk::PropertyView
 {
   Q_OBJECT
 

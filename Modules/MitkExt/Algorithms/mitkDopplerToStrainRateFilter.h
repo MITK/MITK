@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKDOPPLERTOSTRAINRATEFILTER_H_HEADER_INCLUDED_C1F48A22
 
 #include "mitkCommon.h"
+#include "MitkExtExports.h"
 #include "mitkImageToImageFilter.h"
 
 #ifndef M_PI
@@ -31,7 +32,7 @@ namespace mitk {
 //## @brief 
 //## @ingroup Process
 
-class MITKEXT_CORE_EXPORT DopplerToStrainRateFilter : public ImageToImageFilter
+class MitkExt_EXPORT DopplerToStrainRateFilter : public ImageToImageFilter
 {
 public:
   mitkClassMacro(DopplerToStrainRateFilter, ImageToImageFilter);

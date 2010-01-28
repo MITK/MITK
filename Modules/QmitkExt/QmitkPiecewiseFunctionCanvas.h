@@ -19,10 +19,11 @@
 #define QMITKPIECEWISEFUNCTIONCANVAS_H_INCLUDED
 
 #include "QmitkTransferFunctionCanvas.h"
+#include "QmitkExtExports.h"
 
 #include <vtkPiecewiseFunction.h>
 
-class QMITKEXT_EXPORT QmitkPiecewiseFunctionCanvas: public QmitkTransferFunctionCanvas
+class QmitkExt_EXPORT QmitkPiecewiseFunctionCanvas: public QmitkTransferFunctionCanvas
 {
 Q_OBJECT
 

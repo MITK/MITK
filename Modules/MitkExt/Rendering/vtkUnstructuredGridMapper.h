@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define __vtkUnstructuredGridMapper_h
 
 #include "mitkCommon.h"
+#include "MitkExtExports.h"
 #include "mitkBoundingObject.h"
 
 #include "vtkMapper.h"
@@ -27,7 +28,7 @@ class vtkPolyDataMapper;
 class vtkGeometryFilter;
 class vtkUnstructuredGrid;
 
-class MITKEXT_CORE_EXPORT vtkUnstructuredGridMapper : public vtkMapper 
+class MitkExt_EXPORT vtkUnstructuredGridMapper : public vtkMapper 
 {
 public:
   static vtkUnstructuredGridMapper *New();

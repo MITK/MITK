@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #endif
 
 #include "itkObjectFactoryBase.h"
+#include "MitkExtExports.h"
 
 namespace mitk
 {
@@ -29,7 +30,7 @@ namespace mitk
 //## @brief Create instances of DICOMFileReader objects using an object factory.
 //##
 //## @ingroup IO
-class MITKEXT_CORE_EXPORT DICOMFileIOFactory : public itk::ObjectFactoryBase
+class MitkExt_EXPORT DICOMFileIOFactory : public itk::ObjectFactoryBase
 {
 public:  
   /** Standard class typedefs. */

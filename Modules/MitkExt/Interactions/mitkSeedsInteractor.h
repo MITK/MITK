@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define __SeedsInteractor_H
 
 #include <mitkCommon.h>
+#include "MitkExtExports.h"
 #include <mitkInteractor.h>
 #include <mitkVector.h>
 #include <mitkImageAccessByItk.h>//needed by QmitkSimplexMeshes (SMDeformation.cpp and LungSegmentation.cpp)
@@ -31,7 +32,7 @@ namespace mitk {
   //##Documentation
   //## @brief SeedsInteractor handles all actions on the seedsimage
   //## @ingroup Interaction
-  class MITKEXT_CORE_EXPORT SeedsInteractor : public Interactor
+  class MitkExt_EXPORT SeedsInteractor : public Interactor
   {
   public:
     mitkClassMacro(SeedsInteractor, Interactor);

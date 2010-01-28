@@ -25,6 +25,7 @@
 #define _vtkQtChartContentsArea_h
 
 #include "vtkQtChartExport.h"
+#include "QmitkExtExports.h"
 #include <QGraphicsItem>
 
 #include "vtkQtChartGraphicsItemTypes.h" // needed for enum

@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKLINEMAPPER2D_H_HEADER_INCLUDED
 
 #include "mitkCommon.h"
+#include "MitkExtExports.h"
 #include "mitkPointSetMapper2D.h"
 //#include "mitkDataTree.h"
 
@@ -34,7 +35,7 @@ class PointSet;
 //## uses the information from the PointSet to build up the lines. 
 //## Only lines in 2D in one Slice are drawn, not between slices!
 //## @ingroup Mapper
-class MITKEXT_CORE_EXPORT LineMapper2D : public PointSetMapper2D
+class MitkExt_EXPORT LineMapper2D : public PointSetMapper2D
 {
 public:
   mitkClassMacro(LineMapper2D, PointSetMapper2D);

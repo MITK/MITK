@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKHISTOGRAMMATCHING_H
 
 #include "itkHistogramMatchingImageFilter.h"
+#include "MitkExtExports.h"
 
 #include "mitkRegistrationBase.h"
 #include "mitkImageAccessByItk.h"
@@ -35,7 +36,7 @@ namespace mitk
   \author Daniel Stein
   */
 
-  class MITKEXT_CORE_EXPORT HistogramMatching : public RegistrationBase
+  class MitkExt_EXPORT HistogramMatching : public RegistrationBase
   {
 
   public:

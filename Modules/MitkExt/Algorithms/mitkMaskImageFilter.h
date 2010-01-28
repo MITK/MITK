@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKMASKIMAGEFILTER_H_HEADER_INCLUDED_C1F48A22
 
 #include "mitkCommon.h"
+#include "MitkExtExports.h"
 #include "mitkImageToImageFilter.h"
 #include "mitkImageTimeSelector.h"
 
@@ -32,7 +33,7 @@ namespace mitk {
 //##Documentation
 //## @brief 
 //## @ingroup Process
-class MITKEXT_CORE_EXPORT MaskImageFilter : public ImageToImageFilter
+class MitkExt_EXPORT MaskImageFilter : public ImageToImageFilter
 {
 public:
   mitkClassMacro(MaskImageFilter, ImageToImageFilter);

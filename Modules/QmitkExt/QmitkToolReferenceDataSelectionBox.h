@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define QmitkToolReferenceDataSelectionBox_h_Included
 
 #include "mitkToolManager.h"
+#include "QmitkExtExports.h"
 #include "mitkDataStorage.h"
 
 #include <QWidget>
@@ -43,7 +44,7 @@ The reference image can be selected from a combobox, where all images of the sce
 
 $Author: maleike $
 */
-class QMITKEXT_EXPORT QmitkToolReferenceDataSelectionBox : public QWidget
+class QmitkExt_EXPORT QmitkToolReferenceDataSelectionBox : public QWidget
 {
   Q_OBJECT
 

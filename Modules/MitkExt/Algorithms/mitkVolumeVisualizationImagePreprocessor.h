@@ -21,6 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkCommon.h"
+#include "MitkExtExports.h"
 
 
 #include "mitkImageCast.h"
@@ -54,7 +55,7 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk
 {
 
-class MITKEXT_CORE_EXPORT VolumeVisualizationImagePreprocessor : public itk::Object
+class MitkExt_EXPORT VolumeVisualizationImagePreprocessor : public itk::Object
 {
 public:
 

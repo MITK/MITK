@@ -18,11 +18,12 @@ PURPOSE.  See the above copyright notices for more information.
 #define QMITK_STRINGPROPERTYONDEMANDDEDITOR_H_INCLUDED
 
 #include <mitkPropertyObserver.h>
+#include "QmitkExtExports.h"
 #include <mitkStringProperty.h>
 #include <QLayout>
 #include <QLabel>
 
-class QMITKEXT_EXPORT QClickableLabel2 : public QLabel
+class QmitkExt_EXPORT QClickableLabel2 : public QLabel
 {
   Q_OBJECT
 
@@ -44,7 +45,7 @@ class QMITKEXT_EXPORT QClickableLabel2 : public QLabel
 
 
 /// @ingroup Widgets
-class QMITKEXT_EXPORT QmitkStringPropertyOnDemandEdit : public QFrame, public mitk::PropertyEditor
+class QmitkExt_EXPORT QmitkStringPropertyOnDemandEdit : public QFrame, public mitk::PropertyEditor
 {
   Q_OBJECT
 

@@ -25,7 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkToolManager.h"
 
 namespace mitk {
-  MITK_TOOL_MACRO(MITKEXT_CORE_EXPORT, CalculateVolumetryTool, "Volumetry tool");
+  MITK_TOOL_MACRO(MitkExt_EXPORT, CalculateVolumetryTool, "Volumetry tool");
 }
 
 mitk::CalculateVolumetryTool::CalculateVolumetryTool()

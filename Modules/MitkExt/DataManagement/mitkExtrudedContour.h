@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKEXTRUDEDCONTOUR_H_HEADER_INCLUDED
 
 #include "mitkBoundingObject.h"
+#include "MitkExtExports.h"
 #include <mitkContour.h>
 #include <vtkConfigure.h>
 #include <mitkPlaneGeometry.h>
@@ -41,7 +42,7 @@ namespace mitk {
 //## The m_Contour is extruded in the direction m_Vector until
 //## reaching m_ClippingGeometry.
 //## @ingroup Data
-class MITKEXT_CORE_EXPORT ExtrudedContour : public BoundingObject
+class MitkExt_EXPORT ExtrudedContour : public BoundingObject
 {
 public:
   mitkClassMacro(ExtrudedContour, BoundingObject);  

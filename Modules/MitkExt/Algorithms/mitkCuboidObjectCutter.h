@@ -19,12 +19,13 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKCUBOIDOBJECTCUTTER_H_
 
 #include <mitkBoundingObjectCutter.h>
+#include "MitkExtExports.h"
 #include <mitkCuboid.h>
 
 namespace mitk
 {
 
-class MITKEXT_CORE_EXPORT CuboidObjectCutter : public BoundingObjectCutter
+class MitkExt_EXPORT CuboidObjectCutter : public BoundingObjectCutter
 {
 public:
   mitkClassMacro(CuboidObjectCutter, BoundingObjectCutter);

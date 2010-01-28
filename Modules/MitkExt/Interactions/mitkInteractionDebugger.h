@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKINTERACTIONDEBUGGER_H
 
 #include <itkObject.h>
+#include "MitkExtExports.h"
 #include "mitkCommon.h"
 
 
@@ -30,7 +31,7 @@ namespace mitk{
   * prints out recieved text in a sorted way
   * @ingroup Interaction
   */
-  class MITKEXT_CORE_EXPORT InteractionDebugger : public itk::Object
+  class MitkExt_EXPORT InteractionDebugger : public itk::Object
   {
   public:
     /**

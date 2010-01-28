@@ -19,6 +19,7 @@
 #define __itkBSplineDeformableTransformInitializer_h
 
 #include "itkObject.h"
+#include "MitkExtExports.h"
 #include "itkObjectFactory.h"
 
 #include <iostream>

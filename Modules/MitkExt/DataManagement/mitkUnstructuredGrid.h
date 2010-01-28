@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define _MITK_UNSTRUCTURED_GRID_H_
 
 #include "mitkBaseData.h"
+#include "MitkExtExports.h"
 #include "itkImageRegion.h"
 
 class vtkUnstructuredGrid;
@@ -29,7 +30,7 @@ namespace mitk {
 //##Documentation
 //## @brief Class for storing unstructured grids (vtkUnstructuredGrid)
 //## @ingroup Data
-class MITKEXT_CORE_EXPORT UnstructuredGrid : public BaseData
+class MitkExt_EXPORT UnstructuredGrid : public BaseData
 {
 
 public:

@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define QmitkPointListWidgetHIncluded
 
 #include "mitkDataTreeNode.h"
+#include "QmitkExtExports.h"
 #include "mitkPointSetInteractor.h"
 
 #include "QmitkPointListView.h"
@@ -47,7 +48,7 @@ class QPushButton;
  * currently selected point, the widget user has to provide
  * a QmitkStdMultiWidget object.
  */
-class QMITKEXT_EXPORT QmitkPointListWidget : public QWidget
+class QmitkExt_EXPORT QmitkPointListWidget : public QWidget
 {
   Q_OBJECT
 

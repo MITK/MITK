@@ -1,5 +1,5 @@
 <ui version="4.0" >
- <exportmacro>QMITKEXT_EXPORT</exportmacro>
+ <exportmacro>QmitkExt_EXPORT</exportmacro>
  <class>QmitkThresholdComponentControls</class>
  <widget class="QWidget" name="QmitkThresholdComponentControls" >
   <property name="geometry" >

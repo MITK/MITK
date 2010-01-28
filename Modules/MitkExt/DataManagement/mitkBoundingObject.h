@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define BOUNDINGOBJECT_H_HEADER_INCLUDED
 
 #include <mitkSurface.h>
+#include "MitkExtExports.h"
 
 namespace mitk {
 
@@ -29,7 +30,7 @@ namespace mitk {
 //## Manages generic functions and provides an interface for IsInside()
 //## calculates a generic bounding box
 //## @ingroup Data
-class MITKEXT_CORE_EXPORT BoundingObject : public mitk::Surface     //BaseData
+class MitkExt_EXPORT BoundingObject : public mitk::Surface     //BaseData
 {
 public:
   mitkClassMacro(BoundingObject, mitk::Surface);  

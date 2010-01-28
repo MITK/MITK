@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define UNSTRUCTURED_GIRD_HISTOGRAM_H_HEADER_INCLUDED
 
 #include <itkHistogram.h>
+#include "MitkExtExports.h"
 #include "mitkUnstructuredGrid.h"
 
 namespace mitk {
@@ -26,7 +27,7 @@ namespace mitk {
 //##Documentation
 //## @brief Subclass of itk::Histogram, specialized for a mitk::UnstructuredGrid
 //##
-class MITKEXT_CORE_EXPORT UnstructuredGridHistogram : public itk::Statistics::Histogram<double>
+class MitkExt_EXPORT UnstructuredGridHistogram : public itk::Statistics::Histogram<double>
 {
 public:
   mitkClassMacro(UnstructuredGridHistogram,itk::Statistics::Histogram<double>);

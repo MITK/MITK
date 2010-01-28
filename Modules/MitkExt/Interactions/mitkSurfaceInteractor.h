@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKSURFACEINTERACTOR_H_HEADER_INCLUDED
 
 #include "mitkAffineInteractor.h"
+#include "MitkExtExports.h"
 #include "mitkPointLocator.h"
 
 namespace mitk {
@@ -31,7 +32,7 @@ namespace mitk {
   //## by modifying its geometry. The surface closest to the picking point is
   //## chosen for interaction automatically by CalculateJurisdiction
   //## @ingroup Interaction
-  class MITKEXT_CORE_EXPORT SurfaceInteractor : public AffineInteractor
+  class MitkExt_EXPORT SurfaceInteractor : public AffineInteractor
   {
   public:
     mitkClassMacro(SurfaceInteractor,AffineInteractor);

@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKDRAWOPERATION_H
 
 #include <mitkCommon.h>
+#include "MitkExtExports.h"
 #include <mitkOperation.h>
 #include <mitkVector.h>
 #include <mitkImage.h>
@@ -32,7 +33,7 @@ namespace mitk {
 //##
 //## Stores everything for adding and deleting seeds.
 //## @ingroup Undo
-class MITKEXT_CORE_EXPORT DrawOperation : public Operation
+class MitkExt_EXPORT DrawOperation : public Operation
 {
   public:
   //##Documentation

@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define QmitkPaintbrushToolGUI_h_Included
 
 #include "QmitkToolGUI.h"
+#include "QmitkExtExports.h"
 #include "mitkPaintbrushTool.h"
 
 class QSlider;
@@ -35,7 +36,7 @@ class QFrame;
 
   Last contributor: $Author$
 */
-class QMITKEXT_EXPORT QmitkPaintbrushToolGUI : public QmitkToolGUI
+class QmitkExt_EXPORT QmitkPaintbrushToolGUI : public QmitkToolGUI
 {
   Q_OBJECT
 

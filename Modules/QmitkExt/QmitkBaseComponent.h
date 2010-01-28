@@ -40,6 +40,7 @@ PURPOSE.  See the above copyright notices for more information.
 */
 
 #include <qstring.h>
+#include "QmitkExtExports.h"
 #include <qobject.h>
 #include <vector>
 #include <mitkCommon.h>
@@ -47,7 +48,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 class QGroupBox;
 
-class QMITKEXT_EXPORT QmitkBaseComponent : public QObject
+class QmitkExt_EXPORT QmitkBaseComponent : public QObject
 {
   Q_OBJECT
 

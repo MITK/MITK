@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define QmitkAmoebaOptimizerViewWidgetHIncluded
 
 #include "ui_QmitkAmoebaOptimizerControls.h"
+#include "QmitkExtExports.h"
 #include "QmitkRigidRegistrationOptimizerGUIBase.h"
 #include <itkArray.h>
 #include <itkObject.h>
@@ -32,7 +33,7 @@ class QLineEdit;
 *
 * Displays options for rigid registration.
 */
-class QMITKEXT_EXPORT QmitkAmoebaOptimizerView : public QmitkRigidRegistrationOptimizerGUIBase
+class QmitkExt_EXPORT QmitkAmoebaOptimizerView : public QmitkRigidRegistrationOptimizerGUIBase
 {
 
 public:

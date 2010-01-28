@@ -19,12 +19,13 @@ PURPOSE.  See the above copyright notices for more information.
 #define UNSTRUCTURED_GRID_WRITERFACTORY_H_HEADER_INCLUDED
 
 #include "itkObjectFactoryBase.h"
+#include "MitkExtExports.h"
 #include "mitkBaseData.h"
 
 namespace mitk
 {
 
-class MITKEXT_CORE_EXPORT UnstructuredGridVtkWriterFactory : public itk::ObjectFactoryBase
+class MitkExt_EXPORT UnstructuredGridVtkWriterFactory : public itk::ObjectFactoryBase
 {
 public:
 

@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define PLANECUTFILTER_H_HEADER_INCLUDED_C1F48A22
 
 #include "mitkCommon.h"
+#include "MitkExtExports.h"
 #include "mitkImageToImageFilter.h"
 #include "mitkPlaneGeometry.h"
 
@@ -36,7 +37,7 @@ namespace mitk {
         Everything in the direction of the normal
         of the planes (if fill mode is set to "FILL") will be set to a specified value.
  */
-class MITKEXT_CORE_EXPORT PlaneCutFilter : public ImageToImageFilter
+class MitkExt_EXPORT PlaneCutFilter : public ImageToImageFilter
 {
 public:
   mitkClassMacro(PlaneCutFilter, ImageToImageFilter);

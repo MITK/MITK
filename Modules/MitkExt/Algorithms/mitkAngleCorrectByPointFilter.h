@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKANGLECORRECTBYPOINTFILTER_H_HEADER_INCLUDED_C1F48A22
 
 #include "mitkCommon.h"
+#include "MitkExtExports.h"
 #include "mitkImageToImageFilter.h"
 #include "mitkVector.h"
 
@@ -28,7 +29,7 @@ namespace mitk {
 //##Documentation
 //## @brief 
 //## @ingroup Process
-class MITKEXT_CORE_EXPORT AngleCorrectByPointFilter : public ImageToImageFilter
+class MitkExt_EXPORT AngleCorrectByPointFilter : public ImageToImageFilter
 {
 public:
   mitkClassMacro(AngleCorrectByPointFilter, ImageToImageFilter);

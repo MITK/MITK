@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 // mmueller
 #include <Q3ListView>
+#include "QmitkExtExports.h"
 
 #include "mitkToolManager.h"
 #include "mitkProperties.h"
@@ -45,7 +46,7 @@ class QCustomEvent;
 
   $Author: maleike $
 */
-class QMITKEXT_EXPORT QmitkToolWorkingDataSelectionBox : public Q3ListView
+class QmitkExt_EXPORT QmitkToolWorkingDataSelectionBox : public Q3ListView
 {
   Q_OBJECT
 

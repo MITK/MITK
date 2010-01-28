@@ -25,6 +25,7 @@
 #define _vtkQtChartSeriesLayer_h
 
 #include "vtkQtChartExport.h"
+#include "QmitkExtExports.h"
 #include "vtkQtChartLayer.h"
 #include <QPixmap> // needed for return type
 

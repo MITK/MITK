@@ -19,10 +19,11 @@
 #define QMITKTCROSSWIDGET_H_INCLUDED
 
 #include <QLabel>
+#include "QmitkExtExports.h"
 
 #include <mitkCommon.h>
 
-class QMITKEXT_EXPORT QmitkCrossWidget : public QLabel
+class QmitkExt_EXPORT QmitkCrossWidget : public QLabel
 {
 
   Q_OBJECT

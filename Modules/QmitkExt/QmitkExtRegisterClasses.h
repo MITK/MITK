@@ -20,8 +20,9 @@ PURPOSE.  See the above copyright notices for more information.
 #define QmitkExtRegisterClassesHIncluded
 
 #include "mitkCommon.h"
+#include "QmitkExtExports.h"
 
-QMITKEXT_EXPORT void QmitkExtRegisterClasses();
+QmitkExt_EXPORT void QmitkExtRegisterClasses();
 
 #endif
 

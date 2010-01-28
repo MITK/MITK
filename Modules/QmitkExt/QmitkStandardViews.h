@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define QmitkStandardViews_h_included
 
 #include "mitkCommon.h"
+#include "QmitkExtExports.h"
 #include "mitkCameraController.h"
 
 #include <QWidget>
@@ -26,7 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 class QClickableLabel;
 class vtkRenderWindow;
 
-class QMITKEXT_EXPORT QmitkStandardViews : public QWidget 
+class QmitkExt_EXPORT QmitkStandardViews : public QWidget 
 {
 
   Q_OBJECT

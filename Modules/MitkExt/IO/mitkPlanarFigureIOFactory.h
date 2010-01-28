@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #endif
 
 #include "itkObjectFactoryBase.h"
+#include "MitkExtExports.h"
 #include "mitkBaseData.h"
 
 namespace mitk
@@ -30,7 +31,7 @@ namespace mitk
 //## @brief Create instances of PlanarFigureReader objects using an object factory.
 //##
 //## @ingroup IO
-class MITKEXT_CORE_EXPORT PlanarFigureIOFactory : public itk::ObjectFactoryBase
+class MitkExt_EXPORT PlanarFigureIOFactory : public itk::ObjectFactoryBase
 {
 public:  
   /** Standard class typedefs. */

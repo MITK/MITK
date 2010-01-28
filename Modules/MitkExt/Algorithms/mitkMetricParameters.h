@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKMETRICPARAMETERS_H
 
 #include <itkObjectFactory.h>
+#include "MitkExtExports.h"
 #include "mitkCommon.h"
 
 namespace mitk {
@@ -39,7 +40,7 @@ namespace mitk {
 
   \author Daniel Stein
   */
-  class MITKEXT_CORE_EXPORT MetricParameters : public itk::Object
+  class MitkExt_EXPORT MetricParameters : public itk::Object
   {
   public:
     mitkClassMacro(MetricParameters,::itk::Object);

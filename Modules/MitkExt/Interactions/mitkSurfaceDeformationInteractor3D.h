@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKSURFACEDEFORMATIONINTERACTOR3D_H_HEADER_INCLUDED
 
 #include "mitkInteractor.h"
+#include "MitkExtExports.h"
 #include "mitkCommon.h"
 
 #include <vtkType.h>
@@ -39,7 +40,7 @@ class Surface;
   *
   * \ingroup Interaction
   */
-class MITKEXT_CORE_EXPORT SurfaceDeformationInteractor3D : public Interactor
+class MitkExt_EXPORT SurfaceDeformationInteractor3D : public Interactor
 {
 public:
   mitkClassMacro(SurfaceDeformationInteractor3D, Interactor);

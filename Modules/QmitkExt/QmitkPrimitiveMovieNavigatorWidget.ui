@@ -1,5 +1,5 @@
 <ui version="4.0" >
- <exportmacro>QMITKEXT_EXPORT</exportmacro>
+ <exportmacro>QmitkExt_EXPORT</exportmacro>
  <class>QmitkPrimitiveMovieNavigator</class>
  <widget class="QWidget" name="QmitkPrimitiveMovieNavigator" >
   <property name="geometry" >
@@ -103,7 +103,7 @@
  </widget>
  <layoutdefault spacing="6" margin="11" />
  <includes>
-  <include location="local" >mitkCommon.h</include>
+  <include location="local" >QmitkExtExports.h</include>
   <include location="global" >mitkStepper.h</include>
  </includes>
  <resources>

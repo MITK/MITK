@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define QMITKSTEPPERADAPTER_H_HEADER_INCLUDED_C1E77191
 
 #include "qobject.h"
+#include "QmitkExtExports.h"
 #include "mitkStepper.h"
 #include "itkObject.h"
 #include "itkCommand.h"
@@ -36,7 +37,7 @@ PURPOSE.  See the above copyright notices for more information.
 //## \warning The \a Navigator has to be aware that it might have caused the changes 
 //## of the \a Stepper itself. So take care that no infinite recursion is created!
 //## @ingroup NavigationControl
-class QMITKEXT_EXPORT QmitkStepperAdapter : public QObject
+class QmitkExt_EXPORT QmitkStepperAdapter : public QObject
 {
   Q_OBJECT
 public:
@@ -49,7 +50,7 @@ public:
     this->Refetch();
   }
 
-  class QMITKEXT_EXPORT ItkEventListener : public itk::Command
+  class QmitkExt_EXPORT ItkEventListener : public itk::Command
   {
     public:
       mitkClassMacro(ItkEventListener, itk::Command);

@@ -2,6 +2,7 @@
 #define _QmitkPlotDialog_H
 
 #include <qdialog.h>
+#include "QmitkExtExports.h"
 #include <QmitkPlotWidget.h>
 #include "mitkCommon.h"
 
@@ -27,7 +28,7 @@
 *    the QwtPlot instance using the method GetQwtPlot().
 * @see QwtPlot, @see QmitkPlotWidget
 */
-class QMITKEXT_EXPORT QmitkPlotDialog: public QDialog 
+class QmitkExt_EXPORT QmitkPlotDialog: public QDialog 
 {
 
 public:

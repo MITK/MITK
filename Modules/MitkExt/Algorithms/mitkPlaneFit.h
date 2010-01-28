@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITK_PLANEFIT_H__INCLUDED_
 
 #include "mitkPointSet.h"
+#include "MitkExtExports.h"
 #include "mitkTimeSlicedGeometry.h"
 #include "mitkPlaneGeometry.h"
 #include "mitkGeometryDataSource.h"
@@ -62,7 +63,7 @@ namespace mitk {
   // [x0, a <, d, normd >] = lsplane(X)
   // ---------------------------------------------------------------------
 
-  class MITKEXT_CORE_EXPORT PlaneFit : public GeometryDataSource
+  class MitkExt_EXPORT PlaneFit : public GeometryDataSource
   {
     public:
 

@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define _MITK_PLANAR_RECTANGLE_H_
 
 #include "mitkPlanarPolygon.h"
+#include "MitkExtExports.h"
 
 
 namespace mitk 
@@ -31,7 +32,7 @@ class Geometry2D;
  * \brief Implementation of PlanarFigure representing a polygon
  * with two or more control points
  */
-class MITKEXT_CORE_EXPORT PlanarRectangle : public PlanarFigure
+class MitkExt_EXPORT PlanarRectangle : public PlanarFigure
 {
 public:
   mitkClassMacro( PlanarRectangle, PlanarFigure );

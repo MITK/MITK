@@ -25,6 +25,7 @@
 #define _vtkQtStatisticalBoxChartSeriesOptions_h
 
 #include "vtkQtChartExport.h"
+#include "QmitkExtExports.h"
 #include "vtkQtChartSeriesOptions.h"
 #include "vtkQtPointMarker.h" // needed for enum
 

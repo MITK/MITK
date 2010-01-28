@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define QMITKHistogramWidget_H_
 
 #include <qlayout.h>
+#include "QmitkExtExports.h"
 #include <qtextedit.h>
 #include <qdialog.h>
 #include <qwt_plot.h>
@@ -38,7 +39,7 @@ PURPOSE.  See the above copyright notices for more information.
  Offers zoom possibility. 
  A marker can be set and shows the frequency at his position.
  */
-class QMITKEXT_EXPORT QmitkHistogramWidget: public QDialog
+class QmitkExt_EXPORT QmitkHistogramWidget: public QDialog
 {
   Q_OBJECT
 

@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define _MITK_GRID_VOLUME_MAPPER_PROPERTY__H_
 
 #include "mitkEnumerationProperty.h"
+#include "MitkExtExports.h"
 
 namespace mitk
 {
@@ -29,7 +30,7 @@ namespace mitk
  * PT/0/Projected Tetrahedra, ZSWEEP/1/ZSweep, RAYCAST/2/Ray Cast
  * Default is the Wireframe representation
  */
-class MITKEXT_CORE_EXPORT GridVolumeMapperProperty : public EnumerationProperty
+class MitkExt_EXPORT GridVolumeMapperProperty : public EnumerationProperty
 {
 public:
 

@@ -25,6 +25,7 @@
 #define _vtkQtChartSeriesDomain_h
 
 #include "vtkQtChartExport.h"
+#include "QmitkExtExports.h"
 
 class vtkQtChartAxisDomain;
 class vtkQtChartSeriesDomainInternal;

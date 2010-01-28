@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define FRAMEOFREFERENCEUIDMANAGER_H_HEADER_INCLUDED_C1EBD0AD
 
 #include "mitkCommon.h"
+#include "MitkExtExports.h"
 #include <vector>
 #include <string>
 
@@ -30,7 +31,7 @@ namespace mitk {
 //## the Geometry3D (Geometry3D::m_FrameOfReferenceID) to a 
 //## DICOM FrameOfReferenceUID
 //##
-class MITKEXT_CORE_EXPORT FrameOfReferenceUIDManager
+class MitkExt_EXPORT FrameOfReferenceUIDManager
 {
 public:
   typedef std::string FrameOfReferenceUIDType;

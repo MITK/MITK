@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKUSLookupTableSOURCE_H_HEADER_INCLUDED
 
 #include "mitkCommon.h"
+#include "MitkExtExports.h"
 #include "mitkLookupTableSource.h"
 
 
@@ -29,7 +30,7 @@ namespace mitk
 {
 
 
-class MITKEXT_CORE_EXPORT USLookupTableSource : public LookupTableSource
+class MitkExt_EXPORT USLookupTableSource : public LookupTableSource
 {
 public:
     typedef enum {DSRDoppler, StrainRate, DefaultLUT} LookupTableMode;

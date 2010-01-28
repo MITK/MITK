@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITK_CONTOUR_VTK_MAPPER_3D_H
 
 #include "mitkCommon.h"
+#include "MitkExtExports.h"
 #include "mitkBaseVtkMapper3D.h"
 #include "mitkContour.h"
 #include "mitkBaseRenderer.h"
@@ -35,7 +36,7 @@ namespace mitk {
 //##Documentation
 //## @brief Vtk-based mapper for mitk::Contour
 //## @ingroup Mapper
-class MITKEXT_CORE_EXPORT ContourVtkMapper3D : public BaseVtkMapper3D
+class MitkExt_EXPORT ContourVtkMapper3D : public BaseVtkMapper3D
 {
 public:
   mitkClassMacro(ContourVtkMapper3D, BaseVtkMapper3D);

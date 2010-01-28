@@ -25,6 +25,7 @@
 #define _vtkQtChartScene_h
 
 #include "vtkQtChartExport.h"
+#include "QmitkExtExports.h"
 #include <QGraphicsScene>
 
 class vtkQtChartMouseBox;

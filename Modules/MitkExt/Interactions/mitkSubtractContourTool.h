@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define mitkSubtractContourTool_h_Included
 
 #include "mitkContourTool.h"
+#include "MitkExtExports.h"
 
 namespace mitk
 {
@@ -43,7 +44,7 @@ namespace mitk
 
   $Author$
 */
-class MITKEXT_CORE_EXPORT SubtractContourTool : public ContourTool
+class MitkExt_EXPORT SubtractContourTool : public ContourTool
 {
   public:
     

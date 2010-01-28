@@ -22,12 +22,13 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkCommon.h"
+#include "MitkExtExports.h"
 #include "mitkStepper.h"
 #include "mitkBaseRenderer.h"
 
 namespace mitk {
 
-class MITKEXT_CORE_EXPORT  MovieGenerator : public  itk::LightObject
+class MitkExt_EXPORT  MovieGenerator : public  itk::LightObject
 {
 public:
 

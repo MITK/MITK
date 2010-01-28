@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define QmitkNormalizedCorrelationMetricViewWidgetHIncluded
 
 #include "ui_QmitkNormalizedCorrelationMetricControls.h"
+#include "QmitkExtExports.h"
 #include "QmitkRigidRegistrationMetricsGUIBase.h"
 #include <itkArray.h>
 #include <itkObject.h>
@@ -30,7 +31,7 @@ PURPOSE.  See the above copyright notices for more information.
 *
 * Displays options for rigid registration.
 */
-class QMITKEXT_EXPORT QmitkNormalizedCorrelationMetricView : public QmitkRigidRegistrationMetricsGUIBase
+class QmitkExt_EXPORT QmitkNormalizedCorrelationMetricView : public QmitkRigidRegistrationMetricsGUIBase
 {
 
 public:

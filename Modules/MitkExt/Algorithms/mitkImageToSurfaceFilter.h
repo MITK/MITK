@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define _MITKIMAGETOSURFACEFILTER_h__
 
 #include <vtkPolyData.h>
+#include "MitkExtExports.h"
 #include <mitkCommon.h>
 #include <mitkSurfaceSource.h>
 #include <mitkSurface.h>
@@ -49,7 +50,7 @@ namespace mitk {
   * @ingroup Process
   */
 
-  class MITKEXT_CORE_EXPORT ImageToSurfaceFilter : public SurfaceSource
+  class MitkExt_EXPORT ImageToSurfaceFilter : public SurfaceSource
   {
     public:
 

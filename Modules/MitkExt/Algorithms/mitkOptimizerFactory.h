@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKOPTIMIZERFACTORY_H
 
 #include "itkSingleValuedNonLinearOptimizer.h"
+#include "MitkExtExports.h"
 #include "mitkOptimizerParameters.h"
 
 namespace mitk {
@@ -42,7 +43,7 @@ namespace mitk {
   \author Daniel Stein
   */
 
-  class MITKEXT_CORE_EXPORT OptimizerFactory : public ::itk::Object
+  class MitkExt_EXPORT OptimizerFactory : public ::itk::Object
   {
   public:
 

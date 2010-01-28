@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define _mitk_Image_Background2D_h_
 
 #include "mitkVideoSource.h"
+#include "MitkExtExports.h"
 
 #include "mitkConfig.h"
 
@@ -40,7 +41,7 @@ namespace mitk
   * pointer to the image. Also the image dimensions needs to be set correctly before enabling the 
   * background.
   */
-  class MITKEXT_CORE_EXPORT ImageBackground2D : public itk::Object
+  class MitkExt_EXPORT ImageBackground2D : public itk::Object
   {
     public:
      mitkClassMacro( ImageBackground2D, itk::Object );

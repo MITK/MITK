@@ -18,6 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKCOLORSEQUENCE_H_URTESEINDEUTIGEKENNUNG_01
 
 #include <mitkColorProperty.h>
+#include "MitkExtExports.h"
 
 namespace mitk
 {
@@ -27,7 +28,7 @@ namespace mitk
 
   See derived classes for implemented sequences. 
 */
-class MITKEXT_CORE_EXPORT ColorSequence
+class MitkExt_EXPORT ColorSequence
 {
 public:
   ColorSequence();

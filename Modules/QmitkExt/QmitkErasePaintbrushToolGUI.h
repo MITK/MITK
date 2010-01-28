@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define QmitkErasePaintbrushToolGUI_h_Included
 
 #include "QmitkPaintbrushToolGUI.h"
+#include "QmitkExtExports.h"
 
 /**
   \ingroup org_mitk_gui_qt_interactivesegmentation_internal
@@ -30,7 +31,7 @@ PURPOSE.  See the above copyright notices for more information.
   Last contributor: $Author$
 */
 
-class QMITKEXT_EXPORT QmitkErasePaintbrushToolGUI : public QmitkPaintbrushToolGUI
+class QmitkExt_EXPORT QmitkErasePaintbrushToolGUI : public QmitkPaintbrushToolGUI
 {
   Q_OBJECT
 

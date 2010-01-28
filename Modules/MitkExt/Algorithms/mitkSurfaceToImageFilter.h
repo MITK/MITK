@@ -20,6 +20,7 @@ See MITKCopyright.txt or http://www.mitk.org/ for details.
 #define _mitkSurfaceToImageFilter_h__
 
 #include "mitkCommon.h"
+#include "MitkExtExports.h"
 #include "mitkImageSource.h"
 #include "mitkSurface.h"
 //#include "mitkImage.h"
@@ -52,7 +53,7 @@ namespace mitk {
  * @ingroup SurfaceFilters
  * @ingroup Process
  */
-class MITKEXT_CORE_EXPORT SurfaceToImageFilter : public ImageSource
+class MitkExt_EXPORT SurfaceToImageFilter : public ImageSource
 {
 public:
   mitkClassMacro(SurfaceToImageFilter, ImageSource);

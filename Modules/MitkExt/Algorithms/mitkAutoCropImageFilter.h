@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define __mitkAutoCropImageFilter_h_
 
 #include "mitkCommon.h"
+#include "MitkExtExports.h"
 #include "mitkSubImageSelector.h"
 #include "mitkImageTimeSelector.h"
 
@@ -55,7 +56,7 @@ namespace mitk {
  *
  */
 
-class MITKEXT_CORE_EXPORT AutoCropImageFilter : public SubImageSelector
+class MitkExt_EXPORT AutoCropImageFilter : public SubImageSelector
 {
 public:
 

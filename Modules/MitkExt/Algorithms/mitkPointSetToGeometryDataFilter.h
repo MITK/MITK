@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define _mitk_Point_Set_To_Geometry_Data_Filter__h_
 
 #include <mitkPointSet.h>
+#include "MitkExtExports.h"
 #include <mitkGeometryDataSource.h>
 
 namespace mitk
@@ -28,7 +29,7 @@ namespace mitk
  * Common superclass for all algorithms having one or more point
  * sets as input and producing one or more geometry datas as output
  */
-class MITKEXT_CORE_EXPORT PointSetToGeometryDataFilter : public GeometryDataSource
+class MitkExt_EXPORT PointSetToGeometryDataFilter : public GeometryDataSource
 {
 public:
   /**

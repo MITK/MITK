@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define _mitk_Video_Source_h_
 
 #include "mitkCommon.h"
+#include "MitkExtExports.h"
 #include <itkObject.h>
 #include "itkObjectFactory.h"
 
@@ -27,7 +28,7 @@ namespace mitk
   /**
   * Simple base class for acquiring video data. 
   */
-  class MITKEXT_CORE_EXPORT VideoSource : public itk::Object
+  class MitkExt_EXPORT VideoSource : public itk::Object
   {
     public:
       mitkClassMacro( VideoSource, itk::Object );

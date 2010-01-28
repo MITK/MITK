@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define _MITK_PLANAR_FOURPOINTANGLE_H_
 
 #include "mitkPlanarFigure.h"
+#include "MitkExtExports.h"
 
 
 namespace mitk 
@@ -32,7 +33,7 @@ class Geometry2D;
  * angle, which is defined by two non-intersecting lines in 2D. Each of those lines 
  * is defined by two control points.
  */
-class MITKEXT_CORE_EXPORT PlanarFourPointAngle : public PlanarFigure
+class MitkExt_EXPORT PlanarFourPointAngle : public PlanarFigure
 {
 public:
   mitkClassMacro( PlanarFourPointAngle, PlanarFigure );

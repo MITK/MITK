@@ -19,6 +19,7 @@
 #define QMITKTRANSFERFUNCTIONCANVAS_H_INCLUDED
 
 #include <mitkHistogramGenerator.h>
+#include "QmitkExtExports.h"
 #include <mitkRenderingManager.h>
 
 #include <QWidget>
@@ -34,7 +35,7 @@
 
 namespace mitk {
 
-class QMITKEXT_EXPORT SimpleHistogram
+class QmitkExt_EXPORT SimpleHistogram
 {
   public:
   
@@ -96,7 +97,7 @@ class QMITKEXT_EXPORT SimpleHistogram
   
 };
 
-class QMITKEXT_EXPORT SimpleHistogramCache
+class QmitkExt_EXPORT SimpleHistogramCache
 {
   public:
   
@@ -200,7 +201,7 @@ class QMITKEXT_EXPORT SimpleHistogramCache
 }
 
 
-class QMITKEXT_EXPORT QmitkTransferFunctionCanvas : public QWidget
+class QmitkExt_EXPORT QmitkTransferFunctionCanvas : public QWidget
 {
 
   Q_OBJECT

@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKTRANSFORMPARAMETERS_H
 
 #include <itkObjectFactory.h>
+#include "MitkExtExports.h"
 #include <itkArray.h>
 #include "mitkCommon.h"
 
@@ -42,7 +43,7 @@ namespace mitk {
   \author Daniel Stein
   */
 
-  class MITKEXT_CORE_EXPORT TransformParameters : public itk::Object
+  class MitkExt_EXPORT TransformParameters : public itk::Object
   {
   public:
     mitkClassMacro(TransformParameters, ::itk::Object);

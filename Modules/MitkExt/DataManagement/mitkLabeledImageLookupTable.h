@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKMITKLABELEDIMAGELOOKUPTABLE_H
 
 #include "mitkLookupTable.h"
+#include "MitkExtExports.h"
 #include "mitkLevelWindow.h"
 #include <iostream>
 #include <string>
@@ -35,7 +36,7 @@ namespace mitk
  * the label 0 is assumed. The color for the background is set to fully transparent
  * as default.
  */
-class MITKEXT_CORE_EXPORT LabeledImageLookupTable : public LookupTable
+class MitkExt_EXPORT LabeledImageLookupTable : public LookupTable
 {
 public:
   /** 

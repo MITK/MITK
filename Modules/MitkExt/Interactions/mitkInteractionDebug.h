@@ -18,11 +18,12 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef INTERACTION_DEBUG_H
 #define INTERACTION_DEBUG_H
 #include "mitkStateMachine.h"
+#include "MitkExtExports.h"
 #include "mitkSocketClient.h"
 
 namespace mitk{
 
-class MITKEXT_CORE_EXPORT InteractionDebug
+class MitkExt_EXPORT InteractionDebug
 {
   static InteractionDebug* m_Instance;
   static char* m_FileName;

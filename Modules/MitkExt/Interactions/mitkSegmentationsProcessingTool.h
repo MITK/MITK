@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define mitkSegmentationsProcessingTool_h_Included
 
 #include "mitkCommon.h"
+#include "MitkExtExports.h"
 #include "mitkTool.h"
 #include "mitkDataTreeNode.h"
 
@@ -31,7 +32,7 @@ namespace mitk
 
   This class is undocumented. Ask the creator ($Author$) to supply useful comments.
 */
-class MITKEXT_CORE_EXPORT SegmentationsProcessingTool : public Tool
+class MitkExt_EXPORT SegmentationsProcessingTool : public Tool
 {
   public:
     

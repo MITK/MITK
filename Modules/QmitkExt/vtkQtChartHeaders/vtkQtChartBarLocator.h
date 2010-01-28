@@ -25,6 +25,7 @@
 #define _vtkQtChartBarLocator_h
 
 #include "vtkQtChartExport.h"
+#include "QmitkExtExports.h"
 #include <QLinkedList> // Needed for parameter.
 #include <QList> // Needed for parameter.
 

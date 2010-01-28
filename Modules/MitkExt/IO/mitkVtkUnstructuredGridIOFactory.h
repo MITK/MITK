@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #endif
 
 #include "itkObjectFactoryBase.h"
+#include "MitkExtExports.h"
 #include "mitkBaseData.h"
 
 namespace mitk
@@ -30,7 +31,7 @@ namespace mitk
 //## @brief Create instances of VtkUnstructuredGridReader objects using an object factory.
 //##
 //## @ingroup IO
-class MITKEXT_CORE_EXPORT VtkUnstructuredGridIOFactory : public itk::ObjectFactoryBase
+class MitkExt_EXPORT VtkUnstructuredGridIOFactory : public itk::ObjectFactoryBase
 {
 public:  
   /** Standard class typedefs. */

@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKPOINTSELECTORINTERACTOR_H_HEADER_INCLUDED
 
 #include "mitkCommon.h"
+#include "MitkExtExports.h"
 #include <mitkInteractor.h>
 #include <mitkVector.h>
 
@@ -34,7 +35,7 @@ namespace mitk
   //## All Set-operations would be done through the method "ExecuteAction", if there would be anyone.
   //## the identificationnumber of this point is set by this points and evalued from an empty place in the DataStructure
   //## @ingroup Interaction
-  class MITKEXT_CORE_EXPORT PointSelectorInteractor : public Interactor
+  class MitkExt_EXPORT PointSelectorInteractor : public Interactor
   {
   public:
     mitkClassMacro(PointSelectorInteractor, Interactor);

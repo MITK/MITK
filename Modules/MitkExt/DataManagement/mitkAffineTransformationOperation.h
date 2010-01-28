@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKAFFINETRANSFORMATIONOPERATION_H_HEADER_INCLUDED
 
 #include "mitkPointOperation.h"
+#include "MitkExtExports.h"
 #include "mitkVector.h"
 
 namespace mitk {
@@ -28,7 +29,7 @@ namespace mitk {
 //## @brief Operation, that holds everything necessary for an affine operation.
 //##
 //## @ingroup Undo
-class MITKEXT_CORE_EXPORT AffineTransformationOperation : public PointOperation
+class MitkExt_EXPORT AffineTransformationOperation : public PointOperation
 {
 public:
   AffineTransformationOperation(OperationType operationType, Point3D point, ScalarType angle, int index);

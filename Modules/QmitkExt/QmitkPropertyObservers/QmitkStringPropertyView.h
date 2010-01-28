@@ -18,11 +18,12 @@ PURPOSE.  See the above copyright notices for more information.
 #define QMITK_STRINGPROPERTYVIEW_H_INCLUDED
 
 #include <mitkPropertyObserver.h>
+#include "QmitkExtExports.h"
 #include <mitkStringProperty.h>
 #include <QLabel>
 
 /// @ingroup Widgets
-class QMITKEXT_EXPORT QmitkStringPropertyView : public QLabel, public mitk::PropertyView
+class QmitkExt_EXPORT QmitkStringPropertyView : public QLabel, public mitk::PropertyView
 {
   Q_OBJECT
 

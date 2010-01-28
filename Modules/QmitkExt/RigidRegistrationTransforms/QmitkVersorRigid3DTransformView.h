@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define QmitkVersorRigid3DTransformViewWidgetHIncluded
 
 #include "ui_QmitkVersorRigid3DTransformControls.h"
+#include "QmitkExtExports.h"
 #include "QmitkRigidRegistrationTransformsGUIBase.h"
 #include <itkImage.h>
 
@@ -28,7 +29,7 @@ PURPOSE.  See the above copyright notices for more information.
 *
 * Displays options for rigid registration.
 */
-class QMITKEXT_EXPORT QmitkVersorRigid3DTransformView : public QmitkRigidRegistrationTransformsGUIBase
+class QmitkExt_EXPORT QmitkVersorRigid3DTransformView : public QmitkRigidRegistrationTransformsGUIBase
 {
 
 public:

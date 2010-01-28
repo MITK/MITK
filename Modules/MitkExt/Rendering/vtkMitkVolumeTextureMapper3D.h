@@ -74,6 +74,7 @@
 #define __vtkMitkVolumeTextureMapper3D_h
 
 #include "vtkVolumeMapper.h"
+#include "MitkExtExports.h"
 
 class vtkImageData;
 class vtkColorTransferFunction;
@@ -82,7 +83,7 @@ class vtkVolumeProperty;
 
 #include "mitkCommon.h"
 
-class MITKEXT_CORE_EXPORT vtkMitkVolumeTextureMapper3D : public vtkVolumeMapper
+class MitkExt_EXPORT vtkMitkVolumeTextureMapper3D : public vtkVolumeMapper
 {
 public:
   vtkTypeRevisionMacro(vtkMitkVolumeTextureMapper3D,vtkVolumeMapper);

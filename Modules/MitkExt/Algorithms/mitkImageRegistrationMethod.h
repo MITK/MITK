@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKIMAGEREGISTRATIONMETHOD_H
 
 #include "itkImageRegistrationMethod.h"
+#include "MitkExtExports.h"
 #include "itkSingleValuedNonLinearOptimizer.h"
 
 #include "mitkImageToImageFilter.h"
@@ -39,7 +40,7 @@ namespace mitk
 
   \author Daniel Stein
   */
-  class MITKEXT_CORE_EXPORT ImageRegistrationMethod : public ImageToImageFilter
+  class MitkExt_EXPORT ImageRegistrationMethod : public ImageToImageFilter
   {
 
   public:

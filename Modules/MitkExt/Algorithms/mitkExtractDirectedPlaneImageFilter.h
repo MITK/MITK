@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define mitkExtractDirectedPlaneImageFilter_h_Included
 
 //#include "mitkCommon.h"
+#include "MitkExtExports.h"
 #include "mitkImageToImageFilter.h"
 
 #include "vtkImageReslice.h"
@@ -48,7 +49,7 @@ namespace mitk
   Last contributor: $Author: T. Schwarz$
   */
 
-  class MITKEXT_CORE_EXPORT ExtractDirectedPlaneImageFilter : public ImageToImageFilter
+  class MitkExt_EXPORT ExtractDirectedPlaneImageFilter : public ImageToImageFilter
   {
   public:
 

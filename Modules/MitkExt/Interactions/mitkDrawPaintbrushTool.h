@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define mitkPaintContourTool_h_Included
 
 #include "mitkPaintbrushTool.h"
+#include "MitkExtExports.h"
 
 namespace mitk
 {
@@ -41,7 +42,7 @@ namespace mitk
   \warning Only to be instantiated by mitk::ToolManager.
   $Author: maleike $
 */
-class MITKEXT_CORE_EXPORT DrawPaintbrushTool : public PaintbrushTool
+class MitkExt_EXPORT DrawPaintbrushTool : public PaintbrushTool
 {
   public:
 

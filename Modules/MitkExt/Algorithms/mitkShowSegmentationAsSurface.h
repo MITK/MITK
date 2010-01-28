@@ -19,13 +19,14 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITK_SHOW_SEGMENTATION_AS_SURFACE_H_INCLUDET_WAD
 
 #include "mitkSegmentationSink.h"
+#include "MitkExtExports.h"
 #include "mitkUIDGenerator.h"
 #include "mitkSurface.h"
 
 namespace mitk 
 {
 
-class MITKEXT_CORE_EXPORT ShowSegmentationAsSurface : public SegmentationSink
+class MitkExt_EXPORT ShowSegmentationAsSurface : public SegmentationSink
 {
   public:
     

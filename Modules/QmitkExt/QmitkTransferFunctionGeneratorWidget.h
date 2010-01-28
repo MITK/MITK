@@ -3,6 +3,7 @@
 #define QMITKTRANSFERFUNCTIONGENERATORWIDGET_H
 
 #include "ui_QmitkTransferFunctionGeneratorWidget.h"
+#include "QmitkExtExports.h"
 
 #include <mitkCommon.h>
 
@@ -11,7 +12,7 @@
 #include <mitkDataTreeNode.h>
 #include <mitkTransferFunctionProperty.h>
 
-class QMITKEXT_EXPORT QmitkTransferFunctionGeneratorWidget : public QWidget, public Ui::QmitkTransferFunctionGeneratorWidget
+class QmitkExt_EXPORT QmitkTransferFunctionGeneratorWidget : public QWidget, public Ui::QmitkTransferFunctionGeneratorWidget
 {
 
   Q_OBJECT

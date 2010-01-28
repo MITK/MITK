@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKDelegateManager_H_HEADER_INCLUDED
 
 #include "mitkMessage.h"
+#include "MitkExtExports.h"
 #include "mitkCommon.h"
 
 #include <map>
@@ -40,7 +41,7 @@ namespace mitk
   /// One could also say it is an Event Multiplexer.
   ///
   ///
-  class MITKEXT_CORE_EXPORT DelegateManager
+  class MitkExt_EXPORT DelegateManager
   {
     public:
       ///

@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKPYRAMIDALREGISTRATIONMETHOD_H
 
 #include "itkImageRegistrationMethod.h"
+#include "MitkExtExports.h"
 #include "itkSingleValuedNonLinearOptimizer.h"
 
 #include "mitkImageToImageFilter.h"
@@ -48,7 +49,7 @@ namespace mitk
   \ingroup RigidRegistration
 
   \author Thomas van Bruggen  */
-  class MITKEXT_CORE_EXPORT PyramidalRegistrationMethod : public ImageToImageFilter
+  class MitkExt_EXPORT PyramidalRegistrationMethod : public ImageToImageFilter
   {
 
   public:

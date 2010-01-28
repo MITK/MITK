@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define QmitkToolGUI_h_Included
 
 #include <qwidget.h>
+#include "QmitkExtExports.h"
 
 #include "mitkCommon.h"
 #include "mitkTool.h"
@@ -34,7 +35,7 @@ PURPOSE.  See the above copyright notices for more information.
   Last contributor: $Author$
 */
 
-class QMITKEXT_EXPORT QmitkToolGUI : public QWidget, public itk::Object
+class QmitkExt_EXPORT QmitkToolGUI : public QWidget, public itk::Object
 {
   Q_OBJECT
 

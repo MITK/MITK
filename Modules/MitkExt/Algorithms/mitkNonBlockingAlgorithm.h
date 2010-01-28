@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITK_NON_BLOCKING_ALGORITHM_H_INCLUDED_DFARdfWN1tr
 
 #include <itkObjectFactory.h>
+#include "MitkExtExports.h"
 #include <itkMacro.h>
 #include <itkMultiThreader.h>
 #include <itkFastMutexLock.h>
@@ -69,12 +70,12 @@ namespace mitk
           dass von dort aus die Methoden von NonBlockingAlgorithm aufgerufen werden.
           Erben v.a. um die Output-Sachen zu uebernehmen, die Anpassungen das einfuehren einer Zwischenklasse, um die Interaces zu verheiraten.
 */
-class MITKEXT_CORE_EXPORT NonBlockingAlgorithm : public itk::Object
+class MitkExt_EXPORT NonBlockingAlgorithm : public itk::Object
 {
   public:
 
     // for threading
-    class MITKEXT_CORE_EXPORT ThreadParameters
+    class MitkExt_EXPORT ThreadParameters
     {
       public:
         itk::SmartPointer<NonBlockingAlgorithm> m_Algorithm;

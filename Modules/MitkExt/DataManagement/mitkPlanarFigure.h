@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define _MITK_PLANAR_FIGURE_H_
 
 #include "mitkCommon.h"
+#include "MitkExtExports.h"
 #include "mitkBaseData.h"
 #include <itkSmartPointerVectorContainer.h>
 
@@ -38,7 +39,7 @@ class Geometry2D;
  * TODO: Implement local 2D transform (including center of rotation...)
  *
  */
-class MITKEXT_CORE_EXPORT PlanarFigure : public BaseData
+class MitkExt_EXPORT PlanarFigure : public BaseData
 {
 public:
   mitkClassMacro( PlanarFigure, BaseData );

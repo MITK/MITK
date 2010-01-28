@@ -2,6 +2,7 @@
 #define _QmitkPlotWidget_H_
 
 #include <qwidget.h>
+#include "QmitkExtExports.h"
 #include <qwt_plot.h>
 #include <qwt_plot_curve.h>
 #include <vector>
@@ -33,7 +34,7 @@
 * @see QwtPlot
 */
 
-class QMITKEXT_EXPORT QmitkPlotWidget: public QWidget 
+class QmitkExt_EXPORT QmitkPlotWidget: public QWidget 
 {
 
 public:

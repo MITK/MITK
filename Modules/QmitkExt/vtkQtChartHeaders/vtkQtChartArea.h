@@ -25,6 +25,7 @@
 #define _vtkQtChartArea_h
 
 #include "vtkQtChartExport.h"
+#include "QmitkExtExports.h"
 #include <QGraphicsView>
 
 class vtkQtChartAreaInternal;

@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define mitkTool_h_Included
 
 #include "mitkCommon.h"
+#include "MitkExtExports.h"
 #include "mitkStateMachine.h"
 #include "mitkToolEvents.h"
 #include "itkObjectFactoryBase.h"
@@ -72,7 +73,7 @@ class ToolManager;
 
   $Author$
 */
-class MITKEXT_CORE_EXPORT Tool : public StateMachine
+class MitkExt_EXPORT Tool : public StateMachine
 {
   public:
 

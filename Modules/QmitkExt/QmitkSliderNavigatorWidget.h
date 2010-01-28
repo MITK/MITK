@@ -19,13 +19,14 @@ PURPOSE.  See the above copyright notices for more information.
 #define QMITKSLIDERNAVIGATORWIDGET_H_
 
 #include "ui_QmitkSliderNavigator.h"
+#include "QmitkExtExports.h"
 
 #include <mitkStepper.h>
 
 #include <QWidget>
 #include <QString>
 
-class QMITKEXT_EXPORT QmitkSliderNavigatorWidget : public QWidget, public Ui::QmitkSliderNavigator
+class QmitkExt_EXPORT QmitkSliderNavigatorWidget : public QWidget, public Ui::QmitkSliderNavigator
 {
   Q_OBJECT
   

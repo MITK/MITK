@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define _Qmitk_Video_Background_h_
 
 #include "mitkVideoSource.h"
+#include "QmitkExtExports.h"
 
 // Q-Timer
 #include "qobject.h"
@@ -52,7 +53,7 @@ struct VideoBackgroundVectorInfo
  * pointer to the data. Also the image dimensions needs to be set correctly before enabling the 
  * background.
  */
-class QMITKEXT_EXPORT QmitkVideoBackground : public QObject
+class QmitkExt_EXPORT QmitkVideoBackground : public QObject
 {
   Q_OBJECT
 

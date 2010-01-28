@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKAFFINEINTERACTOR3D_H_HEADER_INCLUDED
 
 #include "mitkInteractor.h"
+#include "MitkExtExports.h"
 #include "mitkCommon.h"
 #include "mitkSurface.h"
 
@@ -38,7 +39,7 @@ class DataTreeNode;
   *
   * \ingroup Interaction
   */
-class MITKEXT_CORE_EXPORT AffineInteractor3D : public Interactor
+class MitkExt_EXPORT AffineInteractor3D : public Interactor
 {
 public:
   enum { INTERACTION_MODE_TRANSLATION, INTERACTION_MODE_ROTATION };

@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKSOCKETCLIENT_H
 #define MITKSOCKETCLIENT_H
 #include <itkObject.h>
+#include "MitkExtExports.h"
 #include "mitkCommon.h"
 
 #include "mitkSocketClientImplementation.h"
@@ -34,7 +35,7 @@ namespace mitk
   //## All mitk-classes use this class to display progress on GUI-ProgressBar.
   //## The mainapplication has to set the internal held ProgressBarImplementation with SetImplementationInstance(..).
   //## @ingroup Interaction
-  class MITKEXT_CORE_EXPORT SocketClient : public itk::Object
+  class MitkExt_EXPORT SocketClient : public itk::Object
   {
 
   public:

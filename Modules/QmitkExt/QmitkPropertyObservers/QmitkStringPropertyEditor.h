@@ -18,11 +18,12 @@ PURPOSE.  See the above copyright notices for more information.
 #define QMITK_STRINGPROPERTYEDITOR_H_INCLUDED
 
 #include <mitkPropertyObserver.h>
+#include "QmitkExtExports.h"
 #include <mitkStringProperty.h>
 #include <QLineEdit>
 
 /// @ingroup Widgets
-class QMITKEXT_EXPORT QmitkStringPropertyEditor : public QLineEdit, public mitk::PropertyEditor
+class QmitkExt_EXPORT QmitkStringPropertyEditor : public QLineEdit, public mitk::PropertyEditor
 {
   Q_OBJECT
 

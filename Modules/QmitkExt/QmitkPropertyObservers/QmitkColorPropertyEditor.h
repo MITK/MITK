@@ -18,13 +18,14 @@ PURPOSE.  See the above copyright notices for more information.
 #define QMITK_COLORPROPERTYEDITOR_H_INCLUDED
 
 #include "QmitkColorPropertyView.h"
+#include "QmitkExtExports.h"
 #include <QFrame>
 #include <mitkColorProperty.h>
 
 class QListBox;
 
 /// @ingroup Widgets
-class QMITKEXT_EXPORT QmitkPopupColorChooser : public QFrame
+class QmitkExt_EXPORT QmitkPopupColorChooser : public QFrame
 {
   Q_OBJECT
     
@@ -70,7 +71,7 @@ class QMITKEXT_EXPORT QmitkPopupColorChooser : public QFrame
 };
 
 /// @ingroup Widgets
-class QMITKEXT_EXPORT QmitkColorPropertyEditor : public QmitkColorPropertyView
+class QmitkExt_EXPORT QmitkColorPropertyEditor : public QmitkColorPropertyView
 {
   Q_OBJECT
 

@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define QmitkToolSelectionBox_h_Included
 
 #include "QmitkToolGUIArea.h"
+#include "QmitkExtExports.h"
 
 #include "mitkToolManager.h"
 
@@ -53,7 +54,7 @@ class QmitkToolGUI;
 
   Last contributor: $Author: maleike $
 */
-class QMITKEXT_EXPORT QmitkToolSelectionBox : public QWidget
+class QmitkExt_EXPORT QmitkToolSelectionBox : public QWidget
 //!
 {
   Q_OBJECT

@@ -1,5 +1,5 @@
 <ui version="4.0" >
- <exportmacro>QMITKEXT_EXPORT</exportmacro>
+ <exportmacro>QmitkExt_EXPORT</exportmacro>
  <class>QmitkFunctionalityComponentContainerGUI</class>
  <widget class="QWidget" name="QmitkFunctionalityComponentContainerGUI" >
   <property name="geometry" >
@@ -75,7 +75,7 @@
   </customwidget>
  </customwidgets>
  <includes>
-  <include location="local" >mitkCommon.h</include>
+  <include location="local" >QmitkExtExports.h</include>
   <include location="local" >mitkDataTree.h</include>
  </includes>
  <resources/>

@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define _MITK_POINT_DATA_VTK_MAPPER_3D__H_
 
 #include <mitkBaseVtkMapper3D.h>
+#include "MitkExtExports.h"
 #include "mitkPointData.h"
 #include "vtkCellArray.h"
 #include "vtkFloatArray.h"
@@ -41,7 +42,7 @@ class vtkCellArray;
 namespace mitk
 {
 
-class MITKEXT_CORE_EXPORT PointDataVtkMapper3D : public BaseVtkMapper3D
+class MitkExt_EXPORT PointDataVtkMapper3D : public BaseVtkMapper3D
 {
 public:
 

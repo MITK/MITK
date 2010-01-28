@@ -18,11 +18,12 @@ PURPOSE.  See the above copyright notices for more information.
 #define QMITK_NUMBERPROPERTYEDITOR_H_INCLUDED
 
 #include <mitkPropertyObserver.h>
+#include "QmitkExtExports.h"
 #include <mitkProperties.h>
 #include <QSpinBox>
 
 /// @ingroup Widgets
-class QMITKEXT_EXPORT QmitkNumberPropertyEditor : public QSpinBox, public mitk::PropertyEditor
+class QmitkExt_EXPORT QmitkNumberPropertyEditor : public QSpinBox, public mitk::PropertyEditor
 {
   Q_OBJECT
   Q_PROPERTY( short decimalPlaces READ getDecimalPlaces WRITE setDecimalPlaces )

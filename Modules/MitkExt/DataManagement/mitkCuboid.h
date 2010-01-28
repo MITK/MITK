@@ -20,13 +20,14 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITCUBOID_H_HEADER_INCLUDED
 
 #include "mitkBoundingObject.h"
+#include "MitkExtExports.h"
 
 namespace mitk {
 
 //##Documentation
 //## @brief Data class containing an cuboid
 //## @ingroup Data
-class MITKEXT_CORE_EXPORT Cuboid : public BoundingObject
+class MitkExt_EXPORT Cuboid : public BoundingObject
 {
 public:
   mitkClassMacro(Cuboid, BoundingObject);  

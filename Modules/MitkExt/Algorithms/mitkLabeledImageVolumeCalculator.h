@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define _MITK_LABELEDIMAGEVOLUMECALCULATOR_H
 
 #include <itkObject.h>
+#include "MitkExtExports.h"
 
 #include "mitkImage.h"
 #include "mitkImageTimeSelector.h"
@@ -38,7 +39,7 @@ namespace mitk
  *
  * TODO: Extend class for time resolved images
  */
-class MITKEXT_CORE_EXPORT LabeledImageVolumeCalculator : public itk::Object
+class MitkExt_EXPORT LabeledImageVolumeCalculator : public itk::Object
 {
 public:
 

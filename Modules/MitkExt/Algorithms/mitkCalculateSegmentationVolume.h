@@ -19,12 +19,13 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITK_CALCULATE_SEGMENTATION_VOLUME_H_INCLUDET_WAD
 
 #include "mitkSegmentationSink.h"
+#include "MitkExtExports.h"
 #include "mitkImageCast.h"
 
 namespace mitk 
 {
 
-class MITKEXT_CORE_EXPORT CalculateSegmentationVolume : public SegmentationSink
+class MitkExt_EXPORT CalculateSegmentationVolume : public SegmentationSink
 {
   public:
     

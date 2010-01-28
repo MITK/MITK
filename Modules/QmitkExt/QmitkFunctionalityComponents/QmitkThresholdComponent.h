@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITK_THRESHOLDCOMPONENT_H
 
 #include "QmitkFunctionalityComponentContainer.h"
+#include "QmitkExtExports.h"
 #include <itkImage.h>
 #include "ui_QmitkThresholdComponentControls.h"
 class QmitkStdMultiWidget;
@@ -44,7 +45,7 @@ class QmitkStdMultiWidget;
 */
 
 
-class QMITKEXT_EXPORT QmitkThresholdComponent : public QmitkFunctionalityComponentContainer
+class QmitkExt_EXPORT QmitkThresholdComponent : public QmitkFunctionalityComponentContainer
 {
 
   Q_OBJECT

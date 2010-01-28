@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define _Stl_VOLUME_TIME_SERIES_READER__H_
 
 #include "mitkCommon.h"
+#include "MitkExtExports.h"
 #include "mitkFileSeriesReader.h"
 #include "mitkSurfaceSource.h"
 
@@ -28,7 +29,7 @@ namespace mitk
 //##Documentation
 //## @brief Reader to read a series of volume files in stl-format
 //## @ingroup IO
-class MITKEXT_CORE_EXPORT StlVolumeTimeSeriesReader : public SurfaceSource, public FileSeriesReader
+class MitkExt_EXPORT StlVolumeTimeSeriesReader : public SurfaceSource, public FileSeriesReader
 {
 public:
     mitkClassMacro( StlVolumeTimeSeriesReader, FileReader );

@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define _MITK_GRID_REPRESENTATION_PROPERTY__H_
 
 #include "mitkEnumerationProperty.h"
+#include "MitkExtExports.h"
 
 namespace mitk
 {
@@ -29,7 +30,7 @@ namespace mitk
  * POINTS/0/Points, WIREFRAME/1/Wireframe, SURFACE/2/Surface, VOLUME/3/Volume
  * Default is the Wireframe representation
  */
-class MITKEXT_CORE_EXPORT GridRepresentationProperty : public EnumerationProperty
+class MitkExt_EXPORT GridRepresentationProperty : public EnumerationProperty
 {
 public:
 

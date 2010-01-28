@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define _MITK_SPLINE_VTK_MAPPER_3D__H
 
 #include "mitkPointSetVtkMapper3D.h"
+#include "MitkExtExports.h"
 
 class vtkActor;
 class vtkAssembly;
@@ -39,7 +40,7 @@ namespace mitk
   
   */
   /************************************************************************/
-class MITKEXT_CORE_EXPORT SplineVtkMapper3D : public PointSetVtkMapper3D
+class MitkExt_EXPORT SplineVtkMapper3D : public PointSetVtkMapper3D
 {
 public:
 

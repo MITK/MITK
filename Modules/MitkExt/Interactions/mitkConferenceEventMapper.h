@@ -19,10 +19,11 @@ PURPOSE.  See the above copyright notices for more information.
 #define CONFERENCEVENTMAPPER_H_HEADER_INCLUDE
 
 #include <mitkEventMapper.h>
+#include "MitkExtExports.h"
 
 namespace mitk {
 
-  class MITKEXT_CORE_EXPORT ConferenceEventMapper : public EventMapper
+  class MitkExt_EXPORT ConferenceEventMapper : public EventMapper
   {
     public:
       ConferenceEventMapper();

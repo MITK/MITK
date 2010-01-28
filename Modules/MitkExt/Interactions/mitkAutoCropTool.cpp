@@ -23,7 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkAutoCropImageFilter.h"
 
 namespace mitk {
-  MITK_TOOL_MACRO(MITKEXT_CORE_EXPORT, AutoCropImageFilter, "Crop tool");
+  MITK_TOOL_MACRO(MitkExt_EXPORT, AutoCropImageFilter, "Crop tool");
 }
 
 mitk::AutoCropTool::AutoCropTool()

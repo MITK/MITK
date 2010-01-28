@@ -26,6 +26,7 @@
 
 
 #include "vtkQtChartExport.h"
+#include "QmitkExtExports.h"
 #include <QSizeF>
 #include <QRectF>
 

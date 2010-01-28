@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 //!mm,update: QPopupMenu is deprecated, use QtMenu in Qt4
 //#include <Q3PopupMenu>
+#include "QmitkExtExports.h"
 #include <QMenu>
 //!
 
@@ -44,7 +45,7 @@ class QmitkMaterialEditor;
   When all changes are done successfully, clients are notified by the signal propertyListChangesDone.
 
 */
-class QMITKEXT_EXPORT QmitkPropertyListPopup : public QObject
+class QmitkExt_EXPORT QmitkPropertyListPopup : public QObject
 {
   Q_OBJECT
 

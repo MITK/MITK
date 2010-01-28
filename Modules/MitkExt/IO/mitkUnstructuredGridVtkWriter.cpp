@@ -64,9 +64,9 @@ std::vector<std::string> UnstructuredGridVtkWriter<vtkXMLUnstructuredGridWriter>
   return possibleFileExtensions;
 }
 
-template class MITKEXT_CORE_EXPORT UnstructuredGridVtkWriter<vtkUnstructuredGridWriter>;
+template class MitkExt_EXPORT UnstructuredGridVtkWriter<vtkUnstructuredGridWriter>;
 
-template class MITKEXT_CORE_EXPORT UnstructuredGridVtkWriter<vtkXMLUnstructuredGridWriter>;
+template class MitkExt_EXPORT UnstructuredGridVtkWriter<vtkXMLUnstructuredGridWriter>;
 
 }
 

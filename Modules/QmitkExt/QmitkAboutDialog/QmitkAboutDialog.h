@@ -1,10 +1,11 @@
 
 #include <QDialog>
+#include "QmitkExtExports.h"
 #include <QWidget>
 #include <mitkCommon.h>
 
 
-class QMITKEXT_EXPORT QmitkAboutDialog : public QDialog
+class QmitkExt_EXPORT QmitkAboutDialog : public QDialog
 {
   Q_OBJECT
 

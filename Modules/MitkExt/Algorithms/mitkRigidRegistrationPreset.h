@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKRIGIDREGISTRATIONPRESET_H_HEADER
 
 #include <vtkXMLParser.h>
+#include "MitkExtExports.h"
 #include <map>
 #include <string>
 #include <itkArray.h>
@@ -38,7 +39,7 @@ namespace mitk {
    *
    * \author Daniel Stein
    */
-  class MITKEXT_CORE_EXPORT RigidRegistrationPreset : public vtkXMLParser
+  class MitkExt_EXPORT RigidRegistrationPreset : public vtkXMLParser
   {
   public:
     RigidRegistrationPreset();

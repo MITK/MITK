@@ -20,13 +20,14 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKSEEDSIMAGELOOKUPTABLESOURCE_H_HEADER_INCLUDED
 
 #include "mitkCommon.h"
+#include "MitkExtExports.h"
 #include "mitkLookupTableSource.h"
 
 
 namespace mitk
 {
 
-class MITKEXT_CORE_EXPORT SeedsImageLookupTableSource : public LookupTableSource
+class MitkExt_EXPORT SeedsImageLookupTableSource : public LookupTableSource
 {
 public:
   typedef enum {Seeds, DefaultLUT, Force} LookupTableMode;

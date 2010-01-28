@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define QmitkKullbackLeiblerCompareHistogramMetricViewWidgetHIncluded
 
 #include "ui_QmitkKullbackLeiblerCompareHistogramMetricControls.h"
+#include "QmitkExtExports.h"
 #include "QmitkRigidRegistrationMetricsGUIBase.h"
 #include <itkArray.h>
 #include <itkObject.h>
@@ -30,7 +31,7 @@ PURPOSE.  See the above copyright notices for more information.
 *
 * Displays options for rigid registration.
 */
-class QMITKEXT_EXPORT QmitkKullbackLeiblerCompareHistogramMetricView : public QmitkRigidRegistrationMetricsGUIBase
+class QmitkExt_EXPORT QmitkKullbackLeiblerCompareHistogramMetricView : public QmitkRigidRegistrationMetricsGUIBase
 {
 
 public:

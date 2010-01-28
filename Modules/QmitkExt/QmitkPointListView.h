@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define QMITK_POINTLIST_VIEW_H_INCLUDED
 
 #include <QListView>
+#include "QmitkExtExports.h"
 
 #include "QmitkPointListModel.h"
 
@@ -37,7 +38,7 @@ class QmitkStdMultiWidget;
  * point.
  *
  */
-class QMITKEXT_EXPORT QmitkPointListView : public QListView
+class QmitkExt_EXPORT QmitkPointListView : public QListView
 {
   Q_OBJECT
 

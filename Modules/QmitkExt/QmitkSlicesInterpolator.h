@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define QmitkSlicesInterpolator_h_Included
 
 #include "mitkSliceNavigationController.h"
+#include "QmitkExtExports.h"
 #include "mitkSegmentationInterpolationController.h"
 #include "mitkDataTreeNode.h"
 #include "mitkDataStorage.h"
@@ -57,7 +58,7 @@ class QPushButton;
 
   Last contributor: $Author: maleike $
 */
-class QMITKEXT_EXPORT QmitkSlicesInterpolator : public QWidget
+class QmitkExt_EXPORT QmitkSlicesInterpolator : public QWidget
 {
   Q_OBJECT
 

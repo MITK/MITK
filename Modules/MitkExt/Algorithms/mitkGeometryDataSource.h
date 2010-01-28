@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKGEOMETRYDATASOURCE_H_HEADER_INCLUDED_C10B4740
 
 #include "mitkBaseProcess.h"
+#include "MitkExtExports.h"
 #include "mitkGeometryDataSource.h"
 
 namespace mitk {
@@ -36,7 +37,7 @@ class GeometryData;
 //## DataObject. This is also true for subclasses of mitk::BaseProcess and thus
 //## for mitk::GeometryDataSource.
 //## @ingroup Process
-class MITKEXT_CORE_EXPORT GeometryDataSource : public BaseProcess
+class MitkExt_EXPORT GeometryDataSource : public BaseProcess
 {
 public:
   mitkClassMacro(GeometryDataSource, BaseProcess);

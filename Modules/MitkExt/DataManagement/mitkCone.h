@@ -20,13 +20,14 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKCONE_H_HEADER_INCLUDED
 
 #include "mitkBoundingObject.h"
+#include "MitkExtExports.h"
 
 namespace mitk {
 
 //##Documentation
 //## @brief Data class containing an cylinder
 //## @ingroup Data
-class MITKEXT_CORE_EXPORT Cone : public BoundingObject
+class MitkExt_EXPORT Cone : public BoundingObject
 {
 public:
   mitkClassMacro(Cone, BoundingObject);  

@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define DATATREEHELPER_H_HEADER_INCLUDED_C1C7797C
 
 #include "mitkCommon.h"
+#include "MitkExtExports.h"
 #include "mitkDataTree.h"
 
 #include "mitkImageCast.h"
@@ -37,11 +38,11 @@ namespace mitk
   {
     //##Documentation
     //## @brief Search a data tree for (the first) iterator to a given node
-    MITKEXT_CORE_EXPORT DataTreeIteratorClone FindIteratorToNode(mitk::DataTreeBase* tree, const DataTreeNode* node);
+    MitkExt_EXPORT DataTreeIteratorClone FindIteratorToNode(mitk::DataTreeBase* tree, const DataTreeNode* node);
 
     //##Documentation
     //## @brief Search a data tree for (the first) iterator to a given node
-    MITKEXT_CORE_EXPORT DataTreeIteratorClone FindIteratorToNode(const DataTreeIteratorBase* startPosition, const DataTreeNode* node);
+    MitkExt_EXPORT DataTreeIteratorClone FindIteratorToNode(const DataTreeIteratorBase* startPosition, const DataTreeNode* node);
 
     //##Documentation
     //## @brief Add itk-image to data tree
@@ -96,7 +97,7 @@ namespace mitk
     /** Get child node which has a specified name
      * @returns child node of iterator which has the given name
     */
-    MITKEXT_CORE_EXPORT DataTreeIteratorClone GetNamedChild(mitk::DataTreeIteratorBase* iterator, std::string name);
+    MitkExt_EXPORT DataTreeIteratorClone GetNamedChild(mitk::DataTreeIteratorBase* iterator, std::string name);
   };
 
 } // namespace mitk

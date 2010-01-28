@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define QmitkVtkHistogramWidget_H_
 
 #include "QmitkHistogram.h"
+#include "QmitkExtExports.h"
 #include "mitkImage.h"
 #include "mitkPlanarFigure.h"
 
@@ -41,7 +42,7 @@ PURPOSE.  See the above copyright notices for more information.
  * \brief Widget for displaying image histograms based on the vtkQtChart
  * framework
  */
-class QMITKEXT_EXPORT QmitkVtkHistogramWidget : public QDialog, public itk::Object
+class QmitkExt_EXPORT QmitkVtkHistogramWidget : public QDialog, public itk::Object
 {
   Q_OBJECT
 

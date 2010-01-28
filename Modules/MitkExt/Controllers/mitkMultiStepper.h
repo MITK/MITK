@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define MULTISTEPPER_H_HEADER_INCLUDED
 
 #include <set>
+#include "MitkExtExports.h"
 #include "mitkCommon.h"
 #include "mitkVector.h"
 #include "mitkStepper.h"
@@ -35,7 +36,7 @@ namespace mitk {
 //## position in the list (between 0 and GetSteps()). Provides methods like
 //## First (go to the first element), Next (go to the next one), etc.
 //## @ingroup NavigationControl
-class MITKEXT_CORE_EXPORT MultiStepper : public Stepper
+class MitkExt_EXPORT MultiStepper : public Stepper
 {
 public:
   mitkClassMacro(MultiStepper, Stepper);

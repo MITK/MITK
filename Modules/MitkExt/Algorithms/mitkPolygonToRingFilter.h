@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKPOLYGONTORINGFILTER_H_HEADER_INCLUDED_C10B22CD
 
 #include "mitkCommon.h"
+#include "MitkExtExports.h"
 #include "mitkSurfaceSource.h"
 #include "mitkMesh.h"
 
@@ -35,7 +36,7 @@ namespace mitk {
  * \brief Create ring around polygons contained in a Mesh
  * \ingroup Process
  */
-class MITKEXT_CORE_EXPORT PolygonToRingFilter : public SurfaceSource
+class MitkExt_EXPORT PolygonToRingFilter : public SurfaceSource
 {
 public:
   mitkClassMacro(PolygonToRingFilter, SurfaceSource);

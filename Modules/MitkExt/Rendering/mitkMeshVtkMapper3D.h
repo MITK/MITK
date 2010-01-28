@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKMESHVTKMAPPER3D_H_HEADER_INCLUDED
 
 #include "mitkCommon.h"
+#include "MitkExtExports.h"
 #include "mitkBaseVtkMapper3D.h"
 #include "mitkMesh.h"
 #include "mitkBaseRenderer.h"
@@ -50,7 +51,7 @@ namespace mitk {
  * \brief Vtk-based mapper for PointList
  * \ingroup Mapper
  */
-class MITKEXT_CORE_EXPORT MeshVtkMapper3D : public BaseVtkMapper3D
+class MitkExt_EXPORT MeshVtkMapper3D : public BaseVtkMapper3D
 {
 public:
 

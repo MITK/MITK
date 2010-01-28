@@ -19,10 +19,11 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITK_POINT_DATA_H
 
 #include <mitkBaseData.h>
+#include "MitkExtExports.h"
 
 namespace mitk {
 
-class MITKEXT_CORE_EXPORT PointData : public mitk::BaseData
+class MitkExt_EXPORT PointData : public mitk::BaseData
 {
 public:
   mitkClassMacro( PointData, BaseData );

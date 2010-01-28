@@ -18,13 +18,14 @@ PURPOSE.  See the above copyright notices for more information.
 #define VtkUnstructuredGridReader_H_HEADER_INCLUDED
 
 #include "mitkCommon.h"
+#include "MitkExtExports.h"
 #include "mitkUnstructuredGridSource.h"
 
 namespace mitk {
 //##Documentation
 //## @brief Reader to read unstructured grid files in vtk-format
 //## @ingroup IO
-class MITKEXT_CORE_EXPORT VtkUnstructuredGridReader : public UnstructuredGridSource
+class MitkExt_EXPORT VtkUnstructuredGridReader : public UnstructuredGridSource
 {
 public:
     mitkClassMacro(VtkUnstructuredGridReader, UnstructuredGridSource);

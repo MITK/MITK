@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define QmitkConjugateGradientOptimizerViewWidgetHIncluded
 
 #include "ui_QmitkConjugateGradientOptimizerControls.h"
+#include "QmitkExtExports.h"
 #include "QmitkRigidRegistrationOptimizerGUIBase.h"
 #include <itkArray.h>
 #include <itkObject.h>
@@ -30,7 +31,7 @@ PURPOSE.  See the above copyright notices for more information.
 *
 * Displays options for rigid registration.
 */
-class QMITKEXT_EXPORT QmitkConjugateGradientOptimizerView : public QmitkRigidRegistrationOptimizerGUIBase
+class QmitkExt_EXPORT QmitkConjugateGradientOptimizerView : public QmitkRigidRegistrationOptimizerGUIBase
 {
 
 public:

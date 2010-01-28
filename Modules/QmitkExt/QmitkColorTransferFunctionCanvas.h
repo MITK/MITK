@@ -19,10 +19,11 @@
 #define QMITKCOLORTRANSFERFUNCTIONCANVAS_H_INCLUDED
 
 #include "QmitkTransferFunctionCanvas.h"
+#include "QmitkExtExports.h"
 
 #include <vtkColorTransferFunction.h>
 
-class QMITKEXT_EXPORT QmitkColorTransferFunctionCanvas: public QmitkTransferFunctionCanvas
+class QmitkExt_EXPORT QmitkColorTransferFunctionCanvas: public QmitkTransferFunctionCanvas
 {
 Q_OBJECT
 

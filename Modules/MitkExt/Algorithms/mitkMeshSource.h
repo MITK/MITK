@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define _MITKMESHSOURCE_H
 
 #include "itkProcessObject.h"
+#include "MitkExtExports.h"
 #include "mitkMesh.h"
 
 namespace mitk
@@ -34,7 +35,7 @@ namespace mitk
  * DataObject. 
  * @ingroup Process
  */
-class MITKEXT_CORE_EXPORT MeshSource : public itk::ProcessObject
+class MitkExt_EXPORT MeshSource : public itk::ProcessObject
 {
 public:
     mitkClassMacro( MeshSource, itk::ProcessObject );

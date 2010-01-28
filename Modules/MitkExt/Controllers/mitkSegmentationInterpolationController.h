@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define mitkSegmentationInterpolationController_h_Included
 
 #include "mitkCommon.h"
+#include "MitkExtExports.h"
 #include "mitkImage.h"
 
 #include <itkImage.h>
@@ -63,7 +64,7 @@ class Image;
 
   $Author$
 */
-class MITKEXT_CORE_EXPORT SegmentationInterpolationController : public itk::Object
+class MitkExt_EXPORT SegmentationInterpolationController : public itk::Object
 {
   public:
 
@@ -142,7 +143,7 @@ class MITKEXT_CORE_EXPORT SegmentationInterpolationController : public itk::Obje
     /**
       \brief Protected class of mitk::SegmentationInterpolationController. Don't use (you shouldn't be able to do so)!
     */
-    class MITKEXT_CORE_EXPORT SetChangedSliceOptions
+    class MitkExt_EXPORT SetChangedSliceOptions
     {
       public:
         SetChangedSliceOptions( unsigned int sd, unsigned int si, unsigned int d0, unsigned int d1, unsigned int t, void* pixels )

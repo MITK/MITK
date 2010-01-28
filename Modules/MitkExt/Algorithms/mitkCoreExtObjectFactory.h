@@ -19,10 +19,11 @@ PURPOSE.  See the above copyright notices for more information.
 #define COREEXTOBJECTFACTORY_H_INCLUDED
 
 #include "mitkCoreObjectFactory.h"
+#include "MitkExtExports.h"
 
 namespace mitk {
 
-class MITKEXT_CORE_EXPORT CoreExtObjectFactory : public CoreObjectFactory
+class MitkExt_EXPORT CoreExtObjectFactory : public CoreObjectFactory
 {
   public:
     mitkClassMacro(CoreExtObjectFactory,CoreObjectFactory);
@@ -40,7 +41,7 @@ class MITKEXT_CORE_EXPORT CoreExtObjectFactory : public CoreObjectFactory
 }
 // global declaration for simple call by
 // applications
-void MITKEXT_CORE_EXPORT RegisterCoreExtObjectFactory();
+void MitkExt_EXPORT RegisterCoreExtObjectFactory();
 
 #endif
 

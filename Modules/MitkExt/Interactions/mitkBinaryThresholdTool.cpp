@@ -38,7 +38,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkImageRegionConstIteratorWithIndex.h>
 
 namespace mitk {
-  MITK_TOOL_MACRO(MITKEXT_CORE_EXPORT, BinaryThresholdTool, "Thresholding tool");
+  MITK_TOOL_MACRO(MitkExt_EXPORT, BinaryThresholdTool, "Thresholding tool");
 }
 
 mitk::BinaryThresholdTool::BinaryThresholdTool()

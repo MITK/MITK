@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define mitkBinaryThresholdTool_h_Included
 
 #include "mitkCommon.h"
+#include "MitkExtExports.h"
 #include "mitkAutoSegmentationTool.h"
 #include "mitkDataTreeNode.h"
 
@@ -37,7 +38,7 @@ namespace mitk
 
   Last contributor: $Author$
 */
-class MITKEXT_CORE_EXPORT BinaryThresholdTool : public AutoSegmentationTool
+class MitkExt_EXPORT BinaryThresholdTool : public AutoSegmentationTool
 {
   public:
 

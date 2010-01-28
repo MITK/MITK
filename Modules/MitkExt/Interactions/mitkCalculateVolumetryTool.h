@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define mitkCalculateVolumetryTool_h_Included
 
 #include "mitkCommon.h"
+#include "MitkExtExports.h"
 #include "mitkSegmentationsProcessingTool.h"
 
 namespace mitk
@@ -34,7 +35,7 @@ namespace mitk
 
   Last contributor: $Author$
 */
-class MITKEXT_CORE_EXPORT CalculateVolumetryTool : public SegmentationsProcessingTool
+class MitkExt_EXPORT CalculateVolumetryTool : public SegmentationsProcessingTool
 {
   public:
     

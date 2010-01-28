@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define PARRECFILEREADER_H_HEADER_INCLUDED_C1F48A22
 
 #include "mitkCommon.h"
+#include "MitkExtExports.h"
 #include "mitkFileReader.h"
 #include "mitkImageSource.h"
 
@@ -27,7 +28,7 @@ namespace mitk {
 //##Documentation
 //## @brief Reader to read files in Philips PAR/REC file format
 //## @ingroup IO
-class MITKEXT_CORE_EXPORT ParRecFileReader : public ImageSource, public FileReader
+class MitkExt_EXPORT ParRecFileReader : public ImageSource, public FileReader
 {
 public:
   mitkClassMacro(ParRecFileReader, FileReader);

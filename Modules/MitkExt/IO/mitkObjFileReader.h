@@ -20,13 +20,14 @@ PURPOSE.  See the above copyright notices for more information.
 #define ObjFileReader_H_HEADER_INCLUDED
 
 #include "mitkCommon.h"
+#include "MitkExtExports.h"
 #include "mitkSurfaceSource.h"
 
 namespace mitk {
 //##Documentation
 //## @brief Reader to read files in Obj-format
 //## @ingroup IO
-class MITKEXT_CORE_EXPORT ObjFileReader : public SurfaceSource
+class MitkExt_EXPORT ObjFileReader : public SurfaceSource
 {
 public:
     mitkClassMacro(ObjFileReader, SurfaceSource);

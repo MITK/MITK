@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKCONNECTPOINTSINTERACTOR_H_HEADER_INCLUDED_C11202FF
 
 #include "mitkCommon.h"
+#include "MitkExtExports.h"
 #include "mitkVector.h"
 #include <mitkInteractor.h>
 
@@ -29,7 +30,7 @@ namespace mitk
   //##Documentation
   //## @brief Interaction for mitk::Mesh: Connect existing points to lines
   //## @ingroup Interaction
-  class MITKEXT_CORE_EXPORT ConnectPointsInteractor : public Interactor
+  class MitkExt_EXPORT ConnectPointsInteractor : public Interactor
   {
   public:
     mitkClassMacro(ConnectPointsInteractor, Interactor);

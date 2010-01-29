@@ -54,11 +54,10 @@ class QmitkExt_EXPORT QmitkNewSegmentationDialog : public QDialog
 
     virtual ~QmitkNewSegmentationDialog();
 
-    const std::string GetSegmentationName();
+    const QString GetSegmentationName();
     const char* GetOrganType();
-    mitk::Color GetColorProperty();
+    mitk::Color GetColor();
 
-    void AddSuggestion(const QStringList organColor);
     void SetSuggestionList(QStringList organColorList);
 
   signals:
@@ -90,14 +89,14 @@ class QmitkExt_EXPORT QmitkNewSegmentationDialog : public QDialog
 
     bool newOrganEntry;
 
-    QColor color;
+    QColor m_Color;
 
     QCompleter* completer;
 
     QString m_SegmentationName;
 
     QStringList organList;
-    QStringList colorList;
+    QList<QColor> colorList;
 };
 
 #endif

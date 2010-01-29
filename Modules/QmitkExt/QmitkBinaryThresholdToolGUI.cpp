@@ -99,8 +99,8 @@ void QmitkBinaryThresholdToolGUI::OnAcceptThresholdPreview()
     dialog->setPrompt("What did you just segment?");
     int dialogReturnValue = dialog->exec();
 
-    std::string organName = dialog->GetSegmentationName();
-    mitk::Color color     = dialog->GetColorProperty();
+    std::string organName = dialog->GetSegmentationName().toStdString();
+    mitk::Color color     = dialog->GetColor();
 
     delete dialog;
 

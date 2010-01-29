@@ -18,19 +18,11 @@
 #ifndef MITKSEGMENTATIONSELECTIONPROVIDER_H_
 #define MITKSEGMENTATIONSELECTIONPROVIDER_H_
 
-//#include "berryUiQtDll.h"
-
 #include <berryISelection.h>
 #include <berryISelectionProvider.h>
 #include <berryISelectionChangedListener.h>
 #include <berryISelectionListener.h>
 #include <mitkDataTreeNodeSelection.h>
-
-/*
-#include <QItemSelectionModel>
-#include <QItemSelection>
-#include <QObject>
-*/
 
 namespace mitk
 {
@@ -56,14 +48,6 @@ public:
   void FireSelectionChanged(mitk::DataTreeNodeSelection::Pointer selection);
   void FireSelectionChanged(mitk::DataTreeNode::Pointer selectedNode);
 
-  //QItemSelection GetQItemSelection() const;
-  
-  //void SetQItemSelection(const QItemSelection& selection);
-
-  //QItemSelectionModel* GetItemSelectionModel() const;
-  
-  //void SetItemSelectionModel(QItemSelectionModel* combo);
-
   protected:
 
    DataTreeNodeSelection::Pointer m_CurrentSelection;
@@ -73,3 +57,4 @@ public:
 }
 
 #endif /* MITKSEGMENTATIONSELECTIONPROVIDER_H_ */
+

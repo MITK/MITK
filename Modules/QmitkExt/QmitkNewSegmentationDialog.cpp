@@ -100,9 +100,9 @@ void QmitkNewSegmentationDialog::onAcceptClicked()
   this->accept();
 }
 
-const std::string QmitkNewSegmentationDialog::GetSegmentationName()
+const QString QmitkNewSegmentationDialog::GetSegmentationName()
 {
-  return m_SegmentationName.toStdString();
+  return m_SegmentationName;
 }
 
 const char* QmitkNewSegmentationDialog::GetOrganType()
@@ -125,14 +125,14 @@ void QmitkNewSegmentationDialog::onNewOrganNameChanged(const QString& newText)
 
 void QmitkNewSegmentationDialog::onColorBtnClicked()
 {
-  color = QColorDialog::getColor();
-  if (color.spec() == 0)
+  m_Color = QColorDialog::getColor();
+  if (m_Color.spec() == 0)
   {
-    color.setRed(255);
-    color.setGreen(0);
-    color.setBlue(0);
+    m_Color.setRed(255);
+    m_Color.setGreen(0);
+    m_Color.setBlue(0);
   }
-  btnColor->setStyleSheet(QString("background-color:rgb(%1,%2, %3)").arg(color.red()).arg(color.green()).arg(color.blue()));
+  btnColor->setStyleSheet(QString("background-color:rgb(%1,%2, %3)").arg(m_Color.red()).arg(m_Color.green()).arg(m_Color.blue()));
 }
     
 void QmitkNewSegmentationDialog::setPrompt( const QString& prompt )
@@ -146,10 +146,10 @@ void QmitkNewSegmentationDialog::setSegmentationName( const QString& name )
   m_SegmentationName = name;
 }
 
-mitk::Color QmitkNewSegmentationDialog::GetColorProperty()
+mitk::Color QmitkNewSegmentationDialog::GetColor()
 {
   mitk::Color colorProperty;
-  if (color.spec() == 0)
+  if (m_Color.spec() == 0)
   {
     colorProperty.SetRed(1);
     colorProperty.SetGreen(0);
@@ -157,27 +157,27 @@ mitk::Color QmitkNewSegmentationDialog::GetColorProperty()
   }
   else
   {
-    colorProperty.SetRed(color.redF());
-    colorProperty.SetGreen(color.greenF());
-    colorProperty.SetBlue(color.blueF());
+    colorProperty.SetRed(m_Color.redF());
+    colorProperty.SetGreen(m_Color.greenF());
+    colorProperty.SetBlue(m_Color.blueF());
   }
   return colorProperty;
 }
 
-void QmitkNewSegmentationDialog::AddSuggestion(const QStringList organColor)
-{
-  SetSuggestionList(organColor);
-}
-
 void QmitkNewSegmentationDialog::SetSuggestionList(QStringList organColorList)
 {
-  for (int i = 0; i < organColorList.size()/4; i++)
+  QStringList::iterator iter;
+  for (iter = organColorList.begin(); iter != organColorList.end(); ++iter)
   {
-    organList.push_back(organColorList.at(4*i));
-    colorList.push_back(organColorList.at(4*i+1));
-    colorList.push_back(organColorList.at(4*i+2));
-    colorList.push_back(organColorList.at(4*i+3));
+    QString& element = *iter;
+    QString colorName = element.right(7);
+    QColor color(colorName);
+    QString organName = element.left(element.size() - 7);
+
+    organList.push_back(organName);
+    colorList.push_back(color);
   }
+
   QStringListModel* completeModel = static_cast<QStringListModel*> (completer->model());
   completeModel->setStringList(organList);
 }
@@ -187,9 +187,7 @@ void QmitkNewSegmentationDialog::onColorChange(const QString& completedWord)
   if (organList.contains(completedWord))
   {
     int j = organList.indexOf(completedWord);
-    color.setRed(colorList.at(3*j).toInt());
-    color.setGreen(colorList.at(3*j+1).toInt());
-    color.setBlue(colorList.at(3*j+2).toInt());
-    btnColor->setStyleSheet(QString("background-color:rgb(%1,%2, %3)").arg(color.red()).arg(color.green()).arg(color.blue()));
+    m_Color = colorList.at(j);
+    btnColor->setStyleSheet(QString("background-color:rgb(%1,%2, %3)").arg(m_Color.red()).arg(m_Color.green()).arg(m_Color.blue()));
   }
 }

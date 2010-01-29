@@ -5,6 +5,7 @@ SET(SRC_CPP_FILES
 SET(INTERNAL_CPP_FILES
   QmitkSegmentationView.cpp
   mitkSegmentationSelectionProvider.cpp
+  QmitkSegmentationPostProcessing.cpp
 )
 
 SET(UI_FILES
@@ -14,6 +15,7 @@ SET(UI_FILES
 SET(MOC_H_FILES
   src/QmitkSegmentationPreferencePage.h
   src/internal/QmitkSegmentationView.h
+  src/internal/QmitkSegmentationPostProcessing.h
 )
 
 SET(RESOURCE_FILES

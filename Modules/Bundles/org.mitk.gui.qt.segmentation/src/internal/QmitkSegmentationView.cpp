@@ -24,7 +24,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkNewSegmentationDialog.h"
 #include "QmitkCommonFunctionality.h"
 #include "QmitkSlicesInterpolator.h"
-#include "QmitkNodeDescriptorManager.h"
 #include "QmitkToolGUI.h"
 
 #include "mitkToolManager.h"
@@ -35,11 +34,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkOrganTypeProperty.h"
 #include "mitkVtkResliceInterpolationProperty.h"
 #include "mitkSegTool2D.h"
-#include "mitkShowSegmentationAsSurface.h"
-#include "mitkProgressBar.h"
-#include "mitkStatusBar.h"
-#include "mitkAutoCropImageFilter.h"
-#include "mitkBinaryThresholdTool.h"
 
 #include <QPushButton>
 #include <QDockWidget>
@@ -65,65 +59,64 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkDataTreeNodeObject.h"
 
 #include "itkTreeChangeEvent.h"
-#include <itkConstantPadImageFilter.h>
 
-std::string QmitkSegmentationView::ORGAN_COLOR_STRING = QmitkSegmentationView::CreateOrganColorString();
-
-std::string QmitkSegmentationView::CreateOrganColorString()
+QStringList QmitkSegmentationView::GetDefaultOrganColorString()
 {
-  std::string m;
-  m="Ankle;255;0;0;";
-  m+="Appendix;255;0;0;";
-  m+="Blood vessels;255;49;49;";
-  m+="Bronchial tree;49;104;255;";
-  m+="Bone;213;213;213;";
-  m+="Brain;255;156;202;";
-  m+="Coccyx;255;0;0;";
-  m+="Colon;255;0;0;";
-  m+="Cyst;255;0;0;";
-  m+="Elbow;255;0;0;";
-  m+="Eye;255;0;0;";
-  m+="Fallopian tube;255;0;0;";
-  m+="Fat;255;43;238;";
-  m+="Hand;255;0;0;";
-  m+="Gall Bladder;86;127;24;";
-  m+="Heart;235;29;50;";
-  m+="Hip;255;0;0;";
-  m+="Kidney;211;63;0;";
-  m+="Knee;255;0;0;";
-  m+="Larynx;255;0;0;";
-  m+="Liver;255;204;61;";
-  m+="Lung;107;220;255;";
-  m+="Lymph node;255;0;0;";
-  m+="Muscle;255;69;106;";
-  m+="Nerve;255;234;79;";
-  m+="Nose;255;0;0;";
-  m+="Oesophagus;255;0;0;";
-  m+="Ovaries;255;0;0;";
-  m+="Pancreas;249;171;61;";
-  m+="Pelvis;255;0;0;";
-  m+="Penis;255;0;0;";
-  m+="Pharynx;255;0;0;";
-  m+="Prostate;255;0;0;";
-  m+="Rectum;255;0;0;";
-  m+="Sacrum;255;0;0;";
-  m+="Seminal vesicle;255;0;0;";
-  m+="Shoulder;255;0;0;";
-  m+="Spinal cord;245;249;61;";
-  m+="Spleen;249;108;61;";
-  m+="Stomach;249;108;61;";
-  m+="Teeth;255;252;216;";
-  m+="Testicles;255;0;0;";
-  m+="Thyroid;255;246;148;";
-  m+="Tongue;255;0;0;";
-  m+="Tumor;147;112;17;";
-  m+="Urethra;248;255;50;";
-  m+="Urinary bladder;248;255;50;";
-  m+="Uterus;255;0;0;";
-  m+="Vagina;255;0;0;";
-  m+="Vertebra;255;0;0;";
-  m+="Wrist;255;0;0";
-  return m;
+  QStringList organColors;
+
+  AppendToOrganList(organColors, "Ankle", 255, 0, 0);
+  AppendToOrganList(organColors, "Appendix", 255, 0, 0);
+  AppendToOrganList(organColors, "Blood vessels", 255, 49, 49);
+  AppendToOrganList(organColors, "Bone", 213, 213, 213);
+  AppendToOrganList(organColors, "Brain", 255, 156, 202);
+  AppendToOrganList(organColors, "Bronchial tree", 49, 104, 255);
+  AppendToOrganList(organColors, "Coccyx", 255, 0, 0);
+  AppendToOrganList(organColors, "Colon", 255, 0, 0);
+  AppendToOrganList(organColors, "Cyst", 255, 0, 0);
+  AppendToOrganList(organColors, "Elbow", 255, 0, 0);
+  AppendToOrganList(organColors, "Eye", 255, 0, 0);
+  AppendToOrganList(organColors, "Fallopian tube", 255, 0, 0);
+  AppendToOrganList(organColors, "Fat", 255, 43, 238);
+  AppendToOrganList(organColors, "Gall Bladder", 86, 127, 24);
+  AppendToOrganList(organColors, "Hand", 255, 0, 0);
+  AppendToOrganList(organColors, "Heart", 235, 29, 50);
+  AppendToOrganList(organColors, "Hip", 255, 0, 0);
+  AppendToOrganList(organColors, "Kidney", 211, 63, 0);
+  AppendToOrganList(organColors, "Knee", 255, 0, 0);
+  AppendToOrganList(organColors, "Larynx", 255, 0, 0);
+  AppendToOrganList(organColors, "Liver", 255, 204, 61);
+  AppendToOrganList(organColors, "Lung", 107, 220, 255);
+  AppendToOrganList(organColors, "Lymph node", 255, 0, 0);
+  AppendToOrganList(organColors, "Muscle", 255, 69, 106);
+  AppendToOrganList(organColors, "Nerve", 255, 234, 79);
+  AppendToOrganList(organColors, "Nose", 255, 0, 0);
+  AppendToOrganList(organColors, "Oesophagus", 255, 0, 0);
+  AppendToOrganList(organColors, "Ovaries", 255, 0, 0);
+  AppendToOrganList(organColors, "Pancreas", 249, 171, 61);
+  AppendToOrganList(organColors, "Pelvis", 255, 0, 0);
+  AppendToOrganList(organColors, "Penis", 255, 0, 0);
+  AppendToOrganList(organColors, "Pharynx", 255, 0, 0);
+  AppendToOrganList(organColors, "Prostate", 255, 0, 0);
+  AppendToOrganList(organColors, "Rectum", 255, 0, 0);
+  AppendToOrganList(organColors, "Sacrum", 255, 0, 0);
+  AppendToOrganList(organColors, "Seminal vesicle", 255, 0, 0);
+  AppendToOrganList(organColors, "Shoulder", 255, 0, 0);
+  AppendToOrganList(organColors, "Spinal cord", 245, 249, 61);
+  AppendToOrganList(organColors, "Spleen", 249, 108, 61);
+  AppendToOrganList(organColors, "Stomach", 249, 108, 61);
+  AppendToOrganList(organColors, "Teeth", 255, 252, 216);
+  AppendToOrganList(organColors, "Testicles", 255, 0, 0);
+  AppendToOrganList(organColors, "Thyroid", 255, 246, 148);
+  AppendToOrganList(organColors, "Tongue", 255, 0, 0);
+  AppendToOrganList(organColors, "Tumor", 147, 112, 17);
+  AppendToOrganList(organColors, "Urethra", 248, 255, 50);
+  AppendToOrganList(organColors, "Urinary bladder", 248, 255, 50);
+  AppendToOrganList(organColors, "Uterus", 255, 0, 0);
+  AppendToOrganList(organColors, "Vagina", 255, 0, 0);
+  AppendToOrganList(organColors, "Vertebra", 255, 0, 0);
+  AppendToOrganList(organColors, "Wrist", 255, 0, 0);
+
+  return organColors;
 }
 
 
@@ -137,7 +130,7 @@ QmitkSegmentationView::QmitkSegmentationView()
 
 void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
 {
-  //# Preferences
+  // preferences
   berry::IPreferencesService::Pointer prefService 
     = berry::Platform::GetServiceRegistry()
     .GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
@@ -150,7 +143,6 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
   }
 
   // setup the basic GUI of this view
-
   m_Parent = parent;
 
   m_Controls = new Ui::QmitkSegmentationControls;
@@ -164,24 +156,37 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
   toolManager->SetDataStorage( *m_DataStorage );
   assert ( toolManager );
 
+  // all part of open source MITK
   m_Controls->m_ManualToolSelectionBox->SetGenerateAccelerators(true);
   m_Controls->m_ManualToolSelectionBox->SetToolGUIArea( m_Controls->m_ManualToolGUIContainer );
   m_Controls->m_ManualToolSelectionBox->SetDisplayedToolGroups("Add Subtract Paint Wipe 'Region Growing' Correction Fill Erase");
   m_Controls->m_ManualToolSelectionBox->SetEnabledMode( QmitkToolSelectionBox::EnabledWithReferenceAndWorkingData );
 
+  // available only in the 3M application
+  if ( m_Controls->m_OrganToolSelectionBox->children().count() )
+  {
+    m_Controls->widgetStack->setItemEnabled( 1, false );
+  }
   m_Controls->m_OrganToolSelectionBox->SetToolManager( *toolManager );
   m_Controls->m_OrganToolSelectionBox->SetToolGUIArea( m_Controls->m_OrganToolGUIContainer );
   m_Controls->m_OrganToolSelectionBox->SetDisplayedToolGroups("'Hippocampus left' 'Hippocampus right' 'Lung left' 'Lung right' 'Liver' 'Heart LV' 'Endocard LV' 'Epicard LV'");
   m_Controls->m_OrganToolSelectionBox->SetEnabledMode( QmitkToolSelectionBox::EnabledWithReferenceData );
 
+  // available only in the 3M application
+  if ( m_Controls->m_LesionToolSelectionBox->children().count() )
+  {
+    m_Controls->widgetStack->setItemEnabled( 2, false );
+  }
   m_Controls->m_LesionToolSelectionBox->SetToolManager( *toolManager );
   m_Controls->m_LesionToolSelectionBox->SetToolGUIArea( m_Controls->m_LesionToolGUIContainer );
   m_Controls->m_LesionToolSelectionBox->SetDisplayedToolGroups("'Lymph Node' 'Lymph Node Correction'");
   m_Controls->m_LesionToolSelectionBox->SetEnabledMode( QmitkToolSelectionBox::EnabledWithReferenceData );
     
-  toolManager->NewNodesGenerated += mitk::MessageDelegate<QmitkSegmentationView>( this, &QmitkSegmentationView::OnNewNodesGenerated );          // update the list of segmentations
-  toolManager->NewNodeObjectsGenerated += mitk::MessageDelegate1<QmitkSegmentationView, mitk::ToolManager::DataVectorType*>( this, &QmitkSegmentationView::OnNewNodeObjectsGenerated );          // update the list of segmentations
-  
+  toolManager->NewNodesGenerated += 
+    mitk::MessageDelegate<QmitkSegmentationView>( this, &QmitkSegmentationView::OnNewNodesGenerated );          // update the list of segmentations
+  toolManager->NewNodeObjectsGenerated += 
+    mitk::MessageDelegate1<QmitkSegmentationView, mitk::ToolManager::DataVectorType*>( this, &QmitkSegmentationView::OnNewNodeObjectsGenerated );          // update the list of segmentations
+
   // create signal/slot connections
   connect( m_Controls->btnNewSegmentation, SIGNAL(clicked()), this, SLOT(CreateNewSegmentation()) );
   connect( m_Controls->m_ManualToolSelectionBox, SIGNAL(ToolSelected(int)), this, SLOT(OnToolSelected(int)) );
@@ -190,97 +195,26 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
   // register as listener for BlueBerry selection events (mainly from DataManager)
   m_SelectionListener = berry::ISelectionListener::Pointer(new berry::SelectionChangedAdapter<QmitkSegmentationView>(this, &QmitkSegmentationView::SelectionChanged));
   this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddPostSelectionListener(/*"org.mitk.views.datamanager",*/ m_SelectionListener);
-
-  UpdateFromCurrentDataManagerSelection();
-
-  // register a couple of additional actions for DataManager's context menu
-  QmitkNodeDescriptor* imageDataTreeNodeDescriptor = 
-    QmitkNodeDescriptorManager::GetInstance()->GetDescriptor("Image");
-
-  if (imageDataTreeNodeDescriptor)
-  {
-    m_ThresholdAction = new QAction("Threshold..", parent);
-    imageDataTreeNodeDescriptor->AddAction(m_ThresholdAction);
-    connect( m_ThresholdAction, SIGNAL( triggered(bool) ) , this, SLOT( ThresholdImage(bool) ) );
-  }
-  else
-  {
-    MITK_WARN << "Could not get datamanager's node descriptor for 'ImageMask'";
-  }
-
-  // register a couple of additional actions for DataManager's context menu
-  QmitkNodeDescriptor* binaryImageDataTreeNodeDescriptor = 
-    QmitkNodeDescriptorManager::GetInstance()->GetDescriptor("ImageMask");
-
-  if (binaryImageDataTreeNodeDescriptor)
-  {
-    m_CreateSurfaceAction = new QAction("Create polygon model", parent);
-    binaryImageDataTreeNodeDescriptor->AddAction(m_CreateSurfaceAction);
-    connect( m_CreateSurfaceAction, SIGNAL( triggered(bool) ) , this, SLOT( CreateSurface(bool) ) );
-
-    m_CreateSmoothSurfaceAction = new QAction("Create smoothed polygon model", parent);
-    binaryImageDataTreeNodeDescriptor->AddAction(m_CreateSmoothSurfaceAction);
-    connect( m_CreateSmoothSurfaceAction, SIGNAL( triggered(bool) ) , this, SLOT( CreateSmoothedSurface(bool) ) );
-
-    m_StatisticsAction = new QAction("Statistics", parent);
-    binaryImageDataTreeNodeDescriptor->AddAction(m_StatisticsAction);
-    connect( m_StatisticsAction, SIGNAL( triggered(bool) ) , this, SLOT( ImageStatistics(bool) ) );
-   
-    m_AutocropAction = new QAction("Autocrop", parent);
-    binaryImageDataTreeNodeDescriptor->AddAction(m_AutocropAction);
-    connect( m_AutocropAction, SIGNAL( triggered(bool) ) , this, SLOT( AutocropSelected(bool) ) );
-  }
-  else
-  {
-    MITK_WARN << "Could not get datamanager's node descriptor for 'ImageMask'";
-  }
-  
-  // call preferences changed for initialization
-  this->OnPreferencesChanged(m_SegmentationPreferencesNode.GetPointer());
-  
-  //# m_SelectionProvider
+ 
+  // also make us a provider of selections 
   m_SelectionProvider = new mitk::SegmentationSelectionProvider();
-  //m_SelectionProvider->SetItemSelectionModel(m_NodeTreeView->selectionModel());
   this->GetSite()->SetSelectionProvider(m_SelectionProvider);
-}
 
-void QmitkSegmentationView::SetFocus()
-{
+
+  // create helper class to provide context menus for segmentations in data manager
+  m_PostProcessing = new QmitkSegmentationPostProcessing(this->GetDefaultDataStorage(), this, parent);
+ 
+  // call preferences changed for initialization
+  // changes GUI according to current data manager selection (because it might have changed before QmitkSegmentationView came into being)
+  this->OnPreferencesChanged(m_SegmentationPreferencesNode.GetPointer());
 }
 
 QmitkSegmentationView::~QmitkSegmentationView()
 {
   berry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
   if(s)
+  {
     s->RemoveSelectionListener(m_SelectionListener);
-
-  // unregister a couple of additional actions for DataManager's context menu
-  QmitkNodeDescriptor* imageDataTreeNodeDescriptor = 
-    QmitkNodeDescriptorManager::GetInstance()->GetDescriptor("Image");
-
-  if (imageDataTreeNodeDescriptor)
-  {
-    imageDataTreeNodeDescriptor->RemoveAction( m_ThresholdAction );
-  }
-  else
-  {
-    MITK_WARN << "Could not get datamanager's node descriptor for 'Image'";
-  }
-
-  // unregister a couple of additional actions for DataManager's context menu
-  QmitkNodeDescriptor* binaryImageDataTreeNodeDescriptor = 
-    QmitkNodeDescriptorManager::GetInstance()->GetDescriptor("ImageMask");
-
-  if (binaryImageDataTreeNodeDescriptor)
-  {
-    binaryImageDataTreeNodeDescriptor->RemoveAction( m_CreateSurfaceAction );
-    binaryImageDataTreeNodeDescriptor->RemoveAction( m_CreateSmoothSurfaceAction );
-    binaryImageDataTreeNodeDescriptor->RemoveAction( m_StatisticsAction );
-    binaryImageDataTreeNodeDescriptor->RemoveAction( m_AutocropAction );
-  }
-  else
-  {
-    MITK_WARN << "Could not get datamanager's node descriptor for 'ImageMask'";
   }
 
   this->Deactivated();
@@ -300,15 +234,19 @@ void QmitkSegmentationView::CreateNewSegmentation()
         // ask about the name and organ type of the new segmentation
         QmitkNewSegmentationDialog* dialog = new QmitkNewSegmentationDialog( m_Parent ); // needs a QWidget as parent, "this" is not QWidget
 
-        std::string organlist_prefs = m_SegmentationPreferencesNode->GetByteArray("Organ-Color-List","");
-        if (QString::fromStdString(organlist_prefs).contains(QString::fromStdString(ORGAN_COLOR_STRING)))
-          ORGAN_COLOR_STRING=m_SegmentationPreferencesNode->GetByteArray("Organ-Color-List","");
+        QString storedList = QString::fromStdString( m_SegmentationPreferencesNode->GetByteArray("Organ-Color-List","") );
+        QStringList organColors;
+        if (storedList.isEmpty())
+        {
+          organColors = GetDefaultOrganColorString();
+        }
+        else
+        {
+          organColors = QString::fromStdString( m_SegmentationPreferencesNode->GetByteArray("Organ-Color-List","") ).split(";");
+        }
 
-        QString organColorQString = QString::fromStdString(ORGAN_COLOR_STRING);
+        dialog->SetSuggestionList( organColors );
 
-        organColorList = organColorQString.split(";");
-
-        dialog->SetSuggestionList(organColorList);
         int dialogReturnValue = dialog->exec();
 
         if ( dialogReturnValue == QDialog::Rejected ) return; // user clicked cancel or pressed Esc or something similar
@@ -322,11 +260,11 @@ void QmitkSegmentationView::CreateNewSegmentation()
           try
           {
             mitk::DataTreeNode::Pointer emptySegmentation =
-              firstTool->CreateEmptySegmentationNode( image, dialog->GetSegmentationName(), dialog->GetColorProperty() );
+              firstTool->CreateEmptySegmentationNode( image, dialog->GetSegmentationName().toStdString(), dialog->GetColor() );
 
-            ExtendOrganList(dialog->GetSegmentationName(),dialog->GetColorProperty());
+            UpdateOrganList( organColors, dialog->GetSegmentationName(), dialog->GetColor() );
 
-            m_SegmentationPreferencesNode->PutByteArray("Organ-Color-List",ORGAN_COLOR_STRING);
+            m_SegmentationPreferencesNode->PutByteArray("Organ-Color-List", organColors.join(";").toStdString() );
             m_SegmentationPreferencesNode->Flush();
 
             if (!emptySegmentation) return; // could be aborted by user
@@ -335,11 +273,10 @@ void QmitkSegmentationView::CreateNewSegmentation()
 
             this->GetDefaultDataStorage()->Add( emptySegmentation, node ); // add as a child, because the segmentation "derives" from the original
 
-            // TODO select this new segmentation in data manager
             SendSelectedEvent( node, emptySegmentation );
-            UpdateFromCurrentDataManagerSelection();
+            UpdateFromCurrentDataManagerSelection(); // needs to be done because this view ignores selection from self
 
-            m_Controls->m_ManualToolSelectionBox->GetToolManager()->SetWorkingData( emptySegmentation );
+            // TODO still working? m_Controls->m_ManualToolSelectionBox->GetToolManager()->SetWorkingData( emptySegmentation );
           }
           catch (std::bad_alloc)
           {
@@ -378,6 +315,7 @@ void QmitkSegmentationView::OnToolSelected(int id)
 
 void QmitkSegmentationView::OnSegmentationMethodSelected(int id)
 {
+  // this is just a workaround, should be removed when all tools support 3D+t
   if (id==0) //manual
   {
 
@@ -780,88 +718,6 @@ void QmitkSegmentationView::Deactivated()
   }
 }
 
-void QmitkSegmentationView::CreateSmoothedSurface(bool)
-{
-  CreateASurface(true);
-}
-
-void QmitkSegmentationView::CreateSurface(bool)
-{
-  CreateASurface(false);
-}
-
-void QmitkSegmentationView::CreateASurface(bool smoothed)
-{
-  MITK_INFO << "CreateSurface for:";
-
-  NodeList selection = this->GetSelectedNodes();
-
-  for ( NodeList::iterator iter = selection.begin(); iter != selection.end(); ++iter )
-  {
-    mitk::DataTreeNode* node = *iter;
-
-    if (node)
-    {
-      MITK_INFO << "   " << (*iter)->GetName();
-
-      mitk::Image::Pointer image = dynamic_cast<mitk::Image*>( node->GetData() );
-      if (image.IsNull()) return;
-        
-      try
-      {
-        mitk::ShowSegmentationAsSurface::Pointer surfaceFilter = mitk::ShowSegmentationAsSurface::New();
-
-        // attach observer to get notified about result
-        itk::SimpleMemberCommand<QmitkSegmentationView>::Pointer goodCommand = itk::SimpleMemberCommand<QmitkSegmentationView>::New();
-        goodCommand->SetCallbackFunction(this, &QmitkSegmentationView::OnSurfaceCalculationDone);
-        surfaceFilter->AddObserver(mitk::ResultAvailable(), goodCommand);
-        itk::SimpleMemberCommand<QmitkSegmentationView>::Pointer badCommand = itk::SimpleMemberCommand<QmitkSegmentationView>::New();
-        badCommand->SetCallbackFunction(this, &QmitkSegmentationView::OnSurfaceCalculationDone);
-        surfaceFilter->AddObserver(mitk::ProcessingError(), badCommand);
-
-        mitk::DataTreeNode::Pointer nodepointer = node;
-        surfaceFilter->SetPointerParameter("Input", image);
-        surfaceFilter->SetPointerParameter("Group node", nodepointer);
-        surfaceFilter->SetParameter("Show result", true );
-        surfaceFilter->SetParameter("Sync visibility", false );
-        surfaceFilter->SetDataStorage( *m_DataStorage );
-
-        if (smoothed)
-        {
-          surfaceFilter->SetParameter("Smooth", true );
-          surfaceFilter->SetParameter("Apply median", true );
-          surfaceFilter->SetParameter("Median kernel size", 3u );
-          surfaceFilter->SetParameter("Gaussian SD", 1.5f );
-          surfaceFilter->SetParameter("Decimate mesh", true );
-          surfaceFilter->SetParameter("Decimation rate", 0.8f );
-        }
-        else
-        {
-          surfaceFilter->SetParameter("Smooth", false );
-          surfaceFilter->SetParameter("Apply median", false );
-          surfaceFilter->SetParameter("Median kernel size", 3u );
-          surfaceFilter->SetParameter("Gaussian SD", 1.5f );
-          surfaceFilter->SetParameter("Decimate mesh", true );
-          surfaceFilter->SetParameter("Decimation rate", 0.8f );
-        }
-        
-        mitk::ProgressBar::GetInstance()->AddStepsToDo(10);
-        mitk::ProgressBar::GetInstance()->Progress(2);
-        mitk::StatusBar::GetInstance()->DisplayText("Surface creation started in background...");
-        surfaceFilter->StartAlgorithm();
-      }
-      catch(...)
-      {
-        MITK_ERROR << "surface creation filter had an error";
-      }
-    }
-    else
-    {
-      MITK_INFO << "   a NULL node selected";
-    }
-  }
-}
-
 QmitkSegmentationView::NodeList QmitkSegmentationView::GetSelectedNodes() const
 {
   NodeList result;
@@ -894,134 +750,6 @@ void QmitkSegmentationView::SendSelectedEvent( mitk::DataTreeNode* referenceNode
 
   //m_SelectionProvider->SetSelection( berry::ISelection::Pointer(new mitk::DataTreeNodeSelection(nodes)) );
   m_SelectionProvider->FireSelectionChanged(workingNode);
-}
-
-void QmitkSegmentationView::OnSurfaceCalculationDone()
-{
-  mitk::ProgressBar::GetInstance()->Progress(8);
-}
-
-void QmitkSegmentationView::ImageStatistics(bool)
-{
-  this->GetSite()->GetWorkbenchWindow()->GetActivePage()->ShowView("org.mitk.views.imagestatistics");
-}
-
-void QmitkSegmentationView::AutocropSelected(bool)
-{
-  MITK_INFO << "Autocrop for:";
-
-  NodeList selection = this->GetSelectedNodes();
-
-  for ( NodeList::iterator iter = selection.begin(); iter != selection.end(); ++iter )
-  {
-    mitk::DataTreeNode* node = *iter;
-
-    if (node)
-    {
-      MITK_INFO << "   " << (*iter)->GetName();
-
-      mitk::Image::Pointer image = dynamic_cast<mitk::Image*>( node->GetData() );
-      if (image.IsNull()) return;
-
-      mitk::ProgressBar::GetInstance()->AddStepsToDo(10);
-      mitk::ProgressBar::GetInstance()->Progress(2);
-
-      qApp->processEvents();
-
-      mitk::AutoCropImageFilter::Pointer cropFilter = mitk::AutoCropImageFilter::New();
-      cropFilter->SetInput( image );
-      cropFilter->SetBackgroundValue( 0 );
-      try
-      {
-        cropFilter->Update();
-
-        image = cropFilter->GetOutput();
-        
-        if (image.IsNotNull())
-        {
-          node->SetData( this->IncreaseCroppedImageSize(image) ); // bug fix 3145
-        }
-      }
-      catch(...)
-      {
-        MITK_ERROR << "Cropping image failed...";
-      }
-      mitk::ProgressBar::GetInstance()->Progress(8);
-    }
-    else
-    {
-      MITK_INFO << "   a NULL node selected";
-    }
-  }
-}
-
-void QmitkSegmentationView::ThresholdImage(bool)
-{
-  MITK_INFO << "Thresholding all this node:";
-
-  NodeList selection = this->GetSelectedNodes();
-
-  m_ThresholdingToolManager = mitk::ToolManager::New( this->GetDefaultDataStorage() );
-  m_ThresholdingToolManager->RegisterClient();
-  m_ThresholdingToolManager->ActiveToolChanged += mitk::MessageDelegate<QmitkSegmentationView>( this, &QmitkSegmentationView::OnThresholdingToolManagerToolModified );
-
-  m_ThresholdingDialog = new QDialog(m_Parent);
-  connect( m_ThresholdingDialog, SIGNAL(finished(int)), this, SLOT(ThresholdingDone(int)) );
-
-  QVBoxLayout* layout = new QVBoxLayout;
-  layout->setContentsMargins(0, 0, 0, 0);
-
-  mitk::Tool* tool = m_ThresholdingToolManager->GetToolById( m_ThresholdingToolManager->GetToolIdByToolType<mitk::BinaryThresholdTool>() );
-  if (tool)
-  {
-    itk::Object::Pointer possibleGUI = tool->GetGUI("Qmitk", "GUI");
-    QmitkToolGUI* gui = dynamic_cast<QmitkToolGUI*>( possibleGUI.GetPointer() );
-    if (gui)
-    {
-      gui->SetTool(tool);
-      gui->setParent(m_ThresholdingDialog);
-      layout->addWidget(gui);
-      m_ThresholdingDialog->setLayout(layout);
-      layout->activate();
-      m_ThresholdingDialog->setFixedSize(m_ThresholdingDialog->width()+100, m_ThresholdingDialog->height());
-      m_ThresholdingDialog->open();
-    }
-  }
-
-  for ( NodeList::iterator iter = selection.begin(); iter != selection.end(); ++iter )
-  {
-    mitk::DataTreeNode* node = *iter;
-
-    if (node)
-    {
-      MITK_INFO << "   " << (*iter)->GetName();
-
-      m_ThresholdingToolManager->SetReferenceData( node );
-      m_ThresholdingToolManager->ActivateTool( m_ThresholdingToolManager->GetToolIdByToolType<mitk::BinaryThresholdTool>() );
-    }
-  }
-}
-
-void QmitkSegmentationView::ThresholdingDone(int)
-{
-  MITK_INFO << "Thresholding done, cleaning up";
-  m_ThresholdingDialog->deleteLater();
-  m_ThresholdingDialog = NULL;
-  m_ThresholdingToolManager = NULL;
-
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-}
-
-void QmitkSegmentationView::OnThresholdingToolManagerToolModified()
-{
-  if ( m_ThresholdingToolManager.IsNull() ) return;
-
-  MITK_INFO << "Not got tool " << m_ThresholdingToolManager->GetActiveToolID();
-
-  if ( m_ThresholdingToolManager->GetActiveToolID() < 0)
-  {
-    m_ThresholdingDialog->accept();
-  }
 }
 
 void QmitkSegmentationView::ApplyDisplayOptions(mitk::DataTreeNode* node)
@@ -1079,74 +807,35 @@ void QmitkSegmentationView::OnNewNodeObjectsGenerated(mitk::ToolManager::DataVec
   }
 }
 
-void QmitkSegmentationView::ExtendOrganList(std::string organname,mitk::Color colorname)
+void QmitkSegmentationView::UpdateOrganList(QStringList& organColors, const QString& organname, mitk::Color color)
 {
-  if (!organColorList.contains(QString::fromStdString(organname),Qt::CaseInsensitive))
+  std::cout << "UpdateOrganList" << std::endl;
+
+  QString listElement( organname + QColor(color.GetRed() * 255 , color.GetGreen() * 255 , color.GetBlue() * 255).name() );
+  std::cout <<"looking for " << listElement.toStdString() << std::endl;
+  
+  // remove previous definition if necessary
+  int oldIndex = organColors.indexOf( QRegExp(organname + "#......", Qt::CaseInsensitive));
+    std::cout <<"found at " << oldIndex << std::endl;
+  if (oldIndex < 0 || organColors.at(oldIndex) != listElement )
   {
-    ORGAN_COLOR_STRING+=";";
-    ORGAN_COLOR_STRING+=organname;
-    ORGAN_COLOR_STRING+=";";
+    if (oldIndex >= 0)
+    {
+    std::cout <<"remove" << std::endl;
+      organColors.removeAt( oldIndex );
+    }
 
-    std::stringstream red;
-    red << colorname.GetRed()*255;
-    std::string temp;
-    red >> temp;
-    ORGAN_COLOR_STRING+=temp;
-    ORGAN_COLOR_STRING+=";";
-
-    std::stringstream green;
-    green << colorname.GetGreen()*255;
-    green >> temp;
-    ORGAN_COLOR_STRING+=temp;
-    ORGAN_COLOR_STRING+=";";
-
-    std::stringstream blue;
-    blue << colorname.GetBlue()*255;
-    blue >> temp;
-    ORGAN_COLOR_STRING+=temp;
+    std::cout << "append" << std::endl;
+    // add colored organ name AND sort list
+    organColors.append( listElement );
+    organColors.sort();
   }
+  
+  std::cout << "organColors: " << organColors.join(" ").toStdString() << std::endl;
 }
 
-mitk::Image::Pointer QmitkSegmentationView::IncreaseCroppedImageSize( mitk::Image::Pointer image )
+void QmitkSegmentationView::AppendToOrganList(QStringList& organColors, const QString& organname, int r, int g, int b)
 {
-  typedef itk::Image< short, 3 > ImageType;
-  typedef itk::Image< unsigned char, 3 > PADOutputImageType;
-  ImageType::Pointer itkTransformImage = ImageType::New();
-  mitk::CastToItkImage( image, itkTransformImage );
-
-  typedef itk::ConstantPadImageFilter< ImageType, PADOutputImageType > PadFilterType;
-  PadFilterType::Pointer padFilter = PadFilterType::New();
-
-  unsigned long upperPad[3];
-  unsigned long lowerPad[3];
-  int borderLiner = 6;
-
-  mitk::Point3D mitkOriginPoint;
-  double origin[3];
-  origin[0]=0;
-  origin[1]=0;
-  origin[2]=0;
-  itkTransformImage->SetOrigin(origin);
-
-  lowerPad[0]=borderLiner/2;
-  lowerPad[1]=borderLiner/2;
-  lowerPad[2]=borderLiner/2;
-
-  upperPad[0]=borderLiner/2;
-  upperPad[1]=borderLiner/2;
-  upperPad[2]=borderLiner/2;
-
-  padFilter->SetInput(itkTransformImage);
-  padFilter->SetConstant(0);
-  padFilter->SetPadUpperBound(upperPad);
-  padFilter->SetPadLowerBound(lowerPad);
-  padFilter->UpdateLargestPossibleRegion();
-
-
-  mitk::Image::Pointer segmentationImage = mitk::Image::New();
-  mitk::CastToMitkImage(padFilter->GetOutput(), segmentationImage);
-
-  segmentationImage->SetGeometry(image->GetGeometry());
-
-  return segmentationImage;
+  organColors.append( organname + QColor(r, g, b).name() );
 }
+

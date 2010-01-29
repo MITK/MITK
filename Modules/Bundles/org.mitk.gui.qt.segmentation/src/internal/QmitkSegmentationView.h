@@ -1,3 +1,21 @@
+/*=========================================================================
+ 
+Program:   Medical Imaging & Interaction Toolkit
+Module:    $RCSfile: mitkPropertyManager.cpp,v $
+Language:  C++
+Date:      $Date$
+Version:   $Revision: 1.12 $
+ 
+Copyright (c) German Cancer Research Center, Division of Medical and
+Biological Informatics. All rights reserved.
+See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
+ 
+This software is distributed WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.  See the above copyright notices for more information.
+ 
+=========================================================================*/
+
 #ifndef QMITKsegmentationVIEW_H_
 #define QMITKsegmentationVIEW_H_
 
@@ -14,6 +32,8 @@
 
 #include "mitkSegmentationSelectionProvider.h"
 
+#include "QmitkSegmentationPostProcessing.h"
+
 /**
  * \ingroup org_mitk_gui_qt_segmentation_internal
  */
@@ -22,14 +42,10 @@ class QmitkSegmentationView : public QObject, public QmitkFunctionality
   Q_OBJECT
 
 public:
-  static std::string ORGAN_COLOR_STRING;
-  static std::string CreateOrganColorString();
-  void SetFocus();
+  QStringList GetDefaultOrganColorString();
 
   QmitkSegmentationView();
   virtual ~QmitkSegmentationView();
-    
-  void OnSurfaceCalculationDone();
     
   void OnNewNodesGenerated();
   void OnNewNodeObjectsGenerated(mitk::ToolManager::DataVectorType*);
@@ -37,9 +53,6 @@ public:
   virtual void Activated();
   virtual void Deactivated();
 
-protected:
-
-  void CreateQtPartControl(QWidget* parent);
 
   public:
 
@@ -56,10 +69,11 @@ protected:
     /// Called when no StdMultiWidget is getting closed.
     ///
     virtual void StdMultiWidgetClosed(QmitkStdMultiWidget& stdMultiWidget);
-
-    void OnThresholdingToolManagerToolModified();
   
     void OnPreferencesChanged(const berry::IBerryPreferences*);
+protected:
+
+  void CreateQtPartControl(QWidget* parent);
   protected slots:
 
     void SelectionChanged(berry::IWorkbenchPart::Pointer sourcepart, berry::ISelection::ConstPointer selection);
@@ -73,29 +87,18 @@ protected:
 
     void SendSelectedEvent( mitk::DataTreeNode* referenceNode, mitk::DataTreeNode* workingNode );
 
-    void CreateSurface(bool);
-    void CreateSmoothedSurface(bool);
-    void ImageStatistics(bool);
-    void AutocropSelected(bool);    
-    
-    void ThresholdImage(bool);
-    void ThresholdingDone(int);
-
   protected:
 
     typedef std::vector<mitk::DataTreeNode*> NodeList;
     NodeList GetSelectedNodes() const;
 
     void CheckImageAlignment();
-    void CreateASurface(bool smoothed);
-
     void ApplyDisplayOptions(mitk::DataTreeNode* node);
 
     void UpdateFromCurrentDataManagerSelection();
 
-    void ExtendOrganList(std::string organname,mitk::Color colorname);
-
-    mitk::Image::Pointer IncreaseCroppedImageSize( mitk::Image::Pointer image );
+    void UpdateOrganList(QStringList& organColors, const QString& organname, mitk::Color colorname);
+    void AppendToOrganList(QStringList& organColors, const QString& organname, int r, int g, int b);
   
     berry::IBerryPreferences::Pointer m_SegmentationPreferencesNode;
 
@@ -111,21 +114,14 @@ protected:
     berry::ISelectionListener::Pointer m_SelectionListener;
     friend struct berry::SelectionChangedAdapter<QmitkSegmentationView>;
   
-    QAction* m_CreateSurfaceAction;
-    QAction* m_CreateSmoothSurfaceAction;
-    QAction* m_StatisticsAction;
-    QAction* m_AutocropAction;
-    QAction* m_ThresholdAction;
-
-    QDialog* m_ThresholdingDialog;
-    mitk::ToolManager::Pointer m_ThresholdingToolManager;
-
     bool m_ShowSegmentationsAsOutline;
     bool m_ShowSegmentationsAsVolumeRendering;
 
     mitk::SegmentationSelectionProvider::Pointer m_SelectionProvider;
 
-    QStringList organColorList;
+    QStringList m_OrganColor;
+
+    QmitkSegmentationPostProcessing* m_PostProcessing;
 
   /// from QmitkSegmentation
 

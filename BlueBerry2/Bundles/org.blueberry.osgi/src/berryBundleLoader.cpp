@@ -214,8 +214,8 @@ BundleLoader::ListLibraries(osgi::framework::IBundle::Pointer bundle, std::vecto
   {
     if (bundle->GetStorage().IsDirectory(baseDir + *iter))
     {
-      //BERRY_INFO << "Found directory: " << (baseDir + *iter) << std::endl;
-      this->ListLibraries(bundle, list, baseDir + *iter + "/");
+      // uncomment the following line for a recursive lookup
+      //this->ListLibraries(bundle, list, baseDir + *iter + "/");
       iter = tmpList.erase(iter);
     }
     else

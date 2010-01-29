@@ -34,6 +34,12 @@ PURPOSE.  See the above copyright notices for more information.
 #include "internal/berryBundle.h"
 #include "internal/berrySystemBundle.h"
 
+#ifdef CMAKE_INTDIR
+  #define BERRY_DEFAULT_LIBRARY_DIR "bin/" CMAKE_INTDIR "/"
+#else
+  #define BERRY_DEFAULT_LIBRARY_DIR "bin/"
+#endif
+
 namespace berry {
 
 class CodeCache;
@@ -102,7 +108,7 @@ public:
   void ReadContributions(SmartPointer<IBundle> bundle);
   void ReadDependentContributions(SmartPointer<IBundle> bundle);
 
-  void ListLibraries(SmartPointer<IBundle> bundle, std::vector<std::string>& list, const std::string& baseDir = "bin/");
+  void ListLibraries(SmartPointer<IBundle> bundle, std::vector<std::string>& list, const std::string& baseDir = BERRY_DEFAULT_LIBRARY_DIR);
   void InstallLibraries(SmartPointer<IBundle> bundle, bool copy = false);
 
   // start all resolved bundles, except the system bundle

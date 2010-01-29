@@ -78,6 +78,8 @@ void QmitkWorkbenchWindowAdvisor::PostWindowCreate()
 
   for (iter = viewDescriptors.begin(); iter != viewDescriptors.end(); ++iter)
   {
+    if ((*iter)->GetId() == "org.blueberry.ui.internal.introview")
+      continue;
     std::pair<std::string, berry::IViewDescriptor::Pointer> p((*iter)->GetLabel(), (*iter)); 
     VDMap.insert(p);
   }

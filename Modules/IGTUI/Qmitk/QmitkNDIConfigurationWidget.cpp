@@ -463,3 +463,18 @@ mitk::DataTreeNode* QmitkNDIConfigurationWidget::GetNode( unsigned int index ) c
   QVariant data = model->data(model->index(index, QmitkNDIToolDelegate::NodeCol), QmitkNDIToolDelegate::OrganNodeRole);
   return data.value<mitk::DataTreeNode*>();
 }
+
+void QmitkNDIConfigurationWidget::HideDiscoverDeviceButton( bool on )
+{
+  m_Controls->m_DisoverDevicesBtn->setHidden(on);
+}
+
+void QmitkNDIConfigurationWidget::HideDiscoverWiredToolseButton( bool on )
+{
+  m_Controls->m_DiscoverToolsBtn->setHidden(on);
+}
+
+void QmitkNDIConfigurationWidget::HideAddPassiveToolButton( bool on )
+{
+  m_Controls->m_AddToolBtn->setHidden(on);
+}

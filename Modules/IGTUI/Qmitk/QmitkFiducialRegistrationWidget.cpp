@@ -121,3 +121,18 @@ mitk::DataTreeNode::Pointer QmitkFiducialRegistrationWidget::GetTrackerFiducials
 {
   return m_TrackerFiducialsNode;
 }
+
+void QmitkFiducialRegistrationWidget::HideStaticRegistrationRadioButton( bool on )
+{
+  m_Controls->m_rbStaticRegistration->setHidden(on);
+}
+
+void QmitkFiducialRegistrationWidget::HideContinousRegistrationRadioButton( bool on )
+{
+  m_Controls->m_rbContinousRegistration->setHidden(on);
+}
+
+void QmitkFiducialRegistrationWidget::HideUseICPRegistrationCheckbox( bool on )
+{
+  m_Controls->m_UseICPRegistration->setHidden(on);
+}

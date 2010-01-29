@@ -58,6 +58,9 @@ public:
   void SetPredicate(mitk::NodePredicateBase::Pointer p); ///< set predicate for organ node editor
   void SetTagPropertyName(const std::string& name);      ///< set name of the property that is used to tag selected nodes
   void SetTagProperty(mitk::BaseProperty::Pointer prop);   ///< set the property that is used to tag selected nodes
+  void HideDiscoverDeviceButton(bool on); ///< show or hide w "Discover Device" button in the UI
+  void HideDiscoverWiredToolseButton(bool on); ///< show or hide "Discover wired tools" button in the UI
+  void HideAddPassiveToolButton(bool on); ///< show or hide "add passive tool" radio button in the UI
 
   const QString GetToolType(unsigned int index) const;
   QMap<QString, unsigned int> GetToolAndTypes() const;

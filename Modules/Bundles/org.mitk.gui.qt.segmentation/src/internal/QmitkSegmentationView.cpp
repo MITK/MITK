@@ -16,114 +16,22 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#include "QmitkSegmentationView.h"
-
-#include "QmitkStdMultiWidget.h"
-#include "QmitkToolReferenceDataSelectionBox.h"
-#include "QmitkToolSelectionBox.h"
-#include "QmitkNewSegmentationDialog.h"
-#include "QmitkCommonFunctionality.h"
-#include "QmitkSlicesInterpolator.h"
-#include "QmitkToolGUI.h"
-
-#include "mitkToolManager.h"
-#include "mitkDataTreeNodeFactory.h"
-#include "mitkLevelWindowProperty.h"
-#include "mitkColorProperty.h"
+#include "mitkDataTreeNodeObject.h"
 #include "mitkProperties.h"
-#include "mitkOrganTypeProperty.h"
-#include "mitkVtkResliceInterpolationProperty.h"
 #include "mitkSegTool2D.h"
 
-#include <QPushButton>
-#include <QDockWidget>
-#include <QVBoxLayout>
-#include <QAbstractItemView>
+#include "QmitkSegmentationView.h"
+#include "QmitkSegmentationPostProcessing.h"
+
+#include "QmitkStdMultiWidget.h"
+#include "QmitkNewSegmentationDialog.h"
+
 #include <QMessageBox> 
 
-#include <mitkDataStorageEditorInput.h>
-#include <mitkIDataStorageReference.h>
-
-#include <mitkNodePredicateDataType.h>
-
-#include <QmitkStdMultiWidget.h>
-#include <QmitkDataStorageListModel.h>
-
-#include <QmitkStdMultiWidgetEditor.h>
-#include <berryQtItemSelection.h>
-
-#include <berryIEditorPart.h>
 #include <berryIWorkbenchPage.h>
-#include "mitkIDataStorageService.h"
-#include "mitkDataTreeNodeSelection.h"
-#include "mitkDataTreeNodeObject.h"
-
-#include "itkTreeChangeEvent.h"
-
-QStringList QmitkSegmentationView::GetDefaultOrganColorString()
-{
-  QStringList organColors;
-
-  AppendToOrganList(organColors, "Ankle", 255, 0, 0);
-  AppendToOrganList(organColors, "Appendix", 255, 0, 0);
-  AppendToOrganList(organColors, "Blood vessels", 255, 49, 49);
-  AppendToOrganList(organColors, "Bone", 213, 213, 213);
-  AppendToOrganList(organColors, "Brain", 255, 156, 202);
-  AppendToOrganList(organColors, "Bronchial tree", 49, 104, 255);
-  AppendToOrganList(organColors, "Coccyx", 255, 0, 0);
-  AppendToOrganList(organColors, "Colon", 255, 0, 0);
-  AppendToOrganList(organColors, "Cyst", 255, 0, 0);
-  AppendToOrganList(organColors, "Elbow", 255, 0, 0);
-  AppendToOrganList(organColors, "Eye", 255, 0, 0);
-  AppendToOrganList(organColors, "Fallopian tube", 255, 0, 0);
-  AppendToOrganList(organColors, "Fat", 255, 43, 238);
-  AppendToOrganList(organColors, "Gall Bladder", 86, 127, 24);
-  AppendToOrganList(organColors, "Hand", 255, 0, 0);
-  AppendToOrganList(organColors, "Heart", 235, 29, 50);
-  AppendToOrganList(organColors, "Hip", 255, 0, 0);
-  AppendToOrganList(organColors, "Kidney", 211, 63, 0);
-  AppendToOrganList(organColors, "Knee", 255, 0, 0);
-  AppendToOrganList(organColors, "Larynx", 255, 0, 0);
-  AppendToOrganList(organColors, "Liver", 255, 204, 61);
-  AppendToOrganList(organColors, "Lung", 107, 220, 255);
-  AppendToOrganList(organColors, "Lymph node", 255, 0, 0);
-  AppendToOrganList(organColors, "Muscle", 255, 69, 106);
-  AppendToOrganList(organColors, "Nerve", 255, 234, 79);
-  AppendToOrganList(organColors, "Nose", 255, 0, 0);
-  AppendToOrganList(organColors, "Oesophagus", 255, 0, 0);
-  AppendToOrganList(organColors, "Ovaries", 255, 0, 0);
-  AppendToOrganList(organColors, "Pancreas", 249, 171, 61);
-  AppendToOrganList(organColors, "Pelvis", 255, 0, 0);
-  AppendToOrganList(organColors, "Penis", 255, 0, 0);
-  AppendToOrganList(organColors, "Pharynx", 255, 0, 0);
-  AppendToOrganList(organColors, "Prostate", 255, 0, 0);
-  AppendToOrganList(organColors, "Rectum", 255, 0, 0);
-  AppendToOrganList(organColors, "Sacrum", 255, 0, 0);
-  AppendToOrganList(organColors, "Seminal vesicle", 255, 0, 0);
-  AppendToOrganList(organColors, "Shoulder", 255, 0, 0);
-  AppendToOrganList(organColors, "Spinal cord", 245, 249, 61);
-  AppendToOrganList(organColors, "Spleen", 249, 108, 61);
-  AppendToOrganList(organColors, "Stomach", 249, 108, 61);
-  AppendToOrganList(organColors, "Teeth", 255, 252, 216);
-  AppendToOrganList(organColors, "Testicles", 255, 0, 0);
-  AppendToOrganList(organColors, "Thyroid", 255, 246, 148);
-  AppendToOrganList(organColors, "Tongue", 255, 0, 0);
-  AppendToOrganList(organColors, "Tumor", 147, 112, 17);
-  AppendToOrganList(organColors, "Urethra", 248, 255, 50);
-  AppendToOrganList(organColors, "Urinary bladder", 248, 255, 50);
-  AppendToOrganList(organColors, "Uterus", 255, 0, 0);
-  AppendToOrganList(organColors, "Vagina", 255, 0, 0);
-  AppendToOrganList(organColors, "Vertebra", 255, 0, 0);
-  AppendToOrganList(organColors, "Wrist", 255, 0, 0);
-
-  return organColors;
-}
-
 
 QmitkSegmentationView::QmitkSegmentationView()
 :m_MultiWidget(NULL)
-,m_ShowSegmentationsAsOutline(true)
-,m_ShowSegmentationsAsVolumeRendering(false)
 {
 }
 
@@ -139,7 +47,7 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
   if(m_SegmentationPreferencesNode.IsNotNull())
   {
     m_SegmentationPreferencesNode->OnChanged
-      .AddListener(berry::MessageDelegate1<QmitkSegmentationView, const berry::IBerryPreferences*>(this, &QmitkSegmentationView::OnPreferencesChanged));
+      .AddListener(berry::MessageDelegate1<QmitkSegmentationView, const berry::IBerryPreferences*>(this, &QmitkSegmentationView::PreferencesChanged));
   }
 
   // setup the basic GUI of this view
@@ -150,10 +58,8 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
   m_Controls->lblWorkingImageSelectionWarning->hide();
   m_Controls->lblAlignmentWarning->hide();
 
-  m_DataStorage = this->GetDefaultDataStorage();
-
   mitk::ToolManager* toolManager = m_Controls->m_ManualToolSelectionBox->GetToolManager();
-  toolManager->SetDataStorage( *m_DataStorage );
+  toolManager->SetDataStorage( *(this->GetDefaultDataStorage()) );
   assert ( toolManager );
 
   // all part of open source MITK
@@ -183,14 +89,14 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
   m_Controls->m_LesionToolSelectionBox->SetEnabledMode( QmitkToolSelectionBox::EnabledWithReferenceData );
     
   toolManager->NewNodesGenerated += 
-    mitk::MessageDelegate<QmitkSegmentationView>( this, &QmitkSegmentationView::OnNewNodesGenerated );          // update the list of segmentations
+    mitk::MessageDelegate<QmitkSegmentationView>( this, &QmitkSegmentationView::NewNodesGenerated );          // update the list of segmentations
   toolManager->NewNodeObjectsGenerated += 
-    mitk::MessageDelegate1<QmitkSegmentationView, mitk::ToolManager::DataVectorType*>( this, &QmitkSegmentationView::OnNewNodeObjectsGenerated );          // update the list of segmentations
+    mitk::MessageDelegate1<QmitkSegmentationView, mitk::ToolManager::DataVectorType*>( this, &QmitkSegmentationView::NewNodeObjectsGenerated );          // update the list of segmentations
 
   // create signal/slot connections
   connect( m_Controls->btnNewSegmentation, SIGNAL(clicked()), this, SLOT(CreateNewSegmentation()) );
-  connect( m_Controls->m_ManualToolSelectionBox, SIGNAL(ToolSelected(int)), this, SLOT(OnToolSelected(int)) );
-  connect( m_Controls->widgetStack, SIGNAL(currentChanged(int)), this, SLOT(OnSegmentationMethodSelected(int)) );
+  connect( m_Controls->m_ManualToolSelectionBox, SIGNAL(ToolSelected(int)), this, SLOT(ManualToolSelected(int)) );
+  connect( m_Controls->widgetStack, SIGNAL(currentChanged(int)), this, SLOT(ToolboxStackPageChanged(int)) );
 
   // register as listener for BlueBerry selection events (mainly from DataManager)
   m_SelectionListener = berry::ISelectionListener::Pointer(new berry::SelectionChangedAdapter<QmitkSegmentationView>(this, &QmitkSegmentationView::SelectionChanged));
@@ -202,11 +108,11 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
 
 
   // create helper class to provide context menus for segmentations in data manager
-  m_PostProcessing = new QmitkSegmentationPostProcessing(this->GetDefaultDataStorage(), this, parent);
+  new QmitkSegmentationPostProcessing(this->GetDefaultDataStorage(), this, parent);
  
   // call preferences changed for initialization
   // changes GUI according to current data manager selection (because it might have changed before QmitkSegmentationView came into being)
-  this->OnPreferencesChanged(m_SegmentationPreferencesNode.GetPointer());
+  this->PreferencesChanged(m_SegmentationPreferencesNode.GetPointer());
 }
 
 QmitkSegmentationView::~QmitkSegmentationView()
@@ -262,6 +168,7 @@ void QmitkSegmentationView::CreateNewSegmentation()
             mitk::DataTreeNode::Pointer emptySegmentation =
               firstTool->CreateEmptySegmentationNode( image, dialog->GetSegmentationName().toStdString(), dialog->GetColor() );
 
+            // TODO escape # and ; at all costs, this would mess up parsing of the stored list
             UpdateOrganList( organColors, dialog->GetSegmentationName(), dialog->GetColor() );
 
             m_SegmentationPreferencesNode->PutByteArray("Organ-Color-List", organColors.join(";").toStdString() );
@@ -274,7 +181,7 @@ void QmitkSegmentationView::CreateNewSegmentation()
             this->GetDefaultDataStorage()->Add( emptySegmentation, node ); // add as a child, because the segmentation "derives" from the original
 
             SendSelectedEvent( node, emptySegmentation );
-            UpdateFromCurrentDataManagerSelection(); // needs to be done because this view ignores selection from self
+            PullCurrentDataManagerSelection(); // needs to be done because this view ignores selection from self
 
             // TODO still working? m_Controls->m_ManualToolSelectionBox->GetToolManager()->SetWorkingData( emptySegmentation );
           }
@@ -298,7 +205,7 @@ void QmitkSegmentationView::CreateNewSegmentation()
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-void QmitkSegmentationView::OnToolSelected(int id)
+void QmitkSegmentationView::ManualToolSelected(int id)
 {
   if (m_MultiWidget)
   {
@@ -313,7 +220,7 @@ void QmitkSegmentationView::OnToolSelected(int id)
   }
 }
 
-void QmitkSegmentationView::OnSegmentationMethodSelected(int id)
+void QmitkSegmentationView::ToolboxStackPageChanged(int id)
 {
   // this is just a workaround, should be removed when all tools support 3D+t
   if (id==0) //manual
@@ -420,9 +327,9 @@ void QmitkSegmentationView::CheckImageAlignment()
   }
 }
 
-void QmitkSegmentationView::OnReferenceNodeSelected(const mitk::DataTreeNode* node)
+void QmitkSegmentationView::ReferenceNodeSelected(const mitk::DataTreeNode* node)
 {
-  MITK_DEBUG << "OnReferenceNodeSelected(" << (void*)node << ")";
+  MITK_DEBUG << "ReferenceNodeSelected(" << (void*)node << ")";
   mitk::ToolManager* toolManager = m_Controls->m_ManualToolSelectionBox->GetToolManager();
   toolManager->SetReferenceData(const_cast<mitk::DataTreeNode*>(node));
 
@@ -434,7 +341,7 @@ void QmitkSegmentationView::OnReferenceNodeSelected(const mitk::DataTreeNode* no
     mitk::DataStorage::SetOfObjects::ConstPointer image_set = this->GetDefaultDataStorage()->GetSubset(
         mitk::NodePredicateAND::New(
             mitk::TNodePredicateDataType<mitk::Image>::New(),
-            mitk::NodePredicateProperty::New("binary", mitk::GenericProperty<bool>::New(false))));
+            mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(false))));
     const unsigned int size = image_set->Size();
 
     for (unsigned int i = 0u; i < size; ++i)
@@ -465,9 +372,9 @@ void QmitkSegmentationView::OnReferenceNodeSelected(const mitk::DataTreeNode* no
   CheckImageAlignment();
 }
 
-void QmitkSegmentationView::OnWorkingDataSelectionChanged(const mitk::DataTreeNode* node)
+void QmitkSegmentationView::WorkingDataSelectionChanged(const mitk::DataTreeNode* node)
 {
-  MITK_DEBUG << "OnWorkingDataSelectionChanged(" << (void*)node << ")";
+  MITK_DEBUG << "WorkingDataSelectionChanged(" << (void*)node << ")";
   mitk::ToolManager* toolManager = m_Controls->m_ManualToolSelectionBox->GetToolManager();
   toolManager->SetWorkingData(const_cast<mitk::DataTreeNode*>(node));
 
@@ -479,7 +386,7 @@ void QmitkSegmentationView::OnWorkingDataSelectionChanged(const mitk::DataTreeNo
     mitk::DataStorage::SetOfObjects::ConstPointer segmentationSet = this->GetDefaultDataStorage()->GetSubset(
         mitk::NodePredicateAND::New(
             mitk::TNodePredicateDataType<mitk::Image>::New(),
-            mitk::NodePredicateProperty::New("binary", mitk::GenericProperty<bool>::New(true))));
+            mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true))));
     const unsigned int size = segmentationSet->Size();
 
     for (unsigned int i = 0u; i < size; ++i)
@@ -520,7 +427,7 @@ void QmitkSegmentationView::StdMultiWidgetAvailable( QmitkStdMultiWidget& stdMul
     mitk::ToolManager* toolManager = m_Controls->m_ManualToolSelectionBox->GetToolManager();
 
     // tell the interpolation about toolmanager and multiwidget
-    m_Controls->m_SlicesInterpolator->SetDataStorage( *m_DataStorage );
+    m_Controls->m_SlicesInterpolator->SetDataStorage( *(this->GetDefaultDataStorage()));
     m_Controls->m_SlicesInterpolator->Initialize( toolManager, m_MultiWidget );
   }
 }
@@ -630,7 +537,7 @@ void QmitkSegmentationView::SelectionChanged(berry::IWorkbenchPart::Pointer sour
     mitk::NodePredicateNOT::Pointer isNotBinary = mitk::NodePredicateNOT::New( isBinary );
     mitk::NodePredicateAND::Pointer isNormalImage = mitk::NodePredicateAND::New( isImage, isNotBinary );
 
-    mitk::DataStorage::SetOfObjects::ConstPointer possibleParents = m_DataStorage->GetSources( workingData, isNormalImage );
+    mitk::DataStorage::SetOfObjects::ConstPointer possibleParents = this->GetDefaultDataStorage()->GetSources( workingData, isNormalImage );
 
     if (possibleParents->size() > 0)
     {
@@ -648,8 +555,8 @@ void QmitkSegmentationView::SelectionChanged(berry::IWorkbenchPart::Pointer sour
 
   MITK_INFO << "Reference " << (void*)referenceData.GetPointer() << " Working " << (void*)workingData.GetPointer();
   // update image selections for our toolmanagers
-  OnReferenceNodeSelected(referenceData);
-  OnWorkingDataSelectionChanged(workingData);
+  ReferenceNodeSelected(referenceData);
+  WorkingDataSelectionChanged(workingData);
 
   if ( referenceData.IsNull() && workingData.IsNull() )
   {
@@ -756,21 +663,18 @@ void QmitkSegmentationView::ApplyDisplayOptions(mitk::DataTreeNode* node)
 {
   if (!node) return;
 
-  node->SetProperty( "outline binary", mitk::BoolProperty::New( m_ShowSegmentationsAsOutline ) );
+  node->SetProperty( "outline binary", mitk::BoolProperty::New( m_SegmentationPreferencesNode->GetBool("draw outline", true)) );
   node->SetProperty( "outline width", mitk::FloatProperty::New( 2.0 ) );
-  node->SetProperty( "opacity", mitk::FloatProperty::New( m_ShowSegmentationsAsOutline ? 1.0 : 0.3 ) );
-  node->SetProperty( "volumerendering", mitk::BoolProperty::New( m_ShowSegmentationsAsVolumeRendering ) );
+  node->SetProperty( "opacity", mitk::FloatProperty::New( m_SegmentationPreferencesNode->GetBool("draw outline", true) ? 1.0 : 0.3 ) );
+  node->SetProperty( "volumerendering", mitk::BoolProperty::New( m_SegmentationPreferencesNode->GetBool("volume rendering", false) ) );
 }
 
-void QmitkSegmentationView::OnPreferencesChanged(const berry::IBerryPreferences* prefs )
+void QmitkSegmentationView::PreferencesChanged(const berry::IBerryPreferences* prefs )
 {
-  m_ShowSegmentationsAsOutline = m_SegmentationPreferencesNode->GetBool("draw outline", true);
-  m_ShowSegmentationsAsVolumeRendering = m_SegmentationPreferencesNode->GetBool("volume rendering", false);
-  
-  UpdateFromCurrentDataManagerSelection();
+  PullCurrentDataManagerSelection();
 }
 
-void QmitkSegmentationView::UpdateFromCurrentDataManagerSelection()
+void QmitkSegmentationView::PullCurrentDataManagerSelection()
 {
   MITK_INFO << "Update selection from DataManager";
   berry::ISelection::ConstPointer selection( this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection("org.mitk.views.datamanager"));
@@ -778,15 +682,15 @@ void QmitkSegmentationView::UpdateFromCurrentDataManagerSelection()
   this->SelectionChanged(berry::SmartPointer<IWorkbenchPart>(NULL), m_CurrentSelection);
 }
 
-void QmitkSegmentationView::OnNewNodesGenerated()
+void QmitkSegmentationView::NewNodesGenerated()
 {
-  UpdateFromCurrentDataManagerSelection();
+  PullCurrentDataManagerSelection();
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-void QmitkSegmentationView::OnNewNodeObjectsGenerated(mitk::ToolManager::DataVectorType* nodes)
+void QmitkSegmentationView::NewNodeObjectsGenerated(mitk::ToolManager::DataVectorType* nodes)
 {
-  UpdateFromCurrentDataManagerSelection(); // for display options
+  PullCurrentDataManagerSelection(); // for display options
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   if (nodes)
   {
@@ -796,7 +700,7 @@ void QmitkSegmentationView::OnNewNodeObjectsGenerated(mitk::ToolManager::DataVec
       GetSite()->GetWorkbenchWindow()->GetActivePage()->ShowView("org.mitk.views.segmentation" ,"", berry::IWorkbenchPage::VIEW_ACTIVATE);
       SendSelectedEvent( toolManager->GetReferenceData(0), *iter );
       toolManager->SetWorkingData( *iter );
-      OnWorkingDataSelectionChanged( *iter );
+      WorkingDataSelectionChanged( *iter );
       break;
     }
 
@@ -807,35 +711,4 @@ void QmitkSegmentationView::OnNewNodeObjectsGenerated(mitk::ToolManager::DataVec
   }
 }
 
-void QmitkSegmentationView::UpdateOrganList(QStringList& organColors, const QString& organname, mitk::Color color)
-{
-  std::cout << "UpdateOrganList" << std::endl;
-
-  QString listElement( organname + QColor(color.GetRed() * 255 , color.GetGreen() * 255 , color.GetBlue() * 255).name() );
-  std::cout <<"looking for " << listElement.toStdString() << std::endl;
-  
-  // remove previous definition if necessary
-  int oldIndex = organColors.indexOf( QRegExp(organname + "#......", Qt::CaseInsensitive));
-    std::cout <<"found at " << oldIndex << std::endl;
-  if (oldIndex < 0 || organColors.at(oldIndex) != listElement )
-  {
-    if (oldIndex >= 0)
-    {
-    std::cout <<"remove" << std::endl;
-      organColors.removeAt( oldIndex );
-    }
-
-    std::cout << "append" << std::endl;
-    // add colored organ name AND sort list
-    organColors.append( listElement );
-    organColors.sort();
-  }
-  
-  std::cout << "organColors: " << organColors.join(" ").toStdString() << std::endl;
-}
-
-void QmitkSegmentationView::AppendToOrganList(QStringList& organColors, const QString& organname, int r, int g, int b)
-{
-  organColors.append( organname + QColor(r, g, b).name() );
-}
 

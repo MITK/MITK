@@ -32,6 +32,7 @@ namespace berry {
  */
 struct IIntroRegistry {
 
+    virtual ~IIntroRegistry() {};
     /**
      * Return the number of introduction extensions known by this registry.
      *

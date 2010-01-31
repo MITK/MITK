@@ -30,6 +30,8 @@ class BERRY_UI Display
 
 public:
 
+  virtual ~Display() {}
+
   static Display* GetDefault();
 
   /**

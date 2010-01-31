@@ -20,15 +20,16 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkProperties.h"
 #include "mitkSegTool2D.h"
 
-#include "QmitkSegmentationView.h"
-#include "QmitkSegmentationPostProcessing.h"
-
 #include "QmitkStdMultiWidget.h"
 #include "QmitkNewSegmentationDialog.h"
 
 #include <QMessageBox> 
 
 #include <berryIWorkbenchPage.h>
+
+#include "QmitkSegmentationView.h"
+#include "QmitkSegmentationPostProcessing.h"
+#include "QmitkSegmentationOrganNamesHandling.cpp"
 
 QmitkSegmentationView::QmitkSegmentationView()
 :m_MultiWidget(NULL)
@@ -710,5 +711,3 @@ void QmitkSegmentationView::NewNodeObjectsGenerated(mitk::ToolManager::DataVecto
     }
   }
 }
-
-

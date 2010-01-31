@@ -16,8 +16,6 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
-#include "QmitkSegmentationView.h"
-
 #include <QStringList>
 
 QStringList QmitkSegmentationView::GetDefaultOrganColorString()
@@ -81,29 +79,21 @@ QStringList QmitkSegmentationView::GetDefaultOrganColorString()
 
 void QmitkSegmentationView::UpdateOrganList(QStringList& organColors, const QString& organname, mitk::Color color)
 {
-  std::cout << "UpdateOrganList" << std::endl;
-
   QString listElement( organname + QColor(color.GetRed() * 255 , color.GetGreen() * 255 , color.GetBlue() * 255).name() );
-  std::cout <<"looking for " << listElement.toStdString() << std::endl;
   
   // remove previous definition if necessary
   int oldIndex = organColors.indexOf( QRegExp(organname + "#......", Qt::CaseInsensitive));
-    std::cout <<"found at " << oldIndex << std::endl;
   if (oldIndex < 0 || organColors.at(oldIndex) != listElement )
   {
     if (oldIndex >= 0)
     {
-    std::cout <<"remove" << std::endl;
       organColors.removeAt( oldIndex );
     }
 
-    std::cout << "append" << std::endl;
     // add colored organ name AND sort list
     organColors.append( listElement );
     organColors.sort();
   }
-  
-  std::cout << "organColors: " << organColors.join(" ").toStdString() << std::endl;
 }
 
 void QmitkSegmentationView::AppendToOrganList(QStringList& organColors, const QString& organname, int r, int g, int b)

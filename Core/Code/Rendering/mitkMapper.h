@@ -44,6 +44,7 @@ namespace mitk {
   class BaseLocalStorageHandler
   {
     public:
+      virtual ~BaseLocalStorageHandler() {}
       virtual void ClearLocalStorage(mitk::BaseRenderer *renderer,bool unregisterFromBaseRenderer=true )=0;
   };
 

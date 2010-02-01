@@ -34,9 +34,10 @@ class QmitkNDIConfigurationWidget;
 /*!
  * \ingroup org_mitk_gui_qt_igttoolpairnavigation_internal
  *
- * \brief QmitkToolPairNavigationView
- *
- * Document your class here.
+ * \brief This view can be used to guide one tracking tool to another tracking tool. 
+ * The plugin connects to a tracking system and shows the connected/added tools in two 3D widgets (standard 3D widget is interactable, the other (widget2) isn't).
+ * Furthermore it calculates the distance between the two tools and displays it in GUI. 
+ * In widget 4 the tool connected on port b is shown from the point of view of the tool in port a. 
  *
  * \sa QmitkFunctionality
  */
@@ -130,6 +131,11 @@ protected:
   void RemoveVisualizationObjects( mitk::DataStorage* ds );
 
   /**
+  * @brief MultiWidget for this view
+  **/
+  QmitkStdMultiWidget* m_MultiWidget;
+
+  /**
   * @brief timer
   **/
   QTimer* m_RenderingTimer;
@@ -154,11 +160,6 @@ protected:
   //GUI widget to connect to a NDI tracker
   QmitkNDIConfigurationWidget* m_NDIConfigWidget;
 
-
-  ///**
-  //* @brief some names for the DataStorage
-  //**/
-  //std::string m_InstrumentName;
   QString m_NavigationOfflineText;
 
   /**
@@ -168,7 +169,6 @@ protected:
 
   Ui::QmitkToolPairNavigationViewControls m_Controls;
 
-  QmitkStdMultiWidget* m_MultiWidget;
   int m_LastMapperIDWidget3;
 
 };

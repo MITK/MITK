@@ -465,9 +465,9 @@ void QmitkToolPairNavigationView::RenderScene()
       else
         counter++;
     }
-    catch(std::exception& e)
+    catch(std::exception& e) 
     {
-      QMessageBox::warning(NULL, "Warning", QString("exception during QmitkToolPairNavigationView::RenderScene()\n"));
+      std::cout << "Exception during QmitkToolPairNavigationView::RenderScene():" << e.what() << "\n";
     }
     
     //update all Widgets

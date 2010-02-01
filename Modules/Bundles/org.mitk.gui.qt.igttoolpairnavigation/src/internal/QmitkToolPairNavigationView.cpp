@@ -57,7 +57,7 @@ void QmitkToolPairNavigationView::CreateQtPartControl(QWidget *parent)
 void QmitkToolPairNavigationView::CreateBundleWidgets(QWidget* parent)
 {
   //get default data storage
-  mitk::DataStorage* ds = this->GetDefaultDataStorage();
+  //mitk::DataStorage* ds = this->GetDefaultDataStorage();
 
   //instanciate widget
   m_NDIConfigWidget = new QmitkNDIConfigurationWidget(parent);

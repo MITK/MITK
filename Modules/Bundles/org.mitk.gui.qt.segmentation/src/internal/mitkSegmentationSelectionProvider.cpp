@@ -46,7 +46,7 @@ berry::ISelection::ConstPointer SegmentationSelectionProvider::GetSelection() co
  return m_CurrentSelection;
 }
 
-void SegmentationSelectionProvider::SetSelection(berry::ISelection::Pointer selection)
+void SegmentationSelectionProvider::SetSelection(berry::ISelection::Pointer /*selection*/)
 {
 }
 

@@ -296,6 +296,10 @@ class AutoCategorize
         "generation",         "gen",
         "generator",          "gen",
 
+        "vector",             "vec",
+        "gradient",           "grad",
+        "flow",               "flow",
+
         "paint",              "pnt",
         "brush",              "brsh",
         "volumetry",          "vol",

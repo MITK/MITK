@@ -108,7 +108,7 @@ QmitkSegmentationPostProcessing::~QmitkSegmentationPostProcessing()
   }
 }
 
-void QmitkSegmentationPostProcessing::SelectionChanged(berry::IWorkbenchPart::Pointer sourcepart, berry::ISelection::ConstPointer selection)
+void QmitkSegmentationPostProcessing::SelectionChanged(berry::IWorkbenchPart::Pointer /*sourcepart*/, berry::ISelection::ConstPointer selection)
 {
   if ( selection.IsNull() )  // prevents being notified by own selection events
   {

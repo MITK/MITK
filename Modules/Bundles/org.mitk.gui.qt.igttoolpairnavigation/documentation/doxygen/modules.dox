@@ -1,0 +1,19 @@
+/**
+  \defgroup org_mitk_gui_qt_igttoolpairnavigation org.mitk.gui.qt.igttoolpairnavigation Plugin
+  \ingroup MITKPlugins
+
+  \brief This plugin can be used to guide one tracking tool to another tracking tool. 
+  The plugin connects to a tracking system and shows the connected/added tools in two 3D widgets (standard 3D widget is interactable, the other (widget2) isn't).
+  Furthermore it calculates the distance between the two tools and displays it in GUI. 
+  In widget 4 the tool connected on port b is shown from the point of view of the tool in port a. 
+  
+*/
+
+/**
+  \defgroup org_mitk_gui_qt_igttoolpairnavigation_internal Internal
+  \ingroup org_mitk_gui_qt_igttoolpairnavigation
+
+  \brief This subcategory includes the internal classes of the org.mitk.gui.qt.igttoolpairnavigation plugin. Other
+  plugins must not rely on these classes. They contain implementation details and their interface
+  may change at any time. We mean it.
+*/

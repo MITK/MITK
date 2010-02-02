@@ -263,6 +263,10 @@ mitk::TimeSlicedGeometry::Pointer mitk::DataStorage::ComputeBoundingGeometry3D( 
   ScalarType minimalTime = stmax;
   ScalarType maximalTime = 0;
 
+  // Needed for check of zero bounding boxes
+  mitk::ScalarType nullpoint[]={0,0,0,0,0,0};
+  BoundingBox::BoundsArrayType itkBoundsZero(nullpoint);
+
   for (SetOfObjects::ConstIterator it = input->Begin(); it != input->End(); ++it)
   {
     DataTreeNode::Pointer node = it->Value();
@@ -275,7 +279,13 @@ mitk::TimeSlicedGeometry::Pointer mitk::DataStorage::ComputeBoundingGeometry3D( 
       const TimeSlicedGeometry* geometry = node->GetData()->GetUpdatedTimeSlicedGeometry();
       if (geometry != NULL ) 
       {
-        // bounding box
+        // bounding box (only if non-zero)
+        BoundingBox::BoundsArrayType itkBounds = geometry->GetBoundingBox()->GetBounds();
+        if (itkBounds == itkBoundsZero)
+        {
+          continue;
+        }
+
         unsigned char i;
         for(i=0; i<8; ++i)
         {
@@ -304,8 +314,9 @@ mitk::TimeSlicedGeometry::Pointer mitk::DataStorage::ComputeBoundingGeometry3D( 
               minSpacing[axis] = mmPerPixel;
             }
           }
-          // timebounds
+          // time bounds
           // iterate over all time steps
+          // Attention: Objects with zero bounding box are not respected in time bound calculation
           TimeBounds minTB = geometry->GetTimeBounds(); 
           for (unsigned int i=0; i<geometry->GetTimeSteps(); i++)
           {
@@ -326,7 +337,7 @@ mitk::TimeSlicedGeometry::Pointer mitk::DataStorage::ComputeBoundingGeometry3D( 
               minTB = curTimeBounds;
             }
           }
-          // get the minimal intervall size of all time steps of all objects of the DataStorage
+          // get the minimal interval size of all time steps of all objects of the DataStorage
           if (minTB[1]-minTB[0]<minimalIntervallSize)
           {
             minimalIntervallSize = minTB[1]-minTB[0];
@@ -399,6 +410,10 @@ mitk::BoundingBox::Pointer mitk::DataStorage::ComputeBoundingBox( const char* bo
   BoundingBox::PointIdentifier pointid=0;
   Point3D point;
 
+  // Needed for check of zero bounding boxes
+  mitk::ScalarType nullpoint[]={0,0,0,0,0,0};
+  BoundingBox::BoundsArrayType itkBoundsZero(nullpoint);
+
   SetOfObjects::ConstPointer all = this->GetAll();
   for (SetOfObjects::ConstIterator it = all->Begin(); it != all->End(); ++it)
   {
@@ -412,6 +427,13 @@ mitk::BoundingBox::Pointer mitk::DataStorage::ComputeBoundingBox( const char* bo
       const Geometry3D* geometry = node->GetData()->GetUpdatedTimeSlicedGeometry();
       if (geometry != NULL ) 
       {
+        // bounding box (only if non-zero)
+        BoundingBox::BoundsArrayType itkBounds = geometry->GetBoundingBox()->GetBounds();
+        if (itkBounds == itkBoundsZero)
+        {
+          continue;
+        }
+
         unsigned char i;
         for(i=0; i<8; ++i)
         {

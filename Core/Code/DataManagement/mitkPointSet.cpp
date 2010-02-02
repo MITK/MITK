@@ -648,6 +648,10 @@ void mitk::PointSet::UpdateOutputInformation()
     itkExceptionMacro(<<"timeGeometry->GetTimeSteps() != m_PointSetSeries.size() -- use Initialize(timeSteps) with correct number of timeSteps!");
   }
 
+  // This is needed to detect zero objects
+  mitk::ScalarType nullpoint[]={0,0,0,0,0,0};
+  BoundingBox::BoundsArrayType itkBoundsNull(nullpoint);
+
   //
   // Iterate over the PointSets and update the Geometry
   // information of each of the items.
@@ -658,6 +662,13 @@ void mitk::PointSet::UpdateOutputInformation()
     {
       const DataType::BoundingBoxType *bb = m_PointSetSeries[i]->GetBoundingBox();
       BoundingBox::BoundsArrayType itkBounds = bb->GetBounds();
+
+      if ( m_PointSetSeries[i].IsNull() || (m_PointSetSeries[i]->GetNumberOfPoints() == 0) 
+        || (itkBounds == itkBoundsNull) )
+      {
+        itkBounds = itkBoundsNull;
+        continue;
+      }
       
       // Ensure minimal bounds of 1.0 in each dimension
       for ( unsigned int j = 0; j < 3; ++j )

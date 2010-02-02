@@ -34,14 +34,16 @@ void mitk::TimeSlicedGeometry::UpdateInformation()
   mitk::BoundingBox::Pointer boundingBox=mitk::BoundingBox::New();
 
   mitk::BoundingBox::PointsContainer::Pointer pointscontainer=mitk::BoundingBox::PointsContainer::New();
-  mitk::ScalarType nullpoint[]={0,0,0};
-  mitk::BoundingBox::PointType p(nullpoint);
 
   unsigned int t;
 
   mitk::Geometry3D* geometry3d;
   mitk::BoundingBox::ConstPointer nextBoundingBox;
   mitk::BoundingBox::PointIdentifier pointid=0;
+
+  // Need to check for zero bounding boxes
+  mitk::ScalarType zeropoint[]={0,0,0,0,0,0};
+  BoundingBox::BoundsArrayType itkBoundsZero(zeropoint);
 
   for(t=0; t < m_TimeSteps; ++t)
   {
@@ -60,6 +62,13 @@ void mitk::TimeSlicedGeometry::UpdateInformation()
 
     nextBoundingBox = geometry3d->GetBoundingBox();
     assert(nextBoundingBox.IsNotNull());
+
+    // Only respect non-zero BBes
+    if (nextBoundingBox->GetBounds() == itkBoundsZero)
+    {
+      continue;
+    }
+
     const mitk::BoundingBox::PointsContainer * nextPoints = nextBoundingBox->GetPoints();
     if(nextPoints!=NULL)
     {

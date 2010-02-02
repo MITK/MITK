@@ -96,6 +96,10 @@ mitk::Geometry3D::Pointer mitk::DataTree::ComputeBoundingGeometry3D(mitk::DataTr
 
   timeBounds[0]=stmax; timeBounds[1]=stmin;
 
+  // Needed for check of zero bounding boxes
+  mitk::ScalarType nullpoint[]={0,0,0,0,0,0};
+  BoundingBox::BoundsArrayType itkBoundsZero(nullpoint);
+
   while (!_it->IsAtEnd())
   {
     DataTreeNode::Pointer node = _it->Get();
@@ -108,7 +112,13 @@ mitk::Geometry3D::Pointer mitk::DataTree::ComputeBoundingGeometry3D(mitk::DataTr
       const Geometry3D* geometry = node->GetData()->GetUpdatedTimeSlicedGeometry();
       if (geometry != NULL ) 
       {
-        // bounding box
+        // bounding box (only if non-zero)
+        BoundingBox::BoundsArrayType itkBounds = geometry->GetBoundingBox()->GetBounds();
+        if (itkBounds == itkBoundsZero)
+        {
+          continue;
+        }
+
         unsigned char i;
         for(i=0; i<8; ++i)
         {
@@ -137,7 +147,8 @@ mitk::Geometry3D::Pointer mitk::DataTree::ComputeBoundingGeometry3D(mitk::DataTr
               minSpacing[axis] = mmPerPixel;
             }
           }
-          // timebounds
+          // time bounds
+          // Attention: Objects with zero bounding box are not respected in time bound calculation
           const TimeBounds & curTimeBounds = geometry->GetTimeBounds();
           cur=curTimeBounds[0];
           //is it after -infinity, but before everything else that we found until now?
@@ -177,7 +188,7 @@ mitk::Geometry3D::Pointer mitk::DataTree::ComputeBoundingGeometry3D(mitk::DataTr
     }
     geometry->SetBounds(bounds);
     geometry->SetSpacing(minSpacing);
-    // timebounds
+    // time bounds
     if(!(timeBounds[0]<stmax))
     {
       timeBounds[0] = stmin;
@@ -206,6 +217,10 @@ mitk::BoundingBox::Pointer mitk::DataTree::ComputeBoundingBox(mitk::DataTreeIter
   BoundingBox::PointIdentifier pointid=0;
   Point3D point;
 
+  // Needed for check of zero bounding boxes
+  mitk::ScalarType nullpoint[]={0,0,0,0,0,0};
+  BoundingBox::BoundsArrayType itkBoundsZero(nullpoint);
+
   while (!_it->IsAtEnd())
   {
     DataTreeNode::Pointer node = _it->Get();
@@ -218,6 +233,13 @@ mitk::BoundingBox::Pointer mitk::DataTree::ComputeBoundingBox(mitk::DataTreeIter
       const Geometry3D* geometry = node->GetData()->GetUpdatedTimeSlicedGeometry();
       if (geometry != NULL ) 
       {
+        // ignore if zero
+        BoundingBox::BoundsArrayType itkBounds = geometry->GetBoundingBox()->GetBounds();
+        if (itkBounds == itkBoundsZero)
+        {
+          continue;
+        }
+
         unsigned char i;
         for(i=0; i<8; ++i)
         {

@@ -54,11 +54,11 @@ class MitkIGTUI_EXPORT QmitkIGTLoggerWidget : public QWidget
 
   protected slots:    
     void OnLoadDir();
-    void OnStartRecording(bool on);    
+    void OnStartRecording();    
     void OnRecording();
     void UpdateFilename();
     void UpdateRecordingTime();
-    void UpdateRecordingSamples();
+    void StopRecording();
 
 
   protected:
@@ -80,6 +80,6 @@ class MitkIGTUI_EXPORT QmitkIGTLoggerWidget : public QWidget
     QTimer* m_RecordingTimer;
     QString m_MilliSeconds;
     QString m_Samples;
-    int m_UpdateRate;
+    bool m_RecordingActivated;
 };
 #endif

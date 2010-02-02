@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>352</width>
-    <height>227</height>
+    <width>486</width>
+    <height>379</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,7 +17,7 @@
    <item row="1" column="0">
     <widget class="QLabel" name="label_3">
      <property name="text">
-      <string>Tracking Device is connected to</string>
+      <string>NDI Tracking Device is connected to</string>
      </property>
      <property name="wordWrap">
       <bool>true</bool>

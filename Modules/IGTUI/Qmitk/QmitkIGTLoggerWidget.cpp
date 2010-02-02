@@ -38,7 +38,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 QmitkIGTLoggerWidget::QmitkIGTLoggerWidget(QWidget* parent, Qt::WindowFlags f)
-  : QWidget(parent, f), m_Recorder(NULL), m_UpdateRate(50)
+  : QWidget(parent, f), m_Recorder(NULL), m_RecordingActivated(false)
 {
   m_Controls = NULL;
   CreateQtPartControl(this);
@@ -70,7 +70,7 @@ void QmitkIGTLoggerWidget::CreateQtPartControl(QWidget *parent)
     m_Controls = new Ui::QmitkIGTLoggerWidgetControls;                         
     m_Controls->setupUi(parent);
    
-    m_RecordingTimer = new QTimer(parent);
+    m_RecordingTimer = new QTimer(this);
     }
   }
 
@@ -79,12 +79,11 @@ void QmitkIGTLoggerWidget::CreateConnections()
   if ( m_Controls )
   {     
     connect( (QObject*)(m_Controls->m_pbLoadDir), SIGNAL(clicked()), this, SLOT(OnLoadDir()) );
-    connect( (QObject*)(m_Controls->m_pbStartRecording), SIGNAL(toggled(bool)), this, SLOT(OnStartRecording(bool)) );
+    connect( (QObject*)(m_Controls->m_pbStartRecording), SIGNAL(clicked()), this, SLOT(OnStartRecording()) );
     connect( m_RecordingTimer, SIGNAL(timeout()), this, SLOT(OnRecording()) );
     connect( (QObject*)(m_Controls->m_leFileName), SIGNAL(editingFinished()), this, SLOT(UpdateFilename()) );
-    connect( (QObject*)(m_Controls->m_leMilliSeconds), SIGNAL(editingFinished()), this, SLOT(UpdateRecordingTime()) );
-    connect( (QObject*)(m_Controls->m_leSamples), SIGNAL(editingFinished()), this, SLOT(UpdateRecordingSamples()) );
-
+    connect( (QObject*)(m_Controls->m_leRecordingValue), SIGNAL(editingFinished()), this, SLOT(UpdateRecordingTime()) );
+    connect( (QObject*)(m_Controls->m_cbRecordingType), SIGNAL(activated(int)), this, SLOT(UpdateRecordingTime()) );
   }
 }
 
@@ -93,8 +92,9 @@ void QmitkIGTLoggerWidget::SetDataStorage(mitk::DataStorage* dataStorage)
   m_DataStorage = dataStorage;
 }
 
-void QmitkIGTLoggerWidget::OnStartRecording(bool on)
+void QmitkIGTLoggerWidget::OnStartRecording()
 {
+  
   if (m_Recorder.IsNull())
   {
     QMessageBox::warning(NULL, "Warning", QString("Please start tracking before recording!"));
@@ -106,43 +106,62 @@ void QmitkIGTLoggerWidget::OnStartRecording(bool on)
     return;
   }
 
-  if (on)
-  {
-    m_Controls->m_pbStartRecording->setText("Stop recording");
-    m_Controls->m_pbStartRecording->toggle();
-
+   if (!m_RecordingActivated)
+  {   
     m_Recorder->SetFileName(m_CmpFilename.toStdString());  
 
     try
     { /*start the recording mechanism */     
       m_Recorder->StartRecording();  
-      m_RecordingTimer->start(100);    //now every update of the recorder stores one line into the file for each added NavigationData
+      m_RecordingTimer->start(50);    //now every update of the recorder stores one line into the file for each added NavigationData      
+      mitk::StatusBar::GetInstance()->DisplayText("Recording tracking data now"); // Display recording message for 75ms in status bar
     }
     catch (std::exception& e)
     {
       QMessageBox::warning(NULL, "IGT-Tracking Logger: Error", QString("Error while recording tracking data: %1").arg(e.what()));
+      mitk::StatusBar::GetInstance()->DisplayText(""); // Display recording message for 75ms in status bar
+    }
+    m_Controls->m_pbStartRecording->setText("Stop recording");
+    m_RecordingActivated = true;
+
+    if(m_Controls->m_cbRecordingType->currentIndex()==0)
+    {
+      bool success = false;
+      QString str_ms = m_Controls->m_leRecordingValue->text();
+      int int_ms = str_ms.toInt(&success);
+      if (success)
+        QTimer::singleShot(int_ms, this, SLOT(StopRecording()));
     }
   }
-
   else
   {  
-    /* Stop recording */
-    m_RecordingTimer->stop();
-    m_Recorder->StopRecording();
-    mitk::StatusBar::GetInstance()->DisplayText("Recording STOPPED", 2000); // Display  message for 2s in status bar
-    m_Controls->m_pbStartRecording->setText("Start recording");
-    m_Controls->m_pbStartRecording->toggle();
-
+    this->StopRecording();   
   }
+ 
+}
 
-
-
+void QmitkIGTLoggerWidget::StopRecording()
+{
+  m_RecordingTimer->stop();
+  m_Recorder->StopRecording();
+  mitk::StatusBar::GetInstance()->DisplayText("Recording STOPPED", 2000); // Display  message for 2s in status bar
+  m_Controls->m_pbStartRecording->setText("Start recording"); 
+  m_RecordingActivated = false;
 }
 
 void QmitkIGTLoggerWidget::OnRecording()
 {
+  static unsigned int sampleCounter = 0;
+  int int_samples = m_Samples.toInt();
+  if(sampleCounter >= int_samples)
+  {
+    this->StopRecording();
+    sampleCounter=0;
+  }
   m_Recorder->Update();
-  mitk::StatusBar::GetInstance()->DisplayText("Recording tracking data now", 75); // Display recording message for 75ms in status bar
+  
+  if (m_Controls->m_cbRecordingType->currentIndex()==1)
+    sampleCounter++;
 }
 
 void QmitkIGTLoggerWidget::OnLoadDir()
@@ -166,9 +185,6 @@ void QmitkIGTLoggerWidget::OnLoadDir()
   m_CmpFilename.append(m_Dir);
   m_CmpFilename.append(filename);    
   m_Controls->m_tlFullFileName->setText(m_CmpFilename+".xml");
-
-
-
 }
 
 void QmitkIGTLoggerWidget::SetRecorder( mitk::NavigationDataRecorder::Pointer recorder )
@@ -181,53 +197,51 @@ void QmitkIGTLoggerWidget::UpdateFilename()
   m_CmpFilename.clear();
   m_CmpFilename.append(m_Dir);
   m_CmpFilename.append(m_Controls->m_leFileName->text());
-  //m_CmpFilename.append(".xml"); 
-
+ 
   m_Controls->m_tlFullFileName->setText(m_CmpFilename+".xml");
 }
 
 void QmitkIGTLoggerWidget::UpdateRecordingTime()
 {
-  m_MilliSeconds = m_Controls->m_leMilliSeconds->text();
-
-  bool success = false;
-  int int_ms = m_MilliSeconds.toInt(&success);
-
-  if (!success)
+  // milliseconds selected in the combobox
+  if (m_Controls->m_cbRecordingType->currentIndex()==0)
   {
-    QMessageBox::warning(NULL, "Warning", QString("Please enter a number!"));
-    this->SetDefaultRecordingSettings();
-    return;
+     m_MilliSeconds = m_Controls->m_leRecordingValue->text();
+     
+     bool success = false;
+     int int_ms = m_MilliSeconds.toInt(&success);
+
+     if (!success)
+     {
+       QMessageBox::warning(NULL, "Warning", QString("Please enter a number!"));
+       this->SetDefaultRecordingSettings();
+       return;
+     }
   }
-  int samples = int_ms/m_UpdateRate;
-  m_Controls->m_leSamples->setText(QString::number(samples));
+  else // #samples selected in the combobox
+  {
+    m_Samples = m_Controls->m_leRecordingValue->text();
+
+    bool success = false;
+    int int_samples = m_Samples.toInt(&success);
+
+    if (!success)
+    {
+      QMessageBox::warning(NULL, "Warning", QString("Please enter a number!"));
+      this->SetDefaultRecordingSettings();
+      return;
+    }
+
+  }
+ // m_Controls->m_leSamples->setText(QString::number(samples));
 }
 
-void QmitkIGTLoggerWidget::UpdateRecordingSamples()
-{
-  m_Samples = m_Controls->m_leSamples->text();
-
-  bool success = false;
-  int int_samples = m_Samples.toInt(&success);
-
-  if (!success)
-  {
-    QMessageBox::warning(NULL, "Warning", QString("Please enter a number!"));
-    this->SetDefaultRecordingSettings();
-    return;
-  }
-  int int_ms = m_UpdateRate*int_samples;
-  m_Controls->m_leMilliSeconds->setText(QString::number(int_ms));
-
-}
 
 void QmitkIGTLoggerWidget::SetDefaultRecordingSettings()
 {
-  m_MilliSeconds = "2000";
-  m_Controls->m_leMilliSeconds->setText(m_MilliSeconds);
-
-  int int_ms = m_MilliSeconds.toInt();
-  int int_samples = int_ms/m_UpdateRate;
-  m_Controls->m_leSamples->setText(QString::number(int_samples));
-
+  m_Controls->m_leRecordingValue->setText("2000");
+  m_Controls->m_cbRecordingType->setCurrentIndex(0);
+  m_Samples="100";
+  m_MilliSeconds="2000";
 }
+

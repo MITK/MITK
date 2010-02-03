@@ -1,5 +1,5 @@
 Manifest-Version: 1.0
-Bundle-Name: PointSetInteraction 
+Bundle-Name: Point Set Interaction 
 Bundle-SymbolicName: org.mitk.gui.qt.pointsetinteraction 
 Bundle-Version: 0.1
 Bundle-Vendor: DKFZ, Medical and Biological Informatics

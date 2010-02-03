@@ -1,0 +1,75 @@
+/**
+\bundlemainpage{org.igtexample} The MITK-IGT Showcase Module
+
+\image html ImageGuidedTherapy.png "Icon of the Module"
+
+\section QmitkIGTExampleViewUserManualSummary Summary
+
+This module demonstrates the capabilities of the MITK-IGT component. It allows to track and visualize objects using a tracking device.
+It is not a end-user application module, but a showcase for developer that want to use the MITK-IGT component.
+
+
+Please see \ref QmitkIGTExampleViewUserManualDetails for more detailed information on usage and supported filters.
+If you encounter problems using the module, please have a look at the \ref QmitkBasicImageProcessingUserManualTrouble page.
+
+\section QmitkIGTExampleViewUserManualDetails Detailed description
+
+Manual sections:
+
+- \ref IGTExampleOverview 
+- \ref QmitkBasicImageProcessingUserManualFilters 
+- \ref QmitkBasicImageProcessingUserManualUsage
+- \ref QmitkBasicImageProcessingUserManualTrouble
+
+\section IGTExampleOverview Overview
+
+This module allows to select a tracking device, add tracked objects ("Tools") and use different visualisations for the 
+tracking data.
+
+
+\section IGTExampleTrackerSelection Selecting a tracking device
+
+Choose one of the following available tracking devices:
+ - Polaris from Northern Digital Inc. (should work for NDI Vicra too)
+ - Aurora from NDI
+ - MicronTracker from Claron Technologies Inc.
+ - MicroBird from Ascension Technology Corporation
+ - a virtual (simulated) tracking device
+
+note that you need to have the tracking devices connected to your computer, the drivers must be installed 
+and MITK must be properly configured in order to access the tracking devices. Only the VirtualTrackingDevice
+does not need a hardware device connected to your computer.
+If you select the optical Polaris or MicronTracker devices, you have to load tool definition files for each object that you want to track.
+Click on the Load Tool(s) button to load these files.
+The Polaris and Aurora tracking devices use a serial port connection to the computer. You have to specify the serial port name
+in the Port text field. Standard port names are "COM1", "COM2",... for windows systems and /dev/ttyS0, ... for unix systems.
+
+
+
+\section IGTExampleTrackingTest testing the tracking
+
+Click on "Start MITK-IGT-Tracking Test". If the tracking device is able to track your tools, 
+the position and orientation values should be printed in the text output area below the button.
+
+
+\section IGTExampleNavigationTest testing the navigation pipeline
+
+Click on "Start MITK-IGT-Navigation Test". This will instantiate the following MITK-IGT filterpipeline:
+ - a displacement filter will add a offset to the tracking data. You can specify the offset in x, y and z direction in the "Offset" text fields.
+ - a visualization filter will render a cone for each tool at the current position and orientation
+ - if you have checked the "Show trajectories" checkbox, a NavigationDataToPointSetFilter will add the positions of the tools to a pointset
+
+The pipeline will not be executed automatically. Each time you click on the "Measure!" button, the pipeline will be updated with the current 
+tracking data. Alternatively, you can click on the "Start measure continuously" button, which will automatically update the pipeline every 100 ms.
+If you click on the "Show Error Plot" button, a NavigationDataToMessageFilter will be instantiated that will plot the error value that the tracking device reports over time and additionally visualize the error in a progress bar.
+
+
+\section IGTExampleRecorderTest recording and replaying tracking data
+You can save the tracking data to a file by clicking on the "Start Recording Test" button. Clicking "Start Replaying" will stop the recording
+and replay the stored tracking data. The replayed data is visualized with the NavigationDataToPointSetFilter. It will draw a movement trajectory.
+
+
+\section IGTExampleTrouble Troubleshooting
+
+ If you don't see anything in the 3D render window, you need to initialize the views properly. The easiest way is to load an image or surface file. You can also try to perform a global reinit in the DataManager component.
+*/

@@ -75,7 +75,7 @@ QmitkSegmentationPostProcessing::~QmitkSegmentationPostProcessing()
   berry::ISelectionService* s = m_BlueBerryView->GetSite()->GetWorkbenchWindow()->GetSelectionService();
   if(s)
   {
-    s->RemoveSelectionListener(m_SelectionListener);
+    s->RemovePostSelectionListener(m_SelectionListener);
   }
 
   // unregister a couple of additional actions for DataManager's context menu
@@ -108,9 +108,9 @@ QmitkSegmentationPostProcessing::~QmitkSegmentationPostProcessing()
   }
 }
 
-void QmitkSegmentationPostProcessing::SelectionChanged(berry::IWorkbenchPart::Pointer /*sourcepart*/, berry::ISelection::ConstPointer selection)
+void QmitkSegmentationPostProcessing::SelectionChanged(berry::IWorkbenchPart::Pointer sourcepart, berry::ISelection::ConstPointer selection)
 {
-  if ( selection.IsNull() )  // prevents being notified by own selection events
+  if ( selection.IsNull()  )
   {
     return;
   }

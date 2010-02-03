@@ -28,6 +28,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "ui_QmitkSegmentationControls.h"
 
+class QmitkRenderWindow;
+class QmitkSegmentationPostProcessing;
+
 /**
  * \ingroup org_mitk_gui_qt_segmentation_internal
  * \warning Implementation of this class is split up into two .cpp files to make things more compact. Check both this file and QmitkSegmentationOrganNamesHandling.cpp
@@ -45,9 +48,9 @@ class QmitkSegmentationView : public QObject, public QmitkFunctionality
     void NewNodesGenerated();
     void NewNodeObjectsGenerated(mitk::ToolManager::DataVectorType*);
 
-    // QmitkFunctionality's activated/deactivated status changes
-    virtual void Activated();
-    virtual void Deactivated();
+    // QmitkFunctionality's visibility changes
+    virtual void Visible();
+    virtual void Hidden();
 
     // QmitkFunctionality's changes regarding THE QmitkStdMultiWidget
     virtual void StdMultiWidgetAvailable(QmitkStdMultiWidget& stdMultiWidget);
@@ -72,30 +75,39 @@ class QmitkSegmentationView : public QObject, public QmitkFunctionality
     
     // a type for handling lists of DataTreeNodes
     typedef std::vector<mitk::DataTreeNode*> NodeList;
+    
+    // set available multiwidget
+    void SetMultiWidget(QmitkStdMultiWidget* multiWidget);
 
     // actively query the current selection of data manager
     void PullCurrentDataManagerSelection();
 
     // reactions to selection events from data manager (and potential other senders)
-    void SelectionChanged(berry::IWorkbenchPart::Pointer sourcepart, berry::ISelection::ConstPointer selection);
-    void ReferenceNodeSelected(const mitk::DataTreeNode*);
-    void WorkingDataSelectionChanged(const mitk::DataTreeNode*);
+    void BlueBerrySelectionChanged(berry::IWorkbenchPart::Pointer sourcepart, berry::ISelection::ConstPointer selection);
+    mitk::DataTreeNode::Pointer FindFirstRegularImage( mitk::DataTreeNodeSelection::ConstPointer selection );
+    mitk::DataTreeNode::Pointer FindFirstSegmentation( mitk::DataTreeNodeSelection::ConstPointer selection );
+
+    // propagate BlueBerry selection to ToolManager for manual segmentation
+    void SetToolManagerSelection(const mitk::DataTreeNode* referenceData, const mitk::DataTreeNode* workingData);
     
     // sending of selection events to data manager (an potential other observers)
     void SendSelectedEvent( mitk::DataTreeNode* referenceNode, mitk::DataTreeNode* workingNode );
 
-    // get the current selection of data manager (or other selection senders)
-    NodeList GetSelectedNodes() const;
-   
     // checks if selected reference image is aligned with the slices stack orientation of the StdMultiWidget
     void CheckImageAlignment();
 
-    // GUI setup
-    void CreateQtPartControl(QWidget* parent);
+    // checks if given render window aligns with the slices of given image
+    bool IsRenderWindowAligned(QmitkRenderWindow* renderWindow, mitk::Image* image);
+  
+    // make sure all images/segmentations look as selected by the users in this view's preferences
+    void ForceDisplayPreferencesUponAllImages();
 
     // decorates a DataTreeNode according to the user preference settings
     void ApplyDisplayOptions(mitk::DataTreeNode* node);
     
+    // GUI setup
+    void CreateQtPartControl(QWidget* parent);
+
     // handling of a list of known (organ name, organ color) combination
     // ATTENTION these methods are defined in QmitkSegmentationOrganNamesHandling.cpp
     QStringList GetDefaultOrganColorString();
@@ -111,9 +123,6 @@ class QmitkSegmentationView : public QObject, public QmitkFunctionality
     // THE currently existing QmitkStdMultiWidget
     QmitkStdMultiWidget * m_MultiWidget;
  
-    // buffer for the data manager selection
-    mitk::DataTreeNodeSelection::ConstPointer m_CurrentSelection;
-
     // object to observe BlueBerry selections
     berry::ISelectionListener::Pointer m_SelectionListener;
     // helper stuff to observe BlueBerry selections
@@ -124,6 +133,11 @@ class QmitkSegmentationView : public QObject, public QmitkFunctionality
   
     // container of this view's user preferences (automatically retrieved/stored by BlueBerry)
     berry::IBerryPreferences::Pointer m_SegmentationPreferencesNode;
+
+    // used to allow the exceptional reaction of this view to its own selection events
+    bool m_JustSentASelection;
+
+    QmitkSegmentationPostProcessing* m_PostProcessing;
 };
 
 #endif /*QMITKsegmentationVIEW_H_*/

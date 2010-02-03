@@ -17,7 +17,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 #ifndef MITK_APPLICATION_CURSOR_H_DEFINED_AND_ALL_IS_GOOD
 #define MITK_APPLICATION_CURSOR_H_DEFINED_AND_ALL_IS_GOOD
+
 #include "mitkCommon.h"
+#include "mitkVector.h"
 
 namespace mitk
 {
@@ -38,6 +40,12 @@ class MITK_CORE_EXPORT ApplicationCursorImplementation
     
     /// Restore the previous cursor
     virtual void PopCursor() = 0;
+
+    /// Get absolute mouse position on screen
+    virtual const Point2I GetCursorPosition() = 0;
+    
+    /// Set absolute mouse position on screen
+    virtual void SetCursorPosition(const Point2I&) = 0;
 
     virtual ~ApplicationCursorImplementation() {};
 
@@ -70,6 +78,14 @@ class MITK_CORE_EXPORT ApplicationCursor
     
     /// Restore the previous cursor
     void PopCursor();
+
+    /// Get absolute mouse position on screen
+    /// \return (-1, -1) if querying mouse position is not possible
+    const Point2I GetCursorPosition();
+    
+    /// Set absolute mouse position on screen
+    void SetCursorPosition(const Point2I&);
+
     
   protected:
 

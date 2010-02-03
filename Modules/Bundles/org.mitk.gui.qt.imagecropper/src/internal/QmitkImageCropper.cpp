@@ -38,6 +38,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkIDataStorageService.h"
 #include "mitkNodePredicateDataType.h"
 
+#include <itkCommand.h>
+
 //to be moved to mitkInteractionConst.h by StateMachineEditor
 const mitk::OperationType QmitkImageCropper::OP_EXCHANGE = 717;
 
@@ -45,6 +47,22 @@ const mitk::OperationType QmitkImageCropper::OP_EXCHANGE = 717;
 QmitkImageCropper::opExchangeNodes::opExchangeNodes( mitk::OperationType type, mitk::DataTreeNode* node, mitk::BaseData* oldData, mitk::BaseData* newData )
 :mitk::Operation(type),m_Node(node),m_OldData(oldData),m_NewData(newData)
 {
+  m_NodeDeletedObserverTag, m_OldDataDeletedObserverTag, m_NewDataDeletedObserverTag = 0;
+    // listen to the node the image is hold
+    itk::MemberCommand<opExchangeNodes>::Pointer nodeDeletedCommand
+      = itk::MemberCommand<opExchangeNodes>::New();
+    nodeDeletedCommand->SetCallbackFunction(this, &opExchangeNodes::NodeDeleted);
+
+    m_NodeDeletedObserverTag = m_Node->AddObserver(itk::DeleteEvent(), nodeDeletedCommand);
+    m_OldDataDeletedObserverTag = m_OldData->AddObserver(itk::DeleteEvent(), nodeDeletedCommand);
+    m_NewDataDeletedObserverTag = m_NewData->AddObserver(itk::DeleteEvent(), nodeDeletedCommand);
+}
+
+void QmitkImageCropper::opExchangeNodes::NodeDeleted(const itk::Object *caller, const itk::EventObject &event)
+{
+  m_Node=NULL;
+  m_OldData=NULL;
+  m_NewData=NULL;
 }
 
 //!QmitkImageCropper::QmitkImageCropper(QObject *parent, const char *name, QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIteratorBase* it)
@@ -286,7 +304,8 @@ void QmitkImageCropper::CropImage()
   // do the actual cutting
   try
   {
-    cutter->UpdateLargestPossibleRegion();
+    cutter->Update();
+    //cutter->UpdateLargestPossibleRegion();
   }
   catch(itk::ExceptionObject&)
   {

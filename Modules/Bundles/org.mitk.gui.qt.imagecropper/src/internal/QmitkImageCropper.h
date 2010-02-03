@@ -63,9 +63,15 @@ class QmitkImageCropper : public QObject, public QmitkFunctionality, public mitk
             mitk::DataTreeNode* GetNode() { return m_Node; }
             mitk::BaseData* GetOldData() { return m_OldData; }
             mitk::BaseData* GetNewData() { return m_NewData; }
-    private: mitk::DataTreeNode::Pointer m_Node;
-             mitk::BaseData::Pointer m_OldData;
-             mitk::BaseData::Pointer m_NewData;
+    protected: 
+            void NodeDeleted(const itk::Object *caller, const itk::EventObject &event);
+    private: 
+            mitk::DataTreeNode* m_Node;
+            mitk::BaseData::Pointer m_OldData;
+            mitk::BaseData::Pointer m_NewData;
+            long m_NodeDeletedObserverTag;
+            long m_OldDataDeletedObserverTag;
+            long m_NewDataDeletedObserverTag;
   };
 
 private:

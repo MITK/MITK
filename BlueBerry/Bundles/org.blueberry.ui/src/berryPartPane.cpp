@@ -51,7 +51,7 @@ void PartPane::CreateControl(void* parent) {
     return;
   }
 
-  partReference->AddPropertyListener(IPropertyChangeListener::Pointer(this));
+  partReference.Lock()->AddPropertyListener(IPropertyChangeListener::Pointer(this));
 
   // Create view form.
   control = Tweaklets::Get(WorkbenchPageTweaklet::KEY)->CreatePaneControl(parent);
@@ -97,7 +97,10 @@ PartPane::~PartPane()
 //    paneMenuManager = null;
 //  }
 //
-  partReference->RemovePropertyListener(IPropertyChangeListener::Pointer(this));
+  if (!partReference.Expired())
+  {
+    partReference.Lock()->RemovePropertyListener(IPropertyChangeListener::Pointer(this));
+  }
 //  partReference.removePartPropertyListener(this);
 
   this->UnRegister(false);
@@ -105,13 +108,13 @@ PartPane::~PartPane()
 
 void PartPane::DoHide()
 {
-  if (partReference.Cast<IViewReference>() != 0)
+  if (partReference.Lock().Cast<IViewReference>() != 0)
   {
-    this->GetPage()->HideView(partReference.Cast<IViewReference>());
+    this->GetPage()->HideView(partReference.Lock().Cast<IViewReference>());
   }
-  else if (partReference.Cast<IEditorReference>() != 0)
+  else if (partReference.Lock().Cast<IEditorReference>() != 0)
   {
-    this->GetPage()->CloseEditor(partReference.Cast<IEditorReference>(), true);
+    this->GetPage()->CloseEditor(partReference.Lock().Cast<IEditorReference>(), true);
   }
 }
 
@@ -137,7 +140,7 @@ void* PartPane::GetControl()
 
 IWorkbenchPartReference::Pointer PartPane::GetPartReference() const
 {
-  return partReference;
+  return partReference.Lock();
 }
 
 void PartPane::ControlActivated(GuiTk::ControlEvent::Pointer /*e*/)
@@ -163,7 +166,7 @@ void PartPane::MoveAbove(void* refControl)
 
 void PartPane::RequestActivation()
 {
-  IWorkbenchPart::Pointer part = partReference->GetPart(true);
+  IWorkbenchPart::Pointer part = partReference.Lock()->GetPart(true);
 
   this->page->RequestActivation(part);
 }
@@ -255,13 +258,13 @@ void PartPane::ShowFocus(bool inFocus)
 
   PartStack::Pointer stack = this->GetContainer().Cast<PartStack>();
 
-  if (partReference.Cast<IViewReference>() != 0)
+  if (partReference.Lock().Cast<IViewReference>() != 0)
   {
     hasFocus = inFocus;
     stack->SetActive(inFocus ? StackPresentation::AS_ACTIVE_FOCUS
                             : StackPresentation::AS_INACTIVE);
   }
-  else if (partReference.Cast<IEditorReference>() != 0)
+  else if (partReference.Lock().Cast<IEditorReference>() != 0)
   {
     if (inFocus)
     {
@@ -291,13 +294,13 @@ void PartPane::SetVisible(bool makeVisible)
 
   if (makeVisible)
   {
-    partReference->GetPart(true);
+    partReference.Lock()->GetPart(true);
   }
 
   if (this->GetControl() != 0)
     Tweaklets::Get(GuiWidgetsTweaklet::KEY)->SetVisible(this->GetControl(), makeVisible);
 
-  partReference.Cast<WorkbenchPartReference>()->FireVisibilityChange();
+  partReference.Lock().Cast<WorkbenchPartReference>()->FireVisibilityChange();
 }
 
 bool PartPane::GetVisible()
@@ -311,7 +314,7 @@ void PartPane::SetFocus()
 {
   this->RequestActivation();
 
-  IWorkbenchPart::Pointer part = partReference->GetPart(true);
+  IWorkbenchPart::Pointer part = partReference.Lock()->GetPart(true);
   if (part.IsNotNull())
   {
 //    Control control = getControl();
@@ -376,7 +379,7 @@ void PartPane::DescribeLayout(std::string& buf) const
 
 bool PartPane::IsCloseable()
 {
-  if (partReference.Cast<IViewReference>() != 0)
+  if (partReference.Lock().Cast<IViewReference>() != 0)
   {
     Perspective::Pointer perspective = page->GetActivePerspective();
     if (perspective == 0) {
@@ -384,7 +387,7 @@ bool PartPane::IsCloseable()
         // perspective
         return true;
     }
-    return perspective->IsCloseable(partReference.Cast<IViewReference>());
+    return perspective->IsCloseable(partReference.Lock().Cast<IViewReference>());
   }
 
   return true;
@@ -440,13 +443,13 @@ int PartPane::ComputePreferredSize(bool width, int availableParallel,
     int availablePerpendicular, int preferredParallel)
 {
 
-  return partReference.Cast<WorkbenchPartReference>()->ComputePreferredSize(width,
+  return partReference.Lock().Cast<WorkbenchPartReference>()->ComputePreferredSize(width,
       availableParallel, availablePerpendicular, preferredParallel);
 }
 
 int PartPane::GetSizeFlags(bool horizontal)
 {
-  return partReference.Cast<WorkbenchPartReference>()->GetSizeFlags(horizontal);
+  return partReference.Lock().Cast<WorkbenchPartReference>()->GetSizeFlags(horizontal);
 }
 
 void PartPane::ShellActivated()

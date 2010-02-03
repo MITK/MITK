@@ -63,7 +63,7 @@ public:
 //    private: ListenerList partListeners = new ListenerList();
   private: IPropertyChangeListener::Events propertyChangeEvents;
 
-    protected: IWorkbenchPartReference::Pointer partReference;
+    protected: IWorkbenchPartReference::WeakPtr partReference;
 
     protected: SmartPointer<WorkbenchPage> page;
 

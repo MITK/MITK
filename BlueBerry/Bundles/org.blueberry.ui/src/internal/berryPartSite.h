@@ -90,7 +90,7 @@ public:
 
 private:
 
-  IWorkbenchPartReference::Pointer partReference;
+  IWorkbenchPartReference::WeakPtr partReference;
   WeakPointer<IWorkbenchPart> part;
   SmartPointer<IWorkbenchPage> page;
   std::string extensionID;

@@ -769,6 +769,8 @@ void mitk::NDITrackingDevice::TrackMarkerPositions()
   if (returnvalue != NDIOKAY)
     return;
 
+  MutexLockHolder trackingFinishedLockHolder(*m_TrackingFinishedMutex); // keep lock until end of scope
+
   bool localStopTracking;       // Because m_StopTracking is used by two threads, access has to be guarded by a mutex. To minimize thread locking, a local copy is used here
   this->m_StopTrackingMutex->Lock();  // update the local copy of m_StopTracking
   localStopTracking = this->m_StopTracking;
@@ -807,6 +809,8 @@ void mitk::NDITrackingDevice::TrackToolsAndMarkers()
   returnvalue = m_DeviceProtocol->TSTART();   // Start Diagnostic Mode
   if (returnvalue != NDIOKAY)
     return;
+
+  MutexLockHolder trackingFinishedLockHolder(*m_TrackingFinishedMutex); // keep lock until end of scope
 
   bool localStopTracking;       // Because m_StopTracking is used by two threads, access has to be guarded by a mutex. To minimize thread locking, a local copy is used here
   this->m_StopTrackingMutex->Lock();  // update the local copy of m_StopTracking
@@ -1110,13 +1114,13 @@ bool mitk::NDITrackingDevice::DiscoverWiredTools()
   
   
   //after initialization readout serial numbers of tools
-  for (unsigned int i = 0; i < this->GetToolCount(); i += 2)
-    {
-    ph = portHandle.substr(occupiedPorts.at(i), 2);
-    std::string portInfo;
-    NDIErrorCode returnvaluePort = m_DeviceProtocol->PHINF(ph, &portInfo);
-    if ((returnvaluePort==NDIOKAY) && (portInfo.size()>31)) dynamic_cast<mitk::NDIPassiveTool*>(this->GetTool(i))->SetSerialNumber(portInfo.substr(23,8));
-    }
+  //for (unsigned int i = 0; i < this->GetToolCount(); i += 2)
+  //  {
+  //  ph = portHandle.substr(occupiedPorts.at(i), 2);
+  //  std::string portInfo;
+  //  NDIErrorCode returnvaluePort = m_DeviceProtocol->PHINF(ph, &portInfo);
+  //  if ((returnvaluePort==NDIOKAY) && (portInfo.size()>31)) dynamic_cast<mitk::NDIPassiveTool*>(this->GetTool(i))->SetSerialNumber(portInfo.substr(23,8));
+  //  }
 
   return true;
 }

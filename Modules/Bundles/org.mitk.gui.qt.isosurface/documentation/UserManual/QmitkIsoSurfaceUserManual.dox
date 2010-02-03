@@ -1,11 +1,14 @@
 /**
-\image html IsoSurfaceIcon.png 
-\page QmitkIsoSurfaceUserManual Iso surface
+
+\bundlemainpage{org.isosurface} Iso surface Module
+
+\image html IsoSurfaceIcon.png "Module Icon"
 
 Available sections:
   - \ref QmitkIsoSurfaceUserManualOverview 
   - \ref QmitkIsoSurfaceUserManualFeatures 
   - \ref QmitkIsoSurfaceUserManualUsage 
+  - \ref QmitkIsoSurfaceUserManualTroubleshooting
 
 \section QmitkIsoSurfaceUserManualOverview Overview
 
@@ -14,21 +17,21 @@ that can be saved as an *.stl-object.
 
 \section QmitkIsoSurfaceUserManualFeatures Features
 
-<ul>
-  <li> Creates a surface by thresholding an image
-</ul>
+- Creates a surface by thresholding an image
+
     
 \section QmitkIsoSurfaceUserManualUsage Usage
 How to create a surface:
-<ul> 
- <li>	Load an image into the program, for example by drag & drop 
- <li>	Look for a meaningful threshold. All pixel grey values of the image that are lower than the threshold will be used to create the surface. All grey values that are higher than the surface will be ignored. 
-	You can find the best threshold by using the Volumetry-Functionality or by reading the grey value while clicking on a pixel (see picture 2). 
-	Insert the threshold into the GUI 
- <li>      Press the Button "Create Surface" 
-</ul>
 
-\image html IsoSurfaceGUI.png Graphical User Interface of Iso Surface
+- Load an image into the program, for example by drag & drop 
+- Look for a meaningful threshold. All pixel grey values of the image that are lower than the threshold will be used to create the surface. All grey values that are higher than the surface will be ignored. You can find the best threshold by using the Volumetry-Functionality or by reading the grey value while clicking on a pixel (see picture 2). 
+- Insert the threshold into the GUI 
+- Press the Button "Create Surface" 
+
+
+\image html IsoSurfaceGUI.png "Graphical User Interface of Iso Surface"
+
+\section QmitkIsoSurfaceUserManualTroubleshooting Troubleshooting
 
 */
 

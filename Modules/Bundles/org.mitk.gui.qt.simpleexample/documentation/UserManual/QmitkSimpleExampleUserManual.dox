@@ -1,32 +1,21 @@
 /**
-\page QmitkSimpleExampleFunctionalityUserManual The "simple example" functionality
+\bundlemainpage{org.simpleexample} The Simple Example module
 
-Available sections:
-  - \ref QmitkSimpleExampleFunctionalityUserManualOverview 
-  - \ref QmitkSimpleExampleFunctionalityUserManualFeatures 
-  - \ref QmitkSimpleExampleFunctionalityUserManualUsage 
+\image html SimpleExample.png "Icon of the Module"
 
-\section QmitkSimpleExampleFunctionalityUserManualOverview Overview
+\section QmitkSimpleExampleViewUserManualSummary Summary
 
-SimpleExampleFunctionality is a functionality for ...
-
-\section QmitkSimpleExampleFunctionalityUserManualFeatures Features
-
+This module is namely a simple example for simple image interaction. 
+It offers:
 <ul>
-  <li> This
-  <ul>
-    <li> thing
-    <li> stuff
-  </ul>
-  <li> and that
-  <ul>
-    <li> to be replaced
-  </ul>
+<li>Sliders to navigate through the different slice stacks (Transversal, Sagittal, Coronal) and the time steps
+<li>A "player" for image time series. It automatically steps through all time series with a speed defined by the slider on the right.
+<li>A button "Re-Initialize Navigators" to reinitialize those sliders to their initial position (Slice and time position 0)
+<li>A button "Take Screenshot" to take a screenshot of the chosen window (1=Transveral, 2=Sagittal, 3=Coronal, 4=3D View)
+<li>A button "Take HighDef 3D Screenshot" to take an high resolution screenshot of the 3D scene
+<li>A button "Generate Movie" whichs takes a movie of the chosen window by scrolling either through all slices (Transversal, Sagittal, Coronal)
+or rotating the 3D scene
+<li>A selection box where the 3D view can be transformed into either a red-blue stereo or a D4D stereo view
 </ul>
-    
-\section QmitkSimpleExampleFunctionalityUserManualUsage Usage
-
-\todo This must still be written
-
 */
 

@@ -71,9 +71,10 @@ void QmitkSegmentationView::NewNodeObjectsGenerated(mitk::ToolManager::DataVecto
   if (!nodes) return;
 
   mitk::ToolManager* toolManager = m_Controls->m_ManualToolSelectionBox->GetToolManager();
+  if (!toolManager) return;
   for (mitk::ToolManager::DataVectorType::iterator iter = nodes->begin(); iter != nodes->end(); ++iter)
   {
-    SendSelectedEvent( m_Controls->m_ManualToolSelectionBox->GetToolManager()->GetReferenceData(0), *iter );
+    SendSelectedEvent( toolManager->GetReferenceData(0), *iter );
     // only last iteration meaningful, multiple generated objects are not taken into account here
   }
 }
@@ -289,7 +290,7 @@ void QmitkSegmentationView::BlueBerrySelectionChanged(berry::IWorkbenchPart::Poi
   bool invalidSelection( blueberrySelection && 
                          (
                            blueberrySelection->Size() > 2 ||    // maximum 2 selected nodes
-                           blueberrySelection->Size() == 2 && (workingData.IsNull() || referenceData.IsNull() ) // with two nodes, one must be the original image, one the segmentation
+                           (blueberrySelection->Size() == 2 && (workingData.IsNull() || referenceData.IsNull()) ) // with two nodes, one must be the original image, one the segmentation
                            // one item is always ok (might be working or reference or nothing
                          )  
                        );

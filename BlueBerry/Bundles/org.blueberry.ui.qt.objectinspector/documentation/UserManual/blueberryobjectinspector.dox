@@ -1,0 +1,6 @@
+/**
+\bundlemainpage{org.berry.inspect} The Object Inspector
+
+This view is only a debugging tool for berry::Object derived classes.
+
+*/

@@ -1,0 +1,8 @@
+/**
+\bundlemainpage{org.berry.log} The Log View
+
+\image html LogView.png "Log View"
+
+Once activated the Log View records all logging output of events and progress as specified in the source code with time of occurence, level of importance (Info, Warning, Error, Fatal, Debug), the message given and where it happens. The filter text field allows for searching all log events containing a certain substring.
+
+*/

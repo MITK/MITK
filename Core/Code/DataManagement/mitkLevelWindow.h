@@ -223,12 +223,12 @@ protected:
   /*!
   * default value of the level for image
   */
-  //ScalarType m_DefaultLevel;
+  ScalarType m_DefaultLevel;
 
   /*!
   * default value of the window for image
   */
-  //ScalarType m_DefaultWindow;
+  ScalarType m_DefaultWindow;
 
   /*!
    * Defines whether the level window settings may be changed after

@@ -27,6 +27,7 @@ mitk::LevelWindow::LevelWindow(mitk::ScalarType level, mitk::ScalarType window)
 : m_LowerWindowBound( level - window / 2.0 ), m_UpperWindowBound( level + window / 2.0 ),
   m_RangeMin( -2048.0 ), m_RangeMax( 4096.0 ),
   m_DefaultRangeMin( -2048.0 ), m_DefaultRangeMax( 4096.0 ),
+  m_DefaultLevel( level ), m_DefaultWindow( window ),
   m_Fixed( false )
 {
 }
@@ -52,19 +53,19 @@ mitk::ScalarType mitk::LevelWindow::GetWindow() const
 
 mitk::ScalarType mitk::LevelWindow::GetDefaultLevel() const
 {
-  return (m_DefaultRangeMax-m_DefaultRangeMin) / 2.0 + m_DefaultRangeMin;
+  return m_DefaultLevel;
 }
 
 mitk::ScalarType mitk::LevelWindow::GetDefaultWindow() const
 {
-  return (m_DefaultRangeMax-m_DefaultRangeMin);
+  return m_DefaultWindow;
 }
 
 void mitk::LevelWindow::ResetDefaultLevelWindow()
 {
   if ( IsFixed() )
     return;
-  SetRangeMinMax(m_DefaultRangeMin, m_DefaultRangeMax);
+  SetLevelWindow(m_DefaultLevel, m_DefaultWindow);
 }
 
 mitk::ScalarType mitk::LevelWindow::GetLowerWindowBound() const
@@ -82,8 +83,8 @@ void mitk::LevelWindow::SetDefaultLevelWindow(mitk::ScalarType level, mitk::Scal
   if ( IsFixed() )
     return;
   
-  m_DefaultRangeMax = level + window / 2;
-  m_DefaultRangeMin = level - window / 2;
+  m_DefaultLevel = level;
+  m_DefaultWindow = window;
 }
 
 void mitk::LevelWindow::SetLevelWindow(mitk::ScalarType level, mitk::ScalarType window)
@@ -422,6 +423,7 @@ bool mitk::LevelWindow::operator==(const mitk::LevelWindow& levWin) const
   if ( m_RangeMin == levWin.GetRangeMin() && 
     m_RangeMax == levWin.GetRangeMax() && 
     m_LowerWindowBound == levWin.GetLowerWindowBound() && m_UpperWindowBound == levWin.GetUpperWindowBound() &&
+    m_DefaultLevel == levWin.GetDefaultLevel() && m_DefaultWindow == levWin.GetDefaultWindow() &&
     m_DefaultRangeMin == levWin.GetDefaultRangeMin() && m_DefaultRangeMax == levWin.GetDefaultRangeMax() && m_Fixed == levWin.IsFixed() ) {
 
       return true;
@@ -446,6 +448,8 @@ mitk::LevelWindow& mitk::LevelWindow::operator=(const mitk::LevelWindow& levWin)
     m_RangeMax = levWin.GetRangeMax();
     m_LowerWindowBound= levWin.GetLowerWindowBound();
     m_UpperWindowBound= levWin.GetUpperWindowBound();
+    m_DefaultLevel = levWin.GetDefaultLevel();
+    m_DefaultWindow = levWin.GetDefaultWindow();
     m_DefaultRangeMin = levWin.GetDefaultRangeMin();
     m_DefaultRangeMax = levWin.GetDefaultRangeMax();
     m_Fixed = levWin.GetFixed();

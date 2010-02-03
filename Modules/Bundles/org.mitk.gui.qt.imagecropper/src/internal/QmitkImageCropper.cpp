@@ -45,9 +45,9 @@ const mitk::OperationType QmitkImageCropper::OP_EXCHANGE = 717;
 
 // constructors for operation classes
 QmitkImageCropper::opExchangeNodes::opExchangeNodes( mitk::OperationType type, mitk::DataTreeNode* node, mitk::BaseData* oldData, mitk::BaseData* newData )
-:mitk::Operation(type),m_Node(node),m_OldData(oldData),m_NewData(newData)
+:mitk::Operation(type),m_Node(node),m_OldData(oldData),m_NewData(newData), m_NodeDeletedObserverTag(0), m_OldDataDeletedObserverTag(0), 
+m_NewDataDeletedObserverTag(0)
 {
-  m_NodeDeletedObserverTag, m_OldDataDeletedObserverTag, m_NewDataDeletedObserverTag = 0;
     // listen to the node the image is hold
     itk::MemberCommand<opExchangeNodes>::Pointer nodeDeletedCommand
       = itk::MemberCommand<opExchangeNodes>::New();

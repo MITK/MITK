@@ -23,6 +23,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkRotationOperation.h"
 #include "mitkInteractionConst.h"
 
+#include "mitkTestingMacros.h"
+
 #include <fstream>
 
 bool testGetAxisVectorVariants(mitk::Geometry3D* geometry)
@@ -132,6 +134,15 @@ int mitkGeometry3DTest(int /*argc*/, char* /*argv*/[])
   // Todo: Find a meaningful way to test rotation success
   delete op;
   std::cout<<"[PASSED]"<<std::endl;
+
+  MITK_TEST_OUTPUT( << "Testing consistancy of index and world coordinate systems: ");
+
+  mitk::Point3D point = geometry3d->GetOrigin();
+  mitk::Point3D dummy;
+
+  geometry3d->WorldToIndex(point, dummy);
+  geometry3d->IndexToWorld(dummy, dummy);
+  MITK_TEST_CONDITION_REQUIRED(dummy == point, "");
 
   std::cout<<"[TEST DONE]"<<std::endl;
   return EXIT_SUCCESS;

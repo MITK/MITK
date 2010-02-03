@@ -1,0 +1,6 @@
+<!DOCTYPE RCC><RCC version="1.0">
+ <qresource prefix="/QmitkImageStatisticsView">
+     <file>lena.xpm</file>
+	 <file>ImageStatistic_24.png</file>
+ </qresource>
+ </RCC>

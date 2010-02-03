@@ -27,7 +27,6 @@
 #define __vtkQtChartStyleGenerator_h
 
 #include "vtkQtChartExport.h"
-#include "QmitkExtExports.h"
 #include <QObject>
 #include <QBrush> // Needed for return value.
 #include <QPen> // Needed for return value.

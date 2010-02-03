@@ -25,7 +25,6 @@
 #define _vtkQtChartHelpFormatter_h
 
 #include "vtkQtChartExport.h"
-#include "QmitkExtExports.h"
 #include <QString> // needed for return type
 
 class QStringList;

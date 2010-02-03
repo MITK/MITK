@@ -25,7 +25,6 @@
 #define _vtkQtChartAxis_h
 
 #include "vtkQtChartExport.h"
-#include "QmitkExtExports.h"
 #include <QObject>
 #include <QGraphicsItem>
 

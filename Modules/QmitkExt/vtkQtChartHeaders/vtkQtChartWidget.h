@@ -26,7 +26,6 @@
 
 
 #include "vtkQtChartExport.h"
-#include "QmitkExtExports.h"
 #include <QWidget>
 #include "vtkQtChartAxis.h" // Needed for enum
 

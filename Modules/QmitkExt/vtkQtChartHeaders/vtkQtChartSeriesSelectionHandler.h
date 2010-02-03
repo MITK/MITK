@@ -25,7 +25,6 @@
 #define _vtkQtChartSeriesSelectionHandler_h
 
 #include "vtkQtChartExport.h"
-#include "QmitkExtExports.h"
 #include "vtkQtChartMouseSelectionHandler.h"
 
 class vtkQtChartSeriesLayer;

@@ -25,7 +25,6 @@
 #define _vtkQtChartAxisCornerDomain_h
 
 #include "vtkQtChartExport.h"
-#include "QmitkExtExports.h"
 #include "vtkQtChartAxis.h" // needed for enum
 
 class vtkQtChartAxisCornerDomainInternal;

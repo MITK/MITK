@@ -26,7 +26,6 @@
 
 
 #include "vtkQtChartExport.h"
-#include "QmitkExtExports.h"
 #include <QObject>
 #include <QPixmap> // Needed for return type
 #include <QString> // Needed for return type

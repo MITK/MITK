@@ -25,7 +25,6 @@
 #define _vtkQtChartColors_h
 
 #include "vtkQtChartExport.h"
-#include "QmitkExtExports.h"
 #include <QColor> // Needed for return type.
 
 class vtkQtChartColorsInternal;

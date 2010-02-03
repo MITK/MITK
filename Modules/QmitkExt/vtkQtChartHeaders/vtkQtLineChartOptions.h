@@ -25,7 +25,6 @@
 #define _vtkQtLineChartOptions_h
 
 #include "vtkQtChartExport.h"
-#include "QmitkExtExports.h"
 #include <QObject>
 
 class vtkQtChartHelpFormatter;

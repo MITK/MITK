@@ -25,7 +25,6 @@
 #define _vtkQtChartShape_h
 
 #include "vtkQtChartExport.h"
-#include "QmitkExtExports.h"
 
 class QPointF;
 class QPolygonF;

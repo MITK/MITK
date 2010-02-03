@@ -26,7 +26,6 @@
 
 
 #include "vtkQtChartExport.h"
-#include "QmitkExtExports.h"
 #include <QWidget>
 #include <QString> // Needed for return type
 

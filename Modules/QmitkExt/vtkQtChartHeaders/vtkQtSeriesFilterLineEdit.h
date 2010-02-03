@@ -25,7 +25,6 @@
 #define _vtkQtSeriesFilterLineEdit_h
 
 #include "vtkQtChartExport.h"
-#include "QmitkExtExports.h"
 
 #include <QLineEdit>
 

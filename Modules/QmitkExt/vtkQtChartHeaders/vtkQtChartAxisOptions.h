@@ -26,7 +26,6 @@
 
 
 #include "vtkQtChartExport.h"
-#include "QmitkExtExports.h"
 #include <QObject>
 
 #include <QColor>  // Needed for member variable

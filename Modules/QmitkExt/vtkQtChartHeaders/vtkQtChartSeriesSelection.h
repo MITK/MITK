@@ -25,7 +25,6 @@
 #define _vtkQtChartSeriesSelection_h
 
 #include "vtkQtChartExport.h"
-#include "QmitkExtExports.h"
 #include <QList> // needed for typedef
 #include <QPair> // needed for typedef
 

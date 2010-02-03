@@ -26,7 +26,6 @@
 
 
 #include "vtkQtChartExport.h"
-#include "QmitkExtExports.h"
 #include <QObject>
 
 class vtkQtChartContentsSpaceInternal;

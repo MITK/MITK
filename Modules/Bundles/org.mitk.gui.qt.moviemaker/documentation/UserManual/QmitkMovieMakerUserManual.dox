@@ -1,12 +1,6 @@
+/**
 
-/*!
-
-\page QmitkMovieMakerUserManual Movie maker
-
-\author Tobias Schwarz, German Cancer Research Center
-\version 0.1
-\date    2008
-
+\bundlemainpage{org.moviemaker} The Movie Maker Module
 
 
 Available sections:
@@ -21,36 +15,30 @@ It is also possible to slide through your data, automatically rotate 3D scenes a
 
 \section QmitkMovieMakerUserManualFeatures Features
 
- * Can write movies and screenshots from MITK widgets.
- * Can automatically scroll through datasets for movie creation
- * Can also scroll through time series
+ The Movie Maker allows you to create movies and screenshots from within MITK. It can automatically scroll thorugh timesteps and slices while recording a movie. This way you can record visualizations like a beating heart or a rotating skull.
  
 \section QmitkMovieMakerUserManualUsage Usage
 
-\image html QmitkMovieMakerControlArea.jpg "A view of the command area of QmitkMovieMaker"
+\image html QmitkMovieMakerControlArea.png "A view of the command area of QmitkMovieMaker"
 
-Description of functions and buttons from top to bottom:
+\subsection QmitkMovieMakerUserManualWindowSelection Window selection
+With the first two drop down boxes you can choose which window you want to step through and which window you want to record in. left clicking inside a window will set both drop down boxes to that one, but you can choose different windows for stepping and recording.
 
- * Window for stepping: If stepping is set to spatial (see below), slices in this window will be stepped through.
- * Window for recording: What is shown in this winow will be recorded.
- 
- Note 1: You can set both stepping and recording window to a one you like by clicking inside of one.
- Note 2: Windows for stepping and recording do not have to be the same.
- 
- * Recording options: 
-  * The step slider can be used to manually step through the possible slices.
-  * Start and Stop buttons should be self explanatory
-  * "Write Movie" button opens a file dialog, and after confiming the movie is created according to the options set in the lower fields
-  * "Write Screenshot" creates a screenshot of the selected Widget
-   
- * Playing options
-  * The first section controls whether the movie steps through slices (if a 2D view is selected), 
-  rotate the shown scene (if a 3D view is selected), or step through time steps (if set to temporal and a time resolved dataset is selected).
-  If set to combined, a combination of both above options is used, with their speed relation set via the S/T Relation Spinbox.
-  * In the second section the direction of stepping can be set. Options are: Forward, backward and Ping-Pong, which is back-and-forth. Via the spinbox, stepping speed can be set (total time in seconds).
-  
-Note 3: Although stepping speed is a total time in sec., this can not always be achieved. As a minimal frame rate of 25 fps is assumed to provide smooth movies,
-a dataset with only 25 slices will always be stepped through in 1 sec or faster.
+The first drop down box defines the window along which slices will be stepped through if stepping is set to spatial (see below). The second denotes the window which content will be recorded.
+
+\subsection QmitkMovieMakerUserManualRecordingOptions Recording options
+
+The slider can be used to step through the slices manually while not recording. Start and stop control a preview of what a video would look like.
+
+The buttons in the bottom part of this section can be used to create movies (windows only) or screenshots. Clicking opens a file dialog, where a name can be selected. After confirmation a screenshot or movie, according to the playing options, is created.
+
+\subsection QmitkMovieMakerUserManualPlayingOptions Playing options
+
+The first section controls whether the movie steps through slices (if a 2D view is selected), rotate the shown scene (if a 3D view is selected), or step through time steps (if set to temporal and a time resolved dataset is selected). If set to combined, a combination of both above options is used, with their speed relation set via the S/T Relation Spinbox.
+
+In the second section the direction of stepping can be set. Options are: Forward, backward and Ping-Pong, which is back-and-forth. Via the spinbox, stepping speed can be set (total time in seconds).
+
+Although stepping speed is a total time in sec., this can not always be achieved. As a minimal frame rate of 25 fps is assumed to provide smooth movies, a dataset with only 25 slices will always be stepped through in 1 sec or faster.
 
 */
 

@@ -1,5 +1,5 @@
 Manifest-Version: 1.0
-Bundle-Name: MovieMaker 
+Bundle-Name: Movie Maker 
 Bundle-SymbolicName: org.mitk.gui.qt.moviemaker 
 Bundle-Version: 0.1
 Bundle-Vendor: DKFZ, Medical and Biological Informatics

@@ -18,6 +18,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkPlaneGeometry.h"
 
+#include "mitkTestingMacros.h"
+
 #include <vnl/vnl_quaternion.h>
 #include <vnl/vnl_quaternion.txx>
 
@@ -298,6 +300,14 @@ int mitkPlaneGeometryTest(int /*argc*/, char* /*argv*/[])
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;
   }
+
+  MITK_TEST_OUTPUT( << "Testing consistancy of index and world coordinates. ");
+  mitk::Point2D point; point[0] = 4; point[1] = 3;
+  mitk::Point2D dummy;
+  planegeometry->WorldToIndex(point, dummy);
+  planegeometry->IndexToWorld(dummy, dummy);
+  MITK_TEST_CONDITION_REQUIRED(dummy == point, "");
+
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Testing width, height and thickness (in mm) of rotated version: ";

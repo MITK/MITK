@@ -47,12 +47,14 @@ namespace mitk {
     * \brief There are two different operation modes. 
     *
     * - Mode3D:   every input NavigationData is processed into one output pointset that contains a point with the ND position for each Update()
+    * - Mode3DMean:   a defined number of input NavigationData is used to generate a mean position and processed into one output pointset that contains a point with the ND position for each Update()
     * - Mode4D:   one output pointset is generated that contains one point for each input NavigationData. Each call to Update() adds a new timestep to the PointSet that contains new positions for the points.
     * The RingBufferSize limits the number of timesteps in the 4D mode. It currently does _not_ limit the number of points in the 3D mode.
     */
     enum OperationMode
     {
       Mode3D,
+      Mode3DMean,
       Mode4D
     };
 
@@ -118,6 +120,12 @@ namespace mitk {
     *
     */
     virtual void GenerateDataMode3D();
+
+    /**
+    * \brief Generates the output for Mode3DMean
+    *
+    */
+    virtual void GenerateDataMode3DMean();
 
     /**
     * \brief Generates the output for Mode4D

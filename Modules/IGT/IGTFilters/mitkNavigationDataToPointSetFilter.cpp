@@ -42,6 +42,9 @@ void mitk::NavigationDataToPointSetFilter::GenerateData()
   case Mode3D:
     GenerateDataMode3D();
     break;
+  case Mode3DMean:
+    GenerateDataMode3DMean();
+    break;
   case Mode4D:
     GenerateDataMode4D();
     break;
@@ -123,6 +126,73 @@ void mitk::NavigationDataToPointSetFilter::GenerateDataMode3D()
   }
 }
 
+/**
+* @brief read n times all connected inputs and sum them into outputs. Finish with dividing each output by n.
+**/
+void mitk::NavigationDataToPointSetFilter::GenerateDataMode3DMean()
+{
+  //make it editable through a Set method if needed
+  const unsigned int numberforMean = 100;
+  
+  //check for outputs and inputs
+  for (unsigned int i = 0; i < this->GetNumberOfOutputs() ; ++i)  // for each output PointSet; change through pointsets to collect all navigation data in order
+  {
+    mitk::PointSet* output = this->GetOutput(i);
+    assert(output);
+    const mitk::NavigationData* input = this->GetInput(i);
+    assert(input);
+  }
+  
+  //vector of counters for each output
+  std::vector<unsigned int> counterVec(this->GetNumberOfOutputs());
+  
+  //use first Output to get the size of the pointsets. All output pointssets have to have the same size!
+  mitk::PointSet::PointIdentifier newPointId = this->GetOutput(0)->GetSize(); 
+
+  for (unsigned int counter = 0; counter < numberforMean; counter++)
+  {
+    for (unsigned int i = 0; i < this->GetNumberOfOutputs() ; ++i)  // for each output PointSet; change through pointsets to collect all navigation data in order
+    {
+      mitk::PointSet* output = this->GetOutput(i);
+      const mitk::NavigationData* input = this->GetInput(i);
+      if (input->IsDataValid() == false)  // don't add point if input is invalid
+        continue;//do not store
+      mitk::PointSet::PointType pos = input->GetPosition();  // NavigationData::PositionType must be compatible with PointSet::PointType!
+      if (counter == 0) //first Element must be inserted
+      {
+        output->InsertPoint(newPointId, pos);  // add point with current position of input NavigationData to the output PointSet
+        counterVec[i]++;
+      }
+      else
+      {
+        //manually call an update to track new positions
+        this->ProcessObject::GetInput(i)->Update();
+
+        //calculate the summ of the old position and the current coordinate
+        mitk::Vector3D vec;
+        vec.SetVnlVector(pos.GetVnlVector());
+        mitk::PointSet::PointType oPoint = output->GetPoint(newPointId);
+        oPoint += vec;//summ up 
+        output->SetPoint(newPointId, oPoint); 
+        
+        //store in counterVec to know how many have been added (and not skipped because of invalid data)
+        counterVec[i]++;
+      }
+      // \TODO: regard ringbuffersize
+    }
+  }
+
+  //divide with counterVec
+  for (unsigned int i = 0; i < this->GetNumberOfOutputs() ; ++i)  // for each output PointSet; change through pointsets to collect all navigation data in order
+  {
+    mitk::PointSet* output = this->GetOutput(i);
+    mitk::PointSet::PointType oPoint = output->GetPoint(newPointId);
+    for (unsigned int index = 0; index < oPoint.Size(); index++)
+      oPoint[index] = oPoint[index] / counterVec[i];
+    output->SetPoint(newPointId, oPoint); 
+  }
+
+}
 
 void mitk::NavigationDataToPointSetFilter::GenerateDataMode4D()
 {

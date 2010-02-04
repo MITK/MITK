@@ -30,7 +30,7 @@ The first drop down box defines the window along which slices will be stepped th
 
 The slider can be used to step through the slices manually while not recording. Start and stop control a preview of what a video would look like.
 
-The buttons in the bottom part of this section can be used to create movies (windows only) or screenshots. Clicking opens a file dialog, where a name can be selected. After confirmation a screenshot or movie, according to the playing options, is created.
+The buttons in the bottom part of this section can be used to create movies (windows only) or screenshots. Clicking opens a file %dialog, where a name can be selected. After confirmation a screenshot or movie, according to the playing options, is created.
 
 \subsection QmitkMovieMakerUserManualPlayingOptions Playing options
 

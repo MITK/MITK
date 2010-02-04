@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <mitkPointOperation.h>
 #include <mitkInteractionConst.h>
+#include <itksys/SystemTools.hxx>
 
 mitk::NavigationDataToPointSetFilter::NavigationDataToPointSetFilter()
 {
@@ -93,20 +94,23 @@ void mitk::NavigationDataToPointSetFilter::CreateOutputsForAllInputs()
   case Mode3D:
     this->SetNumberOfOutputs(this->GetNumberOfInputs());  // create one pointset output for each navigation data input
     break;
+  case Mode3DMean:
+    this->SetNumberOfOutputs(this->GetNumberOfInputs());  // create one pointset output for each navigation data input
+    break;
   case Mode4D:
     this->SetNumberOfOutputs(1); // create just one output pointset that will contain all input navigation data objects
     break;
   default:
     break;
   }
-  
+
   for (unsigned int idx = 0; idx < this->GetNumberOfOutputs(); ++idx)
     if (this->GetOutput(idx) == NULL)
     {
       DataObjectPointer newOutput = this->MakeOutput(idx);
       this->SetNthOutput(idx, newOutput);
     }
-  this->Modified();
+    this->Modified();
 }
 
 
@@ -132,8 +136,8 @@ void mitk::NavigationDataToPointSetFilter::GenerateDataMode3D()
 void mitk::NavigationDataToPointSetFilter::GenerateDataMode3DMean()
 {
   //make it editable through a Set method if needed
-  const unsigned int numberforMean = 100;
-  
+  const unsigned int numberforMean = 100; 
+
   //check for outputs and inputs
   for (unsigned int i = 0; i < this->GetNumberOfOutputs() ; ++i)  // for each output PointSet; change through pointsets to collect all navigation data in order
   {
@@ -142,10 +146,10 @@ void mitk::NavigationDataToPointSetFilter::GenerateDataMode3DMean()
     const mitk::NavigationData* input = this->GetInput(i);
     assert(input);
   }
-  
+
   //vector of counters for each output
   std::vector<unsigned int> counterVec(this->GetNumberOfOutputs());
-  
+
   //use first Output to get the size of the pointsets. All output pointssets have to have the same size!
   mitk::PointSet::PointIdentifier newPointId = this->GetOutput(0)->GetSize(); 
 
@@ -157,9 +161,11 @@ void mitk::NavigationDataToPointSetFilter::GenerateDataMode3DMean()
       const mitk::NavigationData* input = this->GetInput(i);
       if (input->IsDataValid() == false)  // don't add point if input is invalid
         continue;//do not store
-      mitk::PointSet::PointType pos = input->GetPosition();  // NavigationData::PositionType must be compatible with PointSet::PointType!
+      mitk::PointSet::PointType pos;
       if (counter == 0) //first Element must be inserted
       {
+        //no need to call an update
+        pos = input->GetPosition();  // NavigationData::PositionType must be compatible with PointSet::PointType!
         output->InsertPoint(newPointId, pos);  // add point with current position of input NavigationData to the output PointSet
         counterVec[i]++;
       }
@@ -167,6 +173,7 @@ void mitk::NavigationDataToPointSetFilter::GenerateDataMode3DMean()
       {
         //manually call an update to track new positions
         this->ProcessObject::GetInput(i)->Update();
+        pos = input->GetPosition();  // NavigationData::PositionType must be compatible with PointSet::PointType!
 
         //calculate the summ of the old position and the current coordinate
         mitk::Vector3D vec;
@@ -174,12 +181,15 @@ void mitk::NavigationDataToPointSetFilter::GenerateDataMode3DMean()
         mitk::PointSet::PointType oPoint = output->GetPoint(newPointId);
         oPoint += vec;//summ up 
         output->SetPoint(newPointId, oPoint); 
-        
+
         //store in counterVec to know how many have been added (and not skipped because of invalid data)
         counterVec[i]++;
       }
       // \TODO: regard ringbuffersize
     }
+
+    //wait some time to be sure, that we receive new coordinates
+    itksys::SystemTools::Delay(25);
   }
 
   //divide with counterVec
@@ -190,7 +200,9 @@ void mitk::NavigationDataToPointSetFilter::GenerateDataMode3DMean()
     for (unsigned int index = 0; index < oPoint.Size(); index++)
       oPoint[index] = oPoint[index] / counterVec[i];
     output->SetPoint(newPointId, oPoint); 
+    MBI_INFO << "For output # " << i << " " << counterVec[i] << " tracked positions used for averaging";
   }
+
 
 }
 

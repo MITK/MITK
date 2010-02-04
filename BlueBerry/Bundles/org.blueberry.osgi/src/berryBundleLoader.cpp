@@ -201,6 +201,15 @@ BundleLoader::ResolveAllBundles()
 }
 
 void
+BundleLoader::ListLibraries(IBundle::Pointer bundle, std::vector<std::string>& list)
+{
+  ListLibraries(bundle, list, "bin/");
+#ifdef CMAKE_INTDIR
+  ListLibraries(bundle, list, "bin/" CMAKE_INTDIR "/");
+#endif
+}
+
+void
 BundleLoader::ListLibraries(IBundle::Pointer bundle, std::vector<std::string>& list, const std::string& baseDir)
 {
   std::vector<std::string> tmpList;

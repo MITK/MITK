@@ -576,15 +576,13 @@ void QmitkMovieMaker::CreateQtPartControl(QWidget *parent)
     const mitk::RenderingManager::RenderWindowVector rwv =
         mitk::RenderingManager::GetInstance()->GetAllRegisteredRenderWindows();
 
-    m_Controls->cmbSelectedStepperWindow->setInsertPolicy(QComboBox::InsertAtTop);
-    m_Controls->cmbSelectedRecordingWindow->setInsertPolicy(QComboBox::InsertAtTop);
-
     mitk::RenderingManager::RenderWindowVector::const_iterator iter;
+    unsigned int i = 0;
     for (iter = rwv.begin(); iter != rwv.end(); ++iter)
     {
-      m_Controls->cmbSelectedStepperWindow->insertItem(-1,
+      m_Controls->cmbSelectedStepperWindow->insertItem(i,
           mitk::BaseRenderer::GetInstance((*iter))->GetName());
-      m_Controls->cmbSelectedRecordingWindow->insertItem(-1, mitk::BaseRenderer::GetInstance(
+      m_Controls->cmbSelectedRecordingWindow->insertItem(i++, mitk::BaseRenderer::GetInstance(
           (*iter))->GetName());
     }
 

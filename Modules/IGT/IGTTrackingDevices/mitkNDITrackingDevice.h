@@ -87,6 +87,8 @@ namespace mitk
     */
     virtual bool CloseConnection();
 
+    bool InitializeWiredTools();
+
     /**
     * \brief TestConnection() tries to connect to a NDI tracking device on the current port/device and returns which device it has found
     *

@@ -567,6 +567,53 @@ bool mitk::NDITrackingDevice::OpenConnection()
   return true;
 }
 
+bool mitk::NDITrackingDevice::InitializeWiredTools()
+{
+  NDIErrorCode returnvalue;
+  std::string portHandle;
+  returnvalue = m_DeviceProtocol->PHSR(OCCUPIED, &portHandle);
+
+  if (returnvalue != NDIOKAY)
+  {
+    this->SetErrorMessage("Could not obtain a list of port handles that are connected");
+    return false;     // ToDo: Is this a fatal error?
+  }
+
+  /* if there are port handles that need to be initialized, initialize them. Furthermore instantiate tools for each handle that has no tool yet. */
+  std::string ph;
+
+  for (unsigned int i = 0; i < portHandle.size(); i += 2)
+  {
+    ph = portHandle.substr(i, 2);
+    mitk::NDIPassiveTool* pt = this->GetInternalTool(ph);
+    if ( pt == NULL) // if we already have a tool with this handle
+      continue;
+
+    returnvalue = m_DeviceProtocol->PVWR(&ph, pt->GetSROMData(), pt->GetSROMDataLength());
+    if (returnvalue != NDIOKAY)
+    {
+      this->SetErrorMessage((std::string("Could not write SROM file for tool '") + pt->GetToolName() + std::string("' to tracking device")).c_str());
+      return false;
+    }
+    returnvalue = m_DeviceProtocol->PINIT(&portHandle);
+    if (returnvalue != NDIOKAY)
+    {
+      this->SetErrorMessage((std::string("Could not initialize tool '") + pt->GetToolName()).c_str());
+      return false;
+    }
+    if (pt->IsEnabled() == true)
+    {
+      returnvalue = m_DeviceProtocol->PENA(&portHandle, pt->GetTrackingPriority()); // Enable tool
+      if (returnvalue != NDIOKAY)
+      {
+        this->SetErrorMessage((std::string("Could not enable port '") + portHandle +
+          std::string("' for tool '")+ pt->GetToolName() + std::string("'")).c_str());
+        return false;
+      }
+    }
+  }
+}
+
 
 mitk::TrackingDeviceType mitk::NDITrackingDevice::TestConnection()
 {

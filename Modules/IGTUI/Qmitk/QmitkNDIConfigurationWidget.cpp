@@ -76,6 +76,7 @@ void QmitkNDIConfigurationWidget::CreateConnections()
   connect(m_Controls->m_DiscoverToolsBtn, SIGNAL(clicked()), this, SLOT(OnDiscoverTools()));
   connect(m_Controls->m_AddToolBtn, SIGNAL(clicked()), this, SLOT(OnAddPassiveTool()));
   connect(m_Controls->m_DisoverDevicesBtn, SIGNAL(clicked()), this, SLOT(OnDiscoverDevices()));
+  connect(m_Controls->m_ToolTable->model(), SIGNAL(dataChanged(const QModelIndex &, const QModelIndex &)), this, SLOT(UpdateTrackerFromToolTable(const QModelIndex &, const QModelIndex &)));
 }
 
 
@@ -385,23 +386,29 @@ void QmitkNDIConfigurationWidget::SetTagProperty( mitk::BaseProperty::Pointer pr
 }
 
 
-//void QmitkNDIConfigurationWidget::UpdateTrackerFromToolTable()
-//{
-//  if (m_Tracker.IsNull())
-//    return;
-//  QAbstractItemModel* model = m_Controls->m_ToolTable->model();
-//  for (unsigned int i = 0; i < m_Controls->m_ToolTable->rowCount(), ++i)
-//  {
-//    mitk::NDIPassiveTool* t = dynamic_cast<mitk::NDIPassiveTool*>(m_Tracker->GetTool(i));
-//    if (t == NULL)
-//      continue;
-//    t->SetToolName(model->data(model->index(i, 1)).toString().toLatin1());
-//    QString romfile = model->data(model->index(i, QmitkNDIToolDelegate::SROMCol)).toString();
-//    if (QFileInfo(romfile).exists())
-//      t->LoadSROMFile(.toLatin1());
-//
-//  }
-//}
+void QmitkNDIConfigurationWidget::UpdateTrackerFromToolTable(const QModelIndex & topLeft, const QModelIndex & bottomRight)
+{
+  //Colums ID doesn't have to be processed.
+  if (topLeft.column()<1)
+    return;
+
+  if (m_Tracker.IsNull())
+    return;
+  QAbstractItemModel* model = m_Controls->m_ToolTable->model();
+  for (unsigned int i = 0; i < m_Controls->m_ToolTable->rowCount(); ++i)
+  {
+    mitk::NDIPassiveTool* tool = dynamic_cast<mitk::NDIPassiveTool*> (m_Tracker->GetTool(i));
+    if (tool == NULL)
+      continue;
+    tool->SetToolName(model->data(model->index(i, 1)).toString().toLatin1());
+    QString romfile = model->data(model->index(i, QmitkNDIToolDelegate::SROMCol)).toString();
+    if (romfile.isEmpty())
+      continue;
+    if (QFileInfo(romfile).exists())
+      tool->LoadSROMFile(romfile.toLatin1());
+  }
+  m_Tracker->InitializeWiredTools();
+}
 
 
 const QString QmitkNDIConfigurationWidget::GetToolType( unsigned int index ) const

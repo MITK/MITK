@@ -1,7 +1,0 @@
-Manifest-Version: 1.0
-Bundle-Name: Scene serialization 
-Bundle-SymbolicName: org.mitk.gui.qt.sceneserialization 
-Bundle-Version: 0.1
-Bundle-Vendor: DKFZ, Medical and Biological Informatics
-Require-Bundle: org.mitk.gui.qt.common
-Bundle-Activator: 

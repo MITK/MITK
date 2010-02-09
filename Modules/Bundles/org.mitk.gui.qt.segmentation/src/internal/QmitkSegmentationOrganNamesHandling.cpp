@@ -82,7 +82,7 @@ void QmitkSegmentationView::UpdateOrganList(QStringList& organColors, const QStr
   QString listElement( organname + QColor(color.GetRed() * 255 , color.GetGreen() * 255 , color.GetBlue() * 255).name() );
   
   // remove previous definition if necessary
-  int oldIndex = organColors.indexOf( QRegExp(organname + "#......", Qt::CaseInsensitive));
+  int oldIndex = organColors.indexOf( QRegExp(QRegExp::escape(organname) + "#......", Qt::CaseInsensitive));
   if (oldIndex < 0 || organColors.at(oldIndex) != listElement )
   {
     if (oldIndex >= 0)

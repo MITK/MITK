@@ -166,7 +166,46 @@ void QmitkSegmentationView::CreateNewSegmentation()
         }
         else
         {
-          organColors = QString::fromStdString( m_SegmentationPreferencesNode->GetByteArray("Organ-Color-List","") ).split(";");
+          /*
+             a couple of examples of how organ names are stored:
+
+             a simple item is built up like 'name#AABBCC' where #AABBCC is the hexadecimal notation of a color as known from HTML
+             
+             items are stored separated by ';'
+             this makes it necessary to escape occurrences of ';' in name.
+             otherwise the string "hugo;ypsilon#AABBCC;eugen#AABBCC" could not be parsed as two organs 
+             but we would get "hugo" and "ypsilon#AABBCC" and "eugen#AABBCC"
+
+             so the organ name "hugo;ypsilon" is stored as "hugo\;ypsilon"
+             and must be unescaped after loading
+
+             the following lines could be one split with Perl's negative lookbehind
+          */
+
+          // recover string list from BlueBerry view's preferences
+          QString storedString = QString::fromStdString( m_SegmentationPreferencesNode->GetByteArray("Organ-Color-List","") );
+          MITK_DEBUG << "storedString: " << storedString.toStdString();
+          // match a string consisting of any number of repetitions of either "anything but ;" or "\;". This matches everything until the next unescaped ';'
+          QRegExp onePart("(?:[^;]|\\\\;)*"); 
+          MITK_DEBUG << "matching " << onePart.pattern().toStdString();
+          int count = 0;
+          int pos = 0;
+          while( (pos = onePart.indexIn( storedString, pos )) != -1 )
+          {
+            ++count;
+            int length = onePart.matchedLength();
+            if (length == 0) break;
+            QString matchedString = storedString.mid(pos, length);
+            MITK_DEBUG << "   Captured length " << length << ": " << matchedString.toStdString();
+            pos += length + 1; // skip separating ';'
+
+            // unescape possible occurrences of '\;' in the string
+            matchedString.replace("\\;", ";");
+            
+            // add matched string part to output list
+            organColors << matchedString;
+          }
+          MITK_DEBUG << "Captured " << count << " organ name/colors";
         }
 
         dialog->SetSuggestionList( organColors );
@@ -188,10 +227,14 @@ void QmitkSegmentationView::CreateNewSegmentation()
 
             if (!emptySegmentation) return; // could be aborted by user
 
-            // TODO escape # and ; at all costs, this would mess up parsing of the stored list
             UpdateOrganList( organColors, dialog->GetSegmentationName(), dialog->GetColor() );
 
-            m_SegmentationPreferencesNode->PutByteArray("Organ-Color-List", organColors.join(";").toStdString() );
+            /*
+               escape ';' here (replace by '\;'), see longer comment above
+            */
+            std::string stringForStorage = organColors.replaceInStrings(";","\\;").join(";").toStdString();
+            MITK_DEBUG << "Will store: " << stringForStorage;
+            m_SegmentationPreferencesNode->PutByteArray("Organ-Color-List", stringForStorage );
             m_SegmentationPreferencesNode->Flush();
 
             this->GetDefaultDataStorage()->Add( emptySegmentation, node ); // add as a child, because the segmentation "derives" from the original

@@ -18,13 +18,11 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITK_CONTOUR_VTK_MAPPER_3D_H
 #define MITK_CONTOUR_VTK_MAPPER_3D_H
 
-#include "mitkCommon.h"
 #include "MitkExtExports.h"
 #include "mitkBaseVtkMapper3D.h"
-#include "mitkContour.h"
-#include "mitkBaseRenderer.h"
 
 #include <vtkPolyData.h>
+#include <vtkSmartPointer.h>
 
 class vtkPolyDataMapper;
 class vtkAppendPolyData;
@@ -33,9 +31,13 @@ class vtkTubeFilter;
 
 namespace mitk {
 
-//##Documentation
-//## @brief Vtk-based mapper for mitk::Contour
-//## @ingroup Mapper
+class BaseRenderer;
+class Contour;
+
+/** 
+ @brief Vtk-based mapper for mitk::Contour
+ @ingroup Mapper
+ */
 class MitkExt_EXPORT ContourVtkMapper3D : public BaseVtkMapper3D
 {
 public:
@@ -53,15 +55,15 @@ protected:
 
   virtual void GenerateData(mitk::BaseRenderer* renderer);
 
-  vtkPolyDataMapper* m_PointVtkPolyDataMapper;
-  vtkPolyDataMapper* m_VtkPolyDataMapper;
-  vtkTubeFilter*     m_TubeFilter;
+  vtkSmartPointer<vtkPolyDataMapper> m_VtkPolyDataMapper;
+  vtkSmartPointer<vtkTubeFilter>     m_TubeFilter;
 
-  vtkAppendPolyData *m_VtkPointList;
-  vtkPolyData *m_Contour;
-  vtkActor *m_Actor;
+  vtkSmartPointer<vtkAppendPolyData> m_VtkPointList;
+  vtkSmartPointer<vtkPolyData> m_Contour;
+  vtkSmartPointer<vtkActor> m_Actor;
 };
 
 } // namespace mitk
 
 #endif // MITK_CONTOUR_VTK_MAPPER_3D_H
+

@@ -21,28 +21,22 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkProperties.h"
 #include "mitkColorProperty.h"
 #include "mitkVtkPropRenderer.h"
-
+#include "mitkContour.h"
 
 #include <vtkActor.h>
-#include <vtkActor.h>
-#include <vtkCellArray.h>
 #include <vtkAppendPolyData.h>
+#include <vtkAssembly.h>
+#include <vtkCellArray.h>
+#include <vtkFollower.h>
+#include <vtkLinearTransform.h>
 #include <vtkPolyData.h>
 #include <vtkPolyDataMapper.h>
-#include <vtkFollower.h>
-#include <vtkAssembly.h>
-#include <vtkProp3DCollection.h>
-#include <vtkRenderer.h>
-#include <vtkLinearTransform.h>
-#include <vtkTubeFilter.h>
 #include <vtkPolygon.h>
-#include <vtkSphereSource.h>
-
-
-
+#include <vtkProp3DCollection.h>
 #include <vtkProperty.h>
-#include <vtkPolyDataMapper.h>
-#include <stdlib.h>
+#include <vtkRenderer.h>
+#include <vtkSphereSource.h>
+#include <vtkTubeFilter.h>
 
 mitk::ContourVtkMapper3D::ContourVtkMapper3D()
 {
@@ -51,16 +45,11 @@ mitk::ContourVtkMapper3D::ContourVtkMapper3D()
   m_Actor = vtkActor::New();
   m_Actor->SetMapper(m_VtkPolyDataMapper);
 
-  m_Contour = NULL;
   m_TubeFilter = vtkTubeFilter::New();
 }
 
 mitk::ContourVtkMapper3D::~ContourVtkMapper3D()
 {
-  m_VtkPolyDataMapper->Delete();
-  m_VtkPointList->Delete();
-  if ( m_Contour!=NULL )
-    m_Contour->Delete();
 }
 
 vtkProp* mitk::ContourVtkMapper3D::GetVtkProp(mitk::BaseRenderer*  /*renderer*/)
@@ -77,19 +66,15 @@ void mitk::ContourVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
   }
   m_Actor->VisibilityOn();
 
-  if ( m_Contour!=NULL )
-    m_Contour->Delete();
-
   m_Contour = vtkPolyData::New();
-
 
   mitk::Contour::Pointer input  = const_cast<mitk::Contour*>(this->GetInput());
   bool makeContour = true;
 
   if ( makeContour )
   {
-    vtkPoints *points = vtkPoints::New();
-    vtkCellArray *lines = vtkCellArray::New();
+    vtkSmartPointer<vtkPoints> points = vtkPoints::New();
+    vtkSmartPointer<vtkCellArray> lines = vtkCellArray::New();
 
     int numPts=input->GetNumberOfPoints();
     if ( numPts > 200000 )
@@ -116,7 +101,6 @@ void mitk::ContourVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
     this->GetDataTreeNode()->GetBoolProperty("show points", showPoints);
     if ( showPoints )
     {
-      m_VtkPointList->Delete();
       m_VtkPointList = vtkAppendPolyData::New();
     }
     for ( i=0, ccur=cstart; i<numPts; ++i, ccur+=cstep )
@@ -151,7 +135,6 @@ void mitk::ContourVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
     }
 
     m_Contour->SetPoints(points);
-    points->Delete();
     m_Contour->SetLines(lines);
     m_Contour->Update();
 

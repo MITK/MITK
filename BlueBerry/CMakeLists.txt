@@ -78,7 +78,8 @@ IF(BLUEBERRY_USE_QT AND DESIRED_QT_VERSION EQUAL 4)
     IF(DOXYGEN_FOUND)
       EXECUTE_PROCESS(COMMAND ${DOXYGEN_EXECUTABLE} --version
                       OUTPUT_VARIABLE _doxygen_version)
-      IF(${_doxygen_version} VERSION_GREATER 1.5.7)
+      IF(${_doxygen_version} VERSION_GREATER 1.6.0 OR
+         ${_doxygen_version} VERSION_EQUAL 1.6.0)
         SET(_doxygen_too_old 0)
       ENDIF() 
     ENDIF()

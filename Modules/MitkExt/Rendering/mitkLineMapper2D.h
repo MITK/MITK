@@ -22,7 +22,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkCommon.h"
 #include "MitkExtExports.h"
 #include "mitkPointSetMapper2D.h"
-//#include "mitkDataTree.h"
 
 namespace mitk {
 

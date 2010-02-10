@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkCommon.h"
 #include "MitkExtExports.h"
 #include "mitkGLMapper2D.h"
-#include "mitkDataTree.h"
+
 
 namespace mitk {
 

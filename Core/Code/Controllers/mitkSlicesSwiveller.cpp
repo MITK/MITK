@@ -273,6 +273,8 @@ bool SlicesSwiveller
 
       RenderingManager::GetInstance()->RequestUpdateAll();
       
+      this->InvokeEvent( SliceRotationEvent() ); // notify listeners
+      
       ok = true;
       break;
     }
@@ -385,10 +387,12 @@ bool SlicesSwiveller
     }
     case AcROTATESTART:
     {
+      this->InvokeEvent( SliceRotationEvent() ); // notify listeners
       break;
     }
     case AcROTATEEND:
     {
+      this->InvokeEvent( SliceRotationEvent() ); // notify listeners
       break;
     }
     default:

@@ -425,6 +425,8 @@ bool SlicesRotator::ExecuteAction(Action* action, StateEvent const* stateEvent)
 
       RenderingManager::GetInstance()->RequestUpdateAll();
       
+      this->InvokeEvent( SliceRotationEvent() ); // notify listeners
+      
       ok = true;
       break;
     }
@@ -558,11 +560,13 @@ bool SlicesRotator::ExecuteAction(Action* action, StateEvent const* stateEvent)
     case AcROTATESTART:
     {
       this->SetMouseCursor( rotate_cursor_xpm, 0, 0 );
+      this->InvokeEvent( SliceRotationEvent() ); // notify listeners
       break;
     }
     case AcROTATEEND:
     {
       this->ResetMouseCursor();
+      this->InvokeEvent( SliceRotationEvent() ); // notify listeners
       break;
     }
     default:

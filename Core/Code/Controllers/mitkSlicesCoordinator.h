@@ -27,6 +27,8 @@ namespace mitk {
 class SliceNavigationController;
 class Action;
 class StateEvent;
+
+itkEventMacro( SliceRotationEvent, itk::AnyEvent);
  
 /**
  * \brief Coordinates a list of SliceNavigationControllers.

@@ -1,0 +1,10 @@
+/**
+\bundlemainpage{org.surfacematerialeditor} The Surface Material Editor
+
+\image html SurfaceMaterialEditorIcon.png "Icon of the Module"
+
+The Surface Material Editor shows the properties of the selected data, that are relevant for the selected shader. These properties can be filtered to find a specific property. The preview window shows the representation of a neutral 3D object with the currently selected settings.
+
+\image html QmitkSurfaceMaterialEditorGui.png "The Surface Material Editor"
+
+*/

@@ -23,7 +23,6 @@
  <layoutdefault spacing="6" margin="11" />
  <includes>
   <include location="local" >mitkCommon.h</include>
-  <include location="local" >mitkDataTree.h</include>
  </includes>
  <resources/>
  <connections/>

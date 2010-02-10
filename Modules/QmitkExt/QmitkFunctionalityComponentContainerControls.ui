@@ -76,7 +76,6 @@
  </customwidgets>
  <includes>
   <include location="local" >QmitkExtExports.h</include>
-  <include location="local" >mitkDataTree.h</include>
  </includes>
  <resources/>
  <connections/>

@@ -53,7 +53,7 @@ class QmitkExt_EXPORT QmitkThresholdComponent : public QmitkFunctionalityCompone
 public:
   /***************       CONSTRUCTOR      ***************/
   /** \brief Constructor. */
-  QmitkThresholdComponent(QObject *parent=0, const char *parentName=0, bool updateSelector = true, bool showSelector = true, QmitkStdMultiWidget *mitkStdMultiWidget = NULL, mitk::DataTreeIteratorBase* dataIt = NULL);
+  QmitkThresholdComponent(QObject *parent=0, const char *parentName=0, bool updateSelector = true, bool showSelector = true, QmitkStdMultiWidget *mitkStdMultiWidget = NULL);
 
   /***************        DESTRUCTOR      ***************/
   /** \brief Destructor. */

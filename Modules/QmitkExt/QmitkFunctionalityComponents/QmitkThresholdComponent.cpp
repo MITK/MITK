@@ -23,7 +23,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkRenderingManager.h"
 #include "mitkProperties.h"
-#include "mitkDataTreeFilterFunctions.h"
 #include "mitkDataTreeNodeFactory.h"
 #include "mitkImageTimeSelector.h"
 #include "mitkLevelWindowProperty.h"
@@ -43,7 +42,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 /***************       CONSTRUCTOR      ***************/
-QmitkThresholdComponent::QmitkThresholdComponent(QObject * parent, const char * parentName, bool updateSelector, bool showSelector, QmitkStdMultiWidget * /*mitkStdMultiWidget*/, mitk::DataTreeIteratorBase*  /*it*/)
+QmitkThresholdComponent::QmitkThresholdComponent(QObject * parent, const char * parentName, bool updateSelector, bool showSelector, QmitkStdMultiWidget * /*mitkStdMultiWidget*/)
 : QmitkFunctionalityComponentContainer(parent, parentName, updateSelector, showSelector),
 m_ThresholdImageNode(NULL),
 m_ThresholdComponentGUI(NULL),
@@ -286,9 +285,6 @@ void QmitkThresholdComponent::CreateQtPartControl(QWidget * /*parent*/, mitk::Da
     m_ThresholdSelectDataGroupBox->setShown(m_ShowSelector);
     //m_ThresholdSelectDataGroupBox->setShown(true);
   }
-
-  // m_TreeNodeSelector->GetFilter()->SetFilter(mitk::IsBaseDataTypeWithoutProperty<mitk::Image>("isComponentThresholdImage"));
-
 }
 
 /*************** GET CONTENT CONTAINER  ***************/

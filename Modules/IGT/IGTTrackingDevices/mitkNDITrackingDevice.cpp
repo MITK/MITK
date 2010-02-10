@@ -589,13 +589,16 @@ bool mitk::NDITrackingDevice::InitializeWiredTools()
     if ( pt == NULL) // if we already have a tool with this handle
       continue;
 
+    if (pt->GetSROMData() == NULL)
+      continue;
+
     returnvalue = m_DeviceProtocol->PVWR(&ph, pt->GetSROMData(), pt->GetSROMDataLength());
     if (returnvalue != NDIOKAY)
     {
       this->SetErrorMessage((std::string("Could not write SROM file for tool '") + pt->GetToolName() + std::string("' to tracking device")).c_str());
       return false;
     }
-    returnvalue = m_DeviceProtocol->PINIT(&portHandle);
+    returnvalue = m_DeviceProtocol->PINIT(&ph);
     if (returnvalue != NDIOKAY)
     {
       this->SetErrorMessage((std::string("Could not initialize tool '") + pt->GetToolName()).c_str());
@@ -603,7 +606,7 @@ bool mitk::NDITrackingDevice::InitializeWiredTools()
     }
     if (pt->IsEnabled() == true)
     {
-      returnvalue = m_DeviceProtocol->PENA(&portHandle, pt->GetTrackingPriority()); // Enable tool
+      returnvalue = m_DeviceProtocol->PENA(&ph, pt->GetTrackingPriority()); // Enable tool
       if (returnvalue != NDIOKAY)
       {
         this->SetErrorMessage((std::string("Could not enable port '") + portHandle +

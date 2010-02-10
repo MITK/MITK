@@ -1057,7 +1057,7 @@ void vtkVolumeTextureMapper3DComputeScalars( T *dataPtr,
   me->GetVolumeDimensions( outputDimensions );
   me->GetVolumeSpacing( outputSpacing );
 
-  int components = input->GetNumberOfScalarComponents();
+  // int components = input->GetNumberOfScalarComponents();
 
   // double wx, wy, wz;
   // double fx, fy, fz;
@@ -2379,7 +2379,7 @@ void vtkMitkOpenGLVolumeTextureMapper3D::Initialize()
   
   
   int canDoFP = 0;
-  int canDoNV = 0;
+  // int canDoNV = 0;
   
   if ( !brokenMesa &&
        supports_texture3D          &&

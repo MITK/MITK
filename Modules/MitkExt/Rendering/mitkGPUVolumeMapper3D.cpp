@@ -248,7 +248,7 @@ void mitk::GPUVolumeMapper3D::GenerateDataGPU( mitk::BaseRenderer *renderer )
   if ( !input || !input->IsInitialized() )
     return;
 
-  vtkRenderWindow* renderWindow = renderer->GetRenderWindow();
+  // vtkRenderWindow* renderWindow = renderer->GetRenderWindow();
 
   if (this->IsVisible(renderer)==false ||
       this->GetDataTreeNode() == NULL ||
@@ -346,7 +346,7 @@ void mitk::GPUVolumeMapper3D::GenerateDataCPU( mitk::BaseRenderer *renderer )
   if ( !input || !input->IsInitialized() )
     return;
 
-  vtkRenderWindow* renderWindow = renderer->GetRenderWindow();
+  // vtkRenderWindow* renderWindow = renderer->GetRenderWindow();
 
   if (this->IsVisible(renderer)==false ||
       this->GetDataTreeNode() == NULL ||

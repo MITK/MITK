@@ -1,6 +1,6 @@
 
 SET(MODULE_TESTS 
-  # mitkPropertySerializationTest.cpp
+  mitkPropertySerializationTest.cpp
   mitkSceneIOTest.cpp
 )
 

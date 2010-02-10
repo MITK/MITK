@@ -92,11 +92,11 @@ static mitk::PointSet::Pointer CreatePointSet()
   
   mitk::PointSet::Pointer ps = mitk::PointSet::New();
   mitk::PointSet::PointType p;
-  mitk::FillVector3D(p, 1.1, -2.22, 33.33);
+  mitk::FillVector3D(p, 1.0, -2.0, 33.0);
   ps->SetPoint(0, p);
-  mitk::FillVector3D(p, 100.1, -200.22, 3300.33);
+  mitk::FillVector3D(p, 100.0, -200.0, 3300.0);
   ps->SetPoint(1, p);
-  mitk::FillVector3D(p, 2.0, -3.0, 22.22);
+  mitk::FillVector3D(p, 2.0, -3.0, 22.0);
   ps->SetPoint(2, p, mitk::PTCORNER); // add point spec
   //mitk::FillVector3D(p, -2.0, -2.0, -2.22);
   //ps->SetPoint(0, p, 1); // ID 0 in timestep 1
@@ -119,6 +119,12 @@ static void FillStorage(mitk::DataStorage* storage)
   imagenode->SetData( image );
   imagenode->SetName( "Pic3D" );
   storage->Add( imagenode );
+
+  mitk::DataTreeNode::Pointer imagechildnode = mitk::DataTreeNode::New();
+  imagechildnode->SetData( image );
+  imagechildnode->SetName( "Pic3D again" );
+  storage->Add( imagechildnode, imagenode );
+
   
   mitk::Surface::Pointer surface = LoadSurface( LocateFile("binary.stl") );
   MITK_TEST_CONDITION_REQUIRED(surface.IsNotNull(),"Loading test surface binary.stl");
@@ -133,12 +139,70 @@ static void FillStorage(mitk::DataStorage* storage)
 
   mitk::PointSet::Pointer ps = CreatePointSet();
   mitk::DataTreeNode::Pointer psenode = mitk::DataTreeNode::New();
-  surfacenode->SetData( ps );
-  surfacenode->SetName( "points" );
+  psenode->SetData( ps );
+  psenode->SetName( "points" );
   storage->Add( psenode );
 
 }
 
+static void VerifyStorage(mitk::DataStorage* storage)
+{
+  //TODO the Surface and PointSet are uncommented until the material property is saved properly
+  mitk::DataTreeNode::Pointer imagenode = storage->GetNamedNode("Pic3D");
+  MITK_TEST_CONDITION_REQUIRED(imagenode.IsNotNull(),"Get previously stored image node");
+
+  //Image
+  std::string testString("");
+  imagenode->GetStringProperty("image type", testString);
+  MITK_TEST_CONDITION_REQUIRED(!(testString == "test image") ,"Get StringProperty from previously stored image node");
+
+  imagenode->GetStringProperty("greetings", testString);
+  MITK_TEST_CONDITION_REQUIRED(!(testString == "to mom") ,"Get another StringProperty from previously stored image node");
+
+  mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(imagenode->GetData());
+  MITK_TEST_CONDITION_REQUIRED(image.IsNotNull(),"Loading test image from Datastorage");
+
+  //Get Image child node
+  mitk::DataTreeNode::Pointer imagechildnode = storage->GetNamedNode("Pic3D again");
+  mitk::DataStorage::SetOfObjects::ConstPointer objects = storage->GetSources(imagechildnode);
+
+  MITK_TEST_CONDITION_REQUIRED(objects->Size() == 1,"Check size of image child nodes source list");
+  MITK_TEST_CONDITION_REQUIRED(objects->ElementAt(0) == imagenode,"Check for right parent node");
+
+  mitk::Image::Pointer imagechild = dynamic_cast<mitk::Image*>(imagechildnode->GetData());
+  MITK_TEST_CONDITION_REQUIRED(imagechild.IsNotNull(),"Loading child test image from Datastorage");
+
+  //Surface
+  mitk::DataTreeNode::Pointer surfacenode = storage->GetNamedNode("binary");
+  MITK_TEST_CONDITION_REQUIRED(surfacenode.IsNotNull(),"Get previously stored surface node");
+
+  surfacenode->GetStringProperty("surface type", testString);
+  MITK_TEST_CONDITION_REQUIRED(!(testString.compare("test surface") == 0) ,"Get StringProperty from previously stored surface node");
+
+  surfacenode->GetStringProperty("greetings", testString);
+  MITK_TEST_CONDITION_REQUIRED(!(testString.compare("to dad") == 0) ,"Get another StringProperty from previously stored surface node");
+
+  mitk::Surface::Pointer surface = dynamic_cast<mitk::Surface*>(surfacenode->GetData());
+  MITK_TEST_CONDITION_REQUIRED(surface.IsNotNull(),"Loading test surface from Datastorage");
+
+
+  //PointSet
+  mitk::DataTreeNode::Pointer pointsnode = storage->GetNamedNode("points");
+  MITK_TEST_CONDITION_REQUIRED(pointsnode.IsNotNull(),"Get previously stored PointSet node");
+
+  mitk::PointSet::Pointer pointset = dynamic_cast<mitk::PointSet*>(pointsnode->GetData());
+  MITK_TEST_CONDITION_REQUIRED(pointset.IsNotNull(),"Loading test PointSet from Datastorage");
+
+  mitk::PointSet::PointType p = pointset->GetPoint(0);
+  MITK_TEST_CONDITION_REQUIRED(p[0] == 1.0 && p[1] == -2.0 && p[2] == 33.0, "Test Pointset entry 0 after loading");
+
+  p = pointset->GetPoint(1);
+  MITK_TEST_CONDITION_REQUIRED(p[0] == 100.0 && p[1] == -200.0 && p[2] == 3300.0, "Test Pointset entry 1 after loading");
+
+  p = pointset->GetPoint(2);
+  MITK_TEST_CONDITION_REQUIRED(p[0] == 2.0 && p[1] == -3.0 && p[2] == 22.0, "Test Pointset entry 2 after loading");
+
+}
 }; // end test helper class
   
 int mitkSceneIOTest(int /* argc */, char* /*argv*/[])
@@ -194,5 +258,14 @@ int mitkSceneIOTest(int /* argc */, char* /*argv*/[])
       // \TODO: should we fail the test case if failed properties exist?
     }
   }
+
+  //Now do the loading part
+  sceneIO = mitk::SceneIO::New();
+
+  //Load scene into the datastorage and clean the DS first
+  storage = sceneIO->LoadScene(sceneFileName,storage,true);
+  SceneIOTestClass::VerifyStorage(storage);
+
+
   MITK_TEST_END()
 }

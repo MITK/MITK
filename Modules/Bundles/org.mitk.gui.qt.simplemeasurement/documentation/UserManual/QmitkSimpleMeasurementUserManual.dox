@@ -1,6 +1,7 @@
 /**
-\image html SimpleMeasurementIcon.png 
-\page QmitkSimpleMeasurementUserManual SimpleMeasurement
+\bundlemainpage{org.simplemeasurement} The Simple Measurement Module
+
+\image html SimpleMeasurementIcon.png  "Icon of the Module"
 
 Available sections:
   - \ref QmitkSimpleMeasurementUserManualOverview 
@@ -9,7 +10,7 @@ Available sections:
 
 \section QmitkSimpleMeasurementUserManualOverview Overview
 
-SimpleMeasurement is a is a program module that allows to measure distances, angels and pathes on a dataset.
+SimpleMeasurement is a program module that allows to measure distances, angels and pathes on a dataset.
 
 \section QmitkSimpleMeasurementUserManualFeatures Features
 
@@ -32,9 +33,9 @@ Choose the simplemeasurement method you need by pressing the according button.
 </ul>
 What the different modes mean and how to use them:
 <ul>
-  <li> a) Distances: To measure the distance between two points, you have to set two points. The distance will be displayed on the line between the points.
-  <li> b) Angles: Angles can be measured between two lines. For that you have to set three points. The angle will be displayed between the two lines. 
-  <li> c) Path: Distances and angles along a path can be measured by setting at least two (for distance) or three (for angles) or more (for longer pathes) points. The distance and the angles for each part will be displayed next to the path.
+  <li> Distances (a): To measure the distance between two points, you have to set two points. The distance will be displayed on the line between the points.
+  <li> Angles(b): Angles can be measured between two lines. For that you have to set three points. The angle will be displayed between the two lines. 
+  <li> Path(c): Distances and angles along a path can be measured by setting at least two (for distance) or three (for angles) or more (for longer pathes) points. The distance and the angles for each part will be displayed next to the path.
 </ul>
 
 \image html SimpleMeasurementGUI.png Graphical User Interface of SimpleMeasurement

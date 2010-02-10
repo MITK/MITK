@@ -1376,9 +1376,9 @@ void vtkVolumeTextureMapper3DComputeRGBA( unsigned char *dataPtr,
                                                GLuint volume2)
 {
   unsigned char  *inPtr;
-  unsigned char  *outPtr, *outPtr2;
-  int             i, j, k;
-  int             idx;
+  // unsigned char  *outPtr, *outPtr2;
+  // int             i, j, k;
+  // int             idx;
 
   int   inputDimensions[3];
   double inputSpacing[3];
@@ -1396,9 +1396,9 @@ void vtkVolumeTextureMapper3DComputeRGBA( unsigned char *dataPtr,
 
   MITK_INFO << "components are " << components;
 
-  double wx, wy, wz;
-  double fx, fy, fz;
-  int x, y, z;
+  // double wx, wy, wz;
+  // double fx, fy, fz;
+  // int x, y, z;
 
   double sampleRate[3];
   sampleRate[0] = outputSpacing[0] / static_cast<double>(inputSpacing[0]);

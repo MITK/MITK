@@ -320,7 +320,7 @@ void mitk::GPUVolumeMapper3D::GenerateDataGPU( mitk::BaseRenderer *renderer )
    
    // Updating shadings
    {
-      float val;
+      //float val;
       mitk::FloatProperty *fp;
       
       fp=dynamic_cast<mitk::FloatProperty*>(GetDataTreeNode()->GetProperty("volumerendering.gpu.ambient",renderer)); 
@@ -408,7 +408,7 @@ void mitk::GPUVolumeMapper3D::GenerateDataCPU( mitk::BaseRenderer *renderer )
 
    // Updating shadings
    {
-      float val;
+      // float val;
       mitk::FloatProperty *fp;
       
       fp=dynamic_cast<mitk::FloatProperty*>(GetDataTreeNode()->GetProperty("volumerendering.cpu.ambient",renderer)); 

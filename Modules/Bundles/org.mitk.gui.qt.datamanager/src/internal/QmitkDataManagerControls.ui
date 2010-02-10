@@ -372,7 +372,6 @@
     </image>
   </images>
   <includes>
-    <include location="global" >mitkDataTree.h</include>
     <include location="local" >QmitkDataTreeViewItem.h</include>
     <include location="global" >map</include>
     <include location="local" >mitkBaseProperty.h</include>

@@ -32,7 +32,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkGlobalInteraction.h>
 #include "mitkUndoController.h"
 #include "mitkCuboidObjectCutter.h"
-#include "mitkDataTreeHelper.h"
 #include "mitkImageAccessByItk.h"
 #include "mitkITKImageImport.h"
 #include "mitkIDataStorageService.h"

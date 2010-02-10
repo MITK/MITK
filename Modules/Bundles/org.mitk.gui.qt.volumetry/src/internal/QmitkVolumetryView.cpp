@@ -31,7 +31,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "itkImage.h"
 #include <limits>
 #include "mitkDataTreeNode.h"
-#include "mitkDataTreeHelper.h"
 #include "mitkRenderingManager.h"
 #include "mitkVolumeCalculator.h"
 

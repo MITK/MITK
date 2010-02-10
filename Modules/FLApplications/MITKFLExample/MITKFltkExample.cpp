@@ -8,7 +8,7 @@
 
 // #include "mitkIpPic.h"
 #include "mitkPicFileReader.h"
-#include "mitkDataTree.h"
+
 #include "mitkStringProperty.h"
 #include "mitkLevelWindowProperty.h"
 #include "mitkSliceNavigationController.h"

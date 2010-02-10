@@ -610,7 +610,6 @@
   <include location="local">mitkEventMapper.h</include>
   <include location="local">mitkInteractionConst.h</include>
   <include location="local">mitkBaseData.h</include>
-  <include location="global">mitkDataTree.h</include>
  </includes>
  <resources>
   <include location="../../resources/QmitkPointBasedRegistrationView.qrc"/>

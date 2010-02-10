@@ -1,7 +1,7 @@
 #include <Fl/Fl.h>
 #include "FLmitkComfortWidget.h"
 //#include "mitkLevelWindow.h"
-// #include "mitkDataTree.h"
+// 
 FLmitkComfortWidget::FLmitkComfortWidget(int x,int y,int w,int h,const char* label) : FLmitkRenderWindow(x,y,w,h,label) { 
 
 }

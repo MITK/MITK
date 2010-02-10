@@ -351,7 +351,6 @@ The original image will not be modified, it will only be hidden.</string>
   </customwidget>
  </customwidgets>
  <includes>
-  <include location="local" >mitkDataTree.h</include>
   <include location="local" >QmitkDataStorageComboBox.h</include>
  </includes>
  <resources>

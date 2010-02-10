@@ -10,7 +10,7 @@
 #include <QtGui/QWidget>
 #include "QmitkRenderWindow.h"
 #include "mitkCommon.h"
-#include "mitkDataTree.h"
+
 #include "mitkDataTreeNode.h"
 #include "mitkMaterialProperty.h"
 #include "mitkSurface.h"

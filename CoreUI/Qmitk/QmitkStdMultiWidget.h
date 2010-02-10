@@ -261,7 +261,6 @@ protected:
   mitk::SlicesRotator::Pointer m_SlicesRotator;
   mitk::SlicesSwiveller::Pointer m_SlicesSwiveller;
 
-  mitk::DataTreeIteratorClone planesIterator;
   mitk::DataTreeNode::Pointer m_PositionTrackerNode;
   mitk::DataStorage::Pointer m_DataStorage;
 

@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkAbortEventFilter.h"
 #include "QmitkRenderingManager.h"
 
-#include "mitkDataTree.h"
+
 #include "mitkGeometry3D.h"
 #include "mitkBaseRenderer.h"
 #include "mitkSliceNavigationController.h"

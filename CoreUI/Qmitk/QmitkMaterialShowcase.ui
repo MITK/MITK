@@ -56,7 +56,6 @@
   <include location="local" >mitkCommon.h</include>
   <include location="local" >mitkMaterialProperty.h</include>
   <include location="local" >mitkDataTreeNode.h</include>
-  <include location="local" >mitkDataTree.h</include>
   <include location="local" >mitkSurface.h</include>
   <include location="local" >vtkTextActor.h</include>
   <include location="local" >vtkRenderer.h</include>

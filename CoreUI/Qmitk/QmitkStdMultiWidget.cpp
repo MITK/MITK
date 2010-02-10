@@ -184,7 +184,6 @@ m_Node(NULL)
 
 void QmitkStdMultiWidget::InitializeWidget()
 {
-  planesIterator = NULL;
   m_PositionTracker = NULL;
 
   // transfer colors in WorldGeometry-Nodes of the associated Renderer

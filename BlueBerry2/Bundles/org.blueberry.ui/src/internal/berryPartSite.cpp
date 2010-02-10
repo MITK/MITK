@@ -133,7 +133,7 @@ IWorkbenchPage::Pointer PartSite::GetPage()
 
 PartPane::Pointer PartSite::GetPane()
 {
-  return partReference.Cast<WorkbenchPartReference>()->GetPane();
+  return partReference.Lock().Cast<WorkbenchPartReference>()->GetPane();
 }
 
 IWorkbenchPart::Pointer PartSite::GetPart()
@@ -143,7 +143,7 @@ IWorkbenchPart::Pointer PartSite::GetPart()
 
 IWorkbenchPartReference::Pointer PartSite::GetPartReference()
 {
-  return partReference;
+  return partReference.Lock();
 }
 
 std::string PartSite::GetPluginId()

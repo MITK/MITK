@@ -110,9 +110,27 @@ void UITestApplication::RunTests()
 IApplication* UITestApplication::GetApplication() throw (CoreException)
 {
 
-  const IExtension* extension =
-  Platform::GetExtensionPointService()->GetExtension(
-      Starter::XP_APPLICATIONS, GetApplicationToRun());
+  const IExtension* extension = 0;
+  /*Platform::GetExtensionPointService()->GetExtension(
+      Starter::XP_APPLICATIONS, GetApplicationToRun());*/
+
+    IConfigurationElement::vector extensions(
+        Platform::GetExtensionPointService()->GetConfigurationElementsFor(Starter::XP_APPLICATIONS));
+    IConfigurationElement::vector::iterator iter;
+
+    std::string appToRun = GetApplicationToRun();
+    std::string id;
+    for (iter = extensions.begin(); iter != extensions.end(); ++iter)
+    {
+      if((*iter)->GetAttribute("id", id))
+      {
+        if(id == appToRun)
+        {
+          extension = (*iter)->GetDeclaringExtension();
+          break;
+        }
+      }
+    }
 
   IApplication* app = 0;
 

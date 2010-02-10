@@ -60,6 +60,12 @@ class QmitkSegmentationView : public QObject, public QmitkFunctionality
     // BlueBerry's notification about preference changes (e.g. from a dialog)
     void PreferencesChanged(const berry::IBerryPreferences*);
 
+    // observer to mitk::RenderingManager's RenderingManagerViewsInitializedEvent event
+    void RenderingManagerReinitialized(const itk::EventObject&);
+    
+    // observer to mitk::SliceController's SliceRotation event
+    void SliceRotation(const itk::EventObject&);
+
   protected slots:
 
     // reaction to the button "New segmentation"
@@ -138,6 +144,10 @@ class QmitkSegmentationView : public QObject, public QmitkFunctionality
     bool m_JustSentASelection;
 
     QmitkSegmentationPostProcessing* m_PostProcessing;
+
+    unsigned long m_RenderingManagerObserverTag;
+    unsigned long m_SlicesRotationObserverTag1;
+    unsigned long m_SlicesRotationObserverTag2;
 };
 
 #endif /*QMITKsegmentationVIEW_H_*/

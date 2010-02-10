@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkDataTreeNodeObject.h"
 #include "mitkProperties.h"
 #include "mitkSegTool2D.h"
+#include "mitkGlobalInteraction.h"
 
 #include "QmitkStdMultiWidget.h"
 #include "QmitkNewSegmentationDialog.h"
@@ -39,11 +40,14 @@ QmitkSegmentationView::QmitkSegmentationView()
 ,m_MultiWidget(NULL)
 ,m_JustSentASelection(false)
 ,m_PostProcessing(NULL)
+,m_RenderingManagerObserverTag(0)
 {
 }
 
 QmitkSegmentationView::~QmitkSegmentationView()
 {
+  mitk::RenderingManager::GetInstance()->RemoveObserver( m_RenderingManagerObserverTag );
+
   berry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
   if(s)
   {
@@ -55,7 +59,6 @@ QmitkSegmentationView::~QmitkSegmentationView()
     m_SegmentationPreferencesNode->OnChanged
       .RemoveListener(berry::MessageDelegate1<QmitkSegmentationView, const berry::IBerryPreferences*>(this, &QmitkSegmentationView::PreferencesChanged));
   }
-
 
   delete m_PostProcessing;
   delete m_Controls;
@@ -121,8 +124,41 @@ void QmitkSegmentationView::StdMultiWidgetClosed( QmitkStdMultiWidget& /*stdMult
   
 void QmitkSegmentationView::SetMultiWidget(QmitkStdMultiWidget* multiWidget)
 {
-  // save the actual multiwidget as the working widget
+  if (m_MultiWidget)
+  {
+  mitk::SlicesCoordinator* coordinator = m_MultiWidget->GetSlicesRotator();
+  if (coordinator)
+  {
+    coordinator->RemoveObserver( m_SlicesRotationObserverTag1 );
+  }
+  coordinator = m_MultiWidget->GetSlicesSwiveller();
+  if (coordinator)
+  {
+    coordinator->RemoveObserver( m_SlicesRotationObserverTag2 );
+  }
+  }
+
+  // save the current multiwidget as the working widget
   m_MultiWidget = multiWidget;
+
+  if (m_MultiWidget)
+  {
+    mitk::SlicesCoordinator* coordinator = m_MultiWidget->GetSlicesRotator();
+    if (coordinator)
+    {
+      itk::ReceptorMemberCommand<QmitkSegmentationView>::Pointer command2 = itk::ReceptorMemberCommand<QmitkSegmentationView>::New();
+      command2->SetCallbackFunction( this, &QmitkSegmentationView::SliceRotation );
+      m_SlicesRotationObserverTag1 = coordinator->AddObserver( mitk::SliceRotationEvent(), command2 );
+    }
+
+    coordinator = m_MultiWidget->GetSlicesSwiveller();
+    if (coordinator)
+    {
+      itk::ReceptorMemberCommand<QmitkSegmentationView>::Pointer command2 = itk::ReceptorMemberCommand<QmitkSegmentationView>::New();
+      command2->SetCallbackFunction( this, &QmitkSegmentationView::SliceRotation );
+      m_SlicesRotationObserverTag2 = coordinator->AddObserver( mitk::SliceRotationEvent(), command2 );
+    }
+  }
 
   if (m_Parent)
   {
@@ -142,6 +178,17 @@ void QmitkSegmentationView::PreferencesChanged(const berry::IBerryPreferences* )
 {
   ForceDisplayPreferencesUponAllImages();
 }
+
+void QmitkSegmentationView::RenderingManagerReinitialized(const itk::EventObject&)
+{
+  CheckImageAlignment();
+}
+
+void QmitkSegmentationView::SliceRotation(const itk::EventObject&)
+{
+  CheckImageAlignment();
+}
+ 
 
 // protected slots
 
@@ -654,7 +701,12 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
   // call preferences changed for initialization
   // changes GUI according to current data manager selection (because it might have changed before QmitkSegmentationView came into being)
   this->PreferencesChanged(m_SegmentationPreferencesNode.GetPointer());
+
+  itk::ReceptorMemberCommand<QmitkSegmentationView>::Pointer command1 = itk::ReceptorMemberCommand<QmitkSegmentationView>::New();
+  command1->SetCallbackFunction( this, &QmitkSegmentationView::RenderingManagerReinitialized );
+  m_RenderingManagerObserverTag = mitk::RenderingManager::GetInstance()->AddObserver( mitk::RenderingManagerViewsInitializedEvent(), command1 );
 }
-       
+
+      
 // ATTENTION some methods for handling the known list of (organ names, colors) are defined in QmitkSegmentationOrganNamesHandling.cpp
 

@@ -3,7 +3,6 @@ SET(SRC_CPP_FILES
   QmitkDnDFrameWidget.cpp
   QmitkDataTreeNodeSelectionProvider.cpp
   QmitkFileOpenAction.cpp
-  QmitkFileSaveProjectAction.cpp
   QmitkFileExitAction.cpp
   QmitkFunctionality.cpp
   QmitkProgressBar.cpp
@@ -21,7 +20,6 @@ SET(INTERNAL_CPP_FILES
 SET(MOC_H_FILES
   src/QmitkCloseProjectAction.h
   src/QmitkFileOpenAction.h
-  src/QmitkFileSaveProjectAction.h
   src/QmitkFileExitAction.h
   src/QmitkProgressBar.h
   src/QmitkPreferencesDialog.h

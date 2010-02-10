@@ -2,8 +2,8 @@
 
 Program:   Medical Imaging & Interaction Toolkit
 Language:  C++
-Date:      $Date$
-Version:   $Revision$
+Date:      $Date: 2010-01-16 19:57:43 +0100 (Sa, 16 Jan 2010) $
+Version:   $Revision: 21070 $
 
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
@@ -15,15 +15,16 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#include "QmitkFileOpenAction.h"
+#include "QmitkExtFileOpenAction.h"
 
 #include <QFileDialog>
 #include <QFileInfo>
 #include <mitkDataTreeNodeFactory.h>
 
+#include "mitkSceneIO.h"
 #include "mitkProgressBar.h"
 
-#include <mitkCoreObjectFactory.h>
+#include <mitkCoreExtObjectFactory.h>
 #include <mitkDataStorageEditorInput.h>
 #include <berryIEditorPart.h>
 #include <berryIWorkbenchPage.h>
@@ -38,13 +39,13 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "QmitkStdMultiWidgetEditor.h"
 
-QmitkFileOpenAction::QmitkFileOpenAction(berry::IWorkbenchWindow::Pointer window)
+QmitkExtFileOpenAction::QmitkExtFileOpenAction(berry::IWorkbenchWindow::Pointer window)
 : QAction(0)
 {
   this->init(window);
 }
 
-QmitkFileOpenAction::QmitkFileOpenAction(const QIcon & icon, berry::IWorkbenchWindow::Pointer window)
+QmitkExtFileOpenAction::QmitkExtFileOpenAction(const QIcon & icon, berry::IWorkbenchWindow::Pointer window)
 : QAction(0)
 {
   this->setIcon(icon);
@@ -52,7 +53,7 @@ QmitkFileOpenAction::QmitkFileOpenAction(const QIcon & icon, berry::IWorkbenchWi
   this->init(window);
 }
 
-void QmitkFileOpenAction::init(berry::IWorkbenchWindow::Pointer window)
+void QmitkExtFileOpenAction::init(berry::IWorkbenchWindow::Pointer window)
 {
   m_Window = window;
   this->setParent(static_cast<QWidget*>(m_Window->GetShell()->GetControl()));
@@ -67,7 +68,7 @@ void QmitkFileOpenAction::init(berry::IWorkbenchWindow::Pointer window)
   this->connect(this, SIGNAL(triggered(bool)), this, SLOT(Run()));
 }
 
-void QmitkFileOpenAction::Run()
+void QmitkExtFileOpenAction::Run()
 {
   /**
    * @brief stores the last path of last opened file
@@ -89,7 +90,16 @@ void QmitkFileOpenAction::Run()
   //  << "MITK Pointset (*.mps)"
   //  << "All Files (*.*)";
   //dialog.setFilters(filters);
-  QStringList fileNames = QFileDialog::getOpenFileNames(NULL,"Open",m_LastPath,mitk::CoreObjectFactory::GetInstance()->GetFileExtensions());
+  std::stringstream ss;
+  ss << mitk::CoreExtObjectFactory::GetInstance()->GetFileExtensions();
+  std::string fileExtensions = ss.str();
+  fileExtensions.append(";; MITK Scene Files (*.mitk)");
+
+  fileExtensions.insert( fileExtensions.find("formats(") + 8, "*.mitk " );
+
+  MITK_INFO << fileExtensions;
+  
+  QStringList fileNames = QFileDialog::getOpenFileNames(NULL,"Open",m_LastPath, fileExtensions.c_str() );
 
   //if (dialog.exec())
   //  fileNames = dialog.selectedFiles();
@@ -124,28 +134,39 @@ void QmitkFileOpenAction::Run()
   for (QStringList::Iterator fileName = fileNames.begin();
     fileName != fileNames.end(); ++fileName)
   {
-
-    mitk::DataTreeNodeFactory::Pointer nodeReader = mitk::DataTreeNodeFactory::New();
-    try
+    if ( fileName->right(5) == ".mitk" ) 
     {
-      nodeReader->SetFileName(fileName->toStdString());
-      nodeReader->Update();
-      for ( unsigned int i = 0 ; i < nodeReader->GetNumberOfOutputs( ); ++i )
+      mitk::SceneIO::Pointer sceneIO = mitk::SceneIO::New();
+
+      bool clearDataStorageFirst(false);
+      mitk::ProgressBar::GetInstance()->AddStepsToDo(2);
+      dataStorage = sceneIO->LoadScene( fileName->toLocal8Bit().constData(), dataStorage, clearDataStorageFirst );
+      dsmodified = true;
+      mitk::ProgressBar::GetInstance()->Progress(2);
+    }
+    else
+    {
+      mitk::DataTreeNodeFactory::Pointer nodeReader = mitk::DataTreeNodeFactory::New();
+      try
       {
-        mitk::DataTreeNode::Pointer node;
-        node = nodeReader->GetOutput(i);
-        if ( node->GetData() != NULL )
-        {  
-          dataStorage->Add(node);
-          dsmodified = true;
+        nodeReader->SetFileName(fileName->toStdString());
+        nodeReader->Update();
+        for ( unsigned int i = 0 ; i < nodeReader->GetNumberOfOutputs( ); ++i )
+        {
+          mitk::DataTreeNode::Pointer node;
+          node = nodeReader->GetOutput(i);
+          if ( node->GetData() != NULL )
+          {  
+            dataStorage->Add(node);
+            dsmodified = true;
+          }
         }
       }
-    }
-    catch(...)
-    {
+      catch(...)
+      {
 
+      }
     }
-
   }
   
   if (multiWidgetEditor.IsNull())

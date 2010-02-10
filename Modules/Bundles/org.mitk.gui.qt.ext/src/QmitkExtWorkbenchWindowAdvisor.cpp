@@ -36,8 +36,8 @@
 #include <internal/berryQtShowViewAction.h>
 #include <internal/berryQtOpenPerspectiveAction.h>
 
-#include <QmitkFileOpenAction.h>
-#include <QmitkFileSaveProjectAction.h>
+#include <QmitkExtFileOpenAction.h>
+#include <QmitkExtFileSaveProjectAction.h>
 #include <QmitkFileExitAction.h>
 #include <QmitkCloseProjectAction.h>
 #include <QmitkStatusBar.h>
@@ -223,9 +223,9 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
 
   QMenu* fileMenu = menuBar->addMenu("&File");
 
-  QAction* fileOpenAction = new QmitkFileOpenAction(QIcon(":/org.mitk.gui.qt.ext/Load_48.png"), window);
+  QAction* fileOpenAction = new QmitkExtFileOpenAction(QIcon(":/org.mitk.gui.qt.ext/Load_48.png"), window);
   fileMenu->addAction(fileOpenAction);
-  QAction* fileSaveProjectAction = new QmitkFileSaveProjectAction(window);
+  QAction* fileSaveProjectAction = new QmitkExtFileSaveProjectAction(window);
   fileSaveProjectAction->setIcon(QIcon(":/org.mitk.gui.qt.ext/Save_48.png"));
   fileMenu->addAction(fileSaveProjectAction);
   QAction* closeProjectAction = new QmitkCloseProjectAction(window);

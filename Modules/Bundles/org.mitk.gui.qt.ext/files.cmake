@@ -1,6 +1,9 @@
 SET(SRC_CPP_FILES
   QmitkExtActionBarAdvisor.cpp
   QmitkExtWorkbenchWindowAdvisor.cpp
+  QmitkExtFileOpenAction.cpp
+  QmitkExtDnDFrameWidget.cpp
+  QmitkExtFileSaveProjectAction.cpp
 )
 
 SET(INTERNAL_CPP_FILES
@@ -13,6 +16,10 @@ SET(UI_FILES
 
 SET(MOC_H_FILES
   src/internal/QmitkExtWorkbenchWindowAdvisorHack.h
+  src/QmitkExtFileOpenAction.h
+  src/QmitkExtFileSaveProjectAction.h
+  src/QmitkExtDnDFrameWidget.h
+  
 )
 
 SET(RESOURCE_FILES

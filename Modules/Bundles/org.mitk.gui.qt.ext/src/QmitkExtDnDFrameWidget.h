@@ -2,8 +2,8 @@
 
 Program:   Medical Imaging & Interaction Toolkit
 Language:  C++
-Date:      $Date: 2009-10-09 16:36:23 +0200 (Fr, 09 Okt 2009) $
-Version:   $Revision: 19414 $
+Date:      $Date: 2009-02-10 14:14:32 +0100 (Di, 10 Feb 2009) $
+Version:   $Revision: 16224 $
 
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
@@ -15,8 +15,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#ifndef QmitkFileSaveProjectAction_H_
-#define QmitkFileSaveProjectAction_H_
+#ifndef QmitkExtDndFrameWidget_h
+#define QmitkExtDndFrameWidget_h
 
 #ifdef __MINGW32__
 // We need to inlclude winbase.h here in order to declare
@@ -25,28 +25,27 @@ PURPOSE.  See the above copyright notices for more information.
 #include <windows.h>
 #endif
 
-#include <QAction>
+#include <QWidget>
+#include "mitkQtCommonExtDll.h"
+//drag&drop
+class QDragEnterEvent;
+class QDropEvent;
+class QMouseEvent;
 
-#include "mitkQtCommonDll.h"
-
-#include <berryIWorkbenchWindow.h>
-
-class MITK_QT_COMMON QmitkFileSaveProjectAction : public QAction
+class MITK_QT_COMMON_EXT_EXPORT QmitkExtDnDFrameWidget : public QWidget
 {
   Q_OBJECT
 
 public:
-
-  QmitkFileSaveProjectAction(berry::IWorkbenchWindow::Pointer window);
-
-protected slots:
-
-  void Run();
+  QmitkExtDnDFrameWidget(QWidget *parent);
+  
 
 private:
+  void dragEnterEvent( QDragEnterEvent *event );
+  void dropEvent( QDropEvent * event );
 
-  berry::IWorkbenchWindow::Pointer m_Window;
+ 
 };
 
 
-#endif /*QmitkFileSaveProjectAction_H_*/
+#endif 

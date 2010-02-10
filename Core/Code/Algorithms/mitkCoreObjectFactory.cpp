@@ -299,8 +299,7 @@ mitk::Mapper::Pointer mitk::CoreObjectFactory::CreateMapper(mitk::DataTreeNode* 
 
 #define INTERNAL_FILE_EXTENSIONS \
     "all (*.seq *.mps *.nii *.pic *.pic.gz *.seq.gz *.pvtk *.stl *.vtk *.vtp *.vtu *.obj *.vti *.ves *.nrrd *.nhdr " \
-         "*.uvg *.dvg *.par *.dcm *.dc3 *.gdcm *.ima *.mhd *.hdr hpsonos.db HPSONOS.DB *.ssm *msm *.bmp *.png *.jpg *.tiff *.mitk);;" \
-    "Project files(*.mitk);;" \
+         "*.uvg *.dvg *.par *.dcm *.dc3 *.gdcm *.ima *.mhd *.hdr hpsonos.db HPSONOS.DB *.ssm *msm *.bmp *.png *.jpg *.tiff);;" \
     "DKFZ Pic (*.seq *.pic *.pic.gz *.seq.gz);;" \
     "NRRD Vector Images (*.nrrd *.nhdr);;" \
     "Point sets (*.mps);;" \

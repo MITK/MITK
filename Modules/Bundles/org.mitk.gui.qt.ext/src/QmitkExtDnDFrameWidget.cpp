@@ -1,5 +1,5 @@
 
-#include <QmitkDnDFrameWidget.h>
+#include <QmitkExtDnDFrameWidget.h>
 #include <QtGui>
 
 
@@ -16,19 +16,21 @@
 #include "mitkNodePredicateNOT.h"
 #include "mitkNodePredicateProperty.h"
 
+
+#include "mitkSceneIO.h"
 #include "mitkProgressBar.h"
 
-QmitkDnDFrameWidget::QmitkDnDFrameWidget(QWidget *parent)
+QmitkExtDnDFrameWidget::QmitkExtDnDFrameWidget(QWidget *parent)
   : QWidget(parent)
 {
    setAcceptDrops(true);
 }
 
-void QmitkDnDFrameWidget::dragEnterEvent( QDragEnterEvent *event )
+void QmitkExtDnDFrameWidget::dragEnterEvent( QDragEnterEvent *event )
 {   // accept drags
   event->accept();
 }
-void QmitkDnDFrameWidget::dropEvent( QDropEvent * event )
+void QmitkExtDnDFrameWidget::dropEvent( QDropEvent * event )
 { //open dragged files
   
   mitk::IDataStorageService::Pointer service = 
@@ -46,28 +48,39 @@ void QmitkDnDFrameWidget::dropEvent( QDropEvent * event )
   for (QList<QUrl>::Iterator fileName = fileNames.begin();
     fileName != fileNames.end(); ++fileName)
   {
-
-    mitk::DataTreeNodeFactory::Pointer nodeReader = mitk::DataTreeNodeFactory::New();
-    try
+    if ( fileName->toLocalFile().right(5) == ".mitk" ) 
     {
-      nodeReader->SetFileName(fileName->toLocalFile().toLatin1().data());
-      nodeReader->Update();
-      for ( unsigned int i = 0 ; i < nodeReader->GetNumberOfOutputs( ); ++i )
+      mitk::SceneIO::Pointer sceneIO = mitk::SceneIO::New();
+
+      bool clearDataStorageFirst(false);
+      mitk::ProgressBar::GetInstance()->AddStepsToDo(2);
+      ds = sceneIO->LoadScene( fileName->toLocalFile().toLocal8Bit().constData(), ds, clearDataStorageFirst );
+      dsmodified = true;
+      mitk::ProgressBar::GetInstance()->Progress(2);
+    }
+    else
+    {
+      mitk::DataTreeNodeFactory::Pointer nodeReader = mitk::DataTreeNodeFactory::New();
+      try
       {
-        mitk::DataTreeNode::Pointer node;
-        node = nodeReader->GetOutput(i);
-        if ( node->GetData() != NULL )
-        {  
-          ds->Add(node);
-          dsmodified = true;
+        nodeReader->SetFileName(fileName->toLocalFile().toLatin1().data());
+        nodeReader->Update();
+        for ( unsigned int i = 0 ; i < nodeReader->GetNumberOfOutputs( ); ++i )
+        {
+          mitk::DataTreeNode::Pointer node;
+          node = nodeReader->GetOutput(i);
+          if ( node->GetData() != NULL )
+          {  
+            ds->Add(node);
+            dsmodified = true;
+          }
         }
       }
-    }
-    catch(...)
-    {
+      catch(...)
+      {
 
+      }
     }
-
   }
   
   if(dsmodified)

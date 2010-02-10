@@ -124,7 +124,7 @@ StackablePart::Pointer EditorSashContainer::GetVisiblePart(
 }
 
 EditorSashContainer::EditorSashContainer(const std::string& editorId,
-    WorkbenchPage::Pointer page, void* parent)
+    WorkbenchPage* page, void* parent)
  : PartSashContainer(editorId, page, parent)
 {
   this->CreateDefaultWorkbook();

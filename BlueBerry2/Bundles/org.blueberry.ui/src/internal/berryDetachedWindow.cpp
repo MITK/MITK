@@ -67,7 +67,7 @@ void DetachedWindow::ShellControlListener::ControlResized(
       Tweaklets::Get(GuiWidgetsTweaklet::KEY)->GetClientArea(e->item));
 }
 
-DetachedWindow::DetachedWindow(WorkbenchPage::Pointer workbenchPage)
+DetachedWindow::DetachedWindow(WorkbenchPage* workbenchPage)
 {
   shellListener = new ShellListener(this);
   resizeListener = new ShellControlListener(this);
@@ -152,7 +152,7 @@ void DetachedWindow::Add(StackablePart::Pointer part)
 bool DetachedWindow::BelongsToWorkbenchPage(
     IWorkbenchPage::Pointer workbenchPage)
 {
-  return (this->page == workbenchPage);
+  return (workbenchPage == this->page);
 }
 
 bool DetachedWindow::Close()
@@ -215,7 +215,7 @@ IStackableContainer::ChildrenType DetachedWindow::GetChildren() const
 
 WorkbenchPage::Pointer DetachedWindow::GetWorkbenchPage()
 {
-  return this->page;
+  return WorkbenchPage::Pointer(this->page);
 }
 
 void DetachedWindow::RestoreState(IMemento::Pointer memento)

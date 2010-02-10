@@ -204,7 +204,7 @@ std::string PartStack::MyStackPresentationSite::GetProperty(
   return partStack->GetProperty(id);
 }
 
-PartStack::PartStack(WorkbenchPage::Pointer p, bool allowsStateChanges,
+PartStack::PartStack(WorkbenchPage* p, bool allowsStateChanges,
     int appear, IPresentationFactory* fac) :
   LayoutPart("PartStack"), page(p), isActive(true), allowStateChanges(
       allowsStateChanges), appearance(appear), ignoreSelectionChanges(false),
@@ -1171,7 +1171,7 @@ WorkbenchPage::Pointer PartStack::GetPage()
   //  }
   //
   //  return window->GetActivePage().Cast<WorkbenchPage>();
-  return page;
+  return WorkbenchPage::Pointer(page);
 }
 
 void PartStack::SetActive(int activeState)

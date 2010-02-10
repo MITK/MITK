@@ -200,7 +200,7 @@ IMemento::Pointer EditorReference::GetMemento()
 
 IWorkbenchPage::Pointer EditorReference::GetPage() const
 {
-  return this->manager->page;
+  return IWorkbenchPage::Pointer(this->manager->page);
 }
 
 IEditorInput::Pointer EditorReference::GetEditorInput()

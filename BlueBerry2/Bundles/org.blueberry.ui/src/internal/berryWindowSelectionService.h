@@ -36,19 +36,19 @@ private:
     /**
      * The window.
      */
-    SmartPointer<IWorkbenchWindow> window;
+    IWorkbenchWindow* window;
 
      /**
      * Sets the window.
      */
-    void SetWindow(SmartPointer<IWorkbenchWindow> window);
+    void SetWindow(IWorkbenchWindow* window);
 
 protected:
 
     /**
      * Returns the window.
      */
-    SmartPointer<IWorkbenchWindow> GetWindow() const;
+    IWorkbenchWindow* GetWindow() const;
 
     /*
      * @see AbstractSelectionService#createPartTracker(String)
@@ -60,7 +60,7 @@ public:
     /**
      * Creates a new selection service for the given window.
      */
-    WindowSelectionService(SmartPointer<IWorkbenchWindow> window);
+    WindowSelectionService(IWorkbenchWindow* window);
 
 };
 

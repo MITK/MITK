@@ -211,7 +211,7 @@ Rectangle PartSashContainer::SashContainerDropTarget::GetSnapRectangle()
 }
 
 PartSashContainer::PartSashContainer(const std::string& id,
-    WorkbenchPage::Pointer _page, void* _parentWidget) :
+    WorkbenchPage* _page, void* _parentWidget) :
   LayoutPart(id), parentWidget(_parentWidget), parent(0), page(_page), active(
       false), layoutDirty(false)
 {
@@ -711,7 +711,7 @@ LayoutTree::Pointer PartSashContainer::GetLayoutTree()
 
 WorkbenchPage::Pointer PartSashContainer::GetPage()
 {
-  return page;
+  return WorkbenchPage::Pointer(page);
 }
 
 void* PartSashContainer::GetParent()

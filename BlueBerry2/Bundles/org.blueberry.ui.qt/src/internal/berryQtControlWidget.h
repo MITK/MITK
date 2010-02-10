@@ -30,7 +30,7 @@ class QtControlWidget : public QFrame
 
 public:
 
-  QtControlWidget(QWidget* parent, SmartPointer<Shell> shell, Qt::WindowFlags f = 0);
+  QtControlWidget(QWidget* parent, Shell* shell, Qt::WindowFlags f = 0);
 
   ~QtControlWidget();
 

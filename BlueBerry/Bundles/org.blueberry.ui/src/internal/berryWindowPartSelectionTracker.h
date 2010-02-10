@@ -40,7 +40,7 @@ private:
     /**
      * The window this selection tracker is working in
      */
-    SmartPointer<IWorkbenchWindow> fWindow;
+    IWorkbenchWindow* fWindow;
 
     /**
      * Part selection listener.
@@ -57,7 +57,7 @@ private:
      *
      * @param window workbench window
      */
-    void SetWindow(SmartPointer<IWorkbenchWindow> window);
+    void SetWindow(IWorkbenchWindow* window);
 
 public:
 
@@ -67,7 +67,7 @@ public:
      * @param window workbench window
      * @param partId part identifier
      */
-    WindowPartSelectionTracker(SmartPointer<IWorkbenchWindow> window, const std::string& partId);
+    WindowPartSelectionTracker(IWorkbenchWindow* window, const std::string& partId);
 
     /*
      * @see IPageListener#pageActivated(IWorkbenchPage)

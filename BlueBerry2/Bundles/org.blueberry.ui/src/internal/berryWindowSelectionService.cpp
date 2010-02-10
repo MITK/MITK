@@ -23,12 +23,12 @@
 namespace berry
 {
 
-void WindowSelectionService::SetWindow(SmartPointer<IWorkbenchWindow> window)
+void WindowSelectionService::SetWindow(IWorkbenchWindow* window)
 {
   this->window = window;
 }
 
-SmartPointer<IWorkbenchWindow> WindowSelectionService::GetWindow() const
+IWorkbenchWindow* WindowSelectionService::GetWindow() const
 {
   return window;
 }
@@ -42,7 +42,7 @@ AbstractPartSelectionTracker::Pointer WindowSelectionService::CreatePartTracker(
 }
 
 WindowSelectionService::WindowSelectionService(
-    SmartPointer<IWorkbenchWindow> window)
+    IWorkbenchWindow* window)
 {
   SetWindow(window);
 }

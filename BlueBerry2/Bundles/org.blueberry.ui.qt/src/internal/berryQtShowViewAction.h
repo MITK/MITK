@@ -41,7 +41,7 @@ class BERRY_UI_QT QtShowViewAction : public QAction {
    
 private:
   
-  IWorkbenchWindow::Pointer m_Window;
+  IWorkbenchWindow* m_Window;
 
   IViewDescriptor::Pointer m_Desc;
   

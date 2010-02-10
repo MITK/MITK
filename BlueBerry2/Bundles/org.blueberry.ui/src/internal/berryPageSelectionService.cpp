@@ -23,17 +23,17 @@
 namespace berry
 {
 
-void PageSelectionService::SetPage(SmartPointer<IWorkbenchPage> page)
+void PageSelectionService::SetPage(IWorkbenchPage* page)
 {
   this->page = page;
 }
 
-PageSelectionService::PageSelectionService(SmartPointer<IWorkbenchPage> page)
+PageSelectionService::PageSelectionService(IWorkbenchPage* page)
 {
   SetPage(page);
 }
 
-SmartPointer<IWorkbenchPage> PageSelectionService::GetPage() const
+IWorkbenchPage* PageSelectionService::GetPage() const
 {
   return page;
 }

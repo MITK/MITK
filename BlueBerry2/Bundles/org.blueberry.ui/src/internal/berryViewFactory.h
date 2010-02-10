@@ -44,10 +44,10 @@ class ViewFactory { // implements IExtensionChangeHandler {
 
 private: 
   
- std::map<std::string, IMemento::Pointer> mementoTable;
- ReferenceCounter<std::string, IViewReference::Pointer> counter;
+   std::map<std::string, IMemento::Pointer> mementoTable;
+   ReferenceCounter<std::string, IViewReference::Pointer> counter;
 
-    SmartPointer<WorkbenchPage> page;
+    WorkbenchPage* page;
 
     IViewRegistry* viewReg;
 
@@ -106,7 +106,7 @@ public:
     /**
      * Constructs a new view factory.
      */
-    ViewFactory(SmartPointer<WorkbenchPage> page, IViewRegistry* reg);
+    ViewFactory(WorkbenchPage* page, IViewRegistry* reg);
     
     
     /**
@@ -152,7 +152,7 @@ public:
      * @return the <code>WorkbenchPage</code> used by this factory.
      * @since 3.0
      */
-    SmartPointer<WorkbenchPage> GetWorkbenchPage() const;
+    WorkbenchPage* GetWorkbenchPage() const;
     
     int GetReferenceCount(IViewReference::Pointer viewRef);
     

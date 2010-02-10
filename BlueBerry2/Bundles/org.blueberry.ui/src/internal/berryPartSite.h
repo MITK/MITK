@@ -92,7 +92,7 @@ private:
 
   IWorkbenchPartReference::WeakPtr partReference;
   WeakPointer<IWorkbenchPart> part;
-  SmartPointer<IWorkbenchPage> page;
+  IWorkbenchPage* page;
   std::string extensionID;
   std::string pluginID;
   std::string extensionName;
@@ -127,7 +127,7 @@ protected:
    *            the page it belongs to
    */
 public: PartSite(IWorkbenchPartReference::Pointer ref, SmartPointer<IWorkbenchPart> part,
-      SmartPointer<IWorkbenchPage> page);
+      IWorkbenchPage* page);
 
   /**
    * Initialize the local services.

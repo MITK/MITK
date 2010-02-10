@@ -60,7 +60,7 @@ void Perspective::Init(WorkbenchPage::Pointer page)
   editorAreaState = IStackPresentationSite::STATE_RESTORED;
   presentation = 0;
   shouldHideEditorsOnActivate = false;
-  this->page = page;
+  this->page = page.GetPointer();
   this->editorArea = page->GetEditorPresentation()->GetLayoutPart();
   this->viewFactory = page->GetViewFactory();
 }

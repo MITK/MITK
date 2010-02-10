@@ -36,7 +36,7 @@ PartPane::Sashes::Sashes() :
 }
 
 PartPane::PartPane(IWorkbenchPartReference::Pointer partReference,
-    WorkbenchPage::Pointer workbenchPage)
+    WorkbenchPage* workbenchPage)
  : StackablePart(partReference->GetId()),
    control(0), inLayout(true), busy(false), hasFocus(false)
 {
@@ -192,7 +192,7 @@ PartPane::Sashes PartPane::FindSashes()
 
 WorkbenchPage::Pointer PartPane::GetPage()
 {
-  return page;
+  return WorkbenchPage::Pointer(page);
 }
 
 void PartPane::SetContainer(IStackableContainer::Pointer container)
@@ -328,7 +328,7 @@ void PartPane::SetFocus()
 
 void PartPane::SetWorkbenchPage(WorkbenchPage::Pointer workbenchPage)
 {
-  this->page = workbenchPage;
+  this->page = workbenchPage.GetPointer();
 }
 
 void PartPane::DoDock()

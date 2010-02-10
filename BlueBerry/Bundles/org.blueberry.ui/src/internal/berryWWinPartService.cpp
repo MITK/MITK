@@ -84,8 +84,9 @@ private:
   WWinPartService* wwps;
 };
 
-WWinPartService::WWinPartService(SmartPointer<IWorkbenchWindow> window) :
-  partService("", ""), selectionService(window), partListener(new WWinListener(
+WWinPartService::WWinPartService(IWorkbenchWindow* window) :
+  partService("", ""), selectionService(window), activePage(0),
+  partListener(new WWinListener(
       this))
 {
 
@@ -178,7 +179,7 @@ void WWinPartService::PageActivated(SmartPointer<IWorkbenchPage> newPage)
   Reset();
 
   // Update active page.
-  activePage = newPage;
+  activePage = newPage.GetPointer();
 
   if (newPage)
   {
@@ -203,11 +204,11 @@ void WWinPartService::PageOpened(SmartPointer<IWorkbenchPage> page)
 
 void WWinPartService::Reset()
 {
-  IWorkbenchPage::Pointer tempPage = activePage;
+  IWorkbenchPage* tempPage = activePage;
   activePage = 0;
   if (tempPage)
   {
-    WorkbenchPage::Pointer page = tempPage.Cast<WorkbenchPage> ();
+    WorkbenchPage* page = dynamic_cast<WorkbenchPage*>(tempPage);
 
     std::vector<IWorkbenchPartReference::Pointer> refs(page->GetOpenParts());
 

@@ -40,7 +40,7 @@ private:
 
   WindowSelectionService selectionService;
 
-  SmartPointer<IWorkbenchPage> activePage;
+  IWorkbenchPage* activePage;
 
   IPartListener::Pointer partListener; // = new WWinListener();
 
@@ -49,7 +49,7 @@ public:
   /**
    * Creates a new part service for a workbench window.
    */
-  WWinPartService(SmartPointer<IWorkbenchWindow> window);
+  WWinPartService(IWorkbenchWindow* window);
 
   /*
    * (non-Javadoc)

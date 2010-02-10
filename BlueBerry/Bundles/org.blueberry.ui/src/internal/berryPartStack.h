@@ -59,7 +59,7 @@ public: berryObjectMacro(PartStack);
     private: typedef std::list<StackablePart::Pointer> ChildVector;
     private: ChildVector children;
 
-    private: WorkbenchPage::Pointer page;
+    private: WorkbenchPage* page;
 
     private: bool isActive;
 
@@ -226,7 +226,7 @@ public: berryObjectMacro(PartStack);
      * @param appearance
      * @param factory custom factory to use (or null to use the default)
      */
-    public: PartStack(WorkbenchPage::Pointer page,
+    public: PartStack(WorkbenchPage* page,
                       bool allowsStateChanges = true,
                       int appearance = PresentationFactoryUtil::ROLE_VIEW,
                       IPresentationFactory* factory = 0);

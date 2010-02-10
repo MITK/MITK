@@ -60,7 +60,7 @@ namespace berry
 //  }
 
 PartSite::PartSite(IWorkbenchPartReference::Pointer ref,
-    IWorkbenchPart::Pointer _part, IWorkbenchPage::Pointer _page) :
+    IWorkbenchPart::Pointer _part, IWorkbenchPage* _page) :
   partReference(ref), part(_part), page(_page),
   serviceLocatorOwner(new ServiceLocatorOwner(this))
 {
@@ -128,7 +128,7 @@ std::string PartSite::GetId()
 
 IWorkbenchPage::Pointer PartSite::GetPage()
 {
-  return page;
+  return IWorkbenchPage::Pointer(page);
 }
 
 PartPane::Pointer PartSite::GetPane()

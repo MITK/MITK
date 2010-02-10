@@ -41,8 +41,10 @@ class ShellPool: public IShellListener
 
   /**
    * Parent shell (or null if none)
+   *
+   * The parentShell is owned by the WorkbenchWindow, which also owns a ShellPool instance
    */
-  Shell::Pointer parentShell;
+  Shell::WeakPtr parentShell;
 
   std::list<Shell::Pointer> availableShells;
 

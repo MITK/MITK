@@ -51,7 +51,7 @@ class PerspectiveHelper
   friend class ViewSashContainer;
 
 private:
-  WorkbenchPage::Pointer page;
+  WorkbenchPage* page;
 
 protected:
   Perspective::Pointer perspective;
@@ -186,7 +186,7 @@ private:
    * Constructs a new object.
    */
 public:
-  PerspectiveHelper(WorkbenchPage::Pointer workbenchPage,
+  PerspectiveHelper(WorkbenchPage* workbenchPage,
       ViewSashContainer::Pointer mainLayout, Perspective::Pointer perspective);
 
   /**

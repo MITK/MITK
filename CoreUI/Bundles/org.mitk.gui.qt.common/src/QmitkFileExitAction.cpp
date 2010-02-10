@@ -31,11 +31,10 @@ PURPOSE.  See the above copyright notices for more information.
 QmitkFileExitAction::QmitkFileExitAction(berry::IWorkbenchWindow::Pointer window)
 : QAction(0)
 {
-  m_Window = window;
+  m_Window = window.GetPointer();
+
   this->setParent(static_cast<QWidget*>(m_Window->GetShell()->GetControl()));
   this->setText("&Exit");
-
-  m_Window = window;
 
   this->connect(this, SIGNAL(triggered(bool)), this, SLOT(Run()));
 }

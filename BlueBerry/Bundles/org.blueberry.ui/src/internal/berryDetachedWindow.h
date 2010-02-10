@@ -46,7 +46,7 @@ public:
 private:
   PartStack::Pointer folder;
 
-  WorkbenchPage::Pointer page;
+  WorkbenchPage* page;
 
   Rectangle bounds;
 
@@ -101,7 +101,7 @@ public:
   /**
    * Create a new FloatingWindow.
    */
-  DetachedWindow(WorkbenchPage::Pointer workbenchPage);
+  DetachedWindow(WorkbenchPage* workbenchPage);
 
   void PropertyChange(Object::Pointer source, int propId);
 

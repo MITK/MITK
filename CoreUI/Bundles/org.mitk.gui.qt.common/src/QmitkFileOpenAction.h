@@ -47,7 +47,7 @@ protected slots:
 
 private:
   void init ( berry::IWorkbenchWindow::Pointer window );
-  berry::IWorkbenchWindow::Pointer m_Window;
+  berry::IWorkbenchWindow* m_Window;
   berry::IPreferences::WeakPtr m_GeneralPreferencesNode;
 };
 

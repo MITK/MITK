@@ -384,6 +384,8 @@ void Window::SetShellStyle(int newShellStyle)
 bool Window::Close()
 {
 
+  BERRY_INFO << "Window::Close()";
+
 //  // stop listening for font changes
 //  if (fontChangeListener != null)
 //  {
@@ -402,6 +404,9 @@ bool Window::Close()
   {
     return true;
   }
+
+  shell->RemoveShellListener(this->GetShellListener());
+  shell->SetData(Object::Pointer(0));
 
   // If we "close" the shell recursion will occur.
   // Instead, we need to "dispose" the shell to remove it from the

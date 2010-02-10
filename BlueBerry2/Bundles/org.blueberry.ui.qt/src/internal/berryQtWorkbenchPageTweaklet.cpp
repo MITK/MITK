@@ -30,7 +30,7 @@ namespace berry
 void* QtWorkbenchPageTweaklet::CreateClientComposite(void* pageControl)
 {
   QWidget* parent = static_cast<QWidget*>(pageControl);
-  QtControlWidget* client = new QtControlWidget(parent, Shell::Pointer(0));
+  QtControlWidget* client = new QtControlWidget(parent, 0);
   client->setObjectName("Client Composite");
   parent->layout()->setContentsMargins(3, 3, 3, 3);
   parent->layout()->addWidget(client);
@@ -44,7 +44,7 @@ void* QtWorkbenchPageTweaklet::CreateClientComposite(void* pageControl)
 void* QtWorkbenchPageTweaklet::CreatePaneControl(void* parent)
 {
   QWidget* qParent = static_cast<QWidget*>(parent);
-  QtControlWidget* control = new QtControlWidget(qParent, Shell::Pointer(0));
+  QtControlWidget* control = new QtControlWidget(qParent, 0);
   // the object name is used in the global event filter to find
   // the pane control over which a mouse pressed event occured
   // --> do not change the object name

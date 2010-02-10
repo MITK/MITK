@@ -38,7 +38,7 @@ protected slots:
 
 private:
 
-  berry::IWorkbenchWindow::Pointer m_Window;
+  berry::IWorkbenchWindow* m_Window;
 };
 
 

@@ -41,13 +41,13 @@ public:
   berryObjectMacro(ViewSite)
   
   ViewSite(SmartPointer<IViewReference> ref, SmartPointer<IViewPart> view, 
-           SmartPointer<WorkbenchPage> page,
+           WorkbenchPage* page,
             const std::string& id, const std::string& pluginId, const std::string& registeredName);
     
     /**
      * Creates a new ViewSite.
      */
-    ViewSite(SmartPointer<IViewReference> ref, SmartPointer<IViewPart> view, SmartPointer<WorkbenchPage> page,
+    ViewSite(SmartPointer<IViewReference> ref, SmartPointer<IViewPart> view, WorkbenchPage* page,
         SmartPointer<IViewDescriptor> desc);
 
     /**

@@ -698,7 +698,6 @@ const IExtensionPoint* WorkbenchPage::GetPerspectiveExtensionPoint()
 
 WorkbenchPage::WorkbenchPage(WorkbenchWindow* w,
     const std::string& layoutID, IAdaptable* input)
- : activationList(this)
 {
   if (layoutID == "")
   {
@@ -711,7 +710,6 @@ WorkbenchPage::WorkbenchPage(WorkbenchWindow* w,
 }
 
 WorkbenchPage::WorkbenchPage(WorkbenchWindow* w, IAdaptable* input)
- : activationList(this)
 {
   this->Register();
   this->Init(w, "", input, false);
@@ -866,7 +864,7 @@ bool WorkbenchPage::InternalBringToTop(IWorkbenchPartReference::Pointer part)
 
   // Ensure that this part is considered the most recently activated part
   // in this stack
-  activationList.BringToTop(part);
+  activationList->BringToTop(part);
 
   return broughtToTop;
 }
@@ -1243,18 +1241,18 @@ void WorkbenchPage::UpdateActivePart()
     // If an editor is active, try to keep an editor active
     if (oldActivePart == oldActiveEditor)
     {
-      newActiveEditor = activationList.GetActiveReference(true).Cast<IEditorReference>();
+      newActiveEditor = activationList->GetActiveReference(true).Cast<IEditorReference>();
       newActivePart = newActiveEditor;
       if (newActivePart == 0)
       {
         // Only activate a non-editor if there's no editors left
-        newActivePart = activationList.GetActiveReference(false);
+        newActivePart = activationList->GetActiveReference(false);
       }
     }
     else
     {
       // If a non-editor is active, activate whatever was activated most recently
-      newActivePart = activationList.GetActiveReference(false);
+      newActivePart = activationList->GetActiveReference(false);
 
       if (newActivePart.Cast<IEditorReference> () != 0)
       {
@@ -1264,7 +1262,7 @@ void WorkbenchPage::UpdateActivePart()
       else
       {
         // Otherwise, select whatever editor was most recently active
-        newActiveEditor = activationList.GetActiveReference(true).Cast<IEditorReference>();
+        newActiveEditor = activationList->GetActiveReference(true).Cast<IEditorReference>();
       }
     }
   }
@@ -1319,7 +1317,7 @@ void WorkbenchPage::MakeActiveEditor(IEditorReference::Pointer ref)
 
   if (ref)
   {
-    activationList.BringToTop(this->GetReference(part));
+    activationList->BringToTop(this->GetReference(part));
   }
 
   partList->SetActiveEditor(ref);
@@ -1703,14 +1701,14 @@ Perspective::Pointer WorkbenchPage::CreatePerspective(
 
 void WorkbenchPage::PartAdded(WorkbenchPartReference::Pointer ref)
 {
-  activationList.Add(ref);
+  activationList->Add(ref);
   partList->AddPart(ref);
   this->UpdateActivePart();
 }
 
 void WorkbenchPage::PartRemoved(WorkbenchPartReference::Pointer ref)
 {
-  activationList.Remove(ref);
+  activationList->Remove(ref);
   this->DisposePart(ref);
 }
 
@@ -1756,6 +1754,10 @@ void WorkbenchPage::AttachView(IViewReference::Pointer ref)
 
 WorkbenchPage::~WorkbenchPage()
 {
+  // increment reference count to prevent recursive deletes
+  this->Register();
+
+  {
 
   this->MakeActiveEditor(IEditorReference::Pointer(0));
   this->MakeActive(IWorkbenchPartReference::Pointer(0));
@@ -1848,6 +1850,13 @@ WorkbenchPage::~WorkbenchPage()
   //    }
   //  }
 
+  delete viewFactory;
+  delete activationList;
+
+}
+
+  // decrement reference count again, without explicit deletion
+  this->UnRegister(false);
 }
 
 void WorkbenchPage::DisposePerspective(Perspective::Pointer persp, bool notify)
@@ -2087,9 +2096,8 @@ ViewFactory* WorkbenchPage::GetViewFactory()
 {
   if (viewFactory == 0)
   {
-    WorkbenchPage::Pointer thisPage(this);
     viewFactory
-    = new ViewFactory(thisPage, WorkbenchPlugin::GetDefault()->GetViewRegistry());
+    = new ViewFactory(this, WorkbenchPlugin::GetDefault()->GetViewRegistry());
   }
   return viewFactory;
 }
@@ -2250,7 +2258,8 @@ void WorkbenchPage::Init(WorkbenchWindow* w,
   this->composite = 0;
   this->viewFactory = 0;
 
-  this->selectionService = new PageSelectionService(IWorkbenchPage::Pointer(this));
+  this->activationList = new ActivationList(this);
+  this->selectionService = new PageSelectionService(this);
   this->partList = new WorkbenchPagePartList(this->selectionService);
   this->stickyViewMan = new StickyViewManager(this);
 
@@ -2260,7 +2269,7 @@ void WorkbenchPage::Init(WorkbenchWindow* w,
 
   // Create presentation.
   this->CreateClientComposite();
-  editorPresentation = new EditorAreaHelper(WorkbenchPage::Pointer(this));
+  editorPresentation = new EditorAreaHelper(this);
   editorMgr = new EditorManager(WorkbenchWindow::Pointer(window), WorkbenchPage::Pointer(this), editorPresentation);
 
   //TODO WorkbenchPage perspective reorder listener?
@@ -3042,7 +3051,7 @@ bool WorkbenchPage::RestoreState(IMemento::Pointer memento,
 
           if (ref)
           {
-            activationList.SetActive(ref);
+            activationList->SetActive(ref);
           }
         }
         // }});
@@ -3327,7 +3336,7 @@ void WorkbenchPage::SetActivePart(IWorkbenchPart::Pointer newPart)
     // Set active part.
     if (newPart != 0)
     {
-      activationList.SetActive(newPart);
+      activationList->SetActive(newPart);
       if (newPart.Cast<IEditorPart> () != 0)
       {
         this->MakeActiveEditor(realPartRef.Cast<IEditorReference> ());
@@ -3506,7 +3515,7 @@ void WorkbenchPage::UpdateVisibility(Perspective::Pointer oldPersp,
       PartPane::Pointer pane = ref->GetPane();
       if (pres->IsPartVisible(ref))
       {
-        activationList.BringToTop(ref);
+        activationList->BringToTop(ref);
       }
 
       pane->SetInLayout(true);
@@ -3641,7 +3650,7 @@ bool WorkbenchPage::CertifyMode(int mode)
 
 std::vector<IEditorReference::Pointer> WorkbenchPage::GetSortedEditors()
 {
-  return activationList.GetEditors();
+  return activationList->GetEditors();
 }
 
 std::vector<IPerspectiveDescriptor::Pointer> WorkbenchPage::GetOpenPerspectives()
@@ -3694,7 +3703,7 @@ std::vector<IPerspectiveDescriptor::Pointer> WorkbenchPage::GetSortedPerspective
 std::vector<IWorkbenchPartReference::Pointer> WorkbenchPage::GetSortedParts()
 {
   //return partList->GetParts(this->GetViewReferences());
-  return activationList.GetParts();
+  return activationList->GetParts();
 }
 
 IWorkbenchPartReference::Pointer WorkbenchPage::GetReference(
@@ -3757,7 +3766,7 @@ std::vector<IViewReference::Pointer> WorkbenchPage::GetViewReferenceStack(
     }
 
     // sort the list by activation order (most recently activated first)
-    std::sort(list.begin(), list.end(), ActivationOrderPred(&activationList));
+    std::sort(list.begin(), list.end(), ActivationOrderPred(activationList));
 
     return list;
   }

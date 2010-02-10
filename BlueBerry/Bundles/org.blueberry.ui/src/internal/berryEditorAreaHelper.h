@@ -59,7 +59,7 @@ public:
     /**
      * Creates a new EditorAreaHelper.
      */
-    EditorAreaHelper(SmartPointer<WorkbenchPage> page);
+    EditorAreaHelper(WorkbenchPage* page);
 
     /**
    * Displays a list of open editors

@@ -46,7 +46,7 @@ private:
   /**
    * The workbench page for which this is tracking selection.
    */
-  IWorkbenchPage::Pointer fPage;
+  IWorkbenchPage* fPage;
 
   /**
    * The part in this tracker's page, or <code>null</code> if one is not open.
@@ -79,7 +79,7 @@ public:
    *
    * @param id part identifier
    */
-  PagePartSelectionTracker(IWorkbenchPage::Pointer page,
+  PagePartSelectionTracker(IWorkbenchPage* page,
       const std::string& partId);
 
 
@@ -127,7 +127,7 @@ private:
    *
    * @param page workbench page
    */
-  void SetPage(IWorkbenchPage::Pointer page);
+  void SetPage(IWorkbenchPage* page);
 
   /**
    * Sets the part for this selection tracker.

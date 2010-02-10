@@ -33,7 +33,7 @@ public:
 
   berryObjectMacro(ViewSashContainer);
 
-  ViewSashContainer(WorkbenchPage::Pointer page, void* parent);
+  ViewSashContainer(WorkbenchPage* page, void* parent);
 
     /**
      * Gets root container for this part.

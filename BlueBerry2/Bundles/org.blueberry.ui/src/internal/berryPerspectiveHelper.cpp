@@ -192,7 +192,7 @@ bool PerspectiveHelper::CompareMatchingParts::operator()(const MatchingPart& m1,
   return (m2.len - m1.len) < 0;
 }
 
-PerspectiveHelper::PerspectiveHelper(WorkbenchPage::Pointer workbenchPage,
+PerspectiveHelper::PerspectiveHelper(WorkbenchPage* workbenchPage,
     ViewSashContainer::Pointer mainLayout, Perspective::Pointer persp)
 : page(workbenchPage), perspective(persp),
 mainLayout(mainLayout),

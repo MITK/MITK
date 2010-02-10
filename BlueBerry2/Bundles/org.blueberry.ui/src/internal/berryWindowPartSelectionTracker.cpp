@@ -24,12 +24,12 @@ namespace berry
 {
 
 void WindowPartSelectionTracker::SetWindow(
-    SmartPointer<IWorkbenchWindow> window)
+    IWorkbenchWindow* window)
 {
   fWindow = window;
 }
 
-WindowPartSelectionTracker::WindowPartSelectionTracker(SmartPointer<IWorkbenchWindow> window,
+WindowPartSelectionTracker::WindowPartSelectionTracker(IWorkbenchWindow* window,
     const std::string& partId) :
   AbstractPartSelectionTracker(partId), selListener(
       new SelectionChangedAdapter<WindowPartSelectionTracker> (this,
@@ -75,7 +75,7 @@ ISelection::ConstPointer WindowPartSelectionTracker::GetSelection()
 
 SmartPointer<IWorkbenchWindow> WindowPartSelectionTracker::GetWindow()
 {
-  return fWindow;
+  return IWorkbenchWindow::Pointer(fWindow);
 }
 
 }

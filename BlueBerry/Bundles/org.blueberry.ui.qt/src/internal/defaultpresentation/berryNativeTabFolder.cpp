@@ -62,7 +62,7 @@ NativeTabFolder::NativeTabFolder(QWidget* parent)
 : QObject(parent)
 {
   content = 0;
-  viewForm = new QtControlWidget(parent, Shell::Pointer(0));
+  viewForm = new QtControlWidget(parent, 0);
   viewForm->setObjectName("ViewForm");
   viewForm->installEventFilter(this);
   QVBoxLayout* layout = new QVBoxLayout(viewForm);

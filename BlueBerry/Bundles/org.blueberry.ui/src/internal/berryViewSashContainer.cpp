@@ -31,7 +31,7 @@
 namespace berry
 {
 
-ViewSashContainer::ViewSashContainer(WorkbenchPage::Pointer page, void* parent) :
+ViewSashContainer::ViewSashContainer(WorkbenchPage* page, void* parent) :
   PartSashContainer("root layout container", page, parent)
 {
 }

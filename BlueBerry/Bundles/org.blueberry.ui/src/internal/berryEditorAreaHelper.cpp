@@ -42,7 +42,7 @@ void EditorAreaHelper::AddToLayout(PartPane::Pointer pane,
   editorArea->AddEditor(pane, stack);
 }
 
-EditorAreaHelper::EditorAreaHelper(WorkbenchPage::Pointer page)
+EditorAreaHelper::EditorAreaHelper(WorkbenchPage* page)
 {
   this->editorArea
       = new EditorSashContainer(IPageLayout::ID_EDITOR_AREA, page, page->GetClientComposite());

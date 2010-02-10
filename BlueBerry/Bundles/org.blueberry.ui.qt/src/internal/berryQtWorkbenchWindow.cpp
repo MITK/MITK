@@ -35,7 +35,7 @@ QtWorkbenchWindow::QtWorkbenchWindow(int number) :
 void* QtWorkbenchWindow::CreatePageComposite(void* p)
 {
   QWidget* parent = static_cast<QWidget*> (p);
-  QtControlWidget* pageArea = new QtControlWidget(parent, Shell::Pointer(0));
+  QtControlWidget* pageArea = new QtControlWidget(parent, 0);
   pageArea->setObjectName("Page Composite");
   new QHBoxLayout(pageArea);
   if (qobject_cast<QMainWindow*> (parent) != 0)

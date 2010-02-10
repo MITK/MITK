@@ -33,26 +33,26 @@ class PageSelectionService : public AbstractSelectionService
 
 private:
 
-  SmartPointer<IWorkbenchPage> page;
+  IWorkbenchPage* page;
 
   /**
    * Sets the page.
    */
-  void SetPage(SmartPointer<IWorkbenchPage> page);
+  void SetPage(IWorkbenchPage* page);
 
 public:
 
     /**
      * Creates a new selection service for a specific workbench page.
      */
-    PageSelectionService(SmartPointer<IWorkbenchPage> page);
+    PageSelectionService(IWorkbenchPage* page);
 
 protected:
 
     /**
      * Returns the page.
      */
-    SmartPointer<IWorkbenchPage> GetPage() const;
+    IWorkbenchPage* GetPage() const;
 
     /*
      * @see AbstractSelectionService#CreatePartTracker(const std::string&)

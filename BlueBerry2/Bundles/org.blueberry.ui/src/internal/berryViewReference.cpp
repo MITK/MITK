@@ -111,7 +111,7 @@ void ViewReference::DoDisposePart()
 
 IWorkbenchPage::Pointer ViewReference::GetPage() const
 {
-  return this->factory->GetWorkbenchPage().Cast<IWorkbenchPage> ();
+  return IWorkbenchPage::Pointer(this->factory->GetWorkbenchPage());
 }
 
 std::string ViewReference::GetRegisteredName()

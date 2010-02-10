@@ -64,7 +64,7 @@ public:
      * Constructs an EditorSite for an editor.
      */
     EditorSite(IEditorReference::Pointer ref, IEditorPart::Pointer editor,
-            WorkbenchPage::Pointer page, EditorDescriptor::Pointer desc);
+            WorkbenchPage* page, EditorDescriptor::Pointer desc);
   
 //    void SetActionBars(SubActionBars bars) {
 //        super.setActionBars(bars);

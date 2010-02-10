@@ -65,7 +65,7 @@ public:
 
     protected: IWorkbenchPartReference::WeakPtr partReference;
 
-    protected: SmartPointer<WorkbenchPage> page;
+    protected: WorkbenchPage* page;
 
     protected: void* control;
 
@@ -120,7 +120,7 @@ public:
      * Construct a pane for a part.
      */
     public: PartPane(IWorkbenchPartReference::Pointer partReference,
-            SmartPointer<WorkbenchPage> workbenchPage);
+            WorkbenchPage* workbenchPage);
 
 //    public: void addSizeMenuItem(Menu menu, int index) {
 //        //Add size menu

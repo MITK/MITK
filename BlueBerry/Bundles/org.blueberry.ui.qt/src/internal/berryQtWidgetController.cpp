@@ -23,7 +23,7 @@ namespace berry {
 
 const char QtWidgetController::PROPERTY_ID[] = "QtWidgetController_property";
 
-QtWidgetController::QtWidgetController(Shell::Pointer shell)
+QtWidgetController::QtWidgetController(Shell* shell)
  : shell(shell)
 {
 
@@ -31,7 +31,7 @@ QtWidgetController::QtWidgetController(Shell::Pointer shell)
 
 Shell::Pointer QtWidgetController::GetShell()
 {
-  return shell;
+  return Shell::Pointer(shell);
 }
 
 void QtWidgetController::AddControlListener(GuiTk::IControlListener::Pointer listener)

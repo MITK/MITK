@@ -39,7 +39,7 @@ class AbstractSelectionService : public ISelectionService {
 
 private:
 
-    IWorkbenchPage::WeakPtr page;
+    IWorkbenchPage* page;
 
     /**
      * The list of selection listeners (not per-part).

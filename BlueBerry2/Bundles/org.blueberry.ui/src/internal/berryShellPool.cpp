@@ -71,7 +71,7 @@ Shell::Pointer ShellPool::AllocateShell(IShellListener::Pointer closeListener)
   }
   else
   {
-    result = Tweaklets::Get(GuiWidgetsTweaklet::KEY)->CreateShell(parentShell,
+    result = Tweaklets::Get(GuiWidgetsTweaklet::KEY)->CreateShell(parentShell.Lock(),
         flags);
     result->AddShellListener(IShellListener::Pointer(this));
     //result.addDisposeListener(disposeListener);

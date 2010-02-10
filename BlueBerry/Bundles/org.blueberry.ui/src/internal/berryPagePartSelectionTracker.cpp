@@ -129,7 +129,7 @@ void PagePartSelectionTracker::PostSelectionListener::SelectionChanged(
 }
 
 PagePartSelectionTracker::PagePartSelectionTracker(
-    IWorkbenchPage::Pointer page, const std::string& partId) :
+    IWorkbenchPage* page, const std::string& partId) :
   AbstractPartSelectionTracker(partId)
 {
   postSelectionListener = new PostSelectionListener(this);
@@ -178,7 +178,7 @@ PagePartSelectionTracker::~PagePartSelectionTracker()
       perspListener);
   page->RemovePartListener(partListener);
   this->SetPart(IWorkbenchPart::Pointer(0), false);
-  this->SetPage(IWorkbenchPage::Pointer(0));
+  this->SetPage(0);
 }
 
 IWorkbenchPart::Pointer PagePartSelectionTracker::GetPart()
@@ -188,7 +188,7 @@ IWorkbenchPart::Pointer PagePartSelectionTracker::GetPart()
 
 IWorkbenchPage::Pointer PagePartSelectionTracker::GetPage()
 {
-  return fPage;
+  return IWorkbenchPage::Pointer(fPage);
 }
 
 ISelectionProvider::Pointer PagePartSelectionTracker::GetSelectionProvider()
@@ -216,7 +216,7 @@ std::string PagePartSelectionTracker::GetPartId(IWorkbenchPart::Pointer part)
   return id;
 }
 
-void PagePartSelectionTracker::SetPage(IWorkbenchPage::Pointer page)
+void PagePartSelectionTracker::SetPage(IWorkbenchPage* page)
 {
   fPage = page;
 }

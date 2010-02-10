@@ -54,7 +54,7 @@ QmitkFileOpenAction::QmitkFileOpenAction(const QIcon & icon, berry::IWorkbenchWi
 
 void QmitkFileOpenAction::init(berry::IWorkbenchWindow::Pointer window)
 {
-  m_Window = window;
+  m_Window = window.GetPointer();
   this->setParent(static_cast<QWidget*>(m_Window->GetShell()->GetControl()));
   this->setText("&Open...");
   this->setToolTip("Open data files (images, surfaces,...) and project files (.mitk)");

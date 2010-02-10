@@ -32,10 +32,9 @@ namespace berry
 QtShell::QtShell(QWidget* parent, Qt::WindowFlags flags)
  : updatesDisabled(false)
 {
-  Shell::Pointer thisShell(this);
   if (parent == 0 || flags.testFlag(Qt::Window))
   {
-    widget = new QtMainWindowControl(thisShell, parent, flags);
+    widget = new QtMainWindowControl(this, parent, flags);
     widget->setUpdatesEnabled(false);
     updatesDisabled = true;
 
@@ -43,7 +42,7 @@ QtShell::QtShell(QWidget* parent, Qt::WindowFlags flags)
   }
   else
   {
-    widget = new QtControlWidget(parent, thisShell, flags | Qt::Dialog);
+    widget = new QtControlWidget(parent, this, flags | Qt::Dialog);
     widget->setObjectName("shell widget");
   }
 }

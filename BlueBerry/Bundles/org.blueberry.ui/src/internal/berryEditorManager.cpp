@@ -45,10 +45,10 @@ const std::string EditorManager::SAVE_RESOURCES_TITLE = "Save Resources";
 EditorManager::EditorManager(WorkbenchWindow::Pointer wind,
     WorkbenchPage::Pointer workbenchPage,
     EditorAreaHelper* pres)
- : editorPresentation(pres), window(wind), page(workbenchPage) {
+ : editorPresentation(pres), window(wind.GetPointer()), page(workbenchPage.GetPointer()) {
   poco_check_ptr(editorPresentation);
-  poco_assert(window.IsNotNull());
-  poco_assert(page.IsNotNull());
+  poco_assert(window != 0);
+  poco_assert(page != 0);
 
   //page.getExtensionTracker().registerHandler(this, null);
 }
@@ -786,31 +786,34 @@ IEditorPart::Pointer EditorManager::CreatePart(EditorDescriptor::Pointer desc) c
       return result;
     }
 
-    bool EditorManager::SaveAll(bool /*confirm*/, bool /*closing*/,
-        bool  /*addNonPartSources*/)
+    bool EditorManager::SaveAll(bool confirm, bool closing,
+        bool addNonPartSources)
     {
       // Get the list of dirty editors and views. If it is
       // empty just return.
-      //std::vector<IWorkbenchPart::Pointer> parts(page->GetDirtyParts());
-      //if (parts.empty())
-      //{
-      //  return true;
-      //}
-      // saveAll below expects a mutable list
-//      List dirtyParts = new ArrayList(parts.length);
-//      for (int i = 0; i < parts.length; i++)
-//      {
-//        dirtyParts.add(parts[i]);
-//      }
+      std::vector<ISaveablePart::Pointer> parts(page->GetDirtyParts());
+      if (parts.empty())
+      {
+        return true;
+      }
+
+      std::vector<IWorkbenchPart::Pointer> wbParts;
+      for (std::vector<ISaveablePart::Pointer>::const_iterator i = parts.begin();
+        i != parts.end(); ++i)
+      {
+        if (IWorkbenchPart::Pointer part = i->Cast<IWorkbenchPart>())
+        {
+          wbParts.push_back(part);
+        }
+      }
 
       // If confirmation is required ..
-      //return this->SaveAll(parts, confirm, closing, addNonPartSources, window);
-      return false;
+      return this->SaveAll(wbParts, confirm, closing, addNonPartSources, IWorkbenchWindow::Pointer(window));
     }
 
     bool EditorManager::SaveAll(
         const std::vector<IWorkbenchPart::Pointer>& /*dirtyParts*/, bool /*confirm*/,
-        bool  /*closing*/, bool  /*addNonPartSources*/, IWorkbenchWindow::Pointer  /*window*/)
+        bool /*closing*/, bool /*addNonPartSources*/, SmartPointer<IWorkbenchWindow> /*window*/)
     {
 //      // clone the input list
 //          dirtyParts = new ArrayList(dirtyParts);

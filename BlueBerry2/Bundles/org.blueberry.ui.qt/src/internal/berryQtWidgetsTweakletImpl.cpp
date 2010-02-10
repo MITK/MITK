@@ -356,7 +356,7 @@ Shell::Pointer QtWidgetsTweakletImpl::CreateShell(Shell::Pointer parent, int sty
 
 QWidget* QtWidgetsTweakletImpl::CreateComposite(QWidget* parent)
 {
-  QWidget* composite = new QtControlWidget(parent, Shell::Pointer(0));
+  QWidget* composite = new QtControlWidget(parent, 0);
   composite->setObjectName("created composite");
   return composite;
 }

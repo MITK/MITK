@@ -28,7 +28,7 @@
 
 namespace berry {
 
-QtControlWidget::QtControlWidget(QWidget* parent, Shell::Pointer shell, Qt::WindowFlags f)
+QtControlWidget::QtControlWidget(QWidget* parent, Shell* shell, Qt::WindowFlags f)
  : QFrame(parent, f)
 {
   controller = new QtWidgetController(shell);
@@ -55,7 +55,7 @@ void QtControlWidget::changeEvent(QEvent* event)
   {
   case QEvent::WindowActivate:
   {
-    ShellEvent::Pointer shellEvent(new ShellEvent(controller->shell));
+      ShellEvent::Pointer shellEvent(new ShellEvent(Shell::Pointer(controller->shell)));
     ListenerList activatedListeners(controller->shellEvents.shellActivated.GetListeners());
     for (ListenerList::iterator listener = activatedListeners.begin();
          listener != activatedListeners.end(); ++listener)
@@ -70,7 +70,7 @@ void QtControlWidget::changeEvent(QEvent* event)
     break;
   case QEvent::WindowDeactivate:
   {
-    ShellEvent::Pointer shellEvent(new ShellEvent(controller->shell));
+      ShellEvent::Pointer shellEvent(new ShellEvent(Shell::Pointer(controller->shell)));
     ListenerList deactivatedListeners(controller->shellEvents.shellDeactivated.GetListeners());
     for (ListenerList::iterator listener = deactivatedListeners.begin();
          listener != deactivatedListeners.end(); ++listener)
@@ -85,7 +85,7 @@ void QtControlWidget::changeEvent(QEvent* event)
     break;
   case QEvent::WindowStateChange:
   {
-    ShellEvent::Pointer shellEvent(new ShellEvent(controller->shell));
+      ShellEvent::Pointer shellEvent(new ShellEvent(Shell::Pointer(controller->shell)));
     QWindowStateChangeEvent* stateEvent = dynamic_cast<QWindowStateChangeEvent*>(event);
     Qt::WindowStates oldState = stateEvent->oldState();
     if (this->isMinimized() && !(oldState & Qt::WindowMinimized))
@@ -124,7 +124,7 @@ void QtControlWidget::closeEvent(QCloseEvent* event)
 {
   typedef IShellListener::Events::ShellEventType::ListenerList ListenerList;
 
-  ShellEvent::Pointer shellEvent(new ShellEvent(controller->shell));
+  ShellEvent::Pointer shellEvent(new ShellEvent(Shell::Pointer(controller->shell)));
 
   ListenerList closedListeners(controller->shellEvents.shellClosed.GetListeners());
   for (ListenerList::iterator listener = closedListeners.begin();

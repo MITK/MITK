@@ -30,7 +30,7 @@ std::string EditorSite::GetInitialScopeId()
 }
 
 EditorSite::EditorSite(IEditorReference::Pointer ref,
-    IEditorPart::Pointer editor, WorkbenchPage::Pointer page,
+    IEditorPart::Pointer editor, WorkbenchPage* page,
     EditorDescriptor::Pointer d)
 : PartSite(ref, editor, page), desc(d)
 {

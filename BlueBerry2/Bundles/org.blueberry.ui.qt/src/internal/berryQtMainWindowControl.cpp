@@ -26,7 +26,7 @@
 
 namespace berry {
 
-QtMainWindowControl::QtMainWindowControl(Shell::Pointer shell, QWidget* parent, Qt::WindowFlags flags)
+QtMainWindowControl::QtMainWindowControl(Shell* shell, QWidget* parent, Qt::WindowFlags flags)
  : QMainWindow(parent, flags)
 {
   controller = new QtWidgetController(shell);
@@ -40,7 +40,7 @@ QtMainWindowControl::QtMainWindowControl(Shell::Pointer shell, QWidget* parent, 
 void QtMainWindowControl::changeEvent(QEvent* event)
 {
   typedef IShellListener::Events::ShellEventType::ListenerList ListenerList;
-  ShellEvent::Pointer shellEvent(new ShellEvent(controller->shell));
+  ShellEvent::Pointer shellEvent(new ShellEvent(Shell::Pointer(controller->shell)));
   switch (event->type())
   {
   case QEvent::ActivationChange:
@@ -113,7 +113,7 @@ void QtMainWindowControl::closeEvent(QCloseEvent* event)
 {
   typedef IShellListener::Events::ShellEventType::ListenerList ListenerList;
 
-  ShellEvent::Pointer shellEvent(new ShellEvent(controller->shell));
+  ShellEvent::Pointer shellEvent(new ShellEvent(Shell::Pointer(controller->shell)));
 
   ListenerList closedListeners(controller->shellEvents.shellClosed.GetListeners());
   for (ListenerList::iterator listener = closedListeners.begin();

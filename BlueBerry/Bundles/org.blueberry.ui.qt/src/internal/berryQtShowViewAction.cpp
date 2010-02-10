@@ -35,7 +35,7 @@ QtShowViewAction::QtShowViewAction(IWorkbenchWindow::Pointer window,
   this->setIcon(*icon);
   desc->GetImageDescriptor()->DestroyImage(icon);
 
-  m_Window = window;
+  m_Window = window.GetPointer();
   m_Desc = desc;
 
   this->connect(this, SIGNAL(triggered(bool)), this, SLOT(Run()));

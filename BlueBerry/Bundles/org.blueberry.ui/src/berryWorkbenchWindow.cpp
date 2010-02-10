@@ -50,7 +50,7 @@ WorkbenchWindow::WorkbenchWindow(int number) :
       actionBarAdvisor(0), number(number), largeUpdates(0), closing(false),
       shellActivated(false), updateDisabled(true), emptyWindowContentsCreated(
           false), emptyWindowContents(0), asMaximizedState(false), partService(
-          IWorkbenchWindow::Pointer(this)), serviceLocatorOwner(
+          this), serviceLocatorOwner(
           new ServiceLocatorOwner(this))
 {
   this->Register(); // increase the reference count to avoid deleting
@@ -87,14 +87,7 @@ WorkbenchWindow::WorkbenchWindow(int number) :
 
 WorkbenchWindow::~WorkbenchWindow()
 {
-
-  Shell::Pointer shell = detachedWindowShells->availableShells.front();
-
-  BERRY_INFO << "Detached shell pointers: ";
-  DebugUtil::PrintSmartPointerIDs(shell.GetPointer());
-#ifdef BLUEBERRY_DEBUG_SMARTPOINTER
-  BERRY_INFO << " Known pointer: " << shell.GetId() << std::endl;
-#endif
+  BERRY_INFO << "WorkbenchWindow::~WorkbenchWindow()";
 }
 
 Object::Pointer WorkbenchWindow::GetService(const std::string& key)
@@ -378,6 +371,7 @@ Point WorkbenchWindow::GetInitialSize()
 
 bool WorkbenchWindow::Close()
 {
+  BERRY_INFO << "WorkbenchWindow::Close()";
   bool ret = false;
   //BusyIndicator.showWhile(null, new Runnable() {
   //      public void run() {
@@ -404,28 +398,17 @@ bool WorkbenchWindow::BusyClose()
     Workbench* workbench = this->GetWorkbenchImpl();
     std::size_t count = workbench->GetWorkbenchWindowCount();
 
-    std::cout << "workbench is starting: " << workbench->IsStarting()
-        << std::endl;
-    std::cout << "workbench is closing: " << workbench->IsClosing()
-        << std::endl;
-    std::cout << "window count: " << count << std::endl;
-    std::cout << "exit on last window close: "
-        << workbench->GetWorkbenchConfigurer() ->GetExitOnLastWindowClose()
-        << std::endl;
-
     // also check for starting - if the first window dies on startup
     // then we'll need to open a default window.
     if (!workbench->IsStarting() && !workbench->IsClosing() && count <= 1
         && workbench->GetWorkbenchConfigurer() ->GetExitOnLastWindowClose())
     {
-      std::cout << "Calling Workbench::Close()" << std::endl;
       windowClosed = workbench->Close();
     }
     else
     {
       if (this->OkToClose())
       {
-        std::cout << "Calling this->HardClose()" << std::endl;
         windowClosed = this->HardClose();
       }
     }

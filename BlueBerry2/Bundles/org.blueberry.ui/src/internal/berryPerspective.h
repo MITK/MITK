@@ -70,7 +70,7 @@ protected:
 
   PerspectiveDescriptor::Pointer descriptor;
 
-  WorkbenchPage::Pointer page;
+  WorkbenchPage* page;
 
     // Editor Area management
     LayoutPart::Pointer editorArea;

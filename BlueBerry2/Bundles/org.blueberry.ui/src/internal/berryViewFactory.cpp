@@ -70,7 +70,7 @@ bool ViewFactory::HasWildcard(const std::string& viewId)
   return viewId.find_first_of('*') != std::string::npos;
 }
 
-ViewFactory::ViewFactory(WorkbenchPage::Pointer p, IViewRegistry* reg) :
+ViewFactory::ViewFactory(WorkbenchPage* p, IViewRegistry* reg) :
   page(p), viewReg(reg)
 {
   //page.getExtensionTracker().registerHandler(this, null);
@@ -142,7 +142,7 @@ std::vector<IViewReference::Pointer> ViewFactory::GetViews()
   return values;
 }
 
-WorkbenchPage::Pointer ViewFactory::GetWorkbenchPage() const
+WorkbenchPage* ViewFactory::GetWorkbenchPage() const
 {
   return page;
 }

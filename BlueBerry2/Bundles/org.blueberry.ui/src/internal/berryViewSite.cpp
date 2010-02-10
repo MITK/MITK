@@ -28,7 +28,7 @@ namespace berry
 {
 
 ViewSite::ViewSite(IViewReference::Pointer ref, IViewPart::Pointer view,
-    WorkbenchPage::Pointer page, const std::string& id,
+    WorkbenchPage* page, const std::string& id,
     const std::string& pluginId, const std::string& registeredName)
 : PartSite(ref, view, page)
 {
@@ -38,7 +38,7 @@ ViewSite::ViewSite(IViewReference::Pointer ref, IViewPart::Pointer view,
 }
 
 ViewSite::ViewSite(IViewReference::Pointer ref, IViewPart::Pointer view,
-    WorkbenchPage::Pointer page, IViewDescriptor::Pointer desc)
+    WorkbenchPage* page, IViewDescriptor::Pointer desc)
 : PartSite(ref, view, page)
 {
   SetConfigurationElement(desc.Cast<ViewDescriptor>()->GetConfigurationElement());

@@ -360,7 +360,7 @@ private:
   void* composite;
 
   //Could be delete. This information is in the active part list;
-  ActivationList activationList;
+  ActivationList* activationList;
 
   EditorManager* editorMgr;
 

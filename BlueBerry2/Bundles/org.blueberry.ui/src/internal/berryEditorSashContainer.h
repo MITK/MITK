@@ -134,7 +134,7 @@ public:
 
   static const std::string DEFAULT_WORKBOOK_ID;
 
-  EditorSashContainer(const std::string& editorId, WorkbenchPage::Pointer page,
+  EditorSashContainer(const std::string& editorId, WorkbenchPage* page,
       void* parent);
 
   bool AllowsAdd(LayoutPart::Pointer layoutPart);

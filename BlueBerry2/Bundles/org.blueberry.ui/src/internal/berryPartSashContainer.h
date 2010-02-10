@@ -88,7 +88,7 @@ protected:
   void* parent;
   GuiTk::IControlListener::Pointer resizeListener;
   SmartPointer<LayoutTree> root;
-  SmartPointer<WorkbenchPage>  page;
+  WorkbenchPage*  page;
 
   bool active;
   bool layoutDirty;
@@ -162,7 +162,7 @@ public:
    *
    * GUI specializations must hook
    */
-  PartSashContainer(const std::string& id, SmartPointer<WorkbenchPage>  page,
+  PartSashContainer(const std::string& id, WorkbenchPage*  page,
       void* parentWidget);
 
   ~PartSashContainer();

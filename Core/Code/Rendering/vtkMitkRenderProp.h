@@ -23,7 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "vtkProp.h"
 #include "mitkVtkPropRenderer.h"
 
-#include "mitkDataTree.h"
+
 
 
 /*!

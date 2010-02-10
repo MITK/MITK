@@ -22,7 +22,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkGeometry2DData.h"
 #include "mitkPlaneGeometry.h"
 #include "mitkAbstractTransformGeometry.h"
-#include "mitkDataTree.h"
 
 #include <vtkPolyData.h>
 #include <vtkPlaneSource.h>

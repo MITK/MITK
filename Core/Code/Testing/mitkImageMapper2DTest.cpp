@@ -17,7 +17,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include <mitkImage.h>
-#include <mitkDataTree.h>
+
 //#include <mitkRenderWindow.h>
 #include <mitkImageMapper2D.h>
 #include <mitkLevelWindow.h>

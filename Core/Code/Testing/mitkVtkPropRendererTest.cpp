@@ -26,7 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <mitkPicFileReader.h>
 #include <mitkImage.h>
-#include <mitkDataTree.h>
+
 #include <mitkDataStorage.h>
 #include <mitkLevelWindow.h>
 #include <mitkLevelWindowProperty.h>

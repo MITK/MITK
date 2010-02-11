@@ -1,5 +1,5 @@
 Manifest-Version: 1.0
-Bundle-Name: BasicImageProcessing 
+Bundle-Name: Basic Image Processing 
 Bundle-SymbolicName: org.mitk.gui.qt.basicimageprocessing 
 Bundle-Version: 0.1
 Bundle-Vendor: DKFZ, Medical and Biological Informatics

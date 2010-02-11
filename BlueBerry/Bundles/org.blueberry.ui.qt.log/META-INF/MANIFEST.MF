@@ -1,5 +1,5 @@
 Manifest-Version: 1.0
-Bundle-Name: BlueBerry Qt Logging Plug-in
+Bundle-Name: BlueBerry Logging View
 Bundle-SymbolicName: org.blueberry.ui.qt.log
 Bundle-Version: 1.0.0
 Bundle-Vendor: DKFZ, Medical and Biological Informatics

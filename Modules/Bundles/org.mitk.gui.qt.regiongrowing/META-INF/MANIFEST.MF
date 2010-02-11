@@ -1,5 +1,5 @@
 Manifest-Version: 1.0
-Bundle-Name: MITK RegionGrowing Plugin
+Bundle-Name: Region Growing
 Bundle-SymbolicName: org.mitk.gui.qt.regiongrowing
 Bundle-Version: 1.0.0
 Bundle-Vendor: DKFZ, Medical and Biological Informatics

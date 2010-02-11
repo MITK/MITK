@@ -1,5 +1,5 @@
 Manifest-Version: 1.0
-Bundle-Name: PointBasedRegistration 
+Bundle-Name: Point Based Registration 
 Bundle-SymbolicName: org.mitk.gui.qt.pointbasedregistration 
 Bundle-Version: 0.1
 Bundle-Vendor: DKFZ, Medical and Biological Informatics

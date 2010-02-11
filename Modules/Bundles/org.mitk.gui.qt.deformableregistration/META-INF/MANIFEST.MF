@@ -1,5 +1,5 @@
 Manifest-Version: 1.0
-Bundle-Name: DeformableRegistration 
+Bundle-Name: Deformable Registration 
 Bundle-SymbolicName: org.mitk.gui.qt.deformableregistration 
 Bundle-Version: 0.1
 Bundle-Vendor: DKFZ, Medical and Biological Informatics

@@ -28,6 +28,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <vtkColorTransferFunction.h>
 #include <vtkPiecewiseFunction.h>
+#include <vtkSmartPointer.h>
 
 #include <vector>
 #include <algorithm>
@@ -163,13 +164,13 @@ protected:
   virtual ~TransferFunction();
     
   /** Wrapped VTK scalar opacity transfer function */
-  vtkPiecewiseFunction* m_ScalarOpacityFunction;
+  vtkSmartPointer<vtkPiecewiseFunction> m_ScalarOpacityFunction;
 
   /** Wrapped VTK gradient opacity transfer function */
-  vtkPiecewiseFunction* m_GradientOpacityFunction;
+  vtkSmartPointer<vtkPiecewiseFunction> m_GradientOpacityFunction;
 
   /** Wrapped VTK color transfer function */
-  vtkColorTransferFunction* m_ColorTransferFunction;
+  vtkSmartPointer<vtkColorTransferFunction> m_ColorTransferFunction;
   
   /** Current range of transfer function (used for initialization) */
   int m_Min;

@@ -46,9 +46,6 @@ TransferFunction::TransferFunction()
 
 TransferFunction::~TransferFunction() 
 {
-  m_ScalarOpacityFunction->Delete();
-  m_ColorTransferFunction->Delete();
-  m_GradientOpacityFunction->Delete();
 }
 
 bool TransferFunction::operator==(Self& other)

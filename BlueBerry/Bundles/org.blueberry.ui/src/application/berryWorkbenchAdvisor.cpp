@@ -71,33 +71,6 @@ void WorkbenchAdvisor::PostShutdown()
   // do nothing
 }
 
-void WorkbenchAdvisor::OpenIntro(IWorkbenchWindowConfigurer::Pointer  /*configurer*/)
-{
-//  if (introOpened)
-//  {
-//    return;
-//  }
-//
-//  introOpened = true;
-//
-//  boolean showIntro = PrefUtil.getAPIPreferenceStore().getBoolean(IWorkbenchPreferenceConstants.SHOW_INTRO);
-//
-//  if (!showIntro)
-//  {
-//    return;
-//  }
-//
-//  if (getWorkbenchConfigurer().getWorkbench().getIntroManager()
-//  .hasIntro())
-//  {
-//    getWorkbenchConfigurer().getWorkbench().getIntroManager()
-//    .showIntro(configurer.getWindow(), false);
-//
-//    PrefUtil.getAPIPreferenceStore().setValue(IWorkbenchPreferenceConstants.SHOW_INTRO, false);
-//    PrefUtil.saveAPIPrefs();
-//  }
-}
-
 IAdaptable* WorkbenchAdvisor::GetDefaultPageInput()
 {
   // default: no input

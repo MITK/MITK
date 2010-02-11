@@ -98,8 +98,8 @@
          Following is an example of an application declaration.
 &lt;p&gt;
    &lt;pre&gt;
-      &lt;extension id=&quot;sampleApplication&quot; point=&quot;org.blueberry.core.runtime.applications&quot;&gt;
-         &lt;application&gt;
+      &lt;extension id=&quot;sampleApplication&quot; point=&quot;org.blueberry.osgi.applications&quot;&gt;
+         &lt;application id=&quot;my.domain.application&quot;&gt;
          &lt;run class=&quot;com.xyz.applications.sample&quot;/&gt;
          &lt;/application&gt;
       &lt;/extension&gt;

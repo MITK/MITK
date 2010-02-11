@@ -37,9 +37,8 @@ namespace berry {
  * This interface is not intended to be implemented by clients.
  * </p>
  *
- * @see WorkbenchAdvisor#initialize
- * @since 3.0
- * @noimplement This interface is not intended to be implemented by clients.
+ * @see WorkbenchAdvisor#Initialize()
+ * @note This interface is not intended to be implemented by clients.
  */
 struct BERRY_UI IWorkbenchConfigurer : public Object {
 
@@ -50,7 +49,7 @@ struct BERRY_UI IWorkbenchConfigurer : public Object {
      * could not be restored, but that startup should continue
      * with a reset state.
      *
-     * @see #restoreState
+     * @see #RestoreState()
      */
     static const int RESTORE_CODE_RESET = 1;
 
@@ -96,37 +95,36 @@ struct BERRY_UI IWorkbenchConfigurer : public Object {
    * @param memento the memento from which to restore the window's state
    * @return the configurer for the restored window
    * @throws WorkbenchException if an error occurred during the restore
-     * @see IWorkbenchWindowConfigurer#saveState(IMemento)
-   * @since 3.1
+   * @see IWorkbenchWindowConfigurer#SaveState(IMemento::Pointer)
    */
   virtual IWorkbenchWindowConfigurer::Pointer RestoreWorkbenchWindow(IMemento::Pointer memento) = 0;
 
-    /**
-     * Declares a workbench image.
-     * <p>
-     * The workbench remembers the given image descriptor under the given name,
-     * and makes the image available to plug-ins via
-     * {@link IWorkbench#getSharedImages() IWorkbench.getSharedImages()}.
-     * For "shared" images, the workbench remembers the image descriptor and
-     * will manages the image object create from it; clients retrieve "shared"
-     * images via
-     * {@link org.blueberry.ui.ISharedImages#getImage ISharedImages.getImage()}.
-     * For the other, "non-shared" images, the workbench remembers only the
-     * image descriptor; clients retrieve the image descriptor via
-     * {@link org.blueberry.ui.ISharedImages#getImageDescriptor
-     * ISharedImages.getImageDescriptor()} and are entirely
-     * responsible for managing the image objects they create from it.
-     * (This is made confusing by the historical fact that the API interface
-     *  is called "ISharedImages".)
-     * </p>
-     *
-     * @param symbolicName the symbolic name of the image
-     * @param descriptor the image descriptor
-     * @param shared <code>true</code> if this is a shared image, and
-     * <code>false</code> if this is not a shared image
-     * @see org.blueberry.ui.ISharedImages#getImage
-     * @see org.blueberry.ui.ISharedImages#getImageDescriptor
-     */
+//    /**
+//     * Declares a workbench image.
+//     * <p>
+//     * The workbench remembers the given image descriptor under the given name,
+//     * and makes the image available to plug-ins via
+//     * {@link IWorkbench#GetSharedImages() IWorkbench.getSharedImages()}.
+//     * For "shared" images, the workbench remembers the image descriptor and
+//     * will manages the image object create from it; clients retrieve "shared"
+//     * images via
+//     * {@link org.blueberry.ui.ISharedImages#getImage ISharedImages.getImage()}.
+//     * For the other, "non-shared" images, the workbench remembers only the
+//     * image descriptor; clients retrieve the image descriptor via
+//     * {@link org.blueberry.ui.ISharedImages#getImageDescriptor
+//     * ISharedImages.getImageDescriptor()} and are entirely
+//     * responsible for managing the image objects they create from it.
+//     * (This is made confusing by the historical fact that the API interface
+//     *  is called "ISharedImages".)
+//     * </p>
+//     *
+//     * @param symbolicName the symbolic name of the image
+//     * @param descriptor the image descriptor
+//     * @param shared <code>true</code> if this is a shared image, and
+//     * <code>false</code> if this is not a shared image
+//     * @see org.blueberry.ui.ISharedImages#getImage
+//     * @see org.blueberry.ui.ISharedImages#getImageDescriptor
+//     */
 //    virtual void declareImage(String symbolicName, ImageDescriptor descriptor,
 //            boolean shared);
 
@@ -138,11 +136,11 @@ struct BERRY_UI IWorkbenchConfigurer : public Object {
      * abbreviated workbench shutdown sequence is performed (less critical
      * steps may be skipped). The workbench advisor is still called; however,
      * it must not attempt to communicate with the user. While an emergency
-     * close is in progress, <code>emergencyClosing</code> returns
+     * close is in progress, EmergencyClosing() returns
      * <code>true</code>. Workbench advisor methods should always check this
      * flag before communicating with the user.
      *
-     * @see #emergencyClosing
+     * @see #EmergencyClosing()
      */
     virtual void EmergencyClose() = 0;
 
@@ -197,7 +195,7 @@ struct BERRY_UI IWorkbenchConfigurer : public Object {
      * @return a status object indicating whether the restore was successful
      * @see #RESTORE_CODE_RESET
      * @see #RESTORE_CODE_EXIT
-     * @see WorkbenchAdvisor#openWindows
+     * @see WorkbenchAdvisor#OpenWindows()
      */
     virtual bool RestoreState() = 0;
 
@@ -205,11 +203,11 @@ struct BERRY_UI IWorkbenchConfigurer : public Object {
      * Opens the first time window, using the default perspective and
      * default page input.
      * <p>
-     * This is typically called from the advisor's <code>openWindows()</code>
+     * This is typically called from the advisor's OpenWindows()
      * method.
      * </p>
      *
-     * @see WorkbenchAdvisor#openWindows
+     * @see WorkbenchAdvisor#OpenWindows()
      */
     virtual void OpenFirstTimeWindow() = 0;
 
@@ -220,15 +218,15 @@ struct BERRY_UI IWorkbenchConfigurer : public Object {
    * <p>
    * If <code>true</code>, the last window's state is saved before closing,
    * so that it will be restored in the next session. This applies only if
-   * {@link #getSaveAndRestore() returns <code>true</code>}).
+   * #GetSaveAndRestore() returns <code>true</code>).
    * </p>
    * <p>
    * If <code>false</code>, the window is simply closed, losing its state.
    * </p>
    * <p>
    * If the workbench is left running, it can be closed using
-   * {@link IWorkbench#close()}, or a new window can be opened using
-   * {@link IWorkbench#openWorkbenchWindow(String, IAdaptable)}.
+   * IWorkbench#Close(), or a new window can be opened using
+   * IWorkbench#OpenWorkbenchWindow(const std::string&, IAdaptable*).
    * </p>
    * <p>
    * The initial value is <code>true</code>.
@@ -237,7 +235,6 @@ struct BERRY_UI IWorkbenchConfigurer : public Object {
    * @return <code>true</code> if the workbench will exit when the last
    *         window is closed, <code>false</code> if the window should just
    *         be closed
-   * @since 3.1
    */
     virtual bool GetExitOnLastWindowClose() = 0;
 
@@ -246,14 +243,13 @@ struct BERRY_UI IWorkbenchConfigurer : public Object {
    * whether the window should just be closed, leaving the workbench (and its
    * event loop) running.
    * <p>
-   * For more details, see {@link #getExitOnLastWindowClose()}.
+   * For more details, see #GetExitOnLastWindowClose().
    * </p>
    *
    * @param enabled
    *            <code>true</code> if the workbench should exit when the last
    *            window is closed, <code>false</code> if the window should
    *            just be closed
-   * @since 3.1
    */
     virtual void SetExitOnLastWindowClose(bool enabled) = 0;
 };

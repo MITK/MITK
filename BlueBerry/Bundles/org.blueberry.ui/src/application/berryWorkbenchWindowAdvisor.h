@@ -43,26 +43,25 @@ namespace berry
  * The following advisor methods are called at strategic points in the
  * workbench window's lifecycle (as with the workbench advisor, all occur
  * within the dynamic scope of the call to
- * {@link PlatformUI#createAndRunWorkbench PlatformUI.createAndRunWorkbench}):
+ * PlatformUI#CreateAndRunWorkbench):
  * <ul>
- * <li><code>preWindowOpen</code> - called as the window is being opened;
+ * <li>PreWindowOpen() - called as the window is being opened;
  *  use to configure aspects of the window other than actions bars</li>
- * <li><code>postWindowRestore</code> - called after the window has been
+ * <li>PostWindowRestore() - called after the window has been
  * recreated from a previously saved state; use to adjust the restored
  * window</li>
- * <li><code>postWindowCreate</code> -  called after the window has been created,
+ * <li>PostWindowCreate() -  called after the window has been created,
  * either from an initial state or from a restored state;  used to adjust the
  * window</li>
- * <li><code>openIntro</code> - called immediately before the window is opened in
+ * <li>OpenIntro() - called immediately before the window is opened in
  * order to create the introduction component, if any.</li>
- * <li><code>postWindowOpen</code> - called after the window has been
+ * <li>PostWindowOpen() - called after the window has been
  * opened; use to hook window listeners, etc.</li>
- * <li><code>preWindowShellClose</code> - called when the window's shell
+ * <li>PreWindowShellClose() - called when the window's shell
  * is closed by the user; use to pre-screen window closings</li>
  * </ul>
  * </p>
  *
- * @since 3.1
  */
 class BERRY_UI WorkbenchWindowAdvisor {
 
@@ -126,7 +125,7 @@ public:
      * very first time, or when workbench state is not saved or restored.
      * Clients must not call this method directly (although super calls are okay).
      * The default implementation does nothing. Subclasses may override.
-     * It is okay to call <code>IWorkbench.close()</code> from this method.
+     * It is okay to call IWorkbench#Close() from this method.
      * </p>
      *
      * @exception WorkbenchException thrown if there are any errors to report
@@ -139,10 +138,10 @@ public:
      * <p>
      * Clients must not call this method directly (although super calls are okay).
      * The default implementation opens the intro in the first window provided
-     * if the preference IWorkbenchPreferences.SHOW_INTRO is <code>true</code>.  If
+     * if the preference WorkbenchPreferencesConstants#SHOW_INTRO is <code>true</code>.  If
      * an intro is shown then this preference will be set to <code>false</code>.
      * Subsequently, and intro will be shown only if
-     * <code>WorkbenchConfigurer.getSaveAndRestore()</code> returns
+     * WorkbenchConfigurer#GetSaveAndRestore() returns
      * <code>true</code> and the introduction was visible on last shutdown.
      * Subclasses may override.
      * </p>
@@ -155,7 +154,7 @@ public:
      * <p>
      * This method is called after the window has been created from scratch,
      * or when it has been restored from a previously-saved window.  In the latter case,
-     * this method is called after <code>postWindowRestore</code>.
+     * this method is called after PostWindowRestore().
      * Clients must not call this method directly (although super calls are okay).
      * The default implementation does nothing. Subclasses may override.
      * </p>
@@ -179,10 +178,10 @@ public:
    * Performs arbitrary actions as the window's shell is being closed
    * directly, and possibly veto the close.
    * <p>
-   * This method is called from a ShellListener associated with the window,
+   * This method is called from a IShellListener associated with the window,
    * for example when the user clicks the window's close button. It is not
    * called when the window is being closed for other reasons, such as if the
-   * user exits the workbench via the {@link ActionFactory#QUIT} action.
+   * user exits the workbench via the ActionFactory#QUIT action.
    * Clients must not call this method directly (although super calls are
    * okay). If this method returns <code>false</code>, then the user's
    * request to close the shell is ignored. This gives the workbench advisor
@@ -192,8 +191,8 @@ public:
    *
    * @return <code>true</code> to allow the window to close, and
    *         <code>false</code> to prevent the window from closing
-   * @see org.blueberry.ui.IWorkbenchWindow#close
-   * @see WorkbenchAdvisor#preShutdown()
+   * @see IWorkbenchWindow#Close()
+   * @see WorkbenchAdvisor#PreShutdown()
    */
   virtual bool PreWindowShellClose();
 
@@ -212,19 +211,19 @@ public:
      * <p>
      * The default implementation adds a menu bar, a cool bar, a status line,
      * a perspective bar, and a fast view bar.  The visibility of these controls
-     * can be configured using the <code>setShow*</code> methods on
-     * <code>IWorkbenchWindowConfigurer</code>.
+     * can be configured using the <code>SetShow*</code> methods on
+     * IWorkbenchWindowConfigurer.
      * </p>
      * <p>
      * Subclasses may override to define custom window contents and layout,
-     * but must call <code>IWorkbenchWindowConfigurer.createPageComposite</code>.
+     * but must call IWorkbenchWindowConfigurer#CreatePageComposite().
      * </p>
      *
      * @param shell the window's shell
-     * @see IWorkbenchWindowConfigurer#createMenuBar
-     * @see IWorkbenchWindowConfigurer#createCoolBarControl
-     * @see IWorkbenchWindowConfigurer#createStatusLineControl
-     * @see IWorkbenchWindowConfigurer#createPageComposite
+     * @see IWorkbenchWindowConfigurer#CreateMenuBar()
+     * @see IWorkbenchWindowConfigurer#CreateCoolBarControl()
+     * @see IWorkbenchWindowConfigurer#CreateStatusLineControl()
+     * @see IWorkbenchWindowConfigurer#CreatePageComposite()
      */
     virtual void CreateWindowContents(Shell::Pointer shell);
 
@@ -248,7 +247,6 @@ public:
    *
    * @param memento the storage area for object's state
    * @return a status object indicating whether the save was successful
-   * @since 3.1
    */
   virtual bool SaveState(IMemento::Pointer memento) ;
 
@@ -257,7 +255,6 @@ public:
    *
    * @param memento the storage area for object's state
    * @return a status object indicating whether the restore was successful
-   * @since 3.1
    */
   virtual bool RestoreState(IMemento::Pointer memento);
 };

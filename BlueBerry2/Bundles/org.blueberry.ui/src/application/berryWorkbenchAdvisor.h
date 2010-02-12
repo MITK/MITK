@@ -33,29 +33,29 @@ namespace berry {
  * <p>
  * Note that the workbench advisor object is created in advance of creating the
  * workbench. However, by the time the workbench starts calling methods on this
- * class, PlatformUI#GetWorkbench() is guaranteed to have been
+ * class, <code>PlatformUI#GetWorkbench()</code> is guaranteed to have been
  * properly initialized.
  * </p>
  * <p>
  * Example of creating and running a workbench (in an
- * <code>berry::IApplictaion</code>):
+ * <code>berry#IApplication</code>):
  * 
  * <pre>
  * <code>
- *           class MyApplication : public berry::IApplication {
+ *           class MyApplication : public %berry::IApplication {
  *
  *             public:
  *
  *             int Start()
  *             {
  *               WorkbenchAdvisor* workbenchAdvisor = new MyWorkbenchAdvisor();
- *               berry::Display* display = berry::PlatformUI::CreateDisplay();
+ *               %berry::Display* display = %berry::PlatformUI::CreateDisplay();
  *               int returnCode = berry::PlatformUI::CreateAndRunWorkbench(display, workbenchAdvisor);
  *
- *               if (returnCode == PlatformUI::RETURN_RESTART) {
- *                  return berry::IApplication::EXIT_RESTART;
+ *               if (returnCode == %PlatformUI::RETURN_RESTART) {
+ *                  return %berry::IApplication::EXIT_RESTART;
  *               } else {
- *                  return berry::IApplication::EXIT_OK;
+ *                  return %berry::IApplication::EXIT_OK;
  *             }
  *           };
  * </code>
@@ -63,14 +63,14 @@ namespace berry {
  * 
  * </p>
  * <p>
- * An application should declare a subclass of berry::WorkbenchAdvisor
+ * An application should declare a subclass of <code>berry::WorkbenchAdvisor</code>
  * and override methods to configure the workbench to suit the needs of the
  * particular application.
  * </p>
  * <p>
  * The following advisor methods are called at strategic points in the
  * workbench's lifecycle (all occur within the dynamic scope of the call to
- * PlatformUI#CreateAndRunWorkbench()):
+ * <code>PlatformUI#CreateAndRunWorkbench()</code>):
  * <ul>
  * <li>Initialize() - called first; before any windows; use to
  * register things</li>
@@ -101,9 +101,9 @@ class BERRY_UI WorkbenchAdvisor {
    */
   private: IWorkbenchConfigurer::Pointer workbenchConfigurer;
 
-//  /**
-//   * The workbench error handler.
-//   */
+/*/**
+   * The workbench error handler.
+   */
   //private: AbstractStatusHandler workbenchErrorHandler;
 
   private: bool introOpened;
@@ -115,7 +115,7 @@ class BERRY_UI WorkbenchAdvisor {
              virtual ~WorkbenchAdvisor();
 
   /**
-   * Remembers the configurer and calls <code>Initialize</code>.
+   * Remembers the configurer and calls <code>Initialize()</code>.
    * <p>
    * For internal use by the workbench only.
    * </p>
@@ -133,7 +133,7 @@ class BERRY_UI WorkbenchAdvisor {
    * (although super calls are okay). The default implementation does nothing.
    * Subclasses may override. Typical clients will use the configurer passed
    * in to tweak the workbench. If further tweaking is required in the future,
-   * the configurer may be obtained using GetWorkbenchConfigurer().
+   * the configurer may be obtained using <code>GetWorkbenchConfigurer()</code>.
    * </p>
    * 
    * @param configurer
@@ -150,12 +150,12 @@ class BERRY_UI WorkbenchAdvisor {
    */
   protected: IWorkbenchConfigurer::Pointer GetWorkbenchConfigurer();
 
-//  /**
-//   * Returns the workbench error handler for the advisor.
-//   *
-//   * @return the workbench error handler
-//   * @since 3.3
-//   */
+/*  /**
+   * Returns the workbench error handler for the advisor.
+   *
+   * @return the workbench error handler
+   * @since 3.3
+   */
 //  public: AbstractStatusHandler getWorkbenchErrorHandler() {
 //    if (workbenchErrorHandler == null) {
 //      workbenchErrorHandler = new WorkbenchErrorHandler();
@@ -218,29 +218,29 @@ class BERRY_UI WorkbenchAdvisor {
    */
   public: virtual void PostShutdown();
 
-//  /**
-//   * Performs arbitrary actions when the event loop crashes (the code that
-//   * handles a UI event throws an exception that is not caught).
-//   * <p>
-//   * This method is called when the code handling a UI event throws an
-//   * exception. In a perfectly functioning application, this method would
-//   * never be called. In practice, it comes into play when there are bugs in
-//   * the code that trigger unchecked runtime exceptions. It is also activated
-//   * when the system runs short of memory, etc. Fatal errors (ThreadDeath) are
-//   * not passed on to this method, as there is nothing that could be done.
-//   * </p>
-//   * <p>
-//   * Clients must not call this method directly (although super calls are
-//   * okay). The default implementation logs the problem so that it does not go
-//   * unnoticed. Subclasses may override or extend this method. It is generally
-//   * a bad idea to override with an empty method, and you should be especially
-//   * careful when handling Errors.
-//   * </p>
-//   *
-//   * @param exception
-//   *            the uncaught exception that was thrown inside the UI event
-//   *            loop
-//   */
+/*  /**
+   * Performs arbitrary actions when the event loop crashes (the code that
+   * handles a UI event throws an exception that is not caught).
+   * <p>
+   * This method is called when the code handling a UI event throws an
+   * exception. In a perfectly functioning application, this method would
+   * never be called. In practice, it comes into play when there are bugs in
+   * the code that trigger unchecked runtime exceptions. It is also activated
+   * when the system runs short of memory, etc. Fatal errors (ThreadDeath) are
+   * not passed on to this method, as there is nothing that could be done.
+   * </p>
+   * <p>
+   * Clients must not call this method directly (although super calls are
+   * okay). The default implementation logs the problem so that it does not go
+   * unnoticed. Subclasses may override or extend this method. It is generally
+   * a bad idea to override with an empty method, and you should be especially
+   * careful when handling Errors.
+   * </p>
+   *
+   * @param exception
+   *            the uncaught exception that was thrown inside the UI event
+   *            loop
+   */
 //  public: void eventLoopException(Throwable exception) {
 //    // Protection from client doing super(null) call
 //    if (exception == null) {
@@ -266,24 +266,24 @@ class BERRY_UI WorkbenchAdvisor {
 //    }
 //  }
 
-//  /**
-//   * Performs arbitrary work or yields when there are no events to be
-//   * processed.
-//   * <p>
-//   * This method is called when there are currently no more events on the
-//   * queue to be processed at the moment.
-//   * </p>
-//   * <p>
-//   * Clients must not call this method directly (although super calls are
-//   * okay). The default implementation yields until new events enter the
-//   * queue. Subclasses may override or extend this method. It is generally a
-//   * bad idea to override with an empty method. It is okay to call
-//   * <code>IWorkbench.close()</code> from this method.
-//   * </p>
-//   *
-//   * @param display
-//   *            the main display of the workbench UI
-//   */
+/*  /**
+   * Performs arbitrary work or yields when there are no events to be
+   * processed.
+   * <p>
+   * This method is called when there are currently no more events on the
+   * queue to be processed at the moment.
+   * </p>
+   * <p>
+   * Clients must not call this method directly (although super calls are
+   * okay). The default implementation yields until new events enter the
+   * queue. Subclasses may override or extend this method. It is generally a
+   * bad idea to override with an empty method. It is okay to call
+   * <code>IWorkbench.close()</code> from this method.
+   * </p>
+   *
+   * @param display
+   *            the main display of the workbench UI
+   */
 //  public: void eventLoopIdle(Display display) {
 //    // default: yield cpu until new events enter the queue
 //    display.sleep();
@@ -326,7 +326,7 @@ class BERRY_UI WorkbenchAdvisor {
    * first new window. Subclasses must implement.
    * </p>
    * <p>
-   * If the WorkbenchPreferenceConstants#DEFAULT_PERSPECTIVE_ID
+   * If the <code>WorkbenchPreferenceConstants#DEFAULT_PERSPECTIVE_ID</code>
    * preference is specified, it supercedes the perspective specified here.
    * </p>
    * 
@@ -351,10 +351,10 @@ class BERRY_UI WorkbenchAdvisor {
   /**
    * Opens the workbench windows on startup. The default implementation tries
    * to restore the previously saved workbench state using
-   * <code>IWorkbenchConfigurer#RestoreWorkbenchState()</code>. If there
+   * <code>IWorkbenchConfigurer#RestoreState()</code>. If there
    * was no previously saved state, or if the restore failed, then a
    * first-time window is opened using
-   * <code>IWorkbenchConfigurer#OpenFirstTimeWindow()</code>.
+   * IWorkbenchConfigurer#OpenFirstTimeWindow().
    * 
    * @return <code>true</code> to proceed with workbench startup, or
    *         <code>false</code> to exit
@@ -389,19 +389,19 @@ class BERRY_UI WorkbenchAdvisor {
    */
   public: virtual bool RestoreState(IMemento::Pointer memento);
 
-//  /**
-//   * Return the contribution comparator for the particular type of
-//   * contribution. The default implementation of this class returns a
-//   * comparator that sorts the items by label.
-//   *
-//   * The contributionType may be one of the constants in
-//   * {@link IContributionService} or it can be a value defined by the user.
-//   *
-//   * @param contributionType
-//   *            the contribution type
-//   * @return the comparator, must not return <code>null</code>
-//   * @see IContributionService#GetComparatorFor(const std::string&)
-//   */
+/*  /**
+   * Return the contribution comparator for the particular type of
+   * contribution. The default implementation of this class returns a
+   * comparator that sorts the items by label.
+   *
+   * The contributionType may be one of the constants in
+   * {@link IContributionService} or it can be a value defined by the user.
+   *
+   * @param contributionType
+   *            the contribution type
+   * @return the comparator, must not return <code>null</code>
+   * @see IContributionService#GetComparatorFor(const std::string&)
+   */
 //  public: ContributionComparator getComparatorFor(String contributionType) {
 //    return new ContributionComparator();
 //  }

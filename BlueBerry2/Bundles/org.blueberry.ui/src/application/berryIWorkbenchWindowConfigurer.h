@@ -35,7 +35,7 @@ struct IWorkbenchWindow;
 /**
  * Interface providing special access for configuring workbench windows.
  * <p>
- * Window configurer objects are in 1-1 correspondence with the workbench
+ * %Window configurer objects are in 1-1 correspondence with the workbench
  * windows they configure. Clients may use <code>Get/SetData</code> to
  * associate arbitrary state with the window configurer object.
  * </p>
@@ -69,7 +69,7 @@ struct BERRY_UI IWorkbenchWindowConfigurer : public Object {
      */
     virtual SmartPointer<IWorkbenchConfigurer> GetWorkbenchConfigurer() = 0;
 
-    /**
+ /*   /**
      * Returns the action bar configurer for this workbench
      * window.
      *
@@ -199,8 +199,8 @@ struct BERRY_UI IWorkbenchWindowConfigurer : public Object {
     /**
      * Sets the style bits to use for the window's shell when it is created.
      * This method has no effect after the shell is created.
-     * That is, it must be called within the PreWindowOpen()
-     * callback on WorkbenchAdvisor.
+     * That is, it must be called within the <code>WorkbenchAdvisor#PreWindowOpen()</code>
+     * callback.
      * <p>
      * For more details on the applicable shell style bits, see the
      * documentation for Shell.
@@ -220,129 +220,129 @@ struct BERRY_UI IWorkbenchWindowConfigurer : public Object {
     /**
      * Sets the size to use for the window's shell when it is created.
      * This method has no effect after the shell is created.
-     * That is, it must be called within the PreWindowOpen()
-     * callback on WorkbenchAdvisor().
+     * That is, it must be called within the <code>WorkbenchAdvisor#PreWindowOpen()</code>
+     * callback.
      *
      * @param initialSize the initial size to use for the shell
      */
     virtual void SetInitialSize(Point initialSize) = 0;
 
-//    /**
-//     * Returns the data associated with this workbench window at the given key.
-//     *
-//     * @param key the key
-//     * @return the data, or <code>null</code> if there is no data at the given
-//     * key
-//     */
+/*    /**
+     * Returns the data associated with this workbench window at the given key.
+     *
+     * @param key the key
+     * @return the data, or <code>null</code> if there is no data at the given
+     * key
+     */
     //virtual Object getData(String key);
 
-//    /**
-//     * Sets the data associated with this workbench window at the given key.
-//     *
-//     * @param key the key
-//     * @param data the data, or <code>null</code> to delete existing data
-//     */
+/*    /**
+     * Sets the data associated with this workbench window at the given key.
+     *
+     * @param key the key
+     * @param data the data, or <code>null</code> to delete existing data
+     */
     //virtual void setData(String key, Object data);
 
-//    /**
-//     * Adds the given drag and drop <code>Transfer</code> type to the ones
-//     * supported for drag and drop on the editor area of this workbench window.
-//     * <p>
-//     * The workbench advisor would ordinarily call this method from the
-//     * <code>preWindowOpen</code> callback.
-//     * A newly-created workbench window supports no drag and drop transfer
-//     * types. Adding <code>EditorInputTransfer.getInstance()</code>
-//     * enables <code>IEditorInput</code>s to be transferred.
-//     * </p>
-//     * <p>
-//     * Note that drag and drop to the editor area requires adding one or more
-//     * transfer types (using <code>addEditorAreaTransfer</code>) and
-//     * configuring a drop target listener
-//     * (with <code>configureEditorAreaDropListener</code>)
-//     * capable of handling any of those transfer types.
-//     * </p>
-//     *
-//     * @param transfer a drag and drop transfer object
-//     * @see #configureEditorAreaDropListener
-//     * @see org.blueberry.ui.part.EditorInputTransfer
-//     */
+/*    /**
+     * Adds the given drag and drop <code>Transfer</code> type to the ones
+     * supported for drag and drop on the editor area of this workbench window.
+     * <p>
+     * The workbench advisor would ordinarily call this method from the
+     * <code>preWindowOpen</code> callback.
+     * A newly-created workbench window supports no drag and drop transfer
+     * types. Adding <code>EditorInputTransfer.getInstance()</code>
+     * enables <code>IEditorInput</code>s to be transferred.
+     * </p>
+     * <p>
+     * Note that drag and drop to the editor area requires adding one or more
+     * transfer types (using <code>addEditorAreaTransfer</code>) and
+     * configuring a drop target listener
+     * (with <code>configureEditorAreaDropListener</code>)
+     * capable of handling any of those transfer types.
+     * </p>
+     *
+     * @param transfer a drag and drop transfer object
+     * @see #configureEditorAreaDropListener
+     * @see org.blueberry.ui.part.EditorInputTransfer
+     */
     //virtual void addEditorAreaTransfer(Transfer transfer);
 
-//    /**
-//     * Configures the drop target listener for the editor area of this workbench window.
-//     * <p>
-//     * The workbench advisor ordinarily calls this method from the
-//     * <code>preWindowOpen</code> callback.
-//     * A newly-created workbench window has no configured drop target listener for its
-//     * editor area.
-//     * </p>
-//     * <p>
-//     * Note that drag and drop to the editor area requires adding one or more
-//     * transfer types (using <code>addEditorAreaTransfer</code>) and
-//     * configuring a drop target listener
-//     * (with <code>configureEditorAreaDropListener</code>)
-//     * capable of handling any of those transfer types.
-//     * </p>
-//     *
-//     * @param dropTargetListener the drop target listener that will handle
-//     * requests to drop an object on to the editor area of this window
-//     *
-//     * @see #addEditorAreaTransfer
-//     */
+/*    /**
+     * Configures the drop target listener for the editor area of this workbench window.
+     * <p>
+     * The workbench advisor ordinarily calls this method from the
+     * <code>preWindowOpen</code> callback.
+     * A newly-created workbench window has no configured drop target listener for its
+     * editor area.
+     * </p>
+     * <p>
+     * Note that drag and drop to the editor area requires adding one or more
+     * transfer types (using <code>addEditorAreaTransfer</code>) and
+     * configuring a drop target listener
+     * (with <code>configureEditorAreaDropListener</code>)
+     * capable of handling any of those transfer types.
+     * </p>
+     *
+     * @param dropTargetListener the drop target listener that will handle
+     * requests to drop an object on to the editor area of this window
+     *
+     * @see #addEditorAreaTransfer
+     */
     //virtual void configureEditorAreaDropListener(
     //        DropTargetListener dropTargetListener);
 
 
-//    /**
-//     * Creates the menu bar for the window's shell.
-//     * <p>
-//     * This should only be called if the advisor is defining custom window contents
-//     * in <code>createWindowContents</code>, and may only be called once.
-//     * The caller must set it in the shell using <code>Shell.setMenuBar(Menu)</code>
-//     * but must not make add, remove or change items in the result.
-//     * The menu bar is populated by the window's menu manager.
-//     * The application can add to the menu manager in the advisor's
-//     * <code>fillActionBars</code> method instead.
-//     * </p>
-//     *
-//     * @return the menu bar, suitable for setting in the shell
-//     */
+/*    /**
+     * Creates the menu bar for the window's shell.
+     * <p>
+     * This should only be called if the advisor is defining custom window contents
+     * in <code>createWindowContents</code>, and may only be called once.
+     * The caller must set it in the shell using <code>Shell.setMenuBar(Menu)</code>
+     * but must not make add, remove or change items in the result.
+     * The menu bar is populated by the window's menu manager.
+     * The application can add to the menu manager in the advisor's
+     * <code>fillActionBars</code> method instead.
+     * </p>
+     *
+     * @return the menu bar, suitable for setting in the shell
+     */
     //virtual Menu createMenuBar();
 
-//    /**
-//     * Creates the cool bar control.
-//     * <p>
-//     * This should only be called if the advisor is defining custom window contents
-//     * in <code>createWindowContents</code>, and may only be called once.
-//     * The caller must lay out the cool bar appropriately within the parent,
-//     * but must not add, remove or change items in the result (hence the
-//     * return type of <code>Control</code>).
-//     * The cool bar is populated by the window's cool bar manager.
-//     * The application can add to the cool bar manager in the advisor's
-//     * <code>fillActionBars</code> method instead.
-//     * </p>
-//     *
-//     * @param parent the parent composite
-//     * @return the cool bar control, suitable for laying out in the parent
-//     */
+/*    /**
+     * Creates the cool bar control.
+     * <p>
+     * This should only be called if the advisor is defining custom window contents
+     * in <code>createWindowContents</code>, and may only be called once.
+     * The caller must lay out the cool bar appropriately within the parent,
+     * but must not add, remove or change items in the result (hence the
+     * return type of <code>Control</code>).
+     * The cool bar is populated by the window's cool bar manager.
+     * The application can add to the cool bar manager in the advisor's
+     * <code>fillActionBars</code> method instead.
+     * </p>
+     *
+     * @param parent the parent composite
+     * @return the cool bar control, suitable for laying out in the parent
+     */
     //virtual Control createCoolBarControl(Composite parent);
 
-//    /**
-//     * Creates the status line control.
-//     * <p>
-//     * This should only be called if the advisor is defining custom window contents
-//     * in <code>createWindowContents</code>, and may only be called once.
-//     * The caller must lay out the status line appropriately within the parent,
-//     * but must not add, remove or change items in the result (hence the
-//     * return type of <code>Control</code>).
-//     * The status line is populated by the window's status line manager.
-//     * The application can add to the status line manager in the advisor's
-//     * <code>fillActionBars</code> method instead.
-//     * </p>
-//     *
-//     * @param parent the parent composite
-//     * @return the status line control, suitable for laying out in the parent
-//     */
+/*    /**
+     * Creates the status line control.
+     * <p>
+     * This should only be called if the advisor is defining custom window contents
+     * in <code>createWindowContents</code>, and may only be called once.
+     * The caller must lay out the status line appropriately within the parent,
+     * but must not add, remove or change items in the result (hence the
+     * return type of <code>Control</code>).
+     * The status line is populated by the window's status line manager.
+     * The application can add to the status line manager in the advisor's
+     * <code>fillActionBars</code> method instead.
+     * </p>
+     *
+     * @param parent the parent composite
+     * @return the status line control, suitable for laying out in the parent
+     */
     //virtual Control createStatusLineControl(Composite parent);
 
     /**
@@ -350,7 +350,7 @@ struct BERRY_UI IWorkbenchWindowConfigurer : public Object {
      * views and editors, appear.
      * <p>
      * This should only be called if the advisor is defining custom window contents
-     * in CreateWindowContents(), and may only be called once.
+     * in <code>WorkbenchWindowAdvisor#CreateWindowContents()</code>, and may only be called once.
      * The caller must lay out the page composite appropriately within the parent,
      * but must not add, remove or change items in the result.
      * The page composite is populated by the workbench.

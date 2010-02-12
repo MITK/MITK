@@ -200,6 +200,8 @@ void QmitkLevelWindowWidgetContextMenu::getContextMenu(QMenu* contextmenu)
       mitk::DataTreeNode* node = objectIter->Value();
       if (node)
       {
+        if (node->IsVisible(NULL) == false)
+          continue;
         mitk::LevelWindowProperty::Pointer levelWindowProperty = dynamic_cast<mitk::LevelWindowProperty*>(node->GetProperty("levelwindow"));
         if (levelWindowProperty.IsNotNull())
         {

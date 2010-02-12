@@ -7,11 +7,16 @@
 #
 MACRO(MACRO_TEST_PLUGIN)
 
+  SET(_cla_switch "--")
   IF(WIN32)
-    ADD_TEST(${BUNDLE-SYMBOLICNAME} ${BLUEBERRY_TEST_APP} /BlueBerry.application=coretestapplication /BlueBerry.testplugin=${BUNDLE-SYMBOLICNAME})
-  ELSE()
-    ADD_TEST(${BUNDLE-SYMBOLICNAME} ${BLUEBERRY_TEST_APP} --BlueBerry.application=coretestapplication --BlueBerry.testplugin=${BUNDLE-SYMBOLICNAME})
+    IF(MSYS)
+      SET(_cla_switch "//")
+    ELSE()
+      SET(_cla_switch "/")
+    ENDIF()
   ENDIF()
+
+  ADD_TEST(${BUNDLE-SYMBOLICNAME} ${BLUEBERRY_TEST_APP} ${_cla_switch}BlueBerry.application=coretestapplication ${_cla_switch}BlueBerry.testplugin=${BUNDLE-SYMBOLICNAME})
   
 ENDMACRO(MACRO_TEST_PLUGIN)
 
@@ -22,21 +27,23 @@ ENDMACRO(MACRO_TEST_PLUGIN)
 #                          a minimalistic default application will be started
 MACRO(MACRO_TEST_UIPLUGIN)
 
+  SET(_cla_switch "--")
+  IF(WIN32)
+    IF(MSYS)
+      SET(_cla_switch "//")
+    ELSE()
+      SET(_cla_switch "/")
+    ENDIF()
+  ENDIF()
+
   IF(BLUEBERRY_ENABLE_GUI_TESTING)
-      IF(BLUEBERRY_TEST_APP_ID)
-        SET(_app_id_arg "BlueBerry.testapplication=${BLUEBERRY_TEST_APP_ID}")
-        IF(WIN32)
-          SET(_app_id_arg "/${_app_id_arg}")
-        ELSE()
-          SET(_app_id_arg "--${_app_id_arg}")
-        ENDIF()
-      ENDIF()
-    
-      IF(WIN32)
-        ADD_TEST(${BUNDLE-SYMBOLICNAME} ${BLUEBERRY_TEST_APP} /BlueBerry.application=uitestapplication ${_app_id_arg} /BlueBerry.testplugin=${BUNDLE-SYMBOLICNAME})
-      ELSE()
-        ADD_TEST(${BUNDLE-SYMBOLICNAME} ${BLUEBERRY_TEST_APP} --BlueBerry.application=uitestapplication ${_app_id_arg} --BlueBerry.testplugin=${BUNDLE-SYMBOLICNAME})
-      ENDIF()
+    IF(BLUEBERRY_TEST_APP_ID)
+      SET(_app_id_arg "${_cla_switch}BlueBerry.testapplication=${BLUEBERRY_TEST_APP_ID}")
+    ELSE()
+      SET(_app_id_arg )
+    ENDIF()
+        
+    ADD_TEST(${BUNDLE-SYMBOLICNAME} ${BLUEBERRY_TEST_APP} ${_cla_switch}BlueBerry.application=uitestapplication ${_app_id_arg} ${_cla_switch}BlueBerry.testplugin=${BUNDLE-SYMBOLICNAME})
   ENDIF()
   
 ENDMACRO(MACRO_TEST_UIPLUGIN)

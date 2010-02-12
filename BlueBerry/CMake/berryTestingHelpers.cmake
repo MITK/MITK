@@ -39,9 +39,11 @@ MACRO(MACRO_TEST_UIPLUGIN)
   IF(BLUEBERRY_ENABLE_GUI_TESTING)
     IF(BLUEBERRY_TEST_APP_ID)
       SET(_app_id_arg "${_cla_switch}BlueBerry.testapplication=${BLUEBERRY_TEST_APP_ID}")
-        
-      ADD_TEST(${BUNDLE-SYMBOLICNAME} ${BLUEBERRY_TEST_APP} ${_cla_switch}BlueBerry.application=uitestapplication ${_app_id_arg} ${_cla_switch}BlueBerry.testplugin=${BUNDLE-SYMBOLICNAME})
+    ELSE()
+      SET(_app_id_arg )
     ENDIF()
+        
+    ADD_TEST(${BUNDLE-SYMBOLICNAME} ${BLUEBERRY_TEST_APP} ${_cla_switch}BlueBerry.application=uitestapplication ${_app_id_arg} ${_cla_switch}BlueBerry.testplugin=${BUNDLE-SYMBOLICNAME})
   ENDIF()
   
 ENDMACRO(MACRO_TEST_UIPLUGIN)

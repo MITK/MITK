@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>279</width>
+    <width>371</width>
     <height>261</height>
    </rect>
   </property>
@@ -393,13 +393,13 @@
   <customwidget>
    <class>QmitkDemonsRegistrationView</class>
    <extends>QWidget</extends>
-   <header location="global">src/internal/QmitkDemonsRegistrationView.h</header>
+   <header location="global">QmitkDemonsRegistrationView.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>QmitkBSplineRegistrationView</class>
    <extends>QWidget</extends>
-   <header location="global">src/internal/QmitkBSplineRegistrationView.h</header>
+   <header location="global">QmitkBSplineRegistrationView.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

@@ -4,14 +4,12 @@ SET(CPP_FILES
   Algorithms/mitkAngleCorrectByPointFilter.cpp
   Algorithms/mitkAutoCropImageFilter.cpp
   Algorithms/mitkBoundingObjectCutter.cpp
-  Algorithms/mitkBSplineRegistration.cpp
   Algorithms/mitkCalculateSegmentationVolume.cpp
   Algorithms/mitkContourSetToPointSetFilter.cpp
   Algorithms/mitkContourUtils.cpp
   Algorithms/mitkCorrectorAlgorithm.cpp
   Algorithms/mitkCylindricToCartesianFilter.cpp
   #Algorithms/mitkDICOMFileIOFactory.cpp
-  Algorithms/mitkDemonsRegistration.cpp
   Algorithms/mitkDiffImageApplier.cpp
   Algorithms/mitkDopplerToStrainRateFilter.cpp
   Algorithms/mitkExtractDirectedPlaneImageFilter.cpp
@@ -19,8 +17,6 @@ SET(CPP_FILES
   Algorithms/mitkGeometryClipImageFilter.cpp
   Algorithms/mitkGeometryDataSource.cpp
   Algorithms/mitkHeightFieldSurfaceClipImageFilter.cpp
-  Algorithms/mitkHistogramMatching.cpp
-  Algorithms/mitkImageRegistrationMethod.cpp
   Algorithms/mitkImageStatisticsCalculator.cpp
   Algorithms/mitkImageToLookupTableFilter.cpp
   Algorithms/mitkImageToSurfaceFilter.cpp
@@ -31,10 +27,7 @@ SET(CPP_FILES
   Algorithms/mitkManualSegmentationToSurfaceFilter.cpp
   Algorithms/mitkMaskImageFilter.cpp
   Algorithms/mitkMeshSource.cpp
-  Algorithms/mitkMetricParameters.cpp
   Algorithms/mitkNonBlockingAlgorithm.cpp
-  Algorithms/mitkOptimizerFactory.cpp
-  Algorithms/mitkOptimizerParameters.cpp
   Algorithms/mitkOverwriteSliceImageFilter.cpp
   Algorithms/mitkPadImageFilter.cpp
   Algorithms/mitkPlanarFigureSource.cpp
@@ -46,17 +39,10 @@ SET(CPP_FILES
   Algorithms/mitkPointSetToGeometryDataFilter.cpp
   Algorithms/mitkPolygonToRingFilter.cpp
   Algorithms/mitkProbeFilter.cpp
-  Algorithms/mitkPyramidalRegistrationMethod.cpp
-  Algorithms/mitkRegistrationBase.cpp
-  Algorithms/mitkRigidRegistrationObserver.cpp
-  Algorithms/mitkRigidRegistrationPreset.cpp
-  Algorithms/mitkRigidRegistrationTestPreset.cpp
   Algorithms/mitkSegmentationSink.cpp
   Algorithms/mitkShapeBasedInterpolationAlgorithm.cpp
   Algorithms/mitkShowSegmentationAsSurface.cpp
   Algorithms/mitkSurfaceToImageFilter.cpp
-  Algorithms/mitkSymmetricForcesDemonsRegistration.cpp
-  Algorithms/mitkTransformParameters.cpp
   Algorithms/mitkUnstructuredGridHistogram.cpp
   Algorithms/mitkUnstructuredGridSource.cpp
   Algorithms/mitkVolumeVisualizationImagePreprocessor.cpp
@@ -211,5 +197,3 @@ ENDIF(WIN32 AND NOT MINGW)
 #     )
 #ENDIF(MITK_USE_TD_MOUSE)
 
-MITK_MULTIPLEX_PICTYPE( Algorithms/mitkImageRegistrationMethod-TYPE.cpp ) 
-MITK_MULTIPLEX_PICTYPE( Algorithms/mitkPyramidalRegistrationMethod-TYPE.cpp ) 

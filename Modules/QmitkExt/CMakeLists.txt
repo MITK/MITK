@@ -2,7 +2,7 @@
 
 MITK_GENERATE_TOOLS_LIBRARY(QmitkExt "NO")
 MITK_CREATE_MODULE( QmitkExt
-  INCLUDE_DIRS QmitkApplicationBase QmitkPropertyObservers QmitkFunctionalityComponents vtkQtChartHeaders RigidRegistrationMetrics RigidRegistrationOptimizer RigidRegistrationTransforms
+  INCLUDE_DIRS QmitkApplicationBase QmitkPropertyObservers QmitkFunctionalityComponents vtkQtChartHeaders
   DEPENDS MitkExt Qmitk qwt qxt SceneSerialization
   QT_MODULE 
   GENERATED_CPP ${TOOL_GUI_CPPS} ${TOOL_CPPS}

@@ -1,0 +1,5 @@
+MITK_CREATE_MODULE(MitkDeformableRegistration
+  DEPENDS Mitk MitkRigidRegistration
+  PROVIDES MitkDeformableRegistration
+  EXPORT_DEFINE MITK_DEFORMABLEREGISTRATION_EXPORT
+)

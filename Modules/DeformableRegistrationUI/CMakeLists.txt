@@ -1,0 +1,6 @@
+MITK_CREATE_MODULE(MitkDeformableRegistrationUI
+  DEPENDS Qmitk MitkDeformableRegistration
+  QT_MODULE
+  PROVIDES MitkDeformableRegistrationUI
+  EXPORT_DEFINE MITK_DEFORMABLEREGISTRATION_UI_EXPORT
+)

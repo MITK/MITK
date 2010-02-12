@@ -54,8 +54,6 @@ public:
    */
   void TestOpenAndCloseSaveNotNeeded();
 
-  void DoTearDown();
-
 protected:
 
   /**

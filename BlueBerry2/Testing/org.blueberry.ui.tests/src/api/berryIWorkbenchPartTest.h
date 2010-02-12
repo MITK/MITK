@@ -40,6 +40,7 @@ protected:
   IWorkbenchPage::Pointer fPage;
 
   void DoSetUp();
+  void DoTearDown();
 
   /**
      * Opens a part.  Subclasses should override
@@ -59,6 +60,8 @@ public:
     IWorkbenchPartTest(const std::string& testName);
 
     void TestOpenAndClose();
+
+    void TestOpenAndWindowClose();
 
 };
 

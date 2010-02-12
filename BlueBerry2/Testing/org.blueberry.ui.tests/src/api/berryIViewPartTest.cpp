@@ -38,6 +38,7 @@ CppUnit::Test* IViewPartTest::Suite()
 
   CppUnit_addTest(suite, IViewPartTest, TestOpenAndCloseSaveNotNeeded);
   CppUnit_addTest(suite, IViewPartTest, TestOpenAndClose);
+  CppUnit_addTest(suite, IViewPartTest, TestOpenAndWindowClose);
 
   return suite;
 }
@@ -78,11 +79,6 @@ void IViewPartTest::TestOpenAndCloseSaveNotNeeded()
   assert(history->VerifyOrder(callOrder));
   // TODO enable assert when saveable support is complete
   //assert(history->Contains("DoSave"));
-}
-
-void IViewPartTest::DoTearDown()
-{
-
 }
 
 MockWorkbenchPart::Pointer IViewPartTest::OpenPart(IWorkbenchPage::Pointer page)

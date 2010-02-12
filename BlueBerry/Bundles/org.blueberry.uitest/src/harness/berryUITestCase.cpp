@@ -78,12 +78,12 @@ IWorkbenchWindow::Pointer UITestCase::OpenTestWindow(
 
 void UITestCase::CloseAllTestWindows()
 {
-  //        Iterator iter = new ArrayList(testWindows).iterator();
-  //        while (iter.hasNext()) {
-  //            IWorkbenchWindow win = (IWorkbenchWindow) iter.next();
-  //            win.close();
-  //        }
-  //        testWindows.clear();
+  std::list<IWorkbenchWindow::Pointer>::iterator i = testWindows.begin();
+  while (!testWindows.empty())
+  {
+    testWindows.back()->Close();
+    testWindows.pop_back();
+  }
 }
 
 IWorkbenchPage::Pointer UITestCase::OpenTestPage(IWorkbenchWindow::Pointer  /*win*/)
@@ -130,7 +130,7 @@ void UITestCase::setUp()
   Trace("----- " + this->name());
   Trace(this->name() + ": setUp...");
   AddWindowListener();
-  TestCase::setUp();
+  berry::TestCase::setUp();
 }
 
 void UITestCase::DoSetUp()
@@ -142,7 +142,7 @@ void UITestCase::tearDown()
 {
   Trace(this->name() + ": tearDown...\n");
   RemoveWindowListener();
-  TestCase::tearDown();
+  berry::TestCase::tearDown();
 }
 
 void UITestCase::DoTearDown()

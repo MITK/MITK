@@ -99,7 +99,7 @@ struct BERRY_UI IWorkbenchConfigurer : public Object {
    */
   virtual IWorkbenchWindowConfigurer::Pointer RestoreWorkbenchWindow(IMemento::Pointer memento) = 0;
 
-/*    /**
+    /*
      * Declares a workbench image.
      * <p>
      * The workbench remembers the given image descriptor under the given name,

@@ -69,7 +69,7 @@ struct BERRY_UI IWorkbenchWindowConfigurer : public Object {
      */
     virtual SmartPointer<IWorkbenchConfigurer> GetWorkbenchConfigurer() = 0;
 
- /*   /**
+    /*
      * Returns the action bar configurer for this workbench
      * window.
      *
@@ -227,7 +227,7 @@ struct BERRY_UI IWorkbenchWindowConfigurer : public Object {
      */
     virtual void SetInitialSize(Point initialSize) = 0;
 
-/*    /**
+    /*
      * Returns the data associated with this workbench window at the given key.
      *
      * @param key the key
@@ -236,7 +236,7 @@ struct BERRY_UI IWorkbenchWindowConfigurer : public Object {
      */
     //virtual Object getData(String key);
 
-/*    /**
+    /*
      * Sets the data associated with this workbench window at the given key.
      *
      * @param key the key
@@ -244,7 +244,7 @@ struct BERRY_UI IWorkbenchWindowConfigurer : public Object {
      */
     //virtual void setData(String key, Object data);
 
-/*    /**
+    /*
      * Adds the given drag and drop <code>Transfer</code> type to the ones
      * supported for drag and drop on the editor area of this workbench window.
      * <p>
@@ -268,7 +268,7 @@ struct BERRY_UI IWorkbenchWindowConfigurer : public Object {
      */
     //virtual void addEditorAreaTransfer(Transfer transfer);
 
-/*    /**
+    /*
      * Configures the drop target listener for the editor area of this workbench window.
      * <p>
      * The workbench advisor ordinarily calls this method from the
@@ -293,7 +293,7 @@ struct BERRY_UI IWorkbenchWindowConfigurer : public Object {
     //        DropTargetListener dropTargetListener);
 
 
-/*    /**
+    /*
      * Creates the menu bar for the window's shell.
      * <p>
      * This should only be called if the advisor is defining custom window contents
@@ -309,7 +309,7 @@ struct BERRY_UI IWorkbenchWindowConfigurer : public Object {
      */
     //virtual Menu createMenuBar();
 
-/*    /**
+    /*
      * Creates the cool bar control.
      * <p>
      * This should only be called if the advisor is defining custom window contents
@@ -327,7 +327,7 @@ struct BERRY_UI IWorkbenchWindowConfigurer : public Object {
      */
     //virtual Control createCoolBarControl(Composite parent);
 
-/*    /**
+    /*
      * Creates the status line control.
      * <p>
      * This should only be called if the advisor is defining custom window contents

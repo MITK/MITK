@@ -101,7 +101,7 @@ class BERRY_UI WorkbenchAdvisor {
    */
   private: IWorkbenchConfigurer::Pointer workbenchConfigurer;
 
-/*/**
+  /*
    * The workbench error handler.
    */
   //private: AbstractStatusHandler workbenchErrorHandler;
@@ -150,7 +150,7 @@ class BERRY_UI WorkbenchAdvisor {
    */
   protected: IWorkbenchConfigurer::Pointer GetWorkbenchConfigurer();
 
-/*  /**
+  /*
    * Returns the workbench error handler for the advisor.
    *
    * @return the workbench error handler
@@ -218,7 +218,7 @@ class BERRY_UI WorkbenchAdvisor {
    */
   public: virtual void PostShutdown();
 
-/*  /**
+  /*
    * Performs arbitrary actions when the event loop crashes (the code that
    * handles a UI event throws an exception that is not caught).
    * <p>
@@ -266,7 +266,7 @@ class BERRY_UI WorkbenchAdvisor {
 //    }
 //  }
 
-/*  /**
+  /*
    * Performs arbitrary work or yields when there are no events to be
    * processed.
    * <p>
@@ -389,7 +389,7 @@ class BERRY_UI WorkbenchAdvisor {
    */
   public: virtual bool RestoreState(IMemento::Pointer memento);
 
-/*  /**
+  /*
    * Return the contribution comparator for the particular type of
    * contribution. The default implementation of this class returns a
    * comparator that sorts the items by label.

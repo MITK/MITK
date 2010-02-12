@@ -86,7 +86,7 @@ IF(BLUEBERRY_USE_QT AND DESIRED_QT_VERSION EQUAL 4)
   ENDIF()
   
   IF (BLUEBERRY_USE_QT_HELP AND _doxygen_too_old)
-    MESSAGE("Doxygen was not found or is too old. Version 1.5.8 or later is needed if BLUEBERRY_USE_QT_HELP is ON")
+    MESSAGE("Doxygen was not found or is too old. Version 1.6.0 or later is needed if BLUEBERRY_USE_QT_HELP is ON")
     SET(BLUEBERRY_USE_QT_HELP OFF CACHE BOOL "Enable support for integrating bundle documentation into Qt Help" FORCE)
   ENDIF()
   

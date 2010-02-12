@@ -2,20 +2,15 @@ SET(MODULE_TESTS
   mitkAutoCropImageFilterTest.cpp
   mitkContourMapper2DTest.cpp
   mitkContourTest.cpp
-  mitkDemonsRegistrationTest.cpp
   mitkDataTreeNodeExtTest.cpp
   mitkExternalToolsTest.cpp
-  mitkHistogramMatchingTest.cpp
   mitkMeshTest.cpp
   mitkMultiStepperTest.cpp
   mitkOrganTypePropertyTest.cpp
   mitkPipelineSmartPointerCorrectnessTest.cpp
   mitkPlaneFitTest.cpp
   mitkPointLocatorTest.cpp
-  # mitkRigidRegistrationPresetTest.cpp
-  # mitkRigidRegistrationTestPresetTest.cpp
   # mitkSegmentationInterpolationTest.cpp
-  mitkSymmetricForcesDemonsRegistrationTest.cpp
   # mitkTestTemplate.cpp
   mitkToolManagerTest.cpp
 )

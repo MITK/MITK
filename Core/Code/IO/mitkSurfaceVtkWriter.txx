@@ -17,7 +17,6 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include "mitkSurfaceVtkWriter.h"
-class vtkDataObject;
 #include <vtkConfigure.h>
 #include <vtkPolyData.h>
 #include <vtkLinearTransform.h>
@@ -44,7 +43,6 @@ mitk::SurfaceVtkWriter<VTKWRITER>::SurfaceVtkWriter()
 template <class VTKWRITER>
 mitk::SurfaceVtkWriter<VTKWRITER>::~SurfaceVtkWriter()
 {
-  m_VtkWriter->Delete();
 }
 
 template <class VTKWRITER>
@@ -54,20 +52,20 @@ void mitk::SurfaceVtkWriter<VTKWRITER>::SetDefaultExtension()
 }
 
 template<class VTKWRITER>
-void mitk::SurfaceVtkWriter<VTKWRITER>::ExecuteWrite( VtkWriterType* m_VtkWriter, vtkTransformPolyDataFilter* )
+void mitk::SurfaceVtkWriter<VTKWRITER>::ExecuteWrite( VtkWriterType* vtkWriter, vtkTransformPolyDataFilter* )
 {
   struct stat fileStatus;
   time_t timeBefore=0;
-  if (!stat(m_VtkWriter->GetFileName(),&fileStatus))
+  if (!stat(vtkWriter->GetFileName(),&fileStatus))
   {
   timeBefore = fileStatus.st_mtime;
   }
-   if (!m_VtkWriter->Write())
+   if (!vtkWriter->Write())
   {
     itkExceptionMacro(<<"Error during surface writing.");
   }
   // check if file can be written because vtkWriter doesn't check that
-  if (stat(m_VtkWriter->GetFileName(),&fileStatus)||(timeBefore==fileStatus.st_mtime))
+  if (stat(vtkWriter->GetFileName(),&fileStatus)||(timeBefore==fileStatus.st_mtime))
   {
     itkExceptionMacro(<<"Error during surface writing: file could not be written");
   }
@@ -84,7 +82,7 @@ void mitk::SurfaceVtkWriter<VTKWRITER>::GenerateData()
 
   mitk::Surface::Pointer input = const_cast<mitk::Surface*>(this->GetInput());
 
-  vtkTransformPolyDataFilter* transformPolyData = vtkTransformPolyDataFilter::New();
+  vtkSmartPointer<vtkTransformPolyDataFilter> transformPolyData = vtkTransformPolyDataFilter::New();
   vtkPolyData * polyData;
   Geometry3D* geometry;
 
@@ -101,7 +99,7 @@ void mitk::SurfaceVtkWriter<VTKWRITER>::GenerateData()
     {
       if(input->GetTimeSlicedGeometry()->IsValidTime(t))
       {
-        const mitk::TimeBounds& timebounds = geometry->GetTimeBounds();
+        const TimeBounds& timebounds = geometry->GetTimeBounds();
         filename <<  m_FileName.c_str() << "_S" << std::setprecision(0) << timebounds[0] << "_E" << std::setprecision(0) << timebounds[1] << "_T" << t << m_Extension;
       }
       else
@@ -120,11 +118,7 @@ void mitk::SurfaceVtkWriter<VTKWRITER>::GenerateData()
     transformPolyData->UpdateWholeExtent();
     polyData = transformPolyData->GetOutput();
 
-#if VTK_MAJOR_VERSION >= 5 
-    m_VtkWriter->SetInput((vtkDataObject*)polyData);
-#else
     m_VtkWriter->SetInput(polyData);
-#endif
 
     ExecuteWrite( m_VtkWriter, transformPolyData );
   }
@@ -148,7 +142,7 @@ const mitk::Surface* mitk::SurfaceVtkWriter<VTKWRITER>::GetInput()
   }
   else
   {
-    return static_cast< const mitk::Surface * >( this->ProcessObject::GetInput( 0 ) );
+    return static_cast< const Surface * >( this->ProcessObject::GetInput( 0 ) );
   }
 }
 
@@ -157,10 +151,10 @@ bool mitk::SurfaceVtkWriter<VTKWRITER>::CanWriteDataType( DataTreeNode* input )
 {
   if ( input )
   {
-    mitk::BaseData* data = input->GetData();
+    BaseData* data = input->GetData();
     if ( data )
     {
-      mitk::Surface::Pointer surface = dynamic_cast<mitk::Surface*>( data );
+      Surface::Pointer surface = dynamic_cast<Surface*>( data );
       if( surface.IsNotNull() )
       {
         SetDefaultExtension();
@@ -175,7 +169,7 @@ template <class VTKWRITER>
 void mitk::SurfaceVtkWriter<VTKWRITER>::SetInput( DataTreeNode* input )
 {
   if( input && CanWriteDataType( input ) )
-    SetInput( dynamic_cast<mitk::Surface*>( input->GetData() ) );
+    SetInput( dynamic_cast<Surface*>( input->GetData() ) );
 }
 
 template <class VTKWRITER>

@@ -26,6 +26,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkPointSet.h>
 #include <mitkSurface.h>
 
+#include <vtkSmartPointer.h>
+
 class vtkTransformPolyDataFilter;
 
 namespace mitk
@@ -169,7 +171,7 @@ protected:
 
     virtual void GenerateData();
       
-    void ExecuteWrite( VtkWriterType* m_VtkWriter, vtkTransformPolyDataFilter* transformPolyData );
+    void ExecuteWrite( VtkWriterType* vtkWriter, vtkTransformPolyDataFilter* transformPolyData );
 
     std::string m_FileName;
 

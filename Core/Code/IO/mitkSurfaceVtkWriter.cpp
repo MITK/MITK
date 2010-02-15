@@ -46,11 +46,10 @@ void SurfaceVtkWriter<vtkXMLPolyDataWriter>::SetDefaultExtension()
 }
 
 template<>
-void SurfaceVtkWriter<vtkXMLPolyDataWriter>::ExecuteWrite( VtkWriterType* m_VtkWriter, vtkTransformPolyDataFilter* transformPolyData )
+void SurfaceVtkWriter<vtkXMLPolyDataWriter>::ExecuteWrite( VtkWriterType* vtkWriter, vtkTransformPolyDataFilter* transformPolyData )
 {
-  if (!m_VtkWriter->Write())
+  if (!vtkWriter->Write())
   {
-    transformPolyData->Delete();
     itkExceptionMacro(<<"Error during surface writing.");
   }
 }

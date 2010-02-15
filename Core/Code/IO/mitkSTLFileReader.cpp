@@ -16,6 +16,7 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 #include "mitkSTLFileReader.h"
 #include <mitkSurface.h>
+#include <vtkSmartPointer.h>
 #include <vtkSTLReader.h>
 #include <vtkPolyData.h>
 #include <vtkPolyDataNormals.h>
@@ -36,20 +37,18 @@ void mitk::STLFileReader::GenerateData()
   if( m_FileName != "")
   {
     MITK_INFO << "Loading " << m_FileName << " as stl..." << std::endl;
-    vtkSTLReader* stlReader = vtkSTLReader::New();
+    vtkSmartPointer<vtkSTLReader> stlReader = vtkSTLReader::New();
     stlReader->SetFileName( m_FileName.c_str() );
 
-    vtkPolyDataNormals* normalsGenerator = vtkPolyDataNormals::New();
+    vtkSmartPointer<vtkPolyDataNormals> normalsGenerator = vtkPolyDataNormals::New();
     normalsGenerator->SetInput( stlReader->GetOutput() );
     
     normalsGenerator->Update();
     if ( ( stlReader->GetOutput() != NULL ) && ( normalsGenerator->GetOutput() != NULL ) )
     {
-      vtkPolyData* surfaceWithNormals = normalsGenerator->GetOutput();
+      vtkSmartPointer<vtkPolyData> surfaceWithNormals = normalsGenerator->GetOutput();
       output->SetVtkPolyData( surfaceWithNormals );
     }
-  normalsGenerator->Delete();
-  stlReader->Delete();
   }
 }
 

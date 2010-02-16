@@ -52,7 +52,7 @@ void mitk::SurfaceVtkWriter<VTKWRITER>::SetDefaultExtension()
 }
 
 template<class VTKWRITER>
-void mitk::SurfaceVtkWriter<VTKWRITER>::ExecuteWrite( VtkWriterType* vtkWriter, vtkTransformPolyDataFilter* )
+void mitk::SurfaceVtkWriter<VTKWRITER>::ExecuteWrite( VtkWriterType* vtkWriter )
 {
   struct stat fileStatus;
   time_t timeBefore=0;
@@ -120,10 +120,9 @@ void mitk::SurfaceVtkWriter<VTKWRITER>::GenerateData()
 
     m_VtkWriter->SetInput(polyData);
 
-    ExecuteWrite( m_VtkWriter, transformPolyData );
+    ExecuteWrite( m_VtkWriter );
   }
 
-  transformPolyData->Delete();
   m_MimeType = "application/MITK.Surface";
 }
 

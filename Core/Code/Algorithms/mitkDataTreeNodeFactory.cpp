@@ -261,7 +261,7 @@ void mitk::DataTreeNodeFactory::ReadFileSeriesTypeDCM()
 {
   MITK_INFO << "loading image series with prefix " << m_FilePrefix << " and pattern " << m_FilePattern << " as DICOM..." << std::endl;
     
-  char* previousCLocale = setlocale(LC_NUMERIC, NULL);
+  const char* previousCLocale = setlocale(LC_NUMERIC, NULL);
   setlocale(LC_NUMERIC, "C");
   std::locale previousCppLocale( std::cin.getloc() );
   std::locale l( "C" );

@@ -46,7 +46,7 @@ void SurfaceVtkWriter<vtkXMLPolyDataWriter>::SetDefaultExtension()
 }
 
 template<>
-void SurfaceVtkWriter<vtkXMLPolyDataWriter>::ExecuteWrite( VtkWriterType* vtkWriter, vtkTransformPolyDataFilter* transformPolyData )
+void SurfaceVtkWriter<vtkXMLPolyDataWriter>::ExecuteWrite( VtkWriterType* vtkWriter )
 {
   if (!vtkWriter->Write())
   {

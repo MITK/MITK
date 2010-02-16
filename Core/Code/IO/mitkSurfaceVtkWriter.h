@@ -171,7 +171,7 @@ protected:
 
     virtual void GenerateData();
       
-    void ExecuteWrite( VtkWriterType* vtkWriter, vtkTransformPolyDataFilter* transformPolyData );
+    void ExecuteWrite( VtkWriterType* vtkWriter );
 
     std::string m_FileName;
 

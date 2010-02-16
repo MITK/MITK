@@ -230,7 +230,7 @@ template<class TType> mitk::Image::Pointer mitkColourImageProcessor::ScalarToRGB
   
   const TType *inputData=input->GetBufferPointer();
 
-  itk::Image<TType, 3>::SizeType ioSize = input->GetLargestPossibleRegion().GetSize();
+  typename itk::Image<TType, 3>::SizeType ioSize = input->GetLargestPossibleRegion().GetSize();
 
   MITK_INFO << "size input image: " << ioSize[0] << ", " << ioSize[1] << ", " << ioSize[2];
   MITK_INFO << "size voxel: " << ioSize[0] * ioSize[1] * ioSize[2];
@@ -515,7 +515,7 @@ mitk::Image::Pointer mitkColourImageProcessor::ScalarAndBinaryToRGBA(itk::Image<
   const TType *inputData=input->GetBufferPointer();
   const BType *input2Data=input2->GetBufferPointer();
 
-  itk::Image<TType, 3>::SizeType ioSize = input->GetLargestPossibleRegion().GetSize();
+  typename itk::Image<TType, 3>::SizeType ioSize = input->GetLargestPossibleRegion().GetSize();
 
   MITK_INFO << "size input image: " << ioSize[0] << ", " << ioSize[1] << ", " << ioSize[2];
   MITK_INFO << "size voxel: " << ioSize[0] * ioSize[1] * ioSize[2];
@@ -802,7 +802,7 @@ mitk::Image::Pointer mitkColourImageProcessor::ScalarAndBinaryAndColorToRGBA(itk
   const TType *inputData=input->GetBufferPointer();
   const BType *input2Data=input2->GetBufferPointer();
 
-  itk::Image<TType, 3>::SizeType ioSize = input->GetLargestPossibleRegion().GetSize();
+  typename itk::Image<TType, 3>::SizeType ioSize = input->GetLargestPossibleRegion().GetSize();
 
   MITK_INFO << "size input image: " << ioSize[0] << ", " << ioSize[1] << ", " << ioSize[2];
   MITK_INFO << "size voxel: " << ioSize[0] * ioSize[1] * ioSize[2];

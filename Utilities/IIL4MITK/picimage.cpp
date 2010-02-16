@@ -241,17 +241,6 @@ dest [2] = _colors [i*3+2];						\
 source++;								\
 dest += 3;								\
 } else									\
-if ((model () == COLOR_ALPHA) && _colors)				\
-while (dest < eol) {							\
-a = source [0] * scale - bias;						\
-i = (a > 255.0 ? 255 : (a < 0.0 ? 0 : (unsigned char) a));		\
-dest [0] = _colors [i*4];						\
-dest [1] = _colors [i*4+1];						\
-dest [2] = _colors [i*4+2];						\
-dest [3] = _colors [i*4+3];						\
-source++;								\
-dest += 4;								\
-} else									\
 if ((model () == COLOR) && !_colors)					\
 while (dest < eol) {							\
 a = source [0] * scale - bias;						\
@@ -449,6 +438,41 @@ void iil4mitkPicImage::copyImage (unsigned int x, unsigned int y, unsigned int w
           dest[2] = (unsigned char)rgb[2];
           source+=3;
           dest+=3;
+        }
+        else
+        {
+          *dest = *source;
+          ++source;
+          ++dest;
+        }
+      }
+    }
+    else if (model () == RGBA)
+    {
+      unsigned char* source = (unsigned char *) src;
+      unsigned char* dest = dst;
+      while (dest < eol) 
+      {
+        if(_min!=0 || _max!=255)
+        {
+          // level/window mechanism for intensity in HSI space
+          double rgb[3], hsi[3];
+          rgb[0] = source[0];
+          rgb[1] = source[1];
+          rgb[2] = source[2];
+          RGBtoHSI<double>(rgb,hsi);
+          hsi[2] = hsi[2] * 255.0 * scale - bias;
+          hsi[2] = (hsi[2] > 255.0 ? 255 : (hsi[2] < 0.0 ? 0 : hsi[2]));
+          hsi[2] /= 255.0;
+          HSItoRGB<double>(hsi,rgb);
+          dest[0] = (unsigned char)rgb[0];
+          dest[1] = (unsigned char)rgb[1];
+          dest[2] = (unsigned char)rgb[2];
+
+          dest[3] = source[3];
+
+          source+=4;
+          dest+=4;
         }
         else
         {

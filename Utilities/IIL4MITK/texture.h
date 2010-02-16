@@ -53,7 +53,7 @@ public:
 	/*!
 	\brief The color models of the image.
 	*/
-	enum {INTENSITY = 0, INTENSITY_ALPHA, COLOR, COLOR_ALPHA, RGB};
+	enum {INTENSITY = 0, INTENSITY_ALPHA, COLOR, COLOR_ALPHA, RGB, RGBA};
 	
 	/*!
 	\brief Sets the color model of the data. If the color is different from white,

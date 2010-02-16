@@ -28,7 +28,7 @@ public:
     /*!
     \brief The supported color models.
     */
-    enum {INTENSITY = 0, INTENSITY_ALPHA, COLOR, COLOR_ALPHA, RGB};
+    enum {INTENSITY = 0, INTENSITY_ALPHA, COLOR, COLOR_ALPHA, RGB, RGBA};
 
     /*!
     \brief Sets the image.

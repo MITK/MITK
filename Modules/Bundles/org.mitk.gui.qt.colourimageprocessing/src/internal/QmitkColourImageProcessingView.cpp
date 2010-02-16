@@ -35,8 +35,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkPiecewiseFunctionCanvas.h"
 #include "QmitkColorTransferFunctionCanvas.h"
 
-#include <QColor.h>
-#include <QColorDialog.h>
+#include <QColor>
+#include <QColorDialog>
 
 
 const std::string QmitkColourImageProcessingView::VIEW_ID = "org.mitk.views.colourimageprocessing";

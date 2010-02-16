@@ -247,33 +247,7 @@ protected:
   * if m_UpperWindowBound > m_RangeMax, m_UpperWindowBound will be set to m_RangeMax. m_LowerWindowBound will be increased the same as m_UpperWindowBound will be decreased, but maximum value for m_LowerWindowBound is also m_RangeMax.
   *
   */
-  inline void testValues()
-  {
-    if ( m_LowerWindowBound > m_UpperWindowBound )
-      std::swap(m_LowerWindowBound,m_UpperWindowBound);
-    else if (m_LowerWindowBound == m_UpperWindowBound )
-      m_LowerWindowBound = m_UpperWindowBound - 1;
-    ScalarType diff;
-    if ( m_LowerWindowBound < m_RangeMin )
-    {
-      diff = m_RangeMin - m_LowerWindowBound;
-      m_LowerWindowBound = m_RangeMin;
-      if (!((m_UpperWindowBound - diff) > m_RangeMin))
-        m_UpperWindowBound = m_RangeMin + 1;
-      else
-        m_UpperWindowBound -= diff;
-    }
-
-    if ( m_UpperWindowBound > m_RangeMax )
-    {
-      diff = m_UpperWindowBound - m_RangeMax;
-      m_UpperWindowBound = m_RangeMax;
-      if (!((m_LowerWindowBound + diff) < m_RangeMax))
-        m_LowerWindowBound = m_RangeMax - 1;
-      else
-        m_LowerWindowBound += diff;
-    }
-  }
+  inline void EnsureConsistency();
   
 };
 

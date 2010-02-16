@@ -23,18 +23,71 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkIpPic.h>
 #include <algorithm>
 
+void mitk::LevelWindow::EnsureConsistency()
+{
+  if ( m_LowerWindowBound > m_UpperWindowBound )
+  {
+    std::swap(m_LowerWindowBound,m_UpperWindowBound);
+  }
+  else if (m_LowerWindowBound == m_UpperWindowBound )
+  {
+    m_LowerWindowBound = m_UpperWindowBound - 1;
+  }
+
+  ScalarType diff;
+  if ( m_LowerWindowBound < m_RangeMin )
+  {
+    diff = m_RangeMin - m_LowerWindowBound;
+    m_LowerWindowBound = m_RangeMin;
+    if ( !((m_UpperWindowBound - diff) > m_RangeMin) )
+    {
+      m_UpperWindowBound = m_RangeMin + 1;
+    }
+    else
+    {
+      m_UpperWindowBound -= diff;
+    }
+  }
+
+  if ( m_UpperWindowBound > m_RangeMax )
+  {
+    diff = m_UpperWindowBound - m_RangeMax;
+    m_UpperWindowBound = m_RangeMax;
+    if (!((m_LowerWindowBound + diff) < m_RangeMax))
+    {
+      m_LowerWindowBound = m_RangeMax - 1;
+    }
+    else
+    {
+      m_LowerWindowBound += diff;
+    }
+  }
+}
+ 
 mitk::LevelWindow::LevelWindow(mitk::ScalarType level, mitk::ScalarType window)
-: m_LowerWindowBound( level - window / 2.0 ), m_UpperWindowBound( level + window / 2.0 ),
-  m_RangeMin( -2048.0 ), m_RangeMax( 4096.0 ),
-  m_DefaultRangeMin( -2048.0 ), m_DefaultRangeMax( 4096.0 ),
-  m_DefaultLevel( level ), m_DefaultWindow( window ),
-  m_Fixed( false )
+: m_LowerWindowBound( level - window / 2.0 )
+, m_UpperWindowBound( level + window / 2.0 )
+, m_RangeMin( -2048.0 )
+, m_RangeMax( 4096.0 )
+, m_DefaultRangeMin( -2048.0 )
+, m_DefaultRangeMax( 4096.0 )
+, m_DefaultLevel( level )
+, m_DefaultWindow( window )
+, m_Fixed( false )
 {
 }
 
 mitk::LevelWindow::LevelWindow(const mitk::LevelWindow& levWin)
+: m_LowerWindowBound( levWin.GetLowerWindowBound() )
+, m_UpperWindowBound( levWin.GetUpperWindowBound() )
+, m_RangeMin( levWin.GetRangeMin() )
+, m_RangeMax( levWin.GetRangeMax() )
+, m_DefaultRangeMin( levWin.GetDefaultRangeMin() )
+, m_DefaultRangeMax( levWin.GetDefaultRangeMax() )
+, m_DefaultLevel( levWin.GetDefaultLevel() )
+, m_DefaultWindow( levWin.GetDefaultWindow() )
+, m_Fixed( levWin.GetFixed() )
 {
-  *this=levWin;
 }
 
 mitk::LevelWindow::~LevelWindow()
@@ -95,7 +148,7 @@ void mitk::LevelWindow::SetLevelWindow(mitk::ScalarType level, mitk::ScalarType 
   m_LowerWindowBound = level - window / 2.0;
   m_UpperWindowBound = level + window / 2.0;
 
-  testValues();
+  EnsureConsistency();
 }
 
 void mitk::LevelWindow::SetWindowBounds(mitk::ScalarType lowerBound, mitk::ScalarType upperBound)
@@ -103,20 +156,34 @@ void mitk::LevelWindow::SetWindowBounds(mitk::ScalarType lowerBound, mitk::Scala
   if ( IsFixed() )
     return;
   
-  if(lowerBound>upperBound)
+  if ( lowerBound > upperBound )
+  {
     std::swap(lowerBound,upperBound);
+  }
 
   m_LowerWindowBound = lowerBound;
   m_UpperWindowBound = upperBound;
   if (m_LowerWindowBound < m_RangeMin)
+  {
     m_LowerWindowBound = m_RangeMin;
+  }
+  
   if (m_LowerWindowBound >= m_RangeMax)
+  {
     m_LowerWindowBound = m_RangeMax - 1;
+  }
+
   if (m_UpperWindowBound > m_RangeMax)
+  {
     m_UpperWindowBound = m_RangeMax;
+  }
+
   if (m_UpperWindowBound <= m_RangeMin)
+  {
     m_UpperWindowBound = m_RangeMin + 1;
-  testValues();
+  }
+
+  EnsureConsistency();
 }
 
 void mitk::LevelWindow::SetToMaxWindowSize()
@@ -145,7 +212,7 @@ void mitk::LevelWindow::SetRangeMinMax(mitk::ScalarType min, mitk::ScalarType ma
   if (m_UpperWindowBound <= m_RangeMin)
     m_UpperWindowBound = m_RangeMin + 1;
 
-  testValues();
+  EnsureConsistency();
 }
 
 void mitk::LevelWindow::SetDefaultRangeMinMax(mitk::ScalarType min, mitk::ScalarType max)
@@ -248,6 +315,8 @@ void mitk::LevelWindow::SetAuto(const mitk::Image* image, bool tryPicTags, bool 
     sliceSelector->SetChannelNr(image->GetDimension(4)/2);
     sliceSelector->Update();
     image = sliceSelector->GetOutput();
+    if ( image == NULL || !image->IsInitialized() ) return;
+
     minValue    = image->GetScalarValueMin();
     maxValue    = image->GetScalarValueMaxNoRecompute();
     min2ndValue = image->GetScalarValue2ndMinNoRecompute(); 
@@ -269,7 +338,7 @@ void mitk::LevelWindow::SetAuto(const mitk::Image* image, bool tryPicTags, bool 
     maxValue    = image->GetScalarValueMaxNoRecompute(0);
     min2ndValue = image->GetScalarValue2ndMinNoRecompute(0);
     max2ndValue = image->GetScalarValue2ndMaxNoRecompute(0);
-    for (int i = 1; i < image->GetDimension(3); i++)
+    for (unsigned int i = 1; i < image->GetDimension(3); ++i)
     {
       ScalarType minValueTemp = image->GetScalarValueMin(i);
       if (minValue > minValueTemp)

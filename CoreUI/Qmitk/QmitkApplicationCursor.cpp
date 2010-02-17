@@ -51,7 +51,11 @@ const mitk::Point2I QmitkApplicationCursor::GetCursorPosition()
 
 void QmitkApplicationCursor::SetCursorPosition(const mitk::Point2I& p)
 {
+  static bool selfCall = false;
+  if (selfCall) return;  // this is to avoid recursive calls
+  selfCall = true;
   QCursor::setPos( p[0], p[1] );
+  selfCall = false;
 }
 
 

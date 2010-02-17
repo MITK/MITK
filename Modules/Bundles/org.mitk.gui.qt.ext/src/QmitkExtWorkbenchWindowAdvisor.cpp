@@ -286,20 +286,20 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
 
   // ==== Window Menu ==========================
   QMenu* windowMenu = menuBar->addMenu("Window");
-  // QAction* newWindowAction = windowMenu->addAction("&New Window",
-  //    QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onNewWindow()));
+  windowMenu->addAction("&New Window",
+    QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onNewWindow()));
   windowMenu->addSeparator();
   QMenu* perspMenu = windowMenu->addMenu("&Open Perspective");
   QMenu* viewMenu = windowMenu->addMenu("Show &View");
   windowMenu->addSeparator();
-  // QAction* resetPerspectiveAction = windowMenu->addAction("&Reset Perspective",
-  //    QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onResetPerspective()));
-  // QAction* closePerspectiveAction = windowMenu->addAction("&Close Perspective",
-  //    QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onClosePerspective()));
+  windowMenu->addAction("&Reset Perspective",
+    QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onResetPerspective()));
+  windowMenu->addAction("&Close Perspective",
+    QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onClosePerspective()));
   windowMenu->addSeparator();
-  // QAction* preferencesAction = windowMenu->addAction("&Preferences...",
-  //    QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onEditPreferences()),
-  //    QKeySequence("CTRL+P"));
+  windowMenu->addAction("&Preferences...",
+    QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onEditPreferences()),
+    QKeySequence("CTRL+P"));
 
   // fill perspective menu
   berry::IPerspectiveRegistry* perspRegistry =
@@ -359,9 +359,9 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
 
   // ===== Help menu ====================================
   QMenu* helpMenu = menuBar->addMenu("Help");
-  // QAction* welcomeAction = helpMenu->addAction("&Welcome",QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onIntro()));
-  // QAction* helpAction = helpMenu->addAction("&Help Contents",QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onHelp()), QKeySequence(QKeySequence::HelpContents));
-  // QAction* aboutAction = helpMenu->addAction("&About",QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onAbout()));
+  helpMenu->addAction("&Welcome",QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onIntro()));
+  helpMenu->addAction("&Help Contents",QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onHelp()), QKeySequence(QKeySequence::HelpContents));
+  helpMenu->addAction("&About",QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onAbout()));
   // =====================================================
 
 

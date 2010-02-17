@@ -18,6 +18,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "QmitkDrawPaintbrushToolGUI.h"
 
+MITK_TOOL_GUI_MACRO(QmitkExt_EXPORT, QmitkDrawPaintbrushToolGUI, "")
+
 QmitkDrawPaintbrushToolGUI::QmitkDrawPaintbrushToolGUI()
 {
 }

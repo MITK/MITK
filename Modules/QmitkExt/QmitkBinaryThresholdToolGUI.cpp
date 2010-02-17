@@ -24,6 +24,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qpushbutton.h>
 #include <qlayout.h>
 
+MITK_TOOL_GUI_MACRO(QmitkExt_EXPORT, QmitkBinaryThresholdToolGUI, "")
+
 QmitkBinaryThresholdToolGUI::QmitkBinaryThresholdToolGUI()
 :QmitkToolGUI(),
  m_Slider(NULL)

@@ -72,6 +72,10 @@ SET(CPP_FILES
  QmitkToolGUI.cpp
  QmitkNewSegmentationDialog.cpp
  QmitkPaintbrushToolGUI.cpp
+ QmitkDrawPaintbrushToolGUI.cpp
+ QmitkErasePaintbrushToolGUI.cpp
+ QmitkBinaryThresholdToolGUI.cpp
+ QmitkCalculateGrayValueStatisticsToolGUI.cpp
  QmitkCopyToClipBoardDialog.cpp
  # QmitkMaterialEditor.cpp
  # QmitkMaterialShowcase.cpp
@@ -157,6 +161,10 @@ SET(MOC_H_FILES
  #QmitkSelectableGLWidget.h
  QmitkNewSegmentationDialog.h
  QmitkPaintbrushToolGUI.h
+ QmitkDrawPaintbrushToolGUI.h
+ QmitkErasePaintbrushToolGUI.h
+ QmitkBinaryThresholdToolGUI.h
+ QmitkCalculateGrayValueStatisticsToolGUI.h
  QmitkCopyToClipBoardDialog.h
  QmitkPrimitiveMovieNavigatorWidget.h
  QmitkPointListModel.h

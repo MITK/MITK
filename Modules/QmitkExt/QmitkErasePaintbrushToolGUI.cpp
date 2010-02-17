@@ -18,6 +18,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "QmitkErasePaintbrushToolGUI.h"
 
+MITK_TOOL_GUI_MACRO(QmitkExt_EXPORT, QmitkErasePaintbrushToolGUI, "")
+
 QmitkErasePaintbrushToolGUI::QmitkErasePaintbrushToolGUI()
 {
 }

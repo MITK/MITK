@@ -20,6 +20,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "QmitkCopyToClipBoardDialog.h"
 
+MITK_TOOL_GUI_MACRO(QmitkExt_EXPORT, QmitkCalculateGrayValueStatisticsToolGUI, "")
+
 QmitkCalculateGrayValueStatisticsToolGUI::QmitkCalculateGrayValueStatisticsToolGUI()
 :QmitkToolGUI()
 {

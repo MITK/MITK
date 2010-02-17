@@ -20,14 +20,14 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "QmitkRenderingManagerFactory.h"
 
-#include "QmitkBinaryThresholdToolGUIFactory.h"
-#include "QmitkCalculateGrayValueStatisticsToolGUIFactory.h"
-#include "QmitkDrawPaintbrushToolGUIFactory.h"
-#include "QmitkErasePaintbrushToolGUIFactory.h"
-
 #include "QmitkCallbackFromGUIThread.h"
 #include "QmitkNodeDescriptorManager.h"
 
+#include "QmitkDrawPaintbrushToolGUI.h"
+
+#include "mitkNodePredicateDataType.h"
+#include "mitkNodePredicateProperty.h"
+#include "mitkNodePredicateAND.h"
 #include "mitkProperties.h"
 
 #include <QtCore>
@@ -41,11 +41,6 @@ void QmitkExtRegisterClasses()
   {
     MITK_INFO << "QmitkExtRegisterClasses()";
     
-    itk::ObjectFactoryBase::RegisterFactory( QmitkBinaryThresholdToolGUIFactory::New() );
-    itk::ObjectFactoryBase::RegisterFactory( QmitkCalculateGrayValueStatisticsToolGUIFactory::New() );
-    itk::ObjectFactoryBase::RegisterFactory( QmitkDrawPaintbrushToolGUIFactory::New() );
-    itk::ObjectFactoryBase::RegisterFactory( QmitkErasePaintbrushToolGUIFactory::New() );
-
     static QmitkCallbackFromGUIThread globalQmitkCallbackFromGUIThread;  
     
     QmitkNodeDescriptorManager* descriptorManager = QmitkNodeDescriptorManager::GetInstance();

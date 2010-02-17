@@ -7,9 +7,9 @@
       name="General"/>
     <view
       id="org.blueberry.views.logview"
-      name="Log View"
+      name="Logging"
       category="org.blueberry.views.general"
       class="berry::LogView"
-	  icon="resources/LogView.png" />
+	  icon="resources/Logging.png" />
   </extension>
 </plugin>

@@ -17,7 +17,17 @@ SET(MOC_H_FILES
 )
 
 SET(RESOURCE_FILES
-  resources/Measurement_48.png
+  resources/measurement.png
+  resources/angle.png
+  resources/arrow.png
+  resources/circle.png
+  resources/four-point-angle.png
+  resources/line.png
+  resources/measurement.png
+  resources/path.png
+  resources/polygon.png
+  resources/rectangle.png
+  resources/text.png
 )
 
 SET(RES_FILES

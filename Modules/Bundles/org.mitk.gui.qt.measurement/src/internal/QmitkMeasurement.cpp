@@ -112,7 +112,7 @@ void QmitkMeasurement::CreateQtPartControl(QWidget* parent)
 
   //# add actions
   QAction* currentAction = m_DrawActionsToolBar->addAction(QIcon(
-      ":/Qmitk/PlanarLine_48.png"), "Draw Line");
+      ":/measurement/line.png"), "Draw Line");
   m_DrawLine = currentAction;
   m_DrawLine->setCheckable(true);
   m_DrawActionsToolBar->addAction(currentAction);
@@ -120,7 +120,7 @@ void QmitkMeasurement::CreateQtPartControl(QWidget* parent)
       , this, SLOT( ActionDrawLineTriggered(bool) ) );
 
   currentAction = m_DrawActionsToolBar->addAction(QIcon(
-      ":/Qmitk/PlanarPath_48.png"), "Draw Path");
+      ":/measurement/path.png"), "Draw Path");
   m_DrawPath = currentAction;
   m_DrawPath->setCheckable(true);
   m_DrawActionsToolBar->addAction(currentAction);
@@ -128,7 +128,7 @@ void QmitkMeasurement::CreateQtPartControl(QWidget* parent)
       , this, SLOT( ActionDrawPathTriggered(bool) ) );
 
   currentAction = m_DrawActionsToolBar->addAction(QIcon(
-      ":/Qmitk/PlanarAngle_48.png"), "Draw Angle");
+      ":/measurement/angle.png"), "Draw Angle");
   m_DrawAngle = currentAction;
   m_DrawAngle->setCheckable(true);
   m_DrawActionsToolBar->addAction(currentAction);
@@ -136,7 +136,7 @@ void QmitkMeasurement::CreateQtPartControl(QWidget* parent)
       , this, SLOT( ActionDrawAngleTriggered(bool) ) );
 
   currentAction = m_DrawActionsToolBar->addAction(QIcon(
-      ":/Qmitk/PlanarFourPointAngle_48.png"), "Draw Four Point Angle");
+      ":/measurement/four-point-angle.png"), "Draw Four Point Angle");
   m_DrawFourPointAngle = currentAction;
   m_DrawFourPointAngle->setCheckable(true);
   m_DrawActionsToolBar->addAction(currentAction);
@@ -144,7 +144,7 @@ void QmitkMeasurement::CreateQtPartControl(QWidget* parent)
       , this, SLOT( ActionDrawFourPointAngleTriggered(bool) ) );
 
   currentAction = m_DrawActionsToolBar->addAction(QIcon(
-      ":/Qmitk/PlanarCircle_48.png"), "Draw Circle");
+      ":/measurement/circle.png"), "Draw Circle");
   m_DrawEllipse = currentAction;
   m_DrawEllipse->setCheckable(true);
   m_DrawActionsToolBar->addAction(currentAction);
@@ -152,7 +152,7 @@ void QmitkMeasurement::CreateQtPartControl(QWidget* parent)
       , this, SLOT( ActionDrawEllipseTriggered(bool) ) );
 
   currentAction = m_DrawActionsToolBar->addAction(QIcon(
-      ":/Qmitk/PlanarRectangle_48.png"), "Draw Rectangle");
+      ":/measurement/rectangle.png"), "Draw Rectangle");
   m_DrawRectangle = currentAction;
   m_DrawRectangle->setCheckable(true);
   m_DrawActionsToolBar->addAction(currentAction);
@@ -160,7 +160,7 @@ void QmitkMeasurement::CreateQtPartControl(QWidget* parent)
       , this, SLOT( ActionDrawRectangleTriggered(bool) ) );
 
   currentAction = m_DrawActionsToolBar->addAction(QIcon(
-      ":/Qmitk/PlanarPolygon_48.png"), "Draw Polygon");
+      ":/measurement/polygon.png"), "Draw Polygon");
   m_DrawPolygon = currentAction;
   m_DrawPolygon->setCheckable(true);
   m_DrawActionsToolBar->addAction(currentAction);

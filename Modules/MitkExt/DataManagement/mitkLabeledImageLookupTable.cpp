@@ -53,7 +53,6 @@ mitk::LabeledImageLookupTable::LabeledImageLookupTable()
   
   // initialize the default level/window settings,
   // which can be accessed via GetLevelWindow();
-  m_LevelWindow.SetDefaultRangeMinMax(0,255);
   m_LevelWindow.SetRangeMinMax(0,255);
   m_LevelWindow.SetWindowBounds(0,255);
   m_LevelWindow.SetFixed(true);

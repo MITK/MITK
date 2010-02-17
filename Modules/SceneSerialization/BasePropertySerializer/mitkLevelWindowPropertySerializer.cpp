@@ -60,10 +60,6 @@ class SceneSerialization_EXPORT LevelWindowPropertySerializer : public BasePrope
           child->SetDoubleAttribute("min", lw.GetRangeMin());
           child->SetDoubleAttribute("max", lw.GetRangeMax());
 
-                child = new TiXmlElement("DefaultRange");
-        element->LinkEndChild( child );
-          child->SetDoubleAttribute("min", lw.GetDefaultRangeMin());
-          child->SetDoubleAttribute("max", lw.GetDefaultRangeMax());
 
         return element;
       }

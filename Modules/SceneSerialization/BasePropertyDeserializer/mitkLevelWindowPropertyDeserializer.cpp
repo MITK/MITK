@@ -60,16 +60,9 @@ class SceneSerialization_EXPORT LevelWindowPropertyDeserializer : public BasePro
         if ( child->QueryFloatAttribute( "max", &maxRange ) != TIXML_SUCCESS ) return NULL;
 
 
-      float minDefaultRange;
-      float maxDefaultRange;
-                    child = element->FirstChildElement("DefaultRange");
-        if ( child->QueryFloatAttribute( "min", &minDefaultRange ) != TIXML_SUCCESS ) return NULL;
-        if ( child->QueryFloatAttribute( "max", &maxDefaultRange ) != TIXML_SUCCESS ) return NULL;
-
         
       LevelWindow lw;
       lw.SetRangeMinMax( minRange, maxRange );
-      lw.SetDefaultRangeMinMax( minDefaultRange, maxDefaultRange );
       lw.SetDefaultLevelWindow( defaultLevel, defaultWindow );
       lw.SetLevelWindow( level, window );
       lw.SetFixed( isFixed );

@@ -117,12 +117,12 @@ public:
   /*!
   * Get the default range minimum value
   */
-  ScalarType GetDefaultRangeMin() const;
+  ScalarType GetDefaultLowerBound() const;
 
   /*!
   * Get the default range maximum value
   */
-  ScalarType GetDefaultRangeMax() const;
+  ScalarType GetDefaultUpperBound() const;
 
   /*!
   * \brief the default min and max range for image will be reset
@@ -140,9 +140,9 @@ public:
   void SetDefaultLevelWindow(ScalarType level, ScalarType window);
 
   /*!
-  * set the default total range maximum value
+  * set the default Bounderies
   */
-  void SetDefaultRangeMinMax(ScalarType min, ScalarType max);
+  void SetDefaultBoundaries(ScalarType low, ScalarType up);
 
   /**!
   * \brief sets level/window to the min/max greyvalues of the given Image
@@ -213,22 +213,13 @@ protected:
   /*!
   * default minimum gray value of the window
   */
-  ScalarType m_DefaultRangeMin;
+  ScalarType m_DefaultLowerBound;
 
   /*!
   * default maximum gray value of the window
   */
-  ScalarType m_DefaultRangeMax;
+  ScalarType m_DefaultUpperBound;
 
-  /*!
-  * default value of the level for image
-  */
-  ScalarType m_DefaultLevel;
-
-  /*!
-  * default value of the window for image
-  */
-  ScalarType m_DefaultWindow;
 
   /*!
    * Defines whether the level window settings may be changed after

@@ -1,2 +1,2 @@
 
-MACRO_CREATE_MITK_PLUGIN(MitkSB MitkSB QmitkExt MitkDiffusionImagingMBI)
+MACRO_CREATE_MITK_PLUGIN(QmitkExt)

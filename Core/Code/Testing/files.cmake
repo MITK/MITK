@@ -50,6 +50,7 @@ SET(MODULE_TESTS
   mitkStepperTest.cpp
   itkTotalVariationDenoisingImageFilterTest.cpp
   mitkDICOMLocaleTest.cpp
+  mitkRenderingManagerTest.cpp
 )
 
 # test with image filename as an extra command line parameter

@@ -49,7 +49,7 @@
 #define myGL_COMPRESSED_RGBA_S3TC_DXT5_EXT                  0x83F3
 
 
-char *vtkMitkVolumeTextureMapper3D_FourDependentShadeFP =
+const char *vtkMitkVolumeTextureMapper3D_FourDependentShadeFP =
 "!!ARBfp1.0\n"
 	
 //# We need some temporary variables		
@@ -142,7 +142,7 @@ char *vtkMitkVolumeTextureMapper3D_FourDependentShadeFP =
 	 
 "END\n";
 
-char *vtkMitkVolumeTextureMapper3D_OneComponentShadeFP =
+const char *vtkMitkVolumeTextureMapper3D_OneComponentShadeFP =
 "!!ARBfp1.0\n"
 	
 //# This is the fragment program for one
@@ -714,14 +714,14 @@ void vtkMitkOpenGLVolumeTextureMapper3D::RenderPolygons( vtkRenderer *ren,
 // gradient magnitude.
 
 
-
+/*
 static int _clamp(int value, int top)
 {
   if(value<0) value=0;
   if(value>top) value=top;
   return value;
 }
-
+*/
 
 template <class T> 
 class ScalarGradientCompute
@@ -1038,7 +1038,7 @@ void vtkVolumeTextureMapper3DComputeScalars( T *dataPtr,
                                                vtkMitkVolumeTextureMapper3D *me,
                                                float offset, float scale,
                                                GLuint volume1,
-                                               GLuint volume2)
+                                               GLuint /*volume2*/)
 {
   T              *inPtr;
   // unsigned char  *outPtr, *outPtr2;

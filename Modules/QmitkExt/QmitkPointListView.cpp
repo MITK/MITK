@@ -121,7 +121,7 @@ void QmitkPointListView::OnListViewSelectionChanged(const QItemSelection& select
     return;
 
   mitk::PointSet* pointSet = const_cast<mitk::PointSet*>( m_PointListModel->GetPointSet() );
-  int timeStep = m_PointListModel->GetTimeStep();
+  //int timeStep = m_PointListModel->GetTimeStep();
 
   if (pointSet == NULL) 
     return;

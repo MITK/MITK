@@ -28,10 +28,12 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 mitk::GlobalInteraction::GlobalInteraction()
-: StateMachine(NULL), 
-m_CurrentlyInInformListenersLoop(false), m_FocusManager(NULL),
-m_StateMachineFactory(NULL), m_EventMapper(NULL),
-m_IsInitialized(false)
+: StateMachine(NULL)
+, m_StateMachineFactory(NULL)
+, m_EventMapper(NULL)
+, m_CurrentlyInInformListenersLoop(false)
+, m_CurrentlyInInformInteractorsLoop(false)
+, m_IsInitialized(false)
 {
 }
 

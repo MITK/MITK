@@ -88,7 +88,7 @@ DefaultStackPresentationSite::DefaultStackPresentationSite()
    /* (non-Javadoc)
     * @see org.blueberry.ui.internal.skins.IPresentationSite#dragStart(org.blueberry.ui.internal.skins.IPresentablePart, boolean)
     */
-   void DefaultStackPresentationSite::DragStart(IPresentablePart::Pointer beingDragged, Point& initialPosition,
+   void DefaultStackPresentationSite::DragStart(IPresentablePart::Pointer /*beingDragged*/, Point& /*initialPosition*/,
            bool  /*keyboard*/) {
    }
 

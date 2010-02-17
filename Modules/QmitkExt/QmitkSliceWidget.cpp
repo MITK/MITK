@@ -138,7 +138,7 @@ void QmitkSliceWidget::SetData(mitk::DataTreeNode::Pointer node)
 //}
 
 
-void QmitkSliceWidget::SetData(mitk::DataTreeNode::Pointer treeNode,
+void QmitkSliceWidget::SetData(mitk::DataTreeNode::Pointer /*treeNode*/,
 		mitk::SliceNavigationController::ViewDirection view)
 {
 	try

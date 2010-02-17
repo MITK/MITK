@@ -271,8 +271,8 @@ void HeightFieldSurfaceClipImageFilter::_InternalComputeClippedImage(
           int y0 = (int) ((double)(m_HeightFieldResolutionY) * (planeP0[1] - bounds[2]) / yWidth);
 
           bool clip;
-          if ( (x0 < 0) || (x0 >= m_HeightFieldResolutionX)
-            || (y0 < 0) || (y0 >= m_HeightFieldResolutionY) )
+          if ( (x0 < 0) || (x0 >= (int)m_HeightFieldResolutionX)
+            || (y0 < 0) || (y0 >= (int)m_HeightFieldResolutionY) )
           {
             clip = true;
           }
@@ -281,8 +281,8 @@ void HeightFieldSurfaceClipImageFilter::_InternalComputeClippedImage(
             // Calculate bilinearly interpolated height field value at plane point
             int x1 = x0 + 1;
             int y1 = y0 + 1;
-            if ( x1 >= m_HeightFieldResolutionX ) { x1 = x0; }
-            if ( y1 >= m_HeightFieldResolutionY ) { y1 = y0; }
+            if ( x1 >= (int)m_HeightFieldResolutionX ) { x1 = x0; }
+            if ( y1 >= (int)m_HeightFieldResolutionY ) { y1 = y0; }
 
             ScalarType q00, q01, q10, q11;
             q00 = heightField[y0 * m_HeightFieldResolutionX + x0];
@@ -348,7 +348,7 @@ void HeightFieldSurfaceClipImageFilter::GenerateData()
     return;
 
 
-  const Geometry2D *clippingGeometryOfCurrentTimeStep = NULL;
+  //const Geometry2D *clippingGeometryOfCurrentTimeStep = NULL;
 
   m_InputTimeSelector->SetInput( inputImage );
   m_OutputTimeSelector->SetInput( outputImage );

@@ -297,6 +297,8 @@ mitk::PolygonToRingFilter
   // Evaluate the spline for the desired number of points
   // (number of input points) * (spline resolution)
   Point3D point, firstPoint, lastPoint;
+  firstPoint.Fill(0);
+  lastPoint.Fill(0);
   int numberOfSegments = numberOfPoints * m_SplineResolution;
   vtkFloatingPointType step = (tEnd - tStart) / numberOfSegments;
   for ( i = 0, t = tStart; i < numberOfSegments; ++i, t += step )

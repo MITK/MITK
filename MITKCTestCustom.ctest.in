@@ -7,5 +7,6 @@ SET(CTEST_CUSTOM_WARNING_EXCEPTION
   "Utilities/tinyxml/"
   "QtCore"
   "QtGui"
+  "vtkCellArray\.h"
 )
 

@@ -93,7 +93,6 @@ int mitkImageWriterTest(int  argc , char* argv[])
   try
   {
     myImageWriter->Update();
-    bool flag = false;
     std::fstream fin;
     fin.open("test.pic",std::ios::in);
     MITK_TEST_CONDITION_REQUIRED(fin.is_open(),"Write file");

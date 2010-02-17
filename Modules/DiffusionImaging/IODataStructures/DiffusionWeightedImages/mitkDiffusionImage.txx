@@ -49,7 +49,7 @@ void mitk::DiffusionImage<TPixelType>
   {
     firstZeroIndex++;
     GradientDirectionType g = it.Value();
-    if(g[0] == 0 && g[3] == 0 && g[2] == 0 )
+    if(g[0] == 0 && g[1] == 0 && g[2] == 0 )
       break;
   }
 

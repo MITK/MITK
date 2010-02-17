@@ -282,6 +282,9 @@ void mitk::ShaderRepository::AddDefaultProperties(mitk::DataTreeNode* node, mitk
           node->AddProperty( (propertyName+".w").c_str(), mitk::FloatProperty::New( (*j)->defaultFloat[3] ), renderer, overwrite );
           break;
 
+       default:
+          break;
+
       }
   
       j++;
@@ -385,6 +388,9 @@ void mitk::ShaderRepository::ApplyProperties(mitk::DataTreeNode* node, vtkActor 
             node->GetFloatProperty( (propertyName+".w").c_str(), fval[3], renderer );
             property->AddShaderVariable( (*j)->name.c_str(), 4 , fval );
             break;
+         
+         default:
+          break;
 
         }
       

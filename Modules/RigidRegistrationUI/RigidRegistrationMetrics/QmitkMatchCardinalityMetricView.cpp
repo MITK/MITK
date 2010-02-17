@@ -40,7 +40,7 @@ itk::Object::Pointer QmitkMatchCardinalityMetricView::GetMetric()
 }
 
 template < class TPixelType, unsigned int VImageDimension >
-itk::Object::Pointer QmitkMatchCardinalityMetricView::GetMetric2(itk::Image<TPixelType, VImageDimension>* itkImage1)
+itk::Object::Pointer QmitkMatchCardinalityMetricView::GetMetric2(itk::Image<TPixelType, VImageDimension>* /*itkImage1*/)
 {
   typedef typename itk::Image< TPixelType, VImageDimension >  FixedImageType;
   typedef typename itk::Image< TPixelType, VImageDimension >  MovingImageType;

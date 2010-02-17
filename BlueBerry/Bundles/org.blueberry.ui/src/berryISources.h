@@ -75,30 +75,30 @@ struct BERRY_UI ISources {
    * The priority given to default handlers and handlers that are active
    * across the entire workbench.
    */
-  static const int WORKBENCH(); // = 0;
+  static int WORKBENCH(); // = 0;
 
   /**
    * The priority given when the activation is defined by a handler submission
    * with a legacy priority.
    */
-  static const int LEGACY_LEGACY(); // = 1;
+  static int LEGACY_LEGACY(); // = 1;
 
   /**
    * The priority given when the activation is defined by a handler submission
    * with a low priority.
    */
-  static const int LEGACY_LOW(); // = 1 << 1;
+  static int LEGACY_LOW(); // = 1 << 1;
 
   /**
    * The priority given when the activation is defined by a handler submission
    * with a medium priority.
    */
-  static const int LEGACY_MEDIUM(); // = 1 << 2;
+  static int LEGACY_MEDIUM(); // = 1 << 2;
 
   /**
    * The priority given when the source includes a particular context.
    */
-  static const int ACTIVE_CONTEXT(); // = 1 << 6;
+  static int ACTIVE_CONTEXT(); // = 1 << 6;
 
   /**
    * The variable name for the active contexts. This is for use with the
@@ -111,7 +111,7 @@ struct BERRY_UI ISources {
    * The priority given when the source includes a particular action set.
    * @since 3.2
    */
-  static const int ACTIVE_ACTION_SETS(); // = 1 << 8;
+  static int ACTIVE_ACTION_SETS(); // = 1 << 8;
 
   /**
    * The variable name for the active action sets. This is for use with the
@@ -123,7 +123,7 @@ struct BERRY_UI ISources {
   /**
    * The priority given when the source includes the currently active shell.
    */
-  static const int ACTIVE_SHELL(); // = 1 << 10();
+  static int ACTIVE_SHELL(); // = 1 << 10();
 
   /**
    * The variable name for the active shell. This is for use with the
@@ -136,7 +136,7 @@ struct BERRY_UI ISources {
    * workbench window shell.
    * @since 3.2
    */
-  static const int ACTIVE_WORKBENCH_WINDOW_SHELL(); // = 1 << 12();
+  static int ACTIVE_WORKBENCH_WINDOW_SHELL(); // = 1 << 12();
 
   /**
    * The variable name for the active workbench window shell. This is for use
@@ -150,7 +150,7 @@ struct BERRY_UI ISources {
    * The priority given when the source includes the currently active
    * workbench window.
    */
-  static const int ACTIVE_WORKBENCH_WINDOW(); // = 1 << 14();
+  static int ACTIVE_WORKBENCH_WINDOW(); // = 1 << 14();
 
   /**
    * The variable name for the active workbench window. This is for use with
@@ -164,7 +164,7 @@ struct BERRY_UI ISources {
    *
    * @since 3.3
    */
-  static const int ACTIVE_WORKBENCH_WINDOW_SUBORDINATE(); // = 1 << 15();
+  static int ACTIVE_WORKBENCH_WINDOW_SUBORDINATE(); // = 1 << 15();
 
   /**
    * The variable name for the coolbar visibility state of the active
@@ -199,7 +199,7 @@ struct BERRY_UI ISources {
   /**
    * The priority given when the source includes the active editor part.
    */
-  static const int ACTIVE_EDITOR(); // = 1 << 16();
+  static int ACTIVE_EDITOR(); // = 1 << 16();
 
   /**
    * The variable name for the active editor part. This is for use with the
@@ -213,7 +213,7 @@ struct BERRY_UI ISources {
    *
    * @since 3.2
    */
-  static const int ACTIVE_EDITOR_ID(); // = 1 << 18();
+  static int ACTIVE_EDITOR_ID(); // = 1 << 18();
 
   /**
    * The variable name for the active editor identifier. This is for use with
@@ -226,7 +226,7 @@ struct BERRY_UI ISources {
   /**
    * The priority given when the source includes the active part.
    */
-  static const int ACTIVE_PART(); // = 1 << 20();
+  static int ACTIVE_PART(); // = 1 << 20();
 
   /**
    * The variable name for the active part. This is for use with the
@@ -239,7 +239,7 @@ struct BERRY_UI ISources {
    *
    * @since 3.2
    */
-  static const int ACTIVE_PART_ID(); // = 1 << 22();
+  static int ACTIVE_PART_ID(); // = 1 << 22();
 
   /**
    * The variable name for the active part id. This is for use with the
@@ -254,7 +254,7 @@ struct BERRY_UI ISources {
    * the case of nesting components, one should be careful to only activate
    * the most nested component.
    */
-  static const int ACTIVE_SITE(); // = 1 << 26();
+  static int ACTIVE_SITE(); // = 1 << 26();
 
   /**
    * The variable name for the active workbench site. This is for use with the
@@ -281,7 +281,7 @@ struct BERRY_UI ISources {
   /**
    * The priority given when the source includes the current selection.
    */
-  static const int ACTIVE_CURRENT_SELECTION(); // = 1 << 30();
+  static int ACTIVE_CURRENT_SELECTION(); // = 1 << 30();
 
   /**
    * The variable name for the active selection. This is for use with the
@@ -294,7 +294,7 @@ struct BERRY_UI ISources {
    * The priority given when the source includes the current menu.
    * @since 3.2
    */
-  static const int ACTIVE_MENU(); // = 1 << 31();
+  static int ACTIVE_MENU(); // = 1 << 31();
 
   /**
    * The variable name for the active menu. This is for use with the

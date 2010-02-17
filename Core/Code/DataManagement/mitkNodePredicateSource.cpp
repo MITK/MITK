@@ -27,7 +27,7 @@ mitk::NodePredicateSource::~NodePredicateSource()
 }
 
 
-bool mitk::NodePredicateSource::CheckNode(const mitk::DataTreeNode* node) const
+bool mitk::NodePredicateSource::CheckNode(const mitk::DataTreeNode*) const
 {
   throw std::logic_error("NodePredicateSourceis not implemented");
 }

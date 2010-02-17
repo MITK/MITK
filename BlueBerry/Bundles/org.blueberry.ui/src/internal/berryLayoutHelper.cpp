@@ -28,7 +28,7 @@ LayoutHelper::LayoutHelper()
 
 }
 
-void LayoutHelper::AddViewActivator(PageLayout::Pointer pageLayout,
+void LayoutHelper::AddViewActivator(PageLayout::Pointer /*pageLayout*/,
     const std::string&  /*viewId*/)
 {
   // TODO View Activator

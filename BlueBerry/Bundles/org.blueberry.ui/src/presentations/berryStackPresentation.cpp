@@ -51,7 +51,7 @@ int StackPresentation::GetSizeFlags(bool  /*width*/)
   return Constants::MIN | (hasMaximumSize ? Constants::MAX : 0);
 }
 
-int StackPresentation::ComputePreferredSize(bool width, int availableParallel,
+int StackPresentation::ComputePreferredSize(bool width, int /*availableParallel*/,
     int  /*availablePerpendicular*/, int preferredResult)
 {
   Point p = this->ComputeMinimumSize();

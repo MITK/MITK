@@ -129,8 +129,8 @@ int mitkLevelWindowTest(int, char* [])
   std::cout << "Testing mitk::LevelWindow ResetDefaultLevelWindow ";
   levWin->SetLevelWindow(100, 50);
   levWin->ResetDefaultLevelWindow();
-  double a = levWin->GetLevel();
-  double d = levWin->GetWindow();
+  //double a = levWin->GetLevel();
+  //double d = levWin->GetWindow();
 
   if (!((levWin->GetLevel() == 20) &&(levWin->GetWindow() == 200)))
   {

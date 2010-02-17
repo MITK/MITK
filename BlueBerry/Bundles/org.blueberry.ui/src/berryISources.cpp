@@ -20,33 +20,33 @@
 namespace berry
 {
 
-const int ISources::WORKBENCH()
+int ISources::WORKBENCH()
 {
-  static const int val = 0;
+  static int val = 0;
   return val;
 }
 
-const int ISources::LEGACY_LEGACY()
+int ISources::LEGACY_LEGACY()
 {
-  static const int val = 1;
+  static int val = 1;
   return val;
 }
 
-const int ISources::LEGACY_LOW()
+int ISources::LEGACY_LOW()
 {
-  static const int val = 1 << 1;
+  static int val = 1 << 1;
   return val;
 }
 
-const int ISources::LEGACY_MEDIUM()
+int ISources::LEGACY_MEDIUM()
 {
-  static const int val = 1 << 2;
+  static int val = 1 << 2;
   return val;
 }
 
-const int ISources::ACTIVE_CONTEXT()
+int ISources::ACTIVE_CONTEXT()
 {
-  static const int val = 1 << 6;
+  static int val = 1 << 6;
   return val;
 }
 
@@ -56,9 +56,9 @@ const std::string ISources::ACTIVE_CONTEXT_NAME()
   return val;
 } //$NON-NLS-1$
 
-const int ISources::ACTIVE_ACTION_SETS()
+int ISources::ACTIVE_ACTION_SETS()
 {
-  static const int val = 1 << 8;
+  static int val = 1 << 8;
   return val;
 }
 
@@ -68,9 +68,9 @@ const std::string ISources::ACTIVE_ACTION_SETS_NAME()
   return val;
 } //$NON-NLS-1$
 
-const int ISources::ACTIVE_SHELL()
+int ISources::ACTIVE_SHELL()
 {
-  static const int val = 1 << 10;
+  static int val = 1 << 10;
   return val;
 }
 
@@ -80,9 +80,9 @@ const std::string ISources::ACTIVE_SHELL_NAME()
   return val;
 } //$NON-NLS-1$
 
-const int ISources::ACTIVE_WORKBENCH_WINDOW_SHELL()
+int ISources::ACTIVE_WORKBENCH_WINDOW_SHELL()
 {
-  static const int val = 1 << 12;
+  static int val = 1 << 12;
   return val;
 }
 
@@ -92,9 +92,9 @@ const std::string ISources::ACTIVE_WORKBENCH_WINDOW_SHELL_NAME()
   return val;
 } //$NON-NLS-1$
 
-const int ISources::ACTIVE_WORKBENCH_WINDOW()
+int ISources::ACTIVE_WORKBENCH_WINDOW()
 {
-  static const int val = 1 << 14;
+  static int val = 1 << 14;
   return val;
 }
 
@@ -104,9 +104,9 @@ const std::string ISources::ACTIVE_WORKBENCH_WINDOW_NAME()
   return val;
 } //$NON-NLS-1$
 
-const int ISources::ACTIVE_WORKBENCH_WINDOW_SUBORDINATE()
+int ISources::ACTIVE_WORKBENCH_WINDOW_SUBORDINATE()
 {
-  static const int val = 1 << 15;
+  static int val = 1 << 15;
   return val;
 }
 
@@ -131,9 +131,9 @@ const std::string ISources::ACTIVE_WORKBENCH_WINDOW_ACTIVE_PERSPECTIVE_NAME()
   return val;
 } //$NON-NLS-1$
 
-const int ISources::ACTIVE_EDITOR()
+int ISources::ACTIVE_EDITOR()
 {
-  static const int val = 1 << 16;
+  static int val = 1 << 16;
   return val;
 }
 
@@ -143,9 +143,9 @@ const std::string ISources::ACTIVE_EDITOR_NAME()
   return val;
 } //$NON-NLS-1$
 
-const int ISources::ACTIVE_EDITOR_ID()
+int ISources::ACTIVE_EDITOR_ID()
 {
-  static const int val = 1 << 18;
+  static int val = 1 << 18;
   return val;
 }
 
@@ -155,9 +155,9 @@ const std::string ISources::ACTIVE_EDITOR_ID_NAME()
   return val;
 } //$NON-NLS-1$
 
-const int ISources::ACTIVE_PART()
+int ISources::ACTIVE_PART()
 {
-  static const int val = 1 << 20;
+  static int val = 1 << 20;
   return val;
 }
 
@@ -167,9 +167,9 @@ const std::string ISources::ACTIVE_PART_NAME()
   return val;
 } //$NON-NLS-1$
 
-const int ISources::ACTIVE_PART_ID()
+int ISources::ACTIVE_PART_ID()
 {
-  static const int val = 1 << 22;
+  static int val = 1 << 22;
   return val;
 }
 
@@ -179,9 +179,9 @@ const std::string ISources::ACTIVE_PART_ID_NAME()
   return val;
 } //$NON-NLS-1$
 
-const int ISources::ACTIVE_SITE()
+int ISources::ACTIVE_SITE()
 {
-  static const int val = 1 << 26;
+  static int val = 1 << 26;
   return val;
 }
 
@@ -203,9 +203,9 @@ const std::string ISources::SHOW_IN_INPUT()
   return val;
 } //$NON-NLS-1$
 
-const int ISources::ACTIVE_CURRENT_SELECTION()
+int ISources::ACTIVE_CURRENT_SELECTION()
 {
-  static const int val = 1 << 30;
+  static int val = 1 << 30;
   return val;
 }
 
@@ -215,9 +215,9 @@ const std::string ISources::ACTIVE_CURRENT_SELECTION_NAME()
   return val;
 } //$NON-NLS-1$
 
-const int ISources::ACTIVE_MENU()
+int ISources::ACTIVE_MENU()
 {
-  static const int val = 1 << 31;
+  static int val = 1 << 31;
   return val;
 }
 

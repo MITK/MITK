@@ -42,7 +42,7 @@ itk::Object::Pointer QmitkSimilarity2DTransformView::GetTransform()
 }
 
 template < class TPixelType, unsigned int VImageDimension >
-itk::Object::Pointer QmitkSimilarity2DTransformView::GetTransform2(itk::Image<TPixelType, VImageDimension>* itkImage1)
+itk::Object::Pointer QmitkSimilarity2DTransformView::GetTransform2(itk::Image<TPixelType, VImageDimension>* /* itkImage1 */)
 {
   if (VImageDimension == 2)
   {
@@ -141,7 +141,7 @@ itk::Array<double> QmitkSimilarity2DTransformView::GetScales()
   return scales;
 }
 
-vtkTransform* QmitkSimilarity2DTransformView::Transform(vtkMatrix4x4* vtkmatrix, vtkTransform* vtktransform, itk::Array<double> transformParams)
+vtkTransform* QmitkSimilarity2DTransformView::Transform(vtkMatrix4x4* /* vtkmatrix */, vtkTransform* vtktransform, itk::Array<double> transformParams)
 {
   if (m_MovingImage.IsNotNull())
   {

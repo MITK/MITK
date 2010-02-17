@@ -101,7 +101,7 @@ void QmitkHistogram::draw(QPainter *painter, const QwtScaleMap &xMap,
 
   painter->setPen(QPen(m_Data->color));
 
-  const int x0 = xMap.transform(baseline());
+  //const int x0 = xMap.transform(baseline());
   const int y0 = yMap.transform(baseline());
 
   for ( int i = 0; i < (int)iData.size(); i++ )

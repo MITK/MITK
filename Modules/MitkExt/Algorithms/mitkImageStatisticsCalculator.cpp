@@ -727,6 +727,7 @@ void ImageStatisticsCalculator::InternalCalculateMaskFromPlanarFigure(
       break;
 
     case 2:
+    default:
       i0 = 0;
       i1 = 1;
       break;

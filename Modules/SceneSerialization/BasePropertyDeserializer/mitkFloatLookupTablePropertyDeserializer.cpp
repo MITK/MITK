@@ -46,7 +46,7 @@ class SceneSerialization_EXPORT FloatLookupTablePropertyDeserializer : public Ba
         if (child->QueryIntAttribute("id", &tempID) == TIXML_WRONG_TYPE)
           return NULL; // TODO: can we do a better error handling?
         FloatLookupTable::IdentifierType id = static_cast<FloatLookupTable::IdentifierType>(tempID);
-        float tempVal;
+        float tempVal = -1.0;
         if (child->QueryFloatAttribute("value", &tempVal) == TIXML_WRONG_TYPE)
           return NULL; // TODO: can we do a better error handling?
         FloatLookupTable::ValueType val = static_cast<FloatLookupTable::ValueType>(tempVal);        

@@ -253,7 +253,7 @@ std::list<unsigned int> DebugUtil::GetSmartPointerIDs(
 }
 #else
 std::list<unsigned int> DebugUtil::GetSmartPointerIDs(
-    const Object* objectPointer, const std::list<unsigned int>&  /*excludeList*/)
+    const Object* /*objectPointer*/, const std::list<unsigned int>&  /*excludeList*/)
 {
   return std::list<unsigned int>();
 }

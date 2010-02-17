@@ -33,7 +33,7 @@ class SceneSerialization_EXPORT GroupTagPropertyDeserializer : public BaseProper
     mitkClassMacro( GroupTagPropertyDeserializer, BasePropertyDeserializer );
     itkNewMacro(Self);
 
-    virtual BaseProperty::Pointer Deserialize(TiXmlElement* element)
+    virtual BaseProperty::Pointer Deserialize(TiXmlElement*)
     {
       //if (!element) 
       //  return NULL;

@@ -134,7 +134,7 @@ void mitk::PlanarRectangle::GeneratePolyLine()
   }
 }
 
-void mitk::PlanarRectangle::GenerateHelperPolyLine(double mmPerDisplayUnit, unsigned int displayHeight)
+void mitk::PlanarRectangle::GenerateHelperPolyLine(double /*mmPerDisplayUnit*/, unsigned int /*displayHeight*/)
 {
   // A polygon does not require helper objects
 }

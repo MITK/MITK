@@ -89,7 +89,7 @@ float mitk::PlanarFigureInteractor
   //  returnValue = 0.5;//it can be understood
   //}
 
-  int timeStep = disPosEvent->GetSender()->GetTimeStep();
+  //int timeStep = disPosEvent->GetSender()->GetTimeStep();
 
   mitk::PlanarFigure *planarFigure = dynamic_cast<mitk::PlanarFigure *>(
     m_DataTreeNode->GetData() );
@@ -104,8 +104,8 @@ float mitk::PlanarFigureInteractor
 
     // Get the Geometry2D of the window the user interacts with (for 2D point 
     // projection)
-    mitk::BaseRenderer *renderer = stateEvent->GetEvent()->GetSender();
-    const Geometry2D *projectionPlane = renderer->GetCurrentWorldGeometry2D();
+    //mitk::BaseRenderer *renderer = stateEvent->GetEvent()->GetSender();
+    //const Geometry2D *projectionPlane = renderer->GetCurrentWorldGeometry2D();
 
     //// For reading on the points, Ids etc
     //mitk::CurveModel::PointSetType *pointSet = curveModel->GetPointSet( timeStep );

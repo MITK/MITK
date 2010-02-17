@@ -46,7 +46,7 @@ void mbilog::DistributeToBackends(mbilog::LogMessage &l)
 
   // Crop Message
   {
-    int i = static_cast<int>( l.message.find_last_not_of(" \t\f\v\n\r") );
+    std::string::size_type i = l.message.find_last_not_of(" \t\f\v\n\r");
     l.message = (i != std::string::npos) ? l.message.substr(0, i+1) : "";
   }
   

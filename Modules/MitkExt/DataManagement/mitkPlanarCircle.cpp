@@ -62,7 +62,7 @@ mitk::PlanarCircle::~PlanarCircle()
 //  boundaryPoint[1] = centerPoint[1];
 //}
 
-bool mitk::PlanarCircle::SetControlPoint( unsigned int index, const Point2D &point, bool createIfDoesNotExist )
+bool mitk::PlanarCircle::SetControlPoint( unsigned int index, const Point2D &point, bool /*createIfDoesNotExist*/ )
 {
   // moving center point
   if(index == 0)
@@ -104,7 +104,7 @@ void mitk::PlanarCircle::GeneratePolyLine()
   }
 }
 
-void mitk::PlanarCircle::GenerateHelperPolyLine(double mmPerDisplayUnit, unsigned int displayHeight)
+void mitk::PlanarCircle::GenerateHelperPolyLine(double /*mmPerDisplayUnit*/, unsigned int /*displayHeight*/)
 {
   // A circle does not require a helper object
 }

@@ -35,7 +35,7 @@ IProgressMonitor::Pointer ProgressProvider::GetDefaultMonitor()
   return sptr_defaultMonitor;
 }
 
-IProgressMonitor::Pointer ProgressProvider::CreateMonitor(Job::Pointer job,
+IProgressMonitor::Pointer ProgressProvider::CreateMonitor(Job::Pointer /*job*/,
     IProgressMonitor::Pointer  /*group*/, int  /*ticks*/)
 {
   //TODO SubProgressMonitor class

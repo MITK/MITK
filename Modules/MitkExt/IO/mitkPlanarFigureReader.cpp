@@ -195,7 +195,7 @@ mitk::Point3D mitk::PlanarFigureReader::GetPointFromXMLNode(TiXmlElement* e)
   if (e == NULL)
     throw std::invalid_argument("node invalid"); // TODO: can we do a better error handling?
   mitk::Point3D point;
-  mitk::ScalarType p;
+  mitk::ScalarType p(-1.0);
   if (e->QueryFloatAttribute("x", &p) == TIXML_WRONG_TYPE)
     throw std::invalid_argument("node malformatted"); // TODO: can we do a better error handling?
   point.SetElement(0, p);
@@ -214,7 +214,7 @@ mitk::Vector3D mitk::PlanarFigureReader::GetVectorFromXMLNode(TiXmlElement* e)
   if (e == NULL)
     throw std::invalid_argument("node invalid"); // TODO: can we do a better error handling?
   mitk::Vector3D vector;
-  mitk::ScalarType p;
+  mitk::ScalarType p(-1.0);
   if (e->QueryFloatAttribute("x", &p) == TIXML_WRONG_TYPE)
     throw std::invalid_argument("node malformatted"); // TODO: can we do a better error handling?
   vector.SetElement(0, p);

@@ -35,7 +35,7 @@ bool Saveable::Show(IWorkbenchPage::Pointer  /*page*/)
   //return 0;
 }
 
-void Saveable::DisableUI(const std::vector<IWorkbenchPart::Pointer>& parts,
+void Saveable::DisableUI(const std::vector<IWorkbenchPart::Pointer>& /*parts*/,
     bool  /*closing*/)
 {
   //TODO Saveable DisableUI

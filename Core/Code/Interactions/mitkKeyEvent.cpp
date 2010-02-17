@@ -20,7 +20,11 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkBaseRenderer.h"
 
 mitk::KeyEvent::KeyEvent(mitk::BaseRenderer* sender, int type, int button, int buttonState, int key, std::string text, const mitk::Point2D& displPosition)
-  : Event(sender, type, button, buttonState, key), m_DisplayPosition(displPosition), m_WorldPositionIsSet(false), m_Key(key), m_Text(text)
+: Event(sender, type, button, buttonState, key)
+, m_DisplayPosition(displPosition)
+, m_Key(key)
+, m_Text(text)
+, m_WorldPositionIsSet(false)
 {
 }
 

@@ -134,7 +134,7 @@ float AffineInteractor3D
     returnValue = 0.5;//it can be understood
   }
 
-  int timeStep = disPosEvent->GetSender()->GetTimeStep();
+  //int timeStep = disPosEvent->GetSender()->GetTimeStep();
 
   //CurveModel *curveModel = dynamic_cast<CurveModel *>(
   //  m_DataTreeNode->GetData() );
@@ -338,7 +338,7 @@ bool AffineInteractor3D
         break;
       }
 
-      DataTreeNode *pickedNode = dpe->GetPickedObjectNode();
+      //DataTreeNode *pickedNode = dpe->GetPickedObjectNode();
       
       m_InitialPickedPoint = m_CurrentPickedPoint;
       m_InitialPickedDisplayPoint = m_CurrentPickedDisplayPoint;
@@ -462,7 +462,7 @@ bool AffineInteractor3D::ColorizeSurface( vtkPolyData *polyData,
     return false;
   }
 
-  vtkPoints *points = polyData->GetPoints();
+  //vtkPoints *points = polyData->GetPoints();
   vtkPointData *pointData = polyData->GetPointData();
   if ( pointData == NULL )
   {

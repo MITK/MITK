@@ -122,7 +122,7 @@ TiXmlElement* mitk::PlanarFigureWriter::CreateXMLVectorElement(const char* name,
 
 void mitk::PlanarFigureWriter::ResizeInputs( const unsigned int& num )
 {
-  unsigned int prevNum = this->GetNumberOfInputs();
+  //unsigned int prevNum = this->GetNumberOfInputs();
   this->SetNumberOfInputs( num );
   //for ( unsigned int i = prevNum; i < num; ++i )
   //{

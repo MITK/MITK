@@ -150,7 +150,6 @@ namespace berry
 
     // make attributes
     Preferences::PropertyMap properties = prefNode->GetProperties();
-    Element* newProp = 0;
     for (Preferences::PropertyMap::iterator it = properties.begin()
       ; it != properties.end(); it++)
     {

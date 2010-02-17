@@ -56,7 +56,7 @@ VolumeVisualizationImagePreprocessor::GetInitialTransferFunction(  )
   double surfaceValue = m_surfaceValue;
   double realSurfaceValue = m_realSurfaceValue;
 
-  double surfaceSteepness = 0.0;
+  //double surfaceSteepness = 0.0;
 
   VVP_INFO << "using threshold of " << treshold << " and opacity of " << opacity;
 
@@ -114,11 +114,11 @@ void VolumeVisualizationImagePreprocessor::UpdateTransferFunction( TransferFunct
 {
   double opacity = 0.005;
 
-  double maskValue = m_OutOfLiverValue;
-  double surfaceValue = m_surfaceValue;
-  double realSurfaceValue = m_realSurfaceValue;
+  //double maskValue = m_OutOfLiverValue;
+  //double surfaceValue = m_surfaceValue;
+  //double realSurfaceValue = m_realSurfaceValue;
 
-  double surfaceSteepness = 0.0;
+  //double surfaceSteepness = 0.0;
 
   //VVP_INFO << "changing to threshold of " << treshold << " and opacity of " << opacity;
 
@@ -563,8 +563,8 @@ mitk::VolumeVisualizationImagePreprocessor::CTImage::Pointer VolumeVisualization
   workIt.GoToBegin();
 //  labelIt.GoToBegin();
 
-  int numGesetzt=0;
-  int numGelassen=0;
+  //int numGesetzt=0;
+  //int numGelassen=0;
   
   
   while ( ! workIt.IsAtEnd() )

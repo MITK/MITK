@@ -124,7 +124,7 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
   else
     glColor3f(0.0f, 1.0f, 0.0f);
 
-  mitk::Point2D firstPoint;
+  mitk::Point2D firstPoint; firstPoint[0] = 0; firstPoint[1] = 1;
   for(unsigned short loop = 0; loop < planarFigure->GetPolyLinesSize(); ++loop)
   {
     if ( planarFigure->IsClosed() )

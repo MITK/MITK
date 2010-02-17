@@ -42,7 +42,7 @@ itk::Object::Pointer QmitkVersorRigid3DTransformView::GetTransform()
 }
 
 template < class TPixelType, unsigned int VImageDimension >
-itk::Object::Pointer QmitkVersorRigid3DTransformView::GetTransform2(itk::Image<TPixelType, VImageDimension>* itkImage1)
+itk::Object::Pointer QmitkVersorRigid3DTransformView::GetTransform2(itk::Image<TPixelType, VImageDimension>* /*itkImage1*/)
 {
   if (VImageDimension == 3)
   {

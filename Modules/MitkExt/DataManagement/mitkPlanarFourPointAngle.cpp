@@ -58,7 +58,7 @@ void mitk::PlanarFourPointAngle::GeneratePolyLine()
   }
 }
 
-void mitk::PlanarFourPointAngle::GenerateHelperPolyLine(double mmPerDisplayUnit, unsigned int displayHeight)
+void mitk::PlanarFourPointAngle::GenerateHelperPolyLine(double /*mmPerDisplayUnit*/, unsigned int /*displayHeight*/)
 {
   // Generate helper-poly-line for an four point angle
   // Need to discuss a sensible implementation

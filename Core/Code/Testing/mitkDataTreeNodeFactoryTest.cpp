@@ -30,7 +30,7 @@ PURPOSE.  See the above copyright notices for more information.
  *  tests, argv is either empty for the simple tests or contains the filename
  *  of a test image for the image tests (see CMakeLists.txt).
  */
-int mitkDataTreeNodeFactoryTest(int argc, char* argv[])
+int mitkDataTreeNodeFactoryTest(int, char* argv[])
 {
   // always start with this!
   MITK_TEST_BEGIN("DataTreeNodeFactory")
@@ -57,11 +57,9 @@ int mitkDataTreeNodeFactoryTest(int argc, char* argv[])
     std::string fileExtension = itksys::SystemTools::GetFilenameExtension(fileName);
     if (fileName.substr(fileName.size()-3) == ".gz")
        fileName = fileName.substr( 0, fileName.length()-3 );
-    int length = fileExtension.length();
     fileName = fileName.substr(0,fileName.length()-fileExtension.length());
     fileName = fileName.substr(filePath.length()+1, fileName.length());
     mitk::StringProperty::Pointer nameProp = dynamic_cast<mitk::StringProperty*>(node->GetProperty("name"));
-    const char* name = nameProp->GetValue();
     MITK_TEST_CONDITION_REQUIRED(strcmp(nameProp->GetValue(),fileName.c_str())==0,"Test for file name");
 
     mitk::BoolProperty::Pointer visibleProp = dynamic_cast<mitk::BoolProperty*>(node->GetProperty("visible"));

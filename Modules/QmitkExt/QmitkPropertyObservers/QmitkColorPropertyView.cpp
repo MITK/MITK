@@ -16,7 +16,6 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 #include "QmitkColorPropertyView.h"
 #include <QPixmap>
-#include "no_color_icon.xpm"
 #define ROUND_P(x) ((int)((x)+0.5))
 
 QmitkColorPropertyView::QmitkColorPropertyView( const mitk::ColorProperty* property, QWidget* parent )

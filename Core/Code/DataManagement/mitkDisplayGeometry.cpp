@@ -182,11 +182,10 @@ mitk::DisplayGeometry::~DisplayGeometry()
 
 void mitk::DisplayGeometry::SetSizeInDisplayUnits(unsigned int width, unsigned int height, bool keepDisplayedRegion)
 {
-  Vector2D oldSizeInMM;
+  Vector2D oldSizeInMM( m_SizeInMM );
   Point2D oldCenterInMM;
   if(keepDisplayedRegion)
   {
-    oldSizeInMM = m_SizeInMM;
     Point2D centerInDisplayUnits;
     centerInDisplayUnits[0] = m_SizeInDisplayUnits[0]*0.5;
     centerInDisplayUnits[1] = m_SizeInDisplayUnits[1]*0.5;

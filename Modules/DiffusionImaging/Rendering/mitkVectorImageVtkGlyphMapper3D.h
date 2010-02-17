@@ -22,7 +22,7 @@ public:
 
     itkNewMacro( Self );
 
-    typedef enum GlyphType{LineGlyph, ArrowGlyph};
+    enum GlyphType {LineGlyph, ArrowGlyph};
     
     itkSetMacro(MaximumNumberOfPoints, unsigned int);
     itkGetMacro(MaximumNumberOfPoints, unsigned int);

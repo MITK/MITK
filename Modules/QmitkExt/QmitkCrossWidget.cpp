@@ -53,6 +53,6 @@ void QmitkCrossWidget::mouseMoveEvent(QMouseEvent * )
   emit SignalDeltaMove( deltaX , deltaY );
 }
 
-void QmitkCrossWidget::mouseReleaseEvent(QMouseEvent* mouseEvent)
+void QmitkCrossWidget::mouseReleaseEvent(QMouseEvent*)
 {
 }

@@ -30,12 +30,12 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "QmitkStdMultiWidget.h"
 
-#include"iconClose.xpm"
+//#include"iconClose.xpm"
 #include"iconFullScreen.xpm"
 #include"iconCrosshairMode.xpm"
-#include"iconHoriSplit.xpm"
+//#include"iconHoriSplit.xpm"
 #include"iconSettings.xpm"
-#include"iconVertiSplit.xpm"
+//#include"iconVertiSplit.xpm"
 #include"iconLeaveFullScreen.xpm"
 
 #include <math.h>
@@ -44,11 +44,11 @@ PURPOSE.  See the above copyright notices for more information.
 QmitkRenderWindowMenu::QmitkRenderWindowMenu(QWidget *parent, Qt::WindowFlags f )
 :QWidget(parent,f),
 m_Settings(NULL),
+m_CrosshairMenu(NULL),
 m_Layout(0),
 m_LayoutDesign(0),
 m_OldLayoutDesign(0),
-m_FullScreenMode(false),
-m_CrosshairMenu(NULL)
+m_FullScreenMode(false)
 {
   //Create Menu Widget
   this->CreateMenuWidget();

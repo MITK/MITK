@@ -41,10 +41,10 @@ QmitkFunctionality* QmitkFunctionality::m_DeactivatedFunctionality = 0;
 
 QmitkFunctionality::QmitkFunctionality()
  : m_Parent(0)
- , m_HandlesMultipleDataStorages(false)
- , m_InDataStorageChanged(false)
  , m_IsActive(false)
  , m_IsVisible(false)
+ , m_HandlesMultipleDataStorages(false)
+ , m_InDataStorageChanged(false)
 {
   m_PreferencesService = 
     berry::Platform::GetServiceRegistry().GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);

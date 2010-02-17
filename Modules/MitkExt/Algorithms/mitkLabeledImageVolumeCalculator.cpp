@@ -96,7 +96,7 @@ void LabeledImageVolumeCalculator::Calculate()
 template < typename TPixel, unsigned int VImageDimension >
 void LabeledImageVolumeCalculator::_InternalCalculateVolumes(
   itk::Image< TPixel, VImageDimension > *image, 
-  LabeledImageVolumeCalculator *volumeCalculator, 
+  LabeledImageVolumeCalculator* /*volumeCalculator*/, 
   Geometry3D *geometry )
 {
   typedef itk::Image< TPixel, VImageDimension > ImageType;
@@ -113,7 +113,7 @@ void LabeledImageVolumeCalculator::_InternalCalculateVolumes(
   for ( it.GoToBegin(); !it.IsAtEnd(); ++it )
   {
     const IndexType &index = it.GetIndex();
-    typename IteratorType::PixelType pixel = it.Get();
+    unsigned int pixel = static_cast<unsigned int>( it.Get() );
 
     if ( m_VolumeVector.size() <= pixel )
     {

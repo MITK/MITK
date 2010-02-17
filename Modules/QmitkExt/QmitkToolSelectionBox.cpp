@@ -614,7 +614,7 @@ void QmitkToolSelectionBox::SetToolGUIArea( QWidget* parentWidget )
   m_ToolGUIWidget = parentWidget;
 }
 
-void QmitkToolSelectionBox::setTitle( const QString& title )
+void QmitkToolSelectionBox::setTitle( const QString& /*title*/ )
 {
 }
 

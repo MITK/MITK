@@ -215,7 +215,7 @@ bool WorkbenchIntroManager::IsIntroInWindow(
 }
 
 void WorkbenchIntroManager::SetIntroStandby(IIntroPart::Pointer part,
-    bool standby)
+    bool /*standby*/)
 {
   if (!introPart || introPart != part)
   {

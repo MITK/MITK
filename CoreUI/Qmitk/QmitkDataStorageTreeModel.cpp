@@ -106,7 +106,7 @@ Qt::ItemFlags QmitkDataStorageTreeModel::flags( const QModelIndex& index ) const
     return Qt::ItemIsDropEnabled;
 }
 
-int QmitkDataStorageTreeModel::columnCount( const QModelIndex & parent /*= QModelIndex() */ ) const
+int QmitkDataStorageTreeModel::columnCount( const QModelIndex& /* parent = QModelIndex() */ ) const
 {
   return 1;
 }
@@ -138,7 +138,7 @@ Qt::DropActions QmitkDataStorageTreeModel::supportedDropActions() const
 }
 
 bool QmitkDataStorageTreeModel::dropMimeData(const QMimeData *data,
-                                     Qt::DropAction action, int row, int column, const QModelIndex &parent)
+                                     Qt::DropAction action, int /*row*/, int /*column*/, const QModelIndex &parent)
 {
   if (action == Qt::IgnoreAction)
     return true;
@@ -225,7 +225,7 @@ QVariant QmitkDataStorageTreeModel::data( const QModelIndex & index, int role ) 
   return QVariant();
 }
 
-QVariant QmitkDataStorageTreeModel::headerData(int section,
+QVariant QmitkDataStorageTreeModel::headerData(int /*section*/,
                                  Qt::Orientation orientation,
                                  int role) const
 {
@@ -297,7 +297,7 @@ void QmitkDataStorageTreeModel::SetDataStorage( mitk::DataStorage* _DataStorage 
   }
 }
 
-void QmitkDataStorageTreeModel::SetDataStorageDeleted( const itk::Object* _DataStorage )
+void QmitkDataStorageTreeModel::SetDataStorageDeleted( const itk::Object* /*_DataStorage*/ )
 {
   this->SetDataStorage(0);
 }
@@ -434,7 +434,7 @@ bool QmitkDataStorageTreeModel::setData( const QModelIndex &index, const QVarian
   return true;
 }
 
-bool QmitkDataStorageTreeModel::setHeaderData( int section, Qt::Orientation orientation, const QVariant &value, int role /*= Qt::EditRole*/ )
+bool QmitkDataStorageTreeModel::setHeaderData( int /*section*/, Qt::Orientation /*orientation*/, const QVariant& /* value */, int /*role = Qt::EditRole*/ )
 {
   return false;
 }

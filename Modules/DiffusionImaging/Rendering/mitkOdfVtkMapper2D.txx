@@ -222,7 +222,7 @@ mitk::OdfVtkMapper2D<T,N>
 
   m_TemplateOdf = itk::OrientationDistributionFunction<T,N>::GetBaseMesh();
 
-  vtkPoints* points = m_TemplateOdf->GetPoints();
+  //vtkPoints* points = m_TemplateOdf->GetPoints();
 
   m_OdfVals->Allocate(N);
   m_OdfSource->SetTemplateOdf(m_TemplateOdf);
@@ -437,8 +437,7 @@ template<class T, int N>
 typename mitk::OdfVtkMapper2D<T,N>::OdfDisplayGeometry* mitk::OdfVtkMapper2D<T,N>
 ::MeasureDisplayedGeometry(mitk::BaseRenderer* renderer)
 {
-  vtkLinearTransform * vtktransform = 
-    this->GetDataTreeNode()->GetVtkTransform(this->GetTimestep());
+  //vtkLinearTransform * vtktransform = this->GetDataTreeNode()->GetVtkTransform(this->GetTimestep());
   Geometry2D::ConstPointer worldGeometry = 
     renderer->GetCurrentWorldGeometry2D();
   PlaneGeometry::ConstPointer worldPlaneGeometry = 

@@ -42,7 +42,7 @@ itk::Object::Pointer QmitkAffineTransformView::GetTransform()
 }
 
 template < class TPixelType, unsigned int VImageDimension >
-itk::Object::Pointer QmitkAffineTransformView::GetTransform2(itk::Image<TPixelType, VImageDimension>* itkImage1)
+itk::Object::Pointer QmitkAffineTransformView::GetTransform2(itk::Image<TPixelType, VImageDimension>* /*itkImage1*/)
 {
   typedef typename itk::Image< TPixelType, VImageDimension >  FixedImageType;
   typedef typename itk::Image< TPixelType, VImageDimension >  MovingImageType;
@@ -170,9 +170,9 @@ vtkTransform* QmitkAffineTransformView::Transform(vtkMatrix4x4* vtkmatrix, vtkTr
     // -  the 9 rotation-coefficients are copied
     //    directly to the top left part of the matrix
     int m = 0;
-    for (int i = 0; i < m_FixedImage->GetDimension(); i++)
+    for (unsigned int i = 0; i < m_FixedImage->GetDimension(); i++)
     {
-      for (int j = 0; j < m_FixedImage->GetDimension(); j++)
+      for (unsigned int j = 0; j < m_FixedImage->GetDimension(); j++)
       {
         vtkmatrix->SetElement(i, j, transformParams[m]);
         m++;

@@ -169,8 +169,8 @@ void BaseVtkMapper3D::ApplyProperties(vtkActor* actor, BaseRenderer* renderer)
     // Check whether one or more AnnotationProperty objects have been defined for
     // this node. Check both renderer specific and global property lists, since
     // properties in both should be considered.
-    const PropertyList::PropertyMap *rendererProperties = this->GetDataTreeNode()->GetPropertyList( renderer )->GetMap();
-    const PropertyList::PropertyMap *globalProperties = this->GetDataTreeNode()->GetPropertyList( NULL )->GetMap();
+    //const PropertyList::PropertyMap *rendererProperties = this->GetDataTreeNode()->GetPropertyList( renderer )->GetMap();
+    //const PropertyList::PropertyMap *globalProperties = this->GetDataTreeNode()->GetPropertyList( NULL )->GetMap();
 
     // Add clipping planes (if any)
 /*

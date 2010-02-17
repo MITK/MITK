@@ -72,7 +72,7 @@ void IPerspectiveListener::PerspectiveChanged(SmartPointer<IWorkbenchPage> /*pag
 {}
 
 void IPerspectiveListener::PerspectiveChanged(SmartPointer<IWorkbenchPage> /*page*/,
-          IPerspectiveDescriptor::Pointer perspective,
+          IPerspectiveDescriptor::Pointer /*perspective*/,
           IWorkbenchPartReference::Pointer  /*partRef*/, const std::string&  /*changeId*/) 
 {}
 

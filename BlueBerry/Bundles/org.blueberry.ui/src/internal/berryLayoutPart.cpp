@@ -90,7 +90,7 @@ int LayoutPart::GetSizeFlags(bool  /*horizontal*/)
   return Constants::MIN;
 }
 
-int LayoutPart::ComputePreferredSize(bool width, int availableParallel,
+int LayoutPart::ComputePreferredSize(bool /*width*/, int /*availableParallel*/,
     int  /*availablePerpendicular*/, int preferredParallel)
 {
   return preferredParallel;

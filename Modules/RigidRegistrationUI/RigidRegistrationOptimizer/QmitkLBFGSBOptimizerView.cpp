@@ -80,6 +80,6 @@ QString QmitkLBFGSBOptimizerView::GetName()
 void QmitkLBFGSBOptimizerView::SetupUI(QWidget* parent)
 {
   m_Controls.setupUi(parent);
-  QValidator* validatorLineEditInput = new QIntValidator(0, 20000000, this);
-  QValidator* validatorLineEditInputFloat = new QDoubleValidator(0, 20000000, 8, this);
+  /*QValidator* validatorLineEditInput = */ new QIntValidator(0, 20000000, this);
+  /*QValidator* validatorLineEditInputFloat = */ new QDoubleValidator(0, 20000000, 8, this);
 }

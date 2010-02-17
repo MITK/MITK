@@ -379,7 +379,11 @@ void mitk::VectorImageMapper2D::PaintCells( vtkPolyData* glyphs, const Geometry2
   vtkIdList* idList;
   vtkCell* cell;
 
-  vtkFloatingPointType offset[3];
+  vtkFloatingPointType offset[3]; 
+  for (unsigned int i = 0; i < 3; ++i) 
+  {
+    offset[i] = 0; 
+  }
 
   vtkIdType numCells = glyphs->GetNumberOfCells();
   for ( vtkIdType cellId = 0; cellId < numCells; ++cellId )

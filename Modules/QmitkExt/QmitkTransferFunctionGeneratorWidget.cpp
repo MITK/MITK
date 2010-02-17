@@ -387,7 +387,7 @@ std::string QmitkTransferFunctionGeneratorWidget::ReduceFileName(std::string fil
   std::string fileNameShort;
   std::string fileNameRevert;
   
-  for(int i=0; i< fileNameLong.length(); i++)
+  for(unsigned int i=0; i< fileNameLong.length(); i++)
   {
     if(i<3)
     {
@@ -401,7 +401,8 @@ std::string QmitkTransferFunctionGeneratorWidget::ReduceFileName(std::string fil
     }
   }
   //MITK_INFO <<" fileNameShort: " << fileNameShort.c_str();
-  for(int i=fileNameLong.length()-1; i>= 0; i--)
+  unsigned int len( fileNameLong.length() );
+  for(unsigned int i=len-1; i <= len; i--)
   {
     std::string x=std::string("")+fileNameLong[i];
     

@@ -101,7 +101,7 @@ class QmitkExt_EXPORT SimpleHistogramCache
 {
   public:
   
-    static const int maxCacheSize = 64;
+    static const unsigned int maxCacheSize = 64;
 
   protected:
 
@@ -184,7 +184,7 @@ class QmitkExt_EXPORT SimpleHistogramCache
  
     void TrimCache(bool full=false)
     {
-      int targetSize = full?0:maxCacheSize;
+      unsigned int targetSize = full?0:maxCacheSize;
       
       while(cache.size()>targetSize)
       {

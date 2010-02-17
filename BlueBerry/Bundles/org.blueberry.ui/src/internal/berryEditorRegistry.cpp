@@ -638,7 +638,7 @@ bool EditorRegistry::ReadEditors(
 }
 
 void EditorRegistry::ReadResources(
-    std::map<std::string, EditorDescriptor::Pointer>& editorTable,
+    std::map<std::string, EditorDescriptor::Pointer>& /*editorTable*/,
     std::ostream&  /*reader*/)
 {
   //      XMLMemento memento = XMLMemento.createReadRoot(reader);

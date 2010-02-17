@@ -321,12 +321,14 @@ void mitk::PointSetMapper2D::Paint( mitk::BaseRenderer *renderer )
         {
           const char * pointLabel = dynamic_cast<mitk::StringProperty *>(
             this->GetDataTreeNode()->GetProperty("label"))->GetValue();
-          char buffer[20];
           std::string l = pointLabel;
           if (input->GetSize()>1)
           {
-            sprintf(buffer,"%d",it->Index());
-            l.append(buffer);
+            // char buffer[20];
+            // sprintf(buffer,"%d",it->Index());
+            std::stringstream ss;
+            ss << it->Index();
+            l.append(ss.str());
           }
           if (unselectedColor != NULL)
           {

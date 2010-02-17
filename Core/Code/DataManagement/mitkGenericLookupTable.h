@@ -134,7 +134,7 @@ typedef LookupTableName Self;                                   \
   LookupTableName() {}                                          \
   virtual ~LookupTableName() {}                                 \
 }; \
-std::ostream& operator<<(std::ostream& stream, const LookupTableName& l);
+std::ostream& operator<<(std::ostream& stream, const LookupTableName& /*l*/);
 
 /**
 * Generates the ostream << operator for the lookuptable. This definition
@@ -142,7 +142,7 @@ std::ostream& operator<<(std::ostream& stream, const LookupTableName& l);
 * class declaration macro mitkSpecializeGenericLookupTable.
 */
 #define mitkSpecializeGenericLookupTableOperator(LookupTableName)              \
-std::ostream& mitk::operator<<(std::ostream& stream, const LookupTableName& l) \
+std::ostream& mitk::operator<<(std::ostream& stream, const LookupTableName& /*l*/) \
 {                                                                              \
   return stream;                                                               \
 };

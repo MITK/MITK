@@ -30,26 +30,29 @@ PURPOSE.  See the above copyright notices for more information.
 namespace itk
 {
 
-  //#define INIT_STATIC_ODF_VARS(N_DIRS)    \
-  //  _INIT_STATIC_ODF_VARS(float,N_DIRS) \
-  //  _INIT_STATIC_ODF_VARS(double,N_DIRS) \
-  //
-  //#define _INIT_STATIC_ODF_VARS(PIXTYPE,N_DIRS)                                                                          \
-  //  vtkPolyData* itk::OrientationDistributionFunction<PIXTYPE,N_DIRS>::m_BaseMesh = NULL;                                \
-  //  vnl_matrix_fixed<double, 3, N_DIRS>* itk::OrientationDistributionFunction<PIXTYPE,N_DIRS>::m_Directions              \
-  //    = itk::PointShell<N_DIRS, vnl_matrix_fixed<double, 3, N_DIRS> >::DistributePointShell();                           \
-  //  std::vector< std::vector<int>* >* itk::OrientationDistributionFunction<PIXTYPE,N_DIRS>::m_NeighborIdxs = NULL;       \
-  //  std::vector<int>* itk::OrientationDistributionFunction<PIXTYPE,N_DIRS>::m_HalfSphereIdxs = NULL;              \
-  //  bool itk::OrientationDistributionFunction<PIXTYPE,N_DIRS>::m_Mutex = false;                                                                                                \
-  //
-  //
-  //  INIT_STATIC_ODF_VARS(40)
-  //  INIT_STATIC_ODF_VARS(60)
-  //  INIT_STATIC_ODF_VARS(80)
-  //  INIT_STATIC_ODF_VARS(100)
-  //  INIT_STATIC_ODF_VARS(150)
-  //  INIT_STATIC_ODF_VARS(200)
-  //  INIT_STATIC_ODF_VARS(250)
+  /*
+  
+  #define INIT_STATIC_ODF_VARS(N_DIRS)    \
+    _INIT_STATIC_ODF_VARS(float,N_DIRS) \
+    _INIT_STATIC_ODF_VARS(double,N_DIRS) \
+  
+  #define _INIT_STATIC_ODF_VARS(PIXTYPE,N_DIRS)                                                                          \
+    vtkPolyData* itk::OrientationDistributionFunction<PIXTYPE,N_DIRS>::m_BaseMesh = NULL;                                \
+    vnl_matrix_fixed<double, 3, N_DIRS>* itk::OrientationDistributionFunction<PIXTYPE,N_DIRS>::m_Directions              \
+      = itk::PointShell<N_DIRS, vnl_matrix_fixed<double, 3, N_DIRS> >::DistributePointShell();                           \
+    std::vector< std::vector<int>* >* itk::OrientationDistributionFunction<PIXTYPE,N_DIRS>::m_NeighborIdxs = NULL;       \
+    std::vector<int>* itk::OrientationDistributionFunction<PIXTYPE,N_DIRS>::m_HalfSphereIdxs = NULL;              \
+    bool itk::OrientationDistributionFunction<PIXTYPE,N_DIRS>::m_Mutex = false;                                                                                                \
+  
+  
+    INIT_STATIC_ODF_VARS(40)
+    INIT_STATIC_ODF_VARS(60)
+    INIT_STATIC_ODF_VARS(80)
+    INIT_STATIC_ODF_VARS(100)
+    INIT_STATIC_ODF_VARS(150)
+    INIT_STATIC_ODF_VARS(200)
+    INIT_STATIC_ODF_VARS(250)
+  */
 
   template<class T, unsigned int N>
   vtkPolyData* itk::OrientationDistributionFunction<T,N>::m_BaseMesh = NULL;
@@ -343,7 +346,7 @@ namespace itk
     OrientationDistributionFunction<T, NOdfDirections>
     ::InitFromTensor(itk::DiffusionTensor3D<T> tensor) 
   {
-    for(int i=0; i<NOdfDirections; i++)
+    for(unsigned int i=0; i<NOdfDirections; i++)
     {
       /*
       *               | t0  t1  t2 |    g0
@@ -476,7 +479,7 @@ namespace itk
     {
 
       vtkPoints* points = vtkPoints::New();
-      for(int j=0; j<NOdfDirections; j++){
+      for(unsigned int j=0; j<NOdfDirections; j++){
         double x = (*m_Directions)(0,j);
         double y = (*m_Directions)(1,j);
         double z = (*m_Directions)(2,j);
@@ -511,7 +514,7 @@ namespace itk
       }
 
       vtkPoints* points2 = vtkPoints::New();
-      for(int j=0; j<NOdfDirections; j++){
+      for(unsigned int j=0; j<NOdfDirections; j++){
         double x = -(*m_Directions)(0,j);
         double y = -(*m_Directions)(2,j);
         double z = -(*m_Directions)(1,j);
@@ -602,7 +605,7 @@ namespace itk
       m_NeighborIdxs = new std::vector< std::vector<int>* >();
       vtkCellArray* polys = m_BaseMesh->GetPolys();
 
-      for(int i=0; i<NOdfDirections; i++)
+      for(unsigned int i=0; i<NOdfDirections; i++)
       {
         std::vector<int> *idxs = new std::vector<int>();
         polys->InitTraversal();
@@ -1006,11 +1009,11 @@ namespace itk
     if(m_AngularRangeIdxs == NULL)
     {
       m_AngularRangeIdxs = new std::vector< std::vector<int>* >();
-      for(int i=0; i<N; i++)
+      for(unsigned int i=0; i<N; i++)
       {
         vnl_vector_fixed<double,3> pDir = GetDirection(i);
         std::vector<int> *idxs = new std::vector<int>();
-        for(int j=0; j<N; j++)
+        for(unsigned int j=0; j<N; j++)
         {
           vnl_vector_fixed<double,3> cDir = GetDirection(j);
           double angle = ( 180 / ODF_PI ) * acos( dot_product(pDir, cDir) );

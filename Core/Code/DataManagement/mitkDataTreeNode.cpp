@@ -543,7 +543,7 @@ bool mitk::DataTreeNode::IsInteractorEnabled() const
   return mitk::GlobalInteraction::GetInstance()->InteractorRegistered( m_Interactor.GetPointer() );
 }
 
-void mitk::DataTreeNode::PropertyListModified( const itk::Object *caller, const itk::EventObject &event )
+void mitk::DataTreeNode::PropertyListModified( const itk::Object* /*caller*/, const itk::EventObject& )
 {
   Modified();
 }

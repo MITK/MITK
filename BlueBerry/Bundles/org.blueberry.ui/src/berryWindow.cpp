@@ -80,7 +80,8 @@ Shell::Pointer Window::GetModalChild(const std::vector<Shell::Pointer>& toSearch
 {
   int modal = Constants::APPLICATION_MODAL | Constants::SYSTEM_MODAL | Constants::PRIMARY_MODAL;
 
-  for (size_t i = toSearch.size() - 1; i >= 0; i--)
+  size_t size = toSearch.size();
+  for (size_t i = size - 1; i < size; i--)
   {
     Shell::Pointer shell = toSearch[i];
 

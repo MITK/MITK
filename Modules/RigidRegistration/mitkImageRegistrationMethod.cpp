@@ -21,8 +21,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
 
-  ImageRegistrationMethod::ImageRegistrationMethod() : m_Observer(NULL), m_Interpolator(0), m_MovingMask(NULL), m_FixedMask(NULL),
-    m_Transform(NULL), m_Metric(NULL), m_Optimizer(NULL)
+  ImageRegistrationMethod::ImageRegistrationMethod() 
+  : m_Interpolator(0)
   {
     m_ReferenceImage = Image::New();
     m_OptimizerScales.clear();

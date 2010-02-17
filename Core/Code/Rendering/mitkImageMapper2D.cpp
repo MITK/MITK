@@ -94,7 +94,7 @@ mitk::ImageMapper2D::Paint( mitk::BaseRenderer *renderer )
   bottomRight += rendererInfo.m_Overlap;
 
   Vector2D diag = ( topLeft - bottomRight );
-  float size = diag.GetNorm();
+  //float size = diag.GetNorm();
 
   glMatrixMode( GL_PROJECTION );
   glLoadIdentity();
@@ -189,8 +189,8 @@ mitk::ImageMapper2D::Paint( mitk::BaseRenderer *renderer )
     int s_y = 0;
     int s_n = 0;
 
-    for(int y=0;y<pic->n[1];y++)
-      for(int x=0;x<pic->n[0];x++)
+    for(unsigned int y=0;y<pic->n[1];y++)
+      for(unsigned int x=0;x<pic->n[0];x++)
       {
         bool set=false;
         switch ( pic->bpe )

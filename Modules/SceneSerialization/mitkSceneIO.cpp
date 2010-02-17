@@ -499,7 +499,7 @@ void mitk::SceneIO::OnUnzipError(const void*  /*pSender*/, std::pair<const Poco:
   MITK_ERROR << "Error while unzipping: " << info.second;
 }
 
-void mitk::SceneIO::OnUnzipOk(const void*  /*pSender*/, std::pair<const Poco::Zip::ZipLocalFileHeader, const Poco::Path>& info)
+void mitk::SceneIO::OnUnzipOk(const void*  /*pSender*/, std::pair<const Poco::Zip::ZipLocalFileHeader, const Poco::Path>& /*info*/)
 {
   // MITK_INFO << "Unzipped ok: " << info.second.toString();
 }

@@ -35,7 +35,11 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkRenderWindowMenu.h"
 
 QmitkRenderWindow::QmitkRenderWindow(QWidget *parent, QString name, mitk::VtkPropRenderer* renderer)
-: QVTKWidget(parent), m_Renderer(renderer), m_ResendQtEvents(true), m_MenuWidgetActivated(false), m_MenuWidget(NULL)
+: QVTKWidget(parent)
+, m_Renderer(renderer)
+, m_ResendQtEvents(true)
+, m_MenuWidget(NULL)
+, m_MenuWidgetActivated(false)
 {
   if(m_Renderer.IsNull())
   {
@@ -329,6 +333,7 @@ QMenu* QmitkRenderWindow::GetCrossHairMenu()
   {
     return m_MenuWidget->GetCrossHairMenu();
   }
+  else return NULL;
 }
   
 void QmitkRenderWindow::SetCrossHairMenu(QMenu* menu)

@@ -88,7 +88,7 @@ mitk::Geometry2D::Map(const mitk::Point2D &pt2d_mm, mitk::Point3D &pt3d_mm) cons
 
 void 
 mitk::Geometry2D::IndexToWorld(
-  const mitk::Point2D &pt_units, mitk::Point2D &pt_mm) const
+  const mitk::Point2D &/*pt_units*/, mitk::Point2D &/*pt_mm*/) const
 {
   itkExceptionMacro(<< "No general transform possible (only affine) ==> no general" \
     " IndexToWorld(const mitk::Point2D &pt_mm, mitk::Point2D &pt_units)" \
@@ -98,7 +98,7 @@ mitk::Geometry2D::IndexToWorld(
 
 void 
 mitk::Geometry2D::WorldToIndex(
-  const mitk::Point2D &pt_mm, mitk::Point2D &pt_units) const
+  const mitk::Point2D &/*pt_mm*/, mitk::Point2D &/*pt_units*/) const
 {
   itkExceptionMacro(<< "No general back transform possible (only affine) ==> no general" \
     " WorldToIndex(const mitk::Point2D &pt_mm, mitk::Point2D &pt_units)" \
@@ -108,7 +108,7 @@ mitk::Geometry2D::WorldToIndex(
 
 void 
 mitk::Geometry2D::IndexToWorld(const mitk::Point2D &/*atPt2d_units*/, 
-  const mitk::Vector2D &vec_units, mitk::Vector2D &vec_mm) const
+  const mitk::Vector2D &/*vec_units*/, mitk::Vector2D &/*vec_mm*/) const
 {
   itkExceptionMacro(<< "No general transform possible (only affine) ==> no general" \
     " IndexToWorld(const mitk::Vector2D &vec_mm, mitk::Vector2D &vec_units)" \
@@ -118,7 +118,7 @@ mitk::Geometry2D::IndexToWorld(const mitk::Point2D &/*atPt2d_units*/,
 
 void 
 mitk::Geometry2D::WorldToIndex(const mitk::Point2D &/*atPt2d_mm*/,
-  const mitk::Vector2D &vec_mm, mitk::Vector2D &vec_units) const
+  const mitk::Vector2D &/*vec_mm*/, mitk::Vector2D &/*vec_units*/) const
 {
   itkExceptionMacro(<< "No general back transform possible (only affine) ==> no general" \
     " WorldToIndex(const mitk::Vector2D &vec_mm, mitk::Vector2D &vec_units)" \

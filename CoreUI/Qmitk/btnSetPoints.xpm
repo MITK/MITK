@@ -1,5 +1,5 @@
 /* XPM */
-static char * btnSetPoints_xpm[] = {
+static const char * btnSetPoints_xpm[] = {
 "30 30 8 1",
 " 	c None",
 ".	c #000000",

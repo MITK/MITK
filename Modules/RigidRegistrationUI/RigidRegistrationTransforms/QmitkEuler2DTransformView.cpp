@@ -42,7 +42,7 @@ itk::Object::Pointer QmitkEuler2DTransformView::GetTransform()
 }
 
 template < class TPixelType, unsigned int VImageDimension >
-itk::Object::Pointer QmitkEuler2DTransformView::GetTransform2(itk::Image<TPixelType, VImageDimension>* itkImage1)
+itk::Object::Pointer QmitkEuler2DTransformView::GetTransform2(itk::Image<TPixelType, VImageDimension>* /* itkImage1 */)
 {
   if (VImageDimension == 2)
   {
@@ -131,7 +131,7 @@ itk::Array<double> QmitkEuler2DTransformView::GetScales()
   return scales;
 }
 
-vtkTransform* QmitkEuler2DTransformView::Transform(vtkMatrix4x4* vtkmatrix, vtkTransform* vtktransform, itk::Array<double> transformParams)
+vtkTransform* QmitkEuler2DTransformView::Transform(vtkMatrix4x4* /*vtkmatrix*/, vtkTransform* vtktransform, itk::Array<double> transformParams)
 {
   if (m_MovingImage.IsNotNull())
   {

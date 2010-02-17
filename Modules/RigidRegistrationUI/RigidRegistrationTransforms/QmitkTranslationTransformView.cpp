@@ -40,7 +40,7 @@ itk::Object::Pointer QmitkTranslationTransformView::GetTransform()
 }
 
 template < class TPixelType, unsigned int VImageDimension >
-itk::Object::Pointer QmitkTranslationTransformView::GetTransform2(itk::Image<TPixelType, VImageDimension>* itkImage1)
+itk::Object::Pointer QmitkTranslationTransformView::GetTransform2(itk::Image<TPixelType, VImageDimension>* /*itkImage1*/)
 {
   typedef typename itk::Image< TPixelType, VImageDimension >  FixedImageType;
   typedef typename itk::Image< TPixelType, VImageDimension >  MovingImageType;
@@ -98,7 +98,7 @@ itk::Array<double> QmitkTranslationTransformView::GetScales()
   return scales;
 }
 
-vtkTransform* QmitkTranslationTransformView::Transform(vtkMatrix4x4* vtkmatrix, vtkTransform* vtktransform, itk::Array<double> transformParams)
+vtkTransform* QmitkTranslationTransformView::Transform(vtkMatrix4x4* /*vtkmatrix*/, vtkTransform* vtktransform, itk::Array<double> transformParams)
 {
   if (m_MovingImage.IsNotNull())
   {

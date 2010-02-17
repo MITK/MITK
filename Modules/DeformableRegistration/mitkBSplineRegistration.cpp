@@ -44,9 +44,9 @@ namespace mitk {
     m_ResultName("deformedImage.mhd"),   
     m_SaveResult(true),
     m_SaveDeformationField(false),
-    m_Metric(0),
+    m_UpdateInputImage(false),
     m_MatchHistograms(true),    
-    m_UpdateInputImage(false)
+    m_Metric(0)
   {
     m_Observer = mitk::RigidRegistrationObserver::New();
   }
@@ -194,8 +194,8 @@ namespace mitk {
       referenceRescaleFilter->SetInput(fixedImage);
       inputRescaleFilter->SetInput(movingImage);
 
-      const float desiredMinimum =  0.0;
-      const float desiredMaximum =  255.0;
+      TPixel desiredMinimum =  0;
+      TPixel desiredMaximum =  255;
       
       referenceRescaleFilter->SetOutputMinimum( desiredMinimum );
       referenceRescaleFilter->SetOutputMaximum( desiredMaximum );

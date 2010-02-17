@@ -41,7 +41,7 @@ itk::Object::Pointer QmitkKullbackLeiblerCompareHistogramMetricView::GetMetric()
 }
 
 template < class TPixelType, unsigned int VImageDimension >
-itk::Object::Pointer QmitkKullbackLeiblerCompareHistogramMetricView::GetMetric2(itk::Image<TPixelType, VImageDimension>* itkImage1)
+itk::Object::Pointer QmitkKullbackLeiblerCompareHistogramMetricView::GetMetric2(itk::Image<TPixelType, VImageDimension>* /*itkImage1*/)
 {
   typedef typename itk::Image< TPixelType, VImageDimension >  FixedImageType;
   typedef typename itk::Image< TPixelType, VImageDimension >  MovingImageType;

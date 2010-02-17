@@ -164,7 +164,7 @@ void QmitkTransferFunctionWidget::UpdateRanges()
 }  
 
 
-void QmitkTransferFunctionWidget::OnSpanChanged(int lower, int upper) 
+void QmitkTransferFunctionWidget::OnSpanChanged(int /*lower*/, int /*upper*/) 
 {
   //MITK_INFO << "OnSpanChanged, m_RangeSlider: lowerValue: " << lower << "upperValue: " << upper;
 

@@ -385,7 +385,7 @@ int mitkImageTest(int /*argc*/, char* /*argv*/[])
   // there is always a small rounding error
   if(abs(112.225 - val) > 1.0){
     std::cout << "[FAILED]"; 
-    EXIT_FAILURE;
+    return EXIT_FAILURE;
   }
   
   //test by world coordinates
@@ -394,7 +394,7 @@ int mitkImageTest(int /*argc*/, char* /*argv*/[])
 
   if(abs(94.4562 - val) > 1.0){
     std::cout << "[FAILED]"; 
-    EXIT_FAILURE;
+    return EXIT_FAILURE;
   }
 
   std::cout<<"[TEST DONE]"<<std::endl;

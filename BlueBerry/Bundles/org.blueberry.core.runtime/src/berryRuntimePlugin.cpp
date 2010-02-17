@@ -42,7 +42,7 @@ RuntimePlugin::Start(IBundleContext::Pointer context)
 }
 
 void
-RuntimePlugin::Stop(IBundleContext::Pointer context)
+RuntimePlugin::Stop(IBundleContext::Pointer /*context*/)
 {
   //BERRY_INFO << "Runtime plugin activated!\n";
 

@@ -69,7 +69,7 @@ void mitk::PlanarFigure::PlaceFigure( const mitk::Point2D &point )
 
 bool mitk::PlanarFigure::AddControlPoint( const mitk::Point2D &point )
 {
-  int currentNumberOfControlPoints = m_ControlPoints->Size();
+  unsigned int currentNumberOfControlPoints = m_ControlPoints->Size();
 
   MITK_INFO << "AddControlPoint()";
   MITK_INFO << "currentNumberOfControlPoints: " << currentNumberOfControlPoints;

@@ -144,7 +144,7 @@ std::string IntroPart::GetPartName() const
   return GetDefaultTitle();
 }
 
-void IntroPart::Init(IIntroSite::Pointer site, IMemento::Pointer memento)
+void IntroPart::Init(IIntroSite::Pointer site, IMemento::Pointer /*memento*/)
     throw (PartInitException)
 {
   SetSite(site);
@@ -155,13 +155,13 @@ void IntroPart::RemovePropertyListener(IPropertyChangeListener::Pointer l)
   propChangeEvents.RemoveListener(l);
 }
 
-void IntroPart::SaveState(IMemento::Pointer memento)
+void IntroPart::SaveState(IMemento::Pointer /*memento*/)
 {
   //no-op
 }
 
 void IntroPart::SetInitializationData(IConfigurationElement::Pointer cfig,
-    const std::string& propertyName, Object::Pointer data)
+    const std::string& /*propertyName*/, Object::Pointer /*data*/)
 {
 
   // Save config element.

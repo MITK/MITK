@@ -222,7 +222,7 @@ void mitk::MeshMapper2D::Paint( mitk::BaseRenderer *renderer )
     }
 
     //now connect the lines inbetween
-    mitk::Mesh::PointType thisPoint;
+    mitk::Mesh::PointType thisPoint; thisPoint.Fill(0);
     Point2D *firstOfCell = NULL;
     Point2D *lastPoint = NULL;
     unsigned int lastPointId = 0;

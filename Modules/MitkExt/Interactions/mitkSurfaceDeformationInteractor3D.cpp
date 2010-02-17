@@ -110,7 +110,7 @@ float mitk::SurfaceDeformationInteractor3D
     returnValue = 0.5;//it can be understood
   }
 
-  int timeStep = disPosEvent->GetSender()->GetTimeStep();
+  //int timeStep = disPosEvent->GetSender()->GetTimeStep();
 
   //mitk::CurveModel *curveModel = dynamic_cast<mitk::CurveModel *>(
   //  m_DataTreeNode->GetData() );

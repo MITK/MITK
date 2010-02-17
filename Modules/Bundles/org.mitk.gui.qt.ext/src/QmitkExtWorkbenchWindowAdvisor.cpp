@@ -252,7 +252,7 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
       QKeySequence("CTRL+Y"));
   redoAction->setToolTip("execute the last action that was undone again (not supported by all modules)");
 
-  QAction* imageNavigatorAction = editMenu->addAction(QIcon(":/org.mitk.gui.qt.ext/Slider_48.png"), "&Image Navigator", 
+  QAction* imageNavigatorAction = editMenu->addAction(QIcon(":/org.mitk.gui.qt.ext/Slider.png"), "&Image Navigator", 
     QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onImageNavigator()),NULL);
   imageNavigatorAction->setCheckable(true);
 
@@ -323,6 +323,8 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
   for (iter = viewDescriptors.begin(); iter != viewDescriptors.end(); ++iter)
   {
     if ((*iter)->GetId() == "org.blueberry.ui.internal.introview")
+      continue;
+    if ((*iter)->GetId() == "org.mitk.views.imagenavigator")
       continue;
     std::pair<std::string, berry::IViewDescriptor::Pointer> p(
         (*iter)->GetLabel(), (*iter));

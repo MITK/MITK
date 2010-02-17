@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkTestingMacros.h"
 
 #include <iostream>
+#include <fstream>
 
 /**
 *  test for "ImageWriter".
@@ -77,6 +78,32 @@ int mitkImageWriterTest(int  argc , char* argv[])
 
   MITK_TEST_CONDITION_REQUIRED(image.IsNotNull(),"loaded image not NULL")
 
+  // test set/get methods
+  myImageWriter->SetInput(image);
+  MITK_TEST_CONDITION_REQUIRED(myImageWriter->GetInput()==image,"test Set/GetInput()");
+  myImageWriter->SetFileName("test");
+  MITK_TEST_CONDITION_REQUIRED(!strcmp(myImageWriter->GetFileName(),"test"),"test Set/GetFileName()");
+  myImageWriter->SetExtension(".pic");
+  MITK_TEST_CONDITION_REQUIRED(!strcmp(myImageWriter->GetExtension(),".pic"),"test Set/GetExtension()");
+  myImageWriter->SetFilePrefix("pref");
+  MITK_TEST_CONDITION_REQUIRED(!strcmp(myImageWriter->GetFilePrefix(),"pref"),"test Set/GetFilePrefix()");
+  myImageWriter->SetFilePattern("pattern");
+  MITK_TEST_CONDITION_REQUIRED(!strcmp(myImageWriter->GetFilePattern(),"pattern"),"test Set/GetFilePattern()");
+  // write image
+  try
+  {
+    myImageWriter->Update();
+    bool flag = false;
+    std::fstream fin;
+    fin.open("test.pic",std::ios::in);
+    MITK_TEST_CONDITION_REQUIRED(fin.is_open(),"Write file");
+    fin.close();
+    remove("test.pic");
+  }
+  catch (...)
+  {
+    MITK_TEST_FAILED_MSG(<< "Exception during file writing");
+  }
 
   // test for exception handling
   try

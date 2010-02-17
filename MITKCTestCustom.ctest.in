@@ -5,5 +5,7 @@ SET(CTEST_CUSTOM_WARNING_EXCEPTION
   "Utilities/qwt/"
   "Utilities/qxt"
   "Utilities/tinyxml/"
+  "QtCore"
+  "QtGui"
 )
 

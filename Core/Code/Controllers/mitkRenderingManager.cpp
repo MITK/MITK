@@ -47,6 +47,8 @@ RenderingManager
 {
   m_ShadingEnabled.assign( 3, false );
   m_ShadingValues.assign( 4, 0.0 );
+
+  InitializePropertyList();
 }
 
 
@@ -928,6 +930,34 @@ void RenderingManager::SetMaxNumberOfPeels( int maxNumber )
     baseRenderer->SetMaxNumberOfPeels(maxNumber);
   }
 }
+
+void RenderingManager::InitializePropertyList()
+{
+  if (m_PropertyList.IsNull())
+  {
+    m_PropertyList = PropertyList::New();
+  }
+
+  this->SetProperty("coupled-zoom", BoolProperty::New(false));
+  this->SetProperty("coupled-plane-rotation", BoolProperty::New(false));
+  this->SetProperty("MIP-slice-rendering", BoolProperty::New(false));
+}
+
+PropertyList::Pointer RenderingManager::GetPropertyList() const
+{
+  return m_PropertyList;
+}
+
+BaseProperty* RenderingManager::GetProperty(const char *propertyKey) const
+{
+  return m_PropertyList->GetProperty(propertyKey);
+}
+
+void RenderingManager::SetProperty(const char *propertyKey, BaseProperty* propertyValue)
+{
+  m_PropertyList->SetProperty(propertyKey, propertyValue);
+}
+
 // Create and register generic RenderingManagerFactory.
 GenericRenderingManagerFactory renderingManagerFactory;
 

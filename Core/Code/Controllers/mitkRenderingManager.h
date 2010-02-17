@@ -27,6 +27,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkObject.h>
 #include <itkObjectFactory.h>
 
+#include "mitkPropertyList.h"
+#include "mitkProperties.h"
+
 class vtkRenderWindow;
 class vtkObject;
 
@@ -238,6 +241,15 @@ public:
 
   FloatVector &GetShadingValues();
 
+  /** Returns a property list */
+  PropertyList::Pointer GetPropertyList() const;
+
+  /** returns a property from m_PropertyList */
+  BaseProperty* GetProperty(const char *propertyKey) const;
+
+  /** returns sets or adds (if not present) a property in m_PropertyList  */
+  void SetProperty(const char *propertyKey, BaseProperty* propertyValue);
+
 
 protected:
   enum
@@ -252,6 +264,8 @@ protected:
   /** Abstract method for generating a system specific event for rendering
    * request. This method is called whenever an update is requested */
   virtual void GenerateRenderingRequestEvent() = 0;
+
+  virtual void InitializePropertyList();
 
   bool m_UpdatePending;
 
@@ -300,6 +314,8 @@ protected:
 
   static RenderingManager::Pointer s_Instance;
   static RenderingManagerFactory *s_RenderingManagerFactory;
+
+  PropertyList::Pointer m_PropertyList;
 
 private:
 

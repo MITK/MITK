@@ -57,9 +57,9 @@ SET(CPP_FILES
   DataManagement/mitkClippingProperty.cpp
   DataManagement/mitkColorProperty.cpp
   DataManagement/mitkDataStorage.cpp
-  DataManagement/mitkDataTree.cpp
+  #DataManagement/mitkDataTree.cpp
   DataManagement/mitkDataTreeNode.cpp
-  DataManagement/mitkDataTreeStorage.cpp
+  #DataManagement/mitkDataTreeStorage.cpp
   DataManagement/mitkDisplayGeometry.cpp
   DataManagement/mitkEnumerationProperty.cpp
   DataManagement/mitkGeometry2D.cpp

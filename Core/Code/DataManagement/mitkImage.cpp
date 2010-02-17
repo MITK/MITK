@@ -1189,6 +1189,8 @@ void mitk::_ComputeExtremaInItkImage(ItkImageType* itkImage, mitk::Image* mitkIm
   typedef typename ItkImageType::PixelType TPixel;
   TPixel value = 0;
 
+  if ( !mitkImage || !mitkImage->IsValidTimeStep( t ) ) return;
+  mitkImage->Expand(t+1); // make sure we have initialized all arrays
   mitkImage->m_CountOfMinValuedVoxels[t] = 0;
   mitkImage->m_CountOfMaxValuedVoxels[t] = 0;
 
@@ -1287,22 +1289,22 @@ void mitk::Image::ResetImageStatistics() const
 
 void mitk::Image::ComputeImageStatistics(int t) const
 {
+  // timestep valid?
+  if (!IsValidTimeStep(t)) return;
+
+  // image modified?
+  if (this->GetMTime() > m_LastRecomputeTimeStamp.GetMTime())
+    this->ResetImageStatistics();
+
+  // adapt vector length
+  this->Expand(t+1);
+
+  // do we have valid information already?
+  if( m_ScalarMin[t] != itk::NumericTraits<ScalarType>::max() || 
+    m_Scalar2ndMin[t] != itk::NumericTraits<ScalarType>::max() ) return; // Values already calculated before...
+
   if(this->m_PixelType.GetNumberOfComponents() == 1)
   {
-    // timestep valid?
-    if (!IsValidTimeStep(t)) return;
-
-    // image modified?
-    if (this->GetMTime() > m_LastRecomputeTimeStamp.GetMTime())
-      this->ResetImageStatistics();
-
-    // adapt vector length
-    this->Expand(t+1);
-
-    // do we have valid information already?
-    if( m_ScalarMin[t] != itk::NumericTraits<ScalarType>::max() || 
-      m_Scalar2ndMin[t] != itk::NumericTraits<ScalarType>::max() ) return; // Values already calculated before...
-
     // recompute
     mitk::ImageTimeSelector* timeSelector = this->GetTimeSelector();
     if(timeSelector!=NULL)

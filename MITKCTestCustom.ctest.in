@@ -1,0 +1,9 @@
+# suppress a couple of MITK external warnings for better overview
+SET(CTEST_CUSTOM_WARNING_EXCEPTION
+  ${CTEST_CUSTOM_WARNING_EXCEPTION}
+  "Utilities/Poco/"
+  "Utilities/qwt/"
+  "Utilities/qxt"
+  "Utilities/tinyxml/"
+)
+

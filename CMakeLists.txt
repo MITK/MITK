@@ -401,3 +401,10 @@ ENDIF(WIN32)
 INCLUDE(InstallRequiredSystemLibraries)
 # include CPack model once all variables are set
 INCLUDE(CPack)
+
+
+# suppress a couple of warnings
+CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/MITKCTestCustom.ctest.in
+${MITK_BINARY_DIR}/CTestCustom.ctest @ONLY)
+FILE(WRITE ${MITK_BINARY_DIR}/CTestCustom.cmake
+"INCLUDE(\"${MITK_BINARY_DIR}/CTestCustom.ctest\")\n")

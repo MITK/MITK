@@ -96,9 +96,9 @@ QmitkMovieMaker::QmitkMovieMaker(QObject *parent, const char * /*name*/)
 
   if (m_movieGenerator.IsNull())
   {
-    std::cerr << "Either mitk::MovieGenerator is not implemented for your";
-    std::cerr << " platform or an error occurred during";
-    std::cerr << " mitk::MovieGenerator::New()" << std::endl;
+    MITK_ERROR << "Either mitk::MovieGenerator is not implemented for your";
+    MITK_ERROR << " platform or an error occurred during";
+    MITK_ERROR << " mitk::MovieGenerator::New()" ;
   }
 
 }
@@ -165,7 +165,8 @@ void QmitkMovieMaker::CreateConnections()
     // radio button group: spatial, temporal
     connect((QObject*) m_Controls->rbtnSpatial, SIGNAL(clicked()), this, SLOT(RBTNSpatial()));
     connect((QObject*) m_Controls->rbtnTemporal, SIGNAL(clicked()), this, SLOT(RBTNTemporal()));
-    connect((QObject*) m_Controls->rbtnCombined, SIGNAL(clicked()), this, SLOT(RBTNCombined()));connect( this, SIGNAL(SwitchAspect(int)), this, SLOT(SetAspect(int)) );
+    connect((QObject*) m_Controls->rbtnCombined, SIGNAL(clicked()), this, SLOT(RBTNCombined()));
+    connect( this, SIGNAL(SwitchAspect(int)), this, SLOT(SetAspect(int)) );
 
     // stepper window selection
     connect((QObject*) (m_Controls->cmbSelectedStepperWindow), SIGNAL ( activated ( int) ), (QObject*) this, SLOT ( SetStepperWindow (int) ) );
@@ -193,6 +194,10 @@ void QmitkMovieMaker::CreateConnections()
 
     connect((QObject*) this, SIGNAL(EndBlockControlsMovieDeactive()), (QObject*) this, SLOT(
         UnBlockControlsMovieDeactive()));
+
+    // allow for change of spatialtime relation
+    connect((QObject*) m_Controls->spatialTimeRelation, SIGNAL(valueChanged ( int ) ), this, SLOT( DeleteMStepper() ) );
+    
   }
 }
 
@@ -206,8 +211,7 @@ void QmitkMovieMaker::Activated()
   // set the callback function of the member command
   stepperChangedCommand->SetCallbackFunction(this, &QmitkMovieMaker::UpdateGUI);
   // add an observer to the data tree node pointer connected to the above member command
-  std::cout << "Add observer on insertion point node in NavigationPathController::AddObservers"
-      << std::endl;
+  MITK_INFO << "Add observer on insertion point node in NavigationPathController::AddObservers";
   m_StepperObserverTag = this->GetTemporalController()->GetTime()->AddObserver(
       itk::ModifiedEvent(), stepperChangedCommand);
 
@@ -370,6 +374,9 @@ void QmitkMovieMaker::SetStepperWindow(int window)
   const mitk::RenderingManager::RenderWindowVector rwv =
       mitk::RenderingManager::GetInstance()->GetAllRegisteredRenderWindows();
 
+  //Delete MultiStepper
+  DeleteMStepper();
+
   int i;
   mitk::RenderingManager::RenderWindowVector::const_iterator iter;
   for (iter = rwv.begin(), i = 0; iter != rwv.end(); ++iter, ++i)
@@ -388,6 +395,9 @@ void QmitkMovieMaker::SetRecordingWindow(int window)
   // Set newly selected window for recording
   const mitk::RenderingManager::RenderWindowVector rwv =
       mitk::RenderingManager::GetInstance()->GetAllRegisteredRenderWindows();
+
+  //Delete MultiStepper
+  DeleteMStepper();
 
   int i;
   mitk::RenderingManager::RenderWindowVector::const_iterator iter;
@@ -441,7 +451,7 @@ mitk::Stepper* QmitkMovieMaker::GetAspectStepper()
     return this->GetTemporalController()->GetTime();
   }
   else if (m_Aspect == 2)
-  {
+  {   
     if (m_Stepper.IsNull())
     {
       int rel = m_Controls->spatialTimeRelation->value();
@@ -459,6 +469,7 @@ mitk::Stepper* QmitkMovieMaker::GetAspectStepper()
       m_Stepper->AddStepper(this->GetSpatialController()->GetSlice(), sliceRepeat);
       m_Stepper->AddStepper(this->GetTemporalController()->GetTime(), timeRepeat);
     }
+
     return m_Stepper.GetPointer();
   }
   else
@@ -496,9 +507,9 @@ void QmitkMovieMaker::GenerateMovie()
   }
   else
   {
-    std::cerr << "Either mitk::MovieGenerator is not implemented for your";
-    std::cerr << " platform or an error occurred during";
-    std::cerr << " mitk::MovieGenerator::New()" << std::endl;
+    MITK_ERROR << "Either mitk::MovieGenerator is not implemented for your";
+    MITK_ERROR << " platform or an error occurred during";
+    MITK_ERROR << " mitk::MovieGenerator::New()";
 
     emit EndBlockControlsMovieDeactive();
   }
@@ -735,3 +746,8 @@ void QmitkMovieMaker::TakeScreenshot(vtkRenderer* renderer, unsigned int magnifi
   renderer->GetRenderWindow()->SetDoubleBuffer(doubleBuffering);
 }
 
+void QmitkMovieMaker::DeleteMStepper()
+{
+  m_Stepper = NULL;
+  UpdateLooping();
+}

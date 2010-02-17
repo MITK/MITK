@@ -236,6 +236,8 @@ protected slots:
   void UnBlockControlsMovieDeactive();
   void BlockControls(bool blocked);
 
+  void DeleteMStepper();
+
   signals:
 
   void SwitchDirection(int);

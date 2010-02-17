@@ -95,7 +95,6 @@ class MITK_CORE_EXPORT ApplicationCursor
   private:
     
     static ApplicationCursorImplementation* m_Implementation;
-    static ApplicationCursor* m_Instance;
 };
 
 } // namespace

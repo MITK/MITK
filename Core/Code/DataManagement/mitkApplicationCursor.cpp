@@ -19,7 +19,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <iostream>
 
-mitk::ApplicationCursor* mitk::ApplicationCursor::m_Instance = NULL;
 mitk::ApplicationCursorImplementation* mitk::ApplicationCursor::m_Implementation = NULL;
 
 namespace mitk {
@@ -30,6 +29,7 @@ ApplicationCursor::ApplicationCursor()
 
 ApplicationCursor* ApplicationCursor::GetInstance()
 {
+  static ApplicationCursor* m_Instance = NULL;
   if (!m_Instance)
   {
     m_Instance = new ApplicationCursor();

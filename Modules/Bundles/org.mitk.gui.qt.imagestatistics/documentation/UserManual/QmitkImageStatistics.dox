@@ -1,0 +1,42 @@
+/**
+\bundlemainpage{org.imagestatistics} The Image Statistics Module
+
+\image html ImageStatistic_48.png "Icon of the Module"
+
+\section QmitkImageStatisticsUserManualSummary Summary
+
+This module provides an easy interface to quickly compute some features of a whole image or a region of interest.
+
+This document will tell you how to use this module, but it is assumed that you already know how to use MITK in general.
+
+Please see \ref QmitkImageStatisticsUserManualDetails for more detailed information on usage and supported filters.
+If you encounter problems using the module, please have a look at the \ref QmitkImageStatisticsUserManualTrouble page.
+
+\section QmitkImageStatisticsUserManualDetails Details
+
+Manual sections:
+
+- \ref QmitkImageStatisticsUserManualOverview 
+- \ref QmitkImageStatisticsUserManualUsage
+- \ref QmitkImageStatisticsUserManualTrouble
+
+\section QmitkImageStatisticsUserManualOverview Overview
+
+This module provides an easy interface to quickly compute some features of a whole image or a region of interest.
+
+\section QmitkImageStatisticsUserManualUsage Usage
+
+After selection of an image or a binary mask of an image in the datamanader the Image Statistics module shows some statistical information. If a mask is selected the name of the mask and the name of the image this mask is applied to are shown at the top.
+
+Below that are the statistics window, which displays the calculated statistical features (such as mean, standard deviation...) and the histogram.
+
+At the bottom of the module are two buttons. They copy their respective data in csv format to the clipboard.
+
+\section QmitkImageStatisticsUserManualTrouble Troubleshooting
+
+No known problems.
+
+<B>All other problems.</B><BR>
+Please report to the MITK mailing list.
+See http://www.mitk.org/wiki/Mailinglist on how to do this.
+*/

@@ -311,8 +311,8 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
   for (std::vector<berry::IPerspectiveDescriptor::Pointer>::iterator perspIt =
       perspectives.begin(); perspIt != perspectives.end(); ++perspIt)
   {
-    // QAction* perspAction = new berry::QtOpenPerspectiveAction(window,
-    //    *perspIt, perspGroup);
+    QAction* perspAction = new berry::QtOpenPerspectiveAction(window,
+        *perspIt, perspGroup);
   }
   perspMenu->addActions(perspGroup->actions());
 

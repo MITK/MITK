@@ -32,7 +32,7 @@ mitk::SurfaceVtkWriter<VTKWRITER>::SurfaceVtkWriter()
 {
   this->SetNumberOfRequiredInputs( 1 );
 
-  m_VtkWriter = VtkWriterType::New();
+  m_VtkWriter = vtkSmartPointer<VtkWriterType>::New();
 
   //enable to write ascii-formatted-file
   //m_VtkWriter->SetFileTypeToASCII();
@@ -82,7 +82,7 @@ void mitk::SurfaceVtkWriter<VTKWRITER>::GenerateData()
 
   mitk::Surface::Pointer input = const_cast<mitk::Surface*>(this->GetInput());
 
-  vtkSmartPointer<vtkTransformPolyDataFilter> transformPolyData = vtkTransformPolyDataFilter::New();
+  vtkSmartPointer<vtkTransformPolyDataFilter> transformPolyData = vtkSmartPointer<vtkTransformPolyDataFilter>::New();
   vtkPolyData * polyData;
   Geometry3D* geometry;
 

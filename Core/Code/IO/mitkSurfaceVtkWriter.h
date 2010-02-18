@@ -183,7 +183,7 @@ protected:
 
     std::string m_MimeType;
 
-    VtkWriterType* m_VtkWriter;
+    vtkSmartPointer<VtkWriterType> m_VtkWriter;
   
     bool m_WriterWriteHasReturnValue;
 };

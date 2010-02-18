@@ -37,10 +37,10 @@ void mitk::STLFileReader::GenerateData()
   if( m_FileName != "")
   {
     MITK_INFO << "Loading " << m_FileName << " as stl..." << std::endl;
-    vtkSmartPointer<vtkSTLReader> stlReader = vtkSTLReader::New();
+    vtkSmartPointer<vtkSTLReader> stlReader = vtkSmartPointer<vtkSTLReader>::New();
     stlReader->SetFileName( m_FileName.c_str() );
 
-    vtkSmartPointer<vtkPolyDataNormals> normalsGenerator = vtkPolyDataNormals::New();
+    vtkSmartPointer<vtkPolyDataNormals> normalsGenerator = vtkSmartPointer<vtkPolyDataNormals>::New();
     normalsGenerator->SetInput( stlReader->GetOutput() );
     
     normalsGenerator->Update();

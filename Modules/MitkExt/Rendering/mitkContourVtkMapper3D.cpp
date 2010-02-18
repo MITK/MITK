@@ -73,8 +73,8 @@ void mitk::ContourVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
 
   if ( makeContour )
   {
-    vtkSmartPointer<vtkPoints> points = vtkPoints::New();
-    vtkSmartPointer<vtkCellArray> lines = vtkCellArray::New();
+    vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
+    vtkSmartPointer<vtkCellArray> lines = vtkSmartPointer<vtkCellArray>::New();
 
     int numPts=input->GetNumberOfPoints();
     if ( numPts > 200000 )
@@ -117,14 +117,13 @@ void mitk::ContourVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
 
       if ( showPoints )
       {
-        vtkSphereSource *sphere = vtkSphereSource::New();
+        vtkSmartPointer<vtkSphereSource> sphere = vtkSmartPointer<vtkSphereSource>::New();
 
         sphere->SetRadius(pointSize);
         sphere->SetCenter(vtkpoint);
 
         m_VtkPointList->AddInput(sphere->GetOutput());
         sphere->Update();
-        sphere->Delete();
       }
     }
 

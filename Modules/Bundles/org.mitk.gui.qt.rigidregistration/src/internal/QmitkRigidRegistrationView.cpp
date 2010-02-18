@@ -163,8 +163,14 @@ QmitkRigidRegistrationView::QmitkRigidRegistrationView(QObject * /*parent*/, con
   m_RotateSliderPos[0] = 0;
   m_RotateSliderPos[1] = 0;
   m_RotateSliderPos[2] = 0;
+
+  m_ScaleSliderPos[0] = 0;
+  m_ScaleSliderPos[1] = 0;
+  m_ScaleSliderPos[2] = 0;
+
   translationParams = new int[3];
   rotationParams = new int[3];
+  scalingParams = new int[3];
 
   m_TimeStepperAdapter = NULL;
 }
@@ -245,6 +251,9 @@ void QmitkRigidRegistrationView::CreateConnections()
   connect(m_Controls.m_XRotSlider, SIGNAL(valueChanged(int)), this, SLOT(xRot_valueChanged(int)));
   connect(m_Controls.m_YRotSlider, SIGNAL(valueChanged(int)), this, SLOT(yRot_valueChanged(int)));
   connect(m_Controls.m_ZRotSlider, SIGNAL(valueChanged(int)), this, SLOT(zRot_valueChanged(int)));
+  connect(m_Controls.m_XScaleSlider, SIGNAL(valueChanged(int)), this, SLOT(xScale_valueChanged(int)));
+  connect(m_Controls.m_YScaleSlider, SIGNAL(valueChanged(int)), this, SLOT(yScale_valueChanged(int)));
+  connect(m_Controls.m_ZScaleSlider, SIGNAL(valueChanged(int)), this, SLOT(zScale_valueChanged(int)));
   connect(m_Controls.m_LoadRigidRegistrationParameter, SIGNAL(clicked()), m_Controls.qmitkRigidRegistrationSelector1, SLOT(LoadRigidRegistrationParameter()));
   connect(m_Controls.m_SaveRigidRegistrationParameter, SIGNAL(clicked()), m_Controls.qmitkRigidRegistrationSelector1, SLOT(SaveRigidRegistrationParameter()));
   connect(m_Controls.m_LoadRigidRegistrationTestParameter, SIGNAL(clicked()), m_Controls.qmitkRigidRegistrationSelector1, SLOT(LoadRigidRegistrationTestParameter()));
@@ -790,6 +799,91 @@ void QmitkRigidRegistrationView::Rotate(int* rotateVector)
   }
 }
 
+void QmitkRigidRegistrationView::Scale(int* scaleVector)
+{ 
+  if (m_MovingNode.IsNotNull())
+  {
+
+    mitk::Vector3D scaleVec; 
+
+    scaleVec[0] = scaleVector[0] - m_ScaleSliderPos[0];
+    scaleVec[1] = scaleVector[1] - m_ScaleSliderPos[1];
+    scaleVec[2] = scaleVector[2] - m_ScaleSliderPos[2];
+
+    m_ScaleSliderPos[0] = scaleVector[0];
+    m_ScaleSliderPos[1] = scaleVector[1];
+    m_ScaleSliderPos[2] = scaleVector[2];
+
+    vtkMatrix4x4* scalingMatrix = vtkMatrix4x4::New();
+    scalingMatrix->Identity();
+
+    double (*scaleMatrix)[4] = scalingMatrix->Element;
+
+    if (scaleVec[0] >= 0)
+    {
+      for(int i = 0; i<scaleVec[0]; i++)
+      {
+        scaleMatrix[0][0] *= 0.95;
+      }    
+    }
+    else
+    {
+      for(int i = 0; i<-scaleVec[0]; i++)
+      {
+        scaleMatrix[0][0] *= 1/0.95;
+      }
+    }
+
+    if (scaleVec[1] >= 0)
+    {
+      for(int i = 0; i<scaleVec[1]; i++)
+      {
+        scaleMatrix[1][1] *= 0.95;
+      }    
+    }
+    else
+    {
+      for(int i = 0; i<-scaleVec[1]; i++)
+      {
+        scaleMatrix[1][1] *= 1/0.95;
+      }
+    }
+
+    if (scaleVec[2] >= 0)
+    {
+      for(int i = 0; i<scaleVec[2]; i++)
+      {
+        scaleMatrix[2][2] *= 0.95;
+      }    
+    }
+    else
+    {
+      for(int i = 0; i<-scaleVec[2]; i++)
+      {
+        scaleMatrix[2][2] *= 1/0.95;
+      }
+    }
+
+    scalingMatrix->Invert();
+
+    m_MovingNode->GetData()->GetGeometry()->Compose( scalingMatrix );
+    m_MovingNode->GetData()->Modified();
+    mitk::DataStorage::SetOfObjects::ConstPointer children = this->GetDataStorage()->GetDerivations(m_MovingNode);
+    unsigned long size;
+    size = children->Size();
+    mitk::DataTreeNode::Pointer childNode;
+    for (unsigned long i = 0; i < size; ++i)
+    {
+      childNode = children->GetElement(i);
+      childNode->GetData()->GetGeometry()->Compose( scalingMatrix );
+      childNode->GetData()->Modified();
+    }
+    m_RedoGeometryList.clear();
+
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  }
+}
+
 void QmitkRigidRegistrationView::AlignCenters()
 {
   if (m_FixedNode.IsNotNull() && m_MovingNode.IsNotNull())
@@ -934,6 +1028,51 @@ void QmitkRigidRegistrationView::zRot_valueChanged( int v )
   }
 }
 
+void QmitkRigidRegistrationView::xScale_valueChanged( int v )
+{
+  if (m_MovingNode.IsNotNull())
+  {
+    scalingParams[0]=v;
+    scalingParams[1]=m_Controls.m_YScaleSlider->value();
+    scalingParams[2]=m_Controls.m_ZScaleSlider->value();
+    Scale(scalingParams);
+  }
+  else
+  {
+    MovingImageChanged();
+  }
+}
+
+void QmitkRigidRegistrationView::yScale_valueChanged( int v )
+{
+  if (m_MovingNode.IsNotNull())
+  {
+    scalingParams[0]=m_Controls.m_XScaleSlider->value();
+    scalingParams[1]=v;
+    scalingParams[2]=m_Controls.m_ZScaleSlider->value();
+    Scale(scalingParams);
+  }
+  else
+  {
+    MovingImageChanged();
+  }
+}
+
+void QmitkRigidRegistrationView::zScale_valueChanged( int v )
+{
+  if (m_MovingNode.IsNotNull())
+  {
+    scalingParams[0]=m_Controls.m_XScaleSlider->value();
+    scalingParams[1]=m_Controls.m_YScaleSlider->value();
+    scalingParams[2]=v;
+    Scale(scalingParams);
+  }
+  else
+  {
+    MovingImageChanged();
+  }
+}
+
 void QmitkRigidRegistrationView::MovingImageChanged()
 {
   if (dynamic_cast<mitk::Image*>(m_MovingNode->GetData()))
@@ -950,6 +1089,12 @@ void QmitkRigidRegistrationView::MovingImageChanged()
     rotationParams[0]=0;
     rotationParams[1]=0;
     rotationParams[2]=0;
+    m_Controls.m_XScaleSlider->setValue(0);
+    m_Controls.m_YScaleSlider->setValue(0);
+    m_Controls.m_ZScaleSlider->setValue(0);
+    scalingParams[0]=0;
+    scalingParams[1]=0;
+    scalingParams[2]=0;
     m_MovingDimension = dynamic_cast<mitk::Image*>(m_MovingNode->GetData())->GetDimension();
     m_Controls.qmitkRigidRegistrationSelector1->SetMovingDimension(m_MovingDimension);
     m_Controls.qmitkRigidRegistrationSelector1->SetMovingNode(m_MovingNode);

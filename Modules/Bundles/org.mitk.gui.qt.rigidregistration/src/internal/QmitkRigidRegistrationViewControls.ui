@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>381</width>
-    <height>577</height>
+    <height>720</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -392,12 +392,6 @@
              <enum>QFrame::Raised</enum>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_4">
-             <property name="spacing">
-              <number>0</number>
-             </property>
-             <property name="margin">
-              <number>0</number>
-             </property>
              <item>
               <layout class="QHBoxLayout" name="horizontalLayout_5">
                <item>
@@ -749,6 +743,150 @@
                          </property>
                          <property name="maximum">
                           <number>20</number>
+                         </property>
+                         <property name="orientation">
+                          <enum>Qt::Horizontal</enum>
+                         </property>
+                        </widget>
+                       </item>
+                      </layout>
+                     </item>
+                    </layout>
+                   </item>
+                  </layout>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QGroupBox" name="interactiveScalingBox">
+                  <property name="font">
+                   <font>
+                    <weight>75</weight>
+                    <bold>true</bold>
+                   </font>
+                  </property>
+                  <property name="title">
+                   <string>Interactive Scaling</string>
+                  </property>
+                  <property name="flat">
+                   <bool>true</bool>
+                  </property>
+                  <layout class="QVBoxLayout" name="verticalLayout_10">
+                   <property name="margin">
+                    <number>0</number>
+                   </property>
+                   <item>
+                    <layout class="QHBoxLayout" name="_16">
+                     <item>
+                      <layout class="QVBoxLayout" name="_17">
+                       <item>
+                        <widget class="QLabel" name="xScalingLabel">
+                         <property name="font">
+                          <font>
+                           <weight>50</weight>
+                           <bold>false</bold>
+                          </font>
+                         </property>
+                         <property name="text">
+                          <string>x-Direction (Frontal):</string>
+                         </property>
+                         <property name="wordWrap">
+                          <bool>false</bool>
+                         </property>
+                        </widget>
+                       </item>
+                       <item>
+                        <widget class="QLabel" name="yScalingLabel">
+                         <property name="font">
+                          <font>
+                           <weight>50</weight>
+                           <bold>false</bold>
+                          </font>
+                         </property>
+                         <property name="text">
+                          <string>y-Direction (Sagittal):</string>
+                         </property>
+                         <property name="wordWrap">
+                          <bool>false</bool>
+                         </property>
+                        </widget>
+                       </item>
+                       <item>
+                        <widget class="QLabel" name="zScalingLabel">
+                         <property name="font">
+                          <font>
+                           <weight>50</weight>
+                           <bold>false</bold>
+                          </font>
+                         </property>
+                         <property name="text">
+                          <string>z-Direction (Transversal):</string>
+                         </property>
+                         <property name="wordWrap">
+                          <bool>false</bool>
+                         </property>
+                        </widget>
+                       </item>
+                      </layout>
+                     </item>
+                     <item>
+                      <layout class="QVBoxLayout" name="_18">
+                       <item>
+                        <widget class="QSlider" name="m_XScaleSlider">
+                         <property name="cursor">
+                          <cursorShape>ArrowCursor</cursorShape>
+                         </property>
+                         <property name="toolTip">
+                          <string/>
+                         </property>
+                         <property name="minimum">
+                          <number>-20</number>
+                         </property>
+                         <property name="maximum">
+                          <number>20</number>
+                         </property>
+                         <property name="singleStep">
+                          <number>1</number>
+                         </property>
+                         <property name="pageStep">
+                          <number>1</number>
+                         </property>
+                         <property name="orientation">
+                          <enum>Qt::Horizontal</enum>
+                         </property>
+                         <property name="invertedAppearance">
+                          <bool>false</bool>
+                         </property>
+                         <property name="tickPosition">
+                          <enum>QSlider::NoTicks</enum>
+                         </property>
+                        </widget>
+                       </item>
+                       <item>
+                        <widget class="QSlider" name="m_YScaleSlider">
+                         <property name="minimum">
+                          <number>-20</number>
+                         </property>
+                         <property name="maximum">
+                          <number>20</number>
+                         </property>
+                         <property name="pageStep">
+                          <number>1</number>
+                         </property>
+                         <property name="orientation">
+                          <enum>Qt::Horizontal</enum>
+                         </property>
+                        </widget>
+                       </item>
+                       <item>
+                        <widget class="QSlider" name="m_ZScaleSlider">
+                         <property name="minimum">
+                          <number>-20</number>
+                         </property>
+                         <property name="maximum">
+                          <number>20</number>
+                         </property>
+                         <property name="pageStep">
+                          <number>1</number>
                          </property>
                          <property name="orientation">
                           <enum>Qt::Horizontal</enum>

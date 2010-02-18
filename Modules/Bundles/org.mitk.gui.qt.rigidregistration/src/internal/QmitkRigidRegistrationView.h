@@ -148,6 +148,13 @@ class RIGIDREGISTRATION_EXPORT QmitkRigidRegistrationView : public QObject, publ
     void Rotate(int* rotateVector);
 
     /*!
+    * \brief Scales the moving image in x, y and z direction given by scaleVector
+    *
+    * @param scaleVector Contains the scaling around x, y and z axis.
+    */
+    void Scale(int* scaleVector);
+
+    /*!
     * \brief Automatically aligns the image centers.
     */
     void AlignCenters();
@@ -206,6 +213,12 @@ class RIGIDREGISTRATION_EXPORT QmitkRigidRegistrationView : public QObject, publ
 
     void zRot_valueChanged( int v );
 
+    void xScale_valueChanged( int v );
+
+    void yScale_valueChanged( int v );
+
+    void zScale_valueChanged( int v );
+
     void MovingImageChanged();
 
     /*!
@@ -262,10 +275,12 @@ class RIGIDREGISTRATION_EXPORT QmitkRigidRegistrationView : public QObject, publ
     int m_MovingDimension;
     int * translationParams;
     int * rotationParams;
+    int * scalingParams;
     mitk::Color m_FixedColor;
     mitk::Color m_MovingColor;
     int m_TranslateSliderPos[3];
     int m_RotateSliderPos[3];
+    int m_ScaleSliderPos[3];
 
     QmitkStepperAdapter*      m_TimeStepperAdapter;
 };

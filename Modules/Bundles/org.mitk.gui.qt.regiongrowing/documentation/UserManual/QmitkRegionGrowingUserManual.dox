@@ -1,6 +1,8 @@
 /**
 \bundlemainpage{org.regiongrowing} The Region Growing Module
 
+\image html icon.xpm "Icon of the Module"
+
 Available documentation sections:
 - \ref QmitkRegionGrowingUserManualOverview
 - \ref QmitkRegionGrowingUserManualUsage

@@ -1,5 +1,8 @@
 /**
 \bundlemainpage{org.imagenavigator} The Image Navigator
+
+\image html Slider.png "Icon of the Module"
+
 \image html ImageNavigator.png "Image Navigator"
 
 Fast movement through the available data can be achieved by using the Image Navigator. By moving the sliders around you can scroll quickly through the slides and timesteps. By entering numbers in the relevant fields you can jump directly to your point of interest.

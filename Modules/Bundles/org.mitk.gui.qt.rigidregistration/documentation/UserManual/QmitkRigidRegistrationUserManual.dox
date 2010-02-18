@@ -1,6 +1,8 @@
 /**
 \bundlemainpage{org.rigid.regis} The Rigid Registration Module
 
+\image html RigidRegistration.xpm "Icon of the Module"
+
 Available sections:
   - \ref QmitkRigidRegistrationUserManualOverview 
   - \ref QmitkRigidRegistrationUserManualIssues 

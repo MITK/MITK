@@ -1,6 +1,7 @@
 /**
 \bundlemainpage{org.measure} Measurement 
-\image html Measurement_48.png 
+
+\image html Measurement_48.png "Icon of the Module"
 
 \section QmitkMeasurementUserManualOverview Overview
 

@@ -1,6 +1,8 @@
 /**
 \bundlemainpage{org.segment} The Segmentation Module
 
+\image html segmentation.png "Icon of the Module"
+
 <i>Some of the below described features are not available in the open-source part of the MITK-3M3-Application.</i>
 
 Available sections:

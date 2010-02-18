@@ -2,6 +2,7 @@
 
 \bundlemainpage{org.moviemaker} The Movie Maker Module
 
+\image html icon.xpm "Icon of the Module"
 
 Available sections:
   - \ref QmitkMovieMakerUserManualOverview 

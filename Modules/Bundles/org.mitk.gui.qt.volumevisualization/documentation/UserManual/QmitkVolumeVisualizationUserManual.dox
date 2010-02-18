@@ -1,6 +1,8 @@
 /**
 \bundlemainpage{org.volvis} The Volume Visualization Module
 
+\image html icon.xpm "Icon of the Module"
+
 Available sections:
 <ul>
 <li> \ref QVV_Overview

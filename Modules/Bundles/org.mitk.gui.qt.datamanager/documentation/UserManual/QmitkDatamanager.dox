@@ -2,6 +2,8 @@
 
 \bundlemainpage{org.datamanager} The DataManager
 
+\image html DataManager_48.png "Icon of the Module"
+
 \section QmitkDataManagerOverview Overview
 
 The Datamanager is the central componenent to manage medical data like images, surfaces, etc.. 

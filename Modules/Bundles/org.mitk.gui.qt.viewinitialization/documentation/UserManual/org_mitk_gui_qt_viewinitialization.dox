@@ -1,6 +1,8 @@
 /**
 \bundlemainpage{org.viewinitialitzation} The View Initialization
 
+\image html viewInitializationIcon.xpm "Icon of the Module"
+
 This view serves as a sandbox for experimenting with and understanding the geometry initialization parameters. For example to view the transversal slices from above instead of from below. It is not intended for end users, but for developers.
 
 */

@@ -1,6 +1,8 @@
 /**
 \bundlemainpage{org.pointsetinteraction} The Point Set Interaction Module
 
+\image html pointset_interaction.png "Icon of the Module"
+
 Available sections:
   - \ref QmitkPointSetInteractionUserManualOverview 
   - \ref QmitkPointSetInteractionUserManualDetails 

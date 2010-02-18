@@ -2,7 +2,7 @@
 
 \bundlemainpage{org.isosurface} Iso surface Module
 
-\image html IsoSurfaceIcon.png "Module Icon"
+\image html IsoSurfaceIcon.png "Icon of the Module"
 
 Available sections:
   - \ref QmitkIsoSurfaceUserManualOverview 

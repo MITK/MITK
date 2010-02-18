@@ -24,6 +24,8 @@ Manual sections:
 
 This module provides an easy interface to quickly compute some features of a whole image or a region of interest.
 
+\image html Screenshot1.png "The interface"
+
 \section QmitkImageStatisticsUserManualUsage Usage
 
 After selection of an image or a binary mask of an image in the datamanader the Image Statistics module shows some statistical information. If a mask is selected the name of the mask and the name of the image this mask is applied to are shown at the top.

@@ -29,9 +29,9 @@ namespace mitk
 
 TransferFunction::TransferFunction()
 {
-  m_ScalarOpacityFunction = vtkPiecewiseFunction::New();
-  m_ColorTransferFunction = vtkColorTransferFunction::New();
-  m_GradientOpacityFunction = vtkPiecewiseFunction::New();
+  m_ScalarOpacityFunction = vtkSmartPointer<vtkPiecewiseFunction>::New();
+  m_ColorTransferFunction = vtkSmartPointer<vtkColorTransferFunction>::New();
+  m_GradientOpacityFunction = vtkSmartPointer<vtkPiecewiseFunction>::New();
   
   m_ScalarOpacityFunction->Initialize();
   m_ScalarOpacityFunction->AddPoint(0,1);

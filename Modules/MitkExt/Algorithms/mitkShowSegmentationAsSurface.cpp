@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkShowSegmentationAsSurface.h"
 #include "mitkManualSegmentationToSurfaceFilter.h"
 #include "mitkDataTreeNodeFactory.h"
-#include "mitkMaterialProperty.h"
+#include "mitkVtkRepresentationProperty.h"
 #include <mitkCoreObjectFactory.h>
 
 #include <vtkPolyDataNormals.h>
@@ -174,11 +174,9 @@ void ShowSegmentationAsSurface::ThreadedUpdateSuccessful()
     GetParameter("Wireframe", wireframe );
     if (wireframe)
     {
-      MaterialProperty* mp = dynamic_cast<MaterialProperty*>( m_Node->GetProperty("material"));
-      if (mp)
-      {
-        mp->SetRepresentation( MaterialProperty::Wireframe );
-      }
+      VtkRepresentationProperty *np = dynamic_cast<VtkRepresentationProperty*>(m_Node->GetProperty("material.representation"));
+      if (np)
+        np->SetRepresentationToWireframe();
     }
   
     m_Node->SetProperty("opacity", FloatProperty::New(0.3) );

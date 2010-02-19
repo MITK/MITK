@@ -3,7 +3,7 @@
 SET(MODULE_TESTS
   
   mitkPointSetWriterTest.cpp
-  mitkMaterialPropertyTest.cpp
+  mitkMaterialTest.cpp
   mitkDataTreeNodeTest.cpp
   mitkActionTest.cpp
   mitkDataStorageTest.cpp

@@ -406,7 +406,7 @@ void QmitkDataManagerView::SurfaceRepresentationMenuAboutToShow()
     return;
 
   mitk::EnumerationProperty* representationProp =
-      dynamic_cast<mitk::EnumerationProperty*> (node->GetProperty("representation"));
+      dynamic_cast<mitk::EnumerationProperty*> (node->GetProperty("material.representation"));
   if(!representationProp)
     return;
 
@@ -438,7 +438,7 @@ void QmitkDataManagerView::SurfaceRepresentationActionToggled( bool checked )
     return;
 
   mitk::EnumerationProperty* representationProp =
-      dynamic_cast<mitk::EnumerationProperty*> (node->GetProperty("representation"));
+      dynamic_cast<mitk::EnumerationProperty*> (node->GetProperty("material.representation"));
   if(!representationProp)
     return;
 

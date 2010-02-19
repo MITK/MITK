@@ -659,10 +659,12 @@ void RenderingManager::UpdateCallback()
 
   // Satisfy all pending update requests
   RenderWindowList::iterator it;
-  for ( it = m_RenderWindowList.begin(); it != m_RenderWindowList.end(); ++it )
+  int i = 0;
+  for ( it = m_RenderWindowList.begin(); it != m_RenderWindowList.end(); ++it, ++i )
   {
     if ( it->second == RENDERING_REQUESTED )
     {
+      MITK_INFO << "RM::ForceImmediateUpdate() for window " << i;
       this->ForceImmediateUpdate( it->first );
     }
   }

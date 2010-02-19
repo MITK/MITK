@@ -71,7 +71,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkPointSet.h"
 #include "mitkStringProperty.h"
 #include "mitkProperties.h"
-#include "mitkMaterialProperty.h"
+//#include "mitkMaterialProperty.h"
 #include "mitkLevelWindowProperty.h"
 #include "mitkVtkRepresentationProperty.h"
 #include "mitkVtkInterpolationProperty.h"

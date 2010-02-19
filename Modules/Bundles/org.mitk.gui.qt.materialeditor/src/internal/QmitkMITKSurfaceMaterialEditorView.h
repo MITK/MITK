@@ -40,7 +40,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkCommon.h"
 #include "mitkDataStorage.h"
 #include "mitkDataTreeNode.h"
-#include "mitkMaterialProperty.h"
 #include "mitkShaderEnumProperty.h"
 #include "mitkSurface.h"
 #include "vtkRenderer.h"
@@ -96,7 +95,6 @@ protected:
 
 private:
 
-  mitk::MaterialProperty::Pointer m_MaterialProperty;
   mitk::Surface::Pointer m_Surface;
   mitk::DataStorage::Pointer m_DataTree;
   mitk::DataTreeNode::Pointer m_DataTreeNode;

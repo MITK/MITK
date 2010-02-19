@@ -24,8 +24,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QMenu>
 //!
 
-#include "QmitkMaterialEditor.h" // by Max
-#include "mitkMaterialProperty.h"
+//#include "QmitkMaterialEditor.h" // by Max
+//#include "mitkMaterialProperty.h"
 
 #include "mitkPropertyList.h"
 #include "mitkProperties.h"
@@ -99,7 +99,7 @@ class QmitkExt_EXPORT QmitkPropertyListPopup : public QObject
     QMenu* m_InfoPopup;
     //!
 
-    QmitkMaterialEditor* m_MaterialEditor;
+  //  QmitkMaterialEditor* m_MaterialEditor;
     
     //!mm
     //int m_NameMenuID;
@@ -116,7 +116,7 @@ class QmitkExt_EXPORT QmitkPropertyListPopup : public QObject
 
     bool m_AcceptOnHide;
 
-    mitk::MaterialProperty::Pointer m_OriginalMaterial;
+//    mitk::MaterialProperty::Pointer m_OriginalMaterial;
     mitk::FloatProperty::Pointer m_OriginalOpacity;
 
     bool m_DisableBoolProperties;

@@ -119,6 +119,8 @@ SET(CPP_FILES
   DataManagement/mitkVtkVolumeRenderingProperty.cpp
   DataManagement/mitkWeakPointerProperty.cpp
   DataManagement/mitkShaderEnumProperty.cpp
+#  DataManagement/mitkResliceMethodEnumProperty.cpp
+  DataManagement/mitkMaterial.cpp
   Interactions/mitkAction.cpp
   Interactions/mitkAffineInteractor.cpp
   Interactions/mitkCoordinateSupplier.cpp
@@ -153,7 +155,6 @@ SET(CPP_FILES
   IO/mitkItkImageFileReader.cpp
   IO/mitkItkImageWrite.cpp
   IO/mitkLookupTableProperty.cpp
-  IO/mitkMaterialProperty.cpp
   IO/mitkOperation.cpp
   IO/mitkPicFileIOFactory.cpp
   IO/mitkPicFileReader.cpp
@@ -188,7 +189,6 @@ SET(CPP_FILES
   Rendering/mitkGeometry2DDataVtkMapper3D.cpp
   Rendering/mitkGLMapper2D.cpp
   Rendering/mitkGradientBackground.cpp
-  Rendering/mitkImageMapper2D.cpp
   Rendering/mitkLogoRendering.cpp
   Rendering/mitkMapper2D.cpp
   Rendering/mitkMapper3D.cpp
@@ -204,5 +204,8 @@ SET(CPP_FILES
   Rendering/vtkMitkRectangleProp.cpp
   Rendering/vtkMitkRenderProp.cpp
   Rendering/mitkShaderRepository.cpp
+
+  Rendering/mitkImageMapper2D.cpp
+#  Rendering/vtkMitkThickSlicesFilter.cpp
 )
 

@@ -556,7 +556,7 @@ void Geometry2DDataVtkMapper3D::GenerateData(BaseRenderer* renderer)
   }
 
   VtkRepresentationProperty* representationProperty;
-  this->GetDataTreeNode()->GetProperty(representationProperty, "representation", renderer);
+  this->GetDataTreeNode()->GetProperty(representationProperty, "material.representation", renderer);
   if ( representationProperty != NULL )
     m_BackgroundActor->GetProperty()->SetRepresentation( representationProperty->GetVtkRepresentation() );
 }

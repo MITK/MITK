@@ -41,7 +41,7 @@ mitk::ExtrudedContourInteractor::ExtrudedContourInteractor(const char * type, mi
 {
   assert(m_DataTreeNode != NULL);
 
-  m_DataTreeNode->SetProperty( "representation", mitk::VtkRepresentationProperty::New("surface") );
+  m_DataTreeNode->SetProperty( "material.representation", mitk::VtkRepresentationProperty::New("surface") );
 
   m_Contour = mitk::Contour::New();
 

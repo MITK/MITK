@@ -79,7 +79,7 @@ mitk::VolumeDataVtkMapper3D::VolumeDataVtkMapper3D()
   m_T2DMapper->SetMaximumNumberOfPlanes( 100 );
 */
   m_HiResMapper = vtkVolumeRayCastMapper::New();
-  m_HiResMapper->SetSampleDistance(0.5); // 4 rays for every pixel
+  m_HiResMapper->SetSampleDistance(1.0); // 4 rays for every pixel
 
   m_HiResMapper->IntermixIntersectingGeometryOn();
   m_HiResMapper->SetNumberOfThreads( itk::MultiThreader::GetGlobalDefaultNumberOfThreads() );
@@ -478,7 +478,7 @@ void mitk::VolumeDataVtkMapper3D::UpdateTransferFunctions( mitk::BaseRenderer *r
 void mitk::VolumeDataVtkMapper3D::SetPreferences()
 {
   //LOD 0
-  if(mitk::RenderingManager::GetInstance()->GetShading(0))
+  /*if(mitk::RenderingManager::GetInstance()->GetShading(0))
   {
     m_VolumePropertyLow->ShadeOn();
     m_VolumePropertyLow->SetAmbient(mitk::RenderingManager::GetInstance()->GetShadingValues()[0]);
@@ -486,13 +486,13 @@ void mitk::VolumeDataVtkMapper3D::SetPreferences()
     m_VolumePropertyLow->SetSpecular(mitk::RenderingManager::GetInstance()->GetShadingValues()[2]);
     m_VolumePropertyLow->SetSpecularPower(mitk::RenderingManager::GetInstance()->GetShadingValues()[3]);
   }
-  else
+  else*/
   {
     m_VolumePropertyLow->ShadeOff();
   }
 
   //LOD 1
-  if(mitk::RenderingManager::GetInstance()->GetShading(1))
+  /*if(mitk::RenderingManager::GetInstance()->GetShading(1))
   {
     m_VolumePropertyMed->ShadeOn();
     m_VolumePropertyMed->SetAmbient(mitk::RenderingManager::GetInstance()->GetShadingValues()[0]);
@@ -500,7 +500,7 @@ void mitk::VolumeDataVtkMapper3D::SetPreferences()
     m_VolumePropertyMed->SetSpecular(mitk::RenderingManager::GetInstance()->GetShadingValues()[2]);
     m_VolumePropertyMed->SetSpecularPower(mitk::RenderingManager::GetInstance()->GetShadingValues()[3]);
   }
-  else
+  else*/
   {
     m_VolumePropertyMed->ShadeOff();
   }

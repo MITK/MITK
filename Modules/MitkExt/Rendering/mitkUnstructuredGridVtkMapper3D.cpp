@@ -22,13 +22,14 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkTransferFunctionProperty.h"
 #include "mitkColorProperty.h"
 //#include "mitkLookupTableProperty.h"
-#include "mitkMaterialProperty.h"
 #include "mitkGridRepresentationProperty.h"
 #include "mitkGridVolumeMapperProperty.h"
 #include "mitkVtkInterpolationProperty.h"
 #include "mitkVtkScalarModeProperty.h"
 
 #include "mitkDataStorage.h"
+
+#include "mitkSurfaceVtkMapper3D.h"
 
 #include <vtkUnstructuredGrid.h>
 #include <vtkVolume.h>
@@ -200,29 +201,9 @@ void mitk::UnstructuredGridVtkMapper3D::SetProperties(mitk::BaseRenderer* render
   vtkVolumeProperty* volProp = m_Volume->GetProperty();
   vtkProperty* property = m_Actor->GetProperty();
 
+  mitk::SurfaceVtkMapper3D::ApplyMitkPropertiesToVtkProperty(node,property,renderer);
 
-  mitk::MaterialProperty* materialProperty;
-  this->GetDataTreeNode()->GetProperty(materialProperty, "material");
-  if ( materialProperty != 0 )
-  {
-    if ( materialProperty->GetRenderer() == 0 || materialProperty->GetRenderer() == renderer )
-    {
-      property->SetColor( materialProperty->GetColor().GetDataPointer() );
-      property->SetAmbientColor( materialProperty->GetColor().GetDataPointer() );
-      property->SetAmbient( materialProperty->GetColorCoefficient() );
-      property->SetDiffuseColor(materialProperty->GetColor().GetDataPointer() );
-      property->SetDiffuse( materialProperty->GetColorCoefficient() );
-      property->SetSpecularColor( materialProperty->GetSpecularColor().GetDataPointer() );
-      property->SetSpecular( materialProperty->GetSpecularCoefficient() );
-      property->SetSpecularPower( materialProperty->GetSpecularPower() );
-      property->SetOpacity( materialProperty->GetOpacity() );
-      property->SetInterpolation( materialProperty->GetVtkInterpolation() );
-      property->SetRepresentation( materialProperty->GetVtkRepresentation() );
-
-      m_ActorWireframe->GetProperty()->SetOpacity(materialProperty->GetOpacity());
-      m_ActorWireframe->GetProperty()->SetColor( materialProperty->GetColor().GetDataPointer() );
-    }
-  }
+  mitk::SurfaceVtkMapper3D::ApplyMitkPropertiesToVtkProperty(node,m_ActorWireframe->GetProperty(),renderer);
 
   mitk::TransferFunctionProperty::Pointer transferFuncProp;
   if (node->GetProperty(transferFuncProp, "TransferFunction", renderer))
@@ -315,12 +296,12 @@ void mitk::UnstructuredGridVtkMapper3D::SetProperties(mitk::BaseRenderer* render
 //   }
 //
 //   mitk::VtkRepresentationProperty* representationProperty;
-//   node->GetProperty(representationProperty, "representation", renderer);
+//   node->GetProperty(representationProperty, "material.representation", renderer);
 //   if ( representationProperty != NULL )
 //     m_Volume->GetProperty()->SetRepresentation( representationProperty->GetVtkRepresentation() );
 //
 //   mitk::VtkInterpolationProperty* interpolationProperty;
-//   node->GetProperty(interpolationProperty, "interpolation", renderer);
+//   node->GetProperty(interpolationProperty, "material.interpolation", renderer);
 //   if ( interpolationProperty != NULL )
 //     m_Volume->GetProperty()->SetInterpolation( interpolationProperty->GetVtkInterpolation() );
 //

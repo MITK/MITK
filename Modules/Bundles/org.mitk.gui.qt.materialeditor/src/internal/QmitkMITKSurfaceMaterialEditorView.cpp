@@ -64,22 +64,25 @@ QmitkMITKSurfaceMaterialEditorView::QmitkMITKSurfaceMaterialEditorView()
   m_MultiWidget(NULL)
 {
   fixedProperties.push_back( "shader" );
-  fixedProperties.push_back( "representation" );
+  fixedProperties.push_back( "material.representation" );
   fixedProperties.push_back( "color" );
   fixedProperties.push_back( "opacity" );
-  fixedProperties.push_back( "wireframe line width" );
+  fixedProperties.push_back( "material.wireframeLineWidth" );
 
-  fixedProperties.push_back( "color_coefficient" );
-  fixedProperties.push_back( "specular_color" );
-  fixedProperties.push_back( "specular_coefficient" );
-  fixedProperties.push_back( "specular_power" );
-  fixedProperties.push_back( "interpolation" );
+  fixedProperties.push_back( "material.ambientCoefficient" );
+  fixedProperties.push_back( "material.diffuseCoefficient" );
+  fixedProperties.push_back( "material.ambientColor" );
+  fixedProperties.push_back( "material.diffuseColor" );
+  fixedProperties.push_back( "material.specularColor" );
+  fixedProperties.push_back( "material.specularCoefficient" );
+  fixedProperties.push_back( "material.specularPower" );
+  fixedProperties.push_back( "material.interpolation" );
 
   shaderProperties.push_back( "shader" );
-  shaderProperties.push_back( "representation" );
+  shaderProperties.push_back( "material.representation" );
   shaderProperties.push_back( "color" );
   shaderProperties.push_back( "opacity" );
-  shaderProperties.push_back( "wireframe line width" );
+  shaderProperties.push_back( "material.wireframeLineWidth" );
   
   observerAllocated = false;
   
@@ -95,8 +98,6 @@ void QmitkMITKSurfaceMaterialEditorView::InitPreviewWindow()
 { 
   usedTimer=0;
   
-  m_MaterialProperty = mitk::MaterialProperty::New();
-
   vtkSphereSource* sphereSource = vtkSphereSource::New();
   sphereSource->SetThetaResolution(25);
   sphereSource->SetPhiResolution(25);

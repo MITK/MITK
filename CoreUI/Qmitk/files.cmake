@@ -11,8 +11,6 @@ QmitkLevelWindowRangeChangeDialog.cpp
 QmitkLevelWindowWidgetContextMenu.cpp
 QmitkLevelWindowWidget.cpp
 QmitkLineEditLevelWindowWidget.cpp
-# QmitkMaterialEditor.cpp
-# QmitkMaterialShowcase.cpp
 QmitkMemoryUsageIndicatorView.cpp
 QmitkNodeDescriptor.cpp
 QmitkNodeDescriptorManager.cpp
@@ -36,8 +34,6 @@ QmitkLevelWindowRangeChangeDialog.h
 QmitkLevelWindowWidgetContextMenu.h
 QmitkLevelWindowWidget.h
 QmitkLineEditLevelWindowWidget.h
-# QmitkMaterialEditor.h
-# QmitkMaterialShowcase.h
 QmitkMemoryUsageIndicatorView.h
 QmitkNodeDescriptor.h
 QmitkNodeDescriptorManager.h

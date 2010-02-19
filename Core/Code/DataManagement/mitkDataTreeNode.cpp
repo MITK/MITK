@@ -25,7 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkStringProperty.h"
 #include "mitkGroupTagProperty.h"
 #include "mitkSmartPointerProperty.h"
-#include "mitkMaterialProperty.h"
+//#include "mitkMaterialProperty.h"
 #include "mitkColorProperty.h"
 #include "mitkLevelWindowProperty.h"
 #include "mitkGeometry3D.h"

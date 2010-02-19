@@ -32,7 +32,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkLevelWindowProperty.h"
 #include "mitkLookupTable.h"
 #include "mitkLookupTableProperty.h"
-#include "mitkMaterialProperty.h"
+//#include "mitkMaterialProperty.h"
 #include "mitkPlaneGeometry.h"
 #include "mitkPointSet.h"
 #include "mitkPointSetMapper2D.h"
@@ -91,7 +91,6 @@ itk::Object::Pointer mitk::CoreObjectFactory::CreateCoreObject( const std::strin
     CREATE_ITK( ColorProperty, "ColorProperty" )
     CREATE_ITK( LevelWindowProperty, "LevelWindowProperty" )
     CREATE_ITK( LookupTableProperty, "LookupTableProperty" )
-    CREATE_ITK( MaterialProperty, "MaterialProperty" )
     CREATE_ITK( StringProperty, "StringProperty" )
     CREATE_ITK( SmartPointerProperty, "SmartPointerProperty" )
     CREATE_ITK( TransferFunctionProperty, "TransferFunctionProperty" )

@@ -25,6 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkBaseRenderer.h"
 
 #include <vtkActor.h>
+#include <vtkOpenGLPolyDataMapper.h>
 #include <vtkPainterPolyDataMapper.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkPolyDataNormals.h>
@@ -46,8 +47,6 @@ namespace mitk {
 
   * Properties that can be set for surfaces and influence the surfaceVTKMapper3D are:
   *
-  *   - \b "material": (MaterialProperty) Material of the surface object. The material properties are:
-
   *   - \b "color": (ColorProperty) Color of the surface object
   *   - \b "AmbientColor": (AmbientColor) Ambient color  of the surface object
   *   - \b "Ambient": (  FloatProperty) Ambient coefficient of the surface object
@@ -63,11 +62,10 @@ namespace mitk {
   *   - \b ""scalar visibility": (BoolProperty) If the scarlars of the surface are visible
   
   The default properties are:
-  *   - \b "wireframe line width": (FloatProperty::New(1.0))
-  *   - \b ""material": (MaterialProperty)
+  *   - \b "material.wireframeLineWidth": (FloatProperty::New(1.0))
   *   - \b ""scalar visibility": (BoolProperty)
   *   - \b "color mode": (BoolProperty)
-  *   - \b "representation": (VtkRepresentationProperty)
+  *   - \b "material.representation": (VtkRepresentationProperty)
   *   - \b "interpolation"(VtkInterpolationProperty)
   *   - \b "scalar mode": (VtkScalarModeProperty)
 
@@ -142,7 +140,7 @@ public:
 
       LocalStorage()
       {
-        m_VtkPolyDataMapper = vtkPainterPolyDataMapper::New();
+        m_VtkPolyDataMapper = vtkOpenGLPolyDataMapper::New();
         m_VtkPolyDataNormals = vtkPolyDataNormals::New();
         m_Actor = vtkActor::New();
         m_ClippingPlaneCollection = vtkPlaneCollection::New();
@@ -161,6 +159,8 @@ public:
     
   mitk::Mapper::LocalStorageHandler<LocalStorage> m_LSH;  
   
+  static void ApplyMitkPropertiesToVtkProperty(mitk::DataTreeNode *node, vtkProperty* property, mitk::BaseRenderer* renderer);
+  static void SetDefaultPropertiesForVtkProperty(mitk::DataTreeNode* node, mitk::BaseRenderer* renderer, bool overwrite);
 };
 
 } // namespace mitk

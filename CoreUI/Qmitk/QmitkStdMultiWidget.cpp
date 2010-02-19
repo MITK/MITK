@@ -127,18 +127,21 @@ m_Node(NULL)
   mitkWidget2->setMaximumSize(2000,2000);
   mitkWidget2->setEnabled( TRUE );
   mitkWidget2->SetLayoutIndex( SAGITTAL );
+  mitkWidget2->SetCrossHairMenu( mitkWidget1->GetCrossHairMenu() );
   mitkWidgetLayout2->addWidget(mitkWidget2); 
 
   //Create RenderWindows 3
   mitkWidget3 = new QmitkRenderWindow(mitkWidget3Container, "stdmulti.widget3");
   mitkWidget3->setMaximumSize(2000,2000);
   mitkWidget3->SetLayoutIndex( CORONAL );
+  mitkWidget3->SetCrossHairMenu( mitkWidget1->GetCrossHairMenu() );
   mitkWidgetLayout3->addWidget(mitkWidget3); 
 
   //Create RenderWindows 4
   mitkWidget4 = new QmitkRenderWindow(mitkWidget4Container, "stdmulti.widget4");
   mitkWidget4->setMaximumSize(2000,2000);
   mitkWidget4->SetLayoutIndex( THREE_D );
+  mitkWidget4->SetCrossHairMenu( mitkWidget1->GetCrossHairMenu() );
   mitkWidgetLayout4->addWidget(mitkWidget4); 
 
   //create SignalSlot Connection
@@ -147,32 +150,11 @@ m_Node(NULL)
   connect( mitkWidget3, SIGNAL( SignalLayoutDesignChanged(int) ), this, SLOT( OnLayoutDesignChanged(int) ) );
   connect( mitkWidget4, SIGNAL( SignalLayoutDesignChanged(int) ), this, SLOT( OnLayoutDesignChanged(int) ) );
   
-  //layout menu connections
   connect( mitkWidget1, SIGNAL( ShowCrosshair(bool) ), this, SLOT( SetWidgetPlanesVisibility(bool) ) );
   connect( this, SIGNAL( WidgetPlanesVisibilityChanged(bool) ), mitkWidget1, SLOT( OnUpdateCrosshairState(bool) ) );
   connect( mitkWidget1, SIGNAL( ResetView() ), this, SLOT( ResetCrosshair() ) );
   connect( mitkWidget1, SIGNAL( ChangeCrosshairRotationMode(int) ), this, SLOT( SetWidgetPlaneMode(int) ) );
-  connect( this, SIGNAL( WidgetPlaneModeChanged(int) ), mitkWidget1, SLOT( OnWidgetPlaneModeChanged(int) ) );
-
-  connect( mitkWidget2, SIGNAL( ShowCrosshair(bool) ), this, SLOT( SetWidgetPlanesVisibility(bool) ) );
-  connect( this, SIGNAL( WidgetPlanesVisibilityChanged(bool) ), mitkWidget2, SLOT( OnUpdateCrosshairState(bool) ) );
-  connect( mitkWidget2, SIGNAL( ResetView() ), this, SLOT( ResetCrosshair() ) );
-  connect( mitkWidget2, SIGNAL( ChangeCrosshairRotationMode(int) ), this, SLOT( SetWidgetPlaneMode(int) ) );
-  connect( this, SIGNAL( WidgetPlaneModeChanged(int) ), mitkWidget2, SLOT( OnWidgetPlaneModeChanged(int) ) );
-
-  connect( mitkWidget3, SIGNAL( ShowCrosshair(bool) ), this, SLOT( SetWidgetPlanesVisibility(bool) ) );
-  connect( this, SIGNAL( WidgetPlanesVisibilityChanged(bool) ), mitkWidget3, SLOT( OnUpdateCrosshairState(bool) ) );
-  connect( mitkWidget3, SIGNAL( ResetView() ), this, SLOT( ResetCrosshair() ) );
-  connect( mitkWidget3, SIGNAL( ChangeCrosshairRotationMode(int) ), this, SLOT( SetWidgetPlaneMode(int) ) );
-  connect( this, SIGNAL( WidgetPlaneModeChanged(int) ), mitkWidget3, SLOT( OnWidgetPlaneModeChanged(int) ) );
-
-  connect( mitkWidget4, SIGNAL( ShowCrosshair(bool) ), this, SLOT( SetWidgetPlanesVisibility(bool) ) );
-  connect( this, SIGNAL( WidgetPlanesVisibilityChanged(bool) ), mitkWidget4, SLOT( OnUpdateCrosshairState(bool) ) );
-  connect( mitkWidget4, SIGNAL( ResetView() ), this, SLOT( ResetCrosshair() ) );
-  connect( mitkWidget4, SIGNAL( ChangeCrosshairRotationMode(int) ), this, SLOT( SetWidgetPlaneMode(int) ) );
-  connect( this, SIGNAL( WidgetPlaneModeChanged(int) ), mitkWidget4, SLOT( OnWidgetPlaneModeChanged(int) ) );
-
-
+  connect( mitkWidget1, SIGNAL( SetCrosshairRotationLinked(bool) ), this, SLOT( SetWidgetPlanesRotationLinked(bool) ) );
 
   //Create Level Window Widget
   levelWindowWidget = new QmitkLevelWindowWidget( m_MainSplit ); //this
@@ -381,7 +363,7 @@ void QmitkStdMultiWidget::InitializeWidget()
   m_GradientBackground4 = mitk::GradientBackground::New();
   m_GradientBackground4->SetRenderWindow(
     mitkWidget4->GetRenderWindow() );
-  m_GradientBackground4->SetGradientColors(0.0,0.0,0.0,0.0,0.0,0.0);
+  m_GradientBackground4->SetGradientColors(0.1,0.1,0.1,0.5,0.5,0.5);
   m_GradientBackground4->Enable();
 
   // setup the department logo rendering
@@ -1532,9 +1514,12 @@ void QmitkStdMultiWidget::MoveCrossToPosition(const mitk::Point3D& newPosition)
 
   // determine if cross is now out of display
   // if so, move the display window
-  EnsureDisplayContainsPoint( mitk::BaseRenderer::GetInstance(mitkWidget1->GetRenderWindow())->GetDisplayGeometry(), newPosition );
-  EnsureDisplayContainsPoint( mitk::BaseRenderer::GetInstance(mitkWidget2->GetRenderWindow())->GetDisplayGeometry(), newPosition );
-  EnsureDisplayContainsPoint( mitk::BaseRenderer::GetInstance(mitkWidget3->GetRenderWindow())->GetDisplayGeometry(), newPosition );
+  EnsureDisplayContainsPoint( mitk::BaseRenderer::GetInstance(mitkWidget1->GetRenderWindow())
+    ->GetDisplayGeometry(), newPosition );
+  EnsureDisplayContainsPoint( mitk::BaseRenderer::GetInstance(mitkWidget2->GetRenderWindow())
+    ->GetDisplayGeometry(), newPosition );
+  EnsureDisplayContainsPoint( mitk::BaseRenderer::GetInstance(mitkWidget3->GetRenderWindow())
+    ->GetDisplayGeometry(), newPosition );
 
   // update displays
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
@@ -1670,7 +1655,7 @@ void QmitkStdMultiWidget::SetWidgetPlanesVisibility(bool visible, mitk::BaseRend
   emit WidgetPlanesVisibilityChanged(visible);
 }
 
-                       
+
 void QmitkStdMultiWidget::SetWidgetPlanesLocked(bool locked)
 {
   //do your job and lock or unlock slices.
@@ -1690,8 +1675,7 @@ void QmitkStdMultiWidget::SetWidgetPlanesRotationLocked(bool locked)
   emit WidgetPlanesRotationLockedChanged(locked);
 }
 
-                       
-                         
+
 void QmitkStdMultiWidget::SetWidgetPlanesRotationLinked( bool link )
 {
   m_SlicesRotator->SetLinkPlanes( link );
@@ -1700,29 +1684,8 @@ void QmitkStdMultiWidget::SetWidgetPlanesRotationLinked( bool link )
 }
 
 
-void QmitkStdMultiWidget::SetWidgetPlaneMode( int menuMode )
+void QmitkStdMultiWidget::SetWidgetPlaneMode( int mode )
 {
-  // Notifiy all renderwindow menus of new mode
-  emit WidgetPlaneModeChanged( menuMode );
-
-  int mode=PLANE_MODE_SLICING;
-  bool link=false;
-  
-  switch( menuMode )
-  {
-    case 2:
-      link=true;
-    case 1:
-      mode=PLANE_MODE_ROTATION;
-      break;
-    case 3:
-      mode=PLANE_MODE_SWIVEL;
-      break;
-  }
-
-  m_SlicesRotator->SetLinkPlanes( link );
-  m_SlicesSwiveller->SetLinkPlanes( link );
-
   MITK_INFO << "Changing crosshair mode to " << mode;
 
   // Do nothing if mode didn't change

@@ -206,8 +206,6 @@ signals:
   void WidgetPlaneModeRotation(bool);
   void WidgetPlaneModeSwivel(bool);
  
-  void WidgetPlaneModeChanged(int);
- 
 public:
 
   /** Define RenderWindow (public)*/ 

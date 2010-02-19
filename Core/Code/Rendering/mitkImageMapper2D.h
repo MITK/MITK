@@ -31,7 +31,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <vtkSystemIncludes.h>
 
-#include "vtkMitkThickSlicesFilter.h"
 
 class iil4mitkPicImage;
 class Vtk2itk;
@@ -160,9 +159,6 @@ public:
 
     /** \brief The actual reslicer (one per renderer) */
     vtkImageReslice *m_Reslicer;
-
-    /** \brief The thick slices filter */
-    vtkMitkThickSlicesFilter *m_TSFilter;
 
     /** \brief Extracted image for 3D rendering (cf. m_iil4mitkImage) */
     vtkImageData *m_Image;

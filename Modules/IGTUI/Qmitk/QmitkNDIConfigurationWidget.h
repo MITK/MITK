@@ -63,12 +63,14 @@ public:
   void HideAddPassiveToolButton(bool on); ///< show or hide "add passive tool" radio button in the UI
 
   const QString GetToolType(unsigned int index) const;
+  const QString GetToolName(unsigned int index) const;
   QMap<QString, unsigned int> GetToolAndTypes() const;
   QList<unsigned int> GetToolsByToolType(QString toolType) const;
   mitk::DataTreeNode* GetNode(unsigned int index) const;
 
   signals:
     void ToolsAdded(QStringList tools);
+    void ToolsChanged();
     void Connected();
     void Disconnected();
   public slots:
@@ -110,3 +112,4 @@ protected:
   QmitkNDIToolDelegate* m_Delegate;
 };
 #endif // _QmitkNDIConfigurationWidget_H_INCLUDED
+

@@ -99,7 +99,7 @@ p, li { white-space: pre-wrap; }
    <item row="5" column="4">
     <widget class="QPushButton" name="m_AddToolBtn">
      <property name="text">
-      <string>Add passive tool</string>
+      <string>Add passive tools</string>
      </property>
     </widget>
    </item>

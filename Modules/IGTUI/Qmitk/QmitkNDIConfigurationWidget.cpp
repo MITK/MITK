@@ -132,7 +132,7 @@ void QmitkNDIConfigurationWidget::UpdateWidgets()
     return;
   }
 
-  if (m_Tracker->GetMode() == mitk::TrackingDevice::Setup)
+  if (m_Tracker->GetState() == mitk::TrackingDevice::Setup)
   {
     m_Controls->m_Connect->setText("Connect");
     disconnect(m_Controls->m_Connect, SIGNAL(clicked()), this, SLOT(OnDisconnect()));
@@ -141,7 +141,7 @@ void QmitkNDIConfigurationWidget::UpdateWidgets()
     m_Controls->m_AddToolBtn->setDisabled(true);
     return;
   }
-  if ((m_Tracker->GetMode() == mitk::TrackingDevice::Ready) || (m_Tracker->GetMode() == mitk::TrackingDevice::Tracking))
+  if ((m_Tracker->GetState() == mitk::TrackingDevice::Ready) || (m_Tracker->GetState() == mitk::TrackingDevice::Tracking))
   {
     m_Controls->m_Connect->setText("Disconnect");
     disconnect(m_Controls->m_Connect, SIGNAL(clicked()), this, SLOT(OnConnect()));
@@ -171,9 +171,9 @@ QString QmitkNDIConfigurationWidget::GetStatusText()
     devName = "unknown tracking device";
     break;
   }
-  if (m_Tracker->GetMode() == mitk::TrackingDevice::Ready)
+  if (m_Tracker->GetState() == mitk::TrackingDevice::Ready)
     return QString("Connected to %1 on %2. Device is ready.").arg(devName).arg(m_Tracker->GetDeviceName());
-  if (m_Tracker->GetMode() == mitk::TrackingDevice::Tracking)
+  if (m_Tracker->GetState() == mitk::TrackingDevice::Tracking)
     return QString("%1 is tracking.").arg(devName);
   return QString("");
 }
@@ -194,15 +194,17 @@ void QmitkNDIConfigurationWidget::OnAddPassiveTool()
   if (m_Tracker.IsNull())
     this->CreateTracker();
 
-  QString filename = QFileDialog::getOpenFileName(this, "Select NDI SROM file", QDir::currentPath(),"NDI SROM files (*.rom)");
-  if (filename.isEmpty())
+  QStringList filenames = QFileDialog::getOpenFileNames(this, "Select NDI SROM file", QDir::currentPath(),"NDI SROM files (*.rom)");
+  if (filenames.isEmpty())
     return;
   bool ok = false;
-  QString toolName = QInputDialog::getText(this, "Enter a name for the tool", "Name of the tool: ", QLineEdit::Normal, QFileInfo(filename).baseName(), &ok);
-  if (ok == false || toolName.isEmpty())
-    return;
-
-  m_Tracker->AddTool(toolName.toLatin1(), filename.toLatin1());
+  foreach(QString fileName, filenames)
+  {
+    //QString toolName = QInputDialog::getText(this, "Enter a name for the tool", "Name of the tool: ", QLineEdit::Normal, QFileInfo(filename).baseName(), &ok);
+    //if (ok == false || toolName.isEmpty())
+    //  return;
+    m_Tracker->AddTool(QFileInfo(fileName).baseName().toLatin1(), fileName.toLatin1());
+  }
   emit ToolsAdded(this->GetToolNamesList());
   this->UpdateToolTable();
 }
@@ -241,6 +243,7 @@ void QmitkNDIConfigurationWidget::SetDeviceName( const char* dev )
 
 void QmitkNDIConfigurationWidget::UpdateToolTable()
 {
+  disconnect(m_Controls->m_ToolTable, SIGNAL(itemChanged(QTableWidgetItem*)), this, SLOT(OnTableItemChanged(QTableWidgetItem*))); // stop listening to table changes
   m_Controls->m_ToolTable->clearContents();
   m_Controls->m_ToolTable->setRowCount(0);
   if (m_Tracker.IsNull() || (m_Controls == NULL))
@@ -276,6 +279,7 @@ void QmitkNDIConfigurationWidget::UpdateToolTable()
     m_Controls->m_ToolTable->item(i, QmitkNDIToolDelegate::NodeCol)->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable   | Qt::ItemIsSelectable | Qt::ItemIsDragEnabled);  // Node
   }
   m_Controls->m_ToolTable->resizeColumnsToContents();
+  connect(m_Controls->m_ToolTable, SIGNAL(itemChanged(QTableWidgetItem*)), this, SLOT(OnTableItemChanged(QTableWidgetItem*))); // listen to table changes again
 }
 
 
@@ -425,6 +429,20 @@ const QString QmitkNDIConfigurationWidget::GetToolType( unsigned int index ) con
 }
 
 
+const QString QmitkNDIConfigurationWidget::GetToolName( unsigned int index ) const
+{
+  if (m_Controls == NULL)
+    return QString("");
+
+  QAbstractItemModel* model = m_Controls->m_ToolTable->model();
+  QModelIndex modelIndex = model->index(index, QmitkNDIToolDelegate::NameCol);
+  if (modelIndex.isValid() == false)
+    return QString("");
+
+  return model->data(modelIndex).toString();
+}
+
+
 QMap<QString, unsigned int> QmitkNDIConfigurationWidget::GetToolAndTypes() const
 {
   QMap<QString, unsigned int> map;
@@ -461,6 +479,7 @@ QList<unsigned int> QmitkNDIConfigurationWidget::GetToolsByToolType( QString too
   return list;
 }
 
+
 mitk::DataTreeNode* QmitkNDIConfigurationWidget::GetNode( unsigned int index ) const
 {
   
@@ -471,15 +490,18 @@ mitk::DataTreeNode* QmitkNDIConfigurationWidget::GetNode( unsigned int index ) c
   return data.value<mitk::DataTreeNode*>();
 }
 
+
 void QmitkNDIConfigurationWidget::HideDiscoverDeviceButton( bool on )
 {
   m_Controls->m_DisoverDevicesBtn->setHidden(on);
 }
 
+
 void QmitkNDIConfigurationWidget::HideDiscoverWiredToolseButton( bool on )
 {
   m_Controls->m_DiscoverToolsBtn->setHidden(on);
 }
+
 
 void QmitkNDIConfigurationWidget::HideAddPassiveToolButton( bool on )
 {

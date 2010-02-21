@@ -53,7 +53,7 @@ m_MultiThreader(NULL), m_ThreadID(0), m_OperationMode(ToolTracking6D), m_MarkerP
 
 bool mitk::NDITrackingDevice::UpdateTool(mitk::TrackingTool* tool)
 {
-  if (this->GetMode() != Setup)
+  if (this->GetState() != Setup)
   {
     mitk::NDIPassiveTool* ndiTool = dynamic_cast<mitk::NDIPassiveTool*>(tool);
     if (ndiTool == NULL)
@@ -88,11 +88,11 @@ bool mitk::NDITrackingDevice::UpdateTool(mitk::TrackingTool* tool)
 mitk::NDITrackingDevice::~NDITrackingDevice()
 {
   /* stop tracking and disconnect from tracking device */
-  if (GetMode() == Tracking)
+  if (GetState() == Tracking)
   {
     this->StopTracking();
   }
-  if (GetMode() == Ready)
+  if (GetState() == Ready)
   {
     this->CloseConnection();
   }
@@ -115,7 +115,7 @@ mitk::NDITrackingDevice::~NDITrackingDevice()
 
 void mitk::NDITrackingDevice::SetPortNumber(const PortNumber _arg)
 {
-  if (this->GetMode() != Setup)
+  if (this->GetState() != Setup)
     return;
   itkDebugMacro("setting PortNumber to " << _arg);
   if (this->m_PortNumber != _arg)
@@ -128,7 +128,7 @@ void mitk::NDITrackingDevice::SetPortNumber(const PortNumber _arg)
 
 void mitk::NDITrackingDevice::SetDeviceName(std::string _arg)
 {
-  if (this->GetMode() != Setup)
+  if (this->GetState() != Setup)
     return;
   itkDebugMacro("setting eviceName to " << _arg);
   if (this->m_DeviceName != _arg)
@@ -141,7 +141,7 @@ void mitk::NDITrackingDevice::SetDeviceName(std::string _arg)
 
 void mitk::NDITrackingDevice::SetBaudRate(const BaudRate _arg)
 {
-  if (this->GetMode() != Setup)
+  if (this->GetState() != Setup)
     return;
   itkDebugMacro("setting BaudRate to " << _arg);
   if (this->m_BaudRate != _arg)
@@ -154,7 +154,7 @@ void mitk::NDITrackingDevice::SetBaudRate(const BaudRate _arg)
 
 void mitk::NDITrackingDevice::SetDataBits(const DataBits _arg)
 {
-  if (this->GetMode() != Setup)
+  if (this->GetState() != Setup)
     return;
   itkDebugMacro("setting DataBits to " << _arg);
   if (this->m_DataBits != _arg)
@@ -167,7 +167,7 @@ void mitk::NDITrackingDevice::SetDataBits(const DataBits _arg)
 
 void mitk::NDITrackingDevice::SetParity(const Parity _arg)
 {
-  if (this->GetMode() != Setup)
+  if (this->GetState() != Setup)
     return;
   itkDebugMacro("setting Parity to " << _arg);
   if (this->m_Parity != _arg)
@@ -180,7 +180,7 @@ void mitk::NDITrackingDevice::SetParity(const Parity _arg)
 
 void mitk::NDITrackingDevice::SetStopBits(const StopBits _arg)
 {
-  if (this->GetMode() != Setup)
+  if (this->GetState() != Setup)
     return;
   itkDebugMacro("setting StopBits to " << _arg);
   if (this->m_StopBits != _arg)
@@ -193,7 +193,7 @@ void mitk::NDITrackingDevice::SetStopBits(const StopBits _arg)
 
 void mitk::NDITrackingDevice::SetHardwareHandshake(const HardwareHandshake _arg)
 {
-  if (this->GetMode() != Setup)
+  if (this->GetState() != Setup)
     return;
   itkDebugMacro("setting HardwareHandshake to " << _arg);
   if (this->m_HardwareHandshake != _arg)
@@ -206,14 +206,14 @@ void mitk::NDITrackingDevice::SetHardwareHandshake(const HardwareHandshake _arg)
 
 void mitk::NDITrackingDevice::SetIlluminationActivationRate(const IlluminationActivationRate _arg)
 {
-  if (this->GetMode() == Tracking)
+  if (this->GetState() == Tracking)
     return;
   itkDebugMacro("setting IlluminationActivationRate to " << _arg);
   if (this->m_IlluminationActivationRate != _arg)
   {
     this->m_IlluminationActivationRate = _arg;
     this->Modified();
-    if (this->GetMode() == Ready)   // if the connection to the tracking system is established, send the new rate to the tracking device too
+    if (this->GetState() == Ready)   // if the connection to the tracking system is established, send the new rate to the tracking device too
       m_DeviceProtocol->IRATE(this->m_IlluminationActivationRate);
   }
 }
@@ -360,7 +360,7 @@ bool mitk::NDITrackingDevice::OpenConnection()
 {
   
   //this->m_ModeMutex->Lock();
-  if (this->GetMode() != Setup)
+  if (this->GetState() != Setup)
   {
     this->SetErrorMessage("Can only try to open the connection if in setup mode");
     return false;
@@ -562,7 +562,7 @@ bool mitk::NDITrackingDevice::OpenConnection()
     }
   }
   /* finish  - now all tools should be added, initialized and enabled, so that tracking can be started */
-  this->SetMode(Ready);
+  this->SetState(Ready);
   this->SetErrorMessage("");
   return true;
 }
@@ -586,7 +586,7 @@ bool mitk::NDITrackingDevice::InitializeWiredTools()
   {
     ph = portHandle.substr(i, 2);
     mitk::NDIPassiveTool* pt = this->GetInternalTool(ph);
-    if ( pt == NULL) // if we already have a tool with this handle
+    if ( pt == NULL) // if we don't have a tool, something is wrong. Tools should be discovered first by calling DiscoverWiredTools()
       continue;
 
     if (pt->GetSROMData() == NULL)
@@ -615,12 +615,13 @@ bool mitk::NDITrackingDevice::InitializeWiredTools()
       }
     }
   }
+  return true;
 }
 
 
 mitk::TrackingDeviceType mitk::NDITrackingDevice::TestConnection()
 {
-  if (this->GetMode() != Setup)
+  if (this->GetState() != Setup)
   {
     return mitk::TrackingSystemNotSpecified;
   }
@@ -691,7 +692,7 @@ mitk::TrackingDeviceType mitk::NDITrackingDevice::TestConnection()
 
 bool mitk::NDITrackingDevice::CloseConnection()
 {
-  if (this->GetMode() != Setup)
+  if (this->GetState() != Setup)
   {
     //init before closing to force the field generator from aurora to switch itself off
     m_DeviceProtocol->INIT();
@@ -700,7 +701,7 @@ bool mitk::NDITrackingDevice::CloseConnection()
     /* invalidate all tools */
     this->InvalidateAll();
     /* return to setup mode */
-    this->SetMode(Setup);
+    this->SetState(Setup);
     this->SetErrorMessage("");
     m_SerialCommunication = NULL;
   }
@@ -741,10 +742,10 @@ ITK_THREAD_RETURN_TYPE mitk::NDITrackingDevice::ThreadStartTracking(void* pInfoS
 
 bool mitk::NDITrackingDevice::StartTracking()
 {
-  if (this->GetMode() != Ready)
+  if (this->GetState() != Ready)
     return false;
 
-  this->SetMode(Tracking);      // go to mode Tracking
+  this->SetState(Tracking);      // go to mode Tracking
   this->m_StopTrackingMutex->Lock();  // update the local copy of m_StopTracking
   this->m_StopTracking = false;
   this->m_StopTrackingMutex->Unlock();
@@ -759,7 +760,7 @@ bool mitk::NDITrackingDevice::StartTracking()
 
 void mitk::NDITrackingDevice::TrackTools()
 {
-  if (this->GetMode() != Tracking)
+  if (this->GetState() != Tracking)
     return;
 
   NDIErrorCode returnvalue;
@@ -774,7 +775,7 @@ void mitk::NDITrackingDevice::TrackTools()
   this->m_StopTrackingMutex->Lock();  // update the local copy of m_StopTracking
   localStopTracking = this->m_StopTracking;
   this->m_StopTrackingMutex->Unlock();
-  while ((this->GetMode() == Tracking) && (localStopTracking == false))
+  while ((this->GetState() == Tracking) && (localStopTracking == false))
   {
     if (this->m_DataTransferMode == TX)
     {
@@ -810,7 +811,7 @@ void mitk::NDITrackingDevice::TrackMarkerPositions()
   if (m_OperationMode == ToolTracking6D)
     return;
 
-  if (this->GetMode() != Tracking)
+  if (this->GetState() != Tracking)
     return;
 
   NDIErrorCode returnvalue;
@@ -825,7 +826,7 @@ void mitk::NDITrackingDevice::TrackMarkerPositions()
   this->m_StopTrackingMutex->Lock();  // update the local copy of m_StopTracking
   localStopTracking = this->m_StopTracking;
   this->m_StopTrackingMutex->Unlock();
-  while ((this->GetMode() == Tracking) && (localStopTracking == false))
+  while ((this->GetState() == Tracking) && (localStopTracking == false))
   {
     m_MarkerPointsMutex->Lock();                                    // lock points data structure
     returnvalue = this->m_DeviceProtocol->POS3D(&m_MarkerPoints); // update points data structure with new position data from tracking device
@@ -844,7 +845,7 @@ void mitk::NDITrackingDevice::TrackMarkerPositions()
   if (returnvalue != NDIOKAY)
     return;     // how can this thread tell the application, that an error has occured?
 
-  this->SetMode(Ready);
+  this->SetState(Ready);
   return;       // returning from this function (and ThreadStartTracking()) this will end the thread
 }
 
@@ -866,7 +867,7 @@ void mitk::NDITrackingDevice::TrackToolsAndMarkers()
   this->m_StopTrackingMutex->Lock();  // update the local copy of m_StopTracking
   localStopTracking = this->m_StopTracking;
   this->m_StopTrackingMutex->Unlock();
-  while ((this->GetMode() == Tracking) && (localStopTracking == false))
+  while ((this->GetState() == Tracking) && (localStopTracking == false))
   {
     m_MarkerPointsMutex->Lock();                                     // lock points data structure
     returnvalue = this->m_DeviceProtocol->TX(true, &m_MarkerPoints); // update points data structure with new position data from tracking device
@@ -886,7 +887,7 @@ void mitk::NDITrackingDevice::TrackToolsAndMarkers()
   if (returnvalue != NDIOKAY)
     return;     // how can this thread tell the application, that an error has occurred?
 
-  this->SetMode(Ready);
+  this->SetState(Ready);
   return;       // returning from this function (and ThreadStartTracking()) this will end the thread
 }
 
@@ -931,7 +932,7 @@ unsigned int mitk::NDITrackingDevice::GetToolCount() const
 
 bool mitk::NDITrackingDevice::Beep(unsigned char count)
 {
-  if (this->GetMode() != Setup)
+  if (this->GetState() != Setup)
   {
     return (m_DeviceProtocol->BEEP(count) == NDIOKAY);
   }
@@ -960,7 +961,7 @@ bool mitk::NDITrackingDevice::InternalAddTool(mitk::NDIPassiveTool* tool)
     return false;
   NDIPassiveTool::Pointer p = tool;
   /* if the connection to the tracking device is already established, add the new tool to the device now */
-  if (this->GetMode() == Ready)
+  if (this->GetState() == Ready)
   {
     /* get a port handle for the tool */
     std::string newPortHandle;
@@ -1003,7 +1004,7 @@ bool mitk::NDITrackingDevice::InternalAddTool(mitk::NDIPassiveTool* tool)
     this->Modified();
     return true;
   }
-  else if (this->GetMode() == Setup)
+  else if (this->GetState() == Setup)
   {
     /* In Setup mode, we only add it to the list, so that OpenConnection() can add it later */
     m_ToolsMutex->Lock();
@@ -1027,7 +1028,7 @@ bool mitk::NDITrackingDevice::RemoveTool(mitk::TrackingTool* tool)
   /* a valid portHandle has length 2. If a valid handle exists, the tool is already added to the tracking device, so we have to remove it there
   if the connection to the tracking device has already been established.
   */
-  if ((portHandle.length() == 2) && (this->GetMode() == Ready))  // do not remove a tool in tracking mode
+  if ((portHandle.length() == 2) && (this->GetState() == Ready))  // do not remove a tool in tracking mode
   {
     NDIErrorCode returnvalue;
     returnvalue = m_DeviceProtocol->PHF(&portHandle);
@@ -1047,7 +1048,7 @@ bool mitk::NDITrackingDevice::RemoveTool(mitk::TrackingTool* tool)
     }
     return false;
   }
-  else if (this->GetMode() == Setup)  // in Setup Mode, we are not connected to the tracking device, so we can just remove the tool from the tool list
+  else if (this->GetState() == Setup)  // in Setup Mode, we are not connected to the tracking device, so we can just remove the tool from the tool list
   {
     MutexLockHolder toolsMutexLockHolder(*m_ToolsMutex); // lock and unlock the mutex
     Tool6DContainerType::iterator end = m_6DTools.end();
@@ -1077,7 +1078,7 @@ void mitk::NDITrackingDevice::InvalidateAll()
 
 bool mitk::NDITrackingDevice::SetOperationMode(OperationMode mode)
 {
-  if (GetMode() == Tracking)
+  if (GetState() == Tracking)
     return false;
 
   m_OperationMode = mode;
@@ -1119,8 +1120,8 @@ bool mitk::NDITrackingDevice::DiscoverWiredTools()
   /* if there are port handles that need to be initialized, initialize them. Furthermore instantiate tools for each handle that has no tool yet. */
   std::string ph;
   
-  /* we need to rember the ports which are occupied to be able to readout the serial numbers of the connected tools later*/
-  std::vector<int> occupiedPorts;
+  ///* we need to remeber the ports which are occupied to be able to readout the serial numbers of the connected tools later*/
+  //std::vector<int> occupiedPorts;
 
   for (unsigned int i = 0; i < portHandle.size(); i += 2)
   {
@@ -1159,7 +1160,7 @@ bool mitk::NDITrackingDevice::DiscoverWiredTools()
     //we have to temporarily unlock m_ModeMutex here to avoid a deadlock with another lock inside InternalAddTool() 
     if (this->InternalAddTool(newTool) == false)
       this->SetErrorMessage("Error while adding new tool");
-    else occupiedPorts.push_back(i);
+    //else occupiedPorts.push_back(i);
   }
   
   

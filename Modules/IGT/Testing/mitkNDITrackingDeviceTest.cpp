@@ -60,7 +60,7 @@ int mitkNDITrackingDeviceTest(int /* argc */, char* /*argv*/[])
   MITK_TEST_CONDITION_REQUIRED(myNDITrackingDevice.IsNotNull(),"Testing instantiation\n");
 
 
-  MITK_TEST_CONDITION_REQUIRED(myNDITrackingDevice->GetMode() == mitk::TrackingDevice::Setup ,"Checking tracking device state == setup.\n");
+  MITK_TEST_CONDITION_REQUIRED(myNDITrackingDevice->GetState() == mitk::TrackingDevice::Setup ,"Checking tracking device state == setup.\n");
 
   //OpenConnection
   //MITK_TEST_CONDITION( (!myNDITrackingDevice->OpenConnection()), "Testing behavior of method OpenConnection() (Errors should occur because Tracking Device is not activated).");

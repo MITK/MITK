@@ -36,7 +36,7 @@ public:
 
   virtual bool OpenConnection(){return true;};
   virtual bool CloseConnection(){return true;};
-  virtual bool StartTracking(){this->SetMode(Tracking); this->m_TrackingFinishedMutex->Unlock(); return true;};
+  virtual bool StartTracking(){this->SetState(Tracking); this->m_TrackingFinishedMutex->Unlock(); return true;};
   virtual mitk::TrackingTool* GetTool(unsigned int toolNumber) const {return NULL;};
   virtual unsigned int GetToolCount() const {return 1;};
 };
@@ -57,8 +57,8 @@ int mitkTrackingDeviceTest(int /* argc */, char* /*argv*/[])
   // Test method GetErrorMessage()
   MITK_TEST_CONDITION(trackingDeviceTestClass->GetErrorMessage()==std::string(""),"Error message should be empty");
   
-  // Test method GetMode()
-  MITK_TEST_CONDITION(trackingDeviceTestClass->GetMode()==mitk::TrackingDevice::Setup,"Mode should be initialized to SETUP");
+  // Test method GetState()
+  MITK_TEST_CONDITION(trackingDeviceTestClass->GetState()==mitk::TrackingDevice::Setup,"Mode should be initialized to SETUP");
 
   // Test method SetType()
   MITK_TEST_CONDITION(trackingDeviceTestClass->GetType()==mitk::TrackingSystemNotSpecified,"Type should be initialized to 'not specified'");
@@ -78,7 +78,7 @@ int mitkTrackingDeviceTest(int /* argc */, char* /*argv*/[])
   // Test method StopTracking()
   trackingDeviceTestClass->StartTracking();
   trackingDeviceTestClass->StopTracking();
-  MITK_TEST_CONDITION(trackingDeviceTestClass->GetMode()== mitk::TrackingDevice::Ready,"Type should be NDIAurora, as it has just been set");
+  MITK_TEST_CONDITION(trackingDeviceTestClass->GetState()== mitk::TrackingDevice::Ready,"Type should be NDIAurora, as it has just been set");
 
   MITK_TEST_END();
 }

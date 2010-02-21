@@ -105,7 +105,7 @@ bool mitk::ClaronTrackingDevice::StartTracking()
   {
     itksys::SystemTools::CopyAFile(m_AllTools[i]->GetFile().c_str(), m_ToolfilesDir.c_str());
   }
-  this->SetMode(Tracking);            // go to mode Tracking
+  this->SetState(Tracking);            // go to mode Tracking
   this->m_StopTrackingMutex->Lock();  // update the local copy of m_StopTracking
   this->m_StopTracking = false;
   this->m_StopTrackingMutex->Unlock();
@@ -135,12 +135,12 @@ bool mitk::ClaronTrackingDevice::StartTracking()
 
 bool mitk::ClaronTrackingDevice::StopTracking()
 {
-  if (this->GetMode() == Tracking) // Only if the object is in the correct state
+  if (this->GetState() == Tracking) // Only if the object is in the correct state
   {
     m_StopTrackingMutex->Lock();  // m_StopTracking is used by two threads, so we have to ensure correct thread handling
     m_StopTracking = true;
     m_StopTrackingMutex->Unlock();
-    this->SetMode(Ready);
+    this->SetState(Ready);
   }
 
   m_TrackingFinishedMutex->Lock();
@@ -181,7 +181,7 @@ bool mitk::ClaronTrackingDevice::OpenConnection()
 
   if (returnValue)
   {
-    this->SetMode(Ready);
+    this->SetState(Ready);
   }
   else
   {
@@ -194,7 +194,7 @@ bool mitk::ClaronTrackingDevice::OpenConnection()
       //m_Device = new ClaronInterface(m_CalibrationDir, m_ToolfilesDir);
     m_Device->StopTracking();
     //delete m_Device;
-    this->SetMode(Setup);
+    this->SetState(Setup);
     m_ErrorMessage = "Error while trying to open connection to the MicronTracker 2!";
   }
   return returnValue;
@@ -204,7 +204,7 @@ bool mitk::ClaronTrackingDevice::OpenConnection()
 bool mitk::ClaronTrackingDevice::CloseConnection()
 {
   bool returnValue = true;
-  if(this->GetMode() == Setup)
+  if(this->GetState() == Setup)
     return true;
 
   returnValue = m_Device->StopTracking();
@@ -213,7 +213,7 @@ bool mitk::ClaronTrackingDevice::CloseConnection()
   //delete the temporary directory
   itksys::SystemTools::RemoveADirectory(m_ToolfilesDir.c_str());
 
-  this->SetMode(Setup);
+  this->SetState(Setup);
   return returnValue;
 }
 
@@ -242,7 +242,7 @@ void mitk::ClaronTrackingDevice::TrackTools()
     localStopTracking = this->m_StopTracking;
     this->m_StopTrackingMutex->Unlock();
 
-    while (this->GetMode() == Tracking)
+    while (this->GetState() == Tracking)
     {
       this->GetDevice()->GrabFrame();
 

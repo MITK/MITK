@@ -368,7 +368,7 @@ void mitk::MicroBirdTrackingDevice::TrackTools()
   double measurementDuration = 0.0;
 
   /* Tracking loop */
-  while ((this->GetMode() == Tracking) && (localStopTracking == false))
+  while ((this->GetState() == Tracking) && (localStopTracking == false))
   {
     int errorCode;
     unsigned int nOfAttachedSensors = 0;

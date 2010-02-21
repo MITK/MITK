@@ -195,7 +195,7 @@ void QmitkToolPairNavigationView::OnShowTrackingVolume( bool on )
     return;
   }
 
-  if (m_Source->GetTrackingDevice()->GetMode() == mitk::TrackingDevice::Setup)
+  if (m_Source->GetTrackingDevice()->GetState() == mitk::TrackingDevice::Setup)
   {
     QMessageBox::warning(NULL, "Warning", QString("Please start connect tracker first\n"));
     return;
@@ -294,7 +294,7 @@ void QmitkToolPairNavigationView::SetupIGTPipeline()
       toolrepresentationNode = this->CreateSphereAsInstrumentVisualization(toolName);
 
     ds->Add(toolrepresentationNode);
-    m_Visualizer->SetBaseData(i, toolrepresentationNode->GetData());  // set instrument nodes as baseData for visualisation filter  
+    m_Visualizer->SetRepresentationObject(i, toolrepresentationNode->GetData());  // set instrument nodes as baseData for visualisation filter  
     m_MessageFilter->SetInput(i, m_Source->GetOutput(i));  // set input for message filter
   }
   

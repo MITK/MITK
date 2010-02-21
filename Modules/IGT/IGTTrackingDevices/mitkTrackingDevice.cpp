@@ -40,7 +40,7 @@ mitk::TrackingDevice::~TrackingDevice()
 }
 
 
-mitk::TrackingDevice::TrackingDeviceMode mitk::TrackingDevice::GetMode() const
+mitk::TrackingDevice::TrackingDeviceMode mitk::TrackingDevice::GetState() const
 {
   this->m_ModeMutex->Lock();
   TrackingDeviceMode result = m_Mode;
@@ -49,7 +49,7 @@ mitk::TrackingDevice::TrackingDeviceMode mitk::TrackingDevice::GetMode() const
 }
 
 
-void mitk::TrackingDevice::SetMode( TrackingDeviceMode m )
+void mitk::TrackingDevice::SetState( TrackingDeviceMode m )
 {
   this->m_ModeMutex->Lock();
   m_Mode = m;
@@ -59,7 +59,7 @@ void mitk::TrackingDevice::SetMode( TrackingDeviceMode m )
 
 bool mitk::TrackingDevice::StopTracking()
 {
-  if (this->GetMode() == Tracking) // Only if the object is in the correct state
+  if (this->GetState() == Tracking) // Only if the object is in the correct state
   {
     m_StopTrackingMutex->Lock();  // m_StopTracking is used by two threads, so we have to ensure correct thread handling
     m_StopTracking = true;
@@ -69,7 +69,7 @@ bool mitk::TrackingDevice::StopTracking()
     mitk::TimeStamp::GetInstance()->Stop(this); // notify realtime clock
     // StopTracking was called, thus the mode should be changed back
     //   to Ready now that the tracking loop has ended.
-    this->SetMode(Ready);
+    this->SetState(Ready);
   }
   return true;
 }

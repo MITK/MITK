@@ -60,16 +60,16 @@ int mitkTrackingDeviceSourceTest(int /* argc */, char* /*argv*/[])
   MITK_TEST_CONDITION(mySource->IsConnected() == false, "Testing IsConnected()");
   mySource->Connect();
   MITK_TEST_CONDITION(mySource->IsConnected() == true, "Testing Connect()/IsConnected()");
-  MITK_TEST_CONDITION(tracker->GetMode() == mitk::TrackingDevice::Ready, "Testing Connect()/IsConnected() 2");
+  MITK_TEST_CONDITION(tracker->GetState() == mitk::TrackingDevice::Ready, "Testing Connect()/IsConnected() 2");
   mySource->Disconnect();
   MITK_TEST_CONDITION(mySource->IsConnected() == false, "Testing Disconnect()/IsConnected()");
-  MITK_TEST_CONDITION(tracker->GetMode() == mitk::TrackingDevice::Setup, "Testing Disconnect()/IsConnected() 2");
+  MITK_TEST_CONDITION(tracker->GetState() == mitk::TrackingDevice::Setup, "Testing Disconnect()/IsConnected() 2");
   
   mySource->Connect();
   mySource->StartTracking();
   MITK_TEST_CONDITION(mySource->IsConnected() == true, "Testing StartTracking()/IsConnected()");
   MITK_TEST_CONDITION(mySource->IsTracking() == true, "Testing StartTracking()/IsTracking()");
-  MITK_TEST_CONDITION(tracker->GetMode() == mitk::TrackingDevice::Tracking, "Testing StartTracking()/IsTracking() 2");
+  MITK_TEST_CONDITION(tracker->GetState() == mitk::TrackingDevice::Tracking, "Testing StartTracking()/IsTracking() 2");
 
   unsigned long modTime = mySource->GetMTime();
   mySource->UpdateOutputInformation();

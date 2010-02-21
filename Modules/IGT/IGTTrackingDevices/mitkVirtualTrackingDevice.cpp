@@ -40,11 +40,11 @@ mitk::VirtualTrackingDevice::VirtualTrackingDevice() : mitk::TrackingDevice(),
 
 mitk::VirtualTrackingDevice::~VirtualTrackingDevice()
 {
-  if (GetMode() == Tracking)
+  if (GetState() == Tracking)
   {
     this->StopTracking();
   }
-  if (GetMode() == Ready)
+  if (GetState() == Ready)
   {
     this->CloseConnection();
   }
@@ -70,7 +70,7 @@ mitk::TrackingTool* mitk::VirtualTrackingDevice::AddTool(const char* toolName)
 
 bool mitk::VirtualTrackingDevice::StartTracking()
 {
-  this->SetMode(Tracking);            // go to mode Tracking
+  this->SetState(Tracking);            // go to mode Tracking
   this->m_StopTrackingMutex->Lock();  
   this->m_StopTracking = false;
   this->m_StopTrackingMutex->Unlock();
@@ -92,12 +92,12 @@ bool mitk::VirtualTrackingDevice::StartTracking()
 
 bool mitk::VirtualTrackingDevice::StopTracking()
 {
-  if (this->GetMode() == Tracking) // Only if the object is in the correct state
+  if (this->GetState() == Tracking) // Only if the object is in the correct state
   {
     m_StopTrackingMutex->Lock();  // m_StopTracking is used by two threads, so we have to ensure correct thread handling
     m_StopTracking = true;
     m_StopTrackingMutex->Unlock();
-    this->SetMode(Ready);
+    this->SetState(Ready);
   }
 
   mitk::TimeStamp::GetInstance()->Stop(this);
@@ -166,7 +166,7 @@ bool mitk::VirtualTrackingDevice::OpenConnection()
     m_Interpolators.push_back(spline);
     m_SplineLengths.push_back(length);
   }
-  this->SetMode(Ready);
+  this->SetState(Ready);
   return true;
 }
 
@@ -174,14 +174,14 @@ bool mitk::VirtualTrackingDevice::OpenConnection()
 bool mitk::VirtualTrackingDevice::CloseConnection()
 {
   bool returnValue = true; 
-  if(this->GetMode() == Setup)
+  if(this->GetState() == Setup)
     return true;
 
   m_Interpolators.clear();
   m_SplineLengths.clear();
   m_ToolVelocities.clear();
   
-  this->SetMode(Setup);
+  this->SetState(Setup);
   return returnValue;
 }
 
@@ -217,7 +217,7 @@ void mitk::VirtualTrackingDevice::TrackTools()
     localStopTracking = this->m_StopTracking;
     this->m_StopTrackingMutex->Unlock();
     mitk::ScalarType t = 0.0;
-    while ((this->GetMode() == Tracking) && (localStopTracking == false))
+    while ((this->GetState() == Tracking) && (localStopTracking == false))
     {
       SplineVectorType::iterator splineIt = m_Interpolators.begin();
       for (ToolContainer::iterator itAllTools = m_AllTools.begin(); itAllTools != m_AllTools.end(); itAllTools++)

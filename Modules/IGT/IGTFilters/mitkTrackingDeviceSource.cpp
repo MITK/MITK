@@ -32,11 +32,11 @@ mitk::TrackingDeviceSource::TrackingDeviceSource()
 
 mitk::TrackingDeviceSource::~TrackingDeviceSource()
 {
-  if (m_TrackingDevice->GetMode()==mitk::TrackingDevice::Tracking)
+  if (m_TrackingDevice->GetState()==mitk::TrackingDevice::Tracking)
   {
     StopTracking();
   }
-  if (m_TrackingDevice->GetMode()==mitk::TrackingDevice::Ready)
+  if (m_TrackingDevice->GetState()==mitk::TrackingDevice::Ready)
   {
     Disconnect();
   }
@@ -193,7 +193,7 @@ bool mitk::TrackingDeviceSource::IsConnected()
   if (m_TrackingDevice.IsNull())
     return false;
   
-  return (m_TrackingDevice->GetMode() == mitk::TrackingDevice::Ready) || (m_TrackingDevice->GetMode() == mitk::TrackingDevice::Tracking);
+  return (m_TrackingDevice->GetState() == mitk::TrackingDevice::Ready) || (m_TrackingDevice->GetState() == mitk::TrackingDevice::Tracking);
 }
 
 
@@ -202,5 +202,5 @@ bool mitk::TrackingDeviceSource::IsTracking()
   if (m_TrackingDevice.IsNull())
     return false;
 
-  return m_TrackingDevice->GetMode() == mitk::TrackingDevice::Tracking;
+  return m_TrackingDevice->GetState() == mitk::TrackingDevice::Tracking;
 }

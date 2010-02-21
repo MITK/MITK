@@ -104,7 +104,7 @@ namespace mitk {
       /**
        * \brief return current object state (Setup, Ready or Tracking)
        */
-      TrackingDeviceMode GetMode() const;
+      TrackingDeviceMode GetState() const;
 
       /**
        * \brief return device type identifier
@@ -123,7 +123,7 @@ namespace mitk {
       /**
       * \brief  change object state
       */
-      void SetMode(TrackingDeviceMode m);
+      void SetState(TrackingDeviceMode m);
 
 
       TrackingDevice();

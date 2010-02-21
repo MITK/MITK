@@ -47,28 +47,20 @@ namespace mitk {
 
   * Properties that can be set for surfaces and influence the surfaceVTKMapper3D are:
   *
-  *   - \b "color": (ColorProperty) Color of the surface object
-  *   - \b "AmbientColor": (AmbientColor) Ambient color  of the surface object
-  *   - \b "Ambient": (  FloatProperty) Ambient coefficient of the surface object
-  *   - \b "DiffuseColor": ( DiffuseColor) Diffuse color of the surface object
-  *   - \b "Diffuse": (FloatProperty) Diffuse coefficient of the surface object
-  *   - \b "SpecularColor": (SpecularColor) Specular Color of the surface object
-  *   - \b "Specular": (FloatProperty) Specular coefficient of the surface object
-  *   - \b "SpecularPower": (FloatProperty) Specular power of the surface object
+  *   - \b "color": (ColorProperty) Diffuse color of the surface object (this property will be read when material.diffuseColor is not defined)
   *   - \b "Opacity": (FloatProperty) Opacity of the surface object
-  *   - \b "Interpolation": (VtkInterpolationProperty) Interpolation
-  *   - \b "Representation": (VtkRepresentationProperty*) Representation
-  *   - \b "LineWidth": (IntProperty) Width in pixels of the lines drawn.
-  *   - \b ""scalar visibility": (BoolProperty) If the scarlars of the surface are visible
+  *   - \b "material.ambientColor": (ColorProperty) Ambient color  of the surface object
+  *   - \b "material.ambientCoefficient": (  FloatProperty) Ambient coefficient of the surface object
+  *   - \b "material.diffuseColor": ( ColorProperty) Diffuse color of the surface object
+  *   - \b "material.diffuseCoefficient": (FloatProperty) Diffuse coefficient of the surface object
+  *   - \b "material.specularColor": (ColorProperty) Specular Color of the surface object
+  *   - \b "material.specularCoefficient": (FloatProperty) Specular coefficient of the surface object
+  *   - \b "material.specularPower": (FloatProperty) Specular power of the surface object
+  *   - \b "material.interpolation": (VtkInterpolationProperty) Interpolation
+  *   - \b "material.representation": (VtkRepresentationProperty*) Representation
+  *   - \b "material.wireframeLineWidth": (FloatProperty) Width in pixels of the lines drawn.
+  *   - \b "scalar visibility": (BoolProperty) If the scarlars of the surface are visible
   
-  The default properties are:
-  *   - \b "material.wireframeLineWidth": (FloatProperty::New(1.0))
-  *   - \b ""scalar visibility": (BoolProperty)
-  *   - \b "color mode": (BoolProperty)
-  *   - \b "material.representation": (VtkRepresentationProperty)
-  *   - \b "interpolation"(VtkInterpolationProperty)
-  *   - \b "scalar mode": (VtkScalarModeProperty)
-
   * Properties to look for are:
   *
   *   - \b "scalar visibility": if set to on, scalars assigned to the data are shown

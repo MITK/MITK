@@ -33,7 +33,7 @@ mitk::NavigationDataObjectVisualizationFilter::~NavigationDataObjectVisualizatio
 }
 
 
-const mitk::BaseData* mitk::NavigationDataObjectVisualizationFilter::GetBaseData(unsigned int idx)
+const mitk::BaseData* mitk::NavigationDataObjectVisualizationFilter::GetRepresentationObject(unsigned int idx)
 {
   //if (idx >= this->GetNumberOfInputs())
   //  return NULL;
@@ -50,7 +50,7 @@ const mitk::BaseData* mitk::NavigationDataObjectVisualizationFilter::GetBaseData
 }
 
 
-void mitk::NavigationDataObjectVisualizationFilter::SetBaseData(unsigned int idx, BaseData* data)
+void mitk::NavigationDataObjectVisualizationFilter::SetRepresentationObject(unsigned int idx, BaseData* data)
 {
   //if (idx >= this->GetNumberOfInputs())
   //  return false;
@@ -87,7 +87,7 @@ void mitk::NavigationDataObjectVisualizationFilter::GenerateData()
       continue;
     }
     output->Graft(nd); // copy all information from input to output
-    const mitk::BaseData* data = this->GetBaseData(index);
+    const mitk::BaseData* data = this->GetRepresentationObject(index);
     if (data == NULL)
     {
       itkWarningMacro("NavigationDataObjectVisualizationFilter: Wrong/No BaseData associated with input.");

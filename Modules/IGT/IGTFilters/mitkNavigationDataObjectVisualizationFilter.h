@@ -61,7 +61,7 @@ namespace mitk {
     * \param data The BaseData to be associated to the index 
     * \param index the index with which data will be associated
     */
-    void SetBaseData(unsigned int index, BaseData* data);
+    void SetRepresentationObject(unsigned int index, BaseData* data);
     
     /** 
     * \brief Get the representation object associated with the index idx
@@ -70,7 +70,7 @@ namespace mitk {
     * \return Returns the desired BaseData if it exists for the given input; Returns NULL 
     *         if no BaseData was found.
     */
-    const BaseData* GetBaseData(unsigned int idx);
+    const BaseData* GetRepresentationObject(unsigned int idx);
 
     virtual void SetTransformPosition(unsigned int index, bool applyTransform); ///< if set to true, the filter will use the position part of the input navigation data at the given index to transform the representation object. If set to false, it will not. If no value is set, it defaults to true.
     virtual bool GetTransformPosition(unsigned int index) const; ///< returns whether position part of the input navigation data at the given index is used for the transformation of the representation object.

@@ -100,18 +100,18 @@ int mitkNavigationDataObjectVisualizationFilterTest(int /* argc */, char* /*argv
   //now we have ndDummy and mitkToolDataDummy to test with
 
   //setting nodes
-  myFilter->SetBaseData(0, mitkToolData1);
-  MITK_TEST_CONDITION(myFilter->GetBaseData(0) == mitkToolData1, "Testing SetBaseData()/GetBaseData() node 1");
+  myFilter->SetRepresentationObject(0, mitkToolData1);
+  MITK_TEST_CONDITION(myFilter->GetRepresentationObject(0) == mitkToolData1, "Testing SetRepresentationObject()/GetRepresentationObject() node 1");
   MITK_TEST_CONDITION(myFilter->GetNumberOfToolRepresentations() == 1, "Testing GetNumberOfToolRepresentations() after adding first tool");
-  myFilter->SetBaseData(1, mitkToolData2);
-  MITK_TEST_CONDITION(myFilter->GetBaseData(1) == mitkToolData2, "Testing SetBaseData() node 2");
+  myFilter->SetRepresentationObject(1, mitkToolData2);
+  MITK_TEST_CONDITION(myFilter->GetRepresentationObject(1) == mitkToolData2, "Testing SetRepresentationObject() node 2");
   MITK_TEST_CONDITION(myFilter->GetNumberOfToolRepresentations() == 2, "Testing GetNumberOfToolRepresentations() after adding second tool");
   //getting nodes
-  MITK_TEST_CONDITION(myFilter->GetBaseData(0) == mitkToolData1, "Testing GetBaseData() node 1");
-  MITK_TEST_CONDITION(myFilter->GetBaseData(0) != mitkToolDataDummy, "Testing GetBaseData() != Dummy node");
-  MITK_TEST_CONDITION(myFilter->GetBaseData(1) == mitkToolData2, "Testing GetBaseData() node 2");
-  MITK_TEST_CONDITION(myFilter->GetBaseData(1) != mitkToolDataDummy, "Testing GetBaseData() != Dummy node");
-  MITK_TEST_CONDITION(myFilter->GetBaseData(111) == NULL, "Testing GetBaseData() with out of range parameter");
+  MITK_TEST_CONDITION(myFilter->GetRepresentationObject(0) == mitkToolData1, "Testing GetRepresentationObject() node 1");
+  MITK_TEST_CONDITION(myFilter->GetRepresentationObject(0) != mitkToolDataDummy, "Testing GetRepresentationObject() != Dummy node");
+  MITK_TEST_CONDITION(myFilter->GetRepresentationObject(1) == mitkToolData2, "Testing GetRepresentationObject() node 2");
+  MITK_TEST_CONDITION(myFilter->GetRepresentationObject(1) != mitkToolDataDummy, "Testing GetRepresentationObject() != Dummy node");
+  MITK_TEST_CONDITION(myFilter->GetRepresentationObject(111) == NULL, "Testing GetRepresentationObject() with out of range parameter");
   
   //Process
   myFilter->Update();
@@ -132,19 +132,19 @@ int mitkNavigationDataObjectVisualizationFilterTest(int /* argc */, char* /*argv
   MITK_TEST_OUTPUT( << "\n initOrient2=" << initialOri2 << " affineTransform2->GetVnlMatrix():\n " << m2);
   
 
-//messing with SetBaseData
+//messing with SetRepresentationObject
 //setting nodes
-  myFilter->SetBaseData(0, mitkToolData2);
-  MITK_TEST_CONDITION(myFilter->GetBaseData(0) == mitkToolData2, "Twisting mitkToolData by using SetBaseData() NavigationData 1 with ToolData 2");
+  myFilter->SetRepresentationObject(0, mitkToolData2);
+  MITK_TEST_CONDITION(myFilter->GetRepresentationObject(0) == mitkToolData2, "Twisting mitkToolData by using SetRepresentationObject() NavigationData 1 with ToolData 2");
   MITK_TEST_CONDITION(myFilter->GetNumberOfToolRepresentations() == 2, "Testing GetNumberOfToolRepresentations() == 1");
-  myFilter->SetBaseData(1, mitkToolData1);
-  MITK_TEST_CONDITION(myFilter->GetBaseData(1) == mitkToolData1, "Twisting mitkToolData by using SetBaseData() NavigationData 2 with ToolData 1");
+  myFilter->SetRepresentationObject(1, mitkToolData1);
+  MITK_TEST_CONDITION(myFilter->GetRepresentationObject(1) == mitkToolData1, "Twisting mitkToolData by using SetRepresentationObject() NavigationData 2 with ToolData 1");
   MITK_TEST_CONDITION(myFilter->GetNumberOfToolRepresentations() == 2, "Testing GetNumberOfToolRepresentations() == 2");
   //getting nodes
-  MITK_TEST_CONDITION(myFilter->GetBaseData(0) == mitkToolData2, "Testing switched BaseData of NavigationData 1 ");
-  MITK_TEST_CONDITION(myFilter->GetBaseData(0) != mitkToolDataDummy, "Testing GetBaseData() != Dummy node");
-  MITK_TEST_CONDITION(myFilter->GetBaseData(1) == mitkToolData1, "Testing switched BaseData NavigationData 2");
-  MITK_TEST_CONDITION(myFilter->GetBaseData(1) != mitkToolDataDummy, "Testing GetBaseData() != Dummy node");
+  MITK_TEST_CONDITION(myFilter->GetRepresentationObject(0) == mitkToolData2, "Testing switched BaseData of NavigationData 1 ");
+  MITK_TEST_CONDITION(myFilter->GetRepresentationObject(0) != mitkToolDataDummy, "Testing GetRepresentationObject() != Dummy node");
+  MITK_TEST_CONDITION(myFilter->GetRepresentationObject(1) == mitkToolData1, "Testing switched BaseData NavigationData 2");
+  MITK_TEST_CONDITION(myFilter->GetRepresentationObject(1) != mitkToolDataDummy, "Testing GetRepresentationObject() != Dummy node");
 
   //processing update through pipeline
   myFilter->Update();
@@ -175,9 +175,9 @@ int mitkNavigationDataObjectVisualizationFilterTest(int /* argc */, char* /*argv
   MITK_TEST_CONDITION(myFilter->GetInput(2) == ndDummy, "Testing Input == newly added input");
   MITK_TEST_CONDITION_REQUIRED(myFilter->GetOutput(2) != NULL, "Testing GetOutput(2) != NULL");
   MITK_TEST_CONDITION_REQUIRED(myFilter->GetOutput(2) != myFilter->GetOutput(1), "Testing GetOutput(2) != GetOutput(1)");
-  myFilter->SetBaseData(2, mitkToolDataDummy);
+  myFilter->SetRepresentationObject(2, mitkToolDataDummy);
   MITK_TEST_CONDITION(myFilter->GetNumberOfToolRepresentations() == 3, "Testing GetNumberOfToolRepresentations() after adding latest tool");
-  MITK_TEST_CONDITION(myFilter->GetBaseData(2) == mitkToolDataDummy, "Testing Set-/GetBaseData() equals was set");
+  MITK_TEST_CONDITION(myFilter->GetRepresentationObject(2) == mitkToolDataDummy, "Testing Set-/GetRepresentationObject() equals was set");
   
   //last time processing update through pipeline
   myFilter->Update();
@@ -191,8 +191,8 @@ int mitkNavigationDataObjectVisualizationFilterTest(int /* argc */, char* /*argv
   MITK_TEST_OUTPUT( << "\n latest initOrient="<<initialOriDummy<<" latest affineTransform->GetVnlMatrix():\n "<< m1Latest);
 
   mitk::Surface::Pointer anotherSurface = mitk::Surface::New();
-  myFilter->SetBaseData(0, anotherSurface);
-  MITK_TEST_CONDITION(myFilter->GetBaseData(0) == anotherSurface, "Overwriting BaseData index 0");
+  myFilter->SetRepresentationObject(0, anotherSurface);
+  MITK_TEST_CONDITION(myFilter->GetRepresentationObject(0) == anotherSurface, "Overwriting BaseData index 0");
 
   // always end with this!
   MITK_TEST_END();

@@ -303,7 +303,7 @@ void QmitkIGTExampleView::OnTestNavigation()
       toolNode->Modified();
       //add it to the DataStorage
       this->GetDefaultDataStorage()->Add(toolNode);
-      visualizer->SetBaseData(i, mitkToolData);
+      visualizer->SetRepresentationObject(i, mitkToolData);
     }
     m_EndOfPipeline = visualizer;
 

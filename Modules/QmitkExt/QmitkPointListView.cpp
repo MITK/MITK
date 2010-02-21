@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "QmitkPointListModel.h"
 #include "QmitkStdMultiWidget.h"
+#include "QmitkEditPointDialog.h"
 
 #include "mitkRenderingManager.h"
 
@@ -30,16 +31,13 @@ QmitkPointListView::QmitkPointListView( QWidget* parent )
  m_PointListModel( new QmitkPointListModel() ),
  m_SelfCall( false ),
  m_MultiWidget( NULL)
-{
-  // cosmetics
+{  
   QListView::setAlternatingRowColors( true );
-  
   // logic
-  QListView::setModel( m_PointListModel );
 
   QListView::setSelectionBehavior( QAbstractItemView::SelectRows );
   QListView::setSelectionMode( QAbstractItemView::SingleSelection );
-
+  QListView::setModel( m_PointListModel );
   //Define Size
   this->setMinimumHeight(40);
   //horizontal, vertical
@@ -47,6 +45,9 @@ QmitkPointListView::QmitkPointListView( QWidget* parent )
 
   connect( m_PointListModel, SIGNAL(UpdateSelection()), this, SLOT(OnPointSetSelectionChanged()) );
   
+  connect( this, SIGNAL(doubleClicked ( const QModelIndex & )),
+           this, SLOT(OnPointDoubleClicked( const QModelIndex & )) );
+
   connect( QListView::selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)),
            this, SLOT(OnListViewSelectionChanged(const QItemSelection& , const QItemSelection&)) );
   
@@ -78,6 +79,15 @@ QmitkStdMultiWidget* QmitkPointListView::GetMultiWidget() const
   return m_MultiWidget;
 }
 
+void QmitkPointListView::OnPointDoubleClicked(const QModelIndex & index)
+{
+  mitk::PointSet::PointType p;
+  mitk::PointSet::PointIdentifier id;
+  m_PointListModel->GetPointForModelIndex(index, p, id);
+  QmitkEditPointDialog _EditPointDialog(this);
+  _EditPointDialog.SetPoint(m_PointListModel->GetPointSet(), id, m_PointListModel->GetTimeStep());
+  _EditPointDialog.exec();
+}
 
 void QmitkPointListView::OnPointSetSelectionChanged()
 {

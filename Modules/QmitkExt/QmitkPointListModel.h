@@ -33,6 +33,7 @@ class QmitkExt_EXPORT QmitkPointListModel : public QAbstractListModel
     QmitkPointListModel( mitk::PointSet* = NULL, int t = 0, QObject* parent = 0 );
     ~QmitkPointListModel();
 
+    Qt::ItemFlags flags(const QModelIndex& index) const;
     // interface of QAbstractListModel
     int rowCount( const QModelIndex& parent = QModelIndex() ) const;
 

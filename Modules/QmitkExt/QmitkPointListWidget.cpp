@@ -40,19 +40,17 @@ QmitkPointListWidget::QmitkPointListWidget( QWidget* parent, Qt::WindowFlags f )
  m_BtnSave(NULL), m_PointSetNode(NULL), m_Interactor(NULL), m_EditAllowed(true),
  m_NodeObserverTag(0)
 {
-  QVBoxLayout* layout = new QVBoxLayout;
+  QGridLayout* layout = new QGridLayout;
   layout->setContentsMargins( 0, 0, 0, 0 );
-  
-  this->setLayout( layout );
-  
-  m_ListView = new QmitkPointListView( this );
-  layout->addWidget(m_ListView);
-  m_ListView->setToolTip("Use F2 to move the selected point up, use F3 to move the selected point down");
+    
+  m_ListView = new QmitkPointListView;
+  layout->addWidget(m_ListView, 0, 0, 1, 1);
+  m_ListView->setToolTip("Use F2 to move the selected point up, use F3 to move the selected point down, double click on a point toggles editing");
   connect( m_ListView, SIGNAL(PointSelectionChanged()), this, SIGNAL(PointSelectionChanged()) );  // forward signal from list view
   
   
   QWidget* buttonWidget = new QWidget;
-  layout->addWidget( buttonWidget );
+  layout->addWidget( buttonWidget, 1, 0, 1, 1 );
 
   QHBoxLayout* buttonLayout = new QHBoxLayout;
   buttonWidget->setLayout( buttonLayout );
@@ -82,6 +80,10 @@ QmitkPointListWidget::QmitkPointListWidget( QWidget* parent, Qt::WindowFlags f )
   m_BtnSave->setToolTip("Save points to file");
   connect( m_BtnSave, SIGNAL(clicked()), this, SLOT(OnSavePointSetButtonClicked()) );
   buttonLayout->addWidget(m_BtnSave);
+
+  layout->setRowStretch(0, 10);
+  layout->setRowStretch(1, 1);
+  this->setLayout( layout );
 
   ObserveNewNode(NULL);
 }

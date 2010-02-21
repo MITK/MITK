@@ -35,6 +35,12 @@ m_TimeStep(t)
   
 }
 
+Qt::ItemFlags QmitkPointListModel::flags(const QModelIndex& index) const
+{
+  // no editing so far, return default (enabled, selectable)
+
+  return Qt::ItemIsSelectable | Qt::ItemIsEnabled;
+}
 
 QmitkPointListModel::~QmitkPointListModel()
 {
@@ -45,7 +51,8 @@ QmitkPointListModel::~QmitkPointListModel()
 void QmitkPointListModel::SetPointSet( mitk::PointSet* pointSet )
 {
   ObserveNewPointset( pointSet );
-  emit QAbstractListModel::layoutChanged();
+  //emit QAbstractListModel::layoutChanged();
+  QAbstractListModel::reset();
   emit UpdateSelection();
 }
 
@@ -59,7 +66,8 @@ mitk::PointSet* QmitkPointListModel::GetPointSet() const
 void QmitkPointListModel::SetTimeStep(int t)
 {
   m_TimeStep = t;
-  emit QAbstractListModel::layoutChanged();
+  //emit QAbstractListModel::layoutChanged();
+  QAbstractListModel::reset();
   emit UpdateSelection();
 }
 
@@ -110,17 +118,19 @@ void QmitkPointListModel::ObserveNewPointset( mitk::PointSet* pointSet )
 void QmitkPointListModel::OnPointSetChanged( const itk::EventObject &  /*e*/ )
 {
   this->reset();
-  emit QAbstractListModel::layoutChanged();
+  //emit QAbstractListModel::layoutChanged();
+  QAbstractListModel::reset();
   emit UpdateSelection();
 }
-
+ 
 
 void QmitkPointListModel::OnPointSetDeleted( const itk::EventObject &  /*e*/ )
 {
   m_PointSet = NULL;
   m_PointSetModifiedObserverTag = 0;
   m_PointSetDeletedObserverTag = 0;
-  emit QAbstractListModel::layoutChanged();
+  //emit QAbstractListModel::layoutChanged();
+  QAbstractListModel::reset();
 }
 
 

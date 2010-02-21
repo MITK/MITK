@@ -36,6 +36,7 @@ SET(CPP_FILES
  #QmitkAbortEventFilter.cpp
  # QmitkApplicationCursor.cpp
  QmitkCallbackFromGUIThread.cpp
+ QmitkEditPointDialog.cpp
  QmitkExtRegisterClasses.cpp
  # QmitkRenderingManager.cpp
  # QmitkRenderingManagerFactory.cpp
@@ -91,6 +92,7 @@ SET(CPP_FILES
  QmitkPointListModel.cpp
  QmitkPointListView.cpp
  QmitkPointListWidget.cpp
+ QmitkPointListViewWidget.cpp
  QmitkVideoBackground.cpp
 )
 
@@ -139,7 +141,7 @@ SET(MOC_H_FILES
 
  qclickablelabel.h
  QmitkCallbackFromGUIThread.h
-
+ QmitkEditPointDialog.h
  #QmitkAlgorithmFunctionalityComponent.h
  #QmitkBaseAlgorithmComponent.h
  QmitkStandardViews.h
@@ -170,6 +172,7 @@ SET(MOC_H_FILES
  QmitkPointListModel.h
  QmitkPointListView.h
  QmitkPointListWidget.h
+ QmitkPointListViewWidget.h
  QmitkHistogramWidget.h
  QmitkVideoBackground.h
  

@@ -57,10 +57,15 @@ class QmitkExt_EXPORT QmitkPointListView : public QListView
     void SetMultiWidget( QmitkStdMultiWidget* multiWidget ); ///< assign a QmitkStdMultiWidget for updating render window crosshair
 
     QmitkStdMultiWidget* GetMultiWidget() const;  ///< return the QmitkStdMultiWidget that is used for updating render window crosshair
-  
+
   signals:
       void PointSelectionChanged();  ///< this signal is emmitted, if the selection of a point in the pointset is changed
   protected slots:
+
+    ///
+    /// Filtering double click event for editing point coordinates via a dialog
+    ///
+    void OnPointDoubleClicked(const QModelIndex & index);
 
     /// called when the point set data structure changes
     void OnPointSetSelectionChanged();

@@ -122,6 +122,8 @@ void QmitkPointSetInteractionView::SelectionChanged( berry::IWorkbenchPart::Poin
   mitk::DataTreeNodeObject* _DataTreeNodeObject = 0;
   mitk::PointSet* _PointSet;
 
+  m_Controls->m_CurrentPointSetLabel->setText("...");
+
   for (mitk::DataTreeNodeSelection::iterator it =
     _DataTreeNodeSelection->Begin(); it != _DataTreeNodeSelection->End(); ++it)
   {

@@ -63,7 +63,7 @@ void mitk::NavigationDataLandmarkTransformFilter::InitializeLandmarkTransform(La
 }
 
 
-void mitk::NavigationDataLandmarkTransformFilter::SetSourcePoints(mitk::PointSet::Pointer mitkSourcePointSet)
+void mitk::NavigationDataLandmarkTransformFilter::SetSourceLandmarks(mitk::PointSet::Pointer mitkSourcePointSet)
 {
   m_SourcePoints.clear();
   mitk::PointSet::PointType mitkSourcePoint;
@@ -86,7 +86,7 @@ void mitk::NavigationDataLandmarkTransformFilter::SetSourcePoints(mitk::PointSet
 }
 
 
-void mitk::NavigationDataLandmarkTransformFilter::SetTargetPoints(mitk::PointSet::Pointer mitkTargetPointSet)
+void mitk::NavigationDataLandmarkTransformFilter::SetTargetLandmarks(mitk::PointSet::Pointer mitkTargetPointSet)
 {
   m_TargetPoints.clear();
   TransformInitializerType::LandmarkPointType lPoint;

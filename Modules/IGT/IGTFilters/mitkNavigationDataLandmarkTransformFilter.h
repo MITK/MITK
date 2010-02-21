@@ -32,7 +32,7 @@ namespace mitk {
   * \brief NavigationDataLandmarkTransformFilter applies a itk-landmark-transformation
   * defined by source and target pointsets. 
   * 
-  * Before executing the filter SetSourcePoints and SetTargetPoints must be called. Before both source 
+  * Before executing the filter SetSourceLandmarks and SetTargetLandmarks must be called. Before both source 
   * and target landmarks are set, the filter performs an identity transform.
   * If source or target points are changed after calling SetXXXPoints, the corresponding SetXXXPoints 
   * method has to be called again to apply the changes.
@@ -58,13 +58,13 @@ namespace mitk {
     *\brief Set points used as source points for landmark transform.
     *
     */
-    virtual void SetSourcePoints(mitk::PointSet::Pointer sourcePointSet);
+    virtual void SetSourceLandmarks(mitk::PointSet::Pointer sourcePointSet);
 
     /** 
     *\brief Set points used as target points for landmark transform
     *
     */
-    virtual void SetTargetPoints(mitk::PointSet::Pointer targetPointSet);
+    virtual void SetTargetLandmarks(mitk::PointSet::Pointer targetPointSet);
 
     virtual bool IsInitialized() const;
 

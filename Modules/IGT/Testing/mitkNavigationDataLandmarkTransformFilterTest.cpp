@@ -91,15 +91,15 @@ int mitkNavigationDataLandmarkTransformFilterTest(int /* argc */, char* /*argv*/
 
   MITK_TEST_CONDITION(myFilter->IsInitialized() == false, "Testing IsInitialized() before setting source points");
 
-  myFilter->SetSourcePoints(sourcePoints);
+  myFilter->SetSourceLandmarks(sourcePoints);
   MITK_TEST_CONDITION(myFilter->IsInitialized() == false, "Testing IsInitialized() after setting source points and before setting target points");
 
   mitk::PointSet::Pointer zeroTargetPoints = mitk::PointSet::New();
   
-  MITK_TEST_FOR_EXCEPTION(itk::ExceptionObject, myFilter->SetTargetPoints(zeroTargetPoints));
+  MITK_TEST_FOR_EXCEPTION(itk::ExceptionObject, myFilter->SetTargetLandmarks(zeroTargetPoints));
   MITK_TEST_CONDITION(myFilter->IsInitialized() == false, "Testing IsInitialized() after setting target pointset with insufficient points");
 
-  myFilter->SetTargetPoints(targetPoints);
+  myFilter->SetTargetLandmarks(targetPoints);
   MITK_TEST_CONDITION(myFilter->IsInitialized() == true, "Testing IsInitialized() after setting source& target points");
   
   //------------------------landmark transform should be initialized at this point------------------------
@@ -151,7 +151,7 @@ int mitkNavigationDataLandmarkTransformFilterTest(int /* argc */, char* /*argv*/
   targetPoints->SetPoint(1,tPoint2);
   targetPoints->SetPoint(2,tPoint3);
   
-  myFilter->SetTargetPoints(targetPoints);
+  myFilter->SetTargetLandmarks(targetPoints);
 
   output1->Update();
   
@@ -176,7 +176,7 @@ int mitkNavigationDataLandmarkTransformFilterTest(int /* argc */, char* /*argv*/
   sourcePoints->SetPoint(1,sPoint2);
   sourcePoints->SetPoint(2,sPoint3);
 
-  myFilter->SetSourcePoints(sourcePoints);
+  myFilter->SetSourceLandmarks(sourcePoints);
 
   output1->Update();
 
@@ -222,8 +222,8 @@ int mitkNavigationDataLandmarkTransformFilterTest(int /* argc */, char* /*argv*/
 
     mitk::NavigationDataLandmarkTransformFilter::Pointer myFilter = mitk::NavigationDataLandmarkTransformFilter::New();
     myFilter->UseICPInitializationOn();
-    myFilter->SetSourcePoints(sourcePoints);
-    myFilter->SetTargetPoints(targetPoints);  // errors would raise exceptions
+    myFilter->SetSourceLandmarks(sourcePoints);
+    myFilter->SetTargetLandmarks(targetPoints);  // errors would raise exceptions
 
     // prepare input
     mitk::NavigationData::PositionType initialPos1, resultPos1;
@@ -251,7 +251,7 @@ int mitkNavigationDataLandmarkTransformFilterTest(int /* argc */, char* /*argv*/
   MITK_TEST_CONDITION_REQUIRED(myFilter2.IsNotNull(),"Testing instantiation for second filter");
 
   mitk::PointSet::Pointer sourcePoints2 = mitk::PointSet::New();
-  MITK_TEST_FOR_EXCEPTION(std::exception, myFilter2->SetSourcePoints(sourcePoints2););
+  MITK_TEST_FOR_EXCEPTION(std::exception, myFilter2->SetSourceLandmarks(sourcePoints2););
 
 
   //------------------------catch exception --> target points < 3------------------------
@@ -259,7 +259,7 @@ int mitkNavigationDataLandmarkTransformFilterTest(int /* argc */, char* /*argv*/
   MITK_TEST_CONDITION_REQUIRED(myFilter3.IsNotNull(),"Testing instantiation for second filter");
 
   mitk::PointSet::Pointer targetPoints2 = mitk::PointSet::New();
-  MITK_TEST_FOR_EXCEPTION(std::exception, myFilter3->SetTargetPoints(targetPoints2););
+  MITK_TEST_FOR_EXCEPTION(std::exception, myFilter3->SetTargetLandmarks(targetPoints2););
 
 
   //------------------------rotate orientation------------------------
@@ -282,8 +282,8 @@ int mitkNavigationDataLandmarkTransformFilterTest(int /* argc */, char* /*argv*/
   targetPoints->SetPoint(1,tPoint2);
   targetPoints->SetPoint(2,tPoint3);
 
-  myFilter->SetSourcePoints(sourcePoints);
-  myFilter->SetTargetPoints(targetPoints);
+  myFilter->SetSourceLandmarks(sourcePoints);
+  myFilter->SetTargetLandmarks(targetPoints);
 
   //set initial orientation (x y z r)
   mitk::NavigationData::OrientationType initialQuat(0.0, 0.0, 0.0, 1.0);
@@ -350,8 +350,8 @@ int mitkNavigationDataLandmarkTransformFilterTest(int /* argc */, char* /*argv*/
   movPoint[0]=2; movPoint[1]=2; movPoint[2]=2; movSet->SetPoint(7, movPoint);
 
   mitk::NavigationDataLandmarkTransformFilter::Pointer myFREFilter = mitk::NavigationDataLandmarkTransformFilter::New();
-  myFREFilter->SetSourcePoints(refSet);
-  myFREFilter->SetTargetPoints(movSet);
+  myFREFilter->SetSourceLandmarks(refSet);
+  myFREFilter->SetTargetLandmarks(movSet);
   
   MITK_TEST_CONDITION_REQUIRED(myFREFilter->GetFRE() == (float) sqrt(3.0),"Testing mean error calculation")
   MITK_TEST_CONDITION_REQUIRED(myFREFilter->GetMaxError() == (float) sqrt(3.0),"Testing mean error calculation")

@@ -20,8 +20,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <berryIViewPart.h>
 #include "src/internal/QmitkIGTExampleView.h"
-
+#include "src/internal/QmitkIGTRecorderView.h"
 
 POCO_BEGIN_NAMED_MANIFEST(berryIViewPart, berry::IViewPart)
   POCO_EXPORT_CLASS(::QmitkIGTExampleView)
+  POCO_EXPORT_CLASS(::QmitkIGTRecorderView)
 POCO_END_MANIFEST

@@ -8,5 +8,10 @@
           class="::QmitkIGTExampleView" 
 		  icon="resources/ImageGuidedTherapy.png"/>
   </extension>
-
+<extension point="org.blueberry.ui.views">
+    <view id="org.mitk.views.igtrecorder"
+          name="IGT Recorder"
+          class="::QmitkIGTRecorderView" 
+		  icon="resources/ImageGuidedTherapy.png"/>
+  </extension>
 </plugin>

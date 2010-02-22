@@ -5,14 +5,17 @@ SET(SRC_CPP_FILES
 SET(INTERNAL_CPP_FILES
   QmitkIGTExampleView.cpp
   QmitkIGTExampleTesting.cpp  
+  QmitkIGTRecorderView.cpp
 )
 
 SET(UI_FILES
   src/internal/QmitkIGTExampleViewControls.ui
+  src/internal/QmitkIGTRecorderViewControls.ui
 )
 
 SET(MOC_H_FILES
   src/internal/QmitkIGTExampleView.h
+  src/internal/QmitkIGTRecorderView.h
 )
 
 SET(RESOURCE_FILES

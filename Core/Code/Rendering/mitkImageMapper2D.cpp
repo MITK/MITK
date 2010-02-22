@@ -675,10 +675,10 @@ mitk::ImageMapper2D::GenerateData( mitk::BaseRenderer *renderer )
 
   rendererInfo.m_Pic = pic;
 
-  if ( pic->bpe == 24 ) // RGB image
-  {
+  if ( pic->bpe == 24 && reslicedImage->GetScalarType()==VTK_UNSIGNED_CHAR ) // RGB image
     m_iil4mitkMode = iil4mitkImage::RGB;
-  }
+  else if ( pic->bpe == 32 && reslicedImage->GetScalarType()==VTK_UNSIGNED_CHAR ) // RGBA image
+    m_iil4mitkMode = iil4mitkImage::RGBA;
 
   image->setImage( pic, m_iil4mitkMode );
   image->setInterpolation( false );

@@ -48,6 +48,8 @@ MAX_INITIALIZER_LINES  = 30
 OPTIMIZE_OUTPUT_FOR_C  = NO
 OPTIMIZE_OUTPUT_JAVA   = NO
 SHOW_USED_FILES        = YES
+SEARCHENGINE           = YES
+SERVER_BASED_SEARCH    = NO
 #---------------------------------------------------------------------------
 # configuration options related to warning and progress messages
 #---------------------------------------------------------------------------

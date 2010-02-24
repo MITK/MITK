@@ -25,6 +25,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <itkImage.h>
 
+#include <berryISelectionListener.h>
+#include <mitkDataTreeNodeSelection.h>
+
 #include "ui_QmitkRegionGrowingControls.h"
 
 /*!
@@ -51,15 +54,14 @@ class QmitkRegionGrowing : public QObject, public QmitkFunctionality
 
   virtual void CreateQtPartControl(QWidget *parent);
 
-  /// \brief Creation of the connections of main and control widget  
-  virtual void CreateConnections();
-
   /// \brief Called when the functionality is activated
   virtual void Activated();
   virtual void Deactivated();
 
   virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget);
   virtual void StdMultiWidgetNotAvailable();
+  
+  void SelectionChanged( berry::IWorkbenchPart::Pointer, berry::ISelection::ConstPointer selection );
 
 protected slots:  
   
@@ -87,6 +89,16 @@ protected:
   Ui::QmitkRegionGrowingControls* m_Controls;
 
   QmitkStdMultiWidget* m_MultiWidget;
+  
+  ///
+  /// A selection listener for datatreenode events
+  ///
+  berry::ISelectionListener::Pointer m_SelectionListener;
+  void UpdateFromCurrentDataManagerSelection();
+  
+private:
+  void SetStatusText( QString text, bool isError);
+  mitk::WeakPointer<mitk::DataTreeNode> m_SelectedNode;
 };
 
 #endif // !defined(QmitkRegionGrowing_H__INCLUDED)

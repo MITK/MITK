@@ -586,7 +586,7 @@ void XMLMementoTest::TestSpacesInRootAreIllegal()
   {
     XMLMemento::CreateWriteRoot("with space");
     failmsg("should fail");
-  } catch (std::exception& e)
+  } catch (std::exception& /*e*/)
   {
     // expected
   }
@@ -599,7 +599,7 @@ void XMLMementoTest::TestSpacesInKeysAreIllegal()
   {
     memento->CreateChild("with space", "bar");
     failmsg("should fail");
-  } catch (std::exception& e)
+  } catch (std::exception& /*e*/)
   {
     // expected
   }
@@ -607,7 +607,7 @@ void XMLMementoTest::TestSpacesInKeysAreIllegal()
   {
     memento->PutString("with space", "bar");
     failmsg("should fail");
-  } catch (std::exception& e)
+  } catch (std::exception& /*e*/)
   {
     // expected
   }
@@ -724,7 +724,7 @@ void XMLMementoTest::TestIllegalKeys() throw ()
     {
       memento->PutString(illegalKeys[i], "some string");
       failmsg("putString with illegal key should fail");
-    } catch (std::exception& ex)
+    } catch (std::exception& /*ex*/)
     {
       // expected
     }

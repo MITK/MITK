@@ -220,7 +220,7 @@ void DebugBreakpointManager::RestoreState(const Poco::Path& path)
   {
     BERRY_WARN << e.displayText();
   }
-  catch (Poco::FileNotFoundException& e)
+  catch (Poco::FileNotFoundException& /*e*/)
   {
 
   }

@@ -29,7 +29,7 @@ int CoreTestApplication::Start() {
   try {
     testPlugin = Platform::GetConfiguration().getString(Platform::ARG_TESTPLUGIN);
   }
-  catch (const Poco::NotFoundException& e)
+  catch (const Poco::NotFoundException& /*e*/)
   {
     BERRY_ERROR << "You must specify a test plug-in id via " << Platform::ARG_TESTPLUGIN << "=<id>";
     return 1;

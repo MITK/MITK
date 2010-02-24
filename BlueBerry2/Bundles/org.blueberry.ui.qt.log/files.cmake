@@ -17,7 +17,7 @@ SET(MOC_H_FILES
 )
 
 SET(RESOURCE_FILES
-  resources/LogView.png
+  resources/Logging.png
 )
 
 SET(UI_FILES

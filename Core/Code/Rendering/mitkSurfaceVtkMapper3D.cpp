@@ -448,7 +448,7 @@ void mitk::SurfaceVtkMapper3D::SetDefaultProperties(mitk::DataTreeNode* node, mi
   node->AddProperty( "color", mitk::ColorProperty::New(1.0f,1.0f,1.0f), renderer, overwrite );
   node->AddProperty( "opacity", mitk::FloatProperty::New(1.0), renderer, overwrite );
 
-  this->SetDefaultPropertiesForVtkProperty(node,renderer,overwrite); // Shading
+  SetDefaultPropertiesForVtkProperty(node,renderer,overwrite); // Shading
   
   node->AddProperty( "scalar visibility", mitk::BoolProperty::New(false), renderer, overwrite );
   node->AddProperty( "color mode", mitk::BoolProperty::New(false), renderer, overwrite );

@@ -4,6 +4,8 @@
 
 #include "QmitkCustomVariants.h"
 
+#include "mitkRenderingManager.h"
+
 #include <bitset>
 #include <QPainter>
 #include <QApplication>
@@ -60,6 +62,8 @@ QWidget* QmitkPropertyDelegate::createEditor(QWidget *parent, const QStyleOption
 
   if(data.isValid())
   {
+  
+    QWidget* editorWidget = NULL;
 
     if(data.type() == QVariant::Color)
     {
@@ -78,7 +82,7 @@ QWidget* QmitkPropertyDelegate::createEditor(QWidget *parent, const QStyleOption
 
       connect(colorBtn, SIGNAL(pressed()), this, SLOT(commitAndCloseEditor()));
 
-      return colorBtn;
+      editorWidget = colorBtn;
     }
 
 /*
@@ -98,7 +102,7 @@ QWidget* QmitkPropertyDelegate::createEditor(QWidget *parent, const QStyleOption
       spinBox->setSingleStep(1);
       spinBox->setMinimum(std::numeric_limits<int>::min());
       spinBox->setMaximum(std::numeric_limits<int>::max());
-      return spinBox;
+      editorWidget = spinBox;
     }
     // see qt documentation. cast is correct, it would be obsolete if we 
     // store doubles
@@ -118,7 +122,7 @@ QWidget* QmitkPropertyDelegate::createEditor(QWidget *parent, const QStyleOption
         spinBox->setMaximum(std::numeric_limits<float>::max());
       }
       
-      return spinBox;
+      editorWidget = spinBox;
     }
 
     else if(data.type() == QVariant::StringList)
@@ -128,12 +132,22 @@ QWidget* QmitkPropertyDelegate::createEditor(QWidget *parent, const QStyleOption
       comboBox->setEditable(false);
       comboBox->addItems(entries);
 
-      return comboBox;
+      editorWidget = comboBox;
     }
 
     
     else
-      return QStyledItemDelegate::createEditor(parent, option, index);
+    {
+      editorWidget = QStyledItemDelegate::createEditor(parent, option, index);
+    }
+
+    if ( editorWidget )
+    {
+      // install event filter
+      editorWidget->installEventFilter( const_cast<QmitkPropertyDelegate*>(this) );
+    }
+
+    return editorWidget;
 
   }
   else
@@ -337,4 +351,33 @@ void QmitkPropertyDelegate::SpinBoxValueChanged( const QString&  /*value*/ )
 void QmitkPropertyDelegate::showColorDialog()
 {
 
+}
+
+bool QmitkPropertyDelegate::eventFilter( QObject *o, QEvent *e )
+{
+  // filter all kind of events on our editor widgets
+  // when certain events occur, repaint all render windows, because rendering relevant properties might have changed
+  switch ( e->type() )
+  {
+    case QEvent::KeyRelease:
+    case QEvent::MouseButtonRelease:
+    case QEvent::MouseButtonDblClick:
+    case QEvent::Wheel:
+    case QEvent::FocusIn:
+    {
+      if( QWidget* editor = dynamic_cast<QWidget*>(o) )
+      {
+        emit commitData(editor);
+      }
+
+      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+      break;
+    }
+    default:
+    {
+      break;
+    }
+  }
+
+  return false;
 }

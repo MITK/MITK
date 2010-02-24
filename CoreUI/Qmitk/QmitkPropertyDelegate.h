@@ -52,6 +52,10 @@ class QMITK_EXPORT QmitkPropertyDelegate : public QStyledItemDelegate
     ///
     void updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index) const;
 
+  protected:
+
+    bool eventFilter( QObject *o, QEvent *e );
+
   private slots:
     ///
     /// Invoked when the user accepts editor input, that is when he does not pushes ESC.

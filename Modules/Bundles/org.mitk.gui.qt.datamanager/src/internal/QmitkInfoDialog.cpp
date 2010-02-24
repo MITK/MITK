@@ -8,6 +8,8 @@
 #include <QTextBrowser>
 #include <QPushButton>
 #include <QLineEdit>
+#include <QEvent>
+#include <QKeyEvent>
 
 QmitkInfoDialog::QmitkInfoDialog( std::vector<mitk::DataTreeNode*> _Nodes, QWidget * parent /*= 0*/, Qt::WindowFlags f /*= 0 */ )
 : QDialog(parent, f)
@@ -69,7 +71,7 @@ void QmitkInfoDialog::OnSelectionChanged( const mitk::DataTreeNode* node )
 void QmitkInfoDialog::OnSearchButtonClicked( bool  /*checked*/ /*= false */ )
 {
   QString keyWord = m_KeyWord->text();
-  QString text = m_TextBrowser->text();
+  QString text = m_TextBrowser->toPlainText();
   
   if(keyWord.isEmpty() || text.isEmpty())
     return;

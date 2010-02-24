@@ -600,10 +600,10 @@ void QmitkDataManagerView::ShowInfoDialogForSelectedNodes( bool )
 
 void QmitkDataManagerView::Load( bool )
 {
-  QStringList fileNames = QFileDialog::getOpenFileNames(mitk::CoreObjectFactory::GetInstance()->GetFileExtensions(), NULL);
+  QStringList fileNames = QFileDialog::getOpenFileNames(NULL, "Load data", "", mitk::CoreObjectFactory::GetInstance()->GetFileExtensions());
   for ( QStringList::Iterator it = fileNames.begin(); it != fileNames.end(); ++it )
   {
-    FileOpen((*it).ascii(), 0);
+    FileOpen((*it).toAscii(), 0);
   }
 }
 

@@ -53,6 +53,8 @@ public:
     
     typedef PointSetType::PointType PointType;
 
+    virtual int InitializeParser();
+    virtual int CleanupParser();
     /**
      * Handler function which is called, when a new xml start-tag 
      * has been parsed.
@@ -127,6 +129,8 @@ protected:
      * by the parser.
      */
     PointIdentifier m_CurrentPointId;
+
+    std::locale m_PreviousLocale;
 
 };    
 }

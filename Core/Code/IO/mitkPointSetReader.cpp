@@ -18,6 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkPointSetReader.h"
 #include "vtkPointSetXMLParser.h"
+#include "vtkSmartPointer.h""
 #include <iostream>
 #include <fstream>
 
@@ -44,21 +45,14 @@ void mitk::PointSetReader::GenerateData()
         itkWarningMacro( << "Sorry, can't read file " << m_FileName << "!" );
         return ;
     }
-    std::ifstream in( m_FileName.c_str() );
-    if ( ! in.good() )
-    {
-        itkWarningMacro( << "Sorry, can't read file " << m_FileName << "!" );
-        in.close();
-        return ;
-    }
-    in.close();
 
-    mitk::vtkPointSetXMLParser* parser = mitk::vtkPointSetXMLParser::New();
+   vtkSmartPointer< vtkPointSetXMLParser > parser = vtkPointSetXMLParser::New();
    parser->SetFileName( m_FileName.c_str() );
+
     if ( parser->Parse() == 0 ) //Parse returns zero as error indicator
     {
         itkWarningMacro( << "Sorry, an error occurred during parsing!" );
-        return ;
+          return ;
     }
     mitk::vtkPointSetXMLParser::PointSetList pointSetList = parser->GetParsedPointSets();
     this->ResizeOutputs( pointSetList.size() );
@@ -68,7 +62,7 @@ void mitk::PointSetReader::GenerateData()
     {
         this->SetNthOutput( i, *it );
     }
-    parser->Delete();
+
     m_Success = true;
 }
 
@@ -80,16 +74,9 @@ void mitk::PointSetReader::GenerateOutputInformation()
 int mitk::PointSetReader::CanReadFile ( const char *name )
 {
     std::ifstream in( name );
-    if ( !in.good() )
-    {
-        in.close();
-        return false;
-    }
-    else
-    {
-        in.close();
-        return true;
-    }
+    bool isGood = in.good();
+    in.close();
+    return isGood;
 }
 
 bool mitk::PointSetReader::CanReadFile(const std::string filename, const std::string filePrefix, const std::string filePattern) 

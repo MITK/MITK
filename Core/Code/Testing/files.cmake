@@ -50,6 +50,7 @@ SET(MODULE_TESTS
   mitkStepperTest.cpp
   itkTotalVariationDenoisingImageFilterTest.cpp
   mitkDICOMLocaleTest.cpp
+  mitkPointSetLocaleTest.cpp
   mitkRenderingManagerTest.cpp
 )
 

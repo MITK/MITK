@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkPointSetWriter.h"
 #include <iostream>
 #include <fstream>
+#include <locale>
 
 
 //
@@ -83,10 +84,14 @@ void mitk::PointSetWriter::GenerateData()
     if ( !out.good() )
     {
       itkExceptionMacro(<< "File " << m_FileName << " could not be opened!");
-        itkWarningMacro( << "Sorry, file " << m_FileName << " could not be opened!" );
-        out.close();
+      itkWarningMacro( << "Sorry, file " << m_FileName << " could not be opened!" );
+      out.close();
         return ;
     }
+
+    std::locale previousLocale(out.getloc());
+    std::locale I("C");
+    out.imbue(I);
 
     //
     // Here the actual xml writing begins
@@ -108,8 +113,8 @@ void mitk::PointSetWriter::GenerateData()
         WriteXML( pointSet.GetPointer(), out );
     }
 
-    WriteEndElement( XML_POINT_SET_FILE, out );
-
+   WriteEndElement( XML_POINT_SET_FILE, out );
+   out.imbue(previousLocale);
     if ( !out.good() ) // some error during output
     {
       out.close();
@@ -218,12 +223,16 @@ template < typename T>
 std::string mitk::PointSetWriter::ConvertToString( T value )
 {
     std::ostringstream o;
+    std::locale I("C");
+    o.imbue(I);
+
     if ( o << value )
+    {
         return o.str();
+     }
     else
         return "conversion error";
 }
-
 
 
 

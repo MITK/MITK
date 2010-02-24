@@ -35,6 +35,37 @@ mitk::vtkPointSetXMLParser::~vtkPointSetXMLParser()
 {
 }
 
+int mitk::vtkPointSetXMLParser::InitializeParser()
+{
+   vtkXMLParser::InitializeParser();
+   std::istream* stream = this -> GetStream();
+   if (!stream)
+   {
+      vtkErrorMacro("no stream available in XML file reader");
+       this->ParseError = 1;
+       return 0;
+   }
+   m_PreviousLocale = stream->getloc();
+   std::locale I("C");
+   stream->imbue(I);
+   return 1;
+}
+
+int mitk::vtkPointSetXMLParser::CleanupParser()
+{
+  std::istream* stream = this -> GetStream();
+   if (!stream)
+   {
+      vtkErrorMacro("no stream available in XML file reader");
+        this->ParseError = 1;
+        return 0;
+   }
+   stream->imbue( m_PreviousLocale );
+   vtkXMLParser::CleanupParser();
+   return 1;
+}
+
+
 
 void mitk::vtkPointSetXMLParser::StartElement ( const char *name, const char ** /*atts */)
 {
@@ -144,7 +175,11 @@ void mitk::vtkPointSetXMLParser::CharacterDataHandler ( const char *inData, int 
 
 mitk::ScalarType mitk::vtkPointSetXMLParser::ParseScalarType( const std::string &data )
 {
-    return ( mitk::ScalarType ) atof( data.c_str() );
+    std::istringstream stm;
+    stm.str(data);
+    ScalarType number;
+    stm >>number;
+     return number;
 }
 
 
@@ -152,7 +187,11 @@ mitk::ScalarType mitk::vtkPointSetXMLParser::ParseScalarType( const std::string 
 
 mitk::vtkPointSetXMLParser::PointIdentifier mitk::vtkPointSetXMLParser::ParsePointIdentifier( const std::string &data )
 {
-    return ( mitk::vtkPointSetXMLParser::PointIdentifier ) atol( data.c_str() );
+   std::istringstream stm;
+   stm.str(data);
+   PointIdentifier pointID;
+   stm >>pointID;
+    return pointID;
 }
 
 

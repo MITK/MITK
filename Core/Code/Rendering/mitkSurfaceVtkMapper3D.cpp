@@ -438,7 +438,6 @@ void mitk::SurfaceVtkMapper3D::SetDefaultPropertiesForVtkProperty(mitk::DataTree
     node->AddProperty( "material.specularColor"      , mitk::ColorProperty::New(1.0f,1.0f,1.0f), renderer, overwrite );
 
     node->AddProperty( "material.representation"      , mitk::VtkRepresentationProperty::New()  , renderer, overwrite );
-
     node->AddProperty( "material.interpolation"       , mitk::VtkInterpolationProperty::New()   , renderer, overwrite );
   }
 }
@@ -446,14 +445,15 @@ void mitk::SurfaceVtkMapper3D::SetDefaultPropertiesForVtkProperty(mitk::DataTree
 
 void mitk::SurfaceVtkMapper3D::SetDefaultProperties(mitk::DataTreeNode* node, mitk::BaseRenderer* renderer, bool overwrite)
 {
-  // Shading
-  SetDefaultPropertiesForVtkProperty(node,renderer,overwrite);
+  node->AddProperty( "color", mitk::ColorProperty::New(1.0f,1.0f,1.0f), renderer, overwrite );
+  node->AddProperty( "opacity", mitk::FloatProperty::New(1.0), renderer, overwrite );
+
+  this->SetDefaultPropertiesForVtkProperty(node,renderer,overwrite); // Shading
   
   node->AddProperty( "scalar visibility", mitk::BoolProperty::New(false), renderer, overwrite );
   node->AddProperty( "color mode", mitk::BoolProperty::New(false), renderer, overwrite );
   node->AddProperty( "scalar mode", mitk::VtkScalarModeProperty::New(), renderer, overwrite );
   mitk::Surface::Pointer surface = dynamic_cast<Surface*>(node->GetData());
-
   if(surface.IsNotNull())
   {
     if((surface->GetVtkPolyData() != 0) && (surface->GetVtkPolyData()->GetPointData() != NULL) && (surface->GetVtkPolyData()->GetPointData()->GetScalars() != 0))
@@ -462,9 +462,9 @@ void mitk::SurfaceVtkMapper3D::SetDefaultProperties(mitk::DataTreeNode* node, mi
       node->AddProperty( "color mode", mitk::BoolProperty::New(true), renderer, overwrite );
     }
   }
-
   Superclass::SetDefaultProperties(node, renderer, overwrite);
 }
+
 
 void mitk::SurfaceVtkMapper3D::SetImmediateModeRenderingOn(int  /*on*/)
 {

@@ -21,6 +21,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkTestingMacros.h"
 #include <list>
 #include <fstream>
+#include <iostream>
+#include <string>
 
 bool ChangeLocale(const std::string& locale)
 {
@@ -94,34 +96,28 @@ void WriterLocaleTest(mitk::Point3D & refPoint)
   MITK_TEST_CONDITION_REQUIRED(refStream,"Read reference point set");
   MITK_TEST_CONDITION_REQUIRED(stream,"Read point set");
 
+  std::string streamLine;
+  std::string refStreamLine;
+
   bool differ = false;
-
-  stream.seekg (0, ios::end);
-  const int streamLength = stream.tellg();
-  stream.seekg(0, ios::beg);
-
-  refStream.seekg (0, ios::end);
-  const int refStreamLength = refStream.tellg();
-  refStream.seekg(0, ios::beg);
-
-  if (streamLength == refStreamLength)
+  if (stream.is_open() && refStream.is_open())
   {
-      char refBuffer[refStreamLength];
-      char buffer[streamLength];
-
-      refStream.read(refBuffer, refStreamLength);
-      stream.read(buffer, streamLength);
-
-      for (int i = 0; i < streamLength; i++)
-        if (refBuffer[i] != buffer[i])
-        {
-          differ = true;
-            break;
-        }
-  }else
-    differ = true;
-
-  MITK_TEST_CONDITION_REQUIRED(!differ, "Writer Test");
+   std::string streamLine;
+   std::string refStreamLine;
+    while(!stream.eof() && ! refStream.eof())
+    {
+      getline(stream, streamLine);
+      getline(refStream, refStreamLine);
+      if(streamLine.compare(refStreamLine) != 0)
+      {
+        differ = true;
+          break;
+       }
+    }
+    stream.close();
+    refStream.close();
+  }
+  MITK_TEST_CONDITION_REQUIRED(!differ, "Write point set correct");
 }
 
 int mitkPointSetLocaleTest(int /*argc*/, char* /*argv*/[])

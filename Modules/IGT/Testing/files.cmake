@@ -22,7 +22,7 @@ SET(MODULE_TESTS
    mitkNavigationDataRecorderTest.cpp
 
    # ------------------ Deavtivated Tests ----------------------------------   
-   #mitkTrackingDeviceSourceTest.cpp
+   mitkTrackingDeviceSourceTest.cpp
    #mitkNavigationDataPlayerTest.cpp  # deactivated, see bug 3073
    #mitkNavigationDataSourceTest.cpp   # deactivated because of  bug #2323
    # -----------------------------------------------------------------------

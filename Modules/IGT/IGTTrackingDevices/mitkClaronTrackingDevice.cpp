@@ -306,6 +306,7 @@ void mitk::ClaronTrackingDevice::TrackTools()
   }
   catch(...)
   {
+    m_TrackingFinishedMutex->Unlock();
     this->StopTracking();
     this->SetErrorMessage("Error while trying to track tools. Thread stopped.");
   }

@@ -94,24 +94,32 @@ void WriterLocaleTest(mitk::Point3D & refPoint)
   MITK_TEST_CONDITION_REQUIRED(refStream,"Read reference point set");
   MITK_TEST_CONDITION_REQUIRED(stream,"Read point set");
 
+  bool differ = false;
+
+  stream.seekg (0, ios::end);
+  const int streamLength = stream.tellg();
+  stream.seekg(0, ios::beg);
+
   refStream.seekg (0, ios::end);
-  int length = refStream.tellg();
+  const int refStreamLength = refStream.tellg();
   refStream.seekg(0, ios::beg);
 
-  char refBuffer[length];
-  char buffer[length];
+  if (streamLength == refStreamLength)
+  {
+      char refBuffer[refStreamLength];
+      char buffer[streamLength];
 
-  refStream.read(refBuffer, length);
-  stream.read(buffer, length);
+      refStream.read(refBuffer, refStreamLength);
+      stream.read(buffer, streamLength);
 
-  bool differ = false;
-  for (int i = 0; i < length; i++)
-    if (refBuffer[i] != buffer[i])
-    {
-
-      differ = true;
-        return;
-    }
+      for (int i = 0; i < streamLength; i++)
+        if (refBuffer[i] != buffer[i])
+        {
+          differ = true;
+            break;
+        }
+  }else
+    differ = true;
 
   MITK_TEST_CONDITION_REQUIRED(!differ, "Writer Test");
 }

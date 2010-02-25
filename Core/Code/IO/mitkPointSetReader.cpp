@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkPointSetReader.h"
 #include "vtkPointSetXMLParser.h"
-#include "vtkSmartPointer.h""
+#include "vtkSmartPointer.h"
 #include <iostream>
 #include <fstream>
 

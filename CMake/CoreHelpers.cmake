@@ -1,10 +1,3 @@
-#
-# Create a core library (Algorithms, DataStructures etc.)
-# 
-# No parameters. Expects files.cmake in the same directory and CMake
-# variables LIBPOSTFIX and KITNAME to be set correctly
-#
-
 MACRO(ORGANIZE_SOURCES)
 
   # this macro gets a filelist as input and looks
@@ -172,7 +165,8 @@ ENDMACRO(_MITK_CREATE_MODULE_CONF)
 #     [PROVIDES <library name which is built>]
 #     [PACKAGE_DEPENDS <packages we need, like ITK, VTK, QT>]
 #     [EXPORT_DEFINE <declspec macro name for dll exports>]
-
+#
+##################################################################
 MACRO(MITK_CREATE_MODULE MODULE_NAME_IN)
   MACRO_PARSE_ARGUMENTS(MODULE "INCLUDE_DIRS;INTERNAL_INCLUDE_DIRS;DEPENDS;DEPENDS_INTERNAL;PROVIDES;PACKAGE_DEPENDS;EXPORT_DEFINE;ADDITIONAL_LIBS;GENERATED_CPP" "QT_MODULE;FORCE_STATIC;HEADERS_ONLY" ${ARGN})
   SET(MODULE_NAME ${MODULE_NAME_IN})

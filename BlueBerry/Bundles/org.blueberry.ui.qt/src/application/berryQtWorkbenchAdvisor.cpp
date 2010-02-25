@@ -26,6 +26,7 @@
 
 #include <QApplication>
 #include <QString>
+#include <QTextCodec>
 
 #include <Poco/File.h>
 #include <Poco/FileStream.h>
@@ -49,6 +50,12 @@ void QtWorkbenchAdvisor::Initialize(IWorkbenchConfigurer::Pointer configurer)
 
   QObject* eventFilter = new QtGlobalEventFilter(qApp);
   qApp->installEventFilter(eventFilter);
+
+  // character strings should be interpredted as UTF-8 encoded strings
+  // e.g. plugin.xml files are UTF-8 encoded
+  QTextCodec* utf8Codec = QTextCodec::codecForName("UTF-8");
+  QTextCodec::setCodecForCStrings(utf8Codec);
+  QTextCodec::setCodecForTr(utf8Codec);
 }
 
 bool QtWorkbenchAdvisor::PreShutdown()

@@ -59,8 +59,8 @@ you have performed an undo to redo the transformation without to recalculate it.
 
 \image html ManualRegistrationArea.png "The Manual Registration area"
 
-In the "Manual Registration" area, shown by checking the checkbox Manual Registration, you can manually allign the images by moving sliders for translation in x-, y- and z-axis as well as for 
-rotation around the x-, y- and z-Axis. Additionally you can automatically allign the image centers with the button "Automatic Allign Image Centers".
+In the "Manual Registration" area, shown by checking the checkbox Manual Registration, you can manually allign the images by moving sliders for translation and scaling in x-, y- and z-axis as 
+well as for rotation around the x-, y- and z-Axis. Additionally you can automatically allign the image centers with the button "Automatic Allign Image Centers".
 
 \image html Tab2.png "The Advanced Mode tab"
 

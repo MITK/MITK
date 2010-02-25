@@ -222,6 +222,7 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
   QMenuBar* menuBar = mainWindow->menuBar();
 
   QMenu* fileMenu = menuBar->addMenu("&File");
+  fileMenu->setObjectName("FileMenu");
 
   QAction* fileOpenAction = new QmitkExtFileOpenAction(QIcon(":/org.mitk.gui.qt.ext/Load_48.png"), window);
   fileMenu->addAction(fileOpenAction);
@@ -232,7 +233,9 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
   closeProjectAction->setIcon(QIcon(":/org.mitk.gui.qt.ext/Remove_48.png"));
   fileMenu->addAction(closeProjectAction);
   fileMenu->addSeparator();
-  fileMenu->addAction(new QmitkFileExitAction(window));
+  QAction* fileExitAction = new QmitkFileExitAction(window);
+  fileExitAction->setObjectName("QmitkFileExitAction");
+  fileMenu->addAction(fileExitAction);
 
   berry::IViewRegistry* viewRegistry =
       berry::PlatformUI::GetWorkbench()->GetViewRegistry();
@@ -291,6 +294,7 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
   windowMenu->addSeparator();
   QMenu* perspMenu = windowMenu->addMenu("&Open Perspective");
   QMenu* viewMenu = windowMenu->addMenu("Show &View");
+  viewMenu->setObjectName("Show View");
   windowMenu->addSeparator();
   windowMenu->addAction("&Reset Perspective",
     QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onResetPerspective()));

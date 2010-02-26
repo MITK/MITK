@@ -315,22 +315,7 @@ void QmitkPointBasedRegistrationView::Activated()
 
 void QmitkPointBasedRegistrationView::Visible()
 {
-  /*
-  m_Deactivated = false;
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-  QmitkFunctionality::Activated();
-  this->clearTransformationLists();
-  if (m_SelListener.IsNull())
-  {
-    m_SelListener = berry::ISelectionListener::Pointer(new SelListenerPointBasedRegistration(this));
-    this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddPostSelectionListener(/*"org.mitk.views.datamanager",* / m_SelListener);
-    berry::ISelection::ConstPointer sel(
-      this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection("org.mitk.views.datamanager"));
-    m_CurrentSelection = sel.Cast<const IStructuredSelection>();
-    m_SelListener.Cast<SelListenerPointBasedRegistration>()->DoSelectionChanged(sel);
-  }
-  this->OpacityUpdate(m_Controls.m_OpacitySlider->value());
-  this->showRedGreen(m_Controls.m_ShowRedGreenValues->isChecked());*/
+
 }
 
 void QmitkPointBasedRegistrationView::Deactivated()

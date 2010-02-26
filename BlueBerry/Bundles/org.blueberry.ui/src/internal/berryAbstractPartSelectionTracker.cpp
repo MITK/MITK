@@ -18,6 +18,7 @@
 #include "berryAbstractPartSelectionTracker.h"
 
 #include "../berryIPostSelectionProvider.h"
+#include "../berryINullSelectionListener.h"
 
 #include "../util/berrySafeRunnable.h"
 
@@ -32,7 +33,7 @@ public:
 
   berryObjectMacro(SafeSelectionRunnable)
 
-  ISelectionService::SelectionEvents::SelectionEvent::AbstractDelegate* l;
+  ISelectionListener::Pointer l;
 
   SafeSelectionRunnable(IWorkbenchPart::Pointer part, ISelection::ConstPointer sel)
   : p(part), s(sel)
@@ -40,7 +41,7 @@ public:
 
   void Run()
   {
-    l->Execute(p, s);
+    l->SelectionChanged(p, s);
   }
 
 private:
@@ -59,29 +60,25 @@ AbstractPartSelectionTracker::AbstractPartSelectionTracker(
 void AbstractPartSelectionTracker::AddSelectionListener(
     ISelectionListener::Pointer listener)
 {
-  selectionEvents.selectionChanged +=
-    ISelectionService::SelectionEvents::Delegate(listener.GetPointer(), &ISelectionListener::SelectionChanged);
+  fListeners.push_back(listener);
 }
 
 void AbstractPartSelectionTracker::AddPostSelectionListener(
     ISelectionListener::Pointer listener)
 {
-  selectionEvents.postSelectionChanged +=
-    ISelectionService::SelectionEvents::Delegate(listener.GetPointer(), &ISelectionListener::SelectionChanged);
+  fPostListeners.push_back(listener);
 }
 
 void AbstractPartSelectionTracker::RemoveSelectionListener(
     ISelectionListener::Pointer listener)
 {
-  selectionEvents.selectionChanged -=
-    ISelectionService::SelectionEvents::Delegate(listener.GetPointer(), &ISelectionListener::SelectionChanged);
+  fListeners.remove(listener);
 }
 
 void AbstractPartSelectionTracker::RemovePostSelectionListener(
     ISelectionListener::Pointer listener)
 {
-  selectionEvents.postSelectionChanged -=
-    ISelectionService::SelectionEvents::Delegate(listener.GetPointer(), &ISelectionListener::SelectionChanged);
+  fPostListeners.remove(listener);
 }
 
 AbstractPartSelectionTracker::~AbstractPartSelectionTracker()
@@ -92,28 +89,32 @@ AbstractPartSelectionTracker::~AbstractPartSelectionTracker()
 void AbstractPartSelectionTracker::FireSelection(IWorkbenchPart::Pointer part,
     ISelection::ConstPointer sel)
 {
-  typedef ISelectionService::SelectionEvents::SelectionEvent::ListenerList ListType;
-  ListType listeners(selectionEvents.selectionChanged.GetListeners());
-
   SafeSelectionRunnable::Pointer runnable(new SafeSelectionRunnable(part, sel));
-  for (ListType::iterator i = listeners.begin(); i != listeners.end(); ++i)
+  for (std::list<ISelectionListener::Pointer>::iterator i = fListeners.begin();
+      i != fListeners.end(); ++i)
   {
-    runnable->l = *i;
-    SafeRunner::Run(runnable);
+    ISelectionListener::Pointer l = *i;
+    if ((part && sel) || l.Cast<INullSelectionListener>())
+    {
+      runnable->l = l;
+      SafeRunner::Run(runnable);
+    }
   }
 }
 
 void AbstractPartSelectionTracker::FirePostSelection(IWorkbenchPart::Pointer part,
     ISelection::ConstPointer sel)
 {
-  typedef ISelectionService::SelectionEvents::SelectionEvent::ListenerList ListType;
-  ListType listeners(selectionEvents.postSelectionChanged.GetListeners());
-
   SafeSelectionRunnable::Pointer runnable(new SafeSelectionRunnable(part, sel));
-  for (ListType::iterator i = listeners.begin(); i != listeners.end(); ++i)
+  for (std::list<ISelectionListener::Pointer>::iterator i = fPostListeners.begin();
+      i != fPostListeners.end(); ++i)
   {
-    runnable->l = *i;
-    SafeRunner::Run(runnable);
+    ISelectionListener::Pointer l = *i;
+    if ((part && sel) || l.Cast<INullSelectionListener>())
+    {
+      runnable->l = l;
+      SafeRunner::Run(runnable);
+    }
   }
 }
 

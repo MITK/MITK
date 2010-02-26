@@ -36,9 +36,9 @@ namespace berry
  * This interface may be implemented by clients.
  * </p>
  *
- * @see ISelectionService#AddSelectionListener(ISelectionListener::Ptr)
- * @see ISelectionService#AddSelectionListener(std::string, ISelectionListener::Ptr)
- * @see org.blueberry.ui.INullSelectionListener
+ * @see ISelectionService#AddSelectionListener(ISelectionListener::Pointer)
+ * @see ISelectionService#AddSelectionListener(const std::string&, ISelectionListener::Pointer)
+ * @see INullSelectionListener
  */
 struct BERRY_UI ISelectionListener: public virtual Object
 {

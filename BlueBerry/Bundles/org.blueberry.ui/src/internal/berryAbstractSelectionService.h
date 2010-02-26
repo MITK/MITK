@@ -44,14 +44,12 @@ private:
     /**
      * The list of selection listeners (not per-part).
      */
-    //private ListenerList listeners = new ListenerList();
+    std::list<ISelectionListener::Pointer> fListeners;
 
     /**
      * The list of post selection listeners (not per-part).
      */
-    //private ListenerList postListeners = new ListenerList();
-
-    ISelectionService::SelectionEvents selectionEvents;
+    std::list<ISelectionListener::Pointer> fPostListeners;
 
     /**
      * The currently active part.

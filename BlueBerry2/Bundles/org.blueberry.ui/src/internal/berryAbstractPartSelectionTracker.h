@@ -26,6 +26,8 @@
 #include "../berryISelectionListener.h"
 #include "../berryIWorkbenchPart.h"
 
+#include <list>
+
 namespace berry {
 
 class AbstractPartSelectionTracker : public virtual Object
@@ -36,17 +38,15 @@ public:
 
 private:
 
-  ISelectionService::SelectionEvents selectionEvents;
-
   /**
    * List of selection listeners for this tracker
    */
-  //private ListenerList fListeners = new ListenerList();
+  std::list<ISelectionListener::Pointer> fListeners;
 
   /**
    * List of post selection listeners for this tracker
    */
-  //private ListenerList postListeners = new ListenerList();
+  std::list<ISelectionListener::Pointer> fPostListeners;
 
   /**
    * The id of the part this tracker tracks

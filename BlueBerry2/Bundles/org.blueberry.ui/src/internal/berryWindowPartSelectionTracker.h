@@ -21,6 +21,8 @@
 
 #include "berryAbstractPartSelectionTracker.h"
 
+#include "../berryINullSelectionListener.h"
+
 namespace berry {
 
 struct IWorkbenchWindow;
@@ -45,12 +47,12 @@ private:
     /**
      * Part selection listener.
      */
-    ISelectionListener::Pointer selListener;
+    INullSelectionListener::Pointer selListener;
 
     /**
      * Part post selection listener
      */
-    ISelectionListener::Pointer postSelListener;
+    INullSelectionListener::Pointer postSelListener;
 
     /**
      * Sets the window this tracker is working in.

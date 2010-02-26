@@ -16,8 +16,10 @@
  =========================================================================*/
 
 #include "berryAbstractSelectionService.h"
+#include "berryWorkbenchPlugin.h"
 
 #include "../berryIPostSelectionProvider.h"
+#include "../berryINullSelectionListener.h"
 
 namespace berry
 {
@@ -59,9 +61,7 @@ void AbstractSelectionService::PostSelectionListener::SelectionChanged(
 
 void AbstractSelectionService::AddSelectionListener(ISelectionListener::Pointer l)
 {
-  selectionEvents.selectionChanged +=
-    ISelectionService::SelectionEvents::Delegate(l.GetPointer(),
-      &ISelectionListener::SelectionChanged);
+  fListeners.push_back(l);
 }
 
 void AbstractSelectionService::AddSelectionListener(const std::string& partId,
@@ -73,9 +73,7 @@ void AbstractSelectionService::AddSelectionListener(const std::string& partId,
 void AbstractSelectionService::AddPostSelectionListener(
     ISelectionListener::Pointer l)
 {
-  selectionEvents.postSelectionChanged +=
-    ISelectionService::SelectionEvents::Delegate(l.GetPointer(),
-      &ISelectionListener::SelectionChanged);
+  fPostListeners.push_back(l);
 }
 
 void AbstractSelectionService::AddPostSelectionListener(const std::string& partId,
@@ -86,9 +84,7 @@ void AbstractSelectionService::AddPostSelectionListener(const std::string& partI
 
 void AbstractSelectionService::RemoveSelectionListener(ISelectionListener::Pointer l)
 {
-  selectionEvents.selectionChanged -=
-    ISelectionService::SelectionEvents::Delegate(l.GetPointer(),
-      &ISelectionListener::SelectionChanged);
+  fListeners.remove(l);
 }
 
 void AbstractSelectionService::RemovePostSelectionListener(
@@ -100,9 +96,7 @@ void AbstractSelectionService::RemovePostSelectionListener(
 void AbstractSelectionService::RemovePostSelectionListener(
     ISelectionListener::Pointer l)
 {
-  selectionEvents.postSelectionChanged -=
-    ISelectionService::SelectionEvents::Delegate(l.GetPointer(),
-      &ISelectionListener::SelectionChanged);
+  fPostListeners.remove(l);
 }
 
 void AbstractSelectionService::RemoveSelectionListener(const std::string& partId,
@@ -114,13 +108,51 @@ void AbstractSelectionService::RemoveSelectionListener(const std::string& partId
 void AbstractSelectionService::FireSelection(IWorkbenchPart::Pointer part,
     ISelection::ConstPointer sel)
 {
-   selectionEvents.selectionChanged(part, sel);
+  for (std::list<ISelectionListener::Pointer>::iterator i = fListeners.begin();
+      i != fListeners.end(); ++i)
+  {
+    ISelectionListener::Pointer l = *i;
+    if ((part && sel) || l.Cast<INullSelectionListener>())
+    {
+      try
+      {
+        l->SelectionChanged(part, sel);
+      }
+      catch (const Poco::RuntimeException& rte)
+      {
+        WorkbenchPlugin::Log(rte);
+      }
+      catch (const std::exception& e)
+      {
+        WorkbenchPlugin::Log(e.what());
+      }
+    }
+  }
 }
 
 void AbstractSelectionService::FirePostSelection(IWorkbenchPart::Pointer part,
     ISelection::ConstPointer sel)
 {
-  selectionEvents.postSelectionChanged(part, sel);
+  for (std::list<ISelectionListener::Pointer>::iterator i = fPostListeners.begin();
+      i != fPostListeners.end(); ++i)
+  {
+    ISelectionListener::Pointer l = *i;
+    if ((part && sel) || l.Cast<INullSelectionListener>())
+    {
+      try
+      {
+        l->SelectionChanged(part, sel);
+      }
+      catch (const Poco::RuntimeException& rte)
+      {
+        WorkbenchPlugin::Log(rte);
+      }
+      catch (const std::exception& e)
+      {
+        WorkbenchPlugin::Log(e.what());
+      }
+    }
+  }
 }
 
 AbstractPartSelectionTracker::Pointer AbstractSelectionService::GetPerPartTracker(

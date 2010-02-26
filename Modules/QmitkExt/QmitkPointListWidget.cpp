@@ -56,6 +56,8 @@ QmitkPointListWidget::QmitkPointListWidget( QWidget* parent, Qt::WindowFlags f )
   buttonWidget->setLayout( buttonLayout );
   buttonLayout->setSizeConstraint(QLayout::SetMinAndMaxSize);
 
+  buttonLayout->setMargin(0);
+
   const QIcon iconEdit( btnSetPoints_xpm ); // installs/removes pointset interactor
   m_BtnEdit = new QPushButton( iconEdit, "", this );
   m_BtnEdit->setToolTip("Toggle point editing (use SHIFT  + Left Mouse Button to add Points)");

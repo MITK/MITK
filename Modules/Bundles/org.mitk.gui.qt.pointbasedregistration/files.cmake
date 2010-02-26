@@ -5,7 +5,7 @@ SET(SRC_CPP_FILES
 SET(INTERNAL_CPP_FILES
   QmitkPointBasedRegistrationView.cpp
   QmitkPointBasedRegistrationTesting.cpp
-  LandmarkWarping.cpp
+  mitkLandmarkWarping.cpp
 )
 
 SET(UI_FILES

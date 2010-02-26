@@ -35,7 +35,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qlabel.h>
 #include "qmessagebox.h"
 
-#include "LandmarkWarping.h"
+#include "mitkLandmarkWarping.h"
 #include <mitkPointOperation.h>
 #include <mitkPositionEvent.h>
 #include "mitkOperationEvent.h"
@@ -1096,9 +1096,9 @@ void QmitkPointBasedRegistrationView::calculateLandmarkbased()
 
 void QmitkPointBasedRegistrationView::calculateLandmarkWarping()
 {
-  LandmarkWarping* registration = new LandmarkWarping();
+  mitk::LandmarkWarping* registration = new mitk::LandmarkWarping();
 
-  LandmarkWarping::FixedImageType::Pointer fixedImage = LandmarkWarping::FixedImageType::New();
+  mitk::LandmarkWarping::FixedImageType::Pointer fixedImage = mitk::LandmarkWarping::FixedImageType::New();
   mitk::Image::Pointer fimage = dynamic_cast<mitk::Image*>(m_FixedNode->GetData());
   if (fimage.IsNotNull() && (fimage->GetDimension() == 2 || fimage->GetDimension() == 3))
   {
@@ -1106,7 +1106,7 @@ void QmitkPointBasedRegistrationView::calculateLandmarkWarping()
     {
       mitk::CastToItkImage(fimage, fixedImage);
     }
-    LandmarkWarping::MovingImageType::Pointer movingImage = LandmarkWarping::MovingImageType::New();
+    mitk::LandmarkWarping::MovingImageType::Pointer movingImage = mitk::LandmarkWarping::MovingImageType::New();
     mitk::Image::Pointer mimage = dynamic_cast<mitk::Image*>(m_MovingNode->GetData());
     if(mimage.IsNotNull())
     {
@@ -1116,14 +1116,14 @@ void QmitkPointBasedRegistrationView::calculateLandmarkWarping()
     registration->SetMovingImage(movingImage);
     unsigned int pointId;
     mitk::Point3D sourcePoint, targetPoint;
-    LandmarkWarping::LandmarkContainerType::Pointer fixedLandmarks = LandmarkWarping::LandmarkContainerType::New();
-    LandmarkWarping::LandmarkPointType point;
+    mitk::LandmarkWarping::LandmarkContainerType::Pointer fixedLandmarks = mitk::LandmarkWarping::LandmarkContainerType::New();
+    mitk::LandmarkWarping::LandmarkPointType point;
     for(pointId = 0; pointId < (unsigned int)m_FixedLandmarks->GetSize(); ++pointId)
     {
       fimage->GetGeometry(0)->WorldToItkPhysicalPoint(m_FixedLandmarks->GetPoint(pointId), point);
       fixedLandmarks->InsertElement( pointId, point);
     }
-    LandmarkWarping::LandmarkContainerType::Pointer movingLandmarks = LandmarkWarping::LandmarkContainerType::New();
+    mitk::LandmarkWarping::LandmarkContainerType::Pointer movingLandmarks = mitk::LandmarkWarping::LandmarkContainerType::New();
     for(pointId = 0; pointId < (unsigned int)m_MovingLandmarks->GetSize(); ++pointId)
     {
       mitk::BaseData::Pointer fixedData = m_FixedNode->GetData();
@@ -1132,7 +1132,7 @@ void QmitkPointBasedRegistrationView::calculateLandmarkWarping()
       movingLandmarks->InsertElement( pointId, point);
     }
     registration->SetLandmarks(fixedLandmarks.GetPointer(), movingLandmarks.GetPointer());
-    LandmarkWarping::MovingImageType::Pointer output = registration->Register();
+    mitk::LandmarkWarping::MovingImageType::Pointer output = registration->Register();
     if (output.IsNotNull())
     {
       mitk::Image::Pointer image = mitk::Image::New();

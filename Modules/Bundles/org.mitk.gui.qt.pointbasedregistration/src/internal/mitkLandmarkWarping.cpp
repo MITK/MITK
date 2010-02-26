@@ -15,19 +15,19 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#include "LandmarkWarping.h"
+#include "mitkLandmarkWarping.h"
 
-LandmarkWarping::LandmarkWarping()
+mitk::LandmarkWarping::LandmarkWarping()
 {
   m_Deformer = DeformationSourceType::New();
   m_LandmarkDeformer = DeformationSourceType::New();
 }
 
-LandmarkWarping::~LandmarkWarping()
+mitk::LandmarkWarping::~LandmarkWarping()
 {
 }
 
-void LandmarkWarping::SetFixedImage(FixedImageType::Pointer fixedImage)
+void mitk::LandmarkWarping::SetFixedImage(FixedImageType::Pointer fixedImage)
 {
   m_FixedImage = fixedImage;
   m_Deformer->SetOutputSpacing( m_FixedImage->GetSpacing() );
@@ -35,7 +35,7 @@ void LandmarkWarping::SetFixedImage(FixedImageType::Pointer fixedImage)
   m_Deformer->SetOutputRegion(  m_FixedImage->GetLargestPossibleRegion() );
 }
 
-void LandmarkWarping::SetMovingImage(MovingImageType::Pointer movingImage)
+void mitk::LandmarkWarping::SetMovingImage(MovingImageType::Pointer movingImage)
 {
   m_MovingImage = movingImage;
   m_LandmarkDeformer->SetOutputSpacing( m_MovingImage->GetSpacing() );
@@ -43,7 +43,7 @@ void LandmarkWarping::SetMovingImage(MovingImageType::Pointer movingImage)
   m_LandmarkDeformer->SetOutputRegion(  m_MovingImage->GetLargestPossibleRegion() );
 }
 
-void LandmarkWarping::SetLandmarks(LandmarkContainerType::Pointer source, LandmarkContainerType::Pointer target)
+void mitk::LandmarkWarping::SetLandmarks(LandmarkContainerType::Pointer source, LandmarkContainerType::Pointer target)
 {
   m_SourceLandmarks = source;
   m_TargetLandmarks = target;
@@ -53,7 +53,7 @@ void LandmarkWarping::SetLandmarks(LandmarkContainerType::Pointer source, Landma
   m_LandmarkDeformer->SetTargetLandmarks( source );
 }
 
-LandmarkWarping::MovingImageType::Pointer LandmarkWarping::Register()
+mitk::LandmarkWarping::MovingImageType::Pointer mitk::LandmarkWarping::Register()
 {
   try
   {
@@ -110,7 +110,7 @@ LandmarkWarping::MovingImageType::Pointer LandmarkWarping::Register()
   return m_Warper->GetOutput();
 }
 
-LandmarkWarping::LandmarkContainerType::Pointer LandmarkWarping::GetTransformedTargetLandmarks()
+mitk::LandmarkWarping::LandmarkContainerType::Pointer mitk::LandmarkWarping::GetTransformedTargetLandmarks()
 {
   LandmarkContainerType::Pointer landmarks = LandmarkContainerType::New();
   LandmarkWarping::LandmarkPointType transformedTargetPoint;

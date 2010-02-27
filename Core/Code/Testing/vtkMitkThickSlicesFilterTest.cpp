@@ -26,7 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 /**
 * 3x3x3 test image
 */
-vtkImageData *GenerateTestImage()
+vtkImageData *GenerateTestImageForTSFilter()
 {
   // a 2x2x2 image
   short myData[] = 
@@ -54,7 +54,7 @@ vtkImageData *GenerateTestImage()
   return i;
 }
 
-void checkResultImage(vtkImageData *i)
+void CheckResultImageForTSFilter(vtkImageData *i)
 {
   int *e=i->GetExtent();
   
@@ -83,7 +83,7 @@ int vtkMitkThickSlicesFilterTest(int /*argc*/, char* /*argv*/[])
 
   vtkImageData *i,*o;
   
-  i = GenerateTestImage();
+  i = GenerateTestImageForTSFilter();
 
   vtkMitkThickSlicesFilter *f = vtkMitkThickSlicesFilter::New();
   f->SetThickSliceMode( 0 ); // MIP
@@ -91,7 +91,7 @@ int vtkMitkThickSlicesFilterTest(int /*argc*/, char* /*argv*/[])
   f->Update();
   o = f->GetOutput();
   
-  checkResultImage(o);
+  CheckResultImageForTSFilter(o);
     
   MITK_TEST_END()
 }

@@ -39,7 +39,7 @@ class vtkLookupTable;
 class vtkGeneralTransform;
 class vtkImageChangeInformation;
 class vtkPoints;
-
+class vtkMitkThickSlicesFilter;
 
 namespace mitk {
 
@@ -159,6 +159,9 @@ public:
 
     /** \brief The actual reslicer (one per renderer) */
     vtkImageReslice *m_Reslicer;
+
+    /** \brief Thickslices post filtering */
+    vtkMitkThickSlicesFilter *m_TSFilter;
 
     /** \brief Extracted image for 3D rendering (cf. m_iil4mitkImage) */
     vtkImageData *m_Image;

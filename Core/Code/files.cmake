@@ -119,7 +119,7 @@ SET(CPP_FILES
   DataManagement/mitkVtkVolumeRenderingProperty.cpp
   DataManagement/mitkWeakPointerProperty.cpp
   DataManagement/mitkShaderEnumProperty.cpp
-#  DataManagement/mitkResliceMethodEnumProperty.cpp
+  DataManagement/mitkResliceMethodEnumProperty.cpp
   DataManagement/mitkMaterial.cpp
   Interactions/mitkAction.cpp
   Interactions/mitkAffineInteractor.cpp
@@ -206,6 +206,6 @@ SET(CPP_FILES
   Rendering/mitkShaderRepository.cpp
 
   Rendering/mitkImageMapper2D.cpp
-#  Rendering/vtkMitkThickSlicesFilter.cpp
+  Rendering/vtkMitkThickSlicesFilter.cpp
 )
 

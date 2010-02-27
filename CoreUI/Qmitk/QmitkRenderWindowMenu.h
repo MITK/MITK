@@ -20,12 +20,14 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkCommon.h"
+#include "mitkBaseRenderer.h"
 
 #include <QWidget>
 #include <QEvent>
 #include <QPushButton>
 #include <QMenuBar>
 #include <QAction>
+#include <QLabel>
 
 
 /**
@@ -42,13 +44,15 @@ PURPOSE.  See the above copyright notices for more information.
 * 
 */
 
+
+
 class QMITK_EXPORT QmitkRenderWindowMenu : public QWidget  
 {
   Q_OBJECT
 
 public:
 
-  QmitkRenderWindowMenu( QWidget* parent = 0, Qt::WFlags f = 0 );
+  QmitkRenderWindowMenu( QWidget* parent = 0, Qt::WFlags f = 0, mitk::BaseRenderer * b = 0 );
   virtual ~QmitkRenderWindowMenu();
 
   /*! Return visibility of settings menu. The menu is connected with m_SettingsButton and includes 
@@ -77,11 +81,9 @@ public:
   is activated.*/
   void MoveWidgetToCorrectPos();
 
-  /*! Update Crosshair mode in contex menu. */
-  void UpdateCrosshairState( bool state ) ;
-
   void ChangeFullScreenMode( bool state );
 
+  void NotifyNewWidgetPlanesMode( int mode );
 
 protected:
 
@@ -105,21 +107,30 @@ protected:
   void ChangeFullScreenIcon();
 
 
+  int currentCrosshairRotationMode;
+
+  public slots:
+  
+  void SetCrossHairVisibility( bool state ) ;
+
+
 signals:
   
-  void ShowCrosshair(bool show);
   void ResetView(); // == "global reinit"
   
   // \brief int parameters are enum from QmitkStdMultiWidget
   void ChangeCrosshairRotationMode(int); 
-  void SetCrosshairRotationLinked(bool);
 
   /*! emit signal, when layout design changed by the setting menu.*/
   void SignalChangeLayoutDesign( int layoutDesign );
 
 protected slots:  
 
+  void OnTSNumChanged(int);
+
   void OnCrosshairRotationModeSelected(QAction*); 
+  
+  
 
   /*! slot for activating/deactivating the full-screen mode. The slot is connected to the clicked() event of m_FullScreenButton. 
   Activating the full-screen maximize the current widget, deactivating restore If layout design changed by the settings menu, 
@@ -166,6 +177,8 @@ protected slots:
 
   /*! Slot for changing layout design to Transversal n 3D left, Sagittal right layout. The slot is connected to the triggered() signal of m_Left2Dand3DRight2DLayoutAction. */
   void OnChangeLayoutToLeft2Dand3DRight2D(bool);
+  
+  void OnCrossHairMenuAboutToShow();
 
 public:
   
@@ -196,16 +209,11 @@ public:
   };
 
 
-  QMenu* GetCrossHairMenu();
-  void SetCrossHairMenu(QMenu* menu);
-
 protected:
-
-  QMenu* CreateCrosshairMenu();
 
   QPushButton*        m_CrosshairModeButton;
 
-  QAction*            m_ShowHideCrosshairVisibilityAction;
+  //QAction*            m_ShowHideCrosshairVisibilityAction;
 
   /*! QPushButton for activating/deactivating full-screen mode*/
   QPushButton*        m_FullScreenButton;
@@ -249,6 +257,8 @@ protected:
   /*! QAction for transversal n 3D left, sagittal right layout design*/
   QAction*            m_Left2Dand3DRight2DLayoutAction;
 
+  QLabel *m_TSLabel;
+
 
   /*! QMenu containg all layout direction and layout design settings.*/
   QMenu*              m_Settings;
@@ -268,6 +278,10 @@ protected:
 
   /*! Flag if full-screen mode is activated or deactivated. */
   bool                m_FullScreenMode;
+  
+  private:
+  
+  mitk::BaseRenderer::Pointer m_Renderer;
 };
 
 #endif // QmitkRenderWindowMenu_H

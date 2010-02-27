@@ -52,6 +52,7 @@ SET(MODULE_TESTS
   mitkDICOMLocaleTest.cpp
   mitkPointSetLocaleTest.cpp
   mitkRenderingManagerTest.cpp
+  vtkMitkThickSlicesFilterTest.cpp
 )
 
 # test with image filename as an extra command line parameter

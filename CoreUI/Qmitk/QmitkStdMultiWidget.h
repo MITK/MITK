@@ -196,15 +196,14 @@ public slots:
 signals:
 
   void WheelMoved( QWheelEvent* );
-  void WidgetPlanesVisibilityChanged(bool);
-  void WidgetPlanesLockedChanged(bool);
-  void WidgetPlanesRotationLockedChanged(bool);
   void WidgetPlanesRotationLinked(bool);
   void WidgetPlanesRotationEnabled(bool);
   void ViewsInitialized();
   void WidgetPlaneModeSlicing(bool);
   void WidgetPlaneModeRotation(bool);
   void WidgetPlaneModeSwivel(bool);
+  void WidgetPlaneModeChange(int);
+  void WidgetNotifyNewCrossHairMode(int);
  
 public:
 

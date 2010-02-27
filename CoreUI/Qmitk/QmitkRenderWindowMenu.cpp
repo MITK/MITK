@@ -18,6 +18,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "QmitkRenderWindowMenu.h"
 
+#include "mitkResliceMethodEnumProperty.h"
+#include "mitkProperties.h"
+
 #include <QHBoxLayout>
 #include <QSpacerItem>
 #include <QSize>
@@ -27,6 +30,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include<QRadioButton>
 #include<QAction>
 #include<QLine>
+#include<QLabel>
+#include<QWidgetAction>
 
 #include "QmitkStdMultiWidget.h"
 
@@ -41,7 +46,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <math.h>
 
 
-QmitkRenderWindowMenu::QmitkRenderWindowMenu(QWidget *parent, Qt::WindowFlags f )
+
+QmitkRenderWindowMenu::QmitkRenderWindowMenu(QWidget *parent, Qt::WindowFlags f, mitk::BaseRenderer *b )
 :QWidget(parent,f),
 m_Settings(NULL),
 m_CrosshairMenu(NULL),
@@ -50,6 +56,10 @@ m_LayoutDesign(0),
 m_OldLayoutDesign(0),
 m_FullScreenMode(false)
 {
+  m_Renderer = b;
+  
+  MITK_DEBUG << "creating renderwindow menu on baserenderer " << b;
+
   //Create Menu Widget
   this->CreateMenuWidget();
   this->setMinimumWidth(61); //DIRTY.. If you add or remove a button, you need to change the size.
@@ -64,10 +74,14 @@ m_FullScreenMode(false)
   //SetOpacity  --  its just posible if the widget is a window. 
   //Windows indicates that the widget is a window, usually with a window system frame and a title bar, 
   //irrespective of whether the widget has a parent or not.
-  //this->setWindowFlags( Qt::Window | Qt::FramelessWindowHint);
-  //this->setAttribute(Qt::WA_TranslucentBackground);
-  //this->setWindowOpacity(0.75);
-  //this->setFocusPolicy( Qt::NoFocus );
+  /*
+  this->setWindowFlags( Qt::Window | Qt::FramelessWindowHint);
+  this->setAttribute(Qt::WA_TranslucentBackground);
+  this->setWindowOpacity(0.75);
+  this->setFocusPolicy( Qt::NoFocus );
+  */
+  
+  currentCrosshairRotationMode = 0;
 }
 
 QmitkRenderWindowMenu::~QmitkRenderWindowMenu()
@@ -81,17 +95,20 @@ void QmitkRenderWindowMenu::CreateMenuWidget()
 
   QSize size( 13, 13 );
 
+  m_CrosshairMenu = new QMenu(this);
+  connect( m_CrosshairMenu, SIGNAL( aboutToShow() ), this, SLOT(OnCrossHairMenuAboutToShow()) );
+
   // button for changing rotation mode
-  m_CrosshairModeButton = new QPushButton();
+  m_CrosshairModeButton = new QPushButton(this);
   m_CrosshairModeButton->setMaximumSize(15, 15);
   m_CrosshairModeButton->setIconSize(size);
   m_CrosshairModeButton->setFlat( true );
-  m_CrosshairModeButton->setMenu( this->GetCrossHairMenu() );
+  m_CrosshairModeButton->setMenu( m_CrosshairMenu );
   m_CrosshairModeButton->setIcon( QIcon( iconCrosshairMode_xpm ) );
   layout->addWidget( m_CrosshairModeButton );
 
   //fullScreenButton
-  m_FullScreenButton = new QPushButton();
+  m_FullScreenButton = new QPushButton(this);
   m_FullScreenButton->setMaximumSize(15, 15);
   m_FullScreenButton->setIconSize(size);
   m_FullScreenButton->setFlat( true );
@@ -99,7 +116,7 @@ void QmitkRenderWindowMenu::CreateMenuWidget()
   layout->addWidget( m_FullScreenButton );
 
   //settingsButton
-  m_SettingsButton = new QPushButton();
+  m_SettingsButton = new QPushButton(this);
   m_SettingsButton->setMaximumSize(15, 15);
   m_SettingsButton->setIconSize(size);
   m_SettingsButton->setFlat( true );
@@ -109,87 +126,6 @@ void QmitkRenderWindowMenu::CreateMenuWidget()
   //Create Connections -- coming soon?
   connect( m_FullScreenButton, SIGNAL( clicked(bool) ), this, SLOT(OnFullScreenButton(bool)) );
   connect( m_SettingsButton, SIGNAL( clicked(bool) ), this, SLOT(OnSettingsButton(bool)) );
-}
-
-QMenu* QmitkRenderWindowMenu::CreateCrosshairMenu()
-{
-  QMenu* crosshairModesMenu = new QMenu(this);
-  
-  m_ShowHideCrosshairVisibilityAction = new QAction(crosshairModesMenu);
-  m_ShowHideCrosshairVisibilityAction->setText("Show crosshair");
-  m_ShowHideCrosshairVisibilityAction->setCheckable(true);
-  m_ShowHideCrosshairVisibilityAction->setChecked(true); // TODO observe current status
-  crosshairModesMenu->addAction( m_ShowHideCrosshairVisibilityAction );
-
-  QAction* resetViewAction = new QAction(crosshairModesMenu);
-  resetViewAction->setText("Reset view");
-  crosshairModesMenu->addAction( resetViewAction );
-
-  QAction* rotationGroupSeparator = new QAction(crosshairModesMenu);
-  rotationGroupSeparator->setSeparator(true);
-  rotationGroupSeparator->setText("Rotation mode");
-  crosshairModesMenu->addAction( rotationGroupSeparator );
-
-  QActionGroup* rotationModeActionGroup = new QActionGroup(crosshairModesMenu);
-  rotationModeActionGroup->setExclusive(true);
-
-  QAction* noCrosshairRotation = new QAction(crosshairModesMenu);
-  noCrosshairRotation->setActionGroup(rotationModeActionGroup);
-  noCrosshairRotation->setText("No crosshair rotation");
-  noCrosshairRotation->setCheckable(true);
-  noCrosshairRotation->setChecked(true); // TODO observe current status
-  noCrosshairRotation->setData( QmitkStdMultiWidget::PLANE_MODE_SLICING );
-  crosshairModesMenu->addAction( noCrosshairRotation );
-
-  QAction* singleCrosshairRotation = new QAction(crosshairModesMenu);
-  singleCrosshairRotation->setActionGroup(rotationModeActionGroup);
-  singleCrosshairRotation->setText("Crosshair rotation");
-  singleCrosshairRotation->setCheckable(true);
-  singleCrosshairRotation->setData( QmitkStdMultiWidget::PLANE_MODE_ROTATION  );
-  crosshairModesMenu->addAction( singleCrosshairRotation );
-
-  QAction* coupledCrosshairRotation = new QAction(crosshairModesMenu);
-  coupledCrosshairRotation->setActionGroup(rotationModeActionGroup);
-  coupledCrosshairRotation->setText("Coupled crosshair rotation");
-  coupledCrosshairRotation->setCheckable(true);
-  coupledCrosshairRotation->setData( QmitkStdMultiWidget::PLANE_MODE_ROTATION );
-  crosshairModesMenu->addAction( coupledCrosshairRotation );
-
-  QAction* swivelMode = new QAction(crosshairModesMenu);
-  swivelMode->setActionGroup(rotationModeActionGroup);
-  swivelMode->setText("Swivel mode");
-  swivelMode->setCheckable(true);
-  swivelMode->setData( QmitkStdMultiWidget::PLANE_MODE_SWIVEL );
-  crosshairModesMenu->addAction( swivelMode );
-  
-  connect( m_ShowHideCrosshairVisibilityAction, SIGNAL(toggled(bool)), this, SIGNAL(ShowCrosshair(bool)));
-  connect( resetViewAction, SIGNAL(triggered()), this, SIGNAL(ResetView()));
-  connect( rotationModeActionGroup, SIGNAL(triggered(QAction*)), this, SLOT(OnCrosshairRotationModeSelected(QAction*)) ); 
-
-  return crosshairModesMenu;
-}
-
-QMenu* QmitkRenderWindowMenu::GetCrossHairMenu()
-{
-  if (!m_CrosshairMenu)
-  {
-    m_CrosshairMenu = this->CreateCrosshairMenu();
-  }
-
-  return m_CrosshairMenu;
-}
-
-void QmitkRenderWindowMenu::SetCrossHairMenu(QMenu* menu)
-{
-  if (m_CrosshairMenu != menu)
-  {
-    m_CrosshairMenu = menu;
-  
-    if (m_CrosshairModeButton)
-    {
-      m_CrosshairModeButton->setMenu( GetCrossHairMenu() );
-    }
-  }
 }
 
 void QmitkRenderWindowMenu::CreateSettingsWidget()
@@ -683,13 +619,187 @@ void QmitkRenderWindowMenu::ChangeFullScreenIcon()
 
 void QmitkRenderWindowMenu::OnCrosshairRotationModeSelected(QAction* action)
 {
+  MITK_DEBUG << "selected crosshair mode " << action->data().toInt() ; 
   emit ChangeCrosshairRotationMode( action->data().toInt() );
-  emit SetCrosshairRotationLinked( action->text().contains("Coupled") );
 }
 
-void QmitkRenderWindowMenu::UpdateCrosshairState( bool state )
+void QmitkRenderWindowMenu::SetCrossHairVisibility( bool state )
 {
-  if( m_ShowHideCrosshairVisibilityAction->isChecked() != state )
-    m_ShowHideCrosshairVisibilityAction->setChecked(state);
+  if(m_Renderer.IsNotNull())  
+  {
+    mitk::DataStorage *ds=m_Renderer->GetDataStorage();
+    mitk::DataTreeNode *n;
+    if(ds)
+    {
+      n = ds->GetNamedNode("widget1Plane"); if(n) n->SetVisibility(state);
+      n = ds->GetNamedNode("widget2Plane"); if(n) n->SetVisibility(state);
+      n = ds->GetNamedNode("widget3Plane"); if(n) n->SetVisibility(state);
+      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    }
+  }
 }
 
+void QmitkRenderWindowMenu::OnTSNumChanged(int num)
+{
+  MITK_DEBUG << "Thickslices num: " << num << " on renderer " << m_Renderer.GetPointer();
+
+  if(m_Renderer.IsNotNull())  
+  {
+    if(num==0)
+    {
+      m_Renderer->GetCurrentWorldGeometry2DNode()->SetProperty( "reslice.thickslices", mitk::ResliceMethodEnumProperty::New( 0 ) );
+    }
+    else
+    {
+      m_Renderer->GetCurrentWorldGeometry2DNode()->SetProperty( "reslice.thickslices", mitk::ResliceMethodEnumProperty::New( 1 ) );
+      m_Renderer->GetCurrentWorldGeometry2DNode()->SetProperty( "reslice.thickslices.num", mitk::IntProperty::New( num ) );
+    }
+    m_TSLabel->setText(QString::number(num*2+1));
+    m_Renderer->SendUpdateSlice();
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  }
+}
+
+
+
+void QmitkRenderWindowMenu::OnCrossHairMenuAboutToShow()
+{
+  QMenu *crosshairModesMenu = m_CrosshairMenu;
+  
+  crosshairModesMenu->clear();
+  
+  QAction* resetViewAction = new QAction(crosshairModesMenu);
+  resetViewAction->setText("Reset view");
+  crosshairModesMenu->addAction( resetViewAction );
+  connect( resetViewAction, SIGNAL(triggered()), this, SIGNAL(ResetView()));
+  
+  // Show hide crosshairs
+  {
+    bool currentState = true;
+    
+    if(m_Renderer.IsNotNull())  
+    {
+      mitk::DataStorage *ds=m_Renderer->GetDataStorage();
+      mitk::DataTreeNode *n;
+      if(ds)
+      {
+        n = ds->GetNamedNode("widget1Plane"); if(n) { bool v; if(n->GetVisibility(v,0)) currentState&=v; }
+        n = ds->GetNamedNode("widget2Plane"); if(n) { bool v; if(n->GetVisibility(v,0)) currentState&=v; }
+        n = ds->GetNamedNode("widget3Plane"); if(n) { bool v; if(n->GetVisibility(v,0)) currentState&=v; }
+      }
+    }
+
+  
+    QAction* showHideCrosshairVisibilityAction = new QAction(crosshairModesMenu);
+    showHideCrosshairVisibilityAction->setText("Show crosshair");
+    showHideCrosshairVisibilityAction->setCheckable(true);
+    showHideCrosshairVisibilityAction->setChecked(currentState);
+    crosshairModesMenu->addAction( showHideCrosshairVisibilityAction );
+    connect( showHideCrosshairVisibilityAction, SIGNAL(toggled(bool)), this, SLOT(SetCrossHairVisibility(bool)));
+  }
+
+  // Rotation mode
+  {
+    QAction* rotationGroupSeparator = new QAction(crosshairModesMenu);
+    rotationGroupSeparator->setSeparator(true);
+    rotationGroupSeparator->setText("Rotation mode");
+    crosshairModesMenu->addAction( rotationGroupSeparator );
+
+    QActionGroup* rotationModeActionGroup = new QActionGroup(crosshairModesMenu);
+    rotationModeActionGroup->setExclusive(true);
+
+    QAction* noCrosshairRotation = new QAction(crosshairModesMenu);
+    noCrosshairRotation->setActionGroup(rotationModeActionGroup);
+    noCrosshairRotation->setText("No crosshair rotation");
+    noCrosshairRotation->setCheckable(true);
+    noCrosshairRotation->setChecked(currentCrosshairRotationMode==0);
+    noCrosshairRotation->setData( 0 );
+    crosshairModesMenu->addAction( noCrosshairRotation );
+
+    QAction* singleCrosshairRotation = new QAction(crosshairModesMenu);
+    singleCrosshairRotation->setActionGroup(rotationModeActionGroup);
+    singleCrosshairRotation->setText("Crosshair rotation");
+    singleCrosshairRotation->setCheckable(true);
+    singleCrosshairRotation->setChecked(currentCrosshairRotationMode==1);
+    singleCrosshairRotation->setData( 1  );
+    crosshairModesMenu->addAction( singleCrosshairRotation );
+
+    QAction* coupledCrosshairRotation = new QAction(crosshairModesMenu);
+    coupledCrosshairRotation->setActionGroup(rotationModeActionGroup);
+    coupledCrosshairRotation->setText("Coupled crosshair rotation");
+    coupledCrosshairRotation->setCheckable(true);
+    coupledCrosshairRotation->setChecked(currentCrosshairRotationMode==2);
+    coupledCrosshairRotation->setData( 2 );
+    crosshairModesMenu->addAction( coupledCrosshairRotation );
+
+    QAction* swivelMode = new QAction(crosshairModesMenu);
+    swivelMode->setActionGroup(rotationModeActionGroup);
+    swivelMode->setText("Swivel mode");
+    swivelMode->setCheckable(true);
+    swivelMode->setChecked(currentCrosshairRotationMode==3);
+    swivelMode->setData( 3 );
+    crosshairModesMenu->addAction( swivelMode );
+
+    connect( rotationModeActionGroup, SIGNAL(triggered(QAction*)), this, SLOT(OnCrosshairRotationModeSelected(QAction*)) ); 
+  }
+    
+  // Thickslices support
+  if( m_Renderer.IsNotNull() && m_Renderer->GetMapperID() == mitk::BaseRenderer::Standard2D )
+  {
+    QAction* thickSlicesGroupSeparator = new QAction(crosshairModesMenu);
+    thickSlicesGroupSeparator->setSeparator(true);
+    thickSlicesGroupSeparator->setText("ThickSlices mode");
+    crosshairModesMenu->addAction( thickSlicesGroupSeparator );
+
+    QActionGroup* thickSlicesActionGroup = new QActionGroup(crosshairModesMenu);
+    thickSlicesActionGroup->setExclusive(true);
+
+    int currentMode = 0;
+    {
+      mitk::ResliceMethodEnumProperty::Pointer m = dynamic_cast<mitk::ResliceMethodEnumProperty*>(m_Renderer->GetCurrentWorldGeometry2DNode()->GetProperty( "reslice.thickslices" ));
+      if( m.IsNotNull() )
+        currentMode = m->GetValueAsId();
+    }
+                            
+    int currentNum = 1;
+    {
+      mitk::IntProperty::Pointer m = dynamic_cast<mitk::IntProperty*>(m_Renderer->GetCurrentWorldGeometry2DNode()->GetProperty( "reslice.thickslices.num" ));
+      if( m.IsNotNull() )
+      {
+        currentNum = m->GetValue();
+        if(currentNum < 1) currentNum = 1;
+        if(currentNum > 10) currentNum = 10;
+      }
+    }
+    
+    if(currentMode==0)
+      currentNum=0;
+    
+    QSlider *m_TSSlider = new QSlider(crosshairModesMenu);
+    m_TSSlider->setMinimum(0);
+    m_TSSlider->setMaximum(9);
+    m_TSSlider->setValue(currentNum);
+    
+    m_TSSlider->setOrientation(Qt::Horizontal);
+
+    connect( m_TSSlider, SIGNAL( valueChanged(int) ), this, SLOT( OnTSNumChanged(int) ) );
+
+    QHBoxLayout* _TSLayout = new QHBoxLayout;
+    _TSLayout->setContentsMargins(4,4,4,4);
+    _TSLayout->addWidget(new QLabel("TS: "));
+    _TSLayout->addWidget(m_TSSlider);
+    _TSLayout->addWidget(m_TSLabel=new QLabel(QString::number(currentNum*2+1),this));
+
+    QWidget* _TSWidget = new QWidget;
+    _TSWidget->setLayout(_TSLayout);
+
+    QWidgetAction *m_TSSliderAction = new QWidgetAction(crosshairModesMenu);
+    m_TSSliderAction->setDefaultWidget(_TSWidget);
+    crosshairModesMenu->addAction(m_TSSliderAction);
+  }  
+}
+
+void QmitkRenderWindowMenu::NotifyNewWidgetPlanesMode( int mode )
+{
+  currentCrosshairRotationMode = mode;
+}

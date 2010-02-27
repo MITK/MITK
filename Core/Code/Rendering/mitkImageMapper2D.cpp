@@ -32,6 +32,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkAbstractTransformGeometry.h"
 #include "mitkDataTreeNodeFactory.h"
 
+#include "mitkResliceMethodEnumProperty.h"
+
 #include <vtkTransform.h>
 #include <vtkGeneralTransform.h>
 #include <vtkMatrix4x4.h>
@@ -43,6 +45,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkImageReslice.h>
 #include <vtkImageChangeInformation.h>
 
+#include "vtkMitkThickSlicesFilter.h"
 
 
 int mitk::ImageMapper2D::numRenderer = 0;
@@ -77,7 +80,6 @@ mitk::ImageMapper2D::Paint( mitk::BaseRenderer *renderer )
   {
     return;
   }
-
 
   const mitk::DisplayGeometry *displayGeometry = renderer->GetDisplayGeometry();
 
@@ -387,8 +389,6 @@ mitk::ImageMapper2D::GenerateData( mitk::BaseRenderer *renderer )
     bounds[i] = 0.0;
   }
 
-
-
   // Do we have a simple PlaneGeometry?
   if ( dynamic_cast< const PlaneGeometry * >( worldGeometry ) != NULL )
   {
@@ -426,6 +426,7 @@ mitk::ImageMapper2D::GenerateData( mitk::BaseRenderer *renderer )
       rendererInfo.m_Extent[1] = bottomInIndex.GetNorm();
     }
 
+    
     // Get the extent of the current world geometry and calculate resampling
     // spacing therefrom.
     widthInMM = worldGeometry->GetExtentInMM( 0 );
@@ -526,7 +527,6 @@ mitk::ImageMapper2D::GenerateData( mitk::BaseRenderer *renderer )
     return;
   }
 
-
   // Initialize the interpolation mode for resampling; switch to nearest
   // neighbor if the input image is too small.
   if ( (input->GetDimension() >= 3) && (input->GetDimension(2) > 1) )
@@ -561,13 +561,40 @@ mitk::ImageMapper2D::GenerateData( mitk::BaseRenderer *renderer )
     rendererInfo.m_Reslicer->SetInterpolationModeToNearestNeighbor();
   }
 
+  int thickSlicesMode = 0;
+  
+  int thickSlicesNum = 1;
+  
+  // Thick slices parameters
+  if( inputData->GetNumberOfScalarComponents() == 1 ) // for now only single component are allowed
+  {
+    DataTreeNode *dn=renderer->GetCurrentWorldGeometry2DNode();
+    if(dn)
+    {
+      ResliceMethodEnumProperty *resliceMethodEnumProperty=0;
+      
+      if( dn->GetProperty( resliceMethodEnumProperty, "reslice.thickslices" ) && resliceMethodEnumProperty )
+        thickSlicesMode = resliceMethodEnumProperty->GetValueAsId(); 
 
+      IntProperty *intProperty=0;
+      if( dn->GetProperty( intProperty, "reslice.thickslices.num" ) && intProperty )
+      {
+        thickSlicesNum = intProperty->GetValue(); 
+        if(thickSlicesNum < 1) thickSlicesNum=1;
+        if(thickSlicesNum > 10) thickSlicesNum=10;
+      }
+    }
+    else
+    {
+      MITK_WARN << "no associated widget plane data tree node found";
+    }
+  }
+  
   rendererInfo.m_UnitSpacingImageFilter->SetInput( inputData );
-
   rendererInfo.m_Reslicer->SetInput( rendererInfo.m_UnitSpacingImageFilter->GetOutput() );
-  rendererInfo.m_Reslicer->SetOutputDimensionality( 2 );
-  rendererInfo.m_Reslicer->SetOutputOrigin( 0.0, 0.0, 0.0 );
-
+  //rendererInfo.m_Reslicer->SetOutputOrigin( 0.0, 0.0, 0.0 );
+  //rendererInfo.m_Reslicer->SetOutputDimensionality( 3 );
+  
   rendererInfo.m_PixelsPerMM[0] = 1.0 / mmPerPixel[0];
   rendererInfo.m_PixelsPerMM[1] = 1.0 / mmPerPixel[1];
 
@@ -624,33 +651,64 @@ mitk::ImageMapper2D::GenerateData( mitk::BaseRenderer *renderer )
     return;
   }
 
-  rendererInfo.m_Reslicer->SetOutputSpacing( mmPerPixel[0], mmPerPixel[1], 1.0 );
+
+  // Calculate dataset spacing in plane z direction (NOT spacing of current
+  // world geometry)
+
+  double dataZSpacing = 1.0;
+  
+  normal.Normalize();    
+  Vector3D normInIndex;
+  inputGeometry->WorldToIndex( origin, normal, normInIndex );
+  
+  if(thickSlicesMode > 0)
+  {
+    dataZSpacing = 1.0 / normInIndex.GetNorm();
+    rendererInfo.m_Reslicer->SetOutputDimensionality( 3 );
+    rendererInfo.m_Reslicer->SetOutputExtent( xMin, xMax-1, yMin, yMax-1, -thickSlicesNum, 0+thickSlicesNum );
+  }  
+  else
+  {
+    rendererInfo.m_Reslicer->SetOutputDimensionality( 2 );
+    rendererInfo.m_Reslicer->SetOutputExtent( xMin, xMax-1, yMin, yMax-1, 0, 0 );
+  }
+
+  rendererInfo.m_Reslicer->SetOutputOrigin( 0.0, 0.0, 0.0 );
+  rendererInfo.m_Reslicer->SetOutputSpacing( mmPerPixel[0], mmPerPixel[1], dataZSpacing );
+
   // xMax and yMax are meant exclusive until now, whereas 
   // SetOutputExtent wants an inclusive bound. Thus, we need 
   // to subtract 1.
-  rendererInfo.m_Reslicer->SetOutputExtent( xMin, xMax-1, yMin, yMax-1, 0, 1 );
-
-
+      
   // Do the reslicing. Modified() is called to make sure that the reslicer is
   // executed even though the input geometry information did not change; this
   // is necessary when the input /em data, but not the /em geometry changes.
-  rendererInfo.m_Reslicer->Modified();
-  rendererInfo.m_Reslicer->ReleaseDataFlagOn();
-
-
-  rendererInfo.m_Reslicer->Update();
-
 
   // The reslicing result is used both for 2D and for 3D mapping. 2D mapping
   // currently uses PIC data structures, while 3D mapping uses VTK data. Thus,
   // the reslicing result needs to be stored twice.
 
   // 1. Check the result
-  vtkImageData* reslicedImage = rendererInfo.m_Reslicer->GetOutput();
+  vtkImageData* reslicedImage = 0;
+  
+  if(thickSlicesMode>0)
+  {
+    rendererInfo.m_TSFilter->SetThickSliceMode( thickSlicesMode-1 );
+    rendererInfo.m_TSFilter->SetInput( rendererInfo.m_Reslicer->GetOutput() );
+    rendererInfo.m_TSFilter->Modified();
+    rendererInfo.m_TSFilter->Update();
+    reslicedImage = rendererInfo.m_TSFilter->GetOutput();
+  }
+  else
+  {
+    rendererInfo.m_Reslicer->Modified();
+    rendererInfo.m_Reslicer->Update();
+    reslicedImage = rendererInfo.m_Reslicer->GetOutput();
+  }  
 
   if((reslicedImage == NULL) || (reslicedImage->GetDataDimension() < 1))
   {
-    itkWarningMacro(<<"reslicer returned empty image");
+    MITK_WARN << "reslicer returned empty image";
     return;
   }
 
@@ -1054,6 +1112,7 @@ m_Renderer(NULL),
 m_Pic(NULL), 
 m_UnitSpacingImageFilter( NULL ),
 m_Reslicer( NULL ),
+m_TSFilter( NULL ),
 m_Image(NULL),
 m_ReferenceGeometry(NULL), 
 m_TextureInterpolation(true),
@@ -1075,6 +1134,10 @@ mitk::ImageMapper2D::RendererInfo
   if ( m_Reslicer != NULL )
   {
     m_Reslicer->Delete();
+  }
+  if ( m_TSFilter != NULL )
+  {
+    m_TSFilter->Delete();
   }
   if ( m_Image != NULL )
   {
@@ -1136,6 +1199,10 @@ void mitk::ImageMapper2D::RendererInfo::Initialize( int rendererID, mitk::BaseRe
   m_Image = vtkImageData::New();
 
   m_Reslicer = vtkImageReslice::New();
+  m_TSFilter = vtkMitkThickSlicesFilter::New();
+
+  m_Reslicer->ReleaseDataFlagOn();
+  m_TSFilter->ReleaseDataFlagOn();
 
   m_UnitSpacingImageFilter = vtkImageChangeInformation::New();
   m_UnitSpacingImageFilter->SetOutputSpacing( 1.0, 1.0, 1.0 );
@@ -1154,6 +1221,8 @@ void mitk::ImageMapper2D::SetDefaultProperties(mitk::DataTreeNode* node, mitk::B
   node->AddProperty( "texture interpolation", mitk::BoolProperty::New( mitk::DataTreeNodeFactory::m_TextureInterpolationActive ) );  // set to user configurable default value (see global options)
   node->AddProperty( "in plane resample extent by geometry", mitk::BoolProperty::New( false ) );
   node->AddProperty( "bounding box", mitk::BoolProperty::New( false ) );
+  
+  
 
   // some more properties specific for a binary...
   if(image->GetScalarValueMax() == image->GetScalarValue2ndMin()&& image->GetScalarValueMin() == image->GetScalarValue2ndMax()) 

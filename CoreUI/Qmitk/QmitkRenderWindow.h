@@ -52,9 +52,6 @@ public:
   virtual mitk::BaseController * GetController();
   virtual mitk::VtkPropRenderer* GetRenderer();
 
-  QMenu* GetCrossHairMenu();
-  void SetCrossHairMenu(QMenu* menu);
-
   /**
    * \brief Whether Qt events should be passed to parent (default: true)
    *
@@ -120,20 +117,17 @@ protected:
 
 signals:
   
-  void ShowCrosshair(bool show);
   void ResetView();
   // \brief int parameters are enum from QmitkStdMultiWidget
   void ChangeCrosshairRotationMode(int); 
-  void SetCrosshairRotationLinked(bool);
+
   void SignalLayoutDesignChanged( int layoutDesignIndex );
 
 protected slots:  
 
   void OnChangeLayoutDesign(int layoutDesignIndex);
 
-  /*! slot for activating/deactivating crosshair mode in MenuWidget. The slot is connected to the WidgetPlanesVisibilityChanged() 
-  event of the StdMultiWidget.  */
-  void OnUpdateCrosshairState( bool state );
+  void OnWidgetPlaneModeChanged( int );
 
 private:
   

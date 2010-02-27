@@ -67,14 +67,12 @@ QmitkRenderWindow::QmitkRenderWindow(QWidget *parent, QString name, mitk::VtkPro
   m_InResize = false;  
 
   //crate Renderwindow MenuBar for split, close Window or set new setting.
-  m_MenuWidget = new QmitkRenderWindowMenu(this);
+  m_MenuWidget = new QmitkRenderWindowMenu(this,0,m_Renderer);
   
   //create Signal/Slot Connection
   connect( m_MenuWidget, SIGNAL( SignalChangeLayoutDesign(int) ), this, SLOT(OnChangeLayoutDesign(int)) );
-  connect( m_MenuWidget, SIGNAL( ShowCrosshair(bool) ), this, SIGNAL( ShowCrosshair(bool)) );
   connect( m_MenuWidget, SIGNAL( ResetView() ), this, SIGNAL( ResetView()) );
   connect( m_MenuWidget, SIGNAL( ChangeCrosshairRotationMode(int) ), this, SIGNAL( ChangeCrosshairRotationMode(int)) );
-  connect( m_MenuWidget, SIGNAL( SetCrosshairRotationLinked(bool) ), this, SIGNAL( SetCrosshairRotationLinked(bool)) );
 }
 
 QmitkRenderWindow::~QmitkRenderWindow()
@@ -315,32 +313,14 @@ void QmitkRenderWindow::HideMenuWidget()
     m_MenuWidget->hide();
 }
 
-void QmitkRenderWindow::OnUpdateCrosshairState( bool state )
+void QmitkRenderWindow::OnWidgetPlaneModeChanged( int mode )
 {
   if( m_MenuWidget )
-    m_MenuWidget->UpdateCrosshairState( state );
+    m_MenuWidget->NotifyNewWidgetPlanesMode( mode );
 }
 
 void QmitkRenderWindow::FullScreenMode(bool state)
 {
   if( m_MenuWidget )
     m_MenuWidget->ChangeFullScreenMode( state );
-}
-  
-QMenu* QmitkRenderWindow::GetCrossHairMenu()
-{
-  if (m_MenuWidget)
-  {
-    return m_MenuWidget->GetCrossHairMenu();
-  }
-  else return NULL;
-}
-  
-void QmitkRenderWindow::SetCrossHairMenu(QMenu* menu)
-{
-  if (m_MenuWidget)
-  {
-    m_MenuWidget->SetCrossHairMenu( menu );
-  }
-}
-
+}  

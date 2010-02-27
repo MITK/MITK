@@ -275,6 +275,10 @@ public:
   itkGetObjectMacro(CurrentWorldGeometry2DNode, DataTreeNode);
 
   //##Documentation
+  //## @brief Sets timestamp of CurrentWorldGeometry2D and DisplayGeometry and forces so reslicing in that renderwindow
+  void SendUpdateSlice();
+
+  //##Documentation
   //## @brief Get timestamp of last call of SetCurrentWorldGeometry2D
   unsigned long GetCurrentWorldGeometry2DUpdateTime() { return m_CurrentWorldGeometry2DUpdateTime; };
   //##Documentation

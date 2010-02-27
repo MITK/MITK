@@ -18,10 +18,12 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkBaseRenderer.h"
 #include "mitkMapper.h"
+#include "mitkResliceMethodEnumProperty.h"
 
 // Geometries
 #include "mitkPlaneGeometry.h"
 #include "mitkSlicedGeometry3D.h"
+
 
 // Controllers
 #include "mitkCameraController.h"
@@ -173,6 +175,10 @@ m_MaxNumberOfPeels(100), m_NumberOfVisibleLODEnabledMappers(0)
   m_CurrentWorldGeometry2DNode->SetData(m_CurrentWorldGeometry2DData);
   m_CurrentWorldGeometry2DNode->GetPropertyList()->SetProperty("renderer", rendererProp);
   m_CurrentWorldGeometry2DNode->GetPropertyList()->SetProperty("layer", IntProperty::New(1000));
+
+  m_CurrentWorldGeometry2DNode->SetProperty( "reslice.thickslices", mitk::ResliceMethodEnumProperty::New( ) );
+  m_CurrentWorldGeometry2DNode->SetProperty( "reslice.thickslices.num", mitk::IntProperty::New( 1 ) );
+
   m_CurrentWorldGeometry2DTransformTime = m_CurrentWorldGeometry2DNode->GetVtkTransform()->GetMTime();
 
   m_DisplayGeometry = mitk::DisplayGeometry::New();
@@ -475,6 +481,12 @@ void mitk::BaseRenderer::SetCurrentWorldGeometry2D(mitk::Geometry2D* geometry2d)
     m_CurrentWorldGeometry2DUpdateTime.Modified();
     Modified();
   }
+}
+
+void mitk::BaseRenderer::SendUpdateSlice()
+{
+  m_DisplayGeometryUpdateTime.Modified();
+  m_CurrentWorldGeometry2DUpdateTime.Modified();
 }
 
 void mitk::BaseRenderer::SetCurrentWorldGeometry(mitk::Geometry3D* geometry)

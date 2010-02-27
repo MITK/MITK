@@ -127,34 +127,40 @@ m_Node(NULL)
   mitkWidget2->setMaximumSize(2000,2000);
   mitkWidget2->setEnabled( TRUE );
   mitkWidget2->SetLayoutIndex( SAGITTAL );
-  mitkWidget2->SetCrossHairMenu( mitkWidget1->GetCrossHairMenu() );
   mitkWidgetLayout2->addWidget(mitkWidget2); 
 
   //Create RenderWindows 3
   mitkWidget3 = new QmitkRenderWindow(mitkWidget3Container, "stdmulti.widget3");
   mitkWidget3->setMaximumSize(2000,2000);
   mitkWidget3->SetLayoutIndex( CORONAL );
-  mitkWidget3->SetCrossHairMenu( mitkWidget1->GetCrossHairMenu() );
   mitkWidgetLayout3->addWidget(mitkWidget3); 
 
   //Create RenderWindows 4
   mitkWidget4 = new QmitkRenderWindow(mitkWidget4Container, "stdmulti.widget4");
   mitkWidget4->setMaximumSize(2000,2000);
   mitkWidget4->SetLayoutIndex( THREE_D );
-  mitkWidget4->SetCrossHairMenu( mitkWidget1->GetCrossHairMenu() );
   mitkWidgetLayout4->addWidget(mitkWidget4); 
 
   //create SignalSlot Connection
   connect( mitkWidget1, SIGNAL( SignalLayoutDesignChanged(int) ), this, SLOT( OnLayoutDesignChanged(int) ) );
-  connect( mitkWidget2, SIGNAL( SignalLayoutDesignChanged(int) ), this, SLOT( OnLayoutDesignChanged(int) ) );
-  connect( mitkWidget3, SIGNAL( SignalLayoutDesignChanged(int) ), this, SLOT( OnLayoutDesignChanged(int) ) );
-  connect( mitkWidget4, SIGNAL( SignalLayoutDesignChanged(int) ), this, SLOT( OnLayoutDesignChanged(int) ) );
-  
-  connect( mitkWidget1, SIGNAL( ShowCrosshair(bool) ), this, SLOT( SetWidgetPlanesVisibility(bool) ) );
-  connect( this, SIGNAL( WidgetPlanesVisibilityChanged(bool) ), mitkWidget1, SLOT( OnUpdateCrosshairState(bool) ) );
   connect( mitkWidget1, SIGNAL( ResetView() ), this, SLOT( ResetCrosshair() ) );
   connect( mitkWidget1, SIGNAL( ChangeCrosshairRotationMode(int) ), this, SLOT( SetWidgetPlaneMode(int) ) );
-  connect( mitkWidget1, SIGNAL( SetCrosshairRotationLinked(bool) ), this, SLOT( SetWidgetPlanesRotationLinked(bool) ) );
+  connect( this, SIGNAL(WidgetNotifyNewCrossHairMode(int)), mitkWidget1, SLOT(OnWidgetPlaneModeChanged(int)) );
+
+  connect( mitkWidget2, SIGNAL( SignalLayoutDesignChanged(int) ), this, SLOT( OnLayoutDesignChanged(int) ) );
+  connect( mitkWidget2, SIGNAL( ResetView() ), this, SLOT( ResetCrosshair() ) );
+  connect( mitkWidget2, SIGNAL( ChangeCrosshairRotationMode(int) ), this, SLOT( SetWidgetPlaneMode(int) ) );
+  connect( this, SIGNAL(WidgetNotifyNewCrossHairMode(int)), mitkWidget2, SLOT(OnWidgetPlaneModeChanged(int)) );
+
+  connect( mitkWidget3, SIGNAL( SignalLayoutDesignChanged(int) ), this, SLOT( OnLayoutDesignChanged(int) ) );
+  connect( mitkWidget3, SIGNAL( ResetView() ), this, SLOT( ResetCrosshair() ) );
+  connect( mitkWidget3, SIGNAL( ChangeCrosshairRotationMode(int) ), this, SLOT( SetWidgetPlaneMode(int) ) );
+  connect( this, SIGNAL(WidgetNotifyNewCrossHairMode(int)), mitkWidget3, SLOT(OnWidgetPlaneModeChanged(int)) );
+
+  connect( mitkWidget4, SIGNAL( SignalLayoutDesignChanged(int) ), this, SLOT( OnLayoutDesignChanged(int) ) );
+  connect( mitkWidget4, SIGNAL( ResetView() ), this, SLOT( ResetCrosshair() ) );
+  connect( mitkWidget4, SIGNAL( ChangeCrosshairRotationMode(int) ), this, SLOT( SetWidgetPlaneMode(int) ) );
+  connect( this, SIGNAL(WidgetNotifyNewCrossHairMode(int)), mitkWidget4, SLOT(OnWidgetPlaneModeChanged(int)) );
 
   //Create Level Window Widget
   levelWindowWidget = new QmitkLevelWindowWidget( m_MainSplit ); //this
@@ -1649,10 +1655,7 @@ void QmitkStdMultiWidget::SetWidgetPlanesVisibility(bool visible, mitk::BaseRend
   SetWidgetPlaneVisibility("widget1Plane", visible, renderer);
   SetWidgetPlaneVisibility("widget2Plane", visible, renderer);
   SetWidgetPlaneVisibility("widget3Plane", visible, renderer);
-
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-  
-  emit WidgetPlanesVisibilityChanged(visible);
 }
 
 
@@ -1662,7 +1665,6 @@ void QmitkStdMultiWidget::SetWidgetPlanesLocked(bool locked)
   GetRenderWindow1()->GetSliceNavigationController()->SetSliceLocked(locked);
   GetRenderWindow2()->GetSliceNavigationController()->SetSliceLocked(locked);
   GetRenderWindow3()->GetSliceNavigationController()->SetSliceLocked(locked);
-  emit WidgetPlanesLockedChanged(locked);
 }
 
 
@@ -1672,7 +1674,6 @@ void QmitkStdMultiWidget::SetWidgetPlanesRotationLocked(bool locked)
   GetRenderWindow1()->GetSliceNavigationController()->SetSliceRotationLocked(locked);
   GetRenderWindow2()->GetSliceNavigationController()->SetSliceRotationLocked(locked);
   GetRenderWindow3()->GetSliceNavigationController()->SetSliceRotationLocked(locked);
-  emit WidgetPlanesRotationLockedChanged(locked);
 }
 
 
@@ -1684,9 +1685,44 @@ void QmitkStdMultiWidget::SetWidgetPlanesRotationLinked( bool link )
 }
 
 
-void QmitkStdMultiWidget::SetWidgetPlaneMode( int mode )
+void QmitkStdMultiWidget::SetWidgetPlaneMode( int userMode )
 {
-  MITK_INFO << "Changing crosshair mode to " << mode;
+  MITK_DEBUG << "Changing crosshair mode to " << userMode;
+
+  emit WidgetNotifyNewCrossHairMode( userMode );
+  
+  int mode = m_PlaneMode;
+  bool link = false;
+  
+  // Convert user interface mode to actual mode
+  {
+    switch(userMode)
+    {
+      case 0:
+        mode = PLANE_MODE_SLICING;
+        link = false;
+        break;
+      
+      case 1:
+        mode = PLANE_MODE_ROTATION;
+        link = false;
+        break;
+     
+      case 2:
+        mode = PLANE_MODE_ROTATION;
+        link = true;
+        break;
+     
+      case 3:
+        mode = PLANE_MODE_SWIVEL;
+        link = false;
+        break;
+    }
+  }
+
+  // Slice rotation linked
+  m_SlicesRotator->SetLinkPlanes( link );
+  m_SlicesSwiveller->SetLinkPlanes( link );
 
   // Do nothing if mode didn't change
   if ( m_PlaneMode == mode )

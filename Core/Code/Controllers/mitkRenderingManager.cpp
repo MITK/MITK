@@ -664,7 +664,6 @@ void RenderingManager::UpdateCallback()
   {
     if ( it->second == RENDERING_REQUESTED )
     {
-      MITK_INFO << "RM::ForceImmediateUpdate() for window " << i;
       this->ForceImmediateUpdate( it->first );
     }
   }

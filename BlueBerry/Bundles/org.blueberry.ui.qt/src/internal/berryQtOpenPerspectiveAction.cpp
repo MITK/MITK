@@ -18,6 +18,7 @@
 #include "berryQtOpenPerspectiveAction.h"
 
 #include <berryIWorkbenchPage.h>
+#include <berryIWorkbench.h>
 
 #include <QWidget>
 #include <QMessageBox>
@@ -28,7 +29,7 @@ namespace berry
 QtOpenPerspectiveAction::QtOpenPerspectiveAction(
     IWorkbenchWindow::Pointer window, IPerspectiveDescriptor::Pointer descr, QActionGroup* group) :
   QAction(0),
-  window(window.GetPointer()), descr(descr)
+  window(window.GetPointer())
 {
   this->setParent(group);
   this->setText(QString(descr->GetLabel().c_str()));
@@ -41,6 +42,8 @@ QtOpenPerspectiveAction::QtOpenPerspectiveAction(
   this->setIcon(*icon);
   descr->GetImageDescriptor()->DestroyImage(icon);
 
+  perspectiveId = descr->GetId();
+
   this->connect(this, SIGNAL(triggered(bool)), this, SLOT(Run()));
 }
 
@@ -48,14 +51,11 @@ void QtOpenPerspectiveAction::Run()
 {
   try
   {
-    if (window->GetActivePage()->GetPerspective() != descr)
-    {
-      window->GetActivePage()->SetPerspective(descr);
-    }
+    window->GetWorkbench()->ShowPerspective(perspectiveId, IWorkbenchWindow::Pointer(window));
   }
   catch (...)
   {
-    QMessageBox::critical(0, "Opening Perspective Failed", QString::fromStdString("The perspective \"" + descr->GetLabel() + "\" could not be opened.\nSee the log for details."));
+    QMessageBox::critical(0, "Opening Perspective Failed", QString("The perspective \"") + this->text() + "\" could not be opened.\nSee the log for details.");
   }
 }
 

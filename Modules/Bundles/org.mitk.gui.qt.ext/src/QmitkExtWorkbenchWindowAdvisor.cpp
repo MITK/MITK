@@ -125,13 +125,15 @@ class PerspectiveListenerForTitle: public berry::IPerspectiveListener
 public:
 
   PerspectiveListenerForTitle(QmitkExtWorkbenchWindowAdvisor* wa) :
-    windowAdvisor(wa)
+    windowAdvisor(wa), perspectivesClosed(false)
   {
   }
 
   Events::Types GetPerspectiveEventTypes() const
   {
-    return Events::ACTIVATED | Events::SAVED_AS | Events::DEACTIVATED;
+    return Events::ACTIVATED | Events::SAVED_AS | Events::DEACTIVATED
+      // remove the following line when command framework is finished
+      | Events::CLOSED | Events::OPENED;
   }
 
   void PerspectiveActivated(berry::IWorkbenchPage::Pointer page,
@@ -153,8 +155,63 @@ public:
     windowAdvisor->UpdateTitle(false);
   }
 
+  void PerspectiveOpened(berry::IWorkbenchPage::Pointer page,
+          berry::IPerspectiveDescriptor::Pointer perspective)
+  {
+    if (perspectivesClosed)
+    {
+      QListIterator<QAction*> i(windowAdvisor->viewActions);
+      while (i.hasNext())
+      {
+        i.next()->setEnabled(false);
+      }
+
+      windowAdvisor->fileSaveProjectAction->setEnabled(false);
+      windowAdvisor->closeProjectAction->setEnabled(false);
+      windowAdvisor->undoAction->setEnabled(false);
+      windowAdvisor->redoAction->setEnabled(false);
+      windowAdvisor->imageNavigatorAction->setEnabled(false);
+      windowAdvisor->resetPerspAction->setEnabled(false);
+      windowAdvisor->closePerspAction->setEnabled(false);
+    }
+
+    perspectivesClosed = false;
+  }
+
+  void PerspectiveClosed(berry::IWorkbenchPage::Pointer page,
+          berry::IPerspectiveDescriptor::Pointer perspective)
+  {
+    berry::IWorkbenchWindow::Pointer wnd = windowAdvisor->GetWindowConfigurer()->GetWindow();
+    bool allClosed = true;
+    if (wnd->GetActivePage())
+    {
+      std::vector<berry::IPerspectiveDescriptor::Pointer> perspectives(wnd->GetActivePage()->GetOpenPerspectives());
+      allClosed = perspectives.empty();
+    }
+
+    if (allClosed)
+    {
+      perspectivesClosed = true;
+
+      QListIterator<QAction*> i(windowAdvisor->viewActions);
+      while (i.hasNext())
+      {
+        i.next()->setEnabled(false);
+      }
+
+      windowAdvisor->fileSaveProjectAction->setEnabled(false);
+      windowAdvisor->closeProjectAction->setEnabled(false);
+      windowAdvisor->undoAction->setEnabled(false);
+      windowAdvisor->redoAction->setEnabled(false);
+      windowAdvisor->imageNavigatorAction->setEnabled(false);
+      windowAdvisor->resetPerspAction->setEnabled(false);
+      windowAdvisor->closePerspAction->setEnabled(false);
+    }
+  }
+
 private:
   QmitkExtWorkbenchWindowAdvisor* windowAdvisor;
+  bool perspectivesClosed;
 };
 
 
@@ -176,6 +233,18 @@ berry::ActionBarAdvisor::Pointer QmitkExtWorkbenchWindowAdvisor::CreateActionBar
   berry::ActionBarAdvisor::Pointer actionBarAdvisor(
       new QmitkExtActionBarAdvisor(configurer));
   return actionBarAdvisor;
+}
+
+void* QmitkExtWorkbenchWindowAdvisor::CreateEmptyWindowContents(void* parent)
+{
+  QWidget* parentWidget = static_cast<QWidget*>(parent);
+  QLabel* label = new QLabel(parentWidget);
+  label->setText("<b>No perspectives are open. Open a perspective in the <i>Window->Open Perspective</i> menu.</b>");
+  label->setContentsMargins(10,10,10,10);
+  label->setAlignment(Qt::AlignTop);
+  label->setEnabled(false);
+  parentWidget->layout()->addWidget(label);
+  return label;
 }
 
 void QmitkExtWorkbenchWindowAdvisor::ShowViewToolbar(bool show)
@@ -226,10 +295,10 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
 
   QAction* fileOpenAction = new QmitkExtFileOpenAction(QIcon(":/org.mitk.gui.qt.ext/Load_48.png"), window);
   fileMenu->addAction(fileOpenAction);
-  QAction* fileSaveProjectAction = new QmitkExtFileSaveProjectAction(window);
+  fileSaveProjectAction = new QmitkExtFileSaveProjectAction(window);
   fileSaveProjectAction->setIcon(QIcon(":/org.mitk.gui.qt.ext/Save_48.png"));
   fileMenu->addAction(fileSaveProjectAction);
-  QAction* closeProjectAction = new QmitkCloseProjectAction(window);
+  closeProjectAction = new QmitkCloseProjectAction(window);
   closeProjectAction->setIcon(QIcon(":/org.mitk.gui.qt.ext/Remove_48.png"));
   fileMenu->addAction(closeProjectAction);
   fileMenu->addSeparator();
@@ -244,18 +313,18 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
 
   // another bad hack to get an edit/undo menu...
   QMenu* editMenu = menuBar->addMenu("&Edit");
-  QAction* undoAction = editMenu->addAction(QIcon(":/org.mitk.gui.qt.ext/Undo_48.png"),
+  undoAction = editMenu->addAction(QIcon(":/org.mitk.gui.qt.ext/Undo_48.png"),
       "&Undo",
       QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onUndo()),
       QKeySequence("CTRL+Z"));
- undoAction->setToolTip("Undo the last action (not supported by all modules)");
- QAction* redoAction = editMenu->addAction(QIcon(":/org.mitk.gui.qt.ext/Redo_48.png")
+  undoAction->setToolTip("Undo the last action (not supported by all modules)");
+  redoAction = editMenu->addAction(QIcon(":/org.mitk.gui.qt.ext/Redo_48.png")
       , "&Redo",
       QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onRedo()),
       QKeySequence("CTRL+Y"));
   redoAction->setToolTip("execute the last action that was undone again (not supported by all modules)");
 
-  QAction* imageNavigatorAction = editMenu->addAction(QIcon(":/org.mitk.gui.qt.ext/Slider.png"), "&Image Navigator", 
+  imageNavigatorAction = editMenu->addAction(QIcon(":/org.mitk.gui.qt.ext/Slider.png"), "&Image Navigator",
     QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onImageNavigator()),NULL);
   imageNavigatorAction->setCheckable(true);
 
@@ -296,9 +365,9 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
   QMenu* viewMenu = windowMenu->addMenu("Show &View");
   viewMenu->setObjectName("Show View");
   windowMenu->addSeparator();
-  windowMenu->addAction("&Reset Perspective",
+  resetPerspAction = windowMenu->addAction("&Reset Perspective",
     QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onResetPerspective()));
-  windowMenu->addAction("&Close Perspective",
+  closePerspAction = windowMenu->addAction("&Close Perspective",
     QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onClosePerspective()));
   windowMenu->addSeparator();
   windowMenu->addAction("&Preferences...",
@@ -345,7 +414,7 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
   {
     berry::QtShowViewAction* viewAction = new berry::QtShowViewAction(window,
         (*MapIter).second);
-    //m_ViewActions.push_back(viewAction);
+    viewActions.push_back(viewAction);
     viewMenu->addAction(viewAction);
     if (showViewToolbar)
     {

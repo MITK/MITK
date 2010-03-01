@@ -27,6 +27,10 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkQtCommonExtDll.h"
 
+#include <QList>
+class QAction;
+class QMenu;
+
 class MITK_QT_COMMON_EXT_EXPORT QmitkExtWorkbenchWindowAdvisor : public berry::WorkbenchWindowAdvisor
 {
 public:
@@ -36,6 +40,8 @@ public:
 
     berry::ActionBarAdvisor::Pointer CreateActionBarAdvisor(
         berry::IActionBarConfigurer::Pointer configurer);
+
+    void* CreateEmptyWindowContents(void* parent);
 
     void PostWindowCreate();
 
@@ -89,6 +95,16 @@ private:
   bool showVersionInfo;
   std::string productName;
   std::string windowIcon;
+
+  // actions which will be enabled/disabled depending on the application state
+  QList<QAction*> viewActions;
+  QAction* fileSaveProjectAction;
+  QAction* closeProjectAction;
+  QAction* undoAction;
+  QAction* redoAction;
+  QAction* imageNavigatorAction;
+  QAction* resetPerspAction;
+  QAction* closePerspAction;
 };
 
 #endif /*QMITKEXTWORKBENCHWINDOWADVISOR_H_*/

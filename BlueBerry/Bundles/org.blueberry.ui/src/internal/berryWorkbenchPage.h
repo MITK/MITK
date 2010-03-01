@@ -81,9 +81,9 @@ private:
   class ActionSwitcher
   {
   private:
-    IWorkbenchPart::Pointer activePart;
+    IWorkbenchPart::WeakPtr activePart;
 
-    IEditorPart::Pointer topEditor;
+    IEditorPart::WeakPtr topEditor;
 
     /**
      * Updates the contributions given the new part as the active part.

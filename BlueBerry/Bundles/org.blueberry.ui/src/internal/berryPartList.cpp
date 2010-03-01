@@ -43,23 +43,23 @@ void PartList::PropertyChange(Object::Pointer source, int propId)
 
 IWorkbenchPartReference::Pointer PartList::GetActivePartReference()
 {
-  return activePartReference;
+  return activePartReference.Lock();
 }
 
 IEditorReference::Pointer PartList::GetActiveEditorReference()
 {
-  return activeEditorReference;
+  return activeEditorReference.Lock();
 }
 
 IEditorPart::Pointer PartList::GetActiveEditor()
 {
-  return activeEditorReference.IsNull() ? IEditorPart::Pointer(0) : activeEditorReference->GetEditor(
+  return activeEditorReference.Expired() ? IEditorPart::Pointer(0) : activeEditorReference.Lock()->GetEditor(
       false);
 }
 
 IWorkbenchPart::Pointer PartList::GetActivePart()
 {
-  return activePartReference == 0 ? IWorkbenchPart::Pointer(0) : activePartReference->GetPart(false);
+  return activePartReference.Expired() ? IWorkbenchPart::Pointer(0) : activePartReference.Lock()->GetPart(false);
 }
 
 //std::vector<IEditorReference::Pointer> PartList::GetEditors()
@@ -106,12 +106,12 @@ void PartList::AddPart(WorkbenchPartReference::Pointer ref)
 
 void PartList::SetActivePart(IWorkbenchPartReference::Pointer ref)
 {
-  if (ref == activePartReference)
+  if (activePartReference.Lock() == ref)
   {
     return;
   }
 
-  IWorkbenchPartReference::Pointer oldPart = activePartReference;
+  IWorkbenchPartReference::Pointer oldPart = activePartReference.Lock();
 
   // A part can't be activated until it is added
   //poco_assert(ref == 0 || this->Contains(ref));
@@ -126,7 +126,7 @@ void PartList::SetActivePart(IWorkbenchPartReference::Pointer ref)
 
 void PartList::SetActiveEditor(IEditorReference::Pointer ref)
 {
-  if (ref == activeEditorReference)
+  if (activeEditorReference.Lock() == ref)
   {
     return;
   }
@@ -148,12 +148,12 @@ void PartList::RemovePart(WorkbenchPartReference::Pointer ref)
   //poco_assert(this->Contains(ref));
   // We're not allowed to remove the active part. We must deactivate it
   // first.
-  poco_assert(activePartReference != ref);
+  poco_assert(activePartReference.Lock() != ref);
   // We're not allowed to remove the active editor. We must deactivate it
   // first.
   if (ref.Cast<IEditorReference>())
   {
-    poco_assert(activeEditorReference != ref.Cast<IEditorReference>());
+    poco_assert(activeEditorReference.Lock() != ref.Cast<IEditorReference>());
   }
 
   if (ref->GetVisible())
@@ -296,12 +296,12 @@ void PartList::PartOpened(WorkbenchPartReference::Pointer ref)
   // never get an open event for a part that is already active.
   // (This either indicates that a redundant
   // open event was fired or that a closed part was somehow activated)
-  poco_assert(activePartReference != ref);
+  poco_assert(activePartReference.Lock() != ref);
   // The active editor must be opened before it is activated, so we should
   // never get an open event for an editor that is already active.
   // (This either indicates that a redundant
   // open event was fired or that a closed editor was somehow activated)
-  poco_assert((void*)activeEditorReference.GetPointer() != (void*)ref.GetPointer());
+  poco_assert((void*)activeEditorReference.Lock().GetPointer() != (void*)ref.GetPointer());
 
   SaveablesList::Pointer modelManager = actualPart
   ->GetSite()->GetService(ISaveablesLifecycleListener::GetManifestName()).Cast<SaveablesList>();
@@ -323,12 +323,12 @@ void PartList::PartClosed(WorkbenchPartReference::Pointer ref)
   // poco_assert(this->Contains(ref));
   // Not allowed to close the active part. The part must be deactivated
   // before it may be closed.
-  poco_assert(activePartReference != ref);
+  poco_assert(activePartReference.Lock() != ref);
   // Not allowed to close the active editor. The editor must be
   // deactivated before it may be closed.
   if (ref.Cast<IEditorReference>())
   {
-    poco_assert(activeEditorReference != ref.Cast<IEditorReference>());
+    poco_assert(activeEditorReference.Lock() != ref.Cast<IEditorReference>());
   }
 
   this->FirePartClosed(ref);

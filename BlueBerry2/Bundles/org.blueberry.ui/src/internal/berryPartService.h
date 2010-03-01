@@ -16,7 +16,7 @@ private:
   //PartListenerList listeners = new PartListenerList();
   IPartListener::Events partEvents;
 
-  IWorkbenchPartReference::Pointer activePart;
+  IWorkbenchPartReference::WeakPtr activePart;
 
   std::string debugListenersKey;
   std::string debugListeners2Key;

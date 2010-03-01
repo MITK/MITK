@@ -89,17 +89,17 @@ void PartService::FirePartOpened(IWorkbenchPartReference::Pointer ref)
 
 IWorkbenchPart::Pointer PartService::GetActivePart()
 {
-  return activePart.IsNull() ? IWorkbenchPart::Pointer(0) : activePart->GetPart(false);
+  return activePart.Expired() ? IWorkbenchPart::Pointer(0) : activePart.Lock()->GetPart(false);
 }
 
 IWorkbenchPartReference::Pointer PartService::GetActivePartReference()
 {
-  return activePart;
+  return activePart.Lock();
 }
 
 void PartService::SetActivePart(IWorkbenchPartReference::Pointer ref)
 {
-  IWorkbenchPartReference::Pointer oldRef = activePart;
+  IWorkbenchPartReference::Pointer oldRef = activePart.Lock();
 
   // Filter out redundant activation events
   if (oldRef == ref)

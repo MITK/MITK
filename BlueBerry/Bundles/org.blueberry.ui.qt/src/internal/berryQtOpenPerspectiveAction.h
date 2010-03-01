@@ -46,7 +46,7 @@ protected slots:
 private:
 
   IWorkbenchWindow* window;
-  IPerspectiveDescriptor::Pointer descr;
+  std::string perspectiveId;
 
 };
 

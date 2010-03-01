@@ -577,7 +577,7 @@ void WorkbenchWindow::CloseAllPages()
   }
   if (!closing)
   {
-    //this->ShowEmptyWindowContents();
+    this->ShowEmptyWindowContents();
   }
 }
 
@@ -608,9 +608,11 @@ bool WorkbenchWindow::IsClosing()
 
 int WorkbenchWindow::Open()
 {
-  //  if (getPages().length == 0) {
-  //    showEmptyWindowContents();
-  //  }
+  if (pageList.IsEmpty())
+  {
+    this->ShowEmptyWindowContents();
+  }
+
   this->FireWindowCreated();
   this->GetWindowAdvisor()->OpenIntro();
 

@@ -19,8 +19,8 @@ private:
   // list of parts in the activation order (oldest last)
   //std::deque<IWorkbenchPartReference::Pointer> parts;
 
-  IWorkbenchPartReference::Pointer activePartReference;
-  IEditorReference::Pointer activeEditorReference;
+  IWorkbenchPartReference::WeakPtr activePartReference;
+  IEditorReference::WeakPtr activeEditorReference;
 
 public:
 

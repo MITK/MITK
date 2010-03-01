@@ -50,16 +50,20 @@
 namespace berry
 {
 
-WorkbenchPage::ActivationOrderPred::ActivationOrderPred(WorkbenchPage::ActivationList* al) :
+WorkbenchPage::ActivationOrderPred::ActivationOrderPred(
+    WorkbenchPage::ActivationList* al) :
   activationList(al)
 {
 
 }
 
-bool WorkbenchPage::ActivationOrderPred::operator()(const IViewReference::Pointer o1, const IViewReference::Pointer o2) const
+bool WorkbenchPage::ActivationOrderPred::operator()(
+    const IViewReference::Pointer o1, const IViewReference::Pointer o2) const
 {
-  WorkbenchPage::ActivationList::PartListIter pos1 = activationList->IndexOf(o1.Cast<IWorkbenchPartReference>());
-  WorkbenchPage::ActivationList::PartListIter pos2 = activationList->IndexOf(o2.Cast<IWorkbenchPartReference>());
+  WorkbenchPage::ActivationList::PartListIter pos1 = activationList->IndexOf(
+      o1.Cast<IWorkbenchPartReference> ());
+  WorkbenchPage::ActivationList::PartListIter pos2 = activationList->IndexOf(
+      o2.Cast<IWorkbenchPartReference> ());
   return pos1 < pos2;
 }
 
@@ -137,7 +141,7 @@ void WorkbenchPage::PerspectiveList::Reorder(
 
   PerspectiveListType::iterator newLocation = openedList.begin();
   for (int i = 0; i < newLoc; ++i, ++newLocation)
-  ;
+    ;
   if (oldLocation == newLocation)
   {
     return;
@@ -236,7 +240,7 @@ Perspective::Pointer WorkbenchPage::PerspectiveList::GetNextActive()
     }
     else
     {
-      return *(usedList.rbegin()++);
+      return *(++usedList.rbegin());
     }
   }
 }
@@ -263,7 +267,8 @@ void WorkbenchPage::PerspectiveList::SetActive(Perspective::Pointer perspective)
   }
 }
 
-WorkbenchPage::ActivationList::ActivationList(WorkbenchPage* page) : page(page)
+WorkbenchPage::ActivationList::ActivationList(WorkbenchPage* page) :
+  page(page)
 {
 
 }
@@ -286,7 +291,8 @@ void WorkbenchPage::ActivationList::SetActive(SmartPointer<IWorkbenchPart> part)
   }
 }
 
-void WorkbenchPage::ActivationList::BringToTop(SmartPointer<IWorkbenchPartReference> ref)
+void WorkbenchPage::ActivationList::BringToTop(SmartPointer<
+    IWorkbenchPartReference> ref)
 {
   IStackableContainer::Pointer targetContainer(page->GetContainer(ref));
 
@@ -310,7 +316,8 @@ void WorkbenchPage::ActivationList::BringToTop(SmartPointer<IWorkbenchPartRefere
   }
 }
 
-WorkbenchPage::ActivationList::PartListIter WorkbenchPage::ActivationList::LastIndexOfContainer(SmartPointer<IStackableContainer> container)
+WorkbenchPage::ActivationList::PartListIter WorkbenchPage::ActivationList::LastIndexOfContainer(
+    SmartPointer<IStackableContainer> container)
 {
   PartListReverseIter i = parts.rbegin();
   while (i != parts.rend())
@@ -327,12 +334,14 @@ WorkbenchPage::ActivationList::PartListIter WorkbenchPage::ActivationList::LastI
   return parts.end();
 }
 
-void WorkbenchPage::ActivationList::SetActive(SmartPointer<IWorkbenchPartReference> ref)
+void WorkbenchPage::ActivationList::SetActive(SmartPointer<
+    IWorkbenchPartReference> ref)
 {
   this->SetActive(ref->GetPart(true));
 }
 
-void WorkbenchPage::ActivationList::Add(SmartPointer<IWorkbenchPartReference> ref)
+void WorkbenchPage::ActivationList::Add(
+    SmartPointer<IWorkbenchPartReference> ref)
 {
   if (std::find(parts.begin(), parts.end(), ref) != parts.end())
   {
@@ -361,12 +370,14 @@ SmartPointer<IWorkbenchPart> WorkbenchPage::ActivationList::GetPreviouslyActive(
   return this->GetActive(--parts.end());
 }
 
-SmartPointer<IWorkbenchPartReference> WorkbenchPage::ActivationList::GetActiveReference(bool editorsOnly)
+SmartPointer<IWorkbenchPartReference> WorkbenchPage::ActivationList::GetActiveReference(
+    bool editorsOnly)
 {
   return this->GetActiveReference(parts.end(), editorsOnly);
 }
 
-WorkbenchPage::ActivationList::PartListIter WorkbenchPage::ActivationList::IndexOf(SmartPointer<IWorkbenchPart> part)
+WorkbenchPage::ActivationList::PartListIter WorkbenchPage::ActivationList::IndexOf(
+    SmartPointer<IWorkbenchPart> part)
 {
   IWorkbenchPartReference::Pointer ref(page->GetReference(part));
   if (ref == 0)
@@ -376,12 +387,14 @@ WorkbenchPage::ActivationList::PartListIter WorkbenchPage::ActivationList::Index
   return std::find(parts.begin(), parts.end(), ref);
 }
 
-WorkbenchPage::ActivationList::PartListIter WorkbenchPage::ActivationList::IndexOf(SmartPointer<IWorkbenchPartReference> ref)
+WorkbenchPage::ActivationList::PartListIter WorkbenchPage::ActivationList::IndexOf(
+    SmartPointer<IWorkbenchPartReference> ref)
 {
   return std::find(parts.begin(), parts.end(), ref);
 }
 
-bool WorkbenchPage::ActivationList::Remove(SmartPointer<IWorkbenchPartReference> ref)
+bool WorkbenchPage::ActivationList::Remove(
+    SmartPointer<IWorkbenchPartReference> ref)
 {
   bool contains = std::find(parts.begin(), parts.end(), ref) != parts.end();
   parts.erase(std::find(parts.begin(), parts.end(), ref));
@@ -390,7 +403,8 @@ bool WorkbenchPage::ActivationList::Remove(SmartPointer<IWorkbenchPartReference>
 
 SmartPointer<IEditorPart> WorkbenchPage::ActivationList::GetTopEditor()
 {
-  IEditorReference::Pointer editor = this->GetActiveReference(parts.end(), true).Cast<IEditorReference>();
+  IEditorReference::Pointer editor =
+      this->GetActiveReference(parts.end(), true).Cast<IEditorReference> ();
 
   if (editor == 0)
   {
@@ -400,7 +414,8 @@ SmartPointer<IEditorPart> WorkbenchPage::ActivationList::GetTopEditor()
   return editor->GetEditor(true);
 }
 
-SmartPointer<IWorkbenchPart> WorkbenchPage::ActivationList::GetActive(PartListIter start)
+SmartPointer<IWorkbenchPart> WorkbenchPage::ActivationList::GetActive(
+    PartListIter start)
 {
   IWorkbenchPartReference::Pointer ref(this->GetActiveReference(start, false));
 
@@ -412,10 +427,12 @@ SmartPointer<IWorkbenchPart> WorkbenchPage::ActivationList::GetActive(PartListIt
   return ref->GetPart(true);
 }
 
-SmartPointer<IWorkbenchPartReference> WorkbenchPage::ActivationList::GetActiveReference(PartListIter start, bool editorsOnly)
+SmartPointer<IWorkbenchPartReference> WorkbenchPage::ActivationList::GetActiveReference(
+    PartListIter start, bool editorsOnly)
 {
   // First look for parts that aren't obscured by the current zoom state
-  IWorkbenchPartReference::Pointer nonObscured = this->GetActiveReference(start, editorsOnly, true);
+  IWorkbenchPartReference::Pointer nonObscured = this->GetActiveReference(
+      start, editorsOnly, true);
 
   if (nonObscured)
   {
@@ -426,15 +443,16 @@ SmartPointer<IWorkbenchPartReference> WorkbenchPage::ActivationList::GetActiveRe
   return this->GetActiveReference(start, editorsOnly, false);
 }
 
-SmartPointer<IWorkbenchPartReference> WorkbenchPage::ActivationList::GetActiveReference(PartListIter start, bool editorsOnly, bool  /*skipPartsObscuredByZoom*/)
+SmartPointer<IWorkbenchPartReference> WorkbenchPage::ActivationList::GetActiveReference(
+    PartListIter start, bool editorsOnly, bool /*skipPartsObscuredByZoom*/)
 {
   std::vector<IViewReference::Pointer> views = page->GetViewReferences();
   PartListReverseIter i(start);
   while (i != parts.rend())
   {
-    WorkbenchPartReference::Pointer ref(i->Cast<WorkbenchPartReference>());
+    WorkbenchPartReference::Pointer ref(i->Cast<WorkbenchPartReference> ());
 
-    if (editorsOnly && (ref.Cast<IEditorReference>() == 0))
+    if (editorsOnly && (ref.Cast<IEditorReference> () == 0))
     {
       ++i;
       continue;
@@ -466,14 +484,14 @@ SmartPointer<IWorkbenchPartReference> WorkbenchPage::ActivationList::GetActiveRe
       {
         if (views[j] == viewRef)
         {
-          return viewRef.Cast<IWorkbenchPartReference>();
+          return viewRef.Cast<IWorkbenchPartReference> ();
         }
       }
       //}
     }
     else
     {
-      return ref.Cast<IWorkbenchPartReference>();
+      return ref.Cast<IWorkbenchPartReference> ();
     }
     ++i;
   }
@@ -523,7 +541,10 @@ std::vector<SmartPointer<IWorkbenchPartReference> > WorkbenchPage::ActivationLis
 void WorkbenchPage::ActionSwitcher::UpdateActivePart(
     IWorkbenchPart::Pointer newPart)
 {
-  if (activePart == newPart)
+  IWorkbenchPart::Pointer _activePart = this->activePart.Lock();
+  IEditorPart::Pointer _topEditor = this->topEditor.Lock();
+
+  if (_activePart == newPart)
   {
     return;
   }
@@ -532,9 +553,9 @@ void WorkbenchPage::ActionSwitcher::UpdateActivePart(
   if (isNewPartAnEditor)
   {
     std::string oldId;
-    if (topEditor.IsNotNull())
+    if (_topEditor)
     {
-      oldId = topEditor->GetSite()->GetId();
+      oldId = _topEditor->GetSite()->GetId();
     }
     std::string newId = newPart->GetSite()->GetId();
 
@@ -552,19 +573,19 @@ void WorkbenchPage::ActionSwitcher::UpdateActivePart(
     // if it is a different kind of editor
     if (oldId != newId)
     {
-      this->DeactivateContributions(topEditor, true);
+      this->DeactivateContributions(_topEditor, true);
     }
 
     // if a view was the active part, disable its contributions
-    if (activePart.IsNotNull() && activePart != topEditor)
+    if (_activePart && _activePart != _topEditor)
     {
-      this->DeactivateContributions(activePart, true);
+      this->DeactivateContributions(_activePart, true);
     }
 
     // show (and enable) the contributions of the new editor
     // if it is a different kind of editor or if the
     // old active part was a view
-    if (newId != oldId || activePart != topEditor)
+    if (newId != oldId || _activePart != _topEditor)
     {
       this->ActivateContributions(newPart, true);
     }
@@ -572,10 +593,10 @@ void WorkbenchPage::ActionSwitcher::UpdateActivePart(
   }
   else if (newPart.IsNull())
   {
-    if (activePart.IsNotNull())
+    if (_activePart)
     {
       // remove all contributions
-      this->DeactivateContributions(activePart, true);
+      this->DeactivateContributions(_activePart, true);
     }
   }
   else
@@ -584,10 +605,10 @@ void WorkbenchPage::ActionSwitcher::UpdateActivePart(
 
     // if old active part is a view, remove all contributions,
     // but if old part is an editor only disable
-    if (activePart.IsNotNull())
+    if (_activePart)
     {
-      this->DeactivateContributions(activePart,
-          activePart.Cast<IViewPart> ().IsNotNull());
+      this->DeactivateContributions(_activePart,
+          _activePart.Cast<IViewPart> ().IsNotNull());
     }
 
     this->ActivateContributions(newPart, true);
@@ -617,7 +638,7 @@ void WorkbenchPage::ActionSwitcher::UpdateActivePart(
   {
     // since we removed all the contributions, we clear the top
     // editor
-    topEditor = 0;
+    topEditor.Reset();
   }
 
   activePart = newPart;
@@ -626,7 +647,7 @@ void WorkbenchPage::ActionSwitcher::UpdateActivePart(
 void WorkbenchPage::ActionSwitcher::UpdateTopEditor(
     IEditorPart::Pointer newEditor)
 {
-  if (topEditor == newEditor)
+  if (topEditor.Lock() == newEditor)
   {
     return;
   }
@@ -638,9 +659,9 @@ void WorkbenchPage::ActionSwitcher::UpdateTopEditor(
   }
 
   std::string oldId;
-  if (topEditor.IsNotNull())
+  if (!topEditor.Expired())
   {
-    oldId = topEditor->GetSite()->GetId();
+    oldId = topEditor.Lock()->GetSite()->GetId();
   }
   std::string newId;
   if (newEditor.IsNotNull())
@@ -655,9 +676,9 @@ void WorkbenchPage::ActionSwitcher::UpdateTopEditor(
   }
 
   // Remove the contributions of the old editor
-  if (topEditor.IsNotNull())
+  if (!topEditor.Expired())
   {
-    this->DeactivateContributions(topEditor, true);
+    this->DeactivateContributions(topEditor.Lock(), true);
   }
 
   // Show (disabled) the contributions of the new editor
@@ -693,11 +714,11 @@ const IExtensionPoint* WorkbenchPage::GetPerspectiveExtensionPoint()
 {
   return Platform::GetExtensionPointService()->GetExtensionPoint(
       PlatformUI::PLUGIN_ID + "."
-      + WorkbenchRegistryConstants::PL_PERSPECTIVE_EXTENSIONS);
+          + WorkbenchRegistryConstants::PL_PERSPECTIVE_EXTENSIONS);
 }
 
-WorkbenchPage::WorkbenchPage(WorkbenchWindow* w,
-    const std::string& layoutID, IAdaptable* input)
+WorkbenchPage::WorkbenchPage(WorkbenchWindow* w, const std::string& layoutID,
+    IAdaptable* input)
 {
   if (layoutID == "")
   {
@@ -779,7 +800,8 @@ void WorkbenchPage::AddSelectionListener(const std::string& partId,
   selectionService->AddSelectionListener(partId, listener);
 }
 
-void WorkbenchPage::AddPostSelectionListener(ISelectionListener::Pointer listener)
+void WorkbenchPage::AddPostSelectionListener(
+    ISelectionListener::Pointer listener)
 {
   selectionService->AddPostSelectionListener(listener);
 }
@@ -933,8 +955,10 @@ void WorkbenchPage::BringToTop(IWorkbenchPart::Pointer part)
 void WorkbenchPage::BusyResetPerspective()
 {
 
-  ViewIntroAdapterPart::Pointer introViewAdapter = dynamic_cast<WorkbenchIntroManager*>(GetWorkbenchWindow()
-        ->GetWorkbench()->GetIntroManager())->GetIntroAdapterPart().Cast<ViewIntroAdapterPart>();
+  ViewIntroAdapterPart::Pointer
+      introViewAdapter =
+          dynamic_cast<WorkbenchIntroManager*> (GetWorkbenchWindow() ->GetWorkbench()->GetIntroManager())->GetIntroAdapterPart().Cast<
+              ViewIntroAdapterPart> ();
   //  PartPane introPane = 0;
   //  boolean introFullScreen = false;
   //  if (introViewAdapter != 0)
@@ -968,15 +992,15 @@ void WorkbenchPage::BusyResetPerspective()
   // If the original template cannot be found then it has been deleted.
   // In that case just return. (PR#1GDSABU).
   IPerspectiveRegistry* reg =
-  WorkbenchPlugin::GetDefault() ->GetPerspectiveRegistry();
+      WorkbenchPlugin::GetDefault() ->GetPerspectiveRegistry();
   PerspectiveDescriptor::Pointer desc = reg->FindPerspectiveWithId(
       oldPersp->GetDesc()->GetId()).Cast<PerspectiveDescriptor> ();
   if (desc == 0)
   {
     desc
-    = reg->FindPerspectiveWithId(oldPersp ->GetDesc().Cast<
-        PerspectiveDescriptor> ()->GetOriginalId()).Cast<
-    PerspectiveDescriptor> ();
+        = reg->FindPerspectiveWithId(oldPersp ->GetDesc().Cast<
+            PerspectiveDescriptor> ()->GetOriginalId()).Cast<
+            PerspectiveDescriptor> ();
   }
   if (desc == 0)
   {
@@ -984,7 +1008,8 @@ void WorkbenchPage::BusyResetPerspective()
   }
 
   // Notify listeners that we are doing a reset.
-  window->FirePerspectiveChanged(IWorkbenchPage::Pointer(this), desc, CHANGE_RESET);
+  window->FirePerspectiveChanged(IWorkbenchPage::Pointer(this), desc,
+      CHANGE_RESET);
 
   // Create new persp from original template.
   // Suppress the perspectiveOpened and perspectiveClosed events otherwise it looks like two
@@ -993,7 +1018,8 @@ void WorkbenchPage::BusyResetPerspective()
   if (newPersp == 0)
   {
     // We're not going through with the reset, so it is complete.
-    window->FirePerspectiveChanged(IWorkbenchPage::Pointer(this), desc, CHANGE_RESET_COMPLETE);
+    window->FirePerspectiveChanged(IWorkbenchPage::Pointer(this), desc,
+        CHANGE_RESET_COMPLETE);
     return;
   }
 
@@ -1016,25 +1042,25 @@ void WorkbenchPage::BusyResetPerspective()
     {
       // ensure that the intro is visible in the new perspective
       ShowView(IntroConstants::INTRO_VIEW_ID);
-//      if (introFullScreen)
-//      {
-//        toggleZoom(introPane.getPartReference());
-//      }
-    }
-    catch (PartInitException& e)
+      //      if (introFullScreen)
+      //      {
+      //        toggleZoom(introPane.getPartReference());
+      //      }
+    } catch (PartInitException& e)
     {
       //TODO IStatus
       WorkbenchPlugin::Log("Could not restore intro", e);
-          // WorkbenchPlugin.getStatus(e));
+      // WorkbenchPlugin.getStatus(e));
     }
-//      finally
-//      {
-//        // we want the intro back to a normal state before we fire the event
-//        introViewAdapter.setHandleZoomEvents(true);
-//      }
+    //      finally
+    //      {
+    //        // we want the intro back to a normal state before we fire the event
+    //        introViewAdapter.setHandleZoomEvents(true);
+    //      }
   }
   // Notify listeners that we have completed our reset.
-  window->FirePerspectiveChanged(IWorkbenchPage::Pointer(this), desc, CHANGE_RESET_COMPLETE);
+  window->FirePerspectiveChanged(IWorkbenchPage::Pointer(this), desc,
+      CHANGE_RESET_COMPLETE);
   //  }
   //  finally
   //  {
@@ -1145,7 +1171,7 @@ void WorkbenchPage::BusyShowView(IViewPart::Pointer part, int mode)
       // otherwise check to see if the we're in the same stack as the active view
       IViewReference::Pointer activeView = ref.Cast<IViewReference> ();
       std::vector<IViewReference::Pointer> viewStack =
-      this->GetViewReferenceStack(part);
+          this->GetViewReferenceStack(part);
       for (unsigned int i = 0; i < viewStack.size(); i++)
       {
         if (viewStack[i] == activeView)
@@ -1169,7 +1195,7 @@ bool WorkbenchPage::CertifyPart(IWorkbenchPart::Pointer part)
   if (part.Cast<IEditorPart> () != 0)
   {
     IEditorReference::Pointer ref = this->GetReference(part).Cast<
-    IEditorReference> ();
+        IEditorReference> ();
     return ref != 0 && this->GetEditorManager()->ContainsEditor(ref);
   }
   if (part.Cast<IViewPart> () != 0)
@@ -1230,9 +1256,9 @@ void WorkbenchPage::UpdateActivePart()
   }
 
   IWorkbenchPartReference::Pointer oldActivePart =
-  partList->GetActivePartReference();
+      partList->GetActivePartReference();
   IWorkbenchPartReference::Pointer oldActiveEditor =
-  partList->GetActiveEditorReference();
+      partList->GetActiveEditorReference();
   IWorkbenchPartReference::Pointer newActivePart;
   IEditorReference::Pointer newActiveEditor;
 
@@ -1241,7 +1267,8 @@ void WorkbenchPage::UpdateActivePart()
     // If an editor is active, try to keep an editor active
     if (oldActivePart == oldActiveEditor)
     {
-      newActiveEditor = activationList->GetActiveReference(true).Cast<IEditorReference>();
+      newActiveEditor = activationList->GetActiveReference(true).Cast<
+          IEditorReference> ();
       newActivePart = newActiveEditor;
       if (newActivePart == 0)
       {
@@ -1262,7 +1289,8 @@ void WorkbenchPage::UpdateActivePart()
       else
       {
         // Otherwise, select whatever editor was most recently active
-        newActiveEditor = activationList->GetActiveReference(true).Cast<IEditorReference>();
+        newActiveEditor = activationList->GetActiveReference(true).Cast<
+            IEditorReference> ();
       }
     }
   }
@@ -1305,7 +1333,8 @@ void WorkbenchPage::MakeActiveEditor(IEditorReference::Pointer ref)
     return;
   }
 
-  IEditorPart::Pointer part = (ref == 0) ? IEditorPart::Pointer(0) : ref->GetEditor(true);
+  IEditorPart::Pointer part = (ref == 0) ? IEditorPart::Pointer(0)
+      : ref->GetEditor(true);
 
   if (part)
   {
@@ -1336,8 +1365,8 @@ bool WorkbenchPage::CloseEditors(
   // Check if we're being asked to close any parts that are already closed or cannot
   // be closed at this time
   std::vector<IEditorReference::Pointer> editorRefs;
-  for (std::list<IEditorReference::Pointer>::const_iterator iter = refArray.begin();
-      iter != refArray.end(); ++iter)
+  for (std::list<IEditorReference::Pointer>::const_iterator iter =
+      refArray.begin(); iter != refArray.end(); ++iter)
   {
     IEditorReference::Pointer reference = *iter;
 
@@ -1350,8 +1379,8 @@ bool WorkbenchPage::CloseEditors(
     {
       Poco::RuntimeException re(
           "WARNING: Blocked recursive attempt to close part " //$NON-NLS-1$
-          + partBeingActivated->GetId()
-          + " while still in the middle of activating it");
+              + partBeingActivated->GetId()
+              + " while still in the middle of activating it");
       WorkbenchPlugin::Log(re);
       return false;
     }
@@ -1383,7 +1412,7 @@ bool WorkbenchPage::CloseEditors(
   }
   SaveablesList::Pointer modelManager;
   SaveablesList::PostCloseInfo::Pointer postCloseInfo;
-  if (partsToClose.size()> 0)
+  if (partsToClose.size() > 0)
   {
     modelManager = this->GetWorkbenchWindow()->GetService(
         ISaveablesLifecycleListener::GetManifestName()).Cast<SaveablesList> ();
@@ -1425,8 +1454,7 @@ bool WorkbenchPage::CloseEditors(
 
       this->PartRemoved(ref.Cast<WorkbenchPartReference> ());
     }
-  }
-  catch (...)
+  } catch (...)
   {
   }
   this->DeferUpdates(false);
@@ -1479,7 +1507,7 @@ void WorkbenchPage::HandleDeferredEvents()
 
 bool WorkbenchPage::IsDeferred()
 {
-  return deferCount> 0;
+  return deferCount > 0;
 }
 
 bool WorkbenchPage::CloseEditor(IEditorReference::Pointer editorRef, bool save)
@@ -1525,7 +1553,7 @@ void WorkbenchPage::ClosePerspective(Perspective::Pointer persp,
   std::list<IWorkbenchPart::Pointer> viewsToClose;
   // collect views that will go away and views that are dirty
   std::vector<IViewReference::Pointer> viewReferences =
-  persp->GetViewReferences();
+      persp->GetViewReferences();
   for (unsigned int i = 0; i < viewReferences.size(); i++)
   {
     IViewReference::Pointer reference = viewReferences[i];
@@ -1546,7 +1574,7 @@ void WorkbenchPage::ClosePerspective(Perspective::Pointer persp,
   {
     // collect editors that are dirty
     std::list<IEditorReference::Pointer> editorReferences =
-    this->GetEditorReferences();
+        this->GetEditorReferences();
     for (std::list<IEditorReference::Pointer>::iterator refIter =
         editorReferences.begin(); refIter != editorReferences.end(); ++refIter)
     {
@@ -1563,14 +1591,15 @@ void WorkbenchPage::ClosePerspective(Perspective::Pointer persp,
   }
   if (saveParts && !partsToSave.empty())
   {
-    if (!EditorManager::SaveAll(partsToSave, true, true, false, IWorkbenchWindow::Pointer(window)))
+    if (!EditorManager::SaveAll(partsToSave, true, true, false,
+        IWorkbenchWindow::Pointer(window)))
     {
       // user canceled
       return;
     }
   }
   // Close all editors on last perspective close
-  if (perspList.Size() == 1 && this->GetEditorManager()->GetEditorCount()> 0)
+  if (perspList.Size() == 1 && this->GetEditorManager()->GetEditorCount() > 0)
   {
     // Close all editors
     if (!this->CloseAllEditors(false))
@@ -1580,13 +1609,15 @@ void WorkbenchPage::ClosePerspective(Perspective::Pointer persp,
   }
 
   // closeAllEditors already notified the saveables list about the editors.
-  SaveablesList::Pointer saveablesList =
-  this->GetWorkbenchWindow()->GetWorkbench()->GetService(
-      ISaveablesLifecycleListener::GetManifestName()).Cast<SaveablesList> ();
+  SaveablesList::Pointer
+      saveablesList =
+          this->GetWorkbenchWindow()->GetWorkbench()->GetService(
+              ISaveablesLifecycleListener::GetManifestName()).Cast<
+              SaveablesList> ();
   // we took care of the saving already, so pass in false (postCloseInfo will be non-0)
   SaveablesList::PostCloseInfo::Pointer postCloseInfo =
-  saveablesList->PreCloseParts(viewsToClose, false,
-      this->GetWorkbenchWindow());
+      saveablesList->PreCloseParts(viewsToClose, false,
+          this->GetWorkbenchWindow());
   saveablesList->PostClose(postCloseInfo);
 
   // Dispose of the perspective
@@ -1653,7 +1684,9 @@ void WorkbenchPage::CreateClientComposite()
   //
   //      public void WorkbenchPage::runWithException()
   //        {
-  composite = Tweaklets::Get(WorkbenchPageTweaklet::KEY)->CreateClientComposite(parent);
+  composite
+      = Tweaklets::Get(WorkbenchPageTweaklet::KEY)->CreateClientComposite(
+          parent);
   Tweaklets::Get(GuiWidgetsTweaklet::KEY)->SetVisible(composite, false); // Make visible on activate.
   // force the client composite to be layed out
   //          parent.layout();
@@ -1683,8 +1716,7 @@ Perspective::Pointer WorkbenchPage::CreatePerspective(
       dirtyPerspectives.erase(desc->GetId());
     }
     return persp;
-  }
-  catch (WorkbenchException& /*e*/)
+  } catch (WorkbenchException& /*e*/)
   {
     if (!window->GetWorkbenchImpl()->IsStarting())
     {
@@ -1758,102 +1790,118 @@ WorkbenchPage::~WorkbenchPage()
   this->Register();
 
   {
-
-  this->MakeActiveEditor(IEditorReference::Pointer(0));
-  this->MakeActive(IWorkbenchPartReference::Pointer(0));
-
-  // Close and dispose the editors.
-  this->CloseAllEditors(false);
-
-  // Need to make sure model data is cleaned up when the page is
-  // disposed. Collect all the views on the page and notify the
-  // saveable list of a pre/post close. This will free model data.
-  std::vector<IWorkbenchPartReference::Pointer> partsToClose =
-  this->GetOpenParts();
-  std::list<IWorkbenchPart::Pointer> dirtyParts;
-  for (unsigned int i = 0; i < partsToClose.size(); i++)
-  {
-    IWorkbenchPart::Pointer part = partsToClose[i]->GetPart(false);
-    if (part != 0 && part.Cast<IViewPart> () != 0)
     {
-      dirtyParts.push_back(part);
+
+      this->MakeActiveEditor(IEditorReference::Pointer(0));
+      this->MakeActive(IWorkbenchPartReference::Pointer(0));
+
+      // Close and dispose the editors.
+      this->CloseAllEditors(false);
+
+      // Need to make sure model data is cleaned up when the page is
+      // disposed. Collect all the views on the page and notify the
+      // saveable list of a pre/post close. This will free model data.
+      std::vector<IWorkbenchPartReference::Pointer> partsToClose =
+          this->GetOpenParts();
+      std::list<IWorkbenchPart::Pointer> dirtyParts;
+      for (unsigned int i = 0; i < partsToClose.size(); i++)
+      {
+        IWorkbenchPart::Pointer part = partsToClose[i]->GetPart(false);
+        if (part != 0 && part.Cast<IViewPart> () != 0)
+        {
+          dirtyParts.push_back(part);
+        }
+      }
+      SaveablesList::Pointer saveablesList =
+          this->GetWorkbenchWindow()->GetWorkbench()->GetService(
+              ISaveablesLifecycleListener::GetManifestName()).Cast<
+              SaveablesList> ();
+      SaveablesList::PostCloseInfo::Pointer postCloseInfo =
+          saveablesList->PreCloseParts(dirtyParts, false,
+              this->GetWorkbenchWindow());
+      saveablesList->PostClose(postCloseInfo);
+
+      IWorkbenchPage::Pointer thisPage(this);
+      // Get rid of perspectives. This will close the views
+      for (PerspectiveList::iterator itr = perspList.Begin(); itr
+          != perspList.End(); ++itr)
+      {
+        Perspective::Pointer perspective = *itr;
+        window->FirePerspectiveClosed(thisPage, perspective->GetDesc());
+        //perspective->Dispose();
+      }
+      perspList = PerspectiveList();
+
+      // Capture views.
+      std::vector<IViewReference::Pointer> refs = viewFactory->GetViews();
+
+      //  if (refs.size() > 0)
+      //  {
+      //    // Dispose views.
+      //    for (unsigned int i = 0; i < refs.size(); i++)
+      //    {
+      //      WorkbenchPartReference::Pointer ref = refs[i].Cast<WorkbenchPartReference>();
+      //      //partList.RemovePart(ref);
+      //      //this->FirePartClosed(refs[i]);
+      //      //              Platform.run(new SafeRunnable() {
+      //      //                  public void run() {
+      //      // //                       WorkbenchPlugin.log(new Status(IStatus.WARNING, WorkbenchPlugin.PI_WORKBENCH,
+      //      // //                               Status.OK, "WorkbenchPage leaked a refcount for view " + ref.getId(), 0));  //$NON-NLS-1$//$NON-NLS-2$
+      //
+      //      ref.dispose();
+      //      //                  }
+      //
+      //      //                  public void handleException(Throwable e) {
+      //      //                   }
+      //      //              });
+      //    }
+      //  }
+
+
+      // Get rid of editor presentation.
+      //editorPresentation->Dispose();
+
+      // Get rid of composite.
+      //composite.dispose();
+
+      //navigationHistory.dispose();
+
+      //stickyViewMan.clear();
+
+      //  if (tracker != 0)
+      //  {
+      //    tracker.close();
+      //  }
+
+      //  // if we're destroying a window in a non-shutdown situation then we should
+      //  // clean up the working set we made.
+      //  if (!window->GetWorkbench()->IsClosing())
+      //  {
+      //    if (aggregateWorkingSet != 0)
+      //    {
+      //      PlatformUI.getWorkbench().getWorkingSetManager().removeWorkingSet(
+      //          aggregateWorkingSet);
+      //    }
+      //  }
     }
+
+    partBeingActivated = 0;
+    pendingDisposals.clear();
+
+    stickyViewMan = 0;
+    delete viewFactory;
+    delete editorPresentation;
+    delete editorMgr;
+    delete activationList;
+
+    deferredActivePersp = 0;
+
+    dirtyPerspectives.clear();
+
+    delete selectionService;
+    partList = 0;
+
   }
-  SaveablesList::Pointer saveablesList =
-  this->GetWorkbenchWindow()->GetWorkbench()->GetService(
-      ISaveablesLifecycleListener::GetManifestName()).Cast<SaveablesList> ();
-  SaveablesList::PostCloseInfo::Pointer postCloseInfo =
-  saveablesList->PreCloseParts(dirtyParts, false,
-      this->GetWorkbenchWindow());
-  saveablesList->PostClose(postCloseInfo);
-
-  IWorkbenchPage::Pointer thisPage(this);
-  // Get rid of perspectives. This will close the views
-  for (PerspectiveList::iterator itr = perspList.Begin(); itr
-      != perspList.End(); ++itr)
-  {
-    Perspective::Pointer perspective = *itr;
-    window->FirePerspectiveClosed(thisPage, perspective->GetDesc());
-    //perspective->Dispose();
-  }
-  perspList = PerspectiveList();
-
-  // Capture views.
-  std::vector<IViewReference::Pointer> refs = viewFactory->GetViews();
-
-  //  if (refs.size() > 0)
-  //  {
-  //    // Dispose views.
-  //    for (unsigned int i = 0; i < refs.size(); i++)
-  //    {
-  //      WorkbenchPartReference::Pointer ref = refs[i].Cast<WorkbenchPartReference>();
-  //      //partList.RemovePart(ref);
-  //      //this->FirePartClosed(refs[i]);
-  //      //              Platform.run(new SafeRunnable() {
-  //      //                  public void run() {
-  //      // //                       WorkbenchPlugin.log(new Status(IStatus.WARNING, WorkbenchPlugin.PI_WORKBENCH,
-  //      // //                               Status.OK, "WorkbenchPage leaked a refcount for view " + ref.getId(), 0));  //$NON-NLS-1$//$NON-NLS-2$
-  //
-  //      ref.dispose();
-  //      //                  }
-  //
-  //      //                  public void handleException(Throwable e) {
-  //      //                   }
-  //      //              });
-  //    }
-  //  }
-
-
-  // Get rid of editor presentation.
-  //editorPresentation->Dispose();
-
-  // Get rid of composite.
-  //composite.dispose();
-
-  //navigationHistory.dispose();
-
-  //stickyViewMan.clear();
-
-  //  if (tracker != 0)
-  //  {
-  //    tracker.close();
-  //  }
-
-  //  // if we're destroying a window in a non-shutdown situation then we should
-  //  // clean up the working set we made.
-  //  if (!window->GetWorkbench()->IsClosing())
-  //  {
-  //    if (aggregateWorkingSet != 0)
-  //    {
-  //      PlatformUI.getWorkbench().getWorkingSetManager().removeWorkingSet(
-  //          aggregateWorkingSet);
-  //    }
-  //  }
-
-  delete viewFactory;
-  delete activationList;
-
-}
 
   // decrement reference count again, without explicit deletion
   this->UnRegister(false);
@@ -2096,8 +2144,8 @@ ViewFactory* WorkbenchPage::GetViewFactory()
 {
   if (viewFactory == 0)
   {
-    viewFactory
-    = new ViewFactory(this, WorkbenchPlugin::GetDefault()->GetViewRegistry());
+    viewFactory = new ViewFactory(this,
+        WorkbenchPlugin::GetDefault()->GetViewRegistry());
   }
   return viewFactory;
 }
@@ -2181,7 +2229,7 @@ void WorkbenchPage::HideView(IViewReference::Pointer ref)
       if (saveable->IsSaveOnCloseNeeded())
       {
         IWorkbenchWindow::Pointer window =
-        view->GetSite()->GetWorkbenchWindow();
+            view->GetSite()->GetWorkbenchWindow();
         std::vector<IWorkbenchPart::Pointer> partsToSave;
         partsToSave.push_back(view);
         bool success = EditorManager::SaveAll(partsToSave, true, true, false,
@@ -2204,8 +2252,10 @@ void WorkbenchPage::HideView(IViewReference::Pointer ref)
     IWorkbenchPart::Pointer actualPart = ref->GetPart(false);
     if (actualPart != 0)
     {
-      saveablesList = actualPart->GetSite()->GetService(
-          ISaveablesLifecycleListener::GetManifestName()).Cast<SaveablesList> ();
+      saveablesList
+          = actualPart->GetSite()->GetService(
+              ISaveablesLifecycleListener::GetManifestName()).Cast<
+              SaveablesList> ();
       std::list<IWorkbenchPart::Pointer> partsToClose;
       partsToClose.push_back(actualPart);
       postCloseInfo = saveablesList->PreCloseParts(partsToClose,
@@ -2220,7 +2270,8 @@ void WorkbenchPage::HideView(IViewReference::Pointer ref)
 
   IWorkbenchPage::Pointer thisPage(this);
   // Notify interested listeners before the hide
-  window->FirePerspectiveChanged(thisPage, persp->GetDesc(), ref, CHANGE_VIEW_HIDE);
+  window->FirePerspectiveChanged(thisPage, persp->GetDesc(), ref,
+      CHANGE_VIEW_HIDE);
 
   PartPane::Pointer pane = this->GetPane(ref.Cast<IWorkbenchPartReference> ());
   pane->SetInLayout(false);
@@ -2236,7 +2287,8 @@ void WorkbenchPage::HideView(IViewReference::Pointer ref)
   persp->HideView(ref);
 
   // Notify interested listeners after the hide
-  window->FirePerspectiveChanged(thisPage, this->GetPerspective(), CHANGE_VIEW_HIDE);
+  window->FirePerspectiveChanged(thisPage, this->GetPerspective(),
+      CHANGE_VIEW_HIDE);
 }
 
 void WorkbenchPage::RefreshActiveView()
@@ -2249,8 +2301,8 @@ void WorkbenchPage::HideView(IViewPart::Pointer view)
   this->HideView(this->GetReference(view).Cast<IViewReference> ());
 }
 
-void WorkbenchPage::Init(WorkbenchWindow* w,
-    const std::string& layoutID, IAdaptable* input, bool openExtras)
+void WorkbenchPage::Init(WorkbenchWindow* w, const std::string& layoutID,
+    IAdaptable* input, bool openExtras)
 {
   // Save args.
   this->window = w;
@@ -2270,7 +2322,8 @@ void WorkbenchPage::Init(WorkbenchWindow* w,
   // Create presentation.
   this->CreateClientComposite();
   editorPresentation = new EditorAreaHelper(this);
-  editorMgr = new EditorManager(WorkbenchWindow::Pointer(window), WorkbenchPage::Pointer(this), editorPresentation);
+  editorMgr = new EditorManager(WorkbenchWindow::Pointer(window),
+      WorkbenchPage::Pointer(this), editorPresentation);
 
   //TODO WorkbenchPage perspective reorder listener?
   //    // add this page as a client to be notified when the UI has re-ordered perspectives
@@ -2294,9 +2347,9 @@ void WorkbenchPage::Init(WorkbenchWindow* w,
   if (layoutID != "")
   {
     PerspectiveDescriptor::Pointer
-    desc =
-    WorkbenchPlugin::GetDefault()->GetPerspectiveRegistry()->FindPerspectiveWithId(
-        layoutID).Cast<PerspectiveDescriptor> ();
+        desc =
+            WorkbenchPlugin::GetDefault()->GetPerspectiveRegistry()->FindPerspectiveWithId(
+                layoutID).Cast<PerspectiveDescriptor> ();
     if (desc == 0)
     {
       throw WorkbenchException("Unable to create Perspective " + layoutID
@@ -2328,9 +2381,9 @@ void WorkbenchPage::OpenPerspectiveExtras()
   {
     std::string id = *itr;
     IPerspectiveDescriptor::Pointer
-    desc =
-    WorkbenchPlugin::GetDefault()->GetPerspectiveRegistry()->FindPerspectiveWithId(
-        id);
+        desc =
+            WorkbenchPlugin::GetDefault()->GetPerspectiveRegistry()->FindPerspectiveWithId(
+                id);
     if (desc != 0)
     {
       descs.push_back(desc);
@@ -2338,10 +2391,10 @@ void WorkbenchPage::OpenPerspectiveExtras()
   }
   // HACK: The perspective switcher currently adds the button for a new perspective to the beginning of the list.
   // So, we process the extra perspectives in reverse order here to have their buttons appear in the order declared.
-  for (int i = (int)descs.size(); --i >= 0;)
+  for (int i = (int) descs.size(); --i >= 0;)
   {
     PerspectiveDescriptor::Pointer desc =
-    descs[i].Cast<PerspectiveDescriptor> ();
+        descs[i].Cast<PerspectiveDescriptor> ();
     if (this->FindPerspective(desc) == 0)
     {
       this->CreatePerspective(desc, true);
@@ -2478,7 +2531,8 @@ IEditorPart::Pointer WorkbenchPage::OpenEditor(
     const IEditorInput::Pointer input, const std::string& editorID,
     bool activate, int matchFlags)
 {
-  return this->OpenEditor(input, editorID, activate, matchFlags, IMemento::Pointer(0));
+  return this->OpenEditor(input, editorID, activate, matchFlags,
+      IMemento::Pointer(0));
 }
 
 IEditorPart::Pointer WorkbenchPage::OpenEditor(
@@ -2500,9 +2554,8 @@ IEditorPart::Pointer WorkbenchPage::OpenEditor(
 }
 
 IEditorPart::Pointer WorkbenchPage::OpenEditorFromDescriptor(
-    IEditorInput::Pointer input,
-    IEditorDescriptor::Pointer editorDescriptor, bool activate,
-    IMemento::Pointer editorState)
+    IEditorInput::Pointer input, IEditorDescriptor::Pointer editorDescriptor,
+    bool activate, IMemento::Pointer editorState)
 {
   if (input == 0 || !(editorDescriptor.Cast<EditorDescriptor> () != 0))
   {
@@ -2528,7 +2581,7 @@ IEditorPart::Pointer WorkbenchPage::BusyOpenEditor(IEditorInput::Pointer input,
 {
 
   Workbench* workbench =
-  this->GetWorkbenchWindow().Cast<WorkbenchWindow> ()->GetWorkbenchImpl();
+      this->GetWorkbenchWindow().Cast<WorkbenchWindow> ()->GetWorkbenchImpl();
   workbench->LargeUpdateStart();
 
   IEditorPart::Pointer result;
@@ -2537,8 +2590,7 @@ IEditorPart::Pointer WorkbenchPage::BusyOpenEditor(IEditorInput::Pointer input,
     result = this->BusyOpenEditorBatched(input, editorID, activate, matchFlags,
         editorState);
 
-  }
-  catch (std::exception& e)
+  } catch (std::exception& e)
   {
     workbench->LargeUpdateEnd();
     throw e;
@@ -2554,7 +2606,7 @@ IEditorPart::Pointer WorkbenchPage::BusyOpenEditorFromDescriptor(
 {
 
   Workbench* workbench =
-  this->GetWorkbenchWindow().Cast<WorkbenchWindow> ()->GetWorkbenchImpl();
+      this->GetWorkbenchWindow().Cast<WorkbenchWindow> ()->GetWorkbenchImpl();
   workbench->LargeUpdateStart();
 
   IEditorPart::Pointer result;
@@ -2563,8 +2615,7 @@ IEditorPart::Pointer WorkbenchPage::BusyOpenEditorFromDescriptor(
     result = this->BusyOpenEditorFromDescriptorBatched(input, editorDescriptor,
         activate, editorState);
 
-  }
-  catch (std::exception& e)
+  } catch (std::exception& e)
   {
     workbench->LargeUpdateEnd();
     throw e;
@@ -2594,15 +2645,14 @@ IEditorPart::Pointer WorkbenchPage::BusyOpenEditorBatched(
         dlgLabels.push_back("No");
         dlgLabels.push_back("Cancel");
         IDialog::Pointer
-        dialog =
-        MessageDialog::CreateMessageDialog(
-            this->GetWorkbenchWindow()->GetShell(),
-            "Save",
-            (void*) 0, // accept the default window icon
-            "\"" + input->GetName()
-            + "\" is opened and has unsaved changes. Do you want to save it?",
-            IDialog::QUESTION,
-            dlgLabels, 0);
+            dialog =
+                MessageDialog::CreateMessageDialog(
+                    this->GetWorkbenchWindow()->GetShell(),
+                    "Save",
+                    (void*) 0, // accept the default window icon
+                    "\"" + input->GetName()
+                        + "\" is opened and has unsaved changes. Do you want to save it?",
+                    IDialog::QUESTION, dlgLabels, 0);
         int saveFile = dialog->Open();
         if (saveFile == 0)
         {
@@ -2730,9 +2780,9 @@ void WorkbenchPage::OpenEmptyTab()
   if (ref != 0)
   {
     editor
-    = ref->GetEmptyEditor(
-        dynamic_cast<EditorRegistry*> (WorkbenchPlugin::GetDefault()->GetEditorRegistry())->FindEditor(
-            EditorRegistry::EMPTY_EDITOR_ID).Cast<EditorDescriptor> ());
+        = ref->GetEmptyEditor(
+            dynamic_cast<EditorRegistry*> (WorkbenchPlugin::GetDefault()->GetEditorRegistry())->FindEditor(
+                EditorRegistry::EMPTY_EDITOR_ID).Cast<EditorDescriptor> ());
   }
 
   if (editor != 0)
@@ -2764,7 +2814,7 @@ void WorkbenchPage::ShowEditor(bool activate, IEditorPart::Pointer editor)
 bool WorkbenchPage::IsEditorPinned(IEditorPart::Pointer editor)
 {
   WorkbenchPartReference::Pointer ref = this->GetReference(editor).Cast<
-  WorkbenchPartReference> ();
+      WorkbenchPartReference> ();
   return ref != 0 && ref->IsPinned();
 }
 
@@ -2867,70 +2917,72 @@ bool WorkbenchPage::RestoreState(IMemento::Pointer memento,
   try
   {
     // Restore working set
-    std::string pageName; memento->GetString(WorkbenchConstants::TAG_LABEL, pageName);
+    std::string pageName;
+    memento->GetString(WorkbenchConstants::TAG_LABEL, pageName);
 
-//    String label = 0; // debugging only
-//    if (UIStats.isDebugging(UIStats.RESTORE_WORKBENCH))
-//    {
-//      label = pageName == 0 ? "" : "::" + pageName; //$NON-NLS-1$ //$NON-NLS-2$
-//    }
+    //    String label = 0; // debugging only
+    //    if (UIStats.isDebugging(UIStats.RESTORE_WORKBENCH))
+    //    {
+    //      label = pageName == 0 ? "" : "::" + pageName; //$NON-NLS-1$ //$NON-NLS-2$
+    //    }
 
     try
     {
       //UIStats.start(UIStats.RESTORE_WORKBENCH, "WorkbenchPage" + label); //$NON-NLS-1$
-//      MultiStatus result =
-//          new MultiStatus(PlatformUI.PLUGIN_ID, IStatus.OK, NLS.bind(
-//              WorkbenchMessages.WorkbenchPage_unableToRestorePerspective,
-//              pageName), 0);
+      //      MultiStatus result =
+      //          new MultiStatus(PlatformUI.PLUGIN_ID, IStatus.OK, NLS.bind(
+      //              WorkbenchMessages.WorkbenchPage_unableToRestorePerspective,
+      //              pageName), 0);
       bool result = true;
 
-//      String workingSetName = memento .getString(
-//          IWorkbenchConstants.TAG_WORKING_SET);
-//      if (workingSetName != 0)
-//      {
-//        AbstractWorkingSetManager
-//            workingSetManager =
-//                (AbstractWorkingSetManager) getWorkbenchWindow() .getWorkbench().getWorkingSetManager();
-//        setWorkingSet(workingSetManager.getWorkingSet(workingSetName));
-//      }
-//
-//      IMemento workingSetMem = memento .getChild(
-//          IWorkbenchConstants.TAG_WORKING_SETS);
-//      if (workingSetMem != 0)
-//      {
-//        std::vector<IMemento::Pointer> workingSetChildren =
-//            workingSetMem .getChildren(IWorkbenchConstants.TAG_WORKING_SET);
-//        List workingSetList = new ArrayList(workingSetChildren.length);
-//        for (int i = 0; i < workingSetChildren.length; i++)
-//        {
-//          IWorkingSet
-//              set =
-//                  getWorkbenchWindow().getWorkbench() .getWorkingSetManager().getWorkingSet(
-//                      workingSetChildren[i].getID());
-//          if (set != 0)
-//          {
-//            workingSetList.add(set);
-//          }
-//        }
-//
-//        workingSets = (IWorkingSet[]) workingSetList .toArray(
-//            new IWorkingSet[workingSetList.size()]);
-//      }
-//
-//      aggregateWorkingSetId = memento.getString(ATT_AGGREGATE_WORKING_SET_ID);
-//
-//      IWorkingSet setWithId =
-//          window.getWorkbench().getWorkingSetManager().getWorkingSet(
-//              aggregateWorkingSetId);
-//
-//      // check to see if the set has already been made and assign it if it has
-//      if (setWithId.Cast<AggregateWorkingSet> () != 0)
-//      {
-//        aggregateWorkingSet = (AggregateWorkingSet) setWithId;
-//      }
+      //      String workingSetName = memento .getString(
+      //          IWorkbenchConstants.TAG_WORKING_SET);
+      //      if (workingSetName != 0)
+      //      {
+      //        AbstractWorkingSetManager
+      //            workingSetManager =
+      //                (AbstractWorkingSetManager) getWorkbenchWindow() .getWorkbench().getWorkingSetManager();
+      //        setWorkingSet(workingSetManager.getWorkingSet(workingSetName));
+      //      }
+      //
+      //      IMemento workingSetMem = memento .getChild(
+      //          IWorkbenchConstants.TAG_WORKING_SETS);
+      //      if (workingSetMem != 0)
+      //      {
+      //        std::vector<IMemento::Pointer> workingSetChildren =
+      //            workingSetMem .getChildren(IWorkbenchConstants.TAG_WORKING_SET);
+      //        List workingSetList = new ArrayList(workingSetChildren.length);
+      //        for (int i = 0; i < workingSetChildren.length; i++)
+      //        {
+      //          IWorkingSet
+      //              set =
+      //                  getWorkbenchWindow().getWorkbench() .getWorkingSetManager().getWorkingSet(
+      //                      workingSetChildren[i].getID());
+      //          if (set != 0)
+      //          {
+      //            workingSetList.add(set);
+      //          }
+      //        }
+      //
+      //        workingSets = (IWorkingSet[]) workingSetList .toArray(
+      //            new IWorkingSet[workingSetList.size()]);
+      //      }
+      //
+      //      aggregateWorkingSetId = memento.getString(ATT_AGGREGATE_WORKING_SET_ID);
+      //
+      //      IWorkingSet setWithId =
+      //          window.getWorkbench().getWorkingSetManager().getWorkingSet(
+      //              aggregateWorkingSetId);
+      //
+      //      // check to see if the set has already been made and assign it if it has
+      //      if (setWithId.Cast<AggregateWorkingSet> () != 0)
+      //      {
+      //        aggregateWorkingSet = (AggregateWorkingSet) setWithId;
+      //      }
 
       // Restore editor manager.
-      IMemento::Pointer childMem = memento->GetChild(WorkbenchConstants::TAG_EDITORS);
+      IMemento::Pointer childMem = memento->GetChild(
+          WorkbenchConstants::TAG_EDITORS);
       //result.merge(getEditorManager().restoreState(childMem));
       result &= this->GetEditorManager()->RestoreState(childMem);
 
@@ -2955,7 +3007,8 @@ bool WorkbenchPage::RestoreState(IMemento::Pointer memento,
         }
       }
       std::string activePerspectiveID;
-      childMem->GetString(WorkbenchConstants::TAG_ACTIVE_PERSPECTIVE, activePerspectiveID);
+      childMem->GetString(WorkbenchConstants::TAG_ACTIVE_PERSPECTIVE,
+          activePerspectiveID);
 
       // Restore perspectives.
       std::vector<IMemento::Pointer> perspMems(childMem->GetChildren(
@@ -2972,7 +3025,8 @@ bool WorkbenchPage::RestoreState(IMemento::Pointer memento,
         //
         //              public void WorkbenchPage::runWithException() throws Throwable
         //                {
-        Perspective::Pointer persp(new Perspective(PerspectiveDescriptor::Pointer(0), WorkbenchPage::Pointer(this)));
+        Perspective::Pointer persp(new Perspective(
+            PerspectiveDescriptor::Pointer(0), WorkbenchPage::Pointer(this)));
         //result.merge(persp.restoreState(current));
         result &= persp->RestoreState(current);
         IPerspectiveDescriptor::Pointer desc = persp->GetDesc();
@@ -2980,7 +3034,8 @@ bool WorkbenchPage::RestoreState(IMemento::Pointer memento,
         {
           activePerspective = persp;
         }
-        else if ((activePerspective == 0) && desc->GetId() == activePerspectiveID)
+        else if ((activePerspective == 0) && desc->GetId()
+            == activePerspectiveID)
         {
           activePerspective = persp;
         }
@@ -2995,22 +3050,22 @@ bool WorkbenchPage::RestoreState(IMemento::Pointer memento,
         restoreActivePerspective = true;
 
       }
-      else if (activePerspective && activePerspective->GetDesc() ==
-          activeDescriptor)
+      else if (activePerspective && activePerspective->GetDesc()
+          == activeDescriptor)
       {
         restoreActivePerspective = true;
       }
       else
       {
         restoreActivePerspective = false;
-        activePerspective = this->CreatePerspective(
-            activeDescriptor.Cast<PerspectiveDescriptor>(), true);
+        activePerspective = this->CreatePerspective(activeDescriptor.Cast<
+            PerspectiveDescriptor> (), true);
         if (activePerspective == 0)
         {
-//          result .merge(
-//              new Status(IStatus.ERR, PlatformUI.PLUGIN_ID, 0, NLS.bind(
-//                  WorkbenchMessages.Workbench_showPerspectiveError,
-//                  activeDescriptor.getId()), 0));
+          //          result .merge(
+          //              new Status(IStatus.ERR, PlatformUI.PLUGIN_ID, 0, NLS.bind(
+          //                  WorkbenchMessages.Workbench_showPerspectiveError,
+          //                  activeDescriptor.getId()), 0));
           result &= false;
         }
       }
@@ -3041,13 +3096,14 @@ bool WorkbenchPage::RestoreState(IMemento::Pointer memento,
         //
         //              public void WorkbenchPage::runWithException() throws Throwable
         //                {
-        window->FirePerspectiveActivated(WorkbenchPage::Pointer(this), myPerspective->GetDesc());
+        window->FirePerspectiveActivated(WorkbenchPage::Pointer(this),
+            myPerspective->GetDesc());
 
         // Restore active part.
         if (!myActivePartId.empty())
         {
-          IWorkbenchPartReference::Pointer ref = myPerspective->FindView(myActivePartId,
-              mySecondaryId);
+          IWorkbenchPartReference::Pointer ref = myPerspective->FindView(
+              myActivePartId, mySecondaryId);
 
           if (ref)
           {
@@ -3058,40 +3114,41 @@ bool WorkbenchPage::RestoreState(IMemento::Pointer memento,
 
       }
 
-//      childMem = memento->GetChild(WorkbenchConstants::TAG_NAVIGATION_HISTORY);
-//      if (childMem)
-//      {
-//        navigationHistory.restoreState(childMem);
-//      }
-//      else if (GetActiveEditor())
-//      {
-//        navigationHistory.markEditor(getActiveEditor());
-//      }
-//
+      //      childMem = memento->GetChild(WorkbenchConstants::TAG_NAVIGATION_HISTORY);
+      //      if (childMem)
+      //      {
+      //        navigationHistory.restoreState(childMem);
+      //      }
+      //      else if (GetActiveEditor())
+      //      {
+      //        navigationHistory.markEditor(getActiveEditor());
+      //      }
+      //
       // restore sticky view state
       stickyViewMan->Restore(memento);
 
-//      std::string blame = activeDescriptor == 0 ? pageName
-//          : activeDescriptor.getId();
-//      UIStats.end(UIStats.RESTORE_WORKBENCH, blame, "WorkbenchPage" + label); //$NON-NLS-1$
+      //      std::string blame = activeDescriptor == 0 ? pageName
+      //          : activeDescriptor.getId();
+      //      UIStats.end(UIStats.RESTORE_WORKBENCH, blame, "WorkbenchPage" + label); //$NON-NLS-1$
 
       //      StartupThreading.runWithoutExceptions(new StartupRunnable()
-    //                {
-    //                public void WorkbenchPage::runWithException() throws Throwable
-    //                  {
-    DeferUpdates(false);
-    //            }
-    //          });
+      //                {
+      //                public void WorkbenchPage::runWithException() throws Throwable
+      //                  {
+      DeferUpdates(false);
+      //            }
+      //          });
 
       return result;
     } catch (...)
     {
-//      std::string blame = activeDescriptor == 0 ? pageName
-//          : activeDescriptor.getId();
-//      UIStats.end(UIStats.RESTORE_WORKBENCH, blame, "WorkbenchPage" + label); //$NON-NLS-1$
-      throw;
+      //      std::string blame = activeDescriptor == 0 ? pageName
+      //          : activeDescriptor.getId();
+      //      UIStats.end(UIStats.RESTORE_WORKBENCH, blame, "WorkbenchPage" + label); //$NON-NLS-1$
+      throw ;
     }
-  } catch (...)
+  }
+  catch (...)
   {
     //      StartupThreading.runWithoutExceptions(new StartupRunnable()
     //                {
@@ -3176,17 +3233,17 @@ void WorkbenchPage::SavePerspectiveAs(IPerspectiveDescriptor::Pointer newDesc)
  */
 bool WorkbenchPage::SaveState(IMemento::Pointer memento)
 {
-//  // We must unzoom to get correct layout.
-//  if (isZoomed())
-//  {
-//    zoomOut();
-//  }
+  //  // We must unzoom to get correct layout.
+  //  if (isZoomed())
+  //  {
+  //    zoomOut();
+  //  }
 
-//  MultiStatus
-//      result =
-//          new MultiStatus(PlatformUI.PLUGIN_ID, IStatus.OK, NLS.bind(
-//              WorkbenchMessages.WorkbenchPage_unableToSavePerspective,
-//              getLabel()), 0);
+  //  MultiStatus
+  //      result =
+  //          new MultiStatus(PlatformUI.PLUGIN_ID, IStatus.OK, NLS.bind(
+  //              WorkbenchMessages.WorkbenchPage_unableToSavePerspective,
+  //              getLabel()), 0);
   bool result = true;
 
   // Save editor manager.
@@ -3232,29 +3289,29 @@ bool WorkbenchPage::SaveState(IMemento::Pointer memento)
     //result.merge(persp.saveState(gChildMem));
     result &= (*itr)->SaveState(gChildMem);
   }
-//  // Save working set if set
-//  if (workingSet != 0)
-//  {
-//    memento.putString(IWorkbenchConstants.TAG_WORKING_SET,
-//        workingSet .getName());
-//  }
-//
-//  IMemento workingSetMem = memento .createChild(
-//      IWorkbenchConstants.TAG_WORKING_SETS);
-//  for (int i = 0; i < workingSets.length; i++)
-//  {
-//    workingSetMem.createChild(IWorkbenchConstants.TAG_WORKING_SET,
-//        workingSets[i].getName());
-//  }
-//
-//  if (aggregateWorkingSetId != 0)
-//  {
-//    memento.putString(ATT_AGGREGATE_WORKING_SET_ID, aggregateWorkingSetId);
-//  }
-//
-//  navigationHistory.saveState(memento .createChild(
-//      IWorkbenchConstants.TAG_NAVIGATION_HISTORY));
-//
+  //  // Save working set if set
+  //  if (workingSet != 0)
+  //  {
+  //    memento.putString(IWorkbenchConstants.TAG_WORKING_SET,
+  //        workingSet .getName());
+  //  }
+  //
+  //  IMemento workingSetMem = memento .createChild(
+  //      IWorkbenchConstants.TAG_WORKING_SETS);
+  //  for (int i = 0; i < workingSets.length; i++)
+  //  {
+  //    workingSetMem.createChild(IWorkbenchConstants.TAG_WORKING_SET,
+  //        workingSets[i].getName());
+  //  }
+  //
+  //  if (aggregateWorkingSetId != 0)
+  //  {
+  //    memento.putString(ATT_AGGREGATE_WORKING_SET_ID, aggregateWorkingSetId);
+  //  }
+  //
+  //  navigationHistory.saveState(memento .createChild(
+  //      IWorkbenchConstants.TAG_NAVIGATION_HISTORY));
+  //
   // save the sticky activation state
   stickyViewMan->Save(memento);
 

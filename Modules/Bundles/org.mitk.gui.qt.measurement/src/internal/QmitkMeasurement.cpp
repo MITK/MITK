@@ -78,6 +78,9 @@ QmitkMeasurement::~QmitkMeasurement()
       m_SelectionListener);
   m_MeasurementInfoRenderer->Delete();
 
+  this->GetDefaultDataStorage()->AddNodeEvent -= mitk::MessageDelegate1<QmitkMeasurement
+    , const mitk::DataTreeNode*>( this, &QmitkMeasurement::NodeAddedInDataStorage );
+
   m_SelectedPlanarFigures->NodeChanged.RemoveListener( mitk::MessageDelegate1<QmitkMeasurement
     , const mitk::DataTreeNode*>( this, &QmitkMeasurement::NodeChanged ) );
 

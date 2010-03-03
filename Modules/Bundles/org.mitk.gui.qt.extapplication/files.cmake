@@ -20,6 +20,11 @@ SET(RESOURCE_FILES
   resources/icon_research.xpm
 )
 
+SET(RES_FILES
+# uncomment the following line if you want to use Qt resources
+  resources/QmitkExtApplication.qrc
+)
+
 SET(CPP_FILES manifest.cpp)
 
 foreach(file ${SRC_CPP_FILES})

@@ -49,7 +49,11 @@ berry::WorkbenchWindowAdvisor*
 QmitkExtAppWorkbenchAdvisor::CreateWorkbenchWindowAdvisor(
         berry::IWorkbenchWindowConfigurer::Pointer configurer)
 {
-  return new QmitkExtWorkbenchWindowAdvisor(this, configurer);
+  QmitkExtWorkbenchWindowAdvisor* advisor = new
+    QmitkExtWorkbenchWindowAdvisor(this, configurer);
+  advisor->SetWindowIcon(":/QmitkExtApplication/icon_research.xpm");
+  return advisor;
+  //return new QmitkExtWorkbenchWindowAdvisor(this, configurer);
 }
 
 std::string QmitkExtAppWorkbenchAdvisor::GetInitialWindowPerspectiveId()

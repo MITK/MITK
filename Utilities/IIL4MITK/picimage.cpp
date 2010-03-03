@@ -241,6 +241,17 @@ dest [2] = _colors [i*3+2];						\
 source++;								\
 dest += 3;								\
 } else									\
+if ((model () == COLOR_ALPHA) && _colors)					\
+while (dest < eol) {							\
+a = source [0] * scale - bias;						\
+i = (a > 255.0 ? 255 : (a < 0.0 ? 0 : (unsigned char) a));		\
+dest [0] = _colors [i*4  ];						\
+dest [1] = _colors [i*4+1];						\
+dest [2] = _colors [i*4+2];						\
+dest [3] = _colors [i*4+3];						\
+source++;								\
+dest += 4;								\
+} else									\
 if ((model () == COLOR) && !_colors)					\
 while (dest < eol) {							\
 a = source [0] * scale - bias;						\

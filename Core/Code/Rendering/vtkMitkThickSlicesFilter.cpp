@@ -118,16 +118,15 @@ void vtkMitkThickSlicesFilterExecute(vtkMitkThickSlicesFilter *self,
                              vtkImageData *outData, T *outPtr,
                              int outExt[6], int id)
 {
-  int idxX, idxY, idxZ;
-  int maxX, maxY, maxZ;
+  int idxX, idxY;
+  int maxX, maxY;
   vtkIdType inIncX, inIncY, inIncZ;
   vtkIdType outIncX, outIncY, outIncZ;
   int axesNum;
   int *inExt = inData->GetExtent();
   int *wholeExtent;
   vtkIdType *inIncs;
-  double r[3], d;
-  int useZMin, useZMax, useYMin, useYMax, useXMin, useXMax;
+  int useYMin, useYMax, useXMin, useXMax;
 
   // find the region to loop over
   maxX = outExt[1] - outExt[0];

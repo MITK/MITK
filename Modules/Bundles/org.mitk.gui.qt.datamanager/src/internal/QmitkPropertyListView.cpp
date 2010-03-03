@@ -68,3 +68,8 @@ void QmitkPropertyListView::SelectionChanged( berry::IWorkbenchPart::Pointer, be
     }
   }
 }
+
+bool QmitkPropertyListView::IsExclusiveFunctionality() const
+{
+  return false;
+}

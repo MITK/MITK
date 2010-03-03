@@ -74,14 +74,11 @@ public:
   */  
   virtual void CreateConnections();
 
-  virtual void Activated();
-
-  void Visible();
+  bool IsExclusiveFunctionality() const;
 
   virtual bool event( QEvent *event );
   
 protected slots:  
-  void DataStorageChanged();
   /*
   * When an image is selected through the data tree combo box.
   */

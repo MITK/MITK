@@ -66,7 +66,7 @@ QmitkMeasurement::QmitkMeasurement() :
       m_SelectedImageNode(),
       m_LineCounter(0), m_PathCounter(0),
       m_AngleCounter(0), m_FourPointAngleCounter(0), m_EllipseCounter(0),
-      m_RectangleCounter(0), m_PolygonCounter(0)
+      m_RectangleCounter(0), m_PolygonCounter(0), m_LastRenderWindow(0)
 {
 
 }
@@ -786,22 +786,44 @@ void QmitkMeasurement::CopyToClipboard(bool)
 void QmitkMeasurement::SetMeasurementInfoToRenderWindow(const QString& text,
     QmitkRenderWindow* _RenderWindow)
 {
-  static QmitkRenderWindow* lastRenderWindow = 0;
-  if(_RenderWindow != 0)
-    lastRenderWindow = _RenderWindow;
+  if(m_LastRenderWindow != _RenderWindow)
+  {
 
-  if (!text.isEmpty())
+    if(m_LastRenderWindow)
+    {
+      QObject::disconnect( m_LastRenderWindow, SIGNAL( destroyed(QObject*) )
+        , this, SLOT( OnRenderWindowDelete(QObject*) ) );
+    }
+    m_LastRenderWindow = _RenderWindow;
+    if(m_LastRenderWindow)
+    {
+      QObject::connect( m_LastRenderWindow, SIGNAL( destroyed(QObject*) )
+        , this, SLOT( OnRenderWindowDelete(QObject*) ) );
+    }
+  }
+
+  if(m_LastRenderWindow)
   {
-    m_MeasurementInfoAnnotation->SetText(1, text.toLatin1().data());
-    mitk::VtkLayerController::GetInstance(_RenderWindow->GetRenderWindow())->InsertForegroundRenderer(
+    if (!text.isEmpty())
+    {
+      m_MeasurementInfoAnnotation->SetText(1, text.toLatin1().data());
+      mitk::VtkLayerController::GetInstance(m_LastRenderWindow->GetRenderWindow())->InsertForegroundRenderer(
         m_MeasurementInfoRenderer, true);
-  }
-  else
-  {
-    if (lastRenderWindow != 0 && mitk::VtkLayerController::GetInstance(
-        lastRenderWindow->GetRenderWindow()) ->IsRendererInserted(
+    }
+    else
+    {
+      if (mitk::VtkLayerController::GetInstance(
+        m_LastRenderWindow->GetRenderWindow()) ->IsRendererInserted(
         m_MeasurementInfoRenderer))
-      mitk::VtkLayerController::GetInstance(lastRenderWindow->GetRenderWindow())->RemoveRenderer(
-          m_MeasurementInfoRenderer);
+        mitk::VtkLayerController::GetInstance(m_LastRenderWindow->GetRenderWindow())->RemoveRenderer(
+        m_MeasurementInfoRenderer);
+    }
   }
+}
+
+
+void QmitkMeasurement::OnRenderWindowDelete(QObject * obj)
+{
+  if(obj == m_LastRenderWindow)
+    m_LastRenderWindow = 0;
 }

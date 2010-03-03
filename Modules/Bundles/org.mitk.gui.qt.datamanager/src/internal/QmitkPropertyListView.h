@@ -36,6 +36,11 @@ public:
   void CreateQtPartControl(QWidget* parent);
 
   ///
+  /// This is not a standalone functionality (can be easily used with other functionalities open) -> return false
+  ///
+  virtual bool IsExclusiveFunctionality() const;
+
+  ///
   /// Invoked when the DataManager selection changed
   ///
   virtual void SelectionChanged(berry::IWorkbenchPart::Pointer part

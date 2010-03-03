@@ -66,6 +66,8 @@
 #include <QSizePolicy>
 #include "mitkDataTreeNodeObject.h"
 
+const std::string QmitkDataManagerView::VIEW_ID = "org.mitk.views.datamanager";
+
 QmitkDataManagerView::QmitkDataManagerView()
 {
 }
@@ -73,10 +75,6 @@ QmitkDataManagerView::QmitkDataManagerView()
 
 QmitkDataManagerView::~QmitkDataManagerView()
 {
-  if(m_DataManagerPreferencesNode.IsNotNull())
-    m_DataManagerPreferencesNode->OnChanged
-    .RemoveListener(berry::MessageDelegate1<QmitkDataManagerView, const berry::IBerryPreferences*>(this, &QmitkDataManagerView::OnPreferencesChanged));
-
   berry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
   if(s)
     s->RemoveSelectionListener(m_SelectionListener);
@@ -89,11 +87,6 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   berry::IPreferencesService::Pointer prefService 
     = berry::Platform::GetServiceRegistry()
     .GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
-
-  m_DataManagerPreferencesNode = (prefService->GetSystemPreferences()->Node("/DataManager")).Cast<berry::IBerryPreferences>();
-  if(m_DataManagerPreferencesNode.IsNotNull())
-    m_DataManagerPreferencesNode->OnChanged
-      .AddListener(berry::MessageDelegate1<QmitkDataManagerView, const berry::IBerryPreferences*>(this, &QmitkDataManagerView::OnPreferencesChanged));
 
   //# GUI
   m_NodeTreeModel = new QmitkDataStorageTreeModel(this->GetDataStorage());
@@ -252,9 +245,6 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   layout->setContentsMargins(0,0,0,0);
 
   m_Parent->setLayout(layout);
-
-  // call preferences changed to enable initial single click editing or not
-  this->OnPreferencesChanged(m_DataManagerPreferencesNode.GetPointer());
 
   m_SelectionListener = new berry::SelectionChangedAdapter<QmitkDataManagerView>
     (this, &QmitkDataManagerView::SelectionChanged);

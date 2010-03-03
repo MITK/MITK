@@ -112,7 +112,12 @@ class QmitkMeasurement : public QObject, public QmitkFunctionality
     ///
     virtual void SelectionChanged(berry::IWorkbenchPart::Pointer part
       , berry::ISelection::ConstPointer selection);
-
+  
+  public slots:
+    ///
+    /// Called when the renderwindow gets deleted
+    ///
+    void OnRenderWindowDelete(QObject * obj = 0);
 
   protected:
     ///
@@ -181,6 +186,11 @@ protected:
   unsigned int m_PolygonCounter;
   unsigned int m_InitializedObserverTag;
   bool m_Visible;
+
+  ///
+  /// Saves the last renderwindow any info data was inserted
+  ///
+  QmitkRenderWindow* m_LastRenderWindow;
 
 };
 

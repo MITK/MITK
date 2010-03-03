@@ -86,10 +86,20 @@ unsigned char* mitk::OpenCVVideoSource::GetVideoTexture()
 
 void mitk::OpenCVVideoSource::GetCurrentFrameAsOpenCVImage(IplImage * image)
 { // get last captured frame for processing the image data
+  
+
   if(m_CurrentImage)
   {
-    image->origin = m_CurrentImage->origin;
-    memcpy(image->imageData,m_CurrentImage->imageData,m_CurrentImage->width*m_CurrentImage->height*3);  
+
+    if(!image)
+    {
+      image = cvCloneImage(m_CurrentImage);
+    }
+    else
+    {
+      image->origin = m_CurrentImage->origin;
+      memcpy(image->imageData,m_CurrentImage->imageData,m_CurrentImage->width*m_CurrentImage->height*3);  
+    }
   }
 }
 

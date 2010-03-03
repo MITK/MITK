@@ -24,14 +24,14 @@ PURPOSE.  See the above copyright notices for more information.
 #include <berryIEditorPart.h>
 #include <berryIWorkbenchPage.h>
 #include <berryWorkbenchAdvisor.h>
-
 #include "mitkQtCommonExtDll.h"
+#include "QmitkCommonWorkbenchWindowAdvisor.h"
 
 #include <QList>
 class QAction;
 class QMenu;
 
-class MITK_QT_COMMON_EXT_EXPORT QmitkExtWorkbenchWindowAdvisor : public berry::WorkbenchWindowAdvisor
+class MITK_QT_COMMON_EXT_EXPORT QmitkExtWorkbenchWindowAdvisor : public QmitkCommonWorkbenchWindowAdvisor
 {
 public:
 

@@ -215,10 +215,9 @@ private:
 };
 
 
-QmitkExtWorkbenchWindowAdvisor::QmitkExtWorkbenchWindowAdvisor(
-    berry::WorkbenchAdvisor* wbAdvisor,
-    berry::IWorkbenchWindowConfigurer::Pointer configurer) :
-  berry::WorkbenchWindowAdvisor(configurer),
+QmitkExtWorkbenchWindowAdvisor::QmitkExtWorkbenchWindowAdvisor(berry::WorkbenchAdvisor* wbAdvisor,
+                                                               berry::IWorkbenchWindowConfigurer::Pointer configurer) :
+  QmitkCommonWorkbenchWindowAdvisor(configurer),
   lastInput(0),
   wbAdvisor(wbAdvisor),
   showViewToolbar(true),
@@ -269,6 +268,7 @@ void QmitkExtWorkbenchWindowAdvisor::SetWindowIcon(const std::string& wndIcon)
 
 void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
 {
+  QmitkCommonWorkbenchWindowAdvisor::PostWindowCreate();
   // very bad hack...
   berry::IWorkbenchWindow::Pointer window =
       this->GetWindowConfigurer()->GetWindow();

@@ -16,6 +16,7 @@
  =========================================================================*/
 
 #include "QmitkDataManagerPreferencePage.h"
+#include "QmitkDataManagerView.h"
 
 #include <QLabel>
 #include <QPushButton>
@@ -42,7 +43,7 @@ void QmitkDataManagerPreferencePage::CreateQtControl(QWidget* parent)
     = berry::Platform::GetServiceRegistry()
     .GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
 
-  m_DataManagerPreferencesNode = prefService->GetSystemPreferences()->Node("/DataManager");
+  m_DataManagerPreferencesNode = prefService->GetSystemPreferences()->Node(QmitkDataManagerView::VIEW_ID);
 
   m_MainControl = new QWidget(parent);
   m_EnableSingleEditing = new QCheckBox;

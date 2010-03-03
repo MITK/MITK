@@ -10,6 +10,7 @@ SET(SRC_CPP_FILES
   QmitkStdMultiWidgetEditor.cpp
   QmitkGeneralPreferencePage.cpp
   QmitkPreferencesDialog.cpp
+  QmitkFunctionalityCoordinator.cpp
 )
 
 SET(INTERNAL_CPP_FILES

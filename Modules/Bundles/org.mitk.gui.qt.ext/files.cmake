@@ -1,4 +1,5 @@
 SET(SRC_CPP_FILES
+  QmitkCommonWorkbenchWindowAdvisor.cpp
   QmitkExtActionBarAdvisor.cpp
   QmitkExtWorkbenchWindowAdvisor.cpp
   QmitkExtFileOpenAction.cpp

@@ -158,25 +158,11 @@ void QmitkImageStatistics::StdMultiWidgetAvailable( QmitkStdMultiWidget& stdMult
   this->UpdateTimestep();
 }
 
-void QmitkImageStatistics::DataStorageChanged()
-{
-}
-
-void QmitkImageStatistics::Visible()
-{
-
-}
-
 void QmitkImageStatistics::UpdateCurrentSelection()
 {
   berry::ISelection::ConstPointer selection( this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection());
   m_CurrentSelection = selection.Cast< const berry::IStructuredSelection >();
   this->SelectionChanged(berry::SmartPointer<IWorkbenchPart>(NULL), selection);
-}
-
-void QmitkImageStatistics::Activated()
-{
-  QmitkFunctionality::Activated();
 }
 
 void QmitkImageStatistics::onImageSelected(const mitk::DataTreeNode* item)
@@ -1027,4 +1013,9 @@ void QmitkImageStatistics::ComputeIntensityProfile( mitk::PlanarLine* line )
   m_Controls->m_HistogramWidget->SetHistogram( histogram );
   m_Controls->m_HistogramWidget->UpdateItemModelFromHistogram();
   
+}
+
+bool QmitkImageStatistics::IsExclusiveFunctionality() const
+{
+  return false;
 }

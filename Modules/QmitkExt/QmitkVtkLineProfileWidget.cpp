@@ -157,7 +157,7 @@ void QmitkVtkLineProfileWidget::UpdateItemModelFromPath()
   unsigned int i = 0;
   for ( i = 0, t = m_DerivedPath->StartOfInput(); ;++i )
   {
-    PathType::OutputType &continuousIndex = m_DerivedPath->Evaluate( t );
+    const PathType::OutputType &continuousIndex = m_DerivedPath->Evaluate( t );
     
     mitk::Point3D indexPoint;
     indexPoint[0] = continuousIndex[0];

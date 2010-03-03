@@ -25,8 +25,9 @@ QmitkFunctionalityCoordinator::~QmitkFunctionalityCoordinator()
 
 berry::IPartListener::Events::Types QmitkFunctionalityCoordinator::GetPartEventTypes() const
 {
-  return Events::ACTIVATED | Events::DEACTIVATED | Events::CLOSED | Events::HIDDEN | Events::VISIBLE
-    | Events::OPENED;
+  return berry::IPartListener::Events::ACTIVATED | berry::IPartListener::Events::DEACTIVATED | 
+    | berry::IPartListener::Events::CLOSED | berry::IPartListener::Events::HIDDEN 
+    | berry::IPartListener::Events::VISIBLE | berry::IPartListener::Events::OPENED;
 }
 
 void QmitkFunctionalityCoordinator::PartActivated( berry::IWorkbenchPartReference::Pointer partRef )

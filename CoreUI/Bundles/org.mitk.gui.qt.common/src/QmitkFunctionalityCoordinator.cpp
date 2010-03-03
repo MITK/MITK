@@ -94,7 +94,7 @@ void QmitkFunctionalityCoordinator::PartClosed( berry::IWorkbenchPartReference::
 
       m_Functionalities.erase(_QmitkFunctionality.GetPointer()); // remove as opened functionality
       // call PartClosed on the QmitkFunctionality
-      _QmitkFunctionality->PartClosedProxy();
+      _QmitkFunctionality->ClosePartProxy();
       //m_VisibleStandaloneFunctionalities.erase(_QmitkFunctionality.GetPointer()); // remove if necessary (should be done before in PartHidden()
     }
   }

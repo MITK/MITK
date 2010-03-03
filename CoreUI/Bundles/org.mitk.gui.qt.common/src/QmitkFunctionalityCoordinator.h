@@ -51,7 +51,7 @@ public:
   ///
   /// \see IPartListener::GetPartEventTypes()
   ///
-  Events::Types GetPartEventTypes() const;
+  berry::IPartListener::Events::Types GetPartEventTypes() const;
   ///
   /// \see IPartListener::PartActivated()
   ///

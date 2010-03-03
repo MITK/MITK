@@ -264,29 +264,34 @@ void mitk::VolumeDataVtkMapper3D::GenerateData( mitk::BaseRenderer *renderer )
   }
   else
   {
-        int renderingValue = dynamic_cast<mitk::VtkVolumeRenderingProperty*>(GetDataTreeNode()->GetProperty("volumerendering configuration",renderer))->GetValueAsId();
-        switch(renderingValue)
+        mitk::VtkVolumeRenderingProperty* vrp=dynamic_cast<mitk::VtkVolumeRenderingProperty*>(GetDataTreeNode()->GetProperty("volumerendering configuration",renderer));
+        if(vrp)
         {
-            case  VTK_VOLUME_RAY_CAST_MIP_FUNCTION:
-            {
-                vtkVolumeRayCastMIPFunction* mipFunction = vtkVolumeRayCastMIPFunction::New();
-                m_HiResMapper->SetVolumeRayCastFunction(mipFunction);
-                mipFunction->Delete();
-                MITK_INFO <<"in switch" <<std::endl;
-                break;
-            }
-            
-            case VTK_RAY_CAST_COMPOSITE_FUNCTION:
-            {
-                vtkVolumeRayCastCompositeFunction* compositeFunction = vtkVolumeRayCastCompositeFunction::New();
-                compositeFunction->SetCompositeMethodToClassifyFirst();
-                m_HiResMapper->SetVolumeRayCastFunction(compositeFunction);
-                compositeFunction->Delete();
-                break;
-            }
-            default:
-                MITK_ERROR <<"Warning: invalid volume rendering option.  " << std::endl;
+          int renderingValue = vrp->GetValueAsId();
+          
+          switch(renderingValue)
+          {
+              case  VTK_VOLUME_RAY_CAST_MIP_FUNCTION:
+              {
+                  vtkVolumeRayCastMIPFunction* mipFunction = vtkVolumeRayCastMIPFunction::New();
+                  m_HiResMapper->SetVolumeRayCastFunction(mipFunction);
+                  mipFunction->Delete();
+                  MITK_INFO <<"in switch" <<std::endl;
+                  break;
+              }
+              
+              case VTK_RAY_CAST_COMPOSITE_FUNCTION:
+              {
+                  vtkVolumeRayCastCompositeFunction* compositeFunction = vtkVolumeRayCastCompositeFunction::New();
+                  compositeFunction->SetCompositeMethodToClassifyFirst();
+                  m_HiResMapper->SetVolumeRayCastFunction(compositeFunction);
+                  compositeFunction->Delete();
+                  break;
+              }
+              default:
+                  MITK_ERROR <<"Warning: invalid volume rendering option.  " << std::endl;
 
+          }
         }
     m_VolumeLOD->VisibilityOn();
   }

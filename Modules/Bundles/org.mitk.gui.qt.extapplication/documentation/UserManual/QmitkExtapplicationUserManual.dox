@@ -107,6 +107,8 @@ The System Load Indicator in the lower right hand corner of the screen gives inf
 Each solution for a specific problem that is self contained is realized as a single view. Thus you can create a workflow for your problem by combining the capabilities of different views to suit your needs.
 One elegant way to do this is by combining views in \ref QmitkExtApplicationUserManualPerspectives.
 
+By pressing and holding the left mouse button on a views tab you can move it around to suit your needs, even out of the application window. 
+
 \section QmitkExtApplicationUserManualPerspectives Perspectives
 
 The different tasks that arise in medical imaging need very different approaches. To acknowledge this circumstance MITK supplies a framework that can be build uppon by very different solutions to those tasks. These solutions are called perspectives, each of them works independently of others although they might be used in sequence to achieve the solution of more difficult problems.

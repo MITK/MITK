@@ -87,6 +87,7 @@ There are different types of representations how to show the Data-Element inside
 <li> The opacity can be changed with a slide control
 <li> In case of images a texture interpolation can be switched on or off. The texture interpolation smoothes the image, so that no single pixels are visible anymore.
 <li> In case of surfaces the surface representation can be changed between points, wireframe or surface.
+<li> Global reinit updates all windows to contain all the current data. Reinit updates a single data item fits the windows to contain this data item.
 </ul>
 
 \image html Image_properties.bmp "Screenshot2: Properties for images"

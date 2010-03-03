@@ -43,7 +43,7 @@ The first information is the selected image's name (here: DICOM-MRI-Image) follo
 Draws a line between two set points and returns the distance between these points.
 
 \subsection SubTwo Draw Path
-Draws a path between several set points (two and more) and calculates the circumference, that is all line's length summed up. 
+Draws a path between several set points (two and more) and calculates the circumference, that is all line's length summed up. Add the final point by right click.
 
 \subsection SubThree Draw Angle
 Draws two lines from three set points connected in the second set point and returns the inner angle at the second point. 
@@ -55,10 +55,10 @@ Draws two lines that may but must not intersect from four set points. The return
 Draws a circle by setting two points, whereas the first set point is the center and the second the radius of the circle. The measured values are the radius and the included area.
 
 \subsection SubSix Draw Rectangle
-Draws a recangle by setting two points at the opposing edges of the rectangle starting with the upper left edge. The measured values are the circumference and the included area. 
+Draws a rectangle by setting two points at the opposing edges of the rectangle starting with the upper left edge. The measured values are the circumference and the included area. 
 
 \subsection SubSeven Draw Polygon
-Draws a polygon by setting three or more points. The measured values are the circumference and the included area.
+Draws a polygon by setting three or more points. The measured values are the circumference and the included area. Add the final point by right click.
 
 Below the buttonline the statistics window is situated, it displays the results of the actual measurements from the selected measurement figures. The content of the statistics window can be copied to the clipboard with the correspondig button for further use in a table calculation programm (e.g. Open Office Calc etc.). 
 
@@ -100,7 +100,7 @@ When applying more then one measurement figure to the image the actual measureme
 After applying the wanted measurement figures the entire scene consisting of the image and the measurement figures can be saved for future use. Therefore just click the right mouse button when over the image item in the Data Manager and choose the item "Save" in the opening item list. Following to that a save dialog appears where the path to the save folder can be set. Afterwards just accept your choice with the save button.
 
 \subsection Four Remove measurement figures or image
-If the single measurement figures or the image is not needed any longer, it can be removed solely or as an entire group. The image can't be removed without simultaneously remove all the dependent measurement figures that belongt the image tree in the Data Manager. To remove just select the wanted items in the data manager list by left-click on it or if several items wanted to be removed left click on all wanted by simultaneously holding the ctrl-button pressed.
+If the single measurement figures or the image is not needed any longer, it can be removed solely or as an entire group. The image can't be removed without simultaneously removing all the dependent measurement figures that belong to the image tree in the Data Manager. To remove just select the wanted items in the data manager list by left-click on it or if several items wanted to be removed left click on all wanted by simultaneously holding the ctrl-button pressed.
 
 For more detailed usage of the save/remove functionality refer to the Data Manager User Manual.
 

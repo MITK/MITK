@@ -65,8 +65,9 @@ Available filters are:
   <li> Sobel Operator</li>
   </ul>
   
-<li><b>Other</b></li>
+<li><b>Misc</b></li>
   <ul>
+  <li> Threshold </li>
   <li> Image Inversion</li>
   <li> Downsampling (isotropic)</li>  
   </ul>

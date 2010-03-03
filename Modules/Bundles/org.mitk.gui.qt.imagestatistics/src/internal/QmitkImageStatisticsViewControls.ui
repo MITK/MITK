@@ -9,14 +9,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>259</width>
-    <height>801</height>
+    <width>465</width>
+    <height>854</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout_8">
+  <layout class="QGridLayout" name="gridLayout_11">
    <item row="0" column="0" colspan="2">
     <widget class="QGroupBox" name="gbOneImageOps">
      <property name="title">
@@ -115,16 +115,6 @@ choose a timestep.</string>
      </item>
     </layout>
    </item>
-   <item row="3" column="0">
-    <widget class="QLabel" name="m_ErrorMessageLabel">
-     <property name="text">
-      <string>Error Message</string>
-     </property>
-     <property name="textFormat">
-      <enum>Qt::AutoText</enum>
-     </property>
-    </widget>
-   </item>
    <item row="4" column="0" colspan="2">
     <widget class="QGroupBox" name="groupBox_3">
      <property name="title">
@@ -220,6 +210,45 @@ choose a timestep.</string>
         <attribute name="verticalHeaderStretchLastSection">
          <bool>false</bool>
         </attribute>
+        <attribute name="verticalHeaderVisible">
+         <bool>true</bool>
+        </attribute>
+        <attribute name="horizontalHeaderShowSortIndicator" stdset="0">
+         <bool>false</bool>
+        </attribute>
+        <attribute name="verticalHeaderDefaultSectionSize">
+         <number>20</number>
+        </attribute>
+        <attribute name="horizontalHeaderStretchLastSection">
+         <bool>true</bool>
+        </attribute>
+        <attribute name="horizontalHeaderCascadingSectionResizes">
+         <bool>false</bool>
+        </attribute>
+        <attribute name="horizontalHeaderVisible">
+         <bool>false</bool>
+        </attribute>
+        <attribute name="verticalHeaderCascadingSectionResizes">
+         <bool>false</bool>
+        </attribute>
+        <attribute name="horizontalHeaderMinimumSectionSize">
+         <number>80</number>
+        </attribute>
+        <attribute name="verticalHeaderMinimumSectionSize">
+         <number>20</number>
+        </attribute>
+        <attribute name="verticalHeaderShowSortIndicator" stdset="0">
+         <bool>false</bool>
+        </attribute>
+        <attribute name="horizontalHeaderHighlightSections">
+         <bool>true</bool>
+        </attribute>
+        <attribute name="verticalHeaderStretchLastSection">
+         <bool>false</bool>
+        </attribute>
+        <attribute name="horizontalHeaderDefaultSectionSize">
+         <number>80</number>
+        </attribute>
         <row>
          <property name="text">
           <string>Mean</string>
@@ -273,40 +302,103 @@ choose a timestep.</string>
     </widget>
    </item>
    <item row="5" column="0" colspan="2">
-    <widget class="QGroupBox" name="groupBox">
-     <property name="minimumSize">
+    <widget class="QStackedWidget" name="m_StatisticsWidgetStack">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="maximumSize">
       <size>
-       <width>150</width>
-       <height>160</height>
+       <width>447</width>
+       <height>16777215</height>
       </size>
      </property>
-     <property name="title">
-      <string>Histogram</string>
-     </property>
-     <property name="checkable">
+     <property name="autoFillBackground">
       <bool>false</bool>
      </property>
-     <layout class="QGridLayout" name="gridLayout_3">
-      <property name="margin">
-       <number>0</number>
-      </property>
-      <property name="spacing">
-       <number>0</number>
-      </property>
-      <item row="1" column="0">
-       <widget class="QmitkVtkHistogramWidget" name="m_HistogramWidget" native="true">
-        <property name="enabled">
-         <bool>true</bool>
-        </property>
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-       </widget>
-      </item>
-     </layout>
+     <property name="frameShape">
+      <enum>QFrame::NoFrame</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Plain</enum>
+     </property>
+     <property name="lineWidth">
+      <number>-1</number>
+     </property>
+     <property name="midLineWidth">
+      <number>-1</number>
+     </property>
+     <property name="currentIndex">
+      <number>1</number>
+     </property>
+     <widget class="QWidget" name="page">
+      <layout class="QGridLayout" name="gridLayout_8">
+       <item row="0" column="0">
+        <widget class="QGroupBox" name="groupBox">
+         <property name="minimumSize">
+          <size>
+           <width>150</width>
+           <height>160</height>
+          </size>
+         </property>
+         <property name="title">
+          <string>Histogram</string>
+         </property>
+         <property name="checkable">
+          <bool>false</bool>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_3">
+          <property name="margin">
+           <number>0</number>
+          </property>
+          <property name="spacing">
+           <number>0</number>
+          </property>
+          <item row="1" column="0">
+           <widget class="QmitkVtkHistogramWidget" name="m_HistogramWidget" native="true">
+            <property name="enabled">
+             <bool>true</bool>
+            </property>
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="page_2">
+      <layout class="QGridLayout" name="gridLayout_9">
+       <item row="0" column="0">
+        <widget class="QGroupBox" name="groupBox_2">
+         <property name="title">
+          <string>Intensity Profile</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_10">
+          <property name="margin">
+           <number>0</number>
+          </property>
+          <property name="spacing">
+           <number>0</number>
+          </property>
+          <item row="0" column="0">
+           <widget class="QmitkVtkLineProfileWidget" name="m_LineProfileWidget" native="true"/>
+          </item>
+         </layout>
+        </widget>
+       </item>
+      </layout>
+     </widget>
     </widget>
    </item>
    <item row="6" column="0" colspan="2">
@@ -463,6 +555,16 @@ choose a timestep.</string>
      </property>
     </spacer>
    </item>
+   <item row="2" column="1">
+    <widget class="QLabel" name="m_ErrorMessageLabel">
+     <property name="text">
+      <string>Error Message</string>
+     </property>
+     <property name="textFormat">
+      <enum>Qt::AutoText</enum>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
  <customwidgets>
@@ -480,6 +582,12 @@ choose a timestep.</string>
    <class>QmitkVtkHistogramWidget</class>
    <extends>QWidget</extends>
    <header>QmitkVtkHistogramWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QmitkVtkLineProfileWidget</class>
+   <extends>QWidget</extends>
+   <header>QmitkVtkLineProfileWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

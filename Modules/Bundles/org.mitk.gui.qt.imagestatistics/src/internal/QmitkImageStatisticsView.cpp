@@ -119,6 +119,8 @@ void QmitkImageStatistics::CreateQtPartControl(QWidget *parent)
     m_Controls->m_AllTreeButton->hide();
 
     m_Controls->m_ErrorMessageLabel->hide();
+
+    m_Controls->m_LineProfileWidget->SetPathModeToPlanarFigure();
   }
 
 
@@ -622,8 +624,6 @@ void QmitkImageStatistics::SelectionChanged(
   // Clear any unreferenced images
   this->RemoveOrphanImages();
 
-  bool lineSelected = false;
-
   // By default: no image selected
   if ( sourcepart == this || !this->IsVisible() ||  // prevents being notified by own selection events
     !selection.Cast<const berry::IStructuredSelection>() // checks that the selection is a IStructuredSelection and not NULL
@@ -641,6 +641,8 @@ void QmitkImageStatistics::SelectionChanged(
     m_SelectedImage = NULL;
     this->InvalidateStatisticsTableView();
     m_Controls->m_HistogramWidget->ClearItemModel();
+    m_Controls->m_LineProfileWidget->ClearItemModel();
+
     m_CurrentStatisticsValid = false;
     m_Controls->m_ErrorMessageLabel->hide();
     m_Controls->m_SelectedMaskLabel->setText( "None" );
@@ -702,14 +704,6 @@ void QmitkImageStatistics::SelectionChanged(
     m_SelectedImageMask = dynamic_cast< mitk::Image * >( selectedNode->GetData() );
     m_SelectedPlanarFigure = dynamic_cast< mitk::PlanarFigure * >( selectedNode->GetData() );
 
-    //Hier OnLineSelected
-    mitk::PlanarLine::Pointer line = dynamic_cast< mitk::PlanarLine * > (m_SelectedPlanarFigure);
-    if(line.IsNotNull()) //check, whether a Planar Line is selected and compute an intensity profile in that case. The intensity profile is set as a pseudo histogram in the statistics widget.
-    {
-      ComputeIntensityProfile( line.GetPointer() );
-      lineSelected = true;
-    }
-
     if ( (m_SelectedImageMask != NULL) || (m_SelectedPlanarFigure != NULL) )
     {
       m_SelectedMaskNode = selectedNode;
@@ -754,6 +748,7 @@ void QmitkImageStatistics::SelectionChanged(
     // Clear statistics, histogram, and GUI
     this->InvalidateStatisticsTableView();
     m_Controls->m_HistogramWidget->ClearItemModel();
+    m_Controls->m_LineProfileWidget->ClearItemModel();
     m_CurrentStatisticsValid = false;
     m_Controls->m_ErrorMessageLabel->hide();
     m_Controls->m_SelectedMaskLabel->setText( "None" );
@@ -761,7 +756,7 @@ void QmitkImageStatistics::SelectionChanged(
   else
   {
     // Else, request statistics and GUI update
-    if(!lineSelected) this->RequestStatisticsUpdate();
+    this->RequestStatisticsUpdate();
   }
 }
 
@@ -781,6 +776,22 @@ void QmitkImageStatistics::UpdateStatistics()
 
   if ( m_SelectedImage != NULL )
   {
+    // Check if a the selected image is a multi-channel image. If yes, statistics
+    // cannot be calculated currently.
+    if ( m_SelectedImage->GetPixelType().GetNumberOfComponents() > 1 )
+    {
+      std::stringstream message;
+      message << "<font color='red'>Multi-component images not supported.</font>";
+      m_Controls->m_ErrorMessageLabel->setText( message.str().c_str() );
+      m_Controls->m_ErrorMessageLabel->show();
+
+      this->InvalidateStatisticsTableView();
+      m_Controls->m_StatisticsWidgetStack->setCurrentIndex( 0 );
+      m_Controls->m_HistogramWidget->ClearItemModel();
+      m_CurrentStatisticsValid = false;
+      return;
+    }  
+
     // Retrieve ImageStatisticsCalculator from has map (or create a new one
     // for this image if non-existant)
     ImageStatisticsMapType::iterator it = 
@@ -897,10 +908,13 @@ void QmitkImageStatistics::UpdateStatistics()
         m_CurrentStatisticsValid = true;
       }
 
+      m_Controls->m_StatisticsWidgetStack->setCurrentIndex( 0 );
       m_Controls->m_HistogramWidget->SetHistogramModeToDirectHistogram();
       m_Controls->m_HistogramWidget->SetHistogram( 
         m_CurrentStatisticsCalculator->GetHistogram( timeStep ) );
       m_Controls->m_HistogramWidget->UpdateItemModelFromHistogram();
+
+      MITK_INFO << "UpdateItemModelFromHistogram()";
 
       this->FillStatisticsTableView(
         m_CurrentStatisticsCalculator->GetStatistics( timeStep ),
@@ -914,6 +928,18 @@ void QmitkImageStatistics::UpdateStatistics()
       this->InvalidateStatisticsTableView();
       m_Controls->m_HistogramWidget->ClearItemModel();
       m_CurrentStatisticsValid = false;
+
+
+      // If a (non-closed) PlanarFigure is selected, display a line profile widget
+      if ( m_SelectedPlanarFigure != NULL )
+      {
+        // TODO: enable line profile widget
+        //m_Controls->m_StatisticsWidgetStack->setCurrentIndex( 1 );
+        
+        m_Controls->m_LineProfileWidget->SetImage( m_SelectedImage );
+        m_Controls->m_LineProfileWidget->SetPlanarFigure( m_SelectedPlanarFigure );
+        m_Controls->m_LineProfileWidget->UpdateItemModelFromPath();
+      }
     }
   }
 }

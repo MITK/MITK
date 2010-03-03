@@ -100,6 +100,7 @@ IF ( NOT ${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.${VTK_BUILD_VERSION} VERSION_
   SET(CPP_FILES
     ${CPP_FILES}
     QmitkVtkHistogramWidget.cpp
+    QMitkVtkLineProfileWidget.cpp
   )
 ENDIF()
 
@@ -183,6 +184,7 @@ IF ( NOT ${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.${VTK_BUILD_VERSION} VERSION_
   SET(MOC_H_FILES
     ${MOC_H_FILES}
     QmitkVtkHistogramWidget.h
+    QmitkVtkLineProfileWidget.h
   )
 ENDIF()
 

@@ -71,15 +71,6 @@ ImageStatisticsCalculator::~ImageStatisticsCalculator()
 
 void ImageStatisticsCalculator::SetImage( const mitk::Image *image )
 {
-  std::string classname(image->GetNameOfClass());
-  if(classname.compare("TensorImage")==0 ||
-    classname.compare("QBallImage")==0 ||
-    classname.compare("DiffusionImage")==0)
-  {
-    MITK_ERROR << "mitk::ImageStatisticsCalculator::ComputeStatistics does not work on " << classname << ", sorry." << std::endl;
-    return;
-  }
-
   if ( m_Image != image )
   {
     m_Image = image;

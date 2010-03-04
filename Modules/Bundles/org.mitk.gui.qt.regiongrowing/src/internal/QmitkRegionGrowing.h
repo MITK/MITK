@@ -15,91 +15,89 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#if !defined(QmitkRegionGrowing_H__INCLUDED)
-#define QmitkRegionGrowing_H__INCLUDED
+#ifndef QmitkRegionGrowing_h
+#define QmitkRegionGrowing_h
 
 #include "QmitkFunctionality.h"
 
 #include "mitkPointSet.h"
 #include "mitkPointSetInteractor.h"
+#include "mitkDataTreeNodeSelection.h"
 
 #include <itkImage.h>
 
 #include <berryISelectionListener.h>
-#include <mitkDataTreeNodeSelection.h>
 
 #include "ui_QmitkRegionGrowingControls.h"
 
 /*!
-
   \brief QmitkRegionGrowing 
 
   Functionality for demonstration of MITK basics.
 
   This functionality allows the user to set some seed points that are used for a simple region growing algorithm from ITK.
 
+  \warning  This is only for demonstration, it is NOT meant to be useful!
+
   \sa QmitkFunctionality
   \ingroup Functionalities
 */
 class QmitkRegionGrowing : public QObject, public QmitkFunctionality
 {  
-
-  // this is needed for all Qt objects that should have a MOC object (everything that derives from QObject)
+  // this is needed for all Qt objects that should have a Qt meta-object
+  // (everything that derives from QObject and wants to have signal/slots)
   Q_OBJECT
   
   public:  
 
-  QmitkRegionGrowing();
-  virtual ~QmitkRegionGrowing();
+    QmitkRegionGrowing();
+    virtual ~QmitkRegionGrowing();
 
-  virtual void CreateQtPartControl(QWidget *parent);
+    virtual void CreateQtPartControl(QWidget *parent);
 
-  /// \brief Called when the functionality is activated
-  virtual void Activated();
-  virtual void Deactivated();
+    virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget);
+    virtual void StdMultiWidgetNotAvailable();
 
-  virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget);
-  virtual void StdMultiWidgetNotAvailable();
+    void SelectionChanged( berry::IWorkbenchPart::Pointer, berry::ISelection::ConstPointer selection );
+
+  protected slots:
   
-  void SelectionChanged( berry::IWorkbenchPart::Pointer, berry::ISelection::ConstPointer selection );
+    /// \brief Called when the user clicks the GUI button
+    void DoRegionGrowing();
 
-protected slots:  
+  protected:
+
+    /*!
+      \brief ITK image processing function
+      This function is templated like an ITK image. The MITK-Macro AccessByItk determines the actual pixel type and dimensionality of
+      a given MITK image and calls this function for further processing (in our case region growing)
+     */
+    template < typename TPixel, unsigned int VImageDimension >
+    void ItkImageProcessing( itk::Image< TPixel, VImageDimension >* itkImage, mitk::Geometry3D* imageGeometry );
+
+    void UpdateFromCurrentDataManagerSelection();
+
+    /// \brief This node is created once and used for storing seed points
+    mitk::DataTreeNode::Pointer m_PointSetNode;
+
+    /// \brief This is the actual seed point data object
+    mitk::PointSet::Pointer m_PointSet;
+
+    mitk::PointSetInteractor::Pointer m_Interactor;
+
+    Ui::QmitkRegionGrowingControls* m_Controls;
+
+    QmitkStdMultiWidget* m_MultiWidget;
+
+    ///
+    /// A selection listener for datatreenode events
+    ///
+    berry::ISelectionListener::Pointer m_SelectionListener;
   
-  /// \brief Called when the user clicks the GUI button
-  void DoRegionGrowing();
+  private:
 
-protected:  
-  
-  /*!
-    \brief ITK image processing function
-    This function is templated like an ITK image. The MITK-Macro AccessByItk determines the actual pixel type and dimensionality of
-    a given MITK image and calls this function for further processing (in our case region growing)
-   */
-  template < typename TPixel, unsigned int VImageDimension >
-  void ItkImageProcessing( itk::Image< TPixel, VImageDimension >* itkImage, mitk::Geometry3D* imageGeometry );
+    mitk::WeakPointer<mitk::DataTreeNode> m_SelectedNode;
 
-  /// \brief This node is created once and used for storing seed points
-  mitk::DataTreeNode::Pointer m_PointSetNode;
-
-  /// \brief This is the actual seed point data object
-  mitk::PointSet::Pointer m_PointSet;
-
-  mitk::PointSetInteractor::Pointer m_Interactor;
-
-  Ui::QmitkRegionGrowingControls* m_Controls;
-
-  QmitkStdMultiWidget* m_MultiWidget;
-  
-  ///
-  /// A selection listener for datatreenode events
-  ///
-  berry::ISelectionListener::Pointer m_SelectionListener;
-  void UpdateFromCurrentDataManagerSelection();
-  
-private:
-  void SetStatusText( QString text, bool isError);
-  mitk::WeakPointer<mitk::DataTreeNode> m_SelectedNode;
 };
 
-#endif // !defined(QmitkRegionGrowing_H__INCLUDED)
-
+#endif // !defined(QmitkRegionGrowing_h)

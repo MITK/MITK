@@ -21,17 +21,20 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QLabel" name="m_SelectedImageLabel">
+    <widget class="QLabel" name="lblWarning">
+     <property name="styleSheet">
+      <string notr="true">QLabel { color: rgb(255, 0, 0) }</string>
+     </property>
      <property name="text">
-      <string>region grower</string>
+      <string>Please select an image!</string>
      </property>
     </widget>
    </item>
    <item>
-    <widget class="QmitkPointListWidget" name="m_PointListWidget"/>
+    <widget class="QmitkPointListWidget" name="lstPoints"/>
    </item>
    <item>
-    <widget class="QPushButton" name="m_ButtonRegionGrow">
+    <widget class="QPushButton" name="btnStartRegionGrowing">
      <property name="toolTip">
       <string>start dumb segmentation</string>
      </property>

@@ -15,6 +15,10 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
+// BlueBerry
+#include <berryISelectionService.h>
+#include <berryIWorkbenchWindow.h>
+
 // MITK
 #include "mitkImageAccessByItk.h"
 #include "mitkITKImageImport.h"
@@ -29,10 +33,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 // Qt
 #include <QMessageBox>
-
-// BlueBerry
-#include <berryISelectionService.h>
-#include <berryIWorkbenchWindow.h>
 
 // ITK
 #include <itkConnectedThresholdImageFilter.h>

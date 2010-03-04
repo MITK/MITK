@@ -18,6 +18,8 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef QmitkRegionGrowing_h
 #define QmitkRegionGrowing_h
 
+#include <berryISelectionListener.h>
+
 #include "QmitkFunctionality.h"
 
 #include "mitkPointSet.h"
@@ -25,8 +27,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkDataTreeNodeSelection.h"
 
 #include <itkImage.h>
-
-#include <berryISelectionListener.h>
 
 #include "ui_QmitkRegionGrowingControls.h"
 

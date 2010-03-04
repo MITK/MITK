@@ -251,11 +251,12 @@ void QmitkSegmentationPostProcessing::InternalCreateSurface(bool smoothed)
         if (smoothed)
         {
           surfaceFilter->SetParameter("Smooth", true );
-          surfaceFilter->SetParameter("Apply median", true );
+          //surfaceFilter->SetParameter("Apply median", true );
+          surfaceFilter->SetParameter("Apply median", false );  // median makes the resulting surfaces look like lego models
           surfaceFilter->SetParameter("Median kernel size", 3u );
-          surfaceFilter->SetParameter("Gaussian SD", 1.5f );
+          surfaceFilter->SetParameter("Gaussian SD", 2.5f );
           surfaceFilter->SetParameter("Decimate mesh", true );
-          surfaceFilter->SetParameter("Decimation rate", 0.8f );
+          surfaceFilter->SetParameter("Decimation rate", 0.80f );
         }
         else
         {

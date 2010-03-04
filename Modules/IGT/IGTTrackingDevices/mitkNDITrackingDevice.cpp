@@ -1120,7 +1120,7 @@ bool mitk::NDITrackingDevice::DiscoverWiredTools()
   /* if there are port handles that need to be initialized, initialize them. Furthermore instantiate tools for each handle that has no tool yet. */
   std::string ph;
   
-  ///* we need to remeber the ports which are occupied to be able to readout the serial numbers of the connected tools later*/
+  ///* we need to remember the ports which are occupied to be able to readout the serial numbers of the connected tools later*/
   //std::vector<int> occupiedPorts;
 
   for (unsigned int i = 0; i < portHandle.size(); i += 2)

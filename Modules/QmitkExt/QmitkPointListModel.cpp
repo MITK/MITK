@@ -31,14 +31,11 @@ m_PointSetDeletedObserverTag(0),
 m_TimeStep(t)
 {
   ObserveNewPointset( pointSet );
-
-  
 }
 
 Qt::ItemFlags QmitkPointListModel::flags(const QModelIndex& index) const
 {
   // no editing so far, return default (enabled, selectable)
-
   return Qt::ItemIsSelectable | Qt::ItemIsEnabled;
 }
 
@@ -47,36 +44,29 @@ QmitkPointListModel::~QmitkPointListModel()
   ObserveNewPointset( NULL );
 }
 
-
 void QmitkPointListModel::SetPointSet( mitk::PointSet* pointSet )
 {
   ObserveNewPointset( pointSet );
-  //emit QAbstractListModel::layoutChanged();
   QAbstractListModel::reset();
-  emit UpdateSelection();
+  emit SignalUpdateSelection();
 }
-
 
 mitk::PointSet* QmitkPointListModel::GetPointSet() const
 {
   return m_PointSet;
 }
 
-
 void QmitkPointListModel::SetTimeStep(int t)
 {
   m_TimeStep = t;
-  //emit QAbstractListModel::layoutChanged();
   QAbstractListModel::reset();
-  emit UpdateSelection();
+  emit SignalUpdateSelection();
 }
-
 
 int QmitkPointListModel::GetTimeStep() const
 {
   return m_TimeStep;
 }
-
 
 void QmitkPointListModel::ObserveNewPointset( mitk::PointSet* pointSet )
 {
@@ -114,25 +104,19 @@ void QmitkPointListModel::ObserveNewPointset( mitk::PointSet* pointSet )
   }
 }
 
-
 void QmitkPointListModel::OnPointSetChanged( const itk::EventObject &  /*e*/ )
 {
-  this->reset();
-  //emit QAbstractListModel::layoutChanged();
   QAbstractListModel::reset();
-  emit UpdateSelection();
+  emit SignalUpdateSelection();
 }
  
-
 void QmitkPointListModel::OnPointSetDeleted( const itk::EventObject &  /*e*/ )
 {
   m_PointSet = NULL;
   m_PointSetModifiedObserverTag = 0;
   m_PointSetDeletedObserverTag = 0;
-  //emit QAbstractListModel::layoutChanged();
   QAbstractListModel::reset();
 }
-
 
 int QmitkPointListModel::rowCount( const QModelIndex&  /*parent*/ ) const
 {
@@ -145,7 +129,6 @@ int QmitkPointListModel::rowCount( const QModelIndex&  /*parent*/ ) const
     return 0;
   }
 }
-
 
 QVariant QmitkPointListModel::data(const QModelIndex& index, int role) const
 {
@@ -185,7 +168,6 @@ QVariant QmitkPointListModel::data(const QModelIndex& index, int role) const
   }
 }
 
-
 QVariant QmitkPointListModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
   if (role != Qt::DisplayRole)
@@ -203,8 +185,8 @@ QVariant QmitkPointListModel::headerData(int section, Qt::Orientation orientatio
   }
 }
 
-
-bool QmitkPointListModel::GetPointForModelIndex( const QModelIndex &index, mitk::PointSet::PointType& p, mitk::PointSet::PointIdentifier& id) const
+bool QmitkPointListModel::GetPointForModelIndex( const QModelIndex &index, mitk::PointSet::PointType& p, 
+                                                mitk::PointSet::PointIdentifier& id) const
 {
   if (m_PointSet == NULL)
     return false;
@@ -222,6 +204,7 @@ bool QmitkPointListModel::GetPointForModelIndex( const QModelIndex &index, mitk:
     ++it;
     if (it == m_PointSet->GetPointSet(m_TimeStep)->GetPoints()->End())
       return false;
+
   }
   if (it != m_PointSet->GetPointSet(m_TimeStep)->GetPoints()->End()) // not at the end, 
   {
@@ -232,17 +215,20 @@ bool QmitkPointListModel::GetPointForModelIndex( const QModelIndex &index, mitk:
   return false;
 }
 
-
 bool QmitkPointListModel::GetModelIndexForPointID(mitk::PointSet::PointIdentifier id, QModelIndex& index) const
 {
   if (m_PointSet == NULL)
     return false;
 
-  if (m_PointSet->GetPointSet(m_TimeStep)->GetPoints()->IndexExists(id) == false)
+  mitk::PointSet::PointsContainer::Pointer points = m_PointSet->GetPointSet(m_TimeStep)->GetPoints();
+
+  if (points->IndexExists(id) == false)
     return false;
 
   unsigned int idx = 0;
-  for (mitk::PointSet::PointsContainer::Iterator it = m_PointSet->GetPointSet(m_TimeStep)->GetPoints()->Begin(); it != m_PointSet->GetPointSet(m_TimeStep)->GetPoints()->End(); ++it)
+  for (mitk::PointSet::PointsContainer::Iterator it = points->Begin(); 
+       it != points->End(); 
+       ++it)
   {
     if (it->Index() == id) // we found the correct element
     {
@@ -253,7 +239,6 @@ bool QmitkPointListModel::GetModelIndexForPointID(mitk::PointSet::PointIdentifie
   }
   return false; // nothing found
 }
-
 
 void QmitkPointListModel::MoveSelectedPointUp()
 {
@@ -266,7 +251,6 @@ void QmitkPointListModel::MoveSelectedPointUp()
   m_PointSet->ExecuteOperation(doOp);
   mitk::RenderingManager::GetInstance()->RequestUpdateAll(); // Workaround for update problem in Pointset/Mapper
 }
-
 
 void QmitkPointListModel::MoveSelectedPointDown()
 {

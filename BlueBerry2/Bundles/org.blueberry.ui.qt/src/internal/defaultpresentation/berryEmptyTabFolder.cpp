@@ -62,6 +62,11 @@ AbstractTabItem* EmptyTabFolder::Add(int  /*index*/, int  /*flags*/)
   return new EmptyTabItem();
 }
 
+void EmptyTabFolder::Move(int /*from*/, int /*to*/)
+{
+
+}
+
 QWidget* EmptyTabFolder::GetContentParent()
 {
   return control;

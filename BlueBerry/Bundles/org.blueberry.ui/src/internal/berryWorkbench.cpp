@@ -945,7 +945,7 @@ bool Workbench::BusyClose(bool force)
     return false;
   }
 
-  bool closeEditors = !force;
+  bool closeEditors = !force && false; // false is the default for the not yet implemented preference below
   // && PrefUtil.getAPIPreferenceStore().getBoolean(
   //     IWorkbenchPreferenceConstants.CLOSE_EDITORS_ON_EXIT);
   if (closeEditors)

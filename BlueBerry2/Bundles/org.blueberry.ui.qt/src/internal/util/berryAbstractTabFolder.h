@@ -89,6 +89,8 @@ public:
 
   virtual AbstractTabItem* Add(int index, int flags) = 0;
 
+  virtual void Move(int from, int to) = 0;
+
   virtual QWidget* GetContentParent() = 0;
   virtual void SetContent(QWidget* newContent) = 0;
 

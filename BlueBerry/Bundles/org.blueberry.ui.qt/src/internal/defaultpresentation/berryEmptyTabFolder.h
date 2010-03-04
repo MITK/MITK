@@ -53,6 +53,11 @@ public:
   AbstractTabItem* Add(int index, int flags);
 
   /* (non-Javadoc)
+   * @see org.blueberry.ui.internal.presentations.util.AbstractTabFolder#move(int, int)
+   */
+  void Move(int from, int to);
+
+  /* (non-Javadoc)
    * @see org.blueberry.ui.internal.presentations.util.AbstractTabFolder#getContentParent()
    */
   QWidget* GetContentParent();

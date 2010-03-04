@@ -64,40 +64,39 @@ std::vector<IPresentablePart::Pointer> LeftToRightTabOrder::GetPartList()
 }
 
 void LeftToRightTabOrder::RestoreState(IPresentationSerializer* serializer,
-    IMemento::Pointer  /*savedState*/)
+    IMemento::Pointer savedState)
 {
-  //TODO LeftToRightTabOrder restore state
-//  std::vector<IMemento::Pointer> parts = savedState->GetChildren(
-//      WorkbenchConstants::TAG_PART);
-//
-//  for (unsigned int idx = 0; idx < parts.size(); idx++)
-//  {
-//    std::string id = parts[idx]->GetString(WorkbenchConstants::TAG_ID);
-//
-//    if (id != "")
-//    {
-//      IPresentablePart::Pointer part = serializer->GetPart(id);
-//
-//      if (part != 0)
-//      {
-//        this->AddInitial(part);
-//      }
-//    }
-//  }
+  std::vector<IMemento::Pointer> parts = savedState->GetChildren(
+      WorkbenchConstants::TAG_PART);
+
+  for (std::size_t idx = 0; idx < parts.size(); idx++)
+  {
+    std::string id;
+    parts[idx]->GetString(WorkbenchConstants::TAG_ID, id);
+
+    if (!id.empty())
+    {
+      IPresentablePart::Pointer part = serializer->GetPart(id);
+
+      if (part)
+      {
+        this->AddInitial(part);
+      }
+    }
+  }
 }
 
 void LeftToRightTabOrder::SaveState(IPresentationSerializer* context,
-    IMemento::Pointer  /*memento*/)
+    IMemento::Pointer memento)
 {
-//TODO LeftToRightTabOrder save state
-//  std::vector<IPresentablePart::Pointer> parts(list->GetPartList());
-//
-//  for (std::vector<IPresentablePart::Pointer>::iterator iter = parts.begin();
-//       iter != parts.end(); ++iter)
-//  {
-//    IMemento::Pointer childMem = memento->CreateChild(WorkbenchConstants::TAG_PART);
-//    childMem->PutString(WorkbenchConstants::TAG_ID, context->GetId(*iter));
-//  }
+  std::vector<IPresentablePart::Pointer> parts(list->GetPartList());
+
+  for (std::vector<IPresentablePart::Pointer>::iterator iter = parts.begin();
+       iter != parts.end(); ++iter)
+  {
+    IMemento::Pointer childMem = memento->CreateChild(WorkbenchConstants::TAG_PART);
+    childMem->PutString(WorkbenchConstants::TAG_ID, context->GetId(*iter));
+  }
 }
 
 }

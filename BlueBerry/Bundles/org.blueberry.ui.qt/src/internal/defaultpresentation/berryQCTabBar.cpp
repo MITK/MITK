@@ -97,6 +97,23 @@ void QCTabBar::insertTab(int index, AbstractTabItem* item)
   QTabBar::insertTab(index, QString());
 }
 
+void QCTabBar::moveAbstractTab(int from, int to)
+{
+  AbstractTabItem* item = tabItemList[from];
+
+  if (to >= tabItemList.size()) --to;
+
+  std::deque<AbstractTabItem*>::iterator fromIter = tabItemList.begin();
+  std::advance(fromIter, from);
+  tabItemList.erase(fromIter);
+
+  std::deque<AbstractTabItem*>::iterator toIter = tabItemList.begin();
+  std::advance(toIter, to);
+  tabItemList.insert(toIter, item);
+
+  this->moveTab(from, to);
+}
+
 void QCTabBar::setCurrentTab(AbstractTabItem* item)
 {
   std::deque<AbstractTabItem*>::iterator iter = std::find(tabItemList.begin(), tabItemList.end(), item);

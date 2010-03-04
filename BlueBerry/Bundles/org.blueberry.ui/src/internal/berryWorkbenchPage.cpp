@@ -1265,7 +1265,7 @@ void WorkbenchPage::UpdateActivePart()
   if (!window->IsClosing())
   {
     // If an editor is active, try to keep an editor active
-    if (oldActivePart == oldActiveEditor)
+    if (oldActiveEditor && oldActivePart == oldActiveEditor)
     {
       newActiveEditor = activationList->GetActiveReference(true).Cast<
           IEditorReference> ();
@@ -1302,6 +1302,7 @@ void WorkbenchPage::UpdateActivePart()
 
   if (newActivePart != oldActivePart)
   {
+    BERRY_INFO << "########### Maing part " << newActivePart->GetId() << " active";
     this->MakeActive(newActivePart);
   }
 }

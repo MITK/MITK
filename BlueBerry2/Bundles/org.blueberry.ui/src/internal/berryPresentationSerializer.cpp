@@ -19,6 +19,7 @@
 
 #include <Poco/NumberParser.h>
 #include <algorithm>
+#include <sstream>
 
 namespace berry
 {
@@ -34,7 +35,9 @@ std::string PresentationSerializer::GetId(IPresentablePart::Pointer part)
 {
   std::size_t index = std::find(parts.begin(), parts.end(), part) - parts.begin();
 
-  return "" + index; //$NON-NLS-1$
+  std::stringstream ssId;
+  ssId << index;
+  return ssId.str();
 }
 
 IPresentablePart::Pointer PresentationSerializer::GetPart(const std::string& id)

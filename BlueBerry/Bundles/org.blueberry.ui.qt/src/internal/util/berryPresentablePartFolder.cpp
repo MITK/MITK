@@ -292,13 +292,15 @@ void PresentablePartFolder::Move(IPresentablePart::Pointer part, int newIndex)
     return;
   }
 
-  this->InternalRemove(part);
-  this->Insert(part, newIndex);
+  folder->Move(currentIndex, newIndex);
 
-  if (current == part)
-  {
-    folder->SetSelection(this->GetTab(part));
-  }
+  //this->InternalRemove(part);
+  //this->Insert(part, newIndex);
+
+  //if (current == part)
+  //{
+  //  folder->SetSelection(this->GetTab(part));
+  //}
 }
 
 std::size_t PresentablePartFolder::Size()

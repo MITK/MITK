@@ -58,6 +58,8 @@ public:
    */
   void insertTab(int index, AbstractTabItem* item);
 
+  void moveAbstractTab(int from, int to);
+
   void setCurrentTab(AbstractTabItem* item);
   AbstractTabItem* getCurrentTab();
 

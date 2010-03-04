@@ -195,6 +195,13 @@ AbstractTabItem* NativeTabFolder::Add(int index, int flags)
   return item;
 }
 
+void NativeTabFolder::Move(int from, int to)
+{
+  int tabCount = tabControl->count();
+  if (to > tabCount) to = tabCount;
+  tabControl->moveAbstractTab(from, to);
+}
+
 void NativeTabFolder::Layout(bool flushCache)
 {
   AbstractTabFolder::Layout(flushCache);

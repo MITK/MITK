@@ -253,27 +253,29 @@ void PartPane::Reparent(void* newParent)
 
 void PartPane::ShowFocus(bool inFocus)
 {
-  if (this->GetContainer().Cast<PartStack>() == 0)
-    return;
-
-  PartStack::Pointer stack = this->GetContainer().Cast<PartStack>();
-
   if (partReference.Lock().Cast<IViewReference>() != 0)
   {
     hasFocus = inFocus;
-    stack->SetActive(inFocus ? StackPresentation::AS_ACTIVE_FOCUS
-                            : StackPresentation::AS_INACTIVE);
   }
-  else if (partReference.Lock().Cast<IEditorReference>() != 0)
+
+  if (PartStack::Pointer stack = this->GetContainer().Cast<PartStack>())
   {
-    if (inFocus)
+    if (partReference.Lock().Cast<IViewReference>() != 0)
     {
-      page->GetEditorPresentation()->SetActiveWorkbook(stack, true);
+      stack->SetActive(inFocus ? StackPresentation::AS_ACTIVE_FOCUS
+                              : StackPresentation::AS_INACTIVE);
     }
-    else
+    else if (partReference.Lock().Cast<IEditorReference>() != 0)
     {
-      stack->SetActive(page->GetEditorPresentation()->GetActiveWorkbook() == stack ?
-          StackPresentation::AS_ACTIVE_NOFOCUS : StackPresentation::AS_INACTIVE);
+      if (inFocus)
+      {
+        page->GetEditorPresentation()->SetActiveWorkbook(stack, true);
+      }
+      else
+      {
+        stack->SetActive(page->GetEditorPresentation()->GetActiveWorkbook() == stack ?
+            StackPresentation::AS_ACTIVE_NOFOCUS : StackPresentation::AS_INACTIVE);
+      }
     }
   }
 }

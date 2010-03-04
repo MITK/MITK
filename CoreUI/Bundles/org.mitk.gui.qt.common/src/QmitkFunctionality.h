@@ -59,7 +59,7 @@ class QScrollArea;
 /// 7. Some minor important convenience methods (like changing the mouse cursor/exception handling)
 ///
 /// Please use the Activated/Deactivated method to add/remove interactors, disabling multiwidget crosshair or anything which may 
-/// "affect" other functionalities. For further reading please have a look at QmitkFunctionality::IsStandAloneFunctionality().
+/// "affect" other functionalities. For further reading please have a look at QmitkFunctionality::IsExclusiveFunctionality().
 ///
 class MITK_QT_COMMON QmitkFunctionality : public berry::QtViewPart, virtual public berry::ISelectionProvider
 {

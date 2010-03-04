@@ -321,7 +321,8 @@ QmitkStdMultiWidget* QmitkFunctionality::GetActiveStdMultiWidget()
   {
     mitk::DataStorageEditorInput::Pointer editorInput;
     editorInput = new mitk::DataStorageEditorInput();
-    berry::IEditorPart::Pointer editor = this->GetSite()->GetPage()->OpenEditor(editorInput, QmitkStdMultiWidgetEditor::EDITOR_ID);
+    // open a new multi-widget editor, but do not give it the focus
+    berry::IEditorPart::Pointer editor = this->GetSite()->GetPage()->OpenEditor(editorInput, QmitkStdMultiWidgetEditor::EDITOR_ID, false);
     activeStdMultiWidget = editor.Cast<QmitkStdMultiWidgetEditor>()->GetStdMultiWidget();
   }
 

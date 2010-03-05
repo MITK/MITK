@@ -98,6 +98,7 @@ int mitkDICOMLocaleTest(int /*argc*/, char* /*argv*/ [])
   StringList alllocales;
   alllocales.push_back("de_DE");
   alllocales.push_back("de_DE.utf8");
+  alllocales.push_back("de_DE.UTF8");
   alllocales.push_back("de_DE@euro");
   alllocales.push_back("German_Germany");
 

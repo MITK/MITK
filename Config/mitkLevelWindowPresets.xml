@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <mitkLevelWindowPresets FILE_VERSION="0.1" >
-   <preset NAME="Blood" LEVEL="50" WINDOW="40" />
-   <preset NAME="Intestine" LEVEL="25" WINDOW="30" />
+   <preset NAME="Blood" LEVEL="100" WINDOW="600" />
+   <preset NAME="Intestine" LEVEL="30" WINDOW="400" />
    <preset NAME="Fat" LEVEL="-130" WINDOW="200" />
-   <preset NAME="Urinary Bladder" LEVEL="30" WINDOW="20" />
-   <preset NAME="Heart" LEVEL="30" WINDOW="40" />
-   <preset NAME="Bones" LEVEL="1550" WINDOW="3000" />
-   <preset NAME="Liver" LEVEL="45" WINDOW="50" />
-   <preset NAME="Air" LEVEL="-1000" WINDOW="2" />
+   <preset NAME="Urinary Bladder" LEVEL="30" WINDOW="50" />
+   <preset NAME="Heart" LEVEL="200" WINDOW="600" />
+   <preset NAME="Bones" LEVEL="500" WINDOW="1000" />
+   <preset NAME="Liver" LEVEL="30" WINDOW="400" />
+   <preset NAME="Air" LEVEL="-700" WINDOW="600" />
    <preset NAME="Lung" LEVEL="-200" WINDOW="500" />
    <preset NAME="Mamma" LEVEL="-90" WINDOW="80" />
-   <preset NAME="Spleen" LEVEL="40" WINDOW="20" />
-   <preset NAME="Suprarenal Gland" LEVEL="12" WINDOW="16" />
-   <preset NAME="Kidney" LEVEL="42" WINDOW="16" />
-   <preset NAME="Pancreas" LEVEL="25" WINDOW="30" />
-   <preset NAME="Tumor" LEVEL="35" WINDOW="30" />
-   <preset NAME="Water" LEVEL="0" WINDOW="2" />
+   <preset NAME="Spleen" LEVEL="40" WINDOW="50" />
+   <preset NAME="Suprarenal Gland" LEVEL="12" WINDOW="50" />
+   <preset NAME="Kidney" LEVEL="40" WINDOW="300" />
+   <preset NAME="Pancreas" LEVEL="40" WINDOW="400" />
+   <preset NAME="Tumor" LEVEL="35" WINDOW="60" />
+   <preset NAME="Water" LEVEL="0" WINDOW="10" />
 </mitkLevelWindowPresets>

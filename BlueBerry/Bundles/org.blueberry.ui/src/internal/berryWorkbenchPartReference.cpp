@@ -22,7 +22,7 @@
 
 #include "berryWorkbenchPlugin.h"
 #include "berryUtil.h"
-#include "../berryPartPane.h"
+#include "berryPartPane.h"
 #include "../berryIWorkbenchPartSite.h"
 #include "../berryIEditorPart.h"
 #include "../berryIWorkbenchPartConstants.h"

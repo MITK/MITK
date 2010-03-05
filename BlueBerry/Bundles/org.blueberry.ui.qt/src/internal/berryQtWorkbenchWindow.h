@@ -19,7 +19,7 @@
 #ifndef BERRYQTWORKBENCHWINDOW_H_
 #define BERRYQTWORKBENCHWINDOW_H_
 
-#include <berryWorkbenchWindow.h>
+#include <internal/berryWorkbenchWindow.h>
 
 namespace berry {
 

@@ -31,7 +31,7 @@
 #include "berryPerspective.h"
 #include "berryPreferenceConstants.h"
 #include "../dialogs/berryMessageDialog.h"
-#include "../berryWorkbenchWindow.h"
+#include "berryWorkbenchWindow.h"
 #include "../berryImageDescriptor.h"
 #include "../berryDisplay.h"
 #include "../services/berryIServiceFactory.h"

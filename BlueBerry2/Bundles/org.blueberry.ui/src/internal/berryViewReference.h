@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "berryWorkbenchPartReference.h"
 #include "../berryIViewReference.h"
-#include "../berryPartPane.h"
+#include "berryPartPane.h"
 
 namespace berry {
 

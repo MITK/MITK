@@ -33,7 +33,7 @@
 #include "berryEditorManager.h"
 #include "berryViewFactory.h"
 
-#include "../berryPartPane.h"
+#include "berryPartPane.h"
 
 #include <list>
 

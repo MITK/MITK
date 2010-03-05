@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "../berryIEditorRegistry.h"
 #include "../berryUIException.h"
 
-#include "../berryWorkbenchWindow.h"
+#include "berryWorkbenchWindow.h"
 #include "berryWorkbenchPage.h"
 #include "berryEditorSite.h"
 #include "berryEditorReference.h"

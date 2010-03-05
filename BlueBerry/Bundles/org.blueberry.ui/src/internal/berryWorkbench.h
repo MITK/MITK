@@ -20,12 +20,12 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "../berryIViewPart.h"
 #include "../berryIWorkbench.h"
-#include "../berryWorkbenchWindow.h"
+#include "berryWorkbenchWindow.h"
 #include "../berryIWorkbenchPage.h"
 #include "../berryIWorkbenchPartReference.h"
 #include "../berryXMLMemento.h"
 
-#include "../berryPartPane.h"
+#include "berryPartPane.h"
 #include "berryEditorAreaHelper.h"
 #include "berryWindowManager.h"
 #include "berryWorkbenchConfigurer.h"

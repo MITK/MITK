@@ -20,7 +20,7 @@
 #include "../berryIWorkbenchPartConstants.h"
 #include "../berryISaveablePart.h"
 
-#include "../berryWorkbenchWindow.h"
+#include "berryWorkbenchWindow.h"
 
 #include "../tweaklets/berryGuiWidgetsTweaklet.h"
 

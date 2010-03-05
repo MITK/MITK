@@ -20,7 +20,7 @@
 #define BERRYLAYOUTHELPER_H_
 
 #include "berryViewFactory.h"
-#include "../berryPartPane.h"
+#include "berryPartPane.h"
 
 namespace berry {
 

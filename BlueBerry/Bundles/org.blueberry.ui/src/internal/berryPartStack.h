@@ -27,7 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "berryPresentationFactoryUtil.h"
 #include "berryAbstractDropTarget.h"
 
-#include "../berryPartPane.h"
+#include "berryPartPane.h"
 #include "../berryIMemento.h"
 
 #include "../presentations/berryIPresentationFactory.h"

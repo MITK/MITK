@@ -28,7 +28,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <berryPlatform.h>
 #include <berryPlatformUI.h>
-#include <berryWorkbenchWindow.h>
+
+#include <internal/berryWorkbenchWindow.h>
 
 namespace berry {
 

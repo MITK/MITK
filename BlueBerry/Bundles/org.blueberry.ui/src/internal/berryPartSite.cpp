@@ -20,7 +20,7 @@
 #include "../berryIWorkbenchPart.h"
 #include "../berryIWorkbenchPage.h"
 #include "../berryIWorkbenchWindow.h"
-#include "../berryPartPane.h"
+#include "berryPartPane.h"
 
 #include "../services/berryIServiceFactory.h"
 

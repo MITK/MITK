@@ -28,7 +28,7 @@
 
 #include "../berryWorkbenchPreferenceConstants.h"
 #include "../berryGeometry.h"
-#include "../berryPartPane.h"
+#include "berryPartPane.h"
 
 #include "../tweaklets/berryGuiWidgetsTweaklet.h"
 #include "../berryConstants.h"

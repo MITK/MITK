@@ -15,28 +15,29 @@
 
  =========================================================================*/
 
-#include "berryIWorkbenchPage.h"
 #include "berryWorkbenchWindow.h"
-#include "berryIPerspectiveDescriptor.h"
-#include "berryUIException.h"
-#include "berryConstants.h"
 
-#include "internal/intro/berryIntroConstants.h"
-#include "internal/berryWorkbenchPlugin.h"
-#include "internal/berryWorkbenchPage.h"
-#include "internal/berryWorkbench.h"
-#include "internal/berryWorkbenchConstants.h"
-#include "internal/berryPartSite.h"
-#include "internal/berryIServiceLocatorCreator.h"
+#include "../berryIWorkbenchPage.h"
+#include "../berryIPerspectiveDescriptor.h"
+#include "../berryUIException.h"
+#include "../berryConstants.h"
 
-#include "tweaklets/berryGuiWidgetsTweaklet.h"
-#include "tweaklets/berryWorkbenchTweaklet.h"
+#include "intro/berryIntroConstants.h"
+#include "berryWorkbenchPlugin.h"
+#include "berryWorkbenchPage.h"
+#include "berryWorkbench.h"
+#include "berryWorkbenchConstants.h"
+#include "berryPartSite.h"
+#include "berryIServiceLocatorCreator.h"
 
-#include "services/berryIServiceFactory.h"
+#include "../tweaklets/berryGuiWidgetsTweaklet.h"
+#include "../tweaklets/berryWorkbenchTweaklet.h"
 
-#include "berryPlatformUI.h"
+#include "../services/berryIServiceFactory.h"
 
-#include "berryDebugUtil.h"
+#include "../berryPlatformUI.h"
+
+#include "../berryDebugUtil.h"
 
 namespace berry
 {

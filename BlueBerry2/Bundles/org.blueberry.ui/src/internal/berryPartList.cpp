@@ -2,7 +2,7 @@
 
 #include "berrySaveablesList.h"
 
-#include "../berryPartPane.h"
+#include "berryPartPane.h"
 #include "../berryIWorkbenchPartConstants.h"
 #include "../berryIWorkbenchPartSite.h"
 

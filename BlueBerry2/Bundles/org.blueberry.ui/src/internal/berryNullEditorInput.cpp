@@ -16,7 +16,7 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include "berryNullEditorInput.h"
-#include "../berryPartPane.h"
+#include "berryPartPane.h"
 
 
 namespace berry

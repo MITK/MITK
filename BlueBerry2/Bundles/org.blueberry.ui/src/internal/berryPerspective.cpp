@@ -27,7 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "berryEditorAreaHelper.h"
 #include "intro/berryIntroConstants.h"
 #include "../dialogs/berryMessageDialog.h"
-#include "../berryWorkbenchWindow.h"
+#include "berryWorkbenchWindow.h"
 
 #include "../tweaklets/berryGuiWidgetsTweaklet.h"
 

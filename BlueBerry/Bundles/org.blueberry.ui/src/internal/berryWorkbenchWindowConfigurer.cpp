@@ -17,7 +17,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "berryWorkbenchWindowConfigurer.h"
 
-#include "../berryWorkbenchWindow.h"
+#include "berryWorkbenchWindow.h"
 #include "../berryImageDescriptor.h"
 #include "berryWorkbench.h"
 #include "berryWorkbenchPlugin.h"

@@ -17,15 +17,15 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "berryPartPane.h"
 
-#include "internal/berryWorkbenchPage.h"
-#include "internal/berryPartStack.h"
-#include "internal/berryEditorAreaHelper.h"
-#include "internal/berryPerspective.h"
-#include "internal/berryPartStack.h"
-#include "internal/berryDragUtil.h"
+#include "berryWorkbenchPage.h"
+#include "berryPartStack.h"
+#include "berryEditorAreaHelper.h"
+#include "berryPerspective.h"
+#include "berryPartStack.h"
+#include "berryDragUtil.h"
 
-#include "tweaklets/berryGuiWidgetsTweaklet.h"
-#include "tweaklets/berryWorkbenchPageTweaklet.h"
+#include "../tweaklets/berryGuiWidgetsTweaklet.h"
+#include "../tweaklets/berryWorkbenchPageTweaklet.h"
 
 namespace berry
 {

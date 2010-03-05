@@ -25,7 +25,6 @@ SET(SRC_CPP_FILES
   berryIWorkbenchListener.cpp
   berryIWorkbenchPage.cpp
   berryIWorkbenchPartConstants.cpp
-  berryPartPane.cpp
   berryPlatformUI.cpp
   berryPoint.cpp
   berryPropertyChangeEvent.cpp
@@ -41,7 +40,6 @@ SET(SRC_CPP_FILES
   berryWindow.cpp
   berryWorkbenchPart.cpp
   berryWorkbenchPreferenceConstants.cpp
-  berryWorkbenchWindow.cpp
   berryXMLMemento.cpp
   
   #application
@@ -165,6 +163,7 @@ SET(INTERNAL_CPP_FILES
   berryParameter.cpp
   berryParameterValueConverterProxy.cpp
   berryPartList.cpp
+  berryPartPane.cpp
   berryPartPlaceholder.cpp
   berryPartSashContainer.cpp
   berryPartService.cpp
@@ -214,6 +213,7 @@ SET(INTERNAL_CPP_FILES
   berryWorkbenchRegistryConstants.cpp
   berryWorkbenchServiceRegistry.cpp
   berryWorkbenchTestable.cpp
+  berryWorkbenchWindow.cpp
   berryWorkbenchWindowConfigurer.cpp
   berryWWinPartService.cpp
 )

@@ -38,10 +38,10 @@
 #include "../tweaklets/berryWorkbenchPageTweaklet.h"
 #include "../dialogs/berryMessageDialog.h"
 
-#include "../berryWorkbenchWindow.h"
+#include "berryWorkbenchWindow.h"
 #include "../berryUIException.h"
 #include "../berryPlatformUI.h"
-#include "../berryPartPane.h"
+#include "berryPartPane.h"
 #include "../berryImageDescriptor.h"
 
 #include <berryIExtensionPointService.h>

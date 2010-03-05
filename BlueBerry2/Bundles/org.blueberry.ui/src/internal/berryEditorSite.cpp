@@ -17,7 +17,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "berryEditorSite.h"
 
-#include "../berryPartPane.h"
+#include "berryPartPane.h"
 
 #include <cassert>
 

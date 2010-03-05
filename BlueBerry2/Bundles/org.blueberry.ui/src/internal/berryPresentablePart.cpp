@@ -18,7 +18,7 @@
 #include "berryPresentablePart.h"
 
 #include "../berryIWorkbenchPartConstants.h"
-#include "../berryPartPane.h"
+#include "berryPartPane.h"
 #include "berryWorkbenchPage.h"
 
 #include <osgi/framework/Objects.h>

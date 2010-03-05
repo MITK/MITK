@@ -21,7 +21,7 @@
 
 #include "berryStackablePart.h"
 
-#include "../berryPartPane.h"
+#include "berryPartPane.h"
 
 #include <list>
 

@@ -16,7 +16,7 @@
  =========================================================================*/
 
 #include "berryWorkbenchPagePartList.h"
-#include "../berryPartPane.h"
+#include "berryPartPane.h"
 #include "../berryImageDescriptor.h"
 
 namespace berry

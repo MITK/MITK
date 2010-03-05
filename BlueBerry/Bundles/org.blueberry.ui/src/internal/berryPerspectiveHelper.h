@@ -27,7 +27,7 @@
 #include "berryDetachedPlaceHolder.h"
 #include "berryIDragOverListener.h"
 #include "berryAbstractDropTarget.h"
-#include "../berryPartPane.h"
+#include "berryPartPane.h"
 
 namespace berry
 {

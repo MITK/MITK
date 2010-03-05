@@ -27,7 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "berryLayoutPart.h"
 #include "berryPageLayout.h"
 
-#include "../berryPartPane.h"
+#include "berryPartPane.h"
 #include "../berryIWorkbenchPartReference.h"
 #include "../berryIViewReference.h"
 #include "../berryIViewPart.h"

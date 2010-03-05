@@ -18,14 +18,13 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef BERRYPARTPANE_H_
 #define BERRYPARTPANE_H_
 
-#include "internal/berryWorkbenchPartReference.h"
-#include "internal/berryStackablePart.h"
+#include "berryWorkbenchPartReference.h"
+#include "berryStackablePart.h"
 
-#include "berryUiDll.h"
-#include "berryRectangle.h"
-#include "berryIPropertyChangeListener.h"
+#include "../berryRectangle.h"
+#include "../berryIPropertyChangeListener.h"
 
-#include "guitk/berryGuiTkIControlListener.h"
+#include "../guitk/berryGuiTkIControlListener.h"
 
 namespace berry {
 
@@ -38,9 +37,9 @@ struct IStackableContainer;
  * and editor panes.
  *
  */
-class BERRY_UI PartPane : public StackablePart,
-                           public IPropertyChangeListener,
-                           public GuiTk::IControlListener
+class PartPane : public StackablePart,
+                 public IPropertyChangeListener,
+                 public GuiTk::IControlListener
 {
 
 public:

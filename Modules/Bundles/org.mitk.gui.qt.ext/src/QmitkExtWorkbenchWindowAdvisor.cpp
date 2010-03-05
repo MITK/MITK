@@ -163,16 +163,16 @@ public:
       QListIterator<QAction*> i(windowAdvisor->viewActions);
       while (i.hasNext())
       {
-        i.next()->setEnabled(false);
+        i.next()->setEnabled(true);
       }
 
-      windowAdvisor->fileSaveProjectAction->setEnabled(false);
-      windowAdvisor->closeProjectAction->setEnabled(false);
-      windowAdvisor->undoAction->setEnabled(false);
-      windowAdvisor->redoAction->setEnabled(false);
-      windowAdvisor->imageNavigatorAction->setEnabled(false);
-      windowAdvisor->resetPerspAction->setEnabled(false);
-      windowAdvisor->closePerspAction->setEnabled(false);
+      windowAdvisor->fileSaveProjectAction->setEnabled(true);
+      windowAdvisor->closeProjectAction->setEnabled(true);
+      windowAdvisor->undoAction->setEnabled(true);
+      windowAdvisor->redoAction->setEnabled(true);
+      windowAdvisor->imageNavigatorAction->setEnabled(true);
+      windowAdvisor->resetPerspAction->setEnabled(true);
+      windowAdvisor->closePerspAction->setEnabled(true);
     }
 
     perspectivesClosed = false;

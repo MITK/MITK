@@ -50,13 +50,16 @@ class QScrollArea;
 /// \brief The base class of all MITK related blueberry views (~ in the old version of MITK, this was called "Functionality")
 ///
 /// QmitkFunctionality provides several convenience methods that eases the introduction of a new view:
-/// 1. Access to the DataStorage (~ the shared data repository)
-/// 2. Access to the StdMultiWidget (the 2x2 RenderWindow arrangement)
-/// 3. Access to and update notification for the functionality/view preferences
-/// 4. Access to and update notification for the current DataTreeNode selection / to DataTreeNode selection events send through the SelectionService
-/// 5. Methods to send DataTreeNode selections through the SelectionService
-/// 6. Some events for unproblematic inter-View communication (e.g. when to add/remove interactors)
-/// 7. Some minor important convenience methods (like changing the mouse cursor/exception handling)
+///
+/// <ol>
+///   <li> Access to the DataStorage (~ the shared data repository)
+///   <li> Access to the StdMultiWidget (the 2x2 RenderWindow arrangement)
+///   <li> Access to and update notification for the functionality/view preferences
+///   <li> Access to and update notification for the current DataTreeNode selection / to DataTreeNode selection events send through the SelectionService
+///   <li> Methods to send DataTreeNode selections through the SelectionService
+///   <li> Some events for unproblematic inter-View communication (e.g. when to add/remove interactors)
+///   <li> Some minor important convenience methods (like changing the mouse cursor/exception handling)
+/// </ol>
 ///
 /// Please use the Activated/Deactivated method to add/remove interactors, disabling multiwidget crosshair or anything which may 
 /// "affect" other functionalities. For further reading please have a look at QmitkFunctionality::IsExclusiveFunctionality().

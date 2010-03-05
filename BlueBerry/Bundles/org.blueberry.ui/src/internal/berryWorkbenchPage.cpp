@@ -1302,7 +1302,6 @@ void WorkbenchPage::UpdateActivePart()
 
   if (newActivePart != oldActivePart)
   {
-    BERRY_INFO << "########### Maing part " << newActivePart->GetId() << " active";
     this->MakeActive(newActivePart);
   }
 }

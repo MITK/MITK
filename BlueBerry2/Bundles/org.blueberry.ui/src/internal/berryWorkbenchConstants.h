@@ -20,13 +20,15 @@
 
 #include <string>
 
+#include "../berryUiDll.h"
+
 namespace berry
 {
 
 /**
  * General constants used by the workbench.
  */
-struct WorkbenchConstants
+struct BERRY_UI WorkbenchConstants
 {
 
   static const std::string DEFAULT_PRESENTATION_ID; // = "org.blueberry.ui.presentations.default"; //$NON-NLS-1$

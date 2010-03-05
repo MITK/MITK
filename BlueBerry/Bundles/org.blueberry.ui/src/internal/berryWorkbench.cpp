@@ -145,7 +145,7 @@ public:
 
     // Restore the saved state
     //final IStatus restoreResult = restoreState(memento);
-    bool restoreResult = workbench->RestoreState(memento);
+    /*bool restoreResult =*/ workbench->RestoreState(memento);
     input.close();
     //        if (restoreResult.getSeverity() == IStatus.ERROR) {
     //          StartupThreading
@@ -419,7 +419,8 @@ bool Workbench::RestoreState(IMemento::Pointer memento)
 
       // If we don't know how many plug-ins were loaded last time,
       // assume we are loading half of the installed plug-ins.
-      const std::size_t expectedProgressCount = std::max<std::size_t>(1,
+      /*const std::size_t expectedProgressCount =*/
+      std::max<std::size_t>(1,
           lastProgressCount == -1 ? WorkbenchPlugin::GetDefault()->GetBundleCount() / 2
           : lastProgressCount);
 
@@ -1449,7 +1450,7 @@ int Workbench::GetNewWindowNumber()
 {
   // Get window list.
   std::vector<Window::Pointer> windows = windowManager.GetWindows();
-  std::vector<Window::Pointer>::size_type count = windows.size();
+  int count = static_cast<int>(windows.size());
 
   // Create an array of booleans (size = window count).
   // Cross off every number found in the window list.

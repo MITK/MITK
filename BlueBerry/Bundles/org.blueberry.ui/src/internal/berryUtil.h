@@ -59,7 +59,7 @@ public:
       return adapter;
     }
 
-    if (IAdaptable* adaptable = dynamic_cast<IAdaptable*>(sourceObject.GetPointer()))
+    if (/*IAdaptable* adaptable =*/ dynamic_cast<IAdaptable*>(sourceObject.GetPointer()))
     {
       // TODO IAdaptable
       //            IAdaptable adaptable = (IAdaptable) sourceObject;

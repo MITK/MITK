@@ -141,7 +141,8 @@ void mitk::OpenCVVideoSource::UpdateVideoTexture()
   if(m_CurrentVideoTexture == NULL)
     m_CurrentVideoTexture = new unsigned char[m_CaptureWidth*m_CaptureHeight*3];
 
-  if(m_UndistortImage)
+  // only undistort if not paused
+  if(m_UndistortImage && !m_CapturePaused)
     m_UndistortCameraImage->UndistortImageFast(m_CurrentImage, 0);
 
   
@@ -216,6 +217,11 @@ void mitk::OpenCVVideoSource::PauseCapturing()
 {
   m_CapturePaused = !m_CapturePaused;
   m_PauseImage = cvCloneImage(m_CurrentImage);
+
+  // undistort this pause image if necessary
+  if(m_UndistortImage)
+    m_UndistortCameraImage->UndistortImageFast(m_CurrentImage, 0);
+    
 }
 
 void mitk::OpenCVVideoSource::EnableOnlineImageUndistortion(mitk::Point3D focal, mitk::Point3D principal, mitk::Point4D distortion)

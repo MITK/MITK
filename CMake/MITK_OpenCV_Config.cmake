@@ -10,7 +10,8 @@ SET(OpenCV_INCLUDE_DIRS "${OpenCV_OpenCV_SOURCE_DIR}/include" "${OpenCV_OpenCV_S
 	
 LIST(APPEND ALL_INCLUDE_DIRECTORIES ${OpenCV_INCLUDE_DIRS})
 LIST(APPEND ALL_LIBRARIES ${OpenCV_LIBS})
-link_directories(${OpenCV_LIB_DIR})
+# adding release directory for fixing error with RelWitgDebInfo
+link_directories(${OpenCV_LIB_DIR} "${OpenCV_LIB_DIR}/Release")
 ELSE(OPENCV_DIR)
 MESSAGE(STATUS "Warning: OpenCVConfig.cmake not found. Please set OPENCV_DIR manually to guide search.")
 #SET(OPENCV_DIR CACHE PATH "Set the directory containing OpenCVConfig.cmake")

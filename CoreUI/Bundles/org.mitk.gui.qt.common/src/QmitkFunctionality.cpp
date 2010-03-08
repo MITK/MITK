@@ -173,22 +173,24 @@ void QmitkFunctionality::ClosePartProxy()
 
   berry::IBerryPreferences::Pointer prefs = this->GetPreferences().Cast<berry::IBerryPreferences>();
   if(prefs.IsNotNull())
+  {
     prefs->OnChanged.RemoveListener(berry::MessageDelegate1<QmitkFunctionality
     , const berry::IBerryPreferences*>(this, &QmitkFunctionality::OnPreferencesChanged));
+    // flush the preferences here (disabled, everyone should flush them by themselves at the right moment)
+    // prefs->Flush();
+  }
 
   berry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
   if(s)
   {
     s->RemovePostSelectionListener(m_BlueBerrySelectionListener);
   }
-  this->ClosePart();
+
+    this->ClosePart();
 }
 
 QmitkFunctionality::~QmitkFunctionality()
 {
-  this->Register();
-
-  this->UnRegister(false);
 }
 
 std::vector<mitk::DataTreeNode*> QmitkFunctionality::GetDataManagerSelection()

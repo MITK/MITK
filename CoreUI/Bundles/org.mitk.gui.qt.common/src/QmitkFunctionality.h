@@ -124,8 +124,8 @@ public:
   ///
   virtual void StdMultiWidgetNotAvailable();
   ///
-  /// Only called when IsStandAloneFunctionality() returns true.
-  /// \see IsStandAloneFunctionality()
+  /// Only called when IsExclusiveFunctionality() returns true.
+  /// \see IsExclusiveFunctionality()
   ///
   virtual void Activated();
   ///
@@ -133,8 +133,8 @@ public:
   ///
   bool IsActivated() const;
   ///
-  /// Only called when IsStandAloneFunctionality() returns true.
-  /// \see IsStandAloneFunctionality()
+  /// Only called when IsExclusiveFunctionality() returns true.
+  /// \see IsExclusiveFunctionality()
   ///
   virtual void Deactivated();
   ///
@@ -147,7 +147,7 @@ public:
   /// but as there can be several functionalities visible at the same time the behaviour concerning 
   /// when Activated() and Deactivated() are called:
   ///
-  /// 1. Activated() and Deactivated() are only called if IsStandAloneFunctionality() returns true 
+  /// 1. Activated() and Deactivated() are only called if IsExclusiveFunctionality() returns true 
   ///
   /// 2. If only one standalone functionality is or becomes visible, Activated() will be called on that functionality
   ///
@@ -156,7 +156,7 @@ public:
   ///    on the one that looses focus, gets hidden or closed
   ///
   ///
-  /// As a consequence of 1. if you overwrite IsStandAloneFunctionality() and let it return false, you
+  /// As a consequence of 1. if you overwrite IsExclusiveFunctionality() and let it return false, you
   /// signalize the MITK Workbench that this functionality does nothing to the "default configuration"
   /// and can easily be visible while other functionalities are also visible.
   ///
@@ -174,7 +174,7 @@ public:
   ///
   virtual void FireNodesSelected(std::vector<mitk::DataTreeNode::Pointer> nodes);
   ///
-  /// Called when this functionality becomes visible ( no matter what IsStandAloneFunctionality() returns )
+  /// Called when this functionality becomes visible ( no matter what IsExclusiveFunctionality() returns )
   ///
   virtual void Visible();
   ///
@@ -182,7 +182,7 @@ public:
   ///
   bool IsVisible() const;
   ///
-  /// Called when this functionality is hidden ( no matter what IsStandAloneFunctionality() returns )
+  /// Called when this functionality is hidden ( no matter what IsExclusiveFunctionality() returns )
   ///
   virtual void Hidden();
 //# protected virtual methods which can be overwritten
@@ -325,6 +325,9 @@ public:
   virtual void SetSelection(berry::ISelection::Pointer selection);
   ///
   /// Called, when the WorkbenchPart gets closed for removing event listeners
+  /// Internally this method calls ClosePart after it removed the listeners registered
+  /// by QmitkFunctionality. By having this proxy method the user does not have to
+  /// call QmitkFunctionality::ClosePart() when overwriting ClosePart()
   ///
   void ClosePartProxy();
 

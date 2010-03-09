@@ -15,6 +15,10 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
+// Blueberry
+#include <berryISelectionService.h>
+#include <berryIWorkbenchWindow.h>
+
 // MITK
 #include "mitkImageAccessByItk.h"
 #include "mitkITKImageImport.h"

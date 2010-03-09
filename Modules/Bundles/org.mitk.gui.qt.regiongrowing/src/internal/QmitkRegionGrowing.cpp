@@ -15,10 +15,6 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
-// BlueBerry
-#include <berryISelectionService.h>
-#include <berryIWorkbenchWindow.h>
-
 // MITK
 #include "mitkImageAccessByItk.h"
 #include "mitkITKImageImport.h"
@@ -44,21 +40,6 @@ QmitkRegionGrowing::QmitkRegionGrowing()
 , m_MultiWidget( NULL )
 {
 }
-
-
-QmitkRegionGrowing::~QmitkRegionGrowing()
-{
-  // if a selection listener was registered, unregister it
-  if ( m_SelectionListener.IsNotNull() )
-  {
-    berry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
-    if ( s )
-    {
-      s->RemoveSelectionListener(m_SelectionListener);
-    }
-  }
-}
-
 
 void QmitkRegionGrowing::CreateQtPartControl( QWidget *parent )
 {
@@ -89,20 +70,9 @@ void QmitkRegionGrowing::CreateQtPartControl( QWidget *parent )
     // tell the GUI widget about out point set
     m_Controls->lstPoints->SetPointSetNode( m_PointSetNode );
   
-    // observe BlueBerry selection events (mainly from DataManager)
-    m_SelectionListener = berry::ISelectionListener::Pointer(
-            new berry::SelectionChangedAdapter<QmitkRegionGrowing>( this, &QmitkRegionGrowing::SelectionChanged )
-            );
-
-    berry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
-    if ( s )
-    {
-      s->AddSelectionListener(m_SelectionListener);
-    }
-
     // pull selection from BlueBerry service
     // (this is necessary in cases where something is selected before this view is created)
-    UpdateFromCurrentDataManagerSelection();
+    OnSelectionChanged( this->GetDataManagerSelection() );
   }
 }
 
@@ -120,46 +90,33 @@ void QmitkRegionGrowing::StdMultiWidgetNotAvailable()
 }
 
 
-void QmitkRegionGrowing::UpdateFromCurrentDataManagerSelection()
-{
-  //MITK_INFO << "Update selection from DataManager";
-  berry::ISelection::ConstPointer selection( this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection("org.mitk.views.datamanager"));
-  this->SelectionChanged(berry::SmartPointer<IWorkbenchPart>(NULL), selection);
-}
-
-
-void QmitkRegionGrowing::SelectionChanged( berry::IWorkbenchPart::Pointer, berry::ISelection::ConstPointer berrySelection )
+void QmitkRegionGrowing::OnSelectionChanged( std::vector<mitk::DataTreeNode*> nodes )
 { 
-  // only check selection of DataTreeNodes
-  mitk::DataTreeNodeSelection::ConstPointer selection  = berrySelection.Cast<const mitk::DataTreeNodeSelection>();
-
-  if(selection.IsNotNull())
+  // iterate all selected objects, adjust warning visibility
+  for( std::vector<mitk::DataTreeNode*>::iterator it = nodes.begin();
+       it != nodes.end();
+       ++it )
   {
-    // iterate all selected objects
-    for( mitk::DataTreeNodeSelection::iterator it = selection->Begin();
-         it != selection->End();
-         ++it )
+    mitk::DataTreeNode::Pointer node = *it;
+  
+    if( node.IsNotNull() && dynamic_cast<mitk::Image*>(node->GetData()) )
     {
-      if ( mitk::DataTreeNodeObject* nodeObject = dynamic_cast<mitk::DataTreeNodeObject*>((*it).GetPointer()) )
-      {
-        mitk::DataTreeNode::Pointer node = nodeObject->GetDataTreeNode();
-      
-        if( node.IsNotNull() && dynamic_cast<mitk::Image*>(node->GetData()) )
-        {
-          m_SelectedNode = nodeObject->GetDataTreeNode();
-          break;
-        }
-      }
+      m_Controls->lblWarning->setVisible( false );
+      return;
     }
-
-    m_Controls->lblWarning->setVisible( m_SelectedNode.IsNotNull() );
   }
+
+  m_Controls->lblWarning->setVisible( true );
 }
 
 
 void QmitkRegionGrowing::DoRegionGrowing()
 {
-  mitk::DataTreeNode* node = m_SelectedNode;
+  std::vector<mitk::DataTreeNode*> nodes = this->GetDataManagerSelection();
+  if (nodes.empty()) return;
+
+  mitk::DataTreeNode* node = nodes.front();
+
   if (!node)
   {
     // Nothing selected. Inform the user and return

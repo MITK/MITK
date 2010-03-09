@@ -18,8 +18,6 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef QmitkRegionGrowing_h
 #define QmitkRegionGrowing_h
 
-#include <berryISelectionListener.h>
-
 #include "QmitkFunctionality.h"
 
 #include "mitkPointSet.h"
@@ -51,14 +49,11 @@ class QmitkRegionGrowing : public QObject, public QmitkFunctionality
   public:  
 
     QmitkRegionGrowing();
-    virtual ~QmitkRegionGrowing();
 
     virtual void CreateQtPartControl(QWidget *parent);
 
     virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget);
     virtual void StdMultiWidgetNotAvailable();
-
-    void SelectionChanged( berry::IWorkbenchPart::Pointer, berry::ISelection::ConstPointer selection );
 
   protected slots:
   
@@ -75,7 +70,8 @@ class QmitkRegionGrowing : public QObject, public QmitkFunctionality
     template < typename TPixel, unsigned int VImageDimension >
     void ItkImageProcessing( itk::Image< TPixel, VImageDimension >* itkImage, mitk::Geometry3D* imageGeometry );
 
-    void UpdateFromCurrentDataManagerSelection();
+    /// \brief called by QmitkFunctionality when DataManager's selection has changed
+    virtual void OnSelectionChanged( std::vector<mitk::DataTreeNode*> nodes );
 
     /// \brief This node is created once and used for storing seed points
     mitk::DataTreeNode::Pointer m_PointSetNode;
@@ -88,16 +84,6 @@ class QmitkRegionGrowing : public QObject, public QmitkFunctionality
     Ui::QmitkRegionGrowingControls* m_Controls;
 
     QmitkStdMultiWidget* m_MultiWidget;
-
-    ///
-    /// A selection listener for datatreenode events
-    ///
-    berry::ISelectionListener::Pointer m_SelectionListener;
-  
-  private:
-
-    mitk::WeakPointer<mitk::DataTreeNode> m_SelectedNode;
-
 };
 
 #endif // !defined(QmitkRegionGrowing_h)

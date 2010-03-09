@@ -1,5 +1,4 @@
-/*=========================================================================
-
+/*========================================================================= 
 Program:   Medical Imaging & Interaction Toolkit
 Language:  C++
 Date:      $Date$
@@ -17,6 +16,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #ifndef QmitkRegionGrowing_h
 #define QmitkRegionGrowing_h
+
+#include <berryISelectionListener.h>
 
 #include "QmitkFunctionality.h"
 

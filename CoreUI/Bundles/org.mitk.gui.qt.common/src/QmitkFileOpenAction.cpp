@@ -120,6 +120,16 @@ void QmitkFileOpenAction::Run()
     dataStorage = multiWidgetEditor->GetEditorInput().Cast<mitk::DataStorageEditorInput>()->GetDataStorageReference()->GetDataStorage();
   }
 
+  if (multiWidgetEditor.IsNull())
+  {
+    berry::IEditorPart::Pointer editor = m_Window->GetActivePage()->OpenEditor(editorInput, QmitkStdMultiWidgetEditor::EDITOR_ID);
+    multiWidgetEditor = editor.Cast<QmitkStdMultiWidgetEditor>();
+  }
+  else
+  {
+    multiWidgetEditor->GetStdMultiWidget()->RequestUpdate();
+  }
+
   bool dsmodified = false;
   for (QStringList::Iterator fileName = fileNames.begin();
     fileName != fileNames.end(); ++fileName)
@@ -148,15 +158,6 @@ void QmitkFileOpenAction::Run()
 
   }
   
-  if (multiWidgetEditor.IsNull())
-  {
-    berry::IEditorPart::Pointer editor = m_Window->GetActivePage()->OpenEditor(editorInput, QmitkStdMultiWidgetEditor::EDITOR_ID);
-    multiWidgetEditor = editor.Cast<QmitkStdMultiWidgetEditor>();
-  }
-  else
-  {
-    multiWidgetEditor->GetStdMultiWidget()->RequestUpdate();
-  }
 
   if(dsmodified)
   {

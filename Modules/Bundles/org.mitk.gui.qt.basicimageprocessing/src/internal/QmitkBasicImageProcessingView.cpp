@@ -149,12 +149,6 @@ void QmitkBasicImageProcessing::CreateQtPartControl(QWidget *parent)
     m_Controls->m_ImageSelector2->SetDataStorage(this->GetDefaultDataStorage());
     m_Controls->m_ImageSelector2->SetPredicate(mitk::NodePredicateDataType::New("Image"));
   }
-  m_SelectionListener = new berry::SelectionChangedAdapter<QmitkBasicImageProcessing>
-    (this, &QmitkBasicImageProcessing::SelectionChanged);
-  berry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
-  if(s)
-    s->AddSelectionListener(m_SelectionListener);
-
   m_Controls->gbTwoImageOps->hide();
 }
 
@@ -181,10 +175,12 @@ void QmitkBasicImageProcessing::Activated()
   QmitkFunctionality::Activated();
 }
 
-void QmitkBasicImageProcessing::SelectionChanged( berry::IWorkbenchPart::Pointer, berry::ISelection::ConstPointer selection )
+//datamanager selection changed
+void QmitkBasicImageProcessing::OnSelectionChanged(std::vector<mitk::DataTreeNode*> nodes)
 {
-  if ( selection == NULL) return;
-
+  //any nodes there?
+  if (!nodes.empty())
+  {
   // reset GUI
   this->ResetOneImageOpPanel();
   m_Controls->sliceNavigatorTime->setEnabled(false);
@@ -194,30 +190,27 @@ void QmitkBasicImageProcessing::SelectionChanged( berry::IWorkbenchPart::Pointer
   m_Controls->tlWhat2->setEnabled(false);
   m_Controls->cbWhat2->setEnabled(false);
 
-  mitk::DataTreeNodeSelection::ConstPointer dtns 
-    = selection.Cast<const mitk::DataTreeNodeSelection>();
+  //get the selected Node
+  m_SelectedImageNode = nodes.front();
 
-  if(dtns.IsNotNull() && !(dtns->IsEmpty()) )
-  {
-    mitk::DataTreeNodeObject* dtno = 
-      dynamic_cast<mitk::DataTreeNodeObject*>( dtns->GetFirstElement().GetPointer() ) ;
+  //try to cast to image
+  mitk::Image::Pointer tempImage = dynamic_cast<mitk::Image*>(m_SelectedImageNode->GetData());
 
-    m_SelectedImageNode = dtno->GetDataTreeNode();
-
-    mitk::Image::Pointer tempImage = dynamic_cast<mitk::Image*>(m_SelectedImageNode->GetData());
-
+    //no image
     if( tempImage.IsNull() || (tempImage->IsInitialized() == false) ) 
     {
       m_Controls->leImage1->setText("Not an image.");
       return;
     }
 
+    //2D image
     if( tempImage->GetDimension() < 3)
     {
       m_Controls->leImage1->setText("2D images are not supported.");
       return;
     }
 
+    //image
     m_Controls->leImage1->setText(QString(m_SelectedImageNode->GetName().c_str()));
 
     // button coding

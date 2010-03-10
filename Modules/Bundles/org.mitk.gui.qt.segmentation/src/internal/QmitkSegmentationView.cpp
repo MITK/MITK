@@ -619,10 +619,16 @@ void QmitkSegmentationView::ApplyDisplayOptions(mitk::DataTreeNode* node)
 {
   if (!node) return;
 
-  node->SetProperty( "outline binary", mitk::BoolProperty::New( m_SegmentationPreferencesNode->GetBool("draw outline", true)) );
-  node->SetProperty( "outline width", mitk::FloatProperty::New( 2.0 ) );
-  node->SetProperty( "opacity", mitk::FloatProperty::New( m_SegmentationPreferencesNode->GetBool("draw outline", true) ? 1.0 : 0.3 ) );
-  node->SetProperty( "volumerendering", mitk::BoolProperty::New( m_SegmentationPreferencesNode->GetBool("volume rendering", false) ) );
+  bool isBinary(false);
+  node->GetPropertyValue("binary", isBinary);
+
+  if (isBinary)
+  {
+    node->SetProperty( "outline binary", mitk::BoolProperty::New( m_SegmentationPreferencesNode->GetBool("draw outline", true)) );
+    node->SetProperty( "outline width", mitk::FloatProperty::New( 2.0 ) );
+    node->SetProperty( "opacity", mitk::FloatProperty::New( m_SegmentationPreferencesNode->GetBool("draw outline", true) ? 1.0 : 0.3 ) );
+    node->SetProperty( "volumerendering", mitk::BoolProperty::New( m_SegmentationPreferencesNode->GetBool("volume rendering", false) ) );
+  }
 }
 
 void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)

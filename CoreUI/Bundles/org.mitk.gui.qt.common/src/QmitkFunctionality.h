@@ -168,11 +168,11 @@ public:
   ///
   /// Informs other parts of the workbench that node is selected via the blueberry selection service.
   ///
-  virtual void FireNodeSelected(mitk::DataTreeNode::Pointer node);
+  void FireNodeSelected(mitk::DataTreeNode::Pointer node);
   ///
   /// Informs other parts of the workbench that the nodes are selected via the blueberry selection service.
   ///
-  virtual void FireNodesSelected(std::vector<mitk::DataTreeNode::Pointer> nodes);
+  void FireNodesSelected(std::vector<mitk::DataTreeNode::Pointer> nodes);
   ///
   /// Called when this functionality becomes visible ( no matter what IsExclusiveFunctionality() returns )
   ///
@@ -208,10 +208,15 @@ protected:
   ///
   virtual void DataStorageChanged();
   ///
+  /// \return the selection of the currently active part of the workbench or an empty vector
+  ///         if nothing is selected
+  ///    
+  std::vector<mitk::DataTreeNode*> GetCurrentSelection() const;
+  ///
   /// Returns the current selection made in the datamanager bundle or an empty vector
   /// if nothing`s selected or if the bundle does not exist
   ///
-  virtual std::vector<mitk::DataTreeNode*> GetDataManagerSelection();
+  std::vector<mitk::DataTreeNode*> GetDataManagerSelection() const;
   ///
   /// Returns the Preferences object for this Functionality.
   /// <b>Important</b>: When refering to this preferences, e.g. in a PreferencePage: The ID
@@ -349,8 +354,8 @@ protected:
   ///
   /// Converts a mitk::DataTreeNodeSelection to a std::vector<mitk::DataTreeNode*> (possibly empty
   ///
-  std::vector<mitk::DataTreeNode*> DataTreeNodeSelectionToVector(mitk::DataTreeNodeSelection::ConstPointer currentSelection);
-//# protected fields
+  std::vector<mitk::DataTreeNode*> DataTreeNodeSelectionToVector(mitk::DataTreeNodeSelection::ConstPointer currentSelection) const;
+  //# protected fields
 protected:
   /// 
   /// helper stuff to observe BlueBerry selections

@@ -193,7 +193,15 @@ QmitkFunctionality::~QmitkFunctionality()
 {
 }
 
-std::vector<mitk::DataTreeNode*> QmitkFunctionality::GetDataManagerSelection()
+std::vector<mitk::DataTreeNode*> QmitkFunctionality::GetCurrentSelection() const
+{
+  berry::ISelection::ConstPointer selection( this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection());
+  // buffer for the data manager selection
+  mitk::DataTreeNodeSelection::ConstPointer currentSelection = selection.Cast<const mitk::DataTreeNodeSelection>();
+  return this->DataTreeNodeSelectionToVector(currentSelection);
+}
+
+std::vector<mitk::DataTreeNode*> QmitkFunctionality::GetDataManagerSelection() const
 {
   berry::ISelection::ConstPointer selection( this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection("org.mitk.views.datamanager"));
     // buffer for the data manager selection
@@ -220,7 +228,7 @@ void QmitkFunctionality::BlueBerrySelectionChanged(berry::IWorkbenchPart::Pointe
 }
 
 
-std::vector<mitk::DataTreeNode*> QmitkFunctionality::DataTreeNodeSelectionToVector(mitk::DataTreeNodeSelection::ConstPointer currentSelection)
+std::vector<mitk::DataTreeNode*> QmitkFunctionality::DataTreeNodeSelectionToVector(mitk::DataTreeNodeSelection::ConstPointer currentSelection) const
 {
 
   std::vector<mitk::DataTreeNode*> selectedNodes;

@@ -31,6 +31,11 @@ PURPOSE.  See the above copyright notices for more information.
 #include "Poco/File.h"
 #include "Poco/TemporaryFile.h"
 
+#ifndef WIN32
+  #include <ulimit.h>
+  #include <errno.h>
+#endif 
+
 class SceneIOTestClass
 {
   public:
@@ -210,62 +215,78 @@ int mitkSceneIOTest(int /* argc */, char* /*argv*/[])
   MITK_TEST_BEGIN("SceneIO")
 
   itk::ObjectFactoryBase::RegisterFactory(mitk::CoreObjectFactory::New());
-  
-  mitk::SceneIO::Pointer sceneIO = mitk::SceneIO::New();
-  MITK_TEST_CONDITION_REQUIRED(sceneIO.IsNotNull(),"SceneIO instantiation") 
-  
-  mitk::DataStorage::Pointer storage = mitk::StandaloneDataStorage::New().GetPointer();
-  MITK_TEST_CONDITION_REQUIRED(storage.IsNotNull(),"StandaloneDataStorage instantiation");
 
-  SceneIOTestClass::FillStorage(storage);
-
-  std::string  sceneFileName = Poco::Path::temp() + /*Poco::Path::separator() +*/ "scene.zip";
-  MITK_TEST_CONDITION_REQUIRED( sceneIO->SaveScene( storage->GetAll(), storage, sceneFileName), "Saving scene file '" << sceneFileName << "'");
-
-  mitk::SceneIO::FailedBaseDataListType::ConstPointer failedNodes = sceneIO->GetFailedNodes();
-  if (failedNodes.IsNotNull())
+  for (unsigned int i = 0; i < 1; ++i) // TODO change to " < 2" to check cases where file system would be full
   {
-    MITK_TEST_OUTPUT( << "The following nodes could not be serialized:");
-    for ( mitk::SceneIO::FailedBaseDataListType::const_iterator iter = failedNodes->begin();
-          iter != failedNodes->end();
-          ++iter )
+    if (i == 1)
     {
-      MITK_TEST_OUTPUT_NO_ENDL( << " - ");
-      if ( mitk::BaseData* data =(*iter)->GetData() )
-      {
-        MITK_TEST_OUTPUT_NO_ENDL( << data->GetNameOfClass());
-      }
-      else
-      {
-        MITK_TEST_OUTPUT_NO_ENDL( << "(NULL)");
-      }
-
-      MITK_TEST_OUTPUT( << " contained in node '" << (*iter)->GetName() << "'");
-      // \TODO: should we fail the test case if failed properties exist?
+      // call ulimit and restrict maximum file size to something small
+      #ifndef WIN32
+        errno = 0;
+        long int value = ulimit(UL_SETFSIZE, 1);
+        MITK_TEST_CONDITION_REQUIRED( value != -1, "ulimit() returned with errno = " << errno );
+      #else
+        continue;
+      #endif
     }
-  }
 
-  mitk::PropertyList::ConstPointer failedProperties = sceneIO->GetFailedProperties();
-  if (failedProperties.IsNotNull())
-  {
-    std::cout << "The following properties could not be serialized:" << std::endl;
-    const mitk::PropertyList::PropertyMap* propmap = failedProperties->GetMap();
-    for ( mitk::PropertyList::PropertyMap::const_iterator iter = propmap->begin();
-          iter != propmap->end();
-          ++iter )
+  
+    mitk::SceneIO::Pointer sceneIO = mitk::SceneIO::New();
+    MITK_TEST_CONDITION_REQUIRED(sceneIO.IsNotNull(),"SceneIO instantiation") 
+    
+    mitk::DataStorage::Pointer storage = mitk::StandaloneDataStorage::New().GetPointer();
+    MITK_TEST_CONDITION_REQUIRED(storage.IsNotNull(),"StandaloneDataStorage instantiation");
+
+    SceneIOTestClass::FillStorage(storage);
+
+    std::string  sceneFileName = Poco::Path::temp() + /*Poco::Path::separator() +*/ "scene.zip";
+    MITK_TEST_CONDITION_REQUIRED( sceneIO->SaveScene( storage->GetAll(), storage, sceneFileName), "Saving scene file '" << sceneFileName << "'");
+
+    mitk::SceneIO::FailedBaseDataListType::ConstPointer failedNodes = sceneIO->GetFailedNodes();
+    if (failedNodes.IsNotNull())
     {
-      MITK_TEST_OUTPUT( << " - " << iter->second.first->GetNameOfClass() << " associated to key '" << iter->first << "'");
-      // \TODO: should we fail the test case if failed properties exist?
+      MITK_TEST_OUTPUT( << "The following nodes could not be serialized:");
+      for ( mitk::SceneIO::FailedBaseDataListType::const_iterator iter = failedNodes->begin();
+            iter != failedNodes->end();
+            ++iter )
+      {
+        MITK_TEST_OUTPUT_NO_ENDL( << " - ");
+        if ( mitk::BaseData* data =(*iter)->GetData() )
+        {
+          MITK_TEST_OUTPUT_NO_ENDL( << data->GetNameOfClass());
+        }
+        else
+        {
+          MITK_TEST_OUTPUT_NO_ENDL( << "(NULL)");
+        }
+
+        MITK_TEST_OUTPUT( << " contained in node '" << (*iter)->GetName() << "'");
+        // \TODO: should we fail the test case if failed properties exist?
+      }
     }
+
+    mitk::PropertyList::ConstPointer failedProperties = sceneIO->GetFailedProperties();
+    if (failedProperties.IsNotNull())
+    {
+      std::cout << "The following properties could not be serialized:" << std::endl;
+      const mitk::PropertyList::PropertyMap* propmap = failedProperties->GetMap();
+      for ( mitk::PropertyList::PropertyMap::const_iterator iter = propmap->begin();
+            iter != propmap->end();
+            ++iter )
+      {
+        MITK_TEST_OUTPUT( << " - " << iter->second.first->GetNameOfClass() << " associated to key '" << iter->first << "'");
+        // \TODO: should we fail the test case if failed properties exist?
+      }
+    }
+
+    //Now do the loading part
+    sceneIO = mitk::SceneIO::New();
+
+    //Load scene into the datastorage and clean the DS first
+    storage = sceneIO->LoadScene(sceneFileName,storage,true);
+    SceneIOTestClass::VerifyStorage(storage);
+  
   }
-
-  //Now do the loading part
-  sceneIO = mitk::SceneIO::New();
-
-  //Load scene into the datastorage and clean the DS first
-  storage = sceneIO->LoadScene(sceneFileName,storage,true);
-  SceneIOTestClass::VerifyStorage(storage);
-
 
   MITK_TEST_END()
 }

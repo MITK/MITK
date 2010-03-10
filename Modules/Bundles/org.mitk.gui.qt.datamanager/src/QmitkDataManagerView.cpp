@@ -285,7 +285,7 @@ void QmitkDataManagerView::NodeTableViewContextMenuRequested( const QPoint & pos
   {
     m_NodeMenu->clear();
     QList<QAction*> actions;
-    if(selectedNodes.size() == 1)
+    if(selectedNodes.size() == 1 )
     {
       actions = QmitkNodeDescriptorManager::GetInstance()->GetActions(node);
 
@@ -372,7 +372,7 @@ void QmitkDataManagerView::TextureInterpolationChanged()
   mitk::DataTreeNode* node = m_NodeTreeModel->GetNode(m_NodeTreeView->selectionModel()->currentIndex());
   if(node)
   {
-    bool textureInterpolation;
+    bool textureInterpolation = false;
     node->GetBoolProperty("texture interpolation", textureInterpolation);
     m_TextureInterpolation->setChecked(textureInterpolation);
   }

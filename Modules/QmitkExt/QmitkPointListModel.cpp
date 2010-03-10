@@ -202,16 +202,19 @@ bool QmitkPointListModel::GetPointForModelIndex( const QModelIndex &index, mitk:
   for (int i = 0; i < index.row(); ++i)
   {
     ++it;
+  
     if (it == m_PointSet->GetPointSet(m_TimeStep)->GetPoints()->End())
       return false;
 
   }
+
   if (it != m_PointSet->GetPointSet(m_TimeStep)->GetPoints()->End()) // not at the end, 
   {
     p = it->Value();
     id = it->Index();
     return true;
   }
+
   return false;
 }
 
@@ -226,17 +229,17 @@ bool QmitkPointListModel::GetModelIndexForPointID(mitk::PointSet::PointIdentifie
     return false;
 
   unsigned int idx = 0;
-  for (mitk::PointSet::PointsContainer::Iterator it = points->Begin(); 
-       it != points->End(); 
-       ++it)
+  for (mitk::PointSet::PointsContainer::Iterator it = points->Begin(); it != points->End(); ++it)
   {
     if (it->Index() == id) // we found the correct element
     {
       index = this->index(idx);
       return true;
     }
+    
     idx++;
   }
+
   return false; // nothing found
 }
 
@@ -275,4 +278,5 @@ void QmitkPointListModel::RemoveSelectedPoint()
   mitk::PointOperation* doOp = new mitk::PointOperation(mitk::OpREMOVE, m_PointSet->GetPoint(selectedID, m_TimeStep), selectedID, true);
   m_PointSet->ExecuteOperation(doOp);
   mitk::RenderingManager::GetInstance()->RequestUpdateAll(); // Workaround for update problem in Pointset/Mapper
+
 }

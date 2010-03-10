@@ -105,8 +105,7 @@ void QmitkPointListView::OnPointSetSelectionChanged()
 
   if ( pointSet->GetNumberOfSelected( timeStep ) > 1 )
   {
-    /// @TODO use logging as soon as available
-    std::cerr << "Point set has multiple selected points. This view is not designed for more than one selected point." << std::endl;
+    MITK_ERROR << "Point set has multiple selected points. This view is not designed for more than one selected point.";
   }
 
   int selectedIndex = pointSet->SearchSelectedPoint( timeStep );
@@ -122,7 +121,7 @@ void QmitkPointListView::OnPointSetSelectionChanged()
   bool modelIndexOkay = m_PointListModel->GetModelIndexForPointID(selectedIndex, index);
   
   if (modelIndexOkay == true)
-    QListView::selectionModel()->select( m_PointListModel->index( selectedIndex ), QItemSelectionModel::ClearAndSelect );
+    QListView::selectionModel()->select( index , QItemSelectionModel::ClearAndSelect );
  
   emit SignalPointSelectionChanged();
   

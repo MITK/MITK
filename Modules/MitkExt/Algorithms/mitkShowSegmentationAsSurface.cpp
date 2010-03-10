@@ -111,6 +111,8 @@ bool ShowSegmentationAsSurface::ThreadedUpdateFunction()
   {
     surfaceFilter->InterpolationOn();
     surfaceFilter->SetGaussianStandardDeviation( gaussianSD ); 
+    //surfaceFilter->SetGaussianStandardDeviation( 3 );
+    //surfaceFilter->SetUseGaussianImageSmooth(true);
   }
 
   surfaceFilter->SetMedianFilter3D(applyMedian); // apply median to segmentation before marching cubes ?

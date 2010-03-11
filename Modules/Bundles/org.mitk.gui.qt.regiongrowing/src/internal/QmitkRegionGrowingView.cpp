@@ -1,18 +1,19 @@
 /*=========================================================================
- 
+
 Program:   Medical Imaging & Interaction Toolkit
+Module:    $RCSfile$
 Language:  C++
 Date:      $Date$
-Version:   $Revision: 15359 $
+Version:   $Revision: 17495 $ 
  
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 // Blueberry
@@ -36,7 +37,7 @@ PURPOSE.  See the above copyright notices for more information.
 // ITK
 #include <itkConnectedThresholdImageFilter.h>
 
-const std::string QmitkRegionGrowingView::VIEW_ID = "org.mitk.gui.qt.regiongrowing";
+const std::string QmitkRegionGrowingView::VIEW_ID = "org.mitk.views.regiongrowing";
 
 QmitkRegionGrowingView::QmitkRegionGrowingView()
 : QmitkFunctionality()
@@ -49,13 +50,14 @@ QmitkRegionGrowingView::~QmitkRegionGrowingView()
 {
 }
 
+
 void QmitkRegionGrowingView::CreateQtPartControl( QWidget *parent )
 {
   // build up qt view, unless already done
   if ( !m_Controls )
   {
     // create GUI widgets from the Qt Designer's .ui file
-    m_Controls = new Ui::QmitkRegionGrowingControls;
+    m_Controls = new Ui::QmitkRegionGrowingViewControls;
     m_Controls->setupUi( parent );
  
     connect( m_Controls->btnPerformImageProcessing, SIGNAL(clicked()), this, SLOT(DoImageProcessing()) );
@@ -79,6 +81,7 @@ void QmitkRegionGrowingView::CreateQtPartControl( QWidget *parent )
     m_Controls->lstPoints->SetPointSetNode( pointSetNode );
   }
 }
+
 
 void QmitkRegionGrowingView::StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget)
 {

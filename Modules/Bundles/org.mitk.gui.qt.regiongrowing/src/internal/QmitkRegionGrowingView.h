@@ -1,9 +1,11 @@
-/*========================================================================= 
+/*=========================================================================
+
 Program:   Medical Imaging & Interaction Toolkit
+Module:    $RCSfile$
 Language:  C++
 Date:      $Date$
-Version:   $Revision: 13136 $
-
+Version:   $Revision: 17495 $ 
+ 
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
@@ -14,18 +16,20 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#ifndef QmitkRegionGrowing_h
-#define QmitkRegionGrowing_h
+#ifndef QmitkRegionGrowingView_h
+#define QmitkRegionGrowingView_h
 
 #include <berryISelectionListener.h>
 
-#include "QmitkFunctionality.h"
+#include <QmitkFunctionality.h>
 
 #include "mitkPointSet.h"
 
 #include <itkImage.h>
 
 #include "ui_QmitkRegionGrowingViewControls.h"
+
+
 
 /*!
   \brief QmitkRegionGrowingView 
@@ -46,7 +50,7 @@ class QmitkRegionGrowingView : public QObject, public QmitkFunctionality
   Q_OBJECT
   
   public:  
-    
+
     static const std::string VIEW_ID;
 
     QmitkRegionGrowingView();
@@ -78,9 +82,12 @@ class QmitkRegionGrowingView : public QObject, public QmitkFunctionality
     /// \brief This is the actual seed point data object
     mitk::PointSet::Pointer m_PointSet;
 
-    Ui::QmitkRegionGrowingControls* m_Controls;
+    Ui::QmitkRegionGrowingViewControls* m_Controls;
 
     QmitkStdMultiWidget* m_MultiWidget;
 };
 
-#endif // !defined(QmitkRegionGrowing_h)
+
+
+#endif // _QMITKREGIONGROWINGVIEW_H_INCLUDED
+

@@ -30,6 +30,7 @@ class @VIEW_CLASS@ : public QObject, public QmitkFunctionality
     static const std::string VIEW_ID;
 
     @VIEW_CLASS@();
+    ~@VIEW_CLASS@();
 
     virtual void CreateQtPartControl(QWidget *parent);
 
@@ -46,7 +47,7 @@ class @VIEW_CLASS@ : public QObject, public QmitkFunctionality
     /// \brief called by QmitkFunctionality when DataManager's selection has changed
     virtual void OnSelectionChanged( std::vector<mitk::DataTreeNode*> nodes );
 
-    Ui::@VIEW_CONTROLS_CLASS@Controls* m_Controls;
+    Ui::@VIEW_CONTROLS_CLASS@* m_Controls;
 
     QmitkStdMultiWidget* m_MultiWidget;
 };

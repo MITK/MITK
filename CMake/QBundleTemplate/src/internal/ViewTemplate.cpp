@@ -16,7 +16,7 @@
 const std::string @VIEW_CLASS@::VIEW_ID = "@VIEW_ID@";
 
 @VIEW_CLASS@::@VIEW_CLASS@()
-: @VIEW_BASE_CLASS@(),
+: @VIEW_BASE_CLASS@()
 , m_Controls( 0 )
 , m_MultiWidget( NULL )
 {
@@ -33,7 +33,7 @@ void @VIEW_CLASS@::CreateQtPartControl( QWidget *parent )
   if ( !m_Controls )
   {
     // create GUI widgets from the Qt Designer's .ui file
-    m_Controls = new Ui::@VIEW_CLASS@Controls;
+    m_Controls = new Ui::@VIEW_CONTROLS_CLASS@;
     m_Controls->setupUi( parent );
  
     connect( m_Controls->btnPerformImageProcessing, SIGNAL(clicked()), this, SLOT(DoImageProcessing()) );

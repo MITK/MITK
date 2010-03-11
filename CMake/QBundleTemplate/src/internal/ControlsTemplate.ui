@@ -20,12 +20,19 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout" >
    <item>
-    <widget class="QmitkDataStorageComboBox" name="m_ImageSelector" />
+    <widget class="QLabel" name="lblWarning">
+     <property name="styleSheet">
+      <string notr="true">QLabel { color: rgb(255, 0, 0) }</string>
+     </property>
+     <property name="text">
+      <string>Please select an image!</string>
+     </property>
+    </widget>
    </item>
    <item>
-    <widget class="QPushButton" name="m_Button" >
+    <widget class="QPushButton" name="btnPerformImageProcessing" >
      <property name="toolTip" >
-      <string>start dumb segmentation</string>
+      <string>Do image processing</string>
      </property>
      <property name="text" >
       <string>Do something</string>
@@ -51,16 +58,6 @@
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11" />
- <customwidgets>
-  <customwidget>
-   <class>QmitkDataStorageComboBox</class>
-   <extends>QComboBox</extends>
-   <header>QmitkDataStorageComboBox.h</header>
-  </customwidget>
- </customwidgets>
- <includes>
-  <include location="local" >QmitkDataStorageComboBox.h</include>
- </includes>
  <resources/>
  <connections/>
 </ui>

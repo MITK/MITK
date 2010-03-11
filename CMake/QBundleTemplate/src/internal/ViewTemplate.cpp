@@ -13,6 +13,8 @@
 
 @BEGIN_NAMESPACE@
 
+const std::string @VIEW_CLASS@::VIEW_ID = "@VIEW_ID@";
+
 @VIEW_CLASS@::@VIEW_CLASS@()
 : @VIEW_BASE_CLASS@(),
 , m_Controls( 0 )

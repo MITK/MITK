@@ -36,11 +36,16 @@ PURPOSE.  See the above copyright notices for more information.
 // ITK
 #include <itkConnectedThresholdImageFilter.h>
 
+const std::string QmitkRegionGrowingView::VIEW_ID = "org.mitk.gui.qt.regiongrowing";
 
 QmitkRegionGrowingView::QmitkRegionGrowingView()
 : QmitkFunctionality()
 , m_Controls( 0 )
 , m_MultiWidget( NULL )
+{
+}
+
+virtual QmitkRegionGrowingView::~QmitkRegionGrowingView()
 {
 }
 
@@ -74,7 +79,6 @@ void QmitkRegionGrowingView::CreateQtPartControl( QWidget *parent )
     m_Controls->lstPoints->SetPointSetNode( pointSetNode );
   }
 }
-
 
 void QmitkRegionGrowingView::StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget)
 {

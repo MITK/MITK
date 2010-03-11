@@ -27,6 +27,8 @@ class @VIEW_CLASS@ : public QObject, public QmitkFunctionality
   
   public:  
 
+    static const std::string VIEW_ID;
+
     @VIEW_CLASS@();
 
     virtual void CreateQtPartControl(QWidget *parent);

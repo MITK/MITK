@@ -18,9 +18,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include <Poco/ClassLibrary.h>
 
 #include <berryIViewPart.h>
-#include "src/internal/QmitkRegionGrowing.h"
+#include "src/internal/QmitkRegionGrowingView.h"
 
 
 POCO_BEGIN_NAMED_MANIFEST(berryIViewPart, berry::IViewPart)
-  POCO_EXPORT_CLASS(QmitkRegionGrowing)
+  POCO_EXPORT_CLASS(QmitkRegionGrowingView)
 POCO_END_MANIFEST

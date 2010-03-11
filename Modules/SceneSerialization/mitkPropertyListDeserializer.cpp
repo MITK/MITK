@@ -71,7 +71,8 @@ bool mitk::PropertyListDeserializer::Deserialize()
     if (PropertyListDeserializer* reader = dynamic_cast<PropertyListDeserializer*>( iter->GetPointer() ) )
     {
       reader->SetFilename( m_Filename );
-      error |= reader->Deserialize();
+      bool success = reader->Deserialize();
+      error |= !success;
       m_PropertyList = reader->GetOutput();
       
       if ( error )

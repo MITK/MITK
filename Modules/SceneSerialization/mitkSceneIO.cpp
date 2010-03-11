@@ -389,7 +389,7 @@ bool mitk::SceneIO::SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNode
       catch(...)
       {
         MITK_ERROR << "Could not delete temporary directory " << m_WorkingDirectory;
-        return true; // ok?
+        return false; // ok?
       }
     }
     catch(std::exception& /*e*/)

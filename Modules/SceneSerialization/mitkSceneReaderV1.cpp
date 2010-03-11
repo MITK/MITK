@@ -77,7 +77,12 @@ bool mitk::SceneReaderV1::LoadScene( TiXmlDocument& document, const std::string&
     //        - instantiate the appropriate PropertyListDeSerializer
     //        - use them to construct PropertyList objects
     //        - add these properties to the node (if necessary, use renderwindow name)
-    error |= DecorateNodeWithProperties(node, element, workingDirectory);
+    bool success = DecorateNodeWithProperties(node, element, workingDirectory);
+    if (!success)
+    {
+      MITK_ERROR << "Could not load properties for node.";
+      error = true;
+    }
   } // end for all <node>
     
   // remove all unknown parent UIDs
@@ -225,7 +230,8 @@ bool mitk::SceneReaderV1::DecorateNodeWithProperties(DataTreeNode* node, TiXmlEl
       PropertyListDeserializer::Pointer deserializer = PropertyListDeserializer::New();
       
       deserializer->SetFilename(workingDirectory + Poco::Path::separator() + propertiesfile);
-      error |= deserializer->Deserialize();
+      bool success = deserializer->Deserialize();
+      error |= !success;
       PropertyList::Pointer readProperties = deserializer->GetOutput();
 
       if (readProperties.IsNotNull())

@@ -231,6 +231,7 @@ int mitkSceneIOTest(int /* argc */, char* /*argv*/[])
     }
 
   
+    // create a data storage and fill it with some test data
     mitk::SceneIO::Pointer sceneIO = mitk::SceneIO::New();
     MITK_TEST_CONDITION_REQUIRED(sceneIO.IsNotNull(),"SceneIO instantiation") 
     
@@ -239,11 +240,13 @@ int mitkSceneIOTest(int /* argc */, char* /*argv*/[])
 
     SceneIOTestClass::FillStorage(storage);
 
+    // attempt to save it
     std::string  sceneFileName = Poco::Path::temp() + /*Poco::Path::separator() +*/ "scene.zip";
     MITK_TEST_CONDITION_REQUIRED( sceneIO->SaveScene( storage->GetAll(), storage, sceneFileName), "Saving scene file '" << sceneFileName << "'");
 
+    // test if no errors were reported
     mitk::SceneIO::FailedBaseDataListType::ConstPointer failedNodes = sceneIO->GetFailedNodes();
-    if (failedNodes.IsNotNull())
+    if (failedNodes.IsNotNull() && !failedNodes->empty())
     {
       MITK_TEST_OUTPUT( << "The following nodes could not be serialized:");
       for ( mitk::SceneIO::FailedBaseDataListType::const_iterator iter = failedNodes->begin();
@@ -266,9 +269,56 @@ int mitkSceneIOTest(int /* argc */, char* /*argv*/[])
     }
 
     mitk::PropertyList::ConstPointer failedProperties = sceneIO->GetFailedProperties();
-    if (failedProperties.IsNotNull())
+    if (failedProperties.IsNotNull() && !failedProperties->IsEmpty())
     {
-      std::cout << "The following properties could not be serialized:" << std::endl;
+      MITK_TEST_OUTPUT( << "The following properties could not be serialized:");
+      const mitk::PropertyList::PropertyMap* propmap = failedProperties->GetMap();
+      for ( mitk::PropertyList::PropertyMap::const_iterator iter = propmap->begin();
+            iter != propmap->end();
+            ++iter )
+      {
+        MITK_TEST_OUTPUT( << " - " << iter->second.first->GetNameOfClass() << " associated to key '" << iter->first << "'");
+        // \TODO: should we fail the test case if failed properties exist?
+      }
+    }
+    MITK_TEST_CONDITION_REQUIRED(failedProperties.IsNotNull() && failedProperties->IsEmpty(), "Checking if all properties have been saved.")
+    MITK_TEST_CONDITION_REQUIRED(failedNodes.IsNotNull() && failedNodes->empty(), "Checking if all nodes have been saved.")
+
+    //Now do the loading part
+    sceneIO = mitk::SceneIO::New();
+
+    //Load scene into the datastorage and clean the DS first
+    MITK_TEST_OUTPUT(<< "Loading scene again");
+    storage = sceneIO->LoadScene(sceneFileName,storage,true);
+
+    // test if no errors were reported
+    failedNodes = sceneIO->GetFailedNodes();
+    if (failedNodes.IsNotNull() && !failedNodes->empty())
+    {
+      MITK_TEST_OUTPUT( << "The following nodes could not be serialized:");
+      for ( mitk::SceneIO::FailedBaseDataListType::const_iterator iter = failedNodes->begin();
+            iter != failedNodes->end();
+            ++iter )
+      {
+        MITK_TEST_OUTPUT_NO_ENDL( << " - ");
+        if ( mitk::BaseData* data =(*iter)->GetData() )
+        {
+          MITK_TEST_OUTPUT_NO_ENDL( << data->GetNameOfClass());
+        }
+        else
+        {
+          MITK_TEST_OUTPUT_NO_ENDL( << "(NULL)");
+        }
+
+        MITK_TEST_OUTPUT( << " contained in node '" << (*iter)->GetName() << "'");
+        // \TODO: should we fail the test case if failed properties exist?
+      }
+    }
+
+    failedProperties = sceneIO->GetFailedProperties();
+    if (failedProperties.IsNotNull() && !failedProperties->IsEmpty())
+    {
+      MITK_TEST_OUTPUT( << "The following properties could not be serialized:");
       const mitk::PropertyList::PropertyMap* propmap = failedProperties->GetMap();
       for ( mitk::PropertyList::PropertyMap::const_iterator iter = propmap->begin();
             iter != propmap->end();
@@ -279,11 +329,7 @@ int mitkSceneIOTest(int /* argc */, char* /*argv*/[])
       }
     }
 
-    //Now do the loading part
-    sceneIO = mitk::SceneIO::New();
-
-    //Load scene into the datastorage and clean the DS first
-    storage = sceneIO->LoadScene(sceneFileName,storage,true);
+    // check if data storage content has been restored correctly
     SceneIOTestClass::VerifyStorage(storage);
   
   }

@@ -2,15 +2,15 @@ SET(SRC_CPP_FILES
 )
 
 SET(INTERNAL_CPP_FILES
-  QmitkRegionGrowing.cpp
+  QmitkRegionGrowingView.cpp
 )
 
 SET(UI_FILES
-  src/internal/QmitkRegionGrowingControls.ui
+  src/internal/QmitkRegionGrowingViewControls.ui
 )
 
 SET(MOC_H_FILES
-  src/internal/QmitkRegionGrowing.h
+  src/internal/QmitkRegionGrowingView.h
 )
 
 SET(RESOURCE_FILES

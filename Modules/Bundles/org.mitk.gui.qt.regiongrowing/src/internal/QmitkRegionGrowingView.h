@@ -22,15 +22,13 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkFunctionality.h"
 
 #include "mitkPointSet.h"
-#include "mitkPointSetInteractor.h"
-#include "mitkDataTreeNodeSelection.h"
 
 #include <itkImage.h>
 
-#include "ui_QmitkRegionGrowingControls.h"
+#include "ui_QmitkRegionGrowingViewControls.h"
 
 /*!
-  \brief QmitkRegionGrowing 
+  \brief QmitkRegionGrowingView 
 
   Functionality for demonstration of MITK basics.
 
@@ -41,7 +39,7 @@ PURPOSE.  See the above copyright notices for more information.
   \sa QmitkFunctionality
   \ingroup Functionalities
 */
-class QmitkRegionGrowing : public QObject, public QmitkFunctionality
+class QmitkRegionGrowingView : public QObject, public QmitkFunctionality
 {  
   // this is needed for all Qt objects that should have a Qt meta-object
   // (everything that derives from QObject and wants to have signal/slots)
@@ -49,7 +47,7 @@ class QmitkRegionGrowing : public QObject, public QmitkFunctionality
   
   public:  
 
-    QmitkRegionGrowing();
+    QmitkRegionGrowingView();
 
     virtual void CreateQtPartControl(QWidget *parent);
 
@@ -59,7 +57,7 @@ class QmitkRegionGrowing : public QObject, public QmitkFunctionality
   protected slots:
   
     /// \brief Called when the user clicks the GUI button
-    void DoRegionGrowing();
+    void DoImageProcessing();
 
   protected:
 
@@ -74,13 +72,8 @@ class QmitkRegionGrowing : public QObject, public QmitkFunctionality
     /// \brief called by QmitkFunctionality when DataManager's selection has changed
     virtual void OnSelectionChanged( std::vector<mitk::DataTreeNode*> nodes );
 
-    /// \brief This node is created once and used for storing seed points
-    mitk::DataTreeNode::Pointer m_PointSetNode;
-
     /// \brief This is the actual seed point data object
     mitk::PointSet::Pointer m_PointSet;
-
-    mitk::PointSetInteractor::Pointer m_Interactor;
 
     Ui::QmitkRegionGrowingControls* m_Controls;
 

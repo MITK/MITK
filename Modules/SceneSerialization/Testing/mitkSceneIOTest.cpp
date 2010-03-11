@@ -216,7 +216,7 @@ int mitkSceneIOTest(int /* argc */, char* /*argv*/[])
 
   itk::ObjectFactoryBase::RegisterFactory(mitk::CoreObjectFactory::New());
 
-  for (unsigned int i = 0; i < 2; ++i) // TODO change to " < 2" to check cases where file system would be full
+  for (unsigned int i = 0; i < 1; ++i) // TODO change to " < 2" to check cases where file system would be full
   {
     if (i == 1)
     {

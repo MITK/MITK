@@ -45,7 +45,7 @@ QmitkRegionGrowingView::QmitkRegionGrowingView()
 {
 }
 
-virtual QmitkRegionGrowingView::~QmitkRegionGrowingView()
+QmitkRegionGrowingView::~QmitkRegionGrowingView()
 {
 }
 

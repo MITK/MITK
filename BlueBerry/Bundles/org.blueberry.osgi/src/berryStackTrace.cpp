@@ -739,22 +739,22 @@ void StackTrace(void)
    */
 
 #  if !defined(__GNUC__)
-  if (DumpStack("dbx %s %d 2>/dev/null <<EOF\n"
-    "where\n"
-    "detach\n"
-    "EOF\n",
-    global_progname, (int)getpid()))
+  char line1[] = "dbx %s %d 2>/dev/null <<EOF\n"
+                 "where\n"
+                 "detach\n"
+                 "EOF\n",
+    if ( DumpStack( line1, global_progname, (int)getpid()) )
     return;
 #  endif
 
-  if (DumpStack("gdb -q %s %d 2>/dev/null <<EOF\n"
-    "set prompt\n"
-    "echo --- Stacktrace\\n\n"
-    "where\n"
-    "detach\n"
-    "quit\n"
-    "EOF\n",
-    global_progname, (int)getpid()))
+  char line2[] = "gdb -q %s %d 2>/dev/null <<EOF\n"
+                "set prompt\n"
+                "echo --- Stacktrace\\n\n"
+                "where\n"
+                "detach\n"
+                "quit\n"
+                "EOF\n";
+   if ( DumpStack( line2, global_progname, (int)getpid()))
     return;
 
 # endif

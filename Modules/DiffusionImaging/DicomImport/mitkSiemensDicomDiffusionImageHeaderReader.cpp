@@ -78,12 +78,12 @@ int mitk::SiemensDicomDiffusionImageHeaderReader::ExtractSiemensDiffusionInforma
 int mitk::SiemensDicomDiffusionImageHeaderReader::ExtractSiemensDiffusionGradientInformation( std::string tagString, std::string nameString, std::vector<double>& valueArray )
 {
   int nItems = 0; 
-  int pos = -1;
+  unsigned int pos = -1;
   while(nItems != 3)
   {
     nItems = ExtractSiemensDiffusionInformation( tagString, nameString, valueArray, pos+1 );  
     pos = tagString.find( nameString, pos+1 );
-    if ( pos == std::string::npos)
+    if ( pos == std::string::npos )
     {
       break;
     }

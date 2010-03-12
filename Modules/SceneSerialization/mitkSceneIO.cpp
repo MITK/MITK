@@ -137,7 +137,7 @@ mitk::DataStorage::Pointer mitk::SceneIO::LoadScene( const std::string& filename
   TiXmlDocument document( m_WorkingDirectory + Poco::Path::separator() + "index.xml" );
   if (!document.LoadFile())
   {
-    MITK_ERROR << "Could not open/read/parse " << m_WorkingDirectory << Poco::Path::separator() + "index.xml\nTinyXML reports: " << document.ErrorDesc() << std::endl;
+    MITK_ERROR << "Could not open/read/parse " << m_WorkingDirectory << "/index.xml\nTinyXML reports: " << document.ErrorDesc() << std::endl;
     return NULL;
   }
       

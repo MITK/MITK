@@ -9,7 +9,7 @@
 
 #include <QWidget>
 
-#include <mitkDataTreeNode.h>
+#include <mitkDataNode.h>
 #include <mitkTransferFunctionProperty.h>
 
 #include <QSlider>
@@ -28,7 +28,7 @@ class QmitkExt_EXPORT QmitkTransferFunctionWidget : public QWidget, public Ui::Q
     QmitkTransferFunctionWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
     ~QmitkTransferFunctionWidget () ;
 
-	  void SetDataTreeNode(mitk::DataTreeNode* node);
+	  void SetDataNode(mitk::DataNode* node);
 
   public slots:
 

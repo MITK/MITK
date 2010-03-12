@@ -160,7 +160,7 @@ mitk::PlanarFigure* mitk::PlanarFigureWriter::GetInput( const unsigned int& num 
 }
 
 
-bool mitk::PlanarFigureWriter::CanWriteDataType( DataTreeNode* input )
+bool mitk::PlanarFigureWriter::CanWriteDataType( DataNode* input )
 {
   if ( input == NULL )
     return false;
@@ -177,7 +177,7 @@ bool mitk::PlanarFigureWriter::CanWriteDataType( DataTreeNode* input )
 }
 
 
-void mitk::PlanarFigureWriter::SetInput( DataTreeNode* input )
+void mitk::PlanarFigureWriter::SetInput( DataNode* input )
 {
   if (this->CanWriteDataType(input))
     this->ProcessObject::SetNthInput( 0, dynamic_cast<mitk::PlanarFigure*>( input->GetData() ) );

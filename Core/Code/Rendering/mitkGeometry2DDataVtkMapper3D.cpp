@@ -191,14 +191,14 @@ Geometry2DDataVtkMapper3D::~Geometry2DDataVtkMapper3D()
 
 vtkProp* Geometry2DDataVtkMapper3D::GetVtkProp(mitk::BaseRenderer * /*renderer*/)
 {
-  if ( (this->GetDataTreeNode() != NULL )
+  if ( (this->GetDataNode() != NULL )
     && (m_ImageAssembly != NULL) )
   {
     // Do not transform the entire Prop3D assembly, but only the image part
     // here. The colored frame is transformed elsewhere (via m_EdgeTransformer),
     // since only vertices should be transformed there, not the poly data
     // itself, to avoid distortion for anisotropic datasets.
-    m_ImageAssembly->SetUserTransform( this->GetDataTreeNode()->GetVtkTransform() );
+    m_ImageAssembly->SetUserTransform( this->GetDataNode()->GetVtkTransform() );
   }
   return m_Prop3DAssembly;
 }
@@ -207,7 +207,7 @@ vtkProp* Geometry2DDataVtkMapper3D::GetVtkProp(mitk::BaseRenderer * /*renderer*/
 void Geometry2DDataVtkMapper3D::UpdateVtkTransform(mitk::BaseRenderer * /*renderer*/)
 {
   m_ImageAssembly->SetUserTransform(
-    this->GetDataTreeNode()->GetVtkTransform(this->GetTimestep()) );
+    this->GetDataNode()->GetVtkTransform(this->GetTimestep()) );
 }
 
 const Geometry2DData *
@@ -350,7 +350,7 @@ void Geometry2DDataVtkMapper3D::GenerateData(BaseRenderer* renderer)
   if (input.IsNotNull() && (input->GetGeometry2D() != NULL))
   {
     SmartPointerProperty::Pointer surfacecreatorprop;
-    surfacecreatorprop = dynamic_cast< SmartPointerProperty * >(GetDataTreeNode()->GetProperty("surfacegeometry", renderer));
+    surfacecreatorprop = dynamic_cast< SmartPointerProperty * >(GetDataNode()->GetProperty("surfacegeometry", renderer));
 
     if ( (surfacecreatorprop.IsNull())
       || (surfacecreatorprop->GetSmartPointer().IsNull())
@@ -361,17 +361,17 @@ void Geometry2DDataVtkMapper3D::GenerateData(BaseRenderer* renderer)
       //m_SurfaceCreator = Geometry2DDataToSurfaceFilter::New();
       m_SurfaceCreator->PlaceByGeometryOn();
       surfacecreatorprop = SmartPointerProperty::New( m_SurfaceCreator );
-      GetDataTreeNode()->SetProperty("surfacegeometry", surfacecreatorprop);
+      GetDataNode()->SetProperty("surfacegeometry", surfacecreatorprop);
     }
 
     m_SurfaceCreator->SetInput(input);
 
     int res;
-    if (GetDataTreeNode()->GetIntProperty("xresolution", res, renderer))
+    if (GetDataNode()->GetIntProperty("xresolution", res, renderer))
     {
       m_SurfaceCreator->SetXResolution(res);
     }
-    if (GetDataTreeNode()->GetIntProperty("yresolution", res, renderer))
+    if (GetDataNode()->GetIntProperty("yresolution", res, renderer))
     {
       m_SurfaceCreator->SetYResolution(res);
     }
@@ -432,7 +432,7 @@ void Geometry2DDataVtkMapper3D::GenerateData(BaseRenderer* renderer)
     }
 
     // add a graphical representation of the surface normals if requested
-    DataTreeNode* node = this->GetDataTreeNode();
+    DataNode* node = this->GetDataNode();
     node->GetBoolProperty("draw normals 3D", m_DisplayNormals, renderer);
     node->GetBoolProperty("color two sides", m_ColorTwoSides, renderer);
     node->GetBoolProperty("invert normals", m_InvertNormals, renderer);
@@ -506,7 +506,7 @@ void Geometry2DDataVtkMapper3D::GenerateData(BaseRenderer* renderer)
     mitk::DataStorage::SetOfObjects::ConstPointer all = m_DataStorage->GetSubset(p);
     for (mitk::DataStorage::SetOfObjects::ConstIterator it = all->Begin(); it != all->End(); ++it)
     {
-      DataTreeNode *node = it->Value();
+      DataNode *node = it->Value();
       if (node != NULL)
         this->ProcessNode(node, renderer, surface, layerSortedActors);
     }
@@ -522,7 +522,7 @@ void Geometry2DDataVtkMapper3D::GenerateData(BaseRenderer* renderer)
     // bounds, color as specified in the plane's properties
     vtkPolyData *surfacePolyData = surface->GetVtkPolyData();
     m_Cleaner->SetInput(surfacePolyData);
-    m_EdgeTransformer->SetTransform(this->GetDataTreeNode()->GetVtkTransform(this->GetTimestep()) );
+    m_EdgeTransformer->SetTransform(this->GetDataNode()->GetVtkTransform(this->GetTimestep()) );
 
     // Determine maximum extent
     vtkFloatingPointType* surfaceBounds = surfacePolyData->GetBounds();
@@ -541,7 +541,7 @@ void Geometry2DDataVtkMapper3D::GenerateData(BaseRenderer* renderer)
 
     // Get the plane's color and set the tube properties accordingly
     ColorProperty::Pointer colorProperty;
-    colorProperty = dynamic_cast<ColorProperty*>(this->GetDataTreeNode()->GetProperty( "color" ));
+    colorProperty = dynamic_cast<ColorProperty*>(this->GetDataNode()->GetProperty( "color" ));
     if ( colorProperty.IsNotNull() )
     {
       const Color& color = colorProperty->GetColor();
@@ -552,17 +552,17 @@ void Geometry2DDataVtkMapper3D::GenerateData(BaseRenderer* renderer)
       m_EdgeActor->GetProperty()->SetColor( 1.0, 1.0, 1.0 );
     }
 
-    m_ImageAssembly->SetUserTransform(this->GetDataTreeNode()->GetVtkTransform(this->GetTimestep()) );
+    m_ImageAssembly->SetUserTransform(this->GetDataNode()->GetVtkTransform(this->GetTimestep()) );
   }
 
   VtkRepresentationProperty* representationProperty;
-  this->GetDataTreeNode()->GetProperty(representationProperty, "material.representation", renderer);
+  this->GetDataNode()->GetProperty(representationProperty, "material.representation", renderer);
   if ( representationProperty != NULL )
     m_BackgroundActor->GetProperty()->SetRepresentation( representationProperty->GetVtkRepresentation() );
 }
 
 
-void Geometry2DDataVtkMapper3D::ProcessNode( DataTreeNode * node, BaseRenderer* renderer, Surface * surface, LayerSortedActorList &layerSortedActors )
+void Geometry2DDataVtkMapper3D::ProcessNode( DataNode * node, BaseRenderer* renderer, Surface * surface, LayerSortedActorList &layerSortedActors )
 {
   if ( node != NULL )
   {
@@ -572,7 +572,7 @@ void Geometry2DDataVtkMapper3D::ProcessNode( DataTreeNode * node, BaseRenderer* 
     if ( (node->IsVisible(renderer)) && imageMapper )
     {
       WeakPointerProperty::Pointer rendererProp =
-        dynamic_cast< WeakPointerProperty * >(GetDataTreeNode()->GetPropertyList()->GetProperty("renderer"));
+        dynamic_cast< WeakPointerProperty * >(GetDataNode()->GetPropertyList()->GetProperty("renderer"));
 
       if ( rendererProp.IsNotNull() )
       {

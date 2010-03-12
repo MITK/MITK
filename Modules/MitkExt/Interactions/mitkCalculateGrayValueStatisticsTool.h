@@ -69,7 +69,7 @@ protected:
   virtual ~CalculateGrayValueStatisticsTool();
 
   virtual void StartProcessingAllData();
-    virtual bool ProcessOneWorkingData( DataTreeNode* node );
+    virtual bool ProcessOneWorkingData( DataNode* node );
   virtual void FinishProcessingAllData();
 
   virtual std::string GetErrorMessage();

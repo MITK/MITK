@@ -47,7 +47,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkNodePredicateAND.h"
 #include "mitkNodePredicateNOT.h"
 
-#include "mitkDataTreeNodeObject.h"
+#include "mitkDataNodeObject.h"
 
 #include "berryIWorkbenchWindow.h"
 #include "berryISelectionService.h"
@@ -101,13 +101,13 @@ struct SelListenerPointBasedRegistration : ISelectionListener
       {
         m_View->m_Controls.m_StatusLabel->hide();
         bool foundFixedImage = false;
-        mitk::DataTreeNode::Pointer fixedNode;
+        mitk::DataNode::Pointer fixedNode;
         // iterate selection
         for (IStructuredSelection::iterator i = m_View->m_CurrentSelection->Begin(); 
           i != m_View->m_CurrentSelection->End(); ++i)
         {
           // extract datatree node
-          if (mitk::DataTreeNodeObject::Pointer nodeObj = i->Cast<mitk::DataTreeNodeObject>())
+          if (mitk::DataNodeObject::Pointer nodeObj = i->Cast<mitk::DataNodeObject>())
           {
             mitk::TNodePredicateDataType<mitk::BaseData>::Pointer isBaseData(mitk::TNodePredicateDataType<mitk::BaseData>::New());
             mitk::TNodePredicateDataType<mitk::PointSet>::Pointer isPointSet(mitk::TNodePredicateDataType<mitk::PointSet>::New());
@@ -120,7 +120,7 @@ struct SelListenerPointBasedRegistration : ISelectionListener
 
             mitk::DataStorage::SetOfObjects::ConstPointer setOfObjects = m_View->GetDataStorage()->GetSubset(predicate);
 
-            mitk::DataTreeNode::Pointer node = nodeObj->GetDataTreeNode();
+            mitk::DataNode::Pointer node = nodeObj->GetDataNode();
 
             // only look at interesting types
             for (mitk::DataStorage::SetOfObjects::ConstIterator nodeIt = setOfObjects->Begin()
@@ -434,7 +434,7 @@ void QmitkPointBasedRegistrationView::Hidden()
   //QmitkFunctionality::Deactivated();*/
 }
 
-void QmitkPointBasedRegistrationView::FixedSelected(mitk::DataTreeNode::Pointer fixedImage)
+void QmitkPointBasedRegistrationView::FixedSelected(mitk::DataNode::Pointer fixedImage)
 {
   if(m_FixedLandmarks.IsNotNull())
     m_FixedLandmarks->RemoveObserver(m_CurrentFixedLandmarksObserverID);
@@ -489,7 +489,7 @@ void QmitkPointBasedRegistrationView::FixedSelected(mitk::DataTreeNode::Pointer 
       if (!hasPointSetNode)
       {
         m_FixedLandmarks = mitk::PointSet::New();
-        m_FixedPointSetNode = mitk::DataTreeNode::New();
+        m_FixedPointSetNode = mitk::DataNode::New();
         m_FixedPointSetNode->SetData(m_FixedLandmarks);
         m_FixedPointSetNode->SetProperty("name", mitk::StringProperty::New("PointBasedRegistrationNode"));
       }
@@ -520,7 +520,7 @@ void QmitkPointBasedRegistrationView::FixedSelected(mitk::DataTreeNode::Pointer 
     m_CurrentFixedLandmarksObserverID = m_FixedLandmarks->AddObserver(itk::ModifiedEvent(), m_FixedLandmarksChangedCommand);
 }
 
-void QmitkPointBasedRegistrationView::MovingSelected(mitk::DataTreeNode::Pointer movingImage)
+void QmitkPointBasedRegistrationView::MovingSelected(mitk::DataNode::Pointer movingImage)
 {
   if(m_MovingLandmarks.IsNotNull())
     m_MovingLandmarks->RemoveObserver(m_CurrentMovingLandmarksObserverID);
@@ -584,7 +584,7 @@ void QmitkPointBasedRegistrationView::MovingSelected(mitk::DataTreeNode::Pointer
       if (!hasPointSetNode)
       {
         m_MovingLandmarks = mitk::PointSet::New();
-        m_MovingPointSetNode = mitk::DataTreeNode::New();
+        m_MovingPointSetNode = mitk::DataNode::New();
         m_MovingPointSetNode->SetData(m_MovingLandmarks);
         m_MovingPointSetNode->SetProperty("name", mitk::StringProperty::New("PointBasedRegistrationNode"));
       }
@@ -1262,8 +1262,8 @@ void QmitkPointBasedRegistrationView::SetImagesVisible(berry::ISelection::ConstP
 
 void QmitkPointBasedRegistrationView::SwitchImages()
 {
-  mitk::DataTreeNode::Pointer newMoving = m_FixedNode;
-  mitk::DataTreeNode::Pointer newFixed = m_MovingNode;
+  mitk::DataNode::Pointer newMoving = m_FixedNode;
+  mitk::DataNode::Pointer newFixed = m_MovingNode;
   this->FixedSelected(newFixed);
   this->MovingSelected(newMoving);
 }

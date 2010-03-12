@@ -23,7 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <berryISelectionService.h>
 #include <berryIWorkbenchWindow.h>
 //#include <berryISelectionService.h>
-#include <mitkDataTreeNodeObject.h>
+#include <mitkDataNodeObject.h>
 
 #include <mitkProperties.h>
 #include <mitkNodePredicateDataType.h>
@@ -96,22 +96,22 @@ void QmitkVolumeVisualizationView::SelectionChanged( berry::IWorkbenchPart::Poin
   //if(!this->m_IsVisible)
     //return;
 
-  mitk::DataTreeNodeSelection::ConstPointer _DataTreeNodeSelection 
-    = selection.Cast<const mitk::DataTreeNodeSelection>();
+  mitk::DataNodeSelection::ConstPointer _DataNodeSelection 
+    = selection.Cast<const mitk::DataNodeSelection>();
 
   bool weHadAnImageButItsNotThreeDeeOrFourDee = false;
    
-  if(_DataTreeNodeSelection.IsNotNull())
+  if(_DataNodeSelection.IsNotNull())
   {
-    std::vector<mitk::DataTreeNode*> selectedNodes;
-    mitk::DataTreeNodeObject* _DataTreeNodeObject = 0;
+    std::vector<mitk::DataNode*> selectedNodes;
+    mitk::DataNodeObject* _DataNodeObject = 0;
 
-    for(mitk::DataTreeNodeSelection::iterator it = _DataTreeNodeSelection->Begin();it != _DataTreeNodeSelection->End(); ++it)
+    for(mitk::DataNodeSelection::iterator it = _DataNodeSelection->Begin();it != _DataNodeSelection->End(); ++it)
     {
-      _DataTreeNodeObject = dynamic_cast<mitk::DataTreeNodeObject*>((*it).GetPointer());
-      if(_DataTreeNodeObject)
+      _DataNodeObject = dynamic_cast<mitk::DataNodeObject*>((*it).GetPointer());
+      if(_DataNodeObject)
       {
-        mitk::DataTreeNode::Pointer node = _DataTreeNodeObject->GetDataTreeNode();
+        mitk::DataNode::Pointer node = _DataNodeObject->GetDataNode();
       
         if( node.IsNotNull() && dynamic_cast<mitk::Image*>(node->GetData()) )
         {
@@ -125,7 +125,7 @@ void QmitkVolumeVisualizationView::SelectionChanged( berry::IWorkbenchPart::Poin
 
     m_SelectedNode = 0;
 
-    mitk::DataTreeNode::Pointer node;
+    mitk::DataNode::Pointer node;
     
     if(selectedNodes.size() > 0)
       node=selectedNodes.front();
@@ -187,8 +187,8 @@ void QmitkVolumeVisualizationView::UpdateInterface()
     m_Controls->m_EnableLOD->setChecked(false);
     m_Controls->m_EnableLOD->setEnabled(false);
     m_Controls->m_EnableGPU->setEnabled(false);
-    m_Controls->m_TransferFunctionWidget->SetDataTreeNode(0);
-    m_Controls->m_TransferFunctionGeneratorWidget->SetDataTreeNode(0);
+    m_Controls->m_TransferFunctionWidget->SetDataNode(0);
+    m_Controls->m_TransferFunctionGeneratorWidget->SetDataNode(0);
     m_Controls->m_TransferFunctionWidget->setEnabled(false);
     m_Controls->m_TransferFunctionGeneratorWidget->setEnabled(false);
     return;
@@ -206,8 +206,8 @@ void QmitkVolumeVisualizationView::UpdateInterface()
     m_Controls->m_EnableLOD->setChecked(false);
     m_Controls->m_EnableLOD->setEnabled(false);
     m_Controls->m_EnableGPU->setEnabled(false);
-    m_Controls->m_TransferFunctionWidget->SetDataTreeNode(0);
-    m_Controls->m_TransferFunctionGeneratorWidget->SetDataTreeNode(0);
+    m_Controls->m_TransferFunctionWidget->SetDataNode(0);
+    m_Controls->m_TransferFunctionGeneratorWidget->SetDataNode(0);
     m_Controls->m_TransferFunctionWidget->setEnabled(false);
     m_Controls->m_TransferFunctionGeneratorWidget->setEnabled(false);
     return;
@@ -224,9 +224,9 @@ void QmitkVolumeVisualizationView::UpdateInterface()
   m_Controls->m_EnableGPU->setEnabled(true);
   m_Controls->m_EnableGPU->setChecked(enabled);
 
-  m_Controls->m_TransferFunctionWidget->SetDataTreeNode(m_SelectedNode);
+  m_Controls->m_TransferFunctionWidget->SetDataNode(m_SelectedNode);
   m_Controls->m_TransferFunctionWidget->setEnabled(true);
-  m_Controls->m_TransferFunctionGeneratorWidget->SetDataTreeNode(m_SelectedNode);
+  m_Controls->m_TransferFunctionGeneratorWidget->SetDataNode(m_SelectedNode);
   m_Controls->m_TransferFunctionGeneratorWidget->setEnabled(true);
 }
 

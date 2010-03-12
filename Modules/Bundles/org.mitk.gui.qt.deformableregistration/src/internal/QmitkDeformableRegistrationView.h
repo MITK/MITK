@@ -120,12 +120,12 @@ class DEFORMABLEREGISTRATION_EXPORT QmitkDeformableRegistrationView : public QOb
     /*!
     * sets the fixed Image according to TreeNodeSelector widget
     */
-    void FixedSelected(mitk::DataTreeNode::Pointer fixedImage);
+    void FixedSelected(mitk::DataNode::Pointer fixedImage);
     
     /*!
     * sets the moving Image according to TreeNodeSelector widget
     */
-    void MovingSelected(mitk::DataTreeNode::Pointer movingImage);
+    void MovingSelected(mitk::DataNode::Pointer movingImage);
 
     /*!
     * checks if registration is possible
@@ -193,8 +193,8 @@ class DEFORMABLEREGISTRATION_EXPORT QmitkDeformableRegistrationView : public QOb
     * control widget to make all changes for Deformable registration 
     */  
     Ui::QmitkDeformableRegistrationViewControls m_Controls;
-    mitk::DataTreeNode::Pointer m_MovingNode;
-    mitk::DataTreeNode::Pointer m_FixedNode;
+    mitk::DataNode::Pointer m_MovingNode;
+    mitk::DataNode::Pointer m_FixedNode;
     bool m_ShowRedGreen;
     float m_Opacity;
     float m_OriginalOpacity;

@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkAffineInteractor.h"
 #include "mitkInteractionConst.h"
-#include "mitkDataTreeNode.h"
+#include "mitkDataNode.h"
 #include "mitkGeometry3D.h"
 #include "mitkRotationOperation.h"
 #include "mitkPointOperation.h"
@@ -53,7 +53,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <iostream>
 
-mitk::AffineInteractor::AffineInteractor(const char * type, DataTreeNode* dataTreeNode)
+mitk::AffineInteractor::AffineInteractor(const char * type, DataNode* dataTreeNode)
 : Interactor(type, dataTreeNode)
 {
 }
@@ -79,18 +79,18 @@ bool mitk::AffineInteractor::ExecuteAction(Action* action, mitk::StateEvent cons
       mitk::ColorProperty::Pointer color;
       mitk::StateEvent* newStateEvent = NULL;
 
-      selected = dynamic_cast<mitk::BoolProperty*>(m_DataTreeNode->GetProperty("selected"));
+      selected = dynamic_cast<mitk::BoolProperty*>(m_DataNode->GetProperty("selected"));
 
       if ( selected.IsNull() ) {
         selected = mitk::BoolProperty::New();
-        m_DataTreeNode->GetPropertyList()->SetProperty("selected", selected);
+        m_DataNode->GetPropertyList()->SetProperty("selected", selected);
       }
 
-      color = dynamic_cast<mitk::ColorProperty*>(m_DataTreeNode->GetProperty("color"));
+      color = dynamic_cast<mitk::ColorProperty*>(m_DataNode->GetProperty("color"));
 
       if ( color.IsNull() ) {
         color = mitk::ColorProperty::New();
-        m_DataTreeNode->GetPropertyList()->SetProperty("color", color);
+        m_DataNode->GetPropertyList()->SetProperty("color", color);
       }
 
       if (this->CheckSelected(worldPoint, m_TimeStep))
@@ -106,7 +106,7 @@ bool mitk::AffineInteractor::ExecuteAction(Action* action, mitk::StateEvent cons
         color->SetColor(0.0, 0.0, 1.0);
 
         /*
-        mitk::BoundingObject* b = dynamic_cast<mitk::BoundingObject*>(m_DataTreeNode->GetData());
+        mitk::BoundingObject* b = dynamic_cast<mitk::BoundingObject*>(m_DataNode->GetData());
         if(b != NULL)
         {
           color = (b->GetPositive())? mitk::ColorProperty::New(0.0, 0.0, 1.0) : mitk::ColorProperty::New(1.0, 0.0, 0.0);  // if deselected, a boundingobject is colored according to its positive/negative state
@@ -128,7 +128,7 @@ bool mitk::AffineInteractor::ExecuteAction(Action* action, mitk::StateEvent cons
       if (this->CheckSelected(worldPoint, m_TimeStep))
       {
         newStateEvent = new mitk::StateEvent(EIDYES, event);
-        m_DataTreeNode->GetPropertyList()->SetProperty("selected", mitk::BoolProperty::New(true));  // TODO: Generate an Select Operation and send it to the undo controller ?
+        m_DataNode->GetPropertyList()->SetProperty("selected", mitk::BoolProperty::New(true));  // TODO: Generate an Select Operation and send it to the undo controller ?
       }
       else  // if not selected, do nothing (don't deselect)
       {
@@ -262,10 +262,10 @@ bool mitk::AffineInteractor::ExecuteAction(Action* action, mitk::StateEvent cons
       geometry->ExecuteOperation(doOp);
       /* Update Volume Property with new value */
       /*
-      mitk::BoundingObject* b = dynamic_cast<mitk::BoundingObject*>(m_DataTreeNode->GetData());
+      mitk::BoundingObject* b = dynamic_cast<mitk::BoundingObject*>(m_DataNode->GetData());
       if (b != NULL)
       {
-        m_DataTreeNode->GetPropertyList()->SetProperty("volume", FloatProperty::New(b->GetVolume()));
+        m_DataNode->GetPropertyList()->SetProperty("volume", FloatProperty::New(b->GetVolume()));
         //MITK_INFO << "Volume of Boundingobject is " << b->GetVolume()/1000.0 << " ml" << std::endl;
       }
       */
@@ -287,12 +287,12 @@ bool mitk::AffineInteractor::ExecuteAction(Action* action, mitk::StateEvent cons
 bool mitk::AffineInteractor::CheckSelected(const mitk::Point3D& worldPoint, int timestep )
 {
   bool selected = false;
-  if (m_DataTreeNode->GetBoolProperty("selected", selected) == false)        // if property does not exist
-    m_DataTreeNode->SetProperty("selected", mitk::BoolProperty::New(false));  // create it
+  if (m_DataNode->GetBoolProperty("selected", selected) == false)        // if property does not exist
+    m_DataNode->SetProperty("selected", mitk::BoolProperty::New(false));  // create it
 
   // check if mouseclick has hit the object
   /*
-  mitk::BoundingObject::Pointer boundingObject = dynamic_cast<mitk::BoundingObject*>(m_DataTreeNode->GetData());
+  mitk::BoundingObject::Pointer boundingObject = dynamic_cast<mitk::BoundingObject*>(m_DataNode->GetData());
   if(boundingObject.IsNotNull())  // if it is a bounding object, use its inside function for exact hit calculation
   {
     selected = boundingObject->IsInside(worldPoint); // check if point is inside the object

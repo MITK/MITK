@@ -20,7 +20,7 @@
 #define QmitkPropertiesTableModel_h
 
 //# Own includes
-#include "mitkDataTreeNode.h"
+#include "mitkDataNode.h"
 #include "mitkWeakPointer.h"
 
 //# Toolkit includes
@@ -52,7 +52,7 @@ public:
 
   ///
   /// Constructs a new QmitkDataStorageTableModel 
-  /// and sets the DataTreeNode for this TableModel.
+  /// and sets the DataNode for this TableModel.
   QmitkPropertiesTableModel(QObject* parent = 0, mitk::PropertyList::Pointer _PropertyList=0);
 
   ///

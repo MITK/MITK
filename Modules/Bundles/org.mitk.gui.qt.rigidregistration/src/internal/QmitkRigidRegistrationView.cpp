@@ -30,7 +30,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <vtkTransform.h>
 
-#include "mitkDataTreeNodeObject.h"
+#include "mitkDataNodeObject.h"
 
 #include "berryIWorkbenchWindow.h"
 #include "berryISelectionService.h"
@@ -80,15 +80,15 @@ struct SelListenerRigidRegistration : ISelectionListener
       {
         m_View->m_Controls.m_StatusLabel->hide();
         bool foundFixedImage = false;
-        mitk::DataTreeNode::Pointer fixedNode;
+        mitk::DataNode::Pointer fixedNode;
         // iterate selection
         for (IStructuredSelection::iterator i = m_View->m_CurrentSelection->Begin(); 
           i != m_View->m_CurrentSelection->End(); ++i)
         {
           // extract datatree node
-          if (mitk::DataTreeNodeObject::Pointer nodeObj = i->Cast<mitk::DataTreeNodeObject>())
+          if (mitk::DataNodeObject::Pointer nodeObj = i->Cast<mitk::DataNodeObject>())
           {
-            mitk::DataTreeNode::Pointer node = nodeObj->GetDataTreeNode();
+            mitk::DataNode::Pointer node = nodeObj->GetDataNode();
             // only look at interesting types
             if(QString("Image").compare(node->GetData()->GetNameOfClass())==0)
             {
@@ -365,7 +365,7 @@ void QmitkRigidRegistrationView::Hidden()
   //QmitkFunctionality::Deactivated();*/
 }
 
-void QmitkRigidRegistrationView::FixedSelected(mitk::DataTreeNode::Pointer fixedImage)
+void QmitkRigidRegistrationView::FixedSelected(mitk::DataNode::Pointer fixedImage)
 {
   if (m_FixedNode.IsNotNull())
   {
@@ -431,7 +431,7 @@ void QmitkRigidRegistrationView::FixedSelected(mitk::DataTreeNode::Pointer fixed
   }
 }
 
-void QmitkRigidRegistrationView::MovingSelected(mitk::DataTreeNode::Pointer movingImage)
+void QmitkRigidRegistrationView::MovingSelected(mitk::DataNode::Pointer movingImage)
 {
   if (m_MovingNode.IsNotNull())
   {
@@ -503,10 +503,10 @@ void QmitkRigidRegistrationView::AddNewTransformationToUndoList()
   unsigned long size;
   mitk::DataStorage::SetOfObjects::ConstPointer children = this->GetDataStorage()->GetDerivations(m_MovingNode);
   size = children->Size();
-  std::map<mitk::DataTreeNode::Pointer, mitk::Geometry3D*> childGeometries;
+  std::map<mitk::DataNode::Pointer, mitk::Geometry3D*> childGeometries;
   for (unsigned long i = 0; i < size; ++i)
   {
-    childGeometries.insert(std::pair<mitk::DataTreeNode::Pointer, mitk::Geometry3D*>(children->GetElement(i), children->GetElement(i)->GetData()->GetGeometry()));
+    childGeometries.insert(std::pair<mitk::DataNode::Pointer, mitk::Geometry3D*>(children->GetElement(i), children->GetElement(i)->GetData()->GetGeometry()));
   }
   m_UndoChildGeometryList.push_back(childGeometries);
   m_RedoGeometryList.clear();
@@ -524,19 +524,19 @@ void QmitkRigidRegistrationView::UndoTransformation()
     unsigned long size;
     mitk::DataStorage::SetOfObjects::ConstPointer children = this->GetDataStorage()->GetDerivations(m_MovingNode);
     size = children->Size();
-    std::map<mitk::DataTreeNode::Pointer, mitk::Geometry3D*> childGeometries;
+    std::map<mitk::DataNode::Pointer, mitk::Geometry3D*> childGeometries;
     for (unsigned long i = 0; i < size; ++i)
     {
-      childGeometries.insert(std::pair<mitk::DataTreeNode::Pointer, mitk::Geometry3D*>(children->GetElement(i), children->GetElement(i)->GetData()->GetGeometry()));
+      childGeometries.insert(std::pair<mitk::DataNode::Pointer, mitk::Geometry3D*>(children->GetElement(i), children->GetElement(i)->GetData()->GetGeometry()));
     }
     m_RedoChildGeometryList.push_back(childGeometries);
 
     movingData->SetGeometry(m_UndoGeometryList.back());
     m_UndoGeometryList.pop_back();
-    std::map<mitk::DataTreeNode::Pointer, mitk::Geometry3D*> oldChildGeometries;
+    std::map<mitk::DataNode::Pointer, mitk::Geometry3D*> oldChildGeometries;
     oldChildGeometries = m_UndoChildGeometryList.back();
     m_UndoChildGeometryList.pop_back();
-    std::map<mitk::DataTreeNode::Pointer, mitk::Geometry3D*>::iterator iter;
+    std::map<mitk::DataNode::Pointer, mitk::Geometry3D*>::iterator iter;
     for (unsigned long j = 0; j < size; ++j)
     {
       iter = oldChildGeometries.find(children->GetElement(j));
@@ -572,20 +572,20 @@ void QmitkRigidRegistrationView::RedoTransformation()
     unsigned long size;
     mitk::DataStorage::SetOfObjects::ConstPointer children = this->GetDataStorage()->GetDerivations(m_MovingNode);
     size = children->Size();
-    std::map<mitk::DataTreeNode::Pointer, mitk::Geometry3D*> childGeometries;
+    std::map<mitk::DataNode::Pointer, mitk::Geometry3D*> childGeometries;
     for (unsigned long i = 0; i < size; ++i)
     {
-      childGeometries.insert(std::pair<mitk::DataTreeNode::Pointer, mitk::Geometry3D*>(children->GetElement(i), children->GetElement(i)->GetData()->GetGeometry()));
+      childGeometries.insert(std::pair<mitk::DataNode::Pointer, mitk::Geometry3D*>(children->GetElement(i), children->GetElement(i)->GetData()->GetGeometry()));
     }
     m_UndoChildGeometryList.push_back(childGeometries);
 
     movingData->SetGeometry(m_RedoGeometryList.back());
     m_RedoGeometryList.pop_back();
 
-    std::map<mitk::DataTreeNode::Pointer, mitk::Geometry3D*> oldChildGeometries;
+    std::map<mitk::DataNode::Pointer, mitk::Geometry3D*> oldChildGeometries;
     oldChildGeometries = m_RedoChildGeometryList.back();
     m_RedoChildGeometryList.pop_back();
-    std::map<mitk::DataTreeNode::Pointer, mitk::Geometry3D*>::iterator iter;
+    std::map<mitk::DataNode::Pointer, mitk::Geometry3D*>::iterator iter;
     for (unsigned long j = 0; j < size; ++j)
     {
       iter = oldChildGeometries.find(children->GetElement(j));
@@ -695,7 +695,7 @@ void QmitkRigidRegistrationView::Translate(int* translateVector)
     mitk::DataStorage::SetOfObjects::ConstPointer children = this->GetDataStorage()->GetDerivations(m_MovingNode);
     unsigned long size;
     size = children->Size();
-    mitk::DataTreeNode::Pointer childNode;
+    mitk::DataNode::Pointer childNode;
     for (unsigned long i = 0; i < size; ++i)
     {
       childNode = children->GetElement(i);
@@ -742,7 +742,7 @@ void QmitkRigidRegistrationView::Rotate(int* rotateVector)
     mitk::DataStorage::SetOfObjects::ConstPointer children = this->GetDataStorage()->GetDerivations(m_MovingNode);
     unsigned long size;
     size = children->Size();
-    mitk::DataTreeNode::Pointer childNode;
+    mitk::DataNode::Pointer childNode;
     for (unsigned long i = 0; i < size; ++i)
     {
       childNode = children->GetElement(i);
@@ -871,7 +871,7 @@ void QmitkRigidRegistrationView::Scale(int* scaleVector)
     mitk::DataStorage::SetOfObjects::ConstPointer children = this->GetDataStorage()->GetDerivations(m_MovingNode);
     unsigned long size;
     size = children->Size();
-    mitk::DataTreeNode::Pointer childNode;
+    mitk::DataNode::Pointer childNode;
     for (unsigned long i = 0; i < size; ++i)
     {
       childNode = children->GetElement(i);
@@ -1249,8 +1249,8 @@ void QmitkRigidRegistrationView::TabChanged(int index)
 
 void QmitkRigidRegistrationView::SwitchImages()
 {
-  mitk::DataTreeNode::Pointer newMoving = m_FixedNode;
-  mitk::DataTreeNode::Pointer newFixed = m_MovingNode;
+  mitk::DataNode::Pointer newMoving = m_FixedNode;
+  mitk::DataNode::Pointer newFixed = m_MovingNode;
   this->FixedSelected(newFixed);
   this->MovingSelected(newMoving);
 }

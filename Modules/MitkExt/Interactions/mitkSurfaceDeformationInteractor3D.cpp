@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkDisplayPositionEvent.h"
 #include "mitkWheelEvent.h"
 #include "mitkStatusBar.h"
-#include "mitkDataTreeNode.h"
+#include "mitkDataNode.h"
 #include "mitkInteractionConst.h"
 #include "mitkAction.h"
 #include "mitkStateEvent.h"
@@ -47,7 +47,7 @@ PURPOSE.  See the above copyright notices for more information.
 //how precise must the user pick the point
 //default value
 mitk::SurfaceDeformationInteractor3D
-::SurfaceDeformationInteractor3D(const char * type, DataTreeNode* dataTreeNode, int /* n */ )
+::SurfaceDeformationInteractor3D(const char * type, DataNode* dataTreeNode, int /* n */ )
 : Interactor( type, dataTreeNode ),
   m_Precision( 6.5 ),
   m_PickedSurfaceNode( NULL ),
@@ -113,7 +113,7 @@ float mitk::SurfaceDeformationInteractor3D
   //int timeStep = disPosEvent->GetSender()->GetTimeStep();
 
   //mitk::CurveModel *curveModel = dynamic_cast<mitk::CurveModel *>(
-  //  m_DataTreeNode->GetData() );
+  //  m_DataNode->GetData() );
 
   //if ( curveModel != NULL )
   //{
@@ -140,7 +140,7 @@ bool mitk::SurfaceDeformationInteractor3D
   bool ok = false;
 
   // Get data object
-  mitk::BaseData *data = m_DataTreeNode->GetData();
+  mitk::BaseData *data = m_DataNode->GetData();
   if ( data == NULL )
   {
     MITK_ERROR << "No data object present!";
@@ -242,7 +242,7 @@ bool mitk::SurfaceDeformationInteractor3D
       }
 
       mitk::StateEvent *newStateEvent;
-      if ( (m_PickedSurfaceNode == m_DataTreeNode) && (m_PickedSurface != NULL) )
+      if ( (m_PickedSurfaceNode == m_DataNode) && (m_PickedSurface != NULL) )
       {
         // Yes: object will be selected
         newStateEvent = new mitk::StateEvent( EIDYES );
@@ -277,7 +277,7 @@ bool mitk::SurfaceDeformationInteractor3D
   case AcDESELECTOBJECT:
     {
       // Color object white
-      m_DataTreeNode->SetColor( 1.0, 1.0, 1.0 );
+      m_DataNode->SetColor( 1.0, 1.0, 1.0 );
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
       // Colorize surface / wireframe as inactive
@@ -291,7 +291,7 @@ bool mitk::SurfaceDeformationInteractor3D
   case AcSELECTPICKEDOBJECT:
     {
       // Color object red
-      m_DataTreeNode->SetColor( 1.0, 0.0, 0.0 );
+      m_DataNode->SetColor( 1.0, 0.0, 0.0 );
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
       // Colorize surface / wireframe dependend on distance from picked point

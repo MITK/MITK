@@ -26,7 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qpushbutton.h>
 #include <qstring.h>
 #include <qobject.h>
-#include <mitkDataTreeNode.h>
+#include <mitkDataNode.h>
 #include <qlayout.h>
 #include <qlabel.h>
 #include "ui_QmitkFunctionalityComponentContainerControls.h"
@@ -172,7 +172,7 @@ QPushButton* GetBackButton();
   bool m_ShowSelector;
 
   /** \brief Slot method that will be called if TreeNodeSelector widget was activated. */
-  void ImageSelected(const mitk::DataTreeNode* item);
+  void ImageSelected(const mitk::DataNode* item);
 
 protected slots:  
 

@@ -197,7 +197,7 @@ void QmitkLevelWindowWidgetContextMenu::getContextMenu(QMenu* contextmenu)
     mitk::DataStorage::SetOfObjects::ConstPointer allObjects = m_Manager->GetRelevantNodes();
     for ( mitk::DataStorage::SetOfObjects::ConstIterator objectIter = allObjects->Begin(); objectIter != allObjects->End(); ++objectIter)
     {
-      mitk::DataTreeNode* node = objectIter->Value();
+      mitk::DataNode* node = objectIter->Value();
       if (node)
       {
         if (node->IsVisible(NULL) == false)
@@ -277,7 +277,7 @@ void QmitkLevelWindowWidgetContextMenu::getContextMenu()
     mitk::DataStorage::SetOfObjects::ConstPointer allObjects = m_Manager->GetRelevantNodes();
     for ( mitk::DataStorage::SetOfObjects::ConstIterator objectIter = allObjects->Begin(); objectIter != allObjects->End(); ++objectIter)
     {
-      mitk::DataTreeNode* node = objectIter->Value();
+      mitk::DataNode* node = objectIter->Value();
       if (node)
       {
         mitk::LevelWindowProperty::Pointer levelWindowProperty = dynamic_cast<mitk::LevelWindowProperty*>(node->GetProperty("levelwindow"));

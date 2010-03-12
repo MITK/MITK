@@ -25,7 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 mitk::DisplayPointSetInteractor
-::DisplayPointSetInteractor(const char * type, DataTreeNode* dataTreeNode, int n)
+::DisplayPointSetInteractor(const char * type, DataNode* dataTreeNode, int n)
 :PointSetInteractor(type, dataTreeNode, n)
 {
 

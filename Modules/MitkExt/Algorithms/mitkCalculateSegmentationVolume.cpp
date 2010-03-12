@@ -104,7 +104,7 @@ bool CalculateSegmentationVolume::ThreadedUpdateFunction()
   Vector3D spacing = image->GetSlicedGeometry()->GetSpacing(); // spacing in mm
   float volumeML = (ScalarType) m_Volume * spacing[0] * spacing[1] * spacing[2] / 1000.0; // convert to ml
  
-  DataTreeNode* groupNode = GetGroupNode();
+  DataNode* groupNode = GetGroupNode();
   if (groupNode)
   {
     groupNode->SetProperty( "volume", FloatProperty::New(volumeML) );

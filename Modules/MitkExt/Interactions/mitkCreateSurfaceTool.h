@@ -48,7 +48,7 @@ class MitkExt_EXPORT CreateSurfaceTool : public SegmentationsProcessingTool
 
   protected:
     
-    virtual bool ProcessOneWorkingData( DataTreeNode* node );
+    virtual bool ProcessOneWorkingData( DataNode* node );
     virtual std::string GetErrorMessage();
 
     CreateSurfaceTool(); // purposely hidden

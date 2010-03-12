@@ -72,7 +72,7 @@ bool QmitkFiducialRegistrationWidget::UseICPIsChecked()
     return false;
 }
 
-void QmitkFiducialRegistrationWidget::SetImageFiducialsNode( mitk::DataTreeNode::Pointer imageFiducialsNode )
+void QmitkFiducialRegistrationWidget::SetImageFiducialsNode( mitk::DataNode::Pointer imageFiducialsNode )
 {
   if(imageFiducialsNode.IsNull())
   {
@@ -90,7 +90,7 @@ void QmitkFiducialRegistrationWidget::SetImageFiducialsNode( mitk::DataTreeNode:
 
 }
 
-void QmitkFiducialRegistrationWidget::SetTrackerFiducialsNode( mitk::DataTreeNode::Pointer trackerFiducialsNode )
+void QmitkFiducialRegistrationWidget::SetTrackerFiducialsNode( mitk::DataNode::Pointer trackerFiducialsNode )
 {
   if(trackerFiducialsNode.IsNull())
   {
@@ -112,12 +112,12 @@ void QmitkFiducialRegistrationWidget::SetMultiWidget( QmitkStdMultiWidget* multi
   m_MultiWidget=multiWidget;
 }
 
-mitk::DataTreeNode::Pointer QmitkFiducialRegistrationWidget::GetImageFiducialsNode()
+mitk::DataNode::Pointer QmitkFiducialRegistrationWidget::GetImageFiducialsNode()
 {
   return m_ImageFiducialsNode;
 }
 
-mitk::DataTreeNode::Pointer QmitkFiducialRegistrationWidget::GetTrackerFiducialsNode()
+mitk::DataNode::Pointer QmitkFiducialRegistrationWidget::GetTrackerFiducialsNode()
 {
   return m_TrackerFiducialsNode;
 }

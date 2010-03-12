@@ -25,7 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk
 {
-  class DataTreeNode;
+  class DataNode;
 
   /**
   * \brief Interaction with a single point by mouse movement.
@@ -37,8 +37,8 @@ namespace mitk
   {
   public:
     mitkClassMacro(MouseMovePointSetInteractor, Interactor);
-    mitkNewMacro3Param(Self, const char*, DataTreeNode*, int);
-    mitkNewMacro2Param(Self, const char*, DataTreeNode*);
+    mitkNewMacro3Param(Self, const char*, DataNode*, int);
+    mitkNewMacro2Param(Self, const char*, DataNode*);
 
     
     /**
@@ -57,7 +57,7 @@ namespace mitk
     *
     * if no n is set, then the number of points is unlimited*
     */
-    MouseMovePointSetInteractor(const char * type, DataTreeNode* dataTreeNode, int n = -1);
+    MouseMovePointSetInteractor(const char * type, DataNode* dataTreeNode, int n = -1);
 
     /**
     * \brief Default Destructor

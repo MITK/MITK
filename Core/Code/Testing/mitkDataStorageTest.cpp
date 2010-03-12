@@ -23,7 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkStringProperty.h"
 #include "mitkColorProperty.h"
 #include "mitkGroupTagProperty.h"
-#include "mitkDataTreeNode.h"
+#include "mitkDataNode.h"
 #include "mitkReferenceCountWatcher.h"
 
 #include "mitkDataStorage.h"
@@ -46,20 +46,20 @@ void TestDataStorage(mitk::DataStorage* ds);
 class DSEventReceiver // Helper class for event testing
 {
 public:
-  const mitk::DataTreeNode* m_NodeAdded;
-  const mitk::DataTreeNode* m_NodeRemoved;
+  const mitk::DataNode* m_NodeAdded;
+  const mitk::DataNode* m_NodeRemoved;
 
   DSEventReceiver()
     : m_NodeAdded(NULL), m_NodeRemoved(NULL)
   {
   }
 
-  void OnAdd(const mitk::DataTreeNode* node)
+  void OnAdd(const mitk::DataNode* node)
   {
     m_NodeAdded = node;
   }
 
-  void OnRemove(const mitk::DataTreeNode* node)
+  void OnRemove(const mitk::DataNode* node)
   {
     m_NodeRemoved = node;
   }
@@ -103,8 +103,8 @@ void TestDataStorage( mitk::DataStorage* ds )
   /* DataStorage valid? */
   MITK_TEST_CONDITION_REQUIRED(ds != NULL, "DataStorage valid?");
 
-  // create some DataTreeNodes to fill the ds
-  mitk::DataTreeNode::Pointer n1 = mitk::DataTreeNode::New();   // node with image and name property
+  // create some DataNodes to fill the ds
+  mitk::DataNode::Pointer n1 = mitk::DataNode::New();   // node with image and name property
   mitk::Image::Pointer image = mitk::Image::New();
   unsigned int imageDimensions[] = { 10, 10, 10, 10 };
   mitk::PixelType pt(typeid(int));
@@ -113,7 +113,7 @@ void TestDataStorage( mitk::DataStorage* ds )
   n1->SetProperty("name", mitk::StringProperty::New("Node 1 - Image Node"));
   mitk::DataStorage::SetOfObjects::Pointer parents1 = mitk::DataStorage::SetOfObjects::New();
 
-  mitk::DataTreeNode::Pointer n2 = mitk::DataTreeNode::New();   // node with surface and name and color properties
+  mitk::DataNode::Pointer n2 = mitk::DataNode::New();   // node with surface and name and color properties
   mitk::Surface::Pointer surface = mitk::Surface::New();
   n2->SetData(surface);
   n2->SetProperty("name", mitk::StringProperty::New("Node 2 - Surface Node"));
@@ -123,21 +123,21 @@ void TestDataStorage( mitk::DataStorage* ds )
   mitk::DataStorage::SetOfObjects::Pointer parents2 = mitk::DataStorage::SetOfObjects::New();
   parents2->InsertElement(0, n1);  // n1 (image node) is source of n2 (surface node)
 
-  mitk::DataTreeNode::Pointer n3 = mitk::DataTreeNode::New();   // node without data but with name property
+  mitk::DataNode::Pointer n3 = mitk::DataNode::New();   // node without data but with name property
   n3->SetProperty("name", mitk::StringProperty::New("Node 3 - Empty Node"));
   n3->SetProperty("Resection Proposal 1", mitk::GroupTagProperty::New());
   n3->SetProperty("Resection Proposal 2", mitk::GroupTagProperty::New());
   mitk::DataStorage::SetOfObjects::Pointer parents3 = mitk::DataStorage::SetOfObjects::New();
   parents3->InsertElement(0, n2);  // n2 is source of n3
 
-  mitk::DataTreeNode::Pointer n4 = mitk::DataTreeNode::New();   // node without data but with color property
+  mitk::DataNode::Pointer n4 = mitk::DataNode::New();   // node without data but with color property
   n4->SetColor(color);
   n4->SetProperty("Resection Proposal 2", mitk::GroupTagProperty::New());
   mitk::DataStorage::SetOfObjects::Pointer parents4 = mitk::DataStorage::SetOfObjects::New();
   parents4->InsertElement(0, n2);
   parents4->InsertElement(1, n3);  // n2 and n3 are sources of n4
 
-  mitk::DataTreeNode::Pointer n5 = mitk::DataTreeNode::New();   // extra node
+  mitk::DataNode::Pointer n5 = mitk::DataNode::New();   // extra node
   n5->SetProperty("name", mitk::StringProperty::New("Node 5"));
 
   try /* adding objects */
@@ -171,7 +171,7 @@ void TestDataStorage( mitk::DataStorage* ds )
   /* Requesting all Objects */
     {
     const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetAll();
-    std::vector<mitk::DataTreeNode::Pointer> stlAll = all->CastToSTLConstContainer();
+    std::vector<mitk::DataNode::Pointer> stlAll = all->CastToSTLConstContainer();
 
     MITK_TEST_CONDITION(
          (stlAll.size() == 5)  // check if all tree nodes are in resultset
@@ -249,7 +249,7 @@ void TestDataStorage( mitk::DataStorage* ds )
     mitk::NodePredicateNOT::Pointer predicate(mitk::NodePredicateNOT::New(proppred));
 
     const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetSubset(predicate);
-    std::vector<mitk::DataTreeNode::Pointer> stlAll = all->CastToSTLConstContainer();
+    std::vector<mitk::DataNode::Pointer> stlAll = all->CastToSTLConstContainer();
     MITK_TEST_CONDITION(
            (all->Size() == 3) // check if correct objects are in resultset
         && (std::find(stlAll.begin(), stlAll.end(), n1) != stlAll.end())
@@ -260,7 +260,7 @@ void TestDataStorage( mitk::DataStorage* ds )
   /* Requesting *direct* source objects */
   {
     const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetSources(n3, NULL, true); // Get direct parents of n3 (=n2)
-    std::vector<mitk::DataTreeNode::Pointer> stlAll = all->CastToSTLConstContainer();
+    std::vector<mitk::DataNode::Pointer> stlAll = all->CastToSTLConstContainer();
     MITK_TEST_CONDITION(
       (all->Size() == 1) && (std::find(stlAll.begin(), stlAll.end(), n2) != stlAll.end()),
       "Requesting *direct* source objects");
@@ -269,7 +269,7 @@ void TestDataStorage( mitk::DataStorage* ds )
   /* Requesting *all* source objects */
   {
     const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetSources(n3, NULL, false); // Get all parents of n3 (= n1 + n2)
-    std::vector<mitk::DataTreeNode::Pointer> stlAll = all->CastToSTLConstContainer();
+    std::vector<mitk::DataNode::Pointer> stlAll = all->CastToSTLConstContainer();
     MITK_TEST_CONDITION(
       (all->Size() == 2)
       && (std::find(stlAll.begin(), stlAll.end(), n1) != stlAll.end())
@@ -280,7 +280,7 @@ void TestDataStorage( mitk::DataStorage* ds )
   /* Requesting *all* sources of object with multiple parents */
   {
     const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetSources(n4, NULL, false); // Get all parents of n4 (= n1 + n2 + n3)
-    std::vector<mitk::DataTreeNode::Pointer> stlAll = all->CastToSTLConstContainer();
+    std::vector<mitk::DataNode::Pointer> stlAll = all->CastToSTLConstContainer();
     MITK_TEST_CONDITION(
       (all->Size() == 3)
       && (std::find(stlAll.begin(), stlAll.end(), n1) != stlAll.end())
@@ -292,7 +292,7 @@ void TestDataStorage( mitk::DataStorage* ds )
   /* Requesting *direct* derived objects */
   {
     const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetDerivations(n1, NULL, true); // Get direct childs of n1 (=n2)
-    std::vector<mitk::DataTreeNode::Pointer> stlAll = all->CastToSTLConstContainer();
+    std::vector<mitk::DataNode::Pointer> stlAll = all->CastToSTLConstContainer();
     MITK_TEST_CONDITION(
       (all->Size() == 1)
       && (std::find(stlAll.begin(), stlAll.end(), n2) != stlAll.end())// check if n1 is the resultset
@@ -304,7 +304,7 @@ void TestDataStorage( mitk::DataStorage* ds )
 
   {
     const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetDerivations(n2, NULL, true); // Get direct childs of n2 (=n3 + n4)
-    std::vector<mitk::DataTreeNode::Pointer> stlAll = all->CastToSTLConstContainer();
+    std::vector<mitk::DataNode::Pointer> stlAll = all->CastToSTLConstContainer();
     MITK_TEST_CONDITION(
       (all->Size() == 2)
       && (std::find(stlAll.begin(), stlAll.end(), n3) != stlAll.end()) // check if n3 is the resultset
@@ -315,7 +315,7 @@ void TestDataStorage( mitk::DataStorage* ds )
   //* Requesting *all* derived objects */
   {
     const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetDerivations(n1, NULL, false); // Get all childs of n1 (=n2, n3, n4)
-    std::vector<mitk::DataTreeNode::Pointer> stlAll = all->CastToSTLConstContainer();
+    std::vector<mitk::DataNode::Pointer> stlAll = all->CastToSTLConstContainer();
     MITK_TEST_CONDITION(
       (all->Size() == 3)
       && (std::find(stlAll.begin(), stlAll.end(), n2) != stlAll.end())
@@ -328,7 +328,7 @@ void TestDataStorage( mitk::DataStorage* ds )
   {
     parents1->InsertElement(0, n4);   // make n1 derived from n4 (which is derived from n2, which is derived from n1)
     const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetSources(n4, NULL, false); // Get all parents of n4 (= n1 + n2 + n3, not n4 itself and not multiple versions of the nodes!)
-    std::vector<mitk::DataTreeNode::Pointer> stlAll = all->CastToSTLConstContainer();
+    std::vector<mitk::DataNode::Pointer> stlAll = all->CastToSTLConstContainer();
     MITK_TEST_CONDITION(
       (all->Size() == 3)
       && (std::find(stlAll.begin(), stlAll.end(), n1) != stlAll.end())
@@ -345,7 +345,7 @@ void TestDataStorage( mitk::DataStorage* ds )
     mitk::GroupTagProperty::Pointer tp = mitk::GroupTagProperty::New();
     mitk::NodePredicateProperty::Pointer pred(mitk::NodePredicateProperty::New("Resection Proposal 1", tp));
     const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetSubset(pred);
-    std::vector<mitk::DataTreeNode::Pointer> stlAll = all->CastToSTLConstContainer();
+    std::vector<mitk::DataNode::Pointer> stlAll = all->CastToSTLConstContainer();
     MITK_TEST_CONDITION(
         (all->Size() == 2) // check if n2 and n3 are in resultset
         && (std::find(stlAll.begin(), stlAll.end(), n2) != stlAll.end())
@@ -358,7 +358,7 @@ void TestDataStorage( mitk::DataStorage* ds )
     mitk::GroupTagProperty::Pointer tp = mitk::GroupTagProperty::New();
     mitk::NodePredicateProperty::Pointer pred(mitk::NodePredicateProperty::New("Resection Proposal 2", tp));
     const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetSubset(pred);
-    std::vector<mitk::DataTreeNode::Pointer> stlAll = all->CastToSTLConstContainer();
+    std::vector<mitk::DataNode::Pointer> stlAll = all->CastToSTLConstContainer();
     MITK_TEST_CONDITION(
       (all->Size() == 2) // check if n3 and n4 are in resultset
       && (std::find(stlAll.begin(), stlAll.end(), n3) != stlAll.end())
@@ -371,7 +371,7 @@ void TestDataStorage( mitk::DataStorage* ds )
   {
     mitk::NodePredicateDataType::Pointer pred = mitk::NodePredicateDataType::New("Surface");
     const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetSources(n4, pred, true);
-    std::vector<mitk::DataTreeNode::Pointer> stlAll = all->CastToSTLConstContainer();
+    std::vector<mitk::DataNode::Pointer> stlAll = all->CastToSTLConstContainer();
     MITK_TEST_CONDITION(
       (all->Size() == 1) // check if n2 is in resultset
       && (std::find(stlAll.begin(), stlAll.end(), n2) != stlAll.end())
@@ -382,7 +382,7 @@ void TestDataStorage( mitk::DataStorage* ds )
   {
     mitk::NodePredicateDataType::Pointer pred = mitk::NodePredicateDataType::New("Image");
     const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetSources(n4, pred, false);
-    std::vector<mitk::DataTreeNode::Pointer> stlAll = all->CastToSTLConstContainer();
+    std::vector<mitk::DataNode::Pointer> stlAll = all->CastToSTLConstContainer();
     MITK_TEST_CONDITION(
       (all->Size() == 1) // check if n1 is in resultset
       && (std::find(stlAll.begin(), stlAll.end(), n1) != stlAll.end())
@@ -400,7 +400,7 @@ void TestDataStorage( mitk::DataStorage* ds )
   {
     mitk::NodePredicateProperty::Pointer pred = mitk::NodePredicateProperty::New("color");
     const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetDerivations(n1, pred, true);
-    std::vector<mitk::DataTreeNode::Pointer> stlAll = all->CastToSTLConstContainer();
+    std::vector<mitk::DataNode::Pointer> stlAll = all->CastToSTLConstContainer();
     MITK_TEST_CONDITION(
       (all->Size() == 1) // check if n2 is in resultset
       && (std::find(stlAll.begin(), stlAll.end(), n2) != stlAll.end())
@@ -412,7 +412,7 @@ void TestDataStorage( mitk::DataStorage* ds )
     mitk::NodePredicateProperty::Pointer pred = mitk::NodePredicateProperty::New("color");
 
     const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetDerivations(n1, pred, false);
-    std::vector<mitk::DataTreeNode::Pointer> stlAll = all->CastToSTLConstContainer();
+    std::vector<mitk::DataNode::Pointer> stlAll = all->CastToSTLConstContainer();
     MITK_TEST_CONDITION(
       (all->Size() == 2) // check if n2 and n4 are in resultset
         && (std::find(stlAll.begin(), stlAll.end(), n2) != stlAll.end())
@@ -472,7 +472,7 @@ void TestDataStorage( mitk::DataStorage* ds )
 
   /* Checking removal of a node without relations */
   {
-    mitk::DataTreeNode::Pointer extra = mitk::DataTreeNode::New();
+    mitk::DataNode::Pointer extra = mitk::DataNode::New();
     extra->SetProperty("name", mitk::StringProperty::New("extra"));
     mitk::ReferenceCountWatcher::Pointer watcher = new mitk::ReferenceCountWatcher(extra);
     int refCountbeforeDS = watcher->GetReferenceCount();
@@ -488,7 +488,7 @@ void TestDataStorage( mitk::DataStorage* ds )
 
   /* Checking removal of a node with a parent */
   {
-    mitk::DataTreeNode::Pointer extra = mitk::DataTreeNode::New();
+    mitk::DataNode::Pointer extra = mitk::DataNode::New();
     extra->SetProperty("name", mitk::StringProperty::New("extra"));
 
     mitk::ReferenceCountWatcher::Pointer watcher = new mitk::ReferenceCountWatcher(extra);
@@ -510,7 +510,7 @@ void TestDataStorage( mitk::DataStorage* ds )
 
   /* Checking removal of a node with two parents */
   {
-    mitk::DataTreeNode::Pointer extra = mitk::DataTreeNode::New();
+    mitk::DataNode::Pointer extra = mitk::DataNode::New();
     extra->SetProperty("name", mitk::StringProperty::New("extra"));
 
     mitk::ReferenceCountWatcher::Pointer watcher = new mitk::ReferenceCountWatcher(extra);
@@ -539,15 +539,15 @@ void TestDataStorage( mitk::DataStorage* ds )
 
   /* Checking removal of a node with two derived nodes */
   {
-    mitk::DataTreeNode::Pointer extra = mitk::DataTreeNode::New();
+    mitk::DataNode::Pointer extra = mitk::DataNode::New();
     extra->SetProperty("name", mitk::StringProperty::New("extra"));
     mitk::ReferenceCountWatcher::Pointer watcher = new mitk::ReferenceCountWatcher(extra);
     int refCountbeforeDS = watcher->GetReferenceCount();
     ds->Add(extra);
-    mitk::DataTreeNode::Pointer d1 = mitk::DataTreeNode::New();
+    mitk::DataNode::Pointer d1 = mitk::DataNode::New();
     d1->SetProperty("name", mitk::StringProperty::New("d1"));
     ds->Add(d1, extra);
-    mitk::DataTreeNode::Pointer d2 = mitk::DataTreeNode::New();
+    mitk::DataNode::Pointer d2 = mitk::DataNode::New();
     d2->SetProperty("name", mitk::StringProperty::New("d2"));
     ds->Add(d2, extra);
 
@@ -574,7 +574,7 @@ void TestDataStorage( mitk::DataStorage* ds )
 
   /* Checking removal of a node with two parents and two derived nodes */
   {
-    mitk::DataTreeNode::Pointer extra = mitk::DataTreeNode::New();
+    mitk::DataNode::Pointer extra = mitk::DataNode::New();
     extra->SetProperty("name", mitk::StringProperty::New("extra"));
     mitk::ReferenceCountWatcher::Pointer watcher = new mitk::ReferenceCountWatcher(extra);
     mitk::ReferenceCountWatcher::Pointer n1watcher = new mitk::ReferenceCountWatcher(n1);
@@ -585,10 +585,10 @@ void TestDataStorage( mitk::DataStorage* ds )
     p->push_back(n2);
     ds->Add(extra, p);   // n1 and n2 are parents of extra
 
-    mitk::DataTreeNode::Pointer d1 = mitk::DataTreeNode::New();
+    mitk::DataNode::Pointer d1 = mitk::DataNode::New();
     d1->SetProperty("name", mitk::StringProperty::New("d1x"));
     ds->Add(d1, extra);
-    mitk::DataTreeNode::Pointer d2 = mitk::DataTreeNode::New();
+    mitk::DataNode::Pointer d2 = mitk::DataNode::New();
     d2->SetProperty("name", mitk::StringProperty::New("d2x"));
     ds->Add(d2, extra);
 
@@ -626,7 +626,7 @@ void TestDataStorage( mitk::DataStorage* ds )
  /* Checking for node is it's own parent exception */
   {
   MITK_TEST_FOR_EXCEPTION_BEGIN(...);
-    mitk::DataTreeNode::Pointer extra = mitk::DataTreeNode::New();
+    mitk::DataNode::Pointer extra = mitk::DataNode::New();
     extra->SetProperty("name", mitk::StringProperty::New("extra"));
     mitk::DataStorage::SetOfObjects::Pointer p = mitk::DataStorage::SetOfObjects::New();
     p->push_back(n1);
@@ -638,7 +638,7 @@ void TestDataStorage( mitk::DataStorage* ds )
 
  /* Checking reference count of node after add and remove */
   {
-    mitk::DataTreeNode::Pointer extra = mitk::DataTreeNode::New();
+    mitk::DataNode::Pointer extra = mitk::DataNode::New();
     mitk::ReferenceCountWatcher::Pointer watcher = new mitk::ReferenceCountWatcher(extra);
     extra->SetProperty("name", mitk::StringProperty::New("extra"));
     mitk::DataStorage::SetOfObjects::Pointer p = mitk::DataStorage::SetOfObjects::New();
@@ -665,10 +665,10 @@ void TestDataStorage( mitk::DataStorage* ds )
   DSEventReceiver listener;
   try
   {
-    ds->AddNodeEvent += mitk::MessageDelegate1<DSEventReceiver, const mitk::DataTreeNode*>(&listener, &DSEventReceiver::OnAdd);
-    ds->RemoveNodeEvent += mitk::MessageDelegate1<DSEventReceiver, const mitk::DataTreeNode*>(&listener, &DSEventReceiver::OnRemove);
+    ds->AddNodeEvent += mitk::MessageDelegate1<DSEventReceiver, const mitk::DataNode*>(&listener, &DSEventReceiver::OnAdd);
+    ds->RemoveNodeEvent += mitk::MessageDelegate1<DSEventReceiver, const mitk::DataNode*>(&listener, &DSEventReceiver::OnRemove);
 
-    mitk::DataTreeNode::Pointer extra = mitk::DataTreeNode::New();
+    mitk::DataNode::Pointer extra = mitk::DataNode::New();
     mitk::ReferenceCountWatcher::Pointer watcher = new mitk::ReferenceCountWatcher(extra);
     ds->Add(extra);
 
@@ -678,8 +678,8 @@ void TestDataStorage( mitk::DataStorage* ds )
     MITK_TEST_CONDITION(listener.m_NodeRemoved == extra.GetPointer(), "Checking RemoveEvent");
 
     /* RemoveListener */
-    ds->AddNodeEvent -= mitk::MessageDelegate1<DSEventReceiver, const mitk::DataTreeNode*>(&listener, &DSEventReceiver::OnAdd);
-    ds->RemoveNodeEvent -= mitk::MessageDelegate1<DSEventReceiver, const mitk::DataTreeNode*>(&listener, &DSEventReceiver::OnRemove);
+    ds->AddNodeEvent -= mitk::MessageDelegate1<DSEventReceiver, const mitk::DataNode*>(&listener, &DSEventReceiver::OnAdd);
+    ds->RemoveNodeEvent -= mitk::MessageDelegate1<DSEventReceiver, const mitk::DataNode*>(&listener, &DSEventReceiver::OnRemove);
     listener.m_NodeAdded = NULL;
     listener.m_NodeRemoved = NULL;
     ds->Add(extra);
@@ -694,8 +694,8 @@ void TestDataStorage( mitk::DataStorage* ds )
   catch(...)
   {
     /* cleanup */
-    ds->AddNodeEvent -= mitk::MessageDelegate1<DSEventReceiver, const mitk::DataTreeNode*>(&listener, &DSEventReceiver::OnAdd);
-    ds->RemoveNodeEvent -= mitk::MessageDelegate1<DSEventReceiver, const mitk::DataTreeNode*>(&listener, &DSEventReceiver::OnRemove);
+    ds->AddNodeEvent -= mitk::MessageDelegate1<DSEventReceiver, const mitk::DataNode*>(&listener, &DSEventReceiver::OnAdd);
+    ds->RemoveNodeEvent -= mitk::MessageDelegate1<DSEventReceiver, const mitk::DataNode*>(&listener, &DSEventReceiver::OnRemove);
     MITK_TEST_FAILED_MSG( << "Exception during object removal methods");
   }
 

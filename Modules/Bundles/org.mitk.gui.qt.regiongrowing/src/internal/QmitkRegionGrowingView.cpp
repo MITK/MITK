@@ -65,10 +65,10 @@ void QmitkRegionGrowingView::CreateQtPartControl( QWidget *parent )
     // let the point set widget know about the multi widget (crosshair updates)
     m_Controls->lstPoints->SetMultiWidget( m_MultiWidget );
     
-    // create a new DataTreeNode containing a PointSet with some interaction
+    // create a new DataNode containing a PointSet with some interaction
     m_PointSet = mitk::PointSet::New();
 
-    mitk::DataTreeNode::Pointer pointSetNode = mitk::DataTreeNode::New();
+    mitk::DataNode::Pointer pointSetNode = mitk::DataNode::New();
     pointSetNode->SetData( m_PointSet );
     pointSetNode->SetName("seed points for region growing");
     pointSetNode->SetProperty("helper object", mitk::BoolProperty::New(true) );
@@ -97,14 +97,14 @@ void QmitkRegionGrowingView::StdMultiWidgetNotAvailable()
 }
 
 
-void QmitkRegionGrowingView::OnSelectionChanged( std::vector<mitk::DataTreeNode*> nodes )
+void QmitkRegionGrowingView::OnSelectionChanged( std::vector<mitk::DataNode*> nodes )
 { 
   // iterate all selected objects, adjust warning visibility
-  for( std::vector<mitk::DataTreeNode*>::iterator it = nodes.begin();
+  for( std::vector<mitk::DataNode*>::iterator it = nodes.begin();
        it != nodes.end();
        ++it )
   {
-    mitk::DataTreeNode::Pointer node = *it;
+    mitk::DataNode::Pointer node = *it;
   
     if( node.IsNotNull() && dynamic_cast<mitk::Image*>(node->GetData()) )
     {
@@ -119,10 +119,10 @@ void QmitkRegionGrowingView::OnSelectionChanged( std::vector<mitk::DataTreeNode*
 
 void QmitkRegionGrowingView::DoImageProcessing()
 {
-  std::vector<mitk::DataTreeNode*> nodes = this->GetDataManagerSelection();
+  std::vector<mitk::DataNode*> nodes = this->GetDataManagerSelection();
   if (nodes.empty()) return;
 
-  mitk::DataTreeNode* node = nodes.front();
+  mitk::DataNode* node = nodes.front();
 
   if (!node)
   {
@@ -131,7 +131,7 @@ void QmitkRegionGrowingView::DoImageProcessing()
     return;
   }
 
-  // here we have a valid mitk::DataTreeNode
+  // here we have a valid mitk::DataNode
 
   // a node itself is not very useful, we need its data item (the image)
   mitk::BaseData* data = node->GetData();
@@ -146,7 +146,7 @@ void QmitkRegionGrowingView::DoImageProcessing()
       message << "Performing image processing for image ";
       if (node->GetName(name))
       {
-        // a property called "name" was found for this DataTreeNode
+        // a property called "name" was found for this DataNode
         message << "'" << name << "'";
       }
       message << ".";
@@ -225,7 +225,7 @@ void QmitkRegionGrowingView::ItkImageProcessing( itk::Image< TPixel, VImageDimen
   regionGrower->Update();
 
   mitk::Image::Pointer resultImage = mitk::ImportItkImage( regionGrower->GetOutput() );
-  mitk::DataTreeNode::Pointer newNode = mitk::DataTreeNode::New();
+  mitk::DataNode::Pointer newNode = mitk::DataNode::New();
   newNode->SetData( resultImage );
 
   // set some properties

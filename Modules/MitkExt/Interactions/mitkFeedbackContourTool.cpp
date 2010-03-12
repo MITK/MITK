@@ -34,7 +34,7 @@ mitk::FeedbackContourTool::FeedbackContourTool(const char* type)
  m_ContourUtils(ContourUtils::New())
 {
   m_FeedbackContour = Contour::New();
-  m_FeedbackContourNode = DataTreeNode::New();
+  m_FeedbackContourNode = DataNode::New();
   m_FeedbackContourNode->SetData( m_FeedbackContour );
   m_FeedbackContourNode->SetProperty("name", StringProperty::New("One of FeedbackContourTool's feedback nodes"));
   m_FeedbackContourNode->SetProperty("visible", BoolProperty::New(true));

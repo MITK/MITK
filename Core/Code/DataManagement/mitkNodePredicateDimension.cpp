@@ -17,7 +17,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkNodePredicateDimension.h"
 
-#include "mitkDataTreeNode.h"
+#include "mitkDataNode.h"
 
 
 mitk::NodePredicateDimension::NodePredicateDimension(unsigned int dimension, int pixelComponents)
@@ -38,7 +38,7 @@ mitk::NodePredicateDimension::~NodePredicateDimension()
 }
 
 
-bool mitk::NodePredicateDimension::CheckNode(const mitk::DataTreeNode* node) const
+bool mitk::NodePredicateDimension::CheckNode(const mitk::DataNode* node) const
 {
   if (node == NULL)
     throw std::invalid_argument("NodePredicateDimension: invalid node");

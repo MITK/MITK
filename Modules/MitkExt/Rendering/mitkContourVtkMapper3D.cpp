@@ -17,7 +17,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkContourVtkMapper3D.h"
-#include "mitkDataTreeNode.h"
+#include "mitkDataNode.h"
 #include "mitkProperties.h"
 #include "mitkColorProperty.h"
 #include "mitkVtkPropRenderer.h"
@@ -95,10 +95,10 @@ void mitk::ContourVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
 
     int i;
     float pointSize = 2;
-    this->GetDataTreeNode()->GetFloatProperty("spheres size", pointSize);
+    this->GetDataNode()->GetFloatProperty("spheres size", pointSize);
 
     bool showPoints = true;
-    this->GetDataTreeNode()->GetBoolProperty("show points", showPoints);
+    this->GetDataNode()->GetBoolProperty("show points", showPoints);
     if ( showPoints )
     {
       m_VtkPointList = vtkAppendPolyData::New();

@@ -29,7 +29,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QStringListModel>
 #include <QAbstractItemModel>
 
-#include <mitkDataTreeNodeFactory.h>
+#include <mitkDataNodeFactory.h>
 
 QmitkNewSegmentationDialog::QmitkNewSegmentationDialog(QWidget* parent)
 :QDialog(parent), // true, modal

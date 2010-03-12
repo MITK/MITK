@@ -17,7 +17,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkCompressedImageContainer.h"
 #include "mitkCoreObjectFactory.h"
-#include "mitkDataTreeNodeFactory.h"
+#include "mitkDataNodeFactory.h"
 #include "mitkImageDataItem.h"
 #include "itkSmartPointerForwardReference.txx"
 
@@ -129,7 +129,7 @@ int mitkCompressedImageContainerTest(int argc, char* argv[])
   // load the image
 
     mitk::Image::Pointer image = NULL;
-    mitk::DataTreeNodeFactory::Pointer factory = mitk::DataTreeNodeFactory::New();
+    mitk::DataNodeFactory::Pointer factory = mitk::DataNodeFactory::New();
     try
     {
       std::cout << "Testing with parameter '" << argv[1] << "'" << std::endl;
@@ -141,7 +141,7 @@ int mitkCompressedImageContainerTest(int argc, char* argv[])
         std::cerr<<"File could not be loaded [FAILED]"<<std::endl;
         return EXIT_FAILURE;
       }
-      mitk::DataTreeNode::Pointer node = factory->GetOutput( 0 );
+      mitk::DataNode::Pointer node = factory->GetOutput( 0 );
       image = dynamic_cast<mitk::Image*>(node->GetData());
       if(image.IsNull())
       {

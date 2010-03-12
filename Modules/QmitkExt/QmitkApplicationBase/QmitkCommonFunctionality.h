@@ -36,8 +36,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkProperties.h>
 #include <mitkLevelWindowProperty.h>
 #include <mitkStringProperty.h>
-#include <mitkDataTreeNode.h>
-#include <mitkDataTreeNodeFactory.h>
+#include <mitkDataNode.h>
+#include <mitkDataNodeFactory.h>
 #include <mitkImageCast.h>
 #include <mitkSurface.h>
 #include "itkImage.h"
@@ -67,7 +67,7 @@ namespace mitk
 namespace CommonFunctionality
 {
 
-  typedef std::vector<mitk::DataTreeNode*> DataTreeNodeVector;
+  typedef std::vector<mitk::DataNode*> DataNodeVector;
   /** \brief compute min and max
   */
   template < typename TImageType >
@@ -86,7 +86,7 @@ namespace CommonFunctionality
   }
 
   template < typename TImageType >
-  static void AutoLevelWindow( mitk::DataTreeNode::Pointer node )
+  static void AutoLevelWindow( mitk::DataNode::Pointer node )
   {
     mitk::Image::Pointer image = dynamic_cast<mitk::Image*> (node->GetData() );
     if ( image.IsNotNull() )
@@ -116,15 +116,15 @@ namespace CommonFunctionality
     }
   }
 
-  QmitkExt_EXPORT mitk::DataTreeNode::Pointer FileOpen( const QString& fileName);
-  QmitkExt_EXPORT mitk::DataTreeNode::Pointer FileOpen( const char *fileName );
-  QmitkExt_EXPORT mitk::DataTreeNode::Pointer FileOpenSpecific( const QString& fileExtensions);
-  QmitkExt_EXPORT mitk::DataTreeNode::Pointer FileOpenSpecific( const char *fileExtensions );
-  QmitkExt_EXPORT mitk::DataTreeNode::Pointer FileOpenImageSequence(const QString& fileName);
-  QmitkExt_EXPORT mitk::DataTreeNode::Pointer FileOpenImageSequence(const char* fileName);
-  QmitkExt_EXPORT mitk::DataTreeNode::Pointer FileOpenImageSequence();
-  QmitkExt_EXPORT mitk::DataTreeNode::Pointer FileOpen();
-  QmitkExt_EXPORT mitk::DataTreeNode::Pointer OpenVolumeOrSliceStack();
+  QmitkExt_EXPORT mitk::DataNode::Pointer FileOpen( const QString& fileName);
+  QmitkExt_EXPORT mitk::DataNode::Pointer FileOpen( const char *fileName );
+  QmitkExt_EXPORT mitk::DataNode::Pointer FileOpenSpecific( const QString& fileExtensions);
+  QmitkExt_EXPORT mitk::DataNode::Pointer FileOpenSpecific( const char *fileExtensions );
+  QmitkExt_EXPORT mitk::DataNode::Pointer FileOpenImageSequence(const QString& fileName);
+  QmitkExt_EXPORT mitk::DataNode::Pointer FileOpenImageSequence(const char* fileName);
+  QmitkExt_EXPORT mitk::DataNode::Pointer FileOpenImageSequence();
+  QmitkExt_EXPORT mitk::DataNode::Pointer FileOpen();
+  QmitkExt_EXPORT mitk::DataNode::Pointer OpenVolumeOrSliceStack();
 
   QmitkExt_EXPORT std::string SaveImage(mitk::Image* image, const char* aFileName = NULL, bool askForDifferentFilename = false);
 

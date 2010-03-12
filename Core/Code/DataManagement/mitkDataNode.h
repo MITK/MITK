@@ -63,7 +63,7 @@ class Mapper;
 //##
 //## @warning Change in semantics of SetProperty() since Aug 25th 2006. Check your usage of this method if you do
 //##          more with properties than just call <tt>SetProperty( "key", new SomeProperty("value") )</tt>.
-class MITK_CORE_EXPORT DataTreeNode : public itk::DataObject
+class MITK_CORE_EXPORT DataNode : public itk::DataObject
 {
 public:
 
@@ -72,14 +72,14 @@ public:
   typedef std::map<const mitk::BaseRenderer*,mitk::PropertyList::Pointer> MapOfPropertyLists;
   typedef std::set<std::string> GroupTagList;
 
-  mitkClassMacro(DataTreeNode, itk::DataObject);
+  mitkClassMacro(DataNode, itk::DataObject);
 
   itkNewMacro(Self);
 
   mitk::Mapper* GetMapper(MapperSlotId id) const;
   //##Documentation
   //## @brief Get the data object (instance of BaseData, e.g., an Image)
-  //## managed by this DataTreeNode
+  //## managed by this DataNode
   BaseData* GetData() const;
   //##Documentation
   //## @brief Get the transformation applied prior to displaying the data as
@@ -91,7 +91,7 @@ public:
   Interactor* GetInteractor() const;
   //##Documentation
   //## @brief Set the data object (instance of BaseData, e.g., an Image)
-  //## managed by this DataTreeNode
+  //## managed by this DataNode
   //## @warning the actor-mode of the vtkInteractor does not work any more, if the transform of the
   //## data-tree-node is connected to the transform of the basedata via vtkTransform->SetInput.
   virtual void SetData(mitk::BaseData* baseData);
@@ -99,9 +99,9 @@ public:
   //## @brief Set the Interactor
   virtual void SetInteractor(Interactor* interactor);
 
-  mitk::DataTreeNode& operator=(const DataTreeNode& right);
+  mitk::DataNode& operator=(const DataNode& right);
 
-  mitk::DataTreeNode& operator=(BaseData* right);
+  mitk::DataNode& operator=(BaseData* right);
   virtual void SetMapper(MapperSlotId id, mitk::Mapper* mapper);
   virtual void UpdateOutputInformation();
 
@@ -132,7 +132,7 @@ public:
   //## of the @a renderer (if NULL, use BaseRenderer-independent PropertyList). This is set-by-reference.
   //##
   //## If @a renderer is @a NULL the property is set in the BaseRenderer-independent
-  //## PropertyList of this DataTreeNode.
+  //## PropertyList of this DataNode.
   //## @sa GetProperty
   //## @sa m_PropertyList
   //## @sa m_MapOfPropertyLists
@@ -157,7 +157,7 @@ public:
 
   //##Documentation
   //## @brief Get the PropertyList of the @a renderer. If @a renderer is @a
-  //## NULL, the BaseRenderer-independent PropertyList of this DataTreeNode
+  //## NULL, the BaseRenderer-independent PropertyList of this DataNode
   //## is returned.
   //## @sa GetProperty
   //## @sa m_PropertyList
@@ -184,7 +184,7 @@ public:
   //##
   //## If @a renderer is @a NULL or the @a propertyKey cannot be found
   //## in the PropertyList specific to @a renderer or is disabled there, the BaseRenderer-independent
-  //## PropertyList of this DataTreeNode is queried.
+  //## PropertyList of this DataNode is queried.
   //## @sa GetPropertyList
   //## @sa m_PropertyList
   //## @sa m_MapOfPropertyLists
@@ -196,7 +196,7 @@ public:
   //##
   //## If @a renderer is @a NULL or the @a propertyKey cannot be found
   //## in the PropertyList specific to @a renderer or is disabled there, the BaseRenderer-independent
-  //## PropertyList of this DataTreeNode is queried.
+  //## PropertyList of this DataNode is queried.
   //## @sa GetPropertyList
   //## @sa m_PropertyList
   //## @sa m_MapOfPropertyLists
@@ -213,7 +213,7 @@ public:
   //##
   //## If @a renderer is @a NULL or the @a propertyKey cannot be found
   //## in the PropertyList specific to @a renderer or is disabled there, the BaseRenderer-independent
-  //## PropertyList of this DataTreeNode is queried.
+  //## PropertyList of this DataNode is queried.
   //## @sa GetPropertyList
   //## @sa m_PropertyList
   //## @sa m_MapOfPropertyLists
@@ -470,12 +470,12 @@ public:
   virtual bool IsInteractorEnabled() const;
 
 protected:
-  DataTreeNode();
+  DataNode();
 
-  virtual ~DataTreeNode();
+  virtual ~DataNode();
 
   //##
-  //## Invoked when the property list was modified. Calls Modified() of the DataTreeNode
+  //## Invoked when the property list was modified. Calls Modified() of the DataNode
   virtual void PropertyListModified(const itk::Object *caller, const itk::EventObject &event);
 
   //##Documentation
@@ -484,7 +484,7 @@ protected:
 
   //##Documentation
   //## @brief The data object (instance of BaseData, e.g., an Image) managed
-  //## by this DataTreeNode
+  //## by this DataNode
   BaseData::Pointer m_Data;
 
   //##Documentation
@@ -511,16 +511,16 @@ protected:
 
 
 #if (_MSC_VER > 1200) || !defined(_MSC_VER)
-MITK_CORE_EXPORT MBI_STD::istream& operator>>( MBI_STD::istream& i, DataTreeNode::Pointer& dtn );
+MITK_CORE_EXPORT MBI_STD::istream& operator>>( MBI_STD::istream& i, DataNode::Pointer& dtn );
 
-MITK_CORE_EXPORT MBI_STD::ostream& operator<<( MBI_STD::ostream& o, DataTreeNode::Pointer& dtn);
+MITK_CORE_EXPORT MBI_STD::ostream& operator<<( MBI_STD::ostream& o, DataNode::Pointer& dtn);
 #endif
 } // namespace mitk
 
 #if ((defined(_MSC_VER)) && (_MSC_VER <= 1200))
-MITK_CORE_EXPORT MBI_STD::istream& operator>>( MBI_STD::istream& i, mitk::DataTreeNode::Pointer& dtn );
+MITK_CORE_EXPORT MBI_STD::istream& operator>>( MBI_STD::istream& i, mitk::DataNode::Pointer& dtn );
 
-MITK_CORE_EXPORT MBI_STD::ostream& operator<<( MBI_STD::ostream& o, mitk::DataTreeNode::Pointer& dtn);
+MITK_CORE_EXPORT MBI_STD::ostream& operator<<( MBI_STD::ostream& o, mitk::DataNode::Pointer& dtn);
 #endif
 
 

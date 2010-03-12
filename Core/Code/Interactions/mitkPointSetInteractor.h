@@ -25,7 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk
 {
-  class DataTreeNode;
+  class DataNode;
 
   /**
    * \brief Interaction with a set of points.
@@ -37,8 +37,8 @@ namespace mitk
   {
   public:
     mitkClassMacro(PointSetInteractor, Interactor);
-    mitkNewMacro3Param(Self, const char*, DataTreeNode*, int);
-    mitkNewMacro2Param(Self, const char*, DataTreeNode*);
+    mitkNewMacro3Param(Self, const char*, DataNode*, int);
+    mitkNewMacro2Param(Self, const char*, DataNode*);
 
     /**
      * @brief Clears all the elements from the given timeStep in the list with undo-functionality and 
@@ -64,7 +64,7 @@ namespace mitk
      *
      * if no n is set, then the number of points is unlimited*
      */
-    PointSetInteractor(const char * type, DataTreeNode* dataTreeNode, int n = -1);
+    PointSetInteractor(const char * type, DataNode* dataTreeNode, int n = -1);
 
     /**
      * \brief Default Destructor

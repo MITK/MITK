@@ -16,10 +16,10 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 
-#include "mitkDataTreeNodeSource.h"
+#include "mitkDataNodeSource.h"
 
 
-mitk::DataTreeNodeSource::DataTreeNodeSource()
+mitk::DataNodeSource::DataNodeSource()
 {
     // Create the output.
     OutputType::Pointer output = dynamic_cast<OutputType*> ( this->MakeOutput( 0 ).GetPointer() );
@@ -31,14 +31,14 @@ mitk::DataTreeNodeSource::DataTreeNodeSource()
 
 
 
-mitk::DataTreeNodeSource::~DataTreeNodeSource()
+mitk::DataNodeSource::~DataNodeSource()
 {
 }
 
 
 
 
-itk::DataObject::Pointer mitk::DataTreeNodeSource::MakeOutput ( unsigned int /*idx*/ )
+itk::DataObject::Pointer mitk::DataNodeSource::MakeOutput ( unsigned int /*idx*/ )
 {
     return OutputType::New().GetPointer();
 }
@@ -46,7 +46,7 @@ itk::DataObject::Pointer mitk::DataTreeNodeSource::MakeOutput ( unsigned int /*i
 
 
 
-void mitk::DataTreeNodeSource::SetOutput( OutputType* output )
+void mitk::DataNodeSource::SetOutput( OutputType* output )
 {
     this->itk::ProcessObject::SetNthOutput( 0, output );
 }
@@ -54,7 +54,7 @@ void mitk::DataTreeNodeSource::SetOutput( OutputType* output )
 
 
 
-void mitk::DataTreeNodeSource::SetOutput( unsigned int idx, OutputType* output )
+void mitk::DataNodeSource::SetOutput( unsigned int idx, OutputType* output )
 {
     this->itk::ProcessObject::SetNthOutput(idx, output);    
 }
@@ -62,7 +62,7 @@ void mitk::DataTreeNodeSource::SetOutput( unsigned int idx, OutputType* output )
 
 
 
-mitk::DataTreeNodeSource::OutputType* mitk::DataTreeNodeSource::GetOutput()
+mitk::DataNodeSource::OutputType* mitk::DataNodeSource::GetOutput()
 {
     if ( this->GetNumberOfOutputs() < 1 )
     {
@@ -77,7 +77,7 @@ mitk::DataTreeNodeSource::OutputType* mitk::DataTreeNodeSource::GetOutput()
 
 
 
-mitk::DataTreeNodeSource::OutputType* mitk::DataTreeNodeSource::GetOutput ( unsigned int idx )
+mitk::DataNodeSource::OutputType* mitk::DataNodeSource::GetOutput ( unsigned int idx )
 {
     return dynamic_cast<OutputType*> ( this->itk::ProcessObject::GetOutput( idx ) );
 }

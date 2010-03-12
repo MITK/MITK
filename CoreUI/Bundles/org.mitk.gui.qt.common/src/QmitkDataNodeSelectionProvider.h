@@ -22,21 +22,21 @@
 #include "mitkQtCommonDll.h"
 
 #include <berryQtSelectionProvider.h>
-#include <mitkDataTreeNodeSelection.h>
+#include <mitkDataNodeSelection.h>
 
-class MITK_QT_COMMON QmitkDataTreeNodeSelectionProvider : public berry::QtSelectionProvider
+class MITK_QT_COMMON QmitkDataNodeSelectionProvider : public berry::QtSelectionProvider
 {
 public:
 
-  berryObjectMacro(QmitkDataTreeNodeSelectionProvider)
+  berryObjectMacro(QmitkDataNodeSelectionProvider)
 
-  QmitkDataTreeNodeSelectionProvider();
+  QmitkDataNodeSelectionProvider();
 
   berry::ISelection::ConstPointer GetSelection() const;
 
 protected:
 
-  mitk::DataTreeNodeSelection::ConstPointer GetDataTreeNodeSelection() const;
+  mitk::DataNodeSelection::ConstPointer GetDataNodeSelection() const;
 
   virtual void FireSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
 };

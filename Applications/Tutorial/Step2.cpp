@@ -2,7 +2,7 @@
 #include "QmitkRegisterClasses.h"
 #include "QmitkRenderWindow.h"
 
-#include <mitkDataTreeNodeFactory.h>
+#include <mitkDataNodeFactory.h>
 #include <mitkStandaloneDataStorage.h>
 
 #include <itksys/SystemTools.hxx>
@@ -12,7 +12,7 @@
 //## @brief Load one or more data sets (many image, surface
 //## and other formats) and display it in a 2D view
 //##
-//## Only very slightly different to Step1: Use DataTreeNodeFactory
+//## Only very slightly different to Step1: Use DataNodeFactory
 //## instead of PicFileReader, and read more than one data set.
 int main(int argc, char* argv[])
 {
@@ -44,9 +44,9 @@ int main(int argc, char* argv[])
     // For testing
     if(strcmp(argv[i], "-testing")==0) continue;
 
-    // Create a DataTreeNodeFactory to read a data format supported
-    // by the DataTreeNodeFactory (many image formats, surface formats, etc.)
-    mitk::DataTreeNodeFactory::Pointer nodeReader=mitk::DataTreeNodeFactory::New();
+    // Create a DataNodeFactory to read a data format supported
+    // by the DataNodeFactory (many image formats, surface formats, etc.)
+    mitk::DataNodeFactory::Pointer nodeReader=mitk::DataNodeFactory::New();
     const char * filename = argv[i];
     try
     {
@@ -56,7 +56,7 @@ int main(int argc, char* argv[])
       // Part III: Put the data into the datastorage
       //*********************************************************************
 
-      // Since the DataTreeNodeFactory directly creates a node,
+      // Since the DataNodeFactory directly creates a node,
       // use the datastorage to add the read node
       storage->Add(nodeReader->GetOutput());
     }

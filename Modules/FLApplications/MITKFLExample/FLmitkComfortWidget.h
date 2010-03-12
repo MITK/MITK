@@ -2,15 +2,15 @@
 #define FLMITKCOMFORTWIDGET_INCLUDED
 #include "FLmitkRenderWindow/FLmitkRenderWindow.h"
 #include "mitkSliceNavigationController.h"
-#include "mitkDataTreeNode.h"
+#include "mitkDataNode.h"
 class FLmitkComfortWidget : public FLmitkRenderWindow {
   public:
     FLmitkComfortWidget(int x,int y,int w,int h,const char* label=NULL);
 
-    void SetNode(mitk::DataTreeNode::Pointer node) {m_Node = node;}
+    void SetNode(mitk::DataNode::Pointer node) {m_Node = node;}
     int handle(int event);
     mitk::SliceNavigationController::Pointer sliceCtrl;
   int m_LastX,m_LastY;
-    mitk::DataTreeNode::Pointer m_Node;     
+    mitk::DataNode::Pointer m_Node;     
 };
 #endif

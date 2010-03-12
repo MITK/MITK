@@ -110,7 +110,7 @@ void QmitkNavigationToolManagementWidget::OnDeleteTool()
     //if no item is selected, show error message:
     if (m_Controls->m_ToolList->currentItem() == NULL) {MessageBox("Error: Please select tool first!");return;}
 
-    m_DataStorage->Remove(m_NavigationToolStorage->GetTool(m_Controls->m_ToolList->currentIndex().row())->GetDataTreeNode());
+    m_DataStorage->Remove(m_NavigationToolStorage->GetTool(m_Controls->m_ToolList->currentIndex().row())->GetDataNode());
     m_NavigationToolStorage->DeleteTool(m_Controls->m_ToolList->currentIndex().row());
     UpdateToolTable();
 
@@ -128,7 +128,7 @@ void QmitkNavigationToolManagementWidget::OnEditTool()
 
     //fill forms
     mitk::NavigationTool::Pointer selectedTool = m_NavigationToolStorage->GetTool(m_Controls->m_ToolList->currentIndex().row());
-    m_Controls->m_ToolNameEdit->setText(QString(selectedTool->GetDataTreeNode()->GetName().c_str()));
+    m_Controls->m_ToolNameEdit->setText(QString(selectedTool->GetDataNode()->GetName().c_str()));
     m_Controls->m_IdentifierEdit->setText(QString(selectedTool->GetIdentifier().c_str()));
     m_Controls->m_SerialNumberEdit->setText(QString(selectedTool->GetSerialNumber().c_str()));
     switch(selectedTool->GetTrackingDeviceType())
@@ -155,7 +155,7 @@ void QmitkNavigationToolManagementWidget::OnEditTool()
         m_Controls->m_ToolTypeChooser->setCurrentIndex(3); break;
       }
 
-    m_Controls->m_SurfaceChooser->SetSelectedNode(selectedTool->GetDataTreeNode());
+    m_Controls->m_SurfaceChooser->SetSelectedNode(selectedTool->GetDataNode());
     m_edit = true;
   }
 
@@ -169,7 +169,7 @@ void QmitkNavigationToolManagementWidget::OnLoadSingleTool()
       if (!m_NavigationToolStorage->AddTool(readTool))
         {
         MessageBox("Error: Can't add tool!");
-        m_DataStorage->Remove(readTool->GetDataTreeNode());
+        m_DataStorage->Remove(readTool->GetDataNode());
         }
       UpdateToolTable();
       }
@@ -220,20 +220,20 @@ void QmitkNavigationToolManagementWidget::OnAddToolSave()
       {
       workTool = m_NavigationToolStorage->GetTool(m_Controls->m_ToolList->currentIndex().row());
       
-      //edit existing DataTreeNode...
-      workTool->GetDataTreeNode()->SetName(m_Controls->m_ToolNameEdit->text().toLatin1());
-      workTool->GetDataTreeNode()->SetData(m_Controls->m_SurfaceChooser->GetSelectedNode()->GetData());
+      //edit existing DataNode...
+      workTool->GetDataNode()->SetName(m_Controls->m_ToolNameEdit->text().toLatin1());
+      workTool->GetDataNode()->SetData(m_Controls->m_SurfaceChooser->GetSelectedNode()->GetData());
       }
     else //here we create a new tool
       {
       workTool = mitk::NavigationTool::New();
     
-      //create DataTreeNode...
-      mitk::DataTreeNode::Pointer newNode = mitk::DataTreeNode::New();
+      //create DataNode...
+      mitk::DataNode::Pointer newNode = mitk::DataNode::New();
       newNode->SetName(m_Controls->m_ToolNameEdit->text().toLatin1());
       newNode->SetData(m_Controls->m_SurfaceChooser->GetSelectedNode()->GetData());
       m_DataStorage->Add(newNode);
-      workTool->SetDataTreeNode(newNode);
+      workTool->SetDataNode(newNode);
       }
 
     //fill NavigationTool object
@@ -279,7 +279,7 @@ void QmitkNavigationToolManagementWidget::OnLoadSurface()
     if ( stlReader->GetOutput() == NULL );
     else
       {
-      mitk::DataTreeNode::Pointer newNode = mitk::DataTreeNode::New();
+      mitk::DataNode::Pointer newNode = mitk::DataNode::New();
       newNode->SetName(filename);
       newNode->SetData(stlReader->GetOutput());
       m_DataStorage->Add(newNode);
@@ -301,7 +301,7 @@ void QmitkNavigationToolManagementWidget::UpdateToolTable()
   m_Controls->m_ToolList->clear();
   for(int i=0; i<m_NavigationToolStorage->GetToolCount(); i++)
     {
-      QString currentTool = "Tool" + QString::number(i) + ": " + QString(m_NavigationToolStorage->GetTool(i)->GetDataTreeNode()->GetName().c_str())+ " ";
+      QString currentTool = "Tool" + QString::number(i) + ": " + QString(m_NavigationToolStorage->GetTool(i)->GetDataNode()->GetName().c_str())+ " ";
       switch (m_NavigationToolStorage->GetTool(i)->GetTrackingDeviceType())
         {
         case mitk::ClaronMicron:

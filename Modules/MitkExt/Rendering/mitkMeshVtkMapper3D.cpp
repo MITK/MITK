@@ -16,7 +16,7 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include "mitkMeshVtkMapper3D.h"
-#include "mitkDataTreeNode.h"
+#include "mitkDataNode.h"
 #include "mitkProperties.h"
 #include "mitkVtkPropRenderer.h"
 
@@ -49,7 +49,7 @@ vtkProp* mitk::MeshVtkMapper3D::GetVtkProp(mitk::BaseRenderer * /*renderer*/)
 void mitk::MeshVtkMapper3D::UpdateVtkTransform(mitk::BaseRenderer * /*renderer*/)
 {
   vtkLinearTransform * vtktransform = 
-    this->GetDataTreeNode()->GetVtkTransform(this->GetTimestep());
+    this->GetDataNode()->GetVtkTransform(this->GetTimestep());
 
   m_SpheresActor->SetUserTransform(vtktransform);
   m_ContourActor->SetUserTransform(vtktransform);
@@ -120,11 +120,11 @@ void mitk::MeshVtkMapper3D::GenerateData()
   mitk::Color tmpColor;
 
   // check for color prop and use it for rendering if it exists
-  m_DataTreeNode->GetColor(floatRgba, NULL); 
+  m_DataNode->GetColor(floatRgba, NULL); 
  
-  if (dynamic_cast<mitk::ColorProperty*>(this->GetDataTreeNode()->GetProperty("unselectedcolor")) != NULL)
+  if (dynamic_cast<mitk::ColorProperty*>(this->GetDataNode()->GetProperty("unselectedcolor")) != NULL)
   {
-    tmpColor = dynamic_cast<mitk::ColorProperty *>(this->GetDataTreeNode()->GetProperty("unselectedcolor"))->GetValue();
+    tmpColor = dynamic_cast<mitk::ColorProperty *>(this->GetDataNode()->GetProperty("unselectedcolor"))->GetValue();
     floatRgba[0] = tmpColor[0];
     floatRgba[1] = tmpColor[1];
     floatRgba[2] = tmpColor[2];
@@ -139,7 +139,7 @@ void mitk::MeshVtkMapper3D::GenerateData()
   {
     // build m_Spheres->GetOutput() vtkPolyData
     float pointSize = 2.0;
-    mitk::FloatProperty::Pointer pointSizeProp = dynamic_cast<mitk::FloatProperty *>(this->GetDataTreeNode()->GetProperty("pointsize"));
+    mitk::FloatProperty::Pointer pointSizeProp = dynamic_cast<mitk::FloatProperty *>(this->GetDataNode()->GetProperty("pointsize"));
     if (pointSizeProp.IsNotNull())
       pointSize = pointSizeProp->GetValue();
 
@@ -174,7 +174,7 @@ void mitk::MeshVtkMapper3D::GenerateData()
       // setup mapper, actor and add to assembly
       m_ContourMapper->SetInput(m_Contour);
       bool wireframe=true;
-      GetDataTreeNode()->GetVisibility(wireframe, NULL, "wireframe");
+      GetDataNode()->GetVisibility(wireframe, NULL, "wireframe");
       if(wireframe)
         m_ContourActor->GetProperty()->SetRepresentationToWireframe();
       else
@@ -199,7 +199,7 @@ void mitk::MeshVtkMapper3D::GenerateData( mitk::BaseRenderer *renderer )
   }
 
   bool makeContour = false;
-  this->GetDataTreeNode()->GetBoolProperty("show contour", makeContour);
+  this->GetDataNode()->GetBoolProperty("show contour", makeContour);
 
   if (makeContour)
   {
@@ -211,7 +211,7 @@ void mitk::MeshVtkMapper3D::GenerateData( mitk::BaseRenderer *renderer )
   }
 
   bool showPoints = true;
-  this->GetDataTreeNode()->GetBoolProperty("show points", showPoints);
+  this->GetDataNode()->GetBoolProperty("show points", showPoints);
   if(showPoints)
   {
     m_SpheresActor->VisibilityOn();

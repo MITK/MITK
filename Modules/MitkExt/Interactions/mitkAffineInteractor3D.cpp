@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkPointOperation.h"
 #include "mitkPositionEvent.h"
 #include "mitkStatusBar.h"
-#include "mitkDataTreeNode.h"
+#include "mitkDataNode.h"
 #include "mitkInteractionConst.h"
 #include "mitkAction.h"
 #include "mitkStateEvent.h"
@@ -48,7 +48,7 @@ namespace mitk
 //how precise must the user pick the point
 //default value
 AffineInteractor3D
-::AffineInteractor3D(const char * type, DataTreeNode* dataTreeNode, int /* n */ )
+::AffineInteractor3D(const char * type, DataNode* dataTreeNode, int /* n */ )
 : Interactor( type, dataTreeNode ),
   m_Precision( 6.5 ),
   m_InteractionMode( INTERACTION_MODE_TRANSLATION )
@@ -137,7 +137,7 @@ float AffineInteractor3D
   //int timeStep = disPosEvent->GetSender()->GetTimeStep();
 
   //CurveModel *curveModel = dynamic_cast<CurveModel *>(
-  //  m_DataTreeNode->GetData() );
+  //  m_DataNode->GetData() );
 
   //if ( curveModel != NULL )
   //{
@@ -164,7 +164,7 @@ bool AffineInteractor3D
   bool ok = false;
 
   // Get data object
-  BaseData *data = m_DataTreeNode->GetData();
+  BaseData *data = m_DataNode->GetData();
   if ( data == NULL )
   {
     MITK_ERROR << "No data object present!";
@@ -274,9 +274,9 @@ bool AffineInteractor3D
       }
 
       // Check if an object is present at the current mouse position
-      DataTreeNode *pickedNode = dpe->GetPickedObjectNode();
+      DataNode *pickedNode = dpe->GetPickedObjectNode();
       StateEvent *newStateEvent;
-      if ( pickedNode == m_DataTreeNode )
+      if ( pickedNode == m_DataNode )
       {
         // Yes: object will be selected
         newStateEvent = new StateEvent( EIDYES );
@@ -296,7 +296,7 @@ bool AffineInteractor3D
   case AcDESELECTOBJECT:
     {
       // Color object white
-      m_DataTreeNode->SetColor( 1.0, 1.0, 1.0 );
+      m_DataNode->SetColor( 1.0, 1.0, 1.0 );
       RenderingManager::GetInstance()->RequestUpdateAll();
   
       // Colorize surface / wireframe as inactive
@@ -310,7 +310,7 @@ bool AffineInteractor3D
   case AcSELECTPICKEDOBJECT:
     {
       // Color object red
-      m_DataTreeNode->SetColor( 1.0, 0.0, 0.0 );
+      m_DataNode->SetColor( 1.0, 0.0, 0.0 );
       RenderingManager::GetInstance()->RequestUpdateAll();
 
       // Colorize surface / wireframe dependend on distance from picked point
@@ -338,7 +338,7 @@ bool AffineInteractor3D
         break;
       }
 
-      //DataTreeNode *pickedNode = dpe->GetPickedObjectNode();
+      //DataNode *pickedNode = dpe->GetPickedObjectNode();
       
       m_InitialPickedPoint = m_CurrentPickedPoint;
       m_InitialPickedDisplayPoint = m_CurrentPickedDisplayPoint;

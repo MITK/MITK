@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef QmitkPointListWidgetHIncluded
 #define QmitkPointListWidgetHIncluded
 
-#include "mitkDataTreeNode.h"
+#include "mitkDataNode.h"
 #include "QmitkExtExports.h"
 #include "mitkPointSetInteractor.h"
 
@@ -58,7 +58,7 @@ class QmitkExt_EXPORT QmitkPointListWidget : public QWidget
     ~QmitkPointListWidget();
 
     /// assign a point set (contained in a node of DataStorage) for observation
-    void SetPointSetNode( mitk::DataTreeNode* node );
+    void SetPointSetNode( mitk::DataNode* node );
     
     /// assign a QmitkStdMultiWidget for updating render window crosshair
     void SetMultiWidget( QmitkStdMultiWidget* multiWidget );
@@ -90,14 +90,14 @@ class QmitkExt_EXPORT QmitkPointListWidget : public QWidget
 
   protected:
 
-    void ObserveNewNode( mitk::DataTreeNode* node );
+    void ObserveNewNode( mitk::DataNode* node );
 
     QmitkPointListView* m_ListView;
     QPushButton* m_BtnEdit;
     QPushButton* m_BtnClear;
     QPushButton* m_BtnLoad;
     QPushButton* m_BtnSave;
-    mitk::DataTreeNode* m_PointSetNode;
+    mitk::DataNode* m_PointSetNode;
     mitk::PointSetInteractor::Pointer m_Interactor;
     bool m_EditAllowed;
     unsigned int m_NodeObserverTag;

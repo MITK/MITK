@@ -50,7 +50,7 @@ int mitkImageMapper2DTest(int /*argc*/, char* /*argv*/[])
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Creating node: ";
-  mitk::DataTreeNode::Pointer node = mitk::DataTreeNode::New();
+  mitk::DataNode::Pointer node = mitk::DataNode::New();
   node->SetData(image);
   std::cout<<"[PASSED]"<<std::endl;
 

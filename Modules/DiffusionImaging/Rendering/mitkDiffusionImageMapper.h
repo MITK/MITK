@@ -36,7 +36,7 @@ namespace mitk {
 
     void GenerateData( mitk::BaseRenderer *renderer );
 
-    static void SetDefaultProperties(DataTreeNode* node, BaseRenderer* renderer = NULL, bool overwrite = false );
+    static void SetDefaultProperties(DataNode* node, BaseRenderer* renderer = NULL, bool overwrite = false );
     
   protected:
 

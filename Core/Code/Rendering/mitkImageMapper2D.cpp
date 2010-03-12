@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "pic2vtk.h"
 #include "mitkTimeSlicedGeometry.h"
 #include "mitkPlaneGeometry.h"
-#include "mitkDataTreeNode.h"
+#include "mitkDataNode.h"
 #include "mitkVtkPropRenderer.h"
 #include "mitkLookupTableProperty.h"
 #include "mitkProperties.h"
@@ -30,7 +30,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkVolumeCalculator.h"
 
 #include "mitkAbstractTransformGeometry.h"
-#include "mitkDataTreeNodeFactory.h"
+#include "mitkDataNodeFactory.h"
 
 #include "mitkResliceMethodEnumProperty.h"
 
@@ -160,7 +160,7 @@ mitk::ImageMapper2D::Paint( mitk::BaseRenderer *renderer )
   bool shouldShowVolume = false, binary = false;
   float segmentationVolume = -1.0;
 
-  mitk::DataTreeNode *node = this->GetDataTreeNode();
+  mitk::DataNode *node = this->GetDataNode();
   mitk::Image* mitkimage = dynamic_cast<mitk::Image*>(node->GetData());
 
   // Check if a volume in ml can be drawn in the image.
@@ -401,7 +401,7 @@ mitk::ImageMapper2D::GenerateData( mitk::BaseRenderer *renderer )
     normal = planeGeometry->GetNormal();
 
     bool inPlaneResampleExtentByGeometry = false;
-    GetDataTreeNode()->GetBoolProperty(
+    GetDataNode()->GetBoolProperty(
       "in plane resample extent by geometry",
       inPlaneResampleExtentByGeometry, renderer
       );
@@ -532,7 +532,7 @@ mitk::ImageMapper2D::GenerateData( mitk::BaseRenderer *renderer )
   if ( (input->GetDimension() >= 3) && (input->GetDimension(2) > 1) )
   {
     VtkResliceInterpolationProperty *resliceInterpolationProperty;
-    this->GetDataTreeNode()->GetProperty(
+    this->GetDataNode()->GetProperty(
       resliceInterpolationProperty, "reslice interpolation" );
 
     int interpolationMode = VTK_RESLICE_NEAREST;
@@ -568,7 +568,7 @@ mitk::ImageMapper2D::GenerateData( mitk::BaseRenderer *renderer )
   // Thick slices parameters
   if( inputData->GetNumberOfScalarComponents() == 1 ) // for now only single component are allowed
   {
-    DataTreeNode *dn=renderer->GetCurrentWorldGeometry2DNode();
+    DataNode *dn=renderer->GetCurrentWorldGeometry2DNode();
     if(dn)
     {
       ResliceMethodEnumProperty *resliceMethodEnumProperty=0;
@@ -955,7 +955,7 @@ mitk::ImageMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
 
   // check for interpolation properties
   bool textureInterpolation = false;
-  GetDataTreeNode()->GetBoolProperty(
+  GetDataNode()->GetBoolProperty(
     "texture interpolation", textureInterpolation, renderer
     );
 
@@ -964,7 +964,7 @@ mitk::ImageMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
   mitk::LevelWindow levelWindow;
 
   bool binary = false;
-  this->GetDataTreeNode()->GetBoolProperty( "binary", binary, renderer );
+  this->GetDataNode()->GetBoolProperty( "binary", binary, renderer );
 
   if ( binary )
   {
@@ -975,11 +975,11 @@ mitk::ImageMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
     bool binaryOutline = false;
     if ( this->GetInput()->GetPixelType().GetBpe() <= 8 )
     {
-      if (this->GetDataTreeNode()->GetBoolProperty( "outline binary", binaryOutline, renderer ))
+      if (this->GetDataNode()->GetBoolProperty( "outline binary", binaryOutline, renderer ))
       {
         image->setOutline(binaryOutline);
         float binaryOutlineWidth(1.0);
-        if (this->GetDataTreeNode()->GetFloatProperty( "outline width", binaryOutlineWidth, renderer ))
+        if (this->GetDataNode()->GetFloatProperty( "outline width", binaryOutlineWidth, renderer ))
         {
           image->setOutlineWidth(binaryOutlineWidth);
         }
@@ -987,8 +987,8 @@ mitk::ImageMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
     }
     else
     { 
-      //this->GetDataTreeNode()->SetBoolProperty( "outline binary", false, renderer );
-      //this->GetDataTreeNode()->SetFloatProperty( "opacity", 0.3, renderer );
+      //this->GetDataNode()->SetBoolProperty( "outline binary", false, renderer );
+      //this->GetDataNode()->SetFloatProperty( "opacity", 0.3, renderer );
       //set opacity
       //rgba[3] = 0.3;
       MITK_WARN << "Type of all binary images should be (un)signed char. Outline does not work on other pixel types!";
@@ -1005,13 +1005,13 @@ mitk::ImageMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
   }
 
   bool useColor = false;
-  GetDataTreeNode()->GetBoolProperty( "use color", useColor, renderer );
+  GetDataNode()->GetBoolProperty( "use color", useColor, renderer );
   mitk::LookupTableProperty::Pointer LookupTableProp;
 
   if ( !useColor )
   {
     LookupTableProp = dynamic_cast<mitk::LookupTableProperty*>(
-      this->GetDataTreeNode()->GetProperty("LookupTable"));
+      this->GetDataNode()->GetProperty("LookupTable"));
 
     if ( LookupTableProp.IsNull() )
     {
@@ -1031,7 +1031,7 @@ mitk::ImageMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
     m_iil4mitkMode = iil4mitkImage::COLOR_ALPHA;
     // only update the lut, when the properties have changed...
     if ( LookupTableProp->GetLookupTable()->GetMTime()
-      <= this->GetDataTreeNode()->GetPropertyList()->GetMTime() )
+      <= this->GetDataNode()->GetPropertyList()->GetMTime() )
     {
       LookupTableProp->GetLookupTable()->ChangeOpacityForAll( opacity );
       LookupTableProp->GetLookupTable()->ChangeOpacity(0, 0.0);
@@ -1057,7 +1057,7 @@ mitk::ImageMapper2D::Update(mitk::BaseRenderer* renderer)
     return;
   }
 
-  const DataTreeNode *node = this->GetDataTreeNode();
+  const DataNode *node = this->GetDataNode();
 
   RendererInfo& rendererInfo = AccessRendererInfo( renderer );
   iil4mitkPicImage* image = rendererInfo.Get_iil4mitkImage();
@@ -1208,7 +1208,7 @@ void mitk::ImageMapper2D::RendererInfo::Initialize( int rendererID, mitk::BaseRe
   m_UnitSpacingImageFilter->SetOutputSpacing( 1.0, 1.0, 1.0 );
 }
 
-void mitk::ImageMapper2D::SetDefaultProperties(mitk::DataTreeNode* node, mitk::BaseRenderer* renderer, bool overwrite)
+void mitk::ImageMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite)
 {
   mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
 
@@ -1218,7 +1218,7 @@ void mitk::ImageMapper2D::SetDefaultProperties(mitk::DataTreeNode* node, mitk::B
   node->AddProperty( "outline width", mitk::FloatProperty::New( 1.0 ), renderer, overwrite );
   if(image->IsRotated()) node->AddProperty( "reslice interpolation", mitk::VtkResliceInterpolationProperty::New(VTK_RESLICE_CUBIC) );
   else node->AddProperty( "reslice interpolation", mitk::VtkResliceInterpolationProperty::New() );
-  node->AddProperty( "texture interpolation", mitk::BoolProperty::New( mitk::DataTreeNodeFactory::m_TextureInterpolationActive ) );  // set to user configurable default value (see global options)
+  node->AddProperty( "texture interpolation", mitk::BoolProperty::New( mitk::DataNodeFactory::m_TextureInterpolationActive ) );  // set to user configurable default value (see global options)
   node->AddProperty( "in plane resample extent by geometry", mitk::BoolProperty::New( false ) );
   node->AddProperty( "bounding box", mitk::BoolProperty::New( false ) );
   

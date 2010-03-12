@@ -24,28 +24,28 @@
 
 #include "mitkGUICommonPluginDll.h"
 
-#include <mitkDataTreeNode.h>
+#include <mitkDataNode.h>
 
 namespace mitk
 {
 
-class MITK_GUI_COMMON_PLUGIN DataTreeNodeObject : public berry::Object
+class MITK_GUI_COMMON_PLUGIN DataNodeObject : public berry::Object
 {
 
 public:
 
-  berryObjectMacro(mitk::DataTreeNodeObject)
+  berryObjectMacro(mitk::DataNodeObject)
 
-  DataTreeNodeObject();
-  DataTreeNodeObject(DataTreeNode::Pointer node);
+  DataNodeObject();
+  DataNodeObject(DataNode::Pointer node);
 
-  DataTreeNode::Pointer GetDataTreeNode() const;
+  DataNode::Pointer GetDataNode() const;
 
   bool operator==(const berry::Object* obj) const;
 
 private:
 
-  DataTreeNode::Pointer m_Node;
+  DataNode::Pointer m_Node;
 
 
 };

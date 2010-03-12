@@ -126,7 +126,7 @@ protected:
   /*
    * Node representing the PointSet last created. It is used to delete empty point sets.
    */
-  mitk::DataTreeNode::Pointer m_CurrentPointSetNode;
+  mitk::DataNode::Pointer m_CurrentPointSetNode;
 };
 
 #endif // !defined(QMITK_MEASUREMENT_H__INCLUDED)

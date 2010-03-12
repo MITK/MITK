@@ -15,31 +15,31 @@
 
  =========================================================================*/
 
-#include "mitkDataTreeNodeObject.h"
+#include "mitkDataNodeObject.h"
 
 namespace mitk
 {
 
-DataTreeNodeObject::DataTreeNodeObject() :
+DataNodeObject::DataNodeObject() :
   m_Node(0)
 {
 
 }
 
-DataTreeNodeObject::DataTreeNodeObject(DataTreeNode::Pointer node) :
+DataNodeObject::DataNodeObject(DataNode::Pointer node) :
   m_Node(node)
 {
 
 }
 
-DataTreeNode::Pointer DataTreeNodeObject::GetDataTreeNode() const
+DataNode::Pointer DataNodeObject::GetDataNode() const
 {
   return m_Node;
 }
 
-bool DataTreeNodeObject::operator==(const berry::Object* obj) const
+bool DataNodeObject::operator==(const berry::Object* obj) const
 {
-  if (const DataTreeNodeObject* other = dynamic_cast<const DataTreeNodeObject*>(obj))
+  if (const DataNodeObject* other = dynamic_cast<const DataNodeObject*>(obj))
   {
     return m_Node == other->m_Node;
   }

@@ -3,7 +3,7 @@
 #include "QmitkRenderWindow.h"
 #include "QmitkSliceWidget.h"
 
-#include "mitkDataTreeNodeFactory.h"
+#include "mitkDataNodeFactory.h"
 #include "mitkProperties.h"
 #include "mitkRenderingManager.h"
 #include "mitkStandaloneDataStorage.h"
@@ -60,9 +60,9 @@ int main(int argc, char* argv[])
     // For testing
     if(strcmp(argv[i], "-testing")==0) continue;
 
-    // Create a DataTreeNodeFactory to read a data format supported
-    // by the DataTreeNodeFactory (many image formats, surface formats, etc.)
-    mitk::DataTreeNodeFactory::Pointer nodeReader=mitk::DataTreeNodeFactory::New();
+    // Create a DataNodeFactory to read a data format supported
+    // by the DataNodeFactory (many image formats, surface formats, etc.)
+    mitk::DataNodeFactory::Pointer nodeReader=mitk::DataNodeFactory::New();
     const char * filename = argv[i];
     try
     {
@@ -72,9 +72,9 @@ int main(int argc, char* argv[])
       // Part III: Put the data into the datastorage
       //*********************************************************************
 
-      // Since the DataTreeNodeFactory directly creates a node,
+      // Since the DataNodeFactory directly creates a node,
       // use the iterator to add the read node to the tree
-      mitk::DataTreeNode::Pointer node = nodeReader->GetOutput();
+      mitk::DataNode::Pointer node = nodeReader->GetOutput();
       ds->Add(node);
     }
     catch(...)
@@ -94,7 +94,7 @@ int main(int argc, char* argv[])
 
   // Create PointSet and a node for it
   mitk::PointSet::Pointer pointSet = mitk::PointSet::New();
-  mitk::DataTreeNode::Pointer pointSetNode = mitk::DataTreeNode::New();
+  mitk::DataNode::Pointer pointSetNode = mitk::DataNode::New();
   pointSetNode->SetData(pointSet);
 
   // Add the node to the tree

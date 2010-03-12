@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkManualSegmentationToSurfaceFilter.h"
 #include <itksys/SystemTools.hxx>
-#include "mitkDataTreeNodeFactory.h"
+#include "mitkDataNodeFactory.h"
 #include <mitkSurfaceVtkWriter.h>
 #include <vtkSTLWriter.h>
 
@@ -49,7 +49,7 @@ int mitkManualSegmentationToSurfaceFilterTest(int argc, char* argv[])
   std::cout<<"Eingabe Datei: "<<fileIn<<std::endl;
   std::cout<<"Ausgabe Datei: "<<fileOut<<std::endl;
   mitk::Image::Pointer image = NULL;
-  mitk::DataTreeNodeFactory::Pointer factory = mitk::DataTreeNodeFactory::New();
+  mitk::DataNodeFactory::Pointer factory = mitk::DataNodeFactory::New();
   try
   {
     std::cout << "Loading file: "<<std::flush;
@@ -61,7 +61,7 @@ int mitkManualSegmentationToSurfaceFilterTest(int argc, char* argv[])
       std::cout<<"file could not be loaded [FAILED]"<<std::endl;
       return EXIT_FAILURE;
     }
-    mitk::DataTreeNode::Pointer node = factory->GetOutput( 0 );
+    mitk::DataNode::Pointer node = factory->GetOutput( 0 );
     image = dynamic_cast<mitk::Image*>(node->GetData());
     if(image.IsNull())
     {

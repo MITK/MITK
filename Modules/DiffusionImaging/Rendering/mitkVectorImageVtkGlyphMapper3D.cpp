@@ -141,17 +141,17 @@ m_MaximumNumberOfPoints = 80*80*80;
     m_Glyph3DMapper->SetInput( m_Glyph3DGenerator->GetOutput() );
     m_Glyph3DActor->SetMapper( m_Glyph3DMapper );
 
-    if (GetDataTreeNode()->GetProperty("LookupTable"))
+    if (GetDataNode()->GetProperty("LookupTable"))
     {
       mitk::LookupTable::Pointer mitkLookupTable = mitk::LookupTable::New();
       m_Glyph3DMapper->Update();
       mitkLookupTable->SetVtkLookupTable(dynamic_cast<vtkLookupTable*>(m_Glyph3DMapper->GetLookupTable()));
       mitk::LookupTableProperty::Pointer LookupTableProp = mitk::LookupTableProperty::New( mitkLookupTable );
-      GetDataTreeNode()->SetProperty( "LookupTable", LookupTableProp );
+      GetDataNode()->SetProperty( "LookupTable", LookupTableProp );
     }
     else
     {
-      mitk::LookupTableProperty::Pointer mitkLutProp = dynamic_cast<mitk::LookupTableProperty*>(GetDataTreeNode()->GetProperty("LookupTable"));
+      mitk::LookupTableProperty::Pointer mitkLutProp = dynamic_cast<mitk::LookupTableProperty*>(GetDataNode()->GetProperty("LookupTable"));
       if (mitkLutProp.IsNotNull())
         m_Glyph3DMapper->SetLookupTable( mitkLutProp->GetLookupTable()->GetVtkLookupTable() );
 

@@ -88,8 +88,8 @@ class SceneSerialization_EXPORT SceneIO : public itk::Object
      * be (de)serialized. The properties may come from either of
      * <ul>
      *   <li> The BaseData's PropertyList
-     *   <li> The DataTreeNodes's PropertyList
-     *   <li> Any of a DataTreeNodes's render window specific PropertyLists
+     *   <li> The DataNodes's PropertyList
+     *   <li> Any of a DataNodes's render window specific PropertyLists
      * </ul>
      */
     const PropertyList* GetFailedProperties();

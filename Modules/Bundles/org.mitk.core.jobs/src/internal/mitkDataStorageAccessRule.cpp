@@ -24,22 +24,22 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 mitk::DataStorageAccessRule
-::DataStorageAccessRule (mitk::DataStorage::Pointer myDataStorage, mitk::DataTreeNode::Pointer myDataTreeNode, 
+::DataStorageAccessRule (mitk::DataStorage::Pointer myDataStorage, mitk::DataNode::Pointer myDataNode, 
                          mitk::DataStorageAccessRule::RuleType myRule) 
  :m_Rule(myRule),
   m_sptrMyDataStorage(myDataStorage),
-  m_sptrMyDataTreeNode(myDataTreeNode)
+  m_sptrMyDataNode(myDataNode)
 
  {
    mitk::DataStorage::SetOfObjects::ConstPointer 
-   sptr_parentsNodesFirstRule = m_sptrMyDataStorage->GetSources(m_sptrMyDataTreeNode);
-   // checks if the DataTreeNode does exists within the specified DataTree, if not an 
+   sptr_parentsNodesFirstRule = m_sptrMyDataStorage->GetSources(m_sptrMyDataNode);
+   // checks if the DataNode does exists within the specified DataTree, if not an 
    // Poco NotFoundException is thrown since the rule is useless 
    bool exsists = false ;
    for(mitk::DataStorage::SetOfObjects::const_iterator it = 
         sptr_parentsNodesFirstRule->begin(); it != sptr_parentsNodesFirstRule->end(); ++ it)
       { 
-        if (*it == m_sptrMyDataTreeNode ) exsists = true ;
+        if (*it == m_sptrMyDataNode ) exsists = true ;
       }
    if (exsists == false) throw  Poco::NotFoundException()  ; 
      
@@ -104,22 +104,22 @@ bool
  {
       
       mitk::DataStorage::SetOfObjects::ConstPointer 
-        sptr_parentsNodesFirstRule = m_sptrMyDataStorage->GetSources(m_sptrMyDataTreeNode);
+        sptr_parentsNodesFirstRule = m_sptrMyDataStorage->GetSources(m_sptrMyDataNode);
      // checks if the DataStorageNode of to be compared DataStorageAccessRule is a parent node 
      // if so the job holding this DataStorageAccessRule need to wait until the operation on the parent node is performed 
       for(mitk::DataStorage::SetOfObjects::const_iterator it = 
         sptr_parentsNodesFirstRule->begin(); it != sptr_parentsNodesFirstRule->end(); ++ it)
       {
-      if (*it == sptr_otherDataStorageAccessRule->GetDataTreeNode()) return true ;
+      if (*it == sptr_otherDataStorageAccessRule->GetDataNode()) return true ;
       }
       mitk::DataStorage::SetOfObjects::ConstPointer
-        sptr_derivedNodesRule = m_sptrMyDataStorage->GetDerivations(m_sptrMyDataTreeNode); 
+        sptr_derivedNodesRule = m_sptrMyDataStorage->GetDerivations(m_sptrMyDataNode); 
       // checks if the DataStorage node of to be compared DataStorageAccessRule is a child node 
       // if so the job holding this DataStorageAccessRule needs to wait until the operation on the parent node is performed 
       for(mitk::DataStorage::SetOfObjects::const_iterator it = 
         sptr_derivedNodesRule->begin(); it != sptr_derivedNodesRule->end(); ++it)
       {
-      if(*it == sptr_otherDataStorageAccessRule->GetDataTreeNode()) return true ;
+      if(*it == sptr_otherDataStorageAccessRule->GetDataNode()) return true ;
       }
       
      // jobs operating on nodes on different branches do not cause conflicts thus they can be performed in different  
@@ -150,11 +150,11 @@ bool
 
  bool 
    mitk::DataStorageAccessRule
-   ::TestDataTreeNode(mitk::DataTreeNode::Pointer  /*dataTreeToBeStored*/) const 
+   ::TestDataNode(mitk::DataNode::Pointer  /*dataTreeToBeStored*/) const 
   {
    mitk::DataStorage::SetOfObjects::ConstPointer tempAllNodes = m_sptrMyDataStorage->GetAll(); 
    for(mitk::DataStorage::SetOfObjects::const_iterator it = tempAllNodes->begin(); it !=tempAllNodes->end(); ++ it){
-     if (m_sptrMyDataTreeNode == *it ) return true ;
+     if (m_sptrMyDataNode == *it ) return true ;
 
      }
    return false ; 
@@ -163,11 +163,11 @@ bool
 
 
   
- mitk::DataTreeNode::Pointer 
+ mitk::DataNode::Pointer 
    mitk::DataStorageAccessRule
-    ::GetDataTreeNode() const
+    ::GetDataNode() const
    {
-    return mitk::DataStorageAccessRule::m_sptrMyDataTreeNode ;  
+    return mitk::DataStorageAccessRule::m_sptrMyDataNode ;  
    }
 
 

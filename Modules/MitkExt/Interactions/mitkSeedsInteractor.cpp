@@ -24,13 +24,13 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkOperationEvent.h"
 #include "mitkInteractionConst.h"
 #include "mitkUndoController.h"
-#include "mitkDataTreeNode.h"
+#include "mitkDataNode.h"
 #include "mitkStateEvent.h"
 #include "mitkState.h"
 #include "mitkDrawOperation.h"
 
 
-mitk::SeedsInteractor::SeedsInteractor(const char * type, mitk::DataTreeNode* dataTreeNode)
+mitk::SeedsInteractor::SeedsInteractor(const char * type, mitk::DataNode* dataTreeNode)
   : mitk::Interactor(type, dataTreeNode)
 {
   m_Radius = 1;
@@ -51,8 +51,8 @@ bool mitk::SeedsInteractor::ExecuteAction(mitk::Action* action, mitk::StateEvent
   
   event_point = posEvent->GetWorldPosition();
 
-  m_DataTreeNode->SetVisibility(true);
-  m_SeedsImage = dynamic_cast<mitk::SeedsImage*>(m_DataTreeNode->GetData());
+  m_DataNode->SetVisibility(true);
+  m_SeedsImage = dynamic_cast<mitk::SeedsImage*>(m_DataNode->GetData());
 
 
   bool ok = false;

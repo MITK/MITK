@@ -150,7 +150,7 @@ void QmitkIGTRecorderView::OnStartRecording()
   {
     mitk::TrackingVolume::Pointer tv = mitk::TrackingVolume::New();
     tv->SetTrackingDeviceType(tracker->GetType());
-    mitk::DataTreeNode::Pointer n = mitk::DataTreeNode::New();
+    mitk::DataNode::Pointer n = mitk::DataNode::New();
     n->SetData(tv);
     n->SetName("Tracking Volume");
     n->SetOpacity(0.1);
@@ -282,7 +282,7 @@ void QmitkIGTRecorderView::SetupIGTPipeline(mitk::TrackingDevice::Pointer tracke
   const QList<unsigned int> instruments = m_ConfigWidget->GetToolsByToolType("Instrument");
   foreach (const unsigned int& index, instruments)
   {
-    mitk::DataTreeNode::Pointer node = this->CreateInstrumentVisualization(m_Source->GetOutput(index)->GetName());
+    mitk::DataNode::Pointer node = this->CreateInstrumentVisualization(m_Source->GetOutput(index)->GetName());
     ds->Add(node);      
     m_Visualizer->SetRepresentationObject(index, node->GetData());
   }
@@ -292,7 +292,7 @@ void QmitkIGTRecorderView::SetupIGTPipeline(mitk::TrackingDevice::Pointer tracke
     mitk::PointSet* p = m_PointSetFilter->GetOutput(i);
     assert(p);
 
-    mitk::DataTreeNode::Pointer pointSetNode = mitk::DataTreeNode::New();
+    mitk::DataNode::Pointer pointSetNode = mitk::DataNode::New();
     pointSetNode->SetData(p);
     pointSetNode->SetName(QString("Trajectory of Tool #%1 (%2)").arg(i).arg(QTime::currentTime().toString()).toLatin1());
     mitk::Color color;
@@ -307,7 +307,7 @@ void QmitkIGTRecorderView::SetupIGTPipeline(mitk::TrackingDevice::Pointer tracke
   }
 }
 
-mitk::DataTreeNode::Pointer QmitkIGTRecorderView::CreateInstrumentVisualization(const char* label)
+mitk::DataNode::Pointer QmitkIGTRecorderView::CreateInstrumentVisualization(const char* label)
 {
   vtkAxes* axes = vtkAxes::New();
   axes->SymmetricOn();
@@ -337,7 +337,7 @@ mitk::DataTreeNode::Pointer QmitkIGTRecorderView::CreateInstrumentVisualization(
   tuber->Delete();
   axes->Delete();
 
-  mitk::DataTreeNode::Pointer node = mitk::DataTreeNode::New();
+  mitk::DataNode::Pointer node = mitk::DataNode::New();
   node->SetData(dummy);
   node->SetName(label);
   node->SetColor(0.2, 0.9, 0.2);

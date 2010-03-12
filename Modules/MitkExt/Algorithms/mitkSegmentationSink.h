@@ -42,9 +42,9 @@ class MitkExt_EXPORT SegmentationSink : public NonBlockingAlgorithm
 
     virtual bool ThreadedUpdateFunction(); // will be called from a thread after calling StartAlgorithm
 
-    void InsertBelowGroupNode(mitk::DataTreeNode* node);
-    DataTreeNode* LookForPointerTargetBelowGroupNode(const char* name);
-    DataTreeNode* GetGroupNode();
+    void InsertBelowGroupNode(mitk::DataNode* node);
+    DataNode* LookForPointerTargetBelowGroupNode(const char* name);
+    DataNode* GetGroupNode();
 
   private:
 

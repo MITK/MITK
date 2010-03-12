@@ -26,7 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkContourUtils.h"
 #include "mitkImage.h"
 
-#include "mitkDataTreeNode.h"
+#include "mitkDataNode.h"
 
 #include "mitkImageCast.h"
 
@@ -94,7 +94,7 @@ class MitkExt_EXPORT FeedbackContourTool : public SegTool2D
   private:
 
     Contour::Pointer      m_FeedbackContour;
-    DataTreeNode::Pointer m_FeedbackContourNode;
+    DataNode::Pointer m_FeedbackContourNode;
     bool                  m_FeedbackContourVisible;
 
     ContourUtils::Pointer m_ContourUtils;

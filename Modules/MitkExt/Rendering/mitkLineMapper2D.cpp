@@ -57,7 +57,7 @@ void mitk::LineMapper2D::Paint(mitk::BaseRenderer * renderer)
     //apply color and opacity read from the PropertyList
     ApplyProperties(renderer);
 
-    vtkLinearTransform* transform = GetDataTreeNode()->GetVtkTransform();
+    vtkLinearTransform* transform = GetDataNode()->GetVtkTransform();
 
     //List of the Points
     PointSet::DataType::PointsContainerConstIterator it, end;

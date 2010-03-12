@@ -15,37 +15,37 @@
 
  =========================================================================*/
 
-#include "QmitkDataTreeNodeSelectionProvider.h"
-#include "internal/QmitkDataTreeNodeSelection.h"
+#include "QmitkDataNodeSelectionProvider.h"
+#include "internal/QmitkDataNodeSelection.h"
 
-QmitkDataTreeNodeSelectionProvider::QmitkDataTreeNodeSelectionProvider()
+QmitkDataNodeSelectionProvider::QmitkDataNodeSelectionProvider()
  : berry::QtSelectionProvider()
 {
 
 }
 
-berry::ISelection::ConstPointer QmitkDataTreeNodeSelectionProvider::GetSelection() const
+berry::ISelection::ConstPointer QmitkDataNodeSelectionProvider::GetSelection() const
 {
-  return this->GetDataTreeNodeSelection();
+  return this->GetDataNodeSelection();
 }
 
-mitk::DataTreeNodeSelection::ConstPointer
-QmitkDataTreeNodeSelectionProvider::GetDataTreeNodeSelection() const
+mitk::DataNodeSelection::ConstPointer
+QmitkDataNodeSelectionProvider::GetDataNodeSelection() const
 {
   if (qSelectionModel)
   {
-    QmitkDataTreeNodeSelection::ConstPointer sel(new QmitkDataTreeNodeSelection(
+    QmitkDataNodeSelection::ConstPointer sel(new QmitkDataNodeSelection(
         qSelectionModel->selection()));
     return sel;
   }
 
-  return QmitkDataTreeNodeSelection::ConstPointer(new QmitkDataTreeNodeSelection());
+  return QmitkDataNodeSelection::ConstPointer(new QmitkDataNodeSelection());
 }
 
-void QmitkDataTreeNodeSelectionProvider::FireSelectionChanged(
+void QmitkDataNodeSelectionProvider::FireSelectionChanged(
     const QItemSelection&  /*selected*/, const QItemSelection&  /*deselected*/)
 {
-  berry::ISelection::ConstPointer sel(this->GetDataTreeNodeSelection());
+  berry::ISelection::ConstPointer sel(this->GetDataNodeSelection());
   berry::SelectionChangedEvent::Pointer event(new berry::SelectionChangedEvent(
       berry::ISelectionProvider::Pointer(this), sel));
   selectionEvents.selectionChanged(event);

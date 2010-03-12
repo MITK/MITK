@@ -50,9 +50,9 @@ public:
   void SetPredicate(mitk::NodePredicateBase* pred);
   mitk::NodePredicateBase* GetPredicate() const;
 
-  std::vector<mitk::DataTreeNode*> GetDataNodes() const; 
+  std::vector<mitk::DataNode*> GetDataNodes() const; 
 
-  mitk::DataTreeNode::Pointer getNode(const QModelIndex &index) const;
+  mitk::DataNode::Pointer getNode(const QModelIndex &index) const;
 
   //# From QAbstractListModel
   Qt::ItemFlags flags(const QModelIndex& index) const;
@@ -64,12 +64,12 @@ public:
   /// Called when a DataStorage Add Event was thrown. May be reimplemented
   /// by deriving classes.
   ///
-  virtual void NodeAdded(const mitk::DataTreeNode* node);
+  virtual void NodeAdded(const mitk::DataNode* node);
   ///
   /// Called when a DataStorage Remove Event was thrown. May be reimplemented
   /// by deriving classes.
   ///
-  virtual void NodeRemoved(const mitk::DataTreeNode* node);
+  virtual void NodeRemoved(const mitk::DataNode* node);
 
   ///
   /// \brief Called when a itk::Object that is hold as a member variable was 
@@ -109,7 +109,7 @@ protected:
   ///
   /// Holds all selected Nodes. Dont hold smart pointer as we are in a GUI class.
   ///
-  std::vector<mitk::DataTreeNode*> m_DataNodes;
+  std::vector<mitk::DataNode*> m_DataNodes;
 
   ///
   /// \brief Holds the tags of the node-modified observers.

@@ -47,7 +47,7 @@ class MitkExt_EXPORT AutoCropTool : public SegmentationsProcessingTool
 
   protected:
     
-    virtual bool ProcessOneWorkingData( DataTreeNode* node );
+    virtual bool ProcessOneWorkingData( DataNode* node );
     virtual std::string GetErrorMessage();
 
     AutoCropTool(); // purposely hidden

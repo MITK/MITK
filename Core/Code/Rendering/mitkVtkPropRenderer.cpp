@@ -277,7 +277,7 @@ void mitk::VtkPropRenderer::PrepareMapperQueue()
 
   for (DataStorage::SetOfObjects::ConstIterator it = allObjects->Begin();  it != allObjects->End(); ++it)
   {
-    DataTreeNode::Pointer node = it->Value();
+    DataNode::Pointer node = it->Value();
     if ( node.IsNull() )
       continue;
     mitk::Mapper::Pointer mapper = node->GetMapper(m_MapperID);
@@ -347,7 +347,7 @@ void mitk::VtkPropRenderer::Disable2DOpenGL()
   glPopMatrix(); 
 }
 
-void mitk::VtkPropRenderer::Update(mitk::DataTreeNode* datatreenode)
+void mitk::VtkPropRenderer::Update(mitk::DataNode* datatreenode)
 {
   if(datatreenode!=NULL)
   {
@@ -504,7 +504,7 @@ void mitk::VtkPropRenderer::PickWorldPoint(const mitk::Point2D& displayPoint, mi
             iter != allSurfaces->end();
             ++iter)
        {
-         const DataTreeNode* currentNode = *iter;
+         const DataNode* currentNode = *iter;
          BaseVtkMapper3D* baseVtkMapper3D = dynamic_cast<BaseVtkMapper3D*>( currentNode->GetMapper( BaseRenderer::Standard3D ) );
          if ( baseVtkMapper3D )
          {
@@ -531,7 +531,7 @@ void mitk::VtkPropRenderer::PickWorldPoint(const mitk::Point2D& displayPoint, mi
   }
 }
 
-mitk::DataTreeNode *
+mitk::DataNode *
 mitk::VtkPropRenderer::PickObject( const Point2D &displayPosition, Point3D &worldPosition ) const 
 {
   if ( m_VtkMapperPresent )
@@ -545,7 +545,7 @@ mitk::VtkPropRenderer::PickObject( const Point2D &displayPosition, Point3D &worl
           it != allObjects->End(); 
           ++it )
     {
-      DataTreeNode *node = it->Value();
+      DataNode *node = it->Value();
       if ( node == NULL )
         continue;
 
@@ -586,7 +586,7 @@ mitk::VtkPropRenderer::PickObject( const Point2D &displayPosition, Point3D &worl
           it != allObjects->End(); 
           ++it)
     {
-      DataTreeNode::Pointer node = it->Value();
+      DataNode::Pointer node = it->Value();
       if ( node.IsNull() )
         continue;
 
@@ -665,7 +665,7 @@ vtkAssemblyPath* mitk::VtkPropRenderer::GetNextPath()
   while (!success)
   {
     // loop until AddNode can be called successfully
-    const DataTreeNode* node = *m_PickingObjectsIterator;
+    const DataNode* node = *m_PickingObjectsIterator;
     if (node)
     {
       Mapper* mapper = node->GetMapper( BaseRenderer::Standard3D );
@@ -709,7 +709,7 @@ void mitk::VtkPropRenderer::ReleaseGraphicsResources(vtkWindow *renWin)
   DataStorage::SetOfObjects::ConstPointer allObjects = m_DataStorage->GetAll();
   for (DataStorage::SetOfObjects::const_iterator iter = allObjects->begin(); iter != allObjects->end(); ++iter)
   {
-    DataTreeNode::Pointer node = *iter;
+    DataNode::Pointer node = *iter;
     if ( node.IsNull() )
       continue;
 

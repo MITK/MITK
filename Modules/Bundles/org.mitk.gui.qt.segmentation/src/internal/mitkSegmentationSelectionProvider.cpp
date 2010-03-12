@@ -16,7 +16,7 @@
  =========================================================================*/
 
 #include "mitkSegmentationSelectionProvider.h"
-#include <mitkDataTreeNodeSelection.h>
+#include <mitkDataNodeSelection.h>
 #include "berrySelectionChangedEvent.h"
 
 
@@ -25,7 +25,7 @@ namespace mitk
 
 
 SegmentationSelectionProvider::SegmentationSelectionProvider()
-: m_CurrentSelection(new DataTreeNodeSelection)
+: m_CurrentSelection(new DataNodeSelection)
 
 {
 }
@@ -50,7 +50,7 @@ void SegmentationSelectionProvider::SetSelection(berry::ISelection::Pointer sele
 {
 }
 
-void SegmentationSelectionProvider::FireSelectionChanged(DataTreeNodeSelection::Pointer selection)
+void SegmentationSelectionProvider::FireSelectionChanged(DataNodeSelection::Pointer selection)
 {
   if(selection.IsNotNull())
   {
@@ -61,9 +61,9 @@ void SegmentationSelectionProvider::FireSelectionChanged(DataTreeNodeSelection::
   }
 }
 
-void SegmentationSelectionProvider::FireSelectionChanged(DataTreeNode::Pointer selectedNode)
+void SegmentationSelectionProvider::FireSelectionChanged(DataNode::Pointer selectedNode)
 {
-  this->FireSelectionChanged(DataTreeNodeSelection::Pointer(new DataTreeNodeSelection(selectedNode)));
+  this->FireSelectionChanged(DataNodeSelection::Pointer(new DataNodeSelection(selectedNode)));
 }
 
 

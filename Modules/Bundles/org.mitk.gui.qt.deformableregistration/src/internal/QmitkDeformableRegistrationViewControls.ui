@@ -404,7 +404,7 @@
   </customwidget>
  </customwidgets>
  <includes>
-  <include location="local">mitkDataTreeNode.h</include>
+  <include location="local">mitkDataNode.h</include>
   <include location="local">mitkBaseData.h</include>
  </includes>
  <resources>

@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITK_DATATREEFILTERFUNCTOINS_H_INCLUDED
 #define MITK_DATATREEFILTERFUNCTOINS_H_INCLUDED
 
-#include <mitkDataTreeNode.h>
+#include <mitkDataNode.h>
 #include "MitkExtExports.h"
 
 #include <mitkProperties.h>
@@ -26,20 +26,20 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk
 {
-  class DataTreeNode; 
+  class DataNode; 
 
   /*! \brief Base class for all filter function that are accepted by mitk::DataTreeFilter.
 
     Subclasses are required to implement the Clone() method, which should return a copy of
     the object, and the NodeMatches() method. NodeMatches() will receive a
-    mitk::DataTreeNode* everytime it is called, and should return true. <b>This pointer can be NULL</b>. 
+    mitk::DataNode* everytime it is called, and should return true. <b>This pointer can be NULL</b>. 
   */
    class MitkExt_EXPORT DataTreeFilterFunction
   {
     public:
       virtual ~DataTreeFilterFunction() {}
-      virtual bool operator()(DataTreeNode*) const;
-      virtual bool NodeMatches(DataTreeNode*) const = 0;
+      virtual bool operator()(DataNode*) const;
+      virtual bool NodeMatches(DataNode*) const = 0;
       virtual DataTreeFilterFunction* Clone() const = 0;
   };
 
@@ -54,7 +54,7 @@ namespace mitk
   class IsBaseDataType : public DataTreeFilterFunction
   {
     public:
-      virtual bool NodeMatches(DataTreeNode* node) const
+      virtual bool NodeMatches(DataNode* node) const
       {
         return ( node != NULL && node->GetData() && dynamic_cast<T*>(node->GetData()) );
       }
@@ -84,7 +84,7 @@ namespace mitk
       {
       }
       
-      virtual bool NodeMatches(DataTreeNode* node) const
+      virtual bool NodeMatches(DataNode* node) const
       {
         return (    node != NULL && node->GetData()                               // node is not NULL, and node->GetData is also not NULL
                  && dynamic_cast<T*>(node->GetData() )                            // data is of a certain type
@@ -122,7 +122,7 @@ namespace mitk
       {
       }
       
-      virtual bool NodeMatches(DataTreeNode* node) const
+      virtual bool NodeMatches(DataNode* node) const
       {
         bool propVal(false);
         return (    node != NULL && node->GetData()                            // node is not NULL, and node->GetData is also not NULL
@@ -162,7 +162,7 @@ namespace mitk
       {
       }
       
-      virtual bool NodeMatches(DataTreeNode* node) const
+      virtual bool NodeMatches(DataNode* node) const
       {
         bool propVal(false);
         bool propertyExists(false);
@@ -197,11 +197,11 @@ namespace mitk
      treeFilter->SetFilter( mitk::IsBaseDataTypeWithoutProperty<mitk::Image>("segmentation") );
     \endcode
   */
-  class MitkExt_EXPORT IsDataTreeNode : public DataTreeFilterFunction
+  class MitkExt_EXPORT IsDataNode : public DataTreeFilterFunction
   {
     public:
-      virtual ~IsDataTreeNode() {}
-      virtual bool NodeMatches(DataTreeNode*) const;
+      virtual ~IsDataNode() {}
+      virtual bool NodeMatches(DataNode*) const;
       virtual DataTreeFilterFunction* Clone() const;
   };
 
@@ -212,11 +212,11 @@ namespace mitk
      treeFilter->SetFilter( mitk::IsBaseDataTypeWithoutProperty<mitk::Image>("segmentation") );
     \endcode
   */
-  class MitkExt_EXPORT IsGoodDataTreeNode : public DataTreeFilterFunction
+  class MitkExt_EXPORT IsGoodDataNode : public DataTreeFilterFunction
   {
     public:
-      virtual ~IsGoodDataTreeNode() {}
-      virtual bool NodeMatches(DataTreeNode*) const;
+      virtual ~IsGoodDataNode() {}
+      virtual bool NodeMatches(DataNode*) const;
       virtual DataTreeFilterFunction* Clone() const;
   };
 
@@ -230,7 +230,7 @@ namespace mitk
   class MitkExt_EXPORT IsInResultSet : public DataTreeFilterFunction
   {
     public:
-      IsInResultSet( std::set<const DataTreeNode*> rs )
+      IsInResultSet( std::set<const DataNode*> rs )
         :m_ResultSet(rs)
       {
       }
@@ -249,11 +249,11 @@ namespace mitk
       }
 
       virtual ~IsInResultSet() {}
-      virtual bool NodeMatches(DataTreeNode*) const;
+      virtual bool NodeMatches(DataNode*) const;
       virtual DataTreeFilterFunction* Clone() const;
     protected:
       //DataStorage::SetOfObjects::ConstPointer m_ResultSet;
-      std::set<const DataTreeNode*> m_ResultSet;
+      std::set<const DataNode*> m_ResultSet;
   };
 
   /*! \brief Tests if the node contains an image with a specified dimensionality (template parameter)
@@ -273,7 +273,7 @@ namespace mitk
       {
       }
       
-      virtual bool NodeMatches(DataTreeNode* node) const
+      virtual bool NodeMatches(DataNode* node) const
       {
         return (    node != NULL && node->GetData()                                // node is not NULL, and node->GetData is also not NULL
                  && dynamic_cast<mitk::Image*>(node->GetData() )                            // data is an image
@@ -307,7 +307,7 @@ namespace mitk
   {
     public:
       
-      virtual bool NodeMatches(DataTreeNode* node) const
+      virtual bool NodeMatches(DataNode* node) const
       {
         return (    node != NULL && node->GetData()                                // node is not NULL, and node->GetData is also not NULL
                  && dynamic_cast<mitk::Image*>(node->GetData() )                            // data is an image

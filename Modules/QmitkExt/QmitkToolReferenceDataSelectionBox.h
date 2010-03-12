@@ -100,11 +100,11 @@ public:
 
 signals:
 
-  void ReferenceNodeSelected(const mitk::DataTreeNode*);
+  void ReferenceNodeSelected(const mitk::DataNode*);
 
 protected slots:
 
-  void OnReferenceDataSelected(const mitk::DataTreeNode* node);
+  void OnReferenceDataSelected(const mitk::DataNode* node);
 
   void EnsureOnlyReferenceImageIsVisibile();
 

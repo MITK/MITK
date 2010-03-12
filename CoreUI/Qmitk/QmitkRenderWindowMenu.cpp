@@ -628,7 +628,7 @@ void QmitkRenderWindowMenu::SetCrossHairVisibility( bool state )
   if(m_Renderer.IsNotNull())  
   {
     mitk::DataStorage *ds=m_Renderer->GetDataStorage();
-    mitk::DataTreeNode *n;
+    mitk::DataNode *n;
     if(ds)
     {
       n = ds->GetNamedNode("widget1Plane"); if(n) n->SetVisibility(state);
@@ -680,7 +680,7 @@ void QmitkRenderWindowMenu::OnCrossHairMenuAboutToShow()
     if(m_Renderer.IsNotNull())  
     {
       mitk::DataStorage *ds=m_Renderer->GetDataStorage();
-      mitk::DataTreeNode *n;
+      mitk::DataNode *n;
       if(ds)
       {
         n = ds->GetNamedNode("widget1Plane"); if(n) { bool v; if(n->GetVisibility(v,0)) currentState&=v; }

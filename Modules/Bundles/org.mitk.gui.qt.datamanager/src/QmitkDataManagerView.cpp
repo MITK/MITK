@@ -9,7 +9,7 @@
 #include "mitkNodePredicateDataType.h"
 #include "mitkCoreObjectFactory.h"
 #include "mitkPACSPlugin.h"
-#include "mitkDataTreeNodeFactory.h"
+#include "mitkDataNodeFactory.h"
 #include "mitkColorProperty.h"
 #include "mitkCommon.h"
 #include "mitkDelegateManager.h"
@@ -64,7 +64,7 @@
 #include <QColor>
 #include <QColorDialog>
 #include <QSizePolicy>
-#include "mitkDataTreeNodeObject.h"
+#include "mitkDataNodeObject.h"
 
 const std::string QmitkDataManagerView::VIEW_ID = "org.mitk.views.datamanager";
 
@@ -115,39 +115,39 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   m_NodeMenu = new QMenu(m_NodeTreeView);
 
   //# m_SelectionProvider
-  m_SelectionProvider = new QmitkDataTreeNodeSelectionProvider();
+  m_SelectionProvider = new QmitkDataNodeSelectionProvider();
   m_SelectionProvider->SetItemSelectionModel(m_NodeTreeView->selectionModel());
   this->GetSite()->SetSelectionProvider(m_SelectionProvider);
 
   // # Actions
-  QmitkNodeDescriptor* unknownDataTreeNodeDescriptor = 
-    QmitkNodeDescriptorManager::GetInstance()->GetUnknownDataTreeNodeDescriptor();
+  QmitkNodeDescriptor* unknownDataNodeDescriptor = 
+    QmitkNodeDescriptorManager::GetInstance()->GetUnknownDataNodeDescriptor();
 
-  QmitkNodeDescriptor* imageDataTreeNodeDescriptor =
+  QmitkNodeDescriptor* imageDataNodeDescriptor =
     QmitkNodeDescriptorManager::GetInstance()->GetDescriptor("Image");
 
-  QmitkNodeDescriptor* surfaceDataTreeNodeDescriptor =
+  QmitkNodeDescriptor* surfaceDataNodeDescriptor =
     QmitkNodeDescriptorManager::GetInstance()->GetDescriptor("Surface");
 
   m_GlobalReinitAction = new QAction(QIcon(":/org.mitk.gui.qt.datamanager/Refresh_48.png"), "Global Reinit", this);
   QObject::connect( m_GlobalReinitAction, SIGNAL( triggered(bool) )
     , this, SLOT( GlobalReinit(bool) ) );
-  unknownDataTreeNodeDescriptor->AddAction(m_GlobalReinitAction);
+  unknownDataNodeDescriptor->AddAction(m_GlobalReinitAction);
 
   m_SaveAction = new QAction(QIcon(":/org.mitk.gui.qt.datamanager/Save_48.png"), "Save...", this);
   QObject::connect( m_SaveAction, SIGNAL( triggered(bool) )
     , this, SLOT( SaveSelectedNodes(bool) ) );
-  unknownDataTreeNodeDescriptor->AddAction(m_SaveAction);
+  unknownDataNodeDescriptor->AddAction(m_SaveAction);
 
   m_RemoveAction = new QAction(QIcon(":/org.mitk.gui.qt.datamanager/Remove_48.png"), "Delete", this);
   QObject::connect( m_RemoveAction, SIGNAL( triggered(bool) )
     , this, SLOT( RemoveSelectedNodes(bool) ) );
-  unknownDataTreeNodeDescriptor->AddAction(m_RemoveAction);
+  unknownDataNodeDescriptor->AddAction(m_RemoveAction);
 
   m_ReinitAction = new QAction(QIcon(":/org.mitk.gui.qt.datamanager/Refresh_48.png"), "Reinit", this);
   QObject::connect( m_ReinitAction, SIGNAL( triggered(bool) )
     , this, SLOT( ReinitSelectedNodes(bool) ) );
-  unknownDataTreeNodeDescriptor->AddAction(m_ReinitAction);
+  unknownDataNodeDescriptor->AddAction(m_ReinitAction);
 
   m_OpacitySlider = new QSlider;
   m_OpacitySlider->setMinimum(0);
@@ -168,7 +168,7 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   m_OpacityAction->setDefaultWidget(_OpacityWidget);
   QObject::connect( m_OpacityAction, SIGNAL( changed() )
     , this, SLOT( OpacityActionChanged() ) );
-  unknownDataTreeNodeDescriptor->AddAction(m_OpacityAction, false);
+  unknownDataNodeDescriptor->AddAction(m_OpacityAction, false);
 
   m_ColorButton = new QPushButton;
   m_ColorButton->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Minimum);
@@ -189,7 +189,7 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   m_ColorAction->setDefaultWidget(_ColorWidget);
   QObject::connect( m_ColorAction, SIGNAL( changed() )
     , this, SLOT( ColorActionChanged() ) );
-  unknownDataTreeNodeDescriptor->AddAction(m_ColorAction, false);
+  unknownDataNodeDescriptor->AddAction(m_ColorAction, false);
 
   m_TextureInterpolation = new QAction("Texture Interpolation", this);
   m_TextureInterpolation->setCheckable ( true );
@@ -197,41 +197,41 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
     , this, SLOT( TextureInterpolationChanged() ) );
   QObject::connect( m_TextureInterpolation, SIGNAL( toggled(bool) )
     , this, SLOT( TextureInterpolationToggled(bool) ) );
-  imageDataTreeNodeDescriptor->AddAction(m_TextureInterpolation, false);
+  imageDataNodeDescriptor->AddAction(m_TextureInterpolation, false);
 
   m_SurfaceRepresentation = new QAction("Surface Representation", this);
   m_SurfaceRepresentation->setMenu(new QMenu);
 
   QObject::connect( m_SurfaceRepresentation->menu(), SIGNAL( aboutToShow() )
     , this, SLOT( SurfaceRepresentationMenuAboutToShow() ) );
-  surfaceDataTreeNodeDescriptor->AddAction(m_SurfaceRepresentation, false);
+  surfaceDataNodeDescriptor->AddAction(m_SurfaceRepresentation, false);
 
   m_ShowOnlySelectedNodes 
     = new QAction(QIcon(":/org.mitk.gui.qt.datamanager/ShowSelectedNode_48.png")
     , "Show only selected nodes", this);
   QObject::connect( m_ShowOnlySelectedNodes, SIGNAL( triggered(bool) )
     , this, SLOT( ShowOnlySelectedNodes(bool) ) );
-  unknownDataTreeNodeDescriptor->AddAction(m_ShowOnlySelectedNodes);
+  unknownDataNodeDescriptor->AddAction(m_ShowOnlySelectedNodes);
 
   m_ToggleSelectedVisibility 
     = new QAction(QIcon(":/org.mitk.gui.qt.datamanager/InvertShowSelectedNode_48.png")
     , "Toggle visibility", this);
   QObject::connect( m_ToggleSelectedVisibility, SIGNAL( triggered(bool) )
     , this, SLOT( ToggleVisibilityOfSelectedNodes(bool) ) );
-  unknownDataTreeNodeDescriptor->AddAction(m_ToggleSelectedVisibility);
+  unknownDataNodeDescriptor->AddAction(m_ToggleSelectedVisibility);
 
   m_ActionShowInfoDialog 
     = new QAction(QIcon(":/org.mitk.gui.qt.datamanager/ShowDataInfo_48.png")
     , "Details...", this);
   QObject::connect( m_ActionShowInfoDialog, SIGNAL( triggered(bool) )
     , this, SLOT( ShowInfoDialogForSelectedNodes(bool) ) );
-  unknownDataTreeNodeDescriptor->AddAction(m_ActionShowInfoDialog);
+  unknownDataNodeDescriptor->AddAction(m_ActionShowInfoDialog);
 
   m_OtsuFilterAction = new QAction("Apply Otsu Filter", this);
   QObject::connect( m_OtsuFilterAction, SIGNAL( triggered(bool) )
     , this, SLOT( OtsuFilter(bool) ) );
   // Otsu filter does not work properly, remove it temporarily
-  // imageDataTreeNodeDescriptor->AddAction(m_OtsuFilterAction);
+  // imageDataNodeDescriptor->AddAction(m_OtsuFilterAction);
 
   QGridLayout* _DndFrameWidgetLayout = new QGridLayout;
   _DndFrameWidgetLayout->addWidget(m_NodeTreeView, 0, 0);
@@ -278,8 +278,8 @@ void QmitkDataManagerView::OnPreferencesChanged(const berry::IBerryPreferences* 
 void QmitkDataManagerView::NodeTableViewContextMenuRequested( const QPoint & pos )
 {
   QModelIndex selected = m_NodeTreeView->indexAt ( pos );
-  mitk::DataTreeNode::Pointer node = m_NodeTreeModel->GetNode(selected);
-  std::vector<mitk::DataTreeNode*> selectedNodes = this->GetSelectedNodes();
+  mitk::DataNode::Pointer node = m_NodeTreeModel->GetNode(selected);
+  std::vector<mitk::DataNode*> selectedNodes = this->GetSelectedNodes();
 
   if(!selectedNodes.empty())
   {
@@ -304,7 +304,7 @@ void QmitkDataManagerView::NodeTableViewContextMenuRequested( const QPoint & pos
 
 void QmitkDataManagerView::OpacityChanged(int value)
 {
-  mitk::DataTreeNode* node = m_NodeTreeModel->GetNode(m_NodeTreeView->selectionModel()->currentIndex());
+  mitk::DataNode* node = m_NodeTreeModel->GetNode(m_NodeTreeView->selectionModel()->currentIndex());
   if(node)
   {
     float opacity = static_cast<float>(value)/100.0f;
@@ -317,7 +317,7 @@ void QmitkDataManagerView::OpacityChanged(int value)
 
 void QmitkDataManagerView::OpacityActionChanged()
 {
-  mitk::DataTreeNode* node = m_NodeTreeModel->GetNode(m_NodeTreeView->selectionModel()->currentIndex());
+  mitk::DataNode* node = m_NodeTreeModel->GetNode(m_NodeTreeView->selectionModel()->currentIndex());
   if(node)
   {
     float opacity = 0.0;
@@ -331,7 +331,7 @@ void QmitkDataManagerView::OpacityActionChanged()
 
 void QmitkDataManagerView::ColorChanged()
 {
-  mitk::DataTreeNode* node = m_NodeTreeModel->GetNode(m_NodeTreeView->selectionModel()->currentIndex());
+  mitk::DataNode* node = m_NodeTreeModel->GetNode(m_NodeTreeView->selectionModel()->currentIndex());
   if(node)
   {
     QColor color = QColorDialog::getColor();
@@ -345,7 +345,7 @@ void QmitkDataManagerView::ColorChanged()
 
 void QmitkDataManagerView::ColorActionChanged()
 {
-  mitk::DataTreeNode* node = m_NodeTreeModel->GetNode(m_NodeTreeView->selectionModel()->currentIndex());
+  mitk::DataNode* node = m_NodeTreeModel->GetNode(m_NodeTreeView->selectionModel()->currentIndex());
   if(node)
   {
     mitk::Color color;
@@ -369,7 +369,7 @@ void QmitkDataManagerView::ColorActionChanged()
 
 void QmitkDataManagerView::TextureInterpolationChanged()
 {
-  mitk::DataTreeNode* node = m_NodeTreeModel->GetNode(m_NodeTreeView->selectionModel()->currentIndex());
+  mitk::DataNode* node = m_NodeTreeModel->GetNode(m_NodeTreeView->selectionModel()->currentIndex());
   if(node)
   {
     bool textureInterpolation = false;
@@ -380,7 +380,7 @@ void QmitkDataManagerView::TextureInterpolationChanged()
 
 void QmitkDataManagerView::TextureInterpolationToggled( bool checked )
 {
-  mitk::DataTreeNode* node = m_NodeTreeModel->GetNode(m_NodeTreeView->selectionModel()->currentIndex());
+  mitk::DataNode* node = m_NodeTreeModel->GetNode(m_NodeTreeView->selectionModel()->currentIndex());
   if(node)
   {
     node->SetBoolProperty("texture interpolation", checked);
@@ -391,7 +391,7 @@ void QmitkDataManagerView::TextureInterpolationToggled( bool checked )
 
 void QmitkDataManagerView::SurfaceRepresentationMenuAboutToShow()
 {
-  mitk::DataTreeNode* node = m_NodeTreeModel->GetNode(m_NodeTreeView->selectionModel()->currentIndex());
+  mitk::DataNode* node = m_NodeTreeModel->GetNode(m_NodeTreeView->selectionModel()->currentIndex());
   if(!node)
     return;
 
@@ -423,7 +423,7 @@ void QmitkDataManagerView::SurfaceRepresentationMenuAboutToShow()
 
 void QmitkDataManagerView::SurfaceRepresentationActionToggled( bool checked )
 {
-  mitk::DataTreeNode* node = m_NodeTreeModel->GetNode(m_NodeTreeView->selectionModel()->currentIndex());
+  mitk::DataNode* node = m_NodeTreeModel->GetNode(m_NodeTreeView->selectionModel()->currentIndex());
   if(!node)
     return;
 
@@ -457,7 +457,7 @@ void QmitkDataManagerView::SaveSelectedNodes( bool )
 {
   QModelIndexList indexesOfSelectedRows = m_NodeTreeView->selectionModel()->selectedRows();
 
-  mitk::DataTreeNode* node = 0;
+  mitk::DataNode* node = 0;
   unsigned int indexesOfSelectedRowsSize = indexesOfSelectedRows.size();
   for (unsigned int i = 0; i<indexesOfSelectedRowsSize; ++i)
   {
@@ -474,10 +474,10 @@ void QmitkDataManagerView::SaveSelectedNodes( bool )
 
 void QmitkDataManagerView::ReinitSelectedNodes( bool )
 {
-  std::vector<mitk::DataTreeNode*> selectedNodes = this->GetSelectedNodes();
+  std::vector<mitk::DataNode*> selectedNodes = this->GetSelectedNodes();
 
-  mitk::DataTreeNode* node = 0;
-  for (std::vector<mitk::DataTreeNode*>::iterator it = selectedNodes.begin()
+  mitk::DataNode* node = 0;
+  for (std::vector<mitk::DataNode*>::iterator it = selectedNodes.begin()
     ; it != selectedNodes.end(); it++)
   {
     node = *it;
@@ -494,9 +494,9 @@ void QmitkDataManagerView::ReinitSelectedNodes( bool )
 void QmitkDataManagerView::RemoveSelectedNodes( bool )
 {
   QModelIndexList indexesOfSelectedRows = m_NodeTreeView->selectionModel()->selectedRows();
-  std::vector<mitk::DataTreeNode*> selectedNodes;
+  std::vector<mitk::DataNode*> selectedNodes;
 
-  mitk::DataTreeNode* node = 0;
+  mitk::DataNode* node = 0;
   QString question = tr("Do you really want to delete ");
 
   for (QModelIndexList::iterator it = indexesOfSelectedRows.begin()
@@ -522,7 +522,7 @@ void QmitkDataManagerView::RemoveSelectedNodes( bool )
 
   if(answerButton == QMessageBox::Yes)
   {
-    for (std::vector<mitk::DataTreeNode*>::iterator it = selectedNodes.begin()
+    for (std::vector<mitk::DataNode*>::iterator it = selectedNodes.begin()
       ; it != selectedNodes.end(); it++)
     {
       node = *it;
@@ -535,9 +535,9 @@ void QmitkDataManagerView::RemoveSelectedNodes( bool )
 
 void QmitkDataManagerView::MakeAllNodesInvisible( bool )
 {
-  std::vector<mitk::DataTreeNode*> nodes = m_NodeTreeModel->GetNodeSet();
+  std::vector<mitk::DataNode*> nodes = m_NodeTreeModel->GetNodeSet();
 
-  for (std::vector<mitk::DataTreeNode*>::iterator it = nodes.begin()
+  for (std::vector<mitk::DataNode*>::iterator it = nodes.begin()
     ; it != nodes.end(); it++)
   {
     (*it)->SetVisibility(false);
@@ -547,11 +547,11 @@ void QmitkDataManagerView::MakeAllNodesInvisible( bool )
 
 void QmitkDataManagerView::ShowOnlySelectedNodes( bool )
 {
-  std::vector<mitk::DataTreeNode*> selectedNodes = this->GetSelectedNodes();
-  std::vector<mitk::DataTreeNode*> allNodes = m_NodeTreeModel->GetNodeSet();
-  mitk::DataTreeNode* node = 0;
+  std::vector<mitk::DataNode*> selectedNodes = this->GetSelectedNodes();
+  std::vector<mitk::DataNode*> allNodes = m_NodeTreeModel->GetNodeSet();
+  mitk::DataNode* node = 0;
 
-  for (std::vector<mitk::DataTreeNode*>::iterator it = allNodes.begin()
+  for (std::vector<mitk::DataNode*>::iterator it = allNodes.begin()
     ; it != allNodes.end(); it++)
   {
     node = *it;
@@ -565,11 +565,11 @@ void QmitkDataManagerView::ShowOnlySelectedNodes( bool )
 
 void QmitkDataManagerView::ToggleVisibilityOfSelectedNodes( bool )
 {
-  std::vector<mitk::DataTreeNode*> selectedNodes = this->GetSelectedNodes();
+  std::vector<mitk::DataNode*> selectedNodes = this->GetSelectedNodes();
 
   bool isVisible = false;
-  mitk::DataTreeNode* node = 0;
-  for (std::vector<mitk::DataTreeNode*>::iterator it = selectedNodes.begin()
+  mitk::DataNode* node = 0;
+  for (std::vector<mitk::DataNode*>::iterator it = selectedNodes.begin()
     ; it != selectedNodes.end(); it++)
   {
     isVisible = false;
@@ -582,7 +582,7 @@ void QmitkDataManagerView::ToggleVisibilityOfSelectedNodes( bool )
 
 void QmitkDataManagerView::ShowInfoDialogForSelectedNodes( bool )
 {
-  std::vector<mitk::DataTreeNode*> selectedNodes = this->GetSelectedNodes();
+  std::vector<mitk::DataNode*> selectedNodes = this->GetSelectedNodes();
 
   QmitkInfoDialog _QmitkInfoDialog(selectedNodes, this->m_Parent);
   _QmitkInfoDialog.exec();
@@ -597,9 +597,9 @@ void QmitkDataManagerView::Load( bool )
   }
 }
 
-void QmitkDataManagerView::FileOpen( const char * fileName, mitk::DataTreeNode* parentNode )
+void QmitkDataManagerView::FileOpen( const char * fileName, mitk::DataNode* parentNode )
 {
-  mitk::DataTreeNodeFactory::Pointer factory = mitk::DataTreeNodeFactory::New();
+  mitk::DataNodeFactory::Pointer factory = mitk::DataNodeFactory::New();
 
   try
   {
@@ -611,7 +611,7 @@ void QmitkDataManagerView::FileOpen( const char * fileName, mitk::DataTreeNode* 
 
     for ( unsigned int i = 0 ; i < factory->GetNumberOfOutputs( ); ++i )
     {
-      mitk::DataTreeNode::Pointer node = factory->GetOutput( i );
+      mitk::DataNode::Pointer node = factory->GetOutput( i );
       if ( ( node.IsNotNull() ) && ( node->GetData() != NULL ) )
       {
         this->GetDataStorage()->Add(node, parentNode);
@@ -644,12 +644,12 @@ void QmitkDataManagerView::GlobalReinit( bool )
   mitk::RenderingManager::GetInstance()->InitializeViews(bounds);
 }
 
-std::vector<mitk::DataTreeNode*> QmitkDataManagerView::GetSelectedNodes() const
+std::vector<mitk::DataNode*> QmitkDataManagerView::GetSelectedNodes() const
 {
   QModelIndexList indexesOfSelectedRows = m_NodeTreeView->selectionModel()->selectedRows();
-  std::vector<mitk::DataTreeNode*> selectedNodes;
+  std::vector<mitk::DataNode*> selectedNodes;
 
-  mitk::DataTreeNode* node = 0;
+  mitk::DataNode* node = 0;
   for (QModelIndexList::iterator it = indexesOfSelectedRows.begin()
     ; it != indexesOfSelectedRows.end(); it++)
   {
@@ -667,26 +667,26 @@ void QmitkDataManagerView::SelectionChanged( berry::IWorkbenchPart::Pointer part
 {
   if(part.GetPointer() == this)
     return;
-  mitk::DataTreeNodeSelection::ConstPointer _DataTreeNodeSelection 
-    = selection.Cast<const mitk::DataTreeNodeSelection>();
+  mitk::DataNodeSelection::ConstPointer _DataNodeSelection 
+    = selection.Cast<const mitk::DataNodeSelection>();
 
-  if(_DataTreeNodeSelection.IsNull())
+  if(_DataNodeSelection.IsNull())
     return;
 
-  std::vector<mitk::DataTreeNode*> selectedNodes;
-  mitk::DataTreeNodeObject* _DataTreeNodeObject = 0;
-  mitk::DataTreeNode* _DataTreeNode = 0;
+  std::vector<mitk::DataNode*> selectedNodes;
+  mitk::DataNodeObject* _DataNodeObject = 0;
+  mitk::DataNode* _DataNode = 0;
   QItemSelection newSelection;
 
   m_NodeTreeView->selectionModel()->reset();
 
-  for(mitk::DataTreeNodeSelection::iterator it = _DataTreeNodeSelection->Begin();
-    it != _DataTreeNodeSelection->End(); ++it)
+  for(mitk::DataNodeSelection::iterator it = _DataNodeSelection->Begin();
+    it != _DataNodeSelection->End(); ++it)
   {
-    _DataTreeNodeObject = dynamic_cast<mitk::DataTreeNodeObject*>((*it).GetPointer());
-    if(_DataTreeNodeObject)
-      _DataTreeNode = _DataTreeNodeObject->GetDataTreeNode();
-    QModelIndex treeIndex = m_NodeTreeModel->GetIndex(_DataTreeNode);
+    _DataNodeObject = dynamic_cast<mitk::DataNodeObject*>((*it).GetPointer());
+    if(_DataNodeObject)
+      _DataNode = _DataNodeObject->GetDataNode();
+    QModelIndex treeIndex = m_NodeTreeModel->GetIndex(_DataNode);
     if(treeIndex.isValid())
       newSelection.select(treeIndex, treeIndex);
   }
@@ -695,15 +695,15 @@ void QmitkDataManagerView::SelectionChanged( berry::IWorkbenchPart::Pointer part
 
 void QmitkDataManagerView::OtsuFilter( bool )
 {
-  std::vector<mitk::DataTreeNode*> selectedNodes = this->GetSelectedNodes();
+  std::vector<mitk::DataNode*> selectedNodes = this->GetSelectedNodes();
 
-  mitk::DataTreeNode* _DataTreeNode = 0;
+  mitk::DataNode* _DataNode = 0;
   mitk::Image::Pointer mitkImage = 0;
-  for (std::vector<mitk::DataTreeNode*>::iterator it = selectedNodes.begin()
+  for (std::vector<mitk::DataNode*>::iterator it = selectedNodes.begin()
     ; it != selectedNodes.end(); it++)
   {
-    _DataTreeNode = *it;
-    mitkImage = dynamic_cast<mitk::Image*>( _DataTreeNode->GetData() );
+    _DataNode = *it;
+    mitkImage = dynamic_cast<mitk::Image*>( _DataNode->GetData() );
 
     if(mitkImage.IsNull())
       continue;
@@ -731,14 +731,14 @@ void QmitkDataManagerView::OtsuFilter( bool )
 
       filter->Update();
 
-      mitk::DataTreeNode::Pointer resultNode = mitk::DataTreeNode::New();
-      std::string nameOfResultImage = _DataTreeNode->GetName();
+      mitk::DataNode::Pointer resultNode = mitk::DataNode::New();
+      std::string nameOfResultImage = _DataNode->GetName();
       nameOfResultImage.append("Otsu");
       resultNode->SetProperty("name", mitk::StringProperty::New(nameOfResultImage) );
       resultNode->SetProperty("binary", mitk::BoolProperty::New(true) );
       resultNode->SetData( mitk::ImportItkImage ( filter->GetOutput() ) );
 
-      this->GetDataStorage()->Add(resultNode, _DataTreeNode);
+      this->GetDataStorage()->Add(resultNode, _DataNode);
 
     }
     catch( std::exception& err )
@@ -752,7 +752,7 @@ void QmitkDataManagerView::OtsuFilter( bool )
 void QmitkDataManagerView::NodeTreeViewRowsInserted( const QModelIndex & parent, int, int )
 {
   m_NodeTreeView->setExpanded(parent, true);
-  /*std::vector<mitk::DataTreeNode*> nodes = m_NodeTreeModel->GetNodeSet();
+  /*std::vector<mitk::DataNode*> nodes = m_NodeTreeModel->GetNodeSet();
   if(nodes.size() == 1)
   {
     QModelIndex treeIndex = m_NodeTreeModel->GetIndex(nodes.front());
@@ -762,10 +762,10 @@ void QmitkDataManagerView::NodeTreeViewRowsInserted( const QModelIndex & parent,
 
 void QmitkDataManagerView::NodeSelectionChanged( const QItemSelection & selected, const QItemSelection & deselected )
 {
-  std::vector<mitk::DataTreeNode*> nodes = m_NodeTreeModel->GetNodeSet();
-  mitk::DataTreeNode* node = 0;
+  std::vector<mitk::DataNode*> nodes = m_NodeTreeModel->GetNodeSet();
+  mitk::DataNode* node = 0;
 
-  for (std::vector<mitk::DataTreeNode*>::iterator it = nodes.begin()
+  for (std::vector<mitk::DataNode*>::iterator it = nodes.begin()
     ; it != nodes.end(); it++)
   {
     node = *it;
@@ -776,7 +776,7 @@ void QmitkDataManagerView::NodeSelectionChanged( const QItemSelection & selected
   nodes.clear();
   nodes = this->GetSelectedNodes();
 
-  for (std::vector<mitk::DataTreeNode*>::iterator it = nodes.begin()
+  for (std::vector<mitk::DataNode*>::iterator it = nodes.begin()
     ; it != nodes.end(); it++)
   {
     node = *it;

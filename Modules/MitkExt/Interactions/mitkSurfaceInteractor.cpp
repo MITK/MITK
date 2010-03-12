@@ -26,7 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <vtkPolyData.h>
 
-mitk::SurfaceInteractor::SurfaceInteractor(const char * type, DataTreeNode* dataTreeNode)
+mitk::SurfaceInteractor::SurfaceInteractor(const char * type, DataNode* dataTreeNode)
 : AffineInteractor(type, dataTreeNode)
 {
   m_PtLoc = PLocType::New();

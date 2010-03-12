@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkFileExitAction.h"
 
 #include <QFileDialog>
-#include <mitkDataTreeNodeFactory.h>
+#include <mitkDataNodeFactory.h>
 
 #include <mitkCoreObjectFactory.h>
 #include <mitkDataStorageEditorInput.h>

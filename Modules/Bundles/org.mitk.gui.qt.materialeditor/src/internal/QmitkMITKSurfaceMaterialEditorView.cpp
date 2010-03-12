@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkNodePredicateDataType.h"
 #include "mitkProperties.h"
 #include "mitkIDataStorageService.h"
-#include "mitkDataTreeNodeObject.h"
+#include "mitkDataNodeObject.h"
 
 #include "berryIEditorPart.h"
 #include "berryIWorkbenchPage.h"
@@ -108,12 +108,12 @@ void QmitkMITKSurfaceMaterialEditorView::InitPreviewWindow()
   m_Surface = mitk::Surface::New();
   m_Surface->SetVtkPolyData( sphere );
   
-  m_DataTreeNode = mitk::DataTreeNode::New();
-  m_DataTreeNode->SetData( m_Surface );
+  m_DataNode = mitk::DataNode::New();
+  m_DataNode->SetData( m_Surface );
     
   m_DataTree = mitk::StandaloneDataStorage::New();
   
-  m_DataTree->Add( m_DataTreeNode , (mitk::DataTreeNode *)0 );
+  m_DataTree->Add( m_DataNode , (mitk::DataNode *)0 );
   
   m_Controls->m_PreviewRenderWindow->GetRenderer()->SetDataStorage( m_DataTree );
   m_Controls->m_PreviewRenderWindow->GetRenderer()->SetMapperID( mitk::BaseRenderer::Standard3D );
@@ -124,8 +124,8 @@ void QmitkMITKSurfaceMaterialEditorView::InitPreviewWindow()
 
 void QmitkMITKSurfaceMaterialEditorView::RefreshPropertiesList()
 { 
-  mitk::DataTreeNode* SrcND = m_SelectedDataTreeNode;
-  mitk::DataTreeNode* DstND = m_DataTreeNode;
+  mitk::DataNode* SrcND = m_SelectedDataNode;
+  mitk::DataNode* DstND = m_DataNode;
 
   mitk::PropertyList* DstPL = DstND->GetPropertyList();
 
@@ -251,7 +251,7 @@ void QmitkMITKSurfaceMaterialEditorView::CreateQtPartControl(QWidget *parent)
   
 	  InitPreviewWindow();
 	  
-	  connect( m_Controls->m_ImageSelector, SIGNAL( OnSelectionChanged(const mitk::DataTreeNode::Pointer) ), this, SLOT( SurfaceSelected() ) );
+	  connect( m_Controls->m_ImageSelector, SIGNAL( OnSelectionChanged(const mitk::DataNode::Pointer) ), this, SLOT( SurfaceSelected() ) );
 	  
     RefreshPropertiesList(); */
 
@@ -320,10 +320,10 @@ void QmitkMITKSurfaceMaterialEditorView::SelectionChanged(berry::IWorkbenchPart:
 	    for (berry::IStructuredSelection::iterator i = m_CurrentSelection->Begin(); i != m_CurrentSelection->End(); ++i)
 	    {
 	      // extract datatree node
-	      if (mitk::DataTreeNodeObject::Pointer nodeObj = i->Cast<mitk::DataTreeNodeObject>())
+	      if (mitk::DataNodeObject::Pointer nodeObj = i->Cast<mitk::DataNodeObject>())
 	      {
-	        m_SelectedDataTreeNode = nodeObj->GetDataTreeNode();
-          MITK_INFO << "Node '" << m_SelectedDataTreeNode->GetName() << "' selected";
+	        m_SelectedDataNode = nodeObj->GetDataNode();
+          MITK_INFO << "Node '" << m_SelectedDataNode->GetName() << "' selected";
 
           SurfaceSelected();
           return;

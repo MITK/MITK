@@ -58,7 +58,7 @@ QVariant QmitkPlanarFiguresTableModel::data( const QModelIndex &index, int role 
   QVariant data;
   if(!index.isValid())
     return data;
-  mitk::DataTreeNode::Pointer node = this->m_NodeSet.at(index.row());
+  mitk::DataNode::Pointer node = this->m_NodeSet.at(index.row());
 
   if(!node)
     return data;

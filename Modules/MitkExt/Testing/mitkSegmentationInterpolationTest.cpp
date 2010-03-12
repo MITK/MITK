@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkSegmentationInterpolationController.h"
 #include "mitkCoreObjectFactory.h"
 #include "mitkStandardFileLocations.h"
-#include "mitkDataTreeNodeFactory.h"
+#include "mitkDataNodeFactory.h"
 #include "ipSegmentation.h"
 #include "mitkCompareImageSliceTestHelper.h"
 
@@ -279,7 +279,7 @@ bool mitkSegmentationInterpolationTestClass::LoadTestImages()
 mitk::Image::Pointer mitkSegmentationInterpolationTestClass::LoadImage(const std::string& filename)
 {
   mitk::Image::Pointer image = NULL;
-  mitk::DataTreeNodeFactory::Pointer factory = mitk::DataTreeNodeFactory::New();
+  mitk::DataNodeFactory::Pointer factory = mitk::DataNodeFactory::New();
   try
   {
     factory->SetFileName( filename );
@@ -290,7 +290,7 @@ mitk::Image::Pointer mitkSegmentationInterpolationTestClass::LoadImage(const std
       std::cerr<<"File " << filename << " could not be loaded [FAILED]"<<std::endl;
       return NULL;
     }
-    mitk::DataTreeNode::Pointer node = factory->GetOutput( 0 );
+    mitk::DataNode::Pointer node = factory->GetOutput( 0 );
     image = dynamic_cast<mitk::Image*>(node->GetData());
     if(image.IsNull())
     {

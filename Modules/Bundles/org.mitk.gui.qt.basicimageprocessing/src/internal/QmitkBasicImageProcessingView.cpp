@@ -32,8 +32,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 // MITK includes (GUI)
 #include "QmitkStdMultiWidget.h"
-#include "QmitkDataTreeNodeSelectionProvider.h"
-#include "mitkDataTreeNodeObject.h"
+#include "QmitkDataNodeSelectionProvider.h"
+#include "mitkDataNodeObject.h"
 
 // MITK includes (general)
 #include "mitkNodePredicateDataType.h"
@@ -176,7 +176,7 @@ void QmitkBasicImageProcessing::Activated()
 }
 
 //datamanager selection changed
-void QmitkBasicImageProcessing::OnSelectionChanged(std::vector<mitk::DataTreeNode*> nodes)
+void QmitkBasicImageProcessing::OnSelectionChanged(std::vector<mitk::DataNode*> nodes)
 {
   //any nodes there?
   if (!nodes.empty())
@@ -744,7 +744,7 @@ void QmitkBasicImageProcessing::StartButtonClicked()
   name.append( nameAddition.str() );
 
   // create final result MITK data storage node
-  mitk::DataTreeNode::Pointer result = mitk::DataTreeNode::New();
+  mitk::DataNode::Pointer result = mitk::DataNode::New();
   result->SetProperty( "levelwindow", levWinProp );
   result->SetProperty( "name", mitk::StringProperty::New( name.c_str() ) );
   result->SetData( newImage );
@@ -958,7 +958,7 @@ void QmitkBasicImageProcessing::StartButton2Clicked()
   }
 
   // create final result MITK data storage node
-  mitk::DataTreeNode::Pointer result = mitk::DataTreeNode::New();  
+  mitk::DataNode::Pointer result = mitk::DataNode::New();  
   result->SetProperty( "levelwindow", levWinProp );
   result->SetProperty( "name", mitk::StringProperty::New( (name + nameAddition ).c_str() ));
   result->SetData( newImage1 );

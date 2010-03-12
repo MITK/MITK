@@ -377,7 +377,7 @@
     <include location="local" >mitkBaseProperty.h</include>
     <include location="global" >string</include>
     <include location="local" >mitkBaseData.h</include>
-    <include location="global" >mitkDataTreeNode.h</include>
+    <include location="global" >mitkDataNode.h</include>
     <include location="local" >QmitkPropertyListView.h</include>
     <include location="local" >QmitkPropertyListView.h</include>
   </includes>

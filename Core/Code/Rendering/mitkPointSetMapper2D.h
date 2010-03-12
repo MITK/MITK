@@ -31,7 +31,7 @@ class PointSet;
  * @brief OpenGL-based mapper to display a mitk::PointSet in a 2D window.
  *
  * This mapper can actually more than just draw a number of points of a 
- * mitk::PointSet. If you set the right properties of the mitk::DataTreeNode, 
+ * mitk::PointSet. If you set the right properties of the mitk::DataNode, 
  * which contains the point set, then this mapper will also draw lines 
  * connecting the points, and calculate and display distances and angles 
  * between adjacent points. Here is a complete list of boolean properties, 
@@ -69,7 +69,7 @@ public:
 
   virtual void ApplyProperties(mitk::BaseRenderer* renderer);
 
-  static void SetDefaultProperties(mitk::DataTreeNode* node, mitk::BaseRenderer* renderer = NULL, bool overwrite = false);
+  static void SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer = NULL, bool overwrite = false);
 
 protected:
   PointSetMapper2D();

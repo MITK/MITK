@@ -160,7 +160,7 @@ void QmitkFunctionalityComponentContainer::CreateConnections()
 {
   if ( m_FunctionalityComponentContainerGUI )
   {
-    connect( (QObject*)(m_FunctionalityComponentContainerGUI->m_TreeNodeSelector), SIGNAL(OnSelectionChanged (const mitk::DataTreeNode *)), (QObject*) this, SLOT(ImageSelected(const mitk::DataTreeNode *)));
+    connect( (QObject*)(m_FunctionalityComponentContainerGUI->m_TreeNodeSelector), SIGNAL(OnSelectionChanged (const mitk::DataNode *)), (QObject*) this, SLOT(ImageSelected(const mitk::DataNode *)));
     connect( (QObject*)(m_FunctionalityComponentContainerGUI->m_ContainerBorder),  SIGNAL(toggled(bool)), (QObject*) this, SLOT(SetContentContainerVisibility(bool)));    
   }
 }
@@ -222,12 +222,12 @@ void QmitkFunctionalityComponentContainer::DataStorageChanged(mitk::DataStorage:
 }
 
 /***************     IMAGE SELECTED     ***************/
-void QmitkFunctionalityComponentContainer::ImageSelected(const mitk::DataTreeNode* item)
+void QmitkFunctionalityComponentContainer::ImageSelected(const mitk::DataNode* item)
 {
 
   if(m_FunctionalityComponentContainerGUI != NULL)
   {
-    mitk::DataTreeNode::Pointer selectedItem = const_cast< mitk::DataTreeNode*>(item);
+    mitk::DataNode::Pointer selectedItem = const_cast< mitk::DataNode*>(item);
     GetTreeNodeSelector()->SetSelectedNode(selectedItem);
 
 //    m_FunctionalityComponentContainerGUI->m_TreeNodeSelector->changeItem();

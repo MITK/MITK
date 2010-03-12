@@ -291,8 +291,8 @@ void QmitkToolSelectionBox::OnToolManagerWorkingDataModified()
 */
 void QmitkToolSelectionBox::SetGUIEnabledAccordingToToolManagerState()
 {
-  mitk::DataTreeNode* referenceNode = m_ToolManager->GetReferenceData(0);
-  mitk::DataTreeNode* workingNode = m_ToolManager->GetWorkingData(0);
+  mitk::DataNode* referenceNode = m_ToolManager->GetReferenceData(0);
+  mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
 
   //MITK_DEBUG << this->name() << ": SetGUIEnabledAccordingToToolManagerState: referenceNode " << (void*)referenceNode << " workingNode " << (void*)workingNode << " isVisible() " << isVisible();
 

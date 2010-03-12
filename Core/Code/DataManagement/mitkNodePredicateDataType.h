@@ -20,13 +20,13 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKNODEPREDICATEDATATYPE_H_HEADER_INCLUDED_
 
 #include "mitkNodePredicateBase.h"
-#include "mitkDataTreeNode.h"
+#include "mitkDataNode.h"
 #include <string>
 
 namespace mitk {
 
   //##Documentation
-  //## @brief Predicate that evaluates if the given DataTreeNodes data object is of a specific data type
+  //## @brief Predicate that evaluates if the given DataNodes data object is of a specific data type
   //##
   //## The data type must be specified in the constructor as a string. The string must equal the result 
   //## value of the requested data types GetNameOfClass() method.
@@ -44,7 +44,7 @@ namespace mitk {
 
     //##Documentation
     //## @brief Checks, if the nodes data object is of a specific data type 
-    virtual bool CheckNode(const mitk::DataTreeNode* node) const;
+    virtual bool CheckNode(const mitk::DataNode* node) const;
 
   protected:
     //##Documentation
@@ -75,7 +75,7 @@ namespace mitk {
 
     //##Documentation
     //## @brief Checks, if the nodes data object is of a specific data type (casts)
-    virtual bool CheckNode(const mitk::DataTreeNode* node) const
+    virtual bool CheckNode(const mitk::DataNode* node) const
     {
       return node && node->GetData() && dynamic_cast<T*>(node->GetData());
     }

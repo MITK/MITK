@@ -26,8 +26,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QLineEdit>
 #include <mitkProperties.h>
 #include <QmitkPointListWidget.h>
-#include <mitkDataTreeNodeObject.h>
-#include <mitkDataTreeNodeSelection.h>
+#include <mitkDataNodeObject.h>
+#include <mitkDataNodeSelection.h>
 
 QmitkPointSetInteractionView::QmitkPointSetInteractionView( QObject *parent )
 : m_SelectionListener(0)
@@ -86,7 +86,7 @@ void QmitkPointSetInteractionView::OnAddPointSetClicked()
   //
   // Create a new data tree node 
   //
-  mitk::DataTreeNode::Pointer pointSetNode = mitk::DataTreeNode::New();
+  mitk::DataNode::Pointer pointSetNode = mitk::DataNode::New();
 
   //
   // fill the data tree node with the appropriate information
@@ -114,27 +114,27 @@ void QmitkPointSetInteractionView::SelectionChanged( berry::IWorkbenchPart::Poin
   if ( sourcepart.GetPointer() == this)
     return;
 
-  mitk::DataTreeNodeSelection::ConstPointer _DataTreeNodeSelection 
-    = selection.Cast<const mitk::DataTreeNodeSelection>();
-  if (_DataTreeNodeSelection.IsNull())
+  mitk::DataNodeSelection::ConstPointer _DataNodeSelection 
+    = selection.Cast<const mitk::DataNodeSelection>();
+  if (_DataNodeSelection.IsNull())
     return;
 
-  mitk::DataTreeNodeObject* _DataTreeNodeObject = 0;
+  mitk::DataNodeObject* _DataNodeObject = 0;
   mitk::PointSet* _PointSet;
 
   m_Controls->m_CurrentPointSetLabel->setText("...");
 
-  for (mitk::DataTreeNodeSelection::iterator it =
-    _DataTreeNodeSelection->Begin(); it != _DataTreeNodeSelection->End(); ++it)
+  for (mitk::DataNodeSelection::iterator it =
+    _DataNodeSelection->Begin(); it != _DataNodeSelection->End(); ++it)
   {
     _PointSet = 0;
 
-    _DataTreeNodeObject
-      = dynamic_cast<mitk::DataTreeNodeObject*> ((*it).GetPointer());
-    if (!_DataTreeNodeObject)
+    _DataNodeObject
+      = dynamic_cast<mitk::DataNodeObject*> ((*it).GetPointer());
+    if (!_DataNodeObject)
       continue;
 
-    m_SelectedPointSetNode = _DataTreeNodeObject->GetDataTreeNode();
+    m_SelectedPointSetNode = _DataNodeObject->GetDataNode();
     if (m_SelectedPointSetNode.IsNull())
       continue;
 

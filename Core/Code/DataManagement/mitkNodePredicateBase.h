@@ -23,7 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "itkObject.h"
 
 namespace mitk {
-  class DataTreeNode;
+  class DataNode;
   //##Documentation
   //## @brief Interface for evaluation conditions used in the DataStorage class GetSubset() method
   //##
@@ -49,7 +49,7 @@ namespace mitk {
 
     //##Documentation
     //## @brief This method will be used to evaluate the node. Has to be overwritten in subclasses
-    virtual bool CheckNode(const mitk::DataTreeNode* node) const = 0;
+    virtual bool CheckNode(const mitk::DataNode* node) const = 0;
   };
 
 

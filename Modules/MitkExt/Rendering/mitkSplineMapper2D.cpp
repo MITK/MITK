@@ -36,7 +36,7 @@ void mitk::SplineMapper2D::Paint ( mitk::BaseRenderer * renderer )
   //
   // get the poly data of the splines in 3D
   //
-  mitk::SplineVtkMapper3D::Pointer mapper3D = dynamic_cast<mitk::SplineVtkMapper3D*> ( this->GetDataTreeNode()->GetMapper ( 2 ) );
+  mitk::SplineVtkMapper3D::Pointer mapper3D = dynamic_cast<mitk::SplineVtkMapper3D*> ( this->GetDataNode()->GetMapper ( 2 ) );
   if ( mapper3D.IsNull() )
   {
     itkWarningMacro ( "Mapper used for 3D mapping is not a mitk::SplineVtkMapper3D!" );
@@ -45,7 +45,7 @@ void mitk::SplineMapper2D::Paint ( mitk::BaseRenderer * renderer )
   //
   // update the 3D spline, if the accoring mapper has not been updated yet
   //
-  if ( mapper3D->GetLastUpdateTime() < GetDataTreeNode()->GetData()->GetMTime() )
+  if ( mapper3D->GetLastUpdateTime() < GetDataNode()->GetData()->GetMTime() )
     mapper3D->UpdateSpline();
   vtkPolyData* spline3D = NULL;
   if ( mapper3D->SplinesAreAvailable() )
@@ -60,7 +60,7 @@ void mitk::SplineMapper2D::Paint ( mitk::BaseRenderer * renderer )
   //
   // get the transform associated with the data tree node
   //
-  vtkLinearTransform* transform = this->GetDataTreeNode()->GetVtkTransform();
+  vtkLinearTransform* transform = this->GetDataNode()->GetVtkTransform();
   if ( transform == NULL )
   {
     itkWarningMacro("transfrom is NULL");  
@@ -86,7 +86,7 @@ void mitk::SplineMapper2D::Paint ( mitk::BaseRenderer * renderer )
   // determine color of the spline
   //
   float color[3];
-  this->GetDataTreeNode()->GetColor ( color, renderer );
+  this->GetDataNode()->GetColor ( color, renderer );
 
   //
   // iterate over the points

@@ -26,7 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkNavigationTool.h"
 #include "mitkSTLFileReader.h"
 #include "mitkBaseData.h"
-#include "mitkDataTreeNode.h"
+#include "mitkDataNode.h"
 #include "mitkSurface.h"
 #include "mitkStandaloneDataStorage.h"
 #include "mitkDataStorage.h"
@@ -58,7 +58,7 @@ class mitkNavigationToolReaderAndWriterTestClass
     mitk::NavigationTool::Pointer myNavigationTool = mitk::NavigationTool::New();
     myNavigationTool->SetCalibrationFile(toolFileName);
 
-    mitk::DataTreeNode::Pointer myNode = mitk::DataTreeNode::New();
+    mitk::DataNode::Pointer myNode = mitk::DataNode::New();
     myNode->SetName("ClaronTool");
       
       //load an stl File
@@ -83,7 +83,7 @@ class mitkNavigationToolReaderAndWriterTestClass
         myNode->SetData(testSurface);    
         }
     
-    myNavigationTool->SetDataTreeNode(myNode);
+    myNavigationTool->SetDataNode(myNode);
     myNavigationTool->SetIdentifier("ClaronTool#1");
     myNavigationTool->SetSerialNumber("0815");
     myNavigationTool->SetTrackingDeviceType(mitk::ClaronMicron);
@@ -105,8 +105,8 @@ class mitkNavigationToolReaderAndWriterTestClass
     mitk::NavigationToolReader::Pointer myReader = mitk::NavigationToolReader::New(testStorage);
     mitk::NavigationTool::Pointer readTool = myReader->DoRead(mitk::StandardFileLocations::GetInstance()->GetOptionDirectory()+Poco::Path::separator()+".."+Poco::Path::separator()+"TestTool.tool");
     MITK_TEST_OUTPUT(<<"---- Testing navigation tool reader ----");
-    MITK_TEST_CONDITION_REQUIRED(readTool->GetDataTreeNode() == testStorage->GetNamedNode(readTool->GetDataTreeNode()->GetName()),"Test if tool was added to storage...");
-    MITK_TEST_CONDITION_REQUIRED(readTool->GetDataTreeNode()->GetData()==testSurface,"Test if surface was restored correctly ...");
+    MITK_TEST_CONDITION_REQUIRED(readTool->GetDataNode() == testStorage->GetNamedNode(readTool->GetDataNode()->GetName()),"Test if tool was added to storage...");
+    MITK_TEST_CONDITION_REQUIRED(readTool->GetDataNode()->GetData()==testSurface,"Test if surface was restored correctly ...");
     */
     //MITK_TEST_CONDITION_REQUIRED();
     }

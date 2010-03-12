@@ -86,7 +86,7 @@ public:
   virtual void SetDataStorage( mitk::DataStorage* storage );  ///< set the datastorage that will be used for rendering
 
   virtual void InitRenderer(vtkRenderWindow* renderwindow);
-  virtual void Update(mitk::DataTreeNode* datatreenode);
+  virtual void Update(mitk::DataNode* datatreenode);
   virtual void SetMapperID(const MapperSlotId mapperId);
 
   // Size
@@ -99,7 +99,7 @@ public:
   itkGetMacro( PickingMode, PickingMode );
 
   virtual void PickWorldPoint(const Point2D& displayPoint, Point3D& worldPoint) const;
-  virtual mitk::DataTreeNode *PickObject( const Point2D &displayPosition, Point3D &worldPosition ) const;
+  virtual mitk::DataNode *PickObject( const Point2D &displayPosition, Point3D &worldPosition ) const;
 
   // Simple text rendering method
   int WriteSimpleText(std::string text, double posX, double posY, double color1 = 0.0, double color2 = 1.0, double color3 = 0.0);

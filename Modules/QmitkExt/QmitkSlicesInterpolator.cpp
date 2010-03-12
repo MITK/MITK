@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkSelectableGLWidget.h"
 
 #include "mitkToolManager.h"
-#include "mitkDataTreeNodeFactory.h"
+#include "mitkDataNodeFactory.h"
 #include "mitkLevelWindowProperty.h"
 #include "mitkColorProperty.h"
 #include "mitkProperties.h"
@@ -86,7 +86,7 @@ QmitkSlicesInterpolator::QmitkSlicesInterpolator(QWidget* parent, const char*  /
   InterpolationInfoChangedObserverTag = m_Interpolator->AddObserver( itk::ModifiedEvent(), command );
 
   // feedback node and its visualization properties
-  m_FeedbackNode = mitk::DataTreeNode::New();
+  m_FeedbackNode = mitk::DataNode::New();
   mitk::CoreObjectFactory::GetInstance()->SetDefaultProperties( m_FeedbackNode );
 
   m_FeedbackNode->SetProperty( "binary", mitk::BoolProperty::New(true) );
@@ -164,7 +164,7 @@ void QmitkSlicesInterpolator::Initialize(mitk::ToolManager* toolManager, QmitkSt
   if (m_ToolManager)
   {
     // set enabled only if a segmentation is selected
-    mitk::DataTreeNode* node = m_ToolManager->GetWorkingData(0);
+    mitk::DataNode* node = m_ToolManager->GetWorkingData(0);
     QWidget::setEnabled( node != NULL );
 
     // react whenever the set of selected segmentation changes
@@ -366,7 +366,7 @@ void QmitkSlicesInterpolator::Interpolate( mitk::PlaneGeometry* plane, unsigned 
 {
   if (m_ToolManager)
   {
-    mitk::DataTreeNode* node = m_ToolManager->GetWorkingData(0);
+    mitk::DataNode* node = m_ToolManager->GetWorkingData(0);
     if (node)
     {
       m_Segmentation = dynamic_cast<mitk::Image*>(node->GetData());
@@ -546,8 +546,8 @@ void QmitkSlicesInterpolator::OnInterpolationActivated(bool on)
 
   if (m_ToolManager)
   {
-    mitk::DataTreeNode* workingNode = m_ToolManager->GetWorkingData(0);
-    mitk::DataTreeNode* referenceNode = m_ToolManager->GetReferenceData(0);
+    mitk::DataNode* workingNode = m_ToolManager->GetWorkingData(0);
+    mitk::DataNode* referenceNode = m_ToolManager->GetReferenceData(0);
     QWidget::setEnabled( workingNode != NULL );
 
     m_BtnAcceptAllInterpolations->setEnabled( on );

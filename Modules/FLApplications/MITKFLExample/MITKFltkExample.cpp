@@ -13,7 +13,7 @@
 #include "mitkLevelWindowProperty.h"
 #include "mitkSliceNavigationController.h"
 
-#include "mitkDataTreeNodeFactory.h"
+#include "mitkDataNodeFactory.h"
 #include "mitkSample.h"
 
 int main(int argc, char **argv) {
@@ -32,7 +32,7 @@ int main(int argc, char **argv) {
   ui.mainWid->GetRenderer()->SetMapperID(1);
   mitk::DataTree::Pointer tree = mitk::DataTree::New();
 
-  mitk::DataTreeNodeFactory::Pointer factory = mitk::DataTreeNodeFactory::New();
+  mitk::DataNodeFactory::Pointer factory = mitk::DataNodeFactory::New();
 
   factory->SetFileName( fileName );
   factory->Update();
@@ -40,7 +40,7 @@ int main(int argc, char **argv) {
     fl_alert("WARNING: More than one image in file. Only showing first one."); 
   }
   mitk::DataTreePreOrderIterator it(tree);
-  mitk::DataTreeNode::Pointer node = factory->GetOutput( 0 );
+  mitk::DataNode::Pointer node = factory->GetOutput( 0 );
   assert(node.IsNotNull());
   {
     it.Add( node );

@@ -23,7 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkInteractor.h>
 #include <mitkVector.h>
 #include <mitkImageAccessByItk.h>//needed by QmitkSimplexMeshes (SMDeformation.cpp and LungSegmentation.cpp)
-#include <mitkDataTreeNode.h>
+#include <mitkDataNode.h>
 #include <mitkSeedsImage.h>
 
 
@@ -36,7 +36,7 @@ namespace mitk {
   {
   public:
     mitkClassMacro(SeedsInteractor, Interactor);
-    mitkNewMacro2Param(Self, const char*, DataTreeNode*);
+    mitkNewMacro2Param(Self, const char*, DataNode*);
 
     /// sets the radius of the seeds.
     void SetRadius(int val){m_Radius=val;};
@@ -49,7 +49,7 @@ namespace mitk {
     /**
     * @brief Default Constructor
     **/
-    SeedsInteractor(const char * type, DataTreeNode* dataTreeNode);
+    SeedsInteractor(const char * type, DataNode* dataTreeNode);
     /**
     * @brief Default Destructor
     **/

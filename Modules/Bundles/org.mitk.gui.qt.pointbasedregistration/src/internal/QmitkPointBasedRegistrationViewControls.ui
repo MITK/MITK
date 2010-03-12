@@ -604,7 +604,7 @@
   </customwidget>
  </customwidgets>
  <includes>
-  <include location="local">mitkDataTreeNode.h</include>
+  <include location="local">mitkDataNode.h</include>
   <include location="local">mitkPointSet.h</include>
   <include location="local">mitkStateEvent.h</include>
   <include location="local">mitkEventMapper.h</include>

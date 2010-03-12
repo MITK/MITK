@@ -27,7 +27,7 @@ mitk::NodePredicateNOT::~NodePredicateNOT()
 {
 }
 
-bool mitk::NodePredicateNOT::CheckNode(const mitk::DataTreeNode* node) const
+bool mitk::NodePredicateNOT::CheckNode(const mitk::DataNode* node) const
 {
   if (node == NULL)
     throw std::invalid_argument("NodePredicateNOT: invalid node");

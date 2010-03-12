@@ -24,11 +24,11 @@
 #include "mitkProperties.h"
 #include "mitkStringProperty.h"
 #include "mitkIDataStorageService.h"
-#include "mitkDataTreeNodeObject.h"
+#include "mitkDataNodeObject.h"
 #include <mitkNodePredicateProperty.h>
 #include <mitkNodePredicateNOT.h>
 #include <mitkNodePredicateAND.h>
-#include <mitkDataTreeNodeSelection.h>
+#include <mitkDataNodeSelection.h>
 
 #include "mitkPlanarCircle.h"
 #include "mitkPlanarPolygon.h"
@@ -77,25 +77,25 @@ QmitkMeasurement::~QmitkMeasurement()
   m_MeasurementInfoRenderer->Delete();
 
   this->GetDefaultDataStorage()->AddNodeEvent -= mitk::MessageDelegate1<QmitkMeasurement
-    , const mitk::DataTreeNode*>( this, &QmitkMeasurement::NodeAddedInDataStorage );
+    , const mitk::DataNode*>( this, &QmitkMeasurement::NodeAddedInDataStorage );
 
   m_SelectedPlanarFigures->NodeChanged.RemoveListener( mitk::MessageDelegate1<QmitkMeasurement
-    , const mitk::DataTreeNode*>( this, &QmitkMeasurement::NodeChanged ) );
+    , const mitk::DataNode*>( this, &QmitkMeasurement::NodeChanged ) );
 
   m_SelectedPlanarFigures->NodeRemoved.RemoveListener( mitk::MessageDelegate1<QmitkMeasurement
-    , const mitk::DataTreeNode*>( this, &QmitkMeasurement::NodeRemoved ) );
+    , const mitk::DataNode*>( this, &QmitkMeasurement::NodeRemoved ) );
 
   m_SelectedPlanarFigures->PropertyChanged.RemoveListener( mitk::MessageDelegate2<QmitkMeasurement
-    , const mitk::DataTreeNode*, const mitk::BaseProperty*>( this, &QmitkMeasurement::PropertyChanged ) );
+    , const mitk::DataNode*, const mitk::BaseProperty*>( this, &QmitkMeasurement::PropertyChanged ) );
 
   m_SelectedImageNode->NodeChanged.RemoveListener( mitk::MessageDelegate1<QmitkMeasurement
-    , const mitk::DataTreeNode*>( this, &QmitkMeasurement::NodeChanged ) );
+    , const mitk::DataNode*>( this, &QmitkMeasurement::NodeChanged ) );
 
   m_SelectedImageNode->NodeRemoved.RemoveListener( mitk::MessageDelegate1<QmitkMeasurement
-    , const mitk::DataTreeNode*>( this, &QmitkMeasurement::NodeRemoved ) );
+    , const mitk::DataNode*>( this, &QmitkMeasurement::NodeRemoved ) );
 
   m_SelectedImageNode->PropertyChanged.RemoveListener( mitk::MessageDelegate2<QmitkMeasurement
-    , const mitk::DataTreeNode*, const mitk::BaseProperty*>( this, &QmitkMeasurement::PropertyChanged ) );
+    , const mitk::DataNode*, const mitk::BaseProperty*>( this, &QmitkMeasurement::PropertyChanged ) );
 }
 
 void QmitkMeasurement::CreateQtPartControl(QWidget* parent)
@@ -195,54 +195,54 @@ void QmitkMeasurement::CreateQtPartControl(QWidget* parent)
   m_SelectedPlanarFigures = mitk::DataStorageSelection::New(this->GetDefaultDataStorage(), false);
 
   m_SelectedPlanarFigures->NodeChanged.AddListener( mitk::MessageDelegate1<QmitkMeasurement
-    , const mitk::DataTreeNode*>( this, &QmitkMeasurement::NodeChanged ) );
+    , const mitk::DataNode*>( this, &QmitkMeasurement::NodeChanged ) );
 
   m_SelectedPlanarFigures->NodeRemoved.AddListener( mitk::MessageDelegate1<QmitkMeasurement
-    , const mitk::DataTreeNode*>( this, &QmitkMeasurement::NodeRemoved ) );
+    , const mitk::DataNode*>( this, &QmitkMeasurement::NodeRemoved ) );
 
   m_SelectedPlanarFigures->PropertyChanged.AddListener( mitk::MessageDelegate2<QmitkMeasurement
-    , const mitk::DataTreeNode*, const mitk::BaseProperty*>( this, &QmitkMeasurement::PropertyChanged ) );
+    , const mitk::DataNode*, const mitk::BaseProperty*>( this, &QmitkMeasurement::PropertyChanged ) );
 
   m_SelectedImageNode = mitk::DataStorageSelection::New(this->GetDefaultDataStorage(), false);
 
   m_SelectedImageNode->PropertyChanged.AddListener( mitk::MessageDelegate2<QmitkMeasurement
-    , const mitk::DataTreeNode*, const mitk::BaseProperty*>( this, &QmitkMeasurement::PropertyChanged ) );
+    , const mitk::DataNode*, const mitk::BaseProperty*>( this, &QmitkMeasurement::PropertyChanged ) );
 
   m_SelectedImageNode->NodeChanged.AddListener( mitk::MessageDelegate1<QmitkMeasurement
-    , const mitk::DataTreeNode*>( this, &QmitkMeasurement::NodeChanged ) );
+    , const mitk::DataNode*>( this, &QmitkMeasurement::NodeChanged ) );
 
   m_SelectedImageNode->NodeRemoved.AddListener( mitk::MessageDelegate1<QmitkMeasurement
-    , const mitk::DataTreeNode*>( this, &QmitkMeasurement::NodeRemoved ) );
+    , const mitk::DataNode*>( this, &QmitkMeasurement::NodeRemoved ) );
 
   this->GetDefaultDataStorage()->AddNodeEvent.AddListener( mitk::MessageDelegate1<QmitkMeasurement
-    , const mitk::DataTreeNode*>( this, &QmitkMeasurement::NodeAddedInDataStorage ) );
+    , const mitk::DataNode*>( this, &QmitkMeasurement::NodeAddedInDataStorage ) );
 
 }
 
-void QmitkMeasurement::OnSelectionChanged(std::vector<mitk::DataTreeNode*> nodes)
+void QmitkMeasurement::OnSelectionChanged(std::vector<mitk::DataNode*> nodes)
 {
   if (nodes.empty()) return;
 
   m_SelectedImageNode->RemoveAllNodes();
 
-  mitk::DataTreeNode* _DataTreeNode = 0;
+  mitk::DataNode* _DataNode = 0;
   mitk::BaseData* _BaseData;
   mitk::PlanarFigure* _PlanarFigure;
   mitk::Image* selectedImage;
   m_SelectedPlanarFigures->RemoveAllNodes();
 
-  for (std::vector<mitk::DataTreeNode*>::iterator it = nodes.begin();
+  for (std::vector<mitk::DataNode*>::iterator it = nodes.begin();
       it != nodes.end(); 
       ++it)
   {
     _PlanarFigure = 0;
 
-    _DataTreeNode = *it;
+    _DataNode = *it;
 
-    if (!_DataTreeNode)
+    if (!_DataNode)
       continue;
 
-    _BaseData = _DataTreeNode->GetData();
+    _BaseData = _DataNode->GetData();
 
     if (!_BaseData)
       continue;
@@ -251,13 +251,13 @@ void QmitkMeasurement::OnSelectionChanged(std::vector<mitk::DataTreeNode*> nodes
     if ((_PlanarFigure = dynamic_cast<mitk::PlanarFigure *> (_BaseData)))
     {
       // add to the selected planar figures
-      m_SelectedPlanarFigures->AddNode(_DataTreeNode);
+      m_SelectedPlanarFigures->AddNode(_DataNode);
       // take parent image as the selected image
       mitk::DataStorage::SetOfObjects::ConstPointer parents =
-          this->GetDefaultDataStorage()->GetSources(_DataTreeNode);
+          this->GetDefaultDataStorage()->GetSources(_DataNode);
       if (parents->size() > 0)
       {
-        mitk::DataTreeNode::Pointer parent = parents->front();
+        mitk::DataNode::Pointer parent = parents->front();
         if ((selectedImage = dynamic_cast<mitk::Image *> (parent->GetData())))
         {
           *m_SelectedImageNode = parent;
@@ -267,7 +267,7 @@ void QmitkMeasurement::OnSelectionChanged(std::vector<mitk::DataTreeNode*> nodes
     }
     else if ((selectedImage = dynamic_cast<mitk::Image *> (_BaseData)))
     {
-      *m_SelectedImageNode = _DataTreeNode;
+      *m_SelectedImageNode = _DataNode;
       /*mitk::RenderingManager::GetInstance()->InitializeViews(
         selectedImage->GetTimeSlicedGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );*/
     }
@@ -310,13 +310,13 @@ void QmitkMeasurement::PlanarFigureSelectionChanged()
   mitk::PlanarFigure* _PlanarFigure = 0;
   mitk::PlanarAngle* planarAngle = 0;
   mitk::PlanarFourPointAngle* planarFourPointAngle = 0;
-  mitk::DataTreeNode::Pointer node = 0;
+  mitk::DataNode::Pointer node = 0;
   m_SelectedPlanarFiguresText->clear();
   QString infoText;
   QString plainInfoText;
-  std::vector<mitk::DataTreeNode*> nodes = m_SelectedPlanarFigures->GetNodes();
+  std::vector<mitk::DataNode*> nodes = m_SelectedPlanarFigures->GetNodes();
 
-  for (std::vector<mitk::DataTreeNode*>::iterator it = nodes.begin(); it
+  for (std::vector<mitk::DataNode*>::iterator it = nodes.begin(); it
       != nodes.end(); ++it, ++j)
   {
     plainInfoText.clear();
@@ -425,11 +425,11 @@ void QmitkMeasurement::PlanarFigureSelectionChanged()
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-void QmitkMeasurement::NodeAddedInDataStorage(const mitk::DataTreeNode* node)
+void QmitkMeasurement::NodeAddedInDataStorage(const mitk::DataNode* node)
 {
   if(!m_Visible)
     return;
-  mitk::DataTreeNode* nonConstNode = const_cast<mitk::DataTreeNode*>(node);
+  mitk::DataNode* nonConstNode = const_cast<mitk::DataNode*>(node);
   mitk::PlanarFigure* figure = dynamic_cast<mitk::PlanarFigure*>(nonConstNode->GetData());
   if(figure)
   {
@@ -465,7 +465,7 @@ void QmitkMeasurement::AddFigureToDataStorage(mitk::PlanarFigure* figure, const 
   if(m_CurrentFigureNode.IsNotNull())
     m_CurrentFigureNode->GetData()->RemoveObserver(m_InitializedObserverTag);
 
-  mitk::DataTreeNode::Pointer newNode = mitk::DataTreeNode::New();
+  mitk::DataNode::Pointer newNode = mitk::DataNode::New();
   m_CurrentFigureNode = newNode;
   m_CurrentFigureNode->SetName(name.toStdString());
   m_CurrentFigureNode->SetData(figure);
@@ -616,14 +616,14 @@ void QmitkMeasurement::Activated()
     = mitk::TNodePredicateDataType<mitk::PlanarFigure>::New();
 
   mitk::DataStorage::SetOfObjects::ConstPointer _NodeSet = this->GetDefaultDataStorage()->GetAll();
-  mitk::DataTreeNode* node = 0;
+  mitk::DataNode* node = 0;
   mitk::PlanarFigure* figure = 0;
   mitk::PlanarFigureInteractor::Pointer figureInteractor = 0;
   // finally add all nodes to the model
   for(mitk::DataStorage::SetOfObjects::ConstIterator it=_NodeSet->Begin(); it!=_NodeSet->End()
     ; it++)
   {
-    node = const_cast<mitk::DataTreeNode*>(it->Value().GetPointer());
+    node = const_cast<mitk::DataNode*>(it->Value().GetPointer());
     figure = dynamic_cast<mitk::PlanarFigure*>(node->GetData());
     if(figure)
     {
@@ -647,14 +647,14 @@ void QmitkMeasurement::Deactivated()
   this->SetMeasurementInfoToRenderWindow("", 0);
 
   mitk::DataStorage::SetOfObjects::ConstPointer _NodeSet = this->GetDefaultDataStorage()->GetAll();
-  mitk::DataTreeNode* node = 0;
+  mitk::DataNode* node = 0;
   mitk::PlanarFigure* figure = 0;
   mitk::PlanarFigureInteractor::Pointer figureInteractor = 0;
   // finally add all nodes to the model
   for(mitk::DataStorage::SetOfObjects::ConstIterator it=_NodeSet->Begin(); it!=_NodeSet->End()
     ; it++)
   {
-    node = const_cast<mitk::DataTreeNode*>(it->Value().GetPointer());
+    node = const_cast<mitk::DataNode*>(it->Value().GetPointer());
     figure = dynamic_cast<mitk::PlanarFigure*>(node->GetData());
     if(figure)
     {
@@ -669,17 +669,17 @@ void QmitkMeasurement::Deactivated()
 }
 
 
-void QmitkMeasurement::PropertyChanged(const mitk::DataTreeNode* node, const mitk::BaseProperty* prop)
+void QmitkMeasurement::PropertyChanged(const mitk::DataNode* node, const mitk::BaseProperty* prop)
 {
   this->PlanarFigureSelectionChanged();
 }
 
-void QmitkMeasurement::NodeChanged(const mitk::DataTreeNode* node)
+void QmitkMeasurement::NodeChanged(const mitk::DataNode* node)
 {
   this->PlanarFigureSelectionChanged();
 }
 
-void QmitkMeasurement::NodeRemoved(const mitk::DataTreeNode* node)
+void QmitkMeasurement::NodeRemoved(const mitk::DataNode* node)
 {
   this->PlanarFigureSelectionChanged();
 }
@@ -693,9 +693,9 @@ void QmitkMeasurement::CopyToClipboard(bool)
   std::vector<QString> newRow;
   headerRow.push_back("Name");
 
-  std::vector<mitk::DataTreeNode*> nodes = m_SelectedPlanarFigures->GetNodes();
+  std::vector<mitk::DataNode*> nodes = m_SelectedPlanarFigures->GetNodes();
 
-  for (std::vector<mitk::DataTreeNode*>::iterator it = nodes.begin(); it
+  for (std::vector<mitk::DataNode*>::iterator it = nodes.begin(); it
       != nodes.end(); ++it)
   {
     mitk::PlanarFigure* planarFigure =

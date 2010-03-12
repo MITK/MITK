@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QmitkFunctionality.h>
 
 #include <berryISelectionListener.h>
-#include <mitkDataTreeNodeSelection.h>
+#include <mitkDataNodeSelection.h>
 
 #include <mitkWeakPointer.h>
 
@@ -78,7 +78,7 @@ protected:
 
 private:
 
-  mitk::WeakPointer<mitk::DataTreeNode> m_SelectedNode;
+  mitk::WeakPointer<mitk::DataNode> m_SelectedNode;
   
   void UpdateInterface();
 

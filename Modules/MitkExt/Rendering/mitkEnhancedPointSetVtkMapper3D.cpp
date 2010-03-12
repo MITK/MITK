@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 //#include <sstream>
 #include <algorithm>
 
-#include "mitkDataTreeNode.h"
+#include "mitkDataNode.h"
 #include "mitkProperties.h"
 #include "mitkLookupTables.h"
 
@@ -205,7 +205,7 @@ void mitk::EnhancedPointSetVtkMapper3D::ApplyProperties( mitk::BaseRenderer * re
   assert(points->Size() == pointData->Size());
   mitk::PointSet::PointsIterator pIt;
   mitk::PointSet::PointDataIterator pdIt;
-  mitk::DataTreeNode* n = this->GetDataTreeNode();
+  mitk::DataNode* n = this->GetDataNode();
   assert(n != NULL);
 
   for (pIt = points->Begin(), pdIt = pointData->Begin(); pIt != itkPointSet->GetPoints()->End(); ++pIt, ++pdIt)  // for each point in the pointset
@@ -347,7 +347,7 @@ void mitk::EnhancedPointSetVtkMapper3D::UpdateVtkTransform(mitk::BaseRenderer * 
   // TODO: apply new transform if time step changed
 
   //vtkLinearTransform * vtktransform = 
-  //  this->GetDataTreeNode()->GetVtkTransform(this->GetTimestep());
+  //  this->GetDataNode()->GetVtkTransform(this->GetTimestep());
 
   //m_SelectedActor->SetUserTransform(vtktransform);
   //m_UnselectedActor->SetUserTransform(vtktransform);
@@ -355,7 +355,7 @@ void mitk::EnhancedPointSetVtkMapper3D::UpdateVtkTransform(mitk::BaseRenderer * 
 }
 
 
-void mitk::EnhancedPointSetVtkMapper3D::SetDefaultProperties(mitk::DataTreeNode* node, mitk::BaseRenderer* renderer, bool overwrite)
+void mitk::EnhancedPointSetVtkMapper3D::SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite)
 {
   node->AddProperty( "line width", mitk::IntProperty::New(2), renderer, overwrite );
   node->AddProperty( "pointsize", mitk::FloatProperty::New(1.0), renderer, overwrite);

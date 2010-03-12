@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <berryISelectionListener.h>
 #include <QmitkFunctionality.h>
 #include <mitkWeakPointer.h>
-#include <mitkDataTreeNode.h>
+#include <mitkDataNode.h>
 
 namespace Ui
 {
@@ -52,7 +52,7 @@ protected:
   friend struct berry::SelectionChangedAdapter<QmitkPointSetInteractionView>;
 
   Ui::QmitkPointSetInteractionControls * m_Controls;
-  mitk::WeakPointer<mitk::DataTreeNode> m_SelectedPointSetNode;
+  mitk::WeakPointer<mitk::DataNode> m_SelectedPointSetNode;
 
 };
 #endif // !defined(QmitkPointSetInteraction_H__INCLUDED)

@@ -15,7 +15,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#include "mitkDataTreeNodeFactory.h"
+#include "mitkDataNodeFactory.h"
 #include "mitkTestingMacros.h"
 
 #include "mitkProperties.h"
@@ -23,19 +23,19 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itksys/SystemTools.hxx>
 #include <itksys/Directory.hxx>
 /**
- *  Test for the class "DataTreeNodeFactory".
+ *  Test for the class "DataNodeFactory".
  *  
  *  argc and argv are the command line parameters which were passed to 
  *  the ADD_TEST command in the CMakeLists.txt file. For the automatic
  *  tests, argv is either empty for the simple tests or contains the filename
  *  of a test image for the image tests (see CMakeLists.txt).
  */
-int mitkDataTreeNodeFactoryTest(int, char* argv[])
+int mitkDataNodeFactoryTest(int, char* argv[])
 {
   // always start with this!
-  MITK_TEST_BEGIN("DataTreeNodeFactory")
+  MITK_TEST_BEGIN("DataNodeFactory")
 
-    mitk::DataTreeNodeFactory::Pointer factory = mitk::DataTreeNodeFactory::New();
+    mitk::DataNodeFactory::Pointer factory = mitk::DataNodeFactory::New();
     MITK_TEST_OUTPUT(<< "Loading file: " << argv[1]);
 
     factory->SetFileName( argv[1] );
@@ -45,7 +45,7 @@ int mitkDataTreeNodeFactoryTest(int, char* argv[])
     MITK_TEST_CONDITION_REQUIRED(factory->GetNumberOfOutputs() > 0, "file loaded");
     
     MITK_TEST_OUTPUT(<< "Test function SetDefaultCommonProperties()");
-    mitk::DataTreeNode::Pointer node = factory->GetOutput( 0 );
+    mitk::DataNode::Pointer node = factory->GetOutput( 0 );
     factory->SetDefaultCommonProperties(node);
     // get file path and property
     std::string filePath = itksys::SystemTools::GetFilenamePath(factory->GetFileName());

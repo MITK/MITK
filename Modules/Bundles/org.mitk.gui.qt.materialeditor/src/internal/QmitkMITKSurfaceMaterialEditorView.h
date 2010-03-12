@@ -39,7 +39,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkRenderWindow.h"
 #include "mitkCommon.h"
 #include "mitkDataStorage.h"
-#include "mitkDataTreeNode.h"
+#include "mitkDataNode.h"
 #include "mitkShaderEnumProperty.h"
 #include "mitkSurface.h"
 #include "vtkRenderer.h"
@@ -97,8 +97,8 @@ private:
 
   mitk::Surface::Pointer m_Surface;
   mitk::DataStorage::Pointer m_DataTree;
-  mitk::DataTreeNode::Pointer m_DataTreeNode;
-  mitk::DataTreeNode::Pointer m_SelectedDataTreeNode;
+  mitk::DataNode::Pointer m_DataNode;
+  mitk::DataNode::Pointer m_SelectedDataNode;
   
   std::list<std::string> fixedProperties;
   std::list<std::string> shaderProperties;

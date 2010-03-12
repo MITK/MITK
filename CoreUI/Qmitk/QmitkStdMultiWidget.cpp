@@ -195,7 +195,7 @@ void QmitkStdMultiWidget::InitializeWidget()
   // transfer colors in WorldGeometry-Nodes of the associated Renderer
   QColor qcolor;
   //float color[3] = {1.0f,1.0f,1.0f};
-  mitk::DataTreeNode::Pointer planeNode;
+  mitk::DataNode::Pointer planeNode;
   mitk::IntProperty::Pointer  layer;
 
   // of widget 1
@@ -1249,7 +1249,7 @@ void QmitkStdMultiWidget::Fit()
 void QmitkStdMultiWidget::InitPositionTracking()
 {
   //PoinSetNode for MouseOrientation
-  m_PositionTrackerNode = mitk::DataTreeNode::New();
+  m_PositionTrackerNode = mitk::DataNode::New();
   m_PositionTrackerNode->SetProperty("name", mitk::StringProperty::New("Mouse Position"));
   m_PositionTrackerNode->SetData( mitk::PointSet::New() );
   m_PositionTrackerNode->SetColor(1.0,0.33,0.0);
@@ -1299,7 +1299,7 @@ void QmitkStdMultiWidget::AddDisplayPlaneSubTree()
   mapper = mitk::Geometry2DDataMapper2D::New();
   m_PlaneNode3->SetMapper(mitk::BaseRenderer::Standard2D, mapper);
 
-  m_Node = mitk::DataTreeNode::New();
+  m_Node = mitk::DataNode::New();
   m_Node->SetProperty("name", mitk::StringProperty::New("Widgets"));
   m_Node->SetProperty("helper object", mitk::BoolProperty::New(true));
 }
@@ -1643,7 +1643,7 @@ void QmitkStdMultiWidget::SetWidgetPlaneVisibility(const char* widgetName, bool 
 {
   if (m_DataStorage.IsNotNull())
   {
-    mitk::DataTreeNode* n = m_DataStorage->GetNamedNode(widgetName);
+    mitk::DataNode* n = m_DataStorage->GetNamedNode(widgetName);
     if (n != NULL)
       n->SetVisibility(visible, renderer);
   }

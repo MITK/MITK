@@ -22,7 +22,7 @@
 #include <berryISelectionProvider.h>
 #include <berryISelectionChangedListener.h>
 #include <berryISelectionListener.h>
-#include <mitkDataTreeNodeSelection.h>
+#include <mitkDataNodeSelection.h>
 
 namespace mitk
 {
@@ -45,12 +45,12 @@ public:
   
   void SetSelection(berry::ISelection::Pointer selection);
   
-  void FireSelectionChanged(mitk::DataTreeNodeSelection::Pointer selection);
-  void FireSelectionChanged(mitk::DataTreeNode::Pointer selectedNode);
+  void FireSelectionChanged(mitk::DataNodeSelection::Pointer selection);
+  void FireSelectionChanged(mitk::DataNode::Pointer selectedNode);
 
   protected:
 
-   DataTreeNodeSelection::Pointer m_CurrentSelection;
+   DataNodeSelection::Pointer m_CurrentSelection;
    berry::ISelectionChangedListener::Events m_RegisteredListeners;
 };
 

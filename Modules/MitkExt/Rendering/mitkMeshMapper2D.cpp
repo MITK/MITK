@@ -109,7 +109,7 @@ void mitk::MeshMapper2D::Paint( mitk::BaseRenderer *renderer )
     //apply color and opacity read from the PropertyList
     ApplyProperties(renderer);
 
-    vtkLinearTransform* transform = GetDataTreeNode()->GetVtkTransform();
+    vtkLinearTransform* transform = GetDataNode()->GetVtkTransform();
 
     //List of the Points
     Mesh::DataType::PointsContainerConstIterator it, end;
@@ -373,10 +373,10 @@ void mitk::MeshMapper2D::Paint( mitk::BaseRenderer *renderer )
 
         //Axis-aligned bounding box(AABB) around the cell if selected and set in Property
         bool showBoundingBox;
-        if (dynamic_cast<mitk::BoolProperty *>(this->GetDataTreeNode()->GetProperty("showBoundingBox")) == NULL)
+        if (dynamic_cast<mitk::BoolProperty *>(this->GetDataNode()->GetProperty("showBoundingBox")) == NULL)
           showBoundingBox = false;
         else
-          showBoundingBox = dynamic_cast<mitk::BoolProperty *>(this->GetDataTreeNode()->GetProperty("showBoundingBox"))->GetValue();
+          showBoundingBox = dynamic_cast<mitk::BoolProperty *>(this->GetDataNode()->GetProperty("showBoundingBox"))->GetValue();
 
         if(showBoundingBox) 
         {

@@ -30,7 +30,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "itkImage.h"
 #include <limits>
-#include "mitkDataTreeNode.h"
+#include "mitkDataNode.h"
 #include "mitkRenderingManager.h"
 #include "mitkVolumeCalculator.h"
 
@@ -82,7 +82,7 @@ void QmitkVolumetryView::CreateConnections()
   if ( m_Controls )
   {
 
-    connect( m_Controls->m_ImageSelector, SIGNAL(OnSelectionChanged(const mitk::DataTreeNode*)), this, SLOT(OnImageSelected(const mitk::DataTreeNode*)) );
+    connect( m_Controls->m_ImageSelector, SIGNAL(OnSelectionChanged(const mitk::DataNode*)), this, SLOT(OnImageSelected(const mitk::DataNode*)) );
 
     //connect( (QObject*)(m_Controls->m_Button), SIGNAL(clicked()), this, SLOT(DoSomething()) );
     connect( (QObject*)(m_Controls->m_ThresholdSlider), SIGNAL(valueChanged(int)), this, SLOT(OnThresholdSliderChanged(int)) );
@@ -105,7 +105,7 @@ void QmitkVolumetryView::Deactivated()
 }
 
 
-void QmitkVolumetryView::OnImageSelected(const mitk::DataTreeNode* item)
+void QmitkVolumetryView::OnImageSelected(const mitk::DataNode* item)
 {
   // nothing selected (NULL selection)
   if( item == NULL  || item->GetData() == NULL )
@@ -113,13 +113,13 @@ void QmitkVolumetryView::OnImageSelected(const mitk::DataTreeNode* item)
 
   if( item->GetData()->GetSource() == NULL ) 
   {
-    m_SelectedDataTreeNode = 0;
+    m_SelectedDataNode = 0;
     return; 
   }
 
-  m_SelectedDataTreeNode = const_cast<mitk::DataTreeNode*>(item);
+  m_SelectedDataNode = const_cast<mitk::DataNode*>(item);
 
-  std::cout << "Selected mitk::Image at address " << m_SelectedDataTreeNode->GetData() << std::endl;
+  std::cout << "Selected mitk::Image at address " << m_SelectedDataNode->GetData() << std::endl;
 
 
   if(item == m_OverlayNode.GetPointer())
@@ -147,9 +147,9 @@ void QmitkVolumetryView::OnImageSelected(const mitk::DataTreeNode* item)
   m_Controls->m_SaveCsvButton->setEnabled(false);
   m_Controls->m_TextEdit->clear();
 
-  if (m_SelectedDataTreeNode.IsNotNull() )
+  if (m_SelectedDataNode.IsNotNull() )
   {
-    mitk::Image* image = dynamic_cast<mitk::Image*>(m_SelectedDataTreeNode->GetData());
+    mitk::Image* image = dynamic_cast<mitk::Image*>(m_SelectedDataNode->GetData());
     image->Update();
     if (image && image->IsInitialized())
     {
@@ -176,7 +176,7 @@ void QmitkVolumetryView::OnImageSelected(const mitk::DataTreeNode* item)
 
 //void QmitkVolumetryView::DoSomething()
 //{
-//  mitk::DataTreeNode* node = m_Controls->m_ImageSelector->GetSelectedNode();
+//  mitk::DataNode* node = m_Controls->m_ImageSelector->GetSelectedNode();
 //  if (!node)
 //  {
 //    // Nothing selected. Inform the user and return
@@ -184,7 +184,7 @@ void QmitkVolumetryView::OnImageSelected(const mitk::DataTreeNode* item)
 //    return;
 //  }
 //
-//  // here we have a valid mitk::DataTreeNode
+//  // here we have a valid mitk::DataNode
 //
 //  // a node itself is not very useful, we need its data item (the image)
 //  mitk::BaseData* data = node->GetData();
@@ -212,11 +212,11 @@ void QmitkVolumetryView::OnImageSelected(const mitk::DataTreeNode* item)
 
 
 
-//void QmitkVolumetryView::SetDataTreeNode(const mitk::DataTreeNode* node)
+//void QmitkVolumetryView::SetDataNode(const mitk::DataNode* node)
 //{
 //  if(node == m_OverlayNode.GetPointer())
 //    return;
-//  m_SelectedDataTreeNode = node; // is the non-const m_SelectedDataTreeNode needed anyway?
+//  m_SelectedDataNode = node; // is the non-const m_SelectedDataNode needed anyway?
 //  if (m_OverlayNode)
 //  {
 //    // remove it from the tree
@@ -235,9 +235,9 @@ void QmitkVolumetryView::OnImageSelected(const mitk::DataTreeNode* item)
 //  m_SaveCsvButton->setEnabled(false);
 //  m_TextEdit->clear();
 //
-//  if (m_SelectedDataTreeNode)
+//  if (m_SelectedDataNode)
 //  {
-//    mitk::Image* image = dynamic_cast<mitk::Image*>(m_SelectedDataTreeNode->GetData());
+//    mitk::Image* image = dynamic_cast<mitk::Image*>(m_SelectedDataNode->GetData());
 //    image->Update();
 //    if (image && image->IsInitialized())
 //    {
@@ -264,9 +264,9 @@ void QmitkVolumetryView::OnImageSelected(const mitk::DataTreeNode* item)
 
 void QmitkVolumetryView::OnCalculateVolume()
 {
-  if (m_SelectedDataTreeNode.IsNotNull() )
+  if (m_SelectedDataNode.IsNotNull() )
   {
-    mitk::Image* image = dynamic_cast<mitk::Image*>(m_SelectedDataTreeNode->GetData());
+    mitk::Image* image = dynamic_cast<mitk::Image*>(m_SelectedDataNode->GetData());
     if (image)
     {
       std::cout << "Dimension:" << image->GetDimension() << std::endl;
@@ -284,9 +284,9 @@ void QmitkVolumetryView::OnCalculateVolume()
 
 void QmitkVolumetryView::OnTimeSeriesButtonClicked()
 {
-  if (m_SelectedDataTreeNode.IsNotNull() )
+  if (m_SelectedDataNode.IsNotNull() )
   {
-    mitk::Image* image = dynamic_cast<mitk::Image*>(m_SelectedDataTreeNode->GetData());
+    mitk::Image* image = dynamic_cast<mitk::Image*>(m_SelectedDataNode->GetData());
     if (image)
     {
       mitk::VolumeCalculator::Pointer volCalc = mitk::VolumeCalculator::New();
@@ -307,14 +307,14 @@ void QmitkVolumetryView::OnTimeSeriesButtonClicked()
   }
 }
 
-const mitk::DataTreeNode* QmitkVolumetryView::GetImageNode()
+const mitk::DataNode* QmitkVolumetryView::GetImageNode()
 {
-  return m_SelectedDataTreeNode;
+  return m_SelectedDataNode;
 }
 
 void QmitkVolumetryView::UpdateSlider()
 {
-  if (m_SelectedDataTreeNode.IsNotNull() && dynamic_cast<mitk::Image*>(m_SelectedDataTreeNode->GetData()))
+  if (m_SelectedDataNode.IsNotNull() && dynamic_cast<mitk::Image*>(m_SelectedDataNode->GetData()))
   {
     int intSliderValue = (int)m_Controls->m_ThresholdSlider->value();
     QString stringSliderValue;
@@ -345,17 +345,17 @@ void QmitkVolumetryView::OnThresholdSliderChanged( int value)
 
 void QmitkVolumetryView::CreateOverlayChild()
 {
-  if (m_SelectedDataTreeNode.IsNotNull())
+  if (m_SelectedDataNode.IsNotNull())
   {
-    m_OverlayNode = mitk::DataTreeNode::New();
+    m_OverlayNode = mitk::DataNode::New();
     mitk::StringProperty::Pointer nameProp = mitk::StringProperty::New("volume threshold overlay image" );
-    m_OverlayNode->SetProperty( "reslice interpolation", m_SelectedDataTreeNode->GetProperty("reslice interpolation") );
+    m_OverlayNode->SetProperty( "reslice interpolation", m_SelectedDataNode->GetProperty("reslice interpolation") );
     m_OverlayNode->SetProperty( "name", nameProp );
-    m_OverlayNode->SetData(m_SelectedDataTreeNode->GetData());
+    m_OverlayNode->SetData(m_SelectedDataNode->GetData());
     m_OverlayNode->SetColor(0.0,1.0,0.0);
     m_OverlayNode->SetOpacity(.25);
     int layer = 0;
-    m_SelectedDataTreeNode->GetIntProperty("layer", layer);
+    m_SelectedDataNode->GetIntProperty("layer", layer);
     m_OverlayNode->SetIntProperty("layer", layer+1);
     m_OverlayNode->SetLevelWindow(mitk::LevelWindow(m_Controls->m_ThresholdSlider->value(),1));
 
@@ -366,8 +366,8 @@ void QmitkVolumetryView::CreateOverlayChild()
     //mitk::DataTreeIteratorClone iteratorClone = m_DataTreeIteratorClone;
     //while ( !iteratorClone->IsAtEnd() )
     //{
-    //  mitk::DataTreeNode::Pointer node = iteratorClone->Get();
-    //  if (  node == m_SelectedDataTreeNode )
+    //  mitk::DataNode::Pointer node = iteratorClone->Get();
+    //  if (  node == m_SelectedDataNode )
     //  {
     //    iteratorClone->Add(m_OverlayNode);
     //    break;
@@ -378,7 +378,7 @@ void QmitkVolumetryView::CreateOverlayChild()
 }
 
 
-mitk::DataTreeNode* QmitkVolumetryView::GetOverlayNode()
+mitk::DataNode* QmitkVolumetryView::GetOverlayNode()
 {
   return m_OverlayNode;
 }
@@ -388,7 +388,7 @@ mitk::DataTreeNode* QmitkVolumetryView::GetOverlayNode()
 
 mitk::Image* QmitkVolumetryView::GetImage()
 {
-  return dynamic_cast<mitk::Image*>(m_SelectedDataTreeNode->GetData());
+  return dynamic_cast<mitk::Image*>(m_SelectedDataNode->GetData());
 }
 void QmitkVolumetryView::OnSaveCsvButtonClicked()
 {

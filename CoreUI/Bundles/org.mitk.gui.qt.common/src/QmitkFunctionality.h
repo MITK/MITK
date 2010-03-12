@@ -36,9 +36,9 @@
 
 //# mitk stuff
 #include "mitkQtCommonDll.h"
-#include "mitkDataTreeNodeSelection.h"
+#include "mitkDataNodeSelection.h"
 #include <mitkDataStorage.h>
-#include <mitkDataTreeNodeSelection.h>
+#include <mitkDataNodeSelection.h>
 
 //# forward declarations
 class QmitkStdMultiWidget;
@@ -55,8 +55,8 @@ class QScrollArea;
 ///   <li> Access to the DataStorage (~ the shared data repository)
 ///   <li> Access to the StdMultiWidget (the 2x2 RenderWindow arrangement)
 ///   <li> Access to and update notification for the functionality/view preferences
-///   <li> Access to and update notification for the current DataTreeNode selection / to DataTreeNode selection events send through the SelectionService
-///   <li> Methods to send DataTreeNode selections through the SelectionService
+///   <li> Access to and update notification for the current DataNode selection / to DataNode selection events send through the SelectionService
+///   <li> Methods to send DataNode selections through the SelectionService
 ///   <li> Some events for unproblematic inter-View communication (e.g. when to add/remove interactors)
 ///   <li> Some minor important convenience methods (like changing the mouse cursor/exception handling)
 /// </ol>
@@ -92,7 +92,7 @@ public:
   ///
   /// Called when the selection in the workbench changed
   ///
-  virtual void OnSelectionChanged(std::vector<mitk::DataTreeNode*> nodes);
+  virtual void OnSelectionChanged(std::vector<mitk::DataNode*> nodes);
   ///
   /// Called when the preferences object of this view changed.
   /// \see GetPreferences()
@@ -168,11 +168,11 @@ public:
   ///
   /// Informs other parts of the workbench that node is selected via the blueberry selection service.
   ///
-  void FireNodeSelected(mitk::DataTreeNode::Pointer node);
+  void FireNodeSelected(mitk::DataNode::Pointer node);
   ///
   /// Informs other parts of the workbench that the nodes are selected via the blueberry selection service.
   ///
-  void FireNodesSelected(std::vector<mitk::DataTreeNode::Pointer> nodes);
+  void FireNodesSelected(std::vector<mitk::DataNode::Pointer> nodes);
   ///
   /// Called when this functionality becomes visible ( no matter what IsExclusiveFunctionality() returns )
   ///
@@ -191,17 +191,17 @@ protected:
   /// Called when a DataStorage Add event was thrown. May be reimplemented
   /// by deriving classes.
   ///
-  virtual void NodeAdded(const mitk::DataTreeNode* node);
+  virtual void NodeAdded(const mitk::DataNode* node);
   ///
   /// Called when a DataStorage Changed event was thrown. May be reimplemented
   /// by deriving classes.
   ///
-  virtual void NodeChanged(const mitk::DataTreeNode* node);
+  virtual void NodeChanged(const mitk::DataNode* node);
   ///
   /// Called when a DataStorage Remove event was thrown. May be reimplemented
   /// by deriving classes.
   ///
-  virtual void NodeRemoved(const mitk::DataTreeNode* node);
+  virtual void NodeRemoved(const mitk::DataNode* node);
   ///
   /// Called when a DataStorage add *or* remove *or* change event was thrown. May be reimplemented
   /// by deriving classes.
@@ -211,12 +211,12 @@ protected:
   /// \return the selection of the currently active part of the workbench or an empty vector
   ///         if nothing is selected
   ///    
-  std::vector<mitk::DataTreeNode*> GetCurrentSelection() const;
+  std::vector<mitk::DataNode*> GetCurrentSelection() const;
   ///
   /// Returns the current selection made in the datamanager bundle or an empty vector
   /// if nothing`s selected or if the bundle does not exist
   ///
-  std::vector<mitk::DataTreeNode*> GetDataManagerSelection() const;
+  std::vector<mitk::DataNode*> GetDataManagerSelection() const;
   ///
   /// Returns the Preferences object for this Functionality.
   /// <b>Important</b>: When refering to this preferences, e.g. in a PreferencePage: The ID
@@ -289,19 +289,19 @@ public:
   /// m_InDataStorageChanged to true and calls NodeAdded afterwards.
   /// \see m_InDataStorageChanged  
   ///
-  void NodeAddedProxy(const mitk::DataTreeNode* node);
+  void NodeAddedProxy(const mitk::DataNode* node);
   ///
   /// Called when a DataStorage remove event was thrown. Sets
   /// m_InDataStorageChanged to true and calls NodeRemoved afterwards.
   /// \see m_InDataStorageChanged  
   ///
-  void NodeRemovedProxy(const mitk::DataTreeNode* node);
+  void NodeRemovedProxy(const mitk::DataNode* node);
   ///
   /// Called when a DataStorage changed event was thrown. Sets
   /// m_InDataStorageChanged to true and calls NodeChanged afterwards.
   /// \see m_InDataStorageChanged  
   ///
-  void NodeChangedProxy(const mitk::DataTreeNode* node);
+  void NodeChangedProxy(const mitk::DataNode* node);
   ///
   /// Toggles the visible flag m_Visible
   ///
@@ -352,9 +352,9 @@ protected:
   ///
   void BlueBerrySelectionChanged(berry::IWorkbenchPart::Pointer sourcepart, berry::ISelection::ConstPointer selection);
   ///
-  /// Converts a mitk::DataTreeNodeSelection to a std::vector<mitk::DataTreeNode*> (possibly empty
+  /// Converts a mitk::DataNodeSelection to a std::vector<mitk::DataNode*> (possibly empty
   ///
-  std::vector<mitk::DataTreeNode*> DataTreeNodeSelectionToVector(mitk::DataTreeNodeSelection::ConstPointer currentSelection) const;
+  std::vector<mitk::DataNode*> DataNodeSelectionToVector(mitk::DataNodeSelection::ConstPointer currentSelection) const;
   //# protected fields
 protected:
   /// 
@@ -384,7 +384,7 @@ private:
   ///
   /// Holds the current selection (selection made by this Functionality !!!)
   ///
-  mitk::DataTreeNodeSelection::Pointer m_CurrentSelection;
+  mitk::DataNodeSelection::Pointer m_CurrentSelection;
   ///
   /// object to observe BlueBerry selections 
   ///

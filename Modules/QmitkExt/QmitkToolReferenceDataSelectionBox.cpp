@@ -42,8 +42,8 @@ m_ToolGroupsForFiltering("default")
   m_ReferenceDataSelectionBox = new QmitkDataStorageComboBox( this );
   m_Layout->addWidget(m_ReferenceDataSelectionBox);
 
-  connect( m_ReferenceDataSelectionBox, SIGNAL(OnSelectionChanged(const mitk::DataTreeNode*)),
-    this, SLOT(OnReferenceDataSelected(const mitk::DataTreeNode*)) );
+  connect( m_ReferenceDataSelectionBox, SIGNAL(OnSelectionChanged(const mitk::DataNode*)),
+    this, SLOT(OnReferenceDataSelected(const mitk::DataNode*)) );
 
   m_ToolManager->ReferenceDataChanged += mitk::MessageDelegate<QmitkToolReferenceDataSelectionBox>( this, &QmitkToolReferenceDataSelectionBox::OnToolManagerReferenceDataModified );
 }
@@ -93,12 +93,12 @@ void QmitkToolReferenceDataSelectionBox::UpdateDataDisplay()
   EnsureOnlyReferenceImageIsVisibile();
 }
 
-void QmitkToolReferenceDataSelectionBox::OnReferenceDataSelected(const mitk::DataTreeNode* selectedNode)
+void QmitkToolReferenceDataSelectionBox::OnReferenceDataSelected(const mitk::DataNode* selectedNode)
 {
   emit ReferenceNodeSelected(selectedNode);
 
   m_SelfCall = true;
-  m_ToolManager->SetReferenceData( const_cast< mitk::DataTreeNode*>(selectedNode)); // maybe NULL
+  m_ToolManager->SetReferenceData( const_cast< mitk::DataNode*>(selectedNode)); // maybe NULL
   m_SelfCall = false;
 
   EnsureOnlyReferenceImageIsVisibile();
@@ -106,14 +106,14 @@ void QmitkToolReferenceDataSelectionBox::OnReferenceDataSelected(const mitk::Dat
 
 void QmitkToolReferenceDataSelectionBox::EnsureOnlyReferenceImageIsVisibile()
 {
-  mitk::DataTreeNode* selectedNode = m_ToolManager->GetReferenceData(0);
+  mitk::DataNode* selectedNode = m_ToolManager->GetReferenceData(0);
 
   mitk::DataStorage::SetOfObjects::ConstPointer allImageNodes = GetAllPossibleReferenceImages();
   for ( mitk::DataStorage::SetOfObjects::const_iterator nodeIter = allImageNodes->begin();
     nodeIter != allImageNodes->end();
     ++nodeIter )
   {
-    mitk::DataTreeNode* currentNode = (*nodeIter).GetPointer();
+    mitk::DataNode* currentNode = (*nodeIter).GetPointer();
 
     currentNode->SetVisibility( currentNode == selectedNode ); // only the selected one is visible, everything else is invisible
   }
@@ -126,7 +126,7 @@ void QmitkToolReferenceDataSelectionBox::OnToolManagerReferenceDataModified()
 {
   if (m_SelfCall) return;
 
-  const mitk::DataTreeNode* node = m_ToolManager->GetReferenceData(0);
+  const mitk::DataNode* node = m_ToolManager->GetReferenceData(0);
   emit ReferenceNodeSelected(node);
 
   UpdateDataDisplay();
@@ -209,7 +209,7 @@ mitk::DataStorage::SetOfObjects::ConstPointer QmitkToolReferenceDataSelectionBox
     objectIter != allObjects->end();
     ++objectIter )
   {
-    mitk::DataTreeNode* node = (*objectIter).GetPointer();
+    mitk::DataNode* node = (*objectIter).GetPointer();
     resultVector.push_back( node );
   }
 

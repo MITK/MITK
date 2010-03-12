@@ -43,7 +43,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qobject.h>
 #include "QmitkExtExports.h"
 #include "QmitkBaseComponent.h"
-#include "mitkDataTreeNode.h"
+#include "mitkDataNode.h"
 #include <mitkDataStorage.h>
 
 
@@ -76,7 +76,7 @@ public:
   virtual void DataStorageChanged(mitk::DataStorage::Pointer ds);
   
   /** \brief Slot method that will be called if TreeNodeSelector widget was activated to select the current image. */
-  virtual void ImageSelected(const mitk::DataTreeNode* item);
+  virtual void ImageSelected(const mitk::DataNode* item);
 
   /*!
   * @brief Image selected in MainSelector

@@ -26,7 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk {
 
     //##Documentation
-    //## @brief Predicate that evaluates if the given DataTreeNode has a specific property. 
+    //## @brief Predicate that evaluates if the given DataNode has a specific property. 
     //## If the second parameter is NULL, it will only be checked whether there is a property with the specified name.
     //## 
     //## 
@@ -45,7 +45,7 @@ namespace mitk {
 
       //##Documentation
       //## @brief Checks, if the nodes contains a property that is equal to m_ValidProperty
-      virtual bool CheckNode(const mitk::DataTreeNode* node) const;
+      virtual bool CheckNode(const mitk::DataNode* node) const;
 
     protected:
       //##Documentation

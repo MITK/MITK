@@ -2,7 +2,7 @@
 #define QmitkPropertiesTableEditor_h
 
 /// Own includes.
-#include "mitkDataTreeNode.h"
+#include "mitkDataNode.h"
 
 /// Toolkit includes.
 #include <QWidget>
@@ -26,8 +26,8 @@ public:
 
   ///
   /// Constructs a new QmitkDataStorageTableModel 
-  /// and sets the DataTreeNode for this TableModel.
-  QmitkPropertiesTableEditor(QWidget* parent = 0, Qt::WindowFlags f = 0,mitk::DataTreeNode::Pointer _Node = 0);
+  /// and sets the DataNode for this TableModel.
+  QmitkPropertiesTableEditor(QWidget* parent = 0, Qt::WindowFlags f = 0,mitk::DataNode::Pointer _Node = 0);
 
   ///
   /// Standard dtor. Nothing to do here.

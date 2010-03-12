@@ -11,7 +11,7 @@
 
 /// Qmitk
 #include <berryQtViewPart.h>
-#include <QmitkDataTreeNodeSelectionProvider.h>
+#include <QmitkDataNodeSelectionProvider.h>
 #include <QmitkDnDFrameWidget.h>
 
 #include <berryIWorkbenchPartReference.h>
@@ -60,7 +60,7 @@ public:
   ///
   /// \brief Returns all selected nodes in a vector
   ///
-  std::vector<mitk::DataTreeNode*> GetSelectedNodes() const;
+  std::vector<mitk::DataNode*> GetSelectedNodes() const;
 public slots:
   ///
   /// Invoked when the opacity slider changed
@@ -165,7 +165,7 @@ protected:
   ///
   /// \brief Shows a file open dialog.
   ///
-  void FileOpen( const char * fileName, mitk::DataTreeNode* parentNode );
+  void FileOpen( const char * fileName, mitk::DataNode* parentNode );
 protected:
   QWidget* m_Parent;
   QmitkDnDFrameWidget* m_DndFrameWidget;
@@ -177,7 +177,7 @@ protected:
   ///
   /// \brief The BlueBerry selection provider
   ///
-  QmitkDataTreeNodeSelectionProvider::Pointer m_SelectionProvider;
+  QmitkDataNodeSelectionProvider::Pointer m_SelectionProvider;
   ///
   /// Holds the preferences for the datamanager. 
   ///

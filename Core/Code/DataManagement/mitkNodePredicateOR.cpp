@@ -37,7 +37,7 @@ mitk::NodePredicateOR::~NodePredicateOR()
 }
 
 
-bool mitk::NodePredicateOR::CheckNode(const DataTreeNode* node) const
+bool mitk::NodePredicateOR::CheckNode(const DataNode* node) const
 {
   if (m_ChildPredicates.empty())
     throw std::invalid_argument("NodePredicateOR: no child predicates available");

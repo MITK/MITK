@@ -17,7 +17,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkFileWriter.h"
 
-bool mitk::FileWriter::CanWriteDataType( DataTreeNode* )
+bool mitk::FileWriter::CanWriteDataType( DataNode* )
 {
   //TODO #345 check for writing permission
   return false;
@@ -28,7 +28,7 @@ std::string mitk::FileWriter::GetWritenMIMEType()
   return "";
 }
 
-void mitk::FileWriter::SetInput( DataTreeNode* )
+void mitk::FileWriter::SetInput( DataNode* )
 {
 }
 

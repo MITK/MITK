@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkStandaloneDataStorage.h"
 #include "mitkStandardFileLocations.h"
-#include "mitkDataTreeNodeFactory.h"
+#include "mitkDataNodeFactory.h"
 #include "mitkCoreObjectFactory.h"
 #include "mitkBaseData.h"
 #include "mitkImage.h"
@@ -50,7 +50,7 @@ static std::string LocateFile(const std::string& filename)
 
 static mitk::BaseData::Pointer LoadBaseData(const std::string& filename)
 {
-  mitk::DataTreeNodeFactory::Pointer factory = mitk::DataTreeNodeFactory::New();
+  mitk::DataNodeFactory::Pointer factory = mitk::DataNodeFactory::New();
   try
   {
     factory->SetFileName( filename );
@@ -61,7 +61,7 @@ static mitk::BaseData::Pointer LoadBaseData(const std::string& filename)
       MITK_TEST_FAILED_MSG(<< "Could not find test data '" << filename << "'");
     }
 
-    mitk::DataTreeNode::Pointer node = factory->GetOutput( 0 );
+    mitk::DataNode::Pointer node = factory->GetOutput( 0 );
     return node->GetData();
   }
   catch ( itk::ExceptionObject & e )
@@ -120,12 +120,12 @@ static void FillStorage(mitk::DataStorage* storage)
   image->SetProperty("image type", mitk::StringProperty::New("test image") );
   image->SetProperty("greetings", mitk::StringProperty::New("to mom") );
 
-  mitk::DataTreeNode::Pointer imagenode = mitk::DataTreeNode::New();
+  mitk::DataNode::Pointer imagenode = mitk::DataNode::New();
   imagenode->SetData( image );
   imagenode->SetName( "Pic3D" );
   storage->Add( imagenode );
 
-  mitk::DataTreeNode::Pointer imagechildnode = mitk::DataTreeNode::New();
+  mitk::DataNode::Pointer imagechildnode = mitk::DataNode::New();
   imagechildnode->SetData( image );
   imagechildnode->SetName( "Pic3D again" );
   storage->Add( imagechildnode, imagenode );
@@ -137,13 +137,13 @@ static void FillStorage(mitk::DataStorage* storage)
   surface->SetProperty("surface type", mitk::StringProperty::New("test surface") );
   surface->SetProperty("greetings", mitk::StringProperty::New("to dad") );
   
-  mitk::DataTreeNode::Pointer surfacenode = mitk::DataTreeNode::New();
+  mitk::DataNode::Pointer surfacenode = mitk::DataNode::New();
   surfacenode->SetData( surface );
   surfacenode->SetName( "binary" );
   storage->Add( surfacenode );
 
   mitk::PointSet::Pointer ps = CreatePointSet();
-  mitk::DataTreeNode::Pointer psenode = mitk::DataTreeNode::New();
+  mitk::DataNode::Pointer psenode = mitk::DataNode::New();
   psenode->SetData( ps );
   psenode->SetName( "points" );
   storage->Add( psenode );
@@ -153,7 +153,7 @@ static void FillStorage(mitk::DataStorage* storage)
 static void VerifyStorage(mitk::DataStorage* storage)
 {
   //TODO the Surface and PointSet are uncommented until the material property is saved properly
-  mitk::DataTreeNode::Pointer imagenode = storage->GetNamedNode("Pic3D");
+  mitk::DataNode::Pointer imagenode = storage->GetNamedNode("Pic3D");
   MITK_TEST_CONDITION_REQUIRED(imagenode.IsNotNull(),"Get previously stored image node");
 
   //Image
@@ -168,7 +168,7 @@ static void VerifyStorage(mitk::DataStorage* storage)
   MITK_TEST_CONDITION_REQUIRED(image.IsNotNull(),"Loading test image from Datastorage");
 
   //Get Image child node
-  mitk::DataTreeNode::Pointer imagechildnode = storage->GetNamedNode("Pic3D again");
+  mitk::DataNode::Pointer imagechildnode = storage->GetNamedNode("Pic3D again");
   mitk::DataStorage::SetOfObjects::ConstPointer objects = storage->GetSources(imagechildnode);
 
   MITK_TEST_CONDITION_REQUIRED(objects->Size() == 1,"Check size of image child nodes source list");
@@ -178,7 +178,7 @@ static void VerifyStorage(mitk::DataStorage* storage)
   MITK_TEST_CONDITION_REQUIRED(imagechild.IsNotNull(),"Loading child test image from Datastorage");
 
   //Surface
-  mitk::DataTreeNode::Pointer surfacenode = storage->GetNamedNode("binary");
+  mitk::DataNode::Pointer surfacenode = storage->GetNamedNode("binary");
   MITK_TEST_CONDITION_REQUIRED(surfacenode.IsNotNull(),"Get previously stored surface node");
 
   surfacenode->GetStringProperty("surface type", testString);
@@ -192,7 +192,7 @@ static void VerifyStorage(mitk::DataStorage* storage)
 
 
   //PointSet
-  mitk::DataTreeNode::Pointer pointsnode = storage->GetNamedNode("points");
+  mitk::DataNode::Pointer pointsnode = storage->GetNamedNode("points");
   MITK_TEST_CONDITION_REQUIRED(pointsnode.IsNotNull(),"Get previously stored PointSet node");
 
   mitk::PointSet::Pointer pointset = dynamic_cast<mitk::PointSet*>(pointsnode->GetData());

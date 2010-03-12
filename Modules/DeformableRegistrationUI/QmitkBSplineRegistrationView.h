@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef QmitkBSplineRegistrationViewWidgetHIncluded
 #define QmitkBSplineRegistrationViewWidgetHIncluded
 
-#include "mitkDataTreeNode.h"
+#include "mitkDataNode.h"
 #include "MitkDeformableRegistrationUIExports.h"
 #include "ui_QmitkBSplineRegistrationViewControls.h"
 #include "mitkOptimizerParameters.h"
@@ -42,8 +42,8 @@ public:
   int GetNumberOfIterations();
   Ui::QmitkBSplineRegistrationViewControls m_Controls;
   
-  void SetFixedNode( mitk::DataTreeNode * fixedNode );
-  void SetMovingNode( mitk::DataTreeNode * movingNode );
+  void SetFixedNode( mitk::DataNode * fixedNode );
+  void SetMovingNode( mitk::DataNode * movingNode );
 
   
 
@@ -71,8 +71,8 @@ protected slots:
 
 protected:
   
-  mitk::DataTreeNode* m_FixedNode;
-  mitk::DataTreeNode* m_MovingNode;
+  mitk::DataNode* m_FixedNode;
+  mitk::DataNode* m_MovingNode;
   mitk::OptimizerParameters::Pointer m_OptimizerParameters;
 
  

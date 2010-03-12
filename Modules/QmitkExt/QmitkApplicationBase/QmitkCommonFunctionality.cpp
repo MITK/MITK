@@ -275,14 +275,14 @@ void CommonFunctionality::SaveBaseData( mitk::BaseData* data, const char * aFile
     QMessageBox::critical(NULL,"ERROR","Save not successful. Possibly no writing permission.");
   }
 }
-mitk::DataTreeNode::Pointer CommonFunctionality::FileOpen( const QString& fileName)
+mitk::DataNode::Pointer CommonFunctionality::FileOpen( const QString& fileName)
 {
   return FileOpen( fileName.toLocal8Bit().constData() );
 }
 
-mitk::DataTreeNode::Pointer CommonFunctionality::FileOpen( const char * fileName )
+mitk::DataNode::Pointer CommonFunctionality::FileOpen( const char * fileName )
 {
-  mitk::DataTreeNodeFactory::Pointer factory = mitk::DataTreeNodeFactory::New();
+  mitk::DataNodeFactory::Pointer factory = mitk::DataNodeFactory::New();
 
   try
   {
@@ -297,16 +297,16 @@ mitk::DataTreeNode::Pointer CommonFunctionality::FileOpen( const char * fileName
   }
 }
 
-mitk::DataTreeNode::Pointer CommonFunctionality::FileOpenImageSequence(const QString& aFileName)
+mitk::DataNode::Pointer CommonFunctionality::FileOpenImageSequence(const QString& aFileName)
 {
   return FileOpenImageSequence( aFileName.toLocal8Bit().constData() );
 }
 
-mitk::DataTreeNode::Pointer CommonFunctionality::FileOpenImageSequence(const char* aFileName)
+mitk::DataNode::Pointer CommonFunctionality::FileOpenImageSequence(const char* aFileName)
 {
   if(aFileName==NULL) return NULL;
 
-  mitk::DataTreeNodeFactory::Pointer factory = mitk::DataTreeNodeFactory::New();
+  mitk::DataNodeFactory::Pointer factory = mitk::DataNodeFactory::New();
 
   QString fileName = aFileName;
   if (!fileName.contains("dcm") && !fileName.contains("DCM"))
@@ -342,7 +342,7 @@ mitk::DataTreeNode::Pointer CommonFunctionality::FileOpenImageSequence(const cha
 
 }
 
-mitk::DataTreeNode::Pointer CommonFunctionality::FileOpenImageSequence()
+mitk::DataNode::Pointer CommonFunctionality::FileOpenImageSequence()
 {
   QString fileName = QFileDialog::getOpenFileName(NULL,mitk::CoreObjectFactory::GetInstance()->GetFileExtensions());
 
@@ -356,22 +356,22 @@ mitk::DataTreeNode::Pointer CommonFunctionality::FileOpenImageSequence()
   }
 }
 
-mitk::DataTreeNode::Pointer CommonFunctionality::FileOpen()
+mitk::DataNode::Pointer CommonFunctionality::FileOpen()
 {
   return CommonFunctionality::FileOpenSpecific( mitk::CoreObjectFactory::GetInstance()->GetFileExtensions() );
 }
   
-mitk::DataTreeNode::Pointer CommonFunctionality::FileOpenSpecific( const QString& fileExtensions)
+mitk::DataNode::Pointer CommonFunctionality::FileOpenSpecific( const QString& fileExtensions)
 {
   return FileOpenSpecific( fileExtensions.toLocal8Bit().constData() );
 }
 
-mitk::DataTreeNode::Pointer CommonFunctionality::FileOpenSpecific( const char *fileExtensions )
+mitk::DataNode::Pointer CommonFunctionality::FileOpenSpecific( const char *fileExtensions )
 {
   QString fileName = QFileDialog::getOpenFileName( NULL, fileExtensions );
   if ( !fileName.isNull() )
   {
-    mitk::DataTreeNode::Pointer result = FileOpen(fileName.toLocal8Bit().constData());
+    mitk::DataNode::Pointer result = FileOpen(fileName.toLocal8Bit().constData());
     if ( result.IsNull() )
     {
       return FileOpenImageSequence(fileName);
@@ -387,9 +387,9 @@ mitk::DataTreeNode::Pointer CommonFunctionality::FileOpenSpecific( const char *f
   }
 }
 
-mitk::DataTreeNode::Pointer CommonFunctionality::OpenVolumeOrSliceStack()
+mitk::DataNode::Pointer CommonFunctionality::OpenVolumeOrSliceStack()
 {
-  mitk::DataTreeNode::Pointer newNode = NULL;
+  mitk::DataNode::Pointer newNode = NULL;
 
   QString fileName = QFileDialog::getOpenFileName(NULL,mitk::CoreObjectFactory::GetInstance()->GetFileExtensions() );
   if ( !fileName.isNull() )

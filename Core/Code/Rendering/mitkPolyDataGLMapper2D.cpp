@@ -61,7 +61,7 @@ void mitk::PolyDataGLMapper2D::Paint( mitk::BaseRenderer * renderer )
     assert( vtkpolydata );
 
 
-    vtkLinearTransform * vtktransform = GetDataTreeNode() ->GetVtkTransform();
+    vtkLinearTransform * vtktransform = GetDataNode() ->GetVtkTransform();
 
     if (vtktransform)
     {
@@ -203,7 +203,7 @@ vtkPolyDataMapper* mitk::PolyDataGLMapper2D::GetVtkPolyDataMapper()
     return NULL;
     /*
 
-    mitk::DataTreeNode::ConstPointer node = this->GetDataTreeNode();
+    mitk::DataNode::ConstPointer node = this->GetDataNode();
     if ( node.IsNull() )
         return NULL;
 

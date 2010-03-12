@@ -81,7 +81,7 @@ public:
   /*!  
   \brief Invoked when the DataManager selection changed
   */
-  virtual void OnSelectionChanged(std::vector<mitk::DataTreeNode*> nodes);
+  virtual void OnSelectionChanged(std::vector<mitk::DataNode*> nodes);
 
 
   protected slots:  
@@ -133,7 +133,7 @@ private:
   */  
   Ui::QmitkBasicImageProcessingViewControls *m_Controls;
 
-  mitk::DataTreeNode*       m_SelectedImageNode;
+  mitk::DataNode*       m_SelectedImageNode;
   QmitkStepperAdapter*      m_TimeStepperAdapter;
 
   berry::ISelectionListener::Pointer m_SelectionListener;

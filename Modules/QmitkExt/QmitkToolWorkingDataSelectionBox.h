@@ -104,14 +104,14 @@ class QmitkExt_EXPORT QmitkToolWorkingDataSelectionBox : public Q3ListView
     void SetToolManager(mitk::ToolManager&); // no NULL pointer allowed here, a manager is required
 
     /**
-     * \brief A list of all displayed DataTreeNode objects.
+     * \brief A list of all displayed DataNode objects.
      * This method might be convenient for program modules that want to display
      * additional information about these nodes, like a total volume of all segmentations, etc.
      */
     mitk::ToolManager::DataVectorType GetAllNodes( bool onlyDerivedFromOriginal = true );
 
     /**
-     * \brief A list of all selected DataTreeNode objects.
+     * \brief A list of all selected DataNode objects.
      * This method might be convenient for program modules that want to display
      * additional information about these nodes, like a total volume of all segmentations, etc.
      */
@@ -121,7 +121,7 @@ class QmitkExt_EXPORT QmitkToolWorkingDataSelectionBox : public Q3ListView
      * \brief Like GetSelectedNodes(), but will only return one object.
      * Will only return what QListView gives as selected object (documentation says nothing is returned if list is in Single selection mode).
      */
-    mitk::DataTreeNode* GetSelectedNode();
+    mitk::DataNode* GetSelectedNode();
     
     /**
      * \brief Callback function, no need to call it.
@@ -175,7 +175,7 @@ class QmitkExt_EXPORT QmitkToolWorkingDataSelectionBox : public Q3ListView
 
   signals:
 
-    void WorkingNodeSelected(const mitk::DataTreeNode*);
+    void WorkingNodeSelected(const mitk::DataNode*);
     void DeleteKeyPressed();
     
   protected slots:
@@ -189,7 +189,7 @@ class QmitkExt_EXPORT QmitkToolWorkingDataSelectionBox : public Q3ListView
 
   protected:
 
-    typedef std::map< Q3ListViewItem*, mitk::DataTreeNode* > ItemNodeMapType;
+    typedef std::map< Q3ListViewItem*, mitk::DataNode* > ItemNodeMapType;
     typedef std::vector< std::pair<std::string, std::string> > ColumnsList;
     typedef std::vector<std::string> StringListType;
 
@@ -216,7 +216,7 @@ class QmitkExt_EXPORT QmitkToolWorkingDataSelectionBox : public Q3ListView
     
     QObject* m_LastKeyFilterObject;
 
-    mitk::DataTreeNode* m_LastSelectedReferenceData;
+    mitk::DataNode* m_LastSelectedReferenceData;
 
     DisplayMode m_DisplayMode;
     std::string m_ToolGroupsForFiltering;

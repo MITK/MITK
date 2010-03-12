@@ -106,12 +106,12 @@ class RIGIDREGISTRATION_EXPORT QmitkRigidRegistrationView : public QObject, publ
     /*!
     * sets the fixed Image according to TreeNodeSelector widget
     */
-    void FixedSelected(mitk::DataTreeNode::Pointer fixedImage);
+    void FixedSelected(mitk::DataNode::Pointer fixedImage);
 
     /*!
     * sets the moving Image according to TreeNodeSelector widget
     */
-    void MovingSelected(mitk::DataTreeNode::Pointer movingImage);
+    void MovingSelected(mitk::DataNode::Pointer movingImage);
 
     /*!
     * checks if registration is possible
@@ -259,14 +259,14 @@ class RIGIDREGISTRATION_EXPORT QmitkRigidRegistrationView : public QObject, publ
     * control widget to make all changes for Deformable registration 
     */  
     Ui::QmitkRigidRegistrationViewControls m_Controls;
-    mitk::DataTreeNode::Pointer m_MovingNode;
-    mitk::DataTreeNode::Pointer m_MovingMaskNode;
-    mitk::DataTreeNode::Pointer m_FixedNode;
-    mitk::DataTreeNode::Pointer m_FixedMaskNode;
+    mitk::DataNode::Pointer m_MovingNode;
+    mitk::DataNode::Pointer m_MovingMaskNode;
+    mitk::DataNode::Pointer m_FixedNode;
+    mitk::DataNode::Pointer m_FixedMaskNode;
     std::list<mitk::Geometry3D::Pointer> m_UndoGeometryList;
-    std::list<std::map<mitk::DataTreeNode::Pointer, mitk::Geometry3D*> > m_UndoChildGeometryList;
+    std::list<std::map<mitk::DataNode::Pointer, mitk::Geometry3D*> > m_UndoChildGeometryList;
     std::list<mitk::Geometry3D::Pointer> m_RedoGeometryList;
-    std::list<std::map<mitk::DataTreeNode::Pointer, mitk::Geometry3D*> > m_RedoChildGeometryList;
+    std::list<std::map<mitk::DataNode::Pointer, mitk::Geometry3D*> > m_RedoChildGeometryList;
     bool m_ShowRedGreen;
     float m_Opacity;
     float m_OriginalOpacity;

@@ -5,7 +5,7 @@
   \brief This subcategory includes the IO classes to read or write data objects.
   
   Available sections:
-    - \ref DataTreeNodeFactory
+    - \ref DataNodeFactory
     - \ref XMLWriterAndXMLReader
     - \ref XMLFile
     - \ref XMLWriter
@@ -13,21 +13,21 @@
     - \ref XMLReader
     - \ref XMLReaderCodeSnippets
   
-  \section DataTreeNodeFactory DataTreeNodeFactory
+  \section DataNodeFactory DataNodeFactory
 
-  The mitk::DataTreeNodeFactory creates instances of mitk::DataTreeNodes filled with data read from a given file.
-  This class reads files, creates an appropriate mitk::BaseData and adds the BaseData to a mitk::DataTreeNode.
-  This filter may produce one or more outputs (i.e. mitk::DataTreeNodes). The number of generated nodes can be retrieved by a call of GetNumberOfOutputs().
+  The mitk::DataNodeFactory creates instances of mitk::DataNodes filled with data read from a given file.
+  This class reads files, creates an appropriate mitk::BaseData and adds the BaseData to a mitk::DataNode.
+  This filter may produce one or more outputs (i.e. mitk::DataNodes). The number of generated nodes can be retrieved by a call of GetNumberOfOutputs().
   If you want to add a new file type, you have to register the factory of the file reader in the class mitk::BaseDataIO.
 
-  \image html DataTreeNodeFactoryMechanism.png "A short overview of the factory mechanism of the DataTreeNodeFactory."
+  \image html DataNodeFactoryMechanism.png "A short overview of the factory mechanism of the DataNodeFactory."
   
-  The mitk::DataTreeNodeFactory calls the mitk::BaseDataIO. 
+  The mitk::DataNodeFactory calls the mitk::BaseDataIO. 
   BaseDataIO registers the defined factories of the file readers. 
   After registration each registered factory will be asked if it can read the file specified by the filename.
   If the asked factory can read the file it instantiates the adequate reader. The reader reads the file and returns as output a pointer of BaseData.
   It is possible that a reader has more than one output. The BaseData is stored in a vector of BaseData.
-  The pointer of this vector is returned to the DataTreeNodeFactory. A node is created for each element of the vector.
+  The pointer of this vector is returned to the DataNodeFactory. A node is created for each element of the vector.
   
   Between BaseDataIO and the ObjectFactoryBase there is still an adapter (mitk::IOAdapter).
   The instantiated reader returns a pointer of mitk::BaseProcess. In the class BaseProcess there couldn't be defined the necessary function CanReadFile().

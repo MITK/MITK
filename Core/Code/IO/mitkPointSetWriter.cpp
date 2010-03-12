@@ -316,7 +316,7 @@ bool mitk::PointSetWriter::GetSuccess() const
 
 
 
-bool mitk::PointSetWriter::CanWriteDataType( DataTreeNode* input )
+bool mitk::PointSetWriter::CanWriteDataType( DataNode* input )
 {
   if ( input )
   {
@@ -335,7 +335,7 @@ bool mitk::PointSetWriter::CanWriteDataType( DataTreeNode* input )
   return false;
 }
 
-void mitk::PointSetWriter::SetInput( DataTreeNode* input )
+void mitk::PointSetWriter::SetInput( DataNode* input )
 {
   if( input && CanWriteDataType( input ) )
     this->ProcessObject::SetNthInput( 0, dynamic_cast<mitk::PointSet*>( input->GetData() ) );

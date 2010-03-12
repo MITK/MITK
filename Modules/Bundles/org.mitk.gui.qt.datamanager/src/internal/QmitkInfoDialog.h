@@ -8,7 +8,7 @@
 //class QmitkDataStorageComboBox;
 namespace mitk
 {
-  class DataTreeNode;
+  class DataNode;
 }
 class QTextBrowser;
 class QLineEdit;
@@ -22,9 +22,9 @@ class QmitkInfoDialog : public QDialog
   Q_OBJECT
 
   public:
-    QmitkInfoDialog( std::vector<mitk::DataTreeNode*> _Nodes, QWidget * parent = 0, Qt::WindowFlags f = 0 );
+    QmitkInfoDialog( std::vector<mitk::DataNode*> _Nodes, QWidget * parent = 0, Qt::WindowFlags f = 0 );
   public slots:
-    void OnSelectionChanged(const mitk::DataTreeNode*);
+    void OnSelectionChanged(const mitk::DataNode*);
     void OnSearchButtonClicked ( bool checked = false );
     void OnCancelButtonClicked ( bool checked = false );
     void KeyWordTextChanged(const QString & text);

@@ -46,7 +46,7 @@ mitk::NodePredicateAND::~NodePredicateAND()
 }
 
 
-bool mitk::NodePredicateAND::CheckNode(const mitk::DataTreeNode* node) const
+bool mitk::NodePredicateAND::CheckNode(const mitk::DataNode* node) const
 {
   if (m_ChildPredicates.empty())
     throw std::invalid_argument("NodePredicateAND: no child predicates available");

@@ -63,8 +63,8 @@ mitk::NavigationTool::Pointer mitk::NavigationToolReader::DoRead(std::string fil
     }
   
   //convert the DataStorage back to a NavigationTool-Object
-  mitk::DataTreeNode::Pointer myNode = loadedStorage->GetAll()->ElementAt(0);
-  mitk::NavigationTool::Pointer returnValue = ConvertDataTreeNodeToNavigationTool(myNode, tempDirectory);
+  mitk::DataNode::Pointer myNode = loadedStorage->GetAll()->ElementAt(0);
+  mitk::NavigationTool::Pointer returnValue = ConvertDataNodeToNavigationTool(myNode, tempDirectory);
   
   //delete the data-storage file which is not needed any more. The toolfile must be left in the temporary directory becauses it is linked in the datatreenode of the tool
   std::remove((std::string(tempDirectory + Poco::Path::separator() + GetFileWithoutPath(filename) + ".storage")).c_str());
@@ -72,16 +72,16 @@ mitk::NavigationTool::Pointer mitk::NavigationToolReader::DoRead(std::string fil
   return returnValue;
   }
 
-mitk::NavigationTool::Pointer mitk::NavigationToolReader::ConvertDataTreeNodeToNavigationTool(mitk::DataTreeNode::Pointer node, std::string toolPath)
+mitk::NavigationTool::Pointer mitk::NavigationToolReader::ConvertDataNodeToNavigationTool(mitk::DataNode::Pointer node, std::string toolPath)
   {
   mitk::NavigationTool::Pointer returnValue = mitk::NavigationTool::New();
   
   //DateTreeNode with Name and Surface
-  mitk::DataTreeNode::Pointer newNode = mitk::DataTreeNode::New();
+  mitk::DataNode::Pointer newNode = mitk::DataNode::New();
   newNode->SetName(node->GetName());
   newNode->SetData(node->GetData());
   m_DataStorage->Add(newNode);
-  returnValue->SetDataTreeNode(newNode);
+  returnValue->SetDataNode(newNode);
 
   //Identifier
   std::string identifier;

@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkTool.h"
 #include "MitkExtExports.h"
-#include "mitkDataTreeNode.h"
+#include "mitkDataNode.h"
 #include "mitkDataStorage.h"
 #include "mitkWeakPointer.h"
 
@@ -61,7 +61,7 @@ class PlaneGeometry;
       as a listener and will receive all mouse clicks and keyboard strokes that get into the MITK event mechanism. Tools are automatically
       unregistered from GlobalInteraction when no clients are registered to ToolManager (see RegisterClient()).
 
-   \li ToolManager knows a set of "reference" DataTreeNodes and a set of "working" DataTreeNodes. The first application are segmentation tools, where the
+   \li ToolManager knows a set of "reference" DataNodes and a set of "working" DataNodes. The first application are segmentation tools, where the
       reference is the original image and the working data the (kind of) binary segmentation. However, ToolManager is implemented more generally, so that
       there could be other tools that work, e.g., with surfaces.
 
@@ -88,8 +88,8 @@ class MitkExt_EXPORT ToolManager : public itk::Object
 
     typedef std::vector<Tool::Pointer>         ToolVectorType;
     typedef std::vector<Tool::ConstPointer>    ToolVectorTypeConst;
-    typedef std::vector<DataTreeNode*> DataVectorType; // has to be observed for delete events!
-    typedef std::map<DataTreeNode*, unsigned long> NodeTagMapType;
+    typedef std::vector<DataNode*> DataVectorType; // has to be observed for delete events!
+    typedef std::map<DataNode*, unsigned long> NodeTagMapType;
 
     Message<> NodePropertiesChanged;
     Message<> NewNodesGenerated;
@@ -159,7 +159,7 @@ class MitkExt_EXPORT ToolManager : public itk::Object
     /*
       \brief Set single data item/image as reference object.
     */
-    void SetReferenceData(DataTreeNode*);
+    void SetReferenceData(DataNode*);
 
     /*
       \brief Set a list of data/images as working objects.
@@ -169,7 +169,7 @@ class MitkExt_EXPORT ToolManager : public itk::Object
     /*
       \brief Set single data item/image as working object.
     */
-    void SetWorkingData(DataTreeNode*);
+    void SetWorkingData(DataNode*);
 
     /*
       \brief Get the list of reference data.
@@ -180,7 +180,7 @@ class MitkExt_EXPORT ToolManager : public itk::Object
       \brief Get the current reference data.
       \warning If there is a list of items, this method will only return the first list item.
     */
-    DataTreeNode* GetReferenceData(int);
+    DataNode* GetReferenceData(int);
 
     /*
       \brief Get the list of working data.
@@ -191,7 +191,7 @@ class MitkExt_EXPORT ToolManager : public itk::Object
       \brief Get the current working data.
       \warning If there is a list of items, this method will only return the first list item.
     */
-    DataTreeNode* GetWorkingData(int);
+    DataNode* GetWorkingData(int);
 
     DataStorage* GetDataStorage();
     void SetDataStorage(DataStorage& storage);

@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkTestingMacros.h"
 
-#include "mitkDataTreeNodeFactory.h"
+#include "mitkDataNodeFactory.h"
 #include "mitkCoreObjectFactory.h"
 
 #include "mitkBaseProperty.h"
@@ -150,7 +150,7 @@ int mitkPropertySerializationTest(int /* argc */, char* /*argv*/[])
   
   /* test default property lists of basedata objects */
   // activate the following tests after MaterialProperty is deleted
-  //mitk::DataTreeNode::Pointer node = mitk::DataTreeNode::New();
+  //mitk::DataNode::Pointer node = mitk::DataNode::New();
   //node->SetData(mitk::Contour::New());
   //TestAllProperties(node->GetPropertyList());
   //node->SetData(mitk::ContourSet::New());

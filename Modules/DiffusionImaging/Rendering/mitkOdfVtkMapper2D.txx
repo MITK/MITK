@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define __mitkOdfVtkMapper2D_txx__
 
 #include "mitkOdfVtkMapper2D.h"
-#include "mitkDataTreeNode.h"
+#include "mitkDataNode.h"
 #include "mitkBaseRenderer.h"
 #include "mitkMatrixConvert.h"
 #include "mitkGeometry3D.h"
@@ -273,7 +273,7 @@ template<class T, int N>
 mitk::Image* mitk::OdfVtkMapper2D<T,N>
 ::GetInput()
 {
-  return static_cast<mitk::Image * > ( m_DataTreeNode->GetData() );
+  return static_cast<mitk::Image * > ( m_DataNode->GetData() );
 }
 
 template<class T, int N>
@@ -437,7 +437,7 @@ template<class T, int N>
 typename mitk::OdfVtkMapper2D<T,N>::OdfDisplayGeometry* mitk::OdfVtkMapper2D<T,N>
 ::MeasureDisplayedGeometry(mitk::BaseRenderer* renderer)
 {
-  //vtkLinearTransform * vtktransform = this->GetDataTreeNode()->GetVtkTransform(this->GetTimestep());
+  //vtkLinearTransform * vtktransform = this->GetDataNode()->GetVtkTransform(this->GetTimestep());
   Geometry2D::ConstPointer worldGeometry = 
     renderer->GetCurrentWorldGeometry2D();
   PlaneGeometry::ConstPointer worldPlaneGeometry = 
@@ -540,7 +540,7 @@ void  mitk::OdfVtkMapper2D<T,N>
 ::Slice(mitk::BaseRenderer* renderer, OdfDisplayGeometry* dispGeo)
 {
   vtkLinearTransform * vtktransform = 
-    this->GetDataTreeNode()->GetVtkTransform(this->GetTimestep());
+    this->GetDataNode()->GetVtkTransform(this->GetTimestep());
 
   int index = GetIndex(renderer);
 
@@ -748,7 +748,7 @@ void  mitk::OdfVtkMapper2D<T,N>
       glyphGenerator->SetInput(cuttedPlane);
       glyphGenerator->SetColorModeToColorBySource();
       glyphGenerator->SetInputArrayToProcess(0,0,0, vtkDataObject::FIELD_ASSOCIATION_POINTS , "vector");
-      glyphGenerator->SetGeometry(this->GetDataTreeNode()->GetData()->GetGeometry());
+      glyphGenerator->SetGeometry(this->GetDataNode()->GetData()->GetGeometry());
       glyphGenerator->SetGlyphMethod(&(GlyphMethod),(void *)glyphGenerator);
       try
       {
@@ -812,7 +812,7 @@ void  mitk::OdfVtkMapper2D<T,N>
     OdfDisplayGeometry* dispGeo = MeasureDisplayedGeometry( renderer);
     AdaptCameraPosition(renderer, dispGeo);
 
-    if(this->GetDataTreeNode()->IsOn("DoRefresh",NULL))
+    if(this->GetDataNode()->IsOn("DoRefresh",NULL))
     {
       glMatrixMode( GL_PROJECTION );  
       glPushMatrix();
@@ -856,7 +856,7 @@ void  mitk::OdfVtkMapper2D<T,N>
 
     this->GetProp(renderer)->RenderOpaqueGeometry( renderer->GetVtkRenderer() );
 
-    if(this->GetDataTreeNode()->IsOn("DoRefresh",NULL))
+    if(this->GetDataNode()->IsOn("DoRefresh",NULL))
     {
       glMatrixMode( GL_PROJECTION );  
       glPopMatrix();
@@ -1006,12 +1006,12 @@ template<class T, int N>
 void  mitk::OdfVtkMapper2D<T,N>
 ::ApplyPropertySettings()
 {
-  this->GetDataTreeNode()->GetFloatProperty( "Scaling", m_Scaling );
-  this->GetDataTreeNode()->GetIntProperty( "ShowMaxNumber", m_ShowMaxNumber );
+  this->GetDataNode()->GetFloatProperty( "Scaling", m_Scaling );
+  this->GetDataNode()->GetIntProperty( "ShowMaxNumber", m_ShowMaxNumber );
 
   OdfNormalizationMethodProperty* nmp = dynamic_cast
     <OdfNormalizationMethodProperty*>(
-    this->GetDataTreeNode()->GetProperty( "Normalization" ));
+    this->GetDataNode()->GetProperty( "Normalization" ));
   if(nmp)
   {
     m_Normalization = nmp->GetNormalization();
@@ -1019,14 +1019,14 @@ void  mitk::OdfVtkMapper2D<T,N>
 
   OdfScaleByProperty* sbp = dynamic_cast
     <OdfScaleByProperty*>(
-    this->GetDataTreeNode()->GetProperty( "ScaleBy" ));
+    this->GetDataNode()->GetProperty( "ScaleBy" ));
   if(sbp)
   {
     m_ScaleBy = sbp->GetScaleBy();
   }
 
-  this->GetDataTreeNode()->GetFloatProperty( "IndexParam1", m_IndexParam1);
-  this->GetDataTreeNode()->GetFloatProperty( "IndexParam2", m_IndexParam2);
+  this->GetDataNode()->GetFloatProperty( "IndexParam1", m_IndexParam1);
+  this->GetDataNode()->GetFloatProperty( "IndexParam2", m_IndexParam2);
 }
 
 template<class T, int N>
@@ -1092,7 +1092,7 @@ void  mitk::OdfVtkMapper2D<T,N>
 
 template<class T, int N>
 void  mitk::OdfVtkMapper2D<T,N>
-::SetDefaultProperties(mitk::DataTreeNode* node, mitk::BaseRenderer*  /*renderer*/, bool  /*overwrite*/)
+::SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer*  /*renderer*/, bool  /*overwrite*/)
 {
   node->SetProperty( "ShowMaxNumber", mitk::IntProperty::New( 150 ) );
   node->SetProperty( "Scaling", mitk::FloatProperty::New( 1.0 ) );

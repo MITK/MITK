@@ -54,7 +54,7 @@ void RegionGrowing( itk::Image<TPixel, VImageDimension>* itkImage, Step6* step6 
 
   if (step6->m_ResultNode.IsNull())
   {
-    step6->m_ResultNode = mitk::DataTreeNode::New();
+    step6->m_ResultNode = mitk::DataNode::New();
     step6->m_DataStorage->Add(step6->m_ResultNode);
   }
   step6->m_ResultNode->SetData(mitkImage);

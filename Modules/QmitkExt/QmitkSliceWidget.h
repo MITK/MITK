@@ -70,11 +70,11 @@ public slots:
 
  void SetData(mitk::DataStorage::SetOfObjects::ConstIterator it, mitk::SliceNavigationController::ViewDirection view);
 
- void SetData( mitk::DataTreeNode::Pointer node  );
+ void SetData( mitk::DataNode::Pointer node  );
 
- // void AddData( mitk::DataTreeNode::Pointer node);
+ // void AddData( mitk::DataNode::Pointer node);
 
-  void SetData( mitk::DataTreeNode::Pointer node, mitk::SliceNavigationController::ViewDirection view );
+  void SetData( mitk::DataNode::Pointer node, mitk::SliceNavigationController::ViewDirection view );
 
   void InitWidget( mitk::SliceNavigationController::ViewDirection viewDirection );
 

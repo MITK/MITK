@@ -4,9 +4,9 @@
 // Own includes
 #include <berryISelectionListener.h>
 #include "../mitkQtDataManagerDll.h"
-#include <mitkDataTreeNodeSelection.h>
+#include <mitkDataNodeSelection.h>
 #include <QmitkFunctionality.h>
-#include <QmitkDataTreeNodeSelectionProvider.h>
+#include <QmitkDataNodeSelectionProvider.h>
 
 class QmitkPropertiesTableEditor;
 

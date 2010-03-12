@@ -248,7 +248,7 @@ bool mitk::SetRegionTool::OnMouseReleased(Action* action, const StateEvent* stat
   
   if (!FeedbackContourTool::OnMouseReleased( action, stateEvent )) return false;
 
-  DataTreeNode* workingNode( m_ToolManager->GetWorkingData(0) );
+  DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
   if (!workingNode) return false;
 
   Image* image = dynamic_cast<Image*>(workingNode->GetData());

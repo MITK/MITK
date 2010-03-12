@@ -9,8 +9,8 @@ SET(CPP_FILES
   Algorithms/mitkBaseDataSource.cpp
   Algorithms/mitkBaseProcess.cpp
   Algorithms/mitkCoreObjectFactory.cpp
-  Algorithms/mitkDataTreeNodeFactory.cpp
-  Algorithms/mitkDataTreeNodeSource.cpp
+  Algorithms/mitkDataNodeFactory.cpp
+  Algorithms/mitkDataNodeSource.cpp
   Algorithms/mitkGeometry2DDataToSurfaceFilter.cpp
   Algorithms/mitkHistogramGenerator.cpp
   Algorithms/mitkImageCastPart1.cpp
@@ -58,7 +58,7 @@ SET(CPP_FILES
   DataManagement/mitkColorProperty.cpp
   DataManagement/mitkDataStorage.cpp
   #DataManagement/mitkDataTree.cpp
-  DataManagement/mitkDataTreeNode.cpp
+  DataManagement/mitkDataNode.cpp
   #DataManagement/mitkDataTreeStorage.cpp
   DataManagement/mitkDisplayGeometry.cpp
   DataManagement/mitkEnumerationProperty.cpp

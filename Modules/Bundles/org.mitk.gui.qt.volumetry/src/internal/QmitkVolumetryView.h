@@ -66,7 +66,7 @@ protected:
 
   mitk::Image* GetImage();
 
-  mitk::DataTreeNode* GetOverlayNode();
+  mitk::DataNode* GetOverlayNode();
 
   void CreateOverlayChild();
 
@@ -74,7 +74,7 @@ protected:
 
   void UpdateSlider();
 
-  const mitk::DataTreeNode* GetImageNode();
+  const mitk::DataNode* GetImageNode();
 
 
 protected slots:
@@ -88,7 +88,7 @@ protected slots:
   
   void OnSaveCsvButtonClicked();
  
-  void OnImageSelected(const mitk::DataTreeNode* item);
+  void OnImageSelected(const mitk::DataNode* item);
 
 
 
@@ -98,11 +98,11 @@ protected:
 
   QmitkStdMultiWidget* m_MultiWidget;
 
-  /// store weak pointer of the DataTreeNode
-  mitk::WeakPointer<mitk::DataTreeNode> m_SelectedDataTreeNode; 
+  /// store weak pointer of the DataNode
+  mitk::WeakPointer<mitk::DataNode> m_SelectedDataNode; 
 
 
-  mitk::DataTreeNode::Pointer m_OverlayNode;
+  mitk::DataNode::Pointer m_OverlayNode;
 
   mitk::DataStorage::Pointer m_DataStorage;
 

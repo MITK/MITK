@@ -77,7 +77,7 @@ class QmitkRegionGrowingView : public QObject, public QmitkFunctionality
     void ItkImageProcessing( itk::Image< TPixel, VImageDimension >* itkImage, mitk::Geometry3D* imageGeometry );
 
     /// \brief called by QmitkFunctionality when DataManager's selection has changed
-    virtual void OnSelectionChanged( std::vector<mitk::DataTreeNode*> nodes );
+    virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes );
 
     /// \brief This is the actual seed point data object
     mitk::PointSet::Pointer m_PointSet;

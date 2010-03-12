@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkNodePredicateBase.h"
 #include "mitkDataStorage.h"
-#include "mitkDataTreeNode.h"
+#include "mitkDataNode.h"
 #include "mitkWeakPointer.h"
 
 namespace mitk {
@@ -39,7 +39,7 @@ namespace mitk {
     public:
 
       mitkClassMacro(NodePredicateSource, NodePredicateBase);
-      mitkNewMacro3Param(NodePredicateSource, mitk::DataTreeNode*, bool, mitk::DataStorage*);
+      mitkNewMacro3Param(NodePredicateSource, mitk::DataNode*, bool, mitk::DataStorage*);
 
       //##Documentation
       //## @brief Standard Destructor
@@ -47,14 +47,14 @@ namespace mitk {
 
       //##Documentation
       //## @brief Checks, if the node is a source node of m_BaseNode (e.g. if m_BaseNode "was created from" node)
-      virtual bool CheckNode(const mitk::DataTreeNode* node) const;
+      virtual bool CheckNode(const mitk::DataNode* node) const;
 
     protected:
       //##Documentation
       //## @brief Constructor - This class can either search only for direct source objects or for all source objects
-      NodePredicateSource(mitk::DataTreeNode* n, bool allsources, mitk::DataStorage* ds);
+      NodePredicateSource(mitk::DataNode* n, bool allsources, mitk::DataStorage* ds);
 
-      mitk::WeakPointer<mitk::DataTreeNode> m_BaseNode;
+      mitk::WeakPointer<mitk::DataNode> m_BaseNode;
       bool m_SearchAllSources;
       mitk::WeakPointer<mitk::DataStorage> m_DataStorage;
     };

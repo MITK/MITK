@@ -24,7 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkSphereLandmarkProjector.h>
 #include <mitkPlaneLandmarkProjector.h>
 #include <mitkPlaneFit.h>
-#include <mitkDataTreeNode.h>
+#include <mitkDataNode.h>
 #include <mitkImage.h>
 
 namespace mitk
@@ -53,7 +53,7 @@ public:
    * Fills a data tree node with appropriate properties
    * for mapping the output geometry surface 
    */
-  static void SetDefaultCurvedGeometryProperties( mitk::DataTreeNode* node );
+  static void SetDefaultCurvedGeometryProperties( mitk::DataNode* node );
 
   /**
    * Sets / Gets whether the input land marks are projected onto a plane

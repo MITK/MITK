@@ -36,7 +36,7 @@ namespace mitk {
 
   class BaseRenderer;
   class BaseData;
-  class DataTreeNode;
+  class DataNode;
   
 
   /** \brief Interface for accessing (templated) LocalStorageHandler instances.
@@ -64,8 +64,8 @@ namespace mitk {
     mitkClassMacro(Mapper, itk::Object);
 
     //##Documentation
-    //## @brief Set the DataTreeNode containing the data to map
-    itkSetObjectMacro(DataTreeNode, DataTreeNode);
+    //## @brief Set the DataNode containing the data to map
+    itkSetObjectMacro(DataNode, DataNode);
 
     //##Documentation
     //## @brief Get the data to map
@@ -75,8 +75,8 @@ namespace mitk {
     BaseData* GetData() const;
 
     //##Documentation
-    //## @brief Get the DataTreeNode containing the data to map
-    virtual DataTreeNode* GetDataTreeNode() const;
+    //## @brief Get the DataNode containing the data to map
+    virtual DataNode* GetDataNode() const;
 
     //##Documentation
     //## @brief Convenience access method for color properties (instances of
@@ -156,7 +156,7 @@ namespace mitk {
     * \param renderer defines which property list of node is used 
     * (default: \a NULL, i.e. default property list)
     */
-    static void SetDefaultProperties(DataTreeNode* node, BaseRenderer* renderer = NULL, bool overwrite = false);
+    static void SetDefaultProperties(DataNode* node, BaseRenderer* renderer = NULL, bool overwrite = false);
 
     /** \brief Returns the current time step as calculated from the renderer */
     int GetTimestep() const {return m_TimeStep;}; 
@@ -182,7 +182,7 @@ namespace mitk {
 
     bool m_VtkBased;
 
-    itk::WeakPointer<DataTreeNode> m_DataTreeNode;
+    itk::WeakPointer<DataNode> m_DataNode;
 
     //##Documentation
     //## @brief timestamp of last update of stored data

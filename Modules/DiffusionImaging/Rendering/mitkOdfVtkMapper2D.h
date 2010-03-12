@@ -94,7 +94,7 @@ namespace mitk {
       OdfDisplayGeometry* dispGeo);
     virtual int GetIndex(mitk::BaseRenderer* renderer);
 
-    static void SetDefaultProperties(DataTreeNode* node, BaseRenderer* renderer = NULL, bool overwrite = false);
+    static void SetDefaultProperties(DataNode* node, BaseRenderer* renderer = NULL, bool overwrite = false);
 
     virtual void GenerateData();
     virtual void GenerateData(mitk::BaseRenderer* renderer);

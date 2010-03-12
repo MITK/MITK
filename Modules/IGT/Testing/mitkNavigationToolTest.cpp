@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkNavigationTool.h"
 #include "mitkCommon.h"
 #include "mitkTestingMacros.h"
-#include "mitkDataTreeNode.h"
+#include "mitkDataNode.h"
 #include "mitkTrackingTool.h"
 
 #include <itkSpatialObject.h>
@@ -39,13 +39,13 @@ class mitkNavigationToolTestClass
     mitk::NavigationTool::Pointer myNavigationTool = mitk::NavigationTool::New();
     
     //initialize a few things
-    mitk::DataTreeNode::Pointer myNode = mitk::DataTreeNode::New();
+    mitk::DataNode::Pointer myNode = mitk::DataNode::New();
     itk::SpatialObject<3>::Pointer mySpatialObject = itk::SpatialObject<3>::New();
 
     //set everything
     myNavigationTool->SetType(mitk::NavigationTool::Instrument);
     myNavigationTool->SetIdentifier("Tool#15");
-    myNavigationTool->SetDataTreeNode(myNode);
+    myNavigationTool->SetDataNode(myNode);
     myNavigationTool->SetSpatialObject(mySpatialObject);
     //notice: cannot test Get/SetTrackingTool because this class cannot be instantiated alone
     myNavigationTool->SetCalibrationFile("Test.srom");
@@ -55,7 +55,7 @@ class mitkNavigationToolTestClass
     //test getter
     MITK_TEST_CONDITION(myNavigationTool->GetType()==mitk::NavigationTool::Instrument,"Testing getter and setter of type.");
     MITK_TEST_CONDITION(myNavigationTool->GetIdentifier()=="Tool#15","Testing getter and setter of identifier.");
-    MITK_TEST_CONDITION(myNavigationTool->GetDataTreeNode()==myNode,"Testing getter and setter of dataTreeNode.");
+    MITK_TEST_CONDITION(myNavigationTool->GetDataNode()==myNode,"Testing getter and setter of dataTreeNode.");
     MITK_TEST_CONDITION(myNavigationTool->GetSpatialObject()==mySpatialObject,"Testing getter and setter of itk spatial object.");
     MITK_TEST_CONDITION(myNavigationTool->GetCalibrationFile()=="Test.srom","Testing getter and setter of calibration file.");
     MITK_TEST_CONDITION(myNavigationTool->GetSerialNumber()=="0815","Testing getter and setter of serial number.");

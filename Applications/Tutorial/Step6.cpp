@@ -3,7 +3,7 @@
 #include "QmitkRenderWindow.h"
 #include "QmitkSliceWidget.h"
 
-#include "mitkDataTreeNodeFactory.h"
+#include "mitkDataNodeFactory.h"
 #include "mitkProperties.h"
 #include "mitkRenderingManager.h"
 
@@ -71,7 +71,7 @@ void Step6::Initialize()
 	// as in Step5, create PointSet (now as a member m_Seeds) and
 	// associate a interactor to it
 	m_Seeds = mitk::PointSet::New();
-	mitk::DataTreeNode::Pointer pointSetNode = mitk::DataTreeNode::New();
+	mitk::DataNode::Pointer pointSetNode = mitk::DataNode::New();
 	pointSetNode->SetData(m_Seeds);
 	pointSetNode->SetProperty("layer", mitk::IntProperty::New(2));
 	m_DataStorage->Add(pointSetNode);
@@ -114,10 +114,10 @@ void Step6::Load(int argc, char* argv[])
 		if (strcmp(argv[i], "-testing") == 0)
 			continue;
 
-		// Create a DataTreeNodeFactory to read a data format supported
-		// by the DataTreeNodeFactory (many image formats, surface formats, etc.)
-		mitk::DataTreeNodeFactory::Pointer nodeReader =
-				mitk::DataTreeNodeFactory::New();
+		// Create a DataNodeFactory to read a data format supported
+		// by the DataNodeFactory (many image formats, surface formats, etc.)
+		mitk::DataNodeFactory::Pointer nodeReader =
+				mitk::DataNodeFactory::New();
 		const char * filename = argv[i];
 		try
 		{
@@ -127,9 +127,9 @@ void Step6::Load(int argc, char* argv[])
 			// Part III: Put the data into the datastorage
 			//*********************************************************************
 
-			// Since the DataTreeNodeFactory directly creates a node,
+			// Since the DataNodeFactory directly creates a node,
 			// use the iterator to add the read node to the tree
-			mitk::DataTreeNode::Pointer node = nodeReader->GetOutput();
+			mitk::DataNode::Pointer node = nodeReader->GetOutput();
 			m_DataStorage->Add(node);
 
 			mitk::Image::Pointer image =

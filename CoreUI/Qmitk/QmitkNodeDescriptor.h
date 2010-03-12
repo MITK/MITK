@@ -2,7 +2,7 @@
 #define QmitkNodeDescriptor_h
 
 #include <map>
-#include "mitkDataTreeNode.h"
+#include "mitkDataNode.h"
 #include <QList>
 #include <QAction>
 #include <QWidgetAction>
@@ -12,14 +12,14 @@
 
 /// 
 /// \class QmitkNodeQmitkNodeDescriptor
-/// \brief QmitkNodeQmitkNodeDescriptor is <i>Decorator</i> class for the mitk::DataTreeNode
-/// which enhances certain mitk::DataTreeNode by additional infos needed by the GUI (Icon, ...)
+/// \brief QmitkNodeQmitkNodeDescriptor is <i>Decorator</i> class for the mitk::DataNode
+/// which enhances certain mitk::DataNode by additional infos needed by the GUI (Icon, ...)
 ///
 /// Moreover, QmitkNodeQmitkNodeDescriptor stores a Menu for actions that can be taken
-/// for a certain DataTreeNode, e.g. for DataTreeNodes containing images this menu
+/// for a certain DataNode, e.g. for DataNodes containing images this menu
 /// can be filled with Image Filter Actions, etc.
 ///
-/// \sa QmitkDataTreeNodeQmitkNodeDescriptorManager
+/// \sa QmitkDataNodeQmitkNodeDescriptorManager
 ///
 class QMITK_EXPORT QmitkNodeDescriptor : public QObject
 {  
@@ -35,21 +35,21 @@ public:
   ///
   virtual ~QmitkNodeDescriptor();
   ///
-  /// Returns a name for this class of DataTreeNodes (e.g. "Image", "Image Mask", etc.)
+  /// Returns a name for this class of DataNodes (e.g. "Image", "Image Mask", etc.)
   ///
   virtual QString GetClassName() const;
   ///
-  /// Returns an Icon for this class of DataTreeNodes
+  /// Returns an Icon for this class of DataNodes
   /// 
   virtual QIcon GetIcon() const;
   ///
-  /// Returns an Icon for this class of DataTreeNodes
+  /// Returns an Icon for this class of DataNodes
   ///
   virtual QAction* GetSeparator() const;
   ///
   /// Check if this class describes the given node
   ///
-  virtual bool CheckNode(const mitk::DataTreeNode* node) const;
+  virtual bool CheckNode(const mitk::DataNode* node) const;
   ///
   /// Create and return an action with this descriptor as owner
   ///

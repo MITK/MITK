@@ -3,7 +3,7 @@
 
 // Own Includes
 #include "mitkDataStorage.h"
-#include "mitkDataTreeNode.h"
+#include "mitkDataNode.h"
 #include "mitkWeakPointer.h"
 #include "mitkNodePredicateBase.h"
 
@@ -52,17 +52,17 @@ class QMITK_EXPORT QmitkDataStorageComboBox : public QComboBox
     ///
     mitk::DataStorage::Pointer GetDataStorage() const;    
     ///
-    /// \brief Return the predicate (may be NULL) that is responsible for the _DataTreeNode selection of this ComboBox.
+    /// \brief Return the predicate (may be NULL) that is responsible for the _DataNode selection of this ComboBox.
     ///
     const mitk::NodePredicateBase::ConstPointer GetPredicate() const;     
     ///
-    /// \brief Returns the _DataTreeNode at Index index or 0 if the index is out of bounds.
+    /// \brief Returns the _DataNode at Index index or 0 if the index is out of bounds.
     ///
-    mitk::DataTreeNode::Pointer GetNode(int index) const;   
+    mitk::DataNode::Pointer GetNode(int index) const;   
     ///
-    /// \brief Returns the selected _DataTreeNode or 0 if there is none.
+    /// \brief Returns the selected _DataNode or 0 if there is none.
     ///
-    mitk::DataTreeNode::Pointer GetSelectedNode() const;     
+    mitk::DataNode::Pointer GetSelectedNode() const;     
     ///
     /// \brief Returns all nodes that are stored in this combobox.
     ///
@@ -88,7 +88,7 @@ class QMITK_EXPORT QmitkDataStorageComboBox : public QComboBox
     ///
     /// Adds a node to the ComboBox. Gets called everytime a DataStorage Add Event was thrown.
     ///
-    virtual void AddNode(const mitk::DataTreeNode* _DataTreeNode);
+    virtual void AddNode(const mitk::DataNode* _DataNode);
     ///
     /// Removes a node from the ComboBox at a specified index (if the index exists). Gets called when a DataStorage Remove Event was thrown.
     ///
@@ -96,17 +96,17 @@ class QMITK_EXPORT QmitkDataStorageComboBox : public QComboBox
     ///
     /// Removes a node from the ComboBox. Gets called when a DataStorage Remove Event was thrown.
     ///
-    virtual void RemoveNode(const mitk::DataTreeNode* _DataTreeNode);
+    virtual void RemoveNode(const mitk::DataNode* _DataNode);
     ///
-    /// Set a _DataTreeNode in the ComboBox at the specified index (if the index exists).    
+    /// Set a _DataNode in the ComboBox at the specified index (if the index exists).    
     /// Internally the method just calls RemoveNode(unsigned int)
     ///
-    virtual void SetNode(int index, const mitk::DataTreeNode* _DataTreeNode);
+    virtual void SetNode(int index, const mitk::DataNode* _DataNode);
     ///
-    /// Replaces a _DataTreeNode in the combobox by an _OtherDataTreeNode.
-    /// Internally the method just calls SetNode(unsigned int, mitk::DataTreeNode*)
+    /// Replaces a _DataNode in the combobox by an _OtherDataNode.
+    /// Internally the method just calls SetNode(unsigned int, mitk::DataNode*)
     ///
-    virtual void SetNode(const mitk::DataTreeNode* _DataTreeNode, const mitk::DataTreeNode* _OtherDataTreeNode);
+    virtual void SetNode(const mitk::DataNode* _DataNode, const mitk::DataNode* _OtherDataNode);
     ///
     /// Sets AutoSelectNewItems flag. If set to true new Nodes will be automatically selected. Default is false.
     ///
@@ -114,15 +114,15 @@ class QMITK_EXPORT QmitkDataStorageComboBox : public QComboBox
     ///
     /// \brief Called when a node is deleted or the name property of the node was modified. Calls RemoveNode or SetNode then.
     ///
-    virtual void OnDataTreeNodeDeleteOrModified(const itk::Object *caller, const itk::EventObject &event);
+    virtual void OnDataNodeDeleteOrModified(const itk::Object *caller, const itk::EventObject &event);
 
    
 
   signals:
     ///
-    /// \brief Throw a signal when the _DataTreeNode selection changed.
+    /// \brief Throw a signal when the _DataNode selection changed.
     ///
-    void OnSelectionChanged(const mitk::DataTreeNode*);
+    void OnSelectionChanged(const mitk::DataNode*);
 
     
   //#PROTECTED GETTER
@@ -135,7 +135,7 @@ class QMITK_EXPORT QmitkDataStorageComboBox : public QComboBox
     ///
     /// \brief Seaches for a given node and returns a valid index or -1 if the node was not found.
     ///
-    int Find( const mitk::DataTreeNode* _DataTreeNode ) const;
+    int Find( const mitk::DataNode* _DataNode ) const;
 
   //#PROTECTED SETTER
   protected slots:
@@ -149,11 +149,11 @@ class QMITK_EXPORT QmitkDataStorageComboBox : public QComboBox
     ///
     /// \brief Slot for signal when user wants to set a node as current selected node.
     ///
-    void SetSelectedNode(mitk::DataTreeNode::Pointer item);
+    void SetSelectedNode(mitk::DataNode::Pointer item);
 
   protected:
     ///
-    /// \brief Inserts a new node at the given index. If the index does not exist, the _DataTreeNode is simply appended to the combobox.
+    /// \brief Inserts a new node at the given index. If the index does not exist, the _DataNode is simply appended to the combobox.
     ///
     /// This function is used by AddNode() and SetNode() because they just to the same:
     /// 1. If node is replaced (that is when index exists),
@@ -161,7 +161,7 @@ class QMITK_EXPORT QmitkDataStorageComboBox : public QComboBox
     /// 2. Check Node against Predicate
     /// 3. Register for itk::Events on the node
     /// 4. Insert Node and show in combobox
-    virtual void InsertNode(int index, const mitk::DataTreeNode* _DataTreeNode);
+    virtual void InsertNode(int index, const mitk::DataNode* _DataNode);
 
     ///
     /// \brief Init-function this class with the given dataStorage and _Predicate. This function is called by all ctors.
@@ -182,15 +182,15 @@ class QMITK_EXPORT QmitkDataStorageComboBox : public QComboBox
     mitk::WeakPointer<mitk::DataStorage> m_DataStorage;
 
     ///
-    /// \brief Holds the predicate that is responsible for the _DataTreeNode selection of this ComboBox.
-    /// If the predicate is 0, every _DataTreeNode will be selected.
+    /// \brief Holds the predicate that is responsible for the _DataNode selection of this ComboBox.
+    /// If the predicate is 0, every _DataNode will be selected.
     ///
     mitk::NodePredicateBase::ConstPointer m_Predicate;
 
     ///
     /// Holds all selected Nodes. Dont hold smart pointer as we are in a GUI class.
     ///
-    std::vector<mitk::DataTreeNode*> m_Nodes;
+    std::vector<mitk::DataNode*> m_Nodes;
 
     ///
     /// \brief Holds the tags of the node-modified observers. (must be updated everytime m_Nodes changes)
@@ -206,7 +206,7 @@ class QMITK_EXPORT QmitkDataStorageComboBox : public QComboBox
     /// \brief Maps a a specific node to (Name-)property. This is needed because we have to find the assiociated node
     /// whenever the name property of a node changed.
     ///
-    std::map<mitk::DataTreeNode*, const mitk::BaseProperty*> m_PropertyToNode;
+    std::map<mitk::DataNode*, const mitk::BaseProperty*> m_PropertyToNode;
 
     ///
     /// \brief Event function guard. Each function which is called by an event mechanism

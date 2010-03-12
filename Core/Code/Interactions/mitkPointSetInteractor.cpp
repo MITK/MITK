@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkPositionEvent.h"
 #include "mitkPointSet.h"
 //#include "mitkStatusBar.h"
-#include "mitkDataTreeNode.h"
+#include "mitkDataNode.h"
 #include "mitkInteractionConst.h"
 #include "mitkAction.h"
 #include "mitkStateEvent.h"
@@ -38,7 +38,7 @@ PURPOSE.  See the above copyright notices for more information.
 const int PRECISION = 5;
 
 mitk::PointSetInteractor
-::PointSetInteractor(const char * type, DataTreeNode* dataTreeNode, int n)
+::PointSetInteractor(const char * type, DataNode* dataTreeNode, int n)
 :Interactor(type, dataTreeNode), m_N(n), m_Precision(PRECISION)
 {
   m_LastPoint.Fill(0);
@@ -87,7 +87,7 @@ float mitk::PointSetInteractor::CalculateJurisdiction(StateEvent const* stateEve
   mitk::BaseRenderer* sender = stateEvent->GetEvent()->GetSender();
   if (sender != NULL)
   {
-    unsigned int timeStep = sender->GetTimeStep(m_DataTreeNode->GetData());
+    unsigned int timeStep = sender->GetTimeStep(m_DataNode->GetData());
     //if the event can be understood and if there is a transition waiting for that event
     mitk::State const* state = this->GetCurrentState(timeStep);
     if (state!= NULL)
@@ -95,7 +95,7 @@ float mitk::PointSetInteractor::CalculateJurisdiction(StateEvent const* stateEve
         returnValue = 0.5;//it can be understood
 
 
-    mitk::PointSet *pointSet = dynamic_cast<mitk::PointSet*>(m_DataTreeNode->GetData());
+    mitk::PointSet *pointSet = dynamic_cast<mitk::PointSet*>(m_DataNode->GetData());
     if ( pointSet != NULL )
     {
       //if we have one point or more, then check if the have been picked
@@ -131,7 +131,7 @@ float mitk::PointSetInteractor::CalculateJurisdiction(StateEvent const* stateEve
 void mitk::PointSetInteractor::UnselectAll( unsigned int timeStep, ScalarType timeInMS )
 {
   mitk::PointSet *pointSet = 
-    dynamic_cast<mitk::PointSet*>( m_DataTreeNode->GetData() );
+    dynamic_cast<mitk::PointSet*>( m_DataNode->GetData() );
   if ( pointSet == NULL )
   {
     return;
@@ -179,7 +179,7 @@ void mitk::PointSetInteractor::UnselectAll( unsigned int timeStep, ScalarType ti
 void mitk::PointSetInteractor::SelectPoint( int position, unsigned int timeStep, ScalarType timeInMS )
 {
   mitk::PointSet *pointSet = dynamic_cast< mitk::PointSet * >( 
-    m_DataTreeNode->GetData() );
+    m_DataNode->GetData() );
 
   //if List is empty, then no select of a point can be done!
   if ( (pointSet == NULL) || (pointSet->GetSize( timeStep ) <= 0) )
@@ -213,7 +213,7 @@ bool mitk::PointSetInteractor::ExecuteAction( Action* action, mitk::StateEvent c
 
   //checking corresponding Data; has to be a PointSet or a subclass
   mitk::PointSet* pointSet = 
-    dynamic_cast<mitk::PointSet*>(m_DataTreeNode->GetData());
+    dynamic_cast<mitk::PointSet*>(m_DataNode->GetData());
   if ( pointSet == NULL )
   {
     return false;
@@ -946,7 +946,7 @@ bool mitk::PointSetInteractor::ExecuteAction( Action* action, mitk::StateEvent c
     return Superclass::ExecuteAction( action, stateEvent );
   }
   // indicate modification of data tree node
-  m_DataTreeNode->Modified();
+  m_DataNode->Modified();
   return ok;
 }
 
@@ -956,7 +956,7 @@ void mitk::PointSetInteractor::Clear( unsigned int timeStep, ScalarType timeInMS
   point.Fill(0);
 
   mitk::PointSet *pointSet = 
-    dynamic_cast<mitk::PointSet*>(m_DataTreeNode->GetData());
+    dynamic_cast<mitk::PointSet*>(m_DataNode->GetData());
   if ( pointSet == NULL )
   {
     return;

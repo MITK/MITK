@@ -56,7 +56,7 @@ mitk::SplineVtkMapper3D::GetVtkProp(mitk::BaseRenderer * /*renderer*/)
 void mitk::SplineVtkMapper3D::UpdateVtkTransform(mitk::BaseRenderer * /*renderer*/)
 {
   vtkLinearTransform * vtktransform = 
-    this->GetDataTreeNode()->GetVtkTransform(this->GetTimestep());
+    this->GetDataNode()->GetVtkTransform(this->GetTimestep());
 
   m_SplinesActor->SetUserTransform(vtktransform);
 }
@@ -110,8 +110,8 @@ void mitk::SplineVtkMapper3D::GenerateData( mitk::BaseRenderer* renderer )
       m_SplineAssembly->RemovePart(m_PointsAssembly);
   }
   //if the properties have been changed, then refresh the properties
-  if ( (m_SplineUpdateTime < this->m_DataTreeNode->GetPropertyList()->GetMTime() ) || 
-       (m_SplineUpdateTime < this->m_DataTreeNode->GetPropertyList(renderer)->GetMTime() ) )
+  if ( (m_SplineUpdateTime < this->m_DataNode->GetPropertyList()->GetMTime() ) || 
+       (m_SplineUpdateTime < this->m_DataNode->GetPropertyList(renderer)->GetMTime() ) )
     this->ApplyProperties();
 }
 
@@ -121,19 +121,19 @@ void mitk::SplineVtkMapper3D::ApplyProperties()
   //vtk changed the type of rgba during releases. Due to that, the following convert is done
   vtkFloatingPointType rgba[ 4 ] = {1.0f, 1.0f, 1.0f, 1.0f};//white
 
-  //getting the color from DataTreeNode
+  //getting the color from DataNode
   float temprgba[4];
-  this->GetDataTreeNode()->GetColor( &temprgba[0], NULL );
+  this->GetDataNode()->GetColor( &temprgba[0], NULL );
   //convert to rgba, what ever type it has!
   rgba[0] = temprgba[0];    rgba[1] = temprgba[1];    rgba[2] = temprgba[2];    rgba[3] = temprgba[3];
   //finaly set the color inside the actor
   m_SplinesActor->GetProperty()->SetColor( rgba );
 
   float lineWidth;
-  if (dynamic_cast<mitk::FloatProperty *>(this->GetDataTreeNode()->GetProperty("line width")) == NULL)
+  if (dynamic_cast<mitk::FloatProperty *>(this->GetDataNode()->GetProperty("line width")) == NULL)
     lineWidth = 1.0;
   else
-    lineWidth = dynamic_cast<mitk::FloatProperty *>(this->GetDataTreeNode()->GetProperty("line width"))->GetValue();
+    lineWidth = dynamic_cast<mitk::FloatProperty *>(this->GetDataNode()->GetProperty("line width"))->GetValue();
   m_SplinesActor->GetProperty()->SetLineWidth(lineWidth);
   
   m_SplineUpdateTime.Modified();

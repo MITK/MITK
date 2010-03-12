@@ -63,14 +63,14 @@ void mitk::CalculateGrayValueStatisticsTool::StartProcessingAllData()
   m_CompleteReport.str("");
 }
 
-bool mitk::CalculateGrayValueStatisticsTool::ProcessOneWorkingData( DataTreeNode* node )
+bool mitk::CalculateGrayValueStatisticsTool::ProcessOneWorkingData( DataNode* node )
 {
   if (node)
   {
     Image::Pointer image = dynamic_cast<Image*>( node->GetData() );
     if (image.IsNull()) return false;
 
-    DataTreeNode* referencenode = m_ToolManager->GetReferenceData(0);
+    DataNode* referencenode = m_ToolManager->GetReferenceData(0);
     if (!referencenode) return false;
 
     try

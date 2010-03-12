@@ -44,13 +44,13 @@ static void TestSetterMethods(mitk::ToolManager::Pointer toolManager)
 {
   MITK_TEST_CONDITION( toolManager->GetReferenceData().size() == 0, "Get reference data size (0)" )
 
-  mitk::DataTreeNode::Pointer nodeEmpty = mitk::DataTreeNode::New();
+  mitk::DataNode::Pointer nodeEmpty = mitk::DataNode::New();
   toolManager->SetReferenceData(nodeEmpty);
   MITK_TEST_CONDITION( toolManager->GetReferenceData().size() == 1, "Get reference data size (1)" )
   MITK_TEST_CONDITION( toolManager->GetReferenceData(0) == nodeEmpty, "Check if it is the right reference data" )
   MITK_TEST_CONDITION( toolManager->GetReferenceData()[0] == nodeEmpty, "Check if it is the right reference data vector" )
   
-  mitk::DataTreeNode::Pointer nodeEmpty2 = mitk::DataTreeNode::New();
+  mitk::DataNode::Pointer nodeEmpty2 = mitk::DataNode::New();
   toolManager->SetWorkingData(nodeEmpty2);
   MITK_TEST_CONDITION( toolManager->GetWorkingData().size() == 1, "Get working data size (1)" )
   MITK_TEST_CONDITION( toolManager->GetWorkingData(0) == nodeEmpty2, "Check if it is the right working data" )

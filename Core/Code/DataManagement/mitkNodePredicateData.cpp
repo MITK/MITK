@@ -17,7 +17,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkNodePredicateData.h"
 
-#include "mitkDataTreeNode.h"
+#include "mitkDataNode.h"
 
 
 mitk::NodePredicateData::NodePredicateData(mitk::BaseData* d)
@@ -32,7 +32,7 @@ mitk::NodePredicateData::~NodePredicateData()
 }
 
 
-bool mitk::NodePredicateData::CheckNode(const mitk::DataTreeNode* node) const
+bool mitk::NodePredicateData::CheckNode(const mitk::DataNode* node) const
 {
   if (node == NULL)
     throw std::invalid_argument("NodePredicateData: invalid node");

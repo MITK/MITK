@@ -39,7 +39,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "itkImageFileReader.h"
 #include "itkWarpImageFilter.h"
 
-#include "mitkDataTreeNodeObject.h"
+#include "mitkDataNodeObject.h"
 
 #include "berryIWorkbenchWindow.h"
 #include "berryISelectionService.h"
@@ -93,15 +93,15 @@ struct SelListenerDeformableRegistration : ISelectionListener
       {
         m_View->m_Controls.m_StatusLabel->hide();
         bool foundFixedImage = false;
-        mitk::DataTreeNode::Pointer fixedNode;
+        mitk::DataNode::Pointer fixedNode;
         // iterate selection
         for (IStructuredSelection::iterator i = m_View->m_CurrentSelection->Begin(); 
           i != m_View->m_CurrentSelection->End(); ++i)
         {
           // extract datatree node
-          if (mitk::DataTreeNodeObject::Pointer nodeObj = i->Cast<mitk::DataTreeNodeObject>())
+          if (mitk::DataNodeObject::Pointer nodeObj = i->Cast<mitk::DataNodeObject>())
           {
-            mitk::DataTreeNode::Pointer node = nodeObj->GetDataTreeNode();
+            mitk::DataNode::Pointer node = nodeObj->GetDataNode();
             // only look at interesting types
             if(QString("Image").compare(node->GetData()->GetNameOfClass())==0)
             {
@@ -257,8 +257,8 @@ void QmitkDeformableRegistrationView::ApplyDeformationField()
 
   mitk::CastToMitkImage(outputImage, result);
 
-  // Create new DataTreeNode
-  mitk::DataTreeNode::Pointer newNode = mitk::DataTreeNode::New();
+  // Create new DataNode
+  mitk::DataNode::Pointer newNode = mitk::DataNode::New();
   newNode->SetData( result );   
   newNode->SetProperty( "name", mitk::StringProperty::New("warped image") );
 
@@ -373,7 +373,7 @@ void QmitkDeformableRegistrationView::Hidden()
   //QmitkFunctionality::Deactivated();
 }
 
-void QmitkDeformableRegistrationView::FixedSelected(mitk::DataTreeNode::Pointer fixedImage)
+void QmitkDeformableRegistrationView::FixedSelected(mitk::DataNode::Pointer fixedImage)
 {
   if (fixedImage.IsNotNull())
   {
@@ -415,7 +415,7 @@ void QmitkDeformableRegistrationView::FixedSelected(mitk::DataTreeNode::Pointer 
   this->CheckCalculateEnabled();
 }
 
-void QmitkDeformableRegistrationView::MovingSelected(mitk::DataTreeNode::Pointer movingImage)
+void QmitkDeformableRegistrationView::MovingSelected(mitk::DataNode::Pointer movingImage)
 {
   if (movingImage.IsNotNull())
   {
@@ -535,7 +535,7 @@ void QmitkDeformableRegistrationView::Calculate()
     mitk::Image::Pointer resultDeformationField = m_Controls.m_QmitkDemonsRegistrationViewControls->GetResultDeformationfield();   
     if (resultImage.IsNotNull())
     {
-      mitk::DataTreeNode::Pointer resultImageNode = mitk::DataTreeNode::New();
+      mitk::DataNode::Pointer resultImageNode = mitk::DataNode::New();
       resultImageNode->SetData(resultImage);
       mitk::LevelWindowProperty::Pointer levWinProp = mitk::LevelWindowProperty::New();
       mitk::LevelWindow levelWindow;
@@ -547,7 +547,7 @@ void QmitkDeformableRegistrationView::Calculate()
     }
     if (resultDeformationField.IsNotNull())
     {
-      mitk::DataTreeNode::Pointer resultDeformationFieldNode = mitk::DataTreeNode::New();
+      mitk::DataNode::Pointer resultDeformationFieldNode = mitk::DataNode::New();
       resultDeformationFieldNode->SetData(resultDeformationField);
       mitk::LevelWindowProperty::Pointer levWinProp = mitk::LevelWindowProperty::New();
       mitk::LevelWindow levelWindow;
@@ -616,8 +616,8 @@ void QmitkDeformableRegistrationView::TabChanged(int index)
 
 void QmitkDeformableRegistrationView::SwitchImages()
 {
-  mitk::DataTreeNode::Pointer newMoving = m_FixedNode;
-  mitk::DataTreeNode::Pointer newFixed = m_MovingNode;
+  mitk::DataNode::Pointer newMoving = m_FixedNode;
+  mitk::DataNode::Pointer newFixed = m_MovingNode;
   this->FixedSelected(newFixed);
   this->MovingSelected(newMoving);
 }

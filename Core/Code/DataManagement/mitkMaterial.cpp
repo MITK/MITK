@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkVtkInterpolationProperty.h"
 #include "mitkVtkRepresentationProperty.h"
 #include <vtkProperty.h>
-#include "mitkDataTreeNode.h"
+#include "mitkDataNode.h"
 #include "mitkBaseRenderer.h"
 
 

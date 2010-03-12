@@ -139,12 +139,12 @@ public:
     /*!  
     \brief Sets the fixed Image according to TreeNodeSelector widget
     */
-    void FixedSelected(mitk::DataTreeNode::Pointer fixedImage);
+    void FixedSelected(mitk::DataNode::Pointer fixedImage);
 
     /*!  
     \brief Sets the moving Image according to TreeNodeSelector widget
     */
-    void MovingSelected(mitk::DataTreeNode::Pointer movingImage);
+    void MovingSelected(mitk::DataNode::Pointer movingImage);
 
     /*!  
     \brief Calculates registration with vtkLandmarkTransform
@@ -270,10 +270,10 @@ protected:
   Ui::QmitkPointBasedRegistrationControls m_Controls;
   mitk::PointSet::Pointer m_FixedLandmarks;
   mitk::PointSet::Pointer m_MovingLandmarks;
-  mitk::DataTreeNode::Pointer m_MovingPointSetNode;
-  mitk::DataTreeNode::Pointer m_FixedPointSetNode;
-  mitk::DataTreeNode::Pointer m_MovingNode;
-  mitk::DataTreeNode::Pointer m_FixedNode;
+  mitk::DataNode::Pointer m_MovingPointSetNode;
+  mitk::DataNode::Pointer m_FixedPointSetNode;
+  mitk::DataNode::Pointer m_MovingNode;
+  mitk::DataNode::Pointer m_FixedNode;
   std::list<mitk::Geometry3D::Pointer> m_UndoGeometryList;
   std::list<mitk::Geometry3D::Pointer> m_UndoPointsGeometryList;
   std::list<mitk::Geometry3D::Pointer> m_RedoGeometryList;

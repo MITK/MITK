@@ -168,7 +168,7 @@ void QmitkImageGuidedTherapyTutorialView::OnStartIGT()
     mitk::Cone::Pointer cone = mitk::Cone::New();                 //instantiate a new cone
     float scale[] = {10.0, 10.0, 10.0}; 
     cone->GetGeometry()->SetSpacing(scale);                       //scale it a little that so we can see something
-    mitk::DataTreeNode::Pointer node = mitk::DataTreeNode::New(); //generate a new node to store the cone into 
+    mitk::DataNode::Pointer node = mitk::DataNode::New(); //generate a new node to store the cone into 
                                                                   //the DataStorage.
     node->SetData(cone);                          //The data of that node is our cone.
     node->SetName("My tracked object");           //The node has additional properties like a name

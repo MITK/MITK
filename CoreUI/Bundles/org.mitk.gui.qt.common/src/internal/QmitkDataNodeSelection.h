@@ -15,21 +15,21 @@
 
  =========================================================================*/
 
-#include <mitkDataTreeNodeSelection.h>
-#include <mitkDataTreeNode.h>
+#include <mitkDataNodeSelection.h>
+#include <mitkDataNode.h>
 
 #include <berryQtItemSelection.h>
 
 #include <vector>
 
-class QmitkDataTreeNodeSelection: public mitk::DataTreeNodeSelection, public berry::QtItemSelection
+class QmitkDataNodeSelection: public mitk::DataNodeSelection, public berry::QtItemSelection
 {
 public:
 
-  berryObjectMacro(QmitkDataTreeNodeSelection);
+  berryObjectMacro(QmitkDataNodeSelection);
 
-  QmitkDataTreeNodeSelection();
-  QmitkDataTreeNodeSelection(const QItemSelection& sel);
+  QmitkDataNodeSelection();
+  QmitkDataNodeSelection(const QItemSelection& sel);
 
   virtual berry::Object::Pointer GetFirstElement() const;
   virtual iterator Begin() const;

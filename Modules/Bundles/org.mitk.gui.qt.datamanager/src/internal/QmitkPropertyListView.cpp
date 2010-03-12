@@ -4,7 +4,7 @@
 #include <berryISelectionService.h>
 #include "QmitkPropertyListView.h"
 #include <QmitkPropertiesTableEditor.h>
-#include <mitkDataTreeNodeObject.h>
+#include <mitkDataNodeObject.h>
 #include <mitkLogMacros.h>
 #include <QVBoxLayout>
 
@@ -46,20 +46,20 @@ void QmitkPropertyListView::CreateQtPartControl( QWidget* parent )
 
 void QmitkPropertyListView::SelectionChanged( berry::IWorkbenchPart::Pointer, berry::ISelection::ConstPointer selection )
 {
-  mitk::DataTreeNodeSelection::ConstPointer _DataTreeNodeSelection 
-    = selection.Cast<const mitk::DataTreeNodeSelection>();
+  mitk::DataNodeSelection::ConstPointer _DataNodeSelection 
+    = selection.Cast<const mitk::DataNodeSelection>();
 
-  if(_DataTreeNodeSelection.IsNotNull())
+  if(_DataNodeSelection.IsNotNull())
   {
-    std::vector<mitk::DataTreeNode*> selectedNodes;
-    mitk::DataTreeNodeObject* _DataTreeNodeObject = 0;
+    std::vector<mitk::DataNode*> selectedNodes;
+    mitk::DataNodeObject* _DataNodeObject = 0;
 
-    for(mitk::DataTreeNodeSelection::iterator it = _DataTreeNodeSelection->Begin();
-      it != _DataTreeNodeSelection->End(); ++it)
+    for(mitk::DataNodeSelection::iterator it = _DataNodeSelection->Begin();
+      it != _DataNodeSelection->End(); ++it)
     {
-      _DataTreeNodeObject = dynamic_cast<mitk::DataTreeNodeObject*>((*it).GetPointer());
-      if(_DataTreeNodeObject)
-        selectedNodes.push_back( _DataTreeNodeObject->GetDataTreeNode() );
+      _DataNodeObject = dynamic_cast<mitk::DataNodeObject*>((*it).GetPointer());
+      if(_DataNodeObject)
+        selectedNodes.push_back( _DataNodeObject->GetDataNode() );
     }
 
     if(selectedNodes.size() > 0)

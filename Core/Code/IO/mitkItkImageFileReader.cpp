@@ -146,7 +146,7 @@ void mitk::ItkImageFileReader::GenerateData()
 
   buffer = NULL;
   MITK_INFO << "number of image components: "<< image->GetPixelType().GetNumberOfComponents() << std::endl;
-//  mitk::DataTreeNode::Pointer node = this->GetOutput();
+//  mitk::DataNode::Pointer node = this->GetOutput();
 //  node->SetData( image );
 
   // add level-window property

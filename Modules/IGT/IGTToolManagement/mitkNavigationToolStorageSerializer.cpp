@@ -43,7 +43,7 @@ bool mitk::NavigationToolStorageSerializer::Serialize(std::string filename, mitk
 
   for(int i=0; i<storage->GetToolCount();i++)
     {
-    mitk::DataTreeNode::Pointer thisTool = myToolWriter->ConvertToDataTreeNode(storage->GetTool(i));
+    mitk::DataNode::Pointer thisTool = myToolWriter->ConvertToDataNode(storage->GetTool(i));
     saveStorage->Add(thisTool);
     }
 

@@ -28,7 +28,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <berryISelectionProvider.h>
 #include <berryISelectionService.h>
 #include <berryIWorkbenchWindow.h>
-#include <mitkDataTreeNodeObject.h>
+#include <mitkDataNodeObject.h>
 
 #include <mitkTransferFunction.h>
 #include <mitkTransferFunctionProperty.h>
@@ -91,27 +91,27 @@ void QmitkColourImageProcessingView::CreateQtPartControl(QWidget *parent)
 void QmitkColourImageProcessingView::SelectionChanged( berry::IWorkbenchPart::Pointer, berry::ISelection::ConstPointer selection )
 { 
 
-  mitk::DataTreeNodeSelection::ConstPointer _DataTreeNodeSelection 
-    = selection.Cast<const mitk::DataTreeNodeSelection>();
+  mitk::DataNodeSelection::ConstPointer _DataNodeSelection 
+    = selection.Cast<const mitk::DataNodeSelection>();
 
-  if(_DataTreeNodeSelection.IsNotNull())
+  if(_DataNodeSelection.IsNotNull())
   {
-    std::vector<mitk::DataTreeNode*> selectedNodes;
-    mitk::DataTreeNodeObject* _DataTreeNodeObject = 0;
+    std::vector<mitk::DataNode*> selectedNodes;
+    mitk::DataNodeObject* _DataNodeObject = 0;
 
-    for(mitk::DataTreeNodeSelection::iterator it = _DataTreeNodeSelection->Begin();it != _DataTreeNodeSelection->End(); ++it)
+    for(mitk::DataNodeSelection::iterator it = _DataNodeSelection->Begin();it != _DataNodeSelection->End(); ++it)
     {
-      _DataTreeNodeObject = dynamic_cast<mitk::DataTreeNodeObject*>((*it).GetPointer());
-      if(_DataTreeNodeObject)
+      _DataNodeObject = dynamic_cast<mitk::DataNodeObject*>((*it).GetPointer());
+      if(_DataNodeObject)
       {
-        mitk::DataTreeNode::Pointer node = _DataTreeNodeObject->GetDataTreeNode();
+        mitk::DataNode::Pointer node = _DataNodeObject->GetDataNode();
       
         if( node.IsNotNull() && dynamic_cast<mitk::Image*>(node->GetData())&&dynamic_cast<mitk::Image*>(node->GetData())->GetDimension()>=3   )
           selectedNodes.push_back( node );
       }
     }
   
-    mitk::DataTreeNode::Pointer node;
+    mitk::DataNode::Pointer node;
     
     if(selectedNodes.size() > 0)
       node=selectedNodes[0];
@@ -127,7 +127,7 @@ void QmitkColourImageProcessingView::SelectionChanged( berry::IWorkbenchPart::Po
 
       if(selectedNodes.size() > 1)
       {
-        mitk::DataTreeNode::Pointer node2;
+        mitk::DataNode::Pointer node2;
         node2=selectedNodes[1];
         m_SelectedNode2=node2;
         infoText = infoText + " and " + node2->GetName();
@@ -182,7 +182,7 @@ void QmitkColourImageProcessingView::OnConvertToRGBAImage()
     RGBAImageResult = CImageProcessor.convertToRGBAImage(dynamic_cast<mitk::Image*>(m_SelectedNode->GetData()),tf);
   }
   
-  mitk::DataTreeNode::Pointer dtn = mitk::DataTreeNode::New();
+  mitk::DataNode::Pointer dtn = mitk::DataNode::New();
   
   dtn->SetData( RGBAImageResult );
   
@@ -222,7 +222,7 @@ void QmitkColourImageProcessingView::OnConvertImageMaskColorToRGBAImage( )
     RGBAImageResult = CImageProcessor.convertToRGBAImage(dynamic_cast<mitk::Image*>(m_SelectedNode->GetData()),tf);
   }
   
-  mitk::DataTreeNode::Pointer dtn = mitk::DataTreeNode::New();
+  mitk::DataNode::Pointer dtn = mitk::DataNode::New();
   
   dtn->SetData( RGBAImageResult );
   
@@ -264,7 +264,7 @@ void QmitkColourImageProcessingView::OnCombineRGBA( )
   
    RGBAImageResult = CImageProcessor.combineRGBAImage(dynamic_cast<mitk::Image*>(m_SelectedNode->GetData()),dynamic_cast<mitk::Image*>(m_SelectedNode2->GetData()));
   MITK_INFO <<"RGBAImage Result";
-  mitk::DataTreeNode::Pointer dtn = mitk::DataTreeNode::New();
+  mitk::DataNode::Pointer dtn = mitk::DataNode::New();
   
   dtn->SetData( RGBAImageResult );
   

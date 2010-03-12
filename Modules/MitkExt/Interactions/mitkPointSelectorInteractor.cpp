@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkPositionEvent.h>
 #include <mitkOperationEvent.h>
 //#include "mitkStatusBar.h"
-#include <mitkDataTreeNode.h>
+#include <mitkDataNode.h>
 #include <mitkPointSet.h>
 #include <mitkInteractionConst.h>
 #include <mitkAction.h>
@@ -32,7 +32,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkState.h>
 
 
-mitk::PointSelectorInteractor::PointSelectorInteractor(const char * type, DataTreeNode* dataTreeNode)
+mitk::PointSelectorInteractor::PointSelectorInteractor(const char * type, DataNode* dataTreeNode)
 : Interactor(type, dataTreeNode), m_LastPosition(0)
 {
   m_LastPoint.Fill(0);
@@ -43,7 +43,7 @@ mitk::PointSelectorInteractor::~PointSelectorInteractor()
 
 void mitk::PointSelectorInteractor::SelectPoint(int position)
 {
-  mitk::PointSet* pointSet = dynamic_cast<mitk::PointSet*>(m_DataTreeNode->GetData());
+  mitk::PointSet* pointSet = dynamic_cast<mitk::PointSet*>(m_DataNode->GetData());
   if (pointSet == NULL)
     return;
   if (pointSet->GetSize()<=0)//if List is empty, then no select of a point can be done!
@@ -63,7 +63,7 @@ void mitk::PointSelectorInteractor::SelectPoint(int position)
 
 void mitk::PointSelectorInteractor::DeselectAllPoints()
 {
-  mitk::PointSet* pointSet = dynamic_cast<mitk::PointSet*>(m_DataTreeNode->GetData());
+  mitk::PointSet* pointSet = dynamic_cast<mitk::PointSet*>(m_DataNode->GetData());
   if (pointSet == NULL)
     return;
 
@@ -127,7 +127,7 @@ float mitk::PointSelectorInteractor::CalculateJurisdiction(StateEvent const* sta
   }
 
   //check on the right data-type
-  mitk::PointSet* pointSet = dynamic_cast<mitk::PointSet*>(m_DataTreeNode->GetData());
+  mitk::PointSet* pointSet = dynamic_cast<mitk::PointSet*>(m_DataNode->GetData());
   if (pointSet == NULL)
     return 0;
 
@@ -138,7 +138,7 @@ float mitk::PointSelectorInteractor::CalculateJurisdiction(StateEvent const* sta
   float p[3];
   itk2vtk(worldPoint, p);
   //transforming the Worldposition to local coordinatesystem
-  m_DataTreeNode->GetData()->GetGeometry()->GetVtkTransform()->GetInverse()->TransformPoint(p, p);
+  m_DataNode->GetData()->GetGeometry()->GetVtkTransform()->GetInverse()->TransformPoint(p, p);
   vtk2itk(p, worldPoint);
 
   float distance = 5;
@@ -177,7 +177,7 @@ bool mitk::PointSelectorInteractor::ExecuteAction( Action* action, mitk::StateEv
   bool ok = false;//for return type bool
 
   //checking corresponding Data; has to be a PointSet or a subclass
-  mitk::PointSet* pointSet = dynamic_cast<mitk::PointSet*>(m_DataTreeNode->GetData());
+  mitk::PointSet* pointSet = dynamic_cast<mitk::PointSet*>(m_DataNode->GetData());
   if (pointSet == NULL)
     return false;
 

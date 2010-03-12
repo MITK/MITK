@@ -15,7 +15,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#include "mitkDataTreeNode.h"
+#include "mitkDataNode.h"
 
 #include <vtkWindow.h>
 #include "mitkVtkPropRenderer.h"
@@ -78,12 +78,12 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 /**
- *  Extended test for mitk::DataTreeNode. A number of tests from the core test
- *  mitkDataTreeNodeTest are assumed to pass!
+ *  Extended test for mitk::DataNode. A number of tests from the core test
+ *  mitkDataNodeTest are assumed to pass!
  */
-class mitkDataTreeNodeExtTestClass { public:
+class mitkDataNodeExtTestClass { public:
 
-static void TestDataSetting(mitk::DataTreeNode::Pointer dataTreeNode)
+static void TestDataSetting(mitk::DataNode::Pointer dataTreeNode)
 {
 
   mitk::BaseData::Pointer baseData; 
@@ -125,7 +125,7 @@ static void TestDataSetting(mitk::DataTreeNode::Pointer dataTreeNode)
   MITK_TEST_CONDITION( baseData == dataTreeNode->GetData(), "Testing if a UnstructuredGrid object was set correctly" )
 }
 
-static void TestMapperSetting(mitk::DataTreeNode::Pointer dataTreeNode)
+static void TestMapperSetting(mitk::DataNode::Pointer dataTreeNode)
 {
   //tests the SetMapper() method
   //in dataTreeNode is a mapper vector which can be accessed by index
@@ -139,75 +139,75 @@ static void TestMapperSetting(mitk::DataTreeNode::Pointer dataTreeNode)
   mapper = mitk::ContourMapper2D::New();
   dataTreeNode->SetMapper(1,mapper);
   MITK_TEST_CONDITION( mapper == dataTreeNode->GetMapper(1), "Testing if a ContourMapper2D was set correctly" )
-  MITK_TEST_CONDITION( dataTreeNode == mapper->GetDataTreeNode(), "Testing if the mapper returns the right DataTreeNode" )
+  MITK_TEST_CONDITION( dataTreeNode == mapper->GetDataNode(), "Testing if the mapper returns the right DataNode" )
 
   mapper = mitk::ContourSetMapper2D::New();
   dataTreeNode->SetMapper(1,mapper);
   MITK_TEST_CONDITION( mapper == dataTreeNode->GetMapper(1), "Testing if a ContourSetMapper2D was set correctly" )
-  MITK_TEST_CONDITION( dataTreeNode == mapper->GetDataTreeNode(), "Testing if the mapper returns the right DataTreeNode" )
+  MITK_TEST_CONDITION( dataTreeNode == mapper->GetDataNode(), "Testing if the mapper returns the right DataNode" )
   
   mapper = mitk::MeshMapper2D::New();
   dataTreeNode->SetMapper(1,mapper);
   MITK_TEST_CONDITION( mapper == dataTreeNode->GetMapper(1), "Testing if a MeshMapper2D was set correctly" )
-  MITK_TEST_CONDITION( dataTreeNode == mapper->GetDataTreeNode(), "Testing if the mapper returns the right DataTreeNode" )
+  MITK_TEST_CONDITION( dataTreeNode == mapper->GetDataNode(), "Testing if the mapper returns the right DataNode" )
 
   mapper = mitk::UnstructuredGridMapper2D::New();
   dataTreeNode->SetMapper(1,mapper);
   MITK_TEST_CONDITION( mapper == dataTreeNode->GetMapper(1), "Testing if a UnstructuredGridMapper2D was set correctly" )
-  MITK_TEST_CONDITION( dataTreeNode == mapper->GetDataTreeNode(), "Testing if the mapper returns the right DataTreeNode" )
+  MITK_TEST_CONDITION( dataTreeNode == mapper->GetDataNode(), "Testing if the mapper returns the right DataNode" )
 
   mapper = mitk::LineMapper2D::New();
   dataTreeNode->SetMapper(1,mapper);
   MITK_TEST_CONDITION( mapper == dataTreeNode->GetMapper(1), "Testing if a LineMapper2D was set correctly" )
-  MITK_TEST_CONDITION( dataTreeNode == mapper->GetDataTreeNode(), "Testing if the mapper returns the right DataTreeNode" )
+  MITK_TEST_CONDITION( dataTreeNode == mapper->GetDataNode(), "Testing if the mapper returns the right DataNode" )
 
   mapper = mitk::SplineMapper2D::New();
   dataTreeNode->SetMapper(1,mapper);
   MITK_TEST_CONDITION( mapper == dataTreeNode->GetMapper(1), "Testing if a SplineMapper2D was set correctly" )
-  MITK_TEST_CONDITION( dataTreeNode == mapper->GetDataTreeNode(), "Testing if the mapper returns the right DataTreeNode" )
+  MITK_TEST_CONDITION( dataTreeNode == mapper->GetDataNode(), "Testing if the mapper returns the right DataNode" )
 
   //3D Mappers
   mapper = mitk::ContourSetVtkMapper3D::New();
   dataTreeNode->SetMapper(1,mapper);
   MITK_TEST_CONDITION( mapper == dataTreeNode->GetMapper(1), "Testing if a ContourSetVtkMapper3D was set correctly" )
-  MITK_TEST_CONDITION( dataTreeNode == mapper->GetDataTreeNode(), "Testing if the mapper returns the right DataTreeNode" )
+  MITK_TEST_CONDITION( dataTreeNode == mapper->GetDataNode(), "Testing if the mapper returns the right DataNode" )
 
   mapper = mitk::ContourVtkMapper3D::New();
   dataTreeNode->SetMapper(1,mapper);
   MITK_TEST_CONDITION( mapper == dataTreeNode->GetMapper(1), "Testing if a ContourVtkMapper3D was set correctly" )
-  MITK_TEST_CONDITION( dataTreeNode == mapper->GetDataTreeNode(), "Testing if the mapper returns the right DataTreeNode" )
+  MITK_TEST_CONDITION( dataTreeNode == mapper->GetDataNode(), "Testing if the mapper returns the right DataNode" )
 
   mapper = mitk::MeshVtkMapper3D::New();
   dataTreeNode->SetMapper(1,mapper);
   MITK_TEST_CONDITION( mapper == dataTreeNode->GetMapper(1), "Testing if a MeshVtkMapper3D was set correctly" )
-  MITK_TEST_CONDITION( dataTreeNode == mapper->GetDataTreeNode(), "Testing if the mapper returns the right DataTreeNode" )
+  MITK_TEST_CONDITION( dataTreeNode == mapper->GetDataNode(), "Testing if the mapper returns the right DataNode" )
 
   mapper = mitk::PointDataVtkMapper3D::New();
   dataTreeNode->SetMapper(1,mapper);
   MITK_TEST_CONDITION( mapper == dataTreeNode->GetMapper(1), "Testing if a PointDataVtkMapper3D was set correctly" )
-  MITK_TEST_CONDITION( dataTreeNode == mapper->GetDataTreeNode(), "Testing if the mapper returns the right DataTreeNode" )
+  MITK_TEST_CONDITION( dataTreeNode == mapper->GetDataNode(), "Testing if the mapper returns the right DataNode" )
 
   mapper = mitk::UnstructuredGridVtkMapper3D::New();
   dataTreeNode->SetMapper(1,mapper);
   MITK_TEST_CONDITION( mapper == dataTreeNode->GetMapper(1), "Testing if a UnstructuredGridVtkMapper3D was set correctly" )
-  MITK_TEST_CONDITION( dataTreeNode == mapper->GetDataTreeNode(), "Testing if the mapper returns the right DataTreeNode" )
+  MITK_TEST_CONDITION( dataTreeNode == mapper->GetDataNode(), "Testing if the mapper returns the right DataNode" )
 
   //linker error
   //mapper = mitk::LineVtkMapper3D::New();
   //dataTreeNode->SetMapper(1,mapper);
   //MITK_TEST_CONDITION( mapper == dataTreeNode->GetMapper(1), "Testing if a LineVtkMapper3D was set correctly" )
-  //MITK_TEST_CONDITION( dataTreeNode == mapper->GetDataTreeNode(), "Testing if the mapper returns the right DataTreeNode" )
+  //MITK_TEST_CONDITION( dataTreeNode == mapper->GetDataNode(), "Testing if the mapper returns the right DataNode" )
 
   mapper = mitk::SplineVtkMapper3D::New();
   dataTreeNode->SetMapper(1,mapper);
   MITK_TEST_CONDITION( mapper == dataTreeNode->GetMapper(1), "Testing if a SplineVtkMapper3D was set correctly" )
-  MITK_TEST_CONDITION( dataTreeNode == mapper->GetDataTreeNode(), "Testing if the mapper returns the right DataTreeNode" )
+  MITK_TEST_CONDITION( dataTreeNode == mapper->GetDataNode(), "Testing if the mapper returns the right DataNode" )
 }
-static void TestInteractorSetting(mitk::DataTreeNode::Pointer dataTreeNode)
+static void TestInteractorSetting(mitk::DataNode::Pointer dataTreeNode)
 {
 
   //this method tests the SetInteractor() and GetInteractor methods
-  //the Interactor base class calls the DataTreeNode->SetInteractor method
+  //the Interactor base class calls the DataNode->SetInteractor method
 
   mitk::Interactor::Pointer interactor;
 
@@ -237,28 +237,28 @@ static void TestInteractorSetting(mitk::DataTreeNode::Pointer dataTreeNode)
 
 };
 
-int mitkDataTreeNodeExtTest(int /* argc */, char* /*argv*/[])
+int mitkDataNodeExtTest(int /* argc */, char* /*argv*/[])
 {
   // always start with this!
-  MITK_TEST_BEGIN("DataTreeNode")
+  MITK_TEST_BEGIN("DataNode")
 
   // Global interaction must(!) be initialized
   mitk::GlobalInteraction::GetInstance()->Initialize("global");
 
   // let's create an object of our class  
-  mitk::DataTreeNode::Pointer myDataTreeNode = mitk::DataTreeNode::New();
+  mitk::DataNode::Pointer myDataNode = mitk::DataNode::New();
 
   // first test: did this work?
   // using MITK_TEST_CONDITION_REQUIRED makes the test stop after failure, since
   // it makes no sense to continue without an object.
-  MITK_TEST_CONDITION_REQUIRED(myDataTreeNode.IsNotNull(),"Testing instantiation") 
+  MITK_TEST_CONDITION_REQUIRED(myDataNode.IsNotNull(),"Testing instantiation") 
 
   //test setData() Method
-  mitkDataTreeNodeExtTestClass::TestDataSetting(myDataTreeNode);
-  mitkDataTreeNodeExtTestClass::TestMapperSetting(myDataTreeNode);
+  mitkDataNodeExtTestClass::TestDataSetting(myDataNode);
+  mitkDataNodeExtTestClass::TestMapperSetting(myDataNode);
   
   //note, that no data is set to the dataTreeNode
-  mitkDataTreeNodeExtTestClass::TestInteractorSetting(myDataTreeNode);
+  mitkDataNodeExtTestClass::TestInteractorSetting(myDataNode);
 
   // write your own tests here and use the macros from mitkTestingMacros.h !!!
   // do not write to std::cout and do not return from this function yourself!

@@ -53,7 +53,7 @@ namespace mitk
     
     /// if autoTopMost == true: sets the topmost layer image to be affected by changes
     /// if removedNode != NULL a node was removed from DataStorage
-    void SetAutoTopMostImage(bool autoTopMost, const mitk::DataTreeNode* removedNode = NULL);
+    void SetAutoTopMostImage(bool autoTopMost, const mitk::DataNode* removedNode = NULL);
 
     void Update(const itk::EventObject& e);  ///< gets called if a visible property changes
 
@@ -77,10 +77,10 @@ namespace mitk
     bool isAutoTopMost();
   
     /// Change notifications from DataStorage
-    void DataStorageChanged(const mitk::DataTreeNode* n = NULL);
+    void DataStorageChanged(const mitk::DataNode* n = NULL);
 
     /// Node removal notifications from DataStorage
-    void DataStorageRemovedNode(const mitk::DataTreeNode* removedNode = NULL);
+    void DataStorageRemovedNode(const mitk::DataNode* removedNode = NULL);
 
     /// change notifications from mitkLevelWindowProperty
     void OnPropertyModified(const itk::EventObject& e);
@@ -100,8 +100,8 @@ namespace mitk
     DataStorage::Pointer         m_DataStorage;
     LevelWindowProperty::Pointer m_LevelWindowProperty; ///< pointer to the LevelWindowProperty of the current image
     typedef std::map<unsigned long, mitk::BaseProperty::Pointer> ObserverToPropertyMap;
-    ObserverToPropertyMap        m_PropObserverToNode; ///< map to hold observer ID큦 to every visible property of DataTreeNode큦 BaseProperty
-    ObserverToPropertyMap        m_PropObserverToNode2; ///< map to hold observer ID큦 to every layer property of DataTreeNode큦 BaseProperty
+    ObserverToPropertyMap        m_PropObserverToNode; ///< map to hold observer ID큦 to every visible property of DataNode큦 BaseProperty
+    ObserverToPropertyMap        m_PropObserverToNode2; ///< map to hold observer ID큦 to every layer property of DataNode큦 BaseProperty
     bool                         m_AutoTopMost;
     unsigned long                m_ObserverTag;
     bool                         m_IsObserverTagSet;

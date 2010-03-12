@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkProperties.h"
 #include "mitkBaseRenderer.h"
-#include "mitkDataTreeNode.h"
+#include "mitkDataNode.h"
 
 #include "mitkNrrdDiffusionImageIOFactory.h"
 #include "mitkNrrdDiffusionImageWriterFactory.h"
@@ -94,7 +94,7 @@ itk::Object::Pointer mitk::DiffusionImagingObjectFactory::CreateCoreObject( cons
 }
 
 
-mitk::Mapper::Pointer mitk::DiffusionImagingObjectFactory::CreateMapper(mitk::DataTreeNode* node, MapperSlotId id) 
+mitk::Mapper::Pointer mitk::DiffusionImagingObjectFactory::CreateMapper(mitk::DataNode* node, MapperSlotId id) 
 {
   mitk::Mapper::Pointer newMapper=NULL;
 
@@ -104,19 +104,19 @@ mitk::Mapper::Pointer mitk::DiffusionImagingObjectFactory::CreateMapper(mitk::Da
     if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
     {
       newMapper = mitk::CompositeMapper::New();
-      newMapper->SetDataTreeNode(node);
+      newMapper->SetDataNode(node);
     }
     classname = "TensorImage";
     if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
     {
       newMapper = mitk::CompositeMapper::New();
-      newMapper->SetDataTreeNode(node);
+      newMapper->SetDataNode(node);
     }
     classname = "DiffusionImage";
     if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
     {
       newMapper = mitk::DiffusionImageMapper<short>::New();
-      newMapper->SetDataTreeNode(node);
+      newMapper->SetDataNode(node);
     }
   }
   else if ( id == mitk::BaseRenderer::Standard3D )
@@ -127,7 +127,7 @@ mitk::Mapper::Pointer mitk::DiffusionImagingObjectFactory::CreateMapper(mitk::Da
   return newMapper;
 }
 
-void mitk::DiffusionImagingObjectFactory::SetDefaultProperties(mitk::DataTreeNode* node)
+void mitk::DiffusionImagingObjectFactory::SetDefaultProperties(mitk::DataNode* node)
 {
   std::string classname = "QBallImage";
   if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)

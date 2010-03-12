@@ -479,14 +479,14 @@ QList<unsigned int> QmitkNDIConfigurationWidget::GetToolsByToolType( QString too
 }
 
 
-mitk::DataTreeNode* QmitkNDIConfigurationWidget::GetNode( unsigned int index ) const
+mitk::DataNode* QmitkNDIConfigurationWidget::GetNode( unsigned int index ) const
 {
   
   if (m_Controls == NULL)
     return NULL;
   QAbstractItemModel* model = m_Controls->m_ToolTable->model();
   QVariant data = model->data(model->index(index, QmitkNDIToolDelegate::NodeCol), QmitkNDIToolDelegate::OrganNodeRole);
-  return data.value<mitk::DataTreeNode*>();
+  return data.value<mitk::DataNode*>();
 }
 
 

@@ -49,13 +49,13 @@ public:
       msgBox.setIcon(QMessageBox::Warning);
 
 
-    QPushButton* defaultButton;
+    QPushButton* defaultButton(NULL);
     for (std::size_t i = 0; i < dialogButtonLabels.size(); ++i)
     {
       QPushButton* button = msgBox.addButton(QString::fromStdString(dialogButtonLabels[i]),
           QMessageBox::ActionRole);
       mapButtonToIndex[(QAbstractButton*)button] = i;
-      if (i == defaultIndex)
+      if (i == (std::size_t)defaultIndex)
         defaultButton = button;
     }
 

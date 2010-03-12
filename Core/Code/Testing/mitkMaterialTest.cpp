@@ -96,7 +96,6 @@ void testConstructor()
 
   void testConstructorColorColorCoefficientSpecularCoefficientSpecularPowerOpacity()
   {
-    mitk::BaseRenderer *renderer = NULL;
     mitk::Material::Color color;
     color.Set(0, 0, 0);
     vtkFloatingPointType opacity = 1.0f;

@@ -106,6 +106,7 @@ bool ObjectItem::operator==(const ObjectItem& item) const
   case SMARTPOINTER:
     return spId == item.spId;
   };
+  return false;
 }
 
 }

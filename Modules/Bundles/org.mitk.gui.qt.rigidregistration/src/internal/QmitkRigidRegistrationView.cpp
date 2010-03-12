@@ -310,7 +310,7 @@ void QmitkRigidRegistrationView::Visible()
   if (m_SelListener.IsNull())
   {
     m_SelListener = berry::ISelectionListener::Pointer(new SelListenerRigidRegistration(this));
-    this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddPostSelectionListener(/*"org.mitk.views.datamanager",* / m_SelListener);
+    this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddPostSelectionListener("org.mitk.views.datamanager", m_SelListener);
     berry::ISelection::ConstPointer sel(
       this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection("org.mitk.views.datamanager"));
     m_CurrentSelection = sel.Cast<const IStructuredSelection>();

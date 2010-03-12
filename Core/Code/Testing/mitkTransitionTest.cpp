@@ -84,7 +84,7 @@ int mitkTransitionTest(int /*argc*/, char* /*argv*/[])
   mitk::Transition::ActionVectorConstIterator end = transition->GetActionEndIterator();
   while (iter != end)
   {
-    if((*iter)->GetActionId()!=count)
+    if((*iter)->GetActionId()!=(int)count)
     {
       std::cout<<"[FAILED]"<<std::endl;
       return EXIT_FAILURE;

@@ -110,7 +110,7 @@ const std::size_t CountExpression::HASH_INITIAL = Poco::Hash<std::string>()("ber
       case ONE_OR_MORE:
       return EvaluationResult::ValueOf(size >= 1);
       case EXACT:
-      return EvaluationResult::ValueOf(fSize == size);
+      return EvaluationResult::ValueOf( (ObjectVector<Object::Pointer>::size_type) fSize == size);
       case ANY_NUMBER:
       return EvaluationResult::TRUE_EVAL;
     }

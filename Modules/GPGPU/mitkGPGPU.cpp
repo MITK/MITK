@@ -228,7 +228,7 @@ void mitk::GPGPU::Texture::Download(TextureFormat inputformat,void *dst)
   }
 }
 
-static char *stubVertexShader =
+static char stubVertexShader[] =
   "void main() { gl_Position = vec4( 2*gl_Vertex.xy-1,0,1 ); }\n";
 
 

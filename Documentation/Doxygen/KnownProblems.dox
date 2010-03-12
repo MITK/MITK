@@ -5,9 +5,6 @@
 \li "Installing" MITK via cmake (or using "make install") is not yet supported.
 \li Sometimes remote X sessions will display black rendering windows. It is not 
     known whether this is a problem within MITK or within the X implementation.
-\li During automated testing in dartclients (ctest) some graphical tests do not 
-    close Qt messageboxes properly. Affects e.g. InteractiveSegmentation. We did
-    not find a way to get this working. Seems to be a problem with ctest or Xvfb (was bug #1152)
 \li MITK CHILI plugin has limitations when working with DICOMDIR data sources (bug #1756)
 
 */

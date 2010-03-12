@@ -126,6 +126,66 @@ int TestCase1210()
   return EXIT_SUCCESS;
 }
 
+/**
+ * @brief This method reproduces the bug #3409.
+ */
+int TestCase3409()
+{
+  mitk::PlaneGeometry::Pointer myPlaneGeometry = mitk::PlaneGeometry::New();
+ 
+  //create normal
+  mitk::Vector3D normal; 
+  normal[0] = 0; 
+  normal[1] = 0; 
+  normal[2] = 1; 
+  
+  //create origin
+  mitk::Point3D point; 
+  point[0] = -27.582859; 
+  point[1] = 50; 
+  point[2] = 200.27742;
+
+  //initialize plane geometry
+  myPlaneGeometry->InitializePlane(point,normal);
+
+  //output to descripe the test
+  std::cout << "Testing PlaneGeometry according to bug #3409" << std::endl;
+  std::cout << "Our normal is: " << normal << std::endl;
+  std::cout << "So ALL projected points should have exactly the same z-value!" << std::endl;
+
+  //create point1
+  mitk::Point3D myPoint1; 
+  myPoint1[0] = -27.582859; 
+  myPoint1[1] = 50.00;   
+  myPoint1[2] = 200.27742;
+
+  //create point2
+  mitk::Point3D myPoint2; 
+  myPoint2[0] = -26.58662; 
+  myPoint2[1] = 50.00; 
+  myPoint2[2] = 200.19026;
+
+  //project both points
+  mitk::Point3D projectedPoint1 = myPlaneGeometry->ProjectPointOntoPlane(myPoint1); 
+  mitk::Point3D projectedPoint2 = myPlaneGeometry->ProjectPointOntoPlane(myPoint2);
+
+  //output to show the problem
+  std::cout << "Point1: " << myPoint1 << "=> " << "Projected Point1: " << projectedPoint1 << std::endl;
+  std::cout << "Point2: " << myPoint2 << "=> " << "Projected Point2: " << projectedPoint2 << std::endl;
+
+  //now compare the z-values
+  if (projectedPoint1[2] != projectedPoint2[2])
+    {
+    std::cout<<"[FAILED]"<<std::endl;
+    return EXIT_FAILURE;
+    }
+  else
+    {
+    std::cout<<"[PASSED]"<<std::endl;
+    return EXIT_SUCCESS;
+    }
+}
+
 int mitkPlaneGeometryTest(int /*argc*/, char* /*argv*/[])
 {
   int result;
@@ -134,6 +194,14 @@ int mitkPlaneGeometryTest(int /*argc*/, char* /*argv*/[])
   // the following can be used to reproduce a bug in ITK matrix inversion
   // which was found while investigating bug #1210.
   result = TestCase1210();
+  if(result!=EXIT_SUCCESS)
+    return result;
+  */
+
+  /*
+  // the following can be used to reproduce a bug in mitk::PlaneGeometry
+  // which is described in bug #3409.
+  result = TestCase3409();
   if(result!=EXIT_SUCCESS)
     return result;
   */
@@ -722,8 +790,6 @@ int mitkPlaneGeometryTest(int /*argc*/, char* /*argv*/[])
   result = mappingTests2D(planegeometry, width, height, widthInMM, heightInMM, backsideorigin, right, -bottom);
   if(result!=EXIT_SUCCESS)
     return result;
-
-
 
   std::cout<<"[TEST DONE]"<<std::endl;
   return EXIT_SUCCESS;

@@ -24,7 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 int mitkPlaneFitTest(int, char*[] )
 {
-  float bounds[]={0.0f,10.0f,0.0f,10.0f,0.0f,5.0f};
+  //float bounds[]={0.0f,10.0f,0.0f,10.0f,0.0f,5.0f};
 
   mitk::PlaneFit::Pointer PlaneFit = mitk::PlaneFit::New();
   mitk::PointSet::Pointer PointSet = mitk::PointSet::New();

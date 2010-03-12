@@ -8,5 +8,6 @@ SET(CTEST_CUSTOM_WARNING_EXCEPTION
   "QtCore"
   "QtGui"
   "vtkCellArray.h"
+  "itkNonUniformBSpline.txx"
 )
 

@@ -74,8 +74,6 @@ QmitkMeasurement::QmitkMeasurement() :
 QmitkMeasurement::~QmitkMeasurement()
 {
 
-  this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->RemovePostSelectionListener(
-      m_SelectionListener);
   m_MeasurementInfoRenderer->Delete();
 
   this->GetDefaultDataStorage()->AddNodeEvent -= mitk::MessageDelegate1<QmitkMeasurement
@@ -216,59 +214,30 @@ void QmitkMeasurement::CreateQtPartControl(QWidget* parent)
   m_SelectedImageNode->NodeRemoved.AddListener( mitk::MessageDelegate1<QmitkMeasurement
     , const mitk::DataTreeNode*>( this, &QmitkMeasurement::NodeRemoved ) );
 
-  // Initialize selection listener mechanism
-  m_SelectionListener = berry::ISelectionListener::Pointer(
-      new berry::SelectionChangedAdapter<QmitkMeasurement>(this,
-          &QmitkMeasurement::SelectionChanged));
-  this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddPostSelectionListener(
-      m_SelectionListener);
-  berry::ISelection::ConstPointer
-      selection(
-          this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection(
-              "org.mitk.views.datamanager"));
-  if (selection.IsNotNull())
-    this->SelectionChanged(berry::IWorkbenchPart::Pointer(0), selection);
-
-  m_SelectionProvider = new mitk::MeasurementSelectionProvider;
-
-  this->GetSite()->SetSelectionProvider(m_SelectionProvider);
   this->GetDefaultDataStorage()->AddNodeEvent.AddListener( mitk::MessageDelegate1<QmitkMeasurement
     , const mitk::DataTreeNode*>( this, &QmitkMeasurement::NodeAddedInDataStorage ) );
 
 }
 
-void QmitkMeasurement::SelectionChanged(
-    berry::IWorkbenchPart::Pointer sourcepart,
-    berry::ISelection::ConstPointer selection)
+void QmitkMeasurement::OnSelectionChanged(std::vector<mitk::DataTreeNode*> nodes)
 {
-  if ( sourcepart.GetPointer() == this)
-    return;
-
-  mitk::DataTreeNodeSelection::ConstPointer _DataTreeNodeSelection =
-      selection.Cast<const mitk::DataTreeNodeSelection> ();
-  if (_DataTreeNodeSelection.IsNull())
-    return;
+  if (nodes.empty()) return;
 
   m_SelectedImageNode->RemoveAllNodes();
 
-  mitk::DataTreeNodeObject* _DataTreeNodeObject = 0;
   mitk::DataTreeNode* _DataTreeNode = 0;
   mitk::BaseData* _BaseData;
   mitk::PlanarFigure* _PlanarFigure;
   mitk::Image* selectedImage;
   m_SelectedPlanarFigures->RemoveAllNodes();
 
-  for (mitk::DataTreeNodeSelection::iterator it =
-      _DataTreeNodeSelection->Begin(); it != _DataTreeNodeSelection->End(); ++it)
+  for (std::vector<mitk::DataTreeNode*>::iterator it = nodes.begin();
+      it != nodes.end(); 
+      ++it)
   {
     _PlanarFigure = 0;
 
-    _DataTreeNodeObject
-        = dynamic_cast<mitk::DataTreeNodeObject*> ((*it).GetPointer());
-    if (!_DataTreeNodeObject)
-      continue;
-
-    _DataTreeNode = _DataTreeNodeObject->GetDataTreeNode();
+    _DataTreeNode = *it;
 
     if (!_DataTreeNode)
       continue;
@@ -520,8 +489,6 @@ void QmitkMeasurement::AddFigureToDataStorage(mitk::PlanarFigure* figure, const 
   this->GetDataStorage()->Add(newNode, m_SelectedImageNode->GetNode());
 
   *m_SelectedPlanarFigures = m_CurrentFigureNode;
-  //m_SelectionProvider->FireSelectionChanged(
-      //mitk::DataTreeNodeSelection::Pointer(new mitk::DataTreeNodeSelection(m_CurrentFigureNode.GetPointer())));
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }

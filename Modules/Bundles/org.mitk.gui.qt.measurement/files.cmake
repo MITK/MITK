@@ -5,7 +5,6 @@ SET(SRC_CPP_FILES
 SET(INTERNAL_CPP_FILES
   QmitkMeasurement.cpp
   QmitkPlanarFiguresTableModel.cpp
-  mitkMeasurementSelectionProvider.cpp
 )
 
 SET(UI_FILES

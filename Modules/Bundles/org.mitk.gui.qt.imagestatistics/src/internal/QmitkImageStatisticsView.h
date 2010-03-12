@@ -77,14 +77,11 @@ public:
   bool IsExclusiveFunctionality() const;
 
   virtual bool event( QEvent *event );
+
+  void OnSelectionChanged( std::vector<mitk::DataTreeNode*> nodes );
   
 protected slots:  
-  /*
-  * When an image is selected through the data tree combo box.
-  */
-  void onImageSelected(const mitk::DataTreeNode* item);
-  void onImageSelected2(const mitk::DataTreeNode* item);
-
+  
   void UpdateTimestep();
 
   void ClipboardHistogramButtonClicked();
@@ -100,7 +97,6 @@ protected slots:
   void ClipboardToFile(int count, std::string imageName1, std::string imageName2, std::string filename, bool appendToFile, bool matlab );
 
 protected: 
-  void UpdateCurrentSelection();
 
   void StdMultiWidgetAvailable( QmitkStdMultiWidget& stdMultiWidget );
 
@@ -108,10 +104,6 @@ protected:
     const mitk::Image *image );
 
   void InvalidateStatisticsTableView();
-
-  /** \brief Invoked when the DataManager selection changed */
-  virtual void SelectionChanged(berry::IWorkbenchPart::Pointer part,
-    berry::ISelection::ConstPointer selection);
 
   /** \brief Issues a request to update statistics by sending an event to the
   * Qt event processing queue.
@@ -150,11 +142,6 @@ protected:
 
   QString                     m_Clipboard;
 
-
-  // Selection service
-  berry::IStructuredSelection::ConstPointer m_CurrentSelection;
-  berry::ISelectionListener::Pointer m_SelectionListener;
-
   // Image and mask data
   mitk::DataTreeNode *m_SelectedImageNode;
   mitk::Image *m_SelectedImage;
@@ -179,17 +166,5 @@ protected:
   bool m_StatisticsUpdatePending;
 };
 
-
-class QmitkRequestStatisticsUpdateEvent : public QEvent
-{
-public:
-  enum Type
-  {
-    StatisticsUpdateRequest = QEvent::MaxUser - 1025
-  };
-
-  QmitkRequestStatisticsUpdateEvent()
-    : QEvent( (QEvent::Type) StatisticsUpdateRequest ) {};
-};
 
 #endif // !defined(QmitkImageStatistics_H__INCLUDED)

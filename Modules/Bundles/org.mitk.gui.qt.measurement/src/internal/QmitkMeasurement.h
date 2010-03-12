@@ -29,7 +29,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkWeakPointer.h>
 #include <mitkPlanarFigure.h>
 #include <mitkDataStorageSelection.h>
-#include "internal/mitkMeasurementSelectionProvider.h"
 
 #include <QmitkFunctionality.h>
 #include <QmitkStandardViews.h>
@@ -110,8 +109,7 @@ class QmitkMeasurement : public QObject, public QmitkFunctionality
     /// All selected planarfigures will be added to m_SelectedPlanarFigures.
     /// Then PlanarFigureSelectionChanged is called
     ///
-    virtual void SelectionChanged(berry::IWorkbenchPart::Pointer part
-      , berry::ISelection::ConstPointer selection);
+    virtual void OnSelectionChanged(std::vector<mitk::DataTreeNode*> nodes);
   
   public slots:
     ///
@@ -167,7 +165,6 @@ protected:
   /// berry::SelectionChangedAdapter<QmitkPropertyListView> must be a friend to call
   friend struct berry::SelectionChangedAdapter<QmitkMeasurement>;
   berry::ISelectionListener::Pointer m_SelectionListener;
-  mitk::MeasurementSelectionProvider::Pointer m_SelectionProvider;
 
   mitk::DataStorageSelection::Pointer m_SelectedPlanarFigures;
   /// Selected image on which measurements will be performed

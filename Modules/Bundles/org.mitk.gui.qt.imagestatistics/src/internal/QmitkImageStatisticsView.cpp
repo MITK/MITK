@@ -53,6 +53,19 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <itkVectorImage.h>
 
+class QmitkRequestStatisticsUpdateEvent : public QEvent
+{
+public:
+  enum Type
+  {
+    StatisticsUpdateRequest = QEvent::MaxUser - 1025
+  };
+
+  QmitkRequestStatisticsUpdateEvent()
+    : QEvent( (QEvent::Type) StatisticsUpdateRequest ) {};
+};
+
+
 
 typedef itk::Image<short, 3>                 ImageType;
 typedef itk::Image<float, 3>                 FloatImageType;
@@ -122,13 +135,6 @@ void QmitkImageStatistics::CreateQtPartControl(QWidget *parent)
 
     m_Controls->m_LineProfileWidget->SetPathModeToPlanarFigure();
   }
-
-
-  m_SelectionListener = berry::ISelectionListener::Pointer(
-    new berry::SelectionChangedAdapter< QmitkImageStatistics >(
-    this, &QmitkImageStatistics::SelectionChanged) );
-  this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddPostSelectionListener(/*"org.mitk.views.datamanager",*/ m_SelectionListener);
-  this->UpdateCurrentSelection();
 }
 
 
@@ -137,16 +143,8 @@ void QmitkImageStatistics::CreateConnections()
 {
   if ( m_Controls )
   {
-    //connect( m_Controls->m_ImageSelector1, SIGNAL(OnSelectionChanged(const mitk::DataTreeNode*)), 
-    //  this, SLOT(onImageSelected(const mitk::DataTreeNode*)) );
-    //connect( m_Controls->m_ImageSelector2, SIGNAL(OnSelectionChanged(const mitk::DataTreeNode*)), 
-    //  this, SLOT(onImageSelected(const mitk::DataTreeNode*)) );
-
     connect( (QObject*)(m_Controls->m_ButtonCopyHistogramToClipboard), SIGNAL(clicked()),(QObject*) this, SLOT(ClipboardHistogramButtonClicked()));
     connect( (QObject*)(m_Controls->m_ButtonCopyStatisticsToClipboard), SIGNAL(clicked()),(QObject*) this, SLOT(ClipboardStatisticsButtonClicked()));
-    //connect( (QObject*)(m_Controls->m_AllTreeButton), SIGNAL(clicked()),(QObject*) this, SLOT(ComputeStatisticsAllImages()));
-
-    //connect( (QObject*)(m_Controls->useMaskStatistics), SIGNAL(clicked()),(QObject*) this, SLOT(ComputeStatistics()));
   }
 }
 
@@ -156,51 +154,6 @@ void QmitkImageStatistics::StdMultiWidgetAvailable( QmitkStdMultiWidget& stdMult
   m_TimeStepperAdapter = new QmitkStepperAdapter((QObject*) m_Controls->sliceNavigatorTime, stdMultiWidget.GetTimeNavigationController()->GetTime(), "sliceNavigatorTimeFromShapeBasedSegmentation");
   connect( m_TimeStepperAdapter, SIGNAL( Refetch() ), this, SLOT( UpdateTimestep() ) );
   this->UpdateTimestep();
-}
-
-void QmitkImageStatistics::UpdateCurrentSelection()
-{
-  berry::ISelection::ConstPointer selection( this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection());
-  m_CurrentSelection = selection.Cast< const berry::IStructuredSelection >();
-  this->SelectionChanged(berry::SmartPointer<IWorkbenchPart>(NULL), selection);
-}
-
-void QmitkImageStatistics::onImageSelected(const mitk::DataTreeNode* item)
-{
-  if (item == NULL) return;
-  std::string name;
-  if (item->GetData())
-  {
-    try
-    {
-      if ( item->GetName(name) )
-        MITK_INFO << "Image selected with name '" << name << "'";
-      mitk::BaseData::Pointer data = item->GetData();
-      m_SelectedImage = dynamic_cast<mitk::Image*> (data.GetPointer());
-      if( m_SelectedImage == NULL ||  m_SelectedImage->IsInitialized() == false ) return;
-
-      this->UpdateTimestep();
-    }
-    catch ( const std::exception & e )
-    {
-      itkGenericOutputMacro( << e.what() );
-    }
-    // doctor-proof button coding
-    if ( m_SelectedImage->GetDimension() > 3 ) 
-    {
-      m_Controls->sliceNavigatorTime->setEnabled(true);
-      m_Controls->tlTime->setEnabled(true);
-    }
-    ComputeStatistics(false, false);
-
-    //m_Controls->m_HistogramWidget->SetImage( m_SelectedImage );
-    //m_Controls->m_HistogramWidget->UpdateItemModelFromHistogram();
-  }
-}
-
-void QmitkImageStatistics::onImageSelected2(const mitk::DataTreeNode* item)
-{
-  ComputeStatistics(false, false);
 }
 
 void QmitkImageStatistics::UpdateTimestep()
@@ -455,8 +408,6 @@ void QmitkImageStatistics::ClipboardToFile( int count, std::string imageName1, s
   }
   if(matlab)
   {
-    long r1 = time(NULL);
-
     fprintf (pFile, "%% %04d -- %s -- %s \n", count, imageName1.c_str(), imageName2.c_str());
     fprintf (pFile, "a%05d=[%s];\n",count, m_Clipboard.toStdString().c_str());
   }
@@ -482,8 +433,7 @@ void QmitkImageStatistics::ComputeStatisticsAllImages( bool appendSourceData )
     m_Parent,
     "save file dialog",
     "result.txt",    
-    "txt files (*.txt)",
-    &QString("Select TXT Outputfile") );
+    "txt files (*.txt)");
 
   if ( filename.isEmpty() )
     return;
@@ -603,25 +553,17 @@ void QmitkImageStatistics::InvalidateStatisticsTableView()
 }
 
 
-void QmitkImageStatistics::SelectionChanged(
-  berry::IWorkbenchPart::Pointer sourcepart,
-  berry::ISelection::ConstPointer selection )
+void QmitkImageStatistics::OnSelectionChanged( std::vector<mitk::DataTreeNode*> nodes )
 {
   // Clear any unreferenced images
   this->RemoveOrphanImages();
 
-  // By default: no image selected
-  if ( sourcepart == this || !this->IsVisible() ||  // prevents being notified by own selection events
-    !selection.Cast<const berry::IStructuredSelection>() // checks that the selection is a IStructuredSelection and not NULL
-    )
+  if ( !this->IsVisible() )
   {
-    return; // otherwise we get "null selection" events each time the view is activated/focussed
+    return;
   }
 
-  // save current selection in member variable
-  m_CurrentSelection = selection.Cast< const berry::IStructuredSelection >();
-
-  if ( m_CurrentSelection.IsNull() || (m_CurrentSelection->Size() != 1) )
+  if ( nodes.empty() || nodes.size() > 1 )
   {
     // Nothing to do: invalidate image, clear statistics, histogram, and GUI
     m_SelectedImage = NULL;
@@ -636,9 +578,7 @@ void QmitkImageStatistics::SelectionChanged(
   }
 
   // Get selected element
-  berry::IStructuredSelection::iterator it = m_CurrentSelection->Begin();
-  mitk::DataTreeNodeObject::Pointer nodeObject = it->Cast <mitk::DataTreeNodeObject >();
-  mitk::DataTreeNode *selectedNode = nodeObject->GetDataTreeNode();
+  mitk::DataTreeNode *selectedNode = nodes.front();
   mitk::Image *selectedImage = dynamic_cast< mitk::Image * >( selectedNode->GetData() );
 
   // Find the next parent/grand-parent node containing an image, if any
@@ -842,7 +782,7 @@ void QmitkImageStatistics::UpdateStatistics()
     // Initialize progress bar
     mitk::ProgressBar::GetInstance()->AddStepsToDo( 100 );
 
-    unsigned long progressObserverTag;
+    unsigned long progressObserverTag(0);
 
     try
     {

@@ -133,6 +133,7 @@ void QmitkImageStatistics::CreateQtPartControl(QWidget *parent)
 
     m_Controls->m_ErrorMessageLabel->hide();
 
+    m_Controls->m_StatisticsWidgetStack->setCurrentIndex( 0 );
     m_Controls->m_LineProfileWidget->SetPathModeToPlanarFigure();
   }
 }
@@ -782,18 +783,16 @@ void QmitkImageStatistics::UpdateStatistics()
     // Initialize progress bar
     mitk::ProgressBar::GetInstance()->AddStepsToDo( 100 );
 
-    unsigned long progressObserverTag(0);
+    // Install listener for progress events and initialize progress bar
+    typedef itk::SimpleMemberCommand< QmitkImageStatistics > ITKCommandType;
+    ITKCommandType::Pointer progressListener;
+    progressListener = ITKCommandType::New();
+    progressListener->SetCallbackFunction( this, &QmitkImageStatistics::UpdateProgressBar );
+    unsigned long progressObserverTag = m_CurrentStatisticsCalculator
+      ->AddObserver( itk::ProgressEvent(), progressListener );
 
     try
     {
-      // Install listener for progress events and initialize progress bar
-      typedef itk::SimpleMemberCommand< QmitkImageStatistics > ITKCommandType;
-      ITKCommandType::Pointer progressListener;
-      progressListener = ITKCommandType::New();
-      progressListener->SetCallbackFunction( this, &QmitkImageStatistics::UpdateProgressBar );
-      progressObserverTag = m_CurrentStatisticsCalculator
-        ->AddObserver( itk::ProgressEvent(), progressListener );
-
       // Compute statistics
       statisticsChanged = 
         m_CurrentStatisticsCalculator->ComputeStatistics( timeStep );
@@ -860,11 +859,10 @@ void QmitkImageStatistics::UpdateStatistics()
       if ( m_SelectedPlanarFigure != NULL )
       {
         // TODO: enable line profile widget
-        //m_Controls->m_StatisticsWidgetStack->setCurrentIndex( 1 );
-        
-        m_Controls->m_LineProfileWidget->SetImage( m_SelectedImage );
-        m_Controls->m_LineProfileWidget->SetPlanarFigure( m_SelectedPlanarFigure );
-        m_Controls->m_LineProfileWidget->UpdateItemModelFromPath();
+        //m_Controls->m_StatisticsWidgetStack->setCurrentIndex( 1 );       
+        //m_Controls->m_LineProfileWidget->SetImage( m_SelectedImage );
+        //m_Controls->m_LineProfileWidget->SetPlanarFigure( m_SelectedPlanarFigure );
+        //m_Controls->m_LineProfileWidget->UpdateItemModelFromPath();
       }
     }
   }

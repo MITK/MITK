@@ -2,4 +2,6 @@
 # and if it contains a plug-in configure it
 MACRO_COLLECT_PLUGINS(OUTPUT_DIR ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/Bundles
                       CACHE_PLUGIN_OUTPUT_DIRS @CUSTOM_PROJECT_NAME@_PLUGIN_OUTPUT_DIRS
-                      CACHE_PLUGIN_TARGETS @CUSTOM_PROJECT_NAME@_ENABLED_PLUGINS)
+                      CACHE_PLUGIN_TARGETS @CUSTOM_PROJECT_NAME@_ENABLED_PLUGINS
+                      DEFAULT_BUILD_ON
+                      )

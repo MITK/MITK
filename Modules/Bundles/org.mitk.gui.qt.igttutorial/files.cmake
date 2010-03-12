@@ -16,7 +16,7 @@ SET(MOC_H_FILES
 )
 
 SET(RES_FILES
-  resources/QmitkImageGuidedTherapyTutorialView.qrc
+  #resources/QmitkImageGuidedTherapyTutorialView.qrc
 )
 
 SET(RESOURCE_FILES

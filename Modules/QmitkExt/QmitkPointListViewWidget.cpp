@@ -176,7 +176,7 @@ void QmitkPointListViewWidget::OnListViewSelectionChanged(const QItemSelection& 
   // (take care that this widget doesn't react to self-induced changes by setting m_SelfCall)
   m_SelfCall = true;
 
-  /* update selection of all points in pointset: select the one(s) that are selected in the view, deselect all others *
+  // update selection of all points in pointset: select the one(s) that are selected in the view, deselect all others
   QModelIndexList selectedIndexes = selected.indexes();
   for (mitk::PointSet::PointsContainer::Iterator it = m_PointSet->GetPointSet(m_TimeStep)->GetPoints()->Begin()
     ; it != m_PointSet->GetPointSet(m_TimeStep)->GetPoints()->End()
@@ -302,7 +302,7 @@ void QmitkPointListViewWidget::Update(bool currentRowChanged)
   }
 
   // remove unnecessary listwidgetitems
-  while (m_PointSet->GetPointSet(m_TimeStep)->GetPoints()->Size() < this->count() )
+  while (m_PointSet->GetPointSet(m_TimeStep)->GetPoints()->Size() < (unsigned int)this->count() )
   {
     QListWidgetItem * item = this->takeItem(this->count()-1);
     delete item;

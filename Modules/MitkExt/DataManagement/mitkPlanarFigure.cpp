@@ -110,7 +110,7 @@ bool mitk::PlanarFigure::SetControlPoint( unsigned int index, const Point2D &poi
 
 bool mitk::PlanarFigure::SetCurrentControlPoint( const Point2D &point )
 {
-  if ( (m_SelectedControlPoint < 0) || (m_SelectedControlPoint >= m_ControlPoints->Size()) )
+  if ( (m_SelectedControlPoint < 0) || (m_SelectedControlPoint >= (int)m_ControlPoints->Size()) )
   {
     return false;
   }

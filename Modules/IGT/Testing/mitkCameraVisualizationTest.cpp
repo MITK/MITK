@@ -64,7 +64,7 @@ int mitkCameraVisualizationTest(int /* argc */, char* /*argv*/[])
 
   // data valid flag of navigation data
   int val = rand()%2;
-  bool valid;
+  bool valid(0); // this was uninitialized. how was this test ever meant to work??
   if (val==0)
   {
     valid=false;

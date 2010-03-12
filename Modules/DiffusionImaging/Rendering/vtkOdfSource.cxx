@@ -81,8 +81,6 @@ int vtkOdfSource::RequestData(
   vtkIdType npts; vtkIdType *pts;
   while(polys->GetNextCell(npts,pts))
   {
-    double max = std::numeric_limits<double>::min();
-    vtkIdType maxId = -1;
     double val = 0;
     for(int i=0; i<npts; i++)
     {

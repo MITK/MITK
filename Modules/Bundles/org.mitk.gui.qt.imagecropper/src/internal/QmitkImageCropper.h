@@ -18,7 +18,9 @@ PURPOSE.  See the above copyright notices for more information.
 #if !defined(QMITK_IMAGECROPPER_H__INCLUDED)
 #define QMITK_IMAGECROPPER_H__INCLUDED
 
+#ifdef WIN32
 #pragma warning( disable : 4250 )
+#endif
 
 #include "QmitkFunctionality.h"
 #include <mitkCuboid.h>

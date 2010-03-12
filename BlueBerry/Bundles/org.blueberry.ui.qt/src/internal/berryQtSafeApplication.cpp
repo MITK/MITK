@@ -53,7 +53,7 @@ QtSafeApplication::~QtSafeApplication()
 {
   if (G_QT_ARGC == 0) return;
 
-  for (std::size_t i = 0; i < G_QT_ARGC; ++i)
+  for (int i = 0; i < G_QT_ARGC; ++i)
     delete[] G_QT_ARGV[i];
 
   delete[] G_QT_ARGV;
@@ -81,6 +81,7 @@ bool QtSafeApplication::notify(QObject* receiver, QEvent* event)
           "An error occurred. You should save all data and quit the program to prevent possible data loss.\nSee the error log for details.\n\n");
   text += msg;
   QMessageBox::critical(0, "Error", text);
+  return false;
 }
 
 }

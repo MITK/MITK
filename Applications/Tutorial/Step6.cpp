@@ -24,9 +24,8 @@
 
 //##Documentation
 //## @brief Start region-grower at interactively added points
-Step6::Step6(int argc, char* argv[], QWidget *parent) :
-	QWidget(parent), m_FirstImage(NULL), m_ResultImage(NULL),
-			m_ResultNode(NULL), m_DataStorage(NULL)
+Step6::Step6(int argc, char* argv[], QWidget *parent) 
+: QWidget(parent)
 {
 	// load data as in the previous steps; a reference to the first loaded
 	// image is kept in the member m_FirstImage and used as input for the

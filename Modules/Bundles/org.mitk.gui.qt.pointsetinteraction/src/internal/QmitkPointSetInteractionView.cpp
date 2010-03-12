@@ -30,8 +30,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkDataTreeNodeSelection.h>
 
 QmitkPointSetInteractionView::QmitkPointSetInteractionView( QObject *parent )
-: m_Controls(0)
-, m_SelectionListener(0)
+: m_SelectionListener(0)
+, m_Controls(0)
 {
 
 }

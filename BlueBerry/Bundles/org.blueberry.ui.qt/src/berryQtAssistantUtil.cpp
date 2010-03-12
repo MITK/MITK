@@ -158,7 +158,7 @@ bool QtAssistantUtil::RegisterQCHFiles(const QString& collectionFile,
 
   QString errorString;
   int exitCode = 0;
-  for (std::size_t i = 0; i < argsVector.size(); ++i)
+  for (int i = 0; i < argsVector.size(); ++i)
   {
     const QStringList& args = argsVector[i];
     progress.setValue(i);

@@ -575,7 +575,7 @@ void QmitkRigidRegistrationSelectorView::DoLoadRigidRegistrationPreset(std::stri
   itk::Array<double> transformValuesForGUI;
   transformValuesForGUI.SetSize(transformValues.Size());
   transformValuesForGUI.fill(0);
-  for (int i = 1; i < transformValues.Size(); i++)
+  for (unsigned int i = 1; i < transformValues.Size(); i++)
   {
     transformValuesForGUI[i-1] = transformValues[i];
   }
@@ -598,7 +598,7 @@ void QmitkRigidRegistrationSelectorView::DoLoadRigidRegistrationPreset(std::stri
   itk::Array<double> metricValuesForGUI;
   metricValuesForGUI.SetSize(metricValues.Size());
   metricValuesForGUI.fill(0);
-  for (int i = 1; i < metricValues.Size(); i++)
+  for (unsigned int i = 1; i < metricValues.Size(); i++)
   {
     metricValuesForGUI[i-1] = metricValues[i];
   }
@@ -621,7 +621,7 @@ void QmitkRigidRegistrationSelectorView::DoLoadRigidRegistrationPreset(std::stri
   itk::Array<double> optimizerValuesForGUI;
   optimizerValuesForGUI.SetSize(optimizerValues.Size());
   optimizerValuesForGUI.fill(0);
-  for (int i = 1; i < optimizerValues.Size(); i++)
+  for (unsigned int i = 1; i < optimizerValues.Size(); i++)
   {
     optimizerValuesForGUI[i-1] = optimizerValues[i];
   }
@@ -688,7 +688,7 @@ void QmitkRigidRegistrationSelectorView::DoSaveRigidRegistrationParameter(bool t
     transformValues[0] = m_Controls.m_TransformBox->currentIndex();
 
     itk::Array<double> transformValuesFromGUI = dynamic_cast<QmitkRigidRegistrationTransformsGUIBase*>(m_Controls.m_TransformWidgetStack->currentWidget())->GetTransformParameters();
-    for (int i = 0; i < transformValuesFromGUI.Size(); i++)
+    for (unsigned int i = 0; i < transformValuesFromGUI.Size(); i++)
     {
       transformValues[i+1] = transformValuesFromGUI[i];
     }
@@ -709,7 +709,7 @@ void QmitkRigidRegistrationSelectorView::DoSaveRigidRegistrationParameter(bool t
     metricValues.fill(0);
     metricValues[0] = m_Controls.m_MetricBox->currentIndex();
     itk::Array<double> metricValuesFromGUI = dynamic_cast<QmitkRigidRegistrationMetricsGUIBase*>(m_Controls.m_MetricWidgetStack->currentWidget())->GetMetricParameters();
-    for (int i = 0; i < metricValuesFromGUI.Size(); i++)
+    for (unsigned int i = 0; i < metricValuesFromGUI.Size(); i++)
     {
       metricValues[i+1] = metricValuesFromGUI[i];
     }
@@ -730,7 +730,7 @@ void QmitkRigidRegistrationSelectorView::DoSaveRigidRegistrationParameter(bool t
     optimizerValues.fill(0);
     optimizerValues[0] = m_Controls.m_OptimizerBox->currentIndex();
     itk::Array<double> optimizerValuesFromGUI = dynamic_cast<QmitkRigidRegistrationOptimizerGUIBase*>(m_Controls.m_OptimizerWidgetStack->currentWidget())->GetOptimizerParameters();
-    for (int i = 0; i < optimizerValuesFromGUI.Size(); i++)
+    for (unsigned int i = 0; i < optimizerValuesFromGUI.Size(); i++)
     {
       optimizerValues[i+1] = optimizerValuesFromGUI[i];
     }

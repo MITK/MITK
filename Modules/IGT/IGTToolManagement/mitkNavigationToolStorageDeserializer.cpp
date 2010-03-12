@@ -55,7 +55,7 @@ mitk::NavigationToolStorage::Pointer mitk::NavigationToolStorageDeserializer::De
   mitk::DataStorage::Pointer readStorage = mySceneIO->LoadScene(tempDirectory + Poco::Path::separator() + myReader->GetFileWithoutPath(filename) + ".storage");
   mitk::NavigationToolStorage::Pointer returnValue = mitk::NavigationToolStorage::New();
 
-  for(int i=0; i<readStorage->GetAll()->Size(); i++)
+  for(unsigned int i=0; i<readStorage->GetAll()->Size(); i++)
     {
     mitk::NavigationTool::Pointer newTool = myReader->ConvertDataTreeNodeToNavigationTool(readStorage->GetAll()->ElementAt(i),tempDirectory);
     if (!returnValue->AddTool(newTool))

@@ -280,17 +280,17 @@ void QmitkIGTExampleView::OnTestNavigation()
     */
 
     out->append(QString("created and initialized NavigationDataDisplacementFilter filter using <%1, %2, %3> as offset").arg(offset[0]).arg(offset[1]).arg(offset[2]));
-    int numberOfOutputs = m_Source->GetNumberOfOutputs();
+    unsigned int numberOfOutputs = m_Source->GetNumberOfOutputs();
     for (unsigned int i = 0; i < numberOfOutputs; i++)
       m_Displacer->SetInput(i , m_Source->GetOutput(i));  // connect filter
 
     //Now we create a visualization filter object to hang up the tools into the datatree and visualize them in the widgets.
     mitk::NavigationDataObjectVisualizationFilter::Pointer visualizer = mitk::NavigationDataObjectVisualizationFilter::New();
-    for (int i = 0; i < m_Displacer->GetNumberOfOutputs(); i++)
+    for (unsigned int i = 0; i < m_Displacer->GetNumberOfOutputs(); i++)
       visualizer->SetInput(i, m_Displacer->GetOutput(i));
 
     //create new BaseData for each tool
-    for (int i = 0; i < m_Displacer->GetNumberOfOutputs();i++)
+    for (unsigned int i = 0; i < m_Displacer->GetNumberOfOutputs();i++)
     {
       mitk::Cone::Pointer mitkToolData = mitk::Cone::New();
       float scale[] = {20.0, 20.0, 20.0};
@@ -738,7 +738,6 @@ void QmitkIGTExampleView::OnErrorValueChanged(mitk::NavigationData::CovarianceMa
     m_Controls->m_ErrorPlot->SetCurveData( 0, m_XValues, m_YValues ); // hardcoded for curve id 0!
     m_Controls->m_ErrorPlot->Replot();
   }
-  const mitk::ScalarType errorThreshold = 0.8; // needs to be set to meaningful value depending on application requirements
   
   mitk::ScalarType progressClampError = (errorValue < 1.0) ? errorValue* 100 : 100;// use primitive mapping of error values to the progress bar range of 0..100. needs to be adjusted to meaningful values
   m_Controls->m_ErrorBar->setValue(progressClampError); 

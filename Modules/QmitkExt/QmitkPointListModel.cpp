@@ -191,7 +191,7 @@ bool QmitkPointListModel::GetPointForModelIndex( const QModelIndex &index, mitk:
   if (m_PointSet == NULL)
     return false;
 
-  if ((index.row() < 0) || (index.row() >= m_PointSet->GetPointSet(m_TimeStep)->GetPoints()->Size()))
+  if ((index.row() < 0) || (index.row() >= (int)m_PointSet->GetPointSet(m_TimeStep)->GetPoints()->Size()))
     return false;
 
   // get the nth. element, if it exists.

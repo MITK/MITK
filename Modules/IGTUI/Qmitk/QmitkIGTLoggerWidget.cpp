@@ -152,7 +152,7 @@ void QmitkIGTLoggerWidget::StopRecording()
 void QmitkIGTLoggerWidget::OnRecording()
 {
   static unsigned int sampleCounter = 0;
-  int int_samples = m_Samples.toInt();
+  unsigned int int_samples = m_Samples.toInt();
   if(sampleCounter >= int_samples)
   {
     this->StopRecording();
@@ -209,7 +209,6 @@ void QmitkIGTLoggerWidget::UpdateRecordingTime()
      m_MilliSeconds = m_Controls->m_leRecordingValue->text();
      
      bool success = false;
-     int int_ms = m_MilliSeconds.toInt(&success);
 
      if (!success)
      {
@@ -223,7 +222,6 @@ void QmitkIGTLoggerWidget::UpdateRecordingTime()
     m_Samples = m_Controls->m_leRecordingValue->text();
 
     bool success = false;
-    int int_samples = m_Samples.toInt(&success);
 
     if (!success)
     {

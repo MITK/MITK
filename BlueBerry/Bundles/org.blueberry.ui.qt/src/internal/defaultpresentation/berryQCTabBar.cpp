@@ -80,7 +80,7 @@ void QCTabBar::mouseMoveEvent(QMouseEvent* event)
 
 AbstractTabItem* QCTabBar::getTab(int index) const
 {
-  if (index < 0 || index >= tabItemList.size()) return 0;
+  if ((unsigned int)index < 0 || (unsigned int)index >= tabItemList.size()) return 0;
   return tabItemList[index];
 }
 
@@ -101,7 +101,7 @@ void QCTabBar::moveAbstractTab(int from, int to)
 {
   AbstractTabItem* item = tabItemList[from];
 
-  if (to >= tabItemList.size()) --to;
+  if ((unsigned int)to >= tabItemList.size()) --to;
 
   std::deque<AbstractTabItem*>::iterator fromIter = tabItemList.begin();
   std::advance(fromIter, from);

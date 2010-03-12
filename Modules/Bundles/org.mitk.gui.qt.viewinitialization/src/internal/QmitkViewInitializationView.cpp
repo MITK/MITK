@@ -91,7 +91,7 @@ void QmitkViewInitializationView::Deactivated()
 
 void QmitkViewInitializationView::OnApply()
 {
-  mitk::SliceNavigationController::ViewDirection viewDirection;
+  mitk::SliceNavigationController::ViewDirection viewDirection( mitk::SliceNavigationController::Transversal );
   if( m_Controls->rbTransversal->isChecked() )
     viewDirection = mitk::SliceNavigationController::Transversal;
     

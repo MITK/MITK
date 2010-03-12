@@ -197,7 +197,6 @@ void QmitkNDIConfigurationWidget::OnAddPassiveTool()
   QStringList filenames = QFileDialog::getOpenFileNames(this, "Select NDI SROM file", QDir::currentPath(),"NDI SROM files (*.rom)");
   if (filenames.isEmpty())
     return;
-  bool ok = false;
   foreach(QString fileName, filenames)
   {
     //QString toolName = QInputDialog::getText(this, "Enter a name for the tool", "Name of the tool: ", QLineEdit::Normal, QFileInfo(filename).baseName(), &ok);
@@ -399,7 +398,7 @@ void QmitkNDIConfigurationWidget::UpdateTrackerFromToolTable(const QModelIndex &
   if (m_Tracker.IsNull())
     return;
   QAbstractItemModel* model = m_Controls->m_ToolTable->model();
-  for (unsigned int i = 0; i < m_Controls->m_ToolTable->rowCount(); ++i)
+  for (int i = 0; i < m_Controls->m_ToolTable->rowCount(); ++i)
   {
     mitk::NDIPassiveTool* tool = dynamic_cast<mitk::NDIPassiveTool*> (m_Tracker->GetTool(i));
     if (tool == NULL)
@@ -449,7 +448,7 @@ QMap<QString, unsigned int> QmitkNDIConfigurationWidget::GetToolAndTypes() const
   if (m_Controls == NULL)
     return map;
   QAbstractItemModel* model = m_Controls->m_ToolTable->model();
-  for (unsigned int i = 0; i < model->rowCount(); ++i)
+  for (int i = 0; i < model->rowCount(); ++i)
   {
     QModelIndex indexIndex = model->index(i, QmitkNDIToolDelegate::IndexCol);
     QModelIndex typeIndex = model->index(i, QmitkNDIToolDelegate::TypeCol);
@@ -467,7 +466,7 @@ QList<unsigned int> QmitkNDIConfigurationWidget::GetToolsByToolType( QString too
   if (m_Controls == NULL)
       return list;
   QAbstractItemModel* model = m_Controls->m_ToolTable->model();
-  for (unsigned int i = 0; i < model->rowCount(); ++i)
+  for (int i = 0; i < model->rowCount(); ++i)
   {
     QModelIndex indexIndex = model->index(i, QmitkNDIToolDelegate::IndexCol);
     QModelIndex typeIndex = model->index(i, QmitkNDIToolDelegate::TypeCol);

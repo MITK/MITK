@@ -122,7 +122,8 @@ bool mitk::Material::Assignable(const Material& other) const
 {
   try
   {
-    dynamic_cast<const Self&>(other); // dear compiler, please don't optimize this away! Thanks.
+    const Material& otherinstance = dynamic_cast<const Self&>(other); // dear compiler, please don't optimize this away! Thanks.
+    otherinstance.GetOpacity();
     return true;
   }
   catch (std::bad_cast)

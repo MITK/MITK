@@ -82,7 +82,7 @@ public:
    * This reflects whether this Mapper currently invokes StartEvent, EndEvent, and
    * ProgressEvent on BaseRenderer. */
   virtual bool IsLODEnabled( BaseRenderer *renderer = NULL ) const;
-  bool IsGPUEnabled( BaseRenderer *renderer = NULL ) const;
+  bool IsGPUEnabled( BaseRenderer *renderer = NULL );
   
   virtual void MitkRenderVolumetricGeometry(mitk::BaseRenderer* renderer);
 
@@ -91,11 +91,10 @@ protected:
   GPUVolumeMapper3D();
   virtual ~GPUVolumeMapper3D();
 
-
   void InitCPU();
-  void InitGPU();
+  void InitGPU(mitk::BaseRenderer* renderer);
   void DeinitCPU();
-  void DeinitGPU();
+  void DeinitGPU(mitk::BaseRenderer* renderer);
 
   virtual void GenerateData(mitk::BaseRenderer* renderer);
 
@@ -104,12 +103,9 @@ protected:
 
   vtkImageChangeInformation* m_UnitSpacingImageFilter;
   vtkVolumeProperty* m_VolumePropertyCPU;
-  vtkVolumeProperty* m_VolumePropertyGPU;
  
-  vtkMitkVolumeTextureMapper3D* m_MapperGPU;
   vtkFixedPointVolumeRayCastMapper* m_MapperCPU;
  
-  vtkVolume * m_VolumeGPU;
   vtkVolume * m_VolumeCPU;
   
   vtkPiecewiseFunction *m_DefaultOpacityTransferFunction;
@@ -123,10 +119,38 @@ protected:
   void GenerateDataGPU(mitk::BaseRenderer* renderer);
   void GenerateDataCPU(mitk::BaseRenderer* renderer);
   
-  bool gpuInitialized;
   bool cpuInitialized;
   
-  bool gpuSupported;
+  class LocalStorage : public mitk::Mapper::BaseLocalStorage
+  {
+    public:
+
+      bool m_gpuInitialized;
+      bool m_gpuSupported;
+      vtkVolume * m_VolumeGPU;
+      vtkMitkVolumeTextureMapper3D* m_MapperGPU;
+      vtkVolumeProperty* m_VolumePropertyGPU;
+  
+      LocalStorage()
+      {
+        m_gpuInitialized = false;
+        m_gpuSupported = true;
+      }
+      
+      ~LocalStorage()
+      {
+        if(m_gpuInitialized)
+        {
+          m_VolumeGPU->Delete();
+          m_MapperGPU->Delete();
+          m_VolumePropertyGPU->Delete();
+          m_gpuInitialized=false;
+        }
+      }
+  };  
+    
+  mitk::Mapper::LocalStorageHandler<LocalStorage> m_LSH;  
+
 
 };
 

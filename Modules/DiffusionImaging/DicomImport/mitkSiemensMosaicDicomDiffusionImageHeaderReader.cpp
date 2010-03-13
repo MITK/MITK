@@ -96,8 +96,8 @@ void mitk::SiemensMosaicDicomDiffusionImageHeaderReader::Update()
 
     ReadPublicTags();
 
-    int mMosaic;   // number of raws in each mosaic block;
-    int nMosaic;   // number of columns in each mosaic block
+    int mMosaic = 0;   // number of raws in each mosaic block;
+    int nMosaic = 0;   // number of columns in each mosaic block
 
     std::cout << "Siemens SliceMosaic......" << std::endl;
 

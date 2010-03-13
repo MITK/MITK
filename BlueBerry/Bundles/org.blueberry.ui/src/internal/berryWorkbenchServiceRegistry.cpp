@@ -46,9 +46,9 @@ WorkbenchServiceRegistry* WorkbenchServiceRegistry::registry = 0;
 const IServiceLocator::Pointer WorkbenchServiceRegistry::GLOBAL_PARENT =
     IServiceLocator::Pointer(new GlobalParentLocator());
 
-const std::string* const WorkbenchServiceRegistry::supportedLevels()
+std::string* WorkbenchServiceRegistry::supportedLevels()
 {
-  static const std::string levels[] = {
+  static std::string levels[] = {
   ISources::ACTIVE_CONTEXT_NAME(),
   ISources::ACTIVE_SHELL_NAME(),
   ISources::ACTIVE_WORKBENCH_WINDOW_NAME(),

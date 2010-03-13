@@ -212,7 +212,7 @@ void PageLayout::AddView(const std::string& viewId, int relationship,
 }
 
 void PageLayout::AddView(const std::string& viewId, int relationship,
-    float ratio, const std::string& refId, bool minimized, bool standalone,
+    float ratio, const std::string& refId, bool /*minimized*/, bool standalone,
     bool showTitle)
 {
   if (this->CheckPartInLayout(viewId))

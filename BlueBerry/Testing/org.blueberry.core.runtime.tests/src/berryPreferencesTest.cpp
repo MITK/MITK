@@ -56,7 +56,7 @@ namespace berry
     ///
     /// To be implemented in the subclasses.
     ///    
-    virtual void Flush(IPreferences* _Preferences) throw(Poco::Exception, BackingStoreException)
+    virtual void Flush(IPreferences* /*_Preferences*/) throw(Poco::Exception, BackingStoreException)
     {
       std::cout << "would flush to " << this->m_File.path() << std::endl;
     }

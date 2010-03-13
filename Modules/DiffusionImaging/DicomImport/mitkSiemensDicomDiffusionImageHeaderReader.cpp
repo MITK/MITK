@@ -46,7 +46,7 @@ mitk::SiemensDicomDiffusionImageHeaderReader::~SiemensDicomDiffusionImageHeaderR
 
 int mitk::SiemensDicomDiffusionImageHeaderReader::ExtractSiemensDiffusionInformation( std::string tagString, std::string nameString, std::vector<double>& valueArray, int startPos )
 {
-  unsigned int atPosition = tagString.find( nameString, startPos );
+  std::string::size_type atPosition = tagString.find( nameString, startPos );
   if ( atPosition == std::string::npos)
   {
     return 0;
@@ -78,7 +78,7 @@ int mitk::SiemensDicomDiffusionImageHeaderReader::ExtractSiemensDiffusionInforma
 int mitk::SiemensDicomDiffusionImageHeaderReader::ExtractSiemensDiffusionGradientInformation( std::string tagString, std::string nameString, std::vector<double>& valueArray )
 {
   int nItems = 0; 
-  unsigned int pos = -1;
+  std::string::size_type pos = -1;
   while(nItems != 3)
   {
     nItems = ExtractSiemensDiffusionInformation( tagString, nameString, valueArray, pos+1 );  

@@ -110,7 +110,7 @@ void DetachedPlaceHolder::SaveState(IMemento::Pointer memento)
   }
 }
 
-void DetachedPlaceHolder::FindSashes(LayoutPart::Pointer part,
+void DetachedPlaceHolder::FindSashes(LayoutPart::Pointer /*part*/,
     PartPane::Sashes& sashes)
 {
   ILayoutContainer::Pointer container = this->GetContainer();

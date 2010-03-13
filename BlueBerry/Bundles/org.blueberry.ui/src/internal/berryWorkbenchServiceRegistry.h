@@ -72,7 +72,7 @@ private:
 
   const IExtensionPoint* GetExtensionPoint();
 
-  static const std::string* const supportedLevels();
+  static std::string* supportedLevels();
   static const unsigned int supportedLevelsCount;
 
   void ProcessVariables(

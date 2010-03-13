@@ -183,8 +183,8 @@ void SaveablesList::FireModelLifecycleEvent(
 }
 
 bool SaveablesList::PromptForSavingIfNecessary(
-    IWorkbenchWindow::Pointer window, const Saveable::Set& modelsClosing,
-    const std::map<Saveable::Pointer, int>& modelsDecrementing, bool canCancel)
+    IWorkbenchWindow::Pointer /*window*/, const Saveable::Set& /*modelsClosing*/,
+    const std::map<Saveable::Pointer, int>& /*modelsDecrementing*/, bool /*canCancel*/)
 {
 //  List modelsToOptionallySave = new ArrayList();
 //  for (Iterator it = modelsDecrementing.keySet().iterator(); it.hasNext();)
@@ -383,9 +383,9 @@ SaveablesList::PostCloseInfo::Pointer SaveablesList::PreCloseParts(
 }
 
 bool SaveablesList::PromptForSaving(
-    const std::list<Saveable::Pointer>& modelsToSave,
+    const std::list<Saveable::Pointer>& /*modelsToSave*/,
     /*final IShellProvider shellProvider, IRunnableContext runnableContext,*/
-    bool canCancel, bool stillOpenElsewhere)
+    bool /*canCancel*/, bool /*stillOpenElsewhere*/)
 {
   //  // Save parts, exit the method if cancel is pressed.
   //  if (modelsToSave.size() > 0) {
@@ -521,7 +521,7 @@ bool SaveablesList::PromptForSaving(
   return true;
 }
 
-bool SaveablesList::SaveModels(const std::list<Saveable::Pointer>& finalModels
+bool SaveablesList::SaveModels(const std::list<Saveable::Pointer>& /*finalModels*/
 /*final IShellProvider shellProvider, IRunnableContext runnableContext*/)
 {
   //  IRunnableWithProgress progressOp = new IRunnableWithProgress() {
@@ -598,7 +598,7 @@ void SaveablesList::DirtyChanged(IWorkbenchPart::Pointer part)
 }
 
 std::vector<Object::Pointer> SaveablesList::TestGetSourcesForModel(
-    Saveable::Pointer model)
+    Saveable::Pointer /*model*/)
 {
   std::vector<Object::Pointer> result;
   //  for (Iterator it = modelMap.entrySet().iterator(); it.hasNext();) {

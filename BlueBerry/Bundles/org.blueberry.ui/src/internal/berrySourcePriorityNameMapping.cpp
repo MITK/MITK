@@ -36,9 +36,9 @@ const std::string SourcePriorityNameMapping::LEGACY_LEGACY_NAME()
   return val;
 }
 
-const int SourcePriorityNameMapping::NO_SOURCE_PRIORITY()
+int SourcePriorityNameMapping::NO_SOURCE_PRIORITY()
 {
-  static const int val = 0;
+  static int val = 0;
   return val;
 }
 

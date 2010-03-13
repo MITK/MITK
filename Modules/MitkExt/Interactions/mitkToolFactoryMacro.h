@@ -80,7 +80,7 @@ class CLASS_NAME ## RegistrationMethod \
  \
     CLASS_NAME ## RegistrationMethod() \
     { \
-      MITK_INFO("tools") << "Registered " #CLASS_NAME; \
+      /*MITK_INFO("tools") << "Registered " #CLASS_NAME; */ \
       itk::ObjectFactoryBase::RegisterFactory( CLASS_NAME ## Factory::New() ); \
     } \
   }; \
@@ -211,7 +211,7 @@ class CLASS_NAME ## RegistrationMethod \
  \
     CLASS_NAME ## RegistrationMethod() \
     { \
-      MITK_INFO("tools") << "Registered " #CLASS_NAME; \
+      /*MITK_INFO("tools") << "Registered " #CLASS_NAME; */ \
       itk::ObjectFactoryBase::RegisterFactory( CLASS_NAME ## Factory::New() ); \
     } \
   }; \

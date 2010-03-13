@@ -41,7 +41,7 @@ PerspectiveHelper::DragOverListener::DragOverListener(PerspectiveHelper* perspHe
 }
 
 IDropTarget::Pointer PerspectiveHelper::DragOverListener::Drag(
-    void* currentControl, Object::Pointer draggedObject, const Point& position,
+    void* /*currentControl*/, Object::Pointer draggedObject, const Point& /*position*/,
     const Rectangle& dragRectangle)
 {
 
@@ -189,7 +189,7 @@ bool PerspectiveHelper::CompareMatchingParts::operator()(const MatchingPart& m1,
     return false;
   }
   // if both are specific or both have wildcards, simply compare based on length
-  return (m2.len - m1.len) < 0;
+  return m1.len > m2.len;
 }
 
 PerspectiveHelper::PerspectiveHelper(WorkbenchPage* workbenchPage,

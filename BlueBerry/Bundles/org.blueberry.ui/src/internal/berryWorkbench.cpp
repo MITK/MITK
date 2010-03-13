@@ -1244,7 +1244,8 @@ IWorkbenchPage::Pointer Workbench::ShowPerspective(
 }
 
 IWorkbenchPage::Pointer Workbench::ShowPerspective(
-    const std::string& perspectiveId, IWorkbenchWindow::Pointer window,
+    const std::string& /*perspectiveId*/, 
+    IWorkbenchWindow::Pointer /*window*/,
     IAdaptable* /*input*/)
 {
   return IWorkbenchPage::Pointer(0);

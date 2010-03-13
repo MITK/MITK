@@ -116,7 +116,7 @@ template <class T>
 void vtkMitkThickSlicesFilterExecute(vtkMitkThickSlicesFilter *self,
                              vtkImageData *inData, T *inPtr,
                              vtkImageData *outData, T *outPtr,
-                             int outExt[6], int id)
+                             int outExt[6], int /*id*/)
 {
   int idxX, idxY;
   int maxX, maxY;

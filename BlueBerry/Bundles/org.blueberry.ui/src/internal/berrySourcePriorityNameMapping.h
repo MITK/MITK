@@ -81,7 +81,7 @@ public:
    *
    * @see SourcePriorityNameMapping#getMapping(String)
    */
-  static const int NO_SOURCE_PRIORITY(); // = 0;
+  static int NO_SOURCE_PRIORITY(); // = 0;
 
 
 private:

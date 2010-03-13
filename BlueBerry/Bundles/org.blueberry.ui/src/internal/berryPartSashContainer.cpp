@@ -888,7 +888,7 @@ void PartSashContainer::SetBounds(const Rectangle& r)
   Tweaklets::Get(GuiWidgetsTweaklet::KEY)->SetBounds(this->parent, r);
 }
 
-IDropTarget::Pointer PartSashContainer::Drag(void* currentControl,
+IDropTarget::Pointer PartSashContainer::Drag(void* /*currentControl*/,
     Object::Pointer draggedObject, const Point& position,
     const Rectangle&  /*dragRectangle*/)
 {
@@ -1170,7 +1170,7 @@ std::size_t PartSashContainer::GetVisibleChildrenCount(
   return container->GetChildren().size();
 }
 
-float PartSashContainer::GetDockingRatio(Object::Pointer dragged,
+float PartSashContainer::GetDockingRatio(Object::Pointer /*dragged*/,
     IStackableContainer::Pointer  /*target*/)
 {
   return 0.5f;

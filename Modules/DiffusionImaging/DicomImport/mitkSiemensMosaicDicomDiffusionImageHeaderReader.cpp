@@ -39,7 +39,7 @@ mitk::SiemensMosaicDicomDiffusionImageHeaderReader::~SiemensMosaicDicomDiffusion
 
 int mitk::SiemensMosaicDicomDiffusionImageHeaderReader::ExtractSiemensDiffusionInformation( std::string tagString, std::string nameString, std::vector<double>& valueArray )
 {
-  unsigned int atPosition = tagString.find( nameString );
+  std::string::size_type atPosition = tagString.find( nameString );
   if ( atPosition == std::string::npos)
   {
     return 0;

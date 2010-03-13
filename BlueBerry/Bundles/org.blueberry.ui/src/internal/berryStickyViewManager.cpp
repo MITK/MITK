@@ -46,8 +46,7 @@ IStickyViewManager::Pointer StickyViewManager::GetInstance(IWorkbenchPage* page)
   return stickyViewMan;
 }
 
-void StickyViewManager::Add(const std::string& perspectiveId, const std::set<
-    std::string>& stickyViewSet)
+void StickyViewManager::Add(const std::string& /*perspectiveId*/, const std::set<std::string>& /*stickyViewSet*/)
 {
   // do nothing
 }
@@ -57,17 +56,17 @@ void StickyViewManager::Clear()
   // do nothing
 }
 
-void StickyViewManager::Remove(const std::string& perspectiveId)
+void StickyViewManager::Remove(const std::string& /*perspectiveId*/)
 {
   // do nothing
 }
 
-void StickyViewManager::Restore(IMemento::Pointer memento)
+void StickyViewManager::Restore(IMemento::Pointer /*memento*/)
 {
   // do nothing
 }
 
-void StickyViewManager::Save(IMemento::Pointer memento)
+void StickyViewManager::Save(IMemento::Pointer /*memento*/)
 {
   // do nothing
 }

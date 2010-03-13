@@ -27,9 +27,9 @@
 namespace berry
 {
 
-MockWorkbenchPart::MockWorkbenchPart() :
-  siteState(false), disposeListener(new GuiTk::ControlDestroyedAdapter<
-      MockWorkbenchPart>(this, &MockWorkbenchPart::ControlDestroyed))
+MockWorkbenchPart::MockWorkbenchPart() 
+: disposeListener(new GuiTk::ControlDestroyedAdapter<MockWorkbenchPart>(this, &MockWorkbenchPart::ControlDestroyed))
+, siteState(false)
 {
   callTrace = new CallHistory();
   selectionProvider = new MockSelectionProvider();
@@ -146,9 +146,9 @@ bool MockWorkbenchPart::IsSiteInitialized()
 void MockWorkbenchPart::SetSiteInitialized()
 {
   SetSiteInitialized(
-  // GetSite()->GetKeyBindingService() != 0 &
-      GetSite()->GetPage() != 0 & GetSite()->GetSelectionProvider() != 0
-          & GetSite()->GetWorkbenchWindow() != 0 // &
+  // GetSite()->GetKeyBindingService() != 0 &&
+      (GetSite()->GetPage() != 0) && (GetSite()->GetSelectionProvider() != 0)
+          && (GetSite()->GetWorkbenchWindow() != 0) // &&
   // TestActionBars(GetActionBars())
   );
 }

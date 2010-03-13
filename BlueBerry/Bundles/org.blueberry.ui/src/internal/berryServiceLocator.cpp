@@ -222,7 +222,7 @@ bool ServiceLocator::IsDisposed() const
   return disposed;
 }
 
-void ServiceLocator::UnregisterServices(const std::vector<std::string>& serviceNames)
+void ServiceLocator::UnregisterServices(const std::vector<std::string>& /*serviceNames*/)
 {
   IDisposable::Pointer d(owner);
   if (d)

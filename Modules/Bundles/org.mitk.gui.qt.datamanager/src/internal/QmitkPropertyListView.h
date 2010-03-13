@@ -2,7 +2,7 @@
 #define QmitkPropertyListView_h_
 
 // Own includes
-#include <berryISelectionListener.h>
+
 #include "../mitkQtDataManagerDll.h"
 #include <mitkDataTreeNodeSelection.h>
 #include <QmitkFunctionality.h>
@@ -13,7 +13,7 @@ class QmitkPropertiesTableEditor;
 ///
 /// A view to show 
 ///
-class MITK_QT_DATAMANAGER QmitkPropertyListView : public QmitkFunctionality, virtual public berry::ISelectionListener
+class MITK_QT_DATAMANAGER QmitkPropertyListView : public QmitkFunctionality
 {  
 public: 
   berryObjectMacro(QmitkPropertyListView)
@@ -43,21 +43,14 @@ public:
   ///
   /// Invoked when the DataManager selection changed
   ///
-  virtual void SelectionChanged(berry::IWorkbenchPart::Pointer part
-    , berry::ISelection::ConstPointer selection);
+  virtual void OnSelectionChanged(std::vector<mitk::DataTreeNode*> nodes);
 
 private:
   ///
   /// \brief The properties table editor.
   ///
   QmitkPropertiesTableEditor* m_NodePropertiesTableEditor;
-  ///
-  /// A selection listener for datatreenode events
-  ///
-  berry::ISelectionListener::Pointer m_SelectionListener;
-  ///
-  /// 
-  ///
+
   friend struct berry::SelectionChangedAdapter<QmitkPropertyListView>;
 };
 

@@ -55,7 +55,7 @@ public:
   ///
   /// Invoked when the DataManager selection changed
   ///
-  virtual void SelectionChanged(berry::IWorkbenchPart::Pointer part, berry::ISelection::ConstPointer selection);
+  virtual void OnSelectionChanged( std::vector<mitk::DataTreeNode*> nodes );
 
 
 protected slots:
@@ -73,8 +73,6 @@ protected:
   berry::ISelectionListener::Pointer m_SelectionListener;
 
   Ui::QmitkVolumeVisualizationViewControls* m_Controls;
-  
-  void UpdateFromCurrentDataManagerSelection();
 
 private:
 

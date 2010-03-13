@@ -48,11 +48,6 @@ QmitkVolumeVisualizationView::QmitkVolumeVisualizationView()
 
 QmitkVolumeVisualizationView::~QmitkVolumeVisualizationView()
 {
-  berry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
-  if(s)
-    s->RemoveSelectionListener(m_SelectionListener);
-
-
 }
 
 void QmitkVolumeVisualizationView::CreateQtPartControl(QWidget* parent)
@@ -77,105 +72,76 @@ void QmitkVolumeVisualizationView::CreateQtPartControl(QWidget* parent)
     m_Controls->m_SelectedImageLabel->hide();
     m_Controls->m_ErrorImageLabel->hide();
     
-    
-    
   }
-  
-  m_SelectionListener = berry::ISelectionListener::Pointer(new berry::SelectionChangedAdapter<QmitkVolumeVisualizationView>
-    (this, &QmitkVolumeVisualizationView::SelectionChanged));
-  berry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
-  if(s)
-    s->AddSelectionListener(m_SelectionListener);
-    
-  UpdateFromCurrentDataManagerSelection();
 }
 
 
-void QmitkVolumeVisualizationView::SelectionChanged( berry::IWorkbenchPart::Pointer, berry::ISelection::ConstPointer selection )
+void QmitkVolumeVisualizationView::OnSelectionChanged( std::vector<mitk::DataTreeNode*> nodes )
 { 
-  //if(!this->m_IsVisible)
-    //return;
-
-  mitk::DataTreeNodeSelection::ConstPointer _DataTreeNodeSelection 
-    = selection.Cast<const mitk::DataTreeNodeSelection>();
-
   bool weHadAnImageButItsNotThreeDeeOrFourDee = false;
-   
-  if(_DataTreeNodeSelection.IsNotNull())
+
+  mitk::DataTreeNode::Pointer node;
+
+  for (std::vector<mitk::DataTreeNode*>::iterator iter = nodes.begin();
+       iter != nodes.end();
+       ++iter)
   {
-    std::vector<mitk::DataTreeNode*> selectedNodes;
-    mitk::DataTreeNodeObject* _DataTreeNodeObject = 0;
-
-    for(mitk::DataTreeNodeSelection::iterator it = _DataTreeNodeSelection->Begin();it != _DataTreeNodeSelection->End(); ++it)
+    mitk::DataTreeNode::Pointer currentNode = *iter;
+  
+    if( currentNode.IsNotNull() && dynamic_cast<mitk::Image*>(currentNode->GetData()) )
     {
-      _DataTreeNodeObject = dynamic_cast<mitk::DataTreeNodeObject*>((*it).GetPointer());
-      if(_DataTreeNodeObject)
+      if( dynamic_cast<mitk::Image*>(currentNode->GetData())->GetDimension()>=3 )
       {
-        mitk::DataTreeNode::Pointer node = _DataTreeNodeObject->GetDataTreeNode();
-      
-        if( node.IsNotNull() && dynamic_cast<mitk::Image*>(node->GetData()) )
+        if (node.IsNull())
         {
-          if( dynamic_cast<mitk::Image*>(node->GetData())->GetDimension()>=3 )
-            selectedNodes.push_back( node );
-          else
-            weHadAnImageButItsNotThreeDeeOrFourDee = true;
-        } 
+          node = currentNode;
+        }
       }
+      else
+      {
+        weHadAnImageButItsNotThreeDeeOrFourDee = true;
+      } 
     }
+  }
 
-    m_SelectedNode = 0;
-
-    mitk::DataTreeNode::Pointer node;
+  if( node.IsNotNull() )
+  {
+    m_Controls->m_NoSelectedImageLabel->hide();
+    m_Controls->m_ErrorImageLabel->hide();
+    m_Controls->m_SelectedImageLabel->show();
     
-    if(selectedNodes.size() > 0)
-      node=selectedNodes.front();
-
-    if( node.IsNotNull() )
+    std::string  infoText;
+    
+    if (node->GetName().empty())
+      infoText = std::string("Selected Image: [currently selected image has no name]");
+    else
+      infoText = std::string("Selected Image: ") + node->GetName();
+    
+    m_Controls->m_SelectedImageLabel->setText( QString( infoText.c_str() ) );
+    
+    m_SelectedNode = node;
+  }
+  else
+  {
+    if(weHadAnImageButItsNotThreeDeeOrFourDee)
     {
       m_Controls->m_NoSelectedImageLabel->hide();
-      m_Controls->m_ErrorImageLabel->hide();
-      m_Controls->m_SelectedImageLabel->show();
-      
+      m_Controls->m_ErrorImageLabel->show();
       std::string  infoText;
-      
-      if (node->GetName().empty())
-        infoText = std::string("Selected Image: [currently selected image has no name]");
-      else
-        infoText = std::string("Selected Image: ") + node->GetName();
-      
-      m_Controls->m_SelectedImageLabel->setText( QString( infoText.c_str() ) );
-      
-      m_SelectedNode = node;
+      infoText = std::string("only 3D or 4D images are supported");
+      m_Controls->m_ErrorImageLabel->setText( QString( infoText.c_str() ) ); 
     }
     else
     {
-      if(weHadAnImageButItsNotThreeDeeOrFourDee)
-      {
-        m_Controls->m_NoSelectedImageLabel->hide();
-        m_Controls->m_ErrorImageLabel->show();
-        std::string  infoText;
-        infoText = std::string("only 3D or 4D images are supported");
-        m_Controls->m_ErrorImageLabel->setText( QString( infoText.c_str() ) ); 
-      }
-      else
-      {
-        m_Controls->m_SelectedImageLabel->hide();
-        m_Controls->m_ErrorImageLabel->hide();
-        m_Controls->m_NoSelectedImageLabel->show();
-      }
+      m_Controls->m_SelectedImageLabel->hide();
+      m_Controls->m_ErrorImageLabel->hide();
+      m_Controls->m_NoSelectedImageLabel->show();
     }
-
-    UpdateInterface();
   }
 
+    UpdateInterface();
 }
 
-void QmitkVolumeVisualizationView::UpdateFromCurrentDataManagerSelection()
-{
-  //MITK_INFO << "Update selection from DataManager";
-  berry::ISelection::ConstPointer selection( this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection("org.mitk.views.datamanager"));
-  this->SelectionChanged(berry::SmartPointer<IWorkbenchPart>(NULL), selection);
-}
 
 void QmitkVolumeVisualizationView::UpdateInterface()
 {

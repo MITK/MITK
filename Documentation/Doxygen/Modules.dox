@@ -3,7 +3,7 @@
   \ingroup DataManagement
 
   \brief This subcategory includes the data classes, e.g., for images (mitk::Image), 
-  surfaces (mitk::SurfaceData), vessel-trees (mitk::VesselTreeData), etc. 
+  surfaces (mitk::Surface), vessel-trees (mitk::VesselTreeData), etc. 
 
   Data access classes are only included, if there is no equivalent in itk (see 
   \ref ProcessAndAdaptorClasses "Process and Adaptor Classes" below).

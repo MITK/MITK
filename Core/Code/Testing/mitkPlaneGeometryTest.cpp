@@ -127,54 +127,73 @@ int TestCase1210()
 }
 
 /**
- * @brief This method reproduces the bug #3409.
+ * @brief This method tests method ProjectPointOntoPlane.
+ *
+ * See also bug #3409.
  */
-int TestCase3409()
+int TestProjectPointOntoPlane()
 {
   mitk::PlaneGeometry::Pointer myPlaneGeometry = mitk::PlaneGeometry::New();
  
   //create normal
   mitk::Vector3D normal; 
-  normal[0] = 0; 
-  normal[1] = 0; 
-  normal[2] = 1; 
+  normal[0] = 0.0; 
+  normal[1] = 0.0; 
+  normal[2] = 1.0; 
   
   //create origin
-  mitk::Point3D point; 
-  point[0] = -27.582859; 
-  point[1] = 50; 
-  point[2] = 200.27742;
+  mitk::Point3D origin; 
+  origin[0] = -27.582859; 
+  origin[1] = 50; 
+  origin[2] = 200.27742;
 
   //initialize plane geometry
-  myPlaneGeometry->InitializePlane(point,normal);
+  myPlaneGeometry->InitializePlane(origin,normal);
 
   //output to descripe the test
   std::cout << "Testing PlaneGeometry according to bug #3409" << std::endl;
   std::cout << "Our normal is: " << normal << std::endl;
   std::cout << "So ALL projected points should have exactly the same z-value!" << std::endl;
 
-  //create point1
-  mitk::Point3D myPoint1; 
-  myPoint1[0] = -27.582859; 
-  myPoint1[1] = 50.00;   
-  myPoint1[2] = 200.27742;
+  //create a number of points
+  mitk::Point3D myPoints[5]; 
+  myPoints[0][0] = -27.582859; 
+  myPoints[0][1] = 50.00;   
+  myPoints[0][2] = 200.27742;
 
-  //create point2
-  mitk::Point3D myPoint2; 
-  myPoint2[0] = -26.58662; 
-  myPoint2[1] = 50.00; 
-  myPoint2[2] = 200.19026;
+  myPoints[1][0] = -26.58662; 
+  myPoints[1][1] = 50.00; 
+  myPoints[1][2] = 200.19026;
 
-  //project both points
-  mitk::Point3D projectedPoint1 = myPlaneGeometry->ProjectPointOntoPlane(myPoint1); 
-  mitk::Point3D projectedPoint2 = myPlaneGeometry->ProjectPointOntoPlane(myPoint2);
+  myPoints[2][0] = -26.58662; 
+  myPoints[2][1] = 50.00; 
+  myPoints[2][2] = 200.33124;
+ 
+  myPoints[3][0] = 104.58662; 
+  myPoints[3][1] = 452.12313; 
+  myPoints[3][2] = 866.41236;
 
-  //output to show the problem
-  std::cout << "Point1: " << myPoint1 << "=> " << "Projected Point1: " << projectedPoint1 << std::endl;
-  std::cout << "Point2: " << myPoint2 << "=> " << "Projected Point2: " << projectedPoint2 << std::endl;
+  myPoints[4][0] = -207.58662; 
+  myPoints[4][1] = 312.00; 
+  myPoints[4][2] = -300.12346;
 
-  //now compare the z-values
-  if (projectedPoint1[2] != projectedPoint2[2])
+  //project points onto plane
+  mitk::Point3D myProjectedPoints[5];
+  for ( unsigned int i = 0; i < 5; ++i )
+  {
+    myProjectedPoints[i] = myPlaneGeometry->ProjectPointOntoPlane( myPoints[i] );
+  }
+
+  //compare z-values with z-value of plane (should be equal)
+  bool allPointsOnPlane = true;
+  for ( unsigned int i = 0; i < 5; ++i )
+  {
+    if ( fabs(myProjectedPoints[i][2] - origin[2]) > mitk::sqrteps )
+    {
+      allPointsOnPlane = false;
+    }
+  }
+  if (!allPointsOnPlane)
     {
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;
@@ -194,14 +213,6 @@ int mitkPlaneGeometryTest(int /*argc*/, char* /*argv*/[])
   // the following can be used to reproduce a bug in ITK matrix inversion
   // which was found while investigating bug #1210.
   result = TestCase1210();
-  if(result!=EXIT_SUCCESS)
-    return result;
-  */
-
-  /*
-  // the following can be used to reproduce a bug in mitk::PlaneGeometry
-  // which is described in bug #3409.
-  result = TestCase3409();
   if(result!=EXIT_SUCCESS)
     return result;
   */
@@ -790,6 +801,14 @@ int mitkPlaneGeometryTest(int /*argc*/, char* /*argv*/[])
   result = mappingTests2D(planegeometry, width, height, widthInMM, heightInMM, backsideorigin, right, -bottom);
   if(result!=EXIT_SUCCESS)
     return result;
+
+
+  // test method mitk::PlaneGeometry::ProjectPointOntoPlane()
+  // (see also bug #3409)
+  result = TestProjectPointOntoPlane();
+  if(result!=EXIT_SUCCESS)
+    return result;
+
 
   std::cout<<"[TEST DONE]"<<std::endl;
   return EXIT_SUCCESS;

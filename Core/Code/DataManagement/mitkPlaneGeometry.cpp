@@ -684,8 +684,8 @@ PlaneGeometry::IsOnPlane( const PlaneGeometry *plane ) const
 Point3D
 PlaneGeometry::ProjectPointOntoPlane( const Point3D& pt ) const
 {
-  ScalarType len = GetNormalVnl().two_norm();
-  return pt-GetNormal()*Distance(pt)/len;
+  ScalarType len = this->GetNormalVnl().two_norm();
+  return pt - this->GetNormal() * this->SignedDistanceFromPlane( pt ) / len;
 }
 
 

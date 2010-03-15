@@ -66,6 +66,8 @@ INPUT                  = ./ \
                          @MITK_SOURCE_DIR@ @MITK_BINARY_DIR@ \
                          @MBIQM_SOURCE_DIR@ @MBIQM_BINARY_DIR@ \
                          @MBISB_SOURCE_DIR@ @MBISB_BINARY_DIR@ \
+                         @MBI_SOURCE_DIR@ @MBI_BINARY_DIR@
+
 FILE_PATTERNS          = *.h \
                          *.cpp \
                          *.dox \

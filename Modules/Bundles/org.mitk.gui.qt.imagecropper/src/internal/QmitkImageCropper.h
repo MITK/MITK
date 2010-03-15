@@ -55,20 +55,20 @@ which implements moving and scaling the cuboid.
 class QmitkImageCropper : public QObject, public QmitkFunctionality, public mitk::OperationActor
 {
 
-  /// Operation base class, which holds pointers to a node of the data tree (mitk::DataTreeNode)
+  /// Operation base class, which holds pointers to a node of the data tree (mitk::DataNode)
   /// and to two data sets (mitk::BaseData) instances
   class opExchangeNodes: public mitk::Operation
   {
-    public: opExchangeNodes( mitk::OperationType type,  mitk::DataTreeNode* node,
+    public: opExchangeNodes( mitk::OperationType type,  mitk::DataNode* node,
                                                         mitk::BaseData* oldData,
                                                         mitk::BaseData* newData );
-            mitk::DataTreeNode* GetNode() { return m_Node; }
+            mitk::DataNode* GetNode() { return m_Node; }
             mitk::BaseData* GetOldData() { return m_OldData; }
             mitk::BaseData* GetNewData() { return m_NewData; }
     protected: 
             void NodeDeleted(const itk::Object *caller, const itk::EventObject &event);
     private: 
-            mitk::DataTreeNode* m_Node;
+            mitk::DataNode* m_Node;
             mitk::BaseData::Pointer m_OldData;
             mitk::BaseData::Pointer m_NewData;
             long m_NodeDeletedObserverTag;
@@ -141,7 +141,7 @@ public:
   /*!
   \brief Filter function, used with the QmitkTreeNodeSelector widget to ensure, only images can be selected
   */
-  static bool DataTreeNodeFilter(mitk::DataTreeNode*);
+  static bool DataNodeFilter(mitk::DataNode*);
 
   /*
   \brief Interface of a mitk::StateMachine (for undo/redo)
@@ -150,7 +150,7 @@ public:
 
    QWidget* GetControls();
 
-   const mitk::DataTreeNode::Pointer selectedImage();
+   const mitk::DataNode::Pointer selectedImage();
 
 public slots:
 
@@ -159,7 +159,7 @@ public slots:
 
   // from QmitkImageCropperControls
   virtual void ImageSelectionChanged();
-  virtual void ImageNodeChanged( const mitk::DataTreeNode* item );
+  virtual void ImageNodeChanged( const mitk::DataNode* item );
   virtual void ChkInformationToggled( bool on );
 
 protected:
@@ -179,7 +179,7 @@ protected:
   /*!
   * \brief A pointer to the node of the image to be croped.
   */
-  mitk::WeakPointer<mitk::DataTreeNode> m_ImageNode;
+  mitk::WeakPointer<mitk::DataNode> m_ImageNode;
 
   /*!
   * \brief A pointer to the image to be cropped.
@@ -194,7 +194,7 @@ protected:
   /*!
   * \brief Tree node of the cuboid used for cropping.
   */
-  mitk::DataTreeNode::Pointer m_CroppingObjectNode;
+  mitk::DataNode::Pointer m_CroppingObjectNode;
 
   /*!
   * \brief Interactor for moving and scaling the cuboid
@@ -209,7 +209,7 @@ protected:
   /*!
    * \brief Finds the given node in the data tree and fits the cuboid to it
    */
-  virtual void AddBoundingObjectToNode(mitk::DataTreeNode* node);
+  virtual void AddBoundingObjectToNode(mitk::DataNode* node);
 
   /*!
    * \brief Removes the cuboid from any node and hides it from the user.

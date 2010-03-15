@@ -144,7 +144,7 @@ public:
 
   /** Initializes the windows specified by requestType to the geometry of the
    * given DataStorage. */
-  //virtual bool InitializeViews( const DataStorage *storage, const DataTreeNode* node = NULL,
+  //virtual bool InitializeViews( const DataStorage *storage, const DataNode* node = NULL,
   //   RequestType type = REQUEST_UPDATE_ALL, bool preserveRoughOrientationInWorldSpace = false );
 
   /** Initializes the windows specified by requestType to the given
@@ -159,9 +159,9 @@ public:
 
 
   /** Initializes the specified window to the geometry of the given
-   * DataTreeNode. Set "initializeGlobalTimeSNC" to true in order to use this
+   * DataNode. Set "initializeGlobalTimeSNC" to true in order to use this
    * geometry as global TimeSlicedGeometry. PLATFORM SPECIFIC. */
-  //virtual bool InitializeView( vtkRenderWindow *renderWindow, const DataStorage* ds, const DataTreeNode* node = NULL, bool initializeGlobalTimeSNC = false );
+  //virtual bool InitializeView( vtkRenderWindow *renderWindow, const DataStorage* ds, const DataNode* node = NULL, bool initializeGlobalTimeSNC = false );
 
   /** Initializes the specified window to the given geometry. Set
    * "initializeGlobalTimeSNC" to true in order to use this geometry as

@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef QmitkRigidRegistrationSelectorViewWidgetHIncluded
 #define QmitkRigidRegistrationSelectorViewWidgetHIncluded
 
-#include "mitkDataTreeNode.h"
+#include "mitkDataNode.h"
 #include "mitkDataStorage.h"
 #include "ui_QmitkRigidRegistrationSelector.h"
 #include "mitkRigidRegistrationTestPreset.h"
@@ -50,12 +50,12 @@ public:
     void AddNewTransformationToUndoList();
   
   public slots:    
-    void SetFixedNode( mitk::DataTreeNode * fixedNode );
-    void SetFixedMaskNode(mitk::DataTreeNode * fixedMaskNode );
+    void SetFixedNode( mitk::DataNode * fixedNode );
+    void SetFixedMaskNode(mitk::DataNode * fixedMaskNode );
     void SetFixedDimension( int dimension );
-    void SetMovingNode( mitk::DataTreeNode * movingNode );
+    void SetMovingNode( mitk::DataNode * movingNode );
     void SetMovingNodeChildren(mitk::DataStorage::SetOfObjects::ConstPointer children);
-    void SetMovingMaskNode(mitk::DataTreeNode * movingMaskNode );
+    void SetMovingMaskNode(mitk::DataNode * movingMaskNode );
     void SetMovingDimension(int dimension );
     int GetSelectedTransform();
     void CalculateTransformation(unsigned int timestep = 0);
@@ -92,10 +92,10 @@ public:
 protected:
 
   Ui::QmitkRigidRegistrationSelector m_Controls;
-  mitk::DataTreeNode::Pointer m_FixedNode;
-  mitk::DataTreeNode::Pointer m_FixedMaskNode;
-  mitk::DataTreeNode::Pointer m_MovingNode;
-  mitk::DataTreeNode::Pointer m_MovingMaskNode;
+  mitk::DataNode::Pointer m_FixedNode;
+  mitk::DataNode::Pointer m_FixedMaskNode;
+  mitk::DataNode::Pointer m_MovingNode;
+  mitk::DataNode::Pointer m_MovingMaskNode;
   int m_FixedDimension;
   int m_MovingDimension;
   bool m_StopOptimization;
@@ -107,8 +107,8 @@ protected:
   mitk::AffineGeometryFrame3D::Pointer m_ImageGeometry;
   mitk::RigidRegistrationObserver::Pointer m_Observer;
   mitk::DataStorage::SetOfObjects::ConstPointer m_MovingNodeChildren;
-  std::map<mitk::DataTreeNode::Pointer, mitk::Geometry3D*> m_ChildNodes;
-  std::map<mitk::DataTreeNode::Pointer, mitk::AffineGeometryFrame3D::Pointer> m_ChildNodes2;
+  std::map<mitk::DataNode::Pointer, mitk::Geometry3D*> m_ChildNodes;
+  std::map<mitk::DataNode::Pointer, mitk::AffineGeometryFrame3D::Pointer> m_ChildNodes2;
 };
 
 #endif

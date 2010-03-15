@@ -11,7 +11,7 @@
 #include <QEvent>
 #include <QKeyEvent>
 
-QmitkInfoDialog::QmitkInfoDialog( std::vector<mitk::DataTreeNode*> _Nodes, QWidget * parent /*= 0*/, Qt::WindowFlags f /*= 0 */ )
+QmitkInfoDialog::QmitkInfoDialog( std::vector<mitk::DataNode*> _Nodes, QWidget * parent /*= 0*/, Qt::WindowFlags f /*= 0 */ )
 : QDialog(parent, f)
 {
   // DIM
@@ -36,10 +36,10 @@ QmitkInfoDialog::QmitkInfoDialog( std::vector<mitk::DataTreeNode*> _Nodes, QWidg
   parentLayout->addWidget(m_TextBrowser, 2, 0, 1, 2);
   parentLayout->addWidget(_CancelButton, 3, 0, 1, 2);
 
-  QObject::connect( _QmitkDataStorageComboBox, SIGNAL( OnSelectionChanged( const mitk::DataTreeNode* ) )
-    , this, SLOT( OnSelectionChanged( const mitk::DataTreeNode* ) ) );
+  QObject::connect( _QmitkDataStorageComboBox, SIGNAL( OnSelectionChanged( const mitk::DataNode* ) )
+    , this, SLOT( OnSelectionChanged( const mitk::DataNode* ) ) );
 
-  for (std::vector<mitk::DataTreeNode*>::iterator it = _Nodes.begin()
+  for (std::vector<mitk::DataNode*>::iterator it = _Nodes.begin()
     ; it != _Nodes.end(); it++)
   {
     _QmitkDataStorageComboBox->AddNode(*it);
@@ -58,7 +58,7 @@ QmitkInfoDialog::QmitkInfoDialog( std::vector<mitk::DataTreeNode*> _Nodes, QWidg
   
 }
 
-void QmitkInfoDialog::OnSelectionChanged( const mitk::DataTreeNode* node )
+void QmitkInfoDialog::OnSelectionChanged( const mitk::DataNode* node )
 {
   std::ostringstream s;
   itk::Indent i(2);

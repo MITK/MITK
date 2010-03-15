@@ -19,7 +19,7 @@
 #include "mitkBaseProperty.h"
 #include "mitkBaseRenderer.h"
 #include "mitkTestingMacros.h"
-#include "mitkDataTreeNode.h"
+#include "mitkDataNode.h"
 #include <mitkVtkPropRenderer.h>
 #include <mitkColorProperty.h>
 

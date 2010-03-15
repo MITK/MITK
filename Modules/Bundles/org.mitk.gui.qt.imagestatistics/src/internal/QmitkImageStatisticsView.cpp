@@ -48,7 +48,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkImageCast.h"
 #include "mitkITKImageImport.h"
 
-#include "mitkDataTreeNodeObject.h"
+#include "mitkDataNodeObject.h"
 #include "mitkNodePredicateData.h"
 
 #include <itkVectorImage.h>
@@ -554,7 +554,7 @@ void QmitkImageStatistics::InvalidateStatisticsTableView()
 }
 
 
-void QmitkImageStatistics::OnSelectionChanged( std::vector<mitk::DataTreeNode*> nodes )
+void QmitkImageStatistics::OnSelectionChanged( std::vector<mitk::DataNode*> nodes )
 {
   // Clear any unreferenced images
   this->RemoveOrphanImages();
@@ -579,12 +579,13 @@ void QmitkImageStatistics::OnSelectionChanged( std::vector<mitk::DataTreeNode*> 
   }
 
   // Get selected element
-  mitk::DataTreeNode *selectedNode = nodes.front();
+
+  mitk::DataNode *selectedNode = nodes.front();
   mitk::Image *selectedImage = dynamic_cast< mitk::Image * >( selectedNode->GetData() );
 
   // Find the next parent/grand-parent node containing an image, if any
   const mitk::DataStorage::SetOfObjects *parentObjects;
-  mitk::DataTreeNode *parentNode = NULL;
+  mitk::DataNode *parentNode = NULL;
   mitk::Image *parentImage = NULL;
 
   // Possibly previous change listeners

@@ -99,7 +99,7 @@ public:
 
   virtual void ApplyProperties(vtkActor* actor, mitk::BaseRenderer* renderer);
 
-  static void SetDefaultProperties(mitk::DataTreeNode* node, mitk::BaseRenderer* renderer = NULL, bool overwrite = false);
+  static void SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer = NULL, bool overwrite = false);
 
 protected:
   SurfaceVtkMapper3D();
@@ -151,8 +151,8 @@ public:
     
   mitk::Mapper::LocalStorageHandler<LocalStorage> m_LSH;  
   
-  static void ApplyMitkPropertiesToVtkProperty(mitk::DataTreeNode *node, vtkProperty* property, mitk::BaseRenderer* renderer);
-  static void SetDefaultPropertiesForVtkProperty(mitk::DataTreeNode* node, mitk::BaseRenderer* renderer, bool overwrite);
+  static void ApplyMitkPropertiesToVtkProperty(mitk::DataNode *node, vtkProperty* property, mitk::BaseRenderer* renderer);
+  static void SetDefaultPropertiesForVtkProperty(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite);
 };
 
 } // namespace mitk

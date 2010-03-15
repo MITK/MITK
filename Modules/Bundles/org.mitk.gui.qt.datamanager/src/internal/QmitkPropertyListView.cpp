@@ -4,7 +4,7 @@
 #include <berryISelectionService.h>
 #include "QmitkPropertyListView.h"
 #include <QmitkPropertiesTableEditor.h>
-#include <mitkDataTreeNodeObject.h>
+#include <mitkDataNodeObject.h>
 #include <mitkLogMacros.h>
 #include <QVBoxLayout>
 
@@ -28,7 +28,7 @@ void QmitkPropertyListView::CreateQtPartControl( QWidget* parent )
   parent->setLayout(layout);
 }
 
-void QmitkPropertyListView::OnSelectionChanged( std::vector<mitk::DataTreeNode*> nodes )
+void QmitkPropertyListView::OnSelectionChanged( std::vector<mitk::DataNode*> nodes )
 {
   if (nodes.empty() || (nodes.front() == NULL)) return;
       

@@ -27,7 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkDataStorage.h"
 
 #include <berryISelectionListener.h>
-#include <mitkDataTreeNodeSelection.h>
+#include <mitkDataNodeSelection.h>
 
 #include <mitkTransferFunctionProperty.h>
 
@@ -69,8 +69,8 @@ protected:
   
 private:
 
-  mitk::WeakPointer<mitk::DataTreeNode> m_SelectedNode;
-  mitk::WeakPointer<mitk::DataTreeNode> m_SelectedNode2;
+  mitk::WeakPointer<mitk::DataNode> m_SelectedNode;
+  mitk::WeakPointer<mitk::DataNode> m_SelectedNode2;
   int m_Color[3];
 };
 

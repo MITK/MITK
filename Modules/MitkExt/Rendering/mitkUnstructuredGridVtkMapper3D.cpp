@@ -17,7 +17,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkUnstructuredGridVtkMapper3D.h"
-#include "mitkDataTreeNode.h"
+#include "mitkDataNode.h"
 #include "mitkProperties.h"
 #include "mitkTransferFunctionProperty.h"
 #include "mitkColorProperty.h"
@@ -174,10 +174,10 @@ void mitk::UnstructuredGridVtkMapper3D::GenerateData(mitk::BaseRenderer* rendere
   m_VtkDataSetMapper->SetInput(grid);
   m_VtkDataSetMapper2->SetInput(grid);
 
-  mitk::DataTreeNode::ConstPointer node = this->GetDataTreeNode();
+  mitk::DataNode::ConstPointer node = this->GetDataNode();
   bool clip = false;
   node->GetBoolProperty("enable clipping", clip);
-  mitk::DataTreeNode::Pointer bbNode = renderer->GetDataStorage()->GetNamedDerivedNode("Clipping Bounding Object", node);
+  mitk::DataNode::Pointer bbNode = renderer->GetDataStorage()->GetNamedDerivedNode("Clipping Bounding Object", node);
   if (clip && bbNode.IsNotNull())
   {
     m_VtkDataSetMapper->SetBoundingObject(dynamic_cast<mitk::BoundingObject*>(bbNode->GetData()));
@@ -197,7 +197,7 @@ void mitk::UnstructuredGridVtkMapper3D::GenerateData(mitk::BaseRenderer* rendere
 
 void mitk::UnstructuredGridVtkMapper3D::SetProperties(mitk::BaseRenderer* renderer)
 {
-  mitk::DataTreeNode::Pointer node = this->GetDataTreeNode();
+  mitk::DataNode::Pointer node = this->GetDataNode();
   vtkVolumeProperty* volProp = m_Volume->GetProperty();
   vtkProperty* property = m_Actor->GetProperty();
 

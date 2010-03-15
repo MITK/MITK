@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkCommon.h"
 #include "MitkExtExports.h"
 #include "mitkAutoSegmentationTool.h"
-#include "mitkDataTreeNode.h"
+#include "mitkDataNode.h"
 
 #include <itkImage.h>
 
@@ -63,15 +63,15 @@ class MitkExt_EXPORT BinaryThresholdTool : public AutoSegmentationTool
     BinaryThresholdTool(); // purposely hidden
     virtual ~BinaryThresholdTool();
 
-    void SetupPreviewNodeFor( DataTreeNode* nodeForThresholding );
+    void SetupPreviewNodeFor( DataNode* nodeForThresholding );
 
-    void CreateNewSegmentationFromThreshold(DataTreeNode* node, const std::string& organType, const Color& color);
+    void CreateNewSegmentationFromThreshold(DataNode* node, const std::string& organType, const Color& color);
 
     template <typename TPixel, unsigned int VImageDimension>
     void ITKThresholding( itk::Image<TPixel, VImageDimension>* originalImage, mitk::Image* segmentation, unsigned int timeStep );
 
-    DataTreeNode::Pointer m_ThresholdFeedbackNode;
-    DataTreeNode::Pointer m_NodeForThresholding;
+    DataNode::Pointer m_ThresholdFeedbackNode;
+    DataNode::Pointer m_NodeForThresholding;
 
     int m_SensibleMinimumThresholdValue;
     int m_SensibleMaximumThresholdValue;

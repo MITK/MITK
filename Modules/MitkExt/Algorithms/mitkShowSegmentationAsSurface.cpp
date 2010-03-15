@@ -17,7 +17,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkShowSegmentationAsSurface.h"
 #include "mitkManualSegmentationToSurfaceFilter.h"
-#include "mitkDataTreeNodeFactory.h"
+#include "mitkDataNodeFactory.h"
 #include "mitkVtkRepresentationProperty.h"
 #include <mitkCoreObjectFactory.h>
 
@@ -170,7 +170,7 @@ void ShowSegmentationAsSurface::ThreadedUpdateSuccessful()
 
   if (m_AddToTree)
   {
-    m_Node = DataTreeNode::New();
+    m_Node = DataNode::New();
 
     bool wireframe(false);
     GetParameter("Wireframe", wireframe );
@@ -189,7 +189,7 @@ void ShowSegmentationAsSurface::ThreadedUpdateSuccessful()
     m_Node->SetProperty( "FILENAME", StringProperty::New( uid + ".vtk" ) ); // undocumented feature of Image::WriteXMLData
     std::string groupNodesName ("surface");
     
-    DataTreeNode* groupNode = GetGroupNode();
+    DataNode* groupNode = GetGroupNode();
     if (groupNode)
     {
       groupNode->GetName( groupNodesName );
@@ -206,7 +206,7 @@ void ShowSegmentationAsSurface::ThreadedUpdateSuccessful()
   if (m_AddToTree)
   {
 
-    DataTreeNode* groupNode = GetGroupNode();
+    DataNode* groupNode = GetGroupNode();
     if (groupNode)
     {
       groupNode->SetProperty( "Surface representation", SmartPointerProperty::New(m_Node) );

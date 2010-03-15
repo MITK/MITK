@@ -78,10 +78,9 @@ public:
 
   virtual bool event( QEvent *event );
 
-  void OnSelectionChanged( std::vector<mitk::DataTreeNode*> nodes );
+  void OnSelectionChanged( std::vector<mitk::DataNode*> nodes );
   
 protected slots:  
-  
   void UpdateTimestep();
 
   void ClipboardHistogramButtonClicked();
@@ -143,10 +142,10 @@ protected:
   QString                     m_Clipboard;
 
   // Image and mask data
-  mitk::DataTreeNode *m_SelectedImageNode;
+  mitk::DataNode *m_SelectedImageNode;
   mitk::Image *m_SelectedImage;
 
-  mitk::DataTreeNode *m_SelectedMaskNode;
+  mitk::DataNode *m_SelectedMaskNode;
   mitk::Image *m_SelectedImageMask;
   mitk::PlanarFigure *m_SelectedPlanarFigure;
 

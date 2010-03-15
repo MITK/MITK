@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkAffineInteractor.h"
 #include "mitkColorProperty.h"
-#include "mitkDataTreeNode.h"
+#include "mitkDataNode.h"
 #include "mitkEnumerationProperty.h"
 #include "mitkGeometry2DData.h"
 #include "mitkGeometry2DDataMapper2D.h"
@@ -159,14 +159,14 @@ mitk::CoreObjectFactory::Pointer mitk::CoreObjectFactory::GetInstance() {
   return instance;
 }
 
-#include <mitkDataTreeNodeFactory.h>
+#include <mitkDataNodeFactory.h>
 
-void mitk::CoreObjectFactory::SetDefaultProperties(mitk::DataTreeNode* node)
+void mitk::CoreObjectFactory::SetDefaultProperties(mitk::DataNode* node)
 {
   if(node==NULL)
     return;
 
-  mitk::DataTreeNode::Pointer nodePointer = node;
+  mitk::DataNode::Pointer nodePointer = node;
 
   mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
   if(image.IsNotNull() && image->IsInitialized())
@@ -217,7 +217,7 @@ mitk::CoreObjectFactory::CoreObjectFactory()
   }
 }
 
-mitk::Mapper::Pointer mitk::CoreObjectFactory::CreateMapper(mitk::DataTreeNode* node, MapperSlotId id)
+mitk::Mapper::Pointer mitk::CoreObjectFactory::CreateMapper(mitk::DataNode* node, MapperSlotId id)
 {
   mitk::Mapper::Pointer newMapper = NULL;
   
@@ -237,24 +237,24 @@ mitk::Mapper::Pointer mitk::CoreObjectFactory::CreateMapper(mitk::DataTreeNode* 
       {
         mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(data);
         newMapper = mitk::ImageMapper2D::New();
-        newMapper->SetDataTreeNode(node);
+        newMapper->SetDataNode(node);
       }
       else if((dynamic_cast<Geometry2DData*>(data)!=NULL))
       {
         newMapper = mitk::Geometry2DDataMapper2D::New();
-        newMapper->SetDataTreeNode(node);
+        newMapper->SetDataNode(node);
       }
       else if((dynamic_cast<Surface*>(data)!=NULL))
       {
         newMapper = mitk::SurfaceMapper2D::New();
-        // cast because SetDataTreeNode is not virtual
+        // cast because SetDataNode is not virtual
         mitk::SurfaceMapper2D *castedMapper = dynamic_cast<mitk::SurfaceMapper2D*>(newMapper.GetPointer());
-        castedMapper->SetDataTreeNode(node);
+        castedMapper->SetDataNode(node);
       }
       else if((dynamic_cast<PointSet*>(data)!=NULL))
       {
         newMapper = mitk::PointSetMapper2D::New();
-        newMapper->SetDataTreeNode(node);
+        newMapper->SetDataNode(node);
       }
     }
     else if ( id == mitk::BaseRenderer::Standard3D )
@@ -262,23 +262,23 @@ mitk::Mapper::Pointer mitk::CoreObjectFactory::CreateMapper(mitk::DataTreeNode* 
       if((dynamic_cast<Image*>(data) != NULL))
       {
         newMapper = mitk::VolumeDataVtkMapper3D::New();
-        newMapper->SetDataTreeNode(node);
+        newMapper->SetDataNode(node);
       }
       else if((dynamic_cast<Geometry2DData*>(data)!=NULL))
       {
         newMapper = mitk::Geometry2DDataVtkMapper3D::New();
-        newMapper->SetDataTreeNode(node);
+        newMapper->SetDataNode(node);
       }
       else if((dynamic_cast<Surface*>(data)!=NULL))
       {
         newMapper = mitk::SurfaceVtkMapper3D::New();
-        newMapper->SetDataTreeNode(node);
+        newMapper->SetDataNode(node);
       }
       else if((dynamic_cast<PointSet*>(data)!=NULL))
       {
         newMapper = mitk::PointSetVtkMapper3D::New();
         //newMapper = mitk::EnhancedPointSetVtkMapper3D::New(); // <-- use this if you want to try the new work in progres point set mapper
-        newMapper->SetDataTreeNode(node);
+        newMapper->SetDataNode(node);
       }
     }
   }

@@ -51,11 +51,11 @@ public:
   /// Get node at a specific model index.
   /// This function is used to get a node from a QModelIndex
   ///
-  mitk::DataTreeNode::Pointer GetNode(const QModelIndex &index) const;
+  mitk::DataNode::Pointer GetNode(const QModelIndex &index) const;
   ///
   /// Returns a copy of the node-vector that is shown by this model
   ///
-  virtual std::vector<mitk::DataTreeNode*> GetNodeSet() const;
+  virtual std::vector<mitk::DataNode*> GetNodeSet() const;
   ///
   /// Get the DataStorage.
   /// 
@@ -98,33 +98,33 @@ public:
   /// Adds a node to this model. 
   /// If a predicate is set (not null) the node will be checked against it.The node has to have a data object (no one wants to see empty nodes).
   ///
-  virtual void AddNode(const mitk::DataTreeNode* node);
+  virtual void AddNode(const mitk::DataNode* node);
   ///
   /// Removes a node from this model. Also removes any event listener from the node.
   ///
-  virtual void RemoveNode(const mitk::DataTreeNode* node);
+  virtual void RemoveNode(const mitk::DataNode* node);
   ///
   /// Sets a node to modfified. Called by the DataStorage
   ///
-  virtual void SetNodeModified(const mitk::DataTreeNode* node);
+  virtual void SetNodeModified(const mitk::DataNode* node);
 
   ///
   /// \return an index for the given datatreenode in the tree. If the node is not found
   ///
-  QModelIndex GetIndex(const mitk::DataTreeNode*) const;
+  QModelIndex GetIndex(const mitk::DataNode*) const;
 
 //# MISC
 protected:
   ///
-  /// Helper class to represent a tree structure of DataTreeNodes
+  /// Helper class to represent a tree structure of DataNodes
   ///
   class TreeItem
   {
   public:
     ///
-    /// Constructs a new TreeItem with the given DataTreeNode (must not be 0)
+    /// Constructs a new TreeItem with the given DataNode (must not be 0)
     ///
-    TreeItem(mitk::DataTreeNode* _DataTreeNode, TreeItem* _Parent=0);
+    TreeItem(mitk::DataNode* _DataNode, TreeItem* _Parent=0);
     ///
     /// Removes itself as child from its parent-> Does not delete its children
     /// \sa Delete()
@@ -141,7 +141,7 @@ protected:
     ///
     /// Find the TreeItem containing a special tree node (recursive tree function)
     ///
-    TreeItem* Find( const mitk::DataTreeNode* _DataTreeNode) const;
+    TreeItem* Find( const mitk::DataNode* _DataNode) const;
     ///
     /// Get the amount of children
     ///
@@ -155,9 +155,9 @@ protected:
     ///
     TreeItem* GetParent() const;
     ///
-    /// Return the DataTreeNode associated with this node
+    /// Return the DataNode associated with this node
     ///
-    mitk::DataTreeNode::Pointer GetDataTreeNode() const;
+    mitk::DataNode::Pointer GetDataNode() const;
     ///
     /// Get all children as vector
     ///
@@ -185,7 +185,7 @@ protected:
   protected:
     TreeItem* m_Parent;
     std::vector<TreeItem*> m_Children;
-    mitk::DataTreeNode::Pointer m_DataTreeNode;
+    mitk::DataNode::Pointer m_DataNode;
   };
   ///
   /// Adjusts the LayerProperty according to the nodes position
@@ -202,7 +202,7 @@ protected:
   ///
   /// Returns the first element in the nodes sources list (if available) or 0
   ///
-  mitk::DataTreeNode* GetParentNode(const mitk::DataTreeNode* node) const;
+  mitk::DataNode* GetParentNode(const mitk::DataNode* node) const;
   ///
   /// Adds all Childs in parent to vec. Before a child is added the function is called recursively
   ///
@@ -210,7 +210,7 @@ protected:
   ///
   /// Adds all Childs in parent to vec. Before a child is added the function is called recursively
   ///
-  void TreeToNodeSet(TreeItem* parent, std::vector<mitk::DataTreeNode*>& vec) const;
+  void TreeToNodeSet(TreeItem* parent, std::vector<mitk::DataNode*>& vec) const;
   //# ATTRIBUTES
 protected:
   mitk::WeakPointer<mitk::DataStorage> m_DataStorage;

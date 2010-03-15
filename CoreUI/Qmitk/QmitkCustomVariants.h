@@ -19,9 +19,9 @@
 #ifndef QMITKCUSTOMVARIANTS_H_
 #define QMITKCUSTOMVARIANTS_H_
 
-#include <mitkDataTreeNode.h>
+#include <mitkDataNode.h>
 
-Q_DECLARE_METATYPE(mitk::DataTreeNode::Pointer)
-Q_DECLARE_METATYPE(mitk::DataTreeNode*)
+Q_DECLARE_METATYPE(mitk::DataNode::Pointer)
+Q_DECLARE_METATYPE(mitk::DataNode*)
 
 #endif /* QMITKCUSTOMVARIANTS_H_ */

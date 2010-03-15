@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <QFileDialog>
 #include <QFileInfo>
-#include <mitkDataTreeNodeFactory.h>
+#include <mitkDataNodeFactory.h>
 
 #include "mitkProgressBar.h"
 
@@ -135,14 +135,14 @@ void QmitkFileOpenAction::Run()
     fileName != fileNames.end(); ++fileName)
   {
 
-    mitk::DataTreeNodeFactory::Pointer nodeReader = mitk::DataTreeNodeFactory::New();
+    mitk::DataNodeFactory::Pointer nodeReader = mitk::DataNodeFactory::New();
     try
     {
       nodeReader->SetFileName(fileName->toStdString());
       nodeReader->Update();
       for ( unsigned int i = 0 ; i < nodeReader->GetNumberOfOutputs( ); ++i )
       {
-        mitk::DataTreeNode::Pointer node;
+        mitk::DataNode::Pointer node;
         node = nodeReader->GetOutput(i);
         if ( node->GetData() != NULL )
         {  

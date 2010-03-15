@@ -99,7 +99,7 @@ void QmitkNDIToolDelegate::setEditorData(QWidget *editor, const QModelIndex &ind
     }
   case NodeCol:
     {
-      mitk::DataTreeNode::Pointer n = qVariantValue<mitk::DataTreeNode::Pointer>(index.data(/*mitk::OrganNodeRole*/));
+      mitk::DataNode::Pointer n = qVariantValue<mitk::DataNode::Pointer>(index.data(/*mitk::OrganNodeRole*/));
       if (n.IsNotNull())
       {
         QmitkDataStorageComboBox* dsc = qobject_cast<QmitkDataStorageComboBox*>(editor);

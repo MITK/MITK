@@ -16,37 +16,37 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include <mitkDataTreeFilterFunctions.h>
-#include "mitkDataTreeNode.h"
+#include "mitkDataNode.h"
 
 namespace mitk
 {
 
-bool DataTreeFilterFunction::operator()(DataTreeNode* node) const
+bool DataTreeFilterFunction::operator()(DataNode* node) const
 {
   return NodeMatches(node);
 }
 
-bool IsDataTreeNode::NodeMatches(DataTreeNode* node) const
+bool IsDataNode::NodeMatches(DataNode* node) const
 {
   return ( node != NULL );
 }
 
-DataTreeFilterFunction* IsDataTreeNode::Clone() const
+DataTreeFilterFunction* IsDataNode::Clone() const
 {
-  return new IsDataTreeNode();
+  return new IsDataNode();
 }
 
-bool IsGoodDataTreeNode::NodeMatches(DataTreeNode* node) const
+bool IsGoodDataNode::NodeMatches(DataNode* node) const
 {
   return ( node != NULL && node->GetData() );
 }
 
-DataTreeFilterFunction* IsGoodDataTreeNode::Clone() const
+DataTreeFilterFunction* IsGoodDataNode::Clone() const
 {
-  return new IsGoodDataTreeNode();
+  return new IsGoodDataNode();
 }
 
-bool IsInResultSet::NodeMatches(DataTreeNode* node) const
+bool IsInResultSet::NodeMatches(DataNode* node) const
 {
   if ((node == NULL) || (m_ResultSet.empty()))
     return false;

@@ -217,33 +217,33 @@ class MitkExt_EXPORT PACSPlugin : public itk::Object
      * \brief Load all images from the given lightbox.
      * \todo rename to LoadLightboxContent and load all images and texts, ignoring the lightbox!! make it use LoadSeriesContent for all series UIDs found in lightbox
      */
-    virtual std::vector<DataTreeNode::Pointer> LoadImagesFromLightbox( unsigned int lightboxIndex = 0 );
+    virtual std::vector<DataNode::Pointer> LoadImagesFromLightbox( unsigned int lightboxIndex = 0 );
 
     /*!
      * \brief Load all objects from a given series instance UID
      * \todo rename to LoadSeriesContent, make this take a list of UIDs
      */
-    virtual std::vector<DataTreeNode::Pointer> LoadFromSeries( const std::string& seriesInstanceUID );
+    virtual std::vector<DataNode::Pointer> LoadFromSeries( const std::string& seriesInstanceUID );
 
     /*!
      * \brief Load all image objects from a given series instance UID
      * \todo rename to LoadSeriesImageContent, make this take a list of UIDs
      */
-    virtual std::vector<DataTreeNode::Pointer> LoadImagesFromSeries( const std::string& seriesInstanceUID );
+    virtual std::vector<DataNode::Pointer> LoadImagesFromSeries( const std::string& seriesInstanceUID );
 
-    virtual std::vector<mitk::DataTreeNode::Pointer> LoadImagesFromSeries( std::vector<std::string> seriesInstanceUIDs );
+    virtual std::vector<mitk::DataNode::Pointer> LoadImagesFromSeries( std::vector<std::string> seriesInstanceUIDs );
 
     /*!
      * \brief Load all objects from a given series instance UID
      * \todo rename to LoadSeriesDocumentContent, make this take a list of UIDs
      */
-    virtual std::vector<DataTreeNode::Pointer> LoadTextsFromSeries( const std::string& seriesInstanceUID );
+    virtual std::vector<DataNode::Pointer> LoadTextsFromSeries( const std::string& seriesInstanceUID );
 
     /*!
      * \brief Load a given document object for a series instance UID and a document instance number
      * \todo rename to LoadDocument make it take a list of parameters
      */
-    virtual DataTreeNode::Pointer LoadSingleText( const std::string& seriesInstanceUID, unsigned int instanceNumber );
+    virtual DataNode::Pointer LoadSingleText( const std::string& seriesInstanceUID, unsigned int instanceNumber );
 
     /*!
      * \brief Load a given document object for a series instance UID and a document instance number

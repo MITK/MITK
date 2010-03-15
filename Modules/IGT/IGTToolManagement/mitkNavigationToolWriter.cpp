@@ -44,7 +44,7 @@ bool mitk::NavigationToolWriter::DoWrite(std::string FileName,mitk::NavigationTo
   {
   //convert whole data to a mitk::DataStorage
   mitk::StandaloneDataStorage::Pointer saveStorage = mitk::StandaloneDataStorage::New();
-  mitk::DataTreeNode::Pointer thisTool = ConvertToDataTreeNode(Tool);
+  mitk::DataNode::Pointer thisTool = ConvertToDataNode(Tool);
   saveStorage->Add(thisTool);
 
   //use SceneSerialization to save the DataStorage
@@ -70,11 +70,11 @@ bool mitk::NavigationToolWriter::DoWrite(std::string FileName,mitk::NavigationTo
   return true;
   }
 
-mitk::DataTreeNode::Pointer mitk::NavigationToolWriter::ConvertToDataTreeNode(mitk::NavigationTool::Pointer Tool)
+mitk::DataNode::Pointer mitk::NavigationToolWriter::ConvertToDataNode(mitk::NavigationTool::Pointer Tool)
   {
-  mitk::DataTreeNode::Pointer thisTool = mitk::DataTreeNode::New();
+  mitk::DataNode::Pointer thisTool = mitk::DataNode::New();
   //Name
-    thisTool->SetName(Tool->GetDataTreeNode()->GetName().c_str());
+    thisTool->SetName(Tool->GetDataNode()->GetName().c_str());
   //Identifier
     thisTool->AddProperty("identifier",mitk::StringProperty::New(Tool->GetIdentifier().c_str()));
   //Serial Number
@@ -86,7 +86,7 @@ mitk::DataTreeNode::Pointer mitk::NavigationToolWriter::ConvertToDataTreeNode(mi
   //Calibration File Name
     thisTool->AddProperty("toolfileName",mitk::StringProperty::New(GetFileWithoutPath(Tool->GetCalibrationFile())));
   //Surface
-    thisTool->SetData(Tool->GetDataTreeNode()->GetData());
+    thisTool->SetData(Tool->GetDataNode()->GetData());
 
   //Material is not needed, to avoid errors in scene serialization we have to do this:
     //thisTool->ReplaceProperty("material",NULL);

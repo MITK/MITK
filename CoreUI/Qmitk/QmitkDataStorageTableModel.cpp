@@ -43,9 +43,9 @@ mitk::NodePredicateBase::Pointer QmitkDataStorageTableModel::GetPredicate() cons
   return m_Predicate;
 }
 
-mitk::DataTreeNode::Pointer QmitkDataStorageTableModel::GetNode( const QModelIndex &index ) const
+mitk::DataNode::Pointer QmitkDataStorageTableModel::GetNode( const QModelIndex &index ) const
 {
-  mitk::DataTreeNode::Pointer node;
+  mitk::DataNode::Pointer node;
 
   if(index.isValid())
   {
@@ -119,7 +119,7 @@ QVariant QmitkDataStorageTableModel::data(const QModelIndex &index, int role) co
 
   if (index.isValid() && !m_NodeSet.empty())
   {
-    mitk::DataTreeNode::Pointer node = m_NodeSet.at(index.row());
+    mitk::DataNode::Pointer node = m_NodeSet.at(index.row());
 
     std::string nodeName = node->GetName();
     if(nodeName.empty())
@@ -133,7 +133,7 @@ QVariant QmitkDataStorageTableModel::data(const QModelIndex &index, int role) co
       {
         data = nodeName.c_str();
       }
-      else if (role == QmitkDataTreeNodeRole)
+      else if (role == QmitkDataNodeRole)
       {
         data = QVariant::fromValue(node);
       }
@@ -192,10 +192,10 @@ void QmitkDataStorageTableModel::SetDataStorage( mitk::DataStorage::Pointer _Dat
     if(m_DataStorage != 0)
     {
       this->m_DataStorage->AddNodeEvent.RemoveListener( mitk::MessageDelegate1<QmitkDataStorageTableModel
-        , const mitk::DataTreeNode*>( this, &QmitkDataStorageTableModel::AddNode ) );
+        , const mitk::DataNode*>( this, &QmitkDataStorageTableModel::AddNode ) );
 
       this->m_DataStorage->RemoveNodeEvent.RemoveListener( mitk::MessageDelegate1<QmitkDataStorageTableModel
-        , const mitk::DataTreeNode*>( this, &QmitkDataStorageTableModel::RemoveNode ) );
+        , const mitk::DataNode*>( this, &QmitkDataStorageTableModel::RemoveNode ) );
     }
 
     // set new data storage
@@ -206,10 +206,10 @@ void QmitkDataStorageTableModel::SetDataStorage( mitk::DataStorage::Pointer _Dat
     {
       // subscribe for node added/removed events
       this->m_DataStorage->AddNodeEvent.AddListener( mitk::MessageDelegate1<QmitkDataStorageTableModel
-        , const mitk::DataTreeNode*>( this, &QmitkDataStorageTableModel::AddNode ) );
+        , const mitk::DataNode*>( this, &QmitkDataStorageTableModel::AddNode ) );
 
       this->m_DataStorage->RemoveNodeEvent.AddListener( mitk::MessageDelegate1<QmitkDataStorageTableModel
-        , const mitk::DataTreeNode*>( this, &QmitkDataStorageTableModel::RemoveNode ) );
+        , const mitk::DataNode*>( this, &QmitkDataStorageTableModel::RemoveNode ) );
     }
 
     // Reset model (even if datastorage is 0->will be checked in Reset())
@@ -218,7 +218,7 @@ void QmitkDataStorageTableModel::SetDataStorage( mitk::DataStorage::Pointer _Dat
 }
 
 
-void QmitkDataStorageTableModel::AddNode( const mitk::DataTreeNode* node )
+void QmitkDataStorageTableModel::AddNode( const mitk::DataNode* node )
 {
   // garantuee no recursions when a new node event is thrown
   if(!m_BlockEvents)
@@ -253,20 +253,20 @@ void QmitkDataStorageTableModel::AddNode( const mitk::DataTreeNode* node )
     beginInsertRows(QModelIndex(), m_NodeSet.size(), m_NodeSet.size());
 
     // add node
-    m_NodeSet.push_back(const_cast<mitk::DataTreeNode*>(node));
+    m_NodeSet.push_back(const_cast<mitk::DataNode*>(node));
 
     // emit endInsertRows event
     endInsertRows();
   }
 }
 
-void QmitkDataStorageTableModel::RemoveNode( const mitk::DataTreeNode* node )
+void QmitkDataStorageTableModel::RemoveNode( const mitk::DataNode* node )
 {
   // garantuee no recursions when a new node event is thrown
   if(!m_BlockEvents)
   {
     // find corresponding node
-    std::vector<mitk::DataTreeNode*>::iterator nodeIt
+    std::vector<mitk::DataNode*>::iterator nodeIt
       = std::find(m_NodeSet.begin(), m_NodeSet.end(), node);
 
     if(nodeIt != m_NodeSet.end())
@@ -313,7 +313,7 @@ void QmitkDataStorageTableModel::PropertyModified( const itk::Object *caller, co
       int row = -1;
       int column = -1;
 
-      std::vector<mitk::DataTreeNode*>::iterator it;
+      std::vector<mitk::DataNode*>::iterator it;
       mitk::BaseProperty* visibilityProperty = 0;
       mitk::BaseProperty* nameProperty = 0;
 
@@ -358,7 +358,7 @@ bool QmitkDataStorageTableModel::setData(const QModelIndex &index, const QVarian
     // --> set m_BlockEvents to true
     m_BlockEvents = true;
 
-    mitk::DataTreeNode::Pointer node = m_NodeSet.at(index.row());
+    mitk::DataNode::Pointer node = m_NodeSet.at(index.row());
 
     if(index.column() == 0)
     {
@@ -436,41 +436,41 @@ void QmitkDataStorageTableModel::sort( int column, Qt::SortOrder order /*= Qt::A
 
     //m_SortDescending = sortDescending;
 
-    DataTreeNodeCompareFunction::CompareCriteria _CompareCriteria
-      = DataTreeNodeCompareFunction::CompareByName;
+    DataNodeCompareFunction::CompareCriteria _CompareCriteria
+      = DataNodeCompareFunction::CompareByName;
 
-    DataTreeNodeCompareFunction::CompareOperator _CompareOperator
-      = sortDescending ? DataTreeNodeCompareFunction::Greater: DataTreeNodeCompareFunction::Less;
+    DataNodeCompareFunction::CompareOperator _CompareOperator
+      = sortDescending ? DataNodeCompareFunction::Greater: DataNodeCompareFunction::Less;
 
     if(column == 1)
-      _CompareCriteria = DataTreeNodeCompareFunction::CompareByClassName;
+      _CompareCriteria = DataNodeCompareFunction::CompareByClassName;
 
     else if(column == 2)
-      _CompareCriteria = DataTreeNodeCompareFunction::CompareByVisibility;
+      _CompareCriteria = DataNodeCompareFunction::CompareByVisibility;
 
 
-    DataTreeNodeCompareFunction compareFunc(_CompareCriteria, _CompareOperator);
+    DataNodeCompareFunction compareFunc(_CompareCriteria, _CompareOperator);
     std::sort(m_NodeSet.begin(), m_NodeSet.end(), compareFunc);
 
     QAbstractTableModel::reset();
   //}
 }
 
-std::vector<mitk::DataTreeNode*> QmitkDataStorageTableModel::GetNodeSet() const
+std::vector<mitk::DataNode*> QmitkDataStorageTableModel::GetNodeSet() const
 {
   return m_NodeSet;
 }
 
-QmitkDataStorageTableModel::DataTreeNodeCompareFunction::DataTreeNodeCompareFunction( CompareCriteria _CompareCriteria
+QmitkDataStorageTableModel::DataNodeCompareFunction::DataNodeCompareFunction( CompareCriteria _CompareCriteria
                                                                                           , CompareOperator _CompareOperator )
                                                                                           : m_CompareCriteria(_CompareCriteria)
                                                                                           , m_CompareOperator(_CompareOperator)
 {
 }
 
-bool QmitkDataStorageTableModel::DataTreeNodeCompareFunction::operator()
-( const mitk::DataTreeNode::Pointer& _Left
- , const mitk::DataTreeNode::Pointer& _Right ) const
+bool QmitkDataStorageTableModel::DataNodeCompareFunction::operator()
+( const mitk::DataNode::Pointer& _Left
+ , const mitk::DataNode::Pointer& _Right ) const
 {
   switch(m_CompareCriteria)
   {

@@ -37,7 +37,7 @@ protected:
   mitk::PointSet::Pointer m_Seeds;
 
   mitk::Image::Pointer m_ResultImage;
-  mitk::DataTreeNode::Pointer m_ResultNode;
+  mitk::DataNode::Pointer m_ResultNode;
 
   QLineEdit *m_LineEditThresholdMin;
   QLineEdit *m_LineEditThresholdMax;

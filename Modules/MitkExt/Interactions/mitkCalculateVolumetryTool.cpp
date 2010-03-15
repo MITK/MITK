@@ -51,7 +51,7 @@ std::string mitk::CalculateVolumetryTool::GetErrorMessage()
   return "Volume could not be calculated for these nodes:";
 }
     
-bool mitk::CalculateVolumetryTool::ProcessOneWorkingData( DataTreeNode* node )
+bool mitk::CalculateVolumetryTool::ProcessOneWorkingData( DataNode* node )
 {
   if (node)
   {

@@ -90,7 +90,7 @@ public:
   /**
    * @brief The Surface to map can be explicitly set by this method. 
    *
-   * If it is set, it is used instead of the data stored in the DataTreeNode.
+   * If it is set, it is used instead of the data stored in the DataNode.
    * This enables to use the mapper also internally from other mappers.
    */
   itkSetConstObjectMacro(Surface, Surface);
@@ -98,7 +98,7 @@ public:
   /**
    * @brief Get the Surface set explicitly.
    *
-   * @return NULL is returned if no Surface is set to be used instead of DataTreeNode::GetData().
+   * @return NULL is returned if no Surface is set to be used instead of DataNode::GetData().
    * @sa SetSurface
    */
   itkGetConstObjectMacro(Surface, Surface);
@@ -106,7 +106,7 @@ public:
   /**
    *\brief Overwritten to initialize lookup table for point scalar data
    */
-  void SetDataTreeNode( DataTreeNode::Pointer node );
+  void SetDataNode( DataNode::Pointer node );
 
   /**
    * \brief Generate OpenGL primitives for the VTK contour held in contour.
@@ -118,7 +118,7 @@ public:
                   vtkLookupTable* lut = NULL,
                   vtkPolyData* original3DObject = NULL);
 
-  static void SetDefaultProperties(DataTreeNode* node, BaseRenderer* renderer = NULL, bool overwrite = false);
+  static void SetDefaultProperties(DataNode* node, BaseRenderer* renderer = NULL, bool overwrite = false);
 
   virtual void ApplyProperties(BaseRenderer* renderer);
 

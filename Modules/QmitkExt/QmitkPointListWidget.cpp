@@ -102,7 +102,7 @@ QmitkPointListWidget::~QmitkPointListWidget()
 }
 
 
-void QmitkPointListWidget::SetPointSetNode( mitk::DataTreeNode* node )
+void QmitkPointListWidget::SetPointSetNode( mitk::DataNode* node )
 {
   ObserveNewNode(node);
 
@@ -138,7 +138,7 @@ void QmitkPointListWidget::DeactivateInteractor(bool deactivate)
 }
    
 
-void QmitkPointListWidget::ObserveNewNode( mitk::DataTreeNode* node )
+void QmitkPointListWidget::ObserveNewNode( mitk::DataNode* node )
 {
   // remove old observer
   if ( m_PointSetNode != NULL )

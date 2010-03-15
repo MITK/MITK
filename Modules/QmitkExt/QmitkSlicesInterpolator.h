@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkSliceNavigationController.h"
 #include "QmitkExtExports.h"
 #include "mitkSegmentationInterpolationController.h"
-#include "mitkDataTreeNode.h"
+#include "mitkDataNode.h"
 #include "mitkDataStorage.h"
 #include "mitkWeakPointer.h"
 
@@ -210,7 +210,7 @@ class QmitkExt_EXPORT QmitkSlicesInterpolator : public QWidget
     QPushButton* m_BtnAcceptInterpolation;
     QPushButton* m_BtnAcceptAllInterpolations;
 
-    mitk::DataTreeNode::Pointer m_FeedbackNode;
+    mitk::DataNode::Pointer m_FeedbackNode;
 
     mitk::Image* m_Segmentation;
     unsigned int m_LastSliceDimension;

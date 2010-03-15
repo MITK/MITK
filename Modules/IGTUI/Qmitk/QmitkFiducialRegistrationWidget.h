@@ -43,10 +43,10 @@ public:
 
   void SetMultiWidget(QmitkStdMultiWidget* multiWidget); ///< Set the default stdMultiWidget (needed for the PointListwidget)
 
-  void SetImageFiducialsNode(mitk::DataTreeNode::Pointer imageFiducialsNode); ///< specify data tree node for the image fiducials
-  void SetTrackerFiducialsNode(mitk::DataTreeNode::Pointer trackerFiducialsNode); ///< specify data tree node for the tracker fiducials  
-  mitk::DataTreeNode::Pointer GetImageFiducialsNode(); ///< returns data tree node for the image fiducials
-  mitk::DataTreeNode::Pointer GetTrackerFiducialsNode(); ///< returns data tree node for the tracker fiducials
+  void SetImageFiducialsNode(mitk::DataNode::Pointer imageFiducialsNode); ///< specify data tree node for the image fiducials
+  void SetTrackerFiducialsNode(mitk::DataNode::Pointer trackerFiducialsNode); ///< specify data tree node for the tracker fiducials  
+  mitk::DataNode::Pointer GetImageFiducialsNode(); ///< returns data tree node for the image fiducials
+  mitk::DataNode::Pointer GetTrackerFiducialsNode(); ///< returns data tree node for the tracker fiducials
 
   void SetQualityDisplayText(QString text); ///< sets specific text on the UI (useful to display FRE/TRE...)
   bool UseICPIsChecked(); ///< returns true if automatic correspondences search is activated else false
@@ -67,8 +67,8 @@ protected:
   
   Ui::QmitkFiducialRegistrationWidget* m_Controls;  ///< gui widget
   QmitkStdMultiWidget* m_MultiWidget;
-  mitk::DataTreeNode::Pointer m_ImageFiducialsNode;
-  mitk::DataTreeNode::Pointer m_TrackerFiducialsNode;
+  mitk::DataNode::Pointer m_ImageFiducialsNode;
+  mitk::DataNode::Pointer m_TrackerFiducialsNode;
  
 };
 #endif // _QmitkFiducialRegistrationWidget_H_INCLUDED

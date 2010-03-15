@@ -17,7 +17,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkBaseVtkMapper3D.h"
-#include "mitkDataTreeNode.h"
+#include "mitkDataNode.h"
 #include "mitkProperties.h"
 #include "mitkAnnotationProperty.h"
 #include "mitkVtkPropRenderer.h"
@@ -56,7 +56,7 @@ void BaseVtkMapper3D::SetVtkMapperImmediateModeRendering(vtkMapper *mapper)
 
 void BaseVtkMapper3D::UpdateVtkTransform(mitk::BaseRenderer *renderer)
 {
-  vtkLinearTransform * vtktransform = GetDataTreeNode()->GetVtkTransform(this->GetTimestep());
+  vtkLinearTransform * vtktransform = GetDataNode()->GetVtkTransform(this->GetTimestep());
   
   vtkProp3D *prop = dynamic_cast<vtkProp3D*>( GetVtkProp(renderer) );
   if(prop)
@@ -82,9 +82,9 @@ void BaseVtkMapper3D::MitkRenderTranslucentGeometry(BaseRenderer* renderer)
   
  /* if(dynamic_cast<vtkLODProp3D*>(m_Prop3D) != NULL)
   {
-    if(  dynamic_cast<BoolProperty*>(GetDataTreeNode()->
+    if(  dynamic_cast<BoolProperty*>(GetDataNode()->
                                            GetProperty("volumerendering",renderer).GetPointer())==NULL ||  
-         dynamic_cast<BoolProperty*>(GetDataTreeNode()->
+         dynamic_cast<BoolProperty*>(GetDataNode()->
                                            GetProperty("volumerendering",renderer).GetPointer())->GetValue() == false)    
        return;
   }*/
@@ -108,9 +108,9 @@ void BaseVtkMapper3D::MitkRenderVolumetricGeometry(BaseRenderer* renderer)
 
   /* if(dynamic_cast<vtkLODProp3D*>(m_Prop3D) != NULL)
   {
-  if(  dynamic_cast<BoolProperty*>(GetDataTreeNode()->
+  if(  dynamic_cast<BoolProperty*>(GetDataNode()->
   GetProperty("volumerendering",renderer).GetPointer())==NULL ||  
-  dynamic_cast<BoolProperty*>(GetDataTreeNode()->
+  dynamic_cast<BoolProperty*>(GetDataNode()->
   GetProperty("volumerendering",renderer).GetPointer())->GetValue() == false)    
   return;
   }*/
@@ -169,8 +169,8 @@ void BaseVtkMapper3D::ApplyProperties(vtkActor* actor, BaseRenderer* renderer)
     // Check whether one or more AnnotationProperty objects have been defined for
     // this node. Check both renderer specific and global property lists, since
     // properties in both should be considered.
-    //const PropertyList::PropertyMap *rendererProperties = this->GetDataTreeNode()->GetPropertyList( renderer )->GetMap();
-    //const PropertyList::PropertyMap *globalProperties = this->GetDataTreeNode()->GetPropertyList( NULL )->GetMap();
+    //const PropertyList::PropertyMap *rendererProperties = this->GetDataNode()->GetPropertyList( renderer )->GetMap();
+    //const PropertyList::PropertyMap *globalProperties = this->GetDataNode()->GetPropertyList( NULL )->GetMap();
 
     // Add clipping planes (if any)
 /*
@@ -213,7 +213,7 @@ void BaseVtkMapper3D::CheckForAnnotationProperty( mitk::BaseProperty *property, 
 
     const Point3D &pos = annotationProperty->GetPosition();
 
-    Geometry3D *geometry = m_DataTreeNode->GetData()->GetGeometry();
+    Geometry3D *geometry = m_DataNode->GetData()->GetGeometry();
 
     Point3D transformedPos;
     geometry->IndexToWorld( pos, transformedPos );
@@ -221,7 +221,7 @@ void BaseVtkMapper3D::CheckForAnnotationProperty( mitk::BaseProperty *property, 
     labelFollower->SetPosition( transformedPos[0], transformedPos[1], transformedPos[2] );
 
     //labelFollower->SetUserTransform(
-    //  m_DataTreeNode->GetData()->GetGeometry()->GetVtkTransform() );
+    //  m_DataNode->GetData()->GetGeometry()->GetVtkTransform() );
 
     m_LabelActorCollection->AddItem( labelFollower );
   }

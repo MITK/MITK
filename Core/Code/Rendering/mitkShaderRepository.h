@@ -24,7 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkXMLDataElement.h>
 
 #include "mitkBaseRenderer.h"
-#include "mitkDataTreeNode.h"
+#include "mitkDataNode.h"
 
 namespace mitk {
 
@@ -32,7 +32,7 @@ namespace mitk {
  * \brief Management class for vtkShader XML descriptions.
  *
  * Looks for all XML shader files in a given directory and adds default properties
- * for each shader object (shader uniforms) to the specified mitk::DataTreeNode.
+ * for each shader object (shader uniforms) to the specified mitk::DataNode.
  *
  * Additionally, it provides a utility function for applying properties for shaders
  * in mappers.
@@ -145,15 +145,15 @@ public:
   Shader *GetShader(const char *id);
   
   
-  /** \brief Adds all parsed shader uniforms to property list of the given DataTreeNode;
+  /** \brief Adds all parsed shader uniforms to property list of the given DataNode;
    * used by mappers.
    */
-  void AddDefaultProperties(mitk::DataTreeNode* node, mitk::BaseRenderer* renderer, bool overwrite);
+  void AddDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite);
 
-  /** \brief Applies shader and shader specific variables of the specified DataTreeNode
+  /** \brief Applies shader and shader specific variables of the specified DataNode
    * to the VTK object by updating the shader variables of its vtkProperty.
    */
-  void ApplyProperties(mitk::DataTreeNode* node, vtkActor *actor, mitk::BaseRenderer* renderer,itk::TimeStamp &MTime);
+  void ApplyProperties(mitk::DataNode* node, vtkActor *actor, mitk::BaseRenderer* renderer,itk::TimeStamp &MTime);
 
 
 };

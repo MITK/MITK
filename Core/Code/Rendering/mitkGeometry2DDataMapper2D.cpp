@@ -312,7 +312,7 @@ void mitk::Geometry2DDataMapper2D::Paint(BaseRenderer *renderer)
     Geometry2DDataToSurfaceFilter::Pointer surfaceCreator;
     SmartPointerProperty::Pointer surfacecreatorprop;
     surfacecreatorprop = dynamic_cast< SmartPointerProperty * >(
-      GetDataTreeNode()->GetProperty(
+      GetDataNode()->GetProperty(
         "surfacegeometry", renderer));
 
     if( (surfacecreatorprop.IsNull()) || 
@@ -324,7 +324,7 @@ void mitk::Geometry2DDataMapper2D::Paint(BaseRenderer *renderer)
       surfaceCreator = Geometry2DDataToSurfaceFilter::New();
       surfacecreatorprop = SmartPointerProperty::New(surfaceCreator);
       surfaceCreator->PlaceByGeometryOn();
-      GetDataTreeNode()->SetProperty( "surfacegeometry", surfacecreatorprop );
+      GetDataNode()->SetProperty( "surfacegeometry", surfacecreatorprop );
     }
     
     surfaceCreator->SetInput( input );
@@ -339,12 +339,12 @@ void mitk::Geometry2DDataMapper2D::Paint(BaseRenderer *renderer)
 
     int res;
     bool usegeometryparametricbounds = true;
-    if ( GetDataTreeNode()->GetIntProperty("xresolution", res, renderer))
+    if ( GetDataNode()->GetIntProperty("xresolution", res, renderer))
     {
       surfaceCreator->SetXResolution(res);
       usegeometryparametricbounds=false;        
     }
-    if (GetDataTreeNode()->GetIntProperty("yresolution", res, renderer))
+    if (GetDataNode()->GetIntProperty("yresolution", res, renderer))
     {
       surfaceCreator->SetYResolution(res);
       usegeometryparametricbounds=false;        
@@ -359,7 +359,7 @@ void mitk::Geometry2DDataMapper2D::Paint(BaseRenderer *renderer)
       m_SurfaceMapper=SurfaceMapper2D::New();
     }
     m_SurfaceMapper->SetSurface(surfaceCreator->GetOutput());
-    m_SurfaceMapper->SetDataTreeNode(GetDataTreeNode());
+    m_SurfaceMapper->SetDataNode(GetDataNode());
     
     m_SurfaceMapper->Paint(renderer);
   }
@@ -410,7 +410,7 @@ void mitk::Geometry2DDataMapper2D::ApplyProperties( BaseRenderer *renderer )
   Superclass::ApplyProperties(renderer);
 
   PlaneDecorationProperty* decorationProperty;
-  this->GetDataTreeNode()->GetProperty( decorationProperty, "decoration", renderer );
+  this->GetDataNode()->GetProperty( decorationProperty, "decoration", renderer );
   if ( decorationProperty != NULL )
   {
     if ( decorationProperty->GetPlaneDecoration() == 
@@ -433,7 +433,7 @@ void mitk::Geometry2DDataMapper2D::ApplyProperties( BaseRenderer *renderer )
 }
 
 
-void mitk::Geometry2DDataMapper2D::SetDatastorageAndGeometryBaseNode( mitk::DataStorage::Pointer ds, mitk::DataTreeNode::Pointer parent )
+void mitk::Geometry2DDataMapper2D::SetDatastorageAndGeometryBaseNode( mitk::DataStorage::Pointer ds, mitk::DataNode::Pointer parent )
 {
   if (ds.IsNotNull())
   {

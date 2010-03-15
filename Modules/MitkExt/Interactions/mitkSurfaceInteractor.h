@@ -37,7 +37,7 @@ namespace mitk {
   public:
     mitkClassMacro(SurfaceInteractor,AffineInteractor);
     //  itkNewMacro(Self);
-    mitkNewMacro2Param(Self, const char*, DataTreeNode*);
+    mitkNewMacro2Param(Self, const char*, DataNode*);
 
   protected:
 
@@ -46,7 +46,7 @@ namespace mitk {
     //##
     //## @param dataTreeNode is the node, this Interactor is connected to
     //## @param type is the type of StateMachine like declared in the XML-Configure-File
-    SurfaceInteractor(const char * type, DataTreeNode* dataTreeNode);
+    SurfaceInteractor(const char * type, DataNode* dataTreeNode);
 
     //##Documentation
     //## @brief Destructor

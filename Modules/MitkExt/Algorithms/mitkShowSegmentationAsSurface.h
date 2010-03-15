@@ -50,7 +50,7 @@ class MitkExt_EXPORT ShowSegmentationAsSurface : public SegmentationSink
     UIDGenerator m_UIDGeneratorSurfaces;
 
     Surface::Pointer m_Surface;
-    DataTreeNode::Pointer m_Node;
+    DataNode::Pointer m_Node;
 
     bool m_AddToTree;
 

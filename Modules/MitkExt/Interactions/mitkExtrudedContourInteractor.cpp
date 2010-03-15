@@ -30,22 +30,22 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkInteractionConst.h>
 #include <mitkPositionEvent.h>
 #include <mitkVtkPropRenderer.h>
-#include <mitkDataTreeNodeFactory.h>
+#include <mitkDataNodeFactory.h>
 #include <mitkVtkRepresentationProperty.h>
 
 #include <vtkRenderer.h>
 #include <vtkCamera.h>
 
-mitk::ExtrudedContourInteractor::ExtrudedContourInteractor(const char * type, mitk::DataTreeNode* dataTreeNode)
+mitk::ExtrudedContourInteractor::ExtrudedContourInteractor(const char * type, mitk::DataNode* dataTreeNode)
   : mitk::Interactor(type, dataTreeNode), m_Started(false)
 {
-  assert(m_DataTreeNode != NULL);
+  assert(m_DataNode != NULL);
 
-  m_DataTreeNode->SetProperty( "material.representation", mitk::VtkRepresentationProperty::New("surface") );
+  m_DataNode->SetProperty( "material.representation", mitk::VtkRepresentationProperty::New("surface") );
 
   m_Contour = mitk::Contour::New();
 
-  m_ContourNode = mitk::DataTreeNode::New();
+  m_ContourNode = mitk::DataNode::New();
   m_ContourNode->SetData(m_Contour);
 
   m_ContourNode->SetProperty("layer", mitk::IntProperty::New(100) );
@@ -169,7 +169,7 @@ bool mitk::ExtrudedContourInteractor::ExecuteAction(mitk::Action* action, mitk::
     {
       if (m_Started)
       {
-        mitk::ExtrudedContour* extrudedcontour = dynamic_cast<mitk::ExtrudedContour*>(m_DataTreeNode->GetData());
+        mitk::ExtrudedContour* extrudedcontour = dynamic_cast<mitk::ExtrudedContour*>(m_DataNode->GetData());
         extrudedcontour->SetContour(m_Contour);
         extrudedcontour->SetVector(eventPlaneNormal);
         Release(eventPoint);

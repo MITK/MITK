@@ -21,7 +21,7 @@
 
 enum QmitkItemModelRole
 {
-  QmitkDataTreeNodeRole = 64
+  QmitkDataNodeRole = 64
 };
 
 #endif /* QMITKENUMS_H_ */

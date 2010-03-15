@@ -23,7 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkStateEvent.h>
 #include <mitkUndoController.h>
 #include <mitkMesh.h>
-#include <mitkDataTreeNode.h>
+#include <mitkDataNode.h>
 #include <mitkInteractionConst.h>
 #include <mitkAction.h>
 #include <vtkLinearTransform.h>
@@ -32,7 +32,7 @@ PURPOSE.  See the above copyright notices for more information.
 //default value
 const int PRECISION = 5;
 
-mitk::ConnectPointsInteractor::ConnectPointsInteractor(const char * type, DataTreeNode* dataTreeNode, int n)
+mitk::ConnectPointsInteractor::ConnectPointsInteractor(const char * type, DataNode* dataTreeNode, int n)
 :Interactor(type, dataTreeNode), m_N(n), m_CurrentCellId(0), m_Precision(PRECISION)
 {
   m_LastPoint.Fill(0);
@@ -77,7 +77,7 @@ float mitk::ConnectPointsInteractor::CalculateJurisdiction(StateEvent const* sta
   }
 
   //check on the right data-type
-  mitk::PointSet* pointSet = dynamic_cast<mitk::PointSet*>(m_DataTreeNode->GetData());
+  mitk::PointSet* pointSet = dynamic_cast<mitk::PointSet*>(m_DataNode->GetData());
   if (pointSet == NULL)
     return 0;
 
@@ -88,7 +88,7 @@ float mitk::ConnectPointsInteractor::CalculateJurisdiction(StateEvent const* sta
   float p[3];
   itk2vtk(worldPoint, p);
   //transforming the Worldposition to local coordinatesystem
-  m_DataTreeNode->GetData()->GetGeometry()->GetVtkTransform()->GetInverse()->TransformPoint(p, p);
+  m_DataNode->GetData()->GetGeometry()->GetVtkTransform()->GetInverse()->TransformPoint(p, p);
   vtk2itk(p, worldPoint);
 
   float distance = 5;
@@ -125,7 +125,7 @@ bool mitk::ConnectPointsInteractor::ExecuteAction( Action* action, mitk::StateEv
   bool ok = false;//for return type bool
 
   //checking corresponding Data; has to be a Mesh or a subclass
-  mitk::Mesh* mesh = dynamic_cast<mitk::Mesh*>(m_DataTreeNode->GetData());
+  mitk::Mesh* mesh = dynamic_cast<mitk::Mesh*>(m_DataNode->GetData());
   if (mesh == NULL)
     return false;
 

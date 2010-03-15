@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkProperties.h"
 #include "mitkBaseRenderer.h"
-#include "mitkDataTreeNode.h"
+#include "mitkDataNode.h"
 
 #include "mitkParRecFileIOFactory.h"
 #include "mitkObjFileIOFactory.h"
@@ -108,7 +108,7 @@ itk::Object::Pointer mitk::CoreExtObjectFactory::CreateCoreObject( const std::st
 }
 
 
-mitk::Mapper::Pointer mitk::CoreExtObjectFactory::CreateMapper(mitk::DataTreeNode* node, MapperSlotId id) 
+mitk::Mapper::Pointer mitk::CoreExtObjectFactory::CreateMapper(mitk::DataNode* node, MapperSlotId id) 
 {
   mitk::Mapper::Pointer newMapper=NULL;
   mitk::BaseData *data = node->GetData();
@@ -118,32 +118,32 @@ mitk::Mapper::Pointer mitk::CoreExtObjectFactory::CreateMapper(mitk::DataTreeNod
     if((dynamic_cast<Mesh*>(data)!=NULL))
     {
       newMapper = mitk::MeshMapper2D::New();
-      newMapper->SetDataTreeNode(node);
+      newMapper->SetDataNode(node);
     }
     else if((dynamic_cast<PointData*>(data)!=NULL))
     {
       newMapper = mitk::PolyDataGLMapper2D::New();
-      newMapper->SetDataTreeNode(node);
+      newMapper->SetDataNode(node);
     }
     else if((dynamic_cast<Contour*>(data)!=NULL))
     {
       newMapper = mitk::ContourMapper2D::New();
-      newMapper->SetDataTreeNode(node);
+      newMapper->SetDataNode(node);
     }
     else if((dynamic_cast<ContourSet*>(data)!=NULL))
     {
       newMapper = mitk::ContourSetMapper2D::New();
-      newMapper->SetDataTreeNode(node);
+      newMapper->SetDataNode(node);
     }
     else if((dynamic_cast<UnstructuredGrid*>(data)!=NULL))
     {
       newMapper = mitk::UnstructuredGridMapper2D::New();
-      newMapper->SetDataTreeNode(node);
+      newMapper->SetDataNode(node);
     }
     else if((dynamic_cast<PlanarFigure*>(data)!=NULL))
     {
       newMapper = mitk::PlanarFigureMapper2D::New();
-      newMapper->SetDataTreeNode(node);
+      newMapper->SetDataNode(node);
     }
   }
   else if ( id == mitk::BaseRenderer::Standard3D )
@@ -151,32 +151,32 @@ mitk::Mapper::Pointer mitk::CoreExtObjectFactory::CreateMapper(mitk::DataTreeNod
     if((dynamic_cast<Image*>(data) != NULL))
     {
       newMapper = mitk::GPUVolumeMapper3D::New();
-      newMapper->SetDataTreeNode(node);
+      newMapper->SetDataNode(node);
     }
     else if((dynamic_cast<Mesh*>(data)!=NULL))
     {
       newMapper = mitk::MeshVtkMapper3D::New();
-      newMapper->SetDataTreeNode(node);
+      newMapper->SetDataNode(node);
     }
     else if((dynamic_cast<PointData*>(data)!=NULL))
     {
       newMapper = mitk::PointDataVtkMapper3D::New();
-      newMapper->SetDataTreeNode(node);
+      newMapper->SetDataNode(node);
     }
     else if((dynamic_cast<Contour*>(data)!=NULL))
     {
       newMapper = mitk::ContourVtkMapper3D::New();
-      newMapper->SetDataTreeNode(node);
+      newMapper->SetDataNode(node);
     }
     else if((dynamic_cast<ContourSet*>(data)!=NULL))
     {
       newMapper = mitk::ContourSetVtkMapper3D::New();
-      newMapper->SetDataTreeNode(node);
+      newMapper->SetDataNode(node);
     }
     else if((dynamic_cast<UnstructuredGrid*>(data)!=NULL))
     {
       newMapper = mitk::UnstructuredGridVtkMapper3D::New();
-      newMapper->SetDataTreeNode(node);
+      newMapper->SetDataNode(node);
     }
   }
 
@@ -186,14 +186,14 @@ mitk::Mapper::Pointer mitk::CoreExtObjectFactory::CreateMapper(mitk::DataTreeNod
   return newMapper;
 }
 
-void mitk::CoreExtObjectFactory::SetDefaultProperties(mitk::DataTreeNode* node)
+void mitk::CoreExtObjectFactory::SetDefaultProperties(mitk::DataNode* node)
 {
   Superclass::SetDefaultProperties(node);
 
   if(node==NULL)
     return;
 
-  mitk::DataTreeNode::Pointer nodePointer = node;
+  mitk::DataNode::Pointer nodePointer = node;
 
   mitk::PlanarFigure::Pointer pf = dynamic_cast<mitk::PlanarFigure*>(node->GetData());
   if(pf.IsNotNull())

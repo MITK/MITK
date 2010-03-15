@@ -43,7 +43,7 @@ PURPOSE.  See the above copyright notices for more information.
 const mitk::OperationType QmitkImageCropper::OP_EXCHANGE = 717;
 
 // constructors for operation classes
-QmitkImageCropper::opExchangeNodes::opExchangeNodes( mitk::OperationType type, mitk::DataTreeNode* node, mitk::BaseData* oldData, mitk::BaseData* newData )
+QmitkImageCropper::opExchangeNodes::opExchangeNodes( mitk::OperationType type, mitk::DataNode* node, mitk::BaseData* oldData, mitk::BaseData* newData )
 :mitk::Operation(type),m_Node(node),m_OldData(oldData),m_NewData(newData), m_NodeDeletedObserverTag(0), m_OldDataDeletedObserverTag(0), 
 m_NewDataDeletedObserverTag(0)
 {
@@ -143,7 +143,7 @@ void QmitkImageCropper::CreateConnections()
     //!connect( (QObject*) m_Controls, SIGNAL(cropImage()), this, SLOT(CropImage()) );   // click on the crop button
     connect( m_Controls->btnCrop, SIGNAL(clicked()), this, SLOT(CropImage()));   // click on the crop button
     connect( m_Controls->m_NewBoxButton, SIGNAL(clicked()), this, SLOT(ImageSelectionChanged()) );
-    connect( m_Controls->cmbImage, SIGNAL(OnSelectionChanged(const mitk::DataTreeNode*)), this, SLOT(ImageNodeChanged(const mitk::DataTreeNode*)) );
+    connect( m_Controls->cmbImage, SIGNAL(OnSelectionChanged(const mitk::DataNode*)), this, SLOT(ImageNodeChanged(const mitk::DataNode*)) );
     connect( m_Controls->m_EnableSurroundingCheckBox, SIGNAL(toggled(bool)), this, SLOT(SurroundingCheck(bool)) );
     connect( m_Controls->chkInformation, SIGNAL(toggled(bool)), this, SLOT(ChkInformationToggled(bool)) );
     //! from QmitkImageCropperControls::init()
@@ -246,7 +246,7 @@ void QmitkImageCropper::SurroundingCheck(bool value)
 
     if(m_ImageNode.IsNotNull())
     {
-      mitk::DataTreeNode *imageNode = m_ImageNode.GetPointer();
+      mitk::DataNode *imageNode = m_ImageNode.GetPointer();
       if (imageNode)
       {
         mitk::BaseData* data = imageNode->GetData();
@@ -436,7 +436,7 @@ void QmitkImageCropper::CreateBoundingObject()
 {
   m_CroppingObject = mitk::Cuboid::New();
 
-  m_CroppingObjectNode = mitk::DataTreeNode::New();
+  m_CroppingObjectNode = mitk::DataNode::New();
   m_CroppingObjectNode->SetData( m_CroppingObject );
   m_CroppingObjectNode->SetProperty( "name", mitk::StringProperty::New( "CroppingObject" ) );
   m_CroppingObjectNode->SetProperty( "color", mitk::ColorProperty::New(1.0, 1.0, 0.0) );
@@ -446,7 +446,7 @@ void QmitkImageCropper::CreateBoundingObject()
 }
 
 
-void QmitkImageCropper::AddBoundingObjectToNode(mitk::DataTreeNode* node)
+void QmitkImageCropper::AddBoundingObjectToNode(mitk::DataNode* node)
 {
   m_ImageToCrop = dynamic_cast<mitk::Image*>(node->GetData());
 
@@ -473,7 +473,7 @@ void QmitkImageCropper::RemoveBoundingObjectFromNode()
     m_CroppingObjectNode->SetVisibility(false);
   }
 }
-void QmitkImageCropper::ImageNodeChanged( const mitk::DataTreeNode* item )
+void QmitkImageCropper::ImageNodeChanged( const mitk::DataNode* item )
 {
   if(m_Controls != 0)
   {
@@ -484,7 +484,7 @@ void QmitkImageCropper::ImageNodeChanged( const mitk::DataTreeNode* item )
 }
 
 
-const mitk::DataTreeNode::Pointer QmitkImageCropper::selectedImage()
+const mitk::DataNode::Pointer QmitkImageCropper::selectedImage()
 {
   return m_Controls->cmbImage->GetSelectedNode();
 }

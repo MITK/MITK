@@ -17,7 +17,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkVolumeDataVtkMapper3D.h"
 
-#include "mitkDataTreeNode.h"
+#include "mitkDataNode.h"
 
 #include "mitkProperties.h"
 #include "mitkLevelWindow.h"
@@ -212,9 +212,9 @@ void mitk::VolumeDataVtkMapper3D::GenerateData( mitk::BaseRenderer *renderer )
   bool volumeRenderingEnabled = true;
 
   if (this->IsVisible(renderer)==false ||
-      this->GetDataTreeNode() == NULL ||
-      dynamic_cast<mitk::BoolProperty*>(GetDataTreeNode()->GetProperty("volumerendering",renderer))==NULL ||
-      dynamic_cast<mitk::BoolProperty*>(GetDataTreeNode()->GetProperty("volumerendering",renderer))->GetValue() == false
+      this->GetDataNode() == NULL ||
+      dynamic_cast<mitk::BoolProperty*>(GetDataNode()->GetProperty("volumerendering",renderer))==NULL ||
+      dynamic_cast<mitk::BoolProperty*>(GetDataNode()->GetProperty("volumerendering",renderer))->GetValue() == false
     )
   {
     volumeRenderingEnabled = false;
@@ -222,7 +222,7 @@ void mitk::VolumeDataVtkMapper3D::GenerateData( mitk::BaseRenderer *renderer )
     // Check if a bounding box should be displayed around the dataset
     // (even if volume rendering is disabled)
     bool hasBoundingBox = false;
-    this->GetDataTreeNode()->GetBoolProperty( "bounding box", hasBoundingBox );
+    this->GetDataNode()->GetBoolProperty( "bounding box", hasBoundingBox );
 
     if ( !hasBoundingBox )
     {
@@ -241,7 +241,7 @@ void mitk::VolumeDataVtkMapper3D::GenerateData( mitk::BaseRenderer *renderer )
         bounds[4], bounds[5] );
 
       ColorProperty *colorProperty;
-      if ( this->GetDataTreeNode()->GetProperty(
+      if ( this->GetDataNode()->GetProperty(
         colorProperty, "color" ) )
       {
         const mitk::Color &color = colorProperty->GetColor();
@@ -264,7 +264,7 @@ void mitk::VolumeDataVtkMapper3D::GenerateData( mitk::BaseRenderer *renderer )
   }
   else
   {
-        mitk::VtkVolumeRenderingProperty* vrp=dynamic_cast<mitk::VtkVolumeRenderingProperty*>(GetDataTreeNode()->GetProperty("volumerendering configuration",renderer));
+        mitk::VtkVolumeRenderingProperty* vrp=dynamic_cast<mitk::VtkVolumeRenderingProperty*>(GetDataNode()->GetProperty("volumerendering configuration",renderer));
         if(vrp)
         {
           int renderingValue = vrp->GetValueAsId();
@@ -319,7 +319,7 @@ void mitk::VolumeDataVtkMapper3D::GenerateData( mitk::BaseRenderer *renderer )
   const Geometry3D* worldgeometry = renderer->GetCurrentWorldGeometry();
   if(worldgeometry==NULL)
   {
-    GetDataTreeNode()->SetProperty("volumerendering",mitk::BoolProperty::New(false));
+    GetDataNode()->SetProperty("volumerendering",mitk::BoolProperty::New(false));
     return;
   }
 
@@ -356,20 +356,20 @@ void mitk::VolumeDataVtkMapper3D::GenerateData( mitk::BaseRenderer *renderer )
   vtkRenderWindowInteractor *interactor = renderWindow->GetInteractor();
   
   float frameRate;
-  if( this->GetDataTreeNode()->GetFloatProperty( "framerate", frameRate ) && frameRate > 0 && frameRate <= 60)
+  if( this->GetDataNode()->GetFloatProperty( "framerate", frameRate ) && frameRate > 0 && frameRate <= 60)
   {
     interactor->SetDesiredUpdateRate(  frameRate );
     interactor->SetStillUpdateRate( frameRate );
   }
   else if( frameRate > 60 )
   {
-    this->GetDataTreeNode()->SetProperty( "framerate",mitk::FloatProperty::New(60));
+    this->GetDataNode()->SetProperty( "framerate",mitk::FloatProperty::New(60));
     interactor->SetDesiredUpdateRate(  60 );
     interactor->SetStillUpdateRate( 60 );
   }
   else
   {
-    this->GetDataTreeNode()->SetProperty( "framerate",mitk::FloatProperty::New(0.00001));
+    this->GetDataNode()->SetProperty( "framerate",mitk::FloatProperty::New(0.00001));
     interactor->SetDesiredUpdateRate(  0.00001 );
     interactor->SetStillUpdateRate( 0.00001 );
   }
@@ -423,8 +423,8 @@ void mitk::VolumeDataVtkMapper3D::UpdateTransferFunctions( mitk::BaseRenderer *r
   vtkColorTransferFunction *colorTransferFunction = NULL;
 
   mitk::LookupTableProperty::Pointer lookupTableProp;
-  lookupTableProp = dynamic_cast<mitk::LookupTableProperty*>(this->GetDataTreeNode()->GetProperty("LookupTable"));
-  mitk::TransferFunctionProperty::Pointer transferFunctionProp = dynamic_cast<mitk::TransferFunctionProperty*>(this->GetDataTreeNode()->GetProperty("TransferFunction"));
+  lookupTableProp = dynamic_cast<mitk::LookupTableProperty*>(this->GetDataNode()->GetProperty("LookupTable"));
+  mitk::TransferFunctionProperty::Pointer transferFunctionProp = dynamic_cast<mitk::TransferFunctionProperty*>(this->GetDataNode()->GetProperty("TransferFunction"));
 
   if ( transferFunctionProp.IsNotNull() )   {
 
@@ -583,7 +583,7 @@ void mitk::VolumeDataVtkMapper3D::ApplyProperties(vtkActor* /*actor*/, mitk::Bas
 
 }
 
-void mitk::VolumeDataVtkMapper3D::SetDefaultProperties(mitk::DataTreeNode* node, mitk::BaseRenderer* renderer, bool overwrite)
+void mitk::VolumeDataVtkMapper3D::SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite)
 {
   node->AddProperty( "volumerendering", mitk::BoolProperty::New( false ), renderer, overwrite );
   node->AddProperty( "volumerendering configuration", mitk::VtkVolumeRenderingProperty::New( 1 ), renderer, overwrite );
@@ -633,8 +633,8 @@ bool mitk::VolumeDataVtkMapper3D::IsLODEnabled( mitk::BaseRenderer * /*renderer*
   // Volume mapper is LOD enabled if volumerendering is enabled
   /*
   return
-    dynamic_cast<mitk::BoolProperty*>(GetDataTreeNode()->GetProperty("volumerendering",renderer)) != NULL &&
-    dynamic_cast<mitk::BoolProperty*>(GetDataTreeNode()->GetProperty("volumerendering",renderer))->GetValue() == true;
+    dynamic_cast<mitk::BoolProperty*>(GetDataNode()->GetProperty("volumerendering",renderer)) != NULL &&
+    dynamic_cast<mitk::BoolProperty*>(GetDataNode()->GetProperty("volumerendering",renderer))->GetValue() == true;
   */
 }
 

@@ -17,7 +17,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkInteractor.h"
-#include <mitkDataTreeNode.h>
+#include <mitkDataNode.h>
 #include <mitkDisplayPositionEvent.h>
 #include <mitkPositionEvent.h>
 #include <mitkGeometry3D.h>
@@ -37,13 +37,13 @@ PURPOSE.  See the above copyright notices for more information.
 
 const std::string mitk::Interactor::XML_NODE_NAME = "interactor";
 
-mitk::Interactor::Interactor(const char * type, DataTreeNode* dataTreeNode)
+mitk::Interactor::Interactor(const char * type, DataNode* dataTreeNode)
 : StateMachine(type), 
-  m_DataTreeNode(dataTreeNode), 
+  m_DataNode(dataTreeNode), 
   m_Mode(SMDESELECTED)
 {
-  if (m_DataTreeNode != NULL)
-    m_DataTreeNode->SetInteractor(this);
+  if (m_DataNode != NULL)
+    m_DataNode->SetInteractor(this);
 
   // handle these actions in those Methods
   CONNECT_ACTION( AcMODEDESELECT,  OnModeDeselect );
@@ -53,8 +53,8 @@ mitk::Interactor::Interactor(const char * type, DataTreeNode* dataTreeNode)
 
 mitk::BaseData* mitk::Interactor::GetData() const
 {
-  if (m_DataTreeNode != NULL)
-    return m_DataTreeNode->GetData();
+  if (m_DataNode != NULL)
+    return m_DataNode->GetData();
   else 
     return NULL;
 }
@@ -230,12 +230,12 @@ const std::string& mitk::Interactor::GetXMLNodeName() const
   return XML_NODE_NAME;
 }
 
-void mitk::Interactor::SetDataTreeNode( DataTreeNode* dataTreeNode )
+void mitk::Interactor::SetDataNode( DataNode* dataTreeNode )
 {
-  m_DataTreeNode = dataTreeNode;
+  m_DataNode = dataTreeNode;
   
   //check for the number of time steps and initialize the vector of CurrentStatePointer accordingly
-  if (m_DataTreeNode != NULL)
+  if (m_DataNode != NULL)
   {
     mitk::BaseData* data = dataTreeNode->GetData();
     if (data != NULL)
@@ -255,9 +255,9 @@ void mitk::Interactor::UpdateTimeStep(unsigned int timeStep)
   {
     // Make sure that the data (if time-resolved) has enough entries;
     // if not, create the required extra ones (empty)
-    if (m_DataTreeNode!= NULL)
-      if (m_DataTreeNode->GetData()!= NULL)
-        m_DataTreeNode->GetData()->Expand(timeStep+1); //+1 becuase the vector starts with 0 and the timesteps with 1
+    if (m_DataNode!= NULL)
+      if (m_DataNode->GetData()!= NULL)
+        m_DataNode->GetData()->Expand(timeStep+1); //+1 becuase the vector starts with 0 and the timesteps with 1
     
     //now check for this object
     this->ExpandStartStateVector(timeStep+1); //nothing is changed if the number of timesteps in data equals the number of startstates held in statemachine

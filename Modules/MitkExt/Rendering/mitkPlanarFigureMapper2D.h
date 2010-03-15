@@ -50,7 +50,7 @@ public:
   * reimplemented from Baseclass
   */
   virtual void Paint(BaseRenderer * renderer);
-  static void SetDefaultProperties(mitk::DataTreeNode* node, mitk::BaseRenderer* renderer = NULL, bool overwrite = false);
+  static void SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer = NULL, bool overwrite = false);
 protected:
   PlanarFigureMapper2D();
 

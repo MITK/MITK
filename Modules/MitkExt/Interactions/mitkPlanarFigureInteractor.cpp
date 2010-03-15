@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkPositionEvent.h"
 #include "mitkPlanarFigure.h"
 #include "mitkStatusBar.h"
-#include "mitkDataTreeNode.h"
+#include "mitkDataNode.h"
 #include "mitkInteractionConst.h"
 #include "mitkAction.h"
 #include "mitkStateEvent.h"
@@ -36,7 +36,7 @@ PURPOSE.  See the above copyright notices for more information.
 //how precise must the user pick the point
 //default value
 mitk::PlanarFigureInteractor
-::PlanarFigureInteractor(const char * type, DataTreeNode* dataTreeNode, int /* n */ )
+::PlanarFigureInteractor(const char * type, DataNode* dataTreeNode, int /* n */ )
 : Interactor( type, dataTreeNode ),
   m_Precision( 6.5 )
 {
@@ -92,7 +92,7 @@ float mitk::PlanarFigureInteractor
   //int timeStep = disPosEvent->GetSender()->GetTimeStep();
 
   mitk::PlanarFigure *planarFigure = dynamic_cast<mitk::PlanarFigure *>(
-    m_DataTreeNode->GetData() );
+    m_DataNode->GetData() );
 
   if ( planarFigure != NULL )
   {
@@ -117,7 +117,7 @@ float mitk::PlanarFigureInteractor
     //int visualizationMode = CurveModel::VISUALIZATION_MODE_PLANAR;
     //if ( renderer != NULL )
     //{
-    //  m_DataTreeNode->GetIntProperty( "VisualizationMode", visualizationMode, renderer );
+    //  m_DataNode->GetIntProperty( "VisualizationMode", visualizationMode, renderer );
     //}                                    
 
     //if ( visualizationMode == CurveModel::VISUALIZATION_MODE_PLANAR )
@@ -161,7 +161,7 @@ bool mitk::PlanarFigureInteractor
 
   // Check corresponding data; has to be sub-class of mitk::PlanarFigure
   mitk::PlanarFigure *planarFigure = 
-    dynamic_cast< mitk::PlanarFigure * >( m_DataTreeNode->GetData() );
+    dynamic_cast< mitk::PlanarFigure * >( m_DataNode->GetData() );
 
   if ( planarFigure == NULL )
   {
@@ -257,7 +257,7 @@ bool mitk::PlanarFigureInteractor
       // the current RenderWindow. This is required so that the same render
       // window can be re-aligned to the Geometry2D of the PlanarFigure later
       // on in an application.
-      m_DataTreeNode->SetBoolProperty( "PlanarFigureInitializedWindow", true, renderer );
+      m_DataNode->SetBoolProperty( "PlanarFigureInitializedWindow", true, renderer );
 
       // Update rendered scene
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
@@ -304,7 +304,7 @@ bool mitk::PlanarFigureInteractor
         planarFigure->DeselectControlPoint();
         planarFigure->InvokeEvent( itk::InitializeEvent() );
         planarFigure->InvokeEvent( itk::EndEvent() );
-        m_DataTreeNode->Modified();
+        m_DataNode->Modified();
         this->HandleEvent( new mitk::StateEvent( EIDYES, stateEvent->GetEvent() ) );
       }
       else
@@ -335,7 +335,7 @@ bool mitk::PlanarFigureInteractor
         planarFigure->DeselectControlPoint();
         planarFigure->InvokeEvent( itk::InitializeEvent() );
         planarFigure->InvokeEvent( itk::EndEvent() );
-        m_DataTreeNode->Modified();
+        m_DataNode->Modified();
         this->HandleEvent( new mitk::StateEvent( EIDYES, NULL ) );
       }
       else
@@ -385,7 +385,7 @@ bool mitk::PlanarFigureInteractor
       // Issue event so that listeners may update themselves
       planarFigure->Modified();
       planarFigure->InvokeEvent( itk::EndEvent() );
-      m_DataTreeNode->Modified();
+      m_DataNode->Modified();
 
       // falls through
     }

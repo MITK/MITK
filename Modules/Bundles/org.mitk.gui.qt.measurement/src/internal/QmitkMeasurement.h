@@ -62,7 +62,7 @@ class QmitkMeasurement : public QObject, public QmitkFunctionality
     ///
     /// Just a shortcut
     ///
-    typedef std::vector<mitk::DataTreeNode::Pointer> DataTreeNodes;
+    typedef std::vector<mitk::DataNode::Pointer> DataNodes;
 
     ///
     /// Initialize pointers to 0. The rest is done in CreateQtPartControl()
@@ -94,10 +94,10 @@ class QmitkMeasurement : public QObject, public QmitkFunctionality
     ///
     /// Invoked from a DataStorage selection
     ///
-    virtual void NodeChanged(const mitk::DataTreeNode* node);
-    virtual void PropertyChanged(const mitk::DataTreeNode* node, const mitk::BaseProperty* prop);
-    virtual void NodeRemoved(const mitk::DataTreeNode* node);
-    virtual void NodeAddedInDataStorage(const mitk::DataTreeNode* node);
+    virtual void NodeChanged(const mitk::DataNode* node);
+    virtual void PropertyChanged(const mitk::DataNode* node, const mitk::BaseProperty* prop);
+    virtual void NodeRemoved(const mitk::DataNode* node);
+    virtual void NodeAddedInDataStorage(const mitk::DataNode* node);
     virtual void PlanarFigureInitialized();
     virtual void AddFigureToDataStorage(mitk::PlanarFigure* figure, const QString& name,
       const char *propertyKey = NULL, mitk::BaseProperty *property = NULL );
@@ -109,7 +109,7 @@ class QmitkMeasurement : public QObject, public QmitkFunctionality
     /// All selected planarfigures will be added to m_SelectedPlanarFigures.
     /// Then PlanarFigureSelectionChanged is called
     ///
-    virtual void OnSelectionChanged(std::vector<mitk::DataTreeNode*> nodes);
+    virtual void OnSelectionChanged(std::vector<mitk::DataNode*> nodes);
   
   public slots:
     ///
@@ -170,7 +170,7 @@ protected:
   /// Selected image on which measurements will be performed
   ///
   mitk::DataStorageSelection::Pointer m_SelectedImageNode;
-  mitk::WeakPointer<mitk::DataTreeNode> m_CurrentFigureNode;
+  mitk::WeakPointer<mitk::DataNode> m_CurrentFigureNode;
 
   /// Counter variables to give a newly created Figure a unique name.
   ///

@@ -87,7 +87,7 @@ protected:
 
   mitk::TrackingDevice::Pointer ConfigureTrackingDevice();  ///< create the selected tracker object and configure it (using values from m_Controls)
   void SetupIGTPipeline(mitk::TrackingDevice::Pointer tracker, QString fileName);
-  mitk::DataTreeNode::Pointer CreateInstrumentVisualization(const char* label);
+  mitk::DataNode::Pointer CreateInstrumentVisualization(const char* label);
  
   QmitkStdMultiWidget * m_MultiWidget; ///< default render widget
   Ui::QmitkIGTRecorderControls * m_Controls; ///< GUI widget for this functionality

@@ -20,22 +20,22 @@
 #define MITKDATATREENODESELECTION_H_
 
 #include <berryIStructuredSelection.h>
-#include <mitkDataTreeNode.h>
+#include <mitkDataNode.h>
 #include "mitkGUICommonPluginDll.h"
 
 
 namespace mitk {
 
-class MITK_GUI_COMMON_PLUGIN DataTreeNodeSelection : public virtual berry::IStructuredSelection
+class MITK_GUI_COMMON_PLUGIN DataNodeSelection : public virtual berry::IStructuredSelection
 {
 
 public:
 
-  berryObjectMacro(DataTreeNodeSelection);
+  berryObjectMacro(DataNodeSelection);
 
-  DataTreeNodeSelection();
-  DataTreeNodeSelection(DataTreeNode::Pointer node);
-  DataTreeNodeSelection(const std::vector<DataTreeNode::Pointer>& nodes);
+  DataNodeSelection();
+  DataNodeSelection(DataNode::Pointer node);
+  DataNodeSelection(const std::vector<DataNode::Pointer>& nodes);
 
   virtual Object::Pointer GetFirstElement() const;
   virtual iterator Begin() const;

@@ -106,6 +106,6 @@ Under-the-hood changes:
 - support for "Connexion 3D SpaceNavigator (TM) Mouse": Activate option MITK_USE_TD_MOUSE in cmake to enable interaction with a connexion 3D mouse in 3D widget.
 
 Minor interface changes to lower command complexibility (-classes::method):
-- mitkDataTreeNode::GetInteractor(): now returns a standard C-Pointer, not a SmartPointer. 
-- mitkDataTreeNode::GetPropertyList() and ::GetProperty(): now returns a standard C-Pointer, not a SmartPointer. 
+- mitkDataNode::GetInteractor(): now returns a standard C-Pointer, not a SmartPointer. 
+- mitkDataNode::GetPropertyList() and ::GetProperty(): now returns a standard C-Pointer, not a SmartPointer. 
 - mitkPropertyList::GetProperty(): now returns a standard C-Pointer, not a SmartPointer. 

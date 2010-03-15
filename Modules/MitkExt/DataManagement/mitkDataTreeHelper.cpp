@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 mitk::DataTreeIteratorClone mitk::DataTreeHelper::FindIteratorToNode(
   mitk::DataTreeBase* tree,
-  const mitk::DataTreeNode* node)
+  const mitk::DataNode* node)
 {
   if(tree == NULL)
     return NULL;
@@ -37,7 +37,7 @@ mitk::DataTreeIteratorClone mitk::DataTreeHelper::FindIteratorToNode(
 
 mitk::DataTreeIteratorClone mitk::DataTreeHelper::FindIteratorToNode(
   const mitk::DataTreeIteratorBase* startPosition,
-  const mitk::DataTreeNode* node
+  const mitk::DataNode* node
   )
 {
   DataTreeIteratorClone pos = *startPosition;
@@ -56,7 +56,7 @@ mitk::DataTreeIteratorClone mitk::DataTreeHelper::GetNamedChild(mitk::DataTreeIt
   mitk::DataTreeChildIterator childIterator(*iterator);
   while (! childIterator.IsAtEnd() )
   {
-    mitk::DataTreeNode* node = childIterator.Get();
+    mitk::DataNode* node = childIterator.Get();
     std::string nodeName;
     if (node && node->GetName(nodeName))
     {

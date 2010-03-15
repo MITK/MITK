@@ -180,7 +180,7 @@ void mitk::ToolManager::SetReferenceData(DataVectorType data)
       itk::MemberCommand<ToolManager>::Pointer command = itk::MemberCommand<ToolManager>::New();
       command->SetCallbackFunction( this, &ToolManager::OnOneOfTheReferenceDataDeleted );
       command->SetCallbackFunction( this, &ToolManager::OnOneOfTheReferenceDataDeletedConst );
-      m_ReferenceDataObserverTags.insert( std::pair<DataTreeNode*, unsigned long>( (*dataIter), (*dataIter)->AddObserver( itk::DeleteEvent(), command ) ) );
+      m_ReferenceDataObserverTags.insert( std::pair<DataNode*, unsigned long>( (*dataIter), (*dataIter)->AddObserver( itk::DeleteEvent(), command ) ) );
     }
 
     ReferenceDataChanged.Send();
@@ -214,7 +214,7 @@ void mitk::ToolManager::OnOneOfTheReferenceDataDeleted(itk::Object* caller, cons
   this->SetReferenceData( v );
 }
 
-void mitk::ToolManager::SetReferenceData(DataTreeNode* data)
+void mitk::ToolManager::SetReferenceData(DataNode* data)
 {
   //MITK_INFO << "ToolManager::SetReferenceData(" << (void*)data << ")" << std::endl;
   DataVectorType v;
@@ -251,7 +251,7 @@ void mitk::ToolManager::SetWorkingData(DataVectorType data)
       itk::MemberCommand<ToolManager>::Pointer command = itk::MemberCommand<ToolManager>::New();
       command->SetCallbackFunction( this, &ToolManager::OnOneOfTheWorkingDataDeleted );
       command->SetCallbackFunction( this, &ToolManager::OnOneOfTheWorkingDataDeletedConst );
-      m_WorkingDataObserverTags.insert( std::pair<DataTreeNode*, unsigned long>( (*dataIter), (*dataIter)->AddObserver( itk::DeleteEvent(), command ) ) );
+      m_WorkingDataObserverTags.insert( std::pair<DataNode*, unsigned long>( (*dataIter), (*dataIter)->AddObserver( itk::DeleteEvent(), command ) ) );
     }
 
     WorkingDataChanged.Send();
@@ -286,7 +286,7 @@ void mitk::ToolManager::OnOneOfTheWorkingDataDeleted(itk::Object* caller, const 
 }
 
 
-void mitk::ToolManager::SetWorkingData(DataTreeNode* data)
+void mitk::ToolManager::SetWorkingData(DataNode* data)
 {
   DataVectorType v;
 
@@ -303,7 +303,7 @@ mitk::ToolManager::DataVectorType mitk::ToolManager::GetReferenceData()
   return m_ReferenceData;
 }
 
-mitk::DataTreeNode* mitk::ToolManager::GetReferenceData(int idx)
+mitk::DataNode* mitk::ToolManager::GetReferenceData(int idx)
 {
   try
   {
@@ -339,7 +339,7 @@ void mitk::ToolManager::SetDataStorage(DataStorage& storage)
 
 
 
-mitk::DataTreeNode* mitk::ToolManager::GetWorkingData(int idx)
+mitk::DataNode* mitk::ToolManager::GetWorkingData(int idx)
 {
   try
   {

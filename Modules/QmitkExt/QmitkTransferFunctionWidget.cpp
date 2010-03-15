@@ -41,7 +41,7 @@ QmitkTransferFunctionWidget::~QmitkTransferFunctionWidget()
 {
 }
 
-void QmitkTransferFunctionWidget::SetDataTreeNode(mitk::DataTreeNode* node)
+void QmitkTransferFunctionWidget::SetDataNode(mitk::DataNode* node)
 {
 
   //MITK_INFO << "TransW called with" << (1&&node);
@@ -55,7 +55,7 @@ void QmitkTransferFunctionWidget::SetDataTreeNode(mitk::DataTreeNode* node)
     {
       if (! dynamic_cast<mitk::Image*>(node->GetData()))
       {
-        MITK_WARN << "QmitkTransferFunctionWidget::SetDataTreeNode called with non-image node";
+        MITK_WARN << "QmitkTransferFunctionWidget::SetDataNode called with non-image node";
         goto turnOff;
       }
       

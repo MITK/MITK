@@ -1,7 +1,7 @@
 SET(SRC_CPP_FILES
   QmitkCloseProjectAction.cpp
   QmitkDnDFrameWidget.cpp
-  QmitkDataTreeNodeSelectionProvider.cpp
+  QmitkDataNodeSelectionProvider.cpp
   QmitkFileOpenAction.cpp
   QmitkFileExitAction.cpp
   QmitkFunctionality.cpp
@@ -14,7 +14,7 @@ SET(SRC_CPP_FILES
 )
 
 SET(INTERNAL_CPP_FILES
-  QmitkDataTreeNodeSelection.cpp
+  QmitkDataNodeSelection.cpp
   QmitkCommonActivator.cpp
 )
 

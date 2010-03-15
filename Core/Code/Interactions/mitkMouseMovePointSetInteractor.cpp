@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkBaseRenderer.h"
 
 mitk::MouseMovePointSetInteractor
-::MouseMovePointSetInteractor(const char * type, DataTreeNode* dataTreeNode, int n)
+::MouseMovePointSetInteractor(const char * type, DataNode* dataTreeNode, int n)
 :PointSetInteractor(type, dataTreeNode, n)
 {
 }
@@ -58,7 +58,7 @@ float mitk::MouseMovePointSetInteractor::CalculateJurisdiction(StateEvent const*
   mitk::BaseRenderer* sender = stateEvent->GetEvent()->GetSender();
   if (sender != NULL)
   {
-    unsigned int timeStep = sender->GetTimeStep(m_DataTreeNode->GetData());
+    unsigned int timeStep = sender->GetTimeStep(m_DataNode->GetData());
     //if the event can be understood and if there is a transition waiting for that event
     mitk::State const* state = this->GetCurrentState(timeStep);
     if (state!= NULL)

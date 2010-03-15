@@ -520,14 +520,14 @@ void QmitkPropertyListPopup::UpdateNodeMaterialOnPopupHiding( bool& changes )
   mitk::MaterialProperty* material = dynamic_cast<mitk::MaterialProperty*>( m_PropertyList->GetProperty("material"));
   if (material)
   {
-    mitk::DataTreeNode* node = material->GetDataTreeNode();
-    material->SetDataTreeNode(NULL);
-    m_OriginalMaterial->SetDataTreeNode(NULL);
+    mitk::DataNode* node = material->GetDataNode();
+    material->SetDataNode(NULL);
+    m_OriginalMaterial->SetDataNode(NULL);
     if ( !(*material == *m_OriginalMaterial) )
     {
       changes = true;
     }
-    material->SetDataTreeNode(node);
+    material->SetDataNode(node);
   }
 }
 

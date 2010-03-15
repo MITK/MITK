@@ -27,13 +27,13 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
 
-class DataTreeNode;
+class DataNode;
 class BaseData;
 
 //##Documentation
 //## @brief Interface for an Interactor.
 //##
-//## The Interactor is held with a SmartPointer by a DataTreeNode
+//## The Interactor is held with a SmartPointer by a DataNode
 //## and holds its Node with a Pointer. That way Smartpointer doesn't build a circle.
 //## Different Modes: In order to not send Events to all StateMachines, a StateMachine can be
 //## in three different modes:
@@ -55,7 +55,7 @@ public:
     /**
     * @brief NewMacro with two parameters for calling itk::Lightobject::New(..) method
     **/
-    mitkNewMacro2Param(Self, const char*, DataTreeNode*);
+    mitkNewMacro2Param(Self, const char*, DataNode*);
 
   //##Documentation
   //##@brief Enumeration of the different modes an Interactor can be into.
@@ -103,9 +103,9 @@ protected:
   * @param dataTreeNode is the node, this Interactor is connected to
   * @param type is the type of StateMachine like declared in the XML-Configure-File
   *
-  * Interactor connects itself to the DataTreeNode-Interactor-pointer through call of SetInteractor(this)
+  * Interactor connects itself to the DataNode-Interactor-pointer through call of SetInteractor(this)
   **/
-  Interactor(const char * type, DataTreeNode* dataTreeNode);
+  Interactor(const char * type, DataNode* dataTreeNode);
 
   /**
   * @brief Destructor
@@ -134,8 +134,8 @@ protected:
 
 
   //##Documentation
-  //## @brief Used by friend class DataTreeNode
-  virtual void SetDataTreeNode( DataTreeNode* dataTreeNode );
+  //## @brief Used by friend class DataNode
+  virtual void SetDataNode( DataNode* dataTreeNode );
 
   /**
   * @brief Derived from superclass to also check if enough timesteps are instantiated in m_CurrentStateVector
@@ -146,13 +146,13 @@ protected:
 
   //##Documentation
   //## @brief Pointer to the data, this object handles the Interaction for
-  DataTreeNode* m_DataTreeNode;
+  DataNode* m_DataNode;
 
   //##Documentation
   //## @brief Mode of Selection
   ModeType m_Mode;
 
-  friend class DataTreeNode;
+  friend class DataNode;
 };
 
 }//namespace mitk

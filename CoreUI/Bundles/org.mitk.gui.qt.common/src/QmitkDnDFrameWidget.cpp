@@ -6,7 +6,7 @@
 // berry Includes
 #include <berryPlatform.h>
 
-#include <mitkDataTreeNodeFactory.h>
+#include <mitkDataNodeFactory.h>
 #include "mitkIDataStorageService.h"
 #include "mitkDataStorageEditorInput.h"
 #include "mitkRenderingManager.h"
@@ -47,14 +47,14 @@ void QmitkDnDFrameWidget::dropEvent( QDropEvent * event )
     fileName != fileNames.end(); ++fileName)
   {
 
-    mitk::DataTreeNodeFactory::Pointer nodeReader = mitk::DataTreeNodeFactory::New();
+    mitk::DataNodeFactory::Pointer nodeReader = mitk::DataNodeFactory::New();
     try
     {
       nodeReader->SetFileName(fileName->toLocalFile().toLatin1().data());
       nodeReader->Update();
       for ( unsigned int i = 0 ; i < nodeReader->GetNumberOfOutputs( ); ++i )
       {
-        mitk::DataTreeNode::Pointer node;
+        mitk::DataNode::Pointer node;
         node = nodeReader->GetOutput(i);
         if ( node->GetData() != NULL )
         {  

@@ -27,7 +27,7 @@ mitk::NodePredicateFirstLevel::~NodePredicateFirstLevel()
 }
 
 
-bool mitk::NodePredicateFirstLevel::CheckNode(const mitk::DataTreeNode* node) const
+bool mitk::NodePredicateFirstLevel::CheckNode(const mitk::DataNode* node) const
 {
   if (node == NULL)
     throw std::invalid_argument("NodePredicateFirstLevel: invalid node");

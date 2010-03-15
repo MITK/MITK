@@ -62,9 +62,9 @@ QmitkDataStorageTreeModel::~QmitkDataStorageTreeModel()
   m_Root->Delete(); m_Root = 0;
 }
 
-mitk::DataTreeNode::Pointer QmitkDataStorageTreeModel::GetNode( const QModelIndex &index ) const
+mitk::DataNode::Pointer QmitkDataStorageTreeModel::GetNode( const QModelIndex &index ) const
 {
-  return this->TreeItemFromIndex(index)->GetDataTreeNode();
+  return this->TreeItemFromIndex(index)->GetDataNode();
 }
 
 const mitk::DataStorage::Pointer QmitkDataStorageTreeModel::GetDataStorage() const
@@ -196,7 +196,7 @@ QMimeData * QmitkDataStorageTreeModel::mimeData(const QModelIndexList & indexes)
 
 QVariant QmitkDataStorageTreeModel::data( const QModelIndex & index, int role ) const
 {
-  mitk::DataTreeNode* dataNode = this->TreeItemFromIndex(index)->GetDataTreeNode();
+  mitk::DataNode* dataNode = this->TreeItemFromIndex(index)->GetDataNode();
 
   // get name of treeItem (may also be edited)
   QString nodeName = QString::fromStdString(dataNode->GetName());
@@ -217,9 +217,9 @@ QVariant QmitkDataStorageTreeModel::data( const QModelIndex & index, int role ) 
   {
     return dataNode->IsVisible(0);
   }
-  else if(role == QmitkDataTreeNodeRole)
+  else if(role == QmitkDataNodeRole)
   {
-    return QVariant::fromValue<mitk::DataTreeNode::Pointer>(mitk::DataTreeNode::Pointer(dataNode));
+    return QVariant::fromValue<mitk::DataNode::Pointer>(mitk::DataNode::Pointer(dataNode));
   }
 
   return QVariant();
@@ -230,7 +230,7 @@ QVariant QmitkDataStorageTreeModel::headerData(int /*section*/,
                                  int role) const
 {
    if (orientation == Qt::Horizontal && role == Qt::DisplayRole && m_Root)
-     return QString::fromStdString(m_Root->GetDataTreeNode()->GetName());
+     return QString::fromStdString(m_Root->GetDataNode()->GetName());
 
    return QVariant();
 }
@@ -247,13 +247,13 @@ void QmitkDataStorageTreeModel::SetDataStorage( mitk::DataStorage* _DataStorage 
 
       // remove listeners for the nodes
       m_DataStorage->AddNodeEvent.RemoveListener( mitk::MessageDelegate1<QmitkDataStorageTreeModel
-        , const mitk::DataTreeNode*>( this, &QmitkDataStorageTreeModel::AddNode ) );
+        , const mitk::DataNode*>( this, &QmitkDataStorageTreeModel::AddNode ) );
 
       m_DataStorage->ChangedNodeEvent.RemoveListener( mitk::MessageDelegate1<QmitkDataStorageTreeModel
-        , const mitk::DataTreeNode*>( this, &QmitkDataStorageTreeModel::SetNodeModified ) );
+        , const mitk::DataNode*>( this, &QmitkDataStorageTreeModel::SetNodeModified ) );
 
       m_DataStorage->RemoveNodeEvent.RemoveListener( mitk::MessageDelegate1<QmitkDataStorageTreeModel
-        , const mitk::DataTreeNode*>( this, &QmitkDataStorageTreeModel::RemoveNode ) );
+        , const mitk::DataNode*>( this, &QmitkDataStorageTreeModel::RemoveNode ) );
 
     }
 
@@ -263,7 +263,7 @@ void QmitkDataStorageTreeModel::SetDataStorage( mitk::DataStorage* _DataStorage 
     // delete the old root (if necessary, create new)
     if(m_Root)
       m_Root->Delete();
-    mitk::DataTreeNode::Pointer rootDataNode = mitk::DataTreeNode::New();
+    mitk::DataNode::Pointer rootDataNode = mitk::DataNode::New();
     rootDataNode->SetName("Data Manager");
     m_Root = new TreeItem(rootDataNode, 0);
     this->reset();
@@ -276,13 +276,13 @@ void QmitkDataStorageTreeModel::SetDataStorage( mitk::DataStorage* _DataStorage 
 
       // add listeners for the nodes
       m_DataStorage->AddNodeEvent.AddListener( mitk::MessageDelegate1<QmitkDataStorageTreeModel
-        , const mitk::DataTreeNode*>( this, &QmitkDataStorageTreeModel::AddNode ) );
+        , const mitk::DataNode*>( this, &QmitkDataStorageTreeModel::AddNode ) );
 
       m_DataStorage->ChangedNodeEvent.AddListener( mitk::MessageDelegate1<QmitkDataStorageTreeModel
-        , const mitk::DataTreeNode*>( this, &QmitkDataStorageTreeModel::SetNodeModified ) );
+        , const mitk::DataNode*>( this, &QmitkDataStorageTreeModel::SetNodeModified ) );
 
       m_DataStorage->RemoveNodeEvent.AddListener( mitk::MessageDelegate1<QmitkDataStorageTreeModel
-        , const mitk::DataTreeNode*>( this, &QmitkDataStorageTreeModel::RemoveNode ) );
+        , const mitk::DataNode*>( this, &QmitkDataStorageTreeModel::RemoveNode ) );
 
       mitk::DataStorage::SetOfObjects::ConstPointer _NodeSet = m_DataStorage->GetSubset(m_Predicate);
 
@@ -302,7 +302,7 @@ void QmitkDataStorageTreeModel::SetDataStorageDeleted( const itk::Object* /*_Dat
   this->SetDataStorage(0);
 }
 
-void QmitkDataStorageTreeModel::AddNode( const mitk::DataTreeNode* node )
+void QmitkDataStorageTreeModel::AddNode( const mitk::DataNode* node )
 {
   if(node == 0 
     || m_DataStorage.IsNull() 
@@ -314,7 +314,7 @@ void QmitkDataStorageTreeModel::AddNode( const mitk::DataTreeNode* node )
   // find out if we have a root node
   TreeItem* parentTreeItem = m_Root;
   QModelIndex index;
-  mitk::DataTreeNode* parentDataNode = this->GetParentNode(node);
+  mitk::DataNode* parentDataNode = this->GetParentNode(node);
 
   if(parentDataNode) // no top level data node
   {    
@@ -334,7 +334,7 @@ void QmitkDataStorageTreeModel::AddNode( const mitk::DataTreeNode* node )
   beginInsertRows(index, 0, 0);
 
   // add node
-  parentTreeItem->InsertChild(new TreeItem(const_cast<mitk::DataTreeNode*>(node)), 0);
+  parentTreeItem->InsertChild(new TreeItem(const_cast<mitk::DataNode*>(node)), 0);
 
   // emit endInsertRows event
   endInsertRows();
@@ -342,7 +342,7 @@ void QmitkDataStorageTreeModel::AddNode( const mitk::DataTreeNode* node )
   this->AdjustLayerProperty();
 }
 
-void QmitkDataStorageTreeModel::RemoveNode( const mitk::DataTreeNode* node )
+void QmitkDataStorageTreeModel::RemoveNode( const mitk::DataNode* node )
 {
   if(!m_Root) return;
 
@@ -380,7 +380,7 @@ void QmitkDataStorageTreeModel::RemoveNode( const mitk::DataTreeNode* node )
   this->AdjustLayerProperty();
 }
 
-void QmitkDataStorageTreeModel::SetNodeModified( const mitk::DataTreeNode* node )
+void QmitkDataStorageTreeModel::SetNodeModified( const mitk::DataNode* node )
 {
   TreeItem* treeItem = m_Root->Find(node);
   if(!treeItem)
@@ -396,9 +396,9 @@ void QmitkDataStorageTreeModel::SetNodeModified( const mitk::DataTreeNode* node 
   emit dataChanged(index, index);
 }
 
-mitk::DataTreeNode* QmitkDataStorageTreeModel::GetParentNode( const mitk::DataTreeNode* node ) const
+mitk::DataNode* QmitkDataStorageTreeModel::GetParentNode( const mitk::DataNode* node ) const
 {
-  mitk::DataTreeNode* dataNode = 0;
+  mitk::DataNode* dataNode = 0;
 
   mitk::DataStorage::SetOfObjects::ConstPointer _Sources = m_DataStorage->GetSources(node);
 
@@ -410,7 +410,7 @@ mitk::DataTreeNode* QmitkDataStorageTreeModel::GetParentNode( const mitk::DataTr
 
 bool QmitkDataStorageTreeModel::setData( const QModelIndex &index, const QVariant &value, int role )
 {
-  mitk::DataTreeNode* dataNode = this->TreeItemFromIndex(index)->GetDataTreeNode();
+  mitk::DataNode* dataNode = this->TreeItemFromIndex(index)->GetDataNode();
   if(!dataNode)
     return false;
 
@@ -448,7 +448,7 @@ void QmitkDataStorageTreeModel::AdjustLayerProperty()
   int i = vec.size()-1;
   for(std::vector<TreeItem*>::const_iterator it = vec.begin(); it != vec.end(); ++it)
   {
-    (*it)->GetDataTreeNode()->SetIntProperty("layer", i);
+    (*it)->GetDataNode()->SetIntProperty("layer", i);
     --i;
   }
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
@@ -473,27 +473,27 @@ QModelIndex QmitkDataStorageTreeModel::IndexFromTreeItem( TreeItem* item ) const
     return this->createIndex(item->GetIndex(), 0, item);
 }
 
-std::vector<mitk::DataTreeNode*> QmitkDataStorageTreeModel::GetNodeSet() const
+std::vector<mitk::DataNode*> QmitkDataStorageTreeModel::GetNodeSet() const
 {
-  std::vector<mitk::DataTreeNode*> vec;
+  std::vector<mitk::DataNode*> vec;
   if(m_Root)
     this->TreeToNodeSet(m_Root, vec);
 
   return vec;
 }
 
-void QmitkDataStorageTreeModel::TreeToNodeSet( TreeItem* parent, std::vector<mitk::DataTreeNode*>& vec ) const
+void QmitkDataStorageTreeModel::TreeToNodeSet( TreeItem* parent, std::vector<mitk::DataNode*>& vec ) const
 {
   TreeItem* current;
   for(int i = 0; i<parent->GetChildCount(); ++i)
   {
     current = parent->GetChild(i);
-    vec.push_back(current->GetDataTreeNode());
+    vec.push_back(current->GetDataNode());
     this->TreeToNodeSet(current, vec);
   }
 }
 
-QModelIndex QmitkDataStorageTreeModel::GetIndex( const mitk::DataTreeNode* node ) const
+QModelIndex QmitkDataStorageTreeModel::GetIndex( const mitk::DataNode* node ) const
 {
   if(m_Root)
   {
@@ -504,9 +504,9 @@ QModelIndex QmitkDataStorageTreeModel::GetIndex( const mitk::DataTreeNode* node 
   return QModelIndex();
 }
 
-QmitkDataStorageTreeModel::TreeItem::TreeItem( mitk::DataTreeNode* _DataTreeNode, TreeItem* _Parent )
+QmitkDataStorageTreeModel::TreeItem::TreeItem( mitk::DataNode* _DataNode, TreeItem* _Parent )
 : m_Parent(_Parent)
-, m_DataTreeNode(_DataTreeNode)
+, m_DataNode(_DataNode)
 {
   if(m_Parent)
     m_Parent->AddChild(this);
@@ -526,12 +526,12 @@ void QmitkDataStorageTreeModel::TreeItem::Delete()
   delete this;
 }
 
-QmitkDataStorageTreeModel::TreeItem* QmitkDataStorageTreeModel::TreeItem::Find( const mitk::DataTreeNode* _DataTreeNode ) const
+QmitkDataStorageTreeModel::TreeItem* QmitkDataStorageTreeModel::TreeItem::Find( const mitk::DataNode* _DataNode ) const
 {
   QmitkDataStorageTreeModel::TreeItem* item = 0;
-  if(_DataTreeNode)
+  if(_DataNode)
   {
-    if(m_DataTreeNode == _DataTreeNode)
+    if(m_DataNode == _DataNode)
       item = const_cast<TreeItem*>(this);
     else
     {
@@ -539,7 +539,7 @@ QmitkDataStorageTreeModel::TreeItem* QmitkDataStorageTreeModel::TreeItem::Find( 
       {
         if(item)
           break;
-        item = (*it)->Find(_DataTreeNode);
+        item = (*it)->Find(_DataNode);
       }
     }
   }
@@ -590,9 +590,9 @@ QmitkDataStorageTreeModel::TreeItem* QmitkDataStorageTreeModel::TreeItem::GetPar
   return m_Parent;
 }
 
-mitk::DataTreeNode::Pointer QmitkDataStorageTreeModel::TreeItem::GetDataTreeNode() const
+mitk::DataNode::Pointer QmitkDataStorageTreeModel::TreeItem::GetDataNode() const
 {
-  return m_DataTreeNode;
+  return m_DataNode;
 }
 
 void QmitkDataStorageTreeModel::TreeItem::InsertChild( TreeItem* item, int index )

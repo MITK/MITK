@@ -58,7 +58,7 @@ void mitk::ContourSetMapper2D::Paint(mitk::BaseRenderer * renderer)
     while ( contourIt != contourVec.end() )
     {
       mitk::Contour::Pointer nextContour = (mitk::Contour::Pointer) (*contourIt).second;
-      vtkLinearTransform* transform = GetDataTreeNode()->GetVtkTransform();
+      vtkLinearTransform* transform = GetDataNode()->GetVtkTransform();
 
       //    Contour::OutputType point;
       Contour::BoundingBoxType::PointType point;

@@ -26,7 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "itkVersion.h"
 #include "mitkToolFactoryMacro.h"
 #include "mitkMessage.h"
-#include "mitkDataTreeNode.h"
+#include "mitkDataNode.h"
 #include "mitkNodePredicateProperty.h"
 #include "mitkNodePredicateDataType.h"
 #include "mitkNodePredicateDimension.h"
@@ -145,8 +145,8 @@ class MitkExt_EXPORT Tool : public StateMachine
     virtual NodePredicateBase::ConstPointer GetReferenceDataPreference() const;
     virtual NodePredicateBase::ConstPointer GetWorkingDataPreference() const;
 
-    DataTreeNode::Pointer CreateEmptySegmentationNode( Image* original, const std::string& organName, const mitk::Color& color );
-    DataTreeNode::Pointer CreateSegmentationNode(      Image* image,    const std::string& organName, const mitk::Color& color );
+    DataNode::Pointer CreateEmptySegmentationNode( Image* original, const std::string& organName, const mitk::Color& color );
+    DataNode::Pointer CreateSegmentationNode(      Image* image,    const std::string& organName, const mitk::Color& color );
 
 
   protected:

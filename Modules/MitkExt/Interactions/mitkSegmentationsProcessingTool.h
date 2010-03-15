@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkCommon.h"
 #include "MitkExtExports.h"
 #include "mitkTool.h"
-#include "mitkDataTreeNode.h"
+#include "mitkDataNode.h"
 
 namespace mitk
 {
@@ -59,7 +59,7 @@ class MitkExt_EXPORT SegmentationsProcessingTool : public Tool
      Will call the following methods in turn
 
        - StartProcessingAllData
-       - ProcessOneWorkingData(DataTreeNode*) for each node in the working data list of our tool manager
+       - ProcessOneWorkingData(DataNode*) for each node in the working data list of our tool manager
        - FinishProcessingAllData
 
      Subclasses should override these methods as needed and provide meaningful implementations.
@@ -76,7 +76,7 @@ class MitkExt_EXPORT SegmentationsProcessingTool : public Tool
       \brief Subclasses should override this method
       \sa ProcessAllObjects
     */
-    virtual bool ProcessOneWorkingData( DataTreeNode* node );
+    virtual bool ProcessOneWorkingData( DataNode* node );
 
     /**
       \brief Subclasses should override this method

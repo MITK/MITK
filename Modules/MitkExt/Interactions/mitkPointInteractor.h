@@ -26,7 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk
 {
-  class DataTreeNode;
+  class DataNode;
 
   //##Documentation
   //## @brief Interaction with a point
@@ -39,7 +39,7 @@ namespace mitk
   {
   public:
     mitkClassMacro(PointInteractor, Interactor);
-    mitkNewMacro2Param(Self, const char*, DataTreeNode*);
+    mitkNewMacro2Param(Self, const char*, DataNode*);
 
     //##Documentation
     //## @brief Sets the amount of precision
@@ -55,7 +55,7 @@ namespace mitk
   protected:
     //##Documentation
     //##@brief Constructor 
-    PointInteractor(const char * type, DataTreeNode* dataTreeNode);
+    PointInteractor(const char * type, DataNode* dataTreeNode);
 
     //##Documentation
     //##@brief Destructor 

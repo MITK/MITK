@@ -109,7 +109,7 @@
   </customwidget>
  </customwidgets>
  <includes>
-  <include location="global">mitkDataTreeNode.h</include>
+  <include location="global">mitkDataNode.h</include>
   <include location="global">mitkPointSet.h</include>
   <include location="global">mitkPointSetInteractor.h</include>
  </includes>

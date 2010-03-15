@@ -207,7 +207,7 @@ void QmitkToolPairNavigationView::OnShowTrackingVolume( bool on )
 
   //try to the the node
   std::string trackerVolumeName = "Tracking Volume";
-  mitk::DataTreeNode::Pointer node = ds->GetNamedNode(trackerVolumeName);
+  mitk::DataNode::Pointer node = ds->GetNamedNode(trackerVolumeName);
 
   if (on == false)
   {
@@ -227,7 +227,7 @@ void QmitkToolPairNavigationView::OnShowTrackingVolume( bool on )
         QMessageBox::warning(NULL, "Error", "can not load tracking volume. Tracking volume display is not available");
         return;
       }
-      mitk::DataTreeNode::Pointer node = mitk::DataTreeNode::New();
+      mitk::DataNode::Pointer node = mitk::DataNode::New();
       node->SetData(volume);
       node->SetName(trackerVolumeName);
       node->SetOpacity(0.2);
@@ -281,7 +281,7 @@ void QmitkToolPairNavigationView::SetupIGTPipeline()
     m_Visualizer->SetInput(i, m_Source->GetOutput(i)); // set input for visualization filter
 
     const char* toolName = tracker->GetTool(i)->GetToolName();
-    mitk::DataTreeNode::Pointer toolrepresentationNode;
+    mitk::DataNode::Pointer toolrepresentationNode;
     
     //the first tool represents the tool to guide 
     //it will be represented as cone wheras the target tools will be represented by a sphere
@@ -352,7 +352,7 @@ void QmitkToolPairNavigationView::StopContinuousUpdate()
 }
 
 
-mitk::DataTreeNode::Pointer QmitkToolPairNavigationView::CreateConeAsInstrumentVisualization(const char* label)
+mitk::DataNode::Pointer QmitkToolPairNavigationView::CreateConeAsInstrumentVisualization(const char* label)
 {
   //new data
   mitk::Cone::Pointer activeToolData = mitk::Cone::New();
@@ -368,7 +368,7 @@ mitk::DataTreeNode::Pointer QmitkToolPairNavigationView::CreateConeAsInstrumentV
   vtkData->Delete();
 
   //new node
-  mitk::DataTreeNode::Pointer coneNode = mitk::DataTreeNode::New();
+  mitk::DataNode::Pointer coneNode = mitk::DataNode::New();
   coneNode->SetData(activeToolData);
   coneNode->GetPropertyList()->SetProperty("name", mitk::StringProperty::New ( label ) );
   coneNode->GetPropertyList()->SetProperty("layer", mitk::IntProperty::New(0));
@@ -382,7 +382,7 @@ mitk::DataTreeNode::Pointer QmitkToolPairNavigationView::CreateConeAsInstrumentV
   return coneNode;
 }
 
-mitk::DataTreeNode::Pointer QmitkToolPairNavigationView::CreateSphereAsInstrumentVisualization(const char* label)
+mitk::DataNode::Pointer QmitkToolPairNavigationView::CreateSphereAsInstrumentVisualization(const char* label)
 {
   //new data
   mitk::Ellipsoid::Pointer activeToolData = mitk::Ellipsoid::New();
@@ -394,7 +394,7 @@ mitk::DataTreeNode::Pointer QmitkToolPairNavigationView::CreateSphereAsInstrumen
   vtkData->Delete();
 
   //new node
-  mitk::DataTreeNode::Pointer sphereNode = mitk::DataTreeNode::New();
+  mitk::DataNode::Pointer sphereNode = mitk::DataNode::New();
   sphereNode->SetData(activeToolData);
   sphereNode->GetPropertyList()->SetProperty("name", mitk::StringProperty::New ( label ) );
   sphereNode->GetPropertyList()->SetProperty("layer", mitk::IntProperty::New(0));

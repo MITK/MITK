@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkToolManager.h"
 
-//#include "mitkDataTreeNodeFactory.h"
+//#include "mitkDataNodeFactory.h"
 #include <mitkCoreObjectFactory.h>
 #include "mitkLevelWindowProperty.h"
 #include "mitkColorProperty.h"
@@ -46,7 +46,7 @@ mitk::BinaryThresholdTool::BinaryThresholdTool()
  m_SensibleMaximumThresholdValue(+100),
  m_CurrentThresholdValue(1)
 {
-  m_ThresholdFeedbackNode = DataTreeNode::New();
+  m_ThresholdFeedbackNode = DataNode::New();
   mitk::CoreObjectFactory::GetInstance()->SetDefaultProperties( m_ThresholdFeedbackNode );
 
   m_ThresholdFeedbackNode->SetProperty( "color", ColorProperty::New(1.0, 0.0, 0.0) );
@@ -128,7 +128,7 @@ void mitk::BinaryThresholdTool::CancelThresholding()
   m_ToolManager->ActivateTool(-1);
 }
 
-void mitk::BinaryThresholdTool::SetupPreviewNodeFor( DataTreeNode* nodeForThresholding )
+void mitk::BinaryThresholdTool::SetupPreviewNodeFor( DataNode* nodeForThresholding )
 {
   if (nodeForThresholding)
   {
@@ -166,7 +166,7 @@ void mitk::BinaryThresholdTool::SetupPreviewNodeFor( DataTreeNode* nodeForThresh
   }
 }
 
-void mitk::BinaryThresholdTool::CreateNewSegmentationFromThreshold(DataTreeNode* node, const std::string& organName, const Color& color)
+void mitk::BinaryThresholdTool::CreateNewSegmentationFromThreshold(DataNode* node, const std::string& organName, const Color& color)
 {
   if (node)
   {
@@ -174,7 +174,7 @@ void mitk::BinaryThresholdTool::CreateNewSegmentationFromThreshold(DataTreeNode*
     if (image.IsNotNull())
     {
       // create a new image of the same dimensions and smallest possible pixel type
-      DataTreeNode::Pointer emptySegmentation = Tool::CreateEmptySegmentationNode( image, organName, color );
+      DataNode::Pointer emptySegmentation = Tool::CreateEmptySegmentationNode( image, organName, color );
 
       if (emptySegmentation)
       {

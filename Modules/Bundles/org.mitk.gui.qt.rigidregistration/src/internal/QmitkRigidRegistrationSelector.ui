@@ -370,7 +370,7 @@
  <layoutdefault spacing="6" margin="11"/>
  <pixmapfunction>qPixmapFromMimeSource</pixmapfunction>
  <includes>
-  <include location="local">mitkDataTreeNode.h</include>
+  <include location="local">mitkDataNode.h</include>
   <include location="local">mitkImageRegistrationMethod.h</include>
   <include location="local">mitkRenderingManager.h</include>
   <include location="local">mitkRigidRegistrationPreset.h</include>

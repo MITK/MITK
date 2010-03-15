@@ -222,8 +222,8 @@ bool mitk::SceneIO::SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNode
     ProgressBar::GetInstance()->AddStepsToDo( sceneNodes->size() );
  
     // find out about dependencies
-    typedef std::map< DataTreeNode*, std::string > UIDMapType;
-    typedef std::map< DataTreeNode*, std::list<std::string> > SourcesMapType;
+    typedef std::map< DataNode*, std::string > UIDMapType;
+    typedef std::map< DataNode*, std::list<std::string> > SourcesMapType;
 
     UIDMapType nodeUIDs;              // for dependencies: ID of each node
     SourcesMapType sourceUIDs; // for dependencies: IDs of a node's parent nodes
@@ -234,7 +234,7 @@ bool mitk::SceneIO::SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNode
          iter != sceneNodes->end();
          ++iter)
     {
-      DataTreeNode* node = iter->GetPointer();
+      DataNode* node = iter->GetPointer();
       if (!node)  
         continue; // unlikely event that we get a NULL pointer as an object for saving. just ignore
     
@@ -268,7 +268,7 @@ bool mitk::SceneIO::SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNode
          iter != sceneNodes->end();
          ++iter)
     {
-      DataTreeNode* node = iter->GetPointer();
+      DataNode* node = iter->GetPointer();
       
       if (node)
       {

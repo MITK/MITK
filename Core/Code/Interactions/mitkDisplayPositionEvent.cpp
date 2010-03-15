@@ -44,7 +44,7 @@ const mitk::Point3D& mitk::DisplayPositionEvent::GetWorldPosition() const
   return m_WorldPosition;
 }
 
-mitk::DataTreeNode *mitk::DisplayPositionEvent::GetPickedObjectNode() const
+mitk::DataNode *mitk::DisplayPositionEvent::GetPickedObjectNode() const
 {
   // Method performs object picking and sets both object and world position
   if ( m_PickedObjectIsSet )
@@ -64,7 +64,7 @@ mitk::DataTreeNode *mitk::DisplayPositionEvent::GetPickedObjectNode() const
 
 mitk::BaseData *mitk::DisplayPositionEvent::GetPickedObject() const
 {
-  mitk::DataTreeNode *node = this->GetPickedObjectNode();
+  mitk::DataNode *node = this->GetPickedObjectNode();
 
   if ( node != NULL )
   {

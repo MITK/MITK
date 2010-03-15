@@ -1,16 +1,16 @@
 #include "berrySingleNodeSelection.h"
 
-#include "mitkDataTreeNode.h"
+#include "mitkDataNode.h"
 
 namespace berry
 {
 
-  void SingleNodeSelection::SetNode( mitk::DataTreeNode* _SelectedNode )
+  void SingleNodeSelection::SetNode( mitk::DataNode* _SelectedNode )
   {
     m_Node = _SelectedNode;
   }
 
-  mitk::DataTreeNode* SingleNodeSelection::GetNode() const
+  mitk::DataNode* SingleNodeSelection::GetNode() const
   {
     return m_Node;
   }

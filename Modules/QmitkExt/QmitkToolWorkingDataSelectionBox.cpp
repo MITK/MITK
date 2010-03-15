@@ -129,7 +129,7 @@ void QmitkToolWorkingDataSelectionBox::OnWorkingDataSelectionChanged()
 
   if (selection.size() >0)
   {
-    const mitk::DataTreeNode* node = selection[0];
+    const mitk::DataNode* node = selection[0];
     emit WorkingNodeSelected(node);
   }
   else
@@ -149,7 +149,7 @@ void QmitkToolWorkingDataSelectionBox::OnToolManagerWorkingDataModified()
   if (m_SelfCall) return;
 
 
-  const mitk::DataTreeNode* node = m_ToolManager->GetWorkingData(0);
+  const mitk::DataNode* node = m_ToolManager->GetWorkingData(0);
   emit WorkingNodeSelected(node);
 
   UpdateDataDisplay();
@@ -230,7 +230,7 @@ void QmitkToolWorkingDataSelectionBox::UpdateDataDisplay()
         objectIter != allObjects.end();
         ++objectIter, ++laufendeNummer )
   {
-    mitk::DataTreeNode* node = *objectIter;
+    mitk::DataNode* node = *objectIter;
 
     if (node) // delete this check when datastorage is really used
     {
@@ -354,7 +354,7 @@ mitk::ToolManager::DataVectorType QmitkToolWorkingDataSelectionBox::GetSelectedN
   return result;
 }
 
-mitk::DataTreeNode* QmitkToolWorkingDataSelectionBox::GetSelectedNode()
+mitk::DataNode* QmitkToolWorkingDataSelectionBox::GetSelectedNode()
 {
   Q3ListViewItem* item = Q3ListView::selectedItem();
   if (item)
@@ -433,7 +433,7 @@ mitk::ToolManager::DataVectorType QmitkToolWorkingDataSelectionBox::GetAllNodes(
    */
   if ( onlyDerivedFromOriginal )
   {
-    mitk::DataTreeNode* sourceNode( m_ToolManager->GetReferenceData(0) );
+    mitk::DataNode* sourceNode( m_ToolManager->GetReferenceData(0) );
     if (sourceNode)
     {
       allObjects = dataStorage->GetDerivations( sourceNode, completePredicate, false );
@@ -464,7 +464,7 @@ mitk::ToolManager::DataVectorType QmitkToolWorkingDataSelectionBox::GetAllNodes(
         objectIter != allObjects->end();
         ++objectIter )
   {
-    mitk::DataTreeNode* node = (*objectIter).GetPointer();
+    mitk::DataNode* node = (*objectIter).GetPointer();
     resultVector.push_back( node );
   }
 
@@ -479,7 +479,7 @@ void QmitkToolWorkingDataSelectionBox::itemRightClicked( Q3ListViewItem* item, c
     ItemNodeMapType::iterator iter = m_Node.find(item);
     if ( iter != m_Node.end() )
     {
-      mitk::DataTreeNode* node( iter->second );
+      mitk::DataNode* node( iter->second );
 
       if (node)
       {
@@ -649,7 +649,7 @@ bool QmitkToolWorkingDataSelectionBox::eventFilter( QObject *o, QEvent *e )
       {
         try
         {
-          mitk::DataTreeNode* node = allSegmentations.at(figuredOutIndex);
+          mitk::DataNode* node = allSegmentations.at(figuredOutIndex);
           m_ToolManager->SetWorkingData( node );
           return false; // let anybody know about this event, don't swallow it
         }

@@ -240,7 +240,7 @@ void mitk::ShaderRepository::Shader::Uniform::LoadFromXML(vtkXMLDataElement *y)
 
 
 
-void mitk::ShaderRepository::AddDefaultProperties(mitk::DataTreeNode* node, mitk::BaseRenderer* renderer, bool overwrite)
+void mitk::ShaderRepository::AddDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite)
 {
   node->AddProperty( "shader", mitk::ShaderEnumProperty::New(), renderer, overwrite );
     
@@ -297,7 +297,7 @@ void mitk::ShaderRepository::AddDefaultProperties(mitk::DataTreeNode* node, mitk
   
 }
                                    
-void mitk::ShaderRepository::ApplyProperties(mitk::DataTreeNode* node, vtkActor *actor, mitk::BaseRenderer* renderer,itk::TimeStamp &MTime)
+void mitk::ShaderRepository::ApplyProperties(mitk::DataNode* node, vtkActor *actor, mitk::BaseRenderer* renderer,itk::TimeStamp &MTime)
 {
   bool setMTime = false;
 

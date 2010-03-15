@@ -112,7 +112,7 @@ void QmitkSliceWidget::SetData(
 	SetData(it->Value(), view);
 }
 
-void QmitkSliceWidget::SetData(mitk::DataTreeNode::Pointer node)
+void QmitkSliceWidget::SetData(mitk::DataNode::Pointer node)
 {
 	try
 	{
@@ -126,7 +126,7 @@ void QmitkSliceWidget::SetData(mitk::DataTreeNode::Pointer node)
 	SetData(node, m_View);
 }
 
-//void QmitkSliceWidget::AddData( mitk::DataTreeNode::Pointer node)
+//void QmitkSliceWidget::AddData( mitk::DataNode::Pointer node)
 //{
 //  if ( m_DataTree.IsNull() )
 //  {
@@ -138,7 +138,7 @@ void QmitkSliceWidget::SetData(mitk::DataTreeNode::Pointer node)
 //}
 
 
-void QmitkSliceWidget::SetData(mitk::DataTreeNode::Pointer /*treeNode*/,
+void QmitkSliceWidget::SetData(mitk::DataNode::Pointer /*treeNode*/,
 		mitk::SliceNavigationController::ViewDirection view)
 {
 	try
@@ -153,7 +153,7 @@ void QmitkSliceWidget::SetData(mitk::DataTreeNode::Pointer /*treeNode*/,
 			bool noVisibleImage = true;
 			for (it = rs->Begin(); it != rs->End(); ++it)
 			{
-				mitk::DataTreeNode::Pointer node = it.Value();
+				mitk::DataNode::Pointer node = it.Value();
 				node->SetName("currentImage");
 				mitk::Image::Pointer image = m_DataStorage->GetNamedObject<
 						mitk::Image> ("currentImage");

@@ -50,14 +50,14 @@ mitk::NavigationToolStorage::Pointer mitk::NavigationToolStorageDeserializer::De
   unzipper.decompressAllFiles();
 
 
-  //create DataTreeNodes using the decomressed storage
+  //create DataNodes using the decomressed storage
   mitk::SceneIO::Pointer mySceneIO = mitk::SceneIO::New();
   mitk::DataStorage::Pointer readStorage = mySceneIO->LoadScene(tempDirectory + Poco::Path::separator() + myReader->GetFileWithoutPath(filename) + ".storage");
   mitk::NavigationToolStorage::Pointer returnValue = mitk::NavigationToolStorage::New();
 
   for(unsigned int i=0; i<readStorage->GetAll()->Size(); i++)
     {
-    mitk::NavigationTool::Pointer newTool = myReader->ConvertDataTreeNodeToNavigationTool(readStorage->GetAll()->ElementAt(i),tempDirectory);
+    mitk::NavigationTool::Pointer newTool = myReader->ConvertDataNodeToNavigationTool(readStorage->GetAll()->ElementAt(i),tempDirectory);
     if (!returnValue->AddTool(newTool))
       {
       m_ErrorMessage = "Error can't parse data storage!";

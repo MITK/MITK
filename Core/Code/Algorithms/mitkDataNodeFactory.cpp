@@ -16,7 +16,7 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include <mitkConfig.h>
-#include <mitkDataTreeNodeFactory.h>
+#include <mitkDataNodeFactory.h>
 #include <mitkBaseDataIOFactory.h>
 #include <mitkCoreObjectFactory.h>
 #include <mitkITKImageImport.h>
@@ -86,9 +86,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkVtkResliceInterpolationProperty.h"
 #include "mitkProgressBar.h"
 
-bool mitk::DataTreeNodeFactory::m_TextureInterpolationActive = false;    // default value for texture interpolation if nothing is defined in global options (see QmitkMainTemplate.ui.h)
+bool mitk::DataNodeFactory::m_TextureInterpolationActive = false;    // default value for texture interpolation if nothing is defined in global options (see QmitkMainTemplate.ui.h)
 
-mitk::DataTreeNodeFactory::DataTreeNodeFactory()
+mitk::DataNodeFactory::DataNodeFactory()
 : m_UseSeriesDetails(true)
 {
   m_Serie = false;
@@ -97,15 +97,15 @@ mitk::DataTreeNodeFactory::DataTreeNodeFactory()
   mitk::CoreObjectFactory::GetInstance();
 }
 
-mitk::DataTreeNodeFactory::~DataTreeNodeFactory()
+mitk::DataNodeFactory::~DataNodeFactory()
 {}
 
-void mitk::DataTreeNodeFactory::SetImageSerie(bool serie)
+void mitk::DataNodeFactory::SetImageSerie(bool serie)
 {
   m_Serie = serie;
 }
 
-void mitk::DataTreeNodeFactory::GenerateData()
+void mitk::DataNodeFactory::GenerateData()
 {
   // IF filename is something.pic, and something.pic does not exist, try to read something.pic.gz
   // if there are both, something.pic and something.pic.gz, only the requested file is read
@@ -174,7 +174,7 @@ void mitk::DataTreeNodeFactory::GenerateData()
       if( baseData.IsNotNull() )
       {
         usedNewDTNF = true;
-        mitk::DataTreeNode::Pointer node = mitk::DataTreeNode::New();
+        mitk::DataNode::Pointer node = mitk::DataNode::New();
         node->SetData(baseData);
         this->SetDefaultCommonProperties( node );
 
@@ -186,7 +186,7 @@ void mitk::DataTreeNodeFactory::GenerateData()
   }
 }
 
-void mitk::DataTreeNodeFactory::ResizeOutputs( const unsigned int& num )
+void mitk::DataNodeFactory::ResizeOutputs( const unsigned int& num )
 {
   unsigned int prevNum = this->GetNumberOfOutputs();
   this->SetNumberOfOutputs( num );
@@ -196,29 +196,29 @@ void mitk::DataTreeNodeFactory::ResizeOutputs( const unsigned int& num )
   }
 }
 
-bool mitk::DataTreeNodeFactory::FileNameEndsWith( const std::string& name )
+bool mitk::DataNodeFactory::FileNameEndsWith( const std::string& name )
 {
   if (m_FileName.size() < name.size()) return false;
   
   return m_FileName.substr(m_FileName.size() - name.size()) == name;
 }
 
-bool mitk::DataTreeNodeFactory::FilePatternEndsWith( const std::string& name )
+bool mitk::DataNodeFactory::FilePatternEndsWith( const std::string& name )
 {
   return m_FilePattern.find( name ) != std::string::npos;
 }
 
-std::string mitk::DataTreeNodeFactory::GetBaseFileName()
+std::string mitk::DataNodeFactory::GetBaseFileName()
 {
   return itksys::SystemTools::GetFilenameName( m_FileName );
 }
 
-std::string mitk::DataTreeNodeFactory::GetBaseFilePrefix()
+std::string mitk::DataNodeFactory::GetBaseFilePrefix()
 {
   return itksys::SystemTools::GetFilenameName( m_FilePrefix );
 }
 
-std::string mitk::DataTreeNodeFactory::GetDirectory()
+std::string mitk::DataNodeFactory::GetDirectory()
 {
   if ( m_FileName != "" )
     return itksys::SystemTools::GetFilenamePath( m_FileName );
@@ -230,7 +230,7 @@ std::string mitk::DataTreeNodeFactory::GetDirectory()
 
 
 // a progress callback
-void mitk::DataTreeNodeFactory::OnITKProgressEvent(itk::Object *source, const itk::EventObject &) {
+void mitk::DataNodeFactory::OnITKProgressEvent(itk::Object *source, const itk::EventObject &) {
   //// Get the value of the progress
   itk::ProcessObject* _ProcessObject = dynamic_cast<itk::ProcessObject*>(source);
   if(!_ProcessObject)
@@ -257,7 +257,7 @@ void mitk::DataTreeNodeFactory::OnITKProgressEvent(itk::Object *source, const it
 
 }
 
-void mitk::DataTreeNodeFactory::ReadFileSeriesTypeDCM()
+void mitk::DataNodeFactory::ReadFileSeriesTypeDCM()
 {
   MITK_INFO << "loading image series with prefix " << m_FilePrefix << " and pattern " << m_FilePattern << " as DICOM..." << std::endl;
     
@@ -344,7 +344,7 @@ void mitk::DataTreeNodeFactory::ReadFileSeriesTypeDCM()
       image->DisconnectPipeline();
 
       //add the mitk image to the node
-      mitk::DataTreeNode::Pointer node = this->GetOutput( i );
+      mitk::DataNode::Pointer node = this->GetOutput( i );
       node->SetData( image );
 
       //SetDefaultImageProperties(node);
@@ -369,7 +369,7 @@ void mitk::DataTreeNodeFactory::ReadFileSeriesTypeDCM()
 
 
 
-void mitk::DataTreeNodeFactory::ReadFileSeriesTypeITKImageSeriesReader()
+void mitk::DataNodeFactory::ReadFileSeriesTypeITKImageSeriesReader()
 {
   typedef itk::Image<int, 3> ImageType;
   typedef itk::ImageSeriesReader< ImageType > ReaderType;
@@ -403,7 +403,7 @@ void mitk::DataTreeNodeFactory::ReadFileSeriesTypeITKImageSeriesReader()
       image->SetVolume( reader->GetOutput( i )->GetBufferPointer() );
 
       //add the mitk image to the node
-      mitk::DataTreeNode::Pointer node = this->GetOutput( i );
+      mitk::DataNode::Pointer node = this->GetOutput( i );
       node->SetData( image );
 
       mitk::StringProperty::Pointer nameProp = mitk::StringProperty::New( m_FileName );
@@ -419,7 +419,7 @@ void mitk::DataTreeNodeFactory::ReadFileSeriesTypeITKImageSeriesReader()
 
 
 
-mitk::ColorProperty::Pointer mitk::DataTreeNodeFactory::DefaultColorForOrgan( const std::string& organ )
+mitk::ColorProperty::Pointer mitk::DataNodeFactory::DefaultColorForOrgan( const std::string& organ )
 {
   static bool initialized = false;
   static std::map< std::string, std::string > s_ColorMap;
@@ -510,7 +510,7 @@ mitk::ColorProperty::Pointer mitk::DataTreeNodeFactory::DefaultColorForOrgan( co
 
 }
 
-void mitk::DataTreeNodeFactory::SetDefaultCommonProperties(mitk::DataTreeNode::Pointer &node)
+void mitk::DataNodeFactory::SetDefaultCommonProperties(mitk::DataNode::Pointer &node)
 {
   // path
   mitk::StringProperty::Pointer pathProp = mitk::StringProperty::New( itksys::SystemTools::GetFilenamePath( m_FileName ) );

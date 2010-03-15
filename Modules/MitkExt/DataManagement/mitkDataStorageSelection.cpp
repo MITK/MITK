@@ -41,17 +41,17 @@ namespace mitk
     return m_Nodes.size();
   }
 
-  mitk::DataTreeNode::Pointer DataStorageSelection::GetNode() const
+  mitk::DataNode::Pointer DataStorageSelection::GetNode() const
   {
     return this->GetNode(0);
   }
 
-  mitk::DataTreeNode::Pointer DataStorageSelection::GetNode(unsigned int index) const
+  mitk::DataNode::Pointer DataStorageSelection::GetNode(unsigned int index) const
   {
     return (index < m_Nodes.size())? m_Nodes.at(index): 0;
   }
 
-  std::vector<mitk::DataTreeNode*> DataStorageSelection::GetNodes() const
+  std::vector<mitk::DataNode*> DataStorageSelection::GetNodes() const
   {
     return m_Nodes;
   }
@@ -62,14 +62,14 @@ namespace mitk
     return m_AutoAddNodes;
   }
 
-  DataStorageSelection& DataStorageSelection::operator=(mitk::DataTreeNode* node)
+  DataStorageSelection& DataStorageSelection::operator=(mitk::DataNode* node)
   {
     this->RemoveAllNodes();
     this->AddNode(node);
     return *this;
   }
 
-  DataStorageSelection& DataStorageSelection::operator=(mitk::DataTreeNode::Pointer node)
+  DataStorageSelection& DataStorageSelection::operator=(mitk::DataNode::Pointer node)
   {
     *this = node.GetPointer();
     return *this;
@@ -85,10 +85,10 @@ namespace mitk
       {
         if(m_AutoAddNodes)
           this->m_DataStorage->AddNodeEvent.RemoveListener( mitk::MessageDelegate1<DataStorageSelection
-          , const mitk::DataTreeNode*>( this, &DataStorageSelection::AddNode ) );
+          , const mitk::DataNode*>( this, &DataStorageSelection::AddNode ) );
 
         this->m_DataStorage->RemoveNodeEvent.RemoveListener( mitk::MessageDelegate1<DataStorageSelection
-          , const mitk::DataTreeNode*>( this, &DataStorageSelection::RemoveNode ) );
+          , const mitk::DataNode*>( this, &DataStorageSelection::RemoveNode ) );
 
         m_DataStorage->RemoveObserver(m_DataStorageDeletedTag);
         m_DataStorageDeletedTag = 0;
@@ -103,10 +103,10 @@ namespace mitk
         // subscribe for node added/removed events
         if(m_AutoAddNodes)
           this->m_DataStorage->AddNodeEvent.AddListener( mitk::MessageDelegate1<DataStorageSelection
-          , const mitk::DataTreeNode*>( this, &DataStorageSelection::AddNode ) );
+          , const mitk::DataNode*>( this, &DataStorageSelection::AddNode ) );
 
         this->m_DataStorage->RemoveNodeEvent.AddListener( mitk::MessageDelegate1<DataStorageSelection
-          , const mitk::DataTreeNode*>( this, &DataStorageSelection::RemoveNode ) );
+          , const mitk::DataNode*>( this, &DataStorageSelection::RemoveNode ) );
 
         itk::MemberCommand<DataStorageSelection>::Pointer ObjectChangedCommand
           = itk::MemberCommand<DataStorageSelection>::New();
@@ -129,7 +129,7 @@ namespace mitk
     }
   }
 
-  void DataStorageSelection::AddNode(const mitk::DataTreeNode* node)
+  void DataStorageSelection::AddNode(const mitk::DataNode* node)
   {
     // garantuee no recursions when a new node event is thrown
     if(m_SelfCall)
@@ -143,7 +143,7 @@ namespace mitk
     if(std::find(m_Nodes.begin(), m_Nodes.end(), node) != m_Nodes.end())
       return;
 
-    mitk::DataTreeNode* nonConstNode = const_cast<mitk::DataTreeNode*>(node);
+    mitk::DataNode* nonConstNode = const_cast<mitk::DataNode*>(node);
     // add listener
     this->AddListener(nonConstNode);
 
@@ -155,19 +155,19 @@ namespace mitk
   }
 
 
-  void DataStorageSelection::RemoveNode(const mitk::DataTreeNode* node)
+  void DataStorageSelection::RemoveNode(const mitk::DataNode* node)
   {
     if(m_SelfCall)
       return;
 
     // find corresponding node
-    std::vector<mitk::DataTreeNode*>::iterator nodeIt
+    std::vector<mitk::DataNode*>::iterator nodeIt
       = std::find(m_Nodes.begin(), m_Nodes.end(), node);
 
     if(nodeIt == m_Nodes.end())
       return;
 
-    mitk::DataTreeNode* nonConstNode = const_cast<mitk::DataTreeNode*>(node);
+    mitk::DataNode* nonConstNode = const_cast<mitk::DataNode*>(node);
     // add listener
     this->RemoveListener(nonConstNode);
 
@@ -203,7 +203,7 @@ namespace mitk
 
     const mitk::BaseProperty* prop = 0;
     const mitk::PropertyList* propList = 0;
-    const mitk::DataTreeNode* node = dynamic_cast<const mitk::DataTreeNode*>(caller);
+    const mitk::DataNode* node = dynamic_cast<const mitk::DataNode*>(caller);
     if(!node)
     {
       if((prop = dynamic_cast<const mitk::BaseProperty*>(caller)))
@@ -231,9 +231,9 @@ namespace mitk
   }
 
   //# protected
-  mitk::DataTreeNode::Pointer DataStorageSelection::FindNode(const mitk::BaseProperty* prop) const
+  mitk::DataNode::Pointer DataStorageSelection::FindNode(const mitk::BaseProperty* prop) const
   {
-    mitk::DataTreeNode* node = 0;
+    mitk::DataNode* node = 0;
     for(Nodes::const_iterator it=m_Nodes.begin(); it!=m_Nodes.end(); ++it)
     {
       for(mitk::PropertyList::PropertyMap::const_iterator it2
@@ -250,9 +250,9 @@ namespace mitk
     return node;
   }
 
-  mitk::DataTreeNode::Pointer DataStorageSelection::FindNode(const mitk::PropertyList* propList) const
+  mitk::DataNode::Pointer DataStorageSelection::FindNode(const mitk::PropertyList* propList) const
   {
-    mitk::DataTreeNode* node = 0;
+    mitk::DataNode* node = 0;
     for(Nodes::const_iterator it=m_Nodes.begin(); it!=m_Nodes.end(); ++it)
     {
       if((*it)->GetPropertyList() == propList)
@@ -291,7 +291,7 @@ namespace mitk
     }
   }
 
-  void DataStorageSelection::RemoveListener(mitk::DataTreeNode* node)
+  void DataStorageSelection::RemoveListener(mitk::DataNode* node)
   {
     // remove node listener
     node->RemoveObserver(m_NodeModifiedObserverTags[node]);
@@ -318,7 +318,7 @@ namespace mitk
     }
   }
 
-  void DataStorageSelection::AddListener(mitk::DataTreeNode* node)
+  void DataStorageSelection::AddListener(mitk::DataNode* node)
   {
     // node listener
     itk::MemberCommand<DataStorageSelection>::Pointer ObjectChangedCommand

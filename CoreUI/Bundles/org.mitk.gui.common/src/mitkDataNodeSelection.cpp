@@ -15,37 +15,37 @@
 
  =========================================================================*/
 
-#include "mitkDataTreeNodeSelection.h"
+#include "mitkDataNodeSelection.h"
 
-#include "mitkDataTreeNodeObject.h"
+#include "mitkDataNodeObject.h"
 
 namespace mitk
 {
 
-DataTreeNodeSelection::DataTreeNodeSelection() :
+DataNodeSelection::DataNodeSelection() :
   m_Selection(new ContainerType())
 {
 
 }
 
-DataTreeNodeSelection::DataTreeNodeSelection(DataTreeNode::Pointer node) :
+DataNodeSelection::DataNodeSelection(DataNode::Pointer node) :
   m_Selection(new ContainerType())
 {
-  DataTreeNodeObject::Pointer obj(new DataTreeNodeObject(node));
+  DataNodeObject::Pointer obj(new DataNodeObject(node));
   m_Selection->push_back(obj);
 }
 
-DataTreeNodeSelection::DataTreeNodeSelection(const std::vector<DataTreeNode::Pointer>& nodes) :
+DataNodeSelection::DataNodeSelection(const std::vector<DataNode::Pointer>& nodes) :
   m_Selection(new ContainerType())
 {
-  for (std::vector<DataTreeNode::Pointer>::const_iterator i = nodes.begin(); i != nodes.end(); ++i)
+  for (std::vector<DataNode::Pointer>::const_iterator i = nodes.begin(); i != nodes.end(); ++i)
   {
-    DataTreeNodeObject::Pointer obj(new DataTreeNodeObject(*i));
+    DataNodeObject::Pointer obj(new DataNodeObject(*i));
     m_Selection->push_back(obj);
   }
 }
 
-berry::Object::Pointer DataTreeNodeSelection::GetFirstElement() const
+berry::Object::Pointer DataNodeSelection::GetFirstElement() const
 {
   if (m_Selection->empty())
     return berry::Object::Pointer();
@@ -53,32 +53,32 @@ berry::Object::Pointer DataTreeNodeSelection::GetFirstElement() const
   return *(m_Selection->begin());
 }
 
-berry::IStructuredSelection::iterator DataTreeNodeSelection::Begin() const
+berry::IStructuredSelection::iterator DataNodeSelection::Begin() const
 {
   return m_Selection->begin();
 }
 
-berry::IStructuredSelection::iterator DataTreeNodeSelection::End() const
+berry::IStructuredSelection::iterator DataNodeSelection::End() const
 {
   return m_Selection->end();
 }
 
-int DataTreeNodeSelection::Size() const
+int DataNodeSelection::Size() const
 {
   return m_Selection->size();
 }
 
-berry::IStructuredSelection::ContainerType::Pointer DataTreeNodeSelection::ToVector() const
+berry::IStructuredSelection::ContainerType::Pointer DataNodeSelection::ToVector() const
 {
   return m_Selection;
 }
 
-bool DataTreeNodeSelection::IsEmpty() const
+bool DataNodeSelection::IsEmpty() const
 {
   return m_Selection->empty();
 }
 
-bool DataTreeNodeSelection::operator==(const berry::Object* obj) const
+bool DataNodeSelection::operator==(const berry::Object* obj) const
 {
   if (const berry::IStructuredSelection* other = dynamic_cast<const berry::IStructuredSelection*>(obj))
   {

@@ -64,10 +64,10 @@ void mitk::LineVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
 
   int j;
   bool makeContour;
-  if (dynamic_cast<mitk::BoolProperty *>(this->GetDataTreeNode()->GetProperty("show contour").GetPointer()) == NULL)
+  if (dynamic_cast<mitk::BoolProperty *>(this->GetDataNode()->GetProperty("show contour").GetPointer()) == NULL)
     makeContour = false;
   else
-    makeContour = dynamic_cast<mitk::BoolProperty *>(this->GetDataTreeNode()->GetProperty("show contour").GetPointer())->GetValue();
+    makeContour = dynamic_cast<mitk::BoolProperty *>(this->GetDataNode()->GetProperty("show contour").GetPointer())->GetValue();
 
   vtkPoints *points = vtkPoints::New();
   vtkCellArray *polys = vtkCellArray::New();
@@ -81,10 +81,10 @@ void mitk::LineVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
   }
 
   bool close;
-  if (dynamic_cast<mitk::BoolProperty *>(this->GetDataTreeNode()->GetProperty("close contour").GetPointer()) == NULL)
+  if (dynamic_cast<mitk::BoolProperty *>(this->GetDataNode()->GetProperty("close contour").GetPointer()) == NULL)
     close = false;
   else
-    close = dynamic_cast<mitk::BoolProperty *>(this->GetDataTreeNode()->GetProperty("close contour").GetPointer())->GetValue();
+    close = dynamic_cast<mitk::BoolProperty *>(this->GetDataNode()->GetProperty("close contour").GetPointer())->GetValue();
 
   if (close) 
   {
@@ -118,12 +118,12 @@ void mitk::LineVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
 
     m_vtkPointList->AddInput(sphere->GetOutput());
 
-    if (dynamic_cast<mitk::StringProperty *>(this->GetDataTreeNode()->GetProperty("label").GetPointer()) == NULL)
+    if (dynamic_cast<mitk::StringProperty *>(this->GetDataNode()->GetProperty("label").GetPointer()) == NULL)
     {
     }
     else 
     {
-      const char * pointLabel =dynamic_cast<mitk::StringProperty *>(this->GetDataTreeNode()->GetProperty("label").GetPointer())->GetValue();
+      const char * pointLabel =dynamic_cast<mitk::StringProperty *>(this->GetDataNode()->GetProperty("label").GetPointer())->GetValue();
       char buffer[20];
        std::string l = pointLabel;
       if (input->GetSize()>1)

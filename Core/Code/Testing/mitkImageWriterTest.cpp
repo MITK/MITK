@@ -16,7 +16,7 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include "mitkImageWriter.h"
-#include "mitkDataTreeNodeFactory.h"
+#include "mitkDataNodeFactory.h"
 #include "mitkTestingMacros.h"
 
 #include <iostream>
@@ -52,7 +52,7 @@ int mitkImageWriterTest(int  argc , char* argv[])
 
 
   mitk::Image::Pointer image = NULL;
-  mitk::DataTreeNodeFactory::Pointer factory = mitk::DataTreeNodeFactory::New();
+  mitk::DataNodeFactory::Pointer factory = mitk::DataNodeFactory::New();
 
   try
   {
@@ -61,7 +61,7 @@ int mitkImageWriterTest(int  argc , char* argv[])
     factory->Update();
     MITK_TEST_CONDITION_REQUIRED(factory->GetNumberOfOutputs() > 0, "file loaded");
     
-    mitk::DataTreeNode::Pointer node = factory->GetOutput( 0 );
+    mitk::DataNode::Pointer node = factory->GetOutput( 0 );
     image = dynamic_cast<mitk::Image*>(node->GetData());
     if(image.IsNull())
     {

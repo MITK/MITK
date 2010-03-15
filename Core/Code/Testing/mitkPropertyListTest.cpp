@@ -32,13 +32,13 @@ PURPOSE.  See the above copyright notices for more information.
 //  std::cout << "Testing to share properties between two PropertyLists..." << std::endl;
 //
 //  // first list
-//  mitk::DataTreeNode::Pointer list1 = mitk::DataTreeNode::New();
+//  mitk::DataNode::Pointer list1 = mitk::DataNode::New();
 //  // insert an IntProperty
 //  mitk::IntProperty::Pointer intProp = mitk::IntProperty::New(FIRST_VALUE);
 //  list1->SetProperty("int", intProp);
 //  
 //  // second list
-//  mitk::DataTreeNode::Pointer list2 = mitk::DataTreeNode::New();
+//  mitk::DataNode::Pointer list2 = mitk::DataNode::New();
 //  // insert the same property as in list1
 //  list2->SetProperty("int", intProp);
 //

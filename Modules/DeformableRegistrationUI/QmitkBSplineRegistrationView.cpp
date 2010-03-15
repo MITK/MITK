@@ -206,12 +206,12 @@ void QmitkBSplineRegistrationView::setOptimizerParameters()
 }
 
 
-void QmitkBSplineRegistrationView::SetFixedNode( mitk::DataTreeNode * fixedNode )
+void QmitkBSplineRegistrationView::SetFixedNode( mitk::DataNode * fixedNode )
 {
   m_FixedNode = fixedNode;
 }
 
-void QmitkBSplineRegistrationView::SetMovingNode( mitk::DataTreeNode * movingNode )
+void QmitkBSplineRegistrationView::SetMovingNode( mitk::DataNode * movingNode )
 {
   m_MovingNode = movingNode;
 }

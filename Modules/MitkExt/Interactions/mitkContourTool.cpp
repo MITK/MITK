@@ -100,7 +100,7 @@ bool mitk::ContourTool::OnMouseReleased(Action* action, const StateEvent* stateE
   
   if (!FeedbackContourTool::OnMouseReleased( action, stateEvent )) return false;
 
-  DataTreeNode* workingNode( m_ToolManager->GetWorkingData(0) );
+  DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
   if (!workingNode) return false;
 
   Image* image = dynamic_cast<Image*>(workingNode->GetData());
@@ -121,7 +121,7 @@ bool mitk::ContourTool::OnMouseReleased(Action* action, const StateEvent* stateE
     }
 
     /*
-    DataTreeNode::Pointer debugNode = DataTreeNode::New();
+    DataNode::Pointer debugNode = DataNode::New();
     debugNode->SetData( slice );
     debugNode->SetProperty( "name", StringProperty::New("extracted slice") );
     debugNode->SetProperty( "color", ColorProperty::New(1.0, 0.0, 0.0) );

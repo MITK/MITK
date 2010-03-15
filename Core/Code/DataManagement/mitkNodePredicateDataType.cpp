@@ -17,7 +17,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkNodePredicateDataType.h"
 
-#include "mitkDataTreeNode.h"
+#include "mitkDataNode.h"
 #include "mitkBaseData.h"
 
 mitk::NodePredicateDataType::NodePredicateDataType(const char* datatype)
@@ -35,7 +35,7 @@ mitk::NodePredicateDataType::~NodePredicateDataType()
 }
 
 
-bool mitk::NodePredicateDataType::CheckNode(const mitk::DataTreeNode* node) const
+bool mitk::NodePredicateDataType::CheckNode(const mitk::DataNode* node) const
 {
   if (node == NULL)
     throw std::invalid_argument("NodePredicateDataType: invalid node");

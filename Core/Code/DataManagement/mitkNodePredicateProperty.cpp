@@ -16,7 +16,7 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include "mitkNodePredicateProperty.h"
-#include "mitkDataTreeNode.h"
+#include "mitkDataNode.h"
 
 
 
@@ -35,7 +35,7 @@ mitk::NodePredicateProperty::~NodePredicateProperty()
 }
 
 
-bool mitk::NodePredicateProperty::CheckNode(const mitk::DataTreeNode* node) const
+bool mitk::NodePredicateProperty::CheckNode(const mitk::DataNode* node) const
 {
   if (node == NULL)
     throw std::invalid_argument("NodePredicateProperty: invalid node");

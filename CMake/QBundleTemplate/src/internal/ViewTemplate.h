@@ -45,7 +45,7 @@ class @VIEW_CLASS@ : public QObject, public QmitkFunctionality
   protected:
 
     /// \brief called by QmitkFunctionality when DataManager's selection has changed
-    virtual void OnSelectionChanged( std::vector<mitk::DataTreeNode*> nodes );
+    virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes );
 
     Ui::@VIEW_CONTROLS_CLASS@* m_Controls;
 

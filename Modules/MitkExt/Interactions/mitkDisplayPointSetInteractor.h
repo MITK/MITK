@@ -28,7 +28,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk
 {
-  class DataTreeNode;
+  class DataNode;
 
   /**
    * \brief Interaction with a set of points.
@@ -40,8 +40,8 @@ namespace mitk
   {
   public:
     mitkClassMacro(DisplayPointSetInteractor, PointSetInteractor);
-    mitkNewMacro3Param(Self, const char*, DataTreeNode*, int);
-    mitkNewMacro2Param(Self, const char*, DataTreeNode*);
+    mitkNewMacro3Param(Self, const char*, DataNode*, int);
+    mitkNewMacro2Param(Self, const char*, DataNode*);
 
     Point2D GetLastDisplayCoordinates();
 
@@ -55,7 +55,7 @@ namespace mitk
      * if no n is set, then the number of points is unlimited*
      */
     DisplayPointSetInteractor(const char * type, 
-      DataTreeNode* dataTreeNode, int n = -1);
+      DataNode* dataTreeNode, int n = -1);
 
     /**
      * \brief Default Destructor

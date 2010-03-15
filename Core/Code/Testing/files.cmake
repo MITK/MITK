@@ -4,7 +4,7 @@ SET(MODULE_TESTS
   
   mitkPointSetWriterTest.cpp
   mitkMaterialTest.cpp
-  mitkDataTreeNodeTest.cpp
+  mitkDataNodeTest.cpp
   mitkActionTest.cpp
   mitkDataStorageTest.cpp
   mitkEnumerationPropertyTest.cpp
@@ -64,7 +64,7 @@ SET(MODULE_IMAGE_TESTS
   mitkImageTimeSelectorTest.cpp
   mitkPicFileReaderTest.cpp
   # mitkVtkPropRendererTest.cpp
-  mitkDataTreeNodeFactoryTest.cpp
+  mitkDataNodeFactoryTest.cpp
 )
 
 # list of images for which the tests are run

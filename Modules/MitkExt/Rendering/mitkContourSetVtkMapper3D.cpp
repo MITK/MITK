@@ -17,7 +17,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkContourSetVtkMapper3D.h"
-#include "mitkDataTreeNode.h"
+#include "mitkDataNode.h"
 #include "mitkProperties.h"
 #include "mitkColorProperty.h"
 #include "mitkVtkPropRenderer.h"

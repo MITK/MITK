@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkCommand.h>
 
 #include <QmitkDataStorageComboBox.h>
-#include <mitkDataTreeNode.h>
+#include <mitkDataNode.h>
 
 /***************       CONSTRUCTOR      ***************/
 QmitkBaseFunctionalityComponent::QmitkBaseFunctionalityComponent(QObject *parent, const char *name)
@@ -32,7 +32,7 @@ QmitkBaseFunctionalityComponent::~QmitkBaseFunctionalityComponent()
 {
 }
 
-void QmitkBaseFunctionalityComponent::ImageSelected(const mitk::DataTreeNode*  /*item*/)
+void QmitkBaseFunctionalityComponent::ImageSelected(const mitk::DataNode*  /*item*/)
 {
 
 }

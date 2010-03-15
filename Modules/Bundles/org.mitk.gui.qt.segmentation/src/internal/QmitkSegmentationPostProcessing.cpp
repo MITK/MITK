@@ -10,7 +10,7 @@
 #include "mitkProgressBar.h"
 #include "mitkStatusBar.h"
 #include "mitkImageCast.h"
-#include "mitkDataTreeNodeObject.h"
+#include "mitkDataNodeObject.h"
 
 #include <QtGui>
 
@@ -24,13 +24,13 @@ QmitkSegmentationPostProcessing::QmitkSegmentationPostProcessing(mitk::DataStora
 ,m_DataStorage(storage)
 {
   // register a couple of additional actions for DataManager's context menu
-  QmitkNodeDescriptor* imageDataTreeNodeDescriptor = 
+  QmitkNodeDescriptor* imageDataNodeDescriptor = 
     QmitkNodeDescriptorManager::GetInstance()->GetDescriptor("Image");
 
-  if (imageDataTreeNodeDescriptor)
+  if (imageDataNodeDescriptor)
   {
     m_ThresholdAction = new QAction("Threshold..", parent);
-    imageDataTreeNodeDescriptor->AddAction(m_ThresholdAction);
+    imageDataNodeDescriptor->AddAction(m_ThresholdAction);
     connect( m_ThresholdAction, SIGNAL( triggered(bool) ) , this, SLOT( ThresholdImage(bool) ) );
   }
   else
@@ -39,25 +39,25 @@ QmitkSegmentationPostProcessing::QmitkSegmentationPostProcessing(mitk::DataStora
   }
 
   // register a couple of additional actions for DataManager's context menu
-  QmitkNodeDescriptor* binaryImageDataTreeNodeDescriptor = 
+  QmitkNodeDescriptor* binaryImageDataNodeDescriptor = 
     QmitkNodeDescriptorManager::GetInstance()->GetDescriptor("ImageMask");
 
-  if (binaryImageDataTreeNodeDescriptor)
+  if (binaryImageDataNodeDescriptor)
   {
     m_CreateSurfaceAction = new QAction("Create polygon model", parent);
-    binaryImageDataTreeNodeDescriptor->AddAction(m_CreateSurfaceAction);
+    binaryImageDataNodeDescriptor->AddAction(m_CreateSurfaceAction);
     connect( m_CreateSurfaceAction, SIGNAL( triggered(bool) ) , this, SLOT( CreateSurface(bool) ) );
 
     m_CreateSmoothSurfaceAction = new QAction("Create smoothed polygon model", parent);
-    binaryImageDataTreeNodeDescriptor->AddAction(m_CreateSmoothSurfaceAction);
+    binaryImageDataNodeDescriptor->AddAction(m_CreateSmoothSurfaceAction);
     connect( m_CreateSmoothSurfaceAction, SIGNAL( triggered(bool) ) , this, SLOT( CreateSmoothedSurface(bool) ) );
 
     m_StatisticsAction = new QAction("Statistics", parent);
-    binaryImageDataTreeNodeDescriptor->AddAction(m_StatisticsAction);
+    binaryImageDataNodeDescriptor->AddAction(m_StatisticsAction);
     connect( m_StatisticsAction, SIGNAL( triggered(bool) ) , this, SLOT( ImageStatistics(bool) ) );
    
     m_AutocropAction = new QAction("Autocrop", parent);
-    binaryImageDataTreeNodeDescriptor->AddAction(m_AutocropAction);
+    binaryImageDataNodeDescriptor->AddAction(m_AutocropAction);
     connect( m_AutocropAction, SIGNAL( triggered(bool) ) , this, SLOT( AutocropSelected(bool) ) );
   }
   else
@@ -79,12 +79,12 @@ QmitkSegmentationPostProcessing::~QmitkSegmentationPostProcessing()
   }
 
   // unregister a couple of additional actions for DataManager's context menu
-  QmitkNodeDescriptor* imageDataTreeNodeDescriptor = 
+  QmitkNodeDescriptor* imageDataNodeDescriptor = 
     QmitkNodeDescriptorManager::GetInstance()->GetDescriptor("Image");
 
-  if (imageDataTreeNodeDescriptor)
+  if (imageDataNodeDescriptor)
   {
-    imageDataTreeNodeDescriptor->RemoveAction( m_ThresholdAction );
+    imageDataNodeDescriptor->RemoveAction( m_ThresholdAction );
   }
   else
   {
@@ -92,15 +92,15 @@ QmitkSegmentationPostProcessing::~QmitkSegmentationPostProcessing()
   }
 
   // unregister a couple of additional actions for DataManager's context menu
-  QmitkNodeDescriptor* binaryImageDataTreeNodeDescriptor = 
+  QmitkNodeDescriptor* binaryImageDataNodeDescriptor = 
     QmitkNodeDescriptorManager::GetInstance()->GetDescriptor("ImageMask");
 
-  if (binaryImageDataTreeNodeDescriptor)
+  if (binaryImageDataNodeDescriptor)
   {
-    binaryImageDataTreeNodeDescriptor->RemoveAction( m_CreateSurfaceAction );
-    binaryImageDataTreeNodeDescriptor->RemoveAction( m_CreateSmoothSurfaceAction );
-    binaryImageDataTreeNodeDescriptor->RemoveAction( m_StatisticsAction );
-    binaryImageDataTreeNodeDescriptor->RemoveAction( m_AutocropAction );
+    binaryImageDataNodeDescriptor->RemoveAction( m_CreateSurfaceAction );
+    binaryImageDataNodeDescriptor->RemoveAction( m_CreateSmoothSurfaceAction );
+    binaryImageDataNodeDescriptor->RemoveAction( m_StatisticsAction );
+    binaryImageDataNodeDescriptor->RemoveAction( m_AutocropAction );
   }
   else
   {
@@ -116,7 +116,7 @@ void QmitkSegmentationPostProcessing::SelectionChanged(berry::IWorkbenchPart::Po
   }
 
   // save current selection in member variable
-  m_CurrentSelection = selection.Cast<const mitk::DataTreeNodeSelection>();
+  m_CurrentSelection = selection.Cast<const mitk::DataNodeSelection>();
 }
 
 QmitkSegmentationPostProcessing::NodeList QmitkSegmentationPostProcessing::GetSelectedNodes() const
@@ -126,12 +126,12 @@ QmitkSegmentationPostProcessing::NodeList QmitkSegmentationPostProcessing::GetSe
   {
 
     // iterate selection
-    for (mitk::DataTreeNodeSelection::iterator i = m_CurrentSelection->Begin(); i != m_CurrentSelection->End(); ++i)
+    for (mitk::DataNodeSelection::iterator i = m_CurrentSelection->Begin(); i != m_CurrentSelection->End(); ++i)
     {
       // extract datatree node
-      if (mitk::DataTreeNodeObject::Pointer nodeObj = i->Cast<mitk::DataTreeNodeObject>())
+      if (mitk::DataNodeObject::Pointer nodeObj = i->Cast<mitk::DataNodeObject>())
       {
-        mitk::DataTreeNode::Pointer node = nodeObj->GetDataTreeNode();
+        mitk::DataNode::Pointer node = nodeObj->GetDataNode();
         result.push_back( node );
       }
     }
@@ -174,7 +174,7 @@ void QmitkSegmentationPostProcessing::ThresholdImage(bool)
 
   for ( NodeList::iterator iter = selection.begin(); iter != selection.end(); ++iter )
   {
-    mitk::DataTreeNode* node = *iter;
+    mitk::DataNode* node = *iter;
 
     if (node)
     {
@@ -222,7 +222,7 @@ void QmitkSegmentationPostProcessing::InternalCreateSurface(bool smoothed)
 
   for ( NodeList::iterator iter = selection.begin(); iter != selection.end(); ++iter )
   {
-    mitk::DataTreeNode* node = *iter;
+    mitk::DataNode* node = *iter;
 
     if (node)
     {
@@ -241,7 +241,7 @@ void QmitkSegmentationPostProcessing::InternalCreateSurface(bool smoothed)
         badCommand->SetCallbackFunction(this, &QmitkSegmentationPostProcessing::OnSurfaceCalculationDone);
         surfaceFilter->AddObserver(mitk::ProcessingError(), badCommand);
 
-        mitk::DataTreeNode::Pointer nodepointer = node;
+        mitk::DataNode::Pointer nodepointer = node;
         surfaceFilter->SetPointerParameter("Input", image);
         surfaceFilter->SetPointerParameter("Group node", nodepointer);
         surfaceFilter->SetParameter("Show result", true );
@@ -305,7 +305,7 @@ void QmitkSegmentationPostProcessing::AutocropSelected(bool)
 
   for ( NodeList::iterator iter = selection.begin(); iter != selection.end(); ++iter )
   {
-    mitk::DataTreeNode* node = *iter;
+    mitk::DataNode* node = *iter;
 
     if (node)
     {

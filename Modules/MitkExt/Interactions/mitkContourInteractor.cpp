@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkContour.h>
 
 //#include "ipSegmentation.h"
-//#include "mitkDataTreeNode.h"
+//#include "mitkDataNode.h"
 #include <mitkProperties.h>
 #include <mitkStringProperty.h>
 #include <mitkPointOperation.h>
@@ -33,16 +33,16 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <vtkRenderer.h>
 
-mitk::ContourInteractor::ContourInteractor(const char * type, mitk::DataTreeNode* dataTreeNode)
+mitk::ContourInteractor::ContourInteractor(const char * type, mitk::DataNode* dataTreeNode)
   : mitk::Interactor(type, dataTreeNode), m_Started(false)
 {
-  assert(m_DataTreeNode != NULL);
+  assert(m_DataNode != NULL);
 
-  m_DataTreeNode->SetProperty("layer", mitk::IntProperty::New(100) );
-  m_DataTreeNode->SetProperty("name", mitk::StringProperty::New("InteractiveFeedbackData") );
-  m_DataTreeNode->SetOpacity(1);
-  m_DataTreeNode->SetColor(0.4,0.9,0.0);
-  m_DataTreeNode->SetProperty( "Width", mitk::FloatProperty::New(2.0) );
+  m_DataNode->SetProperty("layer", mitk::IntProperty::New(100) );
+  m_DataNode->SetProperty("name", mitk::StringProperty::New("InteractiveFeedbackData") );
+  m_DataNode->SetOpacity(1);
+  m_DataNode->SetColor(0.4,0.9,0.0);
+  m_DataNode->SetProperty( "Width", mitk::FloatProperty::New(2.0) );
   m_Started = false;
 }
 
@@ -163,11 +163,11 @@ bool mitk::ContourInteractor::ExecuteAction(mitk::Action* action, mitk::StateEve
 
 void mitk::ContourInteractor::Press(mitk::Point3D& point)
 {
-  mitk::Contour* contour = dynamic_cast<mitk::Contour*>(m_DataTreeNode->GetData());
+  mitk::Contour* contour = dynamic_cast<mitk::Contour*>(m_DataNode->GetData());
   assert(contour!=NULL);
 
   if (!m_Positive)
-    m_DataTreeNode->SetColor(1.0,0.0,0.0);
+    m_DataNode->SetColor(1.0,0.0,0.0);
 
   contour->Initialize();
   contour->AddVertex( point );
@@ -175,7 +175,7 @@ void mitk::ContourInteractor::Press(mitk::Point3D& point)
 
 void mitk::ContourInteractor::Move(mitk::Point3D& point)
 {
-  mitk::Contour* contour = dynamic_cast<mitk::Contour*>(m_DataTreeNode->GetData());
+  mitk::Contour* contour = dynamic_cast<mitk::Contour*>(m_DataNode->GetData());
   assert(contour!=NULL);
 
   contour->AddVertex( point );

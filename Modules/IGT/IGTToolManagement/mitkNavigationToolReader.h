@@ -63,7 +63,7 @@ namespace mitk {
 
     mitk::DataStorage::Pointer m_DataStorage;
 
-    mitk::NavigationTool::Pointer ConvertDataTreeNodeToNavigationTool(mitk::DataTreeNode::Pointer node, std::string toolPath);
+    mitk::NavigationTool::Pointer ConvertDataNodeToNavigationTool(mitk::DataNode::Pointer node, std::string toolPath);
 
     //################### protected help methods ########################
     std::string GetFileWithoutPath(std::string FileWithPath);

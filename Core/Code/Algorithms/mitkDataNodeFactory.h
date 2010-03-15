@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef _DATA_TREE_NODE_FACTORY_H_
 #define _DATA_TREE_NODE_FACTORY_H_
 
-#include "mitkDataTreeNodeSource.h"
+#include "mitkDataNodeSource.h"
 #include "mitkFileSeriesReader.h"
 #include "mitkColorProperty.h"
 
@@ -29,23 +29,23 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk
 {
 /**
-* @brief Factory, which creates instances of mitk::DataTreeNodes filled with
+* @brief Factory, which creates instances of mitk::DataNodes filled with
 *        data read from a given file 
 *
 * This class reads files, creates an appropriate mitk::BaseData and adds the
-* BaseData to a mitk::DataTreeNode. This filter may produce one or more outputs
-* (i.e. mitk::DataTreeNodes). The number of generated nodes can be retrieved by a 
+* BaseData to a mitk::DataNode. This filter may produce one or more outputs
+* (i.e. mitk::DataNodes). The number of generated nodes can be retrieved by a 
 * call of GetNumberOfOutputs().
 *
 * If you want to add a new file type, you have to register the factory 
 * of the file reader in the class mitk::BaseDataIOFactory.
 * @ingroup IO
 */
-class MITK_CORE_EXPORT DataTreeNodeFactory : public DataTreeNodeSource, public FileSeriesReader
+class MITK_CORE_EXPORT DataNodeFactory : public DataNodeSource, public FileSeriesReader
 {
 public:
 
-  mitkClassMacro( DataTreeNodeFactory, DataTreeNodeSource );
+  mitkClassMacro( DataNodeFactory, DataNodeSource );
 
   itkNewMacro( Self );
 
@@ -86,7 +86,7 @@ public:
     */
   static ColorProperty::Pointer DefaultColorForOrgan( const std::string& );
 
-  void SetDefaultCommonProperties(mitk::DataTreeNode::Pointer &node);
+  void SetDefaultCommonProperties(mitk::DataNode::Pointer &node);
 
   /**
    * if true -> loaded image is part of a serie
@@ -106,12 +106,12 @@ protected:
   /**
   * Constructor.
   */
-  DataTreeNodeFactory();
+  DataNodeFactory();
 
   /**
   * Virtual destructor.
   */
-  virtual ~DataTreeNodeFactory();
+  virtual ~DataNodeFactory();
 
   bool m_Serie;
 
@@ -124,7 +124,7 @@ protected:
 
   /**
   * Resizes the number of outputs of the factory.
-  * The outputs are initialized by empty DataTreeNodes
+  * The outputs are initialized by empty DataNodes
   * @param num the new number of outputs
   */
   virtual void ResizeOutputs( const unsigned int& num );

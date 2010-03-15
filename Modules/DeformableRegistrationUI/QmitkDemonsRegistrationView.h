@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef QmitkDemonsRegistrationViewWidgetHIncluded
 #define QmitkDemonsRegistrationViewWidgetHIncluded
 
-#include "mitkDataTreeNode.h"
+#include "mitkDataNode.h"
 #include "ui_QmitkDemonsRegistrationViewControls.h"
 #include "MitkDeformableRegistrationUIExports.h"
 
@@ -41,8 +41,8 @@ public:
   int GetNumberOfIterations();
   float GetStandardDeviation();
   
-  void SetFixedNode( mitk::DataTreeNode * fixedNode );
-  void SetMovingNode( mitk::DataTreeNode * movingNode );
+  void SetFixedNode( mitk::DataNode * fixedNode );
+  void SetMovingNode( mitk::DataNode * movingNode );
   void UseHistogramMatching( bool useHM );
   mitk::Image::Pointer GetResultImage();
   mitk::Image::Pointer GetResultDeformationfield();
@@ -51,8 +51,8 @@ public slots:
   void CalculateTransformation();
 protected:
   Ui::QmitkDemonsRegistrationViewControls m_Controls;
-  mitk::DataTreeNode::Pointer m_FixedNode;
-  mitk::DataTreeNode::Pointer m_MovingNode;
+  mitk::DataNode::Pointer m_FixedNode;
+  mitk::DataNode::Pointer m_MovingNode;
   mitk::Image::Pointer m_ResultImage;
   mitk::Image::Pointer m_ResultDeformationField;
 };

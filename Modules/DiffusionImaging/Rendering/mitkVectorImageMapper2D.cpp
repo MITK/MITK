@@ -101,7 +101,7 @@ void mitk::VectorImageMapper2D::Paint( mitk::BaseRenderer * renderer )
   //This might be quite slow. Thus, the idea is, to perform an inverse transform of the plane instead.
   //@todo It probably does not work for scaling operations yet:scaling operations have to be
   //dealed with after the cut is performed by scaling the contour.
-  vtkLinearTransform * vtktransform = GetDataTreeNode() ->GetVtkTransform();
+  vtkLinearTransform * vtktransform = GetDataNode() ->GetVtkTransform();
 
   vtkTransform* world2vtk = vtkTransform::New();
   world2vtk->Identity();
@@ -240,7 +240,7 @@ void mitk::VectorImageMapper2D::Paint( mitk::BaseRenderer * renderer )
     vnl2vtk( normal.Get_vnl_vector(), wnormal );
     vtkMath::Normalize( wnormal );
     bool normalizeVecs;
-    m_DataTreeNode->GetBoolProperty( "NormalizeVecs", normalizeVecs );
+    m_DataNode->GetBoolProperty( "NormalizeVecs", normalizeVecs );
     for ( pointId = 0; pointId < numPoints; ++pointId )
     {
       inVectors->GetTuple( pointId, inVector );
@@ -290,7 +290,7 @@ void mitk::VectorImageMapper2D::Paint( mitk::BaseRenderer * renderer )
     min = min > spacing[2] ? spacing[2] : min;
 
     float scale = 1;
-    mitk::FloatProperty::Pointer mitkScaleProp = dynamic_cast<mitk::FloatProperty*>(GetDataTreeNode()->GetProperty("Scale"));
+    mitk::FloatProperty::Pointer mitkScaleProp = dynamic_cast<mitk::FloatProperty*>(GetDataNode()->GetProperty("Scale"));
     if (mitkScaleProp.IsNotNull())
     {
       scale = mitkScaleProp->GetValue();
@@ -310,14 +310,14 @@ void mitk::VectorImageMapper2D::Paint( mitk::BaseRenderer * renderer )
     glyphGenerator->Update();
 
     vtkLookupTable* vtkLut = NULL;
-    mitk::LookupTableProperty::Pointer mitkLutProp = dynamic_cast<mitk::LookupTableProperty*>(GetDataTreeNode()->GetProperty("LookupTable"));
+    mitk::LookupTableProperty::Pointer mitkLutProp = dynamic_cast<mitk::LookupTableProperty*>(GetDataNode()->GetProperty("LookupTable"));
     if (mitkLutProp.IsNotNull())
     {
       vtkLut = mitkLutProp->GetLookupTable()->GetVtkLookupTable();
     }
 
     mitk::Color color;
-    mitk::ColorProperty::Pointer mitkColorProp = dynamic_cast<mitk::ColorProperty*>(GetDataTreeNode()->GetProperty("color"));
+    mitk::ColorProperty::Pointer mitkColorProp = dynamic_cast<mitk::ColorProperty*>(GetDataNode()->GetProperty("color"));
     if (mitkColorProp.IsNotNull())
     {
       color = mitkColorProp->GetColor();
@@ -330,7 +330,7 @@ void mitk::VectorImageMapper2D::Paint( mitk::BaseRenderer * renderer )
     }
 
     float lwidth = 1;
-    mitk::FloatProperty::Pointer mitkLWidthProp = dynamic_cast<mitk::FloatProperty*>(GetDataTreeNode()->GetProperty("LineWidth"));
+    mitk::FloatProperty::Pointer mitkLWidthProp = dynamic_cast<mitk::FloatProperty*>(GetDataNode()->GetProperty("LineWidth"));
     if (mitkLWidthProp.IsNotNull())
     {
       lwidth = mitkLWidthProp->GetValue();

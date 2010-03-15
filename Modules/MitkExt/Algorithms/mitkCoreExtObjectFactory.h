@@ -28,8 +28,8 @@ class MitkExt_EXPORT CoreExtObjectFactory : public CoreObjectFactory
   public:
     mitkClassMacro(CoreExtObjectFactory,CoreObjectFactory);
     itkNewMacro(CoreExtObjectFactory);
-    virtual Mapper::Pointer CreateMapper(mitk::DataTreeNode* node, MapperSlotId slotId);
-    virtual void SetDefaultProperties(mitk::DataTreeNode* node);
+    virtual Mapper::Pointer CreateMapper(mitk::DataNode* node, MapperSlotId slotId);
+    virtual void SetDefaultProperties(mitk::DataNode* node);
     virtual const char* GetFileExtensions();
     virtual const char* GetSaveFileExtensions();
     virtual itk::Object::Pointer CreateCoreObject( const std::string& className );

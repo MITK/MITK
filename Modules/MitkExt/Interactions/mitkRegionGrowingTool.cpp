@@ -276,7 +276,7 @@ bool mitk::RegionGrowingTool::OnMousePressedOutside(Action* itkNotUsed( action )
          m_SeedPointMemoryOffset >= 0 )
     {
 
-      // 3.2.2 Get level window from reference DataTreeNode
+      // 3.2.2 Get level window from reference DataNode
       //       Use some logic to determine initial gray value bounds
       LevelWindow lw(0, 500);
       m_ToolManager->GetReferenceData(0)->GetLevelWindow(lw); // will fill lw if levelwindow property is present, otherwise won't touch it.

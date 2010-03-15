@@ -17,7 +17,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkDataStorage.h"
 
-#include "mitkDataTreeNode.h"
+#include "mitkDataNode.h"
 #include "mitkProperties.h"
 #include "mitkNodePredicateBase.h"
 #include "mitkNodePredicateProperty.h"
@@ -44,7 +44,7 @@ mitk::DataStorage::~DataStorage()
 }
 
 
-void mitk::DataStorage::Add(mitk::DataTreeNode* node, mitk::DataTreeNode* parent)
+void mitk::DataStorage::Add(mitk::DataNode* node, mitk::DataNode* parent)
 {
   mitk::DataStorage::SetOfObjects::Pointer parents = mitk::DataStorage::SetOfObjects::New();
   parents->InsertElement(0, parent);
@@ -68,7 +68,7 @@ mitk::DataStorage::SetOfObjects::ConstPointer mitk::DataStorage::GetSubset(const
 }
 
 
-mitk::DataTreeNode* mitk::DataStorage::GetNamedNode(const char* name) const
+mitk::DataNode* mitk::DataStorage::GetNamedNode(const char* name) const
 
 {
   if (name == NULL)
@@ -84,7 +84,7 @@ mitk::DataTreeNode* mitk::DataStorage::GetNamedNode(const char* name) const
 }
 
 
-mitk::DataTreeNode* mitk::DataStorage::GetNode(const NodePredicateBase* condition) const
+mitk::DataNode* mitk::DataStorage::GetNode(const NodePredicateBase* condition) const
 {
   if (condition == NULL)
     return NULL;
@@ -96,7 +96,7 @@ mitk::DataTreeNode* mitk::DataStorage::GetNode(const NodePredicateBase* conditio
     return NULL;
 }
 
-mitk::DataTreeNode* mitk::DataStorage::GetNamedDerivedNode(const char* name, const mitk::DataTreeNode* sourceNode, bool onlyDirectDerivations) const
+mitk::DataNode* mitk::DataStorage::GetNamedDerivedNode(const char* name, const mitk::DataNode* sourceNode, bool onlyDirectDerivations) const
 {
   if (name == NULL)
     return NULL;
@@ -159,9 +159,9 @@ mitk::DataStorage::SetOfObjects::ConstPointer mitk::DataStorage::FilterSetOfObje
 }
 
 
-const mitk::DataTreeNode::GroupTagList mitk::DataStorage::GetGroupTags() const
+const mitk::DataNode::GroupTagList mitk::DataStorage::GetGroupTags() const
 {
-  DataTreeNode::GroupTagList result;
+  DataNode::GroupTagList result;
   SetOfObjects::ConstPointer all = this->GetAll();
   if (all.IsNull())
     return result;
@@ -178,13 +178,13 @@ const mitk::DataTreeNode::GroupTagList mitk::DataStorage::GetGroupTags() const
 }
 
 
-void mitk::DataStorage::EmitAddNodeEvent(const mitk::DataTreeNode* node)
+void mitk::DataStorage::EmitAddNodeEvent(const mitk::DataNode* node)
 {
   AddNodeEvent.Send(node);
 }
 
 
-void mitk::DataStorage::EmitRemoveNodeEvent(const mitk::DataTreeNode* node)
+void mitk::DataStorage::EmitRemoveNodeEvent(const mitk::DataNode* node)
 {
   RemoveNodeEvent.Send(node);
 }
@@ -194,7 +194,7 @@ void mitk::DataStorage::OnNodeModifiedOrDeleted( const itk::Object *caller, cons
   if(m_BlockNodeModifiedEvents)
     return;
 
-  const mitk::DataTreeNode* _Node = dynamic_cast<const mitk::DataTreeNode*>(caller);
+  const mitk::DataNode* _Node = dynamic_cast<const mitk::DataNode*>(caller);
   if(_Node)
   {
     const itk::ModifiedEvent* modEvent = dynamic_cast<const itk::ModifiedEvent*>(&event);
@@ -206,7 +206,7 @@ void mitk::DataStorage::OnNodeModifiedOrDeleted( const itk::Object *caller, cons
 }
 
 
-void mitk::DataStorage::AddListeners( const mitk::DataTreeNode* _Node )
+void mitk::DataStorage::AddListeners( const mitk::DataNode* _Node )
 {
   itk::MutexLockHolder<itk::SimpleFastMutexLock> locked(m_MutexOne);
   // node must not be 0 and must not be yet registered
@@ -228,7 +228,7 @@ void mitk::DataStorage::AddListeners( const mitk::DataTreeNode* _Node )
 }
 
 
-void mitk::DataStorage::RemoveListeners( const mitk::DataTreeNode* _Node )
+void mitk::DataStorage::RemoveListeners( const mitk::DataNode* _Node )
 {
   itk::MutexLockHolder<itk::SimpleFastMutexLock> locked(m_MutexOne) ;
   // node must not be 0 and must be registered
@@ -236,7 +236,7 @@ void mitk::DataStorage::RemoveListeners( const mitk::DataTreeNode* _Node )
   {
     // const cast is bad! but sometimes it is necessary. removing an observer does not really
     // touch the internal state
-    mitk::DataTreeNode* NonConstNode = const_cast<mitk::DataTreeNode*>(_Node);
+    mitk::DataNode* NonConstNode = const_cast<mitk::DataNode*>(_Node);
     NonConstNode->RemoveObserver(m_NodeModifiedObserverTags.find(_Node)->second);
     NonConstNode->RemoveObserver(m_NodeDeleteObserverTags.find(_Node)->second);
   }
@@ -269,7 +269,7 @@ mitk::TimeSlicedGeometry::Pointer mitk::DataStorage::ComputeBoundingGeometry3D( 
 
   for (SetOfObjects::ConstIterator it = input->Begin(); it != input->End(); ++it)
   {
-    DataTreeNode::Pointer node = it->Value();
+    DataNode::Pointer node = it->Value();
     if((node.IsNotNull()) && (node->GetData() != NULL) && 
       (node->GetData()->IsEmpty()==false) && 
       node->IsOn(boolPropertyKey, renderer) && 
@@ -331,7 +331,7 @@ mitk::TimeSlicedGeometry::Pointer mitk::DataStorage::ComputeBoundingGeometry3D( 
             {
               maximalTime = curTimeBounds[1];
             }
-            // get the minimal TimeBound of all time steps of the current DataTreeNode
+            // get the minimal TimeBound of all time steps of the current DataNode
             if (curTimeBounds[1]-curTimeBounds[0]<minTB[1]-minTB[0])
             {
               minTB = curTimeBounds;
@@ -417,7 +417,7 @@ mitk::BoundingBox::Pointer mitk::DataStorage::ComputeBoundingBox( const char* bo
   SetOfObjects::ConstPointer all = this->GetAll();
   for (SetOfObjects::ConstIterator it = all->Begin(); it != all->End(); ++it)
   {
-    DataTreeNode::Pointer node = it->Value();
+    DataNode::Pointer node = it->Value();
     if((node.IsNotNull()) && (node->GetData() != NULL) && 
       (node->GetData()->IsEmpty()==false) && 
       node->IsOn(boolPropertyKey, renderer) && 
@@ -472,7 +472,7 @@ mitk::TimeBounds mitk::DataStorage::ComputeTimeBounds( const char* boolPropertyK
   SetOfObjects::ConstPointer all = this->GetAll();
   for (SetOfObjects::ConstIterator it = all->Begin(); it != all->End(); ++it)
   {
-    DataTreeNode::Pointer node = it->Value();
+    DataNode::Pointer node = it->Value();
     if((node.IsNotNull()) && (node->GetData() != NULL) && 
       (node->GetData()->IsEmpty()==false) && 
       node->IsOn(boolPropertyKey, renderer) && 

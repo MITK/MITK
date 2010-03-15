@@ -66,7 +66,7 @@ public:
   const QString GetToolName(unsigned int index) const;
   QMap<QString, unsigned int> GetToolAndTypes() const;
   QList<unsigned int> GetToolsByToolType(QString toolType) const;
-  mitk::DataTreeNode* GetNode(unsigned int index) const;
+  mitk::DataNode* GetNode(unsigned int index) const;
 
   signals:
     void ToolsAdded(QStringList tools);

@@ -108,13 +108,13 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
   glHint( GL_LINE_SMOOTH_HINT, GL_NICEST );
 
 
-  //if (dynamic_cast<mitk::FloatProperty *>(this->GetDataTreeNode()->GetProperty("Width")) != NULL)
-  //  lineWidth = dynamic_cast<mitk::FloatProperty*>(this->GetDataTreeNode()->GetProperty("Width"))->GetValue();
+  //if (dynamic_cast<mitk::FloatProperty *>(this->GetDataNode()->GetProperty("Width")) != NULL)
+  //  lineWidth = dynamic_cast<mitk::FloatProperty*>(this->GetDataNode()->GetProperty("Width"))->GetValue();
   //glLineWidth(lineWidth);
   typedef mitk::PlanarFigure::VertexContainerType VertexContainerType;
   VertexContainerType::ConstIterator it;
 
-  const mitk::DataTreeNode* node=this->GetDataTreeNode();
+  const mitk::DataNode* node=this->GetDataNode();
   bool isSelected = false;
   if(node)
     node->GetBoolProperty("selected", isSelected);
@@ -264,7 +264,7 @@ void mitk::PlanarFigureMapper2D::DrawMarker(
 }
 
 
-void mitk::PlanarFigureMapper2D::SetDefaultProperties( mitk::DataTreeNode* node, mitk::BaseRenderer* renderer, bool overwrite )
+void mitk::PlanarFigureMapper2D::SetDefaultProperties( mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite )
 {
   node->AddProperty( "visible", mitk::BoolProperty::New(true), renderer, overwrite );
   node->AddProperty( "color", mitk::ColorProperty::New(1.0, 1.0, 1.0), renderer, overwrite );

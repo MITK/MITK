@@ -141,47 +141,47 @@ void mitk::PACSPlugin::AbortPACSImport()
 }
 
 
-std::vector<mitk::DataTreeNode::Pointer> mitk::PACSPlugin::LoadImagesFromLightbox( unsigned int itkNotUsed(lightboxIndex) )
+std::vector<mitk::DataNode::Pointer> mitk::PACSPlugin::LoadImagesFromLightbox( unsigned int itkNotUsed(lightboxIndex) )
 {
-  std::vector<DataTreeNode::Pointer> emptyVector;
+  std::vector<DataNode::Pointer> emptyVector;
   emptyVector.clear();
   return emptyVector;
 }
 
 
-std::vector<mitk::DataTreeNode::Pointer> mitk::PACSPlugin::LoadFromSeries( const std::string& seriesInstanceUID )
+std::vector<mitk::DataNode::Pointer> mitk::PACSPlugin::LoadFromSeries( const std::string& seriesInstanceUID )
 {
-  std::vector<DataTreeNode::Pointer> resultVector = this->LoadImagesFromSeries( seriesInstanceUID );
-  std::vector<DataTreeNode::Pointer> secondResultVector = this->LoadTextsFromSeries( seriesInstanceUID );
+  std::vector<DataNode::Pointer> resultVector = this->LoadImagesFromSeries( seriesInstanceUID );
+  std::vector<DataNode::Pointer> secondResultVector = this->LoadTextsFromSeries( seriesInstanceUID );
   resultVector.insert( resultVector.end(), secondResultVector.begin(), secondResultVector.end() );
   return resultVector;
 }
 
 
-std::vector<mitk::DataTreeNode::Pointer> mitk::PACSPlugin::LoadImagesFromSeries( const std::string& /* seriesInstanceUID */ )
+std::vector<mitk::DataNode::Pointer> mitk::PACSPlugin::LoadImagesFromSeries( const std::string& /* seriesInstanceUID */ )
 {
-  std::vector<DataTreeNode::Pointer> emptyVector;
+  std::vector<DataNode::Pointer> emptyVector;
   emptyVector.clear();
   return emptyVector;
 }
     
-std::vector<mitk::DataTreeNode::Pointer> mitk::PACSPlugin::LoadImagesFromSeries( std::vector<std::string> /* seriesInstanceUIDs */ )
+std::vector<mitk::DataNode::Pointer> mitk::PACSPlugin::LoadImagesFromSeries( std::vector<std::string> /* seriesInstanceUIDs */ )
 {
-  std::vector<DataTreeNode::Pointer> emptyVector;
+  std::vector<DataNode::Pointer> emptyVector;
   emptyVector.clear();
   return emptyVector;
 }
 
 
-std::vector<mitk::DataTreeNode::Pointer> mitk::PACSPlugin::LoadTextsFromSeries( const std::string&  /* seriesInstanceUID */ )
+std::vector<mitk::DataNode::Pointer> mitk::PACSPlugin::LoadTextsFromSeries( const std::string&  /* seriesInstanceUID */ )
 {
-  std::vector<DataTreeNode::Pointer> emptyVector;
+  std::vector<DataNode::Pointer> emptyVector;
   emptyVector.clear();
   return emptyVector;
 }
 
 
-mitk::DataTreeNode::Pointer mitk::PACSPlugin::LoadSingleText( const std::string& /* seriesInstanceUID */ , unsigned int /* instanceNumber */ )
+mitk::DataNode::Pointer mitk::PACSPlugin::LoadSingleText( const std::string& /* seriesInstanceUID */ , unsigned int /* instanceNumber */ )
 {
   return NULL;
 }

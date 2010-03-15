@@ -117,8 +117,8 @@ protected:
   /**
   * @brief create objects for visualization
   **/
-  mitk::DataTreeNode::Pointer CreateConeAsInstrumentVisualization(const char* label = ""); 
-  mitk::DataTreeNode::Pointer CreateSphereAsInstrumentVisualization(const char* label = ""); 
+  mitk::DataNode::Pointer CreateConeAsInstrumentVisualization(const char* label = ""); 
+  mitk::DataNode::Pointer CreateSphereAsInstrumentVisualization(const char* label = ""); 
   
   /**
   * @brief display status "valid" of tools

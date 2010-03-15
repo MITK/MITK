@@ -23,7 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkCommon.h"
 #include "mitkMessage.h"
 #include "itkVectorContainer.h"
-#include "mitkDataTreeNode.h"
+#include "mitkDataNode.h"
 #include "mitkGeometry3D.h"
 #include "itkSimpleFastMutexLock.h"
 #include <map>
@@ -31,7 +31,7 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk {
 
   class NodePredicateBase;
-  class DataTreeNode;
+  class DataNode;
   class BaseRenderer;
 
   //##Documentation
@@ -52,35 +52,35 @@ namespace mitk {
     mitkClassMacro(DataStorage, itk::Object);
 
     //##Documentation
-    //## @brief A Container of objects that is used as a result set of GetSubset() query operations (Set of SmartPointers to DataTreeNodes).
-    typedef itk::VectorContainer<unsigned int, mitk::DataTreeNode::Pointer> SetOfObjects;
+    //## @brief A Container of objects that is used as a result set of GetSubset() query operations (Set of SmartPointers to DataNodes).
+    typedef itk::VectorContainer<unsigned int, mitk::DataNode::Pointer> SetOfObjects;
 
     //##Documentation
-    //## @brief Adds a DataTreeNode containing a data object to its internal storage
+    //## @brief Adds a DataNode containing a data object to its internal storage
     //##
     //## This Method adds a new data object to the DataStorage. The new object is
     //## passed in the first parameter. The second parameter is a set
     //## of source objects, that were used to create this object. The new object will have
     //## a 'was created from' relation to its source objects.
     //## the addition of a new object will fire the notification mechanism.
-    //## If the node parameter is NULL or if the DataTreeNode has already been added,
+    //## If the node parameter is NULL or if the DataNode has already been added,
     //## an exception will be thrown.
-    virtual void Add(mitk::DataTreeNode* node, const mitk::DataStorage::SetOfObjects* parents = NULL) = 0;
+    virtual void Add(mitk::DataNode* node, const mitk::DataStorage::SetOfObjects* parents = NULL) = 0;
 
     //##Documentation
     //## @brief Convenience method to add a node that has one parent
     //##
-    void Add(mitk::DataTreeNode* node, mitk::DataTreeNode* parent);
+    void Add(mitk::DataNode* node, mitk::DataNode* parent);
 
     //##Documentation
     //## @brief Removes node from the DataStorage
     //##
-    virtual void Remove(const mitk::DataTreeNode* node) = 0;
+    virtual void Remove(const mitk::DataNode* node) = 0;
 
     //##Documentation
     //## @brief Checks if a node exists in the DataStorage
     //##
-    virtual bool Exists(const mitk::DataTreeNode* node) const = 0;
+    virtual bool Exists(const mitk::DataNode* node) const = 0;
 
     //##Documentation
     //## @brief Removes a set of nodes from the DataStorage
@@ -100,26 +100,26 @@ namespace mitk {
     //##  - disjunction of a set of conditions
     //## Conditions are implemented as predicates using the Composite Design Pattern
     //## (see definition of NodePredicateBase for details).
-    //## The method returns a set of SmartPointers to the DataTreeNodes that fulfill the
+    //## The method returns a set of SmartPointers to the DataNodes that fulfill the
     //## conditions. A set of all objects can be retrieved with the GetAll() method;
     SetOfObjects::ConstPointer GetSubset(const NodePredicateBase* condition) const;
 
     //##Documentation
     //## @brief returns a set of source objects for a given node that meet the given condition(s).
     //##
-    virtual SetOfObjects::ConstPointer GetSources(const mitk::DataTreeNode* node, const NodePredicateBase* condition = NULL, bool onlyDirectSources = true) const = 0;
+    virtual SetOfObjects::ConstPointer GetSources(const mitk::DataNode* node, const NodePredicateBase* condition = NULL, bool onlyDirectSources = true) const = 0;
 
     //##Documentation
     //## @brief returns a set of derived objects for a given node.
     //##
-    //## GetDerivations() returns a set of objects that are derived from the DataTreeNode node.
+    //## GetDerivations() returns a set of objects that are derived from the DataNode node.
     //## This means, that node was used to create the returned objects. If the parameter
     //## onlyDirectDerivations is set to true (default value), only objects that directly have
     //## node as one of their source objects will be returned. Otherwise, objects that are
     //## derived from derivations of node are returned too.
     //## The derived objects can be filtered with a predicate object as described in the GetSubset()
     //## method by providing a predicate as the condition parameter.
-    virtual SetOfObjects::ConstPointer GetDerivations(const mitk::DataTreeNode* node, const NodePredicateBase* condition = NULL, bool onlyDirectDerivations = true) const = 0;
+    virtual SetOfObjects::ConstPointer GetDerivations(const mitk::DataNode* node, const NodePredicateBase* condition = NULL, bool onlyDirectDerivations = true) const = 0;
 
     //##Documentation
     //## @brief returns a set of all data objects that are stored in the data storage
@@ -129,18 +129,18 @@ namespace mitk {
     //##Documentation
     //## @brief Convenience method to get the first node that matches the predicate condition
     //##
-    mitk::DataTreeNode* GetNode(const NodePredicateBase* condition = NULL) const;
+    mitk::DataNode* GetNode(const NodePredicateBase* condition = NULL) const;
 
 
     //##Documentation
     //## @brief Convenience method to get the first node with a given name
     //##
-    mitk::DataTreeNode* GetNamedNode(const char* name) const;
+    mitk::DataNode* GetNamedNode(const char* name) const;
 
     //##Documentation
     //## @brief Convenience method to get the first node with a given name
     //##
-    mitk::DataTreeNode* GetNamedNode(const std::string name) const
+    mitk::DataNode* GetNamedNode(const std::string name) const
     {
       return this->GetNamedNode(name.c_str());
     }
@@ -148,7 +148,7 @@ namespace mitk {
     //##Documentation
     //## @brief Convenience method to get the first node with a given name that is derived from sourceNode
     //##
-    mitk::DataTreeNode* GetNamedDerivedNode(const char* name, const mitk::DataTreeNode* sourceNode, bool onlyDirectDerivations = true) const;
+    mitk::DataNode* GetNamedDerivedNode(const char* name, const mitk::DataNode* sourceNode, bool onlyDirectDerivations = true) const;
 
     //##Documentation
     //## @brief Convenience method to get the first data object of a given data type with a given name
@@ -158,7 +158,7 @@ namespace mitk {
     {
       if (name == NULL)
         return NULL;
-      mitk::DataTreeNode* n = this->GetNamedNode(name);
+      mitk::DataNode* n = this->GetNamedNode(name);
       if (n == NULL)
         return NULL;
       else
@@ -177,11 +177,11 @@ namespace mitk {
     //## @brief Convenience method to get the first data object of a given data type with a given name that is derived from a specific node
     //##
     template <class DataType>
-    DataType* GetNamedDerivedObject(const char* name, const mitk::DataTreeNode* sourceNode, bool onlyDirectDerivations = true) const
+    DataType* GetNamedDerivedObject(const char* name, const mitk::DataNode* sourceNode, bool onlyDirectDerivations = true) const
     {
       if (name == NULL)
         return NULL;
-      mitk::DataTreeNode* n = this->GetNamedDerivedNode(name, sourceNode, onlyDirectDerivations);
+      mitk::DataNode* n = this->GetNamedDerivedNode(name, sourceNode, onlyDirectDerivations);
       if (n == NULL)
         return NULL;
       else
@@ -191,13 +191,13 @@ namespace mitk {
     //##Documentation
     //## @brief Returns a list of used grouptags
     //##
-    const DataTreeNode::GroupTagList GetGroupTags() const;
+    const DataNode::GroupTagList GetGroupTags() const;
 
     /*ITK Mutex */
     mutable itk::SimpleFastMutexLock m_MutexOne; 
 
     /* Public Events */
-    typedef Message1<const mitk::DataTreeNode*> DataStorageEvent;
+    typedef Message1<const mitk::DataNode*> DataStorageEvent;
     //##Documentation
     //## @brief AddEvent is emitted whenever a new node has been added to the DataStorage.
     //##
@@ -337,16 +337,16 @@ namespace mitk {
     //## @brief  EmitAddNodeEvent emits the AddNodeEvent
     //##
     //## This method should be called by subclasses to emit the AddNodeEvent
-    void EmitAddNodeEvent(const mitk::DataTreeNode* node);
+    void EmitAddNodeEvent(const mitk::DataNode* node);
 
     //##Documentation
     //## @brief  EmitRemoveNodeEvent emits the RemoveNodeEvent
     //##
     //## This method should be called by subclasses to emit the RemoveNodeEvent
-    void EmitRemoveNodeEvent(const mitk::DataTreeNode* node);
+    void EmitRemoveNodeEvent(const mitk::DataNode* node);
 
     //##Documentation
-    //## @brief  OnNodeModified listens to modified events of DataTreeNodes.
+    //## @brief  OnNodeModified listens to modified events of DataNodes.
     //##
     //## The node is hidden behind the caller parameter, which has to be casted first.
     //## If the cast succeeds the ChangedNodeEvent is emitted with this node.
@@ -354,21 +354,21 @@ namespace mitk {
 
     //##Documentation
     //## @brief  Adds a Modified-Listener to the given Node.
-    void AddListeners(const mitk::DataTreeNode* _Node);
+    void AddListeners(const mitk::DataNode* _Node);
 
     //##Documentation
     //## @brief  Removes a Modified-Listener from the given Node.
-    void RemoveListeners(const mitk::DataTreeNode* _Node);
+    void RemoveListeners(const mitk::DataNode* _Node);
 
 
 
     //##Documentation
     //## @brief  Saves Modified-Observer Tags for each node in order to remove the event listeners again.
-    std::map<const mitk::DataTreeNode*, unsigned long> m_NodeModifiedObserverTags;
+    std::map<const mitk::DataNode*, unsigned long> m_NodeModifiedObserverTags;
 
     //##Documentation
     //## @brief  Saves Delete-Observer Tags for each node in order to remove the event listeners again.
-    std::map<const mitk::DataTreeNode*, unsigned long> m_NodeDeleteObserverTags;
+    std::map<const mitk::DataNode*, unsigned long> m_NodeDeleteObserverTags;
 
     //##Documentation
     //## @brief If this class changes nodes itself, set this to TRUE in order

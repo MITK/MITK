@@ -9,7 +9,7 @@
 //# forward declarations
 namespace mitk
 {
-  class DataTreeNode;
+  class DataNode;
 }
 
 namespace berry
@@ -28,11 +28,11 @@ namespace berry
     ///
     /// \brief Node setter.
     ///
-    void SetNode(mitk::DataTreeNode* _SelectedNode);
+    void SetNode(mitk::DataNode* _SelectedNode);
     ///
     /// \brief Node getter.
     ///
-    mitk::DataTreeNode* GetNode() const;
+    mitk::DataNode* GetNode() const;
     ///
     /// \brief Checks if node is 0.
     ///
@@ -42,7 +42,7 @@ namespace berry
     ///
     /// \brief Holds the node that is currently selected.
     ///
-    mitk::DataTreeNode* m_Node;
+    mitk::DataNode* m_Node;
   };
 
 }

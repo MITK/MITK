@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <berryQtViewPart.h>
 #include "berryISizeProvider.h"
 
-#include <QmitkDataTreeNodeSelectionProvider.h>
+#include <QmitkDataNodeSelectionProvider.h>
 #include <QmitkDnDFrameWidget.h>
 #include <QmitkStdMultiWidgetEditor.h>
 #include "QmitkStepperAdapter.h"

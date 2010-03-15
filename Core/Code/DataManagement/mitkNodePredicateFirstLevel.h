@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkNodePredicateBase.h"
 #include "mitkDataStorage.h"
-#include "mitkDataTreeNode.h"
+#include "mitkDataNode.h"
 #include "mitkWeakPointer.h"
 
 namespace mitk {
@@ -46,7 +46,7 @@ namespace mitk {
 
       //##Documentation
       //## @brief Checks, if the node is a source node of m_BaseNode (e.g. if m_BaseNode "was created from" node)
-      virtual bool CheckNode(const mitk::DataTreeNode* node) const;
+      virtual bool CheckNode(const mitk::DataNode* node) const;
 
     protected:
       //##Documentation

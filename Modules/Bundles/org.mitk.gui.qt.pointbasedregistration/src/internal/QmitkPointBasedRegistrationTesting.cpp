@@ -59,10 +59,10 @@ PURPOSE.  See the above copyright notices for more information.
 //     std::cout << "No Fixed Image available! Won't apply test (l. " << __LINE__ << ")" << std::endl;
 //     return EXIT_SUCCESS;
 //   }
-//   mitk::DataTreeNode::Pointer node = NULL;
+//   mitk::DataNode::Pointer node = NULL;
 //   if (m_Controls->m_MovingSelector->GetSelectedNode() == NULL)
 //   {
-//     node = mitk::DataTreeNode::New();
+//     node = mitk::DataNode::New();
 //     //Create Image out of nowhere
 // 	  mitk::Image::Pointer image;
 //     m_Controls->m_FixedSelector->GetSelectedNode()->GetData();

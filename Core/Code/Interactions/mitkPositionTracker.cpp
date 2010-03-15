@@ -41,7 +41,7 @@ bool mitk::PositionTracker::ExecuteAction(Action* /*action*/, mitk::StateEvent c
   bool ok = false;
   const DisplayPositionEvent* displayPositionEvent = dynamic_cast<const DisplayPositionEvent*>(stateEvent->GetEvent());
 
-  mitk::DataTreeNode::Pointer  dtnode;
+  mitk::DataNode::Pointer  dtnode;
   mitk::DataStorage* ds = NULL;
   if (displayPositionEvent == NULL)
     return false;

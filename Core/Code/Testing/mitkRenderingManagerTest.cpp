@@ -54,7 +54,7 @@ static void TestPropertyList(mitk::RenderingManager::Pointer renderingManager)
   MITK_TEST_CONDITION(propertyList == renderingManager->GetPropertyList(), "Testing if the propertylist has changed during the last tests" )
 }
 
-}; //mitkDataTreeNodeTestClass
+}; //mitkDataNodeTestClass
 int mitkRenderingManagerTest(int /* argc */, char* /*argv*/[])
 {
   // always start with this!

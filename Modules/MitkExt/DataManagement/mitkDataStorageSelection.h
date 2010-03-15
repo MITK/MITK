@@ -16,13 +16,13 @@ namespace mitk
   class MitkExt_EXPORT DataStorageSelection: public itk::Object
   {
   public:
-    typedef std::vector<mitk::DataTreeNode*> Nodes;
-    typedef Message1<const mitk::DataTreeNode*> DataTreeNodeEvent;
+    typedef std::vector<mitk::DataNode*> Nodes;
+    typedef Message1<const mitk::DataNode*> DataNodeEvent;
 
-    DataTreeNodeEvent NodeChanged;
-    DataTreeNodeEvent NodeAdded;
-    DataTreeNodeEvent NodeRemoved;
-    Message2<const mitk::DataTreeNode*, const mitk::BaseProperty*> PropertyChanged;
+    DataNodeEvent NodeChanged;
+    DataNodeEvent NodeAdded;
+    DataNodeEvent NodeRemoved;
+    Message2<const mitk::DataNode*, const mitk::BaseProperty*> PropertyChanged;
 
     mitkClassMacro(DataStorageSelection, itk::Object);
 
@@ -52,15 +52,15 @@ namespace mitk
       ///
       /// Get node at a specific model index.
       ///
-      mitk::DataTreeNode::Pointer GetNode(unsigned int index) const;
+      mitk::DataNode::Pointer GetNode(unsigned int index) const;
       ///
       /// Returns the first node, same as calling GetNode(0)
       ///
-      mitk::DataTreeNode::Pointer GetNode() const;
+      mitk::DataNode::Pointer GetNode() const;
       ///
       /// Returns a copy of the node-vector
       ///
-      std::vector<mitk::DataTreeNode*> GetNodes() const;
+      std::vector<mitk::DataNode*> GetNodes() const;
       ///
       /// \see m_AutoAddNodes
       ///
@@ -69,11 +69,11 @@ namespace mitk
       ///
       /// Removes all nodes, sets node as new first element
       ///
-      DataStorageSelection& operator=(mitk::DataTreeNode* node);
+      DataStorageSelection& operator=(mitk::DataNode* node);
       ///
       /// Removes all nodes, sets node as new first element
       ///
-      DataStorageSelection& operator=(mitk::DataTreeNode::Pointer node);
+      DataStorageSelection& operator=(mitk::DataNode::Pointer node);
       ///
       /// Sets the DataStorage.
       ///
@@ -85,11 +85,11 @@ namespace mitk
       ///
       /// Add a node (if not already there)
       ///
-      virtual void AddNode(const mitk::DataTreeNode* node);
+      virtual void AddNode(const mitk::DataNode* node);
       ///
       /// Removes a node
       ///
-      virtual void RemoveNode(const mitk::DataTreeNode* node);
+      virtual void RemoveNode(const mitk::DataNode* node);
       ///
       /// Removes a node
       ///
@@ -102,11 +102,11 @@ namespace mitk
       ///
       /// Find a node in the list by the given prop
       ///
-      mitk::DataTreeNode::Pointer FindNode(const mitk::BaseProperty* prop) const;
+      mitk::DataNode::Pointer FindNode(const mitk::BaseProperty* prop) const;
       ///
       /// Find a node in the list by the given proplist
       ///
-      mitk::DataTreeNode::Pointer FindNode(const mitk::PropertyList* propList) const;
+      mitk::DataNode::Pointer FindNode(const mitk::PropertyList* propList) const;
       ///
       /// Removes all nodes and fill the vector again
       ///
@@ -114,13 +114,13 @@ namespace mitk
       ///
       /// If a node is already in this list, all listeners will be removed
       ///
-      void RemoveListener(mitk::DataTreeNode* node);
+      void RemoveListener(mitk::DataNode* node);
       ///
       /// Adds listeners for modified/delete event, for the propertylists
       /// modified/delete and for the modified/delete event of each property
       /// and stores listener tags
       ///
-      void AddListener(mitk::DataTreeNode* node);
+      void AddListener(mitk::DataNode* node);
     protected:
       ///
       /// Pointer to the DataStorage from which the nodes are selected
@@ -138,11 +138,11 @@ namespace mitk
       ///
       /// Holds all selected Nodes.
       ///
-      std::vector<mitk::DataTreeNode*> m_Nodes;
+      std::vector<mitk::DataNode*> m_Nodes;
       ///
       /// \brief Maps a node to a modified observer tag.
       ///
-      std::map<mitk::DataTreeNode*, unsigned long> m_NodeModifiedObserverTags;
+      std::map<mitk::DataNode*, unsigned long> m_NodeModifiedObserverTags;
       ///
       /// \brief Maps a propertylist to a modified observer tag.
       ///

@@ -25,7 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
 
-class DataTreeNode;
+class DataNode;
 
 //## @brief base-class for factories of certain mitk objects. 
 //## @ingroup Algorithms
@@ -37,8 +37,8 @@ class CoreObjectFactoryBase : public itk::ObjectFactoryBase
   public:
     typedef std::list<mitk::FileWriterWithInformation::Pointer> FileWriterList;
     mitkClassMacro(CoreObjectFactoryBase,itk::ObjectFactoryBase);
-    virtual Mapper::Pointer CreateMapper(mitk::DataTreeNode* node, MapperSlotId slotId) = 0;
-    virtual void SetDefaultProperties(mitk::DataTreeNode* node) = 0;
+    virtual Mapper::Pointer CreateMapper(mitk::DataNode* node, MapperSlotId slotId) = 0;
+    virtual void SetDefaultProperties(mitk::DataNode* node) = 0;
     virtual itk::Object::Pointer CreateCoreObject( const std::string& className ) = 0;
     virtual const char* GetFileExtensions() = 0;
     virtual const char* GetSaveFileExtensions() = 0;

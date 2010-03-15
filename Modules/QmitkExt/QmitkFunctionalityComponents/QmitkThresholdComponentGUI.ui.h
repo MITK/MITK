@@ -34,8 +34,8 @@ PURPOSE.  See the above copyright notices for more information.
 void QmitkThresholdComponentGUI::SetDataTreeIterator( mitk::DataTreeIteratorBase * it )
 {
    m_DataTreeIterator = it;
-//TODO   m_TreeNodeSelector->SetDataTreeNodeIterator(it);
-   //m_VolumetryWidget->SetDataTreeNodeIterator(it);
+//TODO   m_TreeNodeSelector->SetDataNodeIterator(it);
+   //m_VolumetryWidget->SetDataNodeIterator(it);
 }
 
 

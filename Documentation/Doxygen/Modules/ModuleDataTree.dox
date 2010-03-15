@@ -7,8 +7,8 @@
 
 \section overviewDataTree Overview
 
-All data objects, like images or surfaces, are contained in DataTreeNodes. These
-DataTreeNodes describe the data itself (mitk::BaseData), how they can be rendered in
+All data objects, like images or surfaces, are contained in DataNodes. These
+DataNodes describe the data itself (mitk::BaseData), how they can be rendered in
 2D or 3D (a list of mitk::Mapper), what mitk::Interactor is associated with it, and a list
 of arbirary properties (name, visibility, opacity, etc.). Information about the
 position of a data object in space/time is stored in a Geometry, which is
@@ -31,8 +31,8 @@ To modify a tree, you can use an iterator's Add(), Set() or Remove() methods
 
 \code
   mitk::DataTreeIteratorBase* iterator = GetAnIterator(); //whatever
-  mitk::DataTreeNode* node = GetMyNode();
-  mitk::DataTreeNode* node2 = GetMyNode();
+  mitk::DataNode* node = GetMyNode();
+  mitk::DataNode* node2 = GetMyNode();
 
   if ( iterator.IsNotNull() )
   {
@@ -50,7 +50,7 @@ To access the data behind an iterator, use Get():
 \code
   if ( iterator.IsNotNull() )
   {
-    mitk::DataTreeNode* datanode = iterator->Get();
+    mitk::DataNode* datanode = iterator->Get();
     mitk::BaseData* = datanode->GetData();
   }
 \endcode

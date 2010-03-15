@@ -14,8 +14,8 @@ Mappers differ in the type of data they are capable of rendering (e.g. volume da
 
 \section integrationVisualizationMapper Integration into the rendering process
 
-Mapper objects are owned by the DataTreeNode which contains the data they have to render. An overview over this composition is given in the section \ref Renderer. Each DataTreeNode can have (and usually has) multiple Mappers attached, each responsible for different modes of rendering. In most cases this would be one 2D Mapper and one 3D Mapper, but other Mappers are possible, too.
-Which Mapper of a DataTreeNode to use is determined by an ID; the Renderer of a 2D window would for example ask the DataTreeNode to return an appropriate 2D Mapper. 
+Mapper objects are owned by the DataNode which contains the data they have to render. An overview over this composition is given in the section \ref Renderer. Each DataNode can have (and usually has) multiple Mappers attached, each responsible for different modes of rendering. In most cases this would be one 2D Mapper and one 3D Mapper, but other Mappers are possible, too.
+Which Mapper of a DataNode to use is determined by an ID; the Renderer of a 2D window would for example ask the DataNode to return an appropriate 2D Mapper. 
 
 More details can be found in the section on \ref Rendering.
 

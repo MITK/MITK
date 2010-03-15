@@ -295,8 +295,8 @@ void QmitkIGTExampleView::OnTestNavigation()
       mitk::Cone::Pointer mitkToolData = mitk::Cone::New();
       float scale[] = {20.0, 20.0, 20.0};
       mitkToolData->GetGeometry()->SetSpacing(scale);
-      //create DataTreeNode
-      mitk::DataTreeNode::Pointer toolNode = mitk::DataTreeNode::New();
+      //create DataNode
+      mitk::DataNode::Pointer toolNode = mitk::DataNode::New();
       toolNode->SetData(mitkToolData);
       toolNode->SetName(QString("MyInstrument %1").arg(i).toLatin1());
       toolNode->SetColor(0.2, 0.3 * i ,0.9 - 0.2 * i); //different colors
@@ -319,7 +319,7 @@ void QmitkIGTExampleView::OnTestNavigation()
         mitk::PointSet* p = m_PointSetFilter->GetOutput(i);
         assert(p);
 
-        mitk::DataTreeNode::Pointer pointSetNode = mitk::DataTreeNode::New();
+        mitk::DataNode::Pointer pointSetNode = mitk::DataNode::New();
         pointSetNode->SetData(p);
         pointSetNode->SetName(QString("Trajectory of Output %1").arg(i).toLatin1());
         mitk::Color color;
@@ -660,7 +660,7 @@ void QmitkIGTExampleView::OnStartPlaying()
     mitk::PointSet* p = m_PointSetFilter->GetOutput(i);
     assert(p);
 
-    mitk::DataTreeNode::Pointer pointSetNode = mitk::DataTreeNode::New();
+    mitk::DataNode::Pointer pointSetNode = mitk::DataNode::New();
     pointSetNode->SetData(p);
     pointSetNode->SetName(QString("Trajectory of Output %1").arg(i).toLatin1());
     mitk::Color color;

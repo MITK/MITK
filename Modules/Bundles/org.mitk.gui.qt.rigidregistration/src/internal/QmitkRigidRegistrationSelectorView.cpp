@@ -244,11 +244,11 @@ void QmitkRigidRegistrationSelectorView::CalculateTransformation(unsigned int ti
 
     unsigned long size;
     size = m_MovingNodeChildren->Size();
-    mitk::DataTreeNode::Pointer childNode;
+    mitk::DataNode::Pointer childNode;
     for (unsigned long i = 0; i < size; ++i)
     {
-      m_ChildNodes.insert(std::pair<mitk::DataTreeNode::Pointer, mitk::Geometry3D*>(m_MovingNodeChildren->GetElement(i), m_MovingNodeChildren->GetElement(i)->GetData()->GetGeometry()));
-      m_ChildNodes2.insert(std::pair<mitk::DataTreeNode::Pointer, mitk::AffineGeometryFrame3D::Pointer>(m_MovingNodeChildren->GetElement(i), m_MovingNodeChildren->GetElement(i)->GetData()->GetGeometry()->Clone()));
+      m_ChildNodes.insert(std::pair<mitk::DataNode::Pointer, mitk::Geometry3D*>(m_MovingNodeChildren->GetElement(i), m_MovingNodeChildren->GetElement(i)->GetData()->GetGeometry()));
+      m_ChildNodes2.insert(std::pair<mitk::DataNode::Pointer, mitk::AffineGeometryFrame3D::Pointer>(m_MovingNodeChildren->GetElement(i), m_MovingNodeChildren->GetElement(i)->GetData()->GetGeometry()->Clone()));
     }
 
     m_GeometryWorldToItkPhysicalTransform = mitk::Geometry3D::TransformType::New();
@@ -334,7 +334,7 @@ void QmitkRigidRegistrationSelectorView::CalculateTransformation(unsigned int ti
   }  
 }
 
-void QmitkRigidRegistrationSelectorView::SetFixedNode( mitk::DataTreeNode * fixedNode )
+void QmitkRigidRegistrationSelectorView::SetFixedNode( mitk::DataNode * fixedNode )
 {
   m_FixedNode = fixedNode;
   m_Controls.m_TransformBox->setCurrentIndex(m_Controls.m_TransformBox->currentIndex());
@@ -345,7 +345,7 @@ void QmitkRigidRegistrationSelectorView::SetFixedDimension( int dimension )
   m_FixedDimension = dimension;
 }
 
-void QmitkRigidRegistrationSelectorView::SetMovingNode( mitk::DataTreeNode * movingNode )
+void QmitkRigidRegistrationSelectorView::SetMovingNode( mitk::DataNode * movingNode )
 {
   m_MovingNode = movingNode;
   this->TransformSelected(m_Controls.m_TransformBox->currentIndex());
@@ -426,9 +426,9 @@ void QmitkRigidRegistrationSelectorView::SetOptimizerValue( const itk::EventObje
     std::cout << "offset " << offset[0] << " " << offset[1] << " " << offset[2]  << std::endl << std::endl;*/
 
     // now adapt all children geometries accordingly if children exist
-    std::map<mitk::DataTreeNode::Pointer, mitk::Geometry3D*>::iterator iter;
-    std::map<mitk::DataTreeNode::Pointer, mitk::AffineGeometryFrame3D::Pointer>::iterator iter2;
-    mitk::DataTreeNode::Pointer childNode;
+    std::map<mitk::DataNode::Pointer, mitk::Geometry3D*>::iterator iter;
+    std::map<mitk::DataNode::Pointer, mitk::AffineGeometryFrame3D::Pointer>::iterator iter2;
+    mitk::DataNode::Pointer childNode;
     for( iter = m_ChildNodes.begin(); iter != m_ChildNodes.end(); iter++ ) 
     {
       childNode = (*iter).first;
@@ -787,13 +787,13 @@ int QmitkRigidRegistrationSelectorView::GetSelectedTransform()
   return m_Controls.m_TransformBox->currentIndex();
 }
 
-void QmitkRigidRegistrationSelectorView::SetFixedMaskNode( mitk::DataTreeNode * fixedMaskNode )
+void QmitkRigidRegistrationSelectorView::SetFixedMaskNode( mitk::DataNode * fixedMaskNode )
 {
   m_FixedMaskNode = fixedMaskNode;
   this->TransformSelected(m_Controls.m_TransformBox->currentIndex());
 }
 
-void QmitkRigidRegistrationSelectorView::SetMovingMaskNode( mitk::DataTreeNode * movingMaskNode )
+void QmitkRigidRegistrationSelectorView::SetMovingMaskNode( mitk::DataNode * movingMaskNode )
 {
   m_MovingMaskNode = movingMaskNode;
   this->TransformSelected(m_Controls.m_TransformBox->currentIndex());

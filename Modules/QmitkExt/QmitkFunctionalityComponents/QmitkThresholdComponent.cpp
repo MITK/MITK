@@ -23,7 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkRenderingManager.h"
 #include "mitkProperties.h"
-#include "mitkDataTreeNodeFactory.h"
+#include "mitkDataNodeFactory.h"
 #include "mitkImageTimeSelector.h"
 #include "mitkLevelWindowProperty.h"
 
@@ -88,7 +88,7 @@ void QmitkThresholdComponent::CreateConnections()
 {
   if ( m_ThresholdComponentGUI )
   {
-    connect( (QObject*)(m_TreeNodeSelector), SIGNAL(OnSelectionChanged (const mitk::DataTreeNode *)), (QObject*) this, SLOT(ImageSelected(const mitk::DataTreeNode *)));
+    connect( (QObject*)(m_TreeNodeSelector), SIGNAL(OnSelectionChanged (const mitk::DataNode *)), (QObject*) this, SLOT(ImageSelected(const mitk::DataNode *)));
     connect( (QObject*)(m_ThresholdFinder), SIGNAL(toggled(bool)), (QObject*) this, SLOT(ShowThresholdFinderContent(bool)));     
     connect( (QObject*)(m_ThresholdSelectDataGroupBox), SIGNAL(toggled(bool)), (QObject*) this, SLOT(ShowImageContent(bool))); 
 
@@ -128,11 +128,11 @@ void  QmitkThresholdComponent::DataStorageChanged(mitk::DataStorage::Pointer ds)
 }
 
 /***************     IMAGE SELECTED     ***************/
-void QmitkThresholdComponent::ImageSelected(const mitk::DataTreeNode* item)
+void QmitkThresholdComponent::ImageSelected(const mitk::DataNode* item)
 {
   if(m_ThresholdComponentGUI != NULL)
   {
-    mitk::DataTreeNode::Pointer selectedItem = const_cast< mitk::DataTreeNode*>(item);
+    mitk::DataNode::Pointer selectedItem = const_cast< mitk::DataNode*>(item);
     m_TreeNodeSelector->SetSelectedNode(selectedItem);
     for(unsigned int i = 0;  i < m_AddedChildList.size(); i++) 
     {
@@ -473,7 +473,7 @@ void QmitkThresholdComponent::DeleteThresholdNode()
   if(m_ThresholdImageNode)
   {
 
-    mitk::DataTreeNode::Pointer foundNode = m_DataStorage->GetNamedNode("Thresholdview image");
+    mitk::DataNode::Pointer foundNode = m_DataStorage->GetNamedNode("Thresholdview image");
     foundNode->Delete();
 
 
@@ -492,7 +492,7 @@ void QmitkThresholdComponent::CreateThresholdImageNode()
       return;
     if(!m_TreeNodeSelector->GetSelectedNode())
       return;
-    m_ThresholdImageNode = mitk::DataTreeNode::New();
+    m_ThresholdImageNode = mitk::DataNode::New();
     mitk::StringProperty::Pointer nameProp = mitk::StringProperty::New("Thresholdview image" );
     m_ThresholdImageNode->SetProperty( "name", nameProp );
     mitk::BoolProperty::Pointer componentThresholdImageProp = mitk::BoolProperty::New(true);
@@ -543,7 +543,7 @@ void QmitkThresholdComponent::CreateThresholdSegmentation()
     return ;
   }
 
-  mitk::DataTreeNode::Pointer emptySegmentationNode = CreateSegmentationNode( segmentation);
+  mitk::DataNode::Pointer emptySegmentationNode = CreateSegmentationNode( segmentation);
 
   if (emptySegmentationNode)
   {
@@ -566,19 +566,19 @@ void QmitkThresholdComponent::CreateThresholdSegmentation()
       }
     }
 
-    mitk::DataTreeNode::Pointer originalNode = m_TreeNodeSelector->GetSelectedNode();
+    mitk::DataNode::Pointer originalNode = m_TreeNodeSelector->GetSelectedNode();
     m_DataStorage->Add( emptySegmentationNode, originalNode ); // add as a child, because the segmentation "derives" from the original
    
   }
 }
 
-mitk::DataTreeNode::Pointer QmitkThresholdComponent::CreateSegmentationNode( mitk::Image* image)
+mitk::DataNode::Pointer QmitkThresholdComponent::CreateSegmentationNode( mitk::Image* image)
 {
 
   if (!image) return NULL;
 
   // decorate the datatreenode with some properties
-  mitk::DataTreeNode::Pointer segmentationNode = mitk::DataTreeNode::New();
+  mitk::DataNode::Pointer segmentationNode = mitk::DataNode::New();
   segmentationNode->SetData( image );
 
   // name

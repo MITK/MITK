@@ -16,7 +16,7 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include "mitkTool.h"
-#include "mitkDataTreeNodeFactory.h"
+#include "mitkDataNodeFactory.h"
 #include "mitkProperties.h"
 #include "mitkLevelWindowProperty.h"
 #include "mitkVtkResliceInterpolationProperty.h"
@@ -111,7 +111,7 @@ mitk::NodePredicateBase::ConstPointer mitk::Tool::GetWorkingDataPreference() con
   return m_IsSegmentationPredicate.GetPointer();
 }
 
-mitk::DataTreeNode::Pointer mitk::Tool::CreateEmptySegmentationNode( Image* original, const std::string& organName, const mitk::Color& color )
+mitk::DataNode::Pointer mitk::Tool::CreateEmptySegmentationNode( Image* original, const std::string& organName, const mitk::Color& color )
 {
   // we NEED a reference image for size etc.
   if (!original) return NULL;
@@ -144,12 +144,12 @@ mitk::DataTreeNode::Pointer mitk::Tool::CreateEmptySegmentationNode( Image* orig
   return CreateSegmentationNode( segmentation, organName, color );
 }
 
-mitk::DataTreeNode::Pointer mitk::Tool::CreateSegmentationNode( Image* image, const std::string& organName, const mitk::Color& color )
+mitk::DataNode::Pointer mitk::Tool::CreateSegmentationNode( Image* image, const std::string& organName, const mitk::Color& color )
 {
   if (!image) return NULL;
 
   // decorate the datatreenode with some properties
-  DataTreeNode::Pointer segmentationNode = DataTreeNode::New();
+  DataNode::Pointer segmentationNode = DataNode::New();
   segmentationNode->SetData( image );
 
   // name

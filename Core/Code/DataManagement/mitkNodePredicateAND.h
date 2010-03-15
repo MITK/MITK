@@ -45,7 +45,7 @@ namespace mitk {
 
       //##Documentation
       //## @brief Checks, if the node fulfills all of the subpredicates conditions
-      virtual bool CheckNode(const DataTreeNode* node) const;
+      virtual bool CheckNode(const DataNode* node) const;
     protected:
       //##Documentation
       //## @brief Protected constructor, use static instantiation functions instead

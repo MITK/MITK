@@ -37,7 +37,7 @@ void Step7::StartRegionGrowing()
     mitk::Surface::Pointer surface = mitk::Surface::New();
     surface->SetVtkPolyData(surfaceCreator->GetOutput());
 
-    mitk::DataTreeNode::Pointer surfaceNode = mitk::DataTreeNode::New();
+    mitk::DataNode::Pointer surfaceNode = mitk::DataNode::New();
     surfaceNode->SetData(surface);
 
     m_DataStorage->Add(surfaceNode);

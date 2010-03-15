@@ -17,7 +17,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include <mitkImage.h>
-#include <mitkDataTreeNodeFactory.h>
+#include <mitkDataNodeFactory.h>
 #include <mitkCylindricToCartesianFilter.h>
 #include <mitkImageSliceSelector.h>
 #include <itksys/SystemTools.hxx>
@@ -33,7 +33,7 @@ int mitkImageSliceSelectorTest(int argc, char* argv[])
     return EXIT_FAILURE;
   }
   mitk::Image::Pointer image = NULL;
-  mitk::DataTreeNodeFactory::Pointer factory = mitk::DataTreeNodeFactory::New();
+  mitk::DataNodeFactory::Pointer factory = mitk::DataNodeFactory::New();
   try
   {
     std::cout<<argv[1]<<std::endl;
@@ -45,7 +45,7 @@ int mitkImageSliceSelectorTest(int argc, char* argv[])
       std::cout<<"file could not be loaded [FAILED]"<<std::endl;
       return EXIT_FAILURE;
     }
-    mitk::DataTreeNode::Pointer node = factory->GetOutput( 0 );
+    mitk::DataNode::Pointer node = factory->GetOutput( 0 );
     image = dynamic_cast<mitk::Image*>(node->GetData());
     if(image.IsNull())
     {

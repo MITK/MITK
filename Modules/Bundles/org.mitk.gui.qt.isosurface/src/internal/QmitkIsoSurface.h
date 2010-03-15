@@ -81,7 +81,7 @@ class QmitkIsoSurface : public QObject, public QmitkFunctionality
     /*
      * just an example slot for the example TreeNodeSelector widget
      */
-    void ImageSelected(const mitk::DataTreeNode* item);
+    void ImageSelected(const mitk::DataNode* item);
 
     /*!
       \brief method for creating a surface object

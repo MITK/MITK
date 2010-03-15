@@ -183,12 +183,12 @@ void QmitkDemonsRegistrationView::CalculateTransformation()
   }
 }
 
-void QmitkDemonsRegistrationView::SetFixedNode( mitk::DataTreeNode * fixedNode )
+void QmitkDemonsRegistrationView::SetFixedNode( mitk::DataNode * fixedNode )
 {
   m_FixedNode = fixedNode;
 }
 
-void QmitkDemonsRegistrationView::SetMovingNode( mitk::DataTreeNode * movingNode )
+void QmitkDemonsRegistrationView::SetMovingNode( mitk::DataNode * movingNode )
 {
   m_MovingNode = movingNode;
 }

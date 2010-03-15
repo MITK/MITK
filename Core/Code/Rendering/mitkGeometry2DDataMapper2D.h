@@ -23,7 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkGLMapper2D.h"
 #include "mitkSurfaceMapper2D.h"
 #include "mitkDataStorage.h"
-#include "mitkDataTreeNode.h"
+#include "mitkDataNode.h"
 
 namespace mitk {
 
@@ -61,7 +61,7 @@ public:
   virtual void Paint( BaseRenderer *renderer );
 
 
-  virtual void SetDatastorageAndGeometryBaseNode(mitk::DataStorage::Pointer ds, mitk::DataTreeNode::Pointer parent);
+  virtual void SetDatastorageAndGeometryBaseNode(mitk::DataStorage::Pointer ds, mitk::DataNode::Pointer parent);
 
   /** Applies properties specific to this mapper */
   virtual void ApplyProperties( BaseRenderer *renderer );
@@ -83,9 +83,9 @@ protected:
   SurfaceMapper2D::Pointer m_SurfaceMapper;
 
   DataStorage::Pointer m_DataStorage;  ///< DataStorage that will be searched for sub nodes
-  DataTreeNode::Pointer m_ParentNode;  ///< parent node that will be used to search for sub nodes
+  DataNode::Pointer m_ParentNode;  ///< parent node that will be used to search for sub nodes
  
-  typedef std::vector<DataTreeNode*> NodesVectorType;
+  typedef std::vector<DataNode*> NodesVectorType;
   NodesVectorType m_OtherGeometry2Ds;
 
   bool m_RenderOrientationArrows;

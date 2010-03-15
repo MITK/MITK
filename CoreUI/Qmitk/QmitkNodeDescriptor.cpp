@@ -31,7 +31,7 @@ QList<QAction*> QmitkNodeDescriptor::GetActions() const
   return m_Actions;
 }
 
-bool QmitkNodeDescriptor::CheckNode( const mitk::DataTreeNode* node ) const
+bool QmitkNodeDescriptor::CheckNode( const mitk::DataNode* node ) const
 {
   if(m_Predicate.IsNotNull())
     return m_Predicate->CheckNode(node);

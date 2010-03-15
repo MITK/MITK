@@ -25,7 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 //mitk headers
 #include <mitkCommon.h>
-#include <mitkDataTreeNode.h>
+#include <mitkDataNode.h>
 #include <mitkTrackingTool.h>
 #include "mitkTrackingTypes.h"
 #include <MitkIGTExports.h>
@@ -57,8 +57,8 @@ namespace mitk {
     itkGetMacro(Identifier,std::string);
     itkSetMacro(Identifier,std::string);
     //Datatreenode:
-    itkGetMacro(DataTreeNode,mitk::DataTreeNode::Pointer);
-    itkSetMacro(DataTreeNode,mitk::DataTreeNode::Pointer);
+    itkGetMacro(DataNode,mitk::DataNode::Pointer);
+    itkSetMacro(DataNode,mitk::DataNode::Pointer);
     //SpatialObject:
     itkGetMacro(SpatialObject,itk::SpatialObject<3>::Pointer);
     itkSetMacro(SpatialObject,itk::SpatialObject<3>::Pointer);
@@ -84,8 +84,8 @@ namespace mitk {
     //## 	data structure of a navigation tool object ##
     std::string m_Identifier;
     NavigationToolType m_Type;
-    /** @brief This DataTreeNode holds a toolname and a tool surface */ 
-    mitk::DataTreeNode::Pointer m_DataTreeNode;
+    /** @brief This DataNode holds a toolname and a tool surface */ 
+    mitk::DataNode::Pointer m_DataNode;
     /** @brief This member variable holds a mathamatical description of the tool */
     itk::SpatialObject<3>::Pointer m_SpatialObject;
     /** @brief This member variable holds a pointer to the corresponding tracking tool in the hardware. */

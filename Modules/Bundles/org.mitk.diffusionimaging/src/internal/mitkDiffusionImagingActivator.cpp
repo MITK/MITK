@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "QmitkNodeDescriptorManager.h"
 #include "mitkNodePredicateDataType.h"
-//#include "mitkDataTreeNodeObject.h"
+//#include "mitkDataNodeObject.h"
 //
 //#include "berryISelectionService.h"
 //#include "berryIStructuredSelection.h"
@@ -78,9 +78,9 @@ mitk::DiffusionImagingActivator::Start(berry::IBundleContext::Pointer /*context*
 //
 //  if (ssel)
 //  {
-//    if (mitk::DataTreeNodeObject::Pointer nodeObj = ssel->Begin()->Cast<mitk::DataTreeNodeObject>())
+//    if (mitk::DataNodeObject::Pointer nodeObj = ssel->Begin()->Cast<mitk::DataNodeObject>())
 //    {
-//      mitk::DataTreeNode::Pointer node = nodeObj->GetDataTreeNode();
+//      mitk::DataNode::Pointer node = nodeObj->GetDataNode();
 //      if(QString("DiffusionImage").compare(node->GetData()->GetNameOfClass())==0)
 //      {
 //        node->SetIntProperty("DisplayChannel", value);
@@ -98,9 +98,9 @@ mitk::DiffusionImagingActivator::Start(berry::IBundleContext::Pointer /*context*
 // 
 //  if (ssel)
 //  {
-//    if (mitk::DataTreeNodeObject::Pointer nodeObj = ssel->Begin()->Cast<mitk::DataTreeNodeObject>())
+//    if (mitk::DataNodeObject::Pointer nodeObj = ssel->Begin()->Cast<mitk::DataNodeObject>())
 //    {
-//      mitk::DataTreeNode::Pointer node = nodeObj->GetDataTreeNode();
+//      mitk::DataNode::Pointer node = nodeObj->GetDataNode();
 //      if(QString("DiffusionImage").compare(node->GetData()->GetNameOfClass())==0)
 //      {
 //        int displayChannel = 0.0;

@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkCommon.h"
 #include <itkProcessObject.h>
-#include <mitkDataTreeNode.h>
+#include <mitkDataNode.h>
 
 namespace mitk {
 
@@ -93,7 +93,7 @@ class MITK_CORE_EXPORT FileWriter : public itk::ProcessObject
     //##Documentation
     //## @brief Check if the Writer can write this type of data of the 
     //## DataTreenode.
-    virtual bool CanWriteDataType( DataTreeNode* );
+    virtual bool CanWriteDataType( DataNode* );
 
     //##Documentation
     //## @brief Return the MimeType of the saved File.
@@ -102,7 +102,7 @@ class MITK_CORE_EXPORT FileWriter : public itk::ProcessObject
     //##Documentation
     //## @brief Set the DataTreenode as Input. Important: The Writer
     //## always have a SetInput-Function.
-    virtual void SetInput( DataTreeNode* );
+    virtual void SetInput( DataNode* );
 
     virtual void Write() = 0;
 

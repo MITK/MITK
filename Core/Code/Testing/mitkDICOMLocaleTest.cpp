@@ -31,7 +31,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 */
 
-#include "mitkDataTreeNodeFactory.h"
+#include "mitkDataNodeFactory.h"
 #include "mitkStandardFileLocations.h"
 
 #include "mitkTestingMacros.h"
@@ -65,12 +65,12 @@ void mitkDICOMLocaleTestWithReferenceImage()
   std::string filename = locator->FindFile("spacing-ok.dcm", "Core/Code/Testing/Data/");
 
   mitk::Image::Pointer image;
-  mitk::DataTreeNodeFactory::Pointer factory = mitk::DataTreeNodeFactory::New();
+  mitk::DataNodeFactory::Pointer factory = mitk::DataNodeFactory::New();
   factory->SetFileName( filename );
   factory->Update();
   MITK_TEST_CONDITION_REQUIRED(factory->GetNumberOfOutputs() > 0, "file loaded");
 
-  mitk::DataTreeNode::Pointer node = factory->GetOutput( 0 );
+  mitk::DataNode::Pointer node = factory->GetOutput( 0 );
   image = dynamic_cast<mitk::Image*>(node->GetData());
   if(image.IsNull())
   {

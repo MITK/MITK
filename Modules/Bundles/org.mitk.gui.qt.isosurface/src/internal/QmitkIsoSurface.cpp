@@ -88,7 +88,7 @@ void QmitkIsoSurface::CreateConnections()
 {
   if ( m_Controls )
   {
-    connect( m_Controls->m_ImageSelector, SIGNAL(OnSelectionChanged(const mitk::DataTreeNode*)), this, SLOT(ImageSelected(const mitk::DataTreeNode*)) );
+    connect( m_Controls->m_ImageSelector, SIGNAL(OnSelectionChanged(const mitk::DataNode*)), this, SLOT(ImageSelected(const mitk::DataNode*)) );
     connect( m_Controls->createSurfacePushButton, SIGNAL(clicked()), this, SLOT(CreateSurface()) );
   }
 }
@@ -108,7 +108,7 @@ void QmitkIsoSurface::DataStorageChanged()
 }
 
 
-void QmitkIsoSurface::ImageSelected(const mitk::DataTreeNode* item)
+void QmitkIsoSurface::ImageSelected(const mitk::DataNode* item)
 {
   // nothing selected (NULL selection)
   if( item == 0  || item->GetData() == 0 )
@@ -130,7 +130,7 @@ void QmitkIsoSurface::CreateSurface()
     float targetReduction = 0.05;
 
     //ImageToSurface Instance
-    mitk::DataTreeNode::Pointer node = m_Controls->m_ImageSelector->GetSelectedNode();
+    mitk::DataNode::Pointer node = m_Controls->m_ImageSelector->GetSelectedNode();
 
     /*
     mitk::DataTreeIteratorClone  iteratorOnImageToBeSkinExtracted;
@@ -168,7 +168,7 @@ void QmitkIsoSurface::CreateSurface()
       }
           QApplication::setOverrideCursor( QCursor(Qt::WaitCursor) );
     }
-    mitk::DataTreeNode::Pointer surfaceNode = mitk::DataTreeNode::New();
+    mitk::DataNode::Pointer surfaceNode = mitk::DataNode::New();
     surfaceNode->SetData( filter->GetOutput() );
 
     int layer = 0;

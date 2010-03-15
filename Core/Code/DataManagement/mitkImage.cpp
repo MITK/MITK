@@ -31,7 +31,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkSmartPointerForwardReference.txx>
 #include <vtkImageData.h>
 #include <mitkImageWriter.h>
-#include "mitkDataTreeNodeFactory.h"
+#include "mitkDataNodeFactory.h"
 #include <mitkIpPicTypeMultiplex.h>
 
 

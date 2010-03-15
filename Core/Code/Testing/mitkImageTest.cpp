@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkImageDataItem.h"
 #include <fstream>
 #include <itkSmartPointerForwardReference.txx>
-#include <mitkDataTreeNodeFactory.h>
+#include <mitkDataNodeFactory.h>
 
 
 int mitkImageTest(int /*argc*/, char* /*argv*/[])
@@ -361,8 +361,8 @@ int mitkImageTest(int /*argc*/, char* /*argv*/[])
 
   // testing access by index coordinates and by world coordinates
   
-  mitk::DataTreeNode::Pointer node;      
-  mitk::DataTreeNodeFactory::Pointer nodeReader = mitk::DataTreeNodeFactory::New();
+  mitk::DataNode::Pointer node;      
+  mitk::DataNodeFactory::Pointer nodeReader = mitk::DataNodeFactory::New();
   try
   {
     nodeReader->SetFileName("C:/MITK-QT4/mitk_source3m/mitk/Core/Code/Testing/Data/brain.mhd");

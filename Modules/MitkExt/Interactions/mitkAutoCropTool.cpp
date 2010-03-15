@@ -49,7 +49,7 @@ std::string mitk::AutoCropTool::GetErrorMessage()
   return "Cropping of these nodes failed:";
 }
     
-bool mitk::AutoCropTool::ProcessOneWorkingData( DataTreeNode* node )
+bool mitk::AutoCropTool::ProcessOneWorkingData( DataNode* node )
 {
   if (node)
   {

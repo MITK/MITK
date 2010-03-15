@@ -15,7 +15,7 @@
 /// 
 /// \class QmitkDataStorageTableModel
 ///
-/// \brief A table model for a set of DataTreeNodes defined by a predicate.
+/// \brief A table model for a set of DataNodes defined by a predicate.
 /// \TODO make columns interchangeable, select which properties to show as columns
 ///
 class QMITK_EXPORT QmitkDataStorageTableModel : public QAbstractTableModel
@@ -52,7 +52,7 @@ class QMITK_EXPORT QmitkDataStorageTableModel : public QAbstractTableModel
     /// by introducing a new role like "DateTreeNode" and capture
     /// that in the data function.
     ///
-    mitk::DataTreeNode::Pointer GetNode(const QModelIndex &index) const;
+    mitk::DataNode::Pointer GetNode(const QModelIndex &index) const;
     ///
     /// Overridden from QAbstractTableModel. Returns the header data at section
     /// for given orientation and role. 
@@ -94,15 +94,15 @@ class QMITK_EXPORT QmitkDataStorageTableModel : public QAbstractTableModel
     /// 2. The node has to have a data object (no one wants to see empty nodes).
     /// Also adds event listeners to the node.
     ///
-    virtual void AddNode(const mitk::DataTreeNode* node);
+    virtual void AddNode(const mitk::DataNode* node);
     ///
     /// Removes a node from this model. Also removes any event listener from the node.
     ///
-    virtual void RemoveNode(const mitk::DataTreeNode* node);
+    virtual void RemoveNode(const mitk::DataNode* node);
     ///
     /// Returns a copy of the node-vector that is shown by this model
     ///
-    virtual std::vector<mitk::DataTreeNode*> GetNodeSet() const;
+    virtual std::vector<mitk::DataNode*> GetNodeSet() const;
     ///
     /// \brief Called when a single property was changed.
     /// The function searches through the list of nodes in this model for the changed
@@ -123,11 +123,11 @@ class QMITK_EXPORT QmitkDataStorageTableModel : public QAbstractTableModel
     //#PROTECTED INNER CLASSES
 protected:
   ///
-  /// \struct DataTreeNodeCompareFunction
+  /// \struct DataNodeCompareFunction
   /// \brief A struct that inherits from std::binary_function. You can use it in std::sort algorithm for sorting the node list elements.
   ///
-  struct DataTreeNodeCompareFunction 
-    : public std::binary_function<mitk::DataTreeNode::Pointer, mitk::DataTreeNode::Pointer, bool>
+  struct DataNodeCompareFunction 
+    : public std::binary_function<mitk::DataNode::Pointer, mitk::DataNode::Pointer, bool>
   {
     ///
     /// \brief Specifies field of the property with which it will be sorted.
@@ -149,12 +149,12 @@ protected:
     ///
     /// \brief Creates a PropertyDataSetCompareFunction. A CompareCriteria and a CompareOperator must be given.
     ///
-    DataTreeNodeCompareFunction(CompareCriteria _CompareCriteria = CompareByName, CompareOperator _CompareOperator = Less);
+    DataNodeCompareFunction(CompareCriteria _CompareCriteria = CompareByName, CompareOperator _CompareOperator = Less);
     ///
     /// \brief The reimplemented compare function.
     ///
-    bool operator()(const mitk::DataTreeNode::Pointer& _Left
-      , const mitk::DataTreeNode::Pointer& _Right) const;
+    bool operator()(const mitk::DataNode::Pointer& _Left
+      , const mitk::DataNode::Pointer& _Right) const;
 
   protected:
     CompareCriteria m_CompareCriteria;
@@ -186,7 +186,7 @@ protected:
     ///
     /// Holds all selected Nodes.
     ///
-    std::vector<mitk::DataTreeNode*> m_NodeSet;
+    std::vector<mitk::DataNode*> m_NodeSet;
     ///
     /// \brief Maps a property to an observer tag.
     ///

@@ -9,7 +9,7 @@
 /// 
 /// \class QmitkPlanarFiguresTableModel
 ///
-/// \brief A table model for a set of DataTreeNodes defined by a predicate.
+/// \brief A table model for a set of DataNodes defined by a predicate.
 /// \TODO make columns interchangeable, select which properties to show as columns
 ///
 class QmitkPlanarFiguresTableModel : public QmitkDataStorageTableModel

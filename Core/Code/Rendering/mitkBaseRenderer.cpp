@@ -171,7 +171,7 @@ m_MaxNumberOfPeels(100), m_NumberOfVisibleLODEnabledMappers(0)
 
   m_CurrentWorldGeometry2DData = mitk::Geometry2DData::New();
   m_CurrentWorldGeometry2DData->SetGeometry2D(m_CurrentWorldGeometry2D);
-  m_CurrentWorldGeometry2DNode = mitk::DataTreeNode::New();
+  m_CurrentWorldGeometry2DNode = mitk::DataNode::New();
   m_CurrentWorldGeometry2DNode->SetData(m_CurrentWorldGeometry2DData);
   m_CurrentWorldGeometry2DNode->GetPropertyList()->SetProperty("renderer", rendererProp);
   m_CurrentWorldGeometry2DNode->GetPropertyList()->SetProperty("layer", IntProperty::New(1000));
@@ -185,7 +185,7 @@ m_MaxNumberOfPeels(100), m_NumberOfVisibleLODEnabledMappers(0)
   m_DisplayGeometry->SetWorldGeometry(m_CurrentWorldGeometry2D);
   m_DisplayGeometryData = mitk::Geometry2DData::New();
   m_DisplayGeometryData->SetGeometry2D(m_DisplayGeometry);
-  m_DisplayGeometryNode = mitk::DataTreeNode::New();
+  m_DisplayGeometryNode = mitk::DataNode::New();
   m_DisplayGeometryNode->SetData(m_DisplayGeometryData);
   m_DisplayGeometryNode->GetPropertyList()->SetProperty("renderer", rendererProp);
   m_DisplayGeometryTransformTime = m_DisplayGeometryNode->GetVtkTransform()->GetMTime();

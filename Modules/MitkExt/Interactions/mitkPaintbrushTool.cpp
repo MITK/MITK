@@ -194,7 +194,7 @@ bool mitk::PaintbrushTool::OnMouseMoved   (Action* itkNotUsed(action), const Sta
     m_LastContourSize = m_Size;
   }
 
-  DataTreeNode* workingNode( m_ToolManager->GetWorkingData(0) );
+  DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
   if (!workingNode) return false;
 
   Image* image = dynamic_cast<Image*>(workingNode->GetData());

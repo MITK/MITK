@@ -119,7 +119,7 @@ public:
     /**
     * @brief Check if the Writer can write the Content of the 
     */
-    virtual bool CanWriteDataType( DataTreeNode* );
+    virtual bool CanWriteDataType( DataNode* );
 
     /**
     * @brief Return the MimeType of the saved File.
@@ -129,7 +129,7 @@ public:
     /**
     * @brief Set the DataTreenode as Input. Important: The Writer always have a SetInput-Function.
     */
-    virtual void SetInput( DataTreeNode* );
+    virtual void SetInput( DataNode* );
 
     /**
      * @returns whether the last write attempt was successful or not.

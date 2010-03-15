@@ -260,13 +260,13 @@ protected:
   mitk::SlicesRotator::Pointer m_SlicesRotator;
   mitk::SlicesSwiveller::Pointer m_SlicesSwiveller;
 
-  mitk::DataTreeNode::Pointer m_PositionTrackerNode;
+  mitk::DataNode::Pointer m_PositionTrackerNode;
   mitk::DataStorage::Pointer m_DataStorage;
 
-  mitk::DataTreeNode::Pointer m_PlaneNode1;
-  mitk::DataTreeNode::Pointer m_PlaneNode2;
-  mitk::DataTreeNode::Pointer m_PlaneNode3;
-  mitk::DataTreeNode::Pointer m_Node;
+  mitk::DataNode::Pointer m_PlaneNode1;
+  mitk::DataNode::Pointer m_PlaneNode2;
+  mitk::DataNode::Pointer m_PlaneNode3;
+  mitk::DataNode::Pointer m_Node;
 
   QSplitter *m_MainSplit;
   QSplitter *m_LayoutSplit;

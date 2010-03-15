@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef QmitkSegmentationView_h
 #define QmitkSegmentationView_h
 
-#include "mitkDataTreeNodeSelection.h"
+#include "mitkDataNodeSelection.h"
 #include "mitkSegmentationSelectionProvider.h"
 
 #include "QmitkFunctionality.h"
@@ -79,8 +79,8 @@ class QmitkSegmentationView : public QObject, public QmitkFunctionality
 
   protected:
     
-    // a type for handling lists of DataTreeNodes
-    typedef std::vector<mitk::DataTreeNode*> NodeList;
+    // a type for handling lists of DataNodes
+    typedef std::vector<mitk::DataNode*> NodeList;
     
     // set available multiwidget
     void SetMultiWidget(QmitkStdMultiWidget* multiWidget);
@@ -90,14 +90,14 @@ class QmitkSegmentationView : public QObject, public QmitkFunctionality
 
     // reactions to selection events from data manager (and potential other senders)
     void BlueBerrySelectionChanged(berry::IWorkbenchPart::Pointer sourcepart, berry::ISelection::ConstPointer selection);
-    mitk::DataTreeNode::Pointer FindFirstRegularImage( mitk::DataTreeNodeSelection::ConstPointer selection );
-    mitk::DataTreeNode::Pointer FindFirstSegmentation( mitk::DataTreeNodeSelection::ConstPointer selection );
+    mitk::DataNode::Pointer FindFirstRegularImage( mitk::DataNodeSelection::ConstPointer selection );
+    mitk::DataNode::Pointer FindFirstSegmentation( mitk::DataNodeSelection::ConstPointer selection );
 
     // propagate BlueBerry selection to ToolManager for manual segmentation
-    void SetToolManagerSelection(const mitk::DataTreeNode* referenceData, const mitk::DataTreeNode* workingData);
+    void SetToolManagerSelection(const mitk::DataNode* referenceData, const mitk::DataNode* workingData);
     
     // sending of selection events to data manager (an potential other observers)
-    void SendSelectedEvent( mitk::DataTreeNode* referenceNode, mitk::DataTreeNode* workingNode );
+    void SendSelectedEvent( mitk::DataNode* referenceNode, mitk::DataNode* workingNode );
 
     // checks if selected reference image is aligned with the slices stack orientation of the StdMultiWidget
     void CheckImageAlignment();
@@ -108,8 +108,8 @@ class QmitkSegmentationView : public QObject, public QmitkFunctionality
     // make sure all images/segmentations look as selected by the users in this view's preferences
     void ForceDisplayPreferencesUponAllImages();
 
-    // decorates a DataTreeNode according to the user preference settings
-    void ApplyDisplayOptions(mitk::DataTreeNode* node);
+    // decorates a DataNode according to the user preference settings
+    void ApplyDisplayOptions(mitk::DataNode* node);
     
     // GUI setup
     void CreateQtPartControl(QWidget* parent);

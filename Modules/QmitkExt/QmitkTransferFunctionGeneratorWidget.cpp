@@ -433,7 +433,7 @@ QmitkTransferFunctionGeneratorWidget::~QmitkTransferFunctionGeneratorWidget()
 }
 
 
-void QmitkTransferFunctionGeneratorWidget::SetDataTreeNode(mitk::DataTreeNode* node)
+void QmitkTransferFunctionGeneratorWidget::SetDataNode(mitk::DataNode* node)
 {
   histoGramm = NULL;
 
@@ -445,7 +445,7 @@ void QmitkTransferFunctionGeneratorWidget::SetDataTreeNode(mitk::DataTreeNode* n
     {
       if (! dynamic_cast<mitk::Image*>(node->GetData()))
       {
-        MITK_WARN << "QmitkTransferFunctionGeneratorWidget::SetDataTreeNode called with non-image node";
+        MITK_WARN << "QmitkTransferFunctionGeneratorWidget::SetDataNode called with non-image node";
         return;
       }
       

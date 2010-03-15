@@ -37,7 +37,7 @@ class MITK_CORE_EXPORT AffineInteractor : public Interactor
 public:
   mitkClassMacro(AffineInteractor,Interactor);
 //  itkNewMacro(Self);
-  mitkNewMacro2Param(Self, const char*, DataTreeNode*);
+  mitkNewMacro2Param(Self, const char*, DataNode*);
 
 protected:
 //  AffineInteractor(); //obsolete
@@ -47,7 +47,7 @@ protected:
   //##
   //## @param dataTreeNode is the node, this Interactor is connected to
   //## @param type is the type of StateMachine like declared in the XML-Configure-File
-  AffineInteractor(const char * type, DataTreeNode* dataTreeNode);
+  AffineInteractor(const char * type, DataNode* dataTreeNode);
 
   //##Documentation
   //## @brief Destructor

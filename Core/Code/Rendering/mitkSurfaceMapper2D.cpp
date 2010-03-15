@@ -96,9 +96,9 @@ const mitk::Surface *mitk::SurfaceMapper2D::GetInput(void)
   return static_cast<const Surface * > ( GetData() );
 }
 
-void mitk::SurfaceMapper2D::SetDataTreeNode( mitk::DataTreeNode::Pointer node )
+void mitk::SurfaceMapper2D::SetDataNode( mitk::DataNode::Pointer node )
 {
-  Superclass::SetDataTreeNode( node );
+  Superclass::SetDataNode( node );
 
   bool useCellData;
   if (dynamic_cast<BoolProperty *>(node->GetProperty("deprecated useCellDataForColouring")) == NULL)
@@ -112,7 +112,7 @@ void mitk::SurfaceMapper2D::SetDataTreeNode( mitk::DataTreeNode::Pointer node )
     vtkFloatingPointType dataRange[2] = {0,0};
     vtkFloatingPointType range[2];
 
-    Surface::Pointer input  = const_cast< Surface* >(dynamic_cast<const Surface*>( this->GetDataTreeNode()->GetData() ));
+    Surface::Pointer input  = const_cast< Surface* >(dynamic_cast<const Surface*>( this->GetDataNode()->GetData() ));
     if(input.IsNull()) return;
     const TimeSlicedGeometry::Pointer inputTimeGeometry = input->GetTimeSlicedGeometry();
     if(( inputTimeGeometry.IsNull() ) || ( inputTimeGeometry->GetTimeSteps() == 0 ) ) return;
@@ -157,10 +157,10 @@ void mitk::SurfaceMapper2D::Paint(mitk::BaseRenderer * renderer)
   if(( inputTimeGeometry == NULL ) || ( inputTimeGeometry->GetTimeSteps() == 0 ) )
     return;
 
-  if (dynamic_cast<IntProperty *>(this->GetDataTreeNode()->GetProperty("line width")) == NULL)
+  if (dynamic_cast<IntProperty *>(this->GetDataNode()->GetProperty("line width")) == NULL)
     m_LineWidth = 1;
   else
-    m_LineWidth = dynamic_cast<IntProperty *>(this->GetDataTreeNode()->GetProperty("line width"))->GetValue();
+    m_LineWidth = dynamic_cast<IntProperty *>(this->GetDataNode()->GetProperty("line width"))->GetValue();
 
   //
   // get the world time
@@ -206,15 +206,15 @@ void mitk::SurfaceMapper2D::Paint(mitk::BaseRenderer * renderer)
     vtkLookupTable *lut;// = vtkLookupTable::New();
 
     LookupTableProperty::Pointer lookupTableProp;
-    this->GetDataTreeNode()->GetProperty(lookupTableProp, "LookupTable", renderer);
+    this->GetDataNode()->GetProperty(lookupTableProp, "LookupTable", renderer);
     if (lookupTableProp.IsNotNull() )
     {
       lut = lookupTableProp->GetLookupTable()->GetVtkLookupTable();
 
-      if (dynamic_cast<FloatProperty *>(this->GetDataTreeNode()->GetProperty("ScalarsRangeMinimum")) != NULL)        
-        scalarsMin = dynamic_cast<FloatProperty*>(this->GetDataTreeNode()->GetProperty("ScalarsRangeMinimum"))->GetValue();
-      if (dynamic_cast<FloatProperty *>(this->GetDataTreeNode()->GetProperty("ScalarsRangeMaximum")) != NULL)
-        scalarsMax = dynamic_cast<FloatProperty*>(this->GetDataTreeNode()->GetProperty("ScalarsRangeMaximum"))->GetValue();
+      if (dynamic_cast<FloatProperty *>(this->GetDataNode()->GetProperty("ScalarsRangeMinimum")) != NULL)        
+        scalarsMin = dynamic_cast<FloatProperty*>(this->GetDataNode()->GetProperty("ScalarsRangeMinimum"))->GetValue();
+      if (dynamic_cast<FloatProperty *>(this->GetDataNode()->GetProperty("ScalarsRangeMaximum")) != NULL)
+        scalarsMax = dynamic_cast<FloatProperty*>(this->GetDataNode()->GetProperty("ScalarsRangeMaximum"))->GetValue();
 
       // check if the scalar range has been changed, e.g. manually, for the data tree node, and rebuild the LUT if necessary.
       double* oldRange = lut->GetTableRange();
@@ -229,7 +229,7 @@ void mitk::SurfaceMapper2D::Paint(mitk::BaseRenderer * renderer)
       lut = m_LUT; 
     }
 
-    vtkLinearTransform * vtktransform = GetDataTreeNode()->GetVtkTransform(timestep);
+    vtkLinearTransform * vtktransform = GetDataNode()->GetVtkTransform(timestep);
     if(worldPlaneGeometry.IsNotNull())
     {
       // set up vtkPlane according to worldGeometry
@@ -304,15 +304,15 @@ void mitk::SurfaceMapper2D::PaintCells(mitk::BaseRenderer* renderer, vtkPolyData
   bool usePointData = false;
 
   bool useCellData = false;
-  this->GetDataTreeNode()->GetBoolProperty("deprecated useCellDataForColouring", useCellData);
+  this->GetDataNode()->GetBoolProperty("deprecated useCellDataForColouring", useCellData);
 
   bool scalarVisibility = false;
-  this->GetDataTreeNode()->GetBoolProperty("scalar visibility", scalarVisibility);
+  this->GetDataNode()->GetBoolProperty("scalar visibility", scalarVisibility);
 
   if(scalarVisibility)
   {
     VtkScalarModeProperty* scalarMode;
-    if(this->GetDataTreeNode()->GetProperty(scalarMode, "scalar mode", renderer))
+    if(this->GetDataNode()->GetProperty(scalarMode, "scalar mode", renderer))
     {
       if( (scalarMode->GetVtkScalarMode() == VTK_SCALAR_MODE_USE_POINT_DATA) ||
         (scalarMode->GetVtkScalarMode() == VTK_SCALAR_MODE_DEFAULT) )
@@ -475,7 +475,7 @@ void mitk::SurfaceMapper2D::PaintCells(mitk::BaseRenderer* renderer, vtkPolyData
   glLineWidth(1.0);
 }
 
-void mitk::SurfaceMapper2D::SetDefaultProperties(mitk::DataTreeNode* node, mitk::BaseRenderer* renderer, bool overwrite)
+void mitk::SurfaceMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite)
 {
   node->AddProperty( "line width", IntProperty::New(2), renderer, overwrite );
   node->AddProperty( "scalar mode", VtkScalarModeProperty::New(), renderer, overwrite );
@@ -493,14 +493,14 @@ void mitk::SurfaceMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
 {
   Superclass::ApplyProperties(renderer);
 
-  GetDataTreeNode()->GetBoolProperty("draw normals 2D", m_DrawNormals, renderer);
+  GetDataNode()->GetBoolProperty("draw normals 2D", m_DrawNormals, renderer);
    
   // check for color and opacity properties, use it for rendering if they exists
   GetColor(m_LineColor, renderer /*, "color" */); 
   GetOpacity(m_LineColor[3], renderer /*, "color" */);
   
   bool invertNormals(false);
-  if (DataTreeNode* node = GetDataTreeNode())
+  if (DataNode* node = GetDataNode())
   {
     node->GetBoolProperty("invert normals", invertNormals, renderer);
   }
@@ -513,7 +513,7 @@ void mitk::SurfaceMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
     GetColor(m_BackSideColor, renderer, "back color");
     GetOpacity(m_BackSideColor[3], renderer);
     
-    if (DataTreeNode* node = GetDataTreeNode())
+    if (DataNode* node = GetDataNode())
     {
       node->GetFloatProperty( "front normal lenth (px)", m_FrontNormalLengthInPixels, renderer );
       node->GetFloatProperty( "back normal lenth (px)", m_BackNormalLengthInPixels, renderer );
@@ -527,7 +527,7 @@ void mitk::SurfaceMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
     GetColor(m_BackSideColor, renderer, "front color");
     GetOpacity(m_BackSideColor[3], renderer);
     
-    if (DataTreeNode* node = GetDataTreeNode())
+    if (DataNode* node = GetDataNode())
     {
       node->GetFloatProperty( "back normal lenth (px)", m_FrontNormalLengthInPixels, renderer );
       node->GetFloatProperty( "front normal lenth (px)", m_BackNormalLengthInPixels, renderer );

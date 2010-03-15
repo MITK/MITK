@@ -23,7 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <berryISelectionService.h>
 #include <berryIWorkbenchWindow.h>
 //#include <berryISelectionService.h>
-#include <mitkDataTreeNodeObject.h>
+#include <mitkDataNodeObject.h>
 
 #include <mitkProperties.h>
 #include <mitkNodePredicateDataType.h>
@@ -76,17 +76,17 @@ void QmitkVolumeVisualizationView::CreateQtPartControl(QWidget* parent)
 }
 
 
-void QmitkVolumeVisualizationView::OnSelectionChanged( std::vector<mitk::DataTreeNode*> nodes )
+void QmitkVolumeVisualizationView::OnSelectionChanged( std::vector<mitk::DataNode*> nodes )
 { 
   bool weHadAnImageButItsNotThreeDeeOrFourDee = false;
 
-  mitk::DataTreeNode::Pointer node;
+  mitk::DataNode::Pointer node;
 
-  for (std::vector<mitk::DataTreeNode*>::iterator iter = nodes.begin();
+  for (std::vector<mitk::DataNode*>::iterator iter = nodes.begin();
        iter != nodes.end();
        ++iter)
   {
-    mitk::DataTreeNode::Pointer currentNode = *iter;
+    mitk::DataNode::Pointer currentNode = *iter;
   
     if( currentNode.IsNotNull() && dynamic_cast<mitk::Image*>(currentNode->GetData()) )
     {
@@ -153,8 +153,8 @@ void QmitkVolumeVisualizationView::UpdateInterface()
     m_Controls->m_EnableLOD->setChecked(false);
     m_Controls->m_EnableLOD->setEnabled(false);
     m_Controls->m_EnableGPU->setEnabled(false);
-    m_Controls->m_TransferFunctionWidget->SetDataTreeNode(0);
-    m_Controls->m_TransferFunctionGeneratorWidget->SetDataTreeNode(0);
+    m_Controls->m_TransferFunctionWidget->SetDataNode(0);
+    m_Controls->m_TransferFunctionGeneratorWidget->SetDataNode(0);
     m_Controls->m_TransferFunctionWidget->setEnabled(false);
     m_Controls->m_TransferFunctionGeneratorWidget->setEnabled(false);
     return;
@@ -172,8 +172,8 @@ void QmitkVolumeVisualizationView::UpdateInterface()
     m_Controls->m_EnableLOD->setChecked(false);
     m_Controls->m_EnableLOD->setEnabled(false);
     m_Controls->m_EnableGPU->setEnabled(false);
-    m_Controls->m_TransferFunctionWidget->SetDataTreeNode(0);
-    m_Controls->m_TransferFunctionGeneratorWidget->SetDataTreeNode(0);
+    m_Controls->m_TransferFunctionWidget->SetDataNode(0);
+    m_Controls->m_TransferFunctionGeneratorWidget->SetDataNode(0);
     m_Controls->m_TransferFunctionWidget->setEnabled(false);
     m_Controls->m_TransferFunctionGeneratorWidget->setEnabled(false);
     return;
@@ -190,9 +190,9 @@ void QmitkVolumeVisualizationView::UpdateInterface()
   m_Controls->m_EnableGPU->setEnabled(true);
   m_Controls->m_EnableGPU->setChecked(enabled);
 
-  m_Controls->m_TransferFunctionWidget->SetDataTreeNode(m_SelectedNode);
+  m_Controls->m_TransferFunctionWidget->SetDataNode(m_SelectedNode);
   m_Controls->m_TransferFunctionWidget->setEnabled(true);
-  m_Controls->m_TransferFunctionGeneratorWidget->SetDataTreeNode(m_SelectedNode);
+  m_Controls->m_TransferFunctionGeneratorWidget->SetDataNode(m_SelectedNode);
   m_Controls->m_TransferFunctionGeneratorWidget->setEnabled(true);
 }
 

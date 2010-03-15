@@ -17,7 +17,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkMapper.h"
-#include "mitkDataTreeNode.h"
+#include "mitkDataNode.h"
 #include "mitkBaseRenderer.h"
 #include "mitkProperties.h"
 
@@ -34,19 +34,19 @@ mitk::Mapper::~Mapper()
 
 mitk::BaseData* mitk::Mapper::GetData() const
 {
-  return m_DataTreeNode->GetData();
+  return m_DataNode->GetData();
 }
 
-mitk::DataTreeNode* mitk::Mapper::GetDataTreeNode() const
+mitk::DataNode* mitk::Mapper::GetDataNode() const
 {
-  itkDebugMacro("returning DataTreeNode address " << this->m_DataTreeNode );
-  return this->m_DataTreeNode.GetPointer();
+  itkDebugMacro("returning DataNode address " << this->m_DataNode );
+  return this->m_DataNode.GetPointer();
 }
 
 
 bool mitk::Mapper::GetColor(float rgb[3], mitk::BaseRenderer* renderer, const char* name) const
 {
-    const mitk::DataTreeNode* node=GetDataTreeNode();
+    const mitk::DataNode* node=GetDataNode();
     if(node==NULL)
         return false;
 
@@ -55,7 +55,7 @@ bool mitk::Mapper::GetColor(float rgb[3], mitk::BaseRenderer* renderer, const ch
 
 bool mitk::Mapper::GetVisibility(bool &visible, mitk::BaseRenderer* renderer, const char* name) const
 {
-    const mitk::DataTreeNode* node=GetDataTreeNode();
+    const mitk::DataNode* node=GetDataNode();
     if(node==NULL)
         return false;
 
@@ -64,7 +64,7 @@ bool mitk::Mapper::GetVisibility(bool &visible, mitk::BaseRenderer* renderer, co
 
 bool mitk::Mapper::GetOpacity(float &opacity, mitk::BaseRenderer* renderer, const char* name) const
 {
-    const mitk::DataTreeNode* node=GetDataTreeNode();
+    const mitk::DataNode* node=GetDataNode();
     if(node==NULL)
         return false;
 
@@ -73,7 +73,7 @@ bool mitk::Mapper::GetOpacity(float &opacity, mitk::BaseRenderer* renderer, cons
 
 bool mitk::Mapper::GetLevelWindow(mitk::LevelWindow& levelWindow, mitk::BaseRenderer* renderer, const char* name) const
 {
-    const mitk::DataTreeNode* node=GetDataTreeNode();
+    const mitk::DataNode* node=GetDataNode();
     if(node==NULL)
         return false;
 
@@ -97,9 +97,9 @@ void mitk::Mapper::GenerateData(mitk::BaseRenderer* /*renderer*/)
 
 void mitk::Mapper::CalculateTimeStep( mitk::BaseRenderer *renderer )
 {
-  if ( ( renderer != NULL ) && ( m_DataTreeNode.GetPointer() != NULL ) )
+  if ( ( renderer != NULL ) && ( m_DataNode.GetPointer() != NULL ) )
   {
-    m_TimeStep = renderer->GetTimeStep(m_DataTreeNode->GetData());
+    m_TimeStep = renderer->GetTimeStep(m_DataNode->GetData());
   }
   else
   {
@@ -109,7 +109,7 @@ void mitk::Mapper::CalculateTimeStep( mitk::BaseRenderer *renderer )
 
 void mitk::Mapper::Update(mitk::BaseRenderer *renderer)
 {
-  const DataTreeNode* node = GetDataTreeNode();
+  const DataNode* node = GetDataNode();
   assert(node!=NULL);
 
   this->CalculateTimeStep( renderer );
@@ -144,7 +144,7 @@ void mitk::Mapper::Update(mitk::BaseRenderer *renderer)
   this->GenerateData(renderer);
 }
 
-void mitk::Mapper::SetDefaultProperties(mitk::DataTreeNode* node, mitk::BaseRenderer* renderer, bool overwrite)
+void mitk::Mapper::SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite)
 {
   node->AddProperty( "visible", mitk::BoolProperty::New(true), renderer, overwrite );
   node->AddProperty( "layer", mitk::IntProperty::New(0), renderer, overwrite);

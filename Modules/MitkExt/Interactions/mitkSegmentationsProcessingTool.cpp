@@ -57,7 +57,7 @@ void mitk::SegmentationsProcessingTool::ProcessAllObjects()
         nodeiter != nodes.end();
         ++nodeiter )
   {
-    DataTreeNode::Pointer node = *nodeiter;
+    DataNode::Pointer node = *nodeiter;
     
     if ( !ProcessOneWorkingData(node) )
     {
@@ -86,7 +86,7 @@ void mitk::SegmentationsProcessingTool::StartProcessingAllData()
 {
 }
 
-bool mitk::SegmentationsProcessingTool::ProcessOneWorkingData( DataTreeNode* )
+bool mitk::SegmentationsProcessingTool::ProcessOneWorkingData( DataNode* )
 {
   return true;
 }

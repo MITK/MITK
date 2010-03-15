@@ -193,7 +193,7 @@ void mitk::ImageWriter::GenerateData()
   m_MimeType = "application/MITK.Pic";
 }
 
-bool mitk::ImageWriter::CanWriteDataType( DataTreeNode* input )
+bool mitk::ImageWriter::CanWriteDataType( DataNode* input )
 {
   if ( input )
   {
@@ -212,7 +212,7 @@ bool mitk::ImageWriter::CanWriteDataType( DataTreeNode* input )
   return false;
 }
 
-void mitk::ImageWriter::SetInput( DataTreeNode* input )
+void mitk::ImageWriter::SetInput( DataNode* input )
 {
   if( input && CanWriteDataType( input ) )
     this->ProcessObject::SetNthInput( 0, dynamic_cast<mitk::Image*>( input->GetData() ) );

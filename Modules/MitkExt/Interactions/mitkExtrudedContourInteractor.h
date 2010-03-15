@@ -23,7 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkInteractor.h>
 #include <mitkVector.h>
 #include <mitkContour.h>
-#include <mitkDataTreeNode.h>
+#include <mitkDataNode.h>
 
 namespace mitk {
 
@@ -34,13 +34,13 @@ namespace mitk {
   {
   public:
     mitkClassMacro(ExtrudedContourInteractor, Interactor);
-    mitkNewMacro2Param(Self, const char*, DataTreeNode*);
+    mitkNewMacro2Param(Self, const char*, DataNode*);
 
     itkGetObjectMacro(Contour, mitk::Contour);
-    itkGetObjectMacro(ContourNode, mitk::DataTreeNode);
+    itkGetObjectMacro(ContourNode, mitk::DataNode);
 
   protected:
-    ExtrudedContourInteractor(const char * type, DataTreeNode* dataTreeNode);
+    ExtrudedContourInteractor(const char * type, DataNode* dataTreeNode);
     virtual ~ExtrudedContourInteractor();
 
     virtual bool ExecuteAction(Action* action, mitk::StateEvent const* stateEvent);
@@ -66,7 +66,7 @@ namespace mitk {
     bool m_Started;
 
     mitk::Contour::Pointer m_Contour;
-    mitk::DataTreeNode::Pointer m_ContourNode;
+    mitk::DataNode::Pointer m_ContourNode;
   };
 
 }

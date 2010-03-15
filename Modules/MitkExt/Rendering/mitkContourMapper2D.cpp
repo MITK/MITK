@@ -53,7 +53,7 @@ void mitk::ContourMapper2D::Paint(mitk::BaseRenderer * renderer)
     //apply color and opacity read from the PropertyList
     ApplyProperties(renderer);
 
-    vtkLinearTransform* transform = GetDataTreeNode()->GetVtkTransform();
+    vtkLinearTransform* transform = GetDataNode()->GetVtkTransform();
 
     //    Contour::OutputType point;
     Contour::BoundingBoxType::PointType point;
@@ -62,8 +62,8 @@ void mitk::ContourMapper2D::Paint(mitk::BaseRenderer * renderer)
     float vtkp[3];
     float lineWidth = 3.0;
 
-    if (dynamic_cast<mitk::FloatProperty *>(this->GetDataTreeNode()->GetProperty("Width")) != NULL)
-      lineWidth = dynamic_cast<mitk::FloatProperty*>(this->GetDataTreeNode()->GetProperty("Width"))->GetValue();
+    if (dynamic_cast<mitk::FloatProperty *>(this->GetDataNode()->GetProperty("Width")) != NULL)
+      lineWidth = dynamic_cast<mitk::FloatProperty*>(this->GetDataNode()->GetProperty("Width"))->GetValue();
     glLineWidth(lineWidth);
 
     if (input->GetClosed())
@@ -96,7 +96,7 @@ void mitk::ContourMapper2D::Paint(mitk::BaseRenderer * renderer)
 
       displayGeometry->Project(p, projected_p);
       bool projectmode=false;
-      GetDataTreeNode()->GetVisibility(projectmode, renderer, "project");
+      GetDataNode()->GetVisibility(projectmode, renderer, "project");
       bool drawit=false;
       if(projectmode)
         drawit=true;

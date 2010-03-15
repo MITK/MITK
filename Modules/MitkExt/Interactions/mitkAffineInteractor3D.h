@@ -30,7 +30,7 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk
 {
 
-class DataTreeNode;
+class DataNode;
 
 /**
   * \brief Affine interaction with objects in 3D windows.
@@ -45,8 +45,8 @@ public:
   enum { INTERACTION_MODE_TRANSLATION, INTERACTION_MODE_ROTATION };
 
   mitkClassMacro(AffineInteractor3D, Interactor);
-  mitkNewMacro3Param(Self, const char *, DataTreeNode *, int);
-  mitkNewMacro2Param(Self, const char *, DataTreeNode *);
+  mitkNewMacro3Param(Self, const char *, DataNode *, int);
+  mitkNewMacro2Param(Self, const char *, DataNode *);
 
 
   void SetInteractionMode( unsigned int interactionMode );
@@ -73,7 +73,7 @@ protected:
     * if no n is set, then the number of points is unlimited*
     */
   AffineInteractor3D(const char *type, 
-    DataTreeNode *dataTreeNode, int n = -1);
+    DataNode *dataTreeNode, int n = -1);
 
   /**
     * \brief Default Destructor

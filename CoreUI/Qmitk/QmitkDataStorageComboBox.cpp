@@ -33,10 +33,10 @@ QmitkDataStorageComboBox::~QmitkDataStorageComboBox()
   if(m_DataStorage.IsNotNull())
   {
     this->m_DataStorage->AddNodeEvent.RemoveListener( mitk::MessageDelegate1<QmitkDataStorageComboBox
-      , const mitk::DataTreeNode*>( this, &QmitkDataStorageComboBox::AddNode ) );
+      , const mitk::DataNode*>( this, &QmitkDataStorageComboBox::AddNode ) );
 
     this->m_DataStorage->RemoveNodeEvent.RemoveListener( mitk::MessageDelegate1<QmitkDataStorageComboBox
-      , const mitk::DataTreeNode*>( this, &QmitkDataStorageComboBox::RemoveNode ) );
+      , const mitk::DataNode*>( this, &QmitkDataStorageComboBox::RemoveNode ) );
   }
   //we have lots of observers to nodes and their name properties, this get's ugly if nodes live longer than the box
   while(m_Nodes.size() > 0)
@@ -54,12 +54,12 @@ const mitk::NodePredicateBase::ConstPointer QmitkDataStorageComboBox::GetPredica
   return m_Predicate.GetPointer();
 }
 
-mitk::DataTreeNode::Pointer QmitkDataStorageComboBox::GetNode( int index ) const
+mitk::DataNode::Pointer QmitkDataStorageComboBox::GetNode( int index ) const
 {
   return (this->HasIndex(index))? m_Nodes.at(index): 0;
 }
 
-mitk::DataTreeNode::Pointer QmitkDataStorageComboBox::GetSelectedNode() const
+mitk::DataNode::Pointer QmitkDataStorageComboBox::GetSelectedNode() const
 {
   int _CurrentIndex = this->currentIndex();
   return (_CurrentIndex >= 0)? this->GetNode(_CurrentIndex): 0;
@@ -69,7 +69,7 @@ mitk::DataStorage::SetOfObjects::ConstPointer QmitkDataStorageComboBox::GetNodes
 {
   mitk::DataStorage::SetOfObjects::Pointer _SetOfObjects = mitk::DataStorage::SetOfObjects::New();
 
-  for (std::vector<mitk::DataTreeNode*>::const_iterator it = m_Nodes.begin(); it != m_Nodes.end(); ++it)
+  for (std::vector<mitk::DataNode*>::const_iterator it = m_Nodes.begin(); it != m_Nodes.end(); ++it)
   {
     _SetOfObjects->push_back(*it);
   }
@@ -92,10 +92,10 @@ void QmitkDataStorageComboBox::SetDataStorage(mitk::DataStorage* _DataStorage)
     if(m_DataStorage.IsNotNull())
     {
       this->m_DataStorage->AddNodeEvent.RemoveListener( mitk::MessageDelegate1<QmitkDataStorageComboBox
-        , const mitk::DataTreeNode*>( this, &QmitkDataStorageComboBox::AddNode ) );
+        , const mitk::DataNode*>( this, &QmitkDataStorageComboBox::AddNode ) );
 
       this->m_DataStorage->RemoveNodeEvent.RemoveListener( mitk::MessageDelegate1<QmitkDataStorageComboBox
-        , const mitk::DataTreeNode*>( this, &QmitkDataStorageComboBox::RemoveNode ) );
+        , const mitk::DataNode*>( this, &QmitkDataStorageComboBox::RemoveNode ) );
     }
     // set new storage
     m_DataStorage = _DataStorage;
@@ -104,10 +104,10 @@ void QmitkDataStorageComboBox::SetDataStorage(mitk::DataStorage* _DataStorage)
     if(m_DataStorage.IsNotNull())
     {
       this->m_DataStorage->AddNodeEvent.AddListener( mitk::MessageDelegate1<QmitkDataStorageComboBox
-        , const mitk::DataTreeNode*>( this, &QmitkDataStorageComboBox::AddNode ) );
+        , const mitk::DataNode*>( this, &QmitkDataStorageComboBox::AddNode ) );
 
       this->m_DataStorage->RemoveNodeEvent.AddListener( mitk::MessageDelegate1<QmitkDataStorageComboBox
-        , const mitk::DataTreeNode*>( this, &QmitkDataStorageComboBox::RemoveNode ) );
+        , const mitk::DataNode*>( this, &QmitkDataStorageComboBox::RemoveNode ) );
     }
 
     // reset predicate to reset the combobox
@@ -124,14 +124,14 @@ void QmitkDataStorageComboBox::SetPredicate(const mitk::NodePredicateBase* _Pred
   }  
 }
 
-void QmitkDataStorageComboBox::AddNode( const mitk::DataTreeNode* _DataTreeNode )
+void QmitkDataStorageComboBox::AddNode( const mitk::DataNode* _DataNode )
 {  
   // this is an event function, make sure that we didnt call ourself
   if(!m_BlockEvents)
   {
     m_BlockEvents = true;
     // pass a -1 to the InsertNode function in order to append the datatreenode to the end
-    this->InsertNode(-1, _DataTreeNode);
+    this->InsertNode(-1, _DataNode);
     m_BlockEvents = false;
   }
 }
@@ -141,18 +141,18 @@ void QmitkDataStorageComboBox::RemoveNode( int index )
   if(this->HasIndex(index))
   {
     //# remove itk::Event observer
-    mitk::DataTreeNode* _DataTreeNode = m_Nodes.at(index);
+    mitk::DataNode* _DataNode = m_Nodes.at(index);
     // get name property first
-    mitk::BaseProperty* nameProperty = _DataTreeNode->GetProperty("name");
+    mitk::BaseProperty* nameProperty = _DataNode->GetProperty("name");
     // if prop exists remove modified listener
     if(nameProperty)
     {
       nameProperty->RemoveObserver(m_NodesModifiedObserverTags[index]);
       // remove name property map
-      m_PropertyToNode.erase(_DataTreeNode);
+      m_PropertyToNode.erase(_DataNode);
     }
     // then remove delete listener on the node itself
-    _DataTreeNode->RemoveObserver(m_NodesDeleteObserverTags[index]);
+    _DataNode->RemoveObserver(m_NodesDeleteObserverTags[index]);
     // remove observer tags from lists
     m_NodesModifiedObserverTags.erase(m_NodesModifiedObserverTags.begin()+index);
     m_NodesDeleteObserverTags.erase(m_NodesDeleteObserverTags.begin()+index);
@@ -163,28 +163,28 @@ void QmitkDataStorageComboBox::RemoveNode( int index )
   }
 }
 
-void QmitkDataStorageComboBox::RemoveNode( const mitk::DataTreeNode* _DataTreeNode )
+void QmitkDataStorageComboBox::RemoveNode( const mitk::DataNode* _DataNode )
 {
   // this is an event function, make sure that we didnt call ourself
   if(!m_BlockEvents)
   {
     m_BlockEvents = true;
-    this->RemoveNode( this->Find(_DataTreeNode) );
+    this->RemoveNode( this->Find(_DataNode) );
     m_BlockEvents = false;
   }
 }
 
-void QmitkDataStorageComboBox::SetNode(int index, const mitk::DataTreeNode* _DataTreeNode)
+void QmitkDataStorageComboBox::SetNode(int index, const mitk::DataNode* _DataNode)
 {
   if(this->HasIndex(index))
   {
-    this->InsertNode(index, _DataTreeNode);
+    this->InsertNode(index, _DataNode);
   }
 }
     
-void QmitkDataStorageComboBox::SetNode( const mitk::DataTreeNode* _DataTreeNode, const mitk::DataTreeNode* _OtherDataTreeNode)
+void QmitkDataStorageComboBox::SetNode( const mitk::DataNode* _DataNode, const mitk::DataNode* _OtherDataNode)
 {
-  this->SetNode( this->Find(_DataTreeNode), _OtherDataTreeNode);
+  this->SetNode( this->Find(_DataNode), _OtherDataNode);
 }
 
 void QmitkDataStorageComboBox::SetAutoSelectNewItems( bool _AutoSelectNewItems )
@@ -192,7 +192,7 @@ void QmitkDataStorageComboBox::SetAutoSelectNewItems( bool _AutoSelectNewItems )
   m_AutoSelectNewNodes = _AutoSelectNewItems;
 }
 
-void QmitkDataStorageComboBox::OnDataTreeNodeDeleteOrModified(const itk::Object *caller, const itk::EventObject &event)
+void QmitkDataStorageComboBox::OnDataNodeDeleteOrModified(const itk::Object *caller, const itk::EventObject &event)
 {  
   if(!m_BlockEvents)
   {
@@ -208,7 +208,7 @@ void QmitkDataStorageComboBox::OnDataTreeNodeDeleteOrModified(const itk::Object 
 
       // node name changed, set it
       // but first of all find associated node
-      for(std::map<mitk::DataTreeNode*, const mitk::BaseProperty*>::iterator it=m_PropertyToNode.begin()
+      for(std::map<mitk::DataNode*, const mitk::BaseProperty*>::iterator it=m_PropertyToNode.begin()
         ; it!=m_PropertyToNode.end()
         ; ++it)
       {
@@ -223,17 +223,17 @@ void QmitkDataStorageComboBox::OnDataTreeNodeDeleteOrModified(const itk::Object 
     }
     else
     {
-      const mitk::DataTreeNode* _ConstDataTreeNode = dynamic_cast<const mitk::DataTreeNode*>(caller);
-      if(_ConstDataTreeNode)
+      const mitk::DataNode* _ConstDataNode = dynamic_cast<const mitk::DataNode*>(caller);
+      if(_ConstDataNode)
         // node will be deleted, remove it
-        this->RemoveNode(_ConstDataTreeNode);
+        this->RemoveNode(_ConstDataNode);
     }
 
     m_BlockEvents = false;
   }
 }
 
-void QmitkDataStorageComboBox::SetSelectedNode(mitk::DataTreeNode::Pointer item)
+void QmitkDataStorageComboBox::SetSelectedNode(mitk::DataNode::Pointer item)
 {
   int index = this->Find(item);
   if (index == -1)
@@ -253,12 +253,12 @@ bool QmitkDataStorageComboBox::HasIndex(unsigned int index) const
   return (m_Nodes.size() > 0 && index < m_Nodes.size());
 }
 
-int QmitkDataStorageComboBox::Find( const mitk::DataTreeNode* _DataTreeNode ) const
+int QmitkDataStorageComboBox::Find( const mitk::DataNode* _DataNode ) const
 {
   int index = -1;
 
-  std::vector<mitk::DataTreeNode*>::const_iterator nodeIt = 
-    std::find(m_Nodes.begin(), m_Nodes.end(), _DataTreeNode);
+  std::vector<mitk::DataNode*>::const_iterator nodeIt = 
+    std::find(m_Nodes.begin(), m_Nodes.end(), _DataNode);
 
   if(nodeIt != m_Nodes.end())
     index = std::distance(m_Nodes.begin(), nodeIt);
@@ -275,10 +275,10 @@ void QmitkDataStorageComboBox::OnCurrentIndexChanged(int index)
     emit OnSelectionChanged(NULL);
 }
 
-void QmitkDataStorageComboBox::InsertNode(int index, const mitk::DataTreeNode* _DataTreeNode)
+void QmitkDataStorageComboBox::InsertNode(int index, const mitk::DataNode* _DataNode)
 {
   // check new or updated node first
-  if(m_Predicate.IsNotNull() && !m_Predicate->CheckNode(_DataTreeNode))
+  if(m_Predicate.IsNotNull() && !m_Predicate->CheckNode(_DataNode))
     return;
 
   bool addNewNode = false;
@@ -289,7 +289,7 @@ void QmitkDataStorageComboBox::InsertNode(int index, const mitk::DataTreeNode* _
   if(this->HasIndex(index))
   {
     // if we really have another node at this position then ...
-    if(_DataTreeNode != m_Nodes.at(index))
+    if(_DataNode != m_Nodes.at(index))
     {
       // ... remove node, then proceed as usual
       this->RemoveNode(index);
@@ -306,24 +306,24 @@ void QmitkDataStorageComboBox::InsertNode(int index, const mitk::DataTreeNode* _
   }
 
   // const cast because we need non const nodes
-  mitk::DataTreeNode* _NonConstDataTreeNode = const_cast<mitk::DataTreeNode*>(_DataTreeNode);
-  mitk::BaseProperty* nameProperty = _NonConstDataTreeNode->GetProperty("name");
+  mitk::DataNode* _NonConstDataNode = const_cast<mitk::DataNode*>(_DataNode);
+  mitk::BaseProperty* nameProperty = _NonConstDataNode->GetProperty("name");
 
   if(!changedNode)
   {
     // break on duplicated nodes (that doesnt make sense to have duplicates in the combobox)
-    if(this->Find(_DataTreeNode) != -1)
+    if(this->Find(_DataNode) != -1)
       return;
 
     // add modified observer
     itk::MemberCommand<QmitkDataStorageComboBox>::Pointer modifiedCommand = itk::MemberCommand<QmitkDataStorageComboBox>::New();
-    modifiedCommand->SetCallbackFunction(this, &QmitkDataStorageComboBox::OnDataTreeNodeDeleteOrModified);
+    modifiedCommand->SetCallbackFunction(this, &QmitkDataStorageComboBox::OnDataNodeDeleteOrModified);
     // !!!! add modified observer for the name 
     /// property of the node because this is the only thing we are interested in !!!!!
     if(nameProperty)
     {
       m_NodesModifiedObserverTags.push_back( nameProperty->AddObserver(itk::ModifiedEvent(), modifiedCommand) );
-      m_PropertyToNode[_NonConstDataTreeNode] = nameProperty;
+      m_PropertyToNode[_NonConstDataNode] = nameProperty;
     }
     // if there is no name node save an invalid value for the observer tag (-1)
     else
@@ -331,25 +331,25 @@ void QmitkDataStorageComboBox::InsertNode(int index, const mitk::DataTreeNode* _
     
     // add delete observer
     itk::MemberCommand<QmitkDataStorageComboBox>::Pointer deleteCommand = itk::MemberCommand<QmitkDataStorageComboBox>::New();
-    deleteCommand->SetCallbackFunction(this, &QmitkDataStorageComboBox::OnDataTreeNodeDeleteOrModified);
-    m_NodesDeleteObserverTags.push_back( _NonConstDataTreeNode->AddObserver(itk::DeleteEvent(), modifiedCommand) );
+    deleteCommand->SetCallbackFunction(this, &QmitkDataStorageComboBox::OnDataNodeDeleteOrModified);
+    m_NodesDeleteObserverTags.push_back( _NonConstDataNode->AddObserver(itk::DeleteEvent(), modifiedCommand) );
   }
 
   // add node to the vector
   if(addNewNode)
-    m_Nodes.push_back( _NonConstDataTreeNode );
+    m_Nodes.push_back( _NonConstDataNode );
   else if(insertNewNode)
-    m_Nodes.insert( m_Nodes.begin()+index, _NonConstDataTreeNode );
+    m_Nodes.insert( m_Nodes.begin()+index, _NonConstDataNode );
 
   // ... and to the combobox
-  std::string _NonConstDataTreeNodeName = "unnamed node";
-  // _NonConstDataTreeNodeName is "unnamed node" so far, change it if there is a name property in the node
+  std::string _NonConstDataNodeName = "unnamed node";
+  // _NonConstDataNodeName is "unnamed node" so far, change it if there is a name property in the node
   if(nameProperty)
-    _NonConstDataTreeNodeName = nameProperty->GetValueAsString();
+    _NonConstDataNodeName = nameProperty->GetValueAsString();
 
   if(addNewNode)
   {
-    this->addItem(QString::fromStdString(_NonConstDataTreeNodeName));
+    this->addItem(QString::fromStdString(_NonConstDataNodeName));
     // select new node if m_AutoSelectNewNodes is true or if we have just added the first node
     if(m_AutoSelectNewNodes || m_Nodes.size() == 1)
       this->setCurrentIndex(index);
@@ -357,7 +357,7 @@ void QmitkDataStorageComboBox::InsertNode(int index, const mitk::DataTreeNode* _
   else
   {
     // update text in combobox
-    this->setItemText( index, QString::fromStdString(_NonConstDataTreeNodeName));
+    this->setItemText( index, QString::fromStdString(_NonConstDataNodeName));
   }  
 }
 
@@ -390,7 +390,7 @@ void QmitkDataStorageComboBox::Reset()
 
     // add all found nodes
     for (mitk::DataStorage::SetOfObjects::ConstIterator nodeIt = setOfObjects->Begin()
-      ; nodeIt != setOfObjects->End(); ++nodeIt)  // for each _DataTreeNode
+      ; nodeIt != setOfObjects->End(); ++nodeIt)  // for each _DataNode
     {
       // add node to the node vector and to the combobox
       this->AddNode( nodeIt.Value().GetPointer() );

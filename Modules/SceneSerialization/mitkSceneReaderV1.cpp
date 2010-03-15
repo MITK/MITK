@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkSceneReaderV1.h"
 #include "mitkSerializerMacros.h"
-#include "mitkDataTreeNodeFactory.h"
+#include "mitkDataNodeFactory.h"
 #include "mitkBaseRenderer.h"
 #include "mitkPropertyListDeserializer.h"
 #include "Poco/Path.h"
@@ -41,7 +41,7 @@ bool mitk::SceneReaderV1::LoadScene( TiXmlDocument& document, const std::string&
     //        - try to instantiate this deserializer via itk object factory
     //        - if deserializer could be created, use it to read the file into a BaseData object
     //        - if successful, call the new node's SetData(..)
-    DataTreeNode::Pointer node = LoadBaseDataFromDataTag( element->FirstChildElement("data"), workingDirectory, error );
+    DataNode::Pointer node = LoadBaseDataFromDataTag( element->FirstChildElement("data"), workingDirectory, error );
    
     //   2. check child nodes
     const char* uida = element->Attribute("UID");
@@ -96,7 +96,7 @@ bool mitk::SceneReaderV1::LoadScene( TiXmlDocument& document, const std::string&
       if (m_NodeForID.find( *parentsIter ) == m_NodeForID.end())
       {
         parentsIter = nodesIter->second.erase( parentsIter );
-        MITK_WARN << "Found a DataTreeNode with unknown parents. Will add it to DataStorage without any parent objects.";
+        MITK_WARN << "Found a DataNode with unknown parents. Will add it to DataStorage without any parent objects.";
         error = true;
       }
       else
@@ -165,16 +165,16 @@ bool mitk::SceneReaderV1::LoadScene( TiXmlDocument& document, const std::string&
   return !error;
 }
 
-mitk::DataTreeNode::Pointer mitk::SceneReaderV1::LoadBaseDataFromDataTag( TiXmlElement* dataElement, const std::string& workingDirectory, bool& error )
+mitk::DataNode::Pointer mitk::SceneReaderV1::LoadBaseDataFromDataTag( TiXmlElement* dataElement, const std::string& workingDirectory, bool& error )
 {
-  DataTreeNode::Pointer node;
+  DataNode::Pointer node;
 
   if (dataElement) 
   {
     const char* filename( dataElement->Attribute("file") );
     if ( filename )
     {
-      DataTreeNodeFactory::Pointer factory = DataTreeNodeFactory::New();
+      DataNodeFactory::Pointer factory = DataNodeFactory::New();
       factory->SetFileName( workingDirectory + Poco::Path::separator() + filename );
       
       try
@@ -199,13 +199,13 @@ mitk::DataTreeNode::Pointer mitk::SceneReaderV1::LoadBaseDataFromDataTag( TiXmlE
   // in case there was no <data> element we create a new empty node (for appending a propertylist later)
   if (node.IsNull())
   {
-    node = DataTreeNode::New();
+    node = DataNode::New();
   }
 
   return node;
 }
 
-bool mitk::SceneReaderV1::DecorateNodeWithProperties(DataTreeNode* node, TiXmlElement* nodeElement, const std::string& workingDirectory)
+bool mitk::SceneReaderV1::DecorateNodeWithProperties(DataNode* node, TiXmlElement* nodeElement, const std::string& workingDirectory)
 {
   assert(node);
   assert(nodeElement);
@@ -222,8 +222,8 @@ bool mitk::SceneReaderV1::DecorateNodeWithProperties(DataTreeNode* node, TiXmlEl
     BaseRenderer* renderer = BaseRenderer::GetByName( renderwindow );
     if (renderer || renderwindow.empty())
     {
-      PropertyList::Pointer propertyList = node->GetPropertyList(renderer); // DataTreeNode implementation always returns a propertylist
-      // clear all properties from node that might be set by DataTreeNodeFactory during loading 
+      PropertyList::Pointer propertyList = node->GetPropertyList(renderer); // DataNode implementation always returns a propertylist
+      // clear all properties from node that might be set by DataNodeFactory during loading 
       propertyList->Clear();
 
       // use deserializer to construct new properties

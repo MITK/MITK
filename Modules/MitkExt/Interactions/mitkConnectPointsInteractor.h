@@ -26,7 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk
 {
-  class DataTreeNode;
+  class DataNode;
   //##Documentation
   //## @brief Interaction for mitk::Mesh: Connect existing points to lines
   //## @ingroup Interaction
@@ -34,8 +34,8 @@ namespace mitk
   {
   public:
     mitkClassMacro(ConnectPointsInteractor, Interactor);
-    mitkNewMacro3Param(Self, const char*, DataTreeNode*, int);
-    mitkNewMacro2Param(Self, const char*, DataTreeNode*);
+    mitkNewMacro3Param(Self, const char*, DataNode*, int);
+    mitkNewMacro2Param(Self, const char*, DataNode*);
 
     //##Documentation
     //## @brief Sets the amount of precision
@@ -53,7 +53,7 @@ namespace mitk
     //##@brief Constructor with Param n for limited Set of Points
     //##
     //## if no n is set, then the number of points is unlimited*
-    ConnectPointsInteractor(const char * type, DataTreeNode* dataTreeNode, int n = -1);
+    ConnectPointsInteractor(const char * type, DataNode* dataTreeNode, int n = -1);
 
     virtual ~ConnectPointsInteractor();
 

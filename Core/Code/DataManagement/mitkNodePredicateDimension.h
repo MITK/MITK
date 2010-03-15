@@ -25,7 +25,7 @@ namespace mitk {
  class BaseData;
 
   //##Documentation
-  //## @brief Predicate that evaluates if the given DataTreeNodes data object 
+  //## @brief Predicate that evaluates if the given DataNodes data object 
   //## has the specified dimension, for datasets where dimension is 
   //## applicable.
   //##
@@ -44,7 +44,7 @@ namespace mitk {
 
     //##Documentation
     //## @brief Checks if the nodes data object is of the specified dimension
-    virtual bool CheckNode(const mitk::DataTreeNode* node) const;
+    virtual bool CheckNode(const mitk::DataNode* node) const;
 
   protected:
 

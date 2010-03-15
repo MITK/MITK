@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkPlaneGeometry.h"
 #include "mitkImage.h"
 #include "mitkTimeSlicedGeometry.h"
-#include "mitkDataTreeNode.h"
+#include "mitkDataNode.h"
 #include "mitkGeometryData.h"
 #include "mitkGeometry2DData.h"
 #include "mitkProperties.h"
@@ -172,7 +172,7 @@ mitk::GeometryDataSource::DataObjectPointer mitk::PointSetToCurvedGeometryFilter
 }
 
 
-void mitk::PointSetToCurvedGeometryFilter::SetDefaultCurvedGeometryProperties ( mitk::DataTreeNode* node )
+void mitk::PointSetToCurvedGeometryFilter::SetDefaultCurvedGeometryProperties ( mitk::DataNode* node )
 {
   if ( node == NULL )
   {

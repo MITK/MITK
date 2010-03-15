@@ -166,7 +166,7 @@ const mitk::UnstructuredGrid* mitk::UnstructuredGridVtkWriter<VTKWRITER>::GetInp
 }
 
 template <class VTKWRITER>
-bool mitk::UnstructuredGridVtkWriter<VTKWRITER>::CanWriteDataType( DataTreeNode* input )
+bool mitk::UnstructuredGridVtkWriter<VTKWRITER>::CanWriteDataType( DataNode* input )
 {
   if ( input )
   {
@@ -185,7 +185,7 @@ bool mitk::UnstructuredGridVtkWriter<VTKWRITER>::CanWriteDataType( DataTreeNode*
 }
 
 template <class VTKWRITER>
-void mitk::UnstructuredGridVtkWriter<VTKWRITER>::SetInput( DataTreeNode* input )
+void mitk::UnstructuredGridVtkWriter<VTKWRITER>::SetInput( DataNode* input )
 {
   if( input && CanWriteDataType( input ) )
    SetInput( dynamic_cast<mitk::UnstructuredGrid*>( input->GetData() ) );

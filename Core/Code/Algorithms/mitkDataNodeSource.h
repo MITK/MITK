@@ -20,29 +20,29 @@ PURPOSE.  See the above copyright notices for more information.
 #define _MITK_DATA_TREE_NODE_SOURCE_H
 
 #include "itkProcessObject.h"
-#include "mitkDataTreeNode.h"
+#include "mitkDataNode.h"
 
 namespace mitk
 {
 /**
  * @brief Superclass of all classes generating data tree nodes (instances of class
- * mitk::DataTreeNode) as output. 
+ * mitk::DataNode) as output. 
  *
  * In itk and vtk the generated result of a ProcessObject is only guaranteed
  * to be up-to-date, when Update() of the ProcessObject or the generated
  * DataObject is called immediately before access of the data stored in the
  * DataObject. This is also true for subclasses of mitk::BaseProcess and thus
- * for mitk::DataTreeNodeSource.
+ * for mitk::DataNodeSource.
  * @ingroup Process
  */
-  class MITK_CORE_EXPORT DataTreeNodeSource : public itk::ProcessObject
+  class MITK_CORE_EXPORT DataNodeSource : public itk::ProcessObject
 {
 public:
-    mitkClassMacro( DataTreeNodeSource, itk::ProcessObject );
+    mitkClassMacro( DataNodeSource, itk::ProcessObject );
 
     itkNewMacro( Self );
 
-    typedef mitk::DataTreeNode OutputType;
+    typedef mitk::DataNode OutputType;
 
     typedef OutputType::Pointer OutputTypePointer;
     
@@ -81,9 +81,9 @@ public:
     
 protected:
 
-    DataTreeNodeSource();
+    DataNodeSource();
     
-    virtual ~DataTreeNodeSource();
+    virtual ~DataNodeSource();
 
 };
 

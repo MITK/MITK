@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkPositionEvent.h>
 #include <mitkOperationEvent.h>
 //#include "mitkStatusBar.h"
-#include <mitkDataTreeNode.h>
+#include <mitkDataNode.h>
 #include <mitkPointSet.h>
 #include <mitkInteractionConst.h>
 #include <mitkAction.h>
@@ -32,7 +32,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkState.h>
 
 
-mitk::PointInteractor::PointInteractor(const char * type, DataTreeNode* dataTreeNode)
+mitk::PointInteractor::PointInteractor(const char * type, DataNode* dataTreeNode)
 : Interactor(type, dataTreeNode), m_LastPosition(0)
 {
   m_LastPoint.Fill(0);
@@ -43,7 +43,7 @@ mitk::PointInteractor::~PointInteractor()
 
 void mitk::PointInteractor::SelectPoint(int position)
 {
-  mitk::PointSet* pointSet = dynamic_cast<mitk::PointSet*>(m_DataTreeNode->GetData());
+  mitk::PointSet* pointSet = dynamic_cast<mitk::PointSet*>(m_DataNode->GetData());
   if (pointSet == NULL)
     return;
   if (pointSet->GetSize()<=0)//if List is empty, then no select of a point can be done!
@@ -63,7 +63,7 @@ void mitk::PointInteractor::SelectPoint(int position)
 
 void mitk::PointInteractor::DeselectAllPoints()
 {
-  mitk::PointSet* pointSet = dynamic_cast<mitk::PointSet*>(m_DataTreeNode->GetData());
+  mitk::PointSet* pointSet = dynamic_cast<mitk::PointSet*>(m_DataNode->GetData());
   if (pointSet == NULL)
     return;
 
@@ -127,7 +127,7 @@ float mitk::PointInteractor::CalculateJurisdiction(StateEvent const* stateEvent)
   }
 
   //check on the right data-type
-  mitk::PointSet* pointSet = dynamic_cast<mitk::PointSet*>(m_DataTreeNode->GetData());
+  mitk::PointSet* pointSet = dynamic_cast<mitk::PointSet*>(m_DataNode->GetData());
   if (pointSet == NULL)
     return 0;
 
@@ -138,7 +138,7 @@ float mitk::PointInteractor::CalculateJurisdiction(StateEvent const* stateEvent)
   float p[3];
   itk2vtk(worldPoint, p);
   //transforming the Worldposition to local coordinatesystem
-  m_DataTreeNode->GetData()->GetGeometry()->GetVtkTransform()->GetInverse()->TransformPoint(p, p);
+  m_DataNode->GetData()->GetGeometry()->GetVtkTransform()->GetInverse()->TransformPoint(p, p);
   vtk2itk(p, worldPoint);
 
   float distance = 5;
@@ -177,7 +177,7 @@ bool mitk::PointInteractor::ExecuteAction( Action* action, mitk::StateEvent cons
   bool ok = false;//for return type bool
   
   //checking corresponding Data; has to be a PointSet or a subclass
-  mitk::PointSet* pointSet = dynamic_cast<mitk::PointSet*>(m_DataTreeNode->GetData());
+  mitk::PointSet* pointSet = dynamic_cast<mitk::PointSet*>(m_DataNode->GetData());
   if (pointSet == NULL)
     return false;
 
@@ -361,7 +361,7 @@ bool mitk::PointInteractor::ExecuteAction( Action* action, mitk::StateEvent cons
     PointOperation* doOp = new mitk::PointOperation(OpMOVE, newPoint, m_LastPosition);
     //execute the Operation
     //here no undo is stored. only the start and the end is stored for undo.
-    m_DataTreeNode->GetData()->ExecuteOperation(doOp);
+    m_DataNode->GetData()->ExecuteOperation(doOp);
     ok = true;
     break;
  }
@@ -381,11 +381,11 @@ bool mitk::PointInteractor::ExecuteAction( Action* action, mitk::StateEvent cons
     if ( m_UndoEnabled )
     {
       PointOperation* undoOp = new mitk::PointOperation(OpMOVE, m_LastPoint, m_LastPosition);
-      OperationEvent *operationEvent = new OperationEvent( m_DataTreeNode->GetData(), doOp, undoOp, "Move point");
+      OperationEvent *operationEvent = new OperationEvent( m_DataNode->GetData(), doOp, undoOp, "Move point");
       m_UndoController->SetOperationEvent(operationEvent);
     }
     //execute the Operation
-    m_DataTreeNode->GetData()->ExecuteOperation(doOp);
+    m_DataNode->GetData()->ExecuteOperation(doOp);
 
   //  //increase the GroupEventId, so that the raw-Undo goes to here
     //this->IncCurrGroupEventId();

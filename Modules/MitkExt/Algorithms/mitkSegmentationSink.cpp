@@ -36,7 +36,7 @@ void SegmentationSink::Initialize(const NonBlockingAlgorithm* other)
   UnDefineTriggerParameter("Input");
 
   // some basedata output
-  DataTreeNode::Pointer groupNode;
+  DataNode::Pointer groupNode;
   bool showResult(true);
 
   if (other)
@@ -54,7 +54,7 @@ bool SegmentationSink::ReadyToRun()
   Image::Pointer image;
   GetPointerParameter("Input", image);
 
-  DataTreeNode::Pointer groupNode;
+  DataNode::Pointer groupNode;
   GetPointerParameter("Group node", groupNode);
 
   return image.IsNotNull() && groupNode.IsNotNull();
@@ -66,9 +66,9 @@ bool SegmentationSink::ThreadedUpdateFunction()
 }
 
 /// to be called by subclasses when they want to insert some resulting object (binary image, surface, ...) into the data tree
-void SegmentationSink::InsertBelowGroupNode(mitk::DataTreeNode* node)
+void SegmentationSink::InsertBelowGroupNode(mitk::DataNode* node)
 {
-  DataTreeNode* groupNode = GetGroupNode();
+  DataNode* groupNode = GetGroupNode();
 
   if (m_DataStorage.IsNotNull())
   {
@@ -80,17 +80,17 @@ void SegmentationSink::InsertBelowGroupNode(mitk::DataTreeNode* node)
   RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-DataTreeNode* SegmentationSink::GetGroupNode()
+DataNode* SegmentationSink::GetGroupNode()
 {
-  DataTreeNode::Pointer groupNode;
+  DataNode::Pointer groupNode;
   GetPointerParameter("Group node", groupNode);
 
   return groupNode.GetPointer();
 }
     
-DataTreeNode* SegmentationSink::LookForPointerTargetBelowGroupNode(const char* name)
+DataNode* SegmentationSink::LookForPointerTargetBelowGroupNode(const char* name)
 {
-  DataTreeNode::Pointer groupNode;
+  DataNode::Pointer groupNode;
   GetPointerParameter("Group node", groupNode);
 
   if (groupNode.IsNotNull() && m_DataStorage.IsNotNull())

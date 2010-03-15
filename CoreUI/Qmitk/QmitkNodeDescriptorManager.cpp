@@ -62,9 +62,9 @@ void QmitkNodeDescriptorManager::RemoveDescriptor( QmitkNodeDescriptor* _Descrip
   
 }
 
-QmitkNodeDescriptor* QmitkNodeDescriptorManager::GetDescriptor( const mitk::DataTreeNode* _Node ) const
+QmitkNodeDescriptor* QmitkNodeDescriptorManager::GetDescriptor( const mitk::DataNode* _Node ) const
 {
-  QmitkNodeDescriptor* _Descriptor = m_UnknownDataTreeNodeDescriptor;
+  QmitkNodeDescriptor* _Descriptor = m_UnknownDataNodeDescriptor;
 
   for(QList<QmitkNodeDescriptor*>::const_iterator it = m_NodeDescriptors.begin(); it != m_NodeDescriptors.end(); ++it)
   {
@@ -87,11 +87,11 @@ QmitkNodeDescriptor* QmitkNodeDescriptorManager::GetDescriptor( const QString& _
 
   return _Descriptor;
 }
-QList<QAction*> QmitkNodeDescriptorManager::GetActions( const mitk::DataTreeNode* _Node ) const
+QList<QAction*> QmitkNodeDescriptorManager::GetActions( const mitk::DataNode* _Node ) const
 {
-  QList<QAction*> actions = m_UnknownDataTreeNodeDescriptor->GetBatchActions();
-  actions.append(m_UnknownDataTreeNodeDescriptor->GetActions());
-  QmitkNodeDescriptor* lastDescriptor = m_UnknownDataTreeNodeDescriptor;
+  QList<QAction*> actions = m_UnknownDataNodeDescriptor->GetBatchActions();
+  actions.append(m_UnknownDataNodeDescriptor->GetActions());
+  QmitkNodeDescriptor* lastDescriptor = m_UnknownDataNodeDescriptor;
 
   for(QList<QmitkNodeDescriptor*>::const_iterator it = m_NodeDescriptors.begin(); it != m_NodeDescriptors.end(); ++it)
   {
@@ -107,14 +107,14 @@ QList<QAction*> QmitkNodeDescriptorManager::GetActions( const mitk::DataTreeNode
   return actions;
 }
 
-QList<QAction*> QmitkNodeDescriptorManager::GetActions( const std::vector<mitk::DataTreeNode*>& _Nodes ) const
+QList<QAction*> QmitkNodeDescriptorManager::GetActions( const std::vector<mitk::DataNode*>& _Nodes ) const
 {
-  QList<QAction*> actions = m_UnknownDataTreeNodeDescriptor->GetBatchActions();
+  QList<QAction*> actions = m_UnknownDataNodeDescriptor->GetBatchActions();
   std::vector<QmitkNodeDescriptor*> nodeDescriptors;
   QmitkNodeDescriptor* lastDescriptor;
 
   // find all descriptors for the nodes (unique)
-  for( std::vector<mitk::DataTreeNode*>::const_iterator it = _Nodes.begin()
+  for( std::vector<mitk::DataNode*>::const_iterator it = _Nodes.begin()
     ; it != _Nodes.end(); ++it)
   {
     lastDescriptor = this->GetDescriptor(*it);
@@ -122,7 +122,7 @@ QList<QAction*> QmitkNodeDescriptorManager::GetActions( const std::vector<mitk::
       nodeDescriptors.push_back(lastDescriptor);
   }
   // add all actions for the found descriptors
-  lastDescriptor = m_UnknownDataTreeNodeDescriptor;
+  lastDescriptor = m_UnknownDataNodeDescriptor;
   for( std::vector<QmitkNodeDescriptor*>::const_iterator it = nodeDescriptors.begin()
     ; it != nodeDescriptors.end(); ++it)
   {
@@ -135,18 +135,18 @@ QList<QAction*> QmitkNodeDescriptorManager::GetActions( const std::vector<mitk::
 }
 
 QmitkNodeDescriptorManager::QmitkNodeDescriptorManager()
-: m_UnknownDataTreeNodeDescriptor(new QmitkNodeDescriptor("Unknown", QString(":/Qmitk/DataTypeUnknown_48.png"), 0, this))
+: m_UnknownDataNodeDescriptor(new QmitkNodeDescriptor("Unknown", QString(":/Qmitk/DataTypeUnknown_48.png"), 0, this))
 {
   this->Initialize();
 }
 
 QmitkNodeDescriptorManager::~QmitkNodeDescriptorManager()
 {
-  //delete m_UnknownDataTreeNodeDescriptor;
+  //delete m_UnknownDataNodeDescriptor;
   //qDeleteAll(m_NodeDescriptors);
 }
 
-QmitkNodeDescriptor* QmitkNodeDescriptorManager::GetUnknownDataTreeNodeDescriptor() const
+QmitkNodeDescriptor* QmitkNodeDescriptorManager::GetUnknownDataNodeDescriptor() const
 {
-  return m_UnknownDataTreeNodeDescriptor;
+  return m_UnknownDataNodeDescriptor;
 }

@@ -17,7 +17,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkSurfaceToImageFilter.h"
-#include "mitkDataTreeNodeFactory.h"
+#include "mitkDataNodeFactory.h"
 #include "mitkPicFileWriter.h"
 
 #include <vtkPolyData.h>
@@ -46,7 +46,7 @@ int mitkSurfaceToImageFilterTest(int argc, char* argv[])
     return EXIT_FAILURE;
   }
   mitk::Surface::Pointer surface = NULL;
-  mitk::DataTreeNodeFactory::Pointer factory = mitk::DataTreeNodeFactory::New();
+  mitk::DataNodeFactory::Pointer factory = mitk::DataNodeFactory::New();
   try
   {
     std::cout<<argv[1]<<std::endl;
@@ -58,7 +58,7 @@ int mitkSurfaceToImageFilterTest(int argc, char* argv[])
       std::cout<<"file could not be loaded [FAILED]"<<std::endl;
       return EXIT_FAILURE;
     }
-    mitk::DataTreeNode::Pointer node = factory->GetOutput( 0 );
+    mitk::DataNode::Pointer node = factory->GetOutput( 0 );
     surface = dynamic_cast<mitk::Surface*>(node->GetData());
     if(surface.IsNull())
     {

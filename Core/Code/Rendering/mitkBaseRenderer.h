@@ -265,14 +265,14 @@ public:
   itkGetObjectMacro(WorldGeometryData, Geometry2DData);
 
   //##Documentation
-  //## @brief Get a DataTreeNode pointing to a data object containing the WorldGeometry (3D and 2D rendering)
-  itkGetObjectMacro(WorldGeometryNode, DataTreeNode);
+  //## @brief Get a DataNode pointing to a data object containing the WorldGeometry (3D and 2D rendering)
+  itkGetObjectMacro(WorldGeometryNode, DataNode);
   //##Documentation
-  //## @brief Get a DataTreeNode pointing to a data object containing the DisplayGeometry (for 2D rendering)
-  itkGetObjectMacro(DisplayGeometryNode, DataTreeNode);
+  //## @brief Get a DataNode pointing to a data object containing the DisplayGeometry (for 2D rendering)
+  itkGetObjectMacro(DisplayGeometryNode, DataNode);
   //##Documentation
-  //## @brief Get a DataTreeNode pointing to a data object containing the current 2D-worldgeometry m_CurrentWorldGeometry2D (for 2D rendering)
-  itkGetObjectMacro(CurrentWorldGeometry2DNode, DataTreeNode);
+  //## @brief Get a DataNode pointing to a data object containing the current 2D-worldgeometry m_CurrentWorldGeometry2D (for 2D rendering)
+  itkGetObjectMacro(CurrentWorldGeometry2DNode, DataNode);
 
   //##Documentation
   //## @brief Sets timestamp of CurrentWorldGeometry2D and DisplayGeometry and forces so reslicing in that renderwindow
@@ -297,12 +297,12 @@ public:
   //## m_DisplayGeometry
   virtual void PickWorldPoint(const Point2D& diplayPosition, Point3D& worldPosition) const;
 
-  /** \brief Determines the object (mitk::DataTreeNode) closest to the current
+  /** \brief Determines the object (mitk::DataNode) closest to the current
    * position by means of picking
    *
    * \warning Implementation currently empty for 2D rendering; intended to be
    * implemented for 3D renderers */
-  virtual DataTreeNode* PickObject( const Point2D& /*displayPosition*/, Point3D& /*worldPosition*/ ) const { return NULL; };
+  virtual DataNode* PickObject( const Point2D& /*displayPosition*/, Point3D& /*worldPosition*/ ) const { return NULL; };
 
   //##Documentation
   //## @brief Get the MapperSlotId to use.
@@ -518,14 +518,14 @@ protected:
   Geometry2DData::Pointer m_CurrentWorldGeometry2DData;
 
   //##Documentation
-  //## DataTreeNode objects containing the m_WorldGeometryData defined above.
-  DataTreeNode::Pointer m_WorldGeometryNode;
+  //## DataNode objects containing the m_WorldGeometryData defined above.
+  DataNode::Pointer m_WorldGeometryNode;
   //##Documentation
-  //## DataTreeNode objects containing the m_DisplayGeometryData defined above.
-  DataTreeNode::Pointer m_DisplayGeometryNode;
+  //## DataNode objects containing the m_DisplayGeometryData defined above.
+  DataNode::Pointer m_DisplayGeometryNode;
   //##Documentation
-  //## DataTreeNode objects containing the m_CurrentWorldGeometry2DData defined above.
-  DataTreeNode::Pointer m_CurrentWorldGeometry2DNode;
+  //## DataNode objects containing the m_CurrentWorldGeometry2DData defined above.
+  DataNode::Pointer m_CurrentWorldGeometry2DNode;
 
   //##Documentation
   //## @brief test only

@@ -84,11 +84,11 @@ namespace mitk {
     }
 #endif
 
-    void SetDataTreeNode(DataTreeNode* node)
+    void SetDataNode(DataNode* node)
     {
-      m_DataTreeNode = node;
-      m_ImgMapper->SetDataTreeNode(node);
-      m_OdfMapper->SetDataTreeNode(node);
+      m_DataNode = node;
+      m_ImgMapper->SetDataNode(node);
+      m_OdfMapper->SetDataNode(node);
     }
 
     bool IsVtkBased() const
@@ -107,7 +107,7 @@ namespace mitk {
       m_OdfMapper->ReleaseGraphicsResources(window);
     }
 
-    static void SetDefaultProperties(DataTreeNode* node, BaseRenderer* renderer = NULL, bool overwrite = false )
+    static void SetDefaultProperties(DataNode* node, BaseRenderer* renderer = NULL, bool overwrite = false )
     {
       mitk::OdfVtkMapper2D<float,QBALL_ODFSIZE>::SetDefaultProperties(node, renderer, overwrite);
       mitk::CopyImageMapper2D::SetDefaultProperties(node, renderer, overwrite);

@@ -37,9 +37,9 @@ class XMLWriter;
  * This list is meant to hold an arbitrary list of "properties", 
  * which should describe the object associated with this list.
  *
- * Usually you will use PropertyList as part of a DataTreeNode 
+ * Usually you will use PropertyList as part of a DataNode 
  * object - in this context the properties describe the data object
- * held by the DataTreeNode (e.g. whether the object is rendered at
+ * held by the DataNode (e.g. whether the object is rendered at
  * all, which color is used for rendering, what name should be
  * displayed for the object, etc.)
  *
@@ -104,7 +104,7 @@ class MITK_CORE_EXPORT PropertyList : public itk::Object
      *
      * The actual OBJECT holding the value of the property is replaced by this function.
      * This is useful if you want to change the type of the property, like from BoolProperty to StringProperty.
-     * Another use is to share one and the same property object among several ProperyList/DataTreeNode objects, which
+     * Another use is to share one and the same property object among several ProperyList/DataNode objects, which
      * makes them appear synchronized.
      */
     void ReplaceProperty(const std::string& propertyKey, BaseProperty* property);

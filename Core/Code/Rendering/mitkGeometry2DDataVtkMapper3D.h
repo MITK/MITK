@@ -107,7 +107,7 @@ protected:
 
   typedef std::multimap< int, vtkActor * > LayerSortedActorList;
 
-  void ProcessNode( DataTreeNode * node, BaseRenderer* renderer, Surface * surface, LayerSortedActorList &layerSortedActors );
+  void ProcessNode( DataNode * node, BaseRenderer* renderer, Surface * surface, LayerSortedActorList &layerSortedActors );
 
   /*
    * \brief Construct an extended lookup table from the given one.

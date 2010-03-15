@@ -294,7 +294,7 @@ RenderingManager
 }
 
 
-//bool RenderingManager::InitializeViews( const mitk::DataStorage * storage, const DataTreeNode* node = NULL, RequestType type, bool preserveRoughOrientationInWorldSpace )
+//bool RenderingManager::InitializeViews( const mitk::DataStorage * storage, const DataNode* node = NULL, RequestType type, bool preserveRoughOrientationInWorldSpace )
 //{
 //  mitk::Geometry3D::Pointer geometry;
 //  if ( storage != NULL )
@@ -510,7 +510,7 @@ RenderingManager
   return true;
 }
 
-//bool RenderingManager::InitializeView( vtkRenderWindow * renderWindow, const DataStorage* ds, const DataTreeNode node = NULL,  bool initializeGlobalTimeSNC )
+//bool RenderingManager::InitializeView( vtkRenderWindow * renderWindow, const DataStorage* ds, const DataNode node = NULL,  bool initializeGlobalTimeSNC )
 //{
 //  mitk::Geometry3D::Pointer geometry;
 //  if ( ds != NULL )

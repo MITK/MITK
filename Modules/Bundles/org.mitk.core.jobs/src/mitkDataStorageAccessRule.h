@@ -21,7 +21,7 @@
 #include "berryISchedulingRule.h"
 #include "berryObject.h"
 #include "mitkJobsDll.h"
-#include "mitkDataTreeNode.h"
+#include "mitkDataNode.h"
 #include "mitkDataStorage.h"
 #include "mitkStandaloneDataStorage.h"
 
@@ -37,8 +37,8 @@ namespace mitk {
   * <p> <h2>the IsScheduling(...) method :</h2>
   * returns true or false depending if conflictions with another rule are found 
   * <ul>
-  *   <li><a href="#AddRules">rule behavior if two jobs holing  add rules of an DataTreeNode</a></li>
-  *   <li><a href="#RemoveRules">rule behavior if two jobs holding remove rules of a DataTreeNode </a></li>
+  *   <li><a href="#AddRules">rule behavior if two jobs holing  add rules of an DataNode</a></li>
+  *   <li><a href="#RemoveRules">rule behavior if two jobs holding remove rules of a DataNode </a></li>
   *   <li><a href="#RemoveAddRules">rule behavior of a jobs that is holding an add rule compared with a job that is holding a remove      
   * rule on a DataTree node </a></li>
   * </ul>
@@ -51,7 +51,7 @@ namespace mitk {
   * to be checked by the programmer of the particular job 
   * <img src="../pics/TwoAddRules.png">
   *
-  * <a name"RemoveRules"> <h3>the rule behavior when two jobs holding remove rules of a DataTreeNode</h3></a>
+  * <a name"RemoveRules"> <h3>the rule behavior when two jobs holding remove rules of a DataNode</h3></a>
   *
   * two jobs holding remove rules can be executed concurrently since all removing scenarios do not cause conflictions. If two jobs are     
   * trying to remove the same DataTree node the job by itself needs to check  if the node is still available before executing the removing   
@@ -59,11 +59,11 @@ namespace mitk {
   * <img src="../pics/TwoRemoveRules.png">
   * 
   * <a name"RemoveAddRules"><h3>the rule behavior of a jobs that is holding an add rule compared with a job that is holding a remove rule on a    
-  * DataTreeNode</h3>
+  * DataNode</h3>
   *  
   * adding and removing of DataTree nodes concurrently can cause serious errors and needs to be restricted. Performing add and remove  
   * operations on different DataStorage branches can be done concurrently since no conflictions are expected.   
-  * the performing of add and remove operation on the same DataTreeNode, its parent nodes or child nodes of the same branch 
+  * the performing of add and remove operation on the same DataNode, its parent nodes or child nodes of the same branch 
   * by different jobs is not allowed. Jobs holding rules that are trying to perform such operations are blocked until the running job is done. 
   * <img src="../pics/AddandRemoveRule.png">
   * </p>
@@ -93,7 +93,7 @@ namespace mitk {
 
   berryObjectMacro(DataStorageAccessRule)
 
-  DataStorageAccessRule (mitk::DataStorage::Pointer myDataStorage, mitk::DataTreeNode::Pointer myDataTreeNode,    
+  DataStorageAccessRule (mitk::DataStorage::Pointer myDataStorage, mitk::DataNode::Pointer myDataNode,    
                          DataStorageAccessRule::RuleType myRule) ;  
 
   bool Contains (berry::ISchedulingRule::Pointer otherISchedulingRule) ;
@@ -130,12 +130,12 @@ private:
    * validates if the DataTree node of a particular DataStorageAccess rule belongs to the DataStorage specified within the particular rule. 
    * if not the rule is invalid and false is returned. No conflictions can be expected 
    */ 
-  bool TestDataTreeNode(mitk::DataTreeNode::Pointer dataTreeToBeStored) const; 
+  bool TestDataNode(mitk::DataNode::Pointer dataTreeToBeStored) const; 
 
   /**
    * returns a pointer to the specified DataStorage node 
    */
-  mitk::DataTreeNode::Pointer GetDataTreeNode() const; 
+  mitk::DataNode::Pointer GetDataNode() const; 
   
   /**
    * returns a pointer to the specified DataStorage  
@@ -148,7 +148,7 @@ private:
 
  
   DataStorage::Pointer m_sptrMyDataStorage ;
-  DataTreeNode::Pointer m_sptrMyDataTreeNode ; 
+  DataNode::Pointer m_sptrMyDataNode ; 
 
   
   };

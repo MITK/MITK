@@ -27,7 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk
 {
 
-class DataTreeNode;
+class DataNode;
 class Geometry2D;
 class DisplayGeometry;
 class PlanarFigure;
@@ -41,8 +41,8 @@ class MitkExt_EXPORT PlanarFigureInteractor : public Interactor
 {
 public:
   mitkClassMacro(PlanarFigureInteractor, Interactor);
-  mitkNewMacro3Param(Self, const char *, DataTreeNode *, int);
-  mitkNewMacro2Param(Self, const char *, DataTreeNode *);
+  mitkNewMacro3Param(Self, const char *, DataNode *, int);
+  mitkNewMacro2Param(Self, const char *, DataNode *);
 
   /** \brief Sets the amount of precision */
   void SetPrecision( ScalarType precision );
@@ -63,7 +63,7 @@ protected:
     * if no n is set, then the number of points is unlimited*
     */
   PlanarFigureInteractor(const char *type, 
-    DataTreeNode *dataTreeNode, int n = -1);
+    DataNode *dataTreeNode, int n = -1);
 
   /**
     * \brief Default Destructor

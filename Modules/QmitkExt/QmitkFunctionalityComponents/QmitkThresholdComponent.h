@@ -77,7 +77,7 @@ public:
   virtual QmitkDataStorageComboBox* GetTreeNodeSelector();
 
   /** \brief Method to set the DataStorage*/
-  virtual void SetDataStorage(mitk::DataStorage::Pointer dataStorage/*, mitk::DataTreeNode::Pointer dtn = NULL*/);
+  virtual void SetDataStorage(mitk::DataStorage::Pointer dataStorage/*, mitk::DataNode::Pointer dtn = NULL*/);
 
   /** \brief Method to get the DataStorage*/
   virtual mitk::DataStorage::Pointer GetDataStorage();
@@ -105,7 +105,7 @@ public slots:
   virtual void DataStorageChanged(mitk::DataStorage::Pointer ds);
 
   /** \brief Slot method that will be called if TreeNodeSelector widget was activated to select the current image. */
-	void ImageSelected(const mitk::DataTreeNode* item);
+	void ImageSelected(const mitk::DataNode* item);
 
   /** \brief Slot method that will be called if the CheckBox at the Threshold-Group-Box was toggled to show the threshold image or not. */ 
   void ShowThreshold(bool show = true);
@@ -131,7 +131,7 @@ protected:
   /*!
   Method to create the node for the thresholdbased segmentation
   */
-  mitk::DataTreeNode::Pointer CreateSegmentationNode( mitk::Image* image);
+  mitk::DataNode::Pointer CreateSegmentationNode( mitk::Image* image);
 
   /** \brief Method that controls everything what happend after an image was selected */
   void DataObjectSelected();
@@ -144,7 +144,7 @@ protected:
   /*!
   a reference to the node with the thresholdImage and adjusted preferences to show the threshold
   */
-  mitk::DataTreeNode::Pointer m_ThresholdImageNode;
+  mitk::DataNode::Pointer m_ThresholdImageNode;
 
 
 private:

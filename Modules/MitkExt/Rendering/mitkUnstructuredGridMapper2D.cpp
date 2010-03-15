@@ -59,7 +59,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 void mitk::UnstructuredGridMapper2D::GenerateData()
 {
-  mitk::DataTreeNode::ConstPointer node = this->GetDataTreeNode();
+  mitk::DataNode::ConstPointer node = this->GetDataNode();
   if ( node.IsNull() )
     return;
 
@@ -105,7 +105,7 @@ void mitk::UnstructuredGridMapper2D::GenerateData( mitk::BaseRenderer* renderer 
     
   if (m_ScalarVisibility->GetValue())
   {
-    mitk::DataTreeNode::ConstPointer node = this->GetDataTreeNode();
+    mitk::DataNode::ConstPointer node = this->GetDataNode();
     mitk::TransferFunctionProperty::Pointer transferFuncProp;
     node->GetProperty(transferFuncProp, "TransferFunction", renderer);
     if (transferFuncProp.IsNotNull())
@@ -142,7 +142,7 @@ void mitk::UnstructuredGridMapper2D::Paint( mitk::BaseRenderer* renderer )
   if ( IsVisible( renderer ) == false )
     return ;
 
-  vtkLinearTransform * vtktransform = GetDataTreeNode()->GetVtkTransform();
+  vtkLinearTransform * vtktransform = GetDataNode()->GetVtkTransform();
   vtkLinearTransform * inversetransform = vtktransform->GetLinearInverse();
 
   Geometry2D::ConstPointer worldGeometry = renderer->GetCurrentWorldGeometry2D();
@@ -405,7 +405,7 @@ mitk::UnstructuredGridMapper2D
   /*
 
   //MITK_INFO << "GETVTKABSTRACTMAPPER3D\n";
-  mitk::DataTreeNode::ConstPointer node = this->GetDataTreeNode();
+  mitk::DataNode::ConstPointer node = this->GetDataNode();
   if ( node.IsNull() )
     return 0;
 
@@ -444,7 +444,7 @@ mitk::UnstructuredGridMapper2D
   if ( abstractMapper == 0 )
   {
     // try to get data from the node
-    mitk::DataTreeNode::ConstPointer node = this->GetDataTreeNode();
+    mitk::DataNode::ConstPointer node = this->GetDataNode();
     if ( node.IsNull() )
       return 0;
     mitk::BaseData::Pointer data = node->GetData();
@@ -481,7 +481,7 @@ vtkScalarsToColors* mitk::UnstructuredGridMapper2D::GetVtkLUT(mitk::BaseRenderer
     return mapper->GetLookupTable();
   else
   {
-    mitk::DataTreeNode::ConstPointer node = this->GetDataTreeNode();
+    mitk::DataNode::ConstPointer node = this->GetDataNode();
     if ( node.IsNull() )
       return 0;
 

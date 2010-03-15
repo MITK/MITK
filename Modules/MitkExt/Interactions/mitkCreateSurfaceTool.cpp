@@ -54,7 +54,7 @@ std::string mitk::CreateSurfaceTool::GetErrorMessage()
   return "No surfaces created for these segmentations:";
 }
     
-bool mitk::CreateSurfaceTool::ProcessOneWorkingData( DataTreeNode* node )
+bool mitk::CreateSurfaceTool::ProcessOneWorkingData( DataNode* node )
 {
   if (node)
   {
@@ -73,7 +73,7 @@ bool mitk::CreateSurfaceTool::ProcessOneWorkingData( DataTreeNode* node )
       badCommand->SetCallbackFunction(this, &CreateSurfaceTool::OnSurfaceCalculationDone);
       surfaceFilter->AddObserver(mitk::ProcessingError(), badCommand);
 
-      DataTreeNode::Pointer nodepointer = node;
+      DataNode::Pointer nodepointer = node;
       surfaceFilter->SetPointerParameter("Input", image);
       surfaceFilter->SetPointerParameter("Group node", nodepointer);
       surfaceFilter->SetParameter("Show result", true );

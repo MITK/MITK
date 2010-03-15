@@ -32,11 +32,11 @@ namespace mitk {
   {
   public:
     mitkClassMacro(ContourInteractor, Interactor);
-    mitkNewMacro2Param(Self, const char*, DataTreeNode*);
+    mitkNewMacro2Param(Self, const char*, DataNode*);
 
 
   protected:
-    ContourInteractor(const char * type, DataTreeNode* dataTreeNode);
+    ContourInteractor(const char * type, DataNode* dataTreeNode);
     virtual ~ContourInteractor();
 
     virtual bool ExecuteAction(Action* action, mitk::StateEvent const* stateEvent);

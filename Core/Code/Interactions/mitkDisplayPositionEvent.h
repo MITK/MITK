@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkCommon.h"
 #include "mitkEvent.h"
 #include "mitkVector.h"
-#include "mitkDataTreeNode.h"
+#include "mitkDataNode.h"
 
 
 namespace mitk {
@@ -34,7 +34,7 @@ namespace mitk {
  *
  * If requested, the correspondent 3D world position in mm is calculated via
  * picking (delegated to the BaseRenderer). Additionally, the mitk::BaseData or
- * mitk::DataTreeNode corresponding to the picked object in the (3D) scene can
+ * mitk::DataNode corresponding to the picked object in the (3D) scene can
  * be retrieved.
  * \ingroup Interaction
  */
@@ -59,7 +59,7 @@ public:
   const Point3D& GetWorldPosition() const;
 
   /** Returns node with object at the current position (NULL if not applicable) */
-  mitk::DataTreeNode *GetPickedObjectNode() const;
+  mitk::DataNode *GetPickedObjectNode() const;
 
   /** Returns object at the current position (NULL if not applicable) */
   mitk::BaseData *GetPickedObject() const;
@@ -70,7 +70,7 @@ protected:
   mutable Point3D m_WorldPosition;
   mutable bool m_WorldPositionIsSet;
 
-  mutable mitk::DataTreeNode::Pointer m_PickedObjectNode;
+  mutable mitk::DataNode::Pointer m_PickedObjectNode;
   mutable bool m_PickedObjectIsSet;
 };
 

@@ -4,9 +4,9 @@
 // Own includes
 
 #include "../mitkQtDataManagerDll.h"
-#include <mitkDataTreeNodeSelection.h>
+#include <mitkDataNodeSelection.h>
 #include <QmitkFunctionality.h>
-#include <QmitkDataTreeNodeSelectionProvider.h>
+#include <QmitkDataNodeSelectionProvider.h>
 
 class QmitkPropertiesTableEditor;
 
@@ -43,7 +43,7 @@ public:
   ///
   /// Invoked when the DataManager selection changed
   ///
-  virtual void OnSelectionChanged(std::vector<mitk::DataTreeNode*> nodes);
+  virtual void OnSelectionChanged(std::vector<mitk::DataNode*> nodes);
 
 private:
   ///

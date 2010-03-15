@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkFunctionality.h"
 #include "mitkDataStorage.h"
 #include "mitkToolManager.h"
-#include "mitkDataTreeNodeSelection.h"
+#include "mitkDataNodeSelection.h"
 
 #include <QObject>
 
@@ -65,7 +65,7 @@ class QmitkSegmentationPostProcessing : public QObject
 
   protected:
 
-    typedef std::vector<mitk::DataTreeNode*> NodeList;
+    typedef std::vector<mitk::DataNode*> NodeList;
     NodeList GetSelectedNodes() const;
 
     mitk::Image::Pointer IncreaseCroppedImageSize( mitk::Image::Pointer image );
@@ -84,7 +84,7 @@ class QmitkSegmentationPostProcessing : public QObject
     mitk::ToolManager::Pointer m_ThresholdingToolManager;
     
     berry::ISelectionListener::Pointer m_SelectionListener;
-    mitk::DataTreeNodeSelection::ConstPointer m_CurrentSelection;
+    mitk::DataNodeSelection::ConstPointer m_CurrentSelection;
     friend struct berry::SelectionChangedAdapter<QmitkSegmentationPostProcessing>;
 };
 

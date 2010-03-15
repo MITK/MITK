@@ -194,7 +194,7 @@ mitk::Image::Pointer mitk::SegTool2D::GetAffectedImageSliceAs2DImage(const Posit
 
 mitk::Image::Pointer mitk::SegTool2D::GetAffectedWorkingSlice(const PositionEvent* positionEvent)
 {
-  DataTreeNode* workingNode( m_ToolManager->GetWorkingData(0) );
+  DataNode* workingNode( m_ToolManager->GetWorkingData(0) );
   if ( !workingNode ) return NULL;
   
   Image* workingImage = dynamic_cast<Image*>(workingNode->GetData());
@@ -205,7 +205,7 @@ mitk::Image::Pointer mitk::SegTool2D::GetAffectedWorkingSlice(const PositionEven
 
 mitk::Image::Pointer mitk::SegTool2D::GetAffectedReferenceSlice(const PositionEvent* positionEvent)
 {
-  DataTreeNode* referenceNode( m_ToolManager->GetReferenceData(0) );
+  DataNode* referenceNode( m_ToolManager->GetReferenceData(0) );
   if ( !referenceNode ) return NULL;
   
   Image* referenceImage = dynamic_cast<Image*>(referenceNode->GetData());

@@ -46,7 +46,7 @@ namespace mitk {
 
     //##Documentation
     //## @brief Checks, if the node does not fulfill the child predicate condition
-    virtual bool CheckNode(const mitk::DataTreeNode* node) const;
+    virtual bool CheckNode(const mitk::DataNode* node) const;
   protected:
     //##Documentation
     //## @brief Constructor

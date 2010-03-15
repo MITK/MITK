@@ -61,7 +61,7 @@ namespace mitk
     NavigationToolWriter();
     ~NavigationToolWriter();
     std::string m_ErrorMessage;
-    mitk::DataTreeNode::Pointer ConvertToDataTreeNode(mitk::NavigationTool::Pointer Tool);
+    mitk::DataNode::Pointer ConvertToDataNode(mitk::NavigationTool::Pointer Tool);
     std::string GetFileWithoutPath(std::string FileWithPath);
   };
 } // namespace mitk

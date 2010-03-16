@@ -535,8 +535,8 @@ void QmitkBasicImageProcessing::StartButtonClicked()
         VectorTotalVariationFilterType::Pointer TVFilter
           = VectorTotalVariationFilterType::New();
         TVFilter->SetInput( itkVecImage.GetPointer() );
-        TVFilter->SetNumberIterations(double(param1)/1000.);
-        TVFilter->SetLambda(param2);
+        TVFilter->SetNumberIterations(param1);
+        TVFilter->SetLambda(double(param2)/1000.);
         TVFilter->UpdateLargestPossibleRegion();
 
         newImage = mitk::ImportItkImage(TVFilter->GetOutput());

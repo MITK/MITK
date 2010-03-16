@@ -549,7 +549,7 @@ void QmitkBasicImageProcessing::StartButtonClicked()
           = TotalVariationFilterType::New();
         TVFilter->SetInput( fImage.GetPointer() );
         TVFilter->SetNumberIterations(param1);
-        TVFilter->SetLambda(param2);
+        TVFilter->SetLambda(double(param2)/1000.);
         TVFilter->UpdateLargestPossibleRegion();
 
         newImage = mitk::ImportItkImage(TVFilter->GetOutput());

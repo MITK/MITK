@@ -73,7 +73,9 @@ public:
   enum ImportMemoryManagementType { CopyMemory, ManageMemory, ReferenceMemory, DontManageMemory = ReferenceMemory };
 
   //##Documentation
-  //## @brief Type for STL Array of SmartPointers to ImageDataItems */
+  //## @brief Vector container of SmartPointers to ImageDataItems;
+  //## Class is only for internal usage to allow convenient access to all slices over iterators;
+  //## See documentation of ImageDataItem for details. 
   typedef std::vector<ImageDataItemPointer> ImageDataItemPointerArray;
 
   typedef itk::Statistics::Histogram<double> HistogramType;

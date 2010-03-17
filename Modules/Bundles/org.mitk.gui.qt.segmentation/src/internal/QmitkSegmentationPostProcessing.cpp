@@ -189,7 +189,8 @@ void QmitkSegmentationPostProcessing::ThresholdingDone(int)
   MITK_INFO << "Thresholding done, cleaning up";
   m_ThresholdingDialog->deleteLater();
   m_ThresholdingDialog = NULL;
-  m_ThresholdingToolManager = NULL;
+  m_ThresholdingToolManager->SetReferenceData( NULL );
+  m_ThresholdingToolManager->SetWorkingData( NULL );
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
@@ -202,7 +203,8 @@ void QmitkSegmentationPostProcessing::OnThresholdingToolManagerToolModified()
 
   if ( m_ThresholdingToolManager->GetActiveToolID() < 0)
   {
-    m_ThresholdingDialog->accept();
+    if (m_ThresholdingDialog)
+      m_ThresholdingDialog->accept();
   }
 }
 

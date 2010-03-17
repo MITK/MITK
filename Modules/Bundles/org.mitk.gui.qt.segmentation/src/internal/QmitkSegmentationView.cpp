@@ -48,18 +48,6 @@ QmitkSegmentationView::~QmitkSegmentationView()
 {
   mitk::RenderingManager::GetInstance()->RemoveObserver( m_RenderingManagerObserverTag );
 
-  berry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
-  if(s)
-  {
-    s->RemovePostSelectionListener(m_SelectionListener);
-  }
-
-  if(m_SegmentationPreferencesNode.IsNotNull())
-  {
-    m_SegmentationPreferencesNode->OnChanged
-      .RemoveListener(berry::MessageDelegate1<QmitkSegmentationView, const berry::IBerryPreferences*>(this, &QmitkSegmentationView::PreferencesChanged));
-  }
-
   delete m_PostProcessing;
   delete m_Controls;
 }
@@ -174,7 +162,7 @@ void QmitkSegmentationView::SetMultiWidget(QmitkStdMultiWidget* multiWidget)
   }
 }
 
-void QmitkSegmentationView::PreferencesChanged(const berry::IBerryPreferences* )
+void QmitkSegmentationView::OnPreferencesChanged(const berry::IBerryPreferences*)
 {
   ForceDisplayPreferencesUponAllImages();
 }
@@ -205,7 +193,7 @@ void QmitkSegmentationView::CreateNewSegmentation()
         // ask about the name and organ type of the new segmentation
         QmitkNewSegmentationDialog* dialog = new QmitkNewSegmentationDialog( m_Parent ); // needs a QWidget as parent, "this" is not QWidget
 
-        QString storedList = QString::fromStdString( m_SegmentationPreferencesNode->GetByteArray("Organ-Color-List","") );
+        QString storedList = QString::fromStdString( this->GetPreferences()->GetByteArray("Organ-Color-List","") );
         QStringList organColors;
         if (storedList.isEmpty())
         {
@@ -230,7 +218,7 @@ void QmitkSegmentationView::CreateNewSegmentation()
           */
 
           // recover string list from BlueBerry view's preferences
-          QString storedString = QString::fromStdString( m_SegmentationPreferencesNode->GetByteArray("Organ-Color-List","") );
+          QString storedString = QString::fromStdString( this->GetPreferences()->GetByteArray("Organ-Color-List","") );
           MITK_DEBUG << "storedString: " << storedString.toStdString();
           // match a string consisting of any number of repetitions of either "anything but ;" or "\;". This matches everything until the next unescaped ';'
           QRegExp onePart("(?:[^;]|\\\\;)*"); 
@@ -281,8 +269,8 @@ void QmitkSegmentationView::CreateNewSegmentation()
             */
             std::string stringForStorage = organColors.replaceInStrings(";","\\;").join(";").toStdString();
             MITK_DEBUG << "Will store: " << stringForStorage;
-            m_SegmentationPreferencesNode->PutByteArray("Organ-Color-List", stringForStorage );
-            m_SegmentationPreferencesNode->Flush();
+            this->GetPreferences()->PutByteArray("Organ-Color-List", stringForStorage );
+            this->GetPreferences()->Flush();
 
             this->GetDefaultDataStorage()->Add( emptySegmentation, node ); // add as a child, because the segmentation "derives" from the original
 
@@ -348,39 +336,23 @@ void QmitkSegmentationView::ToolboxStackPageChanged(int id)
 
 // protected 
 
-void QmitkSegmentationView::PullCurrentDataManagerSelection()
-{
-  MITK_INFO << "Update selection from DataManager";
-  berry::ISelection::ConstPointer selection( this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection("org.mitk.views.datamanager"));
-    // buffer for the data manager selection
-  mitk::DataNodeSelection::ConstPointer currentSelection = selection.Cast<const mitk::DataNodeSelection>();
-  this->BlueBerrySelectionChanged(berry::SmartPointer<IWorkbenchPart>(NULL), currentSelection);
-}
 
-void QmitkSegmentationView::BlueBerrySelectionChanged(berry::IWorkbenchPart::Pointer sourcepart, berry::ISelection::ConstPointer selection)
+void QmitkSegmentationView::OnSelectionChanged(std::vector<mitk::DataNode*> nodes)
 {
   if (!m_Parent || !m_Parent->isVisible()) return;
-
-  if ( selection.IsNull() | (sourcepart == this && !m_JustSentASelection) )  // prevents being notified by own selection events (except when wanted ;-)
-  {
-    MITK_INFO << "Ignore this empty selection event.";
-    return; // otherwise we get "null selection" events each time the view is activated/focussed
-  }
-  
+ 
   // reaction to BlueBerry selection events
   //   this method will try to figure out if a relevant segmentation and its corresponding original image were selected
   //   a warning is issued if the selection is invalid
   //   appropriate reactions are triggered otherwise
 
-  mitk::DataNodeSelection::ConstPointer blueberrySelection = selection.Cast<const mitk::DataNodeSelection>();
+  mitk::DataNode::Pointer referenceData = FindFirstRegularImage( nodes );
+  mitk::DataNode::Pointer workingData =   FindFirstSegmentation( nodes );
 
-  mitk::DataNode::Pointer referenceData = FindFirstRegularImage( blueberrySelection );
-  mitk::DataNode::Pointer workingData =   FindFirstSegmentation( blueberrySelection );
-
-  bool invalidSelection( blueberrySelection && 
+  bool invalidSelection( !nodes.empty() && 
                          (
-                           blueberrySelection->Size() > 2 ||    // maximum 2 selected nodes
-                           (blueberrySelection->Size() == 2 && (workingData.IsNull() || referenceData.IsNull()) ) // with two nodes, one must be the original image, one the segmentation
+                           nodes.size() > 2 ||    // maximum 2 selected nodes
+                           (nodes.size() == 2 && (workingData.IsNull() || referenceData.IsNull()) ) // with two nodes, one must be the original image, one the segmentation
                            // one item is always ok (might be working or reference or nothing
                          )  
                        );
@@ -420,57 +392,50 @@ void QmitkSegmentationView::BlueBerrySelectionChanged(berry::IWorkbenchPart::Poi
   ForceDisplayPreferencesUponAllImages();
 }
 
-mitk::DataNode::Pointer QmitkSegmentationView::FindFirstRegularImage( mitk::DataNodeSelection::ConstPointer selection )
+
+mitk::DataNode::Pointer QmitkSegmentationView::FindFirstRegularImage( std::vector<mitk::DataNode*> nodes )
 {
-  if (!selection) return NULL;
+  if (nodes.empty()) return NULL;
 
-  for (mitk::DataNodeSelection::iterator i = selection->Begin(); i != selection->End(); ++i)
+  for(int i = 0; i < nodes.size(); ++i)
   {
-    if (mitk::DataNodeObject::Pointer nodeObject = i->Cast<mitk::DataNodeObject>())
-    {
-      mitk::DataNode::Pointer node = nodeObject->GetDataNode();
-
+      //mitk::DataNode::Pointer node = i.value()
       bool isImage(false);
-      if (node->GetData())
+      if (nodes.at(i)->GetData())
       {
-        isImage = dynamic_cast<mitk::Image*>(node->GetData()) != NULL;
+        isImage = dynamic_cast<mitk::Image*>(nodes.at(i)->GetData()) != NULL;
       }
 
       // make sure this is not a binary image
       bool isSegmentation(false);
-      node->GetBoolProperty("binary", isSegmentation);
+      nodes.at(i)->GetBoolProperty("binary", isSegmentation);
 
       // return first proper mitk::Image
-      if (isImage && !isSegmentation) return node;
-    }
+      if (isImage && !isSegmentation) return nodes.at(i);
   }
   
   return NULL;
 }
 
 
-mitk::DataNode::Pointer QmitkSegmentationView::FindFirstSegmentation( mitk::DataNodeSelection::ConstPointer selection )
+mitk::DataNode::Pointer QmitkSegmentationView::FindFirstSegmentation( std::vector<mitk::DataNode*> nodes )
 {
-  if (!selection) return NULL;
+  if (nodes.empty()) return NULL;
 
-  for (mitk::DataNodeSelection::iterator i = selection->Begin(); i != selection->End(); ++i)
+ 
+  for(int i = 0; i < nodes.size(); ++i)
   {
-    if (mitk::DataNodeObject::Pointer nodeObject = i->Cast<mitk::DataNodeObject>())
-    {
-      mitk::DataNode::Pointer node = nodeObject->GetDataNode();
-
       bool isImage(false);
-      if (node->GetData())
+      if (nodes.at(i)->GetData())
       {
-        isImage = dynamic_cast<mitk::Image*>(node->GetData()) != NULL;
+        isImage = dynamic_cast<mitk::Image*>(nodes.at(i)->GetData()) != NULL;
       }
 
       bool isSegmentation(false);
-      node->GetBoolProperty("binary", isSegmentation);
+      nodes.at(i)->GetBoolProperty("binary", isSegmentation);
 
       // return first proper binary mitk::Image 
-      if (isImage && isSegmentation) return node;
-    }
+      if (isImage && isSegmentation) return nodes.at(i);
   }
   
   return NULL;
@@ -515,7 +480,7 @@ void QmitkSegmentationView::SendSelectedEvent( mitk::DataNode* /*referenceNode*/
 {
   // send a BlueBerry selection event for workingNode (done here for newly created segmentations)
   m_JustSentASelection = true;
-  m_SelectionProvider->FireSelectionChanged(workingNode);
+  this->FireNodeSelected(workingNode);
   m_JustSentASelection = false;
 }
 
@@ -624,10 +589,10 @@ void QmitkSegmentationView::ApplyDisplayOptions(mitk::DataNode* node)
 
   if (isBinary)
   {
-    node->SetProperty( "outline binary", mitk::BoolProperty::New( m_SegmentationPreferencesNode->GetBool("draw outline", true)) );
+    node->SetProperty( "outline binary", mitk::BoolProperty::New( this->GetPreferences()->GetBool("draw outline", true)) );
     node->SetProperty( "outline width", mitk::FloatProperty::New( 2.0 ) );
-    node->SetProperty( "opacity", mitk::FloatProperty::New( m_SegmentationPreferencesNode->GetBool("draw outline", true) ? 1.0 : 0.3 ) );
-    node->SetProperty( "volumerendering", mitk::BoolProperty::New( m_SegmentationPreferencesNode->GetBool("volume rendering", false) ) );
+    node->SetProperty( "opacity", mitk::FloatProperty::New( this->GetPreferences()->GetBool("draw outline", true) ? 1.0 : 0.3 ) );
+    node->SetProperty( "volumerendering", mitk::BoolProperty::New( this->GetPreferences()->GetBool("volume rendering", false) ) );
   }
 }
 
@@ -681,32 +646,8 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
   connect( m_Controls->m_ManualToolSelectionBox, SIGNAL(ToolSelected(int)), this, SLOT(ManualToolSelected(int)) );
   connect( m_Controls->widgetStack, SIGNAL(currentChanged(int)), this, SLOT(ToolboxStackPageChanged(int)) );
 
-  // register as listener for BlueBerry selection events (mainly from DataManager)
-  m_SelectionListener = berry::ISelectionListener::Pointer(new berry::SelectionChangedAdapter<QmitkSegmentationView>(this, &QmitkSegmentationView::BlueBerrySelectionChanged));
-  this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddPostSelectionListener(/*"org.mitk.views.datamanager",*/ m_SelectionListener);
- 
-  // also make us a provider of selections 
-  m_SelectionProvider = new mitk::SegmentationSelectionProvider();
-  this->GetSite()->SetSelectionProvider(m_SelectionProvider);
-
-  // BlueBerry preferences
-  berry::IPreferencesService::Pointer prefService 
-    = berry::Platform::GetServiceRegistry()
-    .GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
-
-  m_SegmentationPreferencesNode = (prefService->GetSystemPreferences()->Node("/Segmentation")).Cast<berry::IBerryPreferences>();
-  if(m_SegmentationPreferencesNode.IsNotNull())
-  {
-    m_SegmentationPreferencesNode->OnChanged
-      .AddListener(berry::MessageDelegate1<QmitkSegmentationView, const berry::IBerryPreferences*>(this, &QmitkSegmentationView::PreferencesChanged));
-  }
-
   // create helper class to provide context menus for segmentations in data manager
   m_PostProcessing = new QmitkSegmentationPostProcessing(this->GetDefaultDataStorage(), this, NULL);
- 
-  // call preferences changed for initialization
-  // changes GUI according to current data manager selection (because it might have changed before QmitkSegmentationView came into being)
-  this->PreferencesChanged(m_SegmentationPreferencesNode.GetPointer());
 
   itk::ReceptorMemberCommand<QmitkSegmentationView>::Pointer command1 = itk::ReceptorMemberCommand<QmitkSegmentationView>::New();
   command1->SetCallbackFunction( this, &QmitkSegmentationView::RenderingManagerReinitialized );

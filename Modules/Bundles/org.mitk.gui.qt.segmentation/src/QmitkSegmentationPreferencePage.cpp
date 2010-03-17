@@ -47,7 +47,7 @@ void QmitkSegmentationPreferencePage::CreateQtControl(QWidget* parent)
     = berry::Platform::GetServiceRegistry()
     .GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
 
-  m_SegmentationPreferencesNode = prefService->GetSystemPreferences()->Node("/Segmentation");
+  m_SegmentationPreferencesNode = prefService->GetSystemPreferences()->Node("/org.mitk.gui.qt.segmentation");
 
   m_MainControl = new QWidget(parent);
 

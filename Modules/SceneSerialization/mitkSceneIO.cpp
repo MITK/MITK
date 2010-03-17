@@ -368,6 +368,9 @@ bool mitk::SceneIO::SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNode
   {
     try
     {
+      Poco::File deleteFile( filename.c_str() );
+      deleteFile.remove();
+
       // create zip at filename
       std::ofstream file( filename.c_str(), std::ios::binary | std::ios::out);
       if (!file.good())
@@ -376,7 +379,7 @@ bool mitk::SceneIO::SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNode
       }
       else
       {
-        Poco::Zip::Compress zipper( file, true );
+        Poco::Zip::Compress zipper( file, false ); // must be set to false when writing to a network (whatever that means)
         Poco::Path tmpdir( m_WorkingDirectory );
         zipper.addRecursive( tmpdir );
         zipper.close();

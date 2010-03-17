@@ -66,57 +66,109 @@ class PartListenerForTitle: public berry::IPartListener
 public:
 
   PartListenerForTitle(QmitkExtWorkbenchWindowAdvisor* wa) :
-    windowAdvisor(wa)
-  {
-  }
+      windowAdvisor(wa)
+      {
+      }
 
-  Events::Types GetPartEventTypes() const
-  {
-    return Events::ACTIVATED | Events::BROUGHT_TO_TOP | Events::CLOSED
-        | Events::HIDDEN | Events::VISIBLE;
-  }
+      Events::Types GetPartEventTypes() const
+      {
+        return Events::ACTIVATED | Events::BROUGHT_TO_TOP | Events::CLOSED
+          | Events::HIDDEN | Events::VISIBLE;
+      }
 
-  void PartActivated(berry::IWorkbenchPartReference::Pointer ref)
-  {
-    if (ref.Cast<berry::IEditorReference> ())
-    {
-      windowAdvisor->UpdateTitle(false);
-    }
-  }
+      void PartActivated(berry::IWorkbenchPartReference::Pointer ref)
+      {
+        if (ref.Cast<berry::IEditorReference> ())
+        {
+          windowAdvisor->UpdateTitle(false);
+        }
+      }
 
-  void PartBroughtToTop(berry::IWorkbenchPartReference::Pointer ref)
-  {
-    if (ref.Cast<berry::IEditorReference> ())
-    {
-      windowAdvisor->UpdateTitle(false);
-    }
-  }
+      void PartBroughtToTop(berry::IWorkbenchPartReference::Pointer ref)
+      {
+        if (ref.Cast<berry::IEditorReference> ())
+        {
+          windowAdvisor->UpdateTitle(false);
+        }
+      }
 
-  void PartClosed(berry::IWorkbenchPartReference::Pointer ref)
-  {
-    windowAdvisor->UpdateTitle(false);
-  }
+      void PartClosed(berry::IWorkbenchPartReference::Pointer ref)
+      {
+        windowAdvisor->UpdateTitle(false);
+      }
 
-  void PartHidden(berry::IWorkbenchPartReference::Pointer ref)
-  {
-    if (!windowAdvisor->lastActiveEditor.Expired() &&
-        ref->GetPart(false) == windowAdvisor->lastActiveEditor.Lock())
-    {
-      windowAdvisor->UpdateTitle(true);
-    }
-  }
+      void PartHidden(berry::IWorkbenchPartReference::Pointer ref)
+      {
+        if (!windowAdvisor->lastActiveEditor.Expired() &&
+          ref->GetPart(false) == windowAdvisor->lastActiveEditor.Lock())
+        {
+          windowAdvisor->UpdateTitle(true);
+        }
+      }
 
-  void PartVisible(berry::IWorkbenchPartReference::Pointer ref)
-  {
-    if (!windowAdvisor->lastActiveEditor.Expired() &&
-        ref->GetPart(false) == windowAdvisor->lastActiveEditor.Lock())
-    {
-      windowAdvisor->UpdateTitle(false);
-    }
-  }
+      void PartVisible(berry::IWorkbenchPartReference::Pointer ref)
+      {
+        if (!windowAdvisor->lastActiveEditor.Expired() &&
+          ref->GetPart(false) == windowAdvisor->lastActiveEditor.Lock())
+        {
+          windowAdvisor->UpdateTitle(false);
+        }
+      }
 
 private:
   QmitkExtWorkbenchWindowAdvisor* windowAdvisor;
+
+};
+
+class PartListenerForImageNavigator: public berry::IPartListener
+{
+public:
+
+  PartListenerForImageNavigator(QAction* act) :
+      imageNavigatorAction(act)
+      {
+      }
+
+      Events::Types GetPartEventTypes() const
+      {
+        return Events::OPENED | Events::CLOSED | Events::HIDDEN | 
+          Events::VISIBLE;
+      }
+
+      void PartOpened(berry::IWorkbenchPartReference::Pointer ref)
+      {
+        if (ref->GetId()=="org.mitk.views.imagenavigator")
+        {
+          imageNavigatorAction->setChecked(true);
+        }
+      }
+
+      void PartClosed(berry::IWorkbenchPartReference::Pointer ref)
+      {
+        if (ref->GetId()=="org.mitk.views.imagenavigator")
+        {
+          imageNavigatorAction->setChecked(false);
+        }
+      }
+
+      void PartVisible(berry::IWorkbenchPartReference::Pointer ref)
+      {
+        if (ref->GetId()=="org.mitk.views.imagenavigator")
+        {
+          imageNavigatorAction->setChecked(true);
+        }
+      }
+
+      void PartHidden(berry::IWorkbenchPartReference::Pointer ref)
+      {
+        if (ref->GetId()=="org.mitk.views.imagenavigator")
+        {
+          imageNavigatorAction->setChecked(false);
+        }
+      }
+
+private:
+  QAction* imageNavigatorAction;
 
 };
 
@@ -328,11 +380,13 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
     QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onImageNavigator()),NULL);
   imageNavigatorAction->setCheckable(true);
 
-
   berry::IWorkbenchWindow::Pointer win =
       berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow();
   if(win.IsNotNull())
   {
+    // add part listener for image navigator
+    imageNavigatorPartListener = new PartListenerForImageNavigator(imageNavigatorAction);
+    win->GetPartService()->AddPartListener(imageNavigatorPartListener);
     berry::IViewPart::Pointer imageNavigatorView =
       win->GetActivePage()->FindView("org.mitk.views.imagenavigator");
     imageNavigatorAction->setChecked(false);
@@ -550,7 +604,7 @@ void QmitkExtWorkbenchWindowAdvisorHack::onImageNavigator()
     }
   }
   berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->ShowView("org.mitk.views.imagenavigator");
-  berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->ResetPerspective();
+  //berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->ResetPerspective();
 }
 
 void QmitkExtWorkbenchWindowAdvisorHack::onEditPreferences()

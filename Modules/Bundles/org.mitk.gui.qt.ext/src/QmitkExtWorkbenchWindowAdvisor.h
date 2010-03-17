@@ -79,10 +79,12 @@ private:
 
   berry::IPartListener::Pointer titlePartListener;
   berry::IPerspectiveListener::Pointer titlePerspectiveListener;
+  berry::IPartListener::Pointer imageNavigatorPartListener;
   berry::IPropertyChangeListener::Pointer editorPropertyListener;
   friend struct berry::PropertyChangeIntAdapter<QmitkExtWorkbenchWindowAdvisor>;
   friend class PartListenerForTitle;
   friend class PerspectiveListenerForTitle;
+  friend class PartListenerForImageNavigator;
 
   berry::IEditorPart::WeakPtr lastActiveEditor;
   berry::IPerspectiveDescriptor::WeakPtr lastPerspective;

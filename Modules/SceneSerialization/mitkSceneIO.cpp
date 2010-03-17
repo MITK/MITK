@@ -54,7 +54,7 @@ mitk::SceneIO::~SceneIO()
 std::string mitk::SceneIO::CreateEmptyTempDirectory()
 {
   std::string uniquename = Poco::TemporaryFile::tempName();
-  Poco::File tempdir( uniquename ); 
+  Poco::File tempdir( uniquename );
   try
   {
     if (!tempdir.createDirectory())
@@ -183,224 +183,233 @@ bool mitk::SceneIO::SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNode
     return false;
   }
 
-  m_FailedNodes = DataStorage::SetOfObjects::New();
-  m_FailedProperties = PropertyList::New();
-
-  // start XML DOM
-  TiXmlDocument document;
-  TiXmlDeclaration* decl = new TiXmlDeclaration( "1.0", "UTF-8", "" ); // TODO what to write here? encoding? standalone would mean that we provide a DTD somewhere...
-  document.LinkEndChild( decl );
-
-  TiXmlElement* version = new TiXmlElement("Version");
-  version->SetAttribute("Writer",  __FILE__ );
-  version->SetAttribute("Revision",  "$Revision: 17055 $" );
-  version->SetAttribute("FileVersion",  1 );
-  document.LinkEndChild(version);
- 
-  //DataStorage::SetOfObjects::ConstPointer sceneNodes = storage->GetSubset( predicate );
-
-  if ( sceneNodes.IsNull() )
+  try
   {
-    MITK_WARN << "Saving empty scene to " << filename;
-  }
-  else
-  {
-    if ( sceneNodes->size() == 0 )
+
+    m_FailedNodes = DataStorage::SetOfObjects::New();
+    m_FailedProperties = PropertyList::New();
+
+    // start XML DOM
+    TiXmlDocument document;
+    TiXmlDeclaration* decl = new TiXmlDeclaration( "1.0", "UTF-8", "" ); // TODO what to write here? encoding? standalone would mean that we provide a DTD somewhere...
+    document.LinkEndChild( decl );
+
+    TiXmlElement* version = new TiXmlElement("Version");
+    version->SetAttribute("Writer",  __FILE__ );
+    version->SetAttribute("Revision",  "$Revision: 17055 $" );
+    version->SetAttribute("FileVersion",  1 );
+    document.LinkEndChild(version);
+
+    //DataStorage::SetOfObjects::ConstPointer sceneNodes = storage->GetSubset( predicate );
+
+    if ( sceneNodes.IsNull() )
     {
       MITK_WARN << "Saving empty scene to " << filename;
     }
+    else
+    {
+      if ( sceneNodes->size() == 0 )
+      {
+        MITK_WARN << "Saving empty scene to " << filename;
+      }
 
     MITK_INFO << "Storing scene with " << sceneNodes->size() << " objects to " << filename;
-  
-    m_WorkingDirectory = CreateEmptyTempDirectory();
-    if (m_WorkingDirectory.empty())
-    {
-      MITK_ERROR << "Could not create temporary directory. Cannot create scene files.";
-      return false;
-    }
-   
-    ProgressBar::GetInstance()->AddStepsToDo( sceneNodes->size() );
- 
-    // find out about dependencies
-    typedef std::map< DataNode*, std::string > UIDMapType;
-    typedef std::map< DataNode*, std::list<std::string> > SourcesMapType;
 
-    UIDMapType nodeUIDs;              // for dependencies: ID of each node
-    SourcesMapType sourceUIDs; // for dependencies: IDs of a node's parent nodes
-
-    UIDGenerator nodeUIDGen("OBJECT_");
-
-    for (DataStorage::SetOfObjects::const_iterator iter = sceneNodes->begin();
-         iter != sceneNodes->end();
-         ++iter)
-    {
-      DataNode* node = iter->GetPointer();
-      if (!node)  
-        continue; // unlikely event that we get a NULL pointer as an object for saving. just ignore
-    
-      // generate UIDs for all source objects  
-      DataStorage::SetOfObjects::ConstPointer sourceObjects = storage->GetSources( node );
-      for ( mitk::DataStorage::SetOfObjects::const_iterator sourceIter = sourceObjects->begin();
-            sourceIter != sourceObjects->end();
-            ++sourceIter )
+      m_WorkingDirectory = CreateEmptyTempDirectory();
+      if (m_WorkingDirectory.empty())
       {
-        if ( std::find( sceneNodes->begin(), sceneNodes->end(), *sourceIter ) == sceneNodes->end() ) 
-          continue; // source is not saved, so don't generate a UID for this source
-
-        // create a uid for the parent object
-        if ( nodeUIDs[ *sourceIter ].empty() )
-        {
-          nodeUIDs[ *sourceIter ] = nodeUIDGen.GetUID();
-        }
-
-        // store this dependency for writing 
-        sourceUIDs[ node ].push_back( nodeUIDs[*sourceIter] );
+        MITK_ERROR << "Could not create temporary directory. Cannot create scene files.";
+        return false;
       }
 
-      if ( nodeUIDs[ node ].empty() )
+      ProgressBar::GetInstance()->AddStepsToDo( sceneNodes->size() );
+
+      // find out about dependencies
+      typedef std::map< DataNode*, std::string > UIDMapType;
+      typedef std::map< DataNode*, std::list<std::string> > SourcesMapType;
+
+      UIDMapType nodeUIDs;              // for dependencies: ID of each node
+      SourcesMapType sourceUIDs; // for dependencies: IDs of a node's parent nodes
+
+      UIDGenerator nodeUIDGen("OBJECT_");
+
+      for (DataStorage::SetOfObjects::const_iterator iter = sceneNodes->begin();
+           iter != sceneNodes->end();
+           ++iter)
       {
-        nodeUIDs[ node ] = nodeUIDGen.GetUID();
+        DataNode* node = iter->GetPointer();
+        if (!node)
+          continue; // unlikely event that we get a NULL pointer as an object for saving. just ignore
+
+        // generate UIDs for all source objects
+        DataStorage::SetOfObjects::ConstPointer sourceObjects = storage->GetSources( node );
+        for ( mitk::DataStorage::SetOfObjects::const_iterator sourceIter = sourceObjects->begin();
+              sourceIter != sourceObjects->end();
+              ++sourceIter )
+        {
+          if ( std::find( sceneNodes->begin(), sceneNodes->end(), *sourceIter ) == sceneNodes->end() )
+            continue; // source is not saved, so don't generate a UID for this source
+
+          // create a uid for the parent object
+          if ( nodeUIDs[ *sourceIter ].empty() )
+          {
+            nodeUIDs[ *sourceIter ] = nodeUIDGen.GetUID();
+          }
+
+          // store this dependency for writing
+          sourceUIDs[ node ].push_back( nodeUIDs[*sourceIter] );
+        }
+
+        if ( nodeUIDs[ node ].empty() )
+        {
+          nodeUIDs[ node ] = nodeUIDGen.GetUID();
+        }
       }
-    }
-   
-    // write out objects, dependencies and properties
-    for (DataStorage::SetOfObjects::const_iterator iter = sceneNodes->begin();
-         iter != sceneNodes->end();
-         ++iter)
-    {
-      DataNode* node = iter->GetPointer();
-      
-      if (node)
+
+      // write out objects, dependencies and properties
+      for (DataStorage::SetOfObjects::const_iterator iter = sceneNodes->begin();
+           iter != sceneNodes->end();
+           ++iter)
       {
-        TiXmlElement* nodeElement = new TiXmlElement("node");
-        std::string filenameHint( node->GetName() );
-        filenameHint = itksys::SystemTools::MakeCindentifier(filenameHint.c_str()); // escape filename <-- only allow [A-Za-z0-9_], replace everything else with _
-          
-        // store dependencies
-        UIDMapType::iterator searchUIDIter = nodeUIDs.find(node);
-        if ( searchUIDIter != nodeUIDs.end() )
-        {
-          // store this node's ID
-          nodeElement->SetAttribute("UID", searchUIDIter->second.c_str() );
-        }
-        
-        SourcesMapType::iterator searchSourcesIter = sourceUIDs.find(node);
-        if ( searchSourcesIter != sourceUIDs.end() )
-        {
-          // store all source IDs
-          for ( std::list<std::string>::iterator sourceUIDIter = searchSourcesIter->second.begin();
-                sourceUIDIter != searchSourcesIter->second.end();
-                ++sourceUIDIter )
-          {
-            TiXmlElement* uidElement = new TiXmlElement("source");
-            uidElement->SetAttribute("UID", sourceUIDIter->c_str() );
-            nodeElement->LinkEndChild( uidElement );
-          }
-        }
+        DataNode* node = iter->GetPointer();
 
-        // store basedata
-        if ( BaseData* data = node->GetData() )
+        if (node)
         {
-          //std::string filenameHint( node->GetName() );
-          bool error(false);
-          TiXmlElement* dataElement( SaveBaseData( data, filenameHint, error ) ); // returns a reference to a file
-          if (error)
+          TiXmlElement* nodeElement = new TiXmlElement("node");
+          std::string filenameHint( node->GetName() );
+          filenameHint = itksys::SystemTools::MakeCindentifier(filenameHint.c_str()); // escape filename <-- only allow [A-Za-z0-9_], replace everything else with _
+
+          // store dependencies
+          UIDMapType::iterator searchUIDIter = nodeUIDs.find(node);
+          if ( searchUIDIter != nodeUIDs.end() )
           {
-            m_FailedNodes->push_back( node );
+            // store this node's ID
+            nodeElement->SetAttribute("UID", searchUIDIter->second.c_str() );
           }
 
-          // store basedata properties
-          PropertyList* propertyList = data->GetPropertyList();
-          if (propertyList && !propertyList->IsEmpty() )
+          SourcesMapType::iterator searchSourcesIter = sourceUIDs.find(node);
+          if ( searchSourcesIter != sourceUIDs.end() )
           {
-            TiXmlElement* baseDataPropertiesElement( SavePropertyList( propertyList, filenameHint + "-data") ); // returns a reference to a file
-            dataElement->LinkEndChild( baseDataPropertiesElement );
-          }
-
-          nodeElement->LinkEndChild( dataElement );
-        }
-
-        // store all renderwindow specific propertylists
-        const RenderingManager::RenderWindowVector& allRenderWindows( RenderingManager::GetInstance()->GetAllRegisteredRenderWindows() );
-        for ( RenderingManager::RenderWindowVector::const_iterator rw = allRenderWindows.begin();
-              rw != allRenderWindows.end();
-              ++rw)
-        {
-          if (vtkRenderWindow* renderWindow = *rw)
-          {
-            std::string renderWindowName( mitk::BaseRenderer::GetInstance(renderWindow)->GetName() );
-            BaseRenderer* renderer = mitk::BaseRenderer::GetInstance(renderWindow);
-            PropertyList* propertyList = node->GetPropertyList(renderer);
-            if ( propertyList && !propertyList->IsEmpty() )
+            // store all source IDs
+            for ( std::list<std::string>::iterator sourceUIDIter = searchSourcesIter->second.begin();
+                  sourceUIDIter != searchSourcesIter->second.end();
+                  ++sourceUIDIter )
             {
-              TiXmlElement* renderWindowPropertiesElement( SavePropertyList( propertyList, filenameHint + "-" + renderWindowName) ); // returns a reference to a file
-              renderWindowPropertiesElement->SetAttribute("renderwindow", renderWindowName);
-              nodeElement->LinkEndChild( renderWindowPropertiesElement );
+              TiXmlElement* uidElement = new TiXmlElement("source");
+              uidElement->SetAttribute("UID", sourceUIDIter->c_str() );
+              nodeElement->LinkEndChild( uidElement );
             }
           }
-        }
 
-        // don't forget the renderwindow independent list
-        PropertyList* propertyList = node->GetPropertyList();
-        if ( propertyList && !propertyList->IsEmpty() )
+          // store basedata
+          if ( BaseData* data = node->GetData() )
+          {
+            //std::string filenameHint( node->GetName() );
+            bool error(false);
+            TiXmlElement* dataElement( SaveBaseData( data, filenameHint, error ) ); // returns a reference to a file
+            if (error)
+            {
+              m_FailedNodes->push_back( node );
+            }
+
+            // store basedata properties
+            PropertyList* propertyList = data->GetPropertyList();
+            if (propertyList && !propertyList->IsEmpty() )
+            {
+              TiXmlElement* baseDataPropertiesElement( SavePropertyList( propertyList, filenameHint + "-data") ); // returns a reference to a file
+              dataElement->LinkEndChild( baseDataPropertiesElement );
+            }
+
+            nodeElement->LinkEndChild( dataElement );
+          }
+
+          // store all renderwindow specific propertylists
+          const RenderingManager::RenderWindowVector& allRenderWindows( RenderingManager::GetInstance()->GetAllRegisteredRenderWindows() );
+          for ( RenderingManager::RenderWindowVector::const_iterator rw = allRenderWindows.begin();
+                rw != allRenderWindows.end();
+                ++rw)
+          {
+            if (vtkRenderWindow* renderWindow = *rw)
+            {
+              std::string renderWindowName( mitk::BaseRenderer::GetInstance(renderWindow)->GetName() );
+              BaseRenderer* renderer = mitk::BaseRenderer::GetInstance(renderWindow);
+              PropertyList* propertyList = node->GetPropertyList(renderer);
+              if ( propertyList && !propertyList->IsEmpty() )
+              {
+                TiXmlElement* renderWindowPropertiesElement( SavePropertyList( propertyList, filenameHint + "-" + renderWindowName) ); // returns a reference to a file
+                renderWindowPropertiesElement->SetAttribute("renderwindow", renderWindowName);
+                nodeElement->LinkEndChild( renderWindowPropertiesElement );
+              }
+            }
+          }
+
+          // don't forget the renderwindow independent list
+          PropertyList* propertyList = node->GetPropertyList();
+          if ( propertyList && !propertyList->IsEmpty() )
+          {
+            TiXmlElement* propertiesElement( SavePropertyList( propertyList, filenameHint + "-node") ); // returns a reference to a file
+            nodeElement->LinkEndChild( propertiesElement );
+          }
+          document.LinkEndChild( nodeElement );
+        }
+        else
         {
-          TiXmlElement* propertiesElement( SavePropertyList( propertyList, filenameHint + "-node") ); // returns a reference to a file
-          nodeElement->LinkEndChild( propertiesElement );
+          MITK_WARN << "Ignoring NULL node during scene serialization.";
         }
-        document.LinkEndChild( nodeElement );
-      }
-      else
-      {
-        MITK_WARN << "Ignoring NULL node during scene serialization.";
-      }
-        
-      ProgressBar::GetInstance()->Progress();
-    } // end for all nodes
 
-  } // end if sceneNodes
+        ProgressBar::GetInstance()->Progress();
+      } // end for all nodes
 
-  if ( !document.SaveFile( m_WorkingDirectory + Poco::Path::separator() + "index.xml" ) )
-  {
-    MITK_ERROR << "Could not write scene to " << m_WorkingDirectory << Poco::Path::separator() << "index.xml" << "\nTinyXML reports '" << document.ErrorDesc() << "'";
-    return false;
-  }
-  else
-  {
-    try
+    } // end if sceneNodes
+
+    if ( !document.SaveFile( m_WorkingDirectory + Poco::Path::separator() + "index.xml" ) )
     {
-      Poco::File deleteFile( filename.c_str() );
-      deleteFile.remove();
-
-      // create zip at filename
-      std::ofstream file( filename.c_str(), std::ios::binary | std::ios::out);
-      if (!file.good())
-      {
-        MITK_ERROR << "Could not open a zip file for writing: '" << filename << "'";
-      }
-      else
-      {
-        Poco::Zip::Compress zipper( file, false ); // must be set to false when writing to a network (whatever that means)
-        Poco::Path tmpdir( m_WorkingDirectory );
-        zipper.addRecursive( tmpdir );
-        zipper.close();
-      }
-      try
-      {
-        Poco::File deleteDir( m_WorkingDirectory );
-        deleteDir.remove(true); // recursive
-      }
-      catch(...)
-      {
-        MITK_ERROR << "Could not delete temporary directory " << m_WorkingDirectory;
-        return false; // ok?
-      }
-    }
-    catch(std::exception& /*e*/)
-    {
-      MITK_ERROR << "Could not create ZIP file from " << m_WorkingDirectory;
+      MITK_ERROR << "Could not write scene to " << m_WorkingDirectory << Poco::Path::separator() << "index.xml" << "\nTinyXML reports '" << document.ErrorDesc() << "'";
       return false;
     }
-    return true;
+    else
+    {
+      try
+      {
+        Poco::File deleteFile( filename.c_str() );
+        deleteFile.remove();
+
+        // create zip at filename
+        std::ofstream file( filename.c_str(), std::ios::binary | std::ios::out);
+        if (!file.good())
+        {
+          MITK_ERROR << "Could not open a zip file for writing: '" << filename << "'";
+        }
+        else
+        {
+          Poco::Zip::Compress zipper( file, false ); // must be set to false when writing to a network (whatever that means)
+          Poco::Path tmpdir( m_WorkingDirectory );
+          zipper.addRecursive( tmpdir );
+          zipper.close();
+        }
+        try
+        {
+          Poco::File deleteDir( m_WorkingDirectory );
+          deleteDir.remove(true); // recursive
+        }
+        catch(...)
+        {
+          MITK_ERROR << "Could not delete temporary directory " << m_WorkingDirectory;
+          return false; // ok?
+        }
+      }
+      catch(std::exception& /*e*/)
+      {
+        MITK_ERROR << "Could not create ZIP file from " << m_WorkingDirectory;
+        return false;
+      }
+      return true;
+    }
+  }
+  catch(std::exception& e)
+  {
+    MITK_ERROR << "Caught exception during saving temporary files to disk. Error description: '" << e.what() << "'";
+    return false;
   }
 }
 

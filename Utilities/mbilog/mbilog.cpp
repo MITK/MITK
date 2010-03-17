@@ -115,7 +115,9 @@ void mbilog::BackendCout::FormatSmart(std::ostream &out, const LogMessage &l,int
       break;
   }
 
-  out << c_open << std::fixed << std::setw(6) << std::setprecision(2) << ((double)std::clock())/CLOCKS_PER_SEC;
+  time_t rawtime;
+  time ( &rawtime );
+  out << c_open << ctime(&rawtime);
 
   out << c_close << " ";
   
@@ -174,8 +176,10 @@ void mbilog::BackendCout::FormatFull(std::ostream &out,const LogMessage &l,int t
       break;
   }
 
-  out << std::setprecision(3) << ":" << ((double)std::clock())/CLOCKS_PER_SEC;
-
+  time_t rawtime;
+  time ( &rawtime );
+  out << ":" << ctime(&rawtime);
+  
   out << "|" << std::string(l.filePath) << "(" << l.lineNumber << ")";
 
   out << "|" << std::string(l.functionName);
@@ -699,7 +703,9 @@ static void FormatSmartWindows(const mbilog::LogMessage &l,int /*threadID*/)
   }
 
   ChangeColor( colorTime );
-  std::cout << std::fixed << std::setprecision(2) << ((double)std::clock())/CLOCKS_PER_SEC << " " << std::flush;
+  time_t rawtime;
+  time ( &rawtime );
+  std::cout << ctime(&rawtime) << " " << std::flush;
   
   // category
   {

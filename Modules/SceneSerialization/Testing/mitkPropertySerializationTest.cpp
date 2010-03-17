@@ -47,6 +47,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkTransferFunctionProperty.h>
 
 #include "mitkPropertyList.h"
+#include "mitkPropertyListSerializer.h"
 #include "mitkBasePropertySerializer.h"
 #include "mitkBasePropertyDeserializer.h"
 
@@ -77,6 +78,8 @@ void TestAllProperties(const mitk::PropertyList* propList);
 int mitkPropertySerializationTest(int /* argc */, char* /*argv*/[])
 {
   MITK_TEST_BEGIN("PropertySerializationTest");
+
+  mitk::PropertyListSerializer::Pointer serializer = mitk::PropertyListSerializer::New(); // make sure something from the lib is actually used (registration of serializers/deserializers)
 
   itk::ObjectFactoryBase::RegisterFactory(mitk::CoreObjectFactory::New());
 
@@ -150,41 +153,41 @@ int mitkPropertySerializationTest(int /* argc */, char* /*argv*/[])
   
   /* test default property lists of basedata objects */
   // activate the following tests after MaterialProperty is deleted
-  //mitk::DataNode::Pointer node = mitk::DataNode::New();
-  //node->SetData(mitk::Contour::New());
+  mitk::DataNode::Pointer node = mitk::DataNode::New();
+  node->SetData(mitk::Contour::New());
+  TestAllProperties(node->GetPropertyList());
+  node->SetData(mitk::ContourSet::New());
+  TestAllProperties(node->GetPropertyList());
+  node->SetData(mitk::PointData::New());
+  TestAllProperties(node->GetPropertyList());
+  node->SetData(mitk::PointSet::New());
+  TestAllProperties(node->GetPropertyList());
+  node->SetData(mitk::Mesh::New());
+  TestAllProperties(node->GetPropertyList());
+  node->SetData(mitk::Image::New());
+  TestAllProperties(node->GetPropertyList());
+  node->SetData(mitk::Surface::New());
+  TestAllProperties(node->GetPropertyList());
+  node->SetData(mitk::Cone::New());
+  TestAllProperties(node->GetPropertyList());
+  node->SetData(mitk::Cuboid::New());
+  TestAllProperties(node->GetPropertyList());
+  node->SetData(mitk::Cylinder::New());
+  TestAllProperties(node->GetPropertyList());
+  node->SetData(mitk::Ellipsoid::New());
+  TestAllProperties(node->GetPropertyList());
+  node->SetData(mitk::ExtrudedContour::New());
+  TestAllProperties(node->GetPropertyList());
+  node->SetData(mitk::Plane::New());
+  TestAllProperties(node->GetPropertyList());
+  //node->SetData(mitk::TrackingVolume::New());  // TrackingVolume is in IGT Module, it does not have special properties, therefore we skip it here
   //TestAllProperties(node->GetPropertyList());
-  //node->SetData(mitk::ContourSet::New());
-  //TestAllProperties(node->GetPropertyList());
-  //node->SetData(mitk::PointData::New());
-  //TestAllProperties(node->GetPropertyList());
-  //node->SetData(mitk::PointSet::New());
-  //TestAllProperties(node->GetPropertyList());
-  //node->SetData(mitk::Mesh::New());
-  //TestAllProperties(node->GetPropertyList());
-  //node->SetData(mitk::Image::New());
-  //TestAllProperties(node->GetPropertyList());
-  //node->SetData(mitk::Surface::New());
-  //TestAllProperties(node->GetPropertyList());
-  //node->SetData(mitk::Cone::New());
-  //TestAllProperties(node->GetPropertyList());
-  //node->SetData(mitk::Cuboid::New());
-  //TestAllProperties(node->GetPropertyList());
-  //node->SetData(mitk::Cylinder::New());
-  //TestAllProperties(node->GetPropertyList());
-  //node->SetData(mitk::Ellipsoid::New());
-  //TestAllProperties(node->GetPropertyList());
-  //node->SetData(mitk::ExtrudedContour::New());
-  //TestAllProperties(node->GetPropertyList());
-  //node->SetData(mitk::Plane::New());
-  //TestAllProperties(node->GetPropertyList());
-  ////node->SetData(mitk::TrackingVolume::New());  // TrackingVolume is in IGT Module, it does not have special properties, therefore we skip it here
-  ////TestAllProperties(node->GetPropertyList());
-  //node->SetData(mitk::UnstructuredGrid::New());
-  //TestAllProperties(node->GetPropertyList());
-  //node->SetData(mitk::VtkWidgetRendering::New());
-  //TestAllProperties(node->GetPropertyList());
+  node->SetData(mitk::UnstructuredGrid::New());
+  TestAllProperties(node->GetPropertyList());
+  node->SetData(mitk::VtkWidgetRendering::New());
+  TestAllProperties(node->GetPropertyList());
 
-/* not tested base data types: 
+/* untested base data types:
   BaseDataImplementation
   ColoredRectangleRendering
   mitk::DiffusionImage< TPixelType >

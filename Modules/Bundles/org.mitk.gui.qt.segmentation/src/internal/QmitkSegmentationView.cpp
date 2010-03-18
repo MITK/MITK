@@ -38,7 +38,6 @@ QmitkSegmentationView::QmitkSegmentationView()
 :m_Parent(NULL)
 ,m_Controls(NULL)
 ,m_MultiWidget(NULL)
-,m_JustSentASelection(false)
 ,m_PostProcessing(NULL)
 ,m_RenderingManagerObserverTag(0)
 {
@@ -63,7 +62,7 @@ void QmitkSegmentationView::NewNodeObjectsGenerated(mitk::ToolManager::DataVecto
   if (!toolManager) return;
   for (mitk::ToolManager::DataVectorType::iterator iter = nodes->begin(); iter != nodes->end(); ++iter)
   {
-    SendSelectedEvent( toolManager->GetReferenceData(0), *iter );
+    this->FireNodeSelected( *iter );
     // only last iteration meaningful, multiple generated objects are not taken into account here
   }
 }
@@ -278,7 +277,8 @@ void QmitkSegmentationView::CreateNewSegmentation()
 
             this->GetDefaultDataStorage()->Add( emptySegmentation, node ); // add as a child, because the segmentation "derives" from the original
 
-            SendSelectedEvent( node, emptySegmentation );
+            this->FireNodeSelected( emptySegmentation );
+            this->OnSelectionChanged( emptySegmentation );
           }
           catch (std::bad_alloc)
           {
@@ -340,6 +340,12 @@ void QmitkSegmentationView::ToolboxStackPageChanged(int id)
 
 // protected 
 
+void QmitkSegmentationView::OnSelectionChanged(mitk::DataNode* node)
+{
+  std::vector<mitk::DataNode*> nodes;
+  nodes.push_back( node );
+  this->OnSelectionChanged( nodes );
+}
 
 void QmitkSegmentationView::OnSelectionChanged(std::vector<mitk::DataNode*> nodes)
 {
@@ -478,14 +484,6 @@ void QmitkSegmentationView::SetToolManagerSelection(const mitk::DataNode* refere
     m_Controls->lblWorkingImageSelectionWarning->hide();
   }
 
-}
-
-void QmitkSegmentationView::SendSelectedEvent( mitk::DataNode* /*referenceNode*/, mitk::DataNode* workingNode )
-{
-  // send a BlueBerry selection event for workingNode (done here for newly created segmentations)
-  m_JustSentASelection = true;
-  this->FireNodeSelected(workingNode);
-  m_JustSentASelection = false;
 }
 
 void QmitkSegmentationView::CheckImageAlignment()

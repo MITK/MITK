@@ -44,6 +44,7 @@ class QmitkSegmentationView : public QObject, public QmitkFunctionality
     /*!  
     \brief Invoked when the DataManager selection changed
     */
+    virtual void OnSelectionChanged(mitk::DataNode* node);
     virtual void OnSelectionChanged(std::vector<mitk::DataNode*> nodes);
       
     // reaction to new segmentations being created by segmentation tools
@@ -98,9 +99,6 @@ class QmitkSegmentationView : public QObject, public QmitkFunctionality
     // propagate BlueBerry selection to ToolManager for manual segmentation
     void SetToolManagerSelection(const mitk::DataNode* referenceData, const mitk::DataNode* workingData);
     
-    // sending of selection events to data manager (an potential other observers)
-    void SendSelectedEvent( mitk::DataNode* referenceNode, mitk::DataNode* workingNode );
-
     // checks if selected reference image is aligned with the slices stack orientation of the StdMultiWidget
     void CheckImageAlignment();
 
@@ -130,9 +128,6 @@ class QmitkSegmentationView : public QObject, public QmitkFunctionality
 
     // THE currently existing QmitkStdMultiWidget
     QmitkStdMultiWidget * m_MultiWidget;
-
-    // used to allow the exceptional reaction of this view to its own selection events
-    bool m_JustSentASelection;
 
     QmitkSegmentationPostProcessing* m_PostProcessing;
 

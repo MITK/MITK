@@ -46,8 +46,6 @@ QmitkSegmentationView::QmitkSegmentationView()
 
 QmitkSegmentationView::~QmitkSegmentationView()
 {
-  mitk::RenderingManager::GetInstance()->RemoveObserver( m_RenderingManagerObserverTag );
-
   delete m_PostProcessing;
   delete m_Controls;
 }
@@ -80,6 +78,10 @@ void QmitkSegmentationView::Visible()
     m_Controls->m_LesionToolSelectionBox->setEnabled( true );
   
     m_Controls->m_SlicesInterpolator->EnableInterpolation( m_Controls->widgetStack->currentWidget() == m_Controls->pageManual );
+
+    itk::ReceptorMemberCommand<QmitkSegmentationView>::Pointer command1 = itk::ReceptorMemberCommand<QmitkSegmentationView>::New();
+    command1->SetCallbackFunction( this, &QmitkSegmentationView::RenderingManagerReinitialized );
+    m_RenderingManagerObserverTag = mitk::RenderingManager::GetInstance()->AddObserver( mitk::RenderingManagerViewsInitializedEvent(), command1 );
   }
 }
 
@@ -87,6 +89,8 @@ void QmitkSegmentationView::Hidden()
 {
   if( m_Controls )
   {
+    mitk::RenderingManager::GetInstance()->RemoveObserver( m_RenderingManagerObserverTag );
+
     m_Controls->m_ManualToolSelectionBox->setEnabled( false );
     m_Controls->m_OrganToolSelectionBox->setEnabled( false );
     m_Controls->m_LesionToolSelectionBox->setEnabled( false );
@@ -648,10 +652,6 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
 
   // create helper class to provide context menus for segmentations in data manager
   m_PostProcessing = new QmitkSegmentationPostProcessing(this->GetDefaultDataStorage(), this, NULL);
-
-  itk::ReceptorMemberCommand<QmitkSegmentationView>::Pointer command1 = itk::ReceptorMemberCommand<QmitkSegmentationView>::New();
-  command1->SetCallbackFunction( this, &QmitkSegmentationView::RenderingManagerReinitialized );
-  m_RenderingManagerObserverTag = mitk::RenderingManager::GetInstance()->AddObserver( mitk::RenderingManagerViewsInitializedEvent(), command1 );
 }
 
       

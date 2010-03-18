@@ -11,7 +11,7 @@
       name="RegionGrowing"
       category="org.mitk.views.general"
       icon="resources/icon.xpm"
-      class="QmitkRegionGrowing" />
+      class="QmitkRegionGrowingView" />
   </extension>
 
 </plugin>

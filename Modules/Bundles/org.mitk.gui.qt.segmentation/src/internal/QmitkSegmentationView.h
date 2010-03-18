@@ -19,8 +19,6 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef QmitkSegmentationView_h
 #define QmitkSegmentationView_h
 
-#include "mitkDataNodeSelection.h"
-
 #include "QmitkFunctionality.h"
 
 #include <berryIBerryPreferences.h>

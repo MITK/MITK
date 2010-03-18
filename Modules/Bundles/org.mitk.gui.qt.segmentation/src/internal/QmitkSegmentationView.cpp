@@ -397,7 +397,7 @@ mitk::DataNode::Pointer QmitkSegmentationView::FindFirstRegularImage( std::vecto
 {
   if (nodes.empty()) return NULL;
 
-  for(int i = 0; i < nodes.size(); ++i)
+  for(unsigned int i = 0; i < nodes.size(); ++i)
   {
       //mitk::DataNode::Pointer node = i.value()
       bool isImage(false);
@@ -423,7 +423,7 @@ mitk::DataNode::Pointer QmitkSegmentationView::FindFirstSegmentation( std::vecto
   if (nodes.empty()) return NULL;
 
  
-  for(int i = 0; i < nodes.size(); ++i)
+  for(unsigned int i = 0; i < nodes.size(); ++i)
   {
       bool isImage(false);
       if (nodes.at(i)->GetData())

@@ -107,6 +107,8 @@ protected:
   virtual ~SurfaceVtkMapper3D();
 
   virtual void GenerateData(mitk::BaseRenderer* renderer);
+  
+  virtual void ResetMapper( mitk::BaseRenderer* renderer );
 
   /** Checks whether the specified property is a ClippingProperty and if yes,
    * adds it to m_ClippingPlaneCollection (internal method). */

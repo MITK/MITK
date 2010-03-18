@@ -178,7 +178,17 @@ namespace mitk {
     virtual void GenerateData();
     //##Documentation
     //## @brief Generate the data needed for rendering into @a renderer
-    virtual void GenerateData(BaseRenderer *renderer);
+    virtual void GenerateData(BaseRenderer* renderer);
+
+    //## Updates the time step, which is sometimes needed in subclasses
+    virtual void CalculateTimeStep( BaseRenderer* renderer );
+    
+    //## Reset the mapper (i.e., make sure that nothing is displayed) if no
+    //## valid data is present.
+    //##
+    //## To be implemented in sub-classes.
+    virtual void ResetMapper( BaseRenderer* renderer ) { };
+
 
     bool m_VtkBased;
 
@@ -190,8 +200,6 @@ namespace mitk {
 
   private:
 
-    //## Updates the time step, which is sometimes needed in subclasses
-    virtual void CalculateTimeStep( BaseRenderer *renderer );
 
     //## The current time step of the dataset to be rendered, for use in subclasses
     //## The momentary timestep can be accessed via the GetTimestep() method.

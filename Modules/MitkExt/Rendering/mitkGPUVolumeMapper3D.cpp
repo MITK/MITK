@@ -280,9 +280,6 @@ void mitk::GPUVolumeMapper3D::GenerateDataGPU( mitk::BaseRenderer *renderer )
   
   ls->m_MapperGPU->SetUseCompressedTexture(useCompression);
   
-  const TimeSlicedGeometry* inputtimegeometry = input->GetTimeSlicedGeometry();
-  assert(inputtimegeometry!=NULL);
-
   const Geometry3D* worldgeometry = renderer->GetCurrentWorldGeometry();
   if(worldgeometry==NULL)
   {
@@ -310,15 +307,7 @@ void mitk::GPUVolumeMapper3D::GenerateDataGPU( mitk::BaseRenderer *renderer )
     ls->m_MapperGPU->SetSampleDistance(1.0); 
   }
 
-  int timestep=0;
-  ScalarType time = worldgeometry->GetTimeBounds()[0];
-  if (time> ScalarTypeNumericTraits::NonpositiveMin())
-    timestep = inputtimegeometry->MSToTimeStep(time);
-
-  if (inputtimegeometry->IsValidTime(timestep)==false)
-    return;
-
-  vtkImageData *inputData = input->GetVtkImageData(timestep);
+  vtkImageData *inputData = input->GetVtkImageData( this->GetTimestep() );
   if(inputData==NULL)
     return;
 
@@ -368,9 +357,6 @@ void mitk::GPUVolumeMapper3D::GenerateDataCPU( mitk::BaseRenderer *renderer )
 
   m_VolumeCPU->VisibilityOn();
   
-  const TimeSlicedGeometry* inputtimegeometry = input->GetTimeSlicedGeometry();
-  assert(inputtimegeometry!=NULL);
-
   const Geometry3D* worldgeometry = renderer->GetCurrentWorldGeometry();
   if(worldgeometry==NULL)
   {
@@ -398,15 +384,7 @@ void mitk::GPUVolumeMapper3D::GenerateDataCPU( mitk::BaseRenderer *renderer )
     m_MapperCPU->SetSampleDistance(1.0); 
   }
 
-  int timestep=0;
-  ScalarType time = worldgeometry->GetTimeBounds()[0];
-  if (time> ScalarTypeNumericTraits::NonpositiveMin())
-    timestep = inputtimegeometry->MSToTimeStep(time);
-
-  if (inputtimegeometry->IsValidTime(timestep)==false)
-    return;
-
-  vtkImageData *inputData = input->GetVtkImageData(timestep);
+  vtkImageData *inputData = input->GetVtkImageData( this->GetTimestep() );
   if(inputData==NULL)
     return;
 

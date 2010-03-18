@@ -116,6 +116,7 @@ namespace mitk {
 
     virtual void GenerateData();
     virtual void GenerateData(mitk::BaseRenderer* renderer);
+    virtual void ResetMapper( BaseRenderer* renderer );
     virtual void ApplyProperties(mitk::BaseRenderer* renderer);
     virtual void CreateContour(mitk::BaseRenderer* renderer);
     virtual void CreateVTKRenderObjects();

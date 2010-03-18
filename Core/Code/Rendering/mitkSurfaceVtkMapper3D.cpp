@@ -58,7 +58,6 @@ mitk::SurfaceVtkMapper3D::~SurfaceVtkMapper3D()
 void mitk::SurfaceVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
 {
   LocalStorage *ls = m_LSH.GetLocalStorage(renderer);
-//  m_Prop3D = ls->m_Actor;
   
   bool visible = IsVisible(renderer);
 
@@ -69,42 +68,10 @@ void mitk::SurfaceVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
   }
 
   //
-  // get the TimeSlicedGeometry of the input object
-  //
-  mitk::Surface::Pointer input  = const_cast< mitk::Surface* >( this->GetInput() );
-  const TimeSlicedGeometry* inputTimeGeometry = input->GetTimeSlicedGeometry();
-  if(( inputTimeGeometry == NULL ) || ( inputTimeGeometry->GetTimeSteps() == 0 ) )
-  {
-    ls->m_Actor->VisibilityOff();
-    return;
-  }
-
-  //
-  // get the world time
-  //
-  const Geometry2D* worldGeometry = renderer->GetCurrentWorldGeometry2D();
-  assert( worldGeometry != NULL );
-  ScalarType time = worldGeometry->GetTimeBounds()[ 0 ];
-
-  //
-  // convert the world time in time steps of the input object
-  //
-  int timestep=0;
-  if( time > ScalarTypeNumericTraits::NonpositiveMin() )
-    timestep = inputTimeGeometry->MSToTimeStep( time );
-  if( inputTimeGeometry->IsValidTime( timestep ) == false )
-  {
-    ls->m_Actor->VisibilityOff();
-    return;
-  }
-//  MITK_INFO << "time: "<< time << std::endl;
-//  MITK_INFO << "timestep: "<<timestep << std::endl;
-  
-  //
   // set the input-object at time t for the mapper
   //
-
-  vtkPolyData * polydata = input->GetVtkPolyData( timestep );
+  mitk::Surface::Pointer input  = const_cast< mitk::Surface* >( this->GetInput() );
+  vtkPolyData * polydata = input->GetVtkPolyData( this->GetTimestep() );
   if(polydata == NULL) 
   {
     ls->m_Actor->VisibilityOff();
@@ -128,6 +95,13 @@ void mitk::SurfaceVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
 
   if(visible)
     ls->m_Actor->VisibilityOn();
+}
+
+
+void mitk::SurfaceVtkMapper3D::ResetMapper( BaseRenderer* renderer )
+{
+  LocalStorage *ls = m_LSH.GetLocalStorage(renderer);
+  ls->m_Actor->VisibilityOff();
 }
 
 void mitk::SurfaceVtkMapper3D::ApplyMitkPropertiesToVtkProperty(mitk::DataNode *node, vtkProperty* property, mitk::BaseRenderer* renderer)

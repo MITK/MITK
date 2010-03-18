@@ -220,20 +220,9 @@ void mitk::MeshVtkMapper3D::GenerateData( mitk::BaseRenderer *renderer )
   {
     m_SpheresActor->VisibilityOff();
   }
+}
 
-
-  // Get the TimeSlicedGeometry of the input object
-  mitk::Mesh::Pointer input  = const_cast<mitk::Mesh*>(this->GetInput());
-  const TimeSlicedGeometry *inputTimeGeometry = input->GetTimeSlicedGeometry();
-  if (( inputTimeGeometry == NULL ) || ( inputTimeGeometry->GetTimeSteps() == 0 ))
-  {
-    m_PropAssembly->VisibilityOff();
-    return;
-  }
-
-  if( inputTimeGeometry->IsValidTime( this->GetTimestep() ) == false )
-  {
-    m_PropAssembly->VisibilityOff();
-    return;
-  }
+void mitk::MeshVtkMapper3D::ResetMapper( BaseRenderer* renderer )
+{
+  m_PropAssembly->VisibilityOff();
 }

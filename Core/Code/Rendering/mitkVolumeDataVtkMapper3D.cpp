@@ -323,15 +323,7 @@ void mitk::VolumeDataVtkMapper3D::GenerateData( mitk::BaseRenderer *renderer )
     return;
   }
 
-  int timestep=0;
-  ScalarType time = worldgeometry->GetTimeBounds()[0];
-  if (time> ScalarTypeNumericTraits::NonpositiveMin())
-    timestep = inputtimegeometry->MSToTimeStep(time);
-
-  if (inputtimegeometry->IsValidTime(timestep)==false)
-    return;
-
-  vtkImageData *inputData = input->GetVtkImageData(timestep);
+  vtkImageData *inputData = input->GetVtkImageData( this->GetTimestep() );
   if(inputData==NULL)
     return;
 

@@ -112,8 +112,6 @@ void mitk::Mapper::Update(mitk::BaseRenderer *renderer)
   const DataNode* node = GetDataNode();
   assert(node!=NULL);
 
-  this->CalculateTimeStep( renderer );
-
   //safety cause there are datatreenodes that have no defined data (video-nodes and root)
   unsigned int dataMTime = 0;
   mitk::BaseData::Pointer data = static_cast<mitk::BaseData *>(node->GetData());
@@ -123,10 +121,18 @@ void mitk::Mapper::Update(mitk::BaseRenderer *renderer)
     dataMTime = data->GetMTime();
   }
 
-  // Check if time step is valid; TODO: Check if invalid data is still visualized
-  if(!(data->GetTimeSlicedGeometry()->IsValidTime(m_TimeStep)))
+  // Calculate time step of the input data for the specified renderer (integer value)
+  this->CalculateTimeStep( renderer );
+
+  // Check if time step is valid
+  const TimeSlicedGeometry *dataTimeGeometry = data->GetTimeSlicedGeometry();
+  if ( ( dataTimeGeometry == NULL )
+    || ( dataTimeGeometry->GetTimeSteps() == 0 )
+    || ( !dataTimeGeometry->IsValidTime( m_TimeStep ) ) )
   {
-    itkWarningMacro(<< "Warning: " << data << " is not defined at this timestep!");
+    // TimeSlicedGeometry or time step is not valid for this data:
+    // reset mapper so that nothing is displayed
+    this->ResetMapper( renderer );
     return;
   }
 

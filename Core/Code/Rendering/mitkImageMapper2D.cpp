@@ -312,13 +312,6 @@ mitk::ImageMapper2D::GenerateData( mitk::BaseRenderer *renderer )
   rendererInfo.Squeeze();
 
 
-  const TimeSlicedGeometry *inputTimeGeometry = input->GetTimeSlicedGeometry();
-  if ( ( inputTimeGeometry == NULL )
-    || ( inputTimeGeometry->GetTimeSteps() == 0 ) )
-  {
-    return;
-  }
-
   iil4mitkPicImage *image = new iil4mitkPicImage( 512 );
   rendererInfo.Set_iil4mitkImage( image );
 
@@ -331,29 +324,17 @@ mitk::ImageMapper2D::GenerateData( mitk::BaseRenderer *renderer )
     return;
   }
 
-  int timestep = 0;
-  ScalarType time = worldGeometry->GetTimeBounds()[0];
-  if ( time > ScalarTypeNumericTraits::NonpositiveMin() )
-  {
-    timestep = inputTimeGeometry->MSToTimeStep( time );
-  }
-
-  if ( inputTimeGeometry->IsValidTime( timestep ) == false )
-  {
-    return;
-  }
-
   // check if there is something to display.
-  if ( ! input->IsVolumeSet( timestep ) ) return;
+  if ( ! input->IsVolumeSet( this->GetTimestep() ) ) return;
 
   Image::RegionType requestedRegion = input->GetLargestPossibleRegion();
-  requestedRegion.SetIndex( 3, timestep );
+  requestedRegion.SetIndex( 3, this->GetTimestep() );
   requestedRegion.SetSize( 3, 1 );
   requestedRegion.SetSize( 4, 1 );
   input->SetRequestedRegion( &requestedRegion );
   input->Update();
 
-  vtkImageData* inputData = input->GetVtkImageData( timestep );
+  vtkImageData* inputData = input->GetVtkImageData( this->GetTimestep() );
 
   if ( inputData == NULL )
   {
@@ -371,15 +352,14 @@ mitk::ImageMapper2D::GenerateData( mitk::BaseRenderer *renderer )
   Vector3D right, bottom, normal;
   Vector3D rightInIndex, bottomInIndex;
 
-  assert( input->GetTimeSlicedGeometry() == inputTimeGeometry );
-
   // take transform of input image into account
-  Geometry3D* inputGeometry = inputTimeGeometry->GetGeometry3D( timestep );
+  const TimeSlicedGeometry *inputTimeGeometry = input->GetTimeSlicedGeometry();
+  const Geometry3D* inputGeometry = inputTimeGeometry->GetGeometry3D( this->GetTimestep() );
 
   ScalarType mmPerPixel[2];
 
 
-  // Bounds information for reslicing (only required if reference geometry 
+  // Bounds information for reslicing (only reuqired if reference geometry 
   // is present)
   vtkFloatingPointType bounds[6];
   bool boundsInitialized = false;
@@ -1043,11 +1023,11 @@ mitk::ImageMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
 void
 mitk::ImageMapper2D::Update(mitk::BaseRenderer* renderer)
 {
-  mitk::Image* input  = const_cast<mitk::ImageMapper2D::InputImageType *>(
+  mitk::Image* data  = const_cast<mitk::ImageMapper2D::InputImageType *>(
     this->GetInput()
     );
 
-  if ( input == NULL )
+  if ( data == NULL )
   {
     return;
   }
@@ -1057,16 +1037,29 @@ mitk::ImageMapper2D::Update(mitk::BaseRenderer* renderer)
     return;
   }
 
+  // Calculate time step of the input data for the specified renderer (integer value)
+  this->CalculateTimeStep( renderer );
+
+  // Check if time step is valid
+  const TimeSlicedGeometry *dataTimeGeometry = data->GetTimeSlicedGeometry();
+  if ( ( dataTimeGeometry == NULL )
+    || ( dataTimeGeometry->GetTimeSteps() == 0 )
+    || ( !dataTimeGeometry->IsValidTime( this->GetTimestep() ) ) )
+  {
+    return;
+  }
+
+
   const DataNode *node = this->GetDataNode();
 
   RendererInfo& rendererInfo = AccessRendererInfo( renderer );
   iil4mitkPicImage* image = rendererInfo.Get_iil4mitkImage();
 
-  input->UpdateOutputInformation();
+  data->UpdateOutputInformation();
 
   if ( (image == NULL)
     || (rendererInfo.m_LastUpdateTime < node->GetMTime())
-    || (rendererInfo.m_LastUpdateTime < input->GetPipelineMTime())
+    || (rendererInfo.m_LastUpdateTime < data->GetPipelineMTime())
     || (rendererInfo.m_LastUpdateTime
     < renderer->GetCurrentWorldGeometry2DUpdateTime())
     || (rendererInfo.m_LastUpdateTime

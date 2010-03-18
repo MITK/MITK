@@ -444,23 +444,14 @@ void mitk::PointSetVtkMapper3D::GenerateData( mitk::BaseRenderer *renderer )
   {
     m_ContourActor->VisibilityOff();
   }
-
-
-  // Get the TimeSlicedGeometry of the input object
-  mitk::PointSet::Pointer input  = const_cast<mitk::PointSet*>(this->GetInput());
-  const TimeSlicedGeometry* inputTimeGeometry = input->GetTimeSlicedGeometry();
-  if (( inputTimeGeometry == NULL ) || ( inputTimeGeometry->GetTimeSteps() == 0 ))
-  {
-    m_PointsAssembly->VisibilityOff();
-    return;
-  }
-
-  if ( inputTimeGeometry->IsValidTime( this->GetTimestep() ) == false )
-  {
-    m_PointsAssembly->VisibilityOff();
-    return;
-  }
 }
+
+
+void mitk::PointSetVtkMapper3D::ResetMapper( BaseRenderer* renderer )
+{
+  m_PointsAssembly->VisibilityOff();
+}
+
 
 vtkProp* mitk::PointSetVtkMapper3D::GetVtkProp(mitk::BaseRenderer * /*renderer*/)
 {

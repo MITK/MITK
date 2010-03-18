@@ -20,7 +20,6 @@ PURPOSE.  See the above copyright notices for more information.
 #define QmitkSegmentationView_h
 
 #include "mitkDataNodeSelection.h"
-#include "mitkSegmentationSelectionProvider.h"
 
 #include "QmitkFunctionality.h"
 

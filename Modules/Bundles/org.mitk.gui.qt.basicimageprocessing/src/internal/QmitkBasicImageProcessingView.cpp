@@ -133,9 +133,9 @@ QmitkBasicImageProcessing::QmitkBasicImageProcessing()
 
 QmitkBasicImageProcessing::~QmitkBasicImageProcessing()
 {
-  berry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
-  if(s)
-    s->RemoveSelectionListener(m_SelectionListener);
+  //berry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
+  //if(s)
+  //  s->RemoveSelectionListener(m_SelectionListener);
 }
 
 void QmitkBasicImageProcessing::CreateQtPartControl(QWidget *parent)

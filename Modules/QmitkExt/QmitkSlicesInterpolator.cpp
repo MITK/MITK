@@ -391,9 +391,10 @@ void QmitkSlicesInterpolator::OnAcceptInterpolationClicked()
 {
   if (m_Segmentation && m_FeedbackNode->GetData())
   {
+    //making interpolation separately undoable
     mitk::UndoStackItem::IncCurrObjectEventId();
     mitk::UndoStackItem::IncCurrGroupEventId();
-    mitk::UndoStackItem::ExecuteIncrement(); // oh well designed undo stack, how do I love thee? let me count the ways... done
+    mitk::UndoStackItem::ExecuteIncrement();
 
     mitk::OverwriteSliceImageFilter::Pointer slicewriter = mitk::OverwriteSliceImageFilter::New();
     slicewriter->SetInput( m_Segmentation );
@@ -420,9 +421,10 @@ void QmitkSlicesInterpolator::AcceptAllInterpolations(unsigned int windowID)
       return; // cannot determine slice orientation
     }
 
+    //making interpolation separately undoable
     mitk::UndoStackItem::IncCurrObjectEventId();
     mitk::UndoStackItem::IncCurrGroupEventId();
-    mitk::UndoStackItem::ExecuteIncrement(); // oh well designed undo stack, how do I love thee? let me count the ways... done
+    mitk::UndoStackItem::ExecuteIncrement(); 
 
     // create a diff image for the undo operation
     mitk::Image::Pointer diffImage = mitk::Image::New();

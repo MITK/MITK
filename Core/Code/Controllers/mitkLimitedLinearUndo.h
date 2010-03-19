@@ -110,6 +110,10 @@ protected:
   //## Destructor
   virtual ~LimitedLinearUndo();
 
+  //## @brief Convenience method to free the memory of 
+  //## elements in the list and to clear the list
+  void ClearList(UndoContainer* list);
+
   UndoContainer m_UndoList;
 
   UndoContainer m_RedoList;

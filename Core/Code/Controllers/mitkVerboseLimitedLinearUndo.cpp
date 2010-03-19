@@ -34,7 +34,7 @@ bool mitk::VerboseLimitedLinearUndo::SetOperationEvent(UndoStackItem* undoStackI
   // clear the redolist, if a new operation is saved
   if (!m_RedoList.empty()) 
   {
-    m_RedoList.clear();
+    this->ClearList(&m_RedoList);
     InvokeEvent( RedoEmptyEvent() );
   }
 

@@ -26,10 +26,20 @@ mitk::LimitedLinearUndo::LimitedLinearUndo()
 
 mitk::LimitedLinearUndo::~LimitedLinearUndo()
 {
-  m_UndoList.clear(); 
-  m_RedoList.clear(); 
+  //delete undo and redo list
+  this->ClearList(&m_UndoList);
+  this->ClearList(&m_RedoList);
 }
 
+void mitk::LimitedLinearUndo::ClearList(UndoContainer* list)
+{
+  while(!list->empty())
+  {
+    UndoStackItem* item = list->back();
+    list->pop_back();
+    delete item;
+  }
+}
 
 bool mitk::LimitedLinearUndo::SetOperationEvent(UndoStackItem* stackItem)
 {
@@ -39,7 +49,7 @@ bool mitk::LimitedLinearUndo::SetOperationEvent(UndoStackItem* stackItem)
   // clear the redolist, if a new operation is saved
   if (!m_RedoList.empty())
   {
-    m_RedoList.clear();
+    this->ClearList(&m_RedoList);
     InvokeEvent( RedoEmptyEvent() );
   }
     
@@ -82,7 +92,7 @@ bool mitk::LimitedLinearUndo::Undo(int oeid)
     m_UndoList.back()->ReverseAndExecute();
     
     m_RedoList.push_back(m_UndoList.back());  // move to redo stack
-    m_UndoList.pop_back();                    // delete last operation from undo-list
+    m_UndoList.pop_back();
     InvokeEvent( RedoNotEmptyEvent() );
 
     if (m_UndoList.empty()) 
@@ -138,16 +148,16 @@ bool mitk::LimitedLinearUndo::Redo(int oeid)
 
 void mitk::LimitedLinearUndo::Clear()
 {
-  m_UndoList.clear();
+  this->ClearList(&m_UndoList);
   InvokeEvent( UndoEmptyEvent() );
-  
-  m_RedoList.clear();
+
+  this->ClearList(&m_RedoList);
   InvokeEvent( RedoEmptyEvent() );
 }
 
 void mitk::LimitedLinearUndo::ClearRedoList()
 {
-  m_RedoList.clear();
+  this->ClearList(&m_RedoList);
   InvokeEvent( RedoEmptyEvent() );
 }
 

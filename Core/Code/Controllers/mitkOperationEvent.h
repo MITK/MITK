@@ -134,24 +134,32 @@ class MITK_CORE_EXPORT UndoStackItem
 //## Additionally to the base class UndoStackItem, which only provides a description of an
 //## item, OperationEvent does the actual accounting of the undo/redo stack. This class
 //## holds two Operation objects (operation and its inverse operation) and the corresponding 
-//## OperationActor. The operations may be swapped, which is done by the
-//## LimitedLinearUndo models, when an OperationEvent is moved from the undo to the redo
+//## OperationActor. The operations may be swapped by the
+//## undo models, when an OperationEvent is moved from their undo to their redo
 //## stack or vice versa.
 //##
-//## \attention New, but highly needed method for this object: IsValid() tells you if the destination is still valid.
-//## If the destination happens to be an itk::Object (often the case), OperationEvent is informed as soon
-//## as the object is deleted - from this moment on the OperationEvent gets invalid. You should definitly
+//## Note, that memory management of operation and undooperation is done by this class. 
+//## Memory of both objects is freed in the destructor. For this, the method IsValid() is needed which holds 
+//## information of the state of m_Destination. In case the object referenced by m_Destination is already deleted, 
+//## isValid() returns false.
+//## In more detail if the destination happens to be an itk::Object (often the case), OperationEvent is informed as soon
+//## as the object is deleted - from this moment on the OperationEvent gets invalid. You should
 //## check this flag before you call anything on destination
 //##
 //## @ingroup Undo
 class MITK_CORE_EXPORT OperationEvent : public UndoStackItem
 {
 public:
-  //OperationEvent(OperationActor* destination, Operation* operation, Operation* undoOperation, int objectEventId, int groupEventId );
+  //## @brief default constructor
   OperationEvent(OperationActor* destination, Operation* operation, Operation* undoOperation, std::string description = "" );
 
+  //## @brief default destructor
+  //##
+  //## removes observers if destination is valid 
+  //## and frees memory referenced by m_Operation and m_UndoOperation
   virtual ~OperationEvent();
 
+  //## @brief Returns the operation
   Operation* GetOperation();
 
   //## @brief Returns the destination of the operations
@@ -160,10 +168,14 @@ public:
   friend class UndoModel;
 
   //## @brief Swaps the two operations and sets a flag, 
-  //## that it has been swapped and do is undo and undo is do
+  //## that it has been swapped and doOp is undoOp and undoOp is doOp
   virtual void ReverseOperations();
-  virtual void ReverseAndExecute();           /// reverses and executes both operations (used, when moved from undo to redo stack)
+  
+  //##reverses and executes both operations (used, when moved from undo to redo stack)
+  virtual void ReverseAndExecute();           
 
+  //## @brief returns true if the destination still is present 
+  //## and false if it already has been deleted
   virtual bool IsValid();
 
 protected:
@@ -176,15 +188,21 @@ private:
   // When destination is deleted, this stack item is invalid!
   OperationActor* m_Destination;
 
+  //## reference to the operation
   Operation* m_Operation;
 
+  //## reference to the undo operation
   Operation* m_UndoOperation;
 
-  OperationEvent(OperationEvent&);             // hide copy constructor
-  void operator=(const OperationEvent&);       // hide operator=
+  //## hide copy constructor
+  OperationEvent(OperationEvent&);             
+  //## hide operator=
+  void operator=(const OperationEvent&);       
 
+  //observertag used to listen to m_Destination
   unsigned long m_DeleteTag;
 
+  //## stores if destination is valid or already has been freed
   bool m_Invalid;
 };
 

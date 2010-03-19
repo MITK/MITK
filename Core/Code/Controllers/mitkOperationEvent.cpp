@@ -115,7 +115,7 @@ mitk::OperationEvent::OperationEvent(OperationActor* destination,
   m_UndoOperation(undoOperation),
   m_Invalid(false)
 {
-  // nothing to do
+  //connect to delete event
   if (itk::Object* object = dynamic_cast<itk::Object*>( m_Destination ))
   {
     itk::SimpleMemberCommand< OperationEvent >::Pointer command = itk::SimpleMemberCommand< OperationEvent >::New();
@@ -126,9 +126,10 @@ mitk::OperationEvent::OperationEvent(OperationActor* destination,
 
 mitk::OperationEvent::~OperationEvent()
 {
-  if (itk::Object* object = dynamic_cast<itk::Object*>( m_Destination ))
+  //remove the observer if the data m_Destination still is present
+  if (!m_Invalid)
   {
-    if (!m_Invalid)
+    if (itk::Object* object = dynamic_cast<itk::Object*>( m_Destination ))
     {
       object->RemoveObserver( m_DeleteTag );
     }

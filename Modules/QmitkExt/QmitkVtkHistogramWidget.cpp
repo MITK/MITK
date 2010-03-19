@@ -1,5 +1,5 @@
 /*=========================================================================
- 
+
 Program:   Medical Imaging & Interaction Toolkit
 Module:    $RCSfile: mitkPropertyManager.cpp,v $
 Language:  C++
@@ -36,7 +36,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkQtChartAxisLayer.h>
 #include <vtkQtChartAxis.h>
 #include <vtkQtChartAxisOptions.h>
-
+#include <vtkQtChartLegend.h>
+#include <vtkQtChartLegendManager.h>
 
 //#include <iostream>
 
@@ -51,9 +52,6 @@ QmitkVtkHistogramWidget::QmitkVtkHistogramWidget( QWidget *parent )
   QBoxLayout *layout = new QVBoxLayout( this );
   layout->addWidget( m_ChartWidget );
   layout->setSpacing( 10 );
-
-
-  //m_BarChart = new vtkBarChart
 
 
 
@@ -100,7 +98,6 @@ QmitkVtkHistogramWidget::QmitkVtkHistogramWidget( QWidget *parent )
   // Set up the model for the bar chart.
   m_ItemModel = new QStandardItemModel( m_BarChart );
   m_ItemModel->setItemPrototype( new QStandardItem() );
-  m_ItemModel->setHorizontalHeaderItem( 0, new QStandardItem("Histogram") );
 }
 
 
@@ -199,11 +196,12 @@ void QmitkVtkHistogramWidget::UpdateItemModelFromHistogram()
 
   // Allocate data in item model
   m_ItemModel->setRowCount( endIndex + 1 - startIndex );
+  m_ItemModel->setColumnCount( 1 );
 
   // Fill item model with histogram data
   for ( it = startIt, i = 0; it != endIt; ++it, ++i )
   {
-    const float &frequency = it.GetFrequency();
+    const double &frequency = it.GetFrequency();
     const double &measurement = it.GetMeasurementVector()[0];
     
     m_ItemModel->setVerticalHeaderItem( i, new QStandardItem() );
@@ -211,21 +209,20 @@ void QmitkVtkHistogramWidget::UpdateItemModelFromHistogram()
       QVariant( measurement ), Qt::DisplayRole );
 
     m_ItemModel->setItem( i, 0, new QStandardItem() );
-    m_ItemModel->item( i, 0 )->setData( frequency, Qt::DisplayRole );
+    m_ItemModel->item( i, 0 )->setData( QVariant( frequency ), Qt::DisplayRole );
   }
 
   vtkQtChartTableSeriesModel *table =
     new vtkQtChartTableSeriesModel( m_ItemModel, m_BarChart );
   m_BarChart->setModel( table );
+
+  m_ChartWidget->show();
 }
 
 
 void QmitkVtkHistogramWidget::ClearItemModel()
 {
-  m_ItemModel->setRowCount( 0 );
-  vtkQtChartTableSeriesModel *table =
-    new vtkQtChartTableSeriesModel( m_ItemModel, m_BarChart );
-  m_BarChart->setModel( table );
+  m_ItemModel->clear();
 }
 
 

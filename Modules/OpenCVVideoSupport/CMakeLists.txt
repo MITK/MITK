@@ -10,7 +10,10 @@ MESSAGE( STATUS "Creating Module mitkOpenCVVideoSupport" )
     PROVIDES mitkOpenCVVideoSupport
     EXPORT_DEFINE MITK_OPENCVVIDEOSUPPORT_EXPORT
   )
-
+  IF(BUILD_TESTING)
+	ADD_SUBDIRECTORY(Testing)
+  ENDIF(BUILD_TESTING)
+  
 ELSE(MITK_USE_OPEN_CV)
 
 	MESSAGE( STATUS "Not creating Module mitkOpenCVVideoSupport" )

@@ -67,6 +67,10 @@ namespace mitk
     virtual int SetVideoCaptureProperty(int property_id, double value);
  
     virtual void GetCurrentFrameAsOpenCVImage(IplImage * image);
+    ///
+    /// Return the current frame
+    ///
+    const IplImage * GetCurrentFrame();
     ////##Documentation
     ////## @brief returns the current video data as an ITK image. 
     virtual void GetCurrentFrameAsItkHSVPixelImage(HSVPixelImageType::Pointer &Image);

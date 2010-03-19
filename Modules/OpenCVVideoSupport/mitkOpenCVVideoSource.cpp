@@ -84,21 +84,23 @@ unsigned char* mitk::OpenCVVideoSource::GetVideoTexture()
   return this->m_CurrentVideoTexture;
 }
 
-void mitk::OpenCVVideoSource::GetCurrentFrameAsOpenCVImage(IplImage * image)
-{ // get last captured frame for processing the image data
-  
 
+//image = cvCreateImage( cvSize( m_CurrentImage->width, m_CurrentImage->height )
+                      //, m_CurrentImage->depth, m_CurrentImage->nChannels );
+
+const IplImage * mitk::OpenCVVideoSource::GetCurrentFrame()
+{
+  return m_CurrentImage;
+}
+
+void mitk::OpenCVVideoSource::GetCurrentFrameAsOpenCVImage(IplImage * image)
+{ // get last captured frame for processing the image data  
   if(m_CurrentImage)
   {
-
-    if(!image)
-    {
-      image = cvCloneImage(m_CurrentImage);
-    }
-    else
+    if(image)
     {
       image->origin = m_CurrentImage->origin;
-      memcpy(image->imageData,m_CurrentImage->imageData,m_CurrentImage->width*m_CurrentImage->height*3);  
+      memcpy(image->imageData,m_CurrentImage->imageData,m_CurrentImage->width*m_CurrentImage->height*m_CurrentImage->nChannels);  
     }
   }
 }

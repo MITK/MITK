@@ -32,9 +32,6 @@ mitk::PaintbrushTool::PaintbrushTool(int paintingPixelValue)
  m_PaintingPixelValue(paintingPixelValue),
  m_LastContourSize(0) // other than initial mitk::PaintbrushTool::m_Size (around l. 28)
 {
-  m_MasterContour = Contour::New();
-  m_MasterContour->Initialize();
-
 }
 
 mitk::PaintbrushTool::~PaintbrushTool()

@@ -70,6 +70,13 @@ public:
 
   /** Smart Pointer type to a ImageDataItem. */
   typedef itk::SmartPointerForwardReference<ImageDataItem> ImageDataItemPointer;
+
+  //## @param ImportMemoryManagementType This parameter is evaluated when setting new data to an image.
+  //## The different options are: 
+  //## CopyMemory: Data to be set is copied and assigned to a new memory block. Data memory block will be freed on deletion of mitk::Image.
+  //## MamageMemory: Data to be set will be referenced, and Data memory block will be freed on deletion of mitk::Image. 
+  //## Reference Memory: Data to be set will be referenced, but Data memory block will not be freed on deletion of mitk::Image.
+  //## DontManageMemory = ReferenceMemory.
   enum ImportMemoryManagementType { CopyMemory, ManageMemory, ReferenceMemory, DontManageMemory = ReferenceMemory };
 
   //##Documentation

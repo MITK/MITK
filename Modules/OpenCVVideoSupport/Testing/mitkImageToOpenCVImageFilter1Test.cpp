@@ -15,7 +15,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#include "mitkImageTOOpenCVImageFilter.h"
+#include "mitkImageToOpenCVImageFilter1.h"
 #include "mitkOpenCVToMitkImageFilter.h"
 #include <mitkTestingMacros.h>
 #include <mitkITKImageImport.h>

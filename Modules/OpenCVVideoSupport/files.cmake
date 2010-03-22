@@ -4,5 +4,5 @@ SET(CPP_FILES
 	mitkUndistortCameraImage.cpp
 	mitkOpenCVVideoSource.cpp
 	mitkOpenCVToMitkImageFilter.cpp
-	mitkImageTOOpenCVImageFilter.cpp
+	mitkImageToOpenCVImageFilter.cpp
 )

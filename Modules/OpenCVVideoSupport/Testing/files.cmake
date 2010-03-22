@@ -2,7 +2,7 @@ SET(MODULE_TESTS
 )
 
 SET(MODULE_IMAGE_TESTS
-  mitkImageTOOpenCVImageFilterTest.cpp
+  mitkImageToOpenCVImageFilterTest.cpp
 )
 
 # list of images for which the tests are run

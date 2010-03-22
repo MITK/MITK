@@ -25,11 +25,11 @@ PURPOSE.  See the above copyright notices for more information.
 // #include <highgui.h>
 
 /**Documentation
- *  test for the class "ImageTOOpenCVImageFilter".
+ *  test for the class "ImageToOpenCVImageFilter".
  */
-int mitkImageTOOpenCVImageFilterTest(int argc, char* argv[])
+int mitkImageToOpenCVImageFilterTest(int argc, char* argv[])
 {
-  MITK_TEST_BEGIN("ImageTOOpenCVImageFilter")
+  MITK_TEST_BEGIN("ImageToOpenCVImageFilter")
 
   // create itk rgb image
   typedef unsigned char PixelType;

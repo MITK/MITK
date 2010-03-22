@@ -172,6 +172,9 @@ void mitk::PointSetInteractor::UnselectAll( unsigned int timeStep, ScalarType ti
       }
 
       pointSet->ExecuteOperation( doOp );
+
+      if ( !m_UndoEnabled )
+        delete doOp;
     }
   }
 }
@@ -204,6 +207,10 @@ void mitk::PointSetInteractor::SelectPoint( int position, unsigned int timeStep,
   }
 
   pointSet->ExecuteOperation( doOp );
+
+  if ( !m_UndoEnabled )
+    delete doOp;
+
 }
 
 
@@ -334,6 +341,9 @@ bool mitk::PointSetInteractor::ExecuteAction( Action* action, mitk::StateEvent c
       //execute the Operation
       pointSet->ExecuteOperation(doOp);
 
+      if ( !m_UndoEnabled )
+        delete doOp;
+
       //the point is added and directly selected in PintSet. So no need to call OpSELECTPOINT
 
       ok = true;
@@ -402,6 +412,8 @@ bool mitk::PointSetInteractor::ExecuteAction( Action* action, mitk::StateEvent c
           //here no undo is stored, because the movement-steps aren't interesting. 
           // only the start and the end is interisting to store for undo.
           pointSet->ExecuteOperation(doOp);
+          
+          delete doOp;
         }
         ++it;
       }
@@ -447,6 +459,9 @@ bool mitk::PointSetInteractor::ExecuteAction( Action* action, mitk::StateEvent c
           }
           //execute the Operation
           pointSet->ExecuteOperation(doOp);
+
+          if ( !m_UndoEnabled )
+            delete doOp;
 
           /*now select the point "position-1",
           and if it is the first in list,
@@ -509,6 +524,9 @@ bool mitk::PointSetInteractor::ExecuteAction( Action* action, mitk::StateEvent c
                 m_UndoController->SetOperationEvent(operationEvent);
               }
               pointSet->ExecuteOperation(doOp);
+
+              if ( !m_UndoEnabled )
+                delete doOp;
 
               //after delete the iterator is undefined, so start again 
               //count to the last existing entry
@@ -599,6 +617,7 @@ bool mitk::PointSetInteractor::ExecuteAction( Action* action, mitk::StateEvent c
               new mitk::PointOperation( OpREMOVE, timeInMS, pt, position );
             ++it;
             pointSet->ExecuteOperation( doOp );
+            delete doOp;
           }
           else it++;
         }
@@ -814,6 +833,10 @@ bool mitk::PointSetInteractor::ExecuteAction( Action* action, mitk::StateEvent c
 
         //execute the Operation
         pointSet->ExecuteOperation(doOp);
+
+        if ( !m_UndoEnabled )
+          delete doOp;
+
         ok = true;
       }
 
@@ -851,6 +874,10 @@ bool mitk::PointSetInteractor::ExecuteAction( Action* action, mitk::StateEvent c
         }
         //execute the Operation
         pointSet->ExecuteOperation(doOp);
+
+        if ( !m_UndoEnabled )
+          delete doOp;
+
         ok = true;
       }
 
@@ -915,6 +942,10 @@ bool mitk::PointSetInteractor::ExecuteAction( Action* action, mitk::StateEvent c
           }
           //execute the Operation
           pointSet->ExecuteOperation(doOp);
+
+          if ( !m_UndoEnabled )
+            delete doOp;
+
         }
         ++it;
       }
@@ -995,6 +1026,10 @@ void mitk::PointSetInteractor::Clear( unsigned int timeStep, ScalarType timeInMS
     
     ++it;
     pointSet->ExecuteOperation( doOp );
+
+    if ( !m_UndoEnabled )
+      delete doOp;
+
   }
 
   //reset the statemachine

@@ -38,6 +38,7 @@ SET(CPP_FILES
  QmitkCallbackFromGUIThread.cpp
  QmitkEditPointDialog.cpp
  QmitkExtRegisterClasses.cpp
+ QmitkFileChooser.cpp
  # QmitkRenderingManager.cpp
  # QmitkRenderingManagerFactory.cpp
  # QmitkRenderWindow.cpp
@@ -176,6 +177,7 @@ SET(MOC_H_FILES
  QmitkPointListViewWidget.h
  QmitkHistogramWidget.h
  QmitkVideoBackground.h
+ QmitkFileChooser.h
  
  QmitkAboutDialog/QmitkAboutDialog.h
 )

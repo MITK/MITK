@@ -49,7 +49,7 @@ QtShell::QtShell(QWidget* parent, Qt::WindowFlags flags)
 
 QtShell::~QtShell()
 {
-  delete widget;
+  widget->deleteLater();
 }
 
 void QtShell::SetBounds(const Rectangle& bounds)

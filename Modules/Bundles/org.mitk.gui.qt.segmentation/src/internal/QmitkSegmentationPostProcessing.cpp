@@ -382,12 +382,23 @@ mitk::Image::Pointer QmitkSegmentationPostProcessing::IncreaseCroppedImageSize( 
   padFilter->UpdateLargestPossibleRegion();
 
 
-  mitk::Image::Pointer segmentationImage = mitk::Image::New();
-  mitk::CastToMitkImage(padFilter->GetOutput(), segmentationImage);
+  mitk::Image::Pointer paddedImage = mitk::Image::New();
+  mitk::CastToMitkImage(padFilter->GetOutput(), paddedImage);
 
-  segmentationImage->SetGeometry(image->GetGeometry());
+  paddedImage->SetGeometry(image->GetGeometry());
+  
+  //calculate translation vector according to padding to get the new origin
+  mitk::Vector3D transVector = image->GetGeometry()->GetSpacing();
+  transVector[0] = -(borderLiner/2);
+  transVector[1] = -(borderLiner/2);
+  transVector[2] = -(borderLiner/2);
 
-  return segmentationImage;
+  mitk::Vector3D newTransVectorInmm = image->GetGeometry()->GetSpacing();
+
+  image->GetGeometry()->IndexToWorld(mitkOriginPoint, transVector, newTransVectorInmm);
+  paddedImage->GetGeometry()->Translate(newTransVectorInmm);
+  //paddedImage->SetRequestedRegionToLargestPossibleRegion();
+
+  return paddedImage;
 }
-
 

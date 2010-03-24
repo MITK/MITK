@@ -32,6 +32,7 @@ PURPOSE.  See the above copyright notices for more information.
 * @brief Constructor
 * daclares a new StateMachine and connects
 * it to a StateMachine of Type type;
+* Also the undo mechanism is instanciated and enabled/disabled
 **/
 mitk::StateMachine::StateMachine(const char * type)
 : m_UndoController(NULL)
@@ -46,6 +47,10 @@ mitk::StateMachine::StateMachine(const char * type)
   if (!m_UndoController)
   {
     m_UndoController = new UndoController(UndoController::VERBOSE_LIMITEDLINEARUNDO);//switch to LLU or add LLU
+    
+    /**
+    * here the Undo mechanism is enabled / disabled for all interactors.
+    **/
     m_UndoEnabled = true;
   }
 

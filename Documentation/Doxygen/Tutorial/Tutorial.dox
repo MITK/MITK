@@ -7,7 +7,7 @@ We will start with the first steps of just compiling what you get after download
 display and do basic interaction with images, and finally show how to build an application module (functionality).
 
 The source code of the examples can be found in mitk/QApplications/Tutorial/ \n
-Two data files are used to execute the example code. They are located in mitk/Testing/Data/
+Two data files are used to execute the example code. They are located in mitk/Core/Code/Testing/Data/
 
 \li Pic3D.pic.gz \n
 This file contains an image.

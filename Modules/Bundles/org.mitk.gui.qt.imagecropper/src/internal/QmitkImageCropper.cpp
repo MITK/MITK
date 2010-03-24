@@ -326,16 +326,6 @@ void QmitkImageCropper::CropImage()
     resultImage = m_surrImage;
   }
 
-  //Centering
-  unsigned int *dims = resultImage->GetDimensions();
-  mitk::Vector3D sp = resultImage->GetGeometry()->GetSpacing();
-  mitk::Point3D origin = resultImage->GetGeometry()->GetOrigin();
-  mitk::Point3D center = m_ImageToCrop->GetGeometry()->GetCenter();
-
-  mitk::FillVector3D(origin,center[0]-((dims[0]/2)*sp[0]),center[1]-((dims[1]/2)*sp[1]),center[2]-((dims[2]/2)*sp[2]));
-
-  resultImage->GetGeometry()->SetOrigin(origin);
-
   RemoveBoundingObjectFromNode();
 
   {

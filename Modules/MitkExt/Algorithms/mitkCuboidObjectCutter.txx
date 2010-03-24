@@ -21,6 +21,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <itkImageRegionIteratorWithIndex.h>
 
+#include <vnl/vnl_cross.h>
+
 namespace mitk
 {
 template < typename TPixel, unsigned int VImageDimension, typename TOutputPixel >
@@ -98,21 +100,14 @@ void CuboidObjectCutter::CutImageWithOutputTypeSelect( itk::Image< TPixel, VImag
     bv1 = bbGeometry->GetAxisVector(1),
     bv2 = bbGeometry->GetAxisVector(2);
 
-  iv0.Normalize();
-  iv1.Normalize();
-  iv2.Normalize();
-  bv0.Normalize();
-  bv1.Normalize();
-  bv2.Normalize();
-
   //Tests if the bounding box was not rotated: if true, a faster version of the method is executed.
-  if ((iv0 == bv0) && (iv1 == bv1) && (iv2 == bv2))
+  if ((vnl_cross_3d(iv0.GetVnlVector(), bv0.GetVnlVector()).squared_magnitude() < 1e-3f) &&
+      (vnl_cross_3d(iv1.GetVnlVector(), bv1.GetVnlVector()).squared_magnitude() < 1e-3f) &&
+      (vnl_cross_3d(iv2.GetVnlVector(), bv2.GetVnlVector()).squared_magnitude() < 1e-3f))
   {
-    //shall we use a fixed value for each inside pixel?
     if (cutter->GetUseInsideValue())
     {
       TOutputPixel insideValue  = (TOutputPixel) cutter->m_InsideValue;
-      // yes, use a fixed value for each inside pixel (create a binary mask of the bounding object)
       for ( inputIt.GoToBegin(), outputIt.GoToBegin(); !inputIt.IsAtEnd(); ++inputIt, ++outputIt)
       {
         outputIt.Set(insideValue);
@@ -120,7 +115,6 @@ void CuboidObjectCutter::CutImageWithOutputTypeSelect( itk::Image< TPixel, VImag
     }
     else
     {
-      // no, use the pixel value of the original image (normal cutting)
       for ( inputIt.GoToBegin(), outputIt.GoToBegin(); !inputIt.IsAtEnd(); ++inputIt, ++outputIt)
       {
         outputIt.Set( (TOutputPixel) inputIt.Value() );
@@ -132,7 +126,7 @@ void CuboidObjectCutter::CutImageWithOutputTypeSelect( itk::Image< TPixel, VImag
     if (cutter->GetUseInsideValue())
     {
       TOutputPixel insideValue  = (TOutputPixel) cutter->m_InsideValue;
-      // yes, use a fixed value for each inside pixel (create a binary mask of the bounding object)
+
       for ( inputIt.GoToBegin(), outputIt.GoToBegin(); !inputIt.IsAtEnd(); ++inputIt, ++outputIt)
       {
         vtk2itk(inputIt.GetIndex(), p);
@@ -151,7 +145,6 @@ void CuboidObjectCutter::CutImageWithOutputTypeSelect( itk::Image< TPixel, VImag
     }
     else
     {
-      // no, use the pixel value of the original image (normal cutting)
       for ( inputIt.GoToBegin(), outputIt.GoToBegin(); !inputIt.IsAtEnd(); ++inputIt, ++outputIt)
       {
         vtk2itk(inputIt.GetIndex(), p);

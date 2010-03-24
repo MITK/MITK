@@ -186,7 +186,7 @@ void mitk::MeshVtkMapper3D::GenerateData()
 }
 
 
-void mitk::MeshVtkMapper3D::GenerateData( mitk::BaseRenderer *renderer )
+void mitk::MeshVtkMapper3D::GenerateData( mitk::BaseRenderer* renderer )
 {
   SetVtkMapperImmediateModeRendering(m_ContourMapper);
   SetVtkMapperImmediateModeRendering(m_SpheresMapper);
@@ -222,7 +222,7 @@ void mitk::MeshVtkMapper3D::GenerateData( mitk::BaseRenderer *renderer )
   }
 }
 
-void mitk::MeshVtkMapper3D::ResetMapper( BaseRenderer* renderer )
+void mitk::MeshVtkMapper3D::ResetMapper( BaseRenderer* /*renderer*/ )
 {
   m_PropAssembly->VisibilityOff();
 }

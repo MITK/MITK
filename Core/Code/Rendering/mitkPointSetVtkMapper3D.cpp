@@ -447,7 +447,7 @@ void mitk::PointSetVtkMapper3D::GenerateData( mitk::BaseRenderer *renderer )
 }
 
 
-void mitk::PointSetVtkMapper3D::ResetMapper( BaseRenderer* renderer )
+void mitk::PointSetVtkMapper3D::ResetMapper( BaseRenderer* /*renderer*/ )
 {
   m_PointsAssembly->VisibilityOff();
 }

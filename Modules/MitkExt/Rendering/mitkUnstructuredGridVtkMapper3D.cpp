@@ -183,7 +183,7 @@ void mitk::UnstructuredGridVtkMapper3D::GenerateData(mitk::BaseRenderer* rendere
 }
 
 
-void mitk::UnstructuredGridVtkMapper3D::ResetMapper( BaseRenderer* renderer )
+void mitk::UnstructuredGridVtkMapper3D::ResetMapper( BaseRenderer* /*renderer*/ )
 {
   m_Assembly->VisibilityOff();
 }

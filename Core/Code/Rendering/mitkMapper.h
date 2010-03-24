@@ -187,7 +187,7 @@ namespace mitk {
     //## valid data is present.
     //##
     //## To be implemented in sub-classes.
-    virtual void ResetMapper( BaseRenderer* renderer ) { };
+    virtual void ResetMapper( BaseRenderer* /*renderer*/ ) { };
 
 
     bool m_VtkBased;

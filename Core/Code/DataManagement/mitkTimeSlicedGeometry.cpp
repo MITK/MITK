@@ -160,7 +160,9 @@ int mitk::TimeSlicedGeometry::MSToTimeStep(mitk::ScalarType time_in_ms) const
     if(m_TimeBounds[0] == m_TimeBounds[1])
       return 0;
     if((m_TimeBounds[0]>ScalarTypeNumericTraits::NonpositiveMin()) && (m_TimeBounds[1]<ScalarTypeNumericTraits::max()))
-      return (int) ((time_in_ms - m_TimeBounds[0])/(m_TimeBounds[1]-m_TimeBounds[0])*m_TimeSteps);
+    {   
+      return (int) ceil(((time_in_ms - m_TimeBounds[0])/(m_TimeBounds[1]-m_TimeBounds[0])*m_TimeSteps)-0.5);
+    }
     return 0;
   }
   else

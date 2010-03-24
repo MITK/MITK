@@ -42,6 +42,16 @@ public:
 
 protected:
 
+ // fix for bug 3378 - setPos() causes an app crash on MAC OS X
+#ifdef __APPLE__
+  void ResetMousePosition(int, int) {};
+#else
+  void ResetMousePosition(int xpos, int ypos)
+  {
+      QCursor::setPos(xpos, ypos);
+  };
+#endif
+
   int lastX,lastY;
 
 };

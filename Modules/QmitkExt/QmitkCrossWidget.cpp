@@ -48,7 +48,7 @@ void QmitkCrossWidget::mouseMoveEvent(QMouseEvent * )
   int deltaX = newX-lastX;
   int deltaY = newY-lastY;
 
-  QCursor::setPos( lastX,lastY );
+  this->ResetMousePosition( lastX,lastY);
 
   emit SignalDeltaMove( deltaX , deltaY );
 }

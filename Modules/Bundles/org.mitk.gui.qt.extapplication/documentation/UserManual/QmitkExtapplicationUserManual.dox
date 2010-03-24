@@ -1,5 +1,5 @@
 /**
-\mainpage The Main Application
+\bundlemainpage{org.extapplication} The Main Application
 
 Welcome to the MITK ExtApplication, build with the <B>M</B>edical <B>I</B>maging <B>T</B>ool<B>k</B>it ( http://mitk.org/ ). 
 
@@ -41,13 +41,13 @@ The datamanager and the \ref QmitkExtApplicationUserManualPerspectives have thei
 
 The four window view is the heart of the MITK ExtApplication image viewing. The standard layout is three 2D windows and one 3D window, with the transversal window in the top left quarter, the sagittal window in the top right quarter, the coronal window in the lower left quarter and the 3D window in the lower right quarter. The different planes form a crosshair that can be seen in the 3D window.
   
-Once you select a point within the picture informations about it are displayed at the bottom of the screen.
+Once you select a point within the picture, informations about it are displayed at the bottom of the screen.
 
 \subsection QmitkExtApplicationUserManualMultiWidgetNavigation Navigation
 
-Left click in any of the 2D windows centers the crosshair on that point. Pressing the right mouse button and moving the mouse zooms in and out. By scrolling with the mouse wheel you can navigate through the slices of the active window and pressing the mouse wheel while moving the mouse moves the image section.
+Left click in any of the 2D windows centers the crosshair on that point. Pressing the right mouse button and moving the mouse <B>zooms</B> in and out. By scrolling with the mouse wheel you can <B>navigate through</B> the slices of the active window and pressing the mouse wheel while moving the mouse <B>pans</B> the image section.
 
-In the 3D window you can rotate the object by pressing the left mouse button and moving the mouse, zoom either with the right mouse button as in 2D or with the mouse wheel, and pan the object by moving the mouse while the mouse wheel is pressed. Placing the cursor within the 3D window and holding the "F" key allows free flight into the 3D view.
+In the 3D window you can <B>rotate</B> the object by pressing the left mouse button and moving the mouse, <B>zoom</B> either with the right mouse button as in 2D or with the mouse wheel, and <B>pan</B> the object by moving the mouse while the mouse wheel is pressed. Placing the cursor within the 3D window and holding the "F" key allows <B>free flight</B> into the 3D view.
 
 \subsection QmitkExtApplicationUserManualMultiWidgetCustomizingViews Customizing
 

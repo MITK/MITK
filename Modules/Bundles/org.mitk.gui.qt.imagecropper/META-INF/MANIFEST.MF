@@ -1,5 +1,5 @@
 Manifest-Version: 1.0
-Bundle-Name: Image Cropper
+Bundle-Name: The Image Cropper Module
 Bundle-SymbolicName: org.mitk.gui.qt.imagecropper
 Bundle-Version: 1.0.0
 Bundle-Vendor: DKFZ, Medical and Biological Informatics

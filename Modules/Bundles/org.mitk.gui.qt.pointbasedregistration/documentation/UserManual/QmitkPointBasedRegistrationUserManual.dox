@@ -1,7 +1,7 @@
 /**
 \bundlemainpage{org.pointbased.reg} The Point Based Registration Module
 
-\image html PointBasedRegistration.xpm "Icon of the Module"
+\image html icon.png "Icon of the Module"
 
 Available sections:
   - \ref PointBasedRegistrationUserManualOverview 

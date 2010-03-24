@@ -1,7 +1,7 @@
 /**
-\bundlemainpage{org.imagecropper} Image cropper Module
+\bundlemainpage{org.imagecropper} The Image Cropper Module
 
-\image html icon.xpm "Icon of the Module"
+\image html icon.png "Icon of the Module"
 
 Available sections:
   - \ref QmitkImageCropperUserManualOverview 

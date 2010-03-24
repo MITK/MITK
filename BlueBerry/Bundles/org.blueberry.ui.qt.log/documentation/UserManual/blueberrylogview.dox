@@ -1,10 +1,8 @@
 /**
-\bundlemainpage{org.berry.log} Logging
+\bundlemainpage{org.berry.log} The Logging Module
 
 \image html Logging.png "Icon of the Module"
 
-\image html LogView.png "Log View"
-
-Once activated the Log View records all logging output of events and progress as specified in the source code with time of occurence, level of importance (Info, Warning, Error, Fatal, Debug), the message given and where it happens. The filter text field allows for searching all log events containing a certain substring.
+Once activated the Logging Module records all logging output of events and progress as specified in the source code with time of occurence, level of importance (Info, Warning, Error, Fatal, Debug), the message given and where it happens. The filter text field allows for searching all log events containing a certain substring.
 
 */

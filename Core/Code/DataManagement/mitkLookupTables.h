@@ -21,6 +21,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkGenericLookupTable.h"
 
+
+namespace mitk {
 /**Documentation
 * \brief specializations of GenericLookupTable
 *
@@ -30,7 +32,6 @@ PURPOSE.  See the above copyright notices for more information.
 * in mitkLookupTables.cpp with each specialization to add an ostream << operator
 * for that lookuptable specialization.
 */
-namespace mitk {
    mitkSpecializeGenericLookupTable(BoolLookupTable, bool);
    mitkSpecializeGenericLookupTable(FloatLookupTable, float);
    mitkSpecializeGenericLookupTable(IntLookupTable, int);

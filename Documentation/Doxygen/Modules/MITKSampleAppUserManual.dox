@@ -1,22 +1,22 @@
 /**
-\page MITKSampleAppUserManual MainApp User Manual
+\page MITKSampleAppUserManual ExtApp User Manual
 
-MainApp is the application that accompanies the Medical Imaging Interaction Toolkit (MITK). 
-If you are a developer, do not think that MainApp is the only MITK application -- it is rather
+ExtApp is the application that accompanies the Medical Imaging Interaction Toolkit (MITK). 
+If you are a developer, do not think that ExtApp is the only MITK application -- it is rather
 a commonly used example of how to create an application with the MITK toolkit.
 
-MainApp can load several kinds of medical data like images and surface models. The application 
-visualizes this data and makes them available to program modules called "functionalities". MainApp
+ExtApp can load several kinds of medical data like images and surface models. The application 
+visualizes this data and makes them available to program modules called "functionalities". ExtApp
 itself does not offer any kind of image processing functions, but it is merely a host to a number of
-functionalities. The exact choice of functionalities that is available in your version of MainApp is
-determined by the developer who created your version of MainApp.
+functionalities. The exact choice of functionalities that is available in your version of ExtApp is
+determined by the developer who created your version of ExtApp.
 
-This page will describe the functions of MainApp that are independent of functionalities. After reading
+This page will describe the functions of ExtApp that are independent of functionalities. After reading
 this page, you should be able to
 <ul>
   <li> Load data like images and polygon surfaces
   <li> Visualize data in 2D cuts and as a 3D rendering
-  <li> Use the buttons in the MainApp toolbar
+  <li> Use the buttons in the ExtApp toolbar
   <li> Switch between functionalities
 </ul>
 
@@ -30,9 +30,9 @@ Available sections:
 
 \section MITKSampleAppUserManualUserInterface The user interface
 
-Your typical MainApp will look like this:
+Your typical ExtApp will look like this:
 
-\image html MITKSampleAppScreenShot.png User interface of MainApp
+\image html MITKSampleAppScreenShot.png User interface of ExtApp
 
 Most of the space is used for the four "render windows" on the left, which visualize loaded images and polygon
 surfaces. By default these will display transversal, sagittal and frontal reconstructions of all loaded data, as
@@ -75,13 +75,13 @@ MITK is able to process different kind of 2D and 3D datasets:
   <ul>
     <li> DKFZ MPS format (*.mps)
 
-To load data into MainApp, you can
+To load data into ExtApp, you can
 <ul>
   <li> drag and drop a file from Explorer/Nautilus/etc. into the application
   <li> choose "File/Open..." and select the file (in case of <i>a series of slices</i>, select only the first slice)
 </ul>
 
-\image html MITKSampleAppLoadDragDrop.png Drag and drop files into MainApp to load data
+\image html MITKSampleAppLoadDragDrop.png Drag and drop files into ExtApp to load data
 
 \section MITKSampleAppUserManualUndoRedo Undo and redo
 
@@ -92,7 +92,7 @@ Some parts of MITK support undo and redo. Examples are the render windows (chang
 \section MITKSampleAppUserManualRenderWindows Render windows (configuration and navigation)
 
 
-When MainApp has loaded data, this data is displayed in four render windows: three 2D slices, which by default display a transversal (red), sagittal (green), and frontal (blue) cut through all images, surfaces, etc. The fourth windows displays the three 2D slices in a 3D scene, together will all other data that can be rendered in 3D, e.g. polygon surface, volume rendered images, or points sets.
+When ExtApp has loaded data, this data is displayed in four render windows: three 2D slices, which by default display a transversal (red), sagittal (green), and frontal (blue) cut through all images, surfaces, etc. The fourth windows displays the three 2D slices in a 3D scene, together will all other data that can be rendered in 3D, e.g. polygon surface, volume rendered images, or points sets.
 
 \image html renderwindows.png Three connected slices through your data are moved by clicking the mouse. The green-blue bar right of the render windows controls the image contrast.
 
@@ -118,7 +118,7 @@ these you can work on a maximized transversal slice, or display only a 3D scene,
 
 The buttons right of the combobox provide these functions:
 <ul>
-  <li> Fullscreen mode: uses up most of the screen space for MainApp.
+  <li> Fullscreen mode: uses up most of the screen space for ExtApp.
   <li> Plane visibility: show or hide the crosshairs in 2D and the planes in 3D.
   <li> Plane locking: lock crosshair positions, do not move them on mouse clicks.
   <li> Rotation off: crosshairs can be moved but not rotated.
@@ -141,7 +141,7 @@ The functions provided by these widgets are as follows:
 
 \section MITKSampleAppUserManualFunctionalities Functionalities (program modules)
 
-With a standard MainApp, you will see these buttons in you toolbar:
+With a standard ExtApp, you will see these buttons in you toolbar:
 
 \image html functionalityButtons.png These buttons change the active functionality
 

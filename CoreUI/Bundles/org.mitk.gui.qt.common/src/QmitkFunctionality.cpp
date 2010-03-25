@@ -42,9 +42,9 @@ QmitkFunctionality::QmitkFunctionality()
  : m_Parent(0)
  , m_Active(false)
  , m_Visible(false)
+ , m_SelectionProvider(0)
  , m_HandlesMultipleDataStorages(false)
  , m_InDataStorageChanged(false)
- , m_SelectionProvider(0)
 {
   m_PreferencesService = 
     berry::Platform::GetServiceRegistry().GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);

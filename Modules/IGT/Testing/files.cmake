@@ -8,6 +8,7 @@ SET(MODULE_TESTS
    mitkNavigationDataLandmarkTransformFilterTest.cpp
    mitkNavigationDataObjectVisualizationFilterTest.cpp
    mitkNavigationDataTest.cpp
+   mitkNavigationDataRecorderTest.cpp
    mitkNavigationDataToMessageFilterTest.cpp
    mitkNavigationDataToNavigationDataFilterTest.cpp
    mitkNavigationDataToPointSetFilterTest.cpp
@@ -19,7 +20,7 @@ SET(MODULE_TESTS
    mitkTrackingVolumeTest.cpp
    mitkTrackingDeviceTest.cpp
    mitkTrackingToolTest.cpp
-   mitkNavigationDataRecorderTest.cpp
+   mitkVirtualTrackingDeviceTest.cpp
 
    # ------------------ Deavtivated Tests ----------------------------------   
    #mitkTrackingDeviceSourceTest.cpp

@@ -42,7 +42,7 @@ namespace mitk {
     public:
       mitkClassMacro(TrackingDevice, itk::Object);
 
-      enum TrackingDeviceMode {Setup, Ready, Tracking};   ///< Type for state variable. The trackingdevice is always in one of these states
+      enum TrackingDeviceState {Setup, Ready, Tracking};   ///< Type for state variable. The trackingdevice is always in one of these states
       /**
        * \brief Opens a connection to the device
        * 
@@ -104,7 +104,7 @@ namespace mitk {
       /**
        * \brief return current object state (Setup, Ready or Tracking)
        */
-      TrackingDeviceMode GetState() const;
+      TrackingDeviceState GetState() const;
 
       /**
        * \brief return device type identifier
@@ -123,18 +123,18 @@ namespace mitk {
       /**
       * \brief  change object state
       */
-      void SetState(TrackingDeviceMode m);
+      void SetState(TrackingDeviceState state);
 
 
       TrackingDevice();
       virtual ~TrackingDevice();
 
       TrackingDeviceType m_Type; ///< current device type 
-      TrackingDeviceMode m_Mode; ///< current object state (Setup, Ready or Tracking)
+      TrackingDeviceState m_State; ///< current object state (Setup, Ready or Tracking)
       bool m_StopTracking;       ///< signal stop to tracking thread
       itk::FastMutexLock::Pointer m_StopTrackingMutex; ///< mutex to control access to m_StopTracking
       itk::FastMutexLock::Pointer m_TrackingFinishedMutex; ///< mutex to manage control flow of StopTracking()
-      itk::FastMutexLock::Pointer m_ModeMutex; ///< mutex to control access to m_Mode
+      itk::FastMutexLock::Pointer m_StateMutex; ///< mutex to control access to m_State
       std::string m_ErrorMessage; ///< current error message
     };
 } // namespace mitk

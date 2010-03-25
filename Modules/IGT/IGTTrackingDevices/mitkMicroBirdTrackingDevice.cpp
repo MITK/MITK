@@ -19,6 +19,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkMicrobirdTrackingDevice.h"
 
 #include <itksys/SystemTools.hxx>
+#include <itkMutexLockHolder.h>
+
+typedef itk::MutexLockHolder<itk::FastMutexLock> MutexLockHolder;
 
 mitk::MicroBirdTrackingDevice::MicroBirdTrackingDevice() : TrackingDevice(),
 m_ErrorMessage(""),
@@ -73,14 +76,10 @@ mitk::MicroBirdTrackingDevice::~MicroBirdTrackingDevice()
 
 bool mitk::MicroBirdTrackingDevice::OpenConnection()
 {
-  /* Grab mode mutex */
-  this->m_ModeMutex->Lock();
-
   /* Check whether in setup mode */
-  if (this->m_Mode != Setup)
+  if (this->GetState() != Setup)
   {
     this->SetErrorMessage("Can only try to open the connection if in setup mode");
-    this->m_ModeMutex->Unlock();
     return false;
   }
 
@@ -91,7 +90,6 @@ bool mitk::MicroBirdTrackingDevice::OpenConnection()
   if (!CompareError(errorCode, BIRD_ERROR_SUCCESS))
   {
     HandleError(errorCode);
-    this->m_ModeMutex->Unlock();
     return false;
   }
   /// @todo : check for transmitter serial numbers here?
@@ -103,7 +101,6 @@ bool mitk::MicroBirdTrackingDevice::OpenConnection()
   if (!CompareError(errorCode, BIRD_ERROR_SUCCESS))
   {
     HandleError(errorCode);
-    this->m_ModeMutex->Unlock();
     return false;
   }
 
@@ -112,7 +109,6 @@ bool mitk::MicroBirdTrackingDevice::OpenConnection()
   if (!CompareError(errorCode, BIRD_ERROR_SUCCESS))
   {
     HandleError(errorCode);
-    this->m_ModeMutex->Unlock();
     return false;
   }
 
@@ -123,7 +119,6 @@ bool mitk::MicroBirdTrackingDevice::OpenConnection()
     if (!CompareError(errorCode, BIRD_ERROR_SUCCESS))
     {
       HandleError(errorCode);
-      this->m_ModeMutex->Unlock();
       return false;
     }
   }
@@ -135,7 +130,6 @@ bool mitk::MicroBirdTrackingDevice::OpenConnection()
     if (!CompareError(errorCode, BIRD_ERROR_SUCCESS))
     {
       HandleError(errorCode);
-      this->m_ModeMutex->Unlock();
       return false;
     }
   }
@@ -146,7 +140,6 @@ bool mitk::MicroBirdTrackingDevice::OpenConnection()
   if (!CompareError(errorCode, BIRD_ERROR_SUCCESS))
   {
     HandleError(errorCode);
-    this->m_ModeMutex->Unlock();
     return false;
   }
 
@@ -187,14 +180,15 @@ bool mitk::MicroBirdTrackingDevice::OpenConnection()
   }
 
   /* Initialize tools vector */
-  m_ToolsMutex->Lock();
-  for (int i = 0; i < m_SystemConfig.numberSensors; i++)
   {
-    if (m_SensorConfig[i].attached)
-      m_Tools.push_back(ToolType::New());
+    MutexLockHolder(*m_ToolsMutex);
+    for (int i = 0; i < m_SystemConfig.numberSensors; i++)
+    {
+      if (m_SensorConfig[i].attached)
+        m_Tools.push_back(ToolType::New());
 
+    }
   }
-  m_ToolsMutex->Unlock();
 
   /* Get transmitter configuration */
   m_TransmitterConfig = new TRANSMITTER_CONFIGURATION[m_SystemConfig.numberTransmitters];
@@ -214,10 +208,8 @@ bool mitk::MicroBirdTrackingDevice::OpenConnection()
   // @todo : set up error scaling?
 
   /* finish  - now all tools should be added, initialized and enabled, so that tracking can be started */
-  this->SetMode(Ready);
+  this->SetState(Ready);
   this->SetErrorMessage("");
-  this->m_ModeMutex->Unlock();
-
   return true; // Return success
 }
 
@@ -265,8 +257,6 @@ bool mitk::MicroBirdTrackingDevice::SwitchTransmitter(bool switchOn)
 
 bool mitk::MicroBirdTrackingDevice::CloseConnection()
 {
-  this->m_ModeMutex->Lock(); // Grab mode mutex
-
   SwitchTransmitter(false); // Switch off the transmitter
 
   int errorCode = CloseBIRDSystem(); // Close connection. This function can take a few seconds
@@ -287,8 +277,7 @@ bool mitk::MicroBirdTrackingDevice::CloseConnection()
     m_SensorConfig = NULL;
   }
   // Change mode and release mutex
-  this->SetMode(Setup);
-  m_ModeMutex->Unlock();
+  this->SetState(Setup);
 
   // Clear error message
   this->SetErrorMessage("");
@@ -324,13 +313,10 @@ bool mitk::MicroBirdTrackingDevice::StopTracking()
 
 bool mitk::MicroBirdTrackingDevice::StartTracking()
 {
-  this->m_ModeMutex->Lock();   // Grab mode mutex
-  if (m_Mode != Ready)
-  {
-    this->m_ModeMutex->Unlock();
+  if (this->GetState() != Ready)
     return false;
-  }
-  this->SetMode(Tracking); // Go to mode Tracking
+
+  this->SetState(Tracking);
 
   /* Switch on transmitter */
   SwitchTransmitter(true);
@@ -342,17 +328,24 @@ bool mitk::MicroBirdTrackingDevice::StartTracking()
 
   m_TrackingFinishedMutex->Unlock(); // transfer the execution rights to tracking thread 
   m_ThreadID = m_MultiThreader->SpawnThread(this->ThreadStartTracking, this); // start a new thread that executes the TrackTools() method
-
-  this->m_ModeMutex->Unlock(); // Release mode mutex
+  mitk::TimeStamp::GetInstance()->Start(this);
   return true;
 }
 
 
 void mitk::MicroBirdTrackingDevice::TrackTools()
 {
+  if (this->GetState() != Tracking)
+    return;
+
+  /* Frequency configuration */
+  double updateRate = 1000.0 / m_SystemConfig.measurementRate;
+  double measurementDuration = 0.0;
+
+
   // lock the TrackingFinishedMutex to signal that the execution rights
   //   are now transfered to the tracking thread
-  m_TrackingFinishedMutex->Lock();
+  MutexLockHolder trackingFinishedLockHolder(*m_TrackingFinishedMutex); // keep lock until end of scope
 
   // Because m_StopTracking is used by two threads, access has to be guarded
   //   by a mutex. To minimize thread locking, a local copy is used here 
@@ -362,10 +355,6 @@ void mitk::MicroBirdTrackingDevice::TrackTools()
   this->m_StopTrackingMutex->Lock();
   localStopTracking = this->m_StopTracking;
   this->m_StopTrackingMutex->Unlock();
-
-  /* Frequency configuration */
-  double updateRate = 1000.0 / m_SystemConfig.measurementRate;
-  double measurementDuration = 0.0;
 
   /* Tracking loop */
   while ((this->GetState() == Tracking) && (localStopTracking == false))
@@ -417,7 +406,8 @@ void mitk::MicroBirdTrackingDevice::TrackTools()
     {
       // Note: we only have to approximately sleep one measurement cycle,
       //    since the tracker keeps track of the measurement rate itself
-      Sleep(static_cast<DWORD>(sleepTime));
+      itksys::SystemTools::Delay(sleepTime)
+      //Sleep(static_cast<DWORD>(sleepTime));
     }
 
     // Update the local copy of m_StopTracking
@@ -430,7 +420,6 @@ void mitk::MicroBirdTrackingDevice::TrackTools()
   //    m_StopTracking should only ever be updated by StopTracking(), so
   //    maybe we should not unlock a mutex that nobody is waiting for?
 
-  m_TrackingFinishedMutex->Unlock(); // transfer control back to main thread (last action here) 
   return; // returning from this function (and ThreadStartTracking()) this will end the thread
 }
 
@@ -445,23 +434,19 @@ mitk::MicroBirdTrackingDevice::ToolType* mitk::MicroBirdTrackingDevice::GetMicro
 {
   ToolType* t = NULL;
 
-  m_ToolsMutex->Lock();
+  MutexLockHolder toolsMutexLockHolder(*m_ToolsMutex); // lock and unlock the mutex
   if (toolNumber < m_Tools.size())
   {
     t = m_Tools.at(toolNumber);
-  }
-  m_ToolsMutex->Unlock();
+  }  
   return t;
 }
 
 
 unsigned int mitk::MicroBirdTrackingDevice::GetToolCount() const
 {
-  unsigned int s = 0;
-  m_ToolsMutex->Lock();
-  s = m_Tools.size();
-  m_ToolsMutex->Unlock();
-  return s;
+  MutexLockHolder toolsMutexLockHolder(*m_ToolsMutex); // lock and unlock the mutex
+  return m_Tools.size();
 }
 
 
@@ -490,8 +475,7 @@ void mitk::MicroBirdTrackingDevice::HandleError(int errorCode)
 
 void mitk::MicroBirdTrackingDevice::InvalidateAll()
 {
-  m_ToolsMutex->Lock();
+  MutexLockHolder toolsMutexLockHolder(*m_ToolsMutex); // lock and unlock the mutex
   for (ToolContainerType::iterator iterator = m_Tools.begin(); iterator != m_Tools.end(); ++iterator)
     (*iterator)->SetDataValid(false);
-  m_ToolsMutex->Unlock();
 }

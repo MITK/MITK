@@ -19,15 +19,19 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkTrackingDevice.h"
 #include "mitkTimeStamp.h"
 #include "mitkTrackingTool.h"
+#include <itkMutexLockHolder.h>
+
+typedef itk::MutexLockHolder<itk::FastMutexLock> MutexLockHolder;
+
 
 mitk::TrackingDevice::TrackingDevice() :
   m_Type(TrackingSystemNotSpecified),
-  m_Mode(mitk::TrackingDevice::Setup),
+  m_State(mitk::TrackingDevice::Setup),
   m_StopTracking(false), m_ErrorMessage("")
 
 {
   m_StopTrackingMutex = itk::FastMutexLock::New();
-  m_ModeMutex = itk::FastMutexLock::New();
+  m_StateMutex = itk::FastMutexLock::New();
   m_TrackingFinishedMutex = itk::FastMutexLock::New();
   m_TrackingFinishedMutex->Lock();  // execution rights are owned by the application thread at the beginning
 }
@@ -40,20 +44,24 @@ mitk::TrackingDevice::~TrackingDevice()
 }
 
 
-mitk::TrackingDevice::TrackingDeviceMode mitk::TrackingDevice::GetState() const
+mitk::TrackingDevice::TrackingDeviceState mitk::TrackingDevice::GetState() const
 {
-  this->m_ModeMutex->Lock();
-  TrackingDeviceMode result = m_Mode;
-  this->m_ModeMutex->Unlock();
-  return result;
+  MutexLockHolder lock(*m_StateMutex);
+  return m_State;
 }
 
 
-void mitk::TrackingDevice::SetState( TrackingDeviceMode m )
+void mitk::TrackingDevice::SetState( TrackingDeviceState state )
 {
-  this->m_ModeMutex->Lock();
-  m_Mode = m;
-  this->m_ModeMutex->Unlock();
+  itkDebugMacro("setting  m_State to " << state);
+
+  MutexLockHolder lock(*m_StateMutex); // lock and unlock the mutex 
+  if (m_State == state)
+  { 
+    return;
+  }
+  m_State = state;
+  this->Modified();
 }
 
 

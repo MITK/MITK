@@ -17,7 +17,9 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include "mitkTrackingTool.h"
+#include <itkMutexLockHolder.h>
 
+typedef itk::MutexLockHolder<itk::FastMutexLock> MutexLockHolder;
 
 
 mitk::TrackingTool::TrackingTool() 
@@ -26,24 +28,23 @@ mitk::TrackingTool::TrackingTool()
   m_MyMutex = itk::FastMutexLock::New();
 }
 
+
 mitk::TrackingTool::~TrackingTool()
 {
   m_MyMutex->Unlock();
   m_MyMutex = NULL;
 }
 
+
 const char* mitk::TrackingTool::GetToolName() const
 { 
-  m_MyMutex->Lock();
-  const char* c = this->m_ToolName.c_str(); 
-  m_MyMutex->Unlock();
-  return c;
+  MutexLockHolder lock(*m_MyMutex); // lock and unlock the mutex 
+  return this->m_ToolName.c_str();
 }
+
 
 const char* mitk::TrackingTool::GetErrorMessage() const
 { 
-  m_MyMutex->Lock();
-  const char* c = this->m_ErrorMessage.c_str(); 
-  m_MyMutex->Unlock();
-  return c;
+ MutexLockHolder lock(*m_MyMutex); // lock and unlock the mutex 
+ return this->m_ErrorMessage.c_str();
 }

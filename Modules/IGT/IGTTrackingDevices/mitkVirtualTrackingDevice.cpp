@@ -22,29 +22,28 @@ PURPOSE.  See the above copyright notices for more information.
 #include <time.h>
 #include <mitkTimeStamp.h>
 #include <itksys/SystemTools.hxx>
+#include <itkMutexLockHolder.h>
+
+typedef itk::MutexLockHolder<itk::FastMutexLock> MutexLockHolder;
 
 
 mitk::VirtualTrackingDevice::VirtualTrackingDevice() : mitk::TrackingDevice(), 
-  m_AllTools(), m_MultiThreader(NULL), m_ThreadID(-1), m_RefreshRate(50), m_NumberOfControlPoints(20),
-  m_Interpolators(), m_SplineLengths(), m_ToolVelocities()
-{
-  //set the type of this tracking device
-  this->m_Type = mitk::TrackingSystemNotSpecified;
-  
+  m_AllTools(), m_ToolsMutex(NULL), m_MultiThreader(NULL), m_ThreadID(-1), m_RefreshRate(100), m_NumberOfControlPoints(20)
+{ 
+  m_Type = mitk::VirtualTrackingDevice;
   m_Bounds[0] = m_Bounds[2] = m_Bounds[4] = -400.0;  // initialize bounds to -400 ... +400 (mm) cube
   m_Bounds[1] = m_Bounds[3] = m_Bounds[5] =  400.0;
-  
-  m_RefreshRate = 20;
+  m_ToolsMutex = itk::FastMutexLock::New();
 }
 
 
 mitk::VirtualTrackingDevice::~VirtualTrackingDevice()
 {
-  if (GetState() == Tracking)
+  if (this->GetState() == Tracking)
   {
     this->StopTracking();
   }
-  if (GetState() == Ready)
+  if (this->GetState() == Ready)
   {
     this->CloseConnection();
   }
@@ -60,16 +59,24 @@ mitk::VirtualTrackingDevice::~VirtualTrackingDevice()
 
 mitk::TrackingTool* mitk::VirtualTrackingDevice::AddTool(const char* toolName)
 {
-  mitk::InternalTrackingTool::Pointer t = mitk::InternalTrackingTool::New();
+  //if (this->GetState() == Tracking)
+  //{
+  //  return NULL;
+  //}
+  mitk::VirtualTrackingTool::Pointer t = mitk::VirtualTrackingTool::New();
   t->SetToolName(toolName);
+  t->SetVelocity(0.1);
+  this->InitializeSpline(t);
+  MutexLockHolder lock(*m_ToolsMutex); // lock and unlock the mutex
   m_AllTools.push_back(t);
-  m_ToolVelocities.push_back(0.1); // standard speed of the tool is 10 seconds per cycle
   return t;
 }
 
 
 bool mitk::VirtualTrackingDevice::StartTracking()
 {
+  if (this->GetState() != Ready)
+    return false;
   this->SetState(Tracking);            // go to mode Tracking
   this->m_StopTrackingMutex->Lock();  
   this->m_StopTracking = false;
@@ -78,7 +85,6 @@ bool mitk::VirtualTrackingDevice::StartTracking()
   m_TrackingFinishedMutex->Unlock(); // transfer the execution rights to tracking thread
 
   mitk::TimeStamp::GetInstance()->Start(this);
-
   
   if (m_MultiThreader.IsNotNull() && (m_ThreadID != -1))
     m_MultiThreader->TerminateThread(m_ThreadID);
@@ -109,16 +115,17 @@ bool mitk::VirtualTrackingDevice::StopTracking()
 
 unsigned int mitk::VirtualTrackingDevice::GetToolCount() const
 {
-  return (unsigned int)this->m_AllTools.size();
+  MutexLockHolder lock(*m_ToolsMutex); // lock and unlock the mutex
+  return static_cast<unsigned int>(this->m_AllTools.size());
 }
 
 
 mitk::TrackingTool* mitk::VirtualTrackingDevice::GetTool(unsigned int toolNumber) const
 {
-  if ( toolNumber >= this->GetToolCount()) 
-    return NULL;
-  else 
-    return this->m_AllTools[toolNumber];
+  MutexLockHolder lock(*m_ToolsMutex); // lock and unlock the mutex
+  if ( toolNumber < m_AllTools.size()) 
+    return this->m_AllTools.at(toolNumber);
+  return NULL;
 }
 
 
@@ -130,44 +137,44 @@ bool mitk::VirtualTrackingDevice::OpenConnection()
     return false;
   }
   srand(time(NULL)); //Init random number generator
-  
-  /* reset interpolator containers */
-  m_Interpolators.clear();
-  m_SplineLengths.clear();
-  m_ToolVelocities.clear();
 
-  /* create spline for all tools */
-  for (ToolContainer::iterator itAllTools = m_AllTools.begin(); itAllTools != m_AllTools.end(); itAllTools++)  // for each tool
-  {
-    SplineType::Pointer spline = SplineType::New(); // create spline
-    /* create random control points */
-    SplineType::ControlPointListType controlPoints;
-    controlPoints.push_back(this->GetRandomPoint()); // insert point 0
-    double length = 0.0;  // estimate spline length by calculating line segments lengths
-    for (unsigned int i = 1; i < m_NumberOfControlPoints - 1; ++i) // set points 1..n-2
-    {
-      SplineType::ControlPointType pos;
-      pos = this->GetRandomPoint();
-      length += controlPoints.at(i - 1).EuclideanDistanceTo(pos);
-      controlPoints.push_back(pos);
-    }
-    controlPoints.push_back(controlPoints.at(0));  // close spline --> insert point last control point with same value as first control point
-    length += controlPoints.at(controlPoints.size() - 2).EuclideanDistanceTo(controlPoints.at(controlPoints.size() - 1));
-
-    /* Create knot list. TODO: rethink knot list values and list size. Is there a better solution? */
-    SplineType::KnotListType knotList;
-    knotList.push_back(0.0);
-    for (unsigned int i = 1; i < controlPoints.size() + spline->GetSplineOrder() + 1; ++i)
-      knotList.push_back(i);
-    knotList.push_back(controlPoints.size() + spline->GetSplineOrder() + 1);
-
-    spline->SetControlPoints(controlPoints);
-    spline->SetKnots(knotList);
-    m_Interpolators.push_back(spline);
-    m_SplineLengths.push_back(length);
-  }
   this->SetState(Ready);
   return true;
+}
+
+
+void mitk::VirtualTrackingDevice::InitializeSpline( mitk::VirtualTrackingTool* t )
+{
+  if (t == NULL)
+  return;
+
+  typedef mitk::VirtualTrackingTool::SplineType SplineType;
+  /* create random control points */
+  SplineType::ControlPointListType controlPoints;
+  controlPoints.reserve(m_NumberOfControlPoints + 1);
+
+  controlPoints.push_back(this->GetRandomPoint()); // insert point 0
+  double length = 0.0;  // estimate spline length by calculating line segments lengths
+  for (unsigned int i = 1; i < m_NumberOfControlPoints - 1; ++i) // set points 1..n-2
+  {
+    SplineType::ControlPointType pos;
+    pos = this->GetRandomPoint();
+    length += controlPoints.at(i - 1).EuclideanDistanceTo(pos);
+    controlPoints.push_back(pos);
+  }
+  controlPoints.push_back(controlPoints.at(0));  // close spline --> insert point last control point with same value as first control point
+  length += controlPoints.at(controlPoints.size() - 2).EuclideanDistanceTo(controlPoints.at(controlPoints.size() - 1));
+
+  /* Create knot list. TODO: rethink knot list values and list size. Is there a better solution? */
+  SplineType::KnotListType knotList;
+  knotList.push_back(0.0);
+  for (unsigned int i = 1; i < controlPoints.size() + t->GetSpline()->GetSplineOrder() + 1; ++i)
+    knotList.push_back(i);
+  knotList.push_back(controlPoints.size() + t->GetSpline()->GetSplineOrder() + 1);
+
+  t->GetSpline()->SetControlPoints(controlPoints);
+  t->GetSpline()->SetKnots(knotList);
+  t->SetSplineLength(length);
 }
 
 
@@ -177,10 +184,6 @@ bool mitk::VirtualTrackingDevice::CloseConnection()
   if(this->GetState() == Setup)
     return true;
 
-  m_Interpolators.clear();
-  m_SplineLengths.clear();
-  m_ToolVelocities.clear();
-  
   this->SetState(Setup);
   return returnValue;
 }
@@ -188,30 +191,43 @@ bool mitk::VirtualTrackingDevice::CloseConnection()
 
 mitk::ScalarType mitk::VirtualTrackingDevice::GetSplineChordLength(unsigned int idx)
 {
-  if (idx >= m_SplineLengths.size())
-    throw std::invalid_argument("No chord length available for this index");
-  return m_SplineLengths.at(idx);
+  mitk::VirtualTrackingTool* t = this->GetInternalTool(idx);
+  if (t != NULL)
+    return t->GetSplineLength();
+  else
+    throw std::invalid_argument("invalid index");
 }
 
+
 void mitk::VirtualTrackingDevice::SetToolSpeed(unsigned int idx, mitk::ScalarType roundsPerSecond)
-{
-  if (idx >= m_ToolVelocities.size())
-    throw std::invalid_argument("No tool available for this index");
+{ 
   if (roundsPerSecond < 0.0001)
     throw std::invalid_argument("Minimum tool speed is 0.0001 rounds per second");
 
-  m_ToolVelocities.at(idx) = roundsPerSecond;
+    mitk::VirtualTrackingTool* t = this->GetInternalTool(idx);
+    if (t != NULL)
+      t->SetVelocity(roundsPerSecond);
+    else
+      throw std::invalid_argument("invalid index");
+}
+
+
+mitk::VirtualTrackingTool* mitk::VirtualTrackingDevice::GetInternalTool(unsigned int idx)
+{
+  MutexLockHolder toolsMutexLockHolder(*m_ToolsMutex); // lock and unlock the mutex
+  if (idx < m_AllTools.size())
+    return m_AllTools.at(idx);
+  else
+    return NULL;
 }
 
 
 void mitk::VirtualTrackingDevice::TrackTools()
 {
-  if (m_Interpolators.size() != m_AllTools.size())
-    throw std::logic_error("mismatch between tool count and interpolator count");
   try
   {
     /* lock the TrackingFinishedMutex to signal that the execution rights are now transfered to the tracking thread */
-    m_TrackingFinishedMutex->Lock();
+    MutexLockHolder trackingFinishedLockHolder(*m_TrackingFinishedMutex); // keep lock until end of scope
     bool localStopTracking;       // Because m_StopTracking is used by two threads, access has to be guarded by a mutex. To minimize thread locking, a local copy is used here 
     this->m_StopTrackingMutex->Lock();  // update the local copy of m_StopTracking
     localStopTracking = this->m_StopTracking;
@@ -219,17 +235,18 @@ void mitk::VirtualTrackingDevice::TrackTools()
     mitk::ScalarType t = 0.0;
     while ((this->GetState() == Tracking) && (localStopTracking == false))
     {
-      SplineVectorType::iterator splineIt = m_Interpolators.begin();
-      for (ToolContainer::iterator itAllTools = m_AllTools.begin(); itAllTools != m_AllTools.end(); itAllTools++)
+      ToolContainer::size_type toolCount = this->GetToolCount();
+
+      //for (ToolContainer::iterator itAllTools = m_AllTools.begin(); itAllTools != m_AllTools.end(); itAllTools++)
+      for (unsigned int i = 0; i < this->GetToolCount(); ++i)
       {
-        mitk::InternalTrackingTool::Pointer currentTool = *itAllTools;
-        SplineType::PointType pos;
+        mitk::VirtualTrackingTool::Pointer currentTool = this->GetInternalTool(i);
+        mitk::VirtualTrackingTool::SplineType::PointType pos;
         /* calculate tool position with spline interpolation */
-        pos = (*splineIt)->EvaluateSpline(t);
+        pos = currentTool->GetSpline()->EvaluateSpline(t);
         mitk::Point3D mp;
         mitk::itk2vtk(pos, mp); // convert from SplineType::PointType to mitk::Point3D
         currentTool->SetPosition(mp);
-        splineIt++;
         // Currently, a constant speed is used. TODO: use tool velocity setting
         t += 0.001;
         if (t >= 1.0)
@@ -287,9 +304,9 @@ ITK_THREAD_RETURN_TYPE mitk::VirtualTrackingDevice::ThreadStartTracking(void* pI
 }
 
 
-mitk::VirtualTrackingDevice::SplineType::ControlPointType mitk::VirtualTrackingDevice::GetRandomPoint()
+mitk::VirtualTrackingDevice::ControlPointType mitk::VirtualTrackingDevice::GetRandomPoint()
 {
-  SplineType::ControlPointType pos;
+  ControlPointType pos;
   pos[0] = m_Bounds[0] + (m_Bounds[1] - m_Bounds[0]) * (rand() / (RAND_MAX + 1.0));  // X =  xMin + xRange * (random number between 0 and 1)
   pos[1] = m_Bounds[2] + (m_Bounds[3] - m_Bounds[2]) * (rand() / (RAND_MAX + 1.0));  // Y
   pos[2] = m_Bounds[4] + (m_Bounds[5] - m_Bounds[4]) * (rand() / (RAND_MAX + 1.0));  // Z

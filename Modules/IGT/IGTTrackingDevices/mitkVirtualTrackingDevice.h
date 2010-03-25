@@ -19,13 +19,13 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKVIRTUALTRACKINGDEVICE_H_HEADER_INCLUDED_
 #define MITKVIRTUALTRACKINGDEVICE_H_HEADER_INCLUDED_
 
-#include <vector>
 #include <MitkIGTExports.h>
 #include <mitkTrackingDevice.h>
-#include <mitkInternalTrackingTool.h>
+#include <mitkVirtualTrackingTool.h>
 #include <itkMultiThreader.h>
-#include <itkNonUniformBSpline.h>
 
+#include "itkFastMutexLock.h"
+#include <vector>
 
 namespace mitk
 {
@@ -45,7 +45,6 @@ namespace mitk
     mitkClassMacro(VirtualTrackingDevice, TrackingDevice);
     itkNewMacro(Self);
 
-    typedef itk::NonUniformBSpline<3> SplineType; ///< spline type used for tool path interpolation
 
     /**
     * \brief Sets the refresh rate of the virtual tracking device in ms
@@ -61,6 +60,11 @@ namespace mitk
 
     /**
     * \brief Starts the tracking.
+    *
+    * After StartTracking() is called,
+    * the tools will move on their spline paths with a constant velocity that can be set with 
+    * SetToolSpeed(). The standard velocity is 10 seconds for one complete cycle along the spline path.
+    * \warning tool speed is not yet used in the current version
     * \return Returns true if the tracking is started. Returns false if there was an error.
     */
     virtual bool StartTracking();
@@ -74,9 +78,6 @@ namespace mitk
     /**
     * \brief Opens the connection to the device. This have to be done before the tracking is started.
     *
-    * This method will initialize a closed spline path for each tool. After StartTracking() is called,
-    * the tools will move on their spline paths with a constant velocity that can be set with 
-    * SetToolSpeed(). The standard velocity is 10 seconds for one complete cycle along the spline path.
     */
     virtual bool OpenConnection();
 
@@ -99,6 +100,10 @@ namespace mitk
 
     /**
     * \brief Adds a tool to the tracking device.
+    *
+    * The tool will have a random path on which it will move around. The path is created with a 
+    * spline function and random control points inside the tracking volume.
+    *
     * \param tool  The tool which will be added.
     * \return Returns true if the tool has been added, false otherwise.
     */
@@ -109,7 +114,10 @@ namespace mitk
     * \brief Set the tracking volume bounds
     *
     * This will set the tracking volume as an axis aligned bounding box
-    * defined by the six bounds values xMin, xMax, yMin, yMax, zMin, zMax
+    * defined by the six bounds values xMin, xMax, yMin, yMax, zMin, zMax.
+    * Note that the random path of existing tools will not be updated with the new
+    * tracking volume. Tools that are created after calling SetBounds() will use the 
+    * new tracking volume
     */
     itkSetVectorMacro(Bounds, mitk::ScalarType, 6);
     
@@ -127,9 +135,8 @@ namespace mitk
     /**
     * \brief return the approximate length of the spline for tool with index idx in millimeter
     *
-    * The call to OpenConnection() will initialize a spline path for each tool.
-    * If GetSplineChordLength() is called before OpenConnection() or if the idx is out of range of 
-    * valid tool indices, a std::invalid_argument exception is thrown. 
+    * if the index idx is not a 
+    * valid tool index, a std::invalid_argument exception is thrown. 
     * GetSplineChordLength() returns the distance between all control points of the 
     * spline in millimeter. This can be used as an approximation for the length of the spline path.
     */
@@ -157,23 +164,25 @@ namespace mitk
     */
     void TrackTools();
 
+    void InitializeSpline(mitk::VirtualTrackingTool* t);  ///< initializes the spline path of the tool t with random control points inside the current tracking volume
+
     static ITK_THREAD_RETURN_TYPE ThreadStartTracking(void* data); ///< static start method for tracking thread
 
-    SplineType::ControlPointType GetRandomPoint(); ///< returns a random position inside the tracking volume (defined by m_Bounds)
+    typedef mitk::VirtualTrackingTool::SplineType::ControlPointType ControlPointType;
+    
+    ControlPointType GetRandomPoint(); ///< returns a random position inside the tracking volume (defined by m_Bounds)
+    mitk::VirtualTrackingTool* GetInternalTool(unsigned int idx);
 
-    typedef std::vector<InternalTrackingTool::Pointer> ToolContainer; ///< container type for tracking tools
+    typedef std::vector<VirtualTrackingTool::Pointer> ToolContainer; ///< container type for tracking tools
     ToolContainer m_AllTools;                       ///< container for all tracking tools
+    itk::FastMutexLock::Pointer m_ToolsMutex; ///< mutex for coordinated access of tool container
 
     itk::MultiThreader::Pointer m_MultiThreader;    ///< MultiThreader that starts continuous tracking update
     int m_ThreadID;
     
-    unsigned int m_RefreshRate;                     ///< refresh rate of the internal tracking thread in milliseconds
+    unsigned int m_RefreshRate;                     ///< refresh rate of the internal tracking thread in milliseconds (NOT refreshs per second!)
     unsigned int m_NumberOfControlPoints;           ///< number of control points for the random path generation
 
-    typedef std::vector<SplineType::Pointer> SplineVectorType; ///< storage container type for splines. 
-    SplineVectorType m_Interpolators;               ///< storage container for splines. \TODO: each tool should manage its own spline
-    std::vector<mitk::ScalarType> m_SplineLengths;  ///< storage container for splines lengths. \TODO: each tool should manage its own spline length
-    std::vector<mitk::ScalarType> m_ToolVelocities; ///< storage container for splines velocities. \TODO: each tool should manage its own spline velocity
     mitk::ScalarType m_Bounds[6];                   ///< bounding box of the tracking volume stored as {xMin, xMax, yMin, yMax, zMin, zMax}
   };   
 }//mitk

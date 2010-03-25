@@ -22,6 +22,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkTimeStamp.h"
 #include <itksys/SystemTools.hxx>
 #include <iostream>
+#include <itkMutexLockHolder.h>
+
+typedef itk::MutexLockHolder<itk::FastMutexLock> MutexLockHolder;
 
 
 mitk::ClaronTrackingDevice::ClaronTrackingDevice(): mitk::TrackingDevice()
@@ -97,7 +100,8 @@ bool mitk::ClaronTrackingDevice::StartTracking()
 {
 
   //By Alfred: next line because no temp directory is set if MicronTracker is not installed
-  if (!m_Device->IsMicronTrackerInstalled()) return false;
+  if (!m_Device->IsMicronTrackerInstalled()) 
+    return false;
   //##################################################################################
 
   //copy all toolfiles into the temp directory
@@ -113,9 +117,6 @@ bool mitk::ClaronTrackingDevice::StartTracking()
   //restart the Microntracker, so it will load the new tool files
   m_Device->StopTracking();
   m_Device->Initialize(m_CalibrationDir,m_ToolfilesDir);
-  //delete m_Device;
-
-  //m_Device = new ClaronInterface(m_CalibrationDir, m_ToolfilesDir);
 
   m_TrackingFinishedMutex->Unlock(); // transfer the execution rights to tracking thread
 
@@ -126,30 +127,19 @@ bool mitk::ClaronTrackingDevice::StartTracking()
     return true;
   }
   else 
-    {
+  {
     m_ErrorMessage = "Error while trying to start the device!";
     return false;
-    }
+  }
 }
 
 
 bool mitk::ClaronTrackingDevice::StopTracking()
 {
-  if (this->GetState() == Tracking) // Only if the object is in the correct state
-  {
-    m_StopTrackingMutex->Lock();  // m_StopTracking is used by two threads, so we have to ensure correct thread handling
-    m_StopTracking = true;
-    m_StopTrackingMutex->Unlock();
-    this->SetState(Ready);
-  }
-
-  m_TrackingFinishedMutex->Lock();
-  mitk::TimeStamp::GetInstance()->Stop(this);
-
+  Superclass::StopTracking();
   //delete all files in the tool files directory
   itksys::SystemTools::RemoveADirectory(m_ToolfilesDir.c_str());
   itksys::SystemTools::MakeDirectory(m_ToolfilesDir.c_str());
-
   return true;
 }
 
@@ -186,16 +176,14 @@ bool mitk::ClaronTrackingDevice::OpenConnection()
   else
   {
     //reset everything
-    if(m_Device.IsNull())
+    if (m_Device.IsNull())
     {
       m_Device = mitk::ClaronInterface::New();
-      m_Device->Initialize(m_CalibrationDir,m_ToolfilesDir);
+      m_Device->Initialize(m_CalibrationDir, m_ToolfilesDir);
     }
-      //m_Device = new ClaronInterface(m_CalibrationDir, m_ToolfilesDir);
     m_Device->StopTracking();
-    //delete m_Device;
     this->SetState(Setup);
-    m_ErrorMessage = "Error while trying to open connection to the MicronTracker 2!";
+    m_ErrorMessage = "Error while trying to open connection to the MicronTracker.";
   }
   return returnValue;
 }
@@ -204,11 +192,10 @@ bool mitk::ClaronTrackingDevice::OpenConnection()
 bool mitk::ClaronTrackingDevice::CloseConnection()
 {
   bool returnValue = true;
-  if(this->GetState() == Setup)
+  if (this->GetState() == Setup)
     return true;
 
   returnValue = m_Device->StopTracking();
-  //delete m_Device;
 
   //delete the temporary directory
   itksys::SystemTools::RemoveADirectory(m_ToolfilesDir.c_str());
@@ -235,7 +222,7 @@ void mitk::ClaronTrackingDevice::TrackTools()
   try
   {
     /* lock the TrackingFinishedMutex to signal that the execution rights are now transfered to the tracking thread */
-    m_TrackingFinishedMutex->Lock();
+    MutexLockHolder trackingFinishedLockHolder(*m_TrackingFinishedMutex); // keep lock until end of scope
 
     bool localStopTracking;       // Because m_StopTracking is used by two threads, access has to be guarded by a mutex. To minimize thread locking, a local copy is used here 
     this->m_StopTrackingMutex->Lock();  // update the local copy of m_StopTracking
@@ -302,11 +289,9 @@ void mitk::ClaronTrackingDevice::TrackTools()
       localStopTracking = m_StopTracking;
       this->m_StopTrackingMutex->Unlock();
     }
-    m_TrackingFinishedMutex->Unlock(); // transfer control back to main thread
   }
   catch(...)
   {
-    m_TrackingFinishedMutex->Unlock();
     this->StopTracking();
     this->SetErrorMessage("Error while trying to track tools. Thread stopped.");
   }

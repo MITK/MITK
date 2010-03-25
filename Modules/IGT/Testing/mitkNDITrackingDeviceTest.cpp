@@ -24,32 +24,11 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkTrackingTool.h"
 #include "mitkStandardFileLocations.h"
 
-/**Documentation
-* NDIPassiveTool has a protected constructor and a protected itkNewMacro
-* so that only it's friend class NDITrackingDevice is able to instantiate
-* tool objects. Therefore, we derive from NDIPassiveTool and add a 
-* public itkNewMacro, so that we can instantiate and test the class
-*/
-class NDIPassiveToolTestClass : public mitk::NDIPassiveTool
-{
-public:
-  mitkClassMacro(NDIPassiveToolTestClass, NDIPassiveTool);
-
-  /** make a public constructor, so that the test is able
-  *   to instantiate NDIPassiveTool
-  */
-  itkNewMacro(Self);
-
-protected:
-  NDIPassiveToolTestClass() : mitk::NDIPassiveTool()  
-  {
-  }
-};
 
 int mitkNDITrackingDeviceTest(int /* argc */, char* /*argv*/[])
 {
   // always start with this!
-  MITK_TEST_BEGIN("NDITrackingDevice ");
+  MITK_TEST_BEGIN("NDITrackingDevice");
 
   // let's create an object of our class  
   mitk::NDITrackingDevice::Pointer myNDITrackingDevice = mitk::NDITrackingDevice::New();

@@ -26,6 +26,7 @@ SET(CPP_FILES
   IGTTrackingDevices/mitkTrackingTool.cpp
   IGTTrackingDevices/mitkTrackingVolume.cpp
   IGTTrackingDevices/mitkVirtualTrackingDevice.cpp
+  IGTTrackingDevices/mitkVirtualTrackingTool.cpp
   
   IGTToolManagement/mitkNavigationToolStorage.cpp
   IGTToolManagement/mitkNavigationToolStorageSerializer.cpp

@@ -267,12 +267,14 @@ bool mitk::PointSetInteractor::ExecuteAction( Action* action, mitk::StateEvent c
         mitk::StateEvent* newStateEvent = 
           new mitk::StateEvent(EIDYES, stateEvent->GetEvent());
         this->HandleEvent( newStateEvent );
+        delete newStateEvent;
       }
       else
       {
         mitk::StateEvent* newStateEvent = 
           new mitk::StateEvent(EIDNO, stateEvent->GetEvent());
         this->HandleEvent( newStateEvent );
+        delete newStateEvent;
       }
       ok = true;
       break;
@@ -654,6 +656,8 @@ bool mitk::PointSetInteractor::ExecuteAction( Action* action, mitk::StateEvent c
             new mitk::StateEvent(EIDYES, newPosEvent);
           //call HandleEvent to leave the guard-state
           this->HandleEvent( newStateEvent );
+          delete newStateEvent;
+          delete newPosEvent;
           ok = true;
         }
         else
@@ -661,6 +665,7 @@ bool mitk::PointSetInteractor::ExecuteAction( Action* action, mitk::StateEvent c
           //new Event with information NO
           mitk::StateEvent* newStateEvent = new mitk::StateEvent(EIDNO, posEvent);
           this->HandleEvent(newStateEvent );
+          delete newStateEvent;
           ok = true;
         }
       }
@@ -675,6 +680,7 @@ bool mitk::PointSetInteractor::ExecuteAction( Action* action, mitk::StateEvent c
           mitk::StateEvent* newStateEvent = 
             new mitk::StateEvent(EIDNO, disPosEvent);
           this->HandleEvent(newStateEvent );
+          delete newStateEvent;
           ok = true;
         }
       }
@@ -715,6 +721,7 @@ bool mitk::PointSetInteractor::ExecuteAction( Action* action, mitk::StateEvent c
           mitk::StateEvent* newStateEvent = 
             new mitk::StateEvent( EIDYES, newPosEvent );
           this->HandleEvent( newStateEvent );
+          delete newStateEvent;
           ok = true;
 
           //saving the spot for calculating the direction vector in moving
@@ -726,8 +733,10 @@ bool mitk::PointSetInteractor::ExecuteAction( Action* action, mitk::StateEvent c
           mitk::StateEvent* newStateEvent = 
             new mitk::StateEvent( EIDNO, newPosEvent );
           this->HandleEvent( newStateEvent );
+          delete newStateEvent;
           ok = true;
         }
+        delete newPosEvent;
       }
       //the position wasn't set properly. If necessary: search the given 
       //point in list and set var position
@@ -755,6 +764,7 @@ bool mitk::PointSetInteractor::ExecuteAction( Action* action, mitk::StateEvent c
         mitk::StateEvent* newStateEvent = 
           new mitk::StateEvent(EIDSTSMALERNMINUS1, stateEvent->GetEvent());
         this->HandleEvent( newStateEvent );
+        delete newStateEvent;
         ok = true;
       }
       else
@@ -765,6 +775,7 @@ bool mitk::PointSetInteractor::ExecuteAction( Action* action, mitk::StateEvent c
           mitk::StateEvent* newStateEvent = 
             new mitk::StateEvent(EIDSTSMALERNMINUS1, stateEvent->GetEvent());
           this->HandleEvent( newStateEvent );
+          delete newStateEvent;
           ok = true;
         }
         else
@@ -773,6 +784,7 @@ bool mitk::PointSetInteractor::ExecuteAction( Action* action, mitk::StateEvent c
           mitk::StateEvent* newStateEvent = 
             new mitk::StateEvent(EIDSTLARGERNMINUS1, stateEvent->GetEvent());
           this->HandleEvent(newStateEvent );
+          delete newStateEvent;
           ok = true;
         }//else
       }//else
@@ -787,6 +799,7 @@ bool mitk::PointSetInteractor::ExecuteAction( Action* action, mitk::StateEvent c
         mitk::StateEvent* newStateEvent = 
           new mitk::StateEvent(EIDYES, stateEvent->GetEvent());
         this->HandleEvent( newStateEvent );
+        delete newStateEvent;
         ok = true;
       }
       else //more than 1 points in list, so stay in the state!
@@ -794,6 +807,7 @@ bool mitk::PointSetInteractor::ExecuteAction( Action* action, mitk::StateEvent c
         mitk::StateEvent* newStateEvent = 
           new mitk::StateEvent(EIDNO, stateEvent->GetEvent());
         this->HandleEvent(newStateEvent );
+        delete newStateEvent;
         ok = true;
       }
     }

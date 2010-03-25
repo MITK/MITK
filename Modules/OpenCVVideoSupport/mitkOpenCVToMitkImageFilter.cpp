@@ -95,17 +95,17 @@ mitk::Image::Pointer mitk::OpenCVToMitkImageFilter::ConvertIplToMitkImage( const
   typedef itk::Image< TPixel, VImageDimension > ItkImage;
 
   typedef itk::ImportImageFilter< TPixel, VImageDimension >  ImportFilterType;
-  ImportFilterType::Pointer importFilter = ImportFilterType::New();
+  typename ImportFilterType::Pointer importFilter = ImportFilterType::New();
 
-  ImportFilterType::SizeType  size;
+  typename ImportFilterType::SizeType  size;
 
   size[0]  = input->width;
   size[1]  = input->height;
 
-  ImportFilterType::IndexType start;
+  typename ImportFilterType::IndexType start;
   start.Fill( 0 );
 
-  ImportFilterType::RegionType region;
+  typename ImportFilterType::RegionType region;
   region.SetIndex( start );
   region.SetSize(  size  );
 
@@ -152,7 +152,7 @@ mitk::Image::Pointer mitk::OpenCVToMitkImageFilter::ConvertIplToMitkImage( const
 
   importFilter->Update();
 
-  ItkImage::Pointer output = importFilter->GetOutput();
+  typename ItkImage::Pointer output = importFilter->GetOutput();
 
   output->DisconnectPipeline();
 

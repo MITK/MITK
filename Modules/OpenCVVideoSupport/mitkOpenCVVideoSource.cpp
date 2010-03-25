@@ -7,6 +7,7 @@ mitk::OpenCVVideoSource::OpenCVVideoSource()
 {
   m_CurrentImage = 0;
   m_VideoCapture = 0;
+  m_PauseImage = 0;
 
   m_CaptureWidth  = 0;
   m_CaptureHeight = 0;
@@ -112,14 +113,19 @@ void mitk::OpenCVVideoSource::FetchFrame()
     if(m_VideoCapture) // we use highgui
     {
       if(!m_CapturePaused)
+      {
+        // release old image here
         m_CurrentImage = cvQueryFrame(m_VideoCapture);
+      }
       else
         m_CurrentImage = m_PauseImage;
       if(m_CurrentImage == NULL) // do we need to repeat the video if it is from video file?
-      {
-        double videopos = this->GetVideoCaptureProperty(CV_CAP_PROP_POS_AVI_RATIO);
-        if(m_RepeatVideo &&  videopos >= 1.0) 
+      {        
+        long videopos = ceil ( this->GetVideoCaptureProperty(CV_CAP_PROP_POS_AVI_RATIO) );
+        MITK_DEBUG << "End of video file found. videopos: " << videopos;
+        if(m_RepeatVideo &&  videopos >= 1) 
         {  
+          MITK_DEBUG << "Restarting video file playback.";
           this->SetVideoCaptureProperty(CV_CAP_PROP_POS_AVI_RATIO, 0);
           m_CurrentImage = cvQueryFrame(m_VideoCapture);
         }
@@ -146,28 +152,6 @@ void mitk::OpenCVVideoSource::UpdateVideoTexture()
   // only undistort if not paused
   if(m_UndistortImage && !m_CapturePaused)
     m_UndistortCameraImage->UndistortImageFast(m_CurrentImage, 0);
-
-  
-   /*
-  int column, row;
-  int stopH = m_CaptureHeight;
-  int stopW = m_CaptureWidth;
-  unsigned char* tex = m_CurrentVideoTexture;
-  char* data = m_CurrentImage->imageData;
-  unsigned char r, g, b;
-  for (column = 0; column < stopH; column++)
-  {
-    for (row = 0; row < stopW; row++)
-    {   //change r with b
-        b = *data++;
-        g = *data++;
-        r = *data++;
-        *tex++ = r;
-        *tex++ = g;
-        *tex++ = b;
-    }
-  } */
-
 
   int width = m_CurrentImage->width;
   int height = m_CurrentImage->height;
@@ -218,12 +202,20 @@ void mitk::OpenCVVideoSource::StopCapturing()
 void mitk::OpenCVVideoSource::PauseCapturing()
 {
   m_CapturePaused = !m_CapturePaused;
-  m_PauseImage = cvCloneImage(m_CurrentImage);
+  if(m_PauseImage)
+  {
+    cvReleaseImage( &m_PauseImage ); // release old pause image if necessary
+    m_PauseImage = 0;
+  }
+  
+  if(m_CapturePaused)
+  {
+    m_PauseImage = cvCloneImage(m_CurrentImage);
 
-  // undistort this pause image if necessary
-  if(m_UndistortImage)
-    m_UndistortCameraImage->UndistortImageFast(m_CurrentImage, 0);
-    
+    // undistort this pause image if necessary
+    if(m_UndistortImage)
+      m_UndistortCameraImage->UndistortImageFast(m_CurrentImage, 0);
+  }
 }
 
 void mitk::OpenCVVideoSource::EnableOnlineImageUndistortion(mitk::Point3D focal, mitk::Point3D principal, mitk::Point4D distortion)

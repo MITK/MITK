@@ -86,11 +86,11 @@ namespace mitk
     typedef itk::Image<TPixel, VImageDimension> ImageType;
 
     const unsigned int numberOfPixels = m_OpenCVImage->width * m_OpenCVImage->height;
-    const unsigned int numberOfBytes = numberOfPixels * sizeof( ImageType::PixelType );
+    const unsigned int numberOfBytes = numberOfPixels * sizeof( typename ImageType::PixelType );
 
-    const ImageType::PixelType * itkBuffer = image->GetBufferPointer();
+    const typename ImageType::PixelType * itkBuffer = image->GetBufferPointer();
 
-    ImageType::SizeType size = image->GetLargestPossibleRegion().GetSize();
+    typename ImageType::SizeType size = image->GetLargestPossibleRegion().GetSize();
     // create new opencv image
     m_OpenCVImage = cvCreateImage( cvSize( size[0], size[1] )
       , depth, 1 );
@@ -107,7 +107,7 @@ namespace mitk
 
     RGBIteratorType it(image, image->GetLargestPossibleRegion());
 
-    RGBImageType::SizeType size = image->GetLargestPossibleRegion().GetSize();
+    typename RGBImageType::SizeType size = image->GetLargestPossibleRegion().GetSize();
     // create new opencv image
     m_OpenCVImage = cvCreateImage( cvSize( size[0], size[1] ), depth, 3 );
 

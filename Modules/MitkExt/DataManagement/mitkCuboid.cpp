@@ -43,13 +43,16 @@ mitk::Cuboid::~Cuboid()
 bool mitk::Cuboid::IsInside(const Point3D& worldPoint) const
 {
   // transform point from world to object coordinates
-  Point3D p;
-  GetGeometry(0)->WorldToIndex(worldPoint, p);
+  ScalarType p[4];
+  p[0] = worldPoint[0];
+  p[1] = worldPoint[1];
+  p[2] = worldPoint[2];
+  p[3] = 1;
+  GetGeometry()->GetVtkTransform()->GetInverse()->TransformPoint(p, p);
 
-  bool retval =(p[0] >= -1) && (p[0] <= 1) 
-            && (p[1] >= -1) && (p[1] <= 1) 
-            && (p[2] >= -1) && (p[2] <= 1);
-  return retval;
+  return (p[0] >= -1) && (p[0] <= 1)
+      && (p[1] >= -1) && (p[1] <= 1)
+      && (p[2] >= -1) && (p[2] <= 1);
 }
 
 mitk::ScalarType mitk::Cuboid::GetVolume()

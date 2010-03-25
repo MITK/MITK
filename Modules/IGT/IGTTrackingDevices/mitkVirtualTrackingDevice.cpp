@@ -235,10 +235,8 @@ void mitk::VirtualTrackingDevice::TrackTools()
     mitk::ScalarType t = 0.0;
     while ((this->GetState() == Tracking) && (localStopTracking == false))
     {
-      ToolContainer::size_type toolCount = this->GetToolCount();
-
       //for (ToolContainer::iterator itAllTools = m_AllTools.begin(); itAllTools != m_AllTools.end(); itAllTools++)
-      for (unsigned int i = 0; i < this->GetToolCount(); ++i)
+      for (unsigned int i = 0; i < this->GetToolCount(); ++i)  // use mutexed methods to access tool container
       {
         mitk::VirtualTrackingTool::Pointer currentTool = this->GetInternalTool(i);
         mitk::VirtualTrackingTool::SplineType::PointType pos;

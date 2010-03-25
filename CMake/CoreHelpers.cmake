@@ -167,6 +167,7 @@ ENDMACRO(_MITK_CREATE_MODULE_CONF)
 #     [PROVIDES <library name which is built>]
 #     [PACKAGE_DEPENDS <packages we need, like ITK, VTK, QT>]
 #     [EXPORT_DEFINE <declspec macro name for dll exports>]
+#     [QT_MODULE]
 #
 ##################################################################
 MACRO(MITK_CREATE_MODULE MODULE_NAME_IN)

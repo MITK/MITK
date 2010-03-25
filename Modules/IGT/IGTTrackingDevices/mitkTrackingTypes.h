@@ -88,7 +88,7 @@ namespace mitk
       ClaronMicron,              ///< Micron Tracker: optical Tracker from Claron
       IntuitiveDaVinci,          ///< Intuitive Surgical: DaVinci Telemanipulator API Interface
       AscensionMicroBird,        ///< Ascension microBird / PCIBird family
-      VirtualTrackingDevice,     ///< Virtual Tracking device class that produces random tracking coordinates
+      VirtualTracker,     ///< Virtual Tracking device class that produces random tracking coordinates
       TrackingSystemNotSpecified ///< entry for not specified or initialized tracking system
     };
 

@@ -27,9 +27,10 @@
 namespace berry
 {
 
-MockWorkbenchPart::MockWorkbenchPart() :
-  siteState(false), disposeListener(new GuiTk::ControlDestroyedAdapter<
-      MockWorkbenchPart>(this, &MockWorkbenchPart::ControlDestroyed))
+MockWorkbenchPart::MockWorkbenchPart() 
+: titleImage(0), parentWidget(0),
+  disposeListener(new GuiTk::ControlDestroyedAdapter<MockWorkbenchPart>(this, &MockWorkbenchPart::ControlDestroyed))
+, siteState(false)
 {
   callTrace = new CallHistory();
   selectionProvider = new MockSelectionProvider();
@@ -96,6 +97,7 @@ void MockWorkbenchPart::SetInitializationData(
 void MockWorkbenchPart::ControlDestroyed(GuiTk::ControlEvent::Pointer)
 {
   callTrace->Add("WidgetDisposed");
+  parentWidget = 0;
 }
 
 void MockWorkbenchPart::AddPropertyListener(
@@ -114,6 +116,7 @@ void MockWorkbenchPart::CreatePartControl(void* parent)
 {
   callTrace->Add("CreatePartControl");
 
+  this->parentWidget = parent;
   Tweaklets::Get(GuiWidgetsTweaklet::KEY)->AddControlListener(parent,
       disposeListener);
 }
@@ -121,6 +124,12 @@ void MockWorkbenchPart::CreatePartControl(void* parent)
 MockWorkbenchPart::~MockWorkbenchPart()
 {
   callTrace->Add("PartDestructor");
+
+  if (parentWidget)
+  {
+    Tweaklets::Get(GuiWidgetsTweaklet::KEY)->RemoveControlListener(parentWidget,
+      disposeListener);
+  }
 }
 
 void* MockWorkbenchPart::GetTitleImage() const

@@ -19,6 +19,8 @@
 #ifndef BERRYCALLHISTORY_H_
 #define BERRYCALLHISTORY_H_
 
+#include "../berryTestDll.h"
+
 #include <berryObject.h>
 #include <berryMacros.h>
 
@@ -50,7 +52,7 @@ namespace berry {
  * be thrown.
  * </p>
  */
-class CallHistory : public Object {
+class BERRY_TEST_EXPORT CallHistory : public Object {
 
 private:
 

@@ -39,6 +39,8 @@ public:
 
   QtWidgetController(Shell* shell);
 
+  ~QtWidgetController();
+
   void AddControlListener(GuiTk::IControlListener::Pointer listener);
   void RemoveControlListener(GuiTk::IControlListener::Pointer listener);
 
@@ -54,6 +56,8 @@ protected:
 
   GuiTk::IControlListener::Events controlEvents;
   IShellListener::Events shellEvents;
+
+  void ShellDestroyed();
 
   Shell* shell;
 

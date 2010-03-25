@@ -18,7 +18,7 @@
 #ifndef BERRYWORKBENCHMOCKPART_H_
 #define BERRYWORKBENCHMOCKPART_H_
 
-#include "../util/berryCallHistory.h"
+#include <util/berryCallHistory.h>
 
 #include "berryMockSelectionProvider.h"
 
@@ -160,6 +160,8 @@ private:
   Object::Pointer data;
 
   void* titleImage;
+
+  void* parentWidget;
 
   IWorkbenchPartSite::Pointer site;
 

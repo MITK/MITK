@@ -93,8 +93,11 @@ void IWorkbenchPartTest::TestOpenAndWindowClose()
     // Close the window.
     newWindow->Close();
   }
-
-  callOrder.push_back("WidgetDisposed");
+  
+  // The Qt widget for the window is deleted
+  // asynchronously, so the "WidgetDisposed"
+  // call may come after the part destructor
+  //callOrder.push_back("WidgetDisposed");
   callOrder.push_back("PartDestructor");
   assert(history->VerifyOrder(callOrder));
 }

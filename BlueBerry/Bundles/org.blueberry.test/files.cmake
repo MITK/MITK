@@ -3,6 +3,8 @@ SET(SRC_CPP_FILES
   berryBlueBerryTestDriver.cpp
   
   harness/berryTestCase.cpp
+  
+  util/berryCallHistory.cpp
 )
 
 SET(INTERNAL_CPP_FILES

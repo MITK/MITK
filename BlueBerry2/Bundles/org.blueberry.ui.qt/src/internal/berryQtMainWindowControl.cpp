@@ -39,6 +39,9 @@ QtMainWindowControl::QtMainWindowControl(Shell* shell, QWidget* parent, Qt::Wind
 
 void QtMainWindowControl::changeEvent(QEvent* event)
 {
+  if (!controller->shell)
+    return QMainWindow::changeEvent(event);
+
   typedef IShellListener::Events::ShellEventType::ListenerList ListenerList;
   ShellEvent::Pointer shellEvent(new ShellEvent(Shell::Pointer(controller->shell)));
   switch (event->type())
@@ -111,6 +114,9 @@ void QtMainWindowControl::changeEvent(QEvent* event)
 
 void QtMainWindowControl::closeEvent(QCloseEvent* event)
 {
+  if (!controller->shell)
+    return QMainWindow::changeEvent(event);
+
   typedef IShellListener::Events::ShellEventType::ListenerList ListenerList;
 
   ShellEvent::Pointer shellEvent(new ShellEvent(Shell::Pointer(controller->shell)));

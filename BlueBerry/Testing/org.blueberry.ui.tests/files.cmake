@@ -13,9 +13,6 @@ SET(SRC_CPP_FILES
   api/berryUiApiTestSuite.cpp
   api/berryXMLMementoTest.cpp
   
-  
-  # Utility classes
-  util/berryCallHistory.cpp
 )
 
 SET(INTERNAL_CPP_FILES

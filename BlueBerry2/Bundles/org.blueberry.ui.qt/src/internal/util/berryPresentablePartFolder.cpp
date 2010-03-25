@@ -176,6 +176,12 @@ PresentablePartFolder::~PresentablePartFolder()
     (*iter)->RemovePropertyListener(childPropertyChangeListener);
   }
 
+  for (QWidget* currentWidget = contentProxy; currentWidget != 0 && currentWidget
+      != folder->GetControl()->parentWidget(); currentWidget = currentWidget->parentWidget())
+  {
+    Tweaklets::Get(GuiWidgetsTweaklet::KEY)->RemoveControlListener(currentWidget, contentListener);
+  }
+
   BERRY_DEBUG << "DELETING PresentablePartFolder and contentProxy\n";
 
   delete folder;
@@ -217,15 +223,13 @@ PresentablePartFolder::PresentablePartFolder(AbstractTabFolder* _folder) :
   contentProxy = new QtControlWidget(folder->GetContentParent(), 0);
   contentProxy->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
   //contentProxy->setVisible(false);
-  int i = 0;
   for (QWidget* currentWidget = contentProxy; currentWidget != 0 && currentWidget
-      != folder->GetControl()->parentWidget(); currentWidget = currentWidget->parentWidget(), ++i)
+      != folder->GetControl()->parentWidget(); currentWidget = currentWidget->parentWidget())
   {
     Tweaklets::Get(GuiWidgetsTweaklet::KEY)->AddControlListener(currentWidget, contentListener);
   }
   folder->SetContent(contentProxy);
   
-  //BERRY_INFO << "listener add: " << i << std::endl;
 }
 
 std::vector<IPresentablePart::Pointer> PresentablePartFolder::GetPartList()

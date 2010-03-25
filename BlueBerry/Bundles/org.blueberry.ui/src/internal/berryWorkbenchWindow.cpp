@@ -373,12 +373,24 @@ Point WorkbenchWindow::GetInitialSize()
 bool WorkbenchWindow::Close()
 {
   BERRY_INFO << "WorkbenchWindow::Close()";
+
+  if (controlResizeListener)
+  {
+    Tweaklets::Get(GuiWidgetsTweaklet::KEY)->RemoveControlListener(GetShell()->GetControl(), controlResizeListener);
+  }
+
   bool ret = false;
   //BusyIndicator.showWhile(null, new Runnable() {
   //      public void run() {
   ret = this->BusyClose();
   //      }
   //    });
+
+  if (!ret && controlResizeListener)
+  {
+    Tweaklets::Get(GuiWidgetsTweaklet::KEY)->AddControlListener(GetShell()->GetControl(), controlResizeListener);
+  }
+
   return ret;
 }
 

@@ -70,7 +70,7 @@ int mitkTrackingDeviceTest(int /* argc */, char* /*argv*/[])
   MITK_TEST_CONDITION(trackingDeviceTestClass->GetType()==mitk::ClaronMicron,"Type should be ClaronMicron, as it has just been set");
   trackingDeviceTestClass->SetType( mitk::AscensionMicroBird );
   MITK_TEST_CONDITION(trackingDeviceTestClass->GetType()==mitk::AscensionMicroBird,"Type should be AscensionMicroBird, as it has just been set");
-  trackingDeviceTestClass->SetType( mitk::VirtualTrackingDevice );
+  trackingDeviceTestClass->SetType( mitk::VirtualTracker);
   MITK_TEST_CONDITION(trackingDeviceTestClass->GetType()==mitk::VirtualTrackingDevice,"Type should be VirtualTrackingDevice, as it has just been set");
   trackingDeviceTestClass->SetType( mitk::IntuitiveDaVinci );
   MITK_TEST_CONDITION(trackingDeviceTestClass->GetType()==mitk::IntuitiveDaVinci,"Type should be IntuitiveDaVinci, as it has just been set");

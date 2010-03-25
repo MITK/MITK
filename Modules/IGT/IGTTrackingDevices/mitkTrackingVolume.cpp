@@ -67,7 +67,7 @@ bool mitk::TrackingVolume::SetTrackingDeviceType(TrackingDeviceType type)
   case mitk::NDIPolaris:
     filename = mitk::StandardFileLocations::GetInstance()->FindFile("NDIPolaris.stl");
     break;
-  case mitk::VirtualTrackingDevice:
+  case mitk::VirtualTracker:
     {
       vtkCubeSource* cs = vtkCubeSource::New();
       double bounds[6];

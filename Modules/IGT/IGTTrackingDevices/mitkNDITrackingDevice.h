@@ -24,13 +24,14 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <MitkIGTExports.h>
 #include <itkMultiThreader.h>
-
-#include <list>
+#include "itkFastMutexLock.h"
+#include <vector>
 
 #include "mitkTrackingTypes.h"
 #include "mitkNDIProtocol.h"
 #include "mitkNDIPassiveTool.h"
 #include "mitkSerialCommunication.h"
+
 
 namespace mitk
 {

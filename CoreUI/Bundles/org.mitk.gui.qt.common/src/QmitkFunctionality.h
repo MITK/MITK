@@ -64,7 +64,7 @@ class QScrollArea;
 /// Please use the Activated/Deactivated method to add/remove interactors, disabling multiwidget crosshair or anything which may 
 /// "affect" other functionalities. For further reading please have a look at QmitkFunctionality::IsExclusiveFunctionality().
 ///
-class MITK_QT_COMMON QmitkFunctionality : public berry::QtViewPart, virtual public berry::ISelectionProvider
+class MITK_QT_COMMON QmitkFunctionality : public berry::QtViewPart
 {
 
 //# public virtual methods which can be overwritten
@@ -140,12 +140,12 @@ public:
   ///
   /// Some functionalities need to add special interactors, removes the crosshair from the stdmultiwidget, etc.
   /// In this case the functionality has to tidy up when changing to another functionality 
-  /// which also wants to do change the "default configuration". In the old Qt3-based
-  /// version of MITK two functionalities could never be opened at the same time so that the 
+  /// which also wants to change the "default configuration". In the old Qt3-based
+  /// version of MITK, two functionalities could never be opened at the same time so that the 
   /// methods Activated() and Deactivated() were the right place for the functionalitites to 
   /// add/remove their interactors, etc. This is still true for the new MITK Workbench,
-  /// but as there can be several functionalities visible at the same time the behaviour concerning 
-  /// when Activated() and Deactivated() are called:
+  /// but as there can be several functionalities visible at the same time, the behaviour concerning 
+  /// when Activated() and Deactivated() are called has changed:
   ///
   /// 1. Activated() and Deactivated() are only called if IsExclusiveFunctionality() returns true 
   ///
@@ -310,24 +310,6 @@ public:
   /// Toggles the activated flag m_Activated
   ///
   void SetActivated(bool activated);
-
-  //# ISelectionProvider methods
-  ///
-  /// \see ISelectionProvider::AddSelectionChangedListener()
-  ///
-  virtual void AddSelectionChangedListener(berry::ISelectionChangedListener::Pointer listener);
-  ///
-  /// \see ISelectionProvider::GetSelection()
-  ///
-  virtual berry::ISelection::ConstPointer GetSelection() const;
-  ///
-  /// \see ISelectionProvider::RemoveSelectionChangedListener()
-  ///
-  virtual void RemoveSelectionChangedListener(berry::ISelectionChangedListener::Pointer listener);
-  ///
-  /// \see ISelectionProvider::SetSelection()
-  ///
-  virtual void SetSelection(berry::ISelection::Pointer selection);
   ///
   /// Called, when the WorkbenchPart gets closed for removing event listeners
   /// Internally this method calls ClosePart after it removed the listeners registered
@@ -335,6 +317,64 @@ public:
   /// call QmitkFunctionality::ClosePart() when overwriting ClosePart()
   ///
   void ClosePartProxy();
+
+  ///
+  /// Internal class for selection providing
+  ///
+  class SelectionProvider: virtual public berry::Object, virtual public berry::ISelectionProvider
+  {
+  public:
+    ///
+    /// Creates smartpointer typedefs
+    ///
+    berryObjectMacro(QmitkFunctionality::SelectionProvider)
+    ///
+    /// Create a selection provider for the given _Functionality
+    ///
+    berryNewMacro1Param(QmitkFunctionality::SelectionProvider, QmitkFunctionality*)
+    //# ISelectionProvider methods
+    ///
+    /// \see ISelectionProvider::AddSelectionChangedListener()
+    ///
+    virtual void AddSelectionChangedListener(berry::ISelectionChangedListener::Pointer listener);
+    ///
+    /// \see ISelectionProvider::GetSelection()
+    ///
+    virtual berry::ISelection::ConstPointer GetSelection() const;
+    ///
+    /// \see ISelectionProvider::RemoveSelectionChangedListener()
+    ///
+    virtual void RemoveSelectionChangedListener(berry::ISelectionChangedListener::Pointer listener);
+    ///
+    /// \see ISelectionProvider::SetSelection()
+    ///
+    virtual void SetSelection(berry::ISelection::Pointer selection);
+    ///
+    /// Sends the nodes as selected to the workbench
+    ///
+    void FireNodesSelected( std::vector<mitk::DataNode::Pointer> nodes );
+  protected:
+    ///
+    /// nothing to do here
+    ///
+    SelectionProvider(QmitkFunctionality* _Functionality);
+    ///
+    /// nothing to do here
+    ///
+    virtual ~SelectionProvider();
+    ///
+    /// the functionality parent
+    ///
+    QmitkFunctionality* m_Functionality;
+    ///
+    /// Holds the current selection (selection made by m_Functionality !!!)
+    ///
+    mitk::DataNodeSelection::Pointer m_CurrentSelection;
+    ///
+    /// The selection events other parts can listen too
+    ///
+    berry::ISelectionChangedListener::Events m_SelectionEvents;
+  };
 
 //# other protected methods which should not be overwritten (or which are deprecated)
 protected:
@@ -378,13 +418,9 @@ protected:
 //# private fields:
 private:
   ///
-  /// The selection events other parts can listen too (needed for QmitkFunctionality to be a selection provider)
-  ///
-  berry::ISelectionChangedListener::Events m_SelectionEvents;
-  ///
   /// Holds the current selection (selection made by this Functionality !!!)
   ///
-  mitk::DataNodeSelection::Pointer m_CurrentSelection;
+  SelectionProvider* m_SelectionProvider;
   ///
   /// object to observe BlueBerry selections 
   ///

@@ -44,6 +44,7 @@ QmitkFunctionality::QmitkFunctionality()
  , m_Visible(false)
  , m_HandlesMultipleDataStorages(false)
  , m_InDataStorageChanged(false)
+ , m_SelectionProvider(0)
 {
   m_PreferencesService = 
     berry::Platform::GetServiceRegistry().GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
@@ -142,9 +143,12 @@ void QmitkFunctionality::AfterCreateQtPartControl()
     , &QmitkFunctionality::BlueBerrySelectionChanged));
   this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddPostSelectionListener(/*"org.mitk.views.datamanager",*/ m_BlueBerrySelectionListener);
 
-  // REGISTER YOURSELF AS SELECTION PROVIDER
-  this->GetSite()->SetSelectionProvider(berry::ISelectionProvider::Pointer(this));
-
+  // REGISTER A SELECTION PROVIDER
+  QmitkFunctionality::SelectionProvider::Pointer _SelectionProvider
+    = QmitkFunctionality::SelectionProvider::New(this);
+  m_SelectionProvider = _SelectionProvider.GetPointer();
+  this->GetSite()->SetSelectionProvider(berry::ISelectionProvider::Pointer(m_SelectionProvider));
+  
   // EMULATE INITIAL SELECTION EVENTS
 
   // by default a a multi widget is always available
@@ -179,6 +183,9 @@ void QmitkFunctionality::ClosePartProxy()
     // flush the preferences here (disabled, everyone should flush them by themselves at the right moment)
     // prefs->Flush();
   }
+
+  // REMOVE SELECTION PROVIDER
+  this->GetSite()->SetSelectionProvider(berry::ISelectionProvider::Pointer(NULL));
 
   berry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
   if(s)
@@ -440,24 +447,46 @@ bool QmitkFunctionality::IsActivated() const
   return m_Active;
 }
 
-void QmitkFunctionality::AddSelectionChangedListener( berry::ISelectionChangedListener::Pointer listener )
+QmitkFunctionality::SelectionProvider::SelectionProvider( QmitkFunctionality* _Functionality )
+: m_Functionality(_Functionality)
+{
+
+}
+
+QmitkFunctionality::SelectionProvider::~SelectionProvider()
+{
+  m_Functionality = 0;
+}
+
+void QmitkFunctionality::SelectionProvider::AddSelectionChangedListener( berry::ISelectionChangedListener::Pointer listener )
 {
   m_SelectionEvents.AddListener(listener);
 }
 
-berry::ISelection::ConstPointer QmitkFunctionality::GetSelection() const
+
+berry::ISelection::ConstPointer QmitkFunctionality::SelectionProvider::GetSelection() const
 {
   return m_CurrentSelection;
 }
 
-void QmitkFunctionality::RemoveSelectionChangedListener( berry::ISelectionChangedListener::Pointer listener )
+void QmitkFunctionality::SelectionProvider::RemoveSelectionChangedListener( berry::ISelectionChangedListener::Pointer listener )
 {
   m_SelectionEvents.RemoveListener(listener);
 }
 
-void QmitkFunctionality::SetSelection( berry::ISelection::Pointer selection )
+void QmitkFunctionality::SelectionProvider::SetSelection( berry::ISelection::Pointer selection )
 {
   m_CurrentSelection = selection.Cast<mitk::DataNodeSelection>();
+}
+
+void QmitkFunctionality::SelectionProvider::FireNodesSelected( std::vector<mitk::DataNode::Pointer> nodes )
+{
+  mitk::DataNodeSelection::Pointer sel(new mitk::DataNodeSelection(nodes));
+  m_CurrentSelection = sel;
+  berry::SelectionChangedEvent::Pointer event(new berry::SelectionChangedEvent(berry::ISelectionProvider::Pointer(this)
+    , m_CurrentSelection));
+  m_SelectionEvents.selectionChanged(event);
+
 }
 
 void QmitkFunctionality::FireNodeSelected( mitk::DataNode::Pointer node )
@@ -469,10 +498,8 @@ void QmitkFunctionality::FireNodeSelected( mitk::DataNode::Pointer node )
 
 void QmitkFunctionality::FireNodesSelected( std::vector<mitk::DataNode::Pointer> nodes )
 {
-  mitk::DataNodeSelection::Pointer sel(new mitk::DataNodeSelection(nodes));
-  m_CurrentSelection = sel;
-  berry::SelectionChangedEvent::Pointer event(new berry::SelectionChangedEvent(berry::ISelectionProvider::Pointer(this)
-    , m_CurrentSelection));
-  m_SelectionEvents.selectionChanged(event);
+  if( !m_SelectionProvider )
+    return;
+  m_SelectionProvider->FireNodesSelected(nodes);
 
 }

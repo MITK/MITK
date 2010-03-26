@@ -7,7 +7,7 @@ IF(MITK_USE_BLUEBERRY)
                         CACHE_PLUGIN_TARGETS MITK_CORE_ENABLED_PLUGINS
                         BUNDLE_LIST_PATH "${MITK_BINARY_DIR}/Bundles/MITKCoreBundleList.cmake"
                         CMAKE_CACHE_PREFIX "MITK"
-                        DEPENDS ${BLUEBERRY_PLUGINS_OUTPUT_DIR}
+#                        DEPENDS ${BLUEBERRY_PLUGINS_OUTPUT_DIR}
                         DEFAULT_BUILD_ON
                         ${MITK_BUILD_ALL_PLUGINS_OPTION})
    

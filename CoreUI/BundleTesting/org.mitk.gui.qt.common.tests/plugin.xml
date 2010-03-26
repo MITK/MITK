@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?BlueBerry version="0.1"?>
+<plugin>
+  <extension point="org.blueberry.tests">
+    <test id="QmitkQtCommonTestSuite" class="QmitkQtCommonTestSuite" uitest="true"/>
+  </extension>
+  
+  <extension point="org.blueberry.ui.views">
+  
+      <view
+            name="Mock QmitkFunctionality"
+            class="QmitkMockFunctionality"
+            id="org.mitk.gui.qt.common.tests.api.MockFunctionality">
+      </view>
+   </extension>
+</plugin>

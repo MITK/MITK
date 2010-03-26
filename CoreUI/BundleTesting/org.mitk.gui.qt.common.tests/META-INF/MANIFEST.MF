@@ -1,0 +1,7 @@
+Manifest-Version: 1.0
+Bundle-Name: MITK Common GUI Qt Tests 
+Bundle-SymbolicName: org.mitk.gui.qt.common.tests 
+Bundle-Version: 0.9
+Bundle-Vendor: DKFZ, Medical and Biological Informatics
+Require-Bundle: org.blueberry.uitest, org.mitk.gui.qt.common
+Bundle-Activator: 

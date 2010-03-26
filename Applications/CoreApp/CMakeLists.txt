@@ -15,7 +15,11 @@ TARGET_LINK_LIBRARIES(CoreApp
                       optimized PocoUtil            debug PocoUtild 
                       optimized org_blueberry_osgi debug org_blueberry_osgi${BLUEBERRY_DEBUG_POSTFIX})
 
-SET(_plugin_deps ${BLUEBERRY_ENABLED_PLUGINS} ${MITK_CORE_ENABLED_PLUGINS})
+SET(_plugin_deps 
+  ${BLUEBERRY_ENABLED_PLUGINS} 
+  ${MITK_CORE_ENABLED_PLUGINS}
+  ${MITK_CORE_ENABLED_TEST_PLUGINS}
+  )
 
 IF(_plugin_deps)
   # Make sure all enabled plug-ins are up to date 

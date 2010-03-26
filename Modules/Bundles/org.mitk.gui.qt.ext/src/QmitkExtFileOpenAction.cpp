@@ -63,6 +63,7 @@ void QmitkExtFileOpenAction::init(berry::IWorkbenchWindow::Pointer window)
   berry::IPreferencesService::Pointer prefService
     = berry::Platform::GetServiceRegistry()
     .GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
+  
   m_GeneralPreferencesNode = prefService->GetSystemPreferences()->Node("/General");
 
   this->connect(this, SIGNAL(triggered(bool)), this, SLOT(Run()));
@@ -71,8 +72,8 @@ void QmitkExtFileOpenAction::init(berry::IWorkbenchWindow::Pointer window)
 void QmitkExtFileOpenAction::Run()
 {
   /**
-   * @brief stores the last path of last opened file
-   */
+  * @brief stores the last path of last opened file
+  */
   static QString m_LastPath;
 
   if(m_GeneralPreferencesNode.Lock().IsNotNull())
@@ -90,15 +91,14 @@ void QmitkExtFileOpenAction::Run()
   //  << "MITK Pointset (*.mps)"
   //  << "All Files (*.*)";
   //dialog.setFilters(filters);
+
   std::stringstream ss;
   ss << mitk::CoreExtObjectFactory::GetInstance()->GetFileExtensions();
+
   std::string fileExtensions = ss.str();
   fileExtensions.append(";; MITK Scene Files (*.mitk)");
-
   fileExtensions.insert( fileExtensions.find("formats(") + 8, "*.mitk " );
 
-  MITK_INFO << fileExtensions;
-  
   QStringList fileNames = QFileDialog::getOpenFileNames(NULL,"Open",m_LastPath, fileExtensions.c_str() );
 
   //if (dialog.exec())
@@ -109,6 +109,7 @@ void QmitkExtFileOpenAction::Run()
 
   QFileInfo info(fileNames.at(0));
   m_LastPath = info.filePath();
+
   if(m_GeneralPreferencesNode.Lock().IsNotNull())
   {
     m_GeneralPreferencesNode.Lock()->Put("LastFileOpenPath", m_LastPath.toStdString());
@@ -119,6 +120,7 @@ void QmitkExtFileOpenAction::Run()
   mitk::DataStorage::Pointer dataStorage;
   QmitkStdMultiWidgetEditor::Pointer multiWidgetEditor;
   berry::IEditorPart::Pointer editor = m_Window->GetActivePage()->GetActiveEditor();
+  
   if (editor.Cast<QmitkStdMultiWidgetEditor>().IsNull())
   {
     editorInput = new mitk::DataStorageEditorInput();
@@ -141,6 +143,7 @@ void QmitkExtFileOpenAction::Run()
   }
 
   bool dsmodified = false;
+  
   for (QStringList::Iterator fileName = fileNames.begin();
     fileName != fileNames.end(); ++fileName)
   {
@@ -178,7 +181,7 @@ void QmitkExtFileOpenAction::Run()
       }
     }
   }
-  
+
 
   if(dsmodified)
   {
@@ -193,6 +196,4 @@ void QmitkExtFileOpenAction::Run()
     // initialize the views to the bounding geometry
     mitk::RenderingManager::GetInstance()->InitializeViews(bounds);
   }
-
- 
 }

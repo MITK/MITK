@@ -87,13 +87,6 @@ protected slots:
 
   void ClipboardStatisticsButtonClicked();
 
-  void ComputeStatistics(bool appendSourceData=false, bool toClipboard=false);
-
-  void ComputeStatistics(mitk::Image::Pointer im1, mitk::Image::Pointer im2, bool appendSourceData, bool toClipboard);
-
-  void ComputeStatisticsAllImages(bool appendSourceData=true);
-
-  void ClipboardToFile(int count, std::string imageName1, std::string imageName2, std::string filename, bool appendToFile, bool matlab );
 
 protected: 
 

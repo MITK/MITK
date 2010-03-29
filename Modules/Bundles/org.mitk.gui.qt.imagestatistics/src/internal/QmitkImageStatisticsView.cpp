@@ -115,22 +115,6 @@ void QmitkImageStatistics::CreateQtPartControl(QWidget *parent)
     m_Controls->setupUi(parent);
     this->CreateConnections();
 
-    m_Controls->m_ImageSelector1->SetDataStorage(this->GetDefaultDataStorage());
-    m_Controls->m_ImageSelector1->SetPredicate(mitk::NodePredicateDataType::New("Image"));
-    m_Controls->m_ImageSelector2->SetDataStorage(this->GetDefaultDataStorage());
-    m_Controls->m_ImageSelector2->SetPredicate(mitk::NodePredicateDataType::New("Image"));
-    m_Controls->sliceNavigatorTime->setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Minimum);
-    m_Controls->m_IgnoreInfCheckbox->setChecked(false);
-
-    m_Controls->sliceNavigatorTime->setEnabled(false);
-    m_Controls->tlTime->setEnabled(false);
-
-    m_Controls->gbOneImageOps->hide();
-    m_Controls->gbTwoImageOps->hide();
-    m_Controls->gbOptions->hide();
-
-    m_Controls->m_AllTreeButton->hide();
-
     m_Controls->m_ErrorMessageLabel->hide();
 
     m_Controls->m_StatisticsWidgetStack->setCurrentIndex( 0 );
@@ -153,17 +137,8 @@ void QmitkImageStatistics::CreateConnections()
 void QmitkImageStatistics::StdMultiWidgetAvailable( QmitkStdMultiWidget& stdMultiWidget )
 {
   QmitkFunctionality::StdMultiWidgetAvailable(stdMultiWidget);
-  m_TimeStepperAdapter = new QmitkStepperAdapter((QObject*) m_Controls->sliceNavigatorTime, stdMultiWidget.GetTimeNavigationController()->GetTime(), "sliceNavigatorTimeFromShapeBasedSegmentation");
-  connect( m_TimeStepperAdapter, SIGNAL( Refetch() ), this, SLOT( UpdateTimestep() ) );
-  this->UpdateTimestep();
 }
 
-
-void QmitkImageStatistics::UpdateTimestep()
-{
-  // Request update of statistics / histogram
-  this->RequestStatisticsUpdate();
-}
 
 void QmitkImageStatistics::ClipboardHistogramButtonClicked()
 {

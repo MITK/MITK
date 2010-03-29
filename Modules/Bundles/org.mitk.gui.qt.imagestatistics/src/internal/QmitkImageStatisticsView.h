@@ -81,8 +81,6 @@ public:
   void OnSelectionChanged( std::vector<mitk::DataNode*> nodes );
   
 protected slots:  
-  void UpdateTimestep();
-
   void ClipboardHistogramButtonClicked();
 
   void ClipboardStatisticsButtonClicked();

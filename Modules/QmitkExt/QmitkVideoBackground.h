@@ -95,7 +95,9 @@ public:
   
   public slots:
     void UpdateVideo();
-  
+  signals:
+    void NewFrameAvailable(mitk::VideoSource*);
+
 protected:
   void ResetVideoBackground();
 

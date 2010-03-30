@@ -175,7 +175,8 @@ void mitk::QmitkVideoBackground::UpdateVideo()
         mitk::RenderingManager::GetInstance()->RequestUpdate((*it).renWin);
       }
     }
-  } 
+  }
+  emit NewFrameAvailable ( m_VideoSource );
 }
 
 void mitk::QmitkVideoBackground::Modified()

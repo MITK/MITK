@@ -47,7 +47,8 @@ bool mitk::NDIPassiveTool::LoadSROMFile(const char* filename)
     return false;
   if (filename[0] == '\0')
     return false;
-
+  
+  m_File = filename;
   std::basic_ifstream<char> file;
   file.open(filename, std::ios::in | std::ios::binary); // open the file
   if (file.is_open() == false)

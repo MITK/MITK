@@ -45,7 +45,7 @@ QmitkPointListWidget::QmitkPointListWidget( QWidget* parent, Qt::WindowFlags f )
   m_ListView = new QmitkPointListView;
   layout->addWidget(m_ListView, 0, 0, 1, 1);
   m_ListView->setToolTip("Use F2 to move the selected point up, use F3 to move the selected point down, double click on a point toggles editing");
-  connect( m_ListView, SIGNAL(PointSelectionChanged()), this, SIGNAL(PointSelectionChanged()) );  // forward signal from list view
+  connect( m_ListView, SIGNAL(SignalPointSelectionChanged()), this, SIGNAL(PointSelectionChanged()) );  // forward signal from list view
   
   
   QWidget* buttonWidget = new QWidget;

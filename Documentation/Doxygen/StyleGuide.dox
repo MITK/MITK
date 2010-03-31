@@ -1,14 +1,440 @@
 /** 
 \page StylesAndNotesPage The MITK Style Guide and Technical Notes 
 
-The style guide for MITK is almost identical to that of ITK, see the ITK Style Guide document. The only difference is that
-MITK has its own namespace (@a mitk ).
+The following document is a description of the accepted coding style for the Medical Imaging Interaction Toolkit (MITK). Developers who wish to contribute code to MITK should read and adhere to the standards described here.
 
-Some technical notes:
+
+Available sections:
+ - \ref NameConventions
+ - \ref Pointer
+ - \ref Namespace
+ - \ref CodeLayoutandIndentation
+ - \ref UseofBraces
+ - \ref IncludeGuards
+ - \ref TechnicalNotes
+
+ 
+\section NameConventions Name Conventions
+
+\li Using case change to indicate separate words 
+@code
+ImageFilter
+PixelType
+DataStorage
+NodePredicateProperty
+@endcode
+
+\li Underscores are not used e.g. Image_Filer, _Node
+
+\li Variable names should convey the meaning behind the code
+@code
+BoundingBox::Pointer boundingBox = BoundingBox::New();
+@endcode
+
+\li Names are generally spelled out
+@code
+mitk::DataTreeNode* node;
+@endcode
+
+\li Abbreviation are allowable when in common use e.g. ROI for Region of
+Interest
+
+
+\subsection NamingClasses Naming Classes
+
+\li Classes are named beginning with a capital letter
+
+\li Classes are named according to the following general rule:
+@code
+class name = <algorithm><input><concept>
+@endcode
+
+\li Examples of concetpts  \n
+Accessor: Access and convert between types e.g. NullScalarAccessor \n
+Container: A container of objects such as points or images e.g. VectorContainer \n
+Filter: A class that participates in the data processing pipeline e.g. AddImageFilter \n
+Mapper: Transform data from one form into another e.g. ContourMapper2D \n
+Reader/Wirter: A class that reads/writes a single data object e.g. VtkSurfaceReader \n
+
+
+\subsection NamingFiles Naming Files
+
 \li MITK classes like @a ExampleClass should be in namespace @a mitk and their corresponding files should be named @a mitkExampleClass.h/.cpp.
+@code 
+mitkDataStorage
+@endcode
+
 \li Qt specific MITK classes like @a QmitkListView should have the prefix Qmitk in their class names and their corresponding files should be named @a QmitkListView.h/.cpp.
+@code 
+QmitkDataStorageComboBox
+@endcode
+
+\li Header Files ends with an .h and 
+
+\li Implementation Files with an .cpp or .txx for a template class
+
+
+\subsection NamingMethodsandFunctions Naming Methods and Functions
+
+\li Functions and methods are named beginning with a capital letter
+
+\li Referring to class methods in code, an explicit this-> pointer should be
+used
+@code
+mitk::DataStorage::SetOfObjects::ConstPointer all = this->GetAll();
+@endcode
+
+
+\subsection NamingSignalSlots Naming Signal/Slots Methods and Functions
+
+\li Slots are named according to the following general rule
+@code 
+On[variable name who send the signal][signal]();
+@endcode
+
+\li Example
+@code
+connect( loadImagePushButton, SIGNAL( clicked(bool ) ),
+SLOT( OnLoadImagePushButtonClicked( bool ) ) );
+
+void mitk::Image::OnLoadImagePushButtonClicked( bool )
+{
+... Do something ...
+}
+@endcode
+
+\li Signals are named according to the following general rule
+@code 
+Signal[MethodName]();
+@endcode
+
+\li Example
+@code
+emit SignalFinishedSegmentation();
+@endcode
+
+
+\subsection NamingClassDataMembers Naming Class Data Members
+
+\li Class data member are prepended with m_
+@code
+m_Volumes
+m_OffsetTable
+m_ImageMask
+@endcode
+
+\li Except of QT class Data Members, those begins in lowercase.
+@code
+loadImageButton;
+closeImageAction;
+@endcode
+
+
+\subsection NamingLocalVariables Naming Local Variables
+
+\li Local variables begin in lowercase
+@code
+offset
+data
+slicesIt
+@endcode
+
+
+\subsection NamingQtVariables Naming Qt Variables
+
+\li GUI variables ends with name of used QT tool.
+@code 
+QPushButton* loadImagePushButton;
+QAction* closeImageAction;
+QCheckBox* hideImageCheckBox;
+QRadioButton* binaryImageRadioButton;
+@endcode
+
+
+\subsection NamingTypedefs Naming Typedefs
+
+\li Typedef names end in the word Type
+@code
+typedef TPixel PixelType;
+typedef itk::Image< TPixel, VImageDimension > ImageType;
+typedef std::list<mitk::Image::Pointer> ImageListType;
+@endcode
+
+
+\section Pointer Pointer
+
+\subsection DeclarationofPointers Declaration of Pointers
+
+\li Position of * pointers are connected with the declaration type
+@code 
+int* counter;
+@endcode
+
+\li Analog to references
+@code
+int& counter;
+@endcode
+
+
+\subsection SmartPointer SmartPointer
+
+\li SmartPointers must be used for classes that have itk::Object as a base
+class.
+
+\li Assignment of a just created instance to a normal pointer results in a
+crash, since the reference count is decreased immediately to zero and the
+object is destroyed.
+@code
+itk::Object::Pointer object = itk::Object::New();
+@endcode
+
+\li Static declarations are also forbidden and result into an exception when
+the scope of the variable is left, because the destructor is called while the
+reference count is still greater than zero.
+
+\li Note that using smart pointers requires using real (normal) pointers when
+setting input. If you want to return a newly created smart pointer that
+is not also kept within the class (e.g., if you write a Clone method), you
+have to return a smart pointer on output (compare itkMacro.h). If the
+smart pointer is kept within the class, returning a real (normal) pointer
+is sufficient.
+
+\li Testing a SmartPointer against NULL is done with the IsNull() and Is-
+NotNull() methods. A simple ==NULL issues a warning.
+
+
+\section Namespace Namespace
+
+\li MITK classes should be in namespace @a mitk
+@code 
+mitk::Image::Pointer mitk::ImageGenerator::MakeImage()
+{
+// already in namespace mitk here!
+Image::Pointer image = mitk::Image::New();
+ImageDecorator::Pointer decorator = mitk::ImageDecorator::New();
+d->Decorate( image );
+return image;
+}
+@endcode
+
+\li Constants in MITK for mitk::Operation and mitk::Action are set in
+namespace, so don't forget to add prefix mitk::
+@code
+switch (actionId)
+{
+  case mitk::AcMOVESELECTED:
+	....Do something ...
+    break;
+  
+  default:
+    break;
+}
+@endcode
+
+
+\section CodeLayoutandIndentation Code Layout and Indentation
+
+\subsection GeneralLayout General Layout
+
+\li Each line of code should take no more than 81 characters.
+
+\li Use lots of whitespace to separate logical blocks of code, intermixed with
+comments
+
+\li <b>DO NOT USE TABS.</b> The standard indention is <b>2 spaces</b> (see <a href="http://www.insightsoftwareconsortium.org/documents/policies/Style.pdf">ITK Style Guide</a>). Configure your
+editor accordingly.
+
+\li Declaration of variables should be one declaration per line
+@code
+int 				sliceNumber;
+char* 				stringName;
+ImageType::Pointer 	image;
+@endcode
+
+
+\subsection ClassLayout Class Layout
+
+\li Copyright
+@code
+/*=========================================================================
+Program: Medical Imaging & Interaction Toolkit
+Module: $RCSfile$
+Language: C++
+Date: $Date$
+Version: $Revision$
+Copyright (c) German Cancer Research Center, Division of Medical and
+Biological Informatics. All rights reserved.
+See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
+This software is distributed WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE. See the above copyright notices for more information.
+=========================================================================*/
+@endcode
+
+\li Include Guards
+@code
+#ifndef __mitkClassName_h
+#define __mitkClassName_h
+@endcode
+
+\li Includes [A .. Z]
+@code
+#include "... .h"
+@endcode
+
+\li Doxygen
+@code
+/*!
+\brief mitkClassName
+\sa .....
+\verbatim
+Last contributor: $Author$
+\endverbatim
+*/
+@endcode
+
+\li Namespace
+@code
+namespace mitk
+{
+@endcode
+
+\li Class (Template)
+@code
+template <class TType>
+class ClassName : public ImageBase<VImageDimension>
+{
+@endcode
+
+\li Typedefs
+@code
+public:
+  ....typedefs....
+@endcode
+
+\li Methods
+@code
+public:
+  ....methods....
+protected:
+  ....methods....
+private:
+  ....methods....
+@endcode
+
+\li QT Signals
+@code
+signals:
+  Signal...();
+@endcode
+
+\li QT Slots
+@code
+public slots:
+  On...();
+protected slots:
+  On...();
+@endcode
+
+\li Data Member
+@code
+private/protected:
+  ....class data members....
+};
+}
+#endif
+@endcode
+
+\section UseofBraces Use of Braces
+
+\li Used to delimit the scope of an if, for, while, switch.
+
+\li Braces are placed on a line by themselves:
+@code
+for ( unsigned int i = 0; i < 3; ++i )
+{
+... do something ...
+}
+@endcode
+or
+@code
+if ( condition )
+{
+... do something ...
+}
+else if ( other condition )
+{
+... do something ...
+}
+else
+{
+... do something ...
+}
+@endcode
+
+\li You can choose to use braces on a line with a code block when the block
+consists of a single line:
+@code 
+if ( condition ) { foo = 1; }
+else if ( condition2 ) { foo = 3; }
+else { return; }
+@endcode
+or
+@code
+for ( unsigned int i = 0; i < 3; ++i) { x[i] = 0.0; }
+@endcode
+
+
+\section IncludeGuards Include Guards
+
+\li #inlcude guard is a particular construct used to avoid the problem of
+double inclusion when dealing with the #include directive.
+
+\li Naming convention for #inlcude guards is: ClassName_h
+
+\li Following example demonstrates a problem that can arise if #include guards
+are missing: Here, the file child.cpp has indirectly included two copies of the text in the
+header file grandfather.h. This causes a compilation error, since the structure
+type foo is apparently defined twice.
+@code 
+grandfather.h  struct foo
+               {
+                 int m Member;
+               };
+
+father.h       #include "grandfather.h"
+
+child.h        #include "grandfather.h"
+               #include "father.h"
+@endcode
+
+
+\subsection Useofincludeguards Use of #include guards
+\li Here, the first inclusion of grandfather.h causes the macro grandfather h to
+be defined. Then, when child.cpp includes grandfather.h the second time,
+the #ifndef test fails, and the preprocessor skips down to the #endif, thus
+avoiding the second definition of struct foo. The program compiles correctly.
+@code
+grandfather.h  #ifndef grandfather h
+               #define grandfather h
+               struct foo
+               {
+                 int m Member;
+               };
+			   
+father.h       #include "grandfather.h"
+
+child.h        #include "grandfather.h"
+               #include "father.h"
+@endcode
+
+
+
+\section TechnicalNotes Some Technical Notes
+
 \li Use forward declarations in header files wherever possible. Only include those header files in a header file 
 that are really necessary. Include the rest in the implementation file.
+
 \li For classes inheriting directly or indirectly from @a itk::LightObject (most of the MITK-classes do so), the
 class definition should include the mitkClassMacro. Additionally, if the class can be instantiated (normally the case, 
 if the class is not abstract) and has @em only a constructor without parameters, the constructor should be declared 
@@ -25,23 +451,12 @@ protected:
     virtual ~ExampleClass();
 }    
 @endcode
-\li The standard indention is two spaces (see <a href="http://www.insightsoftwareconsortium.org/documents/policies/Style.pdf">ITK Style Guide</a>). Configure your
-editor accordingly. <b>Do not use tabs!</b>
-\li @a SmartPointers must be used for classes that have @a itk::Object as a base class. 
-Assignment of a just created instance to a normal pointer, e.g., 
-@code itk::Object* crash = itk::Object::New()@endcode results in a crash, since the reference count 
-is decreased immediately to zero and the object is destroyed. Use: @code itk::Object::Pointer nocrash = itk::Object::New()@endcode 
-Static declarations are also forbidden and result into an exception when the scope of the variable is left, because the destructor is called 
-while the reference count is still greater than zero. 
-\li Note that using smart pointers requires using real (normal) pointers when setting input. If you want to return a newly created
-smart pointer that is not also kept within the class (e.g., if you write a \a Clone method), you have to return a  
-smart pointer on output (compare <a href="http://www.itk.org/Doxygen12/html/itkMacro_8h.html">itkMacro.h</a>). If the 
-smart pointer is kept within the class, returning a real (normal) pointer is sufficient.
-\li Testing a SmartPointer against NULL is done with the IsNull() and IsNotNull() methods. A simple ==NULL issues a warning.
+
 \li Set- and Get-methods can be created with the macros @a itkSetObjectMacro(name,type) and 
 @a itkGetObjectMacro(name,type), respectively, if the @a type is derived from @a itk::LightObject or
 @a itk::Object. There are also macros for other types, e.g., strings, see 
 <a href="http://www.itk.org/Doxygen12/html/itkMacro_8h.html">itkMacro.h</a>.
+
 \li When using inner classes of a parent class which is templated, you have
 to use the keyword @a typename for gcc 3.x and standard compliance. For example, 
 @a TreeChangeListener is an inner class of @a Tree, therefore use:
@@ -59,6 +474,7 @@ Another example:
 typename std::vector<TreeChangeListener*>::iterator pos = treeChangeListenerList.begin();
 @endcode
 @a iterator is an inner class of @a vector.
+
 \li Constants in MITK for mitk::Operation and mitk::Action are set in namespace, so don't forget to add prefix @a mitk:: 
 @code
 switch (actionId)
@@ -66,9 +482,11 @@ switch (actionId)
   case mitk::AcMOVESELECTED:
 @endcode
 Prefixes for the constants are to be used like corresponding others. See file @a Interactions\\mitkBaseInteraction\\mitkInteractionConst.h for further details.
+
 \li Often QmitkFunctionality::Activated() and QmitkFunctionality::Deactivated() is the right place to connect and disconnnect event-handlers 
 (e.g., mitk::GlobalStateMachine::AddStateMachine() in Activated() and mitk::GlobalStateMachine::RemoveStateMachine()
  in Deactivated()).
+ 
 \li The four widgets of the QmitkStdMultiWidget should be initialized in QmitkFunctionality::Activated(),
  but does @em not need to be restored in QmitkFunctionality::Deactivated(): It is the responsiblity of the 
  subsequently activated functionality to initialize them according to its needs.

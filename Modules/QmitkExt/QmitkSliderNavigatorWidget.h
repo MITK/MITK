@@ -74,8 +74,9 @@ public slots:
   void ShowLabelUnit( bool show );
   
   void SetPos(int val);
-  
-  
+
+  void SetInverseDirection (bool inverseDirection);
+    
 protected slots:
 
   void slider_valueChanged( int );
@@ -113,6 +114,8 @@ protected:
   bool m_HasLabels;
   float m_MinValue;
   float m_MaxValue;
+
+  bool m_InverseDirection;
   
 };
 

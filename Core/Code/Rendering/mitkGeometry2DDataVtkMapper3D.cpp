@@ -1,4 +1,5 @@
 /*=========================================================================
+
 Program:   Medical Imaging & Interaction Toolkit
 Language:  C++
 Date:      $Date$
@@ -13,7 +14,6 @@ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
-
 
 #include "mitkGeometry2DDataVtkMapper3D.h"
 

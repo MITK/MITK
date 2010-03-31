@@ -1,9 +1,9 @@
 /*=========================================================================
 
-Program:   MITK
+Program:   Medical Imaging & Interaction Toolkit
 Language:  C++
 Date:      $Date$
-Version:   $Revision: 14921 $
+Version:   $Revision: 18127 $
 
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.

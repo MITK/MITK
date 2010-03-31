@@ -1,12 +1,9 @@
-#ifndef QMITK_BASECOMPONENT_H
-#define QMITK_BASECOMPONENT_H
-
 /*=========================================================================
 
 Program:   Medical Imaging & Interaction Toolkit
 Language:  C++
 Date:      $Date$
-Version:   $Revision: 10646 $
+Version:   $Revision: 18127 $
 
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
@@ -17,6 +14,9 @@ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
+
+#ifndef QMITK_BASECOMPONENT_H
+#define QMITK_BASECOMPONENT_H
 
 
 /**

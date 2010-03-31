@@ -1,5 +1,23 @@
+/*=========================================================================
+
+Program:   Medical Imaging & Interaction Toolkit
+Language:  C++
+Date:      $Date$
+Version:   $Revision$
+
+Copyright (c) German Cancer Research Center, Division of Medical and
+Biological Informatics. All rights reserved.
+See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
+
+This software is distributed WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.  See the above copyright notices for more information.
+
+=========================================================================*/
+
 #ifndef __itkSmartPointerVectorContainer_h
 #define __itkSmartPointerVectorContainer_h
+
 /*
 
    Defines a vector container just like from itkSmartPointerVectorContainer.h.
@@ -11,24 +29,6 @@
    When you ask for a ConstIterator you won't get const SmartPointers,
    but a list of const Object*. 
 */
-
-
-/*=========================================================================
-
-  Program:   Insight Segmentation & Registration Toolkit
-  Module:    $RCSfile$
-  Language:  C++
-  Date:      $Date$
-  Version:   $Revision$
-
-  Copyright (c) Insight Software Consortium. All rights reserved.
-  See ITKCopyright.txt or http://www.itk.org/HTML/Copyright.htm for details.
-
-     This software is distributed WITHOUT ANY WARRANTY; without even 
-     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
-     PURPOSE.  See the above copyright notices for more information.
-
-=========================================================================*/
 
 #include "itkObject.h"
 

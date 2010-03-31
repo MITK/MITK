@@ -168,298 +168,298 @@ void TestDataStorage( mitk::DataStorage* ds )
 
   try  /* object retrieval methods */
   {
-  /* Requesting all Objects */
+    /* Requesting all Objects */
     {
-    const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetAll();
-    std::vector<mitk::DataNode::Pointer> stlAll = all->CastToSTLConstContainer();
+      const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetAll();
+      std::vector<mitk::DataNode::Pointer> stlAll = all->CastToSTLConstContainer();
 
-    MITK_TEST_CONDITION(
-         (stlAll.size() == 5)  // check if all tree nodes are in resultset
-      && (std::find(stlAll.begin(), stlAll.end(), n1) != stlAll.end()) && (std::find(stlAll.begin(), stlAll.end(), n2) != stlAll.end())
-      && (std::find(stlAll.begin(), stlAll.end(), n3) != stlAll.end()) && (std::find(stlAll.begin(), stlAll.end(), n4) != stlAll.end())
-      && (std::find(stlAll.begin(), stlAll.end(), n5) != stlAll.end()),
-      "Testing GetAll()"
-      );
+      MITK_TEST_CONDITION(
+        (stlAll.size() == 5)  // check if all tree nodes are in resultset
+        && (std::find(stlAll.begin(), stlAll.end(), n1) != stlAll.end()) && (std::find(stlAll.begin(), stlAll.end(), n2) != stlAll.end())
+        && (std::find(stlAll.begin(), stlAll.end(), n3) != stlAll.end()) && (std::find(stlAll.begin(), stlAll.end(), n4) != stlAll.end())
+        && (std::find(stlAll.begin(), stlAll.end(), n5) != stlAll.end()),
+        "Testing GetAll()"
+        );
     }
     /* Requesting a named object */
     {
-    mitk::NodePredicateProperty::Pointer predicate(mitk::NodePredicateProperty::New("name", mitk::StringProperty::New("Node 2 - Surface Node")));
-    mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetSubset(predicate);
-    MITK_TEST_CONDITION((all->Size() == 1) && (all->GetElement(0) == n2), "Requesting a named object");
+      mitk::NodePredicateProperty::Pointer predicate(mitk::NodePredicateProperty::New("name", mitk::StringProperty::New("Node 2 - Surface Node")));
+      mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetSubset(predicate);
+      MITK_TEST_CONDITION((all->Size() == 1) && (all->GetElement(0) == n2), "Requesting a named object");
     }
 
-  /* Requesting objects of specific data type */
+    /* Requesting objects of specific data type */
     {
-    mitk::NodePredicateDataType::Pointer predicate(mitk::NodePredicateDataType::New("Image"));
-    mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetSubset(predicate);
-    MITK_TEST_CONDITION((all->Size() == 1) && (all->GetElement(0) == n1), "Requesting objects of specific data type")
-  }
-  /* Requesting objects of specific dimension */
+      mitk::NodePredicateDataType::Pointer predicate(mitk::NodePredicateDataType::New("Image"));
+      mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetSubset(predicate);
+      MITK_TEST_CONDITION((all->Size() == 1) && (all->GetElement(0) == n1), "Requesting objects of specific data type")
+    }
+    /* Requesting objects of specific dimension */
     {
-    mitk::NodePredicateDimension::Pointer predicate(mitk::NodePredicateDimension::New( 4 ));
-    mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetSubset(predicate);
-    MITK_TEST_CONDITION((all->Size() == 1) && (all->GetElement(0) == n1), "Requesting objects of specific dimension")
-  }
-  /* Requesting objects with specific data object */
+      mitk::NodePredicateDimension::Pointer predicate(mitk::NodePredicateDimension::New( 4 ));
+      mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetSubset(predicate);
+      MITK_TEST_CONDITION((all->Size() == 1) && (all->GetElement(0) == n1), "Requesting objects of specific dimension")
+    }
+    /* Requesting objects with specific data object */
     {
-  mitk::NodePredicateData::Pointer predicate(mitk::NodePredicateData::New(image));
-    mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetSubset(predicate);
-    MITK_TEST_CONDITION((all->Size() == 1) && (all->GetElement(0) == n1), "Requesting objects with specific data object")
-  }
-  /* Requesting objects with NULL data */
+      mitk::NodePredicateData::Pointer predicate(mitk::NodePredicateData::New(image));
+      mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetSubset(predicate);
+      MITK_TEST_CONDITION((all->Size() == 1) && (all->GetElement(0) == n1), "Requesting objects with specific data object")
+    }
+    /* Requesting objects with NULL data */
     {
-    mitk::NodePredicateData::Pointer predicate(mitk::NodePredicateData::New(NULL));
-    mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetSubset(predicate);
-    MITK_TEST_CONDITION(
-         (all->Size() == 3)
-      && (std::find(all->begin(), all->end(), n3) != all->end())
-      && (std::find(all->begin(), all->end(), n4) != all->end())
-      && (std::find(all->begin(), all->end(), n5) != all->end())
-      , "Requesting objects with NULL data");
-  }
-  /* Requesting objects that meet a conjunction criteria */
+      mitk::NodePredicateData::Pointer predicate(mitk::NodePredicateData::New(NULL));
+      mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetSubset(predicate);
+      MITK_TEST_CONDITION(
+        (all->Size() == 3)
+        && (std::find(all->begin(), all->end(), n3) != all->end())
+        && (std::find(all->begin(), all->end(), n4) != all->end())
+        && (std::find(all->begin(), all->end(), n5) != all->end())
+        , "Requesting objects with NULL data");
+    }
+    /* Requesting objects that meet a conjunction criteria */
     {
       mitk::NodePredicateDataType::Pointer p1 = mitk::NodePredicateDataType::New("Surface");
-    mitk::NodePredicateProperty::Pointer p2 = mitk::NodePredicateProperty::New("color", mitk::ColorProperty::New(color));
-    mitk::NodePredicateAND::Pointer predicate = mitk::NodePredicateAND::New();
-    predicate->AddPredicate(p1);
-    predicate->AddPredicate(p2);  // objects must be of datatype "Surface" and have red color (= n2)
-    const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetSubset(predicate);
-    MITK_TEST_CONDITION((all->Size() == 1) && (all->GetElement(0) == n2), "Requesting objects that meet a conjunction criteria");
+      mitk::NodePredicateProperty::Pointer p2 = mitk::NodePredicateProperty::New("color", mitk::ColorProperty::New(color));
+      mitk::NodePredicateAND::Pointer predicate = mitk::NodePredicateAND::New();
+      predicate->AddPredicate(p1);
+      predicate->AddPredicate(p2);  // objects must be of datatype "Surface" and have red color (= n2)
+      const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetSubset(predicate);
+      MITK_TEST_CONDITION((all->Size() == 1) && (all->GetElement(0) == n2), "Requesting objects that meet a conjunction criteria");
     }
-  /* Requesting objects that meet a disjunction criteria */
-  {
-    mitk::NodePredicateDataType::Pointer p1(mitk::NodePredicateDataType::New("Image"));
-    mitk::NodePredicateProperty::Pointer p2(mitk::NodePredicateProperty::New("color", mitk::ColorProperty::New(color)));
-    mitk::NodePredicateOR::Pointer predicate = mitk::NodePredicateOR::New();
-    predicate->AddPredicate(p1);
-    predicate->AddPredicate(p2);  // objects must be of datatype "Surface" or have red color (= n1, n2, n4)
-    const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetSubset(predicate);
-    MITK_TEST_CONDITION(
+    /* Requesting objects that meet a disjunction criteria */
+    {
+      mitk::NodePredicateDataType::Pointer p1(mitk::NodePredicateDataType::New("Image"));
+      mitk::NodePredicateProperty::Pointer p2(mitk::NodePredicateProperty::New("color", mitk::ColorProperty::New(color)));
+      mitk::NodePredicateOR::Pointer predicate = mitk::NodePredicateOR::New();
+      predicate->AddPredicate(p1);
+      predicate->AddPredicate(p2);  // objects must be of datatype "Surface" or have red color (= n1, n2, n4)
+      const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetSubset(predicate);
+      MITK_TEST_CONDITION(
         (all->Size() == 3)
         && (std::find(all->begin(), all->end(), n1) != all->end())
         && (std::find(all->begin(), all->end(), n2) != all->end())
         && (std::find(all->begin(), all->end(), n4) != all->end()),
         "Requesting objects that meet a disjunction criteria");
-  }
-  /* Requesting objects that do not meet a criteria */
-  {
-    mitk::ColorProperty::Pointer cp = mitk::ColorProperty::New(color);
-    mitk::NodePredicateProperty::Pointer proppred(mitk::NodePredicateProperty::New("color", cp));
-    mitk::NodePredicateNOT::Pointer predicate(mitk::NodePredicateNOT::New(proppred));
+    }
+    /* Requesting objects that do not meet a criteria */
+    {
+      mitk::ColorProperty::Pointer cp = mitk::ColorProperty::New(color);
+      mitk::NodePredicateProperty::Pointer proppred(mitk::NodePredicateProperty::New("color", cp));
+      mitk::NodePredicateNOT::Pointer predicate(mitk::NodePredicateNOT::New(proppred));
 
-    const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetSubset(predicate);
-    std::vector<mitk::DataNode::Pointer> stlAll = all->CastToSTLConstContainer();
-    MITK_TEST_CONDITION(
-           (all->Size() == 3) // check if correct objects are in resultset
+      const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetSubset(predicate);
+      std::vector<mitk::DataNode::Pointer> stlAll = all->CastToSTLConstContainer();
+      MITK_TEST_CONDITION(
+        (all->Size() == 3) // check if correct objects are in resultset
         && (std::find(stlAll.begin(), stlAll.end(), n1) != stlAll.end())
         && (std::find(stlAll.begin(), stlAll.end(), n3) != stlAll.end())
         && (std::find(stlAll.begin(), stlAll.end(), n5) != stlAll.end()), "Requesting objects that do not meet a criteria");
-  }
+    }
 
-  /* Requesting *direct* source objects */
-  {
-    const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetSources(n3, NULL, true); // Get direct parents of n3 (=n2)
-    std::vector<mitk::DataNode::Pointer> stlAll = all->CastToSTLConstContainer();
-    MITK_TEST_CONDITION(
-      (all->Size() == 1) && (std::find(stlAll.begin(), stlAll.end(), n2) != stlAll.end()),
-      "Requesting *direct* source objects");
-  }
+    /* Requesting *direct* source objects */
+    {
+      const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetSources(n3, NULL, true); // Get direct parents of n3 (=n2)
+      std::vector<mitk::DataNode::Pointer> stlAll = all->CastToSTLConstContainer();
+      MITK_TEST_CONDITION(
+        (all->Size() == 1) && (std::find(stlAll.begin(), stlAll.end(), n2) != stlAll.end()),
+        "Requesting *direct* source objects");
+    }
 
-  /* Requesting *all* source objects */
-  {
-    const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetSources(n3, NULL, false); // Get all parents of n3 (= n1 + n2)
-    std::vector<mitk::DataNode::Pointer> stlAll = all->CastToSTLConstContainer();
-    MITK_TEST_CONDITION(
-      (all->Size() == 2)
-      && (std::find(stlAll.begin(), stlAll.end(), n1) != stlAll.end())
-      && (std::find(stlAll.begin(), stlAll.end(), n2) != stlAll.end()),
-      "Requesting *all* source objects"); // check if n1 and n2 are the resultset
-  }
+    /* Requesting *all* source objects */
+    {
+      const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetSources(n3, NULL, false); // Get all parents of n3 (= n1 + n2)
+      std::vector<mitk::DataNode::Pointer> stlAll = all->CastToSTLConstContainer();
+      MITK_TEST_CONDITION(
+        (all->Size() == 2)
+        && (std::find(stlAll.begin(), stlAll.end(), n1) != stlAll.end())
+        && (std::find(stlAll.begin(), stlAll.end(), n2) != stlAll.end()),
+        "Requesting *all* source objects"); // check if n1 and n2 are the resultset
+    }
 
-  /* Requesting *all* sources of object with multiple parents */
-  {
-    const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetSources(n4, NULL, false); // Get all parents of n4 (= n1 + n2 + n3)
-    std::vector<mitk::DataNode::Pointer> stlAll = all->CastToSTLConstContainer();
-    MITK_TEST_CONDITION(
-      (all->Size() == 3)
-      && (std::find(stlAll.begin(), stlAll.end(), n1) != stlAll.end())
-      && (std::find(stlAll.begin(), stlAll.end(), n2) != stlAll.end())
-      && (std::find(stlAll.begin(), stlAll.end(), n3) != stlAll.end()) // check if n1 and n2 and n3 are the resultset
-      , "Requesting *all* sources of object with multiple parents");
-  }
+    /* Requesting *all* sources of object with multiple parents */
+    {
+      const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetSources(n4, NULL, false); // Get all parents of n4 (= n1 + n2 + n3)
+      std::vector<mitk::DataNode::Pointer> stlAll = all->CastToSTLConstContainer();
+      MITK_TEST_CONDITION(
+        (all->Size() == 3)
+        && (std::find(stlAll.begin(), stlAll.end(), n1) != stlAll.end())
+        && (std::find(stlAll.begin(), stlAll.end(), n2) != stlAll.end())
+        && (std::find(stlAll.begin(), stlAll.end(), n3) != stlAll.end()) // check if n1 and n2 and n3 are the resultset
+        , "Requesting *all* sources of object with multiple parents");
+    }
 
-  /* Requesting *direct* derived objects */
-  {
-    const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetDerivations(n1, NULL, true); // Get direct childs of n1 (=n2)
-    std::vector<mitk::DataNode::Pointer> stlAll = all->CastToSTLConstContainer();
-    MITK_TEST_CONDITION(
-      (all->Size() == 1)
-      && (std::find(stlAll.begin(), stlAll.end(), n2) != stlAll.end())// check if n1 is the resultset
-      , "Requesting *direct* derived objects");
+    /* Requesting *direct* derived objects */
+    {
+      const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetDerivations(n1, NULL, true); // Get direct childs of n1 (=n2)
+      std::vector<mitk::DataNode::Pointer> stlAll = all->CastToSTLConstContainer();
+      MITK_TEST_CONDITION(
+        (all->Size() == 1)
+        && (std::find(stlAll.begin(), stlAll.end(), n2) != stlAll.end())// check if n1 is the resultset
+        , "Requesting *direct* derived objects");
 
-  }
+    }
 
-  ///* Requesting *direct* derived objects with multiple parents/derivations */
+    ///* Requesting *direct* derived objects with multiple parents/derivations */
 
-  {
-    const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetDerivations(n2, NULL, true); // Get direct childs of n2 (=n3 + n4)
-    std::vector<mitk::DataNode::Pointer> stlAll = all->CastToSTLConstContainer();
-    MITK_TEST_CONDITION(
-      (all->Size() == 2)
-      && (std::find(stlAll.begin(), stlAll.end(), n3) != stlAll.end()) // check if n3 is the resultset
-      && (std::find(stlAll.begin(), stlAll.end(), n4) != stlAll.end()) // check if n4 is the resultset
-      , "Requesting *direct* derived objects with multiple parents/derivations");
-  }
+    {
+      const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetDerivations(n2, NULL, true); // Get direct childs of n2 (=n3 + n4)
+      std::vector<mitk::DataNode::Pointer> stlAll = all->CastToSTLConstContainer();
+      MITK_TEST_CONDITION(
+        (all->Size() == 2)
+        && (std::find(stlAll.begin(), stlAll.end(), n3) != stlAll.end()) // check if n3 is the resultset
+        && (std::find(stlAll.begin(), stlAll.end(), n4) != stlAll.end()) // check if n4 is the resultset
+        , "Requesting *direct* derived objects with multiple parents/derivations");
+    }
 
-  //* Requesting *all* derived objects */
-  {
-    const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetDerivations(n1, NULL, false); // Get all childs of n1 (=n2, n3, n4)
-    std::vector<mitk::DataNode::Pointer> stlAll = all->CastToSTLConstContainer();
-    MITK_TEST_CONDITION(
-      (all->Size() == 3)
-      && (std::find(stlAll.begin(), stlAll.end(), n2) != stlAll.end())
-      && (std::find(stlAll.begin(), stlAll.end(), n3) != stlAll.end())
-      && (std::find(stlAll.begin(), stlAll.end(), n4) != stlAll.end())
-      , "Requesting *all* derived objects");
-  }
+    //* Requesting *all* derived objects */
+    {
+      const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetDerivations(n1, NULL, false); // Get all childs of n1 (=n2, n3, n4)
+      std::vector<mitk::DataNode::Pointer> stlAll = all->CastToSTLConstContainer();
+      MITK_TEST_CONDITION(
+        (all->Size() == 3)
+        && (std::find(stlAll.begin(), stlAll.end(), n2) != stlAll.end())
+        && (std::find(stlAll.begin(), stlAll.end(), n3) != stlAll.end())
+        && (std::find(stlAll.begin(), stlAll.end(), n4) != stlAll.end())
+        , "Requesting *all* derived objects");
+    }
 
-  /* Checking for circular source relationships */
-  {
-    parents1->InsertElement(0, n4);   // make n1 derived from n4 (which is derived from n2, which is derived from n1)
-    const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetSources(n4, NULL, false); // Get all parents of n4 (= n1 + n2 + n3, not n4 itself and not multiple versions of the nodes!)
-    std::vector<mitk::DataNode::Pointer> stlAll = all->CastToSTLConstContainer();
-    MITK_TEST_CONDITION(
-      (all->Size() == 3)
-      && (std::find(stlAll.begin(), stlAll.end(), n1) != stlAll.end())
-      && (std::find(stlAll.begin(), stlAll.end(), n2) != stlAll.end())
-      && (std::find(stlAll.begin(), stlAll.end(), n3) != stlAll.end()) // check if n1 and n2 and n3 are the resultset
-      , "Checking for circular source relationships");
-  }
+    /* Checking for circular source relationships */
+    {
+      parents1->InsertElement(0, n4);   // make n1 derived from n4 (which is derived from n2, which is derived from n1)
+      const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetSources(n4, NULL, false); // Get all parents of n4 (= n1 + n2 + n3, not n4 itself and not multiple versions of the nodes!)
+      std::vector<mitk::DataNode::Pointer> stlAll = all->CastToSTLConstContainer();
+      MITK_TEST_CONDITION(
+        (all->Size() == 3)
+        && (std::find(stlAll.begin(), stlAll.end(), n1) != stlAll.end())
+        && (std::find(stlAll.begin(), stlAll.end(), n2) != stlAll.end())
+        && (std::find(stlAll.begin(), stlAll.end(), n3) != stlAll.end()) // check if n1 and n2 and n3 are the resultset
+        , "Checking for circular source relationships");
+    }
 
-  ///* Checking for circular derivation relationships can not be performed, because the internal derivations datastructure
-  //   can not be accessed from the outside. (Therefore it should not be possible to create these circular relations */
+    ///* Checking for circular derivation relationships can not be performed, because the internal derivations datastructure
+    //   can not be accessed from the outside. (Therefore it should not be possible to create these circular relations */
 
-  //* Checking GroupTagProperty */
-  {
-    mitk::GroupTagProperty::Pointer tp = mitk::GroupTagProperty::New();
-    mitk::NodePredicateProperty::Pointer pred(mitk::NodePredicateProperty::New("Resection Proposal 1", tp));
-    const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetSubset(pred);
-    std::vector<mitk::DataNode::Pointer> stlAll = all->CastToSTLConstContainer();
-    MITK_TEST_CONDITION(
+    //* Checking GroupTagProperty */
+    {
+      mitk::GroupTagProperty::Pointer tp = mitk::GroupTagProperty::New();
+      mitk::NodePredicateProperty::Pointer pred(mitk::NodePredicateProperty::New("Resection Proposal 1", tp));
+      const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetSubset(pred);
+      std::vector<mitk::DataNode::Pointer> stlAll = all->CastToSTLConstContainer();
+      MITK_TEST_CONDITION(
         (all->Size() == 2) // check if n2 and n3 are in resultset
         && (std::find(stlAll.begin(), stlAll.end(), n2) != stlAll.end())
         && (std::find(stlAll.begin(), stlAll.end(), n3) != stlAll.end())
         , "Checking GroupTagProperty");
-  }
+    }
 
-  /* Checking GroupTagProperty 2 */
-  {
-    mitk::GroupTagProperty::Pointer tp = mitk::GroupTagProperty::New();
-    mitk::NodePredicateProperty::Pointer pred(mitk::NodePredicateProperty::New("Resection Proposal 2", tp));
-    const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetSubset(pred);
-    std::vector<mitk::DataNode::Pointer> stlAll = all->CastToSTLConstContainer();
-    MITK_TEST_CONDITION(
-      (all->Size() == 2) // check if n3 and n4 are in resultset
-      && (std::find(stlAll.begin(), stlAll.end(), n3) != stlAll.end())
-      && (std::find(stlAll.begin(), stlAll.end(), n4) != stlAll.end())
-      , "Checking GroupTagProperty 2");
+    /* Checking GroupTagProperty 2 */
+    {
+      mitk::GroupTagProperty::Pointer tp = mitk::GroupTagProperty::New();
+      mitk::NodePredicateProperty::Pointer pred(mitk::NodePredicateProperty::New("Resection Proposal 2", tp));
+      const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetSubset(pred);
+      std::vector<mitk::DataNode::Pointer> stlAll = all->CastToSTLConstContainer();
+      MITK_TEST_CONDITION(
+        (all->Size() == 2) // check if n3 and n4 are in resultset
+        && (std::find(stlAll.begin(), stlAll.end(), n3) != stlAll.end())
+        && (std::find(stlAll.begin(), stlAll.end(), n4) != stlAll.end())
+        , "Checking GroupTagProperty 2");
 
-  }
+    }
 
-  /* Checking direct sources with condition */
-  {
-    mitk::NodePredicateDataType::Pointer pred = mitk::NodePredicateDataType::New("Surface");
-    const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetSources(n4, pred, true);
-    std::vector<mitk::DataNode::Pointer> stlAll = all->CastToSTLConstContainer();
-    MITK_TEST_CONDITION(
-      (all->Size() == 1) // check if n2 is in resultset
-      && (std::find(stlAll.begin(), stlAll.end(), n2) != stlAll.end())
-      , "checking direct sources with condition");
-  }
+    /* Checking direct sources with condition */
+    {
+      mitk::NodePredicateDataType::Pointer pred = mitk::NodePredicateDataType::New("Surface");
+      const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetSources(n4, pred, true);
+      std::vector<mitk::DataNode::Pointer> stlAll = all->CastToSTLConstContainer();
+      MITK_TEST_CONDITION(
+        (all->Size() == 1) // check if n2 is in resultset
+        && (std::find(stlAll.begin(), stlAll.end(), n2) != stlAll.end())
+        , "checking direct sources with condition");
+    }
 
-  /* Checking all sources with condition */
-  {
-    mitk::NodePredicateDataType::Pointer pred = mitk::NodePredicateDataType::New("Image");
-    const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetSources(n4, pred, false);
-    std::vector<mitk::DataNode::Pointer> stlAll = all->CastToSTLConstContainer();
-    MITK_TEST_CONDITION(
-      (all->Size() == 1) // check if n1 is in resultset
-      && (std::find(stlAll.begin(), stlAll.end(), n1) != stlAll.end())
-      , "Checking all sources with condition");
-  }
+    /* Checking all sources with condition */
+    {
+      mitk::NodePredicateDataType::Pointer pred = mitk::NodePredicateDataType::New("Image");
+      const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetSources(n4, pred, false);
+      std::vector<mitk::DataNode::Pointer> stlAll = all->CastToSTLConstContainer();
+      MITK_TEST_CONDITION(
+        (all->Size() == 1) // check if n1 is in resultset
+        && (std::find(stlAll.begin(), stlAll.end(), n1) != stlAll.end())
+        , "Checking all sources with condition");
+    }
 
-  /* Checking all sources with condition with empty resultset */
-  {
-    mitk::NodePredicateDataType::Pointer pred = mitk::NodePredicateDataType::New("VesselTree");
-    const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetSources(n4, pred, false);
-    MITK_TEST_CONDITION(all->Size() == 0 , "Checking all sources with condition with empty resultset"); // check if resultset is empty
-  }
+    /* Checking all sources with condition with empty resultset */
+    {
+      mitk::NodePredicateDataType::Pointer pred = mitk::NodePredicateDataType::New("VesselTree");
+      const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetSources(n4, pred, false);
+      MITK_TEST_CONDITION(all->Size() == 0 , "Checking all sources with condition with empty resultset"); // check if resultset is empty
+    }
 
-  /* Checking direct derivations with condition */
-  {
-    mitk::NodePredicateProperty::Pointer pred = mitk::NodePredicateProperty::New("color");
-    const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetDerivations(n1, pred, true);
-    std::vector<mitk::DataNode::Pointer> stlAll = all->CastToSTLConstContainer();
-    MITK_TEST_CONDITION(
-      (all->Size() == 1) // check if n2 is in resultset
-      && (std::find(stlAll.begin(), stlAll.end(), n2) != stlAll.end())
-      , "Checking direct derivations with condition");
-  }
+    /* Checking direct derivations with condition */
+    {
+      mitk::NodePredicateProperty::Pointer pred = mitk::NodePredicateProperty::New("color");
+      const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetDerivations(n1, pred, true);
+      std::vector<mitk::DataNode::Pointer> stlAll = all->CastToSTLConstContainer();
+      MITK_TEST_CONDITION(
+        (all->Size() == 1) // check if n2 is in resultset
+        && (std::find(stlAll.begin(), stlAll.end(), n2) != stlAll.end())
+        , "Checking direct derivations with condition");
+    }
 
-  /* Checking all derivations with condition */
-  {
-    mitk::NodePredicateProperty::Pointer pred = mitk::NodePredicateProperty::New("color");
+    /* Checking all derivations with condition */
+    {
+      mitk::NodePredicateProperty::Pointer pred = mitk::NodePredicateProperty::New("color");
 
-    const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetDerivations(n1, pred, false);
-    std::vector<mitk::DataNode::Pointer> stlAll = all->CastToSTLConstContainer();
-    MITK_TEST_CONDITION(
-      (all->Size() == 2) // check if n2 and n4 are in resultset
+      const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetDerivations(n1, pred, false);
+      std::vector<mitk::DataNode::Pointer> stlAll = all->CastToSTLConstContainer();
+      MITK_TEST_CONDITION(
+        (all->Size() == 2) // check if n2 and n4 are in resultset
         && (std::find(stlAll.begin(), stlAll.end(), n2) != stlAll.end())
         && (std::find(stlAll.begin(), stlAll.end(), n4) != stlAll.end())
         , "Checking direct derivations with condition");
-  }
+    }
 
-  /* Checking named node method */
-  MITK_TEST_CONDITION(ds->GetNamedNode("Node 2 - Surface Node") == n2, "Checking named node method");
-  MITK_TEST_CONDITION(ds->GetNamedNode(std::string("Node 2 - Surface Node")) == n2, "Checking named node(std::string) method");
+    /* Checking named node method */
+    MITK_TEST_CONDITION(ds->GetNamedNode("Node 2 - Surface Node") == n2, "Checking named node method");
+    MITK_TEST_CONDITION(ds->GetNamedNode(std::string("Node 2 - Surface Node")) == n2, "Checking named node(std::string) method");
 
-  /* Checking named node method with wrong name */
-  MITK_TEST_CONDITION(ds->GetNamedNode("This name does not exist") == NULL, "Checking named node method with wrong name");
+    /* Checking named node method with wrong name */
+    MITK_TEST_CONDITION(ds->GetNamedNode("This name does not exist") == NULL, "Checking named node method with wrong name");
 
-  /* Checking named object method */
-  MITK_TEST_CONDITION(ds->GetNamedObject<mitk::Image>("Node 1 - Image Node") == image, "Checking named object method");
-  MITK_TEST_CONDITION(ds->GetNamedObject<mitk::Image>(std::string("Node 1 - Image Node")) == image, "Checking named object(std::string) method");
+    /* Checking named object method */
+    MITK_TEST_CONDITION(ds->GetNamedObject<mitk::Image>("Node 1 - Image Node") == image, "Checking named object method");
+    MITK_TEST_CONDITION(ds->GetNamedObject<mitk::Image>(std::string("Node 1 - Image Node")) == image, "Checking named object(std::string) method");
 
-  /* Checking named object method with wrong DataType */
-  MITK_TEST_CONDITION(ds->GetNamedObject<mitk::Surface>("Node 1 - Image Node") == NULL, "Checking named object method with wrong DataType");
+    /* Checking named object method with wrong DataType */
+    MITK_TEST_CONDITION(ds->GetNamedObject<mitk::Surface>("Node 1 - Image Node") == NULL, "Checking named object method with wrong DataType");
 
-  /* Checking named object method with wrong name */
-  MITK_TEST_CONDITION(ds->GetNamedObject<mitk::Image>("This name does not exist") == NULL, "Checking named object method with wrong name");
+    /* Checking named object method with wrong name */
+    MITK_TEST_CONDITION(ds->GetNamedObject<mitk::Image>("This name does not exist") == NULL, "Checking named object method with wrong name");
 
-  /* Checking GetNamedDerivedNode with valid name and direct derivation only */
-  MITK_TEST_CONDITION(ds->GetNamedDerivedNode("Node 2 - Surface Node", n1, true) == n2, "Checking GetNamedDerivedNode with valid name & direct derivation only");
+    /* Checking GetNamedDerivedNode with valid name and direct derivation only */
+    MITK_TEST_CONDITION(ds->GetNamedDerivedNode("Node 2 - Surface Node", n1, true) == n2, "Checking GetNamedDerivedNode with valid name & direct derivation only");
 
-  /* Checking GetNamedDerivedNode with invalid Name and direct derivation only */
-  MITK_TEST_CONDITION(ds->GetNamedDerivedNode("wrong name", n1, true) == NULL, "Checking GetNamedDerivedNode with invalid name & direct derivation only");
+    /* Checking GetNamedDerivedNode with invalid Name and direct derivation only */
+    MITK_TEST_CONDITION(ds->GetNamedDerivedNode("wrong name", n1, true) == NULL, "Checking GetNamedDerivedNode with invalid name & direct derivation only");
 
-  /* Checking GetNamedDerivedNode with invalid Name and direct derivation only */
-  MITK_TEST_CONDITION(ds->GetNamedDerivedNode("Node 3 - Empty Node", n1, false) == n3, "Checking GetNamedDerivedNode with invalid name & direct derivation only");
+    /* Checking GetNamedDerivedNode with invalid Name and direct derivation only */
+    MITK_TEST_CONDITION(ds->GetNamedDerivedNode("Node 3 - Empty Node", n1, false) == n3, "Checking GetNamedDerivedNode with invalid name & direct derivation only");
 
 
-  /* Checking GetNamedDerivedNode with valid Name but direct derivation only */
-  MITK_TEST_CONDITION(ds->GetNamedDerivedNode("Node 3 - Empty Node", n1, true) == NULL, "Checking GetNamedDerivedNode with valid Name but direct derivation only");
+    /* Checking GetNamedDerivedNode with valid Name but direct derivation only */
+    MITK_TEST_CONDITION(ds->GetNamedDerivedNode("Node 3 - Empty Node", n1, true) == NULL, "Checking GetNamedDerivedNode with valid Name but direct derivation only");
 
-  /* Checking GetNode with valid predicate */
-  {
-    mitk::NodePredicateDataType::Pointer p(mitk::NodePredicateDataType::New("Image"));
-    MITK_TEST_CONDITION(ds->GetNode(p) == n1, "Checking GetNode with valid predicate");
-  }
-  /* Checking GetNode with invalid predicate */
-  {
-    mitk::NodePredicateDataType::Pointer p(mitk::NodePredicateDataType::New("PointSet"));
-    MITK_TEST_CONDITION(ds->GetNode(p) == NULL, "Checking GetNode with invalid predicate");
-  }
+    /* Checking GetNode with valid predicate */
+    {
+      mitk::NodePredicateDataType::Pointer p(mitk::NodePredicateDataType::New("Image"));
+      MITK_TEST_CONDITION(ds->GetNode(p) == n1, "Checking GetNode with valid predicate");
+    }
+    /* Checking GetNode with invalid predicate */
+    {
+      mitk::NodePredicateDataType::Pointer p(mitk::NodePredicateDataType::New("PointSet"));
+      MITK_TEST_CONDITION(ds->GetNode(p) == NULL, "Checking GetNode with invalid predicate");
+    }
 
   } // object retrieval methods
   catch(...)
@@ -470,138 +470,138 @@ void TestDataStorage( mitk::DataStorage* ds )
   try  /* object removal methods */
   {
 
-  /* Checking removal of a node without relations */
-  {
-    mitk::DataNode::Pointer extra = mitk::DataNode::New();
-    extra->SetProperty("name", mitk::StringProperty::New("extra"));
-    mitk::ReferenceCountWatcher::Pointer watcher = new mitk::ReferenceCountWatcher(extra);
-    int refCountbeforeDS = watcher->GetReferenceCount();
-    ds->Add(extra);
-    MITK_TEST_CONDITION(ds->GetNamedNode("extra") == extra, "Adding extra node");
-    ds->Remove(extra);
-    MITK_TEST_CONDITION(
-      (ds->GetNamedNode("extra") == NULL)
-      && (refCountbeforeDS == watcher->GetReferenceCount())
-      , "Checking removal of a node without relations");
-    extra = NULL;
-  }
+    /* Checking removal of a node without relations */
+    {
+      mitk::DataNode::Pointer extra = mitk::DataNode::New();
+      extra->SetProperty("name", mitk::StringProperty::New("extra"));
+      mitk::ReferenceCountWatcher::Pointer watcher = new mitk::ReferenceCountWatcher(extra);
+      int refCountbeforeDS = watcher->GetReferenceCount();
+      ds->Add(extra);
+      MITK_TEST_CONDITION(ds->GetNamedNode("extra") == extra, "Adding extra node");
+      ds->Remove(extra);
+      MITK_TEST_CONDITION(
+        (ds->GetNamedNode("extra") == NULL)
+        && (refCountbeforeDS == watcher->GetReferenceCount())
+        , "Checking removal of a node without relations");
+      extra = NULL;
+    }
 
-  /* Checking removal of a node with a parent */
-  {
-    mitk::DataNode::Pointer extra = mitk::DataNode::New();
-    extra->SetProperty("name", mitk::StringProperty::New("extra"));
+    /* Checking removal of a node with a parent */
+    {
+      mitk::DataNode::Pointer extra = mitk::DataNode::New();
+      extra->SetProperty("name", mitk::StringProperty::New("extra"));
 
-    mitk::ReferenceCountWatcher::Pointer watcher = new mitk::ReferenceCountWatcher(extra);
-    int refCountbeforeDS = watcher->GetReferenceCount();
-    ds->Add(extra, n1);   // n1 is parent of extra
+      mitk::ReferenceCountWatcher::Pointer watcher = new mitk::ReferenceCountWatcher(extra);
+      int refCountbeforeDS = watcher->GetReferenceCount();
+      ds->Add(extra, n1);   // n1 is parent of extra
 
-    MITK_TEST_CONDITION(
-      (ds->GetNamedNode("extra") == extra)
-      && (ds->GetDerivations(n1)->Size() == 2)   // n2 and extra should be derived from n1
-      , "Adding extra node");
-    ds->Remove(extra);
-    MITK_TEST_CONDITION(
-      (ds->GetNamedNode("extra") == NULL)
-      && (refCountbeforeDS == watcher->GetReferenceCount())
-      && (ds->GetDerivations(n1)->Size() == 1)
-      , "Checking removal of a node with a parent");
-    extra = NULL;
-  }
+      MITK_TEST_CONDITION(
+        (ds->GetNamedNode("extra") == extra)
+        && (ds->GetDerivations(n1)->Size() == 2)   // n2 and extra should be derived from n1
+        , "Adding extra node");
+      ds->Remove(extra);
+      MITK_TEST_CONDITION(
+        (ds->GetNamedNode("extra") == NULL)
+        && (refCountbeforeDS == watcher->GetReferenceCount())
+        && (ds->GetDerivations(n1)->Size() == 1)
+        , "Checking removal of a node with a parent");
+      extra = NULL;
+    }
 
-  /* Checking removal of a node with two parents */
-  {
-    mitk::DataNode::Pointer extra = mitk::DataNode::New();
-    extra->SetProperty("name", mitk::StringProperty::New("extra"));
+    /* Checking removal of a node with two parents */
+    {
+      mitk::DataNode::Pointer extra = mitk::DataNode::New();
+      extra->SetProperty("name", mitk::StringProperty::New("extra"));
 
-    mitk::ReferenceCountWatcher::Pointer watcher = new mitk::ReferenceCountWatcher(extra);
-    int refCountbeforeDS = watcher->GetReferenceCount();
-    mitk::DataStorage::SetOfObjects::Pointer p = mitk::DataStorage::SetOfObjects::New();
-    p->push_back(n1);
-    p->push_back(n2);
-    ds->Add(extra, p);   // n1 and n2 are parents of extra
+      mitk::ReferenceCountWatcher::Pointer watcher = new mitk::ReferenceCountWatcher(extra);
+      int refCountbeforeDS = watcher->GetReferenceCount();
+      mitk::DataStorage::SetOfObjects::Pointer p = mitk::DataStorage::SetOfObjects::New();
+      p->push_back(n1);
+      p->push_back(n2);
+      ds->Add(extra, p);   // n1 and n2 are parents of extra
 
 
-    MITK_TEST_CONDITION(
-      (ds->GetNamedNode("extra") == extra)
-      && (ds->GetDerivations(n1)->Size() == 2)    // n2 and extra should be derived from n1
-      && (ds->GetDerivations(n2)->Size() == 3)
-      , "add extra node");
+      MITK_TEST_CONDITION(
+        (ds->GetNamedNode("extra") == extra)
+        && (ds->GetDerivations(n1)->Size() == 2)    // n2 and extra should be derived from n1
+        && (ds->GetDerivations(n2)->Size() == 3)
+        , "add extra node");
 
-    ds->Remove(extra);
-    MITK_TEST_CONDITION(
-      (ds->GetNamedNode("extra") == NULL)
-      && (refCountbeforeDS == watcher->GetReferenceCount())
-      && (ds->GetDerivations(n1)->Size() == 1)   // after remove, only n2 should be derived from n1
-      && (ds->GetDerivations(n2)->Size() == 2)   // after remove, only n3 and n4 should be derived from n2
-      , "Checking removal of a node with two parents");
-    extra = NULL;
-  }
+      ds->Remove(extra);
+      MITK_TEST_CONDITION(
+        (ds->GetNamedNode("extra") == NULL)
+        && (refCountbeforeDS == watcher->GetReferenceCount())
+        && (ds->GetDerivations(n1)->Size() == 1)   // after remove, only n2 should be derived from n1
+        && (ds->GetDerivations(n2)->Size() == 2)   // after remove, only n3 and n4 should be derived from n2
+        , "Checking removal of a node with two parents");
+      extra = NULL;
+    }
 
-  /* Checking removal of a node with two derived nodes */
-  {
-    mitk::DataNode::Pointer extra = mitk::DataNode::New();
-    extra->SetProperty("name", mitk::StringProperty::New("extra"));
-    mitk::ReferenceCountWatcher::Pointer watcher = new mitk::ReferenceCountWatcher(extra);
-    int refCountbeforeDS = watcher->GetReferenceCount();
-    ds->Add(extra);
-    mitk::DataNode::Pointer d1 = mitk::DataNode::New();
-    d1->SetProperty("name", mitk::StringProperty::New("d1"));
-    ds->Add(d1, extra);
-    mitk::DataNode::Pointer d2 = mitk::DataNode::New();
-    d2->SetProperty("name", mitk::StringProperty::New("d2"));
-    ds->Add(d2, extra);
+    /* Checking removal of a node with two derived nodes */
+    {
+      mitk::DataNode::Pointer extra = mitk::DataNode::New();
+      extra->SetProperty("name", mitk::StringProperty::New("extra"));
+      mitk::ReferenceCountWatcher::Pointer watcher = new mitk::ReferenceCountWatcher(extra);
+      int refCountbeforeDS = watcher->GetReferenceCount();
+      ds->Add(extra);
+      mitk::DataNode::Pointer d1 = mitk::DataNode::New();
+      d1->SetProperty("name", mitk::StringProperty::New("d1"));
+      ds->Add(d1, extra);
+      mitk::DataNode::Pointer d2 = mitk::DataNode::New();
+      d2->SetProperty("name", mitk::StringProperty::New("d2"));
+      ds->Add(d2, extra);
 
-    MITK_TEST_CONDITION(
-      (ds->GetNamedNode("extra") == extra)
-      && (ds->GetNamedNode("d1") == d1)
-      && (ds->GetNamedNode("d2") == d2)
-      && (ds->GetSources(d1)->Size() == 1)    // extra should be source of d1
-      && (ds->GetSources(d2)->Size() == 1)    // extra should be source of d2
-      && (ds->GetDerivations(extra)->Size() == 2)    // d1 and d2 should be derived from extra
-      , "add extra node");
+      MITK_TEST_CONDITION(
+        (ds->GetNamedNode("extra") == extra)
+        && (ds->GetNamedNode("d1") == d1)
+        && (ds->GetNamedNode("d2") == d2)
+        && (ds->GetSources(d1)->Size() == 1)    // extra should be source of d1
+        && (ds->GetSources(d2)->Size() == 1)    // extra should be source of d2
+        && (ds->GetDerivations(extra)->Size() == 2)    // d1 and d2 should be derived from extra
+        , "add extra node");
 
-    ds->Remove(extra);
-    MITK_TEST_CONDITION(
-      (ds->GetNamedNode("extra") == NULL)
-      && (ds->GetNamedNode("d1") == d1)
-      && (ds->GetNamedNode("d2") == d2)
-      && (refCountbeforeDS == watcher->GetReferenceCount())
-      && (ds->GetSources(d1)->Size() == 0)   // after remove, d1 should not have a source anymore
-      && (ds->GetSources(d2)->Size() == 0)   // after remove, d2 should not have a source anymore
-      , "Checking removal of a node with two derived nodes");
-    extra = NULL;
-  }
+      ds->Remove(extra);
+      MITK_TEST_CONDITION(
+        (ds->GetNamedNode("extra") == NULL)
+        && (ds->GetNamedNode("d1") == d1)
+        && (ds->GetNamedNode("d2") == d2)
+        && (refCountbeforeDS == watcher->GetReferenceCount())
+        && (ds->GetSources(d1)->Size() == 0)   // after remove, d1 should not have a source anymore
+        && (ds->GetSources(d2)->Size() == 0)   // after remove, d2 should not have a source anymore
+        , "Checking removal of a node with two derived nodes");
+      extra = NULL;
+    }
 
-  /* Checking removal of a node with two parents and two derived nodes */
-  {
-    mitk::DataNode::Pointer extra = mitk::DataNode::New();
-    extra->SetProperty("name", mitk::StringProperty::New("extra"));
-    mitk::ReferenceCountWatcher::Pointer watcher = new mitk::ReferenceCountWatcher(extra);
-    mitk::ReferenceCountWatcher::Pointer n1watcher = new mitk::ReferenceCountWatcher(n1);
-    int refCountbeforeDS = watcher->GetReferenceCount();
+    /* Checking removal of a node with two parents and two derived nodes */
+    {
+      mitk::DataNode::Pointer extra = mitk::DataNode::New();
+      extra->SetProperty("name", mitk::StringProperty::New("extra"));
+      mitk::ReferenceCountWatcher::Pointer watcher = new mitk::ReferenceCountWatcher(extra);
+      mitk::ReferenceCountWatcher::Pointer n1watcher = new mitk::ReferenceCountWatcher(n1);
+      int refCountbeforeDS = watcher->GetReferenceCount();
 
-    mitk::DataStorage::SetOfObjects::Pointer p = mitk::DataStorage::SetOfObjects::New();
-    p->push_back(n1);
-    p->push_back(n2);
-    ds->Add(extra, p);   // n1 and n2 are parents of extra
+      mitk::DataStorage::SetOfObjects::Pointer p = mitk::DataStorage::SetOfObjects::New();
+      p->push_back(n1);
+      p->push_back(n2);
+      ds->Add(extra, p);   // n1 and n2 are parents of extra
 
-    mitk::DataNode::Pointer d1 = mitk::DataNode::New();
-    d1->SetProperty("name", mitk::StringProperty::New("d1x"));
-    ds->Add(d1, extra);
-    mitk::DataNode::Pointer d2 = mitk::DataNode::New();
-    d2->SetProperty("name", mitk::StringProperty::New("d2x"));
-    ds->Add(d2, extra);
+      mitk::DataNode::Pointer d1 = mitk::DataNode::New();
+      d1->SetProperty("name", mitk::StringProperty::New("d1x"));
+      ds->Add(d1, extra);
+      mitk::DataNode::Pointer d2 = mitk::DataNode::New();
+      d2->SetProperty("name", mitk::StringProperty::New("d2x"));
+      ds->Add(d2, extra);
 
-    MITK_TEST_CONDITION(
-      (ds->GetNamedNode("extra") == extra)
-      && (ds->GetNamedNode("d1x") == d1)
-      && (ds->GetNamedNode("d2x") == d2)
-      && (ds->GetSources(d1)->Size() == 1)    // extra should be source of d1
-      && (ds->GetSources(d2)->Size() == 1)    // extra should be source of d2
-      && (ds->GetDerivations(n1)->Size() == 2)    // n2 and extra should be derived from n1
-      && (ds->GetDerivations(n2)->Size() == 3)   // n3, n4 and extra should be derived from n2
-      && (ds->GetDerivations(extra)->Size() == 2)    // d1 and d2 should be derived from extra
-      , "add extra node");
+      MITK_TEST_CONDITION(
+        (ds->GetNamedNode("extra") == extra)
+        && (ds->GetNamedNode("d1x") == d1)
+        && (ds->GetNamedNode("d2x") == d2)
+        && (ds->GetSources(d1)->Size() == 1)    // extra should be source of d1
+        && (ds->GetSources(d2)->Size() == 1)    // extra should be source of d2
+        && (ds->GetDerivations(n1)->Size() == 2)    // n2 and extra should be derived from n1
+        && (ds->GetDerivations(n2)->Size() == 3)   // n3, n4 and extra should be derived from n2
+        && (ds->GetDerivations(extra)->Size() == 2)    // d1 and d2 should be derived from extra
+        , "add extra node");
 
       ds->Remove(extra);
       MITK_TEST_CONDITION(
@@ -617,65 +617,66 @@ void TestDataStorage( mitk::DataStorage* ds )
       extra = NULL;
     }
 
-  /* Checking removal of a node with two derived nodes [ dataStorage->GetDerivations( rootNode )] see bug #3426 */
-  try 
-  {
-    mitk::DataNode::Pointer extra = mitk::DataNode::New();
-    extra->SetProperty("name", mitk::StringProperty::New("extra"));
-    
-    ds->Add(extra);
-    mitk::DataNode::Pointer d1y = mitk::DataNode::New();
-    d1y->SetProperty("name", mitk::StringProperty::New("d1y"));
-    mitk::ReferenceCountWatcher::Pointer watcherD1y = new mitk::ReferenceCountWatcher(d1y);
-    int refCountbeforeDS = watcherD1y->GetReferenceCount();
-    ds->Add(d1y, extra);
-    mitk::DataNode::Pointer d2y = mitk::DataNode::New();
-    d2y->SetProperty("name", mitk::StringProperty::New("d2y"));
-    ds->Add(d2y, extra);
+    /* Checking removal of a node with two derived nodes [ dataStorage->GetDerivations( rootNode )] see bug #3426 */
+    {
+      mitk::DataNode::Pointer extra = mitk::DataNode::New();
+      extra->SetProperty("name", mitk::StringProperty::New("extra"));
 
-    MITK_TEST_CONDITION(
-      (ds->GetNamedNode("extra") == extra)
-      && (ds->GetNamedNode("d1y") == d1y)
-      && (ds->GetNamedNode("d2y") == d2y)
-      && (ds->GetSources(d1y)->Size() == 1)    // extra should be source of d1y
-      && (ds->GetSources(d2y)->Size() == 1)    // extra should be source of d2y
-      && (ds->GetDerivations(extra)->Size() == 2)    // d1y and d2y should be derived from extra
-      , "add extra node");
+      ds->Add(extra);
+      mitk::DataNode::Pointer d1y = mitk::DataNode::New();
+      d1y->SetProperty("name", mitk::StringProperty::New("d1y"));
+      mitk::ReferenceCountWatcher::Pointer watcherD1y = new mitk::ReferenceCountWatcher(d1y);
+      int refCountbeforeDS = watcherD1y->GetReferenceCount();
+      ds->Add(d1y, extra);
+      mitk::DataNode::Pointer d2y = mitk::DataNode::New();
+      d2y->SetProperty("name", mitk::StringProperty::New("d2y"));
+      ds->Add(d2y, extra);
 
-    ds->Remove(ds->GetDerivations( extra));       
-    MITK_TEST_CONDITION(
-      (ds->GetNamedNode("extra") == extra)
-      && (ds->GetNamedNode("d1y") == NULL) // d1y should be NULL now
-      && (ds->GetNamedNode("d2y") == NULL) // d2y should be NULL now
-      && (refCountbeforeDS == watcherD1y->GetReferenceCount())      
-      , "Checking removal of subset of two derived nodes from one parent node");
-    
-    ds->Remove(extra);
-    MITK_TEST_CONDITION(
-      (ds->GetNamedNode("extra") == NULL)
-      , "Checking removal of a parent node");
-    extra = NULL;
+      MITK_TEST_CONDITION(
+        (ds->GetNamedNode("extra") == extra)
+        && (ds->GetNamedNode("d1y") == d1y)
+        && (ds->GetNamedNode("d2y") == d2y)
+        && (ds->GetSources(d1y)->Size() == 1)    // extra should be source of d1y
+        && (ds->GetSources(d2y)->Size() == 1)    // extra should be source of d2y
+        && (ds->GetDerivations(extra)->Size() == 2)    // d1y and d2y should be derived from extra
+        , "add extra node");
+
+      ds->Remove(ds->GetDerivations( extra));       
+      MITK_TEST_CONDITION(
+        (ds->GetNamedNode("extra") == extra)
+        && (ds->GetNamedNode("d1y") == NULL) // d1y should be NULL now
+        && (ds->GetNamedNode("d2y") == NULL) // d2y should be NULL now
+        && (refCountbeforeDS == watcherD1y->GetReferenceCount())      
+        , "Checking removal of subset of two derived nodes from one parent node");
+
+      ds->Remove(extra);
+      MITK_TEST_CONDITION(
+        (ds->GetNamedNode("extra") == NULL)
+        , "Checking removal of a parent node");
+      extra = NULL;
+    }
   }
-  catch (...)
+  catch(...)
   {
     MITK_TEST_FAILED_MSG( << "Exeption during object removal methods");
   }
 
 
- /* Checking for node is it's own parent exception */
+
+  /* Checking for node is it's own parent exception */
   {
-  MITK_TEST_FOR_EXCEPTION_BEGIN(...);
+    MITK_TEST_FOR_EXCEPTION_BEGIN(...);
     mitk::DataNode::Pointer extra = mitk::DataNode::New();
     extra->SetProperty("name", mitk::StringProperty::New("extra"));
     mitk::DataStorage::SetOfObjects::Pointer p = mitk::DataStorage::SetOfObjects::New();
     p->push_back(n1);
     p->push_back(extra); // extra is parent of extra!!!
     ds->Add(extra, p);
-  MITK_TEST_FOR_EXCEPTION_END(...);
+    MITK_TEST_FOR_EXCEPTION_END(...);
   }
 
 
- /* Checking reference count of node after add and remove */
+  /* Checking reference count of node after add and remove */
   {
     mitk::DataNode::Pointer extra = mitk::DataNode::New();
     mitk::ReferenceCountWatcher::Pointer watcher = new mitk::ReferenceCountWatcher(extra);

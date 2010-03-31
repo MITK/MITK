@@ -618,6 +618,7 @@ void TestDataStorage( mitk::DataStorage* ds )
     }
 
   /* Checking removal of a node with two derived nodes [ dataStorage->GetDerivations( rootNode )] see bug #3426 */
+  try 
   {
     mitk::DataNode::Pointer extra = mitk::DataNode::New();
     extra->SetProperty("name", mitk::StringProperty::New("extra"));
@@ -655,7 +656,7 @@ void TestDataStorage( mitk::DataStorage* ds )
       , "Checking removal of a parent node");
     extra = NULL;
   }
-  catch(...)
+  catch (...)
   {
     MITK_TEST_FAILED_MSG( << "Exeption during object removal methods");
   }

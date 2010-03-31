@@ -37,7 +37,9 @@ your new project. The generator uses the CMake GUI for configuration.
 \li Press "Configure" 
 
 \par All
+
 \image html BundleGenerator1.png
+\n
 \li CUSTOM_PROJECT_NAME (optional): The name of your new project. If empty, only the source code for your plug-in is generated.
     MBI members should not supply a value.
 \li GUI_SUPPORT: you usually want to contribute to the UI, so leave this ON
@@ -46,8 +48,10 @@ your new project. The generator uses the CMake GUI for configuration.
 \li PLUGIN_NAME: The name of your plug-in in human-readable form. For example: MITK IsoSurface Plug-in
 \li PLUGIN_TEMPLATE: Leave this as it is, unless you really know what you are doing.
 \li Press "Configure" again and you will get the following screen:
-
+\n
+\n
 \image html BundleGenerator2.png
+\n
 \li ACTIVATOR_CLASS (optional): The name of a class (without namespaces) which can be used to react to lifecycle events of your plug-in. See berry::IBundleActivator .
 \li CUSTOM_PROJECT_EXECUTABLE (optional/required): If you supplied a CUSTOM_PROJECT_NAME, this variable will hold the name of your executable which will start an BlueBerry Workbench.
 \li PLUGIN_VENDOR: The person or institution from which this plug-in comes from. Change to your needs.
@@ -60,9 +64,10 @@ your new project. The generator uses the CMake GUI for configuration.
     MBI members should use an id similar to \c org.mitk.views.isosurface
 \li VIEW_NAME: The name of your view in human-readable form. This name will be shown in the UI of your application.
 \li Press "Configure" again, which will give the following screen:
-
+\n
+\n
 \image html BundleGenerator3.png
-
+\n
 If everything looks okay, press "Generate" and CMake will create a directory named Generated/\<CUSTOM_PROJECT_NAME\> (if you set a value for it) or
 a directory named Generated/\<PLUGIN_ID\>. You can move or rename the \<CUSTOM_PROJECT_NAME\> directory (or the \<PLUGIN_ID\> directory if you did not create a project)
 somewhere else if you want to get rid of the parent directories.

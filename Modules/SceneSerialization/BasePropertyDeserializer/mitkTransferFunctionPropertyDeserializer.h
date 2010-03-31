@@ -1,6 +1,6 @@
 /*=========================================================================
  
-Program:   Medical Imaging & TransferFunctioneraction Toolkit
+Program:   Medical Imaging & Interaction Toolkit
 Language:  C++
 Date:      $Date: 2009-10-23 11:12:48 +0200 (Fr, 23 Okt 2009) $
 Version:   $Revision: 1.12 $

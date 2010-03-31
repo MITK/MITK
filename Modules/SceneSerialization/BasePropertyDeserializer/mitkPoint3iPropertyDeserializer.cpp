@@ -1,6 +1,6 @@
 /*=========================================================================
  
-Program:   Medical Imaging & Point3deraction Toolkit
+Program:   Medical Imaging & Interaction Toolkit
 Language:  C++
 Date:      $Date: 2009-10-08 16:58:56 +0200 (Do, 08. Okt 2009) $
 Version:   $Revision: 1.12 $

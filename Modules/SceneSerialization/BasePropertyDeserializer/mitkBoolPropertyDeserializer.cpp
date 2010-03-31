@@ -1,6 +1,6 @@
 /*=========================================================================
  
-Program:   Medical Imaging & Booleraction Toolkit
+Program:   Medical Imaging & Interaction Toolkit
 Language:  C++
 Date:      $Date$
 Version:   $Revision: 1.12 $

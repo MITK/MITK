@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<Description>
+
+<Header>@MITK_SOURCE_DIR@/Utilities/KWStyle/MITKHeader.h,false,true</Header>
+<Tabs>1</Tabs>
+<!-- 
+<Spaces>2</Spaces>
+<LineLength>150</LineLength>
+<DeclarationOrder>0,1,2</DeclarationOrder>
+<Indent><type>SPACE,2</type></Indent>
+<Comments>/**, *, */,true</Comments>
+<Namespace>mitk</Namespace>
+<NameOfClass>[NameOfClass],mitk</NameOfClass>
+<IfNDefDefine>[NameOfClass]_[Extension]_INCLUDED</IfNDefDefine>
+<EmptyLines>2</EmptyLines>
+<Template>[TNV]</Template>
+<Typedefs>[A-Z]</Typedefs>
+<DeclarationOrder>0,1,2</DeclarationOrder>
+<InternalVariables>m_[A-Z]</InternalVariables>
+<SemicolonSpace>0</SemicolonSpace>
+<EndOfFileNewLine>1</EndOfFileNewLine>
+-->
+
+</Description>

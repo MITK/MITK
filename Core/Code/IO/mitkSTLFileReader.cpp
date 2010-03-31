@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkSTLReader.h>
 #include <vtkPolyData.h>
 #include <vtkPolyDataNormals.h>
+#include <vtkCleanPolyData.h>
 
 
 mitk::STLFileReader::STLFileReader() : mitk::SurfaceSource(), m_FileName("")
@@ -42,11 +43,19 @@ void mitk::STLFileReader::GenerateData()
 
     vtkSmartPointer<vtkPolyDataNormals> normalsGenerator = vtkSmartPointer<vtkPolyDataNormals>::New();
     normalsGenerator->SetInput( stlReader->GetOutput() );
-    
-    normalsGenerator->Update();
-    if ( ( stlReader->GetOutput() != NULL ) && ( normalsGenerator->GetOutput() != NULL ) )
+
+    vtkSmartPointer<vtkCleanPolyData> cleanPolyDataFilter = vtkSmartPointer<vtkCleanPolyData>::New();
+    cleanPolyDataFilter->SetInput(normalsGenerator->GetOutput());
+    cleanPolyDataFilter->PieceInvariantOff();
+    cleanPolyDataFilter->ConvertLinesToPointsOff();
+    cleanPolyDataFilter->ConvertPolysToLinesOff();
+    cleanPolyDataFilter->ConvertStripsToPolysOff();
+    cleanPolyDataFilter->PointMergingOn();
+    cleanPolyDataFilter->Update();
+
+    if ( ( stlReader->GetOutput() != NULL ) && ( cleanPolyDataFilter->GetOutput() != NULL ) )
     {
-      vtkSmartPointer<vtkPolyData> surfaceWithNormals = normalsGenerator->GetOutput();
+      vtkSmartPointer<vtkPolyData> surfaceWithNormals = cleanPolyDataFilter->GetOutput();
       output->SetVtkPolyData( surfaceWithNormals );
     }
   }

@@ -26,14 +26,14 @@ your new project. The generator uses the CMake GUI for configuration.
 
 \par Windows
 \li Start the CMake GUI
-\li Choose \c \<MITK-SRC-DIR\>/Build/Tools/BundleGenerator as source directory
+\li Choose \c \<MITK-SRC-DIR\>/mitk/Build/Tools/BundleGenerator as source directory
 \li Choose a directory for the source code of your project and/or plug-in (create it if it doesn't exist)
 \li Press "Configure" and don't care about the generator
 \li Follow the steps for "All"
 
 \par Linux
 \li Create a directory for the source code of your project and/or plug-in and cd into it. 
-\li Start <tt>ccmake</tt> with <tt>\<MITK-SRC-DIR\>Build/Tools/BundleGenerator</tt> as source directory
+\li Start <tt>ccmake</tt> with <tt>\<MITK-SRC-DIR\>/mitk/Build/Tools/BundleGenerator</tt> as source directory
 \li Press "Configure" 
 
 \par All

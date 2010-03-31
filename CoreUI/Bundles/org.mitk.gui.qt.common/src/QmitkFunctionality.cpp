@@ -198,6 +198,10 @@ void QmitkFunctionality::ClosePartProxy()
 
 QmitkFunctionality::~QmitkFunctionality()
 {
+  this->Register();
+  this->ClosePartProxy();
+
+  this->UnRegister(false);
 }
 
 std::vector<mitk::DataNode*> QmitkFunctionality::GetCurrentSelection() const

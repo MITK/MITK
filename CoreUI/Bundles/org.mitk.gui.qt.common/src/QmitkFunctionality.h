@@ -83,10 +83,9 @@ public:
   ///
   virtual ~QmitkFunctionality();
   ///
-  /// Called, when the WorkbenchPart gets closed for removing event listeners.
-  /// Do not unregister your event listener in the destructor as the workbench
-  /// gets closed before. If in any event processing function the GUI gets accessed
-  /// your app might crash.
+  /// Called, when the WorkbenchPart gets closed 
+  /// by the user directly or by closing the whole
+  /// app (e.g. for removing event listeners)
   ///
   virtual void ClosePart();
   ///

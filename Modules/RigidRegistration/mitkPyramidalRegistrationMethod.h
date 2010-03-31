@@ -1,7 +1,6 @@
 /*=========================================================================
 
 Program:   Medical Imaging & Interaction Toolkit
-Module:    $RCSfile: mitkImageToImageFilter.h,v $
 Language:  C++
 Date:      $Date: 2009-05-28 17:19:30 +0200 (Thu, 28 May 2009) $
 Version:   $Revision: 17495 $

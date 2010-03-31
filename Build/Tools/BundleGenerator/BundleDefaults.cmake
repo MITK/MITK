@@ -15,7 +15,6 @@ SET(PLUGIN_TEMPLATE "${PROJECT_SOURCE_DIR}/../../../CMake/QBundleTemplate" CACHE
 SET(PLUGIN_COPYRIGHT "/*=========================================================================
 
 Program:   Medical Imaging & Interaction Toolkit
-Module:    $RCSfile$
 Language:  C++
 Date:      $Date$
 Version:   $Revision$ 

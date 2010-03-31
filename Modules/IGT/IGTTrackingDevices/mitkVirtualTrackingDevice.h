@@ -1,7 +1,6 @@
 /*=========================================================================
 
 Program:   Medical Imaging & Interaction Toolkit
-Module:    $RCSfile: mitkVirtualTrackingDevice.h,v $
 Language:  C++
 Date:      $Date: 2009-02-11 18:22:32 +0100 (Mi, 11 Feb 2009) $
 Version:   $Revision: 16250 $

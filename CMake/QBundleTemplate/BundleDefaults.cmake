@@ -14,7 +14,6 @@ SET(DEFAULT_CREATE_GUI_PLUGIN_MACRO "MACRO_CREATE_MITK_PLUGIN(QmitkExt)")
 SET(PLUGIN_COPYRIGHT "/*=========================================================================
 
 Program:   Medical Imaging & Interaction Toolkit
-Module:    $RCSfile$
 Language:  C++
 Date:      $Date$
 Version:   $Revision: 16706 $ 

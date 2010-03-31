@@ -1,7 +1,6 @@
 /*=========================================================================
 
 Program:   Medical Imaging & Interaction Toolkit
-Module:    $RCSfile: QmitkTrackingDeviceWidget.cpp $
 Language:  C++
 Date:      $Date: 2009-05-12 19:14:45 +0200 (Di, 12 Mai 2009) $
 Version:   $Revision: 1.12 $

@@ -1,7 +1,6 @@
 /*=========================================================================
 
 Program:   Medical Imaging & Interaction Toolkit
-Module:    $RCSfile: mitk.cpp,v $
 Language:  C++
 Date:      $Date: 2010-01-28 18:32:03 +0100 (Do, 28 Jan 2010) $
 Version:   $Revision: 1.0 $

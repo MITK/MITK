@@ -1,7 +1,6 @@
 /*=========================================================================
 
 Program:   Medical Imaging & Interaction Toolkit
-Module:    $RCSfile$
 Language:  C++
 Date:      $Date: 2007-09-05 13:45:48 +0200 (Mi, 05 Sep 2007) $
 Version:   $Revision: 9502 $

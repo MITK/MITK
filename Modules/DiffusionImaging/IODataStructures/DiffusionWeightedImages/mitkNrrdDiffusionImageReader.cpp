@@ -1,7 +1,6 @@
 /*=========================================================================
 
 Program:   Insight Segmentation & Registration Toolkit
-Module:    $RCSfile: itkImageSeriesReader.txx,v $
 Language:  C++
 Date:      $Date: 2007-08-17 20:16:25 $
 Version:   $Revision: 1.31 $

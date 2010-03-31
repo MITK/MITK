@@ -1,7 +1,6 @@
 /*=========================================================================
  
 Program:   Medical Imaging & LookupTableeraction Toolkit
-Module:    $RCSfile: mitkPropertyManager.cpp,v $
 Language:  C++
 Date:      $Date$
 Version:   $Revision: 1.12 $

@@ -1,7 +1,6 @@
 /*=========================================================================
 
 Program:   Medical Imaging & Interaction Toolkit
-Module:    $RCSfile: mitkClaronTrackingDevice.h,v $
 Language:  C++
 Date:      $Date $
 Version:   $Revision $

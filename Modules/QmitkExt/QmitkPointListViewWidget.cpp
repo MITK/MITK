@@ -1,7 +1,6 @@
 /*=========================================================================
  
 Program:   Medical Imaging & Interaction Toolkit
-Module:    $RCSfile: mitkPropertyManager.cpp,v $
 Language:  C++
 Date:      $Date: 2009-11-27 13:05:38 +0100 (Fr, 27 Nov 2009) $
 Version:   $Revision: 1.12 $

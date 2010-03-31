@@ -1,7 +1,6 @@
 /*=========================================================================
 
 Program:   Insight Segmentation & Registration Toolkit
-Module:    $RCSfile: itkSymmetricSecondRankTensor.txx,v $
 Language:  C++
 Date:      $Date: 2008-03-10 22:48:13 $
 Version:   $Revision: 1.14 $

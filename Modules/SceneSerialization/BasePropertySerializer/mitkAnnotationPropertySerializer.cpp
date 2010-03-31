@@ -1,7 +1,6 @@
 /*=========================================================================
  
 Program:   Medical Imaging & Stringeraction Toolkit
-Module:    $RCSfile: mitkPropertyManager.cpp,v $
 Language:  C++
 Date:      $Date: 2009-07-07 15:56:37 +0200 (Di, 07. Jul 2009) $
 Version:   $Revision: 1.12 $

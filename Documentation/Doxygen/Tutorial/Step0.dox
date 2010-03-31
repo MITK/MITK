@@ -2,12 +2,13 @@
 
 \page Step0Page MITK Tutorial - Step 0: Getting started
 
-After having checked out MITK's current cvs repository use CMake to generate a Makefile under UNIX and a Visual Studio workspace under windows respectively.
-The source and the binary directory have to be specicfied. The picture below shows the CMake interface under windows. To compile the tutorial the variable MITK_BUILD_TUTORIAL has to be set to ON. 
+To build the tutorials follow the \ref BuildInstructionsPage and make sure that MITK_BUILD_TUTORIAL is checked/set to ON. 
 
 \image html configureCMake.PNG
 
-There is a separate page about \ref BuildInstructionsPage
+The tutorial source files can be found in the Applications\\Tutorial\\ subdirectory of the source tree. The tutorial executables are in the bin\\Release\\ or bin\\Debug\\ subdirectory of the binary tree after compilation.
+
+
 
 \ref Step1Page "[Next step]" \ref TutorialPage "[Main tutorial page]"
 

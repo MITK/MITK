@@ -616,6 +616,44 @@ void TestDataStorage( mitk::DataStorage* ds )
         , "Checking removal of a node with two parents and two derived nodes");
       extra = NULL;
     }
+
+  /* Checking removal of a node with two derived nodes [ dataStorage->GetDerivations( rootNode )] see bug #3426 */
+  {
+    mitk::DataNode::Pointer extra = mitk::DataNode::New();
+    extra->SetProperty("name", mitk::StringProperty::New("extra"));
+    
+    ds->Add(extra);
+    mitk::DataNode::Pointer d1y = mitk::DataNode::New();
+    d1y->SetProperty("name", mitk::StringProperty::New("d1y"));
+    mitk::ReferenceCountWatcher::Pointer watcherD1y = new mitk::ReferenceCountWatcher(d1y);
+    int refCountbeforeDS = watcherD1y->GetReferenceCount();
+    ds->Add(d1y, extra);
+    mitk::DataNode::Pointer d2y = mitk::DataNode::New();
+    d2y->SetProperty("name", mitk::StringProperty::New("d2y"));
+    ds->Add(d2y, extra);
+
+    MITK_TEST_CONDITION(
+      (ds->GetNamedNode("extra") == extra)
+      && (ds->GetNamedNode("d1y") == d1y)
+      && (ds->GetNamedNode("d2y") == d2y)
+      && (ds->GetSources(d1y)->Size() == 1)    // extra should be source of d1y
+      && (ds->GetSources(d2y)->Size() == 1)    // extra should be source of d2y
+      && (ds->GetDerivations(extra)->Size() == 2)    // d1y and d2y should be derived from extra
+      , "add extra node");
+
+    ds->Remove(ds->GetDerivations( extra));       
+    MITK_TEST_CONDITION(
+      (ds->GetNamedNode("extra") == extra)
+      && (ds->GetNamedNode("d1y") == NULL) // d1y should be NULL now
+      && (ds->GetNamedNode("d2y") == NULL) // d2y should be NULL now
+      && (refCountbeforeDS == watcherD1y->GetReferenceCount())      
+      , "Checking removal of subset of two derived nodes from one parent node");
+    
+    ds->Remove(extra);
+    MITK_TEST_CONDITION(
+      (ds->GetNamedNode("extra") == NULL)
+      , "Checking removal of a parent node");
+    extra = NULL;
   }
   catch(...)
   {

@@ -149,11 +149,10 @@ mitk::DataStorage::SetOfObjects::ConstPointer mitk::DataStorage::FilterSetOfObje
 {  
   if (set == NULL)
     return NULL;
-  if (condition == NULL)
-    return set;
+
   mitk::DataStorage::SetOfObjects::Pointer result = mitk::DataStorage::SetOfObjects::New();
   for (mitk::DataStorage::SetOfObjects::ConstIterator it = set->Begin(); it != set->End(); it++)
-    if (condition->CheckNode(it.Value()) == true)
+    if (condition == NULL || condition->CheckNode(it.Value()) == true)
       result->InsertElement(result->Size(), it.Value());
   return mitk::DataStorage::SetOfObjects::ConstPointer(result);
 }

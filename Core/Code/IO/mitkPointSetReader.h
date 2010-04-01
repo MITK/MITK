@@ -35,8 +35,10 @@ namespace mitk
  * these are assigned to multiple outputs of the filter. The number of point
  * sets which have be read can be retrieven by a call to GetNumberOfOutputs() 
  * after the pipeline update().
+ * The reader is able to read the old 3D Pointsets without the "specification" and "timeseries" tags and the new 4D Pointsets.
  * @note loading point sets from multiple files according to a given file pattern
  * is not yet supported!
+ * @ingroup PSIO
  * @ingroup IO
 */
 class MITK_CORE_EXPORT PointSetReader: public PointSetSource, public FileReader

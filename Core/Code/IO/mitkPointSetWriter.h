@@ -33,6 +33,7 @@ namespace mitk
  * a single XML file by simply setting multiple inputs to the filter. 
  * Writing of multiple XML files according to a given filename pattern is not
  * yet supported.
+ * @ingroup PSIO
  * @ingroup Process
  */
 class MITK_CORE_EXPORT PointSetWriter : public mitk::FileWriter
@@ -233,12 +234,18 @@ public:
 
     static const char* XML_POINT_SET;
     
+    static const char* XML_TIME_SERIES;
+
+    static const char* XML_TIME_SERIES_ID;
+
     static const char* XML_POINT_SET_FILE;
     
     static const char* XML_FILE_VERSION;
     
     static const char* XML_POINT;
     
+    static const char* XML_SPEC;
+
     static const char* XML_ID;
     
     static const char* XML_X;

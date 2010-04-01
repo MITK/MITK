@@ -32,9 +32,15 @@ const char* mitk::PointSetWriter::XML_FILE_VERSION = "file_version" ;
 
 const char* mitk::PointSetWriter::XML_POINT_SET = "point_set" ;
 
+const char* mitk::PointSetWriter::XML_TIME_SERIES = "time_series";
+
+const char* mitk::PointSetWriter::XML_TIME_SERIES_ID = "time_series_id";
+
 const char* mitk::PointSetWriter::XML_POINT = "point" ;
 
 const char* mitk::PointSetWriter::XML_ID = "id" ;
+
+const char* mitk::PointSetWriter::XML_SPEC = "specification" ;
 
 const char* mitk::PointSetWriter::XML_X = "x" ;
 
@@ -134,30 +140,48 @@ void mitk::PointSetWriter::WriteXML( mitk::PointSet* pointSet, std::ofstream& ou
     WriteStartElement( XML_POINT_SET, out );
     mitk::PointSet::PointsContainer* pointsContainer = pointSet->GetPointSet()->GetPoints();
     mitk::PointSet::PointsContainer::Iterator it;
-    for ( it = pointsContainer->Begin(); it != pointsContainer->End(); ++it )
+    
+    unsigned int timecount = pointSet->GetTimeSteps();
+
+    for(unsigned int i=0; i< timecount; i++)
     {
-        WriteStartElement( XML_POINT, out );
+      WriteStartElement( XML_TIME_SERIES, out );
+      
+      WriteStartElement( XML_TIME_SERIES_ID, out );
+      WriteCharacterData( ConvertToString( i ).c_str() , out );
+      WriteEndElement( XML_TIME_SERIES_ID, out, false );
 
-        WriteStartElement( XML_ID, out );
-        WriteCharacterData( ConvertToString( it->Index() ).c_str() , out );
-        WriteEndElement( XML_ID, out, false );
+      for ( it = pointsContainer->Begin(); it != pointsContainer->End(); ++it )
+      {
+          WriteStartElement( XML_POINT, out );
 
-        mitk::PointSet::PointType point = it->Value();
+          WriteStartElement( XML_ID, out );
+          WriteCharacterData( ConvertToString( it->Index() ).c_str() , out );
+          WriteEndElement( XML_ID, out, false );
 
-        WriteStartElement( XML_X, out );
-        WriteCharacterData( ConvertToString( point[ 0 ] ).c_str(), out );
-        WriteEndElement( XML_X, out, false );
+          mitk::PointSet::PointType point = it->Value();
 
-        WriteStartElement( XML_Y, out );
-        WriteCharacterData( ConvertToString( point[ 1 ] ).c_str(), out );
-        WriteEndElement( XML_Y, out, false );
+          WriteStartElement( XML_SPEC, out );
+          WriteCharacterData( ConvertToString( pointSet->GetSpecificationTypeInfo(it->Index(), i) ).c_str() , out );
+          WriteEndElement( XML_SPEC, out, false );
 
-        WriteStartElement( XML_Z, out );
-        WriteCharacterData( ConvertToString( point[ 2 ] ).c_str(), out );
-        WriteEndElement( XML_Z, out, false );
+          WriteStartElement( XML_X, out );
+          WriteCharacterData( ConvertToString( point[ 0 ] ).c_str(), out );
+          WriteEndElement( XML_X, out, false );
 
-        WriteEndElement( XML_POINT, out );
+          WriteStartElement( XML_Y, out );
+          WriteCharacterData( ConvertToString( point[ 1 ] ).c_str(), out );
+          WriteEndElement( XML_Y, out, false );
+
+          WriteStartElement( XML_Z, out );
+          WriteCharacterData( ConvertToString( point[ 2 ] ).c_str(), out );
+          WriteEndElement( XML_Z, out, false );
+
+          WriteEndElement( XML_POINT, out );
+      }
+    WriteEndElement( XML_TIME_SERIES, out, false );
     }
+
     WriteEndElement( XML_POINT_SET, out );
 }
 

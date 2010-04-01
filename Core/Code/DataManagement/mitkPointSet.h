@@ -210,7 +210,7 @@ public:
   virtual void SetSelectInfo( int position, bool selected, int t = 0 );
 
   /** \brief to get the type of the point at the position and the moment */
-  virtual mitk::PointSpecificationType mitk::PointSet::GetSpecificationTypeInfo( int position, int t ) const;
+  virtual PointSpecificationType GetSpecificationTypeInfo( int position, int t ) const;
 
   /** \brief returns the number of selected points */
   virtual int GetNumberOfSelected( int t = 0 ) const;

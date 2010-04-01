@@ -18,6 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkTransferFunctionWidget.h"
 
 #include <mitkTransferFunctionProperty.h>
+#include <QPlastiqueStyle>
 
 QmitkTransferFunctionWidget::QmitkTransferFunctionWidget(QWidget* parent,
     Qt::WindowFlags f) :
@@ -36,9 +37,12 @@ QmitkTransferFunctionWidget::QmitkTransferFunctionWidget(QWidget* parent,
 
   connect(m_XEditColor, SIGNAL(returnPressed()), this, SLOT(SetXValueColor()));
   
+  QPlastiqueStyle *sliderStyle = new QPlastiqueStyle();
+
   m_RangeSlider->setMaximum(2048);
   m_RangeSlider->setMinimum(-2048);
   m_RangeSlider->setHandleMovementMode(QxtSpanSlider::NoOverlapping);
+  m_RangeSlider->setStyle(sliderStyle);
   connect(m_RangeSlider, SIGNAL(spanChanged(int, int)  ),this, SLOT( OnSpanChanged(int , int ) ));
   
   //reset button

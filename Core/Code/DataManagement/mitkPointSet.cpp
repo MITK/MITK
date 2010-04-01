@@ -237,6 +237,7 @@ void mitk::PointSet::SetPoint( PointIdentifier id, PointType point, int t )
   defaultPointData.id = id;
   defaultPointData.selected = false;
   defaultPointData.pointSpec = mitk::PTUNDEFINED;
+
   m_PointSetSeries[t]->SetPointData( id, defaultPointData );
   //boundingbox has to be computed anyway
   m_CalculateBoundingBox = true;
@@ -370,6 +371,7 @@ bool mitk::PointSet::GetSelectInfo( int position, int t ) const
     return false;
   }
 }
+
   
 void mitk::PointSet::SetSelectInfo( int position, bool selected, int t )
 {
@@ -395,7 +397,19 @@ void mitk::PointSet::SetSelectInfo( int position, bool selected, int t )
   }
 }
 
-
+mitk::PointSpecificationType mitk::PointSet::GetSpecificationTypeInfo( int position, int t ) const
+{
+  if ( this->IndexExists( position, t ) )
+  {
+    PointDataType pointData = { 0, false, PTUNDEFINED };
+    m_PointSetSeries[t]->GetPointData( position, &pointData );
+    return pointData.pointSpec;
+  }
+  else
+  {
+    return PTUNDEFINED;
+  }
+}
 
 int mitk::PointSet::GetNumberOfSelected( int t ) const
 {

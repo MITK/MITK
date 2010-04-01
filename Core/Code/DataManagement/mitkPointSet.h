@@ -76,7 +76,7 @@ namespace mitk {
  *     PointSetAddEvent <i>issued when a point is added to the PointSet</i>
  *     PointSetRemoveEvent <i>issued when a point is removed from the PointSet</i>
  * </tt>
- *
+ * \ingroup PSIO
  * \ingroup Data
  */
 class MITK_CORE_EXPORT PointSet : public BaseData
@@ -208,6 +208,9 @@ public:
   virtual bool GetSelectInfo( int position, int t = 0 ) const;
 
   virtual void SetSelectInfo( int position, bool selected, int t = 0 );
+
+  /** \brief to get the type of the point at the position and the moment */
+  virtual mitk::PointSpecificationType mitk::PointSet::GetSpecificationTypeInfo( int position, int t ) const;
 
   /** \brief returns the number of selected points */
   virtual int GetNumberOfSelected( int t = 0 ) const;

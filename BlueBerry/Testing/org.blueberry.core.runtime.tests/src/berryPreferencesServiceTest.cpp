@@ -16,7 +16,9 @@
  =========================================================================*/
 
 #include "berryPreferencesServiceTest.h"
-#include <internal/berryPreferencesService.h>
+#include <berryIBerryPreferencesService.h>
+#include <berryIPreferences.h>
+#include <berryPlatform.h>
 
 #include "berryLog.h"
 
@@ -51,106 +53,89 @@ namespace berry
 
   void PreferencesServiceTest::TestAll()
   {
-
-    Poco::File sysPrefFile;
-    Poco::File user1PrefFile;
-    Poco::File user2PrefFile;
-
-    std::string userName1 = "testUser1";
-    std::string userName2 = "testUser2";
-
-
-
-    vector<string> validUsersVector; 
-    validUsersVector.push_back(""); 
-    validUsersVector.push_back(userName1); 
-    validUsersVector.push_back(userName2);
-
     try
-    {
+    {    
+      IPreferencesService::Pointer prefService = Platform::GetServiceRegistry().GetServiceById<IPreferencesService>(IPreferencesService::ID);
+      assert(prefService.IsNotNull());
 
-      //std::string defaultPrefDir = berry::PreferencesService::GetDefaultPreferencesDirPath();
-      std::string defaultPrefDir = berry::PreferencesService::GetDefaultPreferencesDirPath();
-      Poco::File prefDir(defaultPrefDir);
+      /// Test for: IPreferences::GetSystemPreferences()
+      IPreferences::Pointer sysPrefs = prefService->GetSystemPreferences();
+      assert(sysPrefs.IsNotNull());
 
-      // tidy up from prior tests
-      if(prefDir.exists())
-        prefDir.remove(true);
+      /// Test for: IPreferences::GetUserPreferences(std::string name)
+      IPreferences::Pointer testUserPrefs = prefService->GetUserPreferences("testUser");
+      assert(testUserPrefs.IsNotNull());
+
+      /// Test for: IPreferences::GetUsers()
+      std::vector<std::string> userList = prefService->GetUsers();
+      // userList should now contain "testUser"
+      bool userListContainsTestUser = false;
+      for (std::vector<std::string>::iterator it = userList.begin()
+        ; it != userList.end(); it++)
       {
-	      berry::PreferencesService::Pointer prefService(new berry::PreferencesService(prefDir.path()));
-    	
-	      // hopefully tested
-	      std::string defaultPrefFileName = berry::PreferencesService::GetDefaultPreferencesFileName();
-    	  	
-	      //# remove old user and sys files (if their was a previous test
-        ostringstream s; s << defaultPrefDir << Poco::Path::separator() << defaultPrefFileName;
-	      sysPrefFile = s.str();
-	      s.str(""); s << defaultPrefDir << Poco::Path::separator() << userName1 << defaultPrefFileName;
-	      user1PrefFile = s.str();
-	      s.str(""); s << defaultPrefDir << Poco::Path::separator() << userName2 << defaultPrefFileName;
-	      user2PrefFile = s.str();
-
-        //# test GetSystemPreferences
-        berry::IPreferences::Pointer sysPrefsRoot = prefService->GetSystemPreferences();
-        assert(sysPrefsRoot.IsNotNull());
-        berry::IPreferences::Pointer sysPrefsGeneral = sysPrefsRoot->Node("/general");
-        sysPrefsGeneral->Put("font-size", "10");
-
-        //# test GetUserPreferences
-        berry::IPreferences::Pointer user1PrefsRoot = prefService->GetUserPreferences(userName1);
-        assert(user1PrefsRoot.IsNotNull());
-        berry::IPreferences::Pointer user1PrefsGeneral = user1PrefsRoot->Node("/general");
-        user1PrefsGeneral->PutInt("font-size", 10);
-
-        //# test GetUserPreferences
-        berry::IPreferences::Pointer user2PrefsRoot = prefService->GetUserPreferences(userName2);
-        assert(user2PrefsRoot.IsNotNull());
-        berry::IPreferences::Pointer user2PrefsGeneral = user2PrefsRoot->Node("/general");
-        user2PrefsGeneral->PutFloat("font-size", 10.32324f);
-
-        //# test GetUsers
-        vector<string> usersVector = prefService->GetUsers();
-        assert(usersVector == validUsersVector);
+        if(*it == "testUser")
+        {
+          userListContainsTestUser = true;
+          break;
+        }
       }
-      // pref service was destructed files should exist now
-      assert(sysPrefFile.exists());
-      assert(user1PrefFile.exists());
-      assert(user2PrefFile.exists());
+      assert(userListContainsTestUser);
 
-      // now create a new pref service that reads the files in again
-      berry::PreferencesService::Pointer prefService(new berry::PreferencesService());
+      IBerryPreferencesService::Pointer berryPrefService = prefService.Cast<IBerryPreferencesService>();    
+      // optional test for IBerryPreferencesService
+      if(berryPrefService.IsNotNull())
+      {
+        /// Test for: IBerryPreferencesService::ExportPreferences(Poco::File f, std::string name="")
 
-      //# test GetUsers
-      vector<string> usersVector = prefService->GetUsers();
-      //assert(usersVector == validUsersVector);
+        // write general prefs
+        std::string sysPrefsExportFilePath = Poco::Path::temp() + Poco::Path::separator() + "systemBerryPreferences";
+        Poco::File sysPrefsExportFile(sysPrefsExportFilePath);
+        sysPrefs->PutInt("testNumber", 1);
+        berryPrefService->ExportPreferences(sysPrefsExportFile);
+        // assert somethings was written
+        assert(sysPrefsExportFile.getSize() > 0);
 
-      //# test GetSystemPreferences
-      berry::IPreferences::Pointer sysPrefsRoot = prefService->GetSystemPreferences();
-      assert(sysPrefsRoot.IsNotNull());
-      berry::IPreferences::Pointer sysPrefsGeneral = sysPrefsRoot->Node("/general");
-      assert(sysPrefsGeneral->Get("font-size", "") == "10");
+        // write testUser prefs
+        std::string testUserPrefsExportFilePath = Poco::Path::temp() + Poco::Path::separator() + "testUserBerryPreferences";
+        Poco::File testUserPrefsExportFile(testUserPrefsExportFilePath);
+        testUserPrefs->PutInt("testNumber", 2);
+        berryPrefService->ExportPreferences(testUserPrefsExportFile, "testUser");
+        assert(testUserPrefsExportFile.getSize() > 0);
 
-      //# test GetUserPreferences
-      berry::IPreferences::Pointer user1PrefsRoot = prefService->GetUserPreferences(userName1);
-      assert(user1PrefsRoot.IsNotNull());
-      berry::IPreferences::Pointer user1PrefsGeneral = user1PrefsRoot->Node("/general");
-      assert(user1PrefsGeneral->GetInt("font-size", 0) == 10);
+        /// Test for: IBerryPreferencesService::ImportPreferences(Poco::File f, std::string name="")
 
-      //# test GetUserPreferences
-      berry::IPreferences::Pointer user2PrefsRoot = prefService->GetUserPreferences(userName2);
-      assert(user2PrefsRoot.IsNotNull());
-      berry::IPreferences::Pointer user2PrefsGeneral = user2PrefsRoot->Node("/general");
-      float user2FontSize = user2PrefsGeneral->GetFloat("font-size", 0.0f);
-      assert(user2FontSize == 10.32324f);
+        // import general prefs
+        // change testNumber value
+        sysPrefs->PutInt("testNumber", 3);
+        berryPrefService->ImportPreferences(sysPrefsExportFile);
+        // "testNumber" preference should now again be overwritten with its old value 1
+        assert(sysPrefs->GetInt("testNumber", 3) == 1);
 
-      if(prefDir.exists())
-        prefDir.remove(true);
-
+        // import testUser prefs
+        // change testNumber value
+        testUserPrefs->PutInt("testNumber", 4);
+        berryPrefService->ImportPreferences(testUserPrefsExportFile, "testUser");
+        // "testNumber" preference should now again be overwritten with its old value 2
+        assert(testUserPrefs->GetInt("testNumber", 4) == 2);
+        
+        // delete files again
+        sysPrefsExportFile.remove();
+        testUserPrefsExportFile.remove();
+      }
     }
-    catch (Poco::Exception& e)
+    catch (Poco::CreateFileException& e)
     {
-      failmsg(e.message());
+      std::string msg = "Failed to create preferences file: ";
+      msg.append(e.what());
+      this->fail( msg );
     }
-
+    catch (std::exception& e)
+    {
+      this->fail( e.what() );
+    }
+    catch (...)
+    {
+      this->fail( "unknown exception occured" );
+    }
   }
 }

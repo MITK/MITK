@@ -23,7 +23,6 @@
 #include "berryCoreRuntimeTestSuite.h"
 
 #include "berryPreferencesTest.h"
-#include "berryXMLPreferencesStorageTest.h"
 #include "berryPreferencesServiceTest.h"
 
 namespace berry {
@@ -32,7 +31,6 @@ CoreRuntimeTestSuite::CoreRuntimeTestSuite()
 : CppUnit::TestSuite("CoreRuntimeTestSuite")
 {
   addTest(PreferencesTest::Suite());
-  addTest(XMLPreferencesStorageTest::Suite());
   addTest(PreferencesServiceTest::Suite());
 }
 

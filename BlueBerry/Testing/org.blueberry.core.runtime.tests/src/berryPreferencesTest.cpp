@@ -17,8 +17,9 @@
 
 #include "berryPreferencesTest.h"
 
-#include <internal/berryPreferences.h>
-#include <internal/berryAbstractPreferencesStorage.h>
+#include <berryIBerryPreferences.h>
+#include <berryIBerryPreferencesService.h>
+#include <berryPlatform.h>
 
 #include <CppUnit/TestSuite.h>
 #include <CppUnit/TestCaller.h>
@@ -36,31 +37,6 @@ using namespace std;
 
 namespace berry
 {
-  class TestPreferencesStorage: public berry::AbstractPreferencesStorage
-  {
-
-  public:
-    ///
-    /// For use with berry::SmartPtr
-    ///
-    berryObjectMacro(berry::TestPreferencesStorage)
-    ///
-    /// Construct a new XML-based PreferencesStorage
-    ///
-    TestPreferencesStorage(const Poco::File& _File)
-      : AbstractPreferencesStorage(_File)
-    {
-      this->m_Root = new Preferences(Preferences::PropertyMap(), "", 0, this);
-    }
-
-    ///
-    /// To be implemented in the subclasses.
-    ///    
-    virtual void Flush(IPreferences* /*_Preferences*/) throw(Poco::Exception, BackingStoreException)
-    {
-      std::cout << "would flush to " << this->m_File.path() << std::endl;
-    }
-  };
 
   PreferencesTest::PreferencesTest(const std::string& testName)
   : berry::TestCase(testName)
@@ -74,30 +50,43 @@ namespace berry
     return suite;
   }
 
+  // simple class for testing berry changed events
+  class TestPreferencesChangedListener
+  {
+  public:
+    TestPreferencesChangedListener(IBerryPreferences* _berryPrefNode) : numCalled(0), berryPrefNode(_berryPrefNode)
+    {
+      berryPrefNode->OnChanged.AddListener( 
+        berry::MessageDelegate1<TestPreferencesChangedListener, const IBerryPreferences*> ( 
+        this, &TestPreferencesChangedListener::PreferencesChanged ) 
+        );
+    };
+
+    ~TestPreferencesChangedListener()
+    {
+      berryPrefNode->OnChanged.RemoveListener( 
+        berry::MessageDelegate1<TestPreferencesChangedListener, const IBerryPreferences*> ( 
+        this, &TestPreferencesChangedListener::PreferencesChanged ) 
+        );
+    };
+
+    void PreferencesChanged(const IBerryPreferences*)
+    {
+      ++numCalled;
+    }
+    int numCalled;
+    IBerryPreferences* berryPrefNode;
+  };
+
   void PreferencesTest::TestAll()
   {
-    berry::IPreferences::Pointer root(0);
-    berry::TestPreferencesStorage::Pointer _PreferencesStorage(0);
+    IPreferencesService::Pointer prefService = Platform::GetServiceRegistry().GetServiceById<IPreferencesService>(IPreferencesService::ID);
+    assert(prefService.IsNotNull());
 
-    // hopefully tested
-    Poco::File prefDir(Poco::Path::home()+Poco::Path::separator()+".BlueBerryTest"+Poco::Path::separator()+"prefs.xml");
+    /// Test for: IPreferences::GetSystemPreferences()
+    IPreferences::Pointer root = prefService->GetSystemPreferences();
+    assert(root.IsNotNull());
 
-    // testing methods
-    // TestPreferencesStorage::TestPreferencesStorage()
-    // AbstractPreferencesStorage::AbstractPreferencesStorage(),
-    // AbstractPreferencesStorage::GetRoot
-    {
-      _PreferencesStorage = new berry::TestPreferencesStorage(Poco::Path(prefDir.path()));
-      root = _PreferencesStorage->GetRoot();
-      assert(root.IsNotNull());
-    }
-
-    // testing methods
-    // Preferences::Node() 
-    // Preferences::NodeExists() 
-    // Preferences::Parent() 
-    // Preferences::ChildrenNames() 
-    // Preferences::RemoveNode() 
     {
       BERRY_INFO << "testing Preferences::Node(), Preferences::NodeExists(), Preferences::Parent(), " 
         "Preferences::ChildrenNames(), Preferences::RemoveNode()";
@@ -140,22 +129,31 @@ namespace berry
     // Preferences::put*() 
     // Preferences::get*()
     {
-      BERRY_INFO << "testing Preferences::put*(), Preferences::get*()";
-      
+      BERRY_INFO << "testing Preferences::put*(), Preferences::get*(), OnChanged";
+
       assert(root->NodeExists("/editors/general"));
       berry::IPreferences::Pointer editorsGeneralNode = root->Node("/editors/general");
 
+      IBerryPreferences::Pointer berryEditorsGeneralNode = editorsGeneralNode.Cast< IBerryPreferences >();
+      assert(berryEditorsGeneralNode.IsNotNull());
+
+      TestPreferencesChangedListener listener(berryEditorsGeneralNode.GetPointer());
+
       std::string strKey = "Bad words";std::string strValue = "badword1 badword2";
       editorsGeneralNode->Put(strKey, strValue);
+
+      assert(listener.numCalled == 1);
       assert(editorsGeneralNode->Get(strKey, "") == strValue);
       assert(editorsGeneralNode->Get("wrong key", "default value") == "default value");
 
       strKey = "Show Line Numbers";bool bValue = true;
       editorsGeneralNode->PutBool(strKey, bValue);
+      assert(listener.numCalled == 2);
       assert(editorsGeneralNode->GetBool(strKey, !bValue) == bValue);
 
       strKey = "backgroundcolor"; strValue = "#00FF00";
       editorsGeneralNode->PutByteArray(strKey, strValue);
+      assert(listener.numCalled == 3);
       assert(editorsGeneralNode->GetByteArray(strKey, "") == strValue);
 
       strKey = "update time"; double dValue = 1.23;
@@ -174,7 +172,6 @@ namespace berry
       editorsGeneralNode->PutLong(strKey, lValue);
       assert(editorsGeneralNode->GetLong(strKey, 0) == lValue);
     }
-
 
   }
 

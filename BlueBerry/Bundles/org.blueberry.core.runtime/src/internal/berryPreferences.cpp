@@ -206,8 +206,11 @@ namespace berry
 
     IPreferences::Pointer node;
 
+    // self reference
+    if(pathName == "")
+      return IPreferences::Pointer(this);
     // absolute path
-    if(pathName[0] == '/')
+    else if(pathName[0] == '/')
     {
       pathName = pathName.substr(1);
       // call root with this relative path

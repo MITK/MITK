@@ -2,7 +2,6 @@ SET(SRC_CPP_FILES
   berryCoreRuntimeTestSuite.cpp
   berryPreferencesServiceTest.cpp
   berryPreferencesTest.cpp
-  berryXMLPreferencesStorageTest.cpp
 )
 
 SET(INTERNAL_CPP_FILES

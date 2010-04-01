@@ -151,9 +151,23 @@ mitk::DataStorage::SetOfObjects::ConstPointer mitk::DataStorage::FilterSetOfObje
     return NULL;
 
   mitk::DataStorage::SetOfObjects::Pointer result = mitk::DataStorage::SetOfObjects::New();
-  for (mitk::DataStorage::SetOfObjects::ConstIterator it = set->Begin(); it != set->End(); it++)
-    if (condition == NULL || condition->CheckNode(it.Value()) == true)
+ 
+  if (condition == NULL)//alway copy the set, otherwise the iterator in mitk::DataStorage::Remove() will crash
+  {
+    for (mitk::DataStorage::SetOfObjects::ConstIterator it = set->Begin(); it != set->End(); it++)
+    {
       result->InsertElement(result->Size(), it.Value());
+    }    
+    return mitk::DataStorage::SetOfObjects::ConstPointer(result);
+  }
+  
+  for (mitk::DataStorage::SetOfObjects::ConstIterator it = set->Begin(); it != set->End(); it++)
+  {
+    if(condition->CheckNode(it.Value()) == true)
+    {
+      result->InsertElement(result->Size(), it.Value());
+    }
+  }
   return mitk::DataStorage::SetOfObjects::ConstPointer(result);
 }
 

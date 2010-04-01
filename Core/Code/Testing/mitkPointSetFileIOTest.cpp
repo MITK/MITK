@@ -18,147 +18,123 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkPointSet.h"
 #include "mitkPointSetWriter.h"
 #include "mitkPointSetReader.h"
-
+#include "mitkTestingMacros.h"
 #include <itksys/SystemTools.hxx>
 
-unsigned int numberOfTestPointSets = 1;
-
+//unsigned int numberOfTestPointSets = 1;
+unsigned int numberOfTimeSeries = 5;
 // create one test PointSet
-mitk::PointSet::Pointer CreateTestPointSet(unsigned int which)
+class mitkPointSetFileIOTestClass { public:
+
+static mitk::PointSet::Pointer CreateTestPointSet(unsigned int which)
 {
   mitk::PointSet::Pointer pointSet = mitk::PointSet::New();
-
-  switch (which)
+  
+  for(unsigned int t= 0; t<numberOfTimeSeries; t++)
   {
-    case 0:
-    {
-      unsigned int position(0);
-      mitk::Point3D point;
-      mitk::FillVector3D(point, 1.0, 2.0, 3.0);             pointSet->GetPointSet()->GetPoints()->InsertElement(position, point);
-      mitk::FillVector3D(point, 2.0, 3.0, 4.0); ++position; pointSet->GetPointSet()->GetPoints()->InsertElement(position, point);
-      mitk::FillVector3D(point, 3.0, 4.0, 5.0); ++position; pointSet->GetPointSet()->GetPoints()->InsertElement(position, point);
-    }
-    break;
+    unsigned int position(0);
+    mitk::Point3D point;
+    mitk::FillVector3D(point, 1.0+t+which, 2.0+t+which, 3.0+t+which);             
+    pointSet->SetPoint(position, point, t);
 
+    mitk::FillVector3D(point, 2.0+t+which, 3.0+t+which, 4.0+t+which); 
+    ++position; 
+    pointSet->SetPoint(position, point, t);
 
-    default:
-    {
-      unsigned int position(0);
-      mitk::Point3D point;
-      mitk::FillVector3D(point, 1.0, 2.0, 3.0);             pointSet->GetPointSet()->GetPoints()->InsertElement(position, point);
-      mitk::FillVector3D(point, 2.0, 3.0, 4.0); ++position; pointSet->GetPointSet()->GetPoints()->InsertElement(position, point);
-      mitk::FillVector3D(point, 3.0, 4.0, 5.0); ++position; pointSet->GetPointSet()->GetPoints()->InsertElement(position, point);
-    }
+    mitk::FillVector3D(point, 3.0+t+which, 4.0+t+which, 5.0+t+which); 
+    ++position; 
+    pointSet->SetPoint(position, point, t);
   }
 
   return pointSet;
 
 }
 
-void PointSetCompare( mitk::PointSet* pointSet2, mitk::PointSet* pointSet1, bool& identical )
+static void PointSetCompare(mitk::PointSet::Pointer pointSet2, mitk::PointSet::Pointer pointSet1, bool& identical)
 {
-  if (pointSet1->GetSize() != pointSet2->GetSize())
+  
+  MITK_TEST_CONDITION(pointSet1->GetSize() == pointSet2->GetSize(), "Testing if PointSet size is correct" );
+
+  for (unsigned int t=0; t<numberOfTimeSeries; t++) 
   {
-    std::cerr << "point sets differ in size" << std::endl;
-    identical = false;
-    return;
-  }
-
-  for (unsigned int i = 0; i < (unsigned int)pointSet1->GetSize(); ++i)
-  {
-    mitk::Point3D p1 = pointSet1->GetPoint(i);
-    mitk::Point3D p2 = pointSet2->GetPoint(i);
-
-    double difference = (   (p1[0] - p2[0])
-                          + (p1[1] - p2[1])
-                          + (p1[2] - p2[2])
-                        );
-
-    if (difference > 0.0001)
+    for (unsigned int i = 0; i < (unsigned int)pointSet1->GetSize(t); ++i)
     {
-      std::cerr << "points not at the same position" << std::endl;
-      identical = false;
-      break;
+      mitk::Point3D p1 = pointSet1->GetPoint(i);
+      mitk::Point3D p2 = pointSet2->GetPoint(i);
+
+      double difference = (   (p1[0] - p2[0])
+                            + (p1[1] - p2[1])
+                            + (p1[2] - p2[2])
+                          );
+
+      MITK_TEST_CONDITION(difference <= 0.0001, "Testing if Points are at the same Position" );
+
     }
   }
 
 }
 
-int mitkPointSetFileIOTest(int, char*[])
+static bool PointSetWrite(unsigned int numberOfPointSets)
 {
-  unsigned int numberFailed(0);
-
-  for (unsigned int i = 0; i < numberOfTestPointSets; ++i)
-  {
-    mitk::PointSet::Pointer originalPointSet = CreateTestPointSet(i);
-    mitk::PointSet::Pointer secondPointSet;
-
-    // write
-      try
+    try
       {
         mitk::PointSetWriter::Pointer pointSetWriter = mitk::PointSetWriter::New();
-        pointSetWriter->SetInput(originalPointSet);
-        pointSetWriter->SetFileName("test_pointset.mps");
+
+        pointSetWriter->SetFileName("test_pointset_new.mps");
+        for(unsigned int i=0; i<numberOfPointSets; i++) 
+        {
+          pointSetWriter->SetInput(i, CreateTestPointSet(i));
+        }
         pointSetWriter->Write();
       }
       catch ( std::exception& e )
       {
-        std::cerr << "Error during attempt to write 'test_pointset.mps' Exception says:" << std::endl;
-        std::cerr << e.what() << std::endl;
-        ++numberFailed;
-        continue;
+        return false;
       }
 
-    // load
-      try
-      {
-        mitk::PointSetReader::Pointer pointSetReader = mitk::PointSetReader::New();
-        
-        pointSetReader->SetFileName("test_pointset.mps");
-        pointSetReader->Update();
+      return true;
+}
 
-        secondPointSet = pointSetReader->GetOutput();
-      }
-      catch ( std::exception& e )
-      {
-        std::cerr << "Error during attempt to read 'test_pointset.mps' Exception says:" << std::endl;
-        std::cerr << e.what() << std::endl;
-        ++numberFailed;
-        continue;
-      }
-
-      if (secondPointSet.IsNull())
-      {
-        std::cerr << "Error reading 'test_pointset.mps'. No PointSet created." << std::endl;
-        ++numberFailed;
-        continue;
-      }
-    
-    std::remove( "test_pointset.mps" );
-  
-    // compare
-    bool identical(true);
-    PointSetCompare( secondPointSet.GetPointer(), originalPointSet.GetPointer(), identical );
-
-    if (!identical)
+static void PointSetLoadAndCompareTest(unsigned int numberOfPointSets)
+{
+  try
     {
-      std::cerr << "PointSets differ for testPointSet " << i << std::endl;
-      ++numberFailed;
-      continue;
+      mitk::PointSetReader::Pointer pointSetReader = mitk::PointSetReader::New();
+      mitk::PointSet::Pointer pointSet;
+
+      pointSetReader->SetFileName("test_pointset_new.mps");
+      for(unsigned int i=0; i<numberOfPointSets; i++)
+      {
+        pointSetReader->Update();
+        pointSet = pointSetReader->GetOutput(i);
+        MITK_TEST_CONDITION(pointSet.IsNotNull(), "Testing if the loaded Data are NULL" );
+         
+        bool identical(true);
+        PointSetCompare(pointSet.GetPointer(), CreateTestPointSet(i).GetPointer(), identical);
+      }
     }
-  }
+    catch ( std::exception& e )
+    {
+    }
+}
 
-  // if one fails, whole test fails
-  if (numberFailed > 0)
-  {
-    std::cout << "[FAILED]: " << numberFailed << " of " << numberOfTestPointSets << " sub-tests failed." << std::endl;
-    return EXIT_FAILURE;
-  }
-  else
-  {
-    std::cout << "[PASSED]" << std::endl;
-    return EXIT_SUCCESS;
-  }
 
+}; //mitkPointSetFileIOTestClass
+
+
+int mitkPointSetFileIOTest(int, char*[])
+{
+  MITK_TEST_BEGIN("PointSet");
+  unsigned int numberFailed(0);
+  unsigned int numberOfPointSets(1);
+
+  // write
+  MITK_TEST_CONDITION(mitkPointSetFileIOTestClass::PointSetWrite(numberOfPointSets), "Testing if the PointSetWriter writes Data" );
+
+  // load - compare  
+  mitkPointSetFileIOTestClass::PointSetLoadAndCompareTest(numberOfPointSets);
+
+
+  MITK_TEST_END();
 }
 

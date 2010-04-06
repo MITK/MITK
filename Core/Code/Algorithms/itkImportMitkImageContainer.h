@@ -43,9 +43,9 @@ class ImportMitkImageContainer:  public ImportImageContainer<TElementIdentifier,
 {
 public:
   /** Standard class typedefs. */
-  typedef ImportMitkImageContainer     Self;
-  typedef Object  Superclass;
-  typedef SmartPointer<Self>  Pointer;
+  typedef ImportMitkImageContainer  Self;
+  typedef Object                    Superclass;
+  typedef SmartPointer<Self>        Pointer;
   typedef SmartPointer<const Self>  ConstPointer;
     
   /** Save the template parameters. */

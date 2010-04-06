@@ -69,4 +69,3 @@ protected slots:
 /**
 \example Step6.h
 */
-

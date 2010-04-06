@@ -26,4 +26,3 @@ int QtTesting();
 //  QtTestingClass( QObject * parent = 0, const char * name = 0 );
 //
 //}
-

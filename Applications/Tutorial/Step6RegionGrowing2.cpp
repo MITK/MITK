@@ -26,4 +26,3 @@ InstantiateAccessFunctionForFixedDimension_1(RegionGrowing, 3, Step6*)
 /**
 \example Step6RegionGrowing2.cpp
 */
-

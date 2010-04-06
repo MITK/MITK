@@ -49,4 +49,3 @@ int main(int argc, char* argv[])
 /**
 \example Step7main.cpp
 */
-

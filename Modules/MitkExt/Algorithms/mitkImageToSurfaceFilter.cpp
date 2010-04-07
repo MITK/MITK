@@ -54,6 +54,8 @@ void mitk::ImageToSurfaceFilter::CreateSurface(int time, vtkImageData *vtkimage,
   //MarchingCube -->create Surface
   vtkMarchingCubes *skinExtractor = vtkMarchingCubes::New();
   skinExtractor->ComputeScalarsOff();
+  skinExtractor->ComputeNormalsOff();
+  skinExtractor->ComputeGradientsOff();
   skinExtractor->SetInput(indexCoordinatesImageFilter->GetOutput());//RC++
   indexCoordinatesImageFilter->Delete();
   skinExtractor->SetValue(0, threshold);
@@ -63,23 +65,23 @@ void mitk::ImageToSurfaceFilter::CreateSurface(int time, vtkImageData *vtkimage,
   polydata->Register(NULL);//RC++
   skinExtractor->Delete();
 
-  if (m_Smooth)
-  {
-    vtkSmoothPolyDataFilter *smoother = vtkSmoothPolyDataFilter::New();
-    //read poly1 (poly1 can be the original polygon, or the decimated polygon)
-    smoother->SetInput(polydata);//RC++
-    smoother->SetNumberOfIterations( m_SmoothIteration );
-    smoother->SetRelaxationFactor( m_SmoothRelaxation );
-    smoother->SetFeatureAngle( 60 );
-    smoother->FeatureEdgeSmoothingOff();
-    smoother->BoundarySmoothingOff();
-    smoother->SetConvergence( 0 );
-
-    polydata->Delete();//RC--
-    polydata = smoother->GetOutput();
-    polydata->Register(NULL);//RC++
-    smoother->Delete();
-  }
+//  if (m_Smooth)
+//  {
+//    vtkSmoothPolyDataFilter *smoother = vtkSmoothPolyDataFilter::New();
+//    //read poly1 (poly1 can be the original polygon, or the decimated polygon)
+//    smoother->SetInput(polydata);//RC++
+//    smoother->SetNumberOfIterations( m_SmoothIteration );
+//    smoother->SetRelaxationFactor( m_SmoothRelaxation );
+//    smoother->SetFeatureAngle( 60 );
+//    smoother->FeatureEdgeSmoothingOff();
+//    smoother->BoundarySmoothingOff();
+//    smoother->SetConvergence( 0 );
+//
+//    polydata->Delete();//RC--
+//    polydata = smoother->GetOutput();
+//    polydata->Register(NULL);//RC++
+//    smoother->Delete();
+//  }
   ProgressBar::GetInstance()->Progress();
 
 //#if (VTK_MAJOR_VERSION >= 5)
@@ -92,39 +94,39 @@ void mitk::ImageToSurfaceFilter::CreateSurface(int time, vtkImageData *vtkimage,
 //#endif
 
   //decimate = to reduce number of polygons
-  if(m_Decimate==DecimatePro)
-  {
-    vtkDecimatePro *decimate = vtkDecimatePro::New();
-    decimate->SplittingOff();
-    decimate->SetErrorIsAbsolute(5);
-    decimate->SetFeatureAngle(30);
-    decimate->PreserveTopologyOn();
-    decimate->BoundaryVertexDeletionOff();
-    decimate->SetDegree(10); //std-value is 25!
-
-    decimate->SetInput(polydata);//RC++
-    decimate->SetTargetReduction(m_TargetReduction);
-    decimate->SetMaximumError(0.002);
-
-    polydata->Delete();//RC--
-    polydata = decimate->GetOutput();
-    polydata->Register(NULL);//RC++
-    decimate->Delete();
-  }
-#if (VTK_MAJOR_VERSION < 5)
-  else if (m_Decimate==Decimate)
-  {
-    vtkDecimate *decimate = vtkDecimate::New();
-    decimate->SetInput( polydata );
-    decimate->PreserveTopologyOn();
-    decimate->BoundaryVertexDeletionOff();
-    decimate->SetTargetReduction( m_TargetReduction );
-    polydata->Delete();//RC--
-    polydata = decimate->GetOutput();
-    polydata->Register(NULL);//RC++
-    decimate->Delete();
-  }
-#endif
+//  if(m_Decimate==DecimatePro)
+//  {
+//    vtkDecimatePro *decimate = vtkDecimatePro::New();
+//    decimate->SplittingOff();
+//    decimate->SetErrorIsAbsolute(5);
+//    decimate->SetFeatureAngle(30);
+//    decimate->PreserveTopologyOn();
+//    decimate->BoundaryVertexDeletionOff();
+//    decimate->SetDegree(10); //std-value is 25!
+//
+//    decimate->SetInput(polydata);//RC++
+//    decimate->SetTargetReduction(m_TargetReduction);
+//    decimate->SetMaximumError(0.002);
+//
+//    polydata->Delete();//RC--
+//    polydata = decimate->GetOutput();
+//    polydata->Register(NULL);//RC++
+//    decimate->Delete();
+//  }
+//#if (VTK_MAJOR_VERSION < 5)
+//  else if (m_Decimate==Decimate)
+//  {
+//    vtkDecimate *decimate = vtkDecimate::New();
+//    decimate->SetInput( polydata );
+//    decimate->PreserveTopologyOn();
+//    decimate->BoundaryVertexDeletionOff();
+//    decimate->SetTargetReduction( m_TargetReduction );
+//    polydata->Delete();//RC--
+//    polydata = decimate->GetOutput();
+//    polydata->Register(NULL);//RC++
+//    decimate->Delete();
+//  }
+//#endif
 
   polydata->Update();
   ProgressBar::GetInstance()->Progress();

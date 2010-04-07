@@ -51,7 +51,7 @@ SET(MODULE_TESTS
   mitkStepperTest.cpp
   itkTotalVariationDenoisingImageFilterTest.cpp
   mitkDICOMLocaleTest.cpp
-  mitkPointSetLocaleTest.cpp
+  #mitkPointSetLocaleTest.cpp
   mitkRenderingManagerTest.cpp
   vtkMitkThickSlicesFilterTest.cpp
 )
@@ -66,7 +66,7 @@ SET(MODULE_IMAGE_TESTS
   mitkPicFileReaderTest.cpp
   # mitkVtkPropRendererTest.cpp
   mitkDataNodeFactoryTest.cpp
-  mitkSTLFileReaderTest.cpp
+  #mitkSTLFileReaderTest.cpp
 )
 
 # list of images for which the tests are run

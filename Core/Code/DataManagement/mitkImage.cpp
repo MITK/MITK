@@ -15,9 +15,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#include "mitkHistogramGenerator.h"
-
 #include "mitkImage.h"
+
+#include "mitkHistogramGenerator.h"
 #include "mitkImageDataItem.h"
 
 #include "mitkBaseProcess.h"
@@ -27,11 +27,12 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkImageTimeSelector.h"
 
 #include "ipFunc/mitkIpFunc.h"
-#include <itkSmartPointerForwardReference.txx>
-#include <vtkImageData.h>
-#include <mitkImageWriter.h>
 #include "mitkDataNodeFactory.h"
-#include <mitkIpPicTypeMultiplex.h>
+#include "mitkIpPicTypeMultiplex.h"
+
+#include <itkSmartPointerForwardReference.txx>
+
+#include <vtkImageData.h>
 
 
 //template class itk::SmartPointerForwardReference<ImageDataItem>;

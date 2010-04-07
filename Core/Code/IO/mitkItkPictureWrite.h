@@ -16,13 +16,12 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 
-#ifndef _MITKITKIMAGEWRITE_H_HEADER_INCLUDED_C1EBD0AD
-#define _MITKITKIMAGEWRITE_H_HEADER_INCLUDED_C1EBD0AD
+#ifndef MITKITKPICTUREWRITE_H
+#define MITKITKPICTUREWRITE_H
 
-#include <itkImage.h>
-#include <string>
+ #include <itkImage.h>
 
 template < typename TPixel, unsigned int VImageDimension > 
-void _mitkItkImageWrite(itk::Image< TPixel, VImageDimension >* itkImage, const std::string& fileName);
+void _mitkItkPictureWrite(itk::Image< TPixel, VImageDimension >* itkImage, const std::string& fileName);
 
-#endif /* _MITKITKIMAGEWRITE_H_HEADER_INCLUDED_C1EBD0AD */
+#endif /* MITKITKPICTUREWRITE_H */

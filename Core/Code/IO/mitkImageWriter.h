@@ -19,12 +19,8 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef _MITK_IMAGE_WRITER__H_
 #define _MITK_IMAGE_WRITER__H_
 
-#include <iomanip>
-
-#include <itkProcessObject.h>
 #include <mitkFileWriter.h>
-#include <mitkPointSet.h>
-#include <mitkSurface.h>
+
 
 namespace mitk
 {
@@ -145,7 +141,7 @@ protected:
 
     virtual void GenerateData();
 
-    virtual void WriteByITK(mitk::Image* image, const std::string& filename);
+    virtual void WriteByITK(mitk::Image* image, const std::string& fileName);
 
     std::string m_FileName;
 

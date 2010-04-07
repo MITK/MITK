@@ -153,7 +153,7 @@ SET(CPP_FILES
   IO/mitkImageWriterFactory.cpp
   IO/mitkItkImageFileIOFactory.cpp
   IO/mitkItkImageFileReader.cpp
-  IO/mitkItkImageWrite.cpp
+  IO/mitkItkPictureWrite.cpp
   IO/mitkLookupTableProperty.cpp
   IO/mitkOperation.cpp
   IO/mitkPicFileIOFactory.cpp

@@ -16,15 +16,16 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include "mitkImageWriter.h"
-#include "mitkItkImageWrite.h"
 
+#include "mitkItkPictureWrite.h"
 #include "mitkImage.h"
 #include "mitkImageTimeSelector.h"
-#include "mitkImageAccessByItk.h"
 #include "mitkPicFileWriter.h"
-#include <itksys/SystemTools.hxx>
+#include "mitkImageAccessByItk.h"
 
-#include <sstream>
+#include <itkImageIOBase.h>
+#include <itkImageIOFactory.h>
+
 
 mitk::ImageWriter::ImageWriter()
 {
@@ -56,47 +57,65 @@ static void writeVti(const char * filename, mitk::Image* image, int t=0)
 }
 #endif
 
-void mitk::ImageWriter::WriteByITK(mitk::Image* image, const std::string& filename)
+void mitk::ImageWriter::WriteByITK(mitk::Image* image, const std::string& fileName)
 {
-  if(image->GetPixelType().GetNumberOfComponents()==1)
+  // Pictures and picture series like .png are written via a different mechanism then volume images.
+  // So, they are still multiplexed and thus not support vector images.
+  if (fileName.find(".png") != std::string::npos || fileName.find(".tif") != std::string::npos || fileName.find(".jpg") != std::string::npos)
   {
-    AccessByItk_1( image, _mitkItkImageWrite, filename );
+    AccessByItk_1( image, _mitkItkPictureWrite, fileName );
+    return;
   }
-  //// Extension for RGB (and maybe also for vector types)
-  //// Does not work yet, see bug 320 and mitkImageCastPart2.cpp
-  //else
-  //if(image->GetPixelType().GetNumberOfComponents()==3)
-  //{
-  //  const std::type_info& typeId=*(image)->GetPixelType().GetTypeId();
-  //  if ( typeId == typeid(unsigned char) )
-  //  {
-  //    if(image->GetDimension()==2)
-  //    {
-  //      typedef itk::Image<itk::RGBPixel<unsigned char>, 2>  itkImageRGBUC2;
-  //      itkImageRGBUC2::Pointer itkRGBimage;
-  //      mitk::CastToItkImage(image, itkRGBimage);
-  //      _mitkItkImageWrite(itkRGBimage.GetPointer(), filename);
-  //    }
-  //    else
-  //    if(image->GetDimension()==3)
-  //    {
-  //      typedef itk::Image<itk::RGBPixel<unsigned char>, 3>  itkImageRGBUC3;
-  //      itkImageRGBUC3::Pointer itkRGBimage;
-  //      mitk::CastToItkImage(image, itkRGBimage);
-  //      _mitkItkImageWrite(itkRGBimage.GetPointer(), filename);
-  //    }
-  //  }
-  //  else
-  //  {
-  //    itkWarningMacro(<<"Sorry, cannot write images with GetNumberOfComponents()==3 that " 
-  //      << "have pixeltype " << typeId.name() << " using ITK writers .");
-  //  }
-  //}
-  else
+
+  // Implementation of writer using itkImageIO directly. This skips the use
+  // of templated itkImageFileWriter, which saves the multiplexing on MITK side.
+
+  unsigned int dimension = image->GetDimension();
+  unsigned int* dimensions = image->GetDimensions();
+  mitk::PixelType pixelType = image->GetPixelType();
+  mitk::Vector3D spacing = image->GetGeometry()->GetSpacing();
+  mitk::Point3D origin = image->GetGeometry()->GetOrigin();
+
+  itk::ImageIOBase::Pointer imageIO = itk::ImageIOFactory::CreateImageIO( fileName.c_str(), 
+    itk::ImageIOFactory::WriteMode );
+
+  if(imageIO.IsNull())
   {
-    itkWarningMacro(<<"Sorry, cannot write images with GetNumberOfComponents()==" 
-      << image->GetPixelType().GetNumberOfComponents() << " using ITK writers .");
+    itkExceptionMacro(<< "Error: Could not create itkImageIO via factory for file " << fileName);
   }
+
+  // Set the necessary information for imageIO
+  imageIO->SetNumberOfDimensions(dimension);
+  imageIO->SetPixelTypeInfo( *(pixelType.GetItkTypeId()) );
+
+  if(pixelType.GetNumberOfComponents() > 1)
+    imageIO->SetNumberOfComponents(pixelType.GetNumberOfComponents());
+
+  itk::ImageIORegion ioRegion( dimension );
+
+  for(unsigned int i=0; i<dimension; i++)
+  {
+    imageIO->SetDimensions(i,dimensions[i]);
+    imageIO->SetSpacing(i,spacing[i]);
+    imageIO->SetOrigin(i,origin[i]);
+
+    mitk::Vector3D direction = image->GetGeometry()->GetAxisVector(i);
+    vnl_vector< double > axisDirection(dimension);
+    for(unsigned int j=0; j<dimension; j++)
+    {
+      axisDirection[j] = direction[j];
+    }
+    imageIO->SetDirection( i, axisDirection );
+
+    ioRegion.SetSize(i, image->GetLargestPossibleRegion().GetSize(i) );
+    ioRegion.SetIndex(i, image->GetLargestPossibleRegion().GetIndex(i) );
+  }
+
+  imageIO->SetIORegion(ioRegion);
+  imageIO->SetFileName(fileName);
+
+  const void * data = image->GetData();
+  imageIO->Write(data);
 }
 
 void mitk::ImageWriter::GenerateData()

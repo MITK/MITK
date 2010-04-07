@@ -15,10 +15,14 @@ SET(STEP7_CPP Step6RegionGrowing1.cpp Step6RegionGrowing2.cpp Step6.cpp Step7mai
 SET(STEP8_CPP Step6RegionGrowing1.cpp Step6RegionGrowing2.cpp Step6.cpp Step8main.cpp)
 
 # some files need Qt wrapping
-QT4_WRAP_CPP(STEP6_CPP Step6.h)
-QT4_WRAP_CPP(STEP7_CPP Step6.h Step7.h)
-QT4_WRAP_CPP(STEP8_CPP Step6.h Step8.h)
+QT4_WRAP_CPP(STEP6_MOC_CPP Step6.h)
+QT4_WRAP_CPP(STEP7_MOC_CPP Step7.h)
+QT4_WRAP_CPP(STEP8_MOC_CPP Step8.h)
 
+# set additional moc files to build
+SET(STEP6_CPP ${STEP6_CPP} ${STEP6_MOC_CPP})
+SET(STEP7_CPP ${STEP7_CPP} ${STEP6_MOC_CPP} ${STEP7_MOC_CPP})
+SET(STEP8_CPP ${STEP8_CPP} ${STEP6_MOC_CPP} ${STEP8_MOC_CPP})
 
 # for the others it's all the same
 FOREACH(stepNo RANGE 1 8) 

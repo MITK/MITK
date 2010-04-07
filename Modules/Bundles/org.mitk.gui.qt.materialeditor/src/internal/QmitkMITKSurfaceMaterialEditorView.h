@@ -46,11 +46,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 /*!
 
-  \brief QmitkTemplate 
-
-  Functionality for demonstration of MITK basics.
-
-  This functionality allows the user to set some seed points that are used for a simple region growing algorithm from ITK.
+  \brief QmitkMITKSurfaceMaterialEditorView 
 
   \sa QmitkFunctionality
   \ingroup Functionalities

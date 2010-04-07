@@ -167,11 +167,11 @@ public:
   ///
   /// Informs other parts of the workbench that node is selected via the blueberry selection service.
   ///
-  void FireNodeSelected(mitk::DataNode::Pointer node);
+  void FireNodeSelected(mitk::DataNode* node);
   ///
   /// Informs other parts of the workbench that the nodes are selected via the blueberry selection service.
   ///
-  void FireNodesSelected(std::vector<mitk::DataNode::Pointer> nodes);
+  void FireNodesSelected(std::vector<mitk::DataNode*> nodes);
   ///
   /// Called when this functionality becomes visible ( no matter what IsExclusiveFunctionality() returns )
   ///

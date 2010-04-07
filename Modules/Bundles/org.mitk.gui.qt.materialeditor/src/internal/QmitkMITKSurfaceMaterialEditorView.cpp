@@ -244,25 +244,7 @@ void QmitkMITKSurfaceMaterialEditorView::CreateQtPartControl(QWidget *parent)
     m_Controls->setupUi(parent);
     this->CreateConnections();
 
-    // define data type for combobox
-   /* m_Controls->m_ImageSelector->SetDataStorage( this->GetDefaultDataStorage() );
-    m_Controls->m_ImageSelector->SetPredicate( mitk::NodePredicateDataType::New("Surface") );
-  
-	  InitPreviewWindow();
-	  
-	  connect( m_Controls->m_ImageSelector, SIGNAL( OnSelectionChanged(const mitk::DataNode::Pointer) ), this, SLOT( SurfaceSelected() ) );
-	  
-    RefreshPropertiesList(); */
-
     InitPreviewWindow();
-
-    // listener for selected entry in the data manager
-    m_SelectionListener = berry::ISelectionListener::Pointer(new berry::SelectionChangedAdapter<QmitkMITKSurfaceMaterialEditorView>(this, &QmitkMITKSurfaceMaterialEditorView::SelectionChanged));
-    this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddPostSelectionListener(/*"org.mitk.views.datamanager",*/ m_SelectionListener);
-    berry::ISelection::ConstPointer selection( this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection());
-    m_CurrentSelection = selection.Cast<const berry::IStructuredSelection>();
-    this->SelectionChanged(berry::SmartPointer<IWorkbenchPart>(NULL), selection);
-    
     RefreshPropertiesList();
 
   }
@@ -280,10 +262,6 @@ void QmitkMITKSurfaceMaterialEditorView::StdMultiWidgetNotAvailable()
 
 void QmitkMITKSurfaceMaterialEditorView::CreateConnections()
 {
-  if ( m_Controls )
-  {
-//    connect( (QObject*)(m_Controls->m_Button), SIGNAL(clicked()), this, SLOT(DoSomething()) );
-  }
 }
 
 void QmitkMITKSurfaceMaterialEditorView::Activated()
@@ -297,39 +275,14 @@ void QmitkMITKSurfaceMaterialEditorView::Deactivated()
 }
 
 
-void QmitkMITKSurfaceMaterialEditorView::SelectionChanged(berry::IWorkbenchPart::Pointer sourcepart, berry::ISelection::ConstPointer selection)
+void QmitkMITKSurfaceMaterialEditorView::OnSelectionChanged(std::vector<mitk::DataNode*> nodes)
 {
-  if ( sourcepart == this ||  // prevents being notified by own selection events
-	       !selection.Cast<const berry::IStructuredSelection>() ) // checks that the selection is a IStructuredSelection and not NULL
-	  {
-	    return; // otherwise we get "null selection" events each time the view is activated/focussed
-	  }
-
-	  MITK_INFO << "selection changed";
-	  // save current selection in member variable
-	  m_CurrentSelection = selection.Cast<const berry::IStructuredSelection>();
-
-	  //bool newReferenceImageSelected(false);
-
-	  // TODO warning when two images are selected
-	  // do something with the selected items
-	  if(m_CurrentSelection)
-	  {
-	    // iterate selection
-	    for (berry::IStructuredSelection::iterator i = m_CurrentSelection->Begin(); i != m_CurrentSelection->End(); ++i)
-	    {
-	      // extract datatree node
-	      if (mitk::DataNodeObject::Pointer nodeObj = i->Cast<mitk::DataNodeObject>())
-	      {
-	        m_SelectedDataNode = nodeObj->GetDataNode();
-          MITK_INFO << "Node '" << m_SelectedDataNode->GetName() << "' selected";
-
-          SurfaceSelected();
-          return;
-	      }
-	    }
-	  }
-	  //TODO: warning if m_InputImageNode is NULL
+  if(!nodes.empty())
+  {
+    m_SelectedDataNode = nodes.at(0);
+    MITK_INFO << "Node '" << m_SelectedDataNode->GetName() << "' selected";
+    SurfaceSelected();
+  }
 }
 
 void QmitkMITKSurfaceMaterialEditorView::SurfaceSelected()

@@ -80,10 +80,10 @@ class QmitkMITKSurfaceMaterialEditorView : public QObject, public QmitkFunctiona
 
   virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget);
   virtual void StdMultiWidgetNotAvailable();
+  virtual void OnSelectionChanged(std::vector<mitk::DataNode*> nodes);
 
 protected slots:  
 
-  void SelectionChanged(berry::IWorkbenchPart::Pointer sourcepart, berry::ISelection::ConstPointer selection);  
   void SurfaceSelected();
 
 protected:  

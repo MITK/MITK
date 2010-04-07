@@ -26,6 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 #endif
 
 static std::list<mbilog::AbstractBackend*> backends;
+static bool g_init=false;
 
 namespace mbilog {
 static const std::string NA_STRING = "n/a";
@@ -115,7 +116,15 @@ void mbilog::BackendCout::FormatSmart(std::ostream &out, const LogMessage &l,int
       break;
   }
 
-  out << std::fixed << std::setprecision(3) << ((double)std::clock())/CLOCKS_PER_SEC << ":";
+  if(!g_init)
+  {
+    time_t rawtime;
+    time ( &rawtime );
+    std::cout << ctime(&rawtime) << std::flush;
+  }
+
+
+  out << std::fixed << std::setprecision(3) << ((double)std::clock())/CLOCKS_PER_SEC << " ";
 
   out << c_close << " ";
   
@@ -176,7 +185,7 @@ void mbilog::BackendCout::FormatFull(std::ostream &out,const LogMessage &l,int t
 
   time_t rawtime;
   time ( &rawtime );
-  out << ":" << ctime(&rawtime);
+  out << "|" << ctime(&rawtime);
   
   out << "|" << std::string(l.filePath) << "(" << l.lineNumber << ")";
 
@@ -203,7 +212,6 @@ void mbilog::BackendCout::FormatFull(std::ostream &out,const LogMessage &l,int t
 #ifdef USE_WIN32COLOREDCONSOLE
 
 static HANDLE g_hConsole;
-static bool g_init=false;
 
 class AutoCategorize
 {
@@ -244,13 +252,13 @@ class AutoCategorize
         ".hxx",                "",
         ".c",                  "",
         
-        "org.blueberry.",     "",
+        "org.blueberry.",      "",
         "org.mitk.gui.qt.",    "",
         "org.mitk.",           "",
 
         "qmitk",               "",
         "mitk",                "",
-        "berry",              "",
+        "berry",               "",
         "itk",                 "",
         "vtk",                 "",
         "qt",                  "",
@@ -707,7 +715,7 @@ static void FormatSmartWindows(const mbilog::LogMessage &l,int /*threadID*/)
   }
 
   ChangeColor( colorTime );
-  std::cout << std::fixed << std::setprecision(2) << ((double)std::clock())/CLOCKS_PER_SEC << ": ";
+  std::cout << std::fixed << std::setprecision(2) << ((double)std::clock())/CLOCKS_PER_SEC << " ";
   
   // category
   {

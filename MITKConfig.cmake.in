@@ -38,6 +38,8 @@ INCLUDE("@MITK_SOURCE_DIR@/CMake/CoreHelpers.cmake")
 INCLUDE("@MITK_SOURCE_DIR@/CMake/ToolExtensionHelpers.cmake")
 APPLY_VTK_FLAGS()
 
+SET(MITK_USE_QT "@MITK_USE_QT@")
+
 
 IF (MITK_USE_BLUEBERRY)
 

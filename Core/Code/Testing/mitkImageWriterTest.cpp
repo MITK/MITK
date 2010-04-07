@@ -90,20 +90,27 @@ int mitkImageWriterTest(int  argc , char* argv[])
   myImageWriter->SetFilePattern("pattern");
   MITK_TEST_CONDITION_REQUIRED(!strcmp(myImageWriter->GetFilePattern(),"pattern"),"test Set/GetFilePattern()");
 
-  // write ITK .mhd image
-  try
+  // write ITK .mhd image (2D and 3D only)
+  if( image->GetDimension() <= 3 )
   {
-    myImageWriter->SetExtension(".mhd");
-    myImageWriter->Update();
-    std::fstream fin;
-    fin.open("test.mhd",std::ios::in);
-    MITK_TEST_CONDITION_REQUIRED(fin.is_open(),"Write .mhd file");
-    fin.close();
-    remove("test.mhd");
-  }
-  catch (...)
-  {
-    MITK_TEST_FAILED_MSG(<< "Exception during .mhd file writing");
+    try
+    {
+      myImageWriter->SetExtension(".mhd");
+      myImageWriter->Update();
+      std::fstream fin, fin2;
+      fin.open("test.mhd",std::ios::in);
+      fin2.open("test.raw",std::ios::in);
+      MITK_TEST_CONDITION_REQUIRED(fin.is_open(),"Write .mhd file");
+      MITK_TEST_CONDITION_REQUIRED(fin2.is_open(),"Write .raw file");
+      fin.close();
+      fin2.close();
+      remove("test.mhd");
+      remove("test.raw");
+    }
+    catch (...)
+    {
+      MITK_TEST_FAILED_MSG(<< "Exception during .mhd file writing");
+    }
   }
 
   // write MITK .pic image

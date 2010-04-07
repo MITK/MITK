@@ -1,68 +1,226 @@
 /**
  
-\page Step9Page MITK Tutorial - Step 9: A functionality
+\page Step9Page MITK Tutorial - Step 9: A plug-in
 
-In MITK there is one example application called MainApp, which combines an 
-arbitrary number of task oriented modules, so called "functionalities". 
+MITK uses a very modular concept to maximize reusability and portability. You start an application (for example ExtApp, the sample application provided by MITK). An application has several bundles (or plug-ins). A bundle can be a functionality, which in turn can be a view, each of these terms specifying certain behaviour and attributes.
 
-For a description of the basic idea of functionalities see "Modules / Functionalities".
+The creation of a MITK plug-in is considerably facilitated by using the MITK BundleGenerator as described in \ref NewPluginPage .
 
-There is a separate page, which describes \ref NewFunctionalityPage "how to create a functionality" 
-with a simple tool that comes with the MITK build system.
-
-The mentioned tool was used to create a functionality QmitkRegionGrowing, which can be found
-in your MITK source tree at "mitk/QFunctionalities/QmitkRegionGrowing". We created this 
-functionality to show you how to apply your knowlege from the previous tutorial steps to a functionality,
-which is the most common development setting at the DKFZ and for most other people.
-
-Let's first look at what files the functionality generator created:
+The mentioned tool was used to create a plug-in QmitkRegionGrowing.
+Let's first look at what files the BundleGenerator created:
 
 \verbatim
-AddToMITK.cmake  \
-CMakeLists.txt    |............... Build system related files for CMake
-files.cmake      /
 
-icon.xpm ......................... The icon of your functionality. This Gimp or other programs (including your text editor)
-                                   can be used to change this
+documentation\doxygen\
+  modules.dox............................. Doxygen file for documenting your plug-in
 
-QmitkRegionGrowingControls.ui .... XML file of the Qt Designer, describes buttons, combo boxes, etc. of your controls
-QmitkRegionGrowingControls.ui.h .. Code for the Qt controls event handlers can be included here
-QmitkRegionGrowing.cpp ........... The most important file, implementing behaviour
-QmitkRegionGrowing.h ............. Header file of the functionality
+META-INF\
+  MANIFEST.MF............................. Information about your plug-in
+
+resources\
+  icon.xpm................................ The icon of your plug-in. GIMP or other programs (including your text editor)
+                                           can be used to change this
+  QmitkMITKRegionGrowingView.qrc.......... QT file for managing resources
+
+src\internal\
+  QmitkMITKRegionGrowingView.cpp.......... The most important file, implementing behaviour
+  QmitkMITKRegionGrowingView.h............ Header file of the functionality
+  QmitkMITKRegionGrowingViewControls.ui... XML file of the Qt Designer, describes buttons, combo boxes, etc. of your controls
+src\
+  RegiongrowingDll.h...................... Manages the import/export of your plug-in dll
+
+CMakeLists.txt \.......................... Build system related files for CMake
+files.cmake    /
+manifest.cpp \............................ BlueBerry integration
+plugin.xml   /
+
 \endverbatim
 
 If you are not familiar with Qt development, please look into 
-<a href="http://doc.trolltech.com/3.3/designer-manual-5.html">this Trolltech page describing .ui files</a> (no, forget about the please, DO it!)
+<a href="http://doc.trolltech.com/4.6/designer-manual.html">this Trolltech page describing .ui files</a> (no, forget about the please, DO it!)
 
 The C++ files implement a subclass of QmitkFunctionality, so they ARE functionalities. In this
 special case of QmitkRegionGrowing, we added the ability to set some seed points and run a region grower.
-The algorithmic part here is largely the same as demonstrated in this tutorial. 
-This was needed to make it work inside a functionality 
+If your are interested in the concrete changes necessary to turn a freshly generated QmitkRegionGrowing into an integrated one:
 
- - In the functionality's Activated() method, we add a PointSet to the DataTree and associate an interactor with it.
-   This Activated() method is called every time the functionality is activated by the user, 
-   so we have to care that we don't add a new PointSet every time.
- - In CreateConnections() we add a Qt signal-slot-connection to react whenever the user clicks a button in the GUI.
-   The Qt concept of signals and slots is nicely described <a href="http://doc.trolltech.com/3.3/signalsandslots.html">here</a> (please read it).
- - We added the slot DoRegionGrowing() to actually start the region growing. In this method we
-   only have an mitk::Image and cannot apply an ITK filter to it. We use the AccessByItk macro described in step 6
-   to convert the mitk::Image to an itk::Image with the correct template parameters. 
- - The templated method which does
-   the region growing is called ItkImageProcessing. It is templated as an itk::Image is, so it knows the concrete pixel type
-   and dimension. This enables the method to use an ITK filter to perform the region growing.
- - After the ITK processing we want to display the result, which means to add the image to the DataTree.
-   Since the DataTree can only contain MITK images, we have to convert the result from an ITK to a MITK image,
-   which is done by mitk::ImportItkImage.
+To add a PointSet for the seed points:
+QmitkRegionGrowingView.h
 
+Add includes:
+\verbatim
+#include "mitkPointSet.h"
+#include <itkImage.h>
+\endverbatim
 
-The functionality works nicely now, but for "real worl use" we would have to take some more care, not to add a new result
-each time the region growing is done (this would sure confuse the user). This and other interesting tasks are left as an exercise for the reader (you).
+Add the point set as protected object:
+\verbatim
+/// \brief This is the actual seed point data object
+mitk::PointSet::Pointer m_PointSet;
+\endverbatim
+ 
+QmitkRegionGrowingView.cpp
+
+Add includes:
+\verbatim
+#include "QmitkPointListWidget.h"
+\endverbatim
+
+CreateQtPartControl(): 
+\verbatim
+// let the point set widget know about the multi widget (crosshair updates)
+m_Controls->lstPoints->SetMultiWidget( m_MultiWidget );
+    
+// create a new DataTreeNode containing a PointSet with some interaction
+m_PointSet = mitk::PointSet::New();
+
+mitk::DataTreeNode::Pointer pointSetNode = mitk::DataTreeNode::New();
+pointSetNode->SetData( m_PointSet );
+pointSetNode->SetName("seed points for region growing");
+pointSetNode->SetProperty("helper object", mitk::BoolProperty::New(true) );
+pointSetNode->SetProperty("layer", mitk::IntProperty::New(1024) );
+
+// add the pointset to the data tree (for rendering and access by other modules)
+GetDefaultDataStorage()->Add( pointSetNode );
+
+// tell the GUI widget about out point set
+m_Controls->lstPoints->SetPointSetNode( pointSetNode );
+\endverbatim
+
+StdMultiWidgetAvailable(): 
+\verbatim
+m_Controls->lstPoints->SetMultiWidget( m_MultiWidget );
+\endverbatim
+StdMultiWidgetNotAvailable(): 
+\verbatim
+m_Controls->lstPoints->SetMultiWidget( NULL );
+\endverbatim
+
+To use the ITK region grower:
+
+QmitkRegionGrowingView.h
+
+Add protected method:
+\verbatim
+/*!
+\brief ITK image processing function
+  This function is templated like an ITK image. The MITK-Macro AccessByItk determines the actual pixel type and dimensionality of
+  a given MITK image and calls this function for further processing (in our case region growing)
+*/
+template < typename TPixel, unsigned int VImageDimension >
+  void ItkImageProcessing( itk::Image< TPixel, VImageDimension >* itkImage, mitk::Geometry3D* imageGeometry );
+\endverbatim
+
+QmitkRegionGrowingView.cpp
+
+Add includes:
+\verbatim
+// MITK
+#include "mitkImageAccessByItk.h"
+#include "mitkITKImageImport.h"
+#include "mitkProperties.h"
+#include "mitkColorProperty.h"
+
+// ITK
+#include <itkConnectedThresholdImageFilter.h>
+
+\endverbatim
+
+DoImageProcessing();
+\verbatim
+// So we have an image. Let's see if the user has set some seed points already
+if ( m_PointSet->GetSize() == 0 )
+{
+  // no points there. Not good for region growing
+  QMessageBox::information( NULL, "Region growing functionality", 
+                                  "Please set some seed points inside the image first.\n"
+                                  "(hold Shift key and click left mouse button inside the image.)"
+                                );
+  return;
+}
+
+// actually perform region growing. Here we have both an image and some seed points
+AccessByItk_1( image, ItkImageProcessing, image->GetGeometry() ); // some magic to call the correctly templated function
+\endverbatim
+
+And add the new method:
+\verbatim
+template < typename TPixel, unsigned int VImageDimension >
+void QmitkRegionGrowingView::ItkImageProcessing( itk::Image< TPixel, VImageDimension >* itkImage, mitk::Geometry3D* imageGeometry )
+{
+  typedef itk::Image< TPixel, VImageDimension > InputImageType;
+  typedef typename InputImageType::IndexType    IndexType;
+  
+  // instantiate an ITK region growing filter, set its parameters
+  typedef itk::ConnectedThresholdImageFilter<InputImageType, InputImageType> RegionGrowingFilterType;
+  typename RegionGrowingFilterType::Pointer regionGrower = RegionGrowingFilterType::New();
+  regionGrower->SetInput( itkImage ); // don't forget this
+
+  // determine a thresholding interval
+  IndexType seedIndex;
+  TPixel min( std::numeric_limits<TPixel>::max() );
+  TPixel max( std::numeric_limits<TPixel>::min() );
+  mitk::PointSet::PointsContainer* points = m_PointSet->GetPointSet()->GetPoints();
+  for ( mitk::PointSet::PointsConstIterator pointsIterator = points->Begin(); 
+        pointsIterator != points->End();
+        ++pointsIterator ) 
+  {
+    // first test if this point is inside the image at all
+    if ( !imageGeometry->IsInside( pointsIterator.Value()) ) 
+    {
+      continue;
+    }
+
+    // convert world coordinates to image indices
+    imageGeometry->WorldToIndex( pointsIterator.Value(), seedIndex);
+
+    // get the pixel value at this point
+    TPixel currentPixelValue = itkImage->GetPixel( seedIndex );
+
+    // adjust minimum and maximum values
+    if (currentPixelValue > max)
+      max = currentPixelValue;
+
+    if (currentPixelValue < min)
+      min = currentPixelValue;
+
+    regionGrower->AddSeed( seedIndex );
+  }
+
+  std::cout << "Values between " << min << " and " << max << std::endl;
+
+  min -= 30;
+  max += 30;
+
+  // set thresholds and execute filter
+  regionGrower->SetLower( min );
+  regionGrower->SetUpper( max );
+
+  regionGrower->Update();
+
+  mitk::Image::Pointer resultImage = mitk::ImportItkImage( regionGrower->GetOutput() );
+  mitk::DataTreeNode::Pointer newNode = mitk::DataTreeNode::New();
+  newNode->SetData( resultImage );
+
+  // set some properties
+  newNode->SetProperty("binary", mitk::BoolProperty::New(true));
+  newNode->SetProperty("name", mitk::StringProperty::New("dumb segmentation"));
+  newNode->SetProperty("color", mitk::ColorProperty::New(1.0,0.0,0.0));
+  newNode->SetProperty("volumerendering", mitk::BoolProperty::New(true));
+  newNode->SetProperty("layer", mitk::IntProperty::New(1));
+  newNode->SetProperty("opacity", mitk::FloatProperty::New(0.5));
+
+  // add result to data tree
+  this->GetDefaultDataStorage()->Add( newNode );
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
+\endverbatim
 
 Have fun using MITK!
 
 If you meet any difficulties during your first steps, don't hesitate to ask on the MITK mailing list mitk-users@lists.sourceforge.net! 
 People there are kind and will try to help you.
- 
+
  \ref Step8Page "[Previous step]" \ref TutorialPage "[Main tutorial page]"
  
 */

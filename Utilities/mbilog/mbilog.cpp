@@ -115,9 +115,7 @@ void mbilog::BackendCout::FormatSmart(std::ostream &out, const LogMessage &l,int
       break;
   }
 
-  time_t rawtime;
-  time ( &rawtime );
-  out << c_open << ctime(&rawtime);
+  out << std::fixed << std::setprecision(3) << ((double)std::clock())/CLOCKS_PER_SEC << ":";
 
   out << c_close << " ";
   
@@ -639,6 +637,12 @@ static void FormatSmartWindows(const mbilog::LogMessage &l,int /*threadID*/)
   int lastColor = colorNormal;
   #define ChangeColor( _col ) { int col=(_col); if(lastColor != (col)) { SetConsoleTextAttribute(g_hConsole, (col) ); lastColor=(col); } }
 
+  int colorTime = FOREGROUND_GREEN;
+  int colorText = FOREGROUND_RED|FOREGROUND_GREEN|FOREGROUND_BLUE;
+  int colorCat = FOREGROUND_BLUE | FOREGROUND_RED;
+  bool showColon = true;
+  bool forceCat = false;
+
   if(!g_init)
   {
     g_hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -658,13 +662,13 @@ static void FormatSmartWindows(const mbilog::LogMessage &l,int /*threadID*/)
     ChangeColor( colorNormal );
     std::cout << std::endl;
     */
-  }
 
-  int colorTime = FOREGROUND_GREEN;
-  int colorText = FOREGROUND_RED|FOREGROUND_GREEN|FOREGROUND_BLUE;
-  int colorCat = FOREGROUND_BLUE | FOREGROUND_RED;
-  bool showColon = true;
-  bool forceCat = false;
+    // Give out start time
+    ChangeColor( colorTime );
+    time_t rawtime;
+    time ( &rawtime );
+    std::cout << ctime(&rawtime) << std::flush;
+  }
   
   switch(l.level)
   {
@@ -703,9 +707,7 @@ static void FormatSmartWindows(const mbilog::LogMessage &l,int /*threadID*/)
   }
 
   ChangeColor( colorTime );
-  time_t rawtime;
-  time ( &rawtime );
-  std::cout << ctime(&rawtime) << " " << std::flush;
+  std::cout << std::fixed << std::setprecision(2) << ((double)std::clock())/CLOCKS_PER_SEC << ": ";
   
   // category
   {

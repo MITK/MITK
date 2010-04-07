@@ -125,7 +125,6 @@ static void PointSetLoadAndCompareTest(unsigned int numberOfPointSets)
 int mitkPointSetFileIOTest(int, char*[])
 {
   MITK_TEST_BEGIN("PointSet");
-  unsigned int numberFailed(0);
   unsigned int numberOfPointSets(1);
 
   // write

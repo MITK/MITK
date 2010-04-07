@@ -60,13 +60,14 @@ void ReaderLocaleTest(mitk::Point3D & refPoint)
   mitk::Point3D point;
   if (pointSet->GetPointIfExists(0, &point))
   {
+
     MITK_TEST_CONDITION_REQUIRED(fabs(refPoint[0] - point[0]) < 0.00001, "read x correct");
     MITK_TEST_CONDITION_REQUIRED(fabs(refPoint[1] - point[1]) < 0.00001, "read y correct");
     MITK_TEST_CONDITION_REQUIRED(fabs(refPoint[2] - point[2]) < 0.00001, "read z correct");
   }else
   {
     MITK_TEST_FAILED_MSG(<< "File "<< filename << " can not be read - test will not applied." );
-     return;
+    return;
   }
 }
 
@@ -152,8 +153,8 @@ int mitkPointSetLocaleTest(int /*argc*/, char* /*argv*/[])
     if ( ChangeLocale(*iter) )
     {
       ++numberOfTestedGermanLocales;
-     ReaderLocaleTest(refPoint);
      WriterLocaleTest(refPoint);
+     ReaderLocaleTest(refPoint);
     }
   }
   MITK_TEST_CONDITION_REQUIRED( numberOfTestedGermanLocales > 0, "Verify that at least one German locale has been tested.");

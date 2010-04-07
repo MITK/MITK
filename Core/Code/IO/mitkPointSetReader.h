@@ -24,6 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <string>
 #include <stack>
 #include <vtkXMLParser.h>
+#include <tinyxml.h>
 
 namespace mitk
 {
@@ -105,6 +106,9 @@ protected:
      */
     virtual void GenerateData();
     
+    virtual mitk::PointSet::Pointer ReadPoint(mitk::PointSet::Pointer newPointSet, 
+      TiXmlElement* currentTimeSeries, unsigned int currentTimeStep);
+
     /**
      * Does nothing in the current implementation
      */

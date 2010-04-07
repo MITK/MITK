@@ -92,6 +92,7 @@ mitk::DataNodeFactory::DataNodeFactory()
 : m_UseSeriesDetails(true)
 {
   m_Serie = false;
+  m_OldProgress = 0;
   this->Modified();
   //ensure that a CoreObjectFactory has been instantiated
   mitk::CoreObjectFactory::GetInstance();
@@ -238,8 +239,10 @@ void mitk::DataNodeFactory::OnITKProgressEvent(itk::Object *source, const itk::E
 
   float progress = _ProcessObject->GetProgress();
   unsigned int iProgress = static_cast<unsigned int>(progress * 100);
+  int steps = iProgress -  m_OldProgress;
+  mitk::ProgressBar::GetInstance()->Progress(steps);
+  m_OldProgress = iProgress;
 
-  mitk::ProgressBar::GetInstance()->Progress(iProgress);
 
   //// Update the progress bar and value in the MITK progress bar
   //m_mitkProgressMeter->value(100 * progress);
@@ -260,7 +263,6 @@ void mitk::DataNodeFactory::OnITKProgressEvent(itk::Object *source, const itk::E
 void mitk::DataNodeFactory::ReadFileSeriesTypeDCM()
 {
   MITK_INFO << "loading image series with prefix " << m_FilePrefix << " and pattern " << m_FilePattern << " as DICOM..." << std::endl;
-    
   const char* previousCLocale = setlocale(LC_NUMERIC, NULL);
   setlocale(LC_NUMERIC, "C");
   std::locale previousCppLocale( std::cin.getloc() );

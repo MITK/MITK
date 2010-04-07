@@ -85,10 +85,11 @@ void QmitkProgressBar::SlotProgress(unsigned int steps)
 {
   m_Progress += steps;
   this->setValue(m_Progress);
-  this->show();
 
   if (m_Progress >= m_TotalSteps)
     Reset();
+  else
+     this->show();
 
   // Update views if repaint has been requested in the meanwhile
   // (because Qt event loop is not reached while progress bar is updating,

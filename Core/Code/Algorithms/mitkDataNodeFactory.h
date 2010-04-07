@@ -180,7 +180,7 @@ protected:
 
   bool m_UseSeriesDetails;
   std::vector<std::string> m_SeriesRestrictions;
-
+  int m_OldProgress;
 };
 
 }

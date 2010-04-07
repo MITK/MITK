@@ -996,7 +996,7 @@ IDropTarget::Pointer PartSashContainer::Drag(void* /*currentControl*/,
 
       bool pointlessDrop = false; // = isZoomed();
 
-      if (sourcePart == targetPart)
+      if (!sourcePart && sourceContainer == targetPart)
       {
         pointlessDrop = true;
       }
@@ -1053,7 +1053,10 @@ IDropTarget::Pointer PartSashContainer::Drag(void* /*currentControl*/,
       side = Constants::NONE;
     }
 
-    return this->CreateDropTarget(sourcePart, side, cursor, Object::Pointer(0));
+    if (sourcePart)
+      return this->CreateDropTarget(sourcePart, side, cursor, Object::Pointer(0));
+    else
+      return this->CreateDropTarget(sourceContainer, side, cursor, Object::Pointer(0));
   }
 
   return IDropTarget::Pointer(0);
@@ -1084,7 +1087,7 @@ void PartSashContainer::Stack(StackablePart::Pointer newPart,
   // Only deref the part if it is being referenced in -this- perspective
   Perspective::Pointer persp = page->GetActivePerspective();
   PerspectiveHelper* pres = (persp != 0) ? persp->GetPresentation() : 0;
-  if (pres != 0 && newPart.Cast<PartPane> () != 0)
+  if (pres != 0 && container.Cast<PartStack>()->GetAppearance() != PresentationFactoryUtil::ROLE_EDITOR)
   {
     IWorkbenchPartReference::Pointer newPartRef =
         newPart.Cast<PartPane> ()->GetPartReference();

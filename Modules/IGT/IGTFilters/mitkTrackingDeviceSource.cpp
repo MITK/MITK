@@ -31,13 +31,13 @@ mitk::TrackingDeviceSource::TrackingDeviceSource()
 
 mitk::TrackingDeviceSource::~TrackingDeviceSource()
 {
-  if (m_TrackingDevice->GetState()==mitk::TrackingDevice::Tracking)
+  if (m_TrackingDevice->GetState() == mitk::TrackingDevice::Tracking)
   {
-    StopTracking();
+    this->StopTracking();
   }
-  if (m_TrackingDevice->GetState()==mitk::TrackingDevice::Ready)
+  if (m_TrackingDevice->GetState() == mitk::TrackingDevice::Ready)
   {
-    Disconnect();
+    this->Disconnect();
   }
   m_TrackingDevice = NULL;
 }

@@ -66,6 +66,7 @@ SET(MODULE_IMAGE_TESTS
   mitkPicFileReaderTest.cpp
   # mitkVtkPropRendererTest.cpp
   mitkDataNodeFactoryTest.cpp
+  mitkSTLFileReaderTest.cpp
 )
 
 # list of images for which the tests are run

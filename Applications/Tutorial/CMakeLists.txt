@@ -12,7 +12,7 @@ INCLUDE_DIRECTORIES(${ALL_INCLUDE_DIRECTORIES})
 # explicitly since it is not a member of ${STEP6_CPP} at this point
 SET(STEP6_CPP Step6RegionGrowing1.cpp Step6RegionGrowing2.cpp Step6main.cpp)
 SET(STEP7_CPP Step6RegionGrowing1.cpp Step6RegionGrowing2.cpp Step6.cpp Step7main.cpp)
-SET(STEP8_CPP Step6RegionGrowing1.cpp Step6RegionGrowing2.cpp Step6.cpp Step8main.cpp)
+SET(STEP8_CPP Step6RegionGrowing1.cpp Step6RegionGrowing2.cpp Step6.cpp Step7.cpp Step8main.cpp)
 
 # some files need Qt wrapping
 QT4_WRAP_CPP(STEP6_MOC_CPP Step6.h)

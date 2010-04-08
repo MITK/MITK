@@ -24,10 +24,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QmitkStandardViews.h>
 #include <QmitkStdMultiWidgetEditor.h>
 
+#include <mitkWeakPointer.h>
 #include <mitkPointSetInteractor.h>
-//!mm
+
 #include "ui_QmitkSimpleMeasurementControls.h"
-//!
 
 class QmitkStdMultiWidget;
 //!mm
@@ -47,86 +47,50 @@ class QmitkSimpleMeasurement : public QObject, public QmitkFunctionality
 
 
   public:
-    virtual void StdMultiWidgetAvailable(QmitkStdMultiWidget& stdMultiWidget);
-    virtual void StdMultiWidgetNotAvailable();
 
     virtual ~QmitkSimpleMeasurement();
+    virtual void Activated();
+    virtual void Deactivated();
+    virtual bool IsExclusiveFunctionality() const;
+    ///
+    /// Called when the selection in the workbench changed
+    ///
+    virtual void OnSelectionChanged(std::vector<mitk::DataNode*> nodes);
+
+    virtual void NodeRemoved(const mitk::DataNode* node);
 
   protected:
     // Pseudo Ctor
     void CreateQtPartControl(QWidget* parent);
 
-  public:
-  /*!
-  \brief default constructor
-  */
-  //!mm
-  //QmitkSimpleMeasurement(QObject *parent=0, const char *name=0, QmitkStdMultiWidget *mitkStdMultiWidget = NULL, mitk::DataTreeIteratorBase* dataIt = NULL);
-  // use this function as constructor
-  //!
+  protected slots:
 
-  /*!
-  \brief default destructor
-  */
-  //virtual ~QmitkSimpleMeasurement();
+    void AddDistanceSimpleMeasurement();
 
-  /*!
-  \brief method for creating the widget containing the application   controls, like sliders, buttons etc.
-  */
-  //virtual QWidget * CreateControlWidget(QWidget *parent);
+    void AddAngleSimpleMeasurement();
 
-  /*!
-  \brief method for creating the applications main widget
-  */
-  //virtual QWidget * CreateMainWidget(QWidget * parent);
+    void AddPathSimpleMeasurement();
 
-  /*!
-  \brief method for creating the connections of main and control widget
-  */
-  virtual void CreateConnections();
+  protected:
+    /*!
+    * controls containing sliders for scrolling through the slices
+    */
+    Ui::QmitkSimpleMeasurementControls * m_Controls;
 
-  /*!
-  \brief method for creating an QAction object, i.e. button & menu entry  @param parent the parent QWidget
-  */
-  //virtual QAction * CreateAction(QActionGroup *parent);
+    /*
+     * Interactor for performing the simplemeasurements.
+     */
+    mitk::WeakPointer<mitk::PointSetInteractor> m_PointSetInteractor;
 
-  virtual void Activated();
-  virtual void Deactivated();
-protected slots:
-  void TreeChanged();
+    /*
+    * Interactor for performing the simplemeasurements.
+    */
+    mitk::WeakPointer<mitk::DataNode> m_SelectedPointSetNode;
 
-  void AddDistanceSimpleMeasurement();
-
-  void AddAngleSimpleMeasurement();
-
-  void AddPathSimpleMeasurement();
-
-protected:
-  // save the parent widget of our UI
-  QWidget* m_Parent;
-
-  //mitk::DataTreeIteratorClone m_DataTreeIterator;
-
-  /*!
-  * default main widget containing 4 windows showing 3
-  * orthogonal slices of the volume and a 3d render window
-  */
-  //QmitkStdMultiWidget * m_MultiWidget;
-
-  /*!
-  * controls containing sliders for scrolling through the slices
-  */
-  Ui::QmitkSimpleMeasurementControls * m_Controls;
-
-  /*
-   * Interactor for performing the simplemeasurements.
-   */
-  mitk::PointSetInteractor::Pointer m_PointSetInteractor;
-
-  /*
-   * Node representing the PointSet last created. It is used to delete empty point sets.
-   */
-  mitk::DataNode::Pointer m_CurrentPointSetNode;
+    /*
+     * Node representing the PointSet last created. It is used to delete empty point sets.
+     */
+    std::vector<mitk::DataNode*> m_CreatedPointSetNodes;
 };
 
 #endif // !defined(QMITK_MEASUREMENT_H__INCLUDED)

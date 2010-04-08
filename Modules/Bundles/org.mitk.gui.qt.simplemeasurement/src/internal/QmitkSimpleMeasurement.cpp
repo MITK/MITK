@@ -39,192 +39,158 @@ QmitkSimpleMeasurement::QmitkSimpleMeasurement(QObject *parent, const char *name
 
 QmitkSimpleMeasurement::~QmitkSimpleMeasurement()
 {
-  this->Deactivated();
-  delete m_Controls;
-}
-
-/*
-QWidget * QmitkSimpleMeasurement::CreateMainWidget(QWidget *)
-{
-  return NULL;
-}
-
-QWidget * QmitkSimpleMeasurement::CreateControlWidget(QWidget *parent)
-{
-  if (m_Controls == NULL)
-  {
-    m_Controls = new Ui::QmitkSimpleMeasurementControls(parent);
-  }
-  return m_Controls;
-}
-*/
-
-void QmitkSimpleMeasurement::CreateConnections()
-{
-  if ( m_Controls )
-  {
-    connect( (QObject*)(m_Controls->pbDistance), SIGNAL(clicked()),(QObject*) this, SLOT(AddDistanceSimpleMeasurement()) );
-    connect( (QObject*)(m_Controls->pbAngle), SIGNAL(clicked()),(QObject*) this, SLOT(AddAngleSimpleMeasurement()) );
-    connect( (QObject*)(m_Controls->pbPath), SIGNAL(clicked()),(QObject*) this, SLOT(AddPathSimpleMeasurement()) );
-  }
-}
-
-/*
-QAction * QmitkSimpleMeasurement::CreateAction(QActionGroup *parent)
-{
-  QAction* action;
-  action = new QAction( tr( "SimpleMeasurement" ), QPixmap((const char**)icon_xpm), tr( "&SimpleMeasurement" ), 0, parent, "SimpleMeasurement" );
-  return action;
-}
-*/
-
-void QmitkSimpleMeasurement::TreeChanged()
-{
-
 }
 
 void QmitkSimpleMeasurement::Activated()
 {
-  m_PointSetInteractor = 0u;
-  m_CurrentPointSetNode = 0u;
+  std::vector<mitk::DataNode*> selection = this->GetDataManagerSelection();
+  this->OnSelectionChanged( selection );
 }
 
 void QmitkSimpleMeasurement::Deactivated()
 {
-  if (m_PointSetInteractor.IsNotNull())
-  {
-    mitk::GlobalInteraction::GetInstance()->RemoveInteractor(m_PointSetInteractor);
-  }
-
-  if (m_CurrentPointSetNode.IsNotNull() && static_cast<mitk::PointSet*>(m_CurrentPointSetNode->GetData())->IsEmpty(0u))
-  {
-    this->GetDataStorage()->Remove(m_CurrentPointSetNode);
-  }
+  std::vector<mitk::DataNode*> selection;
+  this->OnSelectionChanged( selection );
 }
 
 void QmitkSimpleMeasurement::AddDistanceSimpleMeasurement()
 {
-  /*
-   * make sure the last interactor that has been used is removed
-   */
-  if (m_PointSetInteractor.IsNotNull())
-  {
-    mitk::GlobalInteraction::GetInstance()->RemoveInteractor(m_PointSetInteractor);
-  }
-
-  /*
-   * if the last point set was not used for a simplemeasurement delete it
-   */
-  if (m_CurrentPointSetNode.IsNotNull() && static_cast<mitk::PointSet*>(m_CurrentPointSetNode->GetData())->IsEmpty(0u))
-  {
-    this->GetDataStorage()->Remove(m_CurrentPointSetNode);
-  }
-
   mitk::PointSet::Pointer pointSet = mitk::PointSet::New();
 
-  m_CurrentPointSetNode = mitk::DataNode::New();
-  m_CurrentPointSetNode->SetData(pointSet);
-  m_CurrentPointSetNode->SetProperty("show contour", mitk::BoolProperty::New(true));
-  m_CurrentPointSetNode->SetProperty("name", mitk::StringProperty::New("distance"));
-  m_CurrentPointSetNode->SetProperty("show distances", mitk::BoolProperty::New(true));
+  mitk::DataNode::Pointer _CurrentPointSetNode = mitk::DataNode::New();
+  _CurrentPointSetNode->SetData(pointSet);
+  _CurrentPointSetNode->SetProperty("show contour", mitk::BoolProperty::New(true));
+  _CurrentPointSetNode->SetProperty("name", mitk::StringProperty::New("distance"));
+  _CurrentPointSetNode->SetProperty("show distances", mitk::BoolProperty::New(true));
 
-  this->GetDataStorage()->Add(m_CurrentPointSetNode);
+  // add to ds and remember as created
+  this->GetDataStorage()->Add(_CurrentPointSetNode);
+  m_CreatedPointSetNodes.push_back( _CurrentPointSetNode );
 
-  m_PointSetInteractor = mitk::PointSetInteractor::New("pointsetinteractor", m_CurrentPointSetNode, 2);
-  mitk::GlobalInteraction::GetInstance()->AddInteractor(m_PointSetInteractor);
+  // make new selection
+  std::vector<mitk::DataNode*> selection;
+  selection.push_back( _CurrentPointSetNode );
+  this->FireNodesSelected( selection );
+  this->OnSelectionChanged( selection );
 }
 
 void QmitkSimpleMeasurement::AddAngleSimpleMeasurement()
 {
-  /*
-   * make sure the last interactor that has been used is removed
-   */
-  if (m_PointSetInteractor.IsNotNull())
-  {
-    mitk::GlobalInteraction::GetInstance()->RemoveInteractor(m_PointSetInteractor);
-  }
-
- /*
-  * if the last point set was not used for a simplemeasurement delete it
-  */
-  if (m_CurrentPointSetNode.IsNotNull() && static_cast<mitk::PointSet*>(m_CurrentPointSetNode->GetData())->IsEmpty(0u))
-  {
-    this->GetDataStorage()->Remove(m_CurrentPointSetNode);
-  }
-
   mitk::PointSet::Pointer pointSet = mitk::PointSet::New();
 
-  m_CurrentPointSetNode = mitk::DataNode::New();
-  m_CurrentPointSetNode->SetData(pointSet);
-  m_CurrentPointSetNode->SetProperty("show contour", mitk::BoolProperty::New(true));
-  m_CurrentPointSetNode->SetProperty("name", mitk::StringProperty::New("angle"));
-  m_CurrentPointSetNode->SetProperty("show angles", mitk::BoolProperty::New(true));
+  mitk::DataNode::Pointer _CurrentPointSetNode = mitk::DataNode::New();
+  _CurrentPointSetNode->SetData(pointSet);
+  _CurrentPointSetNode->SetProperty("show contour", mitk::BoolProperty::New(true));
+  _CurrentPointSetNode->SetProperty("name", mitk::StringProperty::New("angle"));
+  _CurrentPointSetNode->SetProperty("show angles", mitk::BoolProperty::New(true));
 
-  this->GetDataStorage()->Add(m_CurrentPointSetNode);
+  // add to ds and remember as created
+  this->GetDataStorage()->Add(_CurrentPointSetNode);
+  m_CreatedPointSetNodes.push_back( _CurrentPointSetNode );
 
-  m_PointSetInteractor = mitk::PointSetInteractor::New("pointsetinteractor", m_CurrentPointSetNode, 3);
-  mitk::GlobalInteraction::GetInstance()->AddInteractor(m_PointSetInteractor);
+  // make new selection
+  std::vector<mitk::DataNode*> selection;
+  selection.push_back( _CurrentPointSetNode );
+  this->FireNodesSelected( selection );
+  this->OnSelectionChanged( selection );
 }
 
 void QmitkSimpleMeasurement::AddPathSimpleMeasurement()
 {
-  /*
-   * make sure the last interactor that has been used is removed
-   */
+  mitk::PointSet::Pointer pointSet = mitk::PointSet::New();
+
+  mitk::DataNode::Pointer _CurrentPointSetNode = mitk::DataNode::New();
+  _CurrentPointSetNode->SetData(pointSet);
+  _CurrentPointSetNode->SetProperty("show contour", mitk::BoolProperty::New(true));
+  _CurrentPointSetNode->SetProperty("name", mitk::StringProperty::New("path"));
+  _CurrentPointSetNode->SetProperty("show distances", mitk::BoolProperty::New(true));
+  _CurrentPointSetNode->SetProperty("show angles", mitk::BoolProperty::New(true));
+
+  // add to ds and remember as created
+  this->GetDataStorage()->Add(_CurrentPointSetNode);
+  m_CreatedPointSetNodes.push_back( _CurrentPointSetNode );
+
+  // make new selection
+  std::vector<mitk::DataNode*> selection;
+  selection.push_back( _CurrentPointSetNode );
+  this->FireNodesSelected( selection );
+  this->OnSelectionChanged( selection );
+}
+
+void QmitkSimpleMeasurement::CreateQtPartControl( QWidget* parent )
+{
+  m_Controls = new Ui::QmitkSimpleMeasurementControls;
+  m_Controls->setupUi(parent);
+
+  connect( (QObject*)(m_Controls->pbDistance), SIGNAL(clicked()),(QObject*) this, SLOT(AddDistanceSimpleMeasurement()) );
+  connect( (QObject*)(m_Controls->pbAngle), SIGNAL(clicked()),(QObject*) this, SLOT(AddAngleSimpleMeasurement()) );
+  connect( (QObject*)(m_Controls->pbPath), SIGNAL(clicked()),(QObject*) this, SLOT(AddPathSimpleMeasurement()) );
+}
+
+void QmitkSimpleMeasurement::OnSelectionChanged( std::vector<mitk::DataNode*> nodes )
+{
+  if(!this->IsActivated())
+    return;
+
+  mitk::DataNode* selectedNode = 0;
+  if(nodes.size() > 0)
+    selectedNode = nodes.front();
+
+  mitk::PointSet* pointSet = 0;
+  if(selectedNode)
+    pointSet = dynamic_cast<mitk::PointSet*> ( selectedNode->GetData() );
+
+  // something else was selected. remove old interactor
   if (m_PointSetInteractor.IsNotNull())
   {
     mitk::GlobalInteraction::GetInstance()->RemoveInteractor(m_PointSetInteractor);
   }
 
- /*
-  * if the last point set was not used for a simplemeasurement delete it
-  */
-  if (m_CurrentPointSetNode.IsNotNull() && static_cast<mitk::PointSet*>(m_CurrentPointSetNode->GetData())->IsEmpty(0u))
+  bool pointsetCreatedByThis = false;
+
+  // only go further if a pointset was selected
+  if(pointSet)
   {
-    this->GetDataStorage()->Remove(m_CurrentPointSetNode);
+    // see if this pointset was created by us
+    std::vector<mitk::DataNode*>::iterator it = std::find( m_CreatedPointSetNodes.begin()
+      , m_CreatedPointSetNodes.end(), selectedNode);
+    if(it != m_CreatedPointSetNodes.end())
+     pointsetCreatedByThis = true;
   }
 
-  mitk::PointSet::Pointer pointSet = mitk::PointSet::New();
-
-  m_CurrentPointSetNode = mitk::DataNode::New();
-  m_CurrentPointSetNode->SetData(pointSet);
-  m_CurrentPointSetNode->SetProperty("show contour", mitk::BoolProperty::New(true));
-  m_CurrentPointSetNode->SetProperty("name", mitk::StringProperty::New("path"));
-  m_CurrentPointSetNode->SetProperty("show distances", mitk::BoolProperty::New(true));
-  m_CurrentPointSetNode->SetProperty("show angles", mitk::BoolProperty::New(true));
-
-  //m_DataTreeIterator->Add(m_CurrentPointSetNode);
-  this->GetDataStorage()->Add(m_CurrentPointSetNode);
-
-  m_PointSetInteractor = mitk::PointSetInteractor::New("pointsetinteractor", m_CurrentPointSetNode);
-  mitk::GlobalInteraction::GetInstance()->AddInteractor(m_PointSetInteractor);
+  // do nothing if it was not created by us or it is no pointset node
+  if(pointsetCreatedByThis)
+  {
+    // otherwise: set text and add interactor for the pointset
+    m_Controls->selectedPointSet->setText( QString::fromStdString(selectedNode->GetName()) );
+    mitk::PointSetInteractor::Pointer newPointSetInteractor 
+      = mitk::PointSetInteractor::New("pointsetinteractor", selectedNode);
+    mitk::GlobalInteraction::GetInstance()->AddInteractor(newPointSetInteractor);
+    m_PointSetInteractor = newPointSetInteractor;
+    float green[] = { 0, 255, 0 };
+    float red[] = { 255, 0, 0 };
+    selectedNode->SetColor(green);
+    if(m_SelectedPointSetNode.IsNotNull())
+      m_SelectedPointSetNode->SetColor(red);
+    m_SelectedPointSetNode = selectedNode;
+  }
+  else
+  {
+    // revert text
+    m_Controls->selectedPointSet->setText( "None" );
+  }
 }
 
-void QmitkSimpleMeasurement::CreateQtPartControl( QWidget* parent )
+bool QmitkSimpleMeasurement::IsExclusiveFunctionality() const
 {
-  m_Parent = parent;
-
-  m_Controls = new Ui::QmitkSimpleMeasurementControls;
-  m_Controls->setupUi(parent);
-
-  m_PointSetInteractor = 0u;
-
-  m_CurrentPointSetNode = 0u;
-
-  this->CreateConnections();
-  //SetAvailability(true);
+  return true;
 }
 
-void QmitkSimpleMeasurement::StdMultiWidgetAvailable(QmitkStdMultiWidget& stdMultiWidget)
+void QmitkSimpleMeasurement::NodeRemoved( const mitk::DataNode* node )
 {
-  this->m_Controls->pbAngle->setEnabled(true);
-  this->m_Controls->pbDistance->setEnabled(true);
-  this->m_Controls->pbPath->setEnabled(true);
-}
-
-void QmitkSimpleMeasurement::StdMultiWidgetNotAvailable()
-{
-  this->m_Controls->pbAngle->setEnabled(false);
-  this->m_Controls->pbDistance->setEnabled(false);
-  this->m_Controls->pbPath->setEnabled(false);
+  // remove a node if it is destroyed from our created array
+  std::vector<mitk::DataNode*>::iterator it = std::find( m_CreatedPointSetNodes.begin()
+    , m_CreatedPointSetNodes.end(), node);
+  if(it != m_CreatedPointSetNodes.end())
+    m_CreatedPointSetNodes.erase(it);
 }

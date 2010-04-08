@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QmitkFunctionality.h>
 #include <mitkWeakPointer.h>
 #include <mitkDataNode.h>
+#include <mitkInteractor.h>
 
 namespace Ui
 {
@@ -39,19 +40,18 @@ public:
   QmitkPointSetInteractionView(QObject *parent=0);
   virtual ~QmitkPointSetInteractionView();
   virtual void CreateQtPartControl(QWidget *parent);
-
+  void OnSelectionChanged(std::vector<mitk::DataNode*> nodes);
+  void Activated();
+  void Deactivated();
+  void NodeChanged(const mitk::DataNode* node);
+  bool IsExclusiveFunctionality() const;
+  virtual void StdMultiWidgetAvailable(QmitkStdMultiWidget& stdMultiWidget);
+  virtual void StdMultiWidgetClosed(QmitkStdMultiWidget& stdMultiWidget);
 protected slots:
   void OnAddPointSetClicked();
 protected: 
-  void SelectionChanged(berry::IWorkbenchPart::Pointer sourcepart
-    , berry::ISelection::ConstPointer selection);
-  void Activated();
-  void Deactivated();
-  berry::ISelectionListener::Pointer m_SelectionListener;
-  friend struct berry::SelectionChangedAdapter<QmitkPointSetInteractionView>;
-
   Ui::QmitkPointSetInteractionControls * m_Controls;
   mitk::WeakPointer<mitk::DataNode> m_SelectedPointSetNode;
-
+  mitk::WeakPointer<mitk::Interactor> m_SelectedPointSetInteractor;
 };
 #endif // !defined(QmitkPointSetInteraction_H__INCLUDED)

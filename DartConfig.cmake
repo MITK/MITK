@@ -1,4 +1,4 @@
-OPTION(USE_KITWARE_DARTBOARD "Use the Kitware Dartboard for Build Submissions." OFF)
+OPTION(USE_MITK_ORG_DASHBOARD "Use the dartboard on mitk.org for build submissions." OFF)
 
 # internal cdash
 set(CTEST_PROJECT_NAME "MITK")
@@ -15,24 +15,24 @@ set(DROP_LOCATION "/cdash/submit.php?project=MITK")
 
 
 # configure dart for submission to kitware
-IF(USE_KITWARE_DARTBOARD)
+IF(USE_MITK_ORG_DASHBOARD)
 #
 # Dart server to submit results (used by client)
 #
     SET(DROP_METHOD "http")
-    SET(DROP_SITE "my.cdash.org")
+    SET(DROP_SITE "cdash.mitk.org")
     SET(DROP_LOCATION "/submit.php?project=MITK")
     SET(CTEST_DROP_METHOD "http")
-    SET(CTEST_DROP_SITE "my.cdash.org")
+    SET(CTEST_DROP_SITE "cdash.mitk.org")
     SET(CTEST_DROP_LOCATION "/submit.php?project=MITK")
     SET(CTEST_DROP_SITE_CDASH TRUE)
 
     SET(CTEST_NIGHTLY_START_TIME "21:00 CEST")
     SET (NIGHTLY_START_TIME "21:00:00 CEST")	
     
-    SET (DOXYGEN_URL "http://docs.mitk.org/nightly/" )
+    SET (DOXYGEN_URL "http://docs.mitk.org/nightly-qt4/" )
         
-ENDIF(USE_KITWARE_DARTBOARD)
+ENDIF(USE_MITK_ORG_DASHBOARD)
 
 IF(EXISTS ${MBI_DART_WORKDIR}/notes.txt)
   MAKE_DIRECTORY(${MBI_DART_WORKDIR}/bin/Testing/Notes)

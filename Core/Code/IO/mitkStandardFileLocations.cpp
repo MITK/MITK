@@ -122,7 +122,7 @@ std::string mitk::StandardFileLocations::FindFile(const char* filename, const ch
   // 1. look for MITKCONF environment variable
   const char* mitkConf = itksys::SystemTools::GetEnv("MITKCONF");  
   if (mitkConf!=NULL)
-    AddDirectoryForSearch(mitkConf);
+    AddDirectoryForSearch(mitkConf, false);
 
   // 2. use .mitk-subdirectory in home directory of the user
 #if defined(_WIN32) && !defined(__CYGWIN__)
@@ -134,7 +134,7 @@ std::string mitk::StandardFileLocations::FindFile(const char* filename, const ch
     directoryPath = homeDrive;
     directoryPath += homePath;
     directoryPath += "/.mitk/";
-    AddDirectoryForSearch(directoryPath.c_str());
+    AddDirectoryForSearch(directoryPath.c_str(), false);
   }
  
 #else
@@ -143,7 +143,7 @@ std::string mitk::StandardFileLocations::FindFile(const char* filename, const ch
   {
     directoryPath = homeDirectory;
     directoryPath += "/.mitk/";
-    AddDirectoryForSearch(directoryPath.c_str());
+    AddDirectoryForSearch(directoryPath.c_str(), false);
   }
 
 #endif // defined(_WIN32) && !defined(__CYGWIN__)
@@ -153,10 +153,10 @@ std::string mitk::StandardFileLocations::FindFile(const char* filename, const ch
   AddDirectoryForSearch(directoryPath.c_str());
   
   directoryPath = itksys::SystemTools::GetCurrentWorkingDirectory();
-  AddDirectoryForSearch(directoryPath.c_str());
+  AddDirectoryForSearch(directoryPath.c_str(), false);
 
   std::string directoryBinPath = directoryPath + "/bin"; 
-  AddDirectoryForSearch(directoryBinPath.c_str());
+  AddDirectoryForSearch(directoryBinPath.c_str(), false);
   // 4. use a source tree location from compile time
   directoryPath = MITK_ROOT;
   if (pathInSourceDir)
@@ -164,7 +164,7 @@ std::string mitk::StandardFileLocations::FindFile(const char* filename, const ch
     directoryPath += pathInSourceDir;
   }
   directoryPath += '/';
-  AddDirectoryForSearch(directoryPath.c_str());
+  AddDirectoryForSearch(directoryPath.c_str(), false);
   
   return SearchDirectoriesForFile(filename);
 }

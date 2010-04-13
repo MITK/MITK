@@ -54,6 +54,14 @@ WorkbenchPartReference::WorkbenchPartReference() :
   propertyChangeListener = new PropertyChangeListener(this);
 }
 
+WorkbenchPartReference::~WorkbenchPartReference()
+{
+  this->Register();
+  part = 0;
+  pane = 0;
+  this->UnRegister(false);
+}
+
 bool WorkbenchPartReference::IsDisposed() const
 {
   return state == STATE_DISPOSED;

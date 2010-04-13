@@ -33,8 +33,6 @@
 
 namespace berry {
 
-std::list<Shell::Pointer> QtWidgetsTweakletImpl::shellList = std::list<Shell::Pointer>();
-
 QtSelectionListenerWrapper::QtSelectionListenerWrapper(QWidget* w)
  : widget(w)
 {

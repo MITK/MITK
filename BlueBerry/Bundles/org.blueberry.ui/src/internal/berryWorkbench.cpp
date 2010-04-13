@@ -1772,6 +1772,8 @@ void Workbench::Shutdown()
   //  if (tracker != null) {
   //    tracker.close();
   //  }
+
+  Tweaklets::Clear();
 }
 
 }

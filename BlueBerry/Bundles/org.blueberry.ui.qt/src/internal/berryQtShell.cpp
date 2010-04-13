@@ -22,6 +22,8 @@
 #include "berryQtControlWidget.h"
 
 #include <berryConstants.h>
+#include <internal/berryTweaklets.h>
+#include <tweaklets/berryGuiWidgetsTweaklet.h>
 
 #include <QApplication>
 #include <QVariant>
@@ -174,8 +176,20 @@ void QtShell::Close()
 
 std::vector<Shell::Pointer> QtShell::GetShells()
 {
-  return std::vector<Shell::Pointer>(QtWidgetsTweakletImpl::shellList.begin(),
-                                     QtWidgetsTweakletImpl::shellList.end());
+  GuiWidgetsTweaklet::Pointer widgetTweaklet = Tweaklets::Get(GuiWidgetsTweaklet::KEY);
+  std::vector<Shell::Pointer> allShells(widgetTweaklet->GetShells());
+  std::vector<Shell::Pointer> descendants;
+
+  for (std::size_t i = 0; i < allShells.size(); ++i)
+  {
+    Shell::Pointer shell = allShells[i];
+    if (widgetTweaklet->GetShell(shell->GetControl()) == this)
+    {
+      descendants.push_back(shell);
+    }
+  }
+
+  return descendants;
 }
 
 int QtShell::GetStyle()

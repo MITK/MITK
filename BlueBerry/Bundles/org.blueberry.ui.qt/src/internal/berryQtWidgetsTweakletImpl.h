@@ -149,7 +149,7 @@ private:
   typedef std::map<void*, QtSelectionListenerWrapper* > SelectionListenerMap;
   SelectionListenerMap selectionListenerMap;
 
-  static std::list<Shell::Pointer> shellList;
+  std::list<Shell::Pointer> shellList;
 
   friend class QtShell;
 

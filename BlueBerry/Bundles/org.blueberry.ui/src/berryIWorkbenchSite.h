@@ -29,6 +29,7 @@ namespace berry {
 struct IWorkbenchPage;
 struct ISelectionProvider;
 struct IWorkbenchWindow;
+class  Shell;
 
 /**
  * \ingroup org_blueberry_ui
@@ -77,6 +78,15 @@ struct BERRY_UI IWorkbenchSite : public IServiceLocator { // IAdaptable, IShellP
    * @return the selection provider, or <code>null</code> if none
    */
   virtual SmartPointer<ISelectionProvider> GetSelectionProvider() = 0;
+
+  /**
+   * Returns the shell for this workbench site. Not intended to be called from
+   * outside the UI thread. Clients should call IWorkbench.getDisplay() to
+   * gain access to the display rather than calling getShell().getDisplay().
+   *
+   * @return the shell for this workbench site
+   */
+  virtual SmartPointer<Shell> GetShell() = 0;
 
   /**
    * Returns the workbench window containing this workbench site.

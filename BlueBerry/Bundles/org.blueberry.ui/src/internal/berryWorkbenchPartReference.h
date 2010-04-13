@@ -141,6 +141,8 @@ private: void DeferEvents(bool shouldQueue);
 
 public: WorkbenchPartReference();
 
+public: ~WorkbenchPartReference();
+
 public: virtual bool IsDisposed() const;
 
 protected: virtual void CheckReference();

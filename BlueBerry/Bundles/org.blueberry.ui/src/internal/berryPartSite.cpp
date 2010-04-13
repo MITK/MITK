@@ -162,6 +162,14 @@ PartSite::GetSelectionProvider()
   return selectionProvider;
 }
 
+Shell::Pointer PartSite::GetShell()
+{
+  PartPane::Pointer pane = GetPane();
+
+  if (!pane) return GetWorkbenchWindow()->GetShell();
+  return pane->GetShell();
+}
+
 
 IWorkbenchWindow::Pointer PartSite::GetWorkbenchWindow()
 {

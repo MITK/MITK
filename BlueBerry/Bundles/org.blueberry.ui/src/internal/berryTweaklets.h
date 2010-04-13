@@ -99,6 +99,13 @@ public:
     defaults.insert(std::make_pair(definition, implementation));
   }
 
+  static void Clear()
+  {
+    std::cout << "Clearing tweaklets\n";
+    tweaklets.clear();
+    defaults.clear();
+  }
+
   template<typename I>
   static typename I::Pointer Get(const TweakKey<I>& definition)
   {

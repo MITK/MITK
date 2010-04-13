@@ -374,7 +374,7 @@ void PartStack::TestInvariants()
       // If this child has focus, then ensure that it is selected and that we have
       // the active appearance.
 
-      if (Tweaklets::Get(GuiWidgetsTweaklet::KEY)->IsChild(child->GetControl(), focusControl))
+      if (focusControl && Tweaklets::Get(GuiWidgetsTweaklet::KEY)->IsChild(child->GetControl(), focusControl))
       {
         poco_assert(child == current); // "The part with focus is not the selected part"
         //  focus check commented out since it fails when focus workaround in LayoutPart.setVisible is not present
@@ -401,7 +401,7 @@ void PartStack::TestInvariants()
     StackPresentation::Pointer presentation = this->GetPresentation();
 
     // If the presentation controls have focus, ensure that we have the active appearance
-    if (Tweaklets::Get(GuiWidgetsTweaklet::KEY)->IsChild(presentation->GetControl(), focusControl))
+    if (focusControl && Tweaklets::Get(GuiWidgetsTweaklet::KEY)->IsChild(presentation->GetControl(), focusControl))
     {
       poco_assert(this->GetActive() == StackPresentation::AS_ACTIVE_FOCUS);
       // "The presentation has focus but does not have the active appearance"
@@ -686,7 +686,7 @@ void PartStack::SavePresentationState()
 
 PartStack::~PartStack()
 {
-  //BERRY_INFO << "DELETING PARTSTACK\n";
+  //BERRY_INFO << "DELETING PARTSTACK";
 }
 
 void PartStack::Dispose()

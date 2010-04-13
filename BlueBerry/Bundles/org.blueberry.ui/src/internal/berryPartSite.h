@@ -32,6 +32,7 @@ struct IWorkbenchPart;
 struct IWorkbenchPage;
 struct IWorkbenchWindow;
 class  PartPane;
+class  Shell;
 
 /**
  * \ingroup org_blueberry_ui_internal
@@ -193,6 +194,12 @@ public: virtual std::string GetRegisteredName();
    */
 public: virtual ISelectionProvider::Pointer GetSelectionProvider();
 
+  /**
+   * Returns the shell containing this part.
+   *
+   * @return the shell containing this part
+   */
+public: SmartPointer<Shell> GetShell();
 
   /**
    * Returns the workbench window containing this part.

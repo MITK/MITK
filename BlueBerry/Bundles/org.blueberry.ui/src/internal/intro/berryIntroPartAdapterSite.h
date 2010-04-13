@@ -82,6 +82,8 @@ public:
      */
     SmartPointer<ISelectionProvider> GetSelectionProvider();
 
+    SmartPointer<Shell> GetShell();
+
     /* (non-Javadoc)
      * @see org.eclipse.ui.IWorkbenchSite#getWorkbenchWindow()
      */

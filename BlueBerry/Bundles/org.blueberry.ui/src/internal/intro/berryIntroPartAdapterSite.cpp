@@ -60,6 +60,11 @@ SmartPointer<ISelectionProvider> IntroPartAdapterSite::GetSelectionProvider()
   return partSite->GetSelectionProvider();
 }
 
+SmartPointer<Shell> IntroPartAdapterSite::GetShell()
+{
+  return partSite->GetShell();
+}
+
 SmartPointer<IWorkbenchWindow> IntroPartAdapterSite::GetWorkbenchWindow()
 {
   return partSite->GetWorkbenchWindow();

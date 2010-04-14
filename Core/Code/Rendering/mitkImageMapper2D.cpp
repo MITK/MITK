@@ -319,7 +319,7 @@ mitk::ImageMapper2D::GenerateData( mitk::BaseRenderer *renderer )
 
   const Geometry2D *worldGeometry = renderer->GetCurrentWorldGeometry2D();
 
-  if( ( worldGeometry == NULL ) || ( !worldGeometry->IsValid() ) )
+  if( ( worldGeometry == NULL ) || ( !worldGeometry->IsValid() ) || ( !worldGeometry->GetReferenceGeometry() ))
   {
     return;
   }

@@ -52,21 +52,7 @@ QmitkVtkHistogramWidget::QmitkVtkHistogramWidget( QWidget *parent )
   layout->addWidget( m_ChartWidget );
   layout->setSpacing( 10 );
 
-
-
   vtkQtChartArea *area = m_ChartWidget->getChartArea();
-  vtkQtChartStyleManager *style = area->getStyleManager();
-  vtkQtChartColorStyleGenerator *generator =
-    qobject_cast<vtkQtChartColorStyleGenerator *>( style->getGenerator() );
-  if ( generator )
-  {
-    generator->getColors()->setColorScheme( vtkQtChartColors::Blues );
-  }
-  else
-  {
-    style->setGenerator(
-      new vtkQtChartColorStyleGenerator( m_ChartWidget, vtkQtChartColors::Blues ) );
-  }
 
   // Set up the bar chart.
   m_BarChart = new vtkQtBarChart();

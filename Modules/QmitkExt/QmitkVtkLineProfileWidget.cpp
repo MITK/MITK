@@ -51,18 +51,6 @@ QmitkVtkLineProfileWidget::QmitkVtkLineProfileWidget( QWidget *parent )
   layout->setSpacing( 10 );
 
   vtkQtChartArea *area = m_ChartWidget->getChartArea();
-  vtkQtChartStyleManager *style = area->getStyleManager();
-  vtkQtChartColorStyleGenerator *generator =
-    qobject_cast<vtkQtChartColorStyleGenerator *>( style->getGenerator() );
-  if ( generator )
-  {
-    generator->getColors()->setColorScheme( vtkQtChartColors::Blues );
-  }
-  else
-  {
-    style->setGenerator(
-      new vtkQtChartColorStyleGenerator( m_ChartWidget, vtkQtChartColors::Blues ) );
-  }
 
   // Set up the line chart.
   m_LineChart = new vtkQtLineChart();
@@ -202,10 +190,7 @@ void QmitkVtkLineProfileWidget::UpdateItemModelFromPath()
 
 void QmitkVtkLineProfileWidget::ClearItemModel()
 {
-  m_ItemModel->setRowCount( 0 );
-  vtkQtChartTableSeriesModel *table =
-    new vtkQtChartTableSeriesModel( m_ItemModel, m_LineChart );
-  m_LineChart->setModel( table );
+  m_ItemModel->clear();
 }
 
 

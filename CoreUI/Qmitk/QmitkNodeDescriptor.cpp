@@ -82,8 +82,11 @@ void QmitkNodeDescriptor::RemoveAction( QAction* _Action )
     m_BatchActions.removeAt(indexOfWidgetAction);
   }
 
-  QObject::disconnect( _Action, SIGNAL( destroyed(QObject *) )
-    , this, SLOT( ActionDestroyed(QObject *) ) );
+  if( _Action != 0)
+  {
+    QObject::disconnect( _Action, SIGNAL( destroyed(QObject *) )
+      , this, SLOT( ActionDestroyed(QObject *) ) );
+  }
 }
 
 QmitkNodeDescriptor::~QmitkNodeDescriptor()

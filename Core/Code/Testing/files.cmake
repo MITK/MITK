@@ -25,7 +25,7 @@ SET(MODULE_TESTS
   mitkLevelWindowTest.cpp
   mitkMessageTest.cpp
   #mitkPipelineSmartPointerCorrectnessTest.cpp
-  #mitkPixelTypeTest.cpp
+  mitkPixelTypeTest.cpp
   mitkPlaneGeometryTest.cpp
   mitkPointSetFileIOTest.cpp
   mitkPointSetTest.cpp

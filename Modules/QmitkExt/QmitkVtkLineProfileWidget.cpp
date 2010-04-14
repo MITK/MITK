@@ -100,7 +100,6 @@ void QmitkVtkLineProfileWidget::SetPathModeToDirectPath()
   if ( m_PathMode != PATH_MODE_DIRECT )
   {
     m_PathMode = PATH_MODE_DIRECT;
-    this->Modified();
   }
 }
 
@@ -110,7 +109,6 @@ void QmitkVtkLineProfileWidget::SetPathModeToPlanarFigure()
   if ( m_PathMode != PATH_MODE_PLANARFIGURE )
   {
     m_PathMode = PATH_MODE_PLANARFIGURE;
-    this->Modified();
   }
 }
 
@@ -121,7 +119,7 @@ void QmitkVtkLineProfileWidget::UpdateItemModelFromPath()
 
   if ( m_DerivedPath.IsNull() )
   {
-    itkExceptionMacro( << "QmitkVtkLineProfileWidget: no path set" );
+    throw std::exception("QmitkVtkLineProfileWidget: no path set");
   }
 
   // TODO: indices according to mm
@@ -200,12 +198,12 @@ void QmitkVtkLineProfileWidget::CreatePathFromPlanarFigure()
 
   if ( m_PlanarFigure.IsNull() )
   {
-    itkExceptionMacro( << "QmitkVtkLineProfileWidget: PlanarFigure not set!" );
+    throw std::exception("QmitkVtkLineProfileWidget: PlanarFigure not set!" );
   }
 
   if ( m_Image.IsNull() )
   {
-    itkExceptionMacro( << "QmitkVtkLineProfileWidget: Image not set -- needed to calculate path from PlanarFigure!" );
+    throw std::exception("QmitkVtkLineProfileWidget: Image not set -- needed to calculate path from PlanarFigure!" );
   }
 
   // Get 2D geometry frame of PlanarFigure
@@ -213,14 +211,14 @@ void QmitkVtkLineProfileWidget::CreatePathFromPlanarFigure()
     dynamic_cast< mitk::Geometry2D * >( m_PlanarFigure->GetGeometry( 0 ) );
   if ( planarFigureGeometry2D == NULL )
   {
-    itkExceptionMacro( << "QmitkVtkLineProfileWidget: PlanarFigure has no valid geometry!" );
+    throw std::exception("QmitkVtkLineProfileWidget: PlanarFigure has no valid geometry!" );
   }
 
   // Get 3D geometry from Image (needed for conversion of point to index)
   mitk::Geometry3D *imageGeometry = m_Image->GetGeometry( 0 );
   if ( imageGeometry == NULL )
   {
-    itkExceptionMacro( << "QmitkVtkLineProfileWidget: Image has no valid geometry!" );
+    throw std::exception("QmitkVtkLineProfileWidget: Image has no valid geometry!" );
   }
 
   // Get first poly-line of PlanarFigure (other possible poly-lines in PlanarFigure
@@ -273,4 +271,29 @@ void QmitkVtkLineProfileWidget::ComputePath()
       break;
     }
   }
+}
+
+void QmitkVtkLineProfileWidget::SetImage( mitk::Image* image )
+{
+  m_Image = image;
+}
+
+void QmitkVtkLineProfileWidget::SetPath( const PathType* path )
+{
+  m_Path = path;
+}
+
+void QmitkVtkLineProfileWidget::SetPlanarFigure( const mitk::PlanarFigure* planarFigure )
+{
+  m_PlanarFigure = planarFigure;
+}
+
+void QmitkVtkLineProfileWidget::SetPathMode( unsigned int pathMode )
+{
+  m_PathMode = pathMode;
+}
+
+unsigned int QmitkVtkLineProfileWidget::GetPathMode()
+{
+  return m_PathMode;
 }

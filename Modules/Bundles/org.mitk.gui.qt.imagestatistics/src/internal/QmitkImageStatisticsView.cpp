@@ -103,8 +103,6 @@ QmitkImageStatistics::QmitkImageStatistics(QObject *parent, const char *name)
 
 QmitkImageStatistics::~QmitkImageStatistics()
 {
-  m_Controls->m_LineProfileWidget->Delete();
-  m_Controls->m_HistogramWidget->Delete();
 }
 
 

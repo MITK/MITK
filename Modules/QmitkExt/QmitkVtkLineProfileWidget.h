@@ -41,7 +41,7 @@ PURPOSE.  See the above copyright notices for more information.
  * \brief Widget for displaying intensity profiles of images along a given
  * path
  */
-class QmitkExt_EXPORT QmitkVtkLineProfileWidget : public QDialog, public itk::Object
+class QmitkExt_EXPORT QmitkVtkLineProfileWidget : public QDialog
 {
   Q_OBJECT
 
@@ -60,21 +60,19 @@ public:
 
 
   /** \brief Set image from which to calculate derive the intensity profile. */
-  itkSetObjectMacro( Image, mitk::Image );
+  void SetImage(mitk::Image* image);
 
   /** \brief Set path for calculating intensity profile directly. */
-  itkSetConstObjectMacro( Path, PathType );
+  void SetPath(const PathType* path);
 
   /** \brief Set planar figure for calculating intensity profile. */
-  itkSetConstObjectMacro( PlanarFigure, mitk::PlanarFigure );
-
-
+  void SetPlanarFigure(const mitk::PlanarFigure* planarFigure);
 
   /** \brief Set/Get mode which path to use */
-  itkSetMacro( PathMode, unsigned int );
+  void SetPathMode(unsigned int pathMode);
   
   /** \brief Set/Get mode which path to use */
-  itkGetMacro( PathMode, unsigned int );
+  unsigned int GetPathMode();
 
   /** \brief Set/Get mode which path to use */
   void SetPathModeToDirectPath();

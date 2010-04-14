@@ -41,7 +41,7 @@ PURPOSE.  See the above copyright notices for more information.
  * \brief Widget for displaying image histograms based on the vtkQtChart
  * framework
  */
-class QmitkExt_EXPORT QmitkVtkHistogramWidget : public QDialog, public itk::Object
+class QmitkExt_EXPORT QmitkVtkHistogramWidget : public QDialog
 {
   Q_OBJECT
 
@@ -65,28 +65,27 @@ public:
 
 
   /** \brief Set histogram to be displayed directly. */
-  itkSetConstObjectMacro( Histogram, HistogramType );
+  void SetHistogram(const HistogramType* histogram);
   
   /** \brief Set image from which to calculate the histogram. */
-  itkSetConstObjectMacro( Image, mitk::Image );
+  void SetImage(const mitk::Image* image);
 
   /** \brief Set binary image mask determining the voxels to include in 
    * histogram calculation. */
-  itkSetConstObjectMacro( ImageMask, mitk::Image );
+  void SetImageMask(const mitk::Image* imageMask);
 
   /** \brief Set 3D image region for which to calculate the histogram. */
-  itkSetMacro( ImageRegion, RegionType );
+  void SetImageRegion(const RegionType imageRegion);
 
   /** \brief Set planar figure describing the region for which to calculate
    * the histogram. */
-  itkSetConstObjectMacro( PlanarFigure, mitk::PlanarFigure  );
-
+  void SetPlanarFigure(const mitk::PlanarFigure* planarFigure);
 
   /** \brief Set/Get operation mode for Histogram */
-  itkSetMacro( HistogramMode, unsigned int );
+  void SetHistogramMode(unsigned int histogramMode);
   
   /** \brief Set/Get operation mode for Histogram */
-  itkGetMacro( HistogramMode, unsigned int );
+  unsigned int GetHistogramMode();
 
   /** \brief Set/Get operation mode for Histogram */
   void SetHistogramModeToDirectHistogram();

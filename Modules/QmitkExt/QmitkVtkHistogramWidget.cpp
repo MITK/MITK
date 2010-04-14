@@ -97,7 +97,6 @@ void QmitkVtkHistogramWidget::SetHistogramModeToDirectHistogram()
   if ( m_HistogramMode != HISTOGRAM_MODE_DIRECT )
   {
     m_HistogramMode = HISTOGRAM_MODE_DIRECT;
-    this->Modified();
   }
 }
 
@@ -107,7 +106,6 @@ void QmitkVtkHistogramWidget::SetHistogramModeToEntireImage()
   if ( m_HistogramMode != HISTOGRAM_MODE_ENTIREIMAGE )
   {
     m_HistogramMode = HISTOGRAM_MODE_ENTIREIMAGE;
-    this->Modified();
   }
 }
 
@@ -117,7 +115,6 @@ void QmitkVtkHistogramWidget::SetHistogramModeToMaskedImage()
   if ( m_HistogramMode != HISTOGRAM_MODE_MASKEDIMAGE )
   {
     m_HistogramMode = HISTOGRAM_MODE_MASKEDIMAGE;
-    this->Modified();
   }
 }
 
@@ -127,7 +124,6 @@ void QmitkVtkHistogramWidget::SetHistogramModeToImageRegion()
   if ( m_HistogramMode != HISTOGRAM_MODE_IMAGEREGION )
   {
     m_HistogramMode = HISTOGRAM_MODE_IMAGEREGION;
-    this->Modified();
   }
 }
 
@@ -136,7 +132,6 @@ void QmitkVtkHistogramWidget::SetHistogramModeToPlanarFigureRegion()
   if ( m_HistogramMode != HISTOGRAM_MODE_PLANARFIGUREREGION )
   {
     m_HistogramMode = HISTOGRAM_MODE_PLANARFIGUREREGION;
-    this->Modified();
   }
 }
 
@@ -245,4 +240,39 @@ void QmitkVtkHistogramWidget::ComputeHistogram()
       break;
     }
   }
+}
+
+void QmitkVtkHistogramWidget::SetHistogram(const HistogramType* histogram )
+{
+  m_Histogram = histogram;
+}
+
+void QmitkVtkHistogramWidget::SetImage(const mitk::Image* image )
+{
+  m_Image = image;
+}
+
+void QmitkVtkHistogramWidget::SetImageMask(const mitk::Image* imageMask )
+{
+  m_ImageMask = imageMask;
+}
+
+void QmitkVtkHistogramWidget::SetImageRegion( const RegionType imageRegion )
+{
+  m_ImageRegion = imageRegion;
+}
+
+void QmitkVtkHistogramWidget::SetPlanarFigure(const mitk::PlanarFigure* planarFigure )
+{
+  m_PlanarFigure = planarFigure;
+}
+
+void QmitkVtkHistogramWidget::SetHistogramMode( unsigned int histogramMode )
+{
+  m_HistogramMode = histogramMode;
+}
+
+unsigned int QmitkVtkHistogramWidget::GetHistogramMode()
+{
+  return m_HistogramMode;
 }

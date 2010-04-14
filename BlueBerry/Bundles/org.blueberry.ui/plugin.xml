@@ -53,18 +53,15 @@
          point="org.blueberry.ui.views">
       <category
             name="General"
-            id="org.blueberry.ui">
-      </category>
+            id="org.blueberry.ui"/>
       <view
             class="berry::ViewIntroAdapterPart"
             category="org.blueberry.ui"
             name="Welcome"
-            id="org.blueberry.ui.internal.introview">
-      </view>
+            id="org.blueberry.ui.internal.introview"/>
       <stickyView
-      		location="RIGHT"
-            id="org.blueberry.ui.internal.introview">
-      </stickyView>
+      		  location="RIGHT"
+            id="org.blueberry.ui.internal.introview"/>
    </extension>
    
    <extension

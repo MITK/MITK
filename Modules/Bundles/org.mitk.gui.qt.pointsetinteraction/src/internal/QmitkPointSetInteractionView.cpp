@@ -100,9 +100,6 @@ void QmitkPointSetInteractionView::OnAddPointSetClicked()
 
 void QmitkPointSetInteractionView::OnSelectionChanged(std::vector<mitk::DataNode*> nodes)
 {
-  if(!this->IsActivated())
-    return;
-
   mitk::DataNode* selectedNode = 0;
   if(nodes.size() > 0)
     selectedNode = nodes.front();
@@ -117,7 +114,7 @@ void QmitkPointSetInteractionView::OnSelectionChanged(std::vector<mitk::DataNode
   //  m_SelectedPointSetInteractor = NULL;
   //}
 
-  if (pointSet)
+  if (pointSet && this->IsActivated())
   {
     m_SelectedPointSetNode = selectedNode;
     m_Controls->m_CurrentPointSetLabel->setText(QString::fromStdString(selectedNode->GetName()));

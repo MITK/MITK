@@ -129,9 +129,6 @@ void QmitkSimpleMeasurement::CreateQtPartControl( QWidget* parent )
 
 void QmitkSimpleMeasurement::OnSelectionChanged( std::vector<mitk::DataNode*> nodes )
 {
-  if(!this->IsActivated())
-    return;
-
   mitk::DataNode* selectedNode = 0;
   if(nodes.size() > 0)
     selectedNode = nodes.front();
@@ -158,8 +155,8 @@ void QmitkSimpleMeasurement::OnSelectionChanged( std::vector<mitk::DataNode*> no
      pointsetCreatedByThis = true;
   }
 
-  // do nothing if it was not created by us or it is no pointset node
-  if(pointsetCreatedByThis)
+  // do nothing if it was not created by us or it is no pointset node or we are not activated
+  if(pointsetCreatedByThis && this->IsActivated())
   {
     // otherwise: set text and add interactor for the pointset
     m_Controls->selectedPointSet->setText( QString::fromStdString(selectedNode->GetName()) );

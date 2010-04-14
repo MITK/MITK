@@ -207,7 +207,10 @@ void mitk::CoreExtObjectFactory::SetDefaultProperties(mitk::DataNode* node)
     mitk::GPUVolumeMapper3D::SetDefaultProperties(node);
   }
 
-
+  if (dynamic_cast<mitk::UnstructuredGrid*>(node->GetData()))
+  {
+    mitk::UnstructuredGridVtkMapper3D::SetDefaultProperties(node);
+  }
   
 }
 

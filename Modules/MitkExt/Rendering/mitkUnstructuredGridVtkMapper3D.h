@@ -56,7 +56,10 @@ public:
   virtual const mitk::UnstructuredGrid* GetInput();
 
   virtual vtkProp* GetVtkProp(mitk::BaseRenderer* renderer);
+
+  static void SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer = NULL, bool overwrite = false);
   
+  void ApplyProperties(vtkActor* actor, mitk::BaseRenderer* renderer);
 
 protected:
   

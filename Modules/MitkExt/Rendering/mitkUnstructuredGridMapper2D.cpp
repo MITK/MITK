@@ -30,32 +30,25 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkAbstractTransformGeometry.h"
 #include "mitkBaseVtkMapper3D.h"
 
-#include "vtkPointSetSlicer.h"
-
-#include <vtkPointSet.h>
-#include <vtkPointSetSource.h>
-#include <vtkPolyData.h>
+#include <vtkPointSetSlicer.h>
 #include <vtkUnstructuredGrid.h>
 #include <vtkPlane.h>
-#include <vtkPoints.h>
 #include <vtkCellArray.h>
 #include <vtkLookupTable.h>
 #include <vtkPointData.h>
 #include <vtkCellData.h>
-#include <vtkDataArray.h>
 #include <vtkLinearTransform.h>
-#include <vtkActor.h>
 #include <vtkVolume.h>
 #include <vtkAssembly.h>
 #include <vtkVolumeProperty.h>
 #include <vtkAbstractMapper3D.h>
-#include <vtkMapper.h>
 #include <vtkAbstractVolumeMapper.h>
 #include <vtkScalarsToColors.h>
 #include <vtkPiecewiseFunction.h>
 #include <vtkColorTransferFunction.h>
+#include <vtkProp3DCollection.h>
 
-#include <itkProcessObject.h>
+// #include <itkProcessObject.h>
 
 void mitk::UnstructuredGridMapper2D::GenerateData()
 {
@@ -234,7 +227,7 @@ void mitk::UnstructuredGridMapper2D::Paint( mitk::BaseRenderer* renderer )
     vlines->GetNextCell( cellSize, cell );
 
     float rgba[4] = {1.0f, 1.0f, 1.0f, 0};
-    if (m_ScalarVisibility->GetValue())
+    if (m_ScalarVisibility->GetValue() && vcellscalars)
     {
       if ( m_ScalarMode->GetVtkScalarMode() == VTK_SCALAR_MODE_DEFAULT ||
            m_ScalarMode->GetVtkScalarMode() == VTK_SCALAR_MODE_USE_CELL_DATA )
@@ -298,7 +291,7 @@ void mitk::UnstructuredGridMapper2D::Paint( mitk::BaseRenderer* renderer )
     vpolys->GetNextCell( cellSize, cell );
 
     float rgba[4] = {1.0f, 1.0f, 1.0f, 0};
-    if (m_ScalarVisibility->GetValue())
+    if (m_ScalarVisibility->GetValue() && vcellscalars)
     {
       if ( m_ScalarMode->GetVtkScalarMode() == VTK_SCALAR_MODE_DEFAULT ||
             m_ScalarMode->GetVtkScalarMode() == VTK_SCALAR_MODE_USE_CELL_DATA )
@@ -397,13 +390,8 @@ void mitk::UnstructuredGridMapper2D::Paint( mitk::BaseRenderer* renderer )
 
 vtkAbstractMapper3D* 
 mitk::UnstructuredGridMapper2D
-::GetVtkAbstractMapper3D(mitk::BaseRenderer *  /*renderer*/)
+::GetVtkAbstractMapper3D(mitk::BaseRenderer *  renderer)
 {
-
-  return NULL;
-  
-  /*
-
   //MITK_INFO << "GETVTKABSTRACTMAPPER3D\n";
   mitk::DataNode::ConstPointer node = this->GetDataNode();
   if ( node.IsNull() )
@@ -417,20 +405,43 @@ mitk::UnstructuredGridMapper2D
 
   mitkMapper->Update(renderer);
 
-  vtkActor* actor = dynamic_cast<vtkActor*>( mitkMapper->GetVtkProp() );
-  if (actor)
+  vtkAssembly* assembly = dynamic_cast<vtkAssembly*>(mitkMapper->GetVtkProp(renderer));
+  if (assembly)
   {
-    return dynamic_cast<vtkAbstractMapper3D*>( actor->GetMapper() );
+	  vtkProp3DCollection* collection = assembly->GetParts();
+	  collection->InitTraversal();
+    vtkProp3D* prop3d = 0;
+	  do
+	  {
+	    prop3d = collection->GetNextProp3D();
+      vtkActor* actor = dynamic_cast<vtkActor*>( prop3d );
+      if (actor)
+      {
+        return dynamic_cast<vtkAbstractMapper3D*>( actor->GetMapper() );
+      }
+    
+      vtkVolume* volume = dynamic_cast<vtkVolume*>( prop3d );
+      if (volume)
+      {
+        return dynamic_cast<vtkAbstractMapper3D*>( volume->GetMapper() );
+      }
+    } while (prop3d != collection->GetLastProp3D());
   }
-  
-  vtkVolume* volume = dynamic_cast<vtkVolume*>( mitkMapper->GetVtkProp() );
-  if (volume)
+  else
   {
-    return dynamic_cast<vtkAbstractMapper3D*>( volume->GetMapper() );
+    vtkActor* actor = dynamic_cast<vtkActor*>( mitkMapper->GetVtkProp(renderer) );
+    if (actor)
+    {
+      return dynamic_cast<vtkAbstractMapper3D*>( actor->GetMapper() );
+    }
+    
+    vtkVolume* volume = dynamic_cast<vtkVolume*>( mitkMapper->GetVtkProp(renderer) );
+    if (volume)
+    {
+      return dynamic_cast<vtkAbstractMapper3D*>( volume->GetMapper() );
+    }
   }
-
   return 0;
-  */
 }
 
 

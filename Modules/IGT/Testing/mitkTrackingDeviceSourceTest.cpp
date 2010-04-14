@@ -91,6 +91,7 @@ int mitkTrackingDeviceSourceTest(int /* argc */, char* /*argv*/[])
   
   tracker = mitk::VirtualTrackingDevice::New();
   mySource->SetTrackingDevice(tracker);
+  mySource->Connect();
   mySource->StartTracking();
   MITK_TEST_CONDITION(watch->GetReferenceCount() == 0, "Testing if reference to previous tracker object is released");
 

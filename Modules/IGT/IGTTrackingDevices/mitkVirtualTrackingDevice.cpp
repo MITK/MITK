@@ -226,12 +226,15 @@ void mitk::VirtualTrackingDevice::TrackTools()
 {
   try
   {
-    /* lock the TrackingFinishedMutex to signal that the execution rights are now transfered to the tracking thread */
-    MutexLockHolder trackingFinishedLockHolder(*m_TrackingFinishedMutex); // keep lock until end of scope
     bool localStopTracking;       // Because m_StopTracking is used by two threads, access has to be guarded by a mutex. To minimize thread locking, a local copy is used here 
+
     this->m_StopTrackingMutex->Lock();  // update the local copy of m_StopTracking
     localStopTracking = this->m_StopTracking;
+
+    /* lock the TrackingFinishedMutex to signal that the execution rights are now transfered to the tracking thread */
+    if (!localStopTracking) MutexLockHolder trackingFinishedLockHolder(*m_TrackingFinishedMutex); // keep lock until end of scope
     this->m_StopTrackingMutex->Unlock();
+
     mitk::ScalarType t = 0.0;
     while ((this->GetState() == Tracking) && (localStopTracking == false))
     {
@@ -264,7 +267,7 @@ void mitk::VirtualTrackingDevice::TrackTools()
       }
       itksys::SystemTools::Delay(m_RefreshRate);
       /* Update the local copy of m_StopTracking */
-      this->m_StopTrackingMutex->Lock();  
+      this->m_StopTrackingMutex->Lock();
       localStopTracking = m_StopTracking;
       this->m_StopTrackingMutex->Unlock();
     } // tracking ends if we pass this line

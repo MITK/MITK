@@ -74,14 +74,6 @@ mitk::DiffusionImagingObjectFactory::DiffusionImagingObjectFactory(bool register
     alreadyDone = true;
   }
 
-  if (registerSelf) 
-  {
-    this->RegisterOverride("mitkCoreObjectFactoryBase",
-      "mitkDiffusionImagingObjectFactory",
-      "mitk Mapper Creation",
-      1,
-      itk::CreateObjectFunction<mitk::DiffusionImagingObjectFactory>::New());
-  }
 }
 
 mitk::Mapper::Pointer mitk::DiffusionImagingObjectFactory::CreateMapper(mitk::DataNode* node, MapperSlotId id) 
@@ -157,7 +149,8 @@ void RegisterDiffusionImagingObjectFactory()
   static bool oneDiffusionImagingObjectFactoryRegistered = false;
   if ( ! oneDiffusionImagingObjectFactoryRegistered ) {
     MITK_INFO << "Registering DiffusionImagingObjectFactory..." << std::endl;
-    itk::ObjectFactoryBase::RegisterFactory(mitk::DiffusionImagingObjectFactory::New());
+    mitk::CoreObjectFactory::GetInstance()->RegisterExtraFactory(mitk::DiffusionImagingObjectFactory::New());
+
     oneDiffusionImagingObjectFactoryRegistered = true;
   }
 }

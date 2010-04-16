@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkProperties.h"
 #include "mitkBaseRenderer.h"
 #include "mitkDataNode.h"
+#include "mitkCoreObjectFactory.h"
 
 #include "mitkParRecFileIOFactory.h"
 #include "mitkObjFileIOFactory.h"

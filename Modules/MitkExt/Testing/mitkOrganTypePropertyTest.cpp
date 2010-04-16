@@ -26,9 +26,6 @@ int mitkOrganTypePropertyTest(int /*argc*/, char* /*argv*/[])
   // one big variable to tell if anything went wrong
     unsigned int numberFailed(0);
  
-    std::cout << "Creating CoreObjectFactory" << std::endl;
-    itk::ObjectFactoryBase::RegisterFactory(mitk::CoreObjectFactory::New());
-
     std::cout << "Instantiation" << std::endl;
 
   // instantiation

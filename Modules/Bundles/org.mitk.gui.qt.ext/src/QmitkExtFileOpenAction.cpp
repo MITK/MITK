@@ -21,6 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QFileInfo>
 #include <mitkDataNodeFactory.h>
 
+#include "mitkCoreObjectFactory.h"
 #include "mitkSceneIO.h"
 #include "mitkProgressBar.h"
 

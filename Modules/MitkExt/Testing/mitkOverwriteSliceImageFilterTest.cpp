@@ -304,9 +304,6 @@ int mitkOverwriteSliceImageFilterTest(int argc, char* argv[])
       return EXIT_FAILURE;
     }
  
-    std::cout << "Creating CoreObjectFactory" << std::endl;
-    itk::ObjectFactoryBase::RegisterFactory(mitk::CoreObjectFactory::New());
-
   // load the image
 
     mitk::Image::Pointer image = NULL;

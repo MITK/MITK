@@ -17,6 +17,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkTestingMacros.h"
 #include "mitkCoreExtObjectFactory.h"
+#include "mitkCoreObjectFactory.h"
 
 int mitkCoreExtObjectFactoryTest(int /*argc*/, char* /*argv*/[])
 {

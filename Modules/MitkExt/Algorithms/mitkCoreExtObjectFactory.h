@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef COREEXTOBJECTFACTORY_H_INCLUDED
 #define COREEXTOBJECTFACTORY_H_INCLUDED
 
-#include "mitkCoreObjectFactory.h"
+#include "mitkCoreObjectFactoryBase.h"
 #include "MitkExtExports.h"
 
 namespace mitk {

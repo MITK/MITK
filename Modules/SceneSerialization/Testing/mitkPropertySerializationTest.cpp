@@ -80,9 +80,6 @@ int mitkPropertySerializationTest(int /* argc */, char* /*argv*/[])
 
   mitk::PropertyListSerializer::Pointer serializer = mitk::PropertyListSerializer::New(); // make sure something from the lib is actually used (registration of serializers/deserializers)
 
-  itk::ObjectFactoryBase::RegisterFactory(mitk::CoreObjectFactory::New());
-
-
   /* build list of properties that will be serialized and deserialized */
   mitk::PropertyList::Pointer propList = mitk::PropertyList::New();
   propList->SetProperty("bool", mitk::BoolProperty::New(true));

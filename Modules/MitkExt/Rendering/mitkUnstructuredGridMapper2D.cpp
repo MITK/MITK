@@ -48,7 +48,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkColorTransferFunction.h>
 #include <vtkProp3DCollection.h>
 
-// #include <itkProcessObject.h>
 
 void mitk::UnstructuredGridMapper2D::GenerateData()
 {
@@ -210,15 +209,23 @@ void mitk::UnstructuredGridMapper2D::Paint( mitk::BaseRenderer* renderer )
   vtkCellData *vcelldata = contour->GetCellData();
   vtkDataArray* vcellscalars = vcelldata->GetScalars();
 
-  int numberOfLines = contour->GetNumberOfLines();
-  int numberOfPolys = contour->GetNumberOfPolys();
+  const int numberOfLines = contour->GetNumberOfLines();
+  const int numberOfPolys = contour->GetNumberOfPolys();
+
+  const bool useCellData = m_ScalarMode->GetVtkScalarMode() == VTK_SCALAR_MODE_DEFAULT ||
+              m_ScalarMode->GetVtkScalarMode() == VTK_SCALAR_MODE_USE_CELL_DATA;
+  const bool usePointData = m_ScalarMode->GetVtkScalarMode() == VTK_SCALAR_MODE_USE_POINT_DATA;
 
   Point3D p;
-  Point2D p2d, last, first;
+  Point2D p2d;
 
   vlines->InitTraversal();
   vpolys->InitTraversal();
   
+  mitk::Color outlineColor = m_Color->GetColor();
+
+  glLineWidth((float)m_LineWidth->GetValue());
+
   for (int i = 0;i < numberOfLines;++i )
   {
     vtkIdType *cell(0);
@@ -226,11 +233,10 @@ void mitk::UnstructuredGridMapper2D::Paint( mitk::BaseRenderer* renderer )
 
     vlines->GetNextCell( cellSize, cell );
 
-    float rgba[4] = {1.0f, 1.0f, 1.0f, 0};
+    float rgba[4] = {outlineColor[0], outlineColor[1], outlineColor[2], 1.0f};
     if (m_ScalarVisibility->GetValue() && vcellscalars)
     {
-      if ( m_ScalarMode->GetVtkScalarMode() == VTK_SCALAR_MODE_DEFAULT ||
-           m_ScalarMode->GetVtkScalarMode() == VTK_SCALAR_MODE_USE_CELL_DATA )
+      if ( useCellData )
       {  // color each cell according to cell data
         double scalar = vcellscalars->GetComponent( i, 0 );
         double rgb[3] = { 1.0f, 1.0f, 1.0f };
@@ -240,7 +246,7 @@ void mitk::UnstructuredGridMapper2D::Paint( mitk::BaseRenderer* renderer )
         rgba[2] = (float)rgb[2];
         rgba[3] = (float)m_ScalarsToOpacity->GetValue(scalar);
       }
-      else if ( m_ScalarMode->GetVtkScalarMode() == VTK_SCALAR_MODE_USE_POINT_DATA )
+      else if ( usePointData )
       {
         double scalar = vscalars->GetComponent( i, 0 );
         double rgb[3] = { 1.0f, 1.0f, 1.0f };
@@ -254,7 +260,6 @@ void mitk::UnstructuredGridMapper2D::Paint( mitk::BaseRenderer* renderer )
     
     glColor4fv( rgba );
     
-
     glBegin ( GL_LINE_LOOP );
     for ( int j = 0;j < cellSize;++j )
     {
@@ -279,77 +284,24 @@ void mitk::UnstructuredGridMapper2D::Paint( mitk::BaseRenderer* renderer )
     glEnd ();
 
   }
-
-  glEnable(GL_BLEND);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   
-  for (int i = 0;i < numberOfPolys;++i )
+  bool polyOutline = m_Outline->GetValue();
+  bool scalarVisibility = m_ScalarVisibility->GetValue();
+
+  // only draw polygons if there are cell scalars
+  // or the outline property is set to true
+  if ((scalarVisibility && vcellscalars) || polyOutline)
   {
-    vtkIdType *cell(0);
-    vtkIdType cellSize(0);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-    vpolys->GetNextCell( cellSize, cell );
+    // cache the transformed points
+    // a fixed size array is way faster than 'new'
+    // slices through 3d cells usually do not generated
+    // polygons with more than 6 vertices
+    Point2D cachedPoints[10];
 
-    float rgba[4] = {1.0f, 1.0f, 1.0f, 0};
-    if (m_ScalarVisibility->GetValue() && vcellscalars)
-    {
-      if ( m_ScalarMode->GetVtkScalarMode() == VTK_SCALAR_MODE_DEFAULT ||
-            m_ScalarMode->GetVtkScalarMode() == VTK_SCALAR_MODE_USE_CELL_DATA )
-      {  // color each cell according to cell data
-        double scalar = vcellscalars->GetComponent( i, 0 );
-        double rgb[3] = { 1.0f, 1.0f, 1.0f };
-        m_ScalarsToColors->GetColor(scalar, rgb);
-        rgba[0] = (float)rgb[0];
-        rgba[1] = (float)rgb[1];
-        rgba[2] = (float)rgb[2];
-        rgba[3] = (float)m_ScalarsToOpacity->GetValue(scalar);
-      }
-      else if (m_ScalarMode->GetVtkScalarMode() == VTK_SCALAR_MODE_USE_POINT_DATA )
-      {
-        double scalar = vscalars->GetComponent( i, 0 );
-        double rgb[3] = { 1.0f, 1.0f, 1.0f };
-        m_ScalarsToColors->GetColor(scalar, rgb);
-        rgba[0] = (float)rgb[0];
-        rgba[1] = (float)rgb[1];
-        rgba[2] = (float)rgb[2];
-        rgba[3] = (float)m_ScalarsToOpacity->GetValue(scalar);
-        glColor4fv( rgba );
-      }
-    }
-    glColor4fv( rgba );
-
-    //Point2D points[cellSize];
-    glBegin( GL_POLYGON );
-    for (int j = 0; j < cellSize; ++j)
-    {
-      vpoints->GetPoint( cell[ j ], vp );
-      //take transformation via vtktransform into account
-      vtktransform->TransformPoint( vp, vp );
-
-      vtk2itk( vp, p );
-
-      //convert 3D point (in mm) to 2D point on slice (also in mm)
-      worldGeometry->Map( p, p2d );
-
-      //convert point (until now mm and in worldcoordinates) to display coordinates (units )
-      displayGeometry->WorldToDisplay( p2d, p2d );
-
-      //convert display coordinates ( (0,0) is top-left ) in GL coordinates ( (0,0) is bottom-left )
-      //p2d[1]=toGL-p2d[1];
-
-      //add the current vertex to the line
-      glVertex2f( p2d[0], p2d[1] );
-    }
-    glEnd();
-  }
-  glDisable(GL_BLEND);
-  
-  if (m_Outline->GetValue())
-  {
-    vpolys->InitTraversal();
-    mitk::Color  color = m_Color->GetColor();
-    glColor4f(color[0], color[1], color[2], 1.0f);
-    glLineWidth((float)m_LineWidth->GetValue());
     for (int i = 0;i < numberOfPolys;++i )
     {
       vtkIdType *cell(0);
@@ -357,10 +309,33 @@ void mitk::UnstructuredGridMapper2D::Paint( mitk::BaseRenderer* renderer )
 
       vpolys->GetNextCell( cellSize, cell );
 
-      //Point2D points[cellSize];
-      glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+      float rgba[4] = {1.0f, 1.0f, 1.0f, 0};
+      if (scalarVisibility && vcellscalars)
+      {
+        if ( useCellData )
+        {  // color each cell according to cell data
+          double scalar = vcellscalars->GetComponent( i, 0 );
+          double rgb[3] = { 1.0f, 1.0f, 1.0f };
+          m_ScalarsToColors->GetColor(scalar, rgb);
+          rgba[0] = (float)rgb[0];
+          rgba[1] = (float)rgb[1];
+          rgba[2] = (float)rgb[2];
+          rgba[3] = (float)m_ScalarsToOpacity->GetValue(scalar);
+        }
+        else if ( usePointData )
+        {
+          double scalar = vscalars->GetComponent( i, 0 );
+          double rgb[3] = { 1.0f, 1.0f, 1.0f };
+          m_ScalarsToColors->GetColor(scalar, rgb);
+          rgba[0] = (float)rgb[0];
+          rgba[1] = (float)rgb[1];
+          rgba[2] = (float)rgb[2];
+          rgba[3] = (float)m_ScalarsToOpacity->GetValue(scalar);
+        }
+      }
+      glColor4fv( rgba );
+
       glBegin( GL_POLYGON );
-      //glPolygonOffset(1.0, 1.0);
       for (int j = 0; j < cellSize; ++j)
       {
         vpoints->GetPoint( cell[ j ], vp );
@@ -378,12 +353,30 @@ void mitk::UnstructuredGridMapper2D::Paint( mitk::BaseRenderer* renderer )
         //convert display coordinates ( (0,0) is top-left ) in GL coordinates ( (0,0) is bottom-left )
         //p2d[1]=toGL-p2d[1];
 
+        cachedPoints[j][0] = p2d[0];
+        cachedPoints[j][1] = p2d[1];
+
         //add the current vertex to the line
         glVertex2f( p2d[0], p2d[1] );
       }
       glEnd();
-      glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+      if (polyOutline)
+      {
+        glColor4f(outlineColor[0], outlineColor[1], outlineColor[2], 1.0f);
+
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        glBegin( GL_POLYGON );
+        //glPolygonOffset(1.0, 1.0);
+        for (int j = 0; j < cellSize; ++j)
+        {
+          //add the current vertex to the line
+          glVertex2f( cachedPoints[j][0], cachedPoints[j][1] );
+        }
+        glEnd();
+      }
     }
+    glDisable(GL_BLEND);
   }
 }
 

@@ -201,24 +201,6 @@ void mitk::UnstructuredGridVtkMapper3D::ApplyProperties(vtkActor* actor, mitk::B
   mitk::SurfaceVtkMapper3D::ApplyMitkPropertiesToVtkProperty(node,property,renderer);
 
   mitk::SurfaceVtkMapper3D::ApplyMitkPropertiesToVtkProperty(node,m_ActorWireframe->GetProperty(),renderer);
- /* mitk::MaterialProperty::Pointer materialProperty;
-  if (node->GetProperty(materialProperty, "material"))
-  {
-    if ( materialProperty->GetRenderer() == 0 || materialProperty->GetRenderer() == renderer )
-    {
-      property->SetColor( materialProperty->GetColor().GetDataPointer() );
-      property->SetAmbientColor( materialProperty->GetColor().GetDataPointer() );
-      property->SetAmbient( materialProperty->GetColorCoefficient() );
-      property->SetDiffuseColor(materialProperty->GetColor().GetDataPointer() );
-      property->SetDiffuse( materialProperty->GetColorCoefficient() );
-      property->SetSpecularColor( materialProperty->GetSpecularColor().GetDataPointer() );
-      property->SetSpecular( materialProperty->GetSpecularCoefficient() );
-      property->SetSpecularPower( materialProperty->GetSpecularPower() );
-      property->SetOpacity( materialProperty->GetOpacity() );
-      property->SetInterpolation( materialProperty->GetVtkInterpolation() );
-      property->SetRepresentation( materialProperty->GetVtkRepresentation() );
-    }
-  }*/
 
   mitk::TransferFunctionProperty::Pointer transferFuncProp;
   if (node->GetProperty(transferFuncProp, "TransferFunction", renderer))
@@ -352,10 +334,17 @@ void mitk::UnstructuredGridVtkMapper3D::ApplyProperties(vtkActor* actor, mitk::B
 
 void mitk::UnstructuredGridVtkMapper3D::SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite)
 {
-  //node->AddProperty("material", MaterialProperty::New(), renderer, overwrite);
+
+  SurfaceVtkMapper3D::SetDefaultPropertiesForVtkProperty(node, renderer, overwrite);
+
   //node->AddProperty("TransferFunction", TransferFunctionProperty::New(), renderer, overwrite);
   node->AddProperty("grid representation", GridRepresentationProperty::New(), renderer, overwrite);
   node->AddProperty("grid volume mapper", GridVolumeMapperProperty::New(), renderer, overwrite);
+  node->AddProperty("scalar mode", VtkScalarModeProperty::New(0), renderer, overwrite);
+  node->AddProperty("scalar visibility", BoolProperty::New(true), renderer, overwrite);
+  node->AddProperty("outline polygons", BoolProperty::New(false), renderer, overwrite);
+  node->AddProperty("color", ColorProperty::New(1.0f, 1.0f, 1.0f), renderer, overwrite);
+  node->AddProperty("line width", IntProperty::New(1), renderer, overwrite);
 
   Superclass::SetDefaultProperties(node, renderer, overwrite);
 }

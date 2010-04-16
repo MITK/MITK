@@ -2,6 +2,7 @@ SET(MODULE_TESTS
   mitkAutoCropImageFilterTest.cpp
   mitkContourMapper2DTest.cpp
   mitkContourTest.cpp
+  mitkCoreExtObjectFactoryTest
   mitkDataNodeExtTest.cpp
   mitkExternalToolsTest.cpp
   mitkMeshTest.cpp

@@ -93,7 +93,7 @@ void QmitkExtFileOpenAction::Run()
   //dialog.setFilters(filters);
 
   std::stringstream ss;
-  ss << mitk::CoreExtObjectFactory::GetInstance()->GetFileExtensions();
+  ss << mitk::CoreObjectFactory::GetInstance()->GetFileExtensions();
 
   std::string fileExtensions = ss.str();
   fileExtensions.append(";; MITK Scene Files (*.mitk)");

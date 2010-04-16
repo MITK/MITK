@@ -609,7 +609,8 @@ protected:
   static const std::string INDEX_TO_WORLD_TRANSFORM;
 
 private:
-  TransformType::Pointer m_IndexToWorldBaseTransform;
+  mutable TransformType::Pointer m_InvertedTransform;
+  mutable unsigned long m_IndexToWorldTransformLastModified;
   QuaternionTransformType::Pointer m_IndexToWorldRotationTransform;
 
   VnlQuaternionType m_RotationQuaternion;

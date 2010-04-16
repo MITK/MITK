@@ -29,7 +29,7 @@ PURPOSE.  See the above copyright notices for more information.
 // Standard constructor for the New() macro. Sets the geometry to 3 dimensions
 mitk::Geometry3D::Geometry3D()
   : m_ParametricBoundingBox(NULL),
-    m_ImageGeometry(false), m_Valid(true), m_FrameOfReferenceID(0)
+    m_ImageGeometry(false), m_Valid(true), m_FrameOfReferenceID(0), m_IndexToWorldTransformLastModified(0)
 {
   FillVector3D(m_FloatSpacing, 1,1,1);
   m_VtkMatrix = vtkMatrix4x4::New();
@@ -339,14 +339,18 @@ void mitk::Geometry3D::BackTransform(const mitk::Point3D &in, mitk::Point3D& out
   }
 
   // Get WorldToIndex transform
-  TransformType::Pointer invertedTransform = TransformType::New();
-  if (!m_IndexToWorldTransform->GetInverse( invertedTransform.GetPointer() ))
+  if (m_IndexToWorldTransformLastModified != m_IndexToWorldTransform->GetMTime())
   {
-    itkExceptionMacro( "Internal ITK matrix inversion error, cannot proceed." );
+    m_InvertedTransform = TransformType::New();
+    if (!m_IndexToWorldTransform->GetInverse( m_InvertedTransform.GetPointer() ))
+    {
+      itkExceptionMacro( "Internal ITK matrix inversion error, cannot proceed." );
+    }
+    m_IndexToWorldTransformLastModified = m_IndexToWorldTransform->GetMTime();
   }
 
   // Check for valid matrix inversion
-  const TransformType::MatrixType& inverse = invertedTransform->GetMatrix();
+  const TransformType::MatrixType& inverse = m_InvertedTransform->GetMatrix();
   if(inverse.GetVnlMatrix().has_nans())
   {
     itkExceptionMacro( "Internal ITK matrix inversion error, cannot proceed. Matrix was: " << std::endl 
@@ -377,14 +381,18 @@ void mitk::Geometry3D::BackTransform(const mitk::Point3D &in, mitk::Point3D& out
 void mitk::Geometry3D::BackTransform(const mitk::Point3D &/*at*/, const mitk::Vector3D &in, mitk::Vector3D& out) const
 {
   // Get WorldToIndex transform
-  TransformType::Pointer invertedTransform = TransformType::New();
-  if (!m_IndexToWorldTransform->GetInverse( invertedTransform.GetPointer() ))
+  if (m_IndexToWorldTransformLastModified != m_IndexToWorldTransform->GetMTime())
   {
-    itkExceptionMacro( "Internal ITK matrix inversion error, cannot proceed." );
+    m_InvertedTransform = TransformType::New();
+    if (!m_IndexToWorldTransform->GetInverse( m_InvertedTransform.GetPointer() ))
+    {
+      itkExceptionMacro( "Internal ITK matrix inversion error, cannot proceed." );
+    }
+    m_IndexToWorldTransformLastModified = m_IndexToWorldTransform->GetMTime();
   }
 
   // Check for valid matrix inversion
-  const TransformType::MatrixType& inverse = invertedTransform->GetMatrix();
+  const TransformType::MatrixType& inverse = m_InvertedTransform->GetMatrix();
   if(inverse.GetVnlMatrix().has_nans())
   {
     itkExceptionMacro( "Internal ITK matrix inversion error, cannot proceed. Matrix was: " << std::endl 

@@ -18,6 +18,12 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef COREOBJECTFACTORYBASE_H_INCLUDED
 #define COREOBJECTFACTORYBASE_H_INCLUDED
 
+// the mbilog header is necessary for CMake test drivers.
+// Since the EXTRA_INCLUDE parameter of CREATE_TEST_SOURCELIST only
+// allows one extra include file, we specify mitkLog.h here so it will
+// be available to all classes implementing this interface.
+#include "mitkLog.h"
+
 #include "mitkMapper.h"
 #include <itkObjectFactoryBase.h>
 #include <itkVersion.h>
@@ -32,11 +38,11 @@ class DataNode;
 //## This interface can be implemented by factories which add new mapper classes or extend the
 //## data tree deserialization mechanism.
 
-class CoreObjectFactoryBase : public itk::ObjectFactoryBase
+class CoreObjectFactoryBase : public itk::Object
 {
   public:
     typedef std::list<mitk::FileWriterWithInformation::Pointer> FileWriterList;
-    mitkClassMacro(CoreObjectFactoryBase,itk::ObjectFactoryBase);
+    mitkClassMacro(CoreObjectFactoryBase,itk::Object);
     virtual Mapper::Pointer CreateMapper(mitk::DataNode* node, MapperSlotId slotId) = 0;
     virtual void SetDefaultProperties(mitk::DataNode* node) = 0;
     virtual const char* GetFileExtensions() = 0;
@@ -55,30 +61,5 @@ class CoreObjectFactoryBase : public itk::ObjectFactoryBase
   protected:
      FileWriterList m_FileWriters;
 };
-
-template <class T>
-class CreateOverrideObjectFunction : public itk::CreateObjectFunctionBase
-{
-public:
-  /** Standard class typedefs. */
-  typedef CreateOverrideObjectFunction  Self;
-  typedef itk::SmartPointer<Self>    Pointer;
-    
-  /** Methods from itk:LightObject. */
-  itkFactorylessNewMacro(Self);
-  LightObject::Pointer CreateObject() { typename T::Pointer p = T::New(); 
-    p->Register();
-    return p.GetPointer(); 
-  }
-
-protected:
-  CreateOverrideObjectFunction() {}
-  ~CreateOverrideObjectFunction() {}
-  
-private:
-  CreateOverrideObjectFunction(const Self&); //purposely not implemented
-  void operator=(const Self&); //purposely not implemented
-};
-
 }
 #endif

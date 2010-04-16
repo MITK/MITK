@@ -100,6 +100,8 @@ namespace mbilog {
 
     private:
 
+      static void AppendTimeStamp(std::ostream& out);
+
       bool useFullOutput;
 
   };

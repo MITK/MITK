@@ -85,6 +85,14 @@ void mbilog::BackendCout::ProcessMessage(const mbilog::LogMessage& l)
     FormatSmart(l);
 }
 
+void mbilog::BackendCout::AppendTimeStamp(std::ostream& out)
+{
+  time_t rawtime = time(NULL);
+  std::string timestring( ctime(&rawtime) );
+  timestring.replace( timestring.length() -1, 1," "); // replace \n by " " (separates date/time from following output of relative time since start)
+  out << timestring;
+}
+
 void mbilog::BackendCout::FormatSmart(std::ostream &out, const LogMessage &l,int /*threadID*/)
 {
   char c_open='[';
@@ -116,15 +124,14 @@ void mbilog::BackendCout::FormatSmart(std::ostream &out, const LogMessage &l,int
       break;
   }
 
+  out << c_open;
+
   if(!g_init)
   {
-    time_t rawtime;
-    time ( &rawtime );
-    std::cout << ctime(&rawtime) << std::flush;
+    AppendTimeStamp(out);
   }
 
-
-  out << std::fixed << std::setprecision(3) << ((double)std::clock())/CLOCKS_PER_SEC << " ";
+  out << std::fixed << std::setprecision(3) << ((double)std::clock())/CLOCKS_PER_SEC;
 
   out << c_close << " ";
   
@@ -673,9 +680,7 @@ static void FormatSmartWindows(const mbilog::LogMessage &l,int /*threadID*/)
 
     // Give out start time
     ChangeColor( colorTime );
-    time_t rawtime;
-    time ( &rawtime );
-    std::cout << ctime(&rawtime) << std::flush;
+    AppendTimeStamp(std::out)
   }
   
   switch(l.level)

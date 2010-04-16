@@ -94,7 +94,6 @@ namespace mitk {
  */
 class MITK_CORE_EXPORT ImageMapper2D : public GLMapper2D
 {
-  friend class CoreObjectFactory;
 
 public:
   

@@ -50,7 +50,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 int mitk::ImageMapper2D::numRenderer = 0;
 
-
 mitk::ImageMapper2D::ImageMapper2D()
 {
 }

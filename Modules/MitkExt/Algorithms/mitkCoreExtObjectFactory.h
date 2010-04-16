@@ -23,19 +23,18 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
 
-class MitkExt_EXPORT CoreExtObjectFactory : public CoreObjectFactory
+class MitkExt_EXPORT CoreExtObjectFactory : public CoreObjectFactoryBase
 {
   public:
-    mitkClassMacro(CoreExtObjectFactory,CoreObjectFactory);
+    mitkClassMacro(CoreExtObjectFactory,CoreObjectFactoryBase);
     itkNewMacro(CoreExtObjectFactory);
     virtual Mapper::Pointer CreateMapper(mitk::DataNode* node, MapperSlotId slotId);
     virtual void SetDefaultProperties(mitk::DataNode* node);
     virtual const char* GetFileExtensions();
     virtual const char* GetSaveFileExtensions();
-    virtual itk::Object::Pointer CreateCoreObject( const std::string& className );
     void RegisterIOFactories();
   protected:
-    CoreExtObjectFactory(bool registerSelf = true); 
+    CoreExtObjectFactory(); 
 };
 
 }

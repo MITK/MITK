@@ -84,16 +84,6 @@ mitk::DiffusionImagingObjectFactory::DiffusionImagingObjectFactory(bool register
   }
 }
 
-#define CREATE_CPP( TYPE, NAME ) else if ( className == NAME ) {pointer = new TYPE(); pointer->Register();}
-#define CREATE_ITK( TYPE, NAME ) else if ( className == NAME ) pointer = TYPE::New();
-
-itk::Object::Pointer mitk::DiffusionImagingObjectFactory::CreateCoreObject( const std::string&  /*className*/ )
-{
-  itk::Object::Pointer pointer;
-  return pointer;
-}
-
-
 mitk::Mapper::Pointer mitk::DiffusionImagingObjectFactory::CreateMapper(mitk::DataNode* node, MapperSlotId id) 
 {
   mitk::Mapper::Pointer newMapper=NULL;
@@ -164,7 +154,7 @@ void mitk::DiffusionImagingObjectFactory::RegisterIOFactories()
 
 void RegisterDiffusionImagingObjectFactory() 
 {
-  bool oneDiffusionImagingObjectFactoryRegistered = false;
+  static bool oneDiffusionImagingObjectFactoryRegistered = false;
   if ( ! oneDiffusionImagingObjectFactoryRegistered ) {
     MITK_INFO << "Registering DiffusionImagingObjectFactory..." << std::endl;
     itk::ObjectFactoryBase::RegisterFactory(mitk::DiffusionImagingObjectFactory::New());

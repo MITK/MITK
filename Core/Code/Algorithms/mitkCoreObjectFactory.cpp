@@ -67,94 +67,18 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkPointSetWriterFactory.h"
 #include "mitkSurfaceVtkWriterFactory.h"
 
-#define CREATE_CPP( TYPE, NAME ) else if ( className == NAME ) {pointer = new TYPE(); pointer->Register();}
-#define CREATE_ITK( TYPE, NAME ) else if ( className == NAME ) pointer = TYPE::New();
-
 mitk::CoreObjectFactory::FileWriterList mitk::CoreObjectFactory::m_FileWriters;
 
-itk::Object::Pointer mitk::CoreObjectFactory::CreateCoreObject( const std::string& className )
-{
-  itk::Object::Pointer pointer;
-
-  if ( className == "" )
-    return NULL;
-
-    CREATE_ITK( BoolProperty, "BoolProperty" )
-    CREATE_ITK( IntProperty, "IntProperty" )
-    CREATE_ITK( FloatProperty, "FloatProperty" )
-    CREATE_ITK( DoubleProperty, "DoubleProperty" )
-    CREATE_ITK( Vector3DProperty, "Vector3DProperty" )
-    CREATE_ITK( Point3dProperty, "Point3dProperty" )
-    CREATE_ITK( Point4dProperty, "Point4dProperty" )
-    CREATE_ITK( Point3iProperty, "Point3iProperty" )
-    CREATE_ITK( BoolProperty, "BoolProperty" )
-    CREATE_ITK( ColorProperty, "ColorProperty" )
-    CREATE_ITK( LevelWindowProperty, "LevelWindowProperty" )
-    CREATE_ITK( LookupTableProperty, "LookupTableProperty" )
-    CREATE_ITK( StringProperty, "StringProperty" )
-    CREATE_ITK( SmartPointerProperty, "SmartPointerProperty" )
-    CREATE_ITK( TransferFunctionProperty, "TransferFunctionProperty" )
-    CREATE_ITK( EnumerationProperty, "EnumerationProperty" )
-    CREATE_ITK( VtkInterpolationProperty, "VtkInterpolationProperty" )
-    CREATE_ITK( VtkRepresentationProperty, "VtkRepresentationProperty" )
-    CREATE_ITK( VtkResliceInterpolationProperty, "VtkResliceInterpolationProperty" )
-    CREATE_ITK( GeometryData, "GeometryData" )
-    CREATE_ITK( Surface, "Surface" )
-    CREATE_ITK( Image, "Image" )
-    CREATE_ITK( Geometry3D, "Geometry3D" )
-    CREATE_ITK( TimeSlicedGeometry, "TimeSlicedGeometry" )
-    CREATE_ITK( Surface, "Surface" )
-    CREATE_ITK( PointSet, "PointSet" )
-    CREATE_ITK( SlicedGeometry3D, "SlicedGeometry3D" )
-    CREATE_ITK( PlaneGeometry, "PlaneGeometry" )
-    CREATE_ITK( PropertyList, "PropertyList" )
-    CREATE_ITK( SurfaceMapper2D, "SurfaceMapper2D" )
-    CREATE_ITK( SurfaceVtkMapper3D, "SurfaceVtkMapper3D" )
-    CREATE_ITK( ImageMapper2D, "ImageMapper2D" )
-    CREATE_ITK( VolumeDataVtkMapper3D, "VolumeDataVtkMapper3D" )
-    CREATE_ITK( LookupTable, "LookupTable" )
-    CREATE_ITK( PointSetMapper2D, "PointSetMapper2D" )
-    CREATE_ITK( PointSetVtkMapper3D, "PointSetVtkMapper3D" )
-
-  else
-    MITK_ERROR << "ObjectFactory::CreateObject: unknown class: " << className << std::endl;
-
-  return pointer;
-}
-void mitk::CoreObjectFactory::RegisterExtraFactory(CoreObjectFactoryBase::Pointer factory) {
-  MITK_INFO << "Registering extra factory: " << factory->GetNameOfClass();
-  m_ExtraFactories.push_back(factory);  
+void mitk::CoreObjectFactory::RegisterExtraFactory(CoreObjectFactoryBase* factory) {
+  MITK_INFO << "CoreObjectFactory: registering extra factory of type " << factory->GetNameOfClass();
+  m_ExtraFactories.push_back(CoreObjectFactoryBase::Pointer(factory));  
 }
 
 mitk::CoreObjectFactory::Pointer mitk::CoreObjectFactory::GetInstance() {
   static mitk::CoreObjectFactory::Pointer instance;
-  if (instance.IsNull()) {
-    std::list<itk::LightObject::Pointer> allobjects = itk::ObjectFactoryBase::CreateAllInstance("mitkCoreObjectFactoryBase");
-    std::list<itk::LightObject::Pointer>::iterator factoryIt = allobjects.begin();
-    while (instance.IsNull() && factoryIt != allobjects.end() ) {
-      if (std::string("SBCoreObjectFactory") == (*factoryIt)->GetNameOfClass() ) {
-        instance = dynamic_cast<mitk::CoreObjectFactory*>(factoryIt->GetPointer());
-      }
-      ++factoryIt;
-    }
-    factoryIt = allobjects.begin();
-    while (instance.IsNull() && factoryIt != allobjects.end() ) {
-      if ( std::string("QMCoreObjectFactory") == (*factoryIt)->GetNameOfClass() ) {
-        instance = dynamic_cast<mitk::CoreObjectFactory*>(factoryIt->GetPointer());
-      }
-      ++factoryIt;
-    }
-    factoryIt = allobjects.begin();
-    while (instance.IsNull() && factoryIt != allobjects.end() ) {
-      if (std::string("CoreExtObjectFactory") == (*factoryIt)->GetNameOfClass() ) {
-        instance = dynamic_cast<mitk::CoreObjectFactory*>(factoryIt->GetPointer());
-      }
-      ++factoryIt;
-    }
-    if (instance.IsNull()) {
-      instance = mitk::CoreObjectFactory::New();
-    }
-    MITK_INFO << "CoreObjectFactory: created instance of " << instance->GetNameOfClass() << std::endl;
+  if (instance.IsNull()) 
+  {
+     instance = mitk::CoreObjectFactory::New();
   }
   return instance;
 }

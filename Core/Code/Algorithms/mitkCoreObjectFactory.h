@@ -37,9 +37,8 @@ class MITK_CORE_EXPORT CoreObjectFactory : public CoreObjectFactoryBase
     virtual const char* GetFileExtensions();
     virtual const char* GetSaveFileExtensions();
     virtual FileWriterList GetFileWriters();
-    virtual itk::Object::Pointer CreateCoreObject( const std::string& className );
     virtual void MapEvent(const mitk::Event* event, const int eventID);
-    virtual void RegisterExtraFactory(CoreObjectFactoryBase::Pointer factory);
+    virtual void RegisterExtraFactory(CoreObjectFactoryBase* factory);
     static Pointer GetInstance();
   protected:
     CoreObjectFactory(); 

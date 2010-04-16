@@ -32,7 +32,6 @@ class MitkDiffusionImaging_EXPORT DiffusionImagingObjectFactory : public CoreObj
     virtual void SetDefaultProperties(mitk::DataNode* node);
     virtual const char* GetFileExtensions();
     virtual const char* GetSaveFileExtensions();
-    virtual itk::Object::Pointer CreateCoreObject( const std::string& className );
     void RegisterIOFactories();
   protected:
     DiffusionImagingObjectFactory(bool registerSelf = true); 

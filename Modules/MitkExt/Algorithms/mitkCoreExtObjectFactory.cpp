@@ -53,8 +53,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkVolumeDataVtkMapper3D.h"
 
-mitk::CoreExtObjectFactory::CoreExtObjectFactory(bool registerSelf) 
-:CoreObjectFactory()
+mitk::CoreExtObjectFactory::CoreExtObjectFactory() 
+:CoreObjectFactoryBase()
 {
   static bool alreadyDone = false;
   if (!alreadyDone)
@@ -73,40 +73,7 @@ mitk::CoreExtObjectFactory::CoreExtObjectFactory(bool registerSelf)
 
     alreadyDone = true;
   }
-
-  if (registerSelf) 
-  {
-    this->RegisterOverride("mitkCoreObjectFactoryBase",
-      "mitkCoreExtObjectFactory",
-      "mitk Mapper Creation",
-      1,
-      itk::CreateObjectFunction<mitk::CoreExtObjectFactory>::New());
-  }
 }
-
-#define CREATE_CPP( TYPE, NAME ) else if ( className == NAME ) {pointer = new TYPE(); pointer->Register();}
-#define CREATE_ITK( TYPE, NAME ) else if ( className == NAME ) pointer = TYPE::New();
-
-itk::Object::Pointer mitk::CoreExtObjectFactory::CreateCoreObject( const std::string& className )
-{
-  itk::Object::Pointer pointer;
-
-  if ( className == "" )
-    return NULL;
-  CREATE_ITK( Contour, "Contour" )
-  CREATE_ITK( Ellipsoid, "Ellipsoid" )
-  CREATE_ITK( Cylinder, "Cylinder" )
-  CREATE_ITK( Cuboid, "Cuboid" )
-  CREATE_ITK( Cone, "Cone" )
-  CREATE_ITK( SeedsImage, "SeedsImage" )
-  CREATE_ITK( UnstructuredGrid, "UnstructuredGrid" )
-  CREATE_ITK( UnstructuredGridVtkMapper3D, "UnstructuredGridVtkMapper3D" )
-  else
-    pointer = Superclass::CreateCoreObject( className );
-
-  return pointer;
-}
-
 
 mitk::Mapper::Pointer mitk::CoreExtObjectFactory::CreateMapper(mitk::DataNode* node, MapperSlotId id) 
 {
@@ -179,17 +146,12 @@ mitk::Mapper::Pointer mitk::CoreExtObjectFactory::CreateMapper(mitk::DataNode* n
       newMapper->SetDataNode(node);
     }
   }
-
-  if (newMapper.IsNull()) {
-    newMapper = Superclass::CreateMapper(node,id);
-  }
   return newMapper;
 }
 
 void mitk::CoreExtObjectFactory::SetDefaultProperties(mitk::DataNode* node)
 {
-  Superclass::SetDefaultProperties(node);
-
+  
   if(node==NULL)
     return;
 
@@ -216,7 +178,7 @@ void mitk::CoreExtObjectFactory::SetDefaultProperties(mitk::DataNode* node)
 
 const char* mitk::CoreExtObjectFactory::GetFileExtensions() 
 {
-  return Superclass::GetFileExtensions();
+  return "";
 };
 
 const char* mitk::CoreExtObjectFactory::GetSaveFileExtensions() 
@@ -230,10 +192,11 @@ void mitk::CoreExtObjectFactory::RegisterIOFactories()
 
 void RegisterCoreExtObjectFactory() 
 {
-  bool oneCoreExtObjectFactoryRegistered = false;
-  if ( ! oneCoreExtObjectFactoryRegistered ) {
+  static bool oneCoreExtObjectFactoryRegistered = false;
+  if ( ! oneCoreExtObjectFactoryRegistered ) 
+  {
     MITK_INFO << "Registering CoreExtObjectFactory..." << std::endl;
-    itk::ObjectFactoryBase::RegisterFactory(mitk::CoreExtObjectFactory::New());
+    mitk::CoreObjectFactory::GetInstance()->RegisterExtraFactory(mitk::CoreExtObjectFactory::New());
     oneCoreExtObjectFactoryRegistered = true;
   }
 }

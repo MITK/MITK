@@ -645,7 +645,7 @@ class AutoCategorize
 };
 
 
-static void mbilog::BackendCout::FormatSmartWindows(const mbilog::LogMessage &l,int /*threadID*/)
+void mbilog::BackendCout::FormatSmartWindows(const mbilog::LogMessage &l,int /*threadID*/)
 {
   int colorNormal = FOREGROUND_RED|FOREGROUND_GREEN|FOREGROUND_BLUE;
 

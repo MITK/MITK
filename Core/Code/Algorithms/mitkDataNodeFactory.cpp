@@ -270,23 +270,23 @@ void mitk::DataNodeFactory::ReadFileSeriesTypeDCM()
   std::cin.imbue(l);
 
   typedef itk::Image<short, 3> ImageType;
-  typedef itk::ImageSeriesReader< ImageType > ReaderType;
-  typedef std::vector<std::string> StringContainer;
-  typedef itk::GDCMImageIO IOType;
+  typedef itk::ImageSeriesReader< ImageType > ReaderType;  
+  typedef std::vector<std::string> StringContainer;  
   typedef itk::GDCMSeriesFileNames NameGeneratorType;
-
+  typedef itk::DICOMImageIO2 IOType;
+  
   std::string dir = this->GetDirectory();
-
   IOType::Pointer dicomIO = IOType::New();
-
+  
   // Get the DICOM filenames from the directory
   NameGeneratorType::Pointer nameGenerator = NameGeneratorType::New();
-
+  
   // add more criteria to distinguish between different series
   nameGenerator->SetUseSeriesDetails( m_UseSeriesDetails );
 
   nameGenerator->SetDirectory( dir.c_str() );
- 
+
+  
   // add series restrictions
   std::vector<std::string>::const_iterator it;
   for(it=m_SeriesRestrictions.begin(); it!=m_SeriesRestrictions.end(); it++)
@@ -307,6 +307,7 @@ void mitk::DataNodeFactory::ReadFileSeriesTypeDCM()
 
   unsigned int size = seriesUIDs.size();
   this->ResizeOutputs( size );
+
 
   for ( unsigned int i = 0 ; i < size ; ++i )
   {
@@ -364,6 +365,10 @@ void mitk::DataNodeFactory::ReadFileSeriesTypeDCM()
       reader->ResetPipeline();
     }
   }
+
+
+
+  
 
   setlocale(LC_NUMERIC, previousCLocale);
   std::cin.imbue(previousCppLocale);

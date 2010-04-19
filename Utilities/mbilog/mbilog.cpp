@@ -680,7 +680,9 @@ static void FormatSmartWindows(const mbilog::LogMessage &l,int /*threadID*/)
 
     // Give out start time
     ChangeColor( colorTime );
-    AppendTimeStamp(std::out)
+    time_t rawtime;
+    time ( &rawtime );
+    std::cout << ctime(&rawtime) << std::flush;
   }
   
   switch(l.level)

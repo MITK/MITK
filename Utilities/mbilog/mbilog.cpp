@@ -645,7 +645,7 @@ class AutoCategorize
 };
 
 
-static void FormatSmartWindows(const mbilog::LogMessage &l,int /*threadID*/)
+static void mbilog::BackendCout::FormatSmartWindows(const mbilog::LogMessage &l,int /*threadID*/)
 {
   int colorNormal = FOREGROUND_RED|FOREGROUND_GREEN|FOREGROUND_BLUE;
 
@@ -680,9 +680,7 @@ static void FormatSmartWindows(const mbilog::LogMessage &l,int /*threadID*/)
 
     // Give out start time
     ChangeColor( colorTime );
-    time_t rawtime;
-    time ( &rawtime );
-    std::cout << ctime(&rawtime) << std::flush;
+    AppendTimeStamp(std::cout);
   }
   
   switch(l.level)

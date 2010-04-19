@@ -101,6 +101,7 @@ namespace mbilog {
     private:
 
       static void AppendTimeStamp(std::ostream& out);
+      static void FormatSmartWindows(const mbilog::LogMessage &l,int /*threadID*/);
 
       bool useFullOutput;
 

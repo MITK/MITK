@@ -126,7 +126,10 @@ void mbilog::BackendCout::FormatSmart(std::ostream &out, const LogMessage &l,int
 
   out << c_open;
 
-  AppendTimeStamp(out);
+  if (!g_init)
+  {
+    AppendTimeStamp(out);
+  }
 
   out << std::fixed << std::setprecision(3) << ((double)std::clock())/CLOCKS_PER_SEC;
 

@@ -25,6 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qsplitter.h>
 #include <QMotifStyle>
 #include <QList>
+#include <QMouseEvent>
 
 #include "mitkProperties.h"
 #include "mitkGeometry2DDataMapper2D.h"
@@ -1357,6 +1358,13 @@ void QmitkStdMultiWidget::wheelEvent( QWheelEvent * e )
   emit WheelMoved( e );
 }
 
+void QmitkStdMultiWidget::mousePressEvent(QMouseEvent * e)
+{
+   if (e->button() == Qt::LeftButton) {
+       mitk::Point3D pointValue = this->GetLastLeftClickPosition();
+       emit LeftMouseClicked(pointValue); 
+   }
+}
 
 mitk::DisplayVectorInteractor* QmitkStdMultiWidget::GetMoveAndZoomInteractor()
 {

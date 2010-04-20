@@ -146,6 +146,8 @@ public slots:
 
   void wheelEvent( QWheelEvent * e );
 
+  void mousePressEvent(QMouseEvent * e);
+
   void EnsureDisplayContainsPoint(
     mitk::DisplayGeometry* displayGeometry, const mitk::Point3D& p);
 
@@ -195,7 +197,8 @@ public slots:
 
 signals:
 
-  void WheelMoved( QWheelEvent* );
+  void LeftMouseClicked(mitk::Point3D pointValue);
+  void WheelMoved(QWheelEvent*);
   void WidgetPlanesRotationLinked(bool);
   void WidgetPlanesRotationEnabled(bool);
   void ViewsInitialized();

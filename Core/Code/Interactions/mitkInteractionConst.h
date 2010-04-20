@@ -313,6 +313,8 @@ enum EActions
   AcROTATEEND = 1010,
   AcINITZOOM = 1011,
   AcZOOM = 1012,
+  AcSCROLL = 1013,
+  AcLevelWindow = 1014,
   AcSETSTARTPOINT = 1050,
   AcMODEDESELECT = 1100,  // set interactor in not selected mode
   AcMODESELECT = 1101,  // set interactor in selected mode

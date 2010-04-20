@@ -31,6 +31,9 @@ class MITK_GUI_COMMON_PLUGIN DataStorageEditorInput : public berry::IEditorInput
 public:
   berryObjectMacro(DataStorageEditorInput);
 
+  DataStorageEditorInput();
+  DataStorageEditorInput(IDataStorageReference::Pointer ref);
+
   bool Exists() const;
   std::string GetName() const;
   std::string GetToolTipText() const;

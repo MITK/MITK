@@ -23,6 +23,15 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk
 {
 
+DataStorageEditorInput::DataStorageEditorInput()
+{
+}
+
+DataStorageEditorInput::DataStorageEditorInput(IDataStorageReference::Pointer ref)
+{
+  m_DataStorageRef = ref;
+}
+
 bool DataStorageEditorInput::Exists() const
 {
   return true;

@@ -156,7 +156,7 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
     , this, SLOT( SaveSelectedNodes(bool) ) );
   unknownDataNodeDescriptor->AddAction(m_SaveAction);
 
-  m_RemoveAction = new QAction(QIcon(":/org.mitk.gui.qt.datamanager/Remove_48.png"), "Delete", this);
+  m_RemoveAction = new QAction(QIcon(":/org.mitk.gui.qt.datamanager/Remove_48.png"), "Remove", this);
   QObject::connect( m_RemoveAction, SIGNAL( triggered(bool) )
     , this, SLOT( RemoveSelectedNodes(bool) ) );
   unknownDataNodeDescriptor->AddAction(m_RemoveAction);
@@ -514,7 +514,7 @@ void QmitkDataManagerView::RemoveSelectedNodes( bool )
   std::vector<mitk::DataNode*> selectedNodes;
 
   mitk::DataNode* node = 0;
-  QString question = tr("Do you really want to delete ");
+  QString question = tr("Do you really want to remove ");
 
   for (QModelIndexList::iterator it = indexesOfSelectedRows.begin()
     ; it != indexesOfSelectedRows.end(); it++)
@@ -530,7 +530,7 @@ void QmitkDataManagerView::RemoveSelectedNodes( bool )
   }
   // remove the last two characters = ", "
   question = question.remove(question.size()-2, 2);
-  question.append("?");
+  question.append(" from data storage?");
 
   QMessageBox::StandardButton answerButton = QMessageBox::question( m_Parent
     , tr("DataManager")

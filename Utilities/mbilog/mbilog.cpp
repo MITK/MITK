@@ -126,10 +126,7 @@ void mbilog::BackendCout::FormatSmart(std::ostream &out, const LogMessage &l,int
 
   out << c_open;
 
-  if(!g_init)
-  {
-    AppendTimeStamp(out);
-  }
+  AppendTimeStamp(out);
 
   out << std::fixed << std::setprecision(3) << ((double)std::clock())/CLOCKS_PER_SEC;
 
@@ -681,6 +678,7 @@ void mbilog::BackendCout::FormatSmartWindows(const mbilog::LogMessage &l,int /*t
     // Give out start time
     ChangeColor( colorTime );
     AppendTimeStamp(std::cout);
+    std::cout << std::endl;
   }
   
   switch(l.level)

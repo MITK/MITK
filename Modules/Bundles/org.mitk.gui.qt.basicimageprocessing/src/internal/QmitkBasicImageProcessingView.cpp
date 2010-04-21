@@ -436,7 +436,7 @@ void QmitkBasicImageProcessing::SelectAction(int action)
       m_Controls->tlParam1->setEnabled(true);
       m_Controls->sbParam1->setEnabled(true);
       text1 = "Downsampling by Factor:";
-      m_Controls->sbParam1->setMinimum( 0 );
+      m_Controls->sbParam1->setMinimum( 1 );
       m_Controls->sbParam1->setMaximum( 100 );
       m_Controls->sbParam1->setValue( 2 );
       break;

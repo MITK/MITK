@@ -72,6 +72,12 @@ mitk::PlanarCross::~PlanarCross()
 
 bool mitk::PlanarCross::ResetOnPointSelect()
 {
+  if ( m_SingleLineMode )
+  {
+    // In single line mode --> nothing to reset
+    return false;
+  }
+
   switch ( m_SelectedControlPoint )
   {
   default:

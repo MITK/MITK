@@ -24,7 +24,8 @@ mitk::PlanarAngle::PlanarAngle()
 : FEATURE_ID_ANGLE( this->AddFeature( "Angle", "deg" ) )
 {
   // Start with two control points
-  m_ControlPoints->Reserve( 2 );
+  this->ResetNumberOfControlPoints( 2 );
+
   m_PolyLines->InsertElement( 0, VertexContainerType::New());
   m_HelperPolyLines->InsertElement( 0, VertexContainerType::New());
   m_HelperPolyLinesToBePainted->InsertElement( 0, false );

@@ -26,7 +26,8 @@ mitk::PlanarCircle::PlanarCircle()
   FEATURE_ID_AREA( this->AddFeature( "Area", "mm^2" ) )
 {
   // Circle has two control points
-  m_ControlPoints->Reserve( 2 );
+  this->ResetNumberOfControlPoints( 2 );
+
   m_PolyLines->InsertElement( 0, VertexContainerType::New());
 }
 
@@ -73,12 +74,12 @@ bool mitk::PlanarCircle::SetControlPoint( unsigned int index, const Point2D &poi
 
     boundaryPoint[0] += vec[0];
     boundaryPoint[1] += vec[1];
-    m_ControlPoints->ElementAt( 0 ) = point;
-    m_ControlPoints->ElementAt( 1 ) = boundaryPoint;
+    m_ControlPoints->InsertElement( 0, point );
+    m_ControlPoints->InsertElement( 1, boundaryPoint );
   }
   else if ( index == 1 )
   {
-    m_ControlPoints->ElementAt( index ) = point;
+    m_ControlPoints->InsertElement( index, point );
     return true;
   }
   return false;

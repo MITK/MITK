@@ -119,10 +119,14 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
   if(node)
     node->GetBoolProperty("selected", isSelected);
 
-  if(isSelected)
-    glColor3f(1.0f, 0.0f, 0.0f);
+  if ( isSelected )
+  {
+    glColor4f( 1.0f, 0.0f, 0.0f, 1.0f );
+  }
   else
-    glColor3f(0.0f, 1.0f, 0.0f);
+  {
+    glColor4f( 0.0f, 1.0f, 0.0f, 1.0f );
+  }
 
   mitk::Point2D firstPoint; firstPoint[0] = 0; firstPoint[1] = 1;
   for(unsigned short loop = 0; loop < planarFigure->GetPolyLinesSize(); ++loop)
@@ -153,9 +157,6 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
 
     glEnd();
   }
-  // revert color again
-  // if(isSelected)
-    // glColor3f(1.0f, 1.0f, 1.0f);
 
   // draw name near the first point
   std::string name = node->GetName();
@@ -167,10 +168,14 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
   }
 
 
-  if(isSelected)
-    glColor3f(1.0f, 0.0f, 0.0f);
+  if ( isSelected )
+  {
+    glColor4f( 1.0f, 0.0f, 0.0f, 0.4f );
+  }
   else
-    glColor3f(0.0f, 1.0f, 0.0f);
+  {
+    glColor4f( 0.0f, 1.0f, 0.0f, 0.4f );
+  }
 
   glLineWidth( 1.0 );
 
@@ -204,11 +209,10 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
   glDisable( GL_LINE_SMOOTH );
 
   // Draw markers at control points (selected control point will be colored)
-  const VertexContainerType *controlPoints = planarFigure->GetControlPoints();
-  for ( it = controlPoints->Begin(); it != controlPoints->End(); ++it )
+  for ( unsigned int i = 0; i < planarFigure->GetNumberOfControlPoints(); ++i )
   {
-    this->DrawMarker( it->Value(),
-      ((int)it->Index() == planarFigure->GetSelectedControlPoint()),
+    this->DrawMarker( planarFigure->GetControlPoint( i ),
+      (i == planarFigure->GetSelectedControlPoint()),
       planarFigureGeometry2D, rendererGeometry2D, displayGeometry );
   }
 

@@ -26,7 +26,8 @@ mitk::PlanarPolygon::PlanarPolygon()
   m_Closed( true )
 {
   // Polygon has at least two control points
-  m_ControlPoints->Reserve( 2 );
+  this->ResetNumberOfControlPoints( 2 );
+
   m_PolyLines->InsertElement( 0, VertexContainerType::New());
 }
 
@@ -89,8 +90,8 @@ void mitk::PlanarPolygon::SetClosed( bool closed )
 void mitk::PlanarPolygon::GeneratePolyLine()
 {
   // TODO: start polygon at specified initalize point...
-  m_PolyLines->ElementAt( 0 )->Reserve( m_ControlPoints->Size() );
-  for ( unsigned int i = 0; i < m_ControlPoints->Size(); ++i )
+  m_PolyLines->ElementAt( 0 )->Reserve( this->GetNumberOfControlPoints() );
+  for ( unsigned int i = 0; i < this->GetNumberOfControlPoints(); ++i )
   {
     m_PolyLines->ElementAt( 0 )->ElementAt( i ) = m_ControlPoints->ElementAt( i );  
   }
@@ -103,12 +104,10 @@ void mitk::PlanarPolygon::GenerateHelperPolyLine(double /*mmPerDisplayUnit*/, un
 
 void mitk::PlanarPolygon::EvaluateFeaturesInternal()
 {
-  const unsigned long &numberOfControlPoints = m_ControlPoints->Size();
-
   // Calculate circumference
   double circumference = 0.0;
   unsigned int i;
-  for ( i = 0; i < numberOfControlPoints - 1; ++i )
+  for ( i = 0; i < this->GetNumberOfControlPoints() - 1; ++i )
   {
     circumference += this->GetWorldControlPoint( i ).EuclideanDistanceTo( 
       this->GetWorldControlPoint( i + 1 ) );
@@ -127,10 +126,10 @@ void mitk::PlanarPolygon::EvaluateFeaturesInternal()
   double area = 0.0;
   if ( this->IsClosed() && (this->GetGeometry2D() != NULL) )
   {
-    for ( i = 0; i < numberOfControlPoints; ++i )
+    for ( i = 0; i < this->GetNumberOfControlPoints(); ++i )
     {
       Point2D p0 = this->GetControlPoint( i );
-      Point2D p1 = this->GetControlPoint( (i + 1) % numberOfControlPoints );
+      Point2D p1 = this->GetControlPoint( (i + 1) % this->GetNumberOfControlPoints() );
 
       area += p0[0] * p1[1] - p1[0] * p0[1];
     }

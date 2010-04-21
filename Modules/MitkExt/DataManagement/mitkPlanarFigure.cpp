@@ -54,12 +54,11 @@ const mitk::Geometry2D *mitk::PlanarFigure::GetGeometry2D() const
 }
 
 
-void mitk::PlanarFigure::PlaceFigure( const mitk::Point2D &point )
+void mitk::PlanarFigure::PlaceFigure( const mitk::Point2D& point )
 {
-  VertexContainerType::Iterator it;
-  for ( it = m_ControlPoints->Begin(); it != m_ControlPoints->End(); ++it )
+  for ( unsigned int i = 0; i < this->GetNumberOfControlPoints(); ++i )
   {
-    it->Value() = point;
+    m_ControlPoints->InsertElement( i, this->ApplyControlPointConstraints( i, point ) );
   }
 
   m_FigurePlaced = true;
@@ -67,17 +66,13 @@ void mitk::PlanarFigure::PlaceFigure( const mitk::Point2D &point )
 }
 
 
-bool mitk::PlanarFigure::AddControlPoint( const mitk::Point2D &point )
+bool mitk::PlanarFigure::AddControlPoint( const mitk::Point2D& point )
 {
-  unsigned int currentNumberOfControlPoints = m_ControlPoints->Size();
-
-  MITK_INFO << "AddControlPoint()";
-  MITK_INFO << "currentNumberOfControlPoints: " << currentNumberOfControlPoints;
-  MITK_INFO << "maxNumber: " << this->GetMaximumNumberOfControlPoints();
-  MITK_INFO << "selected point: " << m_SelectedControlPoint;
-  if ( currentNumberOfControlPoints < this->GetMaximumNumberOfControlPoints() )
+  if ( m_NumberOfControlPoints < this->GetMaximumNumberOfControlPoints() )
   {
-    m_ControlPoints->InsertElement( currentNumberOfControlPoints, point );
+    m_ControlPoints->InsertElement( m_NumberOfControlPoints, 
+      this->ApplyControlPointConstraints( m_NumberOfControlPoints, point ) );
+    ++m_NumberOfControlPoints;
     ++m_SelectedControlPoint;
     return true;
   }
@@ -88,17 +83,16 @@ bool mitk::PlanarFigure::AddControlPoint( const mitk::Point2D &point )
 }
 
 
-bool mitk::PlanarFigure::SetControlPoint( unsigned int index, const Point2D &point, bool createIfDoesNotExist )
+bool mitk::PlanarFigure::SetControlPoint( unsigned int index, const Point2D& point, bool createIfDoesNotExist )
 {
   if (createIfDoesNotExist)
   {
-    m_ControlPoints->CreateIndex(index);
-    m_ControlPoints->CreateElementAt(index) = point;
+    m_ControlPoints->InsertElement( index, this->ApplyControlPointConstraints( index, point ) );
     return true;
   }
   else if ( index < m_ControlPoints->Size() )
   {
-    m_ControlPoints->ElementAt( index ) = point;
+    m_ControlPoints->InsertElement( index, this->ApplyControlPointConstraints( index, point ) );
     return true;
   }
   else
@@ -108,9 +102,9 @@ bool mitk::PlanarFigure::SetControlPoint( unsigned int index, const Point2D &poi
 }
 
 
-bool mitk::PlanarFigure::SetCurrentControlPoint( const Point2D &point )
+bool mitk::PlanarFigure::SetCurrentControlPoint( const Point2D& point )
 {
-  if ( (m_SelectedControlPoint < 0) || (m_SelectedControlPoint >= (int)m_ControlPoints->Size()) )
+  if ( (m_SelectedControlPoint < 0) || (m_SelectedControlPoint >= m_NumberOfControlPoints) )
   {
     return false;
   }
@@ -121,8 +115,10 @@ bool mitk::PlanarFigure::SetCurrentControlPoint( const Point2D &point )
 
 unsigned int mitk::PlanarFigure::GetNumberOfControlPoints() const
 {
-  return m_ControlPoints->Size();
+  return m_NumberOfControlPoints;
 }
+
+
 
 
 bool mitk::PlanarFigure::SelectControlPoint( unsigned int index )
@@ -159,34 +155,27 @@ mitk::PlanarFigure::GetControlPoints()
 }
 
 
-mitk::Point2D mitk::PlanarFigure::GetControlPoint( unsigned int index ) const
+mitk::Point2D& mitk::PlanarFigure::GetControlPoint( unsigned int index ) const
 {
-  if ( index < m_ControlPoints->Size() )
+  if ( index < m_NumberOfControlPoints )
   {
     return m_ControlPoints->ElementAt( index );
   }
-  else
-  {
-    Point2D point2D;
-    point2D.Fill( 0.0 );
-    return point2D;
-  }
+
+  itkExceptionMacro( << "GetControlPoint(): Invalid index!" );
 }
 
 
 mitk::Point3D mitk::PlanarFigure::GetWorldControlPoint( unsigned int index ) const
 {
   Point3D point3D;
-  if ( (m_Geometry2D != NULL) && (index < m_ControlPoints->Size()) )
+  if ( (m_Geometry2D != NULL) && (index < m_NumberOfControlPoints) )
   {
     m_Geometry2D->Map( m_ControlPoints->ElementAt( index ), point3D );
-  }
-  else
-  {
-    point3D.Fill( 0.0 );
+    return point3D;
   }
 
-  return point3D;
+  itkExceptionMacro( << "GetWorldControlPoint(): Invalid index!" );
 }
 
 
@@ -323,6 +312,18 @@ void mitk::PlanarFigure::SetRequestedRegion( itk::DataObject * /*data*/ )
 }
 
 
+void mitk::PlanarFigure::ResetNumberOfControlPoints( int numberOfControlPoints )
+{
+  m_NumberOfControlPoints = numberOfControlPoints;
+}
+
+
+mitk::Point2D mitk::PlanarFigure::ApplyControlPointConstraints( unsigned int index, const Point2D& point )
+{
+  return point;
+}
+
+
 unsigned int mitk::PlanarFigure::AddFeature( const char *featureName, const char *unitName )
 {
   unsigned int index = m_Features.size();
@@ -412,12 +413,9 @@ void mitk::PlanarFigure::PrintSelf( std::ostream& os, itk::Indent indent) const
   os << indent << "Current number of control points: " << this->GetNumberOfControlPoints() << std::endl;
   os << indent << "Control points:" << std::endl;
   mitk::PlanarFigure::VertexContainerType::ConstIterator it;  
-  unsigned int i;
-  for ( it = m_ControlPoints->Begin(), i = 0;
-        it != m_ControlPoints->End();
-        ++it, ++i )
+  for ( unsigned int i = 0; i < this->GetNumberOfControlPoints(); ++i )
   {
-    os << indent.GetNextIndent() << i << ": " << it.Value() << std::endl;
+    os << indent.GetNextIndent() << i << ": " << m_ControlPoints->ElementAt( i ) << std::endl;
   }
   os << indent << "Geometry:\n";
   this->GetGeometry2D()->Print(os, indent.GetNextIndent());
@@ -429,12 +427,20 @@ unsigned short mitk::PlanarFigure::GetPolyLinesSize()
   return m_PolyLines->size();
 }
 
+
 unsigned short mitk::PlanarFigure::GetHelperPolyLinesSize()
 {
   return m_HelperPolyLines->size();
 }
 
+
 bool mitk::PlanarFigure::IsHelperToBePainted(unsigned int index)
 {
   return m_HelperPolyLinesToBePainted->GetElement( index );
+}
+
+
+bool mitk::PlanarFigure::ResetOnPointSelect()
+{
+  return false;
 }

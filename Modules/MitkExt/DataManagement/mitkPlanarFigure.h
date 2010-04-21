@@ -83,17 +83,16 @@ public:
    *
    * Can be re-implemented in sub-classes as needed.
    */
-  virtual void PlaceFigure( const Point2D &point );
+  virtual void PlaceFigure( const Point2D& point );
 
 
-  virtual bool AddControlPoint( const Point2D &point );
+  virtual bool AddControlPoint( const Point2D& point );
 
-  virtual bool SetControlPoint( unsigned int index, const Point2D &point, bool createIfDoesNotExist = false);
+  virtual bool SetControlPoint( unsigned int index, const Point2D& point, bool createIfDoesNotExist = false);
 
-  virtual bool SetCurrentControlPoint( const Point2D &point );
+  virtual bool SetCurrentControlPoint( const Point2D& point );
 
-
-  
+   
   /** \brief Returns the current number of 2D control points defining this figure. */
   unsigned int GetNumberOfControlPoints() const;
 
@@ -136,7 +135,7 @@ public:
 
 
   /** \brief Returns specified control point in 2D world coordinates. */
-  Point2D GetControlPoint( unsigned int index ) const;
+  Point2D& GetControlPoint( unsigned int index ) const;
 
 
   /** \brief Returns specified control point in world coordinates. */
@@ -198,18 +197,36 @@ public:
   /** \brief Intherited from parent */
   virtual void SetRequestedRegion(itk::DataObject *data);
  
-  /**  Returns the current number of polylines  */
+  /** \brief  Returns the current number of polylines  */
   virtual unsigned short GetPolyLinesSize();
 
-  /**  Returns the current number of helperpolylines  */
+  /** \brief  Returns the current number of helperpolylines  */
   virtual unsigned short GetHelperPolyLinesSize();
 
-  /**  Returns wether a helper polyline should be painted or not */
+  /** \brief Returns whether a helper polyline should be painted or not */
   virtual bool IsHelperToBePainted(unsigned int index);
+
+  /** \brief Returns true if the planar figure is reset to "add points" mode
+   * when a point is selected.
+   *
+   * Default return falue is false. Subclasses can overwrite this method and
+   * execute any reset / initialization statements required. */
+  virtual bool ResetOnPointSelect();
+
 
 protected:
   PlanarFigure();
   virtual ~PlanarFigure();
+
+  /** \brief Set the initial number of control points of the planar figure */
+  void ResetNumberOfControlPoints( int numberOfControlPoints );
+
+  /** \brief Allow sub-classes to apply constraints on control points.
+  *
+  * Sub-classes can define spatial constraints to certain control points by
+  * overwriting this method and returning a constrained point. By default,
+  * the given point is returned without modification. */
+  virtual Point2D ApplyControlPointConstraints( unsigned int index, const Point2D& point );
 
   /** Adds feature (e.g., circumference, radius, angle, ...) to feature vector
    * of a planar figure object and returns integer ID for the feature element.
@@ -247,10 +264,11 @@ protected:
    * geometry of this figure. Note that each time step holds one Geometry2D. */
   virtual void InitializeTimeSlicedGeometry( unsigned int timeSteps = 1 );
 
-  virtual void PrintSelf( std::ostream &os, itk::Indent indent ) const;
+  virtual void PrintSelf( std::ostream& os, itk::Indent indent ) const;
 
 
   VertexContainerType::Pointer m_ControlPoints;
+  unsigned int m_NumberOfControlPoints;
 
   VertexContainerVectorType::Pointer m_PolyLines;
   VertexContainerVectorType::Pointer m_HelperPolyLines;

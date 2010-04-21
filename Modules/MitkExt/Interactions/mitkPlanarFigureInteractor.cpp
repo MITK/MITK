@@ -423,6 +423,15 @@ bool mitk::PlanarFigureInteractor
 
   case AcSELECTPOINT:
     {
+      if ( planarFigure->ResetOnPointSelect() )
+      {
+        this->HandleEvent( new mitk::StateEvent( EIDYES, stateEvent->GetEvent() ) );
+      }
+      else
+      {
+        this->HandleEvent( new mitk::StateEvent( EIDNO, stateEvent->GetEvent() ) );
+      }
+
       ok = true;  
       break;
     }

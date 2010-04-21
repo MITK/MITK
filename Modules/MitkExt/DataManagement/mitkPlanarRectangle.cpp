@@ -25,8 +25,9 @@ mitk::PlanarRectangle::PlanarRectangle()
   FEATURE_ID_AREA( this->AddFeature( "Area", "mm^2" ) ),
   m_Closed( true )
 {
-  // Polygon has at least two control points
-  m_ControlPoints->Reserve( 4 );
+  // Rectangle has four control points
+  this->ResetNumberOfControlPoints( 4 );
+
   m_PolyLines->InsertElement( 0, VertexContainerType::New());
 }
 
@@ -74,13 +75,12 @@ bool mitk::PlanarRectangle::SetControlPoint( unsigned int index, const Point2D &
 
   if (createIfDoesNotExist)
   {
-    m_ControlPoints->CreateIndex(index);
-    m_ControlPoints->CreateElementAt(index) = point;
+    m_ControlPoints->InsertElement( index, point );
     set = true;
   }
-  else if ( index < m_ControlPoints->Size() )
+  else if ( index < this->GetNumberOfControlPoints() )
   {
-    m_ControlPoints->ElementAt( index ) = point;
+    m_ControlPoints->InsertElement( index, point );
     set = true;
   }
 
@@ -114,10 +114,9 @@ bool mitk::PlanarRectangle::SetControlPoint( unsigned int index, const Point2D &
 
 void mitk::PlanarRectangle::PlaceFigure( const mitk::Point2D &point )
 {
-  VertexContainerType::Iterator it;
-  for ( it = m_ControlPoints->Begin(); it != m_ControlPoints->End(); ++it )
+  for ( unsigned int i = 0; i < this->GetNumberOfControlPoints(); ++i )
   {
-    it->Value() = point;
+    m_ControlPoints->InsertElement( i, point );
   }
 
   m_FigurePlaced = true;
@@ -127,8 +126,8 @@ void mitk::PlanarRectangle::PlaceFigure( const mitk::Point2D &point )
 void mitk::PlanarRectangle::GeneratePolyLine()
 {
   // TODO: start polygon at specified initalize point...
-  m_PolyLines->ElementAt( 0 )->Reserve( m_ControlPoints->Size() );
-  for ( unsigned int i = 0; i < m_ControlPoints->Size(); ++i )
+  m_PolyLines->ElementAt( 0 )->Reserve( this->GetNumberOfControlPoints() );
+  for ( unsigned int i = 0; i < this->GetNumberOfControlPoints(); ++i )
   {
     m_PolyLines->ElementAt( 0 )->ElementAt( i ) = m_ControlPoints->ElementAt( i );  
   }
@@ -141,12 +140,10 @@ void mitk::PlanarRectangle::GenerateHelperPolyLine(double /*mmPerDisplayUnit*/, 
 
 void mitk::PlanarRectangle::EvaluateFeaturesInternal()
 {
-  const unsigned long &numberOfControlPoints = m_ControlPoints->Size();
-
   // Calculate circumference
   double circumference = 0.0;
   unsigned int i;
-  for ( i = 0; i < numberOfControlPoints - 1; ++i )
+  for ( i = 0; i < this->GetNumberOfControlPoints() - 1; ++i )
   {
     circumference += this->GetWorldControlPoint( i ).EuclideanDistanceTo( 
       this->GetWorldControlPoint( i + 1 ) );
@@ -165,10 +162,10 @@ void mitk::PlanarRectangle::EvaluateFeaturesInternal()
   double area = 0.0;
   if ( this->IsClosed() && (this->GetGeometry2D() != NULL) )
   {
-    for ( i = 0; i < numberOfControlPoints; ++i )
+    for ( i = 0; i < this->GetNumberOfControlPoints(); ++i )
     {
       Point2D p0 = this->GetControlPoint( i );
-      Point2D p1 = this->GetControlPoint( (i + 1) % numberOfControlPoints );
+      Point2D p1 = this->GetControlPoint( (i + 1) % this->GetNumberOfControlPoints() );
 
       area += p0[0] * p1[1] - p1[0] * p0[1];
     }
@@ -190,11 +187,8 @@ void mitk::PlanarRectangle::PrintSelf( std::ostream& os, itk::Indent indent) con
 
   mitk::PlanarFigure::VertexContainerType::ConstIterator it;
 
-  unsigned int i;
-  for ( it = m_ControlPoints->Begin(), i = 0;
-    it != m_ControlPoints->End();
-    ++it, ++i )
+  for ( unsigned int i = 0; i < this->GetNumberOfControlPoints(); ++i )
   {
-    os << indent << indent << i << ": " << it.Value() << std::endl;
+    os << indent << indent << i << ": " << m_ControlPoints->ElementAt( i ) << std::endl;
   }
 }

@@ -83,6 +83,7 @@ SET(CPP_FILES
   DataManagement/mitkPlaneLandmarkProjector.cpp
   DataManagement/mitkPlanarAngle.cpp
   DataManagement/mitkPlanarCircle.cpp
+  DataManagement/mitkPlanarCross.cpp
   DataManagement/mitkPlanarFigure.cpp
   DataManagement/mitkPlanarFourPointAngle.cpp
   DataManagement/mitkPlanarLine.cpp

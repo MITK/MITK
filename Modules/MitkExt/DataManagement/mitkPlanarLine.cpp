@@ -24,7 +24,8 @@ mitk::PlanarLine::PlanarLine()
 : FEATURE_ID_LENGTH( this->AddFeature( "Length", "mm" ) )
 {
   // Line has two control points
-  m_ControlPoints->Reserve( 2 );
+  this->ResetNumberOfControlPoints( 2 );
+
   m_PolyLines->InsertElement( 0, VertexContainerType::New());
 }
 

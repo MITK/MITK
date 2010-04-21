@@ -28,7 +28,8 @@ typedef itk::MutexLockHolder<itk::FastMutexLock> MutexLockHolder;
 
 
 mitk::VirtualTrackingDevice::VirtualTrackingDevice() : mitk::TrackingDevice(), 
-  m_AllTools(), m_ToolsMutex(NULL), m_MultiThreader(NULL), m_ThreadID(-1), m_RefreshRate(100), m_NumberOfControlPoints(20)
+  m_AllTools(), m_ToolsMutex(NULL), m_MultiThreader(NULL), m_ThreadID(-1), m_RefreshRate(100), m_NumberOfControlPoints(20),
+  m_TrackingThreadRunning(false)
 { 
   m_Type = VirtualTracker;
   m_Bounds[0] = m_Bounds[2] = m_Bounds[4] = -400.0;  // initialize bounds to -400 ... +400 (mm) cube
@@ -48,7 +49,7 @@ mitk::VirtualTrackingDevice::~VirtualTrackingDevice()
     this->CloseConnection();
   }
   /* cleanup tracking thread */
-  if (m_MultiThreader.IsNotNull() && (m_ThreadID != -1))
+  if (m_MultiThreader.IsNotNull() && (m_TrackingThreadRunning == true) && (m_ThreadID != -1))
   {
     m_MultiThreader->TerminateThread(m_ThreadID);
     m_MultiThreader = NULL;
@@ -224,6 +225,7 @@ mitk::VirtualTrackingTool* mitk::VirtualTrackingDevice::GetInternalTool(unsigned
 
 void mitk::VirtualTrackingDevice::TrackTools()
 {
+  m_TrackingThreadRunning = true; // signal that the thread was started successfully
   try
   {
     bool localStopTracking;       // Because m_StopTracking is used by two threads, access has to be guarded by a mutex. To minimize thread locking, a local copy is used here 
@@ -271,15 +273,13 @@ void mitk::VirtualTrackingDevice::TrackTools()
       localStopTracking = m_StopTracking;
       this->m_StopTrackingMutex->Unlock();
     } // tracking ends if we pass this line
-
-    m_TrackingFinishedMutex->Unlock(); // transfer control back to main thread
   }
   catch(...)
   {
-    m_TrackingFinishedMutex->Unlock();
     this->StopTracking();
     this->SetErrorMessage("Error while trying to track tools. Thread stopped.");
   }
+  m_TrackingThreadRunning = false;  // end of life for the tracking thread
 }
 
 

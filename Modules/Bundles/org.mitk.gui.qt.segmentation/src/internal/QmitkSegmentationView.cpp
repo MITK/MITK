@@ -618,7 +618,7 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
   m_Controls->m_ManualToolSelectionBox->SetEnabledMode( QmitkToolSelectionBox::EnabledWithReferenceAndWorkingData );
 
   // available only in the 3M application
-  if ( m_Controls->m_OrganToolSelectionBox->children().count() )
+  if ( !m_Controls->m_OrganToolSelectionBox->children().count() )
   {
     m_Controls->widgetStack->setItemEnabled( 1, false );
   }
@@ -628,7 +628,7 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
   m_Controls->m_OrganToolSelectionBox->SetEnabledMode( QmitkToolSelectionBox::EnabledWithReferenceData );
 
   // available only in the 3M application
-  if ( m_Controls->m_LesionToolSelectionBox->children().count() )
+  if ( !m_Controls->m_LesionToolSelectionBox->children().count() )
   {
     m_Controls->widgetStack->setItemEnabled( 2, false );
   }

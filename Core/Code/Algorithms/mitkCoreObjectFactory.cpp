@@ -144,10 +144,13 @@ mitk::CoreObjectFactory::CoreObjectFactory()
 mitk::Mapper::Pointer mitk::CoreObjectFactory::CreateMapper(mitk::DataNode* node, MapperSlotId id)
 {
   mitk::Mapper::Pointer newMapper = NULL;
-  
-  // check wether extra factories provide mapper
+  mitk::Mapper::Pointer tmpMapper = NULL;
+
+  // check whether extra factories provide mapper
   for (ExtraFactoriesList::iterator it = m_ExtraFactories.begin(); it != m_ExtraFactories.end() ; it++ ) {
-    newMapper = (*it)->CreateMapper(node,id);
+    tmpMapper = (*it)->CreateMapper(node,id);
+    if(tmpMapper.IsNotNull())
+      newMapper = tmpMapper;
   }
 
   if (newMapper.IsNull()) 

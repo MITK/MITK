@@ -11,7 +11,7 @@ The class QmitkSliceWidget is used, which is based on the class QmitkRenderWindo
 to slice through the data. We create two instances of
 QmitkSliceWidget, one for transversal and one for sagittal slicing. Step 4b enhances the program in that the two slices are also shown at their correct position in 3D as well as intersection-line, each in the other 2D view.
 
-As in the previous steps, to obtain the results the program has to be executed using the image file mitk/Core/Code/Testing/Data/Pic3D.pic.gz and the surface file mitk/Core/Code/Testing/Data/lungs.vtk.
+As in the previous steps, to obtain the results the program has to be executed using the image file mitk/Core/Code/Testing/Data/Pic3D.pic.gz and the surface file mitk/Modules/MITKExt/Testing/Data/lungs.vtk.
 
 \li \ref Step4.cpp "Step4.cpp"\n 
 Contains the code of step 4a + b.

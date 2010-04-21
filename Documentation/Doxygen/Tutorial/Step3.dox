@@ -8,7 +8,7 @@ Since volume-rendering is a (rather) slow procedure, the default is that images 
 
 In Step 3a the default is kept whereas in Step 3b volume rendering is turned on.
 
-As in the previous step, to obtain the results the program has to be executed using the image file mitk/Core/Code/Testing/Data/Pic3D.pic.gz and the surface file mitk/Core/Code/Testing/Data/lungs.vtk.
+As in the previous step, to obtain the results the program has to be executed using the image file mitk/Core/Code/Testing/Data/Pic3D.pic.gz and the surface file mitk/Modules/MITKExt/Testing/Data/lungs.vtk.
 
 
 \li \ref Step3.cpp "Step3.cpp" \n

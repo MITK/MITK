@@ -91,12 +91,24 @@ int mitkTrackingDeviceSourceTest(int /* argc */, char* /*argv*/[])
   
   tracker = mitk::VirtualTrackingDevice::New();
   mySource->SetTrackingDevice(tracker);
+  MITK_TEST_CONDITION(watch->GetReferenceCount() == 0, "Testing if reference to previous tracker object is released");
+  watch = NULL;
+
+  MITK_TEST_FOR_EXCEPTION(std::runtime_error, mySource->StartTracking()); // new tracker, needs Connect() before StartTracking()
+
   mySource->Connect();
   mySource->StartTracking();
-  MITK_TEST_CONDITION(watch->GetReferenceCount() == 0, "Testing if reference to previous tracker object is released");
+ // itksys::SystemTools::Delay(800); // wait for tracking thread to start properly //DEBUG ONLY  --> race condition. will the thread start before the object is destroyed? --> maybe hold a smartpointer?
+  try
+  {
+    mySource = NULL;  // delete source
+    tracker = NULL;   // delete tracker --> both should not result in any exceptions or deadlocks
+  }
+  catch (...)
+  {
+    MITK_TEST_FAILED_MSG(<< "exception during destruction of source or tracker!");
+  }
 
-  mySource = NULL;
-  tracker = NULL;
   // always end with this!
   MITK_TEST_END();
 }

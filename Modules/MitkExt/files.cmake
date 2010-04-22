@@ -9,7 +9,6 @@ SET(CPP_FILES
   Algorithms/mitkContourUtils.cpp
   Algorithms/mitkCorrectorAlgorithm.cpp
   Algorithms/mitkCylindricToCartesianFilter.cpp
-  #Algorithms/mitkDICOMFileIOFactory.cpp
   Algorithms/mitkDiffImageApplier.cpp
   Algorithms/mitkDopplerToStrainRateFilter.cpp
   Algorithms/mitkExtractDirectedPlaneImageFilter.cpp

@@ -212,7 +212,7 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
   for ( unsigned int i = 0; i < planarFigure->GetNumberOfControlPoints(); ++i )
   {
     this->DrawMarker( planarFigure->GetControlPoint( i ),
-      (i == planarFigure->GetSelectedControlPoint()),
+      (i == (unsigned int)planarFigure->GetSelectedControlPoint()),
       planarFigureGeometry2D, rendererGeometry2D, displayGeometry );
   }
 

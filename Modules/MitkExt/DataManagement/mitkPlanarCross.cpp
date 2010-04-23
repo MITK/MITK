@@ -130,6 +130,10 @@ bool mitk::PlanarCross::ResetOnPointSelect()
 
 mitk::Point2D mitk::PlanarCross::ApplyControlPointConstraints( unsigned int index, const Point2D& point )
 {
+  // Apply spatial constraints from superclass
+  Point2D confinedPoint = Superclass::ApplyControlPointConstraints( index, point );
+
+  // Apply constraints depending on current interaction state
   switch ( index )
   {
     case 2:
@@ -142,10 +146,10 @@ mitk::Point2D mitk::PlanarCross::ApplyControlPointConstraints( unsigned int inde
         Vector2D n1 = p2 - p1;
         n1.Normalize();
 
-        Vector2D v1 = point - p1;
+        Vector2D v1 = confinedPoint - p1;
         double dotProduct = n1 * v1;
         Point2D crossPoint = p1 + n1 * dotProduct;;
-        Vector2D crossVector = point - crossPoint;
+        Vector2D crossVector = confinedPoint - crossPoint;
 
         if ( dotProduct < 0.0 )
         {
@@ -160,7 +164,7 @@ mitk::Point2D mitk::PlanarCross::ApplyControlPointConstraints( unsigned int inde
         else
         {
           // Pass back original point
-          return point;
+          return confinedPoint;
         }
       }
 
@@ -177,14 +181,14 @@ mitk::Point2D mitk::PlanarCross::ApplyControlPointConstraints( unsigned int inde
         Vector2D n1 = p2 - p1;
         n1.Normalize();
 
-        Vector2D v1 = point - p3;
+        Vector2D v1 = confinedPoint - p3;
         double dotProduct = n1 * v1;
 
-        return point - n1 * dotProduct;
+        return confinedPoint - n1 * dotProduct;
       }
 
     default:
-      return point;
+      return confinedPoint;
   }
 }
 

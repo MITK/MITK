@@ -320,7 +320,19 @@ void mitk::PlanarFigure::ResetNumberOfControlPoints( int numberOfControlPoints )
 
 mitk::Point2D mitk::PlanarFigure::ApplyControlPointConstraints( unsigned int index, const Point2D& point )
 {
-  return point;
+  Point2D indexPoint;
+  m_Geometry2D->WorldToIndex( point, indexPoint );
+
+  BoundingBox::BoundsArrayType bounds = m_Geometry2D->GetBounds();
+  if ( indexPoint[0] < bounds[0] ) { indexPoint[0] = bounds[0]; }
+  if ( indexPoint[0] > bounds[1] ) { indexPoint[0] = bounds[1]; }
+  if ( indexPoint[1] < bounds[2] ) { indexPoint[1] = bounds[2]; }
+  if ( indexPoint[1] > bounds[3] ) { indexPoint[1] = bounds[3]; }
+  
+  Point2D constrainedPoint;
+  m_Geometry2D->IndexToWorld( indexPoint, constrainedPoint );
+
+  return constrainedPoint;
 }
 
 

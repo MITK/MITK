@@ -168,6 +168,12 @@ void mitk::PlanarAngle::GenerateHelperPolyLine(double mmPerDisplayUnit, unsigned
 
 void mitk::PlanarAngle::EvaluateFeaturesInternal()
 {
+  if ( this->GetNumberOfControlPoints() < 3 )
+  {
+    // Angle not yet complete.
+    return;
+  }
+
   // Calculate angle between lines
   const Point2D &p0 = this->GetControlPoint( 0 );
   const Point2D &p1 = this->GetControlPoint( 1 );

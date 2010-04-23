@@ -67,7 +67,13 @@ void mitk::PlanarFourPointAngle::GenerateHelperPolyLine(double /*mmPerDisplayUni
   
 void mitk::PlanarFourPointAngle::EvaluateFeaturesInternal()
 {
-   // Calculate angle between lines
+  if ( this->GetNumberOfControlPoints() < 4 )
+  {
+    // Angle not yet complete.
+    return;
+  }
+
+  // Calculate angle between lines
   const Point2D &p0 = this->GetControlPoint( 0 );
   const Point2D &p1 = this->GetControlPoint( 1 );
   const Point2D &p2 = this->GetControlPoint( 2 );

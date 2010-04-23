@@ -235,13 +235,16 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
   // Draw helper objects
   for(unsigned int loop = 0; loop < planarFigure->GetHelperPolyLinesSize(); ++loop)
   {    
-    //Check if the current helper objects is to be painted
+    // Get (and possibly generate) helper polyline (this needs to be done before
+    // checking if the helper polyline has to be painted!)
+    const VertexContainerType *polyLine = planarFigure->GetHelperPolyLine(loop, displayGeometry->GetScaleFactorMMPerDisplayUnit(), displayGeometry->GetDisplayHeight());
+
+    // Check if the current helper objects is to be painted
     if ( !planarFigure->IsHelperToBePainted( loop ))
     {
       continue;
     }
 
-    const VertexContainerType *polyLine = planarFigure->GetHelperPolyLine(loop, displayGeometry->GetScaleFactorMMPerDisplayUnit(), displayGeometry->GetDisplayHeight());
     if ( isSelected )
     {
       PaintPolyLine(polyLine, false,    selectedLineColor,    selectedLineOpacity,  lineWidth, firstPoint, planarFigureGeometry2D, rendererGeometry2D, displayGeometry);

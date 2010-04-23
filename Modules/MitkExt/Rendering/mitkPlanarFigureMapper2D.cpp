@@ -25,7 +25,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkGL.h"
 #include "mitkVtkPropRenderer.h"
 
-
 mitk::PlanarFigureMapper2D::PlanarFigureMapper2D()
 {
 }
@@ -163,6 +162,7 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
   float controlPointColor[] = { 1.0f, 1.0f, 1.0f };
   float controlPointOpacity = 1.0f;
   float controlPointWidth = 1.0f;
+  PlanarFigureControlPointStyleProperty::Shape controlPointShape = PlanarFigureControlPointStyleProperty::Square;
   if(node)
   {
     node->GetBoolProperty("selected", isSelected);
@@ -176,6 +176,11 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
     node->GetColor( controlPointColor, NULL, "control point color" );
     node->GetFloatProperty( "control point opacity", controlPointOpacity );
     node->GetFloatProperty( "control point width", controlPointWidth );
+    PlanarFigureControlPointStyleProperty::Pointer styleProperty = dynamic_cast<PlanarFigureControlPointStyleProperty*>( node->GetProperty( "control point shape" ) );
+    if (styleProperty)
+    {
+      controlPointShape = styleProperty->GetShape();
+    }
   }
  
   mitk::Point2D firstPoint; firstPoint[0] = 0; firstPoint[1] = 1;
@@ -215,7 +220,6 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
   // draw name near the first point
   std::string name = node->GetName();
   if(!name.empty())
-  if(false)
   {
     mitk::VtkPropRenderer* OpenGLrenderer = dynamic_cast<mitk::VtkPropRenderer*>( renderer );
     if(OpenGLrenderer)
@@ -251,7 +255,7 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
   {
     this->DrawMarker( planarFigure->GetControlPoint( i ),
       (i == (unsigned int)planarFigure->GetSelectedControlPoint()),
-      controlPointColor, controlPointOpacity, controlPointWidth,
+      controlPointColor, controlPointOpacity, controlPointWidth, controlPointShape,
       planarFigureGeometry2D, rendererGeometry2D, displayGeometry );
   }
 
@@ -281,6 +285,7 @@ void mitk::PlanarFigureMapper2D::DrawMarker(
   float* color,
   float opacity,
   float width,
+  PlanarFigureControlPointStyleProperty::Shape shape,
   const mitk::Geometry2D *objectGeometry,
   const mitk::Geometry2D *rendererGeometry,
   const mitk::DisplayGeometry *displayGeometry )
@@ -294,10 +299,9 @@ void mitk::PlanarFigureMapper2D::DrawMarker(
   glColor4f(color[0], color[1], color[2], opacity);
   glLineWidth(width);
 
-  int style = 0;
-  switch (style)
+  switch (shape)
   {
-    case 0:
+    case PlanarFigureControlPointStyleProperty::Square:
     default:
       // squares
       if ( selected )
@@ -317,7 +321,7 @@ void mitk::PlanarFigureMapper2D::DrawMarker(
         glEnd();
       }
       break;
-    case 1:
+    case PlanarFigureControlPointStyleProperty::Circle:
       // circles
       if ( selected )
       {

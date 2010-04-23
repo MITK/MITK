@@ -23,6 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "MitkExtExports.h"
 #include "mitkGLMapper2D.h"
 #include "mitkPlanarFigure.h"
+#include "mitkPlanarFigureControlPointStyleProperty.h"
 
 namespace mitk {
 
@@ -84,6 +85,7 @@ protected:
     float* color,
     float opacity,
     float width,
+    PlanarFigureControlPointStyleProperty::Shape shape,
     const mitk::Geometry2D *objectGeometry,
     const mitk::Geometry2D *rendererGeometry,
     const mitk::DisplayGeometry *displayGeometry );

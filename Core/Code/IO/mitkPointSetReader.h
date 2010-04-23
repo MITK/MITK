@@ -23,7 +23,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkFileReader.h>
 #include <string>
 #include <stack>
-#include <vtkXMLParser.h>
 #include <tinyxml.h>
 
 namespace mitk

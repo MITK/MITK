@@ -17,8 +17,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkPointSetReader.h"
-//#include "vtkPointSetXMLParser.h"
-//#include "vtkSmartPointer.h"
 #include <iostream>
 #include <fstream>
 #include <locale>
@@ -35,103 +33,91 @@ mitk::PointSetReader::~PointSetReader()
 
 void mitk::PointSetReader::GenerateData()
 {
-    std::locale::global(std::locale("US")); 
+    std::locale::global(std::locale("C"));
 
     m_Success = false;
     if ( m_FileName == "" )
     {
-        itkWarningMacro( << "Sorry, filename has not been set!" );
+      itkWarningMacro( << "Sorry, filename has not been set!" );
         return ;
     }
     if ( ! this->CanReadFile( m_FileName.c_str() ) )
     {
-        itkWarningMacro( << "Sorry, can't read file " << m_FileName << "!" );
+      itkWarningMacro( << "Sorry, can't read file " << m_FileName << "!" );
         return ;
     }
 
-	TiXmlDocument doc(m_FileName.c_str());
-	bool loadOkay = doc.LoadFile();
-	if (loadOkay)
-	{
-		mitk::PointSet::Pointer newPointSet = mitk::PointSet::New();
-		
-		TiXmlHandle docHandle( &doc );
-
-		unsigned int pointSetCounter(0);
-        for( TiXmlElement* currentPointSetElement = docHandle.FirstChildElement("point_set_file").FirstChildElement("point_set").ToElement(); 
-			currentPointSetElement != NULL; currentPointSetElement = currentPointSetElement->NextSiblingElement())
-		{	
-			mitk::PointSet::Pointer newPointSet = mitk::PointSet::New();
-
-      if(currentPointSetElement->FirstChildElement("time_series") != NULL)
+  try{
+    TiXmlDocument doc(m_FileName.c_str());
+    bool loadOkay = doc.LoadFile();
+    if (loadOkay)
+    {
+      TiXmlHandle docHandle( &doc );
+      unsigned int pointSetCounter(0);
+          for( TiXmlElement* currentPointSetElement = docHandle.FirstChildElement("point_set_file").FirstChildElement("point_set").ToElement();
+        currentPointSetElement != NULL; currentPointSetElement = currentPointSetElement->NextSiblingElement())
       {
-        for( TiXmlElement* currentTimeSeries = currentPointSetElement->FirstChildElement("time_series")->ToElement();
-				  currentTimeSeries != NULL; currentTimeSeries = currentTimeSeries->NextSiblingElement())
-			  {
-				  unsigned int currentTimeStep(0);
-				  TiXmlElement* currentTimeSeriesID = currentTimeSeries->FirstChildElement("time_series_id");
-				  currentTimeStep = atoi(currentTimeSeriesID->GetText());
-  						
-				  newPointSet = this->ReadPoint(newPointSet, currentTimeSeries, currentTimeStep);
-			  } 
-      } else {
-          newPointSet = this->ReadPoint(newPointSet, currentPointSetElement, 0);
+        mitk::PointSet::Pointer newPointSet = mitk::PointSet::New();
+        if(currentPointSetElement->FirstChildElement("time_series") != NULL)
+        {
+          for( TiXmlElement* currentTimeSeries = currentPointSetElement->FirstChildElement("time_series")->ToElement();
+            currentTimeSeries != NULL; currentTimeSeries = currentTimeSeries->NextSiblingElement())
+          {
+            unsigned int currentTimeStep(0);
+            TiXmlElement* currentTimeSeriesID = currentTimeSeries->FirstChildElement("time_series_id");
+
+            currentTimeStep = atoi(currentTimeSeriesID->GetText());
+
+            newPointSet = this->ReadPoint(newPointSet, currentTimeSeries, currentTimeStep);
+          }
+        } else {
+            newPointSet = this->ReadPoint(newPointSet, currentPointSetElement, 0);
+        }
+        this->SetNthOutput( pointSetCounter, newPointSet );
+        pointSetCounter++;
       }
-
-			this->SetNthOutput( pointSetCounter, newPointSet );
-			pointSetCounter++;
-		}
-
-	}
-	else
-	{
-		MITK_WARN << "Cannot load XML file!";
-	}
-
-	//this->ResizeOutputs( pointSetList.size() );
-
-    //unsigned int i = 0;
-    //for ( mitk::vtkPointSetXMLParser::PointSetList::iterator it = pointSetList.begin(); it != pointSetList.end(); ++it, ++i )
-    //{
-    //    this->SetNthOutput( i, *it );
-    //}
-
+    }
+    else
+    {
+      MITK_WARN << "XML parser error!";
+    }
+  }catch(...)
+   {
+      MITK_ERROR  << "Cannot read point set.";
+      m_Success = false;
+   }
     m_Success = true;
 }
 
 mitk::PointSet::Pointer mitk::PointSetReader::ReadPoint(mitk::PointSet::Pointer newPointSet, 
         TiXmlElement* currentTimeSeries, unsigned int currentTimeStep) 
 {
-
-for( TiXmlElement* currentPoint = currentTimeSeries->FirstChildElement("point")->ToElement();
-					currentPoint != NULL; currentPoint = currentPoint->NextSiblingElement())
-		{
-			unsigned int id(0);
-      mitk::PointSpecificationType spec((mitk::PointSpecificationType) 0);
-			double x(0.0);
-			double y(0.0);
-			double z(0.0);
-
-			id = atoi(currentPoint->FirstChildElement("id")->GetText());
-      if(currentPoint->FirstChildElement("specification") != NULL)
+  if(currentTimeSeries->FirstChildElement("point") != NULL)
+  {
+    for( TiXmlElement* currentPoint = currentTimeSeries->FirstChildElement("point")->ToElement();
+              currentPoint != NULL; currentPoint = currentPoint->NextSiblingElement())
       {
-        spec = (mitk::PointSpecificationType) atoi(currentPoint->FirstChildElement("specification")->GetText());
+        unsigned int id(0);
+        mitk::PointSpecificationType spec((mitk::PointSpecificationType) 0);
+        double x(0.0);
+        double y(0.0);
+        double z(0.0);
+
+       id = atoi(currentPoint->FirstChildElement("id")->GetText());
+        if(currentPoint->FirstChildElement("specification") != NULL)
+        {
+          spec = (mitk::PointSpecificationType) atoi(currentPoint->FirstChildElement("specification")->GetText());
+        }
+        x = atof(currentPoint->FirstChildElement("x")->GetText());
+        y = atof(currentPoint->FirstChildElement("y")->GetText());
+        z = atof(currentPoint->FirstChildElement("z")->GetText());
+
+        mitk::Point3D point;
+        mitk::FillVector3D(point, x, y, z);
+        newPointSet->SetPoint(id, point, spec, currentTimeStep);
       }
-
-      std::cout << "Test1::: " << currentPoint->FirstChildElement("x")->GetText() << std::endl;
-
-      x = atof(currentPoint->FirstChildElement("x")->GetText());
-			y = atof(currentPoint->FirstChildElement("y")->GetText());
-			z = atof(currentPoint->FirstChildElement("z")->GetText());
-
-			mitk::Point3D point;
-			mitk::FillVector3D(point, x, y, z);
-
-			newPointSet->SetPoint(id, point, spec, currentTimeStep);
-			MITK_INFO << "PointSet " << id << " " << x << " " << y << " " << currentTimeStep;
-		}
-  
-  return newPointSet;
+    }
+    return newPointSet;
 }
 
 void mitk::PointSetReader::GenerateOutputInformation()

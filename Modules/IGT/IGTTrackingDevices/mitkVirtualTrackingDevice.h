@@ -183,7 +183,6 @@ namespace mitk
     unsigned int m_NumberOfControlPoints;           ///< number of control points for the random path generation
 
     mitk::ScalarType m_Bounds[6];                   ///< bounding box of the tracking volume stored as {xMin, xMax, yMin, yMax, zMin, zMax}
-    bool m_TrackingThreadRunning;
   };   
 }//mitk
 #endif /* MITKVIRTUALTRACKINGDEVICE_H_HEADER_INCLUDED_ */

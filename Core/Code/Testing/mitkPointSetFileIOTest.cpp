@@ -98,7 +98,7 @@ public:
       mitk::PointSetWriter::Pointer pointSetWriter =
           mitk::PointSetWriter::New();
 
-      pointSetWriter->SetFileName("/home/wangxi/test_pointset_new.mps");
+      pointSetWriter->SetFileName("test_pointset_new.mps");
       for (unsigned int i = 0; i < numberOfPointSets; i++)
       {
         pointSetWriter->SetInput(i, CreateTestPointSet());
@@ -120,7 +120,7 @@ public:
           mitk::PointSetReader::New();
       mitk::PointSet::Pointer pointSet;
 
-      pointSetReader->SetFileName("/home/wangxi/test_pointset_new.mps");
+      pointSetReader->SetFileName("test_pointset_new.mps");
       for (unsigned int i = 0; i < numberOfPointSets; i++)
       {
         pointSetReader->Update();

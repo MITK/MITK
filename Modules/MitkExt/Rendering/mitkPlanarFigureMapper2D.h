@@ -35,18 +35,39 @@ class Contour;
  * \brief OpenGL-based mapper to render display sub-class instances of
  * mitk::PlanarFigure
  * 
- * Properties that are evaluated during rendering:
+ * A couple of properties are evaluated to determine 
+ * <ol>
+ *   <li> color (ColorProperty)
+ *   <li> opacity  (FloatProperty)
+ *   <li> line width (FloatProperty)
+ * </ol>
+ *   of several rendering elements:
  * <ul>
- * <li> "color": ColorProperty for color of the lines that represent the planar figure (e.g. a circle)
- * <li> "opacity": FloatProperty for opacity of the lines that represent the planar figure (e.g. a circle)
- * <li> "width": FloatProperty for widthof the lines that represent the planar figure (e.g. a circle)
- * <li> "draw outline": BoolProperty. If set, the mapper will draw a second, broader line behind the main lines. This may look like an outline
- * <li> "outline color": ColorProperty for the color of the outline
- * <li> "outline opacity": FloatProperty for the opacity of the outline
- * <li> "outline width": FloatProperty for the width of the outline
- * <li> "control point color": ColorProperty for the color of control points
- * <li> "control point opacity": FloatProperty for the opacity of control points
- * <li> "control point width": FloatProperty for the width of the lines used for drawing control points
+ *   <li> Main lines that constitute the planar figure (e.g. a circle)
+ *   <ul>
+ *     <li> "color"
+ *     <li> "opacity"
+ *     <li> "width"
+ *   </ul>
+ *   <li> An outline for the main lines. This is a second line behind the main lines. By default, this line is broader and looks like an outline
+ *   <ul>
+ *     <li> "draw outline": BoolProperty to control whether the outline is drawn.
+ *     <li> "outline color"
+ *     <li> "outline opacity"
+ *     <li> "outline width"
+ *   </ul>
+ *   <li> Helper elements, such as arrow heads or the arcs that signal a measured angle
+ *   <ul>
+ *     <li> "helper color"
+ *     <li> "helper opacity"
+ *     <li> "helper width"
+ *   </ul>
+ *   <li> Control points (handles) that are used to edit the planar figure
+ *   <ul>
+ *     <li> "control point color"
+ *     <li> "control point opacity"
+ *     <li> "control point width"
+ *   </ul>
  * </ul>
  * 
  * \ingroup Mapper

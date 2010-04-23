@@ -156,6 +156,9 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
   float lineWidth = 1.0f;
   float selectedLineColor[] = { 1.0f, 0.0f, 0.0f };
   float selectedLineOpacity = 1.0f;
+  float helperColor[] = { 0.0f, 1.0f, 0.0f };
+  float helperOpacity = 0.4f;
+  float helperWidth = 4.0f;
   float outlineColor[] = { 0.0f, 0.0f, 1.0f };
   float outlineOpacity = 1.0f;
   float outlineWidth = 4.0f;
@@ -173,6 +176,9 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
     node->GetColor( outlineColor, NULL, "outline color" );
     node->GetFloatProperty( "outline opacity", outlineOpacity );
     node->GetFloatProperty( "outline width", outlineWidth );
+    node->GetColor( helperColor, NULL, "helper color" );
+    node->GetFloatProperty( "helper opacity", helperOpacity );
+    node->GetFloatProperty( "helper width", helperWidth );
     node->GetColor( controlPointColor, NULL, "control point color" );
     node->GetFloatProperty( "control point opacity", controlPointOpacity );
     node->GetFloatProperty( "control point width", controlPointWidth );
@@ -242,7 +248,7 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
     }
     else
     {
-      PaintPolyLine(polyLine, false,            lineColor,            lineOpacity,  lineWidth, firstPoint, planarFigureGeometry2D, rendererGeometry2D, displayGeometry);
+      PaintPolyLine(polyLine, false,          helperColor,          helperOpacity,helperWidth, firstPoint, planarFigureGeometry2D, rendererGeometry2D, displayGeometry);
     }
 
   }

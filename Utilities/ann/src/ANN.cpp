@@ -24,6 +24,7 @@
 //		Added performance counting to annDist()
 //----------------------------------------------------------------------
 
+#include <stdlib.h>
 #include <ANN/ANNx.h>					// all ANN includes
 #include <ANN/ANNperf.h>				// ANN performance 
 

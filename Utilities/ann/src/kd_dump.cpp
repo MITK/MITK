@@ -31,6 +31,8 @@
 // desired.)
 //----------------------------------------------------------------------
 
+#include <string.h>
+#include <stdlib.h>
 #include "kd_tree.h"					// kd-tree declarations
 #include "bd_tree.h"					// bd-tree declarations
 

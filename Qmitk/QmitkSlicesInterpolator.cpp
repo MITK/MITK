@@ -42,6 +42,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qcheckbox.h>
 #include <qpushbutton.h>
 #include <qpopupmenu.h>
+#include <qmessagebox.h>
 #include <qcursor.h>
 
 #define ROUND(a)     ((a)>0 ? (int)((a)+0.5) : -(int)(0.5-(a)))
@@ -325,68 +326,78 @@ void QmitkSlicesInterpolator::OnAcceptInterpolationClicked()
 
 void QmitkSlicesInterpolator::AcceptAllInterpolations(unsigned int sliceDimension)
 {
-  // first creates a 3D diff image, then applies this diff to the segmentation
-  if (m_Segmentation)
+  try
   {
-    mitk::UndoStackItem::IncCurrObjectEventId(); 
-    mitk::UndoStackItem::IncCurrGroupEventId(); 
-    mitk::UndoStackItem::ExecuteIncrement(); // oh well designed undo stack, how do I love thee? let me count the ways... done
-
-    // create a diff image for the undo operation
-    mitk::Image::Pointer diffImage = mitk::Image::New();
-    diffImage->Initialize( m_Segmentation );
-    mitk::PixelType pixelType( typeid(short signed int) );
-    diffImage->Initialize( pixelType, 3, m_Segmentation->GetDimensions() );
- 
-    memset( diffImage->GetData(), 0, (pixelType.GetBpe() >> 3) * diffImage->GetDimension(0) * diffImage->GetDimension(1) * diffImage->GetDimension(2) );
-    // now the diff image is all 0
-
-    unsigned int timeStep( m_TimeStep[sliceDimension] );
-
-    // a slicewriter to create the diff image
-    mitk::OverwriteSliceImageFilter::Pointer diffslicewriter = mitk::OverwriteSliceImageFilter::New();
-    diffslicewriter->SetCreateUndoInformation( false );
-    diffslicewriter->SetInput( diffImage );
-    diffslicewriter->SetSliceDimension( sliceDimension );
-    diffslicewriter->SetTimeStep( timeStep );
-
-    unsigned int totalChangedSlices(0);
-    unsigned int zslices = m_Segmentation->GetDimension( sliceDimension );
-    mitk::ProgressBar::GetInstance()->AddStepsToDo(zslices);
-    for (unsigned int sliceIndex = 0; sliceIndex < zslices; ++sliceIndex)
+    // first creates a 3D diff image, then applies this diff to the segmentation
+    if (m_Segmentation)
     {
-      mitk::Image::Pointer interpolation = m_Interpolator->Interpolate( sliceDimension, sliceIndex, timeStep ); 
-      if (interpolation.IsNotNull()) // we don't check if interpolation is necessary/sensible - but m_Interpolator does
-      {
-        diffslicewriter->SetSliceImage( interpolation );
-        diffslicewriter->SetSliceIndex( sliceIndex );
-        diffslicewriter->Update();
-        ++totalChangedSlices;
-      }
-      mitk::ProgressBar::GetInstance()->Progress();
-    }
+      mitk::UndoStackItem::IncCurrObjectEventId(); 
+      mitk::UndoStackItem::IncCurrGroupEventId(); 
+      mitk::UndoStackItem::ExecuteIncrement(); // oh well designed undo stack, how do I love thee? let me count the ways... done
 
-    if (totalChangedSlices > 0)
-    {
-      // store undo stack items
-      if ( true )
-      {
-        // create do/undo operations (we don't execute the doOp here, because it has already been executed during calculation of the diff image
-        mitk::ApplyDiffImageOperation* doOp = new mitk::ApplyDiffImageOperation( mitk::OpTEST, m_Segmentation, diffImage, timeStep );
-        mitk::ApplyDiffImageOperation* undoOp = new mitk::ApplyDiffImageOperation( mitk::OpTEST, m_Segmentation, diffImage, timeStep );
-        undoOp->SetFactor( -1.0 );
-        std::stringstream comment; 
-        comment << "Accept all interpolations (" << totalChangedSlices << ")";
-        mitk::OperationEvent* undoStackItem = new mitk::OperationEvent( mitk::DiffImageApplier::GetInstanceForUndo(), doOp, undoOp, comment.str() ); 
-        mitk::UndoController::GetCurrentUndoModel()->SetOperationEvent( undoStackItem );
+      // create a diff image for the undo operation
+      mitk::Image::Pointer diffImage = mitk::Image::New();
+      diffImage->Initialize( m_Segmentation );
+      mitk::PixelType pixelType( typeid(short signed int) );
+      diffImage->Initialize( pixelType, 3, m_Segmentation->GetDimensions() );
+   
+      memset( diffImage->GetData(), 0, (pixelType.GetBpe() >> 3) * diffImage->GetDimension(0) * diffImage->GetDimension(1) * diffImage->GetDimension(2) );
+      // now the diff image is all 0
 
-        // acutally apply the changes here
-        mitk::DiffImageApplier::GetInstanceForUndo()->ExecuteOperation( doOp );
+      unsigned int timeStep( m_TimeStep[sliceDimension] );
+
+      // a slicewriter to create the diff image
+      mitk::OverwriteSliceImageFilter::Pointer diffslicewriter = mitk::OverwriteSliceImageFilter::New();
+      diffslicewriter->SetCreateUndoInformation( false );
+      diffslicewriter->SetInput( diffImage );
+      diffslicewriter->SetSliceDimension( sliceDimension );
+      diffslicewriter->SetTimeStep( timeStep );
+
+      unsigned int totalChangedSlices(0);
+      unsigned int zslices = m_Segmentation->GetDimension( sliceDimension );
+      mitk::ProgressBar::GetInstance()->AddStepsToDo(zslices);
+      for (unsigned int sliceIndex = 0; sliceIndex < zslices; ++sliceIndex)
+      {
+        mitk::Image::Pointer interpolation = m_Interpolator->Interpolate( sliceDimension, sliceIndex, timeStep ); 
+        if (interpolation.IsNotNull()) // we don't check if interpolation is necessary/sensible - but m_Interpolator does
+        {
+          diffslicewriter->SetSliceImage( interpolation );
+          diffslicewriter->SetSliceIndex( sliceIndex );
+          diffslicewriter->Update();
+          ++totalChangedSlices;
+        }
+        mitk::ProgressBar::GetInstance()->Progress();
       }
+
+      if (totalChangedSlices > 0)
+      {
+        // store undo stack items
+        if ( true )
+        {
+          // create do/undo operations (we don't execute the doOp here, because it has already been executed during calculation of the diff image
+          mitk::ApplyDiffImageOperation* doOp = new mitk::ApplyDiffImageOperation( mitk::OpTEST, m_Segmentation, diffImage, timeStep );
+          mitk::ApplyDiffImageOperation* undoOp = new mitk::ApplyDiffImageOperation( mitk::OpTEST, m_Segmentation, diffImage, timeStep );
+          undoOp->SetFactor( -1.0 );
+          std::stringstream comment; 
+          comment << "Accept all interpolations (" << totalChangedSlices << ")";
+          mitk::OperationEvent* undoStackItem = new mitk::OperationEvent( mitk::DiffImageApplier::GetInstanceForUndo(), doOp, undoOp, comment.str() ); 
+          mitk::UndoController::GetCurrentUndoModel()->SetOperationEvent( undoStackItem );
+
+          // acutally apply the changes here
+          mitk::DiffImageApplier::GetInstanceForUndo()->ExecuteOperation( doOp );
+        }
+      }
+      
+      m_FeedbackNode->SetData(NULL);
+      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     }
-    
+  }
+  catch (std::exception& e)
+  {
     m_FeedbackNode->SetData(NULL);
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    mitk::UndoController::GetCurrentUndoModel()->Clear();
+    QString errMsg = QString("%1. Please save your work and restart the application.").arg(e.what());
+    QMessageBox::critical( this, "Error in interpolation", errMsg);    
   }
 }
 

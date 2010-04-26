@@ -156,7 +156,7 @@ public:
 
   /** \brief Returns the number of features available for this PlanarFigure
    * (such as, radius, area, ...). */
-  unsigned int GetNumberOfFeatures() const;
+  virtual unsigned int GetNumberOfFeatures() const;
 
 
   /** \brief Returns the name (identifier) of the specified features. */

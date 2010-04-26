@@ -29,8 +29,28 @@ namespace mitk
 class Geometry2D;
 
 /**
- * \brief Implementation of PlanarFigure representing a line
- * through two control points
+ * \brief Implementation of PlanarFigure modeling a cross with two orthogonal lines
+ * on a plane.
+ *
+ * The cross consists of two two orthogonal lines, which are defined by four control points
+ * lying on a plane. The two control points of the first line are freely placable within
+ * the bounds of the underlying 2D geometry, while the two control points of the second line
+ * are ensured to meet the following constraints:
+ * 
+ * 1.) The lines must be orthogonal to each other
+ * 2.) The second line must lie within the 2D area defined by the first line
+ *
+ * When placing the second line interactively, a graphical helper polyline is provided to the
+ * user to indicate the position and orthogonal orientation of the line if it would be placed
+ * at the current mouse position.
+ *
+ * When modifying one of the lines by interactively moving its control points, the respective
+ * other line is deleted and the user is prompted to draw it again.
+ * 
+ * The class provide a special mode for drawing single lines (SingleLineModeOn/Off); in this
+ * case, interaction stops after the first line has been placed.
+ *
+ * The class provides the lengths of both lines via the "feature" interface, ordered by size.
  */
 class MitkExt_EXPORT PlanarCross : public PlanarFigure
 {
@@ -46,34 +66,26 @@ public:
 
   virtual bool IsClosed() const { return false; };
 
-  /** \brief Place figure in its minimal configuration (a point at least)
-   * onto the given 2D geometry.
-   *
-   * Must be implemented in sub-classes.
-   */
-  //virtual void Initialize();
-
   
-  /** \brief Line has 2 control points per definition. */
+  /** \brief PlanarCross has either two or four control points, depending on the operation mode. */
   unsigned int GetMinimumNumberOfControlPoints() const
   {
     return m_SingleLineMode ? 2 : 4;
   }
 
 
-  /** \brief Line has 2 control points per definition. */
+  /** \brief PlanarCross has either two or four control points, depending on the operation mode. */
   unsigned int GetMaximumNumberOfControlPoints() const
   {
     return m_SingleLineMode ? 2 : 4;
   }
 
 
-  /** \brief The cross shall be reset to a single line when a control point
-   * is selected. */
+  /** \brief The cross shall be reset to a single line when a control point is selected. */
   virtual bool ResetOnPointSelect();
 
 
-  /** \brief Returns the number of features available for this PlanarCross. */
+  /** \brief Returns the number of features available for this PlanarCross (1 or 2). */
   virtual unsigned int GetNumberOfFeatures() const;
 
 
@@ -100,15 +112,13 @@ protected:
   const unsigned int FEATURE_ID_LONGESTDIAMETER;
   const unsigned int FEATURE_ID_SHORTAXISDIAMETER;
 
-
-  // TRUE if this object does not represent a cross, but a single line
-  bool m_SingleLineMode;
-
-
 private:
 
   /** Internal method for applying spatial constraints. */
   virtual Point2D InternalApplyControlPointConstraints( unsigned int index, const Point2D& point );
+
+  // TRUE if this object does not represent a cross, but a single line
+  bool m_SingleLineMode;
 
 };
 

@@ -148,6 +148,9 @@ RenderingManager
     m_RenderWindowList[renderWindow] = RENDERING_INACTIVE;
     m_AllRenderWindows.push_back( renderWindow );
 
+    if ( m_DataStorage.IsNotNull() )
+      mitk::BaseRenderer::GetInstance( renderWindow )->SetDataStorage( m_DataStorage.GetPointer() );
+
     // Register vtkRenderWindow instance
     renderWindow->Register( NULL );
 
@@ -957,6 +960,30 @@ void RenderingManager::SetProperty(const char *propertyKey, BaseProperty* proper
 {
   m_PropertyList->SetProperty(propertyKey, propertyValue);
 }
+
+
+void RenderingManager::SetDataStorage( DataStorage* storage )
+{
+  if ( storage != NULL )
+  {
+    m_DataStorage = storage;
+
+    RenderingManager::RenderWindowVector::iterator iter;
+    for ( iter = m_AllRenderWindows.begin(); iter<m_AllRenderWindows.end(); iter++ )
+    {
+      mitk::BaseRenderer::GetInstance( (*iter) )->SetDataStorage( m_DataStorage.GetPointer() );
+    }
+  }
+}
+
+
+void RenderingManager::SetGlobalInteraction( mitk::GlobalInteraction* globalInteraction )
+{
+  if ( globalInteraction != NULL )
+  {
+    m_GlobalInteraction = globalInteraction;
+  }
+} 
 
 // Create and register generic RenderingManagerFactory.
 GenericRenderingManagerFactory renderingManagerFactory;

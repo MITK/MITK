@@ -390,6 +390,16 @@ public:
    * rendering enabled */
   unsigned int GetNumberOfVisibleLODEnabledMappers() const;
 
+  /**
+  * \brief Setter for the RenderingManager that handles this instance of BaseRenderer
+  */
+  void SetRenderingManager( mitk::RenderingManager::Pointer );
+  
+  /**
+  * \brief Getter for the RenderingManager that handles this instance of BaseRenderer
+  */
+  mitk::RenderingManager::Pointer GetRenderingManager();
+
 
 protected:
 
@@ -409,6 +419,10 @@ protected:
   //##Documentation
   //## @brief The DataStorage that is used for rendering.
   DataStorage::Pointer m_DataStorage;
+
+  //##Documentation
+  //## @brief The RenderingManager that manages this instance
+  RenderingManager::Pointer m_RenderingManager;
 
   //##Documentation
   //## @brief Timestamp of last call of Update().

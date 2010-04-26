@@ -42,7 +42,7 @@ class QMITK_EXPORT QmitkRenderWindow : public QVTKWidget //, public mitk::Render
 
 public:
 
-  QmitkRenderWindow(QWidget *parent = 0, QString name = "unnamed renderwindow", mitk::VtkPropRenderer* renderer = NULL);
+  QmitkRenderWindow(QWidget *parent = 0, QString name = "unnamed renderwindow", mitk::VtkPropRenderer* renderer = NULL, mitk::RenderingManager* renderingManager = NULL);
   virtual ~QmitkRenderWindow();
 
   void InitRenderer();

@@ -41,6 +41,8 @@ class RenderingManagerFactory;
 class Geometry3D;
 class SliceNavigationController;
 class BaseRenderer;
+class DataStorage;
+class GlobalInteraction;
 
 /**
  * \brief Manager for coordinating the rendering process.
@@ -86,6 +88,8 @@ public:
   typedef std::vector< vtkRenderWindow* > RenderWindowVector;
   typedef std::vector< float > FloatVector;
   typedef std::vector< bool > BoolVector;
+
+  typedef itk::SmartPointer< DataStorage > DataStoragePointer;
 
   enum RequestType
   {
@@ -251,6 +255,11 @@ public:
   void SetProperty(const char *propertyKey, BaseProperty* propertyValue);
 
 
+  void SetDataStorage( mitk::DataStorage* storage );
+
+  void SetGlobalInteraction( mitk::GlobalInteraction* globalInteraction );
+
+
 protected:
   enum
   {
@@ -316,6 +325,10 @@ protected:
   static RenderingManagerFactory *s_RenderingManagerFactory;
 
   PropertyList::Pointer m_PropertyList;
+
+  DataStoragePointer m_DataStorage;
+
+  mitk::GlobalInteraction* m_GlobalInteraction;
 
 private:
 

@@ -128,7 +128,7 @@ m_DisplayGeometry(NULL), m_Slice(0), m_TimeStep(), m_CurrentWorldGeometry2DUpdat
 m_TimeStepUpdateTime(), m_WorldGeometryData(NULL), m_DisplayGeometryData(NULL), m_CurrentWorldGeometry2DData(NULL),
 m_WorldGeometryNode(NULL), m_DisplayGeometryNode(NULL), m_CurrentWorldGeometry2DNode(NULL), m_DisplayGeometryTransformTime(0),
 m_CurrentWorldGeometry2DTransformTime(0), m_Name(name), /*m_Bounds(),*/ m_EmptyWorldGeometry(true), m_DepthPeelingEnabled(true),
-m_MaxNumberOfPeels(100), m_NumberOfVisibleLODEnabledMappers(0)
+m_MaxNumberOfPeels(100), m_NumberOfVisibleLODEnabledMappers(0), m_RenderingManager(NULL)
 {
   m_Bounds[0] = 0;
   m_Bounds[1] = 0;
@@ -732,6 +732,19 @@ unsigned int mitk::BaseRenderer::GetNumberOfVisibleLODEnabledMappers() const
 {
   return m_NumberOfVisibleLODEnabledMappers;
 }
+
+
+void mitk::BaseRenderer::SetRenderingManager( mitk::RenderingManager::Pointer renderingManager )
+{
+  if ( renderingManager.IsNotNull() )
+    m_RenderingManager = renderingManager;
+}
+
+mitk::RenderingManager::Pointer mitk::BaseRenderer::GetRenderingManager()
+{
+  return m_RenderingManager;
+}
+
 
 /*!
 Sets the new Navigation controller 

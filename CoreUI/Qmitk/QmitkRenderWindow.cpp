@@ -34,7 +34,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "QmitkRenderWindowMenu.h"
 
-QmitkRenderWindow::QmitkRenderWindow(QWidget *parent, QString name, mitk::VtkPropRenderer* renderer)
+QmitkRenderWindow::QmitkRenderWindow(QWidget *parent, QString name, mitk::VtkPropRenderer* renderer, mitk::RenderingManager* renderingManager )
 : QVTKWidget(parent)
 , m_Renderer(renderer)
 , m_ResendQtEvents(true)
@@ -47,6 +47,7 @@ QmitkRenderWindow::QmitkRenderWindow(QWidget *parent, QString name, mitk::VtkPro
   }
 
   m_Renderer->InitRenderer(this->GetRenderWindow());
+  m_Renderer->SetRenderingManager( renderingManager );
 
   mitk::BaseRenderer::AddInstance(GetRenderWindow(),m_Renderer);
 

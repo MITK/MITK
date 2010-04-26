@@ -73,6 +73,10 @@ public:
   virtual bool ResetOnPointSelect();
 
 
+  /** \brief Returns the number of features available for this PlanarCross. */
+  virtual unsigned int GetNumberOfFeatures() const;
+
+
 protected:
   PlanarCross();
   virtual ~PlanarCross();
@@ -93,7 +97,8 @@ protected:
   virtual void PrintSelf( std::ostream &os, itk::Indent indent ) const;
 
   // Feature identifiers
-  const unsigned int FEATURE_ID_LENGTH;
+  const unsigned int FEATURE_ID_LONGESTDIAMETER;
+  const unsigned int FEATURE_ID_SHORTAXISDIAMETER;
 
 
   // TRUE if this object does not represent a cross, but a single line
@@ -101,6 +106,9 @@ protected:
 
 
 private:
+
+  /** Internal method for applying spatial constraints. */
+  virtual Point2D InternalApplyControlPointConstraints( unsigned int index, const Point2D& point );
 
 };
 

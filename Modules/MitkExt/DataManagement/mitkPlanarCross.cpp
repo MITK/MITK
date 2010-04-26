@@ -21,7 +21,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 mitk::PlanarCross::PlanarCross()
-: FEATURE_ID_LENGTH( this->AddFeature( "Length", "mm" ) ),
+: FEATURE_ID_LONGESTDIAMETER( this->AddFeature( "Longest Diameter", "mm" ) ),
+  FEATURE_ID_SHORTAXISDIAMETER( this->AddFeature( "Short Axis Diameter", "mm" ) ),
   m_SingleLineMode( false )
 {
   // Cross has two control points at the beginning
@@ -41,33 +42,6 @@ mitk::PlanarCross::PlanarCross()
 mitk::PlanarCross::~PlanarCross()
 {
 }
-
-
-//void mitk::PlanarCross::Initialize()
-//{
-//  // Default initialization of line control points
-//
-//  mitk::Geometry2D *geometry2D = 
-//    dynamic_cast< mitk::Geometry2D * >( this->GetGeometry( 0 ) );
-//
-//  if ( geometry2D == NULL )
-//  {
-//    MITK_ERROR << "Missing Geometry2D for PlanarCross";
-//    return;
-//  }
-//
-//  mitk::ScalarType width = geometry2D->GetBounds()[1];
-//  mitk::ScalarType height = geometry2D->GetBounds()[3];
-//  
-//  mitk::Point2D &startPoint = m_ControlPoints->ElementAt( 0 );
-//  mitk::Point2D &endPoint = m_ControlPoints->ElementAt( 1 );
-//
-//  startPoint[0] = width / 2.0;
-//  startPoint[1] = height / 2.0;
-//
-//  endPoint[0] = startPoint[0] + 20.0;
-//  endPoint[1] = startPoint[1] + 20.0;
-//}
 
 
 bool mitk::PlanarCross::ResetOnPointSelect()
@@ -128,67 +102,100 @@ bool mitk::PlanarCross::ResetOnPointSelect()
 }
 
 
+unsigned int mitk::PlanarCross::GetNumberOfFeatures() const
+{
+  if ( m_SingleLineMode || (this->GetNumberOfControlPoints() < 4) )
+  {
+    return 1;
+  }
+  else
+  {
+    return 2;
+  }
+}
+
+
 mitk::Point2D mitk::PlanarCross::ApplyControlPointConstraints( unsigned int index, const Point2D& point )
 {
-  // Apply spatial constraints from superclass
-  Point2D confinedPoint = Superclass::ApplyControlPointConstraints( index, point );
+  // Apply spatial constraints from superclass and from this class until the resulting constrained
+  // point converges. Although not an optimal implementation, this iterative approach
+  // helps to respect both constraints from the superclass and from this class. Without this,
+  // situations may occur where control points are constrained by the superclass, but again
+  // moved out of the superclass bounds by the subclass, or vice versa.
+  
+  unsigned int count = 0; // ensures stop of approach if point does not converge in reasonable time
+  Point2D confinedPoint = point;
+  Point2D superclassConfinedPoint;
+  do 
+  {
+    superclassConfinedPoint = Superclass::ApplyControlPointConstraints( index, confinedPoint );
+    confinedPoint = this->InternalApplyControlPointConstraints( index, superclassConfinedPoint );
+    ++count;
+  } while ( (confinedPoint.EuclideanDistanceTo( superclassConfinedPoint ) > mitk::eps)
+         && (count < 32) );
+  
+  return confinedPoint;
+}
 
+
+mitk::Point2D mitk::PlanarCross::InternalApplyControlPointConstraints( unsigned int index, const Point2D& point )
+{
   // Apply constraints depending on current interaction state
   switch ( index )
   {
-    case 2:
+  case 2:
+    {
+      // Check if 3rd control point is outside of the range (2D area) defined by the first
+      // line (via the first two control points); if it is outside, clip it to the bounds
+      const Point2D& p1 = m_ControlPoints->ElementAt( 0 );
+      const Point2D& p2 = m_ControlPoints->ElementAt( 1 );
+
+      Vector2D n1 = p2 - p1;
+      n1.Normalize();
+
+      Vector2D v1 = point - p1;
+      double dotProduct = n1 * v1;
+      Point2D crossPoint = p1 + n1 * dotProduct;;
+      Vector2D crossVector = point - crossPoint;
+
+      if ( dotProduct < 0.0 )
       {
-        // Check if 3rd control point is outside of the range (2D area) defined by the first
-        // line (via the first two control points); if it is outside, clip it to the bounds
-        const Point2D& p1 = m_ControlPoints->ElementAt( 0 );
-        const Point2D& p2 = m_ControlPoints->ElementAt( 1 );
-
-        Vector2D n1 = p2 - p1;
-        n1.Normalize();
-
-        Vector2D v1 = confinedPoint - p1;
-        double dotProduct = n1 * v1;
-        Point2D crossPoint = p1 + n1 * dotProduct;;
-        Vector2D crossVector = confinedPoint - crossPoint;
-
-        if ( dotProduct < 0.0 )
-        {
-          // Out-of-bounds on the left: clip point to left boundary
-          return (p1 + crossVector);
-        }
-        else if ( dotProduct > p2.EuclideanDistanceTo( p1 ) )
-        {
-          // Out-of-bounds on the right: clip point to right boundary
-          return (p2 + crossVector);
-        }
-        else
-        {
-          // Pass back original point
-          return confinedPoint;
-        }
+        // Out-of-bounds on the left: clip point to left boundary
+        return (p1 + crossVector);
       }
-
-    case 3:
+      else if ( dotProduct > p2.EuclideanDistanceTo( p1 ) )
       {
-        // Constrain 4th control point so that with the 3rd control point it forms
-        // a line orthogonal to the first line
-        const Point2D& p1 = m_ControlPoints->ElementAt( 0 );
-        const Point2D& p2 = m_ControlPoints->ElementAt( 1 );
-        const Point2D& p3 = m_ControlPoints->ElementAt( 2 );
-
-        // Calculate distance of original point from orthogonal line the corrected
-        // point should lie on to project the point onto this line
-        Vector2D n1 = p2 - p1;
-        n1.Normalize();
-
-        Vector2D v1 = confinedPoint - p3;
-        double dotProduct = n1 * v1;
-
-        return confinedPoint - n1 * dotProduct;
+        // Out-of-bounds on the right: clip point to right boundary
+        return (p2 + crossVector);
       }
+      else
+      {
+        // Pass back original point
+        return point;
+      }
+    }
 
-    default:
-      return confinedPoint;
+  case 3:
+    {
+      // Constrain 4th control point so that with the 3rd control point it forms
+      // a line orthogonal to the first line
+      const Point2D& p1 = m_ControlPoints->ElementAt( 0 );
+      const Point2D& p2 = m_ControlPoints->ElementAt( 1 );
+      const Point2D& p3 = m_ControlPoints->ElementAt( 2 );
+
+      // Calculate distance of original point from orthogonal line the corrected
+      // point should lie on to project the point onto this line
+      Vector2D n1 = p2 - p1;
+      n1.Normalize();
+
+      Vector2D v1 = point - p3;
+      double dotProduct = n1 * v1;
+
+      return point - n1 * dotProduct;
+    }
+
+  default:
+    return point;
   }
 }
 
@@ -252,12 +259,36 @@ void mitk::PlanarCross::GenerateHelperPolyLine(double /*mmPerDisplayUnit*/, unsi
   
 void mitk::PlanarCross::EvaluateFeaturesInternal()
 {
-  // Calculate line length
+  // Calculate length of first line
   const Point3D &p0 = this->GetWorldControlPoint( 0 );
   const Point3D &p1 = this->GetWorldControlPoint( 1 );
-  double length = p0.EuclideanDistanceTo( p1 );
+  double l1 = p0.EuclideanDistanceTo( p1 );
 
-  this->SetQuantity( FEATURE_ID_LENGTH, length );
+  // Calculate length of second line
+  double l2 = 0.0;
+  if ( !m_SingleLineMode && (this->GetNumberOfControlPoints() > 3) )
+  {
+    const Point3D &p2 = this->GetWorldControlPoint( 2 );
+    const Point3D &p3 = this->GetWorldControlPoint( 3 );
+    l2 = p2.EuclideanDistanceTo( p3 );
+  }
+
+  double longestDiameter;
+  double shortAxisDiameter;
+  if ( l1 > l2 )
+  {
+    longestDiameter = l1;
+    shortAxisDiameter = l2;
+  }
+  else
+  {
+    longestDiameter = l2;
+    shortAxisDiameter = l1;
+  }
+
+
+  this->SetQuantity( FEATURE_ID_LONGESTDIAMETER, longestDiameter );
+  this->SetQuantity( FEATURE_ID_SHORTAXISDIAMETER, shortAxisDiameter );
 }
 
 

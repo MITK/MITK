@@ -88,9 +88,13 @@ bool mitk::PlanarFigure::SetControlPoint( unsigned int index, const Point2D& poi
   if (createIfDoesNotExist)
   {
     m_ControlPoints->InsertElement( index, this->ApplyControlPointConstraints( index, point ) );
+    if ( m_NumberOfControlPoints <= index )
+    {
+      m_NumberOfControlPoints = index + 1;
+    }   
     return true;
   }
-  else if ( index < m_ControlPoints->Size() )
+  else if ( index < m_NumberOfControlPoints )
   {
     m_ControlPoints->InsertElement( index, this->ApplyControlPointConstraints( index, point ) );
     return true;
@@ -320,6 +324,11 @@ void mitk::PlanarFigure::ResetNumberOfControlPoints( int numberOfControlPoints )
 
 mitk::Point2D mitk::PlanarFigure::ApplyControlPointConstraints( unsigned int index, const Point2D& point )
 {
+  if ( m_Geometry2D ==  NULL )
+  {
+    return point;
+  }
+
   Point2D indexPoint;
   m_Geometry2D->WorldToIndex( point, indexPoint );
 

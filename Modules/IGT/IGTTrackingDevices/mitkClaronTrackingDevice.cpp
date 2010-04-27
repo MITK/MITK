@@ -99,9 +99,13 @@ bool mitk::ClaronTrackingDevice::StartTracking()
 {
 
   //By Alfred: next line because no temp directory is set if MicronTracker is not installed
-  if (!m_Device->IsMicronTrackerInstalled()) 
+  if (!m_Device->IsMicronTrackerInstalled())
     return false;
   //##################################################################################
+
+  //be sure that the temp-directory is empty at start: delete all files in the tool files directory
+  itksys::SystemTools::RemoveADirectory(m_ToolfilesDir.c_str());
+  itksys::SystemTools::MakeDirectory(m_ToolfilesDir.c_str());
 
   //copy all toolfiles into the temp directory
   for (unsigned int i=0; i<m_AllTools.size(); i++)
@@ -125,7 +129,7 @@ bool mitk::ClaronTrackingDevice::StartTracking()
     m_ThreadID = m_MultiThreader->SpawnThread(this->ThreadStartTracking, this);    // start a new thread that executes the TrackTools() method
     return true;
   }
-  else 
+  else
   {
     m_ErrorMessage = "Error while trying to start the device!";
     return false;
@@ -223,7 +227,7 @@ void mitk::ClaronTrackingDevice::TrackTools()
     /* lock the TrackingFinishedMutex to signal that the execution rights are now transfered to the tracking thread */
     MutexLockHolder trackingFinishedLockHolder(*m_TrackingFinishedMutex); // keep lock until end of scope
 
-    bool localStopTracking;       // Because m_StopTracking is used by two threads, access has to be guarded by a mutex. To minimize thread locking, a local copy is used here 
+    bool localStopTracking;       // Because m_StopTracking is used by two threads, access has to be guarded by a mutex. To minimize thread locking, a local copy is used here
     this->m_StopTrackingMutex->Lock();  // update the local copy of m_StopTracking
     localStopTracking = this->m_StopTracking;
     this->m_StopTrackingMutex->Unlock();
@@ -284,7 +288,7 @@ void mitk::ClaronTrackingDevice::TrackTools()
         }
       }
       /* Update the local copy of m_StopTracking */
-      this->m_StopTrackingMutex->Lock();  
+      this->m_StopTrackingMutex->Lock();
       localStopTracking = m_StopTracking;
       this->m_StopTrackingMutex->Unlock();
     }

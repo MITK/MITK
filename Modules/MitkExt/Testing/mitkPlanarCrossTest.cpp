@@ -92,14 +92,14 @@ static void TestPlanarCrossPlacement( mitk::PlanarCross::Pointer planarCross )
   const mitk::PlanarFigure::VertexContainerType* polyLine0 = planarCross->GetPolyLine( 0 );
   const mitk::Point2D& pp0 = polyLine0->ElementAt( 0 );
   const mitk::Point2D& pp1 = polyLine0->ElementAt( 1 );
-  MITK_TEST_CONDITION( (pp0 == p0) && (pp1 == p1)
-    || (pp0 == p1) && (pp1 == p0), "Correct polyline 1" );
+  MITK_TEST_CONDITION( ((pp0 == p0) && (pp1 == p1))
+    || ((pp0 == p1) && (pp1 == p0)), "Correct polyline 1" );
 
   const mitk::PlanarFigure::VertexContainerType* polyLine1 = planarCross->GetPolyLine( 1 );
   const mitk::Point2D& pp2 = polyLine1->ElementAt( 0 );
   const mitk::Point2D& pp3 = polyLine1->ElementAt( 1 );
-  MITK_TEST_CONDITION( (pp2 == p2) && (pp3 == p3)
-    || (pp2 == p3) && (pp3 == p2), "Correct polyline 2" );
+  MITK_TEST_CONDITION( ((pp2 == p2) && (pp3 == p3))
+    || ((pp2 == p3) && (pp3 == p2)), "Correct polyline 2" );
 
   
   // Test for number of measurement features

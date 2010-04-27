@@ -371,7 +371,10 @@ bool mitk::SceneIO::SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNode
       try
       {
         Poco::File deleteFile( filename.c_str() );
-        deleteFile.remove();
+        if (deleteFile.exists())
+        {
+          deleteFile.remove();
+        }
 
         // create zip at filename
         std::ofstream file( filename.c_str(), std::ios::binary | std::ios::out);
@@ -397,9 +400,9 @@ bool mitk::SceneIO::SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNode
           return false; // ok?
         }
       }
-      catch(std::exception& /*e*/)
+      catch(std::exception& e)
       {
-        MITK_ERROR << "Could not create ZIP file from " << m_WorkingDirectory;
+        MITK_ERROR << "Could not create ZIP file from " << m_WorkingDirectory << "\nReason: " << e.what();
         return false;
       }
       return true;

@@ -9,6 +9,7 @@ SET(MODULE_TESTS
   mitkMultiStepperTest.cpp
   mitkOrganTypePropertyTest.cpp
   mitkPipelineSmartPointerCorrectnessTest.cpp
+  mitkPlanarCrossTest.cpp
   mitkPlaneFitTest.cpp
   mitkPointLocatorTest.cpp
   # mitkSegmentationInterpolationTest.cpp

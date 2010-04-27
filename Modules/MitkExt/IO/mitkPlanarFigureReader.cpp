@@ -133,6 +133,25 @@ void mitk::PlanarFigureReader::GenerateData()
       MITK_WARN << "encountered unknown planar figure type '" << type << "'. Skipping this element.";
       continue;
     }
+    TiXmlElement* geoElement = pfElement->FirstChildElement("Geometry");
+    if (geoElement != NULL)
+    {
+      try
+      {
+        Vector3D xVector = this->GetVectorFromXMLNode(geoElement->FirstChildElement("xVector"));
+        Vector3D yVector = this->GetVectorFromXMLNode(geoElement->FirstChildElement("yVector"));
+        Vector3D spacing = this->GetVectorFromXMLNode(geoElement->FirstChildElement("Spacing"));
+        Point3D origin = this->GetPointFromXMLNode(geoElement->FirstChildElement("Origin"));
+
+        mitk::PlaneGeometry::Pointer planeGeo = mitk::PlaneGeometry::New();
+        planeGeo->InitializeStandardPlane( xVector, yVector, &spacing );
+        planeGeo->SetOrigin( origin );
+        pf->SetGeometry2D(planeGeo);
+      }
+      catch (...)
+      {
+      }
+    }
     TiXmlElement* cpElement = pfElement->FirstChildElement("ControlPoints");
     bool first = true;
     if (cpElement != NULL)      
@@ -159,25 +178,7 @@ void mitk::PlanarFigureReader::GenerateData()
         }
         pf->SetControlPoint(id, p, true);
       }
-    TiXmlElement* geoElement = pfElement->FirstChildElement("Geometry");
-    if (geoElement != NULL)
-    {
-      try
-      {
-        Vector3D xVector = this->GetVectorFromXMLNode(geoElement->FirstChildElement("xVector"));
-        Vector3D yVector = this->GetVectorFromXMLNode(geoElement->FirstChildElement("yVector"));
-        Vector3D spacing = this->GetVectorFromXMLNode(geoElement->FirstChildElement("Spacing"));
-        Point3D origin = this->GetPointFromXMLNode(geoElement->FirstChildElement("Origin"));
 
-        mitk::PlaneGeometry::Pointer planeGeo = mitk::PlaneGeometry::New();
-        planeGeo->InitializeStandardPlane( xVector, yVector, &spacing );
-        planeGeo->SetOrigin( origin );
-        pf->SetGeometry2D(planeGeo);
-      }
-      catch (...)
-      {        	
-      }
-    }
     // Calculate feature quantities of this PlanarFigure
     pf->EvaluateFeatures();
 

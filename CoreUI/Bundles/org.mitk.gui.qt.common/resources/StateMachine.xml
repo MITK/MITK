@@ -3307,6 +3307,62 @@
       <transition NAME="name" EVENT_ID="1004" NEXT_STATE_ID="45" />
     </state>
   </stateMachine>
+  <stateMachine NAME="Zoom">
+    <state NAME="neutral" ID="0" START_STATE="TRUE" X_POS="288" Y_POS="81" WIDTH="100" HEIGHT="50">
+      <transition NAME="initzoom" NEXT_STATE_ID="2" EVENT_ID="1">
+        <action ID="1011" />
+      </transition>
+    </state>
+    <state NAME="zoom" ID="2" X_POS="584" Y_POS="432" WIDTH="100" HEIGHT="50">
+      <transition NAME="zoom" NEXT_STATE_ID="2" EVENT_ID="530">
+        <action ID="1012" />
+      </transition>
+      <transition NAME="finish" NEXT_STATE_ID="0" EVENT_ID="505" />
+    </state>
+  </stateMachine>
+  <stateMachine NAME="Scroll">
+    <state NAME="neutral" ID="0" START_STATE="TRUE" X_POS="288" Y_POS="81" WIDTH="100" HEIGHT="50">
+      <transition NAME="initmove" NEXT_STATE_ID="1" EVENT_ID="1">
+        <action ID="9" />
+      </transition>
+    </state>
+    <state NAME="scroll" ID="1" X_POS="170" Y_POS="413" WIDTH="100" HEIGHT="50">
+      <transition NAME="scroll" NEXT_STATE_ID="1" EVENT_ID="530">
+        <action ID="1013" />
+      </transition>
+      <transition NAME="finish" NEXT_STATE_ID="0" EVENT_ID="505">
+        <action ID="43" />
+      </transition>
+    </state>
+  </stateMachine>
+  <stateMachine NAME="Pan">
+    <state NAME="neutral" ID="0" START_STATE="TRUE" X_POS="288" Y_POS="81" WIDTH="100" HEIGHT="50">
+      <transition NAME="initmove" NEXT_STATE_ID="1" EVENT_ID="1">
+        <action ID="9" />
+      </transition>
+    </state>
+    <state NAME="move" ID="1" X_POS="170" Y_POS="413" WIDTH="100" HEIGHT="50">
+      <transition NAME="move" NEXT_STATE_ID="1" EVENT_ID="530">
+        <action ID="92" />
+      </transition>
+      <transition NAME="finish" NEXT_STATE_ID="0" EVENT_ID="505">
+        <action ID="43" />
+      </transition>
+    </state>
+  </stateMachine>
+  <stateMachine NAME="LevelWindow">
+    <state NAME="neutral" ID="0" START_STATE="TRUE" X_POS="288" Y_POS="81" WIDTH="100" HEIGHT="50">
+      <transition NAME="initmove" NEXT_STATE_ID="1" EVENT_ID="2">
+        <action ID="9" />
+      </transition>
+    </state>
+    <state NAME="levelwindow" ID="1" X_POS="584" Y_POS="432" WIDTH="100" HEIGHT="50">
+      <transition NAME="levelwindow" NEXT_STATE_ID="1" EVENT_ID="531">
+        <action ID="1014" />
+      </transition>
+      <transition NAME="finish" NEXT_STATE_ID="0" EVENT_ID="507" />
+    </state>
+  </stateMachine>  
 </mitkInteraktionStates>
 <!-- DOCUMENTATION -->
 <!-- This is StateMachine.xml. Includes Information about different StateMachines and Events. Used by EventMapper and StateMachineFactory -->

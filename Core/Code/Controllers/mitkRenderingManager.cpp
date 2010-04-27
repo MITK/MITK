@@ -976,6 +976,11 @@ void RenderingManager::SetDataStorage( DataStorage* storage )
   }
 }
 
+mitk::DataStorage* RenderingManager::GetDataStorage()
+{
+  return m_DataStorage;
+}
+
 
 void RenderingManager::SetGlobalInteraction( mitk::GlobalInteraction* globalInteraction )
 {
@@ -983,7 +988,12 @@ void RenderingManager::SetGlobalInteraction( mitk::GlobalInteraction* globalInte
   {
     m_GlobalInteraction = globalInteraction;
   }
-} 
+}
+
+mitk::GlobalInteraction* RenderingManager::GetGlobalInteraction()
+{
+  return m_GlobalInteraction;
+}
 
 // Create and register generic RenderingManagerFactory.
 GenericRenderingManagerFactory renderingManagerFactory;

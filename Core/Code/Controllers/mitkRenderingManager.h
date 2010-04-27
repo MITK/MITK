@@ -257,7 +257,11 @@ public:
 
   void SetDataStorage( mitk::DataStorage* storage );
 
+  mitk::DataStorage* GetDataStorage();
+
   void SetGlobalInteraction( mitk::GlobalInteraction* globalInteraction );
+
+  mitk::GlobalInteraction* GetGlobalInteraction();
 
 
 protected:

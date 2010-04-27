@@ -246,14 +246,26 @@ void mitk::PlanarCross::GenerateHelperPolyLine(double /*mmPerDisplayUnit*/, unsi
   n1.Normalize();
 
   Vector2D v1 = p3 - p1;
-
   Point2D crossPoint = p1 + n1 * (n1 * v1);
 
-  // Draw orthogonal "infinite" line through this cross point
-  Vector2D n2 = p3 - crossPoint;
-  n2.Normalize();
-  m_HelperPolyLines->ElementAt( 0 )->ElementAt( 0 ) = crossPoint - n2 * 10000.0;
-  m_HelperPolyLines->ElementAt( 0 )->ElementAt( 1 ) = crossPoint + n2 * 10000.0;
+  Vector2D v2 = crossPoint - p3;
+  if ( v2.GetNorm() < 1.0 )
+  {
+    // If third point is on the first line, draw orthogonal "infinite" line
+    // through cross point on line
+    Vector2D v0;
+    v0[0] = n1[1];
+    v0[1] = -n1[0];
+    m_HelperPolyLines->ElementAt( 0 )->ElementAt( 0 ) = p3 - v0 * 10000.0;
+    m_HelperPolyLines->ElementAt( 0 )->ElementAt( 1 ) = p3 + v0 * 10000.0;
+  }
+  else
+  {
+    // Else, draw orthogonal line starting from third point and crossing the
+    // first line, open-ended only on the other side
+    m_HelperPolyLines->ElementAt( 0 )->ElementAt( 0 ) = p3;
+    m_HelperPolyLines->ElementAt( 0 )->ElementAt( 1 ) = p3 + v2 * 10000.0;
+  }
 }
 
   

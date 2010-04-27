@@ -88,8 +88,15 @@ void mitk::PlanarFigureWriter::GenerateData()
     const PlaneGeometry* planeGeo = dynamic_cast<const PlaneGeometry*>(pf->GetGeometry2D());
     if (planeGeo != NULL)
     {
-      Vector3D xVector = planeGeo->GetAxisVector( 0 );
-      Vector3D yVector = planeGeo->GetAxisVector( 1 );
+      // Get x and y direction vectors (in mm) and convert them to units
+      Point3D p0; p0.Fill( 0.0 );
+      Vector3D xVector;
+      static_cast< const mitk::Geometry3D * >( planeGeo )->WorldToIndex(
+        p0, planeGeo->GetAxisVector( 0 ), xVector );
+      Vector3D yVector;
+      static_cast< const mitk::Geometry3D * >( planeGeo )->WorldToIndex(
+        p0, planeGeo->GetAxisVector( 1 ), yVector );
+
       Vector3D spacing = planeGeo->GetSpacing();
       Point3D origin = planeGeo->GetOrigin();
 

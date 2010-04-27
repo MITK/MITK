@@ -26,7 +26,7 @@ SET(MODULE_TESTS
    mitkTrackingDeviceSourceTest.cpp
    #mitkNavigationDataPlayerTest.cpp  # deactivated, see bug 3073
    #mitkNavigationDataSourceTest.cpp   # deactivated because of  bug #2323
-   #mitkNavigationToolReaderAndWriterTest.cpp #deactivated, see bug #3461
+   mitkNavigationToolReaderAndWriterTest.cpp #deactivated, see bug #3461
    # -----------------------------------------------------------------------
    
    # ------------------ Navigation Tool Management Tests -------------------

@@ -59,8 +59,16 @@ public:
 
   itkNewMacro( Self );
 
+  /** \brief Indicates whether the PlanarFigure shall represent only a single line instead of an
+   * orthogonal cross. */
   itkSetMacro( SingleLineMode, bool );
+
+  /** \brief Indicates whether the PlanarFigure shall represent only a single line instead of an
+  * orthogonal cross. */
   itkGetMacro( SingleLineMode, bool );
+
+  /** \brief Indicates whether the PlanarFigure shall represent only a single line instead of an
+  * orthogonal cross. */
   itkBooleanMacro( SingleLineMode );
 
 
@@ -73,13 +81,11 @@ public:
     return m_SingleLineMode ? 2 : 4;
   }
 
-
   /** \brief PlanarCross has either two or four control points, depending on the operation mode. */
   unsigned int GetMaximumNumberOfControlPoints() const
   {
     return m_SingleLineMode ? 2 : 4;
   }
-
 
   /** \brief The cross shall be reset to a single line when a control point is selected. */
   virtual bool ResetOnPointSelect();

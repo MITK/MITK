@@ -232,7 +232,7 @@ void mitk::ClaronTrackingDevice::TrackTools()
     localStopTracking = this->m_StopTracking;
     this->m_StopTrackingMutex->Unlock();
 
-    while (this->GetState() == Tracking)
+    while ((this->GetState() == Tracking) && (localStopTracking == false))
     {
       this->GetDevice()->GrabFrame();
 

@@ -664,8 +664,8 @@ void QmitkBasicImageProcessing::StartButtonClicked()
   case THRESHOLD:
     {
       ThresholdFilterType::Pointer thFilter = ThresholdFilterType::New();
-      thFilter->SetLowerThreshold(param1);
-      thFilter->SetUpperThreshold(param2);
+      thFilter->SetLowerThreshold(param1 < param2 ? param1 : param2);
+      thFilter->SetUpperThreshold(param2 > param1 ? param2 : param1);
       thFilter->SetInsideValue(1);
       thFilter->SetOutsideValue(0);
       thFilter->SetInput(itkImage);

@@ -171,8 +171,7 @@ mitk::ImageMapper2D::Paint( mitk::BaseRenderer *renderer )
     (node->GetBoolProperty("showVolume", shouldShowVolume)) &&
     (shouldShowVolume) && 
     (
-    ((node->GetFloatProperty("volume", segmentationVolume)) &&
-    (segmentationVolume > 0))
+    (node->GetFloatProperty("volume", segmentationVolume) ) 
     || 
     (mitkimage != NULL &&
     mitkimage->GetDimension() >= 3 &&
@@ -250,8 +249,6 @@ mitk::ImageMapper2D::Paint( mitk::BaseRenderer *renderer )
       
       //calc index pos with spacing
       const Geometry2D *worldGeometry = renderer->GetCurrentWorldGeometry2D();
-      pt2D[0] /= rendererInfo.m_PixelsPerMM[0];
-      pt2D[1] /= rendererInfo.m_PixelsPerMM[1];
       
       //calc display coord
       worldGeometry->IndexToWorld( pt2D, pt2D );

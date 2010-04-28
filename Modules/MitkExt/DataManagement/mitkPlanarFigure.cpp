@@ -445,6 +445,10 @@ void mitk::PlanarFigure::PrintSelf( std::ostream& os, itk::Indent indent) const
 
 unsigned short mitk::PlanarFigure::GetPolyLinesSize()
 {
+  if ( m_PolyLines->GetMTime() < m_ControlPoints->GetMTime() )
+  {
+    this->GeneratePolyLine();
+  }
   return m_PolyLines->size();
 }
 

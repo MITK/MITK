@@ -626,9 +626,7 @@ void RenderingManager::InternalViewInitialization(mitk::BaseRenderer *baseRender
 
     // Fit the render window DisplayGeometry
     baseRenderer->GetDisplayGeometry()->Fit();
-
-    vtkRenderer *renderer = baseRenderer->GetVtkRenderer();
-    if ( renderer != NULL ) renderer->ResetCamera();
+    baseRenderer->GetCameraController()->SetViewToAnterior();
   }
   else
   {

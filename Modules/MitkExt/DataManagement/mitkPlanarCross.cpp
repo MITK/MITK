@@ -28,10 +28,6 @@ mitk::PlanarCross::PlanarCross()
   // Cross has two control points at the beginning
   this->ResetNumberOfControlPoints( 2 );
 
-  // Create polyline objects (one for each line of the cross)
-  m_PolyLines->InsertElement( 0, VertexContainerType::New() );
-  m_PolyLines->InsertElement( 1, VertexContainerType::New() );
-
   // Create helper polyline object (for drawing the orthogonal orientation line)
   m_HelperPolyLines->InsertElement( 0, VertexContainerType::New());
   m_HelperPolyLines->ElementAt( 0 )->Reserve( 2 );
@@ -202,12 +198,13 @@ mitk::Point2D mitk::PlanarCross::InternalApplyControlPointConstraints( unsigned 
 
 void mitk::PlanarCross::GeneratePolyLine()
 {
-  m_PolyLines->InsertElement( 0, VertexContainerType::New() );
-  m_PolyLines->InsertElement( 1, VertexContainerType::New() );
+  m_PolyLines->Initialize();
 
+  m_PolyLines->InsertElement( 0, VertexContainerType::New() );
   m_PolyLines->ElementAt( 0 )->Reserve( 2 );
   if ( this->GetNumberOfControlPoints() > 2)
   {
+    m_PolyLines->InsertElement( 1, VertexContainerType::New() );
     m_PolyLines->ElementAt( 1 )->Reserve( this->GetNumberOfControlPoints() - 2 );
   }
 

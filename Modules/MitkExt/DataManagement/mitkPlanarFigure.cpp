@@ -186,7 +186,7 @@ mitk::Point3D mitk::PlanarFigure::GetWorldControlPoint( unsigned int index ) con
 mitk::PlanarFigure::VertexContainerType *
 mitk::PlanarFigure::GetPolyLine(unsigned int index)
 {
-  if ((m_PolyLines->ElementAt( index )) && (m_PolyLines->ElementAt( index )->GetMTime() < m_ControlPoints->GetMTime()) )
+  if ( !m_PolyLines->IndexExists( index ) || (m_PolyLines->ElementAt( index )->GetMTime() < m_ControlPoints->GetMTime()) )
   {
     this->GeneratePolyLine();
   }

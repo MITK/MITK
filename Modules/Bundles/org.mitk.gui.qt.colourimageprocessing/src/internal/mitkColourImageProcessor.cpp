@@ -281,6 +281,12 @@ template<class TType> mitk::Image::Pointer mitkColourImageProcessor::ScalarToRGB
     mitk::CastToItkImage(mitkInput,itkInput);
     mitkResult = ScalarToRGBA<short>(itkInput, tf);
   }
+  else
+  {
+    MITK_ERROR << "unsupported pixel type";
+    return NULL;
+  }
+
 
    mitkResult->SetSpacing( mitkInput->GetGeometry()->GetSpacing() );
   

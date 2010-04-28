@@ -181,10 +181,16 @@ void QmitkColourImageProcessingView::OnConvertToRGBAImage()
     RGBAImageResult = CImageProcessor.convertToRGBAImage(dynamic_cast<mitk::Image*>(m_SelectedNode->GetData()),tf);
   }
   
+  if (!RGBAImageResult)
+  {
+    QMessageBox::warning(NULL, "Warning", QString("Unsupported pixeltype"));
+    return;
+  }
+
   mitk::DataNode::Pointer dtn = mitk::DataNode::New();
   
   dtn->SetData( RGBAImageResult );
-  
+  dtn->SetName(m_SelectedNode->GetName() + "_RGBA");
   this->GetDefaultDataStorage()->Add( dtn ); // add as a child, because the segmentation "derives" from the original
 
   MITK_INFO << "convertToRGBAImage finish";
@@ -213,7 +219,6 @@ void QmitkColourImageProcessingView::OnConvertImageMaskColorToRGBAImage( )
   
   if(m_SelectedNode2.IsNotNull())
   {
-    
     RGBAImageResult = CImageProcessor.convertWithBinaryAndColorToRGBAImage(dynamic_cast<mitk::Image*>(m_SelectedNode->GetData()),dynamic_cast<mitk::Image*>(m_SelectedNode2->GetData()),tf, m_Color);
   }
   else
@@ -221,9 +226,16 @@ void QmitkColourImageProcessingView::OnConvertImageMaskColorToRGBAImage( )
     RGBAImageResult = CImageProcessor.convertToRGBAImage(dynamic_cast<mitk::Image*>(m_SelectedNode->GetData()),tf);
   }
   
+  if (!RGBAImageResult)
+  {
+    QMessageBox::warning(NULL, "Warning", QString("Unsupported pixeltype"));
+    return;
+  }
+
   mitk::DataNode::Pointer dtn = mitk::DataNode::New();
   
   dtn->SetData( RGBAImageResult );
+  dtn->SetName(m_SelectedNode->GetName() + "_RGBA");
   
   this->GetDefaultDataStorage()->Add( dtn ); // add as a child, because the segmentation "derives" from the original
 

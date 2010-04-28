@@ -51,7 +51,7 @@ SET(MODULE_TESTS
   mitkStepperTest.cpp
   itkTotalVariationDenoisingImageFilterTest.cpp
   mitkDICOMLocaleTest.cpp
-  mitkPointSetLocaleTest.cpp
+  #mitkPointSetLocaleTest.cpp
   mitkRenderingManagerTest.cpp
   vtkMitkThickSlicesFilterTest.cpp
 )

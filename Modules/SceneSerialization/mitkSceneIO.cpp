@@ -384,7 +384,7 @@ bool mitk::SceneIO::SaveScene( DataStorage::SetOfObjects::ConstPointer sceneNode
         }
         else
         {
-          Poco::Zip::Compress zipper( file, false ); // must be set to false when writing to a network (whatever that means)
+          Poco::Zip::Compress zipper( file, true );
           Poco::Path tmpdir( m_WorkingDirectory );
           zipper.addRecursive( tmpdir );
           zipper.close();

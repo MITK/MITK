@@ -85,6 +85,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkTransferFunctionProperty.h"
 #include "mitkVtkResliceInterpolationProperty.h"
 #include "mitkProgressBar.h"
+#include <mitkDicomSeriesReader.h>
 
 bool mitk::DataNodeFactory::m_TextureInterpolationActive = false;    // default value for texture interpolation if nothing is defined in global options (see QmitkMainTemplate.ui.h)
 
@@ -140,21 +141,11 @@ void mitk::DataNodeFactory::GenerateData()
   }
 
   // part for DICOM
-  const char *numbers = "0123456789.";
-  std::string::size_type first_non_number;
-  first_non_number = itksys::SystemTools::GetFilenameName(m_FileName).find_first_not_of ( numbers );
+//  const char *numbers = "0123456789.";
+//  std::string::size_type first_non_number;
+//  first_non_number = itksys::SystemTools::GetFilenameName(m_FileName).find_first_not_of ( numbers );
 
-  if ( this->FileNameEndsWith( ".dcm" ) || this->FileNameEndsWith( ".DCM" ) 
-    || this->FileNameEndsWith( ".ima" ) 
-    || this->FileNameEndsWith( ".IMA" ) 
-    || this->FilePatternEndsWith( ".dcm" ) 
-    || this->FilePatternEndsWith( ".DCM" ) 
-    || this->FilePatternEndsWith( ".gdcm" ) 
-    || this->FilePatternEndsWith( ".GDCM" ) 
-    || this->FilePatternEndsWith( ".ima" ) 
-    || this->FilePatternEndsWith( ".IMA" ) 
-    || (itksys::SystemTools::GetFilenameLastExtension(m_FileName) == "" ) 
-    || first_non_number == std::string::npos )
+  if (DicomSeriesReader::IsDicom(this->m_FileName) /*|| first_non_number == std::string::npos*/)
   {
     this->ReadFileSeriesTypeDCM();
   }
@@ -229,37 +220,6 @@ std::string mitk::DataNodeFactory::GetDirectory()
     return std::string( "" );
 }
 
-
-// a progress callback
-void mitk::DataNodeFactory::OnITKProgressEvent(itk::Object *source, const itk::EventObject &) {
-  //// Get the value of the progress
-  itk::ProcessObject* _ProcessObject = dynamic_cast<itk::ProcessObject*>(source);
-  if(!_ProcessObject)
-    return;
-
-  float progress = _ProcessObject->GetProgress();
-  unsigned int iProgress = static_cast<unsigned int>(progress * 100);
-  int steps = iProgress -  m_OldProgress;
-  mitk::ProgressBar::GetInstance()->Progress(steps);
-  m_OldProgress = iProgress;
-
-
-  //// Update the progress bar and value in the MITK progress bar
-  //m_mitkProgressMeter->value(100 * progress);
-  //m_mitkOutProgressCounter->value(100 * progress);
-
-  //// Show or hide progress bar if necessary
-  //if(progress < 1.0f && !m_mitkProgressBar->visible())
-  //{
-  //  m_mitkProgressBar->show();
-  //}
-  //else if (progress == 1.0f && m_mitkProgressBar->visible())
-  //{
-  //  m_mitkProgressBar->hide();
-  //}
-
-}
-
 void mitk::DataNodeFactory::ReadFileSeriesTypeDCM()
 {
   MITK_INFO << "loading image series with prefix " << m_FilePrefix << " and pattern " << m_FilePattern << " as DICOM..." << std::endl;
@@ -269,106 +229,35 @@ void mitk::DataNodeFactory::ReadFileSeriesTypeDCM()
   std::locale l( "C" );
   std::cin.imbue(l);
 
-  typedef itk::Image<short, 3> ImageType;
-  typedef itk::ImageSeriesReader< ImageType > ReaderType;  
-  typedef std::vector<std::string> StringContainer;  
-  typedef itk::GDCMSeriesFileNames NameGeneratorType;
-  typedef itk::DICOMImageIO2 IOType;
-  
-  std::string dir = this->GetDirectory();
-  IOType::Pointer dicomIO = IOType::New();
-  
-  // Get the DICOM filenames from the directory
-  NameGeneratorType::Pointer nameGenerator = NameGeneratorType::New();
-  
-  // add more criteria to distinguish between different series
-  nameGenerator->SetUseSeriesDetails( m_UseSeriesDetails );
+  DicomSeriesReader::UidFileNamesMap names_map = DicomSeriesReader::GetSeries(this->GetDirectory(), this->m_UseSeriesDetails, this->m_SeriesRestrictions);
+  const unsigned int size = names_map.size();
 
-  nameGenerator->SetDirectory( dir.c_str() );
+  this->ResizeOutputs(size);
+  ProgressBar::GetInstance()->AddStepsToDo(size);
+  ProgressBar::GetInstance()->Progress();
 
-  
-  // add series restrictions
-  std::vector<std::string>::const_iterator it;
-  for(it=m_SeriesRestrictions.begin(); it!=m_SeriesRestrictions.end(); it++)
+  unsigned int i = 0u;
+  const DicomSeriesReader::UidFileNamesMap::const_iterator n_end = names_map.end();
+
+  for (DicomSeriesReader::UidFileNamesMap::const_iterator n_it = names_map.begin(); n_it != n_end; ++n_it)
   {
-    nameGenerator->AddSeriesRestriction( *it );
-  }
+    const std::string &uid = n_it->first;
+    DataNode::Pointer node = this->GetOutput(i);
 
-  const StringContainer & seriesUIDs = nameGenerator->GetSeriesUIDs();
-  StringContainer::const_iterator seriesItr = seriesUIDs.begin();
-  StringContainer::const_iterator seriesEnd = seriesUIDs.end();
+    MITK_INFO << "Reading series #" << i << ": " << uid << std::endl;
 
-  MITK_INFO << "The directory " << dir << " contains the following DICOM Series: " << std::endl;
-  while ( seriesItr != seriesEnd )
-  {
-    MITK_INFO << *seriesItr << std::endl;
-    seriesItr++;
-  }
-
-  unsigned int size = seriesUIDs.size();
-  this->ResizeOutputs( size );
-
-
-  for ( unsigned int i = 0 ; i < size ; ++i )
-  {
-    MITK_INFO << "Reading series #" << i << ": " << seriesUIDs[ i ] << std::endl;
-    StringContainer fileNames = nameGenerator->GetFileNames( seriesUIDs[ i ] );
-    StringContainer::const_iterator fnItr = fileNames.begin();
-    StringContainer::const_iterator fnEnd = fileNames.end();
-    while ( fnItr != fnEnd )
+    if (DicomSeriesReader::LoadDicomSeries(n_it->second, *node))
     {
-      MITK_INFO << *fnItr << std::endl;
-      ++fnItr;
+      ++i;
+      node->SetName(uid);
     }
-
-    // a progress command
-    itk::MemberCommand<Self>::Pointer  progressCommand = itk::MemberCommand<Self>::New(); 
-    progressCommand->SetCallbackFunction( this, &Self::OnITKProgressEvent );
-
-    ReaderType::Pointer reader = ReaderType::New();
-    reader->SetFileNames( fileNames );
-    reader->SetImageIO( dicomIO );
-    reader->AddObserver(itk::ProgressEvent(),progressCommand);
-
-    try
+    else
     {
-      mitk::ProgressBar::GetInstance()->AddStepsToDo(100);
-      reader->Update();
-
-      if(reader->GetOutput() == NULL)
-      {
-        MITK_INFO << "no image returned by reader for series #" << i << std::endl;
-        continue;
-      }
-
-      //Initialize mitk image from itk
-      Image::Pointer image = mitk::Image::New();
-      image = ImportItkImage(reader->GetOutput());
-      image->DisconnectPipeline();
-
-      //add the mitk image to the node
-      mitk::DataNode::Pointer node = this->GetOutput( i );
-      node->SetData( image );
-
-      //SetDefaultImageProperties(node);
-
-      // set filename without path as string property
-      std::string filename = std::string( this->GetBaseFilePrefix() );
-      mitk::StringProperty::Pointer nameProp = mitk::StringProperty::New( seriesUIDs[ i ] );
-      node->SetProperty( "name", nameProp );
-
-    }
-    catch ( const std::exception & e )
-    {
-      itkWarningMacro( << e.what() );
       MITK_ERROR << "skipping series #" << i << " due to exception" << std::endl;
-      reader->ResetPipeline();
     }
+
+    ProgressBar::GetInstance()->Progress();
   }
-
-
-
-  
 
   setlocale(LC_NUMERIC, previousCLocale);
   std::cin.imbue(previousCppLocale);

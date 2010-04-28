@@ -126,6 +126,8 @@ void mitk::SurfaceVtkMapper3D::ApplyMitkPropertiesToVtkProperty(mitk::DataNode *
         mitk::Color c = p->GetColor();
         ambient[0]=c.GetRed(); ambient[1]=c.GetGreen(); ambient[2]=c.GetBlue();
         diffuse[0]=c.GetRed(); diffuse[1]=c.GetGreen(); diffuse[2]=c.GetBlue();
+        // Setting specular color to the same, make physically no real sense, however vtk rendering slows down, if these colors are different.
+        specular[0]=c.GetRed(); specular[1]=c.GetGreen(); specular[2]=c.GetBlue();
       }          
     }
     
@@ -407,9 +409,9 @@ void mitk::SurfaceVtkMapper3D::SetDefaultPropertiesForVtkProperty(mitk::DataNode
     node->AddProperty( "material.specularCoefficient", mitk::FloatProperty::New(1.0f)          , renderer, overwrite );
     node->AddProperty( "material.specularPower"      , mitk::FloatProperty::New(16.0f)          , renderer, overwrite );
 
-    node->AddProperty( "material.ambientColor"       , mitk::ColorProperty::New(1.0f,1.0f,1.0f), renderer, overwrite );
+    //node->AddProperty( "material.ambientColor"       , mitk::ColorProperty::New(1.0f,1.0f,1.0f), renderer, overwrite );
     //node->AddProperty( "material.diffuseColor"       , mitk::ColorProperty::New(1.0f,1.0f,1.0f), renderer, overwrite );
-    node->AddProperty( "material.specularColor"      , mitk::ColorProperty::New(1.0f,1.0f,1.0f), renderer, overwrite );
+    //node->AddProperty( "material.specularColor"      , mitk::ColorProperty::New(1.0f,1.0f,1.0f), renderer, overwrite );
 
     node->AddProperty( "material.representation"      , mitk::VtkRepresentationProperty::New()  , renderer, overwrite );
     node->AddProperty( "material.interpolation"       , mitk::VtkInterpolationProperty::New()   , renderer, overwrite );

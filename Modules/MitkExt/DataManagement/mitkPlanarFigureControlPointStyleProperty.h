@@ -26,7 +26,16 @@ namespace mitk
 {
 
 /**
- * See also mitk::PlanarFigureControlPointStyleMapper2D
+ * \brief Defines the rendering style of control points for PlanarFigure objects.
+ * \sa mitk::PlanarFigureMapper2D
+ * \ingroup DataManagement
+ * 
+ * Used by PlanarFigureMapper2D to determine which of several control point shapes to use.
+ * Currently this is basically the choice between squares and circles. If more options
+ * are implemented, this class should be enhanced.
+ *
+ * After construction, the default shape is a square.
+ *
  */
 class MitkExt_EXPORT PlanarFigureControlPointStyleProperty : public EnumerationProperty
 {

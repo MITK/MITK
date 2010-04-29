@@ -27,6 +27,10 @@ bool mitk::DisplayGeometry::Zoom(mitk::ScalarType factor, const mitk::Point2D& c
     // only correct origin if zooming was ok
     return SetOriginInMM(m_OriginInMM-centerInDisplayUnits.GetVectorFromOrigin()*(1-factor)*m_ScaleFactorMMPerDisplayUnit);
   }
+  else
+  {
+    return false;
+  }
 }
 
 bool mitk::DisplayGeometry::MoveBy(const mitk::Vector2D& shiftInDisplayUnits)

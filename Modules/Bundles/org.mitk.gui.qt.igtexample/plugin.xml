@@ -12,6 +12,6 @@
     <view id="org.mitk.views.igtrecorder"
           name="IGT Recorder"
           class="::QmitkIGTRecorderView" 
-		  icon="resources/ImageGuidedTherapy.png"/>
+		  icon="resources/ImageGuidedTherapyExample.png"/>
   </extension>
 </plugin>

@@ -5,7 +5,7 @@
     <view id="org.mitk.views.imageguidedtherapytutorial"
           name="Image Guided Therapy Tutorial"
           class="::QmitkImageGuidedTherapyTutorialView"
-          icon="resources/ImageGuidedTherapy.png"/>
+          icon="resources/ImageGuidedTherapyTutorial.png"/>
   </extension>
 
 </plugin>

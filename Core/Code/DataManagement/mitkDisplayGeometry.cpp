@@ -18,21 +18,24 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkDisplayGeometry.h"
 
-void mitk::DisplayGeometry::Zoom(mitk::ScalarType factor, const mitk::Point2D& centerInDisplayUnits)
+bool mitk::DisplayGeometry::Zoom(mitk::ScalarType factor, const mitk::Point2D& centerInDisplayUnits)
 {
   assert(factor > 0);
 
-  SetScaleFactor(m_ScaleFactorMMPerDisplayUnit/factor);
-  SetOriginInMM(m_OriginInMM-centerInDisplayUnits.GetVectorFromOrigin()*(1-factor)*m_ScaleFactorMMPerDisplayUnit);
-
-  Modified();
+  if ( SetScaleFactor(m_ScaleFactorMMPerDisplayUnit/factor) )
+  {
+    // only correct origin if zooming was ok
+    return SetOriginInMM(m_OriginInMM-centerInDisplayUnits.GetVectorFromOrigin()*(1-factor)*m_ScaleFactorMMPerDisplayUnit);
+  }
 }
 
-void mitk::DisplayGeometry::MoveBy(const mitk::Vector2D& shiftInDisplayUnits)
+bool mitk::DisplayGeometry::MoveBy(const mitk::Vector2D& shiftInDisplayUnits)
 {
   SetOriginInMM(m_OriginInMM+shiftInDisplayUnits*m_ScaleFactorMMPerDisplayUnit);
 
   Modified();
+
+  return !this->RefitVisibleRect();
 }
 
 void mitk::DisplayGeometry::SetWorldGeometry(const mitk::Geometry2D* aWorldGeometry)
@@ -168,9 +171,27 @@ const mitk::TimeBounds& mitk::DisplayGeometry::GetTimeBounds() const
   return m_WorldGeometry->GetTimeBounds();
 }
 
-mitk::DisplayGeometry::DisplayGeometry() : 
-  m_ScaleFactorMMPerDisplayUnit(1.0),
-  m_WorldGeometry(NULL)
+void mitk::DisplayGeometry::SetConstrainZoomingAndPanning(bool constrain)
+{
+  m_ConstrainZoomingAndPanning = constrain;
+  if (m_ConstrainZoomingAndPanning)
+  {
+    this->RefitVisibleRect();
+  }
+}
+
+bool mitk::DisplayGeometry::GetConstrainZommingAndPanning() const
+{
+  return m_ConstrainZoomingAndPanning;
+}
+
+
+mitk::DisplayGeometry::DisplayGeometry()
+:m_ScaleFactorMMPerDisplayUnit(1.0)
+,m_WorldGeometry(NULL)
+,m_ConstrainZoomingAndPanning(false)
+,m_MaxWorldViewPercentage(1.0)
+,m_MinWorldViewPercentage(0.1)
 {
   m_SizeInDisplayUnits.Fill(10);
   m_OriginInMM.Fill(0);
@@ -221,12 +242,14 @@ void mitk::DisplayGeometry::SetSizeInDisplayUnits(unsigned int width, unsigned i
   Modified();
 }
 
-void mitk::DisplayGeometry::SetOriginInMM(const mitk::Vector2D& origin_mm)
+bool mitk::DisplayGeometry::SetOriginInMM(const mitk::Vector2D& origin_mm)
 {
   m_OriginInMM = origin_mm;
   WorldToDisplay(m_OriginInMM, m_OriginInDisplayUnits);
 
   Modified();
+
+  return !this->RefitVisibleRect();
 }
 
 void mitk::DisplayGeometry::Fit()
@@ -263,17 +286,21 @@ void mitk::DisplayGeometry::Fit()
   origin_display[1]=-(height-h)/2.0;
   SetOriginInMM(origin_display*m_ScaleFactorMMPerDisplayUnit);
 
+  this->RefitVisibleRect();
+
   Modified();
 }
 
-void mitk::DisplayGeometry::SetScaleFactor(mitk::ScalarType mmPerDisplayUnit)
+bool mitk::DisplayGeometry::SetScaleFactor(mitk::ScalarType mmPerDisplayUnit)
 {
   if(mmPerDisplayUnit<0.0001) mmPerDisplayUnit=0.0001;
 
   m_ScaleFactorMMPerDisplayUnit = mmPerDisplayUnit;
-  assert(m_ScaleFactorMMPerDisplayUnit<ScalarTypeNumericTraits::infinity());
+  assert(m_ScaleFactorMMPerDisplayUnit < ScalarTypeNumericTraits::infinity());
 
   DisplayToWorld(m_SizeInDisplayUnits, m_SizeInMM);
+
+  return !this->RefitVisibleRect();
 }
 
 mitk::ScalarType mitk::DisplayGeometry::GetScaleFactorMMPerDisplayUnit() const
@@ -326,4 +353,174 @@ void mitk::DisplayGeometry::PrintSelf(std::ostream& os, itk::Indent indent) cons
     os << indent << " ScaleFactorMMPerDisplayUni: " << m_ScaleFactorMMPerDisplayUnit << std::endl;
   }
   Superclass::PrintSelf(os,indent);
+}
+
+bool mitk::DisplayGeometry::RefitVisibleRect()
+{
+  // do nothing if not asked to
+  if (!m_ConstrainZoomingAndPanning) return false;
+
+  // don't allow recursion
+  static bool inRecalculate = false;
+  if (inRecalculate) return false;
+  inRecalculate = true;
+
+  // rename some basic measures of the current viewport and world geometry (MM = milimeters Px = Pixels = display units)
+  float displayXMM = m_OriginInMM[0];
+  float displayYMM = m_OriginInMM[1];
+  float displayWidthPx  = m_SizeInDisplayUnits[0];
+  float displayHeightPx = m_SizeInDisplayUnits[1];
+  float displayWidthMM  = m_SizeInDisplayUnits[0] * m_ScaleFactorMMPerDisplayUnit;
+  float displayHeightMM = m_SizeInDisplayUnits[1] * m_ScaleFactorMMPerDisplayUnit;
+
+  float worldWidthMM  = m_WorldGeometry->GetParametricExtentInMM(0);
+  float worldHeightMM = m_WorldGeometry->GetParametricExtentInMM(1);
+
+  // reserve variables for the correction logic to save a corrected origin and zoom factor
+  Vector2D newOrigin = m_OriginInMM;
+  bool correctPanning = false;
+
+  float newScaleFactor = m_ScaleFactorMMPerDisplayUnit;
+  bool correctZooming = false;
+
+  // start of the correction logic
+
+  // zoom to big means:
+  // at a given percentage of the world's width/height should be visible. Otherwise
+  // the whole screen could show only one pixel
+  //
+  // zoom to small means:
+  // zooming out should be limited at the point where the smaller of the world's sides is completely visible
+
+  bool zoomXtooSmall = displayWidthPx * m_ScaleFactorMMPerDisplayUnit > m_MaxWorldViewPercentage * worldWidthMM;
+  bool zoomXtooBig = displayWidthPx * m_ScaleFactorMMPerDisplayUnit < m_MinWorldViewPercentage * worldWidthMM;
+
+  bool zoomYtooSmall = displayHeightPx * m_ScaleFactorMMPerDisplayUnit > m_MaxWorldViewPercentage * worldHeightMM;
+  bool zoomYtooBig = displayHeightPx * m_ScaleFactorMMPerDisplayUnit < m_MinWorldViewPercentage * worldHeightMM;
+
+  // constrain zooming in in x direction
+  if ( zoomXtooBig )
+  {
+    newScaleFactor = worldWidthMM * m_MinWorldViewPercentage / displayWidthPx;
+    correctZooming = true;
+  }
+
+  // constrain zooming in in y direction
+  if ( zoomYtooBig )
+  {
+    newScaleFactor = worldHeightMM * m_MinWorldViewPercentage / displayHeightPx;
+    correctZooming = true;
+  }
+
+  // constrain zooming out
+  // we stop zooming out at these situations:
+  //
+  // --- world
+  // *** image
+  //
+  //   **********************
+  //   *                    *     x side maxed out
+  //   *                    *
+  //   *--------------------*
+  //   *|                  |*
+  //   *|                  |*
+  //   *--------------------*
+  //   *                    *
+  //   *                    *
+  //   *                    *
+  //   **********************
+  //
+  //   **********************
+  //   *     |------|       *     y side maxed out
+  //   *     |      |       *
+  //   *     |      |       *
+  //   *     |      |       *
+  //   *     |      |       *
+  //   *     |      |       *
+  //   *     |      |       *
+  //   *     |      |       *
+  //   *     |------|       *
+  //   **********************
+  //
+  // In both situations we center the not-maxed out direction
+  //
+  if ( zoomXtooSmall && zoomYtooSmall )
+    {
+      // determine and set the bigger scale factor
+      float fx = worldWidthMM * m_MaxWorldViewPercentage / displayWidthPx;
+      float fy = worldHeightMM * m_MaxWorldViewPercentage / displayHeightPx;
+      newScaleFactor = fx > fy ? fx : fy;
+
+      correctZooming = true;
+    }
+
+  // constrain panning
+  if (zoomXtooSmall)
+  {
+    // zoomed out too much in x (but tolerated because y is still ok)
+    // --> center x
+    newOrigin[0] = (worldWidthMM - displayWidthMM) / 2.0;
+  }
+  else
+  {
+    // make sure left display border inside our world
+    if (displayXMM < 0)
+    {
+      newOrigin[0] = 0;
+      correctPanning = true;
+    }
+    // make sure right display border inside our world
+    else
+    if (displayXMM + displayWidthMM > worldWidthMM)
+    {
+      newOrigin[0] = worldWidthMM - displayWidthMM;
+      correctPanning = true;
+    }
+  }
+
+
+  if (zoomYtooSmall)
+  {
+    // zoomed out too much in y (but tolerated because x is still ok)
+    // --> center y
+    newOrigin[1] = (worldHeightMM - displayHeightMM) / 2.0;
+    correctPanning = true;
+  }
+  else
+  {
+    // make sure bottom display border inside our world
+    if (displayYMM < 0)
+    {
+      newOrigin[1] = 0;
+      correctPanning = true;
+    }
+    // make sure top display border inside our world
+    else
+    if (displayYMM + displayHeightMM >  worldHeightMM)
+    {
+      newOrigin[1] = worldHeightMM - displayHeightMM;
+      correctPanning = true;
+    }
+}
+
+  // actually execute correction
+  if (correctZooming)
+  {
+    SetScaleFactor(newScaleFactor);
+  }
+
+  if (correctPanning)
+  {
+    SetOriginInMM( newOrigin );
+  }
+
+  if ( correctPanning || correctZooming )
+  {
+    Modified();
+  }
+
+  inRecalculate = false;
+
+  // return true if any correction has been made
+  return correctPanning || correctZooming;
 }

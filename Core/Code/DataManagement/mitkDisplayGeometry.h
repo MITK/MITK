@@ -35,24 +35,34 @@ namespace mitk {
 //## represents a recangular view on this world-geometry. E.g., you can tell
 //## the DisplayGeometry to fit the world-geometry in the display area by
 //## calling Fit(). Provides methods for zooming and panning.
+//##
+//## Zooming and panning can be restricted within reasonable bounds by setting
+//## the ConstrainZoomingAndPanning flag. In these cases you can re-define what
+//## bounds you accept as "reasonable" by calling
+//##
 //## @warning @em Units refers to the units of the underlying world-geometry.
 //## Take care, whether these are really the units you want to convert to.
 //## E.g., when you want to convert a point @a pt_display (which is 2D) given
 //## in display coordinates into a point in units of a BaseData-object @a datum
 //## (the requested point is 3D!), use
+//##
 //## @code
 //## displaygeometry->DisplayToWorld(pt_display, pt2d_mm);
 //## displaygeometry->Map(pt2d_mm, pt3d_mm);
 //## datum->GetGeometry()->WorldToIndex(pt3d_mm, pt3d_datum_units);
 //## @endcode
+//##
 //## Even, if you want to convert the 2D point @a pt_display into a 2D point in
 //## units on a certain 2D geometry @a certaingeometry, it is safer to use
+//##
 //## @code
 //## displaygeometry->DisplayToWorld(pt_display, pt_mm);
 //## certaingeometry->WorldToIndex(pt_mm, pt_certain_geometry_units);
 //## @endcode
+//##
 //## unless you can be sure that the underlying geometry of @a displaygeometry
 //## is really the @a certaingeometry.
+//##
 //## @ingroup Geometry
 class MITK_CORE_EXPORT DisplayGeometry : public Geometry2D
 {
@@ -65,8 +75,17 @@ public:
   virtual void SetWorldGeometry(const mitk::Geometry2D* aWorldGeometry);
   itkGetConstObjectMacro(WorldGeometry, Geometry2D);
 
-  virtual void Zoom(mitk::ScalarType factor, const mitk::Point2D& centerInDisplayUnits);
-  virtual void MoveBy(const mitk::Vector2D& shiftInDisplayUnits);
+  itkGetMacro(MaxWorldViewPercentage, float);
+  itkSetMacro(MaxWorldViewPercentage, float);
+
+  itkGetMacro(MinWorldViewPercentage, float);
+  itkSetMacro(MinWorldViewPercentage, float);
+
+  // \return true if zoom request was within accepted limits
+  virtual bool Zoom(mitk::ScalarType factor, const mitk::Point2D& centerInDisplayUnits);
+  // \return true if move request was within accepted limits
+  virtual bool MoveBy(const mitk::Vector2D& shiftInDisplayUnits);
+  // \brief align display with world, make world completely visible
   virtual void Fit();
 
   //##Documentation
@@ -81,7 +100,9 @@ public:
   //## When the aspect ration changes, the displayed region includes the old displayed region, but
   //## cannot be exaclty the same.
   virtual void SetSizeInDisplayUnits(unsigned int width, unsigned int height, bool keepDisplayedRegion=true);
-  virtual void SetOriginInMM(const mitk::Vector2D& origin_mm);
+
+  // \return if new origin was within accepted limits
+  virtual bool SetOriginInMM(const mitk::Vector2D& origin_mm);
 
   mitk::Vector2D GetOriginInMM() const
   {
@@ -128,7 +149,7 @@ public:
     return m_SizeInMM;
   }
 
-  virtual void SetScaleFactor(mitk::ScalarType mmPerDisplayUnit);
+  virtual bool SetScaleFactor(mitk::ScalarType mmPerDisplayUnit);
   mitk::ScalarType GetScaleFactorMMPerDisplayUnit() const;
 
   virtual void DisplayToWorld(const mitk::Point2D &pt_display, mitk::Point2D &pt_mm) const;
@@ -160,9 +181,31 @@ public:
   //##Documentation
   //## @brief duplicates the geometry, NOT useful for this sub-class
   virtual AffineGeometryFrame3D::Pointer Clone() const;
+
+  virtual void SetConstrainZoomingAndPanning(bool constrain);
+  virtual bool GetConstrainZommingAndPanning() const;
+
 protected:
+
   DisplayGeometry();
   virtual ~DisplayGeometry();
+
+  /**
+    \brief Called after zooming/panning to restrict these operations to sensible measures.
+    \return true if a correction in either zooming or panning was made
+
+    Enforces a couple of constraints on the relation of the current viewport and the current world geometry.
+
+    The basic logic in this lengthy method is:
+    <ol>
+    <li> Make display region big enough (in case of too large zoom factors)
+    <li> Make display region small enough (so that the image cannot be scaled into a single screen pixel
+    <li> Correct panning for each border (left, right, bottom, top)
+    </ol>
+
+    The little more complicated implementation is illustrated in the code itself.
+  */
+  virtual bool RefitVisibleRect();
 
   virtual void PrintSelf(std::ostream& os, itk::Indent indent) const;
 
@@ -172,6 +215,10 @@ protected:
   mitk::Vector2D m_SizeInMM;
   mitk::Vector2D m_SizeInDisplayUnits;
   mitk::Geometry2D::ConstPointer m_WorldGeometry;
+
+  bool m_ConstrainZoomingAndPanning;
+  float m_MaxWorldViewPercentage;
+  float m_MinWorldViewPercentage;
 };
 
 } // namespace mitk

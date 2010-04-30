@@ -38,8 +38,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkInteractionConst.h"
 #include "mitkDataStorage.h"
 
-#include "vtkTextProperty.h"
-#include "vtkCornerAnnotation.h"
 #include "mitkVtkLayerController.h"
 
 QmitkStdMultiWidget::QmitkStdMultiWidget(QWidget* parent, Qt::WindowFlags f)
@@ -254,42 +252,39 @@ void QmitkStdMultiWidget::InitializeWidget()
   //if( view >= 0 && view < 4 )
   //  //write LayoutName --> Viewer 3D shoudn't write the layoutName.
 
-  vtkCornerAnnotation *cornerText;
-  vtkTextProperty *textProp;
-  vtkRenderer *ren;
-
   //Render Window 1 == transversal
-  cornerText = vtkCornerAnnotation::New();
-  cornerText->SetText(0, "Transversal");
-  cornerText->SetMaximumFontSize(12);
-  textProp = vtkTextProperty::New();
-  textProp->SetColor( 1.0, 0.0, 0.0 );
-  cornerText->SetTextProperty( textProp );
-  ren = vtkRenderer::New();
-  ren->AddActor(cornerText);
-  mitk::VtkLayerController::GetInstance(this->GetRenderWindow1()->GetRenderWindow())->InsertForegroundRenderer(ren,true);
-
+  m_CornerAnnotaions[0].cornerText = vtkCornerAnnotation::New();
+  m_CornerAnnotaions[0].cornerText->SetText(0, "Transversal");
+  m_CornerAnnotaions[0].cornerText->SetMaximumFontSize(12);
+  m_CornerAnnotaions[0].textProp = vtkTextProperty::New();
+  m_CornerAnnotaions[0].textProp->SetColor( 1.0, 0.0, 0.0 );
+  m_CornerAnnotaions[0].cornerText->SetTextProperty( m_CornerAnnotaions[0].textProp );
+  m_CornerAnnotaions[0].ren = vtkRenderer::New();
+  m_CornerAnnotaions[0].ren->AddActor(m_CornerAnnotaions[0].cornerText);
+  mitk::VtkLayerController::GetInstance(this->GetRenderWindow1()->GetRenderWindow())->InsertForegroundRenderer(m_CornerAnnotaions[0].ren,true);
+  
   //Render Window 2 == sagittal
-  cornerText = vtkCornerAnnotation::New();
-  cornerText->SetText(0, "Sagittal");
-  cornerText->SetMaximumFontSize(12);
-  textProp = vtkTextProperty::New();
-  textProp->SetColor( 0.0, 1.0, 0.0 );
-  cornerText->SetTextProperty( textProp );
-  ren = vtkRenderer::New();
-  ren->AddActor(cornerText);
-  mitk::VtkLayerController::GetInstance(this->GetRenderWindow2()->GetRenderWindow())->InsertForegroundRenderer(ren,true);
-
+  m_CornerAnnotaions[1].cornerText = vtkCornerAnnotation::New();
+  m_CornerAnnotaions[1].cornerText->SetText(0, "Sagittal");
+  m_CornerAnnotaions[1].cornerText->SetMaximumFontSize(12);
+  m_CornerAnnotaions[1].textProp = vtkTextProperty::New();
+  m_CornerAnnotaions[1].textProp->SetColor( 0.0, 1.0, 0.0 );
+  m_CornerAnnotaions[1].cornerText->SetTextProperty( m_CornerAnnotaions[1].textProp );
+  m_CornerAnnotaions[1].ren = vtkRenderer::New();
+  m_CornerAnnotaions[1].ren->AddActor(m_CornerAnnotaions[1].cornerText);
+  mitk::VtkLayerController::GetInstance(this->GetRenderWindow2()->GetRenderWindow())->InsertForegroundRenderer(m_CornerAnnotaions[1].ren,true);
+  
   //Render Window 3 == coronal
-  cornerText = vtkCornerAnnotation::New();
-  cornerText->SetText(0, "Coronal");
-  cornerText->SetMaximumFontSize(12);
-  textProp = vtkTextProperty::New();
-  textProp->SetColor( 0.295, 0.295, 1.0 );
-  cornerText->SetTextProperty( textProp );
-  ren = vtkRenderer::New();
-  ren->AddActor(cornerText);
-  mitk::VtkLayerController::GetInstance(this->GetRenderWindow3()->GetRenderWindow())->InsertForegroundRenderer(ren,true);
+  m_CornerAnnotaions[2].cornerText = vtkCornerAnnotation::New();
+  m_CornerAnnotaions[2].cornerText->SetText(0, "Coronal");
+  m_CornerAnnotaions[2].cornerText->SetMaximumFontSize(12);
+  m_CornerAnnotaions[2].textProp = vtkTextProperty::New();
+  m_CornerAnnotaions[2].textProp->SetColor( 0.295, 0.295, 1.0 );
+  m_CornerAnnotaions[2].cornerText->SetTextProperty( m_CornerAnnotaions[2].textProp );
+  m_CornerAnnotaions[2].ren = vtkRenderer::New();
+  m_CornerAnnotaions[2].ren->AddActor(m_CornerAnnotaions[2].cornerText);
+  mitk::VtkLayerController::GetInstance(this->GetRenderWindow3()->GetRenderWindow())->InsertForegroundRenderer(m_CornerAnnotaions[2].ren,true);
+   
   /*************************************************/
 
 
@@ -419,6 +414,23 @@ QmitkStdMultiWidget::~QmitkStdMultiWidget()
 {
   DisablePositionTracking();
   DisableNavigationControllerEventListening();
+
+  mitk::VtkLayerController::GetInstance(this->GetRenderWindow1()->GetRenderWindow())->RemoveRenderer( m_CornerAnnotaions[0].ren );
+  mitk::VtkLayerController::GetInstance(this->GetRenderWindow2()->GetRenderWindow())->RemoveRenderer( m_CornerAnnotaions[1].ren );
+  mitk::VtkLayerController::GetInstance(this->GetRenderWindow3()->GetRenderWindow())->RemoveRenderer( m_CornerAnnotaions[2].ren );
+
+  //Delete CornerAnnotation
+  m_CornerAnnotaions[0].cornerText->Delete();
+  m_CornerAnnotaions[0].textProp->Delete();
+  m_CornerAnnotaions[0].ren->Delete();
+
+  m_CornerAnnotaions[1].cornerText->Delete();
+  m_CornerAnnotaions[1].textProp->Delete();
+  m_CornerAnnotaions[1].ren->Delete();
+
+  m_CornerAnnotaions[2].cornerText->Delete();
+  m_CornerAnnotaions[2].textProp->Delete();
+  m_CornerAnnotaions[2].ren->Delete();
 }
 
 void QmitkStdMultiWidget::RemovePlanesFromDataStorage()

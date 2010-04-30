@@ -61,6 +61,7 @@ void Step7::StartRegionGrowing()
 
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     std::cout << "8";
+    surfaceCreator->Delete();
   }
 
   std::cout << "9";

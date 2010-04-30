@@ -23,6 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkBaseVtkMapper3D.h"
 #include "mitkDataStorage.h"
 #include "mitkGeometry2DDataToSurfaceFilter.h"
+#include "mitkWeakPointer.h"
 
 #include <vtkSystemIncludes.h>
 #include <vtkCleanPolyData.h>
@@ -202,7 +203,7 @@ protected:
   bool m_NormalsActorAdded;
 
   /** \brief The DataStorage defines which part of the data tree is traversed for renderering. */
-  mitk::DataStorage::Pointer m_DataStorage;
+  mitk::WeakPointer<mitk::DataStorage> m_DataStorage;
 
   /** A default grayscale lookup-table, used for reference */
   vtkLookupTable *m_DefaultLookupTable;

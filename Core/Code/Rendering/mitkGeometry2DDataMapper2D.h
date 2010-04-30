@@ -24,6 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkSurfaceMapper2D.h"
 #include "mitkDataStorage.h"
 #include "mitkDataNode.h"
+#include "mitkWeakPointer.h"
 
 namespace mitk {
 
@@ -82,7 +83,7 @@ protected:
 
   SurfaceMapper2D::Pointer m_SurfaceMapper;
 
-  DataStorage::Pointer m_DataStorage;  ///< DataStorage that will be searched for sub nodes
+  mitk::WeakPointer<mitk::DataStorage> m_DataStorage;  ///< DataStorage that will be searched for sub nodes
   DataNode::Pointer m_ParentNode;  ///< parent node that will be used to search for sub nodes
  
   typedef std::vector<DataNode*> NodesVectorType;

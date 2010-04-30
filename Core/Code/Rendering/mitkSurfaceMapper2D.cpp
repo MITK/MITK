@@ -86,6 +86,7 @@ mitk::SurfaceMapper2D::~SurfaceMapper2D()
   m_Cutter->Delete();
   m_LUT->Delete();
   m_PointLocator->Delete();
+  m_Stripper->Delete();
 }
 
 const mitk::Surface *mitk::SurfaceMapper2D::GetInput(void)

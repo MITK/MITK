@@ -35,6 +35,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QmitkRenderWindow.h>
 #include <QmitkLevelWindowWidget.h>
 
+#include "vtkTextProperty.h"
+#include "vtkCornerAnnotation.h"
+
 class QHBoxLayout;
 class QVBoxLayout;
 class QGridLayout;
@@ -280,6 +283,14 @@ protected:
   QWidget *mitkWidget2Container;
   QWidget *mitkWidget3Container;
   QWidget *mitkWidget4Container;
+
+  struct  
+  {
+    vtkCornerAnnotation *cornerText;
+    vtkTextProperty *textProp;
+    vtkRenderer *ren;
+  } m_CornerAnnotaions[3];
+
   
     
 };

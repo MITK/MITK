@@ -79,7 +79,9 @@ int mitkFocusManagerTest(int /*argc*/, char* /*argv*/[])
   MITK_TEST_CONDITION_REQUIRED(!focusManager->RemoveElement(element2), "Testing removing from empty list with different object");
   MITK_TEST_CONDITION_REQUIRED(!focusManager->RemoveElement(element1), "Testing removing from empty list with different object again");
 
-  focusManager = NULL;
+  //focusManager = NULL;
+  focusManager->Delete();
+  
   //TODO: test IsLast() IsFirst() GetFirst() GetLast() GoToNext() GetIter() SetLoop(bool loop)
 
   MITK_TEST_END();

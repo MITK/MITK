@@ -107,6 +107,7 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
 
   //# GUI
   m_NodeTreeModel = new QmitkDataStorageTreeModel(this->GetDataStorage());
+  m_NodeTreeModel->setParent( parent );
 
   //# Tree View (experimental)
   m_NodeTreeView = new QTreeView;

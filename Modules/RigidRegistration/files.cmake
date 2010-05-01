@@ -7,8 +7,8 @@ SET(CPP_FILES
   mitkRigidRegistrationPreset.cpp
   mitkRigidRegistrationTestPreset.cpp
   mitkTransformParameters.cpp
-  # mitkPyramidalRegistrationMethod.cpp
+  mitkPyramidalRegistrationMethod.cpp
 )
 
 MITK_MULTIPLEX_PICTYPE( mitkImageRegistrationMethod-TYPE.cpp ) 
-# MITK_MULTIPLEX_PICTYPE( mitkImageRegistrationMethod-TYPE.cpp ) 
+MITK_MULTIPLEX_PICTYPE( mitkPyramidalRegistrationMethod-TYPE.cpp ) 

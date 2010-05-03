@@ -20,59 +20,51 @@ PURPOSE.  See the above copyright notices for more information.
 #include <algorithm>
 
 mitk::OpenCVVideoSource::OpenCVVideoSource()
+: m_VideoCapture(0),
+  m_CurrentImage(0),
+  m_CurrentVideoTexture(0),
+  m_PauseImage(0),
+  m_CapturePaused(false),
+  m_GrabbingDeviceNumber(-1),
+  m_RepeatVideo(false),
+  m_UseCVCAMLib(false),
+  m_UndistortImage(false)
 {
-  m_CurrentImage = 0;
-  m_VideoCapture = 0;
-  m_PauseImage = 0;
-
-  m_CaptureWidth  = 0;
-  m_CaptureHeight = 0;
-  m_CapturingInProcess = false;
-  m_CapturePaused      = false;
-
-  m_CurrentVideoTexture = NULL;
-
-  m_UndistortImage = false;
 }
 
 mitk::OpenCVVideoSource::~OpenCVVideoSource()
 {
-  if(m_VideoCapture)
-  {
-      cvReleaseCapture( &m_VideoCapture );    
-      //cvReleaseImage( &m_CurrentImage ); not required since it points to the capture frame buffer
-  }
-  delete m_CurrentVideoTexture;
-  
+  this->Reset();  
 }
 
 void mitk::OpenCVVideoSource::SetVideoFileInput(const char * filename, bool repeatVideo, bool useCVCAMLib)
 {
-  m_UseCVCAMLib  = false;
+  this->Reset();
+  m_VideoFileName = filename;
+
   m_VideoCapture = cvCaptureFromFile(filename);
   if(!m_VideoCapture)
-    std::cout << "Error in initializing video file input!"<< std::endl;;
+    MITK_WARN << "Error in initializing video file input!";
  
   m_RepeatVideo  = repeatVideo;
+  //m_CurrentImage        = cvCreateImage(cvSize(m_CaptureWidth,m_CaptureHeight),8,3);
     
 }
 void mitk::OpenCVVideoSource::SetVideoCameraInput(int cameraindex, bool useCVCAMLib)
 {
-  m_CameraIndex   = cameraindex;
-  m_RepeatVideo   = false;
-  m_UseCVCAMLib   = false;
+  this->Reset();
  
-  m_VideoCapture = cvCaptureFromCAM(cameraindex);
+  m_GrabbingDeviceNumber = cameraindex;
+  m_VideoCapture = cvCaptureFromCAM(m_GrabbingDeviceNumber);
   if(!m_VideoCapture)
-    std::cout << "Error in initializing CVHighGUI video camera!"<< std::endl;
-  m_CurrentImage        = cvCreateImage(cvSize(m_CaptureWidth,m_CaptureHeight),8,3);
+    MITK_ERROR << "Error in initializing CVHighGUI video camera!"<< std::endl;
   
 }
 
 double mitk::OpenCVVideoSource::GetVideoCaptureProperty(int property_id)
 {
   return cvGetCaptureProperty(m_VideoCapture, property_id);
-}
+} 
 
 int mitk::OpenCVVideoSource::SetVideoCaptureProperty(int property_id, double value)
 {
@@ -132,14 +124,16 @@ void mitk::OpenCVVideoSource::FetchFrame()
       {
         // release old image here
         m_CurrentImage = cvQueryFrame(m_VideoCapture);
+
+        ++m_FrameCount;
       }
       else
         m_CurrentImage = m_PauseImage;
       if(m_CurrentImage == NULL) // do we need to repeat the video if it is from video file?
       {        
-        long videopos = ceil ( this->GetVideoCaptureProperty(CV_CAP_PROP_POS_AVI_RATIO) );
-        MITK_DEBUG << "End of video file found. videopos: " << videopos;
-        if(m_RepeatVideo &&  videopos >= 1) 
+        double framePos = this->GetVideoCaptureProperty(CV_CAP_PROP_POS_AVI_RATIO);
+        MITK_DEBUG << "End of video file found. framePos: " << framePos;
+        if(m_RepeatVideo &&  framePos >= 0.99)
         {  
           MITK_DEBUG << "Restarting video file playback.";
           this->SetVideoCaptureProperty(CV_CAP_PROP_POS_AVI_RATIO, 0);
@@ -148,6 +142,7 @@ void mitk::OpenCVVideoSource::FetchFrame()
       }
       if(m_CaptureWidth == 0 || m_CaptureHeight == 0)
       {
+        MITK_DEBUG << "Trying to set m_CaptureWidth & m_CaptureHeight.";
         m_CaptureWidth  = m_CurrentImage->width;
         m_CaptureHeight = m_CurrentImage->height;
         std::cout << "frame width: " << m_CaptureWidth << ", height: " << m_CaptureHeight << std::endl;
@@ -230,7 +225,7 @@ void mitk::OpenCVVideoSource::PauseCapturing()
 
     // undistort this pause image if necessary
     if(m_UndistortImage)
-      m_UndistortCameraImage->UndistortImageFast(m_CurrentImage, 0);
+      m_UndistortCameraImage->UndistortImageFast(m_PauseImage, 0);
   }
 }
 
@@ -370,3 +365,27 @@ IplImage* mitk::OpenCVVideoSource::RotateImage(IplImage* input)
   return dst; 
 }
 
+void mitk::OpenCVVideoSource::Reset()
+{
+  // set capturing to false
+  this->StopCapturing();
+  if(m_VideoCapture)
+    cvReleaseCapture(&m_VideoCapture);
+  m_VideoCapture = 0;
+  m_CurrentImage = 0;
+  m_CaptureWidth = 0;
+  m_CaptureHeight = 0;
+  delete m_CurrentVideoTexture;
+  m_CurrentVideoTexture = 0;
+  if(m_PauseImage)
+    cvReleaseImage(&m_PauseImage);
+  m_PauseImage = 0;
+  m_CapturePaused = false;
+  m_VideoFileName.clear();
+  m_GrabbingDeviceNumber = -1;
+  // do not touch repeat video
+  //m_RepeatVideo = false;
+  m_UseCVCAMLib = false;
+  // do not touch undistort settings
+  // bool m_UndistortImage;
+}

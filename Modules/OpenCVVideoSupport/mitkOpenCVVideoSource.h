@@ -116,10 +116,30 @@ namespace mitk
     virtual void DisableOnlineImageUndistortion();
 
     virtual void PauseCapturing();
+
+    itkGetConstMacro( CapturePaused, bool );
+
+    ///
+    /// Returns the video file name (maybe empty if a grabbing device is used)
+    ///
+    itkGetConstMacro( VideoFileName, std::string );
+
+    ///
+    /// Returns the GrabbingDeviceNumber (maybe -1 if a video file is used)
+    ///
+    itkGetConstMacro( GrabbingDeviceNumber, short );
+
+    itkGetMacro( RepeatVideo, bool );
+    itkSetMacro( RepeatVideo, bool );
   
   protected:
     OpenCVVideoSource();
 	  virtual ~OpenCVVideoSource();
+
+    ///
+    /// Resets the whole class for capturing from a new device
+    ///
+    void Reset();
 
     ////##Documentation
     ////## @brief internally used for converting the current video frame to a texture for opengl rendering, 
@@ -139,7 +159,15 @@ namespace mitk
 
     IplImage     * m_PauseImage;
     bool           m_CapturePaused;
-        
+
+    ///
+    /// saves the video file name (is empty if a grabbing device is used or if this is not initialized)
+    std::string m_VideoFileName;
+
+    ///
+    /// saves the grabbing device number (is -1 if a videofilename is used or if this is not initialized)
+    short m_GrabbingDeviceNumber;
+
     // Repeat a video file
     bool m_RepeatVideo;
 
@@ -148,11 +176,7 @@ namespace mitk
 
     // On-the-fly undistortion of the captured video image
     bool m_UndistortImage;
-    mitk::UndistortCameraImage::Pointer         m_UndistortCameraImage;
-
-
-    // not negative index number of the camera
-    int m_CameraIndex;
+    mitk::UndistortCameraImage::Pointer m_UndistortCameraImage;
   };
 }
 #endif // Header

@@ -29,9 +29,11 @@ QmitkFileChooser::QmitkFileChooser( bool selectDir, QWidget* parent, Qt::WindowF
 {
   m_File = new QLineEdit;
   m_File->setReadOnly( true );
-  m_SelectFile = new QPushButton;
+  m_SelectFile = new QPushButton("Select File");
+  connect( m_SelectFile, SIGNAL(clicked(bool)), this, SLOT( OnSelectFileClicked( bool ) ) );
 
   QVBoxLayout* layout = new QVBoxLayout; 
+  layout->setContentsMargins(0,0,0,0);
   layout->addWidget( m_File );
   layout->addWidget( m_SelectFile );
 

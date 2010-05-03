@@ -34,16 +34,18 @@ class vtkActor2D;
 class vtkVideoSizeCallback;
 
 
-namespace mitk {
-
-struct VideoBackgroundVectorInfo
+namespace mitk 
 {
-  vtkRenderWindow*  renWin;
-  vtkRenderer*      videoRenderer;
-  vtkImageActor*    videoActor;
-  vtkImageImport*   videoImport;
-};
 
+  struct VideoBackgroundVectorInfo
+  {
+    vtkRenderWindow*  renWin;
+    vtkRenderer*      videoRenderer;
+    vtkImageActor*    videoActor;
+    vtkImageImport*   videoImport;
+  };
+
+}
 
 /**
  * Displays a video in the background
@@ -67,15 +69,7 @@ public:
   void AddRenderWindow(vtkRenderWindow* renderWindow);
   void RemoveRenderWindow(vtkRenderWindow* renderWindow);
   bool IsRenderWindowIncluded(vtkRenderWindow* renderWindow);
-  ////##Documentation
-  ////## @brief sets the width and height of the video.
-  ////## must be correctly initialized before enabling the background.
-  void SetImageDimensions(int x, int y)
-  {
-    m_ImageWidth  = x;
-    m_ImageHeight = y;
-    ResetVideoBackground();
-  }
+
   ////##Documentation
   ////## @brief sets the update rate of the video in milli seconds, by default 25.
   void SetTimerDelay(int ms)
@@ -92,6 +86,15 @@ public:
   ////##Documentation
   ////## @brief Checks, if the Video background is currently enabled (visible).
   bool IsEnabled();
+
+  ///
+  /// Returns the videosource attached to this background
+  ///
+  mitk::VideoSource* GetVideoSource() { return m_VideoSource; }
+  ///
+  /// Returns the timer delay
+  ///
+  int GetTimerDelay() { return m_TimerDelay; }
   
   public slots:
     void UpdateVideo();
@@ -103,7 +106,7 @@ protected:
 
   void Modified();
 
-  typedef std::vector<VideoBackgroundVectorInfo> RenderWindowVectorInfoType;
+  typedef std::vector<mitk::VideoBackgroundVectorInfo> RenderWindowVectorInfoType;
   RenderWindowVectorInfoType      m_renderWindowVectorInfo;
  
   //for framegrabbing
@@ -112,11 +115,8 @@ protected:
   //VideoSource
   mitk::VideoSource*          m_VideoSource;
 
-  int m_ImageWidth, m_ImageHeight, m_TimerDelay;
+  int m_TimerDelay;
 };
-
-}
-
 
 #endif
 

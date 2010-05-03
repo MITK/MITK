@@ -1,0 +1,1 @@
+MACRO_CREATE_MITK_PLUGIN(mitkOpenCVVideoSupportUI)

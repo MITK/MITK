@@ -21,7 +21,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkCommon.h"
 #include "MitkExtExports.h"
 #include <itkObject.h>
-#include "itkObjectFactory.h"
+#include <itkObjectFactory.h>
+#include <mitkMessage.h>
 
 namespace mitk
 {
@@ -34,6 +35,14 @@ namespace mitk
       mitkClassMacro( VideoSource, itk::Object );
       itkNewMacro( Self );
          
+      ///
+      /// Define two event types for getting informed when this
+      /// videosource is started/stopped
+      ///
+      typedef mitk::Message<void> StartedStoppedEvent;
+
+      StartedStoppedEvent Started;
+      StartedStoppedEvent Stopped;
       
       ////##Documentation
       ////## @brief assigns the grabbing devices for acquiring the next frame. 
@@ -50,7 +59,7 @@ namespace mitk
 
       ////##Documentation
       ////## @brief returns true if video capturing is active.
-      bool IsCapturingEnabled();
+      bool IsCapturingEnabled() const;
 
       int GetImageWidth(){return m_CaptureWidth;}
       int GetImageHeight(){return m_CaptureHeight;}
@@ -63,6 +72,8 @@ namespace mitk
       
       double GetRotationAngle()
       {return m_RotationAngle;};
+
+      itkGetConstMacro( FrameCount, unsigned long );
 
     protected:
       VideoSource();
@@ -81,7 +92,11 @@ namespace mitk
       * Flag to enable or disable video rotation used for performance enhancement.
       **/
       bool m_RotationEnabled;
-   
+
+      ///
+      /// Saves the current frame count. Incremented in FetchFrame(). Resetted to 0 when StartCapturing() or StopCapturing() is called.
+      ///
+      unsigned long m_FrameCount;
  
   };
 }

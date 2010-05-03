@@ -33,26 +33,21 @@ PURPOSE.  See the above copyright notices for more information.
 #include "vtkCommand.h"
 #include "vtkCamera.h"
 
-mitk::QmitkVideoBackground::QmitkVideoBackground(mitk::VideoSource* v, int TimerDelay)
+QmitkVideoBackground::QmitkVideoBackground(mitk::VideoSource* v, int TimerDelay)
 {
   m_VideoSource = v; 
 
-  if(m_VideoSource->GetImageWidth() == 0)
-    m_VideoSource->FetchFrame();
-
-  m_ImageWidth  = v->GetImageWidth();
-  m_ImageHeight = v->GetImageHeight();
   m_TimerDelay  = TimerDelay;
   ResetVideoBackground();
 }
-void mitk::QmitkVideoBackground::ResetVideoBackground()
+void QmitkVideoBackground::ResetVideoBackground()
 {
   m_renderWindowVectorInfo.clear();
   m_QTimer = new QTimer(this);
   connect( m_QTimer, SIGNAL(timeout()), SLOT(UpdateVideo()) );
 }
 
-mitk::QmitkVideoBackground::~QmitkVideoBackground()
+QmitkVideoBackground::~QmitkVideoBackground()
 {
   if ( m_renderWindowVectorInfo.size() > 0 )
     if ( this->IsEnabled() )
@@ -63,7 +58,7 @@ mitk::QmitkVideoBackground::~QmitkVideoBackground()
  * will be shown. Make sure, you have called this function
  * before calling Enable()
  */
-void mitk::QmitkVideoBackground::AddRenderWindow(vtkRenderWindow* renderWindow )
+void QmitkVideoBackground::AddRenderWindow(vtkRenderWindow* renderWindow )
 {
   RemoveRenderWindow(renderWindow);
   
@@ -73,10 +68,14 @@ void mitk::QmitkVideoBackground::AddRenderWindow(vtkRenderWindow* renderWindow )
   
   videoImport->SetDataScalarTypeToUnsignedChar();
   videoImport->SetNumberOfScalarComponents(3);
-  videoImport->SetWholeExtent(0,m_ImageWidth-1,0,m_ImageHeight-1,0,1-1);
+
+  if(m_VideoSource->GetImageWidth() == 0)
+    m_VideoSource->FetchFrame();
+
+  videoImport->SetWholeExtent(0,m_VideoSource->GetImageWidth()-1,0,m_VideoSource->GetImageHeight()-1,0,1-1);
   videoImport->SetDataExtentToWholeExtent();  
   
-  VideoBackgroundVectorInfo v;
+  mitk::VideoBackgroundVectorInfo v;
   v.renWin        = renderWindow;
   v.videoRenderer = videoRenderer;
   v.videoActor    = videoActor;
@@ -87,7 +86,7 @@ void mitk::QmitkVideoBackground::AddRenderWindow(vtkRenderWindow* renderWindow )
   Modified();
 }
 
-void mitk::QmitkVideoBackground::RemoveRenderWindow(vtkRenderWindow* renderWindow )
+void QmitkVideoBackground::RemoveRenderWindow(vtkRenderWindow* renderWindow )
 {
   for(RenderWindowVectorInfoType::iterator it = m_renderWindowVectorInfo.begin(); 
     it != m_renderWindowVectorInfo.end(); it++)
@@ -107,7 +106,7 @@ void mitk::QmitkVideoBackground::RemoveRenderWindow(vtkRenderWindow* renderWindo
   }
 }
 
-bool mitk::QmitkVideoBackground::IsRenderWindowIncluded(vtkRenderWindow* renderWindow )
+bool QmitkVideoBackground::IsRenderWindowIncluded(vtkRenderWindow* renderWindow )
 {
   for(RenderWindowVectorInfoType::iterator it = m_renderWindowVectorInfo.begin(); 
     it != m_renderWindowVectorInfo.end(); it++)
@@ -122,7 +121,7 @@ bool mitk::QmitkVideoBackground::IsRenderWindowIncluded(vtkRenderWindow* renderW
  * Enables drawing of the color Video background.
  * If you want to disable it, call the Disable() function.
  */
-void mitk::QmitkVideoBackground::Enable()
+void QmitkVideoBackground::Enable()
 {
   UpdateVideo();  
   Modified();
@@ -134,7 +133,7 @@ void mitk::QmitkVideoBackground::Enable()
  * Disables drawing of the color Video background.
  * If you want to enable it, call the Enable() function.
  */
-void mitk::QmitkVideoBackground::Disable()
+void QmitkVideoBackground::Disable()
 {
   if ( this->IsEnabled() )
   {
@@ -150,7 +149,7 @@ void mitk::QmitkVideoBackground::Disable()
  * Checks, if the Video background is currently
  * enabled (visible)
  */
-bool mitk::QmitkVideoBackground::IsEnabled()
+bool QmitkVideoBackground::IsEnabled()
 {
   if (m_QTimer->isActive())
       return true;
@@ -158,7 +157,7 @@ bool mitk::QmitkVideoBackground::IsEnabled()
       return false;    
 }
 
-void mitk::QmitkVideoBackground::UpdateVideo()
+void QmitkVideoBackground::UpdateVideo()
 {  
   unsigned char *src = 0;
   src = m_VideoSource->GetVideoTexture();
@@ -179,7 +178,7 @@ void mitk::QmitkVideoBackground::UpdateVideo()
   emit NewFrameAvailable ( m_VideoSource );
 }
 
-void mitk::QmitkVideoBackground::Modified()
+void QmitkVideoBackground::Modified()
 { // ensures registration of video backrounds in each renderwindow
   for(RenderWindowVectorInfoType::iterator it = m_renderWindowVectorInfo.begin(); 
     it != m_renderWindowVectorInfo.end(); it++)
@@ -189,7 +188,7 @@ void mitk::QmitkVideoBackground::Modified()
     (*it).videoRenderer->ResetCamera();
     (*it).videoRenderer->InteractiveOff();
     (*it).videoRenderer->GetActiveCamera()->ParallelProjectionOn();
-    (*it).videoRenderer->GetActiveCamera()->SetParallelScale(m_ImageHeight/2);
+    (*it).videoRenderer->GetActiveCamera()->SetParallelScale(m_VideoSource->GetImageHeight()/2);
 
     if(!mitk::VtkLayerController::GetInstance((*it).renWin)->IsRendererInserted((*it).videoRenderer))
       mitk::VtkLayerController::GetInstance((*it).renWin)->InsertBackgroundRenderer((*it).videoRenderer,true);

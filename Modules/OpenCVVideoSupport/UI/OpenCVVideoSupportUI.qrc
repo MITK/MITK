@@ -1,0 +1,7 @@
+<RCC>
+  <qresource prefix="OpenCVVideoSupportUI">
+    <file>media-playback-pause.png</file>
+    <file>media-playback-start.png</file>
+    <file>media-playback-stop.png</file>
+  </qresource>
+</RCC>

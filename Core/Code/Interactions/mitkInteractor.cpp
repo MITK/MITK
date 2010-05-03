@@ -120,7 +120,7 @@ bool mitk::Interactor::OnModeSubSelect(Action* /*action*/, StateEvent const*)
   return false;
 }
 
-float mitk::Interactor::CalculateJurisdiction(StateEvent const* stateEvent) const
+float mitk::Interactor::CanHandleEvent(StateEvent const* stateEvent) const
 {
     //return value for boundingbox
   float returnvalueBB = 0.0, 

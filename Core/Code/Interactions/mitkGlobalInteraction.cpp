@@ -219,8 +219,8 @@ void mitk::GlobalInteraction::FillJurisdictionMap(mitk::StateEvent const* stateE
   {
     if ((*it).IsNotNull())
     {
-      //first ask for CalculateJurisdiction(..) and write it into the map if > 0
-      float value = (*it)->CalculateJurisdiction(stateEvent);
+      //first ask for CanHandleEvent(..) and write it into the map if > 0
+      float value = (*it)->CanHandleEvent(stateEvent);
       if (value > threshold)
       {
         m_JurisdictionMap.insert(InteractorMap::value_type(value, (*it)));

@@ -33,7 +33,7 @@ mitk::MouseMovePointSetInteractor::~MouseMovePointSetInteractor()
 
 //##Documentation
 //## overwritten cause this class can handle mouse move events!
-float mitk::MouseMovePointSetInteractor::CalculateJurisdiction(StateEvent const* stateEvent) const
+float mitk::MouseMovePointSetInteractor::CanHandleEvent(StateEvent const* stateEvent) const
 {
   float returnValue = 0.0;
   //if it is a key event that can be handled in the current state, then return 0.5

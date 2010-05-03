@@ -50,7 +50,7 @@ void mitk::ConnectPointsInteractor::SetPrecision(unsigned int precision)
 
 //##Documentation
 //## overwritten cause this class can handle it better!
-float mitk::ConnectPointsInteractor::CalculateJurisdiction(StateEvent const* stateEvent) const
+float mitk::ConnectPointsInteractor::CanHandleEvent(StateEvent const* stateEvent) const
 {
   float returnValue = 0;
   

@@ -30,7 +30,7 @@ namespace mitk {
   //##
   //## A surface interacted by this class can translate, rotate and scale
   //## by modifying its geometry. The surface closest to the picking point is
-  //## chosen for interaction automatically by CalculateJurisdiction
+  //## chosen for interaction automatically by CanHandleEvent
   //## @ingroup Interaction
   class MitkExt_EXPORT SurfaceInteractor : public AffineInteractor
   {
@@ -57,7 +57,7 @@ namespace mitk {
     //## 
     //## Returns a value between 0 and 1.
     //## (Used by GlobalInteraction to decide which DESELECTED state machine to send the event to.)
-    virtual float CalculateJurisdiction(StateEvent const* stateEvent) const;
+    virtual float CanHandleEvent(StateEvent const* stateEvent) const;
 
   private:
 

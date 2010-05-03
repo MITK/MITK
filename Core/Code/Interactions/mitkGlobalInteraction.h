@@ -51,7 +51,7 @@ namespace mitk {
   //## m_ListenerList, m_InteractorList, m_SelectedList and m_JurisdictionMap
   //## The list m_ListenerList holds all listeners.
   //## m_InteractorList holds all interactors, and the List m_SelectedList holds all machines, that were set to SELECTED or SUBSELECTED.
-  //## m_JurisdictionMap maps values returned from CalculateJurisdiction to the asked Interactors.
+  //## m_JurisdictionMap maps values returned from CanHandleEvent to the asked Interactors.
   //## Through this map stepping through interactors, that were not selected and could handle that event, can be done.
   //## 
   //## First the listeners are informed with the event.
@@ -235,7 +235,7 @@ namespace mitk {
     InteractorList m_SelectedList; 
 
     //##Documentation
-    //## @brief map for sorting all interactors by the value returned from CalculateJurisdiction(..).
+    //## @brief map for sorting all interactors by the value returned from CanHandleEvent(..).
     //##
     //## With that list certain interactors can be looped through like diving through layers
     InteractorMap m_JurisdictionMap;

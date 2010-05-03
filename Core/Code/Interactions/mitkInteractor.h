@@ -88,7 +88,7 @@ public:
   //## where 0 represents not responsible and 1 represents definitive responsible!
   //## Standard function to override if needed.
   //## (Used by GlobalInteraction to decide which DESELECTED statemachine to send the event to.)
-  virtual float CalculateJurisdiction(StateEvent const* stateEvent) const;
+  virtual float CanHandleEvent(StateEvent const* stateEvent) const;
 
   /**
   * @brief Updates the current TimeStep according to the associated data and calls Superclass::HandleEvent()

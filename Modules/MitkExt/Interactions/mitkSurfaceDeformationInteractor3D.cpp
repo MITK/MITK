@@ -74,7 +74,7 @@ void mitk::SurfaceDeformationInteractor3D::SetPrecision( mitk::ScalarType precis
 
 // Overwritten since this class can handle it better!
 float mitk::SurfaceDeformationInteractor3D
-::CalculateJurisdiction(StateEvent const* stateEvent) const
+::CanHandleEvent(StateEvent const* stateEvent) const
 {
   float returnValue = 0.5;
   

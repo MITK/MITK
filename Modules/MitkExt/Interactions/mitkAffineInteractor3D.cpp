@@ -98,7 +98,7 @@ void AffineInteractor3D::SetPrecision( ScalarType precision )
 
 // Overwritten since this class can handle it better!
 float AffineInteractor3D
-::CalculateJurisdiction(StateEvent const* stateEvent) const
+::CanHandleEvent(StateEvent const* stateEvent) const
 {
   float returnValue = 0.5;
   

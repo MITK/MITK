@@ -53,7 +53,7 @@ void mitk::PlanarFigureInteractor::SetPrecision( mitk::ScalarType precision )
 
 // Overwritten since this class can handle it better!
 float mitk::PlanarFigureInteractor
-::CalculateJurisdiction(StateEvent const* stateEvent) const
+::CanHandleEvent(StateEvent const* stateEvent) const
 {
   float returnValue = 0.5;
   

@@ -48,7 +48,7 @@ namespace mitk
     * overwritten, cause we don't look at the boundingbox, we look at each point
     * and want to accept mouse movement for setting points
     */
-    virtual float CalculateJurisdiction(StateEvent const* stateEvent) const;
+    virtual float CanHandleEvent(StateEvent const* stateEvent) const;
 
 
   protected:

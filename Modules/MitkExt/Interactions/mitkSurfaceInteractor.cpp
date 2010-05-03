@@ -33,7 +33,7 @@ mitk::SurfaceInteractor::SurfaceInteractor(const char * type, DataNode* dataTree
 }
 
 
-float mitk::SurfaceInteractor::CalculateJurisdiction( StateEvent const* stateEvent ) const
+float mitk::SurfaceInteractor::CanHandleEvent( StateEvent const* stateEvent ) const
 {
   float jd = 0.0f;
 

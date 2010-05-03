@@ -70,9 +70,9 @@ int mitkInteractorTest(int /*argc*/, char* /*argv*/[])
   event = new mitk::Event(NULL, mitk::Type_MouseButtonRelease, mitk::BS_MidButton, mitk::BS_MidButton, mitk::Key_none);
   stateEvent->Set(506, event);
   //because the statemachine is waiting for this event, 0.5 should be returned
-  float returnvalue = interactor->CalculateJurisdiction(stateEvent);
-  MITK_TEST_CONDITION_REQUIRED(returnvalue == 0.5,"Testing to call CalculateJurisdiction with next event")
-  std::cout<<"CalculateJurisdiction returned: "<<returnvalue<<std::endl;
+  float returnvalue = interactor->CanHandleEvent(stateEvent);
+  MITK_TEST_CONDITION_REQUIRED(returnvalue == 0.5,"Testing to call CanHandleEvent with next event")
+  std::cout<<"CanHandleEvent returned: "<<returnvalue<<std::endl;
 
   //The transition "finish" should call no action an lead into state 0 = startState 
   MITK_TEST_CONDITION_REQUIRED(interactor->HandleEvent(stateEvent),"Testing to send next event leading back to startState0")

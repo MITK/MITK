@@ -93,7 +93,7 @@ void mitk::PointSelectorInteractor::DeselectAllPoints()
   }
 }
 
-float mitk::PointSelectorInteractor::CalculateJurisdiction(StateEvent const* stateEvent) const
+float mitk::PointSelectorInteractor::CanHandleEvent(StateEvent const* stateEvent) const
 //go through all points and check, if the given Point lies near a line
 {
   float returnValue = 0;

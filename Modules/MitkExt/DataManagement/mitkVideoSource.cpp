@@ -19,10 +19,11 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkVideoSource.h"
 
 mitk::VideoSource::VideoSource()
-: m_CaptureWidth(0),
+:
+  m_CurrentVideoTexture(NULL),
+  m_CaptureWidth(0),
   m_CaptureHeight(0),
   m_CapturingInProcess(false),
-  m_CurrentVideoTexture(NULL),
   m_RotationAngle(0.0),
   m_RotationEnabled(false),
   m_FrameCount(0)

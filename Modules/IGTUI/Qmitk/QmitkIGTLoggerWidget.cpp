@@ -121,6 +121,9 @@ void QmitkIGTLoggerWidget::OnStartRecording()
       mitk::StatusBar::GetInstance()->DisplayText(""); // Display recording message for 75ms in status bar
     }
     m_Controls->m_pbStartRecording->setText("Stop recording");
+    m_Controls->m_leRecordingValue->setEnabled(false);
+    m_Controls->m_cbRecordingType->setEnabled(false);
+
     m_RecordingActivated = true;
 
     if(m_Controls->m_cbRecordingType->currentIndex()==0)
@@ -144,7 +147,9 @@ void QmitkIGTLoggerWidget::StopRecording()
   m_RecordingTimer->stop();
   m_Recorder->StopRecording();
   mitk::StatusBar::GetInstance()->DisplayText("Recording STOPPED", 2000); // Display  message for 2s in status bar
-  m_Controls->m_pbStartRecording->setText("Start recording"); 
+  m_Controls->m_pbStartRecording->setText("Start recording");
+  m_Controls->m_leRecordingValue->setEnabled(true);
+  m_Controls->m_cbRecordingType->setEnabled(true);
   m_RecordingActivated = false;
 }
 
@@ -208,7 +213,7 @@ void QmitkIGTLoggerWidget::UpdateRecordingTime()
      m_MilliSeconds = m_Controls->m_leRecordingValue->text();
      
      bool success = false;
-
+     m_MilliSeconds.toInt(&success);
      if (!success)
      {
        QMessageBox::warning(NULL, "Warning", QString("Please enter a number!"));
@@ -221,7 +226,7 @@ void QmitkIGTLoggerWidget::UpdateRecordingTime()
     m_Samples = m_Controls->m_leRecordingValue->text();
 
     bool success = false;
-
+    m_Samples.toInt(&success);
     if (!success)
     {
       QMessageBox::warning(NULL, "Warning", QString("Please enter a number!"));

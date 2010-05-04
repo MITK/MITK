@@ -307,9 +307,9 @@ ENDIF()
   ENDIF(MITK_USE_QT)
  
   IF(MITK_USE_OPEN_CV)
-	INCLUDE(MITK_OpenCV_Config)
-    FILE(GLOB opencvdebuglllist "${OPENCV_DIR}/bin/Debug/*.dll")
-    FILE(GLOB opencvreleasedlllist "${OPENCV_DIR}/bin/Release/*.dll")
+	#INCLUDE(MITK_OpenCV_Config)
+    FILE(GLOB opencvdebuglllist "${OpenCV_DIR}/bin/Debug/*.dll")
+    FILE(GLOB opencvreleasedlllist "${OpenCV_DIR}/bin/Release/*.dll")
   
     INSTALL(FILES ${opencvdebuglllist} DESTINATION bin CONFIGURATIONS Debug)
     INSTALL(FILES ${opencvreleasedlllist} DESTINATION bin CONFIGURATIONS Release)

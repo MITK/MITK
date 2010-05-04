@@ -251,7 +251,7 @@ bool mitk::PlanarFigureInteractor
 
       // Re-evaluate features
       planarFigure->EvaluateFeatures();
-      this->LogPrintPlanarFigureQuantities( planarFigure );
+      //this->LogPrintPlanarFigureQuantities( planarFigure );
 
       // Set a bool property indicating that the figure has been placed in
       // the current RenderWindow. This is required so that the same render
@@ -283,7 +283,7 @@ bool mitk::PlanarFigureInteractor
 
       // Re-evaluate features
       planarFigure->EvaluateFeatures();
-      this->LogPrintPlanarFigureQuantities( planarFigure );
+      //this->LogPrintPlanarFigureQuantities( planarFigure );
 
       // Update rendered scene
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
@@ -368,7 +368,7 @@ bool mitk::PlanarFigureInteractor
 
       // Re-evaluate features
       planarFigure->EvaluateFeatures();
-      this->LogPrintPlanarFigureQuantities( planarFigure );
+      //this->LogPrintPlanarFigureQuantities( planarFigure );
 
       // Update rendered scene
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();

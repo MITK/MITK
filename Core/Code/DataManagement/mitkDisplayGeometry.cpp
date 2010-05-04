@@ -513,6 +513,7 @@ bool mitk::DisplayGeometry::RefitVisibleRect()
     // zoomed out too much in x (but tolerated because y is still ok)
     // --> center x
     newOrigin[0] = (worldWidthMM - displayWidthMM) / 2.0;
+    correctPanning = true;
   }
   else
   {

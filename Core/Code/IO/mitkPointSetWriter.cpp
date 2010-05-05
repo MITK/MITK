@@ -179,7 +179,7 @@ void mitk::PointSetWriter::WriteXML( mitk::PointSet* pointSet, std::ofstream& ou
 
           WriteEndElement( XML_POINT, out );
       }
-    WriteEndElement( XML_TIME_SERIES, out, false );
+    WriteEndElement( XML_TIME_SERIES, out );
     }
 
     WriteEndElement( XML_POINT_SET, out );

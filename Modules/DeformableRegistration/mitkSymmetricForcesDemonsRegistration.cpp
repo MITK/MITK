@@ -252,6 +252,7 @@ namespace mitk {
         fieldwriter->SetFileName( m_FieldName );
         fieldwriter->SetInput( filter->GetOutput() );
         //m_DeformationField = filter->GetOutput();
+        m_DeformationField = (itk::Image<itk::Vector<float, 3>,3> *)(filter->GetOutput()); //see BUG #3732
         if(m_SaveField)
         {
           fieldwriter->Update();

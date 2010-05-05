@@ -100,6 +100,8 @@ void QmitkNDIConfigurationWidget::OnConnect()
   else
   {
     QMessageBox::warning(NULL, "Error", QString("Connection failed. Tracking device error message is '%1'").arg(m_Tracker->GetErrorMessage()));
+    m_Tracker->CloseConnection();
+    this->m_Tracker = NULL;
   }
 }
 
@@ -181,7 +183,10 @@ QString QmitkNDIConfigurationWidget::GetStatusText()
 void QmitkNDIConfigurationWidget::OnDiscoverTools()
 {
   if (m_Tracker.IsNull())
+  {
+    QMessageBox::warning(NULL, "Error", QString("Connection failed. No tracking device found."));
     return;
+  }
   m_Tracker->DiscoverWiredTools();
   this->UpdateToolTable();
   emit ToolsAdded(this->GetToolNamesList());
@@ -195,7 +200,10 @@ void QmitkNDIConfigurationWidget::OnAddPassiveTool()
 
   QStringList filenames = QFileDialog::getOpenFileNames(this, "Select NDI SROM file", QDir::currentPath(),"NDI SROM files (*.rom)");
   if (filenames.isEmpty())
+  {
+    this->m_Tracker = NULL;
     return;
+  }
   foreach(QString fileName, filenames)
   {
     //QString toolName = QInputDialog::getText(this, "Enter a name for the tool", "Name of the tool: ", QLineEdit::Normal, QFileInfo(filename).baseName(), &ok);

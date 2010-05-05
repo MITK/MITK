@@ -37,7 +37,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkNodePredicateOR.h"
 #include "mitkNodePredicateSource.h"
 #include "mitkMessage.h"
-
+#include "mitkStandardFileLocations.h"
+#include "mitkPicFileReader.h"
 #include "mitkTestingMacros.h"
 
 
@@ -103,12 +104,22 @@ void TestDataStorage( mitk::DataStorage* ds )
   /* DataStorage valid? */
   MITK_TEST_CONDITION_REQUIRED(ds != NULL, "DataStorage valid?");
 
+  // load test image
+  mitk::StandardFileLocations::Pointer locator = mitk::StandardFileLocations::GetInstance();
+  MITK_TEST_CONDITION_REQUIRED(locator.IsNotNull(),"Instantiating StandardFileLocations");
+  std::string filename = locator->FindFile("US4DCyl.pic.gz", "Core/Code/Testing/Data/");
+
+  mitk::PicFileReader::Pointer reader = mitk::PicFileReader::New();
+  reader -> SetFileName(filename.c_str());
+  reader -> Update();
+  mitk::Image::Pointer image = reader -> GetOutput();
+
   // create some DataNodes to fill the ds
   mitk::DataNode::Pointer n1 = mitk::DataNode::New();   // node with image and name property
-  mitk::Image::Pointer image = mitk::Image::New();
-  unsigned int imageDimensions[] = { 10, 10, 10, 10 };
-  mitk::PixelType pt(typeid(int));
-  image->Initialize( pt, 4, imageDimensions );
+//  mitk::Image::Pointer image = mitk::Image::New();
+//  unsigned int imageDimensions[] = { 10, 10, 10, 10 };
+//  mitk::PixelType pt(typeid(int));
+//  image->Initialize( pt, 4, imageDimensions );
   n1->SetData(image);
   n1->SetProperty("name", mitk::StringProperty::New("Node 1 - Image Node"));
   mitk::DataStorage::SetOfObjects::Pointer parents1 = mitk::DataStorage::SetOfObjects::New();
@@ -742,9 +753,9 @@ void TestDataStorage( mitk::DataStorage* ds )
   //Checking ComputeBoundingGeometry3D method*/
   const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetAll();
   mitk::TimeSlicedGeometry::Pointer geometry = ds->ComputeBoundingGeometry3D();
-  MITK_TEST_CONDITION(geometry->GetTimeSteps()==10, "Test for number or time steps with ComputeBoundingGeometry()");
+  MITK_TEST_CONDITION(geometry->GetTimeSteps()==4, "Test for number or time steps with ComputeBoundingGeometry()");
   mitk::TimeBounds timebounds = geometry->GetTimeBounds();
-  MITK_TEST_CONDITION((timebounds[0]==0)&&(timebounds[1]==10),"Test for timebounds with ComputeBoundingGeometry()");
+  MITK_TEST_CONDITION((timebounds[0]==0)&&(timebounds[1]==4),"Test for timebounds with ComputeBoundingGeometry()");
   for (unsigned int i=0; i<geometry->GetTimeSteps(); i++)
   {
     mitk::Geometry3D::Pointer subGeometry = geometry->GetGeometry3D(i);
@@ -752,9 +763,9 @@ void TestDataStorage( mitk::DataStorage* ds )
     MITK_TEST_CONDITION((bounds[0]==i)&&(bounds[1]==i+1),"Test for timebounds of geometry at different time steps with ComputeBoundingGeometry()");
   }
   geometry = ds->ComputeBoundingGeometry3D(all);
-  MITK_TEST_CONDITION(geometry->GetTimeSteps()==10, "Test for number or time steps with ComputeBoundingGeometry(allNodes)");
+  MITK_TEST_CONDITION(geometry->GetTimeSteps()==4, "Test for number or time steps with ComputeBoundingGeometry(allNodes)");
   timebounds = geometry->GetTimeBounds();
-  MITK_TEST_CONDITION((timebounds[0]==0)&&(timebounds[1]==10),"Test for timebounds with ComputeBoundingGeometry(allNodes)");
+  MITK_TEST_CONDITION((timebounds[0]==0)&&(timebounds[1]==4),"Test for timebounds with ComputeBoundingGeometry(allNodes)");
   for (unsigned int i=0; i<geometry->GetTimeSteps(); i++)
   {
     mitk::Geometry3D::Pointer subGeometry = geometry->GetGeometry3D(i);

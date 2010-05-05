@@ -45,6 +45,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itksys/SystemTools.hxx>
 
 #include <QProgressBar>
+#include <QMessageBox>
 
 //#include <QAction>
 //#include <QComboBox>
@@ -477,7 +478,14 @@ void QmitkIGTExampleView::OnParametersChanged()
 
   mitk::PropertyList::Pointer parameters = mitk::PropertyList::New();
   parameters->SetProperty("NavigationDataDisplacementFilter_Offset", mitk::Vector3DProperty::New(v));
-  m_Displacer->SetParameters(parameters.GetPointer());
+  
+  if(m_Displacer.IsNotNull())
+  {
+    m_Displacer->SetParameters(parameters.GetPointer());
+  }
+  else{
+    QMessageBox::warning(NULL, "No navigation test started", "Please start a navigationtest first", QMessageBox::Ok, NULL);
+  }
 }
 
 

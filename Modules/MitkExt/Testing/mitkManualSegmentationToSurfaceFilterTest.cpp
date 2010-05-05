@@ -172,7 +172,7 @@ int mitkManualSegmentationToSurfaceFilterTest(int argc, char* argv[])
 
   std::cout<<"[TEST DONE]"<<std::endl;
 
-  writer->Delete();
+  //writer->Delete();
 
   return EXIT_SUCCESS;
 }

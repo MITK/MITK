@@ -91,7 +91,11 @@ int vtkMitkThickSlicesFilterTest(int /*argc*/, char* /*argv*/[])
   o = f->GetOutput();
   
   CheckResultImageForTSFilter(o);
-    
+
+  //Delete vtk variable correctly
+  i->Delete();
+  f->Delete();
+  
   MITK_TEST_END()
 }
 

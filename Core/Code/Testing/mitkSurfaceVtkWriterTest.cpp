@@ -37,16 +37,16 @@ int mitkSurfaceVtkWriterTest(int /*argc*/ , char* argv[])
   // always start with this!
   MITK_TEST_BEGIN("SurfaceVtkWriter")
 
-    // let's create an object of our class  
-    mitk::SurfaceVtkWriter<vtkPolyDataWriter>::Pointer mySurfaceVtkWriter = mitk::SurfaceVtkWriter<vtkPolyDataWriter>::New();
+  // let's create an object of our class  
+  mitk::SurfaceVtkWriter<vtkPolyDataWriter>::Pointer mySurfaceVtkWriter = mitk::SurfaceVtkWriter<vtkPolyDataWriter>::New();
 
   // first test: did this work?
   // using MITK_TEST_CONDITION_REQUIRED makes the test stop after failure, since
   // it makes no sense to continue without an object.
   MITK_TEST_CONDITION_REQUIRED(mySurfaceVtkWriter.IsNotNull(),"Testing instantiation") 
 
-    // create contour
-    vtkPolyDataReader* reader = vtkPolyDataReader::New();
+  // create contour
+  vtkPolyDataReader* reader = vtkPolyDataReader::New();
   reader->SetFileName(argv[1]);
   reader->Update();
   if (reader->GetOutput())
@@ -60,7 +60,7 @@ int mitkSurfaceVtkWriterTest(int /*argc*/ , char* argv[])
       try{  
         // test for exception handling
         MITK_TEST_FOR_EXCEPTION_BEGIN(itk::ExceptionObject)
-          mySurfaceVtkWriter->SetInput(surface);
+        mySurfaceVtkWriter->SetInput(surface);
         mySurfaceVtkWriter->SetFileName("/usr/bin");
         mySurfaceVtkWriter->Update(); 
         MITK_TEST_FOR_EXCEPTION_END(itk::ExceptionObject)
@@ -76,6 +76,10 @@ int mitkSurfaceVtkWriterTest(int /*argc*/ , char* argv[])
 
     // always end with this!
   }
+
+  //Delete reader correctly
+  reader->Delete();
+
   MITK_TEST_END()
 
 }

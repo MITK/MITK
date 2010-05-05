@@ -123,6 +123,7 @@ void mitk::SurfaceToImageFilter::Stencil3DImage(int time)
   imageGeometry->TransferItkToVtkTransform();
   transform->Concatenate(imageGeometry->GetVtkTransform()->GetLinearInverse());
   move->SetTransform(transform);
+  transform->Delete();
 
   vtkPolyDataNormals * normalsFilter = vtkPolyDataNormals::New();
   normalsFilter->SetFeatureAngle(50);

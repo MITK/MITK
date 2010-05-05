@@ -95,10 +95,14 @@ int mitkCameraVisualizationTest(int /* argc */, char* /*argv*/[])
 
   // set renderer
   myFilter->SetRenderer(renderer);
+  
   //Update filter
   myFilter->Update();
 
-    // always end with this!
+  //Delete renderWindow correctly
+  renderWindow->Delete();
+
+  // always end with this!
   MITK_TEST_END();
 
 }

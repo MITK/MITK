@@ -240,8 +240,8 @@ static void TestSelected(mitk::DataNode::Pointer dataTreeNode)
 
   MITK_TEST_CONDITION(dataTreeNode->IsSelected(base), "Testing if this node with right base renderer is set as selected" )
 
-
-
+  //Delete RenderWindow correctly
+  renderWindow->Delete();
 
 }
 static void TestGetMTime(mitk::DataNode::Pointer dataTreeNode)
@@ -286,7 +286,7 @@ int mitkDataNodeTest(int /* argc */, char* /*argv*/[])
   //test setData() Method
   mitkDataNodeTestClass::TestDataSetting(myDataNode);
   mitkDataNodeTestClass::TestMapperSetting(myDataNode);
-  
+  //
   //note, that no data is set to the dataTreeNode
   mitkDataNodeTestClass::TestInteractorSetting(myDataNode);
   mitkDataNodeTestClass::TestPropertyList(myDataNode);

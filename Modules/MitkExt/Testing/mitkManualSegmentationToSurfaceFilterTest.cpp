@@ -134,8 +134,19 @@ int mitkManualSegmentationToSurfaceFilterTest(int argc, char* argv[])
     filter->SetDecimate( mitk::ImageToSurfaceFilter::DecimatePro );
     filter->SetTargetReduction(0.05f);
     filter->SmoothOn();
+    
+    try 
+    {
+      filter->Update();
+    }
+    catch( itk::ExceptionObject & err ) 
+    { 
+      MITK_INFO << " ERROR!" << std::endl;
+      MITK_ERROR << "ExceptionObject caught!" << std::endl; 
+      MITK_ERROR << err << std::endl; 
+      return EXIT_FAILURE;
+    } 
 
-    //filter->Update();
     writer->SetInput( filter->GetOutput() );
     if( writer->GetNumberOfInputs() < 1 )
     {
@@ -160,6 +171,9 @@ int mitkManualSegmentationToSurfaceFilterTest(int argc, char* argv[])
   }
 
   std::cout<<"[TEST DONE]"<<std::endl;
+
+  writer->Delete();
+
   return EXIT_SUCCESS;
 }
 

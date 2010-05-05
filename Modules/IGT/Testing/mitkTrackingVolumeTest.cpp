@@ -83,6 +83,7 @@ class mitkTrackingVolumeTestClass
       {
       vtkPolyData* myPolyData = vtkPolyData::New();
       myTrackingVolume->SetVolumeManually(myPolyData);
+      myPolyData->Delete();
       }
     catch(...)
       {

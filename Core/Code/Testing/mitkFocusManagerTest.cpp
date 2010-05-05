@@ -83,5 +83,8 @@ int mitkFocusManagerTest(int /*argc*/, char* /*argv*/[])
     
   //TODO: test IsLast() IsFirst() GetFirst() GetLast() GoToNext() GetIter() SetLoop(bool loop)
 
+  //Delete renderWindo correctly
+  renderWindow->Delete();
+
   MITK_TEST_END();
 }

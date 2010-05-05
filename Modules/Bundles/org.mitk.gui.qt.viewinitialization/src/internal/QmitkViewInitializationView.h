@@ -82,6 +82,8 @@ protected:
   Ui::QmitkViewInitializationViewControls* m_Controls;
 
   QmitkStdMultiWidget* m_MultiWidget;
+
+  unsigned long m_CommandTag;
 };
 
 

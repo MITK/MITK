@@ -38,6 +38,7 @@ QmitkViewInitializationView::QmitkViewInitializationView()
   m_Controls(NULL),
   m_MultiWidget(NULL)
 {
+  m_CommandTag = 0;
 }
 
 QmitkViewInitializationView::~QmitkViewInitializationView()
@@ -52,9 +53,6 @@ void QmitkViewInitializationView::CreateQtPartControl(QWidget *parent)
     m_Controls = new Ui::QmitkViewInitializationViewControls;
     m_Controls->setupUi(parent);
     this->CreateConnections();
-
-    //init render window selector (List Widget)
-    this->InitRenderWindowSelector();
   }
 }
 
@@ -79,11 +77,15 @@ void QmitkViewInitializationView::CreateConnections()
 
 void QmitkViewInitializationView::Activated()
 {
+  //init render window selector (List Widget)
+  this->InitRenderWindowSelector();
   QmitkFunctionality::Activated();
 }
 
 void QmitkViewInitializationView::Deactivated()
 {
+  mitk::FocusManager* fm = mitk::GlobalInteraction::GetInstance()->GetFocusManager();
+  fm->RemoveObserver(m_CommandTag);
   QmitkFunctionality::Deactivated();
 }
 
@@ -142,13 +144,12 @@ vtkRenderWindow* QmitkViewInitializationView::GetSelectedRenderWindow()
 
 void QmitkViewInitializationView::InitRenderWindowSelector()
 {
-  itk::SimpleMemberCommand<QmitkViewInitializationView>::Pointer m_UpdateRendererListCommand = 
-                                          itk::SimpleMemberCommand<QmitkViewInitializationView>::New();
-
-  m_UpdateRendererListCommand->SetCallbackFunction( this, &QmitkViewInitializationView::UpdateRendererList );
+  itk::SimpleMemberCommand<QmitkViewInitializationView>::Pointer updateRendererListCommand = 
+    itk::SimpleMemberCommand<QmitkViewInitializationView>::New();
+  updateRendererListCommand->SetCallbackFunction( this, &QmitkViewInitializationView::UpdateRendererList );
 
   mitk::FocusManager* fm = mitk::GlobalInteraction::GetInstance()->GetFocusManager();
-  fm->AddObserver(mitk::FocusEvent(), m_UpdateRendererListCommand);
+  m_CommandTag = fm->AddObserver(mitk::FocusEvent(), updateRendererListCommand);
 
   this->UpdateRendererList();
 }

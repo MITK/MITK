@@ -27,6 +27,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkSphereSource.h>
 #include <mitkProperties.h>
 #include <mitkNodePredicateProperty.h>
+#include <mitkStatusBar.h>
+
 
 #include <QMessageBox>
 #include <qtimer.h>
@@ -454,6 +456,17 @@ void QmitkToolPairNavigationView::RenderScene()
         //compute distance from tool 1 and tool 2 and display it 
         mitk::NavigationData* nd0 = m_Source->GetOutput(0);
         mitk::NavigationData* nd1 = m_Source->GetOutput(1);
+        if (nd0 == NULL  || nd1 == NULL)
+        {
+          static bool once = true;
+          if (once)
+          {
+            QMessageBox::warning(NULL, "Error", QString("Did not recieve two tracking tools!"));
+            once = false;
+          }
+          mitk::StatusBar::GetInstance()->DisplayText("Error: Did not recieve two tracking tools!"); // Display recording message for 75ms in status bar
+          return;
+        }
         mitk::NavigationData::PositionType::RealType distanceToTool =  nd0->GetPosition().EuclideanDistanceTo(nd1->GetPosition());
         QString str;
         str.setNum(distanceToTool);

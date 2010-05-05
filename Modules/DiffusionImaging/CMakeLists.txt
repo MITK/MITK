@@ -1,11 +1,21 @@
-IF(GDCM_MAJOR_VERSION EQUAL 2)
-  ADD_DEFINITIONS(-DGDCM2)
-ENDIF(GDCM_MAJOR_VERSION EQUAL 2)
+FIND_PACKAGE(ITK)
+IF(ITK_GDCM_DIR)
+  INCLUDE(${ITK_GDCM_DIR}/GDCMConfig.cmake)
+  IF(GDCM_MAJOR_VERSION EQUAL 2)
+    ADD_DEFINITIONS(-DGDCM2)
+    SET(ITK_USES_GDCM2 1)
+  ENDIF(GDCM_MAJOR_VERSION EQUAL 2)
+ENDIF(ITK_GDCM_DIR)
 
-MITK_CREATE_MODULE( MitkDiffusionImaging
-  INCLUDE_DIRS Algorithms DicomImport IODataStructures/DiffusionWeightedImages IODataStructures/QBallImages IODataStructures/TensorImages IODataStructures Reconstruction Tractography Rendering
-  DEPENDS Mitk
-#  PACKAGE_DEPENDS Boost
-)
+IF(ITK_USES_GDCM2)
+  MESSAGE("Warning: MitkDiffusionImaging is still not compatible to GDCM2, won't build module")
+ELSE(ITK_USES_GDCM2)
 
-ADD_SUBDIRECTORY(Testing)
+  MITK_CREATE_MODULE( MitkDiffusionImaging
+    INCLUDE_DIRS Algorithms DicomImport IODataStructures/DiffusionWeightedImages IODataStructures/QBallImages IODataStructures/TensorImages IODataStructures Reconstruction Tractography Rendering
+    DEPENDS Mitk
+  #  PACKAGE_DEPENDS Boost
+  )
+
+  ADD_SUBDIRECTORY(Testing)
+ENDIF(ITK_USES_GDCM2)

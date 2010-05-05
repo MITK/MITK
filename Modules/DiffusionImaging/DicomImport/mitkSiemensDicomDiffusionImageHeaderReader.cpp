@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkSiemensDicomDiffusionImageHeaderReader.h"
 #include "gdcmGlobal.h"
 
-#ifndef DGDCM2
+#ifndef GDCM2
 
 #include "gdcm.h"
 

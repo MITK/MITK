@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "gdcmGlobal.h"
 
-#ifndef DGDCM2
+#ifndef GDCM2
 
 #include "gdcm.h"
 // relevant Siemens private tags
@@ -68,7 +68,7 @@ void mitk::GEDicomDiffusionImageHeaderReader::Update()
     VolumeReaderType::DictionaryArrayRawPointer inputDict 
       = m_VolumeReader->GetMetaDataDictionaryArray();
 
-#ifndef DGDCM2
+#ifndef GDCM2
     if(gdcm::Global::GetDicts()->GetDefaultPubDict()->GetEntry(GEDictBValue.GetKey()) == 0)
       gdcm::Global::GetDicts()->GetDefaultPubDict()->AddEntry(GEDictBValue);
     if(gdcm::Global::GetDicts()->GetDefaultPubDict()->GetEntry(GEDictXGradient.GetKey()) == 0)

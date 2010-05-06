@@ -285,7 +285,7 @@ void QmitkPointBasedRegistrationView::CreateConnections()
   connect((QObject*)(m_Controls.m_UndoTransformation),SIGNAL(clicked()),this,SLOT(UndoTransformation()));
   connect((QObject*)(m_Controls.m_RedoTransformation),SIGNAL(clicked()),this,SLOT(RedoTransformation()));
   connect((QObject*)(m_Controls.m_ShowRedGreenValues),SIGNAL(toggled(bool)),this,SLOT(showRedGreen(bool)));
-  connect((QObject*)(m_Controls.m_OpacitySlider),SIGNAL(sliderMoved(int)),this,SLOT(OpacityUpdate(int)));
+  connect((QObject*)(m_Controls.m_OpacitySlider),SIGNAL(valueChanged(int)),this,SLOT(OpacityUpdate(int)));
   connect((QObject*)(m_Controls.m_SelectedTransformationClass),SIGNAL(activated(int)), this,SLOT(transformationChanged(int)));
   connect((QObject*)(m_Controls.m_UseICP),SIGNAL(toggled(bool)), this,SLOT(checkCalculateEnabled()));
   connect((QObject*)(m_Controls.m_UseICP),SIGNAL(toggled(bool)), this,SLOT(checkLandmarkError()));

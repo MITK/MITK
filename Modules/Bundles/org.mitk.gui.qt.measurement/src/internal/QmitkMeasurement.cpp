@@ -66,7 +66,9 @@ QmitkMeasurement::QmitkMeasurement() :
       m_SelectedImageNode(),
       m_LineCounter(0), m_PathCounter(0),
       m_AngleCounter(0), m_FourPointAngleCounter(0), m_EllipseCounter(0),
-      m_RectangleCounter(0), m_PolygonCounter(0), m_LastRenderWindow(0)
+      m_RectangleCounter(0), m_PolygonCounter(0), m_LastRenderWindow(0), 
+      m_CurrentFigureNodeInitialized(false),
+      m_DrawActionsGroup(0)
 {
 
 }
@@ -110,6 +112,8 @@ void QmitkMeasurement::CreateQtPartControl(QWidget* parent)
 
   m_MeasurementInfoRenderer->AddActor(m_MeasurementInfoAnnotation);
   m_DrawActionsToolBar = new QToolBar;
+  m_DrawActionsGroup = new QActionGroup(this);
+  m_DrawActionsGroup->setExclusive(true);
 
   //# add actions
   QAction* currentAction = m_DrawActionsToolBar->addAction(QIcon(
@@ -117,6 +121,7 @@ void QmitkMeasurement::CreateQtPartControl(QWidget* parent)
   m_DrawLine = currentAction;
   m_DrawLine->setCheckable(true);
   m_DrawActionsToolBar->addAction(currentAction);
+  m_DrawActionsGroup->addAction(currentAction);
   QObject::connect( currentAction, SIGNAL( triggered(bool) )
       , this, SLOT( ActionDrawLineTriggered(bool) ) );
 
@@ -125,6 +130,7 @@ void QmitkMeasurement::CreateQtPartControl(QWidget* parent)
   m_DrawPath = currentAction;
   m_DrawPath->setCheckable(true);
   m_DrawActionsToolBar->addAction(currentAction);
+  m_DrawActionsGroup->addAction(currentAction);
   QObject::connect( currentAction, SIGNAL( triggered(bool) )
       , this, SLOT( ActionDrawPathTriggered(bool) ) );
 
@@ -133,6 +139,7 @@ void QmitkMeasurement::CreateQtPartControl(QWidget* parent)
   m_DrawAngle = currentAction;
   m_DrawAngle->setCheckable(true);
   m_DrawActionsToolBar->addAction(currentAction);
+  m_DrawActionsGroup->addAction(currentAction);
   QObject::connect( currentAction, SIGNAL( triggered(bool) )
       , this, SLOT( ActionDrawAngleTriggered(bool) ) );
 
@@ -141,6 +148,7 @@ void QmitkMeasurement::CreateQtPartControl(QWidget* parent)
   m_DrawFourPointAngle = currentAction;
   m_DrawFourPointAngle->setCheckable(true);
   m_DrawActionsToolBar->addAction(currentAction);
+  m_DrawActionsGroup->addAction(currentAction);
   QObject::connect( currentAction, SIGNAL( triggered(bool) )
       , this, SLOT( ActionDrawFourPointAngleTriggered(bool) ) );
 
@@ -149,6 +157,7 @@ void QmitkMeasurement::CreateQtPartControl(QWidget* parent)
   m_DrawEllipse = currentAction;
   m_DrawEllipse->setCheckable(true);
   m_DrawActionsToolBar->addAction(currentAction);
+  m_DrawActionsGroup->addAction(currentAction);
   QObject::connect( currentAction, SIGNAL( triggered(bool) )
       , this, SLOT( ActionDrawEllipseTriggered(bool) ) );
 
@@ -157,6 +166,7 @@ void QmitkMeasurement::CreateQtPartControl(QWidget* parent)
   m_DrawRectangle = currentAction;
   m_DrawRectangle->setCheckable(true);
   m_DrawActionsToolBar->addAction(currentAction);
+  m_DrawActionsGroup->addAction(currentAction);
   QObject::connect( currentAction, SIGNAL( triggered(bool) )
       , this, SLOT( ActionDrawRectangleTriggered(bool) ) );
 
@@ -165,6 +175,7 @@ void QmitkMeasurement::CreateQtPartControl(QWidget* parent)
   m_DrawPolygon = currentAction;
   m_DrawPolygon->setCheckable(true);
   m_DrawActionsToolBar->addAction(currentAction);
+  m_DrawActionsGroup->addAction(currentAction);
   QObject::connect( currentAction, SIGNAL( triggered(bool) )
       , this, SLOT( ActionDrawPolygonTriggered(bool) ) );
 
@@ -232,7 +243,7 @@ void QmitkMeasurement::OnSelectionChanged(std::vector<mitk::DataNode*> nodes)
   m_SelectedPlanarFigures->RemoveAllNodes();
 
   for (std::vector<mitk::DataNode*>::iterator it = nodes.begin();
-      it != nodes.end(); 
+      it != nodes.end();
       ++it)
   {
     _PlanarFigure = 0;
@@ -439,6 +450,16 @@ void QmitkMeasurement::NodeAddedInDataStorage(const mitk::DataNode* node)
     if(figureInteractor.IsNull())
       figureInteractor = mitk::PlanarFigureInteractor::New("PlanarFigureInteractor", nonConstNode);
 
+    // remove old interactor if present
+    if( m_CurrentFigureNode.IsNotNull() && m_CurrentFigureNodeInitialized == false )
+    {
+      mitk::Interactor::Pointer oldInteractor = m_CurrentFigureNode->GetInteractor();
+      if(oldInteractor.IsNotNull())
+        mitk::GlobalInteraction::GetInstance()->RemoveInteractor(oldInteractor);
+
+      this->GetDefaultDataStorage()->Remove(m_CurrentFigureNode);
+    }
+
     mitk::GlobalInteraction::GetInstance()->AddInteractor(figureInteractor);
   }
 }
@@ -447,6 +468,8 @@ void QmitkMeasurement::PlanarFigureInitialized()
 {
   if(m_CurrentFigureNode.IsNull())
     return;
+
+  m_CurrentFigureNodeInitialized = true;
 
   this->PlanarFigureSelectionChanged();
 
@@ -466,14 +489,13 @@ void QmitkMeasurement::AddFigureToDataStorage(mitk::PlanarFigure* figure, const 
     m_CurrentFigureNode->GetData()->RemoveObserver(m_InitializedObserverTag);
 
   mitk::DataNode::Pointer newNode = mitk::DataNode::New();
-  m_CurrentFigureNode = newNode;
-  m_CurrentFigureNode->SetName(name.toStdString());
-  m_CurrentFigureNode->SetData(figure);
+  newNode->SetName(name.toStdString());
+  newNode->SetData(figure);
 
   // Add custom property, if available
   if ( (propertyKey != NULL) && (property != NULL) )
   {
-    m_CurrentFigureNode->AddProperty( propertyKey, property );
+    newNode->AddProperty( propertyKey, property );
   }
 
   typedef itk::SimpleMemberCommand< QmitkMeasurement > ITKCommandType;
@@ -488,7 +510,10 @@ void QmitkMeasurement::AddFigureToDataStorage(mitk::PlanarFigure* figure, const 
 
   this->GetDataStorage()->Add(newNode, m_SelectedImageNode->GetNode());
 
-  *m_SelectedPlanarFigures = m_CurrentFigureNode;
+  m_CurrentFigureNodeInitialized = false;
+  m_CurrentFigureNode = newNode;
+
+  *m_SelectedPlanarFigures = newNode;
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }

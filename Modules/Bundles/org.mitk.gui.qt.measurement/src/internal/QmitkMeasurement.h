@@ -156,6 +156,7 @@ protected:
   QAction* m_DrawRectangle;
   QAction* m_DrawPolygon;
   QToolBar* m_DrawActionsToolBar;
+  QActionGroup* m_DrawActionsGroup;
   QTextBrowser* m_SelectedPlanarFiguresText;
   QPushButton* m_CopyToClipboard;
   vtkRenderer * m_MeasurementInfoRenderer;
@@ -183,6 +184,7 @@ protected:
   unsigned int m_PolygonCounter;
   unsigned int m_InitializedObserverTag;
   bool m_Visible;
+  bool m_CurrentFigureNodeInitialized;
 
   ///
   /// Saves the last renderwindow any info data was inserted

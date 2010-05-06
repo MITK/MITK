@@ -57,7 +57,6 @@ class MitkExt_EXPORT ContourSetVtkMapper3D : public BaseVtkMapper3D
 
     virtual void GenerateData(mitk::BaseRenderer* renderer);
 
-    vtkPolyDataMapper* m_PointVtkPolyDataMapper;
     vtkPolyDataMapper* m_VtkPolyDataMapper;
     vtkTubeFilter*     m_TubeFilter;
 

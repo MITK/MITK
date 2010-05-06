@@ -55,9 +55,6 @@ mitk::ContourSetVtkMapper3D::ContourSetVtkMapper3D()
 
 mitk::ContourSetVtkMapper3D::~ContourSetVtkMapper3D()
 {
-  if( m_PointVtkPolyDataMapper )
-    m_PointVtkPolyDataMapper->Delete();
-
   if( m_VtkPolyDataMapper )
     m_VtkPolyDataMapper->Delete();;
 

@@ -376,8 +376,8 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
       QKeySequence("CTRL+Y"));
   redoAction->setToolTip("execute the last action that was undone again (not supported by all modules)");
 
-  imageNavigatorAction = editMenu->addAction(QIcon(":/org.mitk.gui.qt.ext/Slider.png"), "&Image Navigator",
-    QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onImageNavigator()),NULL);
+  imageNavigatorAction = new QAction(QIcon(":/org.mitk.gui.qt.ext/Slider.png"), "&Image Navigator", NULL);   
+  QObject::connect(imageNavigatorAction, SIGNAL(triggered(bool)), QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onImageNavigator()));
   imageNavigatorAction->setCheckable(true);
 
   berry::IWorkbenchWindow::Pointer win =

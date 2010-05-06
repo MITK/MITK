@@ -1,4 +1,4 @@
-SET(CPP_FILES 
+SET(CPP_FILES
   Algorithms/vtkPointSetSlicer.cxx
   Algorithms/mitkCoreExtObjectFactory.cpp
   Algorithms/mitkAngleCorrectByPointFilter.cpp
@@ -78,6 +78,7 @@ SET(CPP_FILES
   DataManagement/mitkLabeledImageLookupTable.cpp
   DataManagement/mitkLineOperation.cpp
   DataManagement/mitkMesh.cpp
+  DataManagement/mitkObservedObjectList.cpp
   DataManagement/mitkOrganTypeProperty.cpp
   DataManagement/mitkPlaneLandmarkProjector.cpp
   DataManagement/mitkPlanarAngle.cpp
@@ -181,19 +182,19 @@ SET(CPP_FILES
 )
 
 IF(WIN32 AND NOT MINGW)
-  SET(CPP_FILES 
+  SET(CPP_FILES
     Controllers/mitkMovieGeneratorWin32.cpp
     ${CPP_FILES}
   )
 ENDIF(WIN32 AND NOT MINGW)
 
 #IF(MITK_USE_TD_MOUSE)
-#  SET(CPP_FILES 
+#  SET(CPP_FILES
 #      Controllers/mitkTDMouseVtkCameraController.cpp
 #      Interactions/mitkSpaceNavigatorDriver.cpp
 #      Interactions/mitkTDMouseEvent.cpp
 #      Interactions/mitkTDMouseEventThrower.cpp
-#      ${CPP_FILES}  
+#      ${CPP_FILES}
 #     )
 #ENDIF(MITK_USE_TD_MOUSE)
 

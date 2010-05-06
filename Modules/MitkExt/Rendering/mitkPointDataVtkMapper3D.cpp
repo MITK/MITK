@@ -48,11 +48,11 @@ mitk::PointDataVtkMapper3D::PointDataVtkMapper3D()
 
 mitk::PointDataVtkMapper3D::~PointDataVtkMapper3D()
 {
-  m_PointActor->Delete();
   m_Points->Delete();
   m_CellArray->Delete();
   m_PolyData->Delete();
   m_PointMapper->Delete();
+  m_PointActor->Delete();
 }
 
 vtkProp* mitk::PointDataVtkMapper3D::GetVtkProp(mitk::BaseRenderer*  /*renderer*/)

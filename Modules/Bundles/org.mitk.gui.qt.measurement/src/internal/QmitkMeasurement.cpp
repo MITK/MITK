@@ -61,14 +61,14 @@
 #include <mitkVtkLayerController.h>
 
 QmitkMeasurement::QmitkMeasurement() :
-  m_Layout(0), m_DrawActionsToolBar(0), m_MeasurementInfoRenderer(0),
+  m_Layout(0), m_DrawActionsToolBar(0),
+      m_DrawActionsGroup(0), m_MeasurementInfoRenderer(0),
       m_MeasurementInfoAnnotation(0), m_SelectedPlanarFigures(0),
       m_SelectedImageNode(),
       m_LineCounter(0), m_PathCounter(0),
       m_AngleCounter(0), m_FourPointAngleCounter(0), m_EllipseCounter(0),
-      m_RectangleCounter(0), m_PolygonCounter(0), m_LastRenderWindow(0), 
-      m_CurrentFigureNodeInitialized(false),
-      m_DrawActionsGroup(0)
+      m_RectangleCounter(0), m_PolygonCounter(0),
+      m_CurrentFigureNodeInitialized(false), m_LastRenderWindow(0)
 {
 
 }

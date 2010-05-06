@@ -6,7 +6,7 @@
     <view id="org.mitk.views.colourimageprocessing"
           name="Colour Image Processing"
           class="::QmitkColourImageProcessingView" 
-          icon="resources/icon.xpm" />
+          icon="resources/ColorImageProcessing.png" />
   </extension>
 
 </plugin>

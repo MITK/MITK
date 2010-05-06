@@ -1,5 +1,5 @@
 <!DOCTYPE RCC><RCC version="1.0">
  <qresource prefix="/QmitkColourImageProcessingView">
-     <file>icon.xpm</file>
+     <file>ColorImageProcessing.png</file>
  </qresource>
  </RCC>

@@ -322,6 +322,8 @@ public:
 
   /**
    * \brief Returns whether the plane is parallel to another plane
+   *
+   * @return true iff the normal vectors both point to the same or exactly oposit direction
    */
   bool IsParallel( const PlaneGeometry *plane ) const;
 
@@ -343,6 +345,10 @@ public:
   /**
    * \brief Returns whether the plane is on the plane
    * (bounding-box \em not considered)
+   * 
+   * @return true iff the normal vector of the planes point to the same or the exactly oposit direction and 
+   *  the distance of the planes is < eps
+   *  
    */
   bool IsOnPlane( const PlaneGeometry *plane ) const;
 
@@ -351,19 +357,6 @@ public:
    * \brief Returns the lot from the point to the plane
    */
   Point3D ProjectPointOntoPlane( const Point3D &pt ) const;
-
-
-  /**
-   * \brief Compares plane with another plane: \a true if IsOnPlane
-   * (bounding-box \em not considered)
-   */
-  bool operator==( const PlaneGeometry *plane ) const;
-
-  /**
-   * \brief Compares plane with another plane: \a false if IsOnPlane
-   * (bounding-box \em not considered)
-   */
-  bool operator!=( const PlaneGeometry *plane ) const;
 
 
   virtual void SetIndexToWorldTransform( AffineTransform3D *transform);
@@ -387,6 +380,19 @@ protected:
   virtual void InitializeGeometry( Self *newGeometry ) const;
 
   virtual void PrintSelf( std::ostream &os, itk::Indent indent ) const;
+  
+private:
+   /**
+   * \brief Compares plane with another plane: \a true if IsOnPlane
+   * (bounding-box \em not considered)
+   */
+  virtual bool operator==( const PlaneGeometry *plane ) const;
+
+  /**
+   * \brief Compares plane with another plane: \a false if IsOnPlane
+   * (bounding-box \em not considered)
+   */
+  virtual bool operator!=( const PlaneGeometry *plane ) const;
 
 };
 

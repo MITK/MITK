@@ -17,6 +17,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkPlaneGeometry.h"
+#include "mitkRotationOperation.h"
+#include "mitkInteractionConst.h"
 
 #include "mitkTestingMacros.h"
 
@@ -488,7 +490,7 @@ int mitkPlaneGeometryTest(int /*argc*/, char* /*argv*/[])
     return EXIT_FAILURE;
   }
   std::cout<<"[PASSED]"<<std::endl;
-
+  
   std::cout << "Testing width, height and thickness (in units) of cloned version: ";
   if((mitk::Equal(clonedplanegeometry->GetExtent(0),width)==false) || 
      (mitk::Equal(clonedplanegeometry->GetExtent(1),height)==false) || 
@@ -519,7 +521,89 @@ int mitkPlaneGeometryTest(int /*argc*/, char* /*argv*/[])
   result = mappingTests2D(clonedplanegeometry, width, height, widthInMM, heightInMM, origin, right, bottom);
   if(result!=EXIT_SUCCESS)
     return result;
+    
+  
+  // Clone, move, rotate and test for 'IsParallel' and 'IsOnPlane'
+  std::cout << "Testing Clone(): ";
+  mitk::PlaneGeometry::Pointer clonedplanegeometry2 = dynamic_cast<mitk::PlaneGeometry*>(planegeometry->Clone().GetPointer());
+  if((clonedplanegeometry2.IsNull()) || (clonedplanegeometry2->GetReferenceCount()!=1))
+  {
+    std::cout<<"[FAILED]"<<std::endl;
+    return EXIT_FAILURE;
+  }
+  std::cout << "Testing if cloned and original version are at the same place: ";
+  if(mitk::Equal(clonedplanegeometry2->IsOnPlane(planegeometry), true) ==false)
+  {
+    std::cout<<"[FAILED]"<<std::endl;
+    return EXIT_FAILURE;
+  }
+  std::cout<<"[PASSED]"<<std::endl;
+  
+  std::cout << "Testing if the origin is on the plane: ";
+  if(mitk::Equal(clonedplanegeometry2->IsOnPlane(origin), true)==false)
+  {
+    std::cout<<"[FAILED]"<<std::endl;
+    return EXIT_FAILURE;
+  }
+  std::cout<<"[PASSED]"<<std::endl;
+  
+  mitk::VnlVector newaxis(3);
+  mitk::FillVector3D(newaxis, 1.0, 1.0, 1.0); newaxis.normalize();
+  vnl_quaternion<mitk::ScalarType> rotation2(newaxis, 0.0);
+  
+  mitk::Vector3D clonednormal = clonedplanegeometry2->GetNormal();
+  mitk::Point3D clonedorigin = clonedplanegeometry2->GetOrigin();
+  
+  mitk::RotationOperation* planerot = new mitk::RotationOperation( mitk::OpROTATE, origin, clonedplanegeometry2->GetAxisVector( 0 ), 180.0 );
+  
+  clonedplanegeometry2->ExecuteOperation( planerot ); 
+  
+  std::cout << "Testing whether the flipped plane is still the original plane: ";
+  if( mitk::Equal( clonedplanegeometry2->IsOnPlane(planegeometry), true )==false )
+  {
+    std::cout<<"[FAILED]"<<std::endl;
+    return EXIT_FAILURE;
+  }
+  std::cout<<"[PASSED]"<<std::endl;
+  
+  clonedorigin += clonednormal;
+  clonedplanegeometry2->SetOrigin( clonedorigin );
+ 
+  std::cout << "Testing if the translated (cloned, flipped) plane is parallel to its origin plane: ";
+  if( mitk::Equal( clonedplanegeometry2->IsParallel(planegeometry), true )==false )
+  {
+    std::cout<<"[FAILED]"<<std::endl;
+    return EXIT_FAILURE;
+  }
+  std::cout<<"[PASSED]"<<std::endl;
+  
 
+  delete planerot;
+  
+  planerot = new mitk::RotationOperation( mitk::OpROTATE, origin, clonedplanegeometry2->GetAxisVector( 0 ), 0.1 );
+  clonedplanegeometry2->ExecuteOperation( planerot ); 
+  
+  std::cout << "Testing if a non-paralell plane gets recognized as not paralell  [rotation +0.1 degree] : ";
+  if( mitk::Equal( clonedplanegeometry2->IsParallel(planegeometry), false )==false )
+  {
+    std::cout<<"[FAILED]"<<std::endl;
+    return EXIT_FAILURE;
+  }
+  std::cout<<"[PASSED]"<<std::endl;
+  
+  delete planerot;
+  
+  planerot = new mitk::RotationOperation( mitk::OpROTATE, origin, clonedplanegeometry2->GetAxisVector( 0 ), -0.2 );
+  clonedplanegeometry2->ExecuteOperation( planerot ); 
+  
+  std::cout << "Testing if a non-paralell plane gets recognized as not paralell  [rotation -0.1 degree] : ";
+  if( mitk::Equal( clonedplanegeometry2->IsParallel(planegeometry), false )==false )
+  {
+    std::cout<<"[FAILED]"<<std::endl;
+    return EXIT_FAILURE;
+  }
+  std::cout<<"[PASSED]"<<std::endl;
+  
 
 
   std::cout << "Testing InitializeStandardPlane(clonedplanegeometry, planeorientation = Transversal, zPosition = 0, frontside=true): " <<std::endl;

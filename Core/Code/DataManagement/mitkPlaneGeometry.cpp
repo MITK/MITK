@@ -655,7 +655,7 @@ PlaneGeometry::IntersectionPointParam( const Line3D &line, double &t ) const
 bool
 PlaneGeometry::IsParallel( const PlaneGeometry *plane ) const 
 {
-  return Angle(plane) < eps;
+  return ( (Angle(plane) < eps ) || ( Angle(plane) > ( vnl_math::pi - eps ) ) ) ;
 } 
 
 
@@ -686,20 +686,6 @@ PlaneGeometry::ProjectPointOntoPlane( const Point3D& pt ) const
 {
   ScalarType len = this->GetNormalVnl().two_norm();
   return pt - this->GetNormal() * this->SignedDistanceFromPlane( pt ) / len;
-}
-
-
-bool
-PlaneGeometry::operator==( const PlaneGeometry *plane ) const 
-{
-  return IsOnPlane( plane );
-}
-
-
-bool
-PlaneGeometry::operator!=( const PlaneGeometry *plane ) const 
-{
-  return !IsOnPlane( plane );
 }
 
 

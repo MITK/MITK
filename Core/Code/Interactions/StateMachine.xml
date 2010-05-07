@@ -3242,12 +3242,12 @@
   </stateMachine>
   <stateMachine NAME="PlanarFigureInteractor">
     <!-- Behaviour of a set of Points. a defined number of points can be set/removed/selected/deselectd/moved -->
-    <state NAME="Start" ID="42" START_STATE="TRUE" X_POS="1144" Y_POS="498" WIDTH="100" HEIGHT="50">
+    <state NAME="Start" ID="42" START_STATE="TRUE" X_POS="526" Y_POS="261" WIDTH="100" HEIGHT="50">
       <transition NAME="name" EVENT_ID="0" NEXT_STATE_ID="49">
         <action ID="31" />
       </transition>
     </state>
-    <state NAME="FigurePlaced" ID="45" X_POS="1273" Y_POS="109" WIDTH="100" HEIGHT="50">
+    <state NAME="FigurePlaced" ID="45" X_POS="807" Y_POS="592" WIDTH="100" HEIGHT="50">
       <transition NAME="name" EVENT_ID="520" NEXT_STATE_ID="45">
         <action ID="90" />
       </transition>
@@ -3258,7 +3258,7 @@
         <action ID="33" />
       </transition>
     </state>
-    <state NAME="ControlPointSelected" ID="47" X_POS="394" Y_POS="228" WIDTH="100" HEIGHT="50">
+    <state NAME="ControlPointSelected" ID="47" X_POS="110" Y_POS="522" WIDTH="100" HEIGHT="50">
       <transition NAME="name" EVENT_ID="530" NEXT_STATE_ID="47">
         <action ID="90" />
       </transition>
@@ -3266,41 +3266,45 @@
         <action ID="76" />
       </transition>
     </state>
-    <state NAME="IsLastControlPoint" ID="48" X_POS="1332" Y_POS="326" WIDTH="100" HEIGHT="50">
+    <state NAME="IsLastControlPoint" ID="48" X_POS="710" Y_POS="240" WIDTH="100" HEIGHT="50">
       <transition NAME="name" EVENT_ID="1004" NEXT_STATE_ID="42" />
       <transition NAME="name" EVENT_ID="1003" NEXT_STATE_ID="45">
         <action ID="10" />
       </transition>
     </state>
-    <state NAME="IsPlaced" ID="49" X_POS="958" Y_POS="328" WIDTH="100" HEIGHT="50">
+    <state NAME="IsPlaced" ID="49" X_POS="546" Y_POS="100" WIDTH="100" HEIGHT="50">
       <transition NAME="name" EVENT_ID="1003" NEXT_STATE_ID="50" />
       <transition NAME="name" EVENT_ID="1004" NEXT_STATE_ID="51" />
     </state>
-    <state NAME="PlaceFigure" ID="50" X_POS="1018" Y_POS="106" WIDTH="100" HEIGHT="50">
+    <state NAME="PlaceFigure" ID="50" X_POS="843" Y_POS="98" WIDTH="100" HEIGHT="50">
       <transition NAME="name" EVENT_ID="1" NEXT_STATE_ID="45">
         <action ID="11" />
       </transition>
     </state>
-    <state NAME="EditFigure" ID="51" X_POS="768" Y_POS="495" WIDTH="100" HEIGHT="50">
+    <state NAME="EditFigure" ID="51" X_POS="311" Y_POS="95" WIDTH="100" HEIGHT="50">
       <transition NAME="name" EVENT_ID="520" NEXT_STATE_ID="52">
         <action ID="21" />
       </transition>
     </state>
-    <state NAME="IsOverControlPoint" ID="52" X_POS="519" Y_POS="495" WIDTH="100" HEIGHT="50">
+    <state NAME="IsOverControlPoint" ID="52" X_POS="92" Y_POS="210" WIDTH="100" HEIGHT="50">
       <transition NAME="name" EVENT_ID="1003" NEXT_STATE_ID="51" />
       <transition NAME="name" EVENT_ID="1004" NEXT_STATE_ID="53" />
     </state>
-    <state NAME="ControlPointHover" ID="53" X_POS="229" Y_POS="495" WIDTH="115" HEIGHT="50">
+    <state NAME="ControlPointHover" ID="53" X_POS="332" Y_POS="377" WIDTH="115" HEIGHT="50">
       <transition NAME="name" EVENT_ID="520" NEXT_STATE_ID="52">
         <action ID="21" />
       </transition>
-      <transition NAME="name" EVENT_ID="1" NEXT_STATE_ID="47">
+      <transition NAME="name" EVENT_ID="1" NEXT_STATE_ID="55">
         <action ID="66" />
       </transition>
     </state>
-    <state NAME="IsMinFigureFinished" ID="54" X_POS="1093" Y_POS="256" WIDTH="110" HEIGHT="50">
+    <state NAME="IsMinFigureFinished" ID="54" X_POS="578" Y_POS="406" WIDTH="110" HEIGHT="50">
       <transition NAME="name" EVENT_ID="1004" NEXT_STATE_ID="42" />
       <transition NAME="name" EVENT_ID="1003" NEXT_STATE_ID="45" />
+    </state>
+    <state NAME="ResetFigure" ID="55" X_POS="540" Y_POS="594" WIDTH="100" HEIGHT="50">
+      <transition NAME="name" EVENT_ID="1003" NEXT_STATE_ID="47" />
+      <transition NAME="name" EVENT_ID="1004" NEXT_STATE_ID="45" />
     </state>
   </stateMachine>  
   <stateMachine NAME="Zoom">

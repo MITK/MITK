@@ -19,9 +19,12 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef _MITK_PlanarFigureReader__H_
 #define _MITK_PlanarFigureReader__H_
 
-#include <mitkPlanarFigureSource.h>
+#include "mitkPlanarFigureSource.h"
 #include "MitkExtExports.h"
-#include <mitkFileReader.h>
+#include "mitkFileReader.h"
+
+#include <list>
+
 
 class TiXmlElement;
 namespace mitk
@@ -91,6 +94,8 @@ public:
 
 protected:
 
+    typedef std::list< double > DoubleList;
+
     /**
      * Constructor
      */
@@ -138,6 +143,17 @@ protected:
     * \return returns a mitk::Point3D with the values x,y,z
     */
     mitk::Point3D GetPointFromXMLNode(TiXmlElement* e);
+
+    /**
+    * \brief parses the element for the attributes name0 to nameN, where "name" and the number of attributes
+    * to read are passed as argument. Returns a list of double vales.
+    * \param[in] e the TiXmlElement that will be parsed
+    * \param[in] attributeNameBase the basic name of the parameters
+    * \param[in] count the number of parameters
+    * \return returns a mitk::Point3D with the values x,y,z
+    */
+    DoubleList GetDoubleAttributeListFromXMLNode(TiXmlElement* e, const char *attributeNameBase, unsigned int count);
+
 
     std::string m_FileName;
     std::string m_FilePrefix;

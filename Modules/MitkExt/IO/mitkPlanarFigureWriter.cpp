@@ -88,22 +88,37 @@ void mitk::PlanarFigureWriter::GenerateData()
     const PlaneGeometry* planeGeo = dynamic_cast<const PlaneGeometry*>(pf->GetGeometry2D());
     if (planeGeo != NULL)
     {
-      // Get x and y direction vectors (in mm) and convert them to units
-      Point3D p0; p0.Fill( 0.0 );
-      Vector3D xVector;
-      static_cast< const mitk::Geometry3D * >( planeGeo )->WorldToIndex(
-        p0, planeGeo->GetAxisVector( 0 ), xVector );
-      Vector3D yVector;
-      static_cast< const mitk::Geometry3D * >( planeGeo )->WorldToIndex(
-        p0, planeGeo->GetAxisVector( 1 ), yVector );
+      // Write parameters of IndexToWorldTransform of the PlaneGeometry
+      typedef mitk::AffineGeometryFrame3D::TransformType TransformType;
+      const TransformType* affineGeometry = planeGeo->GetIndexToWorldTransform();
+      const TransformType::ParametersType& parameters = affineGeometry->GetParameters();
+      TiXmlElement* vElement = new TiXmlElement( "transformParam" );
+      for ( unsigned int i = 0; i < affineGeometry->GetNumberOfParameters(); ++i )
+      {
+        std::stringstream paramName; 
+        paramName << "param" << i;
+        vElement->SetDoubleAttribute( paramName.str().c_str(), parameters.GetElement( i ) );
+      }
+      geoElement->LinkEndChild( vElement );
 
+      // Write bounds of the PlaneGeometry
+      typedef mitk::Geometry3D::BoundsArrayType BoundsArrayType;
+      const BoundsArrayType& bounds = planeGeo->GetBounds();
+      vElement = new TiXmlElement( "boundsParam" );
+      for ( unsigned int i = 0; i < 6; ++i )
+      {
+        std::stringstream boundName; 
+        boundName << "bound" << i;
+        vElement->SetDoubleAttribute( boundName.str().c_str(), bounds.GetElement( i ) );
+      }
+      geoElement->LinkEndChild( vElement );
+
+      // Write spacing and origin of the PlaneGeometry
       Vector3D spacing = planeGeo->GetSpacing();
       Point3D origin = planeGeo->GetOrigin();
-
-      geoElement->LinkEndChild(this->CreateXMLVectorElement("xVector", xVector));
-      geoElement->LinkEndChild(this->CreateXMLVectorElement("yVector", yVector));
       geoElement->LinkEndChild(this->CreateXMLVectorElement("Spacing", spacing));
       geoElement->LinkEndChild(this->CreateXMLVectorElement("Origin", origin));
+
       pfElement->LinkEndChild(geoElement);
     }
   }

@@ -17,15 +17,18 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkPlanarFigureReader.h"
-#include "tinyxml.h"
+
 #include "mitkPlanarAngle.h"
-#include "mitkPlanarLine.h"
 #include "mitkPlanarCircle.h"
-#include "mitkPlanarPolygon.h"
+#include "mitkPlanarCross.h"
 #include "mitkPlanarFourPointAngle.h"
+#include "mitkPlanarLine.h"
+#include "mitkPlanarPolygon.h"
 #include "mitkPlanarRectangle.h"
-#include "itksys/SystemTools.hxx"
 #include "mitkPlaneGeometry.h"
+
+#include <tinyxml.h>
+#include <itksys/SystemTools.hxx>
 
 
 mitk::PlanarFigureReader::PlanarFigureReader() : PlanarFigureSource(), FileReader(),
@@ -105,23 +108,27 @@ void mitk::PlanarFigureReader::GenerateData()
     {
       pf = mitk::PlanarAngle::New();
     }
-    else if (type == "PlanarLine")
-    {
-      pf = mitk::PlanarLine::New();
-    }
     else if (type == "PlanarCircle")
     {
       pf = mitk::PlanarCircle::New();
+    }
+    else if (type == "PlanarCross")
+    {
+      pf = mitk::PlanarCross::New();
+    }
+    else if (type == "PlanarFourPointAngle")
+    {
+      pf = mitk::PlanarFourPointAngle::New();
+    }
+    else if (type == "PlanarLine")
+    {
+      pf = mitk::PlanarLine::New();
     }
     else if (type == "PlanarPolygon")
     {
       mitk::PlanarPolygon::Pointer polygon = mitk::PlanarPolygon::New();
       polygon->SetClosed( closed == "true" );
       pf = polygon;
-    }
-    else if (type == "PlanarFourPointAngle")
-    {
-      pf = mitk::PlanarFourPointAngle::New();
     }
     else if (type == "PlanarRectangle")
     {
@@ -138,13 +145,50 @@ void mitk::PlanarFigureReader::GenerateData()
     {
       try
       {
-        Vector3D xVector = this->GetVectorFromXMLNode(geoElement->FirstChildElement("xVector"));
-        Vector3D yVector = this->GetVectorFromXMLNode(geoElement->FirstChildElement("yVector"));
-        Vector3D spacing = this->GetVectorFromXMLNode(geoElement->FirstChildElement("Spacing"));
-        Point3D origin = this->GetPointFromXMLNode(geoElement->FirstChildElement("Origin"));
-
+        // Create plane geometry
         mitk::PlaneGeometry::Pointer planeGeo = mitk::PlaneGeometry::New();
-        planeGeo->InitializeStandardPlane( xVector, yVector, &spacing );
+
+        // Extract and set plane transform parameters
+        DoubleList transformList = this->GetDoubleAttributeListFromXMLNode( geoElement->FirstChildElement( "transformParam" ), "param", 12 );
+
+        typedef mitk::AffineGeometryFrame3D::TransformType TransformType;
+        TransformType::ParametersType parameters;
+        parameters.SetSize( 12 );
+
+        unsigned int i;
+        DoubleList::iterator it;
+        for ( it = transformList.begin(), i = 0;
+              it != transformList.end();
+              ++it, ++i )
+        {
+          parameters.SetElement( i, *it );
+        }
+
+        typedef mitk::AffineGeometryFrame3D::TransformType TransformType;
+        TransformType::Pointer affineGeometry = TransformType::New();
+        affineGeometry->SetParameters( parameters );
+        planeGeo->SetIndexToWorldTransform( affineGeometry );
+
+
+        // Extract and set plane bounds
+        DoubleList boundsList = this->GetDoubleAttributeListFromXMLNode( geoElement->FirstChildElement( "boundsParam" ), "bound", 6 );
+
+        typedef mitk::Geometry3D::BoundsArrayType BoundsArrayType;
+
+        BoundsArrayType bounds;
+        for ( it = boundsList.begin(), i = 0;
+              it != boundsList.end();
+              ++it, ++i )
+        {
+          bounds[i] = *it;
+        }
+
+        planeGeo->SetBounds( bounds );
+
+
+        // Extract and set spacing and origin
+        //Vector3D spacing = this->GetVectorFromXMLNode(geoElement->FirstChildElement("Spacing"));
+        Point3D origin = this->GetPointFromXMLNode(geoElement->FirstChildElement("Origin"));
         planeGeo->SetOrigin( origin );
         pf->SetGeometry2D(planeGeo);
       }
@@ -228,6 +272,28 @@ mitk::Vector3D mitk::PlanarFigureReader::GetVectorFromXMLNode(TiXmlElement* e)
   return vector;
 }
 
+mitk::PlanarFigureReader::DoubleList
+mitk::PlanarFigureReader::GetDoubleAttributeListFromXMLNode(TiXmlElement* e, const char *attributeNameBase, unsigned int count)
+{
+  DoubleList list;
+
+  if (e == NULL)
+    throw std::invalid_argument("node invalid"); // TODO: can we do a better error handling?
+  
+  for ( unsigned int i = 0; i < count; ++i )
+  {
+    mitk::ScalarType p(-1.0);
+    std::stringstream attributeName;
+    attributeName << attributeNameBase << i;
+
+    if (e->QueryFloatAttribute( attributeName.str().c_str(), &p ) == TIXML_WRONG_TYPE)
+      throw std::invalid_argument("node malformatted"); // TODO: can we do a better error handling?
+    list.push_back( p );
+  }
+
+
+  return list;
+}
 
 void mitk::PlanarFigureReader::GenerateOutputInformation()
 {

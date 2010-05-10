@@ -4,6 +4,9 @@ MESSAGE("Tutorial won't be built because QmitkExt is missing.")
 ELSE(MISSING) 
 MITK_USE_MODULE(QmitkExt)
 
+MITK_USE_MODULE(MitkExt)
+
+
 INCLUDE_DIRECTORIES(${ALL_INCLUDE_DIRECTORIES})
 
 

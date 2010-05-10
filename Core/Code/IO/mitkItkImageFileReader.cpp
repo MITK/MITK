@@ -18,6 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkItkImageFileReader.h"
 #include "mitkConfig.h"
+#include "mitkRGBToRGBACastImageFilter.h"
 
 #include <itkImageFileReader.h>
 #include <itksys/SystemTools.hxx>
@@ -155,6 +156,25 @@ void mitk::ItkImageFileReader::GenerateData()
   //  SetDefaultImageProperties( node );
   //} 
   MITK_INFO << "...finished!" << std::endl;
+
+
+  // Check if an RGB image has been read
+  if ( mitk::RGBToRGBACastImageFilter::IsRGBImage( image ) )
+  {
+    // If yes, convert the image to RGBA (for unified color image handling
+    // within MITK) and graft the output of the reader to the output of
+    // the converter.
+    static mitk::RGBToRGBACastImageFilter::Pointer rgbToRgbaFilter = mitk::RGBToRGBACastImageFilter::New();
+    rgbToRgbaFilter->SetInput( image );
+    //rgbToRgbaFilter->GraftOutput( this->GetOutput() );
+
+    // Update the converter
+    rgbToRgbaFilter->Update();
+
+    // Graft the output of the filter back onto the reader's output (to
+    // pass back any modified information)
+    this->GraftOutput( rgbToRgbaFilter->GetOutput() );
+  }
 }
 
 

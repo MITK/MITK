@@ -94,6 +94,10 @@ void QmitkSimpleExampleView::CreateConnections()
     connect(m_Controls->m_RenderWindow4Button, SIGNAL(clicked()), this, SLOT(OnRenderWindow4Clicked()) );
     connect(m_Controls->m_TakeScreenshotBtn, SIGNAL(clicked()), this, SLOT(OnTakeScreenshot()) );
     connect(m_Controls->m_TakeHighResScreenShotBtn, SIGNAL(clicked()), this, SLOT(OnTakeHighResolutionScreenshot()) );
+
+    connect(m_Controls->m_TransversalRotationSlider, SIGNAL(valueChanged(int)), this, SLOT(OnTransversalRotationChanged(int)) );
+    connect(m_Controls->m_CoronalRotationSlider, SIGNAL(valueChanged(int)), this, SLOT(OnCoronalRotationChanged(int)) );
+    connect(m_Controls->m_SagittalRotationSlider, SIGNAL(valueChanged(int)), this, SLOT(OnSagittalRotationChanged(int)) );
   }
 }
 
@@ -246,6 +250,29 @@ void QmitkSimpleExampleView::OnTakeScreenshot()
   this->TakeScreenshot(renderer, 1, fileName);
 }
 
+void QmitkSimpleExampleView::OnTransversalRotationChanged( int angle )
+{
+  //m_MultiWidget->mitkWidget1->GetSliceNavigationController()->SetRotated( true );
+  //m_MultiWidget->mitkWidget1->GetSliceNavigationController()->SetAngleOfRotation( angle );
+  //m_MultiWidget->mitkWidget1->GetSliceNavigationController()->Update();
+  //mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
+void QmitkSimpleExampleView::OnCoronalRotationChanged( int angle )
+{
+  //m_MultiWidget->mitkWidget2->GetSliceNavigationController()->SetRotated( true );
+  //m_MultiWidget->mitkWidget2->GetSliceNavigationController()->SetAngleOfRotation( angle ) ;
+  //m_MultiWidget->mitkWidget2->GetSliceNavigationController()->Update();
+  //mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
+void QmitkSimpleExampleView::OnSagittalRotationChanged( int angle )
+{
+  //m_MultiWidget->mitkWidget3->GetSliceNavigationController()->SetRotated( true );
+  //m_MultiWidget->mitkWidget3->GetSliceNavigationController()->SetAngleOfRotation( angle ) ;
+  //m_MultiWidget->mitkWidget3->GetSliceNavigationController()->Update();
+  //mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}
 
 void QmitkSimpleExampleView::TakeScreenshot(vtkRenderer* renderer, unsigned int magnificationFactor, QString fileName)
 {

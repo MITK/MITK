@@ -35,6 +35,7 @@
 #include "mitkPlanarAngle.h"
 #include "mitkPlanarRectangle.h"
 #include "mitkPlanarLine.h"
+#include "mitkPlanarCross.h"
 #include "mitkPlanarFourPointAngle.h"
 #include "mitkPlanarFigureInteractor.h"
 #include <mitkPlaneGeometry.h>
@@ -538,7 +539,7 @@ void QmitkMeasurement::ActionDrawLineTriggered(bool checked)
 {
   if(!this->AssertDrawingIsPossible(checked))
     return;
-  mitk::PlanarLine::Pointer figure = mitk::PlanarLine::New();
+  mitk::PlanarCross::Pointer figure = mitk::PlanarCross::New();
   this->AddFigureToDataStorage(figure, QString("Line%1").arg(++m_LineCounter));
 
   MITK_INFO << "PlanarLine initialized...";

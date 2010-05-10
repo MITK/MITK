@@ -59,6 +59,8 @@ void mitk::BaseData::InitializeTimeSlicedGeometry(unsigned int timeSteps)
 
 void mitk::BaseData::UpdateOutputInformation()
 {
+  Superclass::UpdateOutputInformation();
+
   if ( this->GetSource() )
   {
     this->GetSource()->UpdateOutputInformation();

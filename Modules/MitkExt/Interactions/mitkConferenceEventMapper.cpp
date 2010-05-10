@@ -20,7 +20,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkBaseRenderer.h>
 #include <mitkPositionEvent.h>
 #include <mitkRenderingManager.h>
-#include <mitkGlobalInteraction.h>
 
 
 mitk::ConferenceEventMapper::ConferenceEventMapper(){}
@@ -100,7 +99,7 @@ mitk::ConferenceEventMapper::MapEvent(signed int mitkEventID, const char* sender
     }
   }
   
-  bool ok = EventMapper::MapEvent( pe, mitk::GlobalInteraction::GetInstance(), mitkEventID );
+  bool ok = EventMapper::MapEvent( pe, mitkEventID );
 
   return ok;
 }

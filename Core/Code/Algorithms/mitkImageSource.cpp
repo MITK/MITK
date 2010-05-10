@@ -83,23 +83,28 @@ void mitk::ImageSource::GraftOutput(OutputImageType *graft)
 /**
  * 
  */
-void mitk::ImageSource::GraftNthOutput(unsigned int idx, OutputImageType *graft)
+void mitk::ImageSource::GraftNthOutput(unsigned int idx, OutputImageType* graft)
 {
-  if ( idx >= this->GetNumberOfOutputs() )
-  {
-    itkExceptionMacro( "Requested to graft output " << idx << 
-      " but this filter only has " << this->GetNumberOfOutputs() << " Outputs.");
-  }
+  itkWarningMacro(<< "GraftNthOutput(): This method is not yet implemented for mitk. Implement it before using!!" );
+  assert(false);
+  if (idx < this->GetNumberOfOutputs())
+    {
+    OutputImageType * output = this->GetOutput(idx);
 
-  if ( !graft )
-  {
-    itkExceptionMacro(<<"Requested to graft output that is a NULL pointer" );
-  }
-
-  itk::DataObject *output = this->BaseProcess::GetOutput( idx );
-
-  // Call GraftImage to copy meta-information, regions, and the pixel container
-  output->Graft( graft );
+    if (output && graft)
+      {
+      // grab a handle to the bulk data of the specified data object
+//      output->SetPixelContainer( graft->GetPixelContainer() ); @FIXME!!!!
+      
+      // copy the region ivars of the specified data object
+      output->SetRequestedRegion( graft );//graft->GetRequestedRegion() );
+//      output->SetLargestPossibleRegion( graft->GetLargestPossibleRegion() ); @FIXME!!!!
+//      output->SetBufferedRegion( graft->GetBufferedRegion() ); @FIXME!!!!
+      
+      // copy the meta-information
+      output->CopyInformation( graft );
+      }
+    }
 }
 
 //----------------------------------------------------------------------------

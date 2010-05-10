@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <!-- Event_Id = 0: this is a * transition with all other eventId's not declared in that state -->
 <mitkInteraktionStates xmlns="http://tempuri.org/StateMachine.xsd" STYLE="User001">
   <!-- ***WARNING*** do not use any &, % and so on in NAME -->
@@ -3240,6 +3240,73 @@
       </transition>
     </state>
   </stateMachine>
+  <stateMachine NAME="PlanarFigureInteractor">
+    <!-- Behaviour of a set of Points. a defined number of points can be set/removed/selected/deselectd/moved -->
+    <state NAME="Start" ID="42" START_STATE="TRUE" X_POS="526" Y_POS="261" WIDTH="100" HEIGHT="50">
+      <transition NAME="name" EVENT_ID="0" NEXT_STATE_ID="49">
+        <action ID="31" />
+      </transition>
+    </state>
+    <state NAME="FigurePlaced" ID="45" X_POS="807" Y_POS="592" WIDTH="100" HEIGHT="50">
+      <transition NAME="name" EVENT_ID="520" NEXT_STATE_ID="45">
+        <action ID="90" />
+      </transition>
+      <transition NAME="name" EVENT_ID="1" NEXT_STATE_ID="48">
+        <action ID="32" />
+      </transition>
+      <transition NAME="name" EVENT_ID="2" NEXT_STATE_ID="54">
+        <action ID="33" />
+      </transition>
+    </state>
+    <state NAME="ControlPointSelected" ID="47" X_POS="110" Y_POS="522" WIDTH="100" HEIGHT="50">
+      <transition NAME="name" EVENT_ID="530" NEXT_STATE_ID="47">
+        <action ID="90" />
+      </transition>
+      <transition NAME="name" EVENT_ID="505" NEXT_STATE_ID="52">
+        <action ID="76" />
+      </transition>
+    </state>
+    <state NAME="IsLastControlPoint" ID="48" X_POS="710" Y_POS="240" WIDTH="100" HEIGHT="50">
+      <transition NAME="name" EVENT_ID="1004" NEXT_STATE_ID="42" />
+      <transition NAME="name" EVENT_ID="1003" NEXT_STATE_ID="45">
+        <action ID="10" />
+      </transition>
+    </state>
+    <state NAME="IsPlaced" ID="49" X_POS="546" Y_POS="100" WIDTH="100" HEIGHT="50">
+      <transition NAME="name" EVENT_ID="1003" NEXT_STATE_ID="50" />
+      <transition NAME="name" EVENT_ID="1004" NEXT_STATE_ID="51" />
+    </state>
+    <state NAME="PlaceFigure" ID="50" X_POS="843" Y_POS="98" WIDTH="100" HEIGHT="50">
+      <transition NAME="name" EVENT_ID="1" NEXT_STATE_ID="45">
+        <action ID="11" />
+      </transition>
+    </state>
+    <state NAME="EditFigure" ID="51" X_POS="311" Y_POS="95" WIDTH="100" HEIGHT="50">
+      <transition NAME="name" EVENT_ID="520" NEXT_STATE_ID="52">
+        <action ID="21" />
+      </transition>
+    </state>
+    <state NAME="IsOverControlPoint" ID="52" X_POS="92" Y_POS="210" WIDTH="100" HEIGHT="50">
+      <transition NAME="name" EVENT_ID="1003" NEXT_STATE_ID="51" />
+      <transition NAME="name" EVENT_ID="1004" NEXT_STATE_ID="53" />
+    </state>
+    <state NAME="ControlPointHover" ID="53" X_POS="332" Y_POS="377" WIDTH="115" HEIGHT="50">
+      <transition NAME="name" EVENT_ID="520" NEXT_STATE_ID="52">
+        <action ID="21" />
+      </transition>
+      <transition NAME="name" EVENT_ID="1" NEXT_STATE_ID="55">
+        <action ID="66" />
+      </transition>
+    </state>
+    <state NAME="IsMinFigureFinished" ID="54" X_POS="578" Y_POS="406" WIDTH="110" HEIGHT="50">
+      <transition NAME="name" EVENT_ID="1004" NEXT_STATE_ID="42" />
+      <transition NAME="name" EVENT_ID="1003" NEXT_STATE_ID="45" />
+    </state>
+    <state NAME="ResetFigure" ID="55" X_POS="540" Y_POS="594" WIDTH="100" HEIGHT="50">
+      <transition NAME="name" EVENT_ID="1003" NEXT_STATE_ID="47" />
+      <transition NAME="name" EVENT_ID="1004" NEXT_STATE_ID="45" />
+    </state>
+  </stateMachine>
   <stateMachine NAME="Zoom">
     <state NAME="neutral" ID="0" START_STATE="TRUE" X_POS="288" Y_POS="81" WIDTH="100" HEIGHT="50">
       <transition NAME="initzoom" NEXT_STATE_ID="2" EVENT_ID="1">
@@ -3295,91 +3362,7 @@
       </transition>
       <transition NAME="finish" NEXT_STATE_ID="0" EVENT_ID="507" />
     </state>
-  </stateMachine>
-  <stateMachine NAME="PlanarFigureInteractor">
-    <!-- Behaviour of a set of Points. a defined number of points can be set/removed/selected/deselectd/moved -->
-    <state NAME="Start" ID="42" START_STATE="TRUE" X_POS="997" Y_POS="592" WIDTH="100" HEIGHT="50">
-      <transition NAME="name" EVENT_ID="0" NEXT_STATE_ID="49">
-        <action ID="31" />
-      </transition>
-    </state>
-    <state NAME="FigurePlaced" ID="45" X_POS="440" Y_POS="476" WIDTH="100" HEIGHT="50">
-      <transition NAME="name" EVENT_ID="520" NEXT_STATE_ID="45">
-        <action ID="90" />
-      </transition>
-      <transition NAME="name" EVENT_ID="2" NEXT_STATE_ID="54">
-        <action ID="33" />
-      </transition>
-      <transition NAME="name" EVENT_ID="530" NEXT_STATE_ID="57">
-        <action ID="90" />
-      </transition>
-      <transition NAME="name" EVENT_ID="1" NEXT_STATE_ID="58">
-        <action ID="21" />
-      </transition>
-    </state>
-    <state NAME="ControlPointSelected" ID="47" X_POS="110" Y_POS="522" WIDTH="100" HEIGHT="50">
-      <transition NAME="name" EVENT_ID="530" NEXT_STATE_ID="47">
-        <action ID="90" />
-      </transition>
-      <transition NAME="name" EVENT_ID="505" NEXT_STATE_ID="52">
-        <action ID="76" />
-      </transition>
-    </state>
-    <state NAME="IsLastControlPoint" ID="48" X_POS="731" Y_POS="588" WIDTH="100" HEIGHT="50">
-      <transition NAME="name" EVENT_ID="1004" NEXT_STATE_ID="42" />
-      <transition NAME="name" EVENT_ID="1003" NEXT_STATE_ID="45">
-        <action ID="10" />
-      </transition>
-    </state>
-    <state NAME="IsPlaced" ID="49" X_POS="931" Y_POS="57" WIDTH="100" HEIGHT="50">
-      <transition NAME="name" EVENT_ID="1003" NEXT_STATE_ID="50" />
-      <transition NAME="name" EVENT_ID="1004" NEXT_STATE_ID="51" />
-    </state>
-    <state NAME="PlaceFigure" ID="50" X_POS="407" Y_POS="145" WIDTH="100" HEIGHT="50">
-      <transition NAME="name" EVENT_ID="1" NEXT_STATE_ID="45">
-        <action ID="11" />
-      </transition>
-    </state>
-    <state NAME="EditFigure" ID="51" X_POS="392" Y_POS="47" WIDTH="100" HEIGHT="50">
-      <transition NAME="name" EVENT_ID="520" NEXT_STATE_ID="52">
-        <action ID="34" />
-      </transition>
-    </state>
-    <state NAME="IsOverControlPoint" ID="52" X_POS="92" Y_POS="210" WIDTH="100" HEIGHT="50">
-      <transition NAME="name" EVENT_ID="1003" NEXT_STATE_ID="51" />
-      <transition NAME="name" EVENT_ID="1004" NEXT_STATE_ID="53" />
-    </state>
-    <state NAME="ControlPointHover" ID="53" X_POS="235" Y_POS="392" WIDTH="115" HEIGHT="50">
-      <transition NAME="name" EVENT_ID="520" NEXT_STATE_ID="52">
-        <action ID="34" />
-      </transition>
-      <transition NAME="name" EVENT_ID="1" NEXT_STATE_ID="55">
-        <action ID="66" />
-      </transition>
-    </state>
-    <state NAME="IsMinFigureFinished" ID="54" X_POS="623" Y_POS="823" WIDTH="110" HEIGHT="50">
-      <transition NAME="name" EVENT_ID="1004" NEXT_STATE_ID="42" />
-      <transition NAME="name" EVENT_ID="1003" NEXT_STATE_ID="45" />
-    </state>
-    <state NAME="ResetFigure" ID="55" X_POS="276" Y_POS="797" WIDTH="100" HEIGHT="50">
-      <transition NAME="name" EVENT_ID="1003" NEXT_STATE_ID="47" />
-      <transition NAME="name" EVENT_ID="1004" NEXT_STATE_ID="45" />
-    </state>
-    <state NAME="FigurePlacedByDrag" ID="57" X_POS="714" Y_POS="247" WIDTH="100" HEIGHT="50">
-      <transition NAME="name" EVENT_ID="530" NEXT_STATE_ID="57">
-        <action ID="90" />
-      </transition>
-      <transition NAME="name" EVENT_ID="505" NEXT_STATE_ID="58">
-        <action ID="21" />
-      </transition>
-    </state>
-    <state NAME="IsPointValid" ID="58" X_POS="841" Y_POS="411" WIDTH="100" HEIGHT="50">
-      <transition NAME="name" EVENT_ID="1004" NEXT_STATE_ID="48">
-        <action ID="32" />
-      </transition>
-      <transition NAME="name" EVENT_ID="1003" NEXT_STATE_ID="45" />
-    </state>
-  </stateMachine>
+  </stateMachine>  
 </mitkInteraktionStates>
 <!-- DOCUMENTATION -->
 <!-- This is StateMachine.xml. Includes Information about different StateMachines and Events. Used by EventMapper and StateMachineFactory -->

@@ -139,7 +139,6 @@ public:
   virtual bool IsVolumeSet(int t = 0, int n = 0) const = 0;
   virtual bool IsChannelSet(int n = 0) const = 0;
   virtual void CopyInformation(const itk::DataObject *data);
-  virtual void Graft( const itk::DataObject *data );
 
   //##Documentation
   //## @brief Get the number of channels
@@ -205,7 +204,6 @@ public:
   //## @brief Convenience method for setting the spacing of 
   //## the SlicedGeometry3D instances of all time steps
   virtual void SetSpacing(mitk::Vector3D aSpacing);
-
 
 protected:
 

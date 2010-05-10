@@ -68,12 +68,10 @@ namespace mitk {
 
     //##Documentation
     //## searches the Event in m_EventDescription
-    //## and if included transmits the event to globalInteraction.
-    //## If specified, a custom instance of GlobalInteraction will be used,
-    //## otherwise the method will retrieve the default (singleton) instance.
+    //## and if included transmits the event to globalInteraction
     //## the optional parameter should be used in a conference to avoid a
     //## feedback
-    static bool MapEvent(Event* event, GlobalInteraction* globalInteraction = NULL, int mitkPostedEventID=0 );
+    static bool MapEvent(Event* event, int mitkPostedEventID=0 );
     
     //##Documentation
     //## maps the Event in m_EventDescription with the ID

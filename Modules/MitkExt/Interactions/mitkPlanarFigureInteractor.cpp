@@ -351,6 +351,56 @@ bool mitk::PlanarFigureInteractor
     }
 
 
+  case AcCHECKPOINT:
+    {
+      // Check if the distance of the current point to the previously set point in display coordinates
+      // is sufficient (if a previous point exists)
+
+      // Extract display position
+      const mitk::PositionEvent *positionEvent = 
+        dynamic_cast< const mitk::PositionEvent * > ( stateEvent->GetEvent() );
+      if ( positionEvent == NULL )
+      {
+        ok = false;
+        break;
+      }
+
+      // Get current display position of the mouse
+      mitk::Point2D currentDisplayPosition = positionEvent->GetDisplayPosition();
+
+      // Check if a previous point has been set
+      int previousIndex = planarFigure->GetNumberOfControlPoints() - 2;
+      if ( previousIndex >= 0 )
+      {
+        
+        // Try to convert previous point to current display coordinates
+        mitk::Point3D previousPoint3D;
+        planarFigureGeometry->Map( planarFigure->GetControlPoint( previousIndex ), previousPoint3D );
+        if ( renderer->GetDisplayGeometry()->Distance( previousPoint3D ) < 0.1 )
+        {
+          mitk::Point2D previousDisplayPosition;
+          renderer->GetCurrentWorldGeometry2D()->Map( previousPoint3D, previousDisplayPosition );
+          renderer->GetDisplayGeometry()->WorldToDisplay( previousDisplayPosition, previousDisplayPosition );
+
+          double a = currentDisplayPosition[0] - previousDisplayPosition[0];
+          double b = currentDisplayPosition[1] - previousDisplayPosition[1];
+
+          // If point is to close, do not set a new point
+          if ( a * a + b * b < 25.0 )
+          {
+            this->HandleEvent( new mitk::StateEvent( EIDNO, stateEvent->GetEvent() ) );
+            ok = true;
+            break;
+          }
+        }
+      }
+
+      this->HandleEvent( new mitk::StateEvent( EIDYES, stateEvent->GetEvent() ) );    
+      ok = true;
+      break;
+    }
+
+  
   case AcADDPOINT:
     {
       // Extract point in 2D world coordinates (relative to Geometry2D of
@@ -390,7 +440,7 @@ bool mitk::PlanarFigureInteractor
       // falls through
     }
 
-  case AcCHECKPOINT:
+  case AcCHECKSELECTED:
     {
       int pointIndex = mitk::PlanarFigureInteractor::IsPositionInsideMarker(
         stateEvent, planarFigure,

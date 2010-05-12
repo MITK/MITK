@@ -26,6 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <berryISelectionListener.h>
 
+#include <mitkDataStorageSelection.h>
 
 /*!
 \brief This module allows to use some basic image processing filters for preprocessing, image enhancement and testing purposes 
@@ -132,7 +133,8 @@ private:
   */  
   Ui::QmitkBasicImageProcessingViewControls *m_Controls;
 
-  mitk::DataNode*       m_SelectedImageNode;
+  //mitk::DataNode*       m_SelectedImageNode;
+  mitk::DataStorageSelection::Pointer m_SelectedImageNode;
   QmitkStepperAdapter*      m_TimeStepperAdapter;
 
   berry::ISelectionListener::Pointer m_SelectionListener;

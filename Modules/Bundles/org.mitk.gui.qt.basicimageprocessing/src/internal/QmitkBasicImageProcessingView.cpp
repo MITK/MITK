@@ -150,6 +150,8 @@ void QmitkBasicImageProcessing::CreateQtPartControl(QWidget *parent)
     m_Controls->m_ImageSelector2->SetPredicate(mitk::NodePredicateDataType::New("Image"));
   }
   m_Controls->gbTwoImageOps->hide();
+
+  m_SelectedImageNode = mitk::DataStorageSelection::New(this->GetDefaultDataStorage(), false);
 }
 
 void QmitkBasicImageProcessing::CreateConnections()
@@ -190,11 +192,12 @@ void QmitkBasicImageProcessing::OnSelectionChanged(std::vector<mitk::DataNode*> 
   m_Controls->tlWhat2->setEnabled(false);
   m_Controls->cbWhat2->setEnabled(false);
 
+  m_SelectedImageNode->RemoveAllNodes();
   //get the selected Node
-  m_SelectedImageNode = nodes.front();
-
+  mitk::DataNode* _DataNode = nodes.front();
+  *m_SelectedImageNode = _DataNode;
   //try to cast to image
-  mitk::Image::Pointer tempImage = dynamic_cast<mitk::Image*>(m_SelectedImageNode->GetData());
+  mitk::Image::Pointer tempImage = dynamic_cast<mitk::Image*>(m_SelectedImageNode->GetNode()->GetData());
 
     //no image
     if( tempImage.IsNull() || (tempImage->IsInitialized() == false) ) 
@@ -211,7 +214,7 @@ void QmitkBasicImageProcessing::OnSelectionChanged(std::vector<mitk::DataNode*> 
     }
 
     //image
-    m_Controls->leImage1->setText(QString(m_SelectedImageNode->GetName().c_str()));
+    m_Controls->leImage1->setText(QString(m_SelectedImageNode->GetNode()->GetName().c_str()));
 
     // button coding
     if ( tempImage->GetDimension() > 3 ) 
@@ -279,7 +282,7 @@ void QmitkBasicImageProcessing::ResetTwoImageOpPanel()
 
 void QmitkBasicImageProcessing::SelectAction(int action)
 {
-  if ( ! m_SelectedImageNode ) return;
+  if ( ! m_SelectedImageNode->GetNode() ) return;
 
   // Prepare GUI
   this->ResetParameterPanel();
@@ -456,7 +459,7 @@ void QmitkBasicImageProcessing::SelectAction(int action)
 
 void QmitkBasicImageProcessing::StartButtonClicked() 
 {
-  if(!m_SelectedImageNode) return;
+  if(!m_SelectedImageNode->GetNode()) return;
 
   this->BusyCursorOn();
 
@@ -464,7 +467,7 @@ void QmitkBasicImageProcessing::StartButtonClicked()
   
   try
   {
-    newImage = dynamic_cast<mitk::Image*>(m_SelectedImageNode->GetData());
+    newImage = dynamic_cast<mitk::Image*>(m_SelectedImageNode->GetNode()->GetData());
   }
   catch ( std::exception &e )
   {
@@ -753,7 +756,7 @@ void QmitkBasicImageProcessing::StartButtonClicked()
   levWinProp->SetLevelWindow( levelwindow );
 
   // compose new image name 
-  std::string name = m_SelectedImageNode->GetName();
+  std::string name = m_SelectedImageNode->GetNode()->GetName();
   if (name.find(".pic.gz") == name.size() -7 )
   {
     name = name.substr(0,name.size() -7);
@@ -778,9 +781,9 @@ void QmitkBasicImageProcessing::StartButtonClicked()
   this->ResetOneImageOpPanel();
 
   // add new image to data storage and set as active to ease further processing
-  GetDefaultDataStorage()->Add( result, m_SelectedImageNode );
+  GetDefaultDataStorage()->Add( result, m_SelectedImageNode->GetNode() );
   if ( m_Controls->cbHideOrig->isChecked() == true )
-    m_SelectedImageNode->SetProperty( "visible", mitk::BoolProperty::New(false) );
+    m_SelectedImageNode->GetNode()->SetProperty( "visible", mitk::BoolProperty::New(false) );
   // TODO!! m_Controls->m_ImageSelector1->SetSelectedNode(result);
 
   // show the results
@@ -826,7 +829,7 @@ void QmitkBasicImageProcessing::SelectAction2(int operation)
 void QmitkBasicImageProcessing::StartButton2Clicked() 
 {
   mitk::Image::Pointer newImage1 = dynamic_cast<mitk::Image*>
-    (m_SelectedImageNode->GetData());
+    (m_SelectedImageNode->GetNode()->GetData());
   mitk::Image::Pointer newImage2 = dynamic_cast<mitk::Image*>
     (m_Controls->m_ImageSelector2->GetSelectedNode()->GetData());
 
@@ -968,7 +971,7 @@ void QmitkBasicImageProcessing::StartButton2Clicked()
   levelwindow.SetAuto( newImage1 );
   mitk::LevelWindowProperty::Pointer levWinProp = mitk::LevelWindowProperty::New();
   levWinProp->SetLevelWindow( levelwindow );
-  std::string name = m_SelectedImageNode->GetName();
+  std::string name = m_SelectedImageNode->GetNode()->GetName();
   if (name.find(".pic.gz") == name.size() -7 )
   {
     name = name.substr(0,name.size() -7);
@@ -979,10 +982,10 @@ void QmitkBasicImageProcessing::StartButton2Clicked()
   result->SetProperty( "levelwindow", levWinProp );
   result->SetProperty( "name", mitk::StringProperty::New( (name + nameAddition ).c_str() ));
   result->SetData( newImage1 );
-  GetDefaultDataStorage()->Add( result, m_SelectedImageNode );
+  GetDefaultDataStorage()->Add( result, m_SelectedImageNode->GetNode() );
 
   // show only the newly created image
-  m_SelectedImageNode->SetProperty( "visible", mitk::BoolProperty::New(false) );
+  m_SelectedImageNode->GetNode()->SetProperty( "visible", mitk::BoolProperty::New(false) );
   m_Controls->m_ImageSelector2->GetSelectedNode()->SetProperty( "visible", mitk::BoolProperty::New(false) );
 
   // show the newly created image

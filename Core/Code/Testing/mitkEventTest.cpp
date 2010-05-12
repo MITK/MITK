@@ -30,7 +30,7 @@ int mitkEventTest(int /*argc*/, char* /*argv*/[])
   mitk::GlobalInteraction::GetInstance()->Initialize("global");
 
   vtkRenderWindow* renWin = vtkRenderWindow::New();
-  mitk::VtkPropRenderer::Pointer renderer = mitk::VtkPropRenderer::New("ContourRenderer",renWin);
+  mitk::VtkPropRenderer::Pointer renderer = mitk::VtkPropRenderer::New( "ContourRenderer",renWin, mitk::RenderingManager::GetInstance() );
 
   //Create Event
   mitk::Event * event = new mitk::Event(renderer, 0, 1, 2, 3);

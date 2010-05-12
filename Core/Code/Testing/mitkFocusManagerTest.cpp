@@ -28,11 +28,13 @@ int mitkFocusManagerTest(int /*argc*/, char* /*argv*/[])
   // Global interaction must(!) be initialized if used
   mitk::GlobalInteraction::GetInstance()->Initialize("global");
 
+  mitk::RenderingManager::Pointer rm = mitk::RenderingManager::GetInstance();
+
   //building up necessary objects
   vtkRenderWindow* renderWindow = vtkRenderWindow::New();
-  mitk::VtkPropRenderer::Pointer element1 = mitk::VtkPropRenderer::New( "renderer1", renderWindow );
-  mitk::VtkPropRenderer::Pointer element2 = mitk::VtkPropRenderer::New( "renderer2", renderWindow );
-  mitk::VtkPropRenderer::Pointer element3 = mitk::VtkPropRenderer::New( "renderer3", renderWindow );
+  mitk::VtkPropRenderer::Pointer element1 = mitk::VtkPropRenderer::New( "renderer1", renderWindow, rm );
+  mitk::VtkPropRenderer::Pointer element2 = mitk::VtkPropRenderer::New( "renderer2", renderWindow, rm );
+  mitk::VtkPropRenderer::Pointer element3 = mitk::VtkPropRenderer::New( "renderer3", renderWindow, rm );
 
   //the FocusManager itself
   mitk::FocusManager::Pointer focusManager = mitk::FocusManager::New();

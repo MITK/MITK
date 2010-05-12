@@ -261,16 +261,13 @@ void QmitkRenderWindow::resizeEvent(QResizeEvent* event)
     return;
   m_InResize = true;
 
-  if(this->isVisible())
+  if(m_Renderer.IsNotNull())
   {
-    if(m_Renderer.IsNotNull())
-    {
-      m_Renderer->Resize(event->size().width(), event->size().height());
-    }
-
-    //this->update();
-    //updateGL();
+    m_Renderer->Resize(event->size().width(), event->size().height());
   }
+
+  //this->update();
+  //updateGL();
 
   m_InResize = false;
 }

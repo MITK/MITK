@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>510</width>
-    <height>645</height>
+    <height>706</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -19,7 +19,7 @@
   <property name="windowTitle">
    <string>QmitkIGTExample</string>
   </property>
-  <layout class="QVBoxLayout">
+  <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
     <widget class="QGroupBox" name="groupBox">
      <property name="title">
@@ -140,6 +140,27 @@
     </widget>
    </item>
    <item>
+    <layout class="QHBoxLayout" name="_2">
+     <item>
+      <widget class="QPushButton" name="m_ShowErrorPlotBtn">
+       <property name="text">
+        <string>Show Error Plot</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QProgressBar" name="m_ErrorBar">
+       <property name="value">
+        <number>0</number>
+       </property>
+       <property name="textVisible">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
     <widget class="QPushButton" name="m_MeasureBtn">
      <property name="enabled">
       <bool>false</bool>
@@ -219,39 +240,24 @@
     </widget>
    </item>
    <item>
-    <widget class="QPushButton" name="m_StartRecordingButton">
+    <widget class="QPushButton" name="m_RecordingButtonToggle">
      <property name="text">
       <string>Start Recording Test</string>
      </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QPushButton" name="m_StartPlayingButton">
-     <property name="text">
-      <string>Start Replaying</string>
+     <property name="checkable">
+      <bool>true</bool>
      </property>
     </widget>
    </item>
    <item>
-    <layout class="QHBoxLayout">
-     <item>
-      <widget class="QPushButton" name="m_ShowErrorPlotBtn">
-       <property name="text">
-        <string>Show Error Plot</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QProgressBar" name="m_ErrorBar">
-       <property name="value">
-        <number>0</number>
-       </property>
-       <property name="textVisible">
-        <bool>false</bool>
-       </property>
-      </widget>
-     </item>
-    </layout>
+    <widget class="QPushButton" name="m_PlayingButtonToggle">
+     <property name="text">
+      <string>Start Replaying</string>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>

@@ -63,6 +63,12 @@ public:
     */
     itkGetStringMacro(FileName);
 
+
+    /**
+    * \brief Returns whether the NavigationDataRecorder is recording or not
+    */
+    itkGetMacro(Recording,bool);
+
     /**
     * \brief Adds the input NavigationDatas
     */

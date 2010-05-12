@@ -162,20 +162,19 @@ protected slots:
    * \brief Starts recording of tracking data
    *
    * This method sets up a IGT pipeline that connects a tracking device
-   * with a NavigationDataRecorder filter. It will then start a timer that 
-   * updates the recorder periodically until OnStartPlaying() is called.
+   * with a NavigationDataRecorder filter and then starts a timer that 
+   * updates the recorder periodically if parameter toggled is TRUE. If it is FALSE the recorder will be stopped.
    */
-   void OnStartRecording();
+   void OnRecordingToggle(bool toggled);
 
    /**Documentation
    * \brief Stops the recording of tracking data and starts the replay
    *
-   * This method stops the recording filter that was set up in OnStartRecording().
-   * It sets up a new pipeline that connects a NavigationDataPlayer with a 
+   * This method sets up a new pipeline that connects a NavigationDataPlayer with a 
    * NavigationDataToPointSetFilter as an example for an alternative visualization
-   * method. It then starts a Replay timer that updates the recorder periodically.
+   * method and then starts a Replay timer that updates the recorder periodically if parameter toggled is TRUE. If it is FALSE the Replay timer will be stopped.
    */
-   void OnStartPlaying();
+   void OnPlayingToggle(bool toggled);
 
    /**Documentation
    * \brief Timer update method for recording of tracking data
@@ -255,5 +254,6 @@ protected:
   QTimer* m_PlayingTimer; ///< timer for continuous playing
 
   QStringList m_ToolList; ///< list to the tool description files
+
 };
 #endif // !defined(QmitkIGTExampleView_H__INCLUDED)

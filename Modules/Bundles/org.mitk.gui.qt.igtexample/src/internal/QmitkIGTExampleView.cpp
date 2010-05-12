@@ -47,11 +47,14 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QProgressBar>
 #include <QMessageBox>
 
+
+
 //#include <QAction>
 //#include <QComboBox>
 #include <QPushButton>
 #include <QTextEdit>
 #include <QTimer>
+#include <QTime>
 #include <QLabel>
 #include <QLineEdit>
 //#include <QCheckBox>
@@ -107,7 +110,7 @@ void QmitkIGTExampleView::CreateQtPartControl(QWidget *parent)
     m_Controls->m_Y->setText("3");
     m_Controls->m_Z->setText("5");  
 
-    m_Controls->m_StartPlayingButton->setEnabled(false);
+    m_Controls->m_PlayingButtonToggle->setEnabled(false);
   }
 }
 
@@ -138,8 +141,8 @@ void QmitkIGTExampleView::CreateConnections()
     connect( m_Timer, SIGNAL(timeout()), this, SLOT(OnMeasure()) );
     connect( m_RecordingTimer, SIGNAL(timeout()), this, SLOT(OnRecording()) );
     connect( m_PlayingTimer, SIGNAL(timeout()), this, SLOT(OnPlaying()) );
-    connect( (QObject*)(m_Controls->m_StartRecordingButton), SIGNAL(clicked()),(QObject*) this, SLOT(OnStartRecording()));  // execute tracking test code
-    connect( (QObject*)(m_Controls->m_StartPlayingButton), SIGNAL(clicked()),(QObject*) this, SLOT(OnStartPlaying()));  // execute tracking test code
+    connect( (QObject*)(m_Controls->m_RecordingButtonToggle), SIGNAL(toggled(bool)),(QObject*) this, SLOT(OnRecordingToggle(bool)));  // execute tracking test code
+    connect( (QObject*)(m_Controls->m_PlayingButtonToggle), SIGNAL(toggled(bool)),(QObject*) this, SLOT(OnPlayingToggle(bool)));  // execute tracking test code
     connect( (QObject*)(m_Controls->m_ShowErrorPlotBtn), SIGNAL(clicked()),(QObject*) this, SLOT(OnShowErrorPlot()));  // execute tracking test code
   }
 }
@@ -582,16 +585,34 @@ mitk::TrackingDevice::Pointer QmitkIGTExampleView::ConfigureTrackingDevice()
 }
 
 
-void QmitkIGTExampleView::OnStartRecording()
+void QmitkIGTExampleView::OnRecordingToggle(bool toggled)
 {
   try
   {
+
     mitk::TrackingDevice::Pointer tracker = this->ConfigureTrackingDevice();
+    
     if (tracker.IsNull())
     {
       out->append("Error creating tracking device. Did you provide all parameters?");
       return;
     }
+    
+    else if(!toggled)
+    {
+
+    /* Stop recording */
+    m_RecordingTimer->stop();
+    m_Recorder->StopRecording();
+    out->append(QString("Stopped recording"));
+    m_Controls->m_RecordingButtonToggle->setText(QString("Start Recording Test"));
+    m_Controls->m_PlayingButtonToggle->setEnabled(true);
+    }
+
+    else 
+    {
+
+    m_Controls->m_PlayingButtonToggle->setEnabled(false);
     m_Source = mitk::TrackingDeviceSource::New();
     m_Source->SetTrackingDevice(tracker); //here we set the device for the pipeline source
 
@@ -621,13 +642,23 @@ void QmitkIGTExampleView::OnStartRecording()
     //now every update of the recorder stores one line into the file for 
     //each added NavigationData
     m_RecordingTimer->start(100);
-    m_Controls->m_StartPlayingButton->setEnabled(true);
+    
+    
+    m_Controls->m_RecordingButtonToggle->setText(QString("Stop Recording Test"));
+    //m_Controls->m_StartPlayingButton->setEnabled(true);
+
+  }
+
   }
   catch (std::exception& e)
   {
     out->append(QString("An error occured: ") + QString(e.what()));
-    m_Controls->m_StartPlayingButton->setEnabled(false);
+    m_Controls->m_PlayingButtonToggle->setEnabled(false);
+  
+
   }
+
+ 
 }
 
 
@@ -638,12 +669,30 @@ void QmitkIGTExampleView::OnRecording()
 }
 
 
-void QmitkIGTExampleView::OnStartPlaying()
+void QmitkIGTExampleView::OnPlayingToggle(bool toggled)
 {
+  if(m_Recorder->GetRecording())
+  {
   /* Stop recording */
   m_RecordingTimer->stop();
   m_Recorder->StopRecording();
   out->append("Stopped recording");
+  }
+
+
+  if(!toggled)
+  {
+    out->append(QString("stopping replay"));
+    m_Player->StopPlaying();
+    m_PlayingTimer->stop();
+    m_Controls->m_RecordingButtonToggle->setEnabled(true);
+    m_Controls->m_PlayingButtonToggle->setText(QString("Start Replaying Test"));
+  }
+  
+  else
+  {
+
+    m_Controls->m_RecordingButtonToggle->setEnabled(false);
 
   std::stringstream filename;
   //the .xml extension and an counter is added automatically
@@ -665,7 +714,7 @@ void QmitkIGTExampleView::OnStartPlaying()
 
   for (unsigned int i = 0; i < m_PointSetFilter->GetNumberOfOutputs(); i++)
   {
-    mitk::PointSet* p = m_PointSetFilter->GetOutput(i);
+    mitk::PointSet::Pointer p = m_PointSetFilter->GetOutput(i);
     assert(p);
 
     mitk::DataNode::Pointer pointSetNode = mitk::DataNode::New();
@@ -675,8 +724,8 @@ void QmitkIGTExampleView::OnStartPlaying()
     color.Set(0.25 * i, 1 - 0.25 * i, 0.5);
     pointSetNode->SetColor(color); //change color of points
     pointSetNode->SetProperty("contourcolor", mitk::ColorProperty::New(color)); // change color of trajectory line
-    pointSetNode->SetProperty("pointsize", mitk::FloatProperty::New(20.0)); // enlarge visualization of points
-    pointSetNode->SetProperty("contoursize", mitk::FloatProperty::New(20.0)); // enlarge visualization of trajectory line
+    pointSetNode->SetProperty("pointsize", mitk::FloatProperty::New(10.0)); // enlarge visualization of points
+    pointSetNode->SetProperty("contoursize", mitk::FloatProperty::New(5.0)); // enlarge visualization of trajectory line
     pointSetNode->SetBoolProperty("show contour", true);
     
     this->GetDefaultDataStorage()->Add(pointSetNode); //add it to the DataStorage
@@ -685,6 +734,9 @@ void QmitkIGTExampleView::OnStartPlaying()
 
   m_PlayingTimer->start(100);  // start the playback timer
   out->append("starting replay");
+  m_Controls->m_PlayingButtonToggle->setText(QString("Stop Replaying Test"));
+
+  }
 }
 
 

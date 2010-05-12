@@ -603,7 +603,19 @@ int mitkPlaneGeometryTest(int /*argc*/, char* /*argv*/[])
     return EXIT_FAILURE;
   }
   std::cout<<"[PASSED]"<<std::endl;
+
+  delete planerot;
+
+  planerot = new mitk::RotationOperation( mitk::OpROTATE, origin, clonedplanegeometry2->GetAxisVector( 0 ), 360.1 );
+  clonedplanegeometry2->ExecuteOperation( planerot ); 
   
+  std::cout << "Testing if a non-paralell plane gets recognized as not paralell  [rotation 360 degree] : ";
+  if( mitk::Equal( clonedplanegeometry2->IsParallel(planegeometry), true )==false )
+  {
+    std::cout<<"[FAILED]"<<std::endl;
+    return EXIT_FAILURE;
+  }
+  std::cout<<"[PASSED]"<<std::endl;
 
 
   std::cout << "Testing InitializeStandardPlane(clonedplanegeometry, planeorientation = Transversal, zPosition = 0, frontside=true): " <<std::endl;

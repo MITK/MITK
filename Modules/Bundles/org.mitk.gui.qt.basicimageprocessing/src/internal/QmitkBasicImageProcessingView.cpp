@@ -24,6 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qcheckbox.h>
 #include <qgroupbox.h>
 #include <qradiobutton.h>
+#include <qmessagebox.h>
 
 // Berry includes (selection service)
 #include <berryISelectionService.h>
@@ -459,8 +460,30 @@ void QmitkBasicImageProcessing::StartButtonClicked()
 
   this->BusyCursorOn();
 
-  mitk::Image::Pointer newImage = dynamic_cast<mitk::Image*>(m_SelectedImageNode->GetData());
-
+  mitk::Image::Pointer newImage;
+  
+  try
+  {
+    newImage = dynamic_cast<mitk::Image*>(m_SelectedImageNode->GetData());
+  }
+  catch ( std::exception &e )
+  {
+  QString exceptionString = "An error occured during image loading:\n";
+  exceptionString.append( e.what() );
+    QMessageBox::warning( NULL, "Basic Image Processing", exceptionString , QMessageBox::Ok, QMessageBox::NoButton );
+    this->BusyCursorOff();
+    return;
+  }
+  
+  // check if input image is valid, casting does not throw exception when casting from 'NULL-Object'
+  if ( (! newImage) || (newImage->IsInitialized() == false) ) 
+  {
+    this->BusyCursorOff();
+   
+    QMessageBox::warning( NULL, "Basic Image Processing", "Input image is broken or not initialized. Returning.", QMessageBox::Ok, QMessageBox::NoButton );
+    return;
+  }
+  
   // check if operation is done on 4D a image time step
   if(newImage->GetDimension() > 3)
   {
@@ -471,12 +494,7 @@ void QmitkBasicImageProcessing::StartButtonClicked()
     newImage = timeSelector->GetOutput();
   }
 
-  // check if input image is valid
-  if ( (! newImage) || (newImage->IsInitialized() == false) ) 
-  {
-    itkGenericOutputMacro(<< "Input image is broken or not initialized. Returning.")
-      return;
-  }
+
 
   // check if image or vector image
   ImageType::Pointer itkImage = ImageType::New();

@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkCommon.h"
 #include "mitkBaseRenderer.h"
 #include "mitkDataStorage.h"
+#include "mitkRenderingManager.h"
 
 #include <itkCommand.h>
 
@@ -66,7 +67,7 @@ private:
 public:
 
   mitkClassMacro(VtkPropRenderer,BaseRenderer);
-  mitkNewMacro2Param(VtkPropRenderer, const char*, vtkRenderWindow *);
+  mitkNewMacro3Param(VtkPropRenderer, const char*, vtkRenderWindow *, mitk::RenderingManager* );
   
   typedef std::map<int,Mapper*> MappersMapType;
 
@@ -145,7 +146,7 @@ public:
   static bool useImmediateModeRendering();
 
 protected:
-  VtkPropRenderer( const char* name = "VtkPropRenderer", vtkRenderWindow * renWin = NULL);
+  VtkPropRenderer( const char* name = "VtkPropRenderer", vtkRenderWindow * renWin = NULL, mitk::RenderingManager* rm = NULL );
   virtual ~VtkPropRenderer();
   virtual void Update();
 

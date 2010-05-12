@@ -120,8 +120,8 @@ vtkRenderWindow* mitk::BaseRenderer::GetRenderWindowByName( const std::string& n
 }
 
 
-mitk::BaseRenderer::BaseRenderer( const char* name, vtkRenderWindow * renWin ) :
-m_RenderWindow(NULL), m_VtkRenderer(NULL), m_MapperID(defaultMapper), m_DataStorage(NULL), m_RenderingManager(NULL), m_LastUpdateTime(0),
+mitk::BaseRenderer::BaseRenderer( const char* name, vtkRenderWindow * renWin, mitk::RenderingManager* rm ) :
+m_RenderWindow(NULL), m_VtkRenderer(NULL), m_MapperID(defaultMapper), m_DataStorage(NULL), m_RenderingManager(rm), m_LastUpdateTime(0),
 m_CameraController(NULL), m_SliceNavigationController(NULL), m_CameraRotationController(NULL), /*m_Size(),*/
  m_Focused(false), m_WorldGeometry(NULL), m_TimeSlicedWorldGeometry(NULL), m_CurrentWorldGeometry(NULL), m_CurrentWorldGeometry2D(NULL),
 m_DisplayGeometry(NULL), m_Slice(0), m_TimeStep(), m_CurrentWorldGeometry2DUpdateTime(), m_DisplayGeometryUpdateTime(),
@@ -163,7 +163,7 @@ m_MaxNumberOfPeels(100), m_NumberOfVisibleLODEnabledMappers(0)
   //instances.insert( this );
 
   //adding this BaseRenderer to the List of all BaseRenderer
-  mitk::GlobalInteraction::GetInstance()->AddFocusElement(this);
+  m_RenderingManager->GetGlobalInteraction()->AddFocusElement(this);
 
   WeakPointerProperty::Pointer rendererProp = WeakPointerProperty::New((itk::Object*)this);
 
@@ -232,7 +232,7 @@ mitk::BaseRenderer::~BaseRenderer()
   if(m_CameraController.IsNotNull())
     m_CameraController->SetRenderer(NULL);
   
-  mitk::GlobalInteraction::GetInstance()->RemoveFocusElement(this);
+  m_RenderingManager->GetGlobalInteraction()->RemoveFocusElement(this);
 
   mitk::VtkLayerController::RemoveInstance(m_RenderWindow);
 
@@ -573,7 +573,7 @@ const double* mitk::BaseRenderer::GetBounds() const
 void mitk::BaseRenderer::MousePressEvent(mitk::MouseEvent *me)
 {
   //set the Focus on the renderer
-  /*bool success =*/ mitk::GlobalInteraction::GetInstance()->SetFocus(this);
+  /*bool success =*/ m_RenderingManager->GetGlobalInteraction()->SetFocus(this);
   /*
   if (! success) 
     mitk::StatusBar::GetInstance()->DisplayText("Warning! from mitkBaseRenderer.cpp: Couldn't focus this BaseRenderer!");
@@ -593,7 +593,7 @@ void mitk::BaseRenderer::MousePressEvent(mitk::MouseEvent *me)
     GetDisplayGeometry()->DisplayToWorld(p, p_mm);
     GetDisplayGeometry()->Map(p_mm, position);
     mitk::PositionEvent event(this, me->GetType(), me->GetButton(), me->GetButtonState(), mitk::Key_unknown, p, position);
-    mitk::EventMapper::MapEvent(&event);
+    mitk::EventMapper::MapEvent( &event, m_RenderingManager->GetGlobalInteraction() );
   }
   else if(m_MapperID>1)//==2 for 3D and ==5 for stencil
   {
@@ -601,7 +601,7 @@ void mitk::BaseRenderer::MousePressEvent(mitk::MouseEvent *me)
 
     GetDisplayGeometry()->ULDisplayToDisplay(p,p);
     me->SetDisplayPosition(p);
-    mitk::EventMapper::MapEvent(me);
+    mitk::EventMapper::MapEvent( me, m_RenderingManager->GetGlobalInteraction() );
   }
 }
 
@@ -623,14 +623,14 @@ void mitk::BaseRenderer::MouseReleaseEvent(mitk::MouseEvent *me)
     GetDisplayGeometry()->DisplayToWorld(p, p_mm);
     GetDisplayGeometry()->Map(p_mm, position);
     mitk::PositionEvent event(this, me->GetType(), me->GetButton(), me->GetButtonState(), mitk::Key_unknown, p, position);
-    mitk::EventMapper::MapEvent(&event);
+    mitk::EventMapper::MapEvent( &event, m_RenderingManager->GetGlobalInteraction() );
   }
   else if(m_MapperID==2)
   {
     Point2D p(me->GetDisplayPosition());
     GetDisplayGeometry()->ULDisplayToDisplay(p,p);
     me->SetDisplayPosition(p);
-    mitk::EventMapper::MapEvent(me);
+    mitk::EventMapper::MapEvent( me, m_RenderingManager->GetGlobalInteraction() );
   }
 }
 
@@ -650,14 +650,14 @@ void mitk::BaseRenderer::MouseMoveEvent(mitk::MouseEvent *me)
     GetDisplayGeometry()->DisplayToWorld(p, p_mm);
     GetDisplayGeometry()->Map(p_mm, position);
     mitk::PositionEvent event(this, me->GetType(), me->GetButton(), me->GetButtonState(), mitk::Key_unknown, p, position);
-    mitk::EventMapper::MapEvent(&event);
+    mitk::EventMapper::MapEvent( &event, m_RenderingManager->GetGlobalInteraction() );
   }
   else if(m_MapperID==2)
   {
     Point2D p(me->GetDisplayPosition());
     GetDisplayGeometry()->ULDisplayToDisplay(p,p);
     me->SetDisplayPosition(p);
-    mitk::EventMapper::MapEvent(me);
+    mitk::EventMapper::MapEvent( me, m_RenderingManager->GetGlobalInteraction() );
   }
 }
 
@@ -679,14 +679,14 @@ void mitk::BaseRenderer::WheelEvent(mitk::WheelEvent * we)
     GetDisplayGeometry()->DisplayToWorld(p, p_mm);
     GetDisplayGeometry()->Map(p_mm, position);
     mitk::PositionEvent event(this, we->GetType(), we->GetButton(), we->GetButtonState(), mitk::Key_unknown, p, position);
-    mitk::EventMapper::MapEvent(&event);
+    mitk::EventMapper::MapEvent( &event, m_RenderingManager->GetGlobalInteraction() );
   }
   else if(m_MapperID==2)
   {
     Point2D p(we->GetDisplayPosition());
     GetDisplayGeometry()->ULDisplayToDisplay(p,p);
     we->SetDisplayPosition(p);
-    mitk::EventMapper::MapEvent(we);
+    mitk::EventMapper::MapEvent( we, m_RenderingManager->GetGlobalInteraction() );
   }
 }
 
@@ -701,14 +701,14 @@ void mitk::BaseRenderer::KeyPressEvent(mitk::KeyEvent *ke)
     GetDisplayGeometry()->DisplayToWorld(p, p_mm);
     GetDisplayGeometry()->Map(p_mm, position);
     mitk::KeyEvent event(this, ke->GetType(), ke->GetButton(), ke->GetButtonState(), ke->GetKey(), ke->GetText(), p);
-    mitk::EventMapper::MapEvent(&event);
+    mitk::EventMapper::MapEvent( &event, m_RenderingManager->GetGlobalInteraction() );
   }
   else if(m_MapperID==2)
   {
     Point2D p(ke->GetDisplayPosition());
     GetDisplayGeometry()->ULDisplayToDisplay(p,p);
     ke->SetDisplayPosition(p);
-    mitk::EventMapper::MapEvent(ke);
+    mitk::EventMapper::MapEvent( ke, m_RenderingManager->GetGlobalInteraction() );
   }
 }
 
@@ -719,12 +719,12 @@ void mitk::BaseRenderer::DrawOverlayMouse(mitk::Point2D& itkNotUsed(p2d))
 
 void mitk::BaseRenderer::RequestUpdate()
 {
-  mitk::RenderingManager::GetInstance()->RequestUpdate(this->m_RenderWindow);
+  m_RenderingManager->RequestUpdate(this->m_RenderWindow);
 }
 
 void mitk::BaseRenderer::ForceImmediateUpdate()
 {
-  mitk::RenderingManager::GetInstance()->ForceImmediateUpdate(this->m_RenderWindow);
+  m_RenderingManager->ForceImmediateUpdate(this->m_RenderWindow);
 }
 
 
@@ -734,15 +734,9 @@ unsigned int mitk::BaseRenderer::GetNumberOfVisibleLODEnabledMappers() const
 }
 
 
-void mitk::BaseRenderer::SetRenderingManager( mitk::RenderingManager::Pointer renderingManager )
+mitk::RenderingManager* mitk::BaseRenderer::GetRenderingManager()
 {
-  if ( renderingManager.IsNotNull() )
-    m_RenderingManager = renderingManager;
-}
-
-mitk::RenderingManager::Pointer mitk::BaseRenderer::GetRenderingManager()
-{
-  return m_RenderingManager;
+  return m_RenderingManager.GetPointer();
 }
 
 
@@ -755,7 +749,7 @@ void mitk::BaseRenderer::SetSliceNavigationController(mitk::SliceNavigationContr
     return;
 
   //disconnect old from globalinteraction
-  mitk::GlobalInteraction::GetInstance()->RemoveListener(SlicenavigationController);
+  m_RenderingManager->GetGlobalInteraction()->RemoveListener(SlicenavigationController);
   
   //copy worldgeometry
   SlicenavigationController->SetInputWorldGeometry( SlicenavigationController->GetCreatedWorldGeometry() );
@@ -837,3 +831,4 @@ void mitk::BaseRenderer::SetMaxNumberOfPeels( int maxNumber )
   m_VtkRenderer->SetMaximumNumberOfPeels(maxNumber);
 #endif
 }
+

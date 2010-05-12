@@ -88,7 +88,7 @@ public:
   /** Standard class typedefs. */
   mitkClassMacro(BaseRenderer, itk::Object);
 
-  BaseRenderer( const char* name = NULL, vtkRenderWindow * renWin = NULL );
+  BaseRenderer( const char* name = NULL, vtkRenderWindow * renWin = NULL, mitk::RenderingManager* rm= NULL );
 
   //##Documentation
   //## @brief MapperSlotId defines which kind of mapper (e.g., 2D or 3D) shoud be used.
@@ -390,15 +390,15 @@ public:
    * rendering enabled */
   unsigned int GetNumberOfVisibleLODEnabledMappers() const;
 
-  /**
-  * \brief Setter for the RenderingManager that handles this instance of BaseRenderer
-  */
-  void SetRenderingManager( mitk::RenderingManager::Pointer );
+  ///**
+  //* \brief Setter for the RenderingManager that handles this instance of BaseRenderer
+  //*/
+  //void SetRenderingManager( mitk::RenderingManager* );
   
   /**
   * \brief Getter for the RenderingManager that handles this instance of BaseRenderer
   */
-  mitk::RenderingManager::Pointer GetRenderingManager();
+  mitk::RenderingManager* GetRenderingManager();
 
 
 protected:

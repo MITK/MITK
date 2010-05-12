@@ -41,17 +41,22 @@ QmitkRenderWindow::QmitkRenderWindow(QWidget *parent, QString name, mitk::VtkPro
 , m_MenuWidget(NULL)
 , m_MenuWidgetActivated(false)
 {
+  // if renderingManager is NULL get the global instance (needed here to initialize VtkPropRenderer below)
+  if ( renderingManager == NULL )
+  {
+    renderingManager = mitk::RenderingManager::GetInstance();
+  }
+
   if(m_Renderer.IsNull())
   {
-      m_Renderer = mitk::VtkPropRenderer::New( qPrintable(name), GetRenderWindow());
+      m_Renderer = mitk::VtkPropRenderer::New( qPrintable(name), GetRenderWindow(), renderingManager );
   }
 
   m_Renderer->InitRenderer(this->GetRenderWindow());
-  m_Renderer->SetRenderingManager( renderingManager );
 
   mitk::BaseRenderer::AddInstance(GetRenderWindow(),m_Renderer);
 
-  mitk::RenderingManager::GetInstance()->AddRenderWindow(GetRenderWindow());
+  renderingManager->AddRenderWindow(GetRenderWindow());
 
   m_RenderProp = vtkMitkRenderProp::New();
   m_RenderProp->SetPropRenderer(m_Renderer);
@@ -60,7 +65,6 @@ QmitkRenderWindow::QmitkRenderWindow(QWidget *parent, QString name, mitk::VtkPro
   if((this->GetRenderWindow()->GetSize()[0] > 10)
       && (this->GetRenderWindow()->GetSize()[1] > 10))
     m_Renderer->InitSize(this->GetRenderWindow()->GetSize()[0], this->GetRenderWindow()->GetSize()[1]);
-
 
   setFocusPolicy(Qt::StrongFocus);
   setMouseTracking(true);
@@ -78,7 +82,7 @@ QmitkRenderWindow::QmitkRenderWindow(QWidget *parent, QString name, mitk::VtkPro
 
 QmitkRenderWindow::~QmitkRenderWindow()
 {
-  mitk::RenderingManager::GetInstance()->RemoveRenderWindow(GetRenderWindow());
+  m_Renderer->GetRenderingManager()->RemoveRenderWindow(GetRenderWindow());
   mitk::BaseRenderer::RemoveInstance(GetRenderWindow());
   m_Renderer->GetVtkRenderer()->RemoveViewProp(m_RenderProp);
   m_RenderProp->Delete();

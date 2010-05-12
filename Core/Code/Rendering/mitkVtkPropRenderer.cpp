@@ -62,8 +62,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 
-mitk::VtkPropRenderer::VtkPropRenderer( const char* name, vtkRenderWindow * renWin )
-  : BaseRenderer(name,renWin), 
+mitk::VtkPropRenderer::VtkPropRenderer( const char* name, vtkRenderWindow * renWin, mitk::RenderingManager* rm )
+  : BaseRenderer(name,renWin, rm), 
   m_VtkMapperPresent(false), 
   m_NewRenderer(true)
 {
@@ -155,6 +155,7 @@ bool mitk::VtkPropRenderer::SetWorldGeometryToDataStorageBounds()
     return false;
 
   this->SetWorldGeometry(geometry);
+  //this->GetDisplayGeometry()->SetSizeInDisplayUnits( this->m_TextRenderer->GetRenderWindow()->GetSize()[0], this->m_TextRenderer->GetRenderWindow()->GetSize()[1] );
   this->GetDisplayGeometry()->Fit();
   this->GetVtkRenderer()->ResetCamera();
   this->Modified();

@@ -438,7 +438,7 @@ mitk::EventMapper::~EventMapper()
 //##Documentation
 //## searches the Event in m_EventDescription
 //##  
-bool mitk::EventMapper::MapEvent(Event* event, int mitkPostedEventID )
+bool mitk::EventMapper::MapEvent(Event* event, GlobalInteraction* globalInteraction, int mitkPostedEventID )
 {
   int eventID = mitkPostedEventID;
 
@@ -498,8 +498,15 @@ bool mitk::EventMapper::MapEvent(Event* event, int mitkPostedEventID )
 #endif //MBI_INTERNAL_CONFERENCE
 
   mitk::OperationEvent::ExecuteIncrement();
-  
-  return mitk::GlobalInteraction::GetInstance()->HandleEvent(&m_StateEvent);
+
+  if ( globalInteraction != NULL )
+  {
+    return globalInteraction->HandleEvent( &m_StateEvent );
+  }
+  else
+  {
+    return mitk::GlobalInteraction::GetInstance()->HandleEvent(&m_StateEvent);
+  }
 }
 
 //##Documentation

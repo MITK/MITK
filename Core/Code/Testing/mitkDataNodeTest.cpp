@@ -227,7 +227,7 @@ static void TestSelected(mitk::DataNode::Pointer dataTreeNode)
 {
   vtkRenderWindow *renderWindow = vtkRenderWindow::New();
  
-  mitk::VtkPropRenderer::Pointer base = mitk::VtkPropRenderer::New( "the first renderer", renderWindow );
+  mitk::VtkPropRenderer::Pointer base = mitk::VtkPropRenderer::New( "the first renderer", renderWindow, mitk::RenderingManager::GetInstance() );
 
   //with BaseRenderer==Null
   MITK_TEST_CONDITION(!dataTreeNode->IsSelected(), "Testing if this node is not set as selected" )

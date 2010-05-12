@@ -83,7 +83,7 @@ int mitkCameraVisualizationTest(int /* argc */, char* /*argv*/[])
 
   // create renderer
   vtkRenderWindow* renderWindow = vtkRenderWindow::New();
-  mitk::VtkPropRenderer::Pointer renderer = mitk::VtkPropRenderer::New("TestRenderer",renderWindow);
+  mitk::VtkPropRenderer::Pointer renderer = mitk::VtkPropRenderer::New( "TestRenderer",renderWindow, mitk::RenderingManager::GetInstance() );
 
   myFilter->SetInput(nd1);
   MITK_TEST_CONDITION(myFilter->GetInput() == nd1, "Testing Set-/GetInput() input 1");

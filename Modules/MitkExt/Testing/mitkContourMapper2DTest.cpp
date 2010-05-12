@@ -69,7 +69,7 @@ int mitkContourMapper2DTest(int /*argc*/, char* /*argv*/[])
 
   vtkRenderWindow* renWin = vtkRenderWindow::New();
 
-  mitk::VtkPropRenderer::Pointer renderer = mitk::VtkPropRenderer::New("ContourRenderer",renWin);
+  mitk::VtkPropRenderer::Pointer renderer = mitk::VtkPropRenderer::New( "ContourRenderer",renWin, mitk::RenderingManager::GetInstance() );
 
   std::cout<<"Testing mitk::BaseRenderer::SetData()"<<std::endl;
 

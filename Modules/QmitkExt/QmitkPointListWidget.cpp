@@ -64,11 +64,16 @@ QmitkPointListWidget::QmitkPointListWidget( QWidget* parent, Qt::WindowFlags f )
   m_BtnEdit->setCheckable( true ); 
   buttonLayout->addWidget( m_BtnEdit );
 
-  const QIcon iconClear( btnClear_xpm ); // clears whole point set
+  const QIcon iconClear( btnClear_xpm ); // clear one point
   m_BtnClear = new QPushButton( iconClear, "", this );
-  m_BtnClear->setToolTip("Erase all points from list. Use the delete key to delete the selected point.");
-  connect( m_BtnClear, SIGNAL(clicked()), this, SLOT(OnClearPointSetButtonClicked()) );
+  m_BtnClear->setToolTip("Erase one point from list   (Hotkey: DEL)");
+  connect( m_BtnClear, SIGNAL(clicked()), this, SLOT(OnClearPointButtonClicked()) );
   buttonLayout->addWidget(m_BtnClear);
+
+  m_BtnClearAll = new QPushButton( iconClear, "", this );
+  m_BtnClearAll->setToolTip("Erase ALL points from list");
+  connect( m_BtnClearAll, SIGNAL(clicked()), this, SLOT(OnClearPointSetButtonClicked()) );
+  buttonLayout->addWidget(m_BtnClearAll);
 
   const QIcon iconLoad( btnLoad_xpm ); // loads a point set from file
   m_BtnLoad = new QPushButton( iconLoad, "", this );
@@ -172,6 +177,7 @@ void QmitkPointListWidget::ObserveNewNode( mitk::DataNode* node )
     m_BtnEdit->setEnabled( false ); 
 
   m_BtnClear->setEnabled( m_PointSetNode != NULL );
+  m_BtnClearAll->setEnabled( m_PointSetNode != NULL );
   m_BtnLoad->setEnabled( m_PointSetNode != NULL );
   m_BtnSave->setEnabled( m_PointSetNode != NULL );
 }
@@ -203,6 +209,17 @@ void QmitkPointListWidget::OnEditPointSetButtonToggled(bool checked)
   }
 }
 
+void QmitkPointListWidget::OnClearPointButtonClicked()
+{
+  if (!m_PointSetNode) return;
+  mitk::PointSet* pointSet = dynamic_cast<mitk::PointSet*>( m_PointSetNode->GetData() );
+  if (!pointSet) return;
+  if (pointSet->GetSize() == 0) return;
+
+  QmitkPointListModel* pointListModel = dynamic_cast<QmitkPointListModel*>( m_ListView->model() );
+  pointListModel->RemoveSelectedPoint();
+  emit PointListChanged();
+}
 
 void QmitkPointListWidget::OnClearPointSetButtonClicked()
 {

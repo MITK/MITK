@@ -18,6 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkRenderingManager.h"
 #include "mitkRenderingManagerFactory.h"
 #include "mitkBaseRenderer.h"
+#include "mitkGlobalInteraction.h"
 
 #include <vtkRenderWindow.h>
 
@@ -42,10 +43,13 @@ RenderingManager
   m_LODIncreaseBlocked( false ),
   m_LODAbortMechanismEnabled( false ),
   m_ClippingPlaneEnabled( false ),
-  m_TimeNavigationController( NULL )
+  m_TimeNavigationController( NULL ),
+  m_DataStorage( NULL )
 {
   m_ShadingEnabled.assign( 3, false );
   m_ShadingValues.assign( 4, 0.0 );
+
+  m_GlobalInteraction = mitk::GlobalInteraction::GetInstance();
 
   InitializePropertyList();
 }

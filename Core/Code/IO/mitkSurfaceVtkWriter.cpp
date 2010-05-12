@@ -21,6 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkSTLWriter.h>
 #include <vtkPolyDataWriter.h>
 #include <vtkXMLPolyDataWriter.h>
+#include <vtkErrorCode.h>
 
 namespace mitk {
 
@@ -48,9 +49,9 @@ void SurfaceVtkWriter<vtkXMLPolyDataWriter>::SetDefaultExtension()
 template<>
 void SurfaceVtkWriter<vtkXMLPolyDataWriter>::ExecuteWrite( VtkWriterType* vtkWriter )
 {
-  if (!vtkWriter->Write())
+  if ( vtkWriter->Write() == 0 || vtkWriter->GetErrorCode() != 0 )
   {
-    itkExceptionMacro(<<"Error during surface writing.");
+    itkExceptionMacro(<<"Error during surface writing: " << vtkErrorCode::GetStringFromErrorCode(vtkWriter->GetErrorCode()) );
   }
 }
 

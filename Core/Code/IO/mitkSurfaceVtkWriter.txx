@@ -20,6 +20,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkPolyData.h>
 #include <vtkLinearTransform.h>
 #include <vtkTransformPolyDataFilter.h>
+#include <vtkErrorCode.h>
+
 #include <sstream>
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -53,20 +55,9 @@ void mitk::SurfaceVtkWriter<VTKWRITER>::SetDefaultExtension()
 template<class VTKWRITER>
 void mitk::SurfaceVtkWriter<VTKWRITER>::ExecuteWrite( VtkWriterType* vtkWriter )
 {
-  struct stat fileStatus;
-  time_t timeBefore=0;
-  if (!stat(vtkWriter->GetFileName(),&fileStatus))
+  if ( vtkWriter->Write() == 0 || vtkWriter->GetErrorCode() != 0 )
   {
-  timeBefore = fileStatus.st_mtime;
-  }
-   if (!vtkWriter->Write())
-  {
-    itkExceptionMacro(<<"Error during surface writing.");
-  }
-  // check if file can be written because vtkWriter doesn't check that
-  if (stat(vtkWriter->GetFileName(),&fileStatus)||(timeBefore==fileStatus.st_mtime))
-  {
-    itkExceptionMacro(<<"Error during surface writing: file could not be written");
+    itkExceptionMacro(<<"Error during surface writing: " << vtkErrorCode::GetStringFromErrorCode(vtkWriter->GetErrorCode()) );
   }
 }
 

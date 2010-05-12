@@ -94,10 +94,10 @@ class QmitkExt_EXPORT QmitkPointListWidget : public QWidget
 
     QmitkPointListView* m_ListView;
     QPushButton* m_BtnEdit;
+    QPushButton* m_BtnClear;
     QPushButton* m_BtnClearAll;
     QPushButton* m_BtnLoad;
-    QPushButton* m_BtnSave;
-    QPushButton* m_BtnClear;
+    QPushButton* m_BtnSave;    
     mitk::DataNode* m_PointSetNode;
     mitk::PointSetInteractor::Pointer m_Interactor;
     bool m_EditAllowed;

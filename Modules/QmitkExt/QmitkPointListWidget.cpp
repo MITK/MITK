@@ -35,7 +35,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "btnSave.xpm"
     
 QmitkPointListWidget::QmitkPointListWidget( QWidget* parent, Qt::WindowFlags f )
-:QWidget( parent, f ), m_ListView(NULL), m_BtnEdit(NULL), m_BtnClear(NULL), m_BtnLoad(NULL),
+:QWidget( parent, f ), m_ListView(NULL), m_BtnEdit(NULL), m_BtnClear(NULL), m_BtnClearAll(NULL), m_BtnLoad(NULL),
  m_BtnSave(NULL), m_PointSetNode(NULL), m_Interactor(NULL), m_EditAllowed(true),
  m_NodeObserverTag(0)
 {

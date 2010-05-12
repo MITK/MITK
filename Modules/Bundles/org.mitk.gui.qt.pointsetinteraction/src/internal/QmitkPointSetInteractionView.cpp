@@ -60,6 +60,7 @@ void QmitkPointSetInteractionView::Deactivated()
   // emulate empty selection
   std::vector<mitk::DataNode*> selection;
   this->OnSelectionChanged( selection );
+  m_Controls->m_PointListWidget->DeactivateInteractor(true);
 }
 
 void QmitkPointSetInteractionView::OnAddPointSetClicked()

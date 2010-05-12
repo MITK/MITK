@@ -49,6 +49,10 @@ QmitkRegionGrowingView::~QmitkRegionGrowingView()
 {
 }
 
+void QmitkRegionGrowingView::Deactivated()
+{
+  m_Controls->lstPoints->DeactivateInteractor(true);
+}
 
 void QmitkRegionGrowingView::CreateQtPartControl( QWidget *parent )
 {

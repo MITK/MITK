@@ -59,6 +59,7 @@ class QmitkRegionGrowingView : public QObject, public QmitkFunctionality
 
     virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget);
     virtual void StdMultiWidgetNotAvailable();
+    virtual void Deactivated();
 
   protected slots:
   

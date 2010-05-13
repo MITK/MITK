@@ -89,10 +89,6 @@ protected slots:
   void OnRenderWindow4Clicked();
   void OnTakeHighResolutionScreenshot(); ///< takes screenshot of the 3D window in 4x resolution of the render window
   void OnTakeScreenshot(); ///< takes screenshot of the selected render window
-
-  void OnTransversalRotationChanged( int angle );
-  void OnCoronalRotationChanged( int angle );
-  void OnSagittalRotationChanged( int angle );
  
 protected:
 

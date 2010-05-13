@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+Bundle-Name: MBI PlanarFigure 
+Bundle-SymbolicName: org.mitk.planarfigure
+Bundle-Version: 0.1
+Bundle-Vendor: DKFZ, Medical and Biological Informatics
+Require-Bundle: org.blueberry.osgi, org.blueberry.ui, org.mitk.gui.common
+Bundle-Activator: mitk::PlanarFigureActivator
+Bundle-ActivationPolicy: eager

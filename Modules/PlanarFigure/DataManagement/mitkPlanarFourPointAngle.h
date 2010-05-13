@@ -2,7 +2,7 @@
 
 Program:   Medical Imaging & Interaction Toolkit
 Language:  C++
-Date:      $Date: 2009-05-13 18:06:46 +0200 (Mi, 13 Mai 2009) $
+Date:      $Date: 2009-10-29 11:59:05 +0100 (Do, 29 Okt 2009) $
 Version:   $Revision: 17258 $
 
 Copyright (c) German Cancer Research Center, Division of Medical and
@@ -16,11 +16,11 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 
-#ifndef _MITK_PLANAR_CIRCLE_H_
-#define _MITK_PLANAR_CIRCLE_H_
+#ifndef _MITK_PLANAR_FOURPOINTANGLE_H_
+#define _MITK_PLANAR_FOURPOINTANGLE_H_
 
 #include "mitkPlanarFigure.h"
-#include "MitkExtExports.h"
+#include "PlanarFigureExports.h"
 
 
 namespace mitk 
@@ -29,18 +29,21 @@ namespace mitk
 class Geometry2D;
 
 /**
- * \brief Implementation of PlanarFigure representing a circle
- * through two control points
+ * \brief Implementation of PlanarFigure representing a four point
+ * angle, which is defined by two non-intersecting lines in 2D. Each of those lines 
+ * is defined by two control points.
  */
-class MitkExt_EXPORT PlanarCircle : public PlanarFigure
+class PlanarFigure_EXPORT PlanarFourPointAngle : public PlanarFigure
 {
 public:
-  mitkClassMacro( PlanarCircle, PlanarFigure );
+  mitkClassMacro( PlanarFourPointAngle, PlanarFigure );
 
   itkNewMacro( Self );
+public:
+  // Feature identifiers
+  const unsigned int FEATURE_ID_ANGLE;
 
-
-  virtual bool IsClosed() const { return true; };
+  virtual bool IsClosed() const { return false; };
 
   /** \brief Place figure in its minimal configuration (a point at least)
    * onto the given 2D geometry.
@@ -49,26 +52,24 @@ public:
    */
   //virtual void Initialize();
 
-  bool SetControlPoint( unsigned int index, const Point2D &point, bool createIfDoesNotExist );
-
-  /** \brief Circle has 2 control points per definition. */
+  
+  /** \brief Four point angle has 4 control points per definition. */
   unsigned int GetMinimumNumberOfControlPoints() const
   {
-    return 2;
+    return 4;
   }
 
 
-  /** \brief Circle has 2 control points per definition. */
+  /** \brief Four point angle has 4 control points per definition. */
   unsigned int GetMaximumNumberOfControlPoints() const
   {
-    return 2;
+    return 4;
   }
 
 
-  
 protected:
-  PlanarCircle();
-  virtual ~PlanarCircle();
+  PlanarFourPointAngle();
+  virtual ~PlanarFourPointAngle();
 
   /** \brief Generates the poly-line representation of the planar figure. */
   virtual void GeneratePolyLine();
@@ -79,13 +80,9 @@ protected:
   /** \brief Calculates feature quantities of the planar figure. */
   virtual void EvaluateFeaturesInternal();
 
+
   virtual void PrintSelf( std::ostream &os, itk::Indent indent ) const;
 
-
-  // Feature identifiers
-  const unsigned int FEATURE_ID_RADIUS;
-  const unsigned int FEATURE_ID_DIAMETER;
-  const unsigned int FEATURE_ID_AREA;
 
 private:
 
@@ -93,4 +90,4 @@ private:
 
 } // namespace mitk
 
-#endif //_MITK_PLANAR_CIRCLE_H_
+#endif //_MITK_PLANAR_FOURPOINTANGLE_H_

@@ -1,0 +1,22 @@
+SET(CPP_FILES
+  Algorithms/mitkImageStatisticsCalculator.cpp
+  Algorithms/mitkPlanarFigureObjectFactory.cpp
+  Algorithms/mitkPlanarFigureSource.cpp
+  DataManagement/mitkPlanarAngle.cpp
+  DataManagement/mitkPlanarCircle.cpp
+  DataManagement/mitkPlanarCross.cpp
+  DataManagement/mitkPlanarFigure.cpp
+  DataManagement/mitkPlanarFourPointAngle.cpp
+  DataManagement/mitkPlanarLine.cpp
+  DataManagement/mitkPlanarPolygon.cpp
+  DataManagement/mitkPlanarRectangle.cpp
+  DataManagement/mitkPlanarFigureControlPointStyleProperty.cpp
+  IO/mitkPlanarFigureIOFactory.cpp
+  IO/mitkPlanarFigureReader.cpp
+  IO/mitkPlanarFigureWriter.cpp
+  IO/mitkPlanarFigureWriterFactory.cpp
+  IO/mitkPlanarFigureSerializer.cpp
+  IO/mitkPlanarFigureSubclassesSerializer.cpp
+  Interactions/mitkPlanarFigureInteractor.cpp
+  Rendering/mitkPlanarFigureMapper2D.cpp
+)

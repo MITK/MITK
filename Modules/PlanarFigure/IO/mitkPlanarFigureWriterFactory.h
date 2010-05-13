@@ -19,13 +19,13 @@ PURPOSE.  See the above copyright notices for more information.
 #define UNSTRUCTURED_GRID_WRITERFACTORY_H_HEADER_INCLUDED
 
 #include "itkObjectFactoryBase.h"
-#include "MitkExtExports.h"
+#include "PlanarFigureExports.h"
 #include "mitkBaseData.h"
 
 namespace mitk
 {
 
-class MitkExt_EXPORT PlanarFigureWriterFactory : public itk::ObjectFactoryBase
+class PlanarFigure_EXPORT PlanarFigureWriterFactory : public itk::ObjectFactoryBase
 {
 public:
 

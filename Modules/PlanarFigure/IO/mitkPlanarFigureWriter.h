@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define _MITK_PlanarFigure_WRITER__H_
 
 #include <itkProcessObject.h>
-#include "MitkExtExports.h"
+#include "PlanarFigureExports.h"
 #include <mitkFileWriter.h>
 #include <mitkPlanarFigure.h>
 
@@ -34,7 +34,7 @@ namespace mitk
   * XML-based writer for mitk::PlanarFigures.
   * @ingroup Process
   */
-  class MitkExt_EXPORT PlanarFigureWriter : public mitk::FileWriter
+  class PlanarFigure_EXPORT PlanarFigureWriter : public mitk::FileWriter
   {
   public:
 

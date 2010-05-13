@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITK_PLANAR_FIGURE_MAPPER_2D_H_
 
 #include "mitkCommon.h"
-#include "MitkExtExports.h"
+#include "PlanarFigureExports.h"
 #include "mitkGLMapper2D.h"
 #include "mitkPlanarFigure.h"
 #include "mitkPlanarFigureControlPointStyleProperty.h"
@@ -72,7 +72,7 @@ class Contour;
  * 
  * \ingroup Mapper
  */
-class MitkExt_EXPORT PlanarFigureMapper2D : public GLMapper2D
+class PlanarFigure_EXPORT PlanarFigureMapper2D : public GLMapper2D
 {
 public:
     

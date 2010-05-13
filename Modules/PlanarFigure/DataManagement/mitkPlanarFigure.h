@@ -19,10 +19,9 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef _MITK_PLANAR_FIGURE_H_
 #define _MITK_PLANAR_FIGURE_H_
 
-#include "mitkCommon.h"
-#include "MitkExtExports.h"
+#include "PlanarFigureExports.h"
 #include "mitkBaseData.h"
-#include <itkSmartPointerVectorContainer.h>
+#include "mitkCommon.h"
 
 
 namespace mitk 
@@ -39,14 +38,14 @@ class Geometry2D;
  * TODO: Implement local 2D transform (including center of rotation...)
  *
  */
-class MitkExt_EXPORT PlanarFigure : public BaseData
+class PlanarFigure_EXPORT PlanarFigure : public BaseData
 {
 public:
   mitkClassMacro( PlanarFigure, BaseData );
 
 
   typedef itk::VectorContainer< unsigned long, mitk::Point2D > VertexContainerType;
-  typedef itk::SmartPointerVectorContainer< unsigned long, VertexContainerType> VertexContainerVectorType;
+  typedef itk::VectorContainer< unsigned long, VertexContainerType::Pointer> VertexContainerVectorType;
   typedef itk::VectorContainer< unsigned long, bool>  BoolContainerType;
 
 

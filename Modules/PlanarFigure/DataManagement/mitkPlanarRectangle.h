@@ -2,7 +2,7 @@
 
 Program:   Medical Imaging & Interaction Toolkit
 Language:  C++
-Date:      $Date$
+Date:      $Date: 2009-11-06 14:14:29 +0100 (Fri, 06 Nov 2009) $
 Version:   $Revision: 17258 $
 
 Copyright (c) German Cancer Research Center, Division of Medical and
@@ -16,11 +16,11 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 
-#ifndef _MITK_PLANAR_POLYGON_H_
-#define _MITK_PLANAR_POLYGON_H_
+#ifndef _MITK_PLANAR_RECTANGLE_H_
+#define _MITK_PLANAR_RECTANGLE_H_
 
-#include "mitkPlanarFigure.h"
-#include "MitkExtExports.h"
+#include "mitkPlanarPolygon.h"
+#include "PlanarFigureExports.h"
 
 
 namespace mitk 
@@ -32,21 +32,15 @@ class Geometry2D;
  * \brief Implementation of PlanarFigure representing a polygon
  * with two or more control points
  */
-class MitkExt_EXPORT PlanarPolygon : public PlanarFigure
+class PlanarFigure_EXPORT PlanarRectangle : public PlanarFigure
 {
 public:
-  mitkClassMacro( PlanarPolygon, PlanarFigure );
+  mitkClassMacro( PlanarRectangle, PlanarFigure );
 
   itkNewMacro( Self );
 
 
-  virtual bool IsClosed() const { return m_Closed; };
-
-  virtual void SetClosed( bool closed );
-
-  itkGetConstMacro( Closed, bool );
-  itkBooleanMacro( Closed ); // Calls SetClosed(); no need to re-implement
-
+  virtual bool IsClosed() const { return true; };
 
   /** \brief Place figure in its minimal configuration (a point at least)
    * onto the given 2D geometry.
@@ -54,25 +48,26 @@ public:
    * Must be implemented in sub-classes.
    */
   //virtual void Initialize();
-
+  virtual void PlaceFigure( const Point2D &point );
 
   /** \brief Polygon has 2 control points per definition. */
-  unsigned int GetMinimumNumberOfControlPoints() const
+  virtual unsigned int GetMinimumNumberOfControlPoints() const
   {
-    return 2;
+    return 4;
   }
 
 
   /** \brief Polygon maximum number of control points is principally not limited. */
-  unsigned int GetMaximumNumberOfControlPoints() const
+  virtual unsigned int GetMaximumNumberOfControlPoints() const
   {
-    return 1000;
+    return 4;
   }
 
+  virtual bool SetControlPoint( unsigned int index, const Point2D &point, bool createIfDoesNotExist = false);
   
 protected:
-  PlanarPolygon();
-  virtual ~PlanarPolygon();
+  PlanarRectangle();
+  virtual ~PlanarRectangle();
 
   /** \brief Generates the poly-line representation of the planar figure. */
   virtual void GeneratePolyLine();

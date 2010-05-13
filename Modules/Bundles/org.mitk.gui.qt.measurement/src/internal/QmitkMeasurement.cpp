@@ -539,7 +539,7 @@ void QmitkMeasurement::ActionDrawLineTriggered(bool checked)
 {
   if(!this->AssertDrawingIsPossible(checked))
     return;
-  mitk::PlanarCross::Pointer figure = mitk::PlanarCross::New();
+  mitk::PlanarLine::Pointer figure = mitk::PlanarLine::New();
   this->AddFigureToDataStorage(figure, QString("Line%1").arg(++m_LineCounter));
 
   MITK_INFO << "PlanarLine initialized...";

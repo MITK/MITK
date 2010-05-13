@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define _MITK_PLANAR_CROSS_H_
 
 #include "mitkPlanarFigure.h"
-#include "MitkExtExports.h"
+#include "PlanarFigureExports.h"
 
 
 namespace mitk 
@@ -52,7 +52,7 @@ class Geometry2D;
  *
  * The class provides the lengths of both lines via the "feature" interface, ordered by size.
  */
-class MitkExt_EXPORT PlanarCross : public PlanarFigure
+class PlanarFigure_EXPORT PlanarCross : public PlanarFigure
 {
 public:
   mitkClassMacro( PlanarCross, PlanarFigure );

@@ -27,8 +27,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkVtkUnstructuredGridIOFactory.h"
 #include "mitkStlVolumeTimeSeriesIOFactory.h"
 #include "mitkVtkVolumeTimeSeriesIOFactory.h"
-#include "mitkPlanarFigureIOFactory.h"
-#include "mitkPlanarFigureWriterFactory.h"
 
 #include "mitkCone.h"
 #include "mitkContour.h"
@@ -49,8 +47,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkUnstructuredGridVtkMapper3D.h"
 #include "mitkPolyDataGLMapper2D.h"
 #include "mitkGPUVolumeMapper3D.h"
-#include "mitkPlanarFigure.h"
-#include "mitkPlanarFigureMapper2D.h"
 
 #include "mitkVolumeDataVtkMapper3D.h"
 
@@ -68,9 +64,6 @@ mitk::CoreExtObjectFactory::CoreExtObjectFactory()
     itk::ObjectFactoryBase::RegisterFactory( VtkUnstructuredGridIOFactory::New() );
     itk::ObjectFactoryBase::RegisterFactory( StlVolumeTimeSeriesIOFactory::New() );
     itk::ObjectFactoryBase::RegisterFactory( VtkVolumeTimeSeriesIOFactory::New() );
-    itk::ObjectFactoryBase::RegisterFactory( PlanarFigureIOFactory::New() );
-
-    PlanarFigureWriterFactory::RegisterOneFactory();
 
     alreadyDone = true;
   }
@@ -106,11 +99,6 @@ mitk::Mapper::Pointer mitk::CoreExtObjectFactory::CreateMapper(mitk::DataNode* n
     else if((dynamic_cast<UnstructuredGrid*>(data)!=NULL))
     {
       newMapper = mitk::UnstructuredGridMapper2D::New();
-      newMapper->SetDataNode(node);
-    }
-    else if((dynamic_cast<PlanarFigure*>(data)!=NULL))
-    {
-      newMapper = mitk::PlanarFigureMapper2D::New();
       newMapper->SetDataNode(node);
     }
   }
@@ -158,12 +146,6 @@ void mitk::CoreExtObjectFactory::SetDefaultProperties(mitk::DataNode* node)
 
   mitk::DataNode::Pointer nodePointer = node;
 
-  mitk::PlanarFigure::Pointer pf = dynamic_cast<mitk::PlanarFigure*>(node->GetData());
-  if(pf.IsNotNull())
-  {
-    mitk::PlanarFigureMapper2D::SetDefaultProperties(node);
-  }
-  
   mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
   if(image.IsNotNull() && image->IsInitialized())
   {
@@ -184,7 +166,7 @@ const char* mitk::CoreExtObjectFactory::GetFileExtensions()
 
 const char* mitk::CoreExtObjectFactory::GetSaveFileExtensions() 
 { 
-  return ";;Planar Figures (*.pf)";  // for mitk::PlanarFigure and derived classes
+  return "";
 };
 
 void mitk::CoreExtObjectFactory::RegisterIOFactories() 

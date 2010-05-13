@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef mitkPlanarFigureSerializer_h_included
 #define mitkPlanarFigureSerializer_h_included
 
-#include "SceneSerializationExports.h"
+#include "PlanarFigureExports.h"
 #include "mitkBaseDataSerializer.h"
 
 namespace mitk
@@ -26,7 +26,7 @@ namespace mitk
 /**
   \brief Serializes mitk::Surface for mitk::SceneIO
 */
-class SceneSerialization_EXPORT PlanarFigureSerializer : public BaseDataSerializer
+class PlanarFigure_EXPORT PlanarFigureSerializer : public BaseDataSerializer
 {
   public:
     mitkClassMacro( PlanarFigureSerializer, BaseDataSerializer );

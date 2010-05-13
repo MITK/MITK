@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkEnumerationProperty.h"
 
-#include "MitkExtExports.h"
+#include "PlanarFigureExports.h"
 
 namespace mitk
 {
@@ -37,7 +37,7 @@ namespace mitk
  * After construction, the default shape is a square.
  *
  */
-class MitkExt_EXPORT PlanarFigureControlPointStyleProperty : public EnumerationProperty
+class PlanarFigure_EXPORT PlanarFigureControlPointStyleProperty : public EnumerationProperty
 {
 public:
 

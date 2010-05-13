@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKPLANARFIGUREINTERACTOR_H_HEADER_INCLUDED
 
 #include "mitkCommon.h"
-#include "MitkExtExports.h"
+#include "PlanarFigureExports.h"
 #include "mitkVector.h"
 #include <mitkInteractor.h>
 
@@ -37,7 +37,7 @@ class PlanarFigure;
   *
   * \ingroup Interaction
   */
-class MitkExt_EXPORT PlanarFigureInteractor : public Interactor
+class PlanarFigure_EXPORT PlanarFigureInteractor : public Interactor
 {
 public:
   mitkClassMacro(PlanarFigureInteractor, Interactor);

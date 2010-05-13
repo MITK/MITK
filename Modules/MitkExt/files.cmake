@@ -16,7 +16,6 @@ SET(CPP_FILES
   Algorithms/mitkGeometryClipImageFilter.cpp
   Algorithms/mitkGeometryDataSource.cpp
   Algorithms/mitkHeightFieldSurfaceClipImageFilter.cpp
-  Algorithms/mitkImageStatisticsCalculator.cpp
   Algorithms/mitkImageToLookupTableFilter.cpp
   Algorithms/mitkImageToSurfaceFilter.cpp
   Algorithms/mitkInterpolateLinesFilter.cpp
@@ -29,7 +28,6 @@ SET(CPP_FILES
   Algorithms/mitkNonBlockingAlgorithm.cpp
   Algorithms/mitkOverwriteSliceImageFilter.cpp
   Algorithms/mitkPadImageFilter.cpp
-  Algorithms/mitkPlanarFigureSource.cpp
   Algorithms/mitkPlaneCutFilter.cpp
   Algorithms/mitkPlaneFit.cpp
   Algorithms/mitkPlanesPerpendicularToLinesFilter.cpp
@@ -81,15 +79,6 @@ SET(CPP_FILES
   DataManagement/mitkObservedObjectList.cpp
   DataManagement/mitkOrganTypeProperty.cpp
   DataManagement/mitkPlaneLandmarkProjector.cpp
-  DataManagement/mitkPlanarAngle.cpp
-  DataManagement/mitkPlanarCircle.cpp
-  DataManagement/mitkPlanarCross.cpp
-  DataManagement/mitkPlanarFigure.cpp
-  DataManagement/mitkPlanarFourPointAngle.cpp
-  DataManagement/mitkPlanarLine.cpp
-  DataManagement/mitkPlanarPolygon.cpp
-  DataManagement/mitkPlanarRectangle.cpp
-  DataManagement/mitkPlanarFigureControlPointStyleProperty.cpp
   DataManagement/mitkPlane.cpp
   DataManagement/mitkPointData.cpp
   DataManagement/mitkPropertyManager.cpp
@@ -105,10 +94,6 @@ SET(CPP_FILES
   IO/mitkPACSPlugin.cpp
   IO/mitkParRecFileIOFactory.cpp
   IO/mitkParRecFileReader.cpp
-  IO/mitkPlanarFigureIOFactory.cpp
-  IO/mitkPlanarFigureReader.cpp
-  IO/mitkPlanarFigureWriter.cpp
-  IO/mitkPlanarFigureWriterFactory.cpp
   IO/mitkStlVolumeTimeSeriesIOFactory.cpp
   IO/mitkStlVolumeTimeSeriesReader.cpp
   IO/mitkUnstructuredGridVtkWriter.cpp
@@ -133,7 +118,6 @@ SET(CPP_FILES
   Interactions/mitkInteractionDebug.cpp
   Interactions/mitkInteractionDebugger.cpp
   Interactions/mitkPaintbrushTool.cpp
-  Interactions/mitkPlanarFigureInteractor.cpp
   Interactions/mitkPointInteractor.cpp
   Interactions/mitkPointSelectorInteractor.cpp
   #Interactions/mitkPositionTracker.cpp
@@ -169,7 +153,6 @@ SET(CPP_FILES
   Rendering/mitkMeshMapper2D.cpp
   Rendering/mitkMeshVtkMapper3D.cpp
   Rendering/mitkNativeRenderWindowInteractor.cpp
-  Rendering/mitkPlanarFigureMapper2D.cpp
   Rendering/mitkPointDataVtkMapper3D.cpp
   Rendering/mitkSplineMapper2D.cpp
   Rendering/mitkSplineVtkMapper3D.cpp

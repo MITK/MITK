@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define _MITK_PLANAR_ANGLE_H_
 
 #include "mitkPlanarFigure.h"
-#include "MitkExtExports.h"
+#include "PlanarFigureExports.h"
 
 
 namespace mitk 
@@ -32,7 +32,7 @@ class Geometry2D;
  * \brief Implementation of PlanarFigure to display an angle
  * through three control points
  */
-class MitkExt_EXPORT PlanarAngle : public PlanarFigure
+class PlanarFigure_EXPORT PlanarAngle : public PlanarFigure
 {
 public:
   mitkClassMacro( PlanarAngle, PlanarFigure );

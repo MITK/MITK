@@ -25,7 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
   namespace mitk \
 { \
   \
-class SceneSerialization_EXPORT classname ## Serializer : public PlanarFigureSerializer \
+class PlanarFigure_EXPORT classname ## Serializer : public PlanarFigureSerializer \
 { \
 public: \
   \

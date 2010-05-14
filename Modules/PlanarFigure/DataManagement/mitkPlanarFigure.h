@@ -49,16 +49,6 @@ public:
   typedef itk::VectorContainer< unsigned long, bool>  BoolContainerType;
 
 
-  /** \brief True if the planar figure is closed. Must be implemented in
-   * sub-classes. */
-  virtual bool IsClosed() const = 0;
-
-
-  /** \brief True if the planar figure has been placed (and can be
-   * displayed/interacted with). */
-  virtual bool IsPlaced() const { return m_FigurePlaced; };
-
-
   /** \brief Sets the 2D geometry on which this figure will be placed.
    *
    * In most cases, this is a Geometry already owned by another object, e.g.
@@ -70,6 +60,17 @@ public:
 
   /** \brief Returns (previously set) 2D geometry of this figure. */
   virtual const Geometry2D *GetGeometry2D() const;
+
+
+  /** \brief True if the planar figure is closed.
+   *
+   * Default is false. The "closed" boolean property must be set in sub-classes. */
+  virtual bool IsClosed() const;
+
+  
+  /** \brief True if the planar figure has been placed (and can be
+   * displayed/interacted with). */
+  virtual bool IsPlaced() const { return m_FigurePlaced; };
 
 
   /** \brief Place figure at the given point (in 2D index coordinates) onto

@@ -27,6 +27,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkPlanarRectangle.h"
 #include "mitkPlaneGeometry.h"
 
+#include "mitkBasePropertyDeserializer.h"
+
 #include <tinyxml.h>
 #include <itksys/SystemTools.hxx>
 
@@ -97,42 +99,43 @@ void mitk::PlanarFigureReader::GenerateData()
 
   this->SetNumberOfOutputs(0); // reset all outputs, we add new ones depending on the file content
   /* file version 1 reader code */
-  for( TiXmlElement* pfElement = document.FirstChildElement("PlanarFigure"); pfElement != NULL; pfElement = pfElement->NextSiblingElement("PlanarFigure") )
+  for( TiXmlElement* pfElement = document.FirstChildElement("PlanarFigure");
+       pfElement != NULL;
+       pfElement = pfElement->NextSiblingElement("PlanarFigure") )
   {
     if (pfElement == NULL)
       continue;
-    std::string closed = pfElement->Attribute("closed");
+
     std::string type = pfElement->Attribute("type");
-    mitk::PlanarFigure::Pointer pf = NULL;
+
+    mitk::PlanarFigure::Pointer planarFigure = NULL;
     if (type == "PlanarAngle")
     {
-      pf = mitk::PlanarAngle::New();
+      planarFigure = mitk::PlanarAngle::New();
     }
     else if (type == "PlanarCircle")
     {
-      pf = mitk::PlanarCircle::New();
+      planarFigure = mitk::PlanarCircle::New();
     }
     else if (type == "PlanarCross")
     {
-      pf = mitk::PlanarCross::New();
+      planarFigure = mitk::PlanarCross::New();
     }
     else if (type == "PlanarFourPointAngle")
     {
-      pf = mitk::PlanarFourPointAngle::New();
+      planarFigure = mitk::PlanarFourPointAngle::New();
     }
     else if (type == "PlanarLine")
     {
-      pf = mitk::PlanarLine::New();
+      planarFigure = mitk::PlanarLine::New();
     }
     else if (type == "PlanarPolygon")
     {
-      mitk::PlanarPolygon::Pointer polygon = mitk::PlanarPolygon::New();
-      polygon->SetClosed( closed == "true" );
-      pf = polygon;
+      planarFigure = mitk::PlanarPolygon::New();
     }
     else if (type == "PlanarRectangle")
     {
-      pf = mitk::PlanarRectangle::New();
+      planarFigure = mitk::PlanarRectangle::New();
     }
     else 
     {
@@ -140,6 +143,56 @@ void mitk::PlanarFigureReader::GenerateData()
       MITK_WARN << "encountered unknown planar figure type '" << type << "'. Skipping this element.";
       continue;
     }
+
+
+    // Read properties of the planar figure
+    for( TiXmlElement* propertyElement = pfElement->FirstChildElement("property");
+         propertyElement != NULL;
+         propertyElement = propertyElement->NextSiblingElement("property") )
+    {
+      const char* keya = propertyElement->Attribute("key");
+      std::string key( keya ? keya : "");
+
+      const char* typea = propertyElement->Attribute("type");
+      std::string type( typea ? typea : "");
+
+      // hand propertyElement to specific reader
+      std::stringstream propertyDeserializerClassName;
+      propertyDeserializerClassName << type << "Deserializer";
+
+      std::list<itk::LightObject::Pointer> readers =
+        itk::ObjectFactoryBase::CreateAllInstance(propertyDeserializerClassName.str().c_str());
+      if (readers.size() < 1)
+      {
+        MITK_ERROR << "No property reader found for " << type;
+      }
+      if (readers.size() > 1)
+      {
+        MITK_WARN << "Multiple property readers found for " << type << ". Using arbitrary first one.";
+      }
+
+      for ( std::list<itk::LightObject::Pointer>::iterator iter = readers.begin();
+        iter != readers.end();
+        ++iter )
+      {
+        if (BasePropertyDeserializer* reader = dynamic_cast<BasePropertyDeserializer*>( iter->GetPointer() ) )
+        {
+          BaseProperty::Pointer property = reader->Deserialize( propertyElement->FirstChildElement() );
+          if (property.IsNotNull())
+          {
+            planarFigure->GetPropertyList()->ReplaceProperty(key, property);
+          }
+          else
+          {
+            MITK_ERROR << "There were errors while loading property '" << key << "' of type " << type << ". Your data may be corrupted";
+          }
+          break;
+        }
+      }
+    }
+
+
+    // Read geometry of containing plane
     TiXmlElement* geoElement = pfElement->FirstChildElement("Geometry");
     if (geoElement != NULL)
     {
@@ -190,7 +243,7 @@ void mitk::PlanarFigureReader::GenerateData()
         //Vector3D spacing = this->GetVectorFromXMLNode(geoElement->FirstChildElement("Spacing"));
         Point3D origin = this->GetPointFromXMLNode(geoElement->FirstChildElement("Origin"));
         planeGeo->SetOrigin( origin );
-        pf->SetGeometry2D(planeGeo);
+        planarFigure->SetGeometry2D(planeGeo);
       }
       catch (...)
       {
@@ -217,20 +270,20 @@ void mitk::PlanarFigureReader::GenerateData()
         p.SetElement(1, y);
         if (first == true)  // needed to set m_FigurePlaced to true
         {
-          pf->PlaceFigure(p);
+          planarFigure->PlaceFigure(p);
           first = false;
         }
-        pf->SetControlPoint(id, p, true);
+        planarFigure->SetControlPoint(id, p, true);
       }
 
     // Calculate feature quantities of this PlanarFigure
-    pf->EvaluateFeatures();
+    planarFigure->EvaluateFeatures();
 
     // Make sure that no control point is currently selected
-    pf->DeselectControlPoint();
+    planarFigure->DeselectControlPoint();
 
     // \TODO: what about m_FigurePlaced and m_SelectedControlPoint ??
-    this->SetNthOutput( this->GetNumberOfOutputs(), pf );  // add pf as new output of this filter
+    this->SetNthOutput( this->GetNumberOfOutputs(), planarFigure );  // add planarFigure as new output of this filter
   }
   m_Success = true;
 }

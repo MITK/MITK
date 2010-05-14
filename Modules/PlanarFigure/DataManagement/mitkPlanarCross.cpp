@@ -18,15 +18,18 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkPlanarCross.h"
 #include "mitkGeometry2D.h"
+#include "mitkProperties.h"
 
 
 mitk::PlanarCross::PlanarCross()
 : FEATURE_ID_LONGESTDIAMETER( this->AddFeature( "Longest Diameter", "mm" ) ),
-  FEATURE_ID_SHORTAXISDIAMETER( this->AddFeature( "Short Axis Diameter", "mm" ) ),
-  m_SingleLineMode( false )
+  FEATURE_ID_SHORTAXISDIAMETER( this->AddFeature( "Short Axis Diameter", "mm" ) )
 {
   // Cross has two control points at the beginning
   this->ResetNumberOfControlPoints( 2 );
+
+  // Create property for SingleLineMode (default: false)
+  this->SetProperty( "SingleLineMode", mitk::BoolProperty::New( false ) );
 
   // Create helper polyline object (for drawing the orthogonal orientation line)
   m_HelperPolyLines->InsertElement( 0, VertexContainerType::New());
@@ -40,9 +43,29 @@ mitk::PlanarCross::~PlanarCross()
 }
 
 
+void mitk::PlanarCross::SetSingleLineMode( bool singleLineMode )
+{
+  this->SetProperty( "SingleLineMode", mitk::BoolProperty::New( singleLineMode ) );
+  this->Modified();
+}
+
+
+bool mitk::PlanarCross::GetSingleLineMode() const
+{
+  mitk::BoolProperty* singleLineMode = dynamic_cast< mitk::BoolProperty* >( 
+    this->GetProperty( "SingleLineMode" ).GetPointer() );
+
+  if ( singleLineMode != NULL )
+  {
+    return singleLineMode->GetValue();
+  }
+  return false;
+}
+
+
 bool mitk::PlanarCross::ResetOnPointSelect()
 {
-  if ( m_SingleLineMode )
+  if ( this->GetSingleLineMode() )
   {
     // In single line mode --> nothing to reset
     return false;
@@ -100,7 +123,7 @@ bool mitk::PlanarCross::ResetOnPointSelect()
 
 unsigned int mitk::PlanarCross::GetNumberOfFeatures() const
 {
-  if ( m_SingleLineMode || (this->GetNumberOfControlPoints() < 4) )
+  if ( this->GetSingleLineMode() || (this->GetNumberOfControlPoints() < 4) )
   {
     return 1;
   }
@@ -275,7 +298,7 @@ void mitk::PlanarCross::EvaluateFeaturesInternal()
 
   // Calculate length of second line
   double l2 = 0.0;
-  if ( !m_SingleLineMode && (this->GetNumberOfControlPoints() > 3) )
+  if ( !this->GetSingleLineMode() && (this->GetNumberOfControlPoints() > 3) )
   {
     const Point3D &p2 = this->GetWorldControlPoint( 2 );
     const Point3D &p3 = this->GetWorldControlPoint( 3 );

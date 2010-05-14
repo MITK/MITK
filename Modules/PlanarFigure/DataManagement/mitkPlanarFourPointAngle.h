@@ -43,8 +43,6 @@ public:
   // Feature identifiers
   const unsigned int FEATURE_ID_ANGLE;
 
-  virtual bool IsClosed() const { return false; };
-
   /** \brief Place figure in its minimal configuration (a point at least)
    * onto the given 2D geometry.
    *

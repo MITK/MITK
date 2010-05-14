@@ -22,8 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 mitk::PlanarRectangle::PlanarRectangle()
 : FEATURE_ID_CIRCUMFERENCE( this->AddFeature( "Circumference", "mm" ) ),
-  FEATURE_ID_AREA( this->AddFeature( "Area", "mm^2" ) ),
-  m_Closed( true )
+  FEATURE_ID_AREA( this->AddFeature( "Area", "mm^2" ) )
 {
   // Rectangle has four control points
   this->ResetNumberOfControlPoints( 4 );
@@ -143,24 +142,18 @@ void mitk::PlanarRectangle::EvaluateFeaturesInternal()
   // Calculate circumference
   double circumference = 0.0;
   unsigned int i;
-  for ( i = 0; i < this->GetNumberOfControlPoints() - 1; ++i )
+  for ( i = 0; i < this->GetNumberOfControlPoints(); ++i )
   {
     circumference += this->GetWorldControlPoint( i ).EuclideanDistanceTo( 
-      this->GetWorldControlPoint( i + 1 ) );
-  }
-
-  if ( this->IsClosed() )
-  {
-    circumference += this->GetWorldControlPoint( i ).EuclideanDistanceTo(
-      this->GetWorldControlPoint( 0 ) );
+      this->GetWorldControlPoint( (i + 1) % this->GetNumberOfControlPoints() ) );
   }
 
   this->SetQuantity( FEATURE_ID_CIRCUMFERENCE, circumference );
 
 
-  // Calculate polygon area (if closed)
+  // Calculate rectangle area (well, done a bit clumsy...)
   double area = 0.0;
-  if ( this->IsClosed() && (this->GetGeometry2D() != NULL) )
+  if ( this->GetGeometry2D() != NULL )
   {
     for ( i = 0; i < this->GetNumberOfControlPoints(); ++i )
     {

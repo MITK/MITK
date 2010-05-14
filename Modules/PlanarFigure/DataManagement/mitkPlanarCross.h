@@ -61,30 +61,27 @@ public:
 
   /** \brief Indicates whether the PlanarFigure shall represent only a single line instead of an
    * orthogonal cross. */
-  itkSetMacro( SingleLineMode, bool );
+  void SetSingleLineMode( bool singleLineMode );
 
   /** \brief Indicates whether the PlanarFigure shall represent only a single line instead of an
   * orthogonal cross. */
-  itkGetMacro( SingleLineMode, bool );
+  bool GetSingleLineMode() const;
 
   /** \brief Indicates whether the PlanarFigure shall represent only a single line instead of an
   * orthogonal cross. */
-  itkBooleanMacro( SingleLineMode );
+  itkBooleanMacro( SingleLineMode ); // No need to reimplement; calls SetSingleLineMode()
 
-
-  virtual bool IsClosed() const { return false; };
-
-  
+ 
   /** \brief PlanarCross has either two or four control points, depending on the operation mode. */
   unsigned int GetMinimumNumberOfControlPoints() const
   {
-    return m_SingleLineMode ? 2 : 4;
+    return this->GetSingleLineMode() ? 2 : 4;
   }
 
   /** \brief PlanarCross has either two or four control points, depending on the operation mode. */
   unsigned int GetMaximumNumberOfControlPoints() const
   {
-    return m_SingleLineMode ? 2 : 4;
+    return this->GetSingleLineMode() ? 2 : 4;
   }
 
   /** \brief The cross shall be reset to a single line when a control point is selected. */
@@ -122,9 +119,6 @@ private:
 
   /** Internal method for applying spatial constraints. */
   virtual Point2D InternalApplyControlPointConstraints( unsigned int index, const Point2D& point );
-
-  // TRUE if this object does not represent a cross, but a single line
-  bool m_SingleLineMode;
 
 };
 

@@ -16,6 +16,8 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include "mitkPlanarFigureWriter.h"
+#include "mitkBasePropertySerializer.h"
+
 #include <tinyxml.h>
 
 
@@ -57,23 +59,70 @@ void mitk::PlanarFigureWriter::GenerateData()
   /* create xml element for each input */
   for ( unsigned int i = 0 ; i < this->GetNumberOfInputs(); ++i )
   {
+    // Create root element for this PlanarFigure
     InputType::Pointer pf = this->GetInput( i );
     if (pf.IsNull())
       continue;
     TiXmlElement* pfElement = new TiXmlElement("PlanarFigure");
     pfElement->SetAttribute("type", pf->GetNameOfClass());
-    if ( pf->IsClosed() )
-    {
-      pfElement->SetAttribute( "closed", "true" );
-    }
-    else
-    {
-      pfElement->SetAttribute( "closed", "false" );
-    }
     document.LinkEndChild(pfElement);
+
     PlanarFigure::VertexContainerType* vertices = pf->GetControlPoints();
     if (vertices == NULL)
       continue;
+
+    // Serialize property list of PlanarFigure
+    mitk::PropertyList::Pointer propertyList = pf->GetPropertyList();
+    mitk::PropertyList::PropertyMap::const_iterator it;
+    for ( it = propertyList->GetMap()->begin(); it != propertyList->GetMap()->end(); ++it )
+    {
+      // Create seralizer for this property
+      const mitk::BaseProperty* prop = it->second.first;
+      std::string serializerName = std::string( prop->GetNameOfClass() ) + "Serializer";
+      std::list< itk::LightObject::Pointer > allSerializers = itk::ObjectFactoryBase::CreateAllInstance(
+        serializerName.c_str() );
+
+      if ( allSerializers.size() != 1 )
+      {
+        // No or too many serializer(s) found, skip this property
+        continue;
+      }
+
+      mitk::BasePropertySerializer* serializer = dynamic_cast< mitk::BasePropertySerializer* >(
+        allSerializers.begin()->GetPointer() );
+      if ( serializer == NULL )
+      {
+        // Serializer not valid; skip this property
+      }
+
+      TiXmlElement* keyElement = new TiXmlElement( "property" );
+      keyElement->SetAttribute( "key", it->first );
+      keyElement->SetAttribute( "type", prop->GetNameOfClass() );
+
+        serializer->SetProperty( prop );
+      TiXmlElement* valueElement = NULL;
+      try
+      {
+        valueElement = serializer->Serialize();
+      }
+      catch (...)
+      {
+      }
+
+      if ( valueElement == NULL )
+      {
+        // Serialization failed; skip this property
+        continue;
+      }
+
+      // Add value to property element
+      keyElement->LinkEndChild( valueElement );
+
+      // Append serialized property to property list
+      pfElement->LinkEndChild( keyElement );
+    }
+
+    // Serialize control points of PlanarFigure
     TiXmlElement* controlPointsElement = new TiXmlElement("ControlPoints");
     pfElement->LinkEndChild(controlPointsElement);
     for (PlanarFigure::VertexContainerType::ConstIterator it = vertices->Begin(); it != vertices->End(); ++it)

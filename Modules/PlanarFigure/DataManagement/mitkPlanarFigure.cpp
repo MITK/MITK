@@ -18,6 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkPlanarFigure.h"
 #include "mitkGeometry2D.h"
+#include "mitkProperties.h"
 
 
 mitk::PlanarFigure::PlanarFigure()
@@ -30,6 +31,8 @@ mitk::PlanarFigure::PlanarFigure()
   m_PolyLines = VertexContainerVectorType::New();
   m_HelperPolyLines = VertexContainerVectorType::New();
   m_HelperPolyLinesToBePainted = BoolContainerType::New();
+
+  this->SetProperty( "closed", mitk::BoolProperty::New( false ) );
 
   // Currently only single-time-step geometries are supported
   this->InitializeTimeSlicedGeometry( 1 );
@@ -51,6 +54,17 @@ void mitk::PlanarFigure::SetGeometry2D( mitk::Geometry2D *geometry )
 const mitk::Geometry2D *mitk::PlanarFigure::GetGeometry2D() const
 {
   return m_Geometry2D;
+}
+
+
+bool mitk::PlanarFigure::IsClosed() const
+{
+  mitk::BoolProperty* closed = dynamic_cast< mitk::BoolProperty* >( this->GetProperty( "closed" ).GetPointer() );
+  if ( closed != NULL )
+  {
+    return closed->GetValue();
+  }
+  return false;
 }
 
 

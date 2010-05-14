@@ -40,11 +40,9 @@ public:
   itkNewMacro( Self );
 
 
-  virtual bool IsClosed() const { return m_Closed; };
-
+  /** \brief Set whether the polygon should be closed between first and last control point or not. */
   virtual void SetClosed( bool closed );
 
-  itkGetConstMacro( Closed, bool );
   itkBooleanMacro( Closed ); // Calls SetClosed(); no need to re-implement
 
 
@@ -88,8 +86,6 @@ protected:
   const unsigned int FEATURE_ID_CIRCUMFERENCE;
   const unsigned int FEATURE_ID_AREA;
 
-
-  bool m_Closed;
 
 private:
 

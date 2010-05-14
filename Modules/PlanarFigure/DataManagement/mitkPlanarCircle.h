@@ -40,8 +40,6 @@ public:
   itkNewMacro( Self );
 
 
-  virtual bool IsClosed() const { return true; };
-
   /** \brief Place figure in its minimal configuration (a point at least)
    * onto the given 2D geometry.
    *

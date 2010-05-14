@@ -18,15 +18,18 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkPlanarPolygon.h"
 #include "mitkGeometry2D.h"
+#include "mitkProperties.h"
 
 
 mitk::PlanarPolygon::PlanarPolygon()
 : FEATURE_ID_CIRCUMFERENCE( this->AddFeature( "Circumference", "mm" ) ),
-  FEATURE_ID_AREA( this->AddFeature( "Area", "mm^2" ) ),
-  m_Closed( true )
+  FEATURE_ID_AREA( this->AddFeature( "Area", "mm^2" ) )
 {
   // Polygon has at least two control points
   this->ResetNumberOfControlPoints( 2 );
+
+  // Polygon is closed by default
+  this->SetProperty( "closed", mitk::BoolProperty::New( true ) );
 
   m_PolyLines->InsertElement( 0, VertexContainerType::New());
 }
@@ -39,24 +42,22 @@ mitk::PlanarPolygon::~PlanarPolygon()
 
 void mitk::PlanarPolygon::SetClosed( bool closed )
 {
-  if ( m_Closed != closed )
-  {
-    m_Closed = closed;
-    this->Modified();
+  this->SetProperty( "closed", mitk::BoolProperty::New( closed ) );
 
-    if ( !closed )
-    {
-      // For non-closed polygons: use "Length" as feature name; disable area
-      this->SetFeatureName( FEATURE_ID_CIRCUMFERENCE, "Length" );
-      this->DeactivateFeature( FEATURE_ID_AREA );
-    }
-    else
-    {
-      // For closed polygons: use "Circumference" as feature name; enable area
-      this->SetFeatureName( FEATURE_ID_CIRCUMFERENCE, "Circumference" );
-      this->ActivateFeature( FEATURE_ID_AREA );
-    }
+  if ( !closed )
+  {
+    // For non-closed polygons: use "Length" as feature name; disable area
+    this->SetFeatureName( FEATURE_ID_CIRCUMFERENCE, "Length" );
+    this->DeactivateFeature( FEATURE_ID_AREA );
   }
+  else
+  {
+    // For closed polygons: use "Circumference" as feature name; enable area
+    this->SetFeatureName( FEATURE_ID_CIRCUMFERENCE, "Circumference" );
+    this->ActivateFeature( FEATURE_ID_AREA );
+  }
+
+  this->Modified();
 }
 
 
@@ -145,7 +146,7 @@ void mitk::PlanarPolygon::PrintSelf( std::ostream& os, itk::Indent indent) const
 {
   Superclass::PrintSelf( os, indent );
 
-  if (this->GetClosed())
+  if (this->IsClosed())
     os << indent << "Polygon is closed\n";
   else
     os << indent << "Polygon is not closed\n";

@@ -240,7 +240,9 @@ void mitk::PlanarFigureReader::GenerateData()
 
 
         // Extract and set spacing and origin
-        //Vector3D spacing = this->GetVectorFromXMLNode(geoElement->FirstChildElement("Spacing"));
+        Vector3D spacing = this->GetVectorFromXMLNode(geoElement->FirstChildElement("Spacing"));
+        planeGeo->SetSpacing( spacing );
+
         Point3D origin = this->GetPointFromXMLNode(geoElement->FirstChildElement("Origin"));
         planeGeo->SetOrigin( origin );
         planarFigure->SetGeometry2D(planeGeo);

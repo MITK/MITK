@@ -90,6 +90,7 @@ public:
   typedef std::vector< bool > BoolVector;
 
   typedef itk::SmartPointer< DataStorage > DataStoragePointer;
+  typedef itk::SmartPointer< GlobalInteraction > GlobalInteractionPointer;
 
   enum RequestType
   {
@@ -332,7 +333,7 @@ protected:
 
   DataStoragePointer m_DataStorage;
 
-  mitk::GlobalInteraction* m_GlobalInteraction;
+  GlobalInteractionPointer m_GlobalInteraction;
 
 private:
 

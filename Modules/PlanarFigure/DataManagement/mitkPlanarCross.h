@@ -51,6 +51,8 @@ class Geometry2D;
  * case, interaction stops after the first line has been placed.
  *
  * The class provides the lengths of both lines via the "feature" interface, ordered by size.
+ *
+ * \sa PlanarFigureMapper2D
  */
 class PlanarFigure_EXPORT PlanarCross : public PlanarFigure
 {

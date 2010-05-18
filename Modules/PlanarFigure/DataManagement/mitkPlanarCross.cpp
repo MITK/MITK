@@ -22,8 +22,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 mitk::PlanarCross::PlanarCross()
-: FEATURE_ID_LONGESTDIAMETER( this->AddFeature( "Longest Diameter", "mm" ) ),
-  FEATURE_ID_SHORTAXISDIAMETER( this->AddFeature( "Short Axis Diameter", "mm" ) )
+: FEATURE_ID_LONGESTDIAMETER( this->AddFeature( "Longest Axis", "mm" ) ),
+  FEATURE_ID_SHORTAXISDIAMETER( this->AddFeature( "Short Axis", "mm" ) )
 {
   // Cross has two control points at the beginning
   this->ResetNumberOfControlPoints( 2 );

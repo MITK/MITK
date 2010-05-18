@@ -151,6 +151,7 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
   const mitk::DataNode* node=this->GetDataNode();
   bool isSelected = false;
   bool drawOutline = false;
+  bool drawQuantities = false;
   float lineColor[] = { 0.0f, 1.0f, 0.0f };
   float lineOpacity = 1.0f;
   float lineWidth = 1.0f;
@@ -170,6 +171,7 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
   {
     node->GetBoolProperty("selected", isSelected);
     node->GetBoolProperty("draw outline", drawOutline);
+    node->GetBoolProperty("draw quantities", drawQuantities);
     node->GetColor( lineColor, NULL, "color" );
     node->GetFloatProperty( "opacity", lineOpacity );
     node->GetFloatProperty( "width", lineWidth );
@@ -223,14 +225,49 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
     }
   }
 
-  // draw name near the first point
+  double annotationOffset = 0.0;
+
+  // draw name near the first point (if present)
   std::string name = node->GetName();
   if(!name.empty())
   {
-    mitk::VtkPropRenderer* OpenGLrenderer = dynamic_cast<mitk::VtkPropRenderer*>( renderer );
-    if(OpenGLrenderer)
-      OpenGLrenderer->WriteSimpleText(name, firstPoint[0]+5, firstPoint[1]+5);
+    mitk::VtkPropRenderer* openGLrenderer = dynamic_cast<mitk::VtkPropRenderer*>( renderer );
+    if ( openGLrenderer )
+    {
+      openGLrenderer->WriteSimpleText(name, firstPoint[0] + 5.0, firstPoint[1] + 5.0);
+      
+      // If drawing is successful, add approximate height to annotation offset
+      annotationOffset -= 15.0;
+    }
   }
+
+  // draw feature quantities (if requested) new the first point
+  if ( drawQuantities )
+  {
+    std::stringstream quantityString;
+    quantityString.setf( ios::fixed, ios::floatfield );
+    quantityString.precision( 1 );
+
+    for ( unsigned int i = 0; i < planarFigure->GetNumberOfFeatures(); ++i )
+    {
+      if ( i != 0 ) 
+      {
+        quantityString << " / ";
+      }
+      quantityString << planarFigure->GetQuantity( i ) << " ";
+      quantityString << planarFigure->GetFeatureUnit( i );
+    }
+
+    mitk::VtkPropRenderer* openGLrenderer = dynamic_cast<mitk::VtkPropRenderer*>( renderer );
+    if ( openGLrenderer )
+    {
+      openGLrenderer->WriteSimpleText(quantityString.str().c_str(), firstPoint[0] + 5.0, firstPoint[1] + 5.0 + annotationOffset);
+
+      // If drawing is successful, add approximate height to annotation offset
+      annotationOffset -= 15.0;
+    }
+  }
+
 
   // Draw helper objects
   for(unsigned int loop = 0; loop < planarFigure->GetHelperPolyLinesSize(); ++loop)

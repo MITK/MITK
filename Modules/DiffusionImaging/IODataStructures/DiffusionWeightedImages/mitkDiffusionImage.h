@@ -35,7 +35,7 @@ namespace mitk
   {
 
   public:
-
+    typedef TPixelType PixelType;
     typedef typename itk::VectorImage<TPixelType, 3> 
                                                 ImageType;
     typedef vnl_vector_fixed< double, 3 >       GradientDirectionType;

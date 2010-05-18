@@ -86,7 +86,7 @@ static void TestPlanarPolygonPlacement( mitk::PlanarPolygon::Pointer planarPolyg
   double length1 = 50.0 * 50.0 ; // area
   MITK_TEST_CONDITION( fabs( planarPolygon->GetQuantity( 1 ) - length1) < mitk::eps, "Size of short axis diameter" );
 }
-
+};
 /**
  * mitkplanarPolygonTest tests the methods and behavior of mitk::PlanarPolygon with sub-tests:
  *
@@ -114,5 +114,5 @@ int mitkPlanarPolygonTest(int /* argc */, char* /*argv*/[])
   mitkPlanarPolygonTestClass::TestPlanarPolygonPlacement( planarPolygon );
 
   // always end with this!
-  MITK_TEST_END()
-}
+  MITK_TEST_END();
+} 

@@ -281,16 +281,21 @@ void mitk::SurfaceMapper2D::Paint(mitk::BaseRenderer * renderer)
 
     //set data into cutter
     m_Cutter->SetInput(vtkpolydata);
+    m_Cutter->Update();
     //    m_Cutter->GenerateCutScalarsOff();
     //    m_Cutter->SetSortByToSortByCell();
 
-    m_Stripper->SetInput( m_Cutter->GetOutput() );
-    // calculate the cut
-    m_Stripper->Update();
-
-    // traverse the cut contour
-    PaintCells(renderer, m_Stripper->GetOutput(), worldGeometry, renderer->GetDisplayGeometry(), vtktransform, lut, vtkpolydata);
-
+    if (m_DrawNormals)
+    {
+      m_Stripper->SetInput( m_Cutter->GetOutput() );
+      // calculate the cut
+      m_Stripper->Update();
+      PaintCells(renderer, m_Stripper->GetOutput(), worldGeometry, renderer->GetDisplayGeometry(), vtktransform, lut, vtkpolydata);
+    }
+    else
+    {
+      PaintCells(renderer, m_Cutter->GetOutput(), worldGeometry, renderer->GetDisplayGeometry(), vtktransform, lut, vtkpolydata);
+    }
   }
 }
 

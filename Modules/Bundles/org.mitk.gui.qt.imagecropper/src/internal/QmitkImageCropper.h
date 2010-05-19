@@ -62,6 +62,7 @@ class QmitkImageCropper : public QObject, public QmitkFunctionality, public mitk
     public: opExchangeNodes( mitk::OperationType type,  mitk::DataNode* node,
                                                         mitk::BaseData* oldData,
                                                         mitk::BaseData* newData );
+            ~opExchangeNodes();
             mitk::DataNode* GetNode() { return m_Node; }
             mitk::BaseData* GetOldData() { return m_OldData; }
             mitk::BaseData* GetNewData() { return m_NewData; }

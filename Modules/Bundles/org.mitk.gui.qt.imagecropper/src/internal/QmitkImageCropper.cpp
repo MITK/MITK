@@ -48,8 +48,7 @@ QmitkImageCropper::opExchangeNodes::opExchangeNodes( mitk::OperationType type, m
 m_NewDataDeletedObserverTag(0)
 {
     // listen to the node the image is hold
-    itk::MemberCommand<opExchangeNodes>::Pointer nodeDeletedCommand
-      = itk::MemberCommand<opExchangeNodes>::New();
+    itk::MemberCommand<opExchangeNodes>::Pointer nodeDeletedCommand = itk::MemberCommand<opExchangeNodes>::New();
     nodeDeletedCommand->SetCallbackFunction(this, &opExchangeNodes::NodeDeleted);
 
     m_NodeDeletedObserverTag = m_Node->AddObserver(itk::DeleteEvent(), nodeDeletedCommand);
@@ -57,11 +56,33 @@ m_NewDataDeletedObserverTag(0)
     m_NewDataDeletedObserverTag = m_NewData->AddObserver(itk::DeleteEvent(), nodeDeletedCommand);
 }
 
+// destructor for operation class
+QmitkImageCropper::opExchangeNodes::~opExchangeNodes()
+{
+  if (m_Node != NULL)
+  {
+    m_Node->RemoveObserver(m_NodeDeletedObserverTag);
+    m_Node=NULL;
+  }
+
+  if (m_OldData.IsNotNull())
+  {
+    m_OldData->RemoveObserver(m_OldDataDeletedObserverTag);
+    m_OldData=NULL;
+  }
+
+  if (m_NewData.IsNotNull())
+  {
+    m_NewData->RemoveObserver(m_NewDataDeletedObserverTag);
+    m_NewData=NULL;
+  }
+}
+
 void QmitkImageCropper::opExchangeNodes::NodeDeleted(const itk::Object *caller, const itk::EventObject &event)
 {
-  m_Node=NULL;
-  m_OldData=NULL;
-  m_NewData=NULL;
+  m_Node = NULL;
+  m_OldData = NULL;
+  m_NewData = NULL;
 }
 
 //!QmitkImageCropper::QmitkImageCropper(QObject *parent, const char *name, QmitkStdMultiWidget *mitkStdMultiWidget, mitk::DataTreeIteratorBase* it)
@@ -79,7 +100,7 @@ m_Controls(NULL)
 
 QmitkImageCropper::~QmitkImageCropper()
 {
-  // delete smart pointer objects
+  //delete smart pointer objects
   m_CroppingObjectNode = NULL;
   m_CroppingObject = NULL;
 }
@@ -326,7 +347,7 @@ void QmitkImageCropper::CropImage()
     resultImage = m_surrImage;
   }
 
-  RemoveBoundingObjectFromNode();
+  //RemoveBoundingObjectFromNode();
 
   {
     opExchangeNodes*  doOp   = new opExchangeNodes(OP_EXCHANGE, m_ImageNode.GetPointer(),

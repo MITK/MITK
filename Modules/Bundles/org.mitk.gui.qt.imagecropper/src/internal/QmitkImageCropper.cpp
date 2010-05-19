@@ -380,6 +380,8 @@ void QmitkImageCropper::AddSurrounding( itk::Image< TPixel, VImageDimension >* i
   region.SetIndex(start);
 
   extended->SetRegions(region);
+  extended->SetDirection(itkImage->GetDirection());
+  extended->SetOrigin(itkImage->GetOrigin());
   extended->Allocate();
 
   extended->SetSpacing(itkImage->GetSpacing());

@@ -64,16 +64,13 @@ PURPOSE.  See the above copyright notices for more information.
 #include "vtkOpenGLRenderer.h"
 
 template<class T, int N>
-vtkTransform* mitk::OdfVtkMapper2D<T,N>::m_OdfTransform
-= vtkTransform::New();
+vtkSmartPointer<vtkTransform> mitk::OdfVtkMapper2D<T,N>::m_OdfTransform = vtkSmartPointer<vtkTransform>::New();
 
 template<class T, int N>
-vtkDoubleArray* mitk::OdfVtkMapper2D<T,N>::m_OdfVals
-= vtkDoubleArray::New();
+vtkSmartPointer<vtkDoubleArray> mitk::OdfVtkMapper2D<T,N>::m_OdfVals = vtkSmartPointer<vtkDoubleArray>::New();
 
 template<class T, int N>
-vtkOdfSource* mitk::OdfVtkMapper2D<T,N>::m_OdfSource
-= vtkOdfSource::New();
+vtkSmartPointer<vtkOdfSource> mitk::OdfVtkMapper2D<T,N>::m_OdfSource = vtkSmartPointer<vtkOdfSource>::New();
 
 template<class T, int N>
 float mitk::OdfVtkMapper2D<T,N>::m_Scaling;

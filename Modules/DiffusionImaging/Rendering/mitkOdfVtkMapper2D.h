@@ -29,7 +29,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "vtkClipPolyData.h"
 #include "vtkTransform.h"
 #include "vtkDataArrayTemplate.h"
-
+#include "vtkSmartPointer.h"
 #include "vtkOdfSource.h"
 #include "vtkThickPlane.h"
 
@@ -116,9 +116,9 @@ namespace mitk {
     std::vector<vtkPolyDataMapper*> m_OdfsMappers;
     vtkPolyData* m_TemplateOdf;
 
-    static vtkTransform* m_OdfTransform;
-    static vtkDoubleArray* m_OdfVals;
-    static vtkOdfSource* m_OdfSource;
+    static vtkSmartPointer<vtkTransform> m_OdfTransform;
+    static vtkSmartPointer<vtkDoubleArray> m_OdfVals;
+    static vtkSmartPointer<vtkOdfSource> m_OdfSource;
     static float m_Scaling;
     static int m_Normalization;
     static int m_ScaleBy;

@@ -66,7 +66,7 @@ void QmitkSegmentationView::NewNodeObjectsGenerated(mitk::ToolManager::DataVecto
   }
 }
 
-void QmitkSegmentationView::Visible()
+void QmitkSegmentationView::Activated()
 {
   // should be moved to ::BecomesVisible() or similar
   if( m_Controls )
@@ -83,16 +83,18 @@ void QmitkSegmentationView::Visible()
   }
 }
 
-void QmitkSegmentationView::Hidden()
+void QmitkSegmentationView::Deactivated()
 {
   if( m_Controls )
   {
     mitk::RenderingManager::GetInstance()->RemoveObserver( m_RenderingManagerObserverTag );
 
     m_Controls->m_ManualToolSelectionBox->setEnabled( false );
+    //deactivate all tools
+    m_Controls->m_ManualToolSelectionBox->GetToolManager()->ActivateTool(-1);
     m_Controls->m_OrganToolSelectionBox->setEnabled( false );
     m_Controls->m_LesionToolSelectionBox->setEnabled( false );
-  
+
     m_Controls->m_SlicesInterpolator->EnableInterpolation( false );
   }
 }

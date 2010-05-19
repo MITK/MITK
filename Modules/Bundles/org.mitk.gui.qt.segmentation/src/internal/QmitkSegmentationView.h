@@ -50,9 +50,9 @@ class QmitkSegmentationView : public QObject, public QmitkFunctionality
     void NewNodesGenerated();
     void NewNodeObjectsGenerated(mitk::ToolManager::DataVectorType*);
 
-    // QmitkFunctionality's visibility changes
-    virtual void Visible();
-    virtual void Hidden();
+    // QmitkFunctionality's activate/deactivate
+    virtual void Activated();
+    virtual void Deactivated();    
 
     // QmitkFunctionality's changes regarding THE QmitkStdMultiWidget
     virtual void StdMultiWidgetAvailable(QmitkStdMultiWidget& stdMultiWidget);

@@ -25,6 +25,7 @@
 
 //unsigned int numberOfTestPointSets = 1;
 unsigned int numberOfTimeSeries = 5;
+
 // create one test PointSet
 class mitkPointSetFileIOTestClass
 {
@@ -95,16 +96,18 @@ public:
     try
     {
       m_SavedPointSet.clear();
-      mitk::PointSetWriter::Pointer pointSetWriter =
-          mitk::PointSetWriter::New();
 
+      mitk::PointSetWriter::Pointer pointSetWriter = mitk::PointSetWriter::New();
       pointSetWriter->SetFileName("test_pointset_new.mps");
+      
       for (unsigned int i = 0; i < numberOfPointSets; i++)
       {
         pointSetWriter->SetInput(i, CreateTestPointSet());
       }
+
       pointSetWriter->Write();
-    } catch (std::exception& e)
+    } 
+    catch (std::exception& e)
     {
       return false;
     }
@@ -142,15 +145,18 @@ public:
 int mitkPointSetFileIOTest(int, char*[])
 {
   MITK_TEST_BEGIN("PointSet");
-    unsigned int numberOfPointSets(5);
+  unsigned int numberOfPointSets(5);
 
-    mitkPointSetFileIOTestClass* test = new mitkPointSetFileIOTestClass();
+  mitkPointSetFileIOTestClass* test = new mitkPointSetFileIOTestClass();
 
-    // write
-    MITK_TEST_CONDITION(test->PointSetWrite(numberOfPointSets), "Testing if the PointSetWriter writes Data" );
+  // write
+  MITK_TEST_CONDITION(test->PointSetWrite(numberOfPointSets), "Testing if the PointSetWriter writes Data" );
 
-    // load - compare
-    //test->PointSetLoadAndCompareTest(numberOfPointSets);
+  // load - compare
+  test->PointSetLoadAndCompareTest(numberOfPointSets);
+  
+  //Delete correctly
+  delete test;
 
   MITK_TEST_END();
 }

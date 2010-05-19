@@ -70,7 +70,11 @@ QmitkSegmentationPostProcessing::QmitkSegmentationPostProcessing(mitk::DataStora
 
     m_StatisticsAction = new QAction("Statistics", parent);
     binaryImageDataNodeDescriptor->AddAction(m_StatisticsAction);
-    connect( m_StatisticsAction, SIGNAL( triggered(bool) ) , this, SLOT( ImageStatistics(bool) ) );
+    berry::IBundle::Pointer imageStatisticsBundle = berry::Platform::GetBundle("org.mitk.gui.qt.imagestatistics");
+    if(imageStatisticsBundle.IsNotNull())
+      connect( m_StatisticsAction, SIGNAL( triggered(bool) ) , this, SLOT( ImageStatistics(bool) ) );
+    else
+      m_StatisticsAction->setEnabled( false );
    
     m_AutocropAction = new QAction("Autocrop", parent);
     binaryImageDataNodeDescriptor->AddAction(m_AutocropAction);

@@ -116,6 +116,8 @@ protected:
   /** \brief Computes an Intensity Profile along line and updates the histogram widget with it. */
   void ComputeIntensityProfile( mitk::PlanarLine* line );
 
+  void Visible( );
+
 
 
   typedef std::map< mitk::Image *, mitk::ImageStatisticsCalculator::Pointer >

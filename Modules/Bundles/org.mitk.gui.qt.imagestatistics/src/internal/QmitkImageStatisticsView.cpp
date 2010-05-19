@@ -645,3 +645,8 @@ bool QmitkImageStatistics::IsExclusiveFunctionality() const
 {
   return false;
 }
+
+void QmitkImageStatistics::Visible()
+{
+  this->OnSelectionChanged( this->GetDataManagerSelection() );
+}

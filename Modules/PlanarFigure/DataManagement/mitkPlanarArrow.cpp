@@ -23,7 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 mitk::PlanarArrow::PlanarArrow()
 : FEATURE_ID_LENGTH( this->AddFeature( "Length", "mm" ) )
 {
-  // Line has two control points
+  // Directed arrow has two control points
   this->ResetNumberOfControlPoints( 2 );
 
   m_PolyLines->InsertElement( 0, VertexContainerType::New());

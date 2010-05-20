@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkPlanarAngle.h"
 #include "mitkPlanarCircle.h"
+#include "mitkPlanarArrow.h"
 #include "mitkPlanarCross.h"
 #include "mitkPlanarFourPointAngle.h"
 #include "mitkPlanarLine.h"
@@ -136,6 +137,10 @@ void mitk::PlanarFigureReader::GenerateData()
     else if (type == "PlanarRectangle")
     {
       planarFigure = mitk::PlanarRectangle::New();
+    }
+    else if (type == "PlanarArrow")
+    {
+      planarFigure = mitk::PlanarArrow::New();
     }
     else 
     {

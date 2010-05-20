@@ -8,6 +8,7 @@ SET(CPP_FILES
   DataManagement/mitkPlanarFigure.cpp
   DataManagement/mitkPlanarFourPointAngle.cpp
   DataManagement/mitkPlanarLine.cpp
+  DataManagement/mitkPlanarArrow.cpp
   DataManagement/mitkPlanarPolygon.cpp
   DataManagement/mitkPlanarRectangle.cpp
   DataManagement/mitkPlanarFigureControlPointStyleProperty.cpp

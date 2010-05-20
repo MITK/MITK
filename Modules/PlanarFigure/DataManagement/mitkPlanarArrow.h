@@ -16,8 +16,8 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 
-#ifndef _MITK_PLANAR_LINE_H_
-#define _MITK_PLANAR_LINE_H_
+#ifndef _MITK_PLANAR_ARROW_H_
+#define _MITK_PLANAR_ARROW_H_
 
 #include "mitkPlanarFigure.h"
 #include "PlanarFigureExports.h"
@@ -29,7 +29,7 @@ namespace mitk
 class Geometry2D;
 
 /**
- * \brief Implementation of PlanarFigure representing a line
+ * \brief Implementation of PlanarFigure representing an arrow
  * through two control points
  */
 class PlanarFigure_EXPORT PlanarArrow : public PlanarFigure
@@ -88,4 +88,4 @@ private:
 
 } // namespace mitk
 
-#endif //_MITK_PLANAR_LINE_H_
+#endif //_MITK_PLANAR_ARROW_H_

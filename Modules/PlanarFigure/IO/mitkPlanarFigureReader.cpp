@@ -20,10 +20,10 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkPlanarAngle.h"
 #include "mitkPlanarCircle.h"
+#include "mitkPlanarLine.h"
 #include "mitkPlanarArrow.h"
 #include "mitkPlanarCross.h"
 #include "mitkPlanarFourPointAngle.h"
-#include "mitkPlanarLine.h"
 #include "mitkPlanarPolygon.h"
 #include "mitkPlanarRectangle.h"
 #include "mitkPlaneGeometry.h"

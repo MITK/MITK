@@ -101,7 +101,7 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
 {
   m_Parent = parent;
   //# Preferences
-  berry::IPreferencesService::Pointer prefService 
+  berry::IPreferencesService::Pointer prefService
     = berry::Platform::GetServiceRegistry()
     .GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
 
@@ -138,7 +138,7 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   this->GetSite()->SetSelectionProvider(m_SelectionProvider);
 
   // # Actions
-  QmitkNodeDescriptor* unknownDataNodeDescriptor = 
+  QmitkNodeDescriptor* unknownDataNodeDescriptor =
     QmitkNodeDescriptorManager::GetInstance()->GetUnknownDataNodeDescriptor();
 
   QmitkNodeDescriptor* imageDataNodeDescriptor =
@@ -224,21 +224,21 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
     , this, SLOT( SurfaceRepresentationMenuAboutToShow() ) );
   surfaceDataNodeDescriptor->AddAction(m_SurfaceRepresentation, false);
 
-  m_ShowOnlySelectedNodes 
+  m_ShowOnlySelectedNodes
     = new QAction(QIcon(":/org.mitk.gui.qt.datamanager/ShowSelectedNode_48.png")
     , "Show only selected nodes", this);
   QObject::connect( m_ShowOnlySelectedNodes, SIGNAL( triggered(bool) )
     , this, SLOT( ShowOnlySelectedNodes(bool) ) );
   unknownDataNodeDescriptor->AddAction(m_ShowOnlySelectedNodes);
 
-  m_ToggleSelectedVisibility 
+  m_ToggleSelectedVisibility
     = new QAction(QIcon(":/org.mitk.gui.qt.datamanager/InvertShowSelectedNode_48.png")
     , "Toggle visibility", this);
   QObject::connect( m_ToggleSelectedVisibility, SIGNAL( triggered(bool) )
     , this, SLOT( ToggleVisibilityOfSelectedNodes(bool) ) );
   unknownDataNodeDescriptor->AddAction(m_ToggleSelectedVisibility);
 
-  m_ActionShowInfoDialog 
+  m_ActionShowInfoDialog
     = new QAction(QIcon(":/org.mitk.gui.qt.datamanager/ShowDataInfo_48.png")
     , "Details...", this);
   QObject::connect( m_ActionShowInfoDialog, SIGNAL( triggered(bool) )
@@ -492,6 +492,7 @@ void QmitkDataManagerView::SaveSelectedNodes( bool )
 
 void QmitkDataManagerView::ReinitSelectedNodes( bool )
 {
+  this->ReinitMultiWidgetEditor();
   std::vector<mitk::DataNode*> selectedNodes = this->GetSelectedNodes();
 
   mitk::DataNode* node = 0;
@@ -650,8 +651,9 @@ void QmitkDataManagerView::FileOpen( const char * fileName, mitk::DataNode* pare
 
 void QmitkDataManagerView::GlobalReinit( bool )
 {
+  this->ReinitMultiWidgetEditor();
   // get all nodes that have not set "includeInBoundingBox" to false
-  mitk::NodePredicateNOT::Pointer pred 
+  mitk::NodePredicateNOT::Pointer pred
     = mitk::NodePredicateNOT::New(mitk::NodePredicateProperty::New("includeInBoundingBox"
     , mitk::BoolProperty::New(false)));
 
@@ -685,7 +687,7 @@ void QmitkDataManagerView::SelectionChanged( berry::IWorkbenchPart::Pointer part
 {
   if(part.GetPointer() == this)
     return;
-  mitk::DataNodeSelection::ConstPointer _DataNodeSelection 
+  mitk::DataNodeSelection::ConstPointer _DataNodeSelection
     = selection.Cast<const mitk::DataNodeSelection>();
 
   if(_DataNodeSelection.IsNull())
@@ -803,4 +805,26 @@ void QmitkDataManagerView::NodeSelectionChanged( const QItemSelection & selected
   }
 
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
+void QmitkDataManagerView::ReinitMultiWidgetEditor()
+{
+  berry::IEditorPart::Pointer editor =
+    this->GetSite()->GetPage()->GetActiveEditor();
+
+  if (editor.Cast<QmitkStdMultiWidgetEditor>().IsNull())
+  {
+    mitk::IDataStorageService::Pointer service =
+      berry::Platform::GetServiceRegistry().GetServiceById<mitk::IDataStorageService>(mitk::IDataStorageService::ID);
+
+    mitk::IDataStorageReference::Pointer DataStorageReference;
+    if (service.IsNotNull())
+    {
+      DataStorageReference = service->GetDefaultDataStorage();
+    }
+    mitk::DataStorageEditorInput::Pointer editorInput;
+    editorInput = new mitk::DataStorageEditorInput(DataStorageReference);
+    // open a new multi-widget editor, but do not give it the focus
+    berry::IEditorPart::Pointer editor = this->GetSite()->GetPage()->OpenEditor(editorInput, QmitkStdMultiWidgetEditor::EDITOR_ID, false);
+  }
 }

@@ -243,6 +243,9 @@ protected:
   /// berry::SelectionChangedAdapter<QmitkPropertyListView> must be a friend to call
   friend struct berry::SelectionChangedAdapter<QmitkDataManagerView>;
 
+private:
+  /// Reopen multi widget editor if it has been closed
+  void ReinitMultiWidgetEditor();
 };
 
 #endif /*QMITKDATAMANAGERVIEW_H_*/

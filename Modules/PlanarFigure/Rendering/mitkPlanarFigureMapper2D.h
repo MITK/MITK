@@ -69,7 +69,11 @@ class Contour;
  *     <li> "control point width"
  *   </ul>
  * </ul>
- * 
+ *
+ * Futher properties that determine rendering:
+ * <li> <b>selected<b> BoolProperty: if true we use a special color instead of the usual one
+ * <li> <b>draw quantities<b> BoolProperty: if true, measured quantities of the planar figure (e.g. diameters) are drawn as text
+ *
  * \ingroup Mapper
  */
 class PlanarFigure_EXPORT PlanarFigureMapper2D : public GLMapper2D

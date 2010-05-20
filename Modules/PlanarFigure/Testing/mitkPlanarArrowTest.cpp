@@ -54,8 +54,7 @@ static void TestPlanarArrowPlacement( mitk::PlanarArrow::Pointer PlanarArrow )
   // Get polylines and check if the generated coordinates are OK
   const mitk::Point2D& pp0 = polyLine0->ElementAt( 0 );
   const mitk::Point2D& pp1 = polyLine0->ElementAt( 1 );
-  MITK_TEST_CONDITION( ((pp0 == p0) && (pp1 == p1))
-    || ((pp0 == p1) && (pp1 == p0)), "Correct polyline 1" );
+  MITK_TEST_CONDITION( (pp0 == p0) && (pp1 == p1), "Correct polyline 1" );
 
     
   // Test for number of measurement features

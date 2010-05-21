@@ -65,6 +65,8 @@ void QmitkNDIConfigurationWidget::CreateQtPartControl(QWidget *parent)
     m_Delegate->SetTypes(QStringList());
     m_Controls->m_ToolTable->setItemDelegate(m_Delegate);
     this->CreateConnections();
+    this->HidePolarisOptionsGroupbox(true);
+    this->HideAuroraOptionsGroupbox(true);
   }
 }
 
@@ -92,6 +94,18 @@ void QmitkNDIConfigurationWidget::OnConnect()
   bool okay = m_Tracker->OpenConnection();
   if (okay)
   {
+    // show/hide options according to connected device
+    if(m_Tracker->GetType() == mitk::NDIPolaris)
+    {
+      this->HideAuroraOptionsGroupbox(true);
+      this->HidePolarisOptionsGroupbox(false);
+    }
+    else if(m_Tracker->GetType() == mitk::NDIAurora)
+    {
+      this->HidePolarisOptionsGroupbox(true);
+      this->HideAuroraOptionsGroupbox(false);
+    }
+
     this->UpdateWidgets();
     this->UpdateToolTable();
     emit ToolsAdded(this->GetToolNamesList());
@@ -117,6 +131,9 @@ void QmitkNDIConfigurationWidget::OnDisconnect()
   this->UpdateWidgets();
   emit ToolsAdded(this->GetToolNamesList());
   emit Disconnected();
+
+  this->HidePolarisOptionsGroupbox(true);
+  this->HideAuroraOptionsGroupbox(true);
 }
 
 
@@ -126,6 +143,8 @@ void QmitkNDIConfigurationWidget::UpdateWidgets()
   if (m_Tracker.IsNull())  // not connected to tracker
   {
     m_Controls->m_Connect->setText("Connect");
+    m_Controls->m_lConnection->setText("III. Enable connection to  device  ");
+
     disconnect(m_Controls->m_Connect, SIGNAL(clicked()), this, SLOT(OnDisconnect()));
     connect(m_Controls->m_Connect, SIGNAL(clicked()), this, SLOT(OnConnect()));
     m_Controls->m_DiscoverToolsBtn->setDisabled(true);
@@ -136,6 +155,7 @@ void QmitkNDIConfigurationWidget::UpdateWidgets()
   if (m_Tracker->GetState() == mitk::TrackingDevice::Setup)
   {
     m_Controls->m_Connect->setText("Connect");
+    m_Controls->m_lConnection->setText("III. Enable connection to  device  ");
     disconnect(m_Controls->m_Connect, SIGNAL(clicked()), this, SLOT(OnDisconnect()));
     connect(m_Controls->m_Connect, SIGNAL(clicked()), this, SLOT(OnConnect()));
     m_Controls->m_DiscoverToolsBtn->setDisabled(true);
@@ -145,6 +165,7 @@ void QmitkNDIConfigurationWidget::UpdateWidgets()
   if ((m_Tracker->GetState() == mitk::TrackingDevice::Ready) || (m_Tracker->GetState() == mitk::TrackingDevice::Tracking))
   {
     m_Controls->m_Connect->setText("Disconnect");
+    m_Controls->m_lConnection->setText("III. Disable connection to  device ");
     disconnect(m_Controls->m_Connect, SIGNAL(clicked()), this, SLOT(OnConnect()));
     connect(m_Controls->m_Connect, SIGNAL(clicked()), this, SLOT(OnDisconnect()));
     m_Controls->m_DiscoverToolsBtn->setEnabled(true);
@@ -496,20 +517,12 @@ mitk::DataNode* QmitkNDIConfigurationWidget::GetNode( unsigned int index ) const
   return data.value<mitk::DataNode*>();
 }
 
-
-void QmitkNDIConfigurationWidget::HideDiscoverDeviceButton( bool on )
+void QmitkNDIConfigurationWidget::HidePolarisOptionsGroupbox( bool on )
 {
-  m_Controls->m_DisoverDevicesBtn->setHidden(on);
+  m_Controls->m_gbPolarisOptions->setHidden(on);
 }
 
-
-void QmitkNDIConfigurationWidget::HideDiscoverWiredToolseButton( bool on )
+void QmitkNDIConfigurationWidget::HideAuroraOptionsGroupbox( bool on )
 {
-  m_Controls->m_DiscoverToolsBtn->setHidden(on);
-}
-
-
-void QmitkNDIConfigurationWidget::HideAddPassiveToolButton( bool on )
-{
-  m_Controls->m_AddToolBtn->setHidden(on);
+  m_Controls->m_gbAuroraOptions->setHidden(on);
 }

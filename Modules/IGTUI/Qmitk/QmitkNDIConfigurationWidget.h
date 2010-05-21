@@ -57,9 +57,6 @@ public:
   void SetPredicate(mitk::NodePredicateBase::Pointer p); ///< set predicate for organ node editor
   void SetTagPropertyName(const std::string& name);      ///< set name of the property that is used to tag selected nodes
   void SetTagProperty(mitk::BaseProperty::Pointer prop);   ///< set the property that is used to tag selected nodes
-  void HideDiscoverDeviceButton(bool on); ///< show or hide w "Discover Device" button in the UI
-  void HideDiscoverWiredToolseButton(bool on); ///< show or hide "Discover wired tools" button in the UI
-  void HideAddPassiveToolButton(bool on); ///< show or hide "add passive tool" radio button in the UI
 
   const QString GetToolType(unsigned int index) const;
   const QString GetToolName(unsigned int index) const;
@@ -104,7 +101,9 @@ protected:
   void UpdateToolTable(); ///< read all tools from the tracking device object and display them in the gui
   virtual void CreateQtPartControl(QWidget *parent);
   virtual void CreateConnections(); ///< \brief Creation of the connections of main and control widget  
- 
+  void HidePolarisOptionsGroupbox( bool on ); ///< show or hide polaris options in the UI
+  void HideAuroraOptionsGroupbox( bool on ); ///< show or hide aurora options in the UI
+
   Ui::QmitkNDIConfigurationWidget* m_Controls;  ///< gui widgets
   mitk::NDITrackingDevice::Pointer m_Tracker;   ///< tracking device object
   mitk::TrackingDeviceSource::Pointer m_Source;

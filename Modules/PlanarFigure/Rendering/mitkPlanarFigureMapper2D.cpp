@@ -190,6 +190,15 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
       controlPointShape = styleProperty->GetShape();
     }
   }
+
+  if (isSelected)
+  {
+    for (unsigned char i = 0; i < 3; ++i)
+    {
+      lineColor[i] = selectedLineColor[i];
+    }
+    lineOpacity = selectedLineOpacity;
+  }
  
   mitk::Point2D firstPoint; firstPoint[0] = 0; firstPoint[1] = 1;
 
@@ -214,15 +223,7 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
   for(unsigned short loop = 0; loop < planarFigure->GetPolyLinesSize(); ++loop)
   {
     const VertexContainerType *polyLine = planarFigure->GetPolyLine(loop);
-    if ( isSelected )
-    {
-      // paint just the line in selectedColor
-      PaintPolyLine(polyLine, planarFigure->IsClosed(), selectedLineColor, selectedLineOpacity, lineWidth, firstPoint, planarFigureGeometry2D, rendererGeometry2D, displayGeometry);
-    }
-    else
-    {
-      PaintPolyLine(polyLine, planarFigure->IsClosed(),    lineColor,    lineOpacity,  lineWidth, firstPoint, planarFigureGeometry2D, rendererGeometry2D, displayGeometry);
-    }
+    PaintPolyLine(polyLine, planarFigure->IsClosed(),    lineColor,    lineOpacity,  lineWidth, firstPoint, planarFigureGeometry2D, rendererGeometry2D, displayGeometry);
   }
 
   double annotationOffset = 0.0;
@@ -234,7 +235,8 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
     mitk::VtkPropRenderer* openGLrenderer = dynamic_cast<mitk::VtkPropRenderer*>( renderer );
     if ( openGLrenderer )
     {
-      openGLrenderer->WriteSimpleText(name, firstPoint[0] + 5.0, firstPoint[1] + 5.0);
+      if ( isSelected )
+      openGLrenderer->WriteSimpleText(name, firstPoint[0] + 5.0, firstPoint[1] + 5.0, lineColor[0], lineColor[1], lineColor[2] );
       
       // If drawing is successful, add approximate height to annotation offset
       annotationOffset -= 15.0;
@@ -261,7 +263,7 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
     mitk::VtkPropRenderer* openGLrenderer = dynamic_cast<mitk::VtkPropRenderer*>( renderer );
     if ( openGLrenderer )
     {
-      openGLrenderer->WriteSimpleText(quantityString.str().c_str(), firstPoint[0] + 5.0, firstPoint[1] + 5.0 + annotationOffset);
+      openGLrenderer->WriteSimpleText(quantityString.str().c_str(), firstPoint[0] + 5.0, firstPoint[1] + 5.0 + annotationOffset, lineColor[0], lineColor[1], lineColor[2] );
 
       // If drawing is successful, add approximate height to annotation offset
       annotationOffset -= 15.0;

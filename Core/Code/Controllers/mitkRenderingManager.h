@@ -255,13 +255,47 @@ public:
   /** returns sets or adds (if not present) a property in m_PropertyList  */
   void SetProperty(const char *propertyKey, BaseProperty* propertyValue);
 
-
+  /**
+  * \brief Setter / Getter for internal DataStorage
+  *
+  * Sets / returns the mitk::DataStorage that is used internally. This instance holds all mitk::DataNodes that are 
+  * rendered by the registered BaseRenderers. 
+  *
+  * If this DataStorage is changed at runtime by calling SetDataStorage(),
+  * all currently registered BaseRenderers are automatically given the correct instance. 
+  * When a new BaseRenderer is added, it is automatically initialized with the currently active DataStorage.
+  */
   void SetDataStorage( mitk::DataStorage* storage );
 
+  /**
+  * \brief Setter / Getter for internal DataStorage
+  *
+  * Sets / returns the mitk::DataStorage that is used internally. This instance holds all mitk::DataNodes that are 
+  * rendered by the registered BaseRenderers. 
+  *
+  * If this DataStorage is changed at runtime by calling SetDataStorage(),
+  * all currently registered BaseRenderers are automatically given the correct instance. 
+  * When a new BaseRenderer is added, it is automatically initialized with the currently active DataStorage.
+  */
   mitk::DataStorage* GetDataStorage();
 
+
+  /** 
+  * \brief Setter / Getter for internal GloabInteraction
+  *
+  * Sets / returns the instance of mitk::GlobalInteraction that is internally held.
+  * It'S not actually used by this class but offers it to all registered BaseRenderers.
+  * These need it for their own internal initialization of the FocusManager and the corresponding EventMappers.
+  */
   void SetGlobalInteraction( mitk::GlobalInteraction* globalInteraction );
 
+  /** 
+  * \brief Setter / Getter for internal GloabInteraction
+  *
+  * Sets / returns the instance of mitk::GlobalInteraction that is internally held.
+  * It'S not actually used by this class but offers it to all registered BaseRenderers.
+  * These need it for their own internal initialization of the FocusManager and the corresponding EventMappers.
+  */
   mitk::GlobalInteraction* GetGlobalInteraction();
 
 

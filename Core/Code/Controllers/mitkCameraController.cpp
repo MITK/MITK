@@ -159,5 +159,7 @@ void mitk::CameraController::SetStandardView( mitk::CameraController::StandardVi
     break;
   }
   vtkRenderer->ResetCameraClippingRange();
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+
+  mitk::RenderingManager* rm = m_Renderer->GetRenderingManager();
+  rm->RequestUpdateAll();
 }

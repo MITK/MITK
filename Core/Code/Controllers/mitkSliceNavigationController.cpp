@@ -54,6 +54,7 @@ SliceNavigationController::SliceNavigationController( const char *type )
   m_CreatedWorldGeometry( NULL ), 
   m_ViewDirection( Transversal ),
   m_DefaultViewDirection( Transversal ),
+  m_RenderingManager( NULL ),
   m_Renderer( NULL ),
   m_Top( false ),
   m_FrontSide( false ),
@@ -115,9 +116,19 @@ RenderingManager *
 SliceNavigationController::GetRenderingManager() const
 {
   mitk::RenderingManager* renderingManager = m_RenderingManager.GetPointer();
-  if(renderingManager == NULL)
-    return mitk::RenderingManager::GetInstance();
-  return renderingManager;
+
+  if (renderingManager != NULL)
+    return renderingManager;
+
+  if ( m_Renderer != NULL )
+  {
+    renderingManager = m_Renderer->GetRenderingManager();
+
+    if (renderingManager != NULL)
+      return renderingManager;
+  }
+
+  return mitk::RenderingManager::GetInstance();
 }
 
 

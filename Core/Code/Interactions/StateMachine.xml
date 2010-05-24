@@ -3380,6 +3380,18 @@
       <transition NAME="name" EVENT_ID="1003" NEXT_STATE_ID="45" />
     </state>
   </stateMachine>
+  <stateMachine NAME="ToolCallbackInteraction">
+    <state NAME="neutral" ID="0" START_STATE="TRUE" X_POS="288" Y_POS="81" WIDTH="100" HEIGHT="50">
+      <transition NAME="initmove" NEXT_STATE_ID="1" EVENT_ID="1">
+        <action ID="9" />
+      </transition>
+    </state>
+    <state NAME="InInteraction" ID="1" X_POS="288" Y_POS="81" WIDTH="100" HEIGHT="50">
+      <transition NAME="finishmove" NEXT_STATE_ID="0" EVENT_ID="1">
+        <action ID="43" />
+      </transition>
+    </state>
+  </stateMachine>
 </mitkInteraktionStates>
 <!-- DOCUMENTATION -->
 <!-- This is StateMachine.xml. Includes Information about different StateMachines and Events. Used by EventMapper and StateMachineFactory -->

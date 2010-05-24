@@ -734,7 +734,7 @@ unsigned int mitk::BaseRenderer::GetNumberOfVisibleLODEnabledMappers() const
 }
 
 
-mitk::RenderingManager* mitk::BaseRenderer::GetRenderingManager()
+mitk::RenderingManager* mitk::BaseRenderer::GetRenderingManager() const
 {
   return m_RenderingManager.GetPointer();
 }

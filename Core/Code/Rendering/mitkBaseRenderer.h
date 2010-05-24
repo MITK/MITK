@@ -398,7 +398,7 @@ public:
   /**
   * \brief Getter for the RenderingManager that handles this instance of BaseRenderer
   */
-  mitk::RenderingManager* GetRenderingManager();
+  virtual mitk::RenderingManager* GetRenderingManager() const;
 
 
 protected:

@@ -139,10 +139,14 @@ int mitkPropertyListTest(int /*argc*/, char* /*argv*/[])
   mitk::BoolProperty::Pointer gpvTest = mitk::BoolProperty::New(true);
   propList->SetProperty("gpvBool", gpvTest);
   bool b = false;
-  if ((propList->GetPropertyValue<bool>("gpvBool", b) == true) && (b == gpvTest->GetValue()))
+  bool getPropertyValueReturnValue = propList->GetPropertyValue<bool>("gpvBool", b);
+  if ((getPropertyValueReturnValue == true) && (b == gpvTest->GetValue()))
     std::cout << "[PASSED]" << std::endl;
   else
   {
+    std::cout << "Oh, not goot:" 
+                 "\nWe called propList->GetPropertyValue<bool>('gpvBool', b) and it returned " << getPropertyValueReturnValue <<
+                 "\nThen we compared b [" << b << "] and gpvTest->GetValue() [" << gpvTest->GetValue() << "]" << std::endl;
     std::cout << "[FAILED]" << std::endl;
     return EXIT_FAILURE;
   }

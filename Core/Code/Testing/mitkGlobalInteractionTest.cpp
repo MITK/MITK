@@ -19,6 +19,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkGlobalInteraction.h>
 #include <mitkPointSetInteractor.h>
 
+#include "mitkTestingMacros.h"
+
 #include <fstream>
 int mitkGlobalInteractionTest(int /*argc*/, char* /*argv*/[])
 {
@@ -27,6 +29,14 @@ int mitkGlobalInteractionTest(int /*argc*/, char* /*argv*/[])
 
   // Initialize with default values
   globalInteraction->Initialize("global");
+
+  MITK_TEST_CONDITION_REQUIRED(globalInteraction.IsNotNull() ,"Testing 'instantiation' of 'global' static GlobalInteraction") 
+
+  mitk::GlobalInteraction::Pointer myGlobalInteraction = mitk::GlobalInteraction::New();
+  myGlobalInteraction->Initialize("global");
+  MITK_TEST_CONDITION_REQUIRED(myGlobalInteraction.IsNotNull() ,"Testing 'instantiation' of 'local' new GlobalInteraction") 
+  MITK_TEST_CONDITION_REQUIRED(myGlobalInteraction != globalInteraction ,"Testing whether new instance equals the global satic one (must not be!)") 
+    
 
   //create Interactors
   mitk::PointSetInteractor::Pointer firstInteractor = mitk::PointSetInteractor::New("pointsetinteractor", NULL, 1);

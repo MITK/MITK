@@ -17,6 +17,10 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkRenderingManager.h"
 #include "mitkProperties.h"
+#include "mitkGlobalInteraction.h"
+#include "mitkVtkPropRenderer.h"
+#include "mitkStandaloneDataStorage.h"
+#include "vtkRenderWindow.h"
 
 #include "mitkTestingMacros.h"
 
@@ -60,11 +64,38 @@ int mitkRenderingManagerTest(int /* argc */, char* /*argv*/[])
   // always start with this!
   MITK_TEST_BEGIN("RenderingManager")
 
+  mitk::RenderingManager::Pointer globalRenderingManager = mitk::RenderingManager::GetInstance();
+
+  MITK_TEST_CONDITION_REQUIRED(globalRenderingManager.IsNotNull(),"Testing instantiation of global static instance")
+
 
   mitk::RenderingManager::Pointer myRenderingManager = mitk::RenderingManager::New();
 
-  MITK_TEST_CONDITION_REQUIRED(myRenderingManager.IsNotNull(),"Testing instantiation") 
+  MITK_TEST_CONDITION_REQUIRED(myRenderingManager.IsNotNull(),"Testing instantiation of second 'local' instance") 
 
+  MITK_TEST_CONDITION_REQUIRED(myRenderingManager != globalRenderingManager ,"Testing whether global instance equals new local instance (must not be!)") 
+
+
+  mitk::StandaloneDataStorage::Pointer ds = mitk::StandaloneDataStorage::New();
+  mitk::StandaloneDataStorage::Pointer ds2 = mitk::StandaloneDataStorage::New();
+  mitk::GlobalInteraction::Pointer gi = mitk::GlobalInteraction::New();
+  gi->Initialize("global");
+  
+  myRenderingManager->SetDataStorage(ds);
+  myRenderingManager->SetGlobalInteraction(gi);
+
+  vtkRenderWindow* vtkRenWin = vtkRenderWindow::New();
+  mitk::VtkPropRenderer::Pointer br = mitk::VtkPropRenderer::New("testingBR", vtkRenWin, myRenderingManager);
+
+  mitk::BaseRenderer::AddInstance(vtkRenWin,br);
+  myRenderingManager->AddRenderWindow(vtkRenWin);
+
+  MITK_TEST_CONDITION_REQUIRED(myRenderingManager->GetDataStorage() == ds,"Testing the setter and getter for internal DataStorage") 
+  MITK_TEST_CONDITION_REQUIRED(myRenderingManager->GetGlobalInteraction(),"Testing the setter and getter for internal GlobalInteraction") 
+
+  MITK_TEST_CONDITION_REQUIRED(br->GetDataStorage() == ds,"Testing if internal DataStorage has been set correctly for registered BaseRenderer") 
+  myRenderingManager->SetDataStorage(ds2);
+  MITK_TEST_CONDITION_REQUIRED(br->GetDataStorage() == ds2,"Testing if change of internal DataStorage has been forwarded correctly to registered BaseRenderer") 
 
   mitkRenderingManagerTestClass::TestPropertyList(myRenderingManager);
 

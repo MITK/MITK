@@ -21,6 +21,7 @@ mitk::NavigationTool::NavigationTool()
   {
     m_Type = mitk::NavigationTool::Unknown;
     m_Identifier = "None";
+    m_TrackingDeviceType = mitk::TrackingSystemNotSpecified;
   }
  
 mitk::NavigationTool::~NavigationTool()

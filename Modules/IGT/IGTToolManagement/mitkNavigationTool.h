@@ -26,7 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkCommon.h>
 #include <mitkDataNode.h>
 #include <mitkTrackingTool.h>
-#include "mitkTrackingTypes.h"
+#include <mitkTrackingTypes.h>
 #include <MitkIGTExports.h>
 
 namespace mitk {

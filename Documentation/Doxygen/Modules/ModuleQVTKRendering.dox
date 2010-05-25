@@ -62,6 +62,40 @@ A sequence diagramm, which illustrates the actions after calling the Render() fu
 \li A single QmitkRenderWindow update can be forced like this: mitk::RenderingManager::GetInstance()->ForceImmediateUpdate(m_MultiWidget->mitkWidget4->GetRenderWindow());
 \li Getting a BaseRenderer by the widget name can be done like this: mitk::BaseRenderer::GetByName("mitkWidget1"); 
 
+
+\subsection distinctRenderWindow Setting up a distinct Rendering-Pipeline
+
+It is sometimes desired to have one (or more) QmitkRenderWindows that are managed totally independent of the 'usual' renderwindows defined by the QmitkStdMultiWidget.
+This may include the data that is rendered as well as possible interactions. In order to achieve this, a set of objects is needed:
+
+\li mitk::RenderingManager   -> Manages the rendering
+\li mitk::DataStorage        -> Manages the data that is rendered
+\li mitk::GlobalInteraction  -> Manages all interaction
+\li QmitkRenderWindow        -> Actually visualizes the data
+
+The actual setup, respectively the connection, of these classes is rather simple:
+
+\code
+// create a new instance of mitk::RenderingManager
+mitk::RenderingManager::Pointer renderingManager = mitk::RenderingManager::New();
+
+// create new instances of DataStorage and GlobalInteraction
+mitk::DataStorage::Pointer dataStorage = mitk::DataStorage::New();
+mitk::GlobalInteraction::Pointer globalInteraction = mitk::GlobalInteraction::New();
+
+// add both to the RenderingManager
+renderingManager->SetDataStorage( dataStorage );
+renderingManager->SetGlobalInteraction( globalInteraction );
+
+// now create a new QmitkRenderWindow with this renderingManager as parameter
+QmitkRenderWindow* renderWindow = new QmitkRenderWindow( parent, "name", renderer, renderingManager );
+
+\endcode
+
+That is basically all you need to setup your own rendering pipeline.
+Obviously you have to add all data you want to render to your new DataStorage. If you want to interact with this renderwindow, you will also have
+to add additional Interactors/Listeners.
+
 Note:
 
 \li Dynamic casts of a mitk::BaseRenderer class to an OpenGLRenderer (or now, to an VtkPropRenderer) should be avoided. The "MITK Scene" vtkRenderer and the vtkRenderWindow as well, are

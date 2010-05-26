@@ -238,7 +238,8 @@ int mitkSceneIOTest(int /* argc */, char* /*argv*/[])
     SceneIOTestClass::FillStorage(storage);
 
     // attempt to save it
-    std::string  sceneFileName = Poco::Path::temp() + /*Poco::Path::separator() +*/ "scene.zip";
+    Poco::Path newname( Poco::TemporaryFile::tempName() );
+    std::string  sceneFileName = Poco::Path::temp() + /*Poco::Path::separator() +*/newname.getFileName() + ".zip";
     MITK_TEST_CONDITION_REQUIRED( sceneIO->SaveScene( storage->GetAll(), storage, sceneFileName), "Saving scene file '" << sceneFileName << "'");
 
     // test if no errors were reported
@@ -331,6 +332,6 @@ int mitkSceneIOTest(int /* argc */, char* /*argv*/[])
   
   }
 
-  MITK_TEST_END()
+  MITK_TEST_END();
 }
 

@@ -3307,7 +3307,7 @@
       <transition NAME="name" EVENT_ID="520" NEXT_STATE_ID="45">
         <action ID="90" />
       </transition>
-      <transition NAME="name" EVENT_ID="2" NEXT_STATE_ID="54">
+      <transition NAME="name" EVENT_ID="8" NEXT_STATE_ID="54">
         <action ID="33" />
       </transition>
       <transition NAME="name" EVENT_ID="530" NEXT_STATE_ID="57">
@@ -3387,8 +3387,7 @@
       </transition>
     </state>
     <state NAME="InInteraction" ID="1" X_POS="288" Y_POS="81" WIDTH="100" HEIGHT="50">
-      <transition NAME="finishmove" NEXT_STATE_ID="0" EVENT_ID="1">
-        <action ID="43" />
+      <transition NAME="finishmove" NEXT_STATE_ID="0" EVENT_ID="1003">
       </transition>
     </state>
   </stateMachine>

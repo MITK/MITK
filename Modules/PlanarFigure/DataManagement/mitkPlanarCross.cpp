@@ -197,7 +197,9 @@ mitk::Point2D mitk::PlanarCross::InternalApplyControlPointConstraints( unsigned 
   case 3:
     {
       // Constrain 4th control point so that with the 3rd control point it forms
-      // a line orthogonal to the first line
+      // a line orthogonal to the first line (constraint 1); the 4th control point
+      // must lie on the opposite side of the line defined by the first two control
+      // points than the 3rd control point (constraint 2)
       const Point2D& p1 = m_ControlPoints->ElementAt( 0 );
       const Point2D& p2 = m_ControlPoints->ElementAt( 1 );
       const Point2D& p3 = m_ControlPoints->ElementAt( 2 );
@@ -208,9 +210,26 @@ mitk::Point2D mitk::PlanarCross::InternalApplyControlPointConstraints( unsigned 
       n1.Normalize();
 
       Vector2D v1 = point - p3;
-      double dotProduct = n1 * v1;
+      double dotProduct1 = n1 * v1;
 
-      return point - n1 * dotProduct;
+      Point2D pointOnLine = point - n1 * dotProduct1;
+
+      // Project new point onto line [p1, p2]
+      Vector2D v2 = pointOnLine - p1;
+      double dotProduct2 = n1 * v2;
+
+      Point2D crossingPoint = p1 + n1 * dotProduct2;
+
+      // Determine whether the projected point on the line, or the crossing point should be
+      // used (according to the second constrained in the comment above)
+      if ( pointOnLine.SquaredEuclideanDistanceTo( p3 ) > crossingPoint.SquaredEuclideanDistanceTo( p3 ) )
+      {
+        return pointOnLine;
+      }
+      else
+      {
+        return crossingPoint;
+      }
     }
 
   default:

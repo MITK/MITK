@@ -39,6 +39,7 @@ class Geometry2D;
  * 
  * 1.) The lines must be orthogonal to each other
  * 2.) The second line must lie within the 2D area defined by the first line
+ * 3.) The two lines must intersect (at least with their boundaries)
  *
  * When placing the second line interactively, a graphical helper polyline is provided to the
  * user to indicate the position and orthogonal orientation of the line if it would be placed

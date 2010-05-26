@@ -225,6 +225,17 @@ static void TestPlanarCrossPlacementConstrained(mitk::PlanarCross::Pointer plana
   MITK_TEST_CONDITION( 
     (fabs(cp3[0] - 10.0) < mitk::eps)
     && (fabs(cp3[1] - 50.0) < mitk::eps), "Point4 placed and constrained correctly" );
+
+  // Move fourth control point (to a position which would result in two non-intersecting line
+  // without the constraint that lines have to intersect)
+  p3[0] = 40.0; p3[1] = 30.0;
+  planarCross->SetControlPoint( 3, p3 );
+
+  // Test if constrained point is on the projected intersection point of both lines (20.0/40.0)
+  cp3 = planarCross->GetControlPoint( 3 );
+  MITK_TEST_CONDITION( 
+    (fabs(cp3[0] - 20.0) < mitk::eps)
+    && (fabs(cp3[1] - 40.0) < mitk::eps), "Point4 placed and constrained correctly" );
 }
 
 

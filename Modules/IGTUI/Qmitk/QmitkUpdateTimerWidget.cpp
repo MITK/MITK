@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkUpdateTimerWidget.h"
 
 #include <QTimer>
-#include <Math.h>
+#include <math.h>
 
 
 static unsigned int DEFAULTUPDATEVALUE = 50; // default update value (in msec) for the timer

@@ -31,7 +31,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkPlaneGeometry.h"
 
 #include <Poco/Zip/ZipLocalFileHeader.h>
-
+#include "Poco/TemporaryFile.h"
 
 
 /** \brief Helper class for testing PlanarFigure reader and writer classes. */
@@ -328,7 +328,8 @@ int mitkPlanarFigureIOTest(int /* argc */, char* /*argv*/[])
 
 
   // Write PlanarFigure objects into temp file
-  std::string fileName = Poco::Path::temp() + "TestPlanarFigure.pf";
+  Poco::Path newname( Poco::TemporaryFile::tempName() );
+  std::string fileName = Poco::Path::temp() + newname.getFileName() + ".pf";
   PlanarFigureIOTestClass::SerializePlanarFigures( originalPlanarFigures, fileName );
 
 

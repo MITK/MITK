@@ -90,8 +90,8 @@ int mitkRenderingManagerTest(int /* argc */, char* /*argv*/[])
   mitk::BaseRenderer::AddInstance(vtkRenWin,br);
   myRenderingManager->AddRenderWindow(vtkRenWin);
 
-  MITK_TEST_CONDITION_REQUIRED(myRenderingManager->GetDataStorage() == ds,"Testing the setter and getter for internal DataStorage") 
-  MITK_TEST_CONDITION_REQUIRED(myRenderingManager->GetGlobalInteraction(),"Testing the setter and getter for internal GlobalInteraction") 
+  MITK_TEST_CONDITION_REQUIRED(myRenderingManager->GetDataStorage() == ds, "Testing the setter and getter for internal DataStorage") 
+  MITK_TEST_CONDITION_REQUIRED(myRenderingManager->GetGlobalInteraction() ==gi, "Testing the setter and getter for internal GlobalInteraction") 
 
   MITK_TEST_CONDITION_REQUIRED(br->GetDataStorage() == ds,"Testing if internal DataStorage has been set correctly for registered BaseRenderer") 
   myRenderingManager->SetDataStorage(ds2);

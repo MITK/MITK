@@ -183,6 +183,12 @@ RenderingManager
     callbacks.commands[1u] = progressCallbackCommand;
     callbacks.commands[2u] = endCallbackCommand;
     this->m_RenderWindowCallbacksList[renderWindow] = callbacks;
+
+    //Delete vtk variables correctly
+    startCallbackCommand->Delete();
+    progressCallbackCommand->Delete();
+    endCallbackCommand->Delete();
+
   }
 }
 
@@ -198,9 +204,6 @@ RenderingManager
     renderWindow->RemoveObserver(callbacks_it->second.commands[0u]);
     renderWindow->RemoveObserver(callbacks_it->second.commands[1u]);
     renderWindow->RemoveObserver(callbacks_it->second.commands[2u]);
-    callbacks_it->second.commands[0u]->Delete();
-    callbacks_it->second.commands[1u]->Delete();
-    callbacks_it->second.commands[2u]->Delete();
     this->m_RenderWindowCallbacksList.erase(callbacks_it);
 
     RenderWindowVector::iterator rw_it = std::find( m_AllRenderWindows.begin(), m_AllRenderWindows.end(), renderWindow );

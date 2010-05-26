@@ -99,10 +99,15 @@ int mitkRenderingManagerTest(int /* argc */, char* /*argv*/[])
 
   mitkRenderingManagerTestClass::TestPropertyList(myRenderingManager);
 
-
   // write your own tests here and use the macros from mitkTestingMacros.h !!!
   // do not write to std::cout and do not return from this function yourself!
-  
+
+  //Remove Render Window
+  myRenderingManager->RemoveRenderWindow(vtkRenWin);
+
+  //Delete vtk variable correctly
+  vtkRenWin->Delete();
+    
   // always end with this!
   MITK_TEST_END()
 }

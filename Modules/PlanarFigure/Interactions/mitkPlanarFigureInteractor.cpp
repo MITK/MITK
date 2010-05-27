@@ -341,6 +341,7 @@ bool mitk::PlanarFigureInteractor
         // InitializeEvent to notify application listeners
         planarFigure->Modified();
         planarFigure->DeselectControlPoint();
+        planarFigure->RemoveLastControlPoint();
         planarFigure->InvokeEvent( itk::InitializeEvent() );
         planarFigure->InvokeEvent( itk::EndEvent() );
         m_DataNode->Modified();

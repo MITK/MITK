@@ -90,6 +90,18 @@ void mitk::PlanarPolygon::SetClosed( bool closed )
 
 void mitk::PlanarPolygon::GeneratePolyLine()
 {
+  // if more elements are needed that have been reserved -> reserve
+  if ( m_PolyLines->ElementAt( 0 )->size() < this->GetNumberOfControlPoints() )
+  {
+    m_PolyLines->ElementAt( 0 )->Reserve( this->GetNumberOfControlPoints() );
+  }
+  // if more elements have been reserved/set before than are needed now -> clear vector
+  else if (m_PolyLines->ElementAt( 0 )->size() > this->GetNumberOfControlPoints())
+  {
+    m_PolyLines->ElementAt( 0 )->clear();
+  }
+
+
   // TODO: start polygon at specified initalize point...
   m_PolyLines->ElementAt( 0 )->Reserve( this->GetNumberOfControlPoints() );
   for ( unsigned int i = 0; i < this->GetNumberOfControlPoints(); ++i )

@@ -209,9 +209,12 @@ public:
   /** \brief Returns true if the planar figure is reset to "add points" mode
    * when a point is selected.
    *
-   * Default return falue is false. Subclasses can overwrite this method and
+   * Default return value is false. Subclasses can overwrite this method and
    * execute any reset / initialization statements required. */
   virtual bool ResetOnPointSelect();
+
+
+  virtual void RemoveLastControlPoint();
 
 
 protected:

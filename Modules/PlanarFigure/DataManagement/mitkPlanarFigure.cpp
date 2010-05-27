@@ -483,3 +483,10 @@ bool mitk::PlanarFigure::ResetOnPointSelect()
 {
   return false;
 }
+
+void mitk::PlanarFigure::RemoveLastControlPoint()
+{
+  m_ControlPoints->DeleteIndex( this->GetNumberOfControlPoints()-1 );
+  this->ResetNumberOfControlPoints( this->GetNumberOfControlPoints()-1 );
+  this->GeneratePolyLine();
+}

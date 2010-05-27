@@ -88,7 +88,7 @@ mitk::DataNode* mitk::DataStorage::GetNode(const NodePredicateBase* condition) c
 {
   if (condition == NULL)
     return NULL;
-  
+
   mitk::DataStorage::SetOfObjects::ConstPointer rs = this->GetSubset(condition);
   if (rs->Size() >= 1)
     return rs->GetElement(0);
@@ -123,7 +123,7 @@ void mitk::DataStorage::PrintSelf(std::ostream& os, itk::Indent indent) const
     std::string datatype;
     if (allIt.Value()->GetData() != NULL)
       datatype = allIt.Value()->GetData()->GetNameOfClass();
-    os << indent << " " << allIt.Value().GetPointer() << "<" << datatype << ">: " << name << std::endl;    
+    os << indent << " " << allIt.Value().GetPointer() << "<" << datatype << ">: " << name << std::endl;
     mitk::DataStorage::SetOfObjects::ConstPointer parents = this->GetSources(allIt.Value());
     if (parents->Size() > 0)
     {
@@ -146,11 +146,11 @@ void mitk::DataStorage::PrintSelf(std::ostream& os, itk::Indent indent) const
 
 
 mitk::DataStorage::SetOfObjects::ConstPointer mitk::DataStorage::FilterSetOfObjects(const SetOfObjects* set, const NodePredicateBase* condition) const
-{  
+{
   if (set == NULL)
     return NULL;
 
-  mitk::DataStorage::SetOfObjects::Pointer result = mitk::DataStorage::SetOfObjects::New();  
+  mitk::DataStorage::SetOfObjects::Pointer result = mitk::DataStorage::SetOfObjects::New();
   for (mitk::DataStorage::SetOfObjects::ConstIterator it = set->Begin(); it != set->End(); it++)
     if (condition == NULL || condition->CheckNode(it.Value()) == true) //alway copy the set, otherwise the iterator in mitk::DataStorage::Remove() will crash
       result->InsertElement(result->Size(), it.Value());
@@ -210,20 +210,23 @@ void mitk::DataStorage::AddListeners( const mitk::DataNode* _Node )
 {
   itk::MutexLockHolder<itk::SimpleFastMutexLock> locked(m_MutexOne);
   // node must not be 0 and must not be yet registered
-  if(_Node && m_NodeModifiedObserverTags.find(_Node) == m_NodeModifiedObserverTags.end())
+  if(_Node)
   {
+    mitk::DataNode* NonConstNode = const_cast<mitk::DataNode*>(_Node);
     itk::MemberCommand<mitk::DataStorage>::Pointer nodeModifiedCommand =
       itk::MemberCommand<mitk::DataStorage>::New();
-    nodeModifiedCommand->SetCallbackFunction(this, &mitk::DataStorage::OnNodeModifiedOrDeleted);
-    m_NodeModifiedObserverTags[_Node] 
-      = _Node->AddObserver(itk::ModifiedEvent(), nodeModifiedCommand);
+    nodeModifiedCommand->SetCallbackFunction(this
+                              , &mitk::DataStorage::OnNodeModifiedOrDeleted);
+    m_NodeModifiedObserverTags[NonConstNode]
+      = NonConstNode->AddObserver(itk::ModifiedEvent(), nodeModifiedCommand);
 
     // add itk delete listener on datastorage
     itk::MemberCommand<mitk::DataStorage>::Pointer deleteCommand =
       itk::MemberCommand<mitk::DataStorage>::New();
     deleteCommand->SetCallbackFunction(this, &mitk::DataStorage::OnNodeModifiedOrDeleted);
     // add observer
-    m_NodeDeleteObserverTags[_Node] = _Node->AddObserver(itk::DeleteEvent(), deleteCommand);
+    m_NodeDeleteObserverTags[NonConstNode]
+        = NonConstNode->AddObserver(itk::DeleteEvent(), deleteCommand);
   }
 }
 
@@ -232,13 +235,17 @@ void mitk::DataStorage::RemoveListeners( const mitk::DataNode* _Node )
 {
   itk::MutexLockHolder<itk::SimpleFastMutexLock> locked(m_MutexOne) ;
   // node must not be 0 and must be registered
-  if(_Node && m_NodeModifiedObserverTags.find(_Node) != m_NodeModifiedObserverTags.end())
+  if(_Node)
   {
     // const cast is bad! but sometimes it is necessary. removing an observer does not really
     // touch the internal state
     mitk::DataNode* NonConstNode = const_cast<mitk::DataNode*>(_Node);
-    NonConstNode->RemoveObserver(m_NodeModifiedObserverTags.find(_Node)->second);
-    NonConstNode->RemoveObserver(m_NodeDeleteObserverTags.find(_Node)->second);
+    NonConstNode->RemoveObserver(m_NodeModifiedObserverTags
+                                 .find(NonConstNode)->second);
+    NonConstNode->RemoveObserver(m_NodeDeleteObserverTags
+                                 .find(NonConstNode)->second);
+    m_NodeModifiedObserverTags.erase(NonConstNode);
+    m_NodeDeleteObserverTags.erase(NonConstNode);
   }
 }
 
@@ -270,14 +277,14 @@ mitk::TimeSlicedGeometry::Pointer mitk::DataStorage::ComputeBoundingGeometry3D( 
   for (SetOfObjects::ConstIterator it = input->Begin(); it != input->End(); ++it)
   {
     DataNode::Pointer node = it->Value();
-    if((node.IsNotNull()) && (node->GetData() != NULL) && 
-      (node->GetData()->IsEmpty()==false) && 
-      node->IsOn(boolPropertyKey, renderer) && 
+    if((node.IsNotNull()) && (node->GetData() != NULL) &&
+      (node->GetData()->IsEmpty()==false) &&
+      node->IsOn(boolPropertyKey, renderer) &&
       node->IsOn(boolPropertyKey2, renderer)
       )
     {
       const TimeSlicedGeometry* geometry = node->GetData()->GetUpdatedTimeSlicedGeometry();
-      if (geometry != NULL ) 
+      if (geometry != NULL )
       {
         // bounding box (only if non-zero)
         BoundingBox::BoundsArrayType itkBounds = geometry->GetBoundingBox()->GetBounds();
@@ -317,7 +324,7 @@ mitk::TimeSlicedGeometry::Pointer mitk::DataStorage::ComputeBoundingGeometry3D( 
           // time bounds
           // iterate over all time steps
           // Attention: Objects with zero bounding box are not respected in time bound calculation
-          TimeBounds minTB = geometry->GetTimeBounds(); 
+          TimeBounds minTB = geometry->GetTimeBounds();
           for (unsigned int i=0; i<geometry->GetTimeSteps(); i++)
           {
             const TimeBounds & curTimeBounds = node->GetData()->GetGeometry(i)->GetTimeBounds();
@@ -356,7 +363,7 @@ mitk::TimeSlicedGeometry::Pointer mitk::DataStorage::ComputeBoundingGeometry3D( 
   result->ComputeBoundingBox();
 
   // minimal time bounds of a single time step for all geometries
-  TimeBounds minTimeBounds; 
+  TimeBounds minTimeBounds;
   minTimeBounds[0] = 0;
   minTimeBounds[1] = 1;
   // compute the number of time steps
@@ -418,14 +425,14 @@ mitk::BoundingBox::Pointer mitk::DataStorage::ComputeBoundingBox( const char* bo
   for (SetOfObjects::ConstIterator it = all->Begin(); it != all->End(); ++it)
   {
     DataNode::Pointer node = it->Value();
-    if((node.IsNotNull()) && (node->GetData() != NULL) && 
-      (node->GetData()->IsEmpty()==false) && 
-      node->IsOn(boolPropertyKey, renderer) && 
+    if((node.IsNotNull()) && (node->GetData() != NULL) &&
+      (node->GetData()->IsEmpty()==false) &&
+      node->IsOn(boolPropertyKey, renderer) &&
       node->IsOn(boolPropertyKey2, renderer)
       )
     {
       const Geometry3D* geometry = node->GetData()->GetUpdatedTimeSlicedGeometry();
-      if (geometry != NULL ) 
+      if (geometry != NULL )
       {
         // bounding box (only if non-zero)
         BoundingBox::BoundsArrayType itkBounds = geometry->GetBoundingBox()->GetBounds();
@@ -447,7 +454,7 @@ mitk::BoundingBox::Pointer mitk::DataStorage::ComputeBoundingBox( const char* bo
         }
       }
     }
-    
+
   }
 
   BoundingBox::Pointer result = BoundingBox::New();
@@ -473,14 +480,14 @@ mitk::TimeBounds mitk::DataStorage::ComputeTimeBounds( const char* boolPropertyK
   for (SetOfObjects::ConstIterator it = all->Begin(); it != all->End(); ++it)
   {
     DataNode::Pointer node = it->Value();
-    if((node.IsNotNull()) && (node->GetData() != NULL) && 
-      (node->GetData()->IsEmpty()==false) && 
-      node->IsOn(boolPropertyKey, renderer) && 
+    if((node.IsNotNull()) && (node->GetData() != NULL) &&
+      (node->GetData()->IsEmpty()==false) &&
+      node->IsOn(boolPropertyKey, renderer) &&
       node->IsOn(boolPropertyKey2, renderer)
       )
     {
       const Geometry3D* geometry = node->GetData()->GetUpdatedTimeSlicedGeometry();
-      if (geometry != NULL ) 
+      if (geometry != NULL )
       {
         const TimeBounds & curTimeBounds = geometry->GetTimeBounds();
         cur=curTimeBounds[0];

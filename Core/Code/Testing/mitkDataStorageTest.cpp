@@ -44,6 +44,22 @@ PURPOSE.  See the above copyright notices for more information.
 
 void TestDataStorage(mitk::DataStorage* ds);
 
+namespace mitk
+{
+  class TestStandaloneDataStorage: public StandaloneDataStorage
+  {
+  public:
+    mitkClassMacro(TestStandaloneDataStorage, mitk::DataStorage);
+    itkNewMacro(Self);
+    std::map<const mitk::DataNode*, unsigned long>
+        GetModifiedObserverTags() const {return m_NodeModifiedObserverTags;}
+    std::map<const mitk::DataNode*, unsigned long>
+        GetDeletedObserverTags() const { return m_NodeDeleteObserverTags; }
+  protected:
+    TestStandaloneDataStorage() {}
+  };
+}
+
 class DSEventReceiver // Helper class for event testing
 {
 public:
@@ -74,6 +90,25 @@ public:
 int mitkDataStorageTest(int /*argc*/, char* /*argv*/[])
 {
   MITK_TEST_BEGIN("DataStorageTest");
+
+  // muellerm: test observer tag remove
+  mitk::TestStandaloneDataStorage::Pointer testDS
+      = mitk::TestStandaloneDataStorage::New();
+  mitk::DataNode::Pointer n1 = mitk::DataNode::New();
+  testDS->Add(n1);
+  MITK_TEST_CONDITION_REQUIRED(
+      testDS->GetModifiedObserverTags().size()==1, "Testing if modified"
+      " observer was added.");
+  MITK_TEST_CONDITION_REQUIRED(
+      testDS->GetDeletedObserverTags().size()==1, "Testing if delete"
+      " observer was added.");
+  testDS->Remove(n1);
+  MITK_TEST_CONDITION_REQUIRED(
+      testDS->GetModifiedObserverTags().size()==0, "Testing if modified"
+      " observer was removed.");
+  MITK_TEST_CONDITION_REQUIRED(
+      testDS->GetDeletedObserverTags().size()==0, "Testing if delete"
+      " observer was removed.");
 
   /* Create StandaloneDataStorage */
   MITK_TEST_OUTPUT( << "Create StandaloneDataStorage : ");
@@ -686,12 +721,12 @@ void TestDataStorage( mitk::DataStorage* ds )
       && (ds->GetDerivations(extra)->Size() == 2)    // d1y and d2y should be derived from extra
       , "add extra node");
 
-    ds->Remove(ds->GetDerivations( extra));       
+    ds->Remove(ds->GetDerivations( extra));
     MITK_TEST_CONDITION(
       (ds->GetNamedNode("extra") == extra)
       && (ds->GetNamedNode("d1y") == NULL) // d1y should be NULL now
       && (ds->GetNamedNode("d2y") == NULL) // d2y should be NULL now
-      && (refCountbeforeDS == watcherD1y->GetReferenceCount())      
+      && (refCountbeforeDS == watcherD1y->GetReferenceCount())
       , "Checking removal of subset of two derived nodes from one parent node");
 
     ds->Remove(extra);

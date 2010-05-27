@@ -210,9 +210,10 @@ void mitk::DataStorage::AddListeners( const mitk::DataNode* _Node )
 {
   itk::MutexLockHolder<itk::SimpleFastMutexLock> locked(m_MutexOne);
   // node must not be 0 and must not be yet registered
-  if(_Node)
-  {
-    mitk::DataNode* NonConstNode = const_cast<mitk::DataNode*>(_Node);
+  mitk::DataNode* NonConstNode = const_cast<mitk::DataNode*>(_Node);
+  if(_Node && m_NodeModifiedObserverTags
+    .find(NonConstNode) == m_NodeModifiedObserverTags.end())
+  {    
     itk::MemberCommand<mitk::DataStorage>::Pointer nodeModifiedCommand =
       itk::MemberCommand<mitk::DataStorage>::New();
     nodeModifiedCommand->SetCallbackFunction(this
@@ -235,11 +236,12 @@ void mitk::DataStorage::RemoveListeners( const mitk::DataNode* _Node )
 {
   itk::MutexLockHolder<itk::SimpleFastMutexLock> locked(m_MutexOne) ;
   // node must not be 0 and must be registered
-  if(_Node)
+  mitk::DataNode* NonConstNode = const_cast<mitk::DataNode*>(_Node);
+  if(_Node && m_NodeModifiedObserverTags
+    .find(NonConstNode) != m_NodeModifiedObserverTags.end())
   {
     // const cast is bad! but sometimes it is necessary. removing an observer does not really
     // touch the internal state
-    mitk::DataNode* NonConstNode = const_cast<mitk::DataNode*>(_Node);
     NonConstNode->RemoveObserver(m_NodeModifiedObserverTags
                                  .find(NonConstNode)->second);
     NonConstNode->RemoveObserver(m_NodeDeleteObserverTags

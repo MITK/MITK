@@ -637,7 +637,7 @@ void mitk::PlanarFigureInteractor::SetCurrentNodeSelected( mitk::BaseRenderer::P
 
   mitk::DataStorage::SetOfObjects::ConstPointer figures = br->GetDataStorage()->GetSubset(collection);
 
-  for ( int i=0; i<figures->size(); i++ )
+  for ( unsigned int i=0; i<figures->size(); i++ )
   {
     figures->GetElement(i)->SetSelected( false );
   }

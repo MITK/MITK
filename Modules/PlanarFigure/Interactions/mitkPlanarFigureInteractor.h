@@ -23,6 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "PlanarFigureExports.h"
 #include "mitkVector.h"
 #include <mitkInteractor.h>
+#include "mitkBaseRenderer.h"
 
 namespace mitk
 {
@@ -84,7 +85,8 @@ protected:
     const DisplayGeometry *displayGeometry ) const;
 
   void LogPrintPlanarFigureQuantities( const PlanarFigure *planarFigure );
-
+ 
+  void SetCurrentNodeSelected( mitk::BaseRenderer::Pointer br );
 private:
 
   /** \brief to store the value of precision to pick a point */

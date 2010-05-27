@@ -31,6 +31,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkStateTransitionOperation.h"
 #include "mitkBaseRenderer.h"
 #include "mitkRenderingManager.h"
+#include "mitkNodePredicateDataType.h"
+#include "mitkNodePredicateOR.h"
 
 
 //how precise must the user pick the point
@@ -261,6 +263,9 @@ bool mitk::PlanarFigureInteractor
 
       // Update rendered scene
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+      
+      // Set node currently interacted with as sole 'selected' PlanarFigure
+      this->SetCurrentNodeSelected( renderer );
 
       ok = true;
       break;
@@ -287,6 +292,9 @@ bool mitk::PlanarFigureInteractor
 
       // Update rendered scene
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+
+      // Set node currently interacted with as sole 'selected' PlanarFigure
+      this->SetCurrentNodeSelected( renderer );
 
       ok = true;
       break;
@@ -389,11 +397,18 @@ bool mitk::PlanarFigureInteractor
           if ( a * a + b * b < 25.0 )
           {
             this->HandleEvent( new mitk::StateEvent( EIDNO, stateEvent->GetEvent() ) );
+
+            // Set node currently interacted with as sole 'selected' PlanarFigure
+            this->SetCurrentNodeSelected( renderer );
+
             ok = true;
             break;
           }
         }
       }
+
+      // Set node currently interacted with as sole 'selected' PlanarFigure
+      this->SetCurrentNodeSelected( renderer );
 
       this->HandleEvent( new mitk::StateEvent( EIDYES, stateEvent->GetEvent() ) );    
       ok = true;
@@ -422,6 +437,9 @@ bool mitk::PlanarFigureInteractor
 
       // Update rendered scene
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+
+      // Set node currently interacted with as sole 'selected' PlanarFigure
+      this->SetCurrentNodeSelected( renderer );
 
       ok = true;
       break;
@@ -481,6 +499,9 @@ bool mitk::PlanarFigureInteractor
       {
         this->HandleEvent( new mitk::StateEvent( EIDNO, stateEvent->GetEvent() ) );
       }
+
+      // Set node currently interacted with as sole 'selected' PlanarFigure
+      this->SetCurrentNodeSelected( renderer );
 
       ok = true;  
       break;
@@ -602,4 +623,24 @@ void mitk::PlanarFigureInteractor::LogPrintPlanarFigureQuantities(
     MITK_INFO << "* " << planarFigure->GetFeatureName( i ) << ": "
       << planarFigure->GetQuantity( i ) << " " << planarFigure->GetFeatureUnit( i );
   }
+}
+
+
+void mitk::PlanarFigureInteractor::SetCurrentNodeSelected( mitk::BaseRenderer::Pointer br )
+{
+  mitk::NodePredicateDataType::Pointer cross = mitk::NodePredicateDataType::New( "PlanarCross" );
+  mitk::NodePredicateDataType::Pointer roi   = mitk::NodePredicateDataType::New( "PlanarPolygon" );
+  mitk::NodePredicateDataType::Pointer arrow = mitk::NodePredicateDataType::New( "PlanarArrow" );
+
+  mitk::NodePredicateOR::Pointer collection = mitk::NodePredicateOR::New(cross,roi);
+  collection->AddPredicate(arrow);
+
+  mitk::DataStorage::SetOfObjects::ConstPointer figures = br->GetDataStorage()->GetSubset(collection);
+
+  for ( int i=0; i<figures->size(); i++ )
+  {
+    figures->GetElement(i)->SetSelected( false );
+  }
+
+  m_DataNode->SetSelected( true );
 }

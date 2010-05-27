@@ -492,6 +492,10 @@ bool mitk::PlanarFigureInteractor
 
   case AcSELECTPOINT:
     {
+      // Invoke a StartEvent to notify listeners that interaction with this PF starts now
+      planarFigure->InvokeEvent( itk::StartEvent() );
+
+      // Reset the PlanarFigure if required
       if ( planarFigure->ResetOnPointSelect() )
       {
         this->HandleEvent( new mitk::StateEvent( EIDYES, stateEvent->GetEvent() ) );

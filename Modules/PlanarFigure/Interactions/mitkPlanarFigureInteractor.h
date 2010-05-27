@@ -86,7 +86,6 @@ protected:
 
   void LogPrintPlanarFigureQuantities( const PlanarFigure *planarFigure );
  
-  void SetCurrentNodeSelected( mitk::BaseRenderer::Pointer br );
 private:
 
   /** \brief to store the value of precision to pick a point */

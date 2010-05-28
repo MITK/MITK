@@ -655,7 +655,7 @@ PlaneGeometry::IntersectionPointParam( const Line3D &line, double &t ) const
 bool
 PlaneGeometry::IsParallel( const PlaneGeometry *plane ) const 
 {
-  return ( (Angle(plane) < eps ) || ( Angle(plane) > ( vnl_math::pi - eps ) ) ) ;
+  return ( (Angle(plane) < 10.0 * mitk::sqrteps ) || ( Angle(plane) > ( vnl_math::pi - 10.0 * sqrteps ) ) ) ;
 } 
 
 

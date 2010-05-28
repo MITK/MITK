@@ -580,10 +580,10 @@ int mitkPlaneGeometryTest(int /*argc*/, char* /*argv*/[])
 
   delete planerot;
   
-  planerot = new mitk::RotationOperation( mitk::OpROTATE, origin, clonedplanegeometry2->GetAxisVector( 0 ), 0.1 );
+  planerot = new mitk::RotationOperation( mitk::OpROTATE, origin, clonedplanegeometry2->GetAxisVector( 0 ), 0.5 );
   clonedplanegeometry2->ExecuteOperation( planerot ); 
   
-  std::cout << "Testing if a non-paralell plane gets recognized as not paralell  [rotation +0.1 degree] : ";
+  std::cout << "Testing if a non-paralell plane gets recognized as not paralell  [rotation +0.5 degree] : ";
   if( mitk::Equal( clonedplanegeometry2->IsParallel(planegeometry), false )==false )
   {
     std::cout<<"[FAILED]"<<std::endl;
@@ -593,10 +593,10 @@ int mitkPlaneGeometryTest(int /*argc*/, char* /*argv*/[])
   
   delete planerot;
   
-  planerot = new mitk::RotationOperation( mitk::OpROTATE, origin, clonedplanegeometry2->GetAxisVector( 0 ), -0.2 );
+  planerot = new mitk::RotationOperation( mitk::OpROTATE, origin, clonedplanegeometry2->GetAxisVector( 0 ), -1.0 );
   clonedplanegeometry2->ExecuteOperation( planerot ); 
   
-  std::cout << "Testing if a non-paralell plane gets recognized as not paralell  [rotation -0.1 degree] : ";
+  std::cout << "Testing if a non-paralell plane gets recognized as not paralell  [rotation -0.5 degree] : ";
   if( mitk::Equal( clonedplanegeometry2->IsParallel(planegeometry), false )==false )
   {
     std::cout<<"[FAILED]"<<std::endl;
@@ -606,7 +606,7 @@ int mitkPlaneGeometryTest(int /*argc*/, char* /*argv*/[])
 
   delete planerot;
 
-  planerot = new mitk::RotationOperation( mitk::OpROTATE, origin, clonedplanegeometry2->GetAxisVector( 0 ), 360.1 );
+  planerot = new mitk::RotationOperation( mitk::OpROTATE, origin, clonedplanegeometry2->GetAxisVector( 0 ), 360.5 );
   clonedplanegeometry2->ExecuteOperation( planerot ); 
   
   std::cout << "Testing if a non-paralell plane gets recognized as not paralell  [rotation 360 degree] : ";

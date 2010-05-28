@@ -94,8 +94,8 @@ void mitk::PlanarArrow::GenerateHelperPolyLine(double mmPerDisplayUnit, unsigned
   m_HelperPolyLinesToBePainted->SetElement( 0, true );
   m_HelperPolyLinesToBePainted->SetElement( 1, true );
  
-  //Fixed size radius depending on screen size for the angle
-  double nonScalingLength = displayHeight * mmPerDisplayUnit * 0.025;
+  //Fixed size depending on screen size for the angle
+  double nonScalingLength = displayHeight * mmPerDisplayUnit * 0.015;
 
   // Calculate arrow peak
   const Point2D& p1 = m_ControlPoints->ElementAt( 0 );

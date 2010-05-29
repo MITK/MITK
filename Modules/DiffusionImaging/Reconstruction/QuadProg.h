@@ -75,7 +75,7 @@ along with QuadProg++. If not, see <http://www.gnu.org/licenses/>.
 #define _QUADPROGPP
 
 #include "Array.h"
-#include "MitkDiffusionImagingMBIExports.h"
+#include "MitkDiffusionImagingExports.h"
 
 namespace QuadProgPP{
 

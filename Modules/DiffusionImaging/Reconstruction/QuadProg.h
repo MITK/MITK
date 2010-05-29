@@ -79,7 +79,7 @@ along with QuadProg++. If not, see <http://www.gnu.org/licenses/>.
 
 namespace QuadProgPP{
 
-  class MitkDiffusionImagingMBI_EXPORT QuadProg
+  class MitkDiffusionImaging_EXPORT QuadProg
   {
   
   public:

@@ -24,7 +24,16 @@ template<class S>
 typename S::Pointer ServiceRegistry::GetServiceById(const std::string& id)
 {
   Poco::Mutex::ScopedLock lock(m_Mutex);
-  Service::Pointer servicePtr = m_ServiceMap[id];
+  Service::Pointer servicePtr;
+
+  std::map<const std::string, Service::Pointer>::const_iterator serviceIt =
+      m_ServiceMap.find(id);
+
+  if (serviceIt != m_ServiceMap.end())
+  {
+    servicePtr = serviceIt->second;
+  }
+
   if (servicePtr.IsNull()) return SmartPointer<S>();
   
   if (servicePtr->IsA(typeid(S)))

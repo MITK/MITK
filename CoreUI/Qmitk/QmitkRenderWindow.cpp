@@ -40,6 +40,7 @@ QmitkRenderWindow::QmitkRenderWindow(QWidget *parent, QString name, mitk::VtkPro
 , m_ResendQtEvents(true)
 , m_MenuWidget(NULL)
 , m_MenuWidgetActivated(false)
+, m_ProcessWheelEvents(true)
 {
   // if renderingManager is NULL get the global instance (needed here to initialize VtkPropRenderer below)
   if ( renderingManager == NULL )
@@ -182,6 +183,8 @@ void QmitkRenderWindow::mouseMoveEvent(QMouseEvent *me)
 
 void QmitkRenderWindow::wheelEvent(QWheelEvent *we)
 {
+  if ( !m_ProcessWheelEvents )
+    return;
   //QVTKWidget::wheelEvent(we);
 
   if ( !GetSliceNavigationController()->GetSliceLocked() )
@@ -314,6 +317,17 @@ void QmitkRenderWindow::HideMenuWidget()
   if( m_MenuWidget )
     m_MenuWidget->hide();
 }
+
+void QmitkRenderWindow::SetProcessWheelEvents( bool state )
+{
+  m_ProcessWheelEvents = state;
+}
+
+bool QmitkRenderWindow::GetProcessWheelEvents()
+{
+  return m_ProcessWheelEvents;
+}
+
 
 void QmitkRenderWindow::OnWidgetPlaneModeChanged( int mode )
 {

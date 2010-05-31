@@ -89,6 +89,11 @@ public:
   bool GetActivateMenuWidgetFlag()
   {  return m_MenuWidgetActivated; }
 
+
+  void SetProcessWheelEvents( bool state );
+
+  bool GetProcessWheelEvents();
+
   void FullScreenMode( bool state );
 
 protected:
@@ -142,6 +147,8 @@ private:
   QmitkRenderWindowMenu*         m_MenuWidget;
 
   bool                           m_MenuWidgetActivated;
+
+  bool                           m_ProcessWheelEvents;
 };
 
 #endif /* QMITKRENDERWINDOW_H_HEADER_INCLUDED_C1C40D66 */

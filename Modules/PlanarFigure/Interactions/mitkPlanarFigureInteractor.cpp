@@ -439,6 +439,7 @@ bool mitk::PlanarFigureInteractor
       // Issue event so that listeners may update themselves
       planarFigure->Modified();
       planarFigure->InvokeEvent( itk::EndEvent() );
+
       m_DataNode->Modified();
 
       // falls through
@@ -454,7 +455,8 @@ bool mitk::PlanarFigureInteractor
 
       if ( pointIndex >= 0 )
       {
-        planarFigure->SelectControlPoint( pointIndex );
+        planarFigure->SelectControlPoint( pointIndex );     
+        planarFigure->InvokeEvent( itk::StartPickEvent() );
         this->HandleEvent( new mitk::StateEvent( EIDYES, NULL ) );
 
         // Return true: only this interactor is eligible to react on this event
@@ -463,6 +465,7 @@ bool mitk::PlanarFigureInteractor
       else
       {
         planarFigure->DeselectControlPoint();
+        planarFigure->InvokeEvent( itk::EndPickEvent() );
         this->HandleEvent( new mitk::StateEvent( EIDNO, NULL ) );
 
         // Return false so that other (PlanarFigure) Interactors may react on this

@@ -74,7 +74,7 @@ class QmitkRegionGrowingView : public QObject, public QmitkFunctionality
       a given MITK image and calls this function for further processing (in our case region growing)
      */
     template < typename TPixel, unsigned int VImageDimension >
-    void ItkImageProcessing( itk::Image< TPixel, VImageDimension >* itkImage, mitk::Geometry3D* imageGeometry );
+    void ItkImageProcessing( itk::Image< TPixel, VImageDimension >* itkImage, mitk::Geometry3D* imageGeometry, mitk::DataNode* parent );
 
     /// \brief called by QmitkFunctionality when DataManager's selection has changed
     virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes );

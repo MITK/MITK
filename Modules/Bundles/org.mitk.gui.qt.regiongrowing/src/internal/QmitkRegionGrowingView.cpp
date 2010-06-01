@@ -167,7 +167,7 @@ void QmitkRegionGrowingView::DoImageProcessing()
       }
 
       // actually perform region growing. Here we have both an image and some seed points
-      AccessByItk_1( image, ItkImageProcessing, image->GetGeometry() ); // some magic to call the correctly templated function
+      AccessByItk_2( image, ItkImageProcessing, image->GetGeometry(), node ); // some magic to call the correctly templated function
 
     }
   }
@@ -175,7 +175,7 @@ void QmitkRegionGrowingView::DoImageProcessing()
 
 
 template < typename TPixel, unsigned int VImageDimension >
-void QmitkRegionGrowingView::ItkImageProcessing( itk::Image< TPixel, VImageDimension >* itkImage, mitk::Geometry3D* imageGeometry )
+void QmitkRegionGrowingView::ItkImageProcessing( itk::Image< TPixel, VImageDimension >* itkImage, mitk::Geometry3D* imageGeometry, mitk::DataNode* parent )
 {
   typedef itk::Image< TPixel, VImageDimension > InputImageType;
   typedef typename InputImageType::IndexType    IndexType;
@@ -235,12 +235,12 @@ void QmitkRegionGrowingView::ItkImageProcessing( itk::Image< TPixel, VImageDimen
   newNode->SetProperty("binary", mitk::BoolProperty::New(true));
   newNode->SetProperty("name", mitk::StringProperty::New("dumb segmentation"));
   newNode->SetProperty("color", mitk::ColorProperty::New(1.0,0.0,0.0));
-  newNode->SetProperty("volumerendering", mitk::BoolProperty::New(true));
+  newNode->SetProperty("volumerendering", mitk::BoolProperty::New(false));
   newNode->SetProperty("layer", mitk::IntProperty::New(1));
   newNode->SetProperty("opacity", mitk::FloatProperty::New(0.5));
 
   // add result to data tree
-  this->GetDefaultDataStorage()->Add( newNode );
+  this->GetDefaultDataStorage()->Add( newNode, parent );
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 

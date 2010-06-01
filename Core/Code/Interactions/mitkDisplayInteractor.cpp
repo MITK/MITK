@@ -76,11 +76,8 @@ void mitk::DisplayInteractor::ExecuteOperation(mitk::Operation * operation)
           // nothing to do, factor remains 1.0
         }
         
-        //renderer->GetDisplayGeometry()->Zoom(factor, dcOperation->GetStartDisplayCoordinate());
-        Point2D center;
-        center[0] = renderer->GetDisplayGeometry()->GetDisplayWidth()/2;
-        center[1] = renderer->GetDisplayGeometry()->GetDisplayHeight()/2;
-        renderer->GetDisplayGeometry()->Zoom(factor, center);
+        renderer->GetDisplayGeometry()->Zoom(factor, dcOperation->GetStartDisplayCoordinate());
+        
         mitk::RenderingManager::GetInstance()->RequestUpdate(renderer->GetRenderWindow());
         ok = true;
       }

@@ -428,7 +428,7 @@ void QmitkNDIConfigurationWidget::UpdateTrackerFromToolTable(const QModelIndex &
   if (m_Tracker.IsNull())
     return;
 
-  if (topLeft.row() >= m_Tracker->GetToolCount())
+  if (topLeft.row() >= (int) m_Tracker->GetToolCount())
     return;
 
   QAbstractItemModel* model = m_Controls->m_ToolTable->model();

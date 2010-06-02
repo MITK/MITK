@@ -15,6 +15,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
+#include "mitkProperties.h"
 
 #include "mitkPlanarRectangle.h"
 #include "mitkGeometry2D.h"
@@ -26,6 +27,7 @@ mitk::PlanarRectangle::PlanarRectangle()
 {
   // Rectangle has four control points
   this->ResetNumberOfControlPoints( 4 );
+  this->SetProperty( "closed", mitk::BoolProperty::New(true) );
 
   m_PolyLines->InsertElement( 0, VertexContainerType::New());
 }

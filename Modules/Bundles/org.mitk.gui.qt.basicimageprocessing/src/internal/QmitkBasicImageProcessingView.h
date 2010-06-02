@@ -140,26 +140,34 @@ private:
   berry::ISelectionListener::Pointer m_SelectionListener;
 
   enum ActionType {
+    NOACTIONSELECTED,
+    CATEGORY_DENOISING,
     GAUSSIAN,
     MEDIAN,	
     TOTALVARIATION,
+    CATEGORY_MORPHOLOGICAL,
     DILATION,
     EROSION,
     OPENING,
     CLOSING,
+    CATEGORY_EDGE_DETECTION,
     GRADIENT,
     LAPLACIAN,
     SOBEL,
+    CATEGORY_MISC,
     THRESHOLD,
     INVERSION,
     DOWNSAMPLING,
   } m_SelectedAction; 
 
   enum OperationType{
+    TWOIMAGESNOACTIONSELECTED,
+    CATEGORY_ARITHMETIC,
     ADD,
     SUBTRACT,
     MULTIPLY,
     DIVIDE,
+    CATEGORY_BOOLEAN,
     AND,
     OR,
     XOR

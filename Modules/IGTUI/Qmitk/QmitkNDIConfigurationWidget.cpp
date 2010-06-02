@@ -458,7 +458,7 @@ void QmitkNDIConfigurationWidget::UpdateTrackerFromToolTable(const QModelIndex &
 
     //TODO: Add Node Status and Type here as well
   default:
-
+    break;
   }
 
 }

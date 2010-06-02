@@ -271,6 +271,7 @@ void QmitkNDIConfigurationWidget::SetDeviceName( const char* dev )
 void QmitkNDIConfigurationWidget::UpdateToolTable()
 {
   disconnect(m_Controls->m_ToolTable, SIGNAL(itemChanged(QTableWidgetItem*)), this, SLOT(OnTableItemChanged(QTableWidgetItem*))); // stop listening to table changes
+  disconnect(m_Controls->m_ToolTable->model(), SIGNAL(dataChanged(const QModelIndex &, const QModelIndex &)), this, SLOT(UpdateTrackerFromToolTable(const QModelIndex &, const QModelIndex &)));
   m_Controls->m_ToolTable->clearContents();
   m_Controls->m_ToolTable->setRowCount(0);
   if (m_Tracker.IsNull() || (m_Controls == NULL))
@@ -307,6 +308,7 @@ void QmitkNDIConfigurationWidget::UpdateToolTable()
   }
   m_Controls->m_ToolTable->resizeColumnsToContents();
   connect(m_Controls->m_ToolTable, SIGNAL(itemChanged(QTableWidgetItem*)), this, SLOT(OnTableItemChanged(QTableWidgetItem*))); // listen to table changes again
+  connect(m_Controls->m_ToolTable->model(), SIGNAL(dataChanged(const QModelIndex &, const QModelIndex &)), this, SLOT(UpdateTrackerFromToolTable(const QModelIndex &, const QModelIndex &)));
 }
 
 
@@ -425,20 +427,41 @@ void QmitkNDIConfigurationWidget::UpdateTrackerFromToolTable(const QModelIndex &
 
   if (m_Tracker.IsNull())
     return;
+
+  if (topLeft.row() >= m_Tracker->GetToolCount())
+    return;
+
   QAbstractItemModel* model = m_Controls->m_ToolTable->model();
-  for (int i = 0; i < m_Controls->m_ToolTable->rowCount(); ++i)
-  {
-    mitk::NDIPassiveTool* tool = dynamic_cast<mitk::NDIPassiveTool*> (m_Tracker->GetTool(i));
+
+  //define topleft contains row and column; row 0 is tool 0; column is index =0, Name =1, SROMFileName = 2; Type = 3; Status = 4; Node (?) = 5
+  //only update the changed item
+  mitk::NDIPassiveTool* tool = dynamic_cast<mitk::NDIPassiveTool*> (m_Tracker->GetTool(topLeft.row()));
     if (tool == NULL)
-      continue;
-    tool->SetToolName(model->data(model->index(i, 1)).toString().toLatin1());
-    QString romfile = model->data(model->index(i, QmitkNDIToolDelegate::SROMCol)).toString();
-    if (romfile.isEmpty())
-      continue;
-    if (QFileInfo(romfile).exists())
-      tool->LoadSROMFile(romfile.toLatin1());
+      return;
+
+  switch (topLeft.column())
+  {
+  case 0: //index
+    break;
+  case 1: //name
+    tool->SetToolName(model->data(model->index(topLeft.row(), 1)).toString().toLatin1());
+    emit ToolsChanged();
+    break;
+  case QmitkNDIToolDelegate::SROMCol: //SROM File Name
+    {
+      QString romfile = model->data(model->index(topLeft.row(), QmitkNDIToolDelegate::SROMCol)).toString();
+      if (QFileInfo(romfile).exists())
+        tool->LoadSROMFile(romfile.toLatin1());
+      m_Tracker->InitializeWiredTools();
+      break;
+    }
+
+    //TODO: Add Node Status and Type here as well
+  
+  default:
+    NULL;
   }
-  m_Tracker->InitializeWiredTools();
+
 }
 
 

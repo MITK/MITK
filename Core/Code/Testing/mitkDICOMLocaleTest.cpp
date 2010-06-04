@@ -101,6 +101,12 @@ int mitkDICOMLocaleTest(int /*argc*/, char* /*argv*/ [])
   alllocales.push_back("de_DE@euro");
   alllocales.push_back("German_Germany");
 
+  // QuickFix for MAC OS X
+  // See for more the Bug #3894 comments
+#ifdef __APPLE__ #if defined (__APPLE__) || defined(MACOSX)
+  alllocales.push_back("C");
+#endif
+
   unsigned int numberOfTestedGermanLocales(0);
 
   for (StringList::iterator iter = alllocales.begin();

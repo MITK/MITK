@@ -103,7 +103,7 @@ int mitkDICOMLocaleTest(int /*argc*/, char* /*argv*/ [])
 
   // QuickFix for MAC OS X
   // See for more the Bug #3894 comments
-#ifdef __APPLE__ #if defined (__APPLE__) || defined(MACOSX)
+#if defined (__APPLE__) || defined(MACOSX)
   alllocales.push_back("C");
 #endif
 

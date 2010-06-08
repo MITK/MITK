@@ -24,6 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <itkProcessObject.h>
 #include <QLabel>
+#include <QVector>
 
 
 
@@ -38,6 +39,9 @@ class MitkIGTUI_EXPORT QmitkToolDistanceWidget : public QWidget
 {  
   Q_OBJECT // this is needed for all Qt objects that should have a MOC object (everything that derives from QObject)
 public: 
+
+  typedef QVector<QVector<QLabel*> > DistanceLabelType;
+
   /*!  
   \brief default constructor  
   */ 
@@ -78,8 +82,8 @@ protected:
 private:
   /*!  
   \brief Double vector for all between tool distances labels.
-  */ 
-  QVector<QVector<QLabel*>>* m_DistanceLabels;
+  */
+  DistanceLabelType* m_DistanceLabels;
 
 };
 #endif // _QmitkToolDistanceWidget_H_INCLUDED

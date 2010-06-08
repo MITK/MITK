@@ -17,7 +17,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "QmitkToolDistanceWidget.h"
 
-#include <QLabel>
 #include <QGridLayout>
 #include <itkDataObject.h>
 #include <mitkNavigationDataSource.h>
@@ -70,7 +69,7 @@ void QmitkToolDistanceWidget::CreateToolDistanceMatrix(itk::ProcessObject::DataO
 
     if(m_DistanceLabels == NULL)
     {
-      m_DistanceLabels = new QVector<QVector<QLabel*>>();
+      m_DistanceLabels = new DistanceLabelType;
     }
 
     if(m_DistanceLabels->isEmpty()) 

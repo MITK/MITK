@@ -175,9 +175,9 @@ void QmitkToolDistanceWidget::CreateToolDistanceMatrix(itk::ProcessObject::DataO
 
   void QmitkToolDistanceWidget::SetDistanceLabelValuesInvalid()
   {
-    for(unsigned int i = 0; i < m_DistanceLabels->size(); i++)
+    for(int i = 0; i < m_DistanceLabels->size(); i++)
     {
-      for(unsigned int j= 0; j < m_DistanceLabels->at(i).size(); j++)
+      for(int j= 0; j < m_DistanceLabels->at(i).size(); j++)
       {
         this->m_DistanceLabels->at(i).at(j)->setText(QString("---"));
       }

@@ -468,8 +468,8 @@ bool mitk::DisplayGeometry::RefitVisibleRect()
   // constrain zooming out
   // we stop zooming out at these situations:
   //
-  // --- world
-  // *** image
+  // *** display
+  // --- image
   //
   //   **********************
   //   *                    *     x side maxed out

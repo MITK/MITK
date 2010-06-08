@@ -38,6 +38,8 @@ QmitkUpdateTimerWidget::QmitkUpdateTimerWidget(QWidget* parent)
 
   this->m_UpdateTimer->setInterval( DEFAULTUPDATEVALUE );
   this->m_Controls->m_UpdateRateSB->setValue( DEFAULTUPDATEVALUE );
+
+  this->DisableWidget();
 }
 
 QmitkUpdateTimerWidget::~QmitkUpdateTimerWidget()
@@ -72,7 +74,6 @@ unsigned int QmitkUpdateTimerWidget::GetTimerInterval()
   return this->m_UpdateTimer->interval();
 }
 
-
 void QmitkUpdateTimerWidget::OnChangeTimerInterval( int interval )
 {
   this->SetTimerInterval(interval);
@@ -92,8 +93,10 @@ void QmitkUpdateTimerWidget::StartTimer()
     this->m_UpdateTimer->start();
     this->m_Controls->m_StartNavigationBtn->setEnabled( false );
     this->m_Controls->m_StopNavigationBtn->setEnabled( true );
-    this->m_Controls->m_NavigationStateLbl->setStyleSheet( "QLabel{background-color: #ccffcc }" );
+    this->m_Controls->m_NavigationStateLbl->setStyleSheet( "QLabel{background-color: #96e066 }" );
     this->m_Controls->m_NavigationStateLbl->setText( "Started ... " );
+
+    emit Started();
   }
 }
 
@@ -106,6 +109,8 @@ void QmitkUpdateTimerWidget::StopTimer()
     this->m_Controls->m_StartNavigationBtn->setEnabled( true );
     this->m_Controls->m_NavigationStateLbl->setStyleSheet( "QLabel{background-color: #ffcccc }" );
     this->m_Controls->m_NavigationStateLbl->setText( "Stopped ... " );
+
+    emit Stopped();
   }
 }
 
@@ -115,8 +120,8 @@ QTimer* QmitkUpdateTimerWidget::GetUpdateTimer()
 }
 
 void QmitkUpdateTimerWidget::OnStartTimer()
-{	
-  this->StartTimer();	
+{
+  this->StartTimer();
 }
 
 void QmitkUpdateTimerWidget::OnStopTimer()
@@ -143,5 +148,24 @@ void QmitkUpdateTimerWidget::SetFrameRateLabel()
 {
   float frameRate = floor(1000 / (float) this->GetTimerInterval() + 0.5);  // floor rounding can be used because there are no negative values
   QString frameRateString = QString::number( frameRate, 'g', 4 );
-  this->m_Controls->m_FrameRateLbl->setText("( " + frameRateString + " Hz )");
+  this->m_Controls->m_FrameRateLbl->setText("msec   (" + frameRateString + " Hz)");
+}
+
+void QmitkUpdateTimerWidget::HideFramerateSettings( bool hidden )
+{
+  this->m_Controls->m_UpdatesInMsecLbl->setVisible( !hidden );
+  this->m_Controls->m_UpdateRateSB->setVisible ( !hidden );
+  this->m_Controls->m_FrameRateLbl->setVisible ( !hidden );
+}
+
+
+void QmitkUpdateTimerWidget::EnableWidget()
+{
+  this->setEnabled( true );
+}
+
+void QmitkUpdateTimerWidget::DisableWidget()
+{
+  this->StopTimer();
+  this->setEnabled( false );
 }

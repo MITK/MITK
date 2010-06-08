@@ -73,6 +73,19 @@ public:
   */
   void SetPurposeLabelText( QString text );
 
+  /*
+  \brief This method hides the framerate settings spinbox and her labels in the view.
+  */
+  void HideFramerateSettings( bool hidden );
+
+
+signals:
+  void Started();
+  void Stopped();
+
+public slots:
+    void EnableWidget();
+    void DisableWidget();
 
 private:
   /*!

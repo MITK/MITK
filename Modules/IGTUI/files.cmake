@@ -7,6 +7,7 @@ SET(CPP_FILES
   Qmitk/QmitkNavigationToolManagementWidget.cpp
   Qmitk/QmitkIGTLoggerWidget.cpp
   Qmitk/QmitkUpdateTimerWidget.cpp
+  Qmitk/QmitkToolDistanceWidget.cpp
 )
 
 SET(UI_FILES
@@ -16,6 +17,7 @@ SET(UI_FILES
   Qmitk/QmitkFiducialRegistrationWidget.ui
   Qmitk/QmitkIGTLoggerWidgetControls.ui
   Qmitk/QmitkUpdateTimerWidgetControls.ui
+  Qmitk/QmitkToolDistanceWidgetControls.ui
 )
 
 SET(MOC_H_FILES
@@ -27,6 +29,7 @@ SET(MOC_H_FILES
   Qmitk/QmitkNDIToolDelegate.h
   Qmitk/QmitkIGTLoggerWidget.h
   Qmitk/QmitkUpdateTimerWidget.h
+  Qmitk/QmitkToolDistanceWidget.h
 )
 
 

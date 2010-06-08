@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?BlueBerry version="0.1"?>
+<plugin>
+  
+  <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.views.qballreconstruction"
+          name="Q-Balls"
+          icon="resources/reconodf.png"
+          class="QmitkQBallReconstructionView" />
+  </extension>
+  
+    <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.views.diffusiondicomimport"
+          name="DICOM Import"
+          class="QmitkDiffusionDicomImport"
+          icon="resources/dwiimport.png" />
+  </extension>
+  
+    <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.views.diffusionquantification"
+          name="Quantification"
+          class="QmitkDiffusionQuantificationView"
+          icon="resources/quantification.png"/>
+  </extension>
+
+  <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.views.tensorreconstruction"
+          name="Tensors"
+          icon="resources/recontensor.png"
+          class="QmitkTensorReconstructionView" />
+  </extension>
+
+  <extension point="org.blueberry.ui.views">
+    <view id="org.mitk.views.controlvisualizationpropertiesview"
+          name="Visualization"
+          icon="resources/vizControls.png"
+          class="QmitkControlVisualizationPropertiesView" />
+  </extension>
+
+
+</plugin>

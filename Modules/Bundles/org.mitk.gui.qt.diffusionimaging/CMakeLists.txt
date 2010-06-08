@@ -1,0 +1,2 @@
+INCLUDE_DIRECTORIES(${Boost_INCLUDE_DIR})
+MACRO_CREATE_MITK_PLUGIN(QmitkExt MitkDiffusionImaging MitkDiffusionImagingMBI)

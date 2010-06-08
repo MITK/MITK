@@ -1,0 +1,343 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>QmitkTensorReconstructionViewControls</class>
+ <widget class="QWidget" name="QmitkTensorReconstructionViewControls">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>248</width>
+    <height>501</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>0</width>
+    <height>0</height>
+   </size>
+  </property>
+  <property name="acceptDrops">
+   <bool>true</bool>
+  </property>
+  <property name="windowTitle">
+   <string>QmitkTensorReconstructionViewControls</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_3">
+   <item>
+    <widget class="QGroupBox" name="groupBox_2">
+     <property name="title">
+      <string>ITK Reconstruction</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <item>
+       <widget class="QCheckBox" name="m_Advanced1">
+        <property name="text">
+         <string>Advanced Settings</string>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QFrame" name="frame">
+        <property name="frameShape">
+         <enum>QFrame::StyledPanel</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Raised</enum>
+        </property>
+        <layout class="QFormLayout" name="formLayout">
+         <item row="0" column="0">
+          <widget class="QLabel" name="m_TensorReconstructionNumberThreadsLabel_2">
+           <property name="text">
+            <string>Number of Threads</string>
+           </property>
+           <property name="wordWrap">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QSpinBox" name="m_TensorReconstructionNumberThreadsSpinbox">
+           <property name="value">
+            <number>4</number>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="m_TensorReconstructionThresholdLabel_2">
+           <property name="text">
+            <string>B0 Threshold</string>
+           </property>
+           <property name="wordWrap">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QLineEdit" name="m_TensorReconstructionThreasholdEdit">
+           <property name="text">
+            <string>0</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QFrame" name="m_TensorReconstructionNumberThreadsFrame_2">
+        <property name="frameShape">
+         <enum>QFrame::StyledPanel</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Raised</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCommandLinkButton" name="m_ItkReconstruction">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="toolTip">
+         <string comment="sum of raw signal on equator, normalized to unit mass (Tuch et al. 2004)" extracomment="sum of raw signal on equator, normalized to unit mass (Tuch et al. 2004)">sum of raw signal on equator, normalized to unit mass (Tuch et al. 2004)</string>
+        </property>
+        <property name="statusTip">
+         <string comment="sum of raw signal on equator, normalized to unit mass (Tuch et al. 2004)" extracomment="sum of raw signal on equator, normalized to unit mass (Tuch et al. 2004)">sum of raw signal on equator, normalized to unit mass (Tuch et al. 2004)</string>
+        </property>
+        <property name="whatsThis">
+         <string notr="true" comment="sum of raw signal on equator, normalized to unit mass (Tuch et al. 2004)" extracomment="sum of raw signal on equator, normalized to unit mass (Tuch et al. 2004)">sum of raw signal on equator, normalized to unit mass (Tuch et al. 2004)</string>
+        </property>
+        <property name="text">
+         <string>ITK Tensor Reconstruction</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="m_TeemToggle">
+     <property name="text">
+      <string>Teem Reconstruction</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox_3">
+     <property name="title">
+      <string>Teem Reconstruction</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <item>
+       <widget class="QCheckBox" name="m_Advanced2">
+        <property name="text">
+         <string>Advanced Settings</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QFrame" name="frame_2">
+        <property name="frameShape">
+         <enum>QFrame::StyledPanel</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Raised</enum>
+        </property>
+        <layout class="QFormLayout" name="formLayout_2">
+         <property name="fieldGrowthPolicy">
+          <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+         </property>
+         <item row="3" column="0">
+          <widget class="QLabel" name="m_TensorEstimationTeemNumItsLabel_2">
+           <property name="toolTip">
+            <string>important in case of method wls</string>
+           </property>
+           <property name="text">
+            <string># Iterations </string>
+           </property>
+           <property name="wordWrap">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1">
+          <widget class="QSpinBox" name="m_TensorEstimationTeemNumItsSpin"/>
+         </item>
+         <item row="4" column="0">
+          <widget class="QLabel" name="m_TensorEstimationTeemFuzzyLabel">
+           <property name="toolTip">
+            <string comment="how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;" extracomment="how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;">how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;</string>
+           </property>
+           <property name="statusTip">
+            <string comment="how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;" extracomment="how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;">how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;</string>
+           </property>
+           <property name="whatsThis">
+            <string comment="how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;" extracomment="how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;">how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;</string>
+           </property>
+           <property name="text">
+            <string>Fuzzy confidence</string>
+           </property>
+           <property name="wordWrap">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="1">
+          <widget class="QLineEdit" name="m_TensorEstimationTeemFuzzyEdit">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="toolTip">
+            <string comment="how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;" extracomment="how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;">how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;</string>
+           </property>
+           <property name="statusTip">
+            <string comment="how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;" extracomment="how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;">how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;</string>
+           </property>
+           <property name="whatsThis">
+            <string comment="how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;" extracomment="how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;">how fuzzy the confidence boundary should be. By default, confidence boundary is perfectly sharp (float); default: &quot;0&quot;</string>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="0">
+          <widget class="QLabel" name="m_TensorEstimationTeemMinValLabel_2">
+           <property name="toolTip">
+            <string comment="minimum plausible value (especially important for linear least squares estimation) (double); default: &quot;1.0&quot;" extracomment="minimum plausible value (especially important for linear least squares estimation) (double); default: &quot;1.0&quot;">minimum plausible value (especially important for linear least squares estimation) (double); default: &quot;1.0&quot;</string>
+           </property>
+           <property name="statusTip">
+            <string comment="minimum plausible value (especially important for linear least squares estimation) (double); default: &quot;1.0&quot;" extracomment="minimum plausible value (especially important for linear least squares estimation) (double); default: &quot;1.0&quot;">minimum plausible value (especially important for linear least squares estimation) (double); default: &quot;1.0&quot;</string>
+           </property>
+           <property name="whatsThis">
+            <string comment="minimum plausible value (especially important for linear least squares estimation) (double); default: &quot;1.0&quot;" extracomment="minimum plausible value (especially important for linear least squares estimation) (double); default: &quot;1.0&quot;">minimum plausible value (especially important for linear least squares estimation) (double); default: &quot;1.0&quot;</string>
+           </property>
+           <property name="text">
+            <string>Min plausible value</string>
+           </property>
+           <property name="wordWrap">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="0">
+          <widget class="QLabel" name="m_TensorEstimationTeemSigmaLabel_2">
+           <property name="toolTip">
+            <string comment="Rician noise parameter (float)" extracomment="Rician noise parameter (float)">Rician noise parameter (float)</string>
+           </property>
+           <property name="statusTip">
+            <string comment="Rician noise parameter (float)" extracomment="Rician noise parameter (float)">Rician noise parameter (float)</string>
+           </property>
+           <property name="whatsThis">
+            <string comment="Rician noise parameter (float)" extracomment="Rician noise parameter (float)">Rician noise parameter (float)</string>
+           </property>
+           <property name="text">
+            <string>Sigma</string>
+           </property>
+           <property name="wordWrap">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="1">
+          <widget class="QLineEdit" name="m_TensorEstimationTeemMinValEdit">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="toolTip">
+            <string comment="minimum plausible value (especially important for linear least squares estimation) (double); default: &quot;1.0&quot;" extracomment="minimum plausible value (especially important for linear least squares estimation) (double); default: &quot;1.0&quot;">minimum plausible value (especially important for linear least squares estimation) (double); default: &quot;1.0&quot;</string>
+           </property>
+           <property name="statusTip">
+            <string comment="minimum plausible value (especially important for linear least squares estimation) (double); default: &quot;1.0&quot;" extracomment="minimum plausible value (especially important for linear least squares estimation) (double); default: &quot;1.0&quot;">minimum plausible value (especially important for linear least squares estimation) (double); default: &quot;1.0&quot;</string>
+           </property>
+           <property name="whatsThis">
+            <string comment="minimum plausible value (especially important for linear least squares estimation) (double); default: &quot;1.0&quot;" extracomment="minimum plausible value (especially important for linear least squares estimation) (double); default: &quot;1.0&quot;">minimum plausible value (especially important for linear least squares estimation) (double); default: &quot;1.0&quot;</string>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="1">
+          <widget class="QLineEdit" name="m_TensorEstimationTeemSigmaEdit">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="toolTip">
+            <string comment="Rician noise parameter (float)" extracomment="Rician noise parameter (float)">Rician noise parameter (float)</string>
+           </property>
+           <property name="statusTip">
+            <string comment="Rician noise parameter (float)" extracomment="Rician noise parameter (float)">Rician noise parameter (float)</string>
+           </property>
+           <property name="whatsThis">
+            <string comment="Rician noise parameter (float)" extracomment="Rician noise parameter (float)">Rician noise parameter (float)</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QComboBox" name="m_TensorEstimationTeemEstimationMethodCombo"/>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="label">
+           <property name="text">
+            <string>Method</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QCheckBox" name="m_TensorEstimationManualThreashold">
+           <property name="text">
+            <string>B0-Threshold</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QLineEdit" name="m_TensorReconstructionThreasholdEdit_2">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="text">
+            <string>0</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCommandLinkButton" name="m_TeemReconstruction">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>Teem Tensor Reconstruction</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>1150</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources/>
+ <connections/>
+</ui>

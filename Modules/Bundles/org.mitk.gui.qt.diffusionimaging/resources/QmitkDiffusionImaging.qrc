@@ -1,0 +1,18 @@
+<!DOCTYPE RCC><RCC version="1.0">
+ <qresource prefix="/QmitkDiffusionImaging">
+   <file>qball.png</file>
+   <file>tensor.png</file>
+   <file>dwi.png</file>
+   <file>dwiimport.png</file>
+   <file>quantification.png</file>
+   <file>reconodf.png</file>
+   <file>recontensor.png</file>
+   <file>texIntONIcon.png</file>
+   <file>texIntOFFIcon.png</file>
+   <file>vizControls.png</file>
+   <file>glyphson.png</file>
+   <file>glyphsoff.png</file>
+   <file>Refresh_48.png</file>
+   <file>QBallData24.png</file>
+ </qresource>
+ </RCC>

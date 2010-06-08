@@ -128,11 +128,11 @@ void QmitkToolDistanceWidget::CreateToolDistanceMatrix(itk::ProcessObject::DataO
     mitk::NavigationData* navData; 
     mitk::NavigationData* nextNavData;
 
-    for(unsigned int i=0; i < m_DistanceLabels->size(); i++)
+    for(int i=0; i < m_DistanceLabels->size(); i++)
     {
       int j = i+1;
 
-      for(unsigned int k=0; k < m_DistanceLabels->at(i).size(); k++)
+      for(int k=0; k < m_DistanceLabels->at(i).size(); k++)
       {
         navData = dynamic_cast<mitk::NavigationData*>(outputs.at(i).GetPointer());
         nextNavData = dynamic_cast<mitk::NavigationData*>(outputs.at(j++).GetPointer());

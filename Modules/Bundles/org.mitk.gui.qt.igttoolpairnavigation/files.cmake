@@ -16,7 +16,7 @@ SET(MOC_H_FILES
 )
 
 SET(RESOURCE_FILES
-  resources/icon.xpm
+  resources/toolpair.png
 )
 
 SET(RES_FILES

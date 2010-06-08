@@ -17,6 +17,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "QmitkToolPairNavigationView.h"
 #include "QmitkNDIConfigurationWidget.h"
+#include "QmitkUpdateTimerWidget.h"
+#include "QmitkToolDistanceWidget.h"
 #include "mitkNodePredicateDataType.h"
 #include <mitkTrackingVolume.h>
 #include "QmitkDataStorageComboBox.h"
@@ -39,12 +41,21 @@ PURPOSE.  See the above copyright notices for more information.
 const std::string QmitkToolPairNavigationView::VIEW_ID = "org.mitk.views.toolpairnavigation";
 
 QmitkToolPairNavigationView::QmitkToolPairNavigationView()
-: QmitkFunctionality(), m_MultiWidget(NULL), m_RenderingTimer(NULL)
+: QmitkFunctionality(), m_MultiWidget(NULL)
 {
 }
 
 QmitkToolPairNavigationView::~QmitkToolPairNavigationView()
 {
+
+  delete m_NDIConfigWidget;
+  delete m_DistanceWidget;
+  m_NDIConfigWidget = NULL;
+  m_DistanceWidget = NULL;
+  m_Source = NULL;
+  m_Visualizer = NULL;
+  m_CameraVisualizer = NULL;
+ 
 }
 
 void QmitkToolPairNavigationView::CreateQtPartControl(QWidget *parent)
@@ -62,8 +73,22 @@ void QmitkToolPairNavigationView::CreateBundleWidgets(QWidget* parent)
 
   //instanciate widget
   m_NDIConfigWidget = new QmitkNDIConfigurationWidget(parent);
+  m_DistanceWidget = new QmitkToolDistanceWidget(parent);
 
-  m_Controls.m_ToolBox->insertItem(0, m_NDIConfigWidget, "Configuration");
+
+  // removes all placeholder tabs from the toolbox that where created in the qt designer before
+  int tabnr = this->m_Controls.m_ToolBox->count();
+  for(int i=0; i < tabnr ;i++)
+  {
+    this->m_Controls.m_ToolBox->removeItem(0);
+  }
+
+  // inserts this bundle's widgets into the toolbox
+  this->m_Controls.m_ToolBox->insertItem(0,m_NDIConfigWidget,QString("Configuration"));
+  this->m_Controls.m_ToolBox->insertItem(1,m_DistanceWidget,QString("Distances"));
+
+
+
 }
 
 void QmitkToolPairNavigationView::StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget)
@@ -78,13 +103,14 @@ void QmitkToolPairNavigationView::StdMultiWidgetNotAvailable()
 
 void QmitkToolPairNavigationView::CreateConnections()
 {
-  connect( (QObject*)(m_Controls.m_pbStartNavigation), SIGNAL(clicked()), this, SLOT(OnStartNavigation()) );
-  connect( (QObject*)(m_Controls.m_pbPauseNavigation), SIGNAL(clicked(bool)), this, SLOT(OnPauseNavigation(bool)) );
-  connect( (QObject*)(m_Controls.m_pbStopNavigation), SIGNAL(clicked()), this, SLOT(OnStopNavigation()) );
+  connect( m_NDIConfigWidget, SIGNAL(Connected()), this, SLOT(SetNavigationUp()));
+  connect( m_NDIConfigWidget, SIGNAL(Connected()), this->m_Controls.m_RenderingTimerWidget, SLOT(EnableWidget()));
+  connect( m_NDIConfigWidget, SIGNAL(Disconnected()), this, SLOT(Disconnected()));
+  connect( m_NDIConfigWidget, SIGNAL(Disconnected()), this->m_Controls.m_RenderingTimerWidget, SLOT(DisableWidget()));
 
-  //NDI configuration widget
-  //connect( (QObject*)(m_NDIConfigWidget), SIGNAL(Disconnected()), this, SLOT(Disconnected()) );
-  //connect( (QObject*)(m_NDIConfigWidget), SIGNAL(ToolsAdded(QStringList)), this, SLOT(ToolsAdded(QStringList)) );
+
+  //to be implemented for tool name changig e.g.
+  //  connect(m_NDIConfigWidget, SIGNAL(ToolsChanged()), this, SLOT(ToolsChanged()));
 }
 
 void QmitkToolPairNavigationView::Activated()
@@ -108,7 +134,19 @@ void QmitkToolPairNavigationView::Deactivated()
 
 void QmitkToolPairNavigationView::Disconnected()
 {
+  if(m_Controls.m_RenderingTimerWidget != NULL)
+  {
+    this->m_Controls.m_RenderingTimerWidget->StopTimer();
+  }
+  if(m_Source.IsNotNull() && m_Source->IsTracking())
+  {
+    this->m_Source->StopTracking();
+  }
+  this->DestroyIGTPipeline();
+  this->RemoveVisualizationObjects(this->GetDefaultDataStorage());
 
+  if(this->m_DistanceWidget != NULL)
+    this->m_DistanceWidget->ClearDistanceMatrix();
 }
 
 void QmitkToolPairNavigationView::ToolsAdded( QStringList tools )
@@ -117,7 +155,7 @@ void QmitkToolPairNavigationView::ToolsAdded( QStringList tools )
 }
 
 
-void QmitkToolPairNavigationView::OnStartNavigation()
+void QmitkToolPairNavigationView::SetNavigationUp()
 {
   if (m_Source.IsNotNull())
     if (m_Source->IsTracking())
@@ -148,109 +186,53 @@ void QmitkToolPairNavigationView::OnStartNavigation()
     return;
   }
 
-  //2. start IGT pipeline to display tracking devices (20 Hz update rate)
+  //2. start IGT pipeline to display tracking devices (20 Hz update rate -> 50 msec timeout)
   try
   {
-    this->StartContinuousUpdate(20);  
-    m_Controls.m_NavigationStatusDisplay->setText("Navigation started. Searching instruments...");
+    // setup for the bundle's update timer widget
+    m_Controls.m_RenderingTimerWidget->SetPurposeLabelText(QString("Navigation"));
+    m_Controls.m_RenderingTimerWidget->SetTimerInterval( 50 );
+
+    connect( m_Controls.m_RenderingTimerWidget->GetUpdateTimer() , SIGNAL(timeout()) , this, SLOT (RenderScene()) );
+    connect( m_Controls.m_RenderingTimerWidget, SIGNAL(Started()), this, SLOT(StartNavigation()));
+    connect( m_Controls.m_RenderingTimerWidget, SIGNAL(Stopped()) , this, SLOT (StopNavigation()));
+    connect( m_Controls.m_RenderingTimerWidget, SIGNAL(Stopped()) , m_DistanceWidget, SLOT (SetDistanceLabelValuesInvalid()));
+
   }
   catch(std::exception& e)
   {
     QMessageBox::warning(NULL, "ToolPairNavigation: Error", QString("Error while starting the IGT-Pipeline: %1").arg(e.what()));
-    this->StopContinuousUpdate();
+    this->m_Controls.m_RenderingTimerWidget->StopTimer();
     this->DestroyIGTPipeline();
-    m_Controls.m_NavigationStatusDisplay->setText(m_NavigationOfflineText);
     return;
   }
 }
 
-void QmitkToolPairNavigationView::OnPauseNavigation( bool pause )
+void QmitkToolPairNavigationView::StartNavigation()
 {
-  if ( m_RenderingTimer == NULL)
-    return;
-  if (pause == true)
+  if(m_Source.IsNotNull() && !m_Source->IsTracking())
   {
-    m_RenderingTimer->stop();
-    m_Controls.m_NavigationStatusDisplay->setText("Navigation is paused. There are currently no position updates!");
+    m_Source->StartTracking();
+    // creates the matrix with distances from the tracking source's outputs
+    m_DistanceWidget->CreateToolDistanceMatrix(m_Source->GetOutputs());
   }
-  else
-    m_RenderingTimer->start();
 }
 
-void QmitkToolPairNavigationView::OnStopNavigation()
+
+// is for tool changing events, like name changes
+void QmitkToolPairNavigationView::ToolsChanged()
 {
-  this->StopContinuousUpdate();
-  this->DestroyIGTPipeline();
 
-  this->RemoveVisualizationObjects(this->GetDefaultDataStorage());
-
-  /* reset GUI */
-  m_Controls.m_NavigationStatusDisplay->setText(m_NavigationOfflineText);
 }
 
-void QmitkToolPairNavigationView::OnShowTrackingVolume( bool on )
+void QmitkToolPairNavigationView::StopNavigation()
 {
-  if (m_Source->GetTrackingDevice() == NULL)
+  if(m_Source.IsNotNull() && m_Source->IsTracking())
   {
-    QMessageBox::warning(NULL, "Warning", QString("Please connect tracker first \n"));
-    return;
+    m_Source->StopTracking();
   }
-
-  if (m_Source->GetTrackingDevice()->GetState() == mitk::TrackingDevice::Setup)
-  {
-    QMessageBox::warning(NULL, "Warning", QString("Please start connect tracker first\n"));
-    return;
-  }
-
-  mitk::DataStorage* ds = this->GetDefaultDataStorage();
-  if (ds == NULL)
-    return;
-
-  //try to the the node
-  std::string trackerVolumeName = "Tracking Volume";
-  mitk::DataNode::Pointer node = ds->GetNamedNode(trackerVolumeName);
-
-  if (on == false)
-  {
-    //if the node is present
-    if (node.IsNotNull())
-      node->SetVisibility(false);
-  }
-  else
-  {
-    //no node present yet
-    if (node.IsNull())
-    {
-      // tracking volume
-      mitk::TrackingVolume::Pointer volume = mitk::TrackingVolume::New();
-      if (volume->SetTrackingDeviceType(m_Source->GetTrackingDevice()->GetType()) == false)
-      {
-        QMessageBox::warning(NULL, "Error", "can not load tracking volume. Tracking volume display is not available");
-        return;
-      }
-      mitk::DataNode::Pointer node = mitk::DataNode::New();
-      node->SetData(volume);
-      node->SetName(trackerVolumeName);
-      node->SetOpacity(0.2);
-      node->SetColor(0.4, 0.4, 1.0);
-      node->SetBoolProperty("helperObject", true);
-      node->SetBoolProperty("ToolPairNavigation", true);
-      ds->Add(node);
-    }
-    else
-    {
-      //mark as visible
-      node->SetVisibility(true);
-    }
-
-    // hide widget planes 
-    if (this->GetActiveStdMultiWidget() != NULL)
-      this->GetActiveStdMultiWidget()->SetWidgetPlanesVisibility(false);  
-  }
-
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-
 }
+
 
 void QmitkToolPairNavigationView::SetupIGTPipeline()
 {
@@ -265,12 +247,11 @@ void QmitkToolPairNavigationView::SetupIGTPipeline()
   m_Source = mitk::TrackingDeviceSource::New(); // create a new source for the IGT filter pipeline
   m_Source->SetTrackingDevice(tracker); // set the found tracker to the source
 
-  m_MessageFilter = mitk::NavigationDataToMessageFilter::New(); // filter used to display messages related to NDs
   m_Visualizer = mitk::NavigationDataObjectVisualizationFilter::New(); // filter to display NDs
   m_CameraVisualizer = mitk::CameraVisualization::New();
   //set widget 3
   m_CameraVisualizer->SetRenderer(mitk::BaseRenderer::GetInstance(m_MultiWidget->mitkWidget3->GetRenderWindow()));
-  
+
   //set viewing direction
   mitk::Vector3D viewVector;
   mitk::FillVector3D( viewVector, 0.0, 0.0, 1.0 );
@@ -282,25 +263,25 @@ void QmitkToolPairNavigationView::SetupIGTPipeline()
     m_Visualizer->SetInput(i, m_Source->GetOutput(i)); // set input for visualization filter
 
     const char* toolName = tracker->GetTool(i)->GetToolName();
-    mitk::DataNode::Pointer toolrepresentationNode;
-    
-    //the first tool represents the tool to guide 
-    //it will be represented as cone wheras the target tools will be represented by a sphere
-    if (i<1) //tool to guide
+    mitk::DataNode::Pointer toolrepresentationNode = ds->GetNamedNode(toolName);
+    if (toolrepresentationNode.IsNull())
     {
-      toolrepresentationNode = this->CreateConeAsInstrumentVisualization(toolName);
-      m_CameraVisualizer->SetInput(m_Source->GetOutput(i));      
+      //the first tool represents the tool to guide 
+      //it will be represented as cone wheras the target tools will be represented by a sphere
+      if (i<1) //tool to guide
+      {
+        toolrepresentationNode = this->CreateConeAsInstrumentVisualization(toolName);
+        m_CameraVisualizer->SetInput(m_Source->GetOutput(i));      
+      }
+      else
+        toolrepresentationNode = this->CreateSphereAsInstrumentVisualization(toolName);
+      ds->Add(toolrepresentationNode);
     }
-    else
-      toolrepresentationNode = this->CreateSphereAsInstrumentVisualization(toolName);
 
-    ds->Add(toolrepresentationNode);
     m_Visualizer->SetRepresentationObject(i, toolrepresentationNode->GetData());  // set instrument nodes as baseData for visualisation filter  
-    m_MessageFilter->SetInput(i, m_Source->GetOutput(i));  // set input for message filter
   }
-  
 
-  m_MessageFilter->AddDataValidChangedListener(mitk::MessageDelegate2<QmitkToolPairNavigationView, bool, unsigned int>(this, &QmitkToolPairNavigationView::OnDataValidChanged));
+
 }
 
 void QmitkToolPairNavigationView::DestroyIGTPipeline()
@@ -312,45 +293,10 @@ void QmitkToolPairNavigationView::DestroyIGTPipeline()
     m_Source = NULL;
   }  
 
-  if (m_MessageFilter.IsNotNull())
-  {
-    m_MessageFilter->RemoveDataValidChangedListener(mitk::MessageDelegate2<QmitkToolPairNavigationView, bool, unsigned int>(this, &QmitkToolPairNavigationView::OnDataValidChanged));
-    m_MessageFilter = NULL;
-  }
-
   m_Visualizer = NULL;
   m_CameraVisualizer = NULL;
 }
 
-void QmitkToolPairNavigationView::StartContinuousUpdate(unsigned int frameRate)
-{
-  if (m_Source.IsNull() || m_Visualizer.IsNull() || m_CameraVisualizer.IsNull())
-    throw std::invalid_argument("Pipeline is not set up correctly");
-  if (frameRate == 0)
-    throw std::invalid_argument("framerate must be larger than 0");
-
-  /* start continuous update */
-  m_Source->StartTracking();
-
-  if (m_RenderingTimer == NULL)
-    m_RenderingTimer = new QTimer(this);
-  connect(m_RenderingTimer, SIGNAL(timeout()), this, SLOT(RenderScene())); //connect the timer to the method RenderScene()
-  m_RenderingTimer->setInterval(1000/frameRate);
-  m_RenderingTimer->start();
-
-}
-
-void QmitkToolPairNavigationView::StopContinuousUpdate()
-{
-  /* stop continuous update */
-  if (m_RenderingTimer != NULL)
-  {
-    m_RenderingTimer->stop();
-    disconnect(m_RenderingTimer, SIGNAL(timeout()), this, SLOT(RenderScene()));
-    delete m_RenderingTimer;
-    m_RenderingTimer = NULL;
-  }
-}
 
 
 mitk::DataNode::Pointer QmitkToolPairNavigationView::CreateConeAsInstrumentVisualization(const char* label)
@@ -407,71 +353,23 @@ mitk::DataNode::Pointer QmitkToolPairNavigationView::CreateSphereAsInstrumentVis
   return sphereNode;
 }
 
-void QmitkToolPairNavigationView::OnDataValidChanged(bool newValue, unsigned int index)
-{
-  QString header("<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.0//EN' 'http://www.w3.org/TR/REC-html40/strict.dtd'>"
-    "<html><head><meta name='qrichtext' content='1' />"
-    "</head><body style=' font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;'>");
-  QString footer("</body></html>");
-
-  QString okay("%1 is tracked <span style=' font-weight:600; color:#2f9f00;'>OKAY</span>"); 
-  QString cannotbetracked( "%1 <span style='font-weight:600; color:#cc0104;'>can not be tracked!</span>");
-
-  if (m_Source.IsNull())
-    return; // no need to display anything, if tracking isn't even setup.
-  if (m_Source->IsTracking() == false)
-    return; // no need to display anything, if tracking isn't even setup.
-
-  mitk::TrackingDevice::ConstPointer tracker = m_Source->GetTrackingDevice();
-  QString dataValidOutput = header;
-  for (unsigned int i = 0; i < m_MessageFilter->GetNumberOfOutputs(); ++i)  // retrieve validity of each input and build up status string accordingly
-  {
-    const char* toolName = tracker->GetTool(i)->GetToolName();
-    if (m_MessageFilter->GetInput(i)->IsDataValid())
-      dataValidOutput += okay.arg(QString(toolName));
-    else
-      dataValidOutput += cannotbetracked.arg(QString(toolName));
-    dataValidOutput += QString("<BR/>");
-  }
-  dataValidOutput += footer;
-  m_Controls.m_NavigationStatusDisplay->setText(dataValidOutput);
-}
 
 void QmitkToolPairNavigationView::RenderScene()
 {
   try
   {
-    if (m_Visualizer.IsNull() || m_MessageFilter.IsNull() || m_CameraVisualizer.IsNull() || this->GetActiveStdMultiWidget() == NULL)
+    if (m_Visualizer.IsNull() || m_CameraVisualizer.IsNull() || this->GetActiveStdMultiWidget() == NULL)
       return;
     try
     {
       m_Visualizer->Update();
-      m_MessageFilter->Update(); // can be moved into own thread with lower update rate
       m_CameraVisualizer->Update();
-      
+
       //every tenth update
       static int counter = 0;
       if (counter > 9)
       {
-        //compute distance from tool 1 and tool 2 and display it 
-        mitk::NavigationData* nd0 = m_Source->GetOutput(0);
-        mitk::NavigationData* nd1 = m_Source->GetOutput(1);
-        if (nd0 == NULL  || nd1 == NULL)
-        {
-          static bool once = true;
-          if (once)
-          {
-            QMessageBox::warning(NULL, "Error", QString("Did not recieve two tracking tools!"));
-            once = false;
-          }
-          mitk::StatusBar::GetInstance()->DisplayText("Error: Did not recieve two tracking tools!"); // Display recording message for 75ms in status bar
-          return;
-        }
-        mitk::NavigationData::PositionType::RealType distanceToTool =  nd0->GetPosition().EuclideanDistanceTo(nd1->GetPosition());
-        QString str;
-        str.setNum(distanceToTool);
-        str+= " mm";
-        m_Controls.m_TLDistance->setText(str);
+        this->m_DistanceWidget->ShowDistanceValues(m_Source->GetOutputs());
         counter = 0;
       }
       else
@@ -481,7 +379,7 @@ void QmitkToolPairNavigationView::RenderScene()
     {
       std::cout << "Exception during QmitkToolPairNavigationView::RenderScene():" << e.what() << "\n";
     }
-    
+
     //update all Widgets
     mitk::RenderingManager::GetInstance()->RequestUpdateAll(mitk::RenderingManager::REQUEST_UPDATE_3DWINDOWS);
   }
@@ -499,6 +397,5 @@ void QmitkToolPairNavigationView::RemoveVisualizationObjects( mitk::DataStorage*
 {
   if (ds != NULL)
     ds->Remove(ds->GetSubset(mitk::NodePredicateProperty::New("ToolPairNavigation", mitk::BoolProperty::New(true)))); // remove all objects that have the ToolPairNavigation tag
-
 }
 

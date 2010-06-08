@@ -1,5 +1,5 @@
 <!DOCTYPE RCC><RCC version="1.0">
  <qresource prefix="/QmitkToolPairNavigationView">
-     <file>icon.xpm</file>
+     <file>toolpair.png</file>
  </qresource>
  </RCC>

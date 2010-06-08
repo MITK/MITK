@@ -28,7 +28,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkTrackingDeviceSource.h>
 #include <mitkNavigationDataToMessageFilter.h>
 
+
 class QmitkNDIConfigurationWidget;
+class QmitkUpdateTimerWidget;
+class QmitkToolDistanceWidget;
 
 /*!
  * \ingroup org_mitk_gui_qt_igttoolpairnavigation_internal
@@ -47,6 +50,7 @@ class QmitkToolPairNavigationView : public QObject, public QmitkFunctionality
   Q_OBJECT
 
   public:
+
 
   static const std::string VIEW_ID;
 
@@ -70,22 +74,22 @@ protected slots:
 
   void Disconnected();
   void ToolsAdded(QStringList tools);
+  void ToolsChanged();
 
   /**
   * @brief starting navigation
   **/
-  void OnStartNavigation(); 
-  
-  /**
-  * @brief pausing navigation
-  **/
-  void OnPauseNavigation(bool pause);
+  void SetNavigationUp(); 
   
   /**
   * @brief stopping navigation
   **/
-  void OnStopNavigation();
-  void OnShowTrackingVolume(bool on);///< this will show/hide the tracking volume
+  void StopNavigation();
+  
+  void StartNavigation();
+
+
+
   void RenderScene();
 
 protected:
@@ -103,26 +107,13 @@ protected:
   **/
   void DestroyIGTPipeline();  
   
-  /**
-  * @brief stop continuous rendering
-  **/
-  void StopContinuousUpdate();  
 
-  /**
-  * @brief start continuous rendering
-  **/
-  void StartContinuousUpdate(unsigned int frameRate);
   
   /**
   * @brief create objects for visualization
   **/
   mitk::DataNode::Pointer CreateConeAsInstrumentVisualization(const char* label = ""); 
   mitk::DataNode::Pointer CreateSphereAsInstrumentVisualization(const char* label = ""); 
-  
-  /**
-  * @brief display status "valid" of tools
-  **/
-  void OnDataValidChanged(bool newValue, unsigned int index);  ///< callback method for IGT event filter. This method changes the text/color of the navigation tool to indicate whether the instrument is tracked correctly
   
   /**
   * @brief remove the visualized objects
@@ -134,11 +125,12 @@ protected:
   **/
   QmitkStdMultiWidget* m_MultiWidget;
 
-  /**
-  * @brief timer
-  **/
-  QTimer* m_RenderingTimer;
   
+  /**
+  * @brief GUI widget with tool distances matrix
+  **/
+  QmitkToolDistanceWidget* m_DistanceWidget;
+
   /**
   * @brief source of the tracking system
   **/
@@ -151,15 +143,9 @@ protected:
   
   mitk::CameraVisualization::Pointer m_CameraVisualizer;
 
-  /**
-  * @brief a message filter
-  **/
-  mitk::NavigationDataToMessageFilter::Pointer m_MessageFilter; ///< message filter will call back OnDataValidChanged() every time the instrument tracking becomes invalid/valid  
-
   //GUI widget to connect to a NDI tracker
   QmitkNDIConfigurationWidget* m_NDIConfigWidget;
 
-  QString m_NavigationOfflineText;
 
   /**
   *@brief setting up the bundle widgets

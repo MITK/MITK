@@ -30,8 +30,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>374</width>
-        <height>69</height>
+        <width>98</width>
+        <height>28</height>
        </rect>
       </property>
       <attribute name="label">
@@ -93,7 +93,7 @@
   <customwidget>
    <class>QmitkUpdateTimerWidget</class>
    <extends>QWidget</extends>
-   <header>qmitkupdatetimerwidget.h</header>
+   <header>QmitkUpdateTimerWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

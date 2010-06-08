@@ -176,35 +176,37 @@ void QmitkBasicImageProcessing::Activated()
 {
   QmitkFunctionality::Activated();
 
+  this->m_Controls->cbWhat1->clear();
   this->m_Controls->cbWhat1->insertItem( NOACTIONSELECTED, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "Please select operation", 0, QApplication::UnicodeUTF8) ));
-    this->m_Controls->cbWhat1->insertItem( CATEGORY_DENOISING, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "--- Denoising ---", 0, QApplication::UnicodeUTF8) ));
-    this->m_Controls->cbWhat1->insertItem( GAUSSIAN, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "Gaussian", 0, QApplication::UnicodeUTF8) ));
-    this->m_Controls->cbWhat1->insertItem( MEDIAN,	 QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "Median", 0, QApplication::UnicodeUTF8) ));
-    this->m_Controls->cbWhat1->insertItem( TOTALVARIATION, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "Total Variation", 0, QApplication::UnicodeUTF8) ));
-    this->m_Controls->cbWhat1->insertItem( CATEGORY_MORPHOLOGICAL, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "--- Morphological ---", 0, QApplication::UnicodeUTF8) ));
-    this->m_Controls->cbWhat1->insertItem( DILATION, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "Dilation", 0, QApplication::UnicodeUTF8) ));
-    this->m_Controls->cbWhat1->insertItem( EROSION, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "Erosion", 0, QApplication::UnicodeUTF8) ));
-    this->m_Controls->cbWhat1->insertItem( OPENING, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "Opening", 0, QApplication::UnicodeUTF8) ));
-    this->m_Controls->cbWhat1->insertItem( CLOSING, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "Closing", 0, QApplication::UnicodeUTF8) ));
-    this->m_Controls->cbWhat1->insertItem( CATEGORY_EDGE_DETECTION, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "--- Edge Detection ---", 0, QApplication::UnicodeUTF8) ));
-    this->m_Controls->cbWhat1->insertItem( GRADIENT, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "Gradient", 0, QApplication::UnicodeUTF8) ));
-    this->m_Controls->cbWhat1->insertItem( LAPLACIAN, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "Laplacian (2nd Derivative)", 0, QApplication::UnicodeUTF8) ));
-    this->m_Controls->cbWhat1->insertItem( SOBEL, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "Sobel Operator", 0, QApplication::UnicodeUTF8) ));
-    this->m_Controls->cbWhat1->insertItem( CATEGORY_MISC, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "--- Misc ---", 0, QApplication::UnicodeUTF8) ));
-    this->m_Controls->cbWhat1->insertItem( THRESHOLD, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "Threshold", 0, QApplication::UnicodeUTF8) ));
-    this->m_Controls->cbWhat1->insertItem( INVERSION, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "Image Inversion", 0, QApplication::UnicodeUTF8) ));
-    this->m_Controls->cbWhat1->insertItem( DOWNSAMPLING, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "Downsampling", 0, QApplication::UnicodeUTF8) ));
+  this->m_Controls->cbWhat1->insertItem( CATEGORY_DENOISING, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "--- Denoising ---", 0, QApplication::UnicodeUTF8) ));
+  this->m_Controls->cbWhat1->insertItem( GAUSSIAN, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "Gaussian", 0, QApplication::UnicodeUTF8) ));
+  this->m_Controls->cbWhat1->insertItem( MEDIAN,	 QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "Median", 0, QApplication::UnicodeUTF8) ));
+  this->m_Controls->cbWhat1->insertItem( TOTALVARIATION, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "Total Variation", 0, QApplication::UnicodeUTF8) ));
+  this->m_Controls->cbWhat1->insertItem( CATEGORY_MORPHOLOGICAL, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "--- Morphological ---", 0, QApplication::UnicodeUTF8) ));
+  this->m_Controls->cbWhat1->insertItem( DILATION, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "Dilation", 0, QApplication::UnicodeUTF8) ));
+  this->m_Controls->cbWhat1->insertItem( EROSION, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "Erosion", 0, QApplication::UnicodeUTF8) ));
+  this->m_Controls->cbWhat1->insertItem( OPENING, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "Opening", 0, QApplication::UnicodeUTF8) ));
+  this->m_Controls->cbWhat1->insertItem( CLOSING, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "Closing", 0, QApplication::UnicodeUTF8) ));
+  this->m_Controls->cbWhat1->insertItem( CATEGORY_EDGE_DETECTION, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "--- Edge Detection ---", 0, QApplication::UnicodeUTF8) ));
+  this->m_Controls->cbWhat1->insertItem( GRADIENT, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "Gradient", 0, QApplication::UnicodeUTF8) ));
+  this->m_Controls->cbWhat1->insertItem( LAPLACIAN, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "Laplacian (2nd Derivative)", 0, QApplication::UnicodeUTF8) ));
+  this->m_Controls->cbWhat1->insertItem( SOBEL, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "Sobel Operator", 0, QApplication::UnicodeUTF8) ));
+  this->m_Controls->cbWhat1->insertItem( CATEGORY_MISC, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "--- Misc ---", 0, QApplication::UnicodeUTF8) ));
+  this->m_Controls->cbWhat1->insertItem( THRESHOLD, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "Threshold", 0, QApplication::UnicodeUTF8) ));
+  this->m_Controls->cbWhat1->insertItem( INVERSION, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "Image Inversion", 0, QApplication::UnicodeUTF8) ));
+  this->m_Controls->cbWhat1->insertItem( DOWNSAMPLING, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "Downsampling", 0, QApplication::UnicodeUTF8) ));
 
-    this->m_Controls->cbWhat2->insertItem( TWOIMAGESNOACTIONSELECTED, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "Please select on operation", 0, QApplication::UnicodeUTF8) ) );
-    this->m_Controls->cbWhat2->insertItem( CATEGORY_ARITHMETIC, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "--- Arithmetric operations ---", 0, QApplication::UnicodeUTF8) ) );
-    this->m_Controls->cbWhat2->insertItem( ADD, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "Add to Image 1:", 0, QApplication::UnicodeUTF8) ) );
-    this->m_Controls->cbWhat2->insertItem( SUBTRACT, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "Subtract from Image 1:", 0, QApplication::UnicodeUTF8) ) );
-    this->m_Controls->cbWhat2->insertItem( MULTIPLY, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "Multiply with Image 1:", 0, QApplication::UnicodeUTF8) ) );
-    this->m_Controls->cbWhat2->insertItem( DIVIDE, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "Divide Image 1 by:", 0, QApplication::UnicodeUTF8) ) );
-    this->m_Controls->cbWhat2->insertItem( CATEGORY_BOOLEAN, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "--- Boolean operations ---", 0, QApplication::UnicodeUTF8) ) );
-    this->m_Controls->cbWhat2->insertItem( AND, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "AND", 0, QApplication::UnicodeUTF8) ) );
-    this->m_Controls->cbWhat2->insertItem( OR, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "OR", 0, QApplication::UnicodeUTF8) ) );
-    this->m_Controls->cbWhat2->insertItem( XOR, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "XOR", 0, QApplication::UnicodeUTF8) ) );
+  this->m_Controls->cbWhat2->clear();
+  this->m_Controls->cbWhat2->insertItem( TWOIMAGESNOACTIONSELECTED, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "Please select on operation", 0, QApplication::UnicodeUTF8) ) );
+  this->m_Controls->cbWhat2->insertItem( CATEGORY_ARITHMETIC, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "--- Arithmetric operations ---", 0, QApplication::UnicodeUTF8) ) );
+  this->m_Controls->cbWhat2->insertItem( ADD, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "Add to Image 1:", 0, QApplication::UnicodeUTF8) ) );
+  this->m_Controls->cbWhat2->insertItem( SUBTRACT, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "Subtract from Image 1:", 0, QApplication::UnicodeUTF8) ) );
+  this->m_Controls->cbWhat2->insertItem( MULTIPLY, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "Multiply with Image 1:", 0, QApplication::UnicodeUTF8) ) );
+  this->m_Controls->cbWhat2->insertItem( DIVIDE, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "Divide Image 1 by:", 0, QApplication::UnicodeUTF8) ) );
+  this->m_Controls->cbWhat2->insertItem( CATEGORY_BOOLEAN, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "--- Boolean operations ---", 0, QApplication::UnicodeUTF8) ) );
+  this->m_Controls->cbWhat2->insertItem( AND, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "AND", 0, QApplication::UnicodeUTF8) ) );
+  this->m_Controls->cbWhat2->insertItem( OR, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "OR", 0, QApplication::UnicodeUTF8) ) );
+  this->m_Controls->cbWhat2->insertItem( XOR, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "XOR", 0, QApplication::UnicodeUTF8) ) );
 
 }
 

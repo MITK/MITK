@@ -161,6 +161,7 @@ void QmitkIGTLoggerWidget::OnRecording()
   {
     this->StopRecording();
     sampleCounter=0;
+    return;
   }
   m_Recorder->Update();
   

@@ -37,13 +37,13 @@ namespace itk {
     TGradientImagePixelType, TOdfPixelType, NrOdfDirections,
     NrBasisFunctionCenters>
     ::DiffusionQballReconstructionImageFilter() :
-    m_NumberOfBaselineImages(1),
-    m_Threshold(NumericTraits< ReferencePixelType >::NonpositiveMin()),
-    m_GradientImageTypeEnumeration(Else),
     m_GradientDirectionContainer(NULL),
-    m_BValue(1.0),
     m_NumberOfGradientDirections(0),
     m_NumberOfEquatorSamplingPoints(0),
+    m_NumberOfBaselineImages(1),
+    m_Threshold(NumericTraits< ReferencePixelType >::NonpositiveMin()),
+    m_BValue(1.0),
+    m_GradientImageTypeEnumeration(Else),
     m_DirectionsDuplicated(false)
   {
     // At least 1 inputs is necessary for a vector image.

@@ -86,7 +86,13 @@ bool mitk::MovieGenerator::WriteMovie()
     int imgSize = 3 * m_width * m_height;
     printf( "Video size = %i x %i\n", m_width, m_height );
     GLbyte *data = new GLbyte[imgSize];
-    for (unsigned int i=0; i<m_stepper->GetSteps(); i++)
+
+    //duplicate steps if pingPong option is switched to on.
+    int numOfSteps = m_stepper->GetSteps();
+    if( m_stepper->GetPingPong() )
+      numOfSteps*=2;
+
+    for (unsigned int i=0; i<numOfSteps; i++)
     {
       if (m_renderer) m_renderer->GetRenderWindow()->MakeCurrent();
       RenderingManager::GetInstance()->ForceImmediateUpdate(m_renderer->GetRenderWindow());

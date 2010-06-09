@@ -41,11 +41,11 @@ namespace itk {
   template< class T, class TG, class TO, int L, int NODF>
   AnalyticalDiffusionQballReconstructionImageFilter<T,TG,TO,L,NODF>
     ::AnalyticalDiffusionQballReconstructionImageFilter() :
-  m_NumberOfBaselineImages(1),
-    m_Threshold(NumericTraits< ReferencePixelType >::NonpositiveMin()),
     m_GradientDirectionContainer(NULL),
-    m_BValue(1.0),
     m_NumberOfGradientDirections(0),
+    m_NumberOfBaselineImages(1),
+    m_Threshold(NumericTraits< ReferencePixelType >::NonpositiveMin()),
+    m_BValue(1.0),
     m_Lambda(0.0),
     m_DirectionsDuplicated(false)
   {

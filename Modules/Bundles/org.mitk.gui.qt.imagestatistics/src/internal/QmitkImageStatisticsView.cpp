@@ -277,7 +277,7 @@ void QmitkImageStatistics::OnSelectionChanged( std::vector<mitk::DataNode*> node
   mitk::Image *selectedImage = dynamic_cast< mitk::Image * >( selectedNode->GetData() );
 
   // Find the next parent/grand-parent node containing an image, if any
-  const mitk::DataStorage::SetOfObjects *parentObjects;
+  mitk::DataStorage::SetOfObjects::ConstPointer parentObjects;
   mitk::DataNode *parentNode = NULL;
   mitk::Image *parentImage = NULL;
 

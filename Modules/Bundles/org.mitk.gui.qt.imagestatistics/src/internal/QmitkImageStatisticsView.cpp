@@ -103,6 +103,12 @@ QmitkImageStatistics::QmitkImageStatistics(QObject *parent, const char *name)
 
 QmitkImageStatistics::~QmitkImageStatistics()
 {
+  if ( m_SelectedImage != NULL )
+    m_SelectedImage->RemoveObserver( m_ImageObserverTag );
+  if ( m_SelectedImageMask != NULL )
+    m_SelectedImageMask->RemoveObserver( m_ImageMaskObserverTag ); 
+  if ( m_SelectedPlanarFigure != NULL )
+    m_SelectedPlanarFigure->RemoveObserver( m_PlanarFigureObserverTag );
 }
 
 
@@ -346,13 +352,13 @@ void QmitkImageStatistics::OnSelectionChanged( std::vector<mitk::DataNode*> node
 
   if ( m_SelectedImageMask != NULL )
   {
-    m_ImageObserverTag = m_SelectedImageMask->AddObserver( 
+    m_ImageMaskObserverTag = m_SelectedImageMask->AddObserver( 
       itk::ModifiedEvent(), changeListener );
   }
 
   if ( m_SelectedPlanarFigure != NULL )
   {
-    m_ImageObserverTag = m_SelectedPlanarFigure->AddObserver( 
+    m_PlanarFigureObserverTag = m_SelectedPlanarFigure->AddObserver( 
       itk::EndEvent(), changeListener );
   }
 

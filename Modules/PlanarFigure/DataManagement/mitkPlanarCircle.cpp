@@ -19,6 +19,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkPlanarCircle.h"
 #include "mitkGeometry2D.h"
 
+#include "mitkProperties.h"
+
 
 mitk::PlanarCircle::PlanarCircle()
 : FEATURE_ID_RADIUS( this->AddFeature( "Radius", "mm" ) ),
@@ -27,6 +29,7 @@ mitk::PlanarCircle::PlanarCircle()
 {
   // Circle has two control points
   this->ResetNumberOfControlPoints( 2 );
+  this->SetProperty( "closed", mitk::BoolProperty::New(true) );
 
   m_PolyLines->InsertElement( 0, VertexContainerType::New());
 }

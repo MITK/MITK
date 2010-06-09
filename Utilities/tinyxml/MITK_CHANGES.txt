@@ -1,0 +1,18 @@
+Changes made to the source code of TinyXML
+(should be checked when updating the source code)
+================================================================================
+
+We set the flag TIXML_USE_XML when compiling the library.
+
+Since most headers look differnt depending on whether this flag ist set or not
+we changed the headers by adding a 
+
+#define TIXML_USE_XML
+
+at the top of each header.
+
+If we wouldn't do this change in the original headers, we would have to put a line
+
+ADD_DEFINITIONS(-DTIXML_USE_XML)
+
+into each MITK module/application that wants to use TinyXML with STL strings.

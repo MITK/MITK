@@ -88,7 +88,7 @@ bool mitk::MovieGenerator::WriteMovie()
     GLbyte *data = new GLbyte[imgSize];
 
     //duplicate steps if pingPong option is switched to on.
-    int numOfSteps = m_stepper->GetSteps();
+    unsigned int numOfSteps = m_stepper->GetSteps();
     if( m_stepper->GetPingPong() )
       numOfSteps*=2;
 

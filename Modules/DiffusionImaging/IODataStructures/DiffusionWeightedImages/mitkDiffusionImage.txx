@@ -276,7 +276,7 @@ void mitk::DiffusionImage<TPixelType>::AverageRedundantGradients(double precisio
     // the old voxel value with duplicates
     typename ImageType::PixelType oldVec = oldIt.Get();
 
-    for(int i=0; i<dirIndices.size(); i++)
+    for(unsigned int i=0; i<dirIndices.size(); i++)
     {
       // do the averaging
       int numavg = dirIndices[i].size();

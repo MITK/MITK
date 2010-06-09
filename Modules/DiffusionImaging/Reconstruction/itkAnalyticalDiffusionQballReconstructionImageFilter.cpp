@@ -213,7 +213,7 @@ namespace itk {
         // If we have more than 2 inputs, then each input, except the first is a 
         // gradient image. The number of gradient images must match the number of
         // gradient directions.
-        const unsigned int numberOfInputs = this->GetNumberOfInputs();
+        //const unsigned int numberOfInputs = this->GetNumberOfInputs();
 
         // There need to be at least 6 gradient directions to be able to compute the 
         // tensor basis
@@ -637,7 +637,7 @@ namespace itk {
         vnl_vector<int>* lj = new vnl_vector<int>(m_NumberCoefficients);
         m_LP = new vnl_vector<double>(m_NumberCoefficients);
 
-        for(int i=0; i<m_NumberOfGradientDirections; i++)
+        for(unsigned int i=0; i<m_NumberOfGradientDirections; i++)
         {
           for(int k=0; k<=l; k+=2)
           {
@@ -723,7 +723,7 @@ namespace itk {
         m_CoeffReconstructionMatrix = new vnl_matrix<TO>(m_NumberCoefficients,m_NumberOfGradientDirections);
         for(int i=0; i<m_NumberCoefficients; i++)
         {
-          for(int j=0; j<m_NumberOfGradientDirections; j++)
+          for(unsigned int j=0; j<m_NumberOfGradientDirections; j++)
           {
             (*m_CoeffReconstructionMatrix)(i,j) = (float) temp(i,j);
           }

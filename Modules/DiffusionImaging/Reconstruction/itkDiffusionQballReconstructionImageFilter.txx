@@ -530,7 +530,7 @@ namespace itk {
     // calculate sampling points on the equator perpendicular to z-axis
     vnl_matrix<double> *C
       = new vnl_matrix<double>(3, m_NumberOfEquatorSamplingPoints);
-    for(int i=0; i<m_NumberOfEquatorSamplingPoints; i++)
+    for(unsigned int i=0; i<m_NumberOfEquatorSamplingPoints; i++)
     {
       double theta = i * (2*QBALL_RECON_PI / m_NumberOfEquatorSamplingPoints);
       (*C)(0,i) = cos(theta);
@@ -595,7 +595,7 @@ namespace itk {
           vnl_matrix<double> *tmpH
             = new vnl_matrix<double>(m_NumberOfGradientDirections,NBasisFunctionCenters);
 
-          for(int r=0; r<m_NumberOfGradientDirections; r++)
+          for(unsigned int r=0; r<m_NumberOfGradientDirections; r++)
           {
             for(int c=0; c<NBasisFunctionCenters; c++)
             {
@@ -651,7 +651,7 @@ namespace itk {
       = new vnl_matrix<double>(m_NumberOfEquatorSamplingPoints*NOdfDirections,NBasisFunctionCenters);
 
     {
-      for(int r=0; r<m_NumberOfEquatorSamplingPoints*NOdfDirections; r++)
+      for(unsigned int r=0; r<m_NumberOfEquatorSamplingPoints*NOdfDirections; r++)
       {
         for(int c=0; c<NBasisFunctionCenters; c++)
         {
@@ -687,7 +687,7 @@ namespace itk {
       }
 
       // this is an addition to the original tuch algorithm
-      for(int i=0; i<NOdfDirections*m_NumberOfEquatorSamplingPoints; i++)
+      for(unsigned int i=0; i<NOdfDirections*m_NumberOfEquatorSamplingPoints; i++)
       {
         vnl_vector< double > r = GH_plus->get_row(i);
         r /= r.sum();
@@ -702,9 +702,9 @@ namespace itk {
         = new vnl_matrix<TOdfPixelType>(NOdfDirections,m_NumberOfGradientDirections,0.0);
       for(int i=0; i<NOdfDirections; i++)
       {
-        for(int j=0; j<m_NumberOfGradientDirections; j++)
+        for(unsigned int j=0; j<m_NumberOfGradientDirections; j++)
         {
-          for(int k=0; k<m_NumberOfEquatorSamplingPoints; k++)
+          for(unsigned int k=0; k<m_NumberOfEquatorSamplingPoints; k++)
           {
             (*m_ReconstructionMatrix)(i,j) += (TOdfPixelType)(*GH_plus)(m_NumberOfEquatorSamplingPoints*i+k,j);
           }

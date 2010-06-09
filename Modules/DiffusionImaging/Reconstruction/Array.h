@@ -71,7 +71,7 @@ private:
 
 template <typename T> 
 Vector<T>::Vector() 
-  : n(0), v(0) 
+  : v(0), n(0)
 {} 
 
 template <typename T> 

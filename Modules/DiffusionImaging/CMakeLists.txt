@@ -18,4 +18,6 @@ ELSE(ITK_USES_GDCM2)
   )
 
   ADD_SUBDIRECTORY(Testing)
+  
+  CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/mitkDiffusionImagingConfigure.h ${CMAKE_CURRENT_BINARY_DIR}/mitkDiffusionImagingConfigure.h)
 ENDIF(ITK_USES_GDCM2)

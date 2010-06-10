@@ -22,6 +22,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkClippingProperty.h"
 #include "mitkVector.h"
 
+#include "SceneSerializationExports.h"
+
 namespace mitk
 {
 

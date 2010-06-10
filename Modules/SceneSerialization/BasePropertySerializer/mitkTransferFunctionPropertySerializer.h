@@ -18,6 +18,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkTransferFunctionProperty.h"
 #include "mitkBasePropertySerializer.h"
 
+#include "SceneSerializationExports.h"
+
 namespace mitk
 {
   class SceneSerialization_EXPORT TransferFunctionPropertySerializer : public BasePropertySerializer

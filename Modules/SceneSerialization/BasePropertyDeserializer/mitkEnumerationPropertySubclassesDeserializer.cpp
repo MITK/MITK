@@ -34,6 +34,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkVtkVolumeRenderingProperty.h"
 #include "mitkModalityProperty.h"
 
+#include "SceneSerializationExports.h"
+
 
 #define MITK_REGISTER_ENUM_SUB_DESERIALIZER(classname) \
  \

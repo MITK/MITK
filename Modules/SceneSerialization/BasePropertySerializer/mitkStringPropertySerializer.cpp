@@ -22,6 +22,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkStringProperty.h"
 
+#include "SceneSerializationExports.h"
+
 namespace mitk
 {
 

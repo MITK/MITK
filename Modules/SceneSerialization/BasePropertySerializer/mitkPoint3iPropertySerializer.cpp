@@ -21,6 +21,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkBasePropertySerializer.h"
 #include "mitkProperties.h"
 
+#include "SceneSerializationExports.h"
+
 namespace mitk
 {
 class SceneSerialization_EXPORT Point3iPropertySerializer : public BasePropertySerializer

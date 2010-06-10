@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef mitkSerializeBaseData_h_included
 #define mitkSerializeBaseData_h_included
 
-#include "SceneSerializationExports.h"
+#include "SceneSerializationBaseExports.h"
 #include "mitkSerializerMacros.h"
 
 #include <itkObjectFactoryBase.h>
@@ -38,7 +38,7 @@ namespace mitk
   Then the serializer for this class must be called GreenDataSerializer
   \endverbatim
 */
-class SceneSerialization_EXPORT BaseDataSerializer : public itk::Object
+class SceneSerializationBase_EXPORT BaseDataSerializer : public itk::Object
 {
   public:
     

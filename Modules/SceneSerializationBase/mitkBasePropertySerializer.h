@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef mitkSerializeBaseProperty_h_included
 #define mitkSerializeBaseProperty_h_included
 
-#include "SceneSerializationExports.h"
+#include "SceneSerializationBaseExports.h"
 #include "mitkSerializerMacros.h"
 
 #include <itkObjectFactoryBase.h>
@@ -40,7 +40,7 @@ namespace mitk
   Then the serializer for this class must be called GreenPropertySerializer
   \endverbatim
 */
-class SceneSerialization_EXPORT BasePropertySerializer : public itk::Object
+class SceneSerializationBase_EXPORT BasePropertySerializer : public itk::Object
 {
   public:
     

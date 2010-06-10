@@ -54,7 +54,7 @@ namespace mitk
  * Note: currently time-resolved and multi-channel pictures are not properly
  * supported.
  */
-class PlanarFigure_EXPORT ImageStatisticsCalculator : public itk::Object
+class MitkExt_EXPORT ImageStatisticsCalculator : public itk::Object
 {
 public:
 

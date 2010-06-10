@@ -314,9 +314,12 @@ void QmitkMeasurement::PlanarFigureSelectionChanged()
     m_DrawActionsToolBar->setEnabled(false);
   }
 
-  if (m_SelectedPlanarFigures->GetSize() == 0)
-    this->SetMeasurementInfoToRenderWindow("", 0);
-
+  if (m_SelectedPlanarFigures->GetSize() == 0){
+    this->SetMeasurementInfoToRenderWindow("", this->GetActiveStdMultiWidget()->GetRenderWindow1());
+    this->SetMeasurementInfoToRenderWindow("", this->GetActiveStdMultiWidget()->GetRenderWindow2());
+    this->SetMeasurementInfoToRenderWindow("", this->GetActiveStdMultiWidget()->GetRenderWindow3());
+    this->SetMeasurementInfoToRenderWindow("", this->GetActiveStdMultiWidget()->GetRenderWindow4());
+  }
 
   unsigned int j = 1;
   mitk::PlanarFigure* _PlanarFigure = 0;
@@ -781,7 +784,7 @@ void QmitkMeasurement::SetMeasurementInfoToRenderWindow(const QString& text,
 {
   if(m_LastRenderWindow != _RenderWindow)
   {
-
+    
     if(m_LastRenderWindow)
     {
       QObject::disconnect( m_LastRenderWindow, SIGNAL( destroyed(QObject*) )

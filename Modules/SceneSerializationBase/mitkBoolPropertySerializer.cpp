@@ -22,12 +22,12 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkProperties.h"
 
-#include "SceneSerializationExports.h"
+#include "SceneSerializationBaseExports.h"
 
 namespace mitk
 {
 
-class SceneSerialization_EXPORT BoolPropertySerializer : public BasePropertySerializer
+class SceneSerializationBase_EXPORT BoolPropertySerializer : public BasePropertySerializer
 {
   public:
     

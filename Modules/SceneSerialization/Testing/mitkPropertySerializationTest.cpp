@@ -82,7 +82,8 @@ int mitkPropertySerializationTest(int /* argc */, char* /*argv*/[])
 
   /* build list of properties that will be serialized and deserialized */
   mitk::PropertyList::Pointer propList = mitk::PropertyList::New();
-  propList->SetProperty("bool", mitk::BoolProperty::New(true));
+  propList->SetProperty("booltrue", mitk::BoolProperty::New(true));
+  propList->SetProperty("boolfalse", mitk::BoolProperty::New(false));
   propList->SetProperty("int", mitk::IntProperty::New(-32));
   propList->SetProperty("float", mitk::FloatProperty::New(-31.337));
   propList->SetProperty("double", mitk::DoubleProperty::New(-31.337));

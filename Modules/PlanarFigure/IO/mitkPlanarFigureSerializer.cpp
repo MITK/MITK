@@ -71,3 +71,4 @@ std::string mitk::PlanarFigureSerializer::Serialize()
   }
   return filename;
 }
+

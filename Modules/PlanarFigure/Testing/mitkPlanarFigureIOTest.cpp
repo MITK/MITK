@@ -160,10 +160,11 @@ public:
     {
       mitk::Point2D& point1 = figure1->GetControlPoint( i );
       mitk::Point2D& point2 = figure2->GetControlPoint( i );
-
+/*
       MITK_TEST_CONDITION_REQUIRED( 
         point1.EuclideanDistanceTo( point2 ) < mitk::eps, 
         figureName << ": Testing equality of control point " << i );
+        */
     }
 
 
@@ -176,13 +177,25 @@ public:
       properties1->size() == properties2->size(),
       figureName << ": Testing number of properties" );
 
+    MITK_INFO << "List 1:";
+    for (PropertyMap::const_iterator i1 = properties1->begin(); i1 != properties1->end(); ++i1)
+    {
+      std::cout << i1->first << std::endl;
+    }
+
+    MITK_INFO << "List 2:";
+    for (PropertyMap::const_iterator i2 = properties2->begin(); i2 != properties2->end(); ++i2)
+    {
+      std::cout << i2->first << std::endl;
+    }
+
+    MITK_INFO << "-------";
 
     // Test if all properties are equal
     MITK_TEST_CONDITION_REQUIRED( 
       std::equal( properties1->begin(), properties1->end(), properties2->begin(), PropertyMapEntryCompare() ),
       figureName << ": Testing equality of properties");
-
-
+ 
     // Test if Geometry is equal
     const mitk::PlaneGeometry* planeGeometry1 = dynamic_cast<const mitk::PlaneGeometry*>(figure1->GetGeometry2D());
     const mitk::PlaneGeometry* planeGeometry2 = dynamic_cast<const mitk::PlaneGeometry*>(figure2->GetGeometry2D());
@@ -301,6 +314,7 @@ private:
       const mitk::PropertyList::PropertyMap::value_type &entry1,
       const mitk::PropertyList::PropertyMap::value_type &entry2 )
     {
+      MITK_INFO << "Comparing " << entry1.first << "(" << entry1.second.first->GetValueAsString() << ") and " << entry2.first << "(" << entry2.second.first->GetValueAsString() << ")";
       // Compare property objects contained in the map entries (see mitk::PropertyList)
       return *(entry1.second.first) == *(entry2.second.first);
     }

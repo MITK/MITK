@@ -31,6 +31,7 @@ int mitkNavigationDataRecorderTest(int /* argc */, char* /*argv*/[])
   MITK_TEST_BEGIN("NavigationDataRecorder");
   std::string tmp = "";
   std::ostringstream* stream = new std::ostringstream( std::ostringstream::trunc );
+  stream->setf( std::ios::fixed, std::ios::floatfield );
 
   // let's create an object of our class  
   mitk::NavigationDataRecorder::Pointer recorder = mitk::NavigationDataRecorder::New();
@@ -51,9 +52,11 @@ int mitkNavigationDataRecorderTest(int /* argc */, char* /*argv*/[])
   for ( unsigned int i=0; i<5; i++ )
   {
     mitk::Point3D pnt;
-    pnt[0] = i+1;
-    pnt[1] = i+1/2;
-    pnt[2] = i+1*3;
+    pnt[0] = i + 1;
+    pnt[1] = i + 1/2;
+    pnt[2] = i +1*3;
+
+    
     naviData->SetPosition(pnt);
     //naviData->Modified();
     recorder->Update();
@@ -70,18 +73,18 @@ int mitkNavigationDataRecorderTest(int /* argc */, char* /*argv*/[])
   MITK_TEST_CONDITION( sub.compare("1") == 0, "check if number of inputs is correct by stringstream");
 
   pos = str.find( "X=" );
-  sub = stream->str().substr(pos+3, 3);
-  MITK_TEST_CONDITION( sub.compare("1.0") == 0, "check if the X coordinate is correct");
+  sub = stream->str().substr(pos+3, 1);
+  MITK_TEST_CONDITION( sub.compare("1") == 0, "check if the X coordinate is correct");
 
   
   pos = str.find( "Y=" );
-  sub = stream->str().substr(pos+3, 3);
-  MITK_TEST_CONDITION( sub.compare("0.0") == 0, "check if the Y coordinate is correct");
+  sub = stream->str().substr(pos+3, 1);
+  MITK_TEST_CONDITION( sub.compare("0") == 0, "check if the Y coordinate is correct");
 
   
   pos = str.find( "Z=" );
-  sub = stream->str().substr(pos+3, 3);
-  MITK_TEST_CONDITION( sub.compare("3.0") == 0, "check if the Z coordinate is correct");
+  sub = stream->str().substr(pos+3, 1);
+  MITK_TEST_CONDITION( sub.compare("3") == 0, "check if the Z coordinate is correct");
 
 
   recorder->SetFileName("blablabla");

@@ -221,8 +221,9 @@ mitk::Point2D mitk::PlanarCross::InternalApplyControlPointConstraints( unsigned 
       Point2D crossingPoint = p1 + n1 * dotProduct2;
 
       // Determine whether the projected point on the line, or the crossing point should be
-      // used (according to the second constrained in the comment above)
-      if ( pointOnLine.SquaredEuclideanDistanceTo( p3 ) > crossingPoint.SquaredEuclideanDistanceTo( p3 ) )
+      // used (according to the second constraint in the comment above)
+      if ( (pointOnLine.SquaredEuclideanDistanceTo( p3 ) > crossingPoint.SquaredEuclideanDistanceTo( p3 ))
+        && (pointOnLine.SquaredEuclideanDistanceTo( p3 ) > pointOnLine.SquaredEuclideanDistanceTo( crossingPoint )) )
       {
         return pointOnLine;
       }

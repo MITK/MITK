@@ -160,11 +160,10 @@ public:
     {
       mitk::Point2D& point1 = figure1->GetControlPoint( i );
       mitk::Point2D& point2 = figure2->GetControlPoint( i );
-/*
+
       MITK_TEST_CONDITION_REQUIRED( 
         point1.EuclideanDistanceTo( point2 ) < mitk::eps, 
         figureName << ": Testing equality of control point " << i );
-        */
     }
 
 

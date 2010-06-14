@@ -123,6 +123,7 @@ class GPGPU_DLL_API GPGPU
     void Activate();
     void Deactivate();
     void Run();
+    void Run(float start,float end);
 
   private:
 #ifdef _WIN32

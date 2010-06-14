@@ -234,7 +234,7 @@ static char stubVertexShader[] =
 
 mitk::GPGPU::Shader::Shader(char *source)
 {
-  std::cout << "compiling shader:\n" << source << std::endl;
+  //std::cout << "compiling shader:\n" << source << std::endl;
 
   glHandleVertex = glCreateShader(GL_VERTEX_SHADER);
   glHandleFragment = glCreateShader(GL_FRAGMENT_SHADER);
@@ -608,6 +608,18 @@ void mitk::GPGPU::Run()
   glVertex2f( 0,1 );
   glVertex2f( 1,0 );
   glVertex2f( 1,1 );
+  glEnd();
+
+  GPGPU_CHECKGLERR << "running a shader";
+}
+
+void mitk::GPGPU::Run(float start,float end)
+{
+  glBegin( GL_TRIANGLE_STRIP );
+  glVertex2f( 0,start );
+  glVertex2f( 0,end );
+  glVertex2f( 1,start );
+  glVertex2f( 1,end );
   glEnd();
 
   GPGPU_CHECKGLERR << "running a shader";

@@ -3253,7 +3253,7 @@
       <transition NAME="finish" NEXT_STATE_ID="0" EVENT_ID="505" />
     </state>
   </stateMachine>
-  <stateMachine NAME="Scroll">
+  <stateMachine NAME="LeftClickScroll">
     <state NAME="neutral" ID="0" START_STATE="TRUE" X_POS="288" Y_POS="81" WIDTH="100" HEIGHT="50">
       <transition NAME="initmove" NEXT_STATE_ID="1" EVENT_ID="1">
         <action ID="9" />
@@ -3264,6 +3264,21 @@
         <action ID="1013" />
       </transition>
       <transition NAME="finish" NEXT_STATE_ID="0" EVENT_ID="505">
+        <action ID="43" />
+      </transition>
+    </state>
+  </stateMachine>
+    <stateMachine NAME="MiddleClickScroll">
+    <state NAME="neutral" ID="0" START_STATE="TRUE" X_POS="288" Y_POS="81" WIDTH="100" HEIGHT="50">
+      <transition NAME="initmove" NEXT_STATE_ID="1" EVENT_ID="4">
+        <action ID="9" />
+      </transition>
+    </state>
+    <state NAME="scroll" ID="1" X_POS="170" Y_POS="413" WIDTH="100" HEIGHT="50">
+      <transition NAME="scroll" NEXT_STATE_ID="1" EVENT_ID="533">
+        <action ID="1013" />
+      </transition>
+      <transition NAME="finish" NEXT_STATE_ID="0" EVENT_ID="506">
         <action ID="43" />
       </transition>
     </state>

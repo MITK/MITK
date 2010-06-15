@@ -1,4 +1,5 @@
 #MESSAGE(STATUS "Searching for OpenCV")
+IF(MITK_USE_OPEN_CV)
 FIND_PACKAGE(OpenCV REQUIRED)
 LIST(APPEND ALL_LIBRARIES ${OpenCV_LIBS})
 # adding release directory for fixing error with RelWitgDebInfo (debug dlls have the suffix "d". thus release dlls wont be loaded accidentally)
@@ -19,3 +20,5 @@ LINK_DIRECTORIES(${OpenCV_LIB_DIR} "${OpenCV_LIB_DIR}/Release")
 #MESSAGE(STATUS "Warning: OpenCVConfig.cmake not found. Please set OPENCV_DIR manually to guide search.")
 #SET(OPENCV_DIR CACHE PATH "Set the directory containing OpenCVConfig.cmake")
 #ENDIF(OPENCV_DIR)
+ENDIF(MITK_USE_OPEN_CV)
+

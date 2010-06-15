@@ -33,7 +33,7 @@ int mitkSTLFileReaderTest(int argc, char* argv[])
   MITK_TEST_BEGIN("STLFileReader")
 
   //Read STL-Image from file
-	mitk::STLFileReader::Pointer reader = mitk::STLFileReader::New();
+  mitk::STLFileReader::Pointer reader = mitk::STLFileReader::New();
 
   if(argc==0)
   {
@@ -52,7 +52,7 @@ int mitkSTLFileReaderTest(int argc, char* argv[])
   }
   std::cout<<"[PASSED]"<<std::endl;
 
-	reader->SetFileName(argv[1]);
+  reader->SetFileName(argv[1]);
   reader->Update();
 
   MITK_TEST_CONDITION_REQUIRED((reader->GetOutput() != NULL),"Reader output not NULL")

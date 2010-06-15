@@ -25,13 +25,13 @@ PURPOSE.  See the above copyright notices for more information.
 
 int mitkImageTest(int /*argc*/, char* /*argv*/[])
 {
-	//Create Image out of nowhere
-	mitk::Image::Pointer imgMem;
-	mitk::PixelType pt(typeid(int));
-	unsigned int dim[]={100,100,20};
+  //Create Image out of nowhere
+  mitk::Image::Pointer imgMem;
+  mitk::PixelType pt(typeid(int));
+  unsigned int dim[]={100,100,20};
 
   std::cout << "Testing creation of Image: ";
-	imgMem=mitk::Image::New();
+  imgMem=mitk::Image::New();
   if(imgMem.IsNull())
   {
     std::cout<<"[FAILED]"<<std::endl;
@@ -40,7 +40,7 @@ int mitkImageTest(int /*argc*/, char* /*argv*/[])
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Testing Initialize(const mitk::PixelType& type, unsigned int dimension, unsigned int *dimensions): ";
-	imgMem->Initialize(mitk::PixelType(typeid(int)), 3, dim);
+  imgMem->Initialize(mitk::PixelType(typeid(int)), 3, dim);
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Testing IsInitialized(): ";
@@ -108,10 +108,10 @@ int mitkImageTest(int /*argc*/, char* /*argv*/[])
 
   //----
   mitkIpPicDescriptor *pic_slice=mitkIpPicClone(imgMem->GetSliceData(dim[2]/2)->GetPicDescriptor());
-	imgMem=mitk::Image::New();
+  imgMem=mitk::Image::New();
 
   std::cout << "Testing reinitializing via Initialize(const mitk::PixelType& type, unsigned int dimension, unsigned int *dimensions): ";
-	imgMem->Initialize(mitk::PixelType(typeid(int)), 3, dim);
+  imgMem->Initialize(mitk::PixelType(typeid(int)), 3, dim);
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Testing slice-wise filling via SetPicSlice(): ";

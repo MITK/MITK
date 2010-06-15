@@ -374,7 +374,7 @@ void QmitkDataStorageTreeModel::RemoveNode( const mitk::DataNode* node )
     parentTreeItem->AddChild(*it);
 
     // emit endInsertRows event
-    endInsertRows();  	
+    endInsertRows();    
   }
 
   this->AdjustLayerProperty();
@@ -421,12 +421,12 @@ bool QmitkDataStorageTreeModel::setData( const QModelIndex &index, const QVarian
   else if(role == Qt::CheckStateRole)
   {
     // Please note: value.toInt() returns 2, independentely from the actual checkstate of the index element. 
-	// Therefore the checkstate is being estimated again here. 
+  // Therefore the checkstate is being estimated again here. 
     
-	QVariant qcheckstate = index.data(Qt::CheckStateRole);
-	int checkstate = qcheckstate.toInt();
+  QVariant qcheckstate = index.data(Qt::CheckStateRole);
+  int checkstate = qcheckstate.toInt();
     bool isVisible = bool(checkstate);
-	dataNode->SetVisibility(!isVisible);
+  dataNode->SetVisibility(!isVisible);
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
   // inform listeners about changes

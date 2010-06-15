@@ -159,11 +159,11 @@ int mitkImageToItkTest(int /*argc*/, char* /*argv*/[])
   int result;
 
   //Create Image out of nowhere
-	mitk::Image::Pointer imgMem;
-	mitk::PixelType pt(typeid(int));
+  mitk::Image::Pointer imgMem;
+  mitk::PixelType pt(typeid(int));
 
   std::cout << "Testing creation of Image: ";
-	imgMem=mitk::Image::New();
+  imgMem=mitk::Image::New();
   if(imgMem.IsNull())
   {
     std::cout<<"[FAILED]"<<std::endl;

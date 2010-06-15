@@ -304,7 +304,7 @@ void mitk::BaseData::CopyInformation( const itk::DataObject* data )
   const Self* bd = dynamic_cast<const Self*>(data);
   if (bd != NULL)
   {
-  	m_TimeSlicedGeometry = dynamic_cast<TimeSlicedGeometry*>(bd->GetTimeSlicedGeometry()->Clone().GetPointer());
+    m_TimeSlicedGeometry = dynamic_cast<TimeSlicedGeometry*>(bd->GetTimeSlicedGeometry()->Clone().GetPointer());
     m_PropertyList = bd->GetPropertyList()->Clone();
   }
   else

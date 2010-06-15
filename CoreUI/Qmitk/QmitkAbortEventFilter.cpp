@@ -191,34 +191,34 @@ QmitkAbortEventFilter
         return true;
       }
 
-	case QEvent::ChildAdded: //change Layout (Big3D, 2D images up, etc.)	 
-    {	 
-      QChildEvent* ce = ( QChildEvent* )( event );	 
-      QChildEvent* newEvent = new QChildEvent(	 
-        QEvent::ChildAdded, ce->child() );	 
+  case QEvent::ChildAdded: //change Layout (Big3D, 2D images up, etc.)   
+    {   
+      QChildEvent* ce = ( QChildEvent* )( event );   
+      QChildEvent* newEvent = new QChildEvent(   
+        QEvent::ChildAdded, ce->child() );   
       m_EventQueue.push( ObjectEventPair(GuardedObject( object ), newEvent) );
-      return true;	 
-    }	 
+      return true;   
+    }   
 
-    case QEvent::ChildRemoved: //change Layout (Big3D, 2D images up, etc.)	 
-    {	 
-      QChildEvent* ce = ( QChildEvent* )( event );	 
-      QChildEvent* newEvent = new QChildEvent(	 
-        QEvent::ChildRemoved, ce->child() );	 
+    case QEvent::ChildRemoved: //change Layout (Big3D, 2D images up, etc.)   
+    {   
+      QChildEvent* ce = ( QChildEvent* )( event );   
+      QChildEvent* newEvent = new QChildEvent(   
+        QEvent::ChildRemoved, ce->child() );   
       m_EventQueue.push( ObjectEventPair(GuardedObject( object ), newEvent) );
-      return true;	 
-    }	 
+      return true;   
+    }   
 
-    case QEvent::Show:	 
-    {	 
-      QShowEvent* newEvent = new QShowEvent();	 
+    case QEvent::Show:   
+    {   
+      QShowEvent* newEvent = new QShowEvent();   
       m_EventQueue.push( ObjectEventPair(GuardedObject( object ), newEvent) );
-      return true;	 
-    }	 
+      return true;   
+    }   
 
-    case QEvent::Hide:	 
-    {	 
-      QHideEvent* newEvent = new QHideEvent();	 
+    case QEvent::Hide:   
+    {   
+      QHideEvent* newEvent = new QHideEvent();   
       m_EventQueue.push( ObjectEventPair(GuardedObject( object ), newEvent) );
       return true;
     }
@@ -255,13 +255,13 @@ QmitkAbortEventFilter
       return true;
     }
 
-    case QEvent::Resize: 	 
-    { 	 
+    case QEvent::Resize:    
+    {    
       QResizeEvent *re = (QResizeEvent *)( event );
       QResizeEvent *newEvent = new QResizeEvent(
         re->size(), re->oldSize() );
       m_EventQueue.push( ObjectEventPair(GuardedObject( object ), newEvent) );
-      return true; 	 
+      return true;    
     }
 
     case QEvent::Timer:

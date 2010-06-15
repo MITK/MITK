@@ -313,7 +313,7 @@ static void TestOpDeselectPoint(mitk::PointSet *pointSet)
 
 static void TestOpMovePointUp(mitk::PointSet *pointSet)
 {
-  //check OpMOVEPOINTUP  ExecuteOperation	
+  //check OpMOVEPOINTUP  ExecuteOperation  
   int id = 4;
   mitk::Point3D point4;
   mitk::Point3D point;
@@ -339,7 +339,7 @@ static void TestOpMovePointUp(mitk::PointSet *pointSet)
 
 static void TestOpMovePointDown(mitk::PointSet *pointSet)
 {
-  //check OpMOVEPOINTDown  ExecuteOperation	
+  //check OpMOVEPOINTDown  ExecuteOperation  
 
   int id = 2;
   mitk::Point3D point;
@@ -480,7 +480,7 @@ static void TestCreateHoleInThePointIDs(mitk::PointSet *pointSet)
 
 static void TestOpMovePointUpOnFirstPoint(mitk::PointSet *pointSet)
 {
-  //check OpMOVEPOINTUP  on first point ExecuteOperation	
+  //check OpMOVEPOINTUP  on first point ExecuteOperation  
 
   mitk::PointSet::PointType p1 = pointSet->GetPoint(1);
   mitk::PointSet::PointType p2 = pointSet->GetPoint(2);

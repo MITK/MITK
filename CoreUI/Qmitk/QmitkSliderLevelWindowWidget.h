@@ -78,8 +78,8 @@ public:
   ~QmitkSliderLevelWindowWidget();
 
   /*!
-  *	data structure which stores the values manipulated
-  *	by a QmitkSliderLevelWindowWidget
+  *  data structure which stores the values manipulated
+  *  by a QmitkSliderLevelWindowWidget
   */
   mitk::LevelWindow m_LevelWindow;
 
@@ -133,7 +133,7 @@ protected:
   QFont m_Font;
 
   /*!
-  *	data structure which creates the contextmenu for QmitkLineEditLevelWindowWidget
+  *  data structure which creates the contextmenu for QmitkLineEditLevelWindowWidget
   */
   QmitkLevelWindowWidgetContextMenu* m_Contextmenu;
 
@@ -152,7 +152,7 @@ protected:
   void mouseMoveEvent( QMouseEvent* mouseEvent );
 
   /*!
-  *	registers events when a mousebutton is pressed
+  *  registers events when a mousebutton is pressed
   *
   * if leftbutton is pressed m_Leftbutton is set to true
   *
@@ -161,7 +161,7 @@ protected:
   void mousePressEvent( QMouseEvent* mouseEvent );
 
   /*!
-  *	sets the variable m_MouseDown to false 
+  *  sets the variable m_MouseDown to false 
   */
   void mouseReleaseEvent( QMouseEvent* mouseEvent );
 

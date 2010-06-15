@@ -61,7 +61,7 @@ int mitkImageTimeSelectorTest(int argc, char* argv[])
   //Take a time step
   mitk::ImageTimeSelector::Pointer timeSelector = mitk::ImageTimeSelector::New();
   timeSelector->SetInput(image);
-	timeSelector->SetTimeNr( 0 );
+  timeSelector->SetTimeNr( 0 );
   timeSelector->UpdateLargestPossibleRegion();
   mitk::Image::Pointer result = timeSelector->GetOutput();
 

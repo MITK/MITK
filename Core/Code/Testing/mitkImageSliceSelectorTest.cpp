@@ -121,7 +121,7 @@ int mitkImageSliceSelectorTest(int argc, char* argv[])
     slice->SetInput(cyl2cart->GetOutput());
     slice->SetSliceNr(1);
 
-    //The requested region is still the old one, 	 
+    //The requested region is still the old one,    
     //therefore the following results in most ITK versions
     //in an exception!
     slice->Update();

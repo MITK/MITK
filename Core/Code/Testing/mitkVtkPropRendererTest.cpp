@@ -63,7 +63,7 @@ int mitkVtkPropRendererTest(int argc, char* argv[])
 
   //Read pic-Image from file
   std::cout << "Reading image: ";
-	mitk::PicFileReader::Pointer reader = mitk::PicFileReader::New();
+  mitk::PicFileReader::Pointer reader = mitk::PicFileReader::New();
   reader->SetFileName(argv[1]);
   reader->Update();
   std::cout<<"[PASSED]"<<std::endl;

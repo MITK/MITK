@@ -134,7 +134,7 @@ QmitkPreferencesDialog::QmitkPreferencesDialog(QWidget * parent, Qt::WindowFlags
 
   //# m_Headline
   m_Headline = new QLabel("");
-  m_Headline->setStyleSheet("background-color: 	silver; "
+  m_Headline->setStyleSheet("background-color:   silver; "
     "border-style: solid; border-width: 1px;"
     "border-color: white; font: bold 13px; color: white;");
 

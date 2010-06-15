@@ -509,7 +509,7 @@ void QmitkFunctionality::FireNodesSelected( std::vector<mitk::DataNode*> nodes )
   for (std::vector<mitk::DataNode*>::iterator it = nodes.begin()
     ; it != nodes.end(); it++)
   {
-  	nodesSmartPointers.push_back( *it );
+    nodesSmartPointers.push_back( *it );
   }
   m_SelectionProvider->FireNodesSelected(nodesSmartPointers);
 

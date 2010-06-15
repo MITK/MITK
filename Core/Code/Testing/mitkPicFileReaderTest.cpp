@@ -42,8 +42,8 @@ int mitkPicFileReaderTest(int argc, char* argv[])
   mitkIpPicGetTags(argv[1], picheader);
 
   //Read pic-Image from file
-	mitk::PicFileReader::Pointer reader = mitk::PicFileReader::New();
-	  reader->SetFileName(argv[1]);
+  mitk::PicFileReader::Pointer reader = mitk::PicFileReader::New();
+    reader->SetFileName(argv[1]);
     reader->Update();
 
   std::cout << "Testing IsInitialized(): ";

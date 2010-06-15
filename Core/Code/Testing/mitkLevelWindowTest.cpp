@@ -605,14 +605,14 @@ int mitkLevelWindowTest(int, char* [])
   // auch für default levelwindow und default range
 
   //Create Image out of nowhere
-	mitk::Image::Pointer image;
-	mitk::PixelType pt(typeid(int));
-	unsigned int dim[]={100,100,20};
+  mitk::Image::Pointer image;
+  mitk::PixelType pt(typeid(int));
+  unsigned int dim[]={100,100,20};
 
   std::cout << "Creating image: ";
-	image = mitk::Image::New();
+  image = mitk::Image::New();
   //image->DebugOn();
-	image->Initialize(mitk::PixelType(typeid(int)), 3, dim);
+  image->Initialize(mitk::PixelType(typeid(int)), 3, dim);
   int *p = (int*)image->GetData();
 
   int size = dim[0]*dim[1]*dim[2];

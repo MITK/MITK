@@ -61,6 +61,8 @@ mitk::PlanarFigureSource::DataObjectPointer mitk::PlanarFigureReader::MakeOutput
 void mitk::PlanarFigureReader::GenerateData()
 {
   m_Success = false;
+  this->SetNumberOfOutputs(0); // reset all outputs, we add new ones depending on the file content
+
   if (m_FileName.empty())
   {
     itkWarningMacro( << "Sorry, filename has not been set!" );
@@ -98,7 +100,6 @@ void mitk::PlanarFigureReader::GenerateData()
       return;
   }
 
-  this->SetNumberOfOutputs(0); // reset all outputs, we add new ones depending on the file content
   /* file version 1 reader code */
   for( TiXmlElement* pfElement = document.FirstChildElement("PlanarFigure");
        pfElement != NULL;

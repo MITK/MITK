@@ -305,16 +305,21 @@ void QmitkImageStatistics::OnSelectionChanged( std::vector<mitk::DataNode*> node
   m_SelectedImageMask = NULL;
   m_SelectedPlanarFigure = NULL;
 
-  do
   {
+    unsigned int parentObjectIndex = 0;
     parentObjects = this->GetDefaultDataStorage()->GetSources( selectedNode );
-    if ( parentObjects->Size() > 0 )
+    while( parentObjectIndex < parentObjects->Size() )
     {
       // Use first parent object (if multiple parents are present)
-      parentNode = parentObjects->ElementAt( 0 );
+      parentNode = parentObjects->ElementAt( parentObjectIndex );
       parentImage = dynamic_cast< mitk::Image * >( parentNode->GetData() );
+      if( parentImage != NULL )
+      {
+        break;
+      }
+      parentObjectIndex++;
     }
-  } while ( (parentImage == NULL) && (parentObjects->Size() != 0) );
+  }
 
   if ( parentImage != NULL )
   {
@@ -325,11 +330,27 @@ void QmitkImageStatistics::OnSelectionChanged( std::vector<mitk::DataNode*> node
     m_SelectedImageMask = dynamic_cast< mitk::Image * >( selectedNode->GetData() );
     m_SelectedPlanarFigure = dynamic_cast< mitk::PlanarFigure * >( selectedNode->GetData() );
 
-    if ( (m_SelectedImageMask != NULL) || (m_SelectedPlanarFigure != NULL) )
+    // Check whether ImageMask is a binary segmentation
+
+    if ( (m_SelectedImageMask != NULL) )
+    {
+      bool isMask( false );
+      selectedNode->GetPropertyValue("binary", isMask);
+      if ( !isMask )
+      {
+        m_SelectedImageNode = selectedNode;
+        m_SelectedImage = selectedImage;
+        m_SelectedImageMask = NULL;
+      }
+      else
+      {
+        m_SelectedMaskNode = selectedNode;
+      }
+    }
+    else if ( (m_SelectedPlanarFigure != NULL) )
     {
       m_SelectedMaskNode = selectedNode;
     }
-
   }
   else if ( selectedImage != NULL )
   {

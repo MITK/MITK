@@ -652,6 +652,11 @@ void mitk::VtkPropRenderer::InitPathTraversal()
 
 vtkAssemblyPath* mitk::VtkPropRenderer::GetNextPath()
 {
+  if (m_DataStorage.IsNull() )
+  {
+    return NULL;
+  }
+
   if ( m_PickingObjectsIterator == m_PickingObjects->end() )
   {
     return NULL;

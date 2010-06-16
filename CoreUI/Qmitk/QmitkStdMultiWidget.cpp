@@ -37,6 +37,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkLine.h"
 #include "mitkInteractionConst.h"
 #include "mitkDataStorage.h"
+#include "mitkNodePredicateNOT.h"
+#include "mitkNodePredicateProperty.h"
 
 #include "mitkVtkLayerController.h"
 
@@ -1976,7 +1978,15 @@ void QmitkStdMultiWidget::ResetCrosshair()
 {
   if (m_DataStorage.IsNotNull())
   {
-    mitk::RenderingManager::GetInstance()->InitializeViews( m_DataStorage->ComputeVisibleBoundingGeometry3D() );
+    mitk::NodePredicateNOT::Pointer pred
+      = mitk::NodePredicateNOT::New(mitk::NodePredicateProperty::New("includeInBoundingBox"
+      , mitk::BoolProperty::New(false)));
+
+    mitk::DataStorage::SetOfObjects::ConstPointer rs = m_DataStorage->GetSubset(pred);
+    // calculate bounding geometry of these nodes
+    mitk::TimeSlicedGeometry::Pointer bounds = m_DataStorage->ComputeBoundingGeometry3D(rs);
+
+    mitk::RenderingManager::GetInstance()->InitializeViews( bounds );
   }
 }
 

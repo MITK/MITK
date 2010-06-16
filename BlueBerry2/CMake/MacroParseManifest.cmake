@@ -45,7 +45,7 @@ SET(REQUIRE-BUNDLE )")
       STRING(REGEX MATCH "[^ ^:]+" _key "${_line}")
       STRING(REGEX REPLACE "^[^:]*[:](.*)" "\\1" _value "${_line}")
       
-	  STRING(STRIP "${_value}" _value)
+    STRING(STRIP "${_value}" _value)
       
       #MESSAGE(SEND_ERROR "(${_key}, ${_value})")
       

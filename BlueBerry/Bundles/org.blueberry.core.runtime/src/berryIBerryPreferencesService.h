@@ -14,17 +14,17 @@ namespace berry
   {
     berryInterfaceMacro(IBerryPreferencesService, berry)      
 
-	  ///
-	  /// Try to import the prefs from the given file.
+    ///
+    /// Try to import the prefs from the given file.
     /// Existing properties will be overridden!
     /// Returns true if the preferences could be imported.
-	  ///
+    ///
     virtual void ImportPreferences(Poco::File f, std::string name="") = 0;
 
     ///
     /// Exports the current system preferences to the given file.
     ///
-	  virtual void ExportPreferences(Poco::File f, std::string name="") = 0;
+    virtual void ExportPreferences(Poco::File f, std::string name="") = 0;
 
   };
 }  // namespace berry

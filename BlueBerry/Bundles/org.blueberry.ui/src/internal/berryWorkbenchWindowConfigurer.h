@@ -43,8 +43,8 @@ class WorkbenchWindow;
  */
 class WorkbenchWindowConfigurer : public IWorkbenchWindowConfigurer {
 
-	friend class WorkbenchWindow;
-	
+  friend class WorkbenchWindow;
+  
 public:
   berryObjectMacro(WorkbenchWindowConfigurer);
 

@@ -371,7 +371,7 @@ BundleLoader::StartAllBundles()
   BundleMap::iterator iter;
   for (iter = m_BundleMap.begin(); iter != m_BundleMap.end(); ++iter)
   {
-	  if  (iter->second.m_Bundle->GetActivationPolicy() == IBundleManifest::EAGER  &&
+    if  (iter->second.m_Bundle->GetActivationPolicy() == IBundleManifest::EAGER  &&
         !iter->second.m_Bundle->IsSystemBundle())
      this->StartBundle(iter->second.m_Bundle);
   }

@@ -3,7 +3,7 @@
 \page ExtPointsIndex Extension-Point Reference
 
 <center>
-	<h1>BlueBerry Platform Extension Points</h1>
+  <h1>BlueBerry Platform Extension Points</h1>
 </center>
 
 The following extension points can be used to extend the capabilities
@@ -11,26 +11,26 @@ of the platform infrastructure:
 
 <h3><a name="runtime"></a>Platform runtime</h3>
 <ul>
-	<li><a href="@BLUEBERRY_DOXYGEN_XP_RELATIVEDIR@/org_blueberry_osgi_applications.html">org.blueberry.osgi.applications</a></li>
+  <li><a href="@BLUEBERRY_DOXYGEN_XP_RELATIVEDIR@/org_blueberry_osgi_applications.html">org.blueberry.osgi.applications</a></li>
 </ul>
 
 <h3><a name="workbench"></a>Workbench</h3>
 <ul>
-	<li><a href="@BLUEBERRY_DOXYGEN_XP_RELATIVEDIR@/org_blueberry_ui_commands.html">org.blueberry.ui.commands</a></li>
-	<li><a href="@BLUEBERRY_DOXYGEN_XP_RELATIVEDIR@/org_blueberry_ui_editors.html">org.blueberry.ui.editors</a></li>
-	<li><a href="@BLUEBERRY_DOXYGEN_XP_RELATIVEDIR@/org_blueberry_ui_perspectives.html">org.blueberry.ui.perspectives</a></li>
-	<li><a href="@BLUEBERRY_DOXYGEN_XP_RELATIVEDIR@/org_blueberry_ui_presentationFactories.html">org.blueberry.ui.presentationFactories</a></li>
-	<li><a href="@BLUEBERRY_DOXYGEN_XP_RELATIVEDIR@/org_blueberry_ui_services.html">org.blueberry.ui.services</a></li>
-	<li><a href="@BLUEBERRY_DOXYGEN_XP_RELATIVEDIR@/org_blueberry_ui_keywords.html">org.blueberry.ui.keywords</a></li>
-	<li><a href="@BLUEBERRY_DOXYGEN_XP_RELATIVEDIR@/org_blueberry_ui_preferencePages.html">org.blueberry.ui.preferencePages</a></li>
-	<li><a href="@BLUEBERRY_DOXYGEN_XP_RELATIVEDIR@/org_blueberry_ui_tweaklets.html">org.blueberry.ui.tweaklets</a></li>
-	<li><a href="@BLUEBERRY_DOXYGEN_XP_RELATIVEDIR@/org_blueberry_ui_views.html">org.blueberry.ui.views</a></li>
+  <li><a href="@BLUEBERRY_DOXYGEN_XP_RELATIVEDIR@/org_blueberry_ui_commands.html">org.blueberry.ui.commands</a></li>
+  <li><a href="@BLUEBERRY_DOXYGEN_XP_RELATIVEDIR@/org_blueberry_ui_editors.html">org.blueberry.ui.editors</a></li>
+  <li><a href="@BLUEBERRY_DOXYGEN_XP_RELATIVEDIR@/org_blueberry_ui_perspectives.html">org.blueberry.ui.perspectives</a></li>
+  <li><a href="@BLUEBERRY_DOXYGEN_XP_RELATIVEDIR@/org_blueberry_ui_presentationFactories.html">org.blueberry.ui.presentationFactories</a></li>
+  <li><a href="@BLUEBERRY_DOXYGEN_XP_RELATIVEDIR@/org_blueberry_ui_services.html">org.blueberry.ui.services</a></li>
+  <li><a href="@BLUEBERRY_DOXYGEN_XP_RELATIVEDIR@/org_blueberry_ui_keywords.html">org.blueberry.ui.keywords</a></li>
+  <li><a href="@BLUEBERRY_DOXYGEN_XP_RELATIVEDIR@/org_blueberry_ui_preferencePages.html">org.blueberry.ui.preferencePages</a></li>
+  <li><a href="@BLUEBERRY_DOXYGEN_XP_RELATIVEDIR@/org_blueberry_ui_tweaklets.html">org.blueberry.ui.tweaklets</a></li>
+  <li><a href="@BLUEBERRY_DOXYGEN_XP_RELATIVEDIR@/org_blueberry_ui_views.html">org.blueberry.ui.views</a></li>
 </ul>
 
 <h3><a name="other"></a>Other</h3>
 <ul>
-	<li><a href="@BLUEBERRY_DOXYGEN_XP_RELATIVEDIR@/org_blueberry_core_expressions_definitions.html">org.blueberry.core.expressions.definitions</a></li>
-	<li><a href="@BLUEBERRY_DOXYGEN_XP_RELATIVEDIR@/org_blueberry_core_expressions_propertyTesters.html">org.blueberry.core.expressions.propertyTesters</a></li>
+  <li><a href="@BLUEBERRY_DOXYGEN_XP_RELATIVEDIR@/org_blueberry_core_expressions_definitions.html">org.blueberry.core.expressions.definitions</a></li>
+  <li><a href="@BLUEBERRY_DOXYGEN_XP_RELATIVEDIR@/org_blueberry_core_expressions_propertyTesters.html">org.blueberry.core.expressions.propertyTesters</a></li>
 </ul>
 <ul>
     <li><a href="@BLUEBERRY_DOXYGEN_XP_RELATIVEDIR@/org_blueberry_tests.html">org.blueberry.tests</a></li>

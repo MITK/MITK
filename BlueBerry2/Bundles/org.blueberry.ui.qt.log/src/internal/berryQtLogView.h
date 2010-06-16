@@ -34,9 +34,9 @@ class QtLogView : public QWidget
 public:
     QtLogView(QWidget *parent = 0);
     ~QtLogView();
-	  QtPlatformLogModel *model;
-	  QSortFilterProxyModel *filterModel;
-	  
+    QtPlatformLogModel *model;
+    QSortFilterProxyModel *filterModel;
+    
 private:
     Ui::QtLogViewClass ui;
     

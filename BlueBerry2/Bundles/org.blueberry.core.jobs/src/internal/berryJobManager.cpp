@@ -122,10 +122,10 @@ void JobManager::Shutdown()
 //void
 //JobManager
 //::Cancel(Object family) {
-//		//don't synchronize because cancel calls listeners
-//		for (Iterator it = select(family).iterator(); it.hasNext();)
-//			cancel((Job) it.next());
-//	}
+//    //don't synchronize because cancel calls listeners
+//    for (Iterator it = select(family).iterator(); it.hasNext();)
+//      cancel((Job) it.next());
+//  }
 
 
 IProgressMonitor::Pointer JobManager::CreateProgressGroup()
@@ -142,15 +142,15 @@ JobManager::CurrentJob()
 {
   //Poco::Thread* ptr_current = Poco::Thread::current();
   //if (Worker* worker = dynamic_cast<Worker*>(ptr_current) )
-  //	return ((Worker) ptr_current).currentJob();
+  //  return ((Worker) ptr_current).currentJob();
   // {
   //    Poco::ScopedLock<Poco::Mutex> lockMe (m_mutex);
   //    Poco::HashSet<InternalJob::Pointer, Object::Hash>::Iterator it ;
   //    for (it = m_running.begin(); it != m_running.end(); it ++) {
-  //		Job job* = dynamic_cast<Job*> (it);
-  //		if (job->GetThread() == ptr_current)
-  //			return job;
-  //	}
+  //    Job job* = dynamic_cast<Job*> (it);
+  //    if (job->GetThread() == ptr_current)
+  //      return job;
+  //  }
   //}
   return 0;
 }
@@ -159,19 +159,19 @@ JobManager::CurrentJob()
 //JobManager
 //::EndRule(ISchedulingRule rule) {
 //implicitJobs.end(rule, false);
-//	}
+//  }
 
 
 //Job[]
 //JobManager
 //::Find(Object family) {
-//		List members = select(family);
-//		return (Job[]) members.toArray(new Job[members.size()]);
-//	}
+//    List members = select(family);
+//    return (Job[]) members.toArray(new Job[members.size()]);
+//  }
 //
 //    LockManager GetLockManager() {
-//		return lockManager;
-//	}
+//    return lockManager;
+//  }
 //
 
 bool JobManager::IsIdle()
@@ -192,88 +192,88 @@ bool JobManager::IsSuspended()
 
 }
 //
-//  	/* 
-//	 * @see IJobManager#join(String, IProgressMonitor)
-//	 */
+//    /* 
+//   * @see IJobManager#join(String, IProgressMonitor)
+//   */
 //void
 //JobManager
 //::Join(final Object family, IProgressMonitor monitor) throws InterruptedException, OperationCanceledException {
-//		monitor = monitorFor(monitor);
-//		IJobChangeListener listener = null;
-//		final Set jobs;
-//		int jobCount;
-//		Job blocking = null;
-//		synchronized (lock) {
-//			//don't join a waiting or sleeping job when suspended (deadlock risk)
-//			int states = suspended ? Job.RUNNING : Job.RUNNING | Job.WAITING | Job.SLEEPING;
-//			jobs = Collections.synchronizedSet(new HashSet(select(family, states)));
-//			jobCount = jobs.size();
-//			if (jobCount > 0) {
-//				//if there is only one blocking job, use it in the blockage callback below
-//				if (jobCount == 1)
-//					blocking = (Job) jobs.iterator().next();
-//				listener = new JobChangeAdapter() {
-//					public void done(IJobChangeEvent event) {
-//						//don't remove from list if job is being rescheduled
-//						if (!((JobChangeEvent) event).reschedule)
-//							jobs.remove(event.getJob());
-//					}
+//    monitor = monitorFor(monitor);
+//    IJobChangeListener listener = null;
+//    final Set jobs;
+//    int jobCount;
+//    Job blocking = null;
+//    synchronized (lock) {
+//      //don't join a waiting or sleeping job when suspended (deadlock risk)
+//      int states = suspended ? Job.RUNNING : Job.RUNNING | Job.WAITING | Job.SLEEPING;
+//      jobs = Collections.synchronizedSet(new HashSet(select(family, states)));
+//      jobCount = jobs.size();
+//      if (jobCount > 0) {
+//        //if there is only one blocking job, use it in the blockage callback below
+//        if (jobCount == 1)
+//          blocking = (Job) jobs.iterator().next();
+//        listener = new JobChangeAdapter() {
+//          public void done(IJobChangeEvent event) {
+//            //don't remove from list if job is being rescheduled
+//            if (!((JobChangeEvent) event).reschedule)
+//              jobs.remove(event.getJob());
+//          }
 //
-//					//update the list of jobs if new ones are added during the join
-//					public void scheduled(IJobChangeEvent event) {
-//						//don't add to list if job is being rescheduled
-//						if (((JobChangeEvent) event).reschedule)
-//							return;
-//						Job job = event.getJob();
-//						if (job.belongsTo(family))
-//							jobs.add(job);
-//					}
-//				};
-//				addJobChangeListener(listener);
-//			}
-//		}
-//		if (jobCount == 0) {
-//			//use up the monitor outside synchronized block because monitors call untrusted code
-//			monitor.beginTask(JobMessages.jobs_blocked0, 1);
-//			monitor.done();
-//			return;
-//		}
-//		//spin until all jobs are completed
-//		try {
-//			monitor.beginTask(JobMessages.jobs_blocked0, jobCount);
-//			monitor.subTask(NLS.bind(JobMessages.jobs_waitFamSub, Integer.toString(jobCount)));
-//			reportBlocked(monitor, blocking);
-//			int jobsLeft;
-//			int reportedWorkDone = 0;
-//			while ((jobsLeft = jobs.size()) > 0) {
-//				//don't let there be negative work done if new jobs have
-//				//been added since the join began
-//				int actualWorkDone = Math.max(0, jobCount - jobsLeft);
-//				if (reportedWorkDone < actualWorkDone) {
-//					monitor.worked(actualWorkDone - reportedWorkDone);
-//					reportedWorkDone = actualWorkDone;
-//					monitor.subTask(NLS.bind(JobMessages.jobs_waitFamSub, Integer.toString(jobsLeft)));
-//				}
-//				if (Thread.interrupted())
-//					throw new InterruptedException();
-//				if (monitor.isCanceled())
-//					throw new OperationCanceledException();
-//				//notify hook to service pending syncExecs before falling asleep
-//				lockManager.aboutToWait(null);
-//				Thread.sleep(100);
-//			}
-//		} finally {
-//			lockManager.aboutToRelease();
-//			removeJobChangeListener(listener);
-//			reportUnblocked(monitor);
-//			monitor.done();
-//		}
-//	}
+//          //update the list of jobs if new ones are added during the join
+//          public void scheduled(IJobChangeEvent event) {
+//            //don't add to list if job is being rescheduled
+//            if (((JobChangeEvent) event).reschedule)
+//              return;
+//            Job job = event.getJob();
+//            if (job.belongsTo(family))
+//              jobs.add(job);
+//          }
+//        };
+//        addJobChangeListener(listener);
+//      }
+//    }
+//    if (jobCount == 0) {
+//      //use up the monitor outside synchronized block because monitors call untrusted code
+//      monitor.beginTask(JobMessages.jobs_blocked0, 1);
+//      monitor.done();
+//      return;
+//    }
+//    //spin until all jobs are completed
+//    try {
+//      monitor.beginTask(JobMessages.jobs_blocked0, jobCount);
+//      monitor.subTask(NLS.bind(JobMessages.jobs_waitFamSub, Integer.toString(jobCount)));
+//      reportBlocked(monitor, blocking);
+//      int jobsLeft;
+//      int reportedWorkDone = 0;
+//      while ((jobsLeft = jobs.size()) > 0) {
+//        //don't let there be negative work done if new jobs have
+//        //been added since the join began
+//        int actualWorkDone = Math.max(0, jobCount - jobsLeft);
+//        if (reportedWorkDone < actualWorkDone) {
+//          monitor.worked(actualWorkDone - reportedWorkDone);
+//          reportedWorkDone = actualWorkDone;
+//          monitor.subTask(NLS.bind(JobMessages.jobs_waitFamSub, Integer.toString(jobsLeft)));
+//        }
+//        if (Thread.interrupted())
+//          throw new InterruptedException();
+//        if (monitor.isCanceled())
+//          throw new OperationCanceledException();
+//        //notify hook to service pending syncExecs before falling asleep
+//        lockManager.aboutToWait(null);
+//        Thread.sleep(100);
+//      }
+//    } finally {
+//      lockManager.aboutToRelease();
+//      removeJobChangeListener(listener);
+//      reportUnblocked(monitor);
+//      monitor.done();
+//    }
+//  }
 
 //JobManager
 //::NewLock() {
-//		return lockManager.newLock();
-//	}
+//    return lockManager.newLock();
+//  }
 
 void JobManager::RemoveJobChangeListener(IJobChangeListener::Pointer listener)
 {
@@ -283,27 +283,27 @@ void JobManager::RemoveJobChangeListener(IJobChangeListener::Pointer listener)
 void JobManager::ReportBlocked(IProgressMonitor::Pointer sptr_monitor, InternalJob::Pointer sptr_blockingJob) const {
 
   if ( sptr_monitor.Cast<IProgressMonitorWithBlocking>() == 0 )
-			return ;
+      return ;
   
   if (sptr_blockingJob == 0 || sptr_blockingJob->IsSystem()) 
     {
    Status::Pointer sptr_reason( new Status(IStatus::INFO_TYPE, JobManager::PI_JOBS, 1, "the user operation is waiting for  background work to complete" ) );
 
-		} 
+    } 
   else 
     {
    std::stringstream msg ;
-   msg << "the user operation is waiting for : " << sptr_blockingJob->GetName() << " to complete. " ;		
+   msg << "the user operation is waiting for : " << sptr_blockingJob->GetName() << " to complete. " ;    
    JobStatus::Pointer sptr_reason(new JobStatus(IStatus::INFO_TYPE, sptr_blockingJob.Cast<Job>(), msg.str() ));
-		}
-		//  ((IProgressmonitorWithBlocking) sptr_monitor)->SetBlocked(sptr_reason);
-	}
+    }
+    //  ((IProgressmonitorWithBlocking) sptr_monitor)->SetBlocked(sptr_reason);
+  }
 
 
 void JobManager::ReportUnblocked(IProgressMonitor::Pointer sptr_monitor) const {
   if ( IProgressMonitorWithBlocking::Pointer sptr_monitorWithBlocking = sptr_monitor.Cast<IProgressMonitorWithBlocking>() )
-		 sptr_monitorWithBlocking->ClearBlocked(); 
-	}
+     sptr_monitorWithBlocking->ClearBlocked(); 
+  }
 
 
 void JobManager::Resume()
@@ -320,8 +320,8 @@ void JobManager::Resume()
 //void
 //JobManager
 //::Resume(ISchedulingRule rule)const {
-//		implicitJobs.resume(rule);
-//	}
+//    implicitJobs.resume(rule);
+//  }
 
 
 void JobManager::SetProgressProvider(ProgressProvider::Pointer provider)
@@ -344,11 +344,11 @@ void JobManager::SetRule(InternalJob::Pointer job,
 //void
 //JobManager
 //::Sleep(Object family) {
-//		//don't synchronize because sleep calls listeners
-//		for (Iterator it = select(family).iterator(); it.hasNext();) {
-//			sleep((InternalJob) it.next());
-//		}
-//	}
+//    //don't synchronize because sleep calls listeners
+//    for (Iterator it = select(family).iterator(); it.hasNext();) {
+//      sleep((InternalJob) it.next());
+//    }
+//  }
 
 
 void JobManager::Suspend()
@@ -362,30 +362,30 @@ void JobManager::Suspend()
 //void
 //JobManager
 //::Suspend(ISchedulingRule rule, IProgressMonitor monitor)const {
-//		Assert.isNotNull(rule);
-//		implicitJobs.suspend(rule, monitorFor(monitor));
-//	}
+//    Assert.isNotNull(rule);
+//    implicitJobs.suspend(rule, monitorFor(monitor));
+//  }
 
 //void
 //JobManager
 //::TransferRule(ISchedulingRule rule, Thread destinationThread) {
-//		implicitJobs.transfer(rule, destinationThread);
-//	}
+//    implicitJobs.transfer(rule, destinationThread);
+//  }
 
 //void
 //JobManager
 //::SetLockListener(LockListener listener) {
-//		lockManager.setLockListener(listener);
-//	}
+//    lockManager.setLockListener(listener);
+//  }
 
 //void
 //JobManager
 //::WakeUp(Object family) {
-//		//don't synchronize because wakeUp calls listeners
-//		for (Iterator it = select(family).iterator(); it.hasNext();) {
-//			wakeUp((InternalJob) it.next(), 0L);
-//		}
-//	}
+//    //don't synchronize because wakeUp calls listeners
+//    for (Iterator it = select(family).iterator(); it.hasNext();) {
+//      wakeUp((InternalJob) it.next(), 0L);
+//    }
+//  }
 
 void JobManager::AddJobChangeListener(IJobChangeListener::Pointer listener)
 {
@@ -395,33 +395,33 @@ void JobManager::AddJobChangeListener(IJobChangeListener::Pointer listener)
 //void 
 //JobManager
 //::BeginRule(ISchedulingRule rule, IProgressMonitor monitor) {
-//		validateRule(rule);
-//		implicitJobs.begin(rule, monitorFor(monitor), false);
-//	}
+//    validateRule(rule);
+//    implicitJobs.begin(rule, monitorFor(monitor), false);
+//  }
 //
 //  /**
-//	 * For debugging purposes only
-//	 */
+//   * For debugging purposes only
+//   */
 //std::String
 //JobManager
 //::PrintJobName(Job job) {
-//		if (job instanceof ThreadJob) {
-//			Job realJob = ((ThreadJob) job).realJob;
-//			if (realJob != null)
-//				return realJob.getClass().getName();
-//			return "ThreadJob on rule: " + job.getRule(); //$NON-NLS-1$
-//		}
-//		return job.getClass().getName();
-//	}
+//    if (job instanceof ThreadJob) {
+//      Job realJob = ((ThreadJob) job).realJob;
+//      if (realJob != null)
+//        return realJob.getClass().getName();
+//      return "ThreadJob on rule: " + job.getRule(); //$NON-NLS-1$
+//    }
+//    return job.getClass().getName();
+//  }
 //
 
-//	instance = this;
-//	initDebugOptions();
-//	synchronized (lock) {
+//  instance = this;
+//  initDebugOptions();
+//  synchronized (lock) {
 
-//		running = new HashSet(10);
-//	}
-//	pool.setDaemon(JobOSGiUtils.getDefault().useDaemonThreads());
+//    running = new HashSet(10);
+//  }
+//  pool.setDaemon(JobOSGiUtils.getDefault().useDaemonThreads());
 //}
 
 
@@ -485,7 +485,7 @@ void JobManager::ChangeState(InternalJob::Pointer sptr_job, int newState)
       //try {
       m_JobQueueSleeping.Enqueue(sptr_job);
       //} catch (RuntimeException e) {
-      //	throw new RuntimeException("Error changing from state: " + oldState);
+      //  throw new RuntimeException("Error changing from state: " + oldState);
       //}
       break;
     case Job::RUNNING:
@@ -496,8 +496,8 @@ void JobManager::ChangeState(InternalJob::Pointer sptr_job, int newState)
       break;
     case InternalJob::ABOUT_TO_SCHEDULE:
       break;
-      //	default :
-      //		Assert.isLegal(false, "Invalid job state: " + job + ", state: " + newState);
+      //  default :
+      //    Assert.isLegal(false, "Invalid job state: " + job + ", state: " + newState);
     }
   }
 
@@ -524,7 +524,7 @@ Poco::Timestamp::TimeDiff JobManager::DelayFor(int priority)
   case Job::DECORATE:
     return 1000;
   default:
-    //	Assert.isTrue(false, "Job has invalid priority: " + priority); //$NON-NLS-1$
+    //  Assert.isTrue(false, "Job has invalid priority: " + priority); //$NON-NLS-1$
     return 0;
   }
 }
@@ -598,7 +598,7 @@ void JobManager::DoShutdown()
       }
       if (DEBUG_SHUTDOWN)
       {
-        //	JobManager.debug("Shutdown - job wait cycle #" + (waitAttempts + 1)); 
+        //  JobManager.debug("Shutdown - job wait cycle #" + (waitAttempts + 1)); 
         std::vector<InternalJob::Pointer> vec_StillRunning;
         {
           Poco::ScopedLock<Poco::Mutex> LockMe(m_mutex);
@@ -606,7 +606,7 @@ void JobManager::DoShutdown()
 
           //   if (!vec_StillRunning.empty()) {
           //for (int j = 0; j < stillRunning.length; j++) {
-          //	JobManager.debug("\tJob: " + printJobName(stillRunning[j])); //$NON-NLS-1$
+          //  JobManager.debug("\tJob: " + printJobName(stillRunning[j])); //$NON-NLS-1$
           //}
         }
       }
@@ -625,16 +625,16 @@ void JobManager::DoShutdown()
   {
     /*for (int i = 0; i < vec_ToCancel.size(); i++) {*/
     //  std::string  tmp_jobName = PrintJobName(toCancel[i]);
-    //				//this doesn't need to be translated because it's just being logged
-    //				String msg = "Job found still running after platform shutdown.  Jobs should be canceled by the plugin that
+    //        //this doesn't need to be translated because it's just being logged
+    //        String msg = "Job found still running after platform shutdown.  Jobs should be canceled by the plugin that
     //        scheduled them during shutdown: " + jobName;
-    //				RuntimeLog.log(new Status(IStatus.WARNING, JobManager.PI_JOBS, JobManager.PLUGIN_ERROR, msg, null));
+    //        RuntimeLog.log(new Status(IStatus.WARNING, JobManager.PI_JOBS, JobManager.PLUGIN_ERROR, msg, null));
     //
-    //				// TODO the RuntimeLog.log in its current implementation won't produce a log
-    //				// during this stage of shutdown. For now add a standard error output.
-    //				// One the logging story is improved, the System.err output below can be removed:
-    //				System.err.println(msg);
-    //			}
+    //        // TODO the RuntimeLog.log in its current implementation won't produce a log
+    //        // during this stage of shutdown. For now add a standard error output.
+    //        // One the logging story is improved, the System.err output below can be removed:
+    //        System.err.println(msg);
+    //      }
   }
 
   m_Pool->Shutdown();
@@ -694,40 +694,40 @@ Job::Pointer JobManager::NextJob()
 //void 
 //JobManager
 //::Select(List members, Object family, InternalJob firstJob, int stateMask) {
-//		if (firstJob == null)
-//			return;
-//		InternalJob job = firstJob;
-//		do {
-//			//note that job state cannot be NONE at this point
-//			if ((family == null || job.belongsTo(family)) && ((job.getState() & stateMask) != 0))
-//				members.add(job);
-//			job = job.previous();
-//		} while (job != null && job != firstJob);
-//	}
+//    if (firstJob == null)
+//      return;
+//    InternalJob job = firstJob;
+//    do {
+//      //note that job state cannot be NONE at this point
+//      if ((family == null || job.belongsTo(family)) && ((job.getState() & stateMask) != 0))
+//        members.add(job);
+//      job = job.previous();
+//    } while (job != null && job != firstJob);
+//  }
 
 //List
 //JobManager
 //::Select(Object family) {
-//		return select(family, Job.WAITING | Job.SLEEPING | Job.RUNNING);
-//	}
+//    return select(family, Job.WAITING | Job.SLEEPING | Job.RUNNING);
+//  }
 
 //List
 //JobManager
 //::Select(Object family, int stateMask) {
-//		List members = new ArrayList();
-//		synchronized (lock) {
-//			if ((stateMask & Job.RUNNING) != 0) {
-//				for (Iterator it = running.iterator(); it.hasNext();) {
-//					select(members, family, (InternalJob) it.next(), stateMask);
-//				}
-//			}
-//			if ((stateMask & Job.WAITING) != 0)
-//				select(members, family, waiting.peek(), stateMask);
-//			if ((stateMask & Job.SLEEPING) != 0)
-//				select(members, family, sleeping.peek(), stateMask);
-//		}
-//		return members;
-//	}
+//    List members = new ArrayList();
+//    synchronized (lock) {
+//      if ((stateMask & Job.RUNNING) != 0) {
+//        for (Iterator it = running.iterator(); it.hasNext();) {
+//          select(members, family, (InternalJob) it.next(), stateMask);
+//        }
+//      }
+//      if ((stateMask & Job.WAITING) != 0)
+//        select(members, family, waiting.peek(), stateMask);
+//      if ((stateMask & Job.SLEEPING) != 0)
+//        select(members, family, sleeping.peek(), stateMask);
+//    }
+//    return members;
+//  }
 
 // dummy validateRule implemenation 
 void JobManager::ValidateRule(ISchedulingRule::Pointer sptr_rule)
@@ -891,7 +891,7 @@ InternalJob::Pointer JobManager::FindBlockingJob(InternalJob::Pointer waitingJob
       if (!hasBlockedJobs)
       hasBlockedJobs = sptr_job->Previous() != 0;
     }
-    //	there are no blocked jobs, so we are done
+    //  there are no blocked jobs, so we are done
     if (!hasBlockedJobs)
     {
       InternalJob::Pointer dummy;
@@ -953,46 +953,46 @@ bool JobManager::IsBlocking(InternalJob::Pointer sptr_runningJob)
 //void
 //JobManager
 //::Join(InternalJob job) {
-//		final IJobChangeListener listener;
-//		final Semaphore barrier;
-//		synchronized (lock) {
-//			int state = job.getState();
-//			if (state == Job.NONE)
-//				return;
-//			//don't join a waiting or sleeping job when suspended (deadlock risk)
-//			if (suspended && state != Job.RUNNING)
-//				return;
-//			//it's an error for a job to join itself
-//			if (state == Job.RUNNING && job.getThread() == Thread.currentThread())
-//				throw new IllegalStateException("Job attempted to join itself"); //$NON-NLS-1$
-//			//the semaphore will be released when the job is done
-//			barrier = new Semaphore(null);
-//			listener = new JobChangeAdapter() {
-//				public void done(IJobChangeEvent event) {
-//					barrier.release();
-//				}
-//			};
-//			job.addJobChangeListener(listener);
-//			//compute set of all jobs that must run before this one
-//			//add a listener that removes jobs from the blocking set when they finish
-//		}
-//		//wait until listener notifies this thread.
-//		try {
-//			while (true) {
-//				//notify hook to service pending syncExecs before falling asleep
-//				lockManager.aboutToWait(job.getThread());
-//				try {
-//					if (barrier.acquire(Long.MAX_VALUE))
-//						break;
-//				} catch (InterruptedException e) {
-//					//loop and keep trying
-//				}
-//			}
-//		} finally {
-//			lockManager.aboutToRelease();
-//			job.removeJobChangeListener(listener);
-//		}
-//	}
+//    final IJobChangeListener listener;
+//    final Semaphore barrier;
+//    synchronized (lock) {
+//      int state = job.getState();
+//      if (state == Job.NONE)
+//        return;
+//      //don't join a waiting or sleeping job when suspended (deadlock risk)
+//      if (suspended && state != Job.RUNNING)
+//        return;
+//      //it's an error for a job to join itself
+//      if (state == Job.RUNNING && job.getThread() == Thread.currentThread())
+//        throw new IllegalStateException("Job attempted to join itself"); //$NON-NLS-1$
+//      //the semaphore will be released when the job is done
+//      barrier = new Semaphore(null);
+//      listener = new JobChangeAdapter() {
+//        public void done(IJobChangeEvent event) {
+//          barrier.release();
+//        }
+//      };
+//      job.addJobChangeListener(listener);
+//      //compute set of all jobs that must run before this one
+//      //add a listener that removes jobs from the blocking set when they finish
+//    }
+//    //wait until listener notifies this thread.
+//    try {
+//      while (true) {
+//        //notify hook to service pending syncExecs before falling asleep
+//        lockManager.aboutToWait(job.getThread());
+//        try {
+//          if (barrier.acquire(Long.MAX_VALUE))
+//            break;
+//        } catch (InterruptedException e) {
+//          //loop and keep trying
+//        }
+//      }
+//    } finally {
+//      lockManager.aboutToRelease();
+//      job.removeJobChangeListener(listener);
+//    }
+//  }
 
 
 bool JobManager::RunNow(InternalJob::Pointer sptr_job)

@@ -34,7 +34,7 @@ using namespace osgi::framework;
  */
 struct BERRY_EXPRESSIONS IVariableResolver {
 
-	virtual ~IVariableResolver() {};
+  virtual ~IVariableResolver() {};
   
   /**
    * Resolves a variable for the given name and arguments. The

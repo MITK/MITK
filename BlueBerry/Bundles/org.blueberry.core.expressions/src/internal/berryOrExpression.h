@@ -27,8 +27,8 @@ class OrExpression : public CompositeExpression {
 public:
   
   EvaluationResult Evaluate(IEvaluationContext* context);
-	
-	bool operator==(Expression& object);
+  
+  bool operator==(Expression& object);
 };
 
 } // namespace berry

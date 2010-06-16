@@ -30,22 +30,22 @@ class WithExpression : public CompositeExpression {
 
 private:
   std::string fVariable;
-	static const std::string ATT_VARIABLE;
+  static const std::string ATT_VARIABLE;
 
-	/**
-	 * The seed for the hash code for all with expressions.
-	 */
-	static const std::size_t HASH_INITIAL;
+  /**
+   * The seed for the hash code for all with expressions.
+   */
+  static const std::size_t HASH_INITIAL;
 
 public:
 
   WithExpression(SmartPointer<IConfigurationElement> configElement);
 
-	WithExpression(Poco::XML::Element* element);
+  WithExpression(Poco::XML::Element* element);
 
-	WithExpression(const std::string& variable);
+  WithExpression(const std::string& variable);
 
-	bool operator==(Expression& object);
+  bool operator==(Expression& object);
 
   EvaluationResult Evaluate(IEvaluationContext* context);
 

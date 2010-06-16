@@ -33,18 +33,18 @@ class TestExpression : public Expression {
 private:
   std::string fNamespace;
   std::string fProperty;
-	std::vector<Object::Pointer> fArgs;
-	Object::Pointer fExpectedValue;
-	bool fForcePluginActivation;
+  std::vector<Object::Pointer> fArgs;
+  Object::Pointer fExpectedValue;
+  bool fForcePluginActivation;
 
-	static const char PROP_SEP;
-	static const std::string ATT_PROPERTY;
-	static const std::string ATT_ARGS;
-	static const std::string ATT_FORCE_PLUGIN_ACTIVATION;
-	/**
-	 * The seed for the hash code for all test expressions.
-	 */
-	static const std::size_t HASH_INITIAL;
+  static const char PROP_SEP;
+  static const std::string ATT_PROPERTY;
+  static const std::string ATT_ARGS;
+  static const std::string ATT_FORCE_PLUGIN_ACTIVATION;
+  /**
+   * The seed for the hash code for all test expressions.
+   */
+  static const std::size_t HASH_INITIAL;
 
   static TypeExtensionManager fgTypeExtensionManager;
 
@@ -53,38 +53,38 @@ public:
 
   TestExpression(SmartPointer<IConfigurationElement> element);
 
-	TestExpression(Poco::XML::Element* element);
+  TestExpression(Poco::XML::Element* element);
 
-	TestExpression(const std::string& namespaze, const std::string& property,
-	    std::vector<Object::Pointer>& args, Object::Pointer expectedValue);
+  TestExpression(const std::string& namespaze, const std::string& property,
+      std::vector<Object::Pointer>& args, Object::Pointer expectedValue);
 
-	TestExpression(const std::string& namespaze, const std::string& property,
-	    std::vector<Object::Pointer>& args, Object::Pointer expectedValue, bool forcePluginActivation);
+  TestExpression(const std::string& namespaze, const std::string& property,
+      std::vector<Object::Pointer>& args, Object::Pointer expectedValue, bool forcePluginActivation);
 
-	EvaluationResult Evaluate(IEvaluationContext* context);
+  EvaluationResult Evaluate(IEvaluationContext* context);
 
-	void CollectExpressionInfo(ExpressionInfo* info);
+  void CollectExpressionInfo(ExpressionInfo* info);
 
-	bool operator==(Expression& object);
+  bool operator==(Expression& object);
 
 protected:
 
   std::size_t ComputeHashCode();
 
-	//---- Debugging ---------------------------------------------------
+  //---- Debugging ---------------------------------------------------
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
+  /* (non-Javadoc)
+   * @see java.lang.Object#toString()
+   */
 public:
 
   std::string ToString();
 
-	//---- testing ---------------------------------------------------
+  //---- testing ---------------------------------------------------
 
-	bool TestGetForcePluginActivation();
+  bool TestGetForcePluginActivation();
 
-	static TypeExtensionManager& TestGetTypeExtensionManager();
+  static TypeExtensionManager& TestGetTypeExtensionManager();
 };
 
 } // namespace berry

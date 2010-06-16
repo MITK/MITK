@@ -39,31 +39,31 @@ private:
   // for now it's just part of the reference expression
   static DefinitionRegistry fgDefinitionRegistry;
 
-	static DefinitionRegistry& GetDefinitionRegistry();
+  static DefinitionRegistry& GetDefinitionRegistry();
 
-	static const std::string ATT_DEFINITION_ID;
+  static const std::string ATT_DEFINITION_ID;
 
-	/**
-	 * The seed for the hash code for all equals expressions.
-	 */
-	static const std::size_t HASH_INITIAL;
+  /**
+   * The seed for the hash code for all equals expressions.
+   */
+  static const std::size_t HASH_INITIAL;
 
-	std::string fDefinitionId;
+  std::string fDefinitionId;
 
 
 public:
 
   ReferenceExpression(const std::string& definitionId);
 
-	ReferenceExpression(SmartPointer<IConfigurationElement> element);
+  ReferenceExpression(SmartPointer<IConfigurationElement> element);
 
-	ReferenceExpression(Poco::XML::Element* element);
+  ReferenceExpression(Poco::XML::Element* element);
 
-	EvaluationResult Evaluate(IEvaluationContext::Pointer context);
+  EvaluationResult Evaluate(IEvaluationContext::Pointer context);
 
-	void CollectExpressionInfo(ExpressionInfo* info);
+  void CollectExpressionInfo(ExpressionInfo* info);
 
-	bool operator==(Expression& object);
+  bool operator==(Expression& object);
 
 
 protected:

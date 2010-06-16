@@ -15,7 +15,7 @@ MACRO(MACRO_INSTALL_PLUGIN _plugin_dir)
   IF(NOT _INSTALL_TARGETS)
     # no targets specified. get the main target from the plug-ins manifest
     MACRO_PARSE_MANIFEST("${_plugin_dir}/META-INF/MANIFEST.MF")
-	STRING(REPLACE "." "_" _INSTALL_TARGETS ${BUNDLE-SYMBOLICNAME})
+  STRING(REPLACE "." "_" _INSTALL_TARGETS ${BUNDLE-SYMBOLICNAME})
   ENDIF()
  
   IF(NOT _INSTALL_DESTINATION)
@@ -30,18 +30,18 @@ MACRO(MACRO_INSTALL_PLUGIN _plugin_dir)
   # Install the directory without shared libraries
   INSTALL(DIRECTORY ${_plugin_dir}  DESTINATION ${_INSTALL_DESTINATION} CONFIGURATIONS Debug 
           PATTERN "Release/*" EXCLUDE 
-		  PATTERN "bin/*" EXCLUDE
-		  PATTERN "lib/*" EXCLUDE)
-		  
+      PATTERN "bin/*" EXCLUDE
+      PATTERN "lib/*" EXCLUDE)
+      
   INSTALL(DIRECTORY ${_plugin_dir} DESTINATION ${_INSTALL_DESTINATION} CONFIGURATIONS Release 
           PATTERN "Debug/*" EXCLUDE
           PATTERN "bin/*" EXCLUDE
-		  PATTERN "lib/*" EXCLUDE)
-		  
+      PATTERN "lib/*" EXCLUDE)
+      
   INSTALL(TARGETS ${_INSTALL_TARGETS}
                   RUNTIME DESTINATION ${_plugin_install_dir}/bin
-				  LIBRARY DESTINATION ${_plugin_install_dir}/lib
-				  ARCHIVE DESTINATION ${_plugin_install_dir}/lib
-		 )
+          LIBRARY DESTINATION ${_plugin_install_dir}/lib
+          ARCHIVE DESTINATION ${_plugin_install_dir}/lib
+     )
 
 ENDMACRO()

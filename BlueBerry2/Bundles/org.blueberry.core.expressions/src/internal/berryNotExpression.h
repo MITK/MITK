@@ -23,7 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 namespace berry {
 
 class NotExpression : public Expression {
-	
+  
 private:
   
   /**
@@ -31,22 +31,22 @@ private:
     */
   static const std::size_t HASH_INITIAL;
 
-	Expression::Pointer fExpression;
+  Expression::Pointer fExpression;
 
 public:
   
   NotExpression(Expression::Pointer expression);
-	
-	EvaluationResult Evaluate(IEvaluationContext::Pointer context);
-	
-	void CollectExpressionInfo(ExpressionInfo* info);
+  
+  EvaluationResult Evaluate(IEvaluationContext::Pointer context);
+  
+  void CollectExpressionInfo(ExpressionInfo* info);
 
-	bool operator==(Expression& object);
+  bool operator==(Expression& object);
 
-	
-	protected:
-	  
-	  std::size_t ComputeHashCode();
+  
+  protected:
+    
+    std::size_t ComputeHashCode();
 };
 
 } // namespace berry

@@ -75,10 +75,10 @@ namespace berry
   {
     try
     {
-	    this->ToDOMTree(dynamic_cast<Preferences*>(this->m_Root.GetPointer()), 0);
-	    // flush dom to file	
-	    Poco::XML::DOMWriter writer;
-	    //writer.setNewLine("\n");
+      this->ToDOMTree(dynamic_cast<Preferences*>(this->m_Root.GetPointer()), 0);
+      // flush dom to file  
+      Poco::XML::DOMWriter writer;
+      //writer.setNewLine("\n");
       writer.setOptions(Poco::XML::XMLWriter::PRETTY_PRINT);
       std::ofstream f;
       f.open (this->m_File.path().c_str());

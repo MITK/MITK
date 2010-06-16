@@ -15,4 +15,4 @@ MACRO_COLLECT_PLUGINS(OUTPUT_DIR ${BLUEBERRY_PLUGINS_OUTPUT_DIR}
                       CMAKE_CACHE_PREFIX "BLUEBERRY"
                       PLUGIN_DEFAULT_ON ${_default_plugins}
                       ${BLUEBERRY_BUILD_ALL_PLUGINS_OPTION})
-					  
+            

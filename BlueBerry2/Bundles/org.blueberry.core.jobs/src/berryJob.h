@@ -239,7 +239,7 @@ public:
    * is scheduled to be run.
    *
    * @return the priority of the job.  One of INTERACTIVE, SHORT, LONG, BUILD,
-   * 	or DECORATE.
+   *   or DECORATE.
    */
   int GetPriority() const;
 

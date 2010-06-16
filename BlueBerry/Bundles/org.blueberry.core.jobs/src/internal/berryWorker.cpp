@@ -90,10 +90,10 @@ void Worker::JobRunnable::run()
 void Worker::JobRunnable::RunMethodFinallyExecution(IStatus::Pointer sptr_result)
 {
 
-		//clear interrupted state for this thread
-	  //Thread.interrupted();
+    //clear interrupted state for this thread
+    //Thread.interrupted();
 
-		//result must not be null
+    //result must not be null
 if (sptr_result.IsNull())
   {   
   std::runtime_error tempError("NullPointerException") ; 
@@ -102,10 +102,10 @@ if (sptr_result.IsNull())
    ptr_currentWorker->m_wpPool.Lock()->EndJob( ptr_currentWorker->ptr_currentJob, sptr_result );
 
     if ((sptr_result->GetSeverity() & (IStatus::ERROR_TYPE | IStatus::WARNING_TYPE)) != 0)
-					// TODO Logging	RuntimeLog.log(result);
+          // TODO Logging  RuntimeLog.log(result);
           std::cout << " Status after executing the job : " << sptr_result->ToString() ; 
-		ptr_currentWorker->ptr_currentJob = 0;
-					//reset thread priority in case job changed it
+    ptr_currentWorker->ptr_currentJob = 0;
+          //reset thread priority in case job changed it
     ptr_currentWorker->setPriority(PRIO_NORMAL);
 
  }

@@ -120,7 +120,7 @@ InternalJob::Pointer WorkerPool::StartJob(Worker* worker)
     Poco::Mutex::ScopedLock lockOne(m_mutexOne);
     if (!m_ptrManager->IsActive())
     {
-      //	must remove the worker immediately to prevent all threads from expiring
+      //  must remove the worker immediately to prevent all threads from expiring
       Worker::Pointer sptr_worker(worker);
       EndWorker(sptr_worker);
       return InternalJob::Pointer(0);
@@ -161,8 +161,8 @@ InternalJob::Pointer WorkerPool::StartJob(Worker* worker)
       //if ((job.getRule() != 0) && !(job instanceof ThreadJob)) {
       // //don't need to re-aquire locks because it was not recorded in the graph
       // //that this thread waited to get this rule
-      //	manager.getLockManager().addLockThread(Thread.currentThread(), job.getRule());
-      //				}
+      //  manager.getLockManager().addLockThread(Thread.currentThread(), job.getRule());
+      //        }
       //see if we need to wake another worker
       if (m_ptrManager->SleepHint() <= 0)
         JobQueued();
@@ -204,17 +204,17 @@ void WorkerPool::JobQueued()
 
 
 void WorkerPool::EndJob(InternalJob::Pointer job, IStatus::Pointer result) {
-  		DecrementBusyThreads();
+      DecrementBusyThreads();
   //TODO LockManager 
-  //		//need to end rule in graph before ending job so that 2 threads
-  //		//do not become the owners of the same rule in the graph
-  //		if ((job.getRule() != null) && !(job instanceof ThreadJob)) {
-  //			//remove any locks this thread may be owning on that rule
-  //			manager.getLockManager().removeLockCompletely(Thread.currentThread(), job.getRule());
-  //		}
+  //    //need to end rule in graph before ending job so that 2 threads
+  //    //do not become the owners of the same rule in the graph
+  //    if ((job.getRule() != null) && !(job instanceof ThreadJob)) {
+  //      //remove any locks this thread may be owning on that rule
+  //      manager.getLockManager().removeLockCompletely(Thread.currentThread(), job.getRule());
+  //    }
       m_ptrManager->EndJob(job, result, true);
-  //		//ensure this thread no longer owns any scheduling rules
-  //		manager.implicitJobs.endJob(job);
-  	}
+  //    //ensure this thread no longer owns any scheduling rules
+  //    manager.implicitJobs.endJob(job);
+    }
 
 }

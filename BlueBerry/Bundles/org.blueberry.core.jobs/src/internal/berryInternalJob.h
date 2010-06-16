@@ -97,8 +97,8 @@ struct BERRY_JOBS InternalJob : public Object
   std::string GetName() const;
 
   /* 
-	 * @see Job#setRule(ISchedulingRule::Pointer)
-	 */
+   * @see Job#setRule(ISchedulingRule::Pointer)
+   */
   void InternalSetRule(ISchedulingRule::Pointer rule);
 
   /**
@@ -117,9 +117,9 @@ struct BERRY_JOBS InternalJob : public Object
   bool IsAboutToRunCanceled() const;
 
   /**
-	 * Returns whether this job was canceled when it was running.
-	 */
-	bool IsRunCanceled() const ; 
+   * Returns whether this job was canceled when it was running.
+   */
+  bool IsRunCanceled() const ; 
 
   /**
    * Returns true if this job conflicts with the given job, and false otherwise.
@@ -157,9 +157,9 @@ struct BERRY_JOBS InternalJob : public Object
    */
 
   /**
-	 * Sets whether this job was canceled when it was running
-	 */
-	void SetRunCanceled(bool value) ; 
+   * Sets whether this job was canceled when it was running
+   */
+  void SetRunCanceled(bool value) ; 
 
   void SetNext(InternalJob::Pointer entry);
 
@@ -345,11 +345,11 @@ protected:
 public:
 
   /**
-	 * Flag on a job indicating that it was canceled when running. This flag
-	 * is used to ensure that #canceling is only ever called once on a job in
+   * Flag on a job indicating that it was canceled when running. This flag
+   * is used to ensure that #canceling is only ever called once on a job in
    * case of recursive cancellation attempts.
-	 */
-	static const int M_RUN_CANCELED = 0x0800;
+   */
+  static const int M_RUN_CANCELED = 0x0800;
 
   /**
    * Job state code (value 16) indicating that a job has been removed from

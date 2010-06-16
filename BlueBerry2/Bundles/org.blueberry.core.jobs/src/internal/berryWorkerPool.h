@@ -110,8 +110,8 @@ private:
   Poco::Mutex m_mutexOne;
   //
   //   /**
-  //	 * Records whether new worker threads should be daemon threads.
-  //	 */
+  //   * Records whether new worker threads should be daemon threads.
+  //   */
   //
   //  bool m_isDaemon;
   //

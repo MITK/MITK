@@ -98,11 +98,11 @@ MACRO(_MACRO_SETUP_PLUGIN_DEPENDENCIES _explicit_libs)
         # set include and link directories
         SET(_dep_src_dir ${${_dep}_SRC_DIR})
         SET(_dep_out_dir ${${_dep}_OUT_DIR})
-		SET(_dep_bin_dir ${${_dep}_BIN_DIR})
+    SET(_dep_bin_dir ${${_dep}_BIN_DIR})
         
         LINK_DIRECTORIES(${_dep_out_dir}/bin)
         INCLUDE_DIRECTORIES(${_dep_src_dir}/src)
-		INCLUDE_DIRECTORIES(${_dep_bin_dir})
+    INCLUDE_DIRECTORIES(${_dep_bin_dir})
     
         IF(EXISTS ${_dep_src_dir}/includes.cmake)
           INCLUDE(${_dep_src_dir}/includes.cmake)

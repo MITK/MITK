@@ -28,7 +28,7 @@ public:
   
   bool operator==(Expression& object) ;
 
-	EvaluationResult Evaluate(IEvaluationContext* context);
+  EvaluationResult Evaluate(IEvaluationContext* context);
 };
 
 }  // namespace berry

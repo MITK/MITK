@@ -83,7 +83,7 @@ struct BERRY_JOBS ISchedulingRule: public Object
    *
    * @param rule the rule to check for conflicts
    * @return <code>true</code> if the rule is conflicting, and <code>false</code>
-   * 	otherwise.
+   *   otherwise.
    */
   virtual bool IsConflicting(ISchedulingRule::Pointer myRule) const = 0;
 

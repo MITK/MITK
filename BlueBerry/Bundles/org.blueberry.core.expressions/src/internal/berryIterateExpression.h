@@ -36,90 +36,90 @@ private:
 
   private:
     std::vector<Object::Pointer>::iterator fIterator;
-		std::vector<Object::Pointer>::iterator fIterEnd;
-		Object::Pointer fDefaultVariable;
-		IEvaluationContext* fParent;
+    std::vector<Object::Pointer>::iterator fIterEnd;
+    Object::Pointer fDefaultVariable;
+    IEvaluationContext* fParent;
 
   public:
 
     IteratePool(IEvaluationContext* parent, std::vector<Object::Pointer>::iterator begin, std::vector<Object::Pointer>::iterator end)
     {
-			poco_check_ptr(parent);
+      poco_check_ptr(parent);
 
-			fParent= parent;
-			fIterator = begin;
-			fIterEnd = end;
-		}
+      fParent= parent;
+      fIterator = begin;
+      fIterEnd = end;
+    }
 
     IEvaluationContext* GetParent() const {
-			return fParent;
-		}
+      return fParent;
+    }
 
     IEvaluationContext* GetRoot() {
-			return fParent->GetRoot();
-		}
+      return fParent->GetRoot();
+    }
 
     Object::Pointer GetDefaultVariable() const {
-			return fDefaultVariable;
-		}
+      return fDefaultVariable;
+    }
 
     bool GetAllowPluginActivation() const {
-			return fParent->GetAllowPluginActivation();
-		}
+      return fParent->GetAllowPluginActivation();
+    }
 
     void SetAllowPluginActivation(bool value) {
-			fParent->SetAllowPluginActivation(value);
-		}
+      fParent->SetAllowPluginActivation(value);
+    }
 
     void AddVariable(const std::string& name, Object::Pointer value) {
-			fParent->AddVariable(name, value);
-		}
+      fParent->AddVariable(name, value);
+    }
 
     Object::Pointer RemoveVariable(const std::string& name) {
-			return fParent->RemoveVariable(name);
-		}
+      return fParent->RemoveVariable(name);
+    }
 
     Object::Pointer GetVariable(const std::string& name) const {
-			return fParent->GetVariable(name);
-		}
+      return fParent->GetVariable(name);
+    }
 
     Object::Pointer ResolveVariable(const std::string& name, std::vector<Object::Pointer>& args) {
-			return fParent->ResolveVariable(name, args);
-		}
+      return fParent->ResolveVariable(name, args);
+    }
 
     Poco::Any Next() {
-			fDefaultVariable = *(++fIterator);
-			return fDefaultVariable;
-		}
+      fDefaultVariable = *(++fIterator);
+      return fDefaultVariable;
+    }
 
     bool HasNext() {
-			return (fIterator != fIterEnd);
-		}
-	};
+      return (fIterator != fIterEnd);
+    }
+  };
 
-	static const std::string ATT_OPERATOR;
-	static const std::string ATT_IF_EMPTY;
-	static const int OR;
-	static const int AND;
+  static const std::string ATT_OPERATOR;
+  static const std::string ATT_IF_EMPTY;
+  static const int OR;
+  static const int AND;
 
-	/**
-	 * The seed for the hash code for all iterate expressions.
-	 */
-	static const std::size_t HASH_INITIAL;
+  /**
+   * The seed for the hash code for all iterate expressions.
+   */
+  static const std::size_t HASH_INITIAL;
 
-	int fOperator;
-	int fEmptyResult;
+  int fOperator;
+  int fEmptyResult;
 
 
 public:
 
   IterateExpression(SmartPointer<IConfigurationElement> configElement);
 
-	IterateExpression(Poco::XML::Element* element);
+  IterateExpression(Poco::XML::Element* element);
 
-	IterateExpression(const std::string& opValue);
+  IterateExpression(const std::string& opValue);
 
-	IterateExpression(const std::string& opValue, const std::string& ifEmpty);
+  IterateExpression(const std::string& opValue, const std::string& ifEmpty);
 
 private: void InitializeOperatorValue(const std::string& opValue);
 
@@ -133,9 +133,9 @@ public:
     */
   EvaluationResult Evaluate(IEvaluationContext* context);
 
-	void CollectExpressionInfo(ExpressionInfo* info);
+  void CollectExpressionInfo(ExpressionInfo* info);
 
-	bool operator==(Expression& object);
+  bool operator==(Expression& object);
 
 
 protected:

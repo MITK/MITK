@@ -119,14 +119,14 @@ FOREACH(dir_relative_entry ${all_dirs})
     LIST(FIND _COLLECT_PLUGIN_EXCLUDES ${BUNDLE-SYMBOLICNAME} _excluded)
     IF(_excluded EQUAL -1)
 
-	# include the generated file with the custom macro code for
-	# checking if a bundle should be enabled
+  # include the generated file with the custom macro code for
+  # checking if a bundle should be enabled
     INCLUDE("${_enable_plugins_file}")
         
     IF(_enable_bundle)
-	  # The bundle is considered valid for the current configuration
-	  # i.e. a build option will be displayed and internal variables are set
-	  
+    # The bundle is considered valid for the current configuration
+    # i.e. a build option will be displayed and internal variables are set
+    
       SET(${BUNDLE-SYMBOLICNAME}_SRC_DIR "${dir_entry}")
       SET(${BUNDLE-SYMBOLICNAME}_BIN_DIR "${CMAKE_CURRENT_BINARY_DIR}/${dir_relative_entry}")
       SET(${BUNDLE-SYMBOLICNAME}_OUT_DIR "${_COLLECT_OUTPUT_DIR}/${BUNDLE-SYMBOLICNAME}")
@@ -136,7 +136,7 @@ SET(${BUNDLE-SYMBOLICNAME}_SRC_DIR \"${${BUNDLE-SYMBOLICNAME}_SRC_DIR}\")
 SET(${BUNDLE-SYMBOLICNAME}_BIN_DIR \"${${BUNDLE-SYMBOLICNAME}_BIN_DIR}\")
 SET(${BUNDLE-SYMBOLICNAME}_OUT_DIR \"${${BUNDLE-SYMBOLICNAME}_OUT_DIR}\")")
       
-	  # compute the default for the build option (ON/OFF)
+    # compute the default for the build option (ON/OFF)
       SET(_default_bundle_option ${_COLLECT_DEFAULT_BUILD_ON})
       LIST(FIND _COLLECT_PLUGIN_DEFAULT_ON ${BUNDLE-SYMBOLICNAME} _PLUGIN_DEFAULT_ON_found)
       IF(_PLUGIN_DEFAULT_ON_found GREATER -1)
@@ -145,22 +145,22 @@ SET(${BUNDLE-SYMBOLICNAME}_OUT_DIR \"${${BUNDLE-SYMBOLICNAME}_OUT_DIR}\")")
       
       OPTION("${_COLLECT_CMAKE_CACHE_PREFIX}BUILD_${BUNDLE-SYMBOLICNAME}" "Build ${BUNDLE-SYMBOLICNAME} Plugin" ${_default_bundle_option})
       
-	  # test if the bundle should be build
-	  IF(${_COLLECT_CMAKE_CACHE_PREFIX}BUILD_${BUNDLE-SYMBOLICNAME} OR _COLLECT_FORCE_BUILD_ALL)
+    # test if the bundle should be build
+    IF(${_COLLECT_CMAKE_CACHE_PREFIX}BUILD_${BUNDLE-SYMBOLICNAME} OR _COLLECT_FORCE_BUILD_ALL)
         LIST(APPEND ENABLED_PLUGINS_RELATIVE_DIRS "${dir_relative_entry}")
-		LIST(APPEND ENABLED_PLUGINS_ABSOLUTE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/${dir_relative_entry}")
+    LIST(APPEND ENABLED_PLUGINS_ABSOLUTE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/${dir_relative_entry}")
         STRING(REPLACE . _ _plugin_target ${BUNDLE-SYMBOLICNAME})
                 
-		# record that this bundle is being build.
+    # record that this bundle is being build.
         SET(_BUILD_${BUNDLE-SYMBOLICNAME} 1)
         SET(BLUEBERRY_BUNDLE_VARIABLES "${BLUEBERRY_BUNDLE_VARIABLES}
 SET(_BUILD_${BUNDLE-SYMBOLICNAME} 1)")
 
       ELSE()
-	  
-	    # the build option for the bundle is off, hence we delete the MANIFEST.MF
-		# file in the output directory to prevent the bundle loader from finding
-		# the disabled bundle.
+    
+      # the build option for the bundle is off, hence we delete the MANIFEST.MF
+    # file in the output directory to prevent the bundle loader from finding
+    # the disabled bundle.
         FILE(REMOVE "${${BUNDLE-SYMBOLICNAME}_OUT_DIR}/META-INF/MANIFEST.MF")
       ENDIF()
       ENDIF()

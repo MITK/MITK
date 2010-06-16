@@ -178,11 +178,11 @@ class BERRY_UI XMLMemento : public IMemento {
     virtual bool GetString(const std::string& key, std::string& value) const;
 
     /**
-	   * @see IMemento#GetString
-	   */
-	  virtual bool GetBoolean(const std::string& key, bool& value) const;
+     * @see IMemento#GetString
+     */
+    virtual bool GetBoolean(const std::string& key, bool& value) const;
 
-	  /**
+    /**
      * Returns the data of the Text node of the memento. Each memento is allowed
      * only one Text node.
      * 
@@ -190,7 +190,7 @@ class BERRY_UI XMLMemento : public IMemento {
      * if the memento has no Text node.
      */
     virtual const std::string& GetTextData() const;
-	
+  
     /**
      * Returns an array of all the attribute keys of the memento. This will not
      * be <code>null</code>. If there are no keys, an array of length zero will

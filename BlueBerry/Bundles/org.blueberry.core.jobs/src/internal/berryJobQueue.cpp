@@ -49,16 +49,16 @@ JobQueue::JobQueue(bool allowConflictOvertaking) :
 
 //TODO JobQueue Constructor IStatus Implementierung
 //TODO Constructor JobQueue IStatus .. implementation
-//	public JobQueue(boolean allowConflictOvertaking) {
-//	//compareTo on dummy is never called
-//	dummy = new InternalJob("Queue-Head") {//$NON-NLS-1$
-//		public IStatus run(IProgressMonitor m) {
-//			return Status.OK_STATUS;
-//		}
-//	};
-//	dummy.setNext(dummy);
-//	dummy.setPrevious(dummy);
-//	this.allowConflictOvertaking = allowConflictOvertaking;
+//  public JobQueue(boolean allowConflictOvertaking) {
+//  //compareTo on dummy is never called
+//  dummy = new InternalJob("Queue-Head") {//$NON-NLS-1$
+//    public IStatus run(IProgressMonitor m) {
+//      return Status.OK_STATUS;
+//    }
+//  };
+//  dummy.setNext(dummy);
+//  dummy.setPrevious(dummy);
+//  this.allowConflictOvertaking = allowConflictOvertaking;
 //}
 
 

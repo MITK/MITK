@@ -69,13 +69,13 @@ int Job::GetPriority() const
 // Object Job::GetProperty(QualifiedName key)
 // {
 //    return InternalJob::GetProperty(key);
-//	}
+//  }
 
 
 IStatus::Pointer Job::GetResult() const
  {
     return InternalJob::GetResult();
-	}
+  }
 
 ISchedulingRule::Pointer Job::GetRule() const
 {
@@ -112,8 +112,8 @@ bool Job::IsUser() const
 //void Job::Join()
 // throw (InterruptedException)
 // {
-//		InternalJob::Join();
-//	}
+//    InternalJob::Join();
+//  }
 
 void Job::RemoveJobChangeListener(IJobChangeListener::Pointer listener)
 {
@@ -149,8 +149,8 @@ void Job::SetProgressGroup(IProgressMonitor::Pointer group, int ticks)
 // TODO SetProperty
 // void Job::SetProperty(QualifiedName key, Object value)
 // {
-//		InternalJob::SetProperty(key, value);
-//	}
+//    InternalJob::SetProperty(key, value);
+//  }
 
 void Job::SetRule(ISchedulingRule::Pointer rule)
 {

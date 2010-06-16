@@ -29,28 +29,28 @@ PURPOSE.  See the above copyright notices for more information.
 namespace berry {
 
 class EqualsExpression : public Expression {
-	/**
-	 * The seed for the hash code for all equals expressions.
-	 */
+  /**
+   * The seed for the hash code for all equals expressions.
+   */
 private:
 
   static const std::size_t HASH_INITIAL;
 
-	Object::Pointer fExpectedValue;
+  Object::Pointer fExpectedValue;
 
 public:
 
   EqualsExpression(const Object::Pointer expectedValue);
 
-	EqualsExpression(SmartPointer<IConfigurationElement> element);
+  EqualsExpression(SmartPointer<IConfigurationElement> element);
 
-	EqualsExpression(Poco::XML::Element* element);
+  EqualsExpression(Poco::XML::Element* element);
 
-	EvaluationResult Evaluate(IEvaluationContext* context);
+  EvaluationResult Evaluate(IEvaluationContext* context);
 
-	void CollectExpressionInfo(ExpressionInfo* info);
+  void CollectExpressionInfo(ExpressionInfo* info);
 
-	bool operator==(Expression& object);
+  bool operator==(Expression& object);
 
 protected:
 

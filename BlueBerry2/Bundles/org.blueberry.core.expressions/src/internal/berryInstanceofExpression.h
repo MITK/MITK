@@ -35,32 +35,32 @@ private:
     */
   static const std::size_t HASH_INITIAL;
 
-	std::string fTypeName;
+  std::string fTypeName;
 
 
 public:
 
   InstanceofExpression(SmartPointer<IConfigurationElement> element);
 
-	InstanceofExpression(Poco::XML::Element* element);
+  InstanceofExpression(Poco::XML::Element* element);
 
-	InstanceofExpression(const std::string& typeName);
+  InstanceofExpression(const std::string& typeName);
 
-	/* (non-Javadoc)
-	 * @see org.blueberry.jdt.internal.corext.refactoring.participants.Expression#evaluate(java.lang.Object)
-	 */
-	EvaluationResult Evaluate(IEvaluationContext::Pointer context);
+  /* (non-Javadoc)
+   * @see org.blueberry.jdt.internal.corext.refactoring.participants.Expression#evaluate(java.lang.Object)
+   */
+  EvaluationResult Evaluate(IEvaluationContext::Pointer context);
 
-	void CollectExpressionInfo(ExpressionInfo* info);
+  void CollectExpressionInfo(ExpressionInfo* info);
 
-	bool operator==(Expression& object);
+  bool operator==(Expression& object);
 
-	//---- Debugging ---------------------------------------------------
+  //---- Debugging ---------------------------------------------------
 
-	  /* (non-Javadoc)
-	   * @see java.lang.Object#toString()
-	   */
-	std::string ToString();
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
+  std::string ToString();
 
 protected:
 

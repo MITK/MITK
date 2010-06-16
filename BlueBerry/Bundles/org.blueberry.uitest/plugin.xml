@@ -18,5 +18,5 @@
             class="berry::EmptyPerspective"
             id="org.blueberry.uitest.util.EmptyPerspective2">
       </perspective>
-	</extension>
+  </extension>
 </plugin>

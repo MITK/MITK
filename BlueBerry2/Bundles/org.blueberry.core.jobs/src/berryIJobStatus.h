@@ -34,10 +34,10 @@
   
    berryObjectMacro(IJobStatus) 
 
-	/**
-	 * Returns the job associated with this status.
-	 * @return the job associated with this status
-	 */
+  /**
+   * Returns the job associated with this status.
+   * @return the job associated with this status
+   */
     virtual Job::Pointer GetJob() = 0;
   };
 }

@@ -34,34 +34,34 @@ class CountExpression : public Expression {
 
 private:
   static const int ANY_NUMBER;
-	static const int EXACT;
-	 static const int ONE_OR_MORE;
-	 static const int NONE_OR_ONE;
-	 static const int NONE;
-	 static const int UNKNOWN;
+  static const int EXACT;
+   static const int ONE_OR_MORE;
+   static const int NONE_OR_ONE;
+   static const int NONE;
+   static const int UNKNOWN;
 
-	/**
-	 * The seed for the hash code for all count expressions.
-	 */
-	static const std::size_t HASH_INITIAL;
+  /**
+   * The seed for the hash code for all count expressions.
+   */
+  static const std::size_t HASH_INITIAL;
 
-	 int fMode;
-	 int fSize;
+   int fMode;
+   int fSize;
 
  void InitializeSize(std::string size);
 
 public:
   CountExpression(SmartPointer<IConfigurationElement> configElement);
 
-	 CountExpression(Poco::XML::Element* element);
+   CountExpression(Poco::XML::Element* element);
 
-	 CountExpression(const std::string& size);
+   CountExpression(const std::string& size);
 
-	 EvaluationResult Evaluate(IEvaluationContext* context);
+   EvaluationResult Evaluate(IEvaluationContext* context);
 
-	 void CollectExpressionInfo(ExpressionInfo* info);
+   void CollectExpressionInfo(ExpressionInfo* info);
 
-	 bool operator==(Expression& object);
+   bool operator==(Expression& object);
 
 
 protected:

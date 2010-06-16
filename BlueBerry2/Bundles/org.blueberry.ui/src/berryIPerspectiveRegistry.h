@@ -42,7 +42,7 @@ namespace berry {
 struct IPerspectiveRegistry {
 
     virtual ~IPerspectiveRegistry() {}
-	
+  
     /**
      * Clones an existing perspective.
      * 

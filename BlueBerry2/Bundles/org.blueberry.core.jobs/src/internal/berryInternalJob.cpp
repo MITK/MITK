@@ -126,7 +126,7 @@ bool InternalJob::IsAboutToRunCanceled() const
 
 bool InternalJob::IsRunCanceled() const 
 {
-	return (flags & M_RUN_CANCELED) != 0;
+  return (flags & M_RUN_CANCELED) != 0;
 }
 
 bool InternalJob::IsConflicting(InternalJob::Pointer otherJob) const
@@ -137,7 +137,7 @@ bool InternalJob::IsConflicting(InternalJob::Pointer otherJob) const
   // TODO MultiRule: extend the IsConflicting (...) method with MultiRule
   // if one of the rules is a compound rule, it must be asked the question.
   //if (schedulingRule.GetClass() == MultiRule.class)
-  //	return schedulingRule.IsConflicting(otherRule);
+  //  return schedulingRule.IsConflicting(otherRule);
   return otherRule->IsConflicting(sptr_schedulingRule);
 }
 
@@ -173,7 +173,7 @@ void InternalJob::SetAboutToRunCanceled(bool value) throw (JobRuntimeException)
 
 void InternalJob::SetRunCanceled(bool value) 
 {
-	flags = value ? flags | M_RUN_CANCELED : flags & ~M_RUN_CANCELED;
+  flags = value ? flags | M_RUN_CANCELED : flags & ~M_RUN_CANCELED;
 }
 
 
@@ -197,7 +197,7 @@ void InternalJob::SetProgressMonitor(IProgressMonitor::Pointer monitor)
 
 void InternalJob::SetResult(IStatus::Pointer result) 
 {
-	m_result = result;
+  m_result = result;
 }
 
 
@@ -271,11 +271,11 @@ int InternalJob::GetPriority() const
 //Object::Pointer
 //InternalJob
 //::GetProperty(QualifiedName key) {
-//		// thread safety: (Concurrency001 - copy on write)
+//    // thread safety: (Concurrency001 - copy on write)
 //  std::map<QualifiedName, Object::Pointer> temp (properties);
 //  if (temp.empty()) return Object::Pointer(0);
-//		else return temp[key];
-//	}
+//    else return temp[key];
+//  }
 
 
 IStatus::Pointer InternalJob::GetResult() const 
@@ -330,8 +330,8 @@ bool InternalJob::IsUser() const
 //void 
 //InternalJob
 //::Join() throws InterruptedException {
-//		manager.join(this);
-//	}
+//    manager.join(this);
+//  }
 
 void InternalJob::RemoveJobChangeListener(IJobChangeListener::Pointer listener)
 {
@@ -381,26 +381,26 @@ void InternalJob::SetProgressGroup(IProgressMonitor::Pointer group, int ticks)
 //void
 //InternalJob
 //::SetProperty(QualifiedName key, Object value) {
-//		// thread safety: (Concurrency001 - copy on write)
-//		if (value == NULL) {
-//			if (properties == NULL)
-//				return;
-//			ObjectMap temp = (ObjectMap) properties.Clone();
-//			temp.Remove(key);
-//			if (temp.isEmpty())
-//				properties = NULL;
-//			else
-//				properties = temp;
-//		} else {
-//			ObjectMap temp = properties;
-//			if (temp == NULL)
-//				temp = new ObjectMap(5);
-//			else
-//				temp = (ObjectMap) properties.Clone();
-//			temp.Put(key, value);
-//			properties = temp;
-//		}
-//	}
+//    // thread safety: (Concurrency001 - copy on write)
+//    if (value == NULL) {
+//      if (properties == NULL)
+//        return;
+//      ObjectMap temp = (ObjectMap) properties.Clone();
+//      temp.Remove(key);
+//      if (temp.isEmpty())
+//        properties = NULL;
+//      else
+//        properties = temp;
+//    } else {
+//      ObjectMap temp = properties;
+//      if (temp == NULL)
+//        temp = new ObjectMap(5);
+//      else
+//        temp = (ObjectMap) properties.Clone();
+//      temp.Put(key, value);
+//      properties = temp;
+//    }
+//  }
 
 void InternalJob::SetRule(ISchedulingRule::Pointer rule)
 {

@@ -77,18 +77,18 @@ namespace berry
       if(prefDir.exists())
         prefDir.remove(true);
       {
-	      berry::PreferencesService::Pointer prefService(new berry::PreferencesService(prefDir.path()));
-    	
-	      // hopefully tested
-	      std::string defaultPrefFileName = berry::PreferencesService::GetDefaultPreferencesFileName();
-    	  	
-	      //# remove old user and sys files (if their was a previous test
+        berry::PreferencesService::Pointer prefService(new berry::PreferencesService(prefDir.path()));
+      
+        // hopefully tested
+        std::string defaultPrefFileName = berry::PreferencesService::GetDefaultPreferencesFileName();
+          
+        //# remove old user and sys files (if their was a previous test
         ostringstream s; s << defaultPrefDir << Poco::Path::separator() << defaultPrefFileName;
-	      sysPrefFile = s.str();
-	      s.str(""); s << defaultPrefDir << Poco::Path::separator() << userName1 << defaultPrefFileName;
-	      user1PrefFile = s.str();
-	      s.str(""); s << defaultPrefDir << Poco::Path::separator() << userName2 << defaultPrefFileName;
-	      user2PrefFile = s.str();
+        sysPrefFile = s.str();
+        s.str(""); s << defaultPrefDir << Poco::Path::separator() << userName1 << defaultPrefFileName;
+        user1PrefFile = s.str();
+        s.str(""); s << defaultPrefDir << Poco::Path::separator() << userName2 << defaultPrefFileName;
+        user2PrefFile = s.str();
 
         //# test GetSystemPreferences
         berry::IPreferences::Pointer sysPrefsRoot = prefService->GetSystemPreferences();

@@ -32,29 +32,29 @@ class ResolveExpression : public CompositeExpression {
 
 private:
   std::string fVariable;
-	std::vector<Object::Pointer> fArgs;
+  std::vector<Object::Pointer> fArgs;
 
-	static const std::string ATT_VARIABLE;
-	static const std::string ATT_ARGS;
+  static const std::string ATT_VARIABLE;
+  static const std::string ATT_ARGS;
 
-	/**
-	 * The seed for the hash code for all resolve expressions.
-	 */
-	static const std::size_t HASH_INITIAL;
+  /**
+   * The seed for the hash code for all resolve expressions.
+   */
+  static const std::size_t HASH_INITIAL;
 
 public:
 
   ResolveExpression(SmartPointer<IConfigurationElement> configElement);
 
-	ResolveExpression(Poco::XML::Element* element);
+  ResolveExpression(Poco::XML::Element* element);
 
-	ResolveExpression(const std::string& variable, std::vector<Object::Pointer>& args);
+  ResolveExpression(const std::string& variable, std::vector<Object::Pointer>& args);
 
-	EvaluationResult Evaluate(IEvaluationContext::Pointer context);
+  EvaluationResult Evaluate(IEvaluationContext::Pointer context);
 
-	void CollectExpressionInfo(ExpressionInfo* info);
+  void CollectExpressionInfo(ExpressionInfo* info);
 
-	bool operator==(Expression& object);
+  bool operator==(Expression& object);
 
 
 protected:

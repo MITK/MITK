@@ -36,16 +36,16 @@
    </extension>
    
    <extension
-   	point="org.blueberry.ui.commands">
-   	<command
-    	name="Show View"
-      	description="Shows a particular view"
-      	id="org.blueberry.ui.views.showView"
-      	defaultHandler="berry::ShowViewHandler">
-      	<commandParameter
-      		id="org.eclipse.ui.views.showView.viewId"
-      		name="%command.showView.viewIdParameter"
-      		values="org.eclipse.ui.internal.registry.ViewParameterValues" />
+     point="org.blueberry.ui.commands">
+     <command
+      name="Show View"
+        description="Shows a particular view"
+        id="org.blueberry.ui.views.showView"
+        defaultHandler="berry::ShowViewHandler">
+        <commandParameter
+          id="org.eclipse.ui.views.showView.viewId"
+          name="%command.showView.viewIdParameter"
+          values="org.eclipse.ui.internal.registry.ViewParameterValues" />
     </command>
    </extension>
    
@@ -60,7 +60,7 @@
             name="Welcome"
             id="org.blueberry.ui.internal.introview"/>
       <stickyView
-      		  location="RIGHT"
+            location="RIGHT"
             id="org.blueberry.ui.internal.introview"/>
    </extension>
    

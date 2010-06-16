@@ -30,38 +30,38 @@ class SystemTestExpression : public Expression {
 
 private:
   std::string fProperty;
-	std::string fExpectedValue;
+  std::string fExpectedValue;
 
-	static const std::string ATT_PROPERTY;
+  static const std::string ATT_PROPERTY;
 
-	/**
-	 * The seed for the hash code for all system test expressions.
-	 */
-	static const std::size_t HASH_INITIAL;
+  /**
+   * The seed for the hash code for all system test expressions.
+   */
+  static const std::size_t HASH_INITIAL;
 
 public:
 
   SystemTestExpression(SmartPointer<IConfigurationElement> element);
 
-	SystemTestExpression(Poco::XML::Element* element);
+  SystemTestExpression(Poco::XML::Element* element);
 
-	SystemTestExpression(const std::string& property, const std::string& expectedValue);
+  SystemTestExpression(const std::string& property, const std::string& expectedValue);
 
-	EvaluationResult Evaluate(IEvaluationContext::Pointer context);
+  EvaluationResult Evaluate(IEvaluationContext::Pointer context);
 
-	void CollectExpressionInfo(ExpressionInfo* info);
+  void CollectExpressionInfo(ExpressionInfo* info);
 
-	bool operator==(Expression& object);
+  bool operator==(Expression& object);
 
 protected:
 
   std::size_t ComputeHashCode();
 
-	// ---- Debugging ---------------------------------------------------
+  // ---- Debugging ---------------------------------------------------
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
+  /* (non-Javadoc)
+   * @see java.lang.Object#toString()
+   */
 public:
   std::string ToString();
 };

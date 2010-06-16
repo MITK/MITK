@@ -10,6 +10,6 @@
       name="Logging"
       category="org.blueberry.views.general"
       class="berry::LogView"
-	  icon="resources/Logging.png" />
+    icon="resources/Logging.png" />
   </extension>
 </plugin>

@@ -100,7 +100,7 @@ Bundle::GetVendor() const
 IBundleManifest::ActivationPolicy
 Bundle::GetActivationPolicy() const
 {
-	return m_Manifest->GetActivationPolicy();
+  return m_Manifest->GetActivationPolicy();
 }
 
 std::istream*

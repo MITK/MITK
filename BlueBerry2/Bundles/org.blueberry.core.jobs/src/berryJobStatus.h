@@ -32,17 +32,17 @@ namespace berry {
 
   berryObjectMacro(JobStatus)
 
-	/**
-	 * Creates a new job status with no interesting error code or exception.
-	 * @param severity
-	 * @param job
-	 * @param message
-	 */ 
+  /**
+   * Creates a new job status with no interesting error code or exception.
+   * @param severity
+   * @param job
+   * @param message
+   */ 
    JobStatus( const Status::Severity& severity, Job::Pointer sptr_job, const std::string& message) ;  
-	
-	/** 
-	 * @see IJobStatus#GetJob()
-	 */
+  
+  /** 
+   * @see IJobStatus#GetJob()
+   */
    Job::Pointer GetJob() ;
 
   /**
@@ -98,7 +98,7 @@ namespace berry {
     Status::Pointer m_internalStatus ;
 
 
-	};
+  };
 
 
  }

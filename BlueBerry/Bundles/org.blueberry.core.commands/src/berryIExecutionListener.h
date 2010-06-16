@@ -50,8 +50,8 @@ struct BERRY_COMMANDS IExecutionListener : public virtual Object {
     Message2<const std::string&, const ExecutionException*> postExecuteFailure;
     Message2<const std::string&, Object::Pointer> postExecuteSuccess;
     Message2<const std::string&, const SmartPointer<const ExecutionEvent> > preExecute;
-	
-	virtual ~Events();
+  
+  virtual ~Events();
 
     virtual void AddListener(IExecutionListener::Pointer listener);
     virtual void RemoveListener(IExecutionListener::Pointer listener);

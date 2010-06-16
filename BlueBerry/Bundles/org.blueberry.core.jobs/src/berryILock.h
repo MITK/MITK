@@ -50,10 +50,10 @@ namespace berry
  * should be done in a finally block to ensure they execute.  For example:
  * <pre>
  * try {
- * 	lock.acquire();
- * 	// ... do work here ...
+ *   lock.acquire();
+ *   // ... do work here ...
  * } finally {
- * 	lock.release();
+ *   lock.release();
  * }
  * </pre>
  * Note: although <tt>lock.acquire</tt> should never fail, it is good practice to place 

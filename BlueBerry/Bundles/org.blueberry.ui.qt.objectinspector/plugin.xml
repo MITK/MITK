@@ -6,7 +6,7 @@
     <view id="objectbrowser"
           name="Object Browser"
           class="berry::ObjectBrowserView"
-		  icon="resources/ObjectBrowser.png" />
+      icon="resources/ObjectBrowser.png" />
   </extension>
 
 </plugin>

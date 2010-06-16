@@ -108,27 +108,27 @@ public:
    */
   static void Shutdown();
 
-  //	 void Cancel(Object family) ;
+  //   void Cancel(Object family) ;
 
   IProgressMonitor::Pointer CreateProgressGroup();
 
   Job* CurrentJob();
 
-  //	 void EndRule(ISchedulingRule rule) ;
+  //   void EndRule(ISchedulingRule rule) ;
 
-  //	Job[] Find(Object family) ;
+  //  Job[] Find(Object family) ;
   //    LockManager GetLockManager() {
-  //		return lockManager;
-  //	}
+  //    return lockManager;
+  //  }
 
   bool IsIdle();
 
   bool IsSuspended();
 
-  //	void Join(final Object family, IProgressMonitor monitor) throws InterruptedException, OperationCanceledException );
+  //  void Join(final Object family, IProgressMonitor monitor) throws InterruptedException, OperationCanceledException );
 
 
-  //	 ILock NewLock() ;
+  //   ILock NewLock() ;
 
   /**
    *  @see IJobManager#RemoveChangeListener(IJobChangeListener::Pointer)
@@ -162,7 +162,7 @@ public:
   //  *  @have a look at IJobManager Resume
   //  */
 
-  //	void Resume(ISchedulingRule::Pointer rule)const ;
+  //  void Resume(ISchedulingRule::Pointer rule)const ;
 
   /**
    *  @have a look at IJobManager SetProgressProvider
@@ -175,7 +175,7 @@ public:
   //  * @see IJobManager#sleep(std::string)
   //  */
 
-  //	 void Sleep(Object family) ;
+  //   void Sleep(Object family) ;
 
   void Suspend();
 
@@ -184,23 +184,23 @@ public:
    */
   void Schedule(InternalJob::Pointer job, Poco::Timestamp::TimeDiff delay, bool reschedule);
 
-  //	 void Suspend(ISchedulingRule::Pointer rule, IProgressMonitor::Pointer monitor)const ;
+  //   void Suspend(ISchedulingRule::Pointer rule, IProgressMonitor::Pointer monitor)const ;
 
-  //	void TransferRule(ISchedulingRule rule, Thread destinationThread) ;
+  //  void TransferRule(ISchedulingRule rule, Thread destinationThread) ;
 
-  //	 void SetLockListener(LockListener listener) ;
+  //   void SetLockListener(LockListener listener) ;
 
 
   // /**
   // * Puts a job to sleep. Returns true if the job was successfully put to sleep.
   // */
 
-  //	void WakeUp(Object family) ;
+  //  void WakeUp(Object family) ;
 
 
   void AddJobChangeListener(IJobChangeListener::Pointer listener);
 
-  //	void beginRule(ISchedulingRule rule, IProgressMonitor monitor) ;
+  //  void beginRule(ISchedulingRule rule, IProgressMonitor monitor) ;
 
 
 protected:
@@ -245,7 +245,7 @@ protected:
    */
   bool IsBlocking(InternalJob::Pointer runningJob);
 
-  //	 void Join(InternalJob job) ;
+  //   void Join(InternalJob job) ;
 
   /**
    * Attempts to immediately start a given job.  Returns true if the job was
@@ -296,7 +296,7 @@ private:
   //   //ToDO static const ISchedulingRule nullRule = new ISchedulingRule() {
 
   //    public bool Contains(ISchedulingRule rule) ;
-  //		public boolean IsConflicting(ISchedulingRule rule) ;
+  //    public boolean IsConflicting(ISchedulingRule rule) ;
 
 
   /**
@@ -310,15 +310,15 @@ private:
   JobListeners m_JobListeners;
 
   //
-  //	/**
-  //	 * The lock for synchronizing all activity in the job manager.  To avoid deadlock,
-  //	 * this lock must never be held for extended periods, and must never be
-  //	 * held while third party code is being called.
-  //	 */
-  //	// private final Object lock = new Object();
+  //  /**
+  //   * The lock for synchronizing all activity in the job manager.  To avoid deadlock,
+  //   * this lock must never be held for extended periods, and must never be
+  //   * held while third party code is being called.
+  //   */
+  //  // private final Object lock = new Object();
   //   static const Object lock ;
   //
-  //	//private LockManager lockManager = new LockManager();
+  //  //private LockManager lockManager = new LockManager();
   //   static const LockManger lockManager;
   /**
    * The pool of worker threads.
@@ -356,8 +356,8 @@ private:
   long long m_waitQueueCounter;
 
   //  /**
-  //	 * For debugging purposes only
-  //	 */
+  //   * For debugging purposes only
+  //   */
   //  const std::string PrintJobName(Job job);
 
 
@@ -391,7 +391,7 @@ private:
    */
   void DoShutdown();
 
-  //	void InitDebugOptions() ;
+  //  void InitDebugOptions() ;
 
   /**
    * Removes and returns the first waiting job in the queue. Returns null if there
@@ -407,26 +407,26 @@ private:
    */
   IProgressMonitor::Pointer MonitorFor(IProgressMonitor::Pointer monitor);
 
-  //  	/**
-  //	 * Adds all family members in the list of jobs to the collection
-  //	 */
-  //	void Select(List members, Object family, InternalJob firstJob, int stateMask) ;
+  //    /**
+  //   * Adds all family members in the list of jobs to the collection
+  //   */
+  //  void Select(List members, Object family, InternalJob firstJob, int stateMask) ;
   //
-  //	/**
-  //	 * Returns a list of all jobs known to the job manager that belong to the given family.
-  //	 */
-  //	List Select(Object family) ;
+  //  /**
+  //   * Returns a list of all jobs known to the job manager that belong to the given family.
+  //   */
+  //  List Select(Object family) ;
   //
-  //	/**
-  //	 * Returns a list of all jobs known to the job manager that belong to the given
-  //	 * family and are in one of the provided states.
-  //	 */
-  //	 List Select(Object family, int stateMask) ;
+  //  /**
+  //   * Returns a list of all jobs known to the job manager that belong to the given
+  //   * family and are in one of the provided states.
+  //   */
+  //   List Select(Object family, int stateMask) ;
   
    /**
-  	* Validates that the given scheduling rule obeys the constraints of
-  	* scheduling rules as described in the <code>ISchedulingRule</code>
-  	*/
+    * Validates that the given scheduling rule obeys the constraints of
+    * scheduling rules as described in the <code>ISchedulingRule</code>
+    */
   void ValidateRule(ISchedulingRule::Pointer rule);
 
 };

@@ -95,11 +95,11 @@ void InternalPlatform::Initialize(int& argc, char** argv, Poco::Util::AbstractCo
   m_InstancePath.assign(this->GetConfiguration().getString("application.dir"));
   try
   {
-		m_InstallPath.assign(this->GetConfiguration().getString(Platform::ARG_HOME));
-	}
+    m_InstallPath.assign(this->GetConfiguration().getString(Platform::ARG_HOME));
+  }
   catch (Poco::NotFoundException& )
   {
-  	m_InstallPath.assign(m_InstancePath);
+    m_InstallPath.assign(m_InstancePath);
   }
 
   m_UserPath.assign(Poco::Path::home());
@@ -174,7 +174,7 @@ void InternalPlatform::Initialize(int& argc, char** argv, Poco::Util::AbstractCo
         BERRY_WARN(m_ConsoleLog) << *pluginBaseDir << " is not a direcotry or does not exist. SKIPPED.\n";
         continue;
       }
-	  
+    
       std::vector<std::string> pluginList;
       pluginDir.list(pluginList);
 

@@ -34,26 +34,26 @@ namespace berry
 
     berryInterfaceMacro(IPreferencesService, berry)      
 
-	  /**
-	   * Returns the root system node for the calling bundle.
-	   * 
-	   * @return The root system node for the calling bundle.
-	   */
+    /**
+     * Returns the root system node for the calling bundle.
+     * 
+     * @return The root system node for the calling bundle.
+     */
     virtual IPreferences::Pointer GetSystemPreferences() = 0;
 
-	  /**
-	   * Returns the root node for the specified user and the calling bundle.
-	   * 
-	   * @param name The user for which to return the preference root node. 
-	   * @return The root node for the specified user and the calling bundle.
-	   */
-	  virtual IPreferences::Pointer GetUserPreferences(std::string name) = 0;
+    /**
+     * Returns the root node for the specified user and the calling bundle.
+     * 
+     * @param name The user for which to return the preference root node. 
+     * @return The root node for the specified user and the calling bundle.
+     */
+    virtual IPreferences::Pointer GetUserPreferences(std::string name) = 0;
 
-	  /**
-	   * Returns the names of users for which node trees exist.
-	   * 
-	   * @return The names of users for which node trees exist.
-	   */
+    /**
+     * Returns the names of users for which node trees exist.
+     * 
+     * @return The names of users for which node trees exist.
+     */
     virtual std::vector<std::string> GetUsers() const = 0;
   };
 }  // namespace berry

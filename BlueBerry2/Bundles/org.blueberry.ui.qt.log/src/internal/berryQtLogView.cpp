@@ -35,20 +35,20 @@ namespace berry {
 QtLogView::QtLogView(QWidget *parent)
     : QWidget(parent)
 {
-	ui.setupUi(this);
-	
-	model = QtLogPlugin::GetInstance()->GetLogModel();
-	
+  ui.setupUi(this);
+  
+  model = QtLogPlugin::GetInstance()->GetLogModel();
+  
   filterModel = new QSortFilterProxyModel(this);
   filterModel->setSourceModel(model);
-	filterModel->setFilterKeyColumn(-1);
+  filterModel->setFilterKeyColumn(-1);
 
-	ui.tableView->setModel(filterModel);
+  ui.tableView->setModel(filterModel);
 
-	ui.tableView->verticalHeader()->setVisible(false);
-	           
-	connect( ui.filterContent, SIGNAL( textChanged( const QString& ) ), this, SLOT( slotFilterChange( const QString& ) ) );
-	connect( filterModel, SIGNAL( rowsInserted ( const QModelIndex &, int, int ) ), this, SLOT( slotRowAdded( const QModelIndex &, int , int  ) ) );
+  ui.tableView->verticalHeader()->setVisible(false);
+             
+  connect( ui.filterContent, SIGNAL( textChanged( const QString& ) ), this, SLOT( slotFilterChange( const QString& ) ) );
+  connect( filterModel, SIGNAL( rowsInserted ( const QModelIndex &, int, int ) ), this, SLOT( slotRowAdded( const QModelIndex &, int , int  ) ) );
            
 }
 
@@ -73,8 +73,8 @@ void QtLogView::slotRowAdded ( const QModelIndex &  /*parent*/, int start, int e
   if(!first)
   {
     first=true;
-	  ui.tableView->resizeColumnsToContents();
-	  ui.tableView->resizeRowsToContents();
+    ui.tableView->resizeColumnsToContents();
+    ui.tableView->resizeRowsToContents();
   }
   else
     for(int r=start;r<=end;r++)

@@ -106,9 +106,9 @@ struct BERRY_JOBS IJobManager: public Object
   // * <pre>
   // * final ISchedulingRule rule = ...;
   // * try {
-  // * 	manager.beginRule(rule, monitor);
+  // *   manager.beginRule(rule, monitor);
   // * } finally {
-  // * 	manager.endRule(rule);
+  // *   manager.endRule(rule);
   // * }
   // * </pre>
   // *
@@ -116,9 +116,9 @@ struct BERRY_JOBS IJobManager: public Object
   // * @param monitor a progress monitor, or <code>null</code> if progress
   // *    reporting and cancellation are not desired
   // * @throws IllegalArgumentException if the rule is not strictly nested within
-  // * 	all other rules currently active for this thread
+  // *   all other rules currently active for this thread
   // * @throws OperationCanceledException if the supplied monitor reports cancelation
-  // * 	before the rule becomes available
+  // *   before the rule becomes available
   // * @see ISchedulingRule#contains(ISchedulingRule)
   // */
 

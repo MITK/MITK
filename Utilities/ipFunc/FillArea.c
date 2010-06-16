@@ -136,7 +136,7 @@ mitkIpPicDescriptor *mitkIpFuncFillArea ( mitkIpPicDescriptor *pic_old,
   if ( pic_new == NULL ) return ( mitkIpFuncERROR );
   if ( pic_new != pic_old )
     {
-       memcpy ( pic_new->data, pic_old->data, _mitkIpPicElements ( pic_old ) * pic_old->bpe /8 );
+       memmove ( pic_new->data, pic_old->data, _mitkIpPicElements ( pic_old ) * pic_old->bpe /8 );
     }
 
   /* Gerade durch die beiden Punkte                                     */

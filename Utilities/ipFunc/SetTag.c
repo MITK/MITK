@@ -110,7 +110,7 @@ int mitkIpFuncSetTag( mitkIpPicDescriptor *pic, char *name, int type, int size,
   tsv->bpe = 8*el_size;
   tsv->dim = 1;
   tsv->n[0] = alloc_size;
-  tsv->value = memcpy( tsv->value, data, size * el_size );
+  tsv->value = memmove( tsv->value, data, size * el_size );
   if(alloc_size!=size) ((char*)tsv->value)[size]=0;
 
   if(add_new==1)

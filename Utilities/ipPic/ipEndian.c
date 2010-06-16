@@ -68,7 +68,7 @@ void _mitkIpCp( void *source, void *destination, unsigned long int len )
   if( !destination )
     return; 
 
-  memcpy( destination, source, len );
+  memmove( destination, source, len );
 }
 
 void _mitkIpCvtEndian( void *data, unsigned long int len, unsigned char bytes )
@@ -100,7 +100,7 @@ void _mitkIpCpCvtEndian( void *source, void *destination, unsigned long int len,
     return;
 
   if( bytes == 1 )
-    memcpy( destination, source, len );
+    memmove( destination, source, len );
   else
     for( i=0; i<len; i+=bytes )
       for( i2=0; i2<bytes; i2++ )

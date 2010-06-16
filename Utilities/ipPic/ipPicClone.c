@@ -90,7 +90,7 @@ mitkIpPicDescriptor *mitkIpPicClone( mitkIpPicDescriptor *pic )
       clone->data = malloc( size );
       if ( ! ( clone->data ) )
           return NULL;
-      memcpy( clone->data, pic->data, size );
+      memmove( clone->data, pic->data, size );
     }
 
   return( clone );
@@ -140,7 +140,7 @@ mitkIpPicTSV_t *_mitkIpPicCloneTag( mitkIpPicTSV_t *source )
       size = _mitkIpPicTSVSize( new );
 
       new->value = malloc( size );
-      memcpy( new->value, source->value, size );
+      memmove( new->value, source->value, size );
     }
 
   return( new );

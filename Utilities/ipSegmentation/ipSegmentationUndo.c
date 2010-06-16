@@ -158,7 +158,7 @@ ipMITKSegmentationUndoSave (mitkIpPicDescriptor* segmentation)
         tag->n[0] = segmentation->n[0];
         tag->n[1] = segmentation->n[1];
         tag->value = malloc (_mitkIpPicSize (segmentation));
-        memcpy (tag->value, segmentation->data, _mitkIpPicSize (segmentation));
+        memmove (tag->value, segmentation->data, _mitkIpPicSize (segmentation));
         mitkIpPicAddSubTag (data, tag);
     }
 }
@@ -186,15 +186,15 @@ ipMITKSegmentationUndo (mitkIpPicDescriptor* segmentation)
             current = current->next;
         }
         tag = _mitkIpPicRemoveTag (&head, current, current->tsv->tag);
-  data->value = head;
-  data->n[0]--;
-        memcpy (segmentation->data, tag->value, _mitkIpPicSize (segmentation));
+        data->value = head;
+        data->n[0]--;
+        memmove (segmentation->data, tag->value, _mitkIpPicSize (segmentation));
         mitkIpPicFreeTag (tag);
 
-  tag = mitkIpPicDelTag (segmentation, tagSEGMENTATION_EMPTY);
-  if (tag) {
-    mitkIpPicFreeTag (tag);
-  }
+        tag = mitkIpPicDelTag (segmentation, tagSEGMENTATION_EMPTY);
+        if (tag) {
+            mitkIpPicFreeTag (tag);
+        }
     }
 }
 

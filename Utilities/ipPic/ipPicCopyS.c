@@ -109,7 +109,7 @@ mitkIpPicDescriptor *_mitkIpPicCopySlice( mitkIpPicDescriptor *pic, mitkIpPicDes
 
   pic->data = malloc( picsize );
 
-  memcpy( pic->data,
+  memmove( pic->data,
 	  &((char *)pic_in->data)[(slice-1) * picsize],
 	  picsize );
 

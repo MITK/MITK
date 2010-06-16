@@ -37,7 +37,7 @@ mitkIpPicDescriptor *mitkIpPicGetMem( mitkIpUInt1_t *mem_pic )
   
   pic = mitkIpPicNew();
   mitkIpPicClear( pic );
-  memcpy( &(pic->info->version), mem_ptr, sizeof(mitkIpPicTag_t) );
+  memmove( &(pic->info->version), mem_ptr, sizeof(mitkIpPicTag_t) );
   mem_ptr += sizeof(mitkIpPicTag_t); 
   if( strncmp( mitkIpPicVERSION, pic->info->version, 4 ) != 0 )
     {      
@@ -45,23 +45,23 @@ mitkIpPicDescriptor *mitkIpPicGetMem( mitkIpUInt1_t *mem_pic )
       return( NULL );
     }
 
-  /*memcpy( &len,  mem_ptr, sizeof(mitkIpUInt4_t) );*/
+  /*memmove( &len,  mem_ptr, sizeof(mitkIpUInt4_t) );*/
   mitkIpCpFromLE( mem_ptr, &len, sizeof(mitkIpUInt4_t), sizeof(mitkIpUInt4_t) );
   mem_ptr += sizeof(mitkIpUInt4_t);
 
-  /*memcpy( &(pic->type),  mem_ptr, sizeof(mitkIpUInt4_t) );*/
+  /*memmove( &(pic->type),  mem_ptr, sizeof(mitkIpUInt4_t) );*/
   mitkIpCpFromLE( mem_ptr, &(pic->type), sizeof(mitkIpUInt4_t), sizeof(mitkIpUInt4_t) );
   mem_ptr += sizeof(mitkIpUInt4_t);
 
-  /*memcpy( &(pic->bpe),  mem_ptr, sizeof(mitkIpUInt4_t) );*/
+  /*memmove( &(pic->bpe),  mem_ptr, sizeof(mitkIpUInt4_t) );*/
   mitkIpCpFromLE( mem_ptr, &(pic->bpe), sizeof(mitkIpUInt4_t), sizeof(mitkIpUInt4_t) );
   mem_ptr += sizeof(mitkIpUInt4_t);
 
-  /*memcpy( &(pic->dim),  mem_ptr, sizeof(mitkIpUInt4_t) );*/
+  /*memmove( &(pic->dim),  mem_ptr, sizeof(mitkIpUInt4_t) );*/
   mitkIpCpFromLE( mem_ptr, &(pic->dim), sizeof(mitkIpUInt4_t), sizeof(mitkIpUInt4_t) );
   mem_ptr += sizeof(mitkIpUInt4_t);
 
-  /*memcpy( &(pic->n),  mem_ptr, pic->dim * sizeof(mitkIpUInt4_t) );*/
+  /*memmove( &(pic->n),  mem_ptr, pic->dim * sizeof(mitkIpUInt4_t) );*/
   mitkIpCpFromLE( mem_ptr, &(pic->n), pic->dim*sizeof(mitkIpUInt4_t), sizeof(mitkIpUInt4_t) );
   mem_ptr += pic->dim*sizeof(mitkIpUInt4_t);
 
@@ -78,7 +78,7 @@ mitkIpPicDescriptor *mitkIpPicGetMem( mitkIpUInt1_t *mem_pic )
     pic->info->pixel_start_in_file = ftell( infile );
   */
   
-  /*memcpy( pic->data,  mem_ptr, pic->bpe/8*_mitkIpPicElements(pic) );*/
+  /*memmove( pic->data,  mem_ptr, pic->bpe/8*_mitkIpPicElements(pic) );*/
   mitkIpCpFromLE( mem_ptr, pic->data, _mitkIpPicSize(pic), pic->bpe/8 );
 
   return( pic );
@@ -95,27 +95,27 @@ _mitkIpPicReadTagsMem( _mitkIpPicTagsElement_t *head, mitkIpUInt4_t bytes_to_rea
 
       tsv = malloc( sizeof(mitkIpPicTSV_t) );
 
-      memcpy( tsv->tag, *mem_ptr, _mitkIpPicTAGLEN );
+      memmove( tsv->tag, *mem_ptr, _mitkIpPicTAGLEN );
       tsv->tag[_mitkIpPicTAGLEN] = '\0';
       *mem_ptr += _mitkIpPicTAGLEN;
 
-      /*memcpy( &len,  *mem_ptr, sizeof(mitkIpUInt4_t) );*/
+      /*memmove( &len,  *mem_ptr, sizeof(mitkIpUInt4_t) );*/
       mitkIpCpFromLE( *mem_ptr, &len, sizeof(mitkIpUInt4_t), sizeof(mitkIpUInt4_t) );
       *mem_ptr += sizeof(mitkIpUInt4_t);
 
-      /*memcpy( &(tsv->type), *mem_ptr, sizeof(mitkIpUInt4_t) );*/
+      /*memmove( &(tsv->type), *mem_ptr, sizeof(mitkIpUInt4_t) );*/
       mitkIpCpFromLE( *mem_ptr, &(tsv->type), sizeof(mitkIpUInt4_t), sizeof(mitkIpUInt4_t) );
       *mem_ptr += sizeof(mitkIpUInt4_t);
 
-      /*memcpy( &(tsv->bpe), *mem_ptr, sizeof(mitkIpUInt4_t) );*/
+      /*memmove( &(tsv->bpe), *mem_ptr, sizeof(mitkIpUInt4_t) );*/
       mitkIpCpFromLE( *mem_ptr, &(tsv->bpe), sizeof(mitkIpUInt4_t), sizeof(mitkIpUInt4_t) );
       *mem_ptr += sizeof(mitkIpUInt4_t);
 
-      /*memcpy( &(tsv->dim), *mem_ptr, sizeof(mitkIpUInt4_t) );*/
+      /*memmove( &(tsv->dim), *mem_ptr, sizeof(mitkIpUInt4_t) );*/
       mitkIpCpFromLE( *mem_ptr, &(tsv->dim), sizeof(mitkIpUInt4_t), sizeof(mitkIpUInt4_t) );
       *mem_ptr += sizeof(mitkIpUInt4_t);
 
-      /*memcpy( &(tsv->n), *mem_ptr, tsv->dim*sizeof(mitkIpUInt4_t) );*/
+      /*memmove( &(tsv->n), *mem_ptr, tsv->dim*sizeof(mitkIpUInt4_t) );*/
       mitkIpCpFromLE( *mem_ptr, &(tsv->n), tsv->dim*sizeof(mitkIpUInt4_t), sizeof(mitkIpUInt4_t) );
       *mem_ptr += tsv->dim*sizeof(mitkIpUInt4_t);
 
@@ -143,7 +143,7 @@ _mitkIpPicReadTagsMem( _mitkIpPicTagsElement_t *head, mitkIpUInt4_t bytes_to_rea
           else
             tsv->value = malloc( elements * tsv->bpe / 8 );
 
-	  /*memcpy( tsv->value,  *mem_ptr, tsv->bpe/8*_mitkIpPicTSVElements(tsv) );*/
+	  /*memmove( tsv->value,  *mem_ptr, tsv->bpe/8*_mitkIpPicTSVElements(tsv) );*/
           mitkIpCpFromLE( *mem_ptr, tsv->value, _mitkIpPicTSVSize(tsv), tsv->bpe/8 );
 	  *mem_ptr += tsv->bpe/8*_mitkIpPicTSVElements(tsv);
 	  
@@ -164,7 +164,7 @@ _mitkIpPicReadTagsMem( _mitkIpPicTagsElement_t *head, mitkIpUInt4_t bytes_to_rea
                free( tsv->value );
   
              tsv->value = strdup( "*** ENCRYPTED ***" );
-             tsv->n[0] = strlen(tsv->value);
+             tsv->n[0] = (mitkIpUInt4_t)strlen(tsv->value);
              tsv->type = mitkIpPicASCII;
              tsv->dim = 1;
            }

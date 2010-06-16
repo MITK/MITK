@@ -157,8 +157,7 @@ int i;
     for (j=0; j<nact && active[j].i!=i; j++);
     if (j>=nact) return;	/* edge not in active list; happens at win->y0*/
     nact--;
-    //bcopy(&active[j+1], &active[j], (nact-j)*sizeof active[0]); DEPRECATED!
-    memcpy( &active[j], &active[j+1], (nact-j)*sizeof active[0]);
+    memmove( &active[j], &active[j+1], (nact-j)*sizeof active[0]);
 }
 
 static void cinsert(i, y)		/* append edge i to end of active list */

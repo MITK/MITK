@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkItkPictureWrite.h"
 #include "mitkImageAccessByItk.h"
 
+#include <itkNumericSeriesFileNames.h>
 #include <itkImageSeriesWriter.h>
 #include <itkRescaleIntensityImageFilter.h>
 
@@ -33,20 +34,23 @@ void _mitkItkPictureWrite(itk::Image< TPixel, VImageDimension >* itkImage, const
   rescaler->SetInput(itkImage);
   rescaler->SetOutputMinimum(0);
   rescaler->SetOutputMaximum(255);
+  itk::NumericSeriesFileNames::Pointer numericFileNameWriter = itk::NumericSeriesFileNames::New();
   itk::ImageSeriesWriter<OutputImage3DType, OutputImage2DType>::Pointer writer = itk::ImageSeriesWriter<OutputImage3DType, OutputImage2DType >::New();
-  writer->SetInput( rescaler->GetOutput() );
 
   int numberOfSlices = itkImage->GetLargestPossibleRegion().GetSize()[2];
-  writer->SetStartIndex(numberOfSlices);
-  writer->SetIncrementIndex(-1);
-
   std::string finalFileName = fileName;
   std::string::size_type pos = fileName.find_last_of(".",fileName.length()-1);
   if(pos==std::string::npos)
     finalFileName.append(".%d.png");
   else
     finalFileName.insert(pos,".%d");
-  writer->SetSeriesFormat( finalFileName.c_str() );
+
+  numericFileNameWriter->SetEndIndex(numberOfSlices);
+  numericFileNameWriter->SetSeriesFormat(finalFileName.c_str());
+  numericFileNameWriter->Modified();
+
+  writer->SetInput( rescaler->GetOutput() );
+  writer->SetFileNames(numericFileNameWriter->GetFileNames());
   writer->Update();
 }
 

@@ -16,6 +16,7 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include "mitkTestingMacros.h"
+#include "mitkTestingConfig.h"
 
 #include "mitkSceneIO.h"
 
@@ -212,6 +213,7 @@ static void VerifyStorage(mitk::DataStorage* storage)
 int mitkSceneIOTest(int /* argc */, char* /*argv*/[])
 {
   MITK_TEST_BEGIN("SceneIO")
+  std::string sceneFileName;
 
   for (unsigned int i = 0; i < 1; ++i) // TODO change to " < 2" to check cases where file system would be full
   {
@@ -226,7 +228,6 @@ int mitkSceneIOTest(int /* argc */, char* /*argv*/[])
         continue;
       #endif
     }
-
   
     // create a data storage and fill it with some test data
     mitk::SceneIO::Pointer sceneIO = mitk::SceneIO::New();
@@ -239,7 +240,7 @@ int mitkSceneIOTest(int /* argc */, char* /*argv*/[])
 
     // attempt to save it
     Poco::Path newname( Poco::TemporaryFile::tempName() );
-    std::string  sceneFileName = Poco::Path::temp() + /*Poco::Path::separator() +*/newname.getFileName() + ".zip";
+    sceneFileName = std::string( MITK_TEST_OUTPUT_DIR ) + Poco::Path::separator() + newname.getFileName() + ".zip";
     MITK_TEST_CONDITION_REQUIRED( sceneIO->SaveScene( storage->GetAll(), storage, sceneFileName), "Saving scene file '" << sceneFileName << "'");
 
     // test if no errors were reported
@@ -331,7 +332,13 @@ int mitkSceneIOTest(int /* argc */, char* /*argv*/[])
     SceneIOTestClass::VerifyStorage(storage);
   
   }
-
+  // if no sub-test failed remove the scene file, otherwise it is kept for debugging purposes
+  if ( mitk::TestManager::GetInstance()->NumberOfFailedTests() == 0 )
+  {    
+    Poco::File pocoSceneFile( sceneFileName );
+    MITK_TEST_CONDITION_REQUIRED( pocoSceneFile.exists(), "Checking if scene file still exists before cleaning up." )
+    pocoSceneFile.remove();
+  }
   MITK_TEST_END();
 }
 

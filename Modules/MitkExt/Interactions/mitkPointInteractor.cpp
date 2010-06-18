@@ -32,8 +32,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkState.h>
 
 
-mitk::PointInteractor::PointInteractor(const char * type, DataNode* dataTreeNode)
-: Interactor(type, dataTreeNode), m_LastPosition(0)
+mitk::PointInteractor::PointInteractor(const char * type, DataNode* dataNode)
+: Interactor(type, dataNode), m_LastPosition(0)
 {
   m_LastPoint.Fill(0);
 }

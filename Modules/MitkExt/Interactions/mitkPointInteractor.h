@@ -55,7 +55,7 @@ namespace mitk
   protected:
     //##Documentation
     //##@brief Constructor 
-    PointInteractor(const char * type, DataNode* dataTreeNode);
+    PointInteractor(const char * type, DataNode* dataNode);
 
     //##Documentation
     //##@brief Destructor 

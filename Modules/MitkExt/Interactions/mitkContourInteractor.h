@@ -36,7 +36,7 @@ namespace mitk {
 
 
   protected:
-    ContourInteractor(const char * type, DataNode* dataTreeNode);
+    ContourInteractor(const char * type, DataNode* dataNode);
     virtual ~ContourInteractor();
 
     virtual bool ExecuteAction(Action* action, mitk::StateEvent const* stateEvent);

@@ -53,7 +53,7 @@ namespace mitk
     //##@brief Constructor with Param n for limited Set of Points
     //##
     //## if no n is set, then the number of points is unlimited*
-    ConnectPointsInteractor(const char * type, DataNode* dataTreeNode, int n = -1);
+    ConnectPointsInteractor(const char * type, DataNode* dataNode, int n = -1);
 
     virtual ~ConnectPointsInteractor();
 

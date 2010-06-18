@@ -47,8 +47,8 @@ PURPOSE.  See the above copyright notices for more information.
 //how precise must the user pick the point
 //default value
 mitk::SurfaceDeformationInteractor3D
-::SurfaceDeformationInteractor3D(const char * type, DataNode* dataTreeNode, int /* n */ )
-: Interactor( type, dataTreeNode ),
+::SurfaceDeformationInteractor3D(const char * type, DataNode* dataNode, int /* n */ )
+: Interactor( type, dataNode ),
   m_Precision( 6.5 ),
   m_PickedSurfaceNode( NULL ),
   m_PickedSurface( NULL ),

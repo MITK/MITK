@@ -100,12 +100,12 @@ public:
 protected:
   /**
   * @brief Constructor
-  * @param dataTreeNode is the node, this Interactor is connected to
+  * @param dataNode is the node, this Interactor is connected to
   * @param type is the type of StateMachine like declared in the XML-Configure-File
   *
   * Interactor connects itself to the DataNode-Interactor-pointer through call of SetInteractor(this)
   **/
-  Interactor(const char * type, DataNode* dataTreeNode);
+  Interactor(const char * type, DataNode* dataNode);
 
   /**
   * @brief Destructor
@@ -135,7 +135,7 @@ protected:
 
   //##Documentation
   //## @brief Used by friend class DataNode
-  virtual void SetDataNode( DataNode* dataTreeNode );
+  virtual void SetDataNode( DataNode* dataNode );
 
   /**
   * @brief Derived from superclass to also check if enough timesteps are instantiated in m_CurrentStateVector

@@ -40,7 +40,7 @@ namespace mitk {
     itkGetObjectMacro(ContourNode, mitk::DataNode);
 
   protected:
-    ExtrudedContourInteractor(const char * type, DataNode* dataTreeNode);
+    ExtrudedContourInteractor(const char * type, DataNode* dataNode);
     virtual ~ExtrudedContourInteractor();
 
     virtual bool ExecuteAction(Action* action, mitk::StateEvent const* stateEvent);

@@ -33,8 +33,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <vtkRenderer.h>
 
-mitk::ContourInteractor::ContourInteractor(const char * type, mitk::DataNode* dataTreeNode)
-  : mitk::Interactor(type, dataTreeNode), m_Started(false)
+mitk::ContourInteractor::ContourInteractor(const char * type, mitk::DataNode* dataNode)
+  : mitk::Interactor(type, dataNode), m_Started(false)
 {
   assert(m_DataNode != NULL);
 

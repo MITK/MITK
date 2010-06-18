@@ -45,9 +45,9 @@ protected:
   //##Documentation
   //## @brief Constructor
   //##
-  //## @param dataTreeNode is the node, this Interactor is connected to
+  //## @param dataNode is the node, this Interactor is connected to
   //## @param type is the type of StateMachine like declared in the XML-Configure-File
-  AffineInteractor(const char * type, DataNode* dataTreeNode);
+  AffineInteractor(const char * type, DataNode* dataNode);
 
   //##Documentation
   //## @brief Destructor

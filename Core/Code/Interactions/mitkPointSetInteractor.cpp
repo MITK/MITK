@@ -38,8 +38,8 @@ PURPOSE.  See the above copyright notices for more information.
 const int PRECISION = 5;
 
 mitk::PointSetInteractor
-::PointSetInteractor(const char * type, DataNode* dataTreeNode, int n)
-:Interactor(type, dataTreeNode), m_N(n), m_Precision(PRECISION)
+::PointSetInteractor(const char * type, DataNode* dataNode, int n)
+:Interactor(type, dataNode), m_N(n), m_Precision(PRECISION)
 {
   m_LastPoint.Fill(0);
   m_SumVec.Fill(0);

@@ -198,7 +198,7 @@ void mitk::PointSetMapper2D::Paint( mitk::BaseRenderer *renderer )
     }
     else
     {
-      //get the color from the dataTreeNode
+      //get the color from the dataNode
       node->GetColor(unselectedColor, NULL);
     }
 

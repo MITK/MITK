@@ -48,8 +48,8 @@ namespace mitk
 //how precise must the user pick the point
 //default value
 AffineInteractor3D
-::AffineInteractor3D(const char * type, DataNode* dataTreeNode, int /* n */ )
-: Interactor( type, dataTreeNode ),
+::AffineInteractor3D(const char * type, DataNode* dataNode, int /* n */ )
+: Interactor( type, dataNode ),
   m_Precision( 6.5 ),
   m_InteractionMode( INTERACTION_MODE_TRANSLATION )
 {

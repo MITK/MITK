@@ -55,7 +55,7 @@ class mitkNavigationToolTestClass
     //test getter
     MITK_TEST_CONDITION(myNavigationTool->GetType()==mitk::NavigationTool::Instrument,"Testing getter and setter of type.");
     MITK_TEST_CONDITION(myNavigationTool->GetIdentifier()=="Tool#15","Testing getter and setter of identifier.");
-    MITK_TEST_CONDITION(myNavigationTool->GetDataNode()==myNode,"Testing getter and setter of dataTreeNode.");
+    MITK_TEST_CONDITION(myNavigationTool->GetDataNode()==myNode,"Testing getter and setter of dataNode.");
     MITK_TEST_CONDITION(myNavigationTool->GetSpatialObject()==mySpatialObject,"Testing getter and setter of itk spatial object.");
     MITK_TEST_CONDITION(myNavigationTool->GetCalibrationFile()=="Test.srom","Testing getter and setter of calibration file.");
     MITK_TEST_CONDITION(myNavigationTool->GetSerialNumber()=="0815","Testing getter and setter of serial number.");

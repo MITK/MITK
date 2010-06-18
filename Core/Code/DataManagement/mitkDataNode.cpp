@@ -486,8 +486,8 @@ public:
   typedef SelectedEvent Self; 
   typedef itk::ModifiedEvent Superclass; 
 
-  SelectedEvent(DataNode* dataTreeNode)
-    { m_DataNode = dataTreeNode; };
+  SelectedEvent(DataNode* dataNode)
+    { m_DataNode = dataNode; };
   DataNode* GetDataNode() 
     { return m_DataNode; };
   virtual const char * GetEventName() const 

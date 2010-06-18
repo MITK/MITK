@@ -30,8 +30,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkDrawOperation.h"
 
 
-mitk::SeedsInteractor::SeedsInteractor(const char * type, mitk::DataNode* dataTreeNode)
-  : mitk::Interactor(type, dataTreeNode)
+mitk::SeedsInteractor::SeedsInteractor(const char * type, mitk::DataNode* dataNode)
+  : mitk::Interactor(type, dataNode)
 {
   m_Radius = 1;
   m_Config = 0; // default config 254, 255 are added for fore- and backgrund seeds

@@ -32,8 +32,8 @@ PURPOSE.  See the above copyright notices for more information.
 //default value
 const int PRECISION = 5;
 
-mitk::ConnectPointsInteractor::ConnectPointsInteractor(const char * type, DataNode* dataTreeNode, int n)
-:Interactor(type, dataTreeNode), m_N(n), m_CurrentCellId(0), m_Precision(PRECISION)
+mitk::ConnectPointsInteractor::ConnectPointsInteractor(const char * type, DataNode* dataNode, int n)
+:Interactor(type, dataNode), m_N(n), m_CurrentCellId(0), m_Precision(PRECISION)
 {
   m_LastPoint.Fill(0);
   m_SumVec.Fill(0);

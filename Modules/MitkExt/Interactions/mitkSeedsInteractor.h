@@ -49,7 +49,7 @@ namespace mitk {
     /**
     * @brief Default Constructor
     **/
-    SeedsInteractor(const char * type, DataNode* dataTreeNode);
+    SeedsInteractor(const char * type, DataNode* dataNode);
     /**
     * @brief Default Destructor
     **/

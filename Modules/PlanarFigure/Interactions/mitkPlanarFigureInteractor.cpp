@@ -38,8 +38,8 @@ PURPOSE.  See the above copyright notices for more information.
 //how precise must the user pick the point
 //default value
 mitk::PlanarFigureInteractor
-::PlanarFigureInteractor(const char * type, DataNode* dataTreeNode, int /* n */ )
-: Interactor( type, dataTreeNode ),
+::PlanarFigureInteractor(const char * type, DataNode* dataNode, int /* n */ )
+: Interactor( type, dataNode ),
   m_Precision( 6.5 )
 {
 }

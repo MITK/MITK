@@ -57,7 +57,7 @@ namespace mitk
     *
     * if no n is set, then the number of points is unlimited*
     */
-    MouseMovePointSetInteractor(const char * type, DataNode* dataTreeNode, int n = -1);
+    MouseMovePointSetInteractor(const char * type, DataNode* dataNode, int n = -1);
 
     /**
     * \brief Default Destructor

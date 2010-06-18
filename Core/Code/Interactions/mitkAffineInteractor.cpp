@@ -53,8 +53,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <iostream>
 
-mitk::AffineInteractor::AffineInteractor(const char * type, DataNode* dataTreeNode)
-: Interactor(type, dataTreeNode)
+mitk::AffineInteractor::AffineInteractor(const char * type, DataNode* dataNode)
+: Interactor(type, dataNode)
 {
 }
 

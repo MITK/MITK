@@ -68,7 +68,7 @@ bool
   mitk::DataStorageAccessRule
     ::IsConflicting(berry::ISchedulingRule::Pointer sptr_otherISchedulingRule) 
   {
-     // test if the stored dataTreeNode 
+     // test if the stored dataNode 
      // cast to check if the ISchedulingRule is a DataStorageAccessRule 
     DataStorageAccessRule::Pointer sptr_DataStorageAccessRule = sptr_otherISchedulingRule.Cast<DataStorageAccessRule>();
      // checks if the Rule of the type ISchedulingRule is a DataStorageAccessRule

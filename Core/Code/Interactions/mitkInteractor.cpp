@@ -37,9 +37,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 const std::string mitk::Interactor::XML_NODE_NAME = "interactor";
 
-mitk::Interactor::Interactor(const char * type, DataNode* dataTreeNode)
+mitk::Interactor::Interactor(const char * type, DataNode* dataNode)
 : StateMachine(type), 
-  m_DataNode(dataTreeNode), 
+  m_DataNode(dataNode), 
   m_Mode(SMDESELECTED)
 {
   if (m_DataNode != NULL)
@@ -230,14 +230,14 @@ const std::string& mitk::Interactor::GetXMLNodeName() const
   return XML_NODE_NAME;
 }
 
-void mitk::Interactor::SetDataNode( DataNode* dataTreeNode )
+void mitk::Interactor::SetDataNode( DataNode* dataNode )
 {
-  m_DataNode = dataTreeNode;
+  m_DataNode = dataNode;
   
   //check for the number of time steps and initialize the vector of CurrentStatePointer accordingly
   if (m_DataNode != NULL)
   {
-    mitk::BaseData* data = dataTreeNode->GetData();
+    mitk::BaseData* data = dataNode->GetData();
     if (data != NULL)
     {
       unsigned int timeSteps = data->GetTimeSteps();

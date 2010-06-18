@@ -22,8 +22,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkBaseRenderer.h"
 
 mitk::MouseMovePointSetInteractor
-::MouseMovePointSetInteractor(const char * type, DataNode* dataTreeNode, int n)
-:PointSetInteractor(type, dataTreeNode, n)
+::MouseMovePointSetInteractor(const char * type, DataNode* dataNode, int n)
+:PointSetInteractor(type, dataNode, n)
 {
 }
 

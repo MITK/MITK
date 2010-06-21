@@ -31,6 +31,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "btnSetPoints.xpm"
 #include "btnClear.xpm"
+#include "btnClearAll.xpm"
 #include "btnLoad.xpm"
 #include "btnSave.xpm"
     
@@ -70,7 +71,8 @@ QmitkPointListWidget::QmitkPointListWidget( QWidget* parent, Qt::WindowFlags f )
   connect( m_BtnClear, SIGNAL(clicked()), this, SLOT(OnClearPointButtonClicked()) );
   buttonLayout->addWidget(m_BtnClear);
 
-  m_BtnClearAll = new QPushButton( iconClear, "", this );
+  const QIcon iconClearAll ( btnClearAll_xpm ); // clear all points
+  m_BtnClearAll = new QPushButton( iconClearAll, "", this );
   m_BtnClearAll->setToolTip("Erase ALL points from list");
   connect( m_BtnClearAll, SIGNAL(clicked()), this, SLOT(OnClearPointSetButtonClicked()) );
   buttonLayout->addWidget(m_BtnClearAll);

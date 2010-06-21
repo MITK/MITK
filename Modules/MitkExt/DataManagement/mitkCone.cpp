@@ -44,8 +44,13 @@ mitk::Cone::~Cone()
 bool mitk::Cone::IsInside(const Point3D& worldPoint) const
 {
   // transform point from world to object coordinates
-  Point3D p;
-  GetGeometry(0)->WorldToIndex(worldPoint, p);
+  ScalarType p[4];
+  p[0] = worldPoint[0];
+  p[1] = worldPoint[1];
+  p[2] = worldPoint[2];
+  p[3] = 1;
+
+  GetGeometry()->GetVtkTransform()->GetInverse()->TransformPoint(p, p);
 
   p[1] += 1;  // translate point, so that it fits to the formula below, which describes a cone that has its cone vertex at the origin                                            
   return (sqrt(p[0] * p[0] + p[2] * p[2]) <= p[1] * 0.5) && (p[1] <= 2);  // formula to calculate if a given point is inside a cone that has its cone vertex at the origin, is aligned on the second axis, has a radius of one an a height of two
@@ -55,7 +60,7 @@ mitk::ScalarType mitk::Cone::GetVolume()
 {
   Geometry3D* geometry = GetTimeSlicedGeometry();
   return   geometry->GetExtentInMM(0) * 0.5
-         * geometry->GetExtentInMM(2) * 0.5
-         * vnl_math::pi / 3.0
-         * geometry->GetExtentInMM(1);
+    * geometry->GetExtentInMM(2) * 0.5
+    * vnl_math::pi / 3.0
+    * geometry->GetExtentInMM(1);
 }

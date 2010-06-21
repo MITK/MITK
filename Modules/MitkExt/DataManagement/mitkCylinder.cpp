@@ -45,8 +45,13 @@ mitk::Cylinder::~Cylinder()
 bool mitk::Cylinder::IsInside(const Point3D& worldPoint) const
 {
   // transform point from world to object coordinates
-  Point3D p;
-  GetGeometry(0)->WorldToIndex(worldPoint, p);
+  ScalarType p[4];
+  p[0] = worldPoint[0];
+  p[1] = worldPoint[1];
+  p[2] = worldPoint[2];
+  p[3] = 1;
+
+  GetGeometry()->GetVtkTransform()->GetInverse()->TransformPoint(p, p);
 
   mitk::ScalarType v =  pow(p[0], 2) + pow(p[2], 2);
   bool retval = (v <= 1) && (p[1] >= -1) && (p[1] <= 1);
@@ -58,7 +63,7 @@ mitk::ScalarType mitk::Cylinder::GetVolume()
 {
   Geometry3D* geometry = GetTimeSlicedGeometry();
   return   geometry->GetExtentInMM(0) * 0.5
-         * geometry->GetExtentInMM(2) * 0.5
-         * vnl_math::pi
-         * geometry->GetExtentInMM(1);
+    * geometry->GetExtentInMM(2) * 0.5
+    * vnl_math::pi
+    * geometry->GetExtentInMM(1);
 }

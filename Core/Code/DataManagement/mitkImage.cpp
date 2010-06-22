@@ -1254,7 +1254,7 @@ void mitk::_ComputeExtremaInItkImage(ItkImageType* itkImage, mitk::Image* mitkIm
       mitkImage->m_Scalar2ndMax[t] = mitkImage->m_Scalar2ndMin[t] = mitkImage->m_ScalarMax[t];
   }
   mitkImage->m_LastRecomputeTimeStamp.Modified();
-  //itkGenericOutputMacro(<<"extrema "<<itk::NumericTraits<TPixel>::NonpositiveMin()<<" "<<mitkImage->m_ScalarMin<<" "<<mitkImage->m_Scalar2ndMin<<" "<<mitkImage->m_Scalar2ndMax<<" "<<mitkImage->m_ScalarMax<<" "<<itk::NumericTraits<TPixel>::max());
+  //MITK_DEBUG <<"extrema "<<itk::NumericTraits<TPixel>::NonpositiveMin()<<" "<<mitkImage->m_ScalarMin<<" "<<mitkImage->m_Scalar2ndMin<<" "<<mitkImage->m_Scalar2ndMax<<" "<<mitkImage->m_ScalarMax<<" "<<itk::NumericTraits<TPixel>::max();
 }
 
 bool mitk::Image::IsValidTimeStep(int t) const

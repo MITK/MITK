@@ -281,33 +281,33 @@ ENDIF()
           ENDIF()
         ENDIF()
       ENDFOREACH(qtlib)
-  	
     INSTALL(FILES ${qtdebugdlls} DESTINATION bin CONFIGURATIONS Debug)
+
     INSTALL(FILES ${qtreleasedlls} DESTINATION bin CONFIGURATIONS Release)
-  	
-  	INSTALL(FILES "${QT_INCLUDE_DIR}/../bin/assistant.exe" DESTINATION bin)
-  	
-  	IF(QT_PLUGINS_DIR)
-  	  # install sqllite plugin
-  	  IF(EXISTS ${QT_PLUGINS_DIR}/sqldrivers/qsqlite4.dll)
-  	    INSTALL(FILES ${QT_PLUGINS_DIR}/sqldrivers/qsqlite4.dll DESTINATION bin/sqldrivers CONFIGURATIONS Release)
-  	    INSTALL(FILES ${QT_PLUGINS_DIR}/sqldrivers/qsqlited4.dll DESTINATION bin/sqldrivers CONFIGURATIONS Debug)
-  	  ENDIF()
-  	  # install imageformat plugins
-  	  SET(_img_formats qgif qico qjpeg qsvg qtiff)
-  	  FOREACH(_img_format ${_img_formats})
-  	    IF(EXISTS ${QT_PLUGINS_DIR}/imageformats/${_img_format}4.dll)
-  	      INSTALL(FILES ${QT_PLUGINS_DIR}/imageformats/${_img_format}4.dll DESTINATION bin/imageformats CONFIGURATIONS Release)
-  	      INSTALL(FILES ${QT_PLUGINS_DIR}/imageformats/${_img_format}d4.dll DESTINATION bin/imageformats CONFIGURATIONS Debug)
-  		ENDIF()
-  	  ENDFOREACH()
-  	ENDIF()
-  	
+    
+    INSTALL(FILES "${QT_INCLUDE_DIR}/../bin/assistant.exe" DESTINATION bin)
+    
+    IF(QT_PLUGINS_DIR)
+      # install sqllite plugin
+      IF(EXISTS ${QT_PLUGINS_DIR}/sqldrivers/qsqlite4.dll)
+        INSTALL(FILES ${QT_PLUGINS_DIR}/sqldrivers/qsqlite4.dll DESTINATION bin/sqldrivers CONFIGURATIONS Release)
+        INSTALL(FILES ${QT_PLUGINS_DIR}/sqldrivers/qsqlited4.dll DESTINATION bin/sqldrivers CONFIGURATIONS Debug)
+      ENDIF()
+      # install imageformat plugins
+      SET(_img_formats qgif qico qjpeg qsvg qtiff)
+      FOREACH(_img_format ${_img_formats})
+        IF(EXISTS ${QT_PLUGINS_DIR}/imageformats/${_img_format}4.dll)
+          INSTALL(FILES ${QT_PLUGINS_DIR}/imageformats/${_img_format}4.dll DESTINATION bin/imageformats CONFIGURATIONS Release)
+          INSTALL(FILES ${QT_PLUGINS_DIR}/imageformats/${_img_format}d4.dll DESTINATION bin/imageformats CONFIGURATIONS Debug)
+      ENDIF()
+      ENDFOREACH()
+    ENDIF()
+    
     
   ENDIF(MITK_USE_QT)
  
   IF(MITK_USE_OPEN_CV)
-	#INCLUDE(MITK_OpenCV_Config)
+  #INCLUDE(MITK_OpenCV_Config)
     FILE(GLOB opencvdebuglllist "${OpenCV_DIR}/bin/Debug/*.dll")
     FILE(GLOB opencvreleasedlllist "${OpenCV_DIR}/bin/Release/*.dll")
   
@@ -320,11 +320,11 @@ ENDIF()
   IF(MINGW)
     FILE(GLOB vtkreleasedlllist ${VTK_RUNTIME_LIBRARY_DIRS}/*.dll)
     FILE(GLOB vtkdebugdlllist ${VTK_RUNTIME_LIBRARY_DIRS}/*.dll)
-	
-	# VTKs freetype library is buggy when used with gcc, need freetype > 2.3.9
-	IF(VTK_FREETYPE_LIBRARIES)
-	  INSTALL(FILES ${VTK_FREETYPE_LIBRARIES} DESTINATION bin)
-	ENDIF()
+  
+  # VTKs freetype library is buggy when used with gcc, need freetype > 2.3.9
+  IF(VTK_FREETYPE_LIBRARIES)
+    INSTALL(FILES ${VTK_FREETYPE_LIBRARIES} DESTINATION bin)
+  ENDIF()
   ELSE()
     FILE(GLOB vtkreleasedlllist ${VTK_RUNTIME_LIBRARY_DIRS}/release/*.dll)
     FILE(GLOB vtkdebugdlllist ${VTK_RUNTIME_LIBRARY_DIRS}/debug/*.dll)
@@ -348,14 +348,14 @@ ENDIF()
   #DCMTK Dlls install target (shared libs on gcc only)
   IF(MINGW AND DCMTK_ofstd_LIBRARY)
     SET(_dcmtk_libs
-	    ${DCMTK_dcmdata_LIBRARY}
-		${DCMTK_dcmimgle_LIBRARY}
-		${DCMTK_dcmnet_LIBRARY}
-		${DCMTK_ofstd_LIBRARY}
+      ${DCMTK_dcmdata_LIBRARY}
+    ${DCMTK_dcmimgle_LIBRARY}
+    ${DCMTK_dcmnet_LIBRARY}
+    ${DCMTK_ofstd_LIBRARY}
     )
-	FOREACH(_dcmtk_lib ${_dcmtk_libs})
-	  INSTALL(FILES ${_dcmtk_lib} DESTINATION bin)
-	ENDFOREACH()
+  FOREACH(_dcmtk_lib ${_dcmtk_libs})
+    INSTALL(FILES ${_dcmtk_lib} DESTINATION bin)
+  ENDFOREACH()
   ENDIF()
   
   #BlueBerry
@@ -372,14 +372,14 @@ ENDIF()
   #MinGW dll
   IF(MINGW)
     FIND_LIBRARY(MINGW_RUNTIME_DLL "mingwm10.dll" HINTS ${CMAKE_FIND_ROOT_PATH}/sys-root/mingw/bin)
-	IF (MINGW_RUNTIME_DLL)
+  IF (MINGW_RUNTIME_DLL)
       INSTALL(FILES ${MINGW_RUNTIME_DLL} DESTINATION bin)
     ELSE()
       MESSAGE(SEND_ERROR "Could not find mingwm10.dll which is needed for a proper install")
     ENDIF()
-	
-	FIND_LIBRARY(MINGW_GCC_RUNTIME_DLL "libgcc_s_dw2-1.dll" HINTS ${CMAKE_FIND_ROOT_PATH}/sys-root/mingw/bin)
-	IF (MINGW_GCC_RUNTIME_DLL)
+  
+  FIND_LIBRARY(MINGW_GCC_RUNTIME_DLL "libgcc_s_dw2-1.dll" HINTS ${CMAKE_FIND_ROOT_PATH}/sys-root/mingw/bin)
+  IF (MINGW_GCC_RUNTIME_DLL)
       INSTALL(FILES ${MINGW_GCC_RUNTIME_DLL} DESTINATION bin)
     ELSE()
       MESSAGE(SEND_ERROR "Could not find libgcc_s_dw2-1.dll which is needed for a proper install")

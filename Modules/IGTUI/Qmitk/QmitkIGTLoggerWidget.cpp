@@ -222,7 +222,7 @@ void QmitkIGTLoggerWidget::UpdateRecordingTime()
        return;
      }
   }
-  else // #samples selected in the combobox
+  else if(m_Controls->m_cbRecordingType->currentIndex()==1) // #samples selected in the combobox
   {
     m_Samples = m_Controls->m_leRecordingValue->text();
 
@@ -234,7 +234,6 @@ void QmitkIGTLoggerWidget::UpdateRecordingTime()
       this->SetDefaultRecordingSettings();
       return;
     }
-
   }
  // m_Controls->m_leSamples->setText(QString::number(samples));
 }

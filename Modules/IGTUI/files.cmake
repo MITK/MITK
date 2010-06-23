@@ -8,6 +8,7 @@ SET(CPP_FILES
   Qmitk/QmitkIGTLoggerWidget.cpp
   Qmitk/QmitkUpdateTimerWidget.cpp
   Qmitk/QmitkToolDistanceWidget.cpp
+  Qmitk/QmitkToolTrackingStatusWidget.cpp
 )
 
 SET(UI_FILES
@@ -18,6 +19,7 @@ SET(UI_FILES
   Qmitk/QmitkIGTLoggerWidgetControls.ui
   Qmitk/QmitkUpdateTimerWidgetControls.ui
   Qmitk/QmitkToolDistanceWidgetControls.ui
+  Qmitk/QmitkToolTrackingStatusWidgetControls.ui
 )
 
 SET(MOC_H_FILES
@@ -30,6 +32,7 @@ SET(MOC_H_FILES
   Qmitk/QmitkIGTLoggerWidget.h
   Qmitk/QmitkUpdateTimerWidget.h
   Qmitk/QmitkToolDistanceWidget.h
+  Qmitk/QmitkToolTrackingStatusWidget.h
 )
 
 

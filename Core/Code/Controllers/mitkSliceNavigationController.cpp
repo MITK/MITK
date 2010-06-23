@@ -653,12 +653,15 @@ SliceNavigationController
                     if(!(nodes->at(x)->GetIntProperty("layer", layer))) continue;
                     if(layer > maxlayer)
                     {
-                      maxlayer = layer;
-                      image3D = dynamic_cast<mitk::Image*>(nodes->at(x)->GetData());
+                      if(static_cast<mitk::DataNode::Pointer>(nodes->at(x))->IsVisible(m_Renderer))
+                      {
+                        image3D = dynamic_cast<mitk::Image*>(nodes->at(x)->GetData());
+                        maxlayer = layer;
+                      }
                     }
                   }
                 }
-                
+
                 std::stringstream stream;
 
                 // get the position and gray value from the image and build up status bar text

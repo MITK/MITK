@@ -190,6 +190,9 @@ protected:
   /// Saves the last renderwindow any info data was inserted
   ///
   QmitkRenderWindow* m_LastRenderWindow;
+  
+  private:
+ mitk::DataNode::Pointer DetectTopMostVisibleImage();
 
 };
 

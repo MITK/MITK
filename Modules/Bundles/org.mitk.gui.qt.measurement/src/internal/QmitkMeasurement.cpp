@@ -486,6 +486,33 @@ void QmitkMeasurement::PlanarFigureInitialized()
   m_DrawPolygon->setChecked(false);
 }
 
+mitk::DataNode::Pointer QmitkMeasurement::DetectTopMostVisibleImage()
+{
+  // get all images from the data storage
+  mitk::DataStorage::SetOfObjects::ConstPointer Images = this->GetDefaultDataStorage()->GetSubset( mitk::NodePredicateDataType::New("Image") );
+  
+  mitk::DataNode::Pointer currentNode( m_SelectedImageNode->GetNode() );
+  int maxLayer = itk::NumericTraits<int>::min();
+  
+  // iterate over selection
+  for (mitk::DataStorage::SetOfObjects::ConstIterator sofIt = Images->Begin(); sofIt != Images->End(); ++sofIt)
+  {
+    mitk::DataNode::Pointer node = sofIt->Value();
+    if ( node.IsNull() )
+      continue;
+    if (node->IsVisible(NULL) == false)
+      continue;  
+    int layer = 0;
+    node->GetIntProperty("layer", layer);
+    if ( layer < maxLayer )
+      continue;
+    
+    currentNode = node;
+  }
+  
+  return currentNode;
+}
+
 void QmitkMeasurement::AddFigureToDataStorage(mitk::PlanarFigure* figure, const QString& name,
   const char *propertyKey, mitk::BaseProperty *property )
 {
@@ -511,8 +538,9 @@ void QmitkMeasurement::AddFigureToDataStorage(mitk::PlanarFigure* figure, const 
 
   // add an observer
   m_InitializedObserverTag = figure->AddObserver( itk::InitializeEvent(), initializationCommand );
-
-  this->GetDataStorage()->Add(newNode, m_SelectedImageNode->GetNode());
+  
+  // figure drawn on the topmost layer / image
+  this->GetDataStorage()->Add(newNode, this->DetectTopMostVisibleImage() );
 
   m_CurrentFigureNodeInitialized = false;
   m_CurrentFigureNode = newNode;

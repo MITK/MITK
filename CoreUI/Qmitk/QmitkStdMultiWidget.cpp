@@ -1987,6 +1987,8 @@ void QmitkStdMultiWidget::ResetCrosshair()
     mitk::TimeSlicedGeometry::Pointer bounds = m_DataStorage->ComputeBoundingGeometry3D(rs);
 
     mitk::RenderingManager::GetInstance()->InitializeViews( bounds );
+    // reset interactor to normal slicing
+    this->SetWidgetPlaneMode(PLANE_MODE_SLICING);
   }
 }
 

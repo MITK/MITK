@@ -17,9 +17,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "QmitkToolTrackingStatusWidget.h"
 
-#include <itkDataObject.h>
-#include <mitkNavigationDataSource.h>
-#include <QWidgetItem>
+
 
 
 
@@ -51,14 +49,21 @@ void QmitkToolTrackingStatusWidget::CreateConnections()
 
 }
 
-void QmitkToolTrackingStatusWidget::ShowStatus(itk::ProcessObject::DataObjectPointerArray & outputs)
+
+void QmitkToolTrackingStatusWidget::SetNavigationDatas(std::vector<mitk::NavigationData::Pointer>* navDatas)
+{  
+  m_NavigationDatas = navDatas;
+}
+
+
+
+void QmitkToolTrackingStatusWidget::Update()
 {
   mitk::NavigationData* navData; 
 
-  for(unsigned int i = 0; i < outputs.size(); i++)
+  for(unsigned int i = 0; i < m_NavigationDatas->size(); i++)
   {
-    navData = dynamic_cast<mitk::NavigationData*>(outputs.at(i).GetPointer());
-
+    navData = m_NavigationDatas->at(i).GetPointer();
     QString name(navData->GetName());
 
     if(name.compare(m_StatusLabels->at(i)->text()) == 0)
@@ -68,21 +73,19 @@ void QmitkToolTrackingStatusWidget::ShowStatus(itk::ProcessObject::DataObjectPoi
       else
         m_StatusLabels->at(i)->setStyleSheet("QLabel{background-color: #ff7878 }");
     }
-
   }
-
 }
 
 
-void QmitkToolTrackingStatusWidget::SetupStatusLabels(itk::ProcessObject::DataObjectPointerArray & outputs)
+void QmitkToolTrackingStatusWidget::SetupStatusLabels()
 {
   m_StatusLabels = new QVector<QLabel*>();
-  mitk::NavigationData* navData; 
+  mitk::NavigationData* navData;
   QLabel* label;
 
-  for(unsigned int i = 0; i < outputs.size(); i++)
+  for(unsigned int i = 0; i < m_NavigationDatas->size(); i++)
   {
-    navData = dynamic_cast<mitk::NavigationData*>(outputs.at(i).GetPointer());
+    navData = m_NavigationDatas->at(i).GetPointer();
 
     QString name(navData->GetName());
 

@@ -21,8 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "ui_QmitkToolTrackingStatusWidgetControls.h"
 #include "MitkIGTUIExports.h"
 
-
-#include <itkProcessObject.h>
+#include <mitkNavigationDataSource.h>
 #include <QVector>
 #include <QLabel>
 
@@ -41,6 +40,9 @@ class MitkIGTUI_EXPORT QmitkToolTrackingStatusWidget : public QWidget
 public: 
 
 
+  typedef std::vector< mitk::NavigationData::Pointer > NavigationDataPointerArray;
+
+
 
   /*!  
   \brief default constructor  
@@ -53,14 +55,19 @@ public:
   virtual ~QmitkToolTrackingStatusWidget();
 
   /*!  
-  \brief Sets up the labels for showing the trackable status of the tracking source's outputs
+  \brief Sets up the labels in this widget's QGridLayout for showing the track status of the tracking tools
   */ 
-  void SetupStatusLabels(itk::ProcessObject::DataObjectPointerArray & outputs);
+  void SetupStatusLabels();
   
+  /*!
+  \brief Sets the ND for this widget
+  */
+  void SetNavigationDatas(std::vector<mitk::NavigationData::Pointer>* navDatas);
+
   /*!  
-  \brief Changes background color of status labels (green or red) to show if actual navigation data of tool is valid.
+  \brief Changes background color of status labels (green or red) to show if actual navigation data of each tool is valid.
   */ 
-  void ShowStatus(itk::ProcessObject::DataObjectPointerArray & outputs);
+  void Update();
   
   /*!  
   \brief Removes all status labels.
@@ -73,11 +80,14 @@ protected:
   Ui::QmitkToolTrackingStatusWidgetControls* m_Controls;  ///< gui widgets
 
 
-private:
+private:  
+
   /*!  
   \brief Vector for all tool tracking status labels.
   */
   QVector< QLabel* >* m_StatusLabels;
+
+  std::vector<mitk::NavigationData::Pointer>*  m_NavigationDatas; 
 
 };
 #endif // _QmitkToolTrackingStatusWidget_H_INCLUDED

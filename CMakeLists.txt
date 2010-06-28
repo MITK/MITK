@@ -159,6 +159,8 @@ CONFIGURE_FILE(mitkVersion.h.in ${PROJECT_BINARY_DIR}/mitkVersion.h)
 
 # TODO: check what could be moved to subdirectories
 #### mitkConfig.h ####
+
+OPTION(MITK_USE_GDCMIO "Use the GDCMIO class instead of ImageIO2 for DICOM" OFF)
 SET(MITK_CONFIG_H ${PROJECT_BINARY_DIR}/mitkConfig.h)
 CONFIGURE_FILE(mitkConfig.h.in ${MITK_CONFIG_H})
 SET(MITK_TESTING_CONFIG_H ${PROJECT_BINARY_DIR}/mitkTestingConfig.h)

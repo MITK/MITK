@@ -19,8 +19,13 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKDICOMSERIESREADER_H_
 
 #include <mitkDataNode.h>
+#include <mitkConfig.h>
 
-#include <itkDICOMImageIO2.h>
+#ifdef MITK_USE_GDCMIO
+  #include <itkGDCMImageIO.h>
+#else
+  #include <itkDICOMImageIO2.h>
+#endif
 
 namespace mitk
 {
@@ -78,7 +83,11 @@ protected:
   inline ~DicomSeriesReader()
   {}
 
+#ifdef MITK_USE_GDCMIO
+  typedef itk::GDCMImageIO DcmIoType;
+#else
   typedef itk::DICOMImageIO2 DcmIoType;
+#endif
 
   /**
    * Performs the loading of a series and creates an image having the specified pixel type.

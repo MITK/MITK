@@ -2,8 +2,8 @@
 
 Program:   Medical Imaging & Interaction Toolkit
 Language:  C++
-Date:      $Date$
-Version:   $Revision$
+Date:      $Date: 2010-04-30 15:25:29 +0200 (Fr, 30 Apr 2010) $
+Version:   $Revision: 22623 $
 
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
@@ -37,8 +37,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkLine.h"
 #include "mitkInteractionConst.h"
 #include "mitkDataStorage.h"
-#include "mitkNodePredicateNOT.h"
-#include "mitkNodePredicateProperty.h"
+
+//#include "QmitkNavigationToolBar.h"
 
 #include "mitkVtkLayerController.h"
 
@@ -62,6 +62,9 @@ m_Node(NULL)
 
   //Set Layout to widget
   this->setLayout(QmitkStdMultiWidgetLayout);
+
+//  QmitkNavigationToolBar* toolBar = new QmitkNavigationToolBar();
+//  QmitkStdMultiWidgetLayout->addWidget( toolBar );
 
   //create main splitter
   m_MainSplit = new QSplitter( this );
@@ -116,6 +119,8 @@ m_Node(NULL)
 
   m_SubSplit2->addWidget( mitkWidget3Container );
   m_SubSplit2->addWidget( mitkWidget4Container );
+
+//  mitk::RenderingManager::GetInstance()->SetGlobalInteraction( mitk::GlobalInteraction::GetInstance() );
 
   //Create RenderWindows 1
   mitkWidget1 = new QmitkRenderWindow(mitkWidget1Container, "stdmulti.widget1");
@@ -1960,10 +1965,10 @@ void QmitkStdMultiWidget::UpdateAllWidgets()
 
 void QmitkStdMultiWidget::HideAllWidgetToolbars()
 {
-  mitkWidget1->HideMenuWidget();
-  mitkWidget2->HideMenuWidget();
-  mitkWidget3->HideMenuWidget();
-  mitkWidget4->HideMenuWidget();
+  mitkWidget1->HideRenderWindowMenu();
+  mitkWidget2->HideRenderWindowMenu();
+  mitkWidget3->HideRenderWindowMenu();
+  mitkWidget4->HideRenderWindowMenu();
 }
 
 void QmitkStdMultiWidget::ActivateMenuWidget( bool state )
@@ -1978,15 +1983,7 @@ void QmitkStdMultiWidget::ResetCrosshair()
 {
   if (m_DataStorage.IsNotNull())
   {
-    mitk::NodePredicateNOT::Pointer pred
-      = mitk::NodePredicateNOT::New(mitk::NodePredicateProperty::New("includeInBoundingBox"
-      , mitk::BoolProperty::New(false)));
-
-    mitk::DataStorage::SetOfObjects::ConstPointer rs = m_DataStorage->GetSubset(pred);
-    // calculate bounding geometry of these nodes
-    mitk::TimeSlicedGeometry::Pointer bounds = m_DataStorage->ComputeBoundingGeometry3D(rs);
-
-    mitk::RenderingManager::GetInstance()->InitializeViews( bounds );
+    mitk::RenderingManager::GetInstance()->InitializeViews( m_DataStorage->ComputeVisibleBoundingGeometry3D() );
     // reset interactor to normal slicing
     this->SetWidgetPlaneMode(PLANE_MODE_SLICING);
   }

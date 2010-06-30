@@ -33,6 +33,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include<QLabel>
 #include<QWidgetAction>
 
+#include <QTimer>
+
 #include "QmitkStdMultiWidget.h"
 
 //#include"iconClose.xpm"
@@ -45,10 +47,15 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <math.h>
 
+#ifdef QMITK_USE_EXTERNAL_RENDERWINDOW_MENU
+QmitkRenderWindowMenu::QmitkRenderWindowMenu(QWidget *parent, Qt::WindowFlags f, mitk::BaseRenderer *b )
+:QWidget(parent, Qt::Tool | Qt::FramelessWindowHint ),
 
-
+#else
 QmitkRenderWindowMenu::QmitkRenderWindowMenu(QWidget *parent, Qt::WindowFlags f, mitk::BaseRenderer *b )
 :QWidget(parent,f),
+#endif
+
 m_Settings(NULL),
 m_CrosshairMenu(NULL),
 m_Layout(0),
@@ -57,14 +64,19 @@ m_OldLayoutDesign(0),
 m_FullScreenMode(false)
 {
   m_Renderer = b;
-  
+  m_Entered = false;
+  m_Hidden = true;
+
   MITK_DEBUG << "creating renderwindow menu on baserenderer " << b;
+
+  this->setFocusPolicy( Qt::NoFocus );
 
   //Create Menu Widget
   this->CreateMenuWidget();
   this->setMinimumWidth(61); //DIRTY.. If you add or remove a button, you need to change the size.
   this->setMaximumWidth(61);
   this->setAutoFillBackground( true );
+  
   this->hide();
   
   //this->setAttribute( Qt::WA_NoSystemBackground  );
@@ -76,16 +88,17 @@ m_FullScreenMode(false)
   //irrespective of whether the widget has a parent or not.
   /*
   this->setWindowFlags( Qt::Window | Qt::FramelessWindowHint);
-  this->setAttribute(Qt::WA_TranslucentBackground);
-  this->setWindowOpacity(0.75);
-  this->setFocusPolicy( Qt::NoFocus );
   */
+  //this->setAttribute(Qt::WA_TranslucentBackground);
+  //this->setWindowOpacity(0.75);
   
   currentCrosshairRotationMode = 0;
 }
 
 QmitkRenderWindowMenu::~QmitkRenderWindowMenu()
 {}
+
+
 
 void QmitkRenderWindowMenu::CreateMenuWidget()
 {
@@ -211,6 +224,44 @@ void QmitkRenderWindowMenu::SetLayoutIndex( unsigned int layoutIndex )
   m_Layout = layoutIndex;
 }
 
+void QmitkRenderWindowMenu::HideMenu( )
+{
+  m_Hidden = true;
+
+  if( ! m_Entered )
+    hide();
+
+}
+
+void QmitkRenderWindowMenu::ShowMenu( )
+{
+  m_Hidden = false;
+  show();
+}
+
+
+void QmitkRenderWindowMenu::enterEvent( QEvent *e )
+{
+  m_Entered=true;
+  setWindowOpacity(1.0f);
+}
+
+void QmitkRenderWindowMenu::DeferredHideMenu( )
+{
+  if(m_Hidden)
+    hide();
+}
+
+void QmitkRenderWindowMenu::leaveEvent( QEvent *e )
+{
+  m_Entered=false;
+
+  QTimer::singleShot(0,this,SLOT( DeferredHideMenu( ) ) );
+
+
+}
+
+
 void QmitkRenderWindowMenu::ChangeFullScreenMode( bool state )
 {
   this->OnFullScreenButton( state );
@@ -249,7 +300,7 @@ void QmitkRenderWindowMenu::OnFullScreenButton( bool  /*checked*/ )
     }
 
     //Move Widget and show again
-    this->MoveWidgetToCorrectPos();
+    this->MoveWidgetToCorrectPos(1.0f);
 
     //change icon
     this->ChangeFullScreenIcon();
@@ -261,7 +312,7 @@ void QmitkRenderWindowMenu::OnFullScreenButton( bool  /*checked*/ )
     emit SignalChangeLayoutDesign( m_OldLayoutDesign );
 
     //Move Widget and show again
-    this->MoveWidgetToCorrectPos();
+    this->MoveWidgetToCorrectPos(1.0f);
 
     //change icon
     this->ChangeFullScreenIcon();
@@ -595,11 +646,25 @@ void QmitkRenderWindowMenu::UpdateLayoutDesignList( int layoutDesignIndex )
   }
 }
 
-void QmitkRenderWindowMenu::MoveWidgetToCorrectPos()
+void QmitkRenderWindowMenu::MoveWidgetToCorrectPos(float opacity)
 {
+#ifdef QMITK_USE_EXTERNAL_RENDERWINDOW_MENU
+  int X=floor( double(this->parentWidget()->width() - this->width() - 8.0) );
+  int Y=7;
+
+  QPoint pos = this->parentWidget()->mapToGlobal( QPoint(0,0) );
+
+  this->move( X+pos.x(), Y+pos.y() );
+  
+  if(opacity<0) opacity=0;
+  else if(opacity>1) opacity=1;
+
+  this->setWindowOpacity(opacity);
+#else
   int moveX= floor( double(this->parentWidget()->width() - this->width() - 4.0) );
   this->move( moveX, 3 );
   this->show();
+#endif
 }
 
 void QmitkRenderWindowMenu::ChangeFullScreenIcon()

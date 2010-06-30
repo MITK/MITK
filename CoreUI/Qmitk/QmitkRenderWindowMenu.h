@@ -18,6 +18,9 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef QmitkRenderWindowMenu_h
 #define QmitkRenderWindowMenu_h
 
+#if defined(_WIN32) || defined(__APPLE__)
+#define QMITK_USE_EXTERNAL_RENDERWINDOW_MENU
+#endif
 
 #include "mitkCommon.h"
 #include "mitkBaseRenderer.h"
@@ -43,8 +46,6 @@ PURPOSE.  See the above copyright notices for more information.
 * \sa QmitkStdMultiWidget
 * 
 */
-
-
 
 class QMITK_EXPORT QmitkRenderWindowMenu : public QWidget  
 {
@@ -79,7 +80,7 @@ public:
 
   /*! Move menu widget to correct position (right upper corner). E.g. it is necessary when the full-screen mode
   is activated.*/
-  void MoveWidgetToCorrectPos();
+  void MoveWidgetToCorrectPos(float opacity);
 
   void ChangeFullScreenMode( bool state );
 
@@ -124,13 +125,18 @@ signals:
   /*! emit signal, when layout design changed by the setting menu.*/
   void SignalChangeLayoutDesign( int layoutDesign );
 
+public slots:
+
+  void DeferredHideMenu( );
+
 protected slots:  
+
+  void enterEvent( QEvent *e );
+  void leaveEvent( QEvent *e );
 
   void OnTSNumChanged(int);
 
   void OnCrosshairRotationModeSelected(QAction*); 
-  
-  
 
   /*! slot for activating/deactivating the full-screen mode. The slot is connected to the clicked() event of m_FullScreenButton. 
   Activating the full-screen maximize the current widget, deactivating restore If layout design changed by the settings menu, 
@@ -208,6 +214,8 @@ public:
     LAYOUT_LEFT2DAND3DRIGHT2D
   };
 
+  void ShowMenu();
+  void HideMenu();
 
 protected:
 
@@ -279,6 +287,10 @@ protected:
   /*! Flag if full-screen mode is activated or deactivated. */
   bool                m_FullScreenMode;
   
+  bool                m_Entered;
+
+  bool                m_Hidden;
+
   private:
   
   mitk::BaseRenderer::Pointer m_Renderer;

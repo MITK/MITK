@@ -2,8 +2,8 @@
 
 Program:   Medical Imaging & Interaction Toolkit
 Language:  C++
-Date:      $Date$
-Version:   $Revision$
+Date:      $Date: 2010-05-31 16:47:20 +0200 (Mo, 31 Mai 2010) $
+Version:   $Revision: 23261 $
 
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
@@ -24,6 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QWheelEvent>
 #include <QKeyEvent>
 #include <QResizeEvent>
+#include <QTimer>
 
 #include "QmitkEventAdapter.h"
 
@@ -145,40 +146,41 @@ void QmitkRenderWindow::mouseReleaseEvent(QMouseEvent *me)
 
 void QmitkRenderWindow::mouseMoveEvent(QMouseEvent *me)
 {
+  this->AdjustRenderWindowMenuVisibility( me->pos() );
+
   if (m_Renderer.IsNotNull()) {
     mitk::MouseEvent event(QmitkEventAdapter::AdaptMouseEvent(m_Renderer, me));
     m_Renderer->MouseMoveEvent(&event);
   }
   QVTKWidget::mouseMoveEvent(me);
 
-  if (m_ResendQtEvents) me->ignore();
-
-  //Show/Hide Menu Widget
-  if( m_MenuWidgetActivated )
-  {
-    //Show Menu Widget when mouse is inside of the define region of the top right corner
-    if( m_MenuWidget->GetLayoutIndex() <= QmitkRenderWindowMenu::CORONAL 
-      && me->pos().x() >= 0
-      && me->pos().y() <= m_MenuWidget->height() + 20 )
-    {
-      m_MenuWidget->MoveWidgetToCorrectPos();
-      m_MenuWidget->show();
-      m_MenuWidget->update();
-    }
-    else if( m_MenuWidget->GetLayoutIndex() == QmitkRenderWindowMenu::THREE_D  
-      && me->pos().x() >= this->width() - m_MenuWidget->width() - 20 
-      && me->pos().y() <= m_MenuWidget->height() + 20 )
-    {
-      m_MenuWidget->MoveWidgetToCorrectPos();
-      m_MenuWidget->show();
-      m_MenuWidget->update();
-    }
-    //Hide Menu Widget when mouse is outside of the define region of the the right corner
-    else if( !m_MenuWidget->GetSettingsMenuVisibilty() )
-    {
-      m_MenuWidget->hide();
-    }    
-  }
+  //if (m_ResendQtEvents) me->ignore();
+  ////Show/Hide Menu Widget
+  //if( m_MenuWidgetActivated )
+  //{
+  //  //Show Menu Widget when mouse is inside of the define region of the top right corner
+  //  if( m_MenuWidget->GetLayoutIndex() <= QmitkRenderWindowMenu::CORONAL 
+  //    && me->pos().x() >= 0
+  //    && me->pos().y() <= m_MenuWidget->height() + 20 )
+  //  {
+  //    m_MenuWidget->MoveWidgetToCorrectPos(1.0);
+  //    m_MenuWidget->show();
+  //    m_MenuWidget->update();
+  //  }
+  //  else if( m_MenuWidget->GetLayoutIndex() == QmitkRenderWindowMenu::THREE_D  
+  //    && me->pos().x() >= this->width() - m_MenuWidget->width() - 20 
+  //    && me->pos().y() <= m_MenuWidget->height() + 20 )
+  //  {
+  //    m_MenuWidget->MoveWidgetToCorrectPos(1.0);
+  //    m_MenuWidget->show();
+  //    m_MenuWidget->update();
+  //  }
+  //  //Hide Menu Widget when mouse is outside of the define region of the the right corner
+  //  else if( !m_MenuWidget->GetSettingsMenuVisibilty() )
+  //  {
+  //    m_MenuWidget->hide();
+  //  }    
+  //}
 }
 
 void QmitkRenderWindow::wheelEvent(QWheelEvent *we)
@@ -236,22 +238,26 @@ void QmitkRenderWindow::keyPressEvent(QKeyEvent *ke)
 
 void QmitkRenderWindow::enterEvent( QEvent *e )
 {
-  //show Menu Widget
-  //if( m_MenuWidget->isHidden() && m_MenuWidgetActivated )
-  //{
-  //  m_MenuWidget->MoveWidgetToCorrectPos();
-  //  m_MenuWidget->show();
-  //  m_MenuWidget->update();
-  //}
-
   QVTKWidget::enterEvent(e);
+}
+
+void QmitkRenderWindow::DeferredHideMenu( )
+{
+  MITK_INFO << "QmitkRenderWindow::DeferredHideMenu";
+
+  if( m_MenuWidget )
+    m_MenuWidget->HideMenu();
 }
 
 void QmitkRenderWindow::leaveEvent( QEvent *e )
 {
+  MITK_INFO << "QmitkRenderWindow::leaveEvent";
+
   //hide Menu Widget
-  if( m_MenuWidget->isVisible() && !m_MenuWidget->GetSettingsMenuVisibilty() && m_MenuWidgetActivated )
-    m_MenuWidget->hide();
+  //if( m_MenuWidget->isVisible() && !m_MenuWidget->GetSettingsMenuVisibilty() && m_MenuWidgetActivated )
+  //  m_MenuWidget->hide();
+  
+  QTimer::singleShot(0,this,SLOT( DeferredHideMenu( ) ) );
 
   QVTKWidget::leaveEvent(e);
 }
@@ -273,11 +279,56 @@ void QmitkRenderWindow::resizeEvent(QResizeEvent* event)
     m_Renderer->Resize(event->size().width(), event->size().height());
   }
 
-  //this->update();
-  //updateGL();
-
   m_InResize = false;
 }
+
+void QmitkRenderWindow::AdjustRenderWindowMenuVisibility( const QPoint& pos )
+{
+  if ( !m_MenuWidgetActivated )
+    return;
+
+/*  if( m_MenuWidget->GetLayoutIndex() <= QmitkRenderWindowMenu::CORONAL 
+    && pos.x() >= 0
+    && pos.y() <= m_MenuWidget->height() + 20 )
+  {
+    m_MenuWidget->ShowMenu();
+    m_MenuWidget->MoveWidgetToCorrectPos();
+  }
+  else if( m_MenuWidget->GetLayoutIndex() == QmitkRenderWindowMenu::THREE_D  
+    && pos.x() >= this->width() - m_MenuWidget->width() - 20 
+    && pos.y() <= m_MenuWidget->height() + 20 )
+  {
+    m_MenuWidget->MoveWidgetToCorrectPos();
+    m_MenuWidget->ShowMenu();
+  }
+  //Hide Menu Widget when mouse is outside of the define region of the the right corner
+  */
+  
+  int min = m_MenuWidget->height() + 20;
+  int max = m_MenuWidget->height() + 64;
+
+  int y=pos.y();
+  
+  if( y <= max )
+  {
+    float opacity = 1.0f-(y-min)/float(max-min);
+    m_MenuWidget->ShowMenu();
+    m_MenuWidget->MoveWidgetToCorrectPos(opacity);
+  }
+  else if( !m_MenuWidget->GetSettingsMenuVisibilty() )
+  {
+    m_MenuWidget->hide();
+  }    
+}
+
+void QmitkRenderWindow::HideRenderWindowMenu( )
+{
+  if ( !m_MenuWidgetActivated )
+    return;
+
+  m_MenuWidget->hide();
+}
+
 
 mitk::SliceNavigationController * QmitkRenderWindow::GetSliceNavigationController()
 {
@@ -312,11 +363,6 @@ void QmitkRenderWindow::OnChangeLayoutDesign( int layoutDesignIndex )
   emit SignalLayoutDesignChanged( layoutDesignIndex );
 }
 
-void QmitkRenderWindow::HideMenuWidget()
-{
-  if( m_MenuWidget )
-    m_MenuWidget->hide();
-}
 
 void QmitkRenderWindow::SetProcessWheelEvents( bool state )
 {

@@ -2,8 +2,8 @@
 
 Program:   Medical Imaging & Interaction Toolkit
 Language:  C++
-Date:      $Date$
-Version:   $Revision$
+Date:      $Date: 2010-05-31 16:47:20 +0200 (Mo, 31 Mai 2010) $
+Version:   $Revision: 23261 $
 
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
@@ -79,9 +79,9 @@ public:
   //MenuWidget need to update the Layout Design List when Layout had changed
   void LayoutDesignListChanged( int layoutDesignIndex );
   
-  //Hide Menu Widget manual e.g. when layout had changed
-  void HideMenuWidget();
   
+  void HideRenderWindowMenu( );
+
   //Activate or Deactivate MenuWidget. 
   void ActivateMenuWidget( bool state )
   {  m_MenuWidgetActivated = state; }
@@ -120,6 +120,8 @@ protected:
     virtual void wheelEvent(QWheelEvent*);
 #endif
 
+    void AdjustRenderWindowMenuVisibility( const QPoint& pos );
+
 signals:
   
   void ResetView();
@@ -133,6 +135,8 @@ protected slots:
   void OnChangeLayoutDesign(int layoutDesignIndex);
 
   void OnWidgetPlaneModeChanged( int );
+
+  void DeferredHideMenu();
 
 private:
   

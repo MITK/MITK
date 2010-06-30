@@ -244,8 +244,8 @@ m_Controls(NULL),
 m_MultiWidget(NULL),
 m_IconTexOFF(new QIcon(":/QmitkDiffusionImaging/texIntOFFIcon.png")),
 m_IconTexON(new QIcon(":/QmitkDiffusionImaging/texIntONIcon.png")),
-m_IconGlyON(new QIcon(":/QmitkDiffusionImaging/glyphson.png")),
 m_IconGlyOFF(new QIcon(":/QmitkDiffusionImaging/glyphsoff.png"))
+m_IconGlyON(new QIcon(":/QmitkDiffusionImaging/glyphson.png")),
 {
 }
 

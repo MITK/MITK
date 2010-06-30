@@ -40,38 +40,38 @@ IF(BLUEBERRY_USE_QT AND DESIRED_QT_VERSION EQUAL 4)
   SET(QT_MT_REQUIRED 1)
   SET(BUILD_QT_PLUGINS 1)
   FIND_PACKAGE(Qt REQUIRED)
-  
+
   IF(QT_QMAKE_CHANGED)
     SET(QT_HELPGENERATOR_EXECUTABLE NOTFOUND)
     SET(QT_COLLECTIONGENERATOR_EXECUTABLE NOTFOUND)
     SET(QT_ASSISTANT_EXECUTABLE NOTFOUND)
   ENDIF()
-  
+
   FIND_PROGRAM(QT_HELPGENERATOR_EXECUTABLE
     NAMES qhelpgenerator qhelpgenerator-qt4 qhelpgenerator4
     PATHS ${QT_BINARY_DIR}
     NO_DEFAULT_PATH
   )
-  
+
   FIND_PROGRAM(QT_COLLECTIONGENERATOR_EXECUTABLE
     NAMES qcollectiongenerator qcollectiongenerator-qt4 qcollectiongenerator4
     PATHS ${QT_BINARY_DIR}
     NO_DEFAULT_PATH
   )
-  
+
   FIND_PROGRAM(QT_ASSISTANT_EXECUTABLE
     NAMES assistant-qt4 assistant4 assistant
     PATHS ${QT_BINARY_DIR}
     NO_DEFAULT_PATH
   )
-  
+
   OPTION(BLUEBERRY_USE_QT_HELP "Enable support for integrating bundle documentation into Qt Help" ON)
-  
-  MARK_AS_ADVANCED(BLUEBERRY_USE_QT_HELP 
-                   QT_HELPGENERATOR_EXECUTABLE 
+
+  MARK_AS_ADVANCED(BLUEBERRY_USE_QT_HELP
+                   QT_HELPGENERATOR_EXECUTABLE
                    QT_COLLECTIONGENERATOR_EXECUTABLE
                    QT_ASSISTANT_EXECUTABLE)
-  
+
   SET(_doxygen_too_old 1)
   IF(BLUEBERRY_USE_QT_HELP)
     FIND_PACKAGE(Doxygen)
@@ -81,20 +81,30 @@ IF(BLUEBERRY_USE_QT AND DESIRED_QT_VERSION EQUAL 4)
       IF(${_doxygen_version} VERSION_GREATER 1.6.0 OR
          ${_doxygen_version} VERSION_EQUAL 1.6.0)
         SET(_doxygen_too_old 0)
-      ENDIF() 
+      ENDIF()
     ENDIF()
-  ENDIF()
+  ELSE(BLUEBERRY_USE_QT_HELP)
   
+	CONFIGURE_FILE( ../Documentation/pregenerated/MITKBlankPage.qch
+				${MITK_BINARY_DIR}/bin/ExtBundles/org.mitk.gui.qt.extapplication/resources/MITKBlankPage.qch
+				COPYONLY )
+				
+	CONFIGURE_FILE( ../Documentation/pregenerated/MitkExtQtHelpCollection.qhc
+				${MITK_BINARY_DIR}/bin/ExtBundles/org.mitk.gui.qt.extapplication/resources/MitkExtQtHelpCollection.qhc
+				COPYONLY )
+  
+  ENDIF(BLUEBERRY_USE_QT_HELP)
+
   IF (BLUEBERRY_USE_QT_HELP AND _doxygen_too_old)
     MESSAGE("Doxygen was not found or is too old. Version 1.6.0 or later is needed if BLUEBERRY_USE_QT_HELP is ON")
     SET(BLUEBERRY_USE_QT_HELP OFF CACHE BOOL "Enable support for integrating bundle documentation into Qt Help" FORCE)
   ENDIF()
-  
+
   IF(BLUEBERRY_USE_QT_HELP AND NOT QT_HELPGENERATOR_EXECUTABLE)
     MESSAGE("You have enabled Qt Help support, but QT_HELPGENERATOR_EXECUTABLE is empty")
     SET(BLUEBERRY_USE_QT_HELP OFF CACHE BOOL "Enable support for integrating bundle documentation into Qt Help" FORCE)
   ENDIF()
-  
+
   INCLUDE(${QT_USE_FILE})
 ENDIF()
 

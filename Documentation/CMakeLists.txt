@@ -62,6 +62,17 @@ ADD_CUSTOM_TARGET(helpPages
                   ${DOXYGEN} 
                   ${PROJECT_BINARY_DIR}/Documentation/helpPages.conf
                   )
+ELSE(DOXYGEN_FOUND)
+# copy blank documentation page to prevent QtHelp from being shown 
+# copy the .qhc and .qch files to $MITK_BIN/mitk/bin/ExtBundles/resources/
+
+CONFIGURE_FILE( pregenerated/MITKBlankPage.qch
+				${MITK_BINARY_DIR}/bin/ExtBundles/org.mitk.gui.qt.extapplication/resources/MITKBlankPage.qch
+				COPYONLY )
+				
+CONFIGURE_FILE( pregenerated/MitkExtQtHelpCollection.qhc
+				${MITK_BINARY_DIR}/bin/ExtBundles/org.mitk.gui.qt.extapplication/resources/MitkExtQtHelpCollection.qhc
+				COPYONLY )				
 
 ENDIF(DOXYGEN_FOUND)
 

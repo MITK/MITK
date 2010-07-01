@@ -77,7 +77,7 @@ SET(CPP_FILES
   DataManagement/mitkLabeledImageLookupTable.cpp
   DataManagement/mitkLineOperation.cpp
   DataManagement/mitkMesh.cpp
-  DataManagement/mitkObservedObjectList.cpp
+  DataManagement/mitkObjectSet.cpp
   DataManagement/mitkOrganTypeProperty.cpp
   DataManagement/mitkPlaneLandmarkProjector.cpp
   DataManagement/mitkPlane.cpp
@@ -90,6 +90,7 @@ SET(CPP_FILES
 #DataManagement/mitkUSLookupTableSource.cpp
   DataManagement/mitkUnstructuredGrid.cpp
   DataManagement/mitkVideoSource.cpp
+  DataManagement/vtkObjectSet.cpp
   IO/mitkObjFileIOFactory.cpp
   IO/mitkObjFileReader.cpp
   IO/mitkPACSPlugin.cpp

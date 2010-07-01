@@ -1,12 +1,8 @@
 #ifndef MITKOBJECTOBSERVER_H
 #define MITKOBJECTOBSERVER_H
 
-class vtkObject;
-
-namespace itk
-{
-  class Object;
-}
+#include <itkObject.h>
+#include "mitkSetObserver.h"
 
 namespace mitk
 {
@@ -16,14 +12,9 @@ namespace mitk
   /// that want to be informed when an
   /// itk object was modified or deleted
   ///
-  struct ObjectObserver
+  struct ObjectObserver: public SetObserver<itk::Object*>
   {
-    virtual void OnModified( const itk::Object* object ) = 0;
-    virtual void OnDeleted( const itk::Object* object ) = 0;
-    virtual void OnModified( const vtkObject* object ) = 0;
-    virtual void OnDeleted( const vtkObject* object ) = 0;
   };
-
 }
 
 #endif // MITKOBJECTOBSERVER_H

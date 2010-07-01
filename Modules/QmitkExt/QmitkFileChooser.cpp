@@ -19,20 +19,34 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <QFileDialog>
 #include <QVBoxLayout>
+#include <QHBoxLayout>
 #include <QPushButton>
 #include <QLineEdit>
 #include <QApplication>
 
-QmitkFileChooser::QmitkFileChooser( bool selectDir, QWidget* parent, Qt::WindowFlags f )
+QmitkFileChooser::QmitkFileChooser(bool horizontalLayout, bool selectDir,
+                                   bool fileMustExist
+                                   , QWidget* parent, Qt::WindowFlags f )
 : QWidget( parent, f )
 , m_SelectDir( selectDir )
+, m_FileMustExist(fileMustExist)
 {
   m_File = new QLineEdit;
   m_File->setReadOnly( true );
   m_SelectFile = new QPushButton("Select File");
   connect( m_SelectFile, SIGNAL(clicked(bool)), this, SLOT( OnSelectFileClicked( bool ) ) );
 
-  QVBoxLayout* layout = new QVBoxLayout; 
+  this->SetHorizotalLayout(horizontalLayout);
+}
+
+void QmitkFileChooser::SetHorizotalLayout(bool horizontalLayout)
+{
+  QBoxLayout* layout = 0;
+  if(horizontalLayout)
+    layout = new QHBoxLayout;
+   else
+    layout = new QVBoxLayout;
+
   layout->setContentsMargins(0,0,0,0);
   layout->addWidget( m_File );
   layout->addWidget( m_SelectFile );
@@ -40,9 +54,14 @@ QmitkFileChooser::QmitkFileChooser( bool selectDir, QWidget* parent, Qt::WindowF
   this->setLayout( layout );
 }
 
-void QmitkFileChooser::SetSelectDir( bool selectDir )
+void QmitkFileChooser::SetSelectDir( bool selectDir  )
 {
   m_SelectDir = selectDir;
+}
+
+void QmitkFileChooser::SetFileMustExist( bool fileMustExist )
+{
+  m_FileMustExist = fileMustExist;
 }
 
 void QmitkFileChooser::SetFile( const std::string& file )
@@ -71,10 +90,17 @@ void QmitkFileChooser::OnSelectFileClicked( bool checked/*=false */ )
   QString filename;
   if( m_SelectDir )
     filename = QFileDialog::getExistingDirectory( QApplication::activeWindow()
-      , "Open directory", m_File->text() );  
+      , "Open directory", m_File->text() );
   else
-    filename = QFileDialog::getOpenFileName( QApplication::activeWindow()
-      , "Open file", m_File->text(), m_FilePattern );
+  {
+    if (m_FileMustExist)
+      filename = QFileDialog::getOpenFileName( QApplication::activeWindow()
+        , "Open file", m_File->text(), m_FilePattern );
+    else
+      filename = QFileDialog::getSaveFileName( QApplication::activeWindow()
+        , "Open file", m_File->text(), m_FilePattern );
+  }
 
-  m_File->setText( filename );  
+  if(!filename.isEmpty())
+    m_File->setText( filename );
 }

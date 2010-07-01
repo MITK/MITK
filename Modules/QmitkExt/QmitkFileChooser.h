@@ -33,21 +33,27 @@ class QmitkExt_EXPORT QmitkFileChooser : public QWidget
   Q_OBJECT
 
   public:
-    explicit QmitkFileChooser( bool selectDir = false,
-      QWidget* parent = 0, Qt::WindowFlags f = 0);
-  
+    explicit QmitkFileChooser( bool horizontalLayout=false,
+                               bool selectDir = false,
+                               bool fileMustExist = true,
+                                QWidget* parent = 0
+                              , Qt::WindowFlags f = 0);
+
+    void SetHorizotalLayout(bool horizontalLayout);
     void SetSelectDir( bool selectDir );
+    void SetFileMustExist( bool fileMustExist );
     void SetFile( const std::string& file );
     void SetFilePattern( const std::string& filepattern );
 
     bool IsValidFile() const;
-    std::string GetFile() const;
+    virtual std::string GetFile() const;
 
   protected slots:
-    void OnSelectFileClicked ( bool checked=false );
+    virtual void OnSelectFileClicked ( bool checked=false );
 
   protected:
     bool m_SelectDir;
+    bool m_FileMustExist;
     bool m_ValidFile;
 
     QString m_FilePattern;

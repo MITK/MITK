@@ -23,24 +23,26 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkVideoSource.h"
 #include "mitkUndistortCameraImage.h"
 
-// HighGui camera interface: a convenient way for grabbing from a video capture (on windows VfW is used) 
+// HighGui camera interface: a convenient way for grabbing from a video capture (on windows VfW is used)
 #include "highgui.h"
 
 // For Providing ITK Image Interface
 #include "itkRGBPixel.h"
 #include "itkImage.h"
 #include "itkImageRegionIterator.h"
+#include "mitkOpenCVImageSource.h"
 
 namespace mitk
 {
  /**
  * Interface for acquiring video data using Intel's OPENCV library.
  * Video data may either be provided from a file or a grabbing device.
- * At the moment, OPENCV includes two separated modules for this grabbing, but only HighGui is 
+ * At the moment, OPENCV includes two separated modules for this grabbing, but only HighGui is
  * used here.
  * Initialize via SetVideoFileInput() or SetVideoCameraInput(), start processing with StartCapturing();
  */
   class MITK_OPENCVVIDEOSUPPORT_EXPORT OpenCVVideoSource : public VideoSource
+      , OpenCVImageSource
   {
     typedef itk::RGBPixel< unsigned char >    CharPixelType;
     typedef itk::FixedArray <float,3>         HSVPixelType;
@@ -55,11 +57,11 @@ namespace mitk
 
     ////##Documentation
     ////## @brief sets a video file as input device. One video frame is being processed by updating the renderwindow.
-    ////## Notice: Which codecs and file formats are supported depends on the back end library. 
+    ////## Notice: Which codecs and file formats are supported depends on the back end library.
     ////## Common Function that currently uses HighGui Lib for video playback
     virtual void SetVideoFileInput(const char * filename, bool repeatVideo, bool useCVCAMLib = false);
     ////##Documentation
-    ////##@brief Initializes capturing video from camera. 
+    ////##@brief Initializes capturing video from camera.
     ////## Common Function for use either with HIGHGUI or with CVCAM library
     ////## On windows: if you use CVCAM Library, you can pass -1 as camera index for a selection menu
     virtual void SetVideoCameraInput(int cameraindex, bool useCVCAMLib = false);
@@ -74,28 +76,29 @@ namespace mitk
     ////## CV_CAP_PROP_FRAME_HEIGHT height of frames in the video stream
     ////## CV_CAP_PROP_FPS frame rate
     ////## CV_CAP_PROP_FOURCC 4-character code of codec
-    ////## CV_CAP_PROP_FRAME_COUNT number of frames in video file 
+    ////## CV_CAP_PROP_FRAME_COUNT number of frames in video file
     ////## See OpenCV Highgui documentation for more details ( http://opencvlibrary.sourceforge.net/HighGui )
     virtual double GetVideoCaptureProperty(int property_id);
     ////##Documentation
-    ////## @brief sets the specified property of video capturing from HIGHGUI LIBRARY. 
+    ////## @brief sets the specified property of video capturing from HIGHGUI LIBRARY.
     ////## Notice: Some properties only can be set using a video file as input devices, others using a camera.
     ////## See OpenCV Highgui documentation for more details ( http://opencvlibrary.sourceforge.net/HighGui )
     virtual int SetVideoCaptureProperty(int property_id, double value);
- 
+
     virtual void GetCurrentFrameAsOpenCVImage(IplImage * image);
     ///
     /// Return the current frame
     ///
+    const IplImage * GetImage();
     const IplImage * GetCurrentFrame();
     ////##Documentation
-    ////## @brief returns the current video data as an ITK image. 
+    ////## @brief returns the current video data as an ITK image.
     virtual void GetCurrentFrameAsItkHSVPixelImage(HSVPixelImageType::Pointer &Image);
     ////##Documentation
-    ////## @brief assigns the grabbing devices for acquiring the next frame. 
+    ////## @brief assigns the grabbing devices for acquiring the next frame.
     virtual void FetchFrame();
     ////##Documentation
-    ////## @brief returns a pointer to the image data array for opengl rendering. 
+    ////## @brief returns a pointer to the image data array for opengl rendering.
     virtual unsigned char * GetVideoTexture();
     ////##Documentation
     ////## @brief starts the video capturing.
@@ -105,7 +108,7 @@ namespace mitk
     virtual void StopCapturing();
     ////##Documentation
     ////## @brief rotate image according to the set angle.
-    virtual IplImage* RotateImage(IplImage* input);   
+    virtual IplImage* RotateImage(IplImage* input);
     ////##Documentation
     ////## @brief EnableOnlineImageUndistortion allows for an online image undistortion directly after capturing an image.
     ////## The function has to be called after setting up the video input; the result is made accessible via the normal
@@ -114,6 +117,10 @@ namespace mitk
      ////##Documentation
     ////## @brief DisableOnlineImageUndistortion is used to disable the automatic image undistortion.
     virtual void DisableOnlineImageUndistortion();
+    ///
+    /// \return true if image undistorsion is enabled
+    ///
+    virtual bool OnlineImageUndistortionEnabled() const;
 
     virtual void PauseCapturing();
 
@@ -131,10 +138,10 @@ namespace mitk
 
     itkGetMacro( RepeatVideo, bool );
     itkSetMacro( RepeatVideo, bool );
-  
+
   protected:
     OpenCVVideoSource();
-	  virtual ~OpenCVVideoSource();
+    virtual ~OpenCVVideoSource();
 
     ///
     /// Resets the whole class for capturing from a new device
@@ -142,20 +149,20 @@ namespace mitk
     void Reset();
 
     ////##Documentation
-    ////## @brief internally used for converting the current video frame to a texture for opengl rendering, 
+    ////## @brief internally used for converting the current video frame to a texture for opengl rendering,
     ////## so that GetVideoTexture() can be used.
     void UpdateVideoTexture();
-   
+
     // Helper functions
     void sleep(unsigned int ms);
     void RGBtoHSV(float r, float g, float b, float &h, float &s, float &v);
 
     // HighGUI Library capture device
     CvCapture    * m_VideoCapture;
- 
+
     // current Video image
     IplImage     * m_CurrentImage;
-    unsigned char* m_CurrentVideoTexture; 
+    unsigned char* m_CurrentVideoTexture;
 
     IplImage     * m_PauseImage;
     bool           m_CapturePaused;

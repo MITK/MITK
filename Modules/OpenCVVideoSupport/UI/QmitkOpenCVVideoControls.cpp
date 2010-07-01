@@ -31,6 +31,7 @@ QmitkOpenCVVideoControls::QmitkOpenCVVideoControls( QmitkVideoBackground* _Video
 , m_SliderCurrentlyMoved(false)
 {
   m_Controls->setupUi(this);
+  m_Controls->FileChooser->SetFileMustExist(true);
   m_Controls->FileChooser->SetSelectDir(false);
 
   this->SetStdMultiWidget(_MultiWidget);
@@ -183,7 +184,7 @@ void QmitkOpenCVVideoControls::Stop()
   m_Controls->VideoFileControls->setEnabled(false);
   this->m_Controls->StopButton->setEnabled(false);
   this->SwitchPlayButton(true);
-  
+
   if(m_MultiWidget)
     m_MultiWidget->EnableGradientBackground();
   if(m_VideoBackground)
@@ -306,7 +307,7 @@ void QmitkOpenCVVideoControls::SetVideoBackground( QmitkVideoBackground* _VideoB
     else
     {
       MITK_WARN << "m_VideoSource is 0";
-      this->setEnabled(false);      
+      this->setEnabled(false);
     }
   }
 

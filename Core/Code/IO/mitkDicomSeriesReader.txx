@@ -22,8 +22,10 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <itkImageSeriesReader.h>
 
-#include <gdcmSorter.h>
-#include <gdcmScanner.h>
+#if GDCM_MAJOR_VERSION >= 2
+  #include <gdcmSorter.h>
+  #include <gdcmScanner.h>
+#endif
 
 namespace mitk
 {
@@ -33,6 +35,15 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
 {
   typedef itk::Image<PixelType, 4> ImageType;
   typedef itk::ImageSeriesReader<ImageType> ReaderType;
+
+  DcmIoType::Pointer io = DcmIoType::New();
+  typename ReaderType::Pointer reader = ReaderType::New();
+  mitk::Image::Pointer image = mitk::Image::New();
+
+  reader->SetImageIO(io);
+  reader->ReverseOrderOff();
+
+#if GDCM_MAJOR_VERSION >= 2
 
   /******** Workaround for 4D data ***************/
   gdcm::Sorter sorter;
@@ -69,14 +80,7 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
   }
   /******** End: Workaround for 4D data **********/
 
-  DcmIoType::Pointer io = DcmIoType::New();
-  typename ReaderType::Pointer reader = ReaderType::New();
-
-  reader->SetImageIO(io);
-  reader->ReverseOrderOff();
-
   const std::list<StringContainer>::const_iterator df_end = decomposed_filenames.end();
-  mitk::Image::Pointer image = mitk::Image::New();
   unsigned int act_volume = 1u;
 
   reader->SetFileNames(decomposed_filenames.front());
@@ -92,6 +96,15 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
     reader->Update();
     image->SetImportVolume(reader->GetOutput()->GetBufferPointer(), act_volume++);
   }
+
+#else
+
+  reader->SetFileNames(filenames);
+  reader->Update();
+  image->InitializeByItk(reader->GetOutput());
+  image->SetImportVolume(reader->GetOutput()->GetBufferPointer());
+
+#endif
 
   node.SetData(image);
 }

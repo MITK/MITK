@@ -19,7 +19,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <itkGDCMSeriesFileNames.h>
 
-#include <gdcmAttribute.h>
+#if GDCM_MAJOR_VERSION >= 2
+  #include <gdcmAttribute.h>
+#endif
 
 namespace mitk
 {
@@ -153,6 +155,7 @@ DicomSeriesReader::StringContainer DicomSeriesReader::GetSeries(const std::strin
   return name_generator->GetFileNames(series_uid);
 }
 
+#if GDCM_MAJOR_VERSION >= 2
 bool DicomSeriesReader::GdcmSortFunction(const gdcm::DataSet &ds1, const gdcm::DataSet &ds2)
 {
   gdcm::Attribute<0x0008,0x0032> acq_time1; // Acquisition time
@@ -174,6 +177,7 @@ bool DicomSeriesReader::GdcmSortFunction(const gdcm::DataSet &ds1, const gdcm::D
 
   return acq_time1 < acq_time2;
 }
+#endif
 
 }
 

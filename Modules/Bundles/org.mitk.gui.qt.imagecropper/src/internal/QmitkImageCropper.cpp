@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 //!#include "QmitkImageCropperControls.h"
 #include <QAction>
 
+#include <QInputDialog>
 #include <QMessageBox>
 #include <QCheckBox>
 #include <QSpinBox>
@@ -27,6 +28,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkRenderWindow.h>
 
 
+#include <mitkEllipsoid.h>
+#include <mitkCylinder.h>
 #include <mitkRenderingManager.h>
 #include <mitkProperties.h>
 #include <mitkGlobalInteraction.h>
@@ -44,7 +47,7 @@ const mitk::OperationType QmitkImageCropper::OP_EXCHANGE = 717;
 
 // constructors for operation classes
 QmitkImageCropper::opExchangeNodes::opExchangeNodes( mitk::OperationType type, mitk::DataNode* node, mitk::BaseData* oldData, mitk::BaseData* newData )
-:mitk::Operation(type),m_Node(node),m_OldData(oldData),m_NewData(newData), m_NodeDeletedObserverTag(0), m_OldDataDeletedObserverTag(0), 
+:mitk::Operation(type),m_Node(node),m_OldData(oldData),m_NewData(newData), m_NodeDeletedObserverTag(0), m_OldDataDeletedObserverTag(0),
 m_NewDataDeletedObserverTag(0)
 {
     // listen to the node the image is hold
@@ -447,7 +450,19 @@ void QmitkImageCropper::AddSurrounding( itk::Image< TPixel, VImageDimension >* i
 
 void QmitkImageCropper::CreateBoundingObject()
 {
-  m_CroppingObject = mitk::Cuboid::New();
+  QStringList items;
+  items << tr("Cuboid") << tr("Ellipsoid") << tr("Cylinder");
+
+  bool ok;
+  QString item = QInputDialog::getItem(m_Parent, tr("QInputDialog::getItem()"),
+                                       tr("Type of Bounding Object:")
+                                       , items, 0, false, &ok);
+  if (item == "Ellipsoid")
+    m_CroppingObject = mitk::Ellipsoid::New();
+  else if(item == "Cylinder")
+    m_CroppingObject = mitk::Cylinder::New();
+  else
+    m_CroppingObject = mitk::Cuboid::New();
 
   m_CroppingObjectNode = mitk::DataNode::New();
   m_CroppingObjectNode->SetData( m_CroppingObject );

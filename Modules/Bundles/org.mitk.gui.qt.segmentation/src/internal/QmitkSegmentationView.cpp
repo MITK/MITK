@@ -1,4 +1,4 @@
-/*========================================================================= 
+/*=========================================================================
 
 Program:   Medical Imaging & Interaction Toolkit
 Language:  C++
@@ -23,13 +23,16 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkStdMultiWidget.h"
 #include "QmitkNewSegmentationDialog.h"
 
-#include <QMessageBox> 
+#include <QMessageBox>
 
 #include <berryIWorkbenchPage.h>
 
 #include "QmitkSegmentationView.h"
 #include "QmitkSegmentationPostProcessing.h"
 #include "QmitkSegmentationOrganNamesHandling.cpp"
+
+#include <mitkSurfaceToImageFilter.h>
+#include <vtkPolyData.h>
 
 // public methods
 
@@ -74,7 +77,7 @@ void QmitkSegmentationView::Activated()
     m_Controls->m_ManualToolSelectionBox->setEnabled( true );
     m_Controls->m_OrganToolSelectionBox->setEnabled( true );
     m_Controls->m_LesionToolSelectionBox->setEnabled( true );
-  
+
     m_Controls->m_SlicesInterpolator->EnableInterpolation( m_Controls->widgetStack->currentWidget() == m_Controls->pageManual );
 
     itk::ReceptorMemberCommand<QmitkSegmentationView>::Pointer command1 = itk::ReceptorMemberCommand<QmitkSegmentationView>::New();
@@ -113,7 +116,7 @@ void QmitkSegmentationView::StdMultiWidgetClosed( QmitkStdMultiWidget& /*stdMult
 {
   SetMultiWidget(NULL);
 }
-  
+
 void QmitkSegmentationView::SetMultiWidget(QmitkStdMultiWidget* multiWidget)
 {
   if (m_MultiWidget)
@@ -180,7 +183,7 @@ void QmitkSegmentationView::SliceRotation(const itk::EventObject&)
 {
   CheckImageAlignment();
 }
- 
+
 
 // protected slots
 
@@ -209,10 +212,10 @@ void QmitkSegmentationView::CreateNewSegmentation()
              a couple of examples of how organ names are stored:
 
              a simple item is built up like 'name#AABBCC' where #AABBCC is the hexadecimal notation of a color as known from HTML
-             
+
              items are stored separated by ';'
              this makes it necessary to escape occurrences of ';' in name.
-             otherwise the string "hugo;ypsilon#AABBCC;eugen#AABBCC" could not be parsed as two organs 
+             otherwise the string "hugo;ypsilon#AABBCC;eugen#AABBCC" could not be parsed as two organs
              but we would get "hugo" and "ypsilon#AABBCC" and "eugen#AABBCC"
 
              so the organ name "hugo;ypsilon" is stored as "hugo\;ypsilon"
@@ -225,7 +228,7 @@ void QmitkSegmentationView::CreateNewSegmentation()
           QString storedString = QString::fromStdString( this->GetPreferences()->GetByteArray("Organ-Color-List","") );
           MITK_DEBUG << "storedString: " << storedString.toStdString();
           // match a string consisting of any number of repetitions of either "anything but ;" or "\;". This matches everything until the next unescaped ';'
-          QRegExp onePart("(?:[^;]|\\\\;)*"); 
+          QRegExp onePart("(?:[^;]|\\\\;)*");
           MITK_DEBUG << "matching " << onePart.pattern().toStdString();
           int count = 0;
           int pos = 0;
@@ -240,7 +243,7 @@ void QmitkSegmentationView::CreateNewSegmentation()
 
             // unescape possible occurrences of '\;' in the string
             matchedString.replace("\\;", ";");
-            
+
             // add matched string part to output list
             organColors << matchedString;
           }
@@ -299,6 +302,50 @@ void QmitkSegmentationView::CreateNewSegmentation()
   }
 }
 
+void QmitkSegmentationView::CreateSegmentationFromSurface()
+{
+
+  mitk::DataNode::Pointer surfaceNode =
+      m_Controls->MaskSurfaces->GetSelectedNode();
+  mitk::Surface::Pointer surface(0);
+  if(surfaceNode.IsNotNull())
+    surface = dynamic_cast<mitk::Surface*> ( surfaceNode->GetData() );
+  if(surface.IsNull())
+  {
+    this->HandleException( "No surface selected.", m_Parent, true);
+    return;
+  }
+
+  mitk::DataNode::Pointer imageNode
+      = m_Controls->m_ManualToolSelectionBox->GetToolManager()->GetReferenceData(0);
+  mitk::Image::Pointer image(0);
+  if (imageNode.IsNotNull())
+    image = dynamic_cast<mitk::Image*>( imageNode->GetData() );
+  if(image.IsNull())
+  {
+    this->HandleException( "No image selected.", m_Parent, true);
+    return;
+  }
+
+  mitk::SurfaceToImageFilter::Pointer s2iFilter
+      = mitk::SurfaceToImageFilter::New();
+
+  s2iFilter->MakeOutputBinaryOn();
+  s2iFilter->SetInput(surface);
+  s2iFilter->SetImage(image);
+  s2iFilter->Update();
+
+  mitk::DataNode::Pointer resultNode = mitk::DataNode::New();
+  std::string nameOfResultImage = imageNode->GetName();
+  nameOfResultImage.append(surfaceNode->GetName());
+  resultNode->SetProperty("name", mitk::StringProperty::New(nameOfResultImage) );
+  resultNode->SetProperty("binary", mitk::BoolProperty::New(true) );
+  resultNode->SetData( s2iFilter->GetOutput() );
+
+  this->GetDataStorage()->Add(resultNode, imageNode);
+
+}
+
 void QmitkSegmentationView::ManualToolSelected(int id)
 {
   // disable crosshair movement when a manual drawing tool is active (otherwise too much visual noise)
@@ -339,7 +386,7 @@ void QmitkSegmentationView::ToolboxStackPageChanged(int id)
   }
 }
 
-// protected 
+// protected
 
 void QmitkSegmentationView::OnSelectionChanged(mitk::DataNode* node)
 {
@@ -351,7 +398,7 @@ void QmitkSegmentationView::OnSelectionChanged(mitk::DataNode* node)
 void QmitkSegmentationView::OnSelectionChanged(std::vector<mitk::DataNode*> nodes)
 {
   if (!m_Parent || !m_Parent->isVisible()) return;
- 
+
   // reaction to BlueBerry selection events
   //   this method will try to figure out if a relevant segmentation and its corresponding original image were selected
   //   a warning is issued if the selection is invalid
@@ -360,12 +407,12 @@ void QmitkSegmentationView::OnSelectionChanged(std::vector<mitk::DataNode*> node
   mitk::DataNode::Pointer referenceData = FindFirstRegularImage( nodes );
   mitk::DataNode::Pointer workingData =   FindFirstSegmentation( nodes );
 
-  bool invalidSelection( !nodes.empty() && 
+  bool invalidSelection( !nodes.empty() &&
                          (
                            nodes.size() > 2 ||    // maximum 2 selected nodes
                            (nodes.size() == 2 && (workingData.IsNull() || referenceData.IsNull()) ) // with two nodes, one must be the original image, one the segmentation
                            // one item is always ok (might be working or reference or nothing
-                         )  
+                         )
                        );
 
   if (invalidSelection)
@@ -424,7 +471,7 @@ mitk::DataNode::Pointer QmitkSegmentationView::FindFirstRegularImage( std::vecto
       // return first proper mitk::Image
       if (isImage && !isSegmentation) return nodes.at(i);
   }
-  
+
   return NULL;
 }
 
@@ -433,7 +480,7 @@ mitk::DataNode::Pointer QmitkSegmentationView::FindFirstSegmentation( std::vecto
 {
   if (nodes.empty()) return NULL;
 
- 
+
   for(unsigned int i = 0; i < nodes.size(); ++i)
   {
       bool isImage(false);
@@ -445,10 +492,10 @@ mitk::DataNode::Pointer QmitkSegmentationView::FindFirstSegmentation( std::vecto
       bool isSegmentation(false);
       nodes.at(i)->GetBoolProperty("binary", isSegmentation);
 
-      // return first proper binary mitk::Image 
+      // return first proper binary mitk::Image
       if (isImage && isSegmentation) return nodes.at(i);
   }
-  
+
   return NULL;
 }
 
@@ -471,7 +518,7 @@ void QmitkSegmentationView::SetToolManagerSelection(const mitk::DataNode* refere
   {
     m_Controls->lblReferenceImageSelectionWarning->show();
   }
-  
+
   // check, wheter reference image is aligned like render windows. Otherwise display a visible warning (because 2D tools will probably not work)
   CheckImageAlignment();
 
@@ -498,7 +545,7 @@ void QmitkSegmentationView::CheckImageAlignment()
 
     if (image.IsNotNull() && m_MultiWidget)
     {
-    
+
       wrongAlignment = !(    IsRenderWindowAligned(m_MultiWidget->GetRenderWindow1(), image )
                           && IsRenderWindowAligned(m_MultiWidget->GetRenderWindow2(), image )
                           && IsRenderWindowAligned(m_MultiWidget->GetRenderWindow3(), image )
@@ -519,11 +566,11 @@ void QmitkSegmentationView::CheckImageAlignment()
 bool QmitkSegmentationView::IsRenderWindowAligned(QmitkRenderWindow* renderWindow, mitk::Image* image)
 {
   if (!renderWindow) return false;
-    
+
   // for all 2D renderwindows of m_MultiWidget check alignment
   mitk::PlaneGeometry::ConstPointer displayPlane = dynamic_cast<const mitk::PlaneGeometry*>( renderWindow->GetRenderer()->GetCurrentWorldGeometry2D() );
   if (displayPlane.IsNull()) return false;
-    
+
   int affectedDimension(-1);
   int affectedSlice(-1);
   return mitk::SegTool2D::DetermineAffectedImageSlice( image, displayPlane, affectedDimension, affectedSlice );
@@ -536,16 +583,16 @@ void QmitkSegmentationView::ForceDisplayPreferencesUponAllImages()
   // check all images and segmentations in DataStorage:
   // (items in brackets are implicitly done by previous steps)
   // 1.
-  //   if  a reference image is selected, 
+  //   if  a reference image is selected,
   //     show the reference image
-  //     and hide all other images (orignal and segmentation), 
+  //     and hide all other images (orignal and segmentation),
   //     (and hide all segmentations of the other original images)
-  //     and show all the reference's segmentations 
+  //     and show all the reference's segmentations
   //   if no reference image is selected, do do nothing
   //
   // 2.
-  //   if  a segmentation is selected, 
-  //     show it 
+  //   if  a segmentation is selected,
+  //     show it
   //     (and hide all all its siblings (childs of the same parent, incl, NULL parent))
   //   if no segmentation is selected, do nothing
 
@@ -568,8 +615,8 @@ void QmitkSegmentationView::ForceDisplayPreferencesUponAllImages()
       mitk::DataNode* node = *iter;
       // apply display preferences
       ApplyDisplayOptions(node);
-    
-      // set visibility  
+
+      // set visibility
       node->SetVisibility(node == referenceData);
     }
   }
@@ -579,7 +626,7 @@ void QmitkSegmentationView::ForceDisplayPreferencesUponAllImages()
   {
     workingData->SetVisibility(true);
   }
-  
+
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
@@ -626,7 +673,7 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
   }
   m_Controls->m_OrganToolSelectionBox->SetToolManager( *toolManager );
   m_Controls->m_OrganToolSelectionBox->SetToolGUIArea( m_Controls->m_OrganToolGUIContainer );
-  m_Controls->m_OrganToolSelectionBox->SetDisplayedToolGroups("'Hippocampus left' 'Hippocampus right' 'Lung left' 'Lung right' 'Liver' 'Heart LV' 'Endocard LV' 'Epicard LV'");
+  m_Controls->m_OrganToolSelectionBox->SetDisplayedToolGroups("'Hippocampus left' 'Hippocampus right' 'Lung left' 'Lung right' 'Liver' 'Heart LV' 'Endocard LV' 'Epicard LV' 'Prostate'");
   m_Controls->m_OrganToolSelectionBox->SetEnabledMode( QmitkToolSelectionBox::EnabledWithReferenceData );
 
   // available only in the 3M application
@@ -638,21 +685,25 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
   m_Controls->m_LesionToolSelectionBox->SetToolGUIArea( m_Controls->m_LesionToolGUIContainer );
   m_Controls->m_LesionToolSelectionBox->SetDisplayedToolGroups("'Lymph Node' 'Lymph Node Correction'");
   m_Controls->m_LesionToolSelectionBox->SetEnabledMode( QmitkToolSelectionBox::EnabledWithReferenceData );
-    
-  toolManager->NewNodesGenerated += 
+
+  toolManager->NewNodesGenerated +=
     mitk::MessageDelegate<QmitkSegmentationView>( this, &QmitkSegmentationView::NewNodesGenerated );          // update the list of segmentations
-  toolManager->NewNodeObjectsGenerated += 
+  toolManager->NewNodeObjectsGenerated +=
     mitk::MessageDelegate1<QmitkSegmentationView, mitk::ToolManager::DataVectorType*>( this, &QmitkSegmentationView::NewNodeObjectsGenerated );          // update the list of segmentations
 
   // create signal/slot connections
   connect( m_Controls->btnNewSegmentation, SIGNAL(clicked()), this, SLOT(CreateNewSegmentation()) );
+  connect( m_Controls->CreateSegmentationFromSurface, SIGNAL(clicked()), this, SLOT(CreateSegmentationFromSurface()) );
   connect( m_Controls->m_ManualToolSelectionBox, SIGNAL(ToolSelected(int)), this, SLOT(ManualToolSelected(int)) );
   connect( m_Controls->widgetStack, SIGNAL(currentChanged(int)), this, SLOT(ToolboxStackPageChanged(int)) );
+
+  m_Controls->MaskSurfaces->SetDataStorage(this->GetDefaultDataStorage());
+  m_Controls->MaskSurfaces->SetPredicate(mitk::NodePredicateDataType::New("Surface"));
 
   // create helper class to provide context menus for segmentations in data manager
   m_PostProcessing = new QmitkSegmentationPostProcessing(this->GetDefaultDataStorage(), this, NULL);
 }
 
-      
+
 // ATTENTION some methods for handling the known list of (organ names, colors) are defined in QmitkSegmentationOrganNamesHandling.cpp
 

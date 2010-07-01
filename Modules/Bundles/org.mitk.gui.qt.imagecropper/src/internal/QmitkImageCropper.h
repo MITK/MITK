@@ -66,9 +66,9 @@ class QmitkImageCropper : public QObject, public QmitkFunctionality, public mitk
             mitk::DataNode* GetNode() { return m_Node; }
             mitk::BaseData* GetOldData() { return m_OldData; }
             mitk::BaseData* GetNewData() { return m_NewData; }
-    protected: 
+    protected:
             void NodeDeleted(const itk::Object *caller, const itk::EventObject &event);
-    private: 
+    private:
             mitk::DataNode* m_Node;
             mitk::BaseData::Pointer m_OldData;
             mitk::BaseData::Pointer m_NewData;
@@ -190,7 +190,7 @@ protected:
   /*!
   * \brief The cuboid used for cropping.
   */
-  mitk::Cuboid::Pointer m_CroppingObject;
+  mitk::BoundingObject::Pointer m_CroppingObject;
 
   /*!
   * \brief Tree node of the cuboid used for cropping.

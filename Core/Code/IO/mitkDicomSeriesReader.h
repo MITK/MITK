@@ -27,6 +27,8 @@ PURPOSE.  See the above copyright notices for more information.
   #include <itkDICOMImageIO2.h>
 #endif
 
+#include <gdcmDataSet.h>
+
 namespace mitk
 {
 
@@ -94,6 +96,12 @@ protected:
    */
   template <typename PixelType>
   static void LoadDicom(const StringContainer &filenames, DataNode &node);
+
+  /*
+   * Auxiliary sort function for Gdcm Dicom sorting. It is used for sorting
+   * 4D Dicom data.
+   */
+  static bool GdcmSortFunction(const gdcm::DataSet &ds1, const gdcm::DataSet &ds2);
 };
 
 }

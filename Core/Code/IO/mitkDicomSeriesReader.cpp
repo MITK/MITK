@@ -19,6 +19,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <itkGDCMSeriesFileNames.h>
 
+#include <gdcmAttribute.h>
+
 namespace mitk
 {
 
@@ -149,6 +151,28 @@ DicomSeriesReader::StringContainer DicomSeriesReader::GetSeries(const std::strin
   }
 
   return name_generator->GetFileNames(series_uid);
+}
+
+bool DicomSeriesReader::GdcmSortFunction(const gdcm::DataSet &ds1, const gdcm::DataSet &ds2)
+{
+  gdcm::Attribute<0x0008,0x0032> acq_time1; // Acquisition time
+  gdcm::Attribute<0x0020,0x0032> image_pos1; // Image Position (Patient)
+
+  acq_time1.Set(ds1);
+  image_pos1.Set(ds1);
+
+  gdcm::Attribute<0x0008,0x0032> acq_time2;
+  gdcm::Attribute<0x0020,0x0032> image_pos2;
+
+  acq_time2.Set(ds2);
+  image_pos2.Set(ds2);
+
+  if (acq_time1 == acq_time2)
+  {
+    return image_pos1 < image_pos2;
+  }
+
+  return acq_time1 < acq_time2;
 }
 
 }

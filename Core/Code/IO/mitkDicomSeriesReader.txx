@@ -22,27 +22,77 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <itkImageSeriesReader.h>
 
+#include <gdcmSorter.h>
+#include <gdcmScanner.h>
+
 namespace mitk
 {
 
 template <typename PixelType>
 void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &node)
 {
-  typedef itk::Image<PixelType, 3> ImageType;
+  typedef itk::Image<PixelType, 4> ImageType;
   typedef itk::ImageSeriesReader<ImageType> ReaderType;
+
+  /******** Workaround for 4D data ***************/
+  gdcm::Sorter sorter;
+
+  sorter.SetSortFunction(DicomSeriesReader::GdcmSortFunction);
+  sorter.Sort(filenames);
+
+  gdcm::Tag acq_time(0x0008,0x0032);
+  gdcm::Scanner scanner;
+
+  scanner.AddTag(acq_time);
+  scanner.Scan(sorter.GetFilenames());
+
+  std::list<StringContainer> decomposed_filenames;
+  const StringContainer::const_iterator f_end = sorter.GetFilenames().end();
+  const char *act_value = scanner.GetValue(sorter.GetFilenames().front().c_str(), acq_time);
+  unsigned int volume_count = 1u;
+
+  decomposed_filenames.push_back(StringContainer());
+  decomposed_filenames.back().push_back(sorter.GetFilenames().front());
+
+  for (StringContainer::const_iterator f_it = ++sorter.GetFilenames().begin(); f_it != f_end; ++f_it)
+  {
+    const char *value = scanner.GetValue(f_it->c_str(), acq_time);
+
+    if (strcmp(act_value, value))
+    {
+      act_value = value;
+      decomposed_filenames.push_back(StringContainer());
+      ++volume_count;
+    }
+
+    decomposed_filenames.back().push_back(*f_it);
+  }
+  /******** End: Workaround for 4D data **********/
 
   DcmIoType::Pointer io = DcmIoType::New();
   typename ReaderType::Pointer reader = ReaderType::New();
 
-  reader->SetFileNames(filenames);
   reader->SetImageIO(io);
   reader->ReverseOrderOff();
-  reader->Update();
 
+  const std::list<StringContainer>::const_iterator df_end = decomposed_filenames.end();
   mitk::Image::Pointer image = mitk::Image::New();
+  unsigned int act_volume = 1u;
 
-  image->InitializeByItk(reader->GetOutput());
-  image->SetImportVolume(reader->GetOutput()->GetBufferPointer());
+  reader->SetFileNames(decomposed_filenames.front());
+  reader->Update();
+  image->InitializeByItk(reader->GetOutput(), 1, volume_count);
+  image->SetImportVolume(reader->GetOutput()->GetBufferPointer(), 0u);
+
+  MITK_INFO << "Volume dimension: [" << image->GetDimension(0) << ", " << image->GetDimension(1) << ", " << image->GetDimension(2) << ", " << image->GetDimension(3) << "]";
+
+  for (std::list<StringContainer>::iterator df_it = ++decomposed_filenames.begin(); df_it != df_end; ++df_it)
+  {
+    reader->SetFileNames(*df_it);
+    reader->Update();
+    image->SetImportVolume(reader->GetOutput()->GetBufferPointer(), act_volume++);
+  }
+
   node.SetData(image);
 }
 

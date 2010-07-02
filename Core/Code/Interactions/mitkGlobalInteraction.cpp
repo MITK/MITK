@@ -76,9 +76,9 @@ void mitk::GlobalInteraction::AddListener(mitk::StateMachine* listener)
   if(listener == NULL) return;
   if(dynamic_cast<Interactor*>(listener)!=NULL)
   {
-    itkWarningMacro(<<"Trying to add an Interactor ("
+    MITK_WARN << "Trying to add an Interactor ("
       << listener->GetNameOfClass() << ") as a listener. "
-      << "This will probably cause problems");
+      << "This will probably cause problems";
   }
 
   if ( std::find(m_ListenerList.begin(), m_ListenerList.end(),listener) == m_ListenerList.end() )
@@ -334,6 +334,8 @@ mitk::State* mitk::GlobalInteraction::GetStartState(const char* type)
 {
   if ( this->IsInitialized() )
     return m_StateMachineFactory->GetStartState(type);
+  
+  MITK_FATAL << "Fatal Error in mitkGlobalInteraction.cpp: GlobalInteraction not initialized!\n";
   return NULL;
 }
 
@@ -375,7 +377,7 @@ bool mitk::GlobalInteraction::Initialize(const char* globalInteractionName, cons
 {
   if (this->IsInitialized())
   {
-    itkExceptionMacro(<<"Global Interaction has already been initialized.");
+    MITK_WARN <<"Global Interaction has already been initialized.\n";
     return false;
   }
 
@@ -408,7 +410,7 @@ bool mitk::GlobalInteraction::Initialize(const char* globalInteractionName, cons
 
   if(!success) 
   {
-    itkExceptionMacro(<< "Error initializing global interaction!");
+    MITK_FATAL << "Error initializing global interaction!\n";
     return false;
   }
 
@@ -419,6 +421,12 @@ bool mitk::GlobalInteraction::Initialize(const char* globalInteractionName, cons
 
   //get the start state of the pattern
   State::Pointer startState = m_StateMachineFactory->GetStartState(globalInteractionName);
+
+  if (startState.IsNull())
+  {
+    MITK_FATAL << "Fatal Error in mitkGlobalInteraction.cpp: No StartState recieved from StateMachineFactory!\n";
+    return false;
+  }
 
   //clear the vector
   m_CurrentStateVector.clear();

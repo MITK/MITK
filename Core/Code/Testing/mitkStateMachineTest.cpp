@@ -37,10 +37,23 @@ int mitkStateMachineTest(int /* argc */, char* /*argv*/[])
   // always start with this!
   MITK_TEST_BEGIN("StateMachine")
 
-  std::string name("global"); //respectively "global"
+  std::string name("global"); 
 
-  // Global interaction must(!) be initialized
-  mitk::GlobalInteraction::GetInstance()->Initialize(name.c_str());
+  //test Statemachine without given pattern name
+  mitk::StateMachine::Pointer noMachine1 = mitk::StateMachine::New("");
+
+  //test Statemachine without initialization of GlobalInteraction
+  mitk::StateMachine::Pointer noMachine2 = mitk::StateMachine::New(name.c_str());
+    
+  // test Statemachine with GlobalInteraction being initialized with no string
+  MITK_TEST_CONDITION_REQUIRED(mitk::GlobalInteraction::GetInstance()->Initialize("")==false,"Testing wrong initialization")
+
+  mitk::StateMachine::Pointer noMachine3 = mitk::StateMachine::New(name.c_str());
+
+  //now get serious
+
+  // now initialize GlobalInteraction 
+  MITK_TEST_CONDITION_REQUIRED(mitk::GlobalInteraction::GetInstance()->Initialize(name.c_str())==true,"Testing wright initialization")
 
   // let's create an object of our class  
   mitk::StateMachine::Pointer myStateMachine = mitk::StateMachine::New(name.c_str());

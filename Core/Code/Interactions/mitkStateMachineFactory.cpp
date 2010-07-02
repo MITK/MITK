@@ -87,6 +87,7 @@ mitk::State* mitk::StateMachineFactory::GetStartState(const char * type)
   if( tempState != m_StartStates.end() )
     return (tempState)->second.GetPointer();
 
+  MITK_ERROR << "Error in StateMachineFactory: StartState for pattern \""<< type<< "\"not found! StateMachine might not work!\n";
   return NULL;
 }
 

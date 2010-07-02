@@ -26,6 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkUndoController.h"
 #include <itkMacro.h>
 #include "mitkGlobalInteraction.h"
+#include <mbilog.h>
 
 
 /**
@@ -35,15 +36,16 @@ PURPOSE.  See the above copyright notices for more information.
 * Also the undo mechanism is instanciated and enabled/disabled
 **/
 mitk::StateMachine::StateMachine(const char * type)
-: m_UndoController(NULL)
+: m_UndoController(NULL), m_Type("")
 {
-  if(type!=NULL)
+  if(type!=NULL) //no need to throw a warning here, because the statemachine yet here doesn't have to be set up. 
   {
     m_Type = type;
     
     //the statemachine doesn't know yet anything about the number of timesteps of the data. So we initialize it with one element.
     this->InitializeStartStates(1);
   }
+  
   if (!m_UndoController)
   {
     m_UndoController = new UndoController(UndoController::VERBOSE_LIMITEDLINEARUNDO);//switch to LLU or add LLU
@@ -105,13 +107,22 @@ bool mitk::StateMachine::HandleEvent(StateEvent const* stateEvent)
     return false;
 
   if (m_CurrentStateVector.empty())
+  {
+    MITK_ERROR << "Error in mitkStateMachine.cpp: StateMachine not initialized!\n";
     return false;//m_CurrentStateVector needs to be initialized!
+  }
 
   if (m_TimeStep >= m_CurrentStateVector.size())
+  {
+    MITK_ERROR << "Error in mitkStateMachine.cpp: StateMachine not initialized for this time step!\n";
     return false;
+  }
 
   if (m_CurrentStateVector[m_TimeStep].IsNull())
+  {
+    MITK_ERROR << "Error in mitkStateMachine.cpp: StateMachine not initialized with the right temporal information!\n";
     return false;//m_CurrentState needs to be initialized!
+  }
 
   //get the Transition from m_CurrentState which waits for this EventId
   const Transition *tempTransition = m_CurrentStateVector[m_TimeStep]->GetTransition(stateEvent->GetId());
@@ -123,7 +134,10 @@ bool mitk::StateMachine::HandleEvent(StateEvent const* stateEvent)
   //get next State
   State *tempNextState = tempTransition->GetNextState();
   if (tempNextState == NULL) //wrong built up statemachine!
+  {
+    MITK_ERROR << "Error in mitkStateMachine.cpp: StateMachinePattern not defined correctly!\n";
     return false;
+  }
 
   //and ActionId to execute later on
   if ( m_CurrentStateVector[m_TimeStep]->GetId() != tempNextState->GetId() )//statechange only if there is a real statechange
@@ -247,6 +261,11 @@ void mitk::StateMachine::InitializeStartStates(unsigned int timeSteps)
 {
   //get the startstate of the pattern
   State::Pointer startState = mitk::GlobalInteraction::GetInstance()->GetStartState(m_Type.c_str());
+
+  if (startState.IsNull())
+  {
+    MITK_FATAL << "Fatal Error in mitkStateMachine.cpp: Initialization of statemachine unsuccessfull! Initialize GlobalInteraction!\n";
+  }
 
   //clear the vector
   m_CurrentStateVector.clear();

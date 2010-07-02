@@ -24,147 +24,99 @@ PURPOSE.  See the above copyright notices for more information.
 #include <fstream>
 int mitkGlobalInteractionTest(int /*argc*/, char* /*argv*/[])
 {
+  MITK_TEST_BEGIN("GlobalInteraction")
+ 
   //get static instance of globalInteraction
   mitk::GlobalInteraction::Pointer globalInteraction = mitk::GlobalInteraction::GetInstance();
+  MITK_TEST_CONDITION_REQUIRED(globalInteraction.IsNotNull(),"testing singleton initialization: ") 
+  MITK_TEST_CONDITION_REQUIRED(globalInteraction->IsInitialized() == false ,"testing initial initialization: not initialized") 
 
   // Initialize with default values
-  globalInteraction->Initialize("global");
+  MITK_TEST_CONDITION_REQUIRED(globalInteraction->Initialize("global"),"testing to initialize: ")
+
+  //testing initialization
+  MITK_TEST_CONDITION_REQUIRED(globalInteraction->IsInitialized(),"testing initial initialization: initialized") 
+  
+  MITK_TEST_CONDITION_REQUIRED(globalInteraction->Initialize("global") == false ,"testing double initialization") 
+
+  MITK_TEST_CONDITION_REQUIRED(globalInteraction->IsInitialized(),"still initialized: ") 
 
   MITK_TEST_CONDITION_REQUIRED(globalInteraction.IsNotNull() ,"Testing 'instantiation' of 'global' static GlobalInteraction") 
 
+  //testing creating non singleton instance
   mitk::GlobalInteraction::Pointer myGlobalInteraction = mitk::GlobalInteraction::New();
-  myGlobalInteraction->Initialize("global");
-  MITK_TEST_CONDITION_REQUIRED(myGlobalInteraction.IsNotNull() ,"Testing 'instantiation' of 'local' new GlobalInteraction") 
-  MITK_TEST_CONDITION_REQUIRED(myGlobalInteraction != globalInteraction ,"Testing whether new instance equals the global satic one (must not be!)") 
-    
+  MITK_TEST_CONDITION_REQUIRED(myGlobalInteraction.IsNotNull(),"testing non singleton initialization: ") 
+  MITK_TEST_CONDITION_REQUIRED(myGlobalInteraction->IsInitialized() == false ,"testing initial initialization of non singleton: not initialized") 
+  MITK_TEST_CONDITION_REQUIRED(myGlobalInteraction->Initialize("global"),"testing to initialize non singleton: ")
+  MITK_TEST_CONDITION_REQUIRED(myGlobalInteraction->IsInitialized() ,"testing initialization of non singleton: initialized") 
 
+  //testing if it really is a different instance than singleton
+  MITK_TEST_CONDITION_REQUIRED(myGlobalInteraction != globalInteraction ,"Testing whether new instance equals the global satic one (must not be!)") 
+  
+  //getting singleton over non singleton instance: bug or feature???
+  MITK_TEST_CONDITION_REQUIRED(myGlobalInteraction->GetInstance() == globalInteraction ,"Testing singleton from non singleton instance") 
+
+  //destroy non singleton class
+  myGlobalInteraction = NULL;
+  
+  //now test adding and removing of Interactors and Listeners
   //create Interactors
   mitk::PointSetInteractor::Pointer firstInteractor = mitk::PointSetInteractor::New("pointsetinteractor", NULL, 1);
   mitk::PointSetInteractor::Pointer secondInteractor = mitk::PointSetInteractor::New("pointsetinteractor", NULL, 10);
 
   globalInteraction->AddInteractor(firstInteractor);
+  MITK_TEST_CONDITION_REQUIRED(globalInteraction->InteractorRegistered(firstInteractor),"Add first interactor to globalInteraction and check if is is registered: ") 
   globalInteraction->AddInteractor(secondInteractor);
-  std::cout << "Add two interactors to globalInteraction and check if they were registered: ";
-  if ( !globalInteraction->InteractorRegistered(firstInteractor) ||
-       !globalInteraction->InteractorRegistered(secondInteractor) )
-  {
-    std::cout<<"[FAILED]"<<std::endl;
-    return EXIT_FAILURE;
-  }
-  std::cout<<"[PASSED]"<<std::endl;
+  MITK_TEST_CONDITION_REQUIRED(globalInteraction->InteractorRegistered(secondInteractor),"Add second interactor to globalInteraction and check if is is registered: ") 
 
   //remove Interactor
-  std::cout << "Remove the first Interactor: ";
-  if ( !globalInteraction->RemoveInteractor(firstInteractor) )
-  {
-    std::cout<<"[FAILED]"<<std::endl;
-    return EXIT_FAILURE;
-  }
-  std::cout<<"[PASSED]"<<std::endl;
+  MITK_TEST_CONDITION_REQUIRED(globalInteraction->RemoveInteractor(firstInteractor),"Remove the first Interactor: ") 
+  MITK_TEST_CONDITION_REQUIRED(!globalInteraction->RemoveInteractor(firstInteractor),"Remove the first Interactor a second time: ") 
 
   //check if really removed
-  std::cout << "Check if the first is still registered: ";
-  if ( globalInteraction->InteractorRegistered(firstInteractor) )
-  {
-    std::cout<<"[FAILED]"<<std::endl;
-    return EXIT_FAILURE;
-  }
-  std::cout<<"[PASSED]"<<std::endl;
-
-  //still registered
-  std::cout << "Check if the second is still registered: ";
-  if ( !globalInteraction->InteractorRegistered(secondInteractor) )
-  {
-    std::cout<<"[FAILED]"<<std::endl;
-    return EXIT_FAILURE;
-  }
-  std::cout<<"[PASSED]"<<std::endl;
-
-  //remove second too
-  std::cout << "Remove the second, too: ";
-  if ( !globalInteraction->RemoveInteractor(secondInteractor) )
-  {
-    std::cout<<"[FAILED]"<<std::endl;
-    return EXIT_FAILURE;
-  }
+  MITK_TEST_CONDITION_REQUIRED(!globalInteraction->InteractorRegistered(firstInteractor),"Check if the first is not registered: ") 
+  //check if second still present
+  MITK_TEST_CONDITION_REQUIRED(globalInteraction->InteractorRegistered(secondInteractor),"Check if the second is still registered: ") 
   
-  //check if empty
-  std::cout << "Check one of the two Interactors is registered: ";
-  if ( globalInteraction->InteractorRegistered(firstInteractor) ||
-       globalInteraction->InteractorRegistered(secondInteractor) )
-  {
-    std::cout<<"[FAILED]"<<std::endl;
-    return EXIT_FAILURE;
-  }
-  std::cout<<"[PASSED]"<<std::endl;
+  //remove the second too
+  MITK_TEST_CONDITION_REQUIRED(globalInteraction->RemoveInteractor(secondInteractor),"Remove the second Interactor: ") 
+  MITK_TEST_CONDITION_REQUIRED(!globalInteraction->RemoveInteractor(secondInteractor),"Remove the second Interactor a second time: ") 
+  MITK_TEST_CONDITION_REQUIRED(!globalInteraction->InteractorRegistered(secondInteractor),"Check if the second is not registered: ") 
+  
 
   //------------------
   //now check the same with Listener
   std::cout << "Check the addition of a Listener the same way: ";
-  std::cout << "Add two listeners. Are they both registered?: ";
+  std::cout << "Add two interactors as listeners (usually you add statemachines, not interactors). Are they both registered?: ";
+  std::cout << "Add listener1 (ITK popup with warning should come up: ";
   globalInteraction->AddListener(firstInteractor);
+  MITK_TEST_CONDITION_REQUIRED(globalInteraction->ListenerRegistered(firstInteractor),"registered listener1: ") 
+  MITK_TEST_CONDITION_REQUIRED(!globalInteraction->ListenerRegistered(secondInteractor),"not yet registered listener2: ") 
+  std::cout << "Add listener2: ";
   globalInteraction->AddListener(secondInteractor);
-  if ( !globalInteraction->ListenerRegistered(firstInteractor) ||
-       !globalInteraction->ListenerRegistered(secondInteractor) )
-  {
-    std::cout<<"[FAILED]"<<std::endl;
-    return EXIT_FAILURE;
-  }
-  std::cout<<"[PASSED]"<<std::endl;
-
-  //remove Listener
-  std::cout << "Remove second L.: ";
-  if ( !globalInteraction->RemoveListener(secondInteractor) )
-  {
-    std::cout<<"[FAILED]"<<std::endl;
-    return EXIT_FAILURE;
-  }
-  std::cout<<"[PASSED]"<<std::endl;
-
-  //check if really removed
-  std::cout << "Check if second is still registered: ";
-  if ( globalInteraction->ListenerRegistered(secondInteractor) )
-  {
-    std::cout<<"[FAILED]"<<std::endl;
-    return EXIT_FAILURE;
-  }
-  std::cout<<"[PASSED]"<<std::endl;
-
-  //still registered
-  std::cout << "Check if the first is still registered: ";
-  if ( !globalInteraction->ListenerRegistered(firstInteractor) )
-  {
-    std::cout<<"[FAILED]"<<std::endl;
-    return EXIT_FAILURE;
-  }
-  std::cout<<"[PASSED]"<<std::endl;
-
-  //remove first too
-  std::cout << "Remove the first Listener, too: ";
-  if ( !globalInteraction->RemoveListener(firstInteractor) )
-  {
-    std::cout<<"[FAILED]"<<std::endl;
-    return EXIT_FAILURE;
-  }
-  std::cout<<"[PASSED]"<<std::endl;
+  MITK_TEST_CONDITION_REQUIRED(globalInteraction->ListenerRegistered(secondInteractor),"registered listener2: ") 
+  MITK_TEST_CONDITION_REQUIRED(globalInteraction->ListenerRegistered(firstInteractor),"listener1 still registered: ") 
   
-  //check if empty
-  std::cout << "Is one of them still registered?: ";
-  if ( globalInteraction->ListenerRegistered(firstInteractor) ||
-       globalInteraction->ListenerRegistered(secondInteractor) )
-  {
-    std::cout<<"[FAILED]"<<std::endl;
-    return EXIT_FAILURE;
-  }
-  std::cout<<"[PASSED]"<<std::endl;
+  //remove Listener
+  MITK_TEST_CONDITION_REQUIRED(globalInteraction->RemoveListener(secondInteractor),"Remove listener2: ") 
+  MITK_TEST_CONDITION_REQUIRED(!globalInteraction->ListenerRegistered(secondInteractor),"listener2 not registered anymore: ") 
+  MITK_TEST_CONDITION_REQUIRED(globalInteraction->ListenerRegistered(firstInteractor),"but listener1: ") 
+  //remove first too
+  MITK_TEST_CONDITION_REQUIRED(globalInteraction->RemoveListener(firstInteractor),"Remove listener1: ") 
+  MITK_TEST_CONDITION_REQUIRED(!globalInteraction->ListenerRegistered(firstInteractor),"listener1 not registered anymore: ") 
+  MITK_TEST_CONDITION_REQUIRED(!globalInteraction->ListenerRegistered(secondInteractor),"listener2 also not registered: ") 
 
-  std::cout << "Now add the two interactors as interactors again and end: ";
+  
+  //now add them as interactors again
+  std::cout << "Now add the two interactors as interactors again: ";
   globalInteraction->AddInteractor(firstInteractor);
   globalInteraction->AddInteractor(secondInteractor);
   
-  //well done!!! Passed!
-  std::cout<<"[ALL PASSED]"<<std::endl;
+  //releasing smartpointer of interactors; should be kept in GlobalInteraction
+  firstInteractor = NULL;
+  secondInteractor = NULL;
+  globalInteraction = NULL;
 
-  std::cout<<"[TEST DONE]"<<std::endl;
-  return EXIT_SUCCESS;
+  // always end with this!
+  MITK_TEST_END();
 }

@@ -2,8 +2,8 @@
 
 Program:   Medical Imaging & Interaction Toolkit
 Language:  C++
-Date:      $Date: 2010-04-30 15:25:29 +0200 (Fr, 30 Apr 2010) $
-Version:   $Revision: 22623 $
+Date:      $Date$
+Version:   $Revision$
 
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
@@ -317,7 +317,7 @@ void QmitkStdMultiWidget::InitializeWidget()
     mitkWidget3->GetSliceNavigationController() );
 
   //initialize m_TimeNavigationController: send time via sliceNavigationControllers
-  m_TimeNavigationController = mitk::SliceNavigationController::New(NULL);
+  m_TimeNavigationController = mitk::SliceNavigationController::New("dummy");
   m_TimeNavigationController->ConnectGeometryTimeEvent(
     mitkWidget1->GetSliceNavigationController() , false);
   m_TimeNavigationController->ConnectGeometryTimeEvent(

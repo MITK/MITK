@@ -157,7 +157,6 @@ void QmitkIGTExampleView::Deactivated()
 }
 void QmitkIGTExampleView::OnTestTracking()
 {
-    mitk::NDITrackingDevice::Pointer trak = mitk::NDITrackingDevice::New(); // TEST
   WaitCursorOn();
   mitk::StatusBar::GetInstance()->DisplayText("Executing test of the tracking component", 4000);
 

@@ -2,8 +2,8 @@
 
 Program:   Medical Imaging & Interaction Toolkit
 Language:  C++
-Date:      $Date: 2010-05-31 16:47:20 +0200 (Mo, 31 Mai 2010) $
-Version:   $Revision: 23261 $
+Date:      $Date$
+Version:   $Revision$
 
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
@@ -243,7 +243,7 @@ void QmitkRenderWindow::enterEvent( QEvent *e )
 
 void QmitkRenderWindow::DeferredHideMenu( )
 {
-  MITK_INFO << "QmitkRenderWindow::DeferredHideMenu";
+  MITK_DEBUG << "QmitkRenderWindow::DeferredHideMenu";
 
   if( m_MenuWidget )
     m_MenuWidget->HideMenu();
@@ -251,7 +251,7 @@ void QmitkRenderWindow::DeferredHideMenu( )
 
 void QmitkRenderWindow::leaveEvent( QEvent *e )
 {
-  MITK_INFO << "QmitkRenderWindow::leaveEvent";
+  MITK_DEBUG << "QmitkRenderWindow::leaveEvent";
 
   //hide Menu Widget
   //if( m_MenuWidget->isVisible() && !m_MenuWidget->GetSettingsMenuVisibilty() && m_MenuWidgetActivated )

@@ -73,6 +73,11 @@ mitk::StateMachineFactory::~StateMachineFactory()
     m_AllStateMachineMap.erase(m_AllStateMachineMap.begin());
     delete temp;
   }
+  
+  //should not be necessary due to SmartPointers
+  m_StartStates.clear();
+  
+  //delete WeakPointer
   if (m_AktTransition)
     delete m_AktTransition;
 }

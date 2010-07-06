@@ -51,6 +51,8 @@ int mitkStateMachineTest(int /* argc */, char* /*argv*/[])
   // test Statemachine with GlobalInteraction being initialized with no string
   MITK_TEST_CONDITION_REQUIRED(mitk::GlobalInteraction::GetInstance()->Initialize("")==false,"Testing wrong initialization")
 
+  MITK_TEST_CONDITION_REQUIRED(mitk::GlobalInteraction::GetInstance()->Initialize("raraolala")==false,"Testing initialization with wrong pattern name")
+
   std::cout<<"should throw fatal error:\n";
   mitk::StateMachine::Pointer noMachine3 = mitk::StateMachine::New(name.c_str());
 

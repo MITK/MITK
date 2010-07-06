@@ -384,8 +384,17 @@ bool mitk::GlobalInteraction::Initialize(const char* globalInteractionName, cons
   m_FocusManager = FocusManager::New();
 
   // instantiates m_StateMachineFactory and load interaction patterns from XML string
+  //if factory has been initialized before, delete it and initialize once more to not add patterns
+  if (m_StateMachineFactory)
+    m_StateMachineFactory->Delete();
   m_StateMachineFactory = StateMachineFactory::New();
+  
+  //if EventMapper was initialized before, delete it and initialize once more 
+  // to create new event descriptions and not to add them
+  if (m_EventMapper)
+    m_EventMapper->Delete();
   m_EventMapper = EventMapper::New();
+  
 
   bool success = true;
 

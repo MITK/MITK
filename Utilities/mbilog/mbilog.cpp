@@ -215,7 +215,7 @@ void mbilog::BackendCout::FormatFull(std::ostream &out,const LogMessage &l,int t
     out << "|" << l.category;
   }
 
-  out << "\n" << l.message << std::endl;
+  out << l.message << std::endl;
 }
 
 #ifdef USE_WIN32COLOREDCONSOLE

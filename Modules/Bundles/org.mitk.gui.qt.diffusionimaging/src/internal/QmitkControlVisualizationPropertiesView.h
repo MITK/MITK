@@ -85,7 +85,7 @@ protected slots:
   void Reinit();
 
   void VisibleOdfsON();
-  void ShowMaxNumberChanged(int);
+  void ShowMaxNumberChanged();
   void NormalizationDropdownChanged(int);
   void ScalingFactorChanged(double);
   void AdditionalScaling(int);

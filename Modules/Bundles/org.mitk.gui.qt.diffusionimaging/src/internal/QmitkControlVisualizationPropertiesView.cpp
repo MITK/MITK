@@ -302,7 +302,7 @@ void QmitkControlVisualizationPropertiesView::CreateConnections()
     connect( (QObject*)(m_Controls->m_Reinit), SIGNAL(clicked()), this, SLOT(Reinit()) );
 
     connect( (QObject*)(m_Controls->m_VisibleOdfsON), SIGNAL(clicked()), this, SLOT(VisibleOdfsON()) );
-    connect( (QObject*)(m_Controls->m_ShowMaxNumber), SIGNAL(valueChanged(int)), this, SLOT(ShowMaxNumberChanged(int)) );
+    connect( (QObject*)(m_Controls->m_ShowMaxNumber), SIGNAL(editingFinished()), this, SLOT(ShowMaxNumberChanged()) );
     connect( (QObject*)(m_Controls->m_NormalizationDropdown), SIGNAL(currentIndexChanged(int)), this, SLOT(NormalizationDropdownChanged(int)) );
     connect( (QObject*)(m_Controls->m_ScalingFactor), SIGNAL(valueChanged(double)), this, SLOT(ScalingFactorChanged(double)) );
     connect( (QObject*)(m_Controls->m_AdditionalScaling), SIGNAL(currentIndexChanged(int)), this, SLOT(AdditionalScaling(int)) );
@@ -522,8 +522,15 @@ void QmitkControlVisualizationPropertiesView::VisibleOdfsON()
 
 }
 
-void QmitkControlVisualizationPropertiesView::ShowMaxNumberChanged(int maxNr)
+void QmitkControlVisualizationPropertiesView::ShowMaxNumberChanged()
 {
+  int maxNr = m_Controls->m_ShowMaxNumber->value();
+  if ( maxNr < 1 )
+  {
+    m_Controls->m_ShowMaxNumber->setValue( 1 );
+    maxNr = 1;
+  }
+
   mitk::DataStorage::SetOfObjects::Pointer set =
     ActiveSet("QBallImage");
   SetIntProp(set,"ShowMaxNumber", maxNr);

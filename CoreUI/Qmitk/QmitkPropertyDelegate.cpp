@@ -96,6 +96,15 @@ QWidget* QmitkPropertyDelegate::createEditor(QWidget *parent, const QStyleOption
         colorBtn->setStyleSheet(QString("background-color: %1;foreground-color: %1; border-style: none;").arg(result.name()));
         //colorBtn->setFlat(true);
       }
+      // QColorDialog closed by 'Cancel' button, use the old property color
+      else
+      {
+        QPalette palette = colorBtn->palette();
+        palette.setColor(QPalette::Button, color);
+        colorBtn->setPalette(palette);
+        colorBtn->setStyleSheet(QString("background-color: %1;foreground-color: %1; border-style: none;").arg(color.name()));
+      
+      }
 
       connect(colorBtn, SIGNAL(pressed()), this, SLOT(commitAndCloseEditor()));
 

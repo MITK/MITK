@@ -23,11 +23,13 @@ PURPOSE.  See the above copyright notices for more information.
 #include "tinyxml.h"
 
 
-namespace mitk {
+namespace mitk
+{
+
   /**Documentation
   * \brief This class is a slightly changed reimplementation of the
   * NavigationDataPlayer which does not care about timestamps and just
-  * outputs the navigationdatas in a sequential order
+  * outputs the navigationdatas in their sequential order
   *
   * \ingroup IGT
   */
@@ -59,7 +61,7 @@ namespace mitk {
     itkGetStringMacro(XMLString);
 
     ///
-    /// set if the data player should repeat the outputs
+    /// set to true if the data player should repeat the outputs
     ///
     itkSetMacro(Repeat, bool);
     ///

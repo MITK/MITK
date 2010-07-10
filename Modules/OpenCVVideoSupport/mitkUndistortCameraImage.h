@@ -28,7 +28,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "cv.h"
 
 /*!
-\brief UndistortCameraImage 
+\brief UndistortCameraImage
 
 This class is used to undistort camera images. Before any undistortion the class has to be initialized using the functions:
 SetFocalLength(),SetPrinzipalPoint() and SetCameraDistortion().
@@ -53,58 +53,58 @@ class MITK_OPENCVVIDEOSUPPORT_EXPORT UndistortCameraImage : public itk::Object
     itkNewMacro(Self);
 
     /// Initialization ///
-    /*  
-    * Set the camera's intrinsic focal length  
-    */  
+    /*
+    * Set the camera's intrinsic focal length
+    */
     void SetFocalLength(float fc_x, float fc_y)
     {
       m_fcX = fc_x; m_fcY = fc_y;
     }
-    /*  
-    * Set the camera's intrinsic principal point  
-    */  
+    /*
+    * Set the camera's intrinsic principal point
+    */
     void SetPrincipalPoint(float cc_x, float cc_y)
     {
       m_ccX = cc_x; m_ccY = cc_y;
     }
-    /*  
-    * Set the camera's intrinsic distortion parameters  
-    */  
+    /*
+    * Set the camera's intrinsic distortion parameters
+    */
     void SetCameraDistortion(float kc1, float kc2, float kc3, float kc4)
     {
       m_distortionMatrixData[0] = kc1; m_distortionMatrixData[1] = kc2;
-      m_distortionMatrixData[2] = kc3; m_distortionMatrixData[3] = kc4;      
-    }    
-    /*  
+      m_distortionMatrixData[2] = kc3; m_distortionMatrixData[3] = kc4;
+    }
+    /*
     * Pre-Calculates matrices for the later use of UndistortImageFast()
     */
     void InitRemapUndistortion(int sizeX, int sizeY);
-   
+
     /// USAGE ///
-    /*  
+    /*
     * Undistort a single pixel, returns undistorted pixel
     */
     mitk::Point2D UndistortPixel(mitk::Point2D src);
-    /*  
+    /*
     * Complete undistortion of an OpenCV image, including all calculations
     */
     void UndistortImage(IplImage* src, IplImage* dst);
-    
-    
-    /*  
+
+
+    /*
     * Complete undistortion of an OpenCV image, using pre-calculated matrices from SetUndistortImageFastInfo()
     * The use of only a source parameter will cause the source to be overwritten.
     * NOTE: Using the Fast undistortion methods does not require a initialization via the Set... methods.
     */
-    void UndistortImageFast(IplImage * src, IplImage* dst = NULL);   
-    void SetUndistortImageFastInfo(float in_dF1, float in_dF2, 
-                                   float in_dPrincipalX, float in_dPrincipalY, 
+    void UndistortImageFast( IplImage * src, IplImage* dst = NULL );
+    void SetUndistortImageFastInfo(float in_dF1, float in_dF2,
+                                   float in_dPrincipalX, float in_dPrincipalY,
                                    float in_Dist[4], float ImageSizeX, float ImageSizeY);
 
     UndistortCameraImage();
     virtual ~UndistortCameraImage();
-  
-  protected:    
+
+  protected:
 
     // principal point and focal length parameters
     float m_ccX, m_ccY, m_fcX, m_fcY;

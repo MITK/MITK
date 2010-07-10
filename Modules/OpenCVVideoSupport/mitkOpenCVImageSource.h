@@ -8,6 +8,7 @@ namespace mitk
   struct OpenCVImageSource
   {
     virtual const IplImage * GetImage() = 0;
+    virtual void FetchFrame() = 0;
   };
 }
 

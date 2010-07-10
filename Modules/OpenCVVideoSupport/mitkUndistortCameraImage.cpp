@@ -31,12 +31,12 @@ PURPOSE.  See the above copyright notices for more information.
 mitk::UndistortCameraImage::UndistortCameraImage()
 {
   m_tempImage = NULL;
-  
+
 }
 mitk::UndistortCameraImage::~UndistortCameraImage()
 {
   if(m_tempImage != NULL)
-    cvReleaseImage( &m_tempImage );
+    cvReleaseImageHeader(&m_tempImage);
 }
 
 
@@ -68,7 +68,7 @@ mitk::Point2D mitk::UndistortCameraImage::UndistortPixel(mitk::Point2D src)
   // Compensate lens distortion
   x = dstd[0];
   y = dstd[1];
-  
+
   for (int iter = 0; iter < 5; iter++)
   {
     r_2 = x*x + y*y;
@@ -84,11 +84,11 @@ mitk::Point2D mitk::UndistortCameraImage::UndistortPixel(mitk::Point2D src)
   dstd[1] *= m_fcY;
   dstd[0] += m_ccX;
   dstd[1] += m_ccY;
-  
+
   // ready
   dst[0] = (float)dstd[0];
   dst[1] = (float)dstd[1];
- 
+
   // do a sanity check to make sure this ideal point translates properly to the distorted point
   // this does the reverse of the above.  It maps ideal undistorted to distorted image coordinates
   x = dstd[0] - m_ccX;
@@ -109,7 +109,7 @@ mitk::Point2D mitk::UndistortCameraImage::UndistortPixel(mitk::Point2D src)
   if (fabs(diffx) > .1 || fabs(diffy) > .1)
   {
     std::cout << "undistort sanity check error: diffx =" << diffx << " , diffy = " << diffy;
-    
+
   }
   return dst;
 }
@@ -118,16 +118,16 @@ void mitk::UndistortCameraImage::UndistortImage(IplImage *src, IplImage *dst)
 {
    // init intrinsic camera matrix [fx 0 cx; 0 fy cy; 0 0 1].
   m_intrinsicMatrixData[0] = (double)m_fcX;
-	m_intrinsicMatrixData[1] = 0.0;
-	m_intrinsicMatrixData[2] = (double)m_ccX;
-	m_intrinsicMatrixData[3] = 0.0;
-	m_intrinsicMatrixData[4] = (double)m_fcY;
-	m_intrinsicMatrixData[5] = (double)m_ccY;
-	m_intrinsicMatrixData[6] = 0.0;
-	m_intrinsicMatrixData[7] = 0.0;
-	m_intrinsicMatrixData[8] = 1.0;
+  m_intrinsicMatrixData[1] = 0.0;
+  m_intrinsicMatrixData[2] = (double)m_ccX;
+  m_intrinsicMatrixData[3] = 0.0;
+  m_intrinsicMatrixData[4] = (double)m_fcY;
+  m_intrinsicMatrixData[5] = (double)m_ccY;
+  m_intrinsicMatrixData[6] = 0.0;
+  m_intrinsicMatrixData[7] = 0.0;
+  m_intrinsicMatrixData[8] = 1.0;
   m_intrinsicMatrix        = cvMat(3, 3, CV_32FC1, m_intrinsicMatrixData);
-  
+
   // init distortion matrix
   m_distortionMatrix       = cvMat(1, 4, CV_32F, m_distortionMatrixData);
 
@@ -162,33 +162,52 @@ void mitk::UndistortCameraImage::UndistortImageFast(IplImage * src, IplImage* ds
     cvRemap(src, dst, m_mapX, m_mapY);
   }*/
 
-  
-  if(m_tempImage == NULL)
-    m_tempImage = cvCreateImage(cvSize(src->width,src->height),src->depth,src->nChannels);
-  
-  cvRemap(src, m_tempImage, m_mapX, m_mapY);
-  
-  m_tempImage->origin = src->origin;
- 
+
+  /*if(m_tempImage == NULL)
+    m_tempImage = cvCreateImage(cvSize(src->width,src->height),src->depth,src->nChannels);*/
+
+  /*if(dst == NULL)
+    dst = cvCreateImage(cvSize(src->width,src->height),src->depth,src->nChannels);*/
+
+  if(!dst)
+  {
+    if(m_tempImage)
+      cvReleaseImageHeader(&m_tempImage);
+    m_tempImage = cvCreateImage(cvSize(src->width,src->height),src->depth
+                                ,src->nChannels);
+    m_tempImage->origin = src->origin;
+    cvRemap(src, m_tempImage, m_mapX, m_mapY, CV_INTER_CUBIC);
+    cvReleaseImageData(src);
+    src->imageData = m_tempImage->imageData;
+    /*memcpy( src->imageData, m_tempImage->imageData, m_tempImage->imageSize );
+    cvReleaseImage( &m_tempImage );*/
+  }
+  else
+  {
+   cvRemap(src, dst, m_mapX, m_mapY, CV_INTER_CUBIC);
+  }
+
+  /*m_tempImage->origin = src->origin;
+
   if(dst == NULL)
     memcpy( src->imageData, m_tempImage->imageData, m_tempImage->imageSize );
   else
     memcpy( dst->imageData, m_tempImage->imageData, m_tempImage->imageSize );
 
   //cvUnDistort(m_srcImg, m_dstImg, m_undistMap,m_interpolationMode);
-	//cvUndistort2(m_srcImg, m_dstImg, &m_intrinsicMatrix,&m_distortionMatrixDataCoefficients);
+  //cvUndistort2(m_srcImg, m_dstImg, &m_intrinsicMatrix,&m_distortionMatrixDataCoefficients);*/
 }
 
 
 
-void mitk::UndistortCameraImage::SetUndistortImageFastInfo(float in_dF1, float in_dF2, 
-                                                 float in_dPrincipalX, float in_dPrincipalY, 
+void mitk::UndistortCameraImage::SetUndistortImageFastInfo(float in_dF1, float in_dF2,
+                                                 float in_dPrincipalX, float in_dPrincipalY,
                                                  float in_Dist[4], float ImageSizeX, float ImageSizeY)
 {
   //create new matrix
   m_DistortionCoeffs  = cvCreateMat(4, 1, CV_64FC1);
   m_CameraMatrix      = cvCreateMat(3, 3, CV_64FC1);
-  
+
 
   //set the camera matrix [fx 0 cx; 0 fy cy; 0 0 1].
   cvSetReal2D(m_CameraMatrix, 0, 0, in_dF1);
@@ -198,11 +217,11 @@ void mitk::UndistortCameraImage::SetUndistortImageFastInfo(float in_dF1, float i
   cvSetReal2D(m_CameraMatrix, 1, 0, 0.0);
   cvSetReal2D(m_CameraMatrix, 1, 1, in_dF2);
   cvSetReal2D(m_CameraMatrix, 1, 2, in_dPrincipalY);
- 
+
   cvSetReal2D(m_CameraMatrix, 2, 0, 0.0);
   cvSetReal2D(m_CameraMatrix, 2, 1, 0.0);
-  cvSetReal2D(m_CameraMatrix, 2, 2, 1.0); 
-  
+  cvSetReal2D(m_CameraMatrix, 2, 2, 1.0);
+
   //set distortions coefficients
   cvSetReal1D(m_DistortionCoeffs, 0, in_Dist[0]);
   cvSetReal1D(m_DistortionCoeffs, 1, in_Dist[1]);
@@ -210,7 +229,7 @@ void mitk::UndistortCameraImage::SetUndistortImageFastInfo(float in_dF1, float i
   cvSetReal1D(m_DistortionCoeffs, 3, in_Dist[3]);
 
   m_mapX = cvCreateMat(ImageSizeY, ImageSizeX, CV_32FC1);
-	m_mapY = cvCreateMat(ImageSizeY, ImageSizeX, CV_32FC1);
+  m_mapY = cvCreateMat(ImageSizeY, ImageSizeX, CV_32FC1);
 
   //cv::initUndistortRectifyMap(m_CameraMatrix, m_DistortionCoeffs, m_mapX, m_mapY);
   cvInitUndistortMap(m_CameraMatrix, m_DistortionCoeffs, m_mapX, m_mapY);

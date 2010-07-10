@@ -41,8 +41,8 @@ namespace mitk
  * used here.
  * Initialize via SetVideoFileInput() or SetVideoCameraInput(), start processing with StartCapturing();
  */
-  class MITK_OPENCVVIDEOSUPPORT_EXPORT OpenCVVideoSource : public VideoSource
-      , OpenCVImageSource
+  class MITK_OPENCVVIDEOSUPPORT_EXPORT OpenCVVideoSource :
+      public VideoSource, public OpenCVImageSource
   {
     typedef itk::RGBPixel< unsigned char >    CharPixelType;
     typedef itk::FixedArray <float,3>         HSVPixelType;

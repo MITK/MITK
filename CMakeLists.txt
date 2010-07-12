@@ -22,7 +22,6 @@ ENDIF(NOT MITK_ALL_BUILD)
 
 INCLUDE(CMake/CoreHelpers.cmake)
 INCLUDE(CMake/ToolExtensionHelpers.cmake)
-INCLUDE(CMake/FunctionalityHelpers.cmake)
 SET(KITNAME "MITK")
 SET(LIBPOSTFIX "")
 SET (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin CACHE STRING "Global output directory for runtime files")

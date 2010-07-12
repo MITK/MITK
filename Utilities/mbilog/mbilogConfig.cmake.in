@@ -1,4 +1,5 @@
 
+SET(mbilog_IS_ENABLED "1")
 SET(mbilog_INCLUDE_DIRS "@mbilog_INCLUDE_DIRS@")
 SET(mbilog_PROVIDES "mbilog")
 SET(mbilog_DEPENDS "")

@@ -1,3 +1,6 @@
+OPTION(MITK_USE_Boost OFF)
+IF(MITK_USE_Boost)
+
 FIND_PACKAGE(Boost)
 
 #here we could also choose the desired components:
@@ -6,4 +9,6 @@ FIND_PACKAGE(Boost)
 LIST(APPEND ALL_INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIRS})
 LIST(APPEND ALL_LIBRARIES ${Boost_LIBRARIES})
 link_directories(${Boost_LIBRARY_DIRS})
+
+ENDIF(MITK_USE_Boost)
 

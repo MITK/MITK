@@ -262,9 +262,21 @@ void QmitkTbssView::OutputValues()
         index[0] = x;
         index[1] = y;
         index[2] = z;
-        if (roi->GetPixel(index) == 1)
+        if (roi->GetPixel(index) != 0)
         {
-          std::cout << roi->GetPixel(index);
+          // Output the values of this point for all subjects
+          AllSkeletonType::IndexType skeletonIndex;
+          skeletonIndex[0] = index[0];
+          skeletonIndex[1] = index[1];
+          skeletonIndex[2] = index[2];
+
+          for(int t=0; t<skeletonSize[3]; t++)
+          {
+            skeletonIndex[3] = t;
+            std::cout << skeleton->GetPixel(skeletonIndex) << std::endl;
+          }
+
+          std::cout << " ";
         }
       }
     }

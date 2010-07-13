@@ -38,4 +38,8 @@ ENDFOREACH(stepNo)
 ADD_DEPENDENCIES(Step7 Step6)
 ADD_DEPENDENCIES(Step8 Step7 Step6)
 
+# adding additional example for mitk itk and vtk interaction
+ADD_EXECUTABLE(mitkWithITKAndVTK mitkWithITKAndVTK.cpp)
+TARGET_LINK_LIBRARIES(mitkWithITKAndVTK ${ALL_LIBRARIES})
+
 ENDIF(MISSING)

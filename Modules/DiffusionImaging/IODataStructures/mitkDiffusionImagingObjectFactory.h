@@ -31,14 +31,19 @@ class MitkDiffusionImaging_EXPORT DiffusionImagingObjectFactory : public CoreObj
     virtual Mapper::Pointer CreateMapper(mitk::DataNode* node, MapperSlotId slotId);
     virtual void SetDefaultProperties(mitk::DataNode* node);
     virtual const char* GetFileExtensions();
+    virtual mitk::CoreObjectFactoryBase::MultimapType GetFileExtensionsMap();
     virtual const char* GetSaveFileExtensions();
+    virtual mitk::CoreObjectFactoryBase::MultimapType GetSaveFileExtensionsMap();
     void RegisterIOFactories();
   protected:
     DiffusionImagingObjectFactory(bool registerSelf = true); 
   private:
+    void CreateFileExtensionsMap();
     std::string m_ExternalFileExtensions;
     std::string m_InternalFileExtensions;
     std::string m_SaveFileExtensions;
+    MultimapType m_FileExtensionsMap;
+    MultimapType m_SaveFileExtensionsMap;
 };
 
 }

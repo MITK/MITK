@@ -97,10 +97,10 @@ void QmitkExtFileOpenAction::Run()
   ss << mitk::CoreObjectFactory::GetInstance()->GetFileExtensions();
 
   std::string fileExtensions = ss.str();
-  fileExtensions.append(";; MITK Scene Files (*.mitk)");
-  fileExtensions.insert( fileExtensions.find("formats(") + 8, "*.mitk " );
+  fileExtensions.append(";;MITK Scene Files (*.mitk)");
+  fileExtensions.insert( fileExtensions.find("all (") + 5, "*.mitk " );
 
-  QStringList fileNames = QFileDialog::getOpenFileNames(NULL,"Open",m_LastPath, fileExtensions.c_str() );
+  QStringList fileNames = QFileDialog::getOpenFileNames(NULL, "Open", m_LastPath, fileExtensions.c_str() );
 
   //if (dialog.exec())
   //  fileNames = dialog.selectedFiles();

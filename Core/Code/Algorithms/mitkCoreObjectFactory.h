@@ -35,18 +35,25 @@ class MITK_CORE_EXPORT CoreObjectFactory : public CoreObjectFactoryBase
     virtual Mapper::Pointer CreateMapper(mitk::DataNode* node, MapperSlotId slotId);
     virtual void SetDefaultProperties(mitk::DataNode* node);
     virtual const char* GetFileExtensions();
+    virtual MultimapType GetFileExtensionsMap();
     virtual const char* GetSaveFileExtensions();
+    virtual MultimapType GetSaveFileExtensionsMap();
     virtual FileWriterList GetFileWriters();
     virtual void MapEvent(const mitk::Event* event, const int eventID);
     virtual void RegisterExtraFactory(CoreObjectFactoryBase* factory);
     static Pointer GetInstance();
   protected:
     CoreObjectFactory(); 
+    void MergeFileExtensions(MultimapType& fileExtensionsMap, MultimapType inputMap);
+    void CreateFileExtensionsMap();
+    void CreateSaveFileExtensions();
     typedef std::list<mitk::CoreObjectFactoryBase::Pointer> ExtraFactoriesList;
     ExtraFactoriesList m_ExtraFactories;
     static FileWriterList m_FileWriters;
     std::string m_FileExtensions;
+    MultimapType m_FileExtensionsMap;
     std::string m_SaveFileExtensions;
+    MultimapType m_SaveFileExtensionsMap;
 
 };
 

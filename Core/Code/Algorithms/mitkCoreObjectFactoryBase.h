@@ -24,6 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 // be available to all classes implementing this interface.
 #include "mitkLog.h"
 
+#include "mitkCommon.h"
 #include "mitkMapper.h"
 #include <itkObjectFactoryBase.h>
 #include <itkVersion.h>
@@ -38,15 +39,18 @@ class DataNode;
 //## This interface can be implemented by factories which add new mapper classes or extend the
 //## data tree deserialization mechanism.
 
-class CoreObjectFactoryBase : public itk::Object
+class MITK_CORE_EXPORT CoreObjectFactoryBase : public itk::Object
 {
   public:
     typedef std::list<mitk::FileWriterWithInformation::Pointer> FileWriterList;
+    typedef std::multimap<std::string, std::string> MultimapType;
     mitkClassMacro(CoreObjectFactoryBase,itk::Object);
     virtual Mapper::Pointer CreateMapper(mitk::DataNode* node, MapperSlotId slotId) = 0;
     virtual void SetDefaultProperties(mitk::DataNode* node) = 0;
     virtual const char* GetFileExtensions() = 0;
+    virtual MultimapType GetFileExtensionsMap() = 0;
     virtual const char* GetSaveFileExtensions() = 0;
+    virtual MultimapType GetSaveFileExtensionsMap() = 0;
     virtual const char* GetITKSourceVersion() const
     { 
       return ITK_SOURCE_VERSION;
@@ -58,8 +62,18 @@ class CoreObjectFactoryBase : public itk::Object
     FileWriterList GetFileWriters() {
       return m_FileWriters;
     }
+
   protected:
-     FileWriterList m_FileWriters;
+  
+    /**
+     * @brief create a string from a map that contains the file extensions
+     * @param fileExtensionsMap input map with the file extensions, e.g. ("*.dcm", "DICOM files")("*.dc3", "DICOM files")
+     * @param fileExtensions the converted output string, suitable for the QT QFileDialog widget
+     *                       e.g. "all (*.dcm *.DCM *.dc3 ... *.vti *.hdr *.nrrd *.nhdr );;Q-Ball Images (*.hqbi *qbi)"
+     */
+    static void CreateFileExtensions(MultimapType fileExtensionsMap, std::string& fileExtensions);
+
+    FileWriterList m_FileWriters;
 };
 }
 #endif

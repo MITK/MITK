@@ -164,6 +164,20 @@ const char* mitk::CoreExtObjectFactory::GetFileExtensions()
   return "";
 };
 
+mitk::CoreObjectFactoryBase::MultimapType mitk::CoreExtObjectFactory::GetFileExtensionsMap()
+{
+  return m_FileExtensionsMap;
+}
+
+mitk::CoreObjectFactoryBase::MultimapType mitk::CoreExtObjectFactory::GetSaveFileExtensionsMap()
+{
+  return m_SaveFileExtensionsMap;
+}
+
+void mitk::CoreExtObjectFactory::CreateFileExtensionsMap()
+{
+}
+
 const char* mitk::CoreExtObjectFactory::GetSaveFileExtensions() 
 { 
   return "";

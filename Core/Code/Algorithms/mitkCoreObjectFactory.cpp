@@ -32,7 +32,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkLevelWindowProperty.h"
 #include "mitkLookupTable.h"
 #include "mitkLookupTableProperty.h"
-//#include "mitkMaterialProperty.h"
 #include "mitkPlaneGeometry.h"
 #include "mitkPointSet.h"
 #include "mitkPointSetMapper2D.h"
@@ -137,6 +136,8 @@ mitk::CoreObjectFactory::CoreObjectFactory()
     mitk::PointSetWriterFactory::RegisterOneFactory();
     mitk::ImageWriterFactory::RegisterOneFactory();
 
+    CreateFileExtensionsMap();
+
     alreadyDone = true;
   }
 }
@@ -213,6 +214,9 @@ mitk::Mapper::Pointer mitk::CoreObjectFactory::CreateMapper(mitk::DataNode* node
   return newMapper;
 }
 
+/*
+// @deprecated
+//
 #define EXTERNAL_FILE_EXTENSIONS \
     "All known formats(*.dcm *.DCM *.dc3 *.DC3 *.gdcm *.ima *.mhd *.mps *.nii *.pic *.pic.gz *.bmp *.png *.jpg *.tiff *.pvtk *.stl *.vtk *.vtp *.vtu *.obj *.vti *.hdr *.nrrd *.nhdr );;" \
     "DICOM files(*.dcm *.DCM *.dc3 *.DC3 *.gdcm);;" \
@@ -223,44 +227,148 @@ mitk::Mapper::Pointer mitk::CoreObjectFactory::CreateMapper(mitk::DataNode* node
     "Surface files (*.stl *.vtk *.vtp *.obj);;" \
     "NIfTI format (*.nii)"
 
-#define INTERNAL_FILE_EXTENSIONS \
-    "all (*.seq *.mps *.nii *.pic *.pic.gz *.seq.gz *.pvtk *.stl *.vtk *.vtp *.vtu *.obj *.vti *.ves *.nrrd *.nhdr " \
-         "*.uvg *.dvg *.par *.dcm *.dc3 *.gdcm *.ima *.mhd *.hdr hpsonos.db HPSONOS.DB *.ssm *msm *.bmp *.png *.jpg *.tiff);;" \
-    "DKFZ Pic (*.seq *.pic *.pic.gz *.seq.gz);;" \
-    "NRRD Vector Images (*.nrrd *.nhdr);;" \
-    "Point sets (*.mps);;" \
-    "surface files (*.stl *.vtk *.vtp *.obj);;" \
-    "stl files (*.stl);;" \
-    "vtk surface files (*.vtk);;" \
-    "vtk image files (*.pvtk);;" \
-    "vessel files (*.ves *.uvg *.dvg);;" \
-    "par/rec files (*.par);;" \
-    "DSR files (hpsonos.db HPSONOS.DB);;" \
-    "DICOM files (*.dcm *.gdcm *.dc3 *.ima);;" \
-    "NIfTI format (*.nii)"
-
 #define SAVE_FILE_EXTENSIONS "all (*.pic *.mhd *.vtk *.vti *.hdr *.png *.tiff *.jpg *.hdr *.bmp *.dcm *.gipl *.nii *.nrrd *.nhdr *.spr *.lsm *.dwi *.hdwi *.qbi *.hqbi)"
+*/
 
+/**
+ * @brief This method gets the supported (open) file extensions as string. This string is can then used by the QT QFileDialog widget.
+ * @return The c-string that contains the file extensions
+ *
+ */
 const char* mitk::CoreObjectFactory::GetFileExtensions()
 {
-  m_FileExtensions = EXTERNAL_FILE_EXTENSIONS;
-
-  for (ExtraFactoriesList::iterator it = m_ExtraFactories.begin(); it != m_ExtraFactories.end() ; it++ ) {
-    m_FileExtensions.append(";;").append((*it)->GetFileExtensions());
+  MultimapType aMap;
+  for (ExtraFactoriesList::iterator it = m_ExtraFactories.begin(); it != m_ExtraFactories.end() ; it++ ) 
+  {
+    aMap = (*it)->GetFileExtensionsMap();
+    this->MergeFileExtensions(m_FileExtensionsMap, aMap);
   }
-
+  this->CreateFileExtensions(m_FileExtensionsMap, m_FileExtensions);
   return m_FileExtensions.c_str();
-};
-
-const char* mitk::CoreObjectFactory::GetSaveFileExtensions() {
-  m_SaveFileExtensions = SAVE_FILE_EXTENSIONS;
-
-  for (ExtraFactoriesList::iterator it = m_ExtraFactories.begin(); it != m_ExtraFactories.end() ; it++ ) {
-    m_SaveFileExtensions.append(";;").append((*it)->GetFileExtensions());
+}
+  
+/**
+ * @brief Merge the input map into the fileExtensionsMap. Duplicate entries are removed
+ * @param fileExtensionsMap the existing map, it contains value pairs like ("*.dcm", "DICOM files"),("*.dc3", "DICOM files").
+ *                          This map is extented/merged with the values from the input map.
+ * @param inputMap the input map, it contains value pairs like ("*.dcm", "DICOM files"),("*.dc3", "DICOM files") returned by
+ *                 the extra factories.
+ *
+ */
+void mitk::CoreObjectFactory::MergeFileExtensions(MultimapType& fileExtensionsMap, MultimapType inputMap)
+{
+  bool duplicateFound = false;
+  std::pair<MultimapType::iterator, MultimapType::iterator> pairOfIter; 
+  for (MultimapType::iterator it = inputMap.begin(); it != inputMap.end(); ++it)
+  {
+    duplicateFound = false;
+    pairOfIter = fileExtensionsMap.equal_range((*it).first);
+    for (MultimapType::iterator it2 = pairOfIter.first; it2 != pairOfIter.second; ++it2)
+    {
+      //cout << "  [" << (*it).first << ", " << (*it).second << "]" << endl;
+      std::string aString = (*it2).second;
+      if (aString.compare((*it).second) == 0)
+      {
+        //cout << "  DUP!! [" << (*it).first << ", " << (*it).second << "]" << endl;
+        duplicateFound = true;
+        break;
+      }
+    }
+    if (!duplicateFound)
+    {
+      fileExtensionsMap.insert(std::pair<std::string, std::string>((*it).first, (*it).second));
+    }
   }
-  return m_SaveFileExtensions.c_str();
+}
 
+/**
+ * @brief get the defined (open) file extension map
+ * @return the defined (open) file extension map
+ */
+mitk::CoreObjectFactoryBase::MultimapType mitk::CoreObjectFactory::GetFileExtensionsMap()
+{
+  return m_FileExtensionsMap;
+}
+
+/**
+ * @brief initialze the file extension entries for open and save
+ */
+void mitk::CoreObjectFactory::CreateFileExtensionsMap()
+{
+  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.dcm", "DICOM files"));
+  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.DCM", "DICOM files"));
+  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.dc3", "DICOM files"));
+  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.DC3", "DICOM files"));
+  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.gdcm", "DICOM files"));
+  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.seq", "DKFZ Pic"));
+  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.pic", "DKFZ Pic"));
+  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.pic.gz", "DKFZ Pic"));
+  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.seq.gz", "DKFZ Pic"));
+  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.nrrd", "NRRD Vector Images"));
+  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.nhdr", "NRRD Vector Images"));
+  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.mps", "Point sets"));
+  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.pic", "Sets of 2D slices"));
+  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.pic.gz", "Sets of 2D slices"));
+  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.bmp", "Sets of 2D slices"));
+  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.png", "Sets of 2D slices"));
+  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.dcm", "Sets of 2D slices"));
+  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.gdcm", "Sets of 2D slices"));
+  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.ima", "Sets of 2D slices"));
+  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.tiff", "Sets of 2D slices"));
+  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.stl", "Surface files"));
+  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.vtk", "Surface files"));
+  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.vtp", "Surface files"));
+  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.obj", "Surface files"));
+  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.nii", "NIfTI format"));
+
+  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.pic", ""));
+  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.mhd", ""));
+  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.vtk", ""));
+  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.vti", ""));
+  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.hdr", ""));
+  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.png", ""));
+  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.tiff", ""));
+  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.jpg", ""));
+  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.bmp", ""));
+  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.dcm", ""));
+  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.gipl", ""));
+  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.nii", ""));
+  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.nrrd", ""));
+  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.nhdr", ""));
+  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.spr", ""));
+  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.lsm", ""));
+  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.dwi", ""));
+  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.hdwi", ""));
+  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.qbi", ""));
+  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.hqbi", ""));
+
+}
+
+/**
+ * @brief This method gets the supported (save) file extensions as string. This string is can then used by the QT QFileDialog widget.
+ * @return The c-string that contains the (save) file extensions
+ *
+ */
+const char* mitk::CoreObjectFactory::GetSaveFileExtensions() {
+  MultimapType aMap;
+  for (ExtraFactoriesList::iterator it = m_ExtraFactories.begin(); it != m_ExtraFactories.end() ; it++ ) 
+  {
+    aMap = (*it)->GetSaveFileExtensionsMap();
+    this->MergeFileExtensions(m_SaveFileExtensionsMap, aMap);
+
+  }
+  this->CreateFileExtensions(m_SaveFileExtensionsMap, m_SaveFileExtensions);
+  return m_SaveFileExtensions.c_str();
 };
+
+/**
+ * @brief get the defined (save) file extension map
+ * @return the defined (save) file extension map
+ */
+mitk::CoreObjectFactoryBase::MultimapType mitk::CoreObjectFactory::GetSaveFileExtensionsMap()
+{
+  return m_SaveFileExtensionsMap;
+}
 
 mitk::CoreObjectFactory::FileWriterList mitk::CoreObjectFactory::GetFileWriters() {
   FileWriterList allWriters = m_FileWriters;

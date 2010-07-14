@@ -39,17 +39,11 @@ PURPOSE.  See the above copyright notices for more information.
 
 typedef short DiffusionPixelType;
 typedef mitk::DiffusionImage<DiffusionPixelType> DiffusionImageShort;
+typedef std::multimap<std::string, std::string> MultimapType;
 
 mitk::DiffusionImagingObjectFactory::DiffusionImagingObjectFactory(bool registerSelf) 
 :CoreObjectFactoryBase()
 {
-  m_ExternalFileExtensions.append("Diffusion Weighted Images (*.dwi *.hdwi)");
-  m_ExternalFileExtensions.append("Q-Ball Images (*.qbi *.hqbi)");
-  m_ExternalFileExtensions.append("Tensor Images (*.dti *.hdti)");
-  
-  m_SaveFileExtensions.append("Diffusion Weighted Images (*.dwi *.hdwi)");
-  m_SaveFileExtensions.append("Q-Ball Images (*.qbi *.hqbi)");
-  m_SaveFileExtensions.append("Tensor Images (*.dti *.hdti)");
 
   static bool alreadyDone = false;
   if (!alreadyDone)
@@ -71,6 +65,8 @@ mitk::DiffusionImagingObjectFactory::DiffusionImagingObjectFactory(bool register
 
     mitk::CoreObjectFactory::GetInstance()->RegisterExtraFactory(this);
     
+    CreateFileExtensionsMap();
+
     alreadyDone = true;
   }
 
@@ -132,13 +128,44 @@ void mitk::DiffusionImagingObjectFactory::SetDefaultProperties(mitk::DataNode* n
 
 const char* mitk::DiffusionImagingObjectFactory::GetFileExtensions() 
 {
-  return m_ExternalFileExtensions.c_str();
+  std::string fileExtension;
+  this->CreateFileExtensions(m_FileExtensionsMap, fileExtension);
+  return fileExtension.c_str();
 };
+
+mitk::CoreObjectFactoryBase::MultimapType mitk::DiffusionImagingObjectFactory::GetFileExtensionsMap()
+{
+  return m_FileExtensionsMap;
+}
 
 const char* mitk::DiffusionImagingObjectFactory::GetSaveFileExtensions() 
 { 
-  return m_SaveFileExtensions.c_str();
+  std::string fileExtension;
+  this->CreateFileExtensions(m_SaveFileExtensionsMap, fileExtension);
+  return fileExtension.c_str();
 };
+
+mitk::CoreObjectFactoryBase::MultimapType mitk::DiffusionImagingObjectFactory::GetSaveFileExtensionsMap()
+{
+  return m_SaveFileExtensionsMap;
+}
+
+void mitk::DiffusionImagingObjectFactory::CreateFileExtensionsMap()
+{
+  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.dwi", "Diffusion Weighted Images"));
+  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.hdwi", "Diffusion Weighted Images"));
+  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.qbi", "Q-Ball Images"));
+  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.hqbi", "Q-Ball Images"));
+  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.dti", "Tensor Images"));
+  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.hdti", "Tensor Images"));
+
+  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.dwi", "Diffusion Weighted Images"));
+  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.hdwi", "Diffusion Weighted Images"));
+  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.qbi", "Q-Ball Images"));
+  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.hqbi", "Q-Ball Images"));
+  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.dti", "Tensor Images"));
+  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.hdti", "Tensor Images"));
+}
 
 void mitk::DiffusionImagingObjectFactory::RegisterIOFactories() 
 {

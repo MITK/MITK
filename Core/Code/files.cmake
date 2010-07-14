@@ -8,6 +8,7 @@ SET(H_FILES
 SET(CPP_FILES
   Algorithms/mitkBaseDataSource.cpp
   Algorithms/mitkBaseProcess.cpp
+  Algorithms/mitkCoreObjectFactoryBase.cpp
   Algorithms/mitkCoreObjectFactory.cpp
   Algorithms/mitkDataNodeFactory.cpp
   Algorithms/mitkDataNodeSource.cpp

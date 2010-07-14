@@ -31,10 +31,15 @@ class MitkExt_EXPORT CoreExtObjectFactory : public CoreObjectFactoryBase
     virtual Mapper::Pointer CreateMapper(mitk::DataNode* node, MapperSlotId slotId);
     virtual void SetDefaultProperties(mitk::DataNode* node);
     virtual const char* GetFileExtensions();
+    virtual mitk::CoreObjectFactoryBase::MultimapType GetFileExtensionsMap();
     virtual const char* GetSaveFileExtensions();
+    virtual mitk::CoreObjectFactoryBase::MultimapType GetSaveFileExtensionsMap();
     void RegisterIOFactories();
   protected:
     CoreExtObjectFactory(); 
+    void CreateFileExtensionsMap();
+    MultimapType m_FileExtensionsMap;
+    MultimapType m_SaveFileExtensionsMap;
 };
 
 }

@@ -204,8 +204,10 @@ void QmitkSegmentationPostProcessing::ThresholdImage(bool)
   }
 }
 
-void QmitkSegmentationPostProcessing::ThresholdingDone(int)
+void QmitkSegmentationPostProcessing::ThresholdingDone(int result)
 {
+  if (result == QDialog::Rejected)
+    m_ThresholdingToolManager->ActivateTool(-1);
   MITK_INFO << "Thresholding done, cleaning up";
   m_ThresholdingDialog->deleteLater();
   m_ThresholdingDialog = NULL;

@@ -33,15 +33,7 @@ namespace mitk
 template <typename PixelType>
 void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &node)
 {
-  typedef itk::Image<PixelType, 4> ImageType;
-  typedef itk::ImageSeriesReader<ImageType> ReaderType;
-
-  DcmIoType::Pointer io = DcmIoType::New();
-  typename ReaderType::Pointer reader = ReaderType::New();
   mitk::Image::Pointer image = mitk::Image::New();
-
-  reader->SetImageIO(io);
-  reader->ReverseOrderOff();
 
 #if GDCM_MAJOR_VERSION >= 2
 
@@ -80,29 +72,69 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
   }
   /******** End: Workaround for 4D data **********/
 
-  const std::list<StringContainer>::const_iterator df_end = decomposed_filenames.end();
-  unsigned int act_volume = 1u;
-
-  reader->SetFileNames(decomposed_filenames.front());
-  reader->Update();
-  image->InitializeByItk(reader->GetOutput(), 1, volume_count);
-  image->SetImportVolume(reader->GetOutput()->GetBufferPointer(), 0u);
-
-  MITK_INFO << "Volume dimension: [" << image->GetDimension(0) << ", " << image->GetDimension(1) << ", " << image->GetDimension(2) << ", " << image->GetDimension(3) << "]";
-
-  for (std::list<StringContainer>::iterator df_it = ++decomposed_filenames.begin(); df_it != df_end; ++df_it)
+  if (volume_count > 1)
   {
-    reader->SetFileNames(*df_it);
+    typedef itk::Image<PixelType, 4> ImageType;
+    typedef itk::ImageSeriesReader<ImageType> ReaderType;
+
+    DcmIoType::Pointer io = DcmIoType::New();
+    typename ReaderType::Pointer reader = ReaderType::New();
+
+    reader->SetImageIO(io);
+    reader->ReverseOrderOff();
+
+    const std::list<StringContainer>::const_iterator df_end = decomposed_filenames.end();
+    unsigned int act_volume = 1u;
+
+    reader->SetFileNames(decomposed_filenames.front());
     reader->Update();
-    image->SetImportVolume(reader->GetOutput()->GetBufferPointer(), act_volume++);
+    image->InitializeByItk(reader->GetOutput(), 1, volume_count);
+    image->SetImportVolume(reader->GetOutput()->GetBufferPointer(), 0u);
+
+    MITK_INFO << "Volume dimension: [" << image->GetDimension(0) << ", " << image->GetDimension(1) << ", " << image->GetDimension(2) << ", " << image->GetDimension(3) << "]";
+
+    for (std::list<StringContainer>::iterator df_it = ++decomposed_filenames.begin(); df_it != df_end; ++df_it)
+    {
+      reader->SetFileNames(*df_it);
+      reader->Update();
+      image->SetImportVolume(reader->GetOutput()->GetBufferPointer(), act_volume++);
+    }
+  }
+  else
+  {
+    typedef itk::Image<PixelType, 3> ImageType;
+    typedef itk::ImageSeriesReader<ImageType> ReaderType;
+
+    DcmIoType::Pointer io = DcmIoType::New();
+    typename ReaderType::Pointer reader = ReaderType::New();
+
+    reader->SetImageIO(io);
+    reader->ReverseOrderOff();
+
+    reader->SetFileNames(filenames);
+    reader->Update();
+    image->InitializeByItk(reader->GetOutput());
+    image->SetImportVolume(reader->GetOutput()->GetBufferPointer());
+
+    MITK_INFO << "Volume dimension: [" << image->GetDimension(0) << ", " << image->GetDimension(1) << ", " << image->GetDimension(2) << "]";
   }
 
 #else
+  typedef itk::Image<PixelType, 3> ImageType;
+  typedef itk::ImageSeriesReader<ImageType> ReaderType;
+
+  DcmIoType::Pointer io = DcmIoType::New();
+  typename ReaderType::Pointer reader = ReaderType::New();
+
+  reader->SetImageIO(io);
+  reader->ReverseOrderOff();
 
   reader->SetFileNames(filenames);
   reader->Update();
   image->InitializeByItk(reader->GetOutput());
   image->SetImportVolume(reader->GetOutput()->GetBufferPointer());
+
+  MITK_INFO << "Volume dimension: [" << image->GetDimension(0) << ", " << image->GetDimension(1) << ", " << image->GetDimension(2) << "]";
 
 #endif
 

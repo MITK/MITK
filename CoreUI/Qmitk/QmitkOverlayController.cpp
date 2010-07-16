@@ -29,6 +29,12 @@ PURPOSE.  See the above copyright notices for more information.
 QmitkOverlayController::QmitkOverlayController( QmitkRenderWindow* rw, mitk::PropertyList* pl )
 : QObject(), m_RenderWindow( rw ), m_PropertyList( pl )
 {
+  if ( m_RenderWindow == NULL )
+  {
+    MITK_ERROR << "invalid QmitkRenderWindow";
+    return;
+  }
+
   this->InitializeOverlayLayout();
   this->AdjustOverlayPosition();
   this->SetOverlayVisibility( true );

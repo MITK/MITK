@@ -80,7 +80,7 @@ public:
   * \brief adjusts the position of all overlays to the position of the RenderWindow
   *
   * This method updates the position of all Widgets according to the position of the RenderWindow 
-  * and the etend of the overlays.
+  * and the extend of the overlays.
   */
   void AdjustOverlayPosition();
 

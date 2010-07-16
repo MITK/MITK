@@ -219,6 +219,12 @@ void QmitkOverlayController::SetOverlayVisibility( bool visible )
 
 void QmitkOverlayController::AddOverlay( QmitkOverlay* overlay )
 {
+  if ( m_RenderWindow == NULL )
+  {
+    MITK_ERROR << "invalid QmitkRenderWindow";
+    return;
+  }
+
   if ( overlay != NULL )
   {
     QmitkOverlay::DisplayPosition pos = overlay->GetPosition();

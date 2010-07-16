@@ -69,14 +69,35 @@ PURPOSE.  See the above copyright notices for more information.
     **/
     virtual ~QmitkTextOverlay();
 
+    /**
+    * \brief Setup the QLabel with overlay specific information
+    *
+    * First, this method sets text-overlay specific properties as described in the class docu above.
+    * Secondly, the actual text of the label is set.
+    * 
+    * \WARNING No error will be issued if the property containing the text is not found, the TextOverlay 
+    * will show an empty string!
+    */
     void GenerateData( mitk::PropertyList::Pointer );
 
+    /**
+    * \brief returns the QLabel* that internally represents the TextOverlay
+    */
     QLabel* GetWidget();
 
   protected:
 
+    /**
+    * \brief internal helper class to determine text-properties
+    *
+    * This method is only used internally to apply the text specific properties that can be set 
+    * using a mitk::PropertyList. If a property cannot be found, a default value is used.
+    *
+    * The values of these properties are then attributed to the label using QFont and QPalette.
+    */ 
     void GetTextProperties( mitk::PropertyList::Pointer );
     
+    /** \brief QLabel internally representing the TextOverlay */
     QLabel* m_Widget;    
   };
 

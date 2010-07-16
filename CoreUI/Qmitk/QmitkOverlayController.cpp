@@ -26,12 +26,15 @@ PURPOSE.  See the above copyright notices for more information.
 #include <algorithm>
 
 
-QmitkOverlayController::QmitkOverlayController( QmitkRenderWindow* rw )
-: QObject(), m_RenderWindow( rw )
+QmitkOverlayController::QmitkOverlayController( QmitkRenderWindow* rw, mitk::PropertyList* pl )
+: QObject(), m_RenderWindow( rw ), m_PropertyList( pl )
 {
   this->InitializeOverlayLayout();
   this->AdjustOverlayPosition();
   this->SetOverlayVisibility( true );
+
+  if ( m_PropertyList.IsNull() )
+    m_PropertyList = mitk::PropertyList::New();
 
 }
 
@@ -215,7 +218,9 @@ void QmitkOverlayController::AddOverlay( QmitkOverlay* overlay )
     QmitkOverlay::DisplayPosition pos = overlay->GetPosition();
     unsigned int layer = overlay->GetLayer();
 
-    overlay->GenerateData( m_RenderWindow->GetRenderer()->GetRenderingManager()->GetPropertyList() );
+    m_PropertyList->ConcatenatePropertyList( m_RenderWindow->GetRenderer()->GetRenderingManager()->GetPropertyList(), false );
+
+    overlay->GenerateData( m_PropertyList );
 
     overlay->GetWidget()->setParent( m_PositionedOverlays[ pos ] );
 

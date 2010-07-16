@@ -21,9 +21,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 // MITK-Stuff
 #include "mitkCommon.h"
+#include "mitkPropertyList.h"
 #include "QmitkOverlay.h"
-
-//#include "QmitkRenderWindow.h"
 
 #include <QObject>
 
@@ -38,7 +37,7 @@ class QMITK_EXPORT QmitkOverlayController : public QObject
 
 public:
 
-  QmitkOverlayController( QmitkRenderWindow* );
+  QmitkOverlayController( QmitkRenderWindow* rw, mitk::PropertyList* pl = NULL );
   virtual ~QmitkOverlayController();
 
   void AddOverlay( QmitkOverlay* );
@@ -58,9 +57,13 @@ protected:
   typedef std::map< QmitkOverlay::DisplayPosition, QWidget* > OverlayPositionMap;
   typedef std::vector< QmitkOverlay* > OverlayVector;
 
-  OverlayVector m_AllOverlays;
-  OverlayPositionMap m_PositionedOverlays;
-  QmitkRenderWindow* m_RenderWindow;
+  OverlayVector                 m_AllOverlays;
+
+  OverlayPositionMap            m_PositionedOverlays;
+
+  QmitkRenderWindow*            m_RenderWindow;
+
+  mitk::PropertyList::Pointer   m_PropertyList;
 
 };
 

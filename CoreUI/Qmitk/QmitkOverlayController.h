@@ -76,6 +76,8 @@ public:
   */
   void AddOverlay( QmitkOverlay* );
 
+  void RemoveOverlay( QmitkOverlay* );
+
   /**
   * \brief adjusts the position of all overlays to the position of the RenderWindow
   *
@@ -120,7 +122,10 @@ protected:
   * \brief initializes one QWidget - internally used by InitializeOverlayLayout()
   */
   void InitializeWidget( QmitkOverlay::DisplayPosition pos );
-
+ 
+  void RestackOverlays( QmitkOverlay::DisplayPosition pos );
+  
+  
   typedef std::map< QmitkOverlay::DisplayPosition, QWidget* > OverlayPositionMap;
   typedef std::vector< QmitkOverlay* > OverlayVector;
 

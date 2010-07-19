@@ -256,7 +256,6 @@ void QmitkOverlayController::AddOverlay( QmitkOverlay* overlay )
   {
     // get desired position and layer of the overlay
     QmitkOverlay::DisplayPosition pos = overlay->GetPosition();
-    unsigned int layer = overlay->GetLayer();
 
     // concatenate local propertyList and propertyList of the RenderingManager
     // local properties have priority as they are not overwritten if preset in both 
@@ -266,45 +265,43 @@ void QmitkOverlayController::AddOverlay( QmitkOverlay* overlay )
     overlay->GenerateData( m_PropertyList );
     // ... and add it to the OverlayContainer in the RenderWindow
     overlay->GetWidget()->setParent( m_PositionedOverlays[ pos ] );
-
-    // determine the desired stacking layer
-    // if the overlay-container is empty, simply append the overlay to the list
-    // if it's not empty, use the layer of the overlay
-    // TODO: restack if an overlay is added that has a high layer when the widget is empty and an overlay with a lower
-    //       layer is added afterwards
-    int stackLayer = dynamic_cast<QBoxLayout*>( m_PositionedOverlays[ pos ]->layout() )->isEmpty() ? -1 : layer;
-  
-    switch ( pos )
-    {
-      // same alignment for all lefts, ...
-      case QmitkOverlay::top_Left : {}
-      case QmitkOverlay::middle_Left : {}
-      case QmitkOverlay::bottom_Left : 
-        {
-          dynamic_cast<QBoxLayout*>( m_PositionedOverlays[ pos ]->layout() )->insertWidget( overlay->GetLayer(), overlay->GetWidget(), stackLayer, Qt::AlignLeft );    
-          break;
-        }
-        // ... for all centers, ...
-      case QmitkOverlay::top_Center : {}
-      case QmitkOverlay::bottom_Center :
-        {
-          dynamic_cast<QBoxLayout*>( m_PositionedOverlays[ pos ]->layout() )->insertWidget( overlay->GetLayer(), overlay->GetWidget(), stackLayer, Qt::AlignCenter );
-          break;
-        }
-        // ... and for all rights
-      case QmitkOverlay::top_Right : {}
-      case QmitkOverlay::middle_Right : {}
-      case QmitkOverlay::bottom_Right : 
-        {
-          dynamic_cast<QBoxLayout*>( m_PositionedOverlays[ pos ]->layout() )->insertWidget( overlay->GetLayer(), overlay->GetWidget(), stackLayer, Qt::AlignRight );    
-          break;
-        }
-    }
+    
+    // add overlay to list of all overlays and correctly put it into the layering
+    m_AllOverlays.push_back( overlay );
+    this->RestackOverlays( pos );
 
     // make sure the widget containing the added overlay is shown ...
     m_PositionedOverlays[ pos ]->show();
     // ... and reset the position of the widgets
     this->AdjustOverlayPosition();
+  }
+}
+
+void QmitkOverlayController::RemoveOverlay( QmitkOverlay* overlay )
+{
+  if ( overlay != NULL )
+  {
+    // get desired position and layer of the overlay
+    QmitkOverlay::DisplayPosition pos = overlay->GetPosition();
+
+    OverlayVector::iterator iter = std::find( m_AllOverlays.begin(), m_AllOverlays.end(), overlay );
+    
+    if ( iter != m_AllOverlays.end() )
+    {
+      m_AllOverlays.erase( iter );
+      overlay->GetWidget()->setParent( NULL );
+
+      if ( m_PositionedOverlays[ pos ]->layout()->isEmpty() )
+      {
+        m_PositionedOverlays[ pos ]->hide();
+      }
+      else
+      {
+        this->RestackOverlays( pos );
+        // reset the position of the widgets
+        this->AdjustOverlayPosition();
+      }
+    }
   }
 }
 
@@ -321,4 +318,59 @@ void QmitkOverlayController::AlignOverlays()
   //  int stackLayer = dynamic_cast<QBoxLayout*>( m_PositionedOverlays[ (*overlayIter)->GetPosition() ]->layout() )->isEmpty() ? 0 : layer;
   //  dynamic_cast<QBoxLayout*>( m_PositionedOverlays[ (*overlayIter)->GetPosition() ]->layout() )->addWidget( (*overlayIter)->GetWidget(), stackLayer, Qt::AlignLeft );
   //}
+}
+
+void QmitkOverlayController::RestackOverlays( QmitkOverlay::DisplayPosition pos )
+{
+  OverlayVector::iterator overlayIter;
+  QBoxLayout* layout = dynamic_cast<QBoxLayout*>( m_PositionedOverlays[ pos ]->layout() );
+
+  std::sort( m_AllOverlays.begin(), m_AllOverlays.end() );
+
+  for ( overlayIter=m_AllOverlays.begin(); overlayIter!=m_AllOverlays.end(); overlayIter++ )
+  {
+    // do nothing if the overlay is not in the right position
+    if ( (*overlayIter)->GetPosition() != pos )
+    {
+      continue;
+    }
+
+    // determine the desired stacking layer
+    // if the overlay-container is empty, simply append the overlay to the list
+    // if it's not empty, use the layer of the overlay
+    unsigned int layer = (*overlayIter)->GetLayer();
+    int stackLayer = 0;
+    if ( !layout->isEmpty() )
+    {
+      stackLayer = layer;
+    }
+    
+    switch ( pos )
+    {
+      // same alignment for all lefts, ...
+    case QmitkOverlay::top_Left : {}
+    case QmitkOverlay::middle_Left : {}
+    case QmitkOverlay::bottom_Left : 
+      {
+        layout->insertWidget( stackLayer, (*overlayIter)->GetWidget(), 0, Qt::AlignLeft );    
+        break;
+      }
+      // ... for all centers, ...
+    case QmitkOverlay::top_Center : {}
+    case QmitkOverlay::bottom_Center :
+      {
+        layout->insertWidget( stackLayer, (*overlayIter)->GetWidget(), 0, Qt::AlignCenter );
+        break;
+      }
+      // ... and for all rights
+    case QmitkOverlay::top_Right : {}
+    case QmitkOverlay::middle_Right : {}
+    case QmitkOverlay::bottom_Right : 
+      {
+        layout->insertWidget( stackLayer, (*overlayIter)->GetWidget(), 0, Qt::AlignRight );    
+        break;
+      }
+    }
+  }
+
 }

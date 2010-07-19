@@ -50,7 +50,7 @@ QmitkOverlayController::~QmitkOverlayController()
 
 void QmitkOverlayController::InitializeOverlayLayout()
 {
-  
+  // setup widget for each position
   this->InitializeWidget( QmitkOverlay::top_Left );
   this->InitializeWidget( QmitkOverlay::top_Center );
   this->InitializeWidget( QmitkOverlay::top_Right );
@@ -64,21 +64,34 @@ void QmitkOverlayController::InitializeOverlayLayout()
 
 void QmitkOverlayController::InitializeWidget( QmitkOverlay::DisplayPosition pos )
 {
+  // create a new QWidget as Tool & FramelessWindowHint
   m_PositionedOverlays[ pos ] = new QWidget( m_RenderWindow, Qt::Tool | Qt::FramelessWindowHint );
+  
+  // autoFillBackGround(false) and WA_TranslucentBackground = true are needed to have a translucent background 
+  // who might have thought...
   m_PositionedOverlays[ pos ]->setAutoFillBackground(false);
   m_PositionedOverlays[ pos ]->setAttribute( Qt::WA_TranslucentBackground, true );
+  
+  // mac-specific attributes:
+  // making sure overlays are even visible if RenderWindow does not have the focus (not default for Qt::Tool on mac)
   //m_PositionedOverlays[ pos ]->setAttribute( Qt::WA_MacAlwaysShowToolWindow, true );
+  // testing something
   //m_PositionedOverlays[ pos ]->setAttribute( Qt::WA_MacShowFocusRect, false );
+
+  // overlays should not get the focus
   m_PositionedOverlays[ pos ]->setFocusPolicy( Qt::NoFocus );
+
+  // setting the color of the background to transparent - not sure it's needed after the attributes have been set above
   QPalette p = QPalette();
   p.setColor( QPalette::Window, Qt::transparent );
   m_PositionedOverlays[ pos ]->setPalette( p );
 
-
+  // setting position-specific properties
   switch ( pos )
   {
   case QmitkOverlay::top_Left : 
     {
+      // adding left-aligned top-to-bottom layout
       QVBoxLayout* layout = new QVBoxLayout( m_PositionedOverlays[ pos ] );
       layout->setDirection( QBoxLayout::TopToBottom );
       layout->setAlignment( Qt::AlignLeft );
@@ -86,6 +99,7 @@ void QmitkOverlayController::InitializeWidget( QmitkOverlay::DisplayPosition pos
     }
   case QmitkOverlay::top_Center : 
     {
+      // adding center-aligned top-to-bottom layout
       QVBoxLayout* layout = new QVBoxLayout( m_PositionedOverlays[ pos ] );
       layout->setDirection( QBoxLayout::TopToBottom );
       layout->setAlignment( Qt::AlignCenter );
@@ -94,6 +108,7 @@ void QmitkOverlayController::InitializeWidget( QmitkOverlay::DisplayPosition pos
     }
   case QmitkOverlay::top_Right :
     {
+      // adding right-aligned top-to-bottom layout
       QVBoxLayout* layout = new QVBoxLayout( m_PositionedOverlays[ pos ] );
       layout->setDirection( QBoxLayout::TopToBottom );
       layout->setAlignment( Qt::AlignRight );
@@ -101,6 +116,7 @@ void QmitkOverlayController::InitializeWidget( QmitkOverlay::DisplayPosition pos
     }
   case QmitkOverlay::middle_Left : 
     {
+      // adding left-aligned left-to-right layout
       QHBoxLayout* layout = new QHBoxLayout( m_PositionedOverlays[ pos ] );
       layout->setDirection( QBoxLayout::LeftToRight );
       layout->setAlignment( Qt::AlignLeft );
@@ -109,6 +125,7 @@ void QmitkOverlayController::InitializeWidget( QmitkOverlay::DisplayPosition pos
     }
   case QmitkOverlay::middle_Right : 
     {
+      // adding right-aligned right-to-left layout
       QHBoxLayout* layout = new QHBoxLayout( m_PositionedOverlays[ pos ] );
       layout->setDirection( QBoxLayout::RightToLeft );
       layout->setAlignment( Qt::AlignRight );
@@ -116,6 +133,7 @@ void QmitkOverlayController::InitializeWidget( QmitkOverlay::DisplayPosition pos
     }
   case QmitkOverlay::bottom_Left : 
     {
+      // adding left-aligned bottom-to-top layout
       QVBoxLayout* layout = new QVBoxLayout( m_PositionedOverlays[ pos ] );
       layout->setDirection( QBoxLayout::BottomToTop );
       layout->setAlignment( Qt::AlignLeft );
@@ -140,13 +158,14 @@ void QmitkOverlayController::InitializeWidget( QmitkOverlay::DisplayPosition pos
 
 void QmitkOverlayController::AdjustOverlayPosition()
 {
-
+  // setting position of top-left overlay-container
   if ( m_PositionedOverlays[ QmitkOverlay::top_Left ]->isVisible() )
   {
     QPoint pos = m_RenderWindow->mapToGlobal( QPoint(0,0) );
     m_PositionedOverlays[ QmitkOverlay::top_Left ]->move( pos.x(), pos.y() );
   }
 
+  // setting position of top-center overlay-container
   if ( m_PositionedOverlays[ QmitkOverlay::top_Center ]->isVisible() )
   {
     QWidget* widget = m_PositionedOverlays[ QmitkOverlay::top_Center ];
@@ -154,6 +173,7 @@ void QmitkOverlayController::AdjustOverlayPosition()
     widget->move( pos.x() - widget->size().width()/2, pos.y() );
   }
 
+  // setting position of top-right overlay-container
   if ( m_PositionedOverlays[ QmitkOverlay::top_Right ]->isVisible() )
   {
     QWidget* widget = m_PositionedOverlays[ QmitkOverlay::top_Right ];
@@ -161,6 +181,7 @@ void QmitkOverlayController::AdjustOverlayPosition()
     widget->move( pos.x() - widget->size().width(), pos.y() );
   }
 
+  // setting position of middle-left overlay-container
   if ( m_PositionedOverlays[ QmitkOverlay::middle_Left ]->isVisible() )
   {
     QWidget* widget = m_PositionedOverlays[ QmitkOverlay::middle_Left ];
@@ -168,6 +189,7 @@ void QmitkOverlayController::AdjustOverlayPosition()
     widget->move( pos.x(), pos.y() - widget->size().height()/2 );
   }
 
+  // setting position of middle-right overlay-container
   if ( m_PositionedOverlays[ QmitkOverlay::middle_Right ]->isVisible() )
   {
     QWidget* widget = m_PositionedOverlays[ QmitkOverlay::middle_Right ];
@@ -175,6 +197,7 @@ void QmitkOverlayController::AdjustOverlayPosition()
     widget->move( pos.x() - widget->size().width(), pos.y() - widget->size().height()/2 );
   }
 
+  // setting position of bottom-left overlay-container
   if ( m_PositionedOverlays[ QmitkOverlay::bottom_Left ]->isVisible() )
   {
     QWidget* widget = m_PositionedOverlays[ QmitkOverlay::bottom_Left ];
@@ -182,6 +205,7 @@ void QmitkOverlayController::AdjustOverlayPosition()
     widget->move( pos.x(), pos.y() - widget->size().height() );
   }
 
+  // setting position of bottom-center overlay-container
   if ( m_PositionedOverlays[ QmitkOverlay::bottom_Center ]->isVisible() )
   {
     QWidget* widget = m_PositionedOverlays[ QmitkOverlay::bottom_Center ];
@@ -189,6 +213,7 @@ void QmitkOverlayController::AdjustOverlayPosition()
     widget->move( pos.x() - widget->size().width()/2, pos.y() - widget->size().height() );
   }
 
+  // setting position of bottom-right overlay-container
   if ( m_PositionedOverlays[ QmitkOverlay::bottom_Right ]->isVisible() )
   {
     QWidget* widget = m_PositionedOverlays[ QmitkOverlay::bottom_Right ];
@@ -201,6 +226,7 @@ void QmitkOverlayController::AdjustOverlayPosition()
 
 void QmitkOverlayController::SetOverlayVisibility( bool visible )
 {
+  // setting visibility of all registered overlays to 'visible'
   foreach( QmitkOverlay* overlay, m_AllOverlays )
   {
     if ( visible )
@@ -219,6 +245,7 @@ void QmitkOverlayController::SetOverlayVisibility( bool visible )
 
 void QmitkOverlayController::AddOverlay( QmitkOverlay* overlay )
 {
+  // if no renderwindow has been set, it's not possible to add overlays...
   if ( m_RenderWindow == NULL )
   {
     MITK_ERROR << "invalid QmitkRenderWindow";
@@ -227,19 +254,29 @@ void QmitkOverlayController::AddOverlay( QmitkOverlay* overlay )
 
   if ( overlay != NULL )
   {
+    // get desired position and layer of the overlay
     QmitkOverlay::DisplayPosition pos = overlay->GetPosition();
     unsigned int layer = overlay->GetLayer();
 
+    // concatenate local propertyList and propertyList of the RenderingManager
+    // local properties have priority as they are not overwritten if preset in both 
     m_PropertyList->ConcatenatePropertyList( m_RenderWindow->GetRenderer()->GetRenderingManager()->GetPropertyList(), false );
 
+    // setting up the overlay with the correct properties ...
     overlay->GenerateData( m_PropertyList );
-
+    // ... and add it to the OverlayContainer in the RenderWindow
     overlay->GetWidget()->setParent( m_PositionedOverlays[ pos ] );
 
-    int stackLayer = dynamic_cast<QBoxLayout*>( m_PositionedOverlays[ pos ]->layout() )->isEmpty() ? 0 : layer;
+    // determine the desired stacking layer
+    // if the overlay-container is empty, simply append the overlay to the list
+    // if it's not empty, use the layer of the overlay
+    // TODO: restack if an overlay is added that has a high layer when the widget is empty and an overlay with a lower
+    //       layer is added afterwards
+    int stackLayer = dynamic_cast<QBoxLayout*>( m_PositionedOverlays[ pos ]->layout() )->isEmpty() ? -1 : layer;
   
     switch ( pos )
     {
+      // same alignment for all lefts, ...
       case QmitkOverlay::top_Left : {}
       case QmitkOverlay::middle_Left : {}
       case QmitkOverlay::bottom_Left : 
@@ -247,12 +284,14 @@ void QmitkOverlayController::AddOverlay( QmitkOverlay* overlay )
           dynamic_cast<QBoxLayout*>( m_PositionedOverlays[ pos ]->layout() )->insertWidget( overlay->GetLayer(), overlay->GetWidget(), stackLayer, Qt::AlignLeft );    
           break;
         }
+        // ... for all centers, ...
       case QmitkOverlay::top_Center : {}
       case QmitkOverlay::bottom_Center :
         {
           dynamic_cast<QBoxLayout*>( m_PositionedOverlays[ pos ]->layout() )->insertWidget( overlay->GetLayer(), overlay->GetWidget(), stackLayer, Qt::AlignCenter );
           break;
         }
+        // ... and for all rights
       case QmitkOverlay::top_Right : {}
       case QmitkOverlay::middle_Right : {}
       case QmitkOverlay::bottom_Right : 
@@ -262,7 +301,9 @@ void QmitkOverlayController::AddOverlay( QmitkOverlay* overlay )
         }
     }
 
+    // make sure the widget containing the added overlay is shown ...
     m_PositionedOverlays[ pos ]->show();
+    // ... and reset the position of the widgets
     this->AdjustOverlayPosition();
   }
 }

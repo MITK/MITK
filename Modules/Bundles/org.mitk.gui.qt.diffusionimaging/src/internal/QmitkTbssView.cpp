@@ -29,7 +29,10 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <itkNiftiImageIO.h>
 #include <itkImageFileReader.h>
-#include <itkImage.h>
+
+#include <iostream>
+#include <fstream>
+
 
 const std::string QmitkTbssView::VIEW_ID = 
   "org.mitk.views.tbss";
@@ -235,8 +238,6 @@ void QmitkTbssView::OutputValues()
     return;
   }
 
-  typedef itk::Image<char, 3> RoiImageType;
-  typedef itk::Image<float, 4> AllSkeletonType;
 
   //read roi
   mitk::Image::Pointer image = dynamic_cast<mitk::Image*>( m_RoiNode->GetData() ); 
@@ -251,39 +252,144 @@ void QmitkTbssView::OutputValues()
   RoiImageType::SizeType roiSize = roi->GetLargestPossibleRegion().GetSize();
   AllSkeletonType::SizeType skeletonSize = skeleton->GetLargestPossibleRegion().GetSize();
 
+  std::vector<RoiImageType::IndexType> indices = SortPoints(roi);
 
-  for(int x=0; x<roiSize[0]; x++)
+
+  //For every subject (4th axis of the 4D volume) output the tract of interest and write results to file
+  std::string filename = "G://home//vanbrugg//spie2011//cc.csv";
+  std::ofstream f;
+  f.open(filename.c_str());
+  
+
+  for (int s=0; s<skeletonSize[3]; s++)
   {
-    for(int y=0; y<roiSize[1]; y++)
+    std::vector<RoiImageType::IndexType>::iterator it = indices.begin();    
+    while(it != indices.end())
     {
-      for(int z=0; z<roiSize[2]; z++)
-      {
-        RoiImageType::IndexType index;
-        index[0] = x;
-        index[1] = y;
-        index[2] = z;
-        if (roi->GetPixel(index) != 0)
-        {
-          // Output the values of this point for all subjects
-          AllSkeletonType::IndexType skeletonIndex;
-          skeletonIndex[0] = index[0];
-          skeletonIndex[1] = index[1];
-          skeletonIndex[2] = index[2];
+      RoiImageType::IndexType roiIndex = *it;
+      AllSkeletonType::IndexType skeletonIndex;
+      skeletonIndex[0] = roiIndex[0];
+      skeletonIndex[1] = roiIndex[1];
+      skeletonIndex[2] = roiIndex[2];
+      skeletonIndex[3] = s;
 
-          for(int t=0; t<skeletonSize[3]; t++)
-          {
-            skeletonIndex[3] = t;
-            std::cout << skeleton->GetPixel(skeletonIndex) << std::endl;
-          }
+      //std::cout << skeleton->GetPixel(skeletonIndex) << ",";
 
-          std::cout << " ";
-        }
-      }
+      f << skeleton->GetPixel(skeletonIndex) << ",";
+     
+
+      ++it;
+    }
+    f << std::endl;
+  }
+
+  f.close();
+
+  //for(int x=0; x<roiSize[0]; x++)
+  //{
+  //  for(int y=0; y<roiSize[1]; y++)
+  //  {
+  //    for(int z=0; z<roiSize[2]; z++)
+  //    {
+  //      RoiImageType::IndexType index;
+  //      index[0] = x;
+  //      index[1] = y;
+  //      index[2] = z;
+  //      if (roi->GetPixel(index) != 0)
+  //      {
+  //        // Output the values of this point for all subjects
+  //        AllSkeletonType::IndexType skeletonIndex;
+  //        skeletonIndex[0] = index[0];
+  //        skeletonIndex[1] = index[1];
+  //        skeletonIndex[2] = index[2];
+
+  //       
+
+  //        for(int t=0; t<skeletonSize[3]; t++)
+  //        {
+  //          if(index[0] == 90 && index[1] == 98 && index[2] == 95)
+  //          {
+  //            std::cout << "the empty voxel" << std::endl;
+  //          }
+  //          skeletonIndex[3] = t;
+  //          std::cout << skeleton->GetPixel(skeletonIndex) << std::endl;
+  //        }
+
+  //        std::cout << " ";
+  //      }
+  //    }
+  //  }
+  //}
+  
+   
+  
+}
+
+std::vector<RoiImageType::IndexType> QmitkTbssView::SortPoints(RoiImageType::Pointer roi)
+{
+  std::vector<RoiImageType::IndexType> indices;
+  
+  //set current point to be the start point. Hard coded for now, should be changed to function in general
+  RoiImageType::IndexType currentPoint;
+  currentPoint[0] = 90; // For Corpus Callosum the constant index;
+  currentPoint[1] = 88;
+  currentPoint[2] = 82;
+
+  bool ready = false;
+  while(!ready)
+  {
+    indices.push_back(currentPoint);
+    currentPoint = FindNextPoint(indices, currentPoint, roi, ready);
+  }
+
+  return indices;
+}
+
+bool QmitkTbssView::PointVisited(std::vector<RoiImageType::IndexType> points, RoiImageType::IndexType point)
+{
+  bool ret = false;
+  std::vector<RoiImageType::IndexType>::iterator it = points.begin();
+  while(it != points.end())
+  {
+    RoiImageType::IndexType p = *it;
+    if(p[0] == point[0] && p[1] == point[1] && p[2] == point[2])
+    {
+      ret = true;
+    }
+    ++it;
+  }
+
+  return ret;
+}
+
+RoiImageType::IndexType QmitkTbssView::FindNextPoint(std::vector<RoiImageType::IndexType> pointsVisited, 
+                                                     RoiImageType::IndexType currentPoint, RoiImageType::Pointer roi, bool &ready)
+{  
+
+  RoiImageType::IndexValueType dx[7] = {0,1,1,1,0,-1,-1};
+  RoiImageType::IndexValueType dy[7] = {1,1,0,-1,-1,-1,0};
+
+  RoiImageType::IndexType newPoint;
+ // RoiImageType::IndexValueType i = currentPoint[0];
+  newPoint[0] = currentPoint[0]; //The constant point
+
+  for (int step=0; step<7; step++)
+  {
+    newPoint[1] = currentPoint[1] + dx[step];
+    newPoint[2] = currentPoint[2] + dy[step];
+
+    // Check if point is not yet visited
+    if(!PointVisited(pointsVisited, newPoint))
+    {
+      if(roi->GetPixel(newPoint) == 1)
+        return newPoint;
     }
   }
-  
-  
-  
+
+  // No points yet to be visited found so we are done searching
+  ready = true;
+  return currentPoint;
+
 }
 
 

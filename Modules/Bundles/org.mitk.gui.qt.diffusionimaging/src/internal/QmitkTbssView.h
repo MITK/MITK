@@ -26,12 +26,17 @@ PURPOSE.  See the above copyright notices for more information.
 #include "ui_QmitkTbssViewControls.h"
 
 #include "mitkDiffusionImage.h"
+#include <itkImage.h>
 
 #include <berryIPartListener.h>
 #include <berryISelectionListener.h>
 #include <berryIStructuredSelection.h>
 
+
+
 typedef short DiffusionPixelType;
+typedef itk::Image<char, 3> RoiImageType;
+typedef itk::Image<float, 4> AllSkeletonType;
 
 struct TrSelListener;
 
@@ -46,6 +51,8 @@ struct TrSelListener;
  */
 class QmitkTbssView : public QObject, public QmitkFunctionality
 {
+
+ 
 
   friend struct TbSelListener;
 
@@ -99,6 +106,12 @@ protected:
   mitk::DataNode::Pointer m_SkeletonNode;
   mitk::DataNode::Pointer m_RoiNode;
 
+  std::vector<RoiImageType::IndexType> SortPoints(RoiImageType::Pointer roi);
+  bool PointVisited(std::vector<RoiImageType::IndexType> points, RoiImageType::IndexType point);
+  
+  // Modifies the current point by reference and returns true if no more points need to be visited
+  RoiImageType::IndexType FindNextPoint(std::vector<RoiImageType::IndexType> pointsVisited, 
+    RoiImageType::IndexType currentPoint, RoiImageType::Pointer roi, bool &ready);
   
 
 };

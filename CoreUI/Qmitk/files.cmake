@@ -14,6 +14,8 @@ QmitkLineEditLevelWindowWidget.cpp
 QmitkMemoryUsageIndicatorView.cpp
 QmitkNodeDescriptor.cpp
 QmitkNodeDescriptorManager.cpp
+QmitkOverlay.cpp
+QmitkOverlayController.cpp
 QmitkRenderWindowMenu.cpp
 QmitkPropertiesTableEditor.cpp
 QmitkPropertiesTableModel.cpp
@@ -24,6 +26,7 @@ QmitkRenderingManagerFactory.cpp
 QmitkRenderWindow.cpp
 QmitkSliderLevelWindowWidget.cpp
 QmitkStdMultiWidget.cpp
+QmitkTextOverlay.cpp
 )
 
 SET(MOC_H_FILES
@@ -37,6 +40,8 @@ QmitkLineEditLevelWindowWidget.h
 QmitkMemoryUsageIndicatorView.h
 QmitkNodeDescriptor.h
 QmitkNodeDescriptorManager.h
+QmitkOverlay.h
+QmitkOverlayController.h
 QmitkRenderWindowMenu.h
 QmitkPropertiesTableEditor.h
 QmitkPropertyDelegate.h
@@ -44,6 +49,7 @@ QmitkRenderingManager.h
 QmitkRenderWindow.h
 QmitkSliderLevelWindowWidget.h
 QmitkStdMultiWidget.h
+QmitkTextOverlay.h
 )
 SET(UI_FILES
 QmitkLevelWindowPresetDefinition.ui

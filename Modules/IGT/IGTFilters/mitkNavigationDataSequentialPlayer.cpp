@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <mitkTimeStamp.h>
 #include <fstream>
+#include <sstream>
 
 mitk::NavigationDataSequentialPlayer::NavigationDataSequentialPlayer()
   : m_Doc(new TiXmlDocument)
@@ -75,7 +76,9 @@ void mitk::NavigationDataSequentialPlayer::
   if(!m_Doc->LoadFile(m_FileName))
   {
     this->SetNumberOfOutputs(0);
-    throw std::invalid_argument("File could not be loaded");
+    std::ostringstream s;
+    s << "File " << _FileName << " could not be loaded";
+    throw std::invalid_argument(s.str());
   }
   else
     this->ReinitXML();

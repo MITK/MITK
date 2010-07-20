@@ -79,14 +79,6 @@ public:
   void RemoveOverlay( QmitkOverlay* );
 
   /**
-  * \brief adjusts the position of all overlays to the position of the RenderWindow
-  *
-  * This method updates the position of all Widgets according to the position of the RenderWindow 
-  * and the extend of the overlays.
-  */
-  void AdjustOverlayPosition();
-
-  /**
   * \brief setting the visibility of all overlays
   */
   void SetOverlayVisibility( bool visible );
@@ -100,6 +92,17 @@ public:
   * \brief setter for the RenderWindow-specific PropertyList
   */
   void SetPropertyList( mitk::PropertyList* );
+
+
+public slots :
+    /**
+    * \brief adjusts the position of all overlays to the position of the RenderWindow
+    *
+    * This method updates the position of all Widgets according to the position of the RenderWindow 
+    * and the extend of the overlays.
+    */
+    void AdjustOverlayPosition();
+
 
 protected:
 

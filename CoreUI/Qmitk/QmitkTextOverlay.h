@@ -21,6 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 // MITK-Stuff
 #include "mitkCommon.h"
+#include "mitkPropertyList.h"
 #include "QmitkOverlay.h"
 
 #include <QLabel>
@@ -96,9 +97,15 @@ PURPOSE.  See the above copyright notices for more information.
     * The values of these properties are then attributed to the label using QFont and QPalette.
     */ 
     void GetTextProperties( mitk::PropertyList::Pointer );
-    
+   
+    void SetupCallback( mitk::BaseProperty::Pointer prop );
+   
+    void SetText();
+
     /** \brief QLabel internally representing the TextOverlay */
-    QLabel* m_Widget;    
+    QLabel* m_Widget;  
+
+    mitk::PropertyList::Pointer m_PropertyList;
   };
 
 

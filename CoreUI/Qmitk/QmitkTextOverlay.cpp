@@ -21,6 +21,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkColorProperty.h"
 #include "mitkPropertyList.h"
 
+#include <itkCommand.h>
+
 #include <QLayout>
 
 
@@ -28,6 +30,7 @@ QmitkTextOverlay::QmitkTextOverlay( const char* id ):
 QmitkOverlay(id), m_Widget( NULL )
 {
   m_Widget = new QLabel();
+  m_Widget->setStyleSheet("");
 }
 
 QmitkTextOverlay::~QmitkTextOverlay()
@@ -40,10 +43,29 @@ void QmitkTextOverlay::GenerateData( mitk::PropertyList::Pointer pl )
   if ( pl.IsNull() )
     return;
 
-  this->GetTextProperties( pl );
+  m_PropertyList = pl;
 
+  if ( m_PropertyList.IsNotNull() )
+  {
+    this->SetupCallback( m_PropertyList->GetProperty( m_Id ) );
+
+    this->GetTextProperties( pl );
+    this->SetText();
+  }
+  else
+  {
+    MITK_ERROR << "invalid propList";
+  }
+
+}
+
+void QmitkTextOverlay::SetText()
+{
   std::string text = "";
-  pl->GetStringProperty( m_Id, text );
+  if ( m_PropertyList.IsNull() || !m_PropertyList->GetStringProperty( m_Id, text ) )
+  {
+    MITK_WARN << "Property " << m_Id << " could not be found";
+  }
   m_Widget->setText( text.c_str() );
 }
 
@@ -62,7 +84,10 @@ void QmitkTextOverlay::GetTextProperties( mitk::PropertyList::Pointer pl )
     dynamic_cast<mitk::ColorProperty*>( propertyList->GetProperty( "overlay.color" ) );
 
   if ( colorProp.IsNull() )
-    colorProp = mitk::ColorProperty::New(0,0,0);
+  {
+    MITK_ERROR << "creating new colorProperty";
+    colorProp = mitk::ColorProperty::New( 127.0, 196.0, 232.0 );
+  }
 
   mitk::Color color = colorProp->GetColor();
   palette.setColor( QPalette::Foreground, QColor( color[0],color[1],color[2],255 ) );
@@ -86,7 +111,6 @@ void QmitkTextOverlay::GetTextProperties( mitk::PropertyList::Pointer pl )
   int fontSize = 0;
   if ( !propertyList->GetIntProperty( "overlay.fontSize", fontSize ) )
   {
-    MITK_INFO << "using default fontSize";
     fontSize = 16;
   } 
   font.setPointSize( fontSize );
@@ -114,4 +138,20 @@ QLabel* QmitkTextOverlay::GetWidget()
   return m_Widget;
 }
 
+
+void QmitkTextOverlay::SetupCallback( mitk::BaseProperty::Pointer prop )
+{
+  if ( prop.IsNotNull() )
+  {
+    typedef itk::SimpleMemberCommand< QmitkTextOverlay > MemberCommandType;
+    MemberCommandType::Pointer propModifiedCommand;
+    propModifiedCommand = MemberCommandType::New();
+    propModifiedCommand->SetCallbackFunction( this, &QmitkTextOverlay::SetText );
+    prop->AddObserver( itk::ModifiedEvent(), propModifiedCommand );
+  }
+  else
+  {
+    MITK_ERROR << "invalid property";
+  }
+}
 

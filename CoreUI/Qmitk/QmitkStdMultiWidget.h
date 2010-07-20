@@ -151,6 +151,8 @@ public slots:
 
   void mousePressEvent(QMouseEvent * e);
 
+  void moveEvent( QMoveEvent* e );
+
   void EnsureDisplayContainsPoint(
     mitk::DisplayGeometry* displayGeometry, const mitk::Point3D& p);
 
@@ -210,7 +212,7 @@ signals:
   void WidgetPlaneModeSwivel(bool);
   void WidgetPlaneModeChange(int);
   void WidgetNotifyNewCrossHairMode(int);
- 
+
 public:
 
   /** Define RenderWindow (public)*/ 

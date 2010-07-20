@@ -22,9 +22,15 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkSmartPointerForwardReference.txx>
 #include <mitkDataNodeFactory.h>
 
+#include <vtkImageData.h>
+
+#include <mitkTestingMacros.h>
+
 
 int mitkImageTest(int /*argc*/, char* /*argv*/[])
 {
+  MITK_TEST_BEGIN(mitkImageTest);
+
   //Create Image out of nowhere
   mitk::Image::Pointer imgMem;
   mitk::PixelType pt(typeid(int));
@@ -346,12 +352,54 @@ int mitkImageTest(int /*argc*/, char* /*argv*/[])
     return EXIT_FAILURE;
   }
   std::cout<<"[PASSED]"<<std::endl;
+
+  //-----------------
+  MITK_TEST_OUTPUT(<< "Testing initialization via vtkImageData");
+  MITK_TEST_OUTPUT(<< " Setting up vtkImageData");
+  vtkImageData* vtkimage = vtkImageData::New();
+  vtkimage->Initialize();
+  vtkimage->SetDimensions( 2, 3, 4);
+  double vtkorigin[] =  {-350,-358.203, -1363.5};
+  vtkimage->SetOrigin(vtkorigin);
+  mitk::Point3D vtkoriginAsMitkPoint;
+  mitk::vtk2itk(vtkorigin, vtkoriginAsMitkPoint);
+  double vtkspacing[] =  {1.367, 1.367, 2};
+  vtkimage->SetSpacing(vtkspacing);
+  vtkimage->SetScalarType( VTK_SHORT );
+  vtkimage->AllocateScalars();
+  std::cout<<"[PASSED]"<<std::endl;
   
+  MITK_TEST_OUTPUT(<< " Testing mitk::Image::Initialize(vtkImageData*, ...)");
+  mitk::Image::Pointer mitkByVtkImage = mitk::Image::New();
+  mitkByVtkImage ->Initialize(vtkimage);
+  MITK_TEST_CONDITION_REQUIRED(mitkByVtkImage->IsInitialized(), "");
+
+  MITK_TEST_OUTPUT(<< " vtkimage->Delete");
+  vtkimage->Delete();
+  std::cout<<"[PASSED]"<<std::endl;
+
+  MITK_TEST_OUTPUT(<< " Testing whether spacing has been correctly initialized from vtkImageData");
+  mitk::Vector3D spacing2 = mitkByVtkImage->GetGeometry()->GetSpacing();
+  mitk::Vector3D vtkspacingAsMitkVector;
+  mitk::vtk2itk(vtkspacing, vtkspacingAsMitkVector);
+  MITK_TEST_CONDITION_REQUIRED(mitk::Equal(spacing2,vtkspacingAsMitkVector), "");
+
+  MITK_TEST_OUTPUT(<< " Testing whether GetSlicedGeometry(0)->GetOrigin() has been correctly initialized from vtkImageData");
+  mitk::Point3D origin2 = mitkByVtkImage->GetSlicedGeometry(0)->GetOrigin();
+  MITK_TEST_CONDITION_REQUIRED(mitk::Equal(origin2,vtkoriginAsMitkPoint), "");
+
+  MITK_TEST_OUTPUT(<< " Testing whether GetGeometry()->GetOrigin() has been correctly initialized from vtkImageData");
+  origin2 = mitkByVtkImage->GetGeometry()->GetOrigin();
+  MITK_TEST_CONDITION_REQUIRED(mitk::Equal(origin2,vtkoriginAsMitkPoint), "");
+
+  MITK_TEST_OUTPUT(<< " Testing whether GetTimeSlicedGeometry()->GetOrigin() has been correctly initialized from vtkImageData");
+  origin2 = mitkByVtkImage->GetTimeSlicedGeometry()->GetOrigin();
+  MITK_TEST_CONDITION_REQUIRED(mitk::Equal(origin2,vtkoriginAsMitkPoint), "");
+
   // TODO test the following initializers on channel-incorporation
   //  void mitk::Image::Initialize(const mitk::PixelType& type, unsigned int dimension, unsigned int *dimensions, unsigned int channels)
   //  void mitk::Image::Initialize(const mitk::PixelType& type, int sDim, const mitk::Geometry2D& geometry2d, bool flipped, unsigned int channels, int tDim )
   //  void mitk::Image::Initialize(const mitk::Image* image) 
-  //  void mitk::Image::Initialize(vtkImageData* vtkimagedata, int channels, int tDim, int sDim)
   //  void mitk::Image::Initialize(const mitkIpPicDescriptor* pic, int channels, int tDim, int sDim)
 
   //mitk::Image::Pointer vecImg = mitk::Image::New();
@@ -397,8 +445,8 @@ int mitkImageTest(int /*argc*/, char* /*argv*/[])
     return EXIT_FAILURE;
   }
 
-  std::cout<<"[TEST DONE]"<<std::endl;
-  return EXIT_SUCCESS;
+  MITK_TEST_END();
 
+  return EXIT_SUCCESS;
 }
 

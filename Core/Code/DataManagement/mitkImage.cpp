@@ -931,6 +931,7 @@ void mitk::Image::Initialize(vtkImageData* vtkimagedata, int channels, int tDim,
   planeGeometry->SetOrigin(origin);
 
   // re-initialize SlicedGeometry3D
+  slicedGeometry->SetOrigin(origin);
   slicedGeometry->SetSpacing(spacing);
   GetTimeSlicedGeometry()->InitializeEvenlyTimed(slicedGeometry, m_Dimensions[3]);
 

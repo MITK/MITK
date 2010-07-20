@@ -2,8 +2,8 @@
 
 Program:   Medical Imaging & Interaction Toolkit
 Language:  C++
-Date:      $Date: 2010-05-31 16:47:20 +0200 (Mo, 31 Mai 2010) $
-Version:   $Revision: 23261 $
+Date:      $Date$
+Version:   $Revision$
 
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
@@ -31,6 +31,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkCameraRotationController.h"
 
 #include "QmitkRenderWindowMenu.h"
+#include "QmitkOverlayController.h"
 
 /**
  * \brief MITK implementation of the QVTKWidget
@@ -96,10 +97,20 @@ public:
 
   void FullScreenMode( bool state );
 
+  void SetOverlayController( QmitkOverlayController* );
+
+  QmitkOverlayController* GetOverlayController();
+
 protected:
 
     // overloaded resize handler
     virtual void resizeEvent(QResizeEvent* event);
+
+    // overloaded move handler
+    virtual void moveEvent( QMoveEvent* event );
+
+    // overloaded show handler
+    void showEvent( QShowEvent* event );
 
     // overloaded mouse press handler
     virtual void mousePressEvent(QMouseEvent* event);
@@ -149,6 +160,8 @@ private:
   bool                           m_ResendQtEvents;
 
   QmitkRenderWindowMenu*         m_MenuWidget;
+
+  QmitkOverlayController*        m_OverlayController;
 
   bool                           m_MenuWidgetActivated;
 

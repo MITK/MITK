@@ -33,6 +33,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkRenderingManager.h"
 #include "vtkRenderer.h"
 
+#include "QmitkOverlayController.h"
 #include "QmitkRenderWindowMenu.h"
 
 QmitkRenderWindow::QmitkRenderWindow(QWidget *parent, QString name, mitk::VtkPropRenderer* renderer, mitk::RenderingManager* renderingManager )
@@ -40,6 +41,7 @@ QmitkRenderWindow::QmitkRenderWindow(QWidget *parent, QString name, mitk::VtkPro
 , m_Renderer(renderer)
 , m_ResendQtEvents(true)
 , m_MenuWidget(NULL)
+, m_OverlayController(NULL)
 , m_MenuWidgetActivated(false)
 , m_ProcessWheelEvents(true)
 {
@@ -73,9 +75,12 @@ QmitkRenderWindow::QmitkRenderWindow(QWidget *parent, QString name, mitk::VtkPro
 
   m_InResize = false;  
 
-  //crate Renderwindow MenuBar for split, close Window or set new setting.
+  //create Renderwindow MenuBar for split, close Window or set new setting.
   m_MenuWidget = new QmitkRenderWindowMenu(this,0,m_Renderer);
-  
+
+  // create overlaycontroller for managing various overlays
+  m_OverlayController = new QmitkOverlayController( this );
+
   //create Signal/Slot Connection
   connect( m_MenuWidget, SIGNAL( SignalChangeLayoutDesign(int) ), this, SLOT(OnChangeLayoutDesign(int)) );
   connect( m_MenuWidget, SIGNAL( ResetView() ), this, SIGNAL( ResetView()) );
@@ -279,8 +284,31 @@ void QmitkRenderWindow::resizeEvent(QResizeEvent* event)
     m_Renderer->Resize(event->size().width(), event->size().height());
   }
 
+  // after the resize the overlays need to be positioned
+  m_OverlayController->AdjustOverlayPosition();
+
   m_InResize = false;
 }
+
+
+void QmitkRenderWindow::moveEvent( QMoveEvent* event )
+{
+  QVTKWidget::moveEvent( event );
+
+  // after a move the overlays need to be positioned
+  m_OverlayController->AdjustOverlayPosition();
+}
+
+
+void QmitkRenderWindow::showEvent( QShowEvent* event )
+{
+  QVTKWidget::showEvent( event );
+
+  // this singleshot is necessary to have the overlays positioned correctly after initial show
+  // simple call of AdjustOverlayPosition() is no use here!!
+  QTimer::singleShot(0, this->GetOverlayController() ,SLOT( AdjustOverlayPosition() ) );
+}
+
 
 void QmitkRenderWindow::AdjustRenderWindowMenuVisibility( const QPoint& pos )
 {
@@ -386,3 +414,14 @@ void QmitkRenderWindow::FullScreenMode(bool state)
   if( m_MenuWidget )
     m_MenuWidget->ChangeFullScreenMode( state );
 }  
+
+void QmitkRenderWindow::SetOverlayController( QmitkOverlayController* overlayController)
+{
+  if ( overlayController != NULL )
+    m_OverlayController = overlayController;
+}
+
+QmitkOverlayController* QmitkRenderWindow::GetOverlayController()
+{
+  return m_OverlayController;
+}

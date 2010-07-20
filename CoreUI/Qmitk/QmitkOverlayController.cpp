@@ -154,6 +154,7 @@ void QmitkOverlayController::InitializeWidget( QmitkOverlay::DisplayPosition pos
       break;
     }
   }
+  m_PositionedOverlays[ pos ]->layout()->setSpacing( 0 );
 }
 
 void QmitkOverlayController::AdjustOverlayPosition()
@@ -290,6 +291,7 @@ void QmitkOverlayController::RemoveOverlay( QmitkOverlay* overlay )
     {
       m_AllOverlays.erase( iter );
       overlay->GetWidget()->setParent( NULL );
+      overlay->GetWidget()->hide();
 
       if ( m_PositionedOverlays[ pos ]->layout()->isEmpty() )
       {

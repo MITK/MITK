@@ -49,7 +49,6 @@ QmitkRenderingManager.h
 QmitkRenderWindow.h
 QmitkSliderLevelWindowWidget.h
 QmitkStdMultiWidget.h
-QmitkTextOverlay.h
 )
 SET(UI_FILES
 QmitkLevelWindowPresetDefinition.ui

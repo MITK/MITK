@@ -190,7 +190,7 @@ TabbedStackPresentation::TabbedStackPresentation(
   this->Init(site, newFolder, tabs, dragBehavior);
 }
 
-void TabbedStackPresentation::Init(IStackPresentationSite::Pointer site,
+void TabbedStackPresentation::Init(IStackPresentationSite::Pointer,
             PresentablePartFolder* newFolder, TabOrder* tabs, TabDragHandler* dragBehavior /*, ISystemMenu systemMenu*/)
 {
   //this->systemMenu = systemMenu;

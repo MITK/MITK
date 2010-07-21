@@ -31,8 +31,8 @@ private:
 
 public:
 
-  QtDialog(Shell::Pointer parentShell, const std::string& dialogTitle,
-      void* dialogTitleImage, const std::string& dialogMessage,
+  QtDialog(Shell::Pointer, const std::string& dialogTitle,
+      void* /*dialogTitleImage*/, const std::string& dialogMessage,
       int dialogImageType, const std::vector<std::string>& dialogButtonLabels,
       int defaultIndex)
   {
@@ -69,7 +69,7 @@ public:
   }
 };
 
-bool QtMessageDialogTweaklet::OpenConfirm(Shell::Pointer parent,
+bool QtMessageDialogTweaklet::OpenConfirm(Shell::Pointer,
     const std::string& title, const std::string& message)
 {
   QMessageBox msgBox;
@@ -81,7 +81,7 @@ bool QtMessageDialogTweaklet::OpenConfirm(Shell::Pointer parent,
   return msgBox.exec() == QMessageBox::Ok;
 }
 
-void QtMessageDialogTweaklet::OpenError(Shell::Pointer parent,
+void QtMessageDialogTweaklet::OpenError(Shell::Pointer,
     const std::string& title, const std::string& message)
 {
   QMessageBox msgBox;
@@ -94,7 +94,7 @@ void QtMessageDialogTweaklet::OpenError(Shell::Pointer parent,
   msgBox.exec();
 }
 
-void QtMessageDialogTweaklet::OpenInformation(Shell::Pointer parent,
+void QtMessageDialogTweaklet::OpenInformation(Shell::Pointer,
     const std::string& title, const std::string& message)
 {
   QMessageBox msgBox;
@@ -107,7 +107,7 @@ void QtMessageDialogTweaklet::OpenInformation(Shell::Pointer parent,
   msgBox.exec();
 }
 
-bool QtMessageDialogTweaklet::OpenQuestion(Shell::Pointer parent,
+bool QtMessageDialogTweaklet::OpenQuestion(Shell::Pointer,
     const std::string& title, const std::string& message)
 {
   QMessageBox msgBox;
@@ -120,7 +120,7 @@ bool QtMessageDialogTweaklet::OpenQuestion(Shell::Pointer parent,
   return msgBox.exec() == QMessageBox::Yes;
 }
 
-void QtMessageDialogTweaklet::OpenWarning(Shell::Pointer parent,
+void QtMessageDialogTweaklet::OpenWarning(Shell::Pointer,
     const std::string& title, const std::string& message)
 {
   QMessageBox msgBox;

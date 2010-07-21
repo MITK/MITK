@@ -26,15 +26,15 @@ namespace berry
 class QtMessageDialogTweaklet: public MessageDialogTweaklet
 {
 
-  bool OpenConfirm(Shell::Pointer parent, const std::string& title,
+  bool OpenConfirm(Shell::Pointer, const std::string& title,
       const std::string& message);
-  void OpenError(Shell::Pointer parent, const std::string& title,
+  void OpenError(Shell::Pointer, const std::string& title,
       const std::string& message);
-  void OpenInformation(Shell::Pointer parent, const std::string& title,
+  void OpenInformation(Shell::Pointer, const std::string& title,
       const std::string& message);
-  bool OpenQuestion(Shell::Pointer parent, const std::string& title,
+  bool OpenQuestion(Shell::Pointer, const std::string& title,
       const std::string& message);
-  void OpenWarning(Shell::Pointer parent, const std::string& title,
+  void OpenWarning(Shell::Pointer, const std::string& title,
       const std::string& message);
 
   IDialog::Pointer MessageDialog(Shell::Pointer parentShell,

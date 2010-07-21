@@ -35,7 +35,7 @@ ReplaceDragHandler::ReplaceDragHandler(AbstractTabFolder* folder) :
 
 }
 
-StackDropResult::Pointer ReplaceDragHandler::DragOver(QWidget* currentControl,
+StackDropResult::Pointer ReplaceDragHandler::DragOver(QWidget*,
     const Point& location, int dragStart)
 {
 

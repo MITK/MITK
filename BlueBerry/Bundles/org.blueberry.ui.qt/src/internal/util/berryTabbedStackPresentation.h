@@ -84,7 +84,7 @@ public:
     TabbedStackPresentation(IStackPresentationSite::Pointer site,
             PresentablePartFolder* newFolder, TabOrder* tabs, TabDragHandler* dragBehavior /*, ISystemMenu systemMenu*/);
 
-    void Init(IStackPresentationSite::Pointer site,
+    void Init(IStackPresentationSite::Pointer,
             PresentablePartFolder* newFolder, TabOrder* tabs, TabDragHandler* dragBehavior /*, ISystemMenu systemMenu*/);
     /**
      * Restores a presentation from a previously stored state

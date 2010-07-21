@@ -86,7 +86,7 @@ void CallHistory::PrintTo(std::ostream& out) const
     out << methodList[i] << std::endl;
 }
 
-void CallHistory::TestMethodName(const std::string& methodName) const
+void CallHistory::TestMethodName(const std::string&) const
 throw(Poco::InvalidArgumentException)
 {
 //  Method[] methods = classType.getMethods();

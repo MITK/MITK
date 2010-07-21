@@ -52,7 +52,7 @@ void NativeTabFolder::DragStarted(const QPoint& location)
   this->HandleDragStarted(location);
 }
 
-void NativeTabFolder::ViewFormDestroyed(QObject* obj)
+void NativeTabFolder::ViewFormDestroyed(QObject*)
 {
   viewForm = 0;
   content = 0;

@@ -73,8 +73,8 @@ public:
     return IPerspectiveListener::Events::PART_CHANGED;
   }
 
-  void PerspectiveChanged(IWorkbenchPage::Pointer page,
-      IPerspectiveDescriptor::Pointer perspective,
+  void PerspectiveChanged(IWorkbenchPage::Pointer,
+      IPerspectiveDescriptor::Pointer,
       IWorkbenchPartReference::Pointer partRef, const std::string& changeId)
   {
     if (!partRef)

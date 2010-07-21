@@ -127,7 +127,7 @@ private:
      * Throws an exception if the method name is invalid
      * for the given target class.
      */
-    void TestMethodName(const std::string& methodName) const throw(Poco::InvalidArgumentException);
+    void TestMethodName(const std::string&) const throw(Poco::InvalidArgumentException);
 
 };
 

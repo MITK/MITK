@@ -67,7 +67,7 @@ public:
   /**
    * @see ISelectionProvider#setSelection(ISelection)
    */
-  void SetSelection(ISelection::Pointer selection);
+  void SetSelection(ISelection::Pointer /*selection*/);
 };
 
 }

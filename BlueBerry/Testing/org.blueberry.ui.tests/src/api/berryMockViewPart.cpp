@@ -32,7 +32,7 @@ IViewSite::Pointer MockViewPart::GetViewSite()
   return GetSite().Cast<IViewSite> ();
 }
 
-void MockViewPart::Init(IViewSite::Pointer site, IMemento::Pointer memento)
+void MockViewPart::Init(IViewSite::Pointer site, IMemento::Pointer /*memento*/)
     throw (PartInitException)
 {
   SetSite(site);
@@ -96,7 +96,7 @@ void MockViewPart::ToolbarContributionItemDisposed()
   callTrace->Add("ToolbarContributionItemDisposed");
 }
 
-void MockViewPart::SaveState(IMemento::Pointer memento)
+void MockViewPart::SaveState(IMemento::Pointer /*memento*/)
 {
   // do nothing
 }

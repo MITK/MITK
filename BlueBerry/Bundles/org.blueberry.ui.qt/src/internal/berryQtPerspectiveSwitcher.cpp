@@ -37,7 +37,7 @@ struct QtPerspectiveSwitcherListener : public IPerspectiveListener
     return Events::ACTIVATED;
   }
 
-  void PerspectiveActivated(IWorkbenchPage::Pointer page,
+  void PerspectiveActivated(IWorkbenchPage::Pointer /*page*/,
           IPerspectiveDescriptor::Pointer perspective)
   {
     QAction* action = switcher->perspIdToActionMap[QString::fromStdString(perspective->GetId())];

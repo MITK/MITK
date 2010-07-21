@@ -53,9 +53,9 @@ protected:
 
 protected slots:
 
-  void StyleChanged(int index);
-  void AddPathClicked(bool checked);
-  void RemovePathClicked(bool checked);
+  void StyleChanged(int /*index*/);
+  void AddPathClicked(bool /*checked*/);
+  void RemovePathClicked(bool /*checked*/);
   void EditPathClicked(bool checked);
 
   void UpdatePathListButtons();

@@ -80,13 +80,13 @@ void QtStylePreferencePage::AddPath(const QString& path, bool updateCombo)
     FillStyleCombo(oldStyle);
 }
 
-void QtStylePreferencePage::StyleChanged(int index)
+void QtStylePreferencePage::StyleChanged(int /*index*/)
 {
   QString fileName = controls.m_StylesCombo->itemData(controls.m_StylesCombo->currentIndex()).toString();
   styleManager->SetStyle(fileName);
 }
 
-void QtStylePreferencePage::AddPathClicked(bool checked)
+void QtStylePreferencePage::AddPathClicked(bool /*checked*/)
 {
   QListWidgetItem* item = controls.m_PathList->currentItem();
   QString initialDir;
@@ -96,7 +96,7 @@ void QtStylePreferencePage::AddPathClicked(bool checked)
   if (!dir.isEmpty()) this->AddPath(dir, true);
 }
 
-void QtStylePreferencePage::RemovePathClicked(bool checked)
+void QtStylePreferencePage::RemovePathClicked(bool /*checked*/)
 {
   QList<QListWidgetItem*> selection = controls.m_PathList->selectedItems();
   QListIterator<QListWidgetItem*> it(selection);

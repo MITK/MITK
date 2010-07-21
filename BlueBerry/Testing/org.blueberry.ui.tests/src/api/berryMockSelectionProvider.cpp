@@ -97,7 +97,7 @@ void MockSelectionProvider::RemoveSelectionChangedListener(
   listeners.RemoveListener(listener);
 }
 
-void MockSelectionProvider::SetSelection(ISelection::Pointer selection)
+void MockSelectionProvider::SetSelection(ISelection::Pointer /*selection*/)
 {
 }
 

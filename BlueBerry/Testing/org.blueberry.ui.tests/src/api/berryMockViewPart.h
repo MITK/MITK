@@ -49,7 +49,7 @@ public:
   /**
    * @see IViewPart#Init(IViewSite, IMemento)
    */
-  void Init(IViewSite::Pointer site, IMemento::Pointer memento)
+  void Init(IViewSite::Pointer site, IMemento::Pointer /*memento*/)
       throw (PartInitException);
 
   /* (non-Javadoc)
@@ -69,7 +69,7 @@ public:
   /**
    * @see IViewPart#saveState(IMemento)
    */
-  void SaveState(IMemento::Pointer memento);
+  void SaveState(IMemento::Pointer /*memento*/);
 
   /**
    * @see IWorkbenchPart#GetSite()

@@ -54,7 +54,7 @@ public:
     model->ObjectDestroyed(obj);
   }
 
-  void ObjectTracingChanged(unsigned int traceId, bool enabled = true,
+  void ObjectTracingChanged(unsigned int /*traceId*/, bool /*enabled = true*/,
       const Object*  /*obj*/ = 0)
   {
   }

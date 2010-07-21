@@ -70,7 +70,7 @@ public:
   ISelectionProvider::Pointer GetSelectionProvider();
 
   void SetInitializationData(IConfigurationElement::Pointer config,
-      const std::string& propertyName, Object::Pointer data);
+      const std::string& /*propertyName*/, Object::Pointer data);
 
   // This isn't actually part of the part API, but we call this method from a dispose listener
   // in order to mark the point in time at which the widgets are disposed

@@ -73,7 +73,7 @@ ISelectionProvider::Pointer MockWorkbenchPart::GetSelectionProvider()
 }
 
 void MockWorkbenchPart::SetInitializationData(
-    IConfigurationElement::Pointer config, const std::string& propertyName,
+    IConfigurationElement::Pointer config, const std::string& /*propertyName*/,
     Object::Pointer data)
 {
 

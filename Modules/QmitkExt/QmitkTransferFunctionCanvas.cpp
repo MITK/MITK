@@ -35,17 +35,23 @@ void mitk::SimpleHistogram::ComputeFromImage( Image::Pointer source )
     last=1;
   }
   
-  //MITK_INFO << "SimpleHistogram: ComputeFromImage started";
-  
-  if(source->GetDimension() != 3)
-  {
-    MITK_WARN << "SimpleHistogram only works on 3D-Images";
-    return;
-  }
+   {
+    int typInt=0;
+    {
+      const std::type_info* typ=source->GetPixelType().GetTypeId();
+      if     (*typ == typeid(unsigned char )) typInt=0;
+      else if(*typ == typeid(signed char   )) typInt=1;
+      else if(*typ == typeid(unsigned short)) typInt=2;
+      else if(*typ == typeid(signed short  )) typInt=3;
+      else
+      {
+        MITK_WARN << "SimpleHistogram currently only supports un/signed char/short";
+        return;
+      }
+    }
 
-  // signed short histogram
-  {
-    first=-32768;  last=32767;
+
+    first=-32768;  last=65535; // support at least full signed and unsigned short range
 
     if(histogram)
       delete histogram;
@@ -56,17 +62,26 @@ void mitk::SimpleHistogram::ComputeFromImage( Image::Pointer source )
     max = first - 1;
     min = last + 1;
     
-    // converting mitk image -> itk image
-    CTImage::Pointer work = CTImage::New();
-    CastToItkImage( source, work );
-    CTIteratorIndexType workIt( work, work->GetRequestedRegion() );
-    
-    workIt.GoToBegin();
+    unsigned int num=1;
+    for(int r=0;r<source->GetDimension();r++)
+      num*=source->GetDimension(r);
 
-    while ( ! workIt.IsAtEnd() )
+   // MITK_INFO << "building histogramm of integer image: 0=" << source->GetDimension(0) << " 1=" << source->GetDimension(1) << " 2=" << source->GetDimension(2) << " 3=" <<  source->GetDimension(3);
+
+    void *src=source->GetData();
+
+    do
     {
-      int value = workIt.Get();
-
+      int value;
+      
+      switch(typInt)
+      {
+        case 0: { unsigned char  *t=(unsigned char *)src; value=*t++; src=(void*)t; } break;
+        case 1: {   signed char  *t=(  signed char *)src; value=*t++; src=(void*)t; } break;
+        case 2: { unsigned short *t=(unsigned short*)src; value=*t++; src=(void*)t; } break;
+        case 3: {   signed short *t=(  signed short*)src; value=*t++; src=(void*)t; } break;
+      }
+      
       if(value >= first && value <= last)
       {
         if(value < min) min = value;
@@ -74,9 +89,10 @@ void mitk::SimpleHistogram::ComputeFromImage( Image::Pointer source )
         CountType tmp = ++histogram[value-first];
         if(tmp > highest) highest = tmp;
       }
-      
-      ++workIt;
     }
+    while(--num);
+
+    //MITK_INFO << "histogramm computed: min=" << min << " max=" << max << " highestBin=" << highest << " samples=" << num;
   }
   
   invLogHighest = 1.0/log(double(highest));

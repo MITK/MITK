@@ -386,13 +386,13 @@ private:
    * \brief Compares plane with another plane: \a true if IsOnPlane
    * (bounding-box \em not considered)
    */
-  virtual bool operator==( const PlaneGeometry *plane ) const { return false; };
+  virtual bool operator==( const PlaneGeometry * ) const { return false; };
 
   /**
    * \brief Compares plane with another plane: \a false if IsOnPlane
    * (bounding-box \em not considered)
    */
-  virtual bool operator!=( const PlaneGeometry *plane ) const { return false; };
+  virtual bool operator!=( const PlaneGeometry * ) const { return false; };
 
 };
 

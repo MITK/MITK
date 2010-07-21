@@ -315,6 +315,7 @@ void mitk::CoreObjectFactory::CreateFileExtensionsMap()
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.gdcm", "Sets of 2D slices"));
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.ima", "Sets of 2D slices"));
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.tiff", "Sets of 2D slices"));
+  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.tif", "Sets of 2D slices"));
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.stl", "Surface files"));
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.vtk", "Surface files"));
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.vtp", "Surface files"));
@@ -328,7 +329,9 @@ void mitk::CoreObjectFactory::CreateFileExtensionsMap()
   m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.hdr", ""));
   m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.png", ""));
   m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.tiff", ""));
+  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.tif", ""));
   m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.jpg", ""));
+  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.jpeg", ""));
   m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.bmp", ""));
   m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.dcm", ""));
   m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.gipl", ""));

@@ -80,7 +80,7 @@ void QCTabBar::mouseMoveEvent(QMouseEvent* event)
 
 AbstractTabItem* QCTabBar::getTab(int index) const
 {
-  if (index < 0 || index >= tabItemList.size()) return 0;
+  if (index < 0 || ((unsigned int) index) >= tabItemList.size()) return 0;
   return tabItemList[index];
 }
 

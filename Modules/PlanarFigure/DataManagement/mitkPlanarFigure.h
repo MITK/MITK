@@ -229,7 +229,7 @@ protected:
   * Sub-classes can define spatial constraints to certain control points by
   * overwriting this method and returning a constrained point. By default,
   * the points are constrained by the image bounds. */
-  virtual Point2D ApplyControlPointConstraints( unsigned int index, const Point2D& point );
+  virtual Point2D ApplyControlPointConstraints( unsigned int /*index*/, const Point2D& point );
 
   /** Adds feature (e.g., circumference, radius, angle, ...) to feature vector
    * of a planar figure object and returns integer ID for the feature element.

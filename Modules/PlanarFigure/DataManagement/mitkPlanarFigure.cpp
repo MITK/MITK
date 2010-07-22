@@ -336,7 +336,7 @@ void mitk::PlanarFigure::ResetNumberOfControlPoints( int numberOfControlPoints )
 }
 
 
-mitk::Point2D mitk::PlanarFigure::ApplyControlPointConstraints( unsigned int index, const Point2D& point )
+mitk::Point2D mitk::PlanarFigure::ApplyControlPointConstraints( unsigned int /*index*/, const Point2D& point )
 {
   if ( m_Geometry2D ==  NULL )
   {

@@ -34,7 +34,7 @@ public:
     /// vtk event function
     ///
     static void OnObjectModified(vtkObject *, unsigned long eid
-                                     , void* clientdata, void *calldata);
+                                     , void* clientdata, void */*calldata*/);
 protected:
     std::set<vtkObjectObserver*> m_vtkObjectObservers;
     std::set<const vtkObject*> m_Objects;

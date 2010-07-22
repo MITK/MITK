@@ -66,10 +66,10 @@ class QmitkExt_EXPORT QmitkPointListViewWidget : public QListWidget
     int GetTimeStep() const;
 
     /// observer for point set "modified" events
-    void OnPointSetChanged( const itk::Object* obj );
+    void OnPointSetChanged( const itk::Object* /*obj*/ );
     
     /// observer for point set "delete" events
-    void OnPointSetDeleted( const itk::Object* obj );
+    void OnPointSetDeleted( const itk::Object* /*obj*/ );
 
   protected slots:
     ///
@@ -78,7 +78,7 @@ class QmitkExt_EXPORT QmitkPointListViewWidget : public QListWidget
     void OnItemDoubleClicked( QListWidgetItem * item );
 
     /// called when the selection of the view widget changes
-    void OnCurrentRowChanged( int currentRow );
+    void OnCurrentRowChanged( int /*currentRow*/ );
     
   protected:
     void keyPressEvent( QKeyEvent * e ); ///< react to F2, F3 and DEL keys    

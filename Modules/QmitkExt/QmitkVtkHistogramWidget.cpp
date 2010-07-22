@@ -40,7 +40,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 //#include <iostream>
 
-QmitkVtkHistogramWidget::QmitkVtkHistogramWidget( QWidget *parent )
+QmitkVtkHistogramWidget::QmitkVtkHistogramWidget( QWidget */*parent*/ )
 : m_HistogramMode( HISTOGRAM_MODE_ENTIREIMAGE )
 {
   //QGroupBox *hgroupbox = new QGroupBox( "", this );

@@ -106,13 +106,13 @@ QmitkStdMultiWidget* QmitkPointListViewWidget::GetMultiWidget() const
   return m_MultiWidget;
 }
 
-void QmitkPointListViewWidget::OnPointSetChanged( const itk::Object* obj )
+void QmitkPointListViewWidget::OnPointSetChanged( const itk::Object* /*obj*/ )
 {
   if(!m_SelfCall)
     this->Update();
 }
 
-void QmitkPointListViewWidget::OnPointSetDeleted( const itk::Object* obj )
+void QmitkPointListViewWidget::OnPointSetDeleted( const itk::Object* /*obj*/ )
 {
   this->SetPointSet(0);
   this->Update();
@@ -125,7 +125,7 @@ void QmitkPointListViewWidget::OnItemDoubleClicked(QListWidgetItem * item)
   _EditPointDialog.exec();
 }
 
-void QmitkPointListViewWidget::OnCurrentRowChanged( int currentRow )
+void QmitkPointListViewWidget::OnCurrentRowChanged( int /*currentRow*/ )
 {
   this->Update(true);
 }

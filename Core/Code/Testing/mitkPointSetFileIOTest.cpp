@@ -64,7 +64,7 @@ public:
   }
 
   void PointSetCompare(mitk::PointSet::Pointer pointSet2,
-      mitk::PointSet::Pointer pointSet1, bool& identical)
+      mitk::PointSet::Pointer pointSet1, bool& /*identical*/)
   {
 
     MITK_TEST_CONDITION(pointSet1->GetSize() == pointSet2->GetSize(), "Testing if PointSet size is correct" );

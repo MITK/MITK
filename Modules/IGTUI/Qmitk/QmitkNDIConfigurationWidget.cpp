@@ -419,7 +419,7 @@ void QmitkNDIConfigurationWidget::SetTagProperty( mitk::BaseProperty::Pointer pr
 }
 
 
-void QmitkNDIConfigurationWidget::UpdateTrackerFromToolTable(const QModelIndex & topLeft, const QModelIndex & bottomRight)
+void QmitkNDIConfigurationWidget::UpdateTrackerFromToolTable(const QModelIndex & topLeft, const QModelIndex & /*bottomRight*/)
 {
   //Colums ID doesn't have to be processed.
   if (topLeft.column()<1)

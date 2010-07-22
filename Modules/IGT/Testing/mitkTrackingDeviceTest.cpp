@@ -37,7 +37,7 @@ public:
   virtual bool OpenConnection(){return true;};
   virtual bool CloseConnection(){return true;};
   virtual bool StartTracking(){this->SetState(Tracking); this->m_TrackingFinishedMutex->Unlock(); return true;};
-  virtual mitk::TrackingTool* GetTool(unsigned int toolNumber) const {return NULL;};
+  virtual mitk::TrackingTool* GetTool(unsigned int /*toolNumber*/) const {return NULL;};
   virtual unsigned int GetToolCount() const {return 1;};
 };
 

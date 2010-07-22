@@ -94,7 +94,7 @@ public:
   /**
   * \brief abstract method to internally setup the overlay
   */
-  virtual void GenerateData( mitk::PropertyList::Pointer pl ) {};
+  virtual void GenerateData( mitk::PropertyList::Pointer /*pl*/ ) {};
 
   /**
   * \brief returns the internally handled QWidget

@@ -80,7 +80,7 @@ public:
 
   /*! Move menu widget to correct position (right upper corner). E.g. it is necessary when the full-screen mode
   is activated.*/
-  void MoveWidgetToCorrectPos(float opacity);
+  void MoveWidgetToCorrectPos(float /*opacity*/);
 
   void ChangeFullScreenMode( bool state );
 
@@ -131,8 +131,8 @@ public slots:
 
 protected slots:  
 
-  void enterEvent( QEvent *e );
-  void leaveEvent( QEvent *e );
+  void enterEvent( QEvent */*e*/ );
+  void leaveEvent( QEvent */*e*/ );
 
   void OnTSNumChanged(int);
 

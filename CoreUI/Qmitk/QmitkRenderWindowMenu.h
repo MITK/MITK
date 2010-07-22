@@ -131,8 +131,8 @@ public slots:
 
 protected slots:  
 
-  void enterEvent( QEvent */*e*/ );
-  void leaveEvent( QEvent */*e*/ );
+  void enterEvent( QEvent* /*e*/ );
+  void leaveEvent( QEvent* /*e*/ );
 
   void OnTSNumChanged(int);
 

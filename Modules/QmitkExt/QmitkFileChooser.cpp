@@ -84,7 +84,7 @@ std::string QmitkFileChooser::GetFile() const
   return m_File->text().toStdString();
 }
 
-void QmitkFileChooser::OnSelectFileClicked( bool checked/*=false */ )
+void QmitkFileChooser::OnSelectFileClicked( bool /*checked*/ )
 {
 
   QString filename;

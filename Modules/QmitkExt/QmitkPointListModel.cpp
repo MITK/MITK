@@ -32,7 +32,7 @@ m_TimeStep(t)
   ObserveNewPointset( pointSet );
 }
 
-Qt::ItemFlags QmitkPointListModel::flags(const QModelIndex& index) const
+Qt::ItemFlags QmitkPointListModel::flags(const QModelIndex& /*index*/) const
 {
   // no editing so far, return default (enabled, selectable)
   return Qt::ItemIsSelectable | Qt::ItemIsEnabled;

@@ -189,7 +189,7 @@ void mitk::UnstructuredGridVtkMapper3D::ResetMapper( BaseRenderer* /*renderer*/ 
 }
 
 
-void mitk::UnstructuredGridVtkMapper3D::ApplyProperties(vtkActor* actor, mitk::BaseRenderer* renderer)
+void mitk::UnstructuredGridVtkMapper3D::ApplyProperties(vtkActor* /*actor*/, mitk::BaseRenderer* renderer)
 {
   mitk::DataNode::Pointer node = this->GetDataNode();
   Superclass::ApplyProperties(m_Actor, renderer);

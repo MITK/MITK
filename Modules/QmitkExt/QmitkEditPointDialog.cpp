@@ -75,7 +75,7 @@ void QmitkEditPointDialog::SetPoint( mitk::PointSet* _PointSet, mitk::PointSet::
 }
 
 
-void QmitkEditPointDialog::OnOkButtonClicked( bool triggered )
+void QmitkEditPointDialog::OnOkButtonClicked( bool /*triggered*/ )
 {  
   if(d->m_PointSet == 0)
   {

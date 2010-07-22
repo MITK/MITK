@@ -38,7 +38,7 @@ class QmitkExt_EXPORT QmitkEditPointDialog : public QDialog
 
     void SetPoint( mitk::PointSet* _PointSet, mitk::PointSet::PointIdentifier _PointId, int timestep=0 );
   protected slots:
-    void OnOkButtonClicked( bool triggered = false );
+    void OnOkButtonClicked( bool /*triggered = false*/ );
   protected:
     QmitkEditPointDialogData* d;
 };

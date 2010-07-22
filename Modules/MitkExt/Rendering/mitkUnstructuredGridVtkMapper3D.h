@@ -59,7 +59,7 @@ public:
 
   static void SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer = NULL, bool overwrite = false);
   
-  void ApplyProperties(vtkActor* actor, mitk::BaseRenderer* renderer);
+  void ApplyProperties(vtkActor* /*actor*/, mitk::BaseRenderer* renderer);
 
 protected:
   

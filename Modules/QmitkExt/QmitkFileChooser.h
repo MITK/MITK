@@ -49,7 +49,7 @@ class QmitkExt_EXPORT QmitkFileChooser : public QWidget
     virtual std::string GetFile() const;
 
   protected slots:
-    virtual void OnSelectFileClicked ( bool checked=false );
+    virtual void OnSelectFileClicked ( bool /*checked=false*/ );
 
   protected:
     bool m_SelectDir;

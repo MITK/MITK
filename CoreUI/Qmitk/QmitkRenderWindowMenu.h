@@ -80,7 +80,12 @@ public:
 
   /*! Move menu widget to correct position (right upper corner). E.g. it is necessary when the full-screen mode
   is activated.*/
+#ifdef QMITK_USE_EXTERNAL_RENDERWINDOW_MENU
+  void MoveWidgetToCorrectPos(float opacity);
+#else
   void MoveWidgetToCorrectPos(float /*opacity*/);
+#endif
+
 
   void ChangeFullScreenMode( bool state );
 

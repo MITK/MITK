@@ -55,7 +55,7 @@ void QmitkFunctionalityCoordinator::PartActivated( berry::IWorkbenchPartReferenc
   this->ActivateStandaloneFunctionality(_QmitkFunctionality.GetPointer());
 }
 
-void QmitkFunctionalityCoordinator::PartDeactivated( berry::IWorkbenchPartReference::Pointer partRef )
+void QmitkFunctionalityCoordinator::PartDeactivated( berry::IWorkbenchPartReference::Pointer /*partRef*/ )
 {    
   // nothing to do here: see PartActivated()
 }
@@ -186,7 +186,7 @@ void QmitkFunctionalityCoordinator::WindowClosed( berry::IWorkbenchWindow::Point
   }
 }
 
-void QmitkFunctionalityCoordinator::WindowOpened( berry::IWorkbenchWindow::Pointer window )
+void QmitkFunctionalityCoordinator::WindowOpened( berry::IWorkbenchWindow::Pointer /*window*/ )
 {
 
 }

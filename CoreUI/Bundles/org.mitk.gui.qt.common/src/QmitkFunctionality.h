@@ -91,7 +91,7 @@ public:
   ///
   /// Called when the selection in the workbench changed
   ///
-  virtual void OnSelectionChanged(std::vector<mitk::DataNode*> nodes);
+  virtual void OnSelectionChanged(std::vector<mitk::DataNode*> /*nodes*/);
   ///
   /// Called when the preferences object of this view changed.
   /// \see GetPreferences()
@@ -195,7 +195,7 @@ protected:
   /// Called when a DataStorage Changed event was thrown. May be reimplemented
   /// by deriving classes.
   ///
-  virtual void NodeChanged(const mitk::DataNode* node);
+  virtual void NodeChanged(const mitk::DataNode* /*node*/);
   ///
   /// Called when a DataStorage Remove event was thrown. May be reimplemented
   /// by deriving classes.

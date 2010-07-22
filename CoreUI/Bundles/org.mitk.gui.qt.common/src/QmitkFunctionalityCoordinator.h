@@ -59,7 +59,7 @@ public:
   ///
   /// \see IPartListener::PartDeactivated()
   ///
-  virtual void PartDeactivated(berry::IWorkbenchPartReference::Pointer partRef);
+  virtual void PartDeactivated(berry::IWorkbenchPartReference::Pointer /*partRef*/);
   ///
   /// \see IPartListener::PartOpened()
   ///
@@ -85,7 +85,7 @@ public:
   /**
   * Notifies this listener that the given window has been opened.
   */
-  virtual void WindowOpened(berry::IWorkbenchWindow::Pointer window);
+  virtual void WindowOpened(berry::IWorkbenchWindow::Pointer /*window*/);
 protected:
   ///
   /// Activates the standalone functionality

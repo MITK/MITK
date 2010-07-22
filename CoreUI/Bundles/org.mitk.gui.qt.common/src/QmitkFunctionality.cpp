@@ -224,7 +224,7 @@ void QmitkFunctionality::OnPreferencesChanged( const berry::IBerryPreferences* )
 {
 }
 
-void QmitkFunctionality::OnSelectionChanged(std::vector<mitk::DataNode*> nodes)
+void QmitkFunctionality::OnSelectionChanged(std::vector<mitk::DataNode*> /*nodes*/)
 {
 }
 
@@ -414,7 +414,7 @@ void QmitkFunctionality::Hidden()
 
 }
 
-void QmitkFunctionality::NodeChanged( const mitk::DataNode* node )
+void QmitkFunctionality::NodeChanged( const mitk::DataNode* /*node*/ )
 {
 
 }

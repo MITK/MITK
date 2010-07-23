@@ -3,8 +3,8 @@
 Program:   Medical Imaging & Interaction Toolkit
 Language:  C++
 Date:      $Date$
-Version:   $Revision: 17495 $ 
- 
+Version:   $Revision: 17495 $
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
@@ -99,7 +99,7 @@ int QmitkImageNavigatorView::GetSizeFlags(bool width)
   }
 }
 
-int QmitkImageNavigatorView::ComputePreferredSize(bool width, int availableParallel, int availablePerpendicular, int preferredResult)
+int QmitkImageNavigatorView::ComputePreferredSize(bool width, int /*availableParallel*/, int /*availablePerpendicular*/, int preferredResult)
 {
   if(width==false)
   {

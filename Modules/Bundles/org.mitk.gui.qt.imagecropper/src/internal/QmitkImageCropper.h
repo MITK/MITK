@@ -64,7 +64,7 @@ class QmitkImageCropper : public QObject, public QmitkFunctionality, public mitk
           mitk::BaseData* GetOldData() { return m_OldData; }
           mitk::BaseData* GetNewData() { return m_NewData; }
   protected:
-    void NodeDeleted(const itk::Object *caller, const itk::EventObject &event);
+    void NodeDeleted(const itk::Object */*caller*/, const itk::EventObject &/*event*/);
   private:
     mitk::DataNode* m_Node;
     mitk::BaseData::Pointer m_OldData;
@@ -134,7 +134,7 @@ public:
     virtual void SurroundingCheck(bool value);
 
     virtual void ImageSelectionChanged();
-    virtual void ImageNodeChanged( const mitk::DataNode* item );
+    virtual void ImageNodeChanged( const mitk::DataNode* /*item*/ );
     virtual void ChkInformationToggled( bool on );
 
 protected:

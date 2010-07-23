@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   Medical Imaging & Interaction Toolkit
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #include "QmitkRigidRegistrationView.h"
@@ -81,7 +81,7 @@ struct SelListenerRigidRegistration : ISelectionListener
         bool foundFixedImage = false;
         mitk::DataNode::Pointer fixedNode;
         // iterate selection
-        for (IStructuredSelection::iterator i = m_View->m_CurrentSelection->Begin(); 
+        for (IStructuredSelection::iterator i = m_View->m_CurrentSelection->Begin();
           i != m_View->m_CurrentSelection->End(); ++i)
         {
           // extract datatree node
@@ -152,7 +152,7 @@ struct SelListenerRigidRegistration : ISelectionListener
 };
 
 QmitkRigidRegistrationView::QmitkRigidRegistrationView(QObject * /*parent*/, const char * /*name*/)
-: QmitkFunctionality(), m_MultiWidget(NULL), m_MovingNode(NULL), m_MovingMaskNode(NULL), m_FixedNode(NULL), m_FixedMaskNode(NULL), 
+: QmitkFunctionality(), m_MultiWidget(NULL), m_MovingNode(NULL), m_MovingMaskNode(NULL), m_FixedNode(NULL), m_FixedMaskNode(NULL),
   m_ShowRedGreen(false), m_Opacity(0.5), m_OriginalOpacity(1.0), m_Deactivated(false),m_FixedDimension(0), m_MovingDimension(0)
 {
   m_TranslateSliderPos[0] = 0;
@@ -212,7 +212,7 @@ void QmitkRigidRegistrationView::CreateQtPartControl(QWidget* parent)
   }
   m_Controls.m_ManualFrame->setEnabled(false);
   m_Parent->setEnabled(false);
-  
+
   this->CreateConnections();
   this->CheckCalculateEnabled();
 }
@@ -297,7 +297,7 @@ void QmitkRigidRegistrationView::Activated()
     this->ShowRedGreen(m_Controls.m_ShowRedGreenValues->isChecked());
     this->ClearTransformationLists();
     this->CheckCalculateEnabled();*/
-  
+
 }
 
 void QmitkRigidRegistrationView::Visible()
@@ -346,7 +346,7 @@ void QmitkRigidRegistrationView::Deactivated()
     m_SelListener = NULL;
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     QmitkFunctionality::Deactivated();*/
-  
+
 }
 
 void QmitkRigidRegistrationView::Hidden()
@@ -549,7 +549,7 @@ void QmitkRigidRegistrationView::UndoTransformation()
 
     movingData->GetTimeSlicedGeometry()->UpdateInformation();
     this->SetRedoEnabled(true);
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();    
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
   if(!m_UndoGeometryList.empty())
   {
@@ -664,11 +664,11 @@ void QmitkRigidRegistrationView::ClearTransformationLists()
 }
 
 void QmitkRigidRegistrationView::Translate(int* translateVector)
-{ 
+{
   if (m_MovingNode.IsNotNull())
   {
-    
-    mitk::Vector3D translateVec; 
+
+    mitk::Vector3D translateVec;
 
     translateVec[0] = translateVector[0] - m_TranslateSliderPos[0];
     translateVec[1] = translateVector[1] - m_TranslateSliderPos[1];
@@ -708,10 +708,10 @@ void QmitkRigidRegistrationView::Translate(int* translateVector)
 }
 
 void QmitkRigidRegistrationView::Rotate(int* rotateVector)
-{ 
+{
   if (m_MovingNode.IsNotNull())
   {
-    mitk::Vector3D rotateVec; 
+    mitk::Vector3D rotateVec;
 
     rotateVec[0] = rotateVector[0] - m_RotateSliderPos[0];
     rotateVec[1] = rotateVector[1] - m_RotateSliderPos[1];
@@ -728,7 +728,7 @@ void QmitkRigidRegistrationView::Rotate(int* rotateVector)
 
     double (*rotMatrix)[4] = rotationMatrix->Element;
     double (*transMatrix)[4] = translationMatrix->Element;
-    
+
     mitk::Point3D centerBB = m_MovingNode->GetData()->GetGeometry()->GetCenter();
 
     transMatrix[0][3] = centerBB[0];
@@ -754,7 +754,7 @@ void QmitkRigidRegistrationView::Rotate(int* rotateVector)
     double radianZ = rotateVec[2] * vnl_math::pi / 180;
 
     if ( rotateVec[0] != 0 )
-    {   
+    {
       rotMatrix[1][1] = cos( radianX );
       rotMatrix[1][2] = -sin( radianX );
       rotMatrix[2][1] = sin( radianX );
@@ -765,14 +765,14 @@ void QmitkRigidRegistrationView::Rotate(int* rotateVector)
       rotMatrix[0][0] = cos( radianY );
       rotMatrix[0][2] = sin( radianY );
       rotMatrix[2][0] = -sin( radianY );
-      rotMatrix[2][2] = cos( radianY );      
-    } 
+      rotMatrix[2][2] = cos( radianY );
+    }
     else if ( rotateVec[2] != 0 )
     {
       rotMatrix[0][0] = cos( radianZ );
       rotMatrix[0][1] = -sin( radianZ );
       rotMatrix[1][0] = sin( radianZ );
-      rotMatrix[1][1] = cos( radianZ );      
+      rotMatrix[1][1] = cos( radianZ );
     }
 
     m_MovingNode->GetData()->GetGeometry()->Compose( rotationMatrix );
@@ -782,7 +782,7 @@ void QmitkRigidRegistrationView::Rotate(int* rotateVector)
       childNode->GetData()->GetGeometry()->Compose( rotationMatrix );
       childNode->GetData()->Modified();
     }
-    
+
     translationMatrix->Invert();
 
     m_MovingNode->GetData()->GetGeometry()->Compose( translationMatrix );
@@ -799,11 +799,11 @@ void QmitkRigidRegistrationView::Rotate(int* rotateVector)
 }
 
 void QmitkRigidRegistrationView::Scale(int* scaleVector)
-{ 
+{
   if (m_MovingNode.IsNotNull())
   {
 
-    mitk::Vector3D scaleVec; 
+    mitk::Vector3D scaleVec;
 
     scaleVec[0] = scaleVector[0] - m_ScaleSliderPos[0];
     scaleVec[1] = scaleVector[1] - m_ScaleSliderPos[1];
@@ -823,7 +823,7 @@ void QmitkRigidRegistrationView::Scale(int* scaleVector)
       for(int i = 0; i<scaleVec[0]; i++)
       {
         scaleMatrix[0][0] *= 0.95;
-      }    
+      }
     }
     else
     {
@@ -838,7 +838,7 @@ void QmitkRigidRegistrationView::Scale(int* scaleVector)
       for(int i = 0; i<scaleVec[1]; i++)
       {
         scaleMatrix[1][1] *= 0.95;
-      }    
+      }
     }
     else
     {
@@ -853,7 +853,7 @@ void QmitkRigidRegistrationView::Scale(int* scaleVector)
       for(int i = 0; i<scaleVec[2]; i++)
       {
         scaleMatrix[2][2] *= 0.95;
-      }    
+      }
     }
     else
     {
@@ -949,7 +949,7 @@ void QmitkRigidRegistrationView::xTrans_valueChanged( int v )
   else
   {
     MovingImageChanged();
-  }  
+  }
 }
 
 void QmitkRigidRegistrationView::yTrans_valueChanged( int v )
@@ -964,7 +964,7 @@ void QmitkRigidRegistrationView::yTrans_valueChanged( int v )
   else
   {
     MovingImageChanged();
-  }  
+  }
 }
 
 void QmitkRigidRegistrationView::zTrans_valueChanged( int v )
@@ -979,7 +979,7 @@ void QmitkRigidRegistrationView::zTrans_valueChanged( int v )
   else
   {
     MovingImageChanged();
-  } 
+  }
 }
 
 void QmitkRigidRegistrationView::xRot_valueChanged( int v )
@@ -1118,7 +1118,7 @@ void QmitkRigidRegistrationView::Calculate()
     m_Controls.qmitkRigidRegistrationSelector1->SetMovingMaskNode(m_MovingMaskNode);
   }
   else
-  {    
+  {
     m_Controls.qmitkRigidRegistrationSelector1->SetMovingMaskNode(NULL);
   }
   m_Controls.frame_2->setEnabled(false);
@@ -1160,7 +1160,7 @@ void QmitkRigidRegistrationView::ShowManualRegistrationFrame(bool show)
   }
 }
 
-void QmitkRigidRegistrationView::SetImagesVisible(berry::ISelection::ConstPointer selection)
+void QmitkRigidRegistrationView::SetImagesVisible(berry::ISelection::ConstPointer /*selection*/)
 {
   if (this->m_CurrentSelection->Size() == 0)
   {

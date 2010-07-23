@@ -40,7 +40,7 @@ QmitkSegmentationPostProcessing::QmitkSegmentationPostProcessing(mitk::DataStora
 ,m_DataStorage(storage)
 {
   // register a couple of additional actions for DataManager's context menu
-  QmitkNodeDescriptor* imageDataNodeDescriptor = 
+  QmitkNodeDescriptor* imageDataNodeDescriptor =
     QmitkNodeDescriptorManager::GetInstance()->GetDescriptor("Image");
 
   if (imageDataNodeDescriptor)
@@ -55,7 +55,7 @@ QmitkSegmentationPostProcessing::QmitkSegmentationPostProcessing(mitk::DataStora
   }
 
   // register a couple of additional actions for DataManager's context menu
-  QmitkNodeDescriptor* binaryImageDataNodeDescriptor = 
+  QmitkNodeDescriptor* binaryImageDataNodeDescriptor =
     QmitkNodeDescriptorManager::GetInstance()->GetDescriptor("ImageMask");
 
   if (binaryImageDataNodeDescriptor)
@@ -75,7 +75,7 @@ QmitkSegmentationPostProcessing::QmitkSegmentationPostProcessing(mitk::DataStora
       connect( m_StatisticsAction, SIGNAL( triggered(bool) ) , this, SLOT( ImageStatistics(bool) ) );
     else
       m_StatisticsAction->setEnabled( false );
-   
+
     m_AutocropAction = new QAction("Autocrop", parent);
     binaryImageDataNodeDescriptor->AddAction(m_AutocropAction);
     connect( m_AutocropAction, SIGNAL( triggered(bool) ) , this, SLOT( AutocropSelected(bool) ) );
@@ -84,7 +84,7 @@ QmitkSegmentationPostProcessing::QmitkSegmentationPostProcessing(mitk::DataStora
   {
     MITK_WARN << "Could not get datamanager's node descriptor for 'ImageMask'";
   }
-  
+
   // register for blueberry selection events
   m_SelectionListener = berry::ISelectionListener::Pointer(new berry::SelectionChangedAdapter<QmitkSegmentationPostProcessing>(this, &QmitkSegmentationPostProcessing::SelectionChanged));
   m_BlueBerryView->GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddPostSelectionListener(/*"org.mitk.views.datamanager",*/ m_SelectionListener);
@@ -99,7 +99,7 @@ QmitkSegmentationPostProcessing::~QmitkSegmentationPostProcessing()
   }
 
   // unregister a couple of additional actions for DataManager's context menu
-  QmitkNodeDescriptor* imageDataNodeDescriptor = 
+  QmitkNodeDescriptor* imageDataNodeDescriptor =
     QmitkNodeDescriptorManager::GetInstance()->GetDescriptor("Image");
 
   if (imageDataNodeDescriptor)
@@ -112,7 +112,7 @@ QmitkSegmentationPostProcessing::~QmitkSegmentationPostProcessing()
   }
 
   // unregister a couple of additional actions for DataManager's context menu
-  QmitkNodeDescriptor* binaryImageDataNodeDescriptor = 
+  QmitkNodeDescriptor* binaryImageDataNodeDescriptor =
     QmitkNodeDescriptorManager::GetInstance()->GetDescriptor("ImageMask");
 
   if (binaryImageDataNodeDescriptor)
@@ -128,7 +128,7 @@ QmitkSegmentationPostProcessing::~QmitkSegmentationPostProcessing()
   }
 }
 
-void QmitkSegmentationPostProcessing::SelectionChanged(berry::IWorkbenchPart::Pointer sourcepart, berry::ISelection::ConstPointer selection)
+void QmitkSegmentationPostProcessing::SelectionChanged(berry::IWorkbenchPart::Pointer /*sourcepart*/, berry::ISelection::ConstPointer selection)
 {
   if ( selection.IsNull()  )
   {
@@ -159,14 +159,14 @@ QmitkSegmentationPostProcessing::NodeList QmitkSegmentationPostProcessing::GetSe
 
   return result;
 }
- 
+
 void QmitkSegmentationPostProcessing::ThresholdImage(bool)
 {
   NodeList selection = this->GetSelectedNodes();
 
   m_ThresholdingToolManager = mitk::ToolManager::New( m_DataStorage );
   m_ThresholdingToolManager->RegisterClient();
-  m_ThresholdingToolManager->ActiveToolChanged += 
+  m_ThresholdingToolManager->ActiveToolChanged +=
     mitk::MessageDelegate<QmitkSegmentationPostProcessing>( this, &QmitkSegmentationPostProcessing::OnThresholdingToolManagerToolModified );
 
   m_ThresholdingDialog = new QDialog(NULL);
@@ -252,7 +252,7 @@ void QmitkSegmentationPostProcessing::InternalCreateSurface(bool smoothed)
     {
       mitk::Image::Pointer image = dynamic_cast<mitk::Image*>( node->GetData() );
       if (image.IsNull()) return;
-        
+
       try
       {
         mitk::ShowSegmentationAsSurface::Pointer surfaceFilter = mitk::ShowSegmentationAsSurface::New();
@@ -291,7 +291,7 @@ void QmitkSegmentationPostProcessing::InternalCreateSurface(bool smoothed)
           surfaceFilter->SetParameter("Decimate mesh", true );
           surfaceFilter->SetParameter("Decimation rate", 0.8f );
         }
-        
+
         mitk::ProgressBar::GetInstance()->AddStepsToDo(10);
         mitk::ProgressBar::GetInstance()->Progress(2);
         mitk::StatusBar::GetInstance()->DisplayText("Surface creation started in background...");
@@ -349,7 +349,7 @@ void QmitkSegmentationPostProcessing::AutocropSelected(bool)
         cropFilter->Update();
 
         image = cropFilter->GetOutput();
-        
+
         if (image.IsNotNull())
         {
           node->SetData( this->IncreaseCroppedImageSize(image) ); // bug fix 3145
@@ -408,7 +408,7 @@ mitk::Image::Pointer QmitkSegmentationPostProcessing::IncreaseCroppedImageSize( 
   mitk::CastToMitkImage(padFilter->GetOutput(), paddedImage);
 
   paddedImage->SetGeometry(image->GetGeometry());
-  
+
   //calculate translation vector according to padding to get the new origin
   mitk::Vector3D transVector = image->GetGeometry()->GetSpacing();
   transVector[0] = -(borderLiner/2);

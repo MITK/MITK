@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   Medical Imaging & Interaction Toolkit
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 // Qmitk related includes
@@ -30,7 +30,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkPointSetInteractor.h>
 #include <mitkGlobalInteraction.h>
 
-QmitkPointSetInteractionView::QmitkPointSetInteractionView( QObject *parent )
+QmitkPointSetInteractionView::QmitkPointSetInteractionView( QObject */*parent*/ )
 : m_Controls(0)
 {
 
@@ -45,7 +45,7 @@ void QmitkPointSetInteractionView::CreateQtPartControl( QWidget *parent )
   m_Controls = new Ui::QmitkPointSetInteractionControls;
   m_Controls->setupUi(parent);
   m_Controls->m_PbAddPointSet->connect( m_Controls->m_PbAddPointSet, SIGNAL( clicked() )
-    , this, SLOT( OnAddPointSetClicked() ) );  
+    , this, SLOT( OnAddPointSetClicked() ) );
 }
 
 void QmitkPointSetInteractionView::Activated()
@@ -77,7 +77,7 @@ void QmitkPointSetInteractionView::OnAddPointSetClicked()
   //
   mitk::PointSet::Pointer pointSet = mitk::PointSet::New();
   //
-  // Create a new data tree node 
+  // Create a new data tree node
   //
   mitk::DataNode::Pointer pointSetNode = mitk::DataNode::New();
   //
@@ -152,7 +152,7 @@ void QmitkPointSetInteractionView::StdMultiWidgetAvailable( QmitkStdMultiWidget&
     m_Controls->m_PointListWidget->SetMultiWidget( &stdMultiWidget );
 }
 
-void QmitkPointSetInteractionView::StdMultiWidgetClosed( QmitkStdMultiWidget& stdMultiWidget )
+void QmitkPointSetInteractionView::StdMultiWidgetClosed( QmitkStdMultiWidget& /*stdMultiWidget*/ )
 {
   if(m_Controls)
     m_Controls->m_PointListWidget->SetMultiWidget( 0 );

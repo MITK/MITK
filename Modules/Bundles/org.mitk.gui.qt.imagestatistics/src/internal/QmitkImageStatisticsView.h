@@ -35,42 +35,42 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 /*!
-\brief QmitkImageStatistics 
+\brief QmitkImageStatistics
 
 \sa QmitkFunctionality
 \ingroup Functionalities
 */
 class IMAGESTATISTICS_EXPORT QmitkImageStatistics : public QObject, public QmitkFunctionality
-{  
+{
   Q_OBJECT
 
-public:  
+public:
 
-  /*! 
+  /*!
   \  Convenient typedefs
   */
   typedef mitk::DataStorage::SetOfObjects  ConstVector;
   typedef ConstVector::ConstPointer        ConstVectorPointer;
   typedef ConstVector::ConstIterator       ConstVectorIterator;
 
-  /*!  
-  \brief default constructor  
-  */  
+  /*!
+  \brief default constructor
+  */
   QmitkImageStatistics(QObject *parent=0, const char *name=0);
 
-  /*!  
-  \brief default destructor  
-  */  
+  /*!
+  \brief default destructor
+  */
   virtual ~QmitkImageStatistics();
 
-  /*!  
-  \brief method for creating the widget containing the application   controls, like sliders, buttons etc.  
-  */  
+  /*!
+  \brief method for creating the widget containing the application   controls, like sliders, buttons etc.
+  */
   virtual void CreateQtPartControl(QWidget *parent);
 
-  /*!  
-  \brief method for creating the connections of main and control widget  
-  */  
+  /*!
+  \brief method for creating the connections of main and control widget
+  */
   virtual void CreateConnections();
 
   bool IsExclusiveFunctionality() const;
@@ -78,14 +78,14 @@ public:
   virtual bool event( QEvent *event );
 
   void OnSelectionChanged( std::vector<mitk::DataNode*> nodes );
-  
-protected slots:  
+
+protected slots:
   void ClipboardHistogramButtonClicked();
 
   void ClipboardStatisticsButtonClicked();
 
 
-protected: 
+protected:
 
   void StdMultiWidgetAvailable( QmitkStdMultiWidget& stdMultiWidget );
 
@@ -96,7 +96,7 @@ protected:
 
   /** \brief Issues a request to update statistics by sending an event to the
   * Qt event processing queue.
-  * 
+  *
   * Statistics update should only be executed after program execution returns
   * to the Qt main loop. This mechanism also prevents multiple execution of
   * updates where only one is required.*/
@@ -123,9 +123,9 @@ protected:
   typedef std::map< mitk::Image *, mitk::ImageStatisticsCalculator::Pointer >
     ImageStatisticsMapType;
 
-  /*!  
-  * controls containing sliders for scrolling through the slices  
-  */  
+  /*!
+  * controls containing sliders for scrolling through the slices
+  */
   Ui::QmitkImageStatisticsViewControls *m_Controls;
 
   QmitkStepperAdapter*      m_TimeStepperAdapter;
@@ -151,7 +151,7 @@ protected:
   ImageStatisticsMapType m_ImageStatisticsMap;
 
   mitk::ImageStatisticsCalculator::Pointer m_CurrentStatisticsCalculator;
-  
+
   bool m_CurrentStatisticsValid;
 
   bool m_StatisticsUpdatePending;

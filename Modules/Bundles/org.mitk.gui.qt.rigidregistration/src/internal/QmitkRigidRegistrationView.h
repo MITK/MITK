@@ -31,10 +31,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QmitkStepperAdapter.h>
 
 /*!
-\brief This functionality allows you to register 2D as well as 3D images in a rigid manner.  
+\brief This functionality allows you to register 2D as well as 3D images in a rigid manner.
 
-Register means to align two images, so that they become as similar as possible. 
-Therefore you can select from different transforms, metrics and optimizers. 
+Register means to align two images, so that they become as similar as possible.
+Therefore you can select from different transforms, metrics and optimizers.
 Registration results will directly be applied to the Moving Image.
 
 \sa QmitkFunctionality
@@ -45,53 +45,53 @@ Registration results will directly be applied to the Moving Image.
 */
 
 class RIGIDREGISTRATION_EXPORT QmitkRigidRegistrationView : public QObject, public QmitkFunctionality
-{  
+{
 
   friend struct SelListenerRigidRegistration;
 
   Q_OBJECT
-  
-  public:  
+
+  public:
 
     static const std::string VIEW_ID;
 
-    /*!  
-    \brief default constructor  
-    */  
+    /*!
+    \brief default constructor
+    */
     QmitkRigidRegistrationView(QObject *parent=0, const char *name=0);
 
-    /*!  
-    \brief default destructor  
-    */  
+    /*!
+    \brief default destructor
+    */
     virtual ~QmitkRigidRegistrationView();
 
-    /*!  
-    \brief method for creating the applications main widget  
-    */  
+    /*!
+    \brief method for creating the applications main widget
+    */
     virtual void CreateQtPartControl(QWidget *parent);
 
-    /*!  
-    \brief Sets the StdMultiWidget and connects it to the functionality. 
-    */  
+    /*!
+    \brief Sets the StdMultiWidget and connects it to the functionality.
+    */
     virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget);
 
-    /*!  
-    \brief Removes the StdMultiWidget and disconnects it from the functionality. 
-    */ 
+    /*!
+    \brief Removes the StdMultiWidget and disconnects it from the functionality.
+    */
     virtual void StdMultiWidgetNotAvailable();
 
-    /*!  
-    \brief method for creating the connections of main and control widget  
-    */  
+    /*!
+    \brief method for creating the connections of main and control widget
+    */
     virtual void CreateConnections();
 
-    /*!  
-    \brief Method which is called when this functionality is selected in MITK  
-    */ 
+    /*!
+    \brief Method which is called when this functionality is selected in MITK
+    */
     virtual void Activated();
 
-    /*!  
-    \brief Method which is called whenever the functionality is deselected in MITK  
+    /*!
+    \brief Method which is called whenever the functionality is deselected in MITK
     */
     virtual void Deactivated();
 
@@ -100,8 +100,8 @@ class RIGIDREGISTRATION_EXPORT QmitkRigidRegistrationView : public QObject, publ
 
   signals:
 
-  protected slots:  
-    
+  protected slots:
+
     /*!
     * sets the fixed Image according to TreeNodeSelector widget
     */
@@ -116,12 +116,12 @@ class RIGIDREGISTRATION_EXPORT QmitkRigidRegistrationView : public QObject, publ
     * checks if registration is possible
     */
     bool CheckCalculate();
-    
+
     /*!
     * \brief Undo the last registration.
     */
     void UndoTransformation();
-    
+
     /*!
     * \brief Redo the last registration
     */
@@ -131,7 +131,7 @@ class RIGIDREGISTRATION_EXPORT QmitkRigidRegistrationView : public QObject, publ
     * \brief Adds a new Transformation to the undo list and enables the undo button.
     */
     void AddNewTransformationToUndoList();
-    
+
     /*!
     * \brief Translates the moving image in x, y and z direction given by translateVector
     *
@@ -176,7 +176,7 @@ class RIGIDREGISTRATION_EXPORT QmitkRigidRegistrationView : public QObject, publ
     */
     void OpacityUpdate(float opacity);
 
-    /*!  
+    /*!
     \brief Sets the selected opacity for moving image
 
     @param opacity the selected opacity
@@ -231,7 +231,7 @@ class RIGIDREGISTRATION_EXPORT QmitkRigidRegistrationView : public QObject, publ
 
     void UpdateTimestep();
 
-    void SetImagesVisible(berry::ISelection::ConstPointer selection);
+    void SetImagesVisible(berry::ISelection::ConstPointer /*selection*/);
 
     void CheckForMaskImages();
 
@@ -248,15 +248,15 @@ class RIGIDREGISTRATION_EXPORT QmitkRigidRegistrationView : public QObject, publ
     berry::ISelectionListener::Pointer m_SelListener;
     berry::IStructuredSelection::ConstPointer m_CurrentSelection;
 
-    /*!  
-    * default main widget containing 4 windows showing 3   
-    * orthogonal slices of the volume and a 3d render window  
-    */  
+    /*!
+    * default main widget containing 4 windows showing 3
+    * orthogonal slices of the volume and a 3d render window
+    */
     QmitkStdMultiWidget * m_MultiWidget;
 
-    /*!  
-    * control widget to make all changes for Deformable registration 
-    */  
+    /*!
+    * control widget to make all changes for Deformable registration
+    */
     Ui::QmitkRigidRegistrationViewControls m_Controls;
     mitk::DataNode::Pointer m_MovingNode;
     mitk::DataNode::Pointer m_MovingMaskNode;

@@ -75,7 +75,7 @@ private:
    */
   void UpdateTitle(bool editorHidden);
 
-  void PropertyChange(berry::Object::Pointer source, int propId);
+  void PropertyChange(berry::Object::Pointer /*source*/, int propId);
 
   berry::IPartListener::Pointer titlePartListener;
   berry::IPerspectiveListener::Pointer titlePerspectiveListener;

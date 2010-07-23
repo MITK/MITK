@@ -81,7 +81,7 @@ QmitkImageCropper::opExchangeNodes::~opExchangeNodes()
   }
 }
 
-void QmitkImageCropper::opExchangeNodes::NodeDeleted(const itk::Object *caller, const itk::EventObject &event)
+void QmitkImageCropper::opExchangeNodes::NodeDeleted(const itk::Object */*caller*/, const itk::EventObject &/*event*/)
 {
   m_Node = NULL;
   m_OldData = NULL;
@@ -439,7 +439,7 @@ void QmitkImageCropper::RemoveBoundingObjectFromNode()
   }
 }
 
-void QmitkImageCropper::ImageNodeChanged( const mitk::DataNode* item )
+void QmitkImageCropper::ImageNodeChanged( const mitk::DataNode* /*item*/ )
 {
   if(m_Controls != 0)
   {

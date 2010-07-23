@@ -3,7 +3,7 @@
 Program:   Medical Imaging & Interaction Toolkit
 Language:  C++
 Date:      $Date: 2009-05-28 17:19:30 +0200 (Do, 28 Mai 2009) $
-Version:   $Revision: 17495 $ 
+Version:   $Revision: 17495 $
 
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
@@ -55,7 +55,7 @@ QmitkToolPairNavigationView::~QmitkToolPairNavigationView()
   m_Source = NULL;
   m_Visualizer = NULL;
   m_CameraVisualizer = NULL;
- 
+
 }
 
 void QmitkToolPairNavigationView::CreateQtPartControl(QWidget *parent)
@@ -149,7 +149,7 @@ void QmitkToolPairNavigationView::Disconnected()
     this->m_DistanceWidget->ClearDistanceMatrix();
 }
 
-void QmitkToolPairNavigationView::ToolsAdded( QStringList tools )
+void QmitkToolPairNavigationView::ToolsAdded( QStringList /*tools*/ )
 {
 
 }
@@ -170,8 +170,8 @@ void QmitkToolPairNavigationView::SetNavigationUp()
 
   //1. build up the filter pipeline
   try
-  {  
-    this->SetupIGTPipeline(); 
+  {
+    this->SetupIGTPipeline();
   }
   catch(std::exception& e)
   {
@@ -258,27 +258,27 @@ void QmitkToolPairNavigationView::SetupIGTPipeline()
   m_CameraVisualizer->SetDirectionOfProjectionInToolCoordinates(viewVector);
 
   /* prepare visualization objects and filter */
-  for (unsigned int i = 0; i < m_Source->GetNumberOfOutputs(); ++i) //for each connected tool 
-  {    
+  for (unsigned int i = 0; i < m_Source->GetNumberOfOutputs(); ++i) //for each connected tool
+  {
     m_Visualizer->SetInput(i, m_Source->GetOutput(i)); // set input for visualization filter
 
     const char* toolName = tracker->GetTool(i)->GetToolName();
     mitk::DataNode::Pointer toolrepresentationNode = ds->GetNamedNode(toolName);
     if (toolrepresentationNode.IsNull())
     {
-      //the first tool represents the tool to guide 
+      //the first tool represents the tool to guide
       //it will be represented as cone wheras the target tools will be represented by a sphere
       if (i<1) //tool to guide
       {
         toolrepresentationNode = this->CreateConeAsInstrumentVisualization(toolName);
-        m_CameraVisualizer->SetInput(m_Source->GetOutput(i));      
+        m_CameraVisualizer->SetInput(m_Source->GetOutput(i));
       }
       else
         toolrepresentationNode = this->CreateSphereAsInstrumentVisualization(toolName);
       ds->Add(toolrepresentationNode);
     }
 
-    m_Visualizer->SetRepresentationObject(i, toolrepresentationNode->GetData());  // set instrument nodes as baseData for visualisation filter  
+    m_Visualizer->SetRepresentationObject(i, toolrepresentationNode->GetData());  // set instrument nodes as baseData for visualisation filter
   }
 
 
@@ -291,7 +291,7 @@ void QmitkToolPairNavigationView::DestroyIGTPipeline()
     m_Source->StopTracking();
     m_Source->Disconnect();
     m_Source = NULL;
-  }  
+  }
 
   m_Visualizer = NULL;
   m_CameraVisualizer = NULL;
@@ -321,7 +321,7 @@ mitk::DataNode::Pointer QmitkToolPairNavigationView::CreateConeAsInstrumentVisua
   coneNode->GetPropertyList()->SetProperty("layer", mitk::IntProperty::New(0));
   coneNode->GetPropertyList()->SetProperty("visible",mitk::BoolProperty::New(true));
   //don't display in widget 3 (3D camera view)
-  coneNode->SetVisibility(false, mitk::BaseRenderer::GetInstance(m_MultiWidget->mitkWidget3->GetRenderWindow())); 
+  coneNode->SetVisibility(false, mitk::BaseRenderer::GetInstance(m_MultiWidget->mitkWidget3->GetRenderWindow()));
   coneNode->SetColor(1.0,0.0,0.0);//red
   coneNode->SetOpacity(0.7);
   coneNode->Modified();
@@ -375,7 +375,7 @@ void QmitkToolPairNavigationView::RenderScene()
       else
         counter++;
     }
-    catch(std::exception& e) 
+    catch(std::exception& e)
     {
       std::cout << "Exception during QmitkToolPairNavigationView::RenderScene():" << e.what() << "\n";
     }

@@ -26,7 +26,7 @@
 struct MITK_QT_APP QmitkDefaultPerspective : public berry::IPerspectiveFactory
 {
 
-  void CreateInitialLayout(berry::IPageLayout::Pointer layout);
+  void CreateInitialLayout(berry::IPageLayout::Pointer /*layout*/);
 
 };
 

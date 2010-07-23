@@ -102,7 +102,7 @@ struct SelListenerPointBasedRegistration : ISelectionListener
         bool foundFixedImage = false;
         mitk::DataNode::Pointer fixedNode;
         // iterate selection
-        for (IStructuredSelection::iterator i = m_View->m_CurrentSelection->Begin(); 
+        for (IStructuredSelection::iterator i = m_View->m_CurrentSelection->Begin();
           i != m_View->m_CurrentSelection->End(); ++i)
         {
           // extract datatree node
@@ -161,7 +161,7 @@ struct SelListenerPointBasedRegistration : ISelectionListener
                 }
               }
             }
-          } 
+          }
         }
         if (m_View->m_FixedNode.IsNull() || m_View->m_MovingNode.IsNull())
         {
@@ -309,7 +309,7 @@ void QmitkPointBasedRegistrationView::Activated()
   }
   this->OpacityUpdate(m_Controls.m_OpacitySlider->value());
   this->showRedGreen(m_Controls.m_ShowRedGreenValues->isChecked());
-  
+
 }
 
 void QmitkPointBasedRegistrationView::Visible()
@@ -372,7 +372,7 @@ void QmitkPointBasedRegistrationView::Deactivated()
   if(s)
     s->RemovePostSelectionListener(m_SelListener);
   m_SelListener = NULL;
-  
+
 }
 
 void QmitkPointBasedRegistrationView::Hidden()
@@ -1229,7 +1229,7 @@ void QmitkPointBasedRegistrationView::calculate()
   }
 }
 
-void QmitkPointBasedRegistrationView::SetImagesVisible(berry::ISelection::ConstPointer selection)
+void QmitkPointBasedRegistrationView::SetImagesVisible(berry::ISelection::ConstPointer /*selection*/)
 {
   if (this->m_CurrentSelection->Size() == 0)
   {

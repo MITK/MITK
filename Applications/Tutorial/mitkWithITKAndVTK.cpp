@@ -13,7 +13,7 @@
 /// Small application for demonstrating the interaction between MITK,
 /// ITK and VTK (not necessarily useful).
 ///
-int main( int argc, char ** argv )
+int main( int /*argc*/, char ** argv )
 {
   // MITK: Read a .pic.gz file, e.g. Core/Code/Testing/Data/Pic3D.pic.gz from
   // disk

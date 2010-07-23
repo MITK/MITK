@@ -92,7 +92,7 @@ public:
         }
       }
 
-      void PartClosed(berry::IWorkbenchPartReference::Pointer ref)
+      void PartClosed(berry::IWorkbenchPartReference::Pointer /*ref*/)
       {
         windowAdvisor->UpdateTitle(false);
       }
@@ -131,7 +131,7 @@ public:
 
       Events::Types GetPartEventTypes() const
       {
-        return Events::OPENED | Events::CLOSED | Events::HIDDEN | 
+        return Events::OPENED | Events::CLOSED | Events::HIDDEN |
           Events::VISIBLE;
       }
 
@@ -188,27 +188,27 @@ public:
       | Events::CLOSED | Events::OPENED;
   }
 
-  void PerspectiveActivated(berry::IWorkbenchPage::Pointer page,
-      berry::IPerspectiveDescriptor::Pointer perspective)
+  void PerspectiveActivated(berry::IWorkbenchPage::Pointer /*page*/,
+      berry::IPerspectiveDescriptor::Pointer /*perspective*/)
   {
     windowAdvisor->UpdateTitle(false);
   }
 
-  void PerspectiveSavedAs(berry::IWorkbenchPage::Pointer page,
-      berry::IPerspectiveDescriptor::Pointer oldPerspective,
-      berry::IPerspectiveDescriptor::Pointer newPerspective)
+  void PerspectiveSavedAs(berry::IWorkbenchPage::Pointer /*page*/,
+      berry::IPerspectiveDescriptor::Pointer /*oldPerspective*/,
+      berry::IPerspectiveDescriptor::Pointer /*newPerspective*/)
   {
     windowAdvisor->UpdateTitle(false);
   }
 
-  void PerspectiveDeactivated(berry::IWorkbenchPage::Pointer page,
-      berry::IPerspectiveDescriptor::Pointer perspective)
+  void PerspectiveDeactivated(berry::IWorkbenchPage::Pointer /*page*/,
+      berry::IPerspectiveDescriptor::Pointer /*perspective*/)
   {
     windowAdvisor->UpdateTitle(false);
   }
 
-  void PerspectiveOpened(berry::IWorkbenchPage::Pointer page,
-          berry::IPerspectiveDescriptor::Pointer perspective)
+  void PerspectiveOpened(berry::IWorkbenchPage::Pointer /*page*/,
+          berry::IPerspectiveDescriptor::Pointer /*perspective*/)
   {
     if (perspectivesClosed)
     {
@@ -230,8 +230,8 @@ public:
     perspectivesClosed = false;
   }
 
-  void PerspectiveClosed(berry::IWorkbenchPage::Pointer page,
-          berry::IPerspectiveDescriptor::Pointer perspective)
+  void PerspectiveClosed(berry::IWorkbenchPage::Pointer /*page*/,
+          berry::IPerspectiveDescriptor::Pointer /*perspective*/)
   {
     berry::IWorkbenchWindow::Pointer wnd = windowAdvisor->GetWindowConfigurer()->GetWindow();
     bool allClosed = true;
@@ -376,7 +376,7 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
       QKeySequence("CTRL+Y"));
   redoAction->setToolTip("execute the last action that was undone again (not supported by all modules)");
 
-  imageNavigatorAction = new QAction(QIcon(":/org.mitk.gui.qt.ext/Slider.png"), "&Image Navigator", NULL);   
+  imageNavigatorAction = new QAction(QIcon(":/org.mitk.gui.qt.ext/Slider.png"), "&Image Navigator", NULL);
   QObject::connect(imageNavigatorAction, SIGNAL(triggered(bool)), QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onImageNavigator()));
   imageNavigatorAction->setCheckable(true);
 
@@ -404,7 +404,7 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
   mainActionsToolBar->setToolButtonStyle ( Qt::ToolButtonTextBesideIcon );
   mainActionsToolBar->addAction(fileOpenAction);
   mainActionsToolBar->addAction(fileSaveProjectAction);
-  mainActionsToolBar->addAction(closeProjectAction);  
+  mainActionsToolBar->addAction(closeProjectAction);
   mainActionsToolBar->addAction(undoAction);
   mainActionsToolBar->addAction(redoAction);
   mainActionsToolBar->addAction(imageNavigatorAction);
@@ -592,7 +592,7 @@ void QmitkExtWorkbenchWindowAdvisorHack::onRedo()
 void QmitkExtWorkbenchWindowAdvisorHack::onImageNavigator()
 {
   // get ImageNavigatorView
-  berry::IViewPart::Pointer imageNavigatorView = 
+  berry::IViewPart::Pointer imageNavigatorView =
     berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->FindView("org.mitk.views.imagenavigator");
   if (imageNavigatorView)
   {
@@ -816,7 +816,7 @@ void QmitkExtWorkbenchWindowAdvisor::UpdateTitle(bool editorHidden)
   RecomputeTitle();
 }
 
-void QmitkExtWorkbenchWindowAdvisor::PropertyChange(berry::Object::Pointer source, int propId)
+void QmitkExtWorkbenchWindowAdvisor::PropertyChange(berry::Object::Pointer /*source*/, int propId)
   {
     if (propId == berry::IWorkbenchPartConstants::PROP_TITLE)
     {

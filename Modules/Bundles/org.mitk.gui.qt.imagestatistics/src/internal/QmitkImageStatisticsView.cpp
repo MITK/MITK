@@ -73,7 +73,7 @@ typedef itk::Image<itk::Vector<float,3>, 3>  VectorImageType;
 inline bool my_isnan(float x)
  {
    volatile float d = x;
-   
+
    if(d!=d)
      return true;
 
@@ -83,7 +83,7 @@ inline bool my_isnan(float x)
 
  }
 
-QmitkImageStatistics::QmitkImageStatistics(QObject *parent, const char *name)
+QmitkImageStatistics::QmitkImageStatistics(QObject */*parent*/, const char */*name*/)
 : QmitkFunctionality(),
   m_Controls( NULL ),
   m_TimeStepperAdapter( NULL ),
@@ -106,7 +106,7 @@ QmitkImageStatistics::~QmitkImageStatistics()
   if ( m_SelectedImage != NULL )
     m_SelectedImage->RemoveObserver( m_ImageObserverTag );
   if ( m_SelectedImageMask != NULL )
-    m_SelectedImageMask->RemoveObserver( m_ImageMaskObserverTag ); 
+    m_SelectedImageMask->RemoveObserver( m_ImageMaskObserverTag );
   if ( m_SelectedPlanarFigure != NULL )
     m_SelectedPlanarFigure->RemoveObserver( m_PlanarFigureObserverTag );
 }
@@ -162,7 +162,7 @@ void QmitkImageStatistics::ClipboardHistogramButtonClicked()
         .arg( it.GetFrequency() );
     }
 
-    QApplication::clipboard()->setText( 
+    QApplication::clipboard()->setText(
       clipboard, QClipboard::Clipboard );
   }
   else
@@ -190,7 +190,7 @@ void QmitkImageStatistics::ClipboardStatisticsButtonClicked()
       .arg( statistics.Min, 0, 'f', 10 )
       .arg( statistics.N );
 
-    QApplication::clipboard()->setText( 
+    QApplication::clipboard()->setText(
       clipboard, QClipboard::Clipboard );
   }
   else
@@ -200,7 +200,7 @@ void QmitkImageStatistics::ClipboardStatisticsButtonClicked()
 }
 
 
-void QmitkImageStatistics::FillStatisticsTableView( 
+void QmitkImageStatistics::FillStatisticsTableView(
   const mitk::ImageStatisticsCalculator::Statistics &s,
   const mitk::Image *image )
 {
@@ -367,19 +367,19 @@ void QmitkImageStatistics::OnSelectionChanged( std::vector<mitk::DataNode*> node
   // Add change listeners to selected objects
   if ( m_SelectedImage != NULL )
   {
-    m_ImageObserverTag = m_SelectedImage->AddObserver( 
+    m_ImageObserverTag = m_SelectedImage->AddObserver(
       itk::ModifiedEvent(), changeListener );
   }
 
   if ( m_SelectedImageMask != NULL )
   {
-    m_ImageMaskObserverTag = m_SelectedImageMask->AddObserver( 
+    m_ImageMaskObserverTag = m_SelectedImageMask->AddObserver(
       itk::ModifiedEvent(), changeListener );
   }
 
   if ( m_SelectedPlanarFigure != NULL )
   {
-    m_PlanarFigureObserverTag = m_SelectedPlanarFigure->AddObserver( 
+    m_PlanarFigureObserverTag = m_SelectedPlanarFigure->AddObserver(
       itk::EndEvent(), changeListener );
   }
 
@@ -432,11 +432,11 @@ void QmitkImageStatistics::UpdateStatistics()
       m_Controls->m_HistogramWidget->ClearItemModel();
       m_CurrentStatisticsValid = false;
       return;
-    }  
+    }
 
     // Retrieve ImageStatisticsCalculator from has map (or create a new one
     // for this image if non-existant)
-    ImageStatisticsMapType::iterator it = 
+    ImageStatisticsMapType::iterator it =
       m_ImageStatisticsMap.find( m_SelectedImage );
 
     if ( it != m_ImageStatisticsMap.end() )
@@ -509,7 +509,7 @@ void QmitkImageStatistics::UpdateStatistics()
     try
     {
       // Compute statistics
-      statisticsChanged = 
+      statisticsChanged =
         m_CurrentStatisticsCalculator->ComputeStatistics( timeStep );
 
       statisticsCalculationSuccessful = true;
@@ -550,7 +550,7 @@ void QmitkImageStatistics::UpdateStatistics()
 
       m_Controls->m_StatisticsWidgetStack->setCurrentIndex( 0 );
       m_Controls->m_HistogramWidget->SetHistogramModeToDirectHistogram();
-      m_Controls->m_HistogramWidget->SetHistogram( 
+      m_Controls->m_HistogramWidget->SetHistogram(
         m_CurrentStatisticsCalculator->GetHistogram( timeStep ) );
       m_Controls->m_HistogramWidget->UpdateItemModelFromHistogram();
 
@@ -574,7 +574,7 @@ void QmitkImageStatistics::UpdateStatistics()
       if ( m_SelectedPlanarFigure != NULL )
       {
         // TODO: enable line profile widget
-        //m_Controls->m_StatisticsWidgetStack->setCurrentIndex( 1 );       
+        //m_Controls->m_StatisticsWidgetStack->setCurrentIndex( 1 );
         //m_Controls->m_LineProfileWidget->SetImage( m_SelectedImage );
         //m_Controls->m_LineProfileWidget->SetPlanarFigure( m_SelectedPlanarFigure );
         //m_Controls->m_LineProfileWidget->UpdateItemModelFromPath();
@@ -628,14 +628,14 @@ void QmitkImageStatistics::RemoveOrphanImages()
 }
 
 
-bool QmitkImageStatistics::event( QEvent *event ) 
+bool QmitkImageStatistics::event( QEvent *event )
 {
   if ( event->type() == (QEvent::Type) QmitkRequestStatisticsUpdateEvent::StatisticsUpdateRequest )
   {
     // Update statistics
 
     m_StatisticsUpdatePending = false;
-    
+
     this->UpdateStatistics();
     return true;
   }
@@ -665,7 +665,7 @@ void QmitkImageStatistics::ComputeIntensityProfile( mitk::PlanarLine* line )
   m_Controls->m_HistogramWidget->SetHistogramModeToDirectHistogram();
   m_Controls->m_HistogramWidget->SetHistogram( histogram );
   m_Controls->m_HistogramWidget->UpdateItemModelFromHistogram();
-  
+
 }
 
 bool QmitkImageStatistics::IsExclusiveFunctionality() const

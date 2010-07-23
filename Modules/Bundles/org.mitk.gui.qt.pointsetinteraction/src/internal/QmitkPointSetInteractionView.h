@@ -30,12 +30,12 @@ class QmitkPointSetInteractionControls;
 };
 
 /*!
-\brief QmitkPointSetInteractionView 
+\brief QmitkPointSetInteractionView
 */
 class QmitkPointSetInteractionView : public QObject, public QmitkFunctionality
-{  
+{
   Q_OBJECT
-  
+
 public:
   QmitkPointSetInteractionView(QObject *parent=0);
   virtual ~QmitkPointSetInteractionView();
@@ -49,7 +49,7 @@ public:
   virtual void StdMultiWidgetClosed(QmitkStdMultiWidget& stdMultiWidget);
 protected slots:
   void OnAddPointSetClicked();
-protected: 
+protected:
   Ui::QmitkPointSetInteractionControls * m_Controls;
   mitk::WeakPointer<mitk::DataNode> m_SelectedPointSetNode;
   mitk::WeakPointer<mitk::Interactor> m_SelectedPointSetInteractor;

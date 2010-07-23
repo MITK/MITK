@@ -490,10 +490,10 @@ mitk::DataNode::Pointer QmitkMeasurement::DetectTopMostVisibleImage()
 {
   // get all images from the data storage
   mitk::DataStorage::SetOfObjects::ConstPointer Images = this->GetDefaultDataStorage()->GetSubset( mitk::NodePredicateDataType::New("Image") );
-  
+
   mitk::DataNode::Pointer currentNode( m_SelectedImageNode->GetNode() );
   int maxLayer = itk::NumericTraits<int>::min();
-  
+
   // iterate over selection
   for (mitk::DataStorage::SetOfObjects::ConstIterator sofIt = Images->Begin(); sofIt != Images->End(); ++sofIt)
   {
@@ -501,15 +501,15 @@ mitk::DataNode::Pointer QmitkMeasurement::DetectTopMostVisibleImage()
     if ( node.IsNull() )
       continue;
     if (node->IsVisible(NULL) == false)
-      continue;  
+      continue;
     int layer = 0;
     node->GetIntProperty("layer", layer);
     if ( layer < maxLayer )
       continue;
-    
+
     currentNode = node;
   }
-  
+
   return currentNode;
 }
 
@@ -538,7 +538,7 @@ void QmitkMeasurement::AddFigureToDataStorage(mitk::PlanarFigure* figure, const 
 
   // add an observer
   m_InitializedObserverTag = figure->AddObserver( itk::InitializeEvent(), initializationCommand );
-  
+
   // figure drawn on the topmost layer / image
   this->GetDataStorage()->Add(newNode, this->DetectTopMostVisibleImage() );
 
@@ -726,17 +726,17 @@ void QmitkMeasurement::Deactivated()
 }
 
 
-void QmitkMeasurement::PropertyChanged(const mitk::DataNode* node, const mitk::BaseProperty* prop)
+void QmitkMeasurement::PropertyChanged(const mitk::DataNode* /*node*/, const mitk::BaseProperty* /*prop*/)
 {
   this->PlanarFigureSelectionChanged();
 }
 
-void QmitkMeasurement::NodeChanged(const mitk::DataNode* node)
+void QmitkMeasurement::NodeChanged(const mitk::DataNode* /*node*/)
 {
   this->PlanarFigureSelectionChanged();
 }
 
-void QmitkMeasurement::NodeRemoved(const mitk::DataNode* node)
+void QmitkMeasurement::NodeRemoved(const mitk::DataNode* /*node*/)
 {
   this->PlanarFigureSelectionChanged();
 }
@@ -812,7 +812,7 @@ void QmitkMeasurement::SetMeasurementInfoToRenderWindow(const QString& text,
 {
   if(m_LastRenderWindow != _RenderWindow)
   {
-    
+
     if(m_LastRenderWindow)
     {
       QObject::disconnect( m_LastRenderWindow, SIGNAL( destroyed(QObject*) )

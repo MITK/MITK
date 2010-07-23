@@ -439,7 +439,7 @@ void QmitkDataManagerView::SurfaceRepresentationMenuAboutToShow()
   }
 }
 
-void QmitkDataManagerView::SurfaceRepresentationActionToggled( bool checked )
+void QmitkDataManagerView::SurfaceRepresentationActionToggled( bool /*checked*/ )
 {
   mitk::DataNode* node = m_NodeTreeModel->GetNode(m_NodeTreeView->selectionModel()->currentIndex());
   if(!node)
@@ -780,7 +780,7 @@ void QmitkDataManagerView::NodeTreeViewRowsInserted( const QModelIndex & parent,
   }*/
 }
 
-void QmitkDataManagerView::NodeSelectionChanged( const QItemSelection & selected, const QItemSelection & deselected )
+void QmitkDataManagerView::NodeSelectionChanged( const QItemSelection & /*selected*/, const QItemSelection & /*deselected*/ )
 {
   std::vector<mitk::DataNode*> nodes = m_NodeTreeModel->GetNodeSet();
   mitk::DataNode* node = 0;

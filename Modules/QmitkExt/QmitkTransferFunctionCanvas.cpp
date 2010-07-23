@@ -34,7 +34,7 @@ void mitk::SimpleHistogram::ComputeFromImage( Image::Pointer source )
     first=0;
     last=1;
   }
-  
+
    {
     int typInt=0;
     {
@@ -55,15 +55,15 @@ void mitk::SimpleHistogram::ComputeFromImage( Image::Pointer source )
 
     if(histogram)
       delete histogram;
-      
+
     histogram = new CountType[last-first+1];
     memset(histogram,0,sizeof(CountType)*(last-first+1));
     highest = 0;
     max = first - 1;
     min = last + 1;
-    
+
     unsigned int num=1;
-    for(int r=0;r<source->GetDimension();r++)
+    for(unsigned int r=0;r<source->GetDimension();r++)
       num*=source->GetDimension(r);
 
    // MITK_INFO << "building histogramm of integer image: 0=" << source->GetDimension(0) << " 1=" << source->GetDimension(1) << " 2=" << source->GetDimension(2) << " 3=" <<  source->GetDimension(3);
@@ -73,7 +73,7 @@ void mitk::SimpleHistogram::ComputeFromImage( Image::Pointer source )
     do
     {
       int value;
-      
+
       switch(typInt)
       {
         case 0: { unsigned char  *t=(unsigned char *)src; value=*t++; src=(void*)t; } break;
@@ -81,7 +81,7 @@ void mitk::SimpleHistogram::ComputeFromImage( Image::Pointer source )
         case 2: { unsigned short *t=(unsigned short*)src; value=*t++; src=(void*)t; } break;
         case 3: {   signed short *t=(  signed short*)src; value=*t++; src=(void*)t; } break;
       }
-      
+
       if(value >= first && value <= last)
       {
         if(value < min) min = value;
@@ -94,7 +94,7 @@ void mitk::SimpleHistogram::ComputeFromImage( Image::Pointer source )
 
     //MITK_INFO << "histogramm computed: min=" << min << " max=" << max << " highestBin=" << highest << " samples=" << num;
   }
-  
+
   invLogHighest = 1.0/log(double(highest));
   valid = true;
 }
@@ -104,7 +104,7 @@ float mitk::SimpleHistogram::GetRelativeBin( float left, float right )
 {
   if( !valid )
     return 0.0f;
-    
+
   int iLeft = floorf(left);
   int iRight = ceilf(right);
 
@@ -119,25 +119,25 @@ float mitk::SimpleHistogram::GetRelativeBin( float left, float right )
   }
 
   sum /= 256.0;
-  return float(sum*invLogHighest); 
+  return float(sum*invLogHighest);
  */
 
   CountType maximum = 0;
-  
-  for( int i = iLeft; i <= iRight ; i++)   
+
+  for( int i = iLeft; i <= iRight ; i++)
   {
     int posInArray = i - first;
     if( histogram[posInArray] > maximum ) maximum = histogram[posInArray];
   }
-  
-  return float(log(double(maximum))*invLogHighest);  
+
+  return float(log(double(maximum))*invLogHighest);
 
 
-   
+
 
 }
 
-  
+
 QmitkTransferFunctionCanvas::QmitkTransferFunctionCanvas(QWidget * parent,
     Qt::WindowFlags f) :
   QWidget(parent, f), m_GrabbedHandle(-1), m_Lower(0.0f), m_Upper(1.0f), m_Min(
@@ -227,7 +227,7 @@ void QmitkTransferFunctionCanvas::mouseMoveEvent(QMouseEvent* mouseEvent)
     std::pair<vtkFloatingPointType,vtkFloatingPointType>
         newPos = this->CanvasToFunction(std::make_pair(mouseEvent->x(),
             mouseEvent->y()));
-    
+
     // X Clamping
     {
       // Check with predecessor
@@ -235,25 +235,25 @@ void QmitkTransferFunctionCanvas::mouseMoveEvent(QMouseEvent* mouseEvent)
         if (newPos.first <= this->GetFunctionX(m_GrabbedHandle - 1))
           newPos.first = this->GetFunctionX(m_GrabbedHandle);
 
-      // Check with sucessor      
+      // Check with sucessor
       if( m_GrabbedHandle < this->GetFunctionSize()-1 )
         if (newPos.first >= this->GetFunctionX(m_GrabbedHandle + 1))
           newPos.first = this->GetFunctionX(m_GrabbedHandle);
-      
+
       // Clamping to histogramm
            if (newPos.first < m_Min) newPos.first = m_Min;
       else if (newPos.first > m_Max) newPos.first = m_Max;
     }
-        
+
     // Y Clamping
     {
            if (newPos.second < 0.0) newPos.second = 0.0;
       else if (newPos.second > 1.0) newPos.second = 1.0;
     }
-    
-    // Move selected point    
+
+    // Move selected point
     this->MoveFunctionPoint(m_GrabbedHandle, newPos);
-    
+
     /*
     // Search again selected point ??????? should not be required, seems like a legacy workaround/bugfix
     // and no longer required
@@ -267,9 +267,9 @@ void QmitkTransferFunctionCanvas::mouseMoveEvent(QMouseEvent* mouseEvent)
       }
     }
     */
-    
+
     update();
-    
+
     //if (m_ImmediateUpdate)
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
@@ -288,32 +288,32 @@ void QmitkTransferFunctionCanvas::PaintHistogram(QPainter &p)
   if(m_Histogram)
   {
     p.save();
-    
+
     p.setPen(Qt::gray);
-        
+
     int displayWidth = contentsRect().width();
     int displayHeight = contentsRect().height();
-  
+
     int windowLeft = m_Lower;
     int windowRight = m_Upper;
 
     double step = (windowRight-windowLeft)/double(displayWidth);
-  
+
     double pos = windowLeft;
-  
+
     for (int x = 0; x < displayWidth; x++)
     {
       float left = pos;
       float right = pos + step;
-      
+
       float height = m_Histogram->GetRelativeBin( left , right );
 
       if (height >= 0)
         p.drawLine(x, displayHeight*(1-height), x, displayHeight);
-      
+
       pos += step;
     }
-    
+
     p.restore();
   }
 }
@@ -339,7 +339,7 @@ void QmitkTransferFunctionCanvas::keyPressEvent(QKeyEvent * e)
     case Qt::Key_Left:
       this->MoveFunctionPoint(m_GrabbedHandle, ValidateCoord(std::make_pair( GetFunctionX(m_GrabbedHandle)-1 , GetFunctionY(m_GrabbedHandle))));
       break;
-  
+
     case Qt::Key_Right:
       this->MoveFunctionPoint(m_GrabbedHandle, ValidateCoord(std::make_pair( GetFunctionX(m_GrabbedHandle)+1 , GetFunctionY(m_GrabbedHandle))));
       break;
@@ -347,7 +347,7 @@ void QmitkTransferFunctionCanvas::keyPressEvent(QKeyEvent * e)
     case Qt::Key_Up:
       this->MoveFunctionPoint(m_GrabbedHandle, ValidateCoord(std::make_pair( GetFunctionX(m_GrabbedHandle) , GetFunctionY(m_GrabbedHandle)+0.001)));
       break;
-  
+
     case Qt::Key_Down:
       this->MoveFunctionPoint(m_GrabbedHandle, ValidateCoord(std::make_pair( GetFunctionX(m_GrabbedHandle) , GetFunctionY(m_GrabbedHandle)-0.001)));
       break;

@@ -1,7 +1,11 @@
 FIND_PACKAGE(ITK)
-IF(ITK_FOUND AND NOT ITK_BUILD_SHARED)
-  MESSAGE(FATAL_ERROR "MITK only supports a ITK which was built with shared libraries. Turn on BUILD_SHARED_LIBS in your ITK config.")
-ENDIF(ITK_FOUND AND NOT ITK_BUILD_SHARED)
+#
+# for some reason this does not work on windows, probably an ITK bug
+# ITK_BUILD_SHARED is OFF even in shared library builds
+#
+#IF(ITK_FOUND AND NOT ITK_BUILD_SHARED)
+#  MESSAGE(FATAL_ERROR "MITK only supports a ITK which was built with shared libraries. Turn on BUILD_SHARED_LIBS in your ITK config.")
+#ENDIF(ITK_FOUND AND NOT ITK_BUILD_SHARED)
 LIST(APPEND ALL_INCLUDE_DIRECTORIES ${ITK_INCLUDE_DIRS})
 LIST(APPEND ALL_LIBRARIES ${ITK_LIBRARIES})
 link_directories(${ITK_LIBRARY_DIRS})

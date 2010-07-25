@@ -28,7 +28,7 @@ SET(STEP7_CPP ${STEP7_CPP} ${STEP7_MOC_CPP} ${STEP6_MOC_CPP})
 SET(STEP8_CPP ${STEP8_CPP} ${STEP8_MOC_CPP} ${STEP7_MOC_CPP} ${STEP6_MOC_CPP})
 
 # for the others it's all the same
-FOREACH(stepNo RANGE 1 8) 
+FOREACH(stepNo RANGE 1 9) 
   SET(STEP${stepNo}_CPP ${STEP${stepNo}_CPP} Step${stepNo}.cpp QtTesting.cpp)
   ADD_EXECUTABLE(Step${stepNo} ${STEP${stepNo}_CPP})
   TARGET_LINK_LIBRARIES(Step${stepNo} ${ALL_LIBRARIES})

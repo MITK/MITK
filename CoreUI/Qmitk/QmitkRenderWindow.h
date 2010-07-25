@@ -19,17 +19,11 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef QMITKRENDERWINDOW_H_HEADER_INCLUDED_C1C40D66
 #define QMITKRENDERWINDOW_H_HEADER_INCLUDED_C1C40D66
 
-//#include <qgl.h>
+
 #include "mitkCommon.h"
+#include "mitkRenderWindowBase.h"
 
-//#include "qlayout.h"
 #include "QVTKWidget.h"
-
-#include "mitkVtkPropRenderer.h"
-#include "vtkMitkRenderProp.h"
-#include "mitkSliceNavigationController.h"
-#include "mitkCameraRotationController.h"
-
 #include "QmitkRenderWindowMenu.h"
 #include "QmitkOverlayController.h"
 
@@ -37,7 +31,7 @@ PURPOSE.  See the above copyright notices for more information.
  * \brief MITK implementation of the QVTKWidget
  * \ingroup Renderer
  */
-class QMITK_EXPORT QmitkRenderWindow : public QVTKWidget //, public mitk::RenderWindow
+class QMITK_EXPORT QmitkRenderWindow : public QVTKWidget , public mitk::RenderWindowBase
 {
   Q_OBJECT
 
@@ -45,14 +39,7 @@ public:
 
   QmitkRenderWindow(QWidget *parent = 0, QString name = "unnamed renderwindow", mitk::VtkPropRenderer* renderer = NULL, mitk::RenderingManager* renderingManager = NULL);
   virtual ~QmitkRenderWindow();
-
-  void InitRenderer();
-
-  virtual mitk::SliceNavigationController * GetSliceNavigationController();
-  virtual mitk::CameraRotationController * GetCameraRotationController();
-  virtual mitk::BaseController * GetController();
-  virtual mitk::VtkPropRenderer* GetRenderer();
-
+ 
   /**
    * \brief Whether Qt events should be passed to parent (default: true)
    *
@@ -90,6 +77,12 @@ public:
   bool GetActivateMenuWidgetFlag()
   {  return m_MenuWidgetActivated; }
 
+  // Get it from the QVTKWidget parent
+  virtual vtkRenderWindow* GetVtkRenderWindow()
+  {  return GetRenderWindow();} 
+
+  virtual vtkRenderWindowInteractor* GetVtkRenderWindowInteractor()
+  {  return NULL;}
 
   void SetProcessWheelEvents( bool state );
 
@@ -103,14 +96,15 @@ public:
 
 protected:
 
-    // overloaded resize handler
-    virtual void resizeEvent(QResizeEvent* event);
-
     // overloaded move handler
     virtual void moveEvent( QMoveEvent* event );
 
     // overloaded show handler
     void showEvent( QShowEvent* event );
+
+
+    // overloaded resize handler
+    virtual void resizeEvent(QResizeEvent* event);
 
     // overloaded mouse press handler
     virtual void mousePressEvent(QMouseEvent* event);
@@ -151,21 +145,14 @@ protected slots:
 
 private:
   
-  mitk::VtkPropRenderer::Pointer m_Renderer;
-
-  vtkMitkRenderProp*             m_RenderProp;
-
-  bool                           m_InResize;
-
   bool                           m_ResendQtEvents;
 
   QmitkRenderWindowMenu*         m_MenuWidget;
 
+  bool                           m_MenuWidgetActivated;
+  
   QmitkOverlayController*        m_OverlayController;
 
-  bool                           m_MenuWidgetActivated;
-
-  bool                           m_ProcessWheelEvents;
 };
 
-#endif /* QMITKRENDERWINDOW_H_HEADER_INCLUDED_C1C40D66 */
+#endif

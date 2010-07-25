@@ -145,6 +145,7 @@ SET(CPP_FILES
   Interactions/mitkTransition.cpp
   Interactions/mitkWheelEvent.cpp
   Interactions/mitkKeyEvent.cpp
+  Interactions/mitkVtkEventAdapter.cpp
   IO/mitkBaseDataIOFactory.cpp
   IO/mitkDicomSeriesReader.cpp
   IO/mitkFileReader.cpp
@@ -205,6 +206,9 @@ SET(CPP_FILES
   Rendering/mitkVtkWidgetRendering.cpp
   Rendering/vtkMitkRectangleProp.cpp
   Rendering/vtkMitkRenderProp.cpp
+  Rendering/mitkVtkEventProvider.cpp
+  Rendering/mitkRenderWindow.cpp
+  Rendering/mitkRenderWindowBase.cpp
   Rendering/mitkShaderRepository.cpp
 
   Rendering/mitkImageMapper2D.cpp

@@ -1,0 +1,60 @@
+/*=========================================================================
+
+Program:   Medical Imaging & Interaction Toolkit
+Language:  C++
+Date:      $Date: 2010-07-05 09:49:37 +0200 (Mo, 05 Jul 2010) $
+Version:   $Revision: 24298 $
+
+Copyright (c) German Cancer Research Center, Division of Medical and
+Biological Informatics. All rights reserved.
+See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
+
+This software is distributed WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.  See the above copyright notices for more information.
+
+=========================================================================*/
+
+
+#include "mitkRenderWindow.h"
+
+#include "mitkDisplayPositionEvent.h"
+#include "mitkVtkLayerController.h"
+#include "mitkRenderingManager.h"
+#include "vtkRenderer.h"
+#include "vtkRenderWindowInteractor.h"
+#include "mitkVtkEventProvider.h"
+
+
+mitk::RenderWindow::RenderWindow( )
+{
+  m_vtkRenderWindow = vtkRenderWindow::New();
+  m_vtkRenderWindowInteractor = vtkRenderWindowInteractor::New();
+  
+  // initialize from RenderWindowBase
+  Initialize();
+
+  m_vtkMitkEventProvider = vtkEventProvider::New();
+  m_vtkMitkEventProvider->SetInteractor(this->GetVtkRenderWindowInteractor());
+  m_vtkMitkEventProvider->SetMitkRenderWindow(this);
+  m_vtkMitkEventProvider->SetEnabled(1);
+
+  m_vtkRenderWindowInteractor->SetRenderWindow(m_vtkRenderWindow);
+  m_vtkRenderWindowInteractor->Initialize();
+}
+
+mitk::RenderWindow::~RenderWindow()
+{
+  Destroy();
+}
+
+vtkRenderWindow* mitk::RenderWindow::GetVtkRenderWindow()
+{
+  return m_vtkRenderWindow;
+}
+
+vtkRenderWindowInteractor* mitk::RenderWindow::GetVtkRenderWindowInteractor()
+{
+  return m_vtkRenderWindowInteractor;   
+}
+

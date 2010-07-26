@@ -43,7 +43,7 @@ QmitkRenderWindow::QmitkRenderWindow(QWidget *parent, QString name, mitk::VtkPro
 , m_OverlayController(NULL)
 , m_MenuWidgetActivated(false)
 {
-  Initialize(); // Initialize mitkRenderWindowBase
+  Initialize( renderingManager ); // Initialize mitkRenderWindowBase
  
   setFocusPolicy(Qt::StrongFocus);
   setMouseTracking(true);

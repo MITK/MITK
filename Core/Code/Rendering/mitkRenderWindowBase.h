@@ -77,7 +77,7 @@ protected:
   RenderWindowBase();
 
   // helper functions: within constructors and destructors classes are not polymorph.
-  void Initialize();
+  void Initialize( mitk::RenderingManager* renderingManager = NULL );
   void Destroy();
 
   mitk::VtkPropRenderer::Pointer m_Renderer;

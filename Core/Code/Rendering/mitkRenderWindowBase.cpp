@@ -37,9 +37,12 @@ mitk::RenderWindowBase::RenderWindowBase( )
 
 * or short: within constructors and destructors classes are not polymorph.
 */
-void mitk::RenderWindowBase::Initialize()
+void mitk::RenderWindowBase::Initialize( mitk::RenderingManager* renderingManager )
 {
-  mitk::RenderingManager*  renderingManager = mitk::RenderingManager::GetInstance();
+  if ( renderingManager == NULL )
+  {
+    renderingManager = mitk::RenderingManager::GetInstance();
+  }
   
   if(m_Renderer.IsNull())
   {

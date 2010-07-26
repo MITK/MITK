@@ -23,7 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "vtkRenderer.h"
 
 
-mitk::RenderWindowBase::RenderWindowBase( )
+mitk::RenderWindowBase::RenderWindowBase( ) : m_ProcessWheelEvents(true)
 {
 
 }

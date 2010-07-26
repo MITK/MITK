@@ -84,10 +84,6 @@ public:
   virtual vtkRenderWindowInteractor* GetVtkRenderWindowInteractor()
   {  return NULL;}
 
-  void SetProcessWheelEvents( bool state );
-
-  bool GetProcessWheelEvents();
-
   void FullScreenMode( bool state );
 
   void SetOverlayController( QmitkOverlayController* );

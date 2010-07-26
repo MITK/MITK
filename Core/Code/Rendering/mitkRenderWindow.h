@@ -58,14 +58,6 @@ public:
   //MenuWidget need to update the Layout Design List when Layout had changed
   void LayoutDesignListChanged( int layoutDesignIndex );
   
-
-  //Activate or Deactivate MenuWidget. 
-  void ActivateMenuWidget( bool state )
-  {  m_MenuWidgetActivated = state; }
-
-  bool GetActivateMenuWidgetFlag()
-  {  return m_MenuWidgetActivated; }
-
   void FullScreenMode( bool state );
 
 protected:

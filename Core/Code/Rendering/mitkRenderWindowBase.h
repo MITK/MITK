@@ -86,8 +86,6 @@ protected:
 
   bool                           m_InResize;
 
-  bool                           m_MenuWidgetActivated;
-
   bool                           m_ProcessWheelEvents;
 
   private:

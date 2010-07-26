@@ -1,0 +1,77 @@
+/*=========================================================================
+
+Program:   Medical Imaging & Interaction Toolkit
+Language:  C++
+Date:      $Date: 2009-05-28 17:19:30 +0200 (Thu, 28 May 2009) $
+Version:   $Revision: 17495 $
+
+Copyright (c) German Cancer Research Center, Division of Medical and
+Biological Informatics. All rights reserved.
+See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
+
+This software is distributed WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.  See the above copyright notices for more information.
+
+=========================================================================*/
+
+
+#ifndef MITKSCALARBAR_H_HEADER_INCLUDED_C10DC4EB
+#define MITKSCALARBAR_H_HEADER_INCLUDED_C10DC4EB
+
+#include <mitkCommon.h>
+
+#include <QPen>
+#include <QWidget>
+
+class QMITK_EXPORT QmitkScalarBar : public QWidget
+  {
+    Q_OBJECT
+  public:
+
+    enum alignment 
+    {
+      vertical = 0,
+      horizontal = 1
+    };
+
+    /**
+    * @brief Default Constructor
+    **/
+    QmitkScalarBar( QWidget *parent = 0 );
+
+    /**
+    * @brief Default Destructor
+    **/
+    virtual ~QmitkScalarBar();
+
+    virtual void SetScaleFactor( double scale );
+
+    virtual void SetAlignment( alignment align );
+
+    void SetPen( const QPen& pen );
+
+  protected:
+   
+    void paintEvent(QPaintEvent* event);
+
+    void SetupGeometry( alignment align );
+
+    //void moveEvent(QMoveEvent*);
+
+    alignment m_Alignment;
+    
+    double m_ScaleFactor;
+
+    QLine* m_VerticalLine;
+
+    std::vector<QLine*> m_HorizontalLines;
+
+    QPen m_Pen;
+
+  };
+
+
+#endif /* MITKSCALARBAR_H_HEADER_INCLUDED_C10DC4EB */
+
+

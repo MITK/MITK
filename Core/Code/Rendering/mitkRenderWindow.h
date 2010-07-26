@@ -66,11 +66,6 @@ public:
   bool GetActivateMenuWidgetFlag()
   {  return m_MenuWidgetActivated; }
 
-
-  void SetProcessWheelEvents( bool state );
-
-  bool GetProcessWheelEvents();
-
   void FullScreenMode( bool state );
 
 protected:

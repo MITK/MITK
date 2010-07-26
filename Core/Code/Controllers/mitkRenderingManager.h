@@ -195,7 +195,7 @@ public:
   /** Executes all pending requests. This method has to be called by the
    * system whenever a RenderingManager induced request event occurs in
    * the system pipeline (see concrete RenderingManager implementations). */
-  virtual void UpdateCallback();
+  virtual void ExecutePendingRequests();
 
   bool IsRendering() const;
   void AbortRendering();

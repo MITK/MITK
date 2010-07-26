@@ -94,7 +94,7 @@ void QmitkProgressBar::SlotProgress(unsigned int steps)
   // Update views if repaint has been requested in the meanwhile
   // (because Qt event loop is not reached while progress bar is updating,
   // unless the application is threaded)
-  mitk::RenderingManager::GetInstance()->UpdateCallback();
+  mitk::RenderingManager::GetInstance()->ExecutePendingRequests();
 }
 
 void QmitkProgressBar::SlotAddStepsToDo(unsigned int steps)
@@ -110,7 +110,7 @@ void QmitkProgressBar::SlotAddStepsToDo(unsigned int steps)
   // Update views if repaint has been requested in the meanwhile
   // (because Qt event loop is not reached while progress bar is updating,
   // unless the application is threaded)
-  mitk::RenderingManager::GetInstance()->UpdateCallback();
+  mitk::RenderingManager::GetInstance()->ExecutePendingRequests();
 }
 
 void QmitkProgressBar::SlotSetPercentageVisible(bool visible)

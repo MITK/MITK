@@ -663,7 +663,7 @@ SliceNavigationController* RenderingManager::GetTimeNavigationController()
 }
 
 
-void RenderingManager::UpdateCallback()
+void RenderingManager::ExecutePendingRequests()
 {
   m_UpdatePending = false;
 

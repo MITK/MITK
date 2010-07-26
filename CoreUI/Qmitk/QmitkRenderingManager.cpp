@@ -70,7 +70,7 @@ QmitkRenderingManager
   if ( event->type() == (QEvent::Type) QmitkRenderingRequestEvent::RenderingRequest )
 {
     // Directly process all pending rendering requests
-    this->UpdateCallback();
+    this->ExecutePendingRequests();
     return true;
 }
 

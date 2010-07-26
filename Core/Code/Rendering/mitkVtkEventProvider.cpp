@@ -172,9 +172,13 @@ void mitk::vtkEventProvider::ProcessEvents(vtkObject* object,
   {
     // key press
     case vtkCommand::KeyPressEvent:
+    { 
       VTKEVENTPROVIDER_DEBUG << "key press event";
-      self->GetRenderWindow()->keyPressMitkEvent(&mitk::VtkEventAdapter::AdaptKeyEvent(baseRenderer,event,rwi));
+      mitk::KeyEvent mke(mitk::VtkEventAdapter::AdaptKeyEvent(baseRenderer,event,rwi));
+      self->GetRenderWindow()->keyPressMitkEvent(&mke);
+    }  
       break;
+
     // mouse events
     case vtkCommand::MouseMoveEvent:
     case vtkCommand::LeftButtonPressEvent:
@@ -183,20 +187,28 @@ void mitk::vtkEventProvider::ProcessEvents(vtkObject* object,
     case vtkCommand::LeftButtonReleaseEvent:
     case vtkCommand::MiddleButtonReleaseEvent:
     case vtkCommand::RightButtonReleaseEvent:
+    { 
       VTKEVENTPROVIDER_DEBUG << "mouse event";
-      self->GetRenderWindow()->mouseMoveMitkEvent(&mitk::VtkEventAdapter::AdaptMouseEvent(baseRenderer,event,rwi));
+      mitk::MouseEvent me(mitk::VtkEventAdapter::AdaptMouseEvent(baseRenderer,event,rwi));
+      self->GetRenderWindow()->mouseMoveMitkEvent(&me);
+    }  
       break;
     // mouse WHEEL
     case vtkCommand::MouseWheelForwardEvent:
     case vtkCommand::MouseWheelBackwardEvent:
+    { 
       VTKEVENTPROVIDER_DEBUG << "mouse wheel event";
-      self->GetRenderWindow()->wheelMitkEvent(&mitk::VtkEventAdapter::AdaptWheelEvent(baseRenderer,event,rwi));
+      mitk::WheelEvent we(mitk::VtkEventAdapter::AdaptWheelEvent(baseRenderer,event,rwi));
+      self->GetRenderWindow()->wheelMitkEvent(&we);
+    }
       break;
     // widget resize
     case vtkCommand::WidgetModifiedEvent:
+    {
       VTKEVENTPROVIDER_DEBUG << "widget resize event";
       self->GetRenderWindow()->resizeMitkEvent(rwi->GetRenderWindow()->GetSize()[0],rwi->GetRenderWindow()->GetSize()[1]);
-      break;
+    }  
+    break;
     default:
       VTKEVENTPROVIDER_INFO << "VTK event not mapped properly.";
     break;

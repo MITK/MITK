@@ -24,6 +24,8 @@ QmitkRegisterClasses.cpp
 QmitkRenderingManager.cpp
 QmitkRenderingManagerFactory.cpp
 QmitkRenderWindow.cpp
+QmitkScalarBar.cpp
+QmitkScalarBarOverlay.cpp
 QmitkSliderLevelWindowWidget.cpp
 QmitkStdMultiWidget.cpp
 QmitkTextOverlay.cpp
@@ -43,6 +45,8 @@ QmitkNodeDescriptorManager.h
 QmitkOverlay.h
 QmitkOverlayController.h
 QmitkRenderWindowMenu.h
+QmitkScalarBar.h
+QmitkScalarBarOverlay.h
 QmitkPropertiesTableEditor.h
 QmitkPropertyDelegate.h
 QmitkRenderingManager.h

@@ -110,7 +110,7 @@ mitk::PACSPlugin::SeriesInformation mitk::PACSPlugin::GetSeriesInformation( cons
 }
 
 
-mitk::PACSPlugin::DocumentInformation mitk::PACSPlugin::GetDocumentInformation( const std::string& itkNotUsed(seriesInstanceUID), 
+mitk::PACSPlugin::DocumentInformation mitk::PACSPlugin::GetDocumentInformation( const std::string& itkNotUsed(seriesInstanceUID),
                                                                                 unsigned int itkNotUsed(instanceNumber) )
 {
   DocumentInformation emptyResult;
@@ -164,7 +164,7 @@ std::vector<mitk::DataNode::Pointer> mitk::PACSPlugin::LoadImagesFromSeries( con
   emptyVector.clear();
   return emptyVector;
 }
-    
+
 std::vector<mitk::DataNode::Pointer> mitk::PACSPlugin::LoadImagesFromSeries( std::vector<std::string> /* seriesInstanceUIDs */ )
 {
   std::vector<DataNode::Pointer> emptyVector;
@@ -187,32 +187,32 @@ mitk::DataNode::Pointer mitk::PACSPlugin::LoadSingleText( const std::string& /* 
 }
 
 
-void mitk::PACSPlugin::SaveAsNewSeries( DataStorage::SetOfObjects::ConstPointer /* inputNodes */, 
-                                        const std::string& /* studyInstanceUID */, 
-                                        int /* seriesNumber */, 
+void mitk::PACSPlugin::SaveAsNewSeries( DataStorage::SetOfObjects::ConstPointer /* inputNodes */,
+                                        const std::string& /* studyInstanceUID */,
+                                        int /* seriesNumber */,
                                         const std::string& /*seriesDescription */)
 {
 }
 
 
-void mitk::PACSPlugin::SaveToSeries( DataStorage::SetOfObjects::ConstPointer /* inputNodes */, 
+void mitk::PACSPlugin::SaveToSeries( DataStorage::SetOfObjects::ConstPointer /* inputNodes */,
                                      const std::string& /* seriesInstanceUID */,
                                      bool /* overwriteExistingSeries */)
 {
 }
 
 void mitk::PACSPlugin::UploadFileAsNewSeries( const std::string& /* filename */,
-                                              const std::string& /* mimeType */, 
-                                              const std::string& /* studyInstanceUID */, 
-                                              int /* seriesNumber */, 
+                                              const std::string& /* mimeType */,
+                                              const std::string& /* studyInstanceUID */,
+                                              int /* seriesNumber */,
                                               const std::string& /* seriesDescription */ )
 {
 }
 
 void mitk::PACSPlugin::UploadFileToSeries( const std::string& /* filename */,
-                                           const std::string& /* filebasename */, 
-                                           const std::string& /* mimeType */, 
-                                           const std::string& /* seriesInstanceUID */, 
+                                           const std::string& /* filebasename */,
+                                           const std::string& /* mimeType */,
+                                           const std::string& /* seriesInstanceUID */,
                                            bool /* overwriteExistingSeries */ )
 {
 }
@@ -227,11 +227,11 @@ std::string mitk::PACSPlugin::GuessMIMEType( const std::string& filename )
   }
 
   const unsigned int maxLength = 8;
-  char line[ maxLength];
-  file.getline( line, maxLength );
+  unsigned char line[ maxLength];
+  file.getline( reinterpret_cast<char*>(line), maxLength );
   file.close();
 
-  std::string firstLine( line );
+  std::string firstLine( reinterpret_cast<char*>(line) );
 
   if ( firstLine.substr( 1, 3 ) == "PDF" )
   {
@@ -248,19 +248,19 @@ std::string mitk::PACSPlugin::GuessMIMEType( const std::string& filename )
     return std::string("application/zip");
   }
 
-  if ( ((reinterpret_cast<unsigned char*>(line))[0] == 0xFF) && (line[1] == 0xD8) )
+  if ( (line[0] == 0xFF) && (line[1] == 0xD8) )
   {
     return std::string("image/jpeg");
   }
 
-  if ( (line[0] == 0x89) && 
+  if ( (line[0] == 0x89) &&
        (line[1] == 0x50) &&
        (line[2] == 0x4E) &&
        (line[3] == 0x47) &&
        (line[4] == 0x0D) &&
        (line[5] == 0x0A) &&
        (line[6] == 0x1A) &&
-       (line[7] == 0x0A) 
+       (line[7] == 0x0A)
      )
   {
     return std::string("image/png");
@@ -289,8 +289,8 @@ std::string mitk::PACSPlugin::GuessMIMEType( const std::string& filename )
   return std::string("");
 }
 
-    
-void mitk::PACSPlugin::DownloadSingleFile( const std::string& /*seriesInstanceUID*/, 
+
+void mitk::PACSPlugin::DownloadSingleFile( const std::string& /*seriesInstanceUID*/,
                                            unsigned int /*instanceNumber*/,
                                            const std::string& /*filename*/)
 {

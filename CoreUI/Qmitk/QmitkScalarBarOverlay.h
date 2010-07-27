@@ -35,6 +35,8 @@ PURPOSE.  See the above copyright notices for more information.
 
   class QMITK_EXPORT QmitkScalarBarOverlay : public QmitkOverlay
   {
+    Q_OBJECT
+
   public:
 
     /**

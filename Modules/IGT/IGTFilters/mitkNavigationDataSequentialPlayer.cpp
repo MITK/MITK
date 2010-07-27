@@ -100,21 +100,29 @@ void mitk::NavigationDataSequentialPlayer::
 void mitk::NavigationDataSequentialPlayer::GenerateData()
 {
   assert(m_DataElem);
-  if(!m_CurrentElem)
-    m_CurrentElem = m_DataElem->FirstChildElement("ND");
-  else
-    m_CurrentElem = m_CurrentElem->NextSiblingElement();
 
-  if(!m_CurrentElem && m_Repeat)
-    m_CurrentElem = m_DataElem->FirstChildElement("ND");
-
+  // very important: go through the tools (there could be more then one)
   mitk::NavigationData::Pointer tmp;
   for (unsigned int index = 0; index < this->GetNumberOfOutputs(); index++)
   {
+    // go to the first element
+    if(!m_CurrentElem)
+      m_CurrentElem = m_DataElem->FirstChildElement("ND");
+    // go to the next element
+    else
+      m_CurrentElem = m_CurrentElem->NextSiblingElement();
+
+    // if repeat is on: go back to the first element (prior calls delivered NULL
+    // elem)
+    if(!m_CurrentElem && m_Repeat)
+      m_CurrentElem = m_DataElem->FirstChildElement("ND");
+
     mitk::NavigationData* output = this->GetOutput(index);
     tmp = this->ReadVersion1();
     if(tmp.IsNotNull())
       output->Graft(tmp);
+    else // no valid output
+      output->SetDataValid(false);
   }
 }
 

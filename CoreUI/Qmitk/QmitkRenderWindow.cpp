@@ -40,8 +40,8 @@ QmitkRenderWindow::QmitkRenderWindow(QWidget *parent, QString name, mitk::VtkPro
 : QVTKWidget(parent)
 , m_ResendQtEvents(true)
 , m_MenuWidget(NULL)
-, m_OverlayController(NULL)
 , m_MenuWidgetActivated(false)
+, m_OverlayController(NULL)
 {
   Initialize( renderingManager ); // Initialize mitkRenderWindowBase
  

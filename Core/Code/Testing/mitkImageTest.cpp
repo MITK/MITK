@@ -21,6 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <fstream>
 #include <itkSmartPointerForwardReference.txx>
 #include <mitkDataNodeFactory.h>
+#include <mitkStandardFileLocations.h>
 
 #include <vtkImageData.h>
 
@@ -411,9 +412,12 @@ int mitkImageTest(int /*argc*/, char* /*argv*/[])
   
   mitk::DataNode::Pointer node;      
   mitk::DataNodeFactory::Pointer nodeReader = mitk::DataNodeFactory::New();
+  mitk::StandardFileLocations::Pointer locator = mitk::StandardFileLocations::GetInstance();
+  MITK_TEST_CONDITION_REQUIRED(locator.IsNotNull(),"Instantiating StandardFileLocations") 
   try
   {
-    nodeReader->SetFileName("C:/MITK-QT4/mitk_source3m/mitk/Core/Code/Testing/Data/brain.mhd");
+    const std::string filename = locator->FindFile("brain.mhd", "Core/Code/Testing/Data");   
+    nodeReader->SetFileName(filename);
     nodeReader->Update();
     node = nodeReader->GetOutput();      
   }

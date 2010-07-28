@@ -494,7 +494,7 @@ static int DumpStack(char *format, ...)
         buffer = buf;
         if (! gotSomething)
         {
-          ssize_t written = 0;
+          size_t written = 0;
           written += write(global_output, "Output from ",
                            strlen("Output from "));
           strtok(cmd, " ");
@@ -506,7 +506,7 @@ static int DumpStack(char *format, ...)
         {
           buf[strlen(buf)-1] = (char)0;
         }
-        ssize_t written = 0;
+        size_t written = 0;
         written += write(global_output, buffer, strlen(buffer));
         written += write(global_output, "\n", strlen("\n"));
         if (written != strlen(buffer) + strlen("\n"))

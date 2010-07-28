@@ -160,7 +160,10 @@ SET(CPP_FILES
   Rendering/mitkSplineVtkMapper3D.cpp
   Rendering/mitkUnstructuredGridMapper2D.cpp
   Rendering/mitkUnstructuredGridVtkMapper3D.cpp
+  Rendering/mitkVectorImageMapper2D.cpp
   Rendering/vtkUnstructuredGridMapper.cpp
+  Rendering/vtkMaskedGlyph2D.cpp
+  Rendering/vtkMaskedGlyph3D.cpp
   Rendering/vtkMitkVolumeTextureMapper3D.cpp
   Rendering/vtkMitkOpenGLVolumeTextureMapper3D.cpp
   Rendering/mitkGPUVolumeMapper3D.cpp

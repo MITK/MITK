@@ -1,2 +1,2 @@
 
-MACRO_CREATE_MITK_PLUGIN(QmitkExt MitkDeformableRegistration MitkDeformableRegistrationUI MitkDiffusionImaging)
+MACRO_CREATE_MITK_PLUGIN(QmitkExt MitkDeformableRegistration MitkDeformableRegistrationUI)

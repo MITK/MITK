@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef __vtkMaskedGlyph2D_h
 #define __vtkMaskedGlyph2D_h
 
-#include "MitkDiffusionImagingExports.h"
+#include "MitkExtExports.h"
 
 #include "vtkGlyph2D.h"
 #include "mitkCommon.h"
@@ -32,7 +32,7 @@ class vtkMaskPoints;
  * InputVectors and InputNormals by their field name in the 
  * input dataset.
  */
-class MitkDiffusionImaging_EXPORT vtkMaskedGlyph2D : public vtkGlyph2D
+class MitkExt_EXPORT vtkMaskedGlyph2D : public vtkGlyph2D
 {
 public:
   vtkTypeRevisionMacro(vtkMaskedGlyph2D,vtkGlyph2D);

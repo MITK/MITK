@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef _MITK_VECTOR_IMAGE_MAPPER_2D__H_
 #define _MITK_VECTOR_IMAGE_MAPPER_2D__H_
 
-#include "MitkDiffusionImagingExports.h"
+#include "MitkExtExports.h"
 
 #include "mitkCommon.h"
 #include "mitkGLMapper2D.h"
@@ -41,7 +41,7 @@ class BaseRenderer;
 class Geometry2D;
 class DisplayGeometry;
 
-class MitkDiffusionImaging_EXPORT VectorImageMapper2D : public GLMapper2D
+class MitkExt_EXPORT VectorImageMapper2D : public GLMapper2D
 {
 public:
     mitkClassMacro( VectorImageMapper2D, GLMapper2D );

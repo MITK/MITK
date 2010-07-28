@@ -13,7 +13,7 @@ ELSE(ITK_USES_GDCM2)
 
   MITK_CREATE_MODULE( MitkDiffusionImaging
     INCLUDE_DIRS Algorithms DicomImport IODataStructures/DiffusionWeightedImages IODataStructures/QBallImages IODataStructures/TensorImages IODataStructures Reconstruction Tractography Rendering  ${CMAKE_CURRENT_BINARY_DIR}
-    DEPENDS Mitk
+    DEPENDS MitkExt
     PACKAGE_DEPENDS Boost
   )
 

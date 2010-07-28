@@ -45,10 +45,7 @@ SET(CPP_FILES
   IODataStructures/TensorImages/mitkTensorImage.cpp
 
   # Rendering
-  Rendering/vtkMaskedGlyph2D.cpp
-  Rendering/vtkMaskedGlyph3D.cpp
   Rendering/vtkMaskedProgrammableGlyphFilter.cpp
-  Rendering/mitkVectorImageMapper2D.cpp
   Rendering/mitkCompositeMapper.cpp
   Rendering/mitkVectorImageVtkGlyphMapper3D.cpp
   Rendering/vtkOdfSource.cxx

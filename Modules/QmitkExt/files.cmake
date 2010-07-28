@@ -54,7 +54,6 @@ SET(CPP_FILES
  # QmitkLevelWindowWidget.cpp
  # QmitkPointListWidget.cpp
  # QmitkPointListView.cpp
- QmitkProgressBar.cpp
  QmitkPiecewiseFunctionCanvas.cpp
  QmitkSliderNavigatorWidget.cpp
  QmitkTransferFunctionCanvas.cpp
@@ -172,7 +171,6 @@ SET(MOC_H_FILES
  QmitkCalculateGrayValueStatisticsToolGUI.h
  QmitkCopyToClipBoardDialog.h
  QmitkPrimitiveMovieNavigatorWidget.h
- QmitkProgressBar.h
  QmitkPointListModel.h
  QmitkPointListView.h
  QmitkPointListWidget.h

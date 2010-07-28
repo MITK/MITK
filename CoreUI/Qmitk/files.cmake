@@ -17,6 +17,7 @@ QmitkNodeDescriptorManager.cpp
 QmitkOverlay.cpp
 QmitkOverlayController.cpp
 QmitkRenderWindowMenu.cpp
+QmitkProgressBar.cpp
 QmitkPropertiesTableEditor.cpp
 QmitkPropertiesTableModel.cpp
 QmitkPropertyDelegate.cpp
@@ -47,6 +48,7 @@ QmitkOverlayController.h
 QmitkRenderWindowMenu.h
 QmitkScalarBar.h
 QmitkScalarBarOverlay.h
+QmitkProgressBar.h
 QmitkPropertiesTableEditor.h
 QmitkPropertyDelegate.h
 QmitkRenderingManager.h

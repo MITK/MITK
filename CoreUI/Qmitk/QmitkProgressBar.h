@@ -22,21 +22,19 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkCommon.h>
 #include <QProgressBar>
 
-#include "QmitkExtExports.h"
-
 //##Documentation
 //## @brief QT-Toolkit/GUI dependent class that provides the QT's ProgressBar
 //##
 //## All mitk-classes will call this class for output:
 //## mitk::ProgressBar::GetInstance();
 
-class QmitkExt_EXPORT QmitkProgressBar : public QProgressBar, public mitk::ProgressBarImplementation
+class QMITK_EXPORT QmitkProgressBar : public QProgressBar, public mitk::ProgressBarImplementation
 {
 
   Q_OBJECT
 
 public:
- 
+
   //##Documentation
   //##@brief Constructor;
   //## holds param instance internally and connects this to the mitkProgressBar

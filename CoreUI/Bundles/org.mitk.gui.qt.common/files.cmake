@@ -5,7 +5,6 @@ SET(SRC_CPP_FILES
   QmitkFileOpenAction.cpp
   QmitkFileExitAction.cpp
   QmitkFunctionality.cpp
-  QmitkProgressBar.cpp
   QmitkStatusBar.cpp
   QmitkStdMultiWidgetEditor.cpp
   QmitkGeneralPreferencePage.cpp
@@ -22,7 +21,6 @@ SET(MOC_H_FILES
   src/QmitkCloseProjectAction.h
   src/QmitkFileOpenAction.h
   src/QmitkFileExitAction.h
-  src/QmitkProgressBar.h
   src/QmitkPreferencesDialog.h
   src/QmitkDnDFrameWidget.h
 )

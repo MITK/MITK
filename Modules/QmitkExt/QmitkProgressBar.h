@@ -21,7 +21,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkProgressBarImplementation.h>
 #include <mitkCommon.h>
 #include <QProgressBar>
-#include "mitkQtCommonDll.h"
+
+#include "QmitkExtExports.h"
 
 //##Documentation
 //## @brief QT-Toolkit/GUI dependent class that provides the QT's ProgressBar
@@ -29,7 +30,7 @@ PURPOSE.  See the above copyright notices for more information.
 //## All mitk-classes will call this class for output:
 //## mitk::ProgressBar::GetInstance();
 
-class MITK_QT_COMMON QmitkProgressBar : public QProgressBar, public mitk::ProgressBarImplementation
+class QmitkExt_EXPORT QmitkProgressBar : public QProgressBar, public mitk::ProgressBarImplementation
 {
 
   Q_OBJECT

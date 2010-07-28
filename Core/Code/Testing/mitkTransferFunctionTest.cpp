@@ -16,6 +16,7 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include "mitkTransferFunction.h"
+#include "mitkTransferFunctionInitializer.h"
 
 #include "mitkTestingMacros.h"
 
@@ -218,7 +219,59 @@ int mitkTransferFunctionTest(int /* argc */, char* /*argv*/[])
     myTransferFunction->GetRGBPoints().size() == 0,
     "Clearing color transfer function points (resulting array should be empty)" );
 
+  /******************TRANSFERFUNCTION INITIALIZER TEST***************************/
+  mitk::TransferFunction::Pointer dummyTransferFunction = mitk::TransferFunction::New();
+  mitk::TransferFunctionInitializer::Pointer transferInit = mitk::TransferFunctionInitializer::New(dummyTransferFunction);
+  MITK_TEST_CONDITION_REQUIRED(
+    transferInit->GetTransferFunction().IsNotNull(),
+    "Testing if Transferfunction is set" );
+  MITK_TEST_CONDITION_REQUIRED(
+    transferInit->GetTransferFunction() == dummyTransferFunction,
+    "Testing if Transferfunction is the correct one" );
 
+  transferInit->SetTransferFunction(myTransferFunction);
+
+  MITK_TEST_CONDITION_REQUIRED(
+    transferInit->GetTransferFunction().IsNotNull(),
+    "Testing if Set Transferfunction works" );
+  MITK_TEST_CONDITION_REQUIRED(
+    transferInit->GetTransferFunction() == myTransferFunction,
+    "Testing if Set Transferfunction sets the correct one" );
+  
+  const int size = 8;
+  int arPointNumbers[size][3] = {{3,1,6},
+                              {2,1,2},
+                              {4,1,5},
+                              {3,1,5},
+                              {4,1,7},
+                              {4,2,7},
+                              {4,1,4},
+                              {6,2,6}};
+
+  std::string names[size] = {"SetDefaultMode",
+                          "SetCtBlackWhiteMode",
+                          "SetCtThoraxLargeMode",
+                          "SetCtThoraxSmallMode",
+                          "SetCtBoneMode",
+                          "SetCtBoneGradientMode",
+                          "SetCtCardiacMode",
+                          "SetMrGenericMode"};
+
+  for(int i =0; i<size; i++)
+  {
+  transferInit->SetTransferFunctionMode(i);
+  
+  std::cout << "Punkte: " << myTransferFunction->GetScalarOpacityFunction()->GetSize() << std::endl;
+  MITK_TEST_CONDITION_REQUIRED(
+    myTransferFunction->GetScalarOpacityFunction()->GetSize() == arPointNumbers[i][0],
+    "Testing if in " << names[i] << " the Scalar Opacity Function is set" );  
+  MITK_TEST_CONDITION_REQUIRED(
+    myTransferFunction->GetGradientOpacityFunction()->GetSize() == arPointNumbers[i][1],
+    "Testing if in " << names[i] << " the Gradient Opacity Function is set" );
+  MITK_TEST_CONDITION_REQUIRED(
+      myTransferFunction->GetColorTransferFunction()->GetSize() == arPointNumbers[i][2],
+    "Testing if in " << names[i] << " the Color Transfer Function is set" );   
+  }
   // always end with this!
   MITK_TEST_END()
 }

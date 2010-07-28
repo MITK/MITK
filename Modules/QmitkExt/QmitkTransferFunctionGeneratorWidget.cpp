@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <mitkTransferFunctionProperty.h>
 #include <mitkRenderingManager.h>
-
+#include <mitkTransferFunctionInitializer.h>
 #include <QFileDialog>
 
 #include <SceneSerializationExports.h>
@@ -205,7 +205,8 @@ void QmitkTransferFunctionGeneratorWidget::OnMitkInternalPreset( int mode )
   m_TransferFunctionComboBox->setCurrentIndex( 0 );
 
   // -- Creat new TransferFunction
-  tfpToChange->GetValue()->SetTransferFunctionMode( mode );
+  mitk::TransferFunctionInitializer::Pointer tfInit = mitk::TransferFunctionInitializer::New(tfpToChange->GetValue());
+  tfInit->SetTransferFunctionMode(mode);
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   emit SignalUpdateCanvas();
   m_InfoPreset->setText( QString( (std::string("selected ")+ std::string(presetNames[mode+1])).c_str() ) );

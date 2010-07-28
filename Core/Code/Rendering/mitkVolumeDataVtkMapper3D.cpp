@@ -25,6 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkLevelWindowProperty.h"
 #include "mitkLookupTableProperty.h"
 #include "mitkTransferFunctionProperty.h"
+#include "mitkTransferFunctionInitializer.h"
 #include "mitkColorProperty.h"
 #include "mitkVtkPropRenderer.h"
 #include "mitkRenderingManager.h"
@@ -608,7 +609,8 @@ void mitk::VolumeDataVtkMapper3D::SetDefaultProperties(mitk::DataNode* node, mit
     {
       // add a default transfer function
       mitk::TransferFunction::Pointer tf = mitk::TransferFunction::New();
-      tf->SetTransferFunctionMode(0);
+      mitk::TransferFunctionInitializer::Pointer tfInit = mitk::TransferFunctionInitializer::New(tf);
+      tfInit->SetTransferFunctionMode(0);
       node->SetProperty ( "TransferFunction", mitk::TransferFunctionProperty::New ( tf.GetPointer() ) );
     }
   }

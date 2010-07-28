@@ -74,13 +74,13 @@ public:
   /** \brief Get/Set min/max of transfer function range for initialization. */
   itkGetMacro(Max,int);
 
-  /** \brief Get wrapped vtk transfer function. */
+  /** \brief Get/Set wrapped vtk transfer function. */
   itkGetMacro(ScalarOpacityFunction,vtkPiecewiseFunction*); 
 
-  /** \brief Get wrapped vtk transfer function. */
+  /** \brief Get/Set wrapped vtk transfer function. */
   itkGetMacro(GradientOpacityFunction,vtkPiecewiseFunction*); 
 
-  /** \brief Get wrapped vtk transfer function. */
+  /** \brief Get/Set wrapped vtk transfer function. */
   itkGetMacro(ColorTransferFunction,vtkColorTransferFunction*); 
 
   /** \brief Get histogram used for transfer function initialization. */
@@ -95,11 +95,7 @@ public:
   
   /** \brief Initialize the internal histogram and min/max range based on the
    * specified mitk::Image. */
-  void InitializeHistogram( const mitk::Image* image );
-
-  /** Initialize transfer function to the specified preset.*/
-  void SetTransferFunctionMode( int mode );
-  
+  void InitializeHistogram( const mitk::Image* image );  
     
   /** \brief Insert control points and values into the scalar opacity transfer
    * function. */
@@ -144,7 +140,6 @@ public:
 
   /** \brief Remove the specified control point from the color transfer function. */
   int RemoveRGBPoint(double x);
-  
 
   /** \brief Removes all control points from the scalar opacity transfer function. */
   void ClearScalarOpacityPoints();

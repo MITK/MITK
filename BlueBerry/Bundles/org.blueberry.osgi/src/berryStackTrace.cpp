@@ -472,8 +472,8 @@ static int DumpStack(char *format, ...)
 
   fd = my_popen(cmd, &pid);
   if (SYS_ERROR != fd)
-    {
-      /*
+  {
+    /*
        * Wait for the child to exit. This must be done
        * to make the debugger attach successfully.
        * The output from the debugger is buffered on
@@ -481,36 +481,42 @@ static int DumpStack(char *format, ...)
        *
        * AIX needs the looping hack
        */
-      do
-  {
-    rc = waitpid(pid, &status, 0);
-  }
-      while ((SYS_ERROR == rc) && (EINTR == errno));
+    do
+    {
+      rc = waitpid(pid, &status, 0);
+    }
+    while ((SYS_ERROR == rc) && (EINTR == errno));
 
-      if ((WIFEXITED(status)) && (WEXITSTATUS(status) == EXIT_SUCCESS))
-  {
-    while (my_getline(fd, buf, sizeof(buf)))
+    if ((WIFEXITED(status)) && (WEXITSTATUS(status) == EXIT_SUCCESS))
+    {
+      while (my_getline(fd, buf, sizeof(buf)))
       {
         buffer = buf;
         if (! gotSomething)
-    {
-      write(global_output, "Output from ",
-      strlen("Output from "));
-      strtok(cmd, " ");
-      write(global_output, cmd, strlen(cmd));
-      write(global_output, "\n", strlen("\n"));
-      gotSomething = TRUE;
-    }
+        {
+          ssize_t written = 0;
+          written += write(global_output, "Output from ",
+                           strlen("Output from "));
+          strtok(cmd, " ");
+          written += write(global_output, cmd, strlen(cmd));
+          written += write(global_output, "\n", strlen("\n"));
+          if (written) gotSomething = TRUE;
+        }
         if ('\n' == buf[strlen(buf)-1])
-    {
-      buf[strlen(buf)-1] = (char)0;
-    }
-        write(global_output, buffer, strlen(buffer));
-        write(global_output, "\n", strlen("\n"));
+        {
+          buf[strlen(buf)-1] = (char)0;
+        }
+        ssize_t written = 0;
+        written += write(global_output, buffer, strlen(buffer));
+        written += write(global_output, "\n", strlen("\n"));
+        if (written != strlen(buffer) + strlen("\n"))
+        {
+          gotSomething = FALSE;
+        }
       }
-  }
-      my_pclose(fd, pid);
     }
+    my_pclose(fd, pid);
+  }
   return gotSomething;
 }
 #endif /* PLATFORM_UNIX */

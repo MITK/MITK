@@ -112,6 +112,7 @@ SET(CPP_FILES
   DataManagement/mitkThinPlateSplineCurvedGeometry.cpp
   DataManagement/mitkTimeSlicedGeometry.cpp
   DataManagement/mitkTransferFunction.cpp
+  DataManagement/mitkTransferFunctionInitializer.cpp
   DataManagement/mitkVector.cpp
   DataManagement/mitkVtkInterpolationProperty.cpp
   DataManagement/mitkVtkRepresentationProperty.cpp

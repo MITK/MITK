@@ -134,8 +134,21 @@ class MITK_CORE_EXPORT DisplayGeometry : public Geometry2D
     virtual bool SetScaleFactor(ScalarType mmPerDisplayUnit);
     ScalarType GetScaleFactorMMPerDisplayUnit() const;
 
-    // \return true if zoom request was within accepted limits
+    /**
+    * \brief Zooms with a factor (1.0=identity) to/from the specified center in display units
+    * \return true if zoom request was within accepted limits
+    */
     virtual bool Zoom(ScalarType factor, const Point2D& centerInDisplayUnits);
+
+    /**
+    * \brief Zooms with a factor (1.0=identity) to/from the specified center, trying to preserve the center of zoom in world coordiantes
+    *
+    * Same zoom as mentioned above but tries (if it's within view contraints) to match the center in display units with the center in world coordinates. 
+    *
+    * \return true if zoom request was within accepted limits
+    */
+    virtual bool ZoomWithFixedWorldCoordinates(ScalarType factor, const Point2D& focusDisplayUnits, const Point2D& focusUnitsInMM );
+
     // \return true if move request was within accepted limits
     virtual bool MoveBy(const Vector2D& shiftInDisplayUnits);
     

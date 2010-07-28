@@ -66,6 +66,7 @@ namespace mitk {
     mitk::Point2D m_StartDisplayCoordinate;
     mitk::Point2D m_LastDisplayCoordinate;
     mitk::Point2D m_CurrentDisplayCoordinate;
+    mitk::Point2D m_StartCoordinateInMM;
 
     OperationActor* m_Destination;
   };

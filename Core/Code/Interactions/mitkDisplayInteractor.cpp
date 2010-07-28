@@ -76,7 +76,7 @@ void mitk::DisplayInteractor::ExecuteOperation(mitk::Operation * operation)
           // nothing to do, factor remains 1.0
         }
         
-        renderer->GetDisplayGeometry()->Zoom(factor, dcOperation->GetStartDisplayCoordinate());
+        renderer->GetDisplayGeometry()->ZoomWithFixedWorldCoordinates(factor, dcOperation->GetStartDisplayCoordinate(), dcOperation->GetStartCoordinateInMM());
         
         mitk::RenderingManager::GetInstance()->RequestUpdate(renderer->GetRenderWindow());
         ok = true;

@@ -46,6 +46,14 @@ namespace mitk {
       const mitk::Point2D& currentDisplayCoordinate
       );
 
+DisplayCoordinateOperation(mitk::OperationType operationType,
+      mitk::BaseRenderer* renderer,
+      const mitk::Point2D& startDisplayCoordinate,
+      const mitk::Point2D& lastDisplayCoordinate,
+      const mitk::Point2D& currentDisplayCoordinate,
+      const mitk::Point2D& startCoordinateInMM
+      );
+
     virtual ~DisplayCoordinateOperation();
 
     mitk::BaseRenderer* GetRenderer();
@@ -53,6 +61,7 @@ namespace mitk {
     mitkGetMacro(StartDisplayCoordinate, mitk::Point2D);
     mitkGetMacro(LastDisplayCoordinate, mitk::Point2D);
     mitkGetMacro(CurrentDisplayCoordinate, mitk::Point2D);
+    mitkGetMacro(StartCoordinateInMM, mitk::Point2D);
 
     mitk::Vector2D GetLastToCurrentDisplayVector();
     mitk::Vector2D GetStartToCurrentDisplayVector();
@@ -65,6 +74,7 @@ namespace mitk {
     const mitk::Point2D m_StartDisplayCoordinate;
     const mitk::Point2D m_LastDisplayCoordinate;
     const mitk::Point2D m_CurrentDisplayCoordinate;
+    const mitk::Point2D m_StartCoordinateInMM;
   };
 
 }

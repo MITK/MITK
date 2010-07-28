@@ -184,13 +184,13 @@ mitk::ScalarType mitk::DisplayGeometry::GetScaleFactorMMPerDisplayUnit() const
   return m_ScaleFactorMMPerDisplayUnit;
 }
 
+// Zooms with a factor (1.0=identity) around the specified center in display units
 bool mitk::DisplayGeometry::Zoom(ScalarType factor, const Point2D& centerInDisplayUnits)
 {
   assert(factor > 0);
 
   if ( SetScaleFactor(m_ScaleFactorMMPerDisplayUnit/factor) )
   {
-    // only correct origin if zooming was ok
     return SetOriginInMM(m_OriginInMM-centerInDisplayUnits.GetVectorFromOrigin()*(1-factor)*m_ScaleFactorMMPerDisplayUnit);
   }
   else
@@ -198,6 +198,18 @@ bool mitk::DisplayGeometry::Zoom(ScalarType factor, const Point2D& centerInDispl
     return false;
   }
 }
+
+
+// Zooms with a factor (1.0=identity) around the specified center, but tries (if its within view contraints) to match the center in display units with the center in world coordinates. 
+bool mitk::DisplayGeometry::ZoomWithFixedWorldCoordinates(ScalarType factor, const Point2D& focusDisplayUnits, const Point2D& focusUnitsInMM )
+{
+  assert(factor > 0);
+
+  SetScaleFactor(m_ScaleFactorMMPerDisplayUnit/factor);
+  SetOriginInMM(focusUnitsInMM.GetVectorFromOrigin()-focusDisplayUnits.GetVectorFromOrigin()*m_ScaleFactorMMPerDisplayUnit);
+  return true;
+}
+
 
 bool mitk::DisplayGeometry::MoveBy(const Vector2D& shiftInDisplayUnits)
 {
@@ -413,7 +425,7 @@ bool mitk::DisplayGeometry::RefitVisibleRect()
   // do nothing if not asked to
   if (!m_ConstrainZoomingAndPanning) return false;
 
-  // don't allow recursion
+  // don't allow recursion (need to be fixed, singleton)
   static bool inRecalculate = false;
   if (inRecalculate) return false;
   inRecalculate = true;
@@ -451,15 +463,23 @@ bool mitk::DisplayGeometry::RefitVisibleRect()
   bool zoomYtooSmall = displayHeightPx * m_ScaleFactorMMPerDisplayUnit > m_MaxWorldViewPercentage * worldHeightMM;
   bool zoomYtooBig = displayHeightPx * m_ScaleFactorMMPerDisplayUnit < m_MinWorldViewPercentage * worldHeightMM;
 
-  // constrain zooming in in x direction
-  if ( zoomXtooBig )
+  // constrain zooming in both direction
+  if ( zoomXtooBig && zoomYtooBig)
+  {
+    double fx = worldWidthMM * m_MinWorldViewPercentage / displayWidthPx;
+    double fy = worldHeightMM * m_MinWorldViewPercentage / displayHeightPx;
+    newScaleFactor = fx < fy ? fx : fy;
+    correctZooming = true;
+  }
+  // constrain zooming in x direction
+  else if ( zoomXtooBig )
   {
     newScaleFactor = worldWidthMM * m_MinWorldViewPercentage / displayWidthPx;
     correctZooming = true;
   }
 
-  // constrain zooming in in y direction
-  if ( zoomYtooBig )
+  // constrain zooming in y direction
+  else if ( zoomYtooBig )
   {
     newScaleFactor = worldHeightMM * m_MinWorldViewPercentage / displayHeightPx;
     correctZooming = true;
@@ -497,7 +517,7 @@ bool mitk::DisplayGeometry::RefitVisibleRect()
   //
   // In both situations we center the not-maxed out direction
   //
-  if ( zoomXtooSmall && zoomYtooSmall )
+if ( zoomXtooSmall && zoomYtooSmall )
     {
       // determine and set the bigger scale factor
       float fx = worldWidthMM * m_MaxWorldViewPercentage / displayWidthPx;
@@ -507,8 +527,18 @@ bool mitk::DisplayGeometry::RefitVisibleRect()
       correctZooming = true;
     }
 
+
+  // actually execute correction
+  if (correctZooming)
+  {
+    SetScaleFactor(newScaleFactor);
+  }
+
+  displayWidthMM  = m_SizeInDisplayUnits[0] * m_ScaleFactorMMPerDisplayUnit;
+  displayHeightMM = m_SizeInDisplayUnits[1] * m_ScaleFactorMMPerDisplayUnit;
+
   // constrain panning
-  if (zoomXtooSmall)
+  if(worldWidthMM<displayWidthMM)
   {
     // zoomed out too much in x (but tolerated because y is still ok)
     // --> center x
@@ -524,8 +554,7 @@ bool mitk::DisplayGeometry::RefitVisibleRect()
       correctPanning = true;
     }
     // make sure right display border inside our world
-    else
-    if (displayXMM + displayWidthMM > worldWidthMM)
+    else  if (displayXMM + displayWidthMM > worldWidthMM)
     {
       newOrigin[0] = worldWidthMM - displayWidthMM;
       correctPanning = true;
@@ -533,7 +562,7 @@ bool mitk::DisplayGeometry::RefitVisibleRect()
   }
 
 
-  if (zoomYtooSmall)
+  if (worldHeightMM<displayHeightMM)
   {
     // zoomed out too much in y (but tolerated because x is still ok)
     // --> center y
@@ -542,28 +571,24 @@ bool mitk::DisplayGeometry::RefitVisibleRect()
   }
   else
   {
-    // make sure bottom display border inside our world
-    if (displayYMM < 0)
-    {
-      newOrigin[1] = 0;
-      correctPanning = true;
-    }
     // make sure top display border inside our world
-    else
     if (displayYMM + displayHeightMM >  worldHeightMM)
     {
       newOrigin[1] = worldHeightMM - displayHeightMM;
       correctPanning = true;
     }
+  // make sure bottom display border inside our world
+    else
+    if (displayYMM < 0)
+    {
+      newOrigin[1] = 0;
+      correctPanning = true;
+    }
+
   }
 
-  // actually execute correction
-  if (correctZooming)
-  {
-    SetScaleFactor(newScaleFactor);
-  }
 
-  if (correctPanning)
+ if (correctPanning)
   {
     SetOriginInMM( newOrigin );
   }

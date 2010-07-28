@@ -90,9 +90,14 @@ bool mitk::DisplayVectorInteractor::ExecuteAction(Action* action, mitk::StateEve
   case AcINITMOVE:
     {
       m_Sender=posEvent->GetSender();
+
+      mitk::Vector2D origin = m_Sender->GetDisplayGeometry()->GetOriginInMM();
+       double scaleFactorMMPerDisplayUnit = m_Sender->GetDisplayGeometry()->GetScaleFactorMMPerDisplayUnit();
+
       m_StartDisplayCoordinate=posEvent->GetDisplayPosition();
       m_LastDisplayCoordinate=posEvent->GetDisplayPosition();
       m_CurrentDisplayCoordinate=posEvent->GetDisplayPosition();
+      m_StartCoordinateInMM=mitk::Point2D( ( origin+m_StartDisplayCoordinate.GetVectorFromOrigin()*scaleFactorMMPerDisplayUnit ).GetDataPointer() );
       ok = true;
       break;
     }
@@ -123,7 +128,7 @@ bool mitk::DisplayVectorInteractor::ExecuteAction(Action* action, mitk::StateEve
     }
   case AcZOOM:
     {
-      DisplayCoordinateOperation* doOp = new DisplayCoordinateOperation(OpZOOM,  m_Sender, m_StartDisplayCoordinate, m_LastDisplayCoordinate, posEvent->GetDisplayPosition());
+      DisplayCoordinateOperation* doOp = new DisplayCoordinateOperation(OpZOOM,  m_Sender, m_StartDisplayCoordinate, m_LastDisplayCoordinate, posEvent->GetDisplayPosition(),m_StartCoordinateInMM);
       
       if (m_UndoEnabled)  //write to UndoMechanism
       {

@@ -33,6 +33,22 @@ mitk::DisplayCoordinateOperation::DisplayCoordinateOperation(mitk::OperationType
 {
 }
 
+mitk::DisplayCoordinateOperation::DisplayCoordinateOperation(mitk::OperationType operationType,
+        mitk::BaseRenderer* renderer,
+        const mitk::Point2D& startDisplayCoordinate,
+        const mitk::Point2D& lastDisplayCoordinate,
+        const mitk::Point2D& currentDisplayCoordinate,
+        const mitk::Point2D& startCoordinateInMM
+)
+  : mitk::Operation(operationType),
+    m_Renderer(renderer),
+    m_StartDisplayCoordinate(startDisplayCoordinate),
+    m_LastDisplayCoordinate(lastDisplayCoordinate),
+    m_CurrentDisplayCoordinate(currentDisplayCoordinate),
+    m_StartCoordinateInMM(startCoordinateInMM)
+{
+}
+
 
 mitk::DisplayCoordinateOperation::~DisplayCoordinateOperation()
 {

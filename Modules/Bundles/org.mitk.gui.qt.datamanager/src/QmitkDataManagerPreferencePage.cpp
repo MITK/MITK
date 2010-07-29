@@ -39,7 +39,7 @@ void QmitkDataManagerPreferencePage::Init(berry::IWorkbench::Pointer )
 
 void QmitkDataManagerPreferencePage::CreateQtControl(QWidget* parent)
 {
-  berry::IPreferencesService::Pointer prefService 
+  berry::IPreferencesService::Pointer prefService
     = berry::Platform::GetServiceRegistry()
     .GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
 
@@ -47,10 +47,12 @@ void QmitkDataManagerPreferencePage::CreateQtControl(QWidget* parent)
 
   m_MainControl = new QWidget(parent);
   m_EnableSingleEditing = new QCheckBox;
+  m_PlaceNewNodesOnTop = new QCheckBox;
 
   QFormLayout *formLayout = new QFormLayout;
   formLayout->addRow("&Single click property editing:", m_EnableSingleEditing);
-  
+  formLayout->addRow("&Place new nodes on top:", m_PlaceNewNodesOnTop);
+
   m_MainControl->setLayout(formLayout);
   this->Update();
 }
@@ -62,7 +64,10 @@ QWidget* QmitkDataManagerPreferencePage::GetQtControl() const
 
 bool QmitkDataManagerPreferencePage::PerformOk()
 {
-  m_DataManagerPreferencesNode->PutBool("Single click property editing", m_EnableSingleEditing->isChecked());
+  m_DataManagerPreferencesNode->PutBool("Single click property editing"
+                                        , m_EnableSingleEditing->isChecked());
+  m_DataManagerPreferencesNode->PutBool("Place new nodes on top"
+                                        , m_PlaceNewNodesOnTop->isChecked());
   return true;
 }
 
@@ -74,4 +79,5 @@ void QmitkDataManagerPreferencePage::PerformCancel()
 void QmitkDataManagerPreferencePage::Update()
 {
   m_EnableSingleEditing->setChecked(m_DataManagerPreferencesNode->GetBool("Single click property editing", true));
+  m_PlaceNewNodesOnTop->setChecked(m_DataManagerPreferencesNode->GetBool("Place new nodes on top", true));
 }

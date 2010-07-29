@@ -32,19 +32,22 @@
 #include <QMimeData>
 #include <QTextStream>
 
-QmitkDataStorageTreeModel::QmitkDataStorageTreeModel( mitk::DataStorage* _DataStorage, QObject* parent )
+QmitkDataStorageTreeModel::QmitkDataStorageTreeModel( mitk::DataStorage* _DataStorage
+                                                      , bool _PlaceNewNodesOnTop
+                                                      , QObject* parent )
 : QAbstractItemModel(parent)
 , m_DataStorage(0)
+, m_PlaceNewNodesOnTop(_PlaceNewNodesOnTop)
 , m_Root(0)
 {
   mitk::NodePredicateData::Pointer dataIsNull = mitk::NodePredicateData::New(0);
-  mitk::NodePredicateNOT::Pointer dataIsNotNull 
+  mitk::NodePredicateNOT::Pointer dataIsNotNull
     = mitk::NodePredicateNOT::New(dataIsNull);// Show only nodes that really contain dat
 
   mitk::NodePredicateProperty::Pointer isHelperObject = mitk::NodePredicateProperty::New("helper object"
     , mitk::BoolProperty::New(true));
 
-  mitk::NodePredicateNOT::Pointer isNotHelperObject 
+  mitk::NodePredicateNOT::Pointer isNotHelperObject
     = mitk::NodePredicateNOT::New(isHelperObject);// Show only nodes that really contain dat
 
   mitk::NodePredicateAND::Pointer dataIsNotNullAndIsNotHelperObject = mitk::NodePredicateAND::New(dataIsNotNull,
@@ -129,7 +132,7 @@ QmitkDataStorageTreeModel::TreeItem* QmitkDataStorageTreeModel::TreeItemFromInde
 {
   if (index.isValid())
     return static_cast<TreeItem *>(index.internalPointer());
-  else 
+  else
     return m_Root;
 }
 Qt::DropActions QmitkDataStorageTreeModel::supportedDropActions() const
@@ -150,7 +153,7 @@ bool QmitkDataStorageTreeModel::dropMimeData(const QMimeData *data,
     TreeItem* draggedItem = static_cast<TreeItem *>((void*)val);
     TreeItem* dropItem = this->TreeItemFromIndex(parent);
     TreeItem* parentItem = dropItem->GetParent();
-    if(dropItem == m_Root) // item was dropped onto empty space 
+    if(dropItem == m_Root) // item was dropped onto empty space
       parentItem = m_Root;
 
     if(draggedItem != dropItem && draggedItem->GetParent() == parentItem) // dragging is only allowed within the same parent
@@ -187,7 +190,7 @@ bool QmitkDataStorageTreeModel::dropMimeData(const QMimeData *data,
 QMimeData * QmitkDataStorageTreeModel::mimeData(const QModelIndexList & indexes) const{
   QMimeData * ret = new QMimeData;
   long a = reinterpret_cast<long>(indexes.at(0).internalPointer());
-  
+
   QString result;
   QTextStream(&result) << a;
   ret->setData("application/x-qabstractitemmodeldatalist", QByteArray(result.toAscii()));
@@ -209,7 +212,7 @@ QVariant QmitkDataStorageTreeModel::data( const QModelIndex & index, int role ) 
     return nodeName;
   else if(role == Qt::DecorationRole)
   {
-    QmitkNodeDescriptor* nodeDescriptor 
+    QmitkNodeDescriptor* nodeDescriptor
       = QmitkNodeDescriptorManager::GetInstance()->GetDescriptor(dataNode);
     return nodeDescriptor->GetIcon();
   }
@@ -304,10 +307,10 @@ void QmitkDataStorageTreeModel::SetDataStorageDeleted( const itk::Object* /*_Dat
 
 void QmitkDataStorageTreeModel::AddNode( const mitk::DataNode* node )
 {
-  if(node == 0 
-    || m_DataStorage.IsNull() 
-    || !m_DataStorage->Exists(node) 
-    || !m_Predicate->CheckNode(node) 
+  if(node == 0
+    || m_DataStorage.IsNull()
+    || !m_DataStorage->Exists(node)
+    || !m_Predicate->CheckNode(node)
     || m_Root->Find(node) != 0)
     return;
 
@@ -317,7 +320,7 @@ void QmitkDataStorageTreeModel::AddNode( const mitk::DataNode* node )
   mitk::DataNode* parentDataNode = this->GetParentNode(node);
 
   if(parentDataNode) // no top level data node
-  {    
+  {
     parentTreeItem = m_Root->Find(parentDataNode); // find the corresponding tree item
     if(!parentTreeItem)
     {
@@ -330,16 +333,32 @@ void QmitkDataStorageTreeModel::AddNode( const mitk::DataNode* node )
     // get the index of this parent with the help of the grand parent
     index = this->createIndex(parentTreeItem->GetIndex(), 0, parentTreeItem);
   }
-  // emit beginInsertRows event
-  beginInsertRows(index, 0, 0);
 
   // add node
-  parentTreeItem->InsertChild(new TreeItem(const_cast<mitk::DataNode*>(node)), 0);
+  if(m_PlaceNewNodesOnTop)
+  {
+    // emit beginInsertRows event
+    beginInsertRows(index, 0, 0);
+    parentTreeItem->InsertChild(new TreeItem(
+        const_cast<mitk::DataNode*>(node)), 0);
+  }
+  else
+  {
+    beginInsertRows(index, parentTreeItem->GetChildCount()
+                    , parentTreeItem->GetChildCount());
+    new TreeItem(const_cast<mitk::DataNode*>(node), parentTreeItem);
+  }
 
   // emit endInsertRows event
   endInsertRows();
 
   this->AdjustLayerProperty();
+}
+
+
+void QmitkDataStorageTreeModel::SetPlaceNewNodesOnTop(bool _PlaceNewNodesOnTop)
+{
+  m_PlaceNewNodesOnTop = _PlaceNewNodesOnTop;
 }
 
 void QmitkDataStorageTreeModel::RemoveNode( const mitk::DataNode* node )
@@ -374,7 +393,7 @@ void QmitkDataStorageTreeModel::RemoveNode( const mitk::DataNode* node )
     parentTreeItem->AddChild(*it);
 
     // emit endInsertRows event
-    endInsertRows();    
+    endInsertRows();
   }
 
   this->AdjustLayerProperty();
@@ -420,9 +439,9 @@ bool QmitkDataStorageTreeModel::setData( const QModelIndex &index, const QVarian
   }
   else if(role == Qt::CheckStateRole)
   {
-    // Please note: value.toInt() returns 2, independentely from the actual checkstate of the index element. 
-  // Therefore the checkstate is being estimated again here. 
-    
+    // Please note: value.toInt() returns 2, independentely from the actual checkstate of the index element.
+  // Therefore the checkstate is being estimated again here.
+
   QVariant qcheckstate = index.data(Qt::CheckStateRole);
   int checkstate = qcheckstate.toInt();
     bool isVisible = bool(checkstate);
@@ -558,7 +577,7 @@ QmitkDataStorageTreeModel::TreeItem* QmitkDataStorageTreeModel::TreeItem::GetChi
 }
 
 void QmitkDataStorageTreeModel::TreeItem::AddChild( TreeItem* item )
-{ 
+{
   this->InsertChild(item);
 }
 

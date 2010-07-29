@@ -95,6 +95,16 @@ QmitkDataManagerView::~QmitkDataManagerView()
   berry::ISelectionService* s = GetSite()->GetWorkbenchWindow()->GetSelectionService();
   if(s)
     s->RemoveSelectionListener(m_SelectionListener);
+  berry::IPreferencesService::Pointer prefService
+    = berry::Platform::GetServiceRegistry()
+    .GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
+
+  berry::IBerryPreferences::Pointer prefs
+      = (prefService->GetSystemPreferences()->Node(VIEW_ID))
+        .Cast<berry::IBerryPreferences>();
+  prefs->OnChanged.RemoveListener( berry::MessageDelegate1<QmitkDataManagerView
+    , const berry::IBerryPreferences*>( this
+      , &QmitkDataManagerView::OnPreferencesChanged ) );
 }
 
 void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
@@ -105,9 +115,19 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
     = berry::Platform::GetServiceRegistry()
     .GetServiceById<berry::IPreferencesService>(berry::IPreferencesService::ID);
 
+  berry::IBerryPreferences::Pointer prefs
+      = (prefService->GetSystemPreferences()->Node(VIEW_ID))
+        .Cast<berry::IBerryPreferences>();
+  assert( prefs );
+  prefs->OnChanged.AddListener( berry::MessageDelegate1<QmitkDataManagerView
+    , const berry::IBerryPreferences*>( this
+      , &QmitkDataManagerView::OnPreferencesChanged ) );
+
   //# GUI
   m_NodeTreeModel = new QmitkDataStorageTreeModel(this->GetDataStorage());
   m_NodeTreeModel->setParent( parent );
+  m_NodeTreeModel->SetPlaceNewNodesOnTop(
+      prefs->GetBool("Place new nodes on top", true) );
 
   //# Tree View (experimental)
   m_NodeTreeView = new QTreeView;
@@ -289,8 +309,9 @@ mitk::DataStorage::Pointer QmitkDataManagerView::GetDataStorage() const
   return 0;
 }
 
-void QmitkDataManagerView::OnPreferencesChanged(const berry::IBerryPreferences* )
+void QmitkDataManagerView::OnPreferencesChanged(const berry::IBerryPreferences* prefs)
 {
+  m_NodeTreeModel->SetPlaceNewNodesOnTop( prefs->GetBool("Place new nodes on top", true) );
 }
 
 void QmitkDataManagerView::NodeTableViewContextMenuRequested( const QPoint & pos )

@@ -42,7 +42,9 @@ public:
 
 //# CTORS,DTOR
 public:
-  QmitkDataStorageTreeModel(mitk::DataStorage* _DataStorage, QObject* parent = 0);
+  QmitkDataStorageTreeModel(mitk::DataStorage* _DataStorage
+                            , bool _PlaceNewNodesOnTop=false
+                            , QObject* parent = 0);
   ~QmitkDataStorageTreeModel();
 
 //# GETTER
@@ -58,12 +60,16 @@ public:
   virtual std::vector<mitk::DataNode*> GetNodeSet() const;
   ///
   /// Get the DataStorage.
-  /// 
+  ///
   const mitk::DataStorage::Pointer GetDataStorage() const;
+  ///
+  ///
+  ///
+  void SetPlaceNewNodesOnTop(bool _PlaceNewNodesOnTop);
 
   //# (Re-)implemented from QAbstractItemModel
   //# Read model
-  Qt::ItemFlags flags(const QModelIndex& index) const;  
+  Qt::ItemFlags flags(const QModelIndex& index) const;
   QVariant data ( const QModelIndex & index, int role = Qt::DisplayRole ) const;
   QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
   int rowCount ( const QModelIndex & parent = QModelIndex() ) const;
@@ -95,7 +101,7 @@ public:
   ///
   void SetDataStorageDeleted(const itk::Object* _DataStorage);
   ///
-  /// Adds a node to this model. 
+  /// Adds a node to this model.
   /// If a predicate is set (not null) the node will be checked against it.The node has to have a data object (no one wants to see empty nodes).
   ///
   virtual void AddNode(const mitk::DataNode* node);
@@ -193,7 +199,7 @@ protected:
   void AdjustLayerProperty();
   ///
   /// invoked after m_DataStorage or m_Predicate changed
-  ///  
+  ///
   TreeItem* TreeItemFromIndex(const QModelIndex &index) const;
   ///
   /// Gives a ModelIndex for the Tree Item
@@ -215,6 +221,7 @@ protected:
 protected:
   mitk::WeakPointer<mitk::DataStorage> m_DataStorage;
   mitk::NodePredicateBase::Pointer m_Predicate;
+  bool m_PlaceNewNodesOnTop;
   TreeItem* m_Root;
 };
 

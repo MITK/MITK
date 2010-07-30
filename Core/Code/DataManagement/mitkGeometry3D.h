@@ -320,7 +320,7 @@ virtual void SetBounds(const BoundsArrayType& bounds);
   //## @brief Convert world coordinates (in mm) of a \em point to index coordinates (in units).
   //## This method rounds to integer indices!
   template <unsigned int VIndexDimension>
-     void WorldToIndex(const mitk::Point3D& pt_mm, itk::Index<VIndexDimension> &index) const
+  void WorldToIndex(const mitk::Point3D& pt_mm, itk::Index<VIndexDimension> &index) const
   {
     typedef itk::Index<VIndexDimension> IndexType;
     mitk::Point3D pt_units;
@@ -332,7 +332,8 @@ virtual void SetBounds(const BoundsArrayType& bounds);
       dim=3;
     }
     for(i=0;i<dim;++i){
-      index[i]=itk::Math::RoundHalfIntegerUp< typename IndexType::IndexValueType>( pt_units[i] );
+      //index[i]=itk::Math::RoundHalfIntegerUp<typename IndexType::IndexValueType >( pt_units[i] );
+      index[i]=itk::Math::RoundHalfIntegerUp( pt_units[i] );
     }
   }
 

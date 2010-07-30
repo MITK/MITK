@@ -219,6 +219,9 @@ void BoundingObjectCutter::GenerateData()
     ComputeData(m_InputTimeSelector->GetOutput(), timestep);
   }
 
+  m_InputTimeSelector->SetInput(NULL);
+  m_OutputTimeSelector->SetInput(NULL);
+
   m_TimeOfHeaderInitialization.Modified();
 }
 

@@ -95,12 +95,6 @@ PlaneGeometry::IndexToWorld( const Point2D &pt_units, Point2D &pt_mm ) const
 {
   pt_mm[0]=m_ScaleFactorMMPerUnitX*pt_units[0];
   pt_mm[1]=m_ScaleFactorMMPerUnitY*pt_units[1];
-  
-  if (m_ImageGeometry)
-  {
-    pt_mm[0]-=0.5;
-    pt_mm[1]-=0.5;
-  }
 }
 
 
@@ -108,12 +102,6 @@ void PlaneGeometry::WorldToIndex( const Point2D &pt_mm, Point2D &pt_units ) cons
 {
   pt_units[0]=pt_mm[0]*(1.0/m_ScaleFactorMMPerUnitX);
   pt_units[1]=pt_mm[1]*(1.0/m_ScaleFactorMMPerUnitY);
-
-  if (m_ImageGeometry)
-  {
-    pt_units[0]+=0.5;
-    pt_units[1]+=0.5;
-  }
 }
 
 

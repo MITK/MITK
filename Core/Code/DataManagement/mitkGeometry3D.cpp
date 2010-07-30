@@ -142,15 +142,7 @@ void mitk::Geometry3D::WorldToIndex(const mitk::Point3D &pt_mm, mitk::Point3D &p
 
 void mitk::Geometry3D::IndexToWorld(const mitk::Point3D &pt_units, mitk::Point3D &pt_mm) const
 {
-  mitk::Point3D temp = pt_units;
-  if(m_ImageGeometry)
-  {
-    for (int i = 0; i < 3; i++)
-    {
-      temp[i] -= 0.5;
-    }
-  }
-  pt_mm = m_IndexToWorldTransform->TransformPoint(temp);
+  pt_mm = m_IndexToWorldTransform->TransformPoint(pt_units);
 }
 
 void mitk::Geometry3D::WorldToIndex(const mitk::Point3D &atPt3d_mm, const mitk::Vector3D &vec_mm, mitk::Vector3D &vec_units) const
@@ -363,15 +355,6 @@ void mitk::Geometry3D::BackTransform(const mitk::Point3D &in, mitk::Point3D& out
     for (j = 0; j < 3; j++)
     {
       out[i] += inverse[i][j]*temp[j];
-    }
-  }
-
-  // Image index coordinates are edge-based
-  if(m_ImageGeometry)
-  {
-    for (i = 0; i < 3; i++)
-    {
-      out[i] += 0.5;
     }
   }
 }

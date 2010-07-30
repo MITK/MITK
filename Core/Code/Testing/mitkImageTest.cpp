@@ -16,8 +16,12 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 
-#include "mitkImage.h"
-#include "mitkImageDataItem.h"
+#include <mitkImage.h>
+#include <mitkImageDataItem.h>
+#include <mitkImageCast.h>
+
+#include <itkImage.h>
+
 #include <fstream>
 #include <itkSmartPointerForwardReference.txx>
 #include <mitkDataNodeFactory.h>
@@ -343,15 +347,22 @@ int mitkImageTest(int /*argc*/, char* /*argv*/[])
   }
   std::cout<<"[PASSED]"<<std::endl;
 
+  //-----------------
+  MITK_TEST_OUTPUT(<< "Testing SetImportChannel");
   mitk::Image::Pointer vecImg = mitk::Image::New();
   vecImg->Initialize(*imgMem->GetPixelType().GetTypeId(), *imgMem->GetGeometry(), 2 /* #channels */, 0 /*tDim*/ );
   vecImg->SetImportChannel(imgMem->GetData(), 0, mitk::Image::CopyMemory );
   vecImg->SetImportChannel(imgMem->GetData(), 1, mitk::Image::CopyMemory );
-  if( !vecImg->IsValidSlice(0,0,1))
-  {
-    std::cout<<"[FAILED]"<<std::endl;
-    return EXIT_FAILURE;
-  }
+  std::cout<<"[PASSED]"<<std::endl;
+
+  MITK_TEST_OUTPUT(<< " Testing whether IsValidSlice returns valid after SetImportChannel");
+  MITK_TEST_CONDITION_REQUIRED( vecImg->IsValidSlice(0,0,1) , "");
+
+  MITK_TEST_OUTPUT(<< " Testing whether CopyMemory worked");
+  MITK_TEST_CONDITION_REQUIRED(imgMem->GetData() != vecImg->GetData(), "");
+
+  MITK_TEST_OUTPUT(<< " Testing destruction after SetImportChannel");
+  vecImg = NULL; 
   std::cout<<"[PASSED]"<<std::endl;
 
   //-----------------
@@ -422,32 +433,53 @@ int mitkImageTest(int /*argc*/, char* /*argv*/[])
     node = nodeReader->GetOutput();      
   }
   catch(...) {
-    MITK_ERROR << "Could not read file";
+    MITK_TEST_FAILED_MSG(<< "Could not read file for testing: " << "brain.mhd");
     return NULL;
   }  
 
   mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
-  
-  mitk::Point3D point;
-  
+    
   // test by index coordinates
-  mitk::FillVector3D(point, 55, 39, 50);
-  double val = image->GetPixelValueByIndex(point);
-
-  // there is always a small rounding error
-  if(abs(112.225 - val) > 1.0){
-    std::cout << "[FAILED]"; 
-    return EXIT_FAILURE;
-  }
+  mitk::Index3D index;
+  mitk::FillVector3D(index, 55, 39, 50);
+  MITK_TEST_OUTPUT(<< "Testing mitk::Image::GetPixelValueByIndex");
+  double val = image->GetPixelValueByIndex(index);
+  MITK_TEST_CONDITION_REQUIRED( mitk::Equal(val,112.22475433349609), "");
   
   //test by world coordinates
+  MITK_TEST_OUTPUT(<< "Testing mitk::Image::GetPixelValueByWorldCoordinate");
+  mitk::Point3D point;
   mitk::FillVector3D(point, -5.93752, 18.7199, 6.74218);
   val = image->GetPixelValueByWorldCoordinate(point);
+  MITK_TEST_CONDITION_REQUIRED( mitk::Equal(val,94.456184387207031), "");
 
-  if(abs(94.4562 - val) > 1.0){
-    std::cout << "[FAILED]"; 
-    return EXIT_FAILURE;
-  }
+  MITK_TEST_OUTPUT(<< "Convert to index and access value by mitk::Image::GetPixelValueByIndex again");
+  mitk::Index3D index2;
+  image->GetGeometry()->WorldToIndex(point, index2);
+  float val2 = image->GetPixelValueByWorldCoordinate(point);
+  MITK_TEST_CONDITION_REQUIRED( mitk::Equal(val,94.456184387207031), "");
+
+  //access via itk
+  MITK_TEST_OUTPUT(<< "Test conversion to itk::Image");
+  typedef itk::Image<float,3> ItkFloatImage3D;
+  ItkFloatImage3D::Pointer itkimage;
+  mitk::CastToItkImage(image, itkimage);
+  std::cout<<"[PASSED]"<<std::endl;
+ 
+  MITK_TEST_OUTPUT(<< "Testing world->itk-physical->world consistency");
+  mitk::Point3D itkPhysicalPoint;
+  image->GetGeometry()->WorldToItkPhysicalPoint(point, itkPhysicalPoint);
+
+  mitk::Point3D backTransformedPoint;
+  image->GetGeometry()->ItkPhysicalPointToWorld(itkPhysicalPoint, backTransformedPoint);
+  MITK_TEST_CONDITION_REQUIRED( mitk::Equal(point,backTransformedPoint), "");
+
+  MITK_TEST_OUTPUT(<< "Compare value of pixel returned by mitk in comparison to itk");
+  itk::Index<3> idx;  
+  itkimage->TransformPhysicalPointToIndex(itkPhysicalPoint, idx);
+  float valByItk = itkimage->GetPixel(idx);
+
+  MITK_TEST_CONDITION_REQUIRED( mitk::Equal(valByItk,94.456184387207031), "");
 
   MITK_TEST_END();
 

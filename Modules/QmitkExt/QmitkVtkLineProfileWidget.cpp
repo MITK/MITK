@@ -144,13 +144,8 @@ void QmitkVtkLineProfileWidget::UpdateItemModelFromPath()
   {
     const PathType::OutputType &continuousIndex = m_DerivedPath->Evaluate( t );
     
-    mitk::Point3D indexPoint;
-    indexPoint[0] = continuousIndex[0];
-    indexPoint[1] = continuousIndex[1];
-    indexPoint[2] = continuousIndex[2];
-
     mitk::Point3D worldPoint;
-    imageGeometry->IndexToWorld( indexPoint, worldPoint );
+    imageGeometry->IndexToWorld( continuousIndex, worldPoint );
 
     if ( i == 0 )
     {
@@ -158,6 +153,9 @@ void QmitkVtkLineProfileWidget::UpdateItemModelFromPath()
     }
 
     distance += currentWorldPoint.EuclideanDistanceTo( worldPoint );
+
+    mitk::Index3D indexPoint;
+    imageGeometry->WorldToIndex( worldPoint, worldPoint );
     double intensity = m_Image->GetPixelValueByIndex( indexPoint );
 
     MITK_INFO << t << "/" << distance << ": " << indexPoint << " (" << intensity << ")";

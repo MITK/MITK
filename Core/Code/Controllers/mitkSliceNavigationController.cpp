@@ -664,13 +664,13 @@ SliceNavigationController
 
                 std::stringstream stream;
 
-                // get the position and gray value from the image and build up status bar text
-                mitk::Point3D p;
+                // get the position and gray value from the image and build up status bar text                
                 if(image3D.IsNotNull())
                 {
+                  Index3D p;
                   image3D->GetGeometry()->WorldToIndex(worldposition, p);
                   stream<<"Position: <"<<worldposition[0] << ", " << worldposition[1] << ", " << worldposition[2] << "> mm";
-                  stream<<"; Index: <"<<floor(p[0]) << ", " << floor(p[1]) << ", " << floor(p[2]) << "> ";
+                  stream<<"; Index: <"<<p[0] << ", " << p[1] << ", " << p[2] << "> ";
                   stream<<"; Time: " << baseRenderer->GetTime() << " ms; Pixelvalue: "<<image3D->GetPixelValueByIndex(p, baseRenderer->GetTimeStep())<<"  ";
                 }
                 else

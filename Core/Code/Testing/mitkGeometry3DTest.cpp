@@ -22,9 +22,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkRotationOperation.h"
 #include "mitkInteractionConst.h"
+#include <mitkMatrixConvert.h>
 
 #include "mitkTestingMacros.h"
-
 #include <fstream>
 
 bool testGetAxisVectorVariants(mitk::Geometry3D* geometry)
@@ -65,7 +65,127 @@ bool testGetAxisVectorExtent(mitk::Geometry3D* geometry)
   return true;
 }
 
-int mitkGeometry3DTest(int /*argc*/, char* /*argv*/[])
+// a part of the test requires axis-parallel coordinates
+int testIndexAndWorldConsistency(mitk::Geometry3D* geometry3d)
+{
+  MITK_TEST_OUTPUT( << "Testing consistency of index and world coordinate systems: ");
+  mitk::Point3D origin = geometry3d->GetOrigin();
+  mitk::Point3D dummy;
+
+  MITK_TEST_OUTPUT( << " Testing index->world->index conversion consistency");
+  geometry3d->WorldToIndex(origin, dummy);
+  geometry3d->IndexToWorld(dummy, dummy);
+  MITK_TEST_CONDITION_REQUIRED(dummy == origin, "");
+
+  MITK_TEST_OUTPUT( << " Testing WorldToIndex(origin, mitk::Point3D)==(0,0,0)");
+  mitk::Point3D globalOrigin;
+  mitk::FillVector3D(globalOrigin, 0,0,0);
+  
+  mitk::Point3D originContinuousIndex;
+  geometry3d->WorldToIndex(origin, originContinuousIndex);
+  MITK_TEST_CONDITION_REQUIRED(originContinuousIndex == globalOrigin, "");
+
+  MITK_TEST_OUTPUT( << " Testing WorldToIndex(origin, itk::Index)==(0,0,0)");
+  itk::Index<3> itkindex;
+  geometry3d->WorldToIndex(origin, itkindex);
+  itk::Index<3> globalOriginIndex;
+  mitk::vtk2itk(globalOrigin, globalOriginIndex);
+  MITK_TEST_CONDITION_REQUIRED(itkindex == globalOriginIndex, "");
+
+  MITK_TEST_OUTPUT( << " Testing WorldToIndex(origin-0.5*spacing, itk::Index)==(0,0,0)");
+  mitk::Vector3D halfSpacingStep = geometry3d->GetSpacing()*0.5;
+  mitk::Matrix3D rotation;
+  mitk::Point3D originOffCenter = origin-halfSpacingStep;
+  geometry3d->WorldToIndex(originOffCenter, itkindex);
+  MITK_TEST_CONDITION_REQUIRED(itkindex == globalOriginIndex, "");
+
+  MITK_TEST_OUTPUT( << " Testing WorldToIndex(origin+0.5*spacing-eps, itk::Index)==(0,0,0)");  
+  originOffCenter = origin+halfSpacingStep;
+  originOffCenter -= 0.0001;
+  geometry3d->WorldToIndex( originOffCenter, itkindex);
+  MITK_TEST_CONDITION_REQUIRED(itkindex == globalOriginIndex, "");
+
+  MITK_TEST_OUTPUT( << " Testing WorldToIndex(origin+0.5*spacing, itk::Index)==(1,1,1)");
+  originOffCenter = origin+halfSpacingStep;
+  itk::Index<3> global111;
+  mitk::FillVector3D(global111, 1,1,1);
+  geometry3d->WorldToIndex( originOffCenter, itkindex);
+  MITK_TEST_CONDITION_REQUIRED(itkindex == global111, "");
+
+  MITK_TEST_OUTPUT( << " Testing WorldToIndex(GetCenter())==BoundingBox.GetCenter: ");
+  mitk::Point3D center = geometry3d->GetCenter();
+  mitk::Point3D centerContIndex;
+  geometry3d->WorldToIndex(center, centerContIndex);
+  mitk::BoundingBox::ConstPointer boundingBox = geometry3d->GetBoundingBox();
+  mitk::BoundingBox::PointType centerBounds = boundingBox->GetCenter();
+  MITK_TEST_CONDITION_REQUIRED(mitk::Equal(centerContIndex,centerBounds), "");
+
+  MITK_TEST_OUTPUT( << " Testing GetCenter()==IndexToWorld(BoundingBox.GetCenter): ");
+  center = geometry3d->GetCenter();
+  mitk::Point3D centerBoundsInWorldCoords;
+  geometry3d->IndexToWorld(centerBounds, centerBoundsInWorldCoords);
+  MITK_TEST_CONDITION_REQUIRED(mitk::Equal(center,centerBoundsInWorldCoords), "");
+
+  return EXIT_SUCCESS;
+}
+
+#include <itkImage.h>
+
+int testItkImageIsCenterBased()
+{
+  MITK_TEST_OUTPUT(<< "Testing whether itk::Image coordinates are center-based.");
+  typedef itk::Image<int,3> ItkIntImage3D;
+  ItkIntImage3D::Pointer itkintimage = ItkIntImage3D::New();
+  ItkIntImage3D::SizeType size;
+  size.Fill(10);
+  mitk::Point3D origin;
+  mitk::FillVector3D(origin, 2,3,7);
+  itkintimage->Initialize();
+  itkintimage->SetRegions(size);
+  itkintimage->SetOrigin(origin);
+  std::cout<<"[PASSED]"<<std::endl;
+
+  MITK_TEST_OUTPUT( << " Testing itk::Image::TransformPhysicalPointToContinuousIndex(origin)==(0,0,0)");
+  mitk::Point3D globalOrigin;
+  mitk::FillVector3D(globalOrigin, 0,0,0);
+
+  itk::ContinuousIndex<mitk::ScalarType, 3> originContinuousIndex;
+  itkintimage->TransformPhysicalPointToContinuousIndex(origin, originContinuousIndex);
+  MITK_TEST_CONDITION_REQUIRED(originContinuousIndex == globalOrigin, "");
+
+  MITK_TEST_OUTPUT( << " Testing itk::Image::TransformPhysicalPointToIndex(origin)==(0,0,0)");
+  itk::Index<3> itkindex;
+  itkintimage->TransformPhysicalPointToIndex(origin, itkindex);
+  itk::Index<3> globalOriginIndex;
+  mitk::vtk2itk(globalOrigin, globalOriginIndex);
+  MITK_TEST_CONDITION_REQUIRED(itkindex == globalOriginIndex, "");
+
+  MITK_TEST_OUTPUT( << " Testing itk::Image::TransformPhysicalPointToIndex(origin-0.5*spacing)==(0,0,0)");
+  mitk::Vector3D halfSpacingStep = itkintimage->GetSpacing()*0.5;
+  mitk::Matrix3D rotation;
+  mitk::Point3D originOffCenter = origin-halfSpacingStep;
+  itkintimage->TransformPhysicalPointToIndex(originOffCenter, itkindex);
+  MITK_TEST_CONDITION_REQUIRED(itkindex == globalOriginIndex, "");
+
+  MITK_TEST_OUTPUT( << " Testing itk::Image::TransformPhysicalPointToIndex(origin+0.5*spacing-eps, itk::Index)==(0,0,0)");  
+  originOffCenter = origin+halfSpacingStep;
+  originOffCenter -= 0.0001;
+  itkintimage->TransformPhysicalPointToIndex( originOffCenter, itkindex);
+  MITK_TEST_CONDITION_REQUIRED(itkindex == globalOriginIndex, "");
+
+  MITK_TEST_OUTPUT( << " Testing itk::Image::TransformPhysicalPointToIndex(origin+0.5*spacing, itk::Index)==(1,1,1)");
+  originOffCenter = origin+halfSpacingStep;
+  itk::Index<3> global111;
+  mitk::FillVector3D(global111, 1,1,1);
+  itkintimage->TransformPhysicalPointToIndex( originOffCenter, itkindex);
+  MITK_TEST_CONDITION_REQUIRED(itkindex == global111, "");
+
+  MITK_TEST_OUTPUT( << "=> Yes, itk::Image coordinates are center-based.");
+
+  return EXIT_SUCCESS;
+}
+
+int testGeometry3D(bool imageGeometry)
 {
   float bounds[ ] = {-10.0, 17.0, -12.0, 188.0, 13.0, 211.0};
 
@@ -73,6 +193,10 @@ int mitkGeometry3DTest(int /*argc*/, char* /*argv*/[])
 
   std::cout << "Initializing: ";
   geometry3d->Initialize();
+  std::cout<<"[PASSED]"<<std::endl;
+
+  MITK_TEST_OUTPUT(<< "Setting ImageGeometry to " << imageGeometry);
+  geometry3d->SetImageGeometry(imageGeometry);
   std::cout<<"[PASSED]"<<std::endl;
 
   std::cout << "Setting bounds by SetFloatBounds(): ";
@@ -124,6 +248,20 @@ int mitkGeometry3DTest(int /*argc*/, char* /*argv*/[])
   }
   std::cout<<"[PASSED]"<<std::endl;
 
+  std::cout << "Testing correctness of SetSpacing: ";
+  mitk::Vector3D newspacing;
+  mitk::FillVector3D(newspacing, 1.5, 2.5, 3.5);
+  geometry3d->SetSpacing(newspacing);
+  const mitk::Vector3D& spacing3 = geometry3d->GetSpacing();
+  if( mitk::Equal(spacing3, newspacing) == false )
+  {
+      std::cout<<"[FAILED]"<<std::endl;
+      return EXIT_FAILURE;
+  }
+  std::cout<<"[PASSED]"<<std::endl;
+
+  testIndexAndWorldConsistency(geometry3d);
+
   std::cout << "Testing a rotation of the geometry: ";
   double angle = 35.0;
   mitk::Vector3D rotationVector; mitk::FillVector3D( rotationVector, 1, 0, 0 );
@@ -131,19 +269,39 @@ int mitkGeometry3DTest(int /*argc*/, char* /*argv*/[])
   mitk::RotationOperation* op = new mitk::RotationOperation( mitk::OpROTATE, center, rotationVector, angle );
   geometry3d->ExecuteOperation(op);
 
-  // Todo: Find a meaningful way to test rotation success
+  MITK_TEST_OUTPUT( << " Testing mitk::GetRotation() and success of rotation");
+  mitk::Matrix3D rotation;
+  mitk::GetRotation(geometry3d, rotation);
+  mitk::Vector3D voxelStep=rotation*newspacing;  
+  mitk::Vector3D voxelStepIndex;
+  geometry3d->WorldToIndex(geometry3d->GetOrigin(), voxelStep, voxelStepIndex);
+  mitk::Vector3D expectedVoxelStepIndex;
+  expectedVoxelStepIndex.Fill(1);
+  MITK_TEST_CONDITION_REQUIRED(mitk::Equal(voxelStepIndex,expectedVoxelStepIndex), "");
   delete op;
   std::cout<<"[PASSED]"<<std::endl;
 
-  MITK_TEST_OUTPUT( << "Testing consistancy of index and world coordinate systems: ");
+  MITK_TEST_OUTPUT( << "Testing that ImageGeometry is still " << imageGeometry);
+  MITK_TEST_CONDITION_REQUIRED(geometry3d->GetImageGeometry() == imageGeometry, "");
 
-  mitk::Point3D point = geometry3d->GetOrigin();
-  mitk::Point3D dummy;
+  return EXIT_SUCCESS;
+}
 
-  geometry3d->WorldToIndex(point, dummy);
-  geometry3d->IndexToWorld(dummy, dummy);
-  MITK_TEST_CONDITION_REQUIRED(dummy == point, "");
+int mitkGeometry3DTest(int /*argc*/, char* /*argv*/[])
+{
+  MITK_TEST_BEGIN(mitkGeometry3DTest);
 
-  std::cout<<"[TEST DONE]"<<std::endl;
+  int result;
+
+  MITK_TEST_CONDITION_REQUIRED( (result = testItkImageIsCenterBased()) == EXIT_SUCCESS, "");
+
+  MITK_TEST_OUTPUT(<< "Running main part of test with ImageGeometry = false");
+  MITK_TEST_CONDITION_REQUIRED( (result = testGeometry3D(false)) == EXIT_SUCCESS, "");
+
+  MITK_TEST_OUTPUT(<< "Running main part of test with ImageGeometry = true");
+  MITK_TEST_CONDITION_REQUIRED( (result = testGeometry3D(true)) == EXIT_SUCCESS, "");
+
+  MITK_TEST_END();
+
   return EXIT_SUCCESS;
 }

@@ -54,9 +54,9 @@ class ImageTimeSelector;
 //## For importing ITK images use of mitk::ITKImageImport is recommended, see
 //## \ref Adaptor.
 //##
-//## Converting coordinates from the ITK physical coordinate system 
-//## (which does not support rotated images) to the MITK world coordinate
-//## system should be performed via the Geometry3D of the Image, see
+//## For ITK v3.8 and older: Converting coordinates from the ITK physical 
+//## coordinate system (which does not support rotated images) to the MITK world 
+//## coordinate system should be performed via the Geometry3D of the Image, see
 //## Geometry3D::WorldToItkPhysicalPoint.
 //## @ingroup Data
 class MITK_CORE_EXPORT Image : public SlicedData
@@ -113,12 +113,12 @@ public:
   //## @brief Get the pixel value at one specific position.
   //##
   //## The pixel type is always being converted to double.
-  double GetPixelValueByIndex(const mitk::Point3D &position, unsigned int timestep = 0);
+  double GetPixelValueByIndex(const mitk::Index3D& position, unsigned int timestep = 0);
 
   //## @brief Get the pixel value at one specific world position.
   //##
   //## The pixel type is always being converted to double.
-  double GetPixelValueByWorldCoordinate(const mitk::Point3D &position, unsigned int timestep = 0);
+  double GetPixelValueByWorldCoordinate(const mitk::Point3D& position, unsigned int timestep = 0);
 
   //##Documentation
   //## @brief Get a volume at a specific time @a t of channel @a n as a vtkImageData.
@@ -540,8 +540,6 @@ public:
     friend void _ComputeExtremaInItkImage(ItkImageType* itkImage, mitk::Image * mitkImage, int t);
 
 protected:
-  template <class T>
-  void AccessPixel(mitkIpPicDescriptor* pic, mitk::Point3D p, double& value, int timestep = 0);
   
   int GetSliceIndex(int s = 0, int t = 0, int n = 0) const;
 
@@ -598,34 +596,6 @@ protected:
 
   itk::TimeStamp m_LastRecomputeTimeStamp;
 
-};
-
-//## @brief Get the pixel value at one specific position.
-//##
-//## The pixel type is always being converted to double.
-template <class T>
-void Image::AccessPixel(mitkIpPicDescriptor* pic, mitk::Point3D p, double& value, int timestep)
-{  
-  itk::Point<int, 3> pi;
-  mitk::itk2vtk(p, pi);
-  if ( (pi[0]>=0 && pi[1] >=0 && pi[2]>=0 && timestep>=0) && (unsigned int)pi[0] < pic->n[0] && (unsigned int)pi[1] < pic->n[1] && (unsigned int)pi[2] < pic->n[2] && (unsigned int)timestep < pic->n[3] )
-  {
-    if(pic->bpe!=24)
-    {
-      value = (double) (((T*) pic->data)[ pi[0] + pi[1]*pic->n[0] + pi[2]*pic->n[0]*pic->n[1] + timestep*pic->n[0]*pic->n[1]*pic->n[2] ]);
-    }
-    else
-    {
-      double returnvalue = (((T*) pic->data)[pi[0]*3 + 0 + pi[1]*pic->n[0]*3 + pi[2]*pic->n[0]*pic->n[1]*3 + timestep*pic->n[0]*pic->n[1]*pic->n[2]*3 ]);
-      returnvalue += (((T*) pic->data)[pi[0]*3 + 1 + pi[1]*pic->n[0]*3 + pi[2]*pic->n[0]*pic->n[1]*3 + timestep*pic->n[0]*pic->n[1]*pic->n[2]*3]);
-      returnvalue += (((T*) pic->data)[pi[0]*3 + 2 + pi[1]*pic->n[0]*3 + pi[2]*pic->n[0]*pic->n[1]*3 + timestep*pic->n[0]*pic->n[1]*pic->n[2]*3]);
-      value = returnvalue;
-    }    
-  }
-  else
-  {
-    value = 0;
-  }
 };
 
 //##Documentation

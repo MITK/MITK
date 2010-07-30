@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkPoint.h>
 #include <float.h>
 #include <itkIndex.h>
+#include <itkContinuousIndex.h>
 #include <itkVector.h>
 #include <itkMatrix.h>
 #include <itkTransform.h>
@@ -48,6 +49,8 @@ typedef itk::Point<int,3> Point3I;
 typedef itk::Point<int,4> Point4I;
 typedef itk::Vector<ScalarType,2> Vector2D;
 typedef itk::Vector<ScalarType,3> Vector3D;
+typedef itk::Index<3> Index3D;
+typedef itk::ContinuousIndex<ScalarType, 3> ContinuousIndex3D;
 typedef vnl_quaternion<ScalarType> Quaternion;
 
 //##Documentation

@@ -99,7 +99,30 @@ void* mitk::Image::GetData()
   return m_CompleteData->GetData();
 }
 
-double mitk::Image::GetPixelValueByIndex(const mitk::Point3D &position, unsigned int timestep)
+template <class T>
+void AccessPixel(mitkIpPicDescriptor* pic, const mitk::Index3D& p, double& value, int timestep)
+{  
+  if ( (p[0]>=0 && p[1] >=0 && p[2]>=0 && timestep>=0) && (unsigned int)p[0] < pic->n[0] && (unsigned int)p[1] < pic->n[1] && (unsigned int)p[2] < pic->n[2] && (unsigned int)timestep < pic->n[3] )
+  {
+    if(pic->bpe!=24)
+    {
+      value = (double) (((T*) pic->data)[ p[0] + p[1]*pic->n[0] + p[2]*pic->n[0]*pic->n[1] + timestep*pic->n[0]*pic->n[1]*pic->n[2] ]);
+    }
+    else
+    {
+      double returnvalue = (((T*) pic->data)[p[0]*3 + 0 + p[1]*pic->n[0]*3 + p[2]*pic->n[0]*pic->n[1]*3 + timestep*pic->n[0]*pic->n[1]*pic->n[2]*3 ]);
+      returnvalue += (((T*) pic->data)[p[0]*3 + 1 + p[1]*pic->n[0]*3 + p[2]*pic->n[0]*pic->n[1]*3 + timestep*pic->n[0]*pic->n[1]*pic->n[2]*3]);
+      returnvalue += (((T*) pic->data)[p[0]*3 + 2 + p[1]*pic->n[0]*3 + p[2]*pic->n[0]*pic->n[1]*3 + timestep*pic->n[0]*pic->n[1]*pic->n[2]*3]);
+      value = returnvalue;
+    }    
+  }
+  else
+  {
+    value = 0;
+  }
+};
+
+double mitk::Image::GetPixelValueByIndex(const mitk::Index3D &position, unsigned int timestep)
 {
   mitkIpPicDescriptor* pic = this->GetPic();
   double value = 0;
@@ -111,7 +134,7 @@ double mitk::Image::GetPixelValueByIndex(const mitk::Point3D &position, unsigned
   return value;
 }
 
-double mitk::Image::GetPixelValueByWorldCoordinate(const mitk::Point3D &position, unsigned int timestep)
+double mitk::Image::GetPixelValueByWorldCoordinate(const mitk::Point3D& position, unsigned int timestep)
 {
   mitkIpPicDescriptor* pic = this->GetPic();
   double value = 0;
@@ -120,13 +143,10 @@ double mitk::Image::GetPixelValueByWorldCoordinate(const mitk::Point3D &position
     timestep = this->GetTimeSteps();
   }
 
-  itk::Index<3> itkIndex;
+  Index3D itkIndex;
   this->GetGeometry()->WorldToIndex(position,itkIndex);
-  Point3D mitkPointIndex;
-  mitkPointIndex[0]=itkIndex[0];
-  mitkPointIndex[1]=itkIndex[1];
-  mitkPointIndex[2]=itkIndex[2];
-  mitkIpPicTypeMultiplex3(AccessPixel, pic, mitkPointIndex, value, timestep);
+  mitkIpPicTypeMultiplex3(AccessPixel, pic, itkIndex, value, timestep);
+
   return value;
 }
 

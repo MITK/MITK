@@ -1,5 +1,6 @@
 SET(MODULE_TESTS 
   mitkAutoCropImageFilterTest.cpp
+  mitkBoundingObjectCutterTest.cpp
   mitkContourMapper2DTest.cpp
   mitkContourTest.cpp
   mitkCoreExtObjectFactoryTest

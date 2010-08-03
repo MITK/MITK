@@ -71,12 +71,15 @@ void QmitkOverlayController::InitializeWidget( QmitkOverlay::DisplayPosition pos
   // who might have thought...
   m_PositionedOverlays[ pos ]->setAutoFillBackground(false);
   m_PositionedOverlays[ pos ]->setAttribute( Qt::WA_TranslucentBackground, true );
-  
+
+  // X11 specific attributes
+  m_PositionedOverlays[ pos ]->setAttribute( Qt::WA_X11NetWmWindowTypeUtility, true );
+
   // mac-specific attributes:
   // making sure overlays are even visible if RenderWindow does not have the focus (not default for Qt::Tool on mac)
-  //m_PositionedOverlays[ pos ]->setAttribute( Qt::WA_MacAlwaysShowToolWindow, true );
+  m_PositionedOverlays[ pos ]->setAttribute( Qt::WA_MacAlwaysShowToolWindow, true );
   // testing something
-  //m_PositionedOverlays[ pos ]->setAttribute( Qt::WA_MacShowFocusRect, false );
+  m_PositionedOverlays[ pos ]->setAttribute( Qt::WA_MacShowFocusRect, false );
 
   // overlays should not get the focus
   m_PositionedOverlays[ pos ]->setFocusPolicy( Qt::NoFocus );
@@ -120,6 +123,7 @@ void QmitkOverlayController::InitializeWidget( QmitkOverlay::DisplayPosition pos
       QHBoxLayout* layout = new QHBoxLayout( m_PositionedOverlays[ pos ] );
       layout->setDirection( QBoxLayout::LeftToRight );
       layout->setAlignment( Qt::AlignLeft );
+      layout->setSpacing( 3 );
       break;
 
     }
@@ -129,6 +133,7 @@ void QmitkOverlayController::InitializeWidget( QmitkOverlay::DisplayPosition pos
       QHBoxLayout* layout = new QHBoxLayout( m_PositionedOverlays[ pos ] );
       layout->setDirection( QBoxLayout::RightToLeft );
       layout->setAlignment( Qt::AlignRight );
+      layout->setSpacing( 3 );
       break;
     }
   case QmitkOverlay::bottom_Left : 

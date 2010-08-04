@@ -57,17 +57,20 @@ public:
   /*!  
   \brief Sets up the labels in this widget's QGridLayout for showing the track status of the tracking tools
   */ 
-  void SetupStatusLabels();
+  void ShowStatusLabels();
   
   /*!
   \brief Sets the ND for this widget
   */
   void SetNavigationDatas(std::vector<mitk::NavigationData::Pointer>* navDatas);
 
+
+  void AddNavigationData(mitk::NavigationData::Pointer nd);
+
   /*!  
   \brief Changes background color of status labels (green or red) to show if actual navigation data of each tool is valid.
   */ 
-  void Update();
+  void Refresh();
   
   /*!  
   \brief Removes all status labels.

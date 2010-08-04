@@ -22,14 +22,16 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 QmitkToolTrackingStatusWidget::QmitkToolTrackingStatusWidget(QWidget* parent)  
-: QWidget(parent), m_Controls(NULL), m_StatusLabels (NULL)
+: QWidget(parent), m_Controls(NULL), m_StatusLabels (NULL), m_NavigationDatas(NULL)
 {
   this->CreateQtPartControl( this );
 }
 
 QmitkToolTrackingStatusWidget::~QmitkToolTrackingStatusWidget()
 {
-  m_Controls = NULL;
+  //m_Controls = NULL;
+  delete m_StatusLabels;
+  delete m_NavigationDatas;
 }
 
 void QmitkToolTrackingStatusWidget::CreateQtPartControl(QWidget *parent)
@@ -56,8 +58,16 @@ void QmitkToolTrackingStatusWidget::SetNavigationDatas(std::vector<mitk::Navigat
 }
 
 
+void QmitkToolTrackingStatusWidget::AddNavigationData(mitk::NavigationData::Pointer nd)
+{
+   if(m_NavigationDatas == NULL)
+     m_NavigationDatas = new std::vector<mitk::NavigationData::Pointer>();
 
-void QmitkToolTrackingStatusWidget::Update()
+   m_NavigationDatas->push_back(nd);
+}
+
+
+void QmitkToolTrackingStatusWidget::Refresh()
 {
   mitk::NavigationData* navData; 
 
@@ -77,7 +87,7 @@ void QmitkToolTrackingStatusWidget::Update()
 }
 
 
-void QmitkToolTrackingStatusWidget::SetupStatusLabels()
+void QmitkToolTrackingStatusWidget::ShowStatusLabels()
 {
   m_StatusLabels = new QVector<QLabel*>();
   mitk::NavigationData* navData;
@@ -110,8 +120,8 @@ void QmitkToolTrackingStatusWidget::RemoveStatusLabels()
     delete actWidget;
   }
 
-  delete this->m_StatusLabels;
-  this->m_StatusLabels = NULL;
+  m_StatusLabels->clear();
+  m_NavigationDatas->clear();
 
 }
 

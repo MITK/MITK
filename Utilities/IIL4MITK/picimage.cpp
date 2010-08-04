@@ -548,21 +548,22 @@ iil4mitkPicImage::display (iil4mitkWidget* widget)
 		float x=0.0, y=0.0;
 		mitkIpInt1_t *current;
 		mitkIpInt1_t *end = ((mitkIpInt1_t*)_pic->data) + (_pic->n[0]*_pic->n[1]);
-		for (current = (mitkIpInt1_t*)_pic->data; current<end; current++) {
-			if (*current != 0) {
-				if (*(current-line) == 0) {
-					glVertex3f( x,     y, 0.0 );
-					glVertex3f( x+1.0, y, 0.0 );
-				}
-				if (*(current+line) == 0) {
-					glVertex3f( x,     y+1.0, 0.0 );
-					glVertex3f( x+1.0, y+1.0, 0.0 );
-				}
-				if (*(current-1) == 0) {
-					glVertex3f( x, y,     0.0 );
-					glVertex3f( x, y+1.0, 0.0 );
-				}
-				if (*(current+1) == 0) {
+    int ii = 0, nn = _pic->n[0]*_pic->n[1];
+    for (current = (mitkIpInt1_t*)_pic->data; current<end; current++, ii++) {
+      if (*current != 0) {
+        if (ii >= line && *(current-line) == 0) {
+          glVertex3f( x,     y, 0.0 );
+          glVertex3f( x+1.0, y, 0.0 );
+        }
+        if (ii <= nn-line && *(current+line) == 0) {
+          glVertex3f( x,     y+1.0, 0.0 );
+          glVertex3f( x+1.0, y+1.0, 0.0 );
+        }
+        if (ii > 1 && *(current-1) == 0) {
+          glVertex3f( x, y,     0.0 );
+          glVertex3f( x, y+1.0, 0.0 );
+        }
+        if (ii < nn-1 && *(current+1) == 0) {
 					glVertex3f( x+1.0, y,     0.0 );
 					glVertex3f( x+1.0, y+1.0, 0.0 );
 				}

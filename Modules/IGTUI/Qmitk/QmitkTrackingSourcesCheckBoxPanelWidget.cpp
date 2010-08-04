@@ -74,7 +74,7 @@ const std::vector<int>* QmitkTrackingSourcesCheckBoxPanelWidget::GetSelectedTrac
   if(m_SelectedIds == NULL)
     m_SelectedIds = new std::vector<int>();
 
-  for (int i=0; i < m_SourceCheckboxes->size(); i++)
+  for (unsigned int i=0; i < m_SourceCheckboxes->size(); i++)
   {
     if(m_SourceCheckboxes->at(i)->isChecked())
       m_SelectedIds->push_back(i);
@@ -130,7 +130,7 @@ void QmitkTrackingSourcesCheckBoxPanelWidget::ShowSourceCheckboxes()
 
 void QmitkTrackingSourcesCheckBoxPanelWidget::EnableCheckboxes(bool enable)
 {
-  for(int i=0; i< m_SourceCheckboxes->size(); i++)
+  for(unsigned int i=0; i< m_SourceCheckboxes->size(); i++)
   {
     m_SourceCheckboxes->at(i)->setEnabled(enable);
   }
@@ -138,7 +138,7 @@ void QmitkTrackingSourcesCheckBoxPanelWidget::EnableCheckboxes(bool enable)
 
 void QmitkTrackingSourcesCheckBoxPanelWidget::SelectAll()
 {
-  for(int i=0; i< m_SourceCheckboxes->size(); i++)
+  for(unsigned int i=0; i< m_SourceCheckboxes->size(); i++)
   {
     m_SourceCheckboxes->at(i)->setChecked(true);
   }
@@ -146,7 +146,7 @@ void QmitkTrackingSourcesCheckBoxPanelWidget::SelectAll()
 
 void QmitkTrackingSourcesCheckBoxPanelWidget::DeselectAll()
 {
-  for(int i=0; i< m_SourceCheckboxes->size(); i++)
+  for(unsigned int i=0; i< m_SourceCheckboxes->size(); i++)
   {
     m_SourceCheckboxes->at(i)->setChecked(false);
   }

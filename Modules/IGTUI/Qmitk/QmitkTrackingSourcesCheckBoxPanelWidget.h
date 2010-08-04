@@ -141,9 +141,8 @@ protected:
 
 
 private:  
-
-  std::vector<mitk::NavigationData::Pointer>*  m_NavigationDatas; 
   TrackingSourcesCheckboxes* m_SourceCheckboxes;
+  std::vector<mitk::NavigationData::Pointer>*  m_NavigationDatas; 
   std::vector<int>* m_SelectedIds;
 
 

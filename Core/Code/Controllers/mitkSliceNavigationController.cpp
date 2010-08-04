@@ -669,7 +669,8 @@ SliceNavigationController
                 {
                   Index3D p;
                   image3D->GetGeometry()->WorldToIndex(worldposition, p);
-                  stream<<"Position: <"<<worldposition[0] << ", " << worldposition[1] << ", " << worldposition[2] << "> mm";
+                  stream.precision(2);
+                  stream<<"Position: <" << std::fixed <<worldposition[0] << ", " << std::fixed << worldposition[1] << ", " << std::fixed << worldposition[2] << "> mm";
                   stream<<"; Index: <"<<p[0] << ", " << p[1] << ", " << p[2] << "> ";
                   stream<<"; Time: " << baseRenderer->GetTime() << " ms; Pixelvalue: "<<image3D->GetPixelValueByIndex(p, baseRenderer->GetTimeStep())<<"  ";
                 }

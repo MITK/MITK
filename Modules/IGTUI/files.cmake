@@ -9,6 +9,7 @@ SET(CPP_FILES
   Qmitk/QmitkUpdateTimerWidget.cpp
   Qmitk/QmitkToolDistanceWidget.cpp
   Qmitk/QmitkToolTrackingStatusWidget.cpp
+  Qmitk/QmitkTrackingSourcesCheckBoxPanelWidget.cpp
 )
 
 SET(UI_FILES
@@ -20,6 +21,7 @@ SET(UI_FILES
   Qmitk/QmitkUpdateTimerWidgetControls.ui
   Qmitk/QmitkToolDistanceWidgetControls.ui
   Qmitk/QmitkToolTrackingStatusWidgetControls.ui
+  Qmitk/QmitkTrackingSourcesCheckBoxPanelWidgetControls.ui
 )
 
 SET(MOC_H_FILES
@@ -33,6 +35,7 @@ SET(MOC_H_FILES
   Qmitk/QmitkUpdateTimerWidget.h
   Qmitk/QmitkToolDistanceWidget.h
   Qmitk/QmitkToolTrackingStatusWidget.h
+  Qmitk/QmitkTrackingSourcesCheckBoxPanelWidget.h
 )
 
 

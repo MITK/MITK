@@ -9,6 +9,7 @@ SET(MODULE_TESTS
    mitkNavigationDataObjectVisualizationFilterTest.cpp
    mitkNavigationDataTest.cpp
    mitkNavigationDataRecorderTest.cpp
+   mitkNavigationDataReferenceTransformFilterTest.cpp
    mitkNavigationDataSequentialPlayerTest.cpp
    mitkNavigationDataToMessageFilterTest.cpp
    mitkNavigationDataToNavigationDataFilterTest.cpp

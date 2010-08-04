@@ -80,6 +80,7 @@ void QmitkDataManagerHotkeysPrefPage::CreateQtControl(QWidget* parent)
   layout->setRowStretch(i+1,10);
 
   m_MainControl->setLayout(layout);
+  this->Update();
 }
 
 QWidget* QmitkDataManagerHotkeysPrefPage::GetQtControl() const

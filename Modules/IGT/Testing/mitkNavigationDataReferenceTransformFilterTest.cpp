@@ -119,7 +119,7 @@ int mitkNavigationDataReferenceTransformFilterTest(int /* argc */, char* /*argv*
   /* create helper objects: reference input IDs vector */
   std::vector<int>* refIDs = new std::vector<int>();
 
-  unsigned int refInpt = 0;
+  int refInpt = 0;
 
   refIDs->push_back(refInpt);
 

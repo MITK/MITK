@@ -28,7 +28,7 @@ namespace mitk
 {
 
   /*!
-  \brief This class performes a symmetric forces demons registration between two images.
+  \brief This class performes a symmetric forces demons registration between two images with the same modality.
 
   \ingroup DeformableRegistration
 

@@ -148,7 +148,7 @@ NativeTabFolder::~NativeTabFolder()
     {
       content->setParent(0);
     }
-    delete viewForm;
+    viewForm->deleteLater();
   }
 }
 

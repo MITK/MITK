@@ -313,6 +313,7 @@ void QtWidgetsTweakletImpl::MoveBelow(QWidget* widgetToMove, QWidget*  /*widget*
 void QtWidgetsTweakletImpl::Dispose(QWidget* widget)
 {
   delete widget;
+  widget = 0;
 }
 
 Shell::Pointer QtWidgetsTweakletImpl::CreateShell(Shell::Pointer parent, int style)

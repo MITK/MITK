@@ -37,6 +37,8 @@ mitk::NavigationDataPlayer::NavigationDataPlayer()
   m_NumberOfOutputs = 0;
   m_StartPlayingTimeStamp = 0.0;
   m_PauseTimeStamp = 0.0;
+  m_parentElement = NULL;
+  m_currentNode = NULL;
 
   //To get a start time
   mitk::TimeStamp::GetInstance()->Start(this);
@@ -48,6 +50,7 @@ mitk::NavigationDataPlayer::NavigationDataPlayer()
 mitk::NavigationDataPlayer::~NavigationDataPlayer()
 {
   StopPlaying();
+  delete m_parentElement;
 }
 
 
@@ -185,8 +188,9 @@ void mitk::NavigationDataPlayer::InitPlayer()
     std::cout << "Playing not possible. Stream is not good!" << std::endl;
     return;
   }
-
-  m_NumberOfOutputs = GetNumberOfNavigationDatas(m_Stream); //now read the number of Tracked Tools
+  if(m_NumberOfOutputs == 0){
+    m_NumberOfOutputs = GetNumberOfNavigationDatas(m_Stream); //now read the number of Tracked Tools
+  }
 
   //with the information about the tracked tool number we can generate the output
   if (m_NumberOfOutputs > 0)
@@ -213,33 +217,41 @@ unsigned int mitk::NavigationDataPlayer::GetFileVersion(std::istream* stream)
   if (stream==NULL)
   {
     std::cout << "No input stream set!" << std::endl;
-    return 1;
+    return 0;
   }
   if (!stream->good())
   {
     std::cout << "Stream not good!" << std::endl;
-    return 1;
+    return 0;
   }
   int version = 1;
-  char str[255];
-  stream->getline(str,255); //1st line this is the xml header
+  
+  TiXmlDeclaration* dec = new TiXmlDeclaration();
+  *stream >> *dec;
+  if(strcmp(dec->Version(),"") == 0){
+    std::cout << "The input stream seems to have XML incompatible format" << std::endl;
+    return 0;
+  }
+  
+  m_parentElement = new TiXmlElement("");
+  *stream >> *m_parentElement; //2nd line this is the file version
 
-  //find out if this is a real xml file
-  if (str[0] != '<' && str[1] != '?' && str[2] != 'x' && str[3] != 'm' && str[4] != 'l')
-    return -1; 
-
-  TiXmlElement* elem = new TiXmlElement("");
-  *stream >> *elem; //2nd line this is the file version
-
-
-  elem->QueryIntAttribute("Ver",&version);
-
-  delete elem;
+  std::string tempValue = m_parentElement->Value();
+  if(tempValue != "Version")
+  {
+      if(tempValue == "Data"){
+          m_parentElement->QueryIntAttribute("version",&version);
+      }
+  }
+  else
+  {
+    m_parentElement->QueryIntAttribute("Ver",&version);
+  }
   
   if (version > 0)
     return version;
   else
-    return 1;
+    return 0;
 
 }
 
@@ -262,22 +274,12 @@ unsigned int mitk::NavigationDataPlayer::GetNumberOfNavigationDatas(std::istream
 
   int numberOfTools = 0;
   
-  //if you stream to a TiXmlElement the whole Tag with its entire data is streamed to the element
-  //therefore we only read one line and parse this
-  char str[255];
-  
-  stream->getline(str,255); //read the line until end
-  stream->getline(str,255); //3th line this one indicates additional parameters of the NavigationData object
-  
-  std::stringstream ss;
-  ss << str;
+  std::string tempValue = m_parentElement->Value();
+  if(tempValue == "Version"){
+    *stream >> *m_parentElement;
+  }
+  m_parentElement->QueryIntAttribute("ToolCount",&numberOfTools);
 
-  TiXmlElement* elem = new TiXmlElement("");
-  ss >> *elem; 
-
-  elem->QueryIntAttribute("ToolCount",&numberOfTools);
-
-  delete elem;
   if (numberOfTools > 0)
     return numberOfTools;
   
@@ -315,7 +317,10 @@ mitk::NavigationData::Pointer mitk::NavigationDataPlayer::ReadVersion1()
   matrix.SetIdentity();
 
   TiXmlElement* elem = new TiXmlElement("");
-  *m_Stream >> *elem;
+  m_currentNode = m_parentElement->IterateChildren(m_currentNode);
+  if(m_currentNode){
+      elem = m_currentNode->ToElement();
+  }
 
   //check here if EOF (the query don't change the timestamp value which should always be > 0)
   elem->QueryDoubleAttribute("Time",&timestamp);
@@ -375,7 +380,7 @@ mitk::NavigationData::Pointer mitk::NavigationDataPlayer::ReadVersion1()
   nd->SetHasOrientation(hasOrientation);
   nd->SetHasPosition(hasPosition);
 
-  delete elem;
+  //delete elem;
   return nd;
 }
 

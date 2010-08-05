@@ -216,8 +216,9 @@ void mitk::NavigationDataRecorder::StartRecording(std::ostream* stream)
   if (m_Stream)
   {
     *m_Stream << "<?xml version=\"1.0\" ?>" << std::endl;
-    *m_Stream << "<Version Ver=\"1\" />" << std::endl;
-    *m_Stream << "    " << "<Data ToolCount=\"" << (m_NumberOfInputs) << "\">" << std::endl;
+    /**m_Stream << "<Version Ver=\"1\" />" << std::endl;*/
+    // should be a generic version, meaning a member variable, which has the actual version
+    *m_Stream << "    " << "<Data ToolCount=\"" << (m_NumberOfInputs) << "\" version=\"1.0\">" << std::endl;
 
     m_Recording = true;
   }

@@ -179,6 +179,10 @@ namespace mitk {
     std::vector<NavigationData::Pointer> m_NextToPlayNavigationData; ///< stores the next possible candidate for playing
 
     std::vector<TimeStampType> m_StartTimeOfData; ///< stores the start time of the different tools
+
+    TiXmlElement * m_parentElement;
+
+    TiXmlNode * m_currentNode;
   };
 } // namespace mitk
 

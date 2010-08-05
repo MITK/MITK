@@ -15,8 +15,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#ifndef UNSTRUCTURED_GRID_WRITERFACTORY_H_HEADER_INCLUDED
-#define UNSTRUCTURED_GRID_WRITERFACTORY_H_HEADER_INCLUDED
+#ifndef PLANARFIGURE_WRITERFACTORY_H_HEADER_INCLUDED
+#define PLANARFIGURE_WRITERFACTORY_H_HEADER_INCLUDED
 
 #include "itkObjectFactoryBase.h"
 #include "PlanarFigureExports.h"
@@ -62,7 +62,7 @@ private:
 
 } // end namespace mitk
 
-#endif // UNSTRUCTURED_GRID_WRITERFACTORY_H_HEADER_INCLUDED
+#endif // PLANARFIGURE_WRITERFACTORY_H_HEADER_INCLUDED
 
 
 

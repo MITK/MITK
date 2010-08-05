@@ -68,6 +68,18 @@ namespace mitk
     /// set if the data player should repeat the outputs
     ///
     itkGetMacro(Repeat, bool);
+    ///
+    /// \return the number of navigation data snapshots available in the file
+    ///
+    itkGetMacro(NumberOfSnapshots, unsigned int);
+
+    ///
+    /// advance the output to the i-th snapshot
+    /// e.g. if you want to have the NavData of snapshot
+    /// 17 then you can call GoToSnapshot(17). index begins at 1!
+    /// you can then also go back to snapshot 1 with GoToSnapshot(1)
+    ///
+    void GoToSnapshot(int i);
 
     /**
     * \brief Used for pipeline update just to tell the pipeline
@@ -91,6 +103,8 @@ namespace mitk
     TiXmlElement* m_DataElem;
     TiXmlElement* m_CurrentElem;
     bool m_Repeat;
+    unsigned int m_NumberOfSnapshots;
+    int m_LastGoTo;
   };
 } // namespace mitk
 

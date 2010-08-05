@@ -29,6 +29,8 @@ mitk::NavigationDataSequentialPlayer::NavigationDataSequentialPlayer()
   , m_DataElem(0)
   , m_CurrentElem(0)
   , m_Repeat(false)
+  , m_NumberOfSnapshots(0)
+  , m_LastGoTo(0)
 {
 }
 
@@ -65,7 +67,51 @@ void mitk::NavigationDataSequentialPlayer::ReinitXML()
       tmp->Graft(emptyNd);
       this->SetNthOutput(index, tmp);
     }
+
+    // find out _NumberOfSnapshots
+    m_NumberOfSnapshots = 0;
+    TiXmlElement* nextND = m_DataElem->FirstChildElement("ND");
+    while(nextND)
+    {
+      ++m_NumberOfSnapshots;
+      nextND = nextND->NextSiblingElement();
+    }
+    // e.g. 12 nd found and 2 tools used => number of snapshots is 12:2=6
+    m_NumberOfSnapshots = m_NumberOfSnapshots/toolcount;
+
   }
+}
+
+void mitk::NavigationDataSequentialPlayer::GoToSnapshot(int i)
+{
+  assert(m_DataElem);
+
+  int numOfUpdateCalls = 0;
+
+  // i.e. number of snapshots 10
+  // goto(7), m_LastGoTo=3 => numOfUpdateCalls = 4
+  if(m_LastGoTo <= i)
+    numOfUpdateCalls = i - m_LastGoTo;
+  // goto(4), m_LastGoTo=7 => numOfUpdateCalls = 7
+  else
+  {
+    if(!m_Repeat)
+    {
+      MITK_WARN << "cannot go back to snapshot " << i << " because the "
+          << this->GetNameOfClass() << " is configured to not repeat the"
+          << " navigation data";
+
+    }
+    else
+    {
+      numOfUpdateCalls = (m_NumberOfSnapshots - m_LastGoTo) + i;
+    }
+  }
+
+  for(int j=0; j<numOfUpdateCalls; ++j)
+    this->Update();
+
+  m_LastGoTo = i;
 }
 
 void mitk::NavigationDataSequentialPlayer::

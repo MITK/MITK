@@ -74,7 +74,7 @@ void mitk::NavigationDataSequentialPlayer::ReinitXML()
     while(nextND)
     {
       ++m_NumberOfSnapshots;
-      nextND = nextND->NextSiblingElement();
+      nextND = nextND->NextSiblingElement("ND");
     }
     // e.g. 12 nd found and 2 tools used => number of snapshots is 12:2=6
     m_NumberOfSnapshots = m_NumberOfSnapshots/toolcount;

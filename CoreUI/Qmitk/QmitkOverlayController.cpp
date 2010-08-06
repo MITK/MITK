@@ -98,6 +98,7 @@ void QmitkOverlayController::InitializeWidget( QmitkOverlay::DisplayPosition pos
       QVBoxLayout* layout = new QVBoxLayout( m_PositionedOverlays[ pos ] );
       layout->setDirection( QBoxLayout::TopToBottom );
       layout->setAlignment( Qt::AlignLeft );
+      m_PositionedOverlays[ pos ]->layout()->setSpacing( 0 );
       break;
     }
   case QmitkOverlay::top_Center : 
@@ -107,6 +108,7 @@ void QmitkOverlayController::InitializeWidget( QmitkOverlay::DisplayPosition pos
       layout->setDirection( QBoxLayout::TopToBottom );
       layout->setAlignment( Qt::AlignCenter );
       layout->setAlignment( Qt::AlignLeft );
+      m_PositionedOverlays[ pos ]->layout()->setSpacing( 0 );
       break;
     }
   case QmitkOverlay::top_Right :
@@ -115,6 +117,7 @@ void QmitkOverlayController::InitializeWidget( QmitkOverlay::DisplayPosition pos
       QVBoxLayout* layout = new QVBoxLayout( m_PositionedOverlays[ pos ] );
       layout->setDirection( QBoxLayout::TopToBottom );
       layout->setAlignment( Qt::AlignRight );
+      m_PositionedOverlays[ pos ]->layout()->setSpacing( 0 );
       break;
     }
   case QmitkOverlay::middle_Left : 
@@ -142,6 +145,7 @@ void QmitkOverlayController::InitializeWidget( QmitkOverlay::DisplayPosition pos
       QVBoxLayout* layout = new QVBoxLayout( m_PositionedOverlays[ pos ] );
       layout->setDirection( QBoxLayout::BottomToTop );
       layout->setAlignment( Qt::AlignLeft );
+      m_PositionedOverlays[ pos ]->layout()->setSpacing( 0 );
       break;
     }
   case QmitkOverlay::bottom_Center : 
@@ -149,6 +153,7 @@ void QmitkOverlayController::InitializeWidget( QmitkOverlay::DisplayPosition pos
       QVBoxLayout* layout = new QVBoxLayout( m_PositionedOverlays[ pos ] );
       layout->setDirection( QBoxLayout::BottomToTop );
       layout->setAlignment( Qt::AlignCenter );
+      m_PositionedOverlays[ pos ]->layout()->setSpacing( 0 );
       break;
     }
   case QmitkOverlay::bottom_Right :
@@ -156,10 +161,10 @@ void QmitkOverlayController::InitializeWidget( QmitkOverlay::DisplayPosition pos
       QVBoxLayout* layout = new QVBoxLayout( m_PositionedOverlays[ pos ] );
       layout->setDirection( QBoxLayout::BottomToTop );
       layout->setAlignment( Qt::AlignRight );
+      m_PositionedOverlays[ pos ]->layout()->setSpacing( 0 );
       break;
     }
   }
-  m_PositionedOverlays[ pos ]->layout()->setSpacing( 0 );
 }
 
 void QmitkOverlayController::AdjustOverlayPosition()
@@ -227,7 +232,7 @@ void QmitkOverlayController::AdjustOverlayPosition()
     widget->move( pos.x() - widget->size().width(), pos.y() - widget->size().height() );
   }
 
-}
+} 
 
 
 void QmitkOverlayController::SetOverlayVisibility( bool visible )
@@ -237,12 +242,10 @@ void QmitkOverlayController::SetOverlayVisibility( bool visible )
   {
     if ( visible )
     {
-      MITK_INFO << "Setting visible";
       overlay->GetWidget()->show();
     }
     else
     {
-      MITK_INFO << "hiding";
       overlay->GetWidget()->hide();
     }
   }
@@ -316,8 +319,6 @@ void QmitkOverlayController::RemoveOverlay( QmitkOverlay* overlay )
 
 void QmitkOverlayController::AlignOverlays()
 {
-  //MITK_INFO << "mitkOverlayController::AlignOverlays";
-
   //OverlayVector::iterator overlayIter;
 
   //for ( overlayIter=m_AllOverlays.begin(); overlayIter!=m_AllOverlays.end(); overlayIter++ )

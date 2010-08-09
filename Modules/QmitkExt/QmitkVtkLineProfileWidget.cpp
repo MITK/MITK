@@ -41,7 +41,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 //#include <iostream>
 
-QmitkVtkLineProfileWidget::QmitkVtkLineProfileWidget( QWidget */*parent*/ )
+QmitkVtkLineProfileWidget::QmitkVtkLineProfileWidget( QWidget * /*parent*/ )
 : m_PathMode( PATH_MODE_DIRECT )
 {
   m_ChartWidget = new vtkQtChartWidget( this );

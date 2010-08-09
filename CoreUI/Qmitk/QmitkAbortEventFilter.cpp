@@ -57,24 +57,28 @@ QmitkAbortEventFilter
   typedef QPointer< QObject > GuardedObject;
   // Extract renderer (if event has been invoked on a RenderWindow)
   bool isLODRenderer = false;
-  mitk::BaseRenderer *renderer = NULL;
   QVTKWidget *qVTKWidget = dynamic_cast< QVTKWidget * >( object );
+  mitk::BaseRenderer *renderer = NULL;
+  
   if (qVTKWidget != NULL )
   {
     renderer = mitk::BaseRenderer::GetInstance( qVTKWidget->GetRenderWindow() );
+    
     if ( renderer && renderer->GetNumberOfVisibleLODEnabledMappers() > 0 )
     {
       isLODRenderer = true;
     }
     else
-{
+    {
       // Only LOD enabled renderers are considered
       renderer = NULL;
     }
 
   }
+  if(renderer == NULL)
+    return false;
 
-  if (mitk::RenderingManager::GetInstance()->IsRendering() )
+  if (renderer->GetRenderingManager() )
   {
     switch ( event->type() )
     {
@@ -89,10 +93,10 @@ QmitkAbortEventFilter
         m_ButtonPressed = true;
 
         // Abort current rendering (for all rendering windows!)
-        mitk::RenderingManager::GetInstance()->AbortRendering();
+        renderer->GetRenderingManager()->AbortRendering();
 
         // Block LOD increase until mouse button is released
-        mitk::RenderingManager::GetInstance()->LODIncreaseBlockedOn();
+        renderer->GetRenderingManager()->LODIncreaseBlockedOn();
 
         // Store renderer (if LOD-enabled), otherwise renderer will be NULL
         m_LODRendererAtButtonPress = renderer;
@@ -127,9 +131,9 @@ QmitkAbortEventFilter
     {
       if ( m_ButtonPressed )
       {
-        if ( isLODRenderer && mitk::RenderingManager::GetInstance()->GetNextLOD( m_LODRendererAtButtonPress ) != 0 )
+        if ( isLODRenderer && renderer->GetRenderingManager()->GetNextLOD( m_LODRendererAtButtonPress ) != 0 )
         {
-          mitk::RenderingManager::GetInstance()->AbortRendering();
+          renderer->GetRenderingManager()->AbortRendering();
         }
       }
       return true;
@@ -141,7 +145,7 @@ QmitkAbortEventFilter
       {
         m_ButtonPressed = false;
         
-        mitk::RenderingManager::GetInstance()->LODIncreaseBlockedOff();
+        renderer->GetRenderingManager()->LODIncreaseBlockedOff();
       }
       
       QMouseEvent* me = ( QMouseEvent* )( event );
@@ -154,7 +158,7 @@ QmitkAbortEventFilter
 
     case QEvent::Wheel:
     {
-      mitk::RenderingManager::GetInstance()->AbortRendering();
+      renderer->GetRenderingManager()->AbortRendering();
 
       QWheelEvent* we = ( QWheelEvent* )( event );
       QWheelEvent* newEvent = new QWheelEvent(
@@ -175,7 +179,7 @@ QmitkAbortEventFilter
 
       case QEvent::KeyPress:
       { 
-        mitk::RenderingManager::GetInstance()->AbortRendering();
+        renderer->GetRenderingManager()->AbortRendering();
         QKeyEvent* ke = ( QKeyEvent* )( event );
         QKeyEvent* newEvent = new QKeyEvent(
           ke->type(), ke->key(), ke->modifiers(), ke->text(), false, ke->count()
@@ -293,7 +297,7 @@ QmitkAbortEventFilter
         if ( !m_ButtonPressed )
         {
           m_ButtonPressed = true;
-          mitk::RenderingManager::GetInstance()->LODIncreaseBlockedOn();
+          renderer->GetRenderingManager()->LODIncreaseBlockedOn();
 
           m_LODRendererAtButtonPress = renderer;
         }
@@ -315,7 +319,7 @@ QmitkAbortEventFilter
 
       case QEvent::Wheel:
       {
-        //mitk::RenderingManager::GetInstance()->RequestUpdateAll(
+        //renderer->GetRenderingManager()->RequestUpdateAll(
         //  mitk::RenderingManager::REQUEST_UPDATE_3DWINDOWS );
         return false;
       }     
@@ -325,16 +329,16 @@ QmitkAbortEventFilter
         if ( m_ButtonPressed )
         {
           m_ButtonPressed = false;
-          mitk::RenderingManager::GetInstance()->LODIncreaseBlockedOff();
+          renderer->GetRenderingManager()->LODIncreaseBlockedOff();
 
           if ( m_LODRendererAtButtonPress != NULL )
           {
-            mitk::RenderingManager::GetInstance()->RequestUpdate(
+            renderer->GetRenderingManager()->RequestUpdate(
               m_LODRendererAtButtonPress->GetRenderWindow() );
           }
           else
           {
-            mitk::RenderingManager::GetInstance()->RequestUpdateAll(
+            renderer->GetRenderingManager()->RequestUpdateAll(
               mitk::RenderingManager::REQUEST_UPDATE_3DWINDOWS );
           }
         }

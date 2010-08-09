@@ -682,16 +682,16 @@ void RenderingManager::ExecutePendingRequests()
 
 void RenderingManager::RenderingStartCallback( vtkObject *caller, unsigned long , void *, void * )
 {
-  // Static method: access member objects via static instance
-  RenderWindowList &renderWindowList = GetInstance()->m_RenderWindowList;
+  vtkRenderWindow *renderWindow  = dynamic_cast< vtkRenderWindow * >( caller );
+  mitk::RenderingManager* renman = mitk::BaseRenderer::GetInstance(renderWindow)->GetRenderingManager();
+  RenderWindowList &renderWindowList = renman->m_RenderWindowList;
 
-  vtkRenderWindow *renderWindow = dynamic_cast< vtkRenderWindow * >( caller );
   if ( renderWindow )
   {
     renderWindowList[renderWindow] = RENDERING_INPROGRESS;
   }
 
-  GetInstance()->m_UpdatePending = false;
+  renman->m_UpdatePending = false;
 }
 
 
@@ -699,7 +699,10 @@ void
 RenderingManager
 ::RenderingProgressCallback( vtkObject *caller, unsigned long , void *, void * )
 {
-  if ( GetInstance()->m_LODAbortMechanismEnabled )
+  vtkRenderWindow *renderWindow  = dynamic_cast< vtkRenderWindow * >( caller );
+  mitk::RenderingManager* renman = mitk::BaseRenderer::GetInstance(renderWindow)->GetRenderingManager();
+
+  if ( renman->m_LODAbortMechanismEnabled )
   {
     vtkRenderWindow *renderWindow = dynamic_cast< vtkRenderWindow * >( caller );
     if ( renderWindow )
@@ -707,7 +710,7 @@ RenderingManager
       BaseRenderer *renderer = BaseRenderer::GetInstance( renderWindow );
       if ( renderer && (renderer->GetNumberOfVisibleLODEnabledMappers() > 0) )
       {
-        GetInstance()->DoMonitorRendering();
+        renman->DoMonitorRendering();
       }
     }
   }
@@ -717,14 +720,16 @@ void
 RenderingManager
 ::RenderingEndCallback( vtkObject *caller, unsigned long , void *, void * )
 {
-  // Static method: access member objects via static instance
-  RenderWindowList &renderWindowList = GetInstance()->m_RenderWindowList;
-  RendererBoolMap &renderingAbortedMap = GetInstance()->m_RenderingAbortedMap;
-  RendererIntMap &nextLODMap = GetInstance()->m_NextLODMap;
-  unsigned int &maxLOD = GetInstance()->m_MaxLOD;
-  bool &lodIncreaseBlocked = GetInstance()->m_LODIncreaseBlocked;
+  vtkRenderWindow *renderWindow  = dynamic_cast< vtkRenderWindow * >( caller );
+  mitk::RenderingManager* renman = mitk::BaseRenderer::GetInstance(renderWindow)->GetRenderingManager();
 
-  vtkRenderWindow *renderWindow = dynamic_cast< vtkRenderWindow * >( caller );
+  RenderWindowList &renderWindowList = renman->m_RenderWindowList;
+  RendererBoolMap &renderingAbortedMap = renman->m_RenderingAbortedMap;
+  RendererIntMap &nextLODMap = renman->m_NextLODMap;
+  unsigned int &maxLOD = renman->m_MaxLOD;
+  bool &lodIncreaseBlocked = renman->m_LODIncreaseBlocked;
+
+  
   if ( renderWindow )
   {
     BaseRenderer *renderer = BaseRenderer::GetInstance( renderWindow );
@@ -768,14 +773,17 @@ RenderingManager
           }
         }
 
+      
+        mitk::RenderingManager* renman = mitk::BaseRenderer::GetInstance(renderWindow)->GetRenderingManager();
+
         // Issue events queued during rendering (abort mechanism)
-        GetInstance()->DoFinishAbortRendering();
+        renman->DoFinishAbortRendering();
 
         // Post new rendering request only at the end to give DoFinishAbortRendering
         // the chance to process other events first!
         if ( newRenderingRequest )
         {
-          GetInstance()->RequestUpdate( renderer->GetRenderWindow() );
+          renman->RequestUpdate( renderer->GetRenderWindow() );
         }
       }
     }

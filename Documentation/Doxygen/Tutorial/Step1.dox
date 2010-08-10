@@ -6,7 +6,10 @@
 
 The first program shows how to display an image in a 2D view. The picture above is a snapshot of the program.
 
-In order to obtain the result the program has to be executed using the image file mitk/Core/Code/Testing/Data/Pic3D.pic.gz.
+The program has to be executed using the image file mitk/Core/Code/Testing/Data/Pic3D.pic.gz.
+To set the image file path in Visual Studio, right click on "Step1"-project and go to 'Properties -> Configuration Properties -> Debugging'. Now insert the image file path in the "Command Arguments" text field. Use this also in the following steps.
+
+\image html configureVisualStudioProperties.png
 
 The code is subdivided in parts I - V. First of all a DataTree has to be created. Then data has to be read from a file which afterwards has to be put into the tree. Part IV creates a window and passes the tree to it. The last part deals with some Qt-specific initialization.
 

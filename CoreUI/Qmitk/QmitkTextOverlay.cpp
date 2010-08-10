@@ -67,6 +67,7 @@ void QmitkTextOverlay::SetText()
     MITK_WARN << "Property " << m_Id << " could not be found";
   }
   m_Widget->setText( text.c_str() );
+  m_Widget->repaint();
 }
 
 

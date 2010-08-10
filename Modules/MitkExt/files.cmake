@@ -35,6 +35,8 @@ SET(CPP_FILES
   Algorithms/mitkPointLocator.cpp
   Algorithms/mitkPointSetToCurvedGeometryFilter.cpp
   Algorithms/mitkPointSetToGeometryDataFilter.cpp
+  Algorithms/mitkPointSetIndexToWorldTransformFilter.cpp
+  Algorithms/mitkSurfaceIndexToWorldTransformFilter.cpp
   Algorithms/mitkPolygonToRingFilter.cpp
   Algorithms/mitkProbeFilter.cpp
   Algorithms/mitkSegmentationSink.cpp

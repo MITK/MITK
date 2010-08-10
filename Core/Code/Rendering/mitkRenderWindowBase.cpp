@@ -37,7 +37,7 @@ mitk::RenderWindowBase::RenderWindowBase( ) : m_ProcessWheelEvents(true)
 
 * or short: within constructors and destructors classes are not polymorph.
 */
-void mitk::RenderWindowBase::Initialize( mitk::RenderingManager* renderingManager )
+void mitk::RenderWindowBase::Initialize( mitk::RenderingManager* renderingManager, const char* name )
 {
   if ( renderingManager == NULL )
   {
@@ -46,7 +46,7 @@ void mitk::RenderWindowBase::Initialize( mitk::RenderingManager* renderingManage
   
   if(m_Renderer.IsNull())
   {
-      m_Renderer = mitk::VtkPropRenderer::New( "asdf" , GetVtkRenderWindow(), renderingManager );
+      m_Renderer = mitk::VtkPropRenderer::New( name , GetVtkRenderWindow(), renderingManager );
   }
 
   m_Renderer->InitRenderer(this->GetVtkRenderWindow());

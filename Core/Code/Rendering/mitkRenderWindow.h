@@ -32,7 +32,6 @@ class vtkEventProvider;
  * \brief mitkRenderWindow integrates the MITK rendering mechanism into VTK and
  * is NOT QT dependent
  *
- * Note: This class is currently experimental.
  *
  * \ingroup Renderer
  */
@@ -43,6 +42,9 @@ class MITK_CORE_EXPORT RenderWindow: public mitk::RenderWindowBase, public itk::
 public:
   mitkClassMacro(RenderWindow, itk::Object);
   itkNewMacro(Self);
+  mitkNewMacro1Param(Self, vtkRenderWindow*);
+  mitkNewMacro2Param(Self, vtkRenderWindow*, const char*);
+
   
   virtual ~RenderWindow();
 
@@ -61,7 +63,8 @@ public:
   void FullScreenMode( bool state );
 
 protected:
-    RenderWindow();
+    RenderWindow(vtkRenderWindow * existingRenderWindow = NULL , const char* name = "unnamed renderer");
+
 
     void ResetView();
   

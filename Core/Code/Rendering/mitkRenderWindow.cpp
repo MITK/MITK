@@ -26,13 +26,17 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkVtkEventProvider.h"
 
 
-mitk::RenderWindow::RenderWindow( )
+mitk::RenderWindow::RenderWindow(vtkRenderWindow* renWin, const char* name ) 
+: m_vtkRenderWindow(renWin)
 {
-  m_vtkRenderWindow = vtkRenderWindow::New();
+  
+  if(m_vtkRenderWindow == NULL)
+    m_vtkRenderWindow = vtkRenderWindow::New();
+  
   m_vtkRenderWindowInteractor = vtkRenderWindowInteractor::New();
   
   // initialize from RenderWindowBase
-  Initialize();
+  Initialize(NULL,name);
 
   m_vtkMitkEventProvider = vtkEventProvider::New();
   m_vtkMitkEventProvider->SetInteractor(this->GetVtkRenderWindowInteractor());

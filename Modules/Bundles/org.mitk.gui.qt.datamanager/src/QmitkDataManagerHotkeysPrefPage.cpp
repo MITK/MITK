@@ -127,13 +127,14 @@ bool QmitkDataManagerHotkeysPrefPage::PerformOk()
       }
     }
 
-    //# no errors -> save all values and flush to file
+	//# no errors -> save all values and flush to file
     for (std::map<QString, QmitkHotkeyLineEdit*>::iterator it = m_HotkeyEditors.begin()
       ; it != m_HotkeyEditors.end(); ++it)
       _DataManagerHotkeysPreferencesNode->Put(it->first.toStdString()
         , it->second->GetKeySequenceAsString().toStdString());
 
     _DataManagerHotkeysPreferencesNode->Flush();
+
     return true;
   }
   return false;
@@ -156,4 +157,9 @@ void QmitkDataManagerHotkeysPrefPage::Update()
         , it->second->text().toStdString())));
     }
   }
+}
+
+void QmitkDataManagerHotkeysPrefPage::FlushPreferences()
+{
+	// flushing is done in perfOK()
 }

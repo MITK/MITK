@@ -68,6 +68,12 @@ public:
   /// \see IPreferencePage::Update()
   ///
   virtual void Update();
+
+   /**
+   * @see berry::IPreferencePage::FlushReferences()
+   */
+  void FlushPreferences();
+
 protected:
   berry::IPreferences::WeakPtr m_GeneralPreferencesNode;
   //QCheckBox* m_StartMaximized;

@@ -53,6 +53,12 @@ public:
   /// \see IPreferencePage::Update()
   ///
   virtual void Update();
+
+  /**
+   * @see berry::IPreferencePage::FlushReferences()
+   */
+  void FlushPreferences();
+
 protected:
   ///
   /// The node from which the properties are taken (will be catched from the preferences service in ctor)

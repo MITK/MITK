@@ -335,7 +335,8 @@ void QmitkPreferencesDialog::OnApplyButtonClicked( bool  /*triggered*/ )
   {
     prefPage = it->prefPage;
     if(prefPage)
-      prefPage->PerformOk();
+      if(prefPage->PerformOk())
+        prefPage->FlushPreferences();
   }
   
   this->done(QDialog::Accepted);

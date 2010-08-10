@@ -84,3 +84,9 @@ void QmitkGeneralPreferencePage::Update()
 //   if(_GeneralPreferencesNode.IsNotNull())
 //     m_StartMaximized->setChecked(_GeneralPreferencesNode->GetBool("startMaximized", false));
 }
+
+void QmitkGeneralPreferencePage::FlushPreferences()
+{
+  // Does not have a flush method
+  /*this->m_GeneralPreferencesNode.Flush();*/
+}

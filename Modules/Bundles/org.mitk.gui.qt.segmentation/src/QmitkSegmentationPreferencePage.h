@@ -56,6 +56,11 @@ public:
   ///
   virtual void Update();
 
+    /**
+   * @see berry::IPreferencePage::FlushReferences()
+   */
+  void FlushPreferences();
+
 protected slots:
 
   void OnVolumeRenderingCheckboxChecked(int);

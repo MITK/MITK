@@ -335,10 +335,21 @@ void QmitkPreferencesDialog::OnApplyButtonClicked( bool  /*triggered*/ )
   {
     prefPage = it->prefPage;
     if(prefPage)
-      if(prefPage->PerformOk())
-        prefPage->FlushPreferences();
+      prefPage->PerformOk();
   }
-  
+
+  /**
+   * Every preference page has its own preferences, which should stay the same after a system restart. <br>
+   * Therefore this method flushes all the preferences, every time a change in the preferences is <br>
+   * performed and confirmed.
+   *
+   */
+  berry::IPreferencesService::Pointer prefService = m_PreferencesService.Lock();
+  if (prefService)
+  {
+    prefService->GetSystemPreferences()->Flush();
+  }
+
   this->done(QDialog::Accepted);
 }
 

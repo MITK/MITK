@@ -113,8 +113,3 @@ void QmitkSegmentationPreferencePage::OnVolumeRenderingCheckboxChecked(int state
                              "If you encounter out-of-memory problems, try turning off volume rendering again.");
   }
 }
-
-void QmitkSegmentationPreferencePage::FlushPreferences()
-{
-	this->m_SegmentationPreferencesNode->Flush();
-}

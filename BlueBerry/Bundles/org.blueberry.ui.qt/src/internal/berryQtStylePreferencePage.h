@@ -46,11 +46,6 @@ public:
   void PerformCancel();
   void Update();
 
-  /**
-   * @see berry::IPreferencePage::FlushReferences()
-   */
-  void FlushPreferences();
-
 protected:
 
   void AddPath(const QString& path, bool updateCombo);

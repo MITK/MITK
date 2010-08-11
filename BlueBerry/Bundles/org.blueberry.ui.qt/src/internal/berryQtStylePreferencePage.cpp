@@ -197,9 +197,4 @@ void QtStylePreferencePage::Update()
   FillStyleCombo(oldStyle);
 }
 
-void berry::QtStylePreferencePage::FlushPreferences()
-{
-	this->m_StylePref->Flush();
-}
-
 }

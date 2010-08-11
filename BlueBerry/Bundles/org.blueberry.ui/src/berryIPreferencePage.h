@@ -97,15 +97,6 @@ struct IPreferencePage: virtual public Object
   /// you should read all values again from the preferences service.
   ///
   virtual void Update() = 0;
-
-  /**
-   * Every preference page has its own preferences, which should stay same after a system restart. <br>
-   * Therefore this method flushes all the preferences, every time a change in the preferences is <br>
-   * performed and confirmed.
-   *
-   * @brief flushes the current preferences
-   */
-  virtual void FlushPreferences() = 0;
 };
 
 }

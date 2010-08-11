@@ -53,11 +53,6 @@ public:
   ///
   virtual void Update();
 
-  /**
-   * @see berry::IPreferencePage::FlushReferences()
-   */
-  void FlushPreferences();
-
 protected:
   QWidget* m_MainControl;
   QCheckBox* m_EnableSingleEditing;

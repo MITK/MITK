@@ -81,8 +81,3 @@ void QmitkDataManagerPreferencePage::Update()
   m_EnableSingleEditing->setChecked(m_DataManagerPreferencesNode->GetBool("Single click property editing", true));
   m_PlaceNewNodesOnTop->setChecked(m_DataManagerPreferencesNode->GetBool("Place new nodes on top", true));
 }
-
-void QmitkDataManagerPreferencePage::FlushPreferences()
-{
-	this->m_DataManagerPreferencesNode->Flush();
-}

@@ -158,8 +158,3 @@ void QmitkDataManagerHotkeysPrefPage::Update()
     }
   }
 }
-
-void QmitkDataManagerHotkeysPrefPage::FlushPreferences()
-{
-	// flushing is done in perfOK()
-}

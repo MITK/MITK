@@ -300,6 +300,7 @@ void QmitkOverlayController::RemoveOverlay( QmitkOverlay* overlay )
       m_AllOverlays.erase( iter );
       overlay->GetWidget()->setParent( NULL );
       overlay->GetWidget()->hide();
+      overlay->deleteLater();
 
       if ( m_PositionedOverlays[ pos ]->layout()->isEmpty() )
       {

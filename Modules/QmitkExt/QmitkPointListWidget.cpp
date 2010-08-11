@@ -23,17 +23,15 @@
 
 
 QmitkPointListWidget::QmitkPointListWidget(QWidget *parent, int orientation):
-        QWidget(parent), m_PointListView(NULL), m_PointSetNode(NULL),  m_MovePointUpBtn(NULL),
-        m_MovePointDownBtn(NULL), m_RemovePointBtn(NULL), m_SavePointsBtn(NULL), m_LoadPointsBtn(NULL), m_Interactor(NULL),
-        m_Orientation(0), m_MultiWidget(NULL), m_ToggleAddPoint(NULL)
+        QWidget(parent), m_PointListView(NULL),  m_MultiWidget(NULL),  m_PointSetNode(NULL), m_Orientation(0),  m_MovePointUpBtn(NULL),
+        m_MovePointDownBtn(NULL), m_RemovePointBtn(NULL), m_SavePointsBtn(NULL), m_LoadPointsBtn(NULL), m_ToggleAddPoint(NULL),
+		m_Interactor(NULL), m_TimeStep(0), m_EditAllowed(true)
 {
     m_PointListView = new QmitkPointListView();
 
     if(orientation != 0)
         m_Orientation = orientation;
 
-    m_EditAllowed = true;
-    m_TimeStep = 0;
     SetupUi();
     SetupConnections();
 

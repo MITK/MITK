@@ -19,12 +19,10 @@
  * Displays a list of point coordinates and a couple of
  * buttons which
  *
- * \li add points using a PointSetInteractor
- * \li remove a selected point
- * \li move a selected point up
- * \li move a selected point down
- * \li save points to file
+ * \li enable point set interaction
+ * \li clear all points from a set
  * \li load points from file
+ * \li save points to file
  *
  * The user/application module of this widget needs to
  * assign a mitk::PointSet object to this widget. The user

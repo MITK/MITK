@@ -219,7 +219,7 @@ void QmitkPointListView::wheelEvent(QWheelEvent *event)
 {
 
 
-	if ((int)(m_PointListModel->GetPointSet()->GetTimeSteps()) == 1 /*|| !m_4DPointSet*/)
+    if (!m_PointListModel || !m_PointListModel->GetPointSet() || (int)(m_PointListModel->GetPointSet()->GetTimeSteps()) == 1 /*|| !m_4DPointSet*/)
         return;
 
 
@@ -259,10 +259,10 @@ void QmitkPointListView::fadeTimeStepIn()
     QWidget *m_TimeStepFader = new QWidget(this);
     QHBoxLayout *layout = new QHBoxLayout(m_TimeStepFader);
 
-    int x = (int)(this->geometry().x()+this->width()*0.05);
+    int x = (int)(this->geometry().x()+this->width()*0.6);
     int y = (int)(this->geometry().y()+this->height()*0.8);
     m_TimeStepFader->move(x,y);
-    m_TimeStepFader->resize(160, 55);
+    m_TimeStepFader->resize(60, 55);
     m_TimeStepFader->setLayout(layout);
     m_TimeStepFader->setAttribute(Qt::WA_DeleteOnClose);
 
@@ -273,11 +273,11 @@ void QmitkPointListView::fadeTimeStepIn()
     m_TimeStepFaderLabel->setAlignment(Qt::AlignCenter);
     m_TimeStepFaderLabel->setFrameStyle(QFrame::StyledPanel | QFrame::Raised);
     m_TimeStepFaderLabel->setLineWidth(2);
-    m_TimeStepFaderLabel->setText(QString("Time: %1").arg(this->m_PointListModel->GetTimeStep()));
+    m_TimeStepFaderLabel->setText(QString("%1").arg(this->m_PointListModel->GetTimeStep()));
 
     //give the widget opacity and some colour
     QPalette pal = m_TimeStepFaderLabel->palette();
-    QColor semiTransparentColor(139, 192, 223, 100);
+    QColor semiTransparentColor(139, 192, 223, 50);
     QColor labelTransparentColor(0,0,0,200);
     pal.setColor(m_TimeStepFaderLabel->backgroundRole(), semiTransparentColor);
     pal.setColor(m_TimeStepFaderLabel->foregroundRole(), labelTransparentColor);
@@ -379,15 +379,17 @@ void QmitkPointListView::ClearPointListTS()
     if ( curPS->GetSize() == 0)
         return;
 
-
+     int ts = this->m_PointListModel->GetTimeStep();
     switch( QMessageBox::question( this, tr("Clear Points in Timestep"),
-                                   tr("Remove all points from the list with the timestep %1?").arg(this->m_PointListModel->GetTimeStep()),
+                                   tr("Remove all points from the list with the timestep %1?").arg(ts),
                                    QMessageBox::Yes | QMessageBox::No, QMessageBox::No))
     {
     case QMessageBox::Yes:
         if (curPS)
         {
-            //curPS->;
+            mitk::PointSet::DataType::Pointer curPSwithTS = curPS->GetPointSet(ts);
+            //curPSwithTS->Clear();
+
         }
         mitk::RenderingManager::GetInstance()->RequestUpdateAll();
         break;

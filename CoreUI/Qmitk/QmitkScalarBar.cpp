@@ -23,12 +23,21 @@ PURPOSE.  See the above copyright notices for more information.
 QmitkScalarBar::QmitkScalarBar(QWidget* parent): 
 QWidget( parent, Qt::Tool | Qt::FramelessWindowHint ), m_Alignment(vertical)
 {
-  this->setAttribute(Qt::WA_PaintOnScreen, true);
   this->setSizePolicy( QSizePolicy::Fixed, QSizePolicy::Fixed );
   this->SetupGeometry( m_Alignment );
   this->setBackgroundRole(QPalette::Base);
   this->setAttribute( Qt::WA_TranslucentBackground, true );
   this->setAutoFillBackground(false);
+
+  // X11 specific attributes
+  this->setAttribute( Qt::WA_X11NetWmWindowTypeUtility, true );
+
+  // mac-specific attributes:
+  // making sure overlays are even visible if RenderWindow does not have the focus (not default for Qt::Tool on mac)
+  this->setAttribute( Qt::WA_MacAlwaysShowToolWindow, true );
+  // testing something
+  this->setAttribute( Qt::WA_MacShowFocusRect, false );
+
 
   this->resize( 20,60 );
   this->setFixedWidth( 20 );

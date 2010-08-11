@@ -1,30 +1,17 @@
-/*=========================================================================
- 
-Program:   Medical Imaging & Interaction Toolkit
-Language:  C++
-Date:      $Date$
-Version:   $Revision: 1.12 $
- 
-Copyright (c) German Cancer Research Center, Division of Medical and
-Biological Informatics. All rights reserved.
-See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
-This software is distributed WITHOUT ANY WARRANTY; without even
-the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-PURPOSE.  See the above copyright notices for more information.
- 
-=========================================================================*/
+#ifndef QmitkPointListWidget_H
+#define QmitkPointListWidget_H
 
-#ifndef QmitkPointListWidgetHIncluded
-#define QmitkPointListWidgetHIncluded
-
-#include "mitkDataNode.h"
+#include <QmitkPointListView.h>
+#include <QmitkPointListModel.h>
 #include "QmitkExtExports.h"
-#include "mitkPointSetInteractor.h"
 
-#include "QmitkPointListView.h"
+#include <mitkDataNode.h>
+#include <mitkPointSet.h>
+#include <mitkPointSetInteractor.h>
+#include <QmitkStdMultiWidget.h>
 
-class QPushButton;
+
+#include <QPushButton>
 
 /*!
  * \brief Widget for regular operations on point sets
@@ -32,10 +19,12 @@ class QPushButton;
  * Displays a list of point coordinates and a couple of
  * buttons which
  *
- * \li enable point set interaction
- * \li clear all points from a set
- * \li load points from file
+ * \li add points using a PointSetInteractor
+ * \li remove a selected point
+ * \li move a selected point up
+ * \li move a selected point down
  * \li save points to file
+ * \li load points from file
  *
  * The user/application module of this widget needs to
  * assign a mitk::PointSet object to this widget. The user
@@ -47,62 +36,76 @@ class QPushButton;
  * currently selected point, the widget user has to provide
  * a QmitkStdMultiWidget object.
  */
+
+
 class QmitkExt_EXPORT QmitkPointListWidget : public QWidget
 {
-  Q_OBJECT
+    Q_OBJECT
 
-  public:
-
-    QmitkPointListWidget( QWidget* parent = 0, Qt::WindowFlags f = 0 );
+public:
+    QmitkPointListWidget(QWidget *parent = 0, int orientation = 0);
     ~QmitkPointListWidget();
 
+    void SetupConnections();
+
     /// assign a point set (contained in a node of DataStorage) for observation
-    void SetPointSetNode( mitk::DataNode* node );
-    
+    void SetPointSet(mitk::PointSet* newPs);
+    mitk::PointSet* GetPointSet();
+
+    /// assign a point set (contained in a node of DataStorage) for observation
+    void SetPointSetNode(mitk::DataNode* newNode);
+    mitk::DataNode* GetPointSetNode();
+
     /// assign a QmitkStdMultiWidget for updating render window crosshair
-    void SetMultiWidget( QmitkStdMultiWidget* multiWidget );
-    
-    /// itk observer for node "delete" events
-    void OnNodeDeleted( const itk::EventObject & e );
+    void SetMultiWidget(QmitkStdMultiWidget* multiWidget);
 
-  signals:
+public slots:
+    void DeactivateInteractor(bool deactivate);
+    void EnableEditButton(bool enabled);
 
+signals:
+    /// signal to inform about the state of the EditPointSetButton, whether an interactor for setting points is active or not
+    void EditPointSets(bool active);
+    /// signal to inform that the selection of a point in the pointset has changed
+    void PointSelectionChanged();
     /// signal to inform about cleared or loaded point sets
     void PointListChanged();
 
-    /// signal to inform about the state of the EditPointSetButton, whether an interactor for setting points is active or not
-    void EditPointSets(bool active);
+protected slots:
+    void OnBtnSavePoints();
+    void OnBtnLoadPoints();
+    void RemoveSelectedPoint();
+    void MoveSelectedPointDown();
+    void MoveSelectedPointUp();
+    void OnBtnAddPoint(bool checked);
+    //void OnBtnSetPointsMode(bool checked);
 
-    /// signal to inform that the selection of a point in the pointset has changed
-    void PointSelectionChanged(); 
-  public slots:
+    void OnListDoubleClick();
 
-    void DeactivateInteractor(bool deactivate);
-    void EnableEditButton(bool enabled);
- 
-  protected slots:
+protected:
 
-    void OnEditPointSetButtonToggled(bool checked);
-    void OnClearPointSetButtonClicked();
-    void OnClearPointButtonClicked();
-    void OnLoadPointSetButtonClicked();
-    void OnSavePointSetButtonClicked();
+    void SetupUi();
 
-  protected:
+    QmitkPointListView* m_PointListView;
+    QmitkStdMultiWidget* m_MultiWidget;
 
-    void ObserveNewNode( mitk::DataNode* node );
 
-    QmitkPointListView* m_ListView;
-    QPushButton* m_BtnEdit;
-    QPushButton* m_BtnClear;
-    QPushButton* m_BtnClearAll;
-    QPushButton* m_BtnLoad;
-    QPushButton* m_BtnSave;    
-    mitk::DataNode* m_PointSetNode;
-    mitk::PointSetInteractor::Pointer m_Interactor;
+    mitk::DataNode::Pointer         m_PointSetNode;
+
+    int      m_Orientation;
+
+    QPushButton* m_MovePointUpBtn;
+    QPushButton* m_MovePointDownBtn;
+    QPushButton* m_RemovePointBtn;
+    QPushButton* m_SavePointsBtn;
+    QPushButton* m_LoadPointsBtn;
+    QPushButton* m_ToggleAddPoint;
+
+
+    mitk::PointSetInteractor::Pointer   m_Interactor;
+    int     m_TimeStep;
     bool m_EditAllowed;
-    unsigned int m_NodeObserverTag;
+
 };
 
 #endif
-

@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   Medical Imaging & Interaction Toolkit
 Language:  C++
 Date:      $Date$
 Version:   $Revision: 1.12 $
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #include "QmitkPointListView.h"
@@ -24,174 +24,377 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkRenderingManager.h"
 
 #include <QKeyEvent>
+#include <QPalette>
+#include <QTimer>
+#include <QMenu>
+#include <QMessageBox>
 
 QmitkPointListView::QmitkPointListView( QWidget* parent )
-:QListView( parent ),
- m_PointListModel( new QmitkPointListModel() ),
- m_SelfCall( false ),
- m_MultiWidget( NULL)
+    :QListView( parent ),
+    m_PointListModel( new QmitkPointListModel() ),
+    m_SelfCall( false ),
+    m_showFading(false),
+    m_MultiWidget( NULL)
 {  
-  QListView::setAlternatingRowColors( true );
- 
-  // logic
+    QListView::setAlternatingRowColors( true );
 
-  QListView::setSelectionBehavior( QAbstractItemView::SelectRows );
-  QListView::setSelectionMode( QAbstractItemView::SingleSelection );
-  QListView::setModel( m_PointListModel );
+    // logic
 
-  //Define Size
-  this->setMinimumHeight(40);
+    QListView::setSelectionBehavior( QAbstractItemView::SelectRows );
+    QListView::setSelectionMode( QAbstractItemView::SingleSelection );
+    QListView::setModel( m_PointListModel );
+    QString tooltip = QString("Use the F2/F3 keys to move a point up/down, the Del key to remove a point\nand the mouse wheel to change the timestep.\n\nTimeStep:\t%1").arg(0);
+    QListView::setToolTip(tooltip);
+    //m_FadeTimer = new QTimer();
+    this->setContextMenuPolicy(Qt::CustomContextMenu);
 
-  //horizontal, vertical
-  this->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
+    m_TimeStepFaderLabel = new QLabel(this);
+    QFont font("Arial", 17);
+    m_TimeStepFaderLabel->setFont(font);
 
-  connect( m_PointListModel, SIGNAL(SignalUpdateSelection()), this, SLOT(OnPointSetSelectionChanged()) );
-  
-  connect( this, SIGNAL(doubleClicked ( const QModelIndex & )),
-           this, SLOT(OnPointDoubleClicked( const QModelIndex & )) );
+    //Define Size
+    this->setMinimumHeight(40);
 
-  connect( QListView::selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)),
-           this, SLOT(OnListViewSelectionChanged(const QItemSelection& , const QItemSelection&)) );
+    //horizontal, vertical
+    this->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
 
 
-  
+    //connect
+    connect( m_PointListModel, SIGNAL(SignalUpdateSelection()), this, SLOT(OnPointSetSelectionChanged()) );
+
+    connect( this, SIGNAL(doubleClicked ( const QModelIndex & )),
+             this, SLOT(OnPointDoubleClicked( const QModelIndex & )) );
+
+    connect( QListView::selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)),
+             this, SLOT(OnListViewSelectionChanged(const QItemSelection& , const QItemSelection&)) );
+
+    connect(this, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(ctxMenu(const QPoint &)));
+
 }
 
 QmitkPointListView::~QmitkPointListView()
 {
-  delete m_PointListModel;
+    delete m_PointListModel;
 }
 
 void QmitkPointListView::SetPointSet( mitk::PointSet* pointSet )
 {
-  m_PointListModel->SetPointSet( pointSet );
+    m_PointListModel->SetPointSet( pointSet );
+
+
 }
 
 const mitk::PointSet* QmitkPointListView::GetPointSet() const
 {
-  return m_PointListModel->GetPointSet();
+    return m_PointListModel->GetPointSet();
 }
-     
+
 void QmitkPointListView::SetMultiWidget( QmitkStdMultiWidget* multiWidget )
 {
-  m_MultiWidget = multiWidget;
+    m_MultiWidget = multiWidget;
+
+
 }
 
 QmitkStdMultiWidget* QmitkPointListView::GetMultiWidget() const
 {
-  return m_MultiWidget;
+    return m_MultiWidget;
 }
 
 void QmitkPointListView::OnPointDoubleClicked(const QModelIndex & index)
 {
-  mitk::PointSet::PointType p;
-  mitk::PointSet::PointIdentifier id;
-  m_PointListModel->GetPointForModelIndex(index, p, id);
-  QmitkEditPointDialog _EditPointDialog(this);
-  _EditPointDialog.SetPoint(m_PointListModel->GetPointSet(), id, m_PointListModel->GetTimeStep());
-  _EditPointDialog.exec();
+    mitk::PointSet::PointType p;
+    mitk::PointSet::PointIdentifier id;
+    m_PointListModel->GetPointForModelIndex(index, p, id);
+    QmitkEditPointDialog _EditPointDialog(this);
+    _EditPointDialog.SetPoint(m_PointListModel->GetPointSet(), id, m_PointListModel->GetTimeStep());
+    _EditPointDialog.exec();
 }
 
 void QmitkPointListView::OnPointSetSelectionChanged()
 {
-  const mitk::PointSet* pointSet = m_PointListModel->GetPointSet();
-  if (pointSet == NULL)
-    return;
+    const mitk::PointSet* pointSet = m_PointListModel->GetPointSet();
+    if (pointSet == NULL)
+        return;
 
-  // update this view's selection status as a result to changes in the point set data structure
-  m_SelfCall = true;
-  int timeStep = m_PointListModel->GetTimeStep();
+    // update this view's selection status as a result to changes in the point set data structure
+    m_SelfCall = true;
+    int timeStep = m_PointListModel->GetTimeStep();
 
-  if ( pointSet->GetNumberOfSelected( timeStep ) > 1 )
-  {
-    MITK_ERROR << "Point set has multiple selected points. This view is not designed for more than one selected point.";
-  }
+    if ( pointSet->GetNumberOfSelected( timeStep ) > 1 )
+    {
+        MITK_ERROR << "Point set has multiple selected points. This view is not designed for more than one selected point.";
+    }
 
-  int selectedIndex = pointSet->SearchSelectedPoint( timeStep );
-  
-  if (selectedIndex == -1) // no selected point is found
-  {
+    int selectedIndex = pointSet->SearchSelectedPoint( timeStep );
+
+    if (selectedIndex == -1) // no selected point is found
+    {
+        m_SelfCall = false;
+        return;
+    }
+
+    QModelIndex index;
+
+    bool modelIndexOkay = m_PointListModel->GetModelIndexForPointID(selectedIndex, index);
+
+    if (modelIndexOkay == true)
+        QListView::selectionModel()->select( index , QItemSelectionModel::ClearAndSelect );
+
+    emit SignalPointSelectionChanged();
+
     m_SelfCall = false;
-    return;
-  }
-
-  QModelIndex index;
-
-  bool modelIndexOkay = m_PointListModel->GetModelIndexForPointID(selectedIndex, index);
-  
-  if (modelIndexOkay == true)
-    QListView::selectionModel()->select( index , QItemSelectionModel::ClearAndSelect );
- 
-  emit SignalPointSelectionChanged();
-  
-  m_SelfCall = false;
 }
 
 
 void QmitkPointListView::OnListViewSelectionChanged(const QItemSelection& selected, const QItemSelection&  /*deselected*/)
 {
-  if (m_SelfCall) 
-    return;
+    if (m_SelfCall)
+        return;
 
-  mitk::PointSet* pointSet = const_cast<mitk::PointSet*>( m_PointListModel->GetPointSet() );
-  
-  if (pointSet == NULL) 
-    return;
+    mitk::PointSet* pointSet = const_cast<mitk::PointSet*>( m_PointListModel->GetPointSet() );
 
-  // (take care that this widget doesn't react to self-induced changes by setting m_SelfCall)
-  m_SelfCall = true;
+    if (pointSet == NULL)
+        return;
 
-  // update selection of all points in pointset: select the one(s) that are selected in the view, deselect all others
-  QModelIndexList selectedIndexes = selected.indexes();
+    // (take care that this widget doesn't react to self-induced changes by setting m_SelfCall)
+    m_SelfCall = true;
 
-  for (mitk::PointSet::PointsContainer::Iterator it = pointSet->GetPointSet(m_PointListModel->GetTimeStep())->GetPoints()->Begin(); 
-       it != pointSet->GetPointSet(m_PointListModel->GetTimeStep())->GetPoints()->End(); ++it)
-  {
-    QModelIndex index;
-    if (m_PointListModel->GetModelIndexForPointID(it->Index(), index))
+    // update selection of all points in pointset: select the one(s) that are selected in the view, deselect all others
+    QModelIndexList selectedIndexes = selected.indexes();
+
+    for (mitk::PointSet::PointsContainer::Iterator it = pointSet->GetPointSet(m_PointListModel->GetTimeStep())->GetPoints()->Begin();
+    it != pointSet->GetPointSet(m_PointListModel->GetTimeStep())->GetPoints()->End(); ++it)
     {
-      if (selectedIndexes.indexOf(index) != -1) // index is found in the selected indices list
-      {
-        pointSet->SetSelectInfo(it->Index(), true, m_PointListModel->GetTimeStep());
-        if ( m_MultiWidget != NULL)
+        QModelIndex index;
+        if (m_PointListModel->GetModelIndexForPointID(it->Index(), index))
         {
-          m_MultiWidget->MoveCrossToPosition(pointSet->GetPoint(it->Index(), m_PointListModel->GetTimeStep()));        
+            if (selectedIndexes.indexOf(index) != -1) // index is found in the selected indices list
+            {
+                pointSet->SetSelectInfo(it->Index(), true, m_PointListModel->GetTimeStep());
+                if ( m_MultiWidget != NULL)
+                {
+                    m_MultiWidget->MoveCrossToPosition(pointSet->GetPoint(it->Index(), m_PointListModel->GetTimeStep()));
+                }
+            }
+            else
+            {
+                pointSet->SetSelectInfo(it->Index(), false, m_PointListModel->GetTimeStep());
+            }
         }
-      }
-      else
-      {
-        pointSet->SetSelectInfo(it->Index(), false, m_PointListModel->GetTimeStep());
-      }
     }
-  }
 
-  m_SelfCall = false;
-  
-  emit SignalPointSelectionChanged();
+    m_SelfCall = false;
 
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();  
+    emit SignalPointSelectionChanged();
+
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 
 void QmitkPointListView::keyPressEvent( QKeyEvent * e )
 {
-  if (m_PointListModel == NULL)
-    return;
+    if (m_PointListModel == NULL)
+        return;
 
-  int key = e->key();
+    int key = e->key();
 
-  switch (key)
-  {
+    switch (key)
+    {
     case Qt::Key_F2:
-     m_PointListModel->MoveSelectedPointUp();
-     break;
+        m_PointListModel->MoveSelectedPointUp();
+        break;
     case Qt::Key_F3:
-      m_PointListModel->MoveSelectedPointDown();
-      break;
+        m_PointListModel->MoveSelectedPointDown();
+        break;
     case Qt::Key_Delete:
-      m_PointListModel->RemoveSelectedPoint();
-      break;
+        m_PointListModel->RemoveSelectedPoint();
+        break;
     default:
-    break;
-  }
+        break;
+    }
+}
+
+void QmitkPointListView::wheelEvent(QWheelEvent *event)
+{
+
+
+	if ((int)(m_PointListModel->GetPointSet()->GetTimeSteps()) == 1 /*|| !m_4DPointSet*/)
+        return;
+
+
+    int whe = event->delta();
+    mitk::PointSet* /*::Pointer*/ ps = dynamic_cast<mitk::PointSet*>(m_PointListModel->GetPointSet());
+    unsigned int numberOfTS = ps->GetTimeSteps();
+
+    if(numberOfTS == 1)
+        return;
+    int currentTS =  this->m_PointListModel->GetTimeStep();
+    if(whe > 0)
+    {
+        if((currentTS >= m_PointListModel->GetPointSet()->GetTimeSteps()))
+            return;
+
+        this->m_PointListModel->SetTimeStep(++currentTS);
+    }
+    else
+    {
+
+        if((currentTS <= 0))
+            return;
+        this->m_PointListModel->SetTimeStep(--currentTS);
+
+    }
+
+
+    QString tooltip = QString("Use the F2/F3 keys to move a point up/down, the Del key to remove a point\nand the mouse wheel to change the timestep.\n\nTimeStep:\t%1").arg(currentTS);
+    this->setToolTip(tooltip);
+
+    fadeTimeStepIn();
+}
+
+void QmitkPointListView::fadeTimeStepIn()
+{
+    //Setup Widget
+    QWidget *m_TimeStepFader = new QWidget(this);
+    QHBoxLayout *layout = new QHBoxLayout(m_TimeStepFader);
+
+    int x = (int)(this->geometry().x()+this->width()*0.05);
+    int y = (int)(this->geometry().y()+this->height()*0.8);
+    m_TimeStepFader->move(x,y);
+    m_TimeStepFader->resize(160, 55);
+    m_TimeStepFader->setLayout(layout);
+    m_TimeStepFader->setAttribute(Qt::WA_DeleteOnClose);
+
+    //setup Label
+    //    QLabel *label = new QLabel(QString("%1").arg(this->m_PointListModel->GetTimeStep()));
+
+    layout->addWidget(m_TimeStepFaderLabel);
+    m_TimeStepFaderLabel->setAlignment(Qt::AlignCenter);
+    m_TimeStepFaderLabel->setFrameStyle(QFrame::StyledPanel | QFrame::Raised);
+    m_TimeStepFaderLabel->setLineWidth(2);
+    m_TimeStepFaderLabel->setText(QString("Time: %1").arg(this->m_PointListModel->GetTimeStep()));
+
+    //give the widget opacity and some colour
+    QPalette pal = m_TimeStepFaderLabel->palette();
+    QColor semiTransparentColor(139, 192, 223, 100);
+    QColor labelTransparentColor(0,0,0,200);
+    pal.setColor(m_TimeStepFaderLabel->backgroundRole(), semiTransparentColor);
+    pal.setColor(m_TimeStepFaderLabel->foregroundRole(), labelTransparentColor);
+    m_TimeStepFaderLabel->setAutoFillBackground(true);
+    m_TimeStepFaderLabel->setPalette(pal);
+
+    //show the widget
+    m_TimeStepFader->show();
+
+    //and start the timer
+    m_TimeStepFaderLabel->setVisible(true);
+    QTimer::singleShot(2000, this, SLOT(fadeTimeStepOut()));
+
+}
+
+
+
+void QmitkPointListView::fadeTimeStepOut()
+{
+
+    m_TimeStepFaderLabel->hide();
+
+}
+
+void QmitkPointListView::ctxMenu(const QPoint &pos)
+{
+    QMenu *menu = new QMenu;
+    //    menu->setStyle();
+    //    menu->addAction(tr("Test Item"), this, SLOT(test_slot()));
+
+
+    //add Fading check
+    QAction *showFading = new QAction(this);
+    showFading->setCheckable(false);  //TODO: reset when fading is working
+    showFading->setEnabled(false);    //TODO: reset when fading is working
+    showFading->setText("Fade TimeStep");
+    connect(showFading, SIGNAL(triggered(bool)), this, SLOT(SetFading(bool)));
+    menu->addAction(showFading);
+
+    //add Clear action
+    QAction *clearList = new QAction(this);
+    clearList->setText("Clear List");
+    connect(clearList, SIGNAL(triggered()), this, SLOT(ClearPointList()));
+    menu->addAction(clearList);
+
+    //add Clear TimeStep action
+    QAction *clearTS = new QAction(this);
+    clearTS->setText("Clear current time step");
+    connect(clearTS, SIGNAL(triggered()), this, SLOT(ClearPointListTS()));
+    menu->addAction(clearTS);
+
+//    //add "show time step in list" option
+//    QAction *viewTS = new QAction(this);
+//    viewTS->setText("Show time step in list");
+//    viewTS->setCheckable(true);
+//    viewTS->setChecked(false);
+//    connect(viewTS, SIGNAL(triggered(bool)), this, SLOT(ClearPointList(bool)));
+//    menu->addAction(viewTS);
+
+
+    menu->exec(this->mapToGlobal(pos));
+
+}
+
+void QmitkPointListView::SetFading(bool onOff)
+{
+    m_showFading = onOff;
+}
+
+void QmitkPointListView::ClearPointList()
+{
+    mitk::PointSet::Pointer  curPS = m_PointListModel->GetPointSet();
+    if ( curPS->GetSize() == 0)
+        return;
+
+
+    switch( QMessageBox::question( this, tr("Clear Points"),
+                                   tr("Remove all points from the displayed list?"),
+                                   QMessageBox::Yes | QMessageBox::No, QMessageBox::No))
+    {
+    case QMessageBox::Yes:
+        if (curPS)
+        {
+            curPS->Clear();
+        }
+        mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+        break;
+
+    case QMessageBox::No:
+        default:
+        break;
+     }
+   // emit PointListChanged();
+}
+
+void QmitkPointListView::ClearPointListTS()
+{
+    mitk::PointSet* /*::Pointer*/  curPS = m_PointListModel->GetPointSet();
+    if ( curPS->GetSize() == 0)
+        return;
+
+
+    switch( QMessageBox::question( this, tr("Clear Points in Timestep"),
+                                   tr("Remove all points from the list with the timestep %1?").arg(this->m_PointListModel->GetTimeStep()),
+                                   QMessageBox::Yes | QMessageBox::No, QMessageBox::No))
+    {
+    case QMessageBox::Yes:
+        if (curPS)
+        {
+            //curPS->;
+        }
+        mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+        break;
+
+    case QMessageBox::No:
+        default:
+        break;
+     }
+   // emit PointListChanged();
 }

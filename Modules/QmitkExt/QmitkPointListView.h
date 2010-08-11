@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define QMITK_POINTLIST_VIEW_H_INCLUDED
 
 #include <QListView>
+#include <QLabel>
 #include "QmitkExtExports.h"
 
 #include "QmitkPointListModel.h"
@@ -56,6 +57,7 @@ public:
 
   QmitkStdMultiWidget* GetMultiWidget() const;  ///< return the QmitkStdMultiWidget that is used for updating render window crosshair
 
+  void SetTimesStep(int i); ///< which time step to display/model
 
 signals:
 
@@ -73,18 +75,39 @@ protected slots:
   /// called when the selection of the view widget changes
   void OnListViewSelectionChanged(const QItemSelection& selected, const QItemSelection& deselected);
 
+   /// fade the shown timestep out
+  void fadeTimeStepOut();
+
+  /// open ContextMenu
+  void ctxMenu(const QPoint &pos);
+
+  /// Turn TimeStep Fading On/Off
+  void SetFading(bool onOff);
+
+  /// Delete all points in the list
+  void ClearPointList();
+
+  /// delete all points in the list in the current timestep
+  void ClearPointListTS();
 
 protected:
 
   void keyPressEvent( QKeyEvent * e ); ///< react to F2, F3 and DEL keys
+  void wheelEvent( QWheelEvent* event); ///< change timestep of the current pointset by mouse wheel
+  void fadeTimeStepIn(); ///< fade a label with the currently shown timestep in
 
 protected:
 
   QmitkPointListModel*    m_PointListModel;
 
+  QLabel*                m_TimeStepFaderLabel;
+
   bool                    m_SelfCall;
+
+  bool                    m_showFading;
 
   /// used to position the planes on a selected point
   QmitkStdMultiWidget*    m_MultiWidget;
+
 };
 #endif

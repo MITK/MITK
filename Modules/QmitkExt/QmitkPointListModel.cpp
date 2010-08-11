@@ -249,7 +249,9 @@ void QmitkPointListModel::MoveSelectedPointUp()
   
   mitk::PointSet::PointIdentifier selectedID;   
   selectedID = m_PointSet->SearchSelectedPoint(m_TimeStep);
-  mitk::PointOperation* doOp = new mitk::PointOperation(mitk::OpMOVEPOINTUP, m_PointSet->GetPoint(selectedID, m_TimeStep), selectedID, true);
+  mitk::PointSet::PointType point = m_PointSet->GetPoint(selectedID, m_TimeStep);
+  mitk::ScalarType tsInMS = m_PointSet->GetTimeSlicedGeometry()->TimeStepToMS(m_TimeStep);
+  mitk::PointOperation* doOp = new mitk::PointOperation(mitk::OpMOVEPOINTUP,tsInMS, m_PointSet->GetPoint(selectedID, m_TimeStep), selectedID, true);
   m_PointSet->ExecuteOperation(doOp);
   mitk::RenderingManager::GetInstance()->RequestUpdateAll(); // Workaround for update problem in Pointset/Mapper
 }
@@ -261,7 +263,8 @@ void QmitkPointListModel::MoveSelectedPointDown()
 
   mitk::PointSet::PointIdentifier selectedID; 
   selectedID = m_PointSet->SearchSelectedPoint(m_TimeStep);
-  mitk::PointOperation* doOp = new mitk::PointOperation(mitk::OpMOVEPOINTDOWN, m_PointSet->GetPoint(selectedID, m_TimeStep), selectedID, true);
+  mitk::ScalarType tsInMS = m_PointSet->GetTimeSlicedGeometry()->TimeStepToMS(m_TimeStep);
+  mitk::PointOperation* doOp = new mitk::PointOperation(mitk::OpMOVEPOINTDOWN, tsInMS, m_PointSet->GetPoint(selectedID, m_TimeStep), selectedID, true);
   m_PointSet->ExecuteOperation(doOp);
   mitk::RenderingManager::GetInstance()->RequestUpdateAll(); // Workaround for update problem in Pointset/Mapper
 }
@@ -269,13 +272,14 @@ void QmitkPointListModel::MoveSelectedPointDown()
 
 void QmitkPointListModel::RemoveSelectedPoint()
 {
-  if (m_PointSet == NULL)
-    return;
+    if (m_PointSet == NULL)
+      return;
 
-  mitk::PointSet::PointIdentifier selectedID; 
-  selectedID = m_PointSet->SearchSelectedPoint(m_TimeStep);
-  mitk::PointOperation* doOp = new mitk::PointOperation(mitk::OpREMOVE, m_PointSet->GetPoint(selectedID, m_TimeStep), selectedID, true);
-  m_PointSet->ExecuteOperation(doOp);
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll(); // Workaround for update problem in Pointset/Mapper
-
+    mitk::PointSet::PointIdentifier selectedID;
+    selectedID = m_PointSet->SearchSelectedPoint(m_TimeStep);
+    mitk::ScalarType tsInMS = m_PointSet->GetTimeSlicedGeometry()->TimeStepToMS(m_TimeStep);
+    mitk::PointOperation* doOp = new mitk::PointOperation(mitk::OpREMOVE, tsInMS, m_PointSet->GetPoint(selectedID, m_TimeStep), selectedID, true);
+    m_PointSet->ExecuteOperation(doOp);
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll(); // Workaround for update problem in Pointset/Mapper
 }
+

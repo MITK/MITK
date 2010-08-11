@@ -100,14 +100,14 @@ protected:
 
   QmitkPointListModel*    m_PointListModel;
 
-  QLabel*                m_TimeStepFaderLabel;
-
   bool                    m_SelfCall;
 
   bool                    m_showFading;
 
   /// used to position the planes on a selected point
   QmitkStdMultiWidget*    m_MultiWidget;
+
+  QLabel*                m_TimeStepFaderLabel;
 
 };
 #endif

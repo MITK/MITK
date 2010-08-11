@@ -232,7 +232,7 @@ void QmitkPointListView::wheelEvent(QWheelEvent *event)
     int currentTS =  this->m_PointListModel->GetTimeStep();
     if(whe > 0)
     {
-        if((currentTS >= m_PointListModel->GetPointSet()->GetTimeSteps()))
+        if((currentTS >= (int)(m_PointListModel->GetPointSet()->GetTimeSteps())))
             return;
 
         this->m_PointListModel->SetTimeStep(++currentTS);

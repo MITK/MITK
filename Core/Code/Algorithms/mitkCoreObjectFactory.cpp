@@ -303,6 +303,7 @@ void mitk::CoreObjectFactory::CreateFileExtensionsMap()
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.seq", "DKFZ Pic"));
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.pic", "DKFZ Pic"));
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.pic.gz", "DKFZ Pic"));
+  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.mhd", "MetaImage"));
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.seq.gz", "DKFZ Pic"));
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.nrrd", "NRRD Vector Images"));
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.nhdr", "NRRD Vector Images"));

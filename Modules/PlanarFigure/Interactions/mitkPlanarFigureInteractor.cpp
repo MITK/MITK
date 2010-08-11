@@ -262,7 +262,7 @@ bool mitk::PlanarFigureInteractor
       m_DataNode->SetBoolProperty( "PlanarFigureInitializedWindow", true, renderer );
 
       // Update rendered scene
-      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+      renderer->GetRenderingManager()->RequestUpdateAll();
 
       ok = true;
       break;
@@ -288,7 +288,7 @@ bool mitk::PlanarFigureInteractor
       //this->LogPrintPlanarFigureQuantities( planarFigure );
 
       // Update rendered scene
-      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+      renderer->GetRenderingManager()->RequestUpdateAll();
 
       ok = true;
       break;
@@ -315,7 +315,7 @@ bool mitk::PlanarFigureInteractor
       }
 
       // Update rendered scene
-      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+      renderer->GetRenderingManager()->RequestUpdateAll();
 
       ok = true;
       break;
@@ -350,7 +350,7 @@ bool mitk::PlanarFigureInteractor
       }
 
       // Update rendered scene
-      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+      renderer->GetRenderingManager()->RequestUpdateAll();
 
       ok = true;
       break;
@@ -428,7 +428,7 @@ bool mitk::PlanarFigureInteractor
       //this->LogPrintPlanarFigureQuantities( planarFigure );
 
       // Update rendered scene
-      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+      renderer->GetRenderingManager()->RequestUpdateAll();
 
       ok = true;
       break;
@@ -477,7 +477,7 @@ bool mitk::PlanarFigureInteractor
       }
 
       // Update rendered scene
-      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+       renderer->GetRenderingManager()->RequestUpdateAll();
       break;
     }
 
@@ -504,7 +504,7 @@ bool mitk::PlanarFigureInteractor
   //case AcMOVESELECTED:
   //  {
   //    // Update the display
-  //    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  //    renderer->GetRenderingManager()->RequestUpdateAll();
 
   //    ok = true;
   //    break;

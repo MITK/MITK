@@ -153,6 +153,8 @@ public slots:
 
   void moveEvent( QMoveEvent* e );
 
+  void leaveEvent ( QEvent * e  );
+
   void EnsureDisplayContainsPoint(
     mitk::DisplayGeometry* displayGeometry, const mitk::Point3D& p);
 

@@ -51,6 +51,10 @@ class QMITK_EXPORT QmitkScalarBar : public QWidget
 
     void SetPen( const QPen& pen );
 
+    void SetNumberOfSubdivisions( unsigned int subs );
+
+    unsigned int GetNumberOfSubdivisions();
+
   protected:
    
     void paintEvent(QPaintEvent* event);
@@ -68,6 +72,8 @@ class QMITK_EXPORT QmitkScalarBar : public QWidget
     std::vector<QLine*> m_HorizontalLines;
 
     QPen m_Pen;
+
+    unsigned int m_NumberOfSubDivisions;
 
   };
 

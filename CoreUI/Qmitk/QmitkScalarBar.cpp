@@ -23,6 +23,8 @@ PURPOSE.  See the above copyright notices for more information.
 QmitkScalarBar::QmitkScalarBar(QWidget* parent): 
 QWidget( parent, Qt::Tool | Qt::FramelessWindowHint ), m_Alignment(vertical)
 {
+  m_NumberOfSubDivisions = 7;
+
   this->setSizePolicy( QSizePolicy::Fixed, QSizePolicy::Fixed );
   this->SetupGeometry( m_Alignment );
   this->setBackgroundRole(QPalette::Base);
@@ -60,15 +62,17 @@ void QmitkScalarBar::SetupGeometry( alignment align )
     { 
       m_VerticalLine = new QLine( QPoint(width()/2,0), QPoint(width()/2,height()) );
 
-      for ( int i=0; i<7; i++ )
+      for ( int i=0; i<m_NumberOfSubDivisions; i++ )
       {
-        int y = this->height()/6*i;
+        int y = this->height()/(m_NumberOfSubDivisions-1)*i;
         if ( i==0 )
         {
+          // this is the first one -> move y 1 down to have this line completely drawn
           y = 1;
         }
-        else if ( i==6 )
+        else if ( i==m_NumberOfSubDivisions-1 )
         {
+          // this is the last one -> move y 1 up to have this line completely drawn
           y = this->height() - 1;
         }
         m_HorizontalLines.push_back( new QLine( QPoint(0,y), QPoint(width(),y) ) );
@@ -79,14 +83,14 @@ void QmitkScalarBar::SetupGeometry( alignment align )
     {
       m_VerticalLine = new QLine( QPoint(0,height()/2), QPoint(width(),height()/2) );
 
-      for ( int i=0; i<7; i++ )
+      for ( int i=0; i<m_NumberOfSubDivisions; i++ )
       {
-        int x = this->width()/6*i;
+        int x = this->width()/(m_NumberOfSubDivisions-1)*i;
         if ( i==0 )
         {
           x = 1;
         }
-        else if ( i==6 )
+        else if ( i==m_NumberOfSubDivisions-1 )
         {
           x = this->width() - 1;
         }
@@ -103,13 +107,39 @@ void QmitkScalarBar::SetScaleFactor( double scale )
 {
   m_ScaleFactor = scale;
 
+  // Adopt the number of small, intersecting lines to the size of the widget.
+  if ( this->parentWidget() != NULL && this->parentWidget()->parentWidget() != NULL )
+  {
+    // If the widget is larger than 80% of the size of the parent -> reduce number by two (must not be smaller than 3)
+    if ( this->height() > this->parentWidget()->parentWidget()->height()*0.8 && m_NumberOfSubDivisions > 3 )
+    {
+      m_NumberOfSubDivisions-=2;
+    }
+    // If the widget is smaller than 30% of the size of the parent -> increase number by two
+    else if ( this->height() < this->parentWidget()->parentWidget()->height()*0.4 && m_NumberOfSubDivisions < 7 )
+    {
+      m_NumberOfSubDivisions+=2;
+    }
+  }
+
+
   //if ( m_Alignment == vertical )
   {
-    this->resize( 20, 60/m_ScaleFactor );
+    this->resize( 20, (m_NumberOfSubDivisions-1)*10/m_ScaleFactor );
     this->setFixedWidth( 20 );
-    this->setFixedHeight( 60/m_ScaleFactor );
+    this->setFixedHeight( (m_NumberOfSubDivisions-1)*10/m_ScaleFactor );
     this->SetupGeometry(m_Alignment);
   }
+}
+
+void QmitkScalarBar::SetNumberOfSubdivisions( unsigned int subs )
+{
+  m_NumberOfSubDivisions = subs;
+}
+
+unsigned int QmitkScalarBar::GetNumberOfSubdivisions()
+{
+  return m_NumberOfSubDivisions;
 }
 
 

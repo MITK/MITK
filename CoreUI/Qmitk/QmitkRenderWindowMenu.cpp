@@ -240,7 +240,7 @@ void QmitkRenderWindowMenu::ShowMenu( )
 }
 
 
-void QmitkRenderWindowMenu::enterEvent( QEvent */*e*/ )
+void QmitkRenderWindowMenu::enterEvent( QEvent * /*e*/ )
 {
   m_Entered=true;
   setWindowOpacity(1.0f);
@@ -252,7 +252,7 @@ void QmitkRenderWindowMenu::DeferredHideMenu( )
     hide();
 }
 
-void QmitkRenderWindowMenu::leaveEvent( QEvent */*e*/ )
+void QmitkRenderWindowMenu::leaveEvent( QEvent * /*e*/ )
 {
   m_Entered=false;
 

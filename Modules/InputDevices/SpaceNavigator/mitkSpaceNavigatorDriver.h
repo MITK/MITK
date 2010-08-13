@@ -32,7 +32,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include <atlctl.h>
 #include <atlhost.h>
 
-#import "progid:TDxInput.Device" embedded_idl no_namespace
+//http://www.3dconnexion.com/forum/viewtopic.php?p=2966#2966
+//#import "progid:TDxInput.Device" embedded_idl no_namespace
+#include "TDxInput.tlh" 
 
 using namespace ATL;
 

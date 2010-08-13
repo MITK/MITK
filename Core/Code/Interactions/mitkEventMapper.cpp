@@ -670,7 +670,7 @@ void mitk::EventMapper::AddEventMapperAddOn(mitk::EventMapperAddOn* newAddOn)
 
 void mitk::EventMapper::RemoveEventMapperAddOn(mitk::EventMapperAddOn* unusedAddOn)
 {
-  for(AddOnVectorType::const_iterator it = this->m_AddOnVector.begin();it != m_AddOnVector.end();it++)
+  for(AddOnVectorType::iterator it = this->m_AddOnVector.begin();it != m_AddOnVector.end();it++)
   {
     if(*it == unusedAddOn)
     {

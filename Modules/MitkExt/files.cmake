@@ -89,7 +89,7 @@ SET(CPP_FILES
   DataManagement/mitkSeedsImage.cpp
   DataManagement/mitkSeedsImageLookupTableSource.cpp
   DataManagement/mitkSphereLandmarkProjector.cpp
-#DataManagement/mitkUSLookupTableSource.cpp
+# DataManagement/mitkUSLookupTableSource.cpp
   DataManagement/mitkUnstructuredGrid.cpp
   DataManagement/mitkVideoSource.cpp
   DataManagement/vtkObjectSet.cpp
@@ -153,7 +153,7 @@ SET(CPP_FILES
   Rendering/mitkEnhancedPointSetVtkMapper3D.cpp
   Rendering/mitkImageBackground2D.cpp
   Rendering/mitkLineMapper2D.cpp
-#Rendering/mitkLineVtkMapper3D.cpp
+# Rendering/mitkLineVtkMapper3D.cpp
   Rendering/mitkMeshMapper2D.cpp
   Rendering/mitkMeshVtkMapper3D.cpp
   Rendering/mitkNativeRenderWindowInteractor.cpp
@@ -177,14 +177,4 @@ IF(WIN32 AND NOT MINGW)
     ${CPP_FILES}
   )
 ENDIF(WIN32 AND NOT MINGW)
-
-#IF(MITK_USE_TD_MOUSE)
-#  SET(CPP_FILES
-#      Controllers/mitkTDMouseVtkCameraController.cpp
-#      Interactions/mitkSpaceNavigatorDriver.cpp
-#      Interactions/mitkTDMouseEvent.cpp
-#      Interactions/mitkTDMouseEventThrower.cpp
-#      ${CPP_FILES}
-#     )
-#ENDIF(MITK_USE_TD_MOUSE)
 

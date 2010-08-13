@@ -1,8 +1,9 @@
 SET(H_FILES
-  DataManagement/mitkCommon.h
   Algorithms/itkLocalVariationImageFilter.h
   Algorithms/itkTotalVariationDenoisingImageFilter.h
   Algorithms/itkTotalVariationSingleIterationImageFilter.h
+  DataManagement/mitkCommon.h
+  Interactions/mitkEventMapperAddOn.h
 )
 
 SET(CPP_FILES

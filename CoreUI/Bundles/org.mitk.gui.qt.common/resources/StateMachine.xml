@@ -2740,7 +2740,7 @@
       <transition NAME="stay in dummy" NEXT_STATE_ID="0" EVENT_ID="0" />
     </state>
   </stateMachine>
-  <stateMachine NAME="TDMouseInteraction">
+  <stateMachine NAME="SpaceNavigatorInteraction">
     <state NAME="neutral" ID="1" START_STATE="TRUE">
       <transition NAME="stay in dummy" NEXT_STATE_ID="1" EVENT_ID="4001">
         <action ID="4001" />

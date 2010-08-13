@@ -80,8 +80,8 @@ enum EEventIds
   EIDSHIFTANDMIDDLEMOUSEPRESS = 2003,
   EIDSHIFTANDMIDDLEMOUSEMOVE = 2004,
   EIDSHIFTANDMIDDLEMOUSERELEASE = 2005,
-  EIDTDMOUSEINPUT = 4001, // 3d Mouse, SpaceNavigator input
-  EIDTDMOUSEKEYDOWN = 4002, // 3d Mouse, KeyDown
+  EIDSPACENAVIGATORINPUT = 4001, // 3d Mouse, SpaceNavigator input
+  EIDSPACENAVIGATORKEYDOWN = 4002, // 3d Mouse, KeyDown
   EIDSTRGANDN = 10,
   EIDSTRGANDE = 11,
   EIDDELETE = 12,
@@ -358,8 +358,8 @@ enum EActions
   AcDISPLAYOPTIONS = 49009,
   AcCYCLE = 49010,
   AcACCEPT = 49011,
-  AcONTDMOUSEINPUT = 4001, // On input of 3D Mouse
-  AcONTDMOUSEKEYDOWN = 4002, // On input of 3D Mouse
+  AcONSPACENAVIGATORMOUSEINPUT = 4001, // On input of 3D Mouse
+  AcONPACENAVIGATORKEYDOWN = 4002, // On input of 3D Mouse
   AcCHECKPOSITION = 5000,
   AcINITIALIZECONTOUR = 5001,
   AcCALCULATENEWSEGMENTATION_SP= 5002,
@@ -450,8 +450,8 @@ enum EEventType
   Type_TabletPress = 92,      // tablet press
   Type_TabletRelease = 93,      // tablet release
   Type_User = 1000,        // first user event id
-  Type_TDMouseInput = 1094,  // 3D mouse input occured
-  Type_TDMouseKeyDown = 1095,  // 3D mouse input occured
+  Type_SpaceNavigatorInput = 1094,  // 3D mouse input occured
+  Type_SpaceNavigatorKeyDown = 1095,  // 3D mouse input occured
   Type_MaxUser = 65535
 };
 

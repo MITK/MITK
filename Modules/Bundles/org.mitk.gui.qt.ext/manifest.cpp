@@ -18,7 +18,15 @@
 #include <Poco/ClassLibrary.h>
 
 #include "src/internal/QmitkCommonExtPlugin.h"
+#include "src/QmitkExtPreferencePage.h"
+#include "src/QmitkInputDevicesPrefPage.h"
 
 POCO_BEGIN_MANIFEST(berry::IBundleActivator)
   POCO_EXPORT_CLASS(QmitkCommonExtPlugin)
 POCO_END_MANIFEST
+
+POCO_BEGIN_NAMED_MANIFEST(berryIPreferencePage, berry::IPreferencePage)
+  POCO_EXPORT_CLASS(QmitkExtPreferencePage)
+  POCO_EXPORT_CLASS(QmitkInputDevicesPrefPage)
+POCO_END_MANIFEST
+

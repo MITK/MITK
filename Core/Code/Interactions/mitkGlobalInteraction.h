@@ -137,6 +137,12 @@ namespace mitk {
     //## to add the observer for an event
     FocusManager* GetFocusManager();
 
+    //##Documentation
+    //## @brief Returns the pointer to the EventMapper
+    //##
+    //## to add an addon
+    EventMapper* GetEventMapper();
+
     /**
     * @brief Return StateMachineFactory
     **/

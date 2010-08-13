@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin>
+  <extension point="org.mitk.core.ext.inputdevices">
+    <class id="org.mitk.inputdevices.wiimote" name="WiiMote" class="mitk::WiiMoteActivator"/>
+  </extension>
+</plugin>

@@ -1,5 +1,7 @@
 SET(SRC_CPP_FILES
   QmitkCommonWorkbenchWindowAdvisor.cpp
+  QmitkExtPreferencePage.cpp
+  QmitkInputDevicesPrefPage.cpp
   QmitkExtActionBarAdvisor.cpp
   QmitkExtWorkbenchWindowAdvisor.cpp
   QmitkExtFileOpenAction.cpp

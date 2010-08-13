@@ -44,6 +44,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <vtkObjectFactory.h>
 
+#include <vector>
 
 namespace mitk
 {
@@ -160,7 +161,8 @@ mitk::EventMapper::EventMapper()
   m_EventConstMap["Type_Style"] =                                       91;     // internal style event
   m_EventConstMap["Type_TabletPress"] =                         92;     // tablet press
   m_EventConstMap["Type_TabletRelease"] =                       93;     // tablet release
-  m_EventConstMap["Type_TDMouseInput"] =                        mitk::Type_TDMouseInput;     // 3D mouse input occured
+  // apparently not necessary, since the IDs can be assigned earlier (in the AddOns after they are generated in the driver)
+  //m_EventConstMap["Type_TDMouseInput"] =                        mitk::Type_TDMouseInput;     // 3D mouse input occured
   m_EventConstMap["Type_User"] =                                        1000;   // first user event id
   m_EventConstMap["Type_MaxUser"] =                             65535;  // last user event id
 
@@ -433,6 +435,7 @@ mitk::EventMapper::EventMapper()
 
 mitk::EventMapper::~EventMapper()
 {
+
 }
 
 //##Documentation
@@ -645,3 +648,34 @@ mitk::StateEvent* mitk::EventMapper::RefreshStateEvent(mitk::StateEvent* stateEv
   return stateEvent;
 }
 
+void mitk::EventMapper::AddEventMapperAddOn(mitk::EventMapperAddOn* newAddOn)
+{
+  bool addOnAlreadyAdded = false;
+´
+  for(AddOnVectorType::const_iterator it = this->m_AddOnVector.begin();it != m_AddOnVector.end();it++)
+  {
+    if(*it == newAddOn)
+    {
+      addOnAlreadyAdded = true;
+      break;
+    }
+  }
+
+  if(!addOnAlreadyAdded)
+  {
+    m_AddOnVector.push_back(newAddOn);
+    MITK_INFO << "AddOn Count: " << m_AddOnVector.size();
+  }
+}
+
+void mitk::EventMapper::RemoveEventMapperAddOn(mitk::EventMapperAddOn* unusedAddOn)
+{
+  for(AddOnVectorType::const_iterator it = this->m_AddOnVector.begin();it != m_AddOnVector.end();it++)
+  {
+    if(*it == unusedAddOn)
+    {
+    ..m_AddOnVector.erase(it);
+    ..break;
+    }
+..}
+}

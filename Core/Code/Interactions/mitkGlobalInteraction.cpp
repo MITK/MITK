@@ -285,6 +285,17 @@ mitk::FocusManager* mitk::GlobalInteraction::GetFocusManager()
   return m_FocusManager.GetPointer();
 }
 
+mitk::EventMapper* mitk::GlobalInteraction::GetEventMapper()
+{
+  if (!this->IsInitialized())
+  {
+    MITK_FATAL <<"Global Interaction needs initialization!\n";
+    return NULL;
+  }
+  return m_EventMapper;
+}
+
+
 bool mitk::GlobalInteraction::ExecuteAction(Action* action, mitk::StateEvent const* stateEvent)
 {
   bool ok = false;

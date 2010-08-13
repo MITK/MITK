@@ -19,11 +19,12 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef EVENTMAPPER_H_HEADER_INCLUDED
 #define EVENTMAPPER_H_HEADER_INCLUDED
 
-#include "mitkEvent.h"
-#include "mitkCommon.h"
-#include "mitkEventDescription.h"
+#include <mitkEvent.h>
+#include <mitkCommon.h>
+#include <mitkEventDescription.h>
 #include <vtkXMLParser.h>
 
+#include <mitkEventMapperAddOn.h>
 
 namespace mitk {
   struct ltstr
@@ -66,6 +67,8 @@ namespace mitk {
     typedef std::map<const char*, int, ltstr> ConstMap;
     typedef std::map<const char*, int, ltstr>::iterator ConstMapIter;
 
+    typedef std::vector<mitk::EventMapperAddOn::Pointer> AddOnVectorType;
+
     //##Documentation
     //## searches the Event in m_EventDescription
     //## and if included transmits the event to globalInteraction.
@@ -74,7 +77,7 @@ namespace mitk {
     //## the optional parameter should be used in a conference to avoid a
     //## feedback
     static bool MapEvent(Event* event, GlobalInteraction* globalInteraction = NULL, int mitkPostedEventID=0 );
-    
+
     //##Documentation
     //## maps the Event in m_EventDescription with the ID
     //## and if found returns the Id,
@@ -110,6 +113,17 @@ namespace mitk {
     //friendship because of SetStateEvent for computing WorldCoordinates
     friend class mitk::GlobalInteraction;
 
+    /**
+    * @brief adds a new EventMapper addon 
+    */
+    void AddEventMapperAddOn(mitk::EventMapperAddOn* newAddOn);
+
+    /**
+    * @brief removes an EventMapper addon 
+    */
+    void RemoveEventMapperAddOn(mitk::EventMapperAddOn* unusedAddOn);
+
+
   protected:
     EventMapper();
     ~EventMapper();
@@ -135,9 +149,9 @@ namespace mitk {
     //##Documentation
     //## @brief converts the strings given by the XML-Behaviour-File to int
     inline int convertConstString2ConstInt(std::string input);
-//    static std::string Convert2String(int input);
-//    static std::string Convert2String(double input);
-//    static std::string Convert2String(float input);
+    //static std::string Convert2String(int input);
+    //static std::string Convert2String(double input);
+    //static std::string Convert2String(float input);
 
     //##Documentation
     //## @brief maps the strings to int for convertion from XML-Behaviour-File
@@ -163,6 +177,11 @@ namespace mitk {
     static const std::string KEY;
     static const std::string EVENTS;
     static const std::string EVENT;
+
+    /**
+    * @brief all available EventMapper addons consisting of one or more input devices
+    */
+    AddOnVectorType m_AddOnVector;
 
   };
 } // namespace mitk

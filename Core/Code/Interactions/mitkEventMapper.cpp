@@ -674,8 +674,9 @@ void mitk::EventMapper::RemoveEventMapperAddOn(mitk::EventMapperAddOn* unusedAdd
   {
     if(*it == unusedAddOn)
     {
-    ..m_AddOnVector.erase(it);
-    ..break;
-    }
-..}
+    m_AddOnVector.erase(it);
+    break;
+  }
+}
+
 }

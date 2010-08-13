@@ -651,7 +651,7 @@ mitk::StateEvent* mitk::EventMapper::RefreshStateEvent(mitk::StateEvent* stateEv
 void mitk::EventMapper::AddEventMapperAddOn(mitk::EventMapperAddOn* newAddOn)
 {
   bool addOnAlreadyAdded = false;
-´
+
   for(AddOnVectorType::const_iterator it = this->m_AddOnVector.begin();it != m_AddOnVector.end();it++)
   {
     if(*it == newAddOn)

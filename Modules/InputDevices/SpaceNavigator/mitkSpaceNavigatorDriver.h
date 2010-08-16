@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef SpaceNavigatorDriver__h__
 #define SpaceNavigatorDriver__h__
 
-#ifdef SPACE_NAVIGATOR_MAIN_SOURCE
+#ifdef MITK_USE_SPACENAVIGATOR_DRIVER
 
 #define _ATL_ATTRIBUTES 1
 #define _WIN32_DCOM

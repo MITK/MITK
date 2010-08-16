@@ -1,13 +1,9 @@
-IF(MITK_BUILD_org.mitk.inputdevices.spacenavigator)
 SET(CPP_FILES
   SpaceNavigator/mitkSpaceNavigatorAddOn.cpp
   SpaceNavigator/mitkSpaceNavigatorDriver.cpp
   SpaceNavigator/mitkSpaceNavigatorEvent.cpp
   SpaceNavigator/mitkSpaceNavigatorVtkCameraController.cpp
   )
-ENDIF(MITK_BUILD_org.mitk.inputdevices.spacenavigator)  
-IF(MITK_BUILD_org.mitk.inputdevices.wiimote)
 SET(CPP_FILES
   WiiMote/mitkWiiMoteAddOn.cpp
   )
-ENDIF(MITK_BUILD_org.mitk.inputdevices.wiimote)  

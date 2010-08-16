@@ -77,11 +77,9 @@ QmitkPointListView::~QmitkPointListView()
     delete m_PointListModel;
 }
 
-void QmitkPointListView::SetPointSet( mitk::PointSet* pointSet )
+void QmitkPointListView::SetPointSetNode( mitk::DataNode* pointSetNode )
 {
-    m_PointListModel->SetPointSet( pointSet );
-
-
+    m_PointListModel->SetPointSetNode( pointSetNode);
 }
 
 const mitk::PointSet* QmitkPointListView::GetPointSet() const

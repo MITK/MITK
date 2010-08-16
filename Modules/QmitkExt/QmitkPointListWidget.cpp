@@ -162,17 +162,17 @@ void QmitkPointListWidget::SetupUi()
 
 void QmitkPointListWidget::SetPointSet(mitk::PointSet* newPs)
 {
-    dynamic_cast<QmitkPointListModel*>(this->m_PointListView->model())->SetPointSet(newPs);
-    this->m_PointSetNode->SetData(newPs);
-
-//    m_Interactor = mitk::PointSetInteractor::New("pointsetinteractor",m_PointSetNode);
+  this->m_PointSetNode->SetData(newPs);
+  dynamic_cast<QmitkPointListModel*>(this->m_PointListView->model())->SetPointSetNode(m_PointSetNode);
 }
 
 void QmitkPointListWidget::SetPointSetNode(mitk::DataNode *newNode)
 {
-    m_PointSetNode = newNode;
-    dynamic_cast<QmitkPointListModel*>(this->m_PointListView->model())->SetPointSet(dynamic_cast<mitk::PointSet*>(newNode->GetData()));
-
+  m_PointSetNode = newNode;
+  if (newNode != NULL)
+    dynamic_cast<QmitkPointListModel*>(this->m_PointListView->model())->SetPointSetNode(newNode);
+  else
+    dynamic_cast<QmitkPointListModel*>(this->m_PointListView->model())->SetPointSetNode(NULL);
 }
 
 void QmitkPointListWidget::OnBtnSavePoints()
@@ -234,7 +234,7 @@ void QmitkPointListWidget::OnBtnLoadPoints()
         //        OnEditPointSetButtonToggled(false);
         //      }
         //
-        SetPointSet(pointSet);
+        this->SetPointSet(pointSet);
         //      if (interactionOn)
         //      {
         //        OnEditPointSetButtonToggled(true);
@@ -245,6 +245,7 @@ void QmitkPointListWidget::OnBtnLoadPoints()
         QMessageBox::warning( this, "Load point set", QString("File reader collapsed while reading %1").arg(filename) );
     }
     emit PointListChanged();
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 mitk::PointSet* QmitkPointListWidget::GetPointSet()
@@ -309,8 +310,13 @@ void QmitkPointListWidget::OnBtnAddPoint(bool checked)
     {
         if (checked)
         {
+          m_Interactor = dynamic_cast<mitk::PointSetInteractor*>(m_PointSetNode->GetInteractor());
+          
+          if (m_Interactor.IsNull())//if not present, instanciate one
             m_Interactor = mitk::PointSetInteractor::New("pointsetinteractor", m_PointSetNode);
-            mitk::GlobalInteraction::GetInstance()->AddInteractor( m_Interactor );
+          
+          //add it to global interaction to activate it
+          mitk::GlobalInteraction::GetInstance()->AddInteractor( m_Interactor );
         }
         else if ( m_Interactor )
         {

@@ -48,7 +48,7 @@ public:
   ~QmitkPointListView();
 
   /// assign a point set for observation
-  void SetPointSet( mitk::PointSet* pointSet );
+  void SetPointSetNode( mitk::DataNode* pointSetNode );
 
   /// which point set to work on
   const mitk::PointSet* GetPointSet() const;

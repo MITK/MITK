@@ -21,6 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QAbstractListModel>
 #include "QmitkExtExports.h"
 
+#include "mitkDataNode.h"
 #include "mitkPointSet.h"
 
 class QmitkExt_EXPORT QmitkPointListModel : public QAbstractListModel
@@ -29,7 +30,7 @@ class QmitkExt_EXPORT QmitkPointListModel : public QAbstractListModel
 
 public:
 
-  QmitkPointListModel( mitk::PointSet* = NULL, int t = 0, QObject* parent = 0 );
+  QmitkPointListModel( mitk::DataNode* = NULL, int t = 0, QObject* parent = 0 );
   ~QmitkPointListModel();
 
   Qt::ItemFlags flags(const QModelIndex& /*index*/) const;
@@ -45,10 +46,13 @@ public:
                       int role = Qt::DisplayRole) const;
 
   /// which point set to work on
-  void SetPointSet( mitk::PointSet* pointSet );
+  void SetPointSetNode( mitk::DataNode* pointSetNode );
 
   /// which point set to work on
   mitk::PointSet* GetPointSet() const;
+  
+  // which point set to work on
+  mitk::DataNode* GetPointSetNode() const;
 
   /// which time step to display/model
   void SetTimeStep(int t);
@@ -112,12 +116,15 @@ signals:
 protected:
 
   /// internally observe different point set
-  void ObserveNewPointset( mitk::PointSet* pointSet );
+  void ObserveNewPointSet( mitk::DataNode* pointSetNode );
 
+  //initially checks if there is a PointSet as data in the DataNode.
+  //returns PointSet if so and NULL if other data is set to node
+  mitk::PointSet* CheckForPointSetInNode(mitk::DataNode* node) const;
 
 protected:
 
-  mitk::PointSet* m_PointSet;
+  mitk::DataNode* m_PointSetNode;
   unsigned int    m_PointSetModifiedObserverTag;
   unsigned int    m_PointSetDeletedObserverTag;
   int             m_TimeStep;

@@ -2,7 +2,7 @@
 
 Program:   Medical Imaging & Interaction Toolkit
 Language:  C++
-Date:      $Date: 2010-03-31 17:34:48 +0200 (Mi, 31 Mrz 2010) $
+Date:      $Date$
 Version:   $Revision: 21985 $
 
 Copyright (c) German Cancer Research Center, Division of Medical and
@@ -29,7 +29,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "vtkRenderWindow.h"
 #include "vtkRenderWindowInteractor.h"
-
+#include "vtkAnnotatedCubeActor.h"
+#include "vtkOrientationMarkerWidget.h"
+#include "vtkProperty.h"
 
 //##Documentation
 //## @brief Example of a NON QT DEPENDENT MITK RENDERING APPLICATION. 
@@ -165,6 +167,33 @@ int main(int argc, char* argv[])
   // Part VI: Rendering initialization
   //*************************************************************************
  
+  
+  vtkAnnotatedCubeActor* cube = vtkAnnotatedCubeActor::New();
+  cube->SetXPlusFaceText("R");
+  cube->SetXMinusFaceText("L");
+  cube->SetYPlusFaceText("A");
+  cube->SetYMinusFaceText("P");
+  cube->SetZPlusFaceText("I");
+  cube->SetZMinusFaceText("S");
+
+  cube->SetXFaceTextRotation(180);
+  cube->SetYFaceTextRotation(180);
+  cube->SetZFaceTextRotation(-90);
+  
+  cube->GetCubeProperty()->SetColor(0.5,1,1);
+  cube->GetTextEdgesProperty()->SetLineWidth(1);
+  cube->GetTextEdgesProperty()->SetDiffuse(0);
+  cube->GetTextEdgesProperty()->SetAmbient(1);
+  cube->GetTextEdgesProperty()->SetColor(0.18,0.28,0.23);
+
+  vtkOrientationMarkerWidget* widget = vtkOrientationMarkerWidget::New();
+  widget->SetOutlineColor(0.93, 0.57, 0.13);
+  widget->SetOrientationMarker(cube);
+
+  widget->SetInteractor(mitkRenWin->GetVtkRenderWindow()->GetInteractor());
+  widget->SetEnabled(1);
+  //widget->SetInteractive(0);
+
 
   mitkRenWin->GetVtkRenderWindow()->SetSize(400, 400);
   mitkRenWin->GetVtkRenderWindow()->Render();

@@ -18,6 +18,10 @@ IF(MITK_USE_BLUEBERRY)
   
   SET(PLUGIN_EXCLUDE_LIST 
     org.mitk.gui.qt.volumetry
+	
+	# not included, because the OS needs to have the driver installed
+	# in order to compile the driver class
+	org.mitk.inputdevices.spacenavigator
   )
 
   MACRO_COLLECT_PLUGINS(OUTPUT_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/ExtBundles

@@ -50,6 +50,9 @@ mitk::RenderWindow::RenderWindow(vtkRenderWindow* renWin, const char* name )
 mitk::RenderWindow::~RenderWindow()
 {
   Destroy();
+  m_vtkRenderWindow->Delete();
+  m_vtkRenderWindowInteractor->Delete();
+  m_vtkMitkEventProvider->Delete();
 }
 
 vtkRenderWindow* mitk::RenderWindow::GetVtkRenderWindow()

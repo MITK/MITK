@@ -19,7 +19,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkRenderWindow.h"
 
 #include <QCursor>
-#include <QLayout>
 #include <QMouseEvent>
 #include <QWheelEvent>
 #include <QKeyEvent>
@@ -27,11 +26,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QTimer>
 
 #include "QmitkEventAdapter.h"
-
-#include "mitkDisplayPositionEvent.h"
-#include "mitkVtkLayerController.h"
-#include "mitkRenderingManager.h"
-#include "vtkRenderer.h"
 
 #include "QmitkOverlayController.h"
 #include "QmitkRenderWindowMenu.h"

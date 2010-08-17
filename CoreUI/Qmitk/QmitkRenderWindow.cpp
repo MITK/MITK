@@ -36,7 +36,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkOverlayController.h"
 #include "QmitkRenderWindowMenu.h"
 
-QmitkRenderWindow::QmitkRenderWindow(QWidget *parent, QString name, mitk::VtkPropRenderer* renderer, mitk::RenderingManager* renderingManager )
+QmitkRenderWindow::QmitkRenderWindow(QWidget *parent, QString /*name*/, mitk::VtkPropRenderer* /*renderer*/, mitk::RenderingManager* renderingManager )
 : QVTKWidget(parent)
 , m_ResendQtEvents(true)
 , m_MenuWidget(NULL)
@@ -48,10 +48,10 @@ QmitkRenderWindow::QmitkRenderWindow(QWidget *parent, QString name, mitk::VtkPro
   setFocusPolicy(Qt::StrongFocus);
   setMouseTracking(true);
 
-  //create Renderwindow MenuBar for split, close Window or set new setting.
+  //create render window MenuBar for split, close Window or set new setting.
   m_MenuWidget = new QmitkRenderWindowMenu(this,0,m_Renderer);
 
-  // create overlaycontroller for managing various overlays
+  // create overlay controller for managing various overlays
   m_OverlayController = new QmitkOverlayController( this );
 
   //create Signal/Slot Connection

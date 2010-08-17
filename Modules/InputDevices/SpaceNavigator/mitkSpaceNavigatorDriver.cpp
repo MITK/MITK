@@ -15,6 +15,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
+#define SPACE_NAVIGATOR_MAIN_SOURCE
+
 #include "mitkSpaceNavigatorDriver.h"
 #include "mitkSpaceNavigatorAddOn.h"
 
@@ -288,4 +290,4 @@ HRESULT SpaceNavigatorDriver::UninitializeCOM()
 
   return hr;
 }
-#endif
+#endif // MITK_USE_SPACENAVIGATOR_DRIVER

@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef SpaceNavigatorDriver__h__
 #define SpaceNavigatorDriver__h__
 
-#ifdef MITK_USE_SPACENAVIGATOR_DRIVER
+#ifdef SPACE_NAVIGATOR_MAIN_SOURCE
 
 #define _ATL_ATTRIBUTES 1
 #define _WIN32_DCOM
@@ -42,7 +42,7 @@ using namespace ATL;
 using std::cout;
 using std::endl;
 
-[module(name="XYZName")];
+[module(name="mitkInputDevices")];
 [ event_receiver(com) ]
 class SpaceNavigatorDriver
 {
@@ -80,7 +80,6 @@ public:
    HRESULT OnSensorInput(void);
    HRESULT UninitializeCOM();
 };
-
 #else // SPACE_NAVIGATOR_MAIN_SOURCE
 
 class SpaceNavigatorDriver
@@ -89,6 +88,6 @@ public:
   static SpaceNavigatorDriver* GetInstance();
 };
 
-#endif // SPACE_NAVIGATOR_MAIN_SOURCE
+#endif
 
 #endif // SpaceNavigatorDriver__h__

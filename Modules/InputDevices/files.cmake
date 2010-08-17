@@ -3,7 +3,6 @@ SET(CPP_FILES
   SpaceNavigator/mitkSpaceNavigatorDriver.cpp
   SpaceNavigator/mitkSpaceNavigatorEvent.cpp
   SpaceNavigator/mitkSpaceNavigatorVtkCameraController.cpp
-  )
-SET(CPP_FILES
   WiiMote/mitkWiiMoteAddOn.cpp
   )
+

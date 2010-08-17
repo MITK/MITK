@@ -1,5 +1,3 @@
-IF(WIN32)
-
 OPTION(MITK_USE_SPACENAVIGATOR_DRIVER "Use space navigator driver" OFF)
 
 IF(MITK_USE_SPACENAVIGATOR_DRIVER)
@@ -10,5 +8,5 @@ MITK_CREATE_MODULE(mitkInputDevices
   INCLUDE_DIRS SpaceNavigator WiiMote
   DEPENDS Mitk
 )
-ENDIF(WIN32)
+
 

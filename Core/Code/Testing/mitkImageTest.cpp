@@ -456,8 +456,8 @@ int mitkImageTest(int /*argc*/, char* /*argv*/[])
   MITK_TEST_OUTPUT(<< "Convert to index and access value by mitk::Image::GetPixelValueByIndex again");
   mitk::Index3D index2;
   image->GetGeometry()->WorldToIndex(point, index2);
-  float val2 = image->GetPixelValueByWorldCoordinate(point);
-  MITK_TEST_CONDITION_REQUIRED( mitk::Equal(val,94.456184387207031), "");
+  float val2 = image->GetPixelValueByIndex(index2);
+  MITK_TEST_CONDITION_REQUIRED( mitk::Equal(val2,94.456184387207031), "");
 
   //access via itk
   MITK_TEST_OUTPUT(<< "Test conversion to itk::Image");

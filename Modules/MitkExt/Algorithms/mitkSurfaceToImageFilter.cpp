@@ -64,7 +64,10 @@ void mitk::SurfaceToImageFilter::GenerateOutputInformation()
      (inputImage->IsInitialized() == false) || 
      (inputImage->GetTimeSlicedGeometry() == NULL)) return;
 
-  output->Initialize(inputImage->GetPixelType(), *inputImage->GetTimeSlicedGeometry());
+  if (m_MakeOutputBinary)
+    output->Initialize(mitk::PixelType(typeid(unsigned char)), *inputImage->GetTimeSlicedGeometry());
+  else
+    output->Initialize(inputImage->GetPixelType(), *inputImage->GetTimeSlicedGeometry());  
 
   output->SetPropertyList(inputImage->GetPropertyList()->Clone());    
 }
@@ -163,6 +166,7 @@ void mitk::SurfaceToImageFilter::Stencil3DImage(int time)
     threshold->ReplaceOutOn();
     threshold->SetInValue( 0 );
     threshold->SetOutValue( 1 );
+    threshold->SetOutputScalarTypeToUnsignedChar();
     threshold->Update();
 
     mitk::Image::Pointer output = this->GetOutput();

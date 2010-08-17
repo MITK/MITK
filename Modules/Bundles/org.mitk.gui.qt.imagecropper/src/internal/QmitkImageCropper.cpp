@@ -175,7 +175,7 @@ void QmitkImageCropper::ExecuteOperation (mitk::Operation *operation)
 
 }
 
-void QmitkImageCropper::OnImageSelectionChanged(const mitk::DataNode* node)
+void QmitkImageCropper::OnImageSelectionChanged(const mitk::DataNode* /*node*/)
 {
   this->RemoveBoundingObjectFromNode();
 }

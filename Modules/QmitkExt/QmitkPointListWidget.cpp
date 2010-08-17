@@ -2,15 +2,10 @@
 #include <mitkGlobalInteraction.h>
 #include <mitkPointSetReader.h>
 #include <mitkPointSetWriter.h>
-#include <mitkPointOperation.h>
-#include <mitkStateEvent.h>
-#include <mitkInteractionConst.h>
-#include <mitkPositionEvent.h>
 
 #include <QHBoxLayout>
 #include <QFileDialog>
 #include <QMessageBox>
-#include <QModelIndexList>
 #include <QDir>
 
 #include "btnLoad.xpm"

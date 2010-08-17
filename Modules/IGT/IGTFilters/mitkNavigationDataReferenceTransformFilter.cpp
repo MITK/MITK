@@ -265,7 +265,7 @@ bool mitk::NavigationDataReferenceTransformFilter::InitializeReferenceLandmarks(
 }
 
 
-void mitk::NavigationDataReferenceTransformFilter::PrintSelf( std::ostream& os, itk::Indent indent ) const
+void mitk::NavigationDataReferenceTransformFilter::PrintSelf( std::ostream& /*os*/, itk::Indent /*indent*/ ) const
 {
 
 }

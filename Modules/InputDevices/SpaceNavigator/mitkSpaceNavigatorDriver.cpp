@@ -15,7 +15,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
+#ifdef MITK_USE_SPACENAVIGATOR_DRIVER
 #define SPACE_NAVIGATOR_MAIN_SOURCE
+#endif
 
 #include "mitkSpaceNavigatorDriver.h"
 #include "mitkSpaceNavigatorAddOn.h"

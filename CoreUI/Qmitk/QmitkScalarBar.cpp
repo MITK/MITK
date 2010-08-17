@@ -62,7 +62,7 @@ void QmitkScalarBar::SetupGeometry( alignment align )
     { 
       m_VerticalLine = new QLine( QPoint(width()/2,0), QPoint(width()/2,height()) );
 
-      for ( int i=0; i<m_NumberOfSubDivisions; i++ )
+      for ( unsigned int i=0; i<m_NumberOfSubDivisions; ++i )
       {
         int y = this->height()/(m_NumberOfSubDivisions-1)*i;
         if ( i==0 )
@@ -83,7 +83,7 @@ void QmitkScalarBar::SetupGeometry( alignment align )
     {
       m_VerticalLine = new QLine( QPoint(0,height()/2), QPoint(width(),height()/2) );
 
-      for ( int i=0; i<m_NumberOfSubDivisions; i++ )
+      for ( unsigned int i=0; i<m_NumberOfSubDivisions; ++i )
       {
         int x = this->width()/(m_NumberOfSubDivisions-1)*i;
         if ( i==0 )

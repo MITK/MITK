@@ -1397,7 +1397,7 @@ void QmitkStdMultiWidget::moveEvent( QMoveEvent* e )
   mitkWidget4->GetOverlayController()->AdjustOverlayPosition();
 }
 
-void QmitkStdMultiWidget::leaveEvent ( QEvent * e  )
+void QmitkStdMultiWidget::leaveEvent ( QEvent * /*e*/  )
 {
   //set cursor back to initial state
   m_SlicesRotator->ResetMouseCursor();

@@ -143,7 +143,7 @@ unsigned int QmitkScalarBar::GetNumberOfSubdivisions()
 }
 
 
-void QmitkScalarBar::paintEvent(QPaintEvent* event)
+void QmitkScalarBar::paintEvent(QPaintEvent* /*event*/)
 {
   QPainter painter(this);
   painter.setPen( m_Pen );

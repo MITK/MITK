@@ -569,7 +569,7 @@ void QmitkDeformableRegistrationView::Calculate()
   }
 }
 
-void QmitkDeformableRegistrationView::SetImagesVisible(berry::ISelection::ConstPointer selection)
+void QmitkDeformableRegistrationView::SetImagesVisible(berry::ISelection::ConstPointer /*selection*/)
 {
   if (this->m_CurrentSelection->Size() == 0)
   {

@@ -342,7 +342,7 @@ void QmitkPointListWidget::OnListDoubleClick()
     ;
 }
 
-void QmitkPointListWidget::DeactivateInteractor(bool deactivate)
+void QmitkPointListWidget::DeactivateInteractor(bool /*deactivate*/)
 {
     ;
 }

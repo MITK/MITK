@@ -163,7 +163,7 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
       unsigned int size = seriesUIDs.size();
       for ( unsigned int i = 0 ; i < size ; ++i )
       {
-        std::cout << std::endl << "Image #" << i+1 << "/" << size << " ";
+        MBI_DEBUG << "Image #" << i+1 << "/" << size << " ";
         headerReader = mitk::DicomDiffusionImageHeaderReader::New();
         headerReader->SetSeriesDicomFilenames(
           inputNames->GetFileNames(seriesUIDs[ i ] ));
@@ -215,8 +215,7 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
           {
             directions->push_back(hc[i]->DiffusionVector);
           }
-          std::cout << std::endl << std::endl;
-
+          
           // DWI TO DATATREE
           typedef mitk::DiffusionImage<PixelValueType> DiffVolumesType;
           DiffVolumesType::Pointer diffImage = DiffVolumesType::New();

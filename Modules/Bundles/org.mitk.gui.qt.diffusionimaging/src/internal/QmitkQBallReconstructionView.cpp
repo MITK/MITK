@@ -16,6 +16,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
+//#define MBILOG_ENABLE_DEBUG
+
 #include "QmitkQBallReconstructionView.h"
 #include "mitkDiffusionImagingConfigure.h"
 
@@ -240,6 +242,7 @@ void QmitkQBallReconstructionView::CreateConnections()
 
 void QmitkQBallReconstructionView::ExtractB0()
 {
+  
   if (m_CurrentSelection)
   {
     mitk::DataStorage::SetOfObjects::Pointer set =
@@ -620,7 +623,7 @@ void QmitkQBallReconstructionView::NumericalQBallReconstruction
 
       // QBALL RECONSTRUCTION
       clock.Start();
-      std::cout << "QBall reconstruction ";
+      MBI_INFO << "QBall reconstruction ";
       mitk::StatusBar::GetInstance()->DisplayText(status.sprintf(
         "QBall reconstruction for %s", nodename.c_str()).toAscii());
 
@@ -665,7 +668,7 @@ void QmitkQBallReconstructionView::NumericalQBallReconstruction
 
       filter->Update();
       clock.Stop();
-      std::cout << "took " << clock.GetMeanTime() << "s." << std::endl;
+      MBI_DEBUG << "took " << clock.GetMeanTime() << "s." ;
 
       // ODFs TO DATATREE
       mitk::QBallImage::Pointer image = mitk::QBallImage::New();
@@ -706,7 +709,7 @@ void QmitkQBallReconstructionView::NumericalQBallReconstruction
   }
   catch (itk::ExceptionObject &ex)
   {
-    std::cout << ex << std::endl;
+    MBI_INFO << ex ;
     return ;
   }
 }
@@ -761,7 +764,7 @@ void QmitkQBallReconstructionView::AnalyticalQBallReconstruction(
 
       // QBALL RECONSTRUCTION
       clock.Start();
-      std::cout << "QBall reconstruction ";
+      MBI_INFO << "QBall reconstruction ";
       mitk::StatusBar::GetInstance()->DisplayText(status.sprintf(
         "QBall reconstruction for %s", nodename.c_str()).toAscii());
 
@@ -795,7 +798,7 @@ void QmitkQBallReconstructionView::AnalyticalQBallReconstruction(
         }
 
         clock.Stop();
-        std::cout << "took " << clock.GetMeanTime() << "s." << std::endl;
+        MBI_DEBUG << "took " << clock.GetMeanTime() << "s." ;
         mitk::ProgressBar::GetInstance()->Progress();
 
       }
@@ -812,7 +815,7 @@ void QmitkQBallReconstructionView::AnalyticalQBallReconstruction(
   }
   catch (itk::ExceptionObject &ex)
   {
-    std::cout << ex << std::endl;
+    MBI_INFO << ex ;
     return ;
   }
 }

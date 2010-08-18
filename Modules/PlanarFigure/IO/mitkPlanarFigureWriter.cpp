@@ -125,12 +125,12 @@ void mitk::PlanarFigureWriter::GenerateData()
     // Serialize control points of PlanarFigure
     TiXmlElement* controlPointsElement = new TiXmlElement("ControlPoints");
     pfElement->LinkEndChild(controlPointsElement);
-    for (PlanarFigure::VertexContainerType::ConstIterator it = vertices->Begin(); it != vertices->End(); ++it)
+    for (int i = 0; i < pf->GetNumberOfControlPoints(); i++)
     {
       TiXmlElement* vElement = new TiXmlElement("Vertex");
-      vElement->SetAttribute("id", it->Index());
-      vElement->SetDoubleAttribute("x", it->Value().GetElement(0));
-      vElement->SetDoubleAttribute("y", it->Value().GetElement(1));
+      vElement->SetAttribute("id", i);
+      vElement->SetDoubleAttribute("x", pf->GetControlPoint(i)[0]);
+      vElement->SetDoubleAttribute("y", pf->GetControlPoint(i)[1]);
       controlPointsElement->LinkEndChild(vElement);
     }
     TiXmlElement* geoElement = new TiXmlElement("Geometry");

@@ -329,7 +329,7 @@ void QmitkTensorReconstructionView::ItkTensorReconstruction
 
       // TENSOR RECONSTRUCTION
        clock.Start();
-      std::cout << "Tensor reconstruction ";
+      MBI_INFO << "Tensor reconstruction ";
       mitk::StatusBar::GetInstance()->DisplayText(status.sprintf(
         "Tensor reconstruction for %s", nodename.c_str()).toAscii());
       typedef itk::DiffusionTensor3DReconstructionImageFilter< 
@@ -342,7 +342,7 @@ void QmitkTensorReconstructionView::ItkTensorReconstruction
       tensorReconstructionFilter->SetThreshold( m_Controls->m_TensorReconstructionThreasholdEdit->text().toFloat() );
       tensorReconstructionFilter->Update();
       clock.Stop();
-      std::cout << "took " << clock.GetMeanTime() << "s." << std::endl;
+      MBI_DEBUG << "took " << clock.GetMeanTime() << "s.";
 
       // TENSORS TO DATATREE
       mitk::TensorImage::Pointer image = mitk::TensorImage::New();
@@ -372,7 +372,7 @@ void QmitkTensorReconstructionView::ItkTensorReconstruction
   }
   catch (itk::ExceptionObject &ex)
   {
-    std::cout << ex << std::endl;
+    MBI_INFO << ex ;
     return ;
   }
 }
@@ -407,7 +407,7 @@ void QmitkTensorReconstructionView::TeemTensorReconstruction
 
       // TENSOR RECONSTRUCTION
       clock.Start();
-      std::cout << "Teem Tensor reconstruction ";
+      MBI_INFO << "Teem Tensor reconstruction ";
       mitk::StatusBar::GetInstance()->DisplayText(status.sprintf(
         "Teem Tensor reconstruction for %s", nodename.c_str()).toAscii());
       typedef mitk::TeemDiffusionTensor3DReconstructionImageFilter< 
@@ -445,7 +445,7 @@ void QmitkTensorReconstructionView::TeemTensorReconstruction
       tensorReconstructionFilter->SetMinPlausibleValue( m_Controls->m_TensorEstimationTeemMinValEdit->text().toDouble() );
       tensorReconstructionFilter->Update();
       clock.Stop();
-      std::cout << "took " << clock.GetMeanTime() << "s." << std::endl;
+      MBI_DEBUG << "took " << clock.GetMeanTime() << "s." ;
 
       // TENSORS TO DATATREE
       mitk::DataNode::Pointer node2=mitk::DataNode::New();
@@ -472,7 +472,7 @@ void QmitkTensorReconstructionView::TeemTensorReconstruction
   }
   catch (itk::ExceptionObject &ex)
   {
-    std::cout << ex << std::endl;
+    MBI_INFO << ex ;
     return ;
   }
 }

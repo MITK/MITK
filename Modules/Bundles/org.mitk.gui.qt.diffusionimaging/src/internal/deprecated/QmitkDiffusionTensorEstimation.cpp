@@ -432,7 +432,7 @@ void QmitkDiffusionTensorEstimation::TensorVolumesSaveButton()
     return;
 
   // WRITING TENSORS TO FILE
-  std::cout << "Writing tensors ";
+  MBI_INFO << "Writing tensors ";
   typedef itk::ImageFileWriter<TensorImageType> TensorWriterType;
   TensorWriterType::Pointer tensorWriter = TensorWriterType::New();
   tensorWriter->SetFileName(filename.ascii());
@@ -518,7 +518,7 @@ void QmitkDiffusionTensorEstimation::QBallVolumesSaveButton()
 
   itk::ImageRegionIterator<IType> it (itkQBallVol, itkQBallVol->GetLargestPossibleRegion() );
   it = it.Begin();
-  std::cout << it.Get() << std::endl;
+  MBI_DEBUG << it.Get();
   for (it = it.Begin(); !it.IsAtEnd(); ++it)
   {
     itk::Vector<TTensorPixelType,odfsize> vec = it.Get();
@@ -541,7 +541,7 @@ void QmitkDiffusionTensorEstimation::QBallVolumesSaveButton()
     return;
 
   // WRITING TENSORS TO FILE
-  std::cout << "Writing data ";
+  MBI_INFO << "Writing data ";
   typedef itk::ImageFileWriter<VarVecImgType> QBallWriterType;
   QBallWriterType::Pointer qballWriter = QBallWriterType::New();
   qballWriter->SetFileName(filename.ascii());
@@ -577,7 +577,7 @@ void QmitkDiffusionTensorEstimation::QBallVolumesLoadButton()
     }
     catch (itk::ExceptionObject e)
     {
-      std::cout << e << std::endl;
+      MBI_LOG << e;
     }
 
     //itk::ImageRegionConstIterator<IVType> it (qballReader->GetOutput(), qballReader->GetOutput()->GetLargestPossibleRegion() );
@@ -622,7 +622,7 @@ void QmitkDiffusionTensorEstimation::QBallVolumesVisualizeSelectedButton()
 
   // PREPARE FOR VISUALIZATION
   clock.Start();
-  std::cout << "Preparing for Visualization ";
+  MBI_INFO << "Preparing for Visualization ";
   mitk::StatusBar::GetInstance()->DisplayText(status.sprintf(
     "Preparing for Visualization of %s", nodename.c_str()));
   typedef itk::DiffusionQballPrepareVisualizationImageFilter<TTensorPixelType,odfsize>
@@ -725,7 +725,7 @@ void QmitkDiffusionTensorEstimation::QBallVolumesVisualizeSelectedButton()
   }
   filter->Update();
   clock.Stop();
-  std::cout << "took " << clock.GetMeanTime() << "s." << std::endl;
+  MBI_DEBUG << "took " << clock.GetMeanTime() << "s.";
 
   // VIZ TO DATATREE
   mitk::Image::Pointer image = mitk::Image::New();
@@ -804,7 +804,7 @@ void QmitkDiffusionTensorEstimation::DirectionVolumesSaveButton()
     return;
 
   // WRITING TENSORS TO FILE
-  std::cout << "Writing data ";
+  MBI_INFO << "Writing data ";
   typedef itk::ImageFileWriter<VarVecImgType> WriterType;
   WriterType::Pointer writer = WriterType::New();
   writer->SetFileName(filename.ascii());
@@ -840,7 +840,7 @@ void QmitkDiffusionTensorEstimation::DirectionVolumesLoadButton()
     }
     catch (itk::ExceptionObject e)
     {
-      std::cout << e << std::endl;
+      MBI_INFO << e << std::endl;
     }
 
     // Tensorvolume
@@ -898,7 +898,7 @@ void QmitkDiffusionTensorEstimation::TensorEstimationTeemEstimateButton()
 
       // TENSOR RECONSTRUCTION
       clock.Start();
-      std::cout << "Teem Tensor reconstruction ";
+      MBI_INFO << "Teem Tensor reconstruction ";
       mitk::StatusBar::GetInstance()->DisplayText(status.sprintf(
         "Teem Tensor reconstruction for %s", nodename.c_str()));
       typedef mitk::TeemDiffusionTensor3DReconstructionImageFilter< 
@@ -933,7 +933,7 @@ void QmitkDiffusionTensorEstimation::TensorEstimationTeemEstimateButton()
       tensorReconstructionFilter->SetMinPlausibleValue( m_Controls->m_TensorEstimationTeemMinValEdit->text().toDouble() );
       tensorReconstructionFilter->Update();
       clock.Stop();
-      std::cout << "took " << clock.GetMeanTime() << "s." << std::endl;
+      MBI_DEBUG << "took " << clock.GetMeanTime() << "s.";
 
       // TENSORS TO DATATREE
       //mitk::DataNode::Pointer node=mitk::DataNode::New();
@@ -965,7 +965,7 @@ void QmitkDiffusionTensorEstimation::TensorEstimationTeemEstimateButton()
   }
   catch (itk::ExceptionObject &ex)
   {
-    std::cout << ex << std::endl;
+    MBI_INFO << ex;
     return ;
   }
 }
@@ -1001,7 +1001,7 @@ void QmitkDiffusionTensorEstimation::TensorEstimationButton()
 
       // TENSOR RECONSTRUCTION
       clock.Start();
-      std::cout << "Tensor reconstruction ";
+      MBI_INFO << "Tensor reconstruction ";
       mitk::StatusBar::GetInstance()->DisplayText(status.sprintf(
         "Tensor reconstruction for %s", nodename.c_str()));
       typedef itk::DiffusionTensor3DReconstructionImageFilter< 
@@ -1014,7 +1014,7 @@ void QmitkDiffusionTensorEstimation::TensorEstimationButton()
       tensorReconstructionFilter->SetThreshold( m_Controls->m_TensorEstimationThreasholdEdit->text().toFloat() );
       tensorReconstructionFilter->Update();
       clock.Stop();
-      std::cout << "took " << clock.GetMeanTime() << "s." << std::endl;
+      MBI_DEBUG << "took " << clock.GetMeanTime() << "s.";
 
       // TENSORS TO DATATREE
       mitk::Image::Pointer image = mitk::Image::New();
@@ -1043,7 +1043,7 @@ void QmitkDiffusionTensorEstimation::TensorEstimationButton()
   }
   catch (itk::ExceptionObject &ex)
   {
-    std::cout << ex << std::endl;
+    MBI_INFO << ex;
     return ;
   }
 }
@@ -1079,7 +1079,7 @@ void QmitkDiffusionTensorEstimation::QBallReconstructionButton()
 
       // QBALL RECONSTRUCTION
       clock.Start();
-      std::cout << "QBall reconstruction ";
+      MBI_INFO << "QBall reconstruction ";
       mitk::StatusBar::GetInstance()->DisplayText(status.sprintf(
         "QBall reconstruction for %s", nodename.c_str()));
 
@@ -1125,7 +1125,7 @@ void QmitkDiffusionTensorEstimation::QBallReconstructionButton()
 
       filter->Update();
       clock.Stop();
-      std::cout << "took " << clock.GetMeanTime() << "s." << std::endl;
+      MBI_DEBUG << "took " << clock.GetMeanTime() << "s." << std::endl;
 
       // ODFs TO DATATREE
       mitk::Image::Pointer image = mitk::Image::New();
@@ -1167,7 +1167,7 @@ void QmitkDiffusionTensorEstimation::QBallReconstructionButton()
   }
   catch (itk::ExceptionObject &ex)
   {
-    std::cout << ex << std::endl;
+    MBI_INFO << ex;
     return ;
   }
 }
@@ -1291,7 +1291,7 @@ void QmitkDiffusionTensorEstimation::QBallReconstructionAnalyticalButton()
 
       // QBALL RECONSTRUCTION
       clock.Start();
-      std::cout << "QBall reconstruction ";
+      MBI_INFO << "QBall reconstruction ";
       mitk::StatusBar::GetInstance()->DisplayText(status.sprintf(
         "QBall reconstruction for %s", nodename.c_str()));
 
@@ -1325,7 +1325,7 @@ void QmitkDiffusionTensorEstimation::QBallReconstructionAnalyticalButton()
         }
 
         clock.Stop();
-        std::cout << "took " << clock.GetMeanTime() << "s." << std::endl;
+        MBI_DEBUG << "took " << clock.GetMeanTime() << "s.";
         mitk::ProgressBar::GetInstance()->Progress();
 
       }
@@ -1345,7 +1345,7 @@ void QmitkDiffusionTensorEstimation::QBallReconstructionAnalyticalButton()
   }
   catch (itk::ExceptionObject &ex)
   {
-    std::cout << ex << std::endl;
+    MBI_INFO << ex;
     return ;
   }
 }
@@ -1366,7 +1366,7 @@ void QmitkDiffusionTensorEstimation::StandardAlgorithmsFAButton()
 
   // COMPUTE FA
   clock.Start();
-  std::cout << "Computing FA ";
+  MBI_INFO << "Computing FA ";
   mitk::StatusBar::GetInstance()->DisplayText(status.sprintf(
     "Computing FA for %s", nodename.c_str()));
   typedef TensorPixelType::RealValueType                 RealValueType;
@@ -1385,7 +1385,7 @@ void QmitkDiffusionTensorEstimation::StandardAlgorithmsFAButton()
   multi->SetInput(fractionalAnisotropyFilter->GetOutput());
   multi->Update();
   clock.Stop();
-  std::cout << "took " << clock.GetMeanTime() << "s." << std::endl;
+  MBI_DEBUG << "took " << clock.GetMeanTime() << "s.";
 
   // FA TO DATATREE
   mitk::Image::Pointer image = mitk::Image::New();
@@ -1421,7 +1421,7 @@ void QmitkDiffusionTensorEstimation::StandardAlgorithmsRAButton()
 
   // COMPUTE RA
   clock.Start();
-  std::cout << "Computing RA ";
+  MBI_INFO << "Computing RA ";
   mitk::StatusBar::GetInstance()->DisplayText(status.sprintf(
     "Computing RA for %s", nodename.c_str()));
   typedef TensorPixelType::RealValueType                 RealValueType;
@@ -1432,7 +1432,7 @@ void QmitkDiffusionTensorEstimation::StandardAlgorithmsRAButton()
   relativeAnisotropyFilter->SetInput( itkvol );
   relativeAnisotropyFilter->Update();
   clock.Stop();
-  std::cout << "took " << clock.GetMeanTime() << "s." << std::endl;
+  MBI_DEBUG << "took " << clock.GetMeanTime() << "s.";
 
   // FA TO DATATREE
   mitk::Image::Pointer image = mitk::Image::New();
@@ -1471,7 +1471,7 @@ void QmitkDiffusionTensorEstimation::StandardAlgorithmsDirectionButton()
   std::string nodename = item->GetProperty("name");
 
   clock.Start();
-  std::cout << "Computing Diffusion Direction ";
+  MBI_INFO << "Computing Diffusion Direction ";
   mitk::StatusBar::GetInstance()->DisplayText(status.sprintf(
     "Computing Diffusion Direction for %s", nodename.c_str()));
 
@@ -1488,7 +1488,7 @@ void QmitkDiffusionTensorEstimation::StandardAlgorithmsDirectionButton()
   it = it.Begin();
 
   // VECTORFIELD
-  std::cout << "Converting to Vectorfield" << std::endl;
+  MBI_DEBUG << "Converting to Vectorfield";
 
   typedef itk::Image<itk::Vector<TTensorPixelType,3>, 3> VecImgType2;
   VecImgType2::Pointer vecImg5 = VecImgType2::New();
@@ -1571,7 +1571,7 @@ void QmitkDiffusionTensorEstimation::QBallStandardAlgorithmsGFAButton()
 
     // COMPUTE RA
     clock.Start();
-    std::cout << "Computing GFA ";
+    MBI_INFO << "Computing GFA ";
     mitk::StatusBar::GetInstance()->DisplayText(status.sprintf(
       "Computing GFA for %s", nodename.c_str()));
     typedef OdfVectorType::ValueType                 RealValueType;
@@ -1699,7 +1699,7 @@ void QmitkDiffusionTensorEstimation::QBallStandardAlgorithmsGFAButton()
     }
     gfaFilter->Update();
     clock.Stop();
-    std::cout << "took " << clock.GetMeanTime() << "s." << std::endl;
+    MBI_DEBUG << "took " << clock.GetMeanTime() << "s.";
 
     typedef itk::Image<TTensorPixelType, 3> ImgType;
     ImgType::Pointer img = ImgType::New();
@@ -1766,7 +1766,7 @@ void QmitkDiffusionTensorEstimation::QBallStandardAlgorithmsDirectionButton()
   std::string nodename = item->GetProperty("name");
 
   clock.Start();
-  std::cout << "Computing Diffusion Direction ";
+  MBI_INFO << "Computing Diffusion Direction ";
   mitk::StatusBar::GetInstance()->DisplayText(status.sprintf(
     "Computing Diffusion Direction for %s", nodename.c_str()));
 
@@ -1801,7 +1801,7 @@ void QmitkDiffusionTensorEstimation::QBallStandardAlgorithmsDirectionButton()
   if(numdir == 0)
   {
 
-    std::cout << "Converting to RGB" << std::endl;
+    MBI_INFO << "Converting to RGB";
 
     typedef itk::Image<itk::RGBPixel<uchar>, 3> VecImgType;
     VecImgType::Pointer vecImg = VecImgType::New();
@@ -1872,7 +1872,7 @@ void QmitkDiffusionTensorEstimation::QBallStandardAlgorithmsDirectionButton()
   }
 
   // VECTORFIELD
-  std::cout << "Converting to Vectorfield" << std::endl;
+  MBI_DEBUG << "Converting to Vectorfield";
 
   typedef itk::Image<itk::Vector<TTensorPixelType,3>, 3> VecImgType2;
   VecImgType2::Pointer vecImg5 = VecImgType2::New();
@@ -1957,7 +1957,7 @@ void QmitkDiffusionTensorEstimation::QBallStandardAlgorithmsDeconvolutionButton(
   std::string nodename = item->GetProperty("name");
 
   clock.Start();
-  std::cout << "Computing Diffusion Direction ";
+  MBI_INFO << "Computing Diffusion Direction ";
   mitk::StatusBar::GetInstance()->DisplayText(status.sprintf(
     "Computing Diffusion Direction for %s", nodename.c_str()));
 
@@ -2019,7 +2019,7 @@ void QmitkDiffusionTensorEstimation::QBallStandardAlgorithmsDeconvolutionButton(
 
     if(i==0)
     {
-      std::cout << "Converting to RGB" << std::endl;
+      MBI_INFO << "Converting to RGB";
 
       typedef itk::Image<itk::RGBPixel<uchar>, 3> VecImgType;
       VecImgType::Pointer vecImg = VecImgType::New();
@@ -2095,7 +2095,7 @@ void QmitkDiffusionTensorEstimation::QBallStandardAlgorithmsDeconvolutionButton(
     }
 
     // VECTORFIELD
-    std::cout << "Converting to Vectorfield" << std::endl;
+    MBI_INFO << "Converting to Vectorfield";
 
     typedef itk::Image<itk::Vector<TTensorPixelType,3>, 3> VecImgType2;
     VecImgType2::Pointer vecImg5 = VecImgType2::New();
@@ -2267,7 +2267,7 @@ void QmitkDiffusionTensorEstimation::DirectionVolumesAngularErrorButton()
   }
   catch (itk::ExceptionObject &ex)
   {
-    std::cout << ex << std::endl;
+    MBI_INFO << ex;
     return ;
   }
 
@@ -2426,7 +2426,7 @@ void QmitkDiffusionTensorEstimation::DiffusionVolumeSaveButton()
   }
   catch (itk::ExceptionObject e)
   {
-    std::cout << e << std::endl;
+    MBI_INFO << e;
   }
 }
 
@@ -2470,7 +2470,7 @@ void QmitkDiffusionTensorEstimation::DiffusionVolumesLoadButton()
     }
     catch (itk::ExceptionObject e)
     {
-      std::cout << e << std::endl;
+      MBI_INFO << e;
     }
 
   }

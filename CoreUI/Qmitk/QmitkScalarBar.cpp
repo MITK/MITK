@@ -105,7 +105,10 @@ void QmitkScalarBar::SetupGeometry( alignment align )
 
 void QmitkScalarBar::SetScaleFactor( double scale )
 {
-  m_ScaleFactor = scale;
+  if ( scale < 0.1 )
+    m_ScaleFactor = 0.1;
+  else
+    m_ScaleFactor = scale;
 
   // Adopt the number of small, intersecting lines to the size of the widget.
   if ( this->parentWidget() != NULL && this->parentWidget()->parentWidget() != NULL )
@@ -145,16 +148,23 @@ unsigned int QmitkScalarBar::GetNumberOfSubdivisions()
 
 void QmitkScalarBar::paintEvent(QPaintEvent* /*event*/)
 {
-  QPainter painter(this);
-  painter.setPen( m_Pen );
-  painter.setBrush( Qt::SolidPattern );
-  painter.setRenderHint( QPainter::Antialiasing, true );
-
-  painter.drawLine( m_VerticalLine->p1(), m_VerticalLine->p2() );
-
-  foreach( QLine* line, m_HorizontalLines )
+  try
   {
-    painter.drawLine( line->p1(), line->p2() );
+    QPainter painter(this);
+    painter.setPen( m_Pen );
+    painter.setBrush( Qt::SolidPattern );
+    painter.setRenderHint( QPainter::Antialiasing, true );
+
+    painter.drawLine( m_VerticalLine->p1(), m_VerticalLine->p2() );
+
+    foreach( QLine* line, m_HorizontalLines )
+    {
+      painter.drawLine( line->p1(), line->p2() );
+    }
+  }
+  catch (...)
+  {
+    MITK_ERROR << "ScalarBar cannot be drawn.";
   }
 }
 

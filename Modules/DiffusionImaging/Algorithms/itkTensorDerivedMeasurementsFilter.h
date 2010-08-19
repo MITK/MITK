@@ -37,8 +37,9 @@ public:
   enum Measure
   {
     FA,
-    L1,
-    V1
+    RA,
+    L1, // = DA (Axial diffusivity)
+    DR //Radial diffusivity
   };
 
   typedef itk::DiffusionTensor3D<TPixel>          TensorType;

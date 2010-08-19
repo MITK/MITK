@@ -9,7 +9,7 @@
 namespace itk {
 
   template <class TPixel>
-  TensorDerivedMeasurementsFilter<TPixel>::TensorDerivedMeasurementsFilter() : m_Measure(FA)
+  TensorDerivedMeasurementsFilter<TPixel>::TensorDerivedMeasurementsFilter() : m_Measure(L1)
   {
 
   }
@@ -39,9 +39,33 @@ namespace itk {
 
       TensorType tensor = tensorIt.Get();
 
-      TPixel fa = tensor.GetFractionalAnisotropy();
-
-      outputIt.Set(fa);
+      switch(m_Measure)
+      {
+        case this->FA:
+        {
+          TPixel diffusionIndex = tensor.GetFractionalAnisotropy();
+          outputIt.Set(diffusionIndex);
+          break;
+        }
+        case this->RA:
+        {
+          TPixel diffusionIndex = tensor.GetRelativeAnisotropy();
+          outputIt.Set(diffusionIndex);
+          break;
+        }
+        case this->L1:
+        {
+          TPixel diffusionIndex = tensor.GetNthComponent(0);
+          outputIt.Set(diffusionIndex);
+          break;
+        }
+        case this->DR:
+        {
+          TPixel diffusionIndex = (tensor.GetNthComponent(1) + tensor.GetNthComponent(2)) / 2;
+          outputIt.Set(diffusionIndex);
+          break;
+        }
+      }
 
       ++tensorIt;
       ++outputIt;

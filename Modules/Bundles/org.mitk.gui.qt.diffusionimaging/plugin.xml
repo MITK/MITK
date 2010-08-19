@@ -37,12 +37,13 @@
           class="QmitkControlVisualizationPropertiesView" />
   </extension>
 
+  <!--
   <extension point="org.blueberry.ui.views">
     <view id="org.mitk.views.tbssview"
           name="TBSS"
           icon="resources/quantification.png"
           class="QmitkTbssView" />
   </extension>
-  
+  -->
 
 </plugin>

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>227</width>
-    <height>286</height>
+    <height>395</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -178,6 +178,26 @@
         </property>
         <property name="text">
          <string>RA</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCommandLinkButton" name="m_L1Button">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>L1 (DA)</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCommandLinkButton" name="m_DRButton">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>DR ( (L1+L2)/2 )</string>
         </property>
        </widget>
       </item>

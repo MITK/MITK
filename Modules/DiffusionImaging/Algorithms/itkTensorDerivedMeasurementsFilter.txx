@@ -17,7 +17,7 @@ namespace itk {
   template <class TPixel>
   void TensorDerivedMeasurementsFilter<TPixel>::GenerateData()
   {
-    TensorImageType::Pointer tensorImage = static_cast< TensorImageType * >( this->ProcessObject::GetInput(0) );
+    typename TensorImageType::Pointer tensorImage = static_cast< TensorImageType * >( this->ProcessObject::GetInput(0) );
     typedef ImageRegionConstIterator< TensorImageType > TensorImageIteratorType;
     typedef ImageRegionIterator< OutputImageType > OutputImageIteratorType;
 
@@ -25,19 +25,19 @@ namespace itk {
     typename OutputImageType::Pointer outputImage = 
       static_cast< OutputImageType * >(this->ProcessObject::GetOutput(0));
 
-    TensorImageType::RegionType region = tensorImage->GetLargestPossibleRegion();
+    typename TensorImageType::RegionType region = tensorImage->GetLargestPossibleRegion();
     outputImage->SetRegions(region);
     outputImage->Allocate();
 
-    TensorImageIteratorType tensorIt(tensorImage, tensorImage->GetLargestPossibleRegion());
-    OutputImageIteratorType outputIt(outputImage, outputImage->GetLargestPossibleRegion());
+    typename TensorImageIteratorType tensorIt(tensorImage, tensorImage->GetLargestPossibleRegion());
+    typename OutputImageIteratorType outputIt(outputImage, outputImage->GetLargestPossibleRegion());
 
     tensorIt.GoToBegin();
     outputIt.GoToBegin();
 
     while(!tensorIt.IsAtEnd() && !outputIt.IsAtEnd()){
 
-      TensorType tensor = tensorIt.Get();
+      typename TensorType tensor = tensorIt.Get();
 
       switch(m_Measure)
       {

@@ -68,9 +68,14 @@ void QmitkOverlayController::InitializeWidget( QmitkOverlay::DisplayPosition pos
   m_PositionedOverlays[ pos ] = new QWidget( m_RenderWindow, Qt::Tool | Qt::FramelessWindowHint );
   
   // autoFillBackGround(false) and WA_TranslucentBackground = true are needed to have a translucent background 
-  // who might have thought...
-  m_PositionedOverlays[ pos ]->setAutoFillBackground(false);
+  // transparency does NOT work under Win-XP 32-Bit --> paint black background
+
+#if !defined(_WIN32) || defined(_WIN64)
   m_PositionedOverlays[ pos ]->setAttribute( Qt::WA_TranslucentBackground, true );
+#else
+  m_PositionedOverlays[ pos ]->setStyleSheet( "QWidget { background: black }" );
+  m_PositionedOverlays[ pos ]->setAttribute( Qt::WA_TranslucentBackground, false );
+#endif
 
   // X11 specific attributes
   m_PositionedOverlays[ pos ]->setAttribute( Qt::WA_X11NetWmWindowTypeUtility, true );

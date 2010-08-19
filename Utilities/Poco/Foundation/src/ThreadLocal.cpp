@@ -74,8 +74,7 @@ TLSAbstractSlot*& ThreadLocalStorage::get(const void* key)
   {
     #if (_MSC_VER > 1500)
       return _map.insert(TLSMap::value_type(key, nullptr)).first->second;
-    #endif
-    #if !defined(_MSC_VER)
+    #else
       return _map.insert(TLSMap::value_type(key, 0)).first->second;
     #endif
   }

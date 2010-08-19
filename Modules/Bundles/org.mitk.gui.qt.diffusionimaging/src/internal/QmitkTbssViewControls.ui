@@ -485,7 +485,14 @@
    <item>
     <widget class="QPushButton" name="m_OutputValues">
      <property name="text">
-      <string>tbss </string>
+      <string>tbss for lines</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="m_OutputPoints">
+     <property name="text">
+      <string>tbss for unconnected points</string>
      </property>
     </widget>
    </item>

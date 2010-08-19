@@ -119,6 +119,34 @@ struct TbSelListener : ISelectionListener
 
       }
 
+      else if(m_View->m_CurrentSelection->Size() == 1)
+      {
+              
+        mitk::DataNode::Pointer skeletonNode;
+        
+        for (IStructuredSelection::iterator i = m_View->m_CurrentSelection->Begin(); 
+          i != m_View->m_CurrentSelection->End(); ++i)
+        {
+          // extract datatree node
+          if (mitk::DataNodeObject::Pointer nodeObj = i->Cast<mitk::DataNodeObject>())
+          {
+            mitk::DataNode::Pointer node = nodeObj->GetDataNode();
+            
+            if(QString("Image").compare(node->GetData()->GetNameOfClass())== 0)
+            {
+              // Find 4D image (3d skeleton + user ID)
+              if (dynamic_cast<mitk::Image*>(node->GetData())->GetDimension() == 4)
+              {
+                m_View->SkeletonSelected(node);                
+              }
+
+              
+            }
+          }
+        }        
+
+      }
+
       else{
         m_View->m_Controls->m_StatusLabel->show();
         m_View->m_Controls->m_RoiNameLabel->setText(QString::fromStdString(""));
@@ -203,6 +231,7 @@ void QmitkTbssView::CreateConnections()
   if ( m_Controls )
   {
     connect( (QObject*)(m_Controls->m_OutputValues), SIGNAL(clicked()), this, SLOT(OutputValues()) );
+    connect( (QObject*)(m_Controls->m_OutputPoints), SIGNAL(clicked()), this, SLOT(OutputUnconnectedPointValues()) );
   }
 }
 
@@ -228,6 +257,89 @@ void QmitkTbssView::RoiSelected(mitk::DataNode::Pointer roiNode)
   m_RoiNode = roiNode; 
   m_RoiNode->SetVisibility(true);
   m_Controls->m_RoiNameLabel->setText(QString::fromStdString(m_RoiNode->GetName()));
+}
+
+void QmitkTbssView::OutputUnconnectedPointValues()
+{
+  if(m_SkeletonNode.IsNull())
+  {
+    return;
+  }
+
+  //read roi
+  /*mitk::Image::Pointer image = dynamic_cast<mitk::Image*>( m_RoiNode->GetData() ); 
+  RoiImageType::Pointer roi = RoiImageType::New();
+  mitk::CastToItkImage(image, roi);*/
+  
+   //read the 4D skeleton
+  mitk::Image::Pointer image2 = dynamic_cast<mitk::Image*>( m_SkeletonNode->GetData() ); 
+  AllSkeletonType::Pointer skeleton = AllSkeletonType::New();  
+  mitk::CastToItkImage(image2, skeleton);
+
+ // RoiImageType::SizeType roiSize = roi->GetLargestPossibleRegion().GetSize();
+  AllSkeletonType::SizeType skeletonSize = skeleton->GetLargestPossibleRegion().GetSize();
+
+
+
+  AllSkeletonType::IndexType indices[3];
+  indices[2][0] = 98; indices[2][1] = 126; indices[2][2] = 105;
+  indices[3][0] = 101; indices[3][1] = 98; indices[3][2] = 104;
+  indices[4][0] = 101; indices[4][1] = 76; indices[4][2] = 92;
+
+  // output file
+  std::string filename = "G://home//vanbrugg//spie2011//CingulumHealthy.csv";
+  std::ofstream f;
+  f.open(filename.c_str());
+
+  for (int s=0; s<skeletonSize[3]; s++)
+  {
+    
+    for(int t=0; t<3; t++)
+    {
+      indices[t][3] = s;     
+      f << skeleton->GetPixel(indices[t]) << ",";
+    }
+
+    f << std::endl;
+  }
+  f.close();
+
+  //for(int x=0; x<roiSize[0]; x++)
+  //{
+  //  for(int y=0; y<roiSize[1]; y++)
+  //  {
+  //    for(int z=0; z<roiSize[2]; z++)
+  //    {
+  //      RoiImageType::IndexType index;
+  //      index[0] = x;
+  //      index[1] = y;
+  //      index[2] = z;
+  //      if (roi->GetPixel(index) != 0)
+  //      {
+  //        // Output the values of this point for all subjects
+  //        AllSkeletonType::IndexType skeletonIndex;
+  //        skeletonIndex[0] = index[0];
+  //        skeletonIndex[1] = index[1];
+  //        skeletonIndex[2] = index[2];
+
+  //       
+
+  //        for(int t=0; t<skeletonSize[3]; t++)
+  //        {
+  //          if(index[0] == 90 && index[1] == 98 && index[2] == 95)
+  //          {
+  //            std::cout << "the empty voxel" << std::endl;
+  //          }
+  //          skeletonIndex[3] = t;
+  //          std::cout << skeleton->GetPixel(skeletonIndex) << std::endl;
+  //        }
+
+  //        std::cout << " ";
+  //      }
+  //    }
+  //  }
+  //}
+
 }
 
 void QmitkTbssView::OutputValues()
@@ -256,7 +368,7 @@ void QmitkTbssView::OutputValues()
 
 
   //For every subject (4th axis of the 4D volume) output the tract of interest and write results to file
-  std::string filename = "G://home//vanbrugg//spie2011//cc.csv";
+  std::string filename = "G://home//vanbrugg//spie2011//paraHipLeftHealthy.csv";
   std::ofstream f;
   f.open(filename.c_str());
   
@@ -331,9 +443,17 @@ std::vector<RoiImageType::IndexType> QmitkTbssView::SortPoints(RoiImageType::Poi
   
   //set current point to be the start point. Hard coded for now, should be changed to function in general
   RoiImageType::IndexType currentPoint;
-  currentPoint[0] = 90; // For Corpus Callosum the constant index;
-  currentPoint[1] = 88;
-  currentPoint[2] = 82;
+  //currentPoint[0] = 90; // For Corpus Callosum the constant index;
+  //currentPoint[1] = 88;
+  //currentPoint[2] = 82;
+
+  //currentPoint[0] = 65; //standard for right parahippocampal white matter
+  //currentPoint[1] = 108;
+  //currentPoint[2] = 45;
+
+  currentPoint[0] = 95; 
+  currentPoint[1] = 166;
+  currentPoint[2] = 78;
 
   bool ready = false;
   while(!ready)
@@ -366,17 +486,17 @@ RoiImageType::IndexType QmitkTbssView::FindNextPoint(std::vector<RoiImageType::I
                                                      RoiImageType::IndexType currentPoint, RoiImageType::Pointer roi, bool &ready)
 {  
 
-  RoiImageType::IndexValueType dx[7] = {0,1,1,1,0,-1,-1};
-  RoiImageType::IndexValueType dy[7] = {1,1,0,-1,-1,-1,0};
+  RoiImageType::IndexValueType dx[26] = {0, 0, 1, 1, 1, 0,-1,-1,-1,0,1,1, 1, 0,-1,-1,-1, 0, 1, 1, 1, 0,-1,-1,-1, 0};
+  RoiImageType::IndexValueType dy[26] = {0, 1, 1, 0,-1,-1,-1, 0, 1,1,1,0,-1,-1,-1, 0, 1, 1, 1, 0,-1,-1,-1, 0, 1, 0};
+  RoiImageType::IndexValueType dz[26] = {0, 0, 0, 0, 0, 0, 0, 0, 0,1,1,1, 1, 1, 1, 1, 1,-1,-1,-1,-1,-1,-1,-1,-1, 1};
 
-  RoiImageType::IndexType newPoint;
- // RoiImageType::IndexValueType i = currentPoint[0];
-  newPoint[0] = currentPoint[0]; //The constant point
+  RoiImageType::IndexType newPoint;   
 
-  for (int step=0; step<7; step++)
+  for (int step=0; step<26; step++)
   {
-    newPoint[1] = currentPoint[1] + dx[step];
-    newPoint[2] = currentPoint[2] + dy[step];
+    newPoint[0] = currentPoint[0] + dx[step];
+    newPoint[1] = currentPoint[1] + dy[step];
+    newPoint[2] = currentPoint[2] + dz[step];
 
     // Check if point is not yet visited
     if(!PointVisited(pointsVisited, newPoint))

@@ -83,7 +83,11 @@ class QmitkTbssView : public QObject, public QmitkFunctionality
 
 protected slots:
 
+  // For lines
   void OutputValues();
+
+  // For unconnected points
+  void OutputUnconnectedPointValues();
   
 
 protected:

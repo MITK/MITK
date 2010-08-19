@@ -29,8 +29,8 @@ namespace itk {
     outputImage->SetRegions(region);
     outputImage->Allocate();
 
-    typename TensorImageIteratorType tensorIt(tensorImage, tensorImage->GetLargestPossibleRegion());
-    typename OutputImageIteratorType outputIt(outputImage, outputImage->GetLargestPossibleRegion());
+    TensorImageIteratorType tensorIt(tensorImage, tensorImage->GetLargestPossibleRegion());
+    OutputImageIteratorType outputIt(outputImage, outputImage->GetLargestPossibleRegion());
 
     tensorIt.GoToBegin();
     outputIt.GoToBegin();

@@ -59,43 +59,52 @@ ThreadLocalStorage::ThreadLocalStorage()
 
 ThreadLocalStorage::~ThreadLocalStorage()
 {
-	for (TLSMap::iterator it = _map.begin(); it != _map.end(); ++it)
-	{
-		delete it->second;	
-	}
+  for (TLSMap::iterator it = _map.begin(); it != _map.end(); ++it)
+  {
+    delete it->second;	
+  }
 }
 
 
 TLSAbstractSlot*& ThreadLocalStorage::get(const void* key)
 {
-	TLSMap::iterator it = _map.find(key);
-	if (it == _map.end())
-		return _map.insert(TLSMap::value_type(key, nullptr)).first->second;
-	else
-		return it->second;
+
+  TLSMap::iterator it = _map.find(key);
+  if (it == _map.end())
+  {
+    #if (_MSC_VER > 1500)
+      return _map.insert(TLSMap::value_type(key, nullptr)).first->second;
+    #endif
+    #if !defined(_MSC_VER)
+      return _map.insert(TLSMap::value_type(key, 0)).first->second;
+    #endif
+  }
+    
+  else
+    return it->second;
 }
 
 
 ThreadLocalStorage& ThreadLocalStorage::current()
 {
-	Thread* pThread = Thread::current();
-	if (pThread)
-	{
-		return pThread->tls();
-	}
-	else
-	{
-		static SingletonHolder<ThreadLocalStorage> sh;
-		return *sh.get();
-	}
+  Thread* pThread = Thread::current();
+  if (pThread)
+  {
+    return pThread->tls();
+  }
+  else
+  {
+    static SingletonHolder<ThreadLocalStorage> sh;
+    return *sh.get();
+  }
 }
 
 
 void ThreadLocalStorage::clear()
 {
-	Thread* pThread = Thread::current();
-	if (pThread)
-		pThread->clearTLS();
+  Thread* pThread = Thread::current();
+  if (pThread)
+    pThread->clearTLS();
 }
 
 

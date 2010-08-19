@@ -312,6 +312,8 @@ void mitk::CoreObjectFactory::CreateFileExtensionsMap()
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.pic.gz", "Sets of 2D slices"));
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.bmp", "Sets of 2D slices"));
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.png", "Sets of 2D slices"));
+  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.jpg", "Sets of 2D slices"));
+  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.jpeg", "Sets of 2D slices"));
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.dcm", "Sets of 2D slices"));
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.gdcm", "Sets of 2D slices"));
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.ima", "Sets of 2D slices"));

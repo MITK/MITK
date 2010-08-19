@@ -90,6 +90,9 @@ private:
 
   /** \brief to store the value of precision to pick a point */
   ScalarType m_Precision;
+
+  /** \brief Index of the point on which the mouse is currently hovering (-1 if none). */
+  int m_HoverPointIndex;
 };
 
 }

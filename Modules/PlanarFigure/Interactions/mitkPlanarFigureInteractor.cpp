@@ -40,7 +40,8 @@ PURPOSE.  See the above copyright notices for more information.
 mitk::PlanarFigureInteractor
 ::PlanarFigureInteractor(const char * type, DataNode* dataNode, int /* n */ )
 : Interactor( type, dataNode ),
-  m_Precision( 6.5 )
+  m_Precision( 6.5 ),
+  m_HoverPointIndex( -1 )
 {
 }
 
@@ -459,7 +460,14 @@ bool mitk::PlanarFigureInteractor
       if ( pointIndex >= 0 )
       {
         planarFigure->SelectControlPoint( pointIndex );     
-        planarFigure->InvokeEvent( itk::StartPickEvent() );
+
+        if ( m_HoverPointIndex != pointIndex )
+        {
+          // Invoke StartPickEvent if the mouse is entering the point area
+          m_HoverPointIndex = pointIndex;
+          planarFigure->InvokeEvent( itk::StartPickEvent() );
+        }
+
         this->HandleEvent( new mitk::StateEvent( EIDYES, NULL ) );
 
         // Return true: only this interactor is eligible to react on this event
@@ -468,7 +476,14 @@ bool mitk::PlanarFigureInteractor
       else
       {
         planarFigure->DeselectControlPoint();
-        planarFigure->InvokeEvent( itk::EndPickEvent() );
+
+        if ( m_HoverPointIndex != -1 )
+        {
+          // Invoke EndPickEvent if the mouse is exiting the point area
+          m_HoverPointIndex = -1;
+          planarFigure->InvokeEvent( itk::EndPickEvent() );
+        }
+
         this->HandleEvent( new mitk::StateEvent( EIDNO, NULL ) );
 
         // Return false so that other (PlanarFigure) Interactors may react on this

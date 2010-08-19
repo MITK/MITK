@@ -564,7 +564,7 @@ void QmitkDiffusionQuantificationView::TensorQuantification(
       
       MeasurementsType::Pointer measurementsCalculator = MeasurementsType::New();
       measurementsCalculator->SetInput(itkvol.GetPointer() );
-      measurementsCalculator->SetMeasure(MeasurementsType::Measure::FA);
+      measurementsCalculator->SetMeasure(MeasurementsType::FA);
       measurementsCalculator->Update();
       multi->SetInput(measurementsCalculator->GetOutput());
       nodename = QString(nodename.c_str()).append("_FA").toStdString();
@@ -582,7 +582,7 @@ void QmitkDiffusionQuantificationView::TensorQuantification(
       
       MeasurementsType::Pointer measurementsCalculator = MeasurementsType::New();
       measurementsCalculator->SetInput(itkvol.GetPointer() );
-      measurementsCalculator->SetMeasure(MeasurementsType::Measure::RA);
+      measurementsCalculator->SetMeasure(MeasurementsType::RA);
       measurementsCalculator->Update();
       multi->SetInput(measurementsCalculator->GetOutput());
       nodename = QString(nodename.c_str()).append("_RA").toStdString();
@@ -592,7 +592,7 @@ void QmitkDiffusionQuantificationView::TensorQuantification(
     {
       MeasurementsType::Pointer measurementsCalculator = MeasurementsType::New();
       measurementsCalculator->SetInput(itkvol.GetPointer() );
-      measurementsCalculator->SetMeasure(MeasurementsType::Measure::L1);
+      measurementsCalculator->SetMeasure(MeasurementsType::L1);
       measurementsCalculator->Update();
       multi->SetInput(measurementsCalculator->GetOutput());
       nodename = QString(nodename.c_str()).append("_L1").toStdString();
@@ -601,7 +601,7 @@ void QmitkDiffusionQuantificationView::TensorQuantification(
     {      
       MeasurementsType::Pointer measurementsCalculator = MeasurementsType::New();
       measurementsCalculator->SetInput(itkvol.GetPointer() );
-      measurementsCalculator->SetMeasure(MeasurementsType::Measure::DR);
+      measurementsCalculator->SetMeasure(MeasurementsType::DR);
       measurementsCalculator->Update();
       multi->SetInput(measurementsCalculator->GetOutput());
       nodename = QString(nodename.c_str()).append("_DR").toStdString();

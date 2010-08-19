@@ -323,28 +323,28 @@ void mitk::CoreObjectFactory::CreateFileExtensionsMap()
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.obj", "Surface files"));
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.nii", "NIfTI format"));
 
-  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.pic", ""));
-  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.mhd", ""));
-  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.vtk", ""));
-  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.vti", ""));
-  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.hdr", ""));
-  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.png", ""));
-  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.tiff", ""));
-  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.tif", ""));
-  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.jpg", ""));
-  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.jpeg", ""));
-  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.bmp", ""));
-  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.dcm", ""));
-  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.gipl", ""));
-  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.nii", ""));
-  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.nrrd", ""));
-  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.nhdr", ""));
-  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.spr", ""));
-  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.lsm", ""));
-  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.dwi", ""));
-  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.hdwi", ""));
-  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.qbi", ""));
-  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.hqbi", ""));
+  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.pic", "DKFZ Pic"));
+  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.mhd", "MetaImage"));
+  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.vtk", "Surface Files"));
+  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.vti", "VTK Image Data Files"));
+  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.hdr", "Image Header Files"));
+  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.png", "Sets of 2D slices"));
+  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.tiff", "Sets of 2D slices"));
+  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.tif", "Sets of 2D slices"));
+  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.jpg", "Sets of 2D slices"));
+  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.jpeg", "Sets of 2D slices"));
+  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.bmp", "Sets of 2D slices"));
+  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.dcm", "Sets of 2D slices"));
+  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.gipl", "UMDS GIPL Format Files"));
+  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.nii", "NIfTI format"));
+  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.nrrd", "NRRD Vector Images"));
+  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.nhdr", "NRRD Vector Images"));
+  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.spr", "Stimulate Files"));
+  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.lsm", "Microscope Images"));
+  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.dwi", "Diffusion Weighted Images"));
+  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.hdwi", "Diffusion Weighted Images"));
+  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.qbi", "Q-Ball Images"));
+  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.hqbi", "Q-Ball Images"));
 
 }
 

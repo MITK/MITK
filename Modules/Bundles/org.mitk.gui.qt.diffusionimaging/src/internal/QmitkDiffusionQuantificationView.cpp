@@ -31,6 +31,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "itkShiftScaleImageFilter.h"
 #include "itkTensorFractionalAnisotropyImageFilter.h"
 #include "itkTensorRelativeAnisotropyImageFilter.h"
+#include "itkTensorDerivedMeasurementsFilter.h"
 
 #include "QmitkDataStorageComboBox.h"
 #include "QmitkStdMultiWidget.h"
@@ -96,7 +97,8 @@ struct DqSelListener : ISelectionListener
 
       m_View->m_Controls->m_FAButton->setEnabled(foundTensorVolume);
       m_View->m_Controls->m_RAButton->setEnabled(foundTensorVolume);
-
+      m_View->m_Controls->m_L1Button->setEnabled(foundTensorVolume);
+      m_View->m_Controls->m_DRButton->setEnabled(foundTensorVolume);
     }
   }
 
@@ -175,6 +177,8 @@ void QmitkDiffusionQuantificationView::CreateConnections()
     connect( (QObject*)(m_Controls->m_CurvatureButton), SIGNAL(clicked()), this, SLOT(Curvature()) );
     connect( (QObject*)(m_Controls->m_FAButton), SIGNAL(clicked()), this, SLOT(FA()) );
     connect( (QObject*)(m_Controls->m_RAButton), SIGNAL(clicked()), this, SLOT(RA()) );
+    connect( (QObject*)(m_Controls->m_L1Button), SIGNAL(clicked()), this, SLOT(L1()) );
+    connect( (QObject*)(m_Controls->m_DRButton), SIGNAL(clicked()), this, SLOT(DR()) );
   }
 }
 
@@ -223,6 +227,16 @@ void QmitkDiffusionQuantificationView::FA()
 void QmitkDiffusionQuantificationView::RA()
 {
   TensorQuantify(1);
+}
+
+void QmitkDiffusionQuantificationView::L1()
+{
+  TensorQuantify(2);
+}
+
+void QmitkDiffusionQuantificationView::DR()
+{
+  TensorQuantify(3);
 }
 
 void QmitkDiffusionQuantificationView::QBIQuantify(int method)
@@ -315,7 +329,7 @@ void QmitkDiffusionQuantificationView::QBIQuantification(
 
     // COMPUTE RA
     clock.Start();
-    std::cout << "Computing GFA ";
+    MBI_INFO << "Computing GFA ";
     mitk::StatusBar::GetInstance()->DisplayText(status.sprintf(
       "Computing GFA for %s", nodename.c_str()).toAscii());
     typedef OdfVectorType::ValueType                 RealValueType;
@@ -447,7 +461,7 @@ void QmitkDiffusionQuantificationView::QBIQuantification(
     }
     gfaFilter->Update();
     clock.Stop();
-    std::cout << "took " << clock.GetMeanTime() << "s." << std::endl;
+    MBI_DEBUG << "took " << clock.GetMeanTime() << "s.";
 
     typedef itk::Image<TOdfPixelType, 3> ImgType;
     ImgType::Pointer img = ImgType::New();
@@ -523,7 +537,7 @@ void QmitkDiffusionQuantificationView::TensorQuantification(
 
     // COMPUTE FA
     clock.Start();
-    std::cout << "Computing FA ";
+    MBI_INFO << "Computing FA ";
     mitk::StatusBar::GetInstance()->DisplayText(status.sprintf(
       "Computing FA for %s", nodename.c_str()).toAscii());
     typedef itk::Image< TTensorPixelType, 3 >              FAImageType;
@@ -535,30 +549,67 @@ void QmitkDiffusionQuantificationView::TensorQuantification(
     multi->SetShift(0.0);
     multi->SetScale(m_ScaleDAIValues);//itk::NumericTraits<RealValueType>::max()
 
-    if(method == 0)
+    typedef itk::TensorDerivedMeasurementsFilter<TTensorPixelType> MeasurementsType;
+
+    if(method == 0) //FA
     {
-      typedef itk::TensorFractionalAnisotropyImageFilter< 
+     /* typedef itk::TensorFractionalAnisotropyImageFilter< 
         TensorImageType, FAImageType >                       FilterType;    
       FilterType::Pointer anisotropyFilter = FilterType::New();
       anisotropyFilter->SetInput( itkvol.GetPointer() );
       anisotropyFilter->Update();
       multi->SetInput(anisotropyFilter->GetOutput());
+      nodename = QString(nodename.c_str()).append("_FA").toStdString();*/
+
+      
+      MeasurementsType::Pointer measurementsCalculator = MeasurementsType::New();
+      measurementsCalculator->SetInput(itkvol.GetPointer() );
+      measurementsCalculator->SetMeasure(MeasurementsType::Measure::FA);
+      measurementsCalculator->Update();
+      multi->SetInput(measurementsCalculator->GetOutput());
       nodename = QString(nodename.c_str()).append("_FA").toStdString();
+
     }
-    else
+    else if(method == 1) //RA
     {
-      typedef itk::TensorRelativeAnisotropyImageFilter< 
+      /*typedef itk::TensorRelativeAnisotropyImageFilter< 
         TensorImageType, FAImageType >                       FilterType;
       FilterType::Pointer anisotropyFilter = FilterType::New();
       anisotropyFilter->SetInput( itkvol.GetPointer() );
       anisotropyFilter->Update();
       multi->SetInput(anisotropyFilter->GetOutput());
+      nodename = QString(nodename.c_str()).append("_RA").toStdString();*/
+      
+      MeasurementsType::Pointer measurementsCalculator = MeasurementsType::New();
+      measurementsCalculator->SetInput(itkvol.GetPointer() );
+      measurementsCalculator->SetMeasure(MeasurementsType::Measure::RA);
+      measurementsCalculator->Update();
+      multi->SetInput(measurementsCalculator->GetOutput());
       nodename = QString(nodename.c_str()).append("_RA").toStdString();
-    }    
+
+    }  
+    else if(method == 2) //L1 = DA (Axial diffusivity)
+    {
+      MeasurementsType::Pointer measurementsCalculator = MeasurementsType::New();
+      measurementsCalculator->SetInput(itkvol.GetPointer() );
+      measurementsCalculator->SetMeasure(MeasurementsType::Measure::L1);
+      measurementsCalculator->Update();
+      multi->SetInput(measurementsCalculator->GetOutput());
+      nodename = QString(nodename.c_str()).append("_L1").toStdString();
+    }
+    else if(method == 3) //DR =(L1+L2)/2
+    {      
+      MeasurementsType::Pointer measurementsCalculator = MeasurementsType::New();
+      measurementsCalculator->SetInput(itkvol.GetPointer() );
+      measurementsCalculator->SetMeasure(MeasurementsType::Measure::DR);
+      measurementsCalculator->Update();
+      multi->SetInput(measurementsCalculator->GetOutput());
+      nodename = QString(nodename.c_str()).append("_DR").toStdString();
+    }
 
     multi->Update();
     clock.Stop();
-    std::cout << "took " << clock.GetMeanTime() << "s." << std::endl;
+    MBI_DEBUG << "took " << clock.GetMeanTime() << "s.";
 
     // FA TO DATATREE
     mitk::Image::Pointer image = mitk::Image::New();

@@ -75,6 +75,8 @@ protected slots:
   void Curvature();
   void FA();
   void RA();
+  void L1();
+  void DR();
 
   void QBIQuantify(int method);
   void QBIQuantification(mitk::DataStorage::SetOfObjects::Pointer inImages, 

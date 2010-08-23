@@ -108,19 +108,19 @@ bool mitk::StateMachine::HandleEvent(StateEvent const* stateEvent)
 
   if (m_CurrentStateVector.empty())
   {
-    MITK_ERROR << "Error in mitkStateMachine.cpp: StateMachine not initialized!\n";
+    STATEMACHINE_ERROR << "Error in mitkStateMachine.cpp: StateMachine not initialized!\n";
     return false;//m_CurrentStateVector needs to be initialized!
   }
 
   if (m_TimeStep >= m_CurrentStateVector.size())
   {
-    MITK_ERROR << "Error in mitkStateMachine.cpp: StateMachine not initialized for this time step!\n";
+    STATEMACHINE_ERROR << "Error in mitkStateMachine.cpp: StateMachine not initialized for this time step!\n";
     return false;
   }
 
   if (m_CurrentStateVector[m_TimeStep].IsNull())
   {
-    MITK_ERROR << "Error in mitkStateMachine.cpp: StateMachine not initialized with the right temporal information!\n";
+    STATEMACHINE_ERROR << "Error in mitkStateMachine.cpp: StateMachine not initialized with the right temporal information!\n";
     return false;//m_CurrentState needs to be initialized!
   }
 
@@ -135,7 +135,7 @@ bool mitk::StateMachine::HandleEvent(StateEvent const* stateEvent)
   State *tempNextState = tempTransition->GetNextState();
   if (tempNextState == NULL) //wrong built up statemachine!
   {
-    MITK_ERROR << "Error in mitkStateMachine.cpp: StateMachinePattern not defined correctly!\n";
+    STATEMACHINE_ERROR << "Error in mitkStateMachine.cpp: StateMachinePattern not defined correctly!\n";
     return false;
   }
 
@@ -150,6 +150,10 @@ bool mitk::StateMachine::HandleEvent(StateEvent const* stateEvent)
       OperationEvent *operationEvent = new OperationEvent(((mitk::OperationActor*)(this)), doOp, undoOp);
       m_UndoController->SetOperationEvent(operationEvent);
     }
+
+    STATEMACHINE_DEBUG("StateChange")<<this->GetType()<<" from " << m_CurrentStateVector[m_TimeStep]->GetId() 
+      << " " << m_CurrentStateVector[m_TimeStep]->GetName()
+      <<" to " << tempNextState->GetId() <<" "<<tempNextState->GetName();
 
     //first following StateChange(or calling ExecuteOperation(tempNextStateOp)), then operation(action)
     m_CurrentStateVector[m_TimeStep] = tempNextState;
@@ -216,7 +220,7 @@ void mitk::StateMachine::ExecuteOperation(Operation* operation)
       mitk::StateTransitionOperation* stateTransOp = dynamic_cast<mitk::StateTransitionOperation *>(operation);
       if (stateTransOp == NULL)
       {
-        itkWarningMacro("Error! see mitkStateMachine.cpp");
+        STATEMACHINE_WARN<<"Error! see mitkStateMachine.cpp";
         return;
       }
       unsigned int time = stateTransOp->GetTime();
@@ -228,7 +232,7 @@ void mitk::StateMachine::ExecuteOperation(Operation* operation)
       mitk::StateTransitionOperation* stateTransOp = dynamic_cast<mitk::StateTransitionOperation *>(operation);
       if (stateTransOp == NULL)
       {
-        itkWarningMacro("Error! see mitkStateMachine.cpp");
+        STATEMACHINE_WARN<<"Error! see mitkStateMachine.cpp";
         return;
       }
       m_TimeStep = stateTransOp->GetTime();
@@ -264,7 +268,7 @@ void mitk::StateMachine::InitializeStartStates(unsigned int timeSteps)
 
   if (startState.IsNull())
   {
-    MITK_FATAL << "Fatal Error in mitkStateMachine.cpp: Initialization of statemachine unsuccessfull! Initialize GlobalInteraction!\n";
+    STATEMACHINE_FATAL << "Fatal Error in mitkStateMachine.cpp: Initialization of statemachine unsuccessfull! Initialize GlobalInteraction!\n";
   }
 
   //clear the vector

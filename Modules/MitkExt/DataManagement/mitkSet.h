@@ -28,6 +28,18 @@ public:
   {
   }
 
+  ///
+  /// clears this set, copies over all elements from otherSet
+  ///
+  void Copy( mitk::Set<T>* otherSet )
+  {
+    this->Clear();
+    for(unsigned int i=0; i< otherSet->GetSize(); ++i)
+    {
+      this->Add( otherSet->Get(i) );
+    }
+  }
+
   bool Add ( const T& obj )
   {
     if(this->Has(obj))  // this is a set! do not add twice
@@ -94,7 +106,7 @@ public:
       this->Remove(m_Objects.size()-1);
   }
 
-  int GetSize() const
+  unsigned int GetSize() const
   {
     return m_Objects.size();
   }
@@ -120,9 +132,14 @@ public:
   {
     return m_Objects.empty();
   }
-  bool IsValid( unsigned int index ) const
+  bool IsValid( int index ) const
   {
-    return m_Objects.size() > 0 && index >=0 && index < m_Objects.size();
+    if(index >= 0)
+    {
+      return m_Objects.size() > 0
+          && static_cast< unsigned int > (index) < m_Objects.size();
+    }
+    return false;
   }
   T& Front()
   {

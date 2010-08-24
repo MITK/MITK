@@ -19,7 +19,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkPlanarFigure.h"
 #include "mitkPlanarFigureWriter.h"
 
-#include <Poco/Path.h>
+#include <itksys/SystemTools.hxx>
+
 
 MITK_REGISTER_SERIALIZER(PlanarFigureSerializer)
 
@@ -50,8 +51,8 @@ std::string mitk::PlanarFigureSerializer::Serialize()
   filename += ".pf";
 
   std::string fullname(m_WorkingDirectory);
-  fullname += Poco::Path::separator();
-  fullname += filename;
+  fullname += "/";
+  fullname += itksys::SystemTools::ConvertToOutputPath(filename.c_str());
 
   try
   {

@@ -45,7 +45,7 @@ inline uint qHash(double key) { return uint(key); }
 #endif
 
 // MOC_SKIP_BEGIN
-template class QWT_EXPORT QList<double>;
+//template class QWT_EXPORT QList<double>;
 // MOC_SKIP_END
 
 #endif // QWT_TEMPLATEDLL

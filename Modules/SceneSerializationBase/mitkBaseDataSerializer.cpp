@@ -15,9 +15,6 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
-#include <Poco/TemporaryFile.h>
-#include <Poco/Path.h>
-
 #include "mitkBaseDataSerializer.h"
 #include "mitkStandardFileLocations.h"
 #include <itksys/SystemTools.hxx>

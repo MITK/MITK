@@ -143,7 +143,7 @@ public:
 
     if (numberOfPointsAllowed>=0) //not number of points set to unlimited
     {
-      MITK_TEST_CONDITION_REQUIRED(pointSet->GetPointSet()->GetNumberOfPoints()==numberOfPointsAllowed,"Checking if only the amount of defined points could be added.");
+      MITK_TEST_CONDITION_REQUIRED(pointSet->GetPointSet()->GetNumberOfPoints()==(unsigned long)numberOfPointsAllowed,"Checking if only the amount of defined points could be added.");
       MITK_TEST_CONDITION_REQUIRED(pointSet->GetSelectInfo(2) ,"Testing if the last point added is selected.");
       MITK_TEST_CONDITION_REQUIRED(pointSet->GetPoint(2) != pos3D,"Testing that the last addition didn't work.");
     }

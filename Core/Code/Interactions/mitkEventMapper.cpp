@@ -439,7 +439,7 @@ mitk::EventMapper::~EventMapper()
 }
 
 //##Documentation
-//## searches the Event in m_EventDescription
+//## searches for the event in m_EventDescription and adds the corresponding eventID
 //##  
 bool mitk::EventMapper::MapEvent(Event* event, GlobalInteraction* globalInteraction, int mitkPostedEventID )
 {
@@ -583,7 +583,7 @@ void  mitk::EventMapper::StartElement (const char *elementName, const char **att
 
 }
 
-std::string mitk::EventMapper::GetStyleName()
+std::string mitk::EventMapper::GetStyleName() const
 {
   return m_StyleName;
 }

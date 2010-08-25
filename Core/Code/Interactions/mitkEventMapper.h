@@ -108,7 +108,7 @@ namespace mitk {
     //## reads a Tag from an XML-file
     //## adds Events to m_EventDescription
 
-    std::string GetStyleName();
+    std::string GetStyleName() const;
 
     //friendship because of SetStateEvent for computing WorldCoordinates
     friend class mitk::GlobalInteraction;

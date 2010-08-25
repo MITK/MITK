@@ -293,8 +293,16 @@ void QmitkPointListModel::RemoveSelectedPoint()
   mitk::PointSetInteractor::Pointer interactor = dynamic_cast<mitk::PointSetInteractor*>(m_PointSetNode->GetInteractor());  
   if (interactor.IsNull())
   {
-    MITK_WARN<<"Unexpected interactor found!\n";
-    return;
+    if (m_PointSetNode->GetInteractor()==NULL && m_PointSetNode != NULL) //no Interactor set to node
+    {
+      interactor = mitk::PointSetInteractor::New("pointsetinteractor",m_PointSetNode);
+      m_PointSetNode->SetInteractor(interactor);
+    }
+    else
+    {
+      MITK_WARN<<"Unexpected interactor found!\n";
+      return;
+    }
   }
 
 

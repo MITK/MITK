@@ -31,8 +31,8 @@
       <event NAME="EIDCTRLANDMIDDLEMOUSEBTNRELEASE" ID="539" />
       <event NAME="EIDSHIFTANDCTRLANDMIDDLEMOUSEBTN" ID="540" />
       <event NAME="EIDSHIFTANDLEFTMOUSEBTNANDMOUSEMOVE" ID="541" />
-      <event NAME="SHIFTANDCTRLANDMOUSEMOVE" ID="542" />
-      <event NAME="SHIFTANDCTRLANDMOUSERELEASE" ID="543" />
+      <event NAME="EIDSHIFTANDCTRLANDMOUSEMOVE" ID="542" />
+      <event NAME="EIDSHIFTANDCTRLANDMOUSERELEASE" ID="543" />
       <event NAME="EIDALTANDLEFTMOUSEBTN" ID="600" />
       <event NAME="EIDALTANDLEFTMOUSEBTNANDMOUSEMOVE" ID="610" />
       <event NAME="EIDALTANDLEFTMOUSERELEASE" ID="620" />
@@ -56,10 +56,10 @@
       <event NAME="EIDE" ID="19" />
       <event NAME="EIDSTRGANDALTANDA" ID="20" />
       <event NAME="EIDSTRGANDALTANDB" ID="21" />
-      <event NAME="H" ID="22" />
-      <event NAME="Return" ID="23" />
-      <event NAME="Enter" ID="24" />
-      <event NAME="Space" ID="25" />
+      <event NAME="EIDH" ID="22" />
+      <event NAME="EIDRETURN" ID="23" />
+      <event NAME="EIDENTER" ID="24" />
+      <event NAME="EIDSPACE" ID="25" />
       <event NAME="EIDSTRGANDALTANDH" ID="30" />
       <event NAME="EIDSTRGANDALTANDI" ID="31" />
       <event NAME="EIDSTRGANDALTANDS" ID="40" />
@@ -81,6 +81,9 @@
       <event NAME="EIDSTLARGERNMINUS1" ID="1011" />
       <event NAME="EIDPOSITIONEVENT" ID="1012" />
       <event NAME="EIDEDIT" ID="1013" />
+  	  <event NAME="EIDSMALLERN" ID="1014" />
+	  <event NAME="EIDEQUALSN" ID="1015" />
+	  <event NAME="EIDLARGERN" ID="1016" />
       <event NAME="EIDSUBDESELECT" ID="1020" />
       <event NAME="EIDSMTOSELECTED" ID="1030" />
       <event NAME="EIDSMTODESELECTED" ID="1031" />
@@ -154,8 +157,14 @@
       <action NAME="AcCHECKEQUALS1" ID="33">
         <!--check if the number of elements in the data is equal to 1-->
       </action>
+      <action NAME="AcCHECKNUMBEROFPOINTS" ID="330">
+        <!--check the number of elements in the data-->
+      </action>
       <action NAME="AcCHECKSELECTED" ID="34">
         <!--check if the given element is selected or not-->
+      </action>
+      <action NAME="AcCHECKONESELECTED" ID="340">
+        <!--check if there is an element that is selected-->
       </action>
       <action NAME="AcCHECKGREATERZERO" ID="35">
         <!--check if the current number of elements is greater than 0-->

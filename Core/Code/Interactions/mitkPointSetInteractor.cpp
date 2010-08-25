@@ -41,8 +41,16 @@ mitk::PointSetInteractor
 ::PointSetInteractor(const char * type, DataNode* dataNode, int n)
 :Interactor(type, dataNode), m_N(n), m_Precision(PRECISION)
 {
+  if (m_N==0)
+  {
+    STATEMACHINE_WARN<<"Instanciation of PointSetInteractor which takes care of 0 points does't make sense!\n";
+    STATEMACHINE_WARN<<"Setting number of points to 1!\n";
+    m_N = 1;
+  }
+
   m_LastPoint.Fill(0);
   m_SumVec.Fill(0);
+  this->InitAccordingToNumberOfPoints();
 }
 
 mitk::PointSetInteractor::~PointSetInteractor()
@@ -671,6 +679,8 @@ bool mitk::PointSetInteractor::ExecuteAction( Action* action, mitk::StateEvent c
       }
       else
       {
+        STATEMACHINE_DEBUG("OperationError")<<this->GetType()<<" AcCHECKELEMENT expected PointOperation.";
+
         mitk::DisplayPositionEvent const  *disPosEvent = 
           dynamic_cast <const mitk::DisplayPositionEvent *> (
             stateEvent->GetEvent());
@@ -687,7 +697,28 @@ bool mitk::PointSetInteractor::ExecuteAction( Action* action, mitk::StateEvent c
 
       break;
     }
+  case AcCHECKONESELECTED:
+    //check if there is a point that is selected
+    {
+      if (pointSet->GetNumberOfSelected(m_TimeStep)>0)
+      {
+        mitk::StateEvent* newStateEvent = 
+          new mitk::StateEvent( EIDYES, theEvent);
+        this->HandleEvent( newStateEvent );
+        delete newStateEvent;
 
+      }
+      else //not selected then call event EIDNO
+      {
+        //new Event with information NO
+        mitk::StateEvent* newStateEvent = 
+          new mitk::StateEvent( EIDNO, theEvent);
+        this->HandleEvent( newStateEvent );
+        delete newStateEvent;
+      }
+      ok = true;
+      break;
+    }
   case AcCHECKSELECTED:
     /*check, if the given point is selected:
     if no, then send EIDNO
@@ -790,7 +821,6 @@ bool mitk::PointSetInteractor::ExecuteAction( Action* action, mitk::StateEvent c
       }//else
     }
     break;
-
   case AcCHECKEQUALS1:
     {
       //the number of points in the list is 1 (or smaler)
@@ -812,7 +842,39 @@ bool mitk::PointSetInteractor::ExecuteAction( Action* action, mitk::StateEvent c
       }
     }
     break;
-
+  case AcCHECKNUMBEROFPOINTS:
+    {
+      //the number of points in the list is 1 (or smaler), so will be empty after delete
+     if (pointSet->GetSize( m_TimeStep ) <= 1)
+      {
+        mitk::StateEvent* newStateEvent = 
+          new mitk::StateEvent(EIDEMPTY, stateEvent->GetEvent());
+        this->HandleEvent( newStateEvent );
+        delete newStateEvent;
+        ok = true;
+      }
+      else if (pointSet->GetSize( m_TimeStep ) <= m_N || m_N <= -1)
+        //m_N is set to unlimited points allowed or more than 1 points in list, but not full, so stay in the state!
+      {
+        mitk::StateEvent* newStateEvent = 
+          new mitk::StateEvent(EIDSMALLERN, stateEvent->GetEvent());
+        this->HandleEvent(newStateEvent );
+        delete newStateEvent;
+        ok = true;
+      }
+      else
+        //pointSet->GetSize( m_TimeStep ) >=m_N. 
+        // This can happen if the points were not added 
+        // by interaction but by loading a .mps file
+      {
+        mitk::StateEvent* newStateEvent = 
+          new mitk::StateEvent(EIDEQUALSN, stateEvent->GetEvent());
+        this->HandleEvent(newStateEvent );
+        delete newStateEvent;
+        ok = true;
+      }
+    }
+    break;
   case AcSELECTPICKEDOBJECT://and deselect others
     {
       mitk::PositionEvent const  *posEvent = 
@@ -1050,3 +1112,48 @@ void mitk::PointSetInteractor::Clear( unsigned int timeStep, ScalarType timeInMS
   this->ResetStatemachineToStartState(timeStep);
 }
 
+
+void mitk::PointSetInteractor::InitAccordingToNumberOfPoints()
+{
+  if (m_DataNode == NULL)
+    return; 
+
+  mitk::PointSet *pointSet = dynamic_cast<mitk::PointSet*>(m_DataNode->GetData());
+  if ( pointSet != NULL )
+  {
+    int numberOfPoints = pointSet->GetSize( m_TimeStep );
+    if (numberOfPoints == 0)
+      return; //pointset is empty
+    else if (numberOfPoints<m_N || m_N <= -1)//if less than specified or specified as unlimited
+    {
+      //get the currentState to state "SpaceLeft"
+      const mitk::Event* nullEvent = new mitk::Event(NULL, Type_User, BS_NoButton, BS_NoButton, Key_none);
+      mitk::StateEvent* newStateEvent = 
+        new mitk::StateEvent(EIDSMALLERN, nullEvent);
+      this->HandleEvent( newStateEvent );
+      delete newStateEvent;
+      delete nullEvent;
+    }
+    else if (numberOfPoints>=m_N)
+    {
+      if (numberOfPoints>m_N)
+      {
+        STATEMACHINE_WARN<<"Point Set contains more points than needed!\n";//display a warning that there are too many points
+      }
+      //get the currentState to state "Set full"
+      const mitk::Event* nullEvent = new mitk::Event(NULL, Type_User, BS_NoButton, BS_NoButton, Key_none);
+      mitk::StateEvent* newStateEvent = 
+        new mitk::StateEvent(EIDEQUALSN, nullEvent);
+      this->HandleEvent( newStateEvent );
+      delete newStateEvent;
+      delete nullEvent;
+    }
+  }
+  return;
+}
+
+void mitk::PointSetInteractor::DataChanged()
+{
+  this->InitAccordingToNumberOfPoints();
+  return;
+}

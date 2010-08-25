@@ -95,6 +95,15 @@ public:
   **/
   bool HandleEvent(StateEvent const* stateEvent);
 
+  /**
+  * @brief Method to call if the associated data has changed by the user (loading of data)
+  * This method is called by DataNode::SetData() to tell the interactor to reinitialize. 
+  * This method should be overwritten by specialized interactors.
+  * (e.g. PointSetInteractor: go to the right state according to number of loaded points)
+  **/
+  virtual void DataChanged(){};
+
+
   static const std::string XML_NODE_NAME;
 
 protected:

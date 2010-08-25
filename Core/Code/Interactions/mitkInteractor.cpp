@@ -292,3 +292,4 @@ bool mitk::Interactor::HandleEvent(StateEvent const* stateEvent)
   }
   return Superclass::HandleEvent(stateEvent);
 }
+

@@ -29,6 +29,7 @@ SET(MODULE_TESTS
   mitkPlaneGeometryTest.cpp
   mitkPointSetFileIOTest.cpp
   mitkPointSetTest.cpp
+  mitkPointSetInteractorTest.cpp
   mitkPropertyListTest.cpp
   #mitkRegistrationBaseTest.cpp
   #mitkSegmentationInterpolationTest.cpp

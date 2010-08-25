@@ -31,6 +31,14 @@ namespace mitk
    * \brief Interaction with a set of points.
    *
    * Points can be added, removed and moved.
+   * In case the interaction shall be done on a 
+   * loaded set of points, the associated data 
+   * object (mitkPointSet) needs to be loaded 
+   * prior to the instanciation of this object. 
+   * The number of points are checked and the internal 
+   * statemachine set to the apropriate state.
+   * The management of 0 points is not supported. 
+   * In this case, the amount of managed points is set to 1.
    * \ingroup Interaction
    */
   class MITK_CORE_EXPORT PointSetInteractor : public Interactor
@@ -57,12 +65,17 @@ namespace mitk
      */
     virtual float CanHandleEvent(StateEvent const* stateEvent) const;
 
+    /**
+    *@brief If data changed then initialize according to numbers of loaded points
+    **/
+    virtual void DataChanged();
 
   protected:
     /**
      * \brief Constructor with Param n for limited Set of Points
      *
-     * if no n is set, then the number of points is unlimited*
+     * If no n is set, then the number of points is unlimited
+     * n=0 is not supported. In this case, n is set to 1.
      */
     PointSetInteractor(const char * type, DataNode* dataNode, int n = -1);
 
@@ -104,6 +117,11 @@ namespace mitk
 
     /** \brief to store the value of precision to pick a point */
     unsigned int m_Precision;
+
+    /**
+    * @brief Init the StatateMachine according to the current number of points in case of a loaded pointset. 
+    **/
+    void InitAccordingToNumberOfPoints();
   };
 }
 #endif /* MITKPOINTSETINTERACTOR_H_HEADER_INCLUDED_C11202FF */

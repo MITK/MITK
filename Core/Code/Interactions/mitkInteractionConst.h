@@ -69,8 +69,8 @@ enum EEventIds
   EIDCTRLANDMIDDLEMOUSEBTNRELEASE = 539,
   EIDSHIFTANDCTRLANDMIDDLEMOUSEBTN = 540,
   EIDSHIFTANDLEFTMOUSEBTNANDMOUSEMOVE = 541,
-  SHIFTANDCTRLANDMOUSEMOVE = 542,
-  SHIFTANDCTRLANDMOUSERELEASE = 543,
+  EIDSHIFTANDCTRLANDMOUSEMOVE = 542,
+  EIDSHIFTANDCTRLANDMOUSERELEASE = 543,
   EIDALTANDLEFTMOUSEBTN = 600,
   EIDALTANDLEFTMOUSEBTNANDMOUSEMOVE = 610,
   EIDALTANDLEFTMOUSERELEASE = 620,
@@ -94,10 +94,10 @@ enum EEventIds
   EIDE = 19,
   EIDSTRGANDALTANDA = 20,
   EIDSTRGANDALTANDB = 21,
-  H = 22,
-  Return = 23,
-  Enter = 24,
-  Space = 25,
+  EIDH = 22,
+  EIDRETURN = 23,
+  EIDENTER = 24,
+  EIDSPACE = 25,
   EIDPLUS = 26,
   EIDMINUS = 27,
   EIDSTRGANDALTANDH = 30,
@@ -119,6 +119,10 @@ enum EEventIds
   EIDSTLARGERNMINUS1 = 1011,
   EIDPOSITIONEVENT = 1012,
   EIDEDIT = 1013,
+  EIDSMALLERN = 1014,
+  EIDEQUALSN = 1015,
+  EIDLARGERN = 1016,
+  EIDEMPTY = 1017,
   EIDSUBDESELECT = 1020,
   EIDSMTOSELECTED = 1030,
   EIDSMTODESELECTED = 1031,
@@ -139,8 +143,6 @@ enum EEventIds
   EV_NEW_LANDMARK = 5551009,
   EV_REMOVE_LANDMARK = 5551010,
   EIDINSIDE = 2500
-
-
 };
 
 //##Constants for Operations
@@ -233,7 +235,9 @@ enum EActions
   AcCHECKOBJECT = 31,  // check if an object is hit
   AcCHECKNMINUS1 = 32,  // check if the number of elements is equal to N-1
   AcCHECKEQUALS1 = 33,  // check if the number of elements in the data is equal to 1
+  AcCHECKNUMBEROFPOINTS = 330, //check the number of elements in the data
   AcCHECKSELECTED = 34,  // check if the given element is selected or not
+  AcCHECKONESELECTED = 340, //check if there is an element that is selected
   AcCHECKGREATERZERO = 35,  // check if the current number of elements is greater than 0
   AcCHECKGREATERTWO = 36,  // check if the current number of elements is greater than two
   AcCHECKOPERATION = 37,  // check if the operation is of one spectial type

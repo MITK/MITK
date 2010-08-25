@@ -15,13 +15,14 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
-#include <Poco/TemporaryFile.h>
-#include <Poco/Path.h>
 
 #include "mitkPropertyListSerializer.h"
 #include "mitkBasePropertySerializer.h"
 
 #include <tinyxml.h>
+
+#include "mitkStandardFileLocations.h"
+#include <itksys/SystemTools.hxx>
 
 mitk::PropertyListSerializer::PropertyListSerializer()
 : m_FilenameHint("unnamed")
@@ -43,15 +44,22 @@ std::string mitk::PropertyListSerializer::Serialize()
     return "";
   }
 
-  Poco::Path newname( Poco::TemporaryFile::tempName() );
-  std::string filename( newname.getFileName() );
-  filename += "_";
-  filename += m_FilenameHint;
-  filename += ".prop";
+  // tmpname
+  static unsigned long count = 1;
+	unsigned long n = count++;
+  std::ostringstream name;
+  for (int i = 0; i < 6; ++i)
+	{
+		name << char('a' + (n % 26));
+		n /= 26;
+	}
+  std::string filename;
+  filename.append(name.str());
 
   std::string fullname(m_WorkingDirectory);
-  fullname += Poco::Path::separator();
+  fullname += "/";
   fullname += filename;
+  fullname = itksys::SystemTools::ConvertToOutputPath(fullname.c_str());
 
   TiXmlDocument document;
   TiXmlDeclaration* decl = new TiXmlDeclaration( "1.0", "", "" ); // TODO what to write here? encoding? etc....

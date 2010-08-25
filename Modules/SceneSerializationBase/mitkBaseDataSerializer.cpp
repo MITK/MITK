@@ -15,10 +15,9 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
-#include <Poco/TemporaryFile.h>
-#include <Poco/Path.h>
-
 #include "mitkBaseDataSerializer.h"
+#include "mitkStandardFileLocations.h"
+#include <itksys/SystemTools.hxx>
 
 mitk::BaseDataSerializer::BaseDataSerializer()
 : m_FilenameHint("unnamed")
@@ -42,7 +41,17 @@ std::string mitk::BaseDataSerializer::Serialize()
 
 std::string mitk::BaseDataSerializer::GetUniqueFilenameInWorkingDirectory()
 {
-  Poco::Path newname( Poco::TemporaryFile::tempName() );
-  return newname.getFileName();
+  // tmpname
+  static unsigned long count = 0;
+	unsigned long n = count++;
+  std::ostringstream name;
+  for (int i = 0; i < 6; ++i)
+	{
+		name << char('a' + (n % 26));
+		n /= 26;
+	}
+  std::string myname;
+  myname.append(name.str());
+  return myname;
 }
 

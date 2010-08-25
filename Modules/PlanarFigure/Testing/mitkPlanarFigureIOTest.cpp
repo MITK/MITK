@@ -30,8 +30,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkPlaneGeometry.h"
 
-#include <Poco/Zip/ZipLocalFileHeader.h>
-#include "Poco/TemporaryFile.h"
+#include <itksys/SystemTools.hxx>
 
 
 /** \brief Helper class for testing PlanarFigure reader and writer classes. */
@@ -341,14 +340,27 @@ int mitkPlanarFigureIOTest(int /* argc */, char* /*argv*/[])
 
 
   // Write PlanarFigure objects into temp file
-  Poco::Path newname( Poco::TemporaryFile::tempName() );
-  std::string fileName = Poco::Path::temp() + newname.getFileName() + ".pf";
+  
+  // tmpname
+  static unsigned long count = 0;
+	unsigned long n = count++;
+  std::ostringstream name;
+  for (int i = 0; i < 6; ++i)
+	{
+		name << char('a' + (n % 26));
+		n /= 26;
+	}
+  std::string myname;
+  myname.append(name.str());
+
+  std::string fileName = itksys::SystemTools::GetCurrentWorkingDirectory() + myname + ".pf";
+
   PlanarFigureIOTestClass::SerializePlanarFigures( originalPlanarFigures, fileName );
 
 
   // Read PlanarFigure objects from temp file
   PlanarFigureIOTestClass::PlanarFigureList retrievedPlanarFigures =
-    PlanarFigureIOTestClass::DeserializePlanarFigures( fileName );
+  PlanarFigureIOTestClass::DeserializePlanarFigures( fileName );
 
 
   // Test if original and retrieved PlanarFigure objects are the same

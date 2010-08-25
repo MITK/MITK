@@ -271,7 +271,21 @@ void QmitkControlVisualizationPropertiesView::CreateQtPartControl(QWidget *paren
     m_Controls->m_TextureIntON->setCheckable(true);
     m_Controls->m_VisibleOdfsON->setCheckable(true);
 
+#ifndef DIFFUSION_IMAGING_EXTENDED
+	int size = m_Controls->m_AdditionalScaling->count();
+	for(int t=0; t<size; t++)
+	{
+	  if(m_Controls->m_AdditionalScaling->itemText(t).toStdString() == "Scale by ASR")
+	  {
+		m_Controls->m_AdditionalScaling->removeItem(t);   
+	  }
+	}
+	
+#endif
+
   }
+
+  
 
   m_IsInitialized = false;
   m_SelListener = berry::ISelectionListener::Pointer(new CvpSelListener(this));
@@ -608,11 +622,13 @@ void QmitkControlVisualizationPropertiesView::AdditionalScaling(int additionalSc
     scaleBy->SetScaleByGFA();
     //m_Controls->params_frame->setVisible(true);
     break;
+#ifdef DIFFUSION_IMAGING_EXTENDED
   case 2:
     scaleBy->SetScaleByPrincipalCurvature();
     // commented in for SPIE paper, Principle curvature scaling
     //m_Controls->params_frame->setVisible(true);
     break;
+#endif
   default:
     scaleBy->SetScaleByNothing();
   }

@@ -30,7 +30,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkPointSetInteractor.h>
 #include <mitkGlobalInteraction.h>
 
-QmitkPointSetInteractionView::QmitkPointSetInteractionView( QObject */*parent*/ )
+QmitkPointSetInteractionView::QmitkPointSetInteractionView( QObject* /*parent*/ )
 : m_Controls(0)
 {
 

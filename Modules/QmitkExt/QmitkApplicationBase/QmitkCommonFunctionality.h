@@ -148,12 +148,5 @@ namespace CommonFunctionality
   
   QmitkExt_EXPORT void SaveBaseData( mitk::BaseData* data, const char* name = NULL );
 
-  /**
-  * Checks if the filename is valid for writing. This includes checking whether the file already exists. 
-  * If so, the user is asked whether he wants to overwrite the existing file. In addition, the writing permission is checked.
-  * @param filename the filename, under which the file should be saved. 
-  * @returns true if the filename is valid for writing  
-  */
-  QmitkExt_EXPORT bool IsFilenameValidForWriting(const char* aFileName);
 };
 #endif // _CommonFunctionality__h_

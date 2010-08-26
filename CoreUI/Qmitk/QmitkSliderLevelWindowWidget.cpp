@@ -254,21 +254,23 @@ void QmitkSliderLevelWindowWidget::paintEvent( QPaintEvent* itkNotUsed(e) )
 /**
 *
 */
-void QmitkSliderLevelWindowWidget::mouseMoveEvent( QMouseEvent* mouseEvent ) {
+void QmitkSliderLevelWindowWidget::mouseMoveEvent( QMouseEvent* mouseEvent ) 
+{
+  if(!mouseEvent)
+    return;
   if ( m_LevelWindow.IsFixed() )
     return;
   if (!m_MouseDown)
   {
-    if ((mouseEvent->pos().y() >= (m_Rect.topLeft().y() - 3) && mouseEvent->pos().y() <= (m_Rect.topLeft().y() + 3))
-      && mouseEvent->pos().x() >= m_Rect.topLeft().x() && mouseEvent->pos().x() <= m_Rect.topRight().x())
+    if ( mouseEvent->pos().y() >= 0 
+      && mouseEvent->pos().y() <= (m_Rect.topLeft().y() + 3) )
     {
       setCursor(Qt::SizeVerCursor);
       m_UpperBound.setRect(m_Rect.topLeft().x(), m_Rect.topLeft().y() - 3, 17, 7);
       QToolTip::showText(mouseEvent->globalPos(), "Ctrl + left click to change only upper bound", this, m_UpperBound);
       m_Resize = true;
     }
-    else if ((mouseEvent->pos().y() >= (m_Rect.bottomLeft().y() - 3) && mouseEvent->pos().y() <= (m_Rect.bottomLeft().y() + 3))
-      && mouseEvent->pos().x() >= m_Rect.topLeft().x() && mouseEvent->pos().x() <= m_Rect.topRight().x())
+    else if ( mouseEvent->pos().y() >= (m_Rect.bottomLeft().y() - 3) )
     {
       setCursor(Qt::SizeVerCursor);
       m_LowerBound.setRect(m_Rect.bottomLeft().x(), m_Rect.bottomLeft().y() - 3, 17, 7);
@@ -389,6 +391,18 @@ void QmitkSliderLevelWindowWidget::mouseMoveEvent( QMouseEvent* mouseEvent ) {
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     }
   }
+}
+void QmitkSliderLevelWindowWidget::enterEvent ( QEvent * event  ) 
+{
+  /*
+  if(event->type() != QEvent::MouseMove)
+    return;*/
+
+  //mouseMoveEvent( static_cast< QMouseEvent* > ( event ) );
+  QPoint p = QCursor::pos();
+  p = this->mapFromGlobal(p);
+  QMouseEvent ev(QEvent::MouseMove, p, Qt::NoButton, Qt::NoButton , Qt::NoModifier );
+  this->mouseMoveEvent( &ev );
 }
 
 /**

@@ -103,10 +103,9 @@ private:
   /// change notifications from the mitkLevelWindowManager
   void OnPropertyModified(const itk::EventObject& e);
 
-  /// recalculate the size and position of the slider bar
-  void update( );
-
 protected:
+  /// recalculate the size and position of the slider bar
+  virtual void update( );
 
   /*!
   * helper for drawing the component
@@ -150,6 +149,8 @@ protected:
   * checks if left mouse button is pressed and if CTRL is pressed and changes sliderbar in movedirection accordingly
   */
   void mouseMoveEvent( QMouseEvent* mouseEvent );
+
+  void enterEvent ( QEvent * event  );
 
   /*!
   *  registers events when a mousebutton is pressed

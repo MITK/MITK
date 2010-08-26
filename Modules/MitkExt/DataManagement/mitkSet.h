@@ -208,6 +208,8 @@ public:
     // instead: use add method for each element of the other List
     for(int i=0; i<other.GetSize(); ++i)
       this->Add( other.Get(i) );
+
+    return *this;
   }
   virtual ~Set()
   {

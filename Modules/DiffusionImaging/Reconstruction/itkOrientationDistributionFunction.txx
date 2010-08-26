@@ -1029,7 +1029,7 @@ namespace itk
     // find the maximum (or minimum) direction (remember index and value)
     T mode;
     int pIdx = -1;
-    if(invert > 0)
+    if(invert == 0)
     {
       pIdx = GetPrincipleDiffusionDirection();
       mode = (*this)[pIdx];
@@ -1046,33 +1046,33 @@ namespace itk
         }
       }
     }
-    ////////////////
-    // compute median of mode and its neighbors to become more stable to noise
-    // compared to simply using the mode
-    ////////////////
+    //////////////////////
+    //////// compute median of mode and its neighbors to become more stable to noise
+    //////// compared to simply using the mode
+    //////////////////////
 
-    // values of mode and its neighbors
-    std::vector<int> nbs = GetNeighbors(pIdx);
-    std::vector<T> modeAndNeighborVals;
-    modeAndNeighborVals.push_back(mode);
-    int numNeighbors = nbs.size();
-    for(int i=0; i<numNeighbors; i++)
-    {
-      modeAndNeighborVals.push_back((*this)[nbs[i]]);
-    }
+    //////// values of mode and its neighbors
+    //////std::vector<int> nbs = GetNeighbors(pIdx);
+    //////std::vector<T> modeAndNeighborVals;
+    //////modeAndNeighborVals.push_back(mode);
+    //////int numNeighbors = nbs.size();
+    //////for(int i=0; i<numNeighbors; i++)
+    //////{
+    //////  modeAndNeighborVals.push_back((*this)[nbs[i]]);
+    //////}
 
-    // sort by value
-    std::sort( modeAndNeighborVals.begin(), modeAndNeighborVals.end() );
+    //////// sort by value
+    //////std::sort( modeAndNeighborVals.begin(), modeAndNeighborVals.end() );
 
-    // median of mode and neighbors
-    mode = modeAndNeighborVals[floor(0.5*(double)(numNeighbors+1)+0.5)];
+    //////// median of mode and neighbors
+    //////mode = modeAndNeighborVals[floor(0.5*(double)(numNeighbors+1)+0.5)];
 
     ////////////////
     // computing a quantile of the angular range 
     ////////////////
 
     // define quantile
-    double quantile = 0.05;
+    double quantile = 0.00;
 
     // collect all values in angular range of mode
     std::vector<T> odfValuesInAngularRange;

@@ -374,20 +374,20 @@ void  mitk::OdfVtkMapper2D<T,N>
     odf = odf * odf.GetGeneralizedGFA(m_IndexParam1, m_IndexParam2);
     break;
   case ODFSB_PC:
-    odf = odf * odf.GetPrincipleCurvature(m_IndexParam1, m_IndexParam2, 1);
+    odf = odf * odf.GetPrincipleCurvature(m_IndexParam1, m_IndexParam2, 0);
     break;
   }
 
   for(int i=0; i<N; i++)
     m_OdfVals->SetComponent(0,i,0.5*odf[i]*m_Scaling);
 
-    double max = -100000;
-    double min = 100000;
-    for( unsigned int i=0; i<N; i++) 
-    {
-      max = odf[i] > max ? odf[i] : max;
-      min = odf[i] < min ? odf[i] : min;
-    }
+    //double max = -100000;
+    //double min = 100000;
+    //for( unsigned int i=0; i<N; i++) 
+    //{
+    //  max = odf[i] > max ? odf[i] : max;
+    //  min = odf[i] < min ? odf[i] : min;
+    //}
     
   m_OdfSource->Modified();
 }

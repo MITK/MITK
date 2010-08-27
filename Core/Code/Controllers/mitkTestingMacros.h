@@ -42,7 +42,8 @@ namespace mitk {
 #define MITK_TEST_OUTPUT(x) \
   MITK_TEST_OUTPUT_NO_ENDL(x << "\n")
 
-/** \brief Do some general test preparations. Must be called first in the main test function. */
+/** \brief Do some general test preparations. Must be called first in the 
+     main test function. */
 #define MITK_TEST_BEGIN(testName)      \
   std::string mitkTestName(#testName);   \
   mitk::TestManager::GetInstance()->Initialize();  \
@@ -68,7 +69,9 @@ namespace mitk {
     mitk::TestManager::GetInstance()->NumberOfFailedTests() )    \
     return EXIT_FAILURE;                                  \
   } else {                                                \
-    MITK_TEST_OUTPUT(<< mitkTestName << ": "<< mitk::TestManager::GetInstance()->NumberOfPassedTests() << " tests [DONE PASSED]")    \
+    MITK_TEST_OUTPUT(<< mitkTestName << ": "              \
+      << mitk::TestManager::GetInstance()->NumberOfPassedTests() \
+      << " tests [DONE PASSED]")    \
     return EXIT_SUCCESS;                                  \
   }                                                       \
 
@@ -99,7 +102,8 @@ namespace mitk {
  * \brief Begin block which should be checked for exceptions
  *
  * This macro, together with MITK_TEST_FOR_EXCEPTION_END, can be used
- * to test whether a code block throws an expected exception. The test FAILS if the exception is NOT thrown. A simple example:
+ * to test whether a code block throws an expected exception. The test FAILS if the 
+ * exception is NOT thrown. A simple example:
  *
 
  MITK_TEST_FOR_EXCEPTION_BEGIN(itk::ImageFileReaderException)
@@ -119,7 +123,8 @@ namespace mitk {
     MITK_TEST_OUTPUT( << "Expected an '" << #EXCEPTIONCLASS << "' exception. [FAILED]") \
   } \
   catch (EXCEPTIONCLASS) { \
-    MITK_TEST_OUTPUT( << "Caught an expected '" << #EXCEPTIONCLASS << "' exception. [PASSED]") \
+    MITK_TEST_OUTPUT( << "Caught an expected '" << #EXCEPTIONCLASS  \
+                      << "' exception. [PASSED]") \
     mitk::TestManager::GetInstance()->TestPassed(); \
   }
 

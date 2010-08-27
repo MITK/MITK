@@ -19,8 +19,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkDataNodeFactory.h"
 #include "mitkTestingMacros.h"
 
-#include <iostream>
-
 /**
 *  Simple example for a test for the (non-existent) class "PicFileWriter".
 *  
@@ -50,6 +48,20 @@ int mitkPicFileWriterTest(int  argc , char* argv[])
     return EXIT_FAILURE;
   }
   mitk::Image::Pointer image = NULL;
+
+  try{  
+    // test for exception handling of NULL image
+    MITK_TEST_FOR_EXCEPTION_BEGIN(itk::ExceptionObject)
+
+    myPicFileWriter->SetInput(image);
+    myPicFileWriter->SetFileName("/usr/bin");
+    myPicFileWriter->Update(); 
+    MITK_TEST_FOR_EXCEPTION_END(itk::ExceptionObject)
+  }
+  catch(...) {
+    std::cout << "Success: Writer warns on NULL image." << std::endl;
+  }
+
   mitk::DataNodeFactory::Pointer factory = mitk::DataNodeFactory::New();
   try
   {
@@ -79,7 +91,6 @@ int mitkPicFileWriterTest(int  argc , char* argv[])
 
   MITK_TEST_CONDITION_REQUIRED(image.IsNotNull(),"loaded image not NULL")
 
-
   try{  
     // test for exception handling
     MITK_TEST_FOR_EXCEPTION_BEGIN(itk::ExceptionObject)
@@ -95,7 +106,6 @@ int mitkPicFileWriterTest(int  argc , char* argv[])
     return EXIT_FAILURE;
   }
 
-  
   // always end with this!
   MITK_TEST_END()
 }

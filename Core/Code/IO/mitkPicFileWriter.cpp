@@ -18,12 +18,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkPicFileWriter.h"
 #include "mitkPicFileReader.h"
 
-#include "mitkImage.h"
-
-#include <itksys/SystemTools.hxx>
-
-#include <sstream>
-
 extern "C" 
 {
 size_t _mitkIpPicFWrite( const void *ptr, size_t size, size_t nitems, mitkIpPicFile_t stream);
@@ -59,6 +53,11 @@ void mitk::PicFileWriter::GenerateData()
 
   Image::Pointer input = const_cast<Image*>(this->GetInput());
 
+  if ( input.IsNull() )
+  {
+    itkExceptionMacro(<< "Nothing to write: Input is NULL." );
+  }
+
   mitkIpPicDescriptor * picImage = input->GetPic();
   SlicedGeometry3D* slicedGeometry = input->GetSlicedGeometry();
   if (slicedGeometry != NULL)
@@ -82,7 +81,7 @@ void mitk::PicFileWriter::GenerateData()
     ((float*)pixelSizeTag->value)[1] = spacing[1];
     ((float*)pixelSizeTag->value)[2] = spacing[2];
     //set tag "ISG"
-    //ISG == offset/origin           transformationmatrix(matrix)                                                              spancings
+    //ISG == offset/origin           transformation matrix(matrix)                                                              spancings
     //ISG == offset0 offset1 offset2 spalte0_0 spalte0_1 spalte0_2 spalte1_0 spalte1_1 spalte1_2 spalte2_0 spalte2_1 spalte2_2 spacing0 spacing1 spacing2
     mitkIpPicTSV_t *geometryTag;
     geometryTag = mitkIpPicQueryTag( picImage, "ISG" );
@@ -185,7 +184,7 @@ int mitk::PicFileWriter::MITKIpPicPut( char *outfile_name, mitkIpPicDescriptor *
     mitkIpPicRemoveFile( outfile_name );
     // Removed due to linker problems when compiling
     // an mitk chili plugin using msvc: there appear
-    // unsresolved external symbol errors to function
+    // unresolved external symbol errors to function
     // _ipPicGetWriteCompression()
     /*
     if( mitkIpPicGetWriteCompression() )
@@ -229,7 +228,7 @@ int mitk::PicFileWriter::MITKIpPicPut( char *outfile_name, mitkIpPicDescriptor *
   _mitkIpPicWriteTags( pic->info->tags_head, outfile, mitkIpPicEncryptionType(pic) );
    // Removed due to linker problems when compiling
    // an mitk chili plugin using msvc: there appear
-   // unsresolved external symbol errors to function
+   // unresolved external symbol errors to function
    // _ipPicGetWriteCompression()
   /*
   if( mitkIpPicGetWriteCompression() )
@@ -277,7 +276,7 @@ int mitk::PicFileWriter::MITKIpPicPut( char *outfile_name, mitkIpPicDescriptor *
   {
     // Removed due to linker problems when compiling
     // an mitk chili plugin using msvc: there appear
-    // unsresolved external symbol errors to function
+    // unresolved external symbol errors to function
     // _ipPicGetWriteCompression()
     /*    
     if( mitkIpPicGetWriteCompression() )

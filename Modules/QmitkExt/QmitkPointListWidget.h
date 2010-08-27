@@ -57,6 +57,9 @@ public:
     /// assign a QmitkStdMultiWidget for updating render window crosshair
     void SetMultiWidget(QmitkStdMultiWidget* multiWidget);
 
+    /// itk observer for node "delete" events
+    void OnNodeDeleted( const itk::EventObject & e );
+
 public slots:
     void DeactivateInteractor(bool deactivate);
     void EnableEditButton(bool enabled);
@@ -83,6 +86,7 @@ protected slots:
 protected:
 
     void SetupUi();
+    void ObserveNewNode(mitk::DataNode* node);
 
     QmitkPointListView* m_PointListView;
     QmitkStdMultiWidget* m_MultiWidget;
@@ -103,6 +107,7 @@ protected:
     mitk::PointSetInteractor::Pointer   m_Interactor;
     int     m_TimeStep;
     bool m_EditAllowed;
+    unsigned long m_NodeObserverTag;
 
 };
 

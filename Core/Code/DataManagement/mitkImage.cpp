@@ -18,16 +18,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkImage.h"
 
 #include "mitkHistogramGenerator.h"
-#include "mitkImageDataItem.h"
-
-#include "mitkBaseProcess.h"
-#include "mitkSlicedGeometry3D.h"
-#include "mitkPlaneGeometry.h"
 #include "mitkPicHelper.h"
 #include "mitkImageTimeSelector.h"
 
 #include "ipFunc/mitkIpFunc.h"
-#include "mitkDataNodeFactory.h"
 #include "mitkIpPicTypeMultiplex.h"
 
 #include <itkSmartPointerForwardReference.txx>

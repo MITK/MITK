@@ -65,7 +65,7 @@ namespace mitk
     typename OutputType::Pointer outputForCache = OutputType::New();
     if ( m_FileName == "") 
     {
-      throw itk::ImageFileReaderException(__FILE__, __LINE__, "Sorry, the filename of the vessel tree to be read is empty!");
+      throw itk::ImageFileReaderException(__FILE__, __LINE__, "Sorry, the filename to be read is empty!");
     }
     else
     {

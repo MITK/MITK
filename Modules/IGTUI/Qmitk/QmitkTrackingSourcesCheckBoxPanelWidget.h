@@ -41,8 +41,6 @@ public:
 
   typedef std::vector< QCheckBox* > TrackingSourcesCheckboxes; /// vector with checkboxes for all set NDs
 
-
-
   /*!  
   \brief default constructor  
   */ 
@@ -53,13 +51,15 @@ public:
   */ 
   virtual ~QmitkTrackingSourcesCheckBoxPanelWidget();
 
+  /*!
+  \brief Shows the checkboxes
+  */
   void ShowSourceCheckboxes();
 
   /*!
   \brief Sets the ND for this widget
   */
   void SetNavigationDatas(std::vector<mitk::NavigationData::Pointer>* navDatas);
-
 
   /*!
   \brief Adds a ND.

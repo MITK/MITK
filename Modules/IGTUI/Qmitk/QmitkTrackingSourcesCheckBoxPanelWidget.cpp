@@ -73,6 +73,8 @@ const std::vector<int>* QmitkTrackingSourcesCheckBoxPanelWidget::GetSelectedTrac
 {
   if(m_SelectedIds == NULL)
     m_SelectedIds = new std::vector<int>();
+  else
+    m_SelectedIds->clear();
 
   for (unsigned int i=0; i < m_SourceCheckboxes->size(); i++)
   {

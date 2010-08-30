@@ -86,7 +86,7 @@ namespace itk {
 
       while(!it.IsAtEnd() && !vectorIt.IsAtEnd())
       {    
-        InputImageType::PixelType vec = vectorIt.Get();
+        typename InputImageType::PixelType vec = vectorIt.Get();
         it.Set((1.0 * it.Get()) + (1.0 * vec[*indexIt]) / (1.0 * indices.size()));        
         ++it;
         ++vectorIt;

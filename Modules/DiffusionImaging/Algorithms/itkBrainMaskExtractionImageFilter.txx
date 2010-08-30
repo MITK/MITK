@@ -46,7 +46,7 @@ namespace itk {
   {
 
     // gaussian filter
-    itk::RecursiveGaussianImageFilter<InputImageType,InputImageType>::Pointer gaussian
+    typename itk::RecursiveGaussianImageFilter<InputImageType,InputImageType>::Pointer gaussian
       = itk::RecursiveGaussianImageFilter<InputImageType,InputImageType>::New();
     gaussian->SetInput( this->GetInput(0) );
     gaussian->SetSigma( 1.0 );
@@ -62,7 +62,7 @@ namespace itk {
     }
 
     // threshold the image
-    itk::BinaryThresholdImageFilter<InputImageType,OutputImageType>::Pointer threshold = 
+    typename itk::BinaryThresholdImageFilter<InputImageType,OutputImageType>::Pointer threshold = 
       itk::BinaryThresholdImageFilter<InputImageType,OutputImageType>::New();
 
     threshold->SetInput( gaussian->GetOutput() );
@@ -95,7 +95,7 @@ namespace itk {
     typedef itk::BinaryBallStructuringElement<int, 3> StructuralElementType;
     StructuralElementType ball;
 
-    itk::BinaryErodeImageFilter<OutputImageType,OutputImageType,StructuralElementType>::Pointer erode = 
+    typename itk::BinaryErodeImageFilter<OutputImageType,OutputImageType,StructuralElementType>::Pointer erode = 
       itk::BinaryErodeImageFilter<OutputImageType,OutputImageType,StructuralElementType>::New();
 
     ball.SetRadius( 3 );
@@ -130,14 +130,14 @@ namespace itk {
     typedef BinaryDilateImageFilter<OutputImageType,OutputImageType,CrossType> DilateFilterType;
     typedef AndImageFilter<OutputImageType,OutputImageType,OutputImageType> AndFilterType;
 
-    OutputImageType::Pointer M0 = threshold->GetOutput();
-    OutputImageType::Pointer Mn = OutputImageType::New();
+    typename OutputImageType::Pointer M0 = threshold->GetOutput();
+    typename OutputImageType::Pointer Mn = OutputImageType::New();
     Mn->SetRegions( M0->GetLargestPossibleRegion() );
     Mn->SetSpacing( M0->GetSpacing() );
     Mn->SetOrigin( M0->GetOrigin() );
     Mn->Allocate();
 
-    OutputImageType::Pointer Mnplus1 = erode->GetOutput();
+    typename OutputImageType::Pointer Mnplus1 = erode->GetOutput();
 
 
     CrossType cross;
@@ -153,7 +153,7 @@ namespace itk {
       std::cout << "Iteration: " << iter++ << std::endl;
       CopyImage( Mn, Mnplus1);
 
-      DilateFilterType::Pointer dilater = DilateFilterType::New();
+      typename DilateFilterType::Pointer dilater = DilateFilterType::New();
       dilater->SetInput( Mn );
       dilater->SetKernel( cross );
 
@@ -167,7 +167,7 @@ namespace itk {
         return;
       }
 
-      AndFilterType::Pointer andfilter = AndFilterType::New();
+      typename AndFilterType::Pointer andfilter = AndFilterType::New();
       andfilter->SetInput(0, M0);
       andfilter->SetInput(1, dilater->GetOutput() );
 
@@ -209,7 +209,7 @@ namespace itk {
 #endif
     // now fill the holes
 
-    itk::VotingBinaryIterativeHoleFillingImageFilter< OutputImageType >::Pointer filler =
+    typename itk::VotingBinaryIterativeHoleFillingImageFilter< OutputImageType >::Pointer filler =
       itk::VotingBinaryIterativeHoleFillingImageFilter< OutputImageType >::New();
     filler->SetInput( Mn );
     filler->SetMaximumNumberOfIterations (1000);
@@ -253,8 +253,8 @@ namespace itk {
     void BrainMaskExtractionImageFilter< TOutputImagePixelType >
     ::CopyImage( typename OutputImageType::Pointer target, typename OutputImageType::Pointer source)
   {
-    itk::ImageRegionConstIterator<typename OutputImageType> itIn( source, source->GetLargestPossibleRegion() );
-    itk::ImageRegionIterator<typename OutputImageType> itOut( target, target->GetLargestPossibleRegion() );
+    itk::ImageRegionConstIterator<OutputImageType> itIn( source, source->GetLargestPossibleRegion() );
+    itk::ImageRegionIterator<OutputImageType> itOut( target, target->GetLargestPossibleRegion() );
 
     while( !itOut.IsAtEnd() )
     {
@@ -269,8 +269,8 @@ namespace itk {
     bool BrainMaskExtractionImageFilter< TOutputImagePixelType >
     ::CompareImages( typename OutputImageType::Pointer im1, typename OutputImageType::Pointer im2)
   {
-    itk::ImageRegionConstIterator<typename OutputImageType> itIn( im1, im1->GetLargestPossibleRegion() );
-    itk::ImageRegionConstIterator<typename OutputImageType> itOut( im2, im2->GetLargestPossibleRegion() );
+    itk::ImageRegionConstIterator<OutputImageType> itIn( im1, im1->GetLargestPossibleRegion() );
+    itk::ImageRegionConstIterator<OutputImageType> itOut( im2, im2->GetLargestPossibleRegion() );
 
     while( !itOut.IsAtEnd() )
     {

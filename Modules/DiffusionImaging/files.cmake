@@ -8,6 +8,7 @@ SET(CPP_FILES
   Algorithms/itkDiffusionQballGeneralizedFaImageFilter.h
   Algorithms/itkDiffusionQballPrepareVisualizationImageFilter.h
   Algorithms/itkTensorDerivedMeasurementsFilter.h
+  Algorithms/itkBrainMaskExtractionImageFilter.h
 
   # DicomImport
   DicomImport/mitkDicomDiffusionImageReader.cpp

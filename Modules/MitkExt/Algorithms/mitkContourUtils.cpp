@@ -47,7 +47,7 @@ mitk::Contour::Pointer mitk::ContourUtils::ProjectContourTo2DSlice(Image* slice,
     for (int i = 0; i < 3; ++i) currentPointIn3D[i] = currentPointIn3DITK[i];
 
     Point3D projectedPointIn2D;
-    projectedPointIn2D.Fill(0.5);
+    projectedPointIn2D.Fill(0.0); 
     sliceGeometry->WorldToIndex( currentPointIn3D, projectedPointIn2D );
     MITK_DEBUG << "world point " << currentPointIn3D << " in index is " << projectedPointIn2D;
 
@@ -104,8 +104,8 @@ void mitk::ContourUtils::FillContourInSlice( Contour* projectedContour, Image* s
         iter != pointsIn2D->end();
         ++iter, ++index )
   {
-    picContour[ 2 * index + 0 ] = static_cast<mitkIpInt4_t>( (*iter)[0] );
-    picContour[ 2 * index + 1 ] = static_cast<mitkIpInt4_t>( (*iter)[1] );
+    picContour[ 2 * index + 0 ] = static_cast<mitkIpInt4_t>( (*iter)[0] + 0.5);
+    picContour[ 2 * index + 1 ] = static_cast<mitkIpInt4_t>( (*iter)[1] + 0.5);
     MITK_DEBUG << "mitk 2d [" << (*iter)[0] << ", " << (*iter)[1] << "]  pic [" << picContour[ 2*index+0] << ", " << picContour[ 2*index+1] << "]";
   }
 

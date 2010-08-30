@@ -143,7 +143,7 @@ void mitk::PaintbrushTool::UpdateContour(const StateEvent* stateEvent)
     newPoint[2] = 0.0;
     MITK_DEBUG << "(" << newPoint[0] << ", " << newPoint[1] << ")" << std::endl;
 
-    contourInImageIndexCoordinates->AddVertex( newPoint + 0.5 );
+    contourInImageIndexCoordinates->AddVertex( newPoint );
   }
 
   free(contourPoints);
@@ -235,13 +235,13 @@ bool mitk::PaintbrushTool::OnMouseMoved   (Action* itkNotUsed(action), const Sta
   // round to nearest voxel center (abort if this hasn't changed)
   if ( m_Size % 2 == 0 ) // even
   {
-    indexCoordinates[firstDimension] = ROUND( indexCoordinates[firstDimension] );
-    indexCoordinates[secondDimension] = ROUND( indexCoordinates[secondDimension] );
+    indexCoordinates[firstDimension] = ROUND( indexCoordinates[firstDimension] + 0.5 );
+    indexCoordinates[secondDimension] = ROUND( indexCoordinates[secondDimension] + 0.5 );
   }
   else // odd
   {
-    indexCoordinates[firstDimension] = ROUND( indexCoordinates[firstDimension] - 0.5 ) + 0.5;
-    indexCoordinates[secondDimension] = ROUND( indexCoordinates[secondDimension] - 0.5 ) + 0.5;
+    indexCoordinates[firstDimension] = ROUND( indexCoordinates[firstDimension]  ) ;//+ 0.5;
+    indexCoordinates[secondDimension] = ROUND( indexCoordinates[secondDimension] );// + 0.5;
   }
 
   static Point3D lastPos; // uninitialized: if somebody finds out how this can be initialized in a one-liner, tell me
@@ -298,6 +298,11 @@ bool mitk::PaintbrushTool::OnMouseMoved   (Action* itkNotUsed(action), const Sta
   for (unsigned int index = 0; index < contour->GetNumberOfPoints(); ++index)
   {
     Point3D point = contour->GetPoints()->ElementAt(index);
+    if ( m_Size % 2 != 0 ) // even
+    {
+      point[0] += 0.5;
+      point[1] += 0.5;
+    }
     displayContour->AddVertex( point );
   }
 

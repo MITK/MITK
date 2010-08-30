@@ -140,7 +140,7 @@ bool mitk::SegTool2D::DetermineAffectedImageSlice( const Image* image, const Pla
   Point3D indexPoint;
 
   imageGeometry->WorldToIndex( projectedPoint, indexPoint );
-  affectedSlice = ROUND( indexPoint[affectedDimension]-0.5 );
+  affectedSlice = ROUND( indexPoint[affectedDimension] );
   MITK_DEBUG << "indexPoint " << indexPoint << " affectedDimension " << affectedDimension << " affectedSlice " << affectedSlice;
 
   // check if this index is still within the image

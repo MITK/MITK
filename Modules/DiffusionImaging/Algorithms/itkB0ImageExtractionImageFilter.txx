@@ -46,7 +46,7 @@ namespace itk {
     int index = 0;
     while(begin!=end)
     {
-      typename GradientDirectionType grad = begin->Value();
+      GradientDirectionType grad = begin->Value();
 
       if(grad[0] == 0 && grad[1] == 0 && grad[2] == 0)
       {

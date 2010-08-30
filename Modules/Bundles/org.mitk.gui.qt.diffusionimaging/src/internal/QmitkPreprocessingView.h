@@ -16,14 +16,14 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#ifndef _QMITKQBALLRECONSTRUCTIONVIEW_H_INCLUDED
-#define _QMITKQBALLRECONSTRUCTIONVIEW_H_INCLUDED
+#ifndef _QMITKPREPROCESSINGVIEW_H_INCLUDED
+#define _QMITKPREPROCESSINGVIEW_H_INCLUDED
 
 #include <QmitkFunctionality.h>
 
 #include <string>
 
-#include "ui_QmitkQBallReconstructionViewControls.h"
+#include "ui_QmitkPreprocessingViewControls.h"
 
 #include "mitkDiffusionImage.h"
 
@@ -33,21 +33,21 @@ PURPOSE.  See the above copyright notices for more information.
 
 typedef short DiffusionPixelType;
 
-struct QbrSelListener;
+struct PrpSelListener;
 
 /*!
- * \ingroup org_mitk_gui_qt_qballreconstruction_internal
+ * \ingroup org_mitk_gui_qt_preprocessing_internal
  *
- * \brief QmitkQBallReconstructionView
+ * \brief QmitkPreprocessingView
  *
  * Document your class here.
  *
  * \sa QmitkFunctionality
  */
-class QmitkQBallReconstructionView : public QObject, public QmitkFunctionality
+class QmitkPreprocessingView : public QObject, public QmitkFunctionality
 {
 
-  friend struct QbrSelListener;
+  friend struct PrpSelListener;
 
   // this is needed for all Qt objects that should have a MOC object (everything that derives from QObject)
   Q_OBJECT
@@ -56,8 +56,8 @@ class QmitkQBallReconstructionView : public QObject, public QmitkFunctionality
 
   static const std::string VIEW_ID;
 
-  QmitkQBallReconstructionView();
-  virtual ~QmitkQBallReconstructionView();
+  QmitkPreprocessingView();
+  virtual ~QmitkPreprocessingView();
 
   virtual void CreateQtPartControl(QWidget *parent);
 
@@ -76,33 +76,21 @@ class QmitkQBallReconstructionView : public QObject, public QmitkFunctionality
 
 protected slots:
 
-  void ReconstructStandard();
-  //void ReconstructNormalized1();
-  //void ReconstructNormalized2();
-  //void ReconstructNonNormalized();
-  //void AnalyticallyReconstructStandard();
-  //void AnalyticallyReconstructSolidAngle();
-  //void AnalyticallyReconstructNonNegSolidAngle();
-  //void AnalyticallyReconstructAdc();
-  //void AnalyticallyReconstructRaw();
-  void MultiLambdasClicked();
-  void AdvancedCheckboxClicked();
-  void MethodChoosen(int method);
+  void AverageGradients();
+  void DoAverageGradients(mitk::DataStorage::SetOfObjects::Pointer inImages);
   
-  void Reconstruct(int method, int normalization);
-  
-  void NumericalQBallReconstruction(mitk::DataStorage::SetOfObjects::Pointer inImages, int normalization);
-  void AnalyticalQBallReconstruction(mitk::DataStorage::SetOfObjects::Pointer inImages, int normalization);
+  void ExtractB0();
+  void DoExtractB0(mitk::DataStorage::SetOfObjects::Pointer inImages);
+
+  void BrainMask();
+  void DoBrainMask(mitk::DataStorage::SetOfObjects::Pointer inImages);
+
 
 protected:
 
-  Ui::QmitkQBallReconstructionViewControls* m_Controls;
+  Ui::QmitkPreprocessingViewControls* m_Controls;
 
   QmitkStdMultiWidget* m_MultiWidget;
-
-  template<int L>
-  void TemplatedAnalyticalQBallReconstruction(mitk::DiffusionImage<DiffusionPixelType>* vols, 
-    float lambda, std::string nodename, std::vector<mitk::DataNode::Pointer>* nodes, int normalization);
 
   void SetDefaultNodeProperties(mitk::DataNode::Pointer node, std::string name);
 
@@ -114,5 +102,5 @@ protected:
 
 
 
-#endif // _QMITKQBALLRECONSTRUCTIONVIEW_H_INCLUDED
+#endif // _QMITKPREPROCESSINGVIEW_H_INCLUDED
 

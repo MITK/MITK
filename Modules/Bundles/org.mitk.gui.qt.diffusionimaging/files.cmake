@@ -4,6 +4,7 @@ SET(SRC_CPP_FILES
 
 SET(INTERNAL_CPP_FILES
   QmitkQBallReconstructionView.cpp
+  QmitkPreprocessingView.cpp
   QmitkDiffusionDicomImportView.cpp
   QmitkDiffusionQuantificationView.cpp
   QmitkTensorReconstructionView.cpp
@@ -14,6 +15,7 @@ SET(INTERNAL_CPP_FILES
 
 SET(UI_FILES
   src/internal/QmitkQBallReconstructionViewControls.ui
+  src/internal/QmitkPreprocessingViewControls.ui
   src/internal/QmitkDiffusionDicomImportViewControls.ui
   src/internal/QmitkDiffusionQuantificationViewControls.ui
   src/internal/QmitkTensorReconstructionViewControls.ui
@@ -23,6 +25,7 @@ SET(UI_FILES
 
 SET(MOC_H_FILES
   src/internal/QmitkQBallReconstructionView.h
+  src/internal/QmitkPreprocessingView.h
   src/internal/QmitkDiffusionDicomImportView.h
   src/internal/QmitkDiffusionQuantificationView.h
   src/internal/QmitkTensorReconstructionView.h
@@ -38,6 +41,7 @@ SET(RESOURCE_FILES
   resources/dwi.png
   resources/tensor.png
   resources/qball.png
+  resources/preprocessing.png
   resources/dwiimport.png
   resources/quantification.png
   resources/reconodf.png

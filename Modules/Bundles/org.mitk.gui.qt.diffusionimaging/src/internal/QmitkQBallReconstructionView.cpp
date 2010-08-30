@@ -105,8 +105,6 @@ struct QbrSelListener : ISelectionListener
       }
 
       m_View->m_Controls->m_ButtonStandard->setEnabled(foundDwiVolume);
-      m_View->m_Controls->m_ButtonAverageGradients->setEnabled(foundDwiVolume);
-      m_View->m_Controls->m_ButtonExtractB0->setEnabled(foundDwiVolume);      
     }
   }
 
@@ -200,7 +198,6 @@ void QmitkQBallReconstructionView::CreateQtPartControl(QWidget *parent)
 #endif
 
     AdvancedCheckboxClicked();
-    PreprocCheckboxClicked();
     // define data type for combobox
     //m_Controls->m_ImageSelector->SetDataStorage( this->GetDefaultDataStorage() );
     //m_Controls->m_ImageSelector->SetPredicate( mitk::NodePredicateDataType::New("DiffusionImage") );
@@ -228,43 +225,10 @@ void QmitkQBallReconstructionView::CreateConnections()
 {
   if ( m_Controls )
   {
-    connect( (QObject*)(m_Controls->m_PreprocessingToggle), SIGNAL(clicked()), this, SLOT(PreprocCheckboxClicked()) );
-    connect( (QObject*)(m_Controls->m_ButtonAverageGradients), SIGNAL(clicked()), this, SLOT(AverageGradients()) );
     connect( (QObject*)(m_Controls->m_ButtonStandard), SIGNAL(clicked()), this, SLOT(ReconstructStandard()) );
     connect( (QObject*)(m_Controls->m_QBallReconstructionLambdaMultiCheckbox), SIGNAL(clicked()), this, SLOT(MultiLambdasClicked()) );
     connect( (QObject*)(m_Controls->m_AdvancedCheckbox), SIGNAL(clicked()), this, SLOT(AdvancedCheckboxClicked()) );
     connect( (QObject*)(m_Controls->m_QBallReconstructionMethodComboBox), SIGNAL(currentIndexChanged(int)), this, SLOT(MethodChoosen(int)) );
-    connect( (QObject*)(m_Controls->m_ButtonExtractB0), SIGNAL(clicked()), this, SLOT(ExtractB0()) );
-
-  }
-}
-
-
-void QmitkQBallReconstructionView::ExtractB0()
-{
-  
-  if (m_CurrentSelection)
-  {
-    mitk::DataStorage::SetOfObjects::Pointer set =
-      mitk::DataStorage::SetOfObjects::New();
-
-    int at = 0;
-    for (IStructuredSelection::iterator i = m_CurrentSelection->Begin(); 
-      i != m_CurrentSelection->End(); 
-      ++i)
-    {
-
-      if (mitk::DataNodeObject::Pointer nodeObj = i->Cast<mitk::DataNodeObject>())
-      {
-        mitk::DataNode::Pointer node = nodeObj->GetDataNode();
-        if(QString("DiffusionImage").compare(node->GetData()->GetNameOfClass())==0)
-        {
-          set->InsertElement(at++, node);
-        }
-      }
-    }
-
-    DoExtractB0(set);
 
   }
 }
@@ -282,12 +246,6 @@ void QmitkQBallReconstructionView::Activated()
 void QmitkQBallReconstructionView::Deactivated()
 {
   QmitkFunctionality::Deactivated();
-}
-
-void QmitkQBallReconstructionView::PreprocCheckboxClicked()
-{
-  m_Controls->groupBox_4->setVisible(m_Controls->
-    m_PreprocessingToggle->isChecked());  
 }
 
 void QmitkQBallReconstructionView::ReconstructStandard()
@@ -405,156 +363,6 @@ void QmitkQBallReconstructionView::AdvancedCheckboxClicked()
   m_Controls->m_QBallReconstructionLambdaMaxLineEdit->setVisible(check);
 
   m_Controls->frame_2->setVisible(check);
-}
-
-void QmitkQBallReconstructionView::AverageGradients()
-{
-
-  if (m_CurrentSelection)
-  {
-    mitk::DataStorage::SetOfObjects::Pointer set =
-      mitk::DataStorage::SetOfObjects::New();
-
-    int at = 0;
-    for (IStructuredSelection::iterator i = m_CurrentSelection->Begin(); 
-      i != m_CurrentSelection->End(); 
-      ++i)
-    {
-
-      if (mitk::DataNodeObject::Pointer nodeObj = i->Cast<mitk::DataNodeObject>())
-      {
-        mitk::DataNode::Pointer node = nodeObj->GetDataNode();
-        if(QString("DiffusionImage").compare(node->GetData()->GetNameOfClass())==0)
-        {
-          set->InsertElement(at++, node);
-        }
-      }
-    }
-
-    DoAverageGradients(set);
-
-  }
-
-}
-
-void QmitkQBallReconstructionView::DoExtractB0
-  (mitk::DataStorage::SetOfObjects::Pointer inImages)
-{
-  typedef mitk::DiffusionImage<DiffusionPixelType>              DiffusionImageType;
-  typedef DiffusionImageType::GradientDirectionContainerType    GradientContainerType;
-
-  int nrFiles = inImages->size();
-  if (!nrFiles) return;
-
-  mitk::DataStorage::SetOfObjects::const_iterator itemiter( inImages->begin() ); 
-  mitk::DataStorage::SetOfObjects::const_iterator itemiterend( inImages->end() ); 
-
-  std::vector<mitk::DataNode::Pointer> nodes;
-  while ( itemiter != itemiterend ) // for all items
-  {
-
-    DiffusionImageType* vols = 
-      static_cast<DiffusionImageType*>(
-      (*itemiter)->GetData());
-
-    std::string nodename;
-    (*itemiter)->GetStringProperty("name", nodename);
-
-    // Extract B0
-    GradientContainerType::Pointer dirs = vols->GetDirections();
-    
-    GradientContainerType::Iterator begin = dirs->Begin();
-    GradientContainerType::Iterator end = dirs->End();
-
-
-    // Find the index of the b0 image
-    std::vector<int> indices;
-    int index = 0;
-    while(begin!=end)
-    {
-      DiffusionImageType::GradientDirectionType grad = begin->Value();
-      
-      if(grad[0] == 0 && grad[1] == 0 && grad[2] == 0)
-      {
-        indices.push_back(index);        
-      }
-      ++index;
-      ++begin;
-    }
-
-
-    // Extract image using found index
-    typedef itk::Image<DiffusionImageType::PixelType,3> SingleImageType;
-    SingleImageType::Pointer b0Image = SingleImageType::New();
-    
-
-    DiffusionImageType::ImageType::Pointer vectorImage = vols->GetVectorImage();
-
-    SingleImageType::RegionType region = vectorImage->GetLargestPossibleRegion();   
-    
-    b0Image->SetRegions(region);
-    b0Image->Allocate();
-
-    b0Image->SetSpacing(vectorImage->GetSpacing());
-    b0Image->SetOrigin(vectorImage->GetOrigin());
-    b0Image->SetDirection(vectorImage->GetDirection());
-
-    itk::ImageRegionIterator<SingleImageType> it(b0Image, b0Image->GetLargestPossibleRegion() );
-    itk::ImageRegionIterator<DiffusionImageType::ImageType> vectorIt(vectorImage, vectorImage->GetLargestPossibleRegion() );
-
-    //Sum all images that have zero diffusion weighting (indices stored in vector index)
-    for(std::vector<int>::iterator indexIt = indices.begin(); 
-        indexIt != indices.end();
-        indexIt++)
-    {
-      it.GoToBegin();
-      vectorIt.GoToBegin();
-      
-      while(!it.IsAtEnd() && !vectorIt.IsAtEnd())
-      {    
-        DiffusionImageType::ImageType::PixelType vec = vectorIt.Get();
-        it.Set(it.Get() + vec[*indexIt]/indices.size());        
-        ++it;
-        ++vectorIt;
-      }      
-    }    
-
-    mitk::Image::Pointer mitkImage = mitk::Image::New();
-    mitkImage->InitializeByItk( b0Image.GetPointer() );
-    mitkImage->SetVolume( b0Image->GetBufferPointer() );
-    mitk::DataNode::Pointer node=mitk::DataNode::New();
-    node->SetData( mitkImage );
-    node->SetProperty( "name", mitk::StringProperty::New(nodename + "_B0"));
-    
-    GetDefaultDataStorage()->Add(node);
-
-    ++itemiter;
-  }
-
- 
-}
-
-void QmitkQBallReconstructionView::DoAverageGradients
-  (mitk::DataStorage::SetOfObjects::Pointer inImages) 
-{
-    int nrFiles = inImages->size();
-    if (!nrFiles) return;
-
-    mitk::DataStorage::SetOfObjects::const_iterator itemiter( inImages->begin() ); 
-    mitk::DataStorage::SetOfObjects::const_iterator itemiterend( inImages->end() ); 
-
-    std::vector<mitk::DataNode::Pointer> nodes;
-    while ( itemiter != itemiterend ) // for all items
-    {
-
-      mitk::DiffusionImage<DiffusionPixelType>* vols = 
-        static_cast<mitk::DiffusionImage<DiffusionPixelType>*>(
-        (*itemiter)->GetData());
-
-      vols->AverageRedundantGradients(m_Controls->m_Blur->value());
-
-      ++itemiter;
-    }
 }
 
 void QmitkQBallReconstructionView::Reconstruct(int method, int normalization)

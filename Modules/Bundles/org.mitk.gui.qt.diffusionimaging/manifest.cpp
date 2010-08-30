@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <Poco/ClassLibrary.h>
 
 #include "src/internal/QmitkQBallReconstructionView.h"
+#include "src/internal/QmitkPreprocessingView.h"
 #include "src/internal/QmitkDiffusionDicomImportView.h"
 #include "src/internal/QmitkDiffusionQuantificationView.h"
 #include "src/internal/QmitkTensorReconstructionView.h"
@@ -32,6 +33,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 POCO_BEGIN_NAMED_MANIFEST(berryIViewPart, berry::IViewPart)
   POCO_EXPORT_CLASS(QmitkQBallReconstructionView)
+  POCO_EXPORT_CLASS(QmitkPreprocessingView)
   POCO_EXPORT_CLASS(QmitkDiffusionDicomImport)
   POCO_EXPORT_CLASS(QmitkDiffusionQuantificationView)
   POCO_EXPORT_CLASS(QmitkTensorReconstructionView)

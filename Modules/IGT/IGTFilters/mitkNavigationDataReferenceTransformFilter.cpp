@@ -32,15 +32,10 @@ m_ReferenceRegistration (false)
   m_LandmarkTransformInitializer = TransformInitializerType::New();
   m_LandmarkTransformInitializer->SetTransform(m_LandmarkTransform);
 
-  
-
   m_QuaternionTransform = QuaternionTransformType::New();
   m_QuaternionLandmarkTransform = QuaternionTransformType::New();
-
   m_QuaternionReferenceTransform = QuaternionTransformType::New();
-
 }
-
 
 mitk::NavigationDataReferenceTransformFilter::~NavigationDataReferenceTransformFilter()
 {
@@ -51,6 +46,20 @@ mitk::NavigationDataReferenceTransformFilter::~NavigationDataReferenceTransformF
   m_QuaternionReferenceTransform =  NULL;
 }
 
+
+void mitk::NavigationDataReferenceTransformFilter::ResetFilter()
+{
+   m_OneSourceRegistration = false;
+   m_ReferenceRegistration = false;
+
+   m_SourcePoints.clear();
+   m_TargetPoints.clear();
+   m_ReferencePoints.clear();
+
+   this->CreateOutputsForAllInputs();   
+
+  
+}
 
 
 void mitk::NavigationDataReferenceTransformFilter::GenerateData()
@@ -329,7 +338,6 @@ bool mitk::NavigationDataReferenceTransformFilter::IsInitialized() const
 {
   return ( m_SourcePoints.size() >= 3 && (m_SourcePoints.size() == (m_TargetPoints.size())) ); // min. 3 landmarks and same size of source and targets
 }
-
 
 
 void mitk::NavigationDataReferenceTransformFilter::UpdateLandmarkTransform(const LandmarkPointContainer &sources,  const LandmarkPointContainer &targets)

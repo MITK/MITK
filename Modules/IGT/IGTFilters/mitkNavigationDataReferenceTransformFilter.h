@@ -69,8 +69,6 @@ namespace mitk {
     *
     */
     const std::vector<int> GetReferenceInputIndexes();  
-
-
    
     /** 
     *\brief Set points used as source points for landmark transform.
@@ -111,10 +109,15 @@ namespace mitk {
     */
     bool InitializeReferenceLandmarks();
 
+    /**
+    *\brief Resets the filter to it's initial state.
+    *
+    * Clears all landmarks and resets the outputs by calling CreateOutputsForAllInputs() from superclass
+    */
+    void ResetFilter();
+
 
   protected:
-
-
 
     /**
     * \brief Constructor 
@@ -126,28 +129,19 @@ namespace mitk {
     **/
     virtual ~NavigationDataReferenceTransformFilter();
 
-    
-
     /**
     * \brief Calculates the transform using source and target PointSets.
     *
     * If there are at least 3 corresponding source and target points a transform will be performed.
     */
     void UpdateLandmarkTransform(const LandmarkPointContainer &sources, const  LandmarkPointContainer &targets);
-
-
     
     /**
     * \brief Transforms input NDs according to the calculated LandmarkTransform.
     */
     virtual void GenerateData();
-
-
     
     void PrintSelf( std::ostream& os, itk::Indent indent ) const;  // print object info to ostream
-
-
-   
 
     /**
     * \brief  Generates landmarks from the actual reference inputs ND.
@@ -155,14 +149,11 @@ namespace mitk {
     * Generates as many landmarks as there are reference inputs. If there are less than 3 reference inputs 2 virtual landmarks are calculated by using the ND of the first reference input.
     */
     const LandmarkPointContainer GenerateReferenceLandmarks();
-
     
 
     LandmarkPointContainer m_SourcePoints;    /// positions of the source points
     LandmarkPointContainer m_TargetPoints;    /// positions of the target points
     LandmarkPointContainer m_ReferencePoints; /// positions of the reference points
-
-
 
     TransformInitializerType::Pointer m_LandmarkTransformInitializer; /// landmark based transform initializer 
     LandmarkTransformType::Pointer m_LandmarkTransform; /// transform calculated from source and target points
@@ -174,11 +165,8 @@ namespace mitk {
 
     bool m_OneSourceRegistration;  /// bool needed to show that there are less than 3 reference inputs
     bool m_ReferenceRegistration; /// bool needed to show if landmarks are generated (true) or set (false)
-
     
     ReferenceInputsType m_ReferenceInputIndexes; /// the input ids of the reference inputs
-
-
 
   };
 } // namespace mitk

@@ -3,7 +3,6 @@ SET(SRC_CPP_FILES
   QmitkDataManagerView.cpp 
   QmitkDataManagerPreferencePage.cpp
   QmitkDataManagerHotkeysPrefPage.cpp
-  QmitkHotkeyLineEdit.cpp
 )
 
 SET(INTERNAL_CPP_FILES
@@ -14,7 +13,6 @@ SET(INTERNAL_CPP_FILES
 
 SET(MOC_H_FILES
   src/QmitkDataManagerView.h
-  src/QmitkHotkeyLineEdit.h
   src/internal/QmitkNodeTableViewKeyFilter.h
   src/internal/QmitkInfoDialog.h
 )

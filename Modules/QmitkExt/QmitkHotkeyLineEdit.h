@@ -22,9 +22,9 @@
 #include <QLineEdit>
 #include <QKeySequence>
 
-#include "mitkQtDataManagerDll.h"
+#include "QmitkExtExports.h"
 
-class MITK_QT_DATAMANAGER QmitkHotkeyLineEdit : public QLineEdit
+class QmitkExt_EXPORT QmitkHotkeyLineEdit : public QLineEdit
 {
   Q_OBJECT
 

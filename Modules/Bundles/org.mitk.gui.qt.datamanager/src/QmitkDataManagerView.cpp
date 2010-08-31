@@ -506,7 +506,23 @@ void QmitkDataManagerView::SaveSelectedNodes( bool )
     {
       mitk::BaseData::Pointer data = node->GetData();
       if (data.IsNotNull())
-        CommonFunctionality::SaveBaseData( data.GetPointer(), node->GetName().c_str() );
+      {
+        QString error;
+        try
+        {
+          CommonFunctionality::SaveBaseData( data.GetPointer(), node->GetName().c_str() );
+        }
+        catch(std::exception& e)
+        {
+          error = e.what();
+        }
+        catch(...)
+        {
+          error = "Unknown error occured";
+        }
+        if( !error.isEmpty() )
+          QMessageBox::critical( m_Parent, "Error saving...", error );
+      }
     }
   }
 }

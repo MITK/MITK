@@ -95,6 +95,7 @@ SET(CPP_FILES
  QmitkPointListWidget.cpp
  QmitkPointListViewWidget.cpp
  QmitkVideoBackground.cpp
+ QmitkHotkeyLineEdit.cpp
 )
 
 IF ( NOT ${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.${VTK_BUILD_VERSION} VERSION_LESS 5.4.0 )
@@ -178,7 +179,7 @@ SET(MOC_H_FILES
  QmitkHistogramWidget.h
  QmitkVideoBackground.h
  QmitkFileChooser.h
- 
+ QmitkHotkeyLineEdit.h
  QmitkAboutDialog/QmitkAboutDialog.h
 )
 

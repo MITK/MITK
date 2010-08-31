@@ -47,6 +47,11 @@ QmitkHotkeyLineEdit::QmitkHotkeyLineEdit( const QString& _QKeySequenceAsString, 
   this->SetKeySequence(_QKeySequenceAsString);
 }
 
+void QmitkHotkeyLineEdit::dumpSlot()
+{
+
+}
+
 void QmitkHotkeyLineEdit::keyPressEvent( QKeyEvent * event )
 {
   if(event->key() == Qt::Key_unknown)

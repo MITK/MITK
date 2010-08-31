@@ -12,12 +12,12 @@ SET(CPP_FILES
  #QmitkAlgorithmFunctionalityComponent.cpp
  #QmitkBaseAlgorithmComponent.cpp
  QmitkAboutDialog/QmitkAboutDialog.cpp
-				#QmitkFunctionalityComponents/QmitkSurfaceCreatorComponent.cpp
-							#QmitkFunctionalityComponents/QmitkPixelGreyValueManipulatorComponent.cpp
-								#QmitkFunctionalityComponents/QmitkConnectivityFilterComponent.cpp
-						#QmitkFunctionalityComponents/QmitkImageCropperComponent.cpp
-							#QmitkFunctionalityComponents/QmitkSeedPointSetComponent.cpp
-		#QmitkFunctionalityComponents/QmitkSurfaceTransformerComponent.cpp
+        #QmitkFunctionalityComponents/QmitkSurfaceCreatorComponent.cpp
+              #QmitkFunctionalityComponents/QmitkPixelGreyValueManipulatorComponent.cpp
+                #QmitkFunctionalityComponents/QmitkConnectivityFilterComponent.cpp
+            #QmitkFunctionalityComponents/QmitkImageCropperComponent.cpp
+              #QmitkFunctionalityComponents/QmitkSeedPointSetComponent.cpp
+    #QmitkFunctionalityComponents/QmitkSurfaceTransformerComponent.cpp
 
  QmitkPropertyObservers/QmitkBasePropertyView.cpp
  QmitkPropertyObservers/QmitkBoolPropertyEditor.cpp
@@ -87,7 +87,7 @@ SET(CPP_FILES
 
  QmitkHistogram.cpp
  QmitkHistogramWidget.cpp
- 
+
  QmitkPlotWidget.cpp
  QmitkPlotDialog.cpp
  QmitkPointListModel.cpp
@@ -135,12 +135,12 @@ SET(MOC_H_FILES
  QmitkPropertyObservers/QmitkStringPropertyView.h
  QmitkPropertyObservers/QmitkNumberPropertySlider.h
 
-							# QmitkFunctionalityComponents/QmitkSurfaceCreatorComponent.h
-											#QmitkFunctionalityComponents/QmitkPixelGreyValueManipulatorComponent.h
-									# QmitkFunctionalityComponents/QmitkConnectivityFilterComponent.h
-						# QmitkFunctionalityComponents/QmitkImageCropperComponent.h
-																# QmitkFunctionalityComponents/QmitkSeedPointSetComponent.h
-												# QmitkFunctionalityComponents/QmitkSurfaceTransformerComponent.h
+              # QmitkFunctionalityComponents/QmitkSurfaceCreatorComponent.h
+                      #QmitkFunctionalityComponents/QmitkPixelGreyValueManipulatorComponent.h
+                  # QmitkFunctionalityComponents/QmitkConnectivityFilterComponent.h
+            # QmitkFunctionalityComponents/QmitkImageCropperComponent.h
+                                # QmitkFunctionalityComponents/QmitkSeedPointSetComponent.h
+                        # QmitkFunctionalityComponents/QmitkSurfaceTransformerComponent.h
 
  qclickablelabel.h
  QmitkCallbackFromGUIThread.h
@@ -218,5 +218,5 @@ SET(UI_FILES
 )
 
 SET(QRC_FILES
-  QmitkExt.qrc  
+  QmitkExt.qrc
 )

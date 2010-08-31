@@ -16,7 +16,7 @@
  =========================================================================*/
 
 #include "QmitkDataManagerHotkeysPrefPage.h"
-#include "QmitkHotkeyLineEdit.h"
+#include <QmitkHotkeyLineEdit.h>
 
 #include "berryIPreferencesService.h"
 #include "berryPlatform.h"

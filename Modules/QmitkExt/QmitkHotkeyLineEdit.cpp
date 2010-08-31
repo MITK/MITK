@@ -22,12 +22,12 @@
 #include <QGridLayout>
 #include <QKeyEvent>
 
-const QString QmitkHotkeyLineEdit::TOOLTIP = "Press any key (combination)";
+const std::string QmitkHotkeyLineEdit::TOOLTIP = "Press any key (combination)";
 
 QmitkHotkeyLineEdit::QmitkHotkeyLineEdit( QWidget* parent )
 : QLineEdit(parent)
 {
-  this->setToolTip(QmitkHotkeyLineEdit::TOOLTIP);
+  this->setToolTip(QString::fromStdString(QmitkHotkeyLineEdit::TOOLTIP));
   //this->setReadOnly(true);
 }
 
@@ -35,21 +35,16 @@ QmitkHotkeyLineEdit::QmitkHotkeyLineEdit( const QKeySequence& _QKeySequence, QWi
 : QLineEdit(parent)
 {
   //this->setReadOnly(true);
-  this->setToolTip(QmitkHotkeyLineEdit::TOOLTIP);
+  this->setToolTip(QString::fromStdString(QmitkHotkeyLineEdit::TOOLTIP));
   this->SetKeySequence(_QKeySequence);
 }
 
 QmitkHotkeyLineEdit::QmitkHotkeyLineEdit( const QString& _QKeySequenceAsString, QWidget* parent)
 : QLineEdit(parent)
 {
-  this->setToolTip(QmitkHotkeyLineEdit::TOOLTIP);
+  this->setToolTip(QString::fromStdString(QmitkHotkeyLineEdit::TOOLTIP));
   //this->setReadOnly(true);
   this->SetKeySequence(_QKeySequenceAsString);
-}
-
-void QmitkHotkeyLineEdit::dumpSlot()
-{
-
 }
 
 void QmitkHotkeyLineEdit::keyPressEvent( QKeyEvent * event )

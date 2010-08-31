@@ -29,7 +29,7 @@ class QmitkExt_EXPORT QmitkHotkeyLineEdit : public QLineEdit
   Q_OBJECT
 
 public:
-  static const QString TOOLTIP;
+  static const std::string TOOLTIP;
 
   QmitkHotkeyLineEdit(QWidget* parent = 0);
   QmitkHotkeyLineEdit(const QKeySequence& _QKeySequence, QWidget* parent = 0);

@@ -22,12 +22,12 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkNavigationDataToNavigationDataFilter.h>
 #include "mitkMessage.h"
 
-namespace mitk 
+namespace mitk
 {
   /**Documentation
   * \brief NavigationDataToMessageFilter emits multiple mitk::Message messages when the input NavigationData values change
   *
-  * This filter can have multiple inputs. It emits 
+  * This filter can have multiple inputs. It emits
   * the following Messages if an input navigation data values changed since the last Update()
   * - PositionChangedMessage
   * - OrientationChangedMessage
@@ -53,19 +53,33 @@ namespace mitk
     /**Documentation
     * \brief sets the nth input of the filter. Warning: this filter only has input #0!
     *
-    * WARNING: NavigationDataToMessageFilter manages only one input. Calling this method 
+    * WARNING: NavigationDataToMessageFilter manages only one input. Calling this method
     * with an idx parameter other than 0 will raise an std::invalid_argument exception!
-    */    
+    */
     //virtual void SetInput(unsigned int idx, const NavigationData* nd);
-    
+
     /**Documentation
     * \brief Sets the input of this filter
     *
-    * Sets the input navigation data object for this filter. 
+    * Sets the input navigation data object for this filter.
     */
     //virtual void SetInput(const NavigationData* nd);
-   
+
+    itkSetMacro(PositionEpsilon, double);
+    itkSetMacro(OrientationEpsilon, double);
+    itkSetMacro(CovErrorEpsilon, double);
+    itkSetMacro(TimeStampEpsilon, double);
+
+    itkGetMacro(PositionEpsilon, double);
+    itkGetMacro(OrientationEpsilon, double);
+    itkGetMacro(CovErrorEpsilon, double);
+    itkGetMacro(TimeStampEpsilon, double);
   protected:
+    double m_PositionEpsilon;
+    double m_OrientationEpsilon;
+    double m_CovErrorEpsilon;
+    double m_TimeStampEpsilon;
+
     NavigationDataToMessageFilter();
     virtual ~NavigationDataToMessageFilter();
 

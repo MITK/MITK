@@ -19,12 +19,12 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkPropertyList.h"
 #include "mitkProperties.h"
 
-mitk::NavigationDataToMessageFilter::NavigationDataToMessageFilter() 
-: mitk::NavigationDataToNavigationDataFilter()
+mitk::NavigationDataToMessageFilter::NavigationDataToMessageFilter()
+: mitk::NavigationDataToNavigationDataFilter(),
+  m_PositionEpsilon(0.0f), m_OrientationEpsilon(0.0f), m_CovErrorEpsilon(0.0f), m_TimeStampEpsilon(0.0f)
 {
   this->SetNumberOfRequiredInputs(1);
 }
-
 
 mitk::NavigationDataToMessageFilter::~NavigationDataToMessageFilter()
 {
@@ -60,14 +60,18 @@ void mitk::NavigationDataToMessageFilter::GenerateData()
     assert(input);
 
     /* check for differences, then send message. */
-    if (input->GetPosition() != output->GetPosition())
+    if ((output->GetPosition() - input->GetPosition()).GetNorm() > m_PositionEpsilon)
       m_PositionChangedMessage.Send(input->GetPosition(), i);
-    if (input->GetOrientation() != output->GetOrientation())
+
+    if ((output->GetOrientation() - input->GetOrientation()).magnitude() > m_OrientationEpsilon)
       m_OrientationChangedMessage.Send(input->GetOrientation(), i);
-    if (input->GetCovErrorMatrix() != output->GetCovErrorMatrix())
+
+    if ((output->GetCovErrorMatrix().GetVnlMatrix() - input->GetCovErrorMatrix().GetVnlMatrix()).absolute_value_max() > m_CovErrorEpsilon)
       m_ErrorChangedMessage.Send(input->GetCovErrorMatrix(), i);
-    if (input->GetTimeStamp() != output->GetTimeStamp())
+
+    if (fabs(output->GetTimeStamp() - input->GetTimeStamp()) > m_TimeStampEpsilon)
       m_TimeStampChangedMessage.Send(input->GetTimeStamp(), i);
+
     if (input->IsDataValid() != output->IsDataValid())
       m_DataValidChangedMessage.Send(input->IsDataValid(), i);
 

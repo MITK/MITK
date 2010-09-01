@@ -44,6 +44,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <vtkPolyDataAlgorithm.h>
 
+#include <mitkLookupTableProperty.h>
+
 
 const mitk::PointSet* mitk::EnhancedPointSetVtkMapper3D::GetInput()
 {
@@ -319,9 +321,32 @@ void mitk::EnhancedPointSetVtkMapper3D::ApplyProperties( mitk::BaseRenderer * re
     // selectedcolor & color
     float color[3];
     if (data.selected)
-      n->GetColor(color, renderer, "selectedcolor");
+    {
+      if(!n->GetColor(color, renderer, "selectedcolor"))
+        n->GetColor(color, renderer);
+    }
     else
-      n->GetColor(color, renderer, "unselectedcolor");  // TODO: What about "color" property? 2D Mapper only uses unselected and selected color properties
+    {
+      mitk::BaseProperty* a = n->GetProperty("colorLookupTable", renderer);
+      mitk::LookupTableProperty* b = dynamic_cast<mitk::LookupTableProperty*>(a);
+      if (b != NULL)
+      {
+         mitk::LookupTable::Pointer c = b->GetLookupTable();    
+         vtkLookupTable *d = c->GetVtkLookupTable();
+         double *e=d->GetTableValue(pointID);
+         color[0]=e[0];         
+         color[1]=e[1];         
+         color[2]=e[2];         
+      }
+      else
+      {
+        if(!n->GetColor(color, renderer, "unselectedcolor"))
+          n->GetColor(color, renderer);
+      }
+    }
+      
+     
+        // TODO: What about "color" property? 2D Mapper only uses unselected and selected color properties
     a->GetProperty()->SetColor(color[0], color[1], color[2]);
 
     // TODO: label property

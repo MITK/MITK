@@ -18,7 +18,7 @@ The <b> Volume Visualization Module </b> is a basic tool for visualizing three d
 MITK provides generic transfer function presets for medical CT data. 
 These functions, that map the gray-value to color and opacity, can be interactively edited. 
 Additionally, there are controls to quickly generate common used transfer function shapes 
-like the threshold and bell curve to help identify a range of gray-values.
+like the threshold and bell curve to help identify a range of grey-values.
 
 \image html vroverview.png ""
 
@@ -79,6 +79,8 @@ Click on the "Preset" tab for using internal or custom presets.
 <li> "CT Bone" emphasizes bones and shows other areas more transparent. 
 <li> "CT Bone (Gradient)" is like "CT Bone", but shows  from other organs only the surface by using the gradient.
 <li> "MR Generic" is the default transferfunction that we use on MRT data (which is not normalized like CT data).  
+<li> "CT Thorax small" tries to increase detail.  
+<li> "CT Thorax large" tries to increase detail.  
 </ul>
 
 \subsection QVV_CustomPreset Saving and loading custom presets

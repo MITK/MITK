@@ -32,28 +32,29 @@ perform a reinit on a specific node or a global reinit for all nodes you have to
 
 The "Fixed Data" area contains a QmitkPointListWidget. Within this widget, all points for the fixed data are listed. The label above this list shows the number of points that are already set. 
 To set points you have to toggle the "Set Points"  button, the leftmost under the QmitkPointListWidget. The views in the QmitkStdMultiWidget were reinitialized to the fixed data. Points can 
-be defined by performing a left mousebutton click while holding the "Shift"-key pressed in the QmitkStdMultiWidget. You can remove the interactor which listens for left mousebutton click while 
+be defined by performing a left click while holding the "Shift"-key pressed in the QmitkStdMultiWidget. You can remove the interactor which listens for left clicks while 
 holding the "Shift"-key pressed by detoggle the "Set Points" button. The next button, "Clear Point Set", is for deleting all specified points from this dataset. The user is prompted to confirm 
-the decision. With the third button a previously saved point set can be loaded and all of its points are shown in the QmitkPointListWidget and in the QmitkStdMultiWidget. The user is prompted 
-to select the file to be loaded. The file extension is ".mps". On the right of this button is the save button. With this function all points specified for this dataset and shown in the 
+the decision. With the most right button, a previously saved point set can be loaded and all of its points are shown in the QmitkPointListWidget and in the QmitkStdMultiWidget. The user is prompted 
+to select the file to be loaded. The file extension is ".mps". On the left of this button is the save button. With this function all points specified for this dataset and shown in the 
 QmitkPointListWidget are saved to harddisk. The user is prompted to select a filename. Pointsets were saved in XML fileformat but have to have a ".mps" file extension. You can select landmarks 
 in the render window with a left mouse button click on them. If you keep the mouse button pressed you can move the landmark to an other position by moving the mouse and then release the mouse 
-button. With the delete key you can remove the selected landmarks. You can also select landmarks by a double click on a landmark within the QmitkPointListWidget. With the "F2" key you can move 
-a landmark upwards in the QmitkPointListWidget, with "F3" downwards. Thus the landmark number can be changed. The QmitkStdMultiWidget changes its view to show the position of the landmark.
+button. With the delete key you can remove the selected landmarks. You can also select landmarks by a double click on a landmark within the QmitkPointListWidget. Using the "Up-Arrow"-button or
+the "F2" key you can easily move a landmark upwards and bring it further downwards by pressing "F3" or using the "Down-Arrow"-button. Thus the landmark number can be changed. 
+The QmitkStdMultiWidget changes its view to show the position of the landmark.
 
 \image html MovingDataPointBased.png "The Moving Data area"
 
 The "Moving Data" area contains a QmitkPointListWidget. Within this widget, all points for the moving data are listed. The label above this list shows the number of points that are already set. 
 To set points you have to toggle the "Set Points"  button, the leftmost under the QmitkPointListWidget. The views in the QmitkStdMultiWidget were reinitialized to the moving data. With the 
 "Opacity:" slider you can change the opacity of the moving dataset. If the slider is leftmost the moving dataset is totally transparent, whereas if it is rightmost the moving dataset is totally 
-opaque. Points can be defined by performing a left mousebutton click while holding the "Shift"-key pressed in the QmitkStdMultiWidget. You can remove the interactor which listens for left 
+opaque. Points can be defined by performing a left click while holding the "Shift"-key pressed in the QmitkStdMultiWidget. You can remove the interactor which listens for left 
 mousebutton click while holding the "Shift"-key pressed by detoggle the "Set Points" button. The next button, "Clear Point Set", is for deleting all specified points from this dataset. The user 
-is prompted to confirm the decision. With the third button a previously saved point set can be loaded and all of its points are shown in the QmitkPointListWidget and in the QmitkStdMultiWidget. 
-The user is prompted to select the file to be loaded. The file extension is ".mps". On the right of this button is the save button. With this function all points specified for this dataset and 
+is prompted to confirm the decision. With the button on your right hand side, a previously saved point set can be loaded and all of its points are shown in the QmitkPointListWidget and in the QmitkStdMultiWidget. 
+The user is prompted to select the file to be loaded. The file extension is ".mps". On the left of this button is the save button. With this function all points specified for this dataset and 
 shown in the QmitkPointListWidget are saved to harddisk. The user is prompted to select a filename. Pointsets were saved in XML fileformat but have to have a ".mps" file extension. You can 
-select landmarks in the render window with a left mouse button click on them. If you keep the mouse button pressed you can move the landmark to an other position by moving the mouse and then 
-release the mouse button. With the delete key you can remove the selected landmarks. You can also select landmarks by a double click on a landmark within the QmitkPointListWidget. With the "F2" 
-key you can move a landmark upwards in the QmitkPointListWidget, with "F3" downwards. Thus the landmark number can be changed.The QmitkStdMultiWidget changes its view to show the position of the 
+select landmarks in the render window with a left click on them. If you keep the mouse button pressed you can move the landmark to an other position by moving the mouse and then 
+release the mouse button. With the delete key you can remove the selected landmarks. You can also select landmarks by a double click on a landmark within the QmitkPointListWidget. Using the "Up-Arrow"-button or
+the "F2" key you can easily move a landmark upwards and bring it further downwards by pressing "F3" or using the "Down-Arrow"-button. Thus the landmark number can be changed.The QmitkStdMultiWidget changes its view to show the position of the 
 landmark.
 
 \image html DisplayOptionsPointBased.png "The Display Options area"
@@ -66,11 +67,12 @@ Before you perform your transformation it is useful to see both images again. Th
 
 \image html RegistrationPointBased.png "The Registration area"
 
-The functions concerning to the registration are in the "Registration" area. To that belongs the registration method selection, the registration itself, the possibility to save the result, the 
-possibility for undo and redo, and a display to show how good the landmarks correspond and are explained in the following paragraphs.
+The functions concerning the registration are displayed in the "Registration" area. It not only contains the registration method selection and the registration itself but also offers the possibility
+to save, undo or redo the results. Furthermore a display is implemented, which shows you how good the landmarks correspond.
+Those features will be explained in following paragraphs.
 
-You can select between different kinds of transformations from a combobox: <b>Rigid</b>, <b>Similarity</b>, <b>Affine</b> and <b>LandmarkWarping</b>. An additional specifier for the first three 
-options can be set via the checkbox "Use ICP", which leads to the following possibilities for registration: 
+Using the "Method"-selector, you can pick one of those transformations: <b>Rigid</b>, <b>Similarity</b>, <b>Affine</b> and <b>LandmarkWarping</b>.
+Depending on which one you chose, an additional specifier, "Use ICP" can be set, which leads to the following possibilities for registration: 
 
 \li <b>Rigid with ICP</b> means only translation and rotation. The order of your landmarks will not be taken into account. E. g. landmark one in the fixed data can be mapped on landmark three in the moving data. You 
 have to set at least one landmark in each dataset to enable the Register button which performs the transformation.
@@ -96,8 +98,8 @@ Register button which performs the transformation.
 
 The root mean squares difference between the landmarks will be displayed as number, so that you can check how good the landmarks correspond.
 
-The "Undo Transformation" button becomes enabled when you have performed an transformation and you can undo the performed transformations. The "Redo Transformation" button becomes enabled when 
-you have performed an undo to redo the transformation without to recalculate it.
+The "Undo Transformation" button becomes enabled after performing a transformation and allows you to undo it. After doing this, the "Redo Transformation" button
+is enabled and lets you redo, the just undone transformation(no calculation  needed)
 
 Saving of the transformed image can be done via the Data Manager.
  

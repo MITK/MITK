@@ -25,9 +25,9 @@ via the Data Manager. Also if you want to perform a reinit on a specific node or
 
 \image html ImageSelectionDeformable.png "The Image area"
 
-The upper area is the "Image" area. The selected images are shown here. It is used for changing the colour of the images between grey values and red/green and changing the opacity of the moving image.
-With the "Moving Image Opacity:" slider you can change the opacity of the moving dataset. In the "Show Images Red/Green" you can switch the color from both datasets. If you check the box, 
-the fixed dataset will be displayed in redvalues and the moving dataset in greenvalues to improve visibility of differences in the datasets. If you uncheck the "Show Images Red/Green" checkbox, 
+The upper area is the "Image" area, where the selected images are shown. It is used for changing the colour of the images between grey values and red/green as well as for changing the opacity of the moving image.
+To do so, just use the "Moving Image Opacity:" slider. In the "Show Images Red/Green" you can switch the color from both datasets. If you check the box, the fixed dataset will be displayed in redvalues and the
+moving dataset in greenvalues to improve visibility of differences in the datasets. If you uncheck the "Show Images Red/Green" checkbox, 
 both datasets will be displayed in greyvalues.
 
 \image html RegistrationDeformable.png "The Registration area for Demons based registration"

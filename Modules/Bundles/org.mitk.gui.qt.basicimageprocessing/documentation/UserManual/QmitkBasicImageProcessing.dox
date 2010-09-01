@@ -106,16 +106,16 @@ A busy cursor appeares; when it vanishes, the operation is completed. Your filte
 because your filtered image is possibly hidden by the original.)
 
 For two image operations, please make sure that the correct second image is selected in the drop down menu, and the image order is correct.
-For sure, image oeder only plays a role for image subtraction and division. These are conducted (Image1 - Image2) or (Image1 / Image2), respectively.
+For sure, image order only plays a role for image subtraction and division. These are conducted (Image1 - Image2) or (Image1 / Image2), respectively.
 
 Please Note: When you select a 4D image, you can select the time step for the filter to work on via the time slider at the top of the GUI.
 The 3D image at this time step is extracted and processed. The result will also be a 3D image.
-This means, a true 4D filtering is not supported by now.
+This means, a true 4D filtering is not yet supported.
 
 \section QmitkBasicImageProcessingUserManualTrouble Troubleshooting
 
 <B>I get an error when using a filter on a 2D image.</B><BR>
-2D images are not supported by now...
+2D images are not yet supported...
 
 <B>I use a filter on a 4D image, and the output is 3D.</B><BR>
 When you select a 4D image, you can select the time step for the filter to work on via the time slider at the top of the GUI.

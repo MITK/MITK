@@ -42,8 +42,8 @@ via the Data Manager. Also if you want to perform a reinit on a specific node or
 
 The colour of the images can be changed between grey values and red/green and the opacity of the moving image can be changed.
 With the "Moving Image Opacity:" slider you can change the opacity of the moving dataset. In the "Show Images Red/Green" you can switch the color from both datasets. If you check the box, 
-the fixed dataset will be displayed in redvalues and the moving dataset in greenvalues to improve visibility of differences in the datasets. If you uncheck the "Show Images Red/Green" checkbox, 
-both datasets will be displayed in greyvalues.
+the fixed dataset will be displayed in red-values and the moving dataset in green-values to improve visibility of differences in the datasets. If you uncheck the "Show Images Red/Green" checkbox, 
+both datasets will be displayed in grey-values.
 
 \image html RegistrationArea.png "The Registration area"
 
@@ -82,31 +82,31 @@ To show the current transform and its parameters for the registration process, t
 
 \li <b>FixedCenterOfRotationAffine:</b> Represents an affine transform composed of rotation around a user provided center, scaling, shearing and translation.
 
-\li <b>Rigid3DTransform:</b> Represents a 3D rotation followed by a 3D translation.
+\li <b>Rigid3D:</b> Represents a 3D rotation followed by a 3D translation.
 
-\li <b>Euler3DTransform:</b> Represents a rigid rotation in 3D space. That is, a rotation followed by a 3D translation.
+\li <b>Euler3D:</b> Represents a rigid rotation in 3D space. That is, a rotation followed by a 3D translation.
 
-\li <b>CenteredEuler3DTransform:</b> Represents a rigid rotation in 3D space around a user provided center. That is, a rotation followed by a 3D translation.
+\li <b>CenteredEuler3D:</b> Represents a rigid rotation in 3D space around a user provided center. That is, a rotation followed by a 3D translation.
 
-\li <b>QuaternionRigidTransform:</b> Represents a 3D rotation and a 3D translation. The rotation is specified as a quaternion.
+\li <b>QuaternionRigid:</b> Represents a 3D rotation and a 3D translation. The rotation is specified as a quaternion.
 
-\li <b>VersorTransform:</b> Represents a 3D rotation. The rotation is specified by a versor or unit quaternion.
+\li <b>Versor:</b> Represents a 3D rotation. The rotation is specified by a versor or unit quaternion.
 
-\li <b>VersorRigid3DTransform:</b> Represents a 3D rotation and a 3D translation. The rotation is specified by a versor or unit quaternion.
+\li <b>VersorRigid3D:</b> Represents a 3D rotation and a 3D translation. The rotation is specified by a versor or unit quaternion.
 
-\li <b>ScaleSkewVersorTransform:</b> Represents a 3D translation, scaling, shearing and rotation. The rotation is specified by a versor or unit quaternion.
+\li <b>ScaleSkewVersor3D:</b> Represents a 3D translation, scaling, shearing and rotation. The rotation is specified by a versor or unit quaternion.
 
-\li <b>Similarity3DTransform:</b> Represents a 3D rotation, a 3D translation and homogeneous scaling.
+\li <b>Similarity3D:</b> Represents a 3D rotation, a 3D translation and homogeneous scaling.
 
-\li <b>Rigid2DTransform:</b> Represents a 2D rotation followed by a 2D translation.
+\li <b>Rigid2D:</b> Represents a 2D rotation followed by a 2D translation.
 
-\li <b>CenteredRigid2DTransform:</b> Represents a 2D rotation around a user provided center followed by a 2D translation.
+\li <b>CenteredRigid2D:</b> Represents a 2D rotation around a user provided center followed by a 2D translation.
 
-\li <b>Euler2DTransform:</b> Represents a 2D rotation and a 2D translation.
+\li <b>Euler2D:</b> Represents a 2D rotation and a 2D translation.
 
-\li <b>Similarity2DTransform:</b> Represents a 2D rotation, homogeneous scaling and a 2D translation.
+\li <b>Similarity2D:</b> Represents a 2D rotation, homogeneous scaling and a 2D translation.
 
-\li <b>CenteredSimilarity2DTransform:</b> Represents a 2D rotation around a user provided center, homogeneous scaling and a 2D translation.
+\li <b>CenteredSimilarity2D:</b> Represents a 2D rotation around a user provided center, homogeneous scaling and a 2D translation.
 
 The desired transform can be chosen from a combo box. All parameters defining the selected transform have to be specified within the line edits and checkboxes underneath the transform combo box.
 To show the current metric and its parameters for the registration process, the Metric checkbox has to be checked. Currently, the following metrics are implemented 
@@ -172,7 +172,7 @@ To show the current optimizer and its parameters for the registration process, t
 \li <b>VersorRigid3DTransform:</b> Variant of a gradient descent optimizer for the VersorRigid3DTransform parameter space.
 
 The desired optimizer can be chosen from a combo box. All parameters defining the selected optimizer have to be specified within the line edits and checkboxes underneath the optimizer combo box.
-To show the current interpolator for the registration process, the Interpolator checkbox has to be checked. Currently, the following interpolators are implemented 
+To show the current interpolator for the registration process, just check the Interpolator checkbox. Currently, the following interpolators are implemented 
 (for detailed information see [1] and [2]):
 
 \li <b>Linear:</b> Intensity varies linearly between grid positions.

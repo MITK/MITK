@@ -55,7 +55,8 @@ void QmitkTrackingSourcesCheckBoxPanelWidget::CreateConnections()
 
 void QmitkTrackingSourcesCheckBoxPanelWidget::SetNavigationDatas(std::vector<mitk::NavigationData::Pointer>* navDatas)
 { 
-   m_NavigationDatas = navDatas;
+  if( navDatas != NULL )
+    m_NavigationDatas = navDatas;
 }
 
 
@@ -64,7 +65,8 @@ void QmitkTrackingSourcesCheckBoxPanelWidget::AddNavigationData(mitk::Navigation
    if(m_NavigationDatas == NULL)
      m_NavigationDatas = new std::vector<mitk::NavigationData::Pointer>();
 
-   m_NavigationDatas->push_back(nd);
+   if( nd.IsNotNull() )
+     m_NavigationDatas->push_back(nd);
 }
 
 
@@ -85,7 +87,6 @@ const std::vector<int>* QmitkTrackingSourcesCheckBoxPanelWidget::GetSelectedTrac
   return m_SelectedIds;
 }
 
-
 void QmitkTrackingSourcesCheckBoxPanelWidget::ClearPanel()
 {
   while(m_Controls->m_GridLayout->count() > 0)
@@ -95,16 +96,28 @@ void QmitkTrackingSourcesCheckBoxPanelWidget::ClearPanel()
     delete actWidget;
   }
 
-  m_SourceCheckboxes->clear();
-  m_NavigationDatas->clear();
-  if(m_SelectedIds != NULL && !m_SelectedIds->empty())
-  m_SelectedIds->clear();
+  if(m_SourceCheckboxes != NULL || m_NavigationDatas != NULL)
+  {
+    m_SourceCheckboxes->clear();
+    m_NavigationDatas->clear();
+  }
 
+  
+}
+
+void QmitkTrackingSourcesCheckBoxPanelWidget::ClearSelectedIDs()
+{
+  if(m_SelectedIds != NULL && !m_SelectedIds->empty())
+    m_SelectedIds->clear();
 }
 
 void QmitkTrackingSourcesCheckBoxPanelWidget::ShowSourceCheckboxes()
 {
-  m_SourceCheckboxes->clear();
+  if( m_SourceCheckboxes != NULL )
+    m_SourceCheckboxes->clear();
+
+  if( m_NavigationDatas == NULL )
+    return;
 
   QCheckBox* checkBox;
 
@@ -168,6 +181,9 @@ void QmitkTrackingSourcesCheckBoxPanelWidget::DeselectCheckbox(unsigned int idx)
 void QmitkTrackingSourcesCheckBoxPanelWidget::OnCheckboxClicked(bool checked)
 {
   QCheckBox* sender = qobject_cast< QCheckBox* > (QObject::sender());
+
+  if( sender == NULL )
+    throw std::invalid_argument("No sender found!");
 
   int idx = -1;
 

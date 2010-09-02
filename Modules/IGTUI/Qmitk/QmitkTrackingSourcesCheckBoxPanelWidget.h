@@ -116,6 +116,11 @@ public:
   */
   void EnableCheckboxes(bool enable);
 
+  /**
+  \brief Clears the vector that holds the selected IDs
+  */
+  void ClearSelectedIDs();
+
 signals:
   void Selected(int id); /// when a checkbox is selected
   void Deselected(int id); /// when a checkbox is deselected

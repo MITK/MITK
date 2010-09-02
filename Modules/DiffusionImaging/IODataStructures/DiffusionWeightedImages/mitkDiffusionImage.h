@@ -66,7 +66,14 @@ namespace mitk
     { return m_Directions; }
     void SetDirections( GradientDirectionContainerType::Pointer directions )
     { this->m_Directions = directions; }
-
+    void SetDirections(const std::vector<itk::Vector<double,3> > directions)
+    {
+      m_Directions = GradientDirectionContainerType::New();
+      for(int i=0; i<directions.size(); i++)
+      {
+        m_Directions->InsertElement( i, directions[i].Get_vnl_vector() );
+      }
+    }
     itkGetMacro(B_Value, float);
     itkSetMacro(B_Value, float);
 

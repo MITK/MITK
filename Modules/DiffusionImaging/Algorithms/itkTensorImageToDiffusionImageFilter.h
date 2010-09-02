@@ -40,9 +40,9 @@ namespace itk
     typedef typename OutputImageType::PixelType       OutputPixelType;
     typedef typename OutputImageType::RegionType      OutputImageRegionType;
 
-    typedef typename OutputScalarType                 BaselineScalarType;
-    typedef typename BaselineScalarType               BaselinePixelType;
-    typedef itk::Image<BaselinePixelType,3>           BaselineImageType;
+    typedef OutputScalarType                          BaselineScalarType;
+    typedef BaselineScalarType                        BaselinePixelType;
+    typedef typename itk::Image<BaselinePixelType,3>  BaselineImageType;
     typedef typename BaselineImageType::RegionType    BaselineImageRegionType;
 
     typedef TensorImageToDiffusionImageFilter Self;

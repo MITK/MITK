@@ -76,6 +76,8 @@ class QmitkTensorReconstructionView : public QObject, public QmitkFunctionality
 
 protected slots:
 
+  void TensorsToDWI();
+  void DoTensorsToDWI(mitk::DataStorage::SetOfObjects::Pointer inImages);
   void TeemCheckboxClicked();
   void Advanced1CheckboxClicked();
   void Advanced2CheckboxClicked();
@@ -89,11 +91,15 @@ protected slots:
   void TeemTensorReconstruction
     (mitk::DataStorage::SetOfObjects::Pointer inImages);
 
+
 protected:
 
   Ui::QmitkTensorReconstructionViewControls* m_Controls;
 
   QmitkStdMultiWidget* m_MultiWidget;
+
+  template<int ndirs>
+  std::vector<itk::Vector<double,3> > MakeGradientList() ;
 
   template<int L>
   void TemplatedAnalyticalTensorReconstruction(mitk::DiffusionImage<DiffusionPixelType>* vols, 

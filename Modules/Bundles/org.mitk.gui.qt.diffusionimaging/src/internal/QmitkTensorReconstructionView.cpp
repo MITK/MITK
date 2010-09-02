@@ -5,7 +5,7 @@ Module:    $RCSfile$
 Language:  C++
 Date:      $Date: 2009-05-28 17:19:30 +0200 (Do, 28 Mai 2009) $
 Version:   $Revision: 17495 $ 
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
@@ -35,19 +35,23 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkTeemDiffusionTensor3DReconstructionImageFilter.h"
 #include "itkDiffusionTensor3DReconstructionImageFilter.h"
+#include "itkTensorImageToDiffusionImageFilter.h"
+#include "itkPointShell.h"
+#include "itkVector.h"
 
 #include "mitkTensorImage.h"
 #include "mitkProperties.h"
 #include "mitkDataNodeObject.h"
 #include "mitkOdfNormalizationMethodProperty.h"
 #include "mitkOdfScaleByProperty.h"
+#include "mitkDiffusionImageMapper.h"
 
 #include "berryIStructuredSelection.h"
 #include "berryIWorkbenchWindow.h"
 #include "berryISelectionService.h"
 
 const std::string QmitkTensorReconstructionView::VIEW_ID = 
-  "org.mitk.views.tensorreconstruction";
+"org.mitk.views.tensorreconstruction";
 
 #define DI_INFO MITK_INFO("DiffusionImaging")
 
@@ -67,8 +71,8 @@ struct TrSelListener : ISelectionListener
 
   void DoSelectionChanged(ISelection::ConstPointer selection)
   {
-//    if(!m_View->IsVisible())
-//      return;
+    //    if(!m_View->IsVisible())
+    //      return;
     // save current selection in member variable
     m_View->m_CurrentSelection = selection.Cast<const IStructuredSelection>();
 
@@ -76,6 +80,7 @@ struct TrSelListener : ISelectionListener
     if(m_View->m_CurrentSelection)
     {
       bool foundDwiVolume = false;
+      bool foundTensorVolume = false;
 
       // iterate selection
       for (IStructuredSelection::iterator i = m_View->m_CurrentSelection->Begin(); 
@@ -86,18 +91,26 @@ struct TrSelListener : ISelectionListener
         if (mitk::DataNodeObject::Pointer nodeObj = i->Cast<mitk::DataNodeObject>())
         {
           mitk::DataNode::Pointer node = nodeObj->GetDataNode();
-          
+
           // only look at interesting types
           if(QString("DiffusionImage").compare(node->GetData()->GetNameOfClass())==0)
           {
             foundDwiVolume = true;
+          }
+
+          // only look at interesting types
+          if(QString("TensorImage").compare(node->GetData()->GetNameOfClass())==0)
+          {
+            foundTensorVolume = true;
           }
         }
       }
 
       m_View->m_Controls->m_ItkReconstruction->setEnabled(foundDwiVolume);
       m_View->m_Controls->m_TeemReconstruction->setEnabled(foundDwiVolume);
-      
+
+      m_View->m_Controls->m_TensorsToDWIButton->setEnabled(foundTensorVolume);
+
     }
   }
 
@@ -122,8 +135,8 @@ struct TrSelListener : ISelectionListener
 
 QmitkTensorReconstructionView::QmitkTensorReconstructionView()
 : QmitkFunctionality(),
-  m_Controls(NULL),
-  m_MultiWidget(NULL)
+m_Controls(NULL),
+m_MultiWidget(NULL)
 {
 }
 
@@ -145,9 +158,9 @@ void QmitkTensorReconstructionView::CreateQtPartControl(QWidget *parent)
 
     QStringList items;
     items << "LLS (Linear Least Squares)"
-          << "MLE (Maximum Likelihood)"
-          << "NLS (Nonlinear Least Squares)"
-          << "WLS (Weighted Least Squares)";
+      << "MLE (Maximum Likelihood)"
+      << "NLS (Nonlinear Least Squares)"
+      << "WLS (Weighted Least Squares)";
     m_Controls->m_TensorEstimationTeemEstimationMethodCombo->addItems(items);
     m_Controls->m_TensorEstimationTeemEstimationMethodCombo->setCurrentIndex(0);
 
@@ -160,10 +173,12 @@ void QmitkTensorReconstructionView::CreateQtPartControl(QWidget *parent)
     m_Controls->m_TensorEstimationTeemNumItsLabel_2->setEnabled(true);
     m_Controls->m_TensorEstimationTeemNumItsSpin->setEnabled(true);
 
+    m_Controls->m_TensorsToDWIBValueEdit->setText("1000");
+
     Advanced1CheckboxClicked();
     Advanced2CheckboxClicked();
     TeemCheckboxClicked();
-    
+
 #ifndef DIFFUSION_IMAGING_EXTENDED
     m_Controls->m_TeemToggle->setVisible(false);
 #endif
@@ -206,6 +221,7 @@ void QmitkTensorReconstructionView::CreateConnections()
     connect( (QObject*)(m_Controls->m_Advanced1), SIGNAL(clicked()), this, SLOT(Advanced1CheckboxClicked()) );
     connect( (QObject*)(m_Controls->m_Advanced2), SIGNAL(clicked()), this, SLOT(Advanced2CheckboxClicked()) );
     connect( (QObject*)(m_Controls->m_TensorEstimationManualThreashold), SIGNAL(clicked()), this, SLOT(ManualThresholdClicked()) );
+    connect( (QObject*)(m_Controls->m_TensorsToDWIButton), SIGNAL(clicked()), this, SLOT(TensorsToDWI()) );
   }
 }
 
@@ -219,7 +235,7 @@ void QmitkTensorReconstructionView::Advanced1CheckboxClicked()
 {
   bool check = m_Controls->
     m_Advanced1->isChecked();
-  
+
   m_Controls->frame->setVisible(check);
 }
 
@@ -227,7 +243,7 @@ void QmitkTensorReconstructionView::Advanced2CheckboxClicked()
 {
   bool check = m_Controls->
     m_Advanced2->isChecked();
-  
+
   m_Controls->frame_2->setVisible(check);
 }
 
@@ -300,7 +316,7 @@ void QmitkTensorReconstructionView::Reconstruct(int method)
 }
 
 void QmitkTensorReconstructionView::ItkTensorReconstruction
-  (mitk::DataStorage::SetOfObjects::Pointer inImages) 
+(mitk::DataStorage::SetOfObjects::Pointer inImages) 
 {
   try
   {
@@ -322,13 +338,13 @@ void QmitkTensorReconstructionView::ItkTensorReconstruction
       mitk::DiffusionImage<DiffusionPixelType>* vols = 
         static_cast<mitk::DiffusionImage<DiffusionPixelType>*>(
         (*itemiter)->GetData());
-      
+
       std::string nodename;
       (*itemiter)->GetStringProperty("name", nodename);
       ++itemiter;
 
       // TENSOR RECONSTRUCTION
-       clock.Start();
+      clock.Start();
       MBI_INFO << "Tensor reconstruction ";
       mitk::StatusBar::GetInstance()->DisplayText(status.sprintf(
         "Tensor reconstruction for %s", nodename.c_str()).toAscii());
@@ -350,7 +366,7 @@ void QmitkTensorReconstructionView::ItkTensorReconstruction
       image->SetVolume( tensorReconstructionFilter->GetOutput()->GetBufferPointer() );
       mitk::DataNode::Pointer node=mitk::DataNode::New();
       node->SetData( image );
-      
+
       QString newname;
       newname = newname.append(nodename.c_str());
       newname = newname.append("_dti");
@@ -377,10 +393,12 @@ void QmitkTensorReconstructionView::ItkTensorReconstruction
   }
 }
 
+
+
 void QmitkTensorReconstructionView::TeemTensorReconstruction
-  (mitk::DataStorage::SetOfObjects::Pointer inImages) 
+(mitk::DataStorage::SetOfObjects::Pointer inImages) 
 {
-    try
+  try
   {
     itk::TimeProbe clock;
 
@@ -400,7 +418,7 @@ void QmitkTensorReconstructionView::TeemTensorReconstruction
       mitk::DiffusionImage<DiffusionPixelType>* vols = 
         static_cast<mitk::DiffusionImage<DiffusionPixelType>*>(
         (*itemiter)->GetData());
-      
+
       std::string nodename;
       (*itemiter)->GetStringProperty("name", nodename);
       ++itemiter;
@@ -419,10 +437,10 @@ void QmitkTensorReconstructionView::TeemTensorReconstruction
         tensorReconstructionFilter->SetSigma( m_Controls->m_TensorEstimationTeemSigmaEdit->text().toFloat() );
       switch(m_Controls->m_TensorEstimationTeemEstimationMethodCombo->currentIndex())
       {
-          //  items << "LLS (Linear Least Squares)"
-          //<< "MLE (Maximum Likelihood)"
-          //<< "NLS (Nonlinear Least Squares)"
-          //<< "WLS (Weighted Least Squares)";
+        //  items << "LLS (Linear Least Squares)"
+        //<< "MLE (Maximum Likelihood)"
+        //<< "NLS (Nonlinear Least Squares)"
+        //<< "WLS (Weighted Least Squares)";
       case 0:
         tensorReconstructionFilter->SetEstimationMethod(mitk::TeemTensorEstimationMethodsLLS);
         break;
@@ -450,7 +468,7 @@ void QmitkTensorReconstructionView::TeemTensorReconstruction
       // TENSORS TO DATATREE
       mitk::DataNode::Pointer node2=mitk::DataNode::New();
       node2->SetData( tensorReconstructionFilter->GetOutputItk() );
-      
+
       QString newname;
       newname = newname.append(nodename.c_str());
       newname = newname.append("_dtix");
@@ -495,42 +513,220 @@ void QmitkTensorReconstructionView::SetDefaultNodeProperties(mitk::DataNode::Poi
 }
 
 
-  //node->SetProperty( "volumerendering", mitk::BoolProperty::New( false ) );
-  //node->SetProperty( "use color", mitk::BoolProperty::New( true ) );
-  //node->SetProperty( "texture interpolation", mitk::BoolProperty::New( true ) );
-  //node->SetProperty( "reslice interpolation", mitk::VtkResliceInterpolationProperty::New() );
-  //node->SetProperty( "layer", mitk::IntProperty::New(0));
-  //node->SetProperty( "in plane resample extent by geometry", mitk::BoolProperty::New( false ) );
-  //node->SetOpacity(1.0f);
-  //node->SetColor(1.0,1.0,1.0);  
-  //node->SetVisibility(true);
-  //node->SetProperty( "IsTensorVolume", mitk::BoolProperty::New( true ) );
+//node->SetProperty( "volumerendering", mitk::BoolProperty::New( false ) );
+//node->SetProperty( "use color", mitk::BoolProperty::New( true ) );
+//node->SetProperty( "texture interpolation", mitk::BoolProperty::New( true ) );
+//node->SetProperty( "reslice interpolation", mitk::VtkResliceInterpolationProperty::New() );
+//node->SetProperty( "layer", mitk::IntProperty::New(0));
+//node->SetProperty( "in plane resample extent by geometry", mitk::BoolProperty::New( false ) );
+//node->SetOpacity(1.0f);
+//node->SetColor(1.0,1.0,1.0);  
+//node->SetVisibility(true);
+//node->SetProperty( "IsTensorVolume", mitk::BoolProperty::New( true ) );
 
-  //mitk::LevelWindowProperty::Pointer levWinProp = mitk::LevelWindowProperty::New();
-  //mitk::LevelWindow levelwindow;
-  ////  levelwindow.SetAuto( image );
-  //levWinProp->SetLevelWindow( levelwindow );
-  //node->GetPropertyList()->SetProperty( "levelwindow", levWinProp );
+//mitk::LevelWindowProperty::Pointer levWinProp = mitk::LevelWindowProperty::New();
+//mitk::LevelWindow levelwindow;
+////  levelwindow.SetAuto( image );
+//levWinProp->SetLevelWindow( levelwindow );
+//node->GetPropertyList()->SetProperty( "levelwindow", levWinProp );
 
-  //// add a default rainbow lookup table for color mapping
-  //if(!node->GetProperty("LookupTable"))
-  //{
-  //  mitk::LookupTable::Pointer mitkLut = mitk::LookupTable::New();
-  //  vtkLookupTable* vtkLut = mitkLut->GetVtkLookupTable();
-  //  vtkLut->SetHueRange(0.6667, 0.0);
-  //  vtkLut->SetTableRange(0.0, 20.0);
-  //  vtkLut->Build();
-  //  mitk::LookupTableProperty::Pointer mitkLutProp = mitk::LookupTableProperty::New();
-  //  mitkLutProp->SetLookupTable(mitkLut);
-  //  node->SetProperty( "LookupTable", mitkLutProp );
-  //}
-  //if(!node->GetProperty("binary"))
-  //  node->SetProperty( "binary", mitk::BoolProperty::New( false ) );
+//// add a default rainbow lookup table for color mapping
+//if(!node->GetProperty("LookupTable"))
+//{
+//  mitk::LookupTable::Pointer mitkLut = mitk::LookupTable::New();
+//  vtkLookupTable* vtkLut = mitkLut->GetVtkLookupTable();
+//  vtkLut->SetHueRange(0.6667, 0.0);
+//  vtkLut->SetTableRange(0.0, 20.0);
+//  vtkLut->Build();
+//  mitk::LookupTableProperty::Pointer mitkLutProp = mitk::LookupTableProperty::New();
+//  mitkLutProp->SetLookupTable(mitkLut);
+//  node->SetProperty( "LookupTable", mitkLutProp );
+//}
+//if(!node->GetProperty("binary"))
+//  node->SetProperty( "binary", mitk::BoolProperty::New( false ) );
 
-  //// add a default transfer function
-  //mitk::TransferFunction::Pointer tf = mitk::TransferFunction::New();
-  //node->SetProperty ( "TransferFunction", mitk::TransferFunctionProperty::New ( tf.GetPointer() ) );
+//// add a default transfer function
+//mitk::TransferFunction::Pointer tf = mitk::TransferFunction::New();
+//node->SetProperty ( "TransferFunction", mitk::TransferFunctionProperty::New ( tf.GetPointer() ) );
 
-  //// set foldername as string property
-  //mitk::StringProperty::Pointer nameProp = mitk::StringProperty::New( name );
-  //node->SetProperty( "name", nameProp );
+//// set foldername as string property
+//mitk::StringProperty::Pointer nameProp = mitk::StringProperty::New( name );
+//node->SetProperty( "name", nameProp );
+
+void QmitkTensorReconstructionView::TensorsToDWI()
+{
+  if (m_CurrentSelection)
+  {
+    mitk::DataStorage::SetOfObjects::Pointer set =
+      mitk::DataStorage::SetOfObjects::New();
+
+    int at = 0;
+    for (IStructuredSelection::iterator i = m_CurrentSelection->Begin(); 
+      i != m_CurrentSelection->End(); 
+      ++i)
+    {
+
+      if (mitk::DataNodeObject::Pointer nodeObj = i->Cast<mitk::DataNodeObject>())
+      {
+        mitk::DataNode::Pointer node = nodeObj->GetDataNode();
+        if(QString("TensorImage").compare(node->GetData()->GetNameOfClass())==0)
+        {
+          set->InsertElement(at++, node);
+        }
+      }
+    }
+
+    DoTensorsToDWI(set);
+  }
+}
+
+template<int ndirs>
+std::vector<itk::Vector<double,3> > QmitkTensorReconstructionView::MakeGradientList()
+{
+  std::vector<itk::Vector<double,3> > retval;
+  vnl_matrix_fixed<double, 3, ndirs>* U =
+    itk::PointShell<ndirs, vnl_matrix_fixed<double, 3, ndirs> >::DistributePointShell();
+
+  for(int i=0; i<ndirs;i++) 
+  {
+    itk::Vector<double,3> v;
+    v[0] = U->get(0,i); v[1] = U->get(1,i); v[2] = U->get(2,i);
+    retval.push_back(v);
+  }
+  return retval;
+}
+
+void QmitkTensorReconstructionView::DoTensorsToDWI
+(mitk::DataStorage::SetOfObjects::Pointer inImages) 
+{
+  try
+  {
+    itk::TimeProbe clock;
+
+    int nrFiles = inImages->size();
+    if (!nrFiles) return;
+
+    QString status;
+    mitk::ProgressBar::GetInstance()->AddStepsToDo(nrFiles);
+
+    mitk::DataStorage::SetOfObjects::const_iterator itemiter( inImages->begin() ); 
+    mitk::DataStorage::SetOfObjects::const_iterator itemiterend( inImages->end() ); 
+
+    std::vector<mitk::DataNode::Pointer> nodes;
+    while ( itemiter != itemiterend ) // for all items
+    {
+
+      std::string nodename;
+      (*itemiter)->GetStringProperty("name", nodename);
+      
+      mitk::TensorImage* vol = 
+        static_cast<mitk::TensorImage*>((*itemiter)->GetData());
+      
+      ++itemiter;
+
+      typedef float                                       TTensorPixelType;
+      typedef itk::DiffusionTensor3D< TTensorPixelType >  TensorPixelType;
+      typedef itk::Image< TensorPixelType, 3 >            TensorImageType;
+
+      
+      TensorImageType::Pointer itkvol = TensorImageType::New();
+      mitk::CastToItkImage<TensorImageType>(vol, itkvol);
+
+      typedef itk::TensorImageToDiffusionImageFilter< 
+        TTensorPixelType, DiffusionPixelType > FilterType;
+
+      FilterType::GradientListType gradientList;
+
+      switch(m_Controls->m_TensorsToDWINumDirsSelect->currentIndex())
+      {
+      case 0:
+        gradientList = MakeGradientList<12>();
+        break;
+      case 1:
+        gradientList = MakeGradientList<42>();
+        break;
+      case 2:
+        gradientList = MakeGradientList<92>();
+        break;
+      case 3:
+        gradientList = MakeGradientList<162>();
+        break;
+      case 4:
+        gradientList = MakeGradientList<252>();
+        break;
+      case 5:
+        gradientList = MakeGradientList<362>();
+        break;
+      case 6:
+        gradientList = MakeGradientList<492>();
+        break;
+      case 7:
+        gradientList = MakeGradientList<642>();
+        break;
+      case 8:
+        gradientList = MakeGradientList<812>();
+        break;
+      case 9:
+        gradientList = MakeGradientList<1002>();
+        break;
+      default:
+        gradientList = MakeGradientList<92>();
+
+      }
+
+      double bVal = m_Controls->m_TensorsToDWIBValueEdit->text().toDouble();
+
+      // DWI ESTIMATION
+      clock.Start();
+      MBI_INFO << "DWI Estimation ";
+      mitk::StatusBar::GetInstance()->DisplayText(status.sprintf(
+        "DWI Estimation for %s", nodename.c_str()).toAscii());
+      FilterType::Pointer filter = FilterType::New();
+      filter->SetInput( itkvol );
+      filter->SetBValue(bVal);  
+      filter->SetGradientList(gradientList);  
+      filter->SetNumberOfThreads(1);
+      filter->Update();
+      clock.Stop();
+      MBI_DEBUG << "took " << clock.GetMeanTime() << "s.";
+
+      itk::Vector<double,3> v;
+      v[0] = 0; v[1] = 0; v[2] = 0;
+      gradientList.push_back(v);
+
+      // TENSORS TO DATATREE
+      mitk::DiffusionImage<DiffusionPixelType>::Pointer image = mitk::DiffusionImage<DiffusionPixelType>::New();
+      image->SetVectorImage( filter->GetOutput() );
+      image->SetB_Value(bVal);
+      image->SetDirections(gradientList);
+      image->InitializeFromVectorImage();
+      mitk::DataNode::Pointer node=mitk::DataNode::New();
+      node->SetData( image );
+
+      mitk::DiffusionImageMapper<short>::SetDefaultProperties(node);
+
+      QString newname;
+      newname = newname.append(nodename.c_str());
+      newname = newname.append("_dwi");
+      node->SetName(newname.toAscii());
+
+      nodes.push_back(node);
+
+      mitk::ProgressBar::GetInstance()->Progress();
+
+    }
+
+    std::vector<mitk::DataNode::Pointer>::iterator nodeIt;
+    for(nodeIt = nodes.begin(); nodeIt != nodes.end(); ++nodeIt)
+      GetDefaultDataStorage()->Add(*nodeIt);
+
+    mitk::StatusBar::GetInstance()->DisplayText(status.sprintf("Finished Processing %d Files", nrFiles).toAscii());
+    m_MultiWidget->RequestUpdate();
+
+  }
+  catch (itk::ExceptionObject &ex)
+  {
+    MBI_INFO << ex ;
+    return ;
+  }
+}

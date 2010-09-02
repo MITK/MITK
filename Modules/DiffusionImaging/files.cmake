@@ -11,9 +11,7 @@ SET(CPP_FILES
   Algorithms/itkBrainMaskExtractionImageFilter.h
   Algorithms/itkB0ImageExtractionImageFilter.h
   Algorithms/itkTensorImageToDiffusionImageFilter.h
-  Algorithms/itkTensorToScalarTensorImageFilter.h
-  Algorithms/itkTensorToScalarFunction.h
-  Algorithms/itkTensorToL2NormFunction.h
+  Algorithms/itkTensorToL2NormImageFilter.h
   
   # DicomImport
   DicomImport/mitkDicomDiffusionImageReader.cpp

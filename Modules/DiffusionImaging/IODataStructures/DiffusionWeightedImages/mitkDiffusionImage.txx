@@ -116,6 +116,8 @@ void mitk::DiffusionImage<TPixelType>
       ++itw;
     }
   }  
+
+  m_DisplayIndex = index;
 }
 
 

@@ -72,7 +72,7 @@ namespace itk
     typedef itk::TensorToL2NormImageFilter<InputImageType, itk::Image<InputScalarType,3> >
       TensorToL2NormFilterType;
 
-    TensorToL2NormFilterType::Pointer myFilter1 = TensorToL2NormFilterType::New();
+    typename TensorToL2NormFilterType::Pointer myFilter1 = TensorToL2NormFilterType::New();
     myFilter1->SetInput (this->GetInput());
 
     try
@@ -85,7 +85,7 @@ namespace itk
       return;
     }
 
-    itk::RescaleIntensityImageFilter< itk::Image<InputScalarType,3>, BaselineImageType>::Pointer rescaler=
+    typename itk::RescaleIntensityImageFilter< itk::Image<InputScalarType,3>, BaselineImageType>::Pointer rescaler=
       itk::RescaleIntensityImageFilter<itk::Image<InputScalarType,3>, BaselineImageType>::New();
 
     rescaler->SetOutputMinimum ( 0 );
@@ -103,7 +103,7 @@ namespace itk
 
     m_BaselineImage = rescaler->GetOutput();
 
-    OutputImageType::Pointer outImage = OutputImageType::New();
+    typename OutputImageType::Pointer outImage = OutputImageType::New();
     outImage->SetSpacing( this->GetInput()->GetSpacing() );   // Set the image spacing
     outImage->SetOrigin( this->GetInput()->GetOrigin() );     // Set the image origin
     outImage->SetDirection( this->GetInput()->GetDirection() );  // Set the image direction

@@ -9,7 +9,12 @@ SET(CPP_FILES
   Algorithms/itkDiffusionQballPrepareVisualizationImageFilter.h
   Algorithms/itkTensorDerivedMeasurementsFilter.h
   Algorithms/itkBrainMaskExtractionImageFilter.h
-
+  Algorithms/itkB0ImageExtractionImageFilter.h
+  Algorithms/itkTensorImageToDiffusionImageFilter.h
+  Algorithms/itkTensorToScalarTensorImageFilter.h
+  Algorithms/itkTensorToScalarFunction.h
+  Algorithms/itkTensorToL2NormFunction.h
+  
   # DicomImport
   DicomImport/mitkDicomDiffusionImageReader.cpp
   DicomImport/mitkGroupDiffusionHeadersFilter.cpp

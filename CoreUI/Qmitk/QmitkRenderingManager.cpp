@@ -29,7 +29,7 @@ PURPOSE.  See the above copyright notices for more information.
 QmitkRenderingManager
 ::QmitkRenderingManager()
 {
-  QApplication::instance()->installEventFilter( QmitkAbortEventFilter::GetInstance() );
+  
 }
 
 
@@ -37,7 +37,7 @@ void
 QmitkRenderingManager
 ::DoMonitorRendering()
 {
-  QmitkAbortEventFilter::GetInstance()->ProcessEvents();
+  
 }
 
 
@@ -45,7 +45,7 @@ void
 QmitkRenderingManager
 ::DoFinishAbortRendering()
 {
-  QmitkAbortEventFilter::GetInstance()->IssueQueuedEvents();
+  
 }
 
 

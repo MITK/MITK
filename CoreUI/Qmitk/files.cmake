@@ -1,5 +1,4 @@
 SET(CPP_FILES
-QmitkAbortEventFilter.cpp
 QmitkApplicationCursor.cpp
 QmitkDataStorageComboBox.cpp
 QmitkDataStorageListModel.cpp

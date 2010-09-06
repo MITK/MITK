@@ -15,7 +15,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#include "QmitkAbortEventFilter.h"
 #include "QmitkRenderingManager.h"
 
 

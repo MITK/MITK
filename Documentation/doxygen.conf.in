@@ -128,7 +128,14 @@ HTML_HEADER            =
 HTML_FOOTER            = 
 HTML_STYLESHEET        = 
 HTML_ALIGN_MEMBERS     = YES
-GENERATE_HTMLHELP      = NO
+GENERATE_HTMLHELP      = @BUILD_QCH_FILES_BOOL@
+CHM_FILE               = 
+HHC_LOCATION           = 
+GENERATE_QHP           = @BUILD_QCH_FILES_BOOL@
+QHP_NAMESPACE          = "org.mitk"
+QHP_VIRTUAL_FOLDER     =
+QCH_FILE               = @MITK_BINARY_DIR@
+QHG_LOCATION           = @QHELPGENERATOR_DIR@
 CHM_FILE               = 
 HHC_LOCATION           = 
 GENERATE_CHI           = NO
@@ -271,3 +278,13 @@ MAX_DOT_GRAPH_WIDTH    = 1024
 MAX_DOT_GRAPH_HEIGHT   = 1024
 GENERATE_LEGEND        = YES
 DOT_CLEANUP            = YES
+#---------------------------------------------------------------------------
+# Configuration options related qch file generation
+#---------------------------------------------------------------------------
+#GENERATE_QHP           = yes
+#QHP_NAMESPACE          = "org.mitk"
+#QHP_VIRTUAL_FOLDER 	   = "imageprocessor-0.1"
+    
+#QCH_FILE 			   = @MITK_BINARY_DIR@ \ ".qch"
+#QHG_LOCATION           = "qhelpgenerator"
+

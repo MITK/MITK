@@ -7,6 +7,7 @@ FIND_PACKAGE(Doxygen)
 IF(DOXYGEN_FOUND)
 
 OPTION(USE_DOT "Use dot program for generating graphical class diagrams with doxygen, if available" ON)
+OPTION(BUILD_MITK_QCH_FILES "Use doxygen to build Qt creator help files" OFF)
 MARK_AS_ADVANCED(USE_DOT)
 
 SET(HAVE_DOT "NO")
@@ -17,6 +18,22 @@ ENDIF()
 SET(MITK_DOXYGEN_OUTPUT_DIR ${MITK_BINARY_DIR}/Documentation/Doxygen CACHE PATH "Output directory for doxygen generated documentation." )
 SET(MITK_HELPPAGES_OUTPUT_DIR ${MITK_BINARY_DIR}/Documentation/helpPages CACHE PATH "Output directory for html help pages." )
   
+SET(BUILD_QCH_FILES_BOOL "NO")
+IF(BUILD_MITK_QCH_FILES)
+    SET(QHELPGENERATOR_DIR ${QT_DIR}/bin CACHE PATH "Help generator directory." )
+    SET(QCH_OUTPUT_DIR ${MITK_DOXYGEN_OUTPUT_DIR}/QCH CACHE PATH "Help generator directory." )
+
+    #OPTION(BUILD_MITK_QCH_FILE "Use doxygen to build a mitk.qch file" ON)
+    OPTION(BUILD_VTK_QCH_FILE "Use doxygen to build a vtk.qch file" OFF)
+    OPTION(BUILD_ITK_QCH_FILE "Use doxygen to build a itk.qch file" OFF)
+
+    #ADD_CUSTOM_TARGET(qchfiles
+    #             ${DOXYGEN}
+    #                 ${PROJECT_BINARY_DIR}/Documentation/doxygen.conf )
+
+    SET(BUILD_QCH_FILES_BOOL "YES")
+ENDIF(BUILD_MITK_QCH_FILES)
+
 
 IF(MITK_USE_BLUEBERRY)
   FILE(RELATIVE_PATH _blueberry_doxygen_path ${MITK_DOXYGEN_OUTPUT_DIR}/html ${BLUEBERRY_DOXYGEN_OUTPUT_DIR}/html)
@@ -34,6 +51,21 @@ CONFIGURE_FILE(doxygen.conf.in
                ${CMAKE_CURRENT_BINARY_DIR}/doxygen.conf)
 CONFIGURE_FILE(helpPages.conf.in
                ${CMAKE_CURRENT_BINARY_DIR}/helpPages.conf)
+
+			   
+IF(BUILD_ITK_QCH_FILE)
+	# add the command to generate the ITK documantation
+	add_custom_command(TARGET doc
+					   POST_BUILD
+					   ${DOXYGEN}  ${CMAKE_CURRENT_BINARY_DIR}/doxygen.itk.conf)
+ENDIF(BUILD_ITK_QCH_FILE)
+
+IF(BUILD_VTK_QCH_FILE)
+	# add the command to generate the VTK documantation
+	add_custom_command(TARGET doc
+					   POST_BUIL
+					   ${DOXYGEN}  ${CMAKE_CURRENT_BINARY_DIR}/doxygen.vtk.conf)
+ENDIF(BUILD_VTK_QCH_FILE)
 
 # CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/Documentation/doxygen.conf.in
 #                ${PROJECT_BINARY_DIR}/Documentation/doxygen.conf)

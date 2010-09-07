@@ -70,6 +70,8 @@ class QmitkSegmentationView : public QObject, public QmitkFunctionality
 
   protected slots:
 
+    void OnComboBoxSelectionChanged(const mitk::DataNode* node);
+
     // reaction to the button "New segmentation"
     void CreateNewSegmentation();
 

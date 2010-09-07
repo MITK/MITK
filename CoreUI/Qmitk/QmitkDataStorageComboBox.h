@@ -62,6 +62,11 @@ class QMITK_EXPORT QmitkDataStorageComboBox : public QComboBox
     ///
     ~QmitkDataStorageComboBox();
 
+    ///
+    /// \brief Seaches for a given node and returns a valid index or -1 if the node was not found.
+    ///
+    int Find( const mitk::DataNode* _DataNode ) const;
+
   //#PUBLIC GETTER  
   public:
     ///
@@ -148,11 +153,6 @@ class QMITK_EXPORT QmitkDataStorageComboBox : public QComboBox
     /// \brief Checks if the given index is within the range of the m_Nodes vector.
     ///
     bool HasIndex(unsigned int index) const;
-
-    ///
-    /// \brief Seaches for a given node and returns a valid index or -1 if the node was not found.
-    ///
-    int Find( const mitk::DataNode* _DataNode ) const;
 
   //#PROTECTED SETTER
   protected slots:

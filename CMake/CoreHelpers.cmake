@@ -137,6 +137,17 @@ ENDMACRO(MITK_MULTIPLEX_PICTYPE)
 
 INCLUDE(MacroParseArguments)
 
+
+###################################################################
+#
+# MITK_CREATE_MODULE_CONF 
+# 
+# This can be called in a similar way like MITK_CREATE_MODULE
+# but it just creates the module configuration files without
+# actually building it. It is used for integration of legacy libraries
+# into the MITK module build system
+#
+##################################################################
 MACRO(MITK_CREATE_MODULE_CONF MODULE_NAME_IN)
   MACRO_PARSE_ARGUMENTS(MODULE "INCLUDE_DIRS;DEPENDS;PROVIDES" "QT_MODULE" ${ARGN})
   SET(MODULE_NAME ${MODULE_NAME_IN})

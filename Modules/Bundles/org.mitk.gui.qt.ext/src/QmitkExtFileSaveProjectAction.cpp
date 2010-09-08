@@ -92,7 +92,7 @@ void QmitkExtFileSaveProjectAction::Run()
     mitk::ProgressBar::GetInstance()->Progress(2);
 
     mitk::SceneIO::FailedBaseDataListType::ConstPointer failedNodes = sceneIO->GetFailedNodes();
-    if (failedNodes.IsNotNull())
+    if (!failedNodes->empty())
     {
       std::stringstream ss;
       ss << "The following nodes could not be serialized:" << std::endl;
@@ -117,7 +117,7 @@ void QmitkExtFileSaveProjectAction::Run()
     }
 
     mitk::PropertyList::ConstPointer failedProperties = sceneIO->GetFailedProperties();
-    if (failedProperties.IsNotNull())
+    if (!failedProperties->GetMap()->empty())
     {
       std::stringstream ss;
       ss << "The following properties could not be serialized:" << std::endl;

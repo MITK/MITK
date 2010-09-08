@@ -550,6 +550,10 @@ void QmitkDataManagerView::ReinitSelectedNodes( bool )
 void QmitkDataManagerView::RemoveSelectedNodes( bool )
 {
   QModelIndexList indexesOfSelectedRows = m_NodeTreeView->selectionModel()->selectedRows();
+  if(indexesOfSelectedRows.size() < 1)
+  {
+    return;
+  }
   std::vector<mitk::DataNode*> selectedNodes;
 
   mitk::DataNode* node = 0;
@@ -584,7 +588,6 @@ void QmitkDataManagerView::RemoveSelectedNodes( bool )
       node = *it;
       this->GetDataStorage()->Remove(node);
       this->GlobalReinit(false);
-
     }
   }
 }

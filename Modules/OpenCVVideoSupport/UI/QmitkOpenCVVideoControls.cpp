@@ -44,13 +44,13 @@ QmitkOpenCVVideoControls::~QmitkOpenCVVideoControls()
     this->Stop(); // emulate stop
 }
 
-void QmitkOpenCVVideoControls::on_UseGrabbingDeviceButton_clicked( bool checked/*=false*/ )
+void QmitkOpenCVVideoControls::on_UseGrabbingDeviceButton_clicked( bool /*checked=false*/ )
 {
   m_Controls->GrabbingDevicePanel->setEnabled(true);
   m_Controls->VideoFilePanel->setEnabled(false);
 }
 
-void QmitkOpenCVVideoControls::on_UseVideoFileButton_clicked( bool checked/*=false*/ )
+void QmitkOpenCVVideoControls::on_UseVideoFileButton_clicked( bool /*checked=false*/ )
 {
   m_Controls->GrabbingDevicePanel->setEnabled(false);
   m_Controls->VideoFilePanel->setEnabled(true);
@@ -165,7 +165,7 @@ void QmitkOpenCVVideoControls::on_PlayButton_clicked( bool checked/*=false*/ )
   }
 }
 
-void QmitkOpenCVVideoControls::on_StopButton_clicked( bool checked/*=false*/ )
+void QmitkOpenCVVideoControls::on_StopButton_clicked( bool /*checked=false*/ )
 {
   this->Stop();
 }
@@ -222,7 +222,7 @@ void QmitkOpenCVVideoControls::SwitchPlayButton(bool paused)
   }
 }
 
-void QmitkOpenCVVideoControls::NewFrameAvailable( mitk::VideoSource* videoSource )
+void QmitkOpenCVVideoControls::NewFrameAvailable( mitk::VideoSource* /*videoSource*/ )
 {
   emit NewOpenCVFrameAvailable( m_VideoSource->GetCurrentFrame() );
   if(!m_SliderCurrentlyMoved)

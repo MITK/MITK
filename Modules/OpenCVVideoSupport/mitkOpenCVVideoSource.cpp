@@ -37,7 +37,7 @@ mitk::OpenCVVideoSource::~OpenCVVideoSource()
   this->Reset();
 }
 
-void mitk::OpenCVVideoSource::SetVideoFileInput(const char * filename, bool repeatVideo, bool useCVCAMLib)
+void mitk::OpenCVVideoSource::SetVideoFileInput(const char * filename, bool repeatVideo, bool /*useCVCAMLib*/)
 {
   this->Reset();
   m_VideoFileName = filename;
@@ -51,7 +51,7 @@ void mitk::OpenCVVideoSource::SetVideoFileInput(const char * filename, bool repe
   this->Modified();
 
 }
-void mitk::OpenCVVideoSource::SetVideoCameraInput(int cameraindex, bool useCVCAMLib)
+void mitk::OpenCVVideoSource::SetVideoCameraInput(int cameraindex, bool /*useCVCAMLib*/)
 {
   this->Reset();
 

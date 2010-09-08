@@ -46,7 +46,7 @@ void mitk::OpenCVToMitkImageFilter::GenerateData()
     cvCvtColor( m_OpenCVImage, rgbOpenCVImage,  CV_BGR2RGB );
 
   // now convert rgb image
-  if( m_OpenCVImage->depth == IPL_DEPTH_8S && m_OpenCVImage->nChannels == 1 )
+  if( (m_OpenCVImage->depth>=0) && ((unsigned int)m_OpenCVImage->depth == IPL_DEPTH_8S) && (m_OpenCVImage->nChannels == 1) )
     m_Image = ConvertIplToMitkImage< char, 2>( m_OpenCVImage );
 
   else if( m_OpenCVImage->depth == IPL_DEPTH_8U && m_OpenCVImage->nChannels == 1 )
@@ -79,7 +79,7 @@ mitk::ImageSource::DataObjectPointer mitk::OpenCVToMitkImageFilter::MakeOutput( 
   return Superclass::MakeOutput(idx);
 }
 
-mitk::ImageSource::OutputImageType* mitk::OpenCVToMitkImageFilter::GetOutput( unsigned int idx )
+mitk::ImageSource::OutputImageType* mitk::OpenCVToMitkImageFilter::GetOutput( unsigned int /*idx*/ )
 {
   return m_Image;
 }

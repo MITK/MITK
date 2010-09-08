@@ -27,7 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 /**Documentation
  *  test for the class "ImageToOpenCVImageFilter".
  */
-int mitkImageToOpenCVImageFilterTest(int argc, char* argv[])
+int mitkImageToOpenCVImageFilterTest(int /*argc*/, char* /*argv*/[])
 {
   MITK_TEST_BEGIN("ImageToOpenCVImageFilter")
 
@@ -95,9 +95,9 @@ int mitkImageToOpenCVImageFilterTest(int argc, char* argv[])
   // check pixel values
   PixelType expectedBlueValue;
   CvScalar s;
-  for (y = 0; y < openCVImage->height; ++y)
+  for (y = 0; (int)y < openCVImage->height; ++y)
   {
-    for (x = 0; x < openCVImage->width; ++x)
+    for (x = 0; (int)x < openCVImage->width; ++x)
     {
       expectedBlueValue = 255;
       if(x > twoThirdsTheWidth)

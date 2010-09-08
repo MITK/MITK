@@ -40,7 +40,7 @@ PURPOSE.  See the above copyright notices for more information.
 const std::string QmitkDiffusionDicomImport::VIEW_ID = "org.mitk.views.diffusiondicomimport";
 
 
-QmitkDiffusionDicomImport::QmitkDiffusionDicomImport(QObject *parent, const char *name)
+QmitkDiffusionDicomImport::QmitkDiffusionDicomImport(QObject */*parent*/, const char */*name*/)
 : QmitkFunctionality(), m_Controls(NULL), m_MultiWidget(NULL)
 {
 }

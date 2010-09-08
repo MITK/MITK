@@ -69,7 +69,7 @@ namespace mitk
     void SetDirections(const std::vector<itk::Vector<double,3> > directions)
     {
       m_Directions = GradientDirectionContainerType::New();
-      for(int i=0; i<directions.size(); i++)
+      for(unsigned int i=0; i<directions.size(); i++)
       {
         m_Directions->InsertElement( i, directions[i].Get_vnl_vector() );
       }

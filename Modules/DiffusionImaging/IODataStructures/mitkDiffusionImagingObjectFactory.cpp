@@ -41,7 +41,7 @@ typedef short DiffusionPixelType;
 typedef mitk::DiffusionImage<DiffusionPixelType> DiffusionImageShort;
 typedef std::multimap<std::string, std::string> MultimapType;
 
-mitk::DiffusionImagingObjectFactory::DiffusionImagingObjectFactory(bool registerSelf) 
+mitk::DiffusionImagingObjectFactory::DiffusionImagingObjectFactory(bool /*registerSelf*/)
 :CoreObjectFactoryBase()
 {
 

@@ -392,7 +392,7 @@ void QmitkSliderLevelWindowWidget::mouseMoveEvent( QMouseEvent* mouseEvent )
     }
   }
 }
-void QmitkSliderLevelWindowWidget::enterEvent ( QEvent * event  ) 
+void QmitkSliderLevelWindowWidget::enterEvent ( QEvent * /*event*/  )
 {
   /*
   if(event->type() != QEvent::MouseMove)

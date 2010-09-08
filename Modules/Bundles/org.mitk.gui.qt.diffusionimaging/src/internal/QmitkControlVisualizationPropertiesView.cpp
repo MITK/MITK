@@ -350,7 +350,7 @@ int QmitkControlVisualizationPropertiesView::GetSizeFlags(bool width)
   }
 }
 
-int QmitkControlVisualizationPropertiesView::ComputePreferredSize(bool width, int availableParallel, int availablePerpendicular, int preferredResult)
+int QmitkControlVisualizationPropertiesView::ComputePreferredSize(bool width, int /*availableParallel*/, int /*availablePerpendicular*/, int preferredResult)
 {
   if(width==false)
   {

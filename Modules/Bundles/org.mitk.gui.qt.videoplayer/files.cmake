@@ -7,7 +7,6 @@ SET(INTERNAL_CPP_FILES
 )
 
 SET(MOC_H_FILES
-  src/internal/QmitkVideoPlayer.h
 )
 
 SET(RESOURCE_FILES

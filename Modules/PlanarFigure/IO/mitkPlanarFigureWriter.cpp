@@ -125,7 +125,7 @@ void mitk::PlanarFigureWriter::GenerateData()
     // Serialize control points of PlanarFigure
     TiXmlElement* controlPointsElement = new TiXmlElement("ControlPoints");
     pfElement->LinkEndChild(controlPointsElement);
-    for (int i = 0; i < pf->GetNumberOfControlPoints(); i++)
+    for (unsigned int i = 0; i < pf->GetNumberOfControlPoints(); i++)
     {
       TiXmlElement* vElement = new TiXmlElement("Vertex");
       vElement->SetAttribute("id", i);

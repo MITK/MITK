@@ -1,5 +1,7 @@
 INCLUDE(VTK_ITK.cmake)
 SUPPRESS_VC8_DEPRECATED_WARNINGS()
+SUPPRESS_ALL_WARNINGS()
+
 # INCLUDE_DIRECTORIES(${${KITNAME}_INCLUDE_DIRS})
 
 # most stuff of these uses itk_zlib.h (via mitkIpPic.h)

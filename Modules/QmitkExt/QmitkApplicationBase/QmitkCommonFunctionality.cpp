@@ -453,7 +453,9 @@ std::string CommonFunctionality::SaveImage(mitk::Image* image, const char* aFile
 
     // prepend the last directory
     initialFilename = lastDirectory + initialFilename;
-    QString qfileName = QFileDialog::getSaveFileName( NULL, "Save image", initialFilename ,mitk::CoreObjectFactory::GetInstance()->GetSaveFileExtensions());
+
+    QString suffix_pic("DKFZ Pic (*.pic)");
+    QString qfileName = QFileDialog::getSaveFileName( NULL, "Save image", initialFilename ,mitk::CoreObjectFactory::GetInstance()->GetSaveFileExtensions(),&suffix_pic);
     MITK_INFO<<qfileName.toLocal8Bit().constData();
     if (qfileName.isEmpty() )
       return "";

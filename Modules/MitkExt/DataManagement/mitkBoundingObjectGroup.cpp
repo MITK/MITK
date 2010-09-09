@@ -24,8 +24,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 mitk::BoundingObjectGroup::BoundingObjectGroup()
 :  m_Counter(0),
-m_CSGMode(Union),// m_CSGMode(Difference) //m_CSGMode(Intersection)
-m_BoundingObjects(0)
+m_BoundingObjects(0),
+m_CSGMode(Union)// m_CSGMode(Difference) //m_CSGMode(Intersection)
 {
   GetTimeSlicedGeometry()->Initialize(1);
   GetGeometry(0)->SetIndexToWorldTransform(GetTimeSlicedGeometry()->GetIndexToWorldTransform());
@@ -67,7 +67,7 @@ void mitk::BoundingObjectGroup::UpdateOutputInformation()
   // calculate a bounding box that includes all BoundingObjects
   // \todo probably we should do this additionally for each time-step
   //while (boundingObjectsIterator != boundingObjectsIteratorEnd)
-  for(int j = 0; j<m_BoundingObjects.size();j++)
+  for(unsigned int j = 0; j<m_BoundingObjects.size();j++)
   {
     const Geometry3D* geometry = m_BoundingObjects.at(j)->GetUpdatedTimeSlicedGeometry();
     unsigned char i;
@@ -120,7 +120,7 @@ void mitk::BoundingObjectGroup::AddBoundingObject(mitk::BoundingObject::Pointer 
 void mitk::BoundingObjectGroup::RemoveBoundingObject(mitk::BoundingObject::Pointer boundingObject)
 {
   std::deque<mitk::BoundingObject::Pointer>::iterator it = m_BoundingObjects.begin();
-  for (int i=0 ; i<m_BoundingObjects.size();i++)
+  for (unsigned int i=0 ; i<m_BoundingObjects.size();i++)
   {
     if (m_BoundingObjects.at(i) == boundingObject)
       m_BoundingObjects.erase(it);
@@ -136,7 +136,7 @@ bool mitk::BoundingObjectGroup::IsInside(const mitk::Point3D& p) const
   bool posInside;
   bool negInside;
 
-  for (int i = 0; i<m_BoundingObjects.size();i++)
+  for (unsigned int i = 0; i<m_BoundingObjects.size();i++)
   {
     switch(m_CSGMode)
     {

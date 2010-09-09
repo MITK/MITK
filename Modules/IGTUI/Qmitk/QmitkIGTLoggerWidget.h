@@ -44,20 +44,20 @@ class MitkIGTUI_EXPORT QmitkIGTLoggerWidget : public QWidget
   public:
     static const std::string VIEW_ID;
 
-    QmitkIGTLoggerWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
+    QmitkIGTLoggerWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);    
     ~QmitkIGTLoggerWidget();
 
     void SetDataStorage(mitk::DataStorage* dataStorage);
     void SetRecorder(mitk::NavigationDataRecorder::Pointer recorder);
 
-
   protected slots:    
-    void OnLoadDir();
+    void OnChangePressed();
     void OnStartRecording();    
-    void OnRecording();
-    void UpdateFilename();
+    void OnRecording();    
     void UpdateRecordingTime();
     void StopRecording();
+    void UpdateOutputFileName();
+
 
 
   protected:
@@ -67,6 +67,8 @@ class MitkIGTUI_EXPORT QmitkIGTLoggerWidget : public QWidget
 
     virtual void CreateQtPartControl(QWidget *parent);
     void SetDefaultRecordingSettings();
+    void SetOutputFileName();
+
     Ui::QmitkIGTLoggerWidgetControls* m_Controls;
 
     /** @brief holds the DataStorage */

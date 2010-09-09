@@ -37,19 +37,16 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 QmitkIGTLoggerWidget::QmitkIGTLoggerWidget(QWidget* parent, Qt::WindowFlags f)
-  : QWidget(parent, f), m_Recorder(NULL), m_RecordingActivated(false)
+: QWidget(parent, f), m_Recorder(NULL), m_RecordingActivated(false)
 {
   m_Controls = NULL;
   CreateQtPartControl(this);
   CreateConnections();
 
-  //update filename label
-  std::string tmpDir = itksys::SystemTools::GetCurrentWorkingDirectory();
-  m_Dir.append(QString(tmpDir.c_str()));
-  m_Dir.append("/");
-  this->UpdateFilename();
+  //set output file 
+  this->SetOutputFileName();
 
-  //update milli seconds and samples
+  //update milliseconds and samples
   this->SetDefaultRecordingSettings();
 }
 
@@ -62,27 +59,28 @@ QmitkIGTLoggerWidget::~QmitkIGTLoggerWidget()
 }
 
 void QmitkIGTLoggerWidget::CreateQtPartControl(QWidget *parent)
+{
+  if (!m_Controls)
   {
-    if (!m_Controls)
-    {
     // create GUI widgets
     m_Controls = new Ui::QmitkIGTLoggerWidgetControls;                         
     m_Controls->setupUi(parent);
-   
+
     m_RecordingTimer = new QTimer(this);
-    }
   }
+}
 
 void QmitkIGTLoggerWidget::CreateConnections()
 {
   if ( m_Controls )
   {     
-    connect( (QObject*)(m_Controls->m_pbLoadDir), SIGNAL(clicked()), this, SLOT(OnLoadDir()) );
+    connect( (QObject*)(m_Controls->m_pbLoadDir), SIGNAL(clicked()), this, SLOT(OnChangePressed()) );
     connect( (QObject*)(m_Controls->m_pbStartRecording), SIGNAL(clicked()), this, SLOT(OnStartRecording()) );
-    connect( m_RecordingTimer, SIGNAL(timeout()), this, SLOT(OnRecording()) );
-    connect( (QObject*)(m_Controls->m_leFileName), SIGNAL(editingFinished()), this, SLOT(UpdateFilename()) );
+    connect( m_RecordingTimer, SIGNAL(timeout()), this, SLOT(OnRecording()) );    
     connect( (QObject*)(m_Controls->m_leRecordingValue), SIGNAL(editingFinished()), this, SLOT(UpdateRecordingTime()) );
     connect( (QObject*)(m_Controls->m_cbRecordingType), SIGNAL(activated(int)), this, SLOT(UpdateRecordingTime()) );
+    connect( (QObject*)(m_Controls->m_leOutputFile), SIGNAL(editingFinished()), this, SLOT(UpdateOutputFileName()) );
+    
   }
 }
 
@@ -93,7 +91,7 @@ void QmitkIGTLoggerWidget::SetDataStorage(mitk::DataStorage* dataStorage)
 
 void QmitkIGTLoggerWidget::OnStartRecording()
 {
-  
+
   if (m_Recorder.IsNull())
   {
     QMessageBox::warning(NULL, "Warning", QString("Please start tracking before recording!"));
@@ -105,7 +103,7 @@ void QmitkIGTLoggerWidget::OnStartRecording()
     return;
   }
 
-   if (!m_RecordingActivated)
+  if (!m_RecordingActivated)
   {   
     m_Recorder->SetFileName(m_CmpFilename.toStdString());  
 
@@ -139,7 +137,7 @@ void QmitkIGTLoggerWidget::OnStartRecording()
   {  
     this->StopRecording();   
   }
- 
+
 }
 
 void QmitkIGTLoggerWidget::StopRecording()
@@ -164,32 +162,36 @@ void QmitkIGTLoggerWidget::OnRecording()
     return;
   }
   m_Recorder->Update();
-  
+
   if (m_Controls->m_cbRecordingType->currentIndex()==1)
     sampleCounter++;
 }
 
-void QmitkIGTLoggerWidget::OnLoadDir()
+void QmitkIGTLoggerWidget::OnChangePressed()
 {
-  m_Dir.clear();
+  QString oldName = m_CmpFilename;
   m_CmpFilename.clear();
-
-  std::string tmpDir = itksys::SystemTools::GetCurrentWorkingDirectory();
-  m_Dir = QFileDialog::getExistingDirectory(this, tr("Open Directory"),
-    QString(tmpDir.c_str()),
-    QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
-  if (m_Controls->m_leFileName->text().isEmpty())
+  m_CmpFilename = QFileDialog::getSaveFileName( QApplication::activeWindow()
+    , "Save tracking data", "IGT_Tracking_Data.xml", "XML files (*.xml)" );
+  
+  if (m_CmpFilename.isEmpty())//if something went wrong or user pressed cancel in the save dialog
   {
-    QMessageBox::warning(NULL, "Warning", QString("Please specify filename without extension!"));
-    return;
+    m_CmpFilename=oldName;
   }
-  
-  m_Dir.append("/");
-  QString filename (m_Controls->m_leFileName->text());
-  
-  m_CmpFilename.append(m_Dir);
-  m_CmpFilename.append(filename);    
-  m_Controls->m_tlFullFileName->setText(m_CmpFilename+".xml");
+  m_Controls->m_leOutputFile->setText(m_CmpFilename);
+}
+
+void QmitkIGTLoggerWidget::UpdateOutputFileName()
+{
+  QString oldName = m_CmpFilename;
+  m_CmpFilename.clear();
+  m_CmpFilename = m_Controls->m_leOutputFile->text();
+  if (m_CmpFilename.isEmpty())
+  {
+    QMessageBox::warning(NULL, "Warning", QString("Please enter valid path! Using previous path again."));
+     m_CmpFilename=oldName;
+     m_Controls->m_leOutputFile->setText(m_CmpFilename);
+  }
 }
 
 void QmitkIGTLoggerWidget::SetRecorder( mitk::NavigationDataRecorder::Pointer recorder )
@@ -197,34 +199,36 @@ void QmitkIGTLoggerWidget::SetRecorder( mitk::NavigationDataRecorder::Pointer re
   m_Recorder = recorder;
 }
 
-void QmitkIGTLoggerWidget::UpdateFilename()
-{
-  m_CmpFilename.clear();
-  m_CmpFilename.append(m_Dir);
-  m_CmpFilename.append(m_Controls->m_leFileName->text());
- 
-  m_Controls->m_tlFullFileName->setText(m_CmpFilename+".xml");
-}
 
 void QmitkIGTLoggerWidget::UpdateRecordingTime()
 {
   // milliseconds selected in the combobox
   if (m_Controls->m_cbRecordingType->currentIndex()==0)
   {
-     m_MilliSeconds = m_Controls->m_leRecordingValue->text();
-     
-     bool success = false;
-     m_MilliSeconds.toInt(&success);
-     if (!success)
-     {
-       QMessageBox::warning(NULL, "Warning", QString("Please enter a number!"));
-       this->SetDefaultRecordingSettings();
-       return;
-     }
+    m_MilliSeconds = m_Controls->m_leRecordingValue->text();
+    
+    if(m_MilliSeconds.compare("infinite")==0)
+    {
+      this->SetDefaultRecordingSettings();
+    }
+
+    bool success = false;
+    m_MilliSeconds.toInt(&success);
+    if (!success)
+    {
+      QMessageBox::warning(NULL, "Warning", QString("Please enter a number!"));
+      this->SetDefaultRecordingSettings();
+      return;
+    }
   }
   else if(m_Controls->m_cbRecordingType->currentIndex()==1) // #samples selected in the combobox
   {
     m_Samples = m_Controls->m_leRecordingValue->text();
+
+    if(m_Samples.compare("infinite")==0)
+    {
+      this->SetDefaultRecordingSettings();
+    }
 
     bool success = false;
     m_Samples.toInt(&success);
@@ -235,7 +239,13 @@ void QmitkIGTLoggerWidget::UpdateRecordingTime()
       return;
     }
   }
- // m_Controls->m_leSamples->setText(QString::number(samples));
+  else if (m_Controls->m_cbRecordingType->currentIndex()==2)// infinite selected in the combobox
+  {
+   // U+221E unicode symbole for infinite
+   QString infinite("infinite");
+   m_Controls->m_leRecordingValue->setText(infinite);
+  }
+  // m_Controls->m_leSamples->setText(QString::number(samples));
 }
 
 
@@ -247,3 +257,26 @@ void QmitkIGTLoggerWidget::SetDefaultRecordingSettings()
   m_MilliSeconds="2000";
 }
 
+void QmitkIGTLoggerWidget::SetOutputFileName()
+{
+  std::string tmpDir = itksys::SystemTools::GetCurrentWorkingDirectory();
+  QString dir = QString(tmpDir.c_str());
+  QString filename = "IGT_Tracking_Data.xml";
+  m_CmpFilename.append(dir); 
+
+  if(dir.isEmpty())
+  {
+    QMessageBox::warning(NULL, "Warning", QString("Could not load current working directory"));
+    return;
+  }
+  if(dir.endsWith("/")||dir.endsWith("\\"))
+  {
+    m_CmpFilename.append(filename);
+  }
+  else
+  {
+    m_CmpFilename.append("/"); 
+    m_CmpFilename.append(filename); 
+  }
+  m_Controls->m_leOutputFile->setText(m_CmpFilename);
+}

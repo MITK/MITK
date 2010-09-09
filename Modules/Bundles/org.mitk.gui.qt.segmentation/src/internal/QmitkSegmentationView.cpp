@@ -562,34 +562,39 @@ void QmitkSegmentationView::SetToolManagerSelection(const mitk::DataNode* refere
   else
   {
     m_Controls->lblReferenceImageSelectionWarning->show();
+    m_Controls->lblWorkingImageSelectionWarning->hide();
+    m_Controls->lblSegImage->hide();
+    m_Controls->lblSegmentation->hide();
   }
 
   // check, wheter reference image is aligned like render windows. Otherwise display a visible warning (because 2D tools will probably not work)
   CheckImageAlignment();
 
   // check segmentation
-  if (referenceData && !workingData)
-  {
-    m_Controls->lblWorkingImageSelectionWarning->show();
-
-    if( m_Controls->widgetStack->currentIndex() == 0 )
+  if (referenceData)
+  { 
+    if (!workingData)
     {
-      m_Controls->lblSegImage->hide();
-      m_Controls->lblSegmentation->hide();
+      m_Controls->lblWorkingImageSelectionWarning->show();
+
+      if( m_Controls->widgetStack->currentIndex() == 0 )
+      {
+        m_Controls->lblSegImage->hide();
+        m_Controls->lblSegmentation->hide();
+      }
+    }
+    else
+    {
+      m_Controls->lblWorkingImageSelectionWarning->hide();
+
+      if( m_Controls->widgetStack->currentIndex() == 0 )
+      {
+        m_Controls->lblSegmentation->setText( workingData->GetName().c_str() );
+        m_Controls->lblSegmentation->show();
+        m_Controls->lblSegImage->show();
+      }
     }
   }
-  else
-  {
-    m_Controls->lblWorkingImageSelectionWarning->hide();
-
-    if( m_Controls->widgetStack->currentIndex() == 0 )
-    {
-      m_Controls->lblSegmentation->setText( workingData->GetName().c_str() );
-      m_Controls->lblSegmentation->show();
-      m_Controls->lblSegImage->show();
-    }
-  }
-
 }
 
 void QmitkSegmentationView::CheckImageAlignment()

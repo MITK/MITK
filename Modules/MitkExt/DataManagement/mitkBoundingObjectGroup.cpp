@@ -23,11 +23,12 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 mitk::BoundingObjectGroup::BoundingObjectGroup()
-:  m_Counter(0), m_CSGMode(Difference) // m_CSGMode(Union) //m_CSGMode(Intersection)
+:  m_Counter(0),
+m_CSGMode(Union),// m_CSGMode(Difference) //m_CSGMode(Intersection)
+m_BoundingObjects(0)
 {
   GetTimeSlicedGeometry()->Initialize(1);
   GetGeometry(0)->SetIndexToWorldTransform(GetTimeSlicedGeometry()->GetIndexToWorldTransform());
-  m_BoundingObjects = mitk::BoundingObjectGroup::BoundingObjectContainer::New();
   SetVtkPolyData(NULL);
 }
 
@@ -43,10 +44,7 @@ void mitk::BoundingObjectGroup::UpdateOutputInformation()
   }
 
   // calculate global bounding box
-  mitk::BoundingObjectGroup::BoundingObjectContainer::ConstIterator boundingObjectsIterator = m_BoundingObjects->Begin();
-  const mitk::BoundingObjectGroup::BoundingObjectContainer::ConstIterator boundingObjectsIteratorEnd = m_BoundingObjects->End();
-
-  if(boundingObjectsIterator == boundingObjectsIteratorEnd) // if there is no BoundingObject, the bounding box is zero
+  if(m_BoundingObjects.size()  < 1 ) // if there is no BoundingObject, the bounding box is zero
   {
     mitk::BoundingBox::BoundsArrayType boundsArray;
     boundsArray.Fill(0);
@@ -68,9 +66,10 @@ void mitk::BoundingObjectGroup::UpdateOutputInformation()
 
   // calculate a bounding box that includes all BoundingObjects
   // \todo probably we should do this additionally for each time-step
-  while (boundingObjectsIterator != boundingObjectsIteratorEnd)
+  //while (boundingObjectsIterator != boundingObjectsIteratorEnd)
+  for(int j = 0; j<m_BoundingObjects.size();j++)
   {
-    const Geometry3D* geometry = boundingObjectsIterator.Value()->GetUpdatedTimeSlicedGeometry();
+    const Geometry3D* geometry = m_BoundingObjects.at(j)->GetUpdatedTimeSlicedGeometry();
     unsigned char i;
     for(i=0; i<8; ++i)
     {
@@ -79,10 +78,9 @@ void mitk::BoundingObjectGroup::UpdateOutputInformation()
         pointscontainer->InsertElement( pointid++, point);
       else
       {
-        itkGenericOutputMacro( << "Unrealistically distant corner point encountered. Ignored. BoundingObject: " << boundingObjectsIterator.Value() );
+        itkGenericOutputMacro( << "Unrealistically distant corner point encountered. Ignored. BoundingObject: " << m_BoundingObjects.at(j) );
       }
     }
-    ++boundingObjectsIterator;
   }
 
   mitk::BoundingBox::Pointer boundingBox = mitk::BoundingBox::New();
@@ -111,62 +109,67 @@ void mitk::BoundingObjectGroup::UpdateOutputInformation()
 
 void mitk::BoundingObjectGroup::AddBoundingObject(mitk::BoundingObject::Pointer boundingObject)
 {
-  m_BoundingObjects->InsertElement( m_Counter++, boundingObject);
+  if (boundingObject->GetPositive())
+    m_BoundingObjects.push_front(boundingObject);
+  else
+    m_BoundingObjects.push_back(boundingObject);
+  ++m_Counter;
+  UpdateOutputInformation();
+}
+
+void mitk::BoundingObjectGroup::RemoveBoundingObject(mitk::BoundingObject::Pointer boundingObject)
+{
+  std::deque<mitk::BoundingObject::Pointer>::iterator it = m_BoundingObjects.begin();
+  for (int i=0 ; i<m_BoundingObjects.size();i++)
+  {
+    if (m_BoundingObjects.at(i) == boundingObject)
+      m_BoundingObjects.erase(it);
+    ++it;
+  }
+  --m_Counter;
   UpdateOutputInformation();
 }
 
 bool mitk::BoundingObjectGroup::IsInside(const mitk::Point3D& p) const
-{
-  mitk::BoundingObjectGroup::BoundingObjectContainer::ConstIterator boundingObjectsIterator = m_BoundingObjects->Begin();
-  const mitk::BoundingObjectGroup::BoundingObjectContainer::ConstIterator boundingObjectsIteratorEnd = m_BoundingObjects->End();
-  
+{  
   bool inside; // initialize with true for intersection, with false for union
-  
-  switch(m_CSGMode)
+  bool posInside;
+  bool negInside;
+
+  for (int i = 0; i<m_BoundingObjects.size();i++)
   {
+    switch(m_CSGMode)
+    {
     case Intersection:
-    {
       inside = true;
-      while (boundingObjectsIterator != boundingObjectsIteratorEnd) // check each BoundingObject
-      {       // calculate intersection: each point, that is inside each BoundingObject is considered inside the group
-        inside = boundingObjectsIterator.Value()->IsInside(p) && inside;
-        if (!inside) // shortcut, it is enough to find one object that does not contain the point
-          break;
-        boundingObjectsIterator++;
-      }
+      // calculate intersection: each point, that is inside each BoundingObject is considered inside the group
+      inside = m_BoundingObjects.at(i)->IsInside(p) && inside;
+      if (!inside) // shortcut, it is enough to find one object that does not contain the point
+        i=m_BoundingObjects.size();
       break;
-    }
+
+    case Union:
     case Difference:
-    {
-      bool posInside = false;
-      bool negInside = false;
-      while (boundingObjectsIterator != boundingObjectsIteratorEnd) // check each BoundingObject
-      {
-        // calculate union: each point, that is inside least one BoundingObject is considered inside the group        
-        if (boundingObjectsIterator.Value()->GetPositive())
-          posInside = boundingObjectsIterator.Value()->IsInside(p) || posInside;
-        else
-          negInside = boundingObjectsIterator.Value()->IsInside(p) || negInside;
-        
-        boundingObjectsIterator++;
-      }
+      posInside = false;
+      negInside = false;
+      // calculate union: each point, that is inside least one BoundingObject is considered inside the group        
+      if (m_BoundingObjects.at(i)->GetPositive())
+        posInside = m_BoundingObjects.at(i)->IsInside(p) || posInside;
+      else
+        negInside = m_BoundingObjects.at(i)->IsInside(p) || negInside;
+
       if (posInside && !negInside)
         inside = true;
       else
         inside = false;
       break;
-    }
-    case Union:
+
     default:
-    {
       inside = false;
-      while (boundingObjectsIterator != boundingObjectsIteratorEnd) // check each BoundingObject
-      {       // calculate union: each point, that is inside least one BoundingObject is considered inside the group
-        inside = boundingObjectsIterator.Value()->IsInside(p) || inside;  
-        if (inside) // shortcut, it is enough to find one object that contains the point
-          break;
-        boundingObjectsIterator++;
-      }
+      // calculate union: each point, that is inside least one BoundingObject is considered inside the group
+      inside = m_BoundingObjects.at(i)->IsInside(p) || inside;  
+      if (inside) // shortcut, it is enough to find one object that contains the point
+        i=m_BoundingObjects.size();
       break;
     }
   }
@@ -186,7 +189,7 @@ bool mitk::BoundingObjectGroup::VerifyRequestedRegion()
 mitk::Geometry3D *  mitk::BoundingObjectGroup::GetGeometry (int t) const
 {
   //if ( m_BoundingObjects == NULL )
-    return Superclass::GetGeometry(t);
+  return Superclass::GetGeometry(t);
 
   //mitk::BoundingObjectGroup::BoundingObjectContainer::ConstIterator boI = m_BoundingObjects->Begin();
   //const mitk::BoundingObjectGroup::BoundingObjectContainer::ConstIterator boIEnd = m_BoundingObjects->End();
@@ -199,4 +202,14 @@ mitk::Geometry3D *  mitk::BoundingObjectGroup::GetGeometry (int t) const
   //}
 
   //return currentGeometry;
+}
+
+void mitk::BoundingObjectGroup::SetBoundingObjects(const std::deque<mitk::BoundingObject::Pointer> boundingObjects)
+{
+  m_BoundingObjects = boundingObjects;
+}
+
+std::deque<mitk::BoundingObject::Pointer> mitk::BoundingObjectGroup::GetBoundingObjects()
+{
+  return m_BoundingObjects;
 }

@@ -98,6 +98,7 @@ class MitkExt_EXPORT ToolManager : public itk::Object
     Message<> ActiveToolChanged;
     Message<> ReferenceDataChanged;
     Message<> WorkingDataChanged;
+    Message<> RoiDataChanged;
 
     Message1<std::string> ToolErrorMessage;
     Message1<std::string> GeneralToolMessage;
@@ -172,6 +173,16 @@ class MitkExt_EXPORT ToolManager : public itk::Object
     void SetWorkingData(DataNode*);
 
     /*
+      \brief Set a list of data/images as roi objects.
+    */
+    void SetRoiData(DataVectorType);
+    
+    /*
+      \brief Set a single data item/image as roi object.
+    */
+    void SetRoiData(DataNode*);
+
+    /*
       \brief Get the list of reference data.
     */
     DataVectorType GetReferenceData();
@@ -192,6 +203,16 @@ class MitkExt_EXPORT ToolManager : public itk::Object
       \warning If there is a list of items, this method will only return the first list item.
     */
     DataNode* GetWorkingData(int);
+
+    /*
+     \brief Get the current roi data
+     */
+    DataVectorType GetRoiData();
+
+    /*
+     \brief Get the roi data at position idx
+     */
+    DataNode* GetRoiData(int idx);
 
     DataStorage* GetDataStorage();
     void SetDataStorage(DataStorage& storage);
@@ -217,6 +238,9 @@ class MitkExt_EXPORT ToolManager : public itk::Object
 
     void OnOneOfTheWorkingDataDeletedConst(const itk::Object* caller, const itk::EventObject& e);
     void OnOneOfTheWorkingDataDeleted           (itk::Object* caller, const itk::EventObject& e);
+
+    void OnOneOfTheRoiDataDeletedConst(const itk::Object* caller, const itk::EventObject& e);
+    void OnOneOfTheRoiDataDeleted           (itk::Object* caller, const itk::EventObject& e);
 
     /*
      \brief Connected to tool's messages
@@ -246,6 +270,9 @@ class MitkExt_EXPORT ToolManager : public itk::Object
 
     DataVectorType m_WorkingData;
     NodeTagMapType  m_WorkingDataObserverTags;
+
+    DataVectorType m_RoiData;
+    NodeTagMapType m_RoiDataObserverTags;
 
     int m_RegisteredClients;
 

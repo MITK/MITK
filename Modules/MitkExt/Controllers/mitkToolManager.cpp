@@ -37,8 +37,8 @@ mitk::ToolManager::ToolManager(DataStorage* storage)
 
   // remember these tools
   for ( std::list<itk::LightObject::Pointer>::iterator iter = thingsThatClaimToBeATool.begin();
-        iter != thingsThatClaimToBeATool.end();
-        ++iter )
+    iter != thingsThatClaimToBeATool.end();
+    ++iter )
   {
     if ( Tool* tool = dynamic_cast<Tool*>( iter->GetPointer() ) )
     {
@@ -86,8 +86,8 @@ const mitk::ToolManager::ToolVectorTypeConst mitk::ToolManager::GetTools()
   ToolVectorTypeConst resultList;
 
   for ( ToolVectorType::iterator iter = m_Tools.begin();
-        iter != m_Tools.end();
-        ++iter )
+    iter != m_Tools.end();
+    ++iter )
   {
     resultList.push_back( iter->GetPointer() );
   }
@@ -298,6 +298,76 @@ void mitk::ToolManager::SetWorkingData(DataNode* data)
   SetWorkingData(v);
 }
 
+void mitk::ToolManager::SetRoiData(DataVectorType data)
+{
+  if (data != m_RoiData)
+  {
+    // remove observers from old nodes
+    for ( DataVectorType::iterator dataIter = m_RoiData.begin(); dataIter != m_RoiData.end(); ++dataIter )
+    {
+      NodeTagMapType::iterator searchIter = m_RoiDataObserverTags.find( *dataIter );
+      if ( searchIter != m_RoiDataObserverTags.end() )
+      {
+        //MITK_INFO << "Stopping observation of " << (void*)(*dataIter) << std::endl;
+        (*dataIter)->RemoveObserver( searchIter->second );
+      }
+    }
+
+    m_RoiData = data;
+    // TODO tell active tool?
+
+    // attach new observers
+    m_RoiDataObserverTags.clear();
+    for ( DataVectorType::iterator dataIter = m_RoiData.begin(); dataIter != m_RoiData.end(); ++dataIter )
+    {
+      //MITK_INFO << "Observing " << (void*)(*dataIter) << std::endl;
+      itk::MemberCommand<ToolManager>::Pointer command = itk::MemberCommand<ToolManager>::New();
+      command->SetCallbackFunction( this, &ToolManager::OnOneOfTheRoiDataDeleted );
+      command->SetCallbackFunction( this, &ToolManager::OnOneOfTheRoiDataDeletedConst );
+      m_RoiDataObserverTags.insert( std::pair<DataNode*, unsigned long>( (*dataIter), (*dataIter)->AddObserver( itk::DeleteEvent(), command ) ) );
+    }
+    RoiDataChanged.Send();
+  }
+}
+
+void mitk::ToolManager::SetRoiData(DataNode* data)
+{
+  DataVectorType v;
+
+  if(data)
+  {
+    v.push_back(data);
+  }
+  this->SetRoiData(v);
+}
+
+void mitk::ToolManager::OnOneOfTheRoiDataDeletedConst(const itk::Object* caller, const itk::EventObject& e)
+{
+  OnOneOfTheRoiDataDeleted( const_cast<itk::Object*>(caller), e );
+}
+
+void mitk::ToolManager::OnOneOfTheRoiDataDeleted(itk::Object* caller, const itk::EventObject& itkNotUsed(e))
+{
+  //MITK_INFO << "Deleted: " << (void*)caller << " Removing from roi data list." << std::endl;
+  DataVectorType v;
+
+  for (DataVectorType::iterator dataIter = m_RoiData.begin(); dataIter != m_RoiData.end(); ++dataIter )
+  {
+    //MITK_INFO << " In list: " << (void*)(*dataIter);
+    if ( (void*)(*dataIter) != (void*)caller )
+    {
+      v.push_back( *dataIter );
+      //MITK_INFO << " kept" << std::endl;
+    }
+    else
+    {
+      //MITK_INFO << " removed" << std::endl;
+      m_RoiDataObserverTags.erase( *dataIter ); // no tag to remove anymore
+    }
+  }
+  this->SetRoiData( v );
+}
+
 mitk::ToolManager::DataVectorType mitk::ToolManager::GetReferenceData()
 {
   return m_ReferenceData;
@@ -318,6 +388,23 @@ mitk::DataNode* mitk::ToolManager::GetReferenceData(int idx)
 mitk::ToolManager::DataVectorType mitk::ToolManager::GetWorkingData()
 {
   return m_WorkingData;
+}
+
+mitk::ToolManager::DataVectorType mitk::ToolManager::GetRoiData()
+{
+  return m_RoiData;
+}
+
+mitk::DataNode* mitk::ToolManager::GetRoiData(int idx)
+{
+  try
+  {
+    return m_RoiData.at(idx);
+  }
+  catch(std::exception&)
+  {
+    return NULL;
+  }
 }
 
 mitk::DataStorage* mitk::ToolManager::GetDataStorage()
@@ -393,8 +480,8 @@ int mitk::ToolManager::GetToolID( const Tool* tool )
 {
   int id(0);
   for ( ToolVectorType::iterator iter = m_Tools.begin();
-        iter != m_Tools.end();
-        ++iter, ++id )
+    iter != m_Tools.end();
+    ++iter, ++id )
   {
     if ( tool == iter->GetPointer() )
     {

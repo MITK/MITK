@@ -23,8 +23,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 mitk::BoundingObjectGroup::BoundingObjectGroup()
-:  m_Counter(0),
-m_BoundingObjects(0),
+:m_BoundingObjects(0),
+m_Counter(0),
 m_CSGMode(Union)// m_CSGMode(Difference) //m_CSGMode(Intersection)
 {
   GetTimeSlicedGeometry()->Initialize(1);

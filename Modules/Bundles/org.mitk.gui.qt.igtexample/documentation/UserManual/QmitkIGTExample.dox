@@ -17,9 +17,10 @@ If you encounter problems using the module, please have a look at the \ref Qmitk
 Manual sections:
 
 - \ref IGTExampleOverview 
-- \ref QmitkBasicImageProcessingUserManualFilters 
-- \ref QmitkBasicImageProcessingUserManualUsage
-- \ref QmitkBasicImageProcessingUserManualTrouble
+- \ref IGTExampleTrackerSelection
+- \ref IGTExampleTrackingTest
+- \ref IGTExampleNavigationTest
+- \ref IGTExampleTrouble
 
 \section IGTExampleOverview Overview
 

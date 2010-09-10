@@ -370,7 +370,7 @@ void DebugUtil::UnregisterSmartPointer(unsigned int  /*smartPointerId*/, const O
 #endif
 
 #ifdef BLUEBERRY_DEBUG_SMARTPOINTER
-void DebugUtil::RegisterSmartPointer(unsigned int  smartPointerId, const Object* objectPointer, bool recordStack)
+void DebugUtil::RegisterSmartPointer(unsigned int  smartPointerId, const Object* objectPointer, bool /*recordStack*/)
 {
   poco_assert(objectPointer != 0);
 

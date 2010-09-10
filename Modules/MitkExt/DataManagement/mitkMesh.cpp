@@ -786,6 +786,7 @@ void mitk::Mesh::ExecuteOperation(Operation* operation)
       {
         unsigned int position = (*it);
         PointType point;
+        point.Fill(0);
         m_PointSetSeries[0]->GetPoint(position, &point);
         point = point + vector;
         m_PointSetSeries[0]->SetPoint(position, point);

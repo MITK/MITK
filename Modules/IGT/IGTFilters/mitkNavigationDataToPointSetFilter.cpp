@@ -140,10 +140,8 @@ void mitk::NavigationDataToPointSetFilter::GenerateDataMode3DMean()
   //check for outputs and inputs
   for (unsigned int i = 0; i < this->GetNumberOfOutputs() ; ++i)  // for each output PointSet; change through pointsets to collect all navigation data in order
   {
-    mitk::PointSet* output = this->GetOutput(i);
-    assert(output);
-    const mitk::NavigationData* input = this->GetInput(i);
-    assert(input);
+    assert(this->GetOutput(i));
+    assert(this->GetInput(i));
   }
 
   //vector of counters for each output

@@ -311,11 +311,9 @@ void mitk::VolumeDataVtkMapper3D::GenerateData( mitk::BaseRenderer *renderer )
     break;
   }
 */  
-      m_VolumeLOD->SetSelectedLODID( m_HiResID );
+  m_VolumeLOD->SetSelectedLODID( m_HiResID );
 
-
-  const TimeSlicedGeometry* inputtimegeometry = input->GetTimeSlicedGeometry();
-  assert(inputtimegeometry!=NULL);
+  assert(input->GetTimeSlicedGeometry());
 
   const Geometry3D* worldgeometry = renderer->GetCurrentWorldGeometry();
   if(worldgeometry==NULL)

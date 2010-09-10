@@ -137,7 +137,7 @@ void QmitkVtkLineProfileWidget::UpdateItemModelFromPath()
   // Fill item model with line profile data
   double distance = 0.0;
   mitk::Point3D currentWorldPoint;
-
+  currentWorldPoint.Fill(0);
   double t;
   unsigned int i = 0;
   for ( i = 0, t = m_DerivedPath->StartOfInput(); ;++i )

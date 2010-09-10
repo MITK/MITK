@@ -49,8 +49,9 @@ namespace mitk
 
   public:
     typedef std::vector<NDIPassiveTool::Pointer> Tool6DContainerType;  ///< List of 6D tools of the correct type for this tracking device
+    typedef std::vector<int> TrackingVolumeDimensionType;          ///< List of the supported tracking volume dimensions.
     typedef mitk::TrackingDeviceType NDITrackingDeviceType;  ///< This enumeration includes the two types of NDI tracking devices (Polaris, Aurora).
-
+    typedef std::vector<NDITrackingVolume> NDITrackingVolumeContainerType;  ///< vector of tracking volumes
     typedef mitk::SerialCommunication::PortNumber PortNumber; ///< Port number of the serial connection
     typedef mitk::SerialCommunication::BaudRate BaudRate;     ///< Baud rate of the serial connection
     typedef mitk::SerialCommunication::DataBits DataBits;     ///< Number of data bits used in the serial connection
@@ -182,6 +183,31 @@ namespace mitk
     * \brief Get 3D marker positions (operation mode must be set to MarkerTracking3D or HybridTracking)
     */
     virtual bool GetMarkerPositions(MarkerPointContainerType* markerpositions);
+
+    /**
+    * \brief Get major revision number from tracking device
+    * should not be called directly after starting to track
+    **/
+    virtual int GetMajorFirmwareRevisionNumber();
+
+    /**
+    * \brief Get revision number from tracking device as string
+    * should not be called directly after starting to track
+    **/
+    virtual const char* GetFirmwareRevisionNumber();
+
+
+    /**
+    * \brief Get number of supported tracking volumes, a vector containing the supported volumes and 
+    * a vector containing the signed dimensions in mm. For each volume 10 boundaries are stored in the order of 
+    * the supported volumes (see AURORA API GUIDE: SFLIST p.54).
+    **/
+    virtual bool GetSupportedVolumes(unsigned int* numberOfVolumes, NDITrackingVolumeContainerType* volumes, TrackingVolumeDimensionType* volumesDimensions);
+    
+    /**
+    * \brief Sets the desired tracking volume. Returns true if the volume type could be set. Usage: ndiTracker->SetVolume(mitk::Dome);
+    **/
+    virtual bool SetVolume(NDITrackingVolume volume);
 
   protected:
 

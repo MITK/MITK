@@ -1573,3 +1573,295 @@ mitk::NDIErrorCode mitk::NDIProtocol::GetErrorCode(const std::string* input)
   else 
     return NDIUNKNOWNERROR;
 }
+
+mitk::NDIErrorCode mitk::NDIProtocol::APIREV(std::string* revision)
+{
+  if (m_TrackingDevice == NULL)
+    return TRACKINGDEVICENOTSET;
+
+  NDIErrorCode returnValue = NDIUNKNOWNERROR; // return code for this function. Will be set according to reply from tracking system
+  
+  /* send command */
+  std::string command;
+  if (m_UseCRC)
+    command = "APIREV:";
+  else
+    command = "APIREV ";
+
+  returnValue = m_TrackingDevice->Send(&command, m_UseCRC);
+  if (returnValue != NDIOKAY)
+  {
+    /* cleanup and return */   
+    m_TrackingDevice->ClearReceiveBuffer();   // flush the buffer to remove the remaining carriage return or unknown/unexpected reply
+    return returnValue;
+  }
+
+  //wait for tracking system to compute the output
+  //itksys::SystemTools::Delay(100);
+
+  /* read number of handles returned */
+  std::string reply;
+  m_TrackingDevice->Receive(&reply, 5); //look for ERROR
+  
+  // read first 5 characters of reply (error beginning of version information)  
+  static const std::string error("ERROR");
+  if (error.compare(0, 6, reply) == 0) // ERROR case
+  { 
+    std::string errorcode;
+    m_TrackingDevice->Receive(&errorcode, 2); // now read 2 bytes error code
+    reply += errorcode;                       // build complete reply string
+    
+    /* perform CRC checking */
+    std::string expectedCRC = m_TrackingDevice->CalcCRC(&reply);    // calculate crc for received reply string
+    std::string readCRC;                      // read attached crc value
+    m_TrackingDevice->Receive(&readCRC, 4);   // CRC16 is 2 bytes long, which is transmitted as 4 hexadecimal digits
+
+    if (expectedCRC == readCRC)               // if the read CRC is correct, return normal error code 
+      returnValue = this->GetErrorCode(&errorcode);
+    else                                      // return error in CRC 
+      returnValue = NDICRCERROR;
+  }
+  else // no error, valid reply: expect something like: D.001.00450D4 (<Family>.<Major revision number>.<Minor revision number><CRC16><CR>
+  {
+    std::string s;
+    
+    m_TrackingDevice->Receive(&s, 4);       // read further
+    reply += s;
+
+    /* perform CRC checking */
+    std::string expectedCRC = m_TrackingDevice->CalcCRC(&reply);  // calculate crc for received reply string
+    std::string readCRC;                                          // read attached crc value
+    m_TrackingDevice->Receive(&readCRC, 4);                       // CRC16 is 2 bytes long, which is transmitted as 4 hexadecimal digits
+    
+    if (expectedCRC == readCRC)                                   // if the read CRC is correct, return normal error code 
+      returnValue = NDIOKAY;
+    else                                      // return error in CRC 
+      returnValue = NDICRCERROR;
+  }
+
+  *revision = reply;
+  m_TrackingDevice->ClearReceiveBuffer();
+  return returnValue;
+}
+
+
+mitk::NDIErrorCode mitk::NDIProtocol::SFLIST(std::string* info)
+{
+  if (m_TrackingDevice == NULL)
+    return TRACKINGDEVICENOTSET;
+
+  NDIErrorCode returnValue = NDIUNKNOWNERROR; // return code for this function. Will be set according to reply from tracking system
+  
+  /* send command */
+  std::string command;
+  if (m_UseCRC)
+    command = "SFLIST:03";
+  else
+    command = "SFLIST 03";
+
+  returnValue = m_TrackingDevice->Send(&command, m_UseCRC);
+  if (returnValue != NDIOKAY)
+  {
+    /* cleanup and return */   
+    m_TrackingDevice->ClearReceiveBuffer();   // flush the buffer to remove the remaining carriage return or unknown/unexpected reply
+    return returnValue;
+  }
+
+  /* read number of handles returned */
+  std::string reply;
+  m_TrackingDevice->Receive(&reply, 5); //look for "ERROR"
+  
+  static const std::string error("ERROR");
+  if (error.compare(0,6,reply) == 0) // ERROR case
+  { 
+    std::string errorcode;
+    m_TrackingDevice->Receive(&errorcode, 2); // now read 2 bytes error code
+    reply += errorcode;                       // build complete reply string
+    
+    /* perform CRC checking */
+    std::string expectedCRC = m_TrackingDevice->CalcCRC(&reply);    // calculate crc for received reply string
+    std::string readCRC;                      // read attached crc value
+    m_TrackingDevice->Receive(&readCRC, 4);   // CRC16 is 2 bytes long, which is transmitted as 4 hexadecimal digits
+
+    if (expectedCRC == readCRC)               // if the read CRC is correct, return normal error code 
+      returnValue = this->GetErrorCode(&errorcode);
+    else                                      // return error in CRC 
+      returnValue = NDICRCERROR;
+  }
+  
+  else // no error, valid reply: expect numbers of devices in hex, and then info of each featured tracking volume <CRC16><CR>
+  {
+    /* parse number of volumes from first character in hex */
+    std::stringstream converter;
+    unsigned int numberOfVolumes = 0;
+    converter << std::hex << reply[0];        // insert reply into stringstream
+    converter >> numberOfVolumes;             // extract number of handles as unsigned byte
+    converter.clear();                        // converter must be cleared to be reused
+    converter.str("");
+
+    //reply currently contains the first 5 elements
+    if (numberOfVolumes>0)
+    {
+      //for each featured volume
+      for (unsigned int i = 0; i<numberOfVolumes; i++)
+      {
+        std::string currentVolume;
+        if (i==0)
+        {
+          //already read the first 4 bytes of the volume info
+          currentVolume.append(reply,1,4);
+          std::string s;
+          m_TrackingDevice->Receive(&s, 69);// 69 characters to get all dimensions plus two characters at the end: one reserved and one for metal resistance.
+          reply += s;
+          currentVolume += s;
+        }
+        else
+        {
+          //read to the end of the line from the last volume 
+          //(needed here, because if only one volume is supported, 
+          //then there is no lineending <LF> before CRC checksum
+          std::string l;
+          m_TrackingDevice->ReceiveLine(&l);
+          reply += l;
+
+          std::string s;
+          m_TrackingDevice->Receive(&s, 73); //need total of 73 bytes for a volume
+          reply += s;
+          currentVolume += s;
+        }
+
+        //analyze volume here
+        static const std::string standard = "0";
+        static const std::string pyramid = "4";
+        static const std::string spectraPyramid = "5";
+        static const std::string vicraVolume = "7";
+        static const std::string cube = "9";
+        static const std::string dome = "A";
+        if (currentVolume.compare(0,1,standard)==0)
+          MITK_INFO<<"Standard volume supported \n";
+        else if (currentVolume.compare(0,1,pyramid)==0)
+          MITK_INFO<<"Pyramid volume supported \n";
+        else if (currentVolume.compare(0,1,spectraPyramid)==0)
+          MITK_INFO<<"Spectra pyramid volume supported \n";
+        else if (currentVolume.compare(0,1,vicraVolume)==0)
+            MITK_INFO<<"Vicra volume supported \n";
+        else if (currentVolume.compare(0,1,cube)==0)
+          MITK_INFO<<"Cube volume supported \n";
+        else if (currentVolume.compare(0,1,dome)==0)
+            MITK_INFO<<"Dome volume supported \n";
+        else
+            MITK_INFO<<"Message not understood!\n";
+      }
+    }
+
+    /* perform CRC checking */
+    std::string expectedCRC = m_TrackingDevice->CalcCRC(&reply);  // calculate crc for received reply string
+    std::string readCRC;                                          // read attached crc value
+    m_TrackingDevice->Receive(&readCRC, 4);                       // CRC16 is 2 bytes long, which is transmitted as 4 hexadecimal digits
+    
+    if (expectedCRC == readCRC)                                   // if the read CRC is correct, return normal error code 
+      returnValue = NDIOKAY;
+    else                                      // return error in CRC 
+      returnValue = NDICRCERROR;
+  }
+
+  *info = reply;
+  m_TrackingDevice->ClearReceiveBuffer();
+  return returnValue;
+}
+
+mitk::NDIErrorCode mitk::NDIProtocol::VSEL(mitk::NDITrackingVolume volume)
+{
+  if (m_TrackingDevice == NULL)
+    return TRACKINGDEVICENOTSET;
+
+  NDIErrorCode returnValue = NDIUNKNOWNERROR; // return code for this function. Will be set according to reply from tracking system
+  
+
+  //get information about the order of volumes from tracking device. Then choose the number needed for VSEL by the output and parameter "device"
+  unsigned int numberOfVolumes;
+  mitk::NDITrackingDevice::NDITrackingVolumeContainerType volumes;
+  mitk::NDITrackingDevice::TrackingVolumeDimensionType volumesDimensions;
+  if (!m_TrackingDevice->GetSupportedVolumes(&numberOfVolumes, &volumes, &volumesDimensions))
+    return returnValue;
+  
+  //interested in volumes(!)
+  if (volumes.empty())
+    return returnValue;
+  //with the order within volumes we can define our needed parameter for VSEL
+  //find the index where volumes[n] == device
+  
+  unsigned int index = 1; //the index for VSEL starts at 1
+  mitk::NDITrackingDevice::NDITrackingVolumeContainerType::iterator it = volumes.begin();
+  while (it != volumes.end())
+  {
+    if ((*it) == volume)
+      break;  
+    it++, index++;
+  }
+  if (it == volumes.end() || index > numberOfVolumes) //not found / volume not supported
+    return NDIINVALIDOPERATIONFORDEVICE;
+
+  //index now contains the information on which position the desired volume is situated
+  
+  /* send command */
+  std::string command;
+  if (m_UseCRC)
+    command = "VSEL:";
+  else
+    command = "VSEL ";
+
+  //add index to command
+  std::stringstream s;
+    s << index;
+  command += s.str();  
+  
+  returnValue = m_TrackingDevice->Send(&command, m_UseCRC);
+  if (returnValue != NDIOKAY)
+  {
+    /* cleanup and return */   
+    m_TrackingDevice->ClearReceiveBuffer();   // flush the buffer to remove the remaining carriage return or unknown/unexpected reply
+    return returnValue;
+  }
+
+  /* read number of handles returned */
+  std::string reply;
+  m_TrackingDevice->Receive(&reply, 4); //look for "ERROR" or "OKAY"
+  
+  static const std::string error("ERRO");
+  if (error.compare(reply) == 0) // ERROR case
+  { 
+    std::string s;
+    m_TrackingDevice->Receive(&s, 1); //get the last "R" in "ERROR"
+    reply += s;
+
+    std::string errorcode;
+    m_TrackingDevice->Receive(&errorcode, 2); // now read 2 bytes error code
+    reply += errorcode;                       // build complete reply string
+    
+    /* perform CRC checking */
+    std::string expectedCRC = m_TrackingDevice->CalcCRC(&reply);    // calculate crc for received reply string
+    std::string readCRC;                      // read attached crc value
+    m_TrackingDevice->Receive(&readCRC, 4);   // CRC16 is 2 bytes long, which is transmitted as 4 hexadecimal digits
+
+    if (expectedCRC == readCRC)               // if the read CRC is correct, return normal error code 
+      returnValue = this->GetErrorCode(&errorcode);
+    else                                      // return error in CRC 
+      returnValue = NDICRCERROR;
+  }
+  else
+  {
+    /* perform CRC checking */
+    std::string expectedCRC = m_TrackingDevice->CalcCRC(&reply);  // calculate crc for received reply string
+    std::string readCRC;                                          // read attached crc value
+    m_TrackingDevice->Receive(&readCRC, 4);                       // CRC16 is 2 bytes long, which is transmitted as 4 hexadecimal digits
+    
+    if (expectedCRC == readCRC)                                   // if the read CRC is correct, return normal error code 
+      returnValue = NDIOKAY;
+    else                                      // return error in CRC 
+      returnValue = NDICRCERROR;
+  }
+
+  m_TrackingDevice->ClearReceiveBuffer();
+  return returnValue;
+}

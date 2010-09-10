@@ -1216,3 +1216,105 @@ mitk::NDIErrorCode mitk::NDITrackingDevice::FreePortHandles()
   }
   return returnvalue;
 }
+
+
+int mitk::NDITrackingDevice::GetMajorFirmwareRevisionNumber()
+{
+  std::string revision;
+  if (m_DeviceProtocol->APIREV(&revision) != mitk::NDIOKAY || revision.empty() || (revision.size() != 9) )
+  {
+    this->SetErrorMessage("Could not receive firmware revision number!");
+    return 0;
+  }
+
+  const std::string majrevno = revision.substr(2,3); //cut out "004" from "D.004.001"
+
+  return std::atoi(majrevno.c_str());
+}
+
+const char* mitk::NDITrackingDevice::GetFirmwareRevisionNumber()
+{
+  static std::string revision;
+  if (m_DeviceProtocol->APIREV(&revision) != mitk::NDIOKAY || revision.empty() || (revision.size() != 9) )
+  {
+    this->SetErrorMessage("Could not receive firmware revision number!");
+    revision = "";
+    return revision.c_str();
+  }
+  return revision.c_str();
+}
+
+bool mitk::NDITrackingDevice::GetSupportedVolumes(unsigned int* numberOfVolumes, mitk::NDITrackingDevice::NDITrackingVolumeContainerType* volumes, mitk::NDITrackingDevice::TrackingVolumeDimensionType* volumesDimensions)
+{
+  if (numberOfVolumes == NULL || volumes == NULL || volumesDimensions == NULL)
+    return false;
+
+  static std::string info;
+  if (m_DeviceProtocol->SFLIST(&info) != mitk::NDIOKAY || info.empty())
+  {
+    this->SetErrorMessage("Could not receive tracking volume information of tracking system!");
+    return false;
+  }
+  
+  /*info contains the following:
+  <HEX:number of volumes> (+n times:) <HEX:shape type> <shape parameters D1-D10> <HEX:reserved / number of wavelength supported> <metal resistant / supported wavelength>
+  */
+  (*numberOfVolumes) = (unsigned int) std::atoi(info.substr(0,1).c_str());
+
+  for (unsigned int i=0; i<(*numberOfVolumes); i++)
+  {
+    //e.g. for cube:  "9-025000+025000-025000+025000-055000-005000+000000+000000+000000+00000011" 
+    //for dome:       "A+005000+048000+005000+066000+000000+000000+000000+000000+000000+00000011"
+
+    std::string::size_type offset, end;
+    offset = (i*73)+1; 
+    end = 73+(i*73);
+    std::string currentVolume = info.substr(offset, end);//i=0: from 1 to 73 characters; i=1: from 75 to 148 char; 
+    // if i>0 then we have a return statement <LF> infront
+    if (i>0)
+      currentVolume = currentVolume.substr(1, currentVolume.size());
+
+    std::string standard = "0";
+    std::string pyramid = "4";
+    std::string spectraPyramid = "5";
+    std::string vicraVolume = "7";
+    std::string cube = "9";
+    std::string dome = "A";
+    if (currentVolume.compare(0,1,standard)==0)
+      volumes->push_back(mitk::Standard);
+    if (currentVolume.compare(0,1,pyramid)==0)
+      volumes->push_back(mitk::Pyramid);
+    if (currentVolume.compare(0,1,spectraPyramid)==0)
+      volumes->push_back(mitk::SpectraPyramid);
+    if (currentVolume.compare(0,1,vicraVolume)==0)
+      volumes->push_back(mitk::VicraVolume);
+    else if (currentVolume.compare(0,1,cube)==0)
+      volumes->push_back(mitk::Cube);//alias cube
+    else if (currentVolume.compare(0,1,dome)==0)
+      volumes->push_back(mitk::Dome);
+
+    //fill volumesDimensions
+    for (unsigned int index = 0; index < 10; index++)
+    {
+      std::string::size_type offD, endD;
+      offD = 1+(index*7); //7 digits per dimension and the first is the type of volume
+      endD = offD+7;
+      int dimension = std::atoi(currentVolume.substr(offD, endD).c_str());
+      dimension /= 100; //given in mm. 7 digits are xxxx.xx according to NDI //strange, the last two digits (11) also for the metal flag get read also...
+      volumesDimensions->push_back(dimension);
+    }
+  }
+    
+  return true;
+}
+
+bool mitk::NDITrackingDevice::SetVolume(NDITrackingVolume volume)
+{
+  if (m_DeviceProtocol->VSEL(volume) != mitk::NDIOKAY)
+  {
+    this->SetErrorMessage("Could not set volume!");
+    return false;
+  }
+  return true;
+}
+

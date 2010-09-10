@@ -25,6 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 mitk::Tool::Tool(const char* type)
 : StateMachine(type),
+  m_SupportRoi(false),
   // for reference images
   m_PredicateImages(NodePredicateDataType::New("Image")),
   m_PredicateDim3(NodePredicateDimension::New(3, 1)),
@@ -48,9 +49,7 @@ mitk::Tool::Tool(const char* type)
   m_PredicateReference( NodePredicateAND::New(m_PredicateImage3D, m_PredicateImageColorfulNotHelper) ),
 
   // for working image
-  m_IsSegmentationPredicate(NodePredicateAND::New(NodePredicateOR::New(m_PredicateBinary, m_PredicateSegmentation), m_PredicateNotHelper)),
-
-  m_SupportRoi(false)
+  m_IsSegmentationPredicate(NodePredicateAND::New(NodePredicateOR::New(m_PredicateBinary, m_PredicateSegmentation), m_PredicateNotHelper))
 {
 }
 

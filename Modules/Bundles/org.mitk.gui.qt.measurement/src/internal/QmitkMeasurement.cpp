@@ -542,12 +542,12 @@ void QmitkMeasurement::AddFigureToDataStorage(mitk::PlanarFigure* figure, const 
   // figure drawn on the topmost layer / image
   this->GetDataStorage()->Add(newNode, this->DetectTopMostVisibleImage() );
   std::vector<mitk::DataNode*> selectedNodes = GetDataManagerSelection();
-  for(int i = 0; i < selectedNodes.size(); i++)
+  for(unsigned int i = 0; i < selectedNodes.size(); i++)
   {
     selectedNodes[i]->SetSelected(false);
   }
   selectedNodes = m_SelectedPlanarFigures->GetNodes();
-  for(int i = 0; i < selectedNodes.size(); i++)
+  for(unsigned int i = 0; i < selectedNodes.size(); i++)
   {
     selectedNodes[i]->SetSelected(false);
   }

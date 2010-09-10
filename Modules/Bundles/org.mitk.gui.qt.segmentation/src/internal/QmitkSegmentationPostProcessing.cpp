@@ -41,7 +41,7 @@ QmitkSegmentationPostProcessing::QmitkSegmentationPostProcessing(mitk::DataStora
 {
   // register a couple of additional actions for DataManager's context menu
   QmitkNodeDescriptor* imageDataNodeDescriptor =
-    QmitkNodeDescriptorManager::GetInstance()->GetDescriptor("Image");
+    QmitkNodeDescriptorManager::GetInstance()->GetDescriptor("NoneBinaryImage");
 
   if (imageDataNodeDescriptor)
   {

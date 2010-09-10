@@ -41,9 +41,9 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk
 {
 
-class ToolManager;
+  class ToolManager;
 
-/**
+  /**
   \brief Base class of all tools used by mitk::ToolManager.
 
   \sa ToolManager
@@ -72,26 +72,26 @@ class ToolManager;
   \warning Only to be instantiated by mitk::ToolManager (because SetToolManager has to be called). All other uses are unsupported.
 
   $Author$
-*/
-class MitkExt_EXPORT Tool : public StateMachine
-{
+  */
+  class MitkExt_EXPORT Tool : public StateMachine
+  {
   public:
 
     typedef unsigned char DefaultSegmentationDataType;
 
     /**
-     * \brief To let GUI process new events (e.g. qApp->processEvents() )
-     */
+    * \brief To let GUI process new events (e.g. qApp->processEvents() )
+    */
     Message<> GUIProcessEventsMessage;
 
     /**
-     * \brief To send error messages (to be shown by some GUI)
-     */
+    * \brief To send error messages (to be shown by some GUI)
+    */
     Message1<std::string> ErrorMessage;
 
     /**
-     * \brief To send general messages (to be shown by some GUI)
-     */
+    * \brief To send general messages (to be shown by some GUI)
+    */
     Message1<std::string> GeneralMessage;
 
     mitkClassMacro(Tool, StateMachine);
@@ -99,47 +99,47 @@ class MitkExt_EXPORT Tool : public StateMachine
     // no New(), there should only be subclasses
 
     /**
-      \brief Returns an icon in the XPM format.
+    \brief Returns an icon in the XPM format.
 
-      This icon has to fit into some kind of button in most applications, so make it smaller than 25x25 pixels.
+    This icon has to fit into some kind of button in most applications, so make it smaller than 25x25 pixels.
 
-      XPM is e.g. supported by The Gimp. But if you open any XPM file in your text editor, you will see that you could also "draw" it with an editor.
+    XPM is e.g. supported by The Gimp. But if you open any XPM file in your text editor, you will see that you could also "draw" it with an editor.
     */
     virtual const char** GetXPM() const = 0;
 
     /**
-      \brief Returns the name of this tool. Make it short!
+    \brief Returns the name of this tool. Make it short!
 
-      This name has to fit into some kind of button in most applications, so take some time to think of a good name!
+    This name has to fit into some kind of button in most applications, so take some time to think of a good name!
     */
     virtual const char* GetName() const = 0;
 
     /**
-      \brief Name of a group.
+    \brief Name of a group.
 
-      You can group several tools by assigning a group name. Graphical tool selectors might use this information to group tools. (What other reason could there be?)
+    You can group several tools by assigning a group name. Graphical tool selectors might use this information to group tools. (What other reason could there be?)
     */
     virtual const char* GetGroup() const;
 
     /**
-     * \brief Interface for GUI creation.
-     *
-     * This is the basic interface for creation of a GUI object belonging to one tool.
-     *
-     * Tools that support a GUI (e.g. for display/editing of parameters) should follow some rules:
-     *
-     *  - A Tool and its GUI are two separate classes
-     *  - There may be several instances of a GUI at the same time.
-     *  - mitk::Tool is toolkit (Qt, wxWidgets, etc.) independent, the GUI part is of course dependent
-     *  - The GUI part inherits both from itk::Object and some GUI toolkit class
-     *  - The GUI class name HAS to be constructed like "toolkitPrefix" tool->GetClassName() + "toolkitPostfix", e.g. MyTool -> wxMyToolGUI
-     *  - For each supported toolkit there is a base class for tool GUIs, which contains some convenience methods
-     *  - Tools notify the GUI about changes using ITK events. The GUI must observe interesting events.
-     *  - The GUI base class may convert all ITK events to the GUI toolkit's favoured messaging system (Qt -> signals)
-     *  - Calling methods of a tool by its GUI is done directly.
-     *    In some cases GUIs don't want to be notified by the tool when they cause a change in a tool.
-     *    There is a macro CALL_WITHOUT_NOTICE(method()), which will temporarily disable all notifications during a method call.
-     */
+    * \brief Interface for GUI creation.
+    *
+    * This is the basic interface for creation of a GUI object belonging to one tool.
+    *
+    * Tools that support a GUI (e.g. for display/editing of parameters) should follow some rules:
+    *
+    *  - A Tool and its GUI are two separate classes
+    *  - There may be several instances of a GUI at the same time.
+    *  - mitk::Tool is toolkit (Qt, wxWidgets, etc.) independent, the GUI part is of course dependent
+    *  - The GUI part inherits both from itk::Object and some GUI toolkit class
+    *  - The GUI class name HAS to be constructed like "toolkitPrefix" tool->GetClassName() + "toolkitPostfix", e.g. MyTool -> wxMyToolGUI
+    *  - For each supported toolkit there is a base class for tool GUIs, which contains some convenience methods
+    *  - Tools notify the GUI about changes using ITK events. The GUI must observe interesting events.
+    *  - The GUI base class may convert all ITK events to the GUI toolkit's favoured messaging system (Qt -> signals)
+    *  - Calling methods of a tool by its GUI is done directly.
+    *    In some cases GUIs don't want to be notified by the tool when they cause a change in a tool.
+    *    There is a macro CALL_WITHOUT_NOTICE(method()), which will temporarily disable all notifications during a method call.
+    */
     virtual itk::Object::Pointer GetGUI(const std::string& toolkitPrefix, const std::string& toolkitPostfix);
 
     virtual NodePredicateBase::ConstPointer GetReferenceDataPreference() const;
@@ -147,6 +147,10 @@ class MitkExt_EXPORT Tool : public StateMachine
 
     DataNode::Pointer CreateEmptySegmentationNode( Image* original, const std::string& organName, const mitk::Color& color );
     DataNode::Pointer CreateSegmentationNode(      Image* image,    const std::string& organName, const mitk::Color& color );
+
+    itkGetMacro(SupportRoi, bool);
+    itkSetMacro(SupportRoi, bool);
+    itkBooleanMacro(SupportRoi);
 
 
   protected:
@@ -156,16 +160,16 @@ class MitkExt_EXPORT Tool : public StateMachine
     virtual void SetToolManager(ToolManager*);
 
     /**
-     \brief Called when the tool gets activated (registered to mitk::GlobalInteraction).
+    \brief Called when the tool gets activated (registered to mitk::GlobalInteraction).
 
-     Derived tools should call their parents implementation.
+    Derived tools should call their parents implementation.
     */
     virtual void Activated();
 
     /**
-     \brief Called when the tool gets deactivated (unregistered from mitk::GlobalInteraction).
+    \brief Called when the tool gets deactivated (unregistered from mitk::GlobalInteraction).
 
-     Derived tools should call their parents implementation.
+    Derived tools should call their parents implementation.
     */
     virtual void Deactivated();
 
@@ -175,10 +179,9 @@ class MitkExt_EXPORT Tool : public StateMachine
 
     ToolManager* m_ToolManager;
 
-  private:
+    bool m_SupportRoi;
 
-    // for working data
-    NodePredicateProperty::Pointer m_IsSegmentationPredicate;
+  private:
 
     // for reference data
     NodePredicateDataType::Pointer m_PredicateImages;
@@ -201,7 +204,11 @@ class MitkExt_EXPORT Tool : public StateMachine
     NodePredicateAND::Pointer m_PredicateImageColorfulNotHelper;
 
     NodePredicateAND::Pointer m_PredicateReference;
-};
+
+    // for working data
+    NodePredicateAND::Pointer m_IsSegmentationPredicate;
+
+  };
 
 } // namespace
 

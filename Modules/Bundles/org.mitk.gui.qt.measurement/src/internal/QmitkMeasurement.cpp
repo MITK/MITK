@@ -541,6 +541,18 @@ void QmitkMeasurement::AddFigureToDataStorage(mitk::PlanarFigure* figure, const 
 
   // figure drawn on the topmost layer / image
   this->GetDataStorage()->Add(newNode, this->DetectTopMostVisibleImage() );
+  std::vector<mitk::DataNode*> selectedNodes = GetDataManagerSelection();
+  for(int i = 0; i < selectedNodes.size(); i++)
+  {
+    selectedNodes[i]->SetSelected(false);
+  }
+  selectedNodes = m_SelectedPlanarFigures->GetNodes();
+  for(int i = 0; i < selectedNodes.size(); i++)
+  {
+    selectedNodes[i]->SetSelected(false);
+  }
+  newNode->SetSelected(true);
+
 
   m_CurrentFigureNodeInitialized = false;
   m_CurrentFigureNode = newNode;
@@ -828,7 +840,7 @@ void QmitkMeasurement::SetMeasurementInfoToRenderWindow(const QString& text,
 
   if(m_LastRenderWindow)
   {
-    if (!text.isEmpty())
+    if (!text.isEmpty() && m_SelectedPlanarFigures->GetNode()->IsSelected())
     {
       m_MeasurementInfoAnnotation->SetText(1, text.toLatin1().data());
       mitk::VtkLayerController::GetInstance(m_LastRenderWindow->GetRenderWindow())->InsertForegroundRenderer(

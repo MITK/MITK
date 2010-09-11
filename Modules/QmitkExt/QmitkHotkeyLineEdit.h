@@ -39,10 +39,12 @@ public:
   virtual void SetKeySequence(const QString& _QKeySequenceAsString);
   virtual QKeySequence GetKeySequence();
   virtual QString GetKeySequenceAsString();
-
+  bool Matches( QKeyEvent * event );
+protected slots:
+  void LineEditTextChanged(const QString &);
 protected:
   virtual void keyPressEvent ( QKeyEvent * event );
-
+  void Init();
 protected:
   QKeySequence m_KeySequence;
 

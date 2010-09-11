@@ -135,8 +135,7 @@ void mitk::OpenCVVideoSource::FetchFrame()
 
         ++m_FrameCount;
       }
-      else
-        m_CurrentImage = m_PauseImage;
+
       if(m_CurrentImage == NULL) // do we need to repeat the video if it is from video file?
       {
         double framePos = this->GetVideoCaptureProperty(CV_CAP_PROP_POS_AVI_RATIO);
@@ -226,11 +225,6 @@ bool mitk::OpenCVVideoSource::OnlineImageUndistortionEnabled() const
 void mitk::OpenCVVideoSource::PauseCapturing()
 {
   m_CapturePaused = !m_CapturePaused;
-  if(m_PauseImage)
-  {
-    cvReleaseImage( &m_PauseImage ); // release old pause image if necessary
-    m_PauseImage = 0;
-  }
 
   if(m_CapturePaused)
   {
@@ -239,6 +233,14 @@ void mitk::OpenCVVideoSource::PauseCapturing()
     // undistort this pause image if necessary
     if(m_UndistortImage)
       m_UndistortCameraImage->UndistortImageFast(m_PauseImage, 0);
+
+    m_CurrentImage = m_PauseImage;
+  }
+  else
+  {
+    cvReleaseImage( &m_PauseImage ); // release old pause image if necessary
+    m_CurrentImage = 0;
+    m_PauseImage = 0;
   }
 }
 

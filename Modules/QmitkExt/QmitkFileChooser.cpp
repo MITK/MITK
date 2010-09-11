@@ -103,4 +103,6 @@ void QmitkFileChooser::OnSelectFileClicked( bool /*checked*/ )
 
   if(!filename.isEmpty())
     m_File->setText( filename );
+
+  emit NewFileSelected(filename.toStdString());
 }

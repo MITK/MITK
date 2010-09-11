@@ -27,24 +27,32 @@ const std::string QmitkHotkeyLineEdit::TOOLTIP = "Press any key (combination)";
 QmitkHotkeyLineEdit::QmitkHotkeyLineEdit( QWidget* parent )
 : QLineEdit(parent)
 {
-  this->setToolTip(QString::fromStdString(QmitkHotkeyLineEdit::TOOLTIP));
+  this->Init();
   //this->setReadOnly(true);
 }
 
 QmitkHotkeyLineEdit::QmitkHotkeyLineEdit( const QKeySequence& _QKeySequence, QWidget* parent)
 : QLineEdit(parent)
 {
+  this->Init();
   //this->setReadOnly(true);
-  this->setToolTip(QString::fromStdString(QmitkHotkeyLineEdit::TOOLTIP));
   this->SetKeySequence(_QKeySequence);
 }
 
 QmitkHotkeyLineEdit::QmitkHotkeyLineEdit( const QString& _QKeySequenceAsString, QWidget* parent)
 : QLineEdit(parent)
 {
-  this->setToolTip(QString::fromStdString(QmitkHotkeyLineEdit::TOOLTIP));
+  this->Init();
   //this->setReadOnly(true);
   this->SetKeySequence(_QKeySequenceAsString);
+}
+
+void QmitkHotkeyLineEdit::Init()
+{
+  this->setToolTip(QString::fromStdString(QmitkHotkeyLineEdit::TOOLTIP));
+  this->setReadOnly(true);
+  connect( this, SIGNAL( textChanged(const QString &) ), this,
+           SLOT( LineEditTextChanged(const QString &) ) );
 }
 
 void QmitkHotkeyLineEdit::keyPressEvent( QKeyEvent * event )
@@ -62,7 +70,6 @@ void QmitkHotkeyLineEdit::keyPressEvent( QKeyEvent * event )
 
 void QmitkHotkeyLineEdit::SetKeySequence( const QKeySequence& _QKeySequence)
 {
-  m_KeySequence = _QKeySequence;
   this->setText(m_KeySequence.toString());
 }
 
@@ -79,4 +86,19 @@ QKeySequence QmitkHotkeyLineEdit::GetKeySequence()
 QString QmitkHotkeyLineEdit::GetKeySequenceAsString()
 {
   return m_KeySequence.toString();
+}
+
+bool QmitkHotkeyLineEdit::Matches( QKeyEvent * event )
+{
+  QKeySequence _KeySequence = QKeySequence(event->modifiers(), event->key());
+  // if no modifier was pressed the sequence is now empty
+  if(event->modifiers() == Qt::NoModifier)
+    _KeySequence = QKeySequence(event->key());
+
+  return _KeySequence == m_KeySequence;
+}
+
+void QmitkHotkeyLineEdit::LineEditTextChanged(const QString & text)
+{
+  m_KeySequence = QKeySequence(text.toUpper());
 }

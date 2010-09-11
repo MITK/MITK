@@ -48,6 +48,9 @@ class QmitkExt_EXPORT QmitkFileChooser : public QWidget
     bool IsValidFile() const;
     virtual std::string GetFile() const;
 
+  signals:
+    void NewFileSelected( const std::string& );
+
   protected slots:
     virtual void OnSelectFileClicked ( bool /*checked=false*/ );
 

@@ -506,6 +506,9 @@ void QmitkImageStatistics::UpdateStatistics()
     unsigned long progressObserverTag = m_CurrentStatisticsCalculator
       ->AddObserver( itk::ProgressEvent(), progressListener );
 
+    // show wait cursor
+    this->WaitCursorOn();
+
     try
     {
       // Compute statistics
@@ -537,6 +540,9 @@ void QmitkImageStatistics::UpdateStatistics()
 
     // Make sure that progress bar closes
     mitk::ProgressBar::GetInstance()->Progress( 100 );
+
+    // remove wait cursor
+    this->WaitCursorOff();
 
     if ( statisticsCalculationSuccessful )
     {

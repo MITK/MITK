@@ -10,7 +10,7 @@ It is not a end-user application module, but a showcase for developer that want 
 
 
 Please see \ref QmitkIGTExampleViewUserManualDetails for more detailed information on usage and supported filters.
-If you encounter problems using the module, please have a look at the \ref QmitkBasicImageProcessingUserManualTrouble page.
+If you encounter problems using the module, please have a look at the \ref IGTExampleTrouble page.
 
 \section QmitkIGTExampleViewUserManualDetails Detailed description
 

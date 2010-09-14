@@ -35,7 +35,7 @@ void mitk::BoundingObjectToSegmentationFilter::GenerateData()
   CastToItkImage(outputImage, itkImage);
   itkImage->FillBuffer(0);
 
-  for (int i=0; i<m_boundingObjectGroup->GetCount(); i++)
+  for (unsigned int i=0; i<m_boundingObjectGroup->GetCount(); i++)
   {
     //create region for boundingobject
     mitk::BoundingObject* boundingObject = m_boundingObjectGroup->GetBoundingObjects().at(i);

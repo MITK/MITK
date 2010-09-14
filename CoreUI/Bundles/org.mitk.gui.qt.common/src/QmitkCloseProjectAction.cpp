@@ -19,6 +19,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <mitkCoreObjectFactory.h>
 #include <mitkDataStorageEditorInput.h>
+#include <mitkNodePredicateNOT.h>
+#include <mitkNodePredicateProperty.h>
 #include <berryIEditorPart.h>
 #include <berryIWorkbenchPage.h>
 #include "QmitkStdMultiWidgetEditor.h"
@@ -50,9 +52,7 @@ void QmitkCloseProjectAction::init(berry::IWorkbenchWindow::Pointer window)
 
 void QmitkCloseProjectAction::Run()
 {
-  /* Ask, if the user is sure about that */
-  if (QMessageBox::question(NULL, "Remove all data?", "Are you sure that you want to close the current project? This will remove all data objects?", QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes)
-    return;
+
 
   try
   {
@@ -71,6 +71,14 @@ void QmitkCloseProjectAction::Run()
       multiWidgetEditor = editor.Cast<QmitkStdMultiWidgetEditor>();
       storage = multiWidgetEditor->GetEditorInput().Cast<mitk::DataStorageEditorInput>()->GetDataStorageReference()->GetDataStorage();
     }
+
+    //check if there is anything else then helper object in the storage
+    if(storage->GetSubset(mitk::NodePredicateNOT::New(mitk::NodePredicateProperty::New("helper object", mitk::BoolProperty::New(true))))->empty())
+      return;
+    /* Ask, if the user is sure about that */
+    if (QMessageBox::question(NULL, "Remove all data?", "Are you sure that you want to close the current project? This will remove all data objects?", QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes)
+      return;
+
     /* Remove everything */
     mitk::DataStorage::SetOfObjects::ConstPointer nodesToRemove = storage->GetAll();
     storage->Remove(nodesToRemove);

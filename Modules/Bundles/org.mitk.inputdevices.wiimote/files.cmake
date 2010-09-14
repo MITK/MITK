@@ -3,7 +3,7 @@ SET(SRC_CPP_FILES
 )
 
 SET(INTERNAL_CPP_FILES
-  mitkWiiMoteActivator.cpp
+  # mitkWiiMoteActivator.cpp
 )
 
 SET(UI_FILES

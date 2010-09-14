@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QFormLayout>
 #include <QCheckBox>
 #include <QHashIterator>
+#include <QMessageBox.h>
 
 #include <berryIPreferencesService.h>
 #include <berryPlatform.h>
@@ -29,6 +30,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkIInputDeviceRegistry.h>
 #include <mitkIInputDeviceDescriptor.h>
 #include <mitkCoreExtConstants.h>
+
 
 QmitkInputDevicesPrefPage::QmitkInputDevicesPrefPage()
 : m_MainControl(0)
@@ -87,6 +89,23 @@ bool QmitkInputDevicesPrefPage::PerformOk()
     else
     {
       result &= inputdevice->CreateInputDevice()->UnRegisterInputDevice();
+
+      // temporary fix, unclean solution:
+      // e.g. user activates SpaceNavigator and leaves the 
+      // the wiimote deactivated, the user will get the warning
+      // despite the fact that it has never been activated 
+      if(it.value() == "org.mitk.inputdevices.wiimote")
+      {
+        // until now 2010-09-06 there were some unfixed problems
+        // with reconnecting the wiimote after disconnecting it.
+        // It was suggested that it might have something to do 
+        // with the type of stack, that is used for the pairing.
+        // MS-Stack for example does not work properly.
+        QMessageBox::information(NULL,"WiiMote supportproblem",
+          "A reconnect of the WiiMote is not yet supported! "
+          "Please restart the application, if you want to "
+          "activate the Wii remote/s again.");
+      }
     }
 
     if(result)

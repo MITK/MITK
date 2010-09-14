@@ -4,7 +4,7 @@ Program:   Medical Imaging & Interaction Toolkit
 Language:  C++
 Date:      $Date: 2010-03-31 16:40:27 +0200 (Mi, 31 Mrz 2010) $
 Version:   $Revision: 21975 $ 
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
@@ -20,21 +20,36 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkIInputDevice.h"
 
+#include "mitkWiiMoteVtkCameraController.h"
+
 namespace mitk
 {
-	class WiiMoteActivator : public IInputDevice
-	{
-		public:
+  class WiiMoteActivator : public IInputDevice
+  {
+  public:
 
-			WiiMoteActivator();
+    WiiMoteActivator();
+    ~WiiMoteActivator();
 
-			bool RegisterInputDevice();
-			bool UnRegisterInputDevice();
+    /**
+    * @see mitk::IInputDevice::RegisterInputDevice()
+    */
+    bool RegisterInputDevice();
 
-		protected:
+    /**
+    * @see mitk::IInputDevice::UnRegisterInputDevice()
+    */
+    bool UnRegisterInputDevice();
 
-		private:
-	}; // end class WiiMoteActivator
+  protected:
+
+  private:
+
+    bool m_IsRegistered;
+
+    mitk::WiiMoteVtkCameraController::Pointer m_Controller;
+
+  }; // end class WiiMoteActivator
 } // end namespace mitk
 
-#endif /* MITK_WIIMOTEACTIVATOR_H_ */
+#endif // MITK_WIIMOTEACTIVATOR_H_

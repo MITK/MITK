@@ -1,41 +1,32 @@
-/*=========================================================================
-
-Program:   Medical Imaging & Interaction Toolkit
-Language:  C++
-Date:      $Date: 2010-03-31 17:34:48 +0200 (Mi, 31 Mrz 2010) $
-Version:   $Revision: 21985 $
-
-Copyright (c) German Cancer Research Center, Division of Medical and
-Biological Informatics. All rights reserved.
-See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
-
-This software is distributed WITHOUT ANY WARRANTY; without even
-the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-PURPOSE.  See the above copyright notices for more information.
-
-=========================================================================*/
-
 #ifndef MITK_WIIMOTEADDON_H_
 #define MITK_WIIMOTEADDON_H_
-
-#include <mitkVector.h>
-#include <mitkCommon.h>
 
 #include <mitkEventMapperAddon.h>
 #include <mitkInputDevicesExports.h>
 
+#include "mitkWiiMoteEvent.h"
+
+// used for Point2D
+#include "mitkVector.h"
+
 namespace mitk {
+  
+  class WiiMoteThread;
 
   /**
-  * Documentation in the interface.
+  * Documentation in the interface. Some code snippets used here are from the demo <br>
+  * application from gl.tter and therefore are under the same license as <code> wiimote.cpp </code>.
   *
-  * @brief EventMapper addon for a WiiRemote
+  * @brief EventMapper addon for a Wiimote
   * @ingroup Interaction
   */
   class mitkInputDevices_EXPORT WiiMoteAddOn : public EventMapperAddOn
   {
 
   public:
+
+    WiiMoteAddOn();
+    ~WiiMoteAddOn();
 
     // Singleton
     static WiiMoteAddOn* GetInstance();
@@ -45,11 +36,29 @@ namespace mitk {
     */
     void ForwardEvent(const mitk::StateEvent* e);
 
+    /**
+    * Starts all available Wiimotes.
+    */
+    void ActivateWiiMotes();
+
+    /**
+    * Disconnects all Wiimotes and stops the thread.
+    */
+    void DeactivateWiiMotes();
+
+    /**
+    * Creates suitable events, when the Wiimote sends data <br>
+    * and forwards it for further processing.
+    */
+    void WiiMoteInput(const itk::EventObject& e);
+
   protected:
 
   private:
 
+    WiiMoteThread* m_WiiMoteThread;
+
   }; // end class WiiMoteAddOn
 } // end namespace mitk
 
-#endif /* MITK_WIIMOTEADDON_H_ */
+#endif // MITK_WIIMOTEADDON_H_ 

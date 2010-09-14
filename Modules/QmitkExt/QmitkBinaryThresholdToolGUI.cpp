@@ -27,17 +27,28 @@ MITK_TOOL_GUI_MACRO(QmitkExt_EXPORT, QmitkBinaryThresholdToolGUI, "")
 
 QmitkBinaryThresholdToolGUI::QmitkBinaryThresholdToolGUI()
 :QmitkToolGUI(),
- m_Slider(NULL)
+ m_Slider(NULL),
+ m_Spinner(NULL)
 {
   // create the visible widgets
-  QBoxLayout* layout = new QHBoxLayout( this );
-  this->setContentsMargins( 0, 0, 0, 0 );
+  QBoxLayout* mainLayout = new QVBoxLayout(this);
 
-  QLabel* label = new QLabel( "Threshold", this );
+  QLabel* label = new QLabel( "Threshold :", this );
   QFont f = label->font();
   f.setBold(false);
   label->setFont( f );
-  layout->addWidget(label);
+  mainLayout->addWidget(label);
+
+
+  QBoxLayout* layout = new QHBoxLayout();
+
+  m_Spinner = new QSpinBox();
+  m_Spinner->setMaximum(20);
+  m_Spinner->setMinimum(5);
+  m_Spinner->setValue(1);
+
+  connect(m_Spinner, SIGNAL(valueChanged(int)), this, SLOT(OnSpinnerValueChanged(int)) );
+  layout->addWidget(m_Spinner);
 
   //m_Slider = new QSlider( 5, 20, 1, 1, Qt::Horizontal, this );
   m_Slider = new QSlider( Qt::Horizontal, this );
@@ -52,6 +63,8 @@ QmitkBinaryThresholdToolGUI::QmitkBinaryThresholdToolGUI()
   connect( okButton, SIGNAL(clicked()), this, SLOT(OnAcceptThresholdPreview()));
   okButton->setFont( f );
   layout->addWidget( okButton );
+
+  mainLayout->addLayout(layout);
 
   connect( this, SIGNAL(NewToolAssociated(mitk::Tool*)), this, SLOT(OnNewToolAssociated(mitk::Tool*)) );
 }
@@ -90,8 +103,8 @@ void QmitkBinaryThresholdToolGUI::OnSliderValueChanged(int value)
   {
     m_BinaryThresholdTool->SetThresholdValue( value );
   }
+  m_Spinner->setValue(value);
 }
-
 void QmitkBinaryThresholdToolGUI::OnAcceptThresholdPreview()
 {
   if (m_BinaryThresholdTool.IsNotNull())
@@ -119,10 +132,16 @@ void QmitkBinaryThresholdToolGUI::OnAcceptThresholdPreview()
 void QmitkBinaryThresholdToolGUI::OnThresholdingIntervalBordersChanged(int lower, int upper)
 {
   m_Slider->setRange(lower, upper);
+  m_Spinner->setRange(lower, upper);
 }
 
 void QmitkBinaryThresholdToolGUI::OnThresholdingValueChanged(int current)
 {
   m_Slider->setValue(current);
+  m_Spinner->setValue(current);
 }
 
+void QmitkBinaryThresholdToolGUI::OnSpinnerValueChanged(int value)
+{
+  m_Slider->setValue(value);
+}

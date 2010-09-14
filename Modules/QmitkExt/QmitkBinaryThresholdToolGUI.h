@@ -22,8 +22,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkExtExports.h"
 #include "mitkBinaryThresholdTool.h"
 
-class QSlider;
+#include <QSpinBox>
 
+class QSlider;
 /**
   \ingroup org_mitk_gui_qt_interactivesegmentation_internal
   \brief GUI for mitk::BinaryThresholdTool.
@@ -37,7 +38,7 @@ class QmitkExt_EXPORT QmitkBinaryThresholdToolGUI : public QmitkToolGUI
   Q_OBJECT
 
   public:
-    
+
     mitkClassMacro(QmitkBinaryThresholdToolGUI, QmitkToolGUI);
     itkNewMacro(QmitkBinaryThresholdToolGUI);
 
@@ -54,15 +55,16 @@ class QmitkExt_EXPORT QmitkBinaryThresholdToolGUI : public QmitkToolGUI
 
     void OnSliderValueChanged(int value);
     void OnAcceptThresholdPreview();
+    void OnSpinnerValueChanged(int);
 
   protected:
     QmitkBinaryThresholdToolGUI();
     virtual ~QmitkBinaryThresholdToolGUI();
 
     QSlider* m_Slider;
+    QSpinBox* m_Spinner;
 
     mitk::BinaryThresholdTool::Pointer m_BinaryThresholdTool;
 };
 
 #endif
-

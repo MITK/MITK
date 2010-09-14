@@ -65,14 +65,14 @@ QmitkNewSegmentationDialog::QmitkNewSegmentationDialog(QWidget* parent)
 
   connect( completer, SIGNAL(activated(const QString&)), this, SLOT(onColorChange(const QString&)) );
 
-  QBoxLayout * horizontalLayout2 = new QHBoxLayout(this);
+  QBoxLayout * horizontalLayout2 = new QHBoxLayout();
   verticalLayout->addLayout(horizontalLayout2);
   horizontalLayout2->addWidget( btnColor );
   horizontalLayout2->addWidget( edtName );
 
 
 
-  // buttons for closing the dialog
+  //buttons for closing the dialog
   btnOk = new QPushButton( tr("Ok"), this );
   btnOk->setDefault(true);
   connect( btnOk, SIGNAL(clicked()), this, SLOT(onAcceptClicked()) );
@@ -80,8 +80,8 @@ QmitkNewSegmentationDialog::QmitkNewSegmentationDialog(QWidget* parent)
   QPushButton* btnCancel = new QPushButton( tr("Cancel"), this );
   connect( btnCancel, SIGNAL(clicked()), this, SLOT(reject()) );
 
-  QBoxLayout * horizontalLayout = new QHBoxLayout(this);
-  verticalLayout->addLayout( horizontalLayout );
+  QBoxLayout * horizontalLayout = new QHBoxLayout();
+  verticalLayout->addLayout(horizontalLayout);
   horizontalLayout->setSpacing(5);
   horizontalLayout->addStretch();
   horizontalLayout->addWidget( btnOk );

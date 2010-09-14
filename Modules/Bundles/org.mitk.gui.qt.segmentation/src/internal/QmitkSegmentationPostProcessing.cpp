@@ -187,7 +187,7 @@ void QmitkSegmentationPostProcessing::ThresholdImage(bool)
       layout->addWidget(gui);
       m_ThresholdingDialog->setLayout(layout);
       layout->activate();
-      m_ThresholdingDialog->setFixedSize(300,50);
+      m_ThresholdingDialog->setFixedSize(300,75);
       m_ThresholdingDialog->open();
     }
   }

@@ -132,9 +132,9 @@ void mitk::BoundingObjectGroup::RemoveBoundingObject(mitk::BoundingObject::Point
 
 bool mitk::BoundingObjectGroup::IsInside(const mitk::Point3D& p) const
 {  
-  bool inside; // initialize with true for intersection, with false for union
-  bool posInside;
-  bool negInside;
+  bool inside = false; // initialize with true for intersection, with false for union
+  bool posInside = false;
+  bool negInside = false;
 
   for (unsigned int i = 0; i<m_BoundingObjects.size();i++)
   {

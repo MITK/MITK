@@ -3105,24 +3105,28 @@
           <!--AcMODE_DESELECT-->
         </action>
       </transition>
-      <transition NAME="addPoint but check n" NEXT_STATE_ID="42" EVENT_ID="1">
-        <action ID="1101">
+      <transition NAME="addPoint" NEXT_STATE_ID="2" EVENT_ID="1">
+        <action ID="1101" />
           <!--AcMODE_SELECT-->
-        </action>
-        <action ID="103" />
+        <action ID="103" /> 
+          <!--AcREMOVEALL-->
         <action ID="10" />
+          <!--AcADDPOINT-->
       </transition>
     </state>
-    <state NAME="point selected" ID="42" X_POS="674" Y_POS="341" WIDTH="100" HEIGHT="50">
-      <transition NAME="StYes" NEXT_STATE_ID="1" EVENT_ID="12">
+    <state NAME="point selected" ID="2" X_POS="674" Y_POS="341" WIDTH="100" HEIGHT="50">
+      <transition NAME="delete point" NEXT_STATE_ID="1" EVENT_ID="12">
         <action ID="100" />
+        <!--AcREMOVEPOINT-->
         <action ID="1100">
           <!--AcMODEDESELECT-->
         </action>
       </transition>
-      <transition NAME="name" EVENT_ID="1" NEXT_STATE_ID="42">
+      <transition NAME="set point" NEXT_STATE_ID="2" EVENT_ID="1" >
         <action ID="103" />
+        <!--AcREMOVEALL-->
         <action ID="10" />
+        <!--AcADDPOINT-->
       </transition>
     </state>
   </stateMachine>

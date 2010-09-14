@@ -632,7 +632,7 @@ bool mitk::PointSetInteractor::ExecuteAction( Action* action, mitk::StateEvent c
           else it++;
         }
       }
-
+      ok = true;
       // Update the display
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
       break;
@@ -1121,32 +1121,47 @@ void mitk::PointSetInteractor::InitAccordingToNumberOfPoints()
   mitk::PointSet *pointSet = dynamic_cast<mitk::PointSet*>(m_DataNode->GetData());
   if ( pointSet != NULL )
   {
-    int numberOfPoints = pointSet->GetSize( m_TimeStep );
-    if (numberOfPoints == 0)
-      return; //pointset is empty
-    else if (numberOfPoints<m_N || m_N <= -1)//if less than specified or specified as unlimited
+    //resize the CurrentStateVector
+    this->ExpandStartStateVector(pointSet->GetPointSetSeriesSize());
+
+    for (unsigned int timestep = 0; timestep < pointSet->GetPointSetSeriesSize(); timestep++)
     {
-      //get the currentState to state "SpaceLeft"
-      const mitk::Event* nullEvent = new mitk::Event(NULL, Type_User, BS_NoButton, BS_NoButton, Key_none);
-      mitk::StateEvent* newStateEvent = 
-        new mitk::StateEvent(EIDSMALLERN, nullEvent);
-      this->HandleEvent( newStateEvent );
-      delete newStateEvent;
-      delete nullEvent;
-    }
-    else if (numberOfPoints>=m_N)
-    {
-      if (numberOfPoints>m_N)
+      //go to new timestep
+      this->UpdateTimeStep(timestep);
+
+      int numberOfPoints = pointSet->GetSize( timestep );
+      if (numberOfPoints == 0)
+        continue; //pointset is empty
+      else 
       {
-        STATEMACHINE_WARN<<"Point Set contains more points than needed!\n";//display a warning that there are too many points
+        //we have a set of loaded points. Deselect all points, because they are all set to selected when added!
+        this->UnselectAll(timestep);
+
+        if (numberOfPoints<m_N || m_N <= -1)//if less than specified or specified as unlimited
+        {
+          //get the currentState to state "SpaceLeft"
+          const mitk::Event* nullEvent = new mitk::Event(NULL, Type_User, BS_NoButton, BS_NoButton, Key_none);
+          mitk::StateEvent* newStateEvent = 
+            new mitk::StateEvent(EIDSMALLERN, nullEvent);
+          this->HandleEvent( newStateEvent );
+          delete newStateEvent;
+          delete nullEvent;
+        }
+        else if (numberOfPoints>=m_N)
+        {
+          if (numberOfPoints>m_N)
+          {
+            STATEMACHINE_WARN<<"Point Set contains more points than needed!\n";//display a warning that there are too many points
+          }
+          //get the currentState to state "Set full"
+          const mitk::Event* nullEvent = new mitk::Event(NULL, Type_User, BS_NoButton, BS_NoButton, Key_none);
+          mitk::StateEvent* newStateEvent = 
+            new mitk::StateEvent(EIDEQUALSN, nullEvent);
+          this->HandleEvent( newStateEvent );
+          delete newStateEvent;
+          delete nullEvent;
+        }
       }
-      //get the currentState to state "Set full"
-      const mitk::Event* nullEvent = new mitk::Event(NULL, Type_User, BS_NoButton, BS_NoButton, Key_none);
-      mitk::StateEvent* newStateEvent = 
-        new mitk::StateEvent(EIDEQUALSN, nullEvent);
-      this->HandleEvent( newStateEvent );
-      delete newStateEvent;
-      delete nullEvent;
     }
   }
   return;

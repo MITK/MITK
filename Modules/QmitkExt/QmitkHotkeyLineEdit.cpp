@@ -70,7 +70,7 @@ void QmitkHotkeyLineEdit::keyPressEvent( QKeyEvent * event )
 
 void QmitkHotkeyLineEdit::SetKeySequence( const QKeySequence& _QKeySequence)
 {
-  this->setText(m_KeySequence.toString());
+  this->setText(_QKeySequence.toString());
 }
 
 void QmitkHotkeyLineEdit::SetKeySequence( const QString& _QKeySequenceAsString )

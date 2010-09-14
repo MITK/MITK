@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QFormLayout>
 #include <QCheckBox>
 #include <QHashIterator>
-#include <QMessageBox.h>
+#include <QMessageBox>
 
 #include <berryIPreferencesService.h>
 #include <berryPlatform.h>

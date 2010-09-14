@@ -232,6 +232,9 @@ INSTALL(FILES ${PROJECT_SOURCE_DIR}/Data/pointInMittlereLebervene.mps DESTINATIO
 INSTALL(FILES ${PROJECT_SOURCE_DIR}/Data/SegmentationBranchOfHepaticVein.pic.gz DESTINATION bin)
 INSTALL(FILES ${PROJECT_SOURCE_DIR}/Data/Resection-Proposal_Left.stl DESTINATION bin)
 INSTALL(FILES ${PROJECT_SOURCE_DIR}/Data/Resection-Proposal_Right.stl DESTINATION bin)
+INSTALL(FILES ${PROJECT_SOURCE_DIR}/Data/PointBehindLiver.mps DESTINATION bin)
+INSTALL(FILES ${PROJECT_SOURCE_DIR}/Data/PointInfrontLiver.mps DESTINATION bin)
+INSTALL(FILES ${PROJECT_SOURCE_DIR}/Data/PointInLiver.mps DESTINATION bin)
 
 # directory has to be created to make sure the installer does not report
 # an error if doxygen was not invoked before.

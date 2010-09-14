@@ -1,4 +1,5 @@
 SET(CPP_FILES
+  Algorithms/mitkBoundingObjectToSegmentationFilter.cpp
   Algorithms/vtkPointSetSlicer.cxx
   Algorithms/mitkCoreExtObjectFactory.cpp
   Algorithms/mitkImageStatisticsCalculator.cpp

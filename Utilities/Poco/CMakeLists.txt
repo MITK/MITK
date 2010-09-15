@@ -14,7 +14,7 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "" CACHE PATH "The single directory for all l
 
 
 #set(COMMON_CXX "-Wall -Wno-sign-compare")
-set(CMAKE_CXX_FLAGS_DEBUG "${COMMON_CXX} ${CMAKE_CXX_FLAGS_DEBUG} /D_DEBUG")
+set(CMAKE_CXX_FLAGS_DEBUG "${COMMON_CXX} ${CMAKE_CXX_FLAGS_DEBUG}")
 set(CMAKE_CXX_FLAGS_MINSIZEREL "${COMMON_CXX} ${CMAKE_CXX_FLAGS_MINSIZEREL}")
 
 # Set the library postfix
@@ -52,6 +52,7 @@ include(CMakeDetermineCompilerId)
 # OS Detection
 if(CMAKE_SYSTEM MATCHES "Windows")
  add_definitions( -DPOCO_OS_FAMILY_WINDOWS )# -DPOCO_WIN32_UTF8)
+ add_definitions( -DPOCO_NO_AUTOMATIC_LIBS )
   set(SYSLIBS iphlpapi gdi32)
 endif(CMAKE_SYSTEM MATCHES "Windows")
 

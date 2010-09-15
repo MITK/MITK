@@ -225,7 +225,7 @@ QmitkLevelWindowPresetDefinitionDialog::
 PresetTableModel::addPreset(std::string& name, double level, double window)
 {
 
-  this->beginInsertRows(QModelIndex(), m_Entries.size(), m_Entries.size());
+  this->beginInsertRows(QModelIndex(), (int) m_Entries.size(), (int) m_Entries.size());
 
   m_Entries.push_back(Entry(name, level, window));
 
@@ -285,7 +285,7 @@ int
 QmitkLevelWindowPresetDefinitionDialog::
 PresetTableModel::rowCount(const QModelIndex&) const
 {
-  return m_Entries.size();
+  return (int) m_Entries.size();
 }
   
 int 

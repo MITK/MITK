@@ -59,7 +59,7 @@ void vtkObjectSet::RemoveObject ( vtkObject * obj )
 }
 
 void vtkObjectSet::OnObjectModified(vtkObject* caller, unsigned long eid
-                                 , void* clientdata, void */*calldata*/)
+                                 , void* clientdata, void * /*calldata*/)
 {
   // if event == modified event, inform objectobservers
   // else: call RemoveObject() or remove objectobserver and inform objectobservers

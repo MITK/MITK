@@ -107,7 +107,7 @@ public:
 
       pointSetWriter->Write();
     } 
-    catch (std::exception& e)
+    catch (std::exception& /*e*/)
     {
       return false;
     }
@@ -134,7 +134,7 @@ public:
         PointSetCompare(pointSet.GetPointer(), m_SavedPointSet.at(i).GetPointer(),
             identical);
       }
-    } catch (std::exception& e)
+    } catch (std::exception& /*e*/)
     {
     }
   }

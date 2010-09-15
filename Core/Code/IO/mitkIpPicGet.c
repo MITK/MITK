@@ -289,8 +289,8 @@ mitkIpPicDescriptor * _MITKipPicOldGet( FILE *infile, mitkIpPicDescriptor *pic )
   
   data = (mitkIpUInt1_t*) pic->data;
   for ( block_nr = 0 ; block_nr < number_of_blocks ; ++block_nr )
-    bytes_read += mitkIpPicFReadLE( data + ( block_nr * block_size ), 1, block_size, infile );
-  bytes_read += mitkIpPicFReadLE( data + ( number_of_blocks * block_size ), 1, remaining_bytes, infile );
+    bytes_read += mitkIpPicFReadLE( data + ( block_nr * block_size ), 1, (unsigned int) block_size, infile );
+  bytes_read += mitkIpPicFReadLE( data + ( number_of_blocks * block_size ), 1, (unsigned int) remaining_bytes, infile );
     
   if ( bytes_read != number_of_bytes )
     fprintf( stderr, "Error while reading (ferror indicates %u), only %lu bytes were read! Eof indicator is %u.\n", ferror(infile), (long unsigned int)bytes_read, feof(infile) );
@@ -614,14 +614,14 @@ MITKipPicGet( char *infile_name, mitkIpPicDescriptor *pic )
   if( pic->type == mitkIpPicNonUniform )
     {
       for ( block_nr = 0 ; block_nr < number_of_blocks ; ++block_nr )
-        bytes_read += mitkIpPicFRead( data + ( block_nr * block_size ), 1, block_size, infile );
-      bytes_read += mitkIpPicFRead( data + ( number_of_blocks * block_size ), 1, remaining_bytes, infile );
+        bytes_read += mitkIpPicFRead( data + ( block_nr * block_size ), 1, (unsigned int) block_size, infile );
+      bytes_read += mitkIpPicFRead( data + ( number_of_blocks * block_size ), 1, (unsigned int) remaining_bytes, infile );
     }
   else
     {
       for ( block_nr = 0 ; block_nr < number_of_blocks ; ++block_nr )
-        bytes_read += mitkIpPicFReadLE( data + ( block_nr * block_size ), 1, block_size, infile );
-      bytes_read += mitkIpPicFReadLE( data + ( number_of_blocks * block_size ), 1, remaining_bytes, infile );
+        bytes_read += mitkIpPicFReadLE( data + ( block_nr * block_size ), 1, (unsigned int) block_size, infile );
+      bytes_read += mitkIpPicFReadLE( data + ( number_of_blocks * block_size ), 1, (unsigned int) remaining_bytes, infile );
     }
     
   if ( bytes_read != number_of_bytes )

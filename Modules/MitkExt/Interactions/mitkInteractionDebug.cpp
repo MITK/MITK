@@ -67,7 +67,7 @@ namespace mitk {
 
     sendCounter();
     // MITK_INFO << "Open Connection file name: " << m_FileName << std::endl;
-    SocketClient::GetInstance()->send( OPEN_CONNECTION, size, m_Buffer );
+    SocketClient::GetInstance()->send( OPEN_CONNECTION, (unsigned int) size, m_Buffer );
   }
 
   /**
@@ -96,7 +96,7 @@ namespace mitk {
 
     sendCounter();
     // MITK_INFO << "NEW_STATE_MACHINE: instance: " << (unsigned int) stateMachine << " Type: " << name << std::endl;
-    return SocketClient::GetInstance()->send( NEW_STATE_MACHINE, size, m_Buffer );
+    return SocketClient::GetInstance()->send( NEW_STATE_MACHINE, (unsigned int) size, m_Buffer );
   }
 
   /**

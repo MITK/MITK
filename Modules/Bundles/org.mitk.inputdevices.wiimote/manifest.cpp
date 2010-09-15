@@ -15,13 +15,12 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-// #include <Poco/ClassLibrary.h>
+#include <Poco/ClassLibrary.h>
 
+#include <mitkIInputDevice.h>
+#include "src/internal/mitkWiiMoteActivator.h"
 
-// #include <mitkIInputDevice.h>
-// #include "src/internal/mitkWiiMoteActivator.h"
-
-// POCO_BEGIN_NAMED_MANIFEST(mitkIInputDevice, mitk::IInputDevice)
-  // POCO_EXPORT_CLASS(mitk::WiiMoteActivator)
-// POCO_END_MANIFEST
+POCO_BEGIN_NAMED_MANIFEST(mitkIInputDevice, mitk::IInputDevice)
+  POCO_EXPORT_CLASS(mitk::WiiMoteActivator)
+POCO_END_MANIFEST
 

@@ -92,11 +92,11 @@ public:
   template<class T>
   static int Compare(const std::vector<T>& leftArray,
       const std::vector<T>& rightArray) {
-    int result = leftArray.size() - rightArray.size();
+    int result = (int) (leftArray.size() - rightArray.size());
     if (result == 0)
     {
       for (unsigned int i = 0; i < leftArray.size(); ++i) {
-        long int diff = (&(leftArray[i]) - &(rightArray[i]));
+        long int diff = (long) (&(leftArray[i]) - &(rightArray[i]));
         int result = diff ? (diff < 0 ? -1 : 1) : 0;
         if (result != 0) break;
       }

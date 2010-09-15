@@ -26,7 +26,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkActor.h>
 #include <vtkAppendPolyData.h>
 #include <vtkAssembly.h>
+#pragma GCC diagnostic ignored "-Wstrict-aliasing"
 #include <vtkCellArray.h>
+#pragma GCC diagnostic warning "-Wstrict-aliasing"
 #include <vtkFollower.h>
 #include <vtkLinearTransform.h>
 #include <vtkPolyData.h>

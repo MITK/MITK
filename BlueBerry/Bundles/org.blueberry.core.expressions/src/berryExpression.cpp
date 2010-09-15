@@ -117,9 +117,9 @@ Expression::HashCode(std::vector<Object::Pointer>& array)
   if (array.size() == 0) {
     return 0;
   }
-  int hashCode = Poco::hash("std::vector<Object::Pointer>");
+  int hashCode = (int) Poco::hash("std::vector<Object::Pointer>");
   for (unsigned int i= 0; i < array.size(); i++) {
-    hashCode = hashCode + array[i]->HashCode();
+    hashCode = hashCode + (int) array[i]->HashCode();
   }
   return hashCode;
 }

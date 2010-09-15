@@ -149,7 +149,7 @@ std::string ParameterizedCommand::GetName() const throw(NotDefinedException)
   {
     std::stringstream nameBuffer;
     nameBuffer << command->GetName() << " (";
-    const unsigned int parameterizationCount = parameterizations.size();
+    const unsigned int parameterizationCount = (unsigned int) parameterizations.size();
     for (unsigned int i = 0; i < parameterizationCount; i++)
     {
       const Parameterization& parameterization = parameterizations[i];

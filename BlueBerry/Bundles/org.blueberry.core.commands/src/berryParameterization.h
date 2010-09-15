@@ -128,7 +128,11 @@ public:
    * @throws ParameterValuesException
    *             If the parameter needed to be initialized, but couldn't be.
    */
+#ifdef _MSC_VER
+  std::string GetValueName() const throw();
+#else
   std::string GetValueName() const throw(ParameterValuesException);
+#endif
 
   /* (non-Javadoc)
    * @see java.lang.Object#hashCode()

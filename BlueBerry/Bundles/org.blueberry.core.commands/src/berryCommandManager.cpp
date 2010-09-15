@@ -191,7 +191,7 @@ CommandManager::CommandManager()
       const std::string& serializedParameterizedCommand)
       throw(NotDefinedException, SerializationException) {
 
-    const int lparenPosition = this->UnescapedIndexOf(
+    const int lparenPosition = (int) this->UnescapedIndexOf(
         serializedParameterizedCommand, PARAMETER_START_CHAR);
 
     std::string commandIdEscaped;

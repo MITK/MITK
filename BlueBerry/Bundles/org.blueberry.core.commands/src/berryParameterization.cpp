@@ -86,7 +86,11 @@ std::string Parameterization::GetValue() const
   return value;
 }
 
+#ifdef _MSC_VER
+std::string Parameterization::GetValueName() const throw()
+#else
 std::string Parameterization::GetValueName() const throw(ParameterValuesException)
+#endif
 {
   const IParameter::ParameterValues parameterValues = parameter->GetValues();
 

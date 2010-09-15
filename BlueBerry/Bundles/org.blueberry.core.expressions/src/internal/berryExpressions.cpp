@@ -269,7 +269,7 @@ namespace berry
       try
       {
         double num = Poco::NumberParser::parseFloat(arg);
-        ObjectFloat::Pointer var(new ObjectFloat(num));
+        ObjectFloat::Pointer var(new ObjectFloat((float) num));
         return var;
       }
       catch (Poco::SyntaxException)

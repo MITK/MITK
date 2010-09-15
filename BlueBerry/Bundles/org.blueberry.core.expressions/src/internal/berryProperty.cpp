@@ -73,9 +73,9 @@ Property::Property(Object::Pointer type,
 
  int
  Property::HashCode() {
-   return (Poco::Hash<std::string>()(typeid(fType).name()) << 16) |
+   return (int) ((Poco::Hash<std::string>()(typeid(fType).name()) << 16) |
            (Poco::Hash<std::string>()(fNamespace) << 8) |
-           Poco::Hash<std::string>()(fName);
+           Poco::Hash<std::string>()(fName));
  }
 
 }

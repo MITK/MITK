@@ -66,7 +66,7 @@ Object::Pointer QtItemSelection::GetFirstElement() const
 
   int QtItemSelection::Size() const
   {
-    return m_Selection->size();
+    return (int) m_Selection->size();
   }
 
   QtItemSelection::ContainerType::Pointer QtItemSelection::ToVector() const

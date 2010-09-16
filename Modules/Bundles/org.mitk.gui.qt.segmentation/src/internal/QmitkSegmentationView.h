@@ -84,6 +84,8 @@ class QmitkSegmentationView : public QObject, public QmitkFunctionality
     // called when one of "Manual", "Organ", "Lesion" pages of the QToolbox is selected
     void ToolboxStackPageChanged(int id);
 
+    void OnSurfaceSelectionChanged();
+
   protected:
 
     // a type for handling lists of DataNodes

@@ -197,7 +197,7 @@
    <item>
     <widget class="QToolBox" name="widgetStack">
      <property name="currentIndex">
-      <number>0</number>
+      <number>3</number>
      </property>
      <widget class="QWidget" name="pageManual">
       <property name="geometry">
@@ -666,6 +666,12 @@
        </item>
        <item>
         <widget class="QPushButton" name="CreateSegmentationFromSurface">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="toolTip">
+          <string/>
+         </property>
          <property name="text">
           <string>Create Segmentation From Surface</string>
          </property>
@@ -693,6 +699,11 @@
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
   <customwidget>
+   <class>QmitkDataStorageComboBox</class>
+   <extends>QComboBox</extends>
+   <header location="global">QmitkDataStorageComboBox.h</header>
+  </customwidget>
+  <customwidget>
    <class>QmitkToolSelectionBox</class>
    <extends>QWidget</extends>
    <header location="global">QmitkToolSelectionBox.h</header>
@@ -706,11 +717,6 @@
    <class>QmitkToolGUIArea</class>
    <extends>QWidget</extends>
    <header location="global">QmitkToolGUIArea.h</header>
-  </customwidget>
-  <customwidget>
-   <class>QmitkDataStorageComboBox</class>
-   <extends>QComboBox</extends>
-   <header location="global">QmitkDataStorageComboBox.h</header>
   </customwidget>
  </customwidgets>
  <includes>

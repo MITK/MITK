@@ -303,8 +303,7 @@ void QmitkSegmentationView::CreateNewSegmentation()
 }
 
 void QmitkSegmentationView::CreateSegmentationFromSurface()
-{
-
+{ 
   mitk::DataNode::Pointer surfaceNode =
       m_Controls->MaskSurfaces->GetSelectedNode();
   mitk::Surface::Pointer surface(0);
@@ -424,8 +423,27 @@ void QmitkSegmentationView::OnSelectionChanged(mitk::DataNode* node)
   this->OnSelectionChanged( nodes );
 }
 
+
+
+void QmitkSegmentationView::OnSurfaceSelectionChanged()
+{   
+  // if Image and Surface are selected, enable button
+  if ( (m_Controls->refImageSelector->GetSelectedNode().IsNull()) ||
+       (m_Controls->MaskSurfaces->GetSelectedNode().IsNull()))
+    m_Controls->CreateSegmentationFromSurface->setEnabled(false);
+  else
+    m_Controls->CreateSegmentationFromSurface->setEnabled(true);
+}
+
 void QmitkSegmentationView::OnSelectionChanged(std::vector<mitk::DataNode*> nodes)
 {
+  // if Image and Surface are selected, enable button
+  if ( (m_Controls->refImageSelector->GetSelectedNode().IsNull()) ||
+       (m_Controls->MaskSurfaces->GetSelectedNode().IsNull()))
+    m_Controls->CreateSegmentationFromSurface->setEnabled(false);
+  else
+    m_Controls->CreateSegmentationFromSurface->setEnabled(true);
+
   if (!m_Parent || !m_Parent->isVisible()) return;
 
   // reaction to BlueBerry selection events
@@ -486,6 +504,15 @@ void QmitkSegmentationView::OnSelectionChanged(std::vector<mitk::DataNode*> node
       referenceData = (*possibleParents)[0];
     }
   }
+
+  // if Image and Surface are selected, enable button
+  if ( (m_Controls->refImageSelector->GetSelectedNode().IsNull()) ||
+       (m_Controls->MaskSurfaces->GetSelectedNode().IsNull()) ||
+       (!referenceData))
+    m_Controls->CreateSegmentationFromSurface->setEnabled(false);
+  else
+    m_Controls->CreateSegmentationFromSurface->setEnabled(true);
+
 
   SetToolManagerSelection(referenceData, workingData);
   ForceDisplayPreferencesUponAllImages();
@@ -772,6 +799,10 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
   connect( m_Controls->CreateSegmentationFromSurface, SIGNAL(clicked()), this, SLOT(CreateSegmentationFromSurface()) );
   connect( m_Controls->m_ManualToolSelectionBox, SIGNAL(ToolSelected(int)), this, SLOT(ManualToolSelected(int)) );
   connect( m_Controls->widgetStack, SIGNAL(currentChanged(int)), this, SLOT(ToolboxStackPageChanged(int)) );
+
+
+  connect(m_Controls->MaskSurfaces,  SIGNAL( OnSelectionChanged( const mitk::DataNode* ) ), 
+           this, SLOT( OnSurfaceSelectionChanged( ) ) );
 
   m_Controls->MaskSurfaces->SetDataStorage(this->GetDefaultDataStorage());
   m_Controls->MaskSurfaces->SetPredicate(mitk::NodePredicateDataType::New("Surface"));

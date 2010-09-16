@@ -197,7 +197,7 @@
    <item>
     <widget class="QToolBox" name="widgetStack">
      <property name="currentIndex">
-      <number>3</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="pageManual">
       <property name="geometry">
@@ -538,8 +538,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>223</width>
-        <height>176</height>
+        <width>98</width>
+        <height>30</height>
        </rect>
       </property>
       <attribute name="label">
@@ -592,8 +592,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>223</width>
-        <height>176</height>
+        <width>98</width>
+        <height>30</height>
        </rect>
       </property>
       <attribute name="label">

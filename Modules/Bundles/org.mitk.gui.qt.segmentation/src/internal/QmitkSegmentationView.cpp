@@ -409,11 +409,13 @@ void QmitkSegmentationView::OnComboBoxSelectionChanged( const mitk::DataNode* no
   if( selectedNode != NULL )
   {
     m_Controls->refImageSelector->show();
+    m_Controls->lblReferenceImageSelectionWarning->hide();
     this->OnSelectionChanged( const_cast<mitk::DataNode*>(node) );
   }
   else
   {
     m_Controls->refImageSelector->hide();
+    m_Controls->lblReferenceImageSelectionWarning->show();
   }
 }
 void QmitkSegmentationView::OnSelectionChanged(mitk::DataNode* node)
@@ -467,7 +469,8 @@ void QmitkSegmentationView::OnSelectionChanged(std::vector<mitk::DataNode*> node
   bool invalidSelection( !nodes.empty() &&
                          (
                            nodes.size() > 2 ||    // maximum 2 selected nodes
-                           (nodes.size() == 2 && (workingData.IsNull() || referenceData.IsNull()) ) // with two nodes, one must be the original image, one the segmentation
+                           (nodes.size() == 2 && (workingData.IsNull() || referenceData.IsNull()) ) || // with two nodes, one must be the original image, one the segmentation
+                           ( workingData.GetPointer() == referenceData.GetPointer() ) //one node is selected as reference and working image
                            // one item is always ok (might be working or reference or nothing
                          )
                        );
@@ -475,7 +478,7 @@ void QmitkSegmentationView::OnSelectionChanged(std::vector<mitk::DataNode*> node
   if (invalidSelection)
   {
     // TODO visible warning when two images are selected
-    MITK_ERROR << "WARNING: No image or too many (>2) were selected.";
+    MITK_ERROR << "WARNING: No image, too many (>2) or two equal images were selected.";
     workingData = NULL;
 
     if( m_Controls->refImageSelector->GetSelectedNode().IsNull() )

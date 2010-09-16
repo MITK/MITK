@@ -42,7 +42,7 @@ struct EmptyStructuredSelection : public IStructuredSelection
     return elements->end();
   }
 
-  size_t Size() const
+  int Size() const
   {
     return elements->size();
   }

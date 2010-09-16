@@ -407,4 +407,9 @@ void QmitkPointListWidget::OnNodeDeleted( const itk::EventObject &  /*e*/ )
   m_NodeObserverTag = 0;
   m_PointSetNode = NULL;
   m_PointListView->SetPointSetNode(NULL);
+  m_ToggleAddPoint->setEnabled(false);
+
+  m_RemovePointBtn->setEnabled( m_PointSetNode );
+  m_LoadPointsBtn->setEnabled( m_PointSetNode );
+  m_LoadPointsBtn->setEnabled( m_PointSetNode );
 }

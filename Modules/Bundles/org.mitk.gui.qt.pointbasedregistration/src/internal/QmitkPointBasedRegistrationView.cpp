@@ -632,6 +632,7 @@ void QmitkPointBasedRegistrationView::MovingSelected(mitk::DataNode::Pointer mov
 void QmitkPointBasedRegistrationView::updateMovingLandmarksList()
 {
   m_MovingLandmarks = (mitk::PointSet*)m_MovingPointSetNode->GetData();
+  m_Controls.m_MovingPointListWidget->SetPointSetNode(m_MovingPointSetNode);    //Workaround: m_MovingPointListWidget->m_PointListView->m_PointListModel loses the pointer on the pointsetnode
   this->checkLandmarkError();
   this->CheckCalculate();
 }
@@ -639,6 +640,7 @@ void QmitkPointBasedRegistrationView::updateMovingLandmarksList()
 void QmitkPointBasedRegistrationView::updateFixedLandmarksList()
 {
   m_FixedLandmarks = (mitk::PointSet*)m_FixedPointSetNode->GetData();
+  m_Controls.m_FixedPointListWidget->SetPointSetNode(m_FixedPointSetNode);     //Workaround: m_FixedPointListWidget->m_PointListView->m_PointListModel loses the pointer on the pointsetnode
   this->checkLandmarkError();
   this->CheckCalculate();
 }

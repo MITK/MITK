@@ -63,11 +63,11 @@ The Segmentation perspective makes a number of assumptions. To know what this mo
 
 \section org_mitk_gui_qt_segmentationUserManualImageSelection Image selection
 
-The Segmentation perspective makes use of the Data Manager view to give you an overview of all images and segmentations.
+The Segmentation perspective makes use of the Data Manager view to give you an overview of all images and segmentations. 
 
-\image html org_mitk_gui_qt_segmentationIMGdatamanagerview.png Data Manager is used for selection of the current segmentation
+\image html org_mitk_gui_qt_segmentationIMGselection.png Data Manager is used for selection of the current segmentation. The reference image is selected in the drop down box of the control area.
 
-Use this hierarchical view to select the original CT/MR image and segmentations for manual editing.
+To select the reference image (e.g. the original CT/MR image) use the drop down box in the control area of the Segmentation view. The segmentation image that has been selected in the Data Manager is displayed below the drop down box. If no segmentation image exists or none is selected create a new segmentation image by using the "New segmentation" button.
 Some items of the graphical user interface might be disabled when no image is selected.
 In any case the application will give you hints if a selection is needed.
 

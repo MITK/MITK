@@ -406,7 +406,7 @@ assert( elements * tsv->bpe / 8 == len
               free( tsv->value );
 
               tsv->value = MITKstrdup( "*** ENCRYPTED ***" );
-              tsv->n[0] = strlen(tsv->value);
+              tsv->n[0] = (mitkIpUInt4_t)strlen(tsv->value);
               tsv->type = mitkIpPicASCII;
               tsv->dim = 1;
             }

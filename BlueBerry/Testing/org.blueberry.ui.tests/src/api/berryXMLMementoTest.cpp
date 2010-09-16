@@ -128,7 +128,7 @@ struct CopyChildChecker: public XMLMementoTest::MementoChecker
     mementoTest->CheckMemento(child, true);
     std::vector<IMemento::Pointer> children(deserializedMemento->GetChildren(
         "c"));
-    assertEqual(2, children.size());
+    assertEqual(2, (long)children.size());
     assertEqual("i", children[0]->GetID());
     mementoTest->CheckMemento(children[0], true);
     assertEqual("i", children[1]->GetID());
@@ -205,7 +205,7 @@ struct GetChildrenChecker: public XMLMementoTest::MementoChecker
     // second child with the same type
     IMemento::Pointer child2 = mementoToSerialize->CreateChild(type, id2);
     assertNotNullPtr(child2.GetPointer());
-    assertEqual(2, mementoToSerialize->GetChildren(type).size());
+    assertEqual(2, (long)mementoToSerialize->GetChildren(type).size());
     assertEqual(id2, child2->GetID());
   }
 
@@ -213,7 +213,7 @@ struct GetChildrenChecker: public XMLMementoTest::MementoChecker
   {
     std::vector<IMemento::Pointer> children(deserializedMemento->GetChildren(
         type));
-    assertEqual(2, children.size());
+    assertEqual(2, (long)children.size());
 
     // this checks that the order is maintained.
     // the spec does not promise this, but clients
@@ -503,7 +503,7 @@ void XMLMementoTest::CheckMemento(IMemento::Pointer memento,
   assertNotNullPtr(child2.GetPointer());
   assertEqual("child2id1", child2->GetID());
   std::vector<IMemento::Pointer> children(memento->GetChildren("child2"));
-  assertEqual(2, children.size());
+  assertEqual(2, (long)children.size());
   assertEqual("child2id1", children[0]->GetID());
   assertEqual("child2id2", children[1]->GetID());
 }

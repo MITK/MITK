@@ -83,7 +83,7 @@ inline bool my_isnan(float x)
 
  }
 
-QmitkImageStatistics::QmitkImageStatistics(QObject */*parent*/, const char */*name*/)
+QmitkImageStatistics::QmitkImageStatistics(QObject* /*parent*/, const char* /*name*/)
 : QmitkFunctionality(),
   m_Controls( NULL ),
   m_TimeStepperAdapter( NULL ),

@@ -86,7 +86,7 @@ inline bool MutexImpl::tryLockImpl()
 {
 	try
 	{
-		return TryEnterCriticalSection(&_cs) == TRUE;
+		return TryEnterCriticalSection(&_cs) == 1;
 	}
 	catch (...)
 	{

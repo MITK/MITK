@@ -83,11 +83,11 @@ CppUnit::Test* MessageTest::Suite()
     typedef berry::MessageDelegate<MessageReceiver> Delegate;
 
     msg += Delegate(&receiver, &MessageReceiver::PureSignal);
-    assertEqual(1, msg.GetListeners().size());
+    assertEqual(1, (long)msg.GetListeners().size());
     msg += Delegate(&receiver2, &MessageReceiver::PureSignal);
     // duplicate entry
     msg += Delegate(&receiver, &MessageReceiver::PureSignal);
-    assertEqual(2, msg.GetListeners().size());
+    assertEqual(2, (long)msg.GetListeners().size());
 
     msg.Send();
     assert(receiver.received && receiver2.received);
@@ -95,7 +95,7 @@ CppUnit::Test* MessageTest::Suite()
     receiver.received = false;
     receiver2.received = false;
     msg -= Delegate(&receiver, &MessageReceiver::PureSignal);
-    assertEqual(1, msg.GetListeners().size());
+    assertEqual(1, (long)msg.GetListeners().size());
 
     msg.Send();
     assert(receiver.received == false && receiver2.received);
@@ -134,11 +134,11 @@ CppUnit::Test* MessageTest::Suite()
     typedef berry::MessageDelegate1<MessageReceiver, int> Delegate;
 
     msg += Delegate(&receiver, &MessageReceiver::Message1);
-    assertEqual(1, msg.GetListeners().size());
+    assertEqual(1, (long)msg.GetListeners().size());
     msg += Delegate(&receiver2, &MessageReceiver::Message1);
     // duplicate entry
     msg += Delegate(&receiver, &MessageReceiver::Message1);
-    assertEqual(2, msg.GetListeners().size());
+    assertEqual(2, (long)msg.GetListeners().size());
 
     msg.Send(1);
     assert(receiver.received && receiver2.received);
@@ -146,7 +146,7 @@ CppUnit::Test* MessageTest::Suite()
     receiver.received = false;
     receiver2.received = false;
     msg -= Delegate(&receiver, &MessageReceiver::Message1);
-    assertEqual(1, msg.GetListeners().size());
+    assertEqual(1, (long)msg.GetListeners().size());
 
     msg.Send(1);
     assert(receiver.received == false && receiver2.received);
@@ -185,11 +185,11 @@ CppUnit::Test* MessageTest::Suite()
     typedef berry::MessageDelegate2<MessageReceiver, int, float> Delegate;
 
     msg += Delegate(&receiver, &MessageReceiver::Message2);
-    assertEqual(1, msg.GetListeners().size());
+    assertEqual(1, (long)msg.GetListeners().size());
     msg += Delegate(&receiver2, &MessageReceiver::Message2);
     // duplicate entry
     msg += Delegate(&receiver, &MessageReceiver::Message2);
-    assertEqual(2, msg.GetListeners().size());
+    assertEqual(2, (long)msg.GetListeners().size());
 
     msg.Send(1, 1.0);
     assert(receiver.received && receiver2.received);
@@ -197,7 +197,7 @@ CppUnit::Test* MessageTest::Suite()
     receiver.received = false;
     receiver2.received = false;
     msg -= Delegate(&receiver, &MessageReceiver::Message2);
-    assertEqual(1, msg.GetListeners().size());
+    assertEqual(1, (long)msg.GetListeners().size());
 
     msg.Send(1, 1.0);
     assert(receiver.received == false && receiver2.received);
@@ -220,7 +220,7 @@ CppUnit::Test* MessageTest::Suite()
     for (Listeners::const_iterator iter = listeners.begin();
          iter != listeners.end(); ++iter)
     {
-      valueReturned = (*iter)->Execute(1, 0.4);
+      valueReturned = (*iter)->Execute(1, 0.4f);
       if (valueReturned) break;
     }
     assert(valueReturned);
@@ -236,11 +236,11 @@ CppUnit::Test* MessageTest::Suite()
     typedef berry::MessageDelegate3<MessageReceiver, int, float, double> Delegate;
 
     msg += Delegate(&receiver, &MessageReceiver::Message3);
-    assertEqual(1, msg.GetListeners().size());
+    assertEqual(1, (long)msg.GetListeners().size());
     msg += Delegate(&receiver2, &MessageReceiver::Message3);
     // duplicate entry
     msg += Delegate(&receiver, &MessageReceiver::Message3);
-    assertEqual(2, msg.GetListeners().size());
+    assertEqual(2, (long)msg.GetListeners().size());
 
     msg.Send(1, 1.0, 2.0);
     assert(receiver.received && receiver2.received);
@@ -248,7 +248,7 @@ CppUnit::Test* MessageTest::Suite()
     receiver.received = false;
     receiver2.received = false;
     msg -= Delegate(&receiver, &MessageReceiver::Message3);
-    assertEqual(1, msg.GetListeners().size());
+    assertEqual(1, (long)msg.GetListeners().size());
 
     msg.Send(1, -1.0, 5.0);
     assert(receiver.received == false && receiver2.received);
@@ -287,21 +287,21 @@ CppUnit::Test* MessageTest::Suite()
     typedef berry::MessageDelegate4<MessageReceiver, int, float, double, bool> Delegate;
 
     msg += Delegate(&receiver, &MessageReceiver::Message4);
-    assertEqual(1, msg.GetListeners().size());
+    assertEqual(1, (long)msg.GetListeners().size());
     msg += Delegate(&receiver2, &MessageReceiver::Message4);
     // duplicate entry
     msg += Delegate(&receiver, &MessageReceiver::Message4);
-    assertEqual(2, msg.GetListeners().size());
+    assertEqual(2, (long)msg.GetListeners().size());
 
-    msg.Send(1, 5.4, -1.0, true);
+    msg.Send(1, 5.4f, -1.0f, true);
     assert(receiver.received && receiver2.received);
 
     receiver.received = false;
     receiver2.received = false;
     msg -= Delegate(&receiver, &MessageReceiver::Message4);
-    assertEqual(1, msg.GetListeners().size());
+    assertEqual(1, (long)msg.GetListeners().size());
 
-    msg.Send(1, 0.2, 12.0, true);
+    msg.Send(1, 0.2f, 12.0f, true);
     assert(receiver.received == false && receiver2.received);
   }
 
@@ -312,7 +312,7 @@ CppUnit::Test* MessageTest::Suite()
     MessageReceiver receiver;
     typedef berry::MessageDelegate4<MessageReceiver, int, float, double, bool, bool> Delegate;
     msg += Delegate(&receiver, &MessageReceiver::Message4WithReturn);
-    msg(1, 4.1, -1, true);
+    msg(1, 4.1f, -1, true);
     assert(receiver.received);
 
     receiver.received = false;
@@ -322,7 +322,7 @@ CppUnit::Test* MessageTest::Suite()
     for (Listeners::const_iterator iter = listeners.begin();
          iter != listeners.end(); ++iter)
     {
-      valueReturned = (*iter)->Execute(1, -34.21, 2, true);
+      valueReturned = (*iter)->Execute(1, -34.21f, 2, true);
       if (valueReturned) break;
     }
     assert(valueReturned);

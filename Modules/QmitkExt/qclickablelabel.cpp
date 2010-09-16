@@ -43,8 +43,8 @@ QClickableLabel::~QClickableLabel()
 void QClickableLabel::AddHotspot( const QString& name, const QRect position )
 {
   m_Hotspots.push_back( position );
-  m_HotspotIndexForName.insert( std::make_pair( name, m_Hotspots.size()-1 ) );
-  m_HotspotNameForIndex.insert( std::make_pair( m_Hotspots.size()-1, name ) );
+  m_HotspotIndexForName.insert( std::make_pair( name, (int)m_Hotspots.size()-1 ) );
+  m_HotspotNameForIndex.insert( std::make_pair( (int)m_Hotspots.size()-1, name ) );
 }
 
     

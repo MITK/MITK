@@ -136,12 +136,14 @@ void mitk::PaintbrushTool::UpdateContour(const StateEvent* stateEvent)
   Contour::Pointer contourInImageIndexCoordinates = Contour::New();
   contourInImageIndexCoordinates->Initialize();
   Point3D newPoint;
-  for (int index = 0; index < numberOfContourPoints; ++index)
+  //ipMITKSegmentationGetContour8N returns all points, which causes vtk warnings, since the first and the last points are coincident.
+  //leaving the last point out, the contour is still drawn correctly
+  for (int index = 0; index < numberOfContourPoints-1; ++index)
   {
     newPoint[0] = contourPoints[ 2 * index + 0 ] - circleCenterX; // master contour should be centered around (0,0)
     newPoint[1] = contourPoints[ 2 * index + 1] - circleCenterY;
     newPoint[2] = 0.0;
-    MITK_DEBUG << "(" << newPoint[0] << ", " << newPoint[1] << ")" << std::endl;
+    MITK_DEBUG << "Point [" << index << "] (" << newPoint[0] << ", " << newPoint[1] << ")" << std::endl;
 
     contourInImageIndexCoordinates->AddVertex( newPoint );
   }
@@ -271,7 +273,7 @@ bool mitk::PaintbrushTool::OnMouseMoved   (Action* itkNotUsed(action), const Sta
     point[0] += indexCoordinates[ firstDimension ];
     point[1] += indexCoordinates[ secondDimension ];
 
-    MITK_DEBUG << "Contour point " << point;
+    MITK_DEBUG << "Contour point [" << index << "] :" << point;
     contour->AddVertex( point );
   }
   

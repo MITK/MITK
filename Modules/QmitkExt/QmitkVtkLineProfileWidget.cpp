@@ -38,9 +38,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkQtChartAxis.h>
 #include <vtkQtChartAxisOptions.h>
 #include <vtkQtBarChartOptions.h>
-#include <vtkQtChartBasicStyleManager.h>
 #include <vtkQtChartSeriesOptions.h>
-#include <vtkQtChartPenGenerator.h>
 #include <vtkQtChartColors.h>
 #include <vtkConfigure.h>
 
@@ -177,11 +175,10 @@ void QmitkVtkLineProfileWidget::UpdateItemModelFromPath()
   double t;
   unsigned int i = 0;
   int t_tmp = 0;
-  int numSegments = m_DerivedPath->EndOfInput();
   QStandardItemModel *tmp_ItemModel = new QStandardItemModel();
   vtkQtChartTableSeriesModel *table;
   vtkQtChartArea* area = m_ChartWidget->getChartArea();
-  for(int j = 0; j < m_VectorLineCharts.size(); j++)
+  for(unsigned int j = 0; j < m_VectorLineCharts.size(); j++)
   {
       area->removeLayer(m_VectorLineCharts[j]);
       m_VectorLineCharts[j]->getModel()->deleteLater();
@@ -255,7 +252,7 @@ void QmitkVtkLineProfileWidget::UpdateItemModelFromPath()
 
     currentWorldPoint = worldPoint;
   }
-  for(int j = 0; j < m_VectorLineCharts.size() ; j++)
+  for(unsigned int j = 0; j < m_VectorLineCharts.size() ; j++)
   {
 /*    int styleIndex = styleManager->getStyleIndex(m_LineChart, m_LineChart->getSeriesOptions(0));
   

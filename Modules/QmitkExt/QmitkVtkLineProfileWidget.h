@@ -31,6 +31,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <vtkQtChartWidget.h>
 #include <vtkQtLineChart.h>
+#include <vtkQtBarChart.h>
 
 #include <QStandardItemModel>
 
@@ -99,6 +100,8 @@ protected:
 
   vtkQtChartWidget *m_ChartWidget;
   vtkQtLineChart *m_LineChart;
+  vtkQtBarChart *m_BarChart;
+  std::vector<vtkQtLineChart*> m_VectorLineCharts;
 
   QStandardItemModel *m_ItemModel;
 

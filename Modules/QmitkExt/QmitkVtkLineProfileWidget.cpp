@@ -23,6 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qlabel.h>
 #include <qpen.h>
 #include <qgroupbox.h>
+#include <QBrush>
 
 
 #include <vtkQtChartArea.h>
@@ -36,8 +37,21 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkQtChartAxisLayer.h>
 #include <vtkQtChartAxis.h>
 #include <vtkQtChartAxisOptions.h>
+#include <vtkQtBarChartOptions.h>
+#include <vtkQtChartBasicStyleManager.h>
+#include <vtkQtChartSeriesOptions.h>
+#include <vtkQtChartPenGenerator.h>
+#include <vtkQtChartColors.h>
+#include <vtkConfigure.h>
 
+#if ((VTK_MAJOR_VERSION<=5) && (VTK_MINOR_VERSION<=4) )
+#include <vtkQtChartPenBrushGenerator.h>
+#endif
 
+#if ((VTK_MAJOR_VERSION>=5) && (VTK_MINOR_VERSION>=6) )
+#include <vtkQtChartPenGenerator.h>
+#include <vtkQtChartBasicStyleManager.h>
+#endif
 
 //#include <iostream>
 
@@ -55,6 +69,7 @@ QmitkVtkLineProfileWidget::QmitkVtkLineProfileWidget( QWidget * /*parent*/ )
   // Set up the line chart.
   m_LineChart = new vtkQtLineChart();
   area->insertLayer( area->getAxisLayerIndex(), m_LineChart );
+  //m_BarChart->getOptions()->setBarGroupFraction(10);
 
   // Set up the default interactor.
   vtkQtChartMouseSelection *selector =
@@ -83,6 +98,27 @@ QmitkVtkLineProfileWidget::QmitkVtkLineProfileWidget( QWidget * /*parent*/ )
   m_ItemModel->setItemPrototype( new QStandardItem() );
   m_ItemModel->setHorizontalHeaderItem( 0, new QStandardItem("Intensity profile") );
 
+#if ((VTK_MAJOR_VERSION<=5) && (VTK_MINOR_VERSION<=4) )
+  vtkQtChartStyleManager *styleManager = area->getStyleManager();
+  vtkQtChartPenBrushGenerator *pen = new vtkQtChartPenBrushGenerator();
+  pen->setPen(0,QPen(Qt::SolidLine));
+  pen->addPens(vtkQtChartColors::WildFlower);
+  styleManager->setGenerator(pen);
+#endif
+
+#if ((VTK_MAJOR_VERSION>=5) && (VTK_MINOR_VERSION>=6) )
+  
+  vtkQtChartBasicStyleManager *styleManager =
+      qobject_cast<vtkQtChartBasicStyleManager *>(area->getStyleManager());
+
+  vtkQtChartPenGenerator *pen = new vtkQtChartPenGenerator();
+  pen->setPen(0,QPen(Qt::SolidLine));
+  pen->addPens(vtkQtChartColors::WildFlower);
+  styleManager->setGenerator("Pen",pen);
+
+#endif
+  
+  
 
   // Initialize parametric path object
   m_ParametricPath = ParametricPathType::New();
@@ -137,9 +173,23 @@ void QmitkVtkLineProfileWidget::UpdateItemModelFromPath()
   // Fill item model with line profile data
   double distance = 0.0;
   mitk::Point3D currentWorldPoint;
-  currentWorldPoint.Fill(0);
+
   double t;
   unsigned int i = 0;
+  int t_tmp = 0;
+  int numSegments = m_DerivedPath->EndOfInput();
+  QStandardItemModel *tmp_ItemModel = new QStandardItemModel();
+  vtkQtChartTableSeriesModel *table;
+  vtkQtChartArea* area = m_ChartWidget->getChartArea();
+  for(int j = 0; j < m_VectorLineCharts.size(); j++)
+  {
+      area->removeLayer(m_VectorLineCharts[j]);
+      m_VectorLineCharts[j]->getModel()->deleteLater();
+      m_VectorLineCharts[j]->deleteLater();
+  }
+  m_VectorLineCharts.clear();
+
+  int k = 0;
   for ( i = 0, t = m_DerivedPath->StartOfInput(); ;++i )
   {
     const PathType::OutputType &continuousIndex = m_DerivedPath->Evaluate( t );
@@ -155,7 +205,7 @@ void QmitkVtkLineProfileWidget::UpdateItemModelFromPath()
     distance += currentWorldPoint.EuclideanDistanceTo( worldPoint );
 
     mitk::Index3D indexPoint;
-    imageGeometry->WorldToIndex( worldPoint, worldPoint );
+    imageGeometry->WorldToIndex( worldPoint, indexPoint );
     double intensity = m_Image->GetPixelValueByIndex( indexPoint );
 
     MITK_INFO << t << "/" << distance << ": " << indexPoint << " (" << intensity << ")";
@@ -167,6 +217,35 @@ void QmitkVtkLineProfileWidget::UpdateItemModelFromPath()
     m_ItemModel->setItem( i, 0, new QStandardItem() );
     m_ItemModel->item( i, 0 )->setData( intensity, Qt::DisplayRole );
 
+    tmp_ItemModel->setVerticalHeaderItem( k, new QStandardItem() );
+    tmp_ItemModel->verticalHeaderItem( k )->setData(
+      QVariant( distance ), Qt::DisplayRole );
+
+    tmp_ItemModel->setItem( k, 0, new QStandardItem() );
+    tmp_ItemModel->item( k, 0 )->setData( intensity, Qt::DisplayRole );
+
+    if ((int)t > t_tmp){
+        t_tmp = (int)t;
+
+        vtkQtLineChart *tmp_LineChart = new vtkQtLineChart();
+        table = new vtkQtChartTableSeriesModel( tmp_ItemModel, tmp_LineChart );
+        tmp_LineChart->setModel( table );
+
+        m_VectorLineCharts.push_back(tmp_LineChart);
+        
+        tmp_ItemModel = new QStandardItemModel();
+        
+        k = 0;
+        
+        tmp_ItemModel->setVerticalHeaderItem( k, new QStandardItem() );
+        tmp_ItemModel->verticalHeaderItem( k )->setData(
+            QVariant( distance ), Qt::DisplayRole );
+
+        tmp_ItemModel->setItem( k, 0, new QStandardItem() );
+        tmp_ItemModel->item( k, 0 )->setData( intensity, Qt::DisplayRole );
+    }
+    k++;
+
     // Go to next index; when iteration offset reaches zero, iteration is finished
     PathType::OffsetType offset = m_DerivedPath->IncrementInput( t );
     if ( !(offset[0] || offset[1] || offset[2]) )
@@ -176,11 +255,19 @@ void QmitkVtkLineProfileWidget::UpdateItemModelFromPath()
 
     currentWorldPoint = worldPoint;
   }
+  for(int j = 0; j < m_VectorLineCharts.size() ; j++)
+  {
+/*    int styleIndex = styleManager->getStyleIndex(m_LineChart, m_LineChart->getSeriesOptions(0));
+  
+    vtkQtChartStylePen *stylePen = qobject_cast<vtkQtChartStylePen *>(
+      styleManager->getGenerator("Pen"));
+    stylePen->getStylePen(styleIndex).setStyle(Qt::SolidLine);*/
+    area->insertLayer(area->getAxisLayerIndex() + j +1, m_VectorLineCharts[j]);
+  }
 
-
-  vtkQtChartTableSeriesModel *table =
+  table =
     new vtkQtChartTableSeriesModel( m_ItemModel, m_LineChart );
-  m_LineChart->setModel( table );
+  //m_LineChart->setModel( table );
 }
 
 

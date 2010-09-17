@@ -132,7 +132,7 @@ void mitk::SiemensDicomDiffusionImageHeaderReader::Update()
     tag.clear();
     itk::ExposeMetaData<std::string> ( *(*inputDict)[0], "0020|0032", tag );
     sscanf( tag.c_str(), "%f\\%f\\%f", &x0, &y0, &z0 );
-    //std::cout << "Slice 0: " << tag << std::endl;
+    //MITK_INFO << "Slice 0: " << tag << std::endl;
     tag.clear();
 
     // assume volume interleaving, i.e. the second dicom file stores
@@ -141,7 +141,7 @@ void mitk::SiemensDicomDiffusionImageHeaderReader::Update()
     {
       itk::ExposeMetaData<std::string> ( *(*inputDict)[1], "0020|0032", tag );
       sscanf( tag.c_str(), "%f\\%f\\%f", &x1, &y1, &z1 );
-      //std::cout << "Slice 1: " << tag << std::endl;
+      //MITK_INFO << "Slice 1: " << tag << std::endl;
       x1 -= x0; y1 -= y0; z1 -= z0;
       x0 = x1*this->m_Output->xSlice + y1*this->m_Output->ySlice + z1*this->m_Output->zSlice;
       if (x0 < 0)
@@ -153,16 +153,17 @@ void mitk::SiemensDicomDiffusionImageHeaderReader::Update()
     ReadPublicTags2();
 
     int nStride = 1;
-    //std::cout << orthoSliceSpacing << std::endl;
+    //MITK_INFO << orthoSliceSpacing << std::endl;
     this->m_Output->nSliceInVolume = m_sliceLocations.size();
     //nVolume = nSlice/this->m_Output->nSliceInVolume;
-    //std::cout << "Number of Slices: " << m_nSlice << std::endl;
-    //std::cout << "Number of Volume: " << nVolume << std::endl;
-    //std::cout << "Number of Slices in each volume: " << this->m_Output->nSliceInVolume << std::endl;
+    //MITK_INFO << "Number of Slices: " << m_nSlice << std::endl;
+    //MITK_INFO << "Number of Volume: " << nVolume << std::endl;
+    //MITK_INFO << "Number of Slices in each volume: " << this->m_Output->nSliceInVolume << std::endl;
     nStride = this->m_Output->nSliceInVolume;
 
-    std::cout << "Dims " << this->m_Output->nRows << "x" 
-      << this->m_Output->nCols << "x" << this->m_Output->nSliceInVolume << " ";
+    MITK_INFO << m_DicomFilenames[0] << std::endl;
+    MITK_INFO << "Dims " << this->m_Output->nRows << "x"
+        << this->m_Output->nCols << "x" << this->m_Output->nSliceInVolume << " " << std::endl;
 
     for (int k = 0; k < m_nSlice; k += nStride )
     {
@@ -229,16 +230,37 @@ void mitk::SiemensDicomDiffusionImageHeaderReader::Update()
       int nItems = ExtractSiemensDiffusionInformation(tag, "B_value", valueArray);
       if (nItems != 1 || valueArray[0] == 0)  // did not find enough information
       {
-        std::cout << "Warning: No B_value in " << m_DicomFilenames[0] << std::endl;
-        this->m_Output->bValue = 0.0;
-        vect3d.fill( 0.0 );
-        this->m_Output->DiffusionVector = vect3d;  
-        continue;
+        tag.clear();
+        MITK_INFO << "Reading 0019|100c (0029,1010 didn't exist)" << std::endl;
+        itk::ExposeMetaData<std::string> ( *(*inputDict)[0], "0019|100c", tag );
+        this->m_Output->bValue = atof( tag.c_str() );
+        tag.clear();
+        if(this->m_Output->bValue != 0)
+        {
+          MITK_INFO << "BV: " << this->m_Output->bValue;
+          itk::ExposeMetaData<std::string> ( *(*inputDict)[k], "0019|100e",  tag);
+          memcpy( &vect3d[0], tag.c_str()+0, 8 );
+          memcpy( &vect3d[1], tag.c_str()+8, 8 );
+          memcpy( &vect3d[2], tag.c_str()+16, 8 );
+          vect3d.normalize();
+          this->m_Output->DiffusionVector = vect3d;
+          MITK_INFO << " GD: " << this->m_Output->DiffusionVector << std::endl;
+          TransformGradients();
+          continue;
+        }
+        else
+        {
+          MITK_INFO << "No diffusion info found, assuming BASELINE" << std::endl;
+          this->m_Output->bValue = 0.0;
+          vect3d.fill( 0.0 );
+          this->m_Output->DiffusionVector = vect3d;
+          continue;
+        }
       }
       else 
       {
         this->m_Output->bValue = valueArray[0];
-        std::cout << "BV: " << this->m_Output->bValue;
+        MITK_INFO << "BV: " << this->m_Output->bValue;
       }
 
       // parse DiffusionGradientDirection from 0029,1010 tag
@@ -246,8 +268,8 @@ void mitk::SiemensDicomDiffusionImageHeaderReader::Update()
       nItems = ExtractSiemensDiffusionGradientInformation(tag, "DiffusionGradientDirection", valueArray);
       if (nItems != 3)  // did not find enough information
       {
-        //std::cout << "Warning: Cannot find complete information on DiffusionGradientDirection in 0029|1010\n";
-        std::cout << "Warning: No gradient direction in " << m_DicomFilenames[0] << std::endl;
+        //MITK_INFO << "Warning: Cannot find complete information on DiffusionGradientDirection in 0029|1010\n";
+        MITK_INFO << "Warning: No gradient direction in " << m_DicomFilenames[0] << std::endl;
 
         vect3d.fill( 0 );
         this->m_Output->DiffusionVector = vect3d;
@@ -259,7 +281,7 @@ void mitk::SiemensDicomDiffusionImageHeaderReader::Update()
         vect3d[2] = valueArray[2];
         vect3d.normalize();
         this->m_Output->DiffusionVector = vect3d;
-        std::cout << " GD: " << this->m_Output->DiffusionVector;
+        MITK_INFO << " GD: " << this->m_Output->DiffusionVector << std::endl;
       }
     }
 
@@ -345,14 +367,14 @@ void mitk::SiemensDicomDiffusionImageHeaderReader::Update()
 //      tag.clear();
 //      itk::ExposeMetaData<std::string> ( *(*inputDict)[0], "0020|0032", tag );
 //      sscanf( tag.c_str(), "%f\\%f\\%f", &x0, &y0, &z0 );
-//      std::cout << "Slice 0: " << tag << std::endl;
+//      MITK_INFO << "Slice 0: " << tag << std::endl;
 //      tag.clear();
 //
 //      // assume volume interleaving, i.e. the second dicom file stores
 //      // the second slice in the same volume as the first dicom file
 //      itk::ExposeMetaData<std::string> ( *(*inputDict)[1], "0020|0032", tag );
 //      sscanf( tag.c_str(), "%f\\%f\\%f", &x1, &y1, &z1 );
-//      std::cout << "Slice 1: " << tag << std::endl;
+//      MITK_INFO << "Slice 1: " << tag << std::endl;
 //      x1 -= x0; y1 -= y0; z1 -= z0;
 //      x0 = x1*xSlice + y1*ySlice + z1*zSlice;
 //      if (x0 < 0)
@@ -362,7 +384,7 @@ void mitk::SiemensDicomDiffusionImageHeaderReader::Update()
 //    }
 //    else if ( vendor.find("SIEMENS") != std::string::npos && SliceMosaic )
 //    {
-//      std::cout << "Siemens SliceMosaic......" << std::endl;
+//      MITK_INFO << "Siemens SliceMosaic......" << std::endl;
 //
 //      SliceOrderIS = false;
 //
@@ -401,8 +423,8 @@ void mitk::SiemensDicomDiffusionImageHeaderReader::Update()
 //      int nItems = ExtractSiemensDiffusionInformation(tag, "SliceNormalVector", valueArray);
 //      if (nItems != 3)  // did not find enough information
 //      {
-//        std::cout << "Warning: Cannot find complete information on SliceNormalVector in 0029|1010\n";
-//        std::cout << "         Slice order may be wrong.\n";
+//        MITK_INFO << "Warning: Cannot find complete information on SliceNormalVector in 0029|1010\n";
+//        MITK_INFO << "         Slice order may be wrong.\n";
 //      }
 //      else if (valueArray[2] > 0)
 //      {
@@ -414,8 +436,8 @@ void mitk::SiemensDicomDiffusionImageHeaderReader::Update()
 //      nItems = ExtractSiemensDiffusionInformation(tag, "NumberOfImagesInMosaic", valueArray);
 //      if (nItems == 0)  // did not find enough information
 //      {
-//        std::cout << "Warning: Cannot find complete information on NumberOfImagesInMosaic in 0029|1010\n";
-//        std::cout << "         Resulting image may contain empty slices.\n";
+//        MITK_INFO << "Warning: Cannot find complete information on NumberOfImagesInMosaic in 0029|1010\n";
+//        MITK_INFO << "         Resulting image may contain empty slices.\n";
 //      }
 //      else 
 //      {
@@ -423,7 +445,7 @@ void mitk::SiemensDicomDiffusionImageHeaderReader::Update()
 //        mMosaic = static_cast<int> (ceil(sqrt(valueArray[0])));
 //        nMosaic = mMosaic;
 //      }
-//      std::cout << "Mosaic in " << mMosaic << " X " << nMosaic << " blocks (total number of blocks = " << valueArray[0] << ").\n"; 
+//      MITK_INFO << "Mosaic in " << mMosaic << " X " << nMosaic << " blocks (total number of blocks = " << valueArray[0] << ").\n";
 //    }
 //    else
 //    {
@@ -441,9 +463,9 @@ void mitk::SiemensDicomDiffusionImageHeaderReader::Update()
 //      nVolume = nSlice/nSliceInVolume;
 //
 //      // assume volume interleaving
-//      std::cout << "Number of Slices: " << nSlice << std::endl;
-//      std::cout << "Number of Volume: " << nVolume << std::endl;
-//      std::cout << "Number of Slices in each volume: " << nSliceInVolume << std::endl;
+//      MITK_INFO << "Number of Slices: " << nSlice << std::endl;
+//      MITK_INFO << "Number of Volume: " << nVolume << std::endl;
+//      MITK_INFO << "Number of Slices in each volume: " << nSliceInVolume << std::endl;
 //
 //      for (int k = 0; k < nSlice; k += nSliceInVolume)
 //      {
@@ -485,20 +507,20 @@ void mitk::SiemensDicomDiffusionImageHeaderReader::Update()
 //      int nStride = 1;
 //      if ( !SliceMosaic )
 //      {
-//        std::cout << orthoSliceSpacing << std::endl;
+//        MITK_INFO << orthoSliceSpacing << std::endl;
 //        nSliceInVolume = sliceLocations.size();
 //        nVolume = nSlice/nSliceInVolume;
-//        std::cout << "Number of Slices: " << nSlice << std::endl;
-//        std::cout << "Number of Volume: " << nVolume << std::endl;
-//        std::cout << "Number of Slices in each volume: " << nSliceInVolume << std::endl;
+//        MITK_INFO << "Number of Slices: " << nSlice << std::endl;
+//        MITK_INFO << "Number of Volume: " << nVolume << std::endl;
+//        MITK_INFO << "Number of Slices in each volume: " << nSliceInVolume << std::endl;
 //        nStride = nSliceInVolume;
 //      }
 //      else
 //      {
-//        std::cout << "Data in Siemens Mosaic Format\n";
+//        MITK_INFO << "Data in Siemens Mosaic Format\n";
 //        nVolume = nSlice;
-//        std::cout << "Number of Volume: " << nVolume << std::endl;
-//        std::cout << "Number of Slices in each volume: " << nSliceInVolume << std::endl;
+//        MITK_INFO << "Number of Volume: " << nVolume << std::endl;
+//        MITK_INFO << "Number of Slices in each volume: " << nSliceInVolume << std::endl;
 //        nStride = 1;
 //      }
 //
@@ -540,7 +562,7 @@ void mitk::SiemensDicomDiffusionImageHeaderReader::Update()
 //        int nItems = ExtractSiemensDiffusionInformation(tag, "B_value", valueArray);
 //        if (nItems != 1 || valueArray[0] == 0)  // did not find enough information
 //        {
-//          std::cout << "Warning: Cannot find complete information on B_value in 0029|1010\n";
+//          MITK_INFO << "Warning: Cannot find complete information on B_value in 0029|1010\n";
 //          bValues.push_back( 0.0 );
 //          vect3d.fill( 0.0 );
 //          DiffusionVectors.push_back(vect3d);      
@@ -557,7 +579,7 @@ void mitk::SiemensDicomDiffusionImageHeaderReader::Update()
 //        nItems = ExtractSiemensDiffusionInformation(tag, "DiffusionGradientDirection", valueArray);
 //        if (nItems != 3)  // did not find enough information
 //        {
-//          std::cout << "Warning: Cannot find complete information on DiffusionGradientDirection in 0029|1010\n";
+//          MITK_INFO << "Warning: Cannot find complete information on DiffusionGradientDirection in 0029|1010\n";
 //          vect3d.fill( 0 );
 //          DiffusionVectors.push_back(vect3d);      
 //          DiffusionVectorsOrig.push_back(vect3d);      
@@ -571,7 +593,7 @@ void mitk::SiemensDicomDiffusionImageHeaderReader::Update()
 //          vect3d.normalize();
 //          DiffusionVectors.push_back(vect3d);      
 //          int p = bValues.size();
-//          std::cout << "Image#: " << k << " BV: " << bValues[p-1] << " GD: " << DiffusionVectors[p-1] << std::endl;
+//          MITK_INFO << "Image#: " << k << " BV: " << bValues[p-1] << " GD: " << DiffusionVectors[p-1] << std::endl;
 //        }
 //      }
 //    }

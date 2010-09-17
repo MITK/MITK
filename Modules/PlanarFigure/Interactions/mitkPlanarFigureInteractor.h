@@ -19,11 +19,14 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKPLANARFIGUREINTERACTOR_H_HEADER_INCLUDED
 #define MITKPLANARFIGUREINTERACTOR_H_HEADER_INCLUDED
 
-#include "mitkCommon.h"
 #include "PlanarFigureExports.h"
+
+#include "mitkCommon.h"
 #include "mitkVector.h"
-#include <mitkInteractor.h>
+#include "mitkInteractor.h"
 #include "mitkBaseRenderer.h"
+
+#include <itkEventObject.h>
 
 namespace mitk
 {
@@ -32,6 +35,19 @@ class DataNode;
 class Geometry2D;
 class DisplayGeometry;
 class PlanarFigure;
+
+
+// Define events for PlanarFigure interaction notifications
+itkEventMacro( PlanarFigureEvent, itk::AnyEvent );
+itkEventMacro( StartPlacementPlanarFigureEvent, PlanarFigureEvent );
+itkEventMacro( EndPlacementPlanarFigureEvent, PlanarFigureEvent );
+itkEventMacro( StartInteractionPlanarFigureEvent, PlanarFigureEvent );
+itkEventMacro( EndInteractionPlanarFigureEvent, PlanarFigureEvent );
+itkEventMacro( StartHoverPlanarFigureEvent, PlanarFigureEvent );
+itkEventMacro( EndHoverPlanarFigureEvent, PlanarFigureEvent );
+
+
+
 
 /**
   * \brief Interaction with mitk::PlanarFigure objects via control-points

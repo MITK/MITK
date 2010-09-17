@@ -224,6 +224,9 @@ bool mitk::PlanarFigureInteractor
 
   case AcADD:
     {
+      // Invoke event to notify listeners that placement of this PF starts now
+      planarFigure->InvokeEvent( StartPlacementPlanarFigureEvent() );
+
       // Use Geometry2D of the renderer clicked on for this PlanarFigure
       mitk::PlaneGeometry *planeGeometry = const_cast< mitk::PlaneGeometry * >(
         dynamic_cast< const mitk::PlaneGeometry * >(
@@ -302,11 +305,11 @@ bool mitk::PlanarFigureInteractor
            planarFigure->GetMaximumNumberOfControlPoints() )
       {
         // Initial placement finished: deselect control point and send an
-        // InitializeEvent to notify application listeners
+        // event to notify application listeners
         planarFigure->Modified();
         planarFigure->DeselectControlPoint();
-        planarFigure->InvokeEvent( itk::InitializeEvent() );
-        planarFigure->InvokeEvent( itk::EndEvent() );
+        planarFigure->InvokeEvent( EndPlacementPlanarFigureEvent() );
+        planarFigure->InvokeEvent( EndInteractionPlanarFigureEvent() );
         m_DataNode->Modified();
         this->HandleEvent( new mitk::StateEvent( EIDYES, stateEvent->GetEvent() ) );
       }
@@ -333,15 +336,15 @@ bool mitk::PlanarFigureInteractor
         planarFigure->GetMinimumNumberOfControlPoints() )
       {
         // Initial placement finished: deselect control point and send an
-        // InitializeEvent to notify application listeners
+        // event to notify application listeners
         planarFigure->Modified();
         planarFigure->DeselectControlPoint();
         if ( planarFigure->GetNumberOfControlPoints()-1 >= planarFigure->GetMinimumNumberOfControlPoints() )
         {
           planarFigure->RemoveLastControlPoint();
         }
-        planarFigure->InvokeEvent( itk::InitializeEvent() );
-        planarFigure->InvokeEvent( itk::EndEvent() );
+        planarFigure->InvokeEvent( EndPlacementPlanarFigureEvent() );
+        planarFigure->InvokeEvent( EndInteractionPlanarFigureEvent() );
         m_DataNode->Modified();
         this->HandleEvent( new mitk::StateEvent( EIDYES, NULL ) );
       }
@@ -442,7 +445,7 @@ bool mitk::PlanarFigureInteractor
 
       // Issue event so that listeners may update themselves
       planarFigure->Modified();
-      planarFigure->InvokeEvent( itk::EndEvent() );
+      planarFigure->InvokeEvent( EndInteractionPlanarFigureEvent() );
 
       m_DataNode->Modified();
 
@@ -463,9 +466,9 @@ bool mitk::PlanarFigureInteractor
 
         if ( m_HoverPointIndex != pointIndex )
         {
-          // Invoke StartPickEvent if the mouse is entering the point area
+          // Invoke hover event if the mouse is entering the point area
           m_HoverPointIndex = pointIndex;
-          planarFigure->InvokeEvent( itk::StartPickEvent() );
+          planarFigure->InvokeEvent( StartHoverPlanarFigureEvent() );
         }
 
         this->HandleEvent( new mitk::StateEvent( EIDYES, NULL ) );
@@ -479,9 +482,9 @@ bool mitk::PlanarFigureInteractor
 
         if ( m_HoverPointIndex != -1 )
         {
-          // Invoke EndPickEvent if the mouse is exiting the point area
+          // Invoke end-hover event if the mouse is exiting the point area
           m_HoverPointIndex = -1;
-          planarFigure->InvokeEvent( itk::EndPickEvent() );
+          planarFigure->InvokeEvent( EndHoverPlanarFigureEvent() );
         }
 
         this->HandleEvent( new mitk::StateEvent( EIDNO, NULL ) );
@@ -498,8 +501,8 @@ bool mitk::PlanarFigureInteractor
 
   case AcSELECTPOINT:
     {
-      // Invoke a StartEvent to notify listeners that interaction with this PF starts now
-      planarFigure->InvokeEvent( itk::StartEvent() );
+      // Invoke event to notify listeners that interaction with this PF starts now
+      planarFigure->InvokeEvent( StartInteractionPlanarFigureEvent() );
 
       // Reset the PlanarFigure if required
       if ( planarFigure->ResetOnPointSelect() )

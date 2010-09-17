@@ -49,6 +49,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkDataNodeObject.h"
 #include "mitkNodePredicateData.h"
+#include "mitkPlanarFigureInteractor.h"
 
 #include <itkVectorImage.h>
 
@@ -380,7 +381,7 @@ void QmitkImageStatistics::OnSelectionChanged( std::vector<mitk::DataNode*> node
   if ( m_SelectedPlanarFigure != NULL )
   {
     m_PlanarFigureObserverTag = m_SelectedPlanarFigure->AddObserver(
-      itk::EndEvent(), changeListener );
+      mitk::EndInteractionPlanarFigureEvent(), changeListener );
   }
 
 

@@ -38,7 +38,7 @@
 #include "mitkPlanarCross.h"
 #include "mitkPlanarFourPointAngle.h"
 #include "mitkPlanarFigureInteractor.h"
-#include <mitkPlaneGeometry.h>
+#include "mitkPlaneGeometry.h"
 #include "QmitkPlanarFiguresTableModel.h"
 
 #include "QmitkMeasurement.h"
@@ -536,8 +536,8 @@ void QmitkMeasurement::AddFigureToDataStorage(mitk::PlanarFigure* figure, const 
   // set the callback function of the member command
   initializationCommand->SetCallbackFunction( this, &QmitkMeasurement::PlanarFigureInitialized );
 
-  // add an observer
-  m_InitializedObserverTag = figure->AddObserver( itk::InitializeEvent(), initializationCommand );
+  // add observer for event when figure has been placed
+  m_InitializedObserverTag = figure->AddObserver( mitk::EndPlacementPlanarFigureEvent(), initializationCommand );
 
   // figure drawn on the topmost layer / image
   this->GetDataStorage()->Add(newNode, this->DetectTopMostVisibleImage() );

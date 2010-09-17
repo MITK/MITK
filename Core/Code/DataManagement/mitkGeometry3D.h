@@ -434,19 +434,35 @@ virtual void SetBounds(const BoundsArrayType& bounds);
   }
 
   //##Documentation
-  //## @brief Test whether the point \a p (index coordinates in units) is 
+  //## @brief Test whether the point \a p ((continous!)index coordinates in units) is 
   //## inside the bounding box
   bool IsIndexInside(const mitk::Point3D& index) const
   {
-    bool inside = m_BoundingBox->IsInside(index);
-    if((m_ImageGeometry) && (inside))
+    bool inside = false;
+     //if it is an image geometry, we need to convert the index to discrete values
+    //this is done by applying the rounding function also used in WorldToIndex (see line 323)
+    if (m_ImageGeometry)
     {
-      const BoundingBox::BoundsArrayType& bounds = m_BoundingBox->GetBounds();
-      if((index[0] == bounds[1]) ||
-         (index[1] == bounds[3]) ||
-         (index[2] == bounds[5]))
-        inside = false;
+      mitk::Point3D discretIndex;
+      discretIndex[0]=itk::Math::RoundHalfIntegerUp( index[0] );
+      discretIndex[1]=itk::Math::RoundHalfIntegerUp( index[1] );
+      discretIndex[2]=itk::Math::RoundHalfIntegerUp( index[2] );
+
+      inside = m_BoundingBox->IsInside(discretIndex);
+      //we have to check if the index is at the upper border of each dimension,
+      // because the boundingbox is not centerbased
+      if (inside)
+      {
+        const BoundingBox::BoundsArrayType& bounds = m_BoundingBox->GetBounds();
+        if((discretIndex[0] == bounds[1]) ||
+           (discretIndex[1] == bounds[3]) ||
+           (discretIndex[2] == bounds[5]))
+         inside = false;
+      }
     }
+    else
+      inside = m_BoundingBox->IsInside(index);
+    
     return inside;
   }
 

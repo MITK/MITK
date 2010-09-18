@@ -19,8 +19,13 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkGEDicomDiffusionImageHeaderReader.h"
 
 #include "gdcmGlobal.h"
+#include "gdcmVersion.h"
 
-#ifndef GDCM2
+#if  GDCM_MAJOR_VERSION >= 2
+  #define DGDCM2
+#endif
+
+#ifndef DGDCM2
 
 #include "gdcm.h"
 // relevant Siemens private tags
@@ -39,10 +44,10 @@ const gdcm::DictEntry GEDictZGradient( 0x0019, 0x10bd, "DS", "1", "Z component o
 #include "gdcmDict.h"
 #include "gdcmFile.h"
 #include "gdcmSerieHelper.h"
-const gdcm::DictEntry GEDictBValue( "0043,1039", gdcm::VR::IS, gdcm::VM::VM1, "B Value of diffusion weighting" );
-const gdcm::DictEntry GEDictXGradient( "0019,10bb", gdcm::VR::DS, gdcm::VM::VM1 , "X component of gradient direction" );
-const gdcm::DictEntry GEDictYGradient( "0019,10bc", gdcm::VR::DS, gdcm::VM::VM1 , "Y component of gradient direction" );
-const gdcm::DictEntry GEDictZGradient( "0019,10bd", gdcm::VR::DS, gdcm::VM::VM1 , "Z component of gradient direction" );
+//const gdcm::DictEntry GEDictBValue( "0043,1039", gdcm::VR::IS, gdcm::VM::VM1, "B Value of diffusion weighting" );
+//const gdcm::DictEntry GEDictXGradient( "0019,10bb", gdcm::VR::DS, gdcm::VM::VM1 , "X component of gradient direction" );
+//const gdcm::DictEntry GEDictYGradient( "0019,10bc", gdcm::VR::DS, gdcm::VM::VM1 , "Y component of gradient direction" );
+//const gdcm::DictEntry GEDictZGradient( "0019,10bd", gdcm::VR::DS, gdcm::VM::VM1 , "Z component of gradient direction" );
 
 #endif
 
@@ -68,7 +73,7 @@ void mitk::GEDicomDiffusionImageHeaderReader::Update()
     VolumeReaderType::DictionaryArrayRawPointer inputDict 
       = m_VolumeReader->GetMetaDataDictionaryArray();
 
-#ifndef GDCM2
+#ifndef DGDCM2
     if(gdcm::Global::GetDicts()->GetDefaultPubDict()->GetEntry(GEDictBValue.GetKey()) == 0)
       gdcm::Global::GetDicts()->GetDefaultPubDict()->AddEntry(GEDictBValue);
     if(gdcm::Global::GetDicts()->GetDefaultPubDict()->GetEntry(GEDictXGradient.GetKey()) == 0)

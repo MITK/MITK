@@ -148,6 +148,7 @@ void DicomDiffusionImageReader<TPixelType, TDimension>
   for (int i = 0; i < numberOfVolumes; i ++)
     {
     
+    MITK_INFO << "Loading volume " << i+1 << "/" << numberOfVolumes;
     typename ReaderType::Pointer reader = ReaderType::New();
     reader->SetFileNames(m_Headers[i]->m_DicomFilenames);
     reader->UpdateLargestPossibleRegion();

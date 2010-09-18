@@ -1,10 +1,4 @@
 /*=========================================================================
-
-Program:   Medical Imaging & Interaction Toolkit
-Language:  C++
-Date:      $Date: 2007-12-11 14:46:19 +0100 (Di, 11 Dez 2007) $
-Version:   $Revision: 13129 $
-
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
@@ -18,21 +12,24 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkSiemensDicomDiffusionImageHeaderReader.h"
 #include "gdcmGlobal.h"
+#include <gdcmVersion.h>
 
-#ifndef GDCM2
+#if  GDCM_MAJOR_VERSION >= 2
+#define DGDCM2
+#endif
+
+#ifndef DGDCM2
 
 #include "gdcm.h"
 
-// relevant Siemens private tags
-const gdcm::DictEntry SiemensDictBValue( 0x0019, 0x100c, "IS", "1", "B Value of diffusion weighting" );       
-const gdcm::DictEntry SiemensDictDiffusionDirection( 0x0019, 0x100e, "FD", "3", "Diffusion Gradient Direction" );       
-const gdcm::DictEntry SiemensDictDiffusionMatrix( 0x0019, 0x1027, "FD", "6", "Diffusion Matrix" );       
-const gdcm::DictEntry SiemensDictShadowInfo( 0x0029, 0x1010, "OB", "1", "Siemens DWI Info" );       
 
 #else
 
 #include "gdcmFile.h"
 #include "gdcmImageReader.h"
+#include "gdcmDictEntry.h"
+#include "gdcmDicts.h"
+#include "gdcmTag.h"
 
 #endif
 
@@ -102,22 +99,46 @@ void mitk::SiemensDicomDiffusionImageHeaderReader::Update()
     // DicomToNrrdConverter.cxx
 
     VolumeReaderType::DictionaryArrayRawPointer 
-      inputDict = m_VolumeReader->GetMetaDataDictionaryArray();
+        inputDict = m_VolumeReader->GetMetaDataDictionaryArray();
 
 #ifndef DGDCM2
+
+    // relevant Siemens private tags
+    gdcm::DictEntry SiemensDictBValue( 0x0019, 0x100c, "IS", "1", "B Value of diffusion weighting" );
+    gdcm::DictEntry SiemensDictDiffusionDirection( 0x0019, 0x100e, "FD", "3", "Diffusion Gradient Direction" );
+    gdcm::DictEntry SiemensDictDiffusionMatrix( 0x0019, 0x1027, "FD", "6", "Diffusion Matrix" );
+    gdcm::DictEntry SiemensDictShadowInfo( 0x0029, 0x1010, "OB", "1", "Siemens DWI Info" );
 
     //if(gdcm::Global::GetDicts()->GetDefaultPubDict()->GetEntry(SiemensMosiacParameters.GetKey()) == 0)
     //  gdcm::Global::GetDicts()->GetDefaultPubDict()->AddEntry(SiemensMosiacParameters);
     //if(gdcm::Global::GetDicts()->GetDefaultPubDict()->GetEntry(SiemensDictNMosiac.GetKey()) == 0)
     //  gdcm::Global::GetDicts()->GetDefaultPubDict()->AddEntry(SiemensDictNMosiac);
-    if(gdcm::Global::GetDicts()->GetDefaultPubDict()->GetEntry(SiemensDictBValue.GetKey()) == 0)
+    //
+
+    if(gdcm::Global::GetDicts()->GetDefaultPubDict()->GetEntry(SiemensDictBValue.GetName())==0)
       gdcm::Global::GetDicts()->GetDefaultPubDict()->AddEntry(SiemensDictBValue);
-    if(gdcm::Global::GetDicts()->GetDefaultPubDict()->GetEntry(SiemensDictDiffusionDirection.GetKey()) == 0)
+    if(gdcm::Global::GetDicts()->GetDefaultPubDict()->GetEntry(SiemensDictDiffusionDirection.GetName()) == 0)
       gdcm::Global::GetDicts()->GetDefaultPubDict()->AddEntry(SiemensDictDiffusionDirection);
-    if(gdcm::Global::GetDicts()->GetDefaultPubDict()->GetEntry(SiemensDictDiffusionMatrix.GetKey()) == 0)
+    if(gdcm::Global::GetDicts()->GetDefaultPubDict()->GetEntry(SiemensDictDiffusionMatrix.GetName()) == 0)
       gdcm::Global::GetDicts()->GetDefaultPubDict()->AddEntry(SiemensDictDiffusionMatrix);
-    if(gdcm::Global::GetDicts()->GetDefaultPubDict()->GetEntry(SiemensDictShadowInfo.GetKey()) == 0)
+    if(gdcm::Global::GetDicts()->GetDefaultPubDict()->GetEntry(SiemensDictShadowInfo.GetName()) == 0)
       gdcm::Global::GetDicts()->GetDefaultPubDict()->AddEntry(SiemensDictShadowInfo);
+
+#else
+
+    //    gdcm::DictEntry SiemensDictBValue( "0019,100c", "B Value of diffusion weighting", gdcm::VR::IS, gdcm::VM::VM1 );
+    //    gdcm::DictEntry SiemensDictDiffusionDirection( "0019,100e", "Diffusion Gradient Direction", gdcm::VR::FD, gdcm::VM::VM3 );
+    //    gdcm::DictEntry SiemensDictDiffusionMatrix( "0019,1027", "Diffusion Matrix", gdcm::VR::FD, gdcm::VM::VM6 );
+    //    gdcm::DictEntry SiemensDictShadowInfo( "0029,1010", "Siemens DWI Info", gdcm::VR::OB, gdcm::VM::VM1 );
+
+    //    //if(gdcm::Global::GetInstance().GetDicts().GetPublicDict().GetDictEntry(gdcm::Tag(0x0019,0x100c)) == 0)
+    //      gdcm::Global::GetInstance().GetDicts().GetPublicDict().AddDictEntry(gdcm::Tag(0x0019,0x100c),SiemensDictBValue);
+    //    if(gdcm::Global::GetDicts()->GetDefaultPubDict()->GetEntry(SiemensDictDiffusionDirection.GetName()) == 0)
+    //      gdcm::Global::GetDicts()->GetDefaultPubDict()->AddEntry(SiemensDictDiffusionDirection);
+    //    if(gdcm::Global::GetDicts()->GetDefaultPubDict()->GetEntry(SiemensDictDiffusionMatrix.GetName()) == 0)
+    //      gdcm::Global::GetDicts()->GetDefaultPubDict()->AddEntry(SiemensDictDiffusionMatrix);
+    //    if(gdcm::Global::GetDicts()->GetDefaultPubDict()->GetEntry(SiemensDictShadowInfo.GetName()) == 0)
+    //      gdcm::Global::GetDicts()->GetDefaultPubDict()->AddEntry(SiemensDictShadowInfo);
 
 #endif
 
@@ -231,62 +252,90 @@ void mitk::SiemensDicomDiffusionImageHeaderReader::Update()
       if (nItems != 1 || valueArray[0] == 0)  // did not find enough information
       {
         tag.clear();
-        MITK_INFO << "Reading 0019|100c (0029,1010 didn't exist)" << std::endl;
-        itk::ExposeMetaData<std::string> ( *(*inputDict)[0], "0019|100c", tag );
+        MITK_INFO << "Reading diffusion info from 0019|100c and 0019|100e tags" << std::endl;
+        bool success = false;
+#ifndef DGDCM2
+        success = itk::ExposeMetaData<std::string> ( *(*inputDict)[0], "0019|100c", tag );
         this->m_Output->bValue = atof( tag.c_str() );
-        tag.clear();
-        if(this->m_Output->bValue != 0)
+#else
+        for(it = ds.Begin(); it != ds.End(); ++it)
         {
-          MITK_INFO << "BV: " << this->m_Output->bValue;
-          itk::ExposeMetaData<std::string> ( *(*inputDict)[k], "0019|100e",  tag);
-          memcpy( &vect3d[0], tag.c_str()+0, 8 );
-          memcpy( &vect3d[1], tag.c_str()+8, 8 );
-          memcpy( &vect3d[2], tag.c_str()+16, 8 );
+          const gdcm::DataElement &ref = *it;
+          if (ref.GetTag() == gdcm::Tag(0x0019,0x100c)) {
+            tag = std::string(ref.GetByteValue()->GetPointer(),ref.GetByteValue()->GetLength());
+            this->m_Output->bValue = atof( tag.c_str() );
+            success = true;
+          }
+        }
+#endif
+        tag.clear();
+        if(success)
+        {
+          if(this->m_Output->bValue == 0)
+          {
+            MITK_INFO << "BV: 0 (Baseline image)";
+            continue;
+          }
+#ifndef DGDCM2
+          success = itk::ExposeMetaData<std::string> ( *(*inputDict)[k], "0019|100e",  tag);
+#else
+          success = false;
+          for(it = ds.Begin(); it != ds.End(); ++it)
+          {
+            const gdcm::DataElement &ref = *it;
+            if (ref.GetTag() == gdcm::Tag(0x0019,0x100e)) {
+              tag = std::string(ref.GetByteValue()->GetPointer(),ref.GetByteValue()->GetLength());
+              success = true;
+            }
+          }
+#endif
+          if(success)
+          {
+            memcpy( &vect3d[0], tag.c_str()+0, 8 );
+            memcpy( &vect3d[1], tag.c_str()+8, 8 );
+            memcpy( &vect3d[2], tag.c_str()+16, 8 );
+            vect3d.normalize();
+            this->m_Output->DiffusionVector = vect3d;
+            TransformGradients();
+            MITK_INFO << "BV: " << this->m_Output->bValue;
+            MITK_INFO << " GD: " << this->m_Output->DiffusionVector;
+            continue;
+          }
+        }
+      }
+      else 
+      {
+        MITK_INFO << "Reading diffusion info from 0029,1010 tag" << std::endl;
+        this->m_Output->bValue = valueArray[0];
+
+        if(this->m_Output->bValue == 0)
+        {
+          MITK_INFO << "BV: 0 (Baseline image)";
+          continue;
+        }
+
+        valueArray.resize(0);
+        nItems = ExtractSiemensDiffusionGradientInformation(tag, "DiffusionGradientDirection", valueArray);
+        if (nItems == 3)
+        {
+          vect3d[0] = valueArray[0];
+          vect3d[1] = valueArray[1];
+          vect3d[2] = valueArray[2];
           vect3d.normalize();
           this->m_Output->DiffusionVector = vect3d;
-          MITK_INFO << " GD: " << this->m_Output->DiffusionVector << std::endl;
           TransformGradients();
-          continue;
-        }
-        else
-        {
-          MITK_INFO << "No diffusion info found, assuming BASELINE" << std::endl;
-          this->m_Output->bValue = 0.0;
-          vect3d.fill( 0.0 );
-          this->m_Output->DiffusionVector = vect3d;
+          MITK_INFO << "BV: " << this->m_Output->bValue;
+          MITK_INFO << " GD: " << this->m_Output->DiffusionVector;
           continue;
         }
       }
-      else 
-      {
-        this->m_Output->bValue = valueArray[0];
-        MITK_INFO << "BV: " << this->m_Output->bValue;
-      }
 
-      // parse DiffusionGradientDirection from 0029,1010 tag
-      valueArray.resize(0);
-      nItems = ExtractSiemensDiffusionGradientInformation(tag, "DiffusionGradientDirection", valueArray);
-      if (nItems != 3)  // did not find enough information
-      {
-        //MITK_INFO << "Warning: Cannot find complete information on DiffusionGradientDirection in 0029|1010\n";
-        MITK_INFO << "Warning: No gradient direction in " << m_DicomFilenames[0] << std::endl;
+      MITK_ERROR << "No diffusion info found, forcing to BASELINE image." << std::endl;
+      this->m_Output->bValue = 0.0;
+      vect3d.fill( 0.0 );
+      this->m_Output->DiffusionVector = vect3d;
 
-        vect3d.fill( 0 );
-        this->m_Output->DiffusionVector = vect3d;
-      }
-      else 
-      {
-        vect3d[0] = valueArray[0];
-        vect3d[1] = valueArray[1];
-        vect3d[2] = valueArray[2];
-        vect3d.normalize();
-        this->m_Output->DiffusionVector = vect3d;
-        MITK_INFO << " GD: " << this->m_Output->DiffusionVector << std::endl;
-      }
     }
-
-    TransformGradients();
-
   }
 }
 

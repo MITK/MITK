@@ -51,7 +51,7 @@ const std::string QmitkDiffusionDicomImport::VIEW_ID = "org.mitk.views.diffusion
 
 QmitkDiffusionDicomImport::QmitkDiffusionDicomImport(QObject* /*parent*/, const char* /*name*/)
   : QmitkFunctionality(), m_Controls(NULL), m_MultiWidget(NULL),
-  m_OutputFolderNameSet(false), m_OutputFolderName("")
+  m_OutputFolderName(""), m_OutputFolderNameSet(false)
 {
 }
 

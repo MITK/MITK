@@ -13,7 +13,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkSiemensMosaicDicomDiffusionImageHeaderReader.h"
 
 #include "gdcmGlobal.h"
-#include "gdcmVersion.h"
+//#include "gdcmVersion.h"
 
 #if  GDCM_MAJOR_VERSION >= 2
 #define DGDCM2

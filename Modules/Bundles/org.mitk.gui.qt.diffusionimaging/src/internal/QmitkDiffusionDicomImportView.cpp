@@ -33,7 +33,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkDiffusionImage.h"
 #include "mitkNrrdDiffusionImageWriter.h"
 
-#include "gdcmVersion.h"
 #if  GDCM_MAJOR_VERSION >= 2
 #define DGDCM2
 #endif
@@ -44,6 +43,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "gdcmSorter.h"
 #include "gdcmIPPSorter.h"
 #include "gdcmAttribute.h"
+#include "gdcmVersion.h"
 #endif
 
 const std::string QmitkDiffusionDicomImport::VIEW_ID = "org.mitk.views.diffusiondicomimport";
@@ -155,6 +155,7 @@ void QmitkDiffusionDicomImport::DicomLoadAddFolderNames()
   m_Controls->listWidget->addItems(w->selectedFiles());
 }
 
+#ifdef DGDCM2
 bool SortBySeriesUID(gdcm::DataSet const & ds1, gdcm::DataSet const & ds2 )
 {
   gdcm::Attribute<0x0020,0x000e> at1;
@@ -185,6 +186,7 @@ bool SortBySeqName(gdcm::DataSet const & ds1, gdcm::DataSet const & ds2 )
   return std::lexicographical_compare(str1.begin(), str1.end(),
                                       str2.begin(), str2.end() );
 }
+#endif
 
 void QmitkDiffusionDicomImport::Status(QString status)
 {
@@ -283,7 +285,12 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
       return;
     }
 
+#ifdef DGDCM2
     Status(QString("GDCM %1 used for DICOM parsing and sorting!").arg(gdcm::Version::GetVersion()));
+#else
+    Status(QString("GDCM 1.x used for DICOM parsing and sorting!"));
+#endif
+
     PrintMemoryUsage();
     QString status;
     mitk::DataNode::Pointer node;
@@ -316,7 +323,7 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
       unsigned int size = seriesUIDs.size();
       for ( unsigned int i = 0 ; i < size ; ++i )
       {
-        seriesFilenames.push_back(inputNames->GetFilenames(seriesUIDs[i]));
+        seriesFilenames.push_back(inputNames->GetFileNames(seriesUIDs[i]));
       }
 #else
 
@@ -486,10 +493,10 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
 
       mitk::DicomDiffusionImageHeaderReader::Pointer headerReader;
       mitk::GroupDiffusionHeadersFilter::InputType inHeaders;
-      unsigned int size = seriesUIDs.size();
-      for ( unsigned int i = 0 ; i < size ; ++i )
+      unsigned int size2 = seriesUIDs.size();
+      for ( unsigned int i = 0 ; i < size2 ; ++i )
       {
-        Status(QString("Reading header image #%1/%2").arg(i+1).arg(size));
+        Status(QString("Reading header image #%1/%2").arg(i+1).arg(size2));
         headerReader = mitk::DicomDiffusionImageHeaderReader::New();
         headerReader->SetSeriesDicomFilenames(seriesFilenames[i]);
         headerReader->Update();

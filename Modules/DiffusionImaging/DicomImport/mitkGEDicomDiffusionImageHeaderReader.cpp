@@ -51,7 +51,6 @@ const gdcm::DictEntry GEDictZGradient( 0x0019, 0x10bd, "DS", "1", "Z component o
 
 #endif
 
-
 mitk::GEDicomDiffusionImageHeaderReader::GEDicomDiffusionImageHeaderReader()
 {
 }

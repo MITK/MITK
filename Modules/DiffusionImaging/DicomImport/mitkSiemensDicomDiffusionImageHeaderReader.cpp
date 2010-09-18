@@ -22,7 +22,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "gdcm.h"
 
-
 #else
 
 #include "gdcmFile.h"

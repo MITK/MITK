@@ -96,6 +96,15 @@ SET(CPP_FILES
  QmitkPointListViewWidget.cpp
  QmitkVideoBackground.cpp
  QmitkHotkeyLineEdit.cpp
+
+ #QmitkErodeToolGUI.cpp
+ #QmitkDilateToolGUI.cpp
+ #QmitkMorphologicToolGUI.cpp
+ #QmitkOpeningToolGUI.cpp
+ #QmitkClosingToolGUI.cpp
+ #QmitkBinaryThresholdULToolGUI.cpp
+ #QmitkToolRoiDataSelectionBox.cpp
+ #QmitkBoundingObjectWidget.cpp
 )
 
 IF ( NOT ${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.${VTK_BUILD_VERSION} VERSION_LESS 5.4.0 )
@@ -181,6 +190,14 @@ SET(MOC_H_FILES
  QmitkFileChooser.h
  QmitkHotkeyLineEdit.h
  QmitkAboutDialog/QmitkAboutDialog.h
+ #QmitkErodeToolGUI.h
+ #QmitkDilateToolGUI.h
+ #QmitkMorphologicToolGUI.h
+ #QmitkOpeningToolGUI.h
+ #QmitkClosingToolGUI.h
+ #QmitkBinaryThresholdULToolGUI.h
+ #QmitkToolRoiDataSelectionBox.h
+ #QmitkBoundingObjectWidget.h
 )
 
 IF ( NOT ${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.${VTK_BUILD_VERSION} VERSION_LESS 5.4.0 )

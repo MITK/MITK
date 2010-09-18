@@ -103,8 +103,8 @@ SET(CPP_FILES
  #QmitkOpeningToolGUI.cpp
  #QmitkClosingToolGUI.cpp
  #QmitkBinaryThresholdULToolGUI.cpp
- #QmitkToolRoiDataSelectionBox.cpp
- #QmitkBoundingObjectWidget.cpp
+ QmitkToolRoiDataSelectionBox.cpp
+ QmitkBoundingObjectWidget.cpp
 )
 
 IF ( NOT ${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.${VTK_BUILD_VERSION} VERSION_LESS 5.4.0 )
@@ -122,7 +122,7 @@ SET(CPP_FILES
  QmitkBaseFunctionalityComponent.cpp
  QmitkFunctionalityComponentContainer.cpp
  QmitkFunctionalityComponents/QmitkThresholdComponent.cpp
- #QmitkToolWorkingDataSelectionBox.cpp
+ QmitkToolWorkingDataSelectionBox.cpp
  )
 ENDIF()
 
@@ -196,8 +196,8 @@ SET(MOC_H_FILES
  #QmitkOpeningToolGUI.h
  #QmitkClosingToolGUI.h
  #QmitkBinaryThresholdULToolGUI.h
- #QmitkToolRoiDataSelectionBox.h
- #QmitkBoundingObjectWidget.h
+ QmitkToolRoiDataSelectionBox.h
+ QmitkBoundingObjectWidget.h
 )
 
 IF ( NOT ${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.${VTK_BUILD_VERSION} VERSION_LESS 5.4.0 )
@@ -215,7 +215,7 @@ SET(MOC_H_FILES
  QmitkBaseFunctionalityComponent.h
  QmitkFunctionalityComponentContainer.h
  QmitkFunctionalityComponents/QmitkThresholdComponent.h
- #QmitkToolWorkingDataSelectionBox.h
+ QmitkToolWorkingDataSelectionBox.h
 )
 ENDIF()
 

@@ -34,8 +34,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 QmitkBoundingObjectWidget::QmitkBoundingObjectWidget (QWidget* parent, Qt::WindowFlags f ):QWidget( parent, f ),
-m_lastSelectedItem(NULL),
 m_DataStorage(NULL),
+m_lastSelectedItem(NULL),
 m_ItemNodeMap()
 {
 

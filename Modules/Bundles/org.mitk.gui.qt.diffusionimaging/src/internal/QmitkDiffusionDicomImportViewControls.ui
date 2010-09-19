@@ -143,26 +143,6 @@ p, li { white-space: pre-wrap; }
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_2">
       <item>
-       <widget class="QCheckBox" name="m_DicomLoadUseSeriesDetailsCheckbox">
-        <property name="text">
-         <string>Use Series Details</string>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QCheckBox" name="m_DicomLoadAcqNumberCheckbox">
-        <property name="text">
-         <string>Consider Acquisition Numbers</string>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item>
        <widget class="QCheckBox" name="m_DicomLoadRecursiveCheckbox">
         <property name="text">
          <string>Recursive</string>

@@ -67,13 +67,8 @@ void QmitkDiffusionDicomImport::CreateQtPartControl(QWidget *parent)
     m_Controls->setupUi(parent);
     this->CreateConnections();
 
-    m_Controls->m_DicomLoadUseSeriesDetailsCheckbox->setChecked(true);
-    m_Controls->m_DicomLoadAcqNumberCheckbox->setChecked(true);
     m_Controls->m_DicomLoadRecursiveCheckbox->setChecked(true);
     m_Controls->m_DicomLoadAverageDuplicatesCheckbox->setChecked(false);
-
-    m_Controls->m_DicomLoadUseSeriesDetailsCheckbox->setVisible(false);
-    m_Controls->m_DicomLoadAcqNumberCheckbox->setVisible(false);
 
 #ifdef DGDCM2
     m_Controls->m_DicomLoadRecursiveCheckbox->setVisible(false);
@@ -229,7 +224,7 @@ void QmitkDiffusionDicomImport::PrintMemoryUsage()
   size_t processSize = mitk::MemoryUtilities::GetProcessMemoryUsage();
   size_t totalSize =  mitk::MemoryUtilities::GetTotalSizeOfPhysicalRam();
   float percentage = ( (float) processSize / (float) totalSize ) * 100.0;
-  Status("Current memory usage: " + GetMemoryDescription( processSize, percentage ));
+  MITK_INFO << "Current memory usage: " << GetMemoryDescription( processSize, percentage );
 }
 
 std::string QmitkDiffusionDicomImport::FormatMemorySize( size_t size )
@@ -285,10 +280,10 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
       return;
     }
 
-#ifdef DGDCM2
-    Status(QString("GDCM %1 used for DICOM parsing and sorting!").arg(gdcm::Version::GetVersion()));
-#else
+#ifndef DGDCM2
     Status(QString("GDCM 1.x used for DICOM parsing and sorting!"));
+#else
+    Status(QString("GDCM %1 used for DICOM parsing and sorting!").arg(gdcm::Version::GetVersion()));
 #endif
 
     PrintMemoryUsage();
@@ -310,13 +305,22 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
       std::vector<std::vector<std::string> > seriesFilenames(0);
 #ifndef DGDCM2
       Status(QString("Parsing directory %1").arg(folderName));
-      typedef itk::GDCMSeriesFileNames InputNamesGeneratorType;
-      typedef InputNamesGeneratorType::Pointer GeneratorPointer;
-      GeneratorPointer inputNames = InputNamesGeneratorType::New();
-      inputNames->SetUseSeriesDetails(m_Controls->m_DicomLoadUseSeriesDetailsCheckbox->isChecked());
-      if(m_Controls->m_DicomLoadAcqNumberCheckbox->isChecked())
-        inputNames->AddSeriesRestriction( "0020|0012" );
+      typedef itk::GDCMSeriesFileNames InputNamesType;
+      InputNamesType::Pointer inputNames = InputNamesType::New();
+
+      //////////////////////////////////////////////////////
+      ////
+      //// if you get seg-faults around here, make sure
+      //// to set the itk GDCM_DIR variable in cmake
+      //// correctly when building ITK
+      //// ( e.g. [itk binary dir]/Utilities/gdcm
+      ////   if not using system gdcm )
+      ////
+      //////////////////////////////////////////////////////
+
       inputNames->SetRecursive(m_Controls->m_DicomLoadRecursiveCheckbox->isChecked());
+      inputNames->SetUseSeriesDetails(true);
+      inputNames->AddSeriesRestriction( "0020|0012" );
       inputNames->SetInputDirectory( folderName.toAscii() );
       mitk::ProgressBar::GetInstance()->Progress();
       seriesUIDs = inputNames->GetSeriesUIDs();

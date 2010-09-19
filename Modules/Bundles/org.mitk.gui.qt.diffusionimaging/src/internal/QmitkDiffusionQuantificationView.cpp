@@ -97,8 +97,9 @@ struct DqSelListener : ISelectionListener
 
       m_View->m_Controls->m_FAButton->setEnabled(foundTensorVolume);
       m_View->m_Controls->m_RAButton->setEnabled(foundTensorVolume);
-      m_View->m_Controls->m_L1Button->setEnabled(foundTensorVolume);
-      m_View->m_Controls->m_DRButton->setEnabled(foundTensorVolume);
+      m_View->m_Controls->m_ADButton->setEnabled(foundTensorVolume);
+      m_View->m_Controls->m_RDButton->setEnabled(foundTensorVolume);
+      m_View->m_Controls->m_ClusteringAnisotropy->setEnabled(foundTensorVolume);
     }
   }
 
@@ -177,8 +178,9 @@ void QmitkDiffusionQuantificationView::CreateConnections()
     connect( (QObject*)(m_Controls->m_CurvatureButton), SIGNAL(clicked()), this, SLOT(Curvature()) );
     connect( (QObject*)(m_Controls->m_FAButton), SIGNAL(clicked()), this, SLOT(FA()) );
     connect( (QObject*)(m_Controls->m_RAButton), SIGNAL(clicked()), this, SLOT(RA()) );
-    connect( (QObject*)(m_Controls->m_L1Button), SIGNAL(clicked()), this, SLOT(L1()) );
-    connect( (QObject*)(m_Controls->m_DRButton), SIGNAL(clicked()), this, SLOT(DR()) );
+    connect( (QObject*)(m_Controls->m_ADButton), SIGNAL(clicked()), this, SLOT(AD()) );
+    connect( (QObject*)(m_Controls->m_RDButton), SIGNAL(clicked()), this, SLOT(RD()) );
+    connect( (QObject*)(m_Controls->m_ClusteringAnisotropy), SIGNAL(clicked()), this, SLOT(ClusterAnisotropy()) );
   }
 }
 
@@ -229,14 +231,19 @@ void QmitkDiffusionQuantificationView::RA()
   TensorQuantify(1);
 }
 
-void QmitkDiffusionQuantificationView::L1()
+void QmitkDiffusionQuantificationView::AD()
 {
   TensorQuantify(2);
 }
 
-void QmitkDiffusionQuantificationView::DR()
+void QmitkDiffusionQuantificationView::RD()
 {
   TensorQuantify(3);
+}
+
+void QmitkDiffusionQuantificationView::ClusterAnisotropy()
+{
+  TensorQuantify(4);
 }
 
 void QmitkDiffusionQuantificationView::QBIQuantify(int method)
@@ -588,23 +595,32 @@ void QmitkDiffusionQuantificationView::TensorQuantification(
       nodename = QString(nodename.c_str()).append("_RA").toStdString();
 
     }  
-    else if(method == 2) //L1 = DA (Axial diffusivity)
+    else if(method == 2) // AD (Axial diffusivity)
     {
       MeasurementsType::Pointer measurementsCalculator = MeasurementsType::New();
       measurementsCalculator->SetInput(itkvol.GetPointer() );
-      measurementsCalculator->SetMeasure(MeasurementsType::L1);
+      measurementsCalculator->SetMeasure(MeasurementsType::AD);
       measurementsCalculator->Update();
       multi->SetInput(measurementsCalculator->GetOutput());
-      nodename = QString(nodename.c_str()).append("_L1").toStdString();
+      nodename = QString(nodename.c_str()).append("_AD").toStdString();
     }
-    else if(method == 3) //DR =(L1+L2)/2
-    {      
+    else if(method == 3) // RD (Radial diffusivity, (Lambda2+Lambda3)/2
+    {
       MeasurementsType::Pointer measurementsCalculator = MeasurementsType::New();
       measurementsCalculator->SetInput(itkvol.GetPointer() );
-      measurementsCalculator->SetMeasure(MeasurementsType::DR);
+      measurementsCalculator->SetMeasure(MeasurementsType::RD);
       measurementsCalculator->Update();
       multi->SetInput(measurementsCalculator->GetOutput());
-      nodename = QString(nodename.c_str()).append("_DR").toStdString();
+      nodename = QString(nodename.c_str()).append("_RD").toStdString();
+    }
+    else if(method == 4) // 1-(Lambda2+Lambda3)/(2*Lambda1)
+    {
+      MeasurementsType::Pointer measurementsCalculator = MeasurementsType::New();
+      measurementsCalculator->SetInput(itkvol.GetPointer() );
+      measurementsCalculator->SetMeasure(MeasurementsType::CA);
+      measurementsCalculator->Update();
+      multi->SetInput(measurementsCalculator->GetOutput());
+      nodename = QString(nodename.c_str()).append("_CA").toStdString();
     }
 
     multi->Update();

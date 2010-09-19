@@ -9,13 +9,12 @@
 namespace itk {
 
   template <class TPixel>
-  TensorDerivedMeasurementsFilter<TPixel>::TensorDerivedMeasurementsFilter() : m_Measure(L1)
+      TensorDerivedMeasurementsFilter<TPixel>::TensorDerivedMeasurementsFilter() : m_Measure(AD)
   {
-
   }
 
   template <class TPixel>
-  void TensorDerivedMeasurementsFilter<TPixel>::GenerateData()
+      void TensorDerivedMeasurementsFilter<TPixel>::GenerateData()
   {
     typename TensorImageType::Pointer tensorImage = static_cast< TensorImageType * >( this->ProcessObject::GetInput(0) );
     typedef ImageRegionConstIterator< TensorImageType > TensorImageIteratorType;
@@ -23,7 +22,7 @@ namespace itk {
 
     
     typename OutputImageType::Pointer outputImage = 
-      static_cast< OutputImageType * >(this->ProcessObject::GetOutput(0));
+        static_cast< OutputImageType * >(this->ProcessObject::GetOutput(0));
 
     typename TensorImageType::RegionType region = tensorImage->GetLargestPossibleRegion();
     outputImage->SetRegions(region);
@@ -41,28 +40,43 @@ namespace itk {
 
       switch(m_Measure)
       {
-        case FA:
+      case FA:
         {
           TPixel diffusionIndex = tensor.GetFractionalAnisotropy();
           outputIt.Set(diffusionIndex);
           break;
         }
-        case RA:
+      case RA:
         {
           TPixel diffusionIndex = tensor.GetRelativeAnisotropy();
           outputIt.Set(diffusionIndex);
           break;
         }
-        case L1:
+      case AD:
         {
-          TPixel diffusionIndex = tensor.GetNthComponent(0);
-          outputIt.Set(diffusionIndex);
+          // eigenvalues are sorted in ascending order by default because the
+          // itk::SymmetricEigenAnalysis defaults are not touched in the tensor implementation
+          typename TensorType::EigenValuesArrayType evs;
+          tensor.ComputeEigenValues(evs);
+          outputIt.Set(evs[2]);
           break;
         }
-        case DR:
+      case RD:
         {
-          TPixel diffusionIndex = (tensor.GetNthComponent(1) + tensor.GetNthComponent(2)) / 2;
-          outputIt.Set(diffusionIndex);
+          // eigenvalues are sorted in ascending order by default because the
+          // itk::SymmetricEigenAnalysis defaults are not touched in the tensor implementation
+          typename TensorType::EigenValuesArrayType evs;
+          tensor.ComputeEigenValues(evs);
+          outputIt.Set((evs[0]+evs[1])/2);
+          break;
+        }
+      case CA:
+        {
+          // eigenvalues are sorted in ascending order by default because the
+          // itk::SymmetricEigenAnalysis defaults are not touched in the tensor implementation
+          typename TensorType::EigenValuesArrayType evs;
+          tensor.ComputeEigenValues(evs);
+          outputIt.Set(1-(evs[0]+evs[1])/(2*evs[2]));
           break;
         }
       }

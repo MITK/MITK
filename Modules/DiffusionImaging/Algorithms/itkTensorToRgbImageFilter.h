@@ -47,21 +47,24 @@ namespace Functor {
     inline TOutput operator()( const TInput & x )
     {
 
+      // eigenvalues are sorted in ascending order by default because the
+      // itk::SymmetricEigenAnalysis defaults are not touched in the tensor implementation
+
       typename TInput::EigenValuesArrayType eigenvalues;
       typename TInput::EigenVectorsMatrixType eigenvectors;
       x.ComputeEigenAnalysis(eigenvalues, eigenvectors);
 
-      int index = 2;
-      if( (eigenvalues[0] >= eigenvalues[1])
-        && (eigenvalues[0] >= eigenvalues[2]) )
-        index = 0;
-      else if(eigenvalues[1] >= eigenvalues[2])
-        index = 1;
+//      int index = 2;
+//      if( (eigenvalues[0] >= eigenvalues[1])
+//        && (eigenvalues[0] >= eigenvalues[2]) )
+//        index = 0;
+//      else if(eigenvalues[1] >= eigenvalues[2])
+//        index = 1;
 
       const float fa = x.GetFractionalAnisotropy();
-      float r = fabs(eigenvectors(index,0)) * fa;
-      float g = fabs(eigenvectors(index,1)) * fa;
-      float b = fabs(eigenvectors(index,2)) * fa;
+      float r = fabs(eigenvectors(2/*index*/,0)) * fa;
+      float g = fabs(eigenvectors(2/*index*/,1)) * fa;
+      float b = fabs(eigenvectors(2/*index*/,2)) * fa;
 
       __IMG_DAT_ITEM__CEIL_ZERO_ONE__(r);
       __IMG_DAT_ITEM__CEIL_ZERO_ONE__(g);

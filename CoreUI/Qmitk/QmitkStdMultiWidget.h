@@ -214,6 +214,7 @@ signals:
   void WidgetPlaneModeSwivel(bool);
   void WidgetPlaneModeChange(int);
   void WidgetNotifyNewCrossHairMode(int);
+  void Moved();
 
 public:
 

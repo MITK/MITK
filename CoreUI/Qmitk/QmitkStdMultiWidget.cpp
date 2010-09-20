@@ -1391,10 +1391,7 @@ void QmitkStdMultiWidget::moveEvent( QMoveEvent* e )
   
   // it is necessary to readjust the position of the overlays as the StdMultiWidget has moved
   // unfortunately it's not done by QmitkRenderWindow::moveEvent -> must be done here
-  //mitkWidget1->GetOverlayController()->AdjustOverlayPosition();
-  //mitkWidget2->GetOverlayController()->AdjustOverlayPosition();
-  //mitkWidget3->GetOverlayController()->AdjustOverlayPosition();
-  //mitkWidget4->GetOverlayController()->AdjustOverlayPosition();
+  emit Moved();
 }
 
 void QmitkStdMultiWidget::leaveEvent ( QEvent * /*e*/  )

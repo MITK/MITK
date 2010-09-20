@@ -25,7 +25,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "QVTKWidget.h"
 #include "QmitkRenderWindowMenu.h"
-#include "QmitkOverlayController.h"
 
 /**
  * \brief MITK implementation of the QVTKWidget
@@ -86,10 +85,6 @@ public:
 
   void FullScreenMode( bool state );
 
-  void SetOverlayController( QmitkOverlayController* );
-
-  QmitkOverlayController* GetOverlayController();
-
 protected:
 
     // overloaded move handler
@@ -131,6 +126,8 @@ signals:
 
   void SignalLayoutDesignChanged( int layoutDesignIndex );
 
+  void Moved();
+
 protected slots:  
 
   void OnChangeLayoutDesign(int layoutDesignIndex);
@@ -147,8 +144,6 @@ private:
 
   bool                           m_MenuWidgetActivated;
   
-  QmitkOverlayController*        m_OverlayController;
-
 };
 
 #endif

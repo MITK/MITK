@@ -27,7 +27,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "QmitkEventAdapter.h"
 
-#include "QmitkOverlayController.h"
 #include "QmitkRenderWindowMenu.h"
 
 QmitkRenderWindow::QmitkRenderWindow(QWidget *parent, QString /*name*/, mitk::VtkPropRenderer* /*renderer*/, mitk::RenderingManager* renderingManager )
@@ -35,7 +34,6 @@ QmitkRenderWindow::QmitkRenderWindow(QWidget *parent, QString /*name*/, mitk::Vt
 , m_ResendQtEvents(true)
 , m_MenuWidget(NULL)
 , m_MenuWidgetActivated(false)
-, m_OverlayController(NULL)
 {
   Initialize( renderingManager ); // Initialize mitkRenderWindowBase
  
@@ -44,9 +42,6 @@ QmitkRenderWindow::QmitkRenderWindow(QWidget *parent, QString /*name*/, mitk::Vt
 
   //create render window MenuBar for split, close Window or set new setting.
   m_MenuWidget = new QmitkRenderWindowMenu(this,0,m_Renderer);
-
-  // create overlay controller for managing various overlays
-  m_OverlayController = new QmitkOverlayController( this );
 
   //create Signal/Slot Connection
   connect( m_MenuWidget, SIGNAL( SignalChangeLayoutDesign(int) ), this, SLOT(OnChangeLayoutDesign(int)) );
@@ -206,7 +201,7 @@ void QmitkRenderWindow::moveEvent( QMoveEvent* event )
   QVTKWidget::moveEvent( event );
 
   // after a move the overlays need to be positioned
-  m_OverlayController->AdjustOverlayPosition();
+  emit Moved();
 }
 
 
@@ -215,8 +210,8 @@ void QmitkRenderWindow::showEvent( QShowEvent* event )
   QVTKWidget::showEvent( event );
 
   // this singleshot is necessary to have the overlays positioned correctly after initial show
-  // simple call of AdjustOverlayPosition() is no use here!!
-  QTimer::singleShot(0, this->GetOverlayController() ,SLOT( AdjustOverlayPosition() ) );
+  // simple call of Moved() is no use here!!
+  QTimer::singleShot(0, this ,SLOT( Moved() ) );
 }
 
 
@@ -285,14 +280,3 @@ void QmitkRenderWindow::FullScreenMode(bool state)
   if( m_MenuWidget )
     m_MenuWidget->ChangeFullScreenMode( state );
 }  
-
-void QmitkRenderWindow::SetOverlayController( QmitkOverlayController* overlayController)
-{
-  if ( overlayController != NULL )
-    m_OverlayController = overlayController;
-}
-
-QmitkOverlayController* QmitkRenderWindow::GetOverlayController()
-{
-  return m_OverlayController;
-}

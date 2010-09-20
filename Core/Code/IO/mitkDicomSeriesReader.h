@@ -33,6 +33,8 @@ PURPOSE.  See the above copyright notices for more information.
   #include <gdcmDataSet.h>
 #endif
 
+#include <itkCommand.h>
+
 namespace mitk
 {
 
@@ -49,16 +51,19 @@ class MITK_CORE_EXPORT DicomSeriesReader
 public:
   typedef std::vector<std::string> StringContainer;
   typedef std::map<std::string, StringContainer> UidFileNamesMap;
+  typedef void (*UpdateCallBackMethod)(float);
 
   /**
    * Loads a DICOM series composed by the file names enumerated in the file names container.
+   * If a callback method is supplied, it will be called after every progress update with a progress value in [0,1].
    */
-  static DataNode::Pointer LoadDicomSeries(const StringContainer &filenames);
+  static DataNode::Pointer LoadDicomSeries(const StringContainer &filenames, UpdateCallBackMethod callback = 0);
 
   /**
    * Loads a DICOM series composed by the file names enumerated in the file names container.
+   * If a callback method is supplied, it will be called after every progress update with a progress value in [0,1].
    */
-  static bool LoadDicomSeries(const StringContainer &filenames, DataNode &node);
+  static bool LoadDicomSeries(const StringContainer &filenames, DataNode &node, UpdateCallBackMethod callback = 0);
 
   /**
    * Checks if a specific file is a DICOM.
@@ -95,11 +100,31 @@ protected:
   typedef itk::DICOMImageIO2 DcmIoType;
 #endif
 
+  class CallbackCommand : public itk::Command
+  {
+  public:
+    inline CallbackCommand(UpdateCallBackMethod callback)
+      : m_Callback(callback)
+    {}
+
+    inline void Execute(const itk::Object *caller, const itk::EventObject&)
+    {
+      (*this->m_Callback)(static_cast<const itk::ProcessObject*>(caller)->GetProgress());
+    }
+
+    inline void Execute(itk::Object *caller, const itk::EventObject&)
+    {
+      (*this->m_Callback)(static_cast<itk::ProcessObject*>(caller)->GetProgress());
+    }
+  protected:
+    UpdateCallBackMethod m_Callback;
+  };
+
   /**
    * Performs the loading of a series and creates an image having the specified pixel type.
    */
   template <typename PixelType>
-  static void LoadDicom(const StringContainer &filenames, DataNode &node);
+  static void LoadDicom(const StringContainer &filenames, DataNode &node, UpdateCallBackMethod callback);
 
 #if GDCM_MAJOR_VERSION >= 2
   /*

@@ -410,7 +410,7 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
 
       int filesPerSeries = nfiles / nSeries;
 
-      gdcm::Scanner::ValuesType::iterator it2 = values2.begin();
+      gdcm::Scanner::ValuesType::const_iterator it2 = values2.begin();
       for(int i=0; i<nSeries; i++)
       {
 
@@ -432,7 +432,7 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
         }
 
         gdcm::Sorter subsorter;
-        gdcm::Scanner::ValuesType::iterator it;
+        gdcm::Scanner::ValuesType::const_iterator it;
 
         const gdcm::Scanner::ValuesType &values3 = s.GetValues(t3);
         const gdcm::Scanner::ValuesType &values4 = s.GetValues(t4);;

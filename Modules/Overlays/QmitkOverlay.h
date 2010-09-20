@@ -26,6 +26,8 @@ PURPOSE.  See the above copyright notices for more information.
 // QT-Stuff
 #include <QWidget>
 
+#include "OverlaysExports.h"
+
 
 /** \class  QmitkOverlay
 * \brief Abstract base class for all overlay-objects in MITK
@@ -50,7 +52,7 @@ PURPOSE.  See the above copyright notices for more information.
 * \ingroup Qmitk
 */
 
-class QMITK_EXPORT QmitkOverlay : public QObject
+class Overlays_EXPORT QmitkOverlay : public QObject
 {
   Q_OBJECT 
 

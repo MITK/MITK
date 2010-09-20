@@ -35,6 +35,8 @@ QmitkOverlayController::QmitkOverlayController( QmitkRenderWindow* rw, mitk::Pro
     return;
   }
 
+  connect( rw, SIGNAL( Moved() ), this, SLOT( AdjustOverlayPosition() ) );
+
   this->InitializeOverlayLayout();
   this->AdjustOverlayPosition();
   this->SetOverlayVisibility( true );
@@ -276,7 +278,7 @@ void QmitkOverlayController::AddOverlay( QmitkOverlay* overlay )
     m_PropertyList->ConcatenatePropertyList( m_RenderWindow->GetRenderer()->GetRenderingManager()->GetPropertyList(), false );
 
     // setting up the overlay with the correct properties ...
-    overlay->GenerateData( m_PropertyList );
+    this->UpdateOverlayData( overlay );
     // ... and add it to the OverlayContainer in the RenderWindow
     overlay->GetWidget()->setParent( m_PositionedOverlays[ pos ] );
     
@@ -289,6 +291,11 @@ void QmitkOverlayController::AddOverlay( QmitkOverlay* overlay )
     // ... and reset the position of the widgets
     this->AdjustOverlayPosition();
   }
+}
+
+void QmitkOverlayController::UpdateOverlayData( QmitkOverlay* overlay )
+{
+  overlay->GenerateData( m_PropertyList );
 }
 
 void QmitkOverlayController::RemoveOverlay( QmitkOverlay* overlay )
@@ -386,4 +393,12 @@ void QmitkOverlayController::RestackOverlays( QmitkOverlay::DisplayPosition pos 
     }
   }
 
+}
+
+void QmitkOverlayController::UpdateAllOverlays()
+{
+  foreach( QmitkOverlay* overlay, m_AllOverlays )
+  {
+    this->UpdateOverlayData( overlay );
+  }
 }

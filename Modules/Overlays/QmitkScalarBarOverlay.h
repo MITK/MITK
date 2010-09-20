@@ -19,6 +19,8 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKSCALARBAROVERLAY_H_HEADER_INCLUDED_C10DC4EB
 #define MITKSCALARBAROVERLAY_H_HEADER_INCLUDED_C10DC4EB
 
+#include "OverlaysExports.h"
+
 // MITK-Stuff
 #include "mitkCommon.h"
 #include "mitkPropertyList.h"
@@ -33,7 +35,7 @@ PURPOSE.  See the above copyright notices for more information.
 */
 
 
-  class QMITK_EXPORT QmitkScalarBarOverlay : public QmitkOverlay
+  class Overlays_EXPORT QmitkScalarBarOverlay : public QmitkOverlay
   {
     Q_OBJECT
 

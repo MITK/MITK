@@ -20,11 +20,14 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKSCALARBAR_H_HEADER_INCLUDED_C10DC4EB
 
 #include <mitkCommon.h>
+#include "OverlaysExports.h"
 
 #include <QPen>
 #include <QWidget>
 
-class QMITK_EXPORT QmitkScalarBar : public QWidget
+
+
+class Overlays_EXPORT QmitkScalarBar : public QWidget
   {
     Q_OBJECT
   public:

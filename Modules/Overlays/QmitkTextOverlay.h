@@ -26,6 +26,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <QLabel>
 
+#include "OverlaysExports.h"
+
+
 /** \class  QmitkTextOverlay
 * \brief object representing a text that is drawn as an overlay
 *
@@ -56,7 +59,7 @@ PURPOSE.  See the above copyright notices for more information.
 */
 
 
-  class QMITK_EXPORT QmitkTextOverlay : public QmitkOverlay
+  class Overlays_EXPORT QmitkTextOverlay : public QmitkOverlay
   {
   public:
 

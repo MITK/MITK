@@ -60,8 +60,6 @@ void QmitkScalarBar::SetupGeometry( alignment align )
   {
   case vertical :
     { 
-      m_VerticalLine = new QLine( QPoint(width()/2,0), QPoint(width()/2,height()) );
-
       for ( unsigned int i=0; i<m_NumberOfSubDivisions; ++i )
       {
         int y = this->height()/(m_NumberOfSubDivisions-1)*i;
@@ -77,12 +75,13 @@ void QmitkScalarBar::SetupGeometry( alignment align )
         }
         m_HorizontalLines.push_back( new QLine( QPoint(0,y), QPoint(width(),y) ) );
       }
+
+      if ( m_HorizontalLines.size() > 0 )
+        m_VerticalLine = new QLine( QPoint(width()/2,0), QPoint(width()/2,height()) );
       break;
     }
   case horizontal :
     {
-      m_VerticalLine = new QLine( QPoint(0,height()/2), QPoint(width(),height()/2) );
-
       for ( unsigned int i=0; i<m_NumberOfSubDivisions; ++i )
       {
         int x = this->width()/(m_NumberOfSubDivisions-1)*i;
@@ -96,6 +95,8 @@ void QmitkScalarBar::SetupGeometry( alignment align )
         }
         m_HorizontalLines.push_back( new QLine( QPoint(x,0), QPoint(x,height()) ) );
       }
+      if ( m_HorizontalLines.size() > 0 )
+      m_VerticalLine = new QLine( QPoint(0,height()/2), QPoint(width(),height()/2) );
 
       break;
     }
@@ -105,33 +106,39 @@ void QmitkScalarBar::SetupGeometry( alignment align )
 
 void QmitkScalarBar::SetScaleFactor( double scale )
 {
-  if ( scale < 0.1 )
-    m_ScaleFactor = 0.1;
-  else
-    m_ScaleFactor = scale;
+  m_ScaleFactor = scale;
 
   // Adopt the number of small, intersecting lines to the size of the widget.
   if ( this->parentWidget() != NULL && this->parentWidget()->parentWidget() != NULL )
   {
     // If the widget is larger than 80% of the size of the parent -> reduce number by two (must not be smaller than 3)
-    if ( this->height() > this->parentWidget()->parentWidget()->height()*0.8 && m_NumberOfSubDivisions > 3 )
+    if ( this->height() > this->parentWidget()->parentWidget()->height()*0.7 && m_NumberOfSubDivisions >= 3 )
     {
       m_NumberOfSubDivisions-=2;
     }
     // If the widget is smaller than 30% of the size of the parent -> increase number by two
-    else if ( this->height() < this->parentWidget()->parentWidget()->height()*0.4 && m_NumberOfSubDivisions < 7 )
+    else if ( this->height() < this->parentWidget()->parentWidget()->height()*0.4 && ( m_NumberOfSubDivisions < 7 && m_NumberOfSubDivisions > 1 ) )
     {
       m_NumberOfSubDivisions+=2;
     }
-  }
 
+    if ( m_NumberOfSubDivisions == 1 )
+    {
+      this->resize( 0, 0 );
+      this->setFixedWidth( 0 );
+      this->setFixedHeight( 0 );
+    }
+    else
+    {
+      this->resize( 20, (m_NumberOfSubDivisions-1)*10/m_ScaleFactor );
+      this->setFixedWidth( 20 );
+      this->setFixedHeight( (m_NumberOfSubDivisions-1)*10/m_ScaleFactor );
+      this->SetupGeometry(m_Alignment);
+    }
 
-  //if ( m_Alignment == vertical )
-  {
-    this->resize( 20, (m_NumberOfSubDivisions-1)*10/m_ScaleFactor );
-    this->setFixedWidth( 20 );
-    this->setFixedHeight( (m_NumberOfSubDivisions-1)*10/m_ScaleFactor );
-    this->SetupGeometry(m_Alignment);
+    if ( this->height() > this->parentWidget()->parentWidget()->height()*0.7 && m_NumberOfSubDivisions >= 3 )
+      SetScaleFactor( scale );
+
   }
 }
 
@@ -148,23 +155,26 @@ unsigned int QmitkScalarBar::GetNumberOfSubdivisions()
 
 void QmitkScalarBar::paintEvent(QPaintEvent* /*event*/)
 {
-  try
+  if ( m_NumberOfSubDivisions > 1 )
   {
-    QPainter painter(this);
-    painter.setPen( m_Pen );
-    painter.setBrush( Qt::SolidPattern );
-    painter.setRenderHint( QPainter::Antialiasing, true );
-
-    painter.drawLine( m_VerticalLine->p1(), m_VerticalLine->p2() );
-
-    foreach( QLine* line, m_HorizontalLines )
+    try
     {
-      painter.drawLine( line->p1(), line->p2() );
+      QPainter painter(this);
+      painter.setPen( m_Pen );
+      painter.setBrush( Qt::SolidPattern );
+      painter.setRenderHint( QPainter::Antialiasing, true );
+
+      painter.drawLine( m_VerticalLine->p1(), m_VerticalLine->p2() );
+
+      foreach( QLine* line, m_HorizontalLines )
+      {
+        painter.drawLine( line->p1(), line->p2() );
+      }
     }
-  }
-  catch (...)
-  {
-    MITK_ERROR << "ScalarBar cannot be drawn.";
+    catch (...)
+    {
+      MITK_ERROR << "ScalarBar cannot be drawn.";
+    }
   }
 }
 

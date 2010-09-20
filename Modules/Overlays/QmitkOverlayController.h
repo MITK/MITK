@@ -28,6 +28,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <string>
 
+#include "OverlaysExports.h"
+
 
 class QmitkRenderWindow;
 
@@ -55,7 +57,7 @@ class QmitkRenderWindow;
 * \ingroup Qmitk
 */
 
-class QMITK_EXPORT QmitkOverlayController : public QObject
+class Overlays_EXPORT QmitkOverlayController : public QObject
 {
   Q_OBJECT 
 
@@ -103,6 +105,8 @@ public slots :
     */
     void AdjustOverlayPosition();
 
+    void UpdateAllOverlays();
+
 
 protected:
 
@@ -127,8 +131,9 @@ protected:
   void InitializeWidget( QmitkOverlay::DisplayPosition pos );
  
   void RestackOverlays( QmitkOverlay::DisplayPosition pos );
-  
-  
+ 
+  void UpdateOverlayData( QmitkOverlay* overlay );
+
   typedef std::map< QmitkOverlay::DisplayPosition, QWidget* > OverlayPositionMap;
   typedef std::vector< QmitkOverlay* > OverlayVector;
 

@@ -112,7 +112,7 @@ void QmitkTextOverlay::GetTextProperties( mitk::PropertyList::Pointer pl )
   int fontSize = 0;
   if ( !propertyList->GetIntProperty( "overlay.fontSize", fontSize ) )
   {
-    fontSize = 16;
+    fontSize = 9.5;
   } 
   font.setPointSize( fontSize );
 

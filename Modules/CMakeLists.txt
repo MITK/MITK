@@ -13,6 +13,7 @@ ADD_SUBDIRECTORY(RigidRegistrationUI)
 ADD_SUBDIRECTORY(DeformableRegistration)
 ADD_SUBDIRECTORY(DeformableRegistrationUI)
 ADD_SUBDIRECTORY(OpenCVVideoSupport)
+ADD_SUBDIRECTORY(Overlays)
 ADD_SUBDIRECTORY(InputDevices)
 
 IF(MITK_USE_BLUEBERRY)

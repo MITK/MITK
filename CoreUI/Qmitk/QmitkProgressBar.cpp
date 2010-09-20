@@ -90,7 +90,7 @@ void QmitkProgressBar::SlotProgress(unsigned int steps)
     Reset();
   else
   {
-     this->show();
+    this->show();
   }
 
   // Update views if repaint has been requested in the meanwhile

@@ -45,6 +45,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkNodePredicateProperty.h"
 #include "mitkNodePredicateAND.h"
 #include "mitkNodePredicateNOT.h"
+#include <mitkMessage.h>
+
+#include <itkCommand.h>
 
 #include "mitkDataNodeObject.h"
 
@@ -212,6 +215,10 @@ m_OldFixedLabel(""), m_OldMovingLabel(""), m_Deactivated (false), m_CurrentFixed
   m_FixedLandmarksChangedCommand->SetCallbackFunction(this, &QmitkPointBasedRegistrationView::updateFixedLandmarksList);
   m_MovingLandmarksChangedCommand = itk::SimpleMemberCommand<QmitkPointBasedRegistrationView>::New();
   m_MovingLandmarksChangedCommand->SetCallbackFunction(this, &QmitkPointBasedRegistrationView::updateMovingLandmarksList);
+
+  this->GetDataStorage()->RemoveNodeEvent.AddListener(mitk::MessageDelegate1<QmitkPointBasedRegistrationView,
+    const mitk::DataNode*> ( this, &QmitkPointBasedRegistrationView::DataNodeHasBeenRemoved ));
+
 }
 
 QmitkPointBasedRegistrationView::~QmitkPointBasedRegistrationView()
@@ -320,6 +327,8 @@ void QmitkPointBasedRegistrationView::Activated()
   this->OpacityUpdate(m_Controls.m_OpacitySlider->value());
   this->showRedGreen(m_Controls.m_ShowRedGreenValues->isChecked());
 
+  
+  
 }
 
 void QmitkPointBasedRegistrationView::Visible()
@@ -443,6 +452,40 @@ void QmitkPointBasedRegistrationView::Hidden()
   //QmitkFunctionality::Deactivated();*/
 }
 
+
+void QmitkPointBasedRegistrationView::DataNodeHasBeenRemoved(const mitk::DataNode* node)
+{
+  if(node == m_FixedNode || node == m_MovingNode || node == m_MovingPointSetNode || node == m_FixedPointSetNode)
+  {  
+    m_Controls.m_StatusLabel->show();
+    m_Controls.TextLabelFixed->hide();
+    m_Controls.m_FixedLabel->hide();
+    m_Controls.line2->hide();
+    m_Controls.m_FixedPointListWidget->hide();
+    m_Controls.TextLabelMoving->hide();
+    m_Controls.m_MovingLabel->hide();
+    m_Controls.line1->hide();
+    m_Controls.m_MovingPointListWidget->hide();
+    m_Controls.m_OpacityLabel->hide();
+    m_Controls.m_OpacitySlider->hide();
+    m_Controls.label->hide();
+    m_Controls.label_2->hide();
+    m_Controls.m_SwitchImages->hide();
+    m_Controls.m_ShowRedGreenValues->setEnabled(false);
+  }    
+
+  if(node == m_FixedPointSetNode)
+  {   
+    m_FixedPointSetNode = NULL;
+  }
+
+  if(node == m_MovingPointSetNode)
+  {   
+    m_MovingPointSetNode = NULL;
+  }
+
+}
+
 void QmitkPointBasedRegistrationView::FixedSelected(mitk::DataNode::Pointer fixedImage)
 {
   if(m_FixedLandmarks.IsNotNull())
@@ -508,6 +551,23 @@ void QmitkPointBasedRegistrationView::FixedSelected(mitk::DataNode::Pointer fixe
       m_FixedPointSetNode->SetVisibility(true);
       m_Controls.m_FixedPointListWidget->SetPointSetNode(m_FixedPointSetNode);
       this->GetDataStorage()->Add(m_FixedPointSetNode, m_FixedNode);
+      
+      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    }
+    if (m_FixedPointSetNode.IsNull())
+    {
+      m_FixedLandmarks = mitk::PointSet::New();
+      m_FixedPointSetNode = mitk::DataNode::New();
+      m_FixedPointSetNode->SetData(m_FixedLandmarks);
+      m_FixedPointSetNode->SetProperty("name", mitk::StringProperty::New("PointBasedRegistrationNode"));
+
+      m_FixedPointSetNode->GetStringProperty("label", m_OldFixedLabel);
+      m_FixedPointSetNode->SetProperty("label", mitk::StringProperty::New("F "));
+      m_FixedPointSetNode->SetProperty("color", mitk::ColorProperty::New(0.0f, 1.0f, 1.0f));
+      m_FixedPointSetNode->SetVisibility(true);
+      m_Controls.m_FixedPointListWidget->SetPointSetNode(m_FixedPointSetNode);
+      this->GetDataStorage()->Add(m_FixedPointSetNode, m_FixedNode);
+      
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     }
   }
@@ -607,6 +667,27 @@ void QmitkPointBasedRegistrationView::MovingSelected(mitk::DataNode::Pointer mov
       this->clearTransformationLists();
       this->OpacityUpdate(m_Opacity);
     }
+    if (m_MovingPointSetNode.IsNull())
+    {
+      m_MovingLandmarks = mitk::PointSet::New();
+      m_MovingPointSetNode = mitk::DataNode::New();
+      m_MovingPointSetNode->SetData(m_MovingLandmarks);
+      m_MovingPointSetNode->SetProperty("name", mitk::StringProperty::New("PointBasedRegistrationNode"));
+
+      m_MovingPointSetNode->GetStringProperty("label", m_OldMovingLabel);
+      m_MovingPointSetNode->SetProperty("label", mitk::StringProperty::New("M "));
+      m_MovingPointSetNode->SetProperty("color", mitk::ColorProperty::New(1.0f, 1.0f, 0.0f));
+      m_MovingPointSetNode->SetVisibility(true);
+      m_Controls.m_MovingPointListWidget->SetPointSetNode(m_MovingPointSetNode);
+      this->GetDataStorage()->Add(m_MovingPointSetNode, m_MovingNode);
+
+      mitk::RenderingManager::GetInstance()->RequestUpdateAll();      
+     
+    }
+    
+
+
+   
   }
   else
   {

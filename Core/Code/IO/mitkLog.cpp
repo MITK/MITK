@@ -18,6 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkLog.h"
 
 #include "itkSimpleFastMutexLock.h"
+#include <itkOutputWindow.h>
 
 #include <iostream>
 #include <fstream>
@@ -25,6 +26,14 @@ PURPOSE.  See the above copyright notices for more information.
 static itk::SimpleFastMutexLock logMutex;
 static mitk::LogBackend *mitkLogBackend = 0;
 static std::ofstream *logFile = 0;
+static std::stringstream *outputWindow = 0;
+static bool logOutputWindow = false;
+
+void mitk::LogBackend::EnableAdditionalConsoleWindow(bool enable)
+{
+  logOutputWindow = enable;
+}
+
 
 void mitk::LogBackend::ProcessMessage(const mbilog::LogMessage& l )
 {
@@ -43,7 +52,19 @@ void mitk::LogBackend::ProcessMessage(const mbilog::LogMessage& l )
       mbilog::BackendCout::FormatFull( *logFile, l );
     #endif
   }
-  
+  if(logOutputWindow)
+  {
+    if(outputWindow == NULL)
+    {  outputWindow = new std::stringstream();}
+    outputWindow->str("");
+    outputWindow->clear();
+    #ifdef _WIN32
+      mbilog::BackendCout::FormatFull( *outputWindow, l, (int)GetCurrentThreadId() );
+    #else
+      mbilog::BackendCout::FormatFull( *outputWindow, l );
+    #endif
+    itk::OutputWindow::GetInstance()->DisplayText(outputWindow->str().c_str());
+  }
   logMutex.Unlock();
 }
 

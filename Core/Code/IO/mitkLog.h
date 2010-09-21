@@ -47,6 +47,11 @@ namespace mitk
       */      
       static void SetLogFile(const char *file);
      
+     /** \brief Enables an additional logging output window by means of itk::outputwindow
+     * This might be relevant for showing log output in applications with no default output console
+      */ 
+      static void EnableAdditionalConsoleWindow(bool enable);
+     
      /** \brief Automatically extracts and removes the "--logfile <file>" parameters from the standard C main(argc,argv) parameter list and calls SetLogFile if needed
       */      
       static void CatchLogFileCommandLineParameter(int &argc,char **argv);

@@ -172,6 +172,9 @@ QmitkRigidRegistrationView::QmitkRigidRegistrationView(QObject * /*parent*/, con
   scalingParams = new int[3];
 
   m_TimeStepperAdapter = NULL;
+
+  this->GetDataStorage()->RemoveNodeEvent.AddListener(mitk::MessageDelegate1<QmitkRigidRegistrationView,
+    const mitk::DataNode*> ( this, &QmitkRigidRegistrationView::DataNodeHasBeenRemoved ));
 }
 
 QmitkRigidRegistrationView::~QmitkRigidRegistrationView()
@@ -362,6 +365,24 @@ void QmitkRigidRegistrationView::Hidden()
   m_SelListener = NULL;
   //mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   //QmitkFunctionality::Deactivated();*/
+}
+
+void QmitkRigidRegistrationView::DataNodeHasBeenRemoved(const mitk::DataNode* node)
+{
+  if(node == m_FixedNode || node == m_MovingNode)
+  {
+    m_Controls.m_StatusLabel->show();
+    m_Controls.TextLabelFixed->hide();
+    m_Controls.m_FixedLabel->hide();
+    m_Controls.TextLabelMoving->hide();
+    m_Controls.m_MovingLabel->hide();
+    m_Controls.m_OpacityLabel->setEnabled(false);
+    m_Controls.m_OpacitySlider->setEnabled(false);
+    m_Controls.label->setEnabled(false);
+    m_Controls.label_2->setEnabled(false);
+    m_Controls.m_ShowRedGreenValues->setEnabled(false);
+    m_Controls.m_SwitchImages->hide();
+  }
 }
 
 void QmitkRigidRegistrationView::FixedSelected(mitk::DataNode::Pointer fixedImage)

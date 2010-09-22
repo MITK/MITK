@@ -858,9 +858,12 @@ void TestDataStorage( mitk::DataStorage* ds )
     ItkDeleteEventListener listener( standaloneDataStorage );
     {
       mitk::DataNode::Pointer emptyNode = mitk::DataNode::New();
+      mitk::DataNode* pEmptyNode = emptyNode;
       listener.SetNode( emptyNode );
       standaloneDataStorage->Add( emptyNode );
-      standaloneDataStorage->Remove( emptyNode ); // this should not freeze the whole thing
+      emptyNode = 0; // emptyNode is still alive because standaloneDataStorage
+                     // owns it
+      standaloneDataStorage->Remove( pEmptyNode ); // this should not freeze the whole thing
     }
   }
   catch(...)

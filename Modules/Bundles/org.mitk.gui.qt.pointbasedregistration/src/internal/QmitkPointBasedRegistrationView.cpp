@@ -338,6 +338,7 @@ void QmitkPointBasedRegistrationView::Visible()
 
 void QmitkPointBasedRegistrationView::Deactivated()
 {
+
   m_Deactivated = true;
   if (m_FixedPointSetNode.IsNotNull())
     m_FixedPointSetNode->SetProperty("label", mitk::StringProperty::New(m_OldFixedLabel));
@@ -712,16 +713,20 @@ void QmitkPointBasedRegistrationView::MovingSelected(mitk::DataNode::Pointer mov
 
 void QmitkPointBasedRegistrationView::updateMovingLandmarksList()
 {
-  m_MovingLandmarks = (mitk::PointSet*)m_MovingPointSetNode->GetData();
-  m_Controls.m_MovingPointListWidget->SetPointSetNode(m_MovingPointSetNode);    //Workaround: m_MovingPointListWidget->m_PointListView->m_PointListModel loses the pointer on the pointsetnode
+//  mitk::PointSet* ps = mitk::PointSet::New();
+//  ps = dynamic_cast<mitk::PointSet*>(m_MovingPointSetNode->GetData());
+//  mitk::DataNode::Pointer tmpPtr = m_MovingPointSetNode;
+//  m_MovingLandmarks = 0;
+//  m_MovingLandmarks = (ps);
+  m_MovingLandmarks = dynamic_cast<mitk::PointSet*>(m_MovingPointSetNode->GetData());
+//  m_Controls.m_MovingPointListWidget->SetPointSetNode(m_MovingPointSetNode);    //Workaround: m_MovingPointListWidget->m_PointListView->m_PointListModel loses the pointer on the pointsetnode
   this->checkLandmarkError();
   this->CheckCalculate();
 }
 
 void QmitkPointBasedRegistrationView::updateFixedLandmarksList()
 {
-  m_FixedLandmarks = (mitk::PointSet*)m_FixedPointSetNode->GetData();
-  m_Controls.m_FixedPointListWidget->SetPointSetNode(m_FixedPointSetNode);     //Workaround: m_FixedPointListWidget->m_PointListView->m_PointListModel loses the pointer on the pointsetnode
+  m_FixedLandmarks = dynamic_cast<mitk::PointSet*>(m_FixedPointSetNode->GetData());
   this->checkLandmarkError();
   this->CheckCalculate();
 }

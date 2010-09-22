@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <!-- Event_Id = 0: this is a * transition with all other eventId's not declared in that state -->
 <mitkInteraktionStates xmlns="http://tempuri.org/StateMachine.xsd" STYLE="User001">
   <!-- ***WARNING*** do not use any &, % and so on in NAME -->
@@ -160,9 +160,9 @@
     <event NAME="PositionEvent" ID="1012" TYPE="Type_MouseButtonPress" BUTTON="BS_LeftButton" BUTTONSTATE="0x0000" KEY="Key_none" />
     <!-- DoubleClick <event NAME="PositionEvent"      ID="510" TYPE="4" BUTTON="0x0001" BUTTONSTATE="0x0000" KEY="0xffff" />-->
     <!--<event NAME="StSmallerN" ID="1014" TYPE="Type_User" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_none" />-->
-	<!--<event NAME="StEqualsN" ID="1015" TYPE="Type_User" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_none" />-->
-	<!--<event NAME="StLargerN" ID="1016" TYPE="Type_User" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_none" />-->
-	<!-- for external thrown Events-->
+    <!--<event NAME="StEqualsN" ID="1015" TYPE="Type_User" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_none" />-->
+    <!--<event NAME="StLargerN" ID="1016" TYPE="Type_User" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_none" />-->
+    <!-- for external thrown Events-->
     <event NAME="clear" ID="1100" TYPE="Type_User" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_none" />
     <!-- Puncture Application -->
     <event NAME="print" ID="3001" TYPE="Type_Application" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_none" />
@@ -1967,9 +1967,11 @@
   <stateMachine NAME="pointsetinteractor">
     <!-- Behaviour of a set of Points. a defined number of points can be set/removed/selected/deselectd/moved -->
     <state NAME="no points or loaded points" ID="1" START_STATE="TRUE" X_POS="1066" Y_POS="281" WIDTH="100" HEIGHT="50">
-	  <transition NAME="0SmallerPointsLoadedSmallerN" NEXT_STATE_ID="2" EVENT_ID="1014" />    <!-- If points have been loaded, goto right state; checked in constructor -->
-	  <transition NAME="PointsLoadedGreaterEqualsN" NEXT_STATE_ID="4" EVENT_ID="1015" />		<!-- If points have been loaded, goto right state; checked in constructor -->    
-	  <transition NAME="addPoint but check n" NEXT_STATE_ID="3" EVENT_ID="3">
+      <transition NAME="0SmallerPointsLoadedSmallerN" NEXT_STATE_ID="2" EVENT_ID="1014" />
+      <!-- If points have been loaded, goto right state; checked in constructor -->
+      <transition NAME="PointsLoadedGreaterEqualsN" NEXT_STATE_ID="4" EVENT_ID="1015" />
+      <!-- If points have been loaded, goto right state; checked in constructor -->
+      <transition NAME="addPoint but check n" NEXT_STATE_ID="3" EVENT_ID="3">
         <action ID="1101">
           <!--AcMODE_SELECT-->
         </action>
@@ -2123,12 +2125,12 @@
       <transition NAME="StillFull" NEXT_STATE_ID="4" EVENT_ID="1015">
         <action ID="100" />
       </transition>
-	  <transition NAME="NotEmptyNotFull" NEXT_STATE_ID="2" EVENT_ID="1014">
+      <transition NAME="NotEmptyNotFull" NEXT_STATE_ID="2" EVENT_ID="1014">
         <action ID="100" />
       </transition>
       <transition NAME="WillBeEmpty" NEXT_STATE_ID="1" EVENT_ID="1017">
-        <action ID="100" /> 
-          <!--AcREMOVEPOINT-->
+        <action ID="100" />
+        <!--AcREMOVEPOINT-->
         <action ID="1100">
           <!--AcMODEDESELECT-->
         </action>
@@ -2137,13 +2139,13 @@
     <state NAME="selected space left" ID="31" X_POS="22" Y_POS="480" WIDTH="90" HEIGHT="50">
       <transition NAME="StNo" NEXT_STATE_ID="2" EVENT_ID="1003" />
       <transition NAME="StYes" NEXT_STATE_ID="30" EVENT_ID="1004">
-        <action ID="330" /> 
+        <action ID="330" />
         <!--AcCHECKNUMBEROFPOINTS-->
       </transition>
     </state>
     <state NAME="checkedPositionEventSmallerN" ID="40" X_POS="267" Y_POS="301" WIDTH="173" HEIGHT="50">
       <transition NAME="PositionEvent" NEXT_STATE_ID="2" EVENT_ID="1004">
-        <action ID="10" /> 
+        <action ID="10" />
         <!--AcADDPOINT-->
       </transition>
       <transition NAME="others" NEXT_STATE_ID="2" EVENT_ID="1003">
@@ -2162,8 +2164,10 @@
   <stateMachine NAME="onlymovepointsetinteractor">
     <!-- Behaviour of a set of Points. The points can only be selected and moved.-->
     <state NAME="no points or loaded points" ID="1" START_STATE="TRUE" X_POS="1066" Y_POS="281" WIDTH="100" HEIGHT="50">
-      <transition NAME="0SmallerPointsLoadedSmallerN" NEXT_STATE_ID="2" EVENT_ID="1014" />    <!-- If points have been loaded, goto right state; checked in constructor -->
-      <transition NAME="PointsLoadedGreaterEqualsN" NEXT_STATE_ID="2" EVENT_ID="1015" />		<!-- If points have been loaded, goto right state; checked in constructor -->    
+      <transition NAME="0SmallerPointsLoadedSmallerN" NEXT_STATE_ID="2" EVENT_ID="1014" />
+      <!-- If points have been loaded, goto right state; checked in constructor -->
+      <transition NAME="PointsLoadedGreaterEqualsN" NEXT_STATE_ID="2" EVENT_ID="1015" />
+      <!-- If points have been loaded, goto right state; checked in constructor -->
       <transition NAME="SetThisStatemachineOnSelected" NEXT_STATE_ID="1" EVENT_ID="1030">
         <action ID="1101">
           <!--AcMODE_SELECT-->
@@ -2230,8 +2234,10 @@
   <stateMachine NAME="seedpointsetinteractor">
     <!-- Behaviour of one Point. Point is added by clicking left Mouse Button and holding Shift-->
     <state NAME="no point" ID="1" START_STATE="TRUE" X_POS="59" Y_POS="45" WIDTH="169" HEIGHT="50">
-   	  <transition NAME="0SmallerPointsLoadedSmallerN" NEXT_STATE_ID="10" EVENT_ID="1014" />    <!-- If point has been loaded, goto right state; checked in constructor -->
-      <transition NAME="PointsLoadedGreaterEqualsN" NEXT_STATE_ID="10" EVENT_ID="1015" />		<!-- If point has been loaded, goto right state; checked in constructor -->    
+      <transition NAME="0SmallerPointsLoadedSmallerN" NEXT_STATE_ID="10" EVENT_ID="1014" />
+      <!-- If point has been loaded, goto right state; checked in constructor -->
+      <transition NAME="PointsLoadedGreaterEqualsN" NEXT_STATE_ID="10" EVENT_ID="1015" />
+      <!-- If point has been loaded, goto right state; checked in constructor -->
       <transition NAME="addPoint" NEXT_STATE_ID="2" EVENT_ID="3">
         <action ID="1101">
           <!--AcMODESELECT-->
@@ -2242,7 +2248,7 @@
     </state>
     <state NAME="checkPositionEvent" ID="2" X_POS="164" Y_POS="334" WIDTH="166" HEIGHT="50">
       <transition NAME="PositionEvent" NEXT_STATE_ID="10" EVENT_ID="1004">
-        <action ID="10" /> 
+        <action ID="10" />
         <!--AcADDPOINT-->
       </transition>
       <transition NAME="others" NEXT_STATE_ID="1" EVENT_ID="1003">
@@ -2325,7 +2331,7 @@
         <!--AcREMOVEPOINT-->
         <action ID="1100" />
         <!--AcMODEDESELECT-->
-        </transition>
+      </transition>
       <transition NAME="largerOne" NEXT_STATE_ID="10" EVENT_ID="1003">
         <action ID="100" />
         <!--AcREMOVEPOINT-->
@@ -3363,6 +3369,16 @@
       <transition NAME="finish" NEXT_STATE_ID="0" EVENT_ID="507" />
     </state>
   </stateMachine>
+  <stateMachine NAME="ToolCallbackInteraction">
+    <state NAME="neutral" ID="0" START_STATE="TRUE" X_POS="288" Y_POS="81" WIDTH="100" HEIGHT="50">
+      <transition NAME="initmove" NEXT_STATE_ID="1" EVENT_ID="1">
+        <action ID="9" />
+      </transition>
+    </state>
+    <state NAME="InInteraction" ID="1" X_POS="288" Y_POS="81" WIDTH="100" HEIGHT="50">
+      <transition NAME="finishmove" NEXT_STATE_ID="0" EVENT_ID="1003" />
+    </state>
+  </stateMachine>
   <stateMachine NAME="PlanarFigureInteractor">
     <!-- Behaviour of a set of Points. a defined number of points can be set/removed/selected/deselectd/moved -->
     <state NAME="Start" ID="42" START_STATE="TRUE" X_POS="997" Y_POS="592" WIDTH="100" HEIGHT="50">
@@ -3384,7 +3400,7 @@
         <action ID="21" />
       </transition>
     </state>
-    <state NAME="ControlPointSelected" ID="47" X_POS="110" Y_POS="522" WIDTH="100" HEIGHT="50">
+    <state NAME="ControlPointSelected" ID="47" X_POS="27" Y_POS="571" WIDTH="100" HEIGHT="50">
       <transition NAME="name" EVENT_ID="530" NEXT_STATE_ID="47">
         <action ID="90" />
       </transition>
@@ -3402,33 +3418,33 @@
       <transition NAME="name" EVENT_ID="1003" NEXT_STATE_ID="50" />
       <transition NAME="name" EVENT_ID="1004" NEXT_STATE_ID="51" />
     </state>
-    <state NAME="PlaceFigure" ID="50" X_POS="407" Y_POS="145" WIDTH="100" HEIGHT="50">
+    <state NAME="PlaceFigure" ID="50" X_POS="497" Y_POS="149" WIDTH="100" HEIGHT="50">
       <transition NAME="name" EVENT_ID="1" NEXT_STATE_ID="45">
         <action ID="11" />
       </transition>
     </state>
-    <state NAME="EditFigure" ID="51" X_POS="392" Y_POS="47" WIDTH="100" HEIGHT="50">
+    <state NAME="EditFigure" ID="51" X_POS="433" Y_POS="55" WIDTH="100" HEIGHT="50">
       <transition NAME="name" EVENT_ID="520" NEXT_STATE_ID="52">
         <action ID="34" />
       </transition>
     </state>
-    <state NAME="IsOverControlPoint" ID="52" X_POS="92" Y_POS="210" WIDTH="100" HEIGHT="50">
+    <state NAME="IsOverFigure" ID="52" X_POS="46" Y_POS="114" WIDTH="100" HEIGHT="50">
       <transition NAME="name" EVENT_ID="1003" NEXT_STATE_ID="51" />
       <transition NAME="name" EVENT_ID="1004" NEXT_STATE_ID="53" />
     </state>
-    <state NAME="ControlPointHover" ID="53" X_POS="235" Y_POS="392" WIDTH="115" HEIGHT="50">
+    <state NAME="FigureHover" ID="53" X_POS="159" Y_POS="367" WIDTH="115" HEIGHT="50">
       <transition NAME="name" EVENT_ID="520" NEXT_STATE_ID="52">
         <action ID="34" />
       </transition>
-      <transition NAME="name" EVENT_ID="1" NEXT_STATE_ID="55">
-        <action ID="66" />
+      <transition NAME="name" EVENT_ID="1" NEXT_STATE_ID="59">
+        <action ID="60" />
       </transition>
     </state>
     <state NAME="IsMinFigureFinished" ID="54" X_POS="623" Y_POS="823" WIDTH="110" HEIGHT="50">
       <transition NAME="name" EVENT_ID="1004" NEXT_STATE_ID="42" />
       <transition NAME="name" EVENT_ID="1003" NEXT_STATE_ID="45" />
     </state>
-    <state NAME="ResetFigure" ID="55" X_POS="276" Y_POS="797" WIDTH="100" HEIGHT="50">
+    <state NAME="ResetFigure" ID="55" X_POS="321" Y_POS="801" WIDTH="100" HEIGHT="50">
       <transition NAME="name" EVENT_ID="1003" NEXT_STATE_ID="47" />
       <transition NAME="name" EVENT_ID="1004" NEXT_STATE_ID="45" />
     </state>
@@ -3446,16 +3462,11 @@
       </transition>
       <transition NAME="name" EVENT_ID="1003" NEXT_STATE_ID="45" />
     </state>
-  </stateMachine>
-  <stateMachine NAME="ToolCallbackInteraction">
-    <state NAME="neutral" ID="0" START_STATE="TRUE" X_POS="288" Y_POS="81" WIDTH="100" HEIGHT="50">
-      <transition NAME="initmove" NEXT_STATE_ID="1" EVENT_ID="1">
-        <action ID="9" />
+    <state NAME="FigureSelected" ID="59" X_POS="242" Y_POS="570" WIDTH="100" HEIGHT="50">
+      <transition NAME="name" EVENT_ID="1004" NEXT_STATE_ID="55">
+        <action ID="66" />
       </transition>
-    </state>
-    <state NAME="InInteraction" ID="1" X_POS="288" Y_POS="81" WIDTH="100" HEIGHT="50">
-      <transition NAME="finishmove" NEXT_STATE_ID="0" EVENT_ID="1003">
-      </transition>
+      <transition NAME="name" EVENT_ID="1003" NEXT_STATE_ID="51" />
     </state>
   </stateMachine>
 </mitkInteraktionStates>

@@ -26,7 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "itkMutexLockHolder.h"
 
 
-mitk::StandaloneDataStorage::StandaloneDataStorage() 
+mitk::StandaloneDataStorage::StandaloneDataStorage()
 : mitk::DataStorage()
 {
 }
@@ -58,7 +58,7 @@ void mitk::StandaloneDataStorage::Add(mitk::DataNode* node, const mitk::DataStor
       throw std::logic_error("DataStorage not initialized");
     /* check if node is in its own list of sources */
     if ((parents != NULL) && (std::find(parents->begin(), parents->end(), node) != parents->end()))
-      throw std::invalid_argument("Node is it's own parent"); 
+      throw std::invalid_argument("Node is it's own parent");
     /* check if node already exists in StandaloneDataStorage */
     if (m_SourceNodes.find(node) != m_SourceNodes.end())
       throw std::invalid_argument("Node is already in DataStorage");
@@ -93,7 +93,7 @@ void mitk::StandaloneDataStorage::Add(mitk::DataNode* node, const mitk::DataStor
 
   /* Notify observers */
   EmitAddNodeEvent(node);
-  
+
 }
 
 
@@ -106,6 +106,14 @@ void mitk::StandaloneDataStorage::Remove(const mitk::DataNode* node)
 
   // remove ITK modified event listener
   this->RemoveListeners(node);
+
+  // muellerm, 22.9.10: add additional reference count to ensure
+  // that the node is not deleted when removed from the relation map
+  // while m_Mutex is locked. This would cause the an itk::DeleteEvent
+  // is thrown and a deadlock will occur when event receivers
+  // access the DataStorage again in their event processing function
+  //
+  mitk::DataNode::ConstPointer nodeGuard(node);
 
   /* Notify observers of imminent node removal */
   EmitRemoveNodeEvent(node);
@@ -146,12 +154,12 @@ mitk::DataStorage::SetOfObjects::ConstPointer mitk::StandaloneDataStorage::GetAl
   itk::MutexLockHolder<itk::SimpleFastMutexLock > locked(m_Mutex);
   if (!IsInitialized())
     throw std::logic_error("DataStorage not initialized");
-    
+
   mitk::DataStorage::SetOfObjects::Pointer resultset = mitk::DataStorage::SetOfObjects::New();
   /* Fill resultset with all objects that are managed by the StandaloneDataStorage object */
   unsigned int index = 0;
   for (AdjacencyList::const_iterator it = m_SourceNodes.begin(); it != m_SourceNodes.end(); ++it)
-    if (it->first.IsNull()) 
+    if (it->first.IsNull())
       continue;
     else
       resultset->InsertElement(index++, const_cast<mitk::DataNode*>(it->first.GetPointer()));
@@ -166,7 +174,7 @@ mitk::DataStorage::SetOfObjects::ConstPointer mitk::StandaloneDataStorage::GetRe
     throw std::invalid_argument("invalid node");
 
   /* Either read direct relations directly from adjacency list */
-  if (onlyDirectlyRelated)  
+  if (onlyDirectlyRelated)
   {
     AdjacencyList::const_iterator it = relation.find(node); // get parents of current node
     if ((it == relation.end()) || (it->second.IsNull())) // node not found in list or no set of parents
@@ -174,12 +182,12 @@ mitk::DataStorage::SetOfObjects::ConstPointer mitk::StandaloneDataStorage::GetRe
     else
       return this->FilterSetOfObjects(it->second, condition);
   }
-  
+
   /* Or traverse adjacency list to collect all related nodes */
   std::vector<mitk::DataNode::ConstPointer> resultset;
   std::vector<mitk::DataNode::ConstPointer> openlist;
 
-  /* Initialize openlist with node. this will add node to resultset, 
+  /* Initialize openlist with node. this will add node to resultset,
      but that is necessary to detect circular relations that would lead to endless recursion */
   openlist.push_back(node);
 
@@ -197,7 +205,7 @@ mitk::DataStorage::SetOfObjects::ConstPointer mitk::StandaloneDataStorage::GetRe
       for (SetOfObjects::ConstIterator parentIt = it->second->Begin(); parentIt != it->second->End(); ++parentIt) // for each parent of current node
       {
         mitk::DataNode::ConstPointer p = parentIt.Value().GetPointer();
-        if (   !(std::find(resultset.begin(), resultset.end(), p) != resultset.end())   // if it is not already in resultset 
+        if (   !(std::find(resultset.begin(), resultset.end(), p) != resultset.end())   // if it is not already in resultset
             && !(std::find(openlist.begin(), openlist.end(), p) != openlist.end()))     // and not already in openlist
           openlist.push_back(p);                                                        // then add it to openlist, so that it can be processed
       }

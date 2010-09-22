@@ -82,6 +82,48 @@ public:
   }
 };
 
+///
+/// \brief a class for checking if the datastorage is really thread safe
+///
+/// Therefore it listens to a node contained in the datastorage. when this node
+/// gets removed and deleted, this class gets informed by calling OnObjectDelete().
+/// in OnObjectDelete() an empty node gets added. this must not cause a deadlock
+///
+struct ItkDeleteEventListener
+{
+  ItkDeleteEventListener( mitk::DataStorage* ds )
+  :   m_Node(0), m_DataStorage(ds),
+  m_DeleteObserverTag(0)
+  {
+  }
+
+  void SetNode( mitk::DataNode* _Node )
+  {
+    if(m_Node)
+      return;
+
+    m_Node = _Node;
+    itk::MemberCommand<ItkDeleteEventListener>::Pointer onObjectDelete =
+      itk::MemberCommand<ItkDeleteEventListener>::New();
+
+    onObjectDelete->SetCallbackFunction(this, &ItkDeleteEventListener::OnObjectDelete);
+    m_DeleteObserverTag = m_Node->AddObserver(itk::DeleteEvent(), onObjectDelete);
+  }
+
+  void OnObjectDelete( const itk::Object *caller, const itk::EventObject & )
+  {
+    mitk::DataNode::Pointer node = mitk::DataNode::New();
+    m_DataStorage->Add( node ); // SHOULD NOT CAUSE A DEADLOCK!
+    m_DataStorage->Remove( node ); // tidy up: remove the empty node again
+
+    m_Node = 0;
+  }
+
+  protected:
+    mitk::DataNode* m_Node;
+    mitk::DataStorage::Pointer m_DataStorage;
+    unsigned int m_DeleteObserverTag;
+};
 
 //## Documentation
 //## main testing method
@@ -808,6 +850,23 @@ void TestDataStorage( mitk::DataStorage* ds )
     MITK_TEST_CONDITION((bounds[0]==i)&&(bounds[1]==i+1),"Test for timebounds of geometry at different time steps with ComputeBoundingGeometry()");
   }
 
+  // test for thread safety of DataStorage
+  try
+  {
+    mitk::StandaloneDataStorage::Pointer standaloneDataStorage
+        = mitk::StandaloneDataStorage::New();
+    ItkDeleteEventListener listener( standaloneDataStorage );
+    {
+      mitk::DataNode::Pointer emptyNode = mitk::DataNode::New();
+      listener.SetNode( emptyNode );
+      standaloneDataStorage->Add( emptyNode );
+      standaloneDataStorage->Remove( emptyNode ); // this should not freeze the whole thing
+    }
+  }
+  catch(...)
+  {
+    MITK_TEST_FAILED_MSG( << "Exception during testing DataStorage thread safe");
+  }
 
   /* Clear DataStorage */
   ds->Remove(ds->GetAll());

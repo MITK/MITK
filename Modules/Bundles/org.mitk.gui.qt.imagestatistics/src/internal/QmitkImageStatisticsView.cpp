@@ -258,11 +258,69 @@ void QmitkImageStatistics::OnSelectionChanged( std::vector<mitk::DataNode*> node
     return;
   }
 
-  if ( nodes.empty() || nodes.size() > 1 )
+  // Check if selection makeup consists only of valid nodes:
+  // One image, segmentation or planarFigure
+  // One image and one of the other two
+  bool tooManyNodes( true );
+  bool invalidNodes( true );
+
+  if ( nodes.size() < 3 )
+  {
+    tooManyNodes = false;
+  }
+
+  if( !tooManyNodes )
+  {
+    unsigned int numberImages = 0;
+    unsigned int numberSegmentations = 0;
+    unsigned int numberPlanarFigures = 0;
+
+    for ( unsigned int index = 0; index < nodes.size(); index++ )
+    {
+      m_SelectedImageMask = dynamic_cast< mitk::Image * >( nodes[ index ]->GetData() );
+      m_SelectedPlanarFigure = dynamic_cast< mitk::PlanarFigure * >( nodes[ index ]->GetData() );
+
+      if ( m_SelectedImageMask != NULL )
+      {
+        bool isMask( false );
+        nodes[ index ]->GetPropertyValue("binary", isMask);
+        if ( !isMask )
+        {
+          numberImages++;
+        }
+        else
+        {
+          numberSegmentations++;
+          if ( numberImages != 0 ) // image should be last element
+          {
+            std::swap( nodes[ index ], nodes[ index - 1 ] );
+          }
+        }
+      }
+      else if ( m_SelectedPlanarFigure != NULL )
+      {
+        numberPlanarFigures++;
+        if ( numberImages != 0 ) // image should be last element
+        {
+          std::swap( nodes[ index ], nodes[ index - 1 ] );
+        }
+      }
+    }
+
+    if ( ( numberPlanarFigures + numberSegmentations + numberImages ) == nodes.size() && //No invalid nodes
+      ( numberPlanarFigures + numberSegmentations ) < 2 && numberImages < 2 
+      // maximum of one image and/or one of either planar figure or segmentation
+      )
+    {
+      invalidNodes = false;
+    }
+  }
+
+  if ( nodes.empty() || tooManyNodes || invalidNodes )
   {
     // Nothing to do: invalidate image, clear statistics, histogram, and GUI
     m_SelectedImage = NULL;
-    this->InvalidateStatisticsTableView();
+    this->InvalidateStatisticsTableView() ;
     m_Controls->m_HistogramWidget->ClearItemModel();
     m_Controls->m_LineProfileWidget->ClearItemModel();
 
@@ -320,6 +378,12 @@ void QmitkImageStatistics::OnSelectionChanged( std::vector<mitk::DataNode*> node
       }
       parentObjectIndex++;
     }
+  }
+
+  if ( nodes.size() == 2 )
+  {
+    parentNode = nodes.back();
+    parentImage = dynamic_cast< mitk::Image * >( parentNode->GetData() );
   }
 
   if ( parentImage != NULL )
@@ -581,10 +645,10 @@ void QmitkImageStatistics::UpdateStatistics()
       if ( m_SelectedPlanarFigure != NULL )
       {
         // TODO: enable line profile widget
-        //m_Controls->m_StatisticsWidgetStack->setCurrentIndex( 1 );
-        //m_Controls->m_LineProfileWidget->SetImage( m_SelectedImage );
-        //m_Controls->m_LineProfileWidget->SetPlanarFigure( m_SelectedPlanarFigure );
-        //m_Controls->m_LineProfileWidget->UpdateItemModelFromPath();
+        m_Controls->m_StatisticsWidgetStack->setCurrentIndex( 1 );       
+        m_Controls->m_LineProfileWidget->SetImage( m_SelectedImage );
+        m_Controls->m_LineProfileWidget->SetPlanarFigure( m_SelectedPlanarFigure );
+        m_Controls->m_LineProfileWidget->UpdateItemModelFromPath();
       }
     }
   }

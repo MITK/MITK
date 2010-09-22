@@ -41,7 +41,7 @@ mitk::PlanarFigureInteractor
 ::PlanarFigureInteractor(const char * type, DataNode* dataNode, int /* n */ )
 : Interactor( type, dataNode ),
   m_Precision( 6.5 ),
-  m_HoverPointIndex( -1 )
+  m_IsHovering( false )
 {
 }
 
@@ -454,6 +454,12 @@ bool mitk::PlanarFigureInteractor
 
   case AcCHECKSELECTED:
     {
+      bool isHovering = mitk::PlanarFigureInteractor::IsPositionOverFigure(
+        stateEvent, planarFigure,
+        planarFigureGeometry,
+        renderer->GetCurrentWorldGeometry2D(),
+        renderer->GetDisplayGeometry() );
+
       int pointIndex = mitk::PlanarFigureInteractor::IsPositionInsideMarker(
         stateEvent, planarFigure,
         planarFigureGeometry,
@@ -462,13 +468,28 @@ bool mitk::PlanarFigureInteractor
 
       if ( pointIndex >= 0 )
       {
+        // If mouse is above control point, mark it as selected
         planarFigure->SelectControlPoint( pointIndex );     
 
-        if ( m_HoverPointIndex != pointIndex )
+        // If mouse is hovering above a marker, it is also hovering above the figure
+        isHovering = true;
+      }
+      else
+      {
+        // Mouse in not above control point --> deselect point
+        planarFigure->DeselectControlPoint();
+      }
+
+      if ( isHovering )
+      {
+        if ( !m_IsHovering )
         {
-          // Invoke hover event if the mouse is entering the point area
-          m_HoverPointIndex = pointIndex;
+          // Invoke hover event once when the mouse is entering the figure area
+          m_IsHovering = true;
           planarFigure->InvokeEvent( StartHoverPlanarFigureEvent() );
+
+          // Set bool property to indicate that planar figure is currently in "hovering" mode
+          m_DataNode->SetBoolProperty( "planarfigure.hover", true );
         }
 
         this->HandleEvent( new mitk::StateEvent( EIDYES, NULL ) );
@@ -478,13 +499,14 @@ bool mitk::PlanarFigureInteractor
       }
       else
       {
-        planarFigure->DeselectControlPoint();
-
-        if ( m_HoverPointIndex != -1 )
+        if ( m_IsHovering )
         {
-          // Invoke end-hover event if the mouse is exiting the point area
-          m_HoverPointIndex = -1;
+          // Invoke end-hover event once the mouse is exiting the figure area
+          m_IsHovering = false;
           planarFigure->InvokeEvent( EndHoverPlanarFigureEvent() );
+
+          // Set bool property to indicate that planar figure is no longer in "hovering" mode
+          m_DataNode->SetBoolProperty( "planarfigure.hover", false );
         }
 
         this->HandleEvent( new mitk::StateEvent( EIDNO, NULL ) );
@@ -498,6 +520,38 @@ bool mitk::PlanarFigureInteractor
        renderer->GetRenderingManager()->RequestUpdateAll();
       break;
     }
+
+  case AcSELECTPICKEDOBJECT:
+    {
+      // Invoke event to notify listeners that this planar figure should be selected
+      planarFigure->InvokeEvent( SelectPlanarFigureEvent() );
+
+      int pointIndex = mitk::PlanarFigureInteractor::IsPositionInsideMarker(
+        stateEvent, planarFigure,
+        planarFigureGeometry,
+        renderer->GetCurrentWorldGeometry2D(),
+        renderer->GetDisplayGeometry() );
+
+      if ( pointIndex >= 0 )
+      {
+        this->HandleEvent( new mitk::StateEvent( EIDYES, NULL ) );
+
+        // Return true: only this interactor is eligible to react on this event
+        ok = true;
+      }
+      else
+      {
+        this->HandleEvent( new mitk::StateEvent( EIDNO, NULL ) );
+
+        // Return false so that other (PlanarFigure) Interactors may react on this
+        // event as well
+        ok = false;
+      }
+
+      ok = true;  
+      break;
+    }
+
 
   case AcSELECTPOINT:
     {
@@ -570,6 +624,127 @@ bool mitk::PlanarFigureInteractor::TransformPositionEventToPoint2D(
   return true;
 }
 
+
+bool mitk::PlanarFigureInteractor::TransformObjectToDisplay(
+  const mitk::Point2D &point2D,
+  mitk::Point2D &displayPoint,
+  const mitk::Geometry2D *objectGeometry,
+  const mitk::Geometry2D *rendererGeometry,
+  const mitk::DisplayGeometry *displayGeometry ) const
+{
+  mitk::Point3D point3D;
+
+  // Map circle point from local 2D geometry into 3D world space
+  objectGeometry->Map( point2D, point3D );
+
+  // TODO: proper handling of distance tolerance
+  if ( displayGeometry->Distance( point3D ) < 0.1 )
+  {
+    // Project 3D world point onto display geometry
+    rendererGeometry->Map( point3D, displayPoint );
+    displayGeometry->WorldToDisplay( displayPoint, displayPoint );
+    return true;
+  }
+
+  return false;
+}
+
+
+bool mitk::PlanarFigureInteractor::IsPointNearLine(
+  const mitk::Point2D& point,
+  const mitk::Point2D& startPoint, const mitk::Point2D& endPoint ) const
+{
+  mitk::Vector2D n1 = endPoint - startPoint;
+  n1.Normalize();
+
+  // Determine dot products between line vector and startpoint-point / endpoint-point vectors
+  double l1 = n1 * (point - startPoint);
+  double l2 = -n1 * (point - endPoint);
+
+  // Determine projection of specified point onto line defined by start / end point
+  mitk::Point2D crossPoint = startPoint + n1 * l1;
+
+  // Point is inside encompassing rectangle IF
+  // - its distance to its projected point is small enough
+  // - it is not further outside of the line than the defined tolerance
+  if ( (crossPoint.SquaredEuclideanDistanceTo( point ) < 20.0 )
+    && ( l1 > -5.0 ) && ( l2 > -5.0 ) )
+  {
+    return true;
+  }
+
+  return false;
+}
+
+
+bool mitk::PlanarFigureInteractor::IsPositionOverFigure(
+  const StateEvent *stateEvent, PlanarFigure *planarFigure,
+  const Geometry2D *planarFigureGeometry,
+  const Geometry2D *rendererGeometry,
+  const DisplayGeometry *displayGeometry ) const
+{
+  // Extract display position
+  const mitk::PositionEvent *positionEvent = 
+    dynamic_cast< const mitk::PositionEvent * > ( stateEvent->GetEvent() );
+  if ( positionEvent == NULL )
+  {
+    return -1;
+  }
+
+  mitk::Point2D displayPosition = positionEvent->GetDisplayPosition();
+
+
+  // Iterate over all polylines of planar figure, and check if
+  // any one is close to the current display position
+  typedef mitk::PlanarFigure::VertexContainerType VertexContainerType;
+  const VertexContainerType *controlPoints = planarFigure->GetControlPoints();
+
+  mitk::Point2D worldPoint2D, displayControlPoint;
+  mitk::Point3D worldPoint3D;
+
+  for ( unsigned short loop = 0; loop < planarFigure->GetPolyLinesSize(); ++loop )
+  {
+    const VertexContainerType* polyLine = planarFigure->GetPolyLine( loop );
+
+    Point2D polyLinePoint;
+    Point2D firstPolyLinePoint;
+    Point2D previousPolyLinePoint;
+
+    bool firstPoint = true;
+    for ( VertexContainerType::ConstIterator it = polyLine->Begin(); it != polyLine->End(); ++it )
+    {
+      // Get plane coordinates of this point of polyline (if possible)
+      if ( !this->TransformObjectToDisplay( it->Value(), polyLinePoint,
+        planarFigureGeometry, rendererGeometry, displayGeometry ) )
+      {
+        break; // Poly line invalid (not on current 2D plane) --> skip it
+      }
+
+      if ( firstPoint )
+      {
+        firstPolyLinePoint = polyLinePoint;
+        firstPoint = false;
+      }
+      else if ( this->IsPointNearLine( displayPosition, previousPolyLinePoint, polyLinePoint ) )
+      {
+        // Return true if the display position is close enough to this line segment
+        return true;
+      }
+      previousPolyLinePoint = polyLinePoint;
+    }
+
+    // For closed figures, also check last line segment
+    if ( planarFigure->IsClosed()
+      && this->IsPointNearLine( displayPosition, polyLinePoint, firstPolyLinePoint ) )
+    {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+
 int mitk::PlanarFigureInteractor::IsPositionInsideMarker(
   const StateEvent *stateEvent, const PlanarFigure *planarFigure,
   const Geometry2D *planarFigureGeometry,
@@ -583,12 +758,6 @@ int mitk::PlanarFigureInteractor::IsPositionInsideMarker(
   {
     return -1;
   }
-
-  //mitk::Point2D displayPosition;
-  //mitk::Point3D cursorWorldPosition = positionEvent->GetWorldPosition();
-
-  //displayGeometry->Project( cursorWorldPosition, cursorWorldPosition );
-  //displayGeometry->Map( cursorWorldPosition, displayPosition );
 
   mitk::Point2D displayPosition = positionEvent->GetDisplayPosition();
 
@@ -604,14 +773,10 @@ int mitk::PlanarFigureInteractor::IsPositionInsideMarker(
   VertexContainerType::ConstIterator it;
   for ( it = controlPoints->Begin(); it != controlPoints->End(); ++it )
   {
-    planarFigureGeometry->Map( it->Value(), worldPoint3D );
-
-    // TODO: proper handling of distance tolerance
-    if ( displayGeometry->Distance( worldPoint3D ) < 0.1 )
+    Point2D displayControlPoint;
+    if ( this->TransformObjectToDisplay( it->Value(), displayControlPoint,
+      planarFigureGeometry, rendererGeometry, displayGeometry ) )
     {
-      rendererGeometry->Map( worldPoint3D, displayControlPoint );
-      displayGeometry->WorldToDisplay( displayControlPoint, displayControlPoint );
-
       // TODO: variable size of markers
       if ( (abs(displayPosition[0] - displayControlPoint[0]) < 4 )
         && (abs(displayPosition[1] - displayControlPoint[1]) < 4 ) )

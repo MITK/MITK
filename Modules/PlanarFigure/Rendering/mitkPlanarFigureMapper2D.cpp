@@ -152,14 +152,17 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
   bool isSelected = false;
   bool drawOutline = false;
   bool drawQuantities = false;
+  bool mouseHovering = false;
   float lineColor[] = { 0.0f, 1.0f, 0.0f };
   float lineOpacity = 1.0f;
   float lineWidth = 1.0f;
+  float hoverColor[] = { 1.0f, 0.7f, 0.0f };
+  float hoverOpacity = 1.0f;
   float selectedLineColor[] = { 1.0f, 0.0f, 0.0f };
   float selectedLineOpacity = 1.0f;
-  float helperColor[] = { 0.0f, 1.0f, 0.0f };
+  float helperColor[] = { 0.4f, 0.8f, 0.2f };
   float helperOpacity = 0.4f;
-  float helperWidth = 4.0f;
+  float helperWidth = 2.0f;
   float outlineColor[] = { 0.0f, 0.0f, 1.0f };
   float outlineOpacity = 1.0f;
   float outlineWidth = 4.0f;
@@ -172,9 +175,12 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
     node->GetBoolProperty("selected", isSelected);
     node->GetBoolProperty("draw outline", drawOutline);
     node->GetBoolProperty("draw quantities", drawQuantities);
+    node->GetBoolProperty("planarfigure.hover", mouseHovering);
     node->GetColor( lineColor, NULL, "color" );
     node->GetFloatProperty( "opacity", lineOpacity );
     node->GetFloatProperty( "width", lineWidth );
+    node->GetColor( hoverColor, NULL, "hover color" );
+    node->GetFloatProperty( "hover opacity", hoverOpacity );
     node->GetColor( outlineColor, NULL, "outline color" );
     node->GetFloatProperty( "outline opacity", outlineOpacity );
     node->GetFloatProperty( "outline width", outlineWidth );
@@ -198,6 +204,14 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
       lineColor[i] = selectedLineColor[i];
     }
     lineOpacity = selectedLineOpacity;
+  }
+  else if (mouseHovering)
+  {
+    for (unsigned char i = 0; i < 3; ++i)
+    {
+      lineColor[i] = hoverColor[i];
+    }
+    lineOpacity = hoverOpacity;
   }
  
   mitk::Point2D firstPoint; firstPoint[0] = 0; firstPoint[1] = 1;
@@ -235,7 +249,7 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
     mitk::VtkPropRenderer* openGLrenderer = dynamic_cast<mitk::VtkPropRenderer*>( renderer );
     if ( openGLrenderer )
     {
-      if ( isSelected )
+      if ( isSelected || mouseHovering )
       openGLrenderer->WriteSimpleText(name, firstPoint[0] + 5.0, firstPoint[1] + 5.0, lineColor[0], lineColor[1], lineColor[2] );
       
       // If drawing is successful, add approximate height to annotation offset

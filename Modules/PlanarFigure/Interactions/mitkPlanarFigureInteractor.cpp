@@ -697,7 +697,6 @@ bool mitk::PlanarFigureInteractor::IsPositionOverFigure(
   // Iterate over all polylines of planar figure, and check if
   // any one is close to the current display position
   typedef mitk::PlanarFigure::VertexContainerType VertexContainerType;
-  const VertexContainerType *controlPoints = planarFigure->GetControlPoints();
 
   mitk::Point2D worldPoint2D, displayControlPoint;
   mitk::Point3D worldPoint3D;

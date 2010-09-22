@@ -453,17 +453,7 @@ void QmitkSegmentationView::OnSelectionChanged(std::vector<mitk::DataNode*> node
   //   a warning is issued if the selection is invalid
   //   appropriate reactions are triggered otherwise
 
-  // Set selected node of the DataStorage as reference image
-  if( m_Controls->widgetStack->currentIndex() != 0 )
-  {
-    if( nodes.size() && nodes.front() != 0 )
-    {
-      int currentIndex = m_Controls->refImageSelector->Find( nodes.front() );
-      m_Controls->refImageSelector->setCurrentIndex( currentIndex );
-    }
-  }
-
-  mitk::DataNode::Pointer referenceData = m_Controls->refImageSelector->GetSelectedNode(); //FindFirstRegularImage( nodes );
+  mitk::DataNode::Pointer referenceData = FindFirstRegularImage( nodes ); //m_Controls->refImageSelector->GetSelectedNode(); //FindFirstRegularImage( nodes );
   mitk::DataNode::Pointer workingData =   FindFirstSegmentation( nodes );
 
   bool invalidSelection( !nodes.empty() &&
@@ -507,6 +497,16 @@ void QmitkSegmentationView::OnSelectionChanged(std::vector<mitk::DataNode*> node
       referenceData = (*possibleParents)[0];
     }
   }
+
+  //set comboBox to reference image
+  disconnect( m_Controls->refImageSelector, SIGNAL( OnSelectionChanged( const mitk::DataNode* ) ), 
+           this, SLOT( OnComboBoxSelectionChanged( const mitk::DataNode* ) ) );
+
+  m_Controls->refImageSelector->setCurrentIndex( m_Controls->refImageSelector->Find(referenceData) );
+
+  connect( m_Controls->refImageSelector, SIGNAL( OnSelectionChanged( const mitk::DataNode* ) ), 
+    this, SLOT( OnComboBoxSelectionChanged( const mitk::DataNode* ) ), Qt::UniqueConnection );
+
 
   // if Image and Surface are selected, enable button
   if ( (m_Controls->refImageSelector->GetSelectedNode().IsNull()) ||
@@ -797,7 +797,7 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
 
   // create signal/slot connections
   connect( m_Controls->refImageSelector, SIGNAL( OnSelectionChanged( const mitk::DataNode* ) ), 
-           this, SLOT( OnComboBoxSelectionChanged( const mitk::DataNode* ) ) );
+           this, SLOT( OnComboBoxSelectionChanged( const mitk::DataNode* ) ), Qt::UniqueConnection );
   connect( m_Controls->btnNewSegmentation, SIGNAL(clicked()), this, SLOT(CreateNewSegmentation()) );
   connect( m_Controls->CreateSegmentationFromSurface, SIGNAL(clicked()), this, SLOT(CreateSegmentationFromSurface()) );
   connect( m_Controls->m_ManualToolSelectionBox, SIGNAL(ToolSelected(int)), this, SLOT(ManualToolSelected(int)) );

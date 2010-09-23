@@ -80,20 +80,6 @@ float mitk::PlanarFigureInteractor
     }
   }
 
-  //on MouseMove do nothing!
-  //if (stateEvent->GetEvent()->GetType() == mitk::Type_MouseMove)
-  //{
-  //  return 0.0;
-  //}
-
-  //if the event can be understood and if there is a transition waiting for that event
-  //if (this->GetCurrentState()->GetTransition(stateEvent->GetId())!=NULL)
-  //{
-  //  returnValue = 0.5;//it can be understood
-  //}
-
-  //int timeStep = disPosEvent->GetSender()->GetTimeStep();
-
   mitk::PlanarFigure *planarFigure = dynamic_cast<mitk::PlanarFigure *>(
     m_DataNode->GetData() );
 
@@ -105,53 +91,6 @@ float mitk::PlanarFigureInteractor
       return 1.0;
     }
 
-    // Get the Geometry2D of the window the user interacts with (for 2D point 
-    // projection)
-    //mitk::BaseRenderer *renderer = stateEvent->GetEvent()->GetSender();
-    //const Geometry2D *projectionPlane = renderer->GetCurrentWorldGeometry2D();
-
-    //// For reading on the points, Ids etc
-    //mitk::CurveModel::PointSetType *pointSet = curveModel->GetPointSet( timeStep );
-    //if ( pointSet == NULL )
-    //{
-    //  return 0.0;
-    //}
-
-    //int visualizationMode = CurveModel::VISUALIZATION_MODE_PLANAR;
-    //if ( renderer != NULL )
-    //{
-    //  m_DataNode->GetIntProperty( "VisualizationMode", visualizationMode, renderer );
-    //}                                    
-
-    //if ( visualizationMode == CurveModel::VISUALIZATION_MODE_PLANAR )
-    //{
-    //  // Check if mouse is near the SELECTED point of the CurveModel (if != -1)
-    //  if ( curveModel->GetSelectedPointId() != -1 )
-    //  {
-    //    Point3D selectedPoint;
-    //    pointSet->GetPoint( curveModel->GetSelectedPointId(), &selectedPoint );
-
-    //    float maxDistance = m_Precision * m_Precision;
-    //    if ( maxDistance == 0.0 ) { maxDistance = 0.000001; }
-
-    //    float distance = selectedPoint.SquaredEuclideanDistanceTo( 
-    //      disPosEvent->GetWorldPosition() );
-
-    //    if ( distance < maxDistance )
-    //    {
-    //      returnValue = 1.0;
-    //    }
-    //  }
-    //}
-    //else if ( visualizationMode == CurveModel::VISUALIZATION_MODE_PROJECTION )
-    //{
-    //  // Check if mouse is near the PROJECTION  of any point of the CurveModel
-    //  if ( curveModel->SearchPoint(
-    //          disPosEvent->GetWorldPosition(), m_Precision, -1, projectionPlane, timeStep) > -1 ) 
-    //  {
-    //    returnValue = 1.0;
-    //  }
-    //}
   }
   return returnValue;
 }
@@ -489,7 +428,7 @@ bool mitk::PlanarFigureInteractor
           planarFigure->InvokeEvent( StartHoverPlanarFigureEvent() );
 
           // Set bool property to indicate that planar figure is currently in "hovering" mode
-          m_DataNode->SetBoolProperty( "planarfigure.hover", true );
+          m_DataNode->SetBoolProperty( "planarfigure.ishovering", true );
         }
 
         this->HandleEvent( new mitk::StateEvent( EIDYES, NULL ) );
@@ -506,7 +445,7 @@ bool mitk::PlanarFigureInteractor
           planarFigure->InvokeEvent( EndHoverPlanarFigureEvent() );
 
           // Set bool property to indicate that planar figure is no longer in "hovering" mode
-          m_DataNode->SetBoolProperty( "planarfigure.hover", false );
+          m_DataNode->SetBoolProperty( "planarfigure.ishovering", false );
         }
 
         this->HandleEvent( new mitk::StateEvent( EIDNO, NULL ) );

@@ -27,53 +27,13 @@ PURPOSE.  See the above copyright notices for more information.
 
 mitk::PlanarFigureMapper2D::PlanarFigureMapper2D()
 {
+  this->InitializeDefaultPlanarFigureProperties();
 }
 
 
 mitk::PlanarFigureMapper2D::~PlanarFigureMapper2D()
 {
 }
-
-void mitk::PlanarFigureMapper2D::PaintPolyLine(
-    const VertexContainerType* vertices, 
-    bool closed,
-    float* color, 
-    float opacity, 
-    float lineWidth, 
-    Point2D& firstPoint, 
-    const Geometry2D* planarFigureGeometry2D, 
-    const Geometry2D* rendererGeometry2D, 
-    const DisplayGeometry* displayGeometry)
-{
-  glColor4f( color[0], color[1], color[2], opacity );
-  glLineWidth(lineWidth);
-
-  if ( closed )
-  {
-    glBegin( GL_LINE_LOOP );
-  }
-  else 
-  {
-    glBegin( GL_LINE_STRIP );
-  }
- 
-  for ( VertexContainerType::ConstIterator it = vertices->Begin(); it != vertices->End(); ++it )
-  {
-    // Draw this 2D point as OpenGL vertex
-    mitk::Point2D displayPoint;
-    this->TransformObjectToDisplay( it->Value(), displayPoint,
-      planarFigureGeometry2D, rendererGeometry2D, displayGeometry );
-
-    if(it == vertices->Begin())
-      firstPoint = displayPoint;
-
-    glVertex2f( displayPoint[0], displayPoint[1] );
-
-  }
-
-  glEnd();
-}
-
 
 
 void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
@@ -144,113 +104,68 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
   glEnable( GL_LINE_SMOOTH );
   glHint( GL_LINE_SMOOTH_HINT, GL_NICEST );
   
-  //if (dynamic_cast<mitk::FloatProperty *>(this->GetDataNode()->GetProperty("Width")) != NULL)
-  //  lineWidth = dynamic_cast<mitk::FloatProperty*>(this->GetDataNode()->GetProperty("Width"))->GetValue();
-  //glLineWidth(lineWidth);
-
+  // Get properties from node (if present)
   const mitk::DataNode* node=this->GetDataNode();
-  bool isSelected = false;
-  bool drawOutline = false;
-  bool drawQuantities = false;
-  bool mouseHovering = false;
-  float lineColor[] = { 0.0f, 1.0f, 0.0f };
-  float lineOpacity = 1.0f;
-  float lineWidth = 1.0f;
-  float hoverColor[] = { 1.0f, 0.7f, 0.0f };
-  float hoverOpacity = 1.0f;
-  float selectedLineColor[] = { 1.0f, 0.0f, 0.0f };
-  float selectedLineOpacity = 1.0f;
-  float helperColor[] = { 0.4f, 0.8f, 0.2f };
-  float helperOpacity = 0.4f;
-  float helperWidth = 2.0f;
-  float outlineColor[] = { 0.0f, 0.0f, 1.0f };
-  float outlineOpacity = 1.0f;
-  float outlineWidth = 4.0f;
-  float controlPointColor[] = { 1.0f, 1.0f, 1.0f };
-  float controlPointOpacity = 1.0f;
-  float controlPointWidth = 1.0f;
-  PlanarFigureControlPointStyleProperty::Shape controlPointShape = PlanarFigureControlPointStyleProperty::Square;
-  if(node)
-  {
-    node->GetBoolProperty("selected", isSelected);
-    node->GetBoolProperty("draw outline", drawOutline);
-    node->GetBoolProperty("draw quantities", drawQuantities);
-    node->GetBoolProperty("planarfigure.hover", mouseHovering);
-    node->GetColor( lineColor, NULL, "color" );
-    node->GetFloatProperty( "opacity", lineOpacity );
-    node->GetFloatProperty( "width", lineWidth );
-    node->GetColor( hoverColor, NULL, "hover color" );
-    node->GetFloatProperty( "hover opacity", hoverOpacity );
-    node->GetColor( outlineColor, NULL, "outline color" );
-    node->GetFloatProperty( "outline opacity", outlineOpacity );
-    node->GetFloatProperty( "outline width", outlineWidth );
-    node->GetColor( helperColor, NULL, "helper color" );
-    node->GetFloatProperty( "helper opacity", helperOpacity );
-    node->GetFloatProperty( "helper width", helperWidth );
-    node->GetColor( controlPointColor, NULL, "control point color" );
-    node->GetFloatProperty( "control point opacity", controlPointOpacity );
-    node->GetFloatProperty( "control point width", controlPointWidth );
-    PlanarFigureControlPointStyleProperty::Pointer styleProperty = dynamic_cast<PlanarFigureControlPointStyleProperty*>( node->GetProperty( "control point shape" ) );
-    if (styleProperty)
-    {
-      controlPointShape = styleProperty->GetShape();
-    }
-  }
+  this->InitializePlanarFigurePropertiesFromDataNode( node );
 
-  if (isSelected)
+  PlanarFigureDisplayMode lineDisplayMode = PF_DEFAULT;
+
+  if ( m_IsSelected )
   {
-    for (unsigned char i = 0; i < 3; ++i)
-    {
-      lineColor[i] = selectedLineColor[i];
-    }
-    lineOpacity = selectedLineOpacity;
+    lineDisplayMode = PF_SELECTED;
   }
-  else if (mouseHovering)
+  else if ( m_IsHovering )
   {
-    for (unsigned char i = 0; i < 3; ++i)
-    {
-      lineColor[i] = hoverColor[i];
-    }
-    lineOpacity = hoverOpacity;
+    lineDisplayMode = PF_HOVER;
   }
  
   mitk::Point2D firstPoint; firstPoint[0] = 0; firstPoint[1] = 1;
 
-  // draw the outline for all polylines
-  if (drawOutline)
+  if ( m_DrawOutline )
   {
-    for(unsigned short loop = 0; loop < planarFigure->GetPolyLinesSize(); ++loop)
-    {
-      const VertexContainerType *polyLine = planarFigure->GetPolyLine(loop);
-      if ( isSelected )
-      {
-        // no outline for selected lines
-      }
-      else
-      {
-        PaintPolyLine(polyLine, planarFigure->IsClosed(), outlineColor, outlineOpacity, outlineWidth, firstPoint, planarFigureGeometry2D, rendererGeometry2D, displayGeometry);
-      }
-    }
+    // Draw the outline for all polylines if requested
+    this->DrawMainLines( planarFigure,
+      m_OutlineColor[lineDisplayMode],
+      m_OutlineOpacity[lineDisplayMode],
+      m_OutlineWidth,
+      firstPoint,
+      planarFigureGeometry2D, rendererGeometry2D, displayGeometry );
+
+    // Draw the outline for all helper objects if requested
+    this->DrawHelperLines( planarFigure,
+      m_OutlineColor[lineDisplayMode],
+      m_OutlineOpacity[lineDisplayMode],
+      m_OutlineWidth,
+      firstPoint,
+      planarFigureGeometry2D, rendererGeometry2D, displayGeometry );
   }
 
-  // draw the main line for all polylines
-  for(unsigned short loop = 0; loop < planarFigure->GetPolyLinesSize(); ++loop)
-  {
-    const VertexContainerType *polyLine = planarFigure->GetPolyLine(loop);
-    PaintPolyLine(polyLine, planarFigure->IsClosed(),    lineColor,    lineOpacity,  lineWidth, firstPoint, planarFigureGeometry2D, rendererGeometry2D, displayGeometry);
-  }
+
+  // Draw the main line for all polylines
+  this->DrawMainLines( planarFigure,
+    m_LineColor[lineDisplayMode],
+    m_LineOpacity[lineDisplayMode],
+    m_LineWidth,
+    firstPoint,
+    planarFigureGeometry2D, rendererGeometry2D, displayGeometry );
 
   double annotationOffset = 0.0;
 
   // draw name near the first point (if present)
   std::string name = node->GetName();
-  if(!name.empty())
+  if ( !name.empty() )
   {
     mitk::VtkPropRenderer* openGLrenderer = dynamic_cast<mitk::VtkPropRenderer*>( renderer );
     if ( openGLrenderer )
     {
-      if ( isSelected || mouseHovering )
-      openGLrenderer->WriteSimpleText(name, firstPoint[0] + 5.0, firstPoint[1] + 5.0, lineColor[0], lineColor[1], lineColor[2] );
+      if ( m_IsSelected || m_IsHovering )
+      {
+        openGLrenderer->WriteSimpleText( name,
+          firstPoint[0] + 5.0, firstPoint[1] + 5.0,
+          m_LineColor[lineDisplayMode][0],
+          m_LineColor[lineDisplayMode][1],
+          m_LineColor[lineDisplayMode][2] );
+      }
       
       // If drawing is successful, add approximate height to annotation offset
       annotationOffset -= 15.0;
@@ -258,7 +173,7 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
   }
 
   // draw feature quantities (if requested) new the first point
-  if ( drawQuantities )
+  if ( m_DrawQuantities )
   {
     std::stringstream quantityString;
     quantityString.setf( ios::fixed, ios::floatfield );
@@ -277,7 +192,11 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
     mitk::VtkPropRenderer* openGLrenderer = dynamic_cast<mitk::VtkPropRenderer*>( renderer );
     if ( openGLrenderer )
     {
-      openGLrenderer->WriteSimpleText(quantityString.str().c_str(), firstPoint[0] + 5.0, firstPoint[1] + 5.0 + annotationOffset, lineColor[0], lineColor[1], lineColor[2] );
+      openGLrenderer->WriteSimpleText( quantityString.str().c_str(),
+        firstPoint[0] + 5.0, firstPoint[1] + 5.0 + annotationOffset,
+        m_LineColor[lineDisplayMode][0],
+        m_LineColor[lineDisplayMode][1],
+        m_LineColor[lineDisplayMode][2] );
 
       // If drawing is successful, add approximate height to annotation offset
       annotationOffset -= 15.0;
@@ -286,28 +205,14 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
 
 
   // Draw helper objects
-  for(unsigned int loop = 0; loop < planarFigure->GetHelperPolyLinesSize(); ++loop)
-  {    
-    // Get (and possibly generate) helper polyline (this needs to be done before
-    // checking if the helper polyline has to be painted!)
-    const VertexContainerType *polyLine = planarFigure->GetHelperPolyLine(loop, displayGeometry->GetScaleFactorMMPerDisplayUnit(), displayGeometry->GetDisplayHeight());
+  this->DrawHelperLines( planarFigure,
+    m_HelperlineColor[lineDisplayMode],
+    m_HelperlineOpacity[lineDisplayMode],
+    m_LineWidth,
+    firstPoint,
+    planarFigureGeometry2D, rendererGeometry2D, displayGeometry );
 
-    // Check if the current helper objects is to be painted
-    if ( !planarFigure->IsHelperToBePainted( loop ))
-    {
-      continue;
-    }
 
-    if ( isSelected )
-    {
-      PaintPolyLine(polyLine, false,    selectedLineColor,    selectedLineOpacity,  lineWidth, firstPoint, planarFigureGeometry2D, rendererGeometry2D, displayGeometry);
-    }
-    else
-    {
-      PaintPolyLine(polyLine, false,          helperColor,          helperOpacity,helperWidth, firstPoint, planarFigureGeometry2D, rendererGeometry2D, displayGeometry);
-    }
-
-  }
 
   // Disable line antialiasing
   glDisable( GL_LINE_SMOOTH );
@@ -315,14 +220,125 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
   // Draw markers at control points (selected control point will be colored)
   for ( unsigned int i = 0; i < planarFigure->GetNumberOfControlPoints(); ++i )
   {
+    PlanarFigureDisplayMode pointDisplayMode = PF_DEFAULT;
+    if ( i == (unsigned int) planarFigure->GetSelectedControlPoint() )
+    {
+      pointDisplayMode = PF_SELECTED;
+    }
+    else if ( m_IsHovering )
+    {
+      pointDisplayMode = PF_HOVER;
+    }
+
     this->DrawMarker( planarFigure->GetControlPoint( i ),
-      (i == (unsigned int)planarFigure->GetSelectedControlPoint()),
-      controlPointColor, controlPointOpacity, controlPointWidth, controlPointShape,
-      planarFigureGeometry2D, rendererGeometry2D, displayGeometry );
+      m_MarkerlineColor[pointDisplayMode],
+      m_MarkerlineOpacity[pointDisplayMode],
+      m_MarkerColor[pointDisplayMode],
+      m_MarkerOpacity[pointDisplayMode],
+      m_LineWidth,
+      m_ControlPointShape,
+      planarFigureGeometry2D, 
+      rendererGeometry2D, 
+      displayGeometry );
   }
 
   glLineWidth( 1.0f );
 }
+
+
+void mitk::PlanarFigureMapper2D::PaintPolyLine(
+  const VertexContainerType* vertices, 
+  bool closed,
+  float* color, 
+  float opacity, 
+  float lineWidth, 
+  Point2D& firstPoint, 
+  const Geometry2D* planarFigureGeometry2D, 
+  const Geometry2D* rendererGeometry2D, 
+  const DisplayGeometry* displayGeometry)
+{
+  glColor4f( color[0], color[1], color[2], opacity );
+  glLineWidth(lineWidth);
+
+  if ( closed )
+  {
+    glBegin( GL_LINE_LOOP );
+  }
+  else 
+  {
+    glBegin( GL_LINE_STRIP );
+  }
+
+  for ( VertexContainerType::ConstIterator it = vertices->Begin(); it != vertices->End(); ++it )
+  {
+    // Draw this 2D point as OpenGL vertex
+    mitk::Point2D displayPoint;
+    this->TransformObjectToDisplay( it->Value(), displayPoint,
+      planarFigureGeometry2D, rendererGeometry2D, displayGeometry );
+
+    if(it == vertices->Begin())
+      firstPoint = displayPoint;
+
+    glVertex2f( displayPoint[0], displayPoint[1] );
+
+  }
+
+  glEnd();
+}
+
+
+void mitk::PlanarFigureMapper2D::DrawMainLines( 
+  mitk::PlanarFigure* figure, 
+  float* color, 
+  float opacity, 
+  float lineWidth, 
+  Point2D& firstPoint,
+  const Geometry2D* planarFigureGeometry2D, 
+  const Geometry2D* rendererGeometry2D, 
+  const DisplayGeometry* displayGeometry)
+{
+  for ( unsigned short loop = 0; loop < figure->GetPolyLinesSize(); ++loop )
+  {
+    const VertexContainerType* polyLine = figure->GetPolyLine(loop);
+    this->PaintPolyLine( polyLine,
+      figure->IsClosed(),    
+      color, opacity, lineWidth, firstPoint,
+      planarFigureGeometry2D, rendererGeometry2D, displayGeometry );
+  }
+}
+
+void mitk::PlanarFigureMapper2D::DrawHelperLines(
+  mitk::PlanarFigure* figure,
+  float* color, 
+  float opacity, 
+  float lineWidth, 
+  Point2D& firstPoint,
+  const Geometry2D* planarFigureGeometry2D, 
+  const Geometry2D* rendererGeometry2D, 
+  const DisplayGeometry* displayGeometry)
+{
+  // Draw helper objects
+  for ( unsigned int loop = 0; loop < figure->GetHelperPolyLinesSize(); ++loop )
+  {    
+    // Get (and possibly generate) helper polyline (this needs to be done before
+    // checking if the helper polyline has to be painted!)
+    const VertexContainerType *polyLine = figure->GetHelperPolyLine( loop,
+      displayGeometry->GetScaleFactorMMPerDisplayUnit(),
+      displayGeometry->GetDisplayHeight() );
+
+    // Check if the current helper objects is to be painted
+    if ( !figure->IsHelperToBePainted( loop ) )
+    {
+      continue;
+    }
+
+    this->PaintPolyLine( polyLine, false,
+      color, opacity, lineWidth, firstPoint,
+      planarFigureGeometry2D, rendererGeometry2D, displayGeometry );
+  }
+}
+
+
 
 void mitk::PlanarFigureMapper2D::TransformObjectToDisplay(
   const mitk::Point2D &point2D,
@@ -341,12 +357,14 @@ void mitk::PlanarFigureMapper2D::TransformObjectToDisplay(
   displayGeometry->WorldToDisplay( displayPoint, displayPoint );
 }
 
+
 void mitk::PlanarFigureMapper2D::DrawMarker(
   const mitk::Point2D &point,
-  bool selected,
-  float* color,
-  float opacity,
-  float width,
+  float* lineColor,
+  float lineOpacity,
+  float* markerColor,
+  float markerOpacity,
+  float lineWidth,
   PlanarFigureControlPointStyleProperty::Shape shape,
   const mitk::Geometry2D *objectGeometry,
   const mitk::Geometry2D *rendererGeometry,
@@ -358,54 +376,166 @@ void mitk::PlanarFigureMapper2D::DrawMarker(
     point, displayPoint,
     objectGeometry, rendererGeometry, displayGeometry );
 
-  glColor4f(color[0], color[1], color[2], opacity);
-  glLineWidth(width);
+  glColor4f( markerColor[0], markerColor[1], markerColor[2], markerOpacity );
+  glLineWidth( lineWidth );
 
-  switch (shape)
+  switch ( shape )
   {
     case PlanarFigureControlPointStyleProperty::Square:
     default:
-      // squares
-      if ( selected )
-      {
-        glColor4f( 1.0, 0.8, 0.2, 1.0 );
-        glRectf(
-          displayPoint[0] - 4, displayPoint[1] - 4, 
-          displayPoint[0] + 4, displayPoint[1] + 4 );
-      }
-      else
-      {
-        glBegin( GL_LINE_LOOP );
-        glVertex2f( displayPoint[0] - 4, displayPoint[1] - 4 );
-        glVertex2f( displayPoint[0] - 4, displayPoint[1] + 4 );
-        glVertex2f( displayPoint[0] + 4, displayPoint[1] + 4 );
-        glVertex2f( displayPoint[0] + 4, displayPoint[1] - 4 );
-        glEnd();
-      }
-      break;
-    case PlanarFigureControlPointStyleProperty::Circle:
-      // circles
-      if ( selected )
-      {
-        glColor4f( 1.0, 0.8, 0.2, 1.0 );
-      }
+      // Paint filled square
+      glRectf(
+        displayPoint[0] - 4, displayPoint[1] - 4, 
+        displayPoint[0] + 4, displayPoint[1] + 4 );
+
+      // Paint outline
+      glColor4f( lineColor[0], lineColor[1], lineColor[2], lineOpacity );
       glBegin( GL_LINE_LOOP );
+      glVertex2f( displayPoint[0] - 4, displayPoint[1] - 4 );
+      glVertex2f( displayPoint[0] - 4, displayPoint[1] + 4 );
+      glVertex2f( displayPoint[0] + 4, displayPoint[1] + 4 );
+      glVertex2f( displayPoint[0] + 4, displayPoint[1] - 4 );
+      glEnd();
+      break;
+
+    case PlanarFigureControlPointStyleProperty::Circle:
+      // Paint filled circle
+      glBegin( GL_POLYGON );
       float radius = 4.0;
-      for (int angle=0; angle < 365; angle=angle+10)
+      for ( int angle = 0; angle < 12; ++angle )
       {
-        float angle_radians = angle * (float)3.14159 / (float)180;
-        float x = displayPoint[0] + radius * (float)cos(angle_radians);
-        float y = displayPoint[1] + radius * (float)sin(angle_radians);
+        float angleRad = angle * (float) 3.14159 / 6.0;
+        float x = displayPoint[0] + radius * (float)cos( angleRad );
+        float y = displayPoint[1] + radius * (float)sin( angleRad );
+        glVertex2f(x,y);
+      }
+      glEnd();
+
+      // Paint outline
+      glColor4f( lineColor[0], lineColor[1], lineColor[2], lineOpacity );
+      glBegin( GL_LINE_LOOP );
+      for ( int angle = 0; angle < 12; ++angle )
+      {
+        float angleRad = angle * (float) 3.14159 / 6.0;
+        float x = displayPoint[0] + radius * (float)cos( angleRad );
+        float y = displayPoint[1] + radius * (float)sin( angleRad );
         glVertex2f(x,y);
       }
       glEnd();
       break;
+
     } // end switch
+}
+
+
+void mitk::PlanarFigureMapper2D::InitializeDefaultPlanarFigureProperties()
+{
+  m_IsSelected = false;
+  m_IsHovering = false;
+  m_DrawOutline = false;
+  m_DrawQuantities = false;
+
+  m_LineWidth = 1.0;
+  m_OutlineWidth = 4.0;
+  m_HelperlineWidth = 2.0;
+
+  m_ControlPointShape = PlanarFigureControlPointStyleProperty::Square;
+
+  this->SetColorProperty( m_LineColor, PF_DEFAULT, 1.0, 1.0, 1.0 );
+  this->SetFloatProperty( m_LineOpacity, PF_DEFAULT, 1.0 );
+  this->SetColorProperty( m_OutlineColor, PF_DEFAULT, 0.0, 0.0, 1.0 );
+  this->SetFloatProperty( m_OutlineOpacity, PF_DEFAULT, 1.0 );
+  this->SetColorProperty( m_HelperlineColor, PF_DEFAULT, 0.4, 0.8, 0.2 );
+  this->SetFloatProperty( m_HelperlineOpacity, PF_DEFAULT, 0.4 );
+  this->SetColorProperty( m_MarkerlineColor, PF_DEFAULT, 1.0, 1.0, 1.0 );
+  this->SetFloatProperty( m_MarkerlineOpacity, PF_DEFAULT, 1.0 );
+  this->SetColorProperty( m_MarkerColor, PF_DEFAULT, 1.0, 1.0, 1.0 );
+  this->SetFloatProperty( m_MarkerOpacity, PF_DEFAULT, 0.0 );
+
+  this->SetColorProperty( m_LineColor, PF_HOVER, 1.0, 0.7, 0.0 );
+  this->SetFloatProperty( m_LineOpacity, PF_HOVER, 1.0 );
+  this->SetColorProperty( m_OutlineColor, PF_HOVER, 0.0, 0.0, 1.0 );
+  this->SetFloatProperty( m_OutlineOpacity, PF_HOVER, 1.0 );
+  this->SetColorProperty( m_HelperlineColor, PF_HOVER, 0.4, 0.8, 0.2 );
+  this->SetFloatProperty( m_HelperlineOpacity, PF_HOVER, 0.4 );
+  this->SetColorProperty( m_MarkerlineColor, PF_HOVER, 1.0, 1.0, 1.0 );
+  this->SetFloatProperty( m_MarkerlineOpacity, PF_HOVER, 1.0 );
+  this->SetColorProperty( m_MarkerColor, PF_HOVER, 1.0, 0.6, 0.0 );
+  this->SetFloatProperty( m_MarkerOpacity, PF_HOVER, 0.2 );
+
+  this->SetColorProperty( m_LineColor, PF_SELECTED, 1.0, 0.0, 0.0 );
+  this->SetFloatProperty( m_LineOpacity, PF_SELECTED, 1.0 );
+  this->SetColorProperty( m_OutlineColor, PF_SELECTED, 0.0, 0.0, 1.0 );
+  this->SetFloatProperty( m_OutlineOpacity, PF_SELECTED, 1.0 );
+  this->SetColorProperty( m_HelperlineColor, PF_SELECTED, 0.4, 0.8, 0.2 );
+  this->SetFloatProperty( m_HelperlineOpacity, PF_SELECTED, 0.4 );
+  this->SetColorProperty( m_MarkerlineColor, PF_SELECTED, 1.0, 1.0, 1.0 );
+  this->SetFloatProperty( m_MarkerlineOpacity, PF_SELECTED, 1.0 );
+  this->SetColorProperty( m_MarkerColor, PF_SELECTED, 1.0, 0.6, 0.0 );
+  this->SetFloatProperty( m_MarkerOpacity, PF_SELECTED, 1.0 );
+}
+
+
+void mitk::PlanarFigureMapper2D::InitializePlanarFigurePropertiesFromDataNode( const mitk::DataNode* node )
+{
+  if ( node == NULL )
+  {
+    return;
+  }
+
+  node->GetBoolProperty( "selected", m_IsSelected );
+  node->GetBoolProperty( "planarfigure.ishovering", m_IsHovering );
+  node->GetBoolProperty( "planarfigure.drawoutline", m_DrawOutline );
+  node->GetBoolProperty( "planarfigure.drawquantities", m_DrawQuantities );
+
+  node->GetFloatProperty( "planarfigure.line.width", m_LineWidth );
+  node->GetFloatProperty( "planarfigure.outline.width", m_OutlineWidth );
+  node->GetFloatProperty( "planarfigure.helperline.width", m_HelperlineWidth );
+
+  PlanarFigureControlPointStyleProperty::Pointer styleProperty = 
+    dynamic_cast< PlanarFigureControlPointStyleProperty* >( node->GetProperty( "planarfigure.controlpointshape" ) );
+  if ( styleProperty.IsNotNull() )
+  {
+    m_ControlPointShape = styleProperty->GetShape();
+  }
+
+  node->GetColor( m_LineColor[PF_DEFAULT], NULL, "planarfigure.default.line.color" );
+  node->GetFloatProperty( "planarfigure.default.line.opacity", m_LineOpacity[PF_DEFAULT] );
+  node->GetColor( m_OutlineColor[PF_DEFAULT], NULL, "planarfigure.default.outline.color" );
+  node->GetFloatProperty( "planarfigure.default.outline.opacity", m_OutlineOpacity[PF_DEFAULT] );
+  node->GetColor( m_HelperlineColor[PF_DEFAULT], NULL, "planarfigure.default.helperline.color" );
+  node->GetFloatProperty( "planarfigure.default.helperline.opacity", m_HelperlineOpacity[PF_DEFAULT] );
+  node->GetColor( m_MarkerlineColor[PF_DEFAULT], NULL, "planarfigure.default.markerline.color" );
+  node->GetFloatProperty( "planarfigure.default.markerline.opacity", m_MarkerlineOpacity[PF_DEFAULT] );
+  node->GetColor( m_MarkerColor[PF_DEFAULT], NULL, "planarfigure.default.marker.color" );
+  node->GetFloatProperty( "planarfigure.default.marker.opacity", m_MarkerOpacity[PF_DEFAULT] );
+
+  node->GetColor( m_LineColor[PF_HOVER], NULL, "planarfigure.hover.line.color" );
+  node->GetFloatProperty( "planarfigure.hover.line.opacity", m_LineOpacity[PF_HOVER] );
+  node->GetColor( m_OutlineColor[PF_HOVER], NULL, "planarfigure.hover.outline.color" );
+  node->GetFloatProperty( "planarfigure.hover.outline.opacity", m_OutlineOpacity[PF_HOVER] );
+  node->GetColor( m_HelperlineColor[PF_HOVER], NULL, "planarfigure.hover.helperline.color" );
+  node->GetFloatProperty( "planarfigure.hover.helperline.opacity", m_HelperlineOpacity[PF_HOVER] );
+  node->GetColor( m_MarkerlineColor[PF_HOVER], NULL, "planarfigure.hover.markerline.color" );
+  node->GetFloatProperty( "planarfigure.hover.markerline.opacity", m_MarkerlineOpacity[PF_HOVER] );
+  node->GetColor( m_MarkerColor[PF_HOVER], NULL, "planarfigure.hover.marker.color" );
+  node->GetFloatProperty( "planarfigure.hover.marker.opacity", m_MarkerOpacity[PF_HOVER] );
+
+  node->GetColor( m_LineColor[PF_SELECTED], NULL, "planarfigure.selected.line.color" );
+  node->GetFloatProperty( "planarfigure.selected.line.opacity", m_LineOpacity[PF_SELECTED] );
+  node->GetColor( m_OutlineColor[PF_SELECTED], NULL, "planarfigure.selected.outline.color" );
+  node->GetFloatProperty( "planarfigure.selected.outline.opacity", m_OutlineOpacity[PF_SELECTED] );
+  node->GetColor( m_HelperlineColor[PF_SELECTED], NULL, "planarfigure.selected.helperline.color" );
+  node->GetFloatProperty( "planarfigure.selected.helperline.opacity", m_HelperlineOpacity[PF_SELECTED] );
+  node->GetColor( m_MarkerlineColor[PF_SELECTED], NULL, "planarfigure.selected.markerline.color" );
+  node->GetFloatProperty( "planarfigure.selected.markerline.opacity", m_MarkerlineOpacity[PF_SELECTED] );
+  node->GetColor( m_MarkerColor[PF_SELECTED], NULL, "planarfigure.selected.marker.color" );
+  node->GetFloatProperty( "planarfigure.selected.marker.opacity", m_MarkerOpacity[PF_SELECTED] );
+
 }
 
 
 void mitk::PlanarFigureMapper2D::SetDefaultProperties( mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite )
 {
   node->AddProperty( "visible", mitk::BoolProperty::New(true), renderer, overwrite );
-  node->AddProperty( "color", mitk::ColorProperty::New(1.0, 1.0, 1.0), renderer, overwrite );
 }

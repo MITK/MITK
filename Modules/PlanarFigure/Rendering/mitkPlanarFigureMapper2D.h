@@ -88,10 +88,20 @@ public:
   * reimplemented from Baseclass
   */
   virtual void Paint(BaseRenderer * renderer);
+
   static void SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer = NULL, bool overwrite = false);
+
+
 protected:
   
   typedef PlanarFigure::VertexContainerType VertexContainerType;
+
+  enum PlanarFigureDisplayMode
+  {
+    PF_DEFAULT = 0,
+    PF_HOVER,
+    PF_SELECTED
+  };
 
   PlanarFigureMapper2D();
 
@@ -106,10 +116,11 @@ protected:
 
   void DrawMarker(
     const mitk::Point2D &point,
-    bool selected,
-    float* color,
-    float opacity,
-    float width,
+    float* lineColor,
+    float lineOpacity,
+    float* markerColor,
+    float markerOpacity,
+    float lineWidth,
     PlanarFigureControlPointStyleProperty::Shape shape,
     const mitk::Geometry2D *objectGeometry,
     const mitk::Geometry2D *rendererGeometry,
@@ -125,6 +136,67 @@ protected:
     const Geometry2D* planarFigureGeometry2D, 
     const Geometry2D* rendererGeometry2D, 
     const DisplayGeometry* displayGeometry);
+
+  void DrawMainLines( mitk::PlanarFigure* figure, 
+    float* color, 
+    float opacity, 
+    float lineWidth, 
+    Point2D& firstPoint,
+    const Geometry2D* planarFigureGeometry2D, 
+    const Geometry2D* rendererGeometry2D, 
+    const DisplayGeometry* displayGeometry) ;
+
+  void DrawHelperLines( mitk::PlanarFigure* figure,
+    float* color, 
+    float opacity, 
+    float lineWidth, 
+    Point2D& firstPoint,
+    const Geometry2D* planarFigureGeometry2D, 
+    const Geometry2D* rendererGeometry2D, 
+    const DisplayGeometry* displayGeometry) ;
+
+  void InitializeDefaultPlanarFigureProperties();
+
+  void InitializePlanarFigurePropertiesFromDataNode( const mitk::DataNode* node );
+
+  void SetColorProperty( float property[3][3], PlanarFigureDisplayMode mode, float red, float green, float blue )
+  {
+    property[mode][0] = red;
+    property[mode][1] = green;
+    property[mode][2] = blue;
+  }
+
+  void SetFloatProperty( float* property, PlanarFigureDisplayMode mode, float value )
+  {
+    property[mode] = value;
+  }
+
+
+
+private:
+  bool m_IsSelected;
+  bool m_IsHovering;
+  bool m_DrawOutline;
+  bool m_DrawQuantities;
+
+  float m_LineWidth;
+  float m_OutlineWidth;
+  float m_HelperlineWidth;
+  float m_PointWidth;
+
+  PlanarFigureControlPointStyleProperty::Shape m_ControlPointShape;
+
+  float m_LineColor[3][3];
+  float m_LineOpacity[3];
+  float m_OutlineColor[3][3];
+  float m_OutlineOpacity[3];
+  float m_HelperlineColor[3][3];
+  float m_HelperlineOpacity[3];
+  float m_MarkerlineColor[3][3];
+  float m_MarkerlineOpacity[3];
+  float m_MarkerColor[3][3];
+  float m_MarkerOpacity[3];
+
 };
 
 } // namespace mitk

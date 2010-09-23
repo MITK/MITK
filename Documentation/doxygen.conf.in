@@ -80,6 +80,7 @@ EXCLUDE                = @MITK_SOURCE_DIR@/Utilities/ipPic/ \
                          @MITK_SOURCE_DIR@/Deprecated/ \
                          @MITK_SOURCE_DIR@/Build/ \
                          @MITK_SOURCE_DIR@/BlueBerry/CMake/BundleTemplate \
+                         @MITK_SOURCE_DIR@/BlueBerry2/CMake/BundleTemplate \
                          @MITK_SOURCE_DIR@/Utilities/Poco/ \
                          @MITK_SOURCE_DIR@/Core/Testing/ \
                          @MITK_SOURCE_DIR@/CMake/ \

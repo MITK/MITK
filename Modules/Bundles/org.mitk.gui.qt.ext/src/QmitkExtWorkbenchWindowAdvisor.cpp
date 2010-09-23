@@ -450,7 +450,7 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
       // should not appear as an menu-entry in the perspective menu
       if (perspectiveExcludeList.size() > 0)
       {
-        for (int i=0; i<perspectiveExcludeList.size(); i++)
+        for (unsigned int i=0; i<perspectiveExcludeList.size(); i++)
         {
           if (perspectiveExcludeList.at(i) == (*perspIt)->GetId())
           {

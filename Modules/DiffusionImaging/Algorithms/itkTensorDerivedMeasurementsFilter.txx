@@ -25,7 +25,12 @@ namespace itk {
         static_cast< OutputImageType * >(this->ProcessObject::GetOutput(0));
 
     typename TensorImageType::RegionType region = tensorImage->GetLargestPossibleRegion();
-    outputImage->SetRegions(region);
+
+
+    outputImage->SetSpacing( tensorImage->GetSpacing() );   // Set the image spacing
+    outputImage->SetOrigin( tensorImage->GetOrigin() );     // Set the image origin
+    outputImage->SetDirection( tensorImage->GetDirection() );  // Set the image direction
+    outputImage->SetRegions( tensorImage->GetLargestPossibleRegion());
     outputImage->Allocate();
 
     TensorImageIteratorType tensorIt(tensorImage, tensorImage->GetLargestPossibleRegion());

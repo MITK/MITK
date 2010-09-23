@@ -53,6 +53,13 @@ void mitk::WiiMoteAddOn::WiiMoteInput(const itk::EventObject& e)
   delete se;
 }
 
+void mitk::WiiMoteAddOn::WiiMoteHomeButton(const itk::EventObject &e)
+{
+  mitk::StateEvent* se = new mitk::StateEvent(mitk::EIDWIIMOTEHOMEBUTTON, (const mitk::WiiMoteEvent*)&e);
+  this->ForwardEvent(se);
+  delete se;
+}
+
 void mitk::WiiMoteAddOn::ForwardEvent(const mitk::StateEvent *e)
 {
   mitk::GlobalInteraction::GetInstance()->HandleEvent(e);

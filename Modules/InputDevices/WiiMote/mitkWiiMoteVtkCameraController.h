@@ -28,6 +28,7 @@ namespace mitk
   private:
 
     bool OnWiiMoteInput(mitk::Action* a, const mitk::StateEvent* e);
+    bool OnWiiMoteHomeButton(mitk::Action* a, const mitk::StateEvent* e);
 
     bool m_ClippingRangeIsSet;
 

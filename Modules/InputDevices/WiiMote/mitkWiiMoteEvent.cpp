@@ -1,14 +1,5 @@
 #include "mitkWiiMoteEvent.h"
 
-#include "mitkInteractionConst.h"
-
-//mitk::WiiMoteEvent::WiiMoteEvent() 
-//: Event(NULL, mitk::Type_WiiMoteInput, mitk::BS_NoButton, mitk::BS_NoButton, Key_none)
-//, m_RecordTime(NULL)
-//{
-//  m_MovementVector.Fill(0);
-//}
-
 mitk::WiiMoteEvent::WiiMoteEvent(mitk::Vector2D inputData, double recordTime) 
 : Event(NULL, mitk::Type_WiiMoteInput, mitk::BS_NoButton, mitk::BS_NoButton, Key_none)
 {
@@ -16,10 +7,18 @@ mitk::WiiMoteEvent::WiiMoteEvent(mitk::Vector2D inputData, double recordTime)
  this->m_RecordTime = recordTime;
 }
 
+// TODO: generic parameter for Type
+mitk::WiiMoteEvent::WiiMoteEvent(mitk::EEventType eventType) 
+: Event(NULL, eventType, mitk::BS_NoButton, mitk::BS_NoButton, Key_none)
+, m_RecordTime(NULL)
+{
+  m_EventType = eventType;
+  m_MovementVector.Fill(0);
+}
+
 mitk::WiiMoteEvent::~WiiMoteEvent() 
 {
 }
-
 
 mitk::Vector2D mitk::WiiMoteEvent::GetMovementVector() const
 {
@@ -43,5 +42,12 @@ bool mitk::WiiMoteEvent::CheckEvent(const itk::EventObject *e) const
 
 itk::EventObject* mitk::WiiMoteEvent::MakeObject() const
 { 
-  return new Self( m_MovementVector, m_RecordTime); 
+  if(m_EventType != mitk::Type_WiiMoteHomeButton)
+  {
+    return new Self(m_MovementVector, m_RecordTime); 
+  }
+  else
+  {
+    return new Self(m_EventType);
+  }
 } 

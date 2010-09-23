@@ -24,6 +24,8 @@ namespace mitk
 
     // typedefs are used in context with CallbackFromGUIThread
     typedef itk::ReceptorMemberCommand<mitk::WiiMoteAddOn> ReceptorCommand;
+
+    // eventually probs with Linux -> typename
     typedef ReceptorCommand::Pointer ReceptorCommandPointer;
 
     WiiMoteThread();
@@ -31,8 +33,7 @@ namespace mitk
 
     /**
     * Allows to set report types, detects extensions and responds to connect/disconnect <br>
-    * events of extension, such as MotionPlus. Also reads incoming data from the IR camera <br>
-    * as well as the acceleration sensors and fires Wiimote events accordingly. 
+    * events of extension, such as MotionPlus. 
     *
     * NOTE: don't access the public state from the 'remote' object here, as it will
     *	      be out-of-date (it's only updated via RefreshState() calls, and these
@@ -81,6 +82,15 @@ namespace mitk
     */
     void DetectWiiMotes();
 
+    /**
+    * Reads incoming data from the IR camera, the acceleration sensors <br>
+    * and the buttons. After processing the data (e.g. computations, assigning <br>
+    * commands...) fires Wiimote events accordingly. 
+    */
+    void WiiMoteInput();
+
+    void WiiMoteHomeButton();
+
   protected:
 
   private: 
@@ -92,15 +102,20 @@ namespace mitk
     itk::FastMutexLock::Pointer m_WiiMoteThreadFinished;
     bool m_StopWiiMote;
 
-    //static only needed because this variable is used 
-    //in static method
-    static wiimote m_WiiMote;
-    static ReceptorCommandPointer m_Command;
+    // access to the wiimote and parameter for callbackfromguithread
+    wiimote m_WiiMote;
+    ReceptorCommandPointer m_Command;
 
     // required for computation of movement
-    static Point2D m_LastReadData;
-    static double m_LastRecordTime;
-    static bool s_ReadDataOnce;
+    Point2D m_LastReadData;
+    double m_LastRecordTime;
+    bool m_ReadDataOnce;
+
+    // compensate delay
+    // release: Skip = 1
+    // debug: 
+    int m_SkipTimeSteps;
+    int m_CurrentTimeStep;
 
     //store all connected Wiimotes
     wiimote* m_WiiMotes[6];

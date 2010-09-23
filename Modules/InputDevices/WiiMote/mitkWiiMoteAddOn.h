@@ -52,6 +52,9 @@ namespace mitk {
     */
     void WiiMoteInput(const itk::EventObject& e);
 
+
+    void WiiMoteHomeButton(const itk::EventObject& e);
+
   protected:
 
   private:

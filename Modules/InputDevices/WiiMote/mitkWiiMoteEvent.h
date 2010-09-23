@@ -3,6 +3,7 @@
 
 #include "mitkEvent.h"
 #include "mitkVector.h"
+#include "mitkInteractionConst.h"
 
 #include "mitkInputDevicesExports.h"
 
@@ -32,24 +33,29 @@ namespace mitk
     */
     WiiMoteEvent(mitk::Vector2D inputData, double recordTime);
     
-    /**
-    * @brief default destructor
-    **/
+    WiiMoteEvent(mitk::EEventType eventType);
+
     ~WiiMoteEvent();
 
+    /**
+    * Returns the current movement vector with the coordinates <br>
+    * in the following order: x, y, z
+    */
     mitk::Vector2D GetMovementVector() const;
     double GetRecordTime();
 
     //itk::EventObject implementation
-    virtual const char * GetEventName() const; 
-    virtual bool CheckEvent(const ::itk::EventObject* e) const; 
-    virtual ::itk::EventObject* MakeObject() const; 
+    const char * GetEventName() const; 
+    bool CheckEvent(const ::itk::EventObject* e) const; 
+    ::itk::EventObject* MakeObject() const; 
 
 
   private:
 
     mitk::Vector2D m_MovementVector;
     double m_RecordTime;
+
+    mitk::EEventType m_EventType;
 
   }; // end class
 } // end namespace mitk

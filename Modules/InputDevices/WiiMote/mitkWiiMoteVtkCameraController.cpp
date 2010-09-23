@@ -16,6 +16,7 @@ mitk::WiiMoteVtkCameraController::WiiMoteVtkCameraController()
 , m_ClippingRangeIsSet(false)
 {
   CONNECT_ACTION(mitk::AcONWIIMOTEINPUT, OnWiiMoteInput);
+  CONNECT_ACTION(mitk::AcONWIIMOTEHOMEBUTTON, OnWiiMoteHomeButton);
 }
 
 mitk::WiiMoteVtkCameraController::~WiiMoteVtkCameraController()
@@ -78,68 +79,74 @@ bool mitk::WiiMoteVtkCameraController::OnWiiMoteInput(mitk::Action* a, const mit
   //sensivity to adapt to mitk speed
   movementVector *= sceneSensivity * TRANSLATIONSENSITIVITY;
 
-  //compute the global space coordinates from the relative mouse coordinate
-  //first we need the position of the camera
-  mitk::Vector3D camPosition;
-  double camPositionTemp[3];
-  vtkCam->GetPosition(camPositionTemp);
-  camPosition[0] = camPositionTemp[0]; camPosition[1] = camPositionTemp[1]; camPosition[2] = camPositionTemp[2]; 
+  // inverts y direction to simulate a 3D View
+  // x direction is already inverted
+  movementVector[1] *= -1;
+  vtkCam->Elevation((double)movementVector[1]);
+  vtkCam->Azimuth((double)movementVector[0]);
 
-  //then the upvector of the camera
-  mitk::Vector3D upCamVector;
-  double upCamTemp[3];
-  vtkCam->GetViewUp(upCamTemp);
-  upCamVector[0] = upCamTemp[0]; upCamVector[1] = upCamTemp[1]; upCamVector[2] = upCamTemp[2]; 
-  upCamVector.Normalize();
+  ////compute the global space coordinates from the relative mouse coordinate
+  ////first we need the position of the camera
+  //mitk::Vector3D camPosition;
+  //double camPositionTemp[3];
+  //vtkCam->GetPosition(camPositionTemp);
+  //camPosition[0] = camPositionTemp[0]; camPosition[1] = camPositionTemp[1]; camPosition[2] = camPositionTemp[2]; 
 
-  //then the vector to which the camera is heading at (focalpoint)
-  mitk::Vector3D focalPoint;
-  double focalPointTemp[3];
-  vtkCam->GetFocalPoint(focalPointTemp);
-  focalPoint[0] = focalPointTemp[0]; focalPoint[1] = focalPointTemp[1]; focalPoint[2] = focalPointTemp[2]; 
-  mitk::Vector3D focalVector;
-  focalVector = focalPoint - camPosition;
-  focalVector.Normalize();
+  ////then the upvector of the camera
+  //mitk::Vector3D upCamVector;
+  //double upCamTemp[3];
+  //vtkCam->GetViewUp(upCamTemp);
+  //upCamVector[0] = upCamTemp[0]; upCamVector[1] = upCamTemp[1]; upCamVector[2] = upCamTemp[2]; 
+  //upCamVector.Normalize();
 
-  //orthogonal vector to focalVector and upCamVector
-  mitk::Vector3D crossVector;
-  crossVector = CrossProduct(upCamVector, focalVector);
-  crossVector.Normalize();
+  ////then the vector to which the camera is heading at (focalpoint)
+  //mitk::Vector3D focalPoint;
+  //double focalPointTemp[3];
+  //vtkCam->GetFocalPoint(focalPointTemp);
+  //focalPoint[0] = focalPointTemp[0]; focalPoint[1] = focalPointTemp[1]; focalPoint[2] = focalPointTemp[2]; 
+  //mitk::Vector3D focalVector;
+  //focalVector = focalPoint - camPosition;
+  //focalVector.Normalize();
 
-  //now we have the current orientation so we can adapt it according to the current information, which we got from the Wiimote
+  ////orthogonal vector to focalVector and upCamVector
+  //mitk::Vector3D crossVector;
+  //crossVector = CrossProduct(upCamVector, focalVector);
+  //crossVector.Normalize();
 
-   //new position of the camera: 
-  //left/right = camPosition + crossVector * movementVector[0];
-  mitk::Vector3D vectorX = crossVector * -movementVector[0]; //changes the magnitude, not the direction
-  double nextCamPosition[3];
-  nextCamPosition[0] = camPosition[0] + vectorX[0];
-  nextCamPosition[1] = camPosition[1] + vectorX[1];
-  nextCamPosition[2] = camPosition[2] + vectorX[2];
+  ////now we have the current orientation so we can adapt it according to the current information, which we got from the Wiimote
 
-  //now the up/down movement
-  mitk::Vector3D vectorY = upCamVector * movementVector[1]; //changes the magnitude, not the direction
-  nextCamPosition[0] += vectorY[0];
-  nextCamPosition[1] += vectorY[1];
-  nextCamPosition[2] += vectorY[2];
+  ////new position of the camera: 
+  ////left/right = camPosition + crossVector * movementVector[0];
+  //mitk::Vector3D vectorX = crossVector * -movementVector[0]; //changes the magnitude, not the direction
+  //double nextCamPosition[3];
+  //nextCamPosition[0] = camPosition[0] + vectorX[0];
+  //nextCamPosition[1] = camPosition[1] + vectorX[1];
+  //nextCamPosition[2] = camPosition[2] + vectorX[2];
 
-  //forward/backward movement
-  mitk::Vector3D vectorZ = focalVector * -movementVector[2]; //changes the magnitude, not the direction
-  nextCamPosition[0] += vectorZ[0];
-  nextCamPosition[1] += vectorZ[1];
-  nextCamPosition[2] += vectorZ[2];
+  ////now the up/down movement
+  //mitk::Vector3D vectorY = upCamVector * movementVector[1]; //changes the magnitude, not the direction
+  //nextCamPosition[0] += vectorY[0];
+  //nextCamPosition[1] += vectorY[1];
+  //nextCamPosition[2] += vectorY[2];
 
-  //set the next position
-  double nextPosition[3];
-  nextPosition[0] = nextCamPosition[0]; nextPosition[1] = nextCamPosition[1]; nextPosition[2] = nextCamPosition[2]; 
-  vtkCam->SetPosition(nextPosition);
+  ////forward/backward movement
+  //mitk::Vector3D vectorZ = focalVector * -movementVector[2]; //changes the magnitude, not the direction
+  //nextCamPosition[0] += vectorZ[0];
+  //nextCamPosition[1] += vectorZ[1];
+  //nextCamPosition[2] += vectorZ[2];
 
-  //adapt the focal point the same way
-  double currentFocalPoint[3], nextFocalPoint[3];
-  vtkCam->GetFocalPoint(currentFocalPoint);
-  nextFocalPoint[0] = currentFocalPoint[0] + vectorX[0] + vectorY[0] + vectorZ[0]; 
-  nextFocalPoint[1] = currentFocalPoint[1] + vectorX[1] + vectorY[1] + vectorZ[1]; ; 
-  nextFocalPoint[2] = currentFocalPoint[2] + vectorX[2] + vectorY[2] + vectorZ[2]; 
-  vtkCam->SetFocalPoint(nextFocalPoint);
+  ////set the next position
+  //double nextPosition[3];
+  //nextPosition[0] = nextCamPosition[0]; nextPosition[1] = nextCamPosition[1]; nextPosition[2] = nextCamPosition[2]; 
+  //vtkCam->SetPosition(nextPosition);
+
+  ////adapt the focal point the same way
+  //double currentFocalPoint[3], nextFocalPoint[3];
+  //vtkCam->GetFocalPoint(currentFocalPoint);
+  //nextFocalPoint[0] = currentFocalPoint[0] + vectorX[0] + vectorY[0] + vectorZ[0]; 
+  //nextFocalPoint[1] = currentFocalPoint[1] + vectorX[1] + vectorY[1] + vectorZ[1]; ; 
+  //nextFocalPoint[2] = currentFocalPoint[2] + vectorX[2] + vectorY[2] + vectorZ[2]; 
+  //vtkCam->SetFocalPoint(nextFocalPoint);
 
   //Reset the camera clipping range based on the bounds of the visible actors. 
   //This ensures that no props are cut off
@@ -148,5 +155,28 @@ bool mitk::WiiMoteVtkCameraController::OnWiiMoteInput(mitk::Action* a, const mit
   mitk::RenderingManager::GetInstance()->ForceImmediateUpdate(mitk::GlobalInteraction::GetInstance()->GetFocus()->GetRenderWindow());
 
   return true;
+}
+
+bool mitk::WiiMoteVtkCameraController::OnWiiMoteHomeButton(mitk::Action *a, const mitk::StateEvent *e)
+{
+  //reset the camera, so that the objects shown in the scene can be seen.
+  const mitk::VtkPropRenderer* glRenderer = dynamic_cast<const mitk::VtkPropRenderer*>(m_Renderer);
+  if (glRenderer)
+  {
+    vtkRenderer* vtkRenderer = glRenderer->GetVtkRenderer();
+    mitk::DataStorage* ds = m_Renderer->GetDataStorage();
+    if (ds == NULL)
+      return false;
+
+    mitk::BoundingBox::Pointer bb = ds->ComputeBoundingBox();
+
+    mitk::Point3D middle = bb->GetCenter();
+    vtkRenderer->GetActiveCamera()->SetFocalPoint(middle[0],middle[1],middle[2]);
+
+    vtkRenderer->ResetCamera();
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    return true;
+  }
+  return false;
 }
 

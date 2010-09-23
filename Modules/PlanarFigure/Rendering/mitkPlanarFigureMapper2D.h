@@ -45,14 +45,9 @@ class Contour;
 * <li>"markerline": the lines by which markers (control points) are surrounded
 * </ol>
 * 
-* In the following, all planar figure properties are listed:
+* In the following, all appearance-related planar figure properties are listed:
 * 
 * <ol>
-* <li>Properties controlled by PlanarFigureInteractor
-*   <ul>
-*     <li>"selected": true if the planar figure is selected
-*     <li>"planarfigure.ishovering": true if the mouse "hovers" over the planar figure
-*   </ul>
 * <li>General properties for the planar figure
 *   <ul>
 *     <li>"planarfigure.drawoutline": if true, the "outline" lines is drawn

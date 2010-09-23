@@ -220,14 +220,24 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
   // Draw markers at control points (selected control point will be colored)
   for ( unsigned int i = 0; i < planarFigure->GetNumberOfControlPoints(); ++i )
   {
+    
+    bool isEditable = true;
+    m_DataNode->GetBoolProperty( "planarfigure.iseditable", isEditable );
+    
     PlanarFigureDisplayMode pointDisplayMode = PF_DEFAULT;
-    if ( i == (unsigned int) planarFigure->GetSelectedControlPoint() )
+
+    // Only if planar figure is marked as editable: display markers (control points) in a
+    // different style if mouse is over them or they are selected
+    if ( isEditable )
     {
-      pointDisplayMode = PF_SELECTED;
-    }
-    else if ( m_IsHovering )
-    {
-      pointDisplayMode = PF_HOVER;
+      if ( i == (unsigned int) planarFigure->GetSelectedControlPoint() )
+      {
+        pointDisplayMode = PF_SELECTED;
+      }
+      else if ( m_IsHovering )
+      {
+        pointDisplayMode = PF_HOVER;
+      }
     }
 
     this->DrawMarker( planarFigure->GetControlPoint( i ),

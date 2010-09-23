@@ -465,12 +465,23 @@ bool mitk::PlanarFigureInteractor
       // Invoke event to notify listeners that this planar figure should be selected
       planarFigure->InvokeEvent( SelectPlanarFigureEvent() );
 
-      int pointIndex = mitk::PlanarFigureInteractor::IsPositionInsideMarker(
-        stateEvent, planarFigure,
-        planarFigureGeometry,
-        renderer->GetCurrentWorldGeometry2D(),
-        renderer->GetDisplayGeometry() );
+      // Check if planar figure is marked as "editable"
+      bool isEditable = true;
+      m_DataNode->GetBoolProperty( "planarfigure.iseditable", isEditable );
 
+      int pointIndex = -1;
+
+      if ( isEditable )
+      {
+        // If planar figure is editable, check if mouse is over a control point
+        pointIndex = mitk::PlanarFigureInteractor::IsPositionInsideMarker(
+          stateEvent, planarFigure,
+          planarFigureGeometry,
+          renderer->GetCurrentWorldGeometry2D(),
+          renderer->GetDisplayGeometry() );
+      }
+
+      // If editing is enabled and the mouse is currently over a control point, select it
       if ( pointIndex >= 0 )
       {
         this->HandleEvent( new mitk::StateEvent( EIDYES, NULL ) );

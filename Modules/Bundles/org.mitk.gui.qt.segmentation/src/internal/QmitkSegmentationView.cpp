@@ -505,7 +505,7 @@ void QmitkSegmentationView::OnSelectionChanged(std::vector<mitk::DataNode*> node
   m_Controls->refImageSelector->setCurrentIndex( m_Controls->refImageSelector->Find(referenceData) );
 
   connect( m_Controls->refImageSelector, SIGNAL( OnSelectionChanged( const mitk::DataNode* ) ), 
-    this, SLOT( OnComboBoxSelectionChanged( const mitk::DataNode* ) ), Qt::UniqueConnection );
+    this, SLOT( OnComboBoxSelectionChanged( const mitk::DataNode* ) ) );
 
 
   // if Image and Surface are selected, enable button
@@ -797,7 +797,7 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
 
   // create signal/slot connections
   connect( m_Controls->refImageSelector, SIGNAL( OnSelectionChanged( const mitk::DataNode* ) ), 
-           this, SLOT( OnComboBoxSelectionChanged( const mitk::DataNode* ) ), Qt::UniqueConnection );
+           this, SLOT( OnComboBoxSelectionChanged( const mitk::DataNode* ) ) );
   connect( m_Controls->btnNewSegmentation, SIGNAL(clicked()), this, SLOT(CreateNewSegmentation()) );
   connect( m_Controls->CreateSegmentationFromSurface, SIGNAL(clicked()), this, SLOT(CreateSegmentationFromSurface()) );
   connect( m_Controls->m_ManualToolSelectionBox, SIGNAL(ToolSelected(int)), this, SLOT(ManualToolSelected(int)) );

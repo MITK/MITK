@@ -55,6 +55,11 @@ public:
     void SetProductName(const std::string& product);
     void SetWindowIcon(const std::string& wndIcon);
 
+    void SetPerspectiveExcludeList(std::vector<std::string> v);
+    std::vector<std::string> GetPerspectiveExcludeList();
+
+
+
 private:
 
   /**
@@ -97,6 +102,9 @@ private:
   bool showVersionInfo;
   std::string productName;
   std::string windowIcon;
+
+  // stringlist for excluding perspectives from the perspective menu entry (e.g. Welcome Perspective)
+  std::vector<std::string> perspectiveExcludeList;
 
   // actions which will be enabled/disabled depending on the application state
   QList<QAction*> viewActions;

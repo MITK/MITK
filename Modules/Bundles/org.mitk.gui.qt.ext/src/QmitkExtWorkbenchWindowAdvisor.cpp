@@ -440,12 +440,34 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
 
 	std::vector<berry::IPerspectiveDescriptor::Pointer> perspectives(
 		perspRegistry->GetPerspectives());
-	for (std::vector<berry::IPerspectiveDescriptor::Pointer>::iterator perspIt =
-		perspectives.begin(); perspIt != perspectives.end(); ++perspIt)
-	{
-		new berry::QtOpenPerspectiveAction(window,
-			*perspIt, perspGroup);
-	}
+    
+    bool skip = false;
+    for (std::vector<berry::IPerspectiveDescriptor::Pointer>::iterator perspIt =
+      perspectives.begin(); perspIt != perspectives.end(); ++perspIt)
+    {
+
+      // if perspectiveExcludeList is set, it contains the id-strings of perspectives, which
+      // should not appear as an menu-entry in the perspective menu
+      if (perspectiveExcludeList.size() > 0)
+      {
+        for (int i=0; i<perspectiveExcludeList.size(); i++)
+        {
+          if (perspectiveExcludeList.at(i) == (*perspIt)->GetId())
+          {
+            skip = true;
+            break;
+          }
+        }
+        if (skip)
+        {
+          skip = false;
+          continue;
+        }
+      }  	
+
+      new berry::QtOpenPerspectiveAction(window,
+        *perspIt, perspGroup);
+    }
 	perspMenu->addActions(perspGroup->actions());
 
 	// sort elements (converting vector to map...)
@@ -851,4 +873,15 @@ void QmitkExtWorkbenchWindowAdvisor::PropertyChange(berry::Object::Pointer /*sou
 			}
 		}
 	}
+}
+
+
+void QmitkExtWorkbenchWindowAdvisor::SetPerspectiveExcludeList(std::vector<std::string> v)
+{
+  this->perspectiveExcludeList = v;    
+}
+
+std::vector<std::string> QmitkExtWorkbenchWindowAdvisor::GetPerspectiveExcludeList()
+{
+  return this->perspectiveExcludeList;
 }

@@ -1182,18 +1182,13 @@ void QmitkPointBasedRegistrationView::calculateLandmarkWarping()
 
   mitk::LandmarkWarping::FixedImageType::Pointer fixedImage = mitk::LandmarkWarping::FixedImageType::New();
   mitk::Image::Pointer fimage = dynamic_cast<mitk::Image*>(m_FixedNode->GetData());
-  if (fimage.IsNotNull() && (fimage->GetDimension() == 2 || fimage->GetDimension() == 3))
+  mitk::LandmarkWarping::MovingImageType::Pointer movingImage = mitk::LandmarkWarping::MovingImageType::New();
+  mitk::Image::Pointer mimage = dynamic_cast<mitk::Image*>(m_MovingNode->GetData());
+  if (fimage.IsNotNull() && /*fimage->GetDimension() == 2 || */ fimage->GetDimension() == 3 && mimage.IsNotNull() && mimage->GetDimension() == 3)
   {
-    if(fimage.IsNotNull())
-    {
-      mitk::CastToItkImage(fimage, fixedImage);
-    }
-    mitk::LandmarkWarping::MovingImageType::Pointer movingImage = mitk::LandmarkWarping::MovingImageType::New();
-    mitk::Image::Pointer mimage = dynamic_cast<mitk::Image*>(m_MovingNode->GetData());
-    if(mimage.IsNotNull())
-    {
-      mitk::CastToItkImage(mimage, movingImage);
-    }
+    mitk::CastToItkImage(fimage, fixedImage);   
+    mitk::CastToItkImage(mimage, movingImage);
+    
     registration->SetFixedImage(fixedImage);
     registration->SetMovingImage(movingImage);
     unsigned int pointId;

@@ -3,7 +3,7 @@
 #include <QBoxLayout>
 #include <QLabel>
 
-QmitkToolRoiDataSelectionBox::QmitkToolRoiDataSelectionBox(QWidget* parent, mitk::DataStorage* storage, const char* name)
+QmitkToolRoiDataSelectionBox::QmitkToolRoiDataSelectionBox(QWidget* parent, mitk::DataStorage* storage)
 :QWidget(parent),
 m_SelfCall(false),
 m_lastSelection(NULL),

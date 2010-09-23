@@ -12,7 +12,7 @@ class QmitkExt_EXPORT QmitkToolRoiDataSelectionBox : public QWidget
 
 public:
 
-  QmitkToolRoiDataSelectionBox(QWidget* parent = 0, mitk::DataStorage* storage = 0, const char* name = 0);
+  QmitkToolRoiDataSelectionBox(QWidget* parent = 0, mitk::DataStorage* storage = 0);
   virtual ~QmitkToolRoiDataSelectionBox();
 
   mitk::DataStorage* GetDataStorage();

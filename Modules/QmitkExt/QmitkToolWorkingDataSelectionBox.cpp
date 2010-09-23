@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkToolWorkingDataSelectionBox.h"
 
 
-QmitkToolWorkingDataSelectionBox::QmitkToolWorkingDataSelectionBox(QWidget* parent, mitk::DataStorage* storage, const char* name)
+QmitkToolWorkingDataSelectionBox::QmitkToolWorkingDataSelectionBox(QWidget* parent, mitk::DataStorage* storage)
 :QListWidget(parent),
 m_SelfCall(false),
 m_LastSelectedReferenceData(NULL),

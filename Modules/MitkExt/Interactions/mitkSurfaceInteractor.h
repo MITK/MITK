@@ -57,6 +57,8 @@ namespace mitk {
     //## 
     //## Returns a value between 0 and 1.
     //## (Used by GlobalInteraction to decide which DESELECTED state machine to send the event to.)
+    //##
+    //## \WARNING This is interactor currently does not work for interaction in 3D. Try using mitkAffineInteractor3D instead.
     virtual float CanHandleEvent(StateEvent const* stateEvent) const;
 
   private:

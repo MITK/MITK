@@ -144,6 +144,10 @@ mitk::TeemDiffusionTensor3DReconstructionImageFilter<D,T>
   // call tend estim command
   std::cout << "Calling <" << command << ">" << std::endl;
   int success = system(command);
+  if(!success)
+  {
+    MITK_ERROR << "system command could not be called!";
+  }
 
   remove(filename);
   sprintf( filename, "dwi_%d.raw", random_integer);

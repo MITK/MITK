@@ -125,10 +125,10 @@ void mitk::SiemensMosaicDicomDiffusionImageHeaderReader::Update()
     // for siemens mosaic image, figure out mosaic slice order from 0029|1010
     std::string tag;
     tag.clear();
-    gdcm::File *header0 = new gdcm::File;
 
 #ifndef DGDCM2
 
+    gdcm::File *header0 = new gdcm::File;
     gdcm::BinEntry* binEntry;
 
     header0->SetMaxSizeLoadEntry(65536);
@@ -225,9 +225,9 @@ void mitk::SiemensMosaicDicomDiffusionImageHeaderReader::Update()
     for (int k = 0; k < m_nSlice; k += nStride )
     {
 
-      gdcm::File *header0 = new gdcm::File;
 #ifndef DGDCM2
 
+      gdcm::File *header0 = new gdcm::File;
       gdcm::BinEntry* binEntry;
 
       header0->SetMaxSizeLoadEntry(65536);

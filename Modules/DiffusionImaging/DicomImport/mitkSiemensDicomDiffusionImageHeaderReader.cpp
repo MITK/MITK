@@ -187,10 +187,10 @@ void mitk::SiemensDicomDiffusionImageHeaderReader::Update()
 
     for (int k = 0; k < m_nSlice; k += nStride )
     {
-      gdcm::File *header0 = new gdcm::File;
 
 #ifndef DGDCM2
 
+      gdcm::File *header0 = new gdcm::File;
       gdcm::BinEntry* binEntry;
 
       header0->SetMaxSizeLoadEntry(65536);

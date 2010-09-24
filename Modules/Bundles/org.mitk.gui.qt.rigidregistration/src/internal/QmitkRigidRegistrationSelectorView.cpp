@@ -89,8 +89,7 @@ m_MovingGeometry(NULL), m_ImageGeometry(NULL)
   this->AddTransform(new QmitkScaleTransformView(this, f));
   this->AddTransform(new QmitkScaleLogarithmicTransformView(this, f));
   this->AddTransform(new QmitkAffineTransformView(this, f));
-  this->AddTransform(new QmitkFixedCenterOfRotationAffineTransformView(this, f));
-  this->AddTransform(new QmitkRigid3DTransformView(this, f));
+  this->AddTransform(new QmitkFixedCenterOfRotationAffineTransformView(this, f));  
   this->AddTransform(new QmitkEuler3DTransformView(this, f));
   this->AddTransform(new QmitkCenteredEuler3DTransformView(this, f));
   this->AddTransform(new QmitkQuaternionRigidTransformView(this, f));

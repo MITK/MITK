@@ -456,7 +456,7 @@ void QmitkPointBasedRegistrationView::Hidden()
 
 void QmitkPointBasedRegistrationView::DataNodeHasBeenRemoved(const mitk::DataNode* node)
 {
-  if(node == m_FixedNode || node == m_MovingNode || node == m_MovingPointSetNode || node == m_FixedPointSetNode)
+  if(node == m_FixedNode || node == m_MovingNode)
   {  
     m_Controls.m_StatusLabel->show();
     m_Controls.TextLabelFixed->hide();
@@ -474,16 +474,6 @@ void QmitkPointBasedRegistrationView::DataNodeHasBeenRemoved(const mitk::DataNod
     m_Controls.m_SwitchImages->hide();
     m_Controls.m_ShowRedGreenValues->setEnabled(false);
   }    
-
-  if(node == m_FixedPointSetNode)
-  {   
-    m_FixedPointSetNode = NULL;
-  }
-
-  if(node == m_MovingPointSetNode)
-  {   
-    m_MovingPointSetNode = NULL;
-  }
 
 }
 

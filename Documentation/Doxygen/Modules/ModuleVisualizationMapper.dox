@@ -9,7 +9,7 @@
 
 \section overviewVisualizationMapper Overview
 
-Mappers differ in the type of data they are capable of rendering (e.g. volume data, polygonal data) and the mode of how data is rendered (e.g. 2D or 3D). For example, the ImageMapper2D renders volume data in a 2D view, i.e. it extracts a slice of the volume (as determined by the Geometry of the associated Renderer) and displays it as a 2D plane. All Mapper classes are arranged in a class hierarchy according to these criterions.
+Mappers differ in the type of data they are capable of rendering (e.g. volume data, polygonal data) and the mode of how data is rendered (e.g. 2D or 3D). For example, the ImageMapperGL2D renders volume data in a 2D view, i.e. it extracts a slice of the volume (as determined by the Geometry of the associated Renderer) and displays it as a 2D plane. All Mapper classes are arranged in a class hierarchy according to these criterions.
 
 
 \section integrationVisualizationMapper Integration into the rendering process

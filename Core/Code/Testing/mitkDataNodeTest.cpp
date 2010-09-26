@@ -38,7 +38,7 @@ PURPOSE.  See the above copyright notices for more information.
 //Mapper Test
 #include <mitkGeometry2DDataMapper2D.h>
 #include <mitkGeometry2DDataMapper2D.h>
-#include <mitkImageMapper2D.h>
+#include <mitkImageMapperGL2D.h>
 #include <mitkPointSetMapper2D.h>
 #include <mitkPolyDataGLMapper2D.h>
 #include <mitkSurfaceMapper2D.h>
@@ -124,9 +124,9 @@ static void TestMapperSetting(mitk::DataNode::Pointer dataNode)
   MITK_TEST_CONDITION( mapper == dataNode->GetMapper(1), "Testing if a Geometry2DDataMapper2D was set correctly" )
   MITK_TEST_CONDITION( dataNode == mapper->GetDataNode(), "Testing if the mapper returns the right DataNode" )
 
-  mapper = mitk::ImageMapper2D::New();
+  mapper = mitk::ImageMapperGL2D::New();
   dataNode->SetMapper(1,mapper);
-  MITK_TEST_CONDITION( mapper == dataNode->GetMapper(1), "Testing if a ImageMapper2D was set correctly" )
+  MITK_TEST_CONDITION( mapper == dataNode->GetMapper(1), "Testing if a ImageMapperGL2D was set correctly" )
   MITK_TEST_CONDITION( dataNode == mapper->GetDataNode(), "Testing if the mapper returns the right DataNode" )
 
   mapper = mitk::PointSetMapper2D::New();

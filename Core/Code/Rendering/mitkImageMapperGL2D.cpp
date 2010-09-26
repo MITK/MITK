@@ -15,7 +15,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
      
-#include "mitkImageMapper2D.h"
+#include "mitkImageMapperGL2D.h"
 #include "widget.h"
 #include "picimage.h"
 #include "pic2vtk.h"
@@ -48,14 +48,14 @@ PURPOSE.  See the above copyright notices for more information.
 #include "vtkMitkThickSlicesFilter.h"
 
 
-int mitk::ImageMapper2D::numRenderer = 0;
+int mitk::ImageMapperGL2D::numRenderer = 0;
 
-mitk::ImageMapper2D::ImageMapper2D()
+mitk::ImageMapperGL2D::ImageMapperGL2D()
 {
 }
 
 
-mitk::ImageMapper2D::~ImageMapper2D()
+mitk::ImageMapperGL2D::~ImageMapperGL2D()
 {
   this->Clear();
   this->InvokeEvent( itk::DeleteEvent() );
@@ -63,7 +63,7 @@ mitk::ImageMapper2D::~ImageMapper2D()
 
 
 void
-mitk::ImageMapper2D::Paint( mitk::BaseRenderer *renderer )
+mitk::ImageMapperGL2D::Paint( mitk::BaseRenderer *renderer )
 {
   if ( !this->IsVisible( renderer ) )
   {
@@ -275,15 +275,15 @@ mitk::ImageMapper2D::Paint( mitk::BaseRenderer *renderer )
 }
 
 
-const mitk::ImageMapper2D::InputImageType *
-mitk::ImageMapper2D::GetInput( void )
+const mitk::ImageMapperGL2D::InputImageType *
+mitk::ImageMapperGL2D::GetInput( void )
 {
-  return static_cast< const mitk::ImageMapper2D::InputImageType * >( this->GetData() );
+  return static_cast< const mitk::ImageMapperGL2D::InputImageType * >( this->GetData() );
 }
 
 
 int
-mitk::ImageMapper2D::GetAssociatedChannelNr( mitk::BaseRenderer *renderer )
+mitk::ImageMapperGL2D::GetAssociatedChannelNr( mitk::BaseRenderer *renderer )
 {
   RendererInfo &rendererInfo = this->AccessRendererInfo( renderer );
 
@@ -292,9 +292,9 @@ mitk::ImageMapper2D::GetAssociatedChannelNr( mitk::BaseRenderer *renderer )
 
 
 void
-mitk::ImageMapper2D::GenerateData( mitk::BaseRenderer *renderer )
+mitk::ImageMapperGL2D::GenerateData( mitk::BaseRenderer *renderer )
 {
-  mitk::Image *input = const_cast< mitk::ImageMapper2D::InputImageType * >(
+  mitk::Image *input = const_cast< mitk::ImageMapperGL2D::InputImageType * >(
     this->GetInput()
     );
   input->Update();
@@ -744,7 +744,7 @@ mitk::ImageMapper2D::GenerateData( mitk::BaseRenderer *renderer )
 
 
 double
-mitk::ImageMapper2D::CalculateSpacing( const mitk::Geometry3D *geometry, const mitk::Vector3D &d ) const
+mitk::ImageMapperGL2D::CalculateSpacing( const mitk::Geometry3D *geometry, const mitk::Vector3D &d ) const
 {
   // The following can be derived from the ellipsoid equation
   //
@@ -765,7 +765,7 @@ mitk::ImageMapper2D::CalculateSpacing( const mitk::Geometry3D *geometry, const m
 }
 
 bool
-mitk::ImageMapper2D
+mitk::ImageMapperGL2D
 ::LineIntersectZero( vtkPoints *points, int p1, int p2,
                     vtkFloatingPointType *bounds )
 {
@@ -792,7 +792,7 @@ mitk::ImageMapper2D
 
 
 bool 
-mitk::ImageMapper2D
+mitk::ImageMapperGL2D
 ::CalculateClippedPlaneBounds( const Geometry3D *boundingGeometry, 
                               const PlaneGeometry *planeGeometry, vtkFloatingPointType *bounds )
 {
@@ -888,7 +888,7 @@ mitk::ImageMapper2D
 
 
 void
-mitk::ImageMapper2D::GenerateAllData()
+mitk::ImageMapperGL2D::GenerateAllData()
 {
   RendererInfoMap::iterator it, end = m_RendererInfo.end();
 
@@ -900,7 +900,7 @@ mitk::ImageMapper2D::GenerateAllData()
 
 
 void 
-mitk::ImageMapper2D::Clear()
+mitk::ImageMapperGL2D::Clear()
 {
   RendererInfoMap::iterator it, end = m_RendererInfo.end();
   for ( it = m_RendererInfo.begin(); it != end; ++it )
@@ -913,7 +913,7 @@ mitk::ImageMapper2D::Clear()
 
 
 void
-mitk::ImageMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
+mitk::ImageMapperGL2D::ApplyProperties(mitk::BaseRenderer* renderer)
 {
   RendererInfo &rendererInfo = this->AccessRendererInfo( renderer );
   iil4mitkPicImage *image = rendererInfo.Get_iil4mitkImage();
@@ -1017,9 +1017,9 @@ mitk::ImageMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
 }
 
 void
-mitk::ImageMapper2D::Update(mitk::BaseRenderer* renderer)
+mitk::ImageMapperGL2D::Update(mitk::BaseRenderer* renderer)
 {
-  mitk::Image* data  = const_cast<mitk::ImageMapper2D::InputImageType *>(
+  mitk::Image* data  = const_cast<mitk::ImageMapperGL2D::InputImageType *>(
     this->GetInput()
     );
 
@@ -1082,7 +1082,7 @@ mitk::ImageMapper2D::Update(mitk::BaseRenderer* renderer)
 
 
 void
-mitk::ImageMapper2D
+mitk::ImageMapperGL2D
 ::DeleteRendererCallback( itk::Object *object, const itk::EventObject & )
 {
   mitk::BaseRenderer *renderer = dynamic_cast< mitk::BaseRenderer* >( object );
@@ -1093,7 +1093,7 @@ mitk::ImageMapper2D
 }
 
 
-mitk::ImageMapper2D::RendererInfo
+mitk::ImageMapperGL2D::RendererInfo
 ::RendererInfo()
 : m_RendererID(-1), 
 m_iil4mitkImage(NULL), 
@@ -1111,7 +1111,7 @@ m_ObserverID( 0 )
 };
 
 
-mitk::ImageMapper2D::RendererInfo
+mitk::ImageMapperGL2D::RendererInfo
 ::~RendererInfo()
 {
   this->Squeeze();
@@ -1136,7 +1136,7 @@ mitk::ImageMapper2D::RendererInfo
 
 
 void
-mitk::ImageMapper2D::RendererInfo
+mitk::ImageMapperGL2D::RendererInfo
 ::Set_iil4mitkImage( iil4mitkPicImage *iil4mitkImage )
 {
   assert( iil4mitkImage != NULL );
@@ -1146,7 +1146,7 @@ mitk::ImageMapper2D::RendererInfo
 }
 
 void
-mitk::ImageMapper2D::RendererInfo::Squeeze()
+mitk::ImageMapperGL2D::RendererInfo::Squeeze()
 {
   delete m_iil4mitkImage;
   m_iil4mitkImage = NULL;
@@ -1163,7 +1163,7 @@ mitk::ImageMapper2D::RendererInfo::Squeeze()
 }
 
 void
-mitk::ImageMapper2D::RendererInfo::RemoveObserver()
+mitk::ImageMapperGL2D::RendererInfo::RemoveObserver()
 {
   if ( m_ObserverID != 0 )
   {
@@ -1173,7 +1173,7 @@ mitk::ImageMapper2D::RendererInfo::RemoveObserver()
 }
 
 
-void mitk::ImageMapper2D::RendererInfo::Initialize( int rendererID, mitk::BaseRenderer *renderer, 
+void mitk::ImageMapperGL2D::RendererInfo::Initialize( int rendererID, mitk::BaseRenderer *renderer, 
                                                    unsigned long observerID )
 {
   // increase ID by one to avoid 0 ID, has to be decreased before remove of the observer
@@ -1197,7 +1197,7 @@ void mitk::ImageMapper2D::RendererInfo::Initialize( int rendererID, mitk::BaseRe
   m_UnitSpacingImageFilter->SetOutputSpacing( 1.0, 1.0, 1.0 );
 }
 
-void mitk::ImageMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite)
+void mitk::ImageMapperGL2D::SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite)
 {
   mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(node->GetData());
 

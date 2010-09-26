@@ -22,15 +22,15 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkGLMapper2D.h"
 #include "mitkVtkMapper2D.h"
 #include "mitkQBallImage.h"
-#include "mitkImageMapper2D.h"
+#include "mitkImageMapperGL2D.h"
 #include "mitkOdfVtkMapper2D.h"
 
 namespace mitk {
 
-  class CopyImageMapper2D : public ImageMapper2D
+  class CopyImageMapper2D : public ImageMapperGL2D
   {
   public:
-    mitkClassMacro(CopyImageMapper2D,ImageMapper2D);
+    mitkClassMacro(CopyImageMapper2D,ImageMapperGL2D);
     itkNewMacro(Self);
 
     friend class CompositeMapper;

@@ -42,7 +42,7 @@ The main classes of the MITK rendering process can be illustrated like this:
 A render request to the vtkRenderWindow does not only update the VTK pipeline, but also the MITK pipeline. However, the mitk::RenderingManager still coordinates the rendering update behaviour.
 Update requests should be sent to the RenderingManager, which then, if needed, will request an update of the overall vtkRenderWindow. The vtkRenderWindow then starts to call the Render() function
 of all vtkRenderers, which are associated to the vtkRenderWindow. Currently, MITK uses specific vtkRenderers (outside the standard MITK rendering pipeline) for purposes, like displaying a gradient 
-background (mitk::GradientBackground), displaying video sources (QmitkVideoBackround and mitk::VideoSource), or displaying a (department) logo (mitk::LogoRendering), etc. Despite these specific
+background (mitk::GradientBackground), displaying video sources (QmitkVideoBackround and mitk::VideoSource), or displaying a (department) logo (mitk::ManufacturerLogo), etc. Despite these specific
 renderers, a kind of "SceneRenderer" is member of each QmitkRenderWindow. This vtkRenderer is associated with the custom vtkMitkRenderProp and is responsible for the MITK rendering.
 
 A sequence diagramm, which illustrates the actions after calling the Render() function of the MITK-Scene vtkRenderer is shown below:

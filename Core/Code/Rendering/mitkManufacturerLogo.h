@@ -40,11 +40,11 @@ class RenderWindow;
  * of a vtkRenderWindow.
  
  */
-class MITK_CORE_EXPORT LogoRendering : public BaseData
+class MITK_CORE_EXPORT ManufacturerLogo : public BaseData
 {
 public:
 
-  mitkClassMacro( LogoRendering, BaseData );
+  mitkClassMacro( ManufacturerLogo, BaseData );
   
   itkNewMacro( Self );
 
@@ -92,25 +92,25 @@ public:
   virtual bool IsEnabled();
    
   /**
-   * Empty implementation, since the LogoRendering doesn't
+   * Empty implementation, since the ManufacturerLogo doesn't
    * support the requested region concept
    */
   virtual void SetRequestedRegionToLargestPossibleRegion();
   
   /**
-   * Empty implementation, since the LogoRendering doesn't
+   * Empty implementation, since the ManufacturerLogo doesn't
    * support the requested region concept
    */
   virtual bool RequestedRegionIsOutsideOfTheBufferedRegion();
   
   /**
-   * Empty implementation, since the LogoRendering doesn't
+   * Empty implementation, since the ManufacturerLogo doesn't
    * support the requested region concept
    */
   virtual bool VerifyRequestedRegion();
   
   /**
-   * Empty implementation, since the LogoRendering doesn't
+   * Empty implementation, since the ManufacturerLogo doesn't
    * support the requested region concept
    */
   virtual void SetRequestedRegion(itk::DataObject*);
@@ -151,12 +151,12 @@ protected:
   /**
    * Constructor
    */
-  LogoRendering();
+  ManufacturerLogo();
 
   /**
    * Destructor
    */
-  ~LogoRendering();
+  ~ManufacturerLogo();
 
   vtkRenderWindow*    m_RenderWindow;
   vtkRenderer*        m_Renderer;

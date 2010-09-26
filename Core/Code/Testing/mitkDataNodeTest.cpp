@@ -30,7 +30,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkGeometryData.h>
 #include <mitkGeometry2DData.h>
 #include <mitkGradientBackground.h>
-#include <mitkLogoRendering.h>
+#include <mitkManufacturerLogo.h>
 #include <mitkPointSet.h>
 #include <mitkImage.h>
 #include <mitkSurface.h>
@@ -92,9 +92,9 @@ static void TestDataSetting(mitk::DataNode::Pointer dataNode)
   dataNode->SetData(baseData);
   MITK_TEST_CONDITION( baseData == dataNode->GetData(), "Testing if a GradientBackground object was set correctly" )
 
-  baseData = mitk::LogoRendering::New();
+  baseData = mitk::ManufacturerLogo::New();
   dataNode->SetData(baseData);
-  MITK_TEST_CONDITION( baseData == dataNode->GetData(), "Testing if a LogoRendering object was set correctly" )
+  MITK_TEST_CONDITION( baseData == dataNode->GetData(), "Testing if a ManufacturerLogo object was set correctly" )
 
   baseData = mitk::PointSet::New();
   dataNode->SetData(baseData);

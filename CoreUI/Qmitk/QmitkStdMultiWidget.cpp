@@ -376,22 +376,22 @@ void QmitkStdMultiWidget::InitializeWidget()
   m_GradientBackground4->Enable();
 
   // setup the department logo rendering
-  m_LogoRendering1 = mitk::LogoRendering::New();
+  m_LogoRendering1 = mitk::ManufacturerLogo::New();
   m_LogoRendering1->SetRenderWindow(
     mitkWidget1->GetRenderWindow() );
   m_LogoRendering1->Disable();
 
-  m_LogoRendering2 = mitk::LogoRendering::New();
+  m_LogoRendering2 = mitk::ManufacturerLogo::New();
   m_LogoRendering2->SetRenderWindow(
     mitkWidget2->GetRenderWindow() );
   m_LogoRendering2->Disable();
 
-  m_LogoRendering3 = mitk::LogoRendering::New();
+  m_LogoRendering3 = mitk::ManufacturerLogo::New();
   m_LogoRendering3->SetRenderWindow(
     mitkWidget3->GetRenderWindow() );
   m_LogoRendering3->Disable();
 
-  m_LogoRendering4 = mitk::LogoRendering::New();
+  m_LogoRendering4 = mitk::ManufacturerLogo::New();
   m_LogoRendering4->SetRenderWindow(
     mitkWidget4->GetRenderWindow() );
   m_LogoRendering4->Enable();

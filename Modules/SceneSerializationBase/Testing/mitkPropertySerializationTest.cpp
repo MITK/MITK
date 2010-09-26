@@ -201,7 +201,7 @@ int mitkPropertySerializationTest(int /* argc */, char* /*argv*/[])
   mitk::Geometry2DData
   GradientBackground
   ItkBaseDataAdapter
-  LogoRendering
+  ManufacturerLogo
   SlicedData
   QBallImage
   SeedsImage

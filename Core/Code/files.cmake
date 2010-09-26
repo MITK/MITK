@@ -195,7 +195,7 @@ SET(CPP_FILES
   Rendering/mitkGeometry2DDataVtkMapper3D.cpp
   Rendering/mitkGLMapper2D.cpp
   Rendering/mitkGradientBackground.cpp
-  Rendering/mitkLogoRendering.cpp
+  Rendering/mitkManufacturerLogo.cpp
   Rendering/mitkMapper2D.cpp
   Rendering/mitkMapper3D.cpp
   Rendering/mitkMapper.cpp

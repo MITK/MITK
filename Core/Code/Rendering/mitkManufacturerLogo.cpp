@@ -15,7 +15,7 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
-#include "mitkLogoRendering.h"
+#include "mitkManufacturerLogo.h"
 
 #include "mitkVtkLayerController.h"
 
@@ -45,7 +45,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <algorithm>
 
 
-mitk::LogoRendering::LogoRendering()
+mitk::ManufacturerLogo::ManufacturerLogo()
 :m_ImageData(NULL)
 {
   m_RenderWindow      = NULL;
@@ -55,7 +55,7 @@ mitk::LogoRendering::LogoRendering()
   m_PngReader         = vtkPNGReader::New();
   m_VtkImageImport    = vtkImageImport::New();
   
-  m_LogoPosition  = mitk::LogoRendering::LowerRight;
+  m_LogoPosition  = mitk::ManufacturerLogo::LowerRight;
  
   m_IsEnabled                  = false;
   m_ForceShowMBIDepartmentLogo = false;
@@ -67,7 +67,7 @@ mitk::LogoRendering::LogoRendering()
   m_PngReader->SetFileName(m_FileName.c_str());
 }
 
-mitk::LogoRendering::~LogoRendering()
+mitk::ManufacturerLogo::~ManufacturerLogo()
 {
   if ( m_RenderWindow != NULL )
     if ( this->IsEnabled() )
@@ -97,7 +97,7 @@ mitk::LogoRendering::~LogoRendering()
  * will be shown. Make sure, you have called this function
  * before calling Enable()
  */
-void mitk::LogoRendering::SetRenderWindow( vtkRenderWindow* renderWindow )
+void mitk::ManufacturerLogo::SetRenderWindow( vtkRenderWindow* renderWindow )
 {
   m_RenderWindow = renderWindow;
 }
@@ -106,7 +106,7 @@ void mitk::LogoRendering::SetRenderWindow( vtkRenderWindow* renderWindow )
  * Returns the vtkRenderWindow, which is used
  * for displaying the logo
  */
-vtkRenderWindow* mitk::LogoRendering::GetRenderWindow()
+vtkRenderWindow* mitk::ManufacturerLogo::GetRenderWindow()
 {
   return m_RenderWindow;
 }
@@ -116,7 +116,7 @@ vtkRenderWindow* mitk::LogoRendering::GetRenderWindow()
  * rendering the  logo into the
  * vtkRenderWindow
  */
-vtkRenderer* mitk::LogoRendering::GetVtkRenderer()
+vtkRenderer* mitk::ManufacturerLogo::GetVtkRenderer()
 {
   return m_Renderer;
 }
@@ -124,7 +124,7 @@ vtkRenderer* mitk::LogoRendering::GetVtkRenderer()
 /**
  * Returns the actor associated with the  logo
  */
-vtkImageActor* mitk::LogoRendering::GetActor()
+vtkImageActor* mitk::ManufacturerLogo::GetActor()
 {
   return m_Actor;
 }
@@ -133,12 +133,12 @@ vtkImageActor* mitk::LogoRendering::GetActor()
  * Returns the mapper associated with the 
  * logo.
  */
-vtkImageMapper* mitk::LogoRendering::GetMapper()
+vtkImageMapper* mitk::ManufacturerLogo::GetMapper()
 {
   return m_Mapper;
 }
 
-void mitk::LogoRendering::SetLogoSource(const char* filename)
+void mitk::ManufacturerLogo::SetLogoSource(const char* filename)
 {
   std::string file = filename;
   if(file.length() != 0)
@@ -152,7 +152,7 @@ void mitk::LogoRendering::SetLogoSource(const char* filename)
  * Enables drawing of the logo.
  * If you want to disable it, call the Disable() function.
  */
-void mitk::LogoRendering::Enable()
+void mitk::ManufacturerLogo::Enable()
 {
   if(m_IsEnabled)
     return;
@@ -216,7 +216,7 @@ void mitk::LogoRendering::Enable()
 }
 
 
-void mitk::LogoRendering::SetupCamera()
+void mitk::ManufacturerLogo::SetupCamera()
 {
   // set the vtk camera in way that stretches the logo all over the renderwindow
 
@@ -262,7 +262,7 @@ void mitk::LogoRendering::SetupCamera()
   m_Camera->SetParallelScale( max / 2 );
 }
 
-void mitk::LogoRendering::SetupPosition()
+void mitk::ManufacturerLogo::SetupPosition()
 { // Position and Scale of the logo
   
   double newPos[4];
@@ -278,7 +278,7 @@ void mitk::LogoRendering::SetupPosition()
  
   switch(m_LogoPosition)
   {
-    case mitk::LogoRendering::LowerLeft:
+    case mitk::ManufacturerLogo::LowerLeft:
     {
       newPos[0] = (0 + buffer);
       newPos[1] = (0 + buffer);
@@ -286,7 +286,7 @@ void mitk::LogoRendering::SetupPosition()
       newPos[3] = 0.2 * normY * m_ZoomFactor;
       break;
     }
-    case mitk::LogoRendering::LowerRight:
+    case mitk::ManufacturerLogo::LowerRight:
     {
       newPos[0] = (1 - buffer) - 0.2 * normX * m_ZoomFactor;
       newPos[1] = 0.0;
@@ -294,7 +294,7 @@ void mitk::LogoRendering::SetupPosition()
       newPos[3] = 0.2 * normY * m_ZoomFactor;
       break;
     }
-    case mitk::LogoRendering::UpperLeft:
+    case mitk::ManufacturerLogo::UpperLeft:
     {
       newPos[0] = (0 + buffer);
       newPos[1] = (1 - buffer) - 0.2 * normY * m_ZoomFactor;
@@ -302,7 +302,7 @@ void mitk::LogoRendering::SetupPosition()
       newPos[3] = (1 - buffer);
       break;
     }
-    case mitk::LogoRendering::UpperRight:
+    case mitk::ManufacturerLogo::UpperRight:
     {
       newPos[0] = (1 - buffer) - 0.2 * normX * m_ZoomFactor;
       newPos[1] = (1 - buffer) - 0.2 * normY * m_ZoomFactor;
@@ -310,7 +310,7 @@ void mitk::LogoRendering::SetupPosition()
       newPos[3] = (1 - buffer);
       break;
     }
-    case mitk::LogoRendering::Middle:
+    case mitk::ManufacturerLogo::Middle:
     default:
     {
       newPos[0] = 0.5 - 0.2 * normX * m_ZoomFactor;
@@ -324,16 +324,16 @@ void mitk::LogoRendering::SetupPosition()
   m_Renderer->SetViewport(newPos);
 }
 
-void mitk::LogoRendering::ForceMBILogoVisible(bool visible)
+void mitk::ManufacturerLogo::ForceMBILogoVisible(bool visible)
 {
   m_ForceShowMBIDepartmentLogo = visible;
 }
 
-void mitk::LogoRendering::SetZoomFactor( double factor )
+void mitk::ManufacturerLogo::SetZoomFactor( double factor )
 {
   m_ZoomFactor = factor;
 }
-void mitk::LogoRendering::SetOpacity(double opacity)
+void mitk::ManufacturerLogo::SetOpacity(double opacity)
 {
   m_Opacity = opacity;
 }
@@ -342,7 +342,7 @@ void mitk::LogoRendering::SetOpacity(double opacity)
  * Disables drawing of the logo.
  * If you want to enable it, call the Enable() function.
  */
-void mitk::LogoRendering::Disable()
+void mitk::ManufacturerLogo::Disable()
 {
   if ( this->IsEnabled() && !m_ForceShowMBIDepartmentLogo )
   {
@@ -355,28 +355,28 @@ void mitk::LogoRendering::Disable()
  * Checks, if the logo is currently
  * enabled (visible)
  */
-bool mitk::LogoRendering::IsEnabled()
+bool mitk::ManufacturerLogo::IsEnabled()
 {
   return  m_IsEnabled;
 }
 
 
-void mitk::LogoRendering::SetRequestedRegionToLargestPossibleRegion()
+void mitk::ManufacturerLogo::SetRequestedRegionToLargestPossibleRegion()
 {
     //nothing to do
 }
 
-bool mitk::LogoRendering::RequestedRegionIsOutsideOfTheBufferedRegion()
+bool mitk::ManufacturerLogo::RequestedRegionIsOutsideOfTheBufferedRegion()
 {
     return false;    
 }
 
-bool mitk::LogoRendering::VerifyRequestedRegion()
+bool mitk::ManufacturerLogo::VerifyRequestedRegion()
 {
     return true;
 }
 
-void mitk::LogoRendering::SetRequestedRegion(itk::DataObject*)
+void mitk::ManufacturerLogo::SetRequestedRegion(itk::DataObject*)
 {
     //nothing to do
 }

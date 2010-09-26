@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkCommon.h"
 #include "mitkGLMapper2D.h"
-#include "mitkSurfaceMapper2D.h"
+#include "mitkSurfaceGLMapper2D.h"
 #include "mitkDataStorage.h"
 #include "mitkDataNode.h"
 #include "mitkWeakPointer.h"
@@ -81,7 +81,7 @@ protected:
                             const DisplayGeometry *displayGeometry,
                             bool positiveOrientation = true );
 
-  SurfaceMapper2D::Pointer m_SurfaceMapper;
+  SurfaceGLMapper2D::Pointer m_SurfaceMapper;
 
   mitk::WeakPointer<mitk::DataStorage> m_DataStorage;  ///< DataStorage that will be searched for sub nodes
   DataNode::Pointer m_ParentNode;  ///< parent node that will be used to search for sub nodes

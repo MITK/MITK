@@ -76,10 +76,10 @@ class DisplayGeometry;
  *   - \b "back normal length (px)": (FloatProperty) Length of the back side normals in pixels.
  *
  */
-class MITK_CORE_EXPORT SurfaceMapper2D : public GLMapper2D
+class MITK_CORE_EXPORT SurfaceGLMapper2D : public GLMapper2D
 {
 public:
-  mitkClassMacro(SurfaceMapper2D, GLMapper2D);
+  mitkClassMacro(SurfaceGLMapper2D, GLMapper2D);
 
   itkNewMacro(Self);
 
@@ -124,9 +124,9 @@ public:
 
 protected:
 
-  SurfaceMapper2D();
+  SurfaceGLMapper2D();
 
-  virtual ~SurfaceMapper2D();
+  virtual ~SurfaceGLMapper2D();
 
   vtkPlane*  m_Plane;
   vtkCutter* m_Cutter;

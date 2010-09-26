@@ -44,7 +44,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkStringProperty.h"
 #include "mitkSurface.h"
 #include "mitkSurface.h"
-#include "mitkSurfaceMapper2D.h"
+#include "mitkSurfaceGLMapper2D.h"
 #include "mitkSurfaceVtkMapper3D.h"
 #include "mitkTimeSlicedGeometry.h"
 #include "mitkTransferFunctionProperty.h"
@@ -101,7 +101,7 @@ void mitk::CoreObjectFactory::SetDefaultProperties(mitk::DataNode* node)
   mitk::Surface::Pointer surface = dynamic_cast<mitk::Surface*>(node->GetData());
   if(surface.IsNotNull())
   {
-    mitk::SurfaceMapper2D::SetDefaultProperties(node);
+    mitk::SurfaceGLMapper2D::SetDefaultProperties(node);
     mitk::SurfaceVtkMapper3D::SetDefaultProperties(node);
   }
 
@@ -174,9 +174,9 @@ mitk::Mapper::Pointer mitk::CoreObjectFactory::CreateMapper(mitk::DataNode* node
       }
       else if((dynamic_cast<Surface*>(data)!=NULL))
       {
-        newMapper = mitk::SurfaceMapper2D::New();
+        newMapper = mitk::SurfaceGLMapper2D::New();
         // cast because SetDataNode is not virtual
-        mitk::SurfaceMapper2D *castedMapper = dynamic_cast<mitk::SurfaceMapper2D*>(newMapper.GetPointer());
+        mitk::SurfaceGLMapper2D *castedMapper = dynamic_cast<mitk::SurfaceGLMapper2D*>(newMapper.GetPointer());
         castedMapper->SetDataNode(node);
       }
       else if((dynamic_cast<PointSet*>(data)!=NULL))

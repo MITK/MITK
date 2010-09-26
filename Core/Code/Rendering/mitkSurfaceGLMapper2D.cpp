@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <mitkGL.h>
 
-#include "mitkSurfaceMapper2D.h"
+#include "mitkSurfaceGLMapper2D.h"
 #include "mitkBaseRenderer.h"
 #include "mitkPlaneGeometry.h"
 #include "mitkSurface.h"
@@ -43,7 +43,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkStripper.h>
 
 
-mitk::SurfaceMapper2D::SurfaceMapper2D()
+mitk::SurfaceGLMapper2D::SurfaceGLMapper2D()
 : m_Plane( vtkPlane::New() ),
   m_Cutter( vtkCutter::New() ),
   m_LUT( vtkLookupTable::New() ),
@@ -80,7 +80,7 @@ mitk::SurfaceMapper2D::SurfaceMapper2D()
   m_LUT->Build();
 }
 
-mitk::SurfaceMapper2D::~SurfaceMapper2D()
+mitk::SurfaceGLMapper2D::~SurfaceGLMapper2D()
 {
   m_Plane->Delete();
   m_Cutter->Delete();
@@ -89,7 +89,7 @@ mitk::SurfaceMapper2D::~SurfaceMapper2D()
   m_Stripper->Delete();
 }
 
-const mitk::Surface *mitk::SurfaceMapper2D::GetInput(void)
+const mitk::Surface *mitk::SurfaceGLMapper2D::GetInput(void)
 {
   if(m_Surface.IsNotNull())
     return m_Surface;
@@ -97,7 +97,7 @@ const mitk::Surface *mitk::SurfaceMapper2D::GetInput(void)
   return static_cast<const Surface * > ( GetData() );
 }
 
-void mitk::SurfaceMapper2D::SetDataNode( mitk::DataNode::Pointer node )
+void mitk::SurfaceGLMapper2D::SetDataNode( mitk::DataNode::Pointer node )
 {
   Superclass::SetDataNode( node );
 
@@ -142,7 +142,7 @@ void mitk::SurfaceMapper2D::SetDataNode( mitk::DataNode::Pointer node )
 }
 
 
-void mitk::SurfaceMapper2D::Paint(mitk::BaseRenderer * renderer)
+void mitk::SurfaceGLMapper2D::Paint(mitk::BaseRenderer * renderer)
 {
   if(IsVisible(renderer)==false) return;
 
@@ -299,7 +299,7 @@ void mitk::SurfaceMapper2D::Paint(mitk::BaseRenderer * renderer)
   }
 }
 
-void mitk::SurfaceMapper2D::PaintCells(mitk::BaseRenderer* renderer, vtkPolyData* contour, 
+void mitk::SurfaceGLMapper2D::PaintCells(mitk::BaseRenderer* renderer, vtkPolyData* contour, 
                                        const Geometry2D* worldGeometry, 
                                        const DisplayGeometry* displayGeometry, 
                                        vtkLinearTransform * vtktransform, 
@@ -481,7 +481,7 @@ void mitk::SurfaceMapper2D::PaintCells(mitk::BaseRenderer* renderer, vtkPolyData
   glLineWidth(1.0);
 }
 
-void mitk::SurfaceMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite)
+void mitk::SurfaceGLMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite)
 {
   node->AddProperty( "line width", IntProperty::New(2), renderer, overwrite );
   node->AddProperty( "scalar mode", VtkScalarModeProperty::New(), renderer, overwrite );
@@ -495,7 +495,7 @@ void mitk::SurfaceMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::Bas
   Superclass::SetDefaultProperties(node, renderer, overwrite);
 }
 
-void mitk::SurfaceMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
+void mitk::SurfaceGLMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
 {
   Superclass::ApplyProperties(renderer);
 

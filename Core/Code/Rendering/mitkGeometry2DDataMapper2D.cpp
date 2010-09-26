@@ -25,7 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkSmartPointerProperty.h"
 #include "mitkPlaneDecorationProperty.h"
 #include "mitkGeometry2DDataToSurfaceFilter.h"
-#include "mitkSurfaceMapper2D.h"
+#include "mitkSurfaceGLMapper2D.h"
 #include "mitkLine.h"
 #include "mitkNodePredicateDataType.h"
 
@@ -356,7 +356,7 @@ void mitk::Geometry2DDataMapper2D::Paint(BaseRenderer *renderer)
     
     if (m_SurfaceMapper.IsNull())
     {
-      m_SurfaceMapper=SurfaceMapper2D::New();
+      m_SurfaceMapper=SurfaceGLMapper2D::New();
     }
     m_SurfaceMapper->SetSurface(surfaceCreator->GetOutput());
     m_SurfaceMapper->SetDataNode(GetDataNode());

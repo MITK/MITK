@@ -41,7 +41,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkImageMapperGL2D.h>
 #include <mitkPointSetGLMapper2D.h>
 #include <mitkPolyDataGLMapper2D.h>
-#include <mitkSurfaceMapper2D.h>
+#include <mitkSurfaceGLMapper2D.h>
 
 #include <mitkGeometry2DDataVtkMapper3D.h>
 #include <mitkPointSetVtkMapper3D.h>
@@ -138,9 +138,9 @@ static void TestMapperSetting(mitk::DataNode::Pointer dataNode)
   MITK_TEST_CONDITION( mapper == dataNode->GetMapper(1), "Testing if a PolyDataGLMapper2D was set correctly" )
   MITK_TEST_CONDITION( dataNode == mapper->GetDataNode(), "Testing if the mapper returns the right DataNode" )
 
-  mapper = mitk::SurfaceMapper2D::New();
+  mapper = mitk::SurfaceGLMapper2D::New();
   dataNode->SetMapper(1,mapper);
-  MITK_TEST_CONDITION( mapper == dataNode->GetMapper(1), "Testing if a SurfaceMapper2D was set correctly" )
+  MITK_TEST_CONDITION( mapper == dataNode->GetMapper(1), "Testing if a SurfaceGLMapper2D was set correctly" )
   MITK_TEST_CONDITION( dataNode == mapper->GetDataNode(), "Testing if the mapper returns the right DataNode" )
 
   mapper = mitk::Geometry2DDataVtkMapper3D::New();

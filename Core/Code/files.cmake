@@ -188,7 +188,7 @@ SET(CPP_FILES
   IO/vtkPointSetXMLParser.cpp
   IO/mitkLog.cpp
   Rendering/mitkBaseRenderer.cpp
-  Rendering/mitkBaseVtkMapper2D.cpp
+  Rendering/mitkVtkMapper2D.cpp
   Rendering/mitkBaseVtkMapper3D.cpp
   Rendering/mitkColoredRectangleRendering.cpp
   Rendering/mitkGeometry2DDataMapper2D.cpp

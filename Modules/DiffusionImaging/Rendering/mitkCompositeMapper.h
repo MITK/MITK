@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define COMPOSITEMAPPER_H_HEADER_INCLUDED
 
 #include "mitkGLMapper2D.h"
-#include "mitkBaseVtkMapper2D.h"
+#include "mitkVtkMapper2D.h"
 #include "mitkQBallImage.h"
 #include "mitkImageMapper2D.h"
 #include "mitkOdfVtkMapper2D.h"
@@ -39,11 +39,11 @@ namespace mitk {
   //##Documentation
   //## @brief Composite pattern for combination of different mappers
   //## @ingroup Mapper
-  class CompositeMapper : public BaseVtkMapper2D
+  class CompositeMapper : public VtkMapper2D
   {
   public:
 
-    mitkClassMacro(CompositeMapper,BaseVtkMapper2D);
+    mitkClassMacro(CompositeMapper,VtkMapper2D);
     itkNewMacro(Self);
 
     virtual void MitkRenderOverlay(BaseRenderer* renderer)

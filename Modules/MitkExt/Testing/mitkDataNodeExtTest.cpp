@@ -38,7 +38,7 @@ PURPOSE.  See the above copyright notices for more information.
 //Mapper Test
 #include <mitkMapper.h>
 #include <mitkMapper2D.h>
-#include <mitkBaseVtkMapper2D.h>
+#include <mitkVtkMapper2D.h>
 #include <mitkContourMapper2D.h>
 #include <mitkContourSetMapper2D.h>
 #include <mitkMeshMapper2D.h>

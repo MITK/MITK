@@ -23,7 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 // MAPPERS
 #include "mitkMapper.h"
 #include "mitkImageMapper2D.h"
-#include "mitkBaseVtkMapper2D.h"
+#include "mitkVtkMapper2D.h"
 #include "mitkBaseVtkMapper3D.h"
 #include "mitkGeometry2DDataVtkMapper3D.h"
 #include "mitkPointSetMapper2D.h"
@@ -359,7 +359,7 @@ void mitk::VtkPropRenderer::Update(mitk::DataNode* datatreenode)
       {
         if(GetDisplayGeometry()->IsValid())
         {
-          BaseVtkMapper2D* vtkmapper2d=dynamic_cast<BaseVtkMapper2D*>(mapper.GetPointer());
+          VtkMapper2D* vtkmapper2d=dynamic_cast<VtkMapper2D*>(mapper.GetPointer());
           if(vtkmapper2d != NULL)
           {
             vtkmapper2d->Update(this);

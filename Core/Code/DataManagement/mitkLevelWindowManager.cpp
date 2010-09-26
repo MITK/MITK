@@ -24,7 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkNodePredicateDataType.h"
 #include "mitkNodePredicateAnd.h"
 #include "mitkNodePredicateOR.h"
-#include "mitkNodePredicateNOT.h"
+#include "mitkNodePredicateNot.h"
 #include "mitkProperties.h"
 #include "mitkMessage.h"
 

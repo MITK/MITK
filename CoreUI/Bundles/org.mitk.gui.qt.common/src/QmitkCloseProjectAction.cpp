@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <mitkCoreObjectFactory.h>
 #include <mitkDataStorageEditorInput.h>
-#include <mitkNodePredicateNOT.h>
+#include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateProperty.h>
 #include <berryIEditorPart.h>
 #include <berryIWorkbenchPage.h>
@@ -73,7 +73,7 @@ void QmitkCloseProjectAction::Run()
     }
 
     //check if there is anything else then helper object in the storage
-    if(storage->GetSubset(mitk::NodePredicateNOT::New(mitk::NodePredicateProperty::New("helper object", mitk::BoolProperty::New(true))))->empty())
+    if(storage->GetSubset(mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object", mitk::BoolProperty::New(true))))->empty())
       return;
     /* Ask, if the user is sure about that */
     if (QMessageBox::question(NULL, "Remove all data?", "Are you sure that you want to close the current project? This will remove all data objects?", QMessageBox::Yes | QMessageBox::No) != QMessageBox::Yes)

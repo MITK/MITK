@@ -32,7 +32,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkNodePredicateDataType.h"
 #include "mitkNodePredicateDimension.h"
 #include "mitkNodePredicateData.h"
-#include "mitkNodePredicateNOT.h"
+#include "mitkNodePredicateNot.h"
 #include "mitkNodePredicateAnd.h"
 #include "mitkNodePredicateOR.h"
 #include "mitkNodePredicateSource.h"
@@ -334,7 +334,7 @@ void TestDataStorage( mitk::DataStorage* ds )
     {
       mitk::ColorProperty::Pointer cp = mitk::ColorProperty::New(color);
       mitk::NodePredicateProperty::Pointer proppred(mitk::NodePredicateProperty::New("color", cp));
-      mitk::NodePredicateNOT::Pointer predicate(mitk::NodePredicateNOT::New(proppred));
+      mitk::NodePredicateNot::Pointer predicate(mitk::NodePredicateNot::New(proppred));
 
       const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetSubset(predicate);
       std::vector<mitk::DataNode::Pointer> stlAll = all->CastToSTLConstContainer();

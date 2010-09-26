@@ -27,7 +27,7 @@
 #include "mitkDataNodeObject.h"
 #include <mitkNodePredicateProperty.h>
 #include <mitkNodePredicateData.h>
-#include <mitkNodePredicateNOT.h>
+#include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateAnd.h>
 #include <mitkDataNodeSelection.h>
 

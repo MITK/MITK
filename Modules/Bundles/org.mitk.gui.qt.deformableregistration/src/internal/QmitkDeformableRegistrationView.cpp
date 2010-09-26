@@ -32,7 +32,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkNodePredicateDataType.h"
 #include "mitkNodePredicateProperty.h"
 #include "mitkNodePredicateAnd.h"
-#include "mitkNodePredicateNOT.h"
+#include "mitkNodePredicateNot.h"
 #include "mitkVectorImageMapper2D.h"
 
 #include "itkImageFileReader.h"

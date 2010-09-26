@@ -34,13 +34,13 @@ mitk::Tool::Tool(const char* type)
   m_PredicateImage3D( NodePredicateAnd::New(m_PredicateImages, m_PredicateDimension) ),
 
   m_PredicateBinary(NodePredicateProperty::New("binary", BoolProperty::New(true))),
-  m_PredicateNotBinary( NodePredicateNOT::New(m_PredicateBinary) ),
+  m_PredicateNotBinary( NodePredicateNot::New(m_PredicateBinary) ),
 
   m_PredicateSegmentation(NodePredicateProperty::New("segmentation", BoolProperty::New(true))),
-  m_PredicateNotSegmentation( NodePredicateNOT::New(m_PredicateSegmentation) ),
+  m_PredicateNotSegmentation( NodePredicateNot::New(m_PredicateSegmentation) ),
   
   m_PredicateHelper(NodePredicateProperty::New("helper object", BoolProperty::New(true))),
-  m_PredicateNotHelper( NodePredicateNOT::New(m_PredicateHelper) ),
+  m_PredicateNotHelper( NodePredicateNot::New(m_PredicateHelper) ),
   
   m_PredicateImageColorful( NodePredicateAnd::New(m_PredicateNotBinary, m_PredicateNotSegmentation) ),
 

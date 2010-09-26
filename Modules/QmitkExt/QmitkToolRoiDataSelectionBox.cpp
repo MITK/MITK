@@ -109,7 +109,7 @@ void QmitkToolRoiDataSelectionBox::UpdateComboBoxData()
   mitk::NodePredicateProperty::Pointer isBinary= mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true));
   mitk::NodePredicateDataType::Pointer isImage= mitk::NodePredicateDataType::New("Image");
   mitk::NodePredicateProperty::Pointer isHelperObject= mitk::NodePredicateProperty::New("helper object", mitk::BoolProperty::New(true));
-  mitk::NodePredicateNOT::Pointer isNotHelperObject = mitk::NodePredicateNOT::New(isHelperObject);
+  mitk::NodePredicateNot::Pointer isNotHelperObject = mitk::NodePredicateNot::New(isHelperObject);
   mitk::NodePredicateAnd::Pointer segmentationPredicate = mitk::NodePredicateAnd::New(isImage, isBinary, isNotHelperObject);
 
   mitk::DataStorage::SetOfObjects::ConstPointer allSegmentations = m_ToolManager->GetDataStorage()->GetSubset(segmentationPredicate);

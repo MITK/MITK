@@ -44,7 +44,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkNodePredicateDataType.h"
 #include "mitkNodePredicateProperty.h"
 #include "mitkNodePredicateAnd.h"
-#include "mitkNodePredicateNOT.h"
+#include "mitkNodePredicateNot.h"
 #include <mitkMessage.h>
 
 #include <itkCommand.h>
@@ -113,9 +113,9 @@ struct SelListenerPointBasedRegistration : ISelectionListener
           {
             mitk::TNodePredicateDataType<mitk::BaseData>::Pointer isBaseData(mitk::TNodePredicateDataType<mitk::BaseData>::New());
             mitk::TNodePredicateDataType<mitk::PointSet>::Pointer isPointSet(mitk::TNodePredicateDataType<mitk::PointSet>::New());
-            mitk::NodePredicateNOT::Pointer notPointSet = mitk::NodePredicateNOT::New(isPointSet);
+            mitk::NodePredicateNot::Pointer notPointSet = mitk::NodePredicateNot::New(isPointSet);
             mitk::TNodePredicateDataType<mitk::Geometry2DData>::Pointer isGeometry2DData(mitk::TNodePredicateDataType<mitk::Geometry2DData>::New());
-            mitk::NodePredicateNOT::Pointer notGeometry2DData = mitk::NodePredicateNOT::New(isGeometry2DData);
+            mitk::NodePredicateNot::Pointer notGeometry2DData = mitk::NodePredicateNot::New(isGeometry2DData);
             mitk::NodePredicateAnd::Pointer notPointSetAndNotGeometry2DData = mitk::NodePredicateAnd::New( notPointSet, notGeometry2DData );
             mitk::NodePredicateAnd::Pointer predicate = mitk::NodePredicateAnd::New( isBaseData, notPointSetAndNotGeometry2DData );
 

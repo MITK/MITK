@@ -32,7 +32,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkNodePredicateDimension.h"
 #include "mitkNodePredicateAnd.h"
 #include "mitkNodePredicateOR.h"
-#include "mitkNodePredicateNOT.h"
+#include "mitkNodePredicateNot.h"
 
 #include <iostream>
 #include <string>
@@ -191,13 +191,13 @@ namespace mitk
     NodePredicateAnd::Pointer m_PredicateImage3D;
 
     NodePredicateProperty::Pointer m_PredicateBinary;
-    NodePredicateNOT::Pointer m_PredicateNotBinary;
+    NodePredicateNot::Pointer m_PredicateNotBinary;
 
     NodePredicateProperty::Pointer m_PredicateSegmentation;
-    NodePredicateNOT::Pointer m_PredicateNotSegmentation;
+    NodePredicateNot::Pointer m_PredicateNotSegmentation;
 
     NodePredicateProperty::Pointer m_PredicateHelper;
-    NodePredicateNOT::Pointer m_PredicateNotHelper;
+    NodePredicateNot::Pointer m_PredicateNotHelper;
 
     NodePredicateAnd::Pointer m_PredicateImageColorful;
 

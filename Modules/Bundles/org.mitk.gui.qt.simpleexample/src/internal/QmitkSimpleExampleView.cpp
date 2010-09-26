@@ -26,7 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <mitkMovieGenerator.h>
 #include "mitkNodePredicateProperty.h"
-#include "mitkNodePredicateNOT.h"
+#include "mitkNodePredicateNot.h"
 #include "mitkProperties.h"
 #include <QmitkStepperAdapter.h>
 #include <QFileDialog>
@@ -110,7 +110,7 @@ void QmitkSimpleExampleView::Deactivated()
 void QmitkSimpleExampleView::initNavigators()
 {
   /* get all nodes that have not set "includeInBoundingBox" to false */
-  mitk::NodePredicateNOT::Pointer pred = mitk::NodePredicateNOT::New(mitk::NodePredicateProperty::New("includeInBoundingBox", mitk::BoolProperty::New(false)));
+  mitk::NodePredicateNot::Pointer pred = mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("includeInBoundingBox", mitk::BoolProperty::New(false)));
   mitk::DataStorage::SetOfObjects::ConstPointer rs = this->GetDataStorage()->GetSubset(pred);
   /* calculate bounding geometry of these nodes */
   mitk::TimeSlicedGeometry::Pointer bounds = this->GetDataStorage()->ComputeBoundingGeometry3D(rs);

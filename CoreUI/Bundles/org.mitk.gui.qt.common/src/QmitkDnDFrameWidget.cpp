@@ -29,7 +29,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkProperties.h"
 #include "mitkNodePredicateData.h"
-#include "mitkNodePredicateNOT.h"
+#include "mitkNodePredicateNot.h"
 #include "mitkNodePredicateProperty.h"
 
 #include "mitkProgressBar.h"
@@ -89,8 +89,8 @@ void QmitkDnDFrameWidget::dropEvent( QDropEvent * event )
   if(dsmodified)
   {
     // get all nodes that have not set "includeInBoundingBox" to false
-    mitk::NodePredicateNOT::Pointer pred 
-      = mitk::NodePredicateNOT::New(mitk::NodePredicateProperty::New("includeInBoundingBox"
+    mitk::NodePredicateNot::Pointer pred 
+      = mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("includeInBoundingBox"
       , mitk::BoolProperty::New(false)));
 
     mitk::DataStorage::SetOfObjects::ConstPointer rs = ds->GetSubset(pred);

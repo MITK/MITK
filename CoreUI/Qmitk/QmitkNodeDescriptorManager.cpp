@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <memory>
 #include <mitkNodePredicateProperty.h>
 #include <mitkNodePredicateAnd.h>
-#include <mitkNodePredicateNOT.h>
+#include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateDataType.h>
 #include <mitkProperties.h>
 #include <QList>
@@ -60,7 +60,7 @@ void QmitkNodeDescriptorManager::Initialize()
   this->AddDescriptor(new QmitkNodeDescriptor(tr("Surface"), QString(":/Qmitk/Surface_48.png"), isSurface, this));
 
   // Adding "NoneBinaryImages"
-  mitk::NodePredicateNOT::Pointer isNotBinary = mitk::NodePredicateNOT::New(isBinary);
+  mitk::NodePredicateNot::Pointer isNotBinary = mitk::NodePredicateNot::New(isBinary);
   mitk::NodePredicateAnd::Pointer isNoneBinaryImage = mitk::NodePredicateAnd::New(isImage, isNotBinary);
   this->AddDescriptor(new QmitkNodeDescriptor(tr("NoneBinaryImage"), QString(":/Qmitk/Images_48.png"), isNoneBinaryImage, this));
 

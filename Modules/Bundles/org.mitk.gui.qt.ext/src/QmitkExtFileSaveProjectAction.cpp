@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkSceneIO.h"
 #include "mitkProgressBar.h"
-#include <mitkNodePredicateNOT.h>
+#include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateProperty.h>
 #include <mitkProperties.h>
 
@@ -78,7 +78,7 @@ void QmitkExtFileSaveProjectAction::Run()
 
     /* Build list of nodes that should be saved */
     
-    mitk::NodePredicateNOT::Pointer isNotHelperObject = mitk::NodePredicateNOT::New(mitk::NodePredicateProperty::New("helper object", mitk::BoolProperty::New(true)));
+    mitk::NodePredicateNot::Pointer isNotHelperObject = mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("helper object", mitk::BoolProperty::New(true)));
 
     mitk::DataStorage::SetOfObjects::ConstPointer nodesToBeSaved = storage->GetSubset(isNotHelperObject);
     if ( !sceneIO->SaveScene( nodesToBeSaved, storage, fileName.toLocal8Bit().constData() ) )

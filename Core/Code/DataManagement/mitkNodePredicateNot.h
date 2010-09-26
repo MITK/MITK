@@ -25,20 +25,20 @@ namespace mitk {
 
   //##Documentation
   //## @brief Composite predicate that negates its child predicate
-  //## Changed: NodePredicateNOT now derives from NodePredicateCompositeBase though it really holds
+  //## Changed: NodePredicateNot now derives from NodePredicateCompositeBase though it really holds
   //## only one subpredicate at any time. But logically any Predicate that has one or more subpredicate
   //## is a CompositePredicate.
   //## 
   //## @ingroup DataStorage
-  class MITK_CORE_EXPORT NodePredicateNOT : public mitk::NodePredicateCompositeBase
+  class MITK_CORE_EXPORT NodePredicateNot : public mitk::NodePredicateCompositeBase
   {
   public:
-    mitkClassMacro(NodePredicateNOT, NodePredicateCompositeBase);
-    mitkNewMacro1Param(NodePredicateNOT, const mitk::NodePredicateBase*);
+    mitkClassMacro(NodePredicateNot, NodePredicateCompositeBase);
+    mitkNewMacro1Param(NodePredicateNot, const mitk::NodePredicateBase*);
 
     //##Documentation
     //## @brief Standard Destructor
-    virtual ~NodePredicateNOT();
+    virtual ~NodePredicateNot();
 
     //##Documentation
     //## @brief Reimplemented, only one child predicate is allowed for the NOT predicate.
@@ -50,7 +50,7 @@ namespace mitk {
   protected:
     //##Documentation
     //## @brief Constructor
-    NodePredicateNOT(const mitk::NodePredicateBase* p);
+    NodePredicateNot(const mitk::NodePredicateBase* p);
 
   };
 

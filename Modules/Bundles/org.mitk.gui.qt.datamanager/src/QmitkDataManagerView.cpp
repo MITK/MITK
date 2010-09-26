@@ -31,7 +31,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkCommon.h"
 #include "mitkDelegateManager.h"
 #include "mitkNodePredicateData.h"
-#include "mitkNodePredicateNOT.h"
+#include "mitkNodePredicateNot.h"
 #include "mitkNodePredicateProperty.h"
 #include "mitkEnumerationProperty.h"
 #include "mitkProperties.h"
@@ -693,8 +693,8 @@ void QmitkDataManagerView::GlobalReinit( bool )
 {
   this->ReinitMultiWidgetEditor();
   // get all nodes that have not set "includeInBoundingBox" to false
-  mitk::NodePredicateNOT::Pointer pred
-    = mitk::NodePredicateNOT::New(mitk::NodePredicateProperty::New("includeInBoundingBox"
+  mitk::NodePredicateNot::Pointer pred
+    = mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("includeInBoundingBox"
     , mitk::BoolProperty::New(false)));
 
   mitk::DataStorage::SetOfObjects::ConstPointer rs = this->GetDataStorage()->GetSubset(pred);

@@ -29,11 +29,11 @@ namespace mitk {
   //## As BaseData is an abstract class, we need an implementation for testing its methods
   //## @ingroup Data
 
-  class BaseDataImplementation : public BaseData
+  class BaseDataTestImplementation : public BaseData
   {
   public:
 
-    mitkClassMacro(BaseDataImplementation, BaseData);
+    mitkClassMacro(BaseDataTestImplementation, BaseData);
 
     itkNewMacro(Self);
 
@@ -49,8 +49,8 @@ namespace mitk {
     virtual void SetRequestedRegionToLargestPossibleRegion(){};
     virtual void SetRequestedRegion(itk::DataObject * /*data*/){};
 
-    BaseDataImplementation(){};
-    virtual ~BaseDataImplementation(){};
+    BaseDataTestImplementation(){};
+    virtual ~BaseDataTestImplementation(){};
     
   };
 

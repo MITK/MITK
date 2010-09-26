@@ -15,7 +15,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#include "mitkBaseDataImplementation.h"
+#include "mitkBaseDataTestImplementation.h"
 #include "mitkStringProperty.h"
 #include "mitkTestingMacros.h"
 #include "itkImage.h"
@@ -28,11 +28,11 @@ int mitkBaseDataTest(int /*argc*/, char* /*argv*/[])
 
   //Create a BaseData implementation
   std::cout << "Creating a base data instance..." << std::endl;
-  mitk::BaseDataImplementation::Pointer baseDataImpl = mitk::BaseDataImplementation::New();
+  mitk::BaseDataTestImplementation::Pointer baseDataImpl = mitk::BaseDataTestImplementation::New();
 
   MITK_TEST_CONDITION_REQUIRED(baseDataImpl.IsNotNull(),"Testing instantiation");
-  MITK_TEST_CONDITION(baseDataImpl->IsInitialized(), "BaseDataImplementation is initialized");
-  MITK_TEST_CONDITION(baseDataImpl->IsEmpty(), "BaseDataImplementation is initialized and empty");
+  MITK_TEST_CONDITION(baseDataImpl->IsInitialized(), "BaseDataTestImplementation is initialized");
+  MITK_TEST_CONDITION(baseDataImpl->IsEmpty(), "BaseDataTestImplementation is initialized and empty");
   MITK_TEST_CONDITION(baseDataImpl->GetExternalReferenceCount()== baseDataImpl->GetReferenceCount(), "Checks external reference count!");
   
 
@@ -100,7 +100,7 @@ int mitkBaseDataTest(int /*argc*/, char* /*argv*/[])
    baseDataImpl->UpdateOutputInformation();
   MITK_TEST_CONDITION(baseDataImpl->GetUpdatedTimeSlicedGeometry() == geo2, "TimeSlicedGeometry update!");
   //Test method CopyInformation()
-  mitk::BaseDataImplementation::Pointer newBaseData =  mitk::BaseDataImplementation::New();
+  mitk::BaseDataTestImplementation::Pointer newBaseData =  mitk::BaseDataTestImplementation::New();
   newBaseData->CopyInformation(baseDataImpl);
   MITK_TEST_CONDITION(  newBaseData->GetTimeSlicedGeometry()->GetTimeSteps() == 5, "Check copying of of Basedata Data Object!");
  

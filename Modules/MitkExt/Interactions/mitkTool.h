@@ -31,7 +31,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkNodePredicateDataType.h"
 #include "mitkNodePredicateDimension.h"
 #include "mitkNodePredicateAnd.h"
-#include "mitkNodePredicateOR.h"
+#include "mitkNodePredicateOr.h"
 #include "mitkNodePredicateNot.h"
 
 #include <iostream>
@@ -187,7 +187,7 @@ namespace mitk
     NodePredicateDataType::Pointer m_PredicateImages;
     NodePredicateDimension::Pointer m_PredicateDim3;
     NodePredicateDimension::Pointer m_PredicateDim4;
-    NodePredicateOR::Pointer m_PredicateDimension;
+    NodePredicateOr::Pointer m_PredicateDimension;
     NodePredicateAnd::Pointer m_PredicateImage3D;
 
     NodePredicateProperty::Pointer m_PredicateBinary;

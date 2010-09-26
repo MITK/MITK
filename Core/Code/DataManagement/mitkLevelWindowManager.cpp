@@ -23,7 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkNodePredicateProperty.h"
 #include "mitkNodePredicateDataType.h"
 #include "mitkNodePredicateAnd.h"
-#include "mitkNodePredicateOR.h"
+#include "mitkNodePredicateOr.h"
 #include "mitkNodePredicateNot.h"
 #include "mitkProperties.h"
 #include "mitkMessage.h"
@@ -297,7 +297,7 @@ mitk::DataStorage::SetOfObjects::ConstPointer mitk::LevelWindowManager::GetRelev
   mitk::NodePredicateDataType::Pointer isDImage = mitk::NodePredicateDataType::New("DiffusionImage");
   mitk::NodePredicateDataType::Pointer isTImage = mitk::NodePredicateDataType::New("TensorImage");
   mitk::NodePredicateDataType::Pointer isQImage = mitk::NodePredicateDataType::New("QBallImage");
-  mitk::NodePredicateOR::Pointer predicateTypes = mitk::NodePredicateOR::New();
+  mitk::NodePredicateOr::Pointer predicateTypes = mitk::NodePredicateOr::New();
   predicateTypes->AddPredicate(isImage);
   predicateTypes->AddPredicate(isDImage);
   predicateTypes->AddPredicate(isTImage);

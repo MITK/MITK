@@ -30,7 +30,7 @@ mitk::Tool::Tool(const char* type)
   m_PredicateImages(NodePredicateDataType::New("Image")),
   m_PredicateDim3(NodePredicateDimension::New(3, 1)),
   m_PredicateDim4(NodePredicateDimension::New(4, 1)),
-  m_PredicateDimension( mitk::NodePredicateOR::New(m_PredicateDim3, m_PredicateDim4) ),
+  m_PredicateDimension( mitk::NodePredicateOr::New(m_PredicateDim3, m_PredicateDim4) ),
   m_PredicateImage3D( NodePredicateAnd::New(m_PredicateImages, m_PredicateDimension) ),
 
   m_PredicateBinary(NodePredicateProperty::New("binary", BoolProperty::New(true))),
@@ -49,7 +49,7 @@ mitk::Tool::Tool(const char* type)
   m_PredicateReference( NodePredicateAnd::New(m_PredicateImage3D, m_PredicateImageColorfulNotHelper) ),
 
   // for working image
-  m_IsSegmentationPredicate(NodePredicateAnd::New(NodePredicateOR::New(m_PredicateBinary, m_PredicateSegmentation), m_PredicateNotHelper))
+  m_IsSegmentationPredicate(NodePredicateAnd::New(NodePredicateOr::New(m_PredicateBinary, m_PredicateSegmentation), m_PredicateNotHelper))
 {
 }
 

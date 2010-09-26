@@ -32,7 +32,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkBaseRenderer.h"
 #include "mitkRenderingManager.h"
 #include "mitkNodePredicateDataType.h"
-#include "mitkNodePredicateOR.h"
+#include "mitkNodePredicateOr.h"
 
 
 //how precise must the user pick the point

@@ -92,7 +92,7 @@ SET(CPP_FILES
   DataManagement/mitkNodePredicateDimension.cpp
   DataManagement/mitkNodePredicateFirstLevel.cpp
   DataManagement/mitkNodePredicateNot.cpp
-  DataManagement/mitkNodePredicateOR.cpp
+  DataManagement/mitkNodePredicateOr.cpp
   DataManagement/mitkNodePredicateProperty.cpp
   DataManagement/mitkNodePredicateSource.cpp
   DataManagement/mitkPlaneDecorationProperty.cpp

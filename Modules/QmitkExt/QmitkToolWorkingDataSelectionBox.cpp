@@ -237,7 +237,7 @@ mitk::ToolManager::DataVectorType QmitkToolWorkingDataSelectionBox::GetAllNodes(
         if (completePredicate.IsNotNull())
         {
 
-          m_Predicates.push_back( mitk::NodePredicateOR::New( completePredicate, tool->GetWorkingDataPreference()).GetPointer() );
+          m_Predicates.push_back( mitk::NodePredicateOr::New( completePredicate, tool->GetWorkingDataPreference()).GetPointer() );
 
           completePredicate = m_Predicates.back();
         }

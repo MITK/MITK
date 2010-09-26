@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKGEOMETRY2DDATAVTKMAPPER3D_H_HEADER_INCLUDED_C196C71F
 
 #include "mitkCommon.h"
-#include "mitkBaseVtkMapper3D.h"
+#include "mitkVtkMapper3D.h"
 #include "mitkDataStorage.h"
 #include "mitkGeometry2DDataToSurfaceFilter.h"
 #include "mitkWeakPointer.h"
@@ -72,10 +72,10 @@ class DataStorage;
  *  \image html mitkGeometry2DDataVtkMapper3D.png "Internal filter pipeline"
  *
  */
-class MITK_CORE_EXPORT Geometry2DDataVtkMapper3D : public BaseVtkMapper3D
+class MITK_CORE_EXPORT Geometry2DDataVtkMapper3D : public VtkMapper3D
 {
 public:
-  mitkClassMacro(Geometry2DDataVtkMapper3D, BaseVtkMapper3D);
+  mitkClassMacro(Geometry2DDataVtkMapper3D, VtkMapper3D);
 
   itkNewMacro(Geometry2DDataVtkMapper3D);
 

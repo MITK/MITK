@@ -24,7 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkMapper.h"
 #include "mitkImageMapper2D.h"
 #include "mitkVtkMapper2D.h"
-#include "mitkBaseVtkMapper3D.h"
+#include "mitkVtkMapper3D.h"
 #include "mitkGeometry2DDataVtkMapper3D.h"
 #include "mitkPointSetMapper2D.h"
 
@@ -191,7 +191,7 @@ int mitk::VtkPropRenderer::Render(mitk::VtkPropRenderer::RenderType type)
     if((mapper->IsVtkBased() == true) )
     {
       sthVtkBased = true;
-      mitk::BaseVtkMapper3D::Pointer vtkMapper = dynamic_cast<mitk::BaseVtkMapper3D*>(mapper);
+      mitk::VtkMapper3D::Pointer vtkMapper = dynamic_cast<mitk::VtkMapper3D*>(mapper);
       if(vtkMapper)
       {
          vtkMapper->GetVtkProp(this)->SetAllocatedRenderTime(5000,GetVtkRenderer()); //B/ ToDo: rendering time calculation
@@ -371,7 +371,7 @@ void mitk::VtkPropRenderer::Update(mitk::DataNode* datatreenode)
       }
       else
       {
-        BaseVtkMapper3D* vtkmapper3d=dynamic_cast<BaseVtkMapper3D*>(mapper.GetPointer());
+        VtkMapper3D* vtkmapper3d=dynamic_cast<VtkMapper3D*>(mapper.GetPointer());
         if(vtkmapper3d != NULL)
         {
           vtkmapper3d->Update(this);
@@ -505,7 +505,7 @@ void mitk::VtkPropRenderer::PickWorldPoint(const mitk::Point2D& displayPoint, mi
             ++iter)
        {
          const DataNode* currentNode = *iter;
-         BaseVtkMapper3D* baseVtkMapper3D = dynamic_cast<BaseVtkMapper3D*>( currentNode->GetMapper( BaseRenderer::Standard3D ) );
+         VtkMapper3D* baseVtkMapper3D = dynamic_cast<VtkMapper3D*>( currentNode->GetMapper( BaseRenderer::Standard3D ) );
          if ( baseVtkMapper3D )
          {
            vtkActor* actor = dynamic_cast<vtkActor*>( baseVtkMapper3D->GetViewProp() );
@@ -554,7 +554,7 @@ mitk::VtkPropRenderer::PickObject( const Point2D &displayPosition, Point3D &worl
       if ( !pickable )
         continue;
 
-      BaseVtkMapper3D *mapper = dynamic_cast< BaseVtkMapper3D * >
+      VtkMapper3D *mapper = dynamic_cast< VtkMapper3D * >
         ( node->GetMapper( m_MapperID ) );
       if ( mapper == NULL )
         continue;
@@ -676,7 +676,7 @@ vtkAssemblyPath* mitk::VtkPropRenderer::GetNextPath()
       Mapper* mapper = node->GetMapper( BaseRenderer::Standard3D );
       if (mapper)
       {
-        BaseVtkMapper3D* vtkmapper = dynamic_cast<BaseVtkMapper3D*>( mapper );
+        VtkMapper3D* vtkmapper = dynamic_cast<VtkMapper3D*>( mapper );
         if (vtkmapper)
         {
           vtkProp* prop = vtkmapper->GetVtkProp(this);

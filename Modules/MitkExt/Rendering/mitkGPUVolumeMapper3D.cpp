@@ -76,7 +76,7 @@ void mitk::GPUVolumeMapper3D::MitkRenderVolumetricGeometry(mitk::BaseRenderer* r
 {
   LocalStorage *ls = m_LSH.GetLocalStorage(renderer);
 
-  BaseVtkMapper3D::MitkRenderVolumetricGeometry(renderer);
+  VtkMapper3D::MitkRenderVolumetricGeometry(renderer);
 
   if(ls->m_gpuInitialized)
     ls->m_MapperGPU->UpdateMTime();

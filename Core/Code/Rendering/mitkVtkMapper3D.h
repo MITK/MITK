@@ -39,10 +39,10 @@ namespace mitk {
 //## initialized by sub-classes (e.g., by setting
 //## it to an vtkActor).
 //## @ingroup Mapper
-class MITK_CORE_EXPORT BaseVtkMapper3D : public Mapper3D
+class MITK_CORE_EXPORT VtkMapper3D : public Mapper3D
 {
 public:
-  mitkClassMacro(BaseVtkMapper3D, Mapper3D);
+  mitkClassMacro(VtkMapper3D, Mapper3D);
 
   virtual vtkProp *GetVtkProp(mitk::BaseRenderer *renderer) = 0;
 
@@ -83,9 +83,9 @@ public:
   
 
 protected:
-  BaseVtkMapper3D();
+  VtkMapper3D();
 
-  virtual ~BaseVtkMapper3D();
+  virtual ~VtkMapper3D();
 
   /** Checks whether the specified property is a AnnotationProperty and if yes,
   * adds it to m_LabelActorCollection (internal method). */

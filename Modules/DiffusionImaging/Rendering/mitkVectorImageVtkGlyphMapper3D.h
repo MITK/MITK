@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "MitkDiffusionImagingExports.h"
 
-#include "mitkBaseVtkMapper3D.h"
+#include "mitkVtkMapper3D.h"
 #include "mitkImage.h"
 
 class vtkMaskedGlyph3D;
@@ -32,10 +32,10 @@ class vtkMaskPoints;
 namespace mitk
 {
 
-class MitkDiffusionImaging_EXPORT VectorImageVtkGlyphMapper3D : public BaseVtkMapper3D
+class MitkDiffusionImaging_EXPORT VectorImageVtkGlyphMapper3D : public VtkMapper3D
 {
 public:
-    mitkClassMacro( VectorImageVtkGlyphMapper3D, BaseVtkMapper3D );
+    mitkClassMacro( VectorImageVtkGlyphMapper3D, VtkMapper3D );
 
     itkNewMacro( Self );
 

@@ -189,7 +189,7 @@ SET(CPP_FILES
   IO/mitkLog.cpp
   Rendering/mitkBaseRenderer.cpp
   Rendering/mitkVtkMapper2D.cpp
-  Rendering/mitkBaseVtkMapper3D.cpp
+  Rendering/mitkVtkMapper3D.cpp
   Rendering/mitkColoredRectangleRendering.cpp
   Rendering/mitkGeometry2DDataMapper2D.cpp
   Rendering/mitkGeometry2DDataVtkMapper3D.cpp

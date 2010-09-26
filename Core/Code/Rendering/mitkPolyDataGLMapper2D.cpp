@@ -25,7 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkColorProperty.h"
 #include "mitkProperties.h"
 #include "mitkAbstractTransformGeometry.h"
-#include "mitkBaseVtkMapper3D.h"
+#include "mitkVtkMapper3D.h"
 
 #include <vtkPolyData.h>
 #include <vtkPolyDataSource.h>
@@ -207,7 +207,7 @@ vtkPolyDataMapper* mitk::PolyDataGLMapper2D::GetVtkPolyDataMapper()
     if ( node.IsNull() )
         return NULL;
 
-    mitk::BaseVtkMapper3D::Pointer mitkMapper = dynamic_cast< mitk::BaseVtkMapper3D* > ( node->GetMapper( 2 ) );
+    mitk::VtkMapper3D::Pointer mitkMapper = dynamic_cast< mitk::VtkMapper3D* > ( node->GetMapper( 2 ) );
     if ( mitkMapper.IsNull() )
         return NULL;
 

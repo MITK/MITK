@@ -16,7 +16,7 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 
-#include "mitkBaseVtkMapper3D.h"
+#include "mitkVtkMapper3D.h"
 #include "mitkDataNode.h"
 #include "mitkProperties.h"
 #include "mitkAnnotationProperty.h"
@@ -38,23 +38,23 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk
 {
 
-BaseVtkMapper3D::BaseVtkMapper3D()
+VtkMapper3D::VtkMapper3D()
 {
 }
 
 
-BaseVtkMapper3D::~BaseVtkMapper3D()
+VtkMapper3D::~VtkMapper3D()
 {
 }
 
-void BaseVtkMapper3D::SetVtkMapperImmediateModeRendering(vtkMapper *mapper)
+void VtkMapper3D::SetVtkMapperImmediateModeRendering(vtkMapper *mapper)
 {
   if(mapper)
     mapper->SetImmediateModeRendering(mitk::VtkPropRenderer::useImmediateModeRendering());
 }
 
 
-void BaseVtkMapper3D::UpdateVtkTransform(mitk::BaseRenderer *renderer)
+void VtkMapper3D::UpdateVtkTransform(mitk::BaseRenderer *renderer)
 {
   vtkLinearTransform * vtktransform = GetDataNode()->GetVtkTransform(this->GetTimestep());
   
@@ -64,7 +64,7 @@ void BaseVtkMapper3D::UpdateVtkTransform(mitk::BaseRenderer *renderer)
 }
 
 
-void BaseVtkMapper3D::MitkRenderOpaqueGeometry(BaseRenderer* renderer)
+void VtkMapper3D::MitkRenderOpaqueGeometry(BaseRenderer* renderer)
 {
   if ( this->IsVisible( renderer )==false ) 
     return;
@@ -75,7 +75,7 @@ void BaseVtkMapper3D::MitkRenderOpaqueGeometry(BaseRenderer* renderer)
   }
 }
 
-void BaseVtkMapper3D::MitkRenderTranslucentGeometry(BaseRenderer* renderer)
+void VtkMapper3D::MitkRenderTranslucentGeometry(BaseRenderer* renderer)
 {
   if ( this->IsVisible(renderer)==false ) 
     return;
@@ -101,7 +101,7 @@ void BaseVtkMapper3D::MitkRenderTranslucentGeometry(BaseRenderer* renderer)
 
 //for VTK 5.2 support
 #if ( ( VTK_MAJOR_VERSION >= 5 ) && ( VTK_MINOR_VERSION>=2)  )
-void BaseVtkMapper3D::MitkRenderVolumetricGeometry(BaseRenderer* renderer)
+void VtkMapper3D::MitkRenderVolumetricGeometry(BaseRenderer* renderer)
 {
   if(IsVisible(renderer)==false) 
     return;
@@ -121,7 +121,7 @@ void BaseVtkMapper3D::MitkRenderVolumetricGeometry(BaseRenderer* renderer)
 }
 #endif
 
-void BaseVtkMapper3D::MitkRenderOverlay(BaseRenderer* renderer)
+void VtkMapper3D::MitkRenderOverlay(BaseRenderer* renderer)
 {
   if ( this->IsVisible(renderer)==false ) 
     return;
@@ -145,7 +145,7 @@ void BaseVtkMapper3D::MitkRenderOverlay(BaseRenderer* renderer)
 }
 
 
-void BaseVtkMapper3D::ApplyProperties(vtkActor* actor, BaseRenderer* renderer)
+void VtkMapper3D::ApplyProperties(vtkActor* actor, BaseRenderer* renderer)
 {
   float rgba[4]={1.0f,1.0f,1.0f,1.0f};
   // check for color prop and use it for rendering if it exists
@@ -191,7 +191,7 @@ void BaseVtkMapper3D::ApplyProperties(vtkActor* actor, BaseRenderer* renderer)
 }
 
 /*
-void BaseVtkMapper3D::CheckForAnnotationProperty( mitk::BaseProperty *property, BaseRenderer *renderer )
+void VtkMapper3D::CheckForAnnotationProperty( mitk::BaseProperty *property, BaseRenderer *renderer )
 {
   AnnotationProperty *annotationProperty =
     dynamic_cast< AnnotationProperty * >( property );
@@ -228,7 +228,7 @@ void BaseVtkMapper3D::CheckForAnnotationProperty( mitk::BaseProperty *property, 
 }
 */
 
-void BaseVtkMapper3D::ReleaseGraphicsResources(vtkWindow * /*renWin*/)
+void VtkMapper3D::ReleaseGraphicsResources(vtkWindow * /*renWin*/)
 {
 /*
   if(m_Prop3D)
@@ -237,7 +237,7 @@ void BaseVtkMapper3D::ReleaseGraphicsResources(vtkWindow * /*renWin*/)
 }
 
 
-bool BaseVtkMapper3D::HasVtkProp( const vtkProp *prop, BaseRenderer *renderer )
+bool VtkMapper3D::HasVtkProp( const vtkProp *prop, BaseRenderer *renderer )
 {
   vtkProp *myProp = this->GetVtkProp( renderer );
   

@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "QmitkRenderWindowMenu.h"
 
-#include "mitkResliceMethodEnumProperty.h"
+#include "mitkResliceMethodProperty.h"
 #include "mitkProperties.h"
 
 #include <QHBoxLayout>
@@ -716,11 +716,11 @@ void QmitkRenderWindowMenu::OnTSNumChanged(int num)
   {
     if(num==0)
     {
-      m_Renderer->GetCurrentWorldGeometry2DNode()->SetProperty( "reslice.thickslices", mitk::ResliceMethodEnumProperty::New( 0 ) );
+      m_Renderer->GetCurrentWorldGeometry2DNode()->SetProperty( "reslice.thickslices", mitk::ResliceMethodProperty::New( 0 ) );
     }
     else
     {
-      m_Renderer->GetCurrentWorldGeometry2DNode()->SetProperty( "reslice.thickslices", mitk::ResliceMethodEnumProperty::New( 1 ) );
+      m_Renderer->GetCurrentWorldGeometry2DNode()->SetProperty( "reslice.thickslices", mitk::ResliceMethodProperty::New( 1 ) );
       m_Renderer->GetCurrentWorldGeometry2DNode()->SetProperty( "reslice.thickslices.num", mitk::IntProperty::New( num ) );
     }
     m_TSLabel->setText(QString::number(num*2+1));
@@ -825,7 +825,7 @@ void QmitkRenderWindowMenu::OnCrossHairMenuAboutToShow()
 
     int currentMode = 0;
     {
-      mitk::ResliceMethodEnumProperty::Pointer m = dynamic_cast<mitk::ResliceMethodEnumProperty*>(m_Renderer->GetCurrentWorldGeometry2DNode()->GetProperty( "reslice.thickslices" ));
+      mitk::ResliceMethodProperty::Pointer m = dynamic_cast<mitk::ResliceMethodProperty*>(m_Renderer->GetCurrentWorldGeometry2DNode()->GetProperty( "reslice.thickslices" ));
       if( m.IsNotNull() )
         currentMode = m->GetValueAsId();
     }

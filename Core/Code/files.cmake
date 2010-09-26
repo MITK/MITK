@@ -123,7 +123,7 @@ SET(CPP_FILES
   DataManagement/mitkVtkVolumeRenderingProperty.cpp
   DataManagement/mitkWeakPointerProperty.cpp
   DataManagement/mitkShaderEnumProperty.cpp
-  DataManagement/mitkResliceMethodEnumProperty.cpp
+  DataManagement/mitkResliceMethodProperty.cpp
   DataManagement/mitkMaterial.cpp
   Interactions/mitkAction.cpp
   Interactions/mitkAffineInteractor.cpp

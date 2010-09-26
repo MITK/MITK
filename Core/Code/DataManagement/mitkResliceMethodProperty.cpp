@@ -15,29 +15,29 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
-#include "mitkResliceMethodEnumProperty.h"
+#include "mitkResliceMethodProperty.h"
 
-mitk::ResliceMethodEnumProperty::ResliceMethodEnumProperty( )
+mitk::ResliceMethodProperty::ResliceMethodProperty( )
 {
   AddThickSlicesTypes();
   SetValue( (IdType)0 );
 }
 
-mitk::ResliceMethodEnumProperty::ResliceMethodEnumProperty( const IdType& value )
+mitk::ResliceMethodProperty::ResliceMethodProperty( const IdType& value )
 {
   AddThickSlicesTypes();
   if ( IsValidEnumerationValue( value ) )
     SetValue( value );
  }
 
-mitk::ResliceMethodEnumProperty::ResliceMethodEnumProperty( const std::string& value )
+mitk::ResliceMethodProperty::ResliceMethodProperty( const std::string& value )
 {
   AddThickSlicesTypes();
   if ( IsValidEnumerationValue( value ) )
     SetValue( value );
 }
 
-void mitk::ResliceMethodEnumProperty::AddThickSlicesTypes()
+void mitk::ResliceMethodProperty::AddThickSlicesTypes()
 {  
   AddEnum( "disabled", (IdType) 0 );
   AddEnum( "mip", (IdType) 1 );

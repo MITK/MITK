@@ -26,20 +26,20 @@ namespace mitk
 /**
  * Encapsulates the thick slices method enumeration
  */
-class MITK_CORE_EXPORT ResliceMethodEnumProperty : public EnumerationProperty
+class MITK_CORE_EXPORT ResliceMethodProperty : public EnumerationProperty
 {
 public:
 
-  mitkClassMacro( ResliceMethodEnumProperty, EnumerationProperty );
-  itkNewMacro(ResliceMethodEnumProperty);
-  mitkNewMacro1Param(ResliceMethodEnumProperty, const IdType&); 
-  mitkNewMacro1Param(ResliceMethodEnumProperty, const std::string&);  
+  mitkClassMacro( ResliceMethodProperty, EnumerationProperty );
+  itkNewMacro(ResliceMethodProperty);
+  mitkNewMacro1Param(ResliceMethodProperty, const IdType&); 
+  mitkNewMacro1Param(ResliceMethodProperty, const std::string&);  
   
 protected:
   
-  ResliceMethodEnumProperty( );  
-  ResliceMethodEnumProperty( const IdType& value );  
-  ResliceMethodEnumProperty( const std::string& value );
+  ResliceMethodProperty( );  
+  ResliceMethodProperty( const IdType& value );  
+  ResliceMethodProperty( const std::string& value );
   
   void AddThickSlicesTypes();
 };

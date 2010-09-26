@@ -32,7 +32,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkAbstractTransformGeometry.h"
 #include "mitkDataNodeFactory.h"
 
-#include "mitkResliceMethodEnumProperty.h"
+#include "mitkResliceMethodProperty.h"
 
 #include <vtkTransform.h>
 #include <vtkGeneralTransform.h>
@@ -547,7 +547,7 @@ mitk::ImageMapperGL2D::GenerateData( mitk::BaseRenderer *renderer )
     DataNode *dn=renderer->GetCurrentWorldGeometry2DNode();
     if(dn)
     {
-      ResliceMethodEnumProperty *resliceMethodEnumProperty=0;
+      ResliceMethodProperty *resliceMethodEnumProperty=0;
       
       if( dn->GetProperty( resliceMethodEnumProperty, "reslice.thickslices" ) && resliceMethodEnumProperty )
         thickSlicesMode = resliceMethodEnumProperty->GetValueAsId(); 

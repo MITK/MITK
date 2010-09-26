@@ -199,7 +199,7 @@ SET(CPP_FILES
   Rendering/mitkMapper2D.cpp
   Rendering/mitkMapper3D.cpp
   Rendering/mitkMapper.cpp
-  Rendering/mitkPointSetMapper2D.cpp
+  Rendering/mitkPointSetGLMapper2D.cpp
   Rendering/mitkPointSetVtkMapper3D.cpp
   Rendering/mitkPolyDataGLMapper2D.cpp
   Rendering/mitkSurfaceMapper2D.cpp

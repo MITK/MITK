@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkCommon.h"
 #include "MitkExtExports.h"
 #include "mitkGLMapper2D.h"
-#include "mitkPointSetMapper2D.h"
+#include "mitkPointSetGLMapper2D.h"
 #include <vtkSystemIncludes.h>
 
 namespace mitk
@@ -54,10 +54,10 @@ class PointSet;
 * - \b "label": StringProperty with a label for this point set
 */
 //## @ingroup Mapper
-class MitkExt_EXPORT SplineMapper2D : public PointSetMapper2D
+class MitkExt_EXPORT SplineMapper2D : public PointSetGLMapper2D
 {
 public:
-  mitkClassMacro ( SplineMapper2D, PointSetMapper2D );
+  mitkClassMacro ( SplineMapper2D, PointSetGLMapper2D );
 
   itkNewMacro ( Self );
 

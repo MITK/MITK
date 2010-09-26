@@ -16,7 +16,7 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 
-#include "mitkPointSetMapper2D.h"
+#include "mitkPointSetGLMapper2D.h"
 #include "mitkPointSet.h"
 #include "mitkPlaneGeometry.h"
 #include "mitkColorProperty.h"
@@ -30,7 +30,7 @@ PURPOSE.  See the above copyright notices for more information.
 //const float selectedColor[]={1.0,0.0,0.6}; //for selected!
 
 
-mitk::PointSetMapper2D::PointSetMapper2D()
+mitk::PointSetGLMapper2D::PointSetGLMapper2D()
 : m_Polygon(false),
   m_ShowPoints(true),
   m_ShowDistances(false),
@@ -42,17 +42,17 @@ mitk::PointSetMapper2D::PointSetMapper2D()
 }
 
 
-mitk::PointSetMapper2D::~PointSetMapper2D()
+mitk::PointSetGLMapper2D::~PointSetGLMapper2D()
 {
 }
 
 
-const mitk::PointSet *mitk::PointSetMapper2D::GetInput(void)
+const mitk::PointSet *mitk::PointSetGLMapper2D::GetInput(void)
 {
   return static_cast<const mitk::PointSet * > ( GetData() );
 }
 
-void mitk::PointSetMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
+void mitk::PointSetGLMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
 {
   GLMapper2D::ApplyProperties( renderer );
 
@@ -95,7 +95,7 @@ static bool makePerpendicularVector2D(const mitk::Vector2D& in, mitk::Vector2D& 
 }
 
 
-void mitk::PointSetMapper2D::Paint( mitk::BaseRenderer *renderer )
+void mitk::PointSetGLMapper2D::Paint( mitk::BaseRenderer *renderer )
 {
 
   const mitk::DataNode* node=GetDataNode();
@@ -481,7 +481,7 @@ void mitk::PointSetMapper2D::Paint( mitk::BaseRenderer *renderer )
   }
 }
 
-void mitk::PointSetMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite)
+void mitk::PointSetGLMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite)
 {
   node->AddProperty( "line width", mitk::IntProperty::New(2), renderer, overwrite ); // width of the line from one point to another
   node->AddProperty( "point line width", mitk::IntProperty::New(1), renderer, overwrite ); //width of the cross marking a point

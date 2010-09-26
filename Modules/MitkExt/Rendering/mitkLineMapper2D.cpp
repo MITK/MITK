@@ -27,7 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkGL.h"
   
 mitk::LineMapper2D::LineMapper2D()
-: mitk::PointSetMapper2D()
+: mitk::PointSetGLMapper2D()
 {
  
 }
@@ -134,6 +134,6 @@ void mitk::LineMapper2D::Paint(mitk::BaseRenderer * renderer)
        j++;
     }
     //drawing the points
-    PointSetMapper2D::Paint(renderer);
+    PointSetGLMapper2D::Paint(renderer);
   }
 }

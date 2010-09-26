@@ -58,7 +58,7 @@ namespace mitk {
  *
  * \section mitkPointSetDisplayOptions
  *
- * The default mappers for this data structure are mitk::PointSetMapper2D and
+ * The default mappers for this data structure are mitk::PointSetGLMapper2D and
  * mitk::PointSetVtkMapper3D. See these classes for display options which can
  * can be set via properties.
  *

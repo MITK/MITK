@@ -55,10 +55,10 @@ class PointSet;
  *
  * @ingroup Mapper
  */
-class MITK_CORE_EXPORT PointSetMapper2D : public GLMapper2D
+class MITK_CORE_EXPORT PointSetGLMapper2D : public GLMapper2D
 {
 public:
-  mitkClassMacro(PointSetMapper2D, GLMapper2D);
+  mitkClassMacro(PointSetGLMapper2D, GLMapper2D);
 
   itkNewMacro(Self);
 
@@ -72,9 +72,9 @@ public:
   static void SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer = NULL, bool overwrite = false);
 
 protected:
-  PointSetMapper2D();
+  PointSetGLMapper2D();
 
-  virtual ~PointSetMapper2D();
+  virtual ~PointSetGLMapper2D();
 
   bool m_Polygon;
   bool m_ShowPoints;

@@ -26,7 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkVtkMapper2D.h"
 #include "mitkVtkMapper3D.h"
 #include "mitkGeometry2DDataVtkMapper3D.h"
-#include "mitkPointSetMapper2D.h"
+#include "mitkPointSetGLMapper2D.h"
 
 #include "mitkImageSliceSelector.h"
 #include "mitkRenderingManager.h"

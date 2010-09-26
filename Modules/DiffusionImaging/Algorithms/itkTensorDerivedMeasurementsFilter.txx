@@ -81,6 +81,11 @@ namespace itk {
           // itk::SymmetricEigenAnalysis defaults are not touched in the tensor implementation
           typename TensorType::EigenValuesArrayType evs;
           tensor.ComputeEigenValues(evs);
+          if (evs[2] == 0)
+          {
+            outputIt.Set(0);
+            break;
+          }
           outputIt.Set(1-(evs[0]+evs[1])/(2*evs[2]));
           break;
         }

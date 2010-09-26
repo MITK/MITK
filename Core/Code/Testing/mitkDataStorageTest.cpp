@@ -33,7 +33,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkNodePredicateDimension.h"
 #include "mitkNodePredicateData.h"
 #include "mitkNodePredicateNOT.h"
-#include "mitkNodePredicateAND.h"
+#include "mitkNodePredicateAnd.h"
 #include "mitkNodePredicateOR.h"
 #include "mitkNodePredicateSource.h"
 #include "mitkMessage.h"
@@ -309,7 +309,7 @@ void TestDataStorage( mitk::DataStorage* ds )
     {
       mitk::NodePredicateDataType::Pointer p1 = mitk::NodePredicateDataType::New("Surface");
       mitk::NodePredicateProperty::Pointer p2 = mitk::NodePredicateProperty::New("color", mitk::ColorProperty::New(color));
-      mitk::NodePredicateAND::Pointer predicate = mitk::NodePredicateAND::New();
+      mitk::NodePredicateAnd::Pointer predicate = mitk::NodePredicateAnd::New();
       predicate->AddPredicate(p1);
       predicate->AddPredicate(p2);  // objects must be of datatype "Surface" and have red color (= n2)
       const mitk::DataStorage::SetOfObjects::ConstPointer all = ds->GetSubset(predicate);

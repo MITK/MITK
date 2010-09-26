@@ -38,7 +38,7 @@ PURPOSE.  See the above copyright notices for more information.
 // MITK includes (general)
 #include "mitkNodePredicateDataType.h"
 #include "mitkNodePredicateDimension.h"
-#include "mitkNodePredicateAND.h"
+#include "mitkNodePredicateAnd.h"
 #include "mitkImageTimeSelector.h"
 #include "mitkVectorImageMapper2D.h"
 #include "mitkProperties.h"
@@ -154,7 +154,7 @@ void QmitkBasicImageProcessing::CreateQtPartControl(QWidget *parent)
     mitk::NodePredicateDimension::Pointer dimensionPredicate = mitk::NodePredicateDimension::New(3);
     mitk::NodePredicateDataType::Pointer imagePredicate = mitk::NodePredicateDataType::New("Image");
     m_Controls->m_ImageSelector2->SetDataStorage(this->GetDefaultDataStorage());
-    m_Controls->m_ImageSelector2->SetPredicate(mitk::NodePredicateAND::New(dimensionPredicate, imagePredicate));
+    m_Controls->m_ImageSelector2->SetPredicate(mitk::NodePredicateAnd::New(dimensionPredicate, imagePredicate));
   }
   m_Controls->gbTwoImageOps->hide();
 

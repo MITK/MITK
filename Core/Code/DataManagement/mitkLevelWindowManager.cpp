@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkNodePredicateBase.h"
 #include "mitkNodePredicateProperty.h"
 #include "mitkNodePredicateDataType.h"
-#include "mitkNodePredicateAND.h"
+#include "mitkNodePredicateAnd.h"
 #include "mitkNodePredicateOR.h"
 #include "mitkNodePredicateNOT.h"
 #include "mitkProperties.h"
@@ -303,7 +303,7 @@ mitk::DataStorage::SetOfObjects::ConstPointer mitk::LevelWindowManager::GetRelev
   predicateTypes->AddPredicate(isTImage);
   predicateTypes->AddPredicate(isQImage);
   
-  mitk::NodePredicateAND::Pointer predicate = mitk::NodePredicateAND::New();
+  mitk::NodePredicateAnd::Pointer predicate = mitk::NodePredicateAnd::New();
   predicate->AddPredicate(notBinary);
   predicate->AddPredicate(hasLevelWindow); 
   predicate->AddPredicate(predicateTypes);

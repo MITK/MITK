@@ -28,7 +28,7 @@
 #include <mitkNodePredicateProperty.h>
 #include <mitkNodePredicateData.h>
 #include <mitkNodePredicateNOT.h>
-#include <mitkNodePredicateAND.h>
+#include <mitkNodePredicateAnd.h>
 #include <mitkDataNodeSelection.h>
 
 #include "mitkPlanarCircle.h"

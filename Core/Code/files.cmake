@@ -84,7 +84,7 @@ SET(CPP_FILES
   DataManagement/mitkMemoryUtilities.cpp
   DataManagement/mitkModalityProperty.cpp
   DataManagement/mitkModeOperation.cpp
-  DataManagement/mitkNodePredicateAND.cpp
+  DataManagement/mitkNodePredicateAnd.cpp
   DataManagement/mitkNodePredicateBase.cpp
   DataManagement/mitkNodePredicateCompositeBase.cpp
   DataManagement/mitkNodePredicateData.cpp

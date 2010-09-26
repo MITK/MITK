@@ -26,7 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkNodePredicateDataType.h"
 #include "mitkNodePredicateProperty.h"
-#include "mitkNodePredicateAND.h"
+#include "mitkNodePredicateAnd.h"
 #include "mitkProperties.h"
 
 #include <QtCore>

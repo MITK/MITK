@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkNodeDescriptor.h"
 #include <memory>
 #include <mitkNodePredicateProperty.h>
-#include <mitkNodePredicateAND.h>
+#include <mitkNodePredicateAnd.h>
 #include <mitkNodePredicateDataType.h>
 #include <mitkProperties.h>
 

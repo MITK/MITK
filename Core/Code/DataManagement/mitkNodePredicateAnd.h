@@ -30,18 +30,18 @@ namespace mitk {
     //## 
     //## 
     //## @ingroup DataStorage
-    class MITK_CORE_EXPORT NodePredicateAND : public NodePredicateCompositeBase
+    class MITK_CORE_EXPORT NodePredicateAnd : public NodePredicateCompositeBase
     {
     public:
-      mitkClassMacro(NodePredicateAND, NodePredicateCompositeBase);
+      mitkClassMacro(NodePredicateAnd, NodePredicateCompositeBase);
 
-      itkFactorylessNewMacro(NodePredicateAND);
-      mitkNewMacro2Param(NodePredicateAND, const NodePredicateBase*, const NodePredicateBase*);
-      mitkNewMacro3Param(NodePredicateAND, const NodePredicateBase*, const NodePredicateBase*, const NodePredicateBase*);
+      itkFactorylessNewMacro(NodePredicateAnd);
+      mitkNewMacro2Param(NodePredicateAnd, const NodePredicateBase*, const NodePredicateBase*);
+      mitkNewMacro3Param(NodePredicateAnd, const NodePredicateBase*, const NodePredicateBase*, const NodePredicateBase*);
 
       //##Documentation
       //## @brief Standard Destructor
-      virtual ~NodePredicateAND();
+      virtual ~NodePredicateAnd();
 
       //##Documentation
       //## @brief Checks, if the node fulfills all of the subpredicates conditions
@@ -49,17 +49,17 @@ namespace mitk {
     protected:
       //##Documentation
       //## @brief Protected constructor, use static instantiation functions instead
-      NodePredicateAND();
+      NodePredicateAnd();
 
       //##Documentation
       //## @brief Convenience constructor that adds p1 and p2 to list of child predicates
       //## Protected constructor, use static instantiation functions instead
-      NodePredicateAND(const NodePredicateBase* p1, const NodePredicateBase* p2);
+      NodePredicateAnd(const NodePredicateBase* p1, const NodePredicateBase* p2);
   
       //##Documentation
       //## @brief Convenience constructor that adds p1, p2 and p3 to list of child predicates
       //## Protected constructor, use static instantiation functions instead
-      NodePredicateAND(const NodePredicateBase* p1, const NodePredicateBase* p2, const NodePredicateBase* p3);
+      NodePredicateAnd(const NodePredicateBase* p1, const NodePredicateBase* p2, const NodePredicateBase* p3);
     };
 
 } // namespace mitk

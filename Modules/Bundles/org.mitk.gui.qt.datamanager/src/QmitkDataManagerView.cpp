@@ -35,7 +35,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkNodePredicateProperty.h"
 #include "mitkEnumerationProperty.h"
 #include "mitkProperties.h"
-#include <mitkNodePredicateAND.h>
+#include <mitkNodePredicateAnd.h>
 #include <mitkITKImageImport.h>
 #include <mitkIDataStorageService.h>
 //## Qmitk

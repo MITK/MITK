@@ -16,7 +16,7 @@
  =========================================================================*/
 #include <mitkStringProperty.h>
 #include <mitkNodePredicateFirstLevel.h>
-#include <mitkNodePredicateAND.h>
+#include <mitkNodePredicateAnd.h>
 #include <mitkNodePredicateData.h>
 #include <mitkNodePredicateNOT.h>
 #include <mitkNodePredicateProperty.h>
@@ -50,7 +50,7 @@ QmitkDataStorageTreeModel::QmitkDataStorageTreeModel( mitk::DataStorage* _DataSt
   mitk::NodePredicateNOT::Pointer isNotHelperObject
     = mitk::NodePredicateNOT::New(isHelperObject);// Show only nodes that really contain dat
 
-  mitk::NodePredicateAND::Pointer dataIsNotNullAndIsNotHelperObject = mitk::NodePredicateAND::New(dataIsNotNull,
+  mitk::NodePredicateAnd::Pointer dataIsNotNullAndIsNotHelperObject = mitk::NodePredicateAnd::New(dataIsNotNull,
     isNotHelperObject);
 
   m_Predicate = dataIsNotNullAndIsNotHelperObject;

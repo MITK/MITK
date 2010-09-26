@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkNodeDescriptorManager.h"
 #include <memory>
 #include <mitkNodePredicateProperty.h>
-#include <mitkNodePredicateAND.h>
+#include <mitkNodePredicateAnd.h>
 #include <mitkNodePredicateNOT.h>
 #include <mitkNodePredicateDataType.h>
 #include <mitkProperties.h>
@@ -48,7 +48,7 @@ void QmitkNodeDescriptorManager::Initialize()
 
   // Adding "Image Masks"
   mitk::NodePredicateProperty::Pointer isBinary = mitk::NodePredicateProperty::New("binary", mitk::BoolProperty::New(true));
-  mitk::NodePredicateAND::Pointer isBinaryImage = mitk::NodePredicateAND::New(isBinary, isImage);
+  mitk::NodePredicateAnd::Pointer isBinaryImage = mitk::NodePredicateAnd::New(isBinary, isImage);
   this->AddDescriptor(new QmitkNodeDescriptor(tr("ImageMask"), QString(":/Qmitk/Binaerbilder_48.png"), isBinaryImage, this));
 
   // Adding "PointSet"
@@ -61,7 +61,7 @@ void QmitkNodeDescriptorManager::Initialize()
 
   // Adding "NoneBinaryImages"
   mitk::NodePredicateNOT::Pointer isNotBinary = mitk::NodePredicateNOT::New(isBinary);
-  mitk::NodePredicateAND::Pointer isNoneBinaryImage = mitk::NodePredicateAND::New(isImage, isNotBinary);
+  mitk::NodePredicateAnd::Pointer isNoneBinaryImage = mitk::NodePredicateAnd::New(isImage, isNotBinary);
   this->AddDescriptor(new QmitkNodeDescriptor(tr("NoneBinaryImage"), QString(":/Qmitk/Images_48.png"), isNoneBinaryImage, this));
 
 }

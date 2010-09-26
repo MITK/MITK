@@ -31,7 +31,7 @@ mitk::Tool::Tool(const char* type)
   m_PredicateDim3(NodePredicateDimension::New(3, 1)),
   m_PredicateDim4(NodePredicateDimension::New(4, 1)),
   m_PredicateDimension( mitk::NodePredicateOR::New(m_PredicateDim3, m_PredicateDim4) ),
-  m_PredicateImage3D( NodePredicateAND::New(m_PredicateImages, m_PredicateDimension) ),
+  m_PredicateImage3D( NodePredicateAnd::New(m_PredicateImages, m_PredicateDimension) ),
 
   m_PredicateBinary(NodePredicateProperty::New("binary", BoolProperty::New(true))),
   m_PredicateNotBinary( NodePredicateNOT::New(m_PredicateBinary) ),
@@ -42,14 +42,14 @@ mitk::Tool::Tool(const char* type)
   m_PredicateHelper(NodePredicateProperty::New("helper object", BoolProperty::New(true))),
   m_PredicateNotHelper( NodePredicateNOT::New(m_PredicateHelper) ),
   
-  m_PredicateImageColorful( NodePredicateAND::New(m_PredicateNotBinary, m_PredicateNotSegmentation) ),
+  m_PredicateImageColorful( NodePredicateAnd::New(m_PredicateNotBinary, m_PredicateNotSegmentation) ),
 
-  m_PredicateImageColorfulNotHelper( NodePredicateAND::New(m_PredicateImageColorful, m_PredicateNotHelper) ),
+  m_PredicateImageColorfulNotHelper( NodePredicateAnd::New(m_PredicateImageColorful, m_PredicateNotHelper) ),
   
-  m_PredicateReference( NodePredicateAND::New(m_PredicateImage3D, m_PredicateImageColorfulNotHelper) ),
+  m_PredicateReference( NodePredicateAnd::New(m_PredicateImage3D, m_PredicateImageColorfulNotHelper) ),
 
   // for working image
-  m_IsSegmentationPredicate(NodePredicateAND::New(NodePredicateOR::New(m_PredicateBinary, m_PredicateSegmentation), m_PredicateNotHelper))
+  m_IsSegmentationPredicate(NodePredicateAnd::New(NodePredicateOR::New(m_PredicateBinary, m_PredicateSegmentation), m_PredicateNotHelper))
 {
 }
 

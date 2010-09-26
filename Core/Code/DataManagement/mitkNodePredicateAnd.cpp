@@ -15,16 +15,16 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#include "mitkNodePredicateAND.h"
+#include "mitkNodePredicateAnd.h"
 
 
-mitk::NodePredicateAND::NodePredicateAND()
+mitk::NodePredicateAnd::NodePredicateAnd()
 : NodePredicateCompositeBase()
 {
 }
 
 
-mitk::NodePredicateAND::NodePredicateAND(const NodePredicateBase* p1, const NodePredicateBase* p2)
+mitk::NodePredicateAnd::NodePredicateAnd(const NodePredicateBase* p1, const NodePredicateBase* p2)
 : NodePredicateCompositeBase()
 {
   this->AddPredicate(p1);
@@ -32,7 +32,7 @@ mitk::NodePredicateAND::NodePredicateAND(const NodePredicateBase* p1, const Node
 }
 
 
-mitk::NodePredicateAND::NodePredicateAND(const NodePredicateBase* p1, const NodePredicateBase* p2, const NodePredicateBase* p3)
+mitk::NodePredicateAnd::NodePredicateAnd(const NodePredicateBase* p1, const NodePredicateBase* p2, const NodePredicateBase* p3)
 : NodePredicateCompositeBase()
 {
   this->AddPredicate(p1);
@@ -41,18 +41,18 @@ mitk::NodePredicateAND::NodePredicateAND(const NodePredicateBase* p1, const Node
 }
 
 
-mitk::NodePredicateAND::~NodePredicateAND()
+mitk::NodePredicateAnd::~NodePredicateAnd()
 {
 }
 
 
-bool mitk::NodePredicateAND::CheckNode(const mitk::DataNode* node) const
+bool mitk::NodePredicateAnd::CheckNode(const mitk::DataNode* node) const
 {
   if (m_ChildPredicates.empty())
-    throw std::invalid_argument("NodePredicateAND: no child predicates available");
+    throw std::invalid_argument("NodePredicateAnd: no child predicates available");
 
   if (node == NULL)
-    throw std::invalid_argument("NodePredicateAND: invalid node");
+    throw std::invalid_argument("NodePredicateAnd: invalid node");
 
   // return the conjunction of the child predicate. If any predicate returns false, we return false too
   for (ChildPredicates::const_iterator it = m_ChildPredicates.begin();  ( it != m_ChildPredicates.end() ); ++it)

@@ -30,7 +30,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkNodePredicateProperty.h"
 #include "mitkNodePredicateDataType.h"
 #include "mitkNodePredicateDimension.h"
-#include "mitkNodePredicateAND.h"
+#include "mitkNodePredicateAnd.h"
 #include "mitkNodePredicateOR.h"
 #include "mitkNodePredicateNOT.h"
 
@@ -188,7 +188,7 @@ namespace mitk
     NodePredicateDimension::Pointer m_PredicateDim3;
     NodePredicateDimension::Pointer m_PredicateDim4;
     NodePredicateOR::Pointer m_PredicateDimension;
-    NodePredicateAND::Pointer m_PredicateImage3D;
+    NodePredicateAnd::Pointer m_PredicateImage3D;
 
     NodePredicateProperty::Pointer m_PredicateBinary;
     NodePredicateNOT::Pointer m_PredicateNotBinary;
@@ -199,14 +199,14 @@ namespace mitk
     NodePredicateProperty::Pointer m_PredicateHelper;
     NodePredicateNOT::Pointer m_PredicateNotHelper;
 
-    NodePredicateAND::Pointer m_PredicateImageColorful;
+    NodePredicateAnd::Pointer m_PredicateImageColorful;
 
-    NodePredicateAND::Pointer m_PredicateImageColorfulNotHelper;
+    NodePredicateAnd::Pointer m_PredicateImageColorfulNotHelper;
 
-    NodePredicateAND::Pointer m_PredicateReference;
+    NodePredicateAnd::Pointer m_PredicateReference;
 
     // for working data
-    NodePredicateAND::Pointer m_IsSegmentationPredicate;
+    NodePredicateAnd::Pointer m_IsSegmentationPredicate;
 
   };
 

@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkNodePredicateProperty.h"
 #include "mitkNodePredicateDataType.h"
 #include "mitkNodePredicateDimension.h"
-#include "mitkNodePredicateAND.h"
+#include "mitkNodePredicateAnd.h"
 #include "mitkNodePredicateOR.h"
 #include "mitkNodePredicateNOT.h"
 
@@ -165,7 +165,7 @@ mitk::NodePredicateBase::ConstPointer QmitkToolReferenceDataSelectionBox::GetAll
         }
         else
         {
-          m_Predicates.push_back( mitk::NodePredicateAND::New( completePredicate, tool->GetReferenceDataPreference() ).GetPointer() );
+          m_Predicates.push_back( mitk::NodePredicateAnd::New( completePredicate, tool->GetReferenceDataPreference() ).GetPointer() );
         }
         completePredicate = m_Predicates.back();
       }

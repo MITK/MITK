@@ -32,7 +32,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkNodePredicateProperty.h"
 #include "mitkNodePredicateDataType.h"
-#include "mitkNodePredicateAND.h"
+#include "mitkNodePredicateAnd.h"
 #include "mitkNodePredicateNOT.h"
 #include "mitkGroupTagProperty.h"
 
@@ -87,7 +87,7 @@ void QmitkIGTRecorderView::CreateQtPartControl(QWidget *parent)
     m_Controls = new Ui::QmitkIGTRecorderControls;
     m_Controls->setupUi(parent);
     m_ConfigWidget = new QmitkNDIConfigurationWidget(parent);
-    mitk::NodePredicateAND::Pointer pred = mitk::NodePredicateAND::New(
+    mitk::NodePredicateAnd::Pointer pred = mitk::NodePredicateAnd::New(
       mitk::NodePredicateNOT::New(mitk::NodePredicateProperty::New("already Assigned")), 
       mitk::NodePredicateDataType::New("Surface"));  // does not have assigned tag and is surface
     m_ConfigWidget->SetDataStorage(this->GetDefaultDataStorage());

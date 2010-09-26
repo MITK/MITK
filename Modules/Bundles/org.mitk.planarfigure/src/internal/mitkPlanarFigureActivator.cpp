@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkNodeDescriptorManager.h"
 #include "mitkNodePredicateDataType.h"
 #include "mitkNodePredicateProperty.h"
-#include "mitkNodePredicateAND.h"
+#include "mitkNodePredicateAnd.h"
 
 
 void
@@ -57,7 +57,7 @@ mitk::PlanarFigureActivator::Start(berry::IBundleContext::Pointer /*context*/)
   
   // Adding "PlanarPath"
   mitk::NodePredicateProperty::Pointer isNotClosedPolygon = mitk::NodePredicateProperty::New("ClosedPlanarPolygon", mitk::BoolProperty::New(false));
-  mitk::NodePredicateAND::Pointer isPlanarPath = mitk::NodePredicateAND::New(isNotClosedPolygon, isPlanarPolygon);
+  mitk::NodePredicateAnd::Pointer isPlanarPath = mitk::NodePredicateAnd::New(isNotClosedPolygon, isPlanarPolygon);
   descriptorManager->AddDescriptor(new QmitkNodeDescriptor(QObject::tr("PlanarPath"), QString(":/QmitkExt/PlanarPath_48.png"), isPlanarPath, descriptorManager));
 
 }

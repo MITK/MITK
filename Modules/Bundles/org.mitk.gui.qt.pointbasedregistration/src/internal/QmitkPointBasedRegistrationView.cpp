@@ -43,7 +43,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkPointSetReader.h>
 #include "mitkNodePredicateDataType.h"
 #include "mitkNodePredicateProperty.h"
-#include "mitkNodePredicateAND.h"
+#include "mitkNodePredicateAnd.h"
 #include "mitkNodePredicateNOT.h"
 #include <mitkMessage.h>
 
@@ -116,8 +116,8 @@ struct SelListenerPointBasedRegistration : ISelectionListener
             mitk::NodePredicateNOT::Pointer notPointSet = mitk::NodePredicateNOT::New(isPointSet);
             mitk::TNodePredicateDataType<mitk::Geometry2DData>::Pointer isGeometry2DData(mitk::TNodePredicateDataType<mitk::Geometry2DData>::New());
             mitk::NodePredicateNOT::Pointer notGeometry2DData = mitk::NodePredicateNOT::New(isGeometry2DData);
-            mitk::NodePredicateAND::Pointer notPointSetAndNotGeometry2DData = mitk::NodePredicateAND::New( notPointSet, notGeometry2DData );
-            mitk::NodePredicateAND::Pointer predicate = mitk::NodePredicateAND::New( isBaseData, notPointSetAndNotGeometry2DData );
+            mitk::NodePredicateAnd::Pointer notPointSetAndNotGeometry2DData = mitk::NodePredicateAnd::New( notPointSet, notGeometry2DData );
+            mitk::NodePredicateAnd::Pointer predicate = mitk::NodePredicateAnd::New( isBaseData, notPointSetAndNotGeometry2DData );
 
 
             mitk::DataStorage::SetOfObjects::ConstPointer setOfObjects = m_View->GetDataStorage()->GetSubset(predicate);

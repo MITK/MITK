@@ -75,7 +75,7 @@ class GlobalInteraction;
  * appropriate event issueing for controlling the update execution process.
  * See method documentation for a description of how this can be done.
  *
- * \sa GenericRenderingManager An "empty" RenderingManager implementation which
+ * \sa TestingRenderingManager An "empty" RenderingManager implementation which
  * can be used in tests etc.
  *
  */
@@ -388,10 +388,10 @@ itkEventMacro( RenderingManagerViewsInitializedEvent, RenderingManagerEvent );
  * RenderingManagerFactory is instantiated explicitly thereafter.
  * (see mitkRenderingManager.cpp)
  */
-class MITK_CORE_EXPORT GenericRenderingManager : public RenderingManager
+class MITK_CORE_EXPORT TestingRenderingManager : public RenderingManager
 {
 public:
-  mitkClassMacro(GenericRenderingManager,RenderingManager);
+  mitkClassMacro(TestingRenderingManager,RenderingManager);
   itkNewMacro(Self);
 
 protected:

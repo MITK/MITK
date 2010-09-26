@@ -63,7 +63,7 @@ private:
 };
 
 /**
- * Factory for the GenericRenderingManager
+ * Factory for the TestingRenderingManager
  */
 class MITK_CORE_EXPORT GenericRenderingManagerFactory : public RenderingManagerFactory
 {
@@ -80,7 +80,7 @@ public:
 
   virtual mitk::RenderingManager::Pointer CreateRenderingManager() const
   {
-    GenericRenderingManager::Pointer specificSmartPtr = GenericRenderingManager::New();
+    TestingRenderingManager::Pointer specificSmartPtr = TestingRenderingManager::New();
     RenderingManager::Pointer smartPtr = specificSmartPtr.GetPointer();
     return smartPtr;
   };

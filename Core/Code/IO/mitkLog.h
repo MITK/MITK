@@ -27,7 +27,7 @@ namespace mitk
   /*!
     \brief mbilog backend implementation for mitk
    */
-  class MITK_CORE_EXPORT LogBackend : public mbilog::AbstractBackend
+  class MITK_CORE_EXPORT LoggingBackend : public mbilog::AbstractBackend
   {
     public:
       

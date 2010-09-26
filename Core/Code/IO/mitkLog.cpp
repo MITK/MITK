@@ -24,18 +24,18 @@ PURPOSE.  See the above copyright notices for more information.
 #include <fstream>
 
 static itk::SimpleFastMutexLock logMutex;
-static mitk::LogBackend *mitkLogBackend = 0;
+static mitk::LoggingBackend *mitkLogBackend = 0;
 static std::ofstream *logFile = 0;
 static std::stringstream *outputWindow = 0;
 static bool logOutputWindow = false;
 
-void mitk::LogBackend::EnableAdditionalConsoleWindow(bool enable)
+void mitk::LoggingBackend::EnableAdditionalConsoleWindow(bool enable)
 {
   logOutputWindow = enable;
 }
 
 
-void mitk::LogBackend::ProcessMessage(const mbilog::LogMessage& l )
+void mitk::LoggingBackend::ProcessMessage(const mbilog::LogMessage& l )
 {
   logMutex.Lock();
   #ifdef _WIN32
@@ -68,15 +68,15 @@ void mitk::LogBackend::ProcessMessage(const mbilog::LogMessage& l )
   logMutex.Unlock();
 }
 
-void mitk::LogBackend::Register()
+void mitk::LoggingBackend::Register()
 {
   if(mitkLogBackend)
     return;
-  mitkLogBackend = new mitk::LogBackend();
+  mitkLogBackend = new mitk::LoggingBackend();
   mbilog::RegisterBackend( mitkLogBackend );
 }
 
-void mitk::LogBackend::Unregister()
+void mitk::LoggingBackend::Unregister()
 {
   if(mitkLogBackend)
   {
@@ -87,7 +87,7 @@ void mitk::LogBackend::Unregister()
   }
 }
 
-void mitk::LogBackend::SetLogFile(const char *file)
+void mitk::LoggingBackend::SetLogFile(const char *file)
 {
   logMutex.Lock();
   if(logFile)
@@ -118,7 +118,7 @@ void mitk::LogBackend::SetLogFile(const char *file)
   logMutex.Unlock();
 }
 
-void mitk::LogBackend::CatchLogFileCommandLineParameter(int &argc,char **argv)
+void mitk::LoggingBackend::CatchLogFileCommandLineParameter(int &argc,char **argv)
 {
   int r;
 
@@ -133,7 +133,7 @@ void mitk::LogBackend::CatchLogFileCommandLineParameter(int &argc,char **argv)
         return;
       }
 
-      mitk::LogBackend::SetLogFile(argv[r+1]);
+      mitk::LoggingBackend::SetLogFile(argv[r+1]);
      
       for(r+=2;r<argc;r++)
         argv[r-2]=argv[r];

@@ -451,10 +451,10 @@ IF(BUILD_TESTING AND MODULE_IS_ENABLED)
     QT4_WRAP_CPP(MODULE_TEST_GENERATED_MOC_CPP ${MOC_H_FILES})
   ENDIF(DEFINED MOC_H_FILES)
    
-  SET(CMAKE_TESTDRIVER_BEFORE_TESTMAIN "mitk::LogBackend::Register(); ${MODULE_TEST_EXTRA_DRIVER_INIT};")
-  SET(CMAKE_TESTDRIVER_AFTER_TESTMAIN "mitk::LogBackend::Unregister();")
+  SET(CMAKE_TESTDRIVER_BEFORE_TESTMAIN "mitk::LoggingBackend::Register(); ${MODULE_TEST_EXTRA_DRIVER_INIT};")
+  SET(CMAKE_TESTDRIVER_AFTER_TESTMAIN "mitk::LoggingBackend::Unregister();")
   IF(NOT MODULE_TEST_EXTRA_DRIVER_INCLUDE)
-    # this is necessary to make the LogBackend calls available if nothing else is included
+    # this is necessary to make the LoggingBackend calls available if nothing else is included
     SET(MODULE_TEST_EXTRA_DRIVER_INCLUDE "mitkLog.h")
   ENDIF(NOT MODULE_TEST_EXTRA_DRIVER_INCLUDE)
   CREATE_TEST_SOURCELIST(MODULETEST_SOURCE ${MODULE_NAME}TestDriver.cpp 

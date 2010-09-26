@@ -26,7 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "berryIEditorPart.h"
 #include "berryIWorkbenchPage.h"
 
-#include "mitkShaderEnumProperty.h"
+#include "mitkShaderProperty.h"
 #include "mitkShaderRepository.h"
 
 #include "QmitkDataStorageComboBox.h"
@@ -143,7 +143,7 @@ void QmitkMITKSurfaceMaterialEditorView::RefreshPropertiesList()
   {
     mitk::PropertyList* SrcPL = SrcND->GetPropertyList();
     
-    mitk::ShaderEnumProperty::Pointer shaderEnum = dynamic_cast<mitk::ShaderEnumProperty*>(SrcPL->GetProperty("shader"));
+    mitk::ShaderProperty::Pointer shaderEnum = dynamic_cast<mitk::ShaderProperty*>(SrcPL->GetProperty("shader"));
     
     std::string shaderState = "fixed";
     

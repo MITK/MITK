@@ -26,7 +26,7 @@ namespace mitk
 /**
  * Encapsulates the shader enumeration
  */
-class MITK_CORE_EXPORT ShaderEnumProperty : public EnumerationProperty
+class MITK_CORE_EXPORT ShaderProperty : public EnumerationProperty
 {
 public:
 
@@ -35,13 +35,13 @@ public:
     std::string name;
   };
   
-  mitkClassMacro( ShaderEnumProperty, EnumerationProperty );
+  mitkClassMacro( ShaderProperty, EnumerationProperty );
   
-  itkNewMacro(ShaderEnumProperty);
+  itkNewMacro(ShaderProperty);
   
-  mitkNewMacro1Param(ShaderEnumProperty, const IdType&);
+  mitkNewMacro1Param(ShaderProperty, const IdType&);
   
-  mitkNewMacro1Param(ShaderEnumProperty, const std::string&);
+  mitkNewMacro1Param(ShaderProperty, const std::string&);
   
   /**
    * Returns the current scalar mode value as defined by VTK constants.
@@ -59,21 +59,21 @@ protected:
   /**
    * Constructor. Sets the representation to a default value of surface(2)
    */
-  ShaderEnumProperty( );
+  ShaderProperty( );
   
   /**
    * \brief Sets the scalar mode to the given value. If it is not
    * valid, the scalar mode is set to default (0).
    * @param value the integer representation of the scalar mode
    */
-  ShaderEnumProperty( const IdType& value );
+  ShaderProperty( const IdType& value );
   
   /**
    * \brief Sets the scalar mode to the given value. If it is not
    * valid, the representation is set to default (0).
    * @param value the string representation of the scalar mode
    */
-  ShaderEnumProperty( const std::string& value );
+  ShaderProperty( const std::string& value );
   
    /**
    * this function is overridden as protected, so that the user may not add

@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define SR_ERROR MITK_ERROR("shader.repository")
 
 #include "mitkShaderRepository.h"
-#include "mitkShaderEnumProperty.h"
+#include "mitkShaderProperty.h"
 #include "mitkProperties.h"
 
 #include <vtkProperty.h>
@@ -242,7 +242,7 @@ void mitk::ShaderRepository::Shader::Uniform::LoadFromXML(vtkXMLDataElement *y)
 
 void mitk::ShaderRepository::AddDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite)
 {
-  node->AddProperty( "shader", mitk::ShaderEnumProperty::New(), renderer, overwrite );
+  node->AddProperty( "shader", mitk::ShaderProperty::New(), renderer, overwrite );
     
   std::list<Shader::Pointer>::const_iterator i = shaders.begin();
   
@@ -305,7 +305,7 @@ void mitk::ShaderRepository::ApplyProperties(mitk::DataNode* node, vtkActor *act
   
   unsigned long ts = MTime.GetMTime();
   
-  mitk::ShaderEnumProperty *sep=(mitk::ShaderEnumProperty *)node->GetProperty("shader",renderer);
+  mitk::ShaderProperty *sep=(mitk::ShaderProperty *)node->GetProperty("shader",renderer);
 
   if(!sep)
   {

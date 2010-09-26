@@ -16,32 +16,32 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include <vtkAbstractMapper.h>
-#include "mitkShaderEnumProperty.h"
+#include "mitkShaderProperty.h"
 #include "mitkShaderRepository.h"
 
 #include <itkDirectory.h>
 #include <itksys/SystemTools.hxx>
 
-mitk::ShaderEnumProperty::ShaderEnumProperty( )
+mitk::ShaderProperty::ShaderProperty( )
 {
   AddShaderTypes();
   SetShader( (IdType)0 );
 }
 
-mitk::ShaderEnumProperty::ShaderEnumProperty( const IdType& value )
+mitk::ShaderProperty::ShaderProperty( const IdType& value )
 {
   AddShaderTypes();
   SetShader(value);
 }
 
-mitk::ShaderEnumProperty::ShaderEnumProperty( const std::string& value )
+mitk::ShaderProperty::ShaderProperty( const std::string& value )
 {
   AddShaderTypes();
   SetShader(value);
 }
 
 
-void mitk::ShaderEnumProperty::SetShader( const IdType& value )
+void mitk::ShaderProperty::SetShader( const IdType& value )
 {
   if ( IsValidEnumerationValue( value ) )
     SetValue( value );
@@ -49,7 +49,7 @@ void mitk::ShaderEnumProperty::SetShader( const IdType& value )
     SetValue( (IdType)0 );
 }
 
-void mitk::ShaderEnumProperty::SetShader( const std::string& value )
+void mitk::ShaderProperty::SetShader( const std::string& value )
 {
   if ( IsValidEnumerationValue( value ) )
     SetValue( value );
@@ -57,18 +57,18 @@ void mitk::ShaderEnumProperty::SetShader( const std::string& value )
     SetValue( (IdType)0 );
 }
 
-mitk::EnumerationProperty::IdType mitk::ShaderEnumProperty::GetShaderId()
+mitk::EnumerationProperty::IdType mitk::ShaderProperty::GetShaderId()
 {
   return GetValueAsId();
 }
 
-std::string mitk::ShaderEnumProperty::GetShaderName()
+std::string mitk::ShaderProperty::GetShaderName()
 {
   return GetValueAsString();
 }
   
 
-void mitk::ShaderEnumProperty::AddShaderTypes()
+void mitk::ShaderProperty::AddShaderTypes()
 {  
   AddEnum( "fixed" );
   
@@ -84,7 +84,7 @@ void mitk::ShaderEnumProperty::AddShaderTypes()
   }
 }
 
-bool mitk::ShaderEnumProperty::AddEnum( const std::string& name )
+bool mitk::ShaderProperty::AddEnum( const std::string& name )
 {
   Element e;
   

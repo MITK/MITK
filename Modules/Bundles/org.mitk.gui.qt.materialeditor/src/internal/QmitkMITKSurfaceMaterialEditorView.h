@@ -39,7 +39,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkCommon.h"
 #include "mitkDataStorage.h"
 #include "mitkDataNode.h"
-#include "mitkShaderEnumProperty.h"
+#include "mitkShaderProperty.h"
 #include "mitkSurface.h"
 #include "vtkRenderer.h"
 #include "vtkTextActor.h"
@@ -100,7 +100,7 @@ private:
   
   unsigned long observerIndex;
   bool observerAllocated;
-  mitk::ShaderEnumProperty::Pointer observedProperty;
+  mitk::ShaderProperty::Pointer observedProperty;
    
   void InitPreviewWindow();
 

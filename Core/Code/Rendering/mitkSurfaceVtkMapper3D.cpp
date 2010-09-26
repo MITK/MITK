@@ -26,7 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkVtkScalarModeProperty.h"
 #include "mitkClippingProperty.h"
 
-#include "mitkShaderEnumProperty.h"
+#include "mitkShaderProperty.h"
 #include "mitkShaderRepository.h"
 
 

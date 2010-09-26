@@ -35,7 +35,7 @@ PURPOSE.  See the above copyright notices for more information.
 //#include <mitkOdfNormalizationMethodProperty.h>
 //#include <mitkOdfScaleByProperty.h>
 #include <mitkPlaneOrientationProperty.h>
-#include <mitkShaderEnumProperty.h>
+#include <mitkShaderProperty.h>
 #include <mitkVtkInterpolationProperty.h>
 #include <mitkVtkRepresentationProperty.h>
 #include <mitkVtkResliceInterpolationProperty.h>
@@ -119,7 +119,7 @@ int mitkPropertySerializationTest(int /* argc */, char* /*argv*/[])
   //propList->SetProperty("OdfNormalizationMethodProperty", mitk::OdfNormalizationMethodProperty::New("Global Maximum"));
   //propList->SetProperty("OdfScaleByProperty", mitk::OdfScaleByProperty::New("Principal Curvature"));
   propList->SetProperty("PlaneOrientationProperty", mitk::PlaneOrientationProperty::New("Arrows in positive direction"));
-  propList->SetProperty("ShaderEnumProperty", mitk::ShaderEnumProperty::New("fixed"));
+  propList->SetProperty("ShaderProperty", mitk::ShaderProperty::New("fixed"));
   propList->SetProperty("VtkInterpolationProperty", mitk::VtkInterpolationProperty::New("Gouraud"));
   propList->SetProperty("VtkRepresentationProperty", mitk::VtkRepresentationProperty::New("Surface"));
   propList->SetProperty("VtkResliceInterpolationProperty", mitk::VtkResliceInterpolationProperty::New("Cubic"));

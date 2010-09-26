@@ -28,7 +28,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkOrganTypeProperty.h"
 */
 #include "mitkPlaneOrientationProperty.h"
-#include "mitkShaderEnumProperty.h"
+#include "mitkShaderProperty.h"
 #include "mitkVtkInterpolationProperty.h"
 #include "mitkVtkRepresentationProperty.h"
 #include "mitkVtkResliceInterpolationProperty.h"
@@ -78,7 +78,7 @@ MITK_REGISTER_ENUM_SUB_DESERIALIZER(GridVolumeMapperProperty);
 MITK_REGISTER_ENUM_SUB_DESERIALIZER(OrganTypeProperty);
 */
 MITK_REGISTER_ENUM_SUB_DESERIALIZER(PlaneOrientationProperty);
-MITK_REGISTER_ENUM_SUB_DESERIALIZER(ShaderEnumProperty);
+MITK_REGISTER_ENUM_SUB_DESERIALIZER(ShaderProperty);
 MITK_REGISTER_ENUM_SUB_DESERIALIZER(VtkInterpolationProperty);
 MITK_REGISTER_ENUM_SUB_DESERIALIZER(VtkRepresentationProperty);
 MITK_REGISTER_ENUM_SUB_DESERIALIZER(VtkResliceInterpolationProperty);

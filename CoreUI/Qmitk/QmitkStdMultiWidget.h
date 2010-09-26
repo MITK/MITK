@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkDisplayVectorInteractor.h"
 #include "mitkSlicesRotator.h"
 #include "mitkSlicesSwiveller.h"
-#include "mitkColoredRectangleRendering.h"
+#include "mitkRenderWindowFrame.h"
 #include "mitkLogoRendering.h"
 #include "mitkGradientBackground.h"
 #include "mitkCoordinateSupplier.h"
@@ -249,10 +249,10 @@ protected:
   int m_Layout;
   int m_PlaneMode;
 
-  mitk::ColoredRectangleRendering::Pointer m_RectangleRendering3;
-  mitk::ColoredRectangleRendering::Pointer m_RectangleRendering2;
-  mitk::ColoredRectangleRendering::Pointer m_RectangleRendering1;
-  mitk::ColoredRectangleRendering::Pointer m_RectangleRendering4;
+  mitk::RenderWindowFrame::Pointer m_RectangleRendering3;
+  mitk::RenderWindowFrame::Pointer m_RectangleRendering2;
+  mitk::RenderWindowFrame::Pointer m_RectangleRendering1;
+  mitk::RenderWindowFrame::Pointer m_RectangleRendering4;
 
   mitk::LogoRendering::Pointer m_LogoRendering1;
   mitk::LogoRendering::Pointer m_LogoRendering2;

@@ -41,11 +41,11 @@ namespace mitk {
  * vtkProp (vtkMitkRectangleProp).
  * This class instantiates the vtkProp and a corresponding vtkRenderer instance. 
  */
-class MITK_CORE_EXPORT ColoredRectangleRendering : public BaseData
+class MITK_CORE_EXPORT RenderWindowFrame : public BaseData
 {
 public:
 
-  mitkClassMacro( ColoredRectangleRendering, BaseData );
+  mitkClassMacro( RenderWindowFrame, BaseData );
   itkNewMacro( Self );
 
   /**
@@ -116,12 +116,12 @@ protected:
   /**
    * Constructor
    */
-  ColoredRectangleRendering();
+  RenderWindowFrame();
 
   /**
    * Destructor
    */
-  ~ColoredRectangleRendering();
+  ~RenderWindowFrame();
   
   vtkRenderWindow*    m_RenderWindow;
   vtkRenderer*        m_RectangleRenderer;

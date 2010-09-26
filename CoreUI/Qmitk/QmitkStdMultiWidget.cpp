@@ -396,22 +396,22 @@ void QmitkStdMultiWidget::InitializeWidget()
     mitkWidget4->GetRenderWindow() );
   m_LogoRendering4->Enable();
 
-  m_RectangleRendering1 = mitk::ColoredRectangleRendering::New();
+  m_RectangleRendering1 = mitk::RenderWindowFrame::New();
   m_RectangleRendering1->SetRenderWindow(
     mitkWidget1->GetRenderWindow() );
   m_RectangleRendering1->Enable(1.0,0.0,0.0);
 
-  m_RectangleRendering2 = mitk::ColoredRectangleRendering::New();
+  m_RectangleRendering2 = mitk::RenderWindowFrame::New();
   m_RectangleRendering2->SetRenderWindow(
     mitkWidget2->GetRenderWindow() );
   m_RectangleRendering2->Enable(0.0,1.0,0.0);
 
-  m_RectangleRendering3 = mitk::ColoredRectangleRendering::New();
+  m_RectangleRendering3 = mitk::RenderWindowFrame::New();
   m_RectangleRendering3->SetRenderWindow(
     mitkWidget3->GetRenderWindow() );
   m_RectangleRendering3->Enable(0.0,0.0,1.0);
 
-  m_RectangleRendering4 = mitk::ColoredRectangleRendering::New();
+  m_RectangleRendering4 = mitk::RenderWindowFrame::New();
   m_RectangleRendering4->SetRenderWindow(
     mitkWidget4->GetRenderWindow() );
   m_RectangleRendering4->Enable(1.0,1.0,0.0);

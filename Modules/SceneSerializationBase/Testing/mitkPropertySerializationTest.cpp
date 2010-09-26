@@ -195,7 +195,7 @@ int mitkPropertySerializationTest(int /* argc */, char* /*argv*/[])
 
 /* untested base data types:
   BaseDataTestImplementation
-  ColoredRectangleRendering
+  RenderWindowFrame
   mitk::DiffusionImage< TPixelType >
   GeometryData
   mitk::Geometry2DData

@@ -26,7 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <iostream>
 
 //Basedata Test
-#include <mitkColoredRectangleRendering.h>
+#include <mitkRenderWindowFrame.h>
 #include <mitkGeometryData.h>
 #include <mitkGeometry2DData.h>
 #include <mitkGradientBackground.h>
@@ -75,9 +75,9 @@ static void TestDataSetting(mitk::DataNode::Pointer dataNode)
   dataNode->SetData(baseData);
   MITK_TEST_CONDITION( baseData == dataNode->GetData(), "Testing if a NULL pointer was set correctly" )
 
-  baseData = mitk::ColoredRectangleRendering::New();
+  baseData = mitk::RenderWindowFrame::New();
   dataNode->SetData(baseData);
-  MITK_TEST_CONDITION( baseData == dataNode->GetData(), "Testing if a ColoredRectangleRendering object was set correctly" )
+  MITK_TEST_CONDITION( baseData == dataNode->GetData(), "Testing if a RenderWindowFrame object was set correctly" )
 //  MITK_TEST_CONDITION( baseData->GetGeometry(0)->GetVtkTransform() == dataNode->GetVtkTransform(0), "Testing if a NULL pointer was set correctly" )    
   
   baseData = mitk::GeometryData::New();

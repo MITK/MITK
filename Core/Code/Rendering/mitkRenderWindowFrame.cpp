@@ -15,7 +15,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#include "mitkColoredRectangleRendering.h"
+#include "mitkRenderWindowFrame.h"
 
 #include "mitkVtkLayerController.h"
 
@@ -32,7 +32,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <vtkMitkRectangleProp.h>
 
-mitk::ColoredRectangleRendering::ColoredRectangleRendering()
+mitk::RenderWindowFrame::RenderWindowFrame()
 {
   m_RenderWindow           = NULL;
   m_RectangleRenderer      = vtkRenderer::New();
@@ -40,7 +40,7 @@ mitk::ColoredRectangleRendering::ColoredRectangleRendering()
   m_IsEnabled         = false;
 }
 
-mitk::ColoredRectangleRendering::~ColoredRectangleRendering()
+mitk::RenderWindowFrame::~RenderWindowFrame()
 {
   if ( m_RenderWindow != NULL )
     if ( this->IsEnabled() )
@@ -56,7 +56,7 @@ mitk::ColoredRectangleRendering::~ColoredRectangleRendering()
  * will be shown. Make sure, you have called this function
  * before calling Enable()
  */
-void mitk::ColoredRectangleRendering::SetRenderWindow( vtkRenderWindow* renderWindow )
+void mitk::RenderWindowFrame::SetRenderWindow( vtkRenderWindow* renderWindow )
 {
   m_RenderWindow = renderWindow;
 }
@@ -65,7 +65,7 @@ void mitk::ColoredRectangleRendering::SetRenderWindow( vtkRenderWindow* renderWi
  * Returns the vtkRenderWindow, which is used
  * for displaying the text
  */
-vtkRenderWindow* mitk::ColoredRectangleRendering::GetRenderWindow()
+vtkRenderWindow* mitk::RenderWindowFrame::GetRenderWindow()
 {
   return m_RenderWindow;
 }
@@ -75,7 +75,7 @@ vtkRenderWindow* mitk::ColoredRectangleRendering::GetRenderWindow()
  * rendering the  text into the
  * vtkRenderWindow
  */
-vtkRenderer* mitk::ColoredRectangleRendering::GetVtkRenderer()
+vtkRenderer* mitk::RenderWindowFrame::GetVtkRenderer()
 {
   return m_RectangleRenderer;
 }
@@ -84,7 +84,7 @@ vtkRenderer* mitk::ColoredRectangleRendering::GetVtkRenderer()
  * Disables drawing of the text label collection.
  * If you want to enable it, call the Enable() function.
  */
-void mitk::ColoredRectangleRendering::Disable()
+void mitk::RenderWindowFrame::Disable()
 {
   if ( this->IsEnabled())
   {
@@ -102,7 +102,7 @@ void mitk::ColoredRectangleRendering::Disable()
  * Enables drawing of the text label collection.
  * If you want to disable it, call the Disable() function.
  */
-void mitk::ColoredRectangleRendering::Enable(float col1, float col2, float col3)
+void mitk::RenderWindowFrame::Enable(float col1, float col2, float col3)
 {
   vtkMitkRectangleProp* rect = vtkMitkRectangleProp::New();
   rect->SetRenderWindow(m_RenderWindow);
@@ -130,27 +130,27 @@ void mitk::ColoredRectangleRendering::Enable(float col1, float col2, float col3)
  * Checks, if the text is currently
  * enabled (visible)
  */
-bool mitk::ColoredRectangleRendering::IsEnabled()
+bool mitk::RenderWindowFrame::IsEnabled()
 {
   return  m_IsEnabled;
 }
  
-void mitk::ColoredRectangleRendering::SetRequestedRegionToLargestPossibleRegion()
+void mitk::RenderWindowFrame::SetRequestedRegionToLargestPossibleRegion()
 {
     //nothing to do
 }
 
-bool mitk::ColoredRectangleRendering::RequestedRegionIsOutsideOfTheBufferedRegion()
+bool mitk::RenderWindowFrame::RequestedRegionIsOutsideOfTheBufferedRegion()
 {
     return false;    
 }
 
-bool mitk::ColoredRectangleRendering::VerifyRequestedRegion()
+bool mitk::RenderWindowFrame::VerifyRequestedRegion()
 {
     return true;
 }
 
-void mitk::ColoredRectangleRendering::SetRequestedRegion(itk::DataObject*)
+void mitk::RenderWindowFrame::SetRequestedRegion(itk::DataObject*)
 {
     //nothing to do
 }

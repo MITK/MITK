@@ -36,17 +36,17 @@ namespace mitk
  *
  * See also mitk::Geometry2DDataMapper2D::DrawOrientationArrow()
  */
-class MITK_CORE_EXPORT PlaneDecorationProperty : public EnumerationProperty
+class MITK_CORE_EXPORT PlaneOrientationProperty : public EnumerationProperty
 {
 public:
 
-  mitkClassMacro( PlaneDecorationProperty, EnumerationProperty );
+  mitkClassMacro( PlaneOrientationProperty, EnumerationProperty );
   
-  itkNewMacro(PlaneDecorationProperty);
+  itkNewMacro(PlaneOrientationProperty);
   
-  mitkNewMacro1Param(PlaneDecorationProperty, const IdType&);
+  mitkNewMacro1Param(PlaneOrientationProperty, const IdType&);
  
-  mitkNewMacro1Param(PlaneDecorationProperty, const std::string&);
+  mitkNewMacro1Param(PlaneOrientationProperty, const std::string&);
 
   enum
   {
@@ -80,19 +80,19 @@ protected:
   /**
    * Constructor. Sets the decoration type to none.
    */
-  PlaneDecorationProperty( );
+  PlaneOrientationProperty( );
   
   /**
    * Constructor. Sets the decoration type to the given value. If it is not
    * valid, the interpolation is set to none
    */
-  PlaneDecorationProperty( const IdType &value );
+  PlaneOrientationProperty( const IdType &value );
   
   /**
    * Constructor. Sets the decoration type to the given value. If it is not
    * valid, the representation is set to none
    */
-  PlaneDecorationProperty( const std::string &value );
+  PlaneOrientationProperty( const std::string &value );
 
 
   /**

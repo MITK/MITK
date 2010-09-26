@@ -40,7 +40,7 @@ class BaseRenderer;
  * 
  * Properties that can be set and influence the Geometry2DDataMapper2D are:
  *
- *   - \b "PlaneDecorationProperty": (PlaneDecorationProperty)
+ *   - \b "PlaneOrientationProperty": (PlaneOrientationProperty)
 
 
  * \todo implement for AbstractTransformGeometry.

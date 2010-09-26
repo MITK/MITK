@@ -23,7 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkColorProperty.h"
 #include "mitkProperties.h"
 #include "mitkSmartPointerProperty.h"
-#include "mitkPlaneDecorationProperty.h"
+#include "mitkPlaneOrientationProperty.h"
 #include "mitkGeometry2DDataToSurfaceFilter.h"
 #include "mitkSurfaceGLMapper2D.h"
 #include "mitkLine.h"
@@ -409,18 +409,18 @@ void mitk::Geometry2DDataMapper2D::ApplyProperties( BaseRenderer *renderer )
 {
   Superclass::ApplyProperties(renderer);
 
-  PlaneDecorationProperty* decorationProperty;
+  PlaneOrientationProperty* decorationProperty;
   this->GetDataNode()->GetProperty( decorationProperty, "decoration", renderer );
   if ( decorationProperty != NULL )
   {
     if ( decorationProperty->GetPlaneDecoration() == 
-      PlaneDecorationProperty::PLANE_DECORATION_POSITIVE_ORIENTATION )
+      PlaneOrientationProperty::PLANE_DECORATION_POSITIVE_ORIENTATION )
     {
       m_RenderOrientationArrows = true;
       m_ArrowOrientationPositive = true;
     }
     else if ( decorationProperty->GetPlaneDecoration() == 
-      PlaneDecorationProperty::PLANE_DECORATION_NEGATIVE_ORIENTATION )
+      PlaneOrientationProperty::PLANE_DECORATION_NEGATIVE_ORIENTATION )
     {
       m_RenderOrientationArrows = true;
       m_ArrowOrientationPositive = false;

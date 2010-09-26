@@ -15,21 +15,21 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
-#include "mitkPlaneDecorationProperty.h"
+#include "mitkPlaneOrientationProperty.h"
 
 
 namespace mitk
 {
 
 
-PlaneDecorationProperty::PlaneDecorationProperty( )
+PlaneOrientationProperty::PlaneOrientationProperty( )
 {
   this->AddDecorationTypes();
   this->SetValue( static_cast<IdType>( PLANE_DECORATION_NONE ) );
 }
 
 
-PlaneDecorationProperty::PlaneDecorationProperty( const IdType& value )
+PlaneOrientationProperty::PlaneOrientationProperty( const IdType& value )
 {
   this->AddDecorationTypes();
   if ( this->IsValidEnumerationValue( value ) )
@@ -42,7 +42,7 @@ PlaneDecorationProperty::PlaneDecorationProperty( const IdType& value )
   }
 }
 
-PlaneDecorationProperty::PlaneDecorationProperty( const std::string& value )
+PlaneOrientationProperty::PlaneOrientationProperty( const std::string& value )
 {
   this->AddDecorationTypes();
   if ( this->IsValidEnumerationValue( value ) )
@@ -56,31 +56,31 @@ PlaneDecorationProperty::PlaneDecorationProperty( const std::string& value )
 }
 
 
-int PlaneDecorationProperty::GetPlaneDecoration()
+int PlaneOrientationProperty::GetPlaneDecoration()
 {
   return static_cast<int>( this->GetValueAsId() );
 }
 
 
-void PlaneDecorationProperty::SetPlaneDecorationToNone()
+void PlaneOrientationProperty::SetPlaneDecorationToNone()
 {
   this->SetValue( static_cast<IdType>( PLANE_DECORATION_NONE ) );
 }
 
 
-void PlaneDecorationProperty::SetPlaneDecorationToPositiveOrientation()
+void PlaneOrientationProperty::SetPlaneDecorationToPositiveOrientation()
 {
   this->SetValue( static_cast<IdType>( PLANE_DECORATION_POSITIVE_ORIENTATION ) );
 }
 
 
-void PlaneDecorationProperty::SetPlaneDecorationToNegativeOrientation()
+void PlaneOrientationProperty::SetPlaneDecorationToNegativeOrientation()
 {
   this->SetValue( static_cast<IdType>( PLANE_DECORATION_NEGATIVE_ORIENTATION ) );
 }
 
 
-void PlaneDecorationProperty::AddDecorationTypes()
+void PlaneOrientationProperty::AddDecorationTypes()
 {
   this->AddEnum( "No plane decoration", static_cast<IdType>( PLANE_DECORATION_NONE ) );
   this->AddEnum( "Arrows in positive direction", static_cast<IdType>( PLANE_DECORATION_POSITIVE_ORIENTATION ) );
@@ -88,7 +88,7 @@ void PlaneDecorationProperty::AddDecorationTypes()
 }
 
 
-bool PlaneDecorationProperty::AddEnum( const std::string& name, const IdType& id )
+bool PlaneOrientationProperty::AddEnum( const std::string& name, const IdType& id )
 {
   return Superclass::AddEnum( name, id );  
 }

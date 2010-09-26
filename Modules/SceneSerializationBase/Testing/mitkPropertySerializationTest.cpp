@@ -34,7 +34,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkModalityProperty.h>
 //#include <mitkOdfNormalizationMethodProperty.h>
 //#include <mitkOdfScaleByProperty.h>
-#include <mitkPlaneDecorationProperty.h>
+#include <mitkPlaneOrientationProperty.h>
 #include <mitkShaderEnumProperty.h>
 #include <mitkVtkInterpolationProperty.h>
 #include <mitkVtkRepresentationProperty.h>
@@ -118,7 +118,7 @@ int mitkPropertySerializationTest(int /* argc */, char* /*argv*/[])
   propList->SetProperty("modality", mitk::ModalityProperty::New("Color Doppler"));
   //propList->SetProperty("OdfNormalizationMethodProperty", mitk::OdfNormalizationMethodProperty::New("Global Maximum"));
   //propList->SetProperty("OdfScaleByProperty", mitk::OdfScaleByProperty::New("Principal Curvature"));
-  propList->SetProperty("PlaneDecorationProperty", mitk::PlaneDecorationProperty::New("Arrows in positive direction"));
+  propList->SetProperty("PlaneOrientationProperty", mitk::PlaneOrientationProperty::New("Arrows in positive direction"));
   propList->SetProperty("ShaderEnumProperty", mitk::ShaderEnumProperty::New("fixed"));
   propList->SetProperty("VtkInterpolationProperty", mitk::VtkInterpolationProperty::New("Gouraud"));
   propList->SetProperty("VtkRepresentationProperty", mitk::VtkRepresentationProperty::New("Surface"));

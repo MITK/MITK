@@ -95,7 +95,7 @@ SET(CPP_FILES
   DataManagement/mitkNodePredicateOr.cpp
   DataManagement/mitkNodePredicateProperty.cpp
   DataManagement/mitkNodePredicateSource.cpp
-  DataManagement/mitkPlaneDecorationProperty.cpp
+  DataManagement/mitkPlaneOrientationProperty.cpp
   DataManagement/mitkPlaneGeometry.cpp
   DataManagement/mitkPlaneOperation.cpp
   DataManagement/mitkPointOperation.cpp

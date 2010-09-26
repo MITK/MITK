@@ -383,7 +383,7 @@ itkEventMacro( RenderingManagerViewsInitializedEvent, RenderingManagerEvent );
 
 /**
  * Generic RenderingManager implementation for "non-rendering-plattform",
- * e.g. for tests. Its factory (GenericRenderingManagerFactory) is
+ * e.g. for tests. Its factory (TestingRenderingManagerFactory) is
  * automatically on start-up and is used by default if not other
  * RenderingManagerFactory is instantiated explicitly thereafter.
  * (see mitkRenderingManager.cpp)

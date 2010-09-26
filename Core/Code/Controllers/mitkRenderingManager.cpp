@@ -1012,7 +1012,7 @@ mitk::GlobalInteraction* RenderingManager::GetGlobalInteraction()
 }
 
 // Create and register generic RenderingManagerFactory.
-GenericRenderingManagerFactory renderingManagerFactory;
+TestingRenderingManagerFactory renderingManagerFactory;
 
 
 } // namespace

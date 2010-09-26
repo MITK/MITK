@@ -65,10 +65,10 @@ private:
 /**
  * Factory for the TestingRenderingManager
  */
-class MITK_CORE_EXPORT GenericRenderingManagerFactory : public RenderingManagerFactory
+class MITK_CORE_EXPORT TestingRenderingManagerFactory : public RenderingManagerFactory
 {
 public:
-  GenericRenderingManagerFactory()
+  TestingRenderingManagerFactory()
   {
     if ( !mitk::RenderingManager::HasFactory() )
     {
@@ -76,7 +76,7 @@ public:
     }
   };
 
-  virtual ~GenericRenderingManagerFactory() {};
+  virtual ~TestingRenderingManagerFactory() {};
 
   virtual mitk::RenderingManager::Pointer CreateRenderingManager() const
   {

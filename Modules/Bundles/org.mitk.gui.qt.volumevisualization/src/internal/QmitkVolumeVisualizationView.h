@@ -79,7 +79,8 @@ private:
   mitk::WeakPointer<mitk::DataNode> m_SelectedNode;
   
   void UpdateInterface();
-
+ 
+  void NodeRemovedFromDataStorage( const mitk::DataNode* node );
 };
 
 #endif /*QMITKVOLUMEVISUALIZATIONVIEW_H_*/

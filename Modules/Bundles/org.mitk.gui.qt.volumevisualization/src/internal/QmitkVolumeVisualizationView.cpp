@@ -104,6 +104,12 @@ void QmitkVolumeVisualizationView::OnSelectionChanged( std::vector<mitk::DataNod
     }
   }
 
+  m_SelectedNode = node;
+
+  this->GetDataStorage()->RemoveNodeEvent.AddListener( mitk::MessageDelegate1<QmitkVolumeVisualizationView
+    , const mitk::DataNode*>( this, &QmitkVolumeVisualizationView::NodeRemovedFromDataStorage ) );
+
+
   if( node.IsNotNull() )
   {
     m_Controls->m_NoSelectedImageLabel->hide();
@@ -119,7 +125,6 @@ void QmitkVolumeVisualizationView::OnSelectionChanged( std::vector<mitk::DataNod
     
     m_Controls->m_SelectedImageLabel->setText( QString( infoText.c_str() ) );
     
-    m_SelectedNode = node;
   }
   else
   {
@@ -230,5 +235,21 @@ void QmitkVolumeVisualizationView::OnEnableGPU(bool state)
 void QmitkVolumeVisualizationView::SetFocus()
 {
 
+}
+
+void QmitkVolumeVisualizationView::NodeRemovedFromDataStorage( const mitk::DataNode* node )
+{
+  if ( node == m_SelectedNode )
+  {
+    m_SelectedNode = NULL;
+
+    this->GetDataStorage()->RemoveNodeEvent.RemoveListener( mitk::MessageDelegate1<QmitkVolumeVisualizationView
+      , const mitk::DataNode*>( this, &QmitkVolumeVisualizationView::NodeRemovedFromDataStorage ) );
+    
+    this->UpdateInterface();
+    m_Controls->m_SelectedImageLabel->hide();
+    m_Controls->m_ErrorImageLabel->hide();
+    m_Controls->m_NoSelectedImageLabel->show();
+  }
 }
 

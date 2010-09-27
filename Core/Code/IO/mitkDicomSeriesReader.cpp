@@ -28,11 +28,11 @@ namespace mitk
 
 typedef itk::GDCMSeriesFileNames DcmFileNamesGeneratorType;
 
-DataNode::Pointer DicomSeriesReader::LoadDicomSeries(const StringContainer &filenames)
+DataNode::Pointer DicomSeriesReader::LoadDicomSeries(const StringContainer &filenames, UpdateCallBackMethod callback)
 {
   DataNode::Pointer node = DataNode::New();
 
-  if (DicomSeriesReader::LoadDicomSeries(filenames, *node))
+  if (DicomSeriesReader::LoadDicomSeries(filenames, *node, callback))
   {
     return node;
   }
@@ -42,7 +42,7 @@ DataNode::Pointer DicomSeriesReader::LoadDicomSeries(const StringContainer &file
   }
 }
 
-bool DicomSeriesReader::LoadDicomSeries(const StringContainer &filenames, DataNode &node)
+bool DicomSeriesReader::LoadDicomSeries(const StringContainer &filenames, DataNode &node, UpdateCallBackMethod callback)
 {
   DcmIoType::Pointer io = DcmIoType::New();
 
@@ -56,34 +56,34 @@ bool DicomSeriesReader::LoadDicomSeries(const StringContainer &filenames, DataNo
       switch (io->GetComponentType())
       {
       case DcmIoType::UCHAR:
-        DicomSeriesReader::LoadDicom<unsigned char>(filenames, node);
+        DicomSeriesReader::LoadDicom<unsigned char>(filenames, node, callback);
         return true;
       case DcmIoType::CHAR:
-        DicomSeriesReader::LoadDicom<char>(filenames, node);
+        DicomSeriesReader::LoadDicom<char>(filenames, node, callback);
         return true;
       case DcmIoType::USHORT:
-        DicomSeriesReader::LoadDicom<unsigned short>(filenames, node);
+        DicomSeriesReader::LoadDicom<unsigned short>(filenames, node, callback);
         return true;
       case DcmIoType::SHORT:
-        DicomSeriesReader::LoadDicom<short>(filenames, node);
+        DicomSeriesReader::LoadDicom<short>(filenames, node, callback);
         return true;
       case DcmIoType::UINT:
-        DicomSeriesReader::LoadDicom<unsigned int>(filenames, node);
+        DicomSeriesReader::LoadDicom<unsigned int>(filenames, node, callback);
         return true;
       case DcmIoType::INT:
-        DicomSeriesReader::LoadDicom<int>(filenames, node);
+        DicomSeriesReader::LoadDicom<int>(filenames, node, callback);
         return true;
       case DcmIoType::ULONG:
-        DicomSeriesReader::LoadDicom<long unsigned int>(filenames, node);
+        DicomSeriesReader::LoadDicom<long unsigned int>(filenames, node, callback);
         return true;
       case DcmIoType::LONG:
-        DicomSeriesReader::LoadDicom<long int>(filenames, node);
+        DicomSeriesReader::LoadDicom<long int>(filenames, node, callback);
         return true;
       case DcmIoType::FLOAT:
-        DicomSeriesReader::LoadDicom<float>(filenames, node);
+        DicomSeriesReader::LoadDicom<float>(filenames, node, callback);
         return true;
       case DcmIoType::DOUBLE:
-        DicomSeriesReader::LoadDicom<double>(filenames, node);
+        DicomSeriesReader::LoadDicom<double>(filenames, node, callback);
         return true;
       default:
         MITK_ERROR << "Unknown pixel type!";

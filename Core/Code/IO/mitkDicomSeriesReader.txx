@@ -31,7 +31,7 @@ namespace mitk
 {
 
 template <typename PixelType>
-void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &node)
+void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &node, UpdateCallBackMethod callback)
 {
   const char* previousCLocale = setlocale(LC_NUMERIC, NULL);
   setlocale(LC_NUMERIC, "C");
@@ -42,6 +42,7 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
   try
   {
     mitk::Image::Pointer image = mitk::Image::New();
+    CallbackCommand *command = callback ? new CallbackCommand(callback) : 0;
 
 #if GDCM_MAJOR_VERSION >= 2
 
@@ -91,6 +92,11 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
       reader->SetImageIO(io);
       reader->ReverseOrderOff();
 
+      if (command)
+      {
+        reader->AddObserver(itk::ProgressEvent(), command);
+      }
+
       const std::list<StringContainer>::const_iterator df_end = decomposed_filenames.end();
       unsigned int act_volume = 1u;
 
@@ -120,6 +126,11 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
       reader->SetImageIO(io);
       reader->ReverseOrderOff();
 
+      if (command)
+      {
+        reader->AddObserver(itk::ProgressEvent(), command);
+      }
+
       reader->SetFileNames(filenames);
       reader->Update();
       image->InitializeByItk(reader->GetOutput());
@@ -138,6 +149,11 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
 
     reader->SetImageIO(io);
     reader->ReverseOrderOff();
+
+    if (command)
+    {
+      reader->AddObserver(itk::ProgressEvent(), command);
+    }
 
     reader->SetFileNames(filenames);
     reader->Update();

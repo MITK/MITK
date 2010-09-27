@@ -122,7 +122,7 @@ void mitk::PlanarPolygon::EvaluateFeaturesInternal()
 {
   // Calculate circumference
   double circumference = 0.0;
-  unsigned int i;
+  unsigned int i,j;
   for ( i = 0; i < this->GetNumberOfControlPoints() - 1; ++i )
   {
     circumference += this->GetWorldControlPoint( i ).EuclideanDistanceTo( 
@@ -145,7 +145,7 @@ void mitk::PlanarPolygon::EvaluateFeaturesInternal()
   if ( this->IsClosed() && (this->GetGeometry2D() != NULL) )
   {
     // does PlanarPolygon overlap/intersect itself?
-    int numberOfPoints = GetNumberOfControlPoints();
+    unsigned int numberOfPoints = (unsigned int)GetNumberOfControlPoints();
     if( numberOfPoints >= 4)
     {
       for ( i = 0; i < (numberOfPoints - 1); ++i )
@@ -154,7 +154,7 @@ void mitk::PlanarPolygon::EvaluateFeaturesInternal()
         Point2D p0 = this->GetControlPoint( i );
         Point2D p1 = this->GetControlPoint(i + 1);
         // check for intersection with all other lines
-        for (int j = i+1; j < (numberOfPoints - 1); ++j )
+        for (j = i+1; j < (numberOfPoints - 1); ++j )
         {
           Point2D p2 = this->GetControlPoint(j);
           Point2D p3 = this->GetControlPoint(j + 1);

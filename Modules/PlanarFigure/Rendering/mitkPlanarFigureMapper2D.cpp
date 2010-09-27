@@ -179,14 +179,19 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
     quantityString.setf( ios::fixed, ios::floatfield );
     quantityString.precision( 1 );
 
+    bool firstActiveFeature = true;
     for ( unsigned int i = 0; i < planarFigure->GetNumberOfFeatures(); ++i )
-    {
-      if ( i != 0 ) 
+    {     
+      if( planarFigure->IsFeatureActive(i) )
       {
-        quantityString << " / ";
+        if ( ! firstActiveFeature ) 
+        {
+          quantityString << " / ";
+        }
+        quantityString << planarFigure->GetQuantity( i ) << " ";
+        quantityString << planarFigure->GetFeatureUnit( i );
+        firstActiveFeature = false;
       }
-      quantityString << planarFigure->GetQuantity( i ) << " ";
-      quantityString << planarFigure->GetFeatureUnit( i );
     }
 
     mitk::VtkPropRenderer* openGLrenderer = dynamic_cast<mitk::VtkPropRenderer*>( renderer );

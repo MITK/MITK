@@ -20,6 +20,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkGeometry2D.h"
 #include "mitkProperties.h"
 
+// stl related includes
+#include <algorithm>
+
 
 mitk::PlanarPolygon::PlanarPolygon()
 : FEATURE_ID_CIRCUMFERENCE( this->AddFeature( "Circumference", "mm" ) ),
@@ -136,9 +139,44 @@ void mitk::PlanarPolygon::EvaluateFeaturesInternal()
 
 
   // Calculate polygon area (if closed)
-  double area = 0.0;
+  double area       = 0.0;
+  bool intersection = false;
+  
   if ( this->IsClosed() && (this->GetGeometry2D() != NULL) )
   {
+    // does PlanarPolygon overlap/intersect itself?
+    int numberOfPoints = GetNumberOfControlPoints();
+    if( numberOfPoints >= 4)
+    {
+      for ( i = 0; i < (numberOfPoints - 1); ++i )
+      {
+        // line 1
+        Point2D p0 = this->GetControlPoint( i );
+        Point2D p1 = this->GetControlPoint(i + 1);
+        // check for intersection with all other lines
+        for (int j = i+1; j < (numberOfPoints - 1); ++j )
+        {
+          Point2D p2 = this->GetControlPoint(j);
+          Point2D p3 = this->GetControlPoint(j + 1);
+          if( CheckForLineIntersection(p0,p1,p2,p3) )
+          {
+            intersection = true;
+            //MITK_INFO << "INTERSECTION";
+          }
+        }
+      
+        // last line from p_x to p_0
+        Point2D p2 = this->GetControlPoint(0);
+        Point2D p3 = this->GetControlPoint(numberOfPoints - 1);
+        if( CheckForLineIntersection(p0,p1,p2,p3) )
+        {
+          intersection = true;
+          //MITK_INFO << "INTERSECTION";
+        }
+      }
+   }
+      
+    // calculate area
     for ( i = 0; i < this->GetNumberOfControlPoints(); ++i )
     {
       Point2D p0 = this->GetControlPoint( i );
@@ -149,8 +187,17 @@ void mitk::PlanarPolygon::EvaluateFeaturesInternal()
     area /= 2.0;
   }
   
-  this->SetQuantity( FEATURE_ID_AREA, fabs( area ) );
-
+  // set area if appropiate (i.e. closed and not intersected)
+  if(this->IsClosed() && !intersection)
+  {
+    SetQuantity( FEATURE_ID_AREA, fabs( area ) );
+    this->ActivateFeature( FEATURE_ID_AREA );
+  }
+  else
+  {    
+    SetQuantity( FEATURE_ID_AREA,  0  );
+    this->DeactivateFeature( FEATURE_ID_AREA );
+  }
 }
 
 
@@ -162,4 +209,40 @@ void mitk::PlanarPolygon::PrintSelf( std::ostream& os, itk::Indent indent) const
     os << indent << "Polygon is closed\n";
   else
     os << indent << "Polygon is not closed\n";
+}
+
+// based on
+// http://flassari.is/2008/11/line-line-intersection-in-cplusplus/
+bool mitk::PlanarPolygon::CheckForLineIntersection(Point2D p1, Point2D p2, Point2D p3, Point2D p4) 
+{
+  // do not check for intersections with control points
+  if(p1 == p2 || p1 == p3 || p1 == p4 ||
+     p2 == p3 || p2 == p4 ||
+     p3 == p4)
+    return false;
+  
+
+  // Store the values for fast access and easy
+  // equations-to-code conversion
+  float x1 = p1[0], x2 = p2[0], x3 = p3[0], x4 = p4[0];
+  float y1 = p1[1], y2 = p2[1], y3 = p3[1], y4 = p4[1];
+   
+  float d = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
+  // If d is zero, there is no intersection
+  if (d == 0) return false;
+   
+  // Get the x and y
+  float pre = (x1*y2 - y1*x2), post = (x3*y4 - y3*x4);
+  float x = ( pre * (x3 - x4) - (x1 - x2) * post ) / d;
+  float y = ( pre * (y3 - y4) - (y1 - y2) * post ) / d;
+   
+  // Check if the x and y coordinates are within both lines
+  if ( x < std::min(x1, x2) || x > std::max(x1, x2) ||
+  x < std::min(x3, x4) || x > std::max(x3, x4) ) return false;
+  if ( y < std::min(y1, y2) || y > std::max(y1, y2) ||
+  y < std::min(y3, y4) || y > std::max(y3, y4) ) return false;
+   
+  // point of intersection
+  Point2D ret; ret[0] = x; ret[1] = y;
+  return true;
 }

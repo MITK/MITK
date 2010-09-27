@@ -81,6 +81,8 @@ protected:
   /** \brief Calculates feature quantities of the planar figure. */
   virtual void EvaluateFeaturesInternal();
 
+  bool CheckForLineIntersection(Point2D p1, Point2D p2, Point2D p3, Point2D p4);
+
   virtual void PrintSelf( std::ostream &os, itk::Indent indent ) const;
 
   const unsigned int FEATURE_ID_CIRCUMFERENCE;

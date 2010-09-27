@@ -24,7 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 /* VIEW MANAGEMENT */
 QmitkFiducialRegistrationWidget::QmitkFiducialRegistrationWidget(QWidget* parent)  
-: QWidget(parent), m_Controls(NULL), m_ImageFiducialsNode(NULL), m_TrackerFiducialsNode(NULL), m_MultiWidget(NULL)
+: QWidget(parent), m_Controls(NULL),m_MultiWidget(NULL), m_ImageFiducialsNode(NULL), m_TrackerFiducialsNode(NULL)
 {
   CreateQtPartControl(this);
 }

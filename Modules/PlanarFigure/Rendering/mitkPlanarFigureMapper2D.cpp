@@ -214,9 +214,6 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
 
 
 
-  // Disable line antialiasing
-  glDisable( GL_LINE_SMOOTH );
-
   // Draw markers at control points (selected control point will be colored)
   for ( unsigned int i = 0; i < planarFigure->GetNumberOfControlPoints(); ++i )
   {

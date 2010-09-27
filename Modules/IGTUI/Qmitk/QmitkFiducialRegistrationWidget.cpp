@@ -24,7 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 /* VIEW MANAGEMENT */
 QmitkFiducialRegistrationWidget::QmitkFiducialRegistrationWidget(QWidget* parent)  
-: QWidget(parent), m_Controls(NULL), m_ImageFiducialsNode(NULL), m_TrackerFiducialsNode(NULL)
+: QWidget(parent), m_Controls(NULL), m_ImageFiducialsNode(NULL), m_TrackerFiducialsNode(NULL), m_MultiWidget(NULL)
 {
   CreateQtPartControl(this);
 }
@@ -83,9 +83,9 @@ void QmitkFiducialRegistrationWidget::SetImageFiducialsNode( mitk::DataNode::Poi
     FRW_WARN<< "stdMultiWidget is NULL";
     return;
   }
-
-  m_Controls->m_RegistrationImagePoints->SetPointSetNode(imageFiducialsNode); // pass node to pointListWidget
   m_Controls->m_RegistrationImagePoints->SetMultiWidget(m_MultiWidget); // pass multiWidget to pointListWidget
+  m_Controls->m_RegistrationImagePoints->SetPointSetNode(imageFiducialsNode); // pass node to pointListWidget
+
 
 }
 
@@ -101,9 +101,9 @@ void QmitkFiducialRegistrationWidget::SetTrackerFiducialsNode( mitk::DataNode::P
     FRW_WARN<< "stdMultiWidget is NULL";
     return;
   }
-
-  m_Controls->m_RegistrationTrackingPoints->SetPointSetNode(trackerFiducialsNode); // pass node to pointListWidget
   m_Controls->m_RegistrationTrackingPoints->SetMultiWidget(m_MultiWidget); // pass multiWidget to pointListWidget
+  m_Controls->m_RegistrationTrackingPoints->SetPointSetNode(trackerFiducialsNode); // pass node to pointListWidget
+
 }
 
 void QmitkFiducialRegistrationWidget::SetMultiWidget( QmitkStdMultiWidget* multiWidget )

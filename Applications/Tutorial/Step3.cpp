@@ -29,7 +29,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <QApplication>
 
-#include <mitkLog.h>
 
 //##Documentation
 //## @brief Change the type of display to 3D
@@ -152,12 +151,6 @@ int main(int argc, char* argv[])
   // ******************* END OF NEW PART 2 *******************
   // *********************************************************
   
-  mitk::LogBackend::Register();
-
-  QString logfile("adsf.log");
-  mitk::LogBackend::SetLogFile( logfile.toLocal8Bit().constData() );
-
-  MITK_INFO << "asdf";
   //*************************************************************************
   // Part VI: Qt-specific initialization
   //*************************************************************************

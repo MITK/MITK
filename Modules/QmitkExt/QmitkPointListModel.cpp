@@ -117,7 +117,14 @@ void QmitkPointListModel::OnPointSetChanged( const itk::EventObject &  /*e*/ )
  
 void QmitkPointListModel::OnPointSetDeleted( const itk::EventObject &  /*e*/ )
 {
-  m_PointSetNode = NULL;
+//  m_PointSetNode = NULL;
+  mitk::PointSet::Pointer ps = CheckForPointSetInNode(m_PointSetNode);
+  if (ps)
+  {
+    ps->RemoveObserver(m_PointSetModifiedObserverTag);
+    ps->RemoveObserver(m_PointSetDeletedObserverTag);
+  }
+
   m_PointSetModifiedObserverTag = 0;
   m_PointSetDeletedObserverTag = 0;
   QAbstractListModel::reset();

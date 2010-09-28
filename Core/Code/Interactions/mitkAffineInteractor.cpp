@@ -352,3 +352,16 @@ bool mitk::AffineInteractor::ConvertDisplayEventToWorldPosition(mitk::DisplayPos
   }
   return true;
 }
+
+float mitk::AffineInteractor::CanHandleEvent( StateEvent const* stateEvent ) const
+{
+  float jd = 0.0f;
+
+  if ( stateEvent->GetEvent()->GetSender()->GetMapperID() == mitk::BaseRenderer::Standard3D )
+  {
+    MITK_DEBUG << "Sorry, mitkAffineInteractor does not support interaction in a 3D view at the moment.";
+    return jd;
+  }
+
+  return Superclass::CanHandleEvent( stateEvent );
+}

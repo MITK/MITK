@@ -40,6 +40,9 @@ float mitk::SurfaceInteractor::CanHandleEvent( StateEvent const* stateEvent ) co
   if( ! ( stateEvent->GetEvent()->GetButtonState() == mitk::BS_ControlButton && stateEvent->GetEvent()->GetType() == mitk::Type_MouseButtonPress ))
     return jd;
 
+  if ( stateEvent->GetEvent()->GetSender()->GetMapperID() == mitk::BaseRenderer::Standard3D )
+    return jd;
+
   mitk::Surface* surf = dynamic_cast<mitk::Surface*>(this->GetData());
   if (surf)
   {

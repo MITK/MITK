@@ -97,6 +97,8 @@ class DEFORMABLEREGISTRATION_EXPORT QmitkDeformableRegistrationView : public QOb
 
     virtual void Hidden();
 
+    void DataNodeHasBeenRemoved(const mitk::DataNode* node);
+
   signals:
 
     /*!  

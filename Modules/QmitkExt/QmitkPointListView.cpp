@@ -222,7 +222,7 @@ void QmitkPointListView::wheelEvent(QWheelEvent *event)
 
 
   int whe = event->delta();
-  mitk::PointSet* /*::Pointer*/ ps = dynamic_cast<mitk::PointSet*>(m_PointListModel->GetPointSet());
+  mitk::PointSet::Pointer ps = dynamic_cast<mitk::PointSet*>(m_PointListModel->GetPointSet());
   unsigned int numberOfTS = ps->GetTimeSteps();
 
   if(numberOfTS == 1)
@@ -349,7 +349,7 @@ void QmitkPointListView::ClearPointList()
 {
   if(!m_PointListModel->GetPointSet())
     return;
-  mitk::PointSet*/*::Pointer*/  curPS = m_PointListModel->GetPointSet();
+  mitk::PointSet::Pointer  curPS = m_PointListModel->GetPointSet();
   if ( curPS->GetSize() == 0)
     return;
 

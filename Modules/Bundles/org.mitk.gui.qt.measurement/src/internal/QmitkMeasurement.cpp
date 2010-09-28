@@ -233,7 +233,7 @@ void QmitkMeasurement::CreateQtPartControl(QWidget* parent)
 
 void QmitkMeasurement::OnSelectionChanged(std::vector<mitk::DataNode*> nodes)
 {
-  if (nodes.empty()) return;
+  if ( nodes.empty() ) return;
 
   m_SelectedImageNode->RemoveAllNodes();
 
@@ -290,6 +290,8 @@ void QmitkMeasurement::OnSelectionChanged(std::vector<mitk::DataNode*> nodes)
 
 void QmitkMeasurement::PlanarFigureSelectionChanged()
 {
+  if ( !this->IsActivated() ) return;
+
   if (m_SelectedImageNode->GetNode().IsNotNull())
   {
     mitk::Image* selectedImage = dynamic_cast<mitk::Image*>(m_SelectedImageNode->GetNode()->GetData());

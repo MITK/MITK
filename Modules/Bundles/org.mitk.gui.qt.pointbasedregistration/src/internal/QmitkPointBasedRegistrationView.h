@@ -133,6 +133,8 @@ public:
   //     void ClearPointSetDialogFound(QWidget* widget){}
   // #endif
 
+    void DataNodeHasBeenRemoved(const mitk::DataNode* node);
+
   protected slots:
 
     /*!
@@ -251,7 +253,7 @@ public:
     void SetImagesVisible(berry::ISelection::ConstPointer /*selection*/);
 
     void SwitchImages();
-
+    
 protected:
 
   berry::ISelectionListener::Pointer m_SelListener;

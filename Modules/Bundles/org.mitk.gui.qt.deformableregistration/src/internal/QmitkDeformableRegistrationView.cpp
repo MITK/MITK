@@ -169,6 +169,8 @@ QmitkDeformableRegistrationView::QmitkDeformableRegistrationView(QObject * /*par
 : QmitkFunctionality() , m_MultiWidget(NULL), m_MovingNode(NULL), m_FixedNode(NULL), m_ShowRedGreen(false), 
   m_Opacity(0.5), m_OriginalOpacity(1.0), m_Deactivated(false)
 {
+  this->GetDataStorage()->RemoveNodeEvent.AddListener(mitk::MessageDelegate1<QmitkDeformableRegistrationView,
+    const mitk::DataNode*> ( this, &QmitkDeformableRegistrationView::DataNodeHasBeenRemoved ));
 }
 
 QmitkDeformableRegistrationView::~QmitkDeformableRegistrationView()
@@ -209,6 +211,27 @@ void QmitkDeformableRegistrationView::CreateQtPartControl(QWidget* parent)
     m_Controls.m_QmitkBSplineRegistrationViewControls->show();
   }
   this->CheckCalculateEnabled();
+}
+
+void QmitkDeformableRegistrationView::DataNodeHasBeenRemoved(const mitk::DataNode* node)
+{
+  if(node == m_FixedNode || node == m_MovingNode)
+  {  
+    m_Controls.m_StatusLabel->show();
+    m_Controls.TextLabelFixed->hide();
+    m_Controls.m_SwitchImages->hide();
+    m_Controls.m_FixedLabel->hide();
+    m_Controls.TextLabelMoving->hide();
+    m_Controls.m_MovingLabel->hide();
+    m_Controls.m_OpacityLabel->setEnabled(false);
+    m_Controls.m_OpacitySlider->setEnabled(false);
+    m_Controls.label->setEnabled(false);
+    m_Controls.label_2->setEnabled(false);
+    m_Controls.m_ShowRedGreenValues->setEnabled(false);
+    m_Controls.m_DeformableTransform->hide();
+    m_Controls.m_CalculateTransformation->setEnabled(false);
+  }    
+
 }
 
 

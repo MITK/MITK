@@ -166,7 +166,8 @@ mitk::DataNode::Pointer mitk::Tool::CreateSegmentationNode( Image* image, const 
   segmentationNode->SetProperty( "opacity", FloatProperty::New(0.3) );
   segmentationNode->SetProperty( "segmentation", BoolProperty::New(true) );
   segmentationNode->SetProperty( "reslice interpolation", VtkResliceInterpolationProperty::New() ); // otherwise -> segmentation appears in 2 slices sometimes (only visual effect, not different data)
-  segmentationNode->SetProperty( "showVolume", BoolProperty::New( false ) );
+  // For MITK-3M3 release, the volume of all segmentations should be shown
+  segmentationNode->SetProperty( "showVolume", BoolProperty::New( true ) );
   
   return segmentationNode;
 }

@@ -98,6 +98,8 @@ class RIGIDREGISTRATION_EXPORT QmitkRigidRegistrationView : public QObject, publ
     virtual void Visible();
     virtual void Hidden();
 
+    void DataNodeHasBeenRemoved(const mitk::DataNode* node);
+
   signals:
 
   protected slots:

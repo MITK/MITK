@@ -26,6 +26,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QFile>
 #include <QRegExp>
 #include <QTextStream>
+#include <QNetworkAccessManager>
+#include <QUrl>
+#include <QNetworkReply>
 
 #include <berryPlatform.h>
 #include <berryPlatformUI.h>
@@ -381,6 +384,12 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
 		QKeySequence("CTRL+Y"));
 	redoAction->setToolTip("execute the last action that was undone again (not supported by all modules)");
 
+  QAction* updateAction = new QAction(mainWindow);
+  updateAction->setText("&Check for updates");
+  updateAction->setIcon(QIcon(":/org.mitk.gui.qt.ext/Refresh_48.png"));
+  updateAction->setToolTip("Check for updates");
+  QObject::connect(updateAction, SIGNAL(triggered(bool)), QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onUpdate(bool)));
+
 	imageNavigatorAction = new QAction(QIcon(":/org.mitk.gui.qt.ext/Slider.png"), "&Image Navigator", NULL);
 	QObject::connect(imageNavigatorAction, SIGNAL(triggered(bool)), QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onImageNavigator()));
 	imageNavigatorAction->setCheckable(true);
@@ -412,6 +421,7 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
 	mainActionsToolBar->addAction(closeProjectAction);
 	mainActionsToolBar->addAction(undoAction);
 	mainActionsToolBar->addAction(redoAction);
+  mainActionsToolBar->addAction(updateAction);
 	mainActionsToolBar->addAction(imageNavigatorAction);
 	mainWindow->addToolBar(mainActionsToolBar);
 
@@ -516,6 +526,7 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
 	helpMenu->addAction("&Welcome",QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onIntro()));
 	helpMenu->addAction("&Help Contents",QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onHelp()), QKeySequence(QKeySequence::HelpContents));
 	helpMenu->addAction("&About",QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onAbout()));
+  helpMenu->addAction(updateAction);
 	// =====================================================
 
 
@@ -633,6 +644,63 @@ void QmitkExtWorkbenchWindowAdvisorHack::onImageNavigator()
 	berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->ShowView("org.mitk.views.imagenavigator");
 	//berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->ResetPerspective();
 }
+
+void QmitkExtWorkbenchWindowAdvisorHack::onUpdateFinished(QNetworkReply* reply)
+{
+
+  if(!reply)
+    return; //throw std::logic_error("No reply!");
+
+  //   LOG_INFO << "reply error: " << reply->error();
+  //   LOG_INFO << "http status code: " << reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+  //   LOG_INFO << "http sttus: " << reply->attribute(QNetworkRequest::HttpReasonPhraseAttribute).toString().toStdString();
+  //   LOG_INFO << "reply content: '" << reply->readAll().constData() << "'";
+  QString errorMessage;
+  if(reply->error() == QNetworkReply::NoError)
+  {
+    QMessageBox m;
+    m.setTextFormat(Qt::RichText);
+    m.setWindowTitle("Update available");
+    m.setText("New update available. Please visit: <a href=http://3m3.mitk.org>http://3m3.mitk.org</a>");
+    m.setWindowModality(Qt::ApplicationModal);
+    m.setStandardButtons(QMessageBox::Ok);
+    m.exec();
+  }
+  else if(reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt() == 404)
+  {
+    QMessageBox::information(QApplication::activeWindow(), "No updates available", "There are currently no updates for MITK 3M3 available. Please check again later. ");
+  }
+  else
+  {
+    QMessageBox::warning(QApplication::activeWindow(), "No updates available", "No updates found. Please check your online connection. ");
+  }
+}
+
+void QmitkExtWorkbenchWindowAdvisorHack::onUpdate(bool)
+{
+  try
+  {
+    QString urlStr = QString("http://www.mitk.org/data/3m3updates/%1").arg(MITK_SVN_REVISION);
+
+    //QString urlStr("http://qt.nokia.com/doc/4.5/qmenu.html");
+    //LOG_INFO << "Checking '" << urlStr.toStdString() << "' for updates.";
+    QUrl url(urlStr);
+    if(url.isValid())
+    {
+      QNetworkAccessManager *manager = new QNetworkAccessManager(this);
+      connect(manager, SIGNAL(finished(QNetworkReply*)),  this, SLOT(onUpdateFinished(QNetworkReply*)));
+      manager->get(QNetworkRequest(QUrl(urlStr)));
+    }
+    else
+      throw std::logic_error("Url not valid!");
+  }
+  catch (std::exception& e)
+  {
+    MITK_WARN << e.what();
+  }
+
+}
+
 
 void QmitkExtWorkbenchWindowAdvisorHack::onEditPreferences()
 {

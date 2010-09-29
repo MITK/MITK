@@ -4,9 +4,8 @@
 #include "mitkQtSegmentationDll.h"
 
 #include "mitkIContextMenuAction.h"
-#include "berryQtViewPart.h"
 
-#include <berryIWorkbenchPage.h>
+#include "berryQtViewPart.h"
 
 class MITK_QT_SEGMENTATION QmitkStatisticsAction: public mitk::IContextMenuAction
 {

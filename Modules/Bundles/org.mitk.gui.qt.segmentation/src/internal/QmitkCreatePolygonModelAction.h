@@ -4,13 +4,10 @@
 #include "mitkQtSegmentationDll.h"
 
 #include "mitkIContextMenuAction.h"
-#include "berryQtViewPart.h"
 
 #include "mitkDataNode.h"
+#include "berryQtViewPart.h"
 
-#include "mitkShowSegmentationAsSurface.h"
-#include "mitkProgressBar.h"
-#include "mitkStatusBar.h"
 
 class MITK_QT_SEGMENTATION QmitkCreatePolygonModelAction: public mitk::IContextMenuAction
 {

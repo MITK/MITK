@@ -1,4 +1,12 @@
+#include "Poco/Foundation.h" 
 #include "QmitkThresholdAction.h"
+
+#include "QmitkToolGUI.h"
+
+#include "mitkBinaryThresholdTool.h"
+#include "mitkRenderingManager.h"
+
+#include <QtGui>
 
 
 QmitkThresholdAction::QmitkThresholdAction()

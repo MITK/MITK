@@ -4,20 +4,15 @@
 #include "mitkQtSegmentationDll.h"
 
 #include "mitkIContextMenuAction.h"
-#include "berryQtViewPart.h"
 
 #include "mitkDataStorage.h"
 #include "mitkToolManager.h"
-#include "mitkBinaryThresholdTool.h"
-#include "mitkRenderingManager.h"
+#include "berryQtViewPart.h"
 
 #include <berryISelectionListener.h>
-
-#include "QmitkToolGUI.h"
-
 #include <QObject>
+
 #include <QDialog>
-#include <QtGui>
 
 class MITK_QT_SEGMENTATION QmitkThresholdAction: public QObject, public mitk::IContextMenuAction
 {

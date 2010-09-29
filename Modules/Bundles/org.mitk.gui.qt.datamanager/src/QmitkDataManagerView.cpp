@@ -81,7 +81,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QColor>
 #include <QColorDialog>
 #include <QSizePolicy>
+
 #include "mitkDataNodeObject.h"
+#include "mitkIContextMenuAction.h"
+#include "berryIExtensionPointService.h"
 
 const std::string QmitkDataManagerView::VIEW_ID = "org.mitk.views.datamanager";
 
@@ -186,6 +189,52 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   QObject::connect( m_ReinitAction, SIGNAL( triggered(bool) )
     , this, SLOT( ReinitSelectedNodes(bool) ) );
   unknownDataNodeDescriptor->AddAction(m_ReinitAction);
+
+  // find contextMenuAction extension points and add them to the node descriptor
+  berry::IExtensionPointService::Pointer extensionPointService = berry::Platform::GetExtensionPointService();
+  berry::IConfigurationElement::vector cmActions(
+    extensionPointService->GetConfigurationElementsFor("org.mitk.gui.qt.datamanager.contextMenuActions") );
+  berry::IConfigurationElement::vector::iterator cmActionsIt;
+
+  std::string cmNodeDescriptorName;
+  std::string cmLabel;
+  std::string cmIcon;
+  std::string cmClass;
+
+  QmitkNodeDescriptor* tmpDescriptor;
+  QAction* contextMenuAction;
+  QVariant cmActionDataIt;
+  m_ConfElements.clear();
+
+  int i=1;
+  for (cmActionsIt = cmActions.begin()
+    ; cmActionsIt != cmActions.end()
+    ; ++cmActionsIt)
+  {
+    cmIcon.erase();
+    if((*cmActionsIt)->GetAttribute("nodeDescriptorName", cmNodeDescriptorName)
+      && (*cmActionsIt)->GetAttribute("label", cmLabel)
+      && (*cmActionsIt)->GetAttribute("class", cmClass))
+    {
+      (*cmActionsIt)->GetAttribute("icon", cmIcon);
+      // create context menu entry here
+      tmpDescriptor = QmitkNodeDescriptorManager::GetInstance()->GetDescriptor(QString::fromStdString(cmNodeDescriptorName));
+      if(!tmpDescriptor)
+      {
+        MITK_WARN << "cannot add action \"" << cmLabel << "\" because descriptor " << cmNodeDescriptorName << " does not exist";
+        continue;
+      }
+      contextMenuAction = new QAction( QString::fromStdString(cmLabel), parent);
+      tmpDescriptor->AddAction(contextMenuAction);
+      m_ConfElements[contextMenuAction] = *cmActionsIt;
+
+      cmActionDataIt.setValue<int>(i);
+      contextMenuAction->setData( cmActionDataIt );
+      int bla = contextMenuAction->data().value<int>();
+      connect( contextMenuAction, SIGNAL( triggered(bool) ) , this, SLOT( ContextMenuActionTriggered(bool) ) );
+      ++i;
+    }
+  }
 
   m_OpacitySlider = new QSlider;
   m_OpacitySlider->setMinimum(0);
@@ -294,6 +343,48 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
 
 void QmitkDataManagerView::SetFocus()
 {
+}
+
+void QmitkDataManagerView::ContextMenuActionTriggered( bool )
+{
+  QAction* action = qobject_cast<QAction*> ( sender() );
+  
+  std::map<QAction*, berry::IConfigurationElement::Pointer>::iterator it
+    = m_ConfElements.find( action );
+  if( it == m_ConfElements.end() )
+  {
+    MITK_WARN << "associated conf element for action " << action->text().toStdString() << " not found";
+    return;
+  }
+  berry::IConfigurationElement::Pointer confElem = it->second;
+  int blubb = action->data().value<int>();
+  mitk::IContextMenuAction* contextMenuAction = dynamic_cast<mitk::IContextMenuAction*>
+    (confElem->CreateExecutableExtension<mitk::IContextMenuAction>("class") );
+  std::string className;
+  std::string smoothed;
+  confElem->GetAttribute("class", className);
+  confElem->GetAttribute("smoothed", smoothed);
+  if(className == "QmitkThresholdAction")
+  {
+    contextMenuAction->SetDataStorage(this->GetDataStorage());
+  }
+  if(className == "QmitkCreatePolygonModelAction")
+  {
+    contextMenuAction->SetDataStorage(this->GetDataStorage());
+    if(smoothed == "false")
+    {
+      contextMenuAction->SetSmoothed(false);
+    }
+    else
+    {
+      contextMenuAction->SetSmoothed(true);
+    }
+  }
+  if(className == "QmitkStatisticsAction")
+  {
+    contextMenuAction->SetFunctionality(this);
+  }
+  contextMenuAction->Run( this->GetSelectedNodes() ); // run the action
 }
 
 mitk::DataStorage::Pointer QmitkDataManagerView::GetDataStorage() const

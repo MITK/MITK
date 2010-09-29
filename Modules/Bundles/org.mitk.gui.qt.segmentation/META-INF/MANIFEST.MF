@@ -3,4 +3,4 @@ Bundle-Name: Segmentation
 Bundle-SymbolicName: org.mitk.gui.qt.segmentation
 Bundle-Version: 1.0.0
 Bundle-Vendor: DKFZ, Medical and Biological Informatics
-Require-Bundle: org.mitk.gui.qt.common
+Require-Bundle: org.mitk.gui.qt.common, org.mitk.gui.qt.datamanager

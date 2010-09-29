@@ -40,14 +40,14 @@ QmitkSegmentationView::QmitkSegmentationView()
 :m_Parent(NULL)
 ,m_Controls(NULL)
 ,m_MultiWidget(NULL)
-,m_PostProcessing(NULL)
+//,m_PostProcessing(NULL)
 ,m_RenderingManagerObserverTag(0)
 {
 }
 
 QmitkSegmentationView::~QmitkSegmentationView()
 {
-  delete m_PostProcessing;
+  /*delete m_PostProcessing;*/
   delete m_Controls;
 }
 
@@ -810,8 +810,8 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
   m_Controls->MaskSurfaces->SetDataStorage(this->GetDefaultDataStorage());
   m_Controls->MaskSurfaces->SetPredicate(mitk::NodePredicateDataType::New("Surface"));
 
-  // create helper class to provide context menus for segmentations in data manager
-  m_PostProcessing = new QmitkSegmentationPostProcessing(this->GetDefaultDataStorage(), this, NULL);
+  //// create helper class to provide context menus for segmentations in data manager
+  //m_PostProcessing = new QmitkSegmentationPostProcessing(this->GetDefaultDataStorage(), this, NULL);
 }
 
 

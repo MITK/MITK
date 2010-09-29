@@ -21,11 +21,12 @@ PURPOSE.  See the above copyright notices for more information.
 #include <berryIViewPart.h>
 
 #include "src/internal/QmitkSegmentationView.h"
+#include "src/QmitkSegmentationPreferencePage.h"
 #include "src/internal/QmitkThresholdAction.h"
 #include "src/internal/QmitkCreatePolygonModelAction.h"
 #include "src/internal/QmitkStatisticsAction.h"
 #include "src/internal/QmitkAutocropAction.h"
-#include "src/QmitkSegmentationPreferencePage.h"
+
 
 POCO_BEGIN_NAMED_MANIFEST(berryIViewPart, berry::IViewPart)
   POCO_EXPORT_CLASS(QmitkSegmentationView)

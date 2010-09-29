@@ -396,6 +396,10 @@ void mitk::PlanarFigureMapper2D::DrawMarker(
     case PlanarFigureControlPointStyleProperty::Square:
     default:
       // Paint filled square
+
+      // Disable line antialiasing (does not look nice for squares)
+      glDisable( GL_LINE_SMOOTH );
+
       glRectf(
         displayPoint[0] - 4, displayPoint[1] - 4, 
         displayPoint[0] + 4, displayPoint[1] + 4 );
@@ -414,9 +418,9 @@ void mitk::PlanarFigureMapper2D::DrawMarker(
       // Paint filled circle
       glBegin( GL_POLYGON );
       float radius = 4.0;
-      for ( int angle = 0; angle < 12; ++angle )
+      for ( int angle = 0; angle < 8; ++angle )
       {
-        float angleRad = angle * (float) 3.14159 / 6.0;
+        float angleRad = angle * (float) 3.14159 / 4.0;
         float x = displayPoint[0] + radius * (float)cos( angleRad );
         float y = displayPoint[1] + radius * (float)sin( angleRad );
         glVertex2f(x,y);
@@ -426,9 +430,9 @@ void mitk::PlanarFigureMapper2D::DrawMarker(
       // Paint outline
       glColor4f( lineColor[0], lineColor[1], lineColor[2], lineOpacity );
       glBegin( GL_LINE_LOOP );
-      for ( int angle = 0; angle < 12; ++angle )
+      for ( int angle = 0; angle < 8; ++angle )
       {
-        float angleRad = angle * (float) 3.14159 / 6.0;
+        float angleRad = angle * (float) 3.14159 / 4.0;
         float x = displayPoint[0] + radius * (float)cos( angleRad );
         float y = displayPoint[1] + radius * (float)sin( angleRad );
         glVertex2f(x,y);

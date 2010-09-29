@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "itkUnaryFunctorImageFilter.h"
 #include "itkOrientationDistributionFunction.h"
+#include "itkRGBAPixel.h"
 
 namespace itk
 {
@@ -27,94 +28,39 @@ namespace itk
   #define __IMG_DAT_ITEM__CEIL_ZERO_ONE__(val) (val) =       \
   ( (val) < 0 ) ? ( 0 ) : ( ( (val)>1 ) ? ( 1 ) : ( (val) ) );
 
-// This functor class invokes the computation of fractional anisotropy from
-// every pixel.
-namespace Functor {  
-
-  template< typename TInput, typename TOutput >
-  class QBallToRgbFunction
-  {
-  public:
-    QBallToRgbFunction() {}
-    ~QBallToRgbFunction() {}
-    bool operator!=( const QBallToRgbFunction & ) const
-    {
-      return false;
-    }
-    bool operator==( const QBallToRgbFunction & other ) const
-    {
-      return !(*this != other);
-    }
-    inline TOutput operator()( const TInput & x )
-    {
-      typedef itk::OrientationDistributionFunction<float,QBALL_ODFSIZE> OdfType;
-      OdfType odf(x.GetDataPointer());
-      //for( unsigned int i=0; i<InternalDimension; i++) 
-      //{
-      //  result[i] = (*this)[i] + r[i];
-      //}
-      int pd = odf.GetPrincipleDiffusionDirection();
-      vnl_vector_fixed<double,3> dir = OdfType::GetDirection(pd);
-      
-      const float fa = odf.GetGeneralizedFractionalAnisotropy();
-      float r = fabs(dir[0]) * fa;
-      float g = fabs(dir[1]) * fa;
-      float b = fabs(dir[2]) * fa;
-
-      __IMG_DAT_ITEM__CEIL_ZERO_ONE__(r);
-      __IMG_DAT_ITEM__CEIL_ZERO_ONE__(g);
-      __IMG_DAT_ITEM__CEIL_ZERO_ONE__(b);
-
-      TOutput out;
-      out.SetRed(   r * 255.0f);
-      out.SetGreen( g * 255.0f);
-      out.SetBlue(  b * 255.0f);
-
-      return out;
-    }
-  }; 
-
-}  // end namespace functor
-
 
 /** \class QBallToRgbImageFilter
- *
- */
-template <typename TInputImage, 
-          typename TOutputImage=itk::Image<itk::RGBPixel<unsigned char>,3> >
-class QBallToRgbImageFilter :
-    public
-    UnaryFunctorImageFilter<TInputImage,TOutputImage, 
-                        Functor::QBallToRgbFunction< 
-                                        typename TInputImage::PixelType,
-                                        typename TOutputImage::PixelType> > 
-{
-public:
+*
+*/
+template <typename TInputImage,
+typename TOutputImage=itk::Image<itk::RGBAPixel<unsigned char>,3> >
+                      class QBallToRgbImageFilter :
+                      public ImageToImageFilter<TInputImage,TOutputImage>
+                      {
+                      public:
   /** Standard class typedefs. */
   typedef QBallToRgbImageFilter  Self;
-  typedef UnaryFunctorImageFilter<
-    TInputImage,TOutputImage, 
-    Functor::QBallToRgbFunction< 
-      typename TInputImage::PixelType,
-      typename TOutputImage::PixelType > >       Superclass;
+  typedef ImageToImageFilter<TInputImage,TOutputImage>
+      Superclass;
   typedef SmartPointer<Self>                     Pointer;
   typedef SmartPointer<const Self>               ConstPointer;
 
+  typedef typename Superclass::InputImageType    InputImageType;
   typedef typename Superclass::OutputImageType    OutputImageType;
   typedef typename OutputImageType::PixelType     OutputPixelType;
   typedef typename TInputImage::PixelType         InputPixelType;
   typedef typename InputPixelType::ValueType      InputValueType;
 
   /** Run-time type information (and related methods).   */
-  itkTypeMacro( QBallToRgbImageFilter, UnaryFunctorImageFilter );
+  itkTypeMacro( QBallToRgbImageFilter, ImageToImageFilter );
 
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
-  
+
   /** Print internal ivars */
   void PrintSelf(std::ostream& os, Indent indent) const
-    { this->Superclass::PrintSelf( os, indent ); }
-  
+  { this->Superclass::PrintSelf( os, indent ); }
+
 #ifdef ITK_USE_CONCEPT_CHECKING
   /** Begin concept checking */
   itkConceptMacro(InputHasNumericTraitsCheck,
@@ -122,17 +68,84 @@ public:
   /** End concept checking */
 #endif
 
-protected:
+  void SetOpacLevel(float v)
+  {m_OpacLevel = v;}
+
+  void SetOpacWindow(float v)
+  {m_OpacWindow = v;}
+
+
+                      protected:
   QBallToRgbImageFilter() {};
   virtual ~QBallToRgbImageFilter() {};
+
+  void GenerateData()
+  {
+
+    typename InputImageType::Pointer qballImage = static_cast< InputImageType * >( this->ProcessObject::GetInput(0) );
+
+    typename OutputImageType::Pointer outputImage =
+        static_cast< OutputImageType * >(this->ProcessObject::GetOutput(0));
+
+    typename InputImageType::RegionType region = qballImage->GetLargestPossibleRegion();
+
+    outputImage->SetSpacing( qballImage->GetSpacing() );   // Set the image spacing
+    outputImage->SetOrigin( qballImage->GetOrigin() );     // Set the image origin
+    outputImage->SetDirection( qballImage->GetDirection() );  // Set the image direction
+    outputImage->SetRegions( qballImage->GetLargestPossibleRegion());
+    outputImage->Allocate();
+
+    typedef ImageRegionConstIterator< InputImageType > QBallImageIteratorType;
+    QBallImageIteratorType qballIt(qballImage, qballImage->GetLargestPossibleRegion());
+
+    typedef ImageRegionIterator< OutputImageType > OutputImageIteratorType;
+    OutputImageIteratorType outputIt(outputImage, outputImage->GetLargestPossibleRegion());
+
+    qballIt.GoToBegin();
+    outputIt.GoToBegin();
+
+    while(!qballIt.IsAtEnd() && !outputIt.IsAtEnd()){
+
+      InputPixelType x = qballIt.Get();
+      typedef itk::OrientationDistributionFunction<float,QBALL_ODFSIZE> OdfType;
+      OdfType odf(x.GetDataPointer());
+
+      int pd = odf.GetPrincipleDiffusionDirection();
+      vnl_vector_fixed<double,3> dir = OdfType::GetDirection(pd);
+
+      const float fa = odf.GetGeneralizedFractionalAnisotropy();
+      float r = fabs(dir[0]) * fa;
+      float g = fabs(dir[1]) * fa;
+      float b = fabs(dir[2]) * fa;
+      float a = (fa-(m_OpacLevel-m_OpacWindow/2.0f))/m_OpacWindow;
+
+      __IMG_DAT_ITEM__CEIL_ZERO_ONE__(r);
+      __IMG_DAT_ITEM__CEIL_ZERO_ONE__(g);
+      __IMG_DAT_ITEM__CEIL_ZERO_ONE__(b);
+      __IMG_DAT_ITEM__CEIL_ZERO_ONE__(a);
+
+      OutputPixelType out;
+      out.SetRed(   r * 255.0f);
+      out.SetGreen( g * 255.0f);
+      out.SetBlue(  b * 255.0f);
+      out.SetAlpha( a * 255.0f);
+
+      outputIt.Set(out);
+
+      ++qballIt;
+      ++outputIt;
+    }
+
+  }
 
 private:
   QBallToRgbImageFilter(const Self&); //purposely not implemented
   void operator=(const Self&); //purposely not implemented
 
+  float m_OpacLevel;
+  float m_OpacWindow;
+
 };
-
-
   
 } // end namespace itk
   

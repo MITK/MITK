@@ -91,6 +91,8 @@ protected slots:
   void AdditionalScaling(int);
   void IndexParam1Changed(double);
   void IndexParam2Changed(double);
+  void OpacityMinFaChanged(int v);
+  void OpacityMaxFaChanged(int v);
 
 protected:
 

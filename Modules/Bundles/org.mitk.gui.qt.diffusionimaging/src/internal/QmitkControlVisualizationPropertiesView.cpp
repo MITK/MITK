@@ -193,6 +193,9 @@ struct CvpSelListener : ISelectionListener
       m_View->m_Controls->m_ScalingFactor->setVisible(m_View->m_FoundSingleOdfImage);
       m_View->m_Controls->m_AdditionalScaling->setVisible(m_View->m_FoundSingleOdfImage);
       
+      m_View->m_Controls->OpacMinFrame->setVisible(m_View->m_FoundSingleOdfImage);
+      m_View->m_Controls->OpacMaxFrame->setVisible(m_View->m_FoundSingleOdfImage);
+
       // changed for SPIE paper, Principle curvature scaling
       //m_View->m_Controls->params_frame->setVisible(m_View->m_FoundSingleOdfImage);
       m_View->m_Controls->params_frame->setVisible(false);
@@ -321,6 +324,10 @@ void QmitkControlVisualizationPropertiesView::CreateConnections()
     connect( (QObject*)(m_Controls->m_AdditionalScaling), SIGNAL(currentIndexChanged(int)), this, SLOT(AdditionalScaling(int)) );
     connect( (QObject*)(m_Controls->m_IndexParam1), SIGNAL(valueChanged(double)), this, SLOT(IndexParam1Changed(double)) );
     connect( (QObject*)(m_Controls->m_IndexParam2), SIGNAL(valueChanged(double)), this, SLOT(IndexParam2Changed(double)) );
+
+    connect( (QObject*)(m_Controls->m_OpacityMinFa), SIGNAL(valueChanged(int)), this, SLOT(OpacityMinFaChanged(int)) );
+    connect( (QObject*)(m_Controls->m_OpacityMaxFa), SIGNAL(valueChanged(int)), this, SLOT(OpacityMaxFaChanged(int)) );
+
   }
 }
 
@@ -670,3 +677,32 @@ void QmitkControlVisualizationPropertiesView::IndexParam2Changed(double param2)
     m_MultiWidget->RequestUpdate();
 }
 
+void QmitkControlVisualizationPropertiesView::OpacityMinFaChanged(int v)
+{
+  mitk::DataStorage::SetOfObjects::Pointer set =
+    ActiveSet("QBallImage");
+  SetFloatProp(set,"opacity min fa", v/100.0);
+
+  set = ActiveSet("TensorImage");
+  SetFloatProp(set,"opacity min fa", v/100.0);
+
+  m_Controls->m_OpacityMinFaLabel->setText(QString::number(v/100.0));
+
+  if(m_MultiWidget)
+    m_MultiWidget->RequestUpdate();
+}
+
+void QmitkControlVisualizationPropertiesView::OpacityMaxFaChanged(int v)
+{
+  mitk::DataStorage::SetOfObjects::Pointer set =
+    ActiveSet("QBallImage");
+  SetFloatProp(set,"opacity max fa", v/100.0);
+
+  set = ActiveSet("TensorImage");
+  SetFloatProp(set,"opacity max fa", v/100.0);
+
+  m_Controls->m_OpacityMaxFaLabel->setText(QString::number(v/100.0));
+
+  if(m_MultiWidget)
+    m_MultiWidget->RequestUpdate();
+}

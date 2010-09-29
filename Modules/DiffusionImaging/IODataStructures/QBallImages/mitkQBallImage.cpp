@@ -33,12 +33,19 @@ mitk::QBallImage::~QBallImage()
 vtkImageData* mitk::QBallImage::GetVtkImageData(int t, int n)
 {
   if(m_RgbImage.IsNull())
-    ConstructRgbImage();
+    ConstructRgbImage(0.5f,1.0f);
   return m_RgbImage->GetVtkImageData(t,n);
 }
 
-void mitk::QBallImage::ConstructRgbImage()
+void mitk::QBallImage::UpdateInternalRGBAImage(float opacLevel, float opacWindow)
 {
+  ConstructRgbImage(opacLevel, opacWindow);
+}
+
+void mitk::QBallImage::ConstructRgbImage(float opacLevel, float opacWindow)
+{
+  if( opacLevel != m_LastLevel || opacWindow != m_LastWindow)
+  {
   typedef itk::Image<itk::Vector<float,QBALL_ODFSIZE>,3> ImageType;
   typedef itk::QBallToRgbImageFilter<ImageType> FilterType;
   FilterType::Pointer filter = FilterType::New();
@@ -46,11 +53,17 @@ void mitk::QBallImage::ConstructRgbImage()
   ImageType::Pointer itkvol = ImageType::New();
   mitk::CastToItkImage<ImageType>(this, itkvol);
   filter->SetInput(itkvol);
+  filter->SetOpacLevel(opacLevel);
+  filter->SetOpacWindow(opacWindow);
   filter->Update();
 
   m_RgbImage = mitk::Image::New();
   m_RgbImage->InitializeByItk( filter->GetOutput() );
   m_RgbImage->SetVolume( filter->GetOutput()->GetBufferPointer() );
+
+  m_LastLevel = opacLevel;
+  m_LastWindow = opacWindow;
+}
 }
 
 vtkImageData* mitk::QBallImage::GetNonRgbVtkImageData(int t, int n)

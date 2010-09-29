@@ -1,9 +1,9 @@
 #ifndef QMITK_AUTOCROPACTION_H
 #define QMITK_AUTOCROPACTION_H
 
-#include "mitkIContextMenuAction.h"
-
 #include "mitkQtSegmentationDll.h"
+
+#include "mitkIContextMenuAction.h"
 
 #include "vector"
 #include "mitkDataNode.h"

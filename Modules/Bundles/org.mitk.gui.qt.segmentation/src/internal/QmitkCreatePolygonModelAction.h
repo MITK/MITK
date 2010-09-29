@@ -1,10 +1,10 @@
 #ifndef QMITK_CREATEPOLYGONMODELACTION_H
 #define QMITK_CREATEPOLYGONMODELACTION_H
 
+#include "mitkQtSegmentationDll.h"
+
 #include "mitkIContextMenuAction.h"
 #include "berryQtViewPart.h"
-
-#include "mitkQtSegmentationDll.h"
 
 #include "mitkDataNode.h"
 

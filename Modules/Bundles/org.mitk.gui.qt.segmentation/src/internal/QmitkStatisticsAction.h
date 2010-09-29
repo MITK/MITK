@@ -1,10 +1,10 @@
 #ifndef QMITK_STATISTICSACTION_H
 #define QMITK_STATISTICSACTION_H
 
+#include "mitkQtSegmentationDll.h"
+
 #include "mitkIContextMenuAction.h"
 #include "berryQtViewPart.h"
-
-#include "mitkQtSegmentationDll.h"
 
 #include <berryIWorkbenchPage.h>
 

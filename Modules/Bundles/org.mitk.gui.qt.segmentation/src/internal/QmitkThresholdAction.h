@@ -1,10 +1,10 @@
 #ifndef QMITK_THRESHOLDACTION_H
 #define QMITK_THRESHOLDACTION_H
 
+#include "mitkQtSegmentationDll.h"
+
 #include "mitkIContextMenuAction.h"
 #include "berryQtViewPart.h"
-
-#include "mitkQtSegmentationDll.h"
 
 #include "mitkDataStorage.h"
 #include "mitkToolManager.h"

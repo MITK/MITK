@@ -2,18 +2,22 @@
 #define QMITK_THRESHOLDACTION_H
 
 #include "mitkIContextMenuAction.h"
-
-#include <QObject>
+#include "berryQtViewPart.h"
 
 #include "mitkQtSegmentationDll.h"
 
 #include "mitkDataStorage.h"
 #include "mitkToolManager.h"
-#include "berryQtViewPart.h"
+#include "mitkBinaryThresholdTool.h"
+#include "mitkRenderingManager.h"
 
 #include <berryISelectionListener.h>
 
+#include "QmitkToolGUI.h"
+
+#include <QObject>
 #include <QDialog>
+#include <QtGui>
 
 class MITK_QT_SEGMENTATION QmitkThresholdAction: public QObject, public mitk::IContextMenuAction
 {

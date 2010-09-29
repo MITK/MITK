@@ -1,7 +1,5 @@
 #include "QmitkStatisticsAction.h"
 
-#include <berryIWorkbenchPage.h>
-
 QmitkStatisticsAction::QmitkStatisticsAction(): m_BlueBerryView(NULL)
 {
 }

@@ -1,9 +1,5 @@
 #include "QmitkCreatePolygonModelAction.h"
 
-#include "mitkShowSegmentationAsSurface.h"
-#include "mitkProgressBar.h"
-#include "mitkStatusBar.h"
-
 QmitkCreatePolygonModelAction::QmitkCreatePolygonModelAction()
 {
 }

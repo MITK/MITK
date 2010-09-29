@@ -1,15 +1,5 @@
 #include "QmitkAutocropAction.h"
 
-#include "mitkAutoCropImageFilter.h"
-#include "mitkImageCast.h"
-
-#include "mitkProgressBar.h"
-
-#include <itkConstantPadImageFilter.h>
-
-//needed for qApp 
-#include <qcoreapplication.h>
-
 QmitkAutocropAction::QmitkAutocropAction()
 {
 }

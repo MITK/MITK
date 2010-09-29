@@ -9,6 +9,16 @@
 #include "mitkDataNode.h"
 #include "mitkImage.h"
 
+#include "mitkAutoCropImageFilter.h"
+#include "mitkImageCast.h"
+
+#include "mitkProgressBar.h"
+
+#include <itkConstantPadImageFilter.h>
+
+//needed for qApp 
+#include <qcoreapplication.h>
+
 class MITK_QT_SEGMENTATION QmitkAutocropAction : public mitk::IContextMenuAction
 {
 public:

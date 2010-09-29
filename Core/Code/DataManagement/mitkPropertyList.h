@@ -120,7 +120,6 @@ class MITK_CORE_EXPORT PropertyList : public itk::Object
     //## @return @a true property was found
     template <typename T>
     bool GetPropertyValue(const char* propertyKey, T & value) const
-#ifdef _MSC_VER
     {
       GenericProperty<T>* gp= dynamic_cast<GenericProperty<T>*>(GetProperty(propertyKey));
       if ( gp != NULL )
@@ -130,9 +129,6 @@ class MITK_CORE_EXPORT PropertyList : public itk::Object
       }
       return false;
     }
-#else
-      ;
-#endif
 
     /**
     * @brief Convenience method to access the value of a BoolProperty

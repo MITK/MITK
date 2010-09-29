@@ -284,6 +284,7 @@ template<class T, int N>
 int  mitk::OdfVtkMapper2D<T,N>
 ::GetIndex(mitk::BaseRenderer* renderer)
 {
+  MITK_INFO << renderer->GetName();
   if(!strcmp(renderer->GetName(),"stdmulti.widget1"))
     return 0;
 
@@ -311,9 +312,9 @@ void  mitk::OdfVtkMapper2D<T,N>
   itk::Point<double,3> p(point);
   Point3D origin = pfilter->GetGeometry()->GetOrigin();
   Vector3D spacing = pfilter->GetGeometry()->GetSpacing();
-  p[0] += origin[0]+spacing[0]*0.5;
-  p[1] += origin[1]+spacing[1]*0.5;
-  p[2] += origin[2]+spacing[2]*0.5;
+  p[0] += origin[0];//+spacing[0]*0.5;
+  p[1] += origin[1];//+spacing[1]*0.5;
+  p[2] += origin[2];//+spacing[2]*0.5;
   mitk::Point3D p2;
   pfilter->GetGeometry()->ItkPhysicalPointToWorld( p, p2 );
   point[0] = p2[0];

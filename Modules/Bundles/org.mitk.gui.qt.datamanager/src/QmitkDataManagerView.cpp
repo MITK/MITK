@@ -17,6 +17,10 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "QmitkDataManagerView.h"
 
+#include "mitkIContextMenuAction.h"
+#include "mitkDataNodeObject.h"
+#include "berryIExtensionPointService.h"
+
 #include <itkOtsuThresholdImageFilter.h>
 
 //# Own Includes
@@ -82,9 +86,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QColorDialog>
 #include <QSizePolicy>
 
-#include "mitkDataNodeObject.h"
-#include "mitkIContextMenuAction.h"
-#include "berryIExtensionPointService.h"
+
 
 const std::string QmitkDataManagerView::VIEW_ID = "org.mitk.views.datamanager";
 

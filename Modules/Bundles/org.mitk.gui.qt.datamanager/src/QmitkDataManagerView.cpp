@@ -230,7 +230,6 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
 
       cmActionDataIt.setValue<int>(i);
       contextMenuAction->setData( cmActionDataIt );
-      int bla = contextMenuAction->data().value<int>();
       connect( contextMenuAction, SIGNAL( triggered(bool) ) , this, SLOT( ContextMenuActionTriggered(bool) ) );
       ++i;
     }
@@ -357,7 +356,6 @@ void QmitkDataManagerView::ContextMenuActionTriggered( bool )
     return;
   }
   berry::IConfigurationElement::Pointer confElem = it->second;
-  int blubb = action->data().value<int>();
   mitk::IContextMenuAction* contextMenuAction = dynamic_cast<mitk::IContextMenuAction*>
     (confElem->CreateExecutableExtension<mitk::IContextMenuAction>("class") );
   std::string className;

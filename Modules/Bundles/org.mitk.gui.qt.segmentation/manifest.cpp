@@ -24,7 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "src/QmitkSegmentationPreferencePage.h"
 #include "src/internal/QmitkThresholdAction.h"
 #include "src/internal/QmitkCreatePolygonModelAction.h"
-#include "src/internal/qmitkstatisticsaction.h"
+#include "src/internal/QmitkStatisticsAction.h"
 #include "src/internal/QmitkAutocropAction.h"
 
 

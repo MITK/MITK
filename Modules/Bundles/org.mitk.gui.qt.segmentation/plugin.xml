@@ -23,13 +23,5 @@
    <extension point="org.blueberry.ui.keywords">
     <keyword id="org.mitk.gui.qt.application.SegmentationPreferencePageKeywords" label="data manager"></keyword>
   </extension>
-  
-  <extension point="org.mitk.gui.qt.datamanager.contextMenuActions">
-    <contextMenuAction nodeDescriptorName="Image" label="Threshold..." icon="" class="QmitkThresholdAction" />
-    <contextMenuAction nodeDescriptorName="ImageMask" label="Create polygon model" icon="" smoothed="false" class="QmitkCreatePolygonModelAction" />
-    <contextMenuAction nodeDescriptorName="ImageMask" label="Create smoothed polygon model" icon="" smoothed = "true" class="QmitkCreatePolygonModelAction" />
-    <contextMenuAction nodeDescriptorName="ImageMask" label="Statistics" icon="" class="QmitkStatisticsAction" />
-    <contextMenuAction nodeDescriptorName="ImageMask" label="Autocrop" icon="" class="QmitkAutocropAction" />
-  </extension>
 
 </plugin>

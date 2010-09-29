@@ -156,12 +156,6 @@ public slots:
   /// Invoked when the preferences were changed
   ///
   void OnPreferencesChanged(const berry::IBerryPreferences*);
-  ///
-  /// \brief will be toggled when a extension point context menu action is toggled
-  /// this is a proxy method which will load the corresponding extension class
-  /// and run IContextMenuAction
-  ///
-  void ContextMenuActionTriggered( bool );
 
   ///
   /// Invoked when the DataManager selection changed
@@ -205,10 +199,6 @@ protected:
   /// Holds the preferences for the datamanager. 
   ///
   berry::IBerryPreferences::Pointer m_DataManagerPreferencesNode;
-  ///
-  /// saves the configuration elements for the context menu actions from extension points
-  ///
-  std::map<QAction*, berry::IConfigurationElement::Pointer> m_ConfElements;
   ///
   /// \brief The Table view to show the selected nodes.
   ///

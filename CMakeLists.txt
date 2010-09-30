@@ -402,6 +402,14 @@ ELSE(WIN32)
           FILES_MATCHING PATTERN "libvtk*.so*" PATTERN "libVTK*.so*"
   )
 
+  # additional VTK libraries
+  SET(additional_vtklibs libVPIC.so libCosmo.so)
+  FOREACH(vtklib ${additional_vtklibs})
+    IF(EXISTS "${VTK_RUNTIME_LIBRARY_DIRS}/${vtklib}")
+      INSTALL(FILES "${VTK_RUNTIME_LIBRARY_DIRS}/${vtklib}" DESTINATION lib)
+    ENDIF()
+  ENDFOREACH()
+
   IF(MITK_USE_QT)
     INSTALL(DIRECTORY ${VTK_RUNTIME_LIBRARY_DIRS}/ DESTINATION lib
             FILES_MATCHING PATTERN "libQ*.so*")

@@ -51,7 +51,7 @@ void mitk::ManualSegmentationToSurfaceFilter::GenerateData()
 
   if ((tmax-tstart) > 0)
   {
-    ProgressBar::GetInstance()->AddStepsToDo( 4 * (tmax - tstart)  );
+    ProgressBar::GetInstance()->AddStepsToDo( 7 * (tmax - tstart)  );
   }
 
   for( int t=tstart; t<tmax; t++ )

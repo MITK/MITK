@@ -157,6 +157,8 @@ void mitk::UnstructuredGridVtkMapper3D::GenerateData(mitk::BaseRenderer* rendere
     return;
   }
 
+  m_Assembly->VisibilityOn();
+
   m_VtkTriangleFilter->SetInput(grid);
   m_VtkDataSetMapper->SetInput(grid);
   m_VtkDataSetMapper2->SetInput(grid);

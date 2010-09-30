@@ -741,7 +741,8 @@ void QmitkBasicImageProcessing::StartButtonClicked()
     {
       InversionFilterType::Pointer invFilter = InversionFilterType::New();
       mitk::ScalarType min = newImage->GetScalarValueMin();
-      invFilter->SetMaximum( std::numeric_limits<short>::max() - std::abs((short)min) - 1 );
+      mitk::ScalarType max = newImage->GetScalarValueMax();
+      invFilter->SetMaximum( max + min );
       invFilter->SetInput(itkImage);
       invFilter->UpdateLargestPossibleRegion();
       newImage = mitk::ImportItkImage(invFilter->GetOutput());

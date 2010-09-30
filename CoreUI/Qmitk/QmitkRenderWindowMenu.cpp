@@ -703,7 +703,7 @@ void QmitkRenderWindowMenu::SetCrossHairVisibility( bool state )
       n = ds->GetNamedNode("widget1Plane"); if(n) n->SetVisibility(state);
       n = ds->GetNamedNode("widget2Plane"); if(n) n->SetVisibility(state);
       n = ds->GetNamedNode("widget3Plane"); if(n) n->SetVisibility(state);
-      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+      m_Renderer->GetRenderingManager()->RequestUpdateAll();
     }
   }
 }
@@ -725,7 +725,7 @@ void QmitkRenderWindowMenu::OnTSNumChanged(int num)
     }
     m_TSLabel->setText(QString::number(num*2+1));
     m_Renderer->SendUpdateSlice();
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    m_Renderer->GetRenderingManager()->RequestUpdateAll();
   }
 }
 

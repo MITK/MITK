@@ -286,8 +286,14 @@
       </property>
       <item>
        <widget class="QLabel" name="label_4">
+        <property name="minimumSize">
+         <size>
+          <width>90</width>
+          <height>0</height>
+         </size>
+        </property>
         <property name="text">
-         <string>Opacity Min-FA</string>
+         <string>Opacity Min</string>
         </property>
        </widget>
       </item>
@@ -303,6 +309,12 @@
       </item>
       <item>
        <widget class="QLabel" name="m_OpacityMinFaLabel">
+        <property name="minimumSize">
+         <size>
+          <width>40</width>
+          <height>0</height>
+         </size>
+        </property>
         <property name="text">
          <string>0.0</string>
         </property>
@@ -325,8 +337,14 @@
       </property>
       <item>
        <widget class="QLabel" name="label_5">
+        <property name="minimumSize">
+         <size>
+          <width>90</width>
+          <height>0</height>
+         </size>
+        </property>
         <property name="text">
-         <string>Opacity Max-FA</string>
+         <string>Opacity Max</string>
         </property>
        </widget>
       </item>
@@ -342,6 +360,12 @@
       </item>
       <item>
        <widget class="QLabel" name="m_OpacityMaxFaLabel">
+        <property name="minimumSize">
+         <size>
+          <width>40</width>
+          <height>0</height>
+         </size>
+        </property>
         <property name="text">
          <string>0.0</string>
         </property>

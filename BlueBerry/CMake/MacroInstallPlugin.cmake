@@ -48,9 +48,9 @@ MACRO(MACRO_INSTALL_PLUGIN _plugin_dir)
                         PROPERTIES INSTALL_RPATH "${_target_install_rpath}")
 		  
   INSTALL(TARGETS ${_INSTALL_TARGETS}
-                  RUNTIME DESTINATION ${_plugin_install_dir}/bin
-          LIBRARY DESTINATION ${_plugin_install_dir}/lib
-          ARCHIVE DESTINATION ${_plugin_install_dir}/lib
+          RUNTIME DESTINATION ${_plugin_install_dir}/bin
+          LIBRARY DESTINATION ${_plugin_install_dir}/bin
+          ARCHIVE DESTINATION ${_plugin_install_dir}/bin
      )
 
 ENDMACRO()

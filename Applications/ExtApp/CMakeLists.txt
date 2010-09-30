@@ -21,6 +21,7 @@ TARGET_LINK_LIBRARIES(ExtApp
                       optimized org_blueberry_osgi debug org_blueberry_osgi${BLUEBERRY_DEBUG_POSTFIX}
                       ${ALL_LIBRARIES})
 
+SET_TARGET_PROPERTIES(ExtApp PROPERTIES INSTALL_RPATH "${CMAKE_INSTALL_RPATH};${CMAKE_INSTALL_PREFIX}/bin/BlueBerry/org.blueberry.osgi/bin")
 					  
 SET(EXTAPP_REQUIRED_BUNDLES
 org.mitk.gui.qt.datamanager

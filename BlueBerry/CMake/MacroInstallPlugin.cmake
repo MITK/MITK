@@ -38,6 +38,15 @@ MACRO(MACRO_INSTALL_PLUGIN _plugin_dir)
           PATTERN "bin/*" EXCLUDE
       PATTERN "lib/*" EXCLUDE)
       
+  SET(_target_install_rpath ${CMAKE_INSTALL_RPATH})
+  FOREACH(_dep ${_plugin_dependencies})
+    SET(_linklib_path "${${_dep}_OUT_DIR}")
+    STRING(REPLACE "${CMAKE_BINARY_DIR}" "${CMAKE_INSTALL_PREFIX}" _linklib_path "${_linklib_path}")
+    LIST(APPEND _target_install_rpath "${_linklib_path}/bin")
+  ENDFOREACH()
+  SET_TARGET_PROPERTIES(${_INSTALL_TARGETS}
+                        PROPERTIES INSTALL_RPATH "${_target_install_rpath}")
+		  
   INSTALL(TARGETS ${_INSTALL_TARGETS}
                   RUNTIME DESTINATION ${_plugin_install_dir}/bin
           LIBRARY DESTINATION ${_plugin_install_dir}/lib

@@ -15,13 +15,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#ifdef _WIN32
-#define _WIN32_WINNT 0x0502
-#include <windows.h>
-#endif
-
-// for std::memcpy
-#include <cstring>
 
 #include "berryLog.h"
 
@@ -43,6 +36,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "service/berryIExtensionPointService.h"
 
+#include <Poco/Environment.h>
 
 namespace berry {
 
@@ -302,21 +296,10 @@ BundleLoader::InstallLibraries(IBundle::Pointer bundle, bool copy)
         // a batch file every time he adds a new plugin from outside the
         // build system.
         #ifdef BERRY_OS_FAMILY_WINDOWS
-        DWORD size = GetEnvironmentVariableA("path", 0, 0);
-        char* currPath = new char[size];
-        DWORD currSize = GetEnvironmentVariableA("path", currPath, size);
-        //BERRY_INFO << "Current path: " << currPath << std::endl;
-        char* newPath = new char[currSize + bundlePath.toString().length() + 2];
-        std::memcpy(newPath, currPath, currSize);
-        newPath[currSize] = ';';
-        std::memcpy(newPath + currSize + 1, bundlePath.toString().c_str(), bundlePath.toString().length());
-        newPath[currSize+bundlePath.toString().length()+1] = '\0';
-        //BERRY_INFO << "Setting additional path: " << newPath;
-        /*bool success =*/ SetEnvironmentVariableA("path", newPath);
-        //BERRY_INFO << " " << (success ? "SUCCESS" : "FAILED") << std::endl;
-
-        delete[] newPath;
-        delete[] currPath;
+        std::string pathEnv = Poco::Environment::get("PATH", "");
+        if (!pathEnv.empty()) pathEnv += ";";
+        pathEnv += bundlePath.toString();
+        Poco::Environment::set("PATH", pathEnv);
         #endif
 
         m_CodeCache->InstallLibrary(libFileName, bundlePath);

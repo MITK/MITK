@@ -5,6 +5,9 @@ if(COMMAND cmake_policy)
   cmake_policy(SET CMP0003 OLD)
 endif(COMMAND cmake_policy)
 
+SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib" "${CMAKE_INSTALL_PREFIX}/lib/mitk")
+SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH FALSE)
+
 SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/CMake)
 SET(MITK_MODULES_CONF_DIR ${MITK_BINARY_DIR}/modulesConf CACHE INTERNAL "Modules Conf")
 
@@ -260,8 +263,9 @@ IF(WIN32)
     ENDIF()
     IF (QT_QTXMLPATTERNS_FOUND)
     SET(QT_USE_QTXMLPATTERNS 1)
-ENDIF()
+    ENDIF()
 
+    # this is not a godd idea since it adds the QT include directories to everything that is built below this directory
       INCLUDE(${QT_USE_FILE})
       
       SET(qtdebugdlls)
@@ -303,7 +307,6 @@ ENDIF()
       ENDIF()
       ENDFOREACH()
     ENDIF()
-    
     
   ENDIF(MITK_USE_QT)
  
@@ -387,6 +390,40 @@ ENDIF()
     ENDIF()
   ENDIF()
 
+ELSE(WIN32)
+  FOREACH(vtklib ${VTK_FOR_MITK_LIBRARIES})
+    IF(EXISTS ${vtklib})
+      # already an absolute path
+      INSTALL(FILES ${vtklib} DESTINATION lib)
+    ENDIF(EXISTS ${vtklib})
+  ENDFOREACH(vtklib)  
+
+  INSTALL(DIRECTORY ${VTK_RUNTIME_LIBRARY_DIRS}/ DESTINATION lib
+          FILES_MATCHING PATTERN "libvtk*.so*" PATTERN "libVTK*.so*"
+  )
+
+  IF(MITK_USE_QT)
+    INSTALL(DIRECTORY ${VTK_RUNTIME_LIBRARY_DIRS}/ DESTINATION lib
+            FILES_MATCHING PATTERN "libQ*.so*")
+  ENDIF()
+
+
+  INSTALL(DIRECTORY ${ITK_LIBRARY_DIRS}/ DESTINATION lib
+          FILES_MATCHING PATTERN "libitk*.so*" PATTERN "libITK*.so*"
+  )
+
+  #DCMTK Dlls install target (shared libs on gcc only)
+  IF(DCMTK_ofstd_LIBRARY)
+    SET(_dcmtk_libs
+        ${DCMTK_dcmdata_LIBRARY}
+        ${DCMTK_dcmimgle_LIBRARY}
+        ${DCMTK_dcmnet_LIBRARY}
+        ${DCMTK_ofstd_LIBRARY}
+    )
+    FOREACH(_dcmtk_lib ${_dcmtk_libs})
+      INSTALL(FILES ${_dcmtk_lib} DESTINATION lib)
+    ENDFOREACH()
+  ENDIF()
  
 ENDIF(WIN32)
    

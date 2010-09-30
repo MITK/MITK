@@ -21,6 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifdef _MSC_VER
 // This warns about truncation to 255 characters in debug/browse info
 #pragma warning (disable : 4786)
+#pragma warning (disable : 4068 ) /* disable unknown pragma warnings */
 #endif
 
 //add only those headers here that are really necessary for all classes!

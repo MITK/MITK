@@ -284,7 +284,6 @@ template<class T, int N>
 int  mitk::OdfVtkMapper2D<T,N>
 ::GetIndex(mitk::BaseRenderer* renderer)
 {
-  MITK_INFO << renderer->GetName();
   if(!strcmp(renderer->GetName(),"stdmulti.widget1"))
     return 0;
 

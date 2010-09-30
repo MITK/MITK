@@ -66,14 +66,7 @@ namespace itk
     /** End concept checking */
 #endif
 
-    void SetOpacLevel(float v)
-    {m_OpacLevel = v;}
-
-    void SetOpacWindow(float v)
-    {m_OpacWindow = v;}
-
-
-                        protected:
+protected:
     TensorToRgbImageFilter() {};
     virtual ~TensorToRgbImageFilter() {};
 
@@ -124,7 +117,8 @@ namespace itk
         float r = fabs(eigenvectors(2/*index*/,0)) * fa;
         float g = fabs(eigenvectors(2/*index*/,1)) * fa;
         float b = fabs(eigenvectors(2/*index*/,2)) * fa;
-        float a = (fa-(m_OpacLevel-m_OpacWindow/2.0f))/m_OpacWindow;
+//        float a = (fa-(m_OpacLevel-m_OpacWindow/2.0f))/m_OpacWindow;
+        float a = fa;
 
         __IMG_DAT_ITEM__CEIL_ZERO_ONE__(r);
         __IMG_DAT_ITEM__CEIL_ZERO_ONE__(g);
@@ -148,10 +142,6 @@ namespace itk
   private:
     TensorToRgbImageFilter(const Self&); //purposely not implemented
     void operator=(const Self&); //purposely not implemented
-
-    float m_OpacLevel;
-    float m_OpacWindow;
-
   };
 
 

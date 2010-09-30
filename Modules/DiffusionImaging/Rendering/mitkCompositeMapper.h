@@ -113,8 +113,11 @@ namespace mitk {
       mitk::OdfVtkMapper2D<float,QBALL_ODFSIZE>::SetDefaultProperties(node, renderer, overwrite);
       mitk::CopyImageMapper2D::SetDefaultProperties(node, renderer, overwrite);
 
-      node->AddProperty( "opacity min fa", mitk::FloatProperty::New( 0.0 ), renderer, overwrite );
-      node->AddProperty( "opacity max fa", mitk::FloatProperty::New( 0.0 ), renderer, overwrite );
+      mitk::LevelWindow opaclevwin;
+      opaclevwin.SetRangeMinMax(0,255);
+      opaclevwin.SetWindowBounds(0,0);
+      mitk::LevelWindowProperty::Pointer prop = mitk::LevelWindowProperty::New(opaclevwin);
+      node->AddProperty( "opaclevelwindow", prop );
     }
 
     bool IsLODEnabled( BaseRenderer * renderer ) const 
@@ -145,39 +148,6 @@ namespace mitk {
 
     virtual void GenerateData(mitk::BaseRenderer* renderer)
     {
-      float min;
-      bool success = m_ImgMapper->GetDataNode()->GetFloatProperty("opacity min fa", min);
-
-      float max;
-      success = success && m_ImgMapper->GetDataNode()->GetFloatProperty("opacity max fa", max);
-
-      if(success)
-      {
-        if (max < min)
-        {
-          max = min;
-        }
-
-        float level = (min+max)/2;
-        float window = max-min;
-
-        mitk::TensorImage::Pointer timg = dynamic_cast<mitk::TensorImage*>(m_ImgMapper->GetDataNode()->GetData());
-        if(timg.IsNotNull())
-        {
-          timg->UpdateInternalRGBAImage(level, window);
-        }
-
-        mitk::QBallImage::Pointer qimg = dynamic_cast<mitk::QBallImage*>(m_ImgMapper->GetDataNode()->GetData());
-        if(qimg.IsNotNull())
-        {
-          qimg->UpdateInternalRGBAImage(level, window);
-        }
-      }
-      else
-      {
-        MITK_ERROR << "opacity level window property not set";
-      }
-
       m_ImgMapper->GenerateData(renderer);
       if( mitk::RenderingManager::GetInstance()->GetNextLOD( renderer ) > 0 )
       {

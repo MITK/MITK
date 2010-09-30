@@ -68,14 +68,7 @@ typename TOutputImage=itk::Image<itk::RGBAPixel<unsigned char>,3> >
   /** End concept checking */
 #endif
 
-  void SetOpacLevel(float v)
-  {m_OpacLevel = v;}
-
-  void SetOpacWindow(float v)
-  {m_OpacWindow = v;}
-
-
-                      protected:
+protected:
   QBallToRgbImageFilter() {};
   virtual ~QBallToRgbImageFilter() {};
 
@@ -117,7 +110,8 @@ typename TOutputImage=itk::Image<itk::RGBAPixel<unsigned char>,3> >
       float r = fabs(dir[0]) * fa;
       float g = fabs(dir[1]) * fa;
       float b = fabs(dir[2]) * fa;
-      float a = (fa-(m_OpacLevel-m_OpacWindow/2.0f))/m_OpacWindow;
+//      float a = (fa-(m_OpacLevel-m_OpacWindow/2.0f))/m_OpacWindow;
+      float a = fa;
 
       __IMG_DAT_ITEM__CEIL_ZERO_ONE__(r);
       __IMG_DAT_ITEM__CEIL_ZERO_ONE__(g);
@@ -141,10 +135,6 @@ typename TOutputImage=itk::Image<itk::RGBAPixel<unsigned char>,3> >
 private:
   QBallToRgbImageFilter(const Self&); //purposely not implemented
   void operator=(const Self&); //purposely not implemented
-
-  float m_OpacLevel;
-  float m_OpacWindow;
-
 };
   
 } // end namespace itk

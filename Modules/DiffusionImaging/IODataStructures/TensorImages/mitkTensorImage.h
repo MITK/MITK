@@ -45,18 +45,13 @@ namespace mitk
 
     virtual vtkImageData* GetVtkImageData(int t = 0, int n = 0);
 
-    virtual void ConstructRgbImage(float opacLevel, float opacWindow);
-    
-    void UpdateInternalRGBAImage(float opacLevel, float opacWindow);
+    virtual void ConstructRgbImage();
 
   protected:
     TensorImage();
     virtual ~TensorImage();
 
     mitk::Image::Pointer m_RgbImage;
-
-    float m_LastLevel;
-    float m_LastWindow;
 
   };
 

@@ -42,20 +42,13 @@ vtkImageData* mitk::TensorImage::GetVtkImageData(int t, int n)
 {
   if(m_RgbImage.IsNull())
   {
-    ConstructRgbImage(0.5f,1.0f);
+    ConstructRgbImage();
   }
   return m_RgbImage->GetVtkImageData(t,n);
 }
 
-void mitk::TensorImage::UpdateInternalRGBAImage(float opacLevel, float opacWindow)
+void mitk::TensorImage::ConstructRgbImage()
 {
-  ConstructRgbImage(opacLevel, opacWindow);
-}
-
-void mitk::TensorImage::ConstructRgbImage(float opacLevel, float opacWindow)
-{
-  if( opacLevel != m_LastLevel || opacWindow != m_LastWindow)
-  {
     typedef itk::Image<itk::DiffusionTensor3D<float>,3> ImageType;
     typedef itk::TensorToRgbImageFilter<ImageType> FilterType;
     FilterType::Pointer filter = FilterType::New();
@@ -63,17 +56,11 @@ void mitk::TensorImage::ConstructRgbImage(float opacLevel, float opacWindow)
     ImageType::Pointer itkvol = ImageType::New();
     mitk::CastToItkImage<ImageType>(this, itkvol);
     filter->SetInput(itkvol);
-    filter->SetOpacLevel(opacLevel);
-    filter->SetOpacWindow(opacWindow);
     filter->Update();
 
     m_RgbImage = mitk::Image::New();
     m_RgbImage->InitializeByItk( filter->GetOutput() );
     m_RgbImage->SetVolume( filter->GetOutput()->GetBufferPointer() );
-
-    m_LastLevel = opacLevel;
-    m_LastWindow = opacWindow;
-  }
 }
 
 vtkImageData* mitk::TensorImage::GetNonRgbVtkImageData(int t, int n)

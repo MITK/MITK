@@ -73,6 +73,7 @@ class QmitkControlVisualizationPropertiesView : public QObject, public QmitkFunc
   void SetBoolProp (mitk::DataStorage::SetOfObjects::Pointer,std::string,bool);
   void SetIntProp  (mitk::DataStorage::SetOfObjects::Pointer,std::string,int);
   void SetFloatProp(mitk::DataStorage::SetOfObjects::Pointer,std::string,float);
+  void SetLevelWindowProp(mitk::DataStorage::SetOfObjects::Pointer,std::string,mitk::LevelWindow);
   void SetEnumProp (mitk::DataStorage::SetOfObjects::Pointer,std::string,mitk::EnumerationProperty::Pointer);
 
   virtual int GetSizeFlags(bool width);

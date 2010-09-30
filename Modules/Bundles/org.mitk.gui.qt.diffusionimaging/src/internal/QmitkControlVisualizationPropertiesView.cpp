@@ -429,11 +429,26 @@ void QmitkControlVisualizationPropertiesView::SetFloatProp(
   mitk::DataStorage::SetOfObjects::Pointer set,
   std::string name, float value)
 {
-  mitk::DataStorage::SetOfObjects::const_iterator itemiter( set->begin() );  
-  mitk::DataStorage::SetOfObjects::const_iterator itemiterend( set->end() );  
+  mitk::DataStorage::SetOfObjects::const_iterator itemiter( set->begin() );
+  mitk::DataStorage::SetOfObjects::const_iterator itemiterend( set->end() );
   while ( itemiter != itemiterend )
   {
     (*itemiter)->SetFloatProperty(name.c_str(), value);
+    ++itemiter;
+  }
+}
+
+void QmitkControlVisualizationPropertiesView::SetLevelWindowProp(
+  mitk::DataStorage::SetOfObjects::Pointer set,
+  std::string name, mitk::LevelWindow value)
+{
+  mitk::LevelWindowProperty::Pointer prop = mitk::LevelWindowProperty::New(value);
+
+  mitk::DataStorage::SetOfObjects::const_iterator itemiter( set->begin() );
+  mitk::DataStorage::SetOfObjects::const_iterator itemiterend( set->end() );
+  while ( itemiter != itemiterend )
+  {
+    (*itemiter)->SetProperty(name.c_str(), prop);
     ++itemiter;
   }
 }
@@ -679,12 +694,15 @@ void QmitkControlVisualizationPropertiesView::IndexParam2Changed(double param2)
 
 void QmitkControlVisualizationPropertiesView::OpacityMinFaChanged(int v)
 {
+  mitk::LevelWindow olw;
+  olw.SetRangeMinMax(v*2.55, m_Controls->m_OpacityMaxFa->value()*2.55);
+
   mitk::DataStorage::SetOfObjects::Pointer set =
     ActiveSet("QBallImage");
-  SetFloatProp(set,"opacity min fa", v/100.0);
+  SetLevelWindowProp(set,"opaclevelwindow", olw);
 
   set = ActiveSet("TensorImage");
-  SetFloatProp(set,"opacity min fa", v/100.0);
+  SetLevelWindowProp(set,"opaclevelwindow", olw);
 
   m_Controls->m_OpacityMinFaLabel->setText(QString::number(v/100.0));
 
@@ -694,12 +712,15 @@ void QmitkControlVisualizationPropertiesView::OpacityMinFaChanged(int v)
 
 void QmitkControlVisualizationPropertiesView::OpacityMaxFaChanged(int v)
 {
+  mitk::LevelWindow olw;
+  olw.SetRangeMinMax(m_Controls->m_OpacityMinFa->value()*2.55, v*2.55);
+
   mitk::DataStorage::SetOfObjects::Pointer set =
     ActiveSet("QBallImage");
-  SetFloatProp(set,"opacity max fa", v/100.0);
+  SetLevelWindowProp(set,"opaclevelwindow", olw);
 
   set = ActiveSet("TensorImage");
-  SetFloatProp(set,"opacity max fa", v/100.0);
+  SetLevelWindowProp(set,"opaclevelwindow", olw);
 
   m_Controls->m_OpacityMaxFaLabel->setText(QString::number(v/100.0));
 

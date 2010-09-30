@@ -239,53 +239,45 @@ void mitk::PropertyList::ConcatenatePropertyList(PropertyList *pList, bool repla
   }
 }
 
-
-#ifndef _MSC_VER
-template <typename T>
-bool mitk::PropertyList::GetPropertyValue(const char* propertyKey, T & value) const
+bool mitk::PropertyList::GetBoolProperty(const char* propertyKey, bool& boolValue) const
 {
-  GenericProperty<T>* gp= dynamic_cast<GenericProperty<T>*>(GetProperty(propertyKey) );
+  BoolProperty *gp = dynamic_cast<BoolProperty*>( GetProperty(propertyKey) );
   if ( gp != NULL )
   {
-    value = gp->GetValue();
+    boolValue = gp->GetValue();
     return true;
   }
   return false;
-}
-
-template bool mitk::PropertyList::GetPropertyValue<double>(char const*, double&) const;
-template bool mitk::PropertyList::GetPropertyValue<float>(char const*, float&) const;
-template bool mitk::PropertyList::GetPropertyValue<int>(char const*, int&) const;
-template bool mitk::PropertyList::GetPropertyValue<bool>(char const*, bool&) const;
-template bool mitk::PropertyList::GetPropertyValue<mitk::Vector3D>(char const*, mitk::Vector3D&) const;
-template bool mitk::PropertyList::GetPropertyValue<mitk::Point3D>(char const*, mitk::Point3D&) const;
-template bool mitk::PropertyList::GetPropertyValue<mitk::Point4D>(char const*, mitk::Point4D&) const;
-template bool mitk::PropertyList::GetPropertyValue<mitk::Point3I>(char const*, mitk::Point3I&) const;
-
-template bool mitk::PropertyList::GetPropertyValue<mitk::FloatLookupTable>(char const*, mitk::FloatLookupTable&) const;
-template bool mitk::PropertyList::GetPropertyValue<mitk::BoolLookupTable>(char const*, mitk::BoolLookupTable&) const;
-template bool mitk::PropertyList::GetPropertyValue<mitk::IntLookupTable>(char const*, mitk::IntLookupTable&) const;
-template bool mitk::PropertyList::GetPropertyValue<mitk::StringLookupTable>(char const*, mitk::StringLookupTable&) const;
-
-
-#endif
-
-
-bool mitk::PropertyList::GetBoolProperty(const char* propertyKey, bool& boolValue) const
-{
-  return GetPropertyValue<bool>(propertyKey, boolValue);
+  // Templated Method does not work on Macs
+  //return GetPropertyValue<bool>(propertyKey, boolValue);
 }
 
 
 bool mitk::PropertyList::GetIntProperty(const char* propertyKey, int &intValue) const
 {
-  return GetPropertyValue<int>(propertyKey, intValue);
+  IntProperty *gp = dynamic_cast<IntProperty*>( GetProperty(propertyKey) );
+  if ( gp != NULL )
+  {
+    intValue = gp->GetValue();
+    return true;
+  }
+  return false;
+  // Templated Method does not work on Macs
+  //return GetPropertyValue<int>(propertyKey, intValue);
 }
 
 
 bool mitk::PropertyList::GetFloatProperty(const char* propertyKey, float &floatValue) const
 {
-  return GetPropertyValue<float>(propertyKey, floatValue);
+  FloatProperty *gp = dynamic_cast<FloatProperty*>( GetProperty(propertyKey) );
+  if ( gp != NULL )
+  {
+    floatValue = gp->GetValue();
+    return true;
+  }
+  return false;
+  // Templated Method does not work on Macs
+  //return GetPropertyValue<float>(propertyKey, floatValue);
 }
 
 

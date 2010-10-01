@@ -373,7 +373,23 @@ public:
       {
         itkdirectionOk = false;
       }
-      if(spacing[j] < mitk::eps)
+      if (    (spacing[j] < - mitk::eps) // (normally sized) negative value
+          &&  (j==2) && (m_Dimensions[2] == 1) )
+      {
+        // Negative spacings can occur when reading single DICOM slices with ITK via GDCMIO
+        // In these cases spacing is not determind by ITK correctly (because it distinguishes correctly
+        // between slice thickness and inter slice distance -- slice distance is meaningless for
+        // single slices).
+        // I experienced that ITK produced something meaningful nonetheless because is is 
+        // evaluating the tag "(0018,0088) Spacing between slices" as a fallback. This tag is not
+        // reliable (http://www.itk.org/pipermail/insight-users/2005-September/014711.html)
+        // but gives at least a hint.
+        // In real world cases I experienced that this tag contained the correct inter slice distance
+        // with a negative sign, so we just invert such negative spacings.
+        MITK_WARN << "Illegal value of itk::Image::GetSpacing()[" << j <<"]=" << spacing[j] << ". Using inverted value " << -spacing[j];
+        spacing[j] = -spacing[j];
+      }
+      else if (spacing[j] < mitk::eps) // value near zero
       {
         MITK_ERROR << "Illegal value of itk::Image::GetSpacing()[" << j <<"]=" << spacing[j] << ". Using 1.0 instead.";
         spacing[j] = 1.0;

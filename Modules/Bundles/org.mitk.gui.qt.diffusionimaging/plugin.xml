@@ -48,7 +48,7 @@
     <perspective id="org.mitk.perspectives.publicdiffusionimaging"
                  name="Diffusion Imaging Public" 
                  class="QmitkDiffusionImagingPublicPerspective" 
-                 icon="resources/QBallData48.png"/>
+                 icon="resources/reconodf.png"/>
   </extension>
 
 </plugin>

@@ -32,11 +32,11 @@ void QmitkDiffusionImagingPublicPerspective::CreateInitialLayout(berry::IPageLay
     layout->CreateFolder("org.mitk.leftcontrols", 
     berry::IPageLayout::BOTTOM, 0.125f, "org.mitk.views.controlvisualizationpropertiesview");
 
-//  layout->AddStandaloneView("org.mitk.views.perspectiveswitcher",
-//    false, berry::IPageLayout::BOTTOM, 0.8f, "org.mitk.leftcontrols");
-
   layout->AddStandaloneView("org.mitk.views.imagenavigator",
-    false, berry::IPageLayout::BOTTOM, 0.9f, "org.mitk.leftcontrols");
+    false, berry::IPageLayout::BOTTOM, 0.8f, "org.mitk.leftcontrols");
+
+  layout->AddStandaloneView("org.mitk.views.perspectiveswitcher",
+    false, berry::IPageLayout::BOTTOM, 0.99f, "org.mitk.views.imagenavigator");
 
 //  layout->AddStandaloneViewPlaceholder("org.mitk.views.imagenavigator",
 //    berry::IPageLayout::TOP, 0.9f, "org.mitk.views.perspectiveswitcher",false);
@@ -61,7 +61,6 @@ void QmitkDiffusionImagingPublicPerspective::CreateInitialLayout(berry::IPageLay
 
   lo = layout->GetViewLayout("org.mitk.views.diffusiondicomimport");
   lo->SetCloseable(false);
-
 
   //berry::IFolderLayout::Pointer right2 =
   //  layout->CreateFolder("right2", berry::IPageLayout::BOTTOM, 0.5f, "right");

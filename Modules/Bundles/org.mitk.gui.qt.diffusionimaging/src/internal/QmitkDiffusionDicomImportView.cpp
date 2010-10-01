@@ -436,7 +436,7 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
 
         const gdcm::Scanner::ValuesType &values3 = s.GetValues(t3);
         const gdcm::Scanner::ValuesType &values4 = s.GetValues(t4);;
-        int nAcquis = values3.size();
+        unsigned int nAcquis = values3.size();
 
         if(nAcquis != 1)
         {

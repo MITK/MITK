@@ -17,7 +17,7 @@
   </extension>
 
   <extension point="org.blueberry.ui.views">
-    <view id="org.mitk.views.preprocessing"
+    <view id="org.mitk.views.diffusionpreprocessing"
           name="Preprocessing"
           class="QmitkPreprocessingView"
           icon="resources/preprocessing.png" />
@@ -44,13 +44,11 @@
           class="QmitkControlVisualizationPropertiesView" />
   </extension>
 
-  <!--
-  <extension point="org.blueberry.ui.views">
-    <view id="org.mitk.views.tbssview"
-          name="TBSS"
-          icon="resources/quantification.png"
-          class="QmitkTbssView" />
+  <extension point="org.blueberry.ui.perspectives">
+    <perspective id="org.mitk.perspectives.publicdiffusionimaging"
+                 name="Diffusion Imaging Public" 
+                 class="QmitkDiffusionImagingPublicPerspective" 
+                 icon="resources/QBallData48.png"/>
   </extension>
-  -->
 
 </plugin>

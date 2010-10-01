@@ -105,18 +105,18 @@ struct CvpSelListener : ISelectionListener
     m_View->m_Controls->m_VisibleOdfsON->setVisible(false);
     m_View->m_Controls->m_TextureIntON->setVisible(false);
 
+    bool foundDiffusionImage = false;
+    bool foundQBIVolume = false;
+    bool foundTensorVolume = false;
+    bool foundImage = false;
+    bool foundMultipleOdfImages = false;
+
     // do something with the selected items
     if(m_View->m_CurrentSelection)
     {
-      bool foundDiffusionImage = false;
-      bool foundQBIVolume = false;
-      bool foundTensorVolume = false;
-      bool foundImage = false;
-      bool foundMultipleOdfImages = false;
-
       // iterate selection
       for (IStructuredSelection::iterator i = m_View->m_CurrentSelection->Begin(); 
-        i != m_View->m_CurrentSelection->End(); ++i)
+      i != m_View->m_CurrentSelection->End(); ++i)
       {
 
         // extract datatree node
@@ -182,33 +182,32 @@ struct CvpSelListener : ISelectionListener
           }
         }
       }
-
-      m_View->m_Controls->m_DisplayIndex->setVisible(foundDiffusionImage);
-
-      m_View->m_FoundSingleOdfImage = (foundQBIVolume || foundTensorVolume) 
-        && !foundMultipleOdfImages;
-      m_View->m_Controls->m_ShowMaxNumber->setVisible(m_View->m_FoundSingleOdfImage);
-      m_View->m_Controls->m_NormalizationDropdown->setVisible(m_View->m_FoundSingleOdfImage);
-      m_View->m_Controls->label->setVisible(m_View->m_FoundSingleOdfImage);
-      m_View->m_Controls->m_ScalingFactor->setVisible(m_View->m_FoundSingleOdfImage);
-      m_View->m_Controls->m_AdditionalScaling->setVisible(m_View->m_FoundSingleOdfImage);
-      
-      m_View->m_Controls->OpacMinFrame->setVisible(m_View->m_FoundSingleOdfImage);
-      m_View->m_Controls->OpacMaxFrame->setVisible(m_View->m_FoundSingleOdfImage);
-
-      // changed for SPIE paper, Principle curvature scaling
-      //m_View->m_Controls->params_frame->setVisible(m_View->m_FoundSingleOdfImage);
-      m_View->m_Controls->params_frame->setVisible(false);
-
-      m_View->m_Controls->m_VisibleOdfsON->setVisible(m_View->m_FoundSingleOdfImage);
-
-      bool foundAnyImage = foundDiffusionImage || 
-        foundQBIVolume || foundTensorVolume || foundImage;
-      m_View->m_Controls->m_Reinit->setVisible(foundAnyImage);
-      m_View->m_Controls->m_TextureIntON->setVisible(foundAnyImage);
-
-
     }
+
+    m_View->m_Controls->m_DisplayIndex->setVisible(foundDiffusionImage);
+
+    m_View->m_FoundSingleOdfImage = (foundQBIVolume || foundTensorVolume)
+                                    && !foundMultipleOdfImages;
+    m_View->m_Controls->m_ShowMaxNumber->setVisible(m_View->m_FoundSingleOdfImage);
+    m_View->m_Controls->m_NormalizationDropdown->setVisible(m_View->m_FoundSingleOdfImage);
+    m_View->m_Controls->label->setVisible(m_View->m_FoundSingleOdfImage);
+    m_View->m_Controls->m_ScalingFactor->setVisible(m_View->m_FoundSingleOdfImage);
+    m_View->m_Controls->m_AdditionalScaling->setVisible(m_View->m_FoundSingleOdfImage);
+
+    m_View->m_Controls->OpacMinFrame->setVisible(m_View->m_FoundSingleOdfImage);
+    m_View->m_Controls->OpacMaxFrame->setVisible(m_View->m_FoundSingleOdfImage);
+
+    // changed for SPIE paper, Principle curvature scaling
+    //m_View->m_Controls->params_frame->setVisible(m_View->m_FoundSingleOdfImage);
+    m_View->m_Controls->params_frame->setVisible(false);
+
+    m_View->m_Controls->m_VisibleOdfsON->setVisible(m_View->m_FoundSingleOdfImage);
+
+    bool foundAnyImage = foundDiffusionImage ||
+                         foundQBIVolume || foundTensorVolume || foundImage;
+
+    m_View->m_Controls->m_Reinit->setVisible(foundAnyImage);
+    m_View->m_Controls->m_TextureIntON->setVisible(foundAnyImage);
 
     if(m_View->m_IsInitialized)
     {
@@ -242,13 +241,13 @@ struct CvpSelListener : ISelectionListener
 };
 
 QmitkControlVisualizationPropertiesView::QmitkControlVisualizationPropertiesView()
-: QmitkFunctionality(),
-m_Controls(NULL),
-m_MultiWidget(NULL),
-m_IconTexOFF(new QIcon(":/QmitkDiffusionImaging/texIntOFFIcon.png")),
-m_IconTexON(new QIcon(":/QmitkDiffusionImaging/texIntONIcon.png")),
-m_IconGlyOFF(new QIcon(":/QmitkDiffusionImaging/glyphsoff.png")),
-m_IconGlyON(new QIcon(":/QmitkDiffusionImaging/glyphson.png"))
+  : QmitkFunctionality(),
+  m_Controls(NULL),
+  m_MultiWidget(NULL),
+  m_IconTexOFF(new QIcon(":/QmitkDiffusionImaging/texIntOFFIcon.png")),
+  m_IconTexON(new QIcon(":/QmitkDiffusionImaging/texIntONIcon.png")),
+  m_IconGlyOFF(new QIcon(":/QmitkDiffusionImaging/glyphsoff.png")),
+  m_IconGlyON(new QIcon(":/QmitkDiffusionImaging/glyphson.png"))
 {
 }
 
@@ -275,14 +274,14 @@ void QmitkControlVisualizationPropertiesView::CreateQtPartControl(QWidget *paren
     m_Controls->m_VisibleOdfsON->setCheckable(true);
 
 #ifndef DIFFUSION_IMAGING_EXTENDED
-	int size = m_Controls->m_AdditionalScaling->count();
-	for(int t=0; t<size; t++)
-	{
-	  if(m_Controls->m_AdditionalScaling->itemText(t).toStdString() == "Scale by ASR")
-	  {
-		m_Controls->m_AdditionalScaling->removeItem(t);   
-	  }
-	}	
+    int size = m_Controls->m_AdditionalScaling->count();
+    for(int t=0; t<size; t++)
+    {
+      if(m_Controls->m_AdditionalScaling->itemText(t).toStdString() == "Scale by ASR")
+      {
+        m_Controls->m_AdditionalScaling->removeItem(t);
+      }
+    }
 #endif
 
   }
@@ -293,7 +292,7 @@ void QmitkControlVisualizationPropertiesView::CreateQtPartControl(QWidget *paren
   m_SelListener = berry::ISelectionListener::Pointer(new CvpSelListener(this));
   this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddPostSelectionListener(/*"org.mitk.views.datamanager",*/ m_SelListener);
   berry::ISelection::ConstPointer sel(
-    this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection("org.mitk.views.datamanager"));
+      this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection("org.mitk.views.datamanager"));
   m_CurrentSelection = sel.Cast<const IStructuredSelection>();
   m_SelListener.Cast<CvpSelListener>()->DoSelectionChanged(sel);
   m_IsInitialized = true;
@@ -334,7 +333,7 @@ void QmitkControlVisualizationPropertiesView::CreateConnections()
 void QmitkControlVisualizationPropertiesView::Activated()
 {
   berry::ISelection::ConstPointer sel(
-    this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection("org.mitk.views.datamanager"));
+      this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection("org.mitk.views.datamanager"));
   m_CurrentSelection = sel.Cast<const IStructuredSelection>();
   m_SelListener.Cast<CvpSelListener>()->DoSelectionChanged(sel);
   QmitkFunctionality::Activated();
@@ -370,17 +369,17 @@ int QmitkControlVisualizationPropertiesView::ComputePreferredSize(bool width, in
 }
 
 mitk::DataStorage::SetOfObjects::Pointer
-QmitkControlVisualizationPropertiesView::ActiveSet(std::string classname)
+    QmitkControlVisualizationPropertiesView::ActiveSet(std::string classname)
 {
   if (m_CurrentSelection)
   {
     mitk::DataStorage::SetOfObjects::Pointer set =
-      mitk::DataStorage::SetOfObjects::New();
+        mitk::DataStorage::SetOfObjects::New();
 
     int at = 0;
     for (IStructuredSelection::iterator i = m_CurrentSelection->Begin(); 
-      i != m_CurrentSelection->End(); 
-      ++i)
+    i != m_CurrentSelection->End();
+    ++i)
     {
 
       if (mitk::DataNodeObject::Pointer nodeObj = i->Cast<mitk::DataNodeObject>())
@@ -400,87 +399,110 @@ QmitkControlVisualizationPropertiesView::ActiveSet(std::string classname)
 }
 
 void QmitkControlVisualizationPropertiesView::SetBoolProp(
-  mitk::DataStorage::SetOfObjects::Pointer set,
-  std::string name, bool value)
+    mitk::DataStorage::SetOfObjects::Pointer set,
+    std::string name, bool value)
 {
-  mitk::DataStorage::SetOfObjects::const_iterator itemiter( set->begin() );  
-  mitk::DataStorage::SetOfObjects::const_iterator itemiterend( set->end() );  
-  while ( itemiter != itemiterend )
+  if(set.IsNotNull())
   {
-    (*itemiter)->SetBoolProperty(name.c_str(), value);
-    ++itemiter;
+
+    mitk::DataStorage::SetOfObjects::const_iterator itemiter( set->begin() );
+    mitk::DataStorage::SetOfObjects::const_iterator itemiterend( set->end() );
+    while ( itemiter != itemiterend )
+    {
+      (*itemiter)->SetBoolProperty(name.c_str(), value);
+      ++itemiter;
+    }
   }
 }
 
 void QmitkControlVisualizationPropertiesView::SetIntProp(
-  mitk::DataStorage::SetOfObjects::Pointer set,
-  std::string name, int value)
+    mitk::DataStorage::SetOfObjects::Pointer set,
+    std::string name, int value)
 {
-  mitk::DataStorage::SetOfObjects::const_iterator itemiter( set->begin() );  
-  mitk::DataStorage::SetOfObjects::const_iterator itemiterend( set->end() );  
-  while ( itemiter != itemiterend )
+  if(set.IsNotNull())
   {
-    (*itemiter)->SetIntProperty(name.c_str(), value);
-    ++itemiter;
+
+    mitk::DataStorage::SetOfObjects::const_iterator itemiter( set->begin() );
+    mitk::DataStorage::SetOfObjects::const_iterator itemiterend( set->end() );
+    while ( itemiter != itemiterend )
+    {
+      (*itemiter)->SetIntProperty(name.c_str(), value);
+      ++itemiter;
+    }
   }
 }
 
 void QmitkControlVisualizationPropertiesView::SetFloatProp(
-  mitk::DataStorage::SetOfObjects::Pointer set,
-  std::string name, float value)
+    mitk::DataStorage::SetOfObjects::Pointer set,
+    std::string name, float value)
 {
-  mitk::DataStorage::SetOfObjects::const_iterator itemiter( set->begin() );
-  mitk::DataStorage::SetOfObjects::const_iterator itemiterend( set->end() );
-  while ( itemiter != itemiterend )
+  if(set.IsNotNull())
   {
-    (*itemiter)->SetFloatProperty(name.c_str(), value);
-    ++itemiter;
+
+    mitk::DataStorage::SetOfObjects::const_iterator itemiter( set->begin() );
+    mitk::DataStorage::SetOfObjects::const_iterator itemiterend( set->end() );
+    while ( itemiter != itemiterend )
+    {
+      (*itemiter)->SetFloatProperty(name.c_str(), value);
+      ++itemiter;
+    }
   }
 }
 
 void QmitkControlVisualizationPropertiesView::SetLevelWindowProp(
-  mitk::DataStorage::SetOfObjects::Pointer set,
-  std::string name, mitk::LevelWindow value)
+    mitk::DataStorage::SetOfObjects::Pointer set,
+    std::string name, mitk::LevelWindow value)
 {
-  mitk::LevelWindowProperty::Pointer prop = mitk::LevelWindowProperty::New(value);
-
-  mitk::DataStorage::SetOfObjects::const_iterator itemiter( set->begin() );
-  mitk::DataStorage::SetOfObjects::const_iterator itemiterend( set->end() );
-  while ( itemiter != itemiterend )
+  if(set.IsNotNull())
   {
-    (*itemiter)->SetProperty(name.c_str(), prop);
-    ++itemiter;
+
+    mitk::LevelWindowProperty::Pointer prop = mitk::LevelWindowProperty::New(value);
+
+    mitk::DataStorage::SetOfObjects::const_iterator itemiter( set->begin() );
+    mitk::DataStorage::SetOfObjects::const_iterator itemiterend( set->end() );
+    while ( itemiter != itemiterend )
+    {
+      (*itemiter)->SetProperty(name.c_str(), prop);
+      ++itemiter;
+    }
   }
 }
 
 void QmitkControlVisualizationPropertiesView::SetEnumProp(
-  mitk::DataStorage::SetOfObjects::Pointer set,
-  std::string name, mitk::EnumerationProperty::Pointer value)
+    mitk::DataStorage::SetOfObjects::Pointer set,
+    std::string name, mitk::EnumerationProperty::Pointer value)
 {
-  mitk::DataStorage::SetOfObjects::const_iterator itemiter( set->begin() );  
-  mitk::DataStorage::SetOfObjects::const_iterator itemiterend( set->end() );  
-  while ( itemiter != itemiterend )
+  if(set.IsNotNull())
   {
-    (*itemiter)->SetProperty(name.c_str(), value);
-    ++itemiter;
+    mitk::DataStorage::SetOfObjects::const_iterator itemiter( set->begin() );
+    mitk::DataStorage::SetOfObjects::const_iterator itemiterend( set->end() );
+    while ( itemiter != itemiterend )
+    {
+      (*itemiter)->SetProperty(name.c_str(), value);
+      ++itemiter;
+    }
   }
 }
 
 void QmitkControlVisualizationPropertiesView::DisplayIndexChanged(int dispIndex)
 {
   mitk::DataStorage::SetOfObjects::Pointer set =
-    ActiveSet("DiffusionImage");
+      ActiveSet("DiffusionImage");
 
-  mitk::DataStorage::SetOfObjects::const_iterator itemiter( set->begin() );  
-  mitk::DataStorage::SetOfObjects::const_iterator itemiterend( set->end() );  
-  while ( itemiter != itemiterend )
+  if(set.IsNotNull())
   {
-    (*itemiter)->SetIntProperty("DisplayChannel", dispIndex);
-    ++itemiter;
-  }
 
-  //m_MultiWidget->RequestUpdate();
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    mitk::DataStorage::SetOfObjects::const_iterator itemiter( set->begin() );
+    mitk::DataStorage::SetOfObjects::const_iterator itemiterend( set->end() );
+    while ( itemiter != itemiterend )
+    {
+      (*itemiter)->SetIntProperty("DisplayChannel", dispIndex);
+      ++itemiter;
+    }
+
+    //m_MultiWidget->RequestUpdate();
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  }
 }
 
 void QmitkControlVisualizationPropertiesView::Reinit()
@@ -488,13 +510,13 @@ void QmitkControlVisualizationPropertiesView::Reinit()
   if (m_CurrentSelection)
   {
     mitk::DataNodeObject::Pointer nodeObj = 
-      m_CurrentSelection->Begin()->Cast<mitk::DataNodeObject>();
+        m_CurrentSelection->Begin()->Cast<mitk::DataNodeObject>();
     mitk::DataNode::Pointer node = nodeObj->GetDataNode();
     mitk::BaseData::Pointer basedata = node->GetData();
     if (basedata.IsNotNull())
     {
       mitk::RenderingManager::GetInstance()->InitializeViews(
-        basedata->GetTimeSlicedGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
+          basedata->GetTimeSlicedGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
       mitk::RenderingManager::GetInstance()->RequestUpdateAll();
     }
   }
@@ -512,7 +534,7 @@ void QmitkControlVisualizationPropertiesView::TextIntON()
   }
 
   mitk::DataStorage::SetOfObjects::Pointer set =
-    ActiveSet("DiffusionImage");
+      ActiveSet("DiffusionImage");
   SetBoolProp(set,"texture interpolation", !m_TexIsOn);
 
   set = ActiveSet("TensorImage");
@@ -544,7 +566,7 @@ void QmitkControlVisualizationPropertiesView::VisibleOdfsON()
   }
 
   mitk::DataStorage::SetOfObjects::Pointer set =
-    ActiveSet("QBallImage");
+      ActiveSet("QBallImage");
   SetBoolProp(set,"VisibleOdfs", !m_GlyIsOn);
 
   set = ActiveSet("TensorImage");
@@ -567,7 +589,7 @@ void QmitkControlVisualizationPropertiesView::ShowMaxNumberChanged()
   }
 
   mitk::DataStorage::SetOfObjects::Pointer set =
-    ActiveSet("QBallImage");
+      ActiveSet("QBallImage");
   SetIntProp(set,"ShowMaxNumber", maxNr);
 
   set = ActiveSet("TensorImage");
@@ -602,7 +624,7 @@ void QmitkControlVisualizationPropertiesView::NormalizationDropdownChanged(int n
   }
 
   mitk::DataStorage::SetOfObjects::Pointer set =
-    ActiveSet("QBallImage");
+      ActiveSet("QBallImage");
   SetEnumProp(set,"Normalization", normMeth.GetPointer());
 
   set = ActiveSet("TensorImage");
@@ -617,7 +639,7 @@ void QmitkControlVisualizationPropertiesView::ScalingFactorChanged(double scalin
 {
 
   mitk::DataStorage::SetOfObjects::Pointer set =
-    ActiveSet("QBallImage");
+      ActiveSet("QBallImage");
   SetFloatProp(set,"Scaling", scalingFactor);
 
   set = ActiveSet("TensorImage");
@@ -655,7 +677,7 @@ void QmitkControlVisualizationPropertiesView::AdditionalScaling(int additionalSc
   }
 
   mitk::DataStorage::SetOfObjects::Pointer set =
-    ActiveSet("QBallImage");
+      ActiveSet("QBallImage");
   SetEnumProp(set,"ScaleBy", scaleBy.GetPointer());
 
   set = ActiveSet("TensorImage");
@@ -669,7 +691,7 @@ void QmitkControlVisualizationPropertiesView::AdditionalScaling(int additionalSc
 void QmitkControlVisualizationPropertiesView::IndexParam1Changed(double param1)
 {
   mitk::DataStorage::SetOfObjects::Pointer set =
-    ActiveSet("QBallImage");
+      ActiveSet("QBallImage");
   SetFloatProp(set,"IndexParam1", param1);
 
   set = ActiveSet("TensorImage");
@@ -682,7 +704,7 @@ void QmitkControlVisualizationPropertiesView::IndexParam1Changed(double param1)
 void QmitkControlVisualizationPropertiesView::IndexParam2Changed(double param2)
 {
   mitk::DataStorage::SetOfObjects::Pointer set =
-    ActiveSet("QBallImage");
+      ActiveSet("QBallImage");
   SetFloatProp(set,"IndexParam2", param2);
 
   set = ActiveSet("TensorImage");
@@ -698,7 +720,7 @@ void QmitkControlVisualizationPropertiesView::OpacityMinFaChanged(int v)
   olw.SetRangeMinMax(v*2.55, m_Controls->m_OpacityMaxFa->value()*2.55);
 
   mitk::DataStorage::SetOfObjects::Pointer set =
-    ActiveSet("QBallImage");
+      ActiveSet("QBallImage");
   SetLevelWindowProp(set,"opaclevelwindow", olw);
 
   set = ActiveSet("TensorImage");
@@ -716,7 +738,7 @@ void QmitkControlVisualizationPropertiesView::OpacityMaxFaChanged(int v)
   olw.SetRangeMinMax(m_Controls->m_OpacityMinFa->value()*2.55, v*2.55);
 
   mitk::DataStorage::SetOfObjects::Pointer set =
-    ActiveSet("QBallImage");
+      ActiveSet("QBallImage");
   SetLevelWindowProp(set,"opaclevelwindow", olw);
 
   set = ActiveSet("TensorImage");

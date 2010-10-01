@@ -153,26 +153,23 @@ void mitk::PlanarPolygon::EvaluateFeaturesInternal()
         // line 1
         Point2D p0 = this->GetControlPoint( i );
         Point2D p1 = this->GetControlPoint(i + 1);
+
         // check for intersection with all other lines
         for (j = i+1; j < (numberOfPoints - 1); ++j )
         {
           Point2D p2 = this->GetControlPoint(j);
           Point2D p3 = this->GetControlPoint(j + 1);
-          if( CheckForLineIntersection(p0,p1,p2,p3) )
-          {
-            intersection = true;
-            //MITK_INFO << "INTERSECTION";
-          }
+          intersection = CheckForLineIntersection(p0,p1,p2,p3);
+          if (intersection) break;
         }
+        if (intersection) break; // only because the inner loop might have changed "intersection"
       
         // last line from p_x to p_0
         Point2D p2 = this->GetControlPoint(0);
         Point2D p3 = this->GetControlPoint(numberOfPoints - 1);
-        if( CheckForLineIntersection(p0,p1,p2,p3) )
-        {
-          intersection = true;
-          //MITK_INFO << "INTERSECTION";
-        }
+       
+        intersection = CheckForLineIntersection(p0,p1,p2,p3);
+        if (intersection) break;
       }
    }
       
@@ -229,6 +226,7 @@ bool mitk::PlanarPolygon::CheckForLineIntersection(Point2D p1, Point2D p2, Point
    
   float d = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
   // If d is zero, there is no intersection
+  //if (d < mitk::eps) return false;
   if (d == 0) return false;
    
   // Get the x and y

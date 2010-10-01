@@ -46,6 +46,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkImageChangeInformation.h>
 
 #include "vtkMitkThickSlicesFilter.h"
+#include "itkRGBAPixel.h"
 
 
 int mitk::ImageMapperGL2D::numRenderer = 0;
@@ -938,6 +939,7 @@ mitk::ImageMapperGL2D::ApplyProperties(mitk::BaseRenderer* renderer)
   rendererInfo.m_TextureInterpolation = textureInterpolation;
 
   mitk::LevelWindow levelWindow;
+  mitk::LevelWindow opacLevelWindow;
 
   bool binary = false;
   this->GetDataNode()->GetBoolProperty( "binary", binary, renderer );
@@ -946,6 +948,7 @@ mitk::ImageMapperGL2D::ApplyProperties(mitk::BaseRenderer* renderer)
   {
    
     image->setExtrema(0, 1);
+    image->setOpacityExtrema( 0.0, 255.0 );
     image->setBinary(true);
 
     bool binaryOutline = false;
@@ -977,7 +980,17 @@ mitk::ImageMapperGL2D::ApplyProperties(mitk::BaseRenderer* renderer)
       this->GetLevelWindow( levelWindow, renderer );
     }
 
-    image->setExtrema( levelWindow.GetLowerWindowBound(), levelWindow.GetUpperWindowBound() ); 
+    image->setExtrema( levelWindow.GetLowerWindowBound(), levelWindow.GetUpperWindowBound() );
+
+    // obtain opacity level window
+    if( this->GetLevelWindow( opacLevelWindow, renderer, "opaclevelwindow" ) )
+    {
+      image->setOpacityExtrema( opacLevelWindow.GetLowerWindowBound(), opacLevelWindow.GetUpperWindowBound() );
+    }
+    else
+    {
+      image->setOpacityExtrema( 0.0, 255.0 );
+    }
   }
 
   bool useColor = false;
@@ -1238,6 +1251,15 @@ void mitk::ImageMapperGL2D::SetDefaultProperties(mitk::DataNode* node, mitk::Bas
       levelwindow.SetAuto( image );
       levWinProp->SetLevelWindow( levelwindow );
       node->SetProperty( "levelwindow", levWinProp, renderer );
+    }
+    if(((overwrite) || (node->GetProperty("opaclevelwindow", renderer)==NULL))
+      && *(image->GetPixelType().GetItkTypeId()) == typeid(itk::RGBAPixel<unsigned char>))
+    {
+      mitk::LevelWindow opaclevwin;
+      opaclevwin.SetRangeMinMax(0,255);
+      opaclevwin.SetWindowBounds(0,255);
+      mitk::LevelWindowProperty::Pointer prop = mitk::LevelWindowProperty::New(opaclevwin);
+      node->SetProperty( "opaclevelwindow", prop, renderer );
     }
     if((overwrite) || (node->GetProperty("LookupTable", renderer)==NULL))
     {

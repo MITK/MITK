@@ -45,7 +45,7 @@ public:
     /*!
     \brief Sets the range of the intensities which will be displayed.
     @param level the level of the window
-    @param window the width of the window 
+    @param window the width of the window
     */
     void setWindow (const float level, const float window);
 
@@ -60,16 +60,52 @@ public:
     float maximum () const;
 
     /*!
-    \brief Gets the level of the window which limits the 
+    \brief Gets the level of the window which limits the
     displayed intensities.
     */
     float level () const;
 
     /*!
-    \brief Gets the width of the window which limits the 
+    \brief Gets the width of the window which limits the
     displayed intensities.
     */
     float window () const;
+
+    /*!
+    \brief Sets the range of opacity values which will be displayed.
+    @param minimum the minimal opacity
+    @param maximum the maximal opacity
+    */
+    void setOpacityExtrema (const float minimum, const float maximum);
+
+    /*!
+    \brief Sets the range of the opacities which will be displayed.
+    @param level the level of the window
+    @param window the width of the window
+    */
+    void setOpacityWindow (const float level, const float window);
+
+    /*!
+    \brief Gets the minimal opacity which will be displayed.
+    */
+    float minimumOpacity () const;
+
+    /*!
+    \brief Gets the maximal opacity which will be displayed.
+    */
+    float maximumOpacity () const;
+
+    /*!
+    \brief Gets the level of the window which limits the
+    displayed opacities.
+    */
+    float levelOpacity () const;
+
+    /*!
+    \brief Gets the width of the window which limits the
+    displayed opacities.
+    */
+    float windowOpacity () const;
 
     /*!
     \brief Sets the color map which assigns each intensity
@@ -151,6 +187,11 @@ private:
     \brief The extremal values.
     */
     float _min, _max;
+
+    /*!
+    \brief The extremal opacity values.
+    */
+    float _minOpac, _maxOpac;
 
     /*!
     \brief The color map.

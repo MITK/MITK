@@ -251,7 +251,7 @@
       </transition>
     </state>
   </stateMachine>
-  <!-- TutorialStep10End-->
+  <!-- TutorialStep10End -->
   <stateMachine NAME="AffineInteractions click to select">
     <state NAME="start" ID="1" START_STATE="TRUE" X_POS="3" Y_POS="40" WIDTH="100" HEIGHT="50">
       <transition NAME="leftButtonPress" NEXT_STATE_ID="2" EVENT_ID="1">
@@ -3557,7 +3557,7 @@
 </mitkInteraktionStates>
 <!-- DOCUMENTATION -->
 <!-- This is StateMachine.xml. Includes Information about different StateMachines and Events. Used by EventMapper and StateMachineFactory -->
-<!-- /** \example StateMachine.xml
+<!-- /** \example StateMachine.xml -->
 <!-- -->
 <!-- -->
 <!-- FAQ -->

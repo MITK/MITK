@@ -1,6 +1,6 @@
  /**
  
- \page Step3Page MITK Tutorial - Step 3: Create 3D view
+ \page Step03Page MITK Tutorial - Step 3: Create 3D view
  
 As in the previous step one or more data sets (many images, surface and other formats) may be loaded. The difference is that they are displayed in a 3D view.
 The QmitkRenderWindow is now used for displaying a 3D view, by setting the used mapper-slot to Standard3D. 
@@ -23,7 +23,7 @@ Contains the code that both creates a 3D view and turns volume rendering on.
 
 Tell the renderer to create a 3D view:
  
-\skipline // use it as a 3D view!
+\skipline // Use it as a 3D view!
 \skipline renderWindow.GetRenderer()->SetMapperID
 
 The rest of the code remains unchanged.
@@ -43,6 +43,6 @@ The property "volumerendering" has to be turned on on the node containing the im
 \skipline Check
 \until node->SetProperty
   
-\ref Step2Page "[Previous step]" \ref Step4Page "[Next step]" \ref TutorialPage "[Main tutorial page]"
+\ref Step02Page "[Previous step]" \ref Step04Page "[Next step]" \ref TutorialPage "[Main tutorial page]"
  
   */

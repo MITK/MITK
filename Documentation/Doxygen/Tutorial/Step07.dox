@@ -1,6 +1,6 @@
  /**
  
- \page Step7Page MITK Tutorial - Step 7: Convert result of region growing into a surface
+ \page Step07Page MITK Tutorial - Step 7: Convert result of region growing into a surface
  
  In this step the result of the previous step is converted into a surface by means of a VTK filter.
  
@@ -16,6 +16,6 @@
  \skipline if(m_ResultImage
  \until }
  
- \ref Step6Page "[Previous step]" \ref Step8Page "[Next step]" \ref TutorialPage "[Main tutorial page]"
+ \ref Step06Page "[Previous step]" \ref Step08Page "[Next step]" \ref TutorialPage "[Main tutorial page]"
  
   */

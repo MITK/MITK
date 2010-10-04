@@ -84,6 +84,9 @@ namespace mitk
      **/
     virtual ~PointSetInteractor();
 
+    /**
+    * @brief Convert the given Actions to Operations and send to data and UndoController
+    */
     virtual bool ExecuteAction( Action* action, mitk::StateEvent const* stateEvent );
 
     /** \brief Deselects the Points in the PointSet.

@@ -1,6 +1,6 @@
  /**
 
- \page Step2Page MITK Tutorial - Step 2: Load one or more data sets
+ \page Step02Page MITK Tutorial - Step 2: Load one or more data sets
  
  \image html step2_result.png 
  
@@ -25,6 +25,6 @@
  
  
  
- \ref Step1Page "[Previous step]" \ref Step3Page "[Next step]" \ref TutorialPage "[Main tutorial page]"
+ \ref Step01Page "[Previous step]" \ref Step03Page "[Next step]" \ref TutorialPage "[Main tutorial page]"
  
   */

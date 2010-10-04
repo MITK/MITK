@@ -17,16 +17,17 @@ This file contains a surface.
 
 \section TutorialSection Tutorial chapters
 
-\li \ref Step0Page "Step 0: Getting started"
-\li \ref Step1Page "Step 1: Displaying an image"
-\li \ref Step2Page "Step 2: Load one or more data sets"
-\li \ref Step3Page "Step 3: Create 3D view"
-\li \ref Step4Page "Step 4: Use several views to explore data"
-\li \ref Step5Page "Step 5: Interactively add points"
-\li \ref Step6Page "Step 6: Use an interactive region-grower"
-\li \ref Step7Page "Step 7: Convert result of region growing into a surface"
-\li \ref Step8Page "Step 8: Use QmitkStdMultiWidget as widget"
-\li \ref Step9Page "Step 9: A functionality"
+\li \ref Step00Page "Step 0: Getting started"
+\li \ref Step01Page "Step 1: Displaying an image"
+\li \ref Step02Page "Step 2: Load one or more data sets"
+\li \ref Step03Page "Step 3: Create 3D view"
+\li \ref Step04Page "Step 4: Use several views to explore data"
+\li \ref Step05Page "Step 5: Interactively add points"
+\li \ref Step06Page "Step 6: Use an interactive region-grower"
+\li \ref Step07Page "Step 7: Convert result of region growing into a surface"
+\li \ref Step08Page "Step 8: Use QmitkStdMultiWidget as widget"
+\li \ref Step09Page "Step 9: A functionality"
+\li \ref Step10Page "Step 10: A new Interaction"
 
 Enjoy MITK!
 

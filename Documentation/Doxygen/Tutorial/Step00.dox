@@ -1,6 +1,6 @@
 /**
 
-\page Step0Page MITK Tutorial - Step 0: Getting started
+\page Step00Page MITK Tutorial - Step 0: Getting started
 
 To build the tutorials follow the \ref BuildInstructionsPage and make sure that MITK_BUILD_TUTORIAL is checked/set to ON. 
 
@@ -10,6 +10,6 @@ The tutorial source files can be found in the Applications\\Tutorial\\ subdirect
 
 
 
-\ref Step1Page "[Next step]" \ref TutorialPage "[Main tutorial page]"
+\ref Step01Page "[Next step]" \ref TutorialPage "[Main tutorial page]"
 
 */

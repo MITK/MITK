@@ -1,6 +1,6 @@
 /**
  
-\page Step4Page MITK Tutorial - Step 4: Use several views to explore data
+\page Step04Page MITK Tutorial - Step 4: Use several views to explore data
   
 As in Step 2 and Step 3 one or more data sets may be loaded.
 
@@ -54,13 +54,13 @@ We now want to see the position of the slice in 2D and the slice itself in 3D.
 Therefore it has to be added to the tree:
 
 \dontinclude Step4.cpp
-\skipline it.Add(view2.GetRenderer()
-\skipline it.Add(view3.GetRenderer()
+\skipline ds->Add(view2.GetRenderer()
+\skipline ds->Add(view3.GetRenderer()
 
 Slice positions are now displayed as can be seen in the picture.
 
 \dontinclude Step4.cpp
 
-\ref Step3Page "[Previous step]" \ref Step5Page "[Next step]" \ref TutorialPage "[Main tutorial page]"
+\ref Step03Page "[Previous step]" \ref Step05Page "[Next step]" \ref TutorialPage "[Main tutorial page]"
  
 */

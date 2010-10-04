@@ -1,6 +1,6 @@
 /**
 
-\page Step1Page MITK Tutorial - Step 1: Displaying an image
+\page Step01Page MITK Tutorial - Step 1: Displaying an image
 
 \image html step1_result.png 
 
@@ -15,6 +15,6 @@ The code is subdivided in parts I - V. First of all a DataTree has to be created
 
 \include Step1.cpp
 
-\ref Step0Page "[Previous step]" \ref Step2Page "[Next step]" \ref TutorialPage "[Main tutorial page]"
+\ref Step00Page "[Previous step]" \ref Step02Page "[Next step]" \ref TutorialPage "[Main tutorial page]"
 
 */

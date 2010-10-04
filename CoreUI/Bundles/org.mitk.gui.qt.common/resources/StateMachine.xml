@@ -68,6 +68,18 @@
     <event NAME="Strg+Alt+I" ID="31" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0600" KEY="Key_I" />
     <!-- Strg + Alt + S -->
     <event NAME="Strg+Alt+S" ID="40" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0600" KEY="Key_S" />
+    <!-- ArrowUp -->
+    <event NAME="ArrowUp" ID="50" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_Up" />
+    <!-- ArrowDown -->
+    <event NAME="ArrowDown" ID="51" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_Down" />
+    <!-- ArrowLeft -->
+    <event NAME="ArrowLeft" ID="52" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_Left" />
+    <!-- ArrowRight -->
+    <event NAME="ArrowRight" ID="53" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_Right" />
+    <!-- ArrowUp + Shift -->
+    <event NAME="ArrowUp+Shift" ID="54" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0100" KEY="Key_Up" />
+    <!-- ArrowDown +Shift -->
+    <event NAME="ArrowDown+Shift" ID="55" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0100" KEY="Key_Down" />
     <!-- Alt -->
     <event NAME="Alt" ID="90" TYPE="Type_KeyPress" BUTTON="BS_NoButton" BUTTONSTATE="0x0400" KEY="Key_Alt" />
     <!-- Strg + B -->
@@ -167,6 +179,79 @@
     <!-- Puncture Application -->
     <event NAME="print" ID="3001" TYPE="Type_Application" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_none" />
   </events>
+  <!-- Beginning of state machine patterns-->
+  <!-- TutorialStep10Begin -->
+  <stateMachine NAME="SelectAndMoveObjectWithArrowKeys">
+    <state NAME="start" ID="1" START_STATE="TRUE" X_POS="3" Y_POS="40" WIDTH="100" HEIGHT="50">
+      <transition NAME="CheckIfObjectIsPicked" NEXT_STATE_ID="2" EVENT_ID="1">
+        <action ID="30" />
+        <!-- 30 = AcCHECKELEMENT  -->
+      </transition>
+    </state>
+    <state NAME="Guard_IsObjectPicked" ID="2" X_POS="282" Y_POS="23" WIDTH="126" HEIGHT="50">
+      <transition NAME="yes" NEXT_STATE_ID="10" EVENT_ID="1004">
+        <action ID="65" />
+        <!-- AcSELECT  -->
+        <action ID="1101" />
+        <!--AcMODE_SELECT-->
+      </transition>      
+      <transition NAME="no" NEXT_STATE_ID="1" EVENT_ID="1003">
+        <action ID="75" />
+        <!-- AcDESELECT  -->
+        <action ID="1100" />
+        <!--AcMODE_DESELECT-->
+      </transition>
+    </state>
+    <state NAME="object selected" ID="10" X_POS="714" Y_POS="85" WIDTH="100" HEIGHT="50">
+      <transition NAME="CheckIfObjectIsPicked" NEXT_STATE_ID="2" EVENT_ID="1">
+        <action ID="30" />
+        <!-- AcCHECKELEMENT  -->
+      </transition>
+      <transition NAME="z+" NEXT_STATE_ID="10" EVENT_ID="50">
+        <action ID="92" >         <!-- AcMove  -->
+          <intParameter NAME="DIRECTION_X" VALUE="0" />
+          <intParameter NAME="DIRECTION_Y" VALUE="0" />
+          <intParameter NAME="DIRECTION_Z" VALUE="1" />
+        </action>
+      </transition>
+      <transition NAME="z-" NEXT_STATE_ID="10" EVENT_ID="51">
+        <action ID="92" >        <!-- AcMove  -->
+          <intParameter NAME="DIRECTION_X" VALUE="0" />
+          <intParameter NAME="DIRECTION_Y" VALUE="0" />
+          <intParameter NAME="DIRECTION_Z" VALUE="-1" />
+        </action>
+      </transition>
+      <transition NAME="x+" NEXT_STATE_ID="10" EVENT_ID="52">
+        <action ID="92" >        <!-- AcMove  -->
+          <intParameter NAME="DIRECTION_X" VALUE="1" />
+          <intParameter NAME="DIRECTION_Y" VALUE="0" />
+          <intParameter NAME="DIRECTION_Z" VALUE="0" />
+        </action>
+      </transition>
+      <transition NAME="x-" NEXT_STATE_ID="10" EVENT_ID="53">
+        <action ID="92" >        <!-- AcMove  -->
+          <intParameter NAME="DIRECTION_X" VALUE="-1" />
+          <intParameter NAME="DIRECTION_Y" VALUE="0" />
+          <intParameter NAME="DIRECTION_Z" VALUE="0" />
+        </action>
+      </transition>
+	  <transition NAME="y+" NEXT_STATE_ID="10" EVENT_ID="54">
+        <action ID="92" >        <!-- AcMove  -->
+          <intParameter NAME="DIRECTION_X" VALUE="0" />
+          <intParameter NAME="DIRECTION_Y" VALUE="1" />
+          <intParameter NAME="DIRECTION_Z" VALUE="0" />
+        </action>
+      </transition>
+	  <transition NAME="y-" NEXT_STATE_ID="10" EVENT_ID="55">
+        <action ID="92" >        <!-- AcMove  -->
+          <intParameter NAME="DIRECTION_X" VALUE="0" />
+          <intParameter NAME="DIRECTION_Y" VALUE="-1" />
+          <intParameter NAME="DIRECTION_Z" VALUE="0" />
+        </action>
+      </transition>
+    </state>
+  </stateMachine>
+  <!-- TutorialStep10End-->
   <stateMachine NAME="AffineInteractions click to select">
     <state NAME="start" ID="1" START_STATE="TRUE" X_POS="3" Y_POS="40" WIDTH="100" HEIGHT="50">
       <transition NAME="leftButtonPress" NEXT_STATE_ID="2" EVENT_ID="1">
@@ -214,7 +299,7 @@
         <action ID="1000" />
       </transition>
       <transition NAME="leftButtonRelease" NEXT_STATE_ID="10" EVENT_ID="505">
-        <!-- 0 = no sideeffect  -->
+        <!-- 0 = no action  -->
         <action ID="0" />
       </transition>
     </state>
@@ -224,7 +309,7 @@
         <action ID="1003" />
       </transition>
       <transition NAME="rightButtonRelease" NEXT_STATE_ID="10" EVENT_ID="507">
-        <!-- 0 = no sideeffect  -->
+        <!-- 0 = no action  -->
         <action ID="0" />
       </transition>
     </state>
@@ -234,7 +319,7 @@
         <action ID="1005" />
       </transition>
       <transition NAME="middleButtonRelease" NEXT_STATE_ID="10" EVENT_ID="506">
-        <!-- 0 = no sideeffect  -->
+        <!-- 0 = no action  -->
         <action ID="0" />
       </transition>
     </state>
@@ -3472,7 +3557,7 @@
 </mitkInteraktionStates>
 <!-- DOCUMENTATION -->
 <!-- This is StateMachine.xml. Includes Information about different StateMachines and Events. Used by EventMapper and StateMachineFactory -->
-<!-- ***WARNING*** do not use any &, % and so on in NAME. TODO "and so on" is not helpful at all! What is the problem with these chars?-->
+<!-- /** \example StateMachine.xml
 <!-- -->
 <!-- -->
 <!-- FAQ -->

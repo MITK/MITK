@@ -97,9 +97,10 @@ public:
 
   /**
   * @brief Method to call if the associated data has changed by the user (loading of data)
-  * This method is called by DataNode::SetData() to tell the interactor to reinitialize. 
+  * This method is called by DataNode::SetData() to tell the interactor to reinitialize.
   * This method should be overwritten by specialized interactors.
   * (e.g. PointSetInteractor: go to the right state according to number of loaded points)
+  * Note: It will not be called when the data gets modified (e.g. adding / removing points to a PointSet)
   **/
   virtual void DataChanged(){};
 
@@ -126,7 +127,7 @@ protected:
   bool OnModeSubSelect(Action* action, StateEvent const*);
 
   //##Documentation
-  //## @brief adds the handling of Operations used for mode change. Unrecognized Operations are send to Superclass.
+  //## @brief adds handling of operations used for mode change. Unrecognized Operations are send to Superclass.
   virtual void ExecuteOperation(Operation* operation);
 
   //##Documentation

@@ -1,6 +1,6 @@
 /**
 
-\page Step6Page MITK Tutorial - Step 6: Use an interactive region-grower
+\page Step06Page MITK Tutorial - Step 6: Use an interactive region-grower
 
 In this step the program is enhanced by the possibility to start a region-grower at interactively added points.
 We will see how MITK images can be accessed as ITK images.
@@ -25,15 +25,16 @@ Function names start with capital letters. To learn more about style conventions
 
 The widgets are initialized as in the previous steps but with an additional QVBox for a button to start the segmentation:
 
-\skipline m_TopLevelWidget = new QVBox(this);
+\skipline Create controlsParent
+\until hlayout->addWidget(m_LineEditThresholdMax)
 
 
 Then a button is created to start the segmentation and its clicked() signal is connected to the method StartRegionGrowing():
 
 \dontinclude Step6.cpp
 
-\skipline QPushButton
-\skipline connect
+\skipline QPushButton* startButton
+\skipline connect(startButton
 
 \section AccessMTIKImagesAsITKImagesSection Access MITK images as ITK images
 
@@ -106,6 +107,6 @@ Again: not a conversion, just accessing.
 \li \code mitk::Surface::SetVtkPolyData(vtkPolyData*, int time = 0) \endcode
 
 
-\ref Step5Page "[Previous step]" \ref Step7Page "[Next step]" \ref TutorialPage "[Main tutorial page]"
+\ref Step05Page "[Previous step]" \ref Step07Page "[Next step]" \ref TutorialPage "[Main tutorial page]"
 
 */

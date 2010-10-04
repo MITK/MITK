@@ -1,6 +1,6 @@
  /**
  
- \page Step8Page MITK Tutorial - Step 8: Use QmitkStdMultiWidget as widget
+ \page Step08Page MITK Tutorial - Step 8: Use QmitkStdMultiWidget as widget
  
  In this step a QmitkStdMultiWidget is used. It offers four views on the data.
  From top left to bottom the views are initialized as transversal, sagittal and coronar. The bottom right view is initialized as 3D view.
@@ -15,10 +15,10 @@
  Step8 inherits from Step6. The method SetupWidgets() is changed: A QmitkStdMultiWidget is used instead of one QmitkRenderWindow and two instances of QmitkSliceWidget.
  
  \dontinclude Step8.cpp 
- \skipline Part II
- \until setCentralWidget
+ \skipline Part Ia
+ \until GetMoveAndZoomInteractor
  
  
- \ref Step7Page "[Previous step]" \ref Step9Page "[Next step]"
+ \ref Step07Page "[Previous step]" \ref Step09Page "[Next step]"
  
   */

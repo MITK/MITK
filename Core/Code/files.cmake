@@ -139,7 +139,6 @@ SET(CPP_FILES
   Interactions/mitkInteractor.cpp
   Interactions/mitkMouseMovePointSetInteractor.cpp
   Interactions/mitkMoveSurfaceInteractor.cpp
-  Interactions/mitkMoveSurfaceInteractor.cpp
   Interactions/mitkPointSetInteractor.cpp
   Interactions/mitkPositionEvent.cpp
   Interactions/mitkPositionTracker.cpp

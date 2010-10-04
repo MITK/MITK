@@ -52,7 +52,8 @@ public:
   // Is hardware rendering supported? No if the input data is
   // more than one independent component, or if the hardware does
   // not support the required extensions
-  int IsRenderSupported(vtkVolumeProperty *);
+  // int IsRenderSupported(vtkVolumeProperty *);
+	int IsRenderSupported(vtkVolumeProperty *, vtkRenderer *ren);
   
 //BTX
 
@@ -106,8 +107,9 @@ protected:
   
   bool SupportsCompressedTexture;
   
-  void Initialize();
-
+  //void Initialize();
+	void Initialize(vtkRenderer *r);
+	
   virtual void RenderFP(vtkRenderer *ren, vtkVolume *vol);
 
   void SetupOneIndependentTextures( vtkRenderer *ren, vtkVolume *vol );

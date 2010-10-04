@@ -115,7 +115,7 @@ public:
   // render using 3D texture mapping. This indicates if 3D texture
   // mapping is supported by the hardware, and if the other extensions
   // necessary to support the specific properties are available.
-  virtual int IsRenderSupported( vtkVolumeProperty * ) {return 0;};
+  virtual int IsRenderSupported( vtkVolumeProperty * , vtkRenderer *) =0;
 
   // Description:
   // Allow access to the number of polygons used for the

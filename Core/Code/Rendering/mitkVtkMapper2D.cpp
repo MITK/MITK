@@ -16,15 +16,15 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 
-#include "mitkBaseVtkMapper2D.h"
+#include "mitkVtkMapper2D.h"
 
-mitk::BaseVtkMapper2D::BaseVtkMapper2D()
+mitk::VtkMapper2D::VtkMapper2D()
 {
   m_VtkBased = true;
 }
 
 
-mitk::BaseVtkMapper2D::~BaseVtkMapper2D()
+mitk::VtkMapper2D::~VtkMapper2D()
 {
 }
 

@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkCommon.h"
 #include "MitkExtExports.h"
-#include "mitkBaseVtkMapper3D.h"
+#include "mitkVtkMapper3D.h"
 #include "mitkBaseRenderer.h"
 #include "mitkImage.h"
 #include <vtkVolumeProperty.h>
@@ -64,10 +64,10 @@ namespace mitk {
 //## @brief Vtk-based mapper for VolumeData
 //##
 //## @ingroup Mapper
-class MitkExt_EXPORT GPUVolumeMapper3D : public BaseVtkMapper3D
+class MitkExt_EXPORT GPUVolumeMapper3D : public VtkMapper3D
 {
 public:
-  mitkClassMacro(GPUVolumeMapper3D, BaseVtkMapper3D);
+  mitkClassMacro(GPUVolumeMapper3D, VtkMapper3D);
 
   itkNewMacro(Self);
 

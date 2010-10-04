@@ -36,10 +36,11 @@ public:
 
   enum Measure
   {
-    FA,
-    RA,
-    L1, // = DA (Axial diffusivity)
-    DR //Radial diffusivity
+    FA,// Fractional anisotropy
+    RA,// Relative anisotropy
+    AD,// Axial diffusivity
+    RD,// Radial diffusivity
+    CA // Clustering anisotropy 1-(λ2+λ3)/(2*λ1)
   };
 
   typedef itk::DiffusionTensor3D<TPixel>          TensorType;
@@ -70,7 +71,7 @@ protected:
   Measure m_Measure; 
 
   void GenerateData();
-  
+
 }; // end class
 
 } // end namespace

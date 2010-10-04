@@ -34,7 +34,7 @@ namespace mitk
   {    
     if ( m_FileName == "") 
     {
-      throw itk::ImageFileReaderException(__FILE__, __LINE__, "Sorry, the filename of the vessel tree to be read is empty!");
+      throw itk::ImageFileReaderException(__FILE__, __LINE__, "Sorry, the filename is empty!");
     }
     else
     {
@@ -54,27 +54,29 @@ namespace mitk
         vecImg->SetSpacing( img->GetSpacing() );   // Set the image spacing
         vecImg->SetOrigin( img->GetOrigin() );     // Set the image origin
         vecImg->SetDirection( img->GetDirection() );  // Set the image direction
-        vecImg->SetLargestPossibleRegion( img->GetLargestPossibleRegion());
-        vecImg->SetBufferedRegion( img->GetLargestPossibleRegion() );
+        vecImg->SetRegions( img->GetLargestPossibleRegion());
         vecImg->Allocate();
 
         itk::ImageRegionIterator<VecImgType> ot (vecImg, vecImg->GetLargestPossibleRegion() );
         ot = ot.Begin();
 
         itk::ImageRegionIterator<ImageType> it (img, img->GetLargestPossibleRegion() );
+        it = it.Begin();
 
         typedef ImageType::PixelType  VarPixType;
         typedef VecImgType::PixelType FixPixType;
 
-        for (it = it.Begin(); !it.IsAtEnd(); ++it)
+        while (!it.IsAtEnd())
         {
           VarPixType vec = it.Get();
           FixPixType fixVec(vec.GetDataPointer());
           ot.Set(fixVec);
           ++ot;
+          ++it;
         }
 
-        mitk::GrabItkImageMemory(vecImg, this->GetOutput());
+        this->GetOutput()->InitializeByItk(vecImg.GetPointer());
+        this->GetOutput()->SetVolume(vecImg->GetBufferPointer());
 
       }
       catch(std::exception& e)

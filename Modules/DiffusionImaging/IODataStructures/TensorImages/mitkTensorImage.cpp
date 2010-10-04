@@ -41,24 +41,26 @@ mitk::TensorImage::~TensorImage()
 vtkImageData* mitk::TensorImage::GetVtkImageData(int t, int n)
 {
   if(m_RgbImage.IsNull())
+  {
     ConstructRgbImage();
+  }
   return m_RgbImage->GetVtkImageData(t,n);
 }
 
 void mitk::TensorImage::ConstructRgbImage()
 {
-  typedef itk::Image<itk::DiffusionTensor3D<float>,3> ImageType;
-  typedef itk::TensorToRgbImageFilter<ImageType> FilterType;
-  FilterType::Pointer filter = FilterType::New();
-  
-  ImageType::Pointer itkvol = ImageType::New();
-  mitk::CastToItkImage<ImageType>(this, itkvol);
-  filter->SetInput(itkvol);
-  filter->Update();
+    typedef itk::Image<itk::DiffusionTensor3D<float>,3> ImageType;
+    typedef itk::TensorToRgbImageFilter<ImageType> FilterType;
+    FilterType::Pointer filter = FilterType::New();
 
-  m_RgbImage = mitk::Image::New();
-  m_RgbImage->InitializeByItk( filter->GetOutput() );
-  m_RgbImage->SetVolume( filter->GetOutput()->GetBufferPointer() );
+    ImageType::Pointer itkvol = ImageType::New();
+    mitk::CastToItkImage<ImageType>(this, itkvol);
+    filter->SetInput(itkvol);
+    filter->Update();
+
+    m_RgbImage = mitk::Image::New();
+    m_RgbImage->InitializeByItk( filter->GetOutput() );
+    m_RgbImage->SetVolume( filter->GetOutput()->GetBufferPointer() );
 }
 
 vtkImageData* mitk::TensorImage::GetNonRgbVtkImageData(int t, int n)

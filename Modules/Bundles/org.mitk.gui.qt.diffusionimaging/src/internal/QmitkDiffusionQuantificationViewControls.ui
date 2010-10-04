@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>227</width>
-    <height>395</height>
+    <width>281</width>
+    <height>402</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -167,7 +167,7 @@
          <bool>false</bool>
         </property>
         <property name="text">
-         <string>FA</string>
+         <string>FA (Fractional Anisotropy)</string>
         </property>
        </widget>
       </item>
@@ -177,27 +177,37 @@
          <bool>false</bool>
         </property>
         <property name="text">
-         <string>RA</string>
+         <string>RA (Relative Anisotropy)</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QCommandLinkButton" name="m_L1Button">
+       <widget class="QCommandLinkButton" name="m_ADButton">
         <property name="enabled">
          <bool>false</bool>
         </property>
         <property name="text">
-         <string>L1 (DA)</string>
+         <string>AD (Axial Diffusivity)</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QCommandLinkButton" name="m_DRButton">
+       <widget class="QCommandLinkButton" name="m_RDButton">
         <property name="enabled">
          <bool>false</bool>
         </property>
         <property name="text">
-         <string>DR ( (L1+L2)/2 )</string>
+         <string>RD (Radial Diffusivity)</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCommandLinkButton" name="m_ClusteringAnisotropy">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>1-(λ2+λ3)/(2*λ1)</string>
         </property>
        </widget>
       </item>

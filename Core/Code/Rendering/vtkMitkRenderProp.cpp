@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkPropAssembly.h>
 
 #if ( ( VTK_MAJOR_VERSION >= 5 ) && ( VTK_MINOR_VERSION>=2)  )
-#include "mitkBaseVtkMapper3D.h"
+#include "mitkVtkMapper3D.h"
 #endif
 
 vtkStandardNewMacro(vtkMitkRenderProp);
@@ -77,7 +77,7 @@ int vtkMitkRenderProp::HasTranslucentPolygonalGeometry()
   for(MappersMapType::iterator it = mappersMap.begin(); it != mappersMap.end(); it++)
   {
     mitk::Mapper * mapper = (*it).second;
-    mitk::BaseVtkMapper3D::Pointer vtkMapper = dynamic_cast<mitk::BaseVtkMapper3D*>(mapper);
+    mitk::VtkMapper3D::Pointer vtkMapper = dynamic_cast<mitk::VtkMapper3D*>(mapper);
     if(vtkMapper)
     {    
       // Due to VTK 5.2 bug, we need to initialize the Paths object in vtkPropAssembly

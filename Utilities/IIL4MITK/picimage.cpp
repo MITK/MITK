@@ -72,6 +72,49 @@ iil4mitkPicImage::window () const
 }
 
 void
+    iil4mitkPicImage::setOpacityExtrema (const float minimum, const float maximum)
+{
+  // assert (minimum < maximum);
+
+  _minOpac = minimum;
+  _maxOpac = maximum;
+  invalidateTextures ();
+}
+
+void
+iil4mitkPicImage::setOpacityWindow (const float level, const float window)
+{
+    // assert (window > 0);
+    _minOpac = level - window / 2.0;
+    _maxOpac = _minOpac + window;
+    invalidateTextures ();
+}
+
+float
+iil4mitkPicImage::minimumOpacity () const
+{
+    return _minOpac;
+}
+
+float
+iil4mitkPicImage::maximumOpacity () const
+{
+    return _maxOpac;
+}
+
+float
+iil4mitkPicImage::levelOpacity () const
+{
+    return (_minOpac + _maxOpac) / 2.0;
+}
+
+float
+iil4mitkPicImage::windowOpacity () const
+{
+    return (_maxOpac - _minOpac);
+}
+
+void
 iil4mitkPicImage::setColors (const unsigned char* colors)
 {
     _colors = colors;
@@ -147,6 +190,7 @@ iil4mitkPicImage::clear ()
 {
     _pic = NULL;
     _min = _max = 0.0;
+    _minOpac = _maxOpac = 0.0;
     _colors = NULL;
     _binary = false;
     _mask = false; 
@@ -417,6 +461,8 @@ void iil4mitkPicImage::copyImage (unsigned int x, unsigned int y, unsigned int w
     unsigned int slice = _pic->n[0] * _pic->n[1] * (_pic->bpe / 8);
     float scale = (_max -_min > 0 ? 255.0 / (_max - _min) : 0.0);
     float bias = _min * scale;
+    float scaleOpac = (_maxOpac -_minOpac > 0 ? 255.0 / (_maxOpac - _minOpac) : 0.0);
+    float biasOpac = _minOpac * scaleOpac;
     unsigned char *src = (unsigned char *) _pic->data + (y * _pic->n[0] + x) * (_pic->bpe/8);
     unsigned char *dst = data + (yoffset * width + xoffset) * (bpe () / 8);
     unsigned char *eol = dst + w * (bpe () / 8);
@@ -464,23 +510,29 @@ void iil4mitkPicImage::copyImage (unsigned int x, unsigned int y, unsigned int w
       unsigned char* dest = dst;
       while (dest < eol) 
       {
-        if(_min!=0 || _max!=255)
+        if(_min!=0 || _max!=255 || _minOpac!=0 || _maxOpac!=255)
         {
+          double rgb[3], alpha, hsi[3];
+
           // level/window mechanism for intensity in HSI space
-          double rgb[3], hsi[3];
           rgb[0] = source[0];
           rgb[1] = source[1];
           rgb[2] = source[2];
+          alpha  = source[3];
           RGBtoHSI<double>(rgb,hsi);
           hsi[2] = hsi[2] * 255.0 * scale - bias;
           hsi[2] = (hsi[2] > 255.0 ? 255 : (hsi[2] < 0.0 ? 0 : hsi[2]));
           hsi[2] /= 255.0;
           HSItoRGB<double>(hsi,rgb);
+
+          // level/window mechanism for opacity
+          alpha = alpha * scaleOpac - biasOpac;
+          alpha = (alpha > 255.0 ? 255 : (alpha < 0.0 ? 0 : alpha));
+
           dest[0] = (unsigned char)rgb[0];
           dest[1] = (unsigned char)rgb[1];
           dest[2] = (unsigned char)rgb[2];
-
-          dest[3] = source[3];
+          dest[3] = (unsigned char)alpha;
 
           source+=4;
           dest+=4;

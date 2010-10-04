@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkCommon.h"
 #include "MitkExtExports.h"
-#include "mitkBaseVtkMapper3D.h"
+#include "mitkVtkMapper3D.h"
 #include "mitkUnstructuredGrid.h"
 #include "mitkBaseRenderer.h"
 
@@ -45,11 +45,11 @@ namespace mitk {
 //## @brief Vtk-based mapper for UnstructuredGrid
 //##
 //## @ingroup Mapper
-class MitkExt_EXPORT UnstructuredGridVtkMapper3D : public BaseVtkMapper3D
+class MitkExt_EXPORT UnstructuredGridVtkMapper3D : public VtkMapper3D
 {
 public:
 
-  mitkClassMacro(UnstructuredGridVtkMapper3D, BaseVtkMapper3D);
+  mitkClassMacro(UnstructuredGridVtkMapper3D, VtkMapper3D);
 
   itkNewMacro(Self);
 

@@ -78,9 +78,22 @@ public:
 
     void AverageClicked();
 
-    void AdvancedClicked();
+    void OutputSet();
+    void OutputClear();
 
 protected: 
+
+  void Status(QString status);
+  void Status(std::string status);
+  void Status(const char* status);
+  void Error(QString status);
+  void Error(std::string status);
+  void Error(const char* status);
+
+  void PrintMemoryUsage();
+  std::string FormatMemorySize( size_t size );
+  std::string FormatPercentage( double val );
+  std::string GetMemoryDescription( size_t processSize, float percentage );
 
   /*!  
   * controls containing sliders for scrolling through the slices  
@@ -90,6 +103,9 @@ protected:
   QmitkStdMultiWidget* m_MultiWidget;
 
   QWidget *m_Parent;
+
+  QString m_OutputFolderName;
+  bool m_OutputFolderNameSet;
 
 };
 

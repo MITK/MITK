@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKSURFACEDATAVTKMAPPER3D_H_HEADER_INCLUDED_C1907273
 
 #include "mitkCommon.h"
-#include "mitkBaseVtkMapper3D.h"
+#include "mitkVtkMapper3D.h"
 #include "mitkSurface.h"
 #include "mitkBaseRenderer.h"
 
@@ -75,11 +75,11 @@ namespace mitk {
   * @ingroup Mapper
   */
 
-class MITK_CORE_EXPORT SurfaceVtkMapper3D : public BaseVtkMapper3D
+class MITK_CORE_EXPORT SurfaceVtkMapper3D : public VtkMapper3D
 {
 public:
 
-  mitkClassMacro(SurfaceVtkMapper3D, BaseVtkMapper3D);
+  mitkClassMacro(SurfaceVtkMapper3D, VtkMapper3D);
 
   itkNewMacro(Self);
 

@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkCommon.h"
 #include "mitkBaseProperty.h"
+#include "mitkGenericProperty.h"
 #include "mitkUIDGenerator.h"
 
 #include <itkObjectFactory.h>

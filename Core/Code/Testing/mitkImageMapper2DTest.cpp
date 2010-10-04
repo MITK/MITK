@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkImage.h>
 
 //#include <mitkRenderWindow.h>
-#include <mitkImageMapper2D.h>
+#include <mitkImageMapperGL2D.h>
 #include <mitkLevelWindow.h>
 #include <mitkLevelWindowProperty.h>
 #include <mitkVtkPropRenderer.h>
@@ -106,8 +106,8 @@ int mitkImageMapper2DTest(int /*argc*/, char* /*argv*/[])
   }
   std::cout<<"[PASSED]"<<std::endl;
 
-  std::cout << "Testing if an mitk::ImageMapper2D was created: ";
-  if(dynamic_cast<mitk::ImageMapper2D*>(node->GetMapper(mitk::BaseRenderer::Standard2D))==NULL)
+  std::cout << "Testing if an mitk::ImageMapperGL2D was created: ";
+  if(dynamic_cast<mitk::ImageMapperGL2D*>(node->GetMapper(mitk::BaseRenderer::Standard2D))==NULL)
   {
     std::cout<<"[FAILED]"<<std::endl;
     return EXIT_FAILURE;

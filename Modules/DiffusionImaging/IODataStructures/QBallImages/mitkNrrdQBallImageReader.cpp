@@ -72,7 +72,8 @@ namespace mitk
           ++ot;
         }
 
-        mitk::GrabItkImageMemory(vecImg, this->GetOutput());
+        this->GetOutput()->InitializeByItk(vecImg.GetPointer());
+        this->GetOutput()->SetVolume(vecImg->GetBufferPointer());
 
       }
       catch(std::exception& e)

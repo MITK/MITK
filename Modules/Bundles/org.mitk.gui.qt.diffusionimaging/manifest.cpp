@@ -25,11 +25,11 @@ PURPOSE.  See the above copyright notices for more information.
 #include "src/internal/QmitkTensorReconstructionView.h"
 #include "src/internal/QmitkControlVisualizationPropertiesView.h"
 //#include "src/internal/QmitkTbssView.h"
-//#include "src/internal/QmitkDiffusionImagingPerspective.h"
+#include "src/internal/QmitkDiffusionImagingPublicPerspective.h"
 
-//POCO_BEGIN_NAMED_MANIFEST(berryIPerspectiveFactory, berry::IPerspectiveFactory)
-//  POCO_EXPORT_CLASS(QmitkDiffusionImagingPerspective)
-//POCO_END_MANIFEST
+POCO_BEGIN_NAMED_MANIFEST(berryIPerspectiveFactory, berry::IPerspectiveFactory)
+  POCO_EXPORT_CLASS(QmitkDiffusionImagingPublicPerspective)
+POCO_END_MANIFEST
 
 POCO_BEGIN_NAMED_MANIFEST(berryIViewPart, berry::IViewPart)
   POCO_EXPORT_CLASS(QmitkQBallReconstructionView)

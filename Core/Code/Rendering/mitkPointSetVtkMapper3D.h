@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKPointSetVtkMAPPER3D_H_HEADER_INCLUDED_C1907273
 
 #include "mitkCommon.h"
-#include "mitkBaseVtkMapper3D.h"
+#include "mitkVtkMapper3D.h"
 #include "mitkBaseRenderer.h"
 
 class vtkActor;
@@ -90,16 +90,16 @@ namespace mitk {
   *
   * @ingroup Mapper
   */
-  class MITK_CORE_EXPORT PointSetVtkMapper3D : public BaseVtkMapper3D
+  class MITK_CORE_EXPORT PointSetVtkMapper3D : public VtkMapper3D
   {
   public:
-    mitkClassMacro(PointSetVtkMapper3D, BaseVtkMapper3D);
+    mitkClassMacro(PointSetVtkMapper3D, VtkMapper3D);
 
     itkNewMacro(Self);
 
     virtual const mitk::PointSet* GetInput();
 
-    //overwritten from BaseVtkMapper3D to be able to return a 
+    //overwritten from VtkMapper3D to be able to return a 
     //m_PointsAssembly which is much faster than a vtkAssembly
     virtual vtkProp* GetVtkProp(mitk::BaseRenderer* renderer);
     virtual void UpdateVtkTransform(mitk::BaseRenderer* renderer);

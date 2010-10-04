@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef ODFVTKMAPPER2D_H_HEADER_INCLUDED
 #define ODFVTKMAPPER2D_H_HEADER_INCLUDED
 
-#include "mitkBaseVtkMapper2D.h"
+#include "mitkVtkMapper2D.h"
 #include "vtkPropAssembly.h"
 #include "vtkAppendPolyData.h"
 #include "vtkActor.h"
@@ -44,7 +44,7 @@ namespace mitk {
   //## method vtkProp* GetProp().
   //## @ingroup Mapper
   template<class TPixelType, int NrOdfDirections>
-  class OdfVtkMapper2D : public BaseVtkMapper2D
+  class OdfVtkMapper2D : public VtkMapper2D
   {
     struct OdfDisplayGeometry {
       vtkFloatingPointType vp[ 3 ], vnormal[ 3 ];
@@ -72,7 +72,7 @@ namespace mitk {
 
   public:
 
-    mitkClassMacro(OdfVtkMapper2D,BaseVtkMapper2D);
+    mitkClassMacro(OdfVtkMapper2D,VtkMapper2D);
     itkNewMacro(Self);
 
     virtual vtkProp* GetProp(mitk::BaseRenderer* renderer);

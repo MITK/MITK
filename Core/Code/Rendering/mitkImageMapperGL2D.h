@@ -92,13 +92,13 @@ namespace mitk {
 
  * \ingroup Mapper
  */
-class MITK_CORE_EXPORT ImageMapper2D : public GLMapper2D
+class MITK_CORE_EXPORT ImageMapperGL2D : public GLMapper2D
 {
 
 public:
   
   /** Standard class typedefs. */
-  mitkClassMacro( ImageMapper2D,GLMapper2D );
+  mitkClassMacro( ImageMapperGL2D,GLMapper2D );
   
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
@@ -221,9 +221,9 @@ public:
   static void SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer = NULL, bool overwrite = false);
 
 protected:
-  ImageMapper2D();
+  ImageMapperGL2D();
 
-  virtual ~ImageMapper2D();
+  virtual ~ImageMapperGL2D();
 
   /** Does the actual resampling, without rendering the image yet. */
   virtual void GenerateData(mitk::BaseRenderer *renderer);
@@ -239,18 +239,18 @@ protected:
       //
       // Note: observer ID is passed to rendererInfo, which will take
       // responsiblity to remove the observer upon its destruction
-      typedef itk::MemberCommand< ImageMapper2D > MemberCommandType;
+      typedef itk::MemberCommand< ImageMapperGL2D > MemberCommandType;
       MemberCommandType::Pointer deleteRendererCommand = 
         MemberCommandType::New();
 
       deleteRendererCommand->SetCallbackFunction(
-        this, &ImageMapper2D::DeleteRendererCallback );
+        this, &ImageMapperGL2D::DeleteRendererCallback );
       
       unsigned long observerID = renderer->AddObserver( 
         BaseRenderer::RendererResetEvent(), deleteRendererCommand );
 
       // Initialize RendererInfo
-      rendererInfo.Initialize( ImageMapper2D::numRenderer++, renderer, observerID );
+      rendererInfo.Initialize( ImageMapperGL2D::numRenderer++, renderer, observerID );
     }
 
     return rendererInfo;

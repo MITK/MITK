@@ -31,16 +31,16 @@ namespace mitk {
   //## Those must implement the abstract
   //## method vtkProp* GetProp().
   //## @ingroup Mapper
-  class MITK_CORE_EXPORT BaseVtkMapper2D : public Mapper2D
+  class MITK_CORE_EXPORT VtkMapper2D : public Mapper2D
   {
   public:
-    mitkClassMacro(BaseVtkMapper2D,Mapper2D);
+    mitkClassMacro(VtkMapper2D,Mapper2D);
     virtual vtkProp* GetProp(mitk::BaseRenderer* renderer) = 0;
 
   protected:
-    BaseVtkMapper2D();
+    VtkMapper2D();
 
-    virtual ~BaseVtkMapper2D();
+    virtual ~VtkMapper2D();
 
   };
 

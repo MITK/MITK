@@ -54,6 +54,10 @@ namespace mitk
 
     void AverageRedundantGradients(double precision);
 
+    GradientDirectionContainerType::Pointer CalcAveragedDirectionSet(double precision);
+
+    void CorrectDKFZBrokenGradientScheme(double precision);
+
     typename ImageType::Pointer GetVectorImage()
     { return m_VectorImage; }
     void SetVectorImage(typename ImageType::Pointer image )

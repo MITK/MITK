@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITK_CONTOUR_VTK_MAPPER_3D_H
 
 #include "MitkExtExports.h"
-#include "mitkBaseVtkMapper3D.h"
+#include "mitkVtkMapper3D.h"
 
 #include <vtkPolyData.h>
 #include <vtkSmartPointer.h>
@@ -38,10 +38,10 @@ class Contour;
  @brief Vtk-based mapper for mitk::Contour
  @ingroup Mapper
  */
-class MitkExt_EXPORT ContourVtkMapper3D : public BaseVtkMapper3D
+class MitkExt_EXPORT ContourVtkMapper3D : public VtkMapper3D
 {
 public:
-  mitkClassMacro(ContourVtkMapper3D, BaseVtkMapper3D);
+  mitkClassMacro(ContourVtkMapper3D, VtkMapper3D);
 
   itkNewMacro(Self);
 

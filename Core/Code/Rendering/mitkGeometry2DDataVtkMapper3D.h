@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKGEOMETRY2DDATAVTKMAPPER3D_H_HEADER_INCLUDED_C196C71F
 
 #include "mitkCommon.h"
-#include "mitkBaseVtkMapper3D.h"
+#include "mitkVtkMapper3D.h"
 #include "mitkDataStorage.h"
 #include "mitkGeometry2DDataToSurfaceFilter.h"
 #include "mitkWeakPointer.h"
@@ -42,7 +42,7 @@ namespace mitk {
 
 class Geometry2DData;
 class BaseRenderer;
-class ImageMapper2D;
+class ImageMapperGL2D;
 class DataStorage;
 
 /**
@@ -72,10 +72,10 @@ class DataStorage;
  *  \image html mitkGeometry2DDataVtkMapper3D.png "Internal filter pipeline"
  *
  */
-class MITK_CORE_EXPORT Geometry2DDataVtkMapper3D : public BaseVtkMapper3D
+class MITK_CORE_EXPORT Geometry2DDataVtkMapper3D : public VtkMapper3D
 {
 public:
-  mitkClassMacro(Geometry2DDataVtkMapper3D, BaseVtkMapper3D);
+  mitkClassMacro(Geometry2DDataVtkMapper3D, VtkMapper3D);
 
   itkNewMacro(Geometry2DDataVtkMapper3D);
 
@@ -94,7 +94,7 @@ public:
 
   /**
    * \brief All images found when traversing the (sub-) tree starting at
-   * \a iterator which are resliced by an ImageMapper2D will be mapped.
+   * \a iterator which are resliced by an ImageMapperGL2D will be mapped.
    */
   virtual void SetDataStorageForTexture(mitk::DataStorage* storage);
 
@@ -124,7 +124,7 @@ protected:
    * From this point onward, the input lookup is just copied into the output
    * lookup table.
    *
-   * See also mitk::ImageMapper2D, where -32768 is defined as BackgroundLevel
+   * See also mitk::ImageMapperGL2D, where -32768 is defined as BackgroundLevel
    * for resampling.
    *
    * NOTE: This method is currently not used; to make sure that the plane is
@@ -226,7 +226,7 @@ protected:
   /** \brief List holding the vtkActor to map the image into 3D for each
    * ImageMapper
    */
-  typedef std::map< ImageMapper2D *, ActorInfo > ActorList;
+  typedef std::map< ImageMapperGL2D *, ActorInfo > ActorList;
   ActorList m_ImageActors;
 
   struct LookupTableProperties
@@ -241,7 +241,7 @@ protected:
     vtkFloatingPointType windowMax;
   };
 
-  typedef std::map< ImageMapper2D *, LookupTableProperties >
+  typedef std::map< ImageMapperGL2D *, LookupTableProperties >
     LookupTablePropertiesList;
 
   /** \brief List holding some lookup table properties of the previous pass */

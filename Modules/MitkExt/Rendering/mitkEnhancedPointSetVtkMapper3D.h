@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkCommon.h"
 #include "MitkExtExports.h"
-#include "mitkBaseVtkMapper3D.h"
+#include "mitkVtkMapper3D.h"
 #include "mitkBaseRenderer.h"
 #include "mitkPointSet.h"
 #include "mitkVector.h"
@@ -67,10 +67,10 @@ namespace mitk {
   *
   * \sa PointSetVtkMapper3D
   */
-  class MitkExt_EXPORT EnhancedPointSetVtkMapper3D : public BaseVtkMapper3D
+  class MitkExt_EXPORT EnhancedPointSetVtkMapper3D : public VtkMapper3D
   {
   public:
-    mitkClassMacro(EnhancedPointSetVtkMapper3D, BaseVtkMapper3D);
+    mitkClassMacro(EnhancedPointSetVtkMapper3D, VtkMapper3D);
 
     itkNewMacro(Self);
 

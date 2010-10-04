@@ -8,7 +8,7 @@ SET(INTERNAL_CPP_FILES
   QmitkDiffusionDicomImportView.cpp
   QmitkDiffusionQuantificationView.cpp
   QmitkTensorReconstructionView.cpp
-  #QmitkDiffusionImagingPerspective.cpp
+  QmitkDiffusionImagingPublicPerspective.cpp
   QmitkControlVisualizationPropertiesView.cpp
   #QmitkTbssView.cpp
 )

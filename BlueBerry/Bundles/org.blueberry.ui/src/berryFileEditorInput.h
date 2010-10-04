@@ -40,7 +40,7 @@ public:
 
   std::string GetToolTipText() const;
 
-  bool operator==(const IEditorInput* o) const;
+  bool operator==(const Object* o) const;
 
 private:
 

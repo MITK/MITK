@@ -48,7 +48,7 @@ std::string FileEditorInput::GetToolTipText() const
   return m_Path.toString();
 }
 
-bool FileEditorInput::operator==(const IEditorInput* o) const
+bool FileEditorInput::operator==(const Object* o) const
 {
   if (const IPathEditorInput* other = dynamic_cast<const IPathEditorInput*>(o))
   {

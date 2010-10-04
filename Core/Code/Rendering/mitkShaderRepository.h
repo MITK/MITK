@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   Medical Imaging & Interaction Toolkit
 Language:  C++
 Date:      $Date: 2008-02-08 13:23:19 +0100 (Fri, 08 Feb 2008) $
 Version:   $Revision: 13561 $
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #ifndef _MITKSHADERREPOSITORY_H_
@@ -42,10 +42,10 @@ class MITK_CORE_EXPORT ShaderRepository : public itk::Object
 public:
 
   mitkClassMacro( ShaderRepository, itk::Object );
-  
+
   itkNewMacro( Self );
 
-  static ShaderRepository *GetGlobalShaderRepository();  
+  static ShaderRepository *GetGlobalShaderRepository();
 
   class Shader : public itk::Object
   {
@@ -72,7 +72,7 @@ public:
         glsl_ivec2,
         glsl_ivec3,
         glsl_ivec4
-      };  
+      };
 
       /**
        * Constructor
@@ -83,13 +83,13 @@ public:
        * Destructor
        */
       ~Uniform();
-      
+
       Type type;
       std::string name;
-      
+
       int defaultInt[4];
       float defaultFloat[4];
-      
+
       void LoadFromXML(vtkXMLDataElement *e);
     };
 
@@ -104,26 +104,27 @@ public:
      * Destructor
      */
     ~Shader();
-    
+
     std::string name;
     std::string path;
-    
+
     void LoadPropertiesFromPath();
-    
+
     Uniform *GetUniform(char * /*id*/) { return 0; }
-    
+
     std::list<Uniform::Pointer> *GetUniforms()
     {
       return &uniforms;
     }
-  }; 
-  
+  };
+
+
+
 protected:
 
   std::list<Shader::Pointer> shaders;
 
   void LoadShaders();
-
 
   /**
    * Constructor
@@ -141,10 +142,10 @@ public:
   {
     return &shaders;
   }
-  
+
   Shader *GetShader(const char *id);
-  
-  
+
+
   /** \brief Adds all parsed shader uniforms to property list of the given DataNode;
    * used by mappers.
    */
@@ -155,10 +156,12 @@ public:
    */
   void ApplyProperties(mitk::DataNode* node, vtkActor *actor, mitk::BaseRenderer* renderer,itk::TimeStamp &MTime);
 
+  /** \brief Loads a shader from a given file. Make sure that this file is in the XML shader format.
+   */
+  void LoadShader(std::string filename);
+
 
 };
 
 } //end of namespace mitk
 #endif
-
-

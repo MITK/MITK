@@ -95,9 +95,9 @@ EXCLUDE                = @MITK_SOURCE_DIR@/Utilities/ipPic/ \
 EXCLUDE_SYMLINKS       = NO
 EXCLUDE_PATTERNS       = moc_* \
                          Register*
-EXAMPLE_PATH           = @MITK_SOURCE_DIR@/Applications/Tutorial/
+EXAMPLE_PATH           = @MITK_SOURCE_DIR@/Applications/Tutorial/  @MITK_SOURCE_DIR@/Core/Code/ @MITK_SOURCE_DIR@/Applications/Tests/QtFreeRender/
 EXAMPLE_PATTERNS       = 
-EXAMPLE_RECURSIVE      = NO
+EXAMPLE_RECURSIVE      = YES
 IMAGE_PATH             = @MITK_SOURCE_DIR@/Documentation/Doxygen/ \
                          @MITK_SOURCE_DIR@/Documentation/Doxygen/Modules/ \
                          @MITK_SOURCE_DIR@/Documentation/Doxygen/Tutorial/ \

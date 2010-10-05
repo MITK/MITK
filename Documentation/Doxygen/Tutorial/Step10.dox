@@ -8,12 +8,12 @@ Please see \ref InteractionPage as an introduction to the MITK interaction mecha
 The beginning of a new interaction is the idea or the feature request. To lighten things up, let's say, that we want to enable the user to move a surface by using the arrow keys. So a new interactor needs to be implemented, that will be associated to a surface (data of a data node) and on an arrow event modifies the geometry of the data to move it in virtual 3D world space.
 
 We start with the definition of the state machine pattern to see what actions need to be implemented inside the interactor.
-
+ 
  \dontinclude StateMachine.xml
  \skip TutorialStep10Begin
  \until TutorialStep10End
 
-The pattern can be read like this: 
+ The pattern can be read like this: 
 \li The state machine pattern starts in state 1. It's the start state.
 \li An event with the ID = 1 (left mouse button click, see corresponding definition in StateMachine.xml) leads to a state 2 and the action 30 ( \c AcCHECKELEMENT) is processed.
 \li State 2 is a guard state and thus the state machine will only temporarily be in this state. \c AcCHECKELEMENT needs to check if the surface was hit by the mouse position (picking) and has to send the answer (\c EIDYES / \c EIDNO) to itself. If the answer is \c YES, then the current state will be changed to state 10 and the actions \c AcSELECT and \c AcMODE_SELECT will be processed. \c AcSELECT has to change the data to show that it is selected (e.g. change the color). \c AcMODE_SELECT causes a change in a special selection mode (for state machines) so that mitk::GlobalInteraction will favour this state machine. If the answer is \c NO, the current state will be changed to state 1 and actions \c AcDESELECT, that needs to deselect (change color) the data, and \c AcMODE_DESELECT is executed. \c AcMODE_DESELECT sets the mode of this state machine to deselected, so it will not be favoured by mitk::GlobalInteraction.
@@ -31,7 +31,7 @@ mitkMoveSurfaceInteractor.h
 Add includes:
  
  \dontinclude mitkMoveSurfaceInteractor.h
- \line <mitkInteractor.h>
+ \skipline mitkInteractor.h
 
  
 We derive the new interactor from class Interactor and add some macros for convenience:
@@ -46,7 +46,7 @@ For this example we use the implementation that is given by mitk::Interactor, so
 
 The following method is used for the case when someone sets a new data to the corresponding data node. Here reinitialization of this interactor can be done. Note that this method is not called if the data gets modified (points moved / added / removed). Here we don't need the method, so we neglect it.
 
- \line DataChanged
+ \skipline DataChanged
     
 Default constructor and destructor specified as protected to fullfill SmartPointer conventions.
 
@@ -55,7 +55,7 @@ Default constructor and destructor specified as protected to fullfill SmartPoint
 
 This is followed by one of the most important methods:
 
- \line ExecuteAction
+ \skipline ExecuteAction
 
 See mitkMoveSurfaceInteractor.h for whole header definition.
 

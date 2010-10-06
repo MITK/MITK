@@ -196,44 +196,44 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
     extensionPointService->GetConfigurationElementsFor("org.mitk.gui.qt.datamanager.contextMenuActions") );
   berry::IConfigurationElement::vector::iterator cmActionsIt;
 
-  std::string cmNodeDescriptorName;
-  std::string cmLabel;
-  std::string cmIcon;
-  std::string cmClass;
+  //std::string cmNodeDescriptorName;
+  //std::string cmLabel;
+  //std::string cmIcon;
+  //std::string cmClass;
 
-  QmitkNodeDescriptor* tmpDescriptor;
-  QAction* contextMenuAction;
-  QVariant cmActionDataIt;
-  m_ConfElements.clear();
+  //QmitkNodeDescriptor* tmpDescriptor;
+  //QAction* contextMenuAction;
+  //QVariant cmActionDataIt;
+  //m_ConfElements.clear();
 
-  int i=1;
-  for (cmActionsIt = cmActions.begin()
-    ; cmActionsIt != cmActions.end()
-    ; ++cmActionsIt)
-  {
-    cmIcon.erase();
-    if((*cmActionsIt)->GetAttribute("nodeDescriptorName", cmNodeDescriptorName)
-      && (*cmActionsIt)->GetAttribute("label", cmLabel)
-      && (*cmActionsIt)->GetAttribute("class", cmClass))
-    {
-      (*cmActionsIt)->GetAttribute("icon", cmIcon);
-      // create context menu entry here
-      tmpDescriptor = QmitkNodeDescriptorManager::GetInstance()->GetDescriptor(QString::fromStdString(cmNodeDescriptorName));
-      if(!tmpDescriptor)
-      {
-        MITK_WARN << "cannot add action \"" << cmLabel << "\" because descriptor " << cmNodeDescriptorName << " does not exist";
-        continue;
-      }
-      contextMenuAction = new QAction( QString::fromStdString(cmLabel), parent);
-      tmpDescriptor->AddAction(contextMenuAction);
-      m_ConfElements[contextMenuAction] = *cmActionsIt;
+  //int i=1;
+  //for (cmActionsIt = cmActions.begin()
+  //  ; cmActionsIt != cmActions.end()
+  //  ; ++cmActionsIt)
+  //{
+  //  cmIcon.erase();
+  //  if((*cmActionsIt)->GetAttribute("nodeDescriptorName", cmNodeDescriptorName)
+  //    && (*cmActionsIt)->GetAttribute("label", cmLabel)
+  //    && (*cmActionsIt)->GetAttribute("class", cmClass))
+  //  {
+  //    (*cmActionsIt)->GetAttribute("icon", cmIcon);
+  //    // create context menu entry here
+  //    tmpDescriptor = QmitkNodeDescriptorManager::GetInstance()->GetDescriptor(QString::fromStdString(cmNodeDescriptorName));
+  //    if(!tmpDescriptor)
+  //    {
+  //      MITK_WARN << "cannot add action \"" << cmLabel << "\" because descriptor " << cmNodeDescriptorName << " does not exist";
+  //      continue;
+  //    }
+  //    contextMenuAction = new QAction( QString::fromStdString(cmLabel), parent);
+  //    tmpDescriptor->AddAction(contextMenuAction);
+  //    m_ConfElements[contextMenuAction] = *cmActionsIt;
 
-      cmActionDataIt.setValue<int>(i);
-      contextMenuAction->setData( cmActionDataIt );
-      connect( contextMenuAction, SIGNAL( triggered(bool) ) , this, SLOT( ContextMenuActionTriggered(bool) ) );
-      ++i;
-    }
-  }
+  //    cmActionDataIt.setValue<int>(i);
+  //    contextMenuAction->setData( cmActionDataIt );
+  //    connect( contextMenuAction, SIGNAL( triggered(bool) ) , this, SLOT( ContextMenuActionTriggered(bool) ) );
+  //    ++i;
+  //  }
+  //}
 
   m_OpacitySlider = new QSlider;
   m_OpacitySlider->setMinimum(0);

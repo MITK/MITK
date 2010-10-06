@@ -6,7 +6,6 @@
 #include "mitkProgressBar.h"
 
 #include <itkConstantPadImageFilter.h>
-#include <berryQtViewPart.h>
 
 //needed for qApp 
 #include <qcoreapplication.h>

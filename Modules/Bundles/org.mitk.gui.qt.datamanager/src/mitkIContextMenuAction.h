@@ -1,15 +1,12 @@
 #ifndef mitkIContextMenuAction_H_
 #define mitkIContextMenuAction_H_
 
+#include <berryMacros.h>
+#include <berryQtViewPart.h>
+
 #include <vector>
 #include <mitkDataNode.h>
-#include <berryMacros.h>
 #include "mitkDataStorage.h"
-
-namespace berry
-{
-  class QtViewPart;
-}
 
 namespace mitk
 {

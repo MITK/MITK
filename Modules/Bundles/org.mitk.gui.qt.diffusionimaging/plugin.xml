@@ -44,11 +44,13 @@
           class="QmitkControlVisualizationPropertiesView" />
   </extension>
 
+<!--
   <extension point="org.blueberry.ui.perspectives">
     <perspective id="org.mitk.perspectives.publicdiffusionimaging"
                  name="Diffusion Imaging Public" 
                  class="QmitkDiffusionImagingPublicPerspective" 
                  icon="resources/reconodf.png"/>
   </extension>
+-->
 
 </plugin>

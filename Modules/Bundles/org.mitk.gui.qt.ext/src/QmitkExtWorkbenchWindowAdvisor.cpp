@@ -514,7 +514,7 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
 	// ===== Help menu ====================================
 	QMenu* helpMenu = menuBar->addMenu("Help");
 	helpMenu->addAction("&Welcome",QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onIntro()));
-	helpMenu->addAction("&Help Contents",QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onHelp()), QKeySequence(QKeySequence::HelpContents));
+  helpMenu->addAction("&Help Contents",QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onHelp()), 	QKeySequence("F1"));
 	helpMenu->addAction("&About",QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onAbout()));
 	// =====================================================
 

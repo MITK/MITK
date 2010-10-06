@@ -135,7 +135,7 @@ class QmitkSegmentationView : public QObject, public QmitkFunctionality
     // THE currently existing QmitkStdMultiWidget
     QmitkStdMultiWidget * m_MultiWidget;
 
-    QmitkSegmentationPostProcessing* m_PostProcessing;
+  /*  QmitkSegmentationPostProcessing* m_PostProcessing;*/
 
     unsigned long m_RenderingManagerObserverTag;
     unsigned long m_SlicesRotationObserverTag1;

@@ -34,5 +34,7 @@
     <keyword id="org.mitk.gui.qt.application.DataManagerPreferencePageKeywords" label="data manager"></keyword>
     <keyword id="org.mitk.gui.qt.application.DataManagerHotkeysPrefPageKeywords" label="data manager hotkeys"></keyword>
   </extension>
-
+  
+  <extension-point id="contextMenuActions" name="Context menu actions"/>
+  
 </plugin>

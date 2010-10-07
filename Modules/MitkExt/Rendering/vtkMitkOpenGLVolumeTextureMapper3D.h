@@ -53,7 +53,7 @@ public:
   // more than one independent component, or if the hardware does
   // not support the required extensions
   // int IsRenderSupported(vtkVolumeProperty *);
-	int IsRenderSupported(vtkVolumeProperty *, vtkRenderer *ren);
+	int IsRenderSupported(vtkRenderer *ren,vtkVolumeProperty *);
   
 //BTX
 
@@ -102,6 +102,7 @@ protected:
   GLuint           AlphaLookupIndex;
   
   GLuint prgOneComponentShade;
+  GLuint prgRGBAShade;
 
   vtkRenderWindow *RenderWindow;
   
@@ -115,8 +116,8 @@ protected:
   void SetupOneIndependentTextures( vtkRenderer *ren, vtkVolume *vol );
   void RenderOneIndependentShadeFP( vtkRenderer *ren, vtkVolume *vol );
 
-  void SetupFourDependentTextures( vtkRenderer *ren, vtkVolume *vol );
-  void RenderFourDependentShadeFP( vtkRenderer *ren, vtkVolume *vol );
+  void SetupRGBATextures( vtkRenderer *ren, vtkVolume *vol );
+  void RenderRGBAShadeFP( vtkRenderer *ren, vtkVolume *vol );
 
   void DeleteTextureIndex( GLuint *index );
   void CreateTextureIndex( GLuint *index );

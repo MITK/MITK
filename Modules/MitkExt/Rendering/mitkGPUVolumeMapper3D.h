@@ -21,34 +21,17 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkCommon.h"
 #include "MitkExtExports.h"
-#include "mitkVtkMapper3D.h"
+
 #include "mitkBaseRenderer.h"
+#include "mitkVtkMapper3D.h"
 #include "mitkImage.h"
+
+#include <vtkFixedPointVolumeRayCastMapper.h>
+#include "vtkMitkVolumeTextureMapper3D.h"
+#include "vtkMitkGPUVolumeRayCastMapper.h"
+
 #include <vtkVolumeProperty.h>
-#include <vtkRenderWindowInteractor.h>
-#include <vtkPlane.h>
-#include <vtkImplicitPlaneWidget.h>
-#include <vtkImageMask.h>
-#include <vtkMitkVolumeTextureMapper3D.h>
-
-#include <vector>
-#include <set>
-
-class vtkAssembly;
-class vtkVolumeRayCastMapper;
-class vtkFixedPointVolumeRayCastMapper;
-class vtkVolumeTextureMapper2D;
-class vtkVolumeMapper;
-class vtkVolume;
-class vtkObject;
-class vtkImageShiftScale;
-class vtkImageChangeInformation;
-class vtkLODProp3D;
-class vtkImageResample;
-class vtkCubeSource;
-class vtkPolyDataMapper;
-class vtkActor;
-
+#include <vtkImageChangeInformation.h>
 
 namespace mitk {
 
@@ -82,7 +65,9 @@ public:
    * This reflects whether this Mapper currently invokes StartEvent, EndEvent, and
    * ProgressEvent on BaseRenderer. */
   virtual bool IsLODEnabled( BaseRenderer *renderer = NULL ) const;
+  bool IsMIPEnabled( BaseRenderer *renderer = NULL );
   bool IsGPUEnabled( BaseRenderer *renderer = NULL );
+  bool IsRAYEnabled( BaseRenderer *renderer = NULL );
   
   virtual void MitkRenderVolumetricGeometry(mitk::BaseRenderer* renderer);
 
@@ -91,67 +76,100 @@ protected:
   GPUVolumeMapper3D();
   virtual ~GPUVolumeMapper3D();
 
-  void InitCPU();
-  void InitGPU(mitk::BaseRenderer* renderer);
-  void DeinitCPU();
+  bool IsRenderable(mitk::BaseRenderer* renderer);
+
+  void InitCommon();
+  void DeinitCommon();
+
+  void InitCPU(mitk::BaseRenderer* renderer);
+  void DeinitCPU(mitk::BaseRenderer* renderer);
+  void GenerateDataCPU(mitk::BaseRenderer* renderer);
+
+  bool InitGPU(mitk::BaseRenderer* renderer);
   void DeinitGPU(mitk::BaseRenderer* renderer);
+  void GenerateDataGPU(mitk::BaseRenderer* renderer);
+
+  bool InitRAY(mitk::BaseRenderer* renderer);
+  void DeinitRAY(mitk::BaseRenderer* renderer);
+  void GenerateDataRAY(mitk::BaseRenderer* renderer);
 
   virtual void GenerateData(mitk::BaseRenderer* renderer);
 
   void CreateDefaultTransferFunctions();
   void UpdateTransferFunctions( mitk::BaseRenderer *renderer );
 
-  vtkImageChangeInformation* m_UnitSpacingImageFilter;
-  vtkVolumeProperty* m_VolumePropertyCPU;
- 
-  vtkFixedPointVolumeRayCastMapper* m_MapperCPU;
- 
-  vtkVolume * m_VolumeCPU;
+  vtkVolume * m_VolumeNULL;
   
+  bool m_commonInitialized;
+  vtkImageChangeInformation* m_UnitSpacingImageFilter;
   vtkPiecewiseFunction *m_DefaultOpacityTransferFunction;
   vtkPiecewiseFunction *m_DefaultGradientTransferFunction;
   vtkColorTransferFunction *m_DefaultColorTransferFunction;
-
   vtkPiecewiseFunction *m_BinaryOpacityTransferFunction;
   vtkPiecewiseFunction *m_BinaryGradientTransferFunction;
   vtkColorTransferFunction *m_BinaryColorTransferFunction;
-
-  void GenerateDataGPU(mitk::BaseRenderer* renderer);
-  void GenerateDataCPU(mitk::BaseRenderer* renderer);
-  
-  bool cpuInitialized;
   
   class LocalStorage : public mitk::Mapper::BaseLocalStorage
   {
     public:
 
-      bool m_gpuInitialized;
-      bool m_gpuSupported;
-      vtkVolume * m_VolumeGPU;
-      vtkMitkVolumeTextureMapper3D* m_MapperGPU;
-      vtkVolumeProperty* m_VolumePropertyGPU;
-  
-      LocalStorage()
-      {
-        m_gpuInitialized = false;
-        m_gpuSupported = true;
-      }
+    bool m_cpuInitialized;
+    vtkVolume *m_VolumeCPU;
+    vtkFixedPointVolumeRayCastMapper* m_MapperCPU;
+    vtkVolumeProperty* m_VolumePropertyCPU;
+
+    bool m_gpuSupported;
+    bool m_gpuInitialized;
+    vtkVolume *m_VolumeGPU;
+    vtkMitkVolumeTextureMapper3D* m_MapperGPU;
+    vtkVolumeProperty* m_VolumePropertyGPU;
+
+    bool m_raySupported;
+    bool m_rayInitialized;
+    vtkVolume *m_VolumeRAY;
+    vtkMitkGPUVolumeRayCastMapper* m_MapperRAY;
+    vtkVolumeProperty* m_VolumePropertyRAY;
+
+    LocalStorage()
+    {
+      m_cpuInitialized = false;
       
-      ~LocalStorage()
+      m_gpuInitialized = false;
+      m_gpuSupported = true;    // assume initially gpu slicing is supported
+
+      m_rayInitialized = false;
+      m_raySupported = true;    // assume initially gpu raycasting is supported
+    }
+    
+    ~LocalStorage()
+    {
+      if(m_cpuInitialized)
       {
-        if(m_gpuInitialized)
-        {
-          m_VolumeGPU->Delete();
-          m_MapperGPU->Delete();
-          m_VolumePropertyGPU->Delete();
-          m_gpuInitialized=false;
-        }
+        m_VolumeCPU->Delete();
+        m_MapperCPU->Delete();
+        m_VolumePropertyCPU->Delete();
+        m_cpuInitialized=false;
       }
+
+      if(m_gpuInitialized)
+      {
+        m_VolumeGPU->Delete();
+        m_MapperGPU->Delete();
+        m_VolumePropertyGPU->Delete();
+        m_gpuInitialized=false;
+      }
+
+      if(m_rayInitialized)
+      {
+        m_VolumeRAY->Delete();
+        m_MapperRAY->Delete();
+        m_VolumePropertyRAY->Delete();
+        m_rayInitialized=false;
+      }
+    }
   };  
     
   mitk::Mapper::LocalStorageHandler<LocalStorage> m_LSH;  
-
-
 };
 
 } // namespace mitk

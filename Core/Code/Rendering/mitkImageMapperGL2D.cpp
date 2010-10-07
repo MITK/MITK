@@ -239,7 +239,6 @@ mitk::ImageMapperGL2D::Paint( mitk::BaseRenderer *renderer )
       std::stringstream volumeString; 
       volumeString << std::fixed << std::setprecision(1) << segmentationVolume;
 
-      bool useCmUnit(false);
       std::string unit;
       if (node->GetStringProperty("volume annotation unit", unit))
       {

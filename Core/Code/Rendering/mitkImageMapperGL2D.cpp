@@ -237,7 +237,19 @@ mitk::ImageMapperGL2D::Paint( mitk::BaseRenderer *renderer )
 
       // create text
       std::stringstream volumeString; 
-      volumeString << std::fixed << std::setprecision(1) << segmentationVolume << " ml";
+      volumeString << std::fixed << std::setprecision(1) << segmentationVolume;
+
+      bool useCmUnit(false);
+      std::string unit;
+      if (node->GetStringProperty("volume annotation unit", unit))
+      {
+        volumeString << " " << unit;
+      }
+      else
+      {
+        volumeString << " ml";
+      }
+
 
       // draw text
       mitk::VtkPropRenderer* OpenGLrenderer = dynamic_cast<mitk::VtkPropRenderer*>( renderer );
@@ -254,9 +266,20 @@ mitk::ImageMapperGL2D::Paint( mitk::BaseRenderer *renderer )
       //calc display coord
       worldGeometry->IndexToWorld( pt2D, pt2D );
       displayGeometry->WorldToDisplay( pt2D, pt2D );
+
+      mitk::ColorProperty::Pointer annotationColorProp;
+      mitk::Color annotationColor;
+      annotationColor.Set(0,1,0);
+
+      if (node->GetProperty(annotationColorProp, "volume annotation color"))
+      {
+        annotationColor = annotationColorProp->GetColor();
+      }
             
-      OpenGLrenderer->WriteSimpleText(volumeString.str(), pt2D[0]+1, pt2D[1]-1,0,0,0);
-      OpenGLrenderer->WriteSimpleText(volumeString.str(), pt2D[0]  , pt2D[1]  ,0,1,0);
+      OpenGLrenderer->WriteSimpleText(volumeString.str(), pt2D[0]+1, pt2D[1]-1,0,0,0); //this is a shadow 
+      OpenGLrenderer->WriteSimpleText(volumeString.str(), pt2D[0]  , pt2D[1]  ,annotationColor.GetRed() 
+                                                                              ,annotationColor.GetGreen()
+                                                                              ,annotationColor.GetBlue());
     }
 
   }

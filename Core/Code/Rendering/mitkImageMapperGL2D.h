@@ -73,6 +73,9 @@ namespace mitk {
  *   - \b "in plane resample extent by geometry": (BoolProperty) Do it or not
  *   - \b "bounding box": (BoolProperty) Is the Bounding Box of the image shown or not
  *   - \b "layer": (IntProperty) Layer of the image
+ *   - \b "volume annotation color": (ColorProperty) color of the volume annotation
+ *   - \b "volume annotation unit": (StringProperty) annotation unit as string (does not implicit convert the unit!) 
+          unit is ml/cm3
 
  * The default properties are:
 

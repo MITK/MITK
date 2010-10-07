@@ -12,7 +12,11 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
+
 #include "vtkMitkOpenGLGPUVolumeRayCastMapper.h"
+
+// Only with VTK 5.6 or above
+#if ((VTK_MAJOR_VERSION > 5) || ((VTK_MAJOR_VERSION==5) && (VTK_MINOR_VERSION>=6) ))
 
 #include "vtkObjectFactory.h"
 #include "vtkVolume.h"
@@ -7312,3 +7316,5 @@ void vtkMitkOpenGLGPUVolumeRayCastMapper::PrintSelf(ostream& os,
 {
   this->Superclass::PrintSelf(os,indent);
 }
+
+#endif

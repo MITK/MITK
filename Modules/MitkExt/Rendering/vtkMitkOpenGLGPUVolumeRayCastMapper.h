@@ -28,6 +28,9 @@
 #include "mitkCommon.h"
 #include "MitkExtExports.h"
 
+// Only with VTK 5.6 or above
+#if ((VTK_MAJOR_VERSION > 5) || ((VTK_MAJOR_VERSION==5) && (VTK_MINOR_VERSION>=6) ))
+
 class vtkVolume;
 class vtkRenderer;
 class vtkOpenGLExtensionManager;
@@ -485,5 +488,7 @@ private:
   vtkMitkOpenGLGPUVolumeRayCastMapper(const vtkMitkOpenGLGPUVolumeRayCastMapper&);  // Not implemented.
   void operator=(const vtkMitkOpenGLGPUVolumeRayCastMapper&);  // Not implemented.
 };
+
+#endif
 
 #endif

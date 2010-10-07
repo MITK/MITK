@@ -12,7 +12,12 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
+
 #include "vtkMitkGPUVolumeRayCastMapper.h"
+
+// Only with VTK 5.6 or above
+#if ((VTK_MAJOR_VERSION > 5) || ((VTK_MAJOR_VERSION==5) && (VTK_MINOR_VERSION>=6) ))
+
 
 #include "vtkVolumeRenderingFactory.h"
 #include "vtkImageData.h"
@@ -643,3 +648,5 @@ void vtkMitkGPUVolumeRayCastMapper::ClipCroppingRegionPlanes()
     ++i;
     }
 }
+
+#endif

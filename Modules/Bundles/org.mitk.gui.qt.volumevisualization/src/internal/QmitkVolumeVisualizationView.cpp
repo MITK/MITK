@@ -72,8 +72,11 @@ void QmitkVolumeVisualizationView::CreateQtPartControl(QWidget* parent)
     m_Controls->m_RenderMode->addItem("CPU raycast");
     m_Controls->m_RenderMode->addItem("CPU MIP raycast");
     m_Controls->m_RenderMode->addItem("GPU slicing");
+// Only with VTK 5.6 or above
+#if ((VTK_MAJOR_VERSION > 5) || ((VTK_MAJOR_VERSION==5) && (VTK_MINOR_VERSION>=6) ))
     m_Controls->m_RenderMode->addItem("GPU raycast");
     m_Controls->m_RenderMode->addItem("GPU MIP raycast");
+#endif
 
     connect( m_Controls->m_EnableRenderingCB, SIGNAL( toggled(bool) ),this, SLOT( OnEnableRendering(bool) ));
     connect( m_Controls->m_EnableLOD, SIGNAL( toggled(bool) ),this, SLOT( OnEnableLOD(bool) ));
@@ -222,7 +225,10 @@ void QmitkVolumeVisualizationView::UpdateInterface()
     bool useray=false;
     bool usemip=false;
     m_SelectedNode->GetBoolProperty("volumerendering.usegpu",usegpu);
+// Only with VTK 5.6 or above
+#if ((VTK_MAJOR_VERSION > 5) || ((VTK_MAJOR_VERSION==5) && (VTK_MINOR_VERSION>=6) ))
     m_SelectedNode->GetBoolProperty("volumerendering.useray",useray);
+#endif
     m_SelectedNode->GetBoolProperty("volumerendering.usemip",usemip);
     
     int mode = 0;
@@ -283,7 +289,10 @@ void QmitkVolumeVisualizationView::OnRenderMode(int mode)
   bool usemip=(mode==RM_GPU_MIP_RAYCAST)||(mode==RM_CPU_MIP_RAYCAST);
       
   m_SelectedNode->SetProperty("volumerendering.usegpu",mitk::BoolProperty::New(usegpu));
+// Only with VTK 5.6 or above
+#if ((VTK_MAJOR_VERSION > 5) || ((VTK_MAJOR_VERSION==5) && (VTK_MINOR_VERSION>=6) ))
   m_SelectedNode->SetProperty("volumerendering.useray",mitk::BoolProperty::New(useray));
+#endif
   m_SelectedNode->SetProperty("volumerendering.usemip",mitk::BoolProperty::New(usemip));
   
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();

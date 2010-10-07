@@ -28,7 +28,13 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <vtkFixedPointVolumeRayCastMapper.h>
 #include "vtkMitkVolumeTextureMapper3D.h"
+
+// Only with VTK 5.6 or above
+#if ((VTK_MAJOR_VERSION > 5) || ((VTK_MAJOR_VERSION==5) && (VTK_MINOR_VERSION>=6) ))
+
 #include "vtkMitkGPUVolumeRayCastMapper.h"
+
+#endif
 
 #include <vtkVolumeProperty.h>
 #include <vtkImageChangeInformation.h>
@@ -89,9 +95,14 @@ protected:
   void DeinitGPU(mitk::BaseRenderer* renderer);
   void GenerateDataGPU(mitk::BaseRenderer* renderer);
 
+// Only with VTK 5.6 or above
+#if ((VTK_MAJOR_VERSION > 5) || ((VTK_MAJOR_VERSION==5) && (VTK_MINOR_VERSION>=6) ))
+
   bool InitRAY(mitk::BaseRenderer* renderer);
   void DeinitRAY(mitk::BaseRenderer* renderer);
   void GenerateDataRAY(mitk::BaseRenderer* renderer);
+
+#endif
 
   virtual void GenerateData(mitk::BaseRenderer* renderer);
 
@@ -124,11 +135,16 @@ protected:
     vtkMitkVolumeTextureMapper3D* m_MapperGPU;
     vtkVolumeProperty* m_VolumePropertyGPU;
 
+// Only with VTK 5.6 or above
+#if ((VTK_MAJOR_VERSION > 5) || ((VTK_MAJOR_VERSION==5) && (VTK_MINOR_VERSION>=6) ))
+
     bool m_raySupported;
     bool m_rayInitialized;
     vtkVolume *m_VolumeRAY;
     vtkMitkGPUVolumeRayCastMapper* m_MapperRAY;
     vtkVolumeProperty* m_VolumePropertyRAY;
+
+#endif
 
     LocalStorage()
     {
@@ -137,8 +153,11 @@ protected:
       m_gpuInitialized = false;
       m_gpuSupported = true;    // assume initially gpu slicing is supported
 
+// Only with VTK 5.6 or above
+#if ((VTK_MAJOR_VERSION > 5) || ((VTK_MAJOR_VERSION==5) && (VTK_MINOR_VERSION>=6) ))
       m_rayInitialized = false;
       m_raySupported = true;    // assume initially gpu raycasting is supported
+#endif
     }
     
     ~LocalStorage()
@@ -159,6 +178,9 @@ protected:
         m_gpuInitialized=false;
       }
 
+// Only with VTK 5.6 or above
+#if ((VTK_MAJOR_VERSION > 5) || ((VTK_MAJOR_VERSION==5) && (VTK_MINOR_VERSION>=6) ))
+
       if(m_rayInitialized)
       {
         m_VolumeRAY->Delete();
@@ -166,6 +188,9 @@ protected:
         m_VolumePropertyRAY->Delete();
         m_rayInitialized=false;
       }
+
+#endif
+
     }
   };  
     

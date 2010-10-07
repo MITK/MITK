@@ -211,7 +211,7 @@ void QmitkRenderWindow::showEvent( QShowEvent* event )
 
   // this singleshot is necessary to have the overlays positioned correctly after initial show
   // simple call of Moved() is no use here!!
-  QTimer::singleShot(0, this ,SLOT( Moved() ) );
+  QTimer::singleShot(0, this ,SIGNAL( Moved() ) );
 }
 
 

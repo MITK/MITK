@@ -49,7 +49,7 @@ bool mitk::WiiMoteActivator::RegisterInputDevice()
   //    return false;
   //  }
   //}
-  //return true;
+  return true;
 }
 
 bool mitk::WiiMoteActivator::UnRegisterInputDevice()

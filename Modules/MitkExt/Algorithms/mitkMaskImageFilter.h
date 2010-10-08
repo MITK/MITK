@@ -24,9 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkImageToImageFilter.h"
 #include "mitkImageTimeSelector.h"
 
-namespace itk {
-template <class TPixel, unsigned int VImageDimension> class ITK_EXPORT Image;
-}
+#include "itkImage.h"
 
 namespace mitk {
 
@@ -44,9 +42,21 @@ public:
   const mitk::Image* GetMask() const;
   
   /**
+  * get/set the min Value of the original image in the masked area
+  **/
+  itkGetMacro(MinValue, mitk::ScalarType);
+  itkSetMacro(MinValue, mitk::ScalarType);
+
+  /**
+  * get/set the max Value of the original image in the masked area
+  **/
+  itkGetMacro(MaxValue, mitk::ScalarType);
+  itkSetMacro(MaxValue, mitk::ScalarType);
+
+  /**
    * This value is used as outside value. This only works
    * if OverrideOutsideValue is set to true. Default is 0.
-   */
+   **/
   itkSetMacro( OutsideValue, mitk::ScalarType );
   
   /**
@@ -83,7 +93,7 @@ protected:
   virtual void GenerateData();
 
   template < typename TPixel, unsigned int VImageDimension >
-    friend void _InternalComputeMask(itk::Image<TPixel, VImageDimension>* itkImage, mitk::MaskImageFilter* volumeCalculator);
+  void InternalComputeMask(itk::Image<TPixel, VImageDimension>* itkImage);
 
   mitk::Image::Pointer m_Mask;
   mitk::ImageTimeSelector::Pointer m_InputTimeSelector;
@@ -95,6 +105,8 @@ protected:
   itk::TimeStamp m_TimeOfHeaderInitialization;
   
   mitk::ScalarType m_OutsideValue;
+  mitk::ScalarType m_MinValue;
+  mitk::ScalarType m_MaxValue;
   bool m_OverrideOutsideValue;
 };
 

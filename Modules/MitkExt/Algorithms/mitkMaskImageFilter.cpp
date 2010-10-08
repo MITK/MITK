@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkProperties.h"
 
 #include "mitkImageToItk.h"
+#include "mitkImageAccessByItk.h"
 
 #include "itkImageRegionConstIterator.h"
 #include "itkImageRegionIteratorWithIndex.h"
@@ -89,24 +90,23 @@ void mitk::MaskImageFilter::GenerateOutputInformation()
 }
 
 template < typename TPixel, unsigned int VImageDimension >
-void mitk::_InternalComputeMask(itk::Image<TPixel, VImageDimension>* inputItkImage, mitk::MaskImageFilter* MaskImageFilter)
+void mitk::MaskImageFilter::InternalComputeMask(itk::Image<TPixel, VImageDimension>* inputItkImage)
 {
   typedef itk::Image<TPixel, VImageDimension> ItkInputImageType;
-
   typedef itk::Image<unsigned char, VImageDimension> ItkMaskImageType;
   typedef itk::Image<TPixel, VImageDimension> ItkOutputImageType;
-
+  
   typedef itk::ImageRegionConstIterator< ItkInputImageType > ItkInputImageIteratorType;
   typedef itk::ImageRegionConstIterator< ItkMaskImageType > ItkMaskImageIteratorType;
   typedef itk::ImageRegionIteratorWithIndex< ItkOutputImageType > ItkOutputImageIteratorType;
 
   typename mitk::ImageToItk<ItkMaskImageType>::Pointer maskimagetoitk = mitk::ImageToItk<ItkMaskImageType>::New();
-  maskimagetoitk->SetInput(MaskImageFilter->m_MaskTimeSelector->GetOutput());
+  maskimagetoitk->SetInput(m_MaskTimeSelector->GetOutput());
   maskimagetoitk->Update();
   typename ItkMaskImageType::Pointer maskItkImage = maskimagetoitk->GetOutput();
 
   typename mitk::ImageToItk<ItkOutputImageType>::Pointer outputimagetoitk = mitk::ImageToItk<ItkOutputImageType>::New();
-  outputimagetoitk->SetInput(MaskImageFilter->m_OutputTimeSelector->GetOutput());
+  outputimagetoitk->SetInput(m_OutputTimeSelector->GetOutput());
   outputimagetoitk->Update();
   typename ItkOutputImageType::Pointer outputItkImage = outputimagetoitk->GetOutput();
 
@@ -117,14 +117,20 @@ void mitk::_InternalComputeMask(itk::Image<TPixel, VImageDimension>* inputItkIma
   ItkOutputImageIteratorType outputIt( outputItkImage, inputRegionOfInterest );
 
   typename ItkOutputImageType::PixelType outsideValue = itk::NumericTraits<typename ItkOutputImageType::PixelType>::min();
-  if ( MaskImageFilter->GetOverrideOutsideValue() )
-    outsideValue = static_cast<typename ItkOutputImageType::PixelType>( MaskImageFilter->GetOutsideValue() );
+  if ( m_OverrideOutsideValue )
+    outsideValue = static_cast<typename ItkOutputImageType::PixelType>( m_OutsideValue );
+
+  m_MinValue = (itk::NumericTraits<typename ItkOutputImageType::PixelType>::max());
+  m_MaxValue = (itk::NumericTraits<typename ItkOutputImageType::PixelType>::min());
+
 
   for ( inputIt.GoToBegin(), maskIt.GoToBegin(), outputIt.GoToBegin(); !inputIt.IsAtEnd() && !maskIt.IsAtEnd(); ++inputIt, ++maskIt, ++outputIt)
   {
     if ( maskIt.Get() > itk::NumericTraits<typename ItkMaskImageType::PixelType>::Zero )
     {
       outputIt.Set(inputIt.Get());
+      m_MinValue = vnl_math_min((float)inputIt.Get(), (float)m_MinValue);
+      m_MaxValue = vnl_math_max((float)inputIt.Get(), (float)m_MaxValue);
     }
     else
     {
@@ -132,8 +138,6 @@ void mitk::_InternalComputeMask(itk::Image<TPixel, VImageDimension>* inputItkIma
     }
   }
 }
-
-#include "mitkImageAccessByItk.h"
 
 void mitk::MaskImageFilter::GenerateData()
 {
@@ -174,7 +178,7 @@ void mitk::MaskImageFilter::GenerateData()
     m_MaskTimeSelector->SetTimeNr(timestep);
     m_MaskTimeSelector->UpdateLargestPossibleRegion();
 
-    AccessByItk_1(m_InputTimeSelector->GetOutput(),_InternalComputeMask,this);
+    AccessByItk(m_InputTimeSelector->GetOutput(),InternalComputeMask);
   }
 
   m_TimeOfHeaderInitialization.Modified();

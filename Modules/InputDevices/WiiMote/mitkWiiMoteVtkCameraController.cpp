@@ -9,14 +9,34 @@
 #include "vtkRenderer.h"
 #include "vtkCamera.h"
 
-const double TRANSLATIONSENSITIVITY = 2.0;
+// factor derived from the asumption that
+// the field of view in the virtual reality
+// is limited to an angle of 45°
+const double CALIBRATIONFACTORY = 0.125;
+const double CALIBRATIONFACTORX = 0.125;
+
+// max resolution of the cam 1024x768
+const double XMIN = 0;
+const double XMAX = 1024;
+const double YMIN = 0;
+const double YMAX = 768;
 
 mitk::WiiMoteVtkCameraController::WiiMoteVtkCameraController() 
 : CameraController("WiiMoteInteraction")
 , m_ClippingRangeIsSet(false)
+, m_SensitivityXMIN (XMAX)
+, m_SensitivityXMAX (XMIN)
+, m_SensitivityYMIN (YMAX)
+, m_SensitivityYMAX (YMIN)
+, m_SensitivityX (0)
+, m_SensitivityY (0)
+, m_Calibrated (false)
 {
   CONNECT_ACTION(mitk::AcONWIIMOTEINPUT, OnWiiMoteInput);
-  CONNECT_ACTION(mitk::AcONWIIMOTEHOMEBUTTON, OnWiiMoteHomeButton);
+  CONNECT_ACTION(mitk::AcRESETVIEW, ResetView);
+  CONNECT_ACTION(mitk::AC_INIT, InitCalibration);
+  CONNECT_ACTION(mitk::AcCHECKPOINT, Calibration);
+  CONNECT_ACTION(mitk::AcFINISH, FinishCalibration);
 }
 
 mitk::WiiMoteVtkCameraController::~WiiMoteVtkCameraController()
@@ -25,7 +45,6 @@ mitk::WiiMoteVtkCameraController::~WiiMoteVtkCameraController()
 
 bool mitk::WiiMoteVtkCameraController::OnWiiMoteInput(mitk::Action* a, const mitk::StateEvent* e)
 {
-
   //only if 3D rendering
   const mitk::BaseRenderer* br = mitk::GlobalInteraction::GetInstance()->GetFocus();
   this->SetRenderer( br );
@@ -48,22 +67,16 @@ bool mitk::WiiMoteVtkCameraController::OnWiiMoteInput(mitk::Action* a, const mit
   if(!m_ClippingRangeIsSet)
     vtkCam->SetClippingRange(0.1, 1000);
 
-  const mitk::WiiMoteEvent* wiiMoteEvent;
+  const mitk::WiiMoteIREvent* WiiMoteIREvent;
 
-  if(wiiMoteEvent = dynamic_cast<const mitk::WiiMoteEvent*>(e->GetEvent()))
-  {
-  //  // testing
-  //  MITK_INFO << "Getting WiiMote input: ";
-  //  MITK_INFO << "Vector: " << wiiMoteEvent->GetMovementVector();
-  }
-  else
+  if(!(WiiMoteIREvent = dynamic_cast<const mitk::WiiMoteIREvent*>(e->GetEvent())))
   {
     MITK_ERROR << "Not a WiiMote Event!";
     return false;
   }
 
   // get data from the Wiimote
-  mitk::Vector2D tempMovementVector(wiiMoteEvent->GetMovementVector());
+  mitk::Vector2D tempMovementVector(WiiMoteIREvent->GetMovementVector());
   float inputCoordinates[3] = {tempMovementVector[0],tempMovementVector[1], 0};
   mitk::Vector3D movementVector(inputCoordinates);
 
@@ -77,7 +90,18 @@ bool mitk::WiiMoteVtkCameraController::OnWiiMoteInput(mitk::Action* a, const mit
     sceneSensivity *= 100.0 / (sqrt(length)) ;
 
   //sensivity to adapt to mitk speed
-  movementVector *= sceneSensivity * TRANSLATIONSENSITIVITY;
+  movementVector *= sceneSensivity;
+
+  if(!m_Calibrated)
+  {
+    movementVector[0] *= CALIBRATIONFACTORX;
+    movementVector[1] *= CALIBRATIONFACTORY;
+  }
+  else
+  { 
+    movementVector[0] *= m_SensitivityX;
+    movementVector[1] *= m_SensitivityY;
+  }
 
   // inverts y direction to simulate a 3D View
   // x direction is already inverted
@@ -157,7 +181,7 @@ bool mitk::WiiMoteVtkCameraController::OnWiiMoteInput(mitk::Action* a, const mit
   return true;
 }
 
-bool mitk::WiiMoteVtkCameraController::OnWiiMoteHomeButton(mitk::Action *a, const mitk::StateEvent *e)
+bool mitk::WiiMoteVtkCameraController::ResetView(mitk::Action *a, const mitk::StateEvent *e)
 {
   //reset the camera, so that the objects shown in the scene can be seen.
   const mitk::VtkPropRenderer* glRenderer = dynamic_cast<const mitk::VtkPropRenderer*>(m_Renderer);
@@ -178,5 +202,100 @@ bool mitk::WiiMoteVtkCameraController::OnWiiMoteHomeButton(mitk::Action *a, cons
     return true;
   }
   return false;
+}
+
+bool mitk::WiiMoteVtkCameraController::InitCalibration(mitk::Action *a, const mitk::StateEvent *e)
+{
+  // to initialize the values with its counterpart 
+  // is essential. The reason is that through calibration
+  // the values will increase or decrease depending on
+  // semantics:
+  // the max will try to reach the XMAX (from XMIN)
+  // the min will try to reach the XMIN (from XMAX)
+  // i.e. in the calibration process they move
+  // into their opposite direction to create an 
+  // intervall that defines the boundaries
+  m_SensitivityX = 0;
+  m_SensitivityXMAX = XMIN;
+  m_SensitivityXMIN = XMAX;
+  m_SensitivityY = 0;
+  m_SensitivityYMAX = YMIN;
+  m_SensitivityYMIN = YMAX;
+
+  this->m_Calibrated = false;
+  MITK_INFO << "Starting calibration - other wiimote functionality deactivated.";
+  return true;
+}
+
+bool mitk::WiiMoteVtkCameraController::Calibration(mitk::Action *a, const mitk::StateEvent *e)
+{
+  const mitk::WiiMoteCalibrationEvent* WiiMoteCalibrationEvent;
+
+  if(!(WiiMoteCalibrationEvent = dynamic_cast<const mitk::WiiMoteCalibrationEvent*>(e->GetEvent())))
+  {
+    MITK_ERROR << "Not a WiiMote Event!";
+    return false;
+  }
+
+  double tempX(WiiMoteCalibrationEvent->GetXCoordinate());
+  double tempY(WiiMoteCalibrationEvent->GetYCoordinate());
+
+  MITK_INFO << "Raw X: " << tempX;
+  MITK_INFO << "Raw Y: " << tempY;
+
+  // checks first whether the incoming data is valid
+  if(XMIN < tempX && tempX < XMAX)
+  {
+    if(tempX > m_SensitivityXMAX)
+    {
+      m_SensitivityXMAX = tempX;
+    }
+    else if(tempX < m_SensitivityXMIN)
+    {
+      m_SensitivityXMIN = tempX;
+    }
+  }
+
+  if(YMIN < tempY && tempY < YMAX)
+  {
+    if(tempY > m_SensitivityYMAX)
+    {
+      m_SensitivityYMAX = tempY;
+    }
+    else if(tempY < m_SensitivityYMIN)
+    {
+      m_SensitivityYMIN = tempY;
+    }
+  }
+
+  return true;
+}
+
+bool mitk::WiiMoteVtkCameraController::FinishCalibration(mitk::Action *a, const mitk::StateEvent *e)
+{
+  // checks if one of the properties was not set at all during the calibration
+  // should that happen, the computation will not be executed
+  if( m_SensitivityXMAX != XMIN && m_SensitivityXMIN != XMAX && m_SensitivityYMAX != YMIN && m_SensitivityYMIN != YMAX )
+  {
+    // computation of the sensitivity out of the calibration data
+    m_SensitivityX = XMAX / (m_SensitivityXMAX - m_SensitivityXMIN);
+    m_SensitivityX *= CALIBRATIONFACTORX;
+
+    m_SensitivityY = YMAX / (m_SensitivityYMAX - m_SensitivityYMIN);
+    m_SensitivityY *= CALIBRATIONFACTORY;
+
+    this->m_Calibrated = true;
+  }
+
+  if(!m_Calibrated)
+  {
+    MITK_INFO << "Calibration was unsuccesful - please repeat the process and move in all directions!";
+  }
+  else
+  {
+    MITK_INFO << "Ending calibration - other wiimote functionality reactivated.";
+  }
+
+  return m_Calibrated;
 }
 

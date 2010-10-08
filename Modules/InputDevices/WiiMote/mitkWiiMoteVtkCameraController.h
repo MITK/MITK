@@ -7,7 +7,8 @@
 #include "mitkAction.h"
 #include "mitkEvent.h"
 
-#include "mitkWiiMoteEvent.h"
+#include "mitkWiiMoteIREvent.h"
+#include "mitkWiiMoteCalibrationEvent.h"
 
 namespace mitk
 {
@@ -27,10 +28,24 @@ namespace mitk
 
   private:
 
+    // head tracking
     bool OnWiiMoteInput(mitk::Action* a, const mitk::StateEvent* e);
-    bool OnWiiMoteHomeButton(mitk::Action* a, const mitk::StateEvent* e);
+    bool ResetView(mitk::Action* a, const mitk::StateEvent* e);
 
     bool m_ClippingRangeIsSet;
+    
+    // calibration 
+    bool m_Calibrated;
+    double m_SensitivityXMAX;
+    double m_SensitivityXMIN;
+    double m_SensitivityYMAX;
+    double m_SensitivityYMIN;
+    double m_SensitivityX;
+    double m_SensitivityY;
+
+    bool InitCalibration(mitk::Action* a, const mitk::StateEvent* e);
+    bool Calibration(mitk::Action* a, const mitk::StateEvent* e);
+    bool FinishCalibration(mitk::Action* a, const mitk::StateEvent* e);
 
   }; // end class 
 } // end namespace mitk

@@ -1,5 +1,5 @@
-#ifndef MITK_WIIMOTEEVENT_H
-#define MITK_WIIMOTEEVENT_H
+#ifndef MITK_WIIMOTEIREVENT_H
+#define MITK_WIIMOTEIREVENT_H
 
 #include "mitkEvent.h"
 #include "mitkVector.h"
@@ -10,16 +10,15 @@
 namespace mitk
 {
   /**
-  * This event type is used for any events triggered by the <br>
-  * the Wiimote driver. It allows to process the given information <br>
-  * (e.g. sensor input, button triggering) fired by the Wiimote.
+  * This event type is used for IR events triggered by the <br>
+  * the Wiimote driver. 
   */
-  class mitkInputDevices_EXPORT WiiMoteEvent : public Event, itk::EventObject
+  class mitkInputDevices_EXPORT WiiMoteIREvent : public Event, itk::EventObject
   {
 
   public:
 
-    typedef WiiMoteEvent Self; 
+    typedef WiiMoteIREvent Self; 
     typedef itk::EventObject Superclass; 
 
     /**
@@ -31,11 +30,9 @@ namespace mitk
     * @param recordTime
     *          the time at which the data was recorded
     */
-    WiiMoteEvent(mitk::Vector2D inputData, double recordTime);
+    WiiMoteIREvent(mitk::Vector2D inputData, double recordTime);
     
-    WiiMoteEvent(mitk::EEventType eventType);
-
-    ~WiiMoteEvent();
+    ~WiiMoteIREvent();
 
     /**
     * Returns the current movement vector with the coordinates <br>
@@ -49,14 +46,11 @@ namespace mitk
     bool CheckEvent(const ::itk::EventObject* e) const; 
     ::itk::EventObject* MakeObject() const; 
 
-
   private:
 
     mitk::Vector2D m_MovementVector;
     double m_RecordTime;
 
-    mitk::EEventType m_EventType;
-
   }; // end class
 } // end namespace mitk
-#endif // MITK_WIIMOTEEVENT_H
+#endif // MITK_WIIMOTEIREVENT_H

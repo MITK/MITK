@@ -48,14 +48,37 @@ void mitk::WiiMoteAddOn::WiiMoteInput(const itk::EventObject& e)
 {
   // apparently the dynamic cast does not work here
   // reason unknown - the normal cast however works fine
-  mitk::StateEvent* se = new mitk::StateEvent(mitk::EIDWIIMOTEINPUT, (const mitk::WiiMoteEvent*)&e);
+  mitk::StateEvent* se = new mitk::StateEvent(mitk::EIDWIIMOTEINPUT, (const mitk::WiiMoteIREvent*)&e);
   this->ForwardEvent(se);
   delete se;
 }
 
-void mitk::WiiMoteAddOn::WiiMoteHomeButton(const itk::EventObject &e)
+void mitk::WiiMoteAddOn::WiiMoteButtonPressed(const itk::EventObject &e)
 {
-  mitk::StateEvent* se = new mitk::StateEvent(mitk::EIDWIIMOTEHOMEBUTTON, (const mitk::WiiMoteEvent*)&e);
+  mitk::WiiMoteButtonEvent const* wiiEvent = (const mitk::WiiMoteButtonEvent*)(&e);
+  int key = wiiEvent->GetKey();
+  mitk::StateEvent* se;
+
+  switch(key)
+  {
+  case mitk::Key_Home:
+    se = new mitk::StateEvent(mitk::EIDWIIMOTEBUTTON, wiiEvent);
+    break;
+  case mitk::Key_A:
+    se = new mitk::StateEvent(mitk::EV_INIT, wiiEvent);
+    break;
+  }
+
+  if(se != NULL)
+  {
+    this->ForwardEvent(se);
+    delete se;
+  }
+}
+
+void mitk::WiiMoteAddOn::WiiMoteCalibrationInput(const itk::EventObject &e)
+{  
+  mitk::StateEvent* se = new mitk::StateEvent(mitk::EIDWIIMOTEINPUT, (const mitk::WiiMoteCalibrationEvent*)&e);
   this->ForwardEvent(se);
   delete se;
 }

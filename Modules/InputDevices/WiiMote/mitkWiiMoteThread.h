@@ -31,6 +31,9 @@ namespace mitk
     WiiMoteThread();
     ~WiiMoteThread();
 
+    itkSetMacro(SleepTime, int);
+    itkGetConstMacro(SleepTime, int);
+
     /**
     * Allows to set report types, detects extensions and responds to connect/disconnect <br>
     * events of extension, such as MotionPlus. 
@@ -83,13 +86,25 @@ namespace mitk
     void DetectWiiMotes();
 
     /**
-    * Reads incoming data from the IR camera, the acceleration sensors <br>
-    * and the buttons. After processing the data (e.g. computations, assigning <br>
-    * commands...) fires Wiimote events accordingly. 
+    * Reads incoming data from the IR camera. After processing the data <br>
+    * (e.g. computations, assigning commands...) fires Wiimote events accordingly. 
     */
-    void WiiMoteInput();
+    void WiiMoteIRInput();
 
-    void WiiMoteHomeButton();
+   /**
+    * Reads incoming data from buttons. After processing the data <br>
+    * (e.g. computations, assigning commands...) fires Wiimote events accordingly. 
+    *
+    * @param buttonType
+    *            the type of button, that was used to trigger this event
+    */
+    void WiiMoteButtonPressed(int buttonType);
+
+    /**
+    * Reads incoming data from the IR camera. Afterwards the raw x and y coordinates <br>
+    * are stored in an event and fired as an event. 
+    */
+    void WiiMoteCalibrationInput();
 
   protected:
 
@@ -111,11 +126,18 @@ namespace mitk
     double m_LastRecordTime;
     bool m_ReadDataOnce;
 
+    // calibration
+    bool m_InCalibrationMode;
+
     // compensate delay
     // release: Skip = 1
     // debug: 
-    int m_SkipTimeSteps;
-    int m_CurrentTimeStep;
+    //int m_SkipTimeSteps;
+    //int m_CurrentTimeStep;
+
+    // to compensate delay, because normally
+    // the data arrives too fast and is queued
+    int m_SleepTime;
 
     //store all connected Wiimotes
     wiimote* m_WiiMotes[6];

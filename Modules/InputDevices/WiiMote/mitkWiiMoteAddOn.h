@@ -4,7 +4,9 @@
 #include <mitkEventMapperAddon.h>
 #include <mitkInputDevicesExports.h>
 
-#include "mitkWiiMoteEvent.h"
+#include "mitkWiiMoteIREvent.h"
+#include "mitkWiiMoteButtonEvent.h"
+#include "mitkWiiMoteCalibrationEvent.h"
 
 // used for Point2D
 #include "mitkVector.h"
@@ -47,13 +49,22 @@ namespace mitk {
     void DeactivateWiiMotes();
 
     /**
-    * Creates suitable events, when the Wiimote sends data <br>
+    * Creates suitable events, when the Wiimote sends IR data <br>
     * and forwards it for further processing.
     */
     void WiiMoteInput(const itk::EventObject& e);
 
+    /**
+    * Creates suitable events, when the Wiimote sends button events <br>
+    * and forwards it for further processing.
+    */
+    void WiiMoteButtonPressed(const itk::EventObject& e);
 
-    void WiiMoteHomeButton(const itk::EventObject& e);
+   /**
+    * Creates suitable events, when the Wiimote sends IR data <br>
+    * to configure the sensitivity and forwards it for further processing.
+    */
+    void WiiMoteCalibrationInput(const itk::EventObject& e);
 
   protected:
 

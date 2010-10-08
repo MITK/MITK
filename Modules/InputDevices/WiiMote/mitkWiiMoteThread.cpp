@@ -1,7 +1,8 @@
 #include "mitkWiiMoteThread.h"
 
 #include "mitkWiiMoteAddOn.h"
-#include "mitkWiiMoteEvent.h"
+#include "mitkWiiMoteIREvent.h"
+#include "mitkWiiMoteButtonEvent.h"
 
 // static variables need declaration,
 // so that they can be linked
@@ -16,7 +17,8 @@
 
 // timelimit between two state changes to send an event
 // the chosen value is empirical
-const double TIMELIMIT = 3; 
+const double TIMELIMIT = 0.5; 
+const int SLEEPDEFAULT = 70; 
 
 mitk::WiiMoteThread::WiiMoteThread()
 : m_MultiThreader(itk::MultiThreader::New())
@@ -25,8 +27,10 @@ mitk::WiiMoteThread::WiiMoteThread()
 , m_ThreadID(-1)
 , m_LastRecordTime(0)
 , m_ReadDataOnce(false)
-, m_SkipTimeSteps(4)
-, m_CurrentTimeStep(0)
+//, m_SkipTimeSteps(4)
+//, m_CurrentTimeStep(0)
+, m_SleepTime(SLEEPDEFAULT)
+, m_InCalibrationMode(false)
 {
   // uses state-change callback to get notified of extension-related 
   // events OnStateChange must be static, otherwise the this-operator 
@@ -116,17 +120,40 @@ void mitk::WiiMoteThread::StartWiiMote()
     m_WiiMoteThreadFinished->Lock();
     while(m_WiiMote.RefreshState() == NO_CHANGE)
     {
-      Sleep(1);
+      itksys::SystemTools::Delay(1);
     }
     m_WiiMoteThreadFinished->Unlock();
 
     m_WiiMoteThreadFinished->Lock();
-    this->WiiMoteInput();
+    if(!m_InCalibrationMode)
+    {
+      this->WiiMoteIRInput();
+    }
+    else
+    {
+      this->WiiMoteCalibrationInput();
+    }
     m_WiiMoteThreadFinished->Unlock();
 
     if(m_WiiMote.Button.Home())
+      this->WiiMoteButtonPressed(mitk::Key_Home);
+
+    if(m_WiiMote.Button.A())
     {
-      this->WiiMoteHomeButton();
+      this->WiiMoteButtonPressed(mitk::Key_A);
+
+      // necessary to avoid sending the movementvector
+      // instead of the raw coordinates for the calibration
+      if(this->m_InCalibrationMode)
+      {
+        this->m_InCalibrationMode = false;
+      }
+      else
+      {
+        this->m_InCalibrationMode = true;
+      }
+ 
+      itksys::SystemTools::Delay(3000);
     }
 
     if(m_WiiMote.ConnectionLost())
@@ -188,60 +215,49 @@ void mitk::WiiMoteThread::DetectWiiMotes()
   //}
 }
 
-void mitk::WiiMoteThread::WiiMoteInput()
+void mitk::WiiMoteThread::WiiMoteIRInput()
 {
   if(IR_CHANGED && m_WiiMote.IR.Dot[0].bVisible)
   {
-    m_CurrentTimeStep++;
-    if(m_CurrentTimeStep > m_SkipTimeSteps)
+    //m_CurrentTimeStep++;
+    //if(m_CurrentTimeStep > m_SkipTimeSteps)
+    //{
+    m_Command = ReceptorCommand::New(); 
+    m_Command->SetCallbackFunction(mitk::WiiMoteAddOn::GetInstance(), &mitk::WiiMoteAddOn::WiiMoteInput);
+
+    double tempTime(itksys::SystemTools::GetTime());
+    float inputCoordinates[2] = {m_WiiMote.IR.Dot[0].RawX, m_WiiMote.IR.Dot[0].RawY};
+    mitk::Point2D tempPoint(inputCoordinates);
+
+    // if the last read data is not valid,
+    // because the thread was not started
+    if(!m_ReadDataOnce)
     {
-      m_Command = ReceptorCommand::New(); 
-      m_Command->SetCallbackFunction(mitk::WiiMoteAddOn::GetInstance(), &mitk::WiiMoteAddOn::WiiMoteInput);
-
-      double tempTime(itksys::SystemTools::GetTime());
-      float inputCoordinates[2] = {m_WiiMote.IR.Dot[0].RawX, m_WiiMote.IR.Dot[0].RawY};
-      mitk::Point2D tempPoint(inputCoordinates);
-
-      // if the last read data is not valid,
-      // because the thread was not started
-      if(!m_ReadDataOnce)
+      m_ReadDataOnce = true;  
+    }
+    else // there is old data available - calculate the movement and send event
+    {
+      // this time constraint allows the user to move the camera
+      // with the IR sender (by switching the IR source on and off) 
+      // similiar to a mouse (e.g. if you lift the mouse from the 
+      // surface and put it down again on another position, there 
+      // was no input. Now the input starts again and the movement 
+      // will begin from the last location of the mouse, although 
+      // the physical position of the mouse changed.)
+      if ((tempTime-m_LastRecordTime) < TIMELIMIT) 
       {
-        m_ReadDataOnce = true;  
+        mitk::Vector2D resultingVector(m_LastReadData-tempPoint);
+        mitk::WiiMoteIREvent e(resultingVector, tempTime);
+        mitk::CallbackFromGUIThread::GetInstance()->CallThisFromGUIThread(m_Command, e.MakeObject());
       }
-      else // there is old data available - calculate the movement and send event
-      {
-        // this time constraint allows the user to move the camera
-        // with the IR sender (by switching the IR source on and off) 
-        // similiar to a mouse (e.g. if you lift the mouse from the 
-        // surface and put it down again on another position, there 
-        // was no input. Now the input starts again and the movement 
-        // will begin from the last location of the mouse, although 
-        // the physical position of the mouse changed.)
-        if ((tempTime-m_LastRecordTime) < TIMELIMIT) 
-        {
-          mitk::Vector2D resultingVector(m_LastReadData-tempPoint);
+    }
+    m_LastRecordTime = tempTime;
+    m_LastReadData = tempPoint;
 
-          // -------------------------------- old ---------------------------------------
-          //        mitk::WiiMoteEvent* e = new mitk::WiiMoteEvent(resultingVector, tempTime);
-          //        itk::AnyEvent* tempEvent;
-          //
-          //        if(tempEvent = dynamic_cast<itk::AnyEvent*>(e))
-          //        {
-          //          mitk::CallbackFromGUIThread::GetInstance()->CallThisFromGUIThread(m_Command, tempEvent);
-          //        }
-          //
-          // not working
+    itksys::SystemTools::Delay(m_SleepTime);
 
-          // -------------------------------- new ---------------------------------------
-          mitk::WiiMoteEvent e(resultingVector, tempTime);
-          mitk::CallbackFromGUIThread::GetInstance()->CallThisFromGUIThread(m_Command, e.MakeObject());
-        }
-      }
-      m_LastRecordTime = tempTime;
-      m_LastReadData = tempPoint;
-
-      m_CurrentTimeStep = 0;
-      }
+    //m_CurrentTimeStep = 0;
+    //}
   }
 
   //read data
@@ -253,15 +269,28 @@ void mitk::WiiMoteThread::WiiMoteInput()
   //MITK_INFO << "Z: " << m_WiiMote.Acceleration.Orientation.Z;
 }
 
-void mitk::WiiMoteThread::WiiMoteHomeButton()
+void mitk::WiiMoteThread::WiiMoteButtonPressed(int buttonType)
 {
   m_Command = ReceptorCommand::New(); 
-  m_Command->SetCallbackFunction(mitk::WiiMoteAddOn::GetInstance(), &mitk::WiiMoteAddOn::WiiMoteHomeButton);
+  m_Command->SetCallbackFunction(mitk::WiiMoteAddOn::GetInstance(), &mitk::WiiMoteAddOn::WiiMoteButtonPressed);
 
-  mitk::WiiMoteEvent e(mitk::Type_WiiMoteHomeButton);
+  mitk::WiiMoteButtonEvent e(mitk::Type_WiiMoteButton, mitk::BS_NoButton, mitk::BS_NoButton, buttonType);
   mitk::CallbackFromGUIThread::GetInstance()->CallThisFromGUIThread(m_Command, e.MakeObject());
 }
 
+void mitk::WiiMoteThread::WiiMoteCalibrationInput()
+{
+  if(IR_CHANGED && m_WiiMote.IR.Dot[0].bVisible)
+  {
+    m_Command = ReceptorCommand::New();
+    m_Command->SetCallbackFunction(mitk::WiiMoteAddOn::GetInstance(), &mitk::WiiMoteAddOn::WiiMoteCalibrationInput);
+
+    mitk::WiiMoteCalibrationEvent e(m_WiiMote.IR.Dot[0].RawX,m_WiiMote.IR.Dot[0].RawY);
+    mitk::CallbackFromGUIThread::GetInstance()->CallThisFromGUIThread(m_Command, e.MakeObject());
+  }
+
+  itksys::SystemTools::Delay(m_SleepTime);
+}
 
 
 

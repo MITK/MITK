@@ -45,10 +45,11 @@ bool mitk::WiiMoteActivator::RegisterInputDevice()
   //  }
   //  else
   //  {
+  //    MITK_ERROR << "Eventmapper is not initialized!";
   //    return false;
   //  }
   //}
-  return true;
+  //return true;
 }
 
 bool mitk::WiiMoteActivator::UnRegisterInputDevice()

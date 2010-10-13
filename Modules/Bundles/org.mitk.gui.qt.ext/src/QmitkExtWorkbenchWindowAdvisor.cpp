@@ -703,7 +703,7 @@ void QmitkExtWorkbenchWindowAdvisorHack::onHelp()
 
 void QmitkExtWorkbenchWindowAdvisorHack::onAbout()
 {
-	QmitkAboutDialog* aboutDialog = new QmitkAboutDialog(NULL,NULL);
+	QmitkAboutDialog* aboutDialog = new QmitkAboutDialog(QApplication::activeWindow(),NULL);
 	aboutDialog->show();
 }
 

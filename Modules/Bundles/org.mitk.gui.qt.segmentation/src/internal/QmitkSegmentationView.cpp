@@ -811,7 +811,7 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
   m_Controls->MaskSurfaces->SetPredicate(mitk::NodePredicateDataType::New("Surface"));
 
   //// create helper class to provide context menus for segmentations in data manager
-  m_PostProcessing = new QmitkSegmentationPostProcessing(this->GetDefaultDataStorage(), this, NULL);
+  m_PostProcessing = new QmitkSegmentationPostProcessing(this->GetDefaultDataStorage(), this, m_Parent);
 }
 
 

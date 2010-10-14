@@ -226,8 +226,12 @@ public:
    * execute any reset / initialization statements required. */
   virtual bool ResetOnPointSelect();
 
-
+  /** \brief Removes last control point */
   virtual void RemoveLastControlPoint();
+
+  /** \brief Copies contents and state of a figre provided as parameter to the current object. 
+             Requires a matching type of both figures. */
+  void DeepCopy(Self::Pointer oldFigure);
 
 
 protected:

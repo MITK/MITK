@@ -194,7 +194,7 @@
         <!-- AcSELECT  -->
         <action ID="1101" />
         <!--AcMODE_SELECT-->
-      </transition>      
+      </transition>
       <transition NAME="no" NEXT_STATE_ID="1" EVENT_ID="1003">
         <action ID="75" />
         <!-- AcDESELECT  -->
@@ -208,42 +208,48 @@
         <!-- AcCHECKELEMENT  -->
       </transition>
       <transition NAME="z+" NEXT_STATE_ID="10" EVENT_ID="50">
-        <action ID="92" >         <!-- AcMove  -->
+        <action ID="92">
+          <!-- AcMove  -->
           <intParameter NAME="DIRECTION_X" VALUE="0" />
           <intParameter NAME="DIRECTION_Y" VALUE="0" />
           <intParameter NAME="DIRECTION_Z" VALUE="1" />
         </action>
       </transition>
       <transition NAME="z-" NEXT_STATE_ID="10" EVENT_ID="51">
-        <action ID="92" >        <!-- AcMove  -->
+        <action ID="92">
+          <!-- AcMove  -->
           <intParameter NAME="DIRECTION_X" VALUE="0" />
           <intParameter NAME="DIRECTION_Y" VALUE="0" />
           <intParameter NAME="DIRECTION_Z" VALUE="-1" />
         </action>
       </transition>
       <transition NAME="x+" NEXT_STATE_ID="10" EVENT_ID="52">
-        <action ID="92" >        <!-- AcMove  -->
+        <action ID="92">
+          <!-- AcMove  -->
           <intParameter NAME="DIRECTION_X" VALUE="1" />
           <intParameter NAME="DIRECTION_Y" VALUE="0" />
           <intParameter NAME="DIRECTION_Z" VALUE="0" />
         </action>
       </transition>
       <transition NAME="x-" NEXT_STATE_ID="10" EVENT_ID="53">
-        <action ID="92" >        <!-- AcMove  -->
+        <action ID="92">
+          <!-- AcMove  -->
           <intParameter NAME="DIRECTION_X" VALUE="-1" />
           <intParameter NAME="DIRECTION_Y" VALUE="0" />
           <intParameter NAME="DIRECTION_Z" VALUE="0" />
         </action>
       </transition>
-	  <transition NAME="y+" NEXT_STATE_ID="10" EVENT_ID="54">
-        <action ID="92" >        <!-- AcMove  -->
+      <transition NAME="y+" NEXT_STATE_ID="10" EVENT_ID="54">
+        <action ID="92">
+          <!-- AcMove  -->
           <intParameter NAME="DIRECTION_X" VALUE="0" />
           <intParameter NAME="DIRECTION_Y" VALUE="1" />
           <intParameter NAME="DIRECTION_Z" VALUE="0" />
         </action>
       </transition>
-	  <transition NAME="y-" NEXT_STATE_ID="10" EVENT_ID="55">
-        <action ID="92" >        <!-- AcMove  -->
+      <transition NAME="y-" NEXT_STATE_ID="10" EVENT_ID="55">
+        <action ID="92">
+          <!-- AcMove  -->
           <intParameter NAME="DIRECTION_X" VALUE="0" />
           <intParameter NAME="DIRECTION_Y" VALUE="-1" />
           <intParameter NAME="DIRECTION_Z" VALUE="0" />
@@ -3198,11 +3204,11 @@
       </transition>
       <transition NAME="addPoint" NEXT_STATE_ID="2" EVENT_ID="1">
         <action ID="1101" />
-          <!--AcMODE_SELECT-->
-        <action ID="103" /> 
-          <!--AcREMOVEALL-->
+        <!--AcMODE_SELECT-->
+        <action ID="103" />
+        <!--AcREMOVEALL-->
         <action ID="10" />
-          <!--AcADDPOINT-->
+        <!--AcADDPOINT-->
       </transition>
     </state>
     <state NAME="point selected" ID="2" X_POS="674" Y_POS="341" WIDTH="100" HEIGHT="50">
@@ -3213,7 +3219,7 @@
           <!--AcMODEDESELECT-->
         </action>
       </transition>
-      <transition NAME="set point" NEXT_STATE_ID="2" EVENT_ID="1" >
+      <transition NAME="set point" NEXT_STATE_ID="2" EVENT_ID="1">
         <action ID="103" />
         <!--AcREMOVEALL-->
         <action ID="10" />
@@ -3552,6 +3558,30 @@
         <action ID="66" />
       </transition>
       <transition NAME="name" EVENT_ID="1003" NEXT_STATE_ID="51" />
+    </state>
+  </stateMachine>
+  <stateMachine NAME="BinaryImageInteractor">
+    <state NAME="neutral" ID="1" START_STATE="TRUE" X_POS="138" Y_POS="318" WIDTH="100" HEIGHT="50">
+      <transition NAME="name" EVENT_ID="520" NEXT_STATE_ID="2">
+        <action ID="30" />
+      </transition>
+    </state>
+    <state NAME="IsOverImage" ID="2" X_POS="447" Y_POS="185" WIDTH="100" HEIGHT="50">
+      <transition NAME="name" EVENT_ID="1003" NEXT_STATE_ID="1" />
+      <transition NAME="isOverImage" EVENT_ID="1004" NEXT_STATE_ID="3" />
+    </state>
+    <state NAME="PickImage" ID="3" X_POS="803" Y_POS="350" WIDTH="100" HEIGHT="50">
+      <transition NAME="SelectingImage" EVENT_ID="1" NEXT_STATE_ID="4">
+        <action ID="60" />
+      </transition>
+      <transition NAME="name" EVENT_ID="520" NEXT_STATE_ID="2">
+        <action ID="30" />
+      </transition>
+    </state>
+    <state NAME="SelectImage" ID="4" X_POS="594" Y_POS="542" WIDTH="100" HEIGHT="50">
+      <transition NAME="name" EVENT_ID="505" NEXT_STATE_ID="2">
+        <action ID="30" />
+      </transition>
     </state>
   </stateMachine>
 </mitkInteraktionStates>

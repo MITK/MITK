@@ -494,24 +494,32 @@ void mitk::PlanarFigure::RemoveLastControlPoint()
 void mitk::PlanarFigure::DeepCopy(Self::Pointer oldFigure)
 {
   //DeepCopy only same types of planar figures 
-  if(typeid(oldFigure) != typeid(this))
+  //Notice to get typeid polymorph you have to use the *operator
+  if(typeid(*oldFigure) != typeid(*this))
   {
     itkExceptionMacro( << "DeepCopy(): Inconsistent type of source and destination figure!" );
     return;
   }
+
   // clone base data members
   SetPropertyList(oldFigure->GetPropertyList()->Clone());  
- 
+
   /// deep copy members
-  m_NumberOfControlPoints       = oldFigure->m_NumberOfControlPoints;
   m_FigurePlaced                = oldFigure->m_FigurePlaced;
   m_SelectedControlPoint        = oldFigure->m_SelectedControlPoint;
   m_FeaturesMTime               = oldFigure->m_FeaturesMTime;
   m_Features                    = oldFigure->m_Features;
-  // geometry 2D of planar figure
+  m_NumberOfControlPoints       = oldFigure->m_NumberOfControlPoints;
+
+  //copy geometry 2D of planar figure
   SetGeometry2D((mitk::Geometry2D*)oldFigure->m_Geometry2D->Clone().GetPointer());
-  // helper lines
-  m_PolyLines                   = oldFigure->m_PolyLines;
-  m_HelperPolyLines             = oldFigure->m_HelperPolyLines;
-  m_HelperPolyLinesToBePainted  = oldFigure->m_HelperPolyLinesToBePainted;
+  
+  m_ControlPoints = VertexContainerType::New();
+  for(unsigned long index=0; index < oldFigure->m_ControlPoints->Size(); index++)
+  {
+    m_ControlPoints->InsertElement(index, oldFigure->m_ControlPoints->ElementAt( index ));
+  }
+
+  //After setting the control points we can generate the polylines
+  this->GeneratePolyLine();
 }

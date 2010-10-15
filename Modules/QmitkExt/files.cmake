@@ -68,6 +68,7 @@ SET(CPP_FILES
  QmitkTransferFunctionGeneratorWidget.cpp
  QmitkSelectableGLWidget.cpp
  QmitkToolReferenceDataSelectionBox.cpp
+ QmitkToolWorkingDataSelectionBox.cpp
  QmitkToolGUIArea.cpp
  QmitkToolSelectionBox.cpp
  # QmitkPropertyListPopup.cpp
@@ -123,7 +124,7 @@ SET(CPP_FILES
  QmitkBaseFunctionalityComponent.cpp
  QmitkFunctionalityComponentContainer.cpp
  QmitkFunctionalityComponents/QmitkThresholdComponent.cpp
- QmitkToolWorkingDataSelectionBox.cpp
+ 
  )
 ENDIF()
 

@@ -5,7 +5,7 @@
   <!-- -->
   <!-- -->
   <!-- EventDescriptions -->
-  <events STYLE="Powerpoint">
+  <events STYLE="standard">
     <!-- Null Event -->
     <!-- not here defined, cause this will never be send from external to mitk (to be mapped in mitkEventMapper to an mitk-event)-->
     <!-- left MouseButton -->
@@ -169,7 +169,7 @@
     <event NAME="ActivateTool" ID="1300" TYPE="Type_User" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_none" />
     <!-- -->
     <!-- Sonstiges -->
-    <event NAME="PositionEvent" ID="1012" TYPE="Type_MouseButtonPress" BUTTON="BS_LeftButton" BUTTONSTATE="0x0000" KEY="Key_none" />
+    <!--<event NAME="PositionEvent" ID="1012" TYPE="Type_MouseButtonPress" BUTTON="BS_LeftButton" BUTTONSTATE="0x0000" KEY="Key_none" />-->
     <!-- DoubleClick <event NAME="PositionEvent"      ID="510" TYPE="4" BUTTON="0x0001" BUTTONSTATE="0x0000" KEY="0xffff" />-->
     <!--<event NAME="StSmallerN" ID="1014" TYPE="Type_User" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_none" />-->
     <!--<event NAME="StEqualsN" ID="1015" TYPE="Type_User" BUTTON="BS_NoButton" BUTTONSTATE="0x0000" KEY="Key_none" />-->

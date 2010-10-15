@@ -73,6 +73,7 @@ namespace itk {
           typename TensorType::EigenValuesArrayType evs;
           tensor.ComputeEigenValues(evs);
           outputIt.Set((evs[0]+evs[1])/2);
+          
           break;
         }
       case CA:
@@ -87,6 +88,24 @@ namespace itk {
             break;
           }
           outputIt.Set(1-(evs[0]+evs[1])/(2*evs[2]));
+          break;
+        }
+      case L2:
+        {
+          // eigenvalues are sorted in ascending order by default because the
+          // itk::SymmetricEigenAnalysis defaults are not touched in the tensor implementation
+          typename TensorType::EigenValuesArrayType evs;
+          tensor.ComputeEigenValues(evs);
+          outputIt.Set(evs[1]);
+          break;
+        }
+      case L3:
+        {
+          // eigenvalues are sorted in ascending order by default because the
+          // itk::SymmetricEigenAnalysis defaults are not touched in the tensor implementation
+          typename TensorType::EigenValuesArrayType evs;
+          tensor.ComputeEigenValues(evs);
+          outputIt.Set(evs[0]);
           break;
         }
       }

@@ -40,7 +40,9 @@ public:
     RA,// Relative anisotropy
     AD,// Axial diffusivity
     RD,// Radial diffusivity
-    CA // Clustering anisotropy 1-(λ2+λ3)/(2*λ1)
+    CA, // Clustering anisotropy 1-(λ2+λ3)/(2*λ1)
+    L2,
+    L3
   };
 
   typedef itk::DiffusionTensor3D<TPixel>          TensorType;

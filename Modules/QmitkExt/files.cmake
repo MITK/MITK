@@ -103,6 +103,7 @@ SET(CPP_FILES
  #QmitkOpeningToolGUI.cpp
  #QmitkClosingToolGUI.cpp
  #QmitkBinaryThresholdULToolGUI.cpp
+ #QmitkPixelManipulationToolGUI.cpp
  QmitkToolRoiDataSelectionBox.cpp
  QmitkBoundingObjectWidget.cpp
 )
@@ -170,6 +171,7 @@ SET(MOC_H_FILES
  QmitkToolGUIArea.h
  QmitkToolGUI.h
  QmitkToolReferenceDataSelectionBox.h
+ QmitkToolWorkingDataSelectionBox.h
  QmitkToolSelectionBox.h
  # QmitkPropertyListPopup.h
  #QmitkSelectableGLWidget.h
@@ -196,6 +198,7 @@ SET(MOC_H_FILES
  #QmitkOpeningToolGUI.h
  #QmitkClosingToolGUI.h
  #QmitkBinaryThresholdULToolGUI.h
+ #QmitkPixelManipulationToolGUI.h
  QmitkToolRoiDataSelectionBox.h
  QmitkBoundingObjectWidget.h
 )
@@ -215,7 +218,6 @@ SET(MOC_H_FILES
  QmitkBaseFunctionalityComponent.h
  QmitkFunctionalityComponentContainer.h
  QmitkFunctionalityComponents/QmitkThresholdComponent.h
- QmitkToolWorkingDataSelectionBox.h
 )
 ENDIF()
 

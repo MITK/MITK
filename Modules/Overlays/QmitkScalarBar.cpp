@@ -117,7 +117,7 @@ void QmitkScalarBar::SetScaleFactor( double scale )
       m_NumberOfSubDivisions-=2;
     }
     // If the widget is smaller than 30% of the size of the parent -> increase number by two
-    else if ( this->height() < this->parentWidget()->parentWidget()->height()*0.4 && ( m_NumberOfSubDivisions < 7 && m_NumberOfSubDivisions > 1 ) )
+    else if ( this->height() < this->parentWidget()->parentWidget()->height()*0.4 && ( m_NumberOfSubDivisions < 7 && m_NumberOfSubDivisions > 0 ) )
     {
       m_NumberOfSubDivisions+=2;
     }

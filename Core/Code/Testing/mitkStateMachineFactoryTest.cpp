@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkState.h>
 #include "mitkTestingMacros.h"
 #include <mitkStandardFileLocations.h>
+#include <mitkInteractionConst.h>
 int mitkStateMachineFactoryTest(int /*argc*/, char* /*argv*/[])
 {
   MITK_TEST_BEGIN("StateMachineFactory")
@@ -54,7 +55,40 @@ int mitkStateMachineFactoryTest(int /*argc*/, char* /*argv*/[])
   state = statemachineFactory->GetStartState("test1");
   MITK_TEST_CONDITION_REQUIRED(state.IsNotNull(),"Testing if previous loaded state machine pattern (test1) is still accessible: ") 
 
+
+  //manually create a state machine pattern and add it to factory
+  std::string patternName("manuallyCreatedStateMachine");
+  mitk::StateMachineFactory::StateMachineMapType* allStatesMap = new mitk::StateMachineFactory::StateMachineMapType();
+
+  mitk::State::Pointer state1 = mitk::State::New("firstState", 1);
+  mitk::Transition* transition1 = new mitk::Transition("goto2", 2, mitk::EIDNULLEVENT); 
+  mitk::Action::Pointer action1 = mitk::Action::New(mitk::AcDONOTHING);
+  transition1->AddAction(action1);
+  state1->AddTransition(transition1);
+  allStatesMap->insert(mitk::StateMachineFactory::StateMachineMapType::value_type(state1->GetId(), state1));
+
+  mitk::State::Pointer state2 = mitk::State::New("secondState", 2);
+  transition1->SetNextState(state2);
+  mitk::Transition* transition2 = new mitk::Transition("goto1", 1, mitk::EIDNULLEVENT); 
+  mitk::Action::Pointer action2 = mitk::Action::New(mitk::AcDONOTHING);
+  transition2->AddAction(action2);
+  transition2->SetNextState(state1);
+  state2->AddTransition(transition2);
+  allStatesMap->insert(mitk::StateMachineFactory::StateMachineMapType::value_type(state2->GetId(), state2));
+
+  //now add to factory
+  statemachineFactory->AddStateMachinePattern(patternName.c_str(), state1, allStatesMap);
+  
+  //check if it is accessable
+  state = statemachineFactory->GetStartState("global");
+  MITK_TEST_CONDITION_REQUIRED(state.IsNotNull(),"Testing if previous loaded state machine pattern (global) is still accessible: ") 
+  state = statemachineFactory->GetStartState("test1");
+  MITK_TEST_CONDITION_REQUIRED(state.IsNotNull(),"Testing if previous loaded state machine pattern (test1) is still accessible: ") 
+  state = statemachineFactory->GetStartState(patternName.c_str());
+  MITK_TEST_CONDITION_REQUIRED(state.IsNotNull(),"Testing if manually created and added state machine pattern is accessible: ") 
+
   statemachineFactory->Delete();
+  //states, transitions and actions are freed in StateMachineFactory
 
   // always end with this!
   MITK_TEST_END();

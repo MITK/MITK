@@ -107,14 +107,17 @@ namespace mitk {
     }
 
     /**
-    * @brief Derived from XMLReader
+    * @brief Adds the given pattern to the internal list of patterns
+    *
+    * Method to support addition of externaly loaded patterns. 
+    * Instances of states, transitions and actions are maintained within this class and freed on destruction.
+    * The states already have to be connected by transitions and actions and checked for errors.
+    * @params type name of the pattern to add. Will be used during initialization of a new interactor.
+    * @params startState the start state of this pattern.
+    * @params allStatesOfStateMachine a map of state ids and its states to hold their reference and delete them in destructor
     **/
-    void  StartElement (const char* elementName, const char **atts);
+    bool AddStateMachinePattern(const char * type, mitk::State* startState, StateMachineMapType* allStatesOfStateMachine);
 
-    /**
-    * @brief Derived from XMLReader
-    **/
-    void  EndElement (const char* elementName);
 
     /**
     * brief To enable StateMachine to access states
@@ -131,6 +134,16 @@ namespace mitk {
     * @brief Default Destructor
     **/
     ~StateMachineFactory();
+
+    /**
+    * @brief Derived from XMLReader
+    **/
+    void  StartElement (const char* elementName, const char **atts);
+
+    /**
+    * @brief Derived from XMLReader
+    **/
+    void  EndElement (const char* elementName);
 
   private:
     /**

@@ -439,3 +439,24 @@ mitk::State* mitk::StateMachineFactory::GetState( const char * type, int StateId
     return NULL;
 }
 
+bool mitk::StateMachineFactory::AddStateMachinePattern(const char * type, mitk::State* startState, mitk::StateMachineFactory::StateMachineMapType* allStatesOfStateMachine)
+{
+  if (startState == NULL || allStatesOfStateMachine == NULL)
+    return false;
+
+  //check if the pattern has already been added
+  StartStateMapIter tempState = m_StartStates.find(type);
+  if( tempState != m_StartStates.end() )
+  {
+    STATEMACHINE_WARN << "Pattern " << type << " has already been added!\n";
+    return false;
+  }
+
+  //add the start state
+  m_StartStates.insert(StartStateMap::value_type(type, startState)); 
+
+  //add all states of the new pattern to hold their references
+  m_AllStateMachineMap.insert(AllStateMachineMapType::value_type(type, allStatesOfStateMachine));
+  return true;
+}
+

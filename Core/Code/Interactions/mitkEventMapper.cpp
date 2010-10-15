@@ -576,6 +576,19 @@ void  mitk::EventMapper::StartElement (const char *elementName, const char **att
       ReadXMLStringAttribut( NAME, atts ),
       ReadXMLIntegerAttribut( ID, atts ));
 
+    //check for a double entry unless it is an event for internal usage
+    if (eventDescr.GetType()!= mitk::Type_User) 
+    {
+      for (EventDescriptionVecIter iter = m_EventDescriptions.begin(); iter!=m_EventDescriptions.end(); iter++)
+      {
+        if (*iter == eventDescr)
+        {
+          STATEMACHINE_WARN<<"Event description " << eventDescr.GetName() << " already present! Skipping event description";
+          return;
+        }
+      }
+    }
+
     m_EventDescriptions.push_back(eventDescr);
   }
   else if ( elementName == EVENTS )
@@ -630,9 +643,9 @@ void mitk::EventMapper::SetStateEvent(mitk::Event* event)
   m_StateEvent.Set( m_StateEvent.GetId(), event );
 }
 
-mitk::StateEvent* mitk::EventMapper::RefreshStateEvent(mitk::StateEvent* stateEvent)
+bool mitk::EventMapper::RefreshStateEvent(mitk::StateEvent* stateEvent)
 {
-  //search the event in the list of event descriptions, if found, then change it and return the pointer
+  //search the event within stateEvent in the list of event descriptions, if found adapt stateEvent ID
   EventDescriptionVecIter iter;
   for (iter = m_EventDescriptions.begin(); iter!=m_EventDescriptions.end(); iter++)
   {
@@ -643,9 +656,12 @@ mitk::StateEvent* mitk::EventMapper::RefreshStateEvent(mitk::StateEvent* stateEv
   if (iter != m_EventDescriptions.end())//found
   {
     stateEvent->Set((*iter).GetId(), stateEvent->GetEvent());
+    return true;
   }
-
-  return stateEvent;
+  else
+    return false;
+  
+  return false;
 }
 
 void mitk::EventMapper::AddEventMapperAddOn(mitk::EventMapperAddOn* newAddOn)

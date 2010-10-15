@@ -79,10 +79,12 @@ namespace mitk {
     static bool MapEvent(Event* event, GlobalInteraction* globalInteraction = NULL, int mitkPostedEventID=0 );
 
     //##Documentation
+    //## Searches for the event within stateEvent in the internal map of event descriptions
+    //## If entry found the stateEvent ID is adapted
     //## maps the Event in m_EventDescription with the ID
-    //## and if found returns the Id,
-    //## if not found it returns -1
-    static StateEvent* RefreshStateEvent(StateEvent* stateEvent);
+    //## and if found returns true,
+    //## if not found it returns false
+    static bool RefreshStateEvent(StateEvent* stateEvent);
 
     //##Documentation
     //## loads an XML-File containing Events into m_EventDescriptions

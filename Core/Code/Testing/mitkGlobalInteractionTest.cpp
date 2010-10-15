@@ -112,6 +112,7 @@ int mitkGlobalInteractionTest(int /*argc*/, char* /*argv*/[])
   globalInteraction->AddInteractor(firstInteractor);
   globalInteraction->AddInteractor(secondInteractor);
   
+  std::cout << "and free the instances!";
   //releasing smartpointer of interactors; should be kept in GlobalInteraction
   firstInteractor = NULL;
   secondInteractor = NULL;

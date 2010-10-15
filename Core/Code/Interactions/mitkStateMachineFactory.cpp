@@ -60,7 +60,7 @@ vtkStandardNewMacro(StateMachineFactory);
 }
 
 mitk::StateMachineFactory::StateMachineFactory()
-: m_AktStateMachineName("")
+: m_AktStateMachineName(""), m_SkipStateMachine(false)
 {}
 
 mitk::StateMachineFactory::~StateMachineFactory()
@@ -220,12 +220,26 @@ bool mitk::StateMachineFactory::ConnectStates(mitk::State::StateMap *states)
 
 void  mitk::StateMachineFactory::StartElement (const char* elementName, const char **atts) 
 {
+  //skip the state machine pattern because the name was not unique!
+  if (m_SkipStateMachine)
+    return;
+
   std::string name(elementName);
 
   if ( name == STATE_MACHINE )
   { 
-    m_AktStateMachineName = ReadXMLStringAttribut( NAME, atts ); 
-    m_AllStateMachineMap[ m_AktStateMachineName ] = new StateMachineMapType;
+    std::string tempStateMachineName = ReadXMLStringAttribut( NAME, atts ); 
+    if (m_AllStateMachineMap.find(tempStateMachineName) != m_AllStateMachineMap.end())
+    {
+      //warning: Statemachine tempStateMachineName already exists!
+      STATEMACHINE_FATAL<<"State machine pattern " << tempStateMachineName << " already exists! Skipping state machine pattern";
+      m_SkipStateMachine = true;
+    }
+    else //tempStateMachineName is unique, so add it
+    {
+      m_AktStateMachineName = tempStateMachineName; 
+      m_AllStateMachineMap[ m_AktStateMachineName ] = new StateMachineMapType;
+    }
   } 
 
   else if ( name == STATE )   
@@ -325,8 +339,19 @@ void mitk::StateMachineFactory::EndElement (const char* elementName)
   bool ok = true;
   std::string name(elementName);
 
+  //skip the state machine pattern because the name was not unique!
+  if (m_SkipStateMachine && (name != STATE_MACHINE) )
+    return;
+
+
   if ( name == STATE_MACHINE_NAME )
   {
+    if (m_SkipStateMachine)
+    {
+      m_SkipStateMachine = false;
+      return;
+    }
+
     ok = ConnectStates(&m_AllStatesOfOneStateMachine);
     m_AllStatesOfOneStateMachine.clear();
   } 

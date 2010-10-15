@@ -8,6 +8,7 @@ SET(MODULE_TESTS
   mitkActionTest.cpp
   mitkDataStorageTest.cpp
   mitkEnumerationPropertyTest.cpp
+  mitkEventMapperTest.cpp
   mitkEventTest.cpp
   mitkFocusManagerTest.cpp
   mitkGenericPropertyTest.cpp

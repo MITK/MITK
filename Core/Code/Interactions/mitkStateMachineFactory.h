@@ -34,10 +34,14 @@ namespace mitk {
   *@brief builds up all specifiyed statemachines and hold them for later access
   *
   * According to the XML-File every different statemachine is build up. A new
-  * Instance of a new StateMachine grabs a StartState of one certain
-  * statemachine. Two instances of one kind of statemachine share that
-  * statemachine. 
-  * During buildprocess at runtime each statemachine is parsed for well formed style.
+  * instance of a new StateMachine grabs a StartState of one certain
+  * state machine. Two instances of one kind of state machine share that
+  * state machine. 
+  * During buildprocess at runtime each state machine is parsed for well formed style.
+  * Currently different interaction styles are not yet supported.
+  * To add individual state machine patterns, call LoadBehavior(...) 
+  * and it will be parsed added to the internal list of patterns
+  *
   * @ingroup Interaction
   **/
   class MITK_CORE_EXPORT StateMachineFactory : public vtkXMLParser
@@ -198,6 +202,11 @@ namespace mitk {
     std::string m_LastLoadedBehavior;
 
     std::string m_AktStateMachineName;
+
+    /** 
+    * @brief Variable to skip a state machine pattern if the state machine name is not unique
+    **/
+    bool m_SkipStateMachine;
   };
 
 } // namespace mitk

@@ -18,46 +18,44 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <mitkStateMachineFactory.h>
 #include <mitkState.h>
-/**
-*http://msdn.microsoft.com/en-us/library/e5ewb1h3.aspx
-* VS9 memory leakage detection
-**/
-//#ifdef WIN32
-//#ifdef _DEBUG
-//#define _CRTDBG_MAP_ALLOC
-//#include <stdlib.h>
-//#include <crtdbg.h>
-//#endif
-//#endif
-
-#include <fstream>
+#include "mitkTestingMacros.h"
+#include <mitkStandardFileLocations.h>
 int mitkStateMachineFactoryTest(int /*argc*/, char* /*argv*/[])
 {
+  MITK_TEST_BEGIN("StateMachineFactory")
   //create statemachinefactory
   mitk::StateMachineFactory* statemachineFactory = mitk::StateMachineFactory::New();
   
   //load standard behavior 
-  std::cout << "Testing LoadStandardBehavior(): ";
-  if (!statemachineFactory->LoadStandardBehavior())
-  {
-    std::cout<<"[FAILED]"<<std::endl;
-    return EXIT_FAILURE;
-  }
-  std::cout<<"[PASSED]"<<std::endl;
+  MITK_TEST_CONDITION_REQUIRED(statemachineFactory->LoadStandardBehavior(),"Testing LoadStandardBehavior(): ") 
   
   //get the first state of the statemachine "global" (mitkGlobalInteraction)
   mitk::State::Pointer state = statemachineFactory->GetStartState("global");
-  std::cout << "Testing GetStartState() of GlobalInteraction StateMachinePattern: ";
-  if (state.IsNull())
-  {
-    std::cout<<"[FAILED]"<<std::endl;
-    return EXIT_FAILURE;
-  }
-  std::cout<<"[PASSED]"<<std::endl;
+  MITK_TEST_CONDITION_REQUIRED(state.IsNotNull(),"Testing GetStartState() of GlobalInteraction state machine pattern: ") 
+
+  std::string xmlFileName1( mitk::StandardFileLocations::GetInstance()->FindFile("TestStateMachine1.xml", "Core/Code/Testing/Data") );
+  MITK_TEST_CONDITION_REQUIRED(!xmlFileName1.empty(),"Getting xml file 1: ") 
+  MITK_TEST_CONDITION_REQUIRED(statemachineFactory->LoadBehavior(xmlFileName1),"Parsing xml file 1: ") 
+  state = statemachineFactory->GetStartState("test1");
+  MITK_TEST_CONDITION_REQUIRED(state.IsNotNull(),"Testing GetStartState() of test1 state machine pattern: ") 
+
+  //global still accessible?
+  state = statemachineFactory->GetStartState("global");
+  MITK_TEST_CONDITION_REQUIRED(state.IsNotNull(),"Testing if previous loaded state machine patterns are still accessible: ") 
+  
+  std::string xmlFileName2( mitk::StandardFileLocations::GetInstance()->FindFile("TestStateMachine2.xml", "Core/Code/Testing/Data") );
+  MITK_TEST_CONDITION_REQUIRED(!xmlFileName2.empty(),"Getting xml file 2: ") 
+  MITK_TEST_CONDITION_REQUIRED(statemachineFactory->LoadBehavior(xmlFileName2),"Parsing xml file 2. Schould throw a fatal error due to already existing pattern name: ") 
+  state = statemachineFactory->GetStartState("test4");
+  MITK_TEST_CONDITION_REQUIRED(state.IsNotNull(),"Testing GetStartState() of test4 state machine pattern: ")
+  
+  state = statemachineFactory->GetStartState("global");
+  MITK_TEST_CONDITION_REQUIRED(state.IsNotNull(),"Testing if previous loaded state machine pattern (global) is still accessible: ") 
+  state = statemachineFactory->GetStartState("test1");
+  MITK_TEST_CONDITION_REQUIRED(state.IsNotNull(),"Testing if previous loaded state machine pattern (test1) is still accessible: ") 
 
   statemachineFactory->Delete();
 
-  std::cout<<"[TEST DONE]"<<std::endl;
-
-  return EXIT_SUCCESS;
+  // always end with this!
+  MITK_TEST_END();
 }

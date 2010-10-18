@@ -52,18 +52,37 @@ mitk::VtkEventAdapter::AdaptMouseEvent(mitk::BaseRenderer* sender, unsigned long
       type   = 3;
       button = 0x00000002;
       break;
+    case vtkCommand::LeftButtonPressEvent:
+      type   = 2;
+      button = 0x00000001;
+      break;
+    case vtkCommand::MiddleButtonPressEvent:
+      type   = 2;
+      button = 0x00000004;
+      break;
+    case vtkCommand::RightButtonPressEvent:
+      type   = 2;
+      button = 0x00000002;
+      break;
+      
   }
   
   int modifiers = 0;
   if(rwi->GetShiftKey())
+  {
     modifiers |= 0x02000000;
     state |= mitk::BS_ShiftButton;
+  }
   if(rwi->GetControlKey())
+  {
     modifiers |= 0x04000000;
     state |= mitk::BS_ControlButton;
+  }
   if(rwi->GetAltKey())
+  {
     modifiers |= 0x08000000;
     state |= mitk::BS_AltButton;
+  }
  
   mitk::MouseEvent mitkEvent(sender, type, button, state, mitk::Key_none, p);
   

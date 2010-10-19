@@ -84,5 +84,6 @@ SET(MODULE_TESTIMAGES
 SET(MODULE_CUSTOM_TESTS 
     #mitkLabeledImageToSurfaceFilterTest.cpp
     #mitkExternalToolsTest.cpp
+    mitkDicomSeriesReaderTest.cpp
 )
 

@@ -181,3 +181,4 @@ bool DicomSeriesReader::GdcmSortFunction(const gdcm::DataSet &ds1, const gdcm::D
 
 }
 
+#include <mitkDicomSeriesReader.txx>

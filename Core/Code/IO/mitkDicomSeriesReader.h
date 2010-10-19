@@ -137,6 +137,5 @@ protected:
 
 }
 
-#include <mitkDicomSeriesReader.txx>
 
 #endif /* MITKDICOMSERIESREADER_H_ */

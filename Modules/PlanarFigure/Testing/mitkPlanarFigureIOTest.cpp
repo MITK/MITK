@@ -114,6 +114,50 @@ public:
 
     return planarFigures;
   }
+
+  static PlanarFigureList CreateDeepCopiedPlanarFigures(PlanarFigureList original)
+  {
+    PlanarFigureList copiedPlanarFigures;
+    
+    PlanarFigureList::iterator it1;
+
+    for ( it1 = original.begin(); it1 != original.end(); ++it1 )
+    {
+      mitk::PlanarFigure::Pointer copiedFigure;
+      if(strcmp((*it1)->GetNameOfClass(), "PlanarAngle") == 0)
+      { 
+        copiedFigure    = mitk::PlanarAngle::New(); 
+      }
+      if(strcmp((*it1)->GetNameOfClass(), "PlanarCircle") == 0)
+      { 
+        copiedFigure    = mitk::PlanarCircle::New(); 
+      }
+      if(strcmp((*it1)->GetNameOfClass(), "PlanarLine") == 0)
+      { 
+        copiedFigure    = mitk::PlanarLine::New(); 
+      }
+      if(strcmp((*it1)->GetNameOfClass(), "PlanarPolygon") == 0)
+      { 
+        copiedFigure    = mitk::PlanarPolygon::New(); 
+      }
+      if(strcmp((*it1)->GetNameOfClass(), "PlanarCross") == 0)
+      { 
+        copiedFigure    = mitk::PlanarCross::New(); 
+      }
+      if(strcmp((*it1)->GetNameOfClass(), "PlanarRectangle") == 0)
+      { 
+        copiedFigure    = mitk::PlanarRectangle::New(); 
+      }
+      if(strcmp((*it1)->GetNameOfClass(), "PlanarFourPointAngle") == 0)
+      { 
+        copiedFigure    = mitk::PlanarFourPointAngle::New(); 
+      }
+  
+      copiedFigure->DeepCopy((*it1));
+      copiedPlanarFigures.push_back(copiedFigure.GetPointer());
+    }
+    return copiedPlanarFigures;
+  }
   
 
   static void VerifyPlanarFigures( PlanarFigureList &planarFigures1, PlanarFigureList &planarFigures2 )
@@ -338,6 +382,10 @@ int mitkPlanarFigureIOTest(int /* argc */, char* /*argv*/[])
   PlanarFigureIOTestClass::PlanarFigureList originalPlanarFigures = 
     PlanarFigureIOTestClass::CreatePlanarFigures();
 
+  // Create a number of "deep-copied" planar figures to test the DeepCopy function
+   PlanarFigureIOTestClass::PlanarFigureList copiedPlanarFigures = 
+    PlanarFigureIOTestClass::CreateDeepCopiedPlanarFigures(originalPlanarFigures);
+
 
   // Write PlanarFigure objects into temp file
   
@@ -365,6 +413,12 @@ int mitkPlanarFigureIOTest(int /* argc */, char* /*argv*/[])
 
   // Test if original and retrieved PlanarFigure objects are the same
   PlanarFigureIOTestClass::VerifyPlanarFigures( originalPlanarFigures, retrievedPlanarFigures );
+
+  //empty the originalPlanarFigures
+  originalPlanarFigures.empty();
+  
+  // Test if deep-copied and retrieved PlanarFigure objects are the same
+  PlanarFigureIOTestClass::VerifyPlanarFigures( copiedPlanarFigures, retrievedPlanarFigures );
 
 
   MITK_TEST_END()

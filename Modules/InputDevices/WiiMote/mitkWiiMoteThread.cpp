@@ -4,21 +4,11 @@
 #include "mitkWiiMoteIREvent.h"
 #include "mitkWiiMoteButtonEvent.h"
 
-// static variables need declaration,
-// so that they can be linked
-//wiimote mitk::WiiMoteThread::m_WiiMote;
-//mitk::Point2D mitk::WiiMoteThread::m_LastReadData;
-//double mitk::WiiMoteThread::m_LastRecordTime;
-//bool mitk::WiiMoteThread::s_ReadDataOnce = false;
-//mitk::WiiMoteThread::ReceptorCommandPointer mitk::WiiMoteThread::m_Command;
-//int mitk::WiiMoteThread::s_SkipTimeSteps = 1;
-//int mitk::WiiMoteThread::m_CurrentTimeSteps = 0;
-//wiimote mitk::WiiMoteAddOn::m_WiiMotes;
-
 // timelimit between two state changes to send an event
 // the chosen value is empirical
 const double TIMELIMIT = 0.5; 
 const int SLEEPDEFAULT = 70; 
+const int MAX_WIIMOTES = 4;
 
 mitk::WiiMoteThread::WiiMoteThread()
 : m_MultiThreader(itk::MultiThreader::New())
@@ -44,6 +34,10 @@ mitk::WiiMoteThread::WiiMoteThread()
 
 mitk::WiiMoteThread::~WiiMoteThread()
 {
+  //for(int i = 0; i < m_NumberDetectedWiiMotes;i++)
+  //{  
+  //  delete m_WiiMotes[i];  
+  //}
 }
 
 void mitk::WiiMoteThread::OnStateChange(wiimote &remote,state_change_flags changed, const wiimote_state &newState)
@@ -90,95 +84,34 @@ void mitk::WiiMoteThread::StartWiiMote()
 
   while(CONNECTED && !m_StopWiiMote) 
   {
-    // connection process
-    if(m_WiiMote.Connect(wiimote::FIRST_AVAILABLE))
+    m_WiiMoteThreadFinished->Lock();
+    if(this->DetectWiiMotes())
     {
-      m_WiiMoteThreadFinished->Lock();
-
-      MITK_INFO << "WiiMote connected..";
-
-      // 0x00 none
-      // 0x0f all leds
-      // 0x01 first led
-      // 0x02 second led
-      // 0x03 third led
-      // 0x04 fourth led
-      m_WiiMote.SetLEDs(0x01);
-
-      // use a non-extension report mode (this gives us back the IR dot sizes)
-      m_WiiMote.SetReportType(wiimote::IN_BUTTONS_ACCEL_IR);
-
-      m_WiiMoteThreadFinished->Unlock();
-
       break;
     }
+    m_WiiMoteThreadFinished->Unlock();
   }
 
-  // update and settings process
-  while(!m_WiiMote.Button.Minus() && !m_StopWiiMote )
+  if(this->m_NumberDetectedWiiMotes <= 1)
   {
-    m_WiiMoteThreadFinished->Lock();
-    while(m_WiiMote.RefreshState() == NO_CHANGE)
-    {
-      itksys::SystemTools::Delay(1);
-    }
-    m_WiiMoteThreadFinished->Unlock();
-
-    m_WiiMoteThreadFinished->Lock();
-    if(!m_InCalibrationMode)
-    {
-      this->WiiMoteIRInput();
-    }
-    else
-    {
-      this->WiiMoteCalibrationInput();
-    }
-    m_WiiMoteThreadFinished->Unlock();
-
-    if(m_WiiMote.Button.Home())
-      this->WiiMoteButtonPressed(mitk::Key_Home);
-
-    if(m_WiiMote.Button.A())
-    {
-      this->WiiMoteButtonPressed(mitk::Key_A);
-
-      // necessary to avoid sending the movementvector
-      // instead of the raw coordinates for the calibration
-      if(this->m_InCalibrationMode)
-      {
-        this->m_InCalibrationMode = false;
-      }
-      else
-      {
-        this->m_InCalibrationMode = true;
-      }
- 
-      itksys::SystemTools::Delay(3000);
-    }
-
-    if(m_WiiMote.ConnectionLost())
-    {
-      m_WiiMoteThreadFinished->Lock();
-      this->ReconnectWiiMote();
-      m_WiiMoteThreadFinished->Unlock();
-    }
-
-    //// testing
-    //m_WiiMoteThreadFinished->Lock();
-    //m_WiiMote.SetRumble(m_WiiMote.Button.B());
-    //m_WiiMoteThreadFinished->Unlock();
+    this->SingleWiiMoteUpdate();
+  }
+  else
+  {
+    this->MultiWiiMoteUpdate();
   }
 
   //if(m_WiiMote.IsConnected() && m_StopWiiMote)
   //{
     //clean up
-    m_WiiMoteThreadFinished->Lock();
-    m_WiiMote.Disconnect();
-    m_WiiMoteThreadFinished->Unlock();
+    //m_WiiMoteThreadFinished->Lock();
+    //m_WiiMote.Disconnect();
+    //m_WiiMoteThreadFinished->Unlock();
 
-    MITK_INFO << "WiiMote disconnected..";
+    //MITK_INFO << "WiiMote disconnected..";
   //}
 
+  this->DisconnectWiiMotes();
 
   return;
 }
@@ -196,28 +129,79 @@ void mitk::WiiMoteThread::ReconnectWiiMote()
   }
 }
 
-void mitk::WiiMoteThread::DetectWiiMotes()
+bool mitk::WiiMoteThread::DetectWiiMotes()
 {
-  //unsigned detected		  = 0;
-  //unsigned connectionTries = 0;
+  bool result = false;
+  unsigned detected		  = 0;
+  unsigned connectionTrys = 0;
 
-  //while(detected < 3 || connectionTrys < 5)
-  //{
-  //  ++connectionTrys;
-  //
-  //  wiimote* newWiiMote;
+  while(detected < 5)
+  {
+    connectionTrys++;
 
-  //  if(!newWiiMote->Connect(wiimote::FIRST_AVAILABLE))
-  //    break;
+    if(!m_WiiMotes[detected].Connect(wiimote::FIRST_AVAILABLE))
+    {
+      if(connectionTrys > 5)
+      {
+        break;
+      }
+    }
+    else
+    {
+      MITK_INFO << "WiiMote detected :: Assigned ID: " << detected;
 
-  //  MITK_INFO << "New WiiMote detected :: Assigned ID: " << detected;
-  //  m_WiiMotes[detected++] = newWiiMote;
-  //}
+      switch(detected)
+      {
+        // 0x00 none
+        // 0x0f all leds
+        // 0x01 first led
+        // 0x02 second led
+        // 0x03 third led
+        // 0x04 fourth led
+      case 0:
+        m_WiiMotes[detected].SetLEDs(0x01);
+        break;
+
+      case 1:
+        m_WiiMotes[detected].SetLEDs(0x02);
+        break;
+
+      case 2:
+        m_WiiMotes[detected].SetLEDs(0x03);
+        break;
+
+      case 3:
+        m_WiiMotes[detected].SetLEDs(0x04);
+        break;
+      }
+
+      // use a non-extension report mode (this gives us back the IR dot sizes)
+      m_WiiMotes[detected].SetReportType(wiimote::IN_BUTTONS_ACCEL_IR);
+
+      detected++;
+      connectionTrys = 0;
+
+      result = true;
+    } // end else
+  } // end while
+
+  m_NumberDetectedWiiMotes = detected;
+  return result;
+}
+
+void mitk::WiiMoteThread::DisconnectWiiMotes()
+{
+  for(int i = 0; i < m_NumberDetectedWiiMotes;i++)
+  {  
+      this->m_WiiMotes[i].Disconnect();  
+  }
+
+  MITK_INFO << "Wiimotes disconnected";
 }
 
 void mitk::WiiMoteThread::WiiMoteIRInput()
 {
-  if(IR_CHANGED && m_WiiMote.IR.Dot[0].bVisible)
+  if(IR_CHANGED && m_WiiMotes[0].IR.Dot[0].bVisible)
   {
     //m_CurrentTimeStep++;
     //if(m_CurrentTimeStep > m_SkipTimeSteps)
@@ -226,7 +210,7 @@ void mitk::WiiMoteThread::WiiMoteIRInput()
     m_Command->SetCallbackFunction(mitk::WiiMoteAddOn::GetInstance(), &mitk::WiiMoteAddOn::WiiMoteInput);
 
     double tempTime(itksys::SystemTools::GetTime());
-    float inputCoordinates[2] = {m_WiiMote.IR.Dot[0].RawX, m_WiiMote.IR.Dot[0].RawY};
+    float inputCoordinates[2] = {m_WiiMotes[0].IR.Dot[0].RawX, m_WiiMotes[0].IR.Dot[0].RawY};
     mitk::Point2D tempPoint(inputCoordinates);
 
     // if the last read data is not valid,
@@ -280,19 +264,168 @@ void mitk::WiiMoteThread::WiiMoteButtonPressed(int buttonType)
 
 void mitk::WiiMoteThread::WiiMoteCalibrationInput()
 {
-  if(IR_CHANGED && m_WiiMote.IR.Dot[0].bVisible)
+  if(IR_CHANGED && m_WiiMotes[0].IR.Dot[0].bVisible)
   {
     m_Command = ReceptorCommand::New();
     m_Command->SetCallbackFunction(mitk::WiiMoteAddOn::GetInstance(), &mitk::WiiMoteAddOn::WiiMoteCalibrationInput);
 
-    mitk::WiiMoteCalibrationEvent e(m_WiiMote.IR.Dot[0].RawX,m_WiiMote.IR.Dot[0].RawY);
+    mitk::WiiMoteCalibrationEvent e(m_WiiMotes[0].IR.Dot[0].RawX,m_WiiMotes[0].IR.Dot[0].RawY);
     mitk::CallbackFromGUIThread::GetInstance()->CallThisFromGUIThread(m_Command, e.MakeObject());
   }
 
   itksys::SystemTools::Delay(m_SleepTime);
 }
 
+void mitk::WiiMoteThread::SingleWiiMoteUpdate()
+{
+   // update and settings process
+  while(!m_WiiMotes[0].Button.Minus() && !m_StopWiiMote )
+  {
+    m_WiiMoteThreadFinished->Lock();
+    while(m_WiiMotes[0].RefreshState() == NO_CHANGE)
+    {
+      itksys::SystemTools::Delay(1);
+    }
+    m_WiiMoteThreadFinished->Unlock();
 
+    m_WiiMoteThreadFinished->Lock();
+    if(!m_InCalibrationMode)
+    {
+      this->WiiMoteIRInput();
+    }
+    else
+    {
+      this->WiiMoteCalibrationInput();
+    }
+    m_WiiMoteThreadFinished->Unlock();
+
+    if(m_WiiMotes[0].Button.Home())
+      this->WiiMoteButtonPressed(mitk::Key_Home);
+
+    if(m_WiiMotes[0].Button.A())
+    {
+      this->WiiMoteButtonPressed(mitk::Key_A);
+
+      // necessary to avoid sending the movementvector
+      // instead of the raw coordinates for the calibration
+      if(this->m_InCalibrationMode)
+      {
+        this->m_InCalibrationMode = false;
+      }
+      else
+      {
+        this->m_InCalibrationMode = true;
+      }
+ 
+      itksys::SystemTools::Delay(3000);
+    }
+
+    if(m_WiiMotes[0].ConnectionLost())
+    {
+      m_WiiMoteThreadFinished->Lock();
+      this->ReconnectWiiMote();
+      m_WiiMoteThreadFinished->Unlock();
+    }
+
+    //// testing
+    //m_WiiMoteThreadFinished->Lock();
+    //m_WiiMote.SetRumble(m_WiiMote.Button.B());
+    //m_WiiMoteThreadFinished->Unlock();
+  }
+}
+
+void mitk::WiiMoteThread::MultiWiiMoteUpdate()
+{
+ // update and settings process
+  while(!m_WiiMotes[0].Button.Minus() && !m_StopWiiMote )
+  {
+    m_WiiMoteThreadFinished->Lock();
+    while(m_WiiMotes[0].RefreshState() == NO_CHANGE
+      && m_WiiMotes[1].RefreshState() == NO_CHANGE)
+    {
+      itksys::SystemTools::Delay(1);
+    }
+    m_WiiMoteThreadFinished->Unlock();
+
+    m_WiiMoteThreadFinished->Lock();
+    if(!m_InCalibrationMode)
+    {
+      this->MultiWiiMoteIRInput();
+    }
+    else
+    {
+      // stereo calibration?
+    }
+    m_WiiMoteThreadFinished->Unlock();
+
+    if(m_WiiMotes[0].Button.A())
+    {
+      this->WiiMoteButtonPressed(mitk::Key_A);
+
+      if(this->m_InCalibrationMode)
+      {
+        this->m_InCalibrationMode = false;
+      }
+      else
+      {
+        this->m_InCalibrationMode = true;
+      }
+ 
+      itksys::SystemTools::Delay(3000);
+    }
+  } // end while
+}
+
+void mitk::WiiMoteThread::MultiWiiMoteIRInput()
+{
+  if(IR_CHANGED && m_WiiMotes[0].IR.Dot[0].bVisible && m_WiiMotes[1].IR.Dot[0].bVisible)
+  {
+    //m_Command = ReceptorCommand::New(); 
+    //m_Command->SetCallbackFunction(mitk::WiiMoteAddOn::GetInstance(), &mitk::WiiMoteAddOn::WiiMoteInput);
+
+    double tempTime(itksys::SystemTools::GetTime());
+
+    float inputCoordinates[2] = {m_WiiMotes[0].IR.Dot[0].RawX, m_WiiMotes[0].IR.Dot[0].RawY};
+    mitk::Point2D tempPoint(inputCoordinates);
+
+    float inputCoordinates2[2] = {m_WiiMotes[1].IR.Dot[0].RawX, m_WiiMotes[1].IR.Dot[0].RawY};
+    mitk::Point2D tempPoint2(inputCoordinates2);
+
+    mitk::Vector2D result = (tempPoint2 - tempPoint);
+    MITK_INFO << "IR1 :: X: " << tempPoint[0];
+    MITK_INFO << "IR1 :: Y: " << tempPoint[1];
+
+    MITK_INFO << "IR2 :: X: " << tempPoint2[0];
+    MITK_INFO << "IR2 :: Y: " << tempPoint2[1];
+
+    //// if the last read data is not valid,
+    //// because the thread was not started
+    //if(!m_ReadDataOnce)
+    //{
+    //  m_ReadDataOnce = true;  
+    //}
+    //else // there is old data available - calculate the movement and send event
+    //{
+    //  // this time constraint allows the user to move the camera
+    //  // with the IR sender (by switching the IR source on and off) 
+    //  // similiar to a mouse (e.g. if you lift the mouse from the 
+    //  // surface and put it down again on another position, there 
+    //  // was no input. Now the input starts again and the movement 
+    //  // will begin from the last location of the mouse, although 
+    //  // the physical position of the mouse changed.)
+    //  if ((tempTime-m_LastRecordTime) < TIMELIMIT) 
+    //  {
+    //    mitk::Vector2D resultingVector(m_LastReadData-tempPoint);
+    //    mitk::WiiMoteIREvent e(resultingVector, tempTime);
+    //    mitk::CallbackFromGUIThread::GetInstance()->CallThisFromGUIThread(m_Command, e.MakeObject());
+    //  }
+    //}
+    //m_LastRecordTime = tempTime;
+    //m_LastReadData = tempPoint;
+
+    //itksys::SystemTools::Delay(m_SleepTime);
+  }
+}
 
 
 

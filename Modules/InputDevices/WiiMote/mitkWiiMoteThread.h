@@ -83,7 +83,12 @@ namespace mitk
     * TODO
     * Detects all available Wiimotes. 
     */
-    void DetectWiiMotes();
+    bool DetectWiiMotes();
+
+    /**
+    * Disconnects all connected Wiimotes.
+    */
+    void DisconnectWiiMotes();
 
     /**
     * Reads incoming data from the IR camera. After processing the data <br>
@@ -105,6 +110,11 @@ namespace mitk
     * are stored in an event and fired as an event. 
     */
     void WiiMoteCalibrationInput();
+
+    void SingleWiiMoteUpdate();
+    void MultiWiiMoteUpdate();
+
+    void MultiWiiMoteIRInput();
 
   protected:
 
@@ -140,7 +150,8 @@ namespace mitk
     int m_SleepTime;
 
     //store all connected Wiimotes
-    wiimote* m_WiiMotes[6];
+    wiimote m_WiiMotes[4];
+    int m_NumberDetectedWiiMotes;
 
   };
 }

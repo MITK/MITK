@@ -6,7 +6,7 @@
       <run class="QmitkExtApplication"/>
     </application>
   </extension>
-  
+<!--  
   <extension point="org.blueberry.ui.perspectives">
     <perspective
       id="org.mitk.extapp.defaultperspective"
@@ -15,4 +15,5 @@
 	  icon="resources/icon_research.xpm">
     </perspective>
   </extension>
+-->
 </plugin>

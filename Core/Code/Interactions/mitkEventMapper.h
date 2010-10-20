@@ -87,8 +87,13 @@ namespace mitk {
     static bool RefreshStateEvent(StateEvent* stateEvent);
 
     //##Documentation
-    //## loads an XML-File containing Events into m_EventDescriptions
-    //## also involved: EventMapper::startEvent(...)
+    //## loads an XML-File containing events and adds definition to internal mapping list
+    //## 
+    //## Several files can be loaded. Event descriptions have to be unique or a warning will be displayed.
+    //## If the same file is loaded twice, 
+    //## it will only be parsed the first time.
+    //## If a file A, then a file B and then file A is to be loaded, warnings 
+    //## will be displayed when loading file A the second time.
     bool LoadBehavior(std::string fileName);
 
     //##Documentation

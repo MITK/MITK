@@ -512,22 +512,22 @@ bool mitk::EventMapper::MapEvent(Event* event, GlobalInteraction* globalInteract
   }
 }
 
-//##Documentation
-//## loads an XML-File containing Events into m_EventDescriptions
-//## also involved: EventMapper::startEvent(...)
 bool mitk::EventMapper::LoadBehavior(std::string fileName)
 {
   if ( fileName.empty() )
     return false;
-
+  
+  if (FileName!=NULL)
+  {
+    if (fileName.compare(FileName) == 0)
+      return false;
+  }
+  
   this->SetFileName( fileName.c_str() );
-
   return ( this->Parse() );
+
 }
 
-//##Documentation
-//## loads Events into m_EventDescriptions from xml string
-//## also involved: EventMapper::startEvent(...)
 bool mitk::EventMapper::LoadBehaviorString(std::string xmlString)
 {
   if ( xmlString.empty() )

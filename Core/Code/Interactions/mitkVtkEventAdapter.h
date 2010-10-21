@@ -35,12 +35,16 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk
 {
 
+class BaseRenderer;
+
 class MITK_EXPORT VtkEventAdapter
 {
 public:
   static mitk::MouseEvent AdaptMouseEvent(mitk::BaseRenderer* sender, unsigned long vtkCommandEventId,vtkRenderWindowInteractor* rwi);
   static mitk::WheelEvent AdaptWheelEvent(mitk::BaseRenderer* sender, unsigned long vtkCommandEventId,vtkRenderWindowInteractor* rwi);
   static mitk::KeyEvent AdaptKeyEvent(mitk::BaseRenderer* sender, unsigned long vtkCommandEventId,vtkRenderWindowInteractor* rwi);
+
+  static std::map<BaseRenderer* ,int> buttonStateMap;
 };
 
 }

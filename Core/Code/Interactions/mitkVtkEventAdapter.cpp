@@ -21,66 +21,106 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "vtkCommand.h"
 
+namespace mitk
+{
+  std::map<BaseRenderer* ,int> VtkEventAdapter::buttonStateMap;
+}
+
 mitk::MouseEvent 
-//mitk::VtkEventAdapter::AdaptMouseEvent(mitk::BaseRenderer* sender, QMouseEvent* mouseEvent)
 mitk::VtkEventAdapter::AdaptMouseEvent(mitk::BaseRenderer* sender, unsigned long vtkCommandEventId,vtkRenderWindowInteractor* rwi)
 {
 
   mitk::Point2D p;
   p[0] = rwi->GetEventPosition()[0];
   p[1] = rwi->GetEventPosition()[1];
+  p[1] = rwi->GetSize()[1] - p[1];       // flip y axis
   
   // http://doc.trolltech.com/4.6/qt.html#MouseButton-enum
   int button = 0;
   int type   = 0;
   int state  = 0;
+
+  // vtkRenderWindowInteractor does not provide information about mouse buttons during
+  // mouse move events...
+
+  // some button action might be going on during mouse move events
+  // that needs to be temp. saved in our buttonStateMap
+  int tmpstate = 0;
+  if(buttonStateMap.find(sender) != buttonStateMap.end())
+    tmpstate = buttonStateMap.find(sender)->second;
+  
+  if(tmpstate != 0 && vtkCommandEventId != vtkCommand::MouseMoveEvent)
+    buttonStateMap.erase(buttonStateMap.find(sender)); //press or release event with active map caching
+  
   switch(vtkCommandEventId)
   {
     case vtkCommand::MouseMoveEvent:
       type   = 5;
-      button = 0x00000000;
+      button = mitk::BS_NoButton;
+     
+      if(tmpstate != 0)
+      {
+        state  = tmpstate;
+        /*
+        // debug output
+        static char  tmp;
+        sprintf(&tmp,"%d",tmpstate); 
+        std::cout << tmp << std::endl;
+        */
+      }
       break;
     case vtkCommand::LeftButtonReleaseEvent:
       type   = 3; 
-      button = 0x00000001;
+      button = mitk::BS_LeftButton;
+
+      buttonStateMap[sender] = (tmpstate - button);
       break;
     case vtkCommand::MiddleButtonReleaseEvent:
       type   = 3;
-      button = 0x00000004;
+      button = mitk::BS_MidButton;
+      
+      buttonStateMap[sender] = (tmpstate - button);
       break;
     case vtkCommand::RightButtonReleaseEvent:
       type   = 3;
-      button = 0x00000002;
+      button = mitk::BS_RightButton;
+
+      buttonStateMap[sender] = (tmpstate - button);
       break;
     case vtkCommand::LeftButtonPressEvent:
       type   = 2;
-      button = 0x00000001;
+      button = mitk::BS_LeftButton;
+      
+      tmpstate |= button;
+      buttonStateMap[sender] = tmpstate;
       break;
     case vtkCommand::MiddleButtonPressEvent:
       type   = 2;
-      button = 0x00000004;
+      button = mitk::BS_MidButton;
+      
+      tmpstate |= button;
+      buttonStateMap[sender] = tmpstate;
       break;
     case vtkCommand::RightButtonPressEvent:
       type   = 2;
-      button = 0x00000002;
+      button = mitk::BS_RightButton;
+      
+      tmpstate |= button;
+      buttonStateMap[sender] = tmpstate;
       break;
       
   }
   
-  int modifiers = 0;
   if(rwi->GetShiftKey())
   {
-    modifiers |= 0x02000000;
     state |= mitk::BS_ShiftButton;
   }
   if(rwi->GetControlKey())
   {
-    modifiers |= 0x04000000;
     state |= mitk::BS_ControlButton;
   }
   if(rwi->GetAltKey())
   {
-    modifiers |= 0x08000000;
     state |= mitk::BS_AltButton;
   }
  
@@ -116,16 +156,13 @@ mitk::VtkEventAdapter::AdaptWheelEvent(mitk::BaseRenderer* sender, unsigned long
       break;
   }
   
-  int modifiers = 0;
+  
   if(rwi->GetShiftKey())
-    modifiers |= 0x02000000;
-    state |= mitk::BS_ShiftButton;
+     state |= mitk::BS_ShiftButton;
   if(rwi->GetControlKey())
-    modifiers |= 0x04000000;
     state |= mitk::BS_ControlButton;
   if(rwi->GetAltKey())
-    modifiers |= 0x08000000;
-    state |= mitk::BS_AltButton;
+     state |= mitk::BS_AltButton;
 
   mitk::WheelEvent mitkEvent(sender, type, button,state, mitk::Key_none, p, delta);
 
@@ -155,16 +192,12 @@ mitk::VtkEventAdapter::AdaptKeyEvent(mitk::BaseRenderer* sender, unsigned long v
     type = 6; // http://doc.trolltech.com/4.6/qevent.html#Type-enum
   
   int state = 0;
-  int modifiers = 0;
   if(rwi->GetShiftKey())
-    modifiers |= 0x02000000;
     state |= mitk::BS_ShiftButton;
   if(rwi->GetControlKey())
-    modifiers |= 0x04000000;
-    state |= mitk::BS_ControlButton;
+     state |= mitk::BS_ControlButton;
   if(rwi->GetAltKey())
-    modifiers |= 0x08000000;
-    state |= mitk::BS_AltButton;
+     state |= mitk::BS_AltButton;
 
     mitk::KeyEvent mke(sender, type, mitk::BS_NoButton, state, key, std::string(rwi->GetKeySym()), p);
   

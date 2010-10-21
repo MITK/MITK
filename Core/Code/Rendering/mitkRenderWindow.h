@@ -44,6 +44,7 @@ public:
   itkNewMacro(Self);
   mitkNewMacro1Param(Self, vtkRenderWindow*);
   mitkNewMacro2Param(Self, vtkRenderWindow*, const char*);
+  mitkNewMacro3Param(Self, vtkRenderWindow*, const char*, mitk::RenderingManager*);
 
   
   virtual ~RenderWindow();
@@ -63,7 +64,7 @@ public:
   void FullScreenMode( bool state );
 
 protected:
-    RenderWindow(vtkRenderWindow * existingRenderWindow = NULL , const char* name = "unnamed renderer");
+    RenderWindow(vtkRenderWindow * existingRenderWindow = NULL , const char* name = "unnamed renderer", mitk::RenderingManager* rm = NULL );
 
 
     void ResetView();

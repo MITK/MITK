@@ -52,15 +52,15 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
     sorter.SetSortFunction(DicomSeriesReader::GdcmSortFunction);
     sorter.Sort(filenames);
 
-    gdcm::Tag acq_time(0x0008,0x0032);
+    gdcm::Tag tag(0x0020,0x1041); //Slice location
     gdcm::Scanner scanner;
 
-    scanner.AddTag(acq_time);
+    scanner.AddTag(tag);
     scanner.Scan(sorter.GetFilenames());
 
     std::list<StringContainer> decomposed_filenames;
     const StringContainer::const_iterator f_end = sorter.GetFilenames().end();
-    const char *act_value = scanner.GetValue(sorter.GetFilenames().front().c_str(), acq_time);
+    const char *act_value = scanner.GetValue(sorter.GetFilenames().front().c_str(), tag);
     unsigned int volume_count = 1u;
 
     decomposed_filenames.push_back(StringContainer());
@@ -68,9 +68,9 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
 
     for (StringContainer::const_iterator f_it = ++sorter.GetFilenames().begin(); f_it != f_end; ++f_it)
     {
-      const char *value = scanner.GetValue(f_it->c_str(), acq_time);
+      const char *value = scanner.GetValue(f_it->c_str(), tag);
 
-      if (strcmp(act_value, value))
+      if (!strcmp(act_value, value))
       {
         act_value = value;
         decomposed_filenames.push_back(StringContainer());

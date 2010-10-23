@@ -123,7 +123,7 @@ To configure MITK do:
   - press <B>Configure</B> twice
   - press <B>Generate</B>
   - start Visual Studio from the called command line \code C:\svn\mitkBinary>%start%  \endcode
-  - build it with e.g. Microsoft Visual Studio (Set MainApp as StartUp Project)
+  - build it with e.g. Microsoft Visual Studio (Set ExtApp as StartUp Project)
   
 \section BIFour MITK specific configuration variables  
 

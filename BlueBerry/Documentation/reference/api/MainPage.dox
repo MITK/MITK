@@ -2,7 +2,7 @@
 
 \mainpage  BlueBerry
 
-\section intro Introduction
+\section bbintro Introduction
 
 BlueBerry is modular, cross-platform, C++ application framwork based on ideas 
 from OSGi and the Eclipse RCP.

@@ -78,7 +78,7 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
     double planeThickness = planarFigurePlaneGeometry->GetExtentInMM( 2 );
     if ( !planarFigurePlaneGeometry->IsParallel( rendererPlaneGeometry )
       || !(planarFigurePlaneGeometry->DistanceFromPlane( 
-           rendererPlaneGeometry ) < planeThickness / 2.0) )
+           rendererPlaneGeometry ) < planeThickness/* / 3.0*/) )
     {
       // Planes are not parallel or renderer plane is not within PlanarFigure
       // geometry bounds --> exit
@@ -161,6 +161,11 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
       if ( m_IsSelected || m_IsHovering )
       {
         openGLrenderer->WriteSimpleText( name,
+          firstPoint[0] + 6.0, firstPoint[1] + 4.0,
+          0,
+          0,
+          0); //this is a shadow 
+        openGLrenderer->WriteSimpleText( name,
           firstPoint[0] + 5.0, firstPoint[1] + 5.0,
           m_LineColor[lineDisplayMode][0],
           m_LineColor[lineDisplayMode][1],
@@ -197,6 +202,12 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
     mitk::VtkPropRenderer* openGLrenderer = dynamic_cast<mitk::VtkPropRenderer*>( renderer );
     if ( openGLrenderer )
     {
+      openGLrenderer->WriteSimpleText( quantityString.str().c_str(), 
+        firstPoint[0] + 6.0, firstPoint[1] + 4.0 + annotationOffset,
+        0,
+        0,
+        0); //this is a shadow 
+
       openGLrenderer->WriteSimpleText( quantityString.str().c_str(),
         firstPoint[0] + 5.0, firstPoint[1] + 5.0 + annotationOffset,
         m_LineColor[lineDisplayMode][0],

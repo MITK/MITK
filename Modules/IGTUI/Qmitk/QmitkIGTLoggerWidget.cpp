@@ -99,7 +99,7 @@ void QmitkIGTLoggerWidget::OnStartRecording()
   }
   if (m_CmpFilename.isEmpty())
   {
-    QMessageBox::warning(NULL, "Warning", QString("Please specify filename without extension!"));
+    QMessageBox::warning(NULL, "Warning", QString("Please specify filename!"));
     return;
   }
 

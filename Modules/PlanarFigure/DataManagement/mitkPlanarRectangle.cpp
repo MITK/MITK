@@ -23,7 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 mitk::PlanarRectangle::PlanarRectangle()
 : FEATURE_ID_CIRCUMFERENCE( this->AddFeature( "Circumference", "mm" ) ),
-  FEATURE_ID_AREA( this->AddFeature( "Area", "mm^2" ) )
+  FEATURE_ID_AREA( this->AddFeature( "Area", "mm2" ) )
 {
   // Rectangle has four control points
   this->ResetNumberOfControlPoints( 4 );

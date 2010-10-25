@@ -25,7 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 mitk::PlanarCircle::PlanarCircle()
 : FEATURE_ID_RADIUS( this->AddFeature( "Radius", "mm" ) ),
   FEATURE_ID_DIAMETER( this->AddFeature( "Diameter", "mm" ) ),
-  FEATURE_ID_AREA( this->AddFeature( "Area", "mm^2" ) )
+  FEATURE_ID_AREA( this->AddFeature( "Area", "mm2" ) )
 {
   // Circle has two control points
   this->ResetNumberOfControlPoints( 2 );

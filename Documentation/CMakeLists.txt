@@ -101,7 +101,9 @@ IF (MITK_USE_BLUEBERRY)
   # convert the extension points schema files into html
   FIND_PACKAGE(Ant)
   IF(ANT_FOUND AND BLUEBERRY_DOC_TOOLS_DIR)
-    FILE(GLOB_RECURSE _plugin_xmls  ${CMAKE_CURRENT_SOURCE_DIR}/../Bundles/plugin.xml)
+    FILE(GLOB_RECURSE _plugin_xmls
+                      ${CMAKE_CURRENT_SOURCE_DIR}/../CoreUI/Bundles/plugin.xml
+                      ${CMAKE_CURRENT_SOURCE_DIR}/../Modules/Bundles/plugin.xml)
     MACRO_CONVERT_SCHEMA(INPUT ${_plugin_xmls} 
                          OUTPUT_DIR "${MITK_DOXYGEN_OUTPUT_DIR}/html/extension-points/html"
                          TARGET_NAME mitkXPDoc

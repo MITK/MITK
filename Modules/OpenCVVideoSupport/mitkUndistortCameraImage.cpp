@@ -36,7 +36,7 @@ mitk::UndistortCameraImage::UndistortCameraImage()
 mitk::UndistortCameraImage::~UndistortCameraImage()
 {
   if(m_tempImage != NULL)
-    cvReleaseImageHeader(&m_tempImage);
+    cvReleaseImage(&m_tempImage);
 }
 
 
@@ -140,6 +140,9 @@ void mitk::UndistortCameraImage::UndistortImage(IplImage *src, IplImage *dst)
 
 void mitk::UndistortCameraImage::UndistortImageFast(IplImage * src, IplImage* dst)
 {
+  if(!src)
+    return;
+
   /*if(dst == NULL)
     dst = src;
 
@@ -171,14 +174,10 @@ void mitk::UndistortCameraImage::UndistortImageFast(IplImage * src, IplImage* ds
 
   if(!dst)
   {
-    if(m_tempImage)
-      cvReleaseImageHeader(&m_tempImage);
-    m_tempImage = cvCreateImage(cvSize(src->width,src->height),src->depth
-                                ,src->nChannels);
-    m_tempImage->origin = src->origin;
-    cvRemap(src, m_tempImage, m_mapX, m_mapY, CV_INTER_CUBIC);
-    cvReleaseImageData(src);
-    src->imageData = m_tempImage->imageData;
+    m_tempImage = cvCloneImage( src );
+    cvRemap(m_tempImage, src, m_mapX, m_mapY, CV_INTER_CUBIC);
+    cvReleaseImage( &m_tempImage );
+    m_tempImage = 0;
     /*memcpy( src->imageData, m_tempImage->imageData, m_tempImage->imageSize );
     cvReleaseImage( &m_tempImage );*/
   }

@@ -132,7 +132,6 @@ void mitk::OpenCVVideoSource::FetchFrame()
       {
         // release old image here
         m_CurrentImage = cvQueryFrame(m_VideoCapture);
-
         ++m_FrameCount;
       }
 
@@ -144,9 +143,17 @@ void mitk::OpenCVVideoSource::FetchFrame()
         {
           MITK_DEBUG << "Restarting video file playback.";
           this->SetVideoCaptureProperty(CV_CAP_PROP_POS_AVI_RATIO, 0);
+          m_FrameCount = 0;
           m_CurrentImage = cvQueryFrame(m_VideoCapture);
         }
       }
+      else
+      {
+        // only undistort if not paused
+        if(m_UndistortImage && m_UndistortCameraImage.IsNotNull())
+          m_UndistortCameraImage->UndistortImageFast(m_CurrentImage, 0);
+      }
+
       if(m_CaptureWidth == 0 || m_CaptureHeight == 0)
       {
         MITK_DEBUG << "Trying to set m_CaptureWidth & m_CaptureHeight.";
@@ -166,10 +173,6 @@ void mitk::OpenCVVideoSource::UpdateVideoTexture()
 
   if(m_CurrentVideoTexture == NULL)
     m_CurrentVideoTexture = new unsigned char[m_CaptureWidth*m_CaptureHeight*3];
-
-  // only undistort if not paused
-  if(m_UndistortImage && !m_CapturePaused)
-    m_UndistortCameraImage->UndistortImageFast(m_CurrentImage, 0);
 
   int width = m_CurrentImage->width;
   int height = m_CurrentImage->height;

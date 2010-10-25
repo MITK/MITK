@@ -2,7 +2,7 @@ OPTION(MITK_USE_OPEN_CV "Use Intel's OpenCV library" OFF)
 
 IF(MITK_USE_OPEN_CV)
 
-MESSAGE( STATUS "Creating Module mitkOpenCVVideoSupport" )
+#MESSAGE( STATUS "Creating Module mitkOpenCVVideoSupport" )
 
   MITK_CREATE_MODULE(mitkOpenCVVideoSupport
     DEPENDS Mitk MitkExt

@@ -1,0 +1,35 @@
+/**
+\page thirdpartylibs Third-party libraries
+
+The following third-party libraries are used in MITK:
+
+\par ANN (A Library for Approximate Nearest Neighbor Searching)
+
+http://www.cs.umd.edu/~mount/ANN/ (Version 1.1)
+
+\par GLEW (The OpenGL Extension Wrangler Library)
+
+http://glew.sourceforge.net/ (Version 1.5.1?)
+
+
+\par POCO (Portable Components, Basic Edition)
+
+http://pocoproject.org (Version 1.3.5)
+
+\par Qwt (Qt Widgets for Technical Applications)
+
+http://qwt.sourceforge.net/ (Version 5.2.0)
+
+\par LibQxt (the Qt eXTension library)
+
+http://www.libqxt.org/ (Version 0.5.1)
+
+\par tinyxml
+
+http://www.grinninglizard.com/tinyxml/index.html (Version 2.5.5)
+
+\par vecmath
+
+http://www.objectclub.jp/download/vecmath_e (Version 1.2-1.4)
+
+*/

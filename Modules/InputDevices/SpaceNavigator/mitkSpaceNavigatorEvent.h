@@ -23,7 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkEvent.h>
 #include <mitkVector.h>
 
-#include <mitkInputDevicesExports.h>
+#include <mitkSpaceNavigatorExports.h>
 
 namespace mitk {
 
@@ -38,7 +38,7 @@ namespace mitk {
   *
   * @ingroup Interaction
   */
-  class mitkInputDevices_EXPORT SpaceNavigatorEvent : public Event
+  class mitkSpaceNavigator_EXPORT SpaceNavigatorEvent : public Event
   {
 
   public:

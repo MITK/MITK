@@ -1,7 +1,7 @@
 #ifndef MITK_WIIMOTECALIBRATIONEVENT_H
 #define MITK_WIIMOTECALIBRATIONEVENT_H
 
-#include "mitkInputDevicesExports.h"
+#include "mitkWiiMoteExports.h"
 
 #include "mitkEvent.h"
 #include "mitkVector.h"
@@ -9,7 +9,7 @@
 
 namespace mitk
 {
-  class mitkInputDevices_EXPORT WiiMoteCalibrationEvent : public Event, itk::EventObject
+  class mitkWiiMote_EXPORT WiiMoteCalibrationEvent : public Event, itk::EventObject
   {
 
   public:

@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkCommon.h>
 
 #include <mitkEventMapperAddOn.h>
-#include <mitkInputDevicesExports.h>
+#include <mitkSpaceNavigatorExports.h>
 
 namespace mitk {
 
@@ -32,7 +32,7 @@ namespace mitk {
   * @brief EventMapper addon for a 3DConnexion Space Navigator
   * @ingroup Interaction
   */
-  class mitkInputDevices_EXPORT SpaceNavigatorAddOn : public EventMapperAddOn
+  class mitkSpaceNavigator_EXPORT SpaceNavigatorAddOn : public EventMapperAddOn
   {
 
   public:

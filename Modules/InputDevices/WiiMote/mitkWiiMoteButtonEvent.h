@@ -5,7 +5,7 @@
 #include "mitkVector.h"
 #include "mitkInteractionConst.h"
 
-#include "mitkInputDevicesExports.h"
+#include "mitkWiiMoteExports.h"
 
 namespace mitk
 {
@@ -13,7 +13,7 @@ namespace mitk
   * This event type is used for button events triggered by the <br>
   * the Wiimote driver. 
   */
-  class mitkInputDevices_EXPORT WiiMoteButtonEvent : public Event, itk::EventObject
+  class mitkWiiMote_EXPORT WiiMoteButtonEvent : public Event, itk::EventObject
   {
 
   public:

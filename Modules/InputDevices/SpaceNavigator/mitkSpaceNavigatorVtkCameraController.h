@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITK_SPACENAVIGATORVTKCAMERACONTROLLER_H_
 
 #include <mitkCameraController.h>
-#include <mitkInputDevicesExports.h>
+#include <mitkSpaceNavigatorExports.h>
 
 
 class vtkRenderWindow;
@@ -33,7 +33,7 @@ namespace mitk {
   * @brief vtk-based camera controller
   * @ingroup NavigationControl
   */
-  class mitkInputDevices_EXPORT SpaceNavigatorVtkCameraController : public CameraController
+  class mitkSpaceNavigator_EXPORT SpaceNavigatorVtkCameraController : public CameraController
   {
 
   public:

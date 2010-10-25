@@ -2,7 +2,7 @@
 #define MITK_WIIMOTEVTKCAMERACONTROLLER_H
 
 #include "mitkCameraController.h"
-#include "mitkInputDevicesExports.h"
+#include "mitkWiiMoteExports.h"
 
 #include "mitkAction.h"
 #include "mitkEvent.h"
@@ -12,7 +12,7 @@
 
 namespace mitk
 {
-  class mitkInputDevices_EXPORT WiiMoteVtkCameraController : public CameraController
+  class mitkWiiMote_EXPORT WiiMoteVtkCameraController : public CameraController
   {
 
   public:

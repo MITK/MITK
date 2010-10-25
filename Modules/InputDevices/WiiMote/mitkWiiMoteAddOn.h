@@ -2,7 +2,7 @@
 #define MITK_WIIMOTEADDON_H_
 
 #include <mitkEventMapperAddon.h>
-#include <mitkInputDevicesExports.h>
+#include <mitkWiiMoteExports.h>
 
 #include "mitkWiiMoteIREvent.h"
 #include "mitkWiiMoteButtonEvent.h"
@@ -22,7 +22,7 @@ namespace mitk {
   * @brief EventMapper addon for a Wiimote
   * @ingroup Interaction
   */
-  class mitkInputDevices_EXPORT WiiMoteAddOn : public EventMapperAddOn
+  class mitkWiiMote_EXPORT WiiMoteAddOn : public EventMapperAddOn
   {
 
   public:

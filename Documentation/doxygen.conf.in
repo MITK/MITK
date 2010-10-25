@@ -621,14 +621,18 @@ RECURSIVE              = YES
 # excluded from the INPUT source files. This way you can easily exclude a
 # subdirectory from a directory tree whose root is specified with the INPUT tag.
 
-EXCLUDE                = @MITK_SOURCE_DIR@/Utilities/ipPic/ \
-                         @MITK_SOURCE_DIR@/Utilities/ipFunc/ \
-                         @MITK_SOURCE_DIR@/Utilities/vecmath/ \
+EXCLUDE                = @MITK_SOURCE_DIR@/Utilities/vecmath/ \
+                         @MITK_SOURCE_DIR@/Utilities/ann/ \
+                         @MITK_SOURCE_DIR@/Utilities/glew/ \
+                         @MITK_SOURCE_DIR@/Utilities/KWStyle/ \
+                         @MITK_SOURCE_DIR@/Utilities/qwt/ \
+                         @MITK_SOURCE_DIR@/Utilities/qxt/ \
+                         @MITK_SOURCE_DIR@/Utilities/tinyxml/ \
+                         @MITK_SOURCE_DIR@/Utilities/Poco/ \
                          @MITK_SOURCE_DIR@/BlueBerry/ \
                          @MITK_SOURCE_DIR@/BlueBerry2/ \
                          @MITK_SOURCE_DIR@/Deprecated/ \
                          @MITK_SOURCE_DIR@/Build/ \
-                         @MITK_SOURCE_DIR@/Utilities/Poco/ \
                          @MITK_SOURCE_DIR@/Core/Testing/ \
                          @MITK_SOURCE_DIR@/CMake/ \
                          @MITK_DOXYGEN_ADDITIONAL_EXCLUDE_DIRS@
@@ -881,7 +885,7 @@ HTML_ALIGN_MEMBERS     = YES
 # JavaScript and DHTML is required (for instance Mozilla 1.0+, Firefox
 # Netscape 6.0+, Internet explorer 5.0+, Konqueror, or Safari).
 
-HTML_DYNAMIC_SECTIONS  = YES
+HTML_DYNAMIC_SECTIONS  = @MITK_DOXYGEN_HTML_DYNAMIC_SECTIONS@
 
 # If the GENERATE_DOCSET tag is set to YES, additional index files
 # will be generated that can be used as input for Apple's Xcode 3
@@ -1059,13 +1063,13 @@ GENERATE_TREEVIEW      = YES
 # By enabling USE_INLINE_TREES, doxygen will generate the Groups, Directories,
 # and Class Hierarchy pages using a tree view instead of an ordered list.
 
-USE_INLINE_TREES       = YES
+USE_INLINE_TREES       = NO
 
 # If the treeview is enabled (see GENERATE_TREEVIEW) then this tag can be
 # used to set the initial width (in pixels) of the frame in which the tree
 # is shown.
 
-TREEVIEW_WIDTH         = 250
+TREEVIEW_WIDTH         = 300
 
 # When the EXT_LINKS_IN_WINDOW option is set to YES doxygen will open
 # links to external symbols imported via tag files in a separate window.
@@ -1611,7 +1615,7 @@ GROUP_GRAPHS           = YES
 # collaboration diagrams in a style similar to the OMG's Unified Modeling
 # Language.
 
-UML_LOOK               = YES
+UML_LOOK               = @MITK_DOXYGEN_UML_LOOK@
 
 # If set to YES, the inheritance and collaboration graphs will show the
 # relations between templates and their instances.

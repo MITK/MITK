@@ -1,5 +1,4 @@
 /*=========================================================================
-
  Program:   BlueBerry Platform
  Language:  C++
  Date:      $Date: 2009-07-08 13:02:46 +0200 (Mi, 08 Jul 2009) $
@@ -12,7 +11,6 @@
  This software is distributed WITHOUT ANY WARRANTY; without even
  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
  PURPOSE.  See the above copyright notices for more information.
-
  =========================================================================*/
 
 #include "QmitkPreferencesDialog.h"
@@ -43,7 +41,7 @@
 using namespace std;
 
 QmitkPreferencesDialog::QmitkPreferencesDialog(QWidget * parent, Qt::WindowFlags f)
-: QDialog(parent, f), m_CurrentPage(0)
+  : QDialog(parent, f), m_CurrentPage(0)
 {
   // m_PreferencesService
   m_PreferencesService = 
@@ -228,8 +226,7 @@ QmitkPreferencesDialog::~QmitkPreferencesDialog()
 
 void QmitkPreferencesDialog::SetSelectedPage(const std::string& id)
 {
-  for(vector<PrefPage>::iterator it = m_PrefPages.begin();
-    it != m_PrefPages.end(); ++it)
+  for(vector<PrefPage>::iterator it = m_PrefPages.begin(); it != m_PrefPages.end(); ++it)
   {
     if(it->id == id)
     {
@@ -251,26 +248,23 @@ void QmitkPreferencesDialog::OnImportButtonClicked( bool  /*triggered*/ )
     berry::IPreferencesService::Pointer prefService = m_PreferencesService.Lock();
     if(prefService.IsNotNull())
     {
-      berry::IBerryPreferencesService::Pointer berryPrefService
-        = prefService.Cast<berry::IBerryPreferencesService>();
+      berry::IBerryPreferencesService::Pointer berryPrefService = prefService.Cast<berry::IBerryPreferencesService>();
       if(berryPrefService != 0)
       {
-        QFileDialog fd(this, "Choose file to import preferences", "", "XML files (*.xml)" );
-        fd.setFileMode(QFileDialog::ExistingFile);
-        QStringList fileNames;
-        if (fd.exec())
-        {
-          fileNames = fd.selectedFiles();
-          if(fileNames.size()>0)
-          {
-            Poco::File f(fileNames.at(0).toStdString());
-            berryPrefService->ImportPreferences(f, "");
-            berry::IQtPreferencePage* prefPage = m_PrefPages[m_CurrentPage].prefPage;
-            if(prefPage)
-              prefPage->Update();
+        static QString importDir = "";
+        QString fileName = QFileDialog::getOpenFileName(this, tr("Choose file to import preferences"),
+                                                        importDir, tr("XML files (*.xml)"));
 
-            MITK_INFO("QmitkPreferencesDialog") << "Preferences successfully imported from " << f.path();
-          }
+        if(!fileName.isEmpty())
+        {
+          importDir = QFileInfo(fileName).absoluteDir().path();
+          Poco::File f(fileName.toLocal8Bit().data());
+          berryPrefService->ImportPreferences(f, "");
+          berry::IQtPreferencePage* prefPage = m_PrefPages[m_CurrentPage].prefPage;
+          if(prefPage)
+            prefPage->Update();
+
+          MITK_INFO("QmitkPreferencesDialog") << "Preferences successfully imported from " << f.path();
         }
       }
     }
@@ -294,22 +288,24 @@ void QmitkPreferencesDialog::OnExportButtonClicked( bool  /*triggered*/ )
     berry::IPreferencesService::Pointer prefService = m_PreferencesService.Lock();
     if(prefService.IsNotNull())
     {
-      berry::IBerryPreferencesService::Pointer berryPrefService
-        = prefService.Cast<berry::IBerryPreferencesService>();
+      berry::IBerryPreferencesService::Pointer berryPrefService = prefService.Cast<berry::IBerryPreferencesService>();
       if(berryPrefService != 0)
       {
-        QFileDialog fd(this, "Choose file to import preferences", "", "XML files (*.xml)" );
-        fd.setFileMode(QFileDialog::AnyFile);
-        QStringList fileNames;
-        if (fd.exec())
+        SavePreferences();
+        static QString exportDir = "";
+        QString fileName = QFileDialog::getSaveFileName(this, tr("Choose file to export preferences"),
+                                                        exportDir, tr("XML files (*.xml)"));
+
+        if(!fileName.isEmpty())
         {
-          fileNames = fd.selectedFiles();
-          if(fileNames.size()>0)
+          if(QFileInfo(fileName).suffix() != ".xml")
           {
-            Poco::File f(fileNames.at(0).toStdString());
-            berryPrefService->ExportPreferences(f, "");
-            MITK_INFO("QmitkPreferencesDialog") << "Preferences successfully exported to " << f.path();
+            fileName += ".xml";
           }
+          exportDir = QFileInfo(fileName).absoluteDir().path();
+          Poco::File f(fileName.toLocal8Bit().data());
+          berryPrefService->ExportPreferences(f, "");
+          MITK_INFO("QmitkPreferencesDialog") << "Preferences successfully exported to " << f.path();
         }
       }
     }
@@ -326,16 +322,16 @@ void QmitkPreferencesDialog::OnExportButtonClicked( bool  /*triggered*/ )
   }
 }
 
-void QmitkPreferencesDialog::OnApplyButtonClicked( bool  /*triggered*/ )
-{  
+void QmitkPreferencesDialog::SavePreferences()
+{
   berry::IQtPreferencePage* prefPage = 0;
 
-  for(vector<PrefPage>::iterator it = m_PrefPages.begin();
-    it != m_PrefPages.end(); ++it, ++m_CurrentPage)
+  for(vector<PrefPage>::iterator it = m_PrefPages.begin(); it != m_PrefPages.end(); ++it)
   {
     prefPage = it->prefPage;
-    if(prefPage)
+    if(prefPage) {
       prefPage->PerformOk();
+    }
   }
 
   /**
@@ -349,7 +345,11 @@ void QmitkPreferencesDialog::OnApplyButtonClicked( bool  /*triggered*/ )
   {
     prefService->GetSystemPreferences()->Flush();
   }
+}
 
+void QmitkPreferencesDialog::OnApplyButtonClicked( bool  /*triggered*/ )
+{  
+  this->SavePreferences();
   this->done(QDialog::Accepted);
 }
 
@@ -402,8 +402,7 @@ void QmitkPreferencesDialog::OnPreferencesTreeItemSelectionChanged()
   {
 
     m_CurrentPage = 0;
-    for(vector<PrefPage>::iterator it = m_PrefPages.begin();
-      it != m_PrefPages.end(); ++it, ++m_CurrentPage)
+    for(vector<PrefPage>::iterator it = m_PrefPages.begin(); it != m_PrefPages.end(); ++it, ++m_CurrentPage)
     {
       if(it->treeWidgetItem == selectedItems.at(0))
       {
@@ -433,7 +432,7 @@ void QmitkPreferencesDialog::UpdateTree()
   map<std::string, QTreeWidgetItem*> items;
 
   for(vector<PrefPage>::iterator it = m_PrefPages.begin();
-    it != m_PrefPages.end(); ++it)
+  it != m_PrefPages.end(); ++it)
   {
     if(it->treeWidgetItem == 0)
     {
@@ -500,16 +499,16 @@ bool QmitkPreferencesDialog::PrefPage::operator<( const PrefPage& other )
 }
 
 QmitkPreferencesDialog::PrefPage::PrefPage( std::string _id, std::string _name, std::string _category
-                                           , std::string _className, std::string _keywords
-                                           , berry::IConfigurationElement::Pointer _confElem )
-: id(_id)
-, name(_name)
-, category(_category)
-, className(_className)
-, keywords(_keywords)
-, prefPage(0)
-, confElem(_confElem)
-, treeWidgetItem(0)
+                                            , std::string _className, std::string _keywords
+                                            , berry::IConfigurationElement::Pointer _confElem )
+                                              : id(_id)
+                                              , name(_name)
+                                              , category(_category)
+                                              , className(_className)
+                                              , keywords(_keywords)
+                                              , prefPage(0)
+                                              , confElem(_confElem)
+                                              , treeWidgetItem(0)
 {
 
 }

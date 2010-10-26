@@ -83,6 +83,11 @@ protected:
   void UpdateTree();
 
   ///
+  /// Saves all preferencepages.
+  ///
+  void SavePreferences();
+
+  ///
   /// The Preferences Service to retrieve and store preferences.
   ///
   berry::IPreferencesService::WeakPtr m_PreferencesService;

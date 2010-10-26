@@ -44,6 +44,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "vtkOpenGLExtensionManager.h"
 #include "vtkgl.h"
 
+#include "vtkOpenGLRenderWindow.h"
+
 
 #define myGL_COMPRESSED_RGB_S3TC_DXT1_EXT                   0x83F0
 #define myGL_COMPRESSED_LUMINANCE_ALPHA_LATC2_EXT           0x8C72
@@ -360,7 +362,8 @@ void vtkMitkOpenGLVolumeTextureMapper3D::Render(vtkRenderer *ren, vtkVolume *vol
   
   if ( !this->Initialized )
     {
-    this->Initialize();
+			//this->Initialize();
+			this->Initialize(ren);
     }
   
   if ( !this->RenderPossible )
@@ -1992,7 +1995,7 @@ void vtkMitkOpenGLVolumeTextureMapper3D::GetLightInformation(
       float lightIntensity = light[lightIndex]->GetIntensity();
       double lightColor[3];
       
-      light[lightIndex]->GetColor( lightColor );
+      light[lightIndex]->GetDiffuseColor( lightColor );
       
       double lightPosition[3];
       double lightFocalPoint[3];
@@ -2121,7 +2124,7 @@ void vtkMitkOpenGLVolumeTextureMapper3D::SetupProgramLocalsForShadingFP(
       float lightIntensity = light[lightIndex]->GetIntensity();
       double lightColor[3];
       
-      light[lightIndex]->GetColor( lightColor );
+      light[lightIndex]->GetDiffuseColor( lightColor );
       
       double lightPosition[3];
       double lightFocalPoint[3];
@@ -2209,14 +2212,15 @@ void vtkMitkOpenGLVolumeTextureMapper3D::SetupProgramLocalsForShadingFP(
 }
 
 int  vtkMitkOpenGLVolumeTextureMapper3D::IsRenderSupported(
-  vtkVolumeProperty *property )
+  vtkVolumeProperty *property , vtkRenderer *r)
 {
   //GPU_INFO << "IsRenderSupported";
 
   if ( !this->Initialized )
     {
-    this->Initialize();
-    }
+    //this->Initialize();
+			this->Initialize(r);
+		}
   
   if ( !this->RenderPossible )
     {
@@ -2237,15 +2241,17 @@ int  vtkMitkOpenGLVolumeTextureMapper3D::IsRenderSupported(
   return 1;
 }
 
-void vtkMitkOpenGLVolumeTextureMapper3D::Initialize()
+void vtkMitkOpenGLVolumeTextureMapper3D::Initialize(vtkRenderer *r)
 {
   //GPU_INFO << "Initialize";
 
   this->Initialized = 1;
-  vtkOpenGLExtensionManager * extensions = vtkOpenGLExtensionManager::New();
-  extensions->SetRenderWindow(NULL); // set render window to the current one.
+ // vtkOpenGLExtensionManager * extensions = vtkOpenGLExtensionManager::New();
+  //extensions->SetRenderWindow(NULL); // set render window to the current one.
+	vtkOpenGLExtensionManager *extensions=static_cast<vtkOpenGLRenderWindow *>(r->GetRenderWindow())->GetExtensionManager();
   
   int supports_texture3D=extensions->ExtensionSupported( "GL_VERSION_1_2" );
+	
   if(supports_texture3D)
     {
     extensions->LoadExtension("GL_VERSION_1_2");
@@ -2376,7 +2382,7 @@ void vtkMitkOpenGLVolumeTextureMapper3D::Initialize()
     extensions->LoadExtension( "GL_NV_register_combiners" );
     }
 
-  extensions->Delete();
+  //extensions->Delete();
   
   
   int canDoFP = 0;
@@ -2438,11 +2444,11 @@ void vtkMitkOpenGLVolumeTextureMapper3D::Initialize()
 void vtkMitkOpenGLVolumeTextureMapper3D::PrintSelf(ostream& os, vtkIndent indent)
 {
  
-  vtkOpenGLExtensionManager * extensions = vtkOpenGLExtensionManager::New();
-  extensions->SetRenderWindow(NULL); // set render window to current render window
+ // vtkOpenGLExtensionManager * extensions = vtkOpenGLExtensionManager::New();
+ // extensions->SetRenderWindow(NULL); // set render window to current render window
   
   os << indent << "Initialized " << this->Initialized << endl;
-  if ( this->Initialized )
+  /* if ( this->Initialized )
     {
     os << indent << "Supports GL_VERSION_1_2:" 
        << extensions->ExtensionSupported( "GL_VERSION_1_2" ) << endl;
@@ -2472,6 +2478,44 @@ void vtkMitkOpenGLVolumeTextureMapper3D::PrintSelf(ostream& os, vtkIndent indent
        << endl;
     }
   extensions->Delete();
+	 */
+	
+	if(this->RenderWindow!=0)
+		    {
+			    vtkOpenGLExtensionManager *extensions=
+			      static_cast<vtkOpenGLRenderWindow *>(this->RenderWindow)->GetExtensionManager();
+			
+			    if ( this->Initialized )
+				      {
+					      os << indent << "Supports GL_VERSION_1_2:"
+					         << extensions->ExtensionSupported( "GL_VERSION_1_2" ) << endl;
+					      os << indent << "Supports GL_EXT_texture3D:"
+					         << extensions->ExtensionSupported( "GL_EXT_texture3D" ) << endl;
+					      os << indent << "Supports GL_VERSION_1_3:"
+					         << extensions->ExtensionSupported( "GL_VERSION_1_3" ) << endl;
+					      os << indent << "Supports GL_ARB_multitexture: "
+					         << extensions->ExtensionSupported( "GL_ARB_multitexture" ) << endl;
+					      os << indent << "Supports GL_NV_texture_shader2: "
+					         << extensions->ExtensionSupported( "GL_NV_texture_shader2" ) << endl;
+					      os << indent << "Supports GL_NV_register_combiners2: "
+					         << extensions->ExtensionSupported( "GL_NV_register_combiners2" )
+					         << endl;
+					      os << indent << "Supports GL_ATI_fragment_shader: "
+					         << extensions->ExtensionSupported( "GL_ATI_fragment_shader" ) << endl;
+					      os << indent << "Supports GL_ARB_fragment_program: "
+					         << extensions->ExtensionSupported( "GL_ARB_fragment_program" )
+					         << endl;
+					      os << indent << "Supports GL_ARB_texture_compression: "
+					         << extensions->ExtensionSupported( "GL_ARB_texture_compression" )
+					         << endl;
+					      os << indent << "Supports GL_VERSION_2_0:"
+					         << extensions->ExtensionSupported( "GL_VERSION_2_0" )
+					         << endl;
+					      os << indent << "Supports GL_ARB_texture_non_power_of_two:"
+					         << extensions->ExtensionSupported( "GL_ARB_texture_non_power_of_two" )
+					         << endl;
+					      }
+			    }
   
   this->Superclass::PrintSelf(os,indent);
 }

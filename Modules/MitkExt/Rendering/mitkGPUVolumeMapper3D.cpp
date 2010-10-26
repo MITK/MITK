@@ -109,7 +109,7 @@ void mitk::GPUVolumeMapper3D::InitGPU(mitk::BaseRenderer* renderer)
   
   ls->m_MapperGPU->SetInput( this->m_UnitSpacingImageFilter->GetOutput() );//m_Resampler->GetOutput());
 
-  ls->m_gpuSupported = ls->m_MapperGPU->IsRenderSupported(ls->m_VolumePropertyGPU);
+  ls->m_gpuSupported = ls->m_MapperGPU->IsRenderSupported(ls->m_VolumePropertyGPU,renderer->GetVtkRenderer());
 
   if(!ls->m_gpuSupported)
     GPU_INFO << "hardware-accelerated rendering is not supported";

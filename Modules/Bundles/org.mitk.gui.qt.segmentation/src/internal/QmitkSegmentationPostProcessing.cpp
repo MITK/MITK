@@ -168,8 +168,8 @@ void QmitkSegmentationPostProcessing::ThresholdImage(bool)
   m_ThresholdingToolManager->RegisterClient();
   m_ThresholdingToolManager->ActiveToolChanged +=
     mitk::MessageDelegate<QmitkSegmentationPostProcessing>( this, &QmitkSegmentationPostProcessing::OnThresholdingToolManagerToolModified );
-
-  m_ThresholdingDialog = new QDialog(NULL);
+  
+  m_ThresholdingDialog = new QDialog(qobject_cast<QWidget *>(parent()));
   connect( m_ThresholdingDialog, SIGNAL(finished(int)), this, SLOT(ThresholdingDone(int)) );
 
   QVBoxLayout* layout = new QVBoxLayout;

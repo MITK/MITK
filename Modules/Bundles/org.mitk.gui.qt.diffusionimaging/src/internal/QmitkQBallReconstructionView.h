@@ -85,7 +85,7 @@ protected slots:
   //void AnalyticallyReconstructNonNegSolidAngle();
   //void AnalyticallyReconstructAdc();
   //void AnalyticallyReconstructRaw();
-  void MultiLambdasClicked();
+  
   void AdvancedCheckboxClicked();
   void MethodChoosen(int method);
   

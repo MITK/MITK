@@ -226,7 +226,6 @@ void QmitkQBallReconstructionView::CreateConnections()
   if ( m_Controls )
   {
     connect( (QObject*)(m_Controls->m_ButtonStandard), SIGNAL(clicked()), this, SLOT(ReconstructStandard()) );
-    connect( (QObject*)(m_Controls->m_QBallReconstructionLambdaMultiCheckbox), SIGNAL(clicked()), this, SLOT(MultiLambdasClicked()) );
     connect( (QObject*)(m_Controls->m_AdvancedCheckbox), SIGNAL(clicked()), this, SLOT(AdvancedCheckboxClicked()) );
     connect( (QObject*)(m_Controls->m_QBallReconstructionMethodComboBox), SIGNAL(currentIndexChanged(int)), this, SLOT(MethodChoosen(int)) );
 
@@ -327,17 +326,6 @@ void QmitkQBallReconstructionView::MethodChoosen(int method)
 }
 
 
-void QmitkQBallReconstructionView::MultiLambdasClicked()
-{
-  bool check = m_Controls->
-    m_QBallReconstructionLambdaMultiCheckbox->isChecked();
-  
-  m_Controls->textLabel1_2->setEnabled(check);
-  m_Controls->m_QBallReconstructionLambdaStepLineEdit->setEnabled(check);
-  m_Controls->textLabel1_3->setEnabled(check);
-  m_Controls->m_QBallReconstructionLambdaMaxLineEdit->setEnabled(check);
-
-}
 
 void QmitkQBallReconstructionView::AdvancedCheckboxClicked()
 {
@@ -348,8 +336,7 @@ void QmitkQBallReconstructionView::AdvancedCheckboxClicked()
   m_Controls->m_QBallReconstructionMaxLLevelComboBox->setVisible(check);
   m_Controls->m_QBallReconstructionLambdaTextLabel_2->setVisible(check);
   m_Controls->m_QBallReconstructionLambdaLineEdit->setVisible(check);
-  m_Controls->m_QBallReconstructionLambdaMultiCheckbox->setVisible(check);
-
+ 
   m_Controls->m_QBallReconstructionThresholdLabel_2->setVisible(check);
   m_Controls->m_QBallReconstructionThreasholdEdit->setVisible(check);
   m_Controls->m_OutputB0Image->setVisible(check);
@@ -357,11 +344,10 @@ void QmitkQBallReconstructionView::AdvancedCheckboxClicked()
   m_Controls->m_QBallReconstructionNumberThreadsSpinbox->setVisible(check);
   m_Controls->label_2->setVisible(check);
 
-  m_Controls->textLabel1_2->setVisible(check);
-  m_Controls->m_QBallReconstructionLambdaStepLineEdit->setVisible(check);
-  m_Controls->textLabel1_3->setVisible(check);
-  m_Controls->m_QBallReconstructionLambdaMaxLineEdit->setVisible(check);
-
+  //m_Controls->textLabel1_2->setVisible(check);
+  //m_Controls->m_QBallReconstructionLambdaStepLineEdit->setVisible(check);
+  //m_Controls->textLabel1_3->setVisible(check);
+  
   m_Controls->frame_2->setVisible(check);
 }
 
@@ -535,21 +521,9 @@ void QmitkQBallReconstructionView::AnalyticalQBallReconstruction(
 
     std::vector<float> lambdas;
     float minLambda  = m_Controls->m_QBallReconstructionLambdaLineEdit->text().toFloat();
-    if(m_Controls->m_QBallReconstructionLambdaMultiCheckbox->isChecked())
-    {
-      float stepLambda = m_Controls->m_QBallReconstructionLambdaStepLineEdit->text().toFloat();
-      float maxLambda  = m_Controls->m_QBallReconstructionLambdaMaxLineEdit->text().toFloat();
-      for(float l=minLambda; l<maxLambda; l+=stepLambda)
-      {
-        lambdas.push_back(l);
-      }
-    }
+    lambdas.push_back(minLambda);
     int nLambdas = lambdas.size();
-    if(nLambdas == 0)
-    {
-      lambdas.push_back(minLambda);
-      nLambdas = 1;
-    }
+   
 
     QString status;
     mitk::ProgressBar::GetInstance()->AddStepsToDo(nrFiles*nLambdas);

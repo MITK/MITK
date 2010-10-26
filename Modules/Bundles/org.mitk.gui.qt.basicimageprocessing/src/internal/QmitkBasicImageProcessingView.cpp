@@ -559,6 +559,8 @@ void QmitkBasicImageProcessing::StartButtonClicked()
   int param1 = m_Controls->sbParam1->value();
   int param2 = m_Controls->sbParam2->value();
 
+  try{
+	
   switch (m_SelectedAction)
   {
 
@@ -787,6 +789,13 @@ void QmitkBasicImageProcessing::StartButtonClicked()
     this->BusyCursorOff();
     return;
   }
+  }
+  catch (...)
+  {
+    this->BusyCursorOff();
+    QMessageBox::warning(NULL, "Warning", "Problem when applying filter operation. Check your input...");
+    return;
+  }
 
   newImage->DisconnectPipeline();
 
@@ -917,6 +926,8 @@ void QmitkBasicImageProcessing::StartButton2Clicked()
 
   std::string nameAddition = "";
 
+  try
+  {
   switch (m_SelectedOperation)
   {
   case ADD:
@@ -999,6 +1010,13 @@ void QmitkBasicImageProcessing::StartButton2Clicked()
   default: 
     std::cout << "Something went wrong..." << std::endl;
     this->BusyCursorOff();
+    return;
+  }
+  }
+  catch (...)
+  {
+    this->BusyCursorOff();
+    QMessageBox::warning(NULL, "Warning", "Problem when applying arithmetic operation to two images. Check dimensions of input images.");
     return;
   }
 

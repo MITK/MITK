@@ -99,6 +99,7 @@ class QmitkMeasurement : public QObject, public QmitkFunctionality
     virtual void NodeRemoved(const mitk::DataNode* node);
     virtual void NodeAddedInDataStorage(const mitk::DataNode* node);
     virtual void PlanarFigureInitialized();
+    virtual void PlanarFigureSelected( itk::Object* object, const itk::EventObject& event );
     virtual void AddFigureToDataStorage(mitk::PlanarFigure* figure, const QString& name,
       const char *propertyKey = NULL, mitk::BaseProperty *property = NULL );
 
@@ -182,7 +183,8 @@ protected:
   unsigned int m_EllipseCounter;
   unsigned int m_RectangleCounter;
   unsigned int m_PolygonCounter;
-  unsigned int m_InitializedObserverTag;
+  unsigned int m_EndPlacementObserverTag;
+  unsigned int m_SelectObserverTag;
   bool m_Visible;
   bool m_CurrentFigureNodeInitialized;
 

@@ -26,6 +26,7 @@
 #include "mitkIDataStorageService.h"
 #include "mitkDataNodeObject.h"
 #include <mitkNodePredicateProperty.h>
+#include <mitkNodePredicateData.h>
 #include <mitkNodePredicateNOT.h>
 #include <mitkNodePredicateAND.h>
 #include <mitkDataNodeSelection.h>
@@ -468,6 +469,7 @@ void QmitkMeasurement::NodeAddedInDataStorage(const mitk::DataNode* node)
   }
 }
 
+
 void QmitkMeasurement::PlanarFigureInitialized()
 {
   if(m_CurrentFigureNode.IsNull())
@@ -485,6 +487,41 @@ void QmitkMeasurement::PlanarFigureInitialized()
   m_DrawRectangle->setChecked(false);
   m_DrawPolygon->setChecked(false);
 }
+
+
+void QmitkMeasurement::PlanarFigureSelected( itk::Object* object, const itk::EventObject& event )
+{
+  // Mark to-be-edited PlanarFigure as selected
+  mitk::PlanarFigure* figure = dynamic_cast< mitk::PlanarFigure* >( object );
+  if ( figure != NULL )
+  {
+    // Get node corresponding to PlanarFigure
+    mitk::DataNode* figureNode = this->GetDefaultDataStorage()->GetNode( 
+      mitk::NodePredicateData::New( figure ) );
+
+    // Select this node (and deselect all others)
+    std::vector< mitk::DataNode* > selectedNodes = this->GetDataManagerSelection();
+    for ( unsigned int i = 0; i < selectedNodes.size(); i++ )
+    {
+      selectedNodes[i]->SetSelected( false );
+    }
+    selectedNodes = m_SelectedPlanarFigures->GetNodes();
+    for ( unsigned int i = 0; i < selectedNodes.size(); i++ )
+    {
+      selectedNodes[i]->SetSelected( false );
+    }
+    figureNode->SetSelected( true );
+
+    m_CurrentFigureNode = figureNode;
+
+    *m_SelectedPlanarFigures = figureNode;
+
+
+    // Re-initialize after selecting new PlanarFigure
+    this->PlanarFigureSelectionChanged();
+  }
+}
+
 
 mitk::DataNode::Pointer QmitkMeasurement::DetectTopMostVisibleImage()
 {
@@ -516,8 +553,10 @@ mitk::DataNode::Pointer QmitkMeasurement::DetectTopMostVisibleImage()
 void QmitkMeasurement::AddFigureToDataStorage(mitk::PlanarFigure* figure, const QString& name,
   const char *propertyKey, mitk::BaseProperty *property )
 {
-  if(m_CurrentFigureNode.IsNotNull())
-    m_CurrentFigureNode->GetData()->RemoveObserver(m_InitializedObserverTag);
+  if ( m_CurrentFigureNode.IsNotNull() )
+  {
+    m_CurrentFigureNode->GetData()->RemoveObserver( m_EndPlacementObserverTag );
+  }
 
   mitk::DataNode::Pointer newNode = mitk::DataNode::New();
   newNode->SetName(name.toStdString());
@@ -529,15 +568,18 @@ void QmitkMeasurement::AddFigureToDataStorage(mitk::PlanarFigure* figure, const 
     newNode->AddProperty( propertyKey, property );
   }
 
-  typedef itk::SimpleMemberCommand< QmitkMeasurement > ITKCommandType;
-  ITKCommandType::Pointer initializationCommand;
-  initializationCommand = ITKCommandType::New();
-
-  // set the callback function of the member command
-  initializationCommand->SetCallbackFunction( this, &QmitkMeasurement::PlanarFigureInitialized );
-
   // add observer for event when figure has been placed
-  m_InitializedObserverTag = figure->AddObserver( mitk::EndPlacementPlanarFigureEvent(), initializationCommand );
+  typedef itk::SimpleMemberCommand< QmitkMeasurement > SimpleCommandType;
+  SimpleCommandType::Pointer initializationCommand = SimpleCommandType::New();
+  initializationCommand->SetCallbackFunction( this, &QmitkMeasurement::PlanarFigureInitialized );
+  m_EndPlacementObserverTag = figure->AddObserver( mitk::EndPlacementPlanarFigureEvent(), initializationCommand );
+
+  // add observer for event when figure is picked (selected)
+  typedef itk::MemberCommand< QmitkMeasurement > MemberCommandType;
+  MemberCommandType::Pointer selectCommand = MemberCommandType::New();
+  selectCommand->SetCallbackFunction( this, &QmitkMeasurement::PlanarFigureSelected );
+  m_SelectObserverTag = figure->AddObserver( mitk::SelectPlanarFigureEvent(), selectCommand );
+
 
   // figure drawn on the topmost layer / image
   this->GetDataStorage()->Add(newNode, this->DetectTopMostVisibleImage() );

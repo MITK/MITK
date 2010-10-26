@@ -41,6 +41,7 @@ class PlanarFigure;
 itkEventMacro( PlanarFigureEvent, itk::AnyEvent );
 itkEventMacro( StartPlacementPlanarFigureEvent, PlanarFigureEvent );
 itkEventMacro( EndPlacementPlanarFigureEvent, PlanarFigureEvent );
+itkEventMacro( SelectPlanarFigureEvent, PlanarFigureEvent );
 itkEventMacro( StartInteractionPlanarFigureEvent, PlanarFigureEvent );
 itkEventMacro( EndInteractionPlanarFigureEvent, PlanarFigureEvent );
 itkEventMacro( StartHoverPlanarFigureEvent, PlanarFigureEvent );
@@ -94,6 +95,31 @@ protected:
     Point2D &point2D,
     const Geometry2D *planarFigureGeometry );
 
+  bool TransformObjectToDisplay( const mitk::Point2D &point2D,
+    mitk::Point2D &displayPoint,
+    const mitk::Geometry2D *objectGeometry,
+    const mitk::Geometry2D *rendererGeometry,
+    const mitk::DisplayGeometry *displayGeometry ) const;
+
+  /** \brief Returns true if the first specified point is in proximity of the line defined
+   * the other two point; false otherwise.
+   *
+   * Proximity is defined as the rectangle around the line with pre-defined distance
+   * from the line. */
+  bool IsPointNearLine( const mitk::Point2D& point,
+    const mitk::Point2D& startPoint, const mitk::Point2D& endPoint ) const;
+
+  /** \brief Returns true if the point contained in the passed event (in display coordinates)
+   * is over the planar figure (with a pre-defined tolerance range); false otherwise. */
+  bool IsPositionOverFigure(
+    const StateEvent *StateEvent, PlanarFigure *planarFigure,
+    const Geometry2D *planarFigureGeometry,
+    const Geometry2D *rendererGeometry,
+    const DisplayGeometry *displayGeometry ) const;
+
+  /** \brief Returns the index of the marker (control point) over which the point contained
+   * in the passed event (in display coordinates) currently is; -1 if the point is not over
+   * a marker. */
   int IsPositionInsideMarker(
     const StateEvent *StateEvent, const PlanarFigure *planarFigure,
     const Geometry2D *planarFigureGeometry,
@@ -107,8 +133,8 @@ private:
   /** \brief to store the value of precision to pick a point */
   ScalarType m_Precision;
 
-  /** \brief Index of the point on which the mouse is currently hovering (-1 if none). */
-  int m_HoverPointIndex;
+  /** \brief True if the mouse is currently hovering over the image. */
+  bool m_IsHovering;
 };
 
 }

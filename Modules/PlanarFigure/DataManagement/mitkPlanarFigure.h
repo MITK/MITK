@@ -35,6 +35,19 @@ class Geometry2D;
  *
  * \warning Currently does not support time-resolved data handling
  *
+ * Behavior and appearance of PlanarFigures are controlled by various properties; for a detailed
+ * list of appearance properties see mitk::PlanarFigureMapper2D
+ *
+ * The following properties control general PlanarFigure behavior:
+ *
+ * <ul>
+ *   <li>"selected": true if the planar figure is selected
+ *   <li>"planarfigure.ishovering": true if the mouse "hovers" over the planar figure
+ *   <li>"planarfigure.iseditable": true if the planar figure can be edited (otherwise,
+ *       it can only be picked/selected, but its control points cannot be edited); default is true
+ * </ul>
+ *
+ *
  * TODO: Implement local 2D transform (including center of rotation...)
  *
  */

@@ -24,7 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "src/QmitkSegmentationPreferencePage.h"
 #include "src/internal/QmitkThresholdAction.h"
 #include "src/internal/QmitkCreatePolygonModelAction.h"
-// #include "src/internal/QmitkStatisticsAction.h"
+#include "src/internal/QmitkStatisticsAction.h"
 #include "src/internal/QmitkAutocropAction.h"
 
 
@@ -38,7 +38,7 @@ POCO_END_MANIFEST
 
 POCO_BEGIN_NAMED_MANIFEST(mitkIContextMenuAction,  mitk::IContextMenuAction)
   POCO_EXPORT_CLASS(QmitkThresholdAction)
-  // POCO_EXPORT_CLASS(QmitkCreatePolygonModelAction)
-  // POCO_EXPORT_CLASS(QmitkStatisticsAction)
+  POCO_EXPORT_CLASS(QmitkCreatePolygonModelAction)
+  POCO_EXPORT_CLASS(QmitkStatisticsAction)
   POCO_EXPORT_CLASS(QmitkAutocropAction)
 POCO_END_MANIFEST

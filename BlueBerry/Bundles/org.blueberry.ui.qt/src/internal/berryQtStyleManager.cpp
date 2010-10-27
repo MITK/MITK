@@ -89,8 +89,10 @@ QtStyleManager::~QtStyleManager()
 
 void QtStyleManager::AddDefaultStyle()
 {
+#ifndef _APPLE_
   AddStyle(":/org.blueberry.ui.qt/defaultstyle.qss", "Default");
   defaultStyle = styles[":/org.blueberry.ui.qt/defaultstyle.qss"];
+#endif
 }
 
 void QtStyleManager::ClearStyles()

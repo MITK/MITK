@@ -230,7 +230,6 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
 
       cmActionDataIt.setValue<int>(i);
       contextMenuAction->setData( cmActionDataIt );
-      int bla = contextMenuAction->data().value<int>();
       connect( contextMenuAction, SIGNAL( triggered(bool) ) , this, SLOT( ContextMenuActionTriggered(bool) ) );
       ++i;
     }

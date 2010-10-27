@@ -6,7 +6,7 @@ SET(INTERNAL_CPP_FILES
   QmitkSegmentationView.cpp
   QmitkSegmentationPostProcessing.cpp
   QmitkThresholdAction.cpp
-  # QmitkCreatePolygonModelAction.cpp
+  QmitkCreatePolygonModelAction.cpp
   # QmitkStatisticsAction.cpp
   QmitkAutocropAction.cpp
 )
@@ -20,7 +20,7 @@ SET(MOC_H_FILES
   src/internal/QmitkSegmentationView.h
   src/internal/QmitkSegmentationPostProcessing.h
   src/internal/QmitkThresholdAction.h
-  # src/internal/QmitkCreatePolygonModelAction.h
+  src/internal/QmitkCreatePolygonModelAction.h
   # src/internal/QmitkStatisticsAction.h
   src/internal/QmitkAutocropAction.h
 )

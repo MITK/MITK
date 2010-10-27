@@ -336,7 +336,7 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
 	{
 		mainWindow->setWindowIcon(QIcon(QString::fromStdString(windowIcon)));
 	}
-
+	
 	/*mainWindow->setStyleSheet("color: white;"
 	"background-color: #808080;"
 	"selection-color: #659EC7;"
@@ -406,7 +406,13 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
 
 	// toolbar for showing file open, undo, redo and other main actions
 	QToolBar* mainActionsToolBar = new QToolBar;
+	
+#ifdef __APPLE__
+	mainActionsToolBar->setToolButtonStyle ( Qt::ToolButtonTextUnderIcon );
+#else
 	mainActionsToolBar->setToolButtonStyle ( Qt::ToolButtonTextBesideIcon );
+#endif
+	
 	mainActionsToolBar->addAction(fileOpenAction);
 	mainActionsToolBar->addAction(fileSaveProjectAction);
 	mainActionsToolBar->addAction(closeProjectAction);
@@ -414,7 +420,11 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
 	mainActionsToolBar->addAction(redoAction);
 	mainActionsToolBar->addAction(imageNavigatorAction);
 	mainWindow->addToolBar(mainActionsToolBar);
-
+  
+#ifdef __APPLE__
+	mainWindow->setUnifiedTitleAndToolBarOnMac(true);
+#endif
+	
 	// ==== Window Menu ==========================
 	QMenu* windowMenu = menuBar->addMenu("Window");
 	windowMenu->addAction("&New Window",
@@ -509,7 +519,9 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
 	}
 	else
 		delete qToolbar;
-	// ====================================================
+	
+ 
+ // ====================================================
 
 	// ===== Help menu ====================================
 	QMenu* helpMenu = menuBar->addMenu("Help");

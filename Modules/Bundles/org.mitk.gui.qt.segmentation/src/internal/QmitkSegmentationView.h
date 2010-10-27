@@ -25,7 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "ui_QmitkSegmentationControls.h"
 
 class QmitkRenderWindow;
-// class QmitkSegmentationPostProcessing;
+class QmitkSegmentationPostProcessing;
 
 /**
  * \ingroup org_mitk_gui_qt_segmentation_internal
@@ -135,7 +135,7 @@ class QmitkSegmentationView : public QObject, public QmitkFunctionality
     // THE currently existing QmitkStdMultiWidget
     QmitkStdMultiWidget * m_MultiWidget;
 
-    // QmitkSegmentationPostProcessing* m_PostProcessing;
+    QmitkSegmentationPostProcessing* m_PostProcessing;
 
     unsigned long m_RenderingManagerObserverTag;
     unsigned long m_SlicesRotationObserverTag1;

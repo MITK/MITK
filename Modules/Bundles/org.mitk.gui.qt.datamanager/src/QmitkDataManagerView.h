@@ -256,6 +256,7 @@ protected:
 private:
   /// Reopen multi widget editor if it has been closed
   void ReinitMultiWidgetEditor();
+
 };
 
 #endif /*QMITKDATAMANAGERVIEW_H_*/

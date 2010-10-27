@@ -190,50 +190,50 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
     , this, SLOT( ReinitSelectedNodes(bool) ) );
   unknownDataNodeDescriptor->AddAction(m_ReinitAction);
 
-  // find contextMenuAction extension points and add them to the node descriptor
-  berry::IExtensionPointService::Pointer extensionPointService = berry::Platform::GetExtensionPointService();
-  berry::IConfigurationElement::vector cmActions(
-    extensionPointService->GetConfigurationElementsFor("org.mitk.gui.qt.datamanager.contextMenuActions") );
-  berry::IConfigurationElement::vector::iterator cmActionsIt;
+  //// find contextMenuAction extension points and add them to the node descriptor
+  //berry::IExtensionPointService::Pointer extensionPointService = berry::Platform::GetExtensionPointService();
+  //berry::IConfigurationElement::vector cmActions(
+  //  extensionPointService->GetConfigurationElementsFor("org.mitk.gui.qt.datamanager.contextMenuActions") );
+  //berry::IConfigurationElement::vector::iterator cmActionsIt;
 
-  std::string cmnodedescriptorname;
-  std::string cmlabel;
-  std::string cmicon;
-  std::string cmclass;
+  //std::string cmnodedescriptorname;
+  //std::string cmlabel;
+  //std::string cmicon;
+  //std::string cmclass;
 
-  qmitknodedescriptor* tmpdescriptor;
-  qaction* contextmenuaction;
-  qvariant cmactiondatait;
-  m_confelements.clear();
+  //QmitkNodeDescriptor* tmpdescriptor;
+  //QAction* contextmenuaction;
+  //QVariant cmactiondatait;
+  //m_confelements.clear();
 
-  int i=1;
-  for (cmactionsit = cmactions.begin()
-   ; cmactionsit != cmactions.end()
-   ; ++cmactionsit)
-  {
-   cmicon.erase();
-   if((*cmactionsit)->getattribute("nodedescriptorname", cmnodedescriptorname)
-     && (*cmactionsit)->getattribute("label", cmlabel)
-     && (*cmactionsit)->getattribute("class", cmclass))
-   {
-     (*cmactionsit)->getattribute("icon", cmicon);
-     // create context menu entry here
-     tmpdescriptor = qmitknodedescriptormanager::getinstance()->getdescriptor(qstring::fromstdstring(cmnodedescriptorname));
-     if(!tmpdescriptor)
-     {
-       mitk_warn << "cannot add action \"" << cmlabel << "\" because descriptor " << cmnodedescriptorname << " does not exist";
-       continue;
-     }
-     contextmenuaction = new qaction( qstring::fromstdstring(cmlabel), parent);
-     tmpdescriptor->addaction(contextmenuaction);
-     m_confelements[contextmenuaction] = *cmactionsit;
+  //int i=1;
+  //for (cmactionsit = cmactions.begin()
+  // ; cmactionsit != cmactions.end()
+  // ; ++cmactionsit)
+  //{
+  // cmicon.erase();
+  // if((*cmactionsit)->getattribute("nodedescriptorname", cmnodedescriptorname)
+  //   && (*cmactionsit)->getattribute("label", cmlabel)
+  //   && (*cmactionsit)->getattribute("class", cmclass))
+  // {
+  //   (*cmactionsit)->getattribute("icon", cmicon);
+  //   // create context menu entry here
+  //   tmpdescriptor = qmitknodedescriptormanager::getinstance()->getdescriptor(qstring::fromstdstring(cmnodedescriptorname));
+  //   if(!tmpdescriptor)
+  //   {
+  //     mitk_warn << "cannot add action \"" << cmlabel << "\" because descriptor " << cmnodedescriptorname << " does not exist";
+  //     continue;
+  //   }
+  //   contextmenuaction = new qaction( qstring::fromstdstring(cmlabel), parent);
+  //   tmpdescriptor->addaction(contextmenuaction);
+  //   m_confelements[contextmenuaction] = *cmactionsit;
 
-     cmactiondatait.setvalue<int>(i);
-     contextmenuaction->setdata( cmactiondatait );
-     connect( contextmenuaction, signal( triggered(bool) ) , this, slot( contextmenuactiontriggered(bool) ) );
-     ++i;
-   }
-  }
+  //   cmactiondatait.setvalue<int>(i);
+  //   contextmenuaction->setdata( cmactiondatait );
+  //   connect( contextmenuaction, signal( triggered(bool) ) , this, slot( contextmenuactiontriggered(bool) ) );
+  //   ++i;
+  // }
+  //}
 
   m_OpacitySlider = new QSlider;
   m_OpacitySlider->setMinimum(0);

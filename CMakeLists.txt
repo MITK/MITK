@@ -276,40 +276,11 @@ IF(WIN32)
     FIND_PACKAGE(Qt4)
     # this is not a godd idea since it adds the QT include directories to everything that is built below this directory
     INCLUDE(${QT_USE_FILE})
-   
+
+    # TODO: use fixup_bundle(...)	
     INSTALL(FILES "${QT_INCLUDE_DIR}/../bin/assistant.exe" DESTINATION bin)
-    
-    IF(QT_PLUGINS_DIR)
-      # install sqllite plugin
-      IF(EXISTS ${QT_PLUGINS_DIR}/sqldrivers/qsqlite4.dll)
-        INSTALL(FILES ${QT_PLUGINS_DIR}/sqldrivers/qsqlite4.dll DESTINATION bin/sqldrivers CONFIGURATIONS Release)
-        INSTALL(FILES ${QT_PLUGINS_DIR}/sqldrivers/qsqlited4.dll DESTINATION bin/sqldrivers CONFIGURATIONS Debug)
-      ENDIF()
-      # install imageformat plugins
-      SET(_img_formats qgif qico qjpeg qsvg qtiff)
-      FOREACH(_img_format ${_img_formats})
-        IF(EXISTS ${QT_PLUGINS_DIR}/imageformats/${_img_format}4.dll)
-          INSTALL(FILES ${QT_PLUGINS_DIR}/imageformats/${_img_format}4.dll DESTINATION bin/imageformats CONFIGURATIONS Release)
-          INSTALL(FILES ${QT_PLUGINS_DIR}/imageformats/${_img_format}d4.dll DESTINATION bin/imageformats CONFIGURATIONS Debug)
-      ENDIF()
-      ENDFOREACH()
-    ENDIF()
-    
   ENDIF(MITK_USE_QT)
  
-  IF(MITK_USE_OPEN_CV)
-  #INCLUDE(MITK_OpenCV_Config)
-    FILE(GLOB opencvdebuglllist "${OpenCV_DIR}/bin/Debug/*.dll")
-    FILE(GLOB opencvreleasedlllist "${OpenCV_DIR}/bin/Release/*.dll")
-  
-    INSTALL(FILES ${opencvdebuglllist} DESTINATION bin CONFIGURATIONS Debug)
-    INSTALL(FILES ${opencvreleasedlllist} DESTINATION bin CONFIGURATIONS Release)
-  ENDIF(MITK_USE_OPEN_CV)
- 
-
-
-  # VTK new
-
  
   #DCMTK Dlls install target (shared libs on gcc only)
   IF(MINGW AND DCMTK_ofstd_LIBRARY)

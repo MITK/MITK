@@ -459,7 +459,19 @@ ENDIF(APPLE)
 
 
 # SET(DIRS ${VTK_RUNTIME_LIBRARY_DIRS} ${ITK_LIBRARY_DIRS} ${QT_LIBRARY_DIR} ${MITK_BINARY_DIR}/bin ${CMAKE_INSTALL_PREFIX}/MacOS )
-SET(DIRS ${VTK_RUNTIME_LIBRARY_DIRS} ${ITK_LIBRARY_DIRS} ${QT_LIBRARY_DIR} ${MITK_BINARY_DIR}/bin ${_install_LIBRARY_DIRS})
+# TODO: how to supply to correct intermediate directory??
+# CMAKE_CFG_INTDIR is not expanded to actual values inside the INSTALL(CODE "...") macro ...
+SET(intermediate_dir )
+IF(WIN32 AND NOT MINGW)
+  SET(intermediate_dir Release)
+ENDIF()
+SET(DIRS 
+  ${VTK_RUNTIME_LIBRARY_DIRS} 
+  ${ITK_LIBRARY_DIRS} 
+  ${QT_LIBRARY_DIR} 
+  ${MITK_BINARY_DIR}/bin/${intermediate_dir} 
+  ${_install_LIBRARY_DIRS}
+  )
 
 FOREACH(_target ${_install_EXECUTABLES})
 
@@ -469,13 +481,25 @@ IF(APPLE AND _is_bundle)
   SET(plugin_dest_dir ${_target}.app/Contents/MacOS)
   SET(qtconf_dest_dir ${_target}.app/Contents/Resources)
 ELSE()
-  SET(_target_location \${CMAKE_INSTALL_PREFIX}/bin/${_target})
+  SET(_target_location \${CMAKE_INSTALL_PREFIX}/bin/${_target}${CMAKE_EXECUTABLE_SUFFIX})
   SET(plugin_dest_dir bin)
   SET(qtconf_dest_dir bin)
 ENDIF()
 
 IF(QT_PLUGINS_DIR)
-  INSTALL(DIRECTORY "${QT_PLUGINS_DIR}" DESTINATION ${plugin_dest_dir} COMPONENT Runtime)
+  INSTALL(DIRECTORY "${QT_PLUGINS_DIR}" 
+          DESTINATION ${plugin_dest_dir} 
+		  CONFIGURATIONS Release
+		  COMPONENT Runtime
+		  FILES_MATCHING REGEX "[^d]4\\.dll$"
+		  )
+		  
+  INSTALL(DIRECTORY "${QT_PLUGINS_DIR}" 
+          DESTINATION ${plugin_dest_dir} 
+		  CONFIGURATIONS Debug
+		  COMPONENT Runtime
+		  FILES_MATCHING PATTERN "*d4.dll"
+		  )
 
   #--------------------------------------------------------------------------------
   # install a qt.conf file

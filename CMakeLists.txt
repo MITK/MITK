@@ -64,14 +64,17 @@ ADD_SUBDIRECTORY(Utilities)
 
 OPTION(MITK_USE_BLUEBERRY "Build the BlueBerry platform" ON)
 IF(MITK_USE_BLUEBERRY)
-
-  IF(MITK_BUILD_org.mitk.gui.qt.extapplication)
-    SET(MACOSX_BUNDLE_NAMES ${MACOSX_BUNDLE_NAMES} ExtApp)
-  ENDIF()
-  IF(MITK_BUILD_org.mitk.gui.qt.application)
-    SET(MACOSX_BUNDLE_NAMES ${MACOSX_BUNDLE_NAMES} CoreApp)
-  ENDIF()
-
+ 
+  # on Mac OSX all BlueBerry plugins get copied into every
+  # application bundle (.app directory) specified here
+  IF(APPLE)
+    IF(MITK_BUILD_org.mitk.gui.qt.extapplication)
+      SET(MACOSX_BUNDLE_NAMES ${MACOSX_BUNDLE_NAMES} ExtApp)
+    ENDIF()
+    IF(MITK_BUILD_org.mitk.gui.qt.application)
+      SET(MACOSX_BUNDLE_NAMES ${MACOSX_BUNDLE_NAMES} CoreApp)
+    ENDIF()
+  ENDIF(APPLE)
 
   SET(mbilog_DIR "${mbilog_BINARY_DIR}")
   ADD_SUBDIRECTORY(BlueBerry)

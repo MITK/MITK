@@ -571,7 +571,7 @@ INSTALL(CODE "
  
     file(GLOB_RECURSE PLUGINS
       # glob for all blueberry bundles of this application
-      \"\${CMAKE_INSTALL_PREFIX}/${plugin_dest_dir}/${CMAKE_SHARED_LIBRARY_PREFIX}org*${CMAKE_SHARED_LIBRARY_SUFFIX}\"
+      \"\${CMAKE_INSTALL_PREFIX}/${plugin_dest_dir}/liborg*${CMAKE_SHARED_LIBRARY_SUFFIX}\"
       # glob for Qt plugins
       \"\${CMAKE_INSTALL_PREFIX}/${plugin_dest_dir}/plugins/*${CMAKE_SHARED_LIBRARY_SUFFIX}\")    
     #file(GLOB_RECURSE PLUGINS

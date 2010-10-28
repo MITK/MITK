@@ -58,7 +58,7 @@ MACRO(MACRO_INSTALL_PLUGIN _plugin_dir)
   INSTALL(TARGETS ${_INSTALL_TARGETS}
           RUNTIME DESTINATION ${_plugin_install_dir}/bin
           LIBRARY DESTINATION ${_plugin_install_dir}/bin
-          ARCHIVE DESTINATION ${_plugin_install_dir}/bin
+          #ARCHIVE DESTINATION ${_plugin_install_dir}/bin
      )
   # ENDIF(FALSE)
 

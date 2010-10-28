@@ -437,7 +437,7 @@ MACRO(MITK_INSTALL_TARGETS)
      RUNTIME DESTINATION bin
    )
   ELSE()
-   INSTALL(TARGETS ${_install_TARGETS} ${_install_EXECUTABLES}
+   INSTALL(TARGETS ${_install_TARGETS} ${_install_EXECUTABLES} CONFIGURATIONS Release
      BUNDLE DESTINATION .
      RUNTIME DESTINATION bin
      # LIBRARY DESTINATION lib/mitk/
@@ -466,8 +466,8 @@ IF(WIN32 AND NOT MINGW)
   SET(intermediate_dir Release)
 ENDIF()
 SET(DIRS 
-  ${VTK_RUNTIME_LIBRARY_DIRS} 
-  ${ITK_LIBRARY_DIRS} 
+  ${VTK_RUNTIME_LIBRARY_DIRS}/${intermediate_dir}
+  ${ITK_LIBRARY_DIRS}/${intermediate_dir}
   ${QT_LIBRARY_DIR} 
   ${MITK_BINARY_DIR}/bin/${intermediate_dir} 
   ${_install_LIBRARY_DIRS}
@@ -490,14 +490,14 @@ IF(QT_PLUGINS_DIR)
   INSTALL(DIRECTORY "${QT_PLUGINS_DIR}" 
           DESTINATION ${plugin_dest_dir} 
 		  CONFIGURATIONS Release
-		  COMPONENT Runtime
+		  
 		  FILES_MATCHING REGEX "[^d]4\\.dll$"
 		  )
 		  
   INSTALL(DIRECTORY "${QT_PLUGINS_DIR}" 
           DESTINATION ${plugin_dest_dir} 
 		  CONFIGURATIONS Debug
-		  COMPONENT Runtime
+		  
 		  FILES_MATCHING PATTERN "*d4.dll"
 		  )
 
@@ -506,7 +506,7 @@ IF(QT_PLUGINS_DIR)
   # this inserts some cmake code into the install script to write the file
   INSTALL(CODE "
       file(WRITE \"\${CMAKE_INSTALL_PREFIX}/${qtconf_dest_dir}/qt.conf\" \"\")
-      " COMPONENT Runtime)
+      ")
 
 
 
@@ -589,7 +589,7 @@ INSTALL(CODE "
     SET(CMAKE_MODULE_PATH ${MITK_SOURCE_DIR}/CMake ${CMAKE_MODULE_PATH} )
     include(BundleUtilities)
     fixup_bundle(\"${_target_location}\" \"\${PLUGINS}\" \"\${PLUGIN_DIRS}\")
-    " COMPONENT Runtime)
+    ")
 
 ELSE(_install_GLOB_PLUGINS)
 
@@ -598,7 +598,7 @@ INSTALL(CODE "
     SET(CMAKE_MODULE_PATH ${MITK_SOURCE_DIR}/CMake ${CMAKE_MODULE_PATH} )
     include(BundleUtilities)
     fixup_bundle(\"${_target_location}\" \"${_install_PLUGINS}\" \"${DIRS}\")
-    " COMPONENT Runtime)
+    ")
 
 ENDIF(_install_GLOB_PLUGINS)
 

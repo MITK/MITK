@@ -529,10 +529,19 @@ INSTALL(CODE "
     ENDMACRO(gp_item_default_embedded_path_override)
 
     MACRO(gp_resolved_file_type_override file type)
-      GET_FILENAME_COMPONENT(_file_name \"\${file}\" NAME)
-      GET_FILENAME_COMPONENT(_file_path \"\${file}\" PATH)
-      IF(_file_name MATCHES \"^liborg\")
-        # SET(\${type} \"system\")
+      IF(NOT APPLE)
+        GET_FILENAME_COMPONENT(_file_path \"\${file}\" PATH)
+        GET_FILENAME_COMPONENT(_file_name \"\${file}\" NAME)
+        IF(_file_path MATCHES \"^\${CMAKE_INSTALL_PREFIX}\")
+          SET(\${type} \"local\")
+          # On linux, rpaths are removed from the plugins
+          # if installing more than on application. This override
+          # should prevent this.
+          IF(_file_name MATCHES \"^liborg\")
+            SET(\${type} \"system\")
+          ENDIF(_file_name MATCHES \"^liborg\")       
+
+         ENDIF()
       ENDIF()
     ENDMACRO(gp_resolved_file_type_override)
  

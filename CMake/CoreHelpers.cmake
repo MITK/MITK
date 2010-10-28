@@ -465,17 +465,17 @@ FOREACH(_target ${_install_EXECUTABLES})
 
 GET_TARGET_PROPERTY(_is_bundle ${_target} MACOSX_BUNDLE)
 IF(APPLE AND _is_bundle)
-  SET(_target_location ${CMAKE_INSTALL_PREFIX}/${_target}.app)
+  SET(_target_location \${CMAKE_INSTALL_PREFIX}/${_target}.app)
   SET(plugin_dest_dir ${_target}.app/Contents/MacOS)
   SET(qtconf_dest_dir ${_target}.app/Contents/Resources)
 ELSE()
-  SET(_target_location ${CMAKE_INSTALL_PREFIX}/bin/${_target})
+  SET(_target_location \${CMAKE_INSTALL_PREFIX}/bin/${_target})
   SET(plugin_dest_dir bin)
   SET(qtconf_dest_dir bin)
 ENDIF()
 
 IF(QT_PLUGINS_DIR)
-  INSTALL(DIRECTORY "${QT_PLUGINS_DIR}" DESTINATION ${CMAKE_INSTALL_PREFIX}/${plugin_dest_dir} COMPONENT Runtime)
+  INSTALL(DIRECTORY "${QT_PLUGINS_DIR}" DESTINATION ${plugin_dest_dir} COMPONENT Runtime)
 
   #--------------------------------------------------------------------------------
   # install a qt.conf file

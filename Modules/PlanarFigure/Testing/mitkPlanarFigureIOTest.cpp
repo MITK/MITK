@@ -39,7 +39,8 @@ class PlanarFigureIOTestClass
 public:
 
   typedef std::list< mitk::PlanarFigure::Pointer > PlanarFigureList;
-
+  typedef std::vector< mitk::PlanarFigureWriter::Pointer > PlanarFigureToMemoryWriterList;
+  
   static PlanarFigureList CreatePlanarFigures()
   {
     PlanarFigureList planarFigures;
@@ -348,6 +349,61 @@ public:
     return planarFigures;
   }
 
+
+  
+
+  static PlanarFigureToMemoryWriterList SerializePlanarFiguresToMemoryBuffers( PlanarFigureList &planarFigures )
+  {
+    PlanarFigureToMemoryWriterList pfMemoryWriters;
+    unsigned int i;
+    PlanarFigureList::iterator it;
+
+    bool success = true;
+    for ( it = planarFigures.begin(), i = 0;
+          it != planarFigures.end();
+          ++it, ++i )
+    {
+      mitk::PlanarFigureWriter::Pointer writer = mitk::PlanarFigureWriter::New();
+      writer->SetWriteToMemory( true );
+      writer->SetInput( *it );
+      writer->Update();
+
+      pfMemoryWriters.push_back(writer);
+    
+      if(!writer->GetSuccess())
+        success = false;
+    }
+    
+    MITK_TEST_CONDITION_REQUIRED(success, "Testing if writing to memory buffers was successful");
+
+    return pfMemoryWriters;
+  }
+
+  static PlanarFigureList DeserializePlanarFiguresFromMemoryBuffers( PlanarFigureToMemoryWriterList pfMemoryWriters)
+  {
+    // Store them in the list and return it
+    PlanarFigureList planarFigures;
+    bool success = true;
+    for ( unsigned int i = 0; i < pfMemoryWriters.size(); ++i )
+    {
+      // Read in the planar figures
+      mitk::PlanarFigureReader::Pointer reader = mitk::PlanarFigureReader::New();
+      reader->SetReadFromMemory( true );
+      reader->SetMemoryBuffer(pfMemoryWriters[i]->GetMemoryPointer(), pfMemoryWriters[i]->GetMemorySize());
+      reader->Update();
+      mitk::PlanarFigure* figure = reader->GetOutput( 0 );
+      planarFigures.push_back( figure );
+
+      if(!reader->GetSuccess())
+        success = false;
+    }
+
+    MITK_TEST_CONDITION_REQUIRED(success, "Testing if reading was successful");
+
+    return planarFigures;
+  }
+
+
 private:
   class PropertyMapEntryCompare
   {
@@ -388,16 +444,15 @@ int mitkPlanarFigureIOTest(int /* argc */, char* /*argv*/[])
 
 
   // Write PlanarFigure objects into temp file
-  
   // tmpname
   static unsigned long count = 0;
-	unsigned long n = count++;
+  unsigned long n = count++;
   std::ostringstream name;
   for (int i = 0; i < 6; ++i)
-	{
-		name << char('a' + (n % 26));
-		n /= 26;
-	}
+  {
+    name << char('a' + (n % 26));
+    n /= 26;
+  }
   std::string myname;
   myname.append(name.str());
 
@@ -405,20 +460,39 @@ int mitkPlanarFigureIOTest(int /* argc */, char* /*argv*/[])
 
   PlanarFigureIOTestClass::SerializePlanarFigures( originalPlanarFigures, fileName );
 
+  // Write PlanarFigure objects to memory buffers
+  PlanarFigureIOTestClass::PlanarFigureToMemoryWriterList writersWithMemoryBuffers =
+    PlanarFigureIOTestClass::SerializePlanarFiguresToMemoryBuffers( originalPlanarFigures );
 
   // Read PlanarFigure objects from temp file
   PlanarFigureIOTestClass::PlanarFigureList retrievedPlanarFigures =
   PlanarFigureIOTestClass::DeserializePlanarFigures( fileName );
 
+  // Read PlanarFigure objects from memory buffers
+  PlanarFigureIOTestClass::PlanarFigureList retrievedPlanarFiguresFromMemory =
+    PlanarFigureIOTestClass::DeserializePlanarFiguresFromMemoryBuffers( writersWithMemoryBuffers );
+
+  PlanarFigureIOTestClass::PlanarFigureToMemoryWriterList::iterator it = writersWithMemoryBuffers.begin();
+  while(it != writersWithMemoryBuffers.end())
+  {
+    (*it)->ReleaseMemory();
+    ++it;
+  }
 
   // Test if original and retrieved PlanarFigure objects are the same
   PlanarFigureIOTestClass::VerifyPlanarFigures( originalPlanarFigures, retrievedPlanarFigures );
 
+  // Test if original and memory retrieved PlanarFigure objects are the same
+  PlanarFigureIOTestClass::VerifyPlanarFigures( originalPlanarFigures, retrievedPlanarFiguresFromMemory );
+  
   //empty the originalPlanarFigures
   originalPlanarFigures.empty();
   
   // Test if deep-copied and retrieved PlanarFigure objects are the same
   PlanarFigureIOTestClass::VerifyPlanarFigures( copiedPlanarFigures, retrievedPlanarFigures );
+
+
+
 
 
   MITK_TEST_END()

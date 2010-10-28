@@ -28,6 +28,8 @@ mitk::PlanarFigureWriter::PlanarFigureWriter()
   this->SetNumberOfRequiredInputs( 1 );
   this->SetNumberOfOutputs( 0 );
   //this->SetNthOutput( 0, mitk::PlanarFigure::New().GetPointer() );
+
+  m_CanWriteToMemory = true;
 }
 
 
@@ -39,7 +41,7 @@ void mitk::PlanarFigureWriter::GenerateData()
 {
   m_Success = false;
 
-  if (m_FileName.empty())
+  if (!m_WriteToMemory && m_FileName.empty())
   {
     MITK_ERROR << "Could not write planar figures. File name is invalid";
     throw std::invalid_argument("file name is empty");
@@ -172,12 +174,36 @@ void mitk::PlanarFigureWriter::GenerateData()
     }
   }
 
-  if (document.SaveFile( m_FileName) == false)
+  
+  if(m_WriteToMemory)
   {
-    MITK_ERROR << "Could not write planar figures to " << m_FileName << "\nTinyXML reports '" << document.ErrorDesc() << "'";
-    throw std::ios_base::failure("Error during writing of planar figure xml file.");
+    // Declare a printer
+    TiXmlPrinter printer;
+    // attach it to the document you want to convert in to a std::string
+    document.Accept(&printer);
+
+    // Create memory buffer and print tinyxmldocument there...
+    m_MemoryBufferSize  = printer.Size();
+    m_MemoryBuffer      = new char[m_MemoryBufferSize];
+    memcpy(m_MemoryBuffer,printer.CStr(),m_MemoryBufferSize);
+  }
+  else
+  {  
+    if (document.SaveFile( m_FileName) == false)
+    {
+      MITK_ERROR << "Could not write planar figures to " << m_FileName << "\nTinyXML reports '" << document.ErrorDesc() << "'";
+      throw std::ios_base::failure("Error during writing of planar figure xml file.");
+    }
   }
   m_Success = true;
+}
+
+void mitk::PlanarFigureWriter::ReleaseMemory()
+{
+  if(m_MemoryBuffer != NULL)
+  {
+    delete [] m_MemoryBuffer;
+  }
 }
 
 

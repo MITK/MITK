@@ -40,6 +40,8 @@ m_FileName(""), m_FilePrefix(""), m_FilePattern(""), m_Success(false)
   this->SetNumberOfRequiredOutputs(1);
   this->SetNumberOfOutputs(1);
   this->SetNthOutput(0, this->MakeOutput(0));
+
+  m_CanReadFromMemory = true;
   
 
   //this->Modified();
@@ -63,24 +65,51 @@ void mitk::PlanarFigureReader::GenerateData()
   m_Success = false;
   this->SetNumberOfOutputs(0); // reset all outputs, we add new ones depending on the file content
 
-  if (m_FileName.empty())
+  TiXmlDocument document;
+  
+  if(m_ReadFromMemory)
   {
-    itkWarningMacro( << "Sorry, filename has not been set!" );
-    return;
-  }
-  if (this->CanReadFile( m_FileName.c_str()) == false)
-  {
-    itkWarningMacro( << "Sorry, can't read file " << m_FileName << "!" );
-    return;
-  }
+    if(m_MemoryBuffer == NULL)
+    {
+      //check
+      itkWarningMacro( << "Sorry, memory buffer has not been set!" );
+      return;
+    }
+    if(m_MemoryBuffer[ m_MemorySize - 1 ]  == '\0')
+    {
+      document.Parse(m_MemoryBuffer);
+    }
+    else
+    {
+      char * tmpArray = new char[(int)m_MemorySize+1];
+      tmpArray[m_MemorySize] = '\0';
+      memcpy(tmpArray,m_MemoryBuffer,m_MemorySize);
 
-  TiXmlDocument document( m_FileName);
-  if (!document.LoadFile())
-  {
-    MITK_ERROR << "Could not open/read/parse " << m_FileName << ". TinyXML reports: '" << document.ErrorDesc() << "'. "
-              << "The error occurred in row " << document.ErrorRow() << ", column " << document.ErrorCol() << ".";
-    return;
+      document.Parse(m_MemoryBuffer);
+
+      delete [] tmpArray;
+    }
   }
+  else
+  {
+    if (m_FileName.empty())
+    {
+      itkWarningMacro( << "Sorry, filename has not been set!" );
+      return;
+    }
+    if (this->CanReadFile( m_FileName.c_str()) == false)
+    {
+      itkWarningMacro( << "Sorry, can't read file " << m_FileName << "!" );
+      return;
+    }
+    if (!document.LoadFile(m_FileName))
+    {
+      MITK_ERROR << "Could not open/read/parse " << m_FileName << ". TinyXML reports: '" << document.ErrorDesc() << "'. "
+              << "The error occurred in row " << document.ErrorRow() << ", column " << document.ErrorCol() << ".";
+      return;
+    }
+  }
+  
   int fileVersion = 1;
   TiXmlElement* versionObject = document.FirstChildElement("Version");
   if (versionObject != NULL)

@@ -62,7 +62,9 @@ bool mitk::FileWriter::IsExtensionValid(std::string extension)
 }
 
 
-mitk::FileWriter::FileWriter()
+mitk::FileWriter::FileWriter() :
+m_CanWriteToMemory(false),
+m_WriteToMemory(false)
 {
 }
 
@@ -70,3 +72,27 @@ mitk::FileWriter::~FileWriter()
 {
 }
 
+bool mitk::FileWriter::CanWriteToMemory(  )
+{
+  return  m_CanWriteToMemory;
+}
+void mitk::FileWriter::SetWriteToMemory( bool write )
+{
+  m_WriteToMemory = write;
+}
+bool mitk::FileWriter::GetWriteToMemory(  )
+{
+  return  m_WriteToMemory;
+}
+const char*  mitk::FileWriter::GetMemoryPointer()
+{
+  return (const char*) m_MemoryBuffer;
+}
+unsigned int mitk::FileWriter::GetMemorySize()
+{
+  return  m_MemoryBufferSize;
+}
+void mitk::FileWriter::ReleaseMemory()
+{
+  // do nothing here
+}

@@ -106,12 +106,40 @@ class MITK_CORE_EXPORT FileWriter : public itk::ProcessObject
 
     virtual void Write() = 0;
 
+    /**
+    @brief Specifies, whether the file writer also can 
+    write a file to a memory buffer */
+    virtual bool CanWriteToMemory(  );
+     
+    /**
+    @brief Set/Get functions to advise the file writer to
+    use tis internal memory array as file writing destination*/
+    virtual void SetWriteToMemory( bool write );
+    virtual bool GetWriteToMemory(  );
+
+    /**
+    @brief To be used along with a call of SetWriteToMemory(true). This returns 
+    the memory buffer where the file was written.*/
+    virtual const char*  GetMemoryPointer();
+    
+    /**
+    @brief To be used along with a call of SetWriteToMemory(true). This returns 
+    the size of the  memory buffer where the file was written.*/
+    virtual unsigned int GetMemorySize(); 
+    
+    /**
+    @brief CAUTION: It's up to the user to call this function to release the 
+    memory buffer after use in case the file writer has written to its memory array.*/
+    virtual void         ReleaseMemory();
+
 protected:
+  FileWriter();
+  virtual ~FileWriter();
 
-    FileWriter();
-
-    virtual ~FileWriter();
-
+  bool   m_CanWriteToMemory;
+  bool   m_WriteToMemory;
+  char *          m_MemoryBuffer;
+  unsigned int    m_MemoryBufferSize;
 };
 
 #define mitkWriterMacro                                                       \

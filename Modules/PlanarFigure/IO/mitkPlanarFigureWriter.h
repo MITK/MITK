@@ -135,6 +135,12 @@ namespace mitk
     */
     itkGetConstMacro(Success, bool);
 
+    /**
+    @brief CAUTION: It's up to the user to call this function to release the 
+    memory buffer after use in case the file writer has written to its memory array.
+    See mitkFileWriter base class. */
+    virtual void         ReleaseMemory();
+
   protected:
 
     /**

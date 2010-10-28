@@ -8,7 +8,7 @@ INCLUDE_DIRECTORIES(
 )
 LINK_DIRECTORIES(${Poco_LIBRARY_DIRS})
   
-ADD_EXECUTABLE(CoreApp CoreApp.cpp)
+ADD_EXECUTABLE(CoreApp MACOSX_BUNDLE WIN32 CoreApp.cpp)
 
 TARGET_LINK_LIBRARIES(CoreApp 
                       optimized PocoFoundation      debug PocoFoundationd 
@@ -42,5 +42,5 @@ IF(WIN32)
                ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/startCoreApp_${COREAPP_BUILD_TYPE}.bat @ONLY)
 ENDIF(WIN32)
 
-MITK_INSTALL_TARGETS(CoreApp)
+MITK_INSTALL_TARGETS(EXECUTABLES CoreApp GLOB_PLUGINS )
 

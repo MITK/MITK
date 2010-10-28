@@ -32,4 +32,4 @@ ADD_LIBRARY(mbilog ${MBILOG_HEADERS} ${MBILOG_SOURCES})
 # configuring happens through ../CMakeList.txt and mbilogConfig.cmake.in
 
 # cpack installer
-MITK_INSTALL_TARGETS(mbilog)
+# deprecated: MITK_INSTALL_TARGETS(mbilog)

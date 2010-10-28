@@ -5,10 +5,10 @@ if(COMMAND cmake_policy)
   cmake_policy(SET CMP0003 OLD)
 endif(COMMAND cmake_policy)
 
-SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib" "${CMAKE_INSTALL_PREFIX}/lib/mitk")
-SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH FALSE)
+SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/bin") 
+#SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
-SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/CMake)
+SET(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/CMake ${CMAKE_MODULE_PATH} )
 SET(MITK_MODULES_CONF_DIR ${MITK_BINARY_DIR}/modulesConf CACHE INTERNAL "Modules Conf")
 
 # Clear the cache variables containing plugin base directories
@@ -64,6 +64,15 @@ ADD_SUBDIRECTORY(Utilities)
 
 OPTION(MITK_USE_BLUEBERRY "Build the BlueBerry platform" ON)
 IF(MITK_USE_BLUEBERRY)
+
+  IF(MITK_BUILD_org.mitk.gui.qt.extapplication)
+    SET(MACOSX_BUNDLE_NAMES ${MACOSX_BUNDLE_NAMES} ExtApp)
+  ENDIF()
+  IF(MITK_BUILD_org.mitk.gui.qt.application)
+    SET(MACOSX_BUNDLE_NAMES ${MACOSX_BUNDLE_NAMES} CoreApp)
+  ENDIF()
+
+
   SET(mbilog_DIR "${mbilog_BINARY_DIR}")
   ADD_SUBDIRECTORY(BlueBerry)
   SET(BlueBerry_DIR ${CMAKE_CURRENT_BINARY_DIR}/BlueBerry CACHE PATH "The directory containing a CMake configuration file for BlueBerry" FORCE)
@@ -249,47 +258,132 @@ INSTALL(FILES ${PROJECT_SOURCE_DIR}/Config/mitkRigidRegistrationPresets.xml DEST
 INSTALL(FILES ${PROJECT_SOURCE_DIR}/Config/mitkRigidRegistrationTestPresets.xml DESTINATION bin)
 
 IF(WIN32)
+SET(MITK_INSTALLED_VERSION_LIB bin)
+SET(MITK_INSTALLED_VERSION_ARCHIVES bin)
+SET(MITK_INSTALLED_VERSION_BIN bin)
+ELSE()
+SET(MITK_INSTALLED_VERSION_LIB lib/mitk)
+SET(MITK_INSTALLED_VERSION_ARCHIVES lib/mitk/static)
+SET(MITK_INSTALLED_VERSION_BIN bin)
+ENDIF() 
+
+MITK_INSTALL_THIRDPARTY_LIBRARIES( ${VTK_RUNTIME_LIBRARY_DIRS}
+  Cosmo
+  MapReduceMPI
+  mpistubs
+  QVTK
+  VPIC
+  vtkalglib
+  vtkCharts
+  vtkCommon
+  vtkDICOMParser
+  vtkexoIIc
+  vtkexpat
+  vtkFiltering
+  vtkfreetype
+  vtkftgl
+  vtkGenericFiltering
+  vtkGeovis
+  vtkGraphics
+  vtkHybrid
+  vtkImaging
+  vtkInfovis
+  vtkIO
+  vtkjpeg
+  vtklibxml2
+  vtkmetaio
+  vtkNetCDF
+  vtkParallel
+  vtkpng
+  vtkproj4
+  vtkQtChart
+  vtkRendering
+  vtksqlite
+  vtksys
+  vtktiff
+  vtkverdict
+  vtkViews
+  vtkVolumeRendering
+  vtkWidgets
+  vtkzlib   
+)
+MITK_INSTALL_THIRDPARTY_LIBRARIES( ${ITK_LIBRARY_DIRS}
+  ITKAlgorithms
+  ITKBasicFilters
+  ITKCommon
+  ITKDICOMParser
+  ITKEXPAT
+  ITKFEM
+  itkgdcm
+  ITKIOReview
+  ITKIO
+  itkjpeg12
+  itkjpeg16
+  itkjpeg8
+  ITKMetaIO
+  itkNetlibSlatec
+  ITKniftiio
+  ITKNrrdIO
+  ITKNumerics
+  itkopenjpeg
+  itkpng
+  ITKQuadEdgeMesh
+  ITKSpatialObject
+  ITKStatistics
+  itksys
+  itktiff
+  itkv3p_lsqr
+  itkv3p_netlib
+  itkvcl
+  itkvnl_algo
+  itkvnl_inst
+  itkvnl
+  itkzlib
+  ITKznz
+)
+IF(MITK_USE_QT)
+  FIND_PACKAGE(Qt4)
+  INCLUDE(${QT_USE_FILE})
+FOREACH(QTLIB 
+  PHONON
+QT3SUPPORT
+QTASSISTANTCLIENT
+QTASSISTANT
+QTCLUCENE
+QTCORE
+QTDBUS
+QTDESIGNERCOMPONENTS
+QTDESIGNER
+QTGUI
+QTHELP
+QTMOTIF
+QTNETWORK
+QTNSPLUGIN
+QTOPENGL
+QTSCRIPTTOOLS
+QTSCRIPT
+QTSQL
+QTSVG
+QTTEST
+QTUITOOLS
+QTWEBKIT
+QTXMLPATTERNS
+QTXML
+)
+IF(EXISTS ${QT_${QTLIB}_LIBRARY_RELEASE})
+#    THIRD_PARTY_INSTALL_LIBRARY(${QT_${QTLIB}_LIBRARY_RELEASE})
+ENDIF(EXISTS ${QT_${QTLIB}_LIBRARY_RELEASE})
+ENDFOREACH(QTLIB)
+ 
+ENDIF(MITK_USE_QT)
+
+IF(WIN32)
   #QT
   IF(MITK_USE_QT)
-    SET(QT_USE_QTSVG 1)
-    SET(QT_USE_QTOPENGL 1)
-    SET(QT_USE_QTASSISTANT 1)
-    SET(QT_USE_QTSQL 1)
-    #SET(QT_USE_QTASSISTANTCLIENT 1)
-    SET(QT_USE_QTHELP 1)
-    SET(QT_USE_QTWEBKIT 1)
-    IF (QT_PHONON_FOUND)
-      SET(QT_USE_PHONON 1)
-    ENDIF()
-    IF (QT_QTXMLPATTERNS_FOUND)
-    SET(QT_USE_QTXMLPATTERNS 1)
-    ENDIF()
-
+    FIND_PACKAGE(Qt4)
     # this is not a godd idea since it adds the QT include directories to everything that is built below this directory
-      INCLUDE(${QT_USE_FILE})
-      
-      SET(qtdebugdlls)
-      SET(qtreleasedlls)
-      FOREACH(qtlib ${QT_LIBRARIES})
-        GET_FILENAME_COMPONENT(qtdllname ${qtlib} NAME_WE)
-        # strip the leading "lib" from the filename for MINGW installs
-        IF(MINGW)
-          STRING(REPLACE "lib" "" qtdllname ${qtdllname})
-        ENDIF()
-        STRING(REGEX MATCH ".*d4" debugmatch ${qtdllname})
-        IF(debugmatch)
-          LIST(APPEND qtdebugdlls "${QT_INCLUDE_DIR}/../bin/${qtdllname}.dll")
-        ELSE()
-          STRING(REGEX MATCH ".*4" releasematch ${qtdllname})
-          IF(releasematch)
-            LIST(APPEND qtreleasedlls "${QT_INCLUDE_DIR}/../bin/${qtdllname}.dll")
-          ENDIF()
-        ENDIF()
-      ENDFOREACH(qtlib)
-    INSTALL(FILES ${qtdebugdlls} DESTINATION bin CONFIGURATIONS Debug)
-
-    INSTALL(FILES ${qtreleasedlls} DESTINATION bin CONFIGURATIONS Release)
-    
+    INCLUDE(${QT_USE_FILE})
+   
     INSTALL(FILES "${QT_INCLUDE_DIR}/../bin/assistant.exe" DESTINATION bin)
     
     IF(QT_PLUGINS_DIR)
@@ -319,36 +413,11 @@ IF(WIN32)
     INSTALL(FILES ${opencvreleasedlllist} DESTINATION bin CONFIGURATIONS Release)
   ENDIF(MITK_USE_OPEN_CV)
  
+
+
+  # VTK new
+
  
-  #VTK DLLs install target
-  IF(MINGW)
-    FILE(GLOB vtkreleasedlllist ${VTK_RUNTIME_LIBRARY_DIRS}/*.dll)
-    FILE(GLOB vtkdebugdlllist ${VTK_RUNTIME_LIBRARY_DIRS}/*.dll)
-  
-  # VTKs freetype library is buggy when used with gcc, need freetype > 2.3.9
-  IF(VTK_FREETYPE_LIBRARIES)
-    INSTALL(FILES ${VTK_FREETYPE_LIBRARIES} DESTINATION bin)
-  ENDIF()
-  ELSE()
-    FILE(GLOB vtkreleasedlllist ${VTK_RUNTIME_LIBRARY_DIRS}/release/*.dll)
-    FILE(GLOB vtkdebugdlllist ${VTK_RUNTIME_LIBRARY_DIRS}/debug/*.dll)
-  ENDIF()
-  
-  INSTALL(FILES ${vtkdebugdlllist} DESTINATION bin CONFIGURATIONS Debug)
-  INSTALL(FILES ${vtkreleasedlllist} DESTINATION bin CONFIGURATIONS Release) 
-  
-  #ITK DLLs install target
-  IF(MINGW)
-    FILE(GLOB itkdebugdlllist ${ITK_LIBRARY_DIRS}/*.dll)
-    FILE(GLOB itkreleasedlllist ${ITK_LIBRARY_DIRS}/*.dll)
-  ELSE()
-    FILE(GLOB itkdebugdlllist ${ITK_LIBRARY_DIRS}/debug/*.dll)
-    FILE(GLOB itkreleasedlllist ${ITK_LIBRARY_DIRS}/release/*.dll)
-  ENDIF()
-  
-  INSTALL(FILES ${itkdebugdlllist} DESTINATION bin CONFIGURATIONS Debug)
-  INSTALL(FILES ${itkreleasedlllist} DESTINATION bin CONFIGURATIONS Release)
-  
   #DCMTK Dlls install target (shared libs on gcc only)
   IF(MINGW AND DCMTK_ofstd_LIBRARY)
     SET(_dcmtk_libs
@@ -391,34 +460,6 @@ IF(WIN32)
   ENDIF()
 
 ELSE(WIN32)
-  FOREACH(vtklib ${VTK_FOR_MITK_LIBRARIES})
-    IF(EXISTS ${vtklib})
-      # already an absolute path
-      INSTALL(FILES ${vtklib} DESTINATION lib)
-    ENDIF(EXISTS ${vtklib})
-  ENDFOREACH(vtklib)  
-
-  INSTALL(DIRECTORY ${VTK_RUNTIME_LIBRARY_DIRS}/ DESTINATION lib
-          FILES_MATCHING PATTERN "libvtk*.so*" PATTERN "libVTK*.so*"
-  )
-
-  # additional VTK libraries
-  SET(additional_vtklibs libVPIC.so libCosmo.so)
-  FOREACH(vtklib ${additional_vtklibs})
-    IF(EXISTS "${VTK_RUNTIME_LIBRARY_DIRS}/${vtklib}")
-      INSTALL(FILES "${VTK_RUNTIME_LIBRARY_DIRS}/${vtklib}" DESTINATION lib)
-    ENDIF()
-  ENDFOREACH()
-
-  IF(MITK_USE_QT)
-    INSTALL(DIRECTORY ${VTK_RUNTIME_LIBRARY_DIRS}/ DESTINATION lib
-            FILES_MATCHING PATTERN "libQ*.so*")
-  ENDIF()
-
-
-  INSTALL(DIRECTORY ${ITK_LIBRARY_DIRS}/ DESTINATION lib
-          FILES_MATCHING PATTERN "libitk*.so*" PATTERN "libITK*.so*"
-  )
 
   #DCMTK Dlls install target (shared libs on gcc only)
   IF(DCMTK_ofstd_LIBRARY)
@@ -429,12 +470,12 @@ ELSE(WIN32)
         ${DCMTK_ofstd_LIBRARY}
     )
     FOREACH(_dcmtk_lib ${_dcmtk_libs})
-      INSTALL(FILES ${_dcmtk_lib} DESTINATION lib)
+#      INSTALL(FILES ${_dcmtk_lib} DESTINATION lib)
     ENDFOREACH()
   ENDIF()
  
 ENDIF(WIN32)
-   
+ 
 
 # include required mfc libraries
 INCLUDE(InstallRequiredSystemLibraries)

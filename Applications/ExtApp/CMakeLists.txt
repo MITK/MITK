@@ -13,7 +13,7 @@ INCLUDE_DIRECTORIES(
 )
 LINK_DIRECTORIES(${Poco_LIBRARY_DIRS})
   
-ADD_EXECUTABLE(ExtApp ExtApp.cpp)
+ADD_EXECUTABLE(ExtApp MACOSX_BUNDLE WIN32 ExtApp.cpp)
 
 TARGET_LINK_LIBRARIES(ExtApp 
                       optimized PocoFoundation      debug PocoFoundationd 
@@ -40,6 +40,7 @@ SET(_plugin_deps ${BLUEBERRY_ENABLED_PLUGINS} ${MITK_CORE_ENABLED_PLUGINS} ${MIT
 IF(_plugin_deps)
   # Make sure all enabled plug-ins are up to date
   ADD_DEPENDENCIES(ExtApp ${_plugin_deps})
+  # TARGET_LINK_LIBRARIES(ExtApp ${_plugin_deps})
 ENDIF()
 
 SET(BLUEBERRY_PLUGIN_CACHE_DIR "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/plugin_cache")
@@ -56,6 +57,6 @@ IF(WIN32)
                ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/startExtApp_${EXTAPP_BUILD_TYPE}.bat @ONLY)
 ENDIF(WIN32)
 
-MITK_INSTALL_TARGETS(ExtApp)
+MITK_INSTALL_TARGETS(EXECUTABLES ExtApp GLOB_PLUGINS )
 
 

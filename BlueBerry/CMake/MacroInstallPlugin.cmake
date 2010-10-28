@@ -47,10 +47,20 @@ MACRO(MACRO_INSTALL_PLUGIN _plugin_dir)
   SET_TARGET_PROPERTIES(${_INSTALL_TARGETS}
                         PROPERTIES INSTALL_RPATH "${_target_install_rpath}")
 		  
+  IF(FALSE)
+  INSTALL(TARGETS ${_INSTALL_TARGETS}
+          RUNTIME DESTINATION bin
+          LIBRARY DESTINATION bin
+          ARCHIVE DESTINATION bin
+     )
+  ENDIF(FALSE)
+  # IF(FALSE)
   INSTALL(TARGETS ${_INSTALL_TARGETS}
           RUNTIME DESTINATION ${_plugin_install_dir}/bin
           LIBRARY DESTINATION ${_plugin_install_dir}/bin
           ARCHIVE DESTINATION ${_plugin_install_dir}/bin
      )
+  # ENDIF(FALSE)
+
 
 ENDMACRO()

@@ -303,11 +303,11 @@ MACRO(MITK_CREATE_MODULE MODULE_NAME_IN)
 
 
       # install only if shared lib (for now)
-      IF(NOT MODULE_FORCE_STATIC OR MINGW)
+      IF(NOT _STATIC OR MINGW)
         IF(NOT MODULE_HEADERS_ONLY)
-          MITK_INSTALL_TARGETS(${MODULE_PROVIDES})
+         # # deprecated: MITK_INSTALL_TARGETS(${MODULE_PROVIDES})
         ENDIF()
-      ENDIF(NOT MODULE_FORCE_STATIC OR MINGW)
+      ENDIF(NOT _STATIC OR MINGW)
     ENDIF(NOT MODULE_QT_MODULE OR MITK_USE_QT)
   ENDIF(MODULE_IS_ENABLED)
 ENDIF(_MISSING_DEP)
@@ -419,18 +419,161 @@ ENDMACRO(MITK_CHECK_MODULE)
 # Usage: MITK_INSTALL_TARGETS(target1 [target2] ....)
 #
 MACRO(MITK_INSTALL_TARGETS)
+  MACRO_PARSE_ARGUMENTS(_install "TARGETS;EXECUTABLES;PLUGINS;LIBRARY_DIRS" "GLOB_PLUGINS" ${ARGN})
+  LIST(APPEND _install_TARGETS ${_install_DEFAULT_ARGS})
+
   IF(WIN32)
-   INSTALL(TARGETS ${ARGN} 
+  SET(MITK_INSTALLED_VERSION_LIB bin)
+  SET(MITK_INSTALLED_VERSION_ARCHIVES bin)
+  SET(MITK_INSTALLED_VERSION_BIN bin)
+  ELSE()
+  SET(MITK_INSTALLED_VERSION_LIB lib/mitk)
+  SET(MITK_INSTALLED_VERSION_ARCHIVES lib/mitk/static)
+  SET(MITK_INSTALLED_VERSION_BIN bin)
+  ENDIF() 
+
+  IF(WIN32)
+   INSTALL(TARGETS ${_install_TARGETS} ${_install_EXECUTABLES}
      RUNTIME DESTINATION bin
    )
   ELSE()
-   INSTALL(TARGETS ${ARGN} 
+   INSTALL(TARGETS ${_install_TARGETS} ${_install_EXECUTABLES}
+     BUNDLE DESTINATION .
      RUNTIME DESTINATION bin
-     LIBRARY DESTINATION lib/mitk/
-     ARCHIVE DESTINATION lib/mitk/static
+     # LIBRARY DESTINATION lib/mitk/
+     # ARCHIVE DESTINATION lib/mitk/static
    )
   ENDIF()
+
+SET(plugin_dest_dir bin)
+SET(qtconf_dest_dir bin)
+# SET(APPS "\${CMAKE_INSTALL_PREFIX}/bin/QtTest")
+IF(APPLE)
+  SET(plugin_dest_dir QtTest.app/Contents/MacOS)
+  SET(qtconf_dest_dir QtTest.app/Contents/Resources)
+  # SET(APPS "\${CMAKE_INSTALL_PREFIX}/QtTest.app")
+ENDIF(APPLE)
+# IF(WIN32)
+#   SET(APPS "\${CMAKE_INSTALL_PREFIX}/bin/QtTest.exe")
+# ENDIF(WIN32)
+
+
+# SET(DIRS ${VTK_RUNTIME_LIBRARY_DIRS} ${ITK_LIBRARY_DIRS} ${QT_LIBRARY_DIR} ${MITK_BINARY_DIR}/bin ${CMAKE_INSTALL_PREFIX}/MacOS )
+SET(DIRS ${VTK_RUNTIME_LIBRARY_DIRS} ${ITK_LIBRARY_DIRS} ${QT_LIBRARY_DIR} ${MITK_BINARY_DIR}/bin ${_install_LIBRARY_DIRS})
+
+FOREACH(_target ${_install_EXECUTABLES})
+
+GET_TARGET_PROPERTY(_is_bundle ${_target} MACOSX_BUNDLE)
+IF(_is_bundle)
+  SET(_target_location ${CMAKE_INSTALL_PREFIX}/${_target}.app)
+  SET(plugin_dest_dir ${_target}.app/Contents/MacOS)
+  SET(qtconf_dest_dir ${_target}.app/Contents/Resources)
+ELSE(_is_bundle)
+  SET(_target_location ${CMAKE_INSTALL_PREFIX}/bin/${_target})
+  SET(plugin_dest_dir bin)
+  SET(qtconf_dest_dir bin)
+ENDIF(_is_bundle)
+
+IF(QT_PLUGINS_DIR)
+  INSTALL(DIRECTORY "${QT_PLUGINS_DIR}" DESTINATION ${CMAKE_INSTALL_PREFIX}/${plugin_dest_dir} COMPONENT Runtime)
+
+  #--------------------------------------------------------------------------------
+  # install a qt.conf file
+  # this inserts some cmake code into the install script to write the file
+  INSTALL(CODE "
+      file(WRITE \"\${CMAKE_INSTALL_PREFIX}/${qtconf_dest_dir}/qt.conf\" \"\")
+      " COMPONENT Runtime)
+
+
+
+
+ENDIF(QT_PLUGINS_DIR)
+
+
+
+
+IF(_install_GLOB_PLUGINS)
+
+INSTALL(CODE "
+    MACRO(gp_item_default_embedded_path_override item default_embedded_path_var)
+      GET_FILENAME_COMPONENT(_item_name \"\${item}\" NAME)
+      GET_FILENAME_COMPONENT(_item_path \"\${item}\" PATH)
+      IF(_item_name MATCHES \"liborg\")
+         IF(APPLE)
+           SET(full_path \"full_path-NOTFOUND\")
+           MESSAGE(\"override: \${item}\")        
+           FILE (GLOB_RECURSE full_path \${CMAKE_INSTALL_PREFIX}/${plugin_dest_dir}/\${_item_name} )
+           MESSAGE(\"find file: \${full_path}\")        
+           
+           GET_FILENAME_COMPONENT(_item_path \"\${full_path}\" PATH)
+           
+           STRING(REPLACE 
+              \${CMAKE_INSTALL_PREFIX} 
+              @executable_path/../../../ \${default_embedded_path_var} \"\${_item_path}\" ) 
+           MESSAGE(\"override result: \${\${default_embedded_path_var}}\")        
+         ELSE(APPLE)
+              SET(\${default_embedded_path_var} \"\${_item_path}\")
+         ENDIF(APPLE)
+      ENDIF()
+
+      #IF(_item_name MATCHES \"^liborg\")
+      #   IF(APPLE)
+      #     MESSAGE(\"override: \${item}\")        
+      #     STRING(REPLACE 
+      #        ${CMAKE_INSTALL_PREFIX} 
+      #        @loader_path/../ \${default_embedded_path_var} \"\${_item_path}\" ) 
+      #   ELSE(APPLE)
+      #        SET(\${default_embedded_path_var} \"\${_item_path}\")
+      #   ENDIF(APPLE)
+      #ENDIF()
+    ENDMACRO(gp_item_default_embedded_path_override)
+
+    MACRO(gp_resolved_file_type_override file type)
+      GET_FILENAME_COMPONENT(_file_name \"\${file}\" NAME)
+      GET_FILENAME_COMPONENT(_file_path \"\${file}\" PATH)
+      IF(_file_name MATCHES \"^liborg\")
+        # SET(\${type} \"system\")
+      ENDIF()
+    ENDMACRO(gp_resolved_file_type_override)
+ 
+    file(GLOB_RECURSE PLUGINS
+      # glob for all blueberry bundles of this application
+      \"\${CMAKE_INSTALL_PREFIX}/${plugin_dest_dir}/${CMAKE_SHARED_LIBRARY_PREFIX}org*${CMAKE_SHARED_LIBRARY_SUFFIX}\"
+      # glob for Qt plugins
+      \"\${CMAKE_INSTALL_PREFIX}/${plugin_dest_dir}/plugins/*${CMAKE_SHARED_LIBRARY_SUFFIX}\")    
+    #file(GLOB_RECURSE PLUGINS
+     # \"${MITK_BINARY_DIR}/liborg*${CMAKE_SHARED_LIBRARY_SUFFIX}\")    
+    # use custom version of BundleUtilities
+    message(\"globbed plugins: \${PLUGINS}\")
+    SET(PLUGIN_DIRS ${DIRS})
+    LIST(APPEND PLUGINS ${_install_PLUGINS})
+    foreach(_plugin \${PLUGINS})
+      get_filename_component(_pluginpath \${_plugin} PATH)
+      list(APPEND PLUGIN_DIRS \${_pluginpath})
+    endforeach(_plugin)
+    list(APPEND DIRS \${PLUGIN_DIRS})
+    # use custom version of BundleUtilities
+    SET(CMAKE_MODULE_PATH ${MITK_SOURCE_DIR}/CMake ${CMAKE_MODULE_PATH} )
+    include(BundleUtilities)
+    fixup_bundle(\"${_target_location}\" \"\${PLUGINS}\" \"\${PLUGIN_DIRS}\")
+    " COMPONENT Runtime)
+
+ELSE(_install_GLOB_PLUGINS)
+
+INSTALL(CODE "
+    # use custom version of BundleUtilities
+    SET(CMAKE_MODULE_PATH ${MITK_SOURCE_DIR}/CMake ${CMAKE_MODULE_PATH} )
+    include(BundleUtilities)
+    fixup_bundle(\"${_target_location}\" \"${_install_PLUGINS}\" \"${DIRS}\")
+    " COMPONENT Runtime)
+
+ENDIF(_install_GLOB_PLUGINS)
+
+ENDFOREACH(_target)
+
+
 ENDMACRO(MITK_INSTALL_TARGETS)
+
 
 #
 # Create tests and testdriver for this module

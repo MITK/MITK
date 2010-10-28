@@ -30,7 +30,7 @@ ENDIF()
 ADD_LIBRARY(ann ${ANN_HEADERS} ${ANN_SOURCES})
 
 # install only if shared lib (for now)
-MITK_INSTALL_TARGETS(ann)
+# deprecated: MITK_INSTALL_TARGETS(ann)
 
 MITK_CREATE_MODULE_CONF(ann
   INCLUDE_DIRS include

@@ -21,23 +21,3 @@ target_link_libraries( ${LIBNAME} PocoFoundation)
 #	SOVERSION ${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH})
 #target_link_libraries( ${LIBNAMED} PocoFoundationd)
 
-#install(
-#    DIRECTORY include/Poco
-#    DESTINATION include
-#    PATTERN ".svn" EXCLUDE
-#    )
-    
-if (WIN32)
-  install(
-    TARGETS ${LIBNAME} #${LIBNAMED}
-    RUNTIME DESTINATION bin
-#    LIBRARY DESTINATION lib
-#    ARCHIVE DESTINATION lib
-    )
-else ()
-  install(TARGETS ${LIBNAME}
-          RUNTIME DESTINATION bin
-          LIBRARY DESTINATION lib
-          ARCHIVE DESTINATION lib
-  )
-endif ()

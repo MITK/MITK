@@ -14,6 +14,9 @@ INCLUDE_DIRECTORIES(
 LINK_DIRECTORIES(${Poco_LIBRARY_DIRS})
   
 ADD_EXECUTABLE(ExtApp MACOSX_BUNDLE WIN32 ExtApp.cpp)
+IF (WIN32)
+  TARGET_LINK_LIBRARIES(ExtApp ${QT_QTMAIN_LIBRARY})
+ENDIF(WIN32)
 
 TARGET_LINK_LIBRARIES(ExtApp 
                       optimized PocoFoundation      debug PocoFoundationd 

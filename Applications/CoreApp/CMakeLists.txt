@@ -9,6 +9,9 @@ INCLUDE_DIRECTORIES(
 LINK_DIRECTORIES(${Poco_LIBRARY_DIRS})
   
 ADD_EXECUTABLE(CoreApp MACOSX_BUNDLE WIN32 CoreApp.cpp)
+IF (WIN32)
+  TARGET_LINK_LIBRARIES(CoreApp ${QT_QTMAIN_LIBRARY})
+ENDIF(WIN32)
 
 TARGET_LINK_LIBRARIES(CoreApp 
                       optimized PocoFoundation      debug PocoFoundationd 

@@ -93,10 +93,17 @@ m_FullScreenMode(false)
   //this->setWindowOpacity(0.75);
   
   currentCrosshairRotationMode = 0;
+
+  // for autorotating
+  m_AutoRotationTimer.setInterval( 75 );
+  connect( &m_AutoRotationTimer, SIGNAL(timeout()), this, SLOT(AutoRotateNextStep()) );
 }
 
 QmitkRenderWindowMenu::~QmitkRenderWindowMenu()
-{}
+{
+  if( m_AutoRotationTimer.isActive() )
+    m_AutoRotationTimer.stop();
+}
 
 
 
@@ -807,11 +814,24 @@ void QmitkRenderWindowMenu::OnCrossHairMenuAboutToShow()
     swivelMode->setCheckable(true);
     swivelMode->setChecked(currentCrosshairRotationMode==3);
     swivelMode->setData( 3 );
-    crosshairModesMenu->addAction( swivelMode );
+    crosshairModesMenu->addAction( swivelMode );   
 
     connect( rotationModeActionGroup, SIGNAL(triggered(QAction*)), this, SLOT(OnCrosshairRotationModeSelected(QAction*)) ); 
   }
-    
+  
+  // auto rotation support
+  if( m_Renderer.IsNotNull() && m_Renderer->GetMapperID() == mitk::BaseRenderer::Standard3D )
+  {
+    QAction* autoRotationGroupSeparator = new QAction(crosshairModesMenu);
+    autoRotationGroupSeparator->setSeparator(true);
+    crosshairModesMenu->addAction( autoRotationGroupSeparator );
+
+    QAction* autoRotationAction = crosshairModesMenu->addAction( "Auto Rotation" );    
+    autoRotationAction->setCheckable(true);
+    autoRotationAction->setChecked( m_AutoRotationTimer.isActive() );
+    connect( autoRotationAction, SIGNAL(triggered()), this, SLOT(OnAutoRotationActionTriggered()) );
+  }
+
   // Thickslices support
   if( m_Renderer.IsNotNull() && m_Renderer->GetMapperID() == mitk::BaseRenderer::Standard2D )
   {
@@ -865,10 +885,31 @@ void QmitkRenderWindowMenu::OnCrossHairMenuAboutToShow()
     QWidgetAction *m_TSSliderAction = new QWidgetAction(crosshairModesMenu);
     m_TSSliderAction->setDefaultWidget(_TSWidget);
     crosshairModesMenu->addAction(m_TSSliderAction);
-  }  
+  }
 }
 
 void QmitkRenderWindowMenu::NotifyNewWidgetPlanesMode( int mode )
 {
   currentCrosshairRotationMode = mode;
 }
+
+void QmitkRenderWindowMenu::OnAutoRotationActionTriggered()
+{
+  if(m_AutoRotationTimer.isActive())
+  {
+    m_AutoRotationTimer.stop();
+    m_Renderer->GetCameraRotationController()->GetSlice()->PingPongOff();
+  }
+  else
+  {
+    m_Renderer->GetCameraRotationController()->GetSlice()->PingPongOn();
+    m_AutoRotationTimer.start();
+  }
+}
+
+void QmitkRenderWindowMenu::AutoRotateNextStep()
+{
+  if(m_Renderer->GetCameraRotationController())
+    m_Renderer->GetCameraRotationController()->GetSlice()->Next();
+}
+

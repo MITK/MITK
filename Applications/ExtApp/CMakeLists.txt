@@ -16,15 +16,14 @@ LINK_DIRECTORIES(${Poco_LIBRARY_DIRS})
 ADD_EXECUTABLE(ExtApp MACOSX_BUNDLE WIN32 ExtApp.cpp)
 IF (WIN32)
   FIND_PACKAGE(Qt4)
-  TARGET_LINK_LIBRARIES(ExtApp ${QT_QTMAIN_LIBRARY})
+  TARGET_LINK_LIBRARIES(ExtApp ${QT_QTCORE_LIBRARY} ${QT_QTMAIN_LIBRARY})
 ENDIF(WIN32)
 
 TARGET_LINK_LIBRARIES(ExtApp 
                       optimized PocoFoundation      debug PocoFoundationd 
                       optimized PocoUtil            debug PocoUtild 
                       optimized org_blueberry_osgi debug org_blueberry_osgi${BLUEBERRY_DEBUG_POSTFIX}
-                      ${ALL_LIBRARIES}
-                      ${QT_QTMAIN_LIBRARY})
+                      ${ALL_LIBRARIES})
 
 SET_TARGET_PROPERTIES(ExtApp PROPERTIES INSTALL_RPATH "${CMAKE_INSTALL_RPATH};${CMAKE_INSTALL_PREFIX}/bin/BlueBerry/org.blueberry.osgi/bin")
 					  

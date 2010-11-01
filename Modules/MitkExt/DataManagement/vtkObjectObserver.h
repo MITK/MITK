@@ -3,8 +3,9 @@
 
 class vtkObject;
 
-struct vtkObjectObserver
+class vtkObjectObserver
 {
+public:
   virtual void OnModified( const vtkObject* object ) = 0;
   virtual void OnDeleted( const vtkObject* object ) = 0;
 };

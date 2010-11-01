@@ -66,7 +66,12 @@ void QmitkFileChooser::SetFileMustExist( bool fileMustExist )
 
 void QmitkFileChooser::SetFile( const std::string& file )
 {
-  m_File->setText( QString::fromStdString(file) );
+  QFileInfo info( QString::fromStdString(file) );
+  if(info.exists())
+  {
+    m_File->setText( QString::fromStdString(file) );
+    emit NewFileSelected( file );
+  }
 }
 
 void QmitkFileChooser::SetFilePattern( const std::string& filepattern )

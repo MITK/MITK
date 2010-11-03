@@ -73,8 +73,8 @@ private:
   double m_LowerValue;
   double m_UpperValue;
 
-  double m_Maximum;
   double m_Minimum;
+  double m_Maximum;
 
   double offset;
   double factor;

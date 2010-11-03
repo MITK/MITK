@@ -42,6 +42,7 @@ QmitkSegmentationView::QmitkSegmentationView()
 ,m_MultiWidget(NULL)
 // ,m_PostProcessing(NULL)
 ,m_RenderingManagerObserverTag(0)
+,m_TempWorkingDataNode(NULL)
 {
 }
 
@@ -135,6 +136,9 @@ void QmitkSegmentationView::SetMultiWidget(QmitkStdMultiWidget* multiWidget)
 
   // save the current multiwidget as the working widget
   m_MultiWidget = multiWidget;
+
+  //connect, so we get informed when plane mode changes
+  connect(m_MultiWidget, SIGNAL(WidgetPlaneModeChange( int )), this, SLOT(OnPlaneModeChanged( int )) );
 
   if (m_MultiWidget)
   {
@@ -353,6 +357,7 @@ void QmitkSegmentationView::ManualToolSelected(int id)
     if (id >= 0)
     {
       m_MultiWidget->DisableNavigationControllerEventListening();
+      m_MultiWidget->SetWidgetPlaneMode(0);
     }
     else
     {
@@ -516,7 +521,7 @@ void QmitkSegmentationView::OnSelectionChanged(std::vector<mitk::DataNode*> node
   else
     m_Controls->CreateSegmentationFromSurface->setEnabled(true);
 
-
+  m_TempWorkingDataNode = NULL;
   SetToolManagerSelection(referenceData, workingData);
   ForceDisplayPreferencesUponAllImages();
 }
@@ -629,7 +634,7 @@ void QmitkSegmentationView::SetToolManagerSelection(const mitk::DataNode* refere
 
 void QmitkSegmentationView::CheckImageAlignment()
 {
-  bool wrongAlignment(false);
+  bool wrongAlignment(true);
 
   mitk::DataNode::Pointer node = m_Controls->m_ManualToolSelectionBox->GetToolManager()->GetReferenceData(0);
   if (node.IsNotNull())
@@ -644,15 +649,27 @@ void QmitkSegmentationView::CheckImageAlignment()
                           && IsRenderWindowAligned(m_MultiWidget->GetRenderWindow3(), image )
                         );
     }
-  }
 
-  if (wrongAlignment)
-  {
-    m_Controls->lblAlignmentWarning->show();
-  }
-  else
-  {
-    m_Controls->lblAlignmentWarning->hide();
+    if (wrongAlignment)
+    {
+      m_Controls->lblAlignmentWarning->show();
+
+      //temporary fix unless we support segmentation in rotated slices part I
+      if ( m_TempWorkingDataNode.IsNull() )
+        m_TempWorkingDataNode = m_Controls->m_ManualToolSelectionBox->GetToolManager()->GetWorkingData(0);
+      m_Controls->m_ManualToolSelectionBox->GetToolManager()->SetWorkingData(NULL);
+      m_Controls->btnNewSegmentation->setEnabled(false);
+    }
+    else
+    {
+      m_Controls->lblAlignmentWarning->hide();
+
+      //temporary fix unless we support segmentation in rotated slices part II
+      if ( m_TempWorkingDataNode.IsNotNull() )
+        m_Controls->m_ManualToolSelectionBox->GetToolManager()->SetWorkingData( m_TempWorkingDataNode );
+      m_TempWorkingDataNode = NULL;
+      m_Controls->btnNewSegmentation->setEnabled(true);
+    }
   }
 }
 
@@ -812,6 +829,28 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
 
   //// create helper class to provide context menus for segmentations in data manager
   // m_PostProcessing = new QmitkSegmentationPostProcessing(this->GetDefaultDataStorage(), this, m_Parent);
+
+}
+
+void QmitkSegmentationView::OnPlaneModeChanged(int i)
+{
+  //if plane mode changes, disable all tools
+  if (m_MultiWidget)
+  {
+    mitk::ToolManager* toolManager = m_Controls->m_ManualToolSelectionBox->GetToolManager();
+
+    if (toolManager)
+    {
+      if (toolManager->GetActiveToolID() >= 0)
+      {
+        toolManager->ActivateTool(-1);
+      }
+      else
+      {
+        m_MultiWidget->EnableNavigationControllerEventListening();
+      }
+    }
+  }
 }
 
 

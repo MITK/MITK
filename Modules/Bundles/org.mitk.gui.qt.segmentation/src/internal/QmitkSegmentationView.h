@@ -86,6 +86,8 @@ class QmitkSegmentationView : public QObject, public QmitkFunctionality
 
     void OnSurfaceSelectionChanged();
 
+    void OnPlaneModeChanged(int);
+
   protected:
 
     // a type for handling lists of DataNodes
@@ -140,6 +142,9 @@ class QmitkSegmentationView : public QObject, public QmitkFunctionality
     unsigned long m_RenderingManagerObserverTag;
     unsigned long m_SlicesRotationObserverTag1;
     unsigned long m_SlicesRotationObserverTag2;
+
+    //for temporary fix unless we support segmentation in rotated slices
+    mitk::DataNode::Pointer m_TempWorkingDataNode;
 };
 
 #endif /*QMITKsegmentationVIEW_H_*/

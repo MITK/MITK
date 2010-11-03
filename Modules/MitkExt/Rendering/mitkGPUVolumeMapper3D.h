@@ -102,9 +102,9 @@ protected:
   void DeinitRAY(mitk::BaseRenderer* renderer);
   void GenerateDataRAY(mitk::BaseRenderer* renderer);
 
-  void InitVtkMapper(mitk::BaseRenderer* renderer);
-
 #endif
+
+  void InitVtkMapper(mitk::BaseRenderer* renderer);
 
   virtual void GenerateData(mitk::BaseRenderer* renderer);
 

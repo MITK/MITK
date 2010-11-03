@@ -93,7 +93,8 @@ bool mitk::GPUVolumeMapper3D::InitGPU(mitk::BaseRenderer* renderer)
   if(ls->m_gpuInitialized)
     return ls->m_gpuSupported;
   
-//  GPU_INFO << "initializing hardware-accelerated (slicing) renderer";
+  GPU_INFO << "initializing gpu-slicing-vr (vtkMitkOpenGLVolumeTextureMapper3D)";
+  
   ls->m_MapperGPU = vtkMitkOpenGLVolumeTextureMapper3D::New();
   ls->m_MapperGPU->SetUseCompressedTexture(false);
   ls->m_MapperGPU->SetSampleDistance(1.0); 
@@ -114,9 +115,6 @@ bool mitk::GPUVolumeMapper3D::InitGPU(mitk::BaseRenderer* renderer)
   ls->m_MapperGPU->SetInput( this->m_UnitSpacingImageFilter->GetOutput() );
 
   ls->m_gpuSupported = ls->m_MapperGPU->IsRenderSupported(renderer->GetVtkRenderer(),ls->m_VolumePropertyGPU);
-
-  if(!ls->m_gpuSupported)
-    GPU_INFO << "hardware-accelerated (slicing) rendering is not supported";
     
   ls->m_gpuInitialized = true;
   
@@ -130,15 +128,16 @@ void mitk::GPUVolumeMapper3D::InitCPU(mitk::BaseRenderer* renderer)
   if(ls->m_cpuInitialized)
     return;
 
-//  GPU_INFO << "initializing software (raycast) renderer";
+  int numThreads = itk::MultiThreader::GetGlobalDefaultNumberOfThreads();
+
+  GPU_INFO << "initializing cpu-raycast-vr (vtkFixedPointVolumeRayCastMapper) (" << numThreads << " threads)";
+
   ls->m_MapperCPU = vtkFixedPointVolumeRayCastMapper::New();
   ls->m_MapperCPU->SetSampleDistance(1.0); 
 //  ls->m_MapperCPU->LockSampleDistanceToInputSpacingOn(); 
   ls->m_MapperCPU->SetImageSampleDistance(1.0); 
   ls->m_MapperCPU->IntermixIntersectingGeometryOn();
   ls->m_MapperCPU->SetAutoAdjustSampleDistances(0);
-  
-  int numThreads = itk::MultiThreader::GetGlobalDefaultNumberOfThreads();
 
   ls->m_MapperCPU->SetNumberOfThreads( numThreads );
   
@@ -156,8 +155,6 @@ void mitk::GPUVolumeMapper3D::InitCPU(mitk::BaseRenderer* renderer)
   ls->m_VolumeCPU->VisibilityOn();
                     
   ls->m_MapperCPU->SetInput( m_UnitSpacingImageFilter->GetOutput() );//m_Resampler->GetOutput());
-  
-//  GPU_INFO << "software (raycast) renderer uses " << numThreads << " threads";
 
   ls->m_cpuInitialized=true;
 }
@@ -168,7 +165,7 @@ void mitk::GPUVolumeMapper3D::DeinitGPU(mitk::BaseRenderer* renderer)
 
   if(ls->m_gpuInitialized)
   {
-//    GPU_INFO << "deinitializing hardware (slicing) renderer";
+    GPU_INFO << "deinitializing gpu-slicing-vr";
 
     ls->m_VolumeGPU->Delete();
     ls->m_MapperGPU->Delete();
@@ -184,7 +181,8 @@ void mitk::GPUVolumeMapper3D::DeinitCPU(mitk::BaseRenderer* renderer)
   if(!ls->m_cpuInitialized)
     return;
 
-//  GPU_INFO << "deinitializing software (raycast) renderer";
+  GPU_INFO << "deinitializing cpu-raycast-vr";
+
   ls->m_VolumeCPU->Delete();
   ls->m_MapperCPU->Delete();
   ls->m_VolumePropertyCPU->Delete();
@@ -265,6 +263,47 @@ bool mitk::GPUVolumeMapper3D::IsRenderable(mitk::BaseRenderer* renderer)
   return true;
 }
 
+void mitk::GPUVolumeMapper3D::InitVtkMapper(mitk::BaseRenderer* renderer)
+{
+// Only with VTK 5.6 or above
+#if ((VTK_MAJOR_VERSION > 5) || ((VTK_MAJOR_VERSION==5) && (VTK_MINOR_VERSION>=6) ))
+  if(IsRAYEnabled(renderer))
+  {
+    DeinitCPU(renderer);
+    DeinitGPU(renderer);
+    if(!InitRAY(renderer))
+    {
+      GPU_WARN << "hardware renderer can't initialize ... falling back to software renderer";
+      goto fallback;
+    }
+  }
+  else 
+#endif  
+  if(IsGPUEnabled(renderer))
+  {
+    DeinitCPU(renderer);
+// Only with VTK 5.6 or above
+#if ((VTK_MAJOR_VERSION > 5) || ((VTK_MAJOR_VERSION==5) && (VTK_MINOR_VERSION>=6) ))
+    DeinitRAY(renderer);
+#endif
+    if(!InitGPU(renderer))
+    {
+      GPU_WARN << "hardware renderer can't initialize ... falling back to software renderer";
+      goto fallback;
+    }
+  }
+  else
+  {
+    fallback:
+    DeinitGPU(renderer);
+// Only with VTK 5.6 or above
+#if ((VTK_MAJOR_VERSION > 5) || ((VTK_MAJOR_VERSION==5) && (VTK_MINOR_VERSION>=6) ))
+    DeinitRAY(renderer);
+#endif
+    InitCPU(renderer);
+  }  
+}
+
 vtkProp *mitk::GPUVolumeMapper3D::GetVtkProp(mitk::BaseRenderer *renderer)
 {
   if(!IsRenderable(renderer))
@@ -278,46 +317,20 @@ vtkProp *mitk::GPUVolumeMapper3D::GetVtkProp(mitk::BaseRenderer *renderer)
   }
   
   InitCommon();
+  InitVtkMapper( renderer );
   
   LocalStorage *ls = m_LSH.GetLocalStorage(renderer);
 
 // Only with VTK 5.6 or above
 #if ((VTK_MAJOR_VERSION > 5) || ((VTK_MAJOR_VERSION==5) && (VTK_MINOR_VERSION>=6) ))
-
-  if(IsRAYEnabled(renderer))
-  {
-    DeinitCPU(renderer);
-    DeinitGPU(renderer);
-    if(!InitRAY(renderer))
-      goto fallback;
+  if(ls->m_rayInitialized)
     return ls->m_VolumeRAY;
-  }
-  else 
-
 #endif  
   
-  if(IsGPUEnabled(renderer))
-  {
-    DeinitCPU(renderer);
-// Only with VTK 5.6 or above
-#if ((VTK_MAJOR_VERSION > 5) || ((VTK_MAJOR_VERSION==5) && (VTK_MINOR_VERSION>=6) ))
-    DeinitRAY(renderer);
-#endif
-    if(!InitGPU(renderer))
-      goto fallback;
+  if(ls->m_gpuInitialized)
     return ls->m_VolumeGPU;
-  }
-  else
-  {
-    fallback:
-    DeinitGPU(renderer);
-// Only with VTK 5.6 or above
-#if ((VTK_MAJOR_VERSION > 5) || ((VTK_MAJOR_VERSION==5) && (VTK_MINOR_VERSION>=6) ))
-    DeinitRAY(renderer);
-#endif
-    InitCPU(renderer);
-    return ls->m_VolumeCPU;
-  }
+
+  return ls->m_VolumeCPU;
 }
 
 
@@ -327,46 +340,29 @@ void mitk::GPUVolumeMapper3D::GenerateData( mitk::BaseRenderer *renderer )
     return;
 
   InitCommon();
+  InitVtkMapper( renderer );
 
   mitk::Image *input = const_cast< mitk::Image * >( this->GetInput() );
   vtkImageData *inputData = input->GetVtkImageData( this->GetTimestep() );
   m_UnitSpacingImageFilter->SetInput( inputData );
 
+  LocalStorage *ls = m_LSH.GetLocalStorage(renderer);
+
 // Only with VTK 5.6 or above
 #if ((VTK_MAJOR_VERSION > 5) || ((VTK_MAJOR_VERSION==5) && (VTK_MINOR_VERSION>=6) ))
-
-  if(IsRAYEnabled(renderer))
+  if(ls->m_rayInitialized)
   {
-    DeinitCPU(renderer);
-    DeinitGPU(renderer);
-    if(!InitRAY(renderer))
-      goto fallback;
     GenerateDataRAY(renderer);
   }
   else 
-
 #endif
   
-  if(IsGPUEnabled(renderer))
+  if(ls->m_gpuInitialized)
   {
-    DeinitCPU(renderer);
-// Only with VTK 5.6 or above
-#if ((VTK_MAJOR_VERSION > 5) || ((VTK_MAJOR_VERSION==5) && (VTK_MINOR_VERSION>=6) ))
-    DeinitRAY(renderer);
-#endif
-    if(!InitGPU(renderer))
-      goto fallback;
     GenerateDataGPU(renderer);
   }
   else
   {
-    fallback:
-    DeinitGPU(renderer);
-// Only with VTK 5.6 or above
-#if ((VTK_MAJOR_VERSION > 5) || ((VTK_MAJOR_VERSION==5) && (VTK_MINOR_VERSION>=6) ))
-    DeinitRAY(renderer);
-#endif
-    InitCPU(renderer);
     GenerateDataCPU(renderer);
   }
 
@@ -442,8 +438,6 @@ void mitk::GPUVolumeMapper3D::GenerateDataCPU( mitk::BaseRenderer *renderer )
 
 void mitk::GPUVolumeMapper3D::CreateDefaultTransferFunctions()
 {
-  //GPU_INFO << "CreateDefaultTransferFunctions";
-
   m_DefaultOpacityTransferFunction = vtkPiecewiseFunction::New();
   m_DefaultOpacityTransferFunction->AddPoint( 0.0, 0.0 );
   m_DefaultOpacityTransferFunction->AddPoint( 255.0, 0.8 );
@@ -473,8 +467,6 @@ void mitk::GPUVolumeMapper3D::CreateDefaultTransferFunctions()
 void mitk::GPUVolumeMapper3D::UpdateTransferFunctions( mitk::BaseRenderer * renderer )
 {
   LocalStorage *ls = m_LSH.GetLocalStorage(renderer);
-
-  //GPU_INFO << "UpdateTransferFunctions";
 
   vtkPiecewiseFunction *opacityTransferFunction = m_DefaultOpacityTransferFunction;
   vtkPiecewiseFunction *gradientTransferFunction = m_DefaultGradientTransferFunction;
@@ -632,7 +624,8 @@ bool mitk::GPUVolumeMapper3D::InitRAY(mitk::BaseRenderer* renderer)
   if(ls->m_rayInitialized)
     return ls->m_raySupported;
   
-//  GPU_INFO << "initializing hardware-accelerated (raycast) renderer";
+  GPU_INFO << "initializing gpu-raycast-vr (vtkMitkOpenGLGPUVolumeRayCastMapper)";
+  
   ls->m_MapperRAY = vtkMitkOpenGLGPUVolumeRayCastMapper::New();
   ls->m_MapperRAY->SetAutoAdjustSampleDistances(0);
   ls->m_MapperRAY->SetSampleDistance(1.0); 
@@ -654,9 +647,6 @@ bool mitk::GPUVolumeMapper3D::InitRAY(mitk::BaseRenderer* renderer)
 
   ls->m_raySupported = ls->m_MapperRAY->IsRenderSupported(renderer->GetRenderWindow(),ls->m_VolumePropertyRAY);
 
-  if(!ls->m_raySupported)
-    GPU_INFO << "hardware-accelerated (raycast) rendering is not supported";
-    
   ls->m_rayInitialized = true;
   
   return ls->m_raySupported;
@@ -668,7 +658,7 @@ void mitk::GPUVolumeMapper3D::DeinitRAY(mitk::BaseRenderer* renderer)
 
   if(ls->m_rayInitialized)
   {
-//    GPU_INFO << "deinitializing hardware (raycast) renderer";
+    GPU_INFO << "deinitializing gpu-raycast-vr";
 
     ls->m_VolumeRAY->Delete();
     ls->m_MapperRAY->Delete();

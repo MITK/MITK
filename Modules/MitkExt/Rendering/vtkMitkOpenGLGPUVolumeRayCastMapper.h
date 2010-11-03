@@ -126,11 +126,17 @@ protected:
   void CreateGLSLObjects();
 
   // Description:
+  // Allows late binding textures to framebuffers, because ATI openGL requires 
+  // the texture to initialized before
+  void BindFramebuffer();
+
+  // Description:
   // Create OpenGL objects such as textures, buffers and fragment program Ids.
   // It only registers Ids, there is no actual initialization of textures or
   // fragment program.
   // \pre extensions_loaded: this->LoadExtensionsSucceeded
   // \post done: this->OpenGLObjectsCreated==1
+
   void CreateOpenGLObjects();
 
   // Description:
@@ -362,6 +368,8 @@ protected:
   // \post valid_k_ratio: ratio[2]>0 && ratio[2]<=1.0
   virtual void GetReductionRatio(double ratio[3]);
 
+  bool m_BindMax;
+
   int NumberOfCroppingRegions;
 
   // World coordinates of each corner of the dataset.
@@ -423,6 +431,7 @@ protected:
   // Final string to send to the GPU as the fragment program source code.
 //  char *FragmentCode;
 //  int FragmentCodeCapacity;
+
 
   int ErrorLine;
   int ErrorColumn;

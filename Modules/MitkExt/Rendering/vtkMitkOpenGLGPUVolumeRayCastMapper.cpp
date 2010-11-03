@@ -1798,6 +1798,8 @@ vtkMitkOpenGLGPUVolumeRayCastMapper::vtkMitkOpenGLGPUVolumeRayCastMapper()
   this->LoadExtensionsSucceeded=0;
   this->NumberOfFrameBuffers=0;
 
+  this->m_BindMax = false;
+
   // up to 2 frame buffer 2D textures (left/right)
   // 1 dataset 3D texture
   // 1 colormap 1D texture
@@ -2415,6 +2417,22 @@ void vtkMitkOpenGLGPUVolumeRayCastMapper::CreateGLSLObjects()
 
 }
 
+void vtkMitkOpenGLGPUVolumeRayCastMapper::BindFramebuffer()
+{
+  vtkgl::FramebufferTexture2DEXT(vtkgl::FRAMEBUFFER_EXT,
+                                 vtkgl::COLOR_ATTACHMENT0_EXT,GL_TEXTURE_2D,
+                                 this->TextureObjects[vtkMitkOpenGLGPUVolumeRayCastMapperTextureObjectFrameBufferLeftFront],
+                                 0);
+  GLenum err = glGetError();
+
+  if(m_BindMax)
+  {
+    vtkgl::FramebufferTexture2DEXT(vtkgl::FRAMEBUFFER_EXT,
+                                   vtkgl::COLOR_ATTACHMENT0_EXT+1,
+                                   GL_TEXTURE_2D,this->MaxValueFrameBuffer,0);
+  }
+}
+
 //-----------------------------------------------------------------------------
 // Create OpenGL objects such as textures, buffers and fragment program Ids.
 // It only registers Ids, there is no actual initialization of textures or
@@ -2438,13 +2456,15 @@ void vtkMitkOpenGLGPUVolumeRayCastMapper::CreateOpenGLObjects()
   // We need only two color buffers (ping-pong)
   this->NumberOfFrameBuffers=2;
 
-  GLuint frameBufferObject;
-  GLuint depthRenderBufferObject;
-
-
   // TODO: clean this up!
   // 2*Frame buffers(2d textures)+colorMap (1d texture) +dataset (3d texture)
   // + opacitymap (1d texture) + grabbed depthMap (2d texture)
+
+  // Frame buffers(2d textures)+colorMap (1d texture) +dataset (3d texture)
+  // + opacity (1d texture)+grabbed depth buffer (2d texture)
+
+  GLuint frameBufferObject;
+  GLuint depthRenderBufferObject;
   GLuint textureObjects[vtkMitkOpenGLGPUVolumeRayCastMapperNumberOfTextureObjects];
 
   // Create the various objects we will need - one frame buffer
@@ -2452,30 +2472,13 @@ void vtkMitkOpenGLGPUVolumeRayCastMapper::CreateOpenGLObjects()
   // for color.
   vtkgl::GenFramebuffersEXT(1, &frameBufferObject); // color
   vtkgl::GenRenderbuffersEXT(1, &depthRenderBufferObject); // depth
-  int i=0;
-  while(i<( vtkMitkOpenGLGPUVolumeRayCastMapperTextureObjectFrameBufferLeftFront+this->NumberOfFrameBuffers))
-    {
-    textureObjects[i]=0;
-    ++i;
-    }
-  // Frame buffers(2d textures)+colorMap (1d texture) +dataset (3d texture)
-  // + opacity (1d texture)+grabbed depth buffer (2d texture)
-  glGenTextures(vtkMitkOpenGLGPUVolumeRayCastMapperTextureObjectFrameBufferLeftFront+this->NumberOfFrameBuffers,textureObjects);
+  glGenTextures(vtkMitkOpenGLGPUVolumeRayCastMapperNumberOfTextureObjects,textureObjects);
+                                           
   // Color buffers
   GLint value;
   glGetIntegerv(vtkgl::FRAMEBUFFER_BINDING_EXT,&value);
   GLuint savedFrameBuffer=static_cast<GLuint>(value);
   vtkgl::BindFramebufferEXT(vtkgl::FRAMEBUFFER_EXT,frameBufferObject);
-  i=0;
-  while(i<this->NumberOfFrameBuffers)
-    {
-    glBindTexture(GL_TEXTURE_2D,textureObjects[vtkMitkOpenGLGPUVolumeRayCastMapperTextureObjectFrameBufferLeftFront+i]);
-    ++i;
-    }
-  vtkgl::FramebufferTexture2DEXT(vtkgl::FRAMEBUFFER_EXT,
-                                 vtkgl::COLOR_ATTACHMENT0_EXT,GL_TEXTURE_2D,
-                                 textureObjects[vtkMitkOpenGLGPUVolumeRayCastMapperTextureObjectFrameBufferLeftFront],
-                                 0);
 
 
   // Depth buffer
@@ -2490,18 +2493,20 @@ void vtkMitkOpenGLGPUVolumeRayCastMapper::CreateOpenGLObjects()
   // Restore default frame buffer.
   vtkgl::BindFramebufferEXT(vtkgl::FRAMEBUFFER_EXT,savedFrameBuffer);
 
+
   this->CreateGLSLObjects();
 
   // Save GL objects by static casting to standard C types. GL* types
   // are not allowed in VTK header files.
   this->FrameBufferObject=static_cast<unsigned int>(frameBufferObject);
   this->DepthRenderBufferObject=static_cast<unsigned int>(depthRenderBufferObject);
-  i=0;
-  while(i<(vtkMitkOpenGLGPUVolumeRayCastMapperTextureObjectFrameBufferLeftFront+this->NumberOfFrameBuffers))
+  int i=0;
+  while(i<vtkMitkOpenGLGPUVolumeRayCastMapperNumberOfTextureObjects)
     {
     this->TextureObjects[i]=static_cast<unsigned int>(textureObjects[i]);
     ++i;
     }
+
 
   this->OpenGLObjectsCreated=1;
 }
@@ -2826,12 +2831,15 @@ int vtkMitkOpenGLGPUVolumeRayCastMapper::AllocateFrameBuffers(vtkRenderer *ren)
   ren->GetTiledSize(&size[0],&size[1]);
 
   int sizeChanged=this->LastSize[0]!=size[0] || this->LastSize[1]!=size[1];
-
+  
+  GLenum errorCode=glGetError();
+    
   // Need allocation?
   if(sizeChanged)
     {
     int i=0;
     GLenum errorCode=glGetError();
+    
     while(i <this->NumberOfFrameBuffers && errorCode==GL_NO_ERROR)
       {
       glBindTexture(GL_TEXTURE_2D,static_cast<GLuint>(this->TextureObjects[vtkMitkOpenGLGPUVolumeRayCastMapperTextureObjectFrameBufferLeftFront+i]));
@@ -2851,6 +2859,7 @@ int vtkMitkOpenGLGPUVolumeRayCastMapper::AllocateFrameBuffers(vtkRenderer *ren)
                      0, GL_RGBA, GL_FLOAT, NULL );
         }
       errorCode=glGetError();
+
       ++i;
       }
     if(errorCode==GL_NO_ERROR)
@@ -2871,6 +2880,9 @@ int vtkMitkOpenGLGPUVolumeRayCastMapper::AllocateFrameBuffers(vtkRenderer *ren)
       glGetIntegerv(vtkgl::FRAMEBUFFER_BINDING_EXT,&savedFrameBuffer);
       vtkgl::BindFramebufferEXT(vtkgl::FRAMEBUFFER_EXT,
                                 static_cast<GLuint>(this->FrameBufferObject));
+
+      this->BindFramebuffer();
+
       vtkgl::BindRenderbufferEXT(
         vtkgl::RENDERBUFFER_EXT,
         static_cast<GLuint>(this->DepthRenderBufferObject));
@@ -2879,6 +2891,7 @@ int vtkMitkOpenGLGPUVolumeRayCastMapper::AllocateFrameBuffers(vtkRenderer *ren)
       vtkgl::BindFramebufferEXT(vtkgl::FRAMEBUFFER_EXT,
                                 static_cast<GLuint>(savedFrameBuffer));
       errorCode=glGetError();
+
       if(errorCode==GL_NO_ERROR)
         {
         this->LastSize[0]=size[0];
@@ -2894,6 +2907,7 @@ int vtkMitkOpenGLGPUVolumeRayCastMapper::AllocateFrameBuffers(vtkRenderer *ren)
 
   if(needNewMaxValueBuffer)
     {
+
     // blend mode changed and need max value buffer.
 
     // create and bind second color buffer (we use only the red component
@@ -2903,26 +2917,22 @@ int vtkMitkOpenGLGPUVolumeRayCastMapper::AllocateFrameBuffers(vtkRenderer *ren)
     // max scalar frame buffer
     GLuint maxValueFrameBuffer;
     glGenTextures(1,&maxValueFrameBuffer);
-    // Color buffers
-    GLint savedFrameBuffer;
-    glGetIntegerv(vtkgl::FRAMEBUFFER_BINDING_EXT,&savedFrameBuffer);
-    vtkgl::BindFramebufferEXT(
-      vtkgl::FRAMEBUFFER_EXT,static_cast<GLuint>(this->FrameBufferObject));
-    glBindTexture(GL_TEXTURE_2D,maxValueFrameBuffer);
-    vtkgl::FramebufferTexture2DEXT(vtkgl::FRAMEBUFFER_EXT,
-                                   vtkgl::COLOR_ATTACHMENT0_EXT+1,
-                                   GL_TEXTURE_2D,maxValueFrameBuffer,0);
     this->MaxValueFrameBuffer=
       static_cast<unsigned int>(maxValueFrameBuffer);
-    vtkgl::BindFramebufferEXT(vtkgl::FRAMEBUFFER_EXT,
-                              static_cast<GLuint>(savedFrameBuffer));
+
+    // Color buffers
+
+    this->m_BindMax = true;
 
     // max scalar frame buffer2
     GLuint maxValueFrameBuffer2;
+
     glGenTextures(1,&maxValueFrameBuffer2);
+
     glBindTexture(GL_TEXTURE_2D,maxValueFrameBuffer2);
     this->MaxValueFrameBuffer2=
       static_cast<unsigned int>(maxValueFrameBuffer2);
+
     }
   else
     {
@@ -2935,11 +2945,14 @@ int vtkMitkOpenGLGPUVolumeRayCastMapper::AllocateFrameBuffers(vtkRenderer *ren)
 
        GLint savedFrameBuffer;
        glGetIntegerv(vtkgl::FRAMEBUFFER_BINDING_EXT,&savedFrameBuffer);
+
        vtkgl::BindFramebufferEXT(vtkgl::FRAMEBUFFER_EXT,
                                 static_cast<GLuint>(this->FrameBufferObject));
+
        vtkgl::FramebufferTexture2DEXT(vtkgl::FRAMEBUFFER_EXT,
                                       vtkgl::COLOR_ATTACHMENT0_EXT+1,
                                       GL_TEXTURE_2D,0,0); // not scalar buffer
+
        vtkgl::BindFramebufferEXT(vtkgl::FRAMEBUFFER_EXT,
                                  static_cast<GLuint>(savedFrameBuffer));
 
@@ -2947,6 +2960,8 @@ int vtkMitkOpenGLGPUVolumeRayCastMapper::AllocateFrameBuffers(vtkRenderer *ren)
          static_cast<GLuint>(this->MaxValueFrameBuffer);
        glDeleteTextures(1,&maxValueFrameBuffer);
        this->MaxValueFrameBuffer=0;
+       
+       m_BindMax = false;
 
        GLuint maxValueFrameBuffer2=
          static_cast<GLuint>(this->MaxValueFrameBuffer2);
@@ -2958,6 +2973,7 @@ int vtkMitkOpenGLGPUVolumeRayCastMapper::AllocateFrameBuffers(vtkRenderer *ren)
   if((this->BlendMode==vtkVolumeMapper::MAXIMUM_INTENSITY_BLEND
       || this->BlendMode==vtkMitkGPUVolumeRayCastMapper::MINIMUM_INTENSITY_BLEND) && (sizeChanged || needNewMaxValueBuffer))
     {
+
     // max scalar frame buffer
     GLuint maxValueFrameBuffer=static_cast<GLuint>(this->MaxValueFrameBuffer);
     glBindTexture(GL_TEXTURE_2D,maxValueFrameBuffer);
@@ -2966,6 +2982,7 @@ int vtkMitkOpenGLGPUVolumeRayCastMapper::AllocateFrameBuffers(vtkRenderer *ren)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     // Here we are assuming that GL_ARB_texture_non_power_of_two is available
+
     if(this->Supports_GL_ARB_texture_float)
       {
       glTexImage2D(GL_TEXTURE_2D,0,vtkgl::RGBA16F_ARB,size[0],size[1],
@@ -2984,6 +3001,7 @@ int vtkMitkOpenGLGPUVolumeRayCastMapper::AllocateFrameBuffers(vtkRenderer *ren)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, vtkgl::CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
     // Here we are assuming that GL_ARB_texture_non_power_of_two is available
     if(this->Supports_GL_ARB_texture_float)
       {
@@ -2997,6 +3015,7 @@ int vtkMitkOpenGLGPUVolumeRayCastMapper::AllocateFrameBuffers(vtkRenderer *ren)
       }
 
     }
+  
   PrintError("AllocateFrameBuffers");
   return result;
 }
@@ -3157,6 +3176,7 @@ bool vtkMitkOpenGLGPUVolumeRayCastMapper::TestLoadingScalar(
                       format,
                       type,0);
     GLenum errorCode=glGetError();
+
     result=errorCode!=GL_OUT_OF_MEMORY;
     if(result)
       {
@@ -4654,6 +4674,8 @@ void vtkMitkOpenGLGPUVolumeRayCastMapper::PreRender(vtkRenderer *ren,
 
   vtkgl::BindFramebufferEXT(vtkgl::FRAMEBUFFER_EXT,
                             static_cast<GLuint>(this->FrameBufferObject));
+
+  this->BindFramebuffer();
 
   GLenum buffer[4];
   buffer[0] = vtkgl::COLOR_ATTACHMENT0_EXT;

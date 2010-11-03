@@ -29,9 +29,6 @@ IF(NOT BUILD_SHARED_LIBS)
 ENDIF()
 ADD_LIBRARY(ann ${ANN_HEADERS} ${ANN_SOURCES})
 
-# install only if shared lib (for now)
-# deprecated: MITK_INSTALL_TARGETS(ann)
-
 MITK_CREATE_MODULE_CONF(ann
   INCLUDE_DIRS include
 )

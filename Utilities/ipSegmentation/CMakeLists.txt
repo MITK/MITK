@@ -22,6 +22,3 @@ MITK_CREATE_MODULE_CONF(ipSegmentation
   DEPENDS mitkIpPic ann
 )
 
-IF(NOT MITK_WIN32_FORCE_STATIC)
-  # deprecated: MITK_INSTALL_TARGETS(ipSegmentation)
-ENDIF()

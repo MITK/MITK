@@ -31,5 +31,3 @@ ADD_LIBRARY(mbilog ${MBILOG_HEADERS} ${MBILOG_SOURCES})
 # mbilog is independent of mitk, and cant use mitk macros i.e. MITK_CREATE_MODULE_CONF( mbilog )
 # configuring happens through ../CMakeList.txt and mbilogConfig.cmake.in
 
-# cpack installer
-# deprecated: MITK_INSTALL_TARGETS(mbilog)

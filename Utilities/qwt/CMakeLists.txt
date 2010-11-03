@@ -189,7 +189,6 @@ ADD_LIBRARY(qwt ${QWT_SOURCES})
 TARGET_LINK_LIBRARIES(qwt ${QT_LIBRARIES})
 
 # install only if shared lib (for now)
-# deprecated: MITK_INSTALL_TARGETS(qwt${LIBPOSTFIX})
 
 MITK_CREATE_MODULE_CONF(qwt
   INCLUDE_DIRS include

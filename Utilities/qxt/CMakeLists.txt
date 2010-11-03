@@ -128,7 +128,6 @@ ADD_LIBRARY(qxt ${QXT_SOURCES})
 TARGET_LINK_LIBRARIES(qxt ${QT_LIBRARIES})
 
 # install only if shared lib (for now)
-# deprecated: MITK_INSTALL_TARGETS(qxt)
 
 MITK_CREATE_MODULE_CONF(qxt
   INCLUDE_DIRS include

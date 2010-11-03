@@ -69,7 +69,7 @@ void mitk::PlanarFigureReader::GenerateData()
   
   if(m_ReadFromMemory)
   {
-    if(m_MemoryBuffer == NULL)
+    if(m_MemoryBuffer == NULL || m_MemorySize == 0)
     {
       //check
       itkWarningMacro( << "Sorry, memory buffer has not been set!" );

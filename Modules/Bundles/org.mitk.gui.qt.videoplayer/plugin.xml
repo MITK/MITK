@@ -10,7 +10,7 @@
       id="org.mitk.views.videoplayer" 
       name="VideoPlayer" 
       category="org.mitk.views.general" 
-      icon="resources/VideoPlayer.png"
+      icon="resources/videoplayer.gif"
       class="QmitkVideoPlayer" />
   </extension>
   

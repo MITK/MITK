@@ -65,6 +65,8 @@ mitk::CoreExtObjectFactory::CoreExtObjectFactory()
     itk::ObjectFactoryBase::RegisterFactory( StlVolumeTimeSeriesIOFactory::New() );
     itk::ObjectFactoryBase::RegisterFactory( VtkVolumeTimeSeriesIOFactory::New() );
 
+    CreateFileExtensionsMap();
+
     alreadyDone = true;
   }
 }
@@ -161,7 +163,9 @@ void mitk::CoreExtObjectFactory::SetDefaultProperties(mitk::DataNode* node)
 
 const char* mitk::CoreExtObjectFactory::GetFileExtensions() 
 {
-  return "";
+  std::string fileExtension;
+  this->CreateFileExtensions(m_FileExtensionsMap, fileExtension);
+  return fileExtension.c_str();
 };
 
 mitk::CoreObjectFactoryBase::MultimapType mitk::CoreExtObjectFactory::GetFileExtensionsMap()
@@ -176,6 +180,8 @@ mitk::CoreObjectFactoryBase::MultimapType mitk::CoreExtObjectFactory::GetSaveFil
 
 void mitk::CoreExtObjectFactory::CreateFileExtensionsMap()
 {
+  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.vtu", "VTK Unstructured Grid"));
+  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.vtk", "VTK Unstructured Grid"));
 }
 
 const char* mitk::CoreExtObjectFactory::GetSaveFileExtensions() 

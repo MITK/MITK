@@ -1839,6 +1839,8 @@ void QmitkStdMultiWidget::SetWidgetPlaneMode( int userMode )
     gi->AddListener( m_SlicesSwiveller );
     break;
   }
+  // Notify MainTemplate GUI that mode has changed
+  emit WidgetPlaneModeChange(m_PlaneMode);
 }
 
 

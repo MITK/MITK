@@ -11,6 +11,8 @@ SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/bin")
 SET(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/CMake ${CMAKE_MODULE_PATH} )
 SET(MITK_MODULES_CONF_DIR ${MITK_BINARY_DIR}/modulesConf CACHE INTERNAL "Modules Conf")
 
+OPTION(BUILD_SHARED_LIBS "Build MITK with shared libraries." ON)
+
 # Clear the cache variables containing plugin base directories
 SET(MITK_MODULES_PLUGIN_SOURCE_DIRS "" CACHE INTERNAL "List of base plugin source directories" FORCE)
 SET(MITK_MODULES_PLUGIN_OUTPUT_DIRS "" CACHE INTERNAL "List of base plugin output directories" FORCE)
@@ -97,7 +99,6 @@ ENDIF(EXISTS ${CMAKE_CURRENT_BINARY_DIR}/Utilities/vtk-bin)
 FIND_PACKAGE(VTK)
 APPLY_VTK_FLAGS()
 
-OPTION(BUILD_SHARED_LIBS "Build MITK with shared libraries." ON)
 
 # TODO: check if necessary
 OPTION(USE_ITKZLIB "Use the ITK zlib for pic compression." ON)

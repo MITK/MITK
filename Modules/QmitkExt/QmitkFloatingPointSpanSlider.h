@@ -28,11 +28,11 @@ class QmitkExt_EXPORT QmitkFloatingPointSpanSlider : public QxtSpanSlider
 {
   Q_OBJECT
   Q_PROPERTY(double loweralue READ lowerValue WRITE setLowerValue
-             NOTIFY lowerValueChanged FINAL)
+             NOTIFY lowerValueChanged)
   Q_PROPERTY(double upperValue READ upperValue WRITE setUpperValue
-             NOTIFY upperValueChanged FINAL)
-  Q_PROPERTY(double maximum READ maximum WRITE setMaximum FINAL)
-  Q_PROPERTY(double minimum READ minimum WRITE setMinimum FINAL)
+             NOTIFY upperValueChanged)
+  Q_PROPERTY(double maximum READ maximum WRITE setMaximum)
+  Q_PROPERTY(double minimum READ minimum WRITE setMinimum)
 
 public:
 

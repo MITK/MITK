@@ -44,6 +44,7 @@ SET(CPP_FILES
   Algorithms/mitkShapeBasedInterpolationAlgorithm.cpp
   Algorithms/mitkShowSegmentationAsSurface.cpp
   Algorithms/mitkSimpleHistogram.cpp
+  Algorithms/mitkSimpleUnstructuredGridHistogram.cpp
   Algorithms/mitkSurfaceToImageFilter.cpp
   Algorithms/mitkUnstructuredGridHistogram.cpp
   Algorithms/mitkUnstructuredGridSource.cpp

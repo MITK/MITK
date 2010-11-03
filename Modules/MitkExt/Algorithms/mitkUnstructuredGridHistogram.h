@@ -30,9 +30,9 @@ namespace mitk {
 class MitkExt_EXPORT UnstructuredGridHistogram : public itk::Statistics::Histogram<double>
 {
 public:
-  mitkClassMacro(UnstructuredGridHistogram,itk::Statistics::Histogram<double>);
+  mitkClassMacro(UnstructuredGridHistogram,itk::Statistics::Histogram<double>)
 
-  itkNewMacro(Self);
+  itkNewMacro(Self)
   
   void Initialize(mitk::UnstructuredGrid*);
   

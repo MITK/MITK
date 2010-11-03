@@ -67,7 +67,7 @@ void mitk::UnstructuredGridHistogram::Initialize(mitk::UnstructuredGrid* ugrid)
       if (scalar != upperBound[0])
         bin = (int)(((double)numBins)*(scalar-lowerBound[0])/length);
       //MITK_INFO << " bin: " << bin << std::endl;
-      this->IncreaseFrequency(bin, scalar/numIds);
+      this->IncreaseFrequency(bin, 1.0/(double)numIds);
       cellIds->Reset();
     }
     cellIds->Delete();
@@ -81,7 +81,7 @@ void mitk::UnstructuredGridHistogram::Initialize(mitk::UnstructuredGrid* ugrid)
       if (scalar != upperBound[0])
         bin = (int)(((double)numBins)*(scalar-lowerBound[0])/length);
       //MITK_INFO << " bin: " << bin << std::endl;
-      this->IncreaseFrequency(bin, scalar);
+      this->IncreaseFrequency(bin, 1.0);
     }
   }
 }

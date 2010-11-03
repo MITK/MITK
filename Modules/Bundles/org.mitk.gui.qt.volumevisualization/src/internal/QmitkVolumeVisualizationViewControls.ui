@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>252</width>
+    <width>323</width>
     <height>679</height>
    </rect>
   </property>
@@ -25,7 +25,7 @@
   <property name="windowTitle">
    <string>QmitkTemplate</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_2">
+  <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <widget class="QLabel" name="m_ErrorImageLabel">
      <property name="sizePolicy">
@@ -248,61 +248,38 @@
     </widget>
    </item>
    <item>
-    <widget class="QFrame" name="frame">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="frameShape">
-      <enum>QFrame::StyledPanel</enum>
-     </property>
-     <property name="frameShadow">
-      <enum>QFrame::Raised</enum>
-     </property>
-     <layout class="QHBoxLayout" name="horizontalLayout">
-      <property name="margin">
-       <number>0</number>
-      </property>
-      <item>
-       <widget class="QCheckBox" name="m_EnableRenderingCB">
-        <property name="toolTip">
-         <string>Click this checkbox to enable volumerendering in the 3D view of the selected image.</string>
-        </property>
-        <property name="text">
-         <string>Volumerendering</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QCheckBox" name="m_EnableLOD">
-        <property name="toolTip">
-         <string>Level of detail (LOD) enables a fast but lower quality preview rendering to increase interactivity.</string>
-        </property>
-        <property name="text">
-         <string>LOD</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QComboBox" name="m_RenderMode"/>
-      </item>
-      <item>
-       <spacer name="horizontalSpacer">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-     </layout>
-    </widget>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QCheckBox" name="m_EnableRenderingCB">
+       <property name="toolTip">
+        <string>Click this checkbox to enable volumerendering in the 3D view of the selected image.</string>
+       </property>
+       <property name="text">
+        <string>Volumerendering</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="m_EnableLOD">
+       <property name="toolTip">
+        <string>Level of detail (LOD) enables a fast but lower quality preview rendering to increase interactivity.</string>
+       </property>
+       <property name="text">
+        <string>LOD</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="m_RenderMode">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>1</verstretch>
+        </sizepolicy>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
    <item>
     <widget class="QmitkTransferFunctionGeneratorWidget" name="m_TransferFunctionGeneratorWidget" native="true">
@@ -321,7 +298,14 @@
     </widget>
    </item>
    <item>
-    <widget class="QmitkTransferFunctionWidget" name="m_TransferFunctionWidget" native="true"/>
+    <widget class="QmitkTransferFunctionWidget" name="m_TransferFunctionWidget" native="true">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>1</verstretch>
+      </sizepolicy>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>

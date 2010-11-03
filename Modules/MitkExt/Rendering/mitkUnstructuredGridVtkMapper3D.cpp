@@ -73,10 +73,8 @@ mitk::UnstructuredGridVtkMapper3D::UnstructuredGridVtkMapper3D()
   m_Assembly->AddPart(m_Volume);
 
   m_VtkVolumeRayCastMapper = 0;
-  #if (VTK_MAJOR_VERSION >= 5)
   m_VtkPTMapper = 0;
   m_VtkVolumeZSweepMapper = 0;
-  #endif
 
   //m_GenerateNormals = false;
 }
@@ -131,6 +129,28 @@ void mitk::UnstructuredGridVtkMapper3D::GenerateData()
   m_ActorWireframe->GetProperty()->SetAmbient(1.0);
   m_ActorWireframe->GetProperty()->SetDiffuse(0.0);
   m_ActorWireframe->GetProperty()->SetSpecular(0.0);
+
+  mitk::DataNode::ConstPointer node = this->GetDataNode();
+  mitk::TransferFunctionProperty::Pointer transferFuncProp;
+  if (node->GetProperty(transferFuncProp, "TransferFunction"))
+  {
+    mitk::TransferFunction::Pointer transferFunction = transferFuncProp->GetValue();
+    if (transferFunction->GetColorTransferFunction()->GetSize() < 2)
+    {
+      mitk::UnstructuredGrid::Pointer input  = const_cast< mitk::UnstructuredGrid* >(this->GetInput());
+      if (input.IsNull()) return;
+
+      vtkUnstructuredGrid * grid = input->GetVtkUnstructuredGrid(this->GetTimestep());
+      if (grid == 0) return;
+
+      double* scalarRange = grid->GetScalarRange();
+      vtkColorTransferFunction* colorFunc = transferFunction->GetColorTransferFunction();
+      colorFunc->RemoveAllPoints();
+      colorFunc->AddRGBPoint(scalarRange[0], 1, 0, 0);
+      colorFunc->AddRGBPoint((scalarRange[0] + scalarRange[1])/2.0, 0, 1, 0);
+      colorFunc->AddRGBPoint(scalarRange[1], 0, 0, 1);
+    }
+  }
 }
 
 void mitk::UnstructuredGridVtkMapper3D::GenerateData(mitk::BaseRenderer* renderer)
@@ -199,10 +219,10 @@ void mitk::UnstructuredGridVtkMapper3D::ApplyProperties(vtkActor* /*actor*/, mit
 
   vtkVolumeProperty* volProp = m_Volume->GetProperty();
   vtkProperty* property = m_Actor->GetProperty();
+  vtkProperty* wireframeProp = m_ActorWireframe->GetProperty();
 
   mitk::SurfaceVtkMapper3D::ApplyMitkPropertiesToVtkProperty(node,property,renderer);
-
-  mitk::SurfaceVtkMapper3D::ApplyMitkPropertiesToVtkProperty(node,m_ActorWireframe->GetProperty(),renderer);
+  mitk::SurfaceVtkMapper3D::ApplyMitkPropertiesToVtkProperty(node,wireframeProp,renderer);
 
   mitk::TransferFunctionProperty::Pointer transferFuncProp;
   if (node->GetProperty(transferFuncProp, "TransferFunction", renderer))
@@ -211,74 +231,76 @@ void mitk::UnstructuredGridVtkMapper3D::ApplyProperties(vtkActor* /*actor*/, mit
 
     volProp->SetColor(transferFunction->GetColorTransferFunction());
     volProp->SetScalarOpacity(transferFunction->GetScalarOpacityFunction());
+    volProp->SetGradientOpacity(transferFunction->GetGradientOpacityFunction());
 
     m_VtkDataSetMapper->SetLookupTable(transferFunction->GetColorTransferFunction());
     m_VtkDataSetMapper2->SetLookupTable(transferFunction->GetColorTransferFunction());
   }
 
-  mitk::GridRepresentationProperty::Pointer gridRepProp;
-  if (node->GetProperty(gridRepProp, "grid representation", renderer))
+  bool isVolumeRenderingOn = false;
+  node->GetBoolProperty("volumerendering", isVolumeRenderingOn, renderer);
+
+  if (isVolumeRenderingOn)
   {
-    mitk::GridRepresentationProperty::IdType type = gridRepProp->GetValueAsId();
-    bool isVolume = false;
-    switch (type) {
-      case mitk::GridRepresentationProperty::POINTS:
-        property->SetRepresentationToPoints();
-        break;
-      case mitk::GridRepresentationProperty::WIREFRAME:
-        property->SetRepresentationToWireframe();
-        break;
-      case mitk::GridRepresentationProperty::SURFACE:
-        property->SetRepresentationToSurface();
-        break;
-      case mitk::GridRepresentationProperty::VOLUME:
-        m_Assembly->RemovePart(m_Actor);
-        m_Assembly->RemovePart(m_ActorWireframe);
-        m_Assembly->AddPart(m_Volume);
-        isVolume = true;
-        break;
+    m_Assembly->RemovePart(m_Actor);
+    m_Assembly->RemovePart(m_ActorWireframe);
+    m_Assembly->AddPart(m_Volume);
+
+    mitk::GridVolumeMapperProperty::Pointer mapperProp;
+    if (node->GetProperty(mapperProp, "volumerendering.mapper", renderer))
+    {
+      mitk::GridVolumeMapperProperty::IdType type = mapperProp->GetValueAsId();
+      switch (type) {
+        case mitk::GridVolumeMapperProperty::RAYCAST:
+          if (m_VtkVolumeRayCastMapper == 0) {
+            m_VtkVolumeRayCastMapper = vtkUnstructuredGridVolumeRayCastMapper::New();
+            m_VtkVolumeRayCastMapper->SetInput(m_VtkTriangleFilter->GetOutput());
+          }
+          m_Volume->SetMapper(m_VtkVolumeRayCastMapper);
+          break;
+        case mitk::GridVolumeMapperProperty::PT:
+          if (m_VtkPTMapper == 0) {
+            m_VtkPTMapper = vtkProjectedTetrahedraMapper::New();
+            m_VtkPTMapper->SetInputConnection(m_VtkTriangleFilter->GetOutputPort());
+          }
+          m_Volume->SetMapper(m_VtkPTMapper);
+          break;
+        case mitk::GridVolumeMapperProperty::ZSWEEP:
+          if (m_VtkVolumeZSweepMapper == 0) {
+            m_VtkVolumeZSweepMapper = vtkUnstructuredGridVolumeZSweepMapper::New();
+            m_VtkVolumeZSweepMapper->SetInputConnection(m_VtkTriangleFilter->GetOutputPort());
+          }
+          m_Volume->SetMapper(m_VtkVolumeZSweepMapper);
+          break;
+      }
     }
-
-    if (!isVolume) {
-      m_Assembly->RemovePart(m_Volume);
-      m_Assembly->AddPart(m_Actor);
-      if (type == mitk::GridRepresentationProperty::SURFACE)
-        m_Assembly->AddPart(m_ActorWireframe);
-      else
-        m_Assembly->RemovePart(m_ActorWireframe);
-    }
-
-
   }
-
-  mitk::GridVolumeMapperProperty::Pointer mapperProp;
-  if (node->GetProperty(mapperProp, "grid volume mapper", renderer))
+  else
   {
-    mitk::GridVolumeMapperProperty::IdType type = mapperProp->GetValueAsId();
-    switch (type) {
-      case mitk::GridVolumeMapperProperty::RAYCAST:
-        if (m_VtkVolumeRayCastMapper == 0) {
-          m_VtkVolumeRayCastMapper = vtkUnstructuredGridVolumeRayCastMapper::New();
-          m_VtkVolumeRayCastMapper->SetInput(m_VtkTriangleFilter->GetOutput());
-        }
-        m_Volume->SetMapper(m_VtkVolumeRayCastMapper);
-        break;
-      #if (VTK_MAJOR_VERSION >= 5)
-      case mitk::GridVolumeMapperProperty::PT:
-        if (m_VtkPTMapper == 0) {
-          m_VtkPTMapper = vtkProjectedTetrahedraMapper::New();
-          m_VtkPTMapper->SetInputConnection(m_VtkTriangleFilter->GetOutputPort());
-        }
-        m_Volume->SetMapper(m_VtkPTMapper);
-        break;
-      case mitk::GridVolumeMapperProperty::ZSWEEP:
-        if (m_VtkVolumeZSweepMapper == 0) {
-          m_VtkVolumeZSweepMapper = vtkUnstructuredGridVolumeZSweepMapper::New();
-          m_VtkVolumeZSweepMapper->SetInputConnection(m_VtkTriangleFilter->GetOutputPort());
-        }
-        m_Volume->SetMapper(m_VtkVolumeZSweepMapper);
-        break;
-      #endif
+    m_Assembly->RemovePart(m_Volume);
+    m_Assembly->AddPart(m_Actor);
+    m_Assembly->RemovePart(m_ActorWireframe);
+
+    mitk::GridRepresentationProperty::Pointer gridRepProp;
+    if (node->GetProperty(gridRepProp, "grid representation", renderer))
+    {
+      mitk::GridRepresentationProperty::IdType type = gridRepProp->GetValueAsId();
+      switch (type) {
+        case mitk::GridRepresentationProperty::POINTS:
+          property->SetRepresentationToPoints();
+          break;
+        case mitk::GridRepresentationProperty::WIREFRAME:
+          property->SetRepresentationToWireframe();
+          break;
+        case mitk::GridRepresentationProperty::SURFACE:
+          property->SetRepresentationToSurface();
+          break;
+      }
+
+//      if (type == mitk::GridRepresentationProperty::WIREFRAME_SURFACE)
+//      {
+//        m_Assembly->AddPart(m_ActorWireframe);
+//      }
     }
   }
 
@@ -304,34 +326,68 @@ void mitk::UnstructuredGridVtkMapper3D::ApplyProperties(vtkActor* /*actor*/, mit
 //   if ( interpolationProperty != NULL )
 //     m_Volume->GetProperty()->SetInterpolation( interpolationProperty->GetVtkInterpolation() );
 //
-//   bool scalarVisibility = false;
-//   node->GetBoolProperty("scalar visibility", scalarVisibility);
-//   m_VtkVolumeRayCastMapper->SetScalarVisibility( (scalarVisibility ? 1 : 0) );
-//
-//   if(scalarVisibility)
+
+   mitk::VtkScalarModeProperty* scalarMode = 0;
+   if(node->GetProperty(scalarMode, "scalar mode", renderer))
+   {
+     if (m_VtkVolumeRayCastMapper)
+       m_VtkVolumeRayCastMapper->SetScalarMode(scalarMode->GetVtkScalarMode());
+     if (m_VtkPTMapper)
+       m_VtkPTMapper->SetScalarMode(scalarMode->GetVtkScalarMode());
+     if (m_VtkVolumeZSweepMapper)
+       m_VtkVolumeZSweepMapper->SetScalarMode(scalarMode->GetVtkScalarMode());
+
+     m_VtkDataSetMapper->SetScalarMode(scalarMode->GetVtkScalarMode());
+     m_VtkDataSetMapper2->SetScalarMode(scalarMode->GetVtkScalarMode());
+   }
+   else
+   {
+     if (m_VtkVolumeRayCastMapper)
+       m_VtkVolumeRayCastMapper->SetScalarModeToDefault();
+     if (m_VtkPTMapper)
+       m_VtkPTMapper->SetScalarModeToDefault();
+     if (m_VtkVolumeZSweepMapper)
+       m_VtkVolumeZSweepMapper->SetScalarModeToDefault();
+
+     m_VtkDataSetMapper->SetScalarModeToDefault();
+     m_VtkDataSetMapper2->SetScalarModeToDefault();
+   }
+
+   bool scalarVisibility = true;
+   node->GetBoolProperty("scalar visibility", scalarVisibility, renderer);
+   m_VtkDataSetMapper->SetScalarVisibility(scalarVisibility ? 1 : 0);
+   m_VtkDataSetMapper2->SetScalarVisibility(scalarVisibility ? 1 : 0);
+
+//   double scalarRangeLower = std::numeric_limits<double>::min();
+//   double scalarRangeUpper = std::numeric_limits<double>::max();
+//   mitk::DoubleProperty* lowerRange = 0;
+//   if (node->GetProperty(lowerRange, "scalar range min", renderer))
 //   {
-//     mitk::VtkScalarModeProperty* scalarMode;
-//     if(node->GetProperty(scalarMode, "scalar mode", renderer))
-//     {
-//       m_VtkVolumeRayCastMapper->SetScalarMode(scalarMode->GetVtkScalarMode());
-//     }
-//     else
-//       m_VtkVolumeRayCastMapper->SetScalarModeToDefault();
-//
-//     bool colorMode = false;
-//     node->GetBoolProperty("color mode", colorMode);
-//     m_VtkVolumeRayCastMapper->SetColorMode( (colorMode ? 1 : 0) );
-//
-//     float scalarsMin = 0;
-//     if (dynamic_cast<mitk::FloatProperty *>(node->GetProperty("ScalarsRangeMinimum").GetPointer()) != NULL)
-//       scalarsMin = dynamic_cast<mitk::FloatProperty*>(node->GetProperty("ScalarsRangeMinimum").GetPointer())->GetValue();
-//
-//     float scalarsMax = 1.0;
-//     if (dynamic_cast<mitk::FloatProperty *>(node->GetProperty("ScalarsRangeMaximum").GetPointer()) != NULL)
-//       scalarsMax = dynamic_cast<mitk::FloatProperty*>(node->GetProperty("ScalarsRangeMaximum").GetPointer())->GetValue();
-//
-//     m_VtkVolumeRayCastMapper->SetScalarRange(scalarsMin,scalarsMax);
+//     scalarRangeLower = lowerRange->GetValue();
 //   }
+//   mitk::DoubleProperty* upperRange = 0;
+//   if (node->GetProperty(upperRange, "scalar range max", renderer))
+//   {
+//     scalarRangeUpper = upperRange->GetValue();
+//   }
+//   m_VtkDataSetMapper->SetScalarRange(scalarRangeLower, scalarRangeUpper);
+//   m_VtkDataSetMapper2->SetScalarRange(scalarRangeLower, scalarRangeUpper);
+
+
+//   bool colorMode = false;
+//   node->GetBoolProperty("color mode", colorMode);
+//   m_VtkVolumeRayCastMapper->SetColorMode( (colorMode ? 1 : 0) );
+
+//   float scalarsMin = 0;
+//   if (dynamic_cast<mitk::FloatProperty *>(node->GetProperty("ScalarsRangeMinimum").GetPointer()) != NULL)
+//     scalarsMin = dynamic_cast<mitk::FloatProperty*>(node->GetProperty("ScalarsRangeMinimum").GetPointer())->GetValue();
+
+//   float scalarsMax = 1.0;
+//   if (dynamic_cast<mitk::FloatProperty *>(node->GetProperty("ScalarsRangeMaximum").GetPointer()) != NULL)
+//     scalarsMax = dynamic_cast<mitk::FloatProperty*>(node->GetProperty("ScalarsRangeMaximum").GetPointer())->GetValue();
+
+//   m_VtkVolumeRayCastMapper->SetScalarRange(scalarsMin,scalarsMax);
+
 }
 
 void mitk::UnstructuredGridVtkMapper3D::SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite)
@@ -339,14 +395,24 @@ void mitk::UnstructuredGridVtkMapper3D::SetDefaultProperties(mitk::DataNode* nod
 
   SurfaceVtkMapper3D::SetDefaultPropertiesForVtkProperty(node, renderer, overwrite);
 
-  //node->AddProperty("TransferFunction", TransferFunctionProperty::New(), renderer, overwrite);
   node->AddProperty("grid representation", GridRepresentationProperty::New(), renderer, overwrite);
-  node->AddProperty("grid volume mapper", GridVolumeMapperProperty::New(), renderer, overwrite);
+  node->AddProperty("volumerendering", BoolProperty::New(false), renderer, overwrite);
+  node->AddProperty("volumerendering.mapper", GridVolumeMapperProperty::New(), renderer, overwrite);
   node->AddProperty("scalar mode", VtkScalarModeProperty::New(0), renderer, overwrite);
   node->AddProperty("scalar visibility", BoolProperty::New(true), renderer, overwrite);
+  //node->AddProperty("scalar range min", DoubleProperty::New(std::numeric_limits<double>::min()), renderer, overwrite);
+  //node->AddProperty("scalar range max", DoubleProperty::New(std::numeric_limits<double>::max()), renderer, overwrite);
   node->AddProperty("outline polygons", BoolProperty::New(false), renderer, overwrite);
   node->AddProperty("color", ColorProperty::New(1.0f, 1.0f, 1.0f), renderer, overwrite);
   node->AddProperty("line width", IntProperty::New(1), renderer, overwrite);
+
+  if(overwrite || node->GetProperty("TransferFunction", renderer) == 0)
+  {
+    // add a default transfer function
+    mitk::TransferFunction::Pointer tf = mitk::TransferFunction::New();
+    //tf->GetColorTransferFunction()->RemoveAllPoints();
+    node->SetProperty ("TransferFunction", mitk::TransferFunctionProperty::New(tf.GetPointer()));
+  }
 
   Superclass::SetDefaultProperties(node, renderer, overwrite);
 }

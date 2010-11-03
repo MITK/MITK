@@ -84,11 +84,8 @@ protected:
   vtkUnstructuredGridMapper* m_VtkDataSetMapper2;
 
   vtkUnstructuredGridVolumeRayCastMapper* m_VtkVolumeRayCastMapper;
-  
-  #if (VTK_MAJOR_VERSION >= 5)
   vtkProjectedTetrahedraMapper* m_VtkPTMapper;
   vtkUnstructuredGridVolumeZSweepMapper* m_VtkVolumeZSweepMapper;
-  #endif
 };
 
 } // namespace mitk

@@ -22,11 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 mitk::GridVolumeMapperProperty::GridVolumeMapperProperty( )
 {
   AddRepresentationTypes();
-  #if (VTK_MAJOR_VERSION >= 5)
   SetValue( PT );
-  #else
-  SetValue( RAYCAST );
-  #endif
 }
 
 
@@ -39,11 +35,7 @@ mitk::GridVolumeMapperProperty::GridVolumeMapperProperty( const IdType& value )
   }
   else
   {
-    #if (VTK_MAJOR_VERSION >= 5)
     SetValue( PT );
-    #else
-    SetValue( RAYCAST );
-    #endif
   }
 }
 
@@ -57,27 +49,21 @@ mitk::GridVolumeMapperProperty::GridVolumeMapperProperty( const std::string& val
   }
   else
   {
-    #if (VTK_MAJOR_VERSION >= 5)
     SetValue( PT );
-    #else
-    SetValue( RAYCAST );
-    #endif
   }
 }
 
-#if (VTK_MAJOR_VERSION >= 5)
+
 void mitk::GridVolumeMapperProperty::SetVolumeMapperToPT()
 {
   SetValue( PT );
 }
-#endif
 
-#if (VTK_MAJOR_VERSION >= 5)
+
 void mitk::GridVolumeMapperProperty::SetVolumeMapperToZSweep()
 {
   SetValue( ZSWEEP );
 }
-#endif
 
 
 void mitk::GridVolumeMapperProperty::SetVolumeMapperToRayCast()
@@ -89,12 +75,8 @@ void mitk::GridVolumeMapperProperty::SetVolumeMapperToRayCast()
 void mitk::GridVolumeMapperProperty::AddRepresentationTypes()
 {
   AddEnum( "Ray Cast", RAYCAST );
-  
-  #if (VTK_MAJOR_VERSION >= 5)
   AddEnum( "Projected Tetrahedra", PT );
   AddEnum( "ZSweep", ZSWEEP );
-  #endif
-  
 }
 
 

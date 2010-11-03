@@ -26,15 +26,20 @@ namespace mitk
 
 /**
  * Extends the enumeration prop mitkEnumerationPropery. Adds the value 
- * (constant/Id/string representation):
- * POINTS/0/Points, WIREFRAME/1/Wireframe, SURFACE/2/Surface, VOLUME/3/Volume
+ * (constant / Id / string representation):
+ * <ul>
+ * <li>POINTS / 0 / Points</li>
+ * <li>WIREFRAME / 1 / Wireframe</li>
+ * <li>SURFACE / 2 / Surface</li>
+ * <li>WIREFRAME_SURFACE / 3 / WireframeSurface</li>
+ * </ul>
  * Default is the Wireframe representation
  */
 class MitkExt_EXPORT GridRepresentationProperty : public EnumerationProperty
 {
 public:
 
-  enum RepresentationType {POINTS = 0, WIREFRAME = 1, SURFACE = 2, VOLUME = 3};
+  enum RepresentationType {POINTS = 0, WIREFRAME = 1, SURFACE = 2}; //, WIREFRAME_SURFACE = 3};
 
   mitkClassMacro( GridRepresentationProperty, EnumerationProperty );
   
@@ -60,9 +65,9 @@ public:
   virtual void SetRepresentationToSurface();
   
   /**
-   * Sets the representation type to VOLUME.
+   * Sets the representation type to WIREFRAME_SURFACE.
    */
-  virtual void SetRepresentationToVolume();
+  virtual void SetRepresentationToWireframeSurface();
   
 protected:
 

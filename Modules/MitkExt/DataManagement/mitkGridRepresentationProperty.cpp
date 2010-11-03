@@ -72,9 +72,9 @@ void mitk::GridRepresentationProperty::SetRepresentationToSurface()
   SetValue( SURFACE );
 }
 
-void mitk::GridRepresentationProperty::SetRepresentationToVolume()
+void mitk::GridRepresentationProperty::SetRepresentationToWireframeSurface()
 {
-  SetValue( VOLUME );
+  //SetValue( WIREFRAME_SURFACE );
 }
 
 void mitk::GridRepresentationProperty::AddRepresentationTypes()
@@ -82,7 +82,7 @@ void mitk::GridRepresentationProperty::AddRepresentationTypes()
   AddEnum( "Points", POINTS );
   AddEnum( "Wireframe", WIREFRAME );
   AddEnum( "Surface", SURFACE );
-  AddEnum( "Volume", VOLUME );
+  //AddEnum( "WireframeSurface", WIREFRAME_SURFACE );
 }
 
 

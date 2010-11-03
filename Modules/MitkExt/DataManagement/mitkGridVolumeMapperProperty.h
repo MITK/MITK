@@ -34,10 +34,10 @@ class MitkExt_EXPORT GridVolumeMapperProperty : public EnumerationProperty
 {
 public:
 
-  enum MapperType { RAYCAST = 0
-  #if (VTK_MAJOR_VERSION >= 5)
-    , PT = 1, ZSWEEP = 2 
-  #endif
+  enum MapperType {
+    RAYCAST = 0,
+    PT = 1,
+    ZSWEEP = 2
   };
   
 
@@ -49,7 +49,6 @@ public:
   
   mitkNewMacro1Param(GridVolumeMapperProperty, const std::string&);
   
-  #if (VTK_MAJOR_VERSION >= 5)
   /**
    * Sets the mapper to projected tetrahedra.
    */
@@ -59,8 +58,7 @@ public:
    * Sets the mapper to zsweep.
    */
   virtual void SetVolumeMapperToZSweep();
-  #endif
-  
+
   /**
    * Sets the mapper to ray casting.
    */

@@ -8,7 +8,11 @@ MACRO(MACRO_CREATE_MITK_PLUGIN)
 
   TARGET_LINK_LIBRARIES(${PLUGIN_TARGET} ${ALL_LIBRARIES})
   ELSE(NOT _MODULE_CHECK_RESULT)
-    MESSAGE("Warning: ${BUNDLE-SYMBOLICNAME} is missing requirements and won't be built. Missing: ${_MODULE_CHECK_RESULT}")
+    IF(NOT MITK_BUILD_ALL_PLUGINS)
+      MESSAGE(SEND_ERROR "${BUNDLE-SYMBOLICNAME} is missing requirements and won't be built. Missing: ${_MODULE_CHECK_RESULT}")
+    ELSE()
+      MESSAGE(STATUS "${BUNDLE-SYMBOLICNAME} is missing requirements and won't be built. Missing: ${_MODULE_CHECK_RESULT}")
+    ENDIF()
   ENDIF(NOT _MODULE_CHECK_RESULT)
 ENDMACRO()
 

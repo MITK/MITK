@@ -205,7 +205,7 @@ MACRO(MITK_CREATE_MODULE MODULE_NAME_IN)
   # first of all we check for the dependencies
   MITK_CHECK_MODULE(_MISSING_DEP ${MODULE_DEPENDS})
   IF(_MISSING_DEP)
-    MESSAGE("Warning: Module ${MODULE_NAME} won't be built, missing dependency: ${_MISSING_DEP}") 
+    MESSAGE("Module ${MODULE_NAME} won't be built, missing dependency: ${_MISSING_DEP}") 
     SET(MODULE_IS_ENABLED 0)
   ELSE(_MISSING_DEP)
     SET(MODULE_IS_ENABLED 1)

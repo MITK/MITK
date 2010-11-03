@@ -27,7 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkColorPropertyEditor.h"
 #include "QmitkNumberPropertyView.h"
 #include "QmitkNumberPropertyEditor.h"
-#include "QmitkEnumerationPropertyEditor.h"
+#include "QmitkEnumerationPropertyWidget.h"
 
 #include <mitkEnumerationProperty.h>
 
@@ -153,7 +153,7 @@ QWidget* QmitkPropertyViewFactory::CreateEditor(mitk::BaseProperty* property, un
   else if ( mitk::EnumerationProperty* prop = dynamic_cast<mitk::EnumerationProperty*>(property) )
   {
     // a enumeration property
-    QmitkEnumerationPropertyEditor* pe = new QmitkEnumerationPropertyEditor(parent);
+    QmitkEnumerationPropertyWidget* pe = new QmitkEnumerationPropertyWidget(parent);
     pe->SetProperty(prop);
     return pe;
   }

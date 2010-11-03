@@ -16,7 +16,7 @@
  =========================================================================*/
 
 
-#include "QmitkUGCombinedRepresentationPropertyEditor.h"
+#include "QmitkUGCombinedRepresentationPropertyWidget.h"
 
 #include <mitkGridRepresentationProperty.h>
 #include <mitkGridVolumeMapperProperty.h>
@@ -31,7 +31,7 @@ class _UGCombinedBoolPropEditor : public mitk::PropertyEditor
   public:
 
     _UGCombinedBoolPropEditor(mitk::BoolProperty* boolProp,
-                              QmitkUGCombinedRepresentationPropertyEditor* combo)
+                              QmitkUGCombinedRepresentationPropertyWidget* combo)
       : PropertyEditor(boolProp), m_BoolProperty(boolProp),
       m_ComboBox(combo)
     {
@@ -72,7 +72,7 @@ class _UGCombinedBoolPropEditor : public mitk::PropertyEditor
     }
 
     mitk::BoolProperty* m_BoolProperty;
-    QmitkUGCombinedRepresentationPropertyEditor* m_ComboBox;
+    QmitkUGCombinedRepresentationPropertyWidget* m_ComboBox;
     bool enabled;
 
 };
@@ -84,7 +84,7 @@ class _UGCombinedEnumPropEditor : public mitk::PropertyEditor
 public:
 
   _UGCombinedEnumPropEditor(mitk::EnumerationProperty* property,
-    QmitkUGCombinedRepresentationPropertyEditor* combo, bool isVolumeProp)
+    QmitkUGCombinedRepresentationPropertyWidget* combo, bool isVolumeProp)
     : PropertyEditor(property), m_EnumerationProperty(property), m_ComboBox(combo),
       m_IsVolumeProp(isVolumeProp)
   {
@@ -127,28 +127,28 @@ public:
 protected:
 
   mitk::EnumerationProperty* m_EnumerationProperty;
-  QmitkUGCombinedRepresentationPropertyEditor* m_ComboBox;
+  QmitkUGCombinedRepresentationPropertyWidget* m_ComboBox;
   QHash<int, int> m_EnumIdToItemIndex;
   bool m_IsVolumeProp;
 };
 
 
 
-QmitkUGCombinedRepresentationPropertyEditor::QmitkUGCombinedRepresentationPropertyEditor(QWidget *parent) :
+QmitkUGCombinedRepresentationPropertyWidget::QmitkUGCombinedRepresentationPropertyWidget(QWidget *parent) :
     QComboBox(parent), gridRepPropEditor(0), volumeMapperPropEditor(0), volumePropEditor(0),
     m_GridRepIndex(0), m_GridVolIndex(0), m_FirstVolumeRepId(0)
 {
   connect(this, SIGNAL(currentIndexChanged(int)), this, SLOT(OnIndexChanged(int)));
 }
 
-QmitkUGCombinedRepresentationPropertyEditor::~QmitkUGCombinedRepresentationPropertyEditor()
+QmitkUGCombinedRepresentationPropertyWidget::~QmitkUGCombinedRepresentationPropertyWidget()
 {
   delete gridRepPropEditor;
   delete volumeMapperPropEditor;
   delete volumePropEditor;
 }
 
-void QmitkUGCombinedRepresentationPropertyEditor::SetProperty(
+void QmitkUGCombinedRepresentationPropertyWidget::SetProperty(
     mitk::GridRepresentationProperty* gridRepProp,
     mitk::GridVolumeMapperProperty* gridVolProp,
     mitk::BoolProperty* volumeProp)
@@ -228,7 +228,7 @@ void QmitkUGCombinedRepresentationPropertyEditor::SetProperty(
 }
 
 
-void QmitkUGCombinedRepresentationPropertyEditor::OnIndexChanged(int index)
+void QmitkUGCombinedRepresentationPropertyWidget::OnIndexChanged(int index)
 {
   int enumIndex = this->itemData(index, Qt::UserRole).toInt();
   if (index < m_FirstVolumeRepId && gridRepPropEditor)
@@ -249,7 +249,7 @@ void QmitkUGCombinedRepresentationPropertyEditor::OnIndexChanged(int index)
   }
 }
 
-void QmitkUGCombinedRepresentationPropertyEditor::SetGridRepresentationId(int enumId)
+void QmitkUGCombinedRepresentationPropertyWidget::SetGridRepresentationId(int enumId)
 {
   m_GridRepIndex = enumId;
   if (volumePropEditor && volumePropEditor->IsEnabled())
@@ -262,7 +262,7 @@ void QmitkUGCombinedRepresentationPropertyEditor::SetGridRepresentationId(int en
   }
 }
 
-void QmitkUGCombinedRepresentationPropertyEditor::SetGridVolumeId(int enumId)
+void QmitkUGCombinedRepresentationPropertyWidget::SetGridVolumeId(int enumId)
 {
   m_GridVolIndex = enumId;
   if (volumePropEditor && volumePropEditor->IsEnabled())
@@ -275,7 +275,7 @@ void QmitkUGCombinedRepresentationPropertyEditor::SetGridVolumeId(int enumId)
   }
 }
 
-void QmitkUGCombinedRepresentationPropertyEditor::IsVolumeChanged(bool volume)
+void QmitkUGCombinedRepresentationPropertyWidget::IsVolumeChanged(bool volume)
 {
   if (volume)
   {

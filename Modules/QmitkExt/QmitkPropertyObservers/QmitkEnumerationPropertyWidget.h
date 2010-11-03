@@ -15,8 +15,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#ifndef QMITK_ENUMERATIONPROPERTYEDITOR_H_INCLUDED
-#define QMITK_ENUMERATIONPROPERTYEDITOR_H_INCLUDED
+#ifndef QMITK_ENUMERATIONPROPERTYWIDGET_H_INCLUDED
+#define QMITK_ENUMERATIONPROPERTYWIDGET_H_INCLUDED
 
 #include "QmitkExtExports.h"
 
@@ -32,14 +32,14 @@ namespace mitk
 class _EnumPropEditorImpl;
 
 /// @ingroup Widgets
-class QmitkExt_EXPORT QmitkEnumerationPropertyEditor : public QComboBox
+class QmitkExt_EXPORT QmitkEnumerationPropertyWidget : public QComboBox
 {
   Q_OBJECT
 
   public:
     
-    QmitkEnumerationPropertyEditor(QWidget* parent = 0);
-    ~QmitkEnumerationPropertyEditor();
+    QmitkEnumerationPropertyWidget(QWidget* parent = 0);
+    ~QmitkEnumerationPropertyWidget();
 
     void SetProperty(mitk::EnumerationProperty* property);
 
@@ -53,5 +53,5 @@ class QmitkExt_EXPORT QmitkEnumerationPropertyEditor : public QComboBox
 
 };
 
-#endif // QMITK_ENUMERATIONPROPERTYEDITOR_H_INCLUDED
+#endif // QMITK_ENUMERATIONPROPERTYWIDGET_H_INCLUDED
 

@@ -29,7 +29,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkVtkScalarModeProperty.h>
 #include <mitkPropertyObserver.h>
 
-#include <QmitkUGCombinedRepresentationPropertyEditor.h>
+#include <QmitkUGCombinedRepresentationPropertyWidget.h>
 #include <QmitkBoolPropertyWidget.h>
 
 #include <QWidgetAction>

@@ -23,7 +23,7 @@ SET(CPP_FILES
  QmitkPropertyObservers/QmitkBoolPropertyWidget.cpp
  QmitkPropertyObservers/QmitkColorPropertyEditor.cpp
  QmitkPropertyObservers/QmitkColorPropertyView.cpp
- QmitkPropertyObservers/QmitkEnumerationPropertyEditor.cpp
+ QmitkPropertyObservers/QmitkEnumerationPropertyWidget.cpp
  QmitkPropertyObservers/QmitkNumberPropertyEditor.cpp
  QmitkPropertyObservers/QmitkNumberPropertyView.cpp
  QmitkPropertyObservers/QmitkPropertyViewFactory.cpp
@@ -31,7 +31,7 @@ SET(CPP_FILES
  QmitkPropertyObservers/QmitkStringPropertyOnDemandEdit.cpp
  QmitkPropertyObservers/QmitkStringPropertyView.cpp
  QmitkPropertyObservers/QmitkNumberPropertySlider.cpp
- QmitkPropertyObservers/QmitkUGCombinedRepresentationPropertyEditor.cpp
+ QmitkPropertyObservers/QmitkUGCombinedRepresentationPropertyWidget.cpp
 
  qclickablelabel.cpp
  #QmitkAbortEventFilter.cpp
@@ -140,14 +140,14 @@ SET(MOC_H_FILES
  QmitkPropertyObservers/QmitkBoolPropertyWidget.h
  QmitkPropertyObservers/QmitkColorPropertyEditor.h
  QmitkPropertyObservers/QmitkColorPropertyView.h
- QmitkPropertyObservers/QmitkEnumerationPropertyEditor.h
+ QmitkPropertyObservers/QmitkEnumerationPropertyWidget.h
  QmitkPropertyObservers/QmitkNumberPropertyEditor.h
  QmitkPropertyObservers/QmitkNumberPropertyView.h
  QmitkPropertyObservers/QmitkStringPropertyEditor.h
  QmitkPropertyObservers/QmitkStringPropertyOnDemandEdit.h
  QmitkPropertyObservers/QmitkStringPropertyView.h
  QmitkPropertyObservers/QmitkNumberPropertySlider.h
- QmitkPropertyObservers/QmitkUGCombinedRepresentationPropertyEditor.h
+ QmitkPropertyObservers/QmitkUGCombinedRepresentationPropertyWidget.h
 
               # QmitkFunctionalityComponents/QmitkSurfaceCreatorComponent.h
                       #QmitkFunctionalityComponents/QmitkPixelGreyValueManipulatorComponent.h

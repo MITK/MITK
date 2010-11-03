@@ -15,7 +15,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#include "QmitkEnumerationPropertyEditor.h"
+#include "QmitkEnumerationPropertyWidget.h"
 
 #include <mitkPropertyObserver.h>
 #include <mitkEnumerationProperty.h>
@@ -67,18 +67,18 @@ protected:
 };
 
 
-QmitkEnumerationPropertyEditor::QmitkEnumerationPropertyEditor(QWidget* parent)
+QmitkEnumerationPropertyWidget::QmitkEnumerationPropertyWidget(QWidget* parent)
 : QComboBox(parent), propView(0)
 {
   connect(this, SIGNAL(currentIndexChanged(int)), this, SLOT(OnIndexChanged(int)));
 }
 
-QmitkEnumerationPropertyEditor::~QmitkEnumerationPropertyEditor()
+QmitkEnumerationPropertyWidget::~QmitkEnumerationPropertyWidget()
 {
   delete propView;
 }
 
-void QmitkEnumerationPropertyEditor::SetProperty(mitk::EnumerationProperty* property)
+void QmitkEnumerationPropertyWidget::SetProperty(mitk::EnumerationProperty* property)
 {
   if(propView)
   {
@@ -108,7 +108,7 @@ void QmitkEnumerationPropertyEditor::SetProperty(mitk::EnumerationProperty* prop
   propView->PropertyChanged();
 }
 
- void QmitkEnumerationPropertyEditor::OnIndexChanged(int index)
+ void QmitkEnumerationPropertyWidget::OnIndexChanged(int index)
  {
    if (propView)
    {

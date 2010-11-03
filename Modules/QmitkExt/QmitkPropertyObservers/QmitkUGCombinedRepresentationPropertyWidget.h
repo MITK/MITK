@@ -16,8 +16,8 @@
  =========================================================================*/
 
 
-#ifndef QMITKUGCOMBINEDREPRESENTATIONPROPERTYEDITOR_H
-#define QMITKUGCOMBINEDREPRESENTATIONPROPERTYEDITOR_H
+#ifndef QMITKUGCOMBINEDREPRESENTATIONPROPERTYWIDGET_H
+#define QMITKUGCOMBINEDREPRESENTATIONPROPERTYWIDGET_H
 
 #include "QmitkExtExports.h"
 
@@ -35,14 +35,14 @@ class _UGCombinedEnumPropEditor;
 class _UGCombinedBoolPropEditor;
 
 /// @ingroup Widgets
-class QmitkExt_EXPORT QmitkUGCombinedRepresentationPropertyEditor : public QComboBox
+class QmitkExt_EXPORT QmitkUGCombinedRepresentationPropertyWidget : public QComboBox
 {
   Q_OBJECT
 
 public:
 
-  QmitkUGCombinedRepresentationPropertyEditor(QWidget *parent = 0);
-  ~QmitkUGCombinedRepresentationPropertyEditor();
+  QmitkUGCombinedRepresentationPropertyWidget(QWidget *parent = 0);
+  ~QmitkUGCombinedRepresentationPropertyWidget();
 
   void SetProperty(mitk::GridRepresentationProperty* gridRepresentation,
                    mitk::GridVolumeMapperProperty* volumeMapper,
@@ -74,4 +74,4 @@ protected:
 
 };
 
-#endif // QMITKUGCOMBINEDREPRESENTATIONPROPERTYEDITOR_H
+#endif // QMITKUGCOMBINEDREPRESENTATIONPROPERTYWIDGET_H

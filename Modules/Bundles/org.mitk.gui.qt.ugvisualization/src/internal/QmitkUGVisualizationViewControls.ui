@@ -81,7 +81,7 @@
           <number>0</number>
          </property>
          <item row="0" column="1">
-          <widget class="QmitkUGCombinedRepresentationPropertyEditor" name="m_RepresentationComboBox">
+          <widget class="QmitkUGCombinedRepresentationPropertyWidget" name="m_RepresentationComboBox">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
              <horstretch>1</horstretch>
@@ -91,7 +91,7 @@
           </widget>
          </item>
          <item row="1" column="1">
-          <widget class="QmitkEnumerationPropertyEditor" name="m_ScalarModeComboBox"/>
+          <widget class="QmitkEnumerationPropertyWidget" name="m_ScalarModeComboBox"/>
          </item>
          <item row="0" column="0">
           <widget class="QLabel" name="label">
@@ -149,14 +149,14 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>QmitkEnumerationPropertyEditor</class>
+   <class>QmitkEnumerationPropertyWidget</class>
    <extends>QComboBox</extends>
-   <header location="global">QmitkEnumerationPropertyEditor.h</header>
+   <header location="global">QmitkEnumerationPropertyWidget.h</header>
   </customwidget>
   <customwidget>
-   <class>QmitkUGCombinedRepresentationPropertyEditor</class>
+   <class>QmitkUGCombinedRepresentationPropertyWidget</class>
    <extends>QComboBox</extends>
-   <header location="global">QmitkUGCombinedRepresentationPropertyEditor.h</header>
+   <header location="global">QmitkUGCombinedRepresentationPropertyWidget.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

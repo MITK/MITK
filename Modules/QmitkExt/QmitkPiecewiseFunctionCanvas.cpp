@@ -36,13 +36,6 @@ void QmitkPiecewiseFunctionCanvas::SetTitle(const QString& title)
 void QmitkPiecewiseFunctionCanvas::paintEvent(QPaintEvent*)
 {
   QPainter painter(this);
-
-  if( ! this->isEnabled() )
-  {
-    painter.setPen(Qt::gray);
-    painter.drawRect(0, 0, contentsRect().width()+1, contentsRect().height()+1);
-    return;
-  }
  
   PaintHistogram(painter);
 
@@ -84,7 +77,7 @@ void QmitkPiecewiseFunctionCanvas::paintEvent(QPaintEvent*)
 
   QRect contentsRect = this->contentsRect();
   painter.drawRect(0, 0, contentsRect.width()+1, contentsRect.height()+1);
-  if (m_PiecewiseFunction)
+  if (m_PiecewiseFunction && this->isEnabled())
   {
     vtkFloatingPointType* dp = m_PiecewiseFunction->GetDataPointer();
 

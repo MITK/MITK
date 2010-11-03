@@ -29,7 +29,7 @@ QmitkColorTransferFunctionCanvas::QmitkColorTransferFunctionCanvas(
   setContentsMargins(1,1,1,1);
 }
 
-void QmitkColorTransferFunctionCanvas::SetTitle(std::string title)
+void QmitkColorTransferFunctionCanvas::SetTitle(const QString& title)
 {
   m_Title=title;
 }
@@ -65,9 +65,9 @@ void QmitkColorTransferFunctionCanvas::paintEvent(QPaintEvent*)
   if (m_Title.size()>0)
   {
     painter.setPen(Qt::black);
-    painter.drawText(QPoint(11,21),QString( m_Title.c_str() ));
+    painter.drawText(QPoint(11,21),m_Title);
     painter.setPen(Qt::white);
-    painter.drawText(QPoint(10,20),QString( m_Title.c_str() ));
+    painter.drawText(QPoint(10,20),m_Title);
   }
   
   //paint min and max

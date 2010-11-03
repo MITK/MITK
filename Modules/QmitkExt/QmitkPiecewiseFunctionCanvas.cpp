@@ -28,7 +28,7 @@ QmitkPiecewiseFunctionCanvas::QmitkPiecewiseFunctionCanvas(QWidget * parent,
   setContentsMargins(1,1,1,1);
 }
 
-void QmitkPiecewiseFunctionCanvas::SetTitle(std::string title)
+void QmitkPiecewiseFunctionCanvas::SetTitle(const QString& title)
 {
   m_Title=title;
 }
@@ -49,9 +49,9 @@ void QmitkPiecewiseFunctionCanvas::paintEvent(QPaintEvent*)
   if (m_Title.size()>0)
   {
     painter.setPen(Qt::black);
-    painter.drawText(QPoint(11,21),QString( m_Title.c_str() ));
+    painter.drawText(QPoint(11,21),m_Title);
     painter.setPen(Qt::white);
-    painter.drawText(QPoint(10,20),QString( m_Title.c_str() ));
+    painter.drawText(QPoint(10,20),m_Title);
   }
 
   {

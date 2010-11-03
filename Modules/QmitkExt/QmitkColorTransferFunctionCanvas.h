@@ -32,7 +32,7 @@ public:
   QmitkColorTransferFunctionCanvas( QWidget* parent = 0, Qt::WindowFlags f = 0 )  ;
   virtual void paintEvent( QPaintEvent* e );
   int GetNearHandle(int x,int y,unsigned int maxSquaredDistance = 32);
-  void SetTitle(std::string title);
+  void SetTitle(const QString& title);
 
   void SetColorTransferFunction(vtkColorTransferFunction* colorTransferFunction)
   {
@@ -41,12 +41,12 @@ public:
     this->SetMax(colorTransferFunction->GetRange()[1]);
     setEnabled(true);
     update();
-  };
+  }
 
   void AddFunctionPoint(vtkFloatingPointType x,vtkFloatingPointType /*val*/)
   {
     m_ColorTransferFunction->AddRGBPoint(x,m_ColorTransferFunction->GetRedValue(x),m_ColorTransferFunction->GetGreenValue(x),m_ColorTransferFunction->GetBlueValue(x));
-  };
+  }
 
   void RemoveFunctionPoint(vtkFloatingPointType x)
   {
@@ -57,7 +57,7 @@ public:
       std::cout << "old/new size" << old_size << "/" << GetFunctionSize() << std::endl;
       std::cout << "called with x=" << x << std::endl;
     }
-  };
+  }
 
   vtkFloatingPointType GetFunctionX(int index)
   {
@@ -112,7 +112,7 @@ public:
 protected:
   
   vtkColorTransferFunction* m_ColorTransferFunction;
-	std::string m_Title;
+  QString m_Title;
 
 };
 #endif

@@ -67,6 +67,47 @@ void QmitkTransferFunctionWidget::SetIntegerMode(bool intMode)
   m_RangeSlider->setIntegerMode(intMode);
 }
 
+void QmitkTransferFunctionWidget::SetScalarLabel(const QString& scalarLabel)
+{
+  m_textLabelX->setText(scalarLabel);
+  m_textLabelX_2->setText(scalarLabel);
+  m_textLabelX_3->setText(scalarLabel);
+
+  m_ScalarOpacityFunctionCanvas->SetTitle(scalarLabel + " -> Opacity");
+  m_GradientOpacityCanvas->SetTitle(scalarLabel + "/Gradient -> Opacity");
+  m_ColorTransferFunctionCanvas->SetTitle(scalarLabel + " -> Color");
+}
+
+void QmitkTransferFunctionWidget::ShowScalarOpacityFunction(bool show)
+{
+  m_ScalarOpacityWidget->setVisible(show);
+}
+
+void QmitkTransferFunctionWidget::ShowColorFunction(bool show)
+{
+  m_ColorWidget->setVisible(show);
+}
+
+void QmitkTransferFunctionWidget::ShowGradientOpacityFunction(bool show)
+{
+  m_GradientOpacityWidget->setVisible(show);
+}
+
+void QmitkTransferFunctionWidget::SetScalarOpacityFunctionEnabled(bool enable)
+{
+  m_ScalarOpacityWidget->setEnabled(enable);
+}
+
+void QmitkTransferFunctionWidget::SetColorFunctionEnabled(bool enable)
+{
+  m_ColorWidget->setEnabled(enable);
+}
+
+void QmitkTransferFunctionWidget::SetGradientOpacityFunctionEnabled(bool enable)
+{
+  m_GradientOpacityWidget->setEnabled(enable);
+}
+
 void QmitkTransferFunctionWidget::SetDataNode(mitk::DataNode* node)
 {
 

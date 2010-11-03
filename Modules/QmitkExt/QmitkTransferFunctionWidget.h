@@ -47,6 +47,17 @@ class QmitkExt_EXPORT QmitkTransferFunctionWidget : public QWidget, public Ui::Q
     void SetDataNode(mitk::DataNode* node);
 
    void SetIntegerMode(bool intMode);
+
+   void SetScalarLabel(const QString& scalarLabel);
+
+   void ShowScalarOpacityFunction(bool show);
+   void ShowColorFunction(bool show);
+   void ShowGradientOpacityFunction(bool show);
+
+   void SetScalarOpacityFunctionEnabled(bool enable);
+   void SetColorFunctionEnabled(bool enable);
+   void SetGradientOpacityFunctionEnabled(bool enable);
+
   public slots:
 
     void SetXValueScalar();

@@ -57,6 +57,7 @@ public:
   {
     m_Property = 0;
     m_EnumerationProperty = 0;
+    m_ComboBox->setEnabled(false);
   }
 
 protected:
@@ -92,6 +93,8 @@ void QmitkEnumerationPropertyWidget::SetProperty(mitk::EnumerationProperty* prop
   {
     return;
   }
+
+  this->setEnabled(true);
 
   QHash<int,int> enumIdToItemIndex;
 

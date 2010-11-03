@@ -39,9 +39,11 @@ public:
     m_Property = NULL;
     m_BoolProperty = NULL;
     // display "no certain value"
+    m_CheckBox->blockSignals(true);
     m_CheckBox->setTristate(true);
     m_CheckBox->setCheckState(Qt::PartiallyChecked);
     m_CheckBox->setEnabled(false);
+    m_CheckBox->blockSignals(false);
   }
 
   void ValueChanged(bool value)

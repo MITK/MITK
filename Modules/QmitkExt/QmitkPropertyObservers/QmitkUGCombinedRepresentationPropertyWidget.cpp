@@ -172,6 +172,7 @@ void QmitkUGCombinedRepresentationPropertyWidget::SetProperty(
   }
 
   this->clear();
+  this->setEnabled(true);
   m_FirstVolumeRepId = 0;
   m_MapRepEnumToIndex.clear();
   m_MapVolEnumToIndex.clear();

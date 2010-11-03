@@ -19,10 +19,12 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef QMITKFLOATINGPOINTSPANSLIDER_H
 #define QMITKFLOATINGPOINTSPANSLIDER_H
 
+#include <QmitkExtExports.h>
+
 #include <qxtspanslider.h>
 #include <QWidget>
 
-class QmitkFloatingPointSpanSlider : public QxtSpanSlider
+class QmitkExt_EXPORT QmitkFloatingPointSpanSlider : public QxtSpanSlider
 {
   Q_OBJECT
   Q_PROPERTY(double loweralue READ lowerValue WRITE setLowerValue

@@ -17,6 +17,17 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkTransferFunctionInitializer.h"
 
+static const char* presetNames[] = {  "choose an internal transferfunction preset",
+                              "CT Generic",
+                              "CT Black & White",
+                              "CT Thorax large",
+                              "CT Thorax small",
+                              "CT Bone",
+                              "CT Bone (with Gradient)",
+                              "CT Cardiac",
+                              "MR Generic" };
+
+static int numPresetNames = sizeof( presetNames ) / sizeof( char * );
 
 namespace mitk
 {
@@ -32,6 +43,14 @@ namespace mitk
 TransferFunctionInitializer::~TransferFunctionInitializer()
 {
 
+}
+
+void TransferFunctionInitializer::GetPresetNames(std::vector<std::string>& names)
+{
+  for (int i = 0; i < numPresetNames; ++i)
+  {
+    names.push_back(presetNames[i]);
+  }
 }
 
 void TransferFunctionInitializer::SetTransferFunction(mitk::TransferFunction::Pointer transferFunction)

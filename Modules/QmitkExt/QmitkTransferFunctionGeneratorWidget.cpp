@@ -20,24 +20,15 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkTransferFunctionProperty.h>
 #include <mitkRenderingManager.h>
 #include <mitkTransferFunctionInitializer.h>
+#include <mitkUnstructuredGrid.h>
 #include <QFileDialog>
 
 #include <SceneSerializationExports.h>
 #include <mitkTransferFunctionPropertySerializer.h>
 #include <mitkTransferFunctionPropertyDeserializer.h>
 
+#include <vtkUnstructuredGrid.h>
 
-static const char* presetNames[] = {  "choose an internal transferfunction preset",
-                              "CT Generic",
-                              "CT Black & White",
-                              "CT Thorax large",
-                              "CT Thorax small",
-                              "CT Bone",
-                              "CT Bone (with Gradient)",
-                              "CT Cardiac",
-                              "MR Generic" };
-
-static int numPresetNames = sizeof( presetNames ) / sizeof( char * );
 
 QmitkTransferFunctionGeneratorWidget::QmitkTransferFunctionGeneratorWidget(QWidget* parent,
     Qt::WindowFlags f) :
@@ -60,11 +51,10 @@ QmitkTransferFunctionGeneratorWidget::QmitkTransferFunctionGeneratorWidget(QWidg
    
   // Presets Tab
   {
-    for(int r=0; r< numPresetNames; r++)
-        m_TransferFunctionComboBox->addItem( QString::fromLocal8Bit(presetNames[r]));
+    m_TransferFunctionComboBox->setVisible(false);
     
-    
-    connect( m_TransferFunctionComboBox, SIGNAL( activated( int ) ), this, SLOT( OnMitkInternalPreset( int ) ) );
+    connect( m_TransferFunctionComboBox, SIGNAL( activated( int ) ), this, SIGNAL(SignalTransferFunctionModeChanged(int)) );
+    connect( m_TransferFunctionComboBox, SIGNAL( activated( int ) ), this, SLOT(OnPreset(int)) );
 
     connect( m_SavePreset, SIGNAL( clicked() ), this, SLOT( OnSavePreset() ) );
     
@@ -75,7 +65,28 @@ QmitkTransferFunctionGeneratorWidget::QmitkTransferFunctionGeneratorWidget(QWidg
 }
 
 
+int QmitkTransferFunctionGeneratorWidget::AddPreset(const QString &presetName)
+{
+  m_TransferFunctionComboBox->setVisible(true);
 
+  m_TransferFunctionComboBox->addItem( presetName);
+  return m_TransferFunctionComboBox->count()-1;
+}
+
+void QmitkTransferFunctionGeneratorWidget::SetPresetsTabEnabled(bool enable)
+{
+  m_PresetTab->setEnabled(enable);
+}
+
+void QmitkTransferFunctionGeneratorWidget::SetThresholdTabEnabled(bool enable)
+{
+  m_ThresholdTab->setEnabled(enable);
+}
+
+void QmitkTransferFunctionGeneratorWidget::SetBellTabEnabled(bool enable)
+{
+  m_BellTab->setEnabled(enable);
+}
 
 void QmitkTransferFunctionGeneratorWidget::OnSavePreset( )
 {
@@ -192,26 +203,17 @@ void QmitkTransferFunctionGeneratorWidget::OnLoadPreset( )
   }
 }
 
-void QmitkTransferFunctionGeneratorWidget::OnMitkInternalPreset( int mode )
+void QmitkTransferFunctionGeneratorWidget::OnPreset(int mode)
 {
-  if(tfpToChange.IsNull())
-    return;
-
   //first item is only information
   if( --mode == -1 )
     return;
 
+  m_InfoPreset->setText(QString("selected ") + m_TransferFunctionComboBox->currentText());
+
   //revert to first item
   m_TransferFunctionComboBox->setCurrentIndex( 0 );
-
-  // -- Creat new TransferFunction
-  mitk::TransferFunctionInitializer::Pointer tfInit = mitk::TransferFunctionInitializer::New(tfpToChange->GetValue());
-  tfInit->SetTransferFunctionMode(mode);
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-  emit SignalUpdateCanvas();
-  m_InfoPreset->setText( QString( (std::string("selected ")+ std::string(presetNames[mode+1])).c_str() ) );
 }
-
 
 static double transformationGlocke ( double x )
 {
@@ -466,12 +468,6 @@ void QmitkTransferFunctionGeneratorWidget::SetDataNode(mitk::DataNode* node)
     
     if(!tfpToChange)
     {
-      if (! dynamic_cast<mitk::Image*>(node->GetData()))
-      {
-        MITK_WARN << "QmitkTransferFunctionGeneratorWidget::SetDataNode called with non-image node";
-        return;
-      }
-      
       node->SetProperty("TransferFunction", tfpToChange = mitk::TransferFunctionProperty::New() );
       dynamic_cast<mitk::TransferFunctionProperty*>(node->GetProperty("TransferFunction"));
     }
@@ -484,8 +480,22 @@ void QmitkTransferFunctionGeneratorWidget::SetDataNode(mitk::DataNode* node)
       histoMinimum= image->GetScalarValueMin();
       histoMaximum= image->GetScalarValueMax();
     }
-            
-    thPos = ( histoMinimum + histoMaximum ) / 2; 
+    else if (mitk::UnstructuredGrid* grid = dynamic_cast<mitk::UnstructuredGrid*>( node->GetData() ) )
+    {
+      double* range = grid->GetVtkUnstructuredGrid()->GetScalarRange();
+      histoMinimum = range[0];
+      histoMaximum = range[1];
+      double histoRange = histoMaximum - histoMinimum;
+      deltaMax = histoRange/4.0;
+      deltaMin = histoRange/400.0;
+      deltaScale = histoRange/1024.0;
+    }
+    else
+    {
+      MITK_WARN << "QmitkTransferFunctonGeneratorWidget does not support " << node->GetData()->GetNameOfClass() << " instances";
+    }
+
+    thPos = ( histoMinimum + histoMaximum ) / 2.0;
     
   }
   else

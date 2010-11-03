@@ -51,6 +51,8 @@ public:
 
   itkNewMacro( TransferFunctionInitializer );
   mitkNewMacro1Param(TransferFunctionInitializer, TransferFunction::Pointer);
+
+  static void GetPresetNames(std::vector<std::string>& presetNames);
   
   void SetTransferFunction(TransferFunction::Pointer transferFunction);
   mitk::TransferFunction::Pointer GetTransferFunction();

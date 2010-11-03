@@ -30,6 +30,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <mitkTransferFunction.h>
 #include <mitkTransferFunctionProperty.h>
+#include <mitkTransferFunctionInitializer.h>
 #include "mitkHistogramGenerator.h"
 #include "QmitkPiecewiseFunctionCanvas.h"
 #include "QmitkColorTransferFunctionCanvas.h"
@@ -69,6 +70,17 @@ void QmitkVolumeVisualizationView::CreateQtPartControl(QWidget* parent)
     m_Controls = new Ui::QmitkVolumeVisualizationViewControls;
     m_Controls->setupUi(parent);
 
+    m_Controls->m_TransferFunctionWidget->SetIntegerMode(true);
+
+    // Fill the tf presets in the generator widget
+    std::vector<std::string> names;
+    mitk::TransferFunctionInitializer::GetPresetNames(names);
+    for (std::vector<std::string>::const_iterator it = names.begin();
+         it != names.end(); ++it)
+    {
+      m_Controls->m_TransferFunctionGeneratorWidget->AddPreset(QString::fromStdString(*it));
+    }
+
     m_Controls->m_RenderMode->addItem("CPU raycast");
     m_Controls->m_RenderMode->addItem("CPU MIP raycast");
     m_Controls->m_RenderMode->addItem("GPU slicing");
@@ -83,7 +95,8 @@ void QmitkVolumeVisualizationView::CreateQtPartControl(QWidget* parent)
     connect( m_Controls->m_RenderMode, SIGNAL( activated(int) ),this, SLOT( OnRenderMode(int) ));
 
     connect( m_Controls->m_TransferFunctionGeneratorWidget, SIGNAL( SignalUpdateCanvas( ) ),   m_Controls->m_TransferFunctionWidget, SLOT( OnUpdateCanvas( ) ) );
- 
+    connect( m_Controls->m_TransferFunctionGeneratorWidget, SIGNAL(SignalTransferFunctionModeChanged(int)), SLOT(OnMitkInternalPreset(int)));
+
     m_Controls->m_EnableRenderingCB->setEnabled(false);
     m_Controls->m_EnableLOD->setEnabled(false);
     m_Controls->m_RenderMode->setEnabled(false);
@@ -93,6 +106,26 @@ void QmitkVolumeVisualizationView::CreateQtPartControl(QWidget* parent)
     m_Controls->m_SelectedImageLabel->hide();
     m_Controls->m_ErrorImageLabel->hide();
     
+  }
+}
+
+void QmitkVolumeVisualizationView::OnMitkInternalPreset( int mode )
+{
+  if (m_SelectedNode.IsNull()) return;
+
+  mitk::DataNode::Pointer node(m_SelectedNode.GetPointer());
+  mitk::TransferFunctionProperty::Pointer transferFuncProp;
+  if (node->GetProperty(transferFuncProp, "TransferFunction"))
+  {
+    //first item is only information
+    if( --mode == -1 )
+      return;
+
+    // -- Creat new TransferFunction
+    mitk::TransferFunctionInitializer::Pointer tfInit = mitk::TransferFunctionInitializer::New(transferFuncProp->GetValue());
+    tfInit->SetTransferFunctionMode(mode);
+    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    m_Controls->m_TransferFunctionWidget->OnUpdateCanvas();
   }
 }
 

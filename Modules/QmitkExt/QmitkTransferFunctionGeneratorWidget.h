@@ -39,12 +39,17 @@ class QmitkExt_EXPORT QmitkTransferFunctionGeneratorWidget : public QWidget, pub
     ~QmitkTransferFunctionGeneratorWidget () ;
 
     void SetDataNode(mitk::DataNode* node);
+
+    int AddPreset(const QString& presetName);
+
+    void SetPresetsTabEnabled(bool enable);
+    void SetThresholdTabEnabled(bool enable);
+    void SetBellTabEnabled(bool enable);
    
   public slots:
 
     void OnSavePreset( );
     void OnLoadPreset( );
-    void OnMitkInternalPreset( int mode );
     
     void OnDeltaLevelWindow( int dx, int dy );
     void OnDeltaThreshold( int dx, int dy );
@@ -52,8 +57,12 @@ class QmitkExt_EXPORT QmitkTransferFunctionGeneratorWidget : public QWidget, pub
   signals:
 
     void SignalTransferFunctionModeChanged( int );
-    void SignalUpdateCanvas( );
+    void SignalUpdateCanvas();
    
+  protected slots:
+
+    void OnPreset( int mode );
+
   protected:
  
     mitk::TransferFunctionProperty::Pointer tfpToChange;

@@ -60,6 +60,8 @@ public:
 
 protected slots:
 
+  void OnMitkInternalPreset( int mode );
+
   void OnEnableRendering( bool state );
   void OnEnableLOD( bool state );
   void OnRenderMode( int mode );

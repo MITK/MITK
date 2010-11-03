@@ -1559,7 +1559,10 @@ const char *vtkMitkGPUVolumeRayCastMapper_ShadeFS =
 "      // diffuse term for this light\n"
 "      if(nDotL>0.0)\n"
 "        {\n"
-"        finalColor+=(gl_FrontLightProduct[0].diffuse*nDotL)*color;\n"
+// WORKAROUND FIX: gl_FrontLightProduct[0].diffuse seems to be not transferred on ATI cards
+//"        finalColor+=(gl_FrontLightProduct[0].diffuse*nDotL)*color;\n"
+// JUST USING A WHITE LIGHT NOW
+"        finalColor+=(1.1*nDotL)*color;\n"
 "        }\n"
 "      \n"
 "      // specular term for this light\n"

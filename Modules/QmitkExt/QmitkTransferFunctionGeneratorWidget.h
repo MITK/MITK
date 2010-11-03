@@ -38,7 +38,7 @@ class QmitkExt_EXPORT QmitkTransferFunctionGeneratorWidget : public QWidget, pub
     QmitkTransferFunctionGeneratorWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
     ~QmitkTransferFunctionGeneratorWidget () ;
 
-	  void SetDataNode(mitk::DataNode* node);
+    void SetDataNode(mitk::DataNode* node);
    
   public slots:
 
@@ -58,17 +58,23 @@ class QmitkExt_EXPORT QmitkTransferFunctionGeneratorWidget : public QWidget, pub
  
     mitk::TransferFunctionProperty::Pointer tfpToChange;
     
-    int histoMinimum;
-    int histoMaximum;
+    double histoMinimum;
+    double histoMaximum;
     
-    int thPos;
-    int thDelta;
+    double thPos;
+    double thDelta;
+
+    double deltaScale;
+    double deltaMax;
+    double deltaMin;
     
     const mitk::Image::HistogramType *histoGramm;
     
     QString presetFileName;
     
     std::string ReduceFileName(std::string fileNameLong );
+
+    double ScaleDelta(int d) const;
     
 };
 #endif

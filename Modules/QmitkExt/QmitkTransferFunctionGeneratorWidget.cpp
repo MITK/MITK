@@ -41,7 +41,7 @@ static int numPresetNames = sizeof( presetNames ) / sizeof( char * );
 
 QmitkTransferFunctionGeneratorWidget::QmitkTransferFunctionGeneratorWidget(QWidget* parent,
     Qt::WindowFlags f) :
-  QWidget(parent, f)
+  QWidget(parent, f), deltaScale(1.0), deltaMax(1024), deltaMin(1)
 {
   histoGramm = NULL;
 
@@ -236,6 +236,12 @@ static double stepFunctionGlocke ( double x )
   return x;
 }
 
+double QmitkTransferFunctionGeneratorWidget::ScaleDelta(int d) const
+{
+  //MITK_INFO << "Scaling (int) " << d << "to (double) " << deltaScale*(double)d;
+  return deltaScale*(double)d;
+}
+
 void QmitkTransferFunctionGeneratorWidget::OnDeltaLevelWindow(int dx, int dy)      // bell
 {
   //std::string infoText;
@@ -245,14 +251,14 @@ void QmitkTransferFunctionGeneratorWidget::OnDeltaLevelWindow(int dx, int dy)   
   if(tfpToChange.IsNull())
     return;
 
-  thPos += dx;
-  thDelta -= dy;
+  thPos += ScaleDelta(dx);
+  thDelta -= ScaleDelta(dy);
   
-  if(thDelta < 1)
-    thDelta = 1;
+  if(thDelta < deltaMin)
+    thDelta = deltaMin;
     
-  if(thDelta > 1024)
-    thDelta = 1024;
+  if(thDelta > deltaMax)
+    thDelta = deltaMax;
     
   if(thPos < histoMinimum)
     thPos = histoMinimum;
@@ -326,25 +332,24 @@ void QmitkTransferFunctionGeneratorWidget::OnDeltaThreshold(int dx, int dy)   //
   if(tfpToChange.IsNull())
     return;
 
-  thPos += dx;
-  thDelta += dy;
+  thPos += ScaleDelta(dx);
+  thDelta += ScaleDelta(dy);
   
-  if(thDelta < 1)
-    thDelta = 1;
+  if(thDelta < deltaMin)
+    thDelta = deltaMin;
     
-  if(thDelta > 1024)
-    thDelta = 1024;
+  if(thDelta > deltaMax)
+    thDelta = deltaMax;
     
   if(thPos < histoMinimum)
     thPos = histoMinimum;
     
   if(thPos > histoMaximum)
     thPos = histoMaximum;
-          /*
-  MITK_INFO << "threshold pos: " << thPos << " delta: " << thDelta;
 
-  MITK_INFO << "histoMinimum: " << histoMinimum << " max: " << histoMaximum;
-            */
+  //MITK_INFO << "threshold pos: " << thPos << " delta: " << thDelta;
+  //MITK_INFO << "histoMinimum: " << histoMinimum << " max: " << histoMaximum;
+
  
 
   std::stringstream ss;

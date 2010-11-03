@@ -45,6 +45,7 @@ SET(CPP_FILES
 
  # QmitkEventAdapter.cpp
 
+ QmitkFloatingPointSpanSlider.cpp
  QmitkColorTransferFunctionCanvas.cpp
  QmitkSlicesInterpolator.cpp
  QmitkStandardViews.cpp
@@ -166,6 +167,7 @@ SET(MOC_H_FILES
  QmitkColorTransferFunctionCanvas.h
  QmitkPiecewiseFunctionCanvas.h
  QmitkTransferFunctionCanvas.h
+ QmitkFloatingPointSpanSlider.h
  QmitkCrossWidget.h
  QmitkTransferFunctionWidget.h
  QmitkTransferFunctionGeneratorWidget.h

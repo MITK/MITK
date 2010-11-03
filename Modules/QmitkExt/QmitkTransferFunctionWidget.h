@@ -44,29 +44,30 @@ class QmitkExt_EXPORT QmitkTransferFunctionWidget : public QWidget, public Ui::Q
     QmitkTransferFunctionWidget(QWidget* parent = 0, Qt::WindowFlags f = 0);
     ~QmitkTransferFunctionWidget () ;
 
-	  void SetDataNode(mitk::DataNode* node);
+    void SetDataNode(mitk::DataNode* node);
 
+   void SetIntegerMode(bool intMode);
   public slots:
 
-	  void SetXValueScalar();
-	  void SetYValueScalar();
-	  void SetXValueGradient();
-	  void SetYValueGradient();
-	  void SetXValueColor();
-	 
-	  void OnUpdateCanvas();
-	  void UpdateRanges();
-	  void OnResetSlider();
-	  
-	  void OnSpanChanged (int lower, int upper);
-	  
+    void SetXValueScalar();
+    void SetYValueScalar();
+    void SetXValueGradient();
+    void SetYValueGradient();
+    void SetXValueColor();
+
+    void OnUpdateCanvas();
+    void UpdateRanges();
+    void OnResetSlider();
+
+   void OnSpanChanged (double lower, double upper);
+
 
   protected:
   
     mitk::TransferFunctionProperty::Pointer tfpToChange;
     
-    int m_RangeSliderMin;
-    int m_RangeSliderMax;
+    double m_RangeSliderMin;
+    double m_RangeSliderMax;
 
     mitk::SimpleHistogramCache histogramCache;
     

@@ -453,9 +453,9 @@ Click right mouse button to delete a point.</string>
    <header>QmitkColorTransferFunctionCanvas.h</header>
   </customwidget>
   <customwidget>
-   <class>QxtSpanSlider</class>
+   <class>QmitkFloatingPointSpanSlider</class>
    <extends>QSlider</extends>
-   <header location="global">qxtspanslider.h</header>
+   <header location="global">QmitkFloatingPointSpanSlider.h</header>
   </customwidget>
  </customwidgets>
  <resources>

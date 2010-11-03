@@ -18,187 +18,13 @@
 #ifndef QMITKTRANSFERFUNCTIONCANVAS_H_INCLUDED
 #define QMITKTRANSFERFUNCTIONCANVAS_H_INCLUDED
 
-#include <mitkHistogramGenerator.h>
 #include "QmitkExtExports.h"
+
+#include <mitkSimpleHistogram.h>
 #include <mitkRenderingManager.h>
 
 #include <QWidget>
 #include <QLineEdit>
-
-#include <vtkPiecewiseFunction.h>
-
-#include <mitkCommon.h>
-#include <mitkImage.h>
-#include "mitkImageCast.h"
-#include <mitkWeakPointer.h>
-
-
-namespace mitk {
-
-class QmitkExt_EXPORT SimpleHistogram
-{
-  public:
-  
-  SimpleHistogram()
-  {
-    valid=false;
-    histogram=0;
-  }
-  
-  ~SimpleHistogram()
-  {
-    if(histogram)
-      delete histogram;
-  }
-  
-  typedef itk::Image<short, 3>          CTImage;
-  typedef itk::ImageRegionIterator< CTImage  > CTIteratorType;
-  typedef itk::ImageRegionIteratorWithIndex< CTImage  > CTIteratorIndexType;
-  
-  typedef itk::Image<unsigned char, 3> BinImage;
-  typedef itk::ImageRegionIterator< BinImage > BinIteratorType;
-  typedef itk::ImageRegionIteratorWithIndex< BinImage > BinIteratorIndexType;
-
-  typedef unsigned long CountType;
-
-  protected:
-
-  CountType *histogram;
-
-  bool valid;
-  
-  int first;
-  int last;
-  int min;
-  int max;
-  CountType highest;
-  double invLogHighest;
-  
-  public:
-  
-  int GetMin()
-  {
-    if(!valid)
-      return 0;
-      
-    return min;
-  }
-  
-  int GetMax()
-  {
-    if(!valid)
-      return 1;
-      
-    return max;
-  }
-  
-  void ComputeFromImage( Image::Pointer source );
-  float GetRelativeBin( float start, float end );
-  
-};
-
-class QmitkExt_EXPORT SimpleHistogramCache
-{
-  public:
-  
-    static const unsigned int maxCacheSize = 64;
-
-  protected:
-
-    class Element
-    {
-      public:
-        mitk::WeakPointer<mitk::Image> image;
-        itk::TimeStamp m_LastUpdateTime;
-        SimpleHistogram histogram;
-    };
-
-    typedef std::list<Element*> CacheContainer;
-    
-    CacheContainer cache;
-    
-  public:
-  
-    SimpleHistogramCache()
-    {
-      
-    }
-    
-    ~SimpleHistogramCache()
-    {
-      TrimCache(true);
-    }
-
-    SimpleHistogram *operator[](mitk::Image::Pointer sp_Image)
-    {
-      mitk::Image *p_Image = sp_Image.GetPointer();
-
-      if(!p_Image)
-      {
-        MITK_WARN << "SimpleHistogramCache::operator[] with null image called";
-        return 0;
-      }
-      
-      Element *elementToUpdate = 0;
-      
-      bool first = true;
-      
-      for(CacheContainer::iterator iter = cache.begin(); iter != cache.end(); iter++)
-      {
-        Element *e = *iter;
-        mitk::Image *p_tmp = e->image.GetPointer();
-
-        if(p_tmp == p_Image)
-        {
-          if(!first)
-          {
-            cache.erase(iter);
-            cache.push_front(e);
-          }
-          if( p_Image->GetMTime() > e->m_LastUpdateTime.GetMTime())
-            goto recomputeElement;
-          
-          //MITK_INFO << "using a cached histogram";
-          
-          return &e->histogram;
-        }
-          
-        first = false;
-      }
-
-      elementToUpdate = new Element();
-      elementToUpdate->image = p_Image;
-      cache.push_front(elementToUpdate);
-      TrimCache();
-
-      recomputeElement:
-
-      //MITK_INFO << "computing a new histogram";
-
-      elementToUpdate->histogram.ComputeFromImage(p_Image);
-      elementToUpdate->m_LastUpdateTime.Modified();
-      return &elementToUpdate->histogram;
-    }
-    
-  protected:
- 
-    void TrimCache(bool full=false)
-    {
-      unsigned int targetSize = full?0:maxCacheSize;
-      
-      while(cache.size()>targetSize)
-      {
-        delete cache.back();
-        cache.pop_back();
-      }
-            
-    }
-    
-};
-
-
-
-}
 
 
 class QmitkExt_EXPORT QmitkTransferFunctionCanvas : public QWidget
@@ -282,7 +108,7 @@ public:
   virtual int GetFunctionSize() = 0;
   int m_GrabbedHandle;
 
-  vtkFloatingPointType m_Lower, m_Upper, m_Min, m_Max;
+  double m_Lower, m_Upper, m_Min, m_Max;
     
   std::pair<int,int> FunctionToCanvas(std::pair<vtkFloatingPointType,vtkFloatingPointType>);
   std::pair<vtkFloatingPointType,vtkFloatingPointType> CanvasToFunction(std::pair<int,int>);

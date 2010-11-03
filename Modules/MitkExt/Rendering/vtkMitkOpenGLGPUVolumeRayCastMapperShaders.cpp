@@ -1559,10 +1559,10 @@ const char *vtkMitkGPUVolumeRayCastMapper_ShadeFS =
 "      // diffuse term for this light\n"
 "      if(nDotL>0.0)\n"
 "        {\n"
-// WORKAROUND FIX: gl_FrontLightProduct[0].diffuse seems to be not transferred on ATI cards
+// WORKAROUND FIX: gl_FrontLightProduct[0].diffuse seems to be not transferred to ATI cards
 //"        finalColor+=(gl_FrontLightProduct[0].diffuse*nDotL)*color;\n"
-// JUST USING A WHITE LIGHT NOW
-"        finalColor+=(1.1*nDotL)*color;\n"
+// just using a white light now
+"        finalColor+=(0.8*nDotL)*color;\n"
 "        }\n"
 "      \n"
 "      // specular term for this light\n"
@@ -1573,7 +1573,10 @@ const char *vtkMitkGPUVolumeRayCastMapper_ShadeFS =
 "    }\n"
 "  \n"
 "  // scene ambient term\n"
-"  finalColor+=gl_FrontLightModelProduct.sceneColor*color;\n"
+// WORKAROUND FIX: gl_FrontLightModelProduct.sceneColor seems to be not transferred to ATI cards
+//"  finalColor+=gl_FrontLightModelProduct.sceneColor*color;\n"
+// just using a dim ambient light
+"  finalColor+=0.3*color;\n"
 "  \n"
 "  // clamp. otherwise we get black spots\n"
 "  finalColor=clamp(finalColor,clampMin,clampMax);\n"

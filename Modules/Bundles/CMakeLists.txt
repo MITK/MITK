@@ -8,7 +8,6 @@ IF(MITK_USE_BLUEBERRY)
   
   SET(_mitk_bundles_default 
       "org.mitk.core.ext" 
-      "org.mitk.diffusionimaging"
       "org.mitk.planarfigure"
   )
   

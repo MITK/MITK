@@ -19,8 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 // the different view and editor classes
 #include "QmitkBasePropertyView.h"
-#include "QmitkBoolPropertyView.h"
-#include "QmitkBoolPropertyEditor.h"
+#include "QmitkBoolPropertyWidget.h"
 #include "QmitkStringPropertyView.h"
 #include "QmitkStringPropertyEditor.h"
 #include "QmitkStringPropertyOnDemandEdit.h"
@@ -28,6 +27,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkColorPropertyEditor.h"
 #include "QmitkNumberPropertyView.h"
 #include "QmitkNumberPropertyEditor.h"
+#include "QmitkEnumerationPropertyEditor.h"
+
+#include <mitkEnumerationProperty.h>
 
 QmitkPropertyViewFactory* QmitkPropertyViewFactory::GetInstance()
 {
@@ -57,7 +59,10 @@ QWidget* QmitkPropertyViewFactory::CreateView(const mitk::BaseProperty* property
   else if ( const mitk::BoolProperty* prop = dynamic_cast<const mitk::BoolProperty*>(property) )
   {
     // a bool property
-    return new QmitkBoolPropertyView(prop, parent);
+    // TODO fix after refactoring
+    QmitkBoolPropertyWidget* widget = new QmitkBoolPropertyWidget(parent);
+    widget->SetProperty(const_cast<mitk::BoolProperty*>(prop));
+    return widget;
   }
   /*
   else if ( const mitk::GenericProperty<short>* prop = dynamic_cast<const mitk::GenericProperty<short>*>(property) )
@@ -114,7 +119,10 @@ QWidget* QmitkPropertyViewFactory::CreateEditor(mitk::BaseProperty* property, un
   else if ( mitk::BoolProperty* prop = dynamic_cast<mitk::BoolProperty*>(property) )
   {
     // a bool property
-    return new QmitkBoolPropertyEditor(prop, parent);
+    // TODO fix after refactoring
+    QmitkBoolPropertyWidget* widget = new QmitkBoolPropertyWidget(parent);
+    widget->SetProperty(prop);
+    return widget;
   }
   /*
   else if ( mitk::GenericProperty<short>* prop = dynamic_cast<mitk::GenericProperty<short>*>(property) )
@@ -140,6 +148,13 @@ QWidget* QmitkPropertyViewFactory::CreateEditor(mitk::BaseProperty* property, un
     // a number property
     QmitkNumberPropertyEditor* pe = new QmitkNumberPropertyEditor(prop, parent);
     pe->setDecimalPlaces(2);
+    return pe;
+  }
+  else if ( mitk::EnumerationProperty* prop = dynamic_cast<mitk::EnumerationProperty*>(property) )
+  {
+    // a enumeration property
+    QmitkEnumerationPropertyEditor* pe = new QmitkEnumerationPropertyEditor(parent);
+    pe->SetProperty(prop);
     return pe;
   }
   else

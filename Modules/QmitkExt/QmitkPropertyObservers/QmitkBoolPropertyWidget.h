@@ -14,29 +14,35 @@ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
-#ifndef QMITK_BOOLPROPERTYEDITOR_H_INCLUDED
-#define QMITK_BOOLPROPERTYEDITOR_H_INCLUDED
+#ifndef QMITK_BOOLPROPERTYVIEW_H_INCLUDED
+#define QMITK_BOOLPROPERTYVIEW_H_INCLUDED
 
-#include "QmitkBoolPropertyView.h"
 #include "QmitkExtExports.h"
+#include <mitkProperties.h>
+#include <QCheckBox>
+
+class _BoolPropertyWidgetImpl;
 
 /// @ingroup Widgets
-class QmitkExt_EXPORT QmitkBoolPropertyEditor : public QmitkBoolPropertyView
+class QmitkExt_EXPORT QmitkBoolPropertyWidget : public QCheckBox
 {
   Q_OBJECT
 
   public:
     
-    QmitkBoolPropertyEditor( const mitk::BoolProperty*, QWidget* parent );
-    virtual ~QmitkBoolPropertyEditor();
-      
-  protected:
+    QmitkBoolPropertyWidget(QWidget* parent = 0 );
+    QmitkBoolPropertyWidget(const QString& text, QWidget* parent = 0 );
+    virtual ~QmitkBoolPropertyWidget();
 
-    virtual void PropertyRemoved();
+    void SetProperty(mitk::BoolProperty* property);
 
   protected slots:
 
     void onToggle(bool on);
+      
+  protected:
+
+    _BoolPropertyWidgetImpl* m_PropEditorImpl;
 
 };
 

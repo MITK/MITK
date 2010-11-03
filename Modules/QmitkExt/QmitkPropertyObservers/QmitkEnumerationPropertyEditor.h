@@ -14,34 +14,44 @@ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
-#ifndef QMITK_BOOLPROPERTYVIEW_H_INCLUDED
-#define QMITK_BOOLPROPERTYVIEW_H_INCLUDED
 
-#include <mitkPropertyObserver.h>
+#ifndef QMITK_ENUMERATIONPROPERTYEDITOR_H_INCLUDED
+#define QMITK_ENUMERATIONPROPERTYEDITOR_H_INCLUDED
+
 #include "QmitkExtExports.h"
-#include <mitkProperties.h>
-#include <QCheckBox>
+
+
+#include <QComboBox>
+#include <QHash>
+
+namespace mitk
+{
+  class EnumerationProperty;
+}
+
+class _EnumPropEditorImpl;
 
 /// @ingroup Widgets
-class QmitkExt_EXPORT QmitkBoolPropertyView : public QCheckBox, public mitk::PropertyView
+class QmitkExt_EXPORT QmitkEnumerationPropertyEditor : public QComboBox
 {
   Q_OBJECT
 
   public:
     
-    QmitkBoolPropertyView( const mitk::BoolProperty*, QWidget* parent );
-    virtual ~QmitkBoolPropertyView();
+    QmitkEnumerationPropertyEditor(QWidget* parent = 0);
+    ~QmitkEnumerationPropertyEditor();
+
+    void SetProperty(mitk::EnumerationProperty* property);
+
+  protected slots:
+
+    void OnIndexChanged(int index);
       
   protected:
 
-    virtual void PropertyChanged();
-    virtual void PropertyRemoved();
-
-    const mitk::BoolProperty* m_BoolProperty;
-
-  private:
+    _EnumPropEditorImpl* propView;
 
 };
 
-#endif
+#endif // QMITK_ENUMERATIONPROPERTYEDITOR_H_INCLUDED
 

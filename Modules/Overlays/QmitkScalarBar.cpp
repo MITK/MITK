@@ -41,9 +41,9 @@ QWidget( parent, Qt::Tool | Qt::FramelessWindowHint ), m_Alignment(vertical)
   this->setAttribute( Qt::WA_MacShowFocusRect, false );
 
 
-  this->resize( 20,60 );
-  this->setFixedWidth( 20 );
-  this->setFixedHeight( 60 );
+  this->resize( 10,61 );
+  this->setFixedWidth( 10 );
+  this->setFixedHeight( 61 );
 
 
   m_Pen = QPen( Qt::red, 1, Qt::SolidLine, Qt::FlatCap, Qt::MiterJoin );
@@ -73,11 +73,11 @@ void QmitkScalarBar::SetupGeometry( alignment align )
           // this is the last one -> move y 1 up to have this line completely drawn
           y = this->height() - 1;
         }
-        m_HorizontalLines.push_back( new QLine( QPoint(0,y), QPoint(width(),y) ) );
+        m_HorizontalLines.push_back( new QLine( QPoint(0,y), QPoint(width()-2,y) ) );
       }
 
       if ( m_HorizontalLines.size() > 0 )
-        m_VerticalLine = new QLine( QPoint(width()/2,0), QPoint(width()/2,height()) );
+        m_VerticalLine = new QLine( QPoint(width()-1,0), QPoint(width()-1,height()) );
       break;
     }
   case horizontal :
@@ -130,8 +130,8 @@ void QmitkScalarBar::SetScaleFactor( double scale )
     }
     else
     {
-      this->resize( 20, (m_NumberOfSubDivisions-1)*10/m_ScaleFactor );
-      this->setFixedWidth( 20 );
+      this->resize( 10, (m_NumberOfSubDivisions-1)*10/m_ScaleFactor );
+      this->setFixedWidth( 10 );
       this->setFixedHeight( (m_NumberOfSubDivisions-1)*10/m_ScaleFactor );
       this->SetupGeometry(m_Alignment);
     }
@@ -159,6 +159,18 @@ void QmitkScalarBar::paintEvent(QPaintEvent* /*event*/)
   {
     try
     {
+      //QPainter shadowPainter( this );
+      //shadowPainter.setPen( QPen( QColor(0,0,0,255) ) );
+      //shadowPainter.setBrush( Qt::SolidPattern );
+      //shadowPainter.setRenderHint( QPainter::Antialiasing, true );
+
+      //shadowPainter.drawLine( m_VerticalLine->p1()+QPoint(1,1), m_VerticalLine->p2()+QPoint(1,1) );
+      //foreach( QLine* line, m_HorizontalLines )
+      //{
+      //  shadowPainter.drawLine( line->p1()+QPoint(1,1), line->p2()+QPoint(1,1) );
+      //}
+
+
       QPainter painter(this);
       painter.setPen( m_Pen );
       painter.setBrush( Qt::SolidPattern );

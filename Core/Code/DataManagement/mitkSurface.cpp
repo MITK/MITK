@@ -65,6 +65,8 @@ void mitk::Surface::SetVtkPolyData( vtkPolyData* polydata, unsigned int t )
 
   if(m_PolyDataSeries[ t ] != NULL)
   {
+    if ( m_PolyDataSeries[ t ] == polydata )
+      return;
     // we do not need the reference on the object any longer
     m_PolyDataSeries[ t ]->Delete();
   }

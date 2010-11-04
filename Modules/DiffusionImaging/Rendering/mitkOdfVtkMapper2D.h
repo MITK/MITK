@@ -99,7 +99,9 @@ namespace mitk {
     virtual void GenerateData();
     virtual void GenerateData(mitk::BaseRenderer* renderer);
 
-    virtual bool IsLODEnabled( BaseRenderer * /*renderer*/ ) const { return true; }
+    // KLAUS DISABLING LOD
+//    virtual bool IsLODEnabled( BaseRenderer * /*renderer*/ ) const { return TRUE; }
+    virtual bool IsLODEnabled( BaseRenderer * /*renderer*/ ) const { return false; }
 
   protected:
     OdfVtkMapper2D();

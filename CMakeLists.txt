@@ -255,23 +255,14 @@ ELSE(SVN_INFO_WC_REVISION)
   SET(CPACK_PACKAGE_VERSION_PATCH "${MITK_VERSION_PATCH}")
 ENDIF(SVN_INFO_WC_REVISION)
 ############################# INSTALL TARGETS ########################## 
-INSTALL(FILES ${PROJECT_SOURCE_DIR}/mitk.ico DESTINATION bin)
-INSTALL(FILES ${PROJECT_SOURCE_DIR}/mitk.bmp DESTINATION bin)
-
-# directory has to be created to make sure the installer does not report
-# an error if doxygen was not invoked before.
-IF (MITK_HELPPAGES_OUTPUT_DIR)
-  FILE(MAKE_DIRECTORY ${MITK_HELPPAGES_OUTPUT_DIR}/html)
-  INSTALL(DIRECTORY ${MITK_HELPPAGES_OUTPUT_DIR}/html DESTINATION doc)
-ENDIF (MITK_HELPPAGES_OUTPUT_DIR)
-
-#OPENCV DLLs may be added elsewhere to install target
+MITK_INSTALL(FILES ${PROJECT_SOURCE_DIR}/mitk.ico )
+MITK_INSTALL(FILES ${PROJECT_SOURCE_DIR}/mitk.bmp )
 
 #STATEMACHINE XML
-INSTALL(FILES ${PROJECT_SOURCE_DIR}/Core/Code/Interactions/StateMachine.xml DESTINATION bin)
-INSTALL(FILES ${PROJECT_SOURCE_DIR}/Config/mitkLevelWindowPresets.xml DESTINATION bin)
-INSTALL(FILES ${PROJECT_SOURCE_DIR}/Config/mitkRigidRegistrationPresets.xml DESTINATION bin)
-INSTALL(FILES ${PROJECT_SOURCE_DIR}/Config/mitkRigidRegistrationTestPresets.xml DESTINATION bin)
+MITK_INSTALL(FILES ${PROJECT_SOURCE_DIR}/Core/Code/Interactions/StateMachine.xml )
+MITK_INSTALL(FILES ${PROJECT_SOURCE_DIR}/Config/mitkLevelWindowPresets.xml )
+MITK_INSTALL(FILES ${PROJECT_SOURCE_DIR}/Config/mitkRigidRegistrationPresets.xml )
+MITK_INSTALL(FILES ${PROJECT_SOURCE_DIR}/Config/mitkRigidRegistrationTestPresets.xml )
 
 IF(WIN32)
 SET(MITK_INSTALLED_VERSION_LIB bin)
@@ -291,7 +282,7 @@ IF(WIN32)
     INCLUDE(${QT_USE_FILE})
 
     # TODO: use fixup_bundle(...)	
-    INSTALL(FILES "${QT_INCLUDE_DIR}/../bin/assistant.exe" DESTINATION bin)
+    MITK_INSTALL(FILES "${QT_INCLUDE_DIR}/../bin/assistant.exe" )
   ENDIF(MITK_USE_QT)
  
  
@@ -304,19 +295,19 @@ IF(WIN32)
     ${DCMTK_ofstd_LIBRARY}
     )
   FOREACH(_dcmtk_lib ${_dcmtk_libs})
-    INSTALL(FILES ${_dcmtk_lib} DESTINATION bin)
+    MITK_INSTALL(FILES ${_dcmtk_lib} )
   ENDFOREACH()
   ENDIF()
   
   #BlueBerry
   IF(MITK_USE_BLUEBERRY)
     IF(MINGW)
-      INSTALL(FILES ${BLUEBERRY_PLUGINS_OUTPUT_DIR}/org.blueberry.osgi/bin/liborg_blueberry_osgid.dll DESTINATION bin CONFIGURATIONS Debug)
-      INSTALL(FILES ${BLUEBERRY_PLUGINS_OUTPUT_DIR}/org.blueberry.osgi/bin/liborg_blueberry_osgi.dll DESTINATION bin CONFIGURATIONS Release)
+      MITK_INSTALL(FILES ${BLUEBERRY_PLUGINS_OUTPUT_DIR}/org.blueberry.osgi/bin/liborg_blueberry_osgid.dll  CONFIGURATIONS Debug)
+      MITK_INSTALL(FILES ${BLUEBERRY_PLUGINS_OUTPUT_DIR}/org.blueberry.osgi/bin/liborg_blueberry_osgi.dll  CONFIGURATIONS Release)
     ELSE()
       IF(NOT APPLE)
-        INSTALL(FILES ${BLUEBERRY_PLUGINS_OUTPUT_DIR}/org.blueberry.osgi/bin/debug/liborg_blueberry_osgid.dll DESTINATION bin CONFIGURATIONS Debug)
-        INSTALL(FILES ${BLUEBERRY_PLUGINS_OUTPUT_DIR}/org.blueberry.osgi/bin/release/liborg_blueberry_osgi.dll DESTINATION bin CONFIGURATIONS Release)
+        MITK_INSTALL(FILES ${BLUEBERRY_PLUGINS_OUTPUT_DIR}/org.blueberry.osgi/bin/debug/liborg_blueberry_osgid.dll  CONFIGURATIONS Debug)
+        MITK_INSTALL(FILES ${BLUEBERRY_PLUGINS_OUTPUT_DIR}/org.blueberry.osgi/bin/release/liborg_blueberry_osgi.dll  CONFIGURATIONS Release)
       ENDIF(NOT APPLE)
     ENDIF()
   ENDIF()
@@ -325,14 +316,14 @@ IF(WIN32)
   IF(MINGW)
     FIND_LIBRARY(MINGW_RUNTIME_DLL "mingwm10.dll" HINTS ${CMAKE_FIND_ROOT_PATH}/sys-root/mingw/bin)
   IF (MINGW_RUNTIME_DLL)
-      INSTALL(FILES ${MINGW_RUNTIME_DLL} DESTINATION bin)
+      MITK_INSTALL(FILES ${MINGW_RUNTIME_DLL} )
     ELSE()
       MESSAGE(SEND_ERROR "Could not find mingwm10.dll which is needed for a proper install")
     ENDIF()
   
   FIND_LIBRARY(MINGW_GCC_RUNTIME_DLL "libgcc_s_dw2-1.dll" HINTS ${CMAKE_FIND_ROOT_PATH}/sys-root/mingw/bin)
   IF (MINGW_GCC_RUNTIME_DLL)
-      INSTALL(FILES ${MINGW_GCC_RUNTIME_DLL} DESTINATION bin)
+      MITK_INSTALL(FILES ${MINGW_GCC_RUNTIME_DLL} )
     ELSE()
       MESSAGE(SEND_ERROR "Could not find libgcc_s_dw2-1.dll which is needed for a proper install")
     ENDIF()
@@ -349,7 +340,7 @@ ELSE(WIN32)
         ${DCMTK_ofstd_LIBRARY}
     )
     FOREACH(_dcmtk_lib ${_dcmtk_libs})
-#      INSTALL(FILES ${_dcmtk_lib} DESTINATION lib)
+#      MITK_INSTALL(FILES ${_dcmtk_lib} DESTINATION lib)
     ENDFOREACH()
   ENDIF()
  

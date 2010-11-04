@@ -414,6 +414,42 @@ MACRO(MITK_CHECK_MODULE RESULT_VAR)
 ENDMACRO(MITK_CHECK_MODULE)
 
 #
+# MITK specific install macro
+#
+# On Mac everything is installed for each bundle listed in MACOSX_BUNDLE_NAMES
+# by replacing the DESTINATION parameter. Everything else is passed to the CMake INSTALL command
+#
+# Usage: MITK_INSTALL( )
+#
+MACRO(MITK_INSTALL)
+
+SET(ARGS ${ARGN})
+ 
+  SET(install_directories "")
+  LIST(FIND ARGS DESTINATION _destination_index)
+    # SET(_install_DESTINATION "")
+  IF(_destination_index GREATER -1)
+    MESSAGE(SEND_ERROR "MITK_INSTALL macro must not be called with a DESTINATION parameter.")  
+### This code was a try to replace a given DESTINATION
+#      MATH(EXPR _destination_index ${_destination_index} + 1)
+#      LIST(GET ARGS ${_destination_index} _install_DESTINATION)
+#      STRING(REGEX REPLACE ^bin "" _install_DESTINATION ${_install_DESTINATION})
+  ELSE(_destination_index GREATER -1)
+  
+    IF(NOT MACOSX_BUNDLE_NAMES)
+      INSTALL(${ARGS} DESTINATION bin)
+    ELSE(NOT MACOSX_BUNDLE_NAMES)
+      FOREACH(bundle_name ${MACOSX_BUNDLE_NAMES})
+        INSTALL(${ARGS} DESTINATION ${bundle_name}.app/Contents/MacOS/${_install_DESTINATION})
+      ENDFOREACH(bundle_name)
+    ENDIF(NOT MACOSX_BUNDLE_NAMES)
+  ENDIF(_destination_index GREATER -1)
+
+ENDMACRO(MITK_INSTALL)
+
+
+
+#
 # MITK specific cross plattform install macro
 #
 # Usage: MITK_INSTALL_TARGETS(target1 [target2] ....)

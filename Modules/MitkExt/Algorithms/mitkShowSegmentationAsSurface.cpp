@@ -120,6 +120,10 @@ bool ShowSegmentationAsSurface::ThreadedUpdateFunction()
   {
     surfaceFilter->SetMedianKernelSize(medianKernelSize, medianKernelSize, medianKernelSize); // apply median to segmentation before marching cubes
   }
+
+  //fix to avoid vtk warnings see bug #5390
+  if ( image->GetDimension() > 3 )
+    decimateMesh = false;
   
   if (decimateMesh)
   {

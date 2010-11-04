@@ -5,7 +5,7 @@
 #---------------------------------------------------------------------------
 PROJECT_NAME           = BlueBerry
 PROJECT_NUMBER         = @BLUEBERRY_VERSION_STRING@
-OUTPUT_DIRECTORY       = @BLUEBERRY_DOXYGEN_OUTPUT_DIR@
+OUTPUT_DIRECTORY       = "@BLUEBERRY_DOXYGEN_OUTPUT_DIR@"
 OUTPUT_LANGUAGE        = English
 EXTRACT_ALL            = YES
 EXTRACT_PRIVATE        = NO
@@ -76,7 +76,7 @@ EXCLUDE_PATTERNS       = moc_* \
 EXAMPLE_PATH           = 
 EXAMPLE_PATTERNS       = 
 EXAMPLE_RECURSIVE      = NO
-IMAGE_PATH             = @BLUEBERRY_SOURCE_DIR@ 
+IMAGE_PATH             = "@BLUEBERRY_SOURCE_DIR@"
 INPUT_FILTER           = 
 FILTER_SOURCE_FILES    = NO
 #---------------------------------------------------------------------------
@@ -192,7 +192,7 @@ SKIP_FUNCTION_MACROS   = YES
 # Configuration::additions related to external references   
 #---------------------------------------------------------------------------
 TAGFILES               = 
-GENERATE_TAGFILE       = @BLUEBERRY_DOXYGEN_OUTPUT_DIR@/BlueBerry.tag
+GENERATE_TAGFILE       = "@BLUEBERRY_DOXYGEN_OUTPUT_DIR@/BlueBerry.tag"
 ALLEXTERNALS           = NO
 EXTERNAL_GROUPS        = YES
 PERL_PATH              = /usr/bin/perl
@@ -209,7 +209,7 @@ INCLUDE_GRAPH          = YES
 INCLUDED_BY_GRAPH      = YES
 GRAPHICAL_HIERARCHY    = YES
 DOT_IMAGE_FORMAT       = png
-DOT_PATH               = @DOXYGEN_DOT_PATH@
+DOT_PATH               = "@DOXYGEN_DOT_PATH@"
 DOTFILE_DIRS           = 
 MAX_DOT_GRAPH_WIDTH    = 1024
 MAX_DOT_GRAPH_HEIGHT   = 1024

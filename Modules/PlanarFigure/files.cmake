@@ -1,4 +1,5 @@
 SET(CPP_FILES
+  Algorithms/mitkImageToPlanarFigureFilter.cpp
   Algorithms/mitkPlanarFigureObjectFactory.cpp
   Algorithms/mitkPlanarFigureSource.cpp
   DataManagement/mitkPlanarAngle.cpp

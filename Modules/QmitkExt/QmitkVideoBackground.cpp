@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   Medical Imaging & Interaction Toolkit
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #include "QmitkVideoBackground.h"
@@ -35,7 +35,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 QmitkVideoBackground::QmitkVideoBackground(mitk::VideoSource* v, int TimerDelay)
 {
-  m_VideoSource = v; 
+  m_VideoSource = v;
 
   m_TimerDelay  = TimerDelay;
   ResetVideoBackground();
@@ -61,11 +61,11 @@ QmitkVideoBackground::~QmitkVideoBackground()
 void QmitkVideoBackground::AddRenderWindow(vtkRenderWindow* renderWindow )
 {
   RemoveRenderWindow(renderWindow);
-  
+
   vtkRenderer*    videoRenderer   = vtkRenderer::New();
   vtkImageActor*  videoActor      = vtkImageActor::New();
   vtkImageImport* videoImport     = vtkImageImport::New();
-  
+
   videoImport->SetDataScalarTypeToUnsignedChar();
   videoImport->SetNumberOfScalarComponents(3);
 
@@ -73,22 +73,22 @@ void QmitkVideoBackground::AddRenderWindow(vtkRenderWindow* renderWindow )
     m_VideoSource->FetchFrame();
 
   videoImport->SetWholeExtent(0,m_VideoSource->GetImageWidth()-1,0,m_VideoSource->GetImageHeight()-1,0,1-1);
-  videoImport->SetDataExtentToWholeExtent();  
-  
+  videoImport->SetDataExtentToWholeExtent();
+
   mitk::VideoBackgroundVectorInfo v;
   v.renWin        = renderWindow;
   v.videoRenderer = videoRenderer;
   v.videoActor    = videoActor;
   v.videoImport   = videoImport;
-  
-  m_renderWindowVectorInfo.push_back(v); 
+
+  m_renderWindowVectorInfo.push_back(v);
 
   Modified();
 }
 
 void QmitkVideoBackground::RemoveRenderWindow(vtkRenderWindow* renderWindow )
 {
-  for(RenderWindowVectorInfoType::iterator it = m_renderWindowVectorInfo.begin(); 
+  for(RenderWindowVectorInfoType::iterator it = m_renderWindowVectorInfo.begin();
     it != m_renderWindowVectorInfo.end(); it++)
   {
     if((*it).renWin == renderWindow)
@@ -108,7 +108,7 @@ void QmitkVideoBackground::RemoveRenderWindow(vtkRenderWindow* renderWindow )
 
 bool QmitkVideoBackground::IsRenderWindowIncluded(vtkRenderWindow* renderWindow )
 {
-  for(RenderWindowVectorInfoType::iterator it = m_renderWindowVectorInfo.begin(); 
+  for(RenderWindowVectorInfoType::iterator it = m_renderWindowVectorInfo.begin();
     it != m_renderWindowVectorInfo.end(); it++)
   {
     if((*it).renWin == renderWindow)
@@ -117,15 +117,33 @@ bool QmitkVideoBackground::IsRenderWindowIncluded(vtkRenderWindow* renderWindow 
   return false;
 }
 
+void QmitkVideoBackground::Pause()
+{
+  m_QTimer->stop();
+}
+
+void QmitkVideoBackground::Resume()
+{
+  m_QTimer->start(m_TimerDelay);
+}
+
+void QmitkVideoBackground::NextFrame()
+{
+  if(!m_QTimer->isActive())
+  {
+    this->UpdateVideo();
+  }
+}
+
 /**
  * Enables drawing of the color Video background.
  * If you want to disable it, call the Disable() function.
  */
 void QmitkVideoBackground::Enable()
 {
-  UpdateVideo();  
+  UpdateVideo();
   Modified();
-  
+
   m_QTimer->start(m_TimerDelay);
 }
 
@@ -137,7 +155,7 @@ void QmitkVideoBackground::Disable()
 {
   if ( this->IsEnabled() )
   {
-    /*for(RenderWindowVectorInfoType::iterator it = m_renderWindowVectorInfo.begin(); 
+    /*for(RenderWindowVectorInfoType::iterator it = m_renderWindowVectorInfo.begin();
       it != m_renderWindowVectorInfo.end(); it++)
     {
       mitk::VtkLayerController::GetInstance((*it).renWin)->RemoveRenderer((*it).videoRenderer);
@@ -154,18 +172,18 @@ bool QmitkVideoBackground::IsEnabled()
   if (m_QTimer->isActive())
       return true;
   else
-      return false;    
+      return false;
 }
 
 void QmitkVideoBackground::UpdateVideo()
-{  
+{
   unsigned char *src = 0;
   src = m_VideoSource->GetVideoTexture();
   if(src)
-  { 
+  {
     if(m_renderWindowVectorInfo.size()>0)
     {
-      for(RenderWindowVectorInfoType::iterator it = m_renderWindowVectorInfo.begin(); 
+      for(RenderWindowVectorInfoType::iterator it = m_renderWindowVectorInfo.begin();
         it != m_renderWindowVectorInfo.end(); it++)
       {
         (*it).videoImport->SetImportVoidPointer(src);
@@ -180,7 +198,7 @@ void QmitkVideoBackground::UpdateVideo()
 
 void QmitkVideoBackground::Modified()
 { // ensures registration of video backrounds in each renderwindow
-  for(RenderWindowVectorInfoType::iterator it = m_renderWindowVectorInfo.begin(); 
+  for(RenderWindowVectorInfoType::iterator it = m_renderWindowVectorInfo.begin();
     it != m_renderWindowVectorInfo.end(); it++)
   {
     (*it).videoActor->SetInput((*it).videoImport->GetOutput());
@@ -192,5 +210,5 @@ void QmitkVideoBackground::Modified()
 
     if(!mitk::VtkLayerController::GetInstance((*it).renWin)->IsRendererInserted((*it).videoRenderer))
       mitk::VtkLayerController::GetInstance((*it).renWin)->InsertBackgroundRenderer((*it).videoRenderer,true);
-  } 
+  }
 }

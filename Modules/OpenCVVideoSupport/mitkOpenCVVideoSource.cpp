@@ -159,7 +159,7 @@ void mitk::OpenCVVideoSource::FetchFrame()
         MITK_DEBUG << "Trying to set m_CaptureWidth & m_CaptureHeight.";
         m_CaptureWidth  = m_CurrentImage->width;
         m_CaptureHeight = m_CurrentImage->height;
-        std::cout << "frame width: " << m_CaptureWidth << ", height: " << m_CaptureHeight << std::endl;
+        MITK_INFO << "frame width: " << m_CaptureWidth << ", height: " << m_CaptureHeight;
         m_CurrentImage->origin = 0;
       }
     }

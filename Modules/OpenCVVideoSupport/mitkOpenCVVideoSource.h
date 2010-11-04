@@ -44,6 +44,7 @@ namespace mitk
   class MITK_OPENCVVIDEOSUPPORT_EXPORT OpenCVVideoSource :
       public VideoSource, public OpenCVImageSource
   {
+  public:
     typedef itk::RGBPixel< unsigned char >    CharPixelType;
     typedef itk::FixedArray <float,3>         HSVPixelType;
     typedef itk::Image< CharPixelType , 2 >   RGBPixelImageType;
@@ -51,7 +52,6 @@ namespace mitk
     typedef itk::ImageRegionIterator< RGBPixelImageType > RGBConstIteratorType;
     typedef itk::ImageRegionIterator< HSVPixelImageType > HSVConstIteratorType;
 
-    public:
     mitkClassMacro( OpenCVVideoSource, itk::Object );
     itkNewMacro( Self );
 
@@ -89,8 +89,8 @@ namespace mitk
     ///
     /// Return the current frame
     ///
-    const IplImage * GetImage();
-    const IplImage * GetCurrentFrame();
+    virtual const IplImage * GetImage();
+    virtual const IplImage * GetCurrentFrame();
     ////##Documentation
     ////## @brief returns the current video data as an ITK image.
     virtual void GetCurrentFrameAsItkHSVPixelImage(HSVPixelImageType::Pointer &Image);

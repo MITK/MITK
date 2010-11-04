@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   Medical Imaging & Interaction Toolkit
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #ifndef _Qmitk_Video_Background_h_
@@ -34,7 +34,7 @@ class vtkActor2D;
 class vtkVideoSizeCallback;
 
 
-namespace mitk 
+namespace mitk
 {
 
   struct VideoBackgroundVectorInfo
@@ -51,8 +51,8 @@ namespace mitk
  * Displays a video in the background
  * of one or more vtkRenderWindow(s).
  * The video is provided by a mitkVideoSource / GetVideoTexture().
- * Caution: As the texture data is not being copied, the user is responsible for a valid 
- * pointer to the data. Also the image dimensions needs to be set correctly before enabling the 
+ * Caution: As the texture data is not being copied, the user is responsible for a valid
+ * pointer to the data. Also the image dimensions needs to be set correctly before enabling the
  * background.
  */
 class QmitkExt_EXPORT QmitkVideoBackground : public QObject
@@ -95,7 +95,19 @@ public:
   /// Returns the timer delay
   ///
   int GetTimerDelay() { return m_TimerDelay; }
-  
+  ///
+  /// pauses the playback (stops the update timer)
+  ///
+  void Pause();
+  ///
+  /// resumes the playback (restarts the update timer)
+  ///
+  void Resume();
+  ///
+  /// show the next frame (single shots the update timer)
+  ///
+  void NextFrame();
+
   public slots:
     void UpdateVideo();
   signals:
@@ -108,7 +120,7 @@ protected:
 
   typedef std::vector<mitk::VideoBackgroundVectorInfo> RenderWindowVectorInfoType;
   RenderWindowVectorInfoType      m_renderWindowVectorInfo;
- 
+
   //for framegrabbing
   QTimer*                     m_QTimer;
 

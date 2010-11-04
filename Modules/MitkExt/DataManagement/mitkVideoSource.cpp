@@ -36,23 +36,18 @@ mitk::VideoSource::~VideoSource()
     delete m_CurrentVideoTexture;
 }
 
-unsigned char* mitk::VideoSource::GetVideoTexture()
-{ // Fetch Frame and return pointer to opengl texture
-  return 0;
-}
-
 void mitk::VideoSource::StartCapturing()
 {   
   m_CapturingInProcess = true;
   m_FrameCount = 0;
-  Started.Send();
+  this->Modified();
 }
 
 void mitk::VideoSource::StopCapturing()
 {
-  mitk::VideoSource::m_CapturingInProcess = false;
+  m_CapturingInProcess = false;
   m_FrameCount = 0;
-  Stopped.Send();
+  this->Modified();
 }
 
 bool mitk::VideoSource::IsCapturingEnabled() const
@@ -63,4 +58,37 @@ bool mitk::VideoSource::IsCapturingEnabled() const
 void mitk::VideoSource::FetchFrame()
 {
   ++m_FrameCount;
+  this->Modified();  
+}
+
+int mitk::VideoSource::GetImageWidth()
+{
+  return m_CaptureWidth;
+}
+
+int mitk::VideoSource::GetImageHeight()
+{
+  return m_CaptureHeight;
+}
+
+void mitk::VideoSource::EnableRotation(bool enable= true)
+{
+  m_RotationEnabled = enable;
+  this->Modified();
+}
+
+void mitk::VideoSource::SetRotationAngle(double rotationAngle)
+{
+  m_RotationAngle = rotationAngle;
+  this->Modified();
+ }
+
+double mitk::VideoSource::GetRotationAngle()
+{
+  return m_RotationAngle;
+}
+
+unsigned long mitk::VideoSource::GetFrameCount() const
+{
+  return m_FrameCount;
 }

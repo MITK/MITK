@@ -26,61 +26,102 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk
 {
-  /**
-  * Simple base class for acquiring video data. 
-  */
+  ///
+  /// Simple base class for acquiring video data. 
+  ///
   class MitkExt_EXPORT VideoSource : public itk::Object
   {
     public:
+      ///
+      /// Smart pointer defs
+      ///
       mitkClassMacro( VideoSource, itk::Object );
-      itkNewMacro( Self );
-         
       ///
-      /// Define two event types for getting informed when this
-      /// videosource is started/stopped
+      /// assigns the grabbing devices for acquiring the next frame. 
+      /// in this base implementation it does nothing except incrementing
+      /// m_FrameCount
       ///
-      typedef mitk::Message<void> StartedStoppedEvent;
-
-      StartedStoppedEvent Started;
-      StartedStoppedEvent Stopped;
-      
-      ////##Documentation
-      ////## @brief assigns the grabbing devices for acquiring the next frame. 
       virtual void FetchFrame();
-      ////##Documentation
-      ////## @brief returns a pointer to the image data array for opengl rendering. 
-      virtual unsigned char * GetVideoTexture();
-      ////##Documentation
-      ////## @brief starts the video capturing.
+      ///
+      /// \return a pointer to the image data array for opengl rendering. 
+      ///
+      virtual unsigned char * GetVideoTexture() = 0;
+      ///
+      /// advices this class to start the video capturing.
+      /// in this base implementation: toggles m_CapturingInProcess,
+      /// send out m_StartedEvent, resets m_FrameCount
+      /// *ATTENTION*: this should be also done in subclasses overwriting this method
+      ///
       virtual void StartCapturing();
-      ////##Documentation
-      ////## @brief stops the video capturing.
+      ///
+      /// advices this class to stop the video capturing.
+      /// in this base implementation: toggles m_CapturingInProcess,
+      /// send out m_StoppedEvent, resets m_FrameCount
+      /// *ATTENTION*: this should be also done in subclasses overwriting this method
+      ///
       virtual void StopCapturing();
+      ///
+      //// \return true if video capturing is active.
+      ///
+      virtual bool IsCapturingEnabled() const;
+      ///
+      /// \return the current frame width (might be 0 if unknown)
+      ///
+      virtual int GetImageWidth();
+      ///
+      /// \return the current frame height (might be 0 if unknown)
+      ///
+      virtual int GetImageHeight();
 
-      ////##Documentation
-      ////## @brief returns true if video capturing is active.
-      bool IsCapturingEnabled() const;
+      ///
+      /// \return advices this class to enable online rotation (has to be
+      /// implemented in subclasses)
+      ///
+      virtual void EnableRotation(bool enable);
 
-      int GetImageWidth(){return m_CaptureWidth;}
-      int GetImageHeight(){return m_CaptureHeight;}
-
-      void EnableRotation(bool enable= true)
-      {m_RotationEnabled = enable;};
-
-      void SetRotationAngle(double rotationAngle)
-      {m_RotationAngle = rotationAngle;};
+      ///
+      /// \return sets the current rotation angle
+      ///
+      virtual void SetRotationAngle(double rotationAngle);
       
-      double GetRotationAngle()
-      {return m_RotationAngle;};
+      ///
+      /// \return the current rotation angle (might be 0)
+      ///
+      virtual double GetRotationAngle();
 
-      itkGetConstMacro( FrameCount, unsigned long );
+      ///
+      /// \return the current frame count
+      ///
+      virtual unsigned long GetFrameCount() const;
 
-    protected:
+  protected:
+      ///
+      /// init member
+      ///
       VideoSource();
+      ///
+      /// deletes m_CurrentVideoTexture (if not 0)
+      ///
       virtual ~VideoSource();  
-      
+
+      ///
+      /// finally this is what the video source must create: a video texture pointer
+      ///
       unsigned char * m_CurrentVideoTexture;
-      int m_CaptureWidth, m_CaptureHeight;
+
+      ///
+      /// should be filled when the first frame is available
+      ///
+      int m_CaptureWidth;
+
+      ///
+      /// should be filled when the first frame is available
+      ///
+      int m_CaptureHeight;
+
+      ///
+      /// saves if capturing is in procress
+      ///
       bool m_CapturingInProcess;
       
       /**
@@ -94,7 +135,8 @@ namespace mitk
       bool m_RotationEnabled;
 
       ///
-      /// Saves the current frame count. Incremented in FetchFrame(). Resetted to 0 when StartCapturing() or StopCapturing() is called.
+      /// Saves the current frame count. Incremented in FetchFrame(). 
+      /// Resetted to 0 when StartCapturing() or StopCapturing() is called.
       ///
       unsigned long m_FrameCount;
  

@@ -88,6 +88,7 @@ void mitk::NrrdDiffusionImageWriter<TPixelType>::GenerateData()
     itk::NrrdImageIO::Pointer io = itk::NrrdImageIO::New();
     //io->SetNrrdVectorType( nrrdKindList );
     io->SetFileType( itk::ImageIOBase::Binary );
+    io->UseCompressionOn();
 
     typedef itk::VectorImage<TPixelType,3> ImageType;
     typedef itk::ImageFileWriter<ImageType> WriterType;
@@ -96,6 +97,7 @@ void mitk::NrrdDiffusionImageWriter<TPixelType>::GenerateData()
     nrrdWriter->SetInput( input->GetVectorImage() );
     nrrdWriter->SetImageIO(io);
     nrrdWriter->SetFileName(m_FileName);
+    nrrdWriter->UseCompressionOn();
 
     try
     {

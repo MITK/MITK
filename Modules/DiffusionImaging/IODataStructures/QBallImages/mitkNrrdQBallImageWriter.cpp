@@ -51,6 +51,7 @@ void mitk::NrrdQBallImageWriter::GenerateData()
     
     itk::NrrdImageIO::Pointer io = itk::NrrdImageIO::New();
     io->SetFileType( itk::ImageIOBase::Binary );
+    io->UseCompressionOn();
 
     typedef itk::VectorImage<float, 3> VecImgType;
 
@@ -89,6 +90,8 @@ void mitk::NrrdQBallImageWriter::GenerateData()
     nrrdWriter->SetInput( vecImg );
     nrrdWriter->SetImageIO(io);
     nrrdWriter->SetFileName(m_FileName);
+    nrrdWriter->UseCompressionOn();
+
 
     try
     {

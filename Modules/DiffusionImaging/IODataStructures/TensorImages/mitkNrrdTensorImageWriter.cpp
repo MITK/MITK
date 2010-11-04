@@ -51,6 +51,7 @@ void mitk::NrrdTensorImageWriter::GenerateData()
     
     itk::NrrdImageIO::Pointer io = itk::NrrdImageIO::New();
     io->SetFileType( itk::ImageIOBase::Binary );
+    io->UseCompressionOn();
 
     typedef itk::Image<itk::DiffusionTensor3D<float>,3> ImageType;
     typedef itk::ImageFileWriter<ImageType> WriterType;
@@ -62,6 +63,7 @@ void mitk::NrrdTensorImageWriter::GenerateData()
     nrrdWriter->SetInput( outimage );
     nrrdWriter->SetImageIO(io);
     nrrdWriter->SetFileName(m_FileName);
+    nrrdWriter->UseCompressionOn();
 
     try
     {

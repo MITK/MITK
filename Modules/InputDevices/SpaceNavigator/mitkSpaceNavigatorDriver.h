@@ -32,6 +32,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include <atlctl.h>
 #include <atlhost.h>
 
+// if the error C2813 occurs
+// just remove /MP suffix: the problem is that
+// the #import statement is not yet compatible [05-11-2010]
+// check the microsoft homepage for further information
 #import "progid:TDxInput.Device" embedded_idl no_namespace
 
 using namespace ATL;

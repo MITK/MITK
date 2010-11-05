@@ -74,6 +74,7 @@ const std::string mitk::EventMapper::EVENTS = "events";
 const std::string mitk::EventMapper::EVENT = "event";
 
 mitk::EventMapper::EventDescriptionVec mitk::EventMapper::m_EventDescriptions;
+std::string mitk::EventMapper::m_XmlFileName;
 
 mitk::StateEvent mitk::EventMapper::m_StateEvent;
 
@@ -91,7 +92,6 @@ struct ltstr
 
 mitk::EventMapper::EventMapper()
 {
-
   //map with string to key for mapping string from xml-file to int
   m_EventConstMap["Type_None"] = mitk::Type_None;               // invalid event
   m_EventConstMap["Type_Timer"] = mitk::Type_Timer;             // timer event
@@ -517,13 +517,14 @@ bool mitk::EventMapper::LoadBehavior(std::string fileName)
   if ( fileName.empty() )
     return false;
   
-  if (FileName!=NULL)
+  if (m_XmlFileName.length() > 0)
   {
-    if (fileName.compare(FileName) == 0)
-      return false;
+    if (fileName.compare(m_XmlFileName) == 0)
+      return true; // this is nothing bad, we already loaded this file.
   }
   
   this->SetFileName( fileName.c_str() );
+  m_XmlFileName    = fileName.c_str();
   return ( this->Parse() );
 
 }

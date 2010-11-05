@@ -168,7 +168,7 @@ namespace mitk {
     //## @brief stores the information for the connection between QT-Events and the internal EventId.
     //## gets this information from xml-File
     static EventDescriptionVec m_EventDescriptions;
-
+    static std::string         m_XmlFileName;
     static StateEvent m_StateEvent;
 
     //##Documentation

@@ -52,7 +52,7 @@ int mitkEventMapperTest(int /*argc*/, char* /*argv*/[])
   MITK_TEST_CONDITION_REQUIRED(!xmlFileName1.empty(),"Getting xml file 1: ") 
   MITK_TEST_CONDITION_REQUIRED(eventMapper->LoadBehavior(xmlFileName1),"Parsing xml file 1 should throw warning: ") 
   //test dubicate file loading
-  MITK_TEST_CONDITION_REQUIRED(eventMapper->LoadBehavior(xmlFileName1) == false,"Double parsing should be avoided and not throw warnings.") 
+  MITK_TEST_CONDITION_REQUIRED(eventMapper->LoadBehavior(xmlFileName1) == true,"Double parsing should be avoided and not throw warnings.") 
   
   stateEvent.Set(0, uniqueEventFile1);
   eventMapper->RefreshStateEvent(&stateEvent);

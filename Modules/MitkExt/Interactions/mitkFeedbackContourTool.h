@@ -65,6 +65,8 @@ class MitkExt_EXPORT FeedbackContourTool : public SegTool2D
 
     Contour* GetFeedbackContour();
     void SetFeedbackContour(Contour&);
+
+    void Disable3dRendering();
     void SetFeedbackContourVisible(bool);
 
     /// Provide values from 0.0 (black) to 1.0 (full color)

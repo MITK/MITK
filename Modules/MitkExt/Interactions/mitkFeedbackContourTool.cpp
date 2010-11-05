@@ -42,18 +42,7 @@ mitk::FeedbackContourTool::FeedbackContourTool(const char* type)
   m_FeedbackContourNode->SetProperty("project", BoolProperty::New(true));
   m_FeedbackContourNode->SetProperty("Width", FloatProperty::New(1)); // uppercase! Slim line looks very accurate :-)
 
-  // set explicitly visible=false for all 3D renderer (that exist already ...)
-  const RenderingManager::RenderWindowVector& renderWindows = RenderingManager::GetInstance()->GetAllRegisteredRenderWindows();
-  for (RenderingManager::RenderWindowVector::const_iterator iter = renderWindows.begin();
-       iter != renderWindows.end();
-       ++iter)
-  {
-    if ( mitk::BaseRenderer::GetInstance((*iter))->GetMapperID() == BaseRenderer::Standard3D )
-    //if ( (*iter)->GetRenderer()->GetMapperID() == BaseRenderer::Standard3D )
-    {
-      m_FeedbackContourNode->SetProperty("visible", BoolProperty::New(false), mitk::BaseRenderer::GetInstance((*iter)));
-    }
-  }
+  this->Disable3dRendering();
 
   SetFeedbackContourColorDefault();
 }
@@ -79,20 +68,8 @@ mitk::Contour* mitk::FeedbackContourTool::GetFeedbackContour()
 
 void mitk::FeedbackContourTool::SetFeedbackContour(Contour& contour)
 {
-  // begin of temporary fix for 3m3 release
-
-  // set explicitly visible=false for all 3D renderer (that exist already ...)
-  const RenderingManager::RenderWindowVector& renderWindows = RenderingManager::GetInstance()->GetAllRegisteredRenderWindows();
-  for (RenderingManager::RenderWindowVector::const_iterator iter = renderWindows.begin();
-       iter != renderWindows.end();
-       ++iter)
-  {
-    if ( mitk::BaseRenderer::GetInstance((*iter))->GetMapperID() == BaseRenderer::Standard3D )
-    //if ( (*iter)->GetRenderer()->GetMapperID() == BaseRenderer::Standard3D )
-    {
-      m_FeedbackContourNode->SetProperty("visible", BoolProperty::New(false), mitk::BaseRenderer::GetInstance((*iter)));
-    }
-  }
+  // begin of temporary fix for 3m3 release  
+  this->Disable3dRendering();
   //end of temporary fix for 3m3 release
 
   m_FeedbackContour = &contour;
@@ -101,7 +78,12 @@ void mitk::FeedbackContourTool::SetFeedbackContour(Contour& contour)
 
 void mitk::FeedbackContourTool::SetFeedbackContourVisible(bool visible)
 {
-  if ( m_FeedbackContourVisible == visible ) return; // nothing changed
+  // begin of temporary fix for 3m3 release  
+  this->Disable3dRendering();
+  //end of temporary fix for 3m3 release
+
+  if ( m_FeedbackContourVisible == visible ) 
+    return; // nothing changed
 
   if ( DataStorage* storage = m_ToolManager->GetDataStorage() )
   {
@@ -133,3 +115,18 @@ void mitk::FeedbackContourTool::FillContourInSlice( Contour* projectedContour, I
   m_ContourUtils->FillContourInSlice(projectedContour, sliceImage, paintingPixelValue);
 }
 
+void mitk::FeedbackContourTool::Disable3dRendering()
+{
+  // set explicitly visible=false for all 3D renderer (that exist already ...)
+  const RenderingManager::RenderWindowVector& renderWindows = RenderingManager::GetInstance()->GetAllRegisteredRenderWindows();
+  for (RenderingManager::RenderWindowVector::const_iterator iter = renderWindows.begin();
+    iter != renderWindows.end();
+    ++iter)
+  {
+    if ( mitk::BaseRenderer::GetInstance((*iter))->GetMapperID() == BaseRenderer::Standard3D )
+      //if ( (*iter)->GetRenderer()->GetMapperID() == BaseRenderer::Standard3D )
+    {
+      m_FeedbackContourNode->SetProperty("visible", BoolProperty::New(false), mitk::BaseRenderer::GetInstance((*iter)));
+    }
+  }  
+}

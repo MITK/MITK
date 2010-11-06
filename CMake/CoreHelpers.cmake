@@ -468,19 +468,6 @@ MACRO(MITK_INSTALL_TARGETS)
   SET(MITK_INSTALLED_VERSION_BIN bin)
   ENDIF() 
 
-  IF(WIN32)
-   INSTALL(TARGETS ${_install_TARGETS} ${_install_EXECUTABLES}
-     RUNTIME DESTINATION bin
-   )
-  ELSE()
-   INSTALL(TARGETS ${_install_TARGETS} ${_install_EXECUTABLES}
-     BUNDLE DESTINATION .
-     RUNTIME DESTINATION bin
-     # LIBRARY DESTINATION lib/mitk/
-     # ARCHIVE DESTINATION lib/mitk/static
-   )
-  ENDIF()
-
 SET(plugin_dest_dir bin)
 SET(qtconf_dest_dir bin)
 # SET(APPS "\${CMAKE_INSTALL_PREFIX}/bin/QtTest")
@@ -513,44 +500,64 @@ FOREACH(_target ${_install_EXECUTABLES})
 
 GET_TARGET_PROPERTY(_is_bundle ${_target} MACOSX_BUNDLE)
 IF(APPLE AND _is_bundle)
-  SET(_target_location \${CMAKE_INSTALL_PREFIX}/${_target}.app)
-  SET(plugin_dest_dir ${_target}.app/Contents/MacOS)
-  SET(qtconf_dest_dir ${_target}.app/Contents/Resources)
 ELSE()
-  SET(_target_location \${CMAKE_INSTALL_PREFIX}/bin/${_target}${CMAKE_EXECUTABLE_SUFFIX})
-  SET(plugin_dest_dir bin)
-  SET(qtconf_dest_dir bin)
 ENDIF()
 
+SET(_qt_plugins_install_dirs "")
+SET(_qt_conf_install_dirs "")
+
+IF(APPLE)
+  IF(_is_bundle)
+    SET(_target_location \${CMAKE_INSTALL_PREFIX}/${_target}.app)
+    SET(_qt_plugins_install_dirs ${_target}.app/Contents/MacOS)
+    SET(_qt_conf_install_dirs ${_target}.app/Contents/Resources)
+    INSTALL(TARGETS ${_target} BUNDLE DESTINATION . )
+  ELSE(_is_bundle)
+    IF(NOT MACOSX_BUNDLE_NAMES)
+      SET(_qt_plugins_install_dirs bin)
+      SET(_qt_conf_install_dirs bin)
+      INSTALL(TARGETS ${_target} RUNTIME DESTINATION bin)
+    ELSE(NOT MACOSX_BUNDLE_NAMES)
+      FOREACH(bundle_name ${MACOSX_BUNDLE_NAMES})
+        LIST(APPEND _qt_plugins_install_dirs ${bundle_name}.app/Contents/MacOS)
+        LIST(APPEND _qt_conf_install_dirs ${bundle_name}.app/Contents/Resources)
+	INSTALL(TARGETS ${_target} RUNTIME DESTINATION ${bundle_name}.app/Contents/MacOS/)
+      ENDFOREACH(bundle_name)
+    ENDIF(NOT MACOSX_BUNDLE_NAMES)
+  ENDIF(_is_bundle)
+ELSE()
+  SET(_target_location \${CMAKE_INSTALL_PREFIX}/bin/${_target}${CMAKE_EXECUTABLE_SUFFIX})
+  SET(_qt_plugins_install_dirs bin)
+  SET(_qt_conf_install_dirs bin)
+  INSTALL(TARGETS ${_target} RUNTIME DESTINATION bin)
+ENDIF() 
+
 IF(QT_PLUGINS_DIR)
-  INSTALL(DIRECTORY "${QT_PLUGINS_DIR}" 
-          DESTINATION ${plugin_dest_dir} 
-		  CONFIGURATIONS Release
-		  
-		  FILES_MATCHING REGEX "[^d]4?\\${CMAKE_SHARED_LIBRARY_SUFFIX}$"
-		  )
-		  
-  INSTALL(DIRECTORY "${QT_PLUGINS_DIR}" 
-          DESTINATION ${plugin_dest_dir} 
-		  CONFIGURATIONS Debug
-		  
-		  FILES_MATCHING REGEX "d4?\\${CMAKE_SHARED_LIBRARY_SUFFIX}$"
-		  )
+  FOREACH(_qt_plugins_install_dir ${_qt_plugins_install_dirs})
+    INSTALL(DIRECTORY "${QT_PLUGINS_DIR}" 
+	    DESTINATION ${plugin_dest_dir} 
+		    CONFIGURATIONS Release
+		    FILES_MATCHING REGEX "[^d]4?\\${CMAKE_SHARED_LIBRARY_SUFFIX}$"
+		    )
+		    
+    INSTALL(DIRECTORY "${QT_PLUGINS_DIR}" 
+	    DESTINATION ${plugin_dest_dir} 
+		    CONFIGURATIONS Debug
+		    FILES_MATCHING REGEX "d4?\\${CMAKE_SHARED_LIBRARY_SUFFIX}$"
+		    )
+  ENDFOREACH()
 
   #--------------------------------------------------------------------------------
   # install a qt.conf file
   # this inserts some cmake code into the install script to write the file
-  INSTALL(CODE "
-      file(WRITE \"\${CMAKE_INSTALL_PREFIX}/${qtconf_dest_dir}/qt.conf\" \"\")
-      ")
+  FOREACH(_qt_conf_install_dir ${_qt_conf_install_dirs})
+    INSTALL(CODE "
+	file(WRITE \"\${CMAKE_INSTALL_PREFIX}/${_qt_conf_install_dir}/qt.conf\" \"\")
+	")
 
-
-
+  ENDFOREACH()
 
 ENDIF(QT_PLUGINS_DIR)
-
-
-
 
 IF(_install_GLOB_PLUGINS)
 

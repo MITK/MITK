@@ -498,7 +498,7 @@ ELSE()
   SET(_target_locations bin/${_target_name})
   SET(${_target_locations}_qt_plugins_install_dir bin)
   SET(_qt_conf_install_dirs bin)
-  INSTALL(TARGETS ${_target} DESTINATION bin)
+  INSTALL(FILES ${_target} DESTINATION bin)
 ENDIF() 
 
 MESSAGE("target locations: ${_target_locations}")

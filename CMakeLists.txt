@@ -212,28 +212,8 @@ CONFIGURE_FILE(${KITNAME}Config.cmake.in ${PROJECT_BINARY_DIR}/${KITNAME}Config.
 ADD_SUBDIRECTORY(Applications)
 
 ###### CPACK OPTIONS ######
-
-#
-# First, set the generator variable
-#
-IF(WIN32)
-  FIND_PROGRAM(NSIS_MAKENSIS NAMES makensis
-    PATHS [HKEY_LOCAL_MACHINE\\SOFTWARE\\NSIS]
-    DOC "Where is makensis.exe located"
-    )
-
-  IF(NOT NSIS_MAKENSIS)
-    SET(CPACK_GENERATOR ZIP)
-  ELSE()
-    SET(CPACK_GENERATOR "NSIS;ZIP")
-  ENDIF(NOT NSIS_MAKENSIS)
-ELSE()
-  IF(APPLE)
-    SET(CPACK_GENERATOR DragNDrop)
-  ELSE()
-    SET(CPACK_GENERATOR TGZ)
-  ENDIF()
-ENDIF()
+IF(CMAKE_BINARY_DIR STREQUAL MITK_BINARY_DIR)
+INCLUDE(MITKSetupCPack)
 
 SET(MITK_CPACK_PACKAGE_EXECUTABLES "ExtApp;MITK - Ext Application\"\"CoreApp;MITK - Core Application" CACHE INTERNAL "Collecting windows shortcuts to executables")
 
@@ -241,19 +221,10 @@ CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/MITKCPackOptions.cmake.in ${PROJECT_BINARY_
 
 SET(CPACK_PROJECT_CONFIG_FILE "${PROJECT_BINARY_DIR}/MITKCPackOptions.cmake")
 
-SET(CPACK_PACKAGE_NAME "MITK")
-SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "MITK is a medical image processing tool")
-SET(CPACK_PACKAGE_VENDOR "German Cancer Research Center (DKFZ)")
-SET(CPACK_PACKAGE_DESCRIPTION_FILE "${PROJECT_SOURCE_DIR}/MITKCopyright.txt")
-SET(CPACK_RESOURCE_FILE_LICENSE "${PROJECT_SOURCE_DIR}/MITKCopyright.txt")
-SET(CPACK_PACKAGE_VERSION_MAJOR "${MITK_VERSION_MAJOR}")
-SET(CPACK_PACKAGE_VERSION_MINOR "${MITK_VERSION_MINOR}")
-# append revision number if available
-IF(SVN_INFO_WC_REVISION)
-  SET(CPACK_PACKAGE_VERSION_PATCH "${MITK_VERSION_PATCH}_r${SVN_INFO_WC_REVISION}")
-ELSE(SVN_INFO_WC_REVISION)
-  SET(CPACK_PACKAGE_VERSION_PATCH "${MITK_VERSION_PATCH}")
-ENDIF(SVN_INFO_WC_REVISION)
+# include CPack model once all variables are set
+INCLUDE(CPack)
+ENDIF()
+
 ############################# INSTALL TARGETS ########################## 
 MITK_INSTALL(FILES ${PROJECT_SOURCE_DIR}/mitk.ico )
 MITK_INSTALL(FILES ${PROJECT_SOURCE_DIR}/mitk.bmp )
@@ -274,7 +245,6 @@ SET(MITK_INSTALLED_VERSION_ARCHIVES lib/mitk/static)
 SET(MITK_INSTALLED_VERSION_BIN bin)
 ENDIF() 
 
-IF(WIN32)
   #QT
   IF(MITK_USE_QT)
     FIND_PACKAGE(Qt4)
@@ -282,8 +252,10 @@ IF(WIN32)
     INCLUDE(${QT_USE_FILE})
 
     # TODO: use fixup_bundle(...)	
-    MITK_INSTALL(FILES "${QT_INCLUDE_DIR}/../bin/assistant.exe" )
+    MITK_INSTALL_HELPER_APP(EXECUTABLES "${QT_ASSISTANT_EXECUTABLE}" )
   ENDIF(MITK_USE_QT)
+
+IF(WIN32)
  
  
   #DCMTK Dlls install target (shared libs on gcc only)
@@ -346,11 +318,6 @@ ELSE(WIN32)
  
 ENDIF(WIN32)
  
-
-# include required mfc libraries
-INCLUDE(InstallRequiredSystemLibraries)
-# include CPack model once all variables are set
-INCLUDE(CPack)
 
 
 # suppress a couple of warnings

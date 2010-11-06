@@ -527,14 +527,14 @@ IF(QT_PLUGINS_DIR)
           DESTINATION ${plugin_dest_dir} 
 		  CONFIGURATIONS Release
 		  
-		  FILES_MATCHING REGEX "[^d]4\\.dll$"
+		  FILES_MATCHING REGEX "[^d]4?\\${CMAKE_SHARED_LIBRARY_SUFFIX}$"
 		  )
 		  
   INSTALL(DIRECTORY "${QT_PLUGINS_DIR}" 
           DESTINATION ${plugin_dest_dir} 
 		  CONFIGURATIONS Debug
 		  
-		  FILES_MATCHING PATTERN "*d4.dll"
+		  FILES_MATCHING REGEX "d4?\\${CMAKE_SHARED_LIBRARY_SUFFIX}$"
 		  )
 
   #--------------------------------------------------------------------------------

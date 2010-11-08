@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <QStringList.h>
 #include <QAbstractTableModel>
+#include <mitkStepper.h>
 #include "QmitkExtExports.h"
 
 #include "mitkDataNode.h"
@@ -103,8 +104,6 @@ public:
 
   void SetSelectedIndex(int row, int column);
 
-  void NodeRemoved( mitk::DataNode::ConstPointer removedNode);
-
   void ClearSelectedPointSet();
 
   void MoveSelectedPointUp();
@@ -114,6 +113,10 @@ public:
   void RemoveSelectedPoint();
 
   void ClearCurrentTimeStep();
+
+  void SetStepper(mitk::Stepper::Pointer stepper);
+
+  mitk::Stepper::Pointer GetStepper();
 
 private:
 
@@ -138,7 +141,7 @@ protected:
   bool QTPropShowCoordinates;
   mitk::DataNode::Pointer m_PointSetNode;
   mitk::DataNode::Pointer m_ReferencePointSetNode;
-  int m_TimeStep;
+  mitk::Stepper::Pointer m_TimeStepper;
   int m_row;
   int m_column;
 };

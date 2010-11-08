@@ -20,7 +20,10 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <QTableView>
 #include <QLabel>
+#include <mitkStepper.h>
+#include <mitkPointSetInteractor.h>
 #include "QmitkExtExports.h"
+
 
 #include "QmitkCorrespondingPointSetsModel.h"
 
@@ -54,11 +57,9 @@ public:
 
   QmitkStdMultiWidget* GetMultiWidget() const;  ///< return the QmitkStdMultiWidget that is used for updating render window crosshair
 
-  void SetTimesStep(int i); ///< which time step to display/model
-
   std::vector<mitk::DataNode*> GetPointSetNodes();
 
-  void NodeRemoved( const mitk::DataNode* removedNode);
+  void UpdateSelection(mitk::DataNode* selectedNode);
 
 signals:
 
@@ -76,9 +77,6 @@ protected slots:
   /// open ContextMenu
   void ctxMenu(const QPoint &pos);
 
-  /// Turn TimeStep Fading On/Off
-  void SetFading(bool onOff);
-
   void DeleteSelectedPoint();
 
   void MoveSelectedPointDown();
@@ -88,6 +86,10 @@ protected slots:
   void ClearSelectedPointSet();
 
   void ClearCurrentTimeStep();
+
+  void SwapPointSets(bool checked);
+
+  void AddPointsMode(bool checked);
 
 protected:
 
@@ -101,14 +103,13 @@ protected:
 
   QmitkCorrespondingPointSetsModel*    m_CorrespondingPointSetsModel;
 
-  bool                    m_SelfCall;
+  bool  m_SelfCall;
+  bool  m_swapPointSets;
+  bool  m_addPointsMode;
 
-  bool                    m_showFading;
-
-  /// used to position the planes on a selected point
   QmitkStdMultiWidget*    m_MultiWidget;
-
   QLabel*                m_TimeStepFaderLabel;
-
+  mitk::Stepper::Pointer m_TimeStepper;
+  mitk::PointSetInteractor::Pointer   m_Interactor;
 };
 #endif

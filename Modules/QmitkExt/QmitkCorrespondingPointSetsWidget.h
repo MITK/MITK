@@ -41,7 +41,7 @@ class QmitkExt_EXPORT QmitkCorrespondingPointSetsWidget : public QWidget
     Q_OBJECT
 
 public:
-    QmitkCorrespondingPointSetsWidget(QWidget *parent = 0, int orientation = 0);
+    QmitkCorrespondingPointSetsWidget(QWidget *parent = 0);
     ~QmitkCorrespondingPointSetsWidget();
 
     /// assign point sets (contained in a node of DataStorage) for observation
@@ -54,31 +54,17 @@ public:
 
     void UpdateSelection(mitk::DataNode* selectedNode);
 
-    void NodeRemoved( const mitk::DataNode* removedNode);
-
 public slots:
 
 signals:
 
 protected slots:
-    void OnBtnAddPoint();
 
 protected:
 
     void SetupUi();
 
     QmitkCorrespondingPointSetsView* m_CorrespondingPointSetsView;
-    QmitkStdMultiWidget* m_MultiWidget;
-    mitk::DataStorage* m_DataStorage;
-
-    int      m_Orientation;
-
-    QPushButton* m_ToggleAddPoint;
-
-
-    mitk::PointSetInteractor::Pointer   m_Interactor;
-    mitk::PointSetInteractor::Pointer   m_ReferenceInteractor;
-    int     m_TimeStep;
 };
 
 #endif

@@ -23,6 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkRenderingManager.h"
 
+#include <mitkStepper.h>
 #include <QKeyEvent>
 #include <QPalette>
 #include <QTimer>
@@ -30,13 +31,19 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QMessageBox>
 #include <QMetaObject.h>
 #include <QMetaProperty>
+#include <mitkStepper.h>
+#include <mitkPointSetInteractor.h>
+#include <mitkGlobalInteraction.h>
 
 QmitkCorrespondingPointSetsView::QmitkCorrespondingPointSetsView( QWidget* parent )
   :QTableView( parent ),
   m_CorrespondingPointSetsModel( new QmitkCorrespondingPointSetsModel() ),
   m_SelfCall( false ),
-  m_showFading(false),
-  m_MultiWidget( NULL)
+  m_swapPointSets(false),
+  m_addPointsMode(false),
+  m_MultiWidget( NULL ),
+  m_Interactor(NULL),
+  m_TimeStepper( NULL )
 {  
   // logic
   m_CorrespondingPointSetsModel->setProperty("QTPropShowCoordinates", true);
@@ -50,9 +57,12 @@ QmitkCorrespondingPointSetsView::QmitkCorrespondingPointSetsView( QWidget* paren
   QTableView::setSelectionMode( QAbstractItemView::SingleSelection );
   QTableView::setModel( m_CorrespondingPointSetsModel );
   //QTableView::horizontalHeader()->resizeSections(QHeaderView::Stretch);
-  QTableView::horizontalHeader()->resizeSection(0, (int)(this->width()/3));
+  QTableView::horizontalHeader()->resizeSection(0, (int)(this->width()/3.5));
   QTableView::horizontalHeader()->setStretchLastSection(true);
-
+  /*this->setDragEnabled(true);
+  this->setAcceptDrops(true);
+  this->setDropIndicatorShown(true);
+  this->setDragDropMode(QAbstractItemView::InternalMove);*/
   m_TimeStepFaderLabel = new QLabel(this);
   QFont font("Arial", 17);
   m_TimeStepFaderLabel->setFont(font);
@@ -72,11 +82,21 @@ QmitkCorrespondingPointSetsView::~QmitkCorrespondingPointSetsView()
 }
 void QmitkCorrespondingPointSetsView::SetPointSetNodes( std::vector<mitk::DataNode*> nodes )
 {
-  m_CorrespondingPointSetsModel->SetPointSetNodes( nodes);
+  if ( !this->m_swapPointSets || nodes.size()<2 )
+    m_CorrespondingPointSetsModel->SetPointSetNodes( nodes );
+  else
+  {
+    std::vector<mitk::DataNode*> reverseNodes;
+    reverseNodes.push_back(nodes.back());
+    reverseNodes.push_back(nodes.front());
+    m_CorrespondingPointSetsModel->SetPointSetNodes( reverseNodes );
+  }
 }
 void QmitkCorrespondingPointSetsView::SetMultiWidget( QmitkStdMultiWidget* multiWidget )
 {
   m_MultiWidget = multiWidget;
+  m_TimeStepper = m_MultiWidget->GetTimeNavigationController()->GetTime();
+  this->m_CorrespondingPointSetsModel->SetStepper(m_TimeStepper);
 }
 QmitkStdMultiWidget* QmitkCorrespondingPointSetsView::GetMultiWidget() const
 {
@@ -171,19 +191,18 @@ void QmitkCorrespondingPointSetsView::keyPressEvent( QKeyEvent * e )
 void QmitkCorrespondingPointSetsView::wheelEvent(QWheelEvent *event)
 {
   int whe = event->delta();
+  int pos = m_TimeStepper->GetPos();
 
   int currentTS =  this->m_CorrespondingPointSetsModel->GetTimeStep();
   if(whe > 0)
   {
     this->m_CorrespondingPointSetsModel->SetTimeStep(++currentTS);
+    m_TimeStepper->SetPos(++pos);
   }
-  else
+  else if( pos > 0 )
   {
-
-    if((currentTS <= 0))
-      return;
     this->m_CorrespondingPointSetsModel->SetTimeStep(--currentTS);
-
+    m_TimeStepper->SetPos(--pos);
   }
   fadeTimeStepIn();
 }
@@ -201,14 +220,11 @@ void QmitkCorrespondingPointSetsView::fadeTimeStepIn()
   m_TimeStepFader->setLayout(layout);
   m_TimeStepFader->setAttribute(Qt::WA_DeleteOnClose);
 
-  //setup Label
-  //    QLabel *label = new QLabel(QString("%1").arg(this->m_CorrespondingPointSetsModel->GetTimeStep()));
-
   layout->addWidget(m_TimeStepFaderLabel);
   m_TimeStepFaderLabel->setAlignment(Qt::AlignCenter);
   m_TimeStepFaderLabel->setFrameStyle(QFrame::StyledPanel | QFrame::Raised);
   m_TimeStepFaderLabel->setLineWidth(2);
-  m_TimeStepFaderLabel->setText(QString("%1").arg(this->m_CorrespondingPointSetsModel->GetTimeStep()));
+  m_TimeStepFaderLabel->setText(QString("%1").arg(this->m_TimeStepper->GetPos()));
 
   //give the widget opacity and some colour
   QPalette pal = m_TimeStepFaderLabel->palette();
@@ -239,20 +255,6 @@ void QmitkCorrespondingPointSetsView::ctxMenu(const QPoint &pos)
   int row = QTableView::rowAt(y);
   int col = QTableView::columnAt(x);
 
-  ////add Fading check
-  //QAction *showFading = new QAction(this);
-  //showFading->setCheckable(true);  //TODO: reset when fading is working
-  //showFading->setEnabled(true);    //TODO: reset when fading is working
-  //showFading->setText("Fade TimeStep");
-  //connect(showFading, SIGNAL(triggered(bool)), this, SLOT(SetFading(bool)));
-  //menu->addAction(showFading);
-
-  ////add Clear TimeStep action
-  //QAction *clearTS = new QAction(this);
-  //clearTS->setText("Clear current time step");
-  //connect(clearTS, SIGNAL(triggered()), this, SLOT(ClearCorrespondingPointSetsTS()));
-  //menu->addAction(clearTS);
-
   //add delete point action
   mitk::PointSet::PointsContainer::ElementIdentifier id;
   mitk::PointSet::PointType p;
@@ -274,8 +276,13 @@ void QmitkCorrespondingPointSetsView::ctxMenu(const QPoint &pos)
     menu->addAction(delPoint);
   }
 
+  QAction *separator = new QAction(this);
+  separator->setSeparator(true);
+
   if (col == 0 || col == 1)
   {
+    menu->addSeparator();
+
     QAction *clearTS = new QAction(this);
     clearTS->setText("Clear time step");
     connect(clearTS, SIGNAL(triggered()), this, SLOT(ClearCurrentTimeStep()));
@@ -286,14 +293,25 @@ void QmitkCorrespondingPointSetsView::ctxMenu(const QPoint &pos)
     connect(clearList, SIGNAL(triggered()), this, SLOT(ClearSelectedPointSet()));
     menu->addAction(clearList);
   }
+  menu->addSeparator();
+
+  QAction *swapSets = new QAction(this);
+  swapSets->setText("Swap point sets");
+  connect(swapSets, SIGNAL(triggered(bool)), this, SLOT(SwapPointSets(bool)));
+  swapSets->setCheckable(true);
+  swapSets->setChecked(m_swapPointSets);
+  menu->addAction(swapSets);
+
+  QAction *addPoints = new QAction(this);
+  addPoints->setText("Check to add new points");
+  connect(addPoints, SIGNAL(triggered(bool)), this, SLOT(AddPointsMode(bool)));
+  addPoints->setCheckable(true);
+  addPoints->setChecked(m_addPointsMode);
+  menu->addAction(addPoints);
 
   menu->exec(this->mapToGlobal(pos));
 }
 
-void QmitkCorrespondingPointSetsView::SetFading(bool onOff)
-{
-  m_showFading = onOff;
-}
 std::vector<mitk::DataNode*> QmitkCorrespondingPointSetsView::GetPointSetNodes(){
   return this->m_CorrespondingPointSetsModel->GetPointSetNodes();
 }
@@ -358,7 +376,60 @@ void QmitkCorrespondingPointSetsView::ClearCurrentTimeStep()
     break;
   }
 }
-void QmitkCorrespondingPointSetsView::NodeRemoved( const mitk::DataNode* removedNode)
+
+void QmitkCorrespondingPointSetsView::SwapPointSets(bool checked)
 {
-  this->m_CorrespondingPointSetsModel->NodeRemoved(removedNode);
+  m_swapPointSets = checked;
+
+  if ( !checked )
+  {
+    std::vector<mitk::DataNode*> nodes = this->GetPointSetNodes();
+    std::vector<mitk::DataNode*> reverseNodes;
+    reverseNodes.push_back(nodes.back());
+    reverseNodes.push_back(nodes.front());
+    this->SetPointSetNodes( reverseNodes );
+  }
+  else
+    this->SetPointSetNodes(this->GetPointSetNodes());
+}
+void QmitkCorrespondingPointSetsView::AddPointsMode(bool checked)
+{
+  m_addPointsMode = checked;
+  std::vector<mitk::DataNode*> pointSetNodes = this->GetPointSetNodes();
+  std::vector<mitk::DataNode*>::iterator it;
+  for ( it = pointSetNodes.begin(); it < pointSetNodes.end(); it++ )
+  {
+    mitk::DataNode* dataNode = dynamic_cast<mitk::DataNode*>(*it);
+    bool selected = false;
+    dataNode->GetPropertyValue<bool>("selected", selected);
+
+    if (selected) {
+      this->UpdateSelection(dataNode);
+      break;
+    }
+  }
+}
+void QmitkCorrespondingPointSetsView::UpdateSelection(mitk::DataNode* selectedNode)
+{
+  if (m_Interactor){
+    mitk::GlobalInteraction::GetInstance()->RemoveInteractor( m_Interactor );
+    m_Interactor = NULL;
+  }
+
+  if ( this->m_addPointsMode && selectedNode )
+  {
+    bool visible = false;
+    selectedNode->GetPropertyValue<bool>("visible", visible);
+
+    if (visible){
+      // set new interactor
+      m_Interactor = dynamic_cast<mitk::PointSetInteractor*>(selectedNode->GetInteractor());
+
+      if (m_Interactor.IsNull())//if not present, instanciate one
+        m_Interactor = mitk::PointSetInteractor::New("pointsetinteractor", selectedNode);
+      
+      //add it to global interaction to activate it
+      mitk::GlobalInteraction::GetInstance()->AddInteractor( m_Interactor );
+    }
+  }
 }

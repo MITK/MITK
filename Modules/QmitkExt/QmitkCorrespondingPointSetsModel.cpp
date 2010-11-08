@@ -24,17 +24,17 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkEvent.h>
 #include <mitkStateEvent.h>
 #include <mitkInteractionConst.h>
+#include <mitkStepper.h>
 
 QmitkCorrespondingPointSetsModel::QmitkCorrespondingPointSetsModel( int t, QObject* parent )
 :QAbstractTableModel(parent),
 m_PointSetNode(NULL),
 m_ReferencePointSetNode(NULL),
-m_TimeStep(t),
+m_TimeStepper(NULL),
 m_row(-1),
 m_column(-1)
 {
-  /*this->m_PointSetNode->SetProperty("layer", mitk::IntProperty::New(50));
-  this->m_ReferencePointSetNode->SetProperty("layer", mitk::IntProperty::New(50));*/
+  ;
 }
 
 Qt::ItemFlags QmitkCorrespondingPointSetsModel::flags(const QModelIndex& /*index*/) const
@@ -65,19 +65,17 @@ void QmitkCorrespondingPointSetsModel::SetPointSetNodes( std::vector<mitk::DataN
     m_ReferencePointSetNode = NULL;
   }
   QAbstractTableModel::reset();
-  //emit SignalUpdateSelection();
 }
 
 void QmitkCorrespondingPointSetsModel::SetTimeStep(int t)
 {
-  m_TimeStep = t;
+  m_TimeStepper->SetPos(t);
   QAbstractTableModel::reset();
-  emit SignalUpdateSelection();
 }
 
 int QmitkCorrespondingPointSetsModel::GetTimeStep() const
 {
-  return m_TimeStep;
+  return m_TimeStepper->GetPos();
 }
 
 int QmitkCorrespondingPointSetsModel::rowCount( const QModelIndex&  /*parent*/ ) const
@@ -88,11 +86,11 @@ int QmitkCorrespondingPointSetsModel::rowCount( const QModelIndex&  /*parent*/ )
   int sizeRPS = 0;
   if ( pointSet.IsNotNull() )
   {
-    sizePS = pointSet->GetSize(m_TimeStep);
+    sizePS = pointSet->GetSize(m_TimeStepper->GetPos());
   }
   if ( referencePointSet.IsNotNull() )
   {
-    sizeRPS = referencePointSet->GetSize(m_TimeStep);
+    sizeRPS = referencePointSet->GetSize(m_TimeStepper->GetPos());
   }
   if ( sizePS > sizeRPS )
     return sizePS;
@@ -122,7 +120,7 @@ QVariant QmitkCorrespondingPointSetsModel::data(const QModelIndex& index, int ro
     return QVariant();
   }
 
-  if ( index.row() >= pointSet->GetSize(m_TimeStep) )
+  if ( index.row() >= pointSet->GetSize(m_TimeStepper->GetPos()) )
   {
     return QVariant();
   }
@@ -169,7 +167,6 @@ QVariant QmitkCorrespondingPointSetsModel::headerData(int section, Qt::Orientati
 
   if (orientation == Qt::Horizontal)
   {
-    //return QString("Coordinates").arg(section);
     if (section == 0)
     {
       if ( m_PointSetNode )
@@ -197,22 +194,22 @@ bool QmitkCorrespondingPointSetsModel::GetPointForModelIndex( const QModelIndex 
   if (pointSet.IsNull())
     return false;
 
-  if ((index.row() < 0) || (index.row() >= (int)pointSet->GetPointSet(m_TimeStep)->GetPoints()->Size()))
+  if ((index.row() < 0) || (index.row() >= (int)pointSet->GetPointSet(m_TimeStepper->GetPos())->GetPoints()->Size()))
     return false;
 
   // get the nth. element, if it exists.
   // we can not use the index directly, because PointSet uses a map container, 
   // where the index is not necessarily the same as the key.
   // Therefore we have to count the elements
-  mitk::PointSet::PointsContainer::Iterator it = pointSet->GetPointSet(m_TimeStep)->GetPoints()->Begin();
+  mitk::PointSet::PointsContainer::Iterator it = pointSet->GetPointSet(m_TimeStepper->GetPos())->GetPoints()->Begin();
   for (int i = 0; i < index.row(); ++i)
   {
     ++it;
-    if (it == pointSet->GetPointSet(m_TimeStep)->GetPoints()->End())
+    if (it == pointSet->GetPointSet(m_TimeStepper->GetPos())->GetPoints()->End())
       return false;
   }
 
-  if (it != pointSet->GetPointSet(m_TimeStep)->GetPoints()->End()) // not at the end, 
+  if (it != pointSet->GetPointSet(m_TimeStepper->GetPos())->GetPoints()->End()) // not at the end, 
   {
     p = it->Value();
     id = it->Index();
@@ -233,22 +230,22 @@ bool QmitkCorrespondingPointSetsModel::GetPointForModelIndex( int row, int colum
   if (pointSet.IsNull())
     return false;
 
-  if ((row < 0) || (row >= (int)pointSet->GetPointSet(m_TimeStep)->GetPoints()->Size()))
+  if ((row < 0) || (row >= (int)pointSet->GetPointSet(m_TimeStepper->GetPos())->GetPoints()->Size()))
     return false;
 
   // get the nth. element, if it exists.
   // we can not use the index directly, because PointSet uses a map container, 
   // where the index is not necessarily the same as the key.
   // Therefore we have to count the elements
-  mitk::PointSet::PointsContainer::Iterator it = pointSet->GetPointSet(m_TimeStep)->GetPoints()->Begin();
+  mitk::PointSet::PointsContainer::Iterator it = pointSet->GetPointSet(m_TimeStepper->GetPos())->GetPoints()->Begin();
   for (int i = 0; i < row; ++i)
   {
     ++it;
-    if (it == pointSet->GetPointSet(m_TimeStep)->GetPoints()->End())
+    if (it == pointSet->GetPointSet(m_TimeStepper->GetPos())->GetPoints()->End())
     return false;
   }
 
-  if (it != pointSet->GetPointSet(m_TimeStep)->GetPoints()->End()) // not at the end, 
+  if (it != pointSet->GetPointSet(m_TimeStepper->GetPos())->GetPoints()->End()) // not at the end, 
   {
     p = it->Value();
     id = it->Index();
@@ -268,7 +265,7 @@ bool QmitkCorrespondingPointSetsModel::GetModelIndexForPointID(mitk::PointSet::P
 
   if (!pointSet.IsNull())
   {
-    mitk::PointSet::PointsContainer::Pointer points = pointSet->GetPointSet(m_TimeStep)->GetPoints();
+    mitk::PointSet::PointsContainer::Pointer points = pointSet->GetPointSet(m_TimeStepper->GetPos())->GetPoints();
 
     if (!points->IndexExists(id))
       return false;
@@ -302,12 +299,15 @@ void QmitkCorrespondingPointSetsModel::MoveSelectedPointUp()
     return;
 
   mitk::PointSet::PointIdentifier selectedID;   
-  selectedID = pointSet->SearchSelectedPoint(m_TimeStep);
-  mitk::PointSet::PointType point = pointSet->GetPoint(selectedID, m_TimeStep);
-  mitk::ScalarType tsInMS = pointSet->GetTimeSlicedGeometry()->TimeStepToMS(m_TimeStep);
-  mitk::PointOperation* doOp = new mitk::PointOperation(mitk::OpMOVEPOINTUP,tsInMS, pointSet->GetPoint(selectedID, m_TimeStep), selectedID, true);
+  selectedID = pointSet->SearchSelectedPoint(m_TimeStepper->GetPos());
+  mitk::PointSet::PointType point = pointSet->GetPoint(selectedID, m_TimeStepper->GetPos());
+  mitk::ScalarType tsInMS = pointSet->GetTimeSlicedGeometry()->TimeStepToMS(m_TimeStepper->GetPos());
+  mitk::PointOperation* doOp = new mitk::PointOperation(mitk::OpMOVEPOINTUP,tsInMS, pointSet->GetPoint(selectedID, m_TimeStepper->GetPos()), selectedID, true);
   pointSet->ExecuteOperation(doOp);
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll(); // Workaround for update problem in Pointset/Mapper
+  QAbstractTableModel::reset();
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  /*selectedID = pointSet->SearchSelectedPoint(m_TimeStepper->GetPos());
+  mitk::PointSet::PointType point = pointSet->GetPoint(selectedID, m_TimeStepper->GetPos());*/
 }
 
 void QmitkCorrespondingPointSetsModel::MoveSelectedPointDown()
@@ -324,10 +324,11 @@ void QmitkCorrespondingPointSetsModel::MoveSelectedPointDown()
     return;
 
   mitk::PointSet::PointIdentifier selectedID; 
-  selectedID = pointSet->SearchSelectedPoint(m_TimeStep);
-  mitk::ScalarType tsInMS = pointSet->GetTimeSlicedGeometry()->TimeStepToMS(m_TimeStep);
-  mitk::PointOperation* doOp = new mitk::PointOperation(mitk::OpMOVEPOINTDOWN, tsInMS, pointSet->GetPoint(selectedID, m_TimeStep), selectedID, true);
+  selectedID = pointSet->SearchSelectedPoint(m_TimeStepper->GetPos());
+  mitk::ScalarType tsInMS = pointSet->GetTimeSlicedGeometry()->TimeStepToMS(m_TimeStepper->GetPos());
+  mitk::PointOperation* doOp = new mitk::PointOperation(mitk::OpMOVEPOINTDOWN, tsInMS, pointSet->GetPoint(selectedID, m_TimeStepper->GetPos()), selectedID, true);
   pointSet->ExecuteOperation(doOp);
+  QAbstractTableModel::reset();
   mitk::RenderingManager::GetInstance()->RequestUpdateAll(); // Workaround for update problem in Pointset/Mapper
 }
 
@@ -350,30 +351,13 @@ void QmitkCorrespondingPointSetsModel::RemoveSelectedPoint()
   if (pointSet.IsNull())
     return;
 
-  //get corresponding interactor to PointSet
-  mitk::PointSetInteractor::Pointer interactor = dynamic_cast<mitk::PointSetInteractor*>(dataNode->GetInteractor());  
-  if (interactor.IsNull())
-  {
-    if (dataNode->GetInteractor()==NULL && dataNode != NULL) //no Interactor set to node
-    {
-      interactor = mitk::PointSetInteractor::New("pointsetinteractor",dataNode);
-      dataNode->SetInteractor(interactor);
-    }
-    else
-    {
-      MITK_WARN<<"Unexpected interactor found!\n";
-      return;
-    }
-  }
-
-  //send a DEL event to pointsetinteractor
-  const mitk::Event* delEvent = new mitk::Event(NULL, mitk::Type_KeyPress, mitk::BS_NoButton, mitk::BS_NoButton, mitk::Key_Delete);
-  mitk::StateEvent* delStateEvent = new mitk::StateEvent(mitk::EIDDELETE, delEvent);
-  interactor->HandleEvent(delStateEvent);
-  delete delEvent;
-  delete delStateEvent;
-
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll(); // Workaround for update problem in PointSet/Mapper
+  mitk::PointSet::PointIdentifier selectedID; 
+  selectedID = pointSet->SearchSelectedPoint(m_TimeStepper->GetPos());
+  mitk::ScalarType tsInMS = pointSet->GetTimeSlicedGeometry()->TimeStepToMS(m_TimeStepper->GetPos());
+  mitk::PointOperation* doOp = new mitk::PointOperation(mitk::OpREMOVE, tsInMS, pointSet->GetPoint(selectedID, m_TimeStepper->GetPos()), selectedID, true);
+  pointSet->ExecuteOperation(doOp);
+  QAbstractTableModel::reset();
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 mitk::PointSet* QmitkCorrespondingPointSetsModel::CheckForPointSetInNode(mitk::DataNode* node) const
@@ -421,10 +405,6 @@ void QmitkCorrespondingPointSetsModel::SetSelectedIndex(int row, int column)
   this->m_column = column;
 }
 
-void QmitkCorrespondingPointSetsModel::NodeRemoved( mitk::DataNode::ConstPointer removedNode)
-{
-  ;
-}
 void QmitkCorrespondingPointSetsModel::ClearSelectedPointSet()
 {
   mitk::DataNode* dataNode = NULL; 
@@ -439,17 +419,9 @@ void QmitkCorrespondingPointSetsModel::ClearSelectedPointSet()
 
   mitk::PointSet* pointSet = dynamic_cast<mitk::PointSet*>(dataNode->GetData());
 
-  mitk::PointSet::PointsContainer::Iterator it;
-  for (int t=0; t<pointSet->GetTimeSteps(); t++){
-    int bla = pointSet->GetSize();
-    while( !pointSet->IsEmpty(t) )
-    {
-      it = pointSet->GetPointSet(t)->GetPoints()->Begin();
-      pointSet->SetSelectInfo(it->Index(),true, t);
-      this->RemoveSelectedPoint();
-    }
-  }
-
+  pointSet->Clear();
+ 
+  QAbstractTableModel::reset();
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 void QmitkCorrespondingPointSetsModel::ClearCurrentTimeStep()
@@ -467,12 +439,22 @@ void QmitkCorrespondingPointSetsModel::ClearCurrentTimeStep()
   mitk::PointSet* pointSet = dynamic_cast<mitk::PointSet*>(dataNode->GetData());
 
   mitk::PointSet::PointsContainer::Iterator it;
-  while( !pointSet->IsEmpty(m_TimeStep) )
-  {
-    it = pointSet->GetPointSet(m_TimeStep)->GetPoints()->Begin();
-    pointSet->SetSelectInfo(it->Index(),true, m_TimeStep);
+  while( !pointSet->IsEmpty(m_TimeStepper->GetPos()) )
+  {    
+    it = pointSet->GetPointSet(m_TimeStepper->GetPos())->GetPoints()->Begin();
+    pointSet->SetSelectInfo(it->Index(),true, m_TimeStepper->GetPos());
     this->RemoveSelectedPoint();
   }
 
+  QAbstractTableModel::reset();
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+}
+
+mitk::Stepper::Pointer QmitkCorrespondingPointSetsModel::GetStepper()
+{
+  return this->m_TimeStepper;
+}
+void QmitkCorrespondingPointSetsModel::SetStepper(mitk::Stepper::Pointer stepper)
+{
+  this->m_TimeStepper = stepper;
 }

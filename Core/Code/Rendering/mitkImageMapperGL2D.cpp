@@ -274,6 +274,27 @@ mitk::ImageMapperGL2D::Paint( mitk::BaseRenderer *renderer )
       {
         annotationColor = annotationColorProp->GetColor();
       }
+      bool hover    = false;
+      bool selected = false;
+      GetDataNode()->GetBoolProperty("binaryimage.ishovering", hover, renderer);
+      GetDataNode()->GetBoolProperty("selected", selected, renderer);
+  
+      if(hover)
+      {
+        mitk::ColorProperty::Pointer colorprop = dynamic_cast<mitk::ColorProperty*>(GetDataNode()->GetProperty
+                                              ("binaryimage.hoveringcolor", renderer));
+        if(colorprop.IsNotNull())
+           annotationColor = colorprop->GetColor();
+
+      }
+      if(selected)
+      {
+        mitk::ColorProperty::Pointer colorprop = dynamic_cast<mitk::ColorProperty*>(GetDataNode()->GetProperty
+                                              ("binaryimage.selectedcolor", renderer));
+        if(colorprop.IsNotNull())
+          annotationColor = colorprop->GetColor();
+
+      }
             
       OpenGLrenderer->WriteSimpleText(volumeString.str(), pt2D[0]+1, pt2D[1]-1,0,0,0); //this is a shadow 
       OpenGLrenderer->WriteSimpleText(volumeString.str(), pt2D[0]  , pt2D[1]  ,annotationColor.GetRed() 
@@ -947,7 +968,30 @@ mitk::ImageMapperGL2D::ApplyProperties(mitk::BaseRenderer* renderer)
   float opacity = 1.0f;
 
   // check for color prop and use it for rendering if it exists
-  GetColor( rgba, renderer );
+  // binary image hovering & binary image selection
+  bool hover    = false;
+  bool selected = false;
+  GetDataNode()->GetBoolProperty("binaryimage.ishovering", hover, renderer);
+  GetDataNode()->GetBoolProperty("selected", selected, renderer);
+  if(hover && !selected)
+  {
+    mitk::ColorProperty::Pointer colorprop = dynamic_cast<mitk::ColorProperty*>(GetDataNode()->GetProperty
+                                              ("binaryimage.hoveringcolor", renderer));
+    if(colorprop.IsNotNull())
+      memcpy(rgba, colorprop->GetColor().GetDataPointer(), 3*sizeof(float));
+  }
+  if(selected)
+  {
+     mitk::ColorProperty::Pointer colorprop = dynamic_cast<mitk::ColorProperty*>(GetDataNode()->GetProperty
+                                              ("binaryimage.selectedcolor", renderer));
+    if(colorprop.IsNotNull())
+      memcpy(rgba, colorprop->GetColor().GetDataPointer(), 3*sizeof(float));
+  }
+  if(!hover && !selected)
+  {
+     GetColor( rgba, renderer );
+  }
+
   // check for opacity prop and use it for rendering if it exists
   GetOpacity( opacity, renderer );
   rgba[3] = opacity;
@@ -1253,6 +1297,10 @@ void mitk::ImageMapperGL2D::SetDefaultProperties(mitk::DataNode* node, mitk::Bas
   {
     node->AddProperty( "opacity", mitk::FloatProperty::New(0.3f), renderer, overwrite );
     node->AddProperty( "color", ColorProperty::New(1.0,0.0,0.0), renderer, overwrite );
+    node->AddProperty( "binaryimage.selectedcolor", ColorProperty::New(1.0,0.0,0.0), renderer, overwrite );
+    node->AddProperty( "binaryimage.selectedannotationcolor", ColorProperty::New(1.0,0.0,0.0), renderer, overwrite );
+    node->AddProperty( "binaryimage.hoveringcolor", ColorProperty::New(1.0,0.0,0.0), renderer, overwrite );
+    node->AddProperty( "binaryimage.hoveringannotationcolor", ColorProperty::New(1.0,0.0,0.0), renderer, overwrite );
     node->AddProperty( "binary", mitk::BoolProperty::New( true ), renderer, overwrite );
     node->AddProperty("layer", mitk::IntProperty::New(10), renderer, overwrite);
   }

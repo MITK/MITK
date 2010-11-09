@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkIInputDevice.h"
 
-//#include "mitkWiiMoteVtkCameraController.h"
+#include "mitkWiiMoteVtkCameraController.h"
 
 namespace mitk
 {
@@ -47,7 +47,7 @@ namespace mitk
 
     bool m_IsRegistered;
 
-    //mitk::WiiMoteVtkCameraController::Pointer m_Controller;
+    mitk::WiiMoteVtkCameraController::Pointer m_Controller;
 
   }; // end class WiiMoteActivator
 } // end namespace mitk

@@ -85,25 +85,6 @@ const mitk::ImageToPlanarFigureFilter::InputImageType *mitk::ImageToPlanarFigure
 void mitk::ImageToPlanarFigureFilter::GenerateInputRequestedRegion()
 {
   Superclass::GenerateInputRequestedRegion();
-
-  for (unsigned int idx = 0; idx < this->GetNumberOfInputs(); ++idx)
-  {
-    if (this->GetInput(idx))
-    {
-      mitk::ImageToPlanarFigureFilter::InputImagePointer input =
-        const_cast< mitk::ImageToPlanarFigureFilter::InputImageType * > ( this->GetInput(idx) );
-
-      // Use the function object RegionCopier to copy the output region
-      // to the input.  The default region copier has default implementations
-      // to handle the cases where the input and output are the same
-      // dimension, the input a higher dimension than the output, and the
-      // input a lower dimension than the output.
-      InputImageRegionType inputRegion;
-      //      this->CallCopyRegion(inputRegion, this->GetOutput()->GetRequestedRegion()); @FIXME  ??
-      //      input->SetRequestedRegion( inputRegion ); @FIXME ??
-      input->SetRequestedRegion( this->GetOutput() ); // ersatz. @FIXME ??
-    }
-  }  
 }
 
 void mitk::ImageToPlanarFigureFilter::PrintSelf(std::ostream& os, itk::Indent indent) const

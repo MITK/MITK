@@ -20,7 +20,7 @@ namespace mitk {
   template <class TRegistration, class TPixel>  
   class RegistrationInterfaceCommand : public itk::Command 
   {
-	
+  
     public:
       typedef RegistrationInterfaceCommand   Self;
       typedef itk::Command                   Superclass;
@@ -31,7 +31,7 @@ namespace mitk {
     {
       m_UseMask = false;
     }
-  	
+    
     public:
     //typedef TRegistration                              RegistrationType;
 
@@ -50,19 +50,19 @@ namespace mitk {
     bool m_UseMask;  
     std::vector<std::string> m_Presets;
     MaskType::Pointer m_BrainMask;
-  	
-		void Execute(itk::Object * object, const itk::EventObject & event)
-		{
-  	  if( !(itk::IterationEvent().CheckEvent( &event )) )
-			{
-			  return;
-			}
-  	
+    
+    void Execute(itk::Object * object, const itk::EventObject & event)
+    {
+      if( !(itk::IterationEvent().CheckEvent( &event )) )
+      {
+        return;
+      }
+    
       RegistrationPointer registration = dynamic_cast<RegistrationPointer>( object );
-  	
+    
       
       /*OptimizerPointer optimizer = dynamic_cast< OptimizerPointer >( 
-												     registration->GetOptimizer() );*/
+                             registration->GetOptimizer() );*/
 
       
       std::cout << "-------------------------------------" << std::endl;
@@ -77,8 +77,7 @@ namespace mitk {
       else
       {
         // Load presets and make a new optimizer if that succeeds
-        mitk::RigidRegistrationTestPreset *preset = new mitk::RigidRegistrationTestPreset();
-
+        mitk::RigidRegistrationPreset *preset = new mitk::RigidRegistrationPreset();
         if( preset->LoadPreset() )
         {          
         
@@ -156,7 +155,7 @@ namespace mitk {
       
 
         }      
-
+        delete preset;
        
       }
          
@@ -171,7 +170,7 @@ namespace mitk {
       std::cout << "TRANSFORM" << std::endl;
       registration->GetTransform()->Print(std::cout,0);
     }
-	
+  
     void Execute(const itk::Object * , const itk::EventObject & )
       { return; }
 

@@ -4,8 +4,7 @@ SET(CPP_FILES
   mitkOptimizerFactory.cpp
   mitkOptimizerParameters.cpp
   mitkRigidRegistrationObserver.cpp
-  mitkRigidRegistrationPreset.cpp
-  mitkRigidRegistrationTestPreset.cpp
+  mitkRigidRegistrationPreset.cpp  
   mitkTransformParameters.cpp
   mitkPyramidalRegistrationMethod.cpp
 )

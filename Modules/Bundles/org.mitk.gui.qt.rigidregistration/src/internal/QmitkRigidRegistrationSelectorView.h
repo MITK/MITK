@@ -21,7 +21,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkDataNode.h"
 #include "mitkDataStorage.h"
 #include "ui_QmitkRigidRegistrationSelector.h"
-#include "mitkRigidRegistrationTestPreset.h"
 #include "qobject.h"
 #include "../RigidregistrationDll.h"
 #include "QmitkRigidRegistrationTransformsGUIBase.h"
@@ -79,11 +78,11 @@ public:
 
     void LoadRigidRegistrationParameter();
     void SaveRigidRegistrationParameter();
-    void LoadRigidRegistrationTestParameter();
-    void SaveRigidRegistrationTestParameter();
-    void DoLoadRigidRegistrationParameter(bool testPreset);
-    void DoLoadRigidRegistrationPreset(std::string presetName, bool testPreset);
-    void DoSaveRigidRegistrationParameter(bool testPreset);
+    //void LoadRigidRegistrationTestParameter();
+    //void SaveRigidRegistrationTestParameter();
+    void DoLoadRigidRegistrationParameter();
+    void DoLoadRigidRegistrationPreset(std::string presetName);
+    void DoSaveRigidRegistrationParameter();
     void AddTransform(QmitkRigidRegistrationTransformsGUIBase* transform);
     void AddMetric(QmitkRigidRegistrationMetricsGUIBase* metric);
     void AddOptimizer(QmitkRigidRegistrationOptimizerGUIBase* optimizer);
@@ -99,7 +98,6 @@ protected:
   int m_MovingDimension;
   bool m_StopOptimization;
   mitk::RigidRegistrationPreset* m_Preset;
-  mitk::RigidRegistrationTestPreset* m_TestPreset;
   mitk::Geometry3D::TransformType::Pointer m_GeometryItkPhysicalToWorldTransform;
   mitk::Geometry3D::TransformType::Pointer m_GeometryWorldToItkPhysicalTransform;
   mitk::Geometry3D* m_MovingGeometry;

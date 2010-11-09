@@ -25,7 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkLoadPresetDialog.h"
 #include <itkArray.h>
 #include "mitkRigidRegistrationPreset.h"
-#include "mitkRigidRegistrationTestPreset.h"
+
 #include "mitkProgressBar.h"
 
 #include "QmitkRigidRegistrationSelectorView.h"
@@ -169,10 +169,7 @@ m_MovingGeometry(NULL), m_ImageGeometry(NULL)
   m_Preset = new mitk::RigidRegistrationPreset();
   m_Preset->LoadPreset();
 
-  m_TestPreset = new mitk::RigidRegistrationTestPreset();
-  m_TestPreset->LoadPreset();
-
-  this->DoLoadRigidRegistrationPreset("AffineMutualInformationGradientDescent", false);
+  this->DoLoadRigidRegistrationPreset("AffineMutualInformationGradientDescent");
 }
 
 QmitkRigidRegistrationSelectorView::~QmitkRigidRegistrationSelectorView()
@@ -514,26 +511,14 @@ void QmitkRigidRegistrationSelectorView::OptimizerSelected( int optimizer )
 
 void QmitkRigidRegistrationSelectorView::LoadRigidRegistrationParameter()
 {
-  this->DoLoadRigidRegistrationParameter(false);
+  this->DoLoadRigidRegistrationParameter();
 }
 
-void QmitkRigidRegistrationSelectorView::LoadRigidRegistrationTestParameter()
-{
-  this->DoLoadRigidRegistrationParameter(true);
-}
-
-void QmitkRigidRegistrationSelectorView::DoLoadRigidRegistrationParameter(bool testPreset)
+void QmitkRigidRegistrationSelectorView::DoLoadRigidRegistrationParameter()
 {
   std::map<std::string, itk::Array<double> > existingPresets;
-  if (testPreset)
-  {
-    existingPresets = m_TestPreset->getTransformValuesPresets(); 
-  }
-  else
-  {
-    existingPresets = m_Preset->getTransformValuesPresets();
-  }
-
+  existingPresets = m_Preset->getTransformValuesPresets();
+  
   std::map<std::string, itk::Array<double> >::iterator iter;
   std::list<std::string> presets;
   for( iter = existingPresets.begin(); iter != existingPresets.end(); iter++ ) 
@@ -551,20 +536,14 @@ void QmitkRigidRegistrationSelectorView::DoLoadRigidRegistrationParameter(bool t
   int dialogReturnValue = dialog.exec();
   if ( dialogReturnValue == QDialog::Rejected ) return; // user clicked cancel or pressed Esc or something similar
 
-  this->DoLoadRigidRegistrationPreset(dialog.GetPresetName(), testPreset);
+  this->DoLoadRigidRegistrationPreset(dialog.GetPresetName());
 }
 
-void QmitkRigidRegistrationSelectorView::DoLoadRigidRegistrationPreset(std::string presetName, bool testPreset)
+void QmitkRigidRegistrationSelectorView::DoLoadRigidRegistrationPreset(std::string presetName)
 {
   itk::Array<double> transformValues;
-  if (testPreset)
-  {
-    transformValues = m_TestPreset->getTransformValues(presetName);
-  }
-  else
-  {
-    transformValues = m_Preset->getTransformValues(presetName);
-  }
+  transformValues = m_Preset->getTransformValues(presetName);
+  
   m_Controls.m_TransformGroup->setChecked(true);
   m_Controls.m_TransformFrame->setVisible(true);
   m_Controls.m_TransformBox->setCurrentIndex((int)transformValues[0]);
@@ -579,15 +558,9 @@ void QmitkRigidRegistrationSelectorView::DoLoadRigidRegistrationPreset(std::stri
   }
   dynamic_cast<QmitkRigidRegistrationTransformsGUIBase*>(m_Controls.m_TransformWidgetStack->currentWidget())->SetTransformParameters(transformValuesForGUI);
 
-  itk::Array<double> metricValues;
-  if (testPreset)
-  {
-    metricValues = m_TestPreset->getMetricValues(presetName);
-  }
-  else
-  {
-    metricValues = m_Preset->getMetricValues(presetName);
-  }
+  itk::Array<double> metricValues;  
+  metricValues = m_Preset->getMetricValues(presetName);
+  
   m_Controls.m_MetricGroup->setChecked(true);
   m_Controls.m_MetricFrame->setVisible(true);
   m_Controls.m_MetricBox->setCurrentIndex((int)metricValues[0]);
@@ -603,14 +576,8 @@ void QmitkRigidRegistrationSelectorView::DoLoadRigidRegistrationPreset(std::stri
   dynamic_cast<QmitkRigidRegistrationMetricsGUIBase*>(m_Controls.m_MetricWidgetStack->currentWidget())->SetMetricParameters(metricValuesForGUI);
 
   itk::Array<double> optimizerValues;
-  if (testPreset)
-  {
-    optimizerValues = m_TestPreset->getOptimizerValues(presetName);
-  }
-  else
-  {
-    optimizerValues = m_Preset->getOptimizerValues(presetName);
-  } 
+  optimizerValues = m_Preset->getOptimizerValues(presetName);
+   
   m_Controls.m_OptimizerGroup->setChecked(true);
   m_Controls.m_OptimizerFrame->setVisible(true);
   m_Controls.m_OptimizerBox->setCurrentIndex((int)optimizerValues[0]);
@@ -626,14 +593,8 @@ void QmitkRigidRegistrationSelectorView::DoLoadRigidRegistrationPreset(std::stri
   dynamic_cast<QmitkRigidRegistrationOptimizerGUIBase*>(m_Controls.m_OptimizerWidgetStack->currentWidget())->SetOptimizerParameters(optimizerValuesForGUI);
 
   itk::Array<double> interpolatorValues;
-  if (testPreset)
-  {
-    interpolatorValues = m_TestPreset->getInterpolatorValues(presetName);
-  }
-  else
-  {
-    interpolatorValues = m_Preset->getInterpolatorValues(presetName);
-  }
+  interpolatorValues = m_Preset->getInterpolatorValues(presetName);
+  
   m_Controls.m_InterpolatorGroup->setChecked(true);
   m_Controls.m_InterpolatorFrame->setVisible(true);
   m_Controls.m_InterpolatorBox->setCurrentIndex((int)interpolatorValues[0]);
@@ -641,15 +602,11 @@ void QmitkRigidRegistrationSelectorView::DoLoadRigidRegistrationPreset(std::stri
 
 void QmitkRigidRegistrationSelectorView::SaveRigidRegistrationParameter()
 {
-  this->DoSaveRigidRegistrationParameter(false);
+  this->DoSaveRigidRegistrationParameter();
 }
 
-void QmitkRigidRegistrationSelectorView::SaveRigidRegistrationTestParameter()
-{
-  this->DoSaveRigidRegistrationParameter(true);
-}
 
-void QmitkRigidRegistrationSelectorView::DoSaveRigidRegistrationParameter(bool testPreset)
+void QmitkRigidRegistrationSelectorView::DoSaveRigidRegistrationParameter()
 {
   bool ok;
   QString text = QInputDialog::getText(this, 
@@ -658,14 +615,8 @@ void QmitkRigidRegistrationSelectorView::DoSaveRigidRegistrationParameter(bool t
   if ( ok )
   {
     std::map<std::string, itk::Array<double> > existingPresets;
-    if (testPreset)
-    {
-      existingPresets = m_TestPreset->getTransformValuesPresets();
-    }
-    else
-    {
-      existingPresets = m_Preset->getTransformValuesPresets();
-    }
+    existingPresets = m_Preset->getTransformValuesPresets();
+    
     std::map<std::string, itk::Array<double> >::iterator iter = existingPresets.find(std::string((const char*)text.toLatin1()));
     if (iter != existingPresets.end())
     {
@@ -692,14 +643,8 @@ void QmitkRigidRegistrationSelectorView::DoSaveRigidRegistrationParameter(bool t
     }
 
     std::map<std::string, itk::Array<double> > transformMap;
-    if (testPreset)
-    {
-      transformMap = m_TestPreset->getTransformValuesPresets();
-    }
-    else
-    {
-      transformMap = m_Preset->getTransformValuesPresets();
-    }
+    transformMap = m_Preset->getTransformValuesPresets();
+    
     transformMap[std::string((const char*)text.toLatin1())] = transformValues;
 
     itk::Array<double> metricValues;
@@ -713,14 +658,8 @@ void QmitkRigidRegistrationSelectorView::DoSaveRigidRegistrationParameter(bool t
     }
 
     std::map<std::string, itk::Array<double> > metricMap;
-    if (testPreset)
-    {
-      metricMap = m_TestPreset->getMetricValuesPresets();
-    }
-    else
-    {
-      metricMap = m_Preset->getMetricValuesPresets();
-    }
+    metricMap = m_Preset->getMetricValuesPresets();
+    
     metricMap[std::string((const char*)text.toLatin1())] = metricValues;
 
     itk::Array<double> optimizerValues;
@@ -734,14 +673,8 @@ void QmitkRigidRegistrationSelectorView::DoSaveRigidRegistrationParameter(bool t
     }
 
     std::map<std::string, itk::Array<double> > optimizerMap;
-    if (testPreset)
-    {
-      optimizerMap = m_TestPreset->getOptimizerValuesPresets();
-    }
-    else
-    {
-      optimizerMap = m_Preset->getOptimizerValuesPresets();
-    }
+    optimizerMap = m_Preset->getOptimizerValuesPresets();
+    
     optimizerMap[std::string((const char*)text.toLatin1())] = optimizerValues;
 
     itk::Array<double> interpolatorValues;
@@ -750,24 +683,12 @@ void QmitkRigidRegistrationSelectorView::DoSaveRigidRegistrationParameter(bool t
     interpolatorValues[0] = m_Controls.m_InterpolatorBox->currentIndex();
 
     std::map<std::string, itk::Array<double> > interpolatorMap;
-    if (testPreset)
-    {
-      interpolatorMap = m_TestPreset->getInterpolatorValuesPresets();
-    }
-    else
-    {
-      interpolatorMap = m_Preset->getInterpolatorValuesPresets();
-    }
+    interpolatorMap = m_Preset->getInterpolatorValuesPresets();
+    
     interpolatorMap[std::string((const char*)text.toLatin1())] = interpolatorValues;
 
-    if (testPreset)
-    {
-      m_TestPreset->newPresets(transformMap, metricMap, optimizerMap, interpolatorMap);
-    }
-    else
-    {
-      m_Preset->newPresets(transformMap, metricMap, optimizerMap, interpolatorMap);
-    }
+    m_Preset->newPresets(transformMap, metricMap, optimizerMap, interpolatorMap);
+    
   }
   else 
   {

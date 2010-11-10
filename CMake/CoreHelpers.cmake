@@ -716,6 +716,19 @@ INSTALL(CODE "
          ENDIF()
       ENDIF()
     ENDMACRO(gp_resolved_file_type_override)
+
+    SET(_rpath_relative ${MITK_INSTALL_RPATH_RELATIVE})
+    IF(_rpath_relative AND NOT APPLE)
+      IF(UNIX OR MINGW)
+        MACRO(gp_resolve_item_override context item exepath dirs resolved_item_var resolved_var)
+          IF(\${item} MATCHES \"blueberry_osgi\")
+            SET(\${resolved_item_var} \"\${exepath}/BlueBerry/org.blueberry.osgi/bin/\${item}\")
+            SET(\${resolved_var} 1)
+          ENDIF()
+        ENDMACRO()
+      ENDIF()
+    ENDIF()
+
     IF(\"${_install_GLOB_PLUGINS}\" STREQUAL \"TRUE\") 
     file(GLOB_RECURSE PLUGINS
       # glob for all blueberry bundles of this application

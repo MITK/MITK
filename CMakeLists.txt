@@ -5,8 +5,14 @@ if(COMMAND cmake_policy)
   cmake_policy(SET CMP0003 OLD)
 endif(COMMAND cmake_policy)
 
-SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/bin") 
-#SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+OPTION(MITK_INSTALL_RPATH_RELATIVE "Use relative rpath entries when installing" OFF)
+MARK_AS_ADVANCED(MITK_INSTALL_RPATH_RELATIVE)
+
+IF(MITK_INSTALL_RPATH_RELATIVE)
+  SET(CMAKE_INSTALL_RPATH ".")
+ELSE()
+  SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/bin")
+ENDIF()
 
 SET(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/CMake ${CMAKE_MODULE_PATH} )
 SET(MITK_MODULES_CONF_DIR ${MITK_BINARY_DIR}/modulesConf CACHE INTERNAL "Modules Conf")
@@ -66,7 +72,10 @@ ADD_SUBDIRECTORY(Utilities)
 
 OPTION(MITK_USE_BLUEBERRY "Build the BlueBerry platform" ON)
 IF(MITK_USE_BLUEBERRY)
- 
+
+  SET(BLUEBERRY_INSTALL_RPATH_RELATIVE ${MITK_INSTALL_RPATH_RELATIVE}
+      CACHE BOOL "Use relative rpath entries when installing" FORCE)
+
   # on Mac OSX all BlueBerry plugins get copied into every
   # application bundle (.app directory) specified here
   IF(APPLE)

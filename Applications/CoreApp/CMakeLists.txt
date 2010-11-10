@@ -19,7 +19,7 @@ TARGET_LINK_LIBRARIES(CoreApp
                       optimized PocoUtil            debug PocoUtild 
                       optimized org_blueberry_osgi debug org_blueberry_osgi${BLUEBERRY_DEBUG_POSTFIX})
 
-SET_TARGET_PROPERTIES(CoreApp PROPERTIES INSTALL_RPATH "${CMAKE_INSTALL_RPATH};${CMAKE_INSTALL_PREFIX}/bin/BlueBerry/org.blueberry.osgi/bin")
+SET_TARGET_PROPERTIES(CoreApp PROPERTIES INSTALL_RPATH "${CMAKE_INSTALL_RPATH};${CMAKE_INSTALL_RPATH}/BlueBerry/org.blueberry.osgi/bin")
 
 SET(_plugin_deps 
   ${BLUEBERRY_ENABLED_PLUGINS} 
@@ -48,3 +48,6 @@ ENDIF(WIN32)
 
 MITK_INSTALL_TARGETS(EXECUTABLES CoreApp GLOB_PLUGINS )
 
+IF(UNIX AND MITK_INSTALL_RPATH_RELATIVE AND NOT APPLE)
+  INSTALL(PROGRAMS "${MITK_SOURCE_DIR}/CMake/RunInstalledApp.sh" DESTINATION "." RENAME CoreApp.sh)
+ENDIF()

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>241</width>
-    <height>393</height>
+    <width>239</width>
+    <height>397</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -37,6 +37,12 @@
       <string/>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_3">
+      <property name="topMargin">
+       <number>3</number>
+      </property>
+      <property name="bottomMargin">
+       <number>3</number>
+      </property>
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout">
         <item>
@@ -204,8 +210,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>223</width>
-        <height>176</height>
+        <width>221</width>
+        <height>187</height>
        </rect>
       </property>
       <attribute name="icon">
@@ -538,8 +544,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>98</width>
-        <height>30</height>
+        <width>223</width>
+        <height>183</height>
        </rect>
       </property>
       <attribute name="label">
@@ -592,8 +598,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>98</width>
-        <height>30</height>
+        <width>223</width>
+        <height>183</height>
        </rect>
       </property>
       <attribute name="label">
@@ -647,7 +653,7 @@
         <x>0</x>
         <y>0</y>
         <width>223</width>
-        <height>176</height>
+        <height>183</height>
        </rect>
       </property>
       <attribute name="label">

@@ -979,6 +979,9 @@ mitk::ImageMapperGL2D::ApplyProperties(mitk::BaseRenderer* renderer)
                                               ("binaryimage.hoveringcolor", renderer));
     if(colorprop.IsNotNull())
       memcpy(rgba, colorprop->GetColor().GetDataPointer(), 3*sizeof(float));
+    else
+      GetColor( rgba, renderer );
+
   }
   if(selected)
   {
@@ -986,6 +989,9 @@ mitk::ImageMapperGL2D::ApplyProperties(mitk::BaseRenderer* renderer)
                                               ("binaryimage.selectedcolor", renderer));
     if(colorprop.IsNotNull())
       memcpy(rgba, colorprop->GetColor().GetDataPointer(), 3*sizeof(float));
+    else
+      GetColor( rgba, renderer );
+
   }
   if(!hover && !selected)
   {

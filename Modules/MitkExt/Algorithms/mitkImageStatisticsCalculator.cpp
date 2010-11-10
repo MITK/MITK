@@ -645,7 +645,7 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
   PointType imageOrigin = image->GetOrigin();
   PointType maskOrigin = maskImage->GetOrigin();
   long offset[ImageType::ImageDimension];
-  for ( unsigned int i = 0; i < typename ImageType::ImageDimension; ++i )
+  for ( unsigned int i = 0; i < ImageType::ImageDimension; ++i )
   {
     double indexCoordDistance = (maskOrigin[i] - imageOrigin[i]) / imageSpacing[i];
     double misalignment = indexCoordDistance - floor( indexCoordDistance + 0.5 );
@@ -682,7 +682,7 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
   typename ImageType::SizeType imageSize = image->GetBufferedRegion().GetSize();
   typename ImageType::SizeType maskSize = maskImage->GetBufferedRegion().GetSize();
   bool maskSmallerImage = false;
-  for ( unsigned int i = 0; i < typename ImageType::ImageDimension; ++i )
+  for ( unsigned int i = 0; i < ImageType::ImageDimension; ++i )
   {
     if ( maskSize[i] < imageSize[i] ) 
     {

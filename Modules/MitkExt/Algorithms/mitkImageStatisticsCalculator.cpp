@@ -22,6 +22,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <itkScalarImageToHistogramGenerator.h>
 
+#include <itkChangeInformationImageFilter.h>
+#include <itkExtractImageFilter.h>
+
 #include <itkStatisticsImageFilter.h>
 #include <itkLabelStatisticsImageFilter.h>
 
@@ -608,54 +611,149 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
 {
   typedef itk::Image< TPixel, VImageDimension > ImageType;
   typedef itk::Image< unsigned short, VImageDimension > MaskImageType;
+
   typedef typename ImageType::IndexType IndexType;
+  typedef typename ImageType::PointType PointType;
+  typedef typename ImageType::SpacingType SpacingType;
 
-  typedef itk::LabelStatisticsImageFilter< ImageType, MaskImageType >
-    LabelStatisticsFilterType;
+  typedef itk::LabelStatisticsImageFilter< ImageType, MaskImageType > LabelStatisticsFilterType;
 
-  typename LabelStatisticsFilterType::Pointer labelStatisticsFilter;
+  typedef itk::ChangeInformationImageFilter< MaskImageType > ChangeInformationFilterType;
 
-  unsigned int i;
-  bool maskNonEmpty = false;
-  if ( maskImage != NULL )
+  typedef itk::ExtractImageFilter< ImageType, ImageType > ExtractImageFilterType;
+
+
+
+  // Make sure that mask is set
+  if ( maskImage == NULL  )
   {
-    // Initialize Filter
-    labelStatisticsFilter = LabelStatisticsFilterType::New();
-    labelStatisticsFilter->SetInput( image );
-    labelStatisticsFilter->SetLabelInput( maskImage );
-    labelStatisticsFilter->UseHistogramsOn();
-    labelStatisticsFilter->SetHistogramParameters( 384, -1024.0, 2048.0);
-
-    // Add progress listening
-    typedef itk::SimpleMemberCommand< ImageStatisticsCalculator > ITKCommandType;
-    ITKCommandType::Pointer progressListener;
-    progressListener = ITKCommandType::New();
-    progressListener->SetCallbackFunction( this,
-      &ImageStatisticsCalculator::MaskedStatisticsProgressUpdate );
-    unsigned long observerTag = labelStatisticsFilter->AddObserver( 
-      itk::ProgressEvent(), progressListener );
+    itkExceptionMacro( << "Mask image needs to be set!" );
+  }
 
 
-    // Execute filter
-    this->InvokeEvent( itk::StartEvent() );
+  // Make sure that spacing of mask and image are the same
+  SpacingType imageSpacing = image->GetSpacing();
+  SpacingType maskSpacing = maskImage->GetSpacing();
+  PointType zeroPoint; zeroPoint.Fill( 0.0 );
+  if ( (zeroPoint + imageSpacing).SquaredEuclideanDistanceTo( (zeroPoint + maskSpacing) ) > mitk::eps )
+  {
+    itkExceptionMacro( << "Mask needs to have same spacing as image!" );
+  }
 
-    labelStatisticsFilter->Update();
-
-    this->InvokeEvent( itk::EndEvent() );
-
-    labelStatisticsFilter->RemoveObserver( observerTag );
-
-
-    // Find label of mask (other than 0)
-    for ( i = 1; i < 4096; ++i )
+  
+  // Make sure that the voxels of mask and image are correctly "aligned", i.e., voxel boundaries are the same in both images
+  PointType imageOrigin = image->GetOrigin();
+  PointType maskOrigin = maskImage->GetOrigin();
+  long offset[ImageType::ImageDimension];
+  for ( unsigned int i = 0; i < typename ImageType::ImageDimension; ++i )
+  {
+    double indexCoordDistance = (maskOrigin[i] - imageOrigin[i]) / imageSpacing[i];
+    double misalignment = indexCoordDistance - floor( indexCoordDistance + 0.5 );
+    if ( fabs( misalignment ) > imageSpacing[i] / 20.0 )
     {
-      if ( labelStatisticsFilter->HasLabel( i ) )
-      {
-        maskNonEmpty = true;
-        break;
-      }
+      MITK_INFO << "Misalignment: " << misalignment;
+      itkExceptionMacro( << "Pixels/voxels of mask and image are not sufficiently aligned!" );
+    }
+
+    offset[i] = (int) indexCoordDistance + image->GetBufferedRegion().GetIndex()[i];
+  }
+
+
+  // Adapt the origin and region (index/size) of the mask so that the origin of both are the same
+  typename ChangeInformationFilterType::Pointer adaptMaskFilter;
+  adaptMaskFilter = ChangeInformationFilterType::New();
+  adaptMaskFilter->ChangeOriginOn();
+  adaptMaskFilter->ChangeRegionOn();
+  adaptMaskFilter->SetInput( maskImage );
+  adaptMaskFilter->SetOutputOrigin( image->GetOrigin() );
+  adaptMaskFilter->SetOutputOffset( offset );
+  adaptMaskFilter->Update();
+  typename MaskImageType::Pointer adaptedMaskImage = adaptMaskFilter->GetOutput();
+
+
+  // Make sure that mask region is contained within image region
+  if ( !image->GetLargestPossibleRegion().IsInside( adaptedMaskImage->GetLargestPossibleRegion() ) )
+  {
+    itkExceptionMacro( << "Mask region needs to be inside of image region!" );
+  }
+
+
+  // If mask region is smaller than image region, extract the sub-sampled region from the original image
+  typename ImageType::SizeType imageSize = image->GetBufferedRegion().GetSize();
+  typename ImageType::SizeType maskSize = maskImage->GetBufferedRegion().GetSize();
+  bool maskSmallerImage = false;
+  for ( unsigned int i = 0; i < typename ImageType::ImageDimension; ++i )
+  {
+    if ( maskSize[i] < imageSize[i] ) 
+    {
+      maskSmallerImage = true;
     }
   }
+
+  typename ImageType::ConstPointer adaptedImage;
+  if ( maskSmallerImage )
+  {
+    typename ExtractImageFilterType::Pointer extractImageFilter = ExtractImageFilterType::New();
+    extractImageFilter->SetInput( image );
+    extractImageFilter->SetExtractionRegion( adaptedMaskImage->GetBufferedRegion() );
+    extractImageFilter->Update();
+    adaptedImage = extractImageFilter->GetOutput();    
+  }
+  else
+  {
+    adaptedImage = image;
+  }
+
+
+
+  // Initialize Filter
+  typename LabelStatisticsFilterType::Pointer labelStatisticsFilter;
+  labelStatisticsFilter = LabelStatisticsFilterType::New();
+  labelStatisticsFilter->SetInput( adaptedImage );
+  labelStatisticsFilter->SetLabelInput( adaptedMaskImage );
+  labelStatisticsFilter->UseHistogramsOn();
+  labelStatisticsFilter->SetHistogramParameters( 384, -1024.0, 2048.0);
+
+  
+  // Add progress listening
+  typedef itk::SimpleMemberCommand< ImageStatisticsCalculator > ITKCommandType;
+  ITKCommandType::Pointer progressListener;
+  progressListener = ITKCommandType::New();
+  progressListener->SetCallbackFunction( this,
+    &ImageStatisticsCalculator::MaskedStatisticsProgressUpdate );
+  unsigned long observerTag = labelStatisticsFilter->AddObserver( 
+    itk::ProgressEvent(), progressListener );
+
+
+  // Execute filter
+  this->InvokeEvent( itk::StartEvent() );
+
+  
+  // Make sure that only the mask region is considered (otherwise, if the mask region is smaller
+  // than the image region, the Update() would result in an exception).
+  labelStatisticsFilter->GetOutput()->SetRequestedRegion( adaptedMaskImage->GetLargestPossibleRegion() );
+
+  
+  // Execute the filter
+  labelStatisticsFilter->Update();
+
+  this->InvokeEvent( itk::EndEvent() );
+
+  labelStatisticsFilter->RemoveObserver( observerTag );
+
+
+  // Find label of mask (other than 0)
+  bool maskNonEmpty = false;
+  unsigned int i;
+  for ( i = 1; i < 4096; ++i )
+  {
+    if ( labelStatisticsFilter->HasLabel( i ) )
+    {
+      maskNonEmpty = true;
+      break;
+    }
+  }
+
 
   if ( maskNonEmpty )
   {

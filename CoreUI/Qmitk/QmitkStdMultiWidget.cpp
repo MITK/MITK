@@ -268,6 +268,7 @@ void QmitkStdMultiWidget::InitializeWidget()
   m_CornerAnnotaions[0].cornerText->SetTextProperty( m_CornerAnnotaions[0].textProp );
   m_CornerAnnotaions[0].ren = vtkRenderer::New();
   m_CornerAnnotaions[0].ren->AddActor(m_CornerAnnotaions[0].cornerText);
+  m_CornerAnnotaions[0].ren->InteractiveOff();
   mitk::VtkLayerController::GetInstance(this->GetRenderWindow1()->GetRenderWindow())->InsertForegroundRenderer(m_CornerAnnotaions[0].ren,true);
   
   //Render Window 2 == sagittal
@@ -279,6 +280,7 @@ void QmitkStdMultiWidget::InitializeWidget()
   m_CornerAnnotaions[1].cornerText->SetTextProperty( m_CornerAnnotaions[1].textProp );
   m_CornerAnnotaions[1].ren = vtkRenderer::New();
   m_CornerAnnotaions[1].ren->AddActor(m_CornerAnnotaions[1].cornerText);
+  m_CornerAnnotaions[1].ren->InteractiveOff();
   mitk::VtkLayerController::GetInstance(this->GetRenderWindow2()->GetRenderWindow())->InsertForegroundRenderer(m_CornerAnnotaions[1].ren,true);
   
   //Render Window 3 == coronal
@@ -290,6 +292,7 @@ void QmitkStdMultiWidget::InitializeWidget()
   m_CornerAnnotaions[2].cornerText->SetTextProperty( m_CornerAnnotaions[2].textProp );
   m_CornerAnnotaions[2].ren = vtkRenderer::New();
   m_CornerAnnotaions[2].ren->AddActor(m_CornerAnnotaions[2].cornerText);
+  m_CornerAnnotaions[2].ren->InteractiveOff();
   mitk::VtkLayerController::GetInstance(this->GetRenderWindow3()->GetRenderWindow())->InsertForegroundRenderer(m_CornerAnnotaions[2].ren,true);
    
   /*************************************************/

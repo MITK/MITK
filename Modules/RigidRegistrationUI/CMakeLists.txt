@@ -1,6 +1,6 @@
 MITK_CREATE_MODULE(MitkRigidRegistrationUI
   INCLUDE_DIRS RigidRegistrationMetrics RigidRegistrationOptimizer RigidRegistrationTransforms
-  DEPENDS Qmitk
+  DEPENDS Qmitk MitkRigidRegistration
   QT_MODULE
   PROVIDES MitkRigidRegistrationUI
   EXPORT_DEFINE MITK_RIGIDREGISTRATION_UI_EXPORT

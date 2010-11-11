@@ -77,6 +77,8 @@ namespace mitk {
 
     virtual vtkProp* GetProp(mitk::BaseRenderer* renderer);
 
+    bool IsVisibleOdfs(mitk::BaseRenderer* renderer);
+
     virtual void MitkRenderOverlay(mitk::BaseRenderer* renderer);
     virtual void MitkRenderOpaqueGeometry(mitk::BaseRenderer* renderer);
     virtual void MitkRenderTranslucentGeometry(mitk::BaseRenderer* renderer);
@@ -99,9 +101,7 @@ namespace mitk {
     virtual void GenerateData();
     virtual void GenerateData(mitk::BaseRenderer* renderer);
 
-    // KLAUS DISABLING LOD
-//    virtual bool IsLODEnabled( BaseRenderer * /*renderer*/ ) const { return TRUE; }
-    virtual bool IsLODEnabled( BaseRenderer * /*renderer*/ ) const { return false; }
+    virtual bool IsLODEnabled( BaseRenderer * /*renderer*/ ) const { return true; }
 
   protected:
     OdfVtkMapper2D();

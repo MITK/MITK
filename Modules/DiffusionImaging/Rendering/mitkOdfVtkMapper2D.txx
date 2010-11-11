@@ -781,11 +781,31 @@ void  mitk::OdfVtkMapper2D<T,N>
 }
 
 template<class T, int N>
+bool mitk::OdfVtkMapper2D<T,N>
+::IsVisibleOdfs(mitk::BaseRenderer* renderer)
+{
+  bool retval = false;
+  switch(GetIndex(renderer))
+  {
+  case 0:
+    retval = this->IsVisible(renderer, "VisibleOdfs_T");
+    break;
+  case 1:
+    retval = this->IsVisible(renderer, "VisibleOdfs_S");
+    break;
+  case 2:
+    retval = this->IsVisible(renderer, "VisibleOdfs_C");
+    break;
+  }
+  return retval;
+}
+
+template<class T, int N>
 void  mitk::OdfVtkMapper2D<T,N>
 ::MitkRenderOverlay(mitk::BaseRenderer* renderer)
 {
   //std::cout << "MitkRenderOverlay(" << renderer->GetName() << ")" << std::endl;
-  if ( this->IsVisible(renderer, "VisibleOdfs")==false ) 
+  if ( this->IsVisibleOdfs(renderer)==false )
     return;
 
   if ( this->GetProp(renderer)->GetVisibility() )
@@ -799,7 +819,7 @@ void  mitk::OdfVtkMapper2D<T,N>
 ::MitkRenderOpaqueGeometry(mitk::BaseRenderer* renderer)
 {
   //std::cout << "MitkRenderOpaqueGeometry(" << renderer->GetName() << ")" << std::endl;
-  if ( this->IsVisible( renderer, "VisibleOdfs" )==false ) 
+  if ( this->IsVisibleOdfs( renderer )==false )
     return;
 
   if ( this->GetProp(renderer)->GetVisibility() )
@@ -869,7 +889,7 @@ void  mitk::OdfVtkMapper2D<T,N>
 ::MitkRenderTranslucentGeometry(mitk::BaseRenderer* renderer)
 {
   //std::cout << "MitkRenderTranslucentGeometry(" << renderer->GetName() << ")" << std::endl;
-  if ( this->IsVisible(renderer, "VisibleOdfs")==false ) 
+  if ( this->IsVisibleOdfs(renderer)==false )
     return;
 
   if ( this->GetProp(renderer)->GetVisibility() )
@@ -1038,7 +1058,7 @@ void  mitk::OdfVtkMapper2D<T,N>
 
   int index = GetIndex(renderer);
 
-  if(IsVisible(renderer, "VisibleOdfs")==false)
+  if(IsVisibleOdfs(renderer)==false)
   {
     m_OdfsActors[0]->VisibilityOff();
     m_OdfsActors[1]->VisibilityOff();
@@ -1098,7 +1118,9 @@ void  mitk::OdfVtkMapper2D<T,N>
   node->SetProperty( "IndexParam1", mitk::FloatProperty::New(2));
   node->SetProperty( "IndexParam2", mitk::FloatProperty::New(1));
   node->SetProperty( "visible", mitk::BoolProperty::New( true ) );
-  node->SetProperty( "VisibleOdfs", mitk::BoolProperty::New( false ) );
+  node->SetProperty( "VisibleOdfs_T", mitk::BoolProperty::New( false ) );
+  node->SetProperty( "VisibleOdfs_C", mitk::BoolProperty::New( false ) );
+  node->SetProperty( "VisibleOdfs_S", mitk::BoolProperty::New( false ) );
   node->SetProperty ("layer", mitk::IntProperty::New(100));
   node->SetProperty( "DoRefresh", mitk::BoolProperty::New( true ) );
   //node->SetProperty( "opacity", mitk::FloatProperty::New(1.0f) );

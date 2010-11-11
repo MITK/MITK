@@ -12,7 +12,7 @@ Available sections:
   - \ref QmitkDiffusionImagingUserManualVisualizationSettings
   - \ref QmitkDiffusionImagingUserManualReferences 
   
-\image html overview.png "The MITK Diffusion Imaging Module"
+\image html overview.png The MITK Diffusion Imaging Module
 
 \section QmitkDiffusionImagingUserManualIssues Known Issues
 
@@ -22,15 +22,15 @@ Available sections:
 
 The tensor reconstruction view allows ITK based tensor reconstruction [3].
 
-\image html tensor1.png "ITK tensor reconstruction"
+\image html tensor1.png ITK tensor reconstruction
 
 The advanced settings for ITK reconstruction let you configure the number of threads to be used and a manual threshold on the non-diffusion weighted image. All voxels below this threshold will not be reconstructed and left blank.
 
-\image html tensor2.png "Advanced settings for ITK tensor reconstruction"
+\image html tensor2.png Advanced settings for ITK tensor reconstruction
 
 A few seconds (depending on the image size) after the reconstruction button is hit, a colored image should appear in the main window.
 
-\image html tensor4.png "Tensor image after reconstruction"
+\image html tensor4.png Tensor image after reconstruction
 
 \section QmitkDiffusionImagingUserManualQBallReconstruction Q-Ball Reconstruction
 
@@ -43,15 +43,15 @@ The different reconstruction methods are described in the following:
 \li <b>ADC-profile only:</b> The ADC-profile reconstructed with spherical harmonic basis functions
 \li <b>Raw signal only:</b> The raw signal reconstructed with spherical harmonic basis functions
 
-\image html qballs1.png "The q-ball resonstruction view"
+\image html qballs1.png The q-ball resonstruction view
 
 Please recognize the tooltips in the advanced settings box. B0 threshold works the same as in tensor reconstruction. The maximum l-level configures the size of the spherical harmonics basis. Larger l-values (e.g. l=8) allow higher levels of detail, lower levels are more stable against noise (e.g. l=4). Lambda is a regularisation parameter. Set it to 0 for no regularisation. lambda = 0.006 has proven to be a stable choice under various settings. The multi lambda option lets you reconstruct different volumes with different lambdas with one click.
 
-\image html qballs2.png "Advanced q-ball reconstruction settings"
+\image html qballs2.png Advanced q-ball reconstruction settings
 
 This is how a q-ball image should initially look after reconstruction. Standard q-balls feature a relatively low GFA and thus appear rather dark. Adjust the level-window to solve this.
 
-\image html qballs3.png "q-ball image after reconstruction"
+\image html qballs3.png q-ball image after reconstruction
 
 \section QmitkDiffusionImagingUserManualDicomImport Dicom Import
 
@@ -59,17 +59,17 @@ The dicom import does not cover all hardware manufacturers. In fact, it has only
 
 In case your dicom images are readable by MITK-DI, select one or more input dicom folders and click import.
 
-\image html dicom1.png "Dicom import"
+\image html dicom1.png Dicom import
 
 The advanced settings control some import options. "Use series details" and "Consider acquisition number" tell the algorithms, if series related information in the dicom header should be used to tell appart different image volumes. "Recursive" digs into the selected folders recursively. "Avg. dupl. grad." does the same as the corresponding "Average redundant gradients" in the q-ball reconstruction view (refer to the corresponding help section for details).
 
-\image html dicom2.png "Advanced settings for dicom import"
+\image html dicom2.png Advanced settings for dicom import
 
 The quantification view allows the derivation of different scalar anisotropy measures for the reconstructed tensors (FA and RA) or q-balls (GFA).
 
 \section QmitkDiffusionImagingUserManualQuantification Quantification
 
-\image html quantification.png "Anisotropy quantification"
+\image html quantification.png Anisotropy quantification
 
 \section QmitkDiffusionImagingUserManualVisualizationSettings ODF Visualization Setting
 
@@ -77,15 +77,15 @@ In this small view, the visualization of ODFs and diffusion images can be config
 
 For a tensor or q-ball image, the third button from the left is of importance - it toggles the visibility of the glyphs. The spin box to its right lets you configer the number of glyphs that should maximaly be displayed. This is usefull to keep the system response time during rendering feasible. The other options configure normalization and scaling of the glyphs.
 
-\image html visualization1.png "Configuring the ODF glyph visualization"
+\image html visualization1.png Configuring the ODF glyph visualization
 
 In diffusion images, a slider lets you choose the desired image channel from the vector of images (each gradient direction one image) for rendering. Furthermore reinit can be performed and texture interpolation toggled.
 
-\image html visualization2.png "Configuring the diffusion imaging visualization"
+\image html visualization2.png Configuring the diffusion imaging visualization
 
 This is how a visualization with activated glyphs should look like:
 
-\image html visualization3.png "Q-ball image with ODF glyph visibility toggled ON"
+\image html visualization3.png Q-ball image with ODF glyph visibility toggled ON
 
 \section QmitkDiffusionImagingUserManualReferences References
 

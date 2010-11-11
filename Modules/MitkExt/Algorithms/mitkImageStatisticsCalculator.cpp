@@ -637,7 +637,7 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
   PointType zeroPoint; zeroPoint.Fill( 0.0 );
   if ( (zeroPoint + imageSpacing).SquaredEuclideanDistanceTo( (zeroPoint + maskSpacing) ) > mitk::eps )
   {
-    itkExceptionMacro( << "Mask needs to have same spacing as image!" );
+    itkExceptionMacro( << "Mask needs to have same spacing as image! (Image spacing: " << imageSpacing << "; Mask spacing: " << maskSpacing << ")" );
   }
 
   
@@ -651,8 +651,7 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
     double misalignment = indexCoordDistance - floor( indexCoordDistance + 0.5 );
     if ( fabs( misalignment ) > imageSpacing[i] / 20.0 )
     {
-      MITK_INFO << "Misalignment: " << misalignment;
-      itkExceptionMacro( << "Pixels/voxels of mask and image are not sufficiently aligned!" );
+      itkExceptionMacro( << "Pixels/voxels of mask and image are not sufficiently aligned! (Misalignment: " << misalignment << ")" );
     }
 
     offset[i] = (int) indexCoordDistance + image->GetBufferedRegion().GetIndex()[i];
@@ -674,7 +673,8 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
   // Make sure that mask region is contained within image region
   if ( !image->GetLargestPossibleRegion().IsInside( adaptedMaskImage->GetLargestPossibleRegion() ) )
   {
-    itkExceptionMacro( << "Mask region needs to be inside of image region!" );
+    itkExceptionMacro( << "Mask region needs to be inside of image region! (Image region: " 
+      << image->GetLargestPossibleRegion() << "; Mask region: " << adaptedMaskImage->GetLargestPossibleRegion() << ")" );
   }
 
 

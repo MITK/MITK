@@ -75,7 +75,7 @@ mitk::Image::Pointer QmitkAutocropAction::IncreaseCroppedImageSize( mitk::Image:
 
   unsigned long upperPad[3];
   unsigned long lowerPad[3];
-  int borderLiner = 6;
+  int borderLiner = 3;
 
   mitk::Point3D mitkOriginPoint;
   double origin[3];
@@ -84,13 +84,13 @@ mitk::Image::Pointer QmitkAutocropAction::IncreaseCroppedImageSize( mitk::Image:
   origin[2]=0;
   itkTransformImage->SetOrigin(origin);
 
-  lowerPad[0]=borderLiner/2;
-  lowerPad[1]=borderLiner/2;
-  lowerPad[2]=borderLiner/2;
+  lowerPad[0]=borderLiner;
+  lowerPad[1]=borderLiner;
+  lowerPad[2]=borderLiner;
 
-  upperPad[0]=borderLiner/2;
-  upperPad[1]=borderLiner/2;
-  upperPad[2]=borderLiner/2;
+  upperPad[0]=borderLiner;
+  upperPad[1]=borderLiner;
+  upperPad[2]=borderLiner;
 
   padFilter->SetInput(itkTransformImage);
   padFilter->SetConstant(0);
@@ -100,21 +100,17 @@ mitk::Image::Pointer QmitkAutocropAction::IncreaseCroppedImageSize( mitk::Image:
 
 
   mitk::Image::Pointer paddedImage = mitk::Image::New();
+  paddedImage->InitializeByItk(padFilter->GetOutput());
   mitk::CastToMitkImage(padFilter->GetOutput(), paddedImage);
 
-  paddedImage->SetGeometry(image->GetGeometry());
+  //calculate translation according to padding to get the new origin
+  mitk::Point3D paddedOrigin = image->GetGeometry()->GetOrigin();
+  mitk::Vector3D spacing = image->GetGeometry()->GetSpacing();
+  paddedOrigin[0] -= (borderLiner)*spacing[0];
+  paddedOrigin[1] -= (borderLiner)*spacing[1];
+  paddedOrigin[2] -= (borderLiner)*spacing[2];
 
-  //calculate translation vector according to padding to get the new origin
-  mitk::Vector3D transVector = image->GetGeometry()->GetSpacing();
-  transVector[0] = -(borderLiner/2);
-  transVector[1] = -(borderLiner/2);
-  transVector[2] = -(borderLiner/2);
-
-  mitk::Vector3D newTransVectorInmm = image->GetGeometry()->GetSpacing();
-
-  image->GetGeometry()->IndexToWorld(mitkOriginPoint, transVector, newTransVectorInmm);
-  paddedImage->GetGeometry()->Translate(newTransVectorInmm);
-  //paddedImage->SetRequestedRegionToLargestPossibleRegion();
+  paddedImage->GetGeometry()->SetOrigin( paddedOrigin );
 
   return paddedImage;
 }

@@ -28,6 +28,11 @@ QmitkScaleLogarithmicTransformView::~QmitkScaleLogarithmicTransformView()
 {
 }
 
+mitk::TransformParameters::TransformType QmitkScaleLogarithmicTransformView::GetTransformType()
+{
+  return mitk::TransformParameters::SCALELOGARITHMICTRANSFORM;
+}
+
 itk::Object::Pointer QmitkScaleLogarithmicTransformView::GetTransform()
 {
   if (m_FixedImage.IsNotNull())

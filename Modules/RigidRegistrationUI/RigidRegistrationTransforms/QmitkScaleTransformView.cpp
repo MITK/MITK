@@ -28,6 +28,11 @@ QmitkScaleTransformView::~QmitkScaleTransformView()
 {
 }
 
+mitk::TransformParameters::TransformType QmitkScaleTransformView::GetTransformType()
+{
+  return mitk::TransformParameters::SCALETRANSFORM;
+}
+
 itk::Object::Pointer QmitkScaleTransformView::GetTransform()
 {
   if (m_FixedImage.IsNotNull())

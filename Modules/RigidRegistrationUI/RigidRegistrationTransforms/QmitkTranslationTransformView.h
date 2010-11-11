@@ -36,6 +36,7 @@ public:
   QmitkTranslationTransformView( QWidget* parent = 0, Qt::WindowFlags f = 0 );
   ~QmitkTranslationTransformView();
 
+  virtual mitk::TransformParameters::TransformType GetTransformType();
 
   virtual itk::Object::Pointer GetTransform();
 
@@ -52,6 +53,8 @@ public:
   virtual vtkTransform* Transform(vtkMatrix4x4* vtkmatrix, vtkTransform* vtktransform, itk::Array<double> transformParams);
 
   virtual int GetNumberOfTransformParameters();
+
+
 
 private:
 

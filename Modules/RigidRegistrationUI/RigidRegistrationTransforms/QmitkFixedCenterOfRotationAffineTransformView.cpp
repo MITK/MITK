@@ -30,6 +30,11 @@ QmitkFixedCenterOfRotationAffineTransformView::~QmitkFixedCenterOfRotationAffine
 {
 }
 
+mitk::TransformParameters::TransformType QmitkFixedCenterOfRotationAffineTransformView::GetTransformType()
+{
+  return mitk::TransformParameters::FIXEDCENTEROFROTATIONAFFINETRANSFORM;
+}
+
 itk::Object::Pointer QmitkFixedCenterOfRotationAffineTransformView::GetTransform()
 {
   if (m_FixedImage.IsNotNull())

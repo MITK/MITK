@@ -30,6 +30,11 @@ QmitkSimilarity2DTransformView::~QmitkSimilarity2DTransformView()
 {
 }
 
+mitk::TransformParameters::TransformType QmitkSimilarity2DTransformView::GetTransformType()
+{
+  return mitk::TransformParameters::SIMILARITY2DTRANSFORM;
+}
+
 itk::Object::Pointer QmitkSimilarity2DTransformView::GetTransform()
 {
   if (m_FixedImage.IsNotNull())

@@ -30,6 +30,11 @@ QmitkVersorTransformView::~QmitkVersorTransformView()
 {
 }
 
+mitk::TransformParameters::TransformType QmitkVersorTransformView::GetTransformType()
+{
+  return mitk::TransformParameters::VERSORTRANSFORM;
+}
+
 itk::Object::Pointer QmitkVersorTransformView::GetTransform()
 {
   if (m_FixedImage.IsNotNull())

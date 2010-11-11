@@ -36,6 +36,7 @@ public:
   QmitkScaleTransformView( QWidget* parent = 0, Qt::WindowFlags f = 0 );
   ~QmitkScaleTransformView();
 
+  virtual mitk::TransformParameters::TransformType GetTransformType();
 
   virtual itk::Object::Pointer GetTransform();
 

@@ -30,6 +30,11 @@ QmitkQuaternionRigidTransformView::~QmitkQuaternionRigidTransformView()
 {
 }
 
+mitk::TransformParameters::TransformType QmitkQuaternionRigidTransformView::GetTransformType()
+{
+  return mitk::TransformParameters::QUATERNIONRIGIDTRANSFORM;
+}
+
 itk::Object::Pointer QmitkQuaternionRigidTransformView::GetTransform()
 {
   if (m_FixedImage.IsNotNull())

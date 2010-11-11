@@ -36,6 +36,7 @@ public:
   QmitkQuaternionRigidTransformView( QWidget* parent = 0, Qt::WindowFlags f = 0 );
   ~QmitkQuaternionRigidTransformView();
 
+  virtual mitk::TransformParameters::TransformType GetTransformType();
 
   virtual itk::Object::Pointer GetTransform();
 

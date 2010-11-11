@@ -38,6 +38,11 @@ itk::Object::Pointer QmitkTranslationTransformView::GetTransform()
   return NULL;
 }
 
+mitk::TransformParameters::TransformType QmitkTranslationTransformView::GetTransformType()
+{
+  return mitk::TransformParameters::TRANSLATIONTRANSFORM;
+}
+
 template < class TPixelType, unsigned int VImageDimension >
 itk::Object::Pointer QmitkTranslationTransformView::GetTransform2(itk::Image<TPixelType, VImageDimension>* /*itkImage1*/)
 {

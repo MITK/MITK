@@ -26,6 +26,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QString>
 #include <vtkTransform.h>
 #include <vtkMatrix4x4.h>
+#include "mitkTransformParameters.h"
+#include "mitkOptimizerParameters.h"
 
 /*!
 * \brief Widget for rigid registration
@@ -39,6 +41,8 @@ public:
 
   QmitkRigidRegistrationTransformsGUIBase(QWidget* parent = 0, Qt::WindowFlags f = 0);
   ~QmitkRigidRegistrationTransformsGUIBase();
+
+  virtual mitk::TransformParameters::TransformType GetTransformType() = 0;
 
   virtual itk::Object::Pointer GetTransform() = 0;
 
@@ -60,6 +64,7 @@ public:
 
   void SetMovingImage(mitk::Image::Pointer movingImage);
 
+   
 
 protected:
 

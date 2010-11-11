@@ -30,6 +30,11 @@ QmitkAffineTransformView::~QmitkAffineTransformView()
 {
 }
 
+mitk::TransformParameters::TransformType QmitkAffineTransformView::GetTransformType()
+{
+  return mitk::TransformParameters::AFFINETRANSFORM;
+}
+
 itk::Object::Pointer QmitkAffineTransformView::GetTransform()
 {
   if (m_FixedImage.IsNotNull())

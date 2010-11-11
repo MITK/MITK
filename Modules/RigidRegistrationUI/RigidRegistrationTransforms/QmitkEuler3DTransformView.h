@@ -36,6 +36,7 @@ public:
   QmitkEuler3DTransformView( QWidget* parent = 0, Qt::WindowFlags f = 0 );
   ~QmitkEuler3DTransformView();
 
+  virtual mitk::TransformParameters::TransformType GetTransformType();
 
   virtual itk::Object::Pointer GetTransform();
 

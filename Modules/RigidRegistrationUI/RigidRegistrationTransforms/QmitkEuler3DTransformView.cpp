@@ -30,6 +30,11 @@ QmitkEuler3DTransformView::~QmitkEuler3DTransformView()
 {
 }
 
+mitk::TransformParameters::TransformType QmitkEuler3DTransformView::GetTransformType()
+{
+  return mitk::TransformParameters::EULER3DTRANSFORM;
+}
+
 itk::Object::Pointer QmitkEuler3DTransformView::GetTransform()
 {
   if (m_FixedImage.IsNotNull())

@@ -36,6 +36,7 @@ public:
   QmitkVersorRigid3DTransformView( QWidget* parent = 0, Qt::WindowFlags f = 0 );
   ~QmitkVersorRigid3DTransformView();
 
+  virtual mitk::TransformParameters::TransformType GetTransformType();
 
   virtual itk::Object::Pointer GetTransform();
 

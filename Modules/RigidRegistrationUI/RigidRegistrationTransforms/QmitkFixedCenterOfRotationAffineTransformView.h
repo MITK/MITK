@@ -36,6 +36,7 @@ public:
   QmitkFixedCenterOfRotationAffineTransformView( QWidget* parent = 0, Qt::WindowFlags f = 0 );
   ~QmitkFixedCenterOfRotationAffineTransformView();
 
+  virtual mitk::TransformParameters::TransformType GetTransformType();
 
   virtual itk::Object::Pointer GetTransform();
 

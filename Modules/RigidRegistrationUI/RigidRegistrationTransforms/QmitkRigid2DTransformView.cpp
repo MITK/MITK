@@ -30,6 +30,11 @@ QmitkRigid2DTransformView::~QmitkRigid2DTransformView()
 {
 }
 
+mitk::TransformParameters::TransformType QmitkRigid2DTransformView::GetTransformType()
+{
+  return mitk::TransformParameters::RIGID2DTRANSFORM;
+}
+
 itk::Object::Pointer QmitkRigid2DTransformView::GetTransform()
 {
   if (m_FixedImage.IsNotNull())

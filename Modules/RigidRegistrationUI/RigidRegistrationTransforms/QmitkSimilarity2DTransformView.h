@@ -36,6 +36,7 @@ public:
   QmitkSimilarity2DTransformView( QWidget* parent = 0, Qt::WindowFlags f = 0 );
   ~QmitkSimilarity2DTransformView();
 
+  virtual mitk::TransformParameters::TransformType GetTransformType();
 
   virtual itk::Object::Pointer GetTransform();
 

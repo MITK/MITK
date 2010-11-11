@@ -29,6 +29,10 @@ m_CenterX(0), m_CenterY(0), m_CenterZ(0)
 QmitkScaleSkewVersor3DTransformView::~QmitkScaleSkewVersor3DTransformView()
 {
 }
+mitk::TransformParameters::TransformType QmitkScaleSkewVersor3DTransformView::GetTransformType()
+{
+  return mitk::TransformParameters::SCALESKEWVERSOR3DTRANSFORM;
+}
 
 itk::Object::Pointer QmitkScaleSkewVersor3DTransformView::GetTransform()
 {

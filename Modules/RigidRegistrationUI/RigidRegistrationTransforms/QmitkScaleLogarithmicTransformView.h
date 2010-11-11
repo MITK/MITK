@@ -36,6 +36,7 @@ public:
   QmitkScaleLogarithmicTransformView( QWidget* parent = 0, Qt::WindowFlags f = 0 );
   ~QmitkScaleLogarithmicTransformView();
 
+  virtual mitk::TransformParameters::TransformType GetTransformType();
 
   virtual itk::Object::Pointer GetTransform();
 

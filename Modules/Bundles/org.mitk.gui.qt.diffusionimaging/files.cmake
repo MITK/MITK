@@ -52,6 +52,12 @@ SET(RESOURCE_FILES
   resources/vizControls.png
   resources/Refresh_48.png
   resources/QBallData24.png
+  resources/glyphsoff_C.png
+  resources/glyphsoff_S.png
+  resources/glyphsoff_T.png
+  resources/glyphson_C.png
+  resources/glyphson_S.png
+  resources/glyphson_T.png
 )
 
 SET(RES_FILES

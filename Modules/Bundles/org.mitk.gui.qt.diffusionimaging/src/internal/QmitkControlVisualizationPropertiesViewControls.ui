@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>339</width>
-    <height>159</height>
+    <height>139</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -60,13 +60,7 @@
       <enum>QFrame::Raised</enum>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_2">
-      <property name="leftMargin">
-       <number>0</number>
-      </property>
-      <property name="topMargin">
-       <number>0</number>
-      </property>
-      <property name="bottomMargin">
+      <property name="margin">
        <number>0</number>
       </property>
       <item>
@@ -102,7 +96,39 @@
        </widget>
       </item>
       <item>
-       <widget class="QToolButton" name="m_VisibleOdfsON">
+       <widget class="QToolButton" name="m_VisibleOdfsON_T">
+        <property name="toolTip">
+         <string comment="Toggle visibility of ODF glyphs" extracomment="Toggle visibility of ODF glyphs">Toggle visibility of ODF glyphs</string>
+        </property>
+        <property name="statusTip">
+         <string comment="Toggle visibility of ODF glyphs" extracomment="Toggle visibility of ODF glyphs">Toggle visibility of ODF glyphs</string>
+        </property>
+        <property name="whatsThis">
+         <string comment="Toggle visibility of ODF glyphs" extracomment="Toggle visibility of ODF glyphs">Toggle visibility of ODF glyphs</string>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QToolButton" name="m_VisibleOdfsON_S">
+        <property name="toolTip">
+         <string comment="Toggle visibility of ODF glyphs" extracomment="Toggle visibility of ODF glyphs">Toggle visibility of ODF glyphs</string>
+        </property>
+        <property name="statusTip">
+         <string comment="Toggle visibility of ODF glyphs" extracomment="Toggle visibility of ODF glyphs">Toggle visibility of ODF glyphs</string>
+        </property>
+        <property name="whatsThis">
+         <string comment="Toggle visibility of ODF glyphs" extracomment="Toggle visibility of ODF glyphs">Toggle visibility of ODF glyphs</string>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QToolButton" name="m_VisibleOdfsON_C">
         <property name="toolTip">
          <string comment="Toggle visibility of ODF glyphs" extracomment="Toggle visibility of ODF glyphs">Toggle visibility of ODF glyphs</string>
         </property>
@@ -286,19 +312,13 @@
       </property>
       <item>
        <widget class="QLabel" name="label_4">
-        <property name="minimumSize">
-         <size>
-          <width>90</width>
-          <height>0</height>
-         </size>
-        </property>
         <property name="text">
-         <string>Opacity Min</string>
+         <string>Opacity</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QSlider" name="m_OpacityMinFa">
+       <widget class="QmitkFloatingPointSpanSlider" name="m_OpacitySlider">
         <property name="maximum">
          <number>100</number>
         </property>
@@ -311,63 +331,12 @@
        <widget class="QLabel" name="m_OpacityMinFaLabel">
         <property name="minimumSize">
          <size>
-          <width>40</width>
+          <width>80</width>
           <height>0</height>
          </size>
         </property>
         <property name="text">
-         <string>0.0</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
-   <item>
-    <widget class="QFrame" name="OpacMaxFrame">
-     <property name="frameShape">
-      <enum>QFrame::StyledPanel</enum>
-     </property>
-     <property name="frameShadow">
-      <enum>QFrame::Raised</enum>
-     </property>
-     <layout class="QHBoxLayout" name="horizontalLayout_5">
-      <property name="margin">
-       <number>0</number>
-      </property>
-      <item>
-       <widget class="QLabel" name="label_5">
-        <property name="minimumSize">
-         <size>
-          <width>90</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="text">
-         <string>Opacity Max</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QSlider" name="m_OpacityMaxFa">
-        <property name="maximum">
-         <number>100</number>
-        </property>
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="m_OpacityMaxFaLabel">
-        <property name="minimumSize">
-         <size>
-          <width>40</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="text">
-         <string>0.0</string>
+         <string>0.0 : 0.0</string>
         </property>
        </widget>
       </item>
@@ -393,6 +362,13 @@
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>QmitkFloatingPointSpanSlider</class>
+   <extends>QSlider</extends>
+   <header>QmitkFloatingPointSpanSlider.h</header>
+  </customwidget>
+ </customwidgets>
  <includes>
   <include location="local">QmitkDataStorageComboBox.h</include>
  </includes>

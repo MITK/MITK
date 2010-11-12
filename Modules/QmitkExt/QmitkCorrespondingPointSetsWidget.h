@@ -39,32 +39,65 @@
 class QmitkExt_EXPORT QmitkCorrespondingPointSetsWidget : public QWidget
 {
     Q_OBJECT
+    Q_PROPERTY(bool QTPropShowButtonBar READ QTPropButtonBarEnabled WRITE QTPropSetButtonBarEnabled)
 
 public:
     QmitkCorrespondingPointSetsWidget(QWidget *parent = 0);
     ~QmitkCorrespondingPointSetsWidget();
 
-    /// assign point sets (contained in a node of DataStorage) for observation
+    /// calls SetPointSetNodes of the according QmitkCorrespondingPointSetsView
     void SetPointSetNodes(std::vector<mitk::DataNode*> nodes);
 
+    /// returns the point set nodes contained in the table model
+    /// calls GetPointSetNodes of the according QmitkCorrespondingPointSetsView
     std::vector<mitk::DataNode*> GetPointSetNodes();
 
-    /// assign a QmitkStdMultiWidget for updating render window crosshair
+    /// calls SetMultiWidget of the according QmitkCorrespondingPointSetsView
     void SetMultiWidget(QmitkStdMultiWidget* multiWidget);
 
+    /// calls SetDataStorage of the according QmitkCorrespondingPointSetsView
+    void SetDataStorage(mitk::DataStorage::Pointer dataStorage);
+
+    /// calls UpdateSelection of the according QmitkCorrespondingPointSetsView
     void UpdateSelection(mitk::DataNode* selectedNode);
 
-public slots:
+    bool QTPropButtonBarEnabled() const;
+
+    void QTPropSetButtonBarEnabled(bool showBB);
 
 signals:
 
 protected slots:
 
+  void OnPointSelectionChanged();
+  
+  void AddPointSet();
+
+  void AddPointsMode(bool checked);
+  
+  void RemoveSelectedPoint();
+
+  void MoveSelectedPointDown();
+  
+  void MoveSelectedPointUp();
+
+  void OnAddPointsModeChanged(bool enabled);
+
+  void SwapPointSets(bool checked);
+
 protected:
 
     void SetupUi();
 
+    bool QTPropShowButtonBar;
     QmitkCorrespondingPointSetsView* m_CorrespondingPointSetsView;
+
+    QToolButton* m_CreatePointSetBtn;
+    QToolButton* m_MovePointUpBtn;
+    QToolButton* m_MovePointDownBtn;
+    QToolButton* m_RemovePointBtn;
+    QToolButton* m_AddPointsBtn;
+    QToolButton* m_SwapSetsBtn;
 };
 
 #endif

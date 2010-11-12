@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QLabel>
 #include <mitkStepper.h>
 #include <mitkPointSetInteractor.h>
+#include <mitkDataStorage.h>
 #include "QmitkExtExports.h"
 
 
@@ -57,14 +58,36 @@ public:
 
   QmitkStdMultiWidget* GetMultiWidget() const;  ///< return the QmitkStdMultiWidget that is used for updating render window crosshair
 
+  void SetDataStorage(mitk::DataStorage::Pointer dataStorage);
+
   std::vector<mitk::DataNode*> GetPointSetNodes();
 
-  void UpdateSelection(mitk::DataNode* selectedNode);
+  bool UpdateSelection(mitk::DataNode* selectedNode);
+
+  // return true if a point from one of the displayed point lists is selected
+  bool IsPointSelected();
+
+  QmitkCorrespondingPointSetsModel* GetModel();
 
 signals:
 
-  /*void SignalPointSelectionChanged();  ///< this signal is emmitted, if the selection of a point in the pointset is changed
-  void SignalPointSetsChanged();*/
+  void SignalPointSelectionChanged();
+
+  void SignalAddPointsModeChanged(bool);
+
+public slots:
+    
+  void AddPointSet();
+
+  void RemoveSelectedPoint();
+
+  void MoveSelectedPointDown();
+  
+  void MoveSelectedPointUp();
+
+  void AddPointsMode(bool checked);
+
+  void SwapPointSets(bool checked);
 
 protected slots:
 
@@ -77,19 +100,12 @@ protected slots:
   /// open ContextMenu
   void ctxMenu(const QPoint &pos);
 
-  void DeleteSelectedPoint();
-
-  void MoveSelectedPointDown();
-  
-  void MoveSelectedPointUp();
 
   void ClearSelectedPointSet();
 
   void ClearCurrentTimeStep();
 
-  void SwapPointSets(bool checked);
-
-  void AddPointsMode(bool checked);
+  void UpdateSelectionHighlighting();
 
 protected:
 
@@ -111,5 +127,6 @@ protected:
   QLabel*                m_TimeStepFaderLabel;
   mitk::Stepper::Pointer m_TimeStepper;
   mitk::PointSetInteractor::Pointer   m_Interactor;
+  mitk::DataStorage::Pointer m_DataStorage;
 };
 #endif

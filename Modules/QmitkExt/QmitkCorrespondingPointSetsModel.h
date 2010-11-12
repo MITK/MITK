@@ -37,8 +37,11 @@ public:
   QmitkCorrespondingPointSetsModel( int t = 0, QObject* parent = 0 );
   ~QmitkCorrespondingPointSetsModel();
 
-  Qt::ItemFlags flags(const QModelIndex& /*index*/) const;
+  Qt::ItemFlags flags(const QModelIndex& index) const;
   
+  // returns PointIdentifier of selected point (-1 if no point is selected)
+  mitk::PointSet::PointIdentifier SearchSelectedPoint();
+
   /// interface of QAbstractTableModel
   int rowCount( const QModelIndex& parent = QModelIndex() ) const;
 
@@ -102,7 +105,9 @@ public:
 
   std::vector<mitk::DataNode*> GetPointSetNodes();
 
-  void SetSelectedIndex(int row, int column);
+  void SetSelectedPointSetIndex(int index);
+
+  int GetSelectedPointSetIndex();
 
   void ClearSelectedPointSet();
 
@@ -118,6 +123,12 @@ public:
 
   mitk::Stepper::Pointer GetStepper();
 
+  Qt::DropActions supportedDropActions() const;
+
+  bool dropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column, const QModelIndex &parent);
+
+  bool GetModelIndexForSelectedPoint(QModelIndex& index) const;
+
 private:
 
 
@@ -125,10 +136,7 @@ public slots:
 
 signals:
 
-  /// emitted, when views should update their selection status
-  /// (because mouse interactions in render windows can change
-  /// the selection status of points)
-  void SignalUpdateSelection();
+  void SignalPointSetChanged();
 
 protected:
   //initially checks if there is a PointSet as data in the DataNode.
@@ -142,7 +150,8 @@ protected:
   mitk::DataNode::Pointer m_PointSetNode;
   mitk::DataNode::Pointer m_ReferencePointSetNode;
   mitk::Stepper::Pointer m_TimeStepper;
-  int m_row;
-  int m_column;
+  int m_SelectedPointSetIndex;
+
+  void MoveSelectedPoint(mitk::PointSet::PointIdentifier targetID);
 };
 #endif

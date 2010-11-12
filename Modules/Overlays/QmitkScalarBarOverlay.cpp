@@ -54,7 +54,7 @@ void QmitkScalarBarOverlay::GenerateData( mitk::PropertyList::Pointer pl )
   }
   else
   {
-    MITK_ERROR << "invalid propList";
+    MITK_DEBUG << "invalid propList";
   }
 
 }
@@ -64,7 +64,7 @@ void QmitkScalarBarOverlay::SetScaleFactor()
   float scale = 2;
   if ( m_PropertyList.IsNull() || !m_PropertyList->GetFloatProperty( m_Id, scale ) )
   {
-    MITK_WARN << "Property " << m_Id << " could not be found";
+    MITK_DEBUG << "Property " << m_Id << " could not be found";
   }
   m_Widget->SetScaleFactor( scale );
 }
@@ -87,7 +87,7 @@ void QmitkScalarBarOverlay::GetProperties( mitk::PropertyList::Pointer pl )
 
   if ( colorProp.IsNull() )
   {
-    MITK_ERROR << "creating new colorProperty";
+    MITK_DEBUG << "creating new colorProperty";
     colorProp = mitk::ColorProperty::New( 127.0, 196.0, 232.0 );
   }
 
@@ -118,7 +118,7 @@ void QmitkScalarBarOverlay::SetupCallback( mitk::BaseProperty::Pointer prop )
   }
   else
   {
-    MITK_ERROR << "invalid property";
+    MITK_DEBUG << "invalid property";
   }
 }
 

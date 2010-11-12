@@ -64,7 +64,7 @@ void QmitkTextOverlay::SetText()
   std::string text = "";
   if ( m_PropertyList.IsNull() || !m_PropertyList->GetStringProperty( m_Id, text ) )
   {
-    MITK_WARN << "Property " << m_Id << " could not be found";
+    MITK_DEBUG << "Property " << m_Id << " could not be found";
   }
   m_Widget->setText( text.c_str() );
   m_Widget->repaint();
@@ -86,7 +86,6 @@ void QmitkTextOverlay::GetTextProperties( mitk::PropertyList::Pointer pl )
 
   if ( colorProp.IsNull() )
   {
-    MITK_ERROR << "creating new colorProperty";
     colorProp = mitk::ColorProperty::New( 127.0, 196.0, 232.0 );
   }
 
@@ -152,7 +151,7 @@ void QmitkTextOverlay::SetupCallback( mitk::BaseProperty::Pointer prop )
   }
   else
   {
-    MITK_ERROR << "invalid property";
+    MITK_DEBUG << "invalid property";
   }
 }
 

@@ -131,6 +131,8 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
   m_NodeTreeModel->setParent( parent );
   m_NodeTreeModel->SetPlaceNewNodesOnTop(
       prefs->GetBool("Place new nodes on top", true) );
+  m_NodeTreeModel->SetShowHelperObjects(
+      prefs->GetBool("Show helper objects", false) );
 
   //# Tree View (experimental)
   m_NodeTreeView = new QTreeView;
@@ -400,7 +402,13 @@ mitk::DataStorage::Pointer QmitkDataManagerView::GetDataStorage() const
 
 void QmitkDataManagerView::OnPreferencesChanged(const berry::IBerryPreferences* prefs)
 {
-  m_NodeTreeModel->SetPlaceNewNodesOnTop( prefs->GetBool("Place new nodes on top", true) );
+  if( m_NodeTreeModel->GetPlaceNewNodesOnTopFlag() !=  prefs->GetBool("Place new nodes on top", true) )
+    m_NodeTreeModel->SetPlaceNewNodesOnTop( !m_NodeTreeModel->GetPlaceNewNodesOnTopFlag() );
+  
+  if( m_NodeTreeModel->GetShowHelperObjectsFlag()!= prefs->GetBool("Show helper objects", false) )
+    m_NodeTreeModel->SetShowHelperObjects( !m_NodeTreeModel->GetShowHelperObjectsFlag() );
+  
+  m_NodeTreeView->expandAll();
 }
 
 void QmitkDataManagerView::NodeTableViewContextMenuRequested( const QPoint & pos )

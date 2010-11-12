@@ -57,6 +57,7 @@ protected:
   QWidget* m_MainControl;
   QCheckBox* m_EnableSingleEditing;
   QCheckBox* m_PlaceNewNodesOnTop;
+  QCheckBox* m_ShowHelperObjects;
   berry::IPreferences::Pointer m_DataManagerPreferencesNode;
 };
 

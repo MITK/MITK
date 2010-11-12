@@ -44,6 +44,7 @@ public:
 public:
   QmitkDataStorageTreeModel(mitk::DataStorage* _DataStorage
                             , bool _PlaceNewNodesOnTop=false
+                            , bool _ShowHelperObjects=false
                             , QObject* parent = 0);
   ~QmitkDataStorageTreeModel();
 
@@ -62,8 +63,25 @@ public:
   /// Get the DataStorage.
   ///
   const mitk::DataStorage::Pointer GetDataStorage() const;
+  
   ///
+  /// Get the top placement flag
   ///
+  bool GetPlaceNewNodesOnTopFlag()
+  {
+    return m_PlaceNewNodesOnTop;
+  }
+
+  ///
+  /// Get the helper object visibility flag
+  ///
+  bool GetShowHelperObjectsFlag()
+  {
+    return m_ShowHelperObjects;
+  }
+
+  ///
+  /// Set the top placement flag
   ///
   void SetPlaceNewNodesOnTop(bool _PlaceNewNodesOnTop);
 
@@ -118,6 +136,11 @@ public:
   /// \return an index for the given datatreenode in the tree. If the node is not found
   ///
   QModelIndex GetIndex(const mitk::DataNode*) const;
+
+  ///
+  /// Show or hide helper objects
+  ///
+  void SetShowHelperObjects(bool _ShowHelperObjects);
 
 //# MISC
 protected:
@@ -217,11 +240,17 @@ protected:
   /// Adds all Childs in parent to vec. Before a child is added the function is called recursively
   ///
   void TreeToNodeSet(TreeItem* parent, std::vector<mitk::DataNode*>& vec) const;
+  ///
+  /// Update Tree Model according to predicates
+  ///
+  void Update();
+
   //# ATTRIBUTES
 protected:
   mitk::WeakPointer<mitk::DataStorage> m_DataStorage;
   mitk::NodePredicateBase::Pointer m_Predicate;
   bool m_PlaceNewNodesOnTop;
+  bool m_ShowHelperObjects;
   TreeItem* m_Root;
 };
 

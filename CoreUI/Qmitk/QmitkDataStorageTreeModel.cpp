@@ -34,27 +34,14 @@
 
 QmitkDataStorageTreeModel::QmitkDataStorageTreeModel( mitk::DataStorage* _DataStorage
                                                       , bool _PlaceNewNodesOnTop
+                                                      , bool _ShowHelperObjects
                                                       , QObject* parent )
 : QAbstractItemModel(parent)
 , m_DataStorage(0)
 , m_PlaceNewNodesOnTop(_PlaceNewNodesOnTop)
 , m_Root(0)
 {
-  mitk::NodePredicateData::Pointer dataIsNull = mitk::NodePredicateData::New(0);
-  mitk::NodePredicateNot::Pointer dataIsNotNull
-    = mitk::NodePredicateNot::New(dataIsNull);// Show only nodes that really contain dat
-
-  mitk::NodePredicateProperty::Pointer isHelperObject = mitk::NodePredicateProperty::New("helper object"
-    , mitk::BoolProperty::New(true));
-
-  mitk::NodePredicateNot::Pointer isNotHelperObject
-    = mitk::NodePredicateNot::New(isHelperObject);// Show only nodes that really contain dat
-
-  mitk::NodePredicateAnd::Pointer dataIsNotNullAndIsNotHelperObject = mitk::NodePredicateAnd::New(dataIsNotNull,
-    isNotHelperObject);
-
-  m_Predicate = dataIsNotNullAndIsNotHelperObject;
-
+  this->SetShowHelperObjects( _ShowHelperObjects );
   this->SetDataStorage(_DataStorage);
 }
 
@@ -289,13 +276,8 @@ void QmitkDataStorageTreeModel::SetDataStorage( mitk::DataStorage* _DataStorage 
 
       mitk::DataStorage::SetOfObjects::ConstPointer _NodeSet = m_DataStorage->GetSubset(m_Predicate);
 
-      // finally add all nodes to the model
-      for(mitk::DataStorage::SetOfObjects::const_iterator it=_NodeSet->begin(); it!=_NodeSet->end()
-        ; it++)
-      {
-        // save node
-        this->AddNode(*it);
-      }
+      // finally add all nodes to the model 
+      this->Update();
     }
   }
 }
@@ -645,3 +627,52 @@ void QmitkDataStorageTreeModel::TreeItem::SetParent( TreeItem* _Parent )
   if(m_Parent)
     m_Parent->AddChild(this);
 }
+
+void QmitkDataStorageTreeModel::SetShowHelperObjects(bool _ShowHelperObjects)
+{
+  m_ShowHelperObjects = _ShowHelperObjects;
+
+  mitk::NodePredicateData::Pointer dataIsNull = mitk::NodePredicateData::New(0);
+  mitk::NodePredicateNot::Pointer dataIsNotNull = mitk::NodePredicateNot::New(dataIsNull);// Show only nodes that really contain dat
+  mitk::NodePredicateProperty::Pointer isHelperObject = mitk::NodePredicateProperty::New("helper object", mitk::BoolProperty::New(true));
+  mitk::NodePredicateNot::Pointer isNotHelperObject = mitk::NodePredicateNot::New(isHelperObject);// Show only nodes that really contain dat
+
+  if (! m_ShowHelperObjects)
+  {
+    //hide helper objects    
+    m_Predicate = mitk::NodePredicateAnd::New(dataIsNotNull, isNotHelperObject);
+  }
+  else
+  {
+    //show helper objects
+    m_Predicate = dataIsNotNull;
+  }
+
+  this->Update();
+}
+
+void QmitkDataStorageTreeModel::Update()
+{
+  if (m_DataStorage.IsNotNull())
+  {
+    this->reset();
+
+    mitk::DataStorage::SetOfObjects::ConstPointer _NodeSet = m_DataStorage->GetSubset(m_Predicate);
+
+    for(mitk::DataStorage::SetOfObjects::const_iterator it=_NodeSet->begin(); it!=_NodeSet->end(); it++)
+    {
+      // save node
+      this->AddNode(*it);
+    }
+
+    mitk::DataStorage::SetOfObjects::ConstPointer _NotNodeSet = m_DataStorage->GetSubset(mitk::NodePredicateNot::New(m_Predicate));
+
+    for(mitk::DataStorage::SetOfObjects::const_iterator it=_NotNodeSet->begin(); it!=_NotNodeSet->end(); it++)
+    {
+      // remove node
+      this->RemoveNode(*it);
+    }
+
+  }
+}
+

@@ -29,6 +29,11 @@ QmitkNormalizedCorrelationMetricView::~QmitkNormalizedCorrelationMetricView()
 {
 }
 
+mitk::MetricParameters::MetricType QmitkNormalizedCorrelationMetricView::GetMetricType()
+{
+  return mitk::MetricParameters::NORMALIZEDCORRELATIONIMAGETOIMAGEMETRIC;
+}
+
 itk::Object::Pointer QmitkNormalizedCorrelationMetricView::GetMetric()
 {
   if (m_MovingImage.IsNotNull())

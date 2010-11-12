@@ -28,6 +28,11 @@ QmitkMeanSquaresMetricView::~QmitkMeanSquaresMetricView()
 {
 }
 
+mitk::MetricParameters::MetricType QmitkMeanSquaresMetricView::GetMetricType()
+{
+  return mitk::MetricParameters::MEANSQUARESIMAGETOIMAGEMETRIC;
+}
+
 itk::Object::Pointer QmitkMeanSquaresMetricView::GetMetric()
 {
   if (m_MovingImage.IsNotNull())

@@ -29,6 +29,11 @@ QmitkSPSAOptimizerView::~QmitkSPSAOptimizerView()
 {
 }
 
+mitk::OptimizerParameters::OptimizerType QmitkSPSAOptimizerView::GetOptimizerType()
+{
+  return mitk::OptimizerParameters::SPSAOPTIMIZER;
+}
+
 itk::Object::Pointer QmitkSPSAOptimizerView::GetOptimizer()
 {
   itk::SPSAOptimizer::Pointer OptimizerPointer = itk::SPSAOptimizer::New();

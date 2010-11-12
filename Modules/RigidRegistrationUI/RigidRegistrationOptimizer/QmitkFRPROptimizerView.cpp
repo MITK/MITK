@@ -29,6 +29,12 @@ QmitkFRPROptimizerView::~QmitkFRPROptimizerView()
 {
 }
 
+mitk::OptimizerParameters::OptimizerType QmitkFRPROptimizerView::GetOptimizerType()
+{
+  return mitk::OptimizerParameters::FRPROPTIMIZER;
+}
+
+
 itk::Object::Pointer QmitkFRPROptimizerView::GetOptimizer()
 {
   itk::FRPROptimizer::Pointer OptimizerPointer = itk::FRPROptimizer::New();

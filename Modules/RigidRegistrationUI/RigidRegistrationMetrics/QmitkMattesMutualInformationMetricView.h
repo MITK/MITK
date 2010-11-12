@@ -38,6 +38,7 @@ public:
   QmitkMattesMutualInformationMetricView( QWidget* parent = 0, Qt::WindowFlags f = 0 );
   ~QmitkMattesMutualInformationMetricView();
 
+  virtual mitk::MetricParameters::MetricType GetMetricType();
 
   virtual itk::Object::Pointer GetMetric();
 

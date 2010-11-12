@@ -38,6 +38,7 @@ public:
   QmitkKappaStatisticMetricView( QWidget* parent = 0, Qt::WindowFlags f = 0 );
   ~QmitkKappaStatisticMetricView();
 
+  virtual mitk::MetricParameters::MetricType GetMetricType();
 
   virtual itk::Object::Pointer GetMetric();
 

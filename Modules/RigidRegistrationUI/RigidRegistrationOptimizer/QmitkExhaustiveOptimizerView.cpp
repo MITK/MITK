@@ -29,6 +29,12 @@ QmitkExhaustiveOptimizerView::~QmitkExhaustiveOptimizerView()
 {
 }
 
+mitk::OptimizerParameters::OptimizerType QmitkExhaustiveOptimizerView::GetOptimizerType()
+{
+  return mitk::OptimizerParameters::EXHAUSTIVEOPTIMIZER;
+}
+
+
 itk::Object::Pointer QmitkExhaustiveOptimizerView::GetOptimizer()
 {
   itk::ExhaustiveOptimizer::Pointer OptimizerPointer = itk::ExhaustiveOptimizer::New();

@@ -29,6 +29,11 @@ QmitkRegularStepGradientDescentOptimizerView::~QmitkRegularStepGradientDescentOp
 {
 }
 
+mitk::OptimizerParameters::OptimizerType QmitkRegularStepGradientDescentOptimizerView::GetOptimizerType()
+{
+  return mitk::OptimizerParameters::REGULARSTEPGRADIENTDESCENTOPTIMIZER;
+}
+
 itk::Object::Pointer QmitkRegularStepGradientDescentOptimizerView::GetOptimizer()
 {
   itk::RegularStepGradientDescentOptimizer::Pointer OptimizerPointer = itk::RegularStepGradientDescentOptimizer::New();

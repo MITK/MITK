@@ -24,6 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkObject.h>
 #include "mitkImage.h"
 #include <QString>
+#include "mitkOptimizerParameters.h"
 
 /*!
 * \brief Widget for rigid registration
@@ -37,6 +38,8 @@ public:
 
   QmitkRigidRegistrationOptimizerGUIBase(QWidget* parent = 0, Qt::WindowFlags f = 0);
   ~QmitkRigidRegistrationOptimizerGUIBase();
+
+  virtual mitk::OptimizerParameters::OptimizerType GetOptimizerType() = 0;
 
   virtual itk::Object::Pointer GetOptimizer() = 0;
 

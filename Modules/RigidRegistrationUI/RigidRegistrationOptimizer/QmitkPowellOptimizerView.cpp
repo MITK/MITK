@@ -29,6 +29,11 @@ QmitkPowellOptimizerView::~QmitkPowellOptimizerView()
 {
 }
 
+mitk::OptimizerParameters::OptimizerType QmitkPowellOptimizerView::GetOptimizerType()
+{
+  return mitk::OptimizerParameters::POWELLOPTIMIZER;
+}
+
 itk::Object::Pointer QmitkPowellOptimizerView::GetOptimizer()
 {
   itk::PowellOptimizer::Pointer OptimizerPointer = itk::PowellOptimizer::New();

@@ -38,6 +38,7 @@ public:
   QmitkMeanSquaresHistogramMetricView( QWidget* parent = 0, Qt::WindowFlags f = 0 );
   ~QmitkMeanSquaresHistogramMetricView();
 
+ virtual mitk::MetricParameters::MetricType GetMetricType();
 
  virtual itk::Object::Pointer GetMetric();
 

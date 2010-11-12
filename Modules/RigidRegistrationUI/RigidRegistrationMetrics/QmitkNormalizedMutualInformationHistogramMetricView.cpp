@@ -29,6 +29,11 @@ QmitkNormalizedMutualInformationHistogramMetricView::~QmitkNormalizedMutualInfor
 {
 }
 
+mitk::MetricParameters::MetricType QmitkNormalizedMutualInformationHistogramMetricView::GetMetricType()
+{
+  return mitk::MetricParameters::NORMALIZEDMUTUALINFORMATIONHISTOGRAMIMAGETOIMAGEMETRIC;
+}
+
 itk::Object::Pointer QmitkNormalizedMutualInformationHistogramMetricView::GetMetric()
 {
   if (m_MovingImage.IsNotNull())

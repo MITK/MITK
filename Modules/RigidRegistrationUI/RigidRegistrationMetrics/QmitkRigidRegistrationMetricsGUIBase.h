@@ -24,6 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkObject.h>
 #include "mitkImage.h"
 #include <QString>
+#include "mitkMetricParameters.h"
 
 /*!
 * \brief Widget for rigid registration
@@ -37,6 +38,8 @@ public:
 
   QmitkRigidRegistrationMetricsGUIBase(QWidget* parent = 0, Qt::WindowFlags f = 0);
   ~QmitkRigidRegistrationMetricsGUIBase();
+
+  virtual mitk::MetricParameters::MetricType GetMetricType() = 0;
 
   virtual itk::Object::Pointer GetMetric() = 0;
 

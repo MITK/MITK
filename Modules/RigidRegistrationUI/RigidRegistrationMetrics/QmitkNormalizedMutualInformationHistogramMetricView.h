@@ -38,6 +38,7 @@ public:
   QmitkNormalizedMutualInformationHistogramMetricView( QWidget* parent = 0, Qt::WindowFlags f = 0 );
   ~QmitkNormalizedMutualInformationHistogramMetricView();
 
+  virtual mitk::MetricParameters::MetricType GetMetricType();
 
   virtual itk::Object::Pointer GetMetric();
 

@@ -25,6 +25,12 @@ m_NumberTransformParameters(16)
 
 }
 
+mitk::OptimizerParameters::OptimizerType QmitkConjugateGradientOptimizerView::GetOptimizerType()
+{
+  return mitk::OptimizerParameters::CONJUGATEGRADIENTOPTIMIZER;
+}
+
+
 QmitkConjugateGradientOptimizerView::~QmitkConjugateGradientOptimizerView()
 {
 }

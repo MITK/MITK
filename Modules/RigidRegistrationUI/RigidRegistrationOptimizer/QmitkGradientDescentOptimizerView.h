@@ -38,6 +38,7 @@ public:
   QmitkGradientDescentOptimizerView( QWidget* parent = 0, Qt::WindowFlags f = 0 );
   ~QmitkGradientDescentOptimizerView();
 
+  virtual mitk::OptimizerParameters::OptimizerType GetOptimizerType();
 
   virtual itk::Object::Pointer GetOptimizer();
 

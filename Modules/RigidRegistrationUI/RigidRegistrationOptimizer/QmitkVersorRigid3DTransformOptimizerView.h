@@ -38,6 +38,7 @@ public:
   QmitkVersorRigid3DTransformOptimizerView( QWidget* parent = 0, Qt::WindowFlags f = 0 );
   ~QmitkVersorRigid3DTransformOptimizerView();
 
+  virtual mitk::OptimizerParameters::OptimizerType GetOptimizerType();
 
   virtual itk::Object::Pointer GetOptimizer();
 

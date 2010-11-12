@@ -38,6 +38,7 @@ public:
   QmitkLBFGSBOptimizerView( QWidget* parent = 0, Qt::WindowFlags f = 0 );
   ~QmitkLBFGSBOptimizerView();
 
+  virtual mitk::OptimizerParameters::OptimizerType GetOptimizerType();
 
   virtual itk::Object::Pointer GetOptimizer();
 

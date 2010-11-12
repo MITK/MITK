@@ -38,6 +38,7 @@ public:
   QmitkFRPROptimizerView( QWidget* parent = 0, Qt::WindowFlags f = 0 );
   ~QmitkFRPROptimizerView();
 
+  virtual mitk::OptimizerParameters::OptimizerType GetOptimizerType();
 
   virtual itk::Object::Pointer GetOptimizer();
 

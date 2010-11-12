@@ -28,6 +28,11 @@ QmitkAmoebaOptimizerView::~QmitkAmoebaOptimizerView()
 {
 }
 
+mitk::OptimizerParameters::OptimizerType QmitkAmoebaOptimizerView::GetOptimizerType()
+{
+  return mitk::OptimizerParameters::AMOEBAOPTIMIZER;
+}
+
 itk::Object::Pointer QmitkAmoebaOptimizerView::GetOptimizer()
 {
   itk::AmoebaOptimizer::Pointer OptimizerPointer = itk::AmoebaOptimizer::New();

@@ -38,6 +38,7 @@ public:
   QmitkExhaustiveOptimizerView( QWidget* parent = 0, Qt::WindowFlags f = 0 );
   ~QmitkExhaustiveOptimizerView();
 
+  virtual mitk::OptimizerParameters::OptimizerType GetOptimizerType();
 
   virtual itk::Object::Pointer GetOptimizer();
 

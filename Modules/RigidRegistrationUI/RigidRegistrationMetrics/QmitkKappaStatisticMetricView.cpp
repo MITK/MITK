@@ -28,6 +28,11 @@ QmitkKappaStatisticMetricView::~QmitkKappaStatisticMetricView()
 {
 }
 
+mitk::MetricParameters::MetricType QmitkKappaStatisticMetricView::GetMetricType()
+{
+  return mitk::MetricParameters::KAPPASTATISTICIMAGETOIMAGEMETRIC;
+}
+
 itk::Object::Pointer QmitkKappaStatisticMetricView::GetMetric()
 {
   if (m_MovingImage.IsNotNull())

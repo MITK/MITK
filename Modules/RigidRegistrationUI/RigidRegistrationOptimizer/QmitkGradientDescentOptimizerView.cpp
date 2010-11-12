@@ -29,10 +29,16 @@ QmitkGradientDescentOptimizerView::~QmitkGradientDescentOptimizerView()
 {
 }
 
+mitk::OptimizerParameters::OptimizerType QmitkGradientDescentOptimizerView::GetOptimizerType()
+{
+  return mitk::OptimizerParameters::GRADIENTDESCENTOPTIMIZER;
+}
+
+
 itk::Object::Pointer QmitkGradientDescentOptimizerView::GetOptimizer()
 {
   itk::GradientDescentOptimizer::Pointer OptimizerPointer = itk::GradientDescentOptimizer::New();
-  OptimizerPointer->SetMaximize( m_Controls.m_Maximize->isChecked());
+  //OptimizerPointer->SetMaximize( m_Controls.m_Maximize->isChecked());
   OptimizerPointer->SetLearningRate(m_Controls.m_LearningRateGradientDescent->text().toFloat());
   OptimizerPointer->SetNumberOfIterations( m_Controls.m_IterationsGradientDescent->text().toInt() );
   return OptimizerPointer.GetPointer();
@@ -43,7 +49,7 @@ itk::Array<double> QmitkGradientDescentOptimizerView::GetOptimizerParameters()
   itk::Array<double> optimizerValues;
   optimizerValues.SetSize(3);
   optimizerValues.fill(0);
-  optimizerValues[0] = m_Controls.m_Maximize->isChecked();
+ // optimizerValues[0] = m_Controls.m_Maximize->isChecked();
   optimizerValues[1] = m_Controls.m_LearningRateGradientDescent->text().toFloat();
   optimizerValues[2] = m_Controls.m_IterationsGradientDescent->text().toInt();
   return optimizerValues;
@@ -51,7 +57,7 @@ itk::Array<double> QmitkGradientDescentOptimizerView::GetOptimizerParameters()
 
 void QmitkGradientDescentOptimizerView::SetOptimizerParameters(itk::Array<double> optimizerValues)
 {
-  m_Controls.m_Maximize->setChecked(optimizerValues[0]);
+  //m_Controls.m_Maximize->setChecked(optimizerValues[0]);
   m_Controls.m_LearningRateGradientDescent->setText(QString::number(optimizerValues[1]));
   m_Controls.m_IterationsGradientDescent->setText(QString::number(optimizerValues[2]));
 }

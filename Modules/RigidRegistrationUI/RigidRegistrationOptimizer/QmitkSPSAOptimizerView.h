@@ -38,6 +38,7 @@ public:
   QmitkSPSAOptimizerView( QWidget* parent = 0, Qt::WindowFlags f = 0 );
   ~QmitkSPSAOptimizerView();
 
+  virtual mitk::OptimizerParameters::OptimizerType GetOptimizerType();
 
   virtual itk::Object::Pointer GetOptimizer();
 

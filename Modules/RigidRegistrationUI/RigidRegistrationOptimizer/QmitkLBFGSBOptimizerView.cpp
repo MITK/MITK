@@ -29,6 +29,12 @@ QmitkLBFGSBOptimizerView::~QmitkLBFGSBOptimizerView()
 {
 }
 
+mitk::OptimizerParameters::OptimizerType QmitkLBFGSBOptimizerView::GetOptimizerType()
+{
+  return mitk::OptimizerParameters::LBFGSBOPTIMIZER;
+}
+
+
 itk::Object::Pointer QmitkLBFGSBOptimizerView::GetOptimizer()
 {
   itk::LBFGSBOptimizer::Pointer OptimizerPointer = itk::LBFGSBOptimizer::New();

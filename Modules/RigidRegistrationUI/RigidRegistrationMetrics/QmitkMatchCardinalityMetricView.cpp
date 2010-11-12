@@ -28,6 +28,11 @@ QmitkMatchCardinalityMetricView::~QmitkMatchCardinalityMetricView()
 {
 }
 
+mitk::MetricParameters::MetricType QmitkMatchCardinalityMetricView::GetMetricType()
+{
+  return mitk::MetricParameters::MATCHCARDINALITYIMAGETOIMAGEMETRIC;
+}
+
 itk::Object::Pointer QmitkMatchCardinalityMetricView::GetMetric()
 {
   if (m_MovingImage.IsNotNull())

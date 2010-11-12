@@ -38,6 +38,7 @@ public:
   QmitkMatchCardinalityMetricView( QWidget* parent = 0, Qt::WindowFlags f = 0 );
   ~QmitkMatchCardinalityMetricView();
 
+  virtual mitk::MetricParameters::MetricType GetMetricType();
 
   virtual itk::Object::Pointer GetMetric();
 

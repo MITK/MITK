@@ -29,6 +29,11 @@ QmitkQuaternionRigidTransformGradientDescentOptimizerView::~QmitkQuaternionRigid
 {
 }
 
+mitk::OptimizerParameters::OptimizerType QmitkQuaternionRigidTransformGradientDescentOptimizerView::GetOptimizerType()
+{
+  return mitk::OptimizerParameters::QUATERNIONRIGIDTRANSFORMGRADIENTDESCENTOPTIMIZER;
+}
+
 itk::Object::Pointer QmitkQuaternionRigidTransformGradientDescentOptimizerView::GetOptimizer()
 {
   itk::QuaternionRigidTransformGradientDescentOptimizer::Pointer OptimizerPointer = itk::QuaternionRigidTransformGradientDescentOptimizer::New();

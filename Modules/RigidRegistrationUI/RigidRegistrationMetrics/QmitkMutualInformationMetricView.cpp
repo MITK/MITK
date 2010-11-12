@@ -28,6 +28,11 @@ QmitkMutualInformationMetricView::~QmitkMutualInformationMetricView()
 {
 }
 
+mitk::MetricParameters::MetricType QmitkMutualInformationMetricView::GetMetricType()
+{
+  return mitk::MetricParameters::MUTUALINFORMATIONIMAGETOIMAGEMETRIC;
+}
+
 itk::Object::Pointer QmitkMutualInformationMetricView::GetMetric()
 {
   if (m_MovingImage.IsNotNull())

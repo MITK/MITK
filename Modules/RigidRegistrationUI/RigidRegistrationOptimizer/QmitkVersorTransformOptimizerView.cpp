@@ -29,6 +29,11 @@ QmitkVersorTransformOptimizerView::~QmitkVersorTransformOptimizerView()
 {
 }
 
+mitk::OptimizerParameters::OptimizerType QmitkVersorTransformOptimizerView::GetOptimizerType()
+{
+  return mitk::OptimizerParameters::VERSORTRANSFORMOPTIMIZER;
+}
+
 itk::Object::Pointer QmitkVersorTransformOptimizerView::GetOptimizer()
 {
   itk::VersorTransformOptimizer::Pointer OptimizerPointer = itk::VersorTransformOptimizer::New();

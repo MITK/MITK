@@ -30,10 +30,15 @@ QmitkOnePlusOneEvolutionaryOptimizerView::~QmitkOnePlusOneEvolutionaryOptimizerV
 {
 }
 
+mitk::OptimizerParameters::OptimizerType QmitkOnePlusOneEvolutionaryOptimizerView::GetOptimizerType()
+{
+  return mitk::OptimizerParameters::ONEPLUSONEEVOLUTIONARYOPTIMIZER;
+}
+
 itk::Object::Pointer QmitkOnePlusOneEvolutionaryOptimizerView::GetOptimizer()
 {
   itk::OnePlusOneEvolutionaryOptimizer::Pointer OptimizerPointer = itk::OnePlusOneEvolutionaryOptimizer::New();
-  OptimizerPointer->SetMaximize( m_Controls.m_Maximize->isChecked() );
+  //OptimizerPointer->SetMaximize( m_Controls.m_Maximize->isChecked() );
   itk::Statistics::NormalVariateGenerator::Pointer generator = itk::Statistics::NormalVariateGenerator::New();
   generator->Initialize(12345);
   OptimizerPointer->SetNormalVariateGenerator(generator); 
@@ -50,7 +55,7 @@ itk::Array<double> QmitkOnePlusOneEvolutionaryOptimizerView::GetOptimizerParamet
   itk::Array<double> optimizerValues;
   optimizerValues.SetSize(6);
   optimizerValues.fill(0);
-  optimizerValues[0] = m_Controls.m_Maximize->isChecked();
+  //optimizerValues[0] = m_Controls.m_Maximize->isChecked();
   optimizerValues[1] = m_Controls.m_ShrinkFactorOnePlusOneEvolutionary->text().toFloat();
   optimizerValues[2] = m_Controls.m_GrowthFactorOnePlusOneEvolutionary->text().toFloat();
   optimizerValues[3] = m_Controls.m_EpsilonOnePlusOneEvolutionary->text().toFloat();
@@ -61,7 +66,7 @@ itk::Array<double> QmitkOnePlusOneEvolutionaryOptimizerView::GetOptimizerParamet
 
 void QmitkOnePlusOneEvolutionaryOptimizerView::SetOptimizerParameters(itk::Array<double> optimizerValues)
 {
-  m_Controls.m_Maximize->setChecked(optimizerValues[0]);
+  //m_Controls.m_Maximize->setChecked(optimizerValues[0]);
   m_Controls.m_ShrinkFactorOnePlusOneEvolutionary->setText(QString::number(optimizerValues[1]));
   m_Controls.m_GrowthFactorOnePlusOneEvolutionary->setText(QString::number(optimizerValues[2]));
   m_Controls.m_EpsilonOnePlusOneEvolutionary->setText(QString::number(optimizerValues[3]));

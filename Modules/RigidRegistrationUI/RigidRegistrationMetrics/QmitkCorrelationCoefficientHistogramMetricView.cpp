@@ -29,6 +29,11 @@ QmitkCorrelationCoefficientHistogramMetricView::~QmitkCorrelationCoefficientHist
 {
 }
 
+mitk::MetricParameters::MetricType QmitkCorrelationCoefficientHistogramMetricView::GetMetricType()
+{
+  return mitk::MetricParameters::CORRELATIONCOEFFICIENTHISTOGRAMIMAGETOIMAGEMETRIC;
+}
+
 itk::Object::Pointer QmitkCorrelationCoefficientHistogramMetricView::GetMetric()
 {
   if (m_MovingImage.IsNotNull())

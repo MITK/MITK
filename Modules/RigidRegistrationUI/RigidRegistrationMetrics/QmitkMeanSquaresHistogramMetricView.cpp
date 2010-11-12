@@ -29,6 +29,11 @@ QmitkMeanSquaresHistogramMetricView::~QmitkMeanSquaresHistogramMetricView()
 {
 }
 
+mitk::MetricParameters::MetricType QmitkMeanSquaresHistogramMetricView::GetMetricType()
+{
+  return mitk::MetricParameters::MEANSQUARESHISTOGRAMIMAGETOIMAGEMETRIC;
+}
+
 itk::Object::Pointer QmitkMeanSquaresHistogramMetricView::GetMetric()
 {
  if (m_MovingImage.IsNotNull())

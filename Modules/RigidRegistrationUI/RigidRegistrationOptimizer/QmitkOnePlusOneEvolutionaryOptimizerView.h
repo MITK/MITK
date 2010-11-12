@@ -38,6 +38,7 @@ public:
   QmitkOnePlusOneEvolutionaryOptimizerView( QWidget* parent = 0, Qt::WindowFlags f = 0 );
   ~QmitkOnePlusOneEvolutionaryOptimizerView();
 
+  virtual mitk::OptimizerParameters::OptimizerType GetOptimizerType();
 
   virtual itk::Object::Pointer GetOptimizer();
 

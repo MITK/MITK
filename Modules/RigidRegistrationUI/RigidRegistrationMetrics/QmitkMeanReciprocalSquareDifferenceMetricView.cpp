@@ -29,6 +29,11 @@ QmitkMeanReciprocalSquareDifferenceMetricView::~QmitkMeanReciprocalSquareDiffere
 {
 }
 
+mitk::MetricParameters::MetricType QmitkMeanReciprocalSquareDifferenceMetricView::GetMetricType()
+{
+  return mitk::MetricParameters::MEANRECIPROCALSQUAREDIFFERENCEIMAGETOIMAGEMETRIC;
+}
+
 itk::Object::Pointer QmitkMeanReciprocalSquareDifferenceMetricView::GetMetric()
 {
   if (m_MovingImage.IsNotNull())

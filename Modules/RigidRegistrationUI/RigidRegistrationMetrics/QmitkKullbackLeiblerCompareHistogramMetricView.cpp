@@ -29,6 +29,11 @@ QmitkKullbackLeiblerCompareHistogramMetricView::~QmitkKullbackLeiblerCompareHist
 {
 }
 
+mitk::MetricParameters::MetricType QmitkKullbackLeiblerCompareHistogramMetricView::GetMetricType()
+{
+  return mitk::MetricParameters::KULLBACKLEIBLERCOMPAREHISTOGRAMIMAGETOIMAGEMETRIC;
+}
+
 itk::Object::Pointer QmitkKullbackLeiblerCompareHistogramMetricView::GetMetric()
 {
   if (m_MovingImage.IsNotNull())

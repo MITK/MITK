@@ -38,6 +38,7 @@ public:
   QmitkQuaternionRigidTransformGradientDescentOptimizerView( QWidget* parent = 0, Qt::WindowFlags f = 0 );
   ~QmitkQuaternionRigidTransformGradientDescentOptimizerView();
 
+  virtual mitk::OptimizerParameters::OptimizerType GetOptimizerType();
 
   virtual itk::Object::Pointer GetOptimizer();
 

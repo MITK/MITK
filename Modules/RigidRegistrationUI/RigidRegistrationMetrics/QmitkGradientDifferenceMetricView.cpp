@@ -29,6 +29,11 @@ QmitkGradientDifferenceMetricView::~QmitkGradientDifferenceMetricView()
 {
 }
 
+mitk::MetricParameters::MetricType QmitkGradientDifferenceMetricView::GetMetricType()
+{
+  return mitk::MetricParameters::GRADIENTDIFFERENCEIMAGETOIMAGEMETRIC;
+}
+
 itk::Object::Pointer QmitkGradientDifferenceMetricView::GetMetric()
 {
   if (m_MovingImage.IsNotNull())

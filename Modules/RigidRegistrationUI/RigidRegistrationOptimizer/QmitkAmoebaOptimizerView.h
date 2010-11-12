@@ -40,6 +40,7 @@ public:
   QmitkAmoebaOptimizerView( QWidget* parent = 0, Qt::WindowFlags f = 0 );
   ~QmitkAmoebaOptimizerView();
 
+  virtual mitk::OptimizerParameters::OptimizerType GetOptimizerType();
 
   virtual itk::Object::Pointer GetOptimizer();
 

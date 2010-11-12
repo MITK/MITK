@@ -29,6 +29,11 @@ QmitkVersorRigid3DTransformOptimizerView::~QmitkVersorRigid3DTransformOptimizerV
 {
 }
 
+mitk::OptimizerParameters::OptimizerType QmitkVersorRigid3DTransformOptimizerView::GetOptimizerType()
+{
+  return mitk::OptimizerParameters::VERSORRIGID3DTRANSFORMOPTIMIZER;
+}
+
 itk::Object::Pointer QmitkVersorRigid3DTransformOptimizerView::GetOptimizer()
 {
   itk::VersorRigid3DTransformOptimizer::Pointer OptimizerPointer = itk::VersorRigid3DTransformOptimizer::New();

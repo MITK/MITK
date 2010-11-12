@@ -14,25 +14,33 @@
 #include <QPushButton>
 
 /*!
- * \brief Widget for regular operations on point sets
+ * \brief Widget for regular operations on two point sets
  *
- * Displays a list of point coordinates and a couple of
- * buttons which
+ * Displays two sets of point coordinates, buttons and a context menu to enable modifications to the point sets
  *
- * \li enable point set interaction
+ * \li creation of new point sets
+ * \li adding/removing points
+ * \li move points
  * \li clear all points from a set
- * \li load points from file
- * \li save points to file
+ * \li clear all points in one time step of one set
  *
  * The user/application module of this widget needs to
- * assign a mitk::PointSet object to this widget. The user
- * also has to decide whether it wants to put the point set
- * into (a) DataStorage. This widget will not add/remove
- * point sets to DataStorage.
+ * assign two visible point sets to the widget 
+ * (via SetPointSetNodes(std::vector<mitk::DataNode*> nodes)), 
+ * preferrably by passing all visible data nodes contained 
+ * in the data storage to the widget every time 
+ * DataStorageChanged() is called.
  *
- * If the render window crosshair should be moved to the
- * currently selected point, the widget user has to provide
- * a QmitkStdMultiWidget object.
+ * The user/application module of this widget needs to
+ * assign one selected point set to the widget 
+ * (via UpdateSelection(mitk::DataNode* selectedNode)), 
+ * preferrably by passing the selected data node contained 
+ * in the data storage to the widget every time 
+ * OnSelectionChanged() is called.
+ *
+ * The user/application module of this widget needs to
+ * assign a QmitkStdMultiWidget and a mitk::DataStorage 
+ * to the widget (via SetMultiWidget and SetDataStorage).
  */
 
 
@@ -61,18 +69,23 @@ public:
     /// calls UpdateSelection of the according QmitkCorrespondingPointSetsView
     void UpdateSelection(mitk::DataNode* selectedNode);
 
+    /// returns the qt property which indicates an activated/deactivated button bar below the table
     bool QTPropButtonBarEnabled() const;
 
+    /// sets the qt property which activates/deactivates the button bar below the table
     void QTPropSetButtonBarEnabled(bool showBB);
 
 signals:
 
 protected slots:
 
+  /// enables/disables buttons if a/no point is selected
   void OnPointSelectionChanged();
   
+  /// add new point set to data manager
   void AddPointSet();
 
+  /// enable if new points should be a added
   void AddPointsMode(bool checked);
   
   void RemoveSelectedPoint();
@@ -81,8 +94,10 @@ protected slots:
   
   void MoveSelectedPointUp();
 
+  /// toggles m_AddPointsBtn checked state
   void OnAddPointsModeChanged(bool enabled);
 
+  /// swap the two table columns columns
   void SwapPointSets(bool checked);
 
 protected:

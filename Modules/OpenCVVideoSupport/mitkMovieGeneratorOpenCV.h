@@ -46,7 +46,12 @@ public:
     m_FourCCCodec = codec;
   }
 
-
+  ///
+  /// if true the movie will be cutted by a 10 pixel margin
+  /// in order to remove the standard mitk coloured borders
+  /// default: true
+  ///
+  void SetRemoveColouredFrame(bool);
 protected:
 
   MovieGeneratorOpenCV();
@@ -61,7 +66,7 @@ protected:
   virtual bool TerminateGenerator();
 
   //! name of output file
-  const char * m_sFile;
+  std::string m_sFile;
 
   //! frame rate 
   int m_dwRate;
@@ -76,6 +81,8 @@ private:
 
   //! frame counter
   long m_lFrame;
+
+  bool m_RemoveColouredFrame;
 };
 
 } // namespace mitk

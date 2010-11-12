@@ -24,19 +24,18 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QLineEdit>
 #include <QApplication>
 
-QmitkFileChooser::QmitkFileChooser(bool horizontalLayout, bool selectDir,
-                                   bool fileMustExist
-                                   , QWidget* parent, Qt::WindowFlags f )
+QmitkFileChooser::QmitkFileChooser(QWidget* parent, Qt::WindowFlags f )
 : QWidget( parent, f )
-, m_SelectDir( selectDir )
-, m_FileMustExist(fileMustExist)
+, m_SelectDir( false )
+, m_FileMustExist( true )
+, m_SelectFile(new QPushButton("Select File"))
+, m_File( new QLineEdit )
 {
-  m_File = new QLineEdit;
   m_File->setReadOnly( true );
-  m_SelectFile = new QPushButton("Select File");
-  connect( m_SelectFile, SIGNAL(clicked(bool)), this, SLOT( OnSelectFileClicked( bool ) ) );
+  this->SetHorizotalLayout(false);
 
-  this->SetHorizotalLayout(horizontalLayout);
+  connect( m_SelectFile, SIGNAL(clicked(bool)), this, SLOT( OnSelectFileClicked( bool ) ) );
+  connect( m_File, SIGNAL( editingFinished () ), this, SLOT( OnFileEditingFinished() ) );
 }
 
 void QmitkFileChooser::SetHorizotalLayout(bool horizontalLayout)
@@ -64,10 +63,15 @@ void QmitkFileChooser::SetFileMustExist( bool fileMustExist )
   m_FileMustExist = fileMustExist;
 }
 
+void QmitkFileChooser::SetReadOnly( bool ReadOnly )
+{
+  m_File->setReadOnly( ReadOnly );
+}
+
 void QmitkFileChooser::SetFile( const std::string& file )
 {
   QFileInfo info( QString::fromStdString(file) );
-  if(info.exists())
+  if(info.exists() || m_FileMustExist == false)
   {
     m_File->setText( QString::fromStdString(file) );
     emit NewFileSelected( file );
@@ -81,7 +85,8 @@ void QmitkFileChooser::SetFilePattern( const std::string& filepattern )
 
 bool QmitkFileChooser::IsValidFile() const
 {
-  return m_ValidFile;
+  QFileInfo info( m_File->text() );
+  return info.exists();
 }
 
 std::string QmitkFileChooser::GetFile() const
@@ -110,4 +115,9 @@ void QmitkFileChooser::OnSelectFileClicked( bool /*checked*/ )
     m_File->setText( filename );
 
   emit NewFileSelected(filename.toStdString());
+}
+
+void QmitkFileChooser::OnFileEditingFinished()
+{
+  emit NewFileSelected( m_File->text().toStdString() );
 }

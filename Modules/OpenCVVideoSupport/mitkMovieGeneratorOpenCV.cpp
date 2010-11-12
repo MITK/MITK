@@ -27,6 +27,7 @@ mitk::MovieGeneratorOpenCV::MovieGeneratorOpenCV()
   m_dwRate = 20;
 
   m_FourCCCodec = NULL;
+  m_RemoveColouredFrame = true;
 }
 
 
@@ -36,19 +37,25 @@ void mitk::MovieGeneratorOpenCV::SetFileName( const char *fileName )
   m_sFile = fileName;
 }
 
+void mitk::MovieGeneratorOpenCV::SetRemoveColouredFrame(bool RemoveColouredFrame)
+{
+  m_RemoveColouredFrame = RemoveColouredFrame;
+}
+
 bool mitk::MovieGeneratorOpenCV::InitGenerator()
 {
   m_width = m_renderer->GetRenderWindow()->GetSize()[0];  // changed from glGetIntegerv( GL_VIEWPORT, viewport );
   m_height = m_renderer->GetRenderWindow()->GetSize()[1]; // due to sometimes strange dimensions
   
-  m_width  -= 10;  //remove colored boarders around renderwindows 
-  m_height -= 10;
+  if(m_RemoveColouredFrame)
+  {
+    m_width  -= 10;  //remove colored boarders around renderwindows 
+    m_height -= 10;
+  }
   
   m_width -= m_width % 4; // some video codecs have prerequisites to the image dimensions
   m_height -= m_height % 4;
 
-
-  
   m_currentFrame = cvCreateImage(cvSize(m_width,m_height),8,3); // creating image with widget size, 8 bit per pixel and 3 channel r,g,b
   m_currentFrame->origin = 1; // avoid building a video with bottom up
   
@@ -77,19 +84,19 @@ bool mitk::MovieGeneratorOpenCV::InitGenerator()
   if(m_FourCCCodec != NULL)
   {
     #ifdef WIN32
-      m_aviWriter = cvCreateVideoWriter(m_sFile,CV_FOURCC(m_FourCCCodec[0],m_FourCCCodec[1],m_FourCCCodec[2],
+      m_aviWriter = cvCreateVideoWriter(m_sFile.c_str(),CV_FOURCC(m_FourCCCodec[0],m_FourCCCodec[1],m_FourCCCodec[2],
                                         m_FourCCCodec[3]),m_dwRate,cvSize(m_width,m_height),1); //initializing video writer
     #else
-      m_aviWriter = cvCreateVideoWriter(m_sFile,CV_FOURCC(m_FourCCCodec[0],m_FourCCCodec[1],m_FourCCCodec[2],
+      m_aviWriter = cvCreateVideoWriter(m_sFile.c_str(),CV_FOURCC(m_FourCCCodec[0],m_FourCCCodec[1],m_FourCCCodec[2],
                                         m_FourCCCodec[3]),m_dwRate,cvSize(m_width,m_height)); //initializing video writer
     #endif
   }
   else
   {
     #ifdef WIN32
-      m_aviWriter = cvCreateVideoWriter(m_sFile,-1,m_dwRate,cvSize(m_width,m_height),1); //initializing video writer
+      m_aviWriter = cvCreateVideoWriter(m_sFile.c_str(),-1,m_dwRate,cvSize(m_width,m_height),1); //initializing video writer
     #else
-      m_aviWriter = cvCreateVideoWriter(m_sFile,CV_FOURCC('X','V','I','D'),m_dwRate,cvSize(m_width,m_height)); //initializing video writer
+      m_aviWriter = cvCreateVideoWriter(m_sFile.c_str(),CV_FOURCC('X','V','I','D'),m_dwRate,cvSize(m_width,m_height)); //initializing video writer
     #endif
   }
  

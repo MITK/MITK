@@ -83,10 +83,6 @@ void mitk::WiiMoteAddOn::WiiMoteCalibrationInput(const itk::EventObject &e)
   delete se;
 }
 
-void mitk::WiiMoteAddOn::ForwardEvent(const mitk::StateEvent *e)
-{
-  mitk::GlobalInteraction::GetInstance()->HandleEvent(e);
-}
 
 
 

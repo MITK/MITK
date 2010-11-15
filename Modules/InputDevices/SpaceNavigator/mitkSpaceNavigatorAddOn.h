@@ -43,7 +43,7 @@ namespace mitk {
     /**
     * @noimplement not needed
     */
-    void DeviceChange (long device, long keys, long programmableKeys);	
+    void DeviceChange (long device, long keys, long programmableKeys);
 
     /**
     * If a button is pressed down an event is fired.
@@ -61,18 +61,13 @@ namespace mitk {
     * Reacts on any movement of the mouse and fires events accordingly.
     *
     * @param translation 
-    *			the translation of the mouse as an 3D vector
+    *           the translation of the mouse as an 3D vector
     * @param rotation 
-    *			the rotation of the mouse as an 3D vector
+    *           the rotation of the mouse as an 3D vector
     * @param angle 
-    *			the angle from the mouse as an scalar unit
+    *           the angle from the mouse as an scalar unit
     */
     void SensorInput(mitk::Vector3D translation, mitk::Vector3D rotation, mitk::ScalarType angle);
-
-    /**
-    * @see mitk::EventMapperAddOn::ForwardEvent(const mitk::StateEvent* e)
-    */
-    void ForwardEvent(const mitk::StateEvent* e);
 
   protected:
 

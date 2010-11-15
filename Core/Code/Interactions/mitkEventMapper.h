@@ -24,8 +24,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkEventDescription.h>
 #include <vtkXMLParser.h>
 
-#include <mitkEventMapperAddOn.h>
-
 namespace mitk {
   struct ltstr
   {
@@ -39,6 +37,7 @@ namespace mitk {
   class GlobalInteraction;
   class StateMachine;
   class StateEvent;
+  class EventMapperAddOn;
 
   //##Documentation
   //## @brief Maps an Event to its description
@@ -67,7 +66,7 @@ namespace mitk {
     typedef std::map<const char*, int, ltstr> ConstMap;
     typedef std::map<const char*, int, ltstr>::iterator ConstMapIter;
 
-    typedef std::vector<mitk::EventMapperAddOn::Pointer> AddOnVectorType;
+    typedef std::vector< itk::SmartPointer<mitk::EventMapperAddOn> > AddOnVectorType;
 
     //##Documentation
     //## searches the Event in m_EventDescription

@@ -56,10 +56,6 @@ void mitk::SpaceNavigatorAddOn::SensorInput( mitk::Vector3D translation, mitk::V
   this->ForwardEvent(se);
 }
 
-void mitk::SpaceNavigatorAddOn::ForwardEvent(const mitk::StateEvent *e)
-{
-  mitk::GlobalInteraction::GetInstance()->HandleEvent(e);
-}
 
 
 

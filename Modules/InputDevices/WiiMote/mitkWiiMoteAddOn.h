@@ -34,11 +34,6 @@ namespace mitk {
     static WiiMoteAddOn* GetInstance();
 
     /**
-    * @see mitk::EventMapperAddOn::ForwardEvent(const mitk::StateEvent* e)
-    */
-    void ForwardEvent(const mitk::StateEvent* e);
-
-    /**
     * Starts all available Wiimotes.
     */
     void ActivateWiiMotes();

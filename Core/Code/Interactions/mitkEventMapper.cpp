@@ -32,6 +32,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkStateEvent.h"
 #include "mitkOperationEvent.h"
 #include "mitkGlobalInteraction.h"
+#include <mitkEventMapperAddOn.h>
 
 #include "mitkStandardFileLocations.h"
 
@@ -691,9 +692,9 @@ void mitk::EventMapper::RemoveEventMapperAddOn(mitk::EventMapperAddOn* unusedAdd
   {
     if(*it == unusedAddOn)
     {
-    m_AddOnVector.erase(it);
-    break;
-  }
+      m_AddOnVector.erase(it);
+      break;
+    }
 }
 
 }

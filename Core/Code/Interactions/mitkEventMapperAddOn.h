@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKEVENTMAPPERADDON_H_
 
 #include <mitkStateEvent.h>
+#include <mitkGlobalInteraction.h>
 
 namespace mitk {
 
@@ -36,7 +37,10 @@ namespace mitk {
     *
     *  @param e the event, who should be processed
     */
-    virtual void ForwardEvent(const mitk::StateEvent* e) = 0;
+    virtual void ForwardEvent(const mitk::StateEvent* e) 
+    {
+      mitk::GlobalInteraction::GetInstance()->HandleEvent(e);
+    }
 
   }; // end struct EventMapperAddOn
 } // end namespace mitk

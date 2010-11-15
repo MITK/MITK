@@ -82,6 +82,8 @@ enum EEventIds
   EIDSHIFTANDMIDDLEMOUSERELEASE = 2005,
   EIDSPACENAVIGATORINPUT = 4001, // 3d Mouse, SpaceNavigator input
   EIDSPACENAVIGATORKEYDOWN = 4002, // 3d Mouse, KeyDown
+  EIDWIIMOTEINPUT = 4003, // WiiMote input
+  EIDWIIMOTEBUTTON = 4004, // WiiMote home button
   EIDSTRGANDN = 10,
   EIDSTRGANDE = 11,
   EIDDELETE = 12,
@@ -364,6 +366,8 @@ enum EActions
   AcACCEPT = 49011,
   AcONSPACENAVIGATORMOUSEINPUT = 4001, // On input of 3D Mouse
   AcONPACENAVIGATORKEYDOWN = 4002, // On input of 3D Mouse
+  AcONWIIMOTEINPUT = 4003, // used for wiimote to signal IR input
+  AcRESETVIEW = 4004, // used for wiimote to reset view
   AcCHECKPOSITION = 5000,
   AcINITIALIZECONTOUR = 5001,
   AcCALCULATENEWSEGMENTATION_SP= 5002,
@@ -456,6 +460,8 @@ enum EEventType
   Type_User = 1000,        // first user event id
   Type_SpaceNavigatorInput = 1094,  // 3D mouse input occured
   Type_SpaceNavigatorKeyDown = 1095,  // 3D mouse input occured
+  Type_WiiMoteInput = 1096, // WiiMote input occured
+  Type_WiiMoteButton= 1097, // WiiMote button pressed
   Type_MaxUser = 65535
 };
 

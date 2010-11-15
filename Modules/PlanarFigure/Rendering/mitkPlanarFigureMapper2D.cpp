@@ -78,7 +78,7 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
     double planeThickness = planarFigurePlaneGeometry->GetExtentInMM( 2 );
     if ( !planarFigurePlaneGeometry->IsParallel( rendererPlaneGeometry )
       || !(planarFigurePlaneGeometry->DistanceFromPlane( 
-           rendererPlaneGeometry ) < planeThickness/* / 3.0*/) )
+           rendererPlaneGeometry ) < planeThickness / 3.0) )
     {
       // Planes are not parallel or renderer plane is not within PlanarFigure
       // geometry bounds --> exit

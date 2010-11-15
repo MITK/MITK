@@ -22,27 +22,48 @@ mitk::WiiMoteThread::WiiMoteThread()
 , m_SleepTime(SLEEPDEFAULT)
 , m_InCalibrationMode(false)
 {
-  // uses state-change callback to get notified of extension-related 
-  // events OnStateChange must be static, otherwise the this-operator 
-  // will be used and this callback can't convert it into the typedef
-  // defined in the wiiyourself library
-  m_WiiMote.ChangedCallback = &mitk::WiiMoteThread::OnStateChange;
-
-  // allows flags to trigger a state change
-  m_WiiMote.CallbackTriggerFlags = (state_change_flags) (CONNECTED | IR_CHANGED);
+  
 }
 
 mitk::WiiMoteThread::~WiiMoteThread()
 {
-  //for(int i = 0; i < m_NumberDetectedWiiMotes;i++)
-  //{  
-  //  delete m_WiiMotes[i];  
-  //}
+  for(int i = 0; i < m_NumberDetectedWiiMotes;i++)
+  {
+    if(m_WiiMotes[i].IsConnected())
+    {
+      m_WiiMotes[i].Disconnect();
+    }
+  }
 }
 
-void mitk::WiiMoteThread::OnStateChange(wiimote &remote,state_change_flags changed, const wiimote_state &newState)
+void mitk::WiiMoteThread::OnStateChange(wiimote &remote, state_change_flags changed, const wiimote_state &newState)
 {
-  // TODO check for extension and configure
+  // a MotionPlus was detected
+  if(changed & MOTIONPLUS_DETECTED)
+  {
+
+    // enable it if there isn't a normal extension plugged into it
+    // (MotionPlus devices don't report like normal extensions until
+    // enabled - and then, other extensions attached to it will no longer be
+    // reported (so disable the M+ when you want to access them again).
+    if(remote.ExtensionType == wiimote_state::NONE)
+    {
+      if(remote.EnableMotionPlus())
+      {
+        MITK_INFO << "Motion Plus enabled";
+      }
+    }
+  }
+ else if(changed & EXTENSION_CONNECTED)
+      {
+      // switch to a report mode that includes the extension data (we will
+      //  loose the IR dot sizes)
+      // note: there is no need to set report types for a Balance Board.
+      if(!remote.IsBalanceBoard())
+      {
+        remote.SetReportType(wiimote::IN_BUTTONS_ACCEL_IR_EXT);
+      }
+  }
 }
 
 void mitk::WiiMoteThread::Run()
@@ -132,7 +153,7 @@ void mitk::WiiMoteThread::ReconnectWiiMote()
 bool mitk::WiiMoteThread::DetectWiiMotes()
 {
   bool result = false;
-  unsigned detected		  = 0;
+  unsigned detected       = 0;
   unsigned connectionTrys = 0;
 
   while(detected < 5)
@@ -175,8 +196,22 @@ bool mitk::WiiMoteThread::DetectWiiMotes()
         break;
       }
 
-      // use a non-extension report mode (this gives us back the IR dot sizes)
-      m_WiiMotes[detected].SetReportType(wiimote::IN_BUTTONS_ACCEL_IR);
+      // ------------------------------- unclean solution, missing generic approach -------------------------------
+
+      // uses state-change callback to get notified of extension-related 
+      // events OnStateChange must be static, otherwise the this-operator 
+      // will be used and this callback can't convert it into the typedef
+      // defined in the wiiyourself library
+      m_WiiMotes[0].ChangedCallback = &mitk::WiiMoteThread::OnStateChange; 
+
+      // allows flags to trigger a state change
+      m_WiiMotes[0].CallbackTriggerFlags = (state_change_flags) (CONNECTED                                                             
+                                                               | EXTENSION_CHANGED 
+                                                               | MOTIONPLUS_CHANGED);
+      
+      m_WiiMotes[0].SetReportType(wiimote::IN_BUTTONS_ACCEL_IR);
+
+      // ----------------------------------------------- END ------------------------------------------------------
 
       detected++;
       connectionTrys = 0;
@@ -201,7 +236,22 @@ void mitk::WiiMoteThread::DisconnectWiiMotes()
 
 void mitk::WiiMoteThread::WiiMoteIRInput()
 {
-  if(IR_CHANGED && m_WiiMotes[0].IR.Dot[0].bVisible)
+  //// test for reading Motion Plus data
+  //short testPitch = m_WiiMotes[0].MotionPlus.Raw.Pitch;
+  //short testRoll = m_WiiMotes[0].MotionPlus.Raw.Roll;
+  //short testYaw = m_WiiMotes[0].MotionPlus.Raw.Yaw;
+
+  //bool connected = m_WiiMotes[0].MotionPlusConnected();
+  //bool enabled = m_WiiMotes[0].MotionPlusEnabled();
+  //bool extension = m_WiiMotes[0].MotionPlusHasExtension();
+
+  //float testPitchSpeed = m_WiiMotes[0].MotionPlus.Speed.Pitch;
+  //float testRollSpeed = m_WiiMotes[0].MotionPlus.Speed.Roll;
+  //float testYawSpeed = m_WiiMotes[0].MotionPlus.Speed.Yaw;
+
+  //bool visibility = m_WiiMotes[0].IR.Dot[0].bVisible;
+
+  if(m_WiiMotes[0].IR.Dot[0].bVisible)
   {
     //m_CurrentTimeStep++;
     //if(m_CurrentTimeStep > m_SkipTimeSteps)
@@ -245,8 +295,8 @@ void mitk::WiiMoteThread::WiiMoteIRInput()
   }
 
   //read data
-  //MITK_INFO << "Pitch: " << m_WiiMote.Acceleration.Orientation.Pitch;
-  //MITK_INFO << "Roll: " << m_WiiMote.Acceleration.Orientation.Roll;
+  //MITK_INFO << "Pitch: " << m_WiiMotes[0].Acceleration.Orientation.Pitch;
+  //MITK_INFO << "Roll: " << m_WiiMotes[0].Acceleration.Orientation.Roll;
 
   //MITK_INFO << "X: " << m_WiiMote.Acceleration.Orientation.X;
   //MITK_INFO << "Y: " << m_WiiMote.Acceleration.Orientation.Y;
@@ -264,7 +314,7 @@ void mitk::WiiMoteThread::WiiMoteButtonPressed(int buttonType)
 
 void mitk::WiiMoteThread::WiiMoteCalibrationInput()
 {
-  if(IR_CHANGED && m_WiiMotes[0].IR.Dot[0].bVisible)
+  if(m_WiiMotes[0].IR.Dot[0].bVisible)
   {
     m_Command = ReceptorCommand::New();
     m_Command->SetCallbackFunction(mitk::WiiMoteAddOn::GetInstance(), &mitk::WiiMoteAddOn::WiiMoteCalibrationInput);
@@ -278,10 +328,14 @@ void mitk::WiiMoteThread::WiiMoteCalibrationInput()
 
 void mitk::WiiMoteThread::SingleWiiMoteUpdate()
 {
-   // update and settings process
+  // update and settings process
+  // the minus button is a manual abort criteria
+  // it can be chosen differently, if needed
   while(!m_WiiMotes[0].Button.Minus() && !m_StopWiiMote )
   {
     m_WiiMoteThreadFinished->Lock();
+    // refreshes the state of the wiimote
+    // do not remove
     while(m_WiiMotes[0].RefreshState() == NO_CHANGE)
     {
       itksys::SystemTools::Delay(1);
@@ -306,7 +360,7 @@ void mitk::WiiMoteThread::SingleWiiMoteUpdate()
     {
       this->WiiMoteButtonPressed(mitk::Key_A);
 
-      // necessary to avoid sending the movementvector
+      // necessary to avoid sending the movement vector
       // instead of the raw coordinates for the calibration
       if(this->m_InCalibrationMode)
       {
@@ -340,6 +394,8 @@ void mitk::WiiMoteThread::MultiWiiMoteUpdate()
   while(!m_WiiMotes[0].Button.Minus() && !m_StopWiiMote )
   {
     m_WiiMoteThreadFinished->Lock();
+    // refreshes the state of the wiimotes
+    // do not remove
     while(m_WiiMotes[0].RefreshState() == NO_CHANGE
       && m_WiiMotes[1].RefreshState() == NO_CHANGE)
     {
@@ -354,7 +410,7 @@ void mitk::WiiMoteThread::MultiWiiMoteUpdate()
     }
     else
     {
-      // stereo calibration?
+    
     }
     m_WiiMoteThreadFinished->Unlock();
 
@@ -378,13 +434,9 @@ void mitk::WiiMoteThread::MultiWiiMoteUpdate()
 
 void mitk::WiiMoteThread::MultiWiiMoteIRInput()
 {
-  if(IR_CHANGED && m_WiiMotes[0].IR.Dot[0].bVisible && m_WiiMotes[1].IR.Dot[0].bVisible)
+  // testing multiple wiimotes 
+  if(m_WiiMotes[0].IR.Dot[0].bVisible && m_WiiMotes[1].IR.Dot[0].bVisible)
   {
-    //m_Command = ReceptorCommand::New(); 
-    //m_Command->SetCallbackFunction(mitk::WiiMoteAddOn::GetInstance(), &mitk::WiiMoteAddOn::WiiMoteInput);
-
-    double tempTime(itksys::SystemTools::GetTime());
-
     float inputCoordinates[2] = {m_WiiMotes[0].IR.Dot[0].RawX, m_WiiMotes[0].IR.Dot[0].RawY};
     mitk::Point2D tempPoint(inputCoordinates);
 
@@ -397,33 +449,6 @@ void mitk::WiiMoteThread::MultiWiiMoteIRInput()
 
     MITK_INFO << "IR2 :: X: " << tempPoint2[0];
     MITK_INFO << "IR2 :: Y: " << tempPoint2[1];
-
-    //// if the last read data is not valid,
-    //// because the thread was not started
-    //if(!m_ReadDataOnce)
-    //{
-    //  m_ReadDataOnce = true;  
-    //}
-    //else // there is old data available - calculate the movement and send event
-    //{
-    //  // this time constraint allows the user to move the camera
-    //  // with the IR sender (by switching the IR source on and off) 
-    //  // similiar to a mouse (e.g. if you lift the mouse from the 
-    //  // surface and put it down again on another position, there 
-    //  // was no input. Now the input starts again and the movement 
-    //  // will begin from the last location of the mouse, although 
-    //  // the physical position of the mouse changed.)
-    //  if ((tempTime-m_LastRecordTime) < TIMELIMIT) 
-    //  {
-    //    mitk::Vector2D resultingVector(m_LastReadData-tempPoint);
-    //    mitk::WiiMoteIREvent e(resultingVector, tempTime);
-    //    mitk::CallbackFromGUIThread::GetInstance()->CallThisFromGUIThread(m_Command, e.MakeObject());
-    //  }
-    //}
-    //m_LastRecordTime = tempTime;
-    //m_LastReadData = tempPoint;
-
-    //itksys::SystemTools::Delay(m_SleepTime);
   }
 }
 

@@ -39,9 +39,9 @@ namespace mitk
     * events of extension, such as MotionPlus. 
     *
     * NOTE: don't access the public state from the 'remote' object here, as it will
-    *	      be out-of-date (it's only updated via RefreshState() calls, and these
-    *		    are reserved for the main application so it can be sure the values
-    *		    stay consistent between calls).  Instead query 'new_state' only.
+    *       be out-of-date (it's only updated via RefreshState() calls, and these
+    *       are reserved for the main application so it can be sure the values
+    *       stay consistent between calls).  Instead query 'new_state' only.
     *
     * @param remote 
     *          the old state of the connected Wii remote
@@ -80,8 +80,9 @@ namespace mitk
     void ReconnectWiiMote();
 
     /**
-    * TODO
     * Detects all available Wiimotes. 
+    *
+    * TODO: more detailed regarding the mode and led lighting
     */
     bool DetectWiiMotes();
 
@@ -111,15 +112,30 @@ namespace mitk
     */
     void WiiMoteCalibrationInput();
 
+    /**
+    * Constantly refreshes the state of a single wiimote. Also changes between <br>
+    * the calibration mode and the IR input mode through button push.
+    *
+    * TODO: more detailed explanation of calibration
+    *
+    */
     void SingleWiiMoteUpdate();
+
+    /**
+    * Constantly refreshes the state of multiple wiimotes.
+    */
     void MultiWiiMoteUpdate();
 
+    /**
+    * Processes the different IR inputs from multiple wiimotes. 
+    */
     void MultiWiiMoteIRInput();
 
   protected:
 
   private: 
 
+    // threading
     int m_ThreadID;
     itk::MultiThreader::Pointer m_MultiThreader;
 
@@ -152,7 +168,6 @@ namespace mitk
     //store all connected Wiimotes
     wiimote m_WiiMotes[4];
     int m_NumberDetectedWiiMotes;
-
   };
 }
 

@@ -98,3 +98,8 @@ void QmitkMattesMutualInformationMetricView::SetupUI(QWidget* parent)
   m_Controls.m_NumberOfSpatialSamplesMattesMutualInformation->setValidator(validatorLineEditInput);
   m_Controls.m_NumberOfHistogramBinsMattesMutualInformation->setValidator(validatorLineEditInput);
 }
+
+bool QmitkMattesMutualInformationMetricView::Maximize()
+{
+  return true;
+}

@@ -78,3 +78,8 @@ void QmitkNormalizedCorrelationMetricView::SetupUI(QWidget* parent)
 {
   m_Controls.setupUi(parent);
 }
+
+bool QmitkNormalizedCorrelationMetricView::Maximize()
+{
+  return true;
+}

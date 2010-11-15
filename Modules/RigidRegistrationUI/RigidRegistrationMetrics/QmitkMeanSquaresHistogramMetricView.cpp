@@ -87,3 +87,8 @@ void QmitkMeanSquaresHistogramMetricView::SetupUI(QWidget* parent)
   QValidator* validatorLineEditInput = new QIntValidator(0, 20000000, this);
   m_Controls.m_NumberOfHistogramBinsMeanSquaresHistogram->setValidator(validatorLineEditInput);
 }
+
+bool QmitkMeanSquaresHistogramMetricView::Maximize()
+{
+  return false;
+}

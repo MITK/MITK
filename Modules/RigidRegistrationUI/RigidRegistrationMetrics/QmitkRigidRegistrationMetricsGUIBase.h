@@ -53,6 +53,7 @@ public:
 
   virtual void SetupUI(QWidget* parent) = 0;
     
+  virtual bool Maximize() = 0;
 
 protected:
 

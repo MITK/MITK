@@ -50,6 +50,8 @@ public:
 
   virtual void SetupUI(QWidget* parent);
 
+  virtual bool Maximize();
+
 private:
 
   template < class TPixelType, unsigned int VImageDimension >

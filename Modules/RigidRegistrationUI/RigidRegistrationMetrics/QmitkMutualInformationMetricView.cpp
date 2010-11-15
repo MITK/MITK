@@ -91,3 +91,8 @@ void QmitkMutualInformationMetricView::SetupUI(QWidget* parent)
   m_Controls.m_FixedImageStandardDeviationMutualInformation->setValidator(validatorLineEditInputFloat);
   m_Controls.m_MovingImageStandardDeviationMutualInformation->setValidator(validatorLineEditInputFloat);
 }
+
+bool QmitkMutualInformationMetricView::Maximize()
+{
+  return true;
+}

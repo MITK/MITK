@@ -77,3 +77,8 @@ void QmitkKappaStatisticMetricView::SetupUI(QWidget* parent)
 {
   m_Controls.setupUi(parent);
 }
+
+bool QmitkKappaStatisticMetricView::Maximize()
+{
+  return true;
+}

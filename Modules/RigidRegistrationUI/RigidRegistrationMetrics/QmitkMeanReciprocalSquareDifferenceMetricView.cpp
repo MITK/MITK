@@ -87,3 +87,8 @@ void QmitkMeanReciprocalSquareDifferenceMetricView::SetupUI(QWidget* parent)
   QValidator* validatorLineEditInput = new QIntValidator(0, 20000000, this);
   m_Controls.m_LambdaMeanReciprocalSquareDifference->setValidator(validatorLineEditInput);
 }
+
+bool QmitkMeanReciprocalSquareDifferenceMetricView::Maximize()
+{
+  return false;
+}

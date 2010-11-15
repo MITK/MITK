@@ -78,3 +78,8 @@ void QmitkGradientDifferenceMetricView::SetupUI(QWidget* parent)
 {
   m_Controls.setupUi(parent);
 }
+
+bool QmitkGradientDifferenceMetricView::Maximize()
+{
+  return false;
+}

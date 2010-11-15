@@ -87,3 +87,8 @@ void QmitkKullbackLeiblerCompareHistogramMetricView::SetupUI(QWidget* parent)
   QValidator* validatorLineEditInput = new QIntValidator(0, 20000000, this);
   m_Controls.m_NumberOfHistogramBinsKullbackLeiblerCompareHistogram->setValidator(validatorLineEditInput);
 }
+
+bool QmitkKullbackLeiblerCompareHistogramMetricView::Maximize()
+{
+  return false;
+}

@@ -77,3 +77,8 @@ void QmitkMeanSquaresMetricView::SetupUI(QWidget* parent)
 {
   m_Controls.setupUi(parent);
 }
+
+bool QmitkMeanSquaresMetricView::Maximize()
+{
+  return false;
+}

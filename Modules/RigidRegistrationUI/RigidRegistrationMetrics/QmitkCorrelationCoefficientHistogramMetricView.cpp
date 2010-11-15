@@ -87,3 +87,9 @@ void QmitkCorrelationCoefficientHistogramMetricView::SetupUI(QWidget* parent)
   QValidator* validatorLineEditInput = new QIntValidator(0, 20000000, this);
   m_Controls.m_NumberOfHistogramBinsCorrelationCoefficientHistogram->setValidator(validatorLineEditInput);
 }
+
+
+bool QmitkCorrelationCoefficientHistogramMetricView::Maximize()
+{
+  return true;
+}

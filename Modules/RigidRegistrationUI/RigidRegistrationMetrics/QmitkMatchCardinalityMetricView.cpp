@@ -77,3 +77,8 @@ void QmitkMatchCardinalityMetricView::SetupUI(QWidget* parent)
 {
   m_Controls.setupUi(parent);
 }
+
+bool QmitkMatchCardinalityMetricView::Maximize()
+{
+  return false;
+}

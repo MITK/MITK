@@ -87,3 +87,8 @@ void QmitkNormalizedMutualInformationHistogramMetricView::SetupUI(QWidget* paren
   QValidator* validatorLineEditInput = new QIntValidator(0, 20000000, this);
   m_Controls.m_NumberOfHistogramBinsNormalizedMutualInformationHistogram->setValidator(validatorLineEditInput);
 }
+
+bool QmitkNormalizedMutualInformationHistogramMetricView::Maximize()
+{
+  return true;
+}

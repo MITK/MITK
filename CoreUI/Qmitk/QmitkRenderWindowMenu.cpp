@@ -15,8 +15,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#define MBILOG_ENABLE_DEBUG
-
 #include "QmitkRenderWindowMenu.h"
 
 #include "mitkResliceMethodProperty.h"

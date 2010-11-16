@@ -133,6 +133,8 @@ signals:
 public slots:
 
   void DeferredHideMenu( );
+  void DeferredShowMenu( );
+  void smoothHide( );
 
 protected slots:  
 
@@ -149,7 +151,6 @@ protected slots:
 
   void enterEvent( QEvent* /*e*/ );
   void leaveEvent( QEvent* /*e*/ );
-
   void OnTSNumChanged(int);
 
   void OnCrosshairRotationModeSelected(QAction*); 

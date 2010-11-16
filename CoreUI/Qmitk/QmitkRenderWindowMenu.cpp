@@ -15,6 +15,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
+#define MBILOG_ENABLE_DEBUG
 
 #include "QmitkRenderWindowMenu.h"
 
@@ -77,7 +78,8 @@ m_FullScreenMode(false)
   this->setMaximumWidth(61);
   this->setAutoFillBackground( true );
   
-  this->hide();
+  this->show();
+  this->setWindowOpacity(0.0);
   
   //this->setAttribute( Qt::WA_NoSystemBackground  );
   //this->setBackgroundRole( QPalette::Dark );
@@ -209,7 +211,7 @@ void QmitkRenderWindowMenu::CreateSettingsWidget()
   connect( m_Big3DLayoutAction, SIGNAL( triggered(bool) ), this, SLOT(OnChangeLayoutToBig3D(bool)) );
   connect( m_Widget1LayoutAction, SIGNAL( triggered(bool) ), this, SLOT(OnChangeLayoutToWidget1(bool)) );
   connect( m_Widget2LayoutAction, SIGNAL( triggered(bool) ), this, SLOT(OnChangeLayoutToWidget2(bool)) );
-  connect( m_Widget3LayoutAction, SIGNAL( triggered(bool) ), this, SLOT(OnChangeLayoutToWidget3(bool)) );
+  connect( m_Widget3LayoutAction  , SIGNAL( triggered(bool) ), this, SLOT(OnChangeLayoutToWidget3(bool)) );
   connect( m_RowWidget3And4LayoutAction, SIGNAL( triggered(bool) ), this, SLOT(OnChangeLayoutToRowWidget3And4(bool)) );
   connect( m_ColumnWidget3And4LayoutAction, SIGNAL( triggered(bool) ), this, SLOT(OnChangeLayoutToColumnWidget3And4(bool)) );
   connect( m_SmallUpperWidget2Big3and4LayoutAction, SIGNAL( triggered(bool) ), this, SLOT(OnChangeLayoutToSmallUpperWidget2Big3and4(bool)) );
@@ -233,38 +235,65 @@ void QmitkRenderWindowMenu::SetLayoutIndex( unsigned int layoutIndex )
 
 void QmitkRenderWindowMenu::HideMenu( )
 {
+  MITK_DEBUG << "menu hideEvent";
+  
   m_Hidden = true;
 
   if( ! m_Entered )
-    hide();
+    setWindowOpacity(0.0f);
+    //hide();
 
 }
 
 void QmitkRenderWindowMenu::ShowMenu( )
 {
+  MITK_DEBUG << "menu showMenu";
+  
   m_Hidden = false;
-  show();
+  setWindowOpacity(1.0f);
 }
 
 
 void QmitkRenderWindowMenu::enterEvent( QEvent * /*e*/ )
 {
+  MITK_DEBUG << "menu enterEvent";
+  
   m_Entered=true;
-  setWindowOpacity(1.0f);
+  
+  m_Hidden=false;
+  
+ // setWindowOpacity(1.0f);
 }
 
 void QmitkRenderWindowMenu::DeferredHideMenu( )
 {
+  MITK_DEBUG << "menu deferredhidemenu";
   if(m_Hidden)
-    hide();
+    setWindowOpacity(0.0f);
+  ///hide();
 }
 
 void QmitkRenderWindowMenu::leaveEvent( QEvent * /*e*/ )
 {
+  MITK_DEBUG << "menu leaveEvent";
+  
+  smoothHide();
+
+}
+
+/* This method is responsible for non fluttering of 
+ the renderWindowMenu when mouse cursor moves along the renderWindowMenu*/
+void QmitkRenderWindowMenu::smoothHide()
+{
+
+  MITK_DEBUG<< "menu leaveEvent";
+  
   m_Entered=false;
-
-  QTimer::singleShot(0,this,SLOT( DeferredHideMenu( ) ) );
-
+  
+  m_Hidden = true;
+  
+  QTimer::singleShot(10,this,SLOT( DeferredHideMenu( ) ) );
+  
 
 }
 
@@ -324,6 +353,9 @@ void QmitkRenderWindowMenu::OnFullScreenButton( bool  /*checked*/ )
     //change icon
     this->ChangeFullScreenIcon();
   }
+  
+  DeferredShowMenu( );
+
 }
 
 
@@ -346,6 +378,9 @@ void QmitkRenderWindowMenu::OnChangeLayoutTo2DImagesUp(bool)
 
   m_LayoutDesign = LAYOUT_2DIMAGEUP;
   emit SignalChangeLayoutDesign( LAYOUT_2DIMAGEUP );
+
+  DeferredShowMenu( );
+
 }
 void QmitkRenderWindowMenu::OnChangeLayoutTo2DImagesLeft(bool)
 {
@@ -355,6 +390,8 @@ void QmitkRenderWindowMenu::OnChangeLayoutTo2DImagesLeft(bool)
 
   m_LayoutDesign = LAYOUT_2DIMAGELEFT;
   emit SignalChangeLayoutDesign( LAYOUT_2DIMAGELEFT );
+  
+  DeferredShowMenu( );
 }
 void QmitkRenderWindowMenu::OnChangeLayoutToDefault(bool)
 {
@@ -364,16 +401,35 @@ void QmitkRenderWindowMenu::OnChangeLayoutToDefault(bool)
 
   m_LayoutDesign = LAYOUT_DEFAULT;
   emit SignalChangeLayoutDesign( LAYOUT_DEFAULT );
+  
+  DeferredShowMenu( );
+  
 }
+
+void QmitkRenderWindowMenu::DeferredShowMenu()
+{   
+  
+  MITK_DEBUG << "deferred show menu";
+  
+  show();
+  setWindowOpacity(1.0);
+}
+
 void QmitkRenderWindowMenu::OnChangeLayoutToBig3D(bool)
 { 
+  MITK_DEBUG << "OnChangeLayoutToBig3D";
+
   //set Full Screen Mode to false, if Layout Design was changed by the LayoutDesign_List
   m_FullScreenMode = false;
   this->ChangeFullScreenIcon();
 
   m_LayoutDesign = LAYOUT_BIG3D;
   emit SignalChangeLayoutDesign( LAYOUT_BIG3D );
+  
+  DeferredShowMenu( );
+
 }
+
 void QmitkRenderWindowMenu::OnChangeLayoutToWidget1(bool)
 {
   //set Full Screen Mode to false, if Layout Design was changed by the LayoutDesign_List
@@ -382,6 +438,8 @@ void QmitkRenderWindowMenu::OnChangeLayoutToWidget1(bool)
 
   m_LayoutDesign = LAYOUT_TRANSVERSAL;
   emit SignalChangeLayoutDesign( LAYOUT_TRANSVERSAL );
+
+  DeferredShowMenu( );
 }
 void QmitkRenderWindowMenu::OnChangeLayoutToWidget2(bool)
 {
@@ -391,6 +449,8 @@ void QmitkRenderWindowMenu::OnChangeLayoutToWidget2(bool)
 
   m_LayoutDesign = LAYOUT_SAGITTAL;
   emit SignalChangeLayoutDesign( LAYOUT_SAGITTAL );
+
+  DeferredShowMenu( );
 }
 void QmitkRenderWindowMenu::OnChangeLayoutToWidget3(bool)
 {
@@ -400,6 +460,8 @@ void QmitkRenderWindowMenu::OnChangeLayoutToWidget3(bool)
 
   m_LayoutDesign = LAYOUT_CORONAL;
   emit SignalChangeLayoutDesign( LAYOUT_CORONAL );
+
+  DeferredShowMenu( );
 }
 void QmitkRenderWindowMenu::OnChangeLayoutToRowWidget3And4(bool)
 {
@@ -409,6 +471,8 @@ void QmitkRenderWindowMenu::OnChangeLayoutToRowWidget3And4(bool)
 
   m_LayoutDesign = LAYOUT_ROWWIDGET3AND4;
   emit SignalChangeLayoutDesign( LAYOUT_ROWWIDGET3AND4 );
+
+  DeferredShowMenu( );
 }
 void QmitkRenderWindowMenu::OnChangeLayoutToColumnWidget3And4(bool)
 {
@@ -418,6 +482,8 @@ void QmitkRenderWindowMenu::OnChangeLayoutToColumnWidget3And4(bool)
 
   m_LayoutDesign = LAYOUT_COLUMNWIDGET3AND4;
   emit SignalChangeLayoutDesign( LAYOUT_COLUMNWIDGET3AND4 );
+
+  DeferredShowMenu( );
 }
 
 void QmitkRenderWindowMenu::OnChangeLayoutToSmallUpperWidget2Big3and4(bool)
@@ -428,6 +494,8 @@ void QmitkRenderWindowMenu::OnChangeLayoutToSmallUpperWidget2Big3and4(bool)
 
   m_LayoutDesign = LAYOUT_SMALLUPPERWIDGET2BIGAND4;
   emit SignalChangeLayoutDesign( LAYOUT_SMALLUPPERWIDGET2BIGAND4 );
+
+  DeferredShowMenu( );
 }
 void QmitkRenderWindowMenu::OnChangeLayoutTo2x2Dand3DWidget(bool)
 {
@@ -437,6 +505,8 @@ void QmitkRenderWindowMenu::OnChangeLayoutTo2x2Dand3DWidget(bool)
 
   m_LayoutDesign = LAYOUT_2X2DAND3DWIDGET;
   emit SignalChangeLayoutDesign( LAYOUT_2X2DAND3DWIDGET );
+
+  DeferredShowMenu( );
 }
 void QmitkRenderWindowMenu::OnChangeLayoutToLeft2Dand3DRight2D(bool)
 {
@@ -446,6 +516,8 @@ void QmitkRenderWindowMenu::OnChangeLayoutToLeft2Dand3DRight2D(bool)
 
   m_LayoutDesign = LAYOUT_LEFT2DAND3DRIGHT2D;
   emit SignalChangeLayoutDesign( LAYOUT_LEFT2DAND3DRIGHT2D );
+
+  DeferredShowMenu( );
 }
 
 void QmitkRenderWindowMenu::UpdateLayoutDesignList( int layoutDesignIndex )
@@ -656,7 +728,7 @@ void QmitkRenderWindowMenu::UpdateLayoutDesignList( int layoutDesignIndex )
 #ifdef QMITK_USE_EXTERNAL_RENDERWINDOW_MENU
 void QmitkRenderWindowMenu::MoveWidgetToCorrectPos(float opacity)
 #else
-void QmitkRenderWindowMenu::MoveWidgetToCorrectPos(float /*opacity*/)
+void QmitkRenderWindowMenu::MoveWidgetToCorrectPos(float opacity)
 #endif
 {
 #ifdef QMITK_USE_EXTERNAL_RENDERWINDOW_MENU

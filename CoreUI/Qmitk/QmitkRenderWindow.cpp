@@ -164,6 +164,8 @@ void QmitkRenderWindow::keyPressEvent(QKeyEvent *ke)
 
 void QmitkRenderWindow::enterEvent( QEvent *e )
 {
+MITK_DEBUG << "rw enter Event";
+
   QVTKWidget::enterEvent(e);
 }
 
@@ -178,12 +180,16 @@ void QmitkRenderWindow::DeferredHideMenu( )
 void QmitkRenderWindow::leaveEvent( QEvent *e )
 {
   MITK_DEBUG << "QmitkRenderWindow::leaveEvent";
+  
+m_MenuWidget->smoothHide();  
 
   //hide Menu Widget
   //if( m_MenuWidget->isVisible() && !m_MenuWidget->GetSettingsMenuVisibilty() && m_MenuWidgetActivated )
   //  m_MenuWidget->hide();
   
-  QTimer::singleShot(0,this,SLOT( DeferredHideMenu( ) ) );
+  //QTimer::singleShot(10,this,SLOT( DeferredHideMenu( ) ) );
+
+
 
   QVTKWidget::leaveEvent(e);
 }
@@ -217,6 +223,11 @@ void QmitkRenderWindow::showEvent( QShowEvent* event )
 
 void QmitkRenderWindow::AdjustRenderWindowMenuVisibility( const QPoint& pos )
 {
+
+  
+  MITK_DEBUG << "rw: adjustrender";
+  
+  
   if ( !m_MenuWidgetActivated )
     return;
 
@@ -237,29 +248,35 @@ void QmitkRenderWindow::AdjustRenderWindowMenuVisibility( const QPoint& pos )
   //Hide Menu Widget when mouse is outside of the define region of the the right corner
   */
   
-  int min = m_MenuWidget->height() + 20;
+  /*int min = m_MenuWidget->height() + 20;
   int max = m_MenuWidget->height() + 64;
 
   int y=pos.y();
   
+  float opacity;
+  
   if( y <= max )
   {
-    float opacity = 1.0f-(y-min)/float(max-min);
-    m_MenuWidget->ShowMenu();
-    m_MenuWidget->MoveWidgetToCorrectPos(opacity);
+    opacity = 1.0f-(y-min)/float(max-min);
   }
   else if( !m_MenuWidget->GetSettingsMenuVisibilty() )
   {
-    m_MenuWidget->hide();
+    opacity = 0;
   }    
+  */
+  m_MenuWidget->ShowMenu();
+ // m_MenuWidget->MoveWidgetToCorrectPos(opacity);
+  m_MenuWidget->MoveWidgetToCorrectPos(1.0f);
 }
 
 void QmitkRenderWindow::HideRenderWindowMenu( )
 {
+  MITK_DEBUG << "rw: hiderenderwindowmenu";
+  
   if ( !m_MenuWidgetActivated )
     return;
 
-  m_MenuWidget->hide();
+ // m_MenuWidget->hide();
 }
 
 

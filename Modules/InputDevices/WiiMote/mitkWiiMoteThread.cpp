@@ -57,7 +57,7 @@ void mitk::WiiMoteThread::OnStateChange(wiimote &remote, state_change_flags chan
  else if(changed & EXTENSION_CONNECTED)
       {
       // switch to a report mode that includes the extension data (we will
-      //  loose the IR dot sizes)
+      // loose the IR dot sizes)
       // note: there is no need to set report types for a Balance Board.
       if(!remote.IsBalanceBoard())
       {
@@ -410,7 +410,7 @@ void mitk::WiiMoteThread::MultiWiiMoteUpdate()
     }
     else
     {
-    
+     // calibration
     }
     m_WiiMoteThreadFinished->Unlock();
 

@@ -31,6 +31,9 @@ namespace mitk
   * This ids have the purpose of connecting the plugin.xml of each bundle to the 
   * appropriate classes. 
   *
+  * Additionally it includes names of tags, which are used in XML files <br>
+  * regarding any input device.
+  *
   * @ingroup org_mitk_core_ext
   */
   struct MITKCOREEXT_EXPORT CoreExtConstants
@@ -42,6 +45,9 @@ namespace mitk
     static const std::string INPUTDEVICE_XMLATTRIBUTE_DESCRIPTION;
     static const std::string INPUTDEVICE_XMLATTRIBUTE_NAME;
     static const std::string INPUTDEVICE_XMLATTRIBUTE_ID;
+    static const std::string WIIMOTE_SURFACEINTERACTION;
+    static const std::string WIIMOTE_HEADTRACKING;
+    static const std::string WIIMOTE_XMLATTRIBUTE_NAME;
   };
 }
 

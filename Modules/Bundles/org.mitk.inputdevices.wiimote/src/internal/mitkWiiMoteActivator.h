@@ -18,6 +18,10 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITK_WIIMOTEACTIVATOR_H_
 #define MITK_WIIMOTEACTIVATOR_H_
 
+#include <berryIPreferences.h>
+#include <berryIPreferencesService.h>
+#include <berryPlatform.h>
+
 #include "mitkIInputDevice.h"
 
 #include "mitkWiiMoteVtkCameraController.h"
@@ -48,6 +52,9 @@ namespace mitk
     bool m_IsRegistered;
 
     mitk::WiiMoteVtkCameraController::Pointer m_Controller;
+
+    berry::IPreferences::Pointer m_WiiMotePreferencesNode;
+     berry::IPreferencesService::Pointer m_PrefService;
 
   }; // end class WiiMoteActivator
 } // end namespace mitk

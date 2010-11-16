@@ -26,3 +26,6 @@ const std::string mitk::CoreExtConstants::INPUTDEVICE_XMLATTRIBUTE_CLASS = "clas
 const std::string mitk::CoreExtConstants::INPUTDEVICE_XMLATTRIBUTE_DESCRIPTION = "description";
 const std::string mitk::CoreExtConstants::INPUTDEVICE_XMLATTRIBUTE_NAME = "name";
 const std::string mitk::CoreExtConstants::INPUTDEVICE_XMLATTRIBUTE_ID = "id";
+const std::string mitk::CoreExtConstants::WIIMOTE_SURFACEINTERACTION = "Surface Interaction";
+const std::string mitk::CoreExtConstants::WIIMOTE_HEADTRACKING = "Headtracking";
+const std::string mitk::CoreExtConstants::WIIMOTE_XMLATTRIBUTE_NAME = "org.mitk.inputdevices.wiimote";

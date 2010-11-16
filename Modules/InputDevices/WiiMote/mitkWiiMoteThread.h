@@ -109,6 +109,7 @@ namespace mitk
     /**
     * Reads incoming data from the IR camera. Afterwards the raw x and y coordinates <br>
     * are stored in an event and fired as an event. 
+    *
     */
     void WiiMoteCalibrationInput();
 
@@ -131,6 +132,16 @@ namespace mitk
     */
     void MultiWiiMoteIRInput();
 
+    /**
+    * Sets the modus for the first connected Wiimote depending <br>
+    * on the given parameter.
+    * 
+    * @param activateModus 
+    *             true, the Surface Interaction modus will be activated
+    *             false, the Surface Interaction modus will be deactivated
+    */
+    void SetWiiMoteSurfaceIModus(bool activateModus);
+
   protected:
 
   private: 
@@ -152,8 +163,9 @@ namespace mitk
     double m_LastRecordTime;
     bool m_ReadDataOnce;
 
-    // calibration
+    // modes
     bool m_InCalibrationMode;
+    bool m_SurfaceInteraction;
 
     // compensate delay
     // release: Skip = 1

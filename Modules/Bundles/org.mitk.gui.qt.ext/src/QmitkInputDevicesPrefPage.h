@@ -21,7 +21,10 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "berryIQtPreferencePage.h"
 #include <berryIPreferences.h>
+
 #include <QHash>
+#include <QGroupBox>
+#include <QRadioButton>
 
 class QWidget;
 class QCheckBox;
@@ -72,6 +75,11 @@ protected:
   QWidget* m_MainControl;
  
   QHash<QCheckBox*,std::string> m_InputDevices;
+
+  // specific for Wiimote
+  QGroupBox* m_WiiMoteModes;
+  QRadioButton* m_WiiMoteHeadTracking;
+  QRadioButton* m_WiiMoteSurfaceInteraction;
 
   berry::IPreferences::Pointer m_InputDevicesPrefNode;
 

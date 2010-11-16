@@ -30,8 +30,9 @@ namespace mitk {
   * @noimplement This interface is not intended to be implemented by clients.
   * @ingroup Interaction
   */
-  struct MITK_CORE_EXPORT EventMapperAddOn : public itk::Object
+  class MITK_CORE_EXPORT EventMapperAddOn : public itk::Object
   {
+  public:
     /**
     *  Forwards an event fired by the driver of device to the <code>mitk::GlobalInteraction</code>
     *

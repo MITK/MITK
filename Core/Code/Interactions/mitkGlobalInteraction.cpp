@@ -141,9 +141,9 @@ bool mitk::GlobalInteraction::InteractorRegistered (mitk::Interactor* interactor
     return true;
 }
 
-bool mitk::GlobalInteraction::ListenerRegistered (mitk::Interactor* interactor)
+bool mitk::GlobalInteraction::ListenerRegistered (mitk::StateMachine* listener)
 {
-  if ( std::find(m_ListenerList.begin(), m_ListenerList.end(), interactor) == m_ListenerList.end() )
+  if ( std::find(m_ListenerList.begin(), m_ListenerList.end(), listener) == m_ListenerList.end() )
     return false;
   else
     return true;

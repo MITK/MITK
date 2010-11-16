@@ -107,7 +107,7 @@ namespace mitk {
 
     //##Documentation
     //## @brief returns true, if the given interactor is already added to the Listener-List
-    bool ListenerRegistered (Interactor* interactor);
+    bool ListenerRegistered (StateMachine* listener);
 
     //##Documentation
     //## @brief adds an element in the list in FocusManager

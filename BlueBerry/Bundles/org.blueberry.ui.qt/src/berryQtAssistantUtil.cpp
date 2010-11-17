@@ -210,7 +210,16 @@ bool QtAssistantUtil::RegisterQCHFiles(const QString& collectionFile,
 QString QtAssistantUtil::GetAssistantExecutable()
 {
   QFileInfo assistantFile(QT_ASSISTANT_EXECUTABLE);
-  return assistantFile.fileName();
+  QFileInfo localAssistant(QCoreApplication::applicationDirPath() + "/" + assistantFile.fileName() );
+  
+  if (localAssistant.isExecutable())
+  {  
+    return localAssistant.absoluteFilePath();
+  } 
+  else
+  {
+    return assistantFile.absoluteFilePath();
+  }
 }
 
 void QtAssistantUtil::SetDefaultHelpUrl(const QString& defaultUrl)

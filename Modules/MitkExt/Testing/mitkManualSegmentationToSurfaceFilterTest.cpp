@@ -44,8 +44,6 @@ int mitkManualSegmentationToSurfaceFilterTest(int argc, char* argv[])
   std::string fileOut = "BallBinary30x30x30.stl";
 
   
-  fileIn = itksys::SystemTools::ConvertToOutputPath(fileIn.c_str());
-  fileOut = itksys::SystemTools::ConvertToOutputPath(fileOut.c_str());
   std::cout<<"Eingabe Datei: "<<fileIn<<std::endl;
   std::cout<<"Ausgabe Datei: "<<fileOut<<std::endl;
   mitk::Image::Pointer image = NULL;

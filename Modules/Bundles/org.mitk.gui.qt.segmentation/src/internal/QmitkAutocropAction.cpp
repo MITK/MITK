@@ -2,7 +2,7 @@
 
 #include "mitkAutoCropImageFilter.h"
 #include "mitkImageCast.h"
-
+#include "mitkRenderingManager.h"
 #include "mitkProgressBar.h"
 
 #include <itkConstantPadImageFilter.h>
@@ -48,6 +48,11 @@ void QmitkAutocropAction::Run( const std::vector<mitk::DataNode*>& selectedNodes
         if (image.IsNotNull())
         {
           node->SetData( this->IncreaseCroppedImageSize(image) ); // bug fix 3145
+          // Reinit node
+          mitk::RenderingManager::GetInstance()->InitializeViews(
+            node->GetData()->GetTimeSlicedGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
+          mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+
         }
       }
       catch(...)

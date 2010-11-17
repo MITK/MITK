@@ -28,6 +28,7 @@
 #include <QProgressDialog>
 #include <QMessageBox>
 #include <QDir>
+#include <QCoreApplication>
 
 namespace berry
 {

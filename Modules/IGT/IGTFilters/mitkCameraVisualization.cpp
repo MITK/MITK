@@ -51,8 +51,8 @@ void mitk::CameraVisualization::GenerateData()
     itkExceptionMacro(<< "Renderer was not properly set");
 
   /* update outputs with tracking data from tools */
-  unsigned int numberOfOutputs = this->GetNumberOfOutputs();
-  for (unsigned int i = 0; i < numberOfOutputs ; ++i)
+  unsigned int numberOfInputs = this->GetNumberOfInputs();
+  for (unsigned int i = 0; i < numberOfInputs ; ++i)
   {
     mitk::NavigationData* output = this->GetOutput(i);
     assert(output);

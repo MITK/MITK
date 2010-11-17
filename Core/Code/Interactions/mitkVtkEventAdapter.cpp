@@ -72,39 +72,42 @@ mitk::VtkEventAdapter::AdaptMouseEvent(mitk::BaseRenderer* sender, unsigned long
     case vtkCommand::LeftButtonReleaseEvent:
       type   = 3; 
       button = mitk::BS_LeftButton;
+      state = tmpstate;
 
       buttonStateMap[sender] = (tmpstate - button);
       break;
     case vtkCommand::MiddleButtonReleaseEvent:
       type   = 3;
       button = mitk::BS_MidButton;
-      
+      state = tmpstate;
+
       buttonStateMap[sender] = (tmpstate - button);
       break;
     case vtkCommand::RightButtonReleaseEvent:
       type   = 3;
       button = mitk::BS_RightButton;
+      state = tmpstate;
 
       buttonStateMap[sender] = (tmpstate - button);
       break;
     case vtkCommand::LeftButtonPressEvent:
       type   = 2;
       button = mitk::BS_LeftButton;
-      
+
       tmpstate |= button;
       buttonStateMap[sender] = tmpstate;
       break;
     case vtkCommand::MiddleButtonPressEvent:
       type   = 2;
       button = mitk::BS_MidButton;
-      
+
       tmpstate |= button;
       buttonStateMap[sender] = tmpstate;
       break;
     case vtkCommand::RightButtonPressEvent:
       type   = 2;
       button = mitk::BS_RightButton;
-      
+
       tmpstate |= button;
       buttonStateMap[sender] = tmpstate;
       break;

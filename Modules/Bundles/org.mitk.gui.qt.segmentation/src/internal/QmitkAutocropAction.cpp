@@ -120,6 +120,11 @@ void QmitkAutocropAction::SetSmoothed(bool smoothed)
  //not needed
 }
 
+void QmitkAutocropAction::SetDecimated(bool decimated)
+{
+  //not needed
+}
+
 void QmitkAutocropAction::SetDataStorage(mitk::DataStorage* dataStorage)
 {
   //not needed

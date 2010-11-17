@@ -20,8 +20,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <QTableView>
 #include <QLabel>
-#include <mitkStepper.h>
-#include <mitkPointSetInteractor.h>
 #include <mitkDataStorage.h>
 #include "QmitkExtExports.h"
 
@@ -62,7 +60,7 @@ public:
 
   std::vector<mitk::DataNode*> GetPointSetNodes();
 
-  bool UpdateSelection(mitk::DataNode* selectedNode);
+  void UpdateSelection(mitk::DataNode* selectedNode);
 
   // return true if a point from one of the displayed point lists is selected
   bool IsPointSelected();
@@ -123,10 +121,7 @@ protected:
   bool  m_swapPointSets;
   bool  m_addPointsMode;
 
-  QmitkStdMultiWidget*    m_MultiWidget;
   QLabel*                m_TimeStepFaderLabel;
-  mitk::Stepper::Pointer m_TimeStepper;
-  mitk::PointSetInteractor::Pointer   m_Interactor;
   mitk::DataStorage::Pointer m_DataStorage;
 };
 #endif

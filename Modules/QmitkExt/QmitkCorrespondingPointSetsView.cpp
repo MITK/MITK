@@ -33,8 +33,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QMetaObject.h>
 #include <QMetaProperty>
 #include <mitkStepper.h>
-#include <mitkPointSetInteractor.h>
-#include <mitkGlobalInteraction.h>
 #include <QTableWidget>
 
 QmitkCorrespondingPointSetsView::QmitkCorrespondingPointSetsView( QWidget* parent )
@@ -43,10 +41,7 @@ QmitkCorrespondingPointSetsView::QmitkCorrespondingPointSetsView( QWidget* paren
   m_SelfCall( false ),
   m_swapPointSets(false),
   m_addPointsMode(false),
-  m_MultiWidget( NULL ),
-  m_DataStorage( NULL ),
-  m_Interactor(NULL),
-  m_TimeStepper( NULL )
+  m_DataStorage( NULL )
 {
   m_CorrespondingPointSetsModel->setProperty("QTPropShowCoordinates", true);
   m_CorrespondingPointSetsModel->setProperty("QTPropShowIds", true);
@@ -99,13 +94,11 @@ void QmitkCorrespondingPointSetsView::SetPointSetNodes( std::vector<mitk::DataNo
 }
 void QmitkCorrespondingPointSetsView::SetMultiWidget( QmitkStdMultiWidget* multiWidget )
 {
-  m_MultiWidget = multiWidget;
-  m_TimeStepper = m_MultiWidget->GetTimeNavigationController()->GetTime();
-  this->m_CorrespondingPointSetsModel->SetStepper(m_TimeStepper);
+  this->m_CorrespondingPointSetsModel->SetMultiWidget(multiWidget);
 }
 QmitkStdMultiWidget* QmitkCorrespondingPointSetsView::GetMultiWidget() const
 {
-  return m_MultiWidget;
+  return this->m_CorrespondingPointSetsModel->GetMultiWidget();
 }
 void QmitkCorrespondingPointSetsView::SetDataStorage(mitk::DataStorage::Pointer dataStorage)
 {
@@ -114,14 +107,10 @@ void QmitkCorrespondingPointSetsView::SetDataStorage(mitk::DataStorage::Pointer 
 
 void QmitkCorrespondingPointSetsView::OnPointSelectionChanged(const QItemSelection& selected, const QItemSelection&  /*deselected*/)
 {
-  if (m_SelfCall)
+  if(m_SelfCall)
     return;
 
-  //mitk::PointSet* pointSet = const_cast<mitk::PointSet*>( m_CorrespondingPointSetsModel->GetPointSet() );
   std::vector<mitk::DataNode*> pointSetNodes = this->GetPointSetNodes();
-
-  // (take care that this widget doesn't react to self-induced changes by setting m_SelfCall)
-  m_SelfCall = true;
 
   QModelIndexList selectedIndexes = selected.indexes();
   m_CorrespondingPointSetsModel->SetSelectedPointSetIndex(-1);
@@ -144,6 +133,7 @@ void QmitkCorrespondingPointSetsView::OnPointSelectionChanged(const QItemSelecti
     {
       pointSet = dynamic_cast<mitk::PointSet*>(pointSetNode->GetData());
 
+      if( pointSet->GetPointSet(m_CorrespondingPointSetsModel->GetTimeStep()))
       for (mitk::PointSet::PointsContainer::Iterator it = pointSet->GetPointSet(m_CorrespondingPointSetsModel->GetTimeStep())->GetPoints()->Begin();
         it != pointSet->GetPointSet(m_CorrespondingPointSetsModel->GetTimeStep())->GetPoints()->End(); ++it)
         {
@@ -155,9 +145,9 @@ void QmitkCorrespondingPointSetsView::OnPointSelectionChanged(const QItemSelecti
               pointSet->SetSelectInfo(it->Index(), true, m_CorrespondingPointSetsModel->GetTimeStep());
               
               m_CorrespondingPointSetsModel->SetSelectedPointSetIndex(index.column());
-              if ( m_MultiWidget != NULL)
+              if ( this->GetMultiWidget() != NULL)
               {
-                m_MultiWidget->MoveCrossToPosition(pointSet->GetPoint(it->Index(), m_CorrespondingPointSetsModel->GetTimeStep()));
+                this->GetMultiWidget()->MoveCrossToPosition(pointSet->GetPoint(it->Index(), m_CorrespondingPointSetsModel->GetTimeStep()));
               }
             }
             else
@@ -168,11 +158,10 @@ void QmitkCorrespondingPointSetsView::OnPointSelectionChanged(const QItemSelecti
         }
     }
   }
-  
-  m_SelfCall = false;
-
   emit(SignalPointSelectionChanged());
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  this->UpdateSelectionHighlighting();
+  m_SelfCall = false;
 }
 
 
@@ -198,22 +187,22 @@ void QmitkCorrespondingPointSetsView::keyPressEvent( QKeyEvent * e )
 
 void QmitkCorrespondingPointSetsView::wheelEvent(QWheelEvent *event)
 {
-  if (!m_TimeStepper)
+  if (!this->m_CorrespondingPointSetsModel->GetStepper())
     return;
 
   int whe = event->delta();
-  int pos = m_TimeStepper->GetPos();
+  int pos = this->m_CorrespondingPointSetsModel->GetStepper()->GetPos();
 
   int currentTS =  this->m_CorrespondingPointSetsModel->GetTimeStep();
   if(whe > 0)
   {
     this->m_CorrespondingPointSetsModel->SetTimeStep(++currentTS);
-    m_TimeStepper->SetPos(++pos);
+    this->m_CorrespondingPointSetsModel->GetStepper()->SetPos(++pos);
   }
   else if( pos > 0 )
   {
     this->m_CorrespondingPointSetsModel->SetTimeStep(--currentTS);
-    m_TimeStepper->SetPos(--pos);
+    this->m_CorrespondingPointSetsModel->GetStepper()->SetPos(--pos);
   }
   fadeTimeStepIn();
   emit SignalPointSelectionChanged();
@@ -221,7 +210,7 @@ void QmitkCorrespondingPointSetsView::wheelEvent(QWheelEvent *event)
 
 void QmitkCorrespondingPointSetsView::fadeTimeStepIn()
 {
-  if (!m_TimeStepper)
+  if (!this->m_CorrespondingPointSetsModel->GetStepper())
     return;
 
   QWidget *m_TimeStepFader = new QWidget(this);
@@ -238,7 +227,7 @@ void QmitkCorrespondingPointSetsView::fadeTimeStepIn()
   m_TimeStepFaderLabel->setAlignment(Qt::AlignCenter);
   m_TimeStepFaderLabel->setFrameStyle(QFrame::StyledPanel | QFrame::Raised);
   m_TimeStepFaderLabel->setLineWidth(2);
-  m_TimeStepFaderLabel->setText(QString("%1").arg(this->m_TimeStepper->GetPos()));
+  m_TimeStepFaderLabel->setText(QString("%1").arg(this->m_CorrespondingPointSetsModel->GetStepper()->GetPos()));
 
   //give the widget opacity and some colour
   QPalette pal = m_TimeStepFaderLabel->palette();
@@ -453,43 +442,15 @@ void QmitkCorrespondingPointSetsView::AddPointsMode(bool checked)
   }
   else
   {
-    if (m_Interactor){
-      mitk::GlobalInteraction::GetInstance()->RemoveInteractor( m_Interactor );
-      m_Interactor = NULL;
-    }
+    this->m_CorrespondingPointSetsModel->RemoveInteractor();
   }
 
   m_addPointsMode = selected;
   emit SignalAddPointsModeChanged(selected);
 }
-bool QmitkCorrespondingPointSetsView::UpdateSelection(mitk::DataNode* selectedNode)
+void QmitkCorrespondingPointSetsView::UpdateSelection(mitk::DataNode* selectedNode)
 {
-  if (m_Interactor){
-    mitk::GlobalInteraction::GetInstance()->RemoveInteractor( m_Interactor );
-    m_Interactor = NULL;
-  }
-
-  if ( selectedNode )
-  {
-    bool visible = false;
-    selectedNode->GetPropertyValue<bool>("visible", visible);
-
-    if (visible){
-      if (this->m_addPointsMode)
-      {
-        // set new interactor
-        m_Interactor = dynamic_cast<mitk::PointSetInteractor*>(selectedNode->GetInteractor());
-
-        if (m_Interactor.IsNull())//if not present, instanciate one
-          m_Interactor = mitk::PointSetInteractor::New("pointsetinteractor", selectedNode);
-        
-        //add it to global interaction to activate it
-        mitk::GlobalInteraction::GetInstance()->AddInteractor( m_Interactor );
-      }
-      return true;
-    }
-  }
-  return false;
+  this->m_CorrespondingPointSetsModel->UpdateSelection(selectedNode);
 }
 void QmitkCorrespondingPointSetsView::AddPointSet()
 {
@@ -534,11 +495,14 @@ QmitkCorrespondingPointSetsModel* QmitkCorrespondingPointSetsView::GetModel()
 }
 void QmitkCorrespondingPointSetsView::UpdateSelectionHighlighting()
 {
+  this->m_SelfCall = true;
   QModelIndex index;
-  this->m_CorrespondingPointSetsModel->GetModelIndexForSelectedPoint(index);
-  QItemSelectionModel* selectionModel = QTableView::selectionModel(); 
-  QItemSelection selection;
-  selection.select(index, index);
-  selectionModel->select(selection, QItemSelectionModel::ClearAndSelect);
-  this->setSelectionModel(selectionModel);
+  bool modelIndexOkay = this->m_CorrespondingPointSetsModel->GetModelIndexForSelectedPoint(index);
+  if(!modelIndexOkay){
+    this->m_SelfCall = false;
+    return;
+  }
+  QTableView::selectionModel()->select( index , QItemSelectionModel::ClearAndSelect );
+  this->setFocus();
+  this->m_SelfCall = false;
 }

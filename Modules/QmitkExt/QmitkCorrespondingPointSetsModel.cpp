@@ -20,18 +20,23 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkInteractionConst.h"
 #include "mitkPointOperation.h"
 #include "mitkRenderingManager.h"
-#include <mitkPointSetInteractor.h>
 #include <mitkEvent.h>
 #include <mitkStateEvent.h>
 #include <mitkInteractionConst.h>
 #include <mitkStepper.h>
 #include <QStringListModel>
+#include <mitkPointSetInteractor.h>
+#include <mitkGlobalInteraction.h>
 
 QmitkCorrespondingPointSetsModel::QmitkCorrespondingPointSetsModel( int t, QObject* parent )
 :QAbstractTableModel(parent),
 m_PointSetNode(NULL),
 m_ReferencePointSetNode(NULL),
 m_TimeStepper(NULL),
+m_Interactor(NULL),
+m_MultiWidget( NULL ),
+m_PointSetModifiedObserverTag(0),
+m_ReferencePointSetModifiedObserverTag(0),
 m_SelectedPointSetIndex(-1)
 {
   ;
@@ -75,9 +80,61 @@ QmitkCorrespondingPointSetsModel::~QmitkCorrespondingPointSetsModel()
 {
   ;
 }
+void QmitkCorrespondingPointSetsModel::RemoveObservers(){
+  if (m_PointSetNode)
+  {
+    mitk::PointSet::Pointer oldPointSet = dynamic_cast<mitk::PointSet*>(m_PointSetNode->GetData());
+    if (oldPointSet.IsNotNull())
+    {
+      oldPointSet->RemoveObserver(m_PointSetModifiedObserverTag);
+    }
+  }
+  if (m_ReferencePointSetNode)
+  {
+    mitk::PointSet::Pointer oldPointSet = dynamic_cast<mitk::PointSet*>(m_ReferencePointSetNode->GetData());
+    if (oldPointSet.IsNotNull())
+    {
+      oldPointSet->RemoveObserver(m_ReferencePointSetModifiedObserverTag);
+    }
+  }
+}
+void QmitkCorrespondingPointSetsModel::AddObservers()
+{
 
+  mitk::PointSet::Pointer pointSet = this->CheckForPointSetInNode(m_PointSetNode);
+  if ( pointSet.IsNotNull())
+  {
+    // add new observer for modified if necessary
+    itk::ReceptorMemberCommand<QmitkCorrespondingPointSetsModel>::Pointer modCommand = itk::ReceptorMemberCommand<QmitkCorrespondingPointSetsModel>::New();
+    modCommand->SetCallbackFunction( this, &QmitkCorrespondingPointSetsModel::OnPointSetChanged );
+    m_PointSetModifiedObserverTag = pointSet->AddObserver( itk::ModifiedEvent(), modCommand );
+  }
+  else
+  {
+    m_PointSetModifiedObserverTag = 0;
+  }
+ 
+  pointSet = this->CheckForPointSetInNode(m_ReferencePointSetNode);
+  if ( pointSet.IsNotNull())
+  {
+    // add new observer for modified if necessary
+    itk::ReceptorMemberCommand<QmitkCorrespondingPointSetsModel>::Pointer modCommand = itk::ReceptorMemberCommand<QmitkCorrespondingPointSetsModel>::New();
+    modCommand->SetCallbackFunction( this, &QmitkCorrespondingPointSetsModel::OnPointSetChanged );
+    m_ReferencePointSetModifiedObserverTag = pointSet->AddObserver( itk::ModifiedEvent(), modCommand );
+  }
+  else
+  {
+    m_ReferencePointSetModifiedObserverTag = 0;
+  }  
+}
+void QmitkCorrespondingPointSetsModel::OnPointSetChanged( const itk::EventObject &  /*e*/ )
+{
+  QAbstractTableModel::reset();
+  //emit SignalPointSetChanged();*/
+}
 void QmitkCorrespondingPointSetsModel::SetPointSetNodes( std::vector<mitk::DataNode*> nodes )
 {
+  this->RemoveObservers();
   if ( nodes.size() > 1 ) {
     m_PointSetNode = nodes.front();
     m_ReferencePointSetNode = nodes.back();
@@ -92,6 +149,7 @@ void QmitkCorrespondingPointSetsModel::SetPointSetNodes( std::vector<mitk::DataN
     m_PointSetNode = NULL;
     m_ReferencePointSetNode = NULL;
   }
+  this->AddObservers();
   QAbstractTableModel::reset();
 }
 
@@ -231,7 +289,7 @@ bool QmitkCorrespondingPointSetsModel::GetPointForModelIndex( const QModelIndex 
   else if ( index.column() == 1 )
     pointSet = this->CheckForPointSetInNode(m_ReferencePointSetNode);
 
-  if (pointSet.IsNull())
+  if (pointSet.IsNull() || !pointSet->GetPointSet(m_TimeStepper->GetPos()))
     return false;
 
   if ((index.row() < 0) || (index.row() >= (int)pointSet->GetPointSet(m_TimeStepper->GetPos())->GetPoints()->Size()))
@@ -270,7 +328,7 @@ bool QmitkCorrespondingPointSetsModel::GetPointForModelIndex( int row, int colum
   else if ( column == 1 )
     pointSet = this->CheckForPointSetInNode(m_ReferencePointSetNode);
 
-  if (pointSet.IsNull())
+  if (pointSet.IsNull() || !pointSet->GetPointSet(m_TimeStepper->GetPos()))
     return false;
 
   if ((row < 0) || (row >= (int)pointSet->GetPointSet(m_TimeStepper->GetPos())->GetPoints()->Size()))
@@ -309,7 +367,7 @@ bool QmitkCorrespondingPointSetsModel::GetModelIndexForPointID(mitk::PointSet::P
   else if (column == 1)
     pointSet = this->CheckForPointSetInNode(m_ReferencePointSetNode);
 
-  if (!pointSet.IsNull())
+  if (!pointSet.IsNull() || !pointSet->GetPointSet(m_TimeStepper->GetPos()))
   {
     mitk::PointSet::PointsContainer::Pointer points = pointSet->GetPointSet(m_TimeStepper->GetPos())->GetPoints();
 
@@ -406,6 +464,7 @@ void QmitkCorrespondingPointSetsModel::MoveSelectedPointDown()
   mitk::ScalarType tsInMS = pointSet->GetTimeSlicedGeometry()->TimeStepToMS(m_TimeStepper->GetPos());
   mitk::PointOperation* doOp = new mitk::PointOperation(mitk::OpMOVEPOINTDOWN, tsInMS, pointSet->GetPoint(selectedID, m_TimeStepper->GetPos()), selectedID, true);
   pointSet->ExecuteOperation(doOp);
+
   QAbstractTableModel::reset();
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   emit SignalPointSetChanged();
@@ -437,15 +496,32 @@ void QmitkCorrespondingPointSetsModel::RemoveSelectedPoint()
 
   mitk::DataNode* dataNode = NULL; 
 
-  if (this->m_SelectedPointSetIndex == 0)
+  if (this->m_SelectedPointSetIndex == 0){
     dataNode = this->m_PointSetNode;
-  else if (this->m_SelectedPointSetIndex == 1)
+  }
+  else if (this->m_SelectedPointSetIndex == 1){
     dataNode = this->m_ReferencePointSetNode;
-
+  }
   if (dataNode == NULL)
     return;
 
-  mitk::PointSet::Pointer pointSet = this->CheckForPointSetInNode(dataNode);
+
+  this->RemoveInteractor();
+  m_Interactor = dynamic_cast<mitk::PointSetInteractor*>(dataNode->GetInteractor());
+  if (m_Interactor.IsNull())//if not present, instanciate one
+    m_Interactor = mitk::PointSetInteractor::New("pointsetinteractor", dataNode);
+  
+  //add it to global interaction to activate it
+  mitk::GlobalInteraction::GetInstance()->AddInteractor( m_Interactor );
+
+  //send a DEL event to pointsetinteractor
+  const mitk::Event* delEvent = new mitk::Event(this->m_MultiWidget->GetRenderWindow1()->GetRenderer(), mitk::Type_KeyPress, mitk::BS_NoButton, mitk::BS_NoButton, mitk::Key_Delete);
+  mitk::StateEvent* delStateEvent = new mitk::StateEvent(mitk::EIDDELETE, delEvent);
+  m_Interactor->HandleEvent(delStateEvent);
+  delete delEvent;
+  delete delStateEvent;
+
+  /*mitk::PointSet::Pointer pointSet = this->CheckForPointSetInNode(dataNode);
   if (pointSet.IsNull())
     return;
 
@@ -455,7 +531,8 @@ void QmitkCorrespondingPointSetsModel::RemoveSelectedPoint()
     return;
   mitk::ScalarType tsInMS = pointSet->GetTimeSlicedGeometry()->TimeStepToMS(m_TimeStepper->GetPos());
   mitk::PointOperation* doOp = new mitk::PointOperation(mitk::OpREMOVE, tsInMS, pointSet->GetPoint(selectedID, m_TimeStepper->GetPos()), selectedID, true);
-  pointSet->ExecuteOperation(doOp);
+  pointSet->ExecuteOperation(doOp);*/
+
   QAbstractTableModel::reset();
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   emit SignalPointSetChanged();
@@ -619,4 +696,39 @@ void QmitkCorrespondingPointSetsModel::SetStepper(mitk::Stepper::Pointer stepper
 int QmitkCorrespondingPointSetsModel::GetSelectedPointSetIndex()
 {
   return this->m_SelectedPointSetIndex;
+}
+void QmitkCorrespondingPointSetsModel::UpdateSelection(mitk::DataNode* selectedNode)
+{
+  if (m_Interactor){
+    mitk::GlobalInteraction::GetInstance()->RemoveInteractor( m_Interactor );
+    m_Interactor = NULL;
+  }
+
+  if ( selectedNode )
+  {
+    // set new interactor
+    m_Interactor = dynamic_cast<mitk::PointSetInteractor*>(selectedNode->GetInteractor());
+
+    if (m_Interactor.IsNull())//if not present, instanciate one
+      m_Interactor = mitk::PointSetInteractor::New("pointsetinteractor", selectedNode);
+    
+    //add it to global interaction to activate it
+    mitk::GlobalInteraction::GetInstance()->AddInteractor( m_Interactor );
+  }
+}
+void QmitkCorrespondingPointSetsModel::RemoveInteractor()
+{
+  if (m_Interactor){
+    mitk::GlobalInteraction::GetInstance()->RemoveInteractor( m_Interactor );
+    m_Interactor = NULL;
+  }
+}
+QmitkStdMultiWidget* QmitkCorrespondingPointSetsModel::GetMultiWidget()
+{
+  return this->m_MultiWidget;
+}
+void QmitkCorrespondingPointSetsModel::SetMultiWidget( QmitkStdMultiWidget* multiWidget )
+{
+  this->m_MultiWidget = multiWidget;
+  this->m_TimeStepper = m_MultiWidget->GetTimeNavigationController()->GetTime();
 }

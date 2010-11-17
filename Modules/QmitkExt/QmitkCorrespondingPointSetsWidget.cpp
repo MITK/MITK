@@ -1,7 +1,5 @@
 #include "QmitkCorrespondingPointSetsWidget.h"
 #include <mitkGlobalInteraction.h>
-//#include <mitkPointSetReader.h>
-//#include <mitkPointSetWriter.h>
 
 #include <QHBoxLayout>
 #include <QStatusBar>
@@ -11,8 +9,11 @@ QmitkCorrespondingPointSetsWidget::QmitkCorrespondingPointSetsWidget(QWidget *pa
   QWidget(parent), 
   m_CorrespondingPointSetsView(NULL)
 {
+  // create new QTableView
   m_CorrespondingPointSetsView = new QmitkCorrespondingPointSetsView();
+  // setup user interface
   SetupUi();
+  // setup connections
   connect( this->m_CorrespondingPointSetsView, SIGNAL(SignalPointSelectionChanged()), this, SLOT(OnPointSelectionChanged()) );
   connect( this->m_CorrespondingPointSetsView, SIGNAL(SignalAddPointsModeChanged(bool)), this, SLOT(OnAddPointsModeChanged(bool)) );
 }
@@ -120,7 +121,17 @@ void QmitkCorrespondingPointSetsWidget::SetDataStorage(mitk::DataStorage::Pointe
 }
 void QmitkCorrespondingPointSetsWidget::UpdateSelection(mitk::DataNode* selectedNode)
 {
-  m_AddPointsBtn->setEnabled(m_CorrespondingPointSetsView->UpdateSelection(selectedNode));
+  m_AddPointsBtn->setEnabled(false);
+  if (!selectedNode || !(dynamic_cast<mitk::PointSet*>(selectedNode->GetData())))
+    return;
+
+  bool visible = false;
+  selectedNode->GetPropertyValue<bool>("visible", visible);
+
+  if (visible){
+    m_AddPointsBtn->setEnabled(true);
+    m_CorrespondingPointSetsView->UpdateSelection(selectedNode);
+  }
 }
 bool QmitkCorrespondingPointSetsWidget::QTPropButtonBarEnabled() const
 {

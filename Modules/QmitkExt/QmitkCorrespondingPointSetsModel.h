@@ -25,6 +25,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkDataNode.h"
 #include "mitkPointSet.h"
+#include <mitkPointSetInteractor.h>
+#include "QmitkStdMultiWidget.h"
 
 class QmitkExt_EXPORT QmitkCorrespondingPointSetsModel : public QAbstractTableModel
 {
@@ -38,6 +40,10 @@ public:
   ~QmitkCorrespondingPointSetsModel();
 
   Qt::ItemFlags flags(const QModelIndex& index) const;
+
+  void UpdateSelection(mitk::DataNode* selectedNode);
+
+  void RemoveInteractor();
   
   // returns PointIdentifier of selected point (-1 if no point is selected)
   mitk::PointSet::PointIdentifier SearchSelectedPoint();
@@ -129,6 +135,12 @@ public:
 
   bool GetModelIndexForSelectedPoint(QModelIndex& index) const;
 
+  void SetMultiWidget( QmitkStdMultiWidget* multiWidget ); ///< assign a QmitkStdMultiWidget for updating render window crosshair
+
+  QmitkStdMultiWidget* GetMultiWidget();  ///< return the QmitkStdMultiWidget that is used for updating render window crosshair
+
+  void OnPointSetChanged( const itk::EventObject &  e );
+
 private:
 
 
@@ -151,7 +163,13 @@ protected:
   mitk::DataNode::Pointer m_ReferencePointSetNode;
   mitk::Stepper::Pointer m_TimeStepper;
   int m_SelectedPointSetIndex;
+  mitk::PointSetInteractor::Pointer   m_Interactor;
+  QmitkStdMultiWidget*    m_MultiWidget;
+  unsigned long m_PointSetModifiedObserverTag;
+  unsigned long m_ReferencePointSetModifiedObserverTag;
 
   void MoveSelectedPoint(mitk::PointSet::PointIdentifier targetID);
+  void RemoveObservers();
+  void AddObservers();
 };
 #endif

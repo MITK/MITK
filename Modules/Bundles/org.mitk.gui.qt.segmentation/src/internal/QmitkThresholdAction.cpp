@@ -40,7 +40,7 @@ void QmitkThresholdAction::Run(const std::vector<mitk::DataNode*> &selectedNodes
       layout->addWidget(gui);
       m_ThresholdingDialog->setLayout(layout);
       layout->activate();
-      m_ThresholdingDialog->setFixedSize(300,50);
+      m_ThresholdingDialog->setFixedSize(300,80);
       m_ThresholdingDialog->open();
     }
   }

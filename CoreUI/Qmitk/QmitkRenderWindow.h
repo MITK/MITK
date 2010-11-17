@@ -70,9 +70,8 @@ public:
   void HideRenderWindowMenu( );
 
   //Activate or Deactivate MenuWidget. 
-  void ActivateMenuWidget( bool state )
-  {  m_MenuWidgetActivated = state; }
-
+  void ActivateMenuWidget( bool state );
+  
   bool GetActivateMenuWidgetFlag()
   {  return m_MenuWidgetActivated; }
 
@@ -143,6 +142,8 @@ private:
   QmitkRenderWindowMenu*         m_MenuWidget;
 
   bool                           m_MenuWidgetActivated;
+  
+  unsigned int                   m_LayoutIndex;
   
 };
 

@@ -34,20 +34,14 @@ QmitkRenderWindow::QmitkRenderWindow(QWidget *parent, QString name, mitk::VtkPro
 , m_ResendQtEvents(true)
 , m_MenuWidget(NULL)
 , m_MenuWidgetActivated(false)
+, m_LayoutIndex(0)
 {
   Initialize( renderingManager, name.toStdString().c_str() ); // Initialize mitkRenderWindowBase
  
   setFocusPolicy(Qt::StrongFocus);
   setMouseTracking(true);
 
-  //create render window MenuBar for split, close Window or set new setting.
-  m_MenuWidget = new QmitkRenderWindowMenu(this,0,m_Renderer);
-
-  //create Signal/Slot Connection
-  connect( m_MenuWidget, SIGNAL( SignalChangeLayoutDesign(int) ), this, SLOT(OnChangeLayoutDesign(int)) );
-  connect( m_MenuWidget, SIGNAL( ResetView() ), this, SIGNAL( ResetView()) );
-  connect( m_MenuWidget, SIGNAL( ChangeCrosshairRotationMode(int) ), this, SIGNAL( ChangeCrosshairRotationMode(int)) );
-}
+ }
 
 QmitkRenderWindow::~QmitkRenderWindow()
 {
@@ -62,6 +56,7 @@ void QmitkRenderWindow::SetResendQtEvents(bool resend)
 
 void QmitkRenderWindow::SetLayoutIndex( unsigned int layoutIndex )
 {
+  m_LayoutIndex = layoutIndex;
   if( m_MenuWidget )
     m_MenuWidget->SetLayoutIndex(layoutIndex);
 }
@@ -181,15 +176,8 @@ void QmitkRenderWindow::leaveEvent( QEvent *e )
 {
   MITK_DEBUG << "QmitkRenderWindow::leaveEvent";
   
-m_MenuWidget->smoothHide();  
-
-  //hide Menu Widget
-  //if( m_MenuWidget->isVisible() && !m_MenuWidget->GetSettingsMenuVisibilty() && m_MenuWidgetActivated )
-  //  m_MenuWidget->hide();
-  
-  //QTimer::singleShot(10,this,SLOT( DeferredHideMenu( ) ) );
-
-
+  if( m_MenuWidget )
+    m_MenuWidget->smoothHide();  
 
   QVTKWidget::leaveEvent(e);
 }
@@ -220,69 +208,50 @@ void QmitkRenderWindow::showEvent( QShowEvent* event )
   QTimer::singleShot(0, this ,SIGNAL( Moved() ) );
 }
 
+void QmitkRenderWindow::ActivateMenuWidget( bool state )
+{  
+  m_MenuWidgetActivated = state; 
+  
+  if(!m_MenuWidgetActivated && m_MenuWidget)
+  {
+    //disconnect Signal/Slot Connection
+    disconnect( m_MenuWidget, SIGNAL( SignalChangeLayoutDesign(int) ), this, SLOT(OnChangeLayoutDesign(int)) );
+    disconnect( m_MenuWidget, SIGNAL( ResetView() ), this, SIGNAL( ResetView()) );
+    disconnect( m_MenuWidget, SIGNAL( ChangeCrosshairRotationMode(int) ), this, SIGNAL( ChangeCrosshairRotationMode(int)) );    
+    
+    delete m_MenuWidget;
+    m_MenuWidget = 0;
+  }
+  else if(m_MenuWidgetActivated && !m_MenuWidget )
+  {
+    //create render window MenuBar for split, close Window or set new setting.
+    m_MenuWidget = new QmitkRenderWindowMenu(this,0,m_Renderer);
+    m_MenuWidget->SetLayoutIndex( m_LayoutIndex );
+    
+    //create Signal/Slot Connection
+    connect( m_MenuWidget, SIGNAL( SignalChangeLayoutDesign(int) ), this, SLOT(OnChangeLayoutDesign(int)) );
+    connect( m_MenuWidget, SIGNAL( ResetView() ), this, SIGNAL( ResetView()) );
+    connect( m_MenuWidget, SIGNAL( ChangeCrosshairRotationMode(int) ), this, SIGNAL( ChangeCrosshairRotationMode(int)) );    
+  }
+}
 
 void QmitkRenderWindow::AdjustRenderWindowMenuVisibility( const QPoint& pos )
 {
-
-  
-  MITK_DEBUG << "rw: adjustrender";
-  
-  
-  if ( !m_MenuWidgetActivated )
-    return;
-
-/*  if( m_MenuWidget->GetLayoutIndex() <= QmitkRenderWindowMenu::CORONAL 
-    && pos.x() >= 0
-    && pos.y() <= m_MenuWidget->height() + 20 )
+  if( m_MenuWidget )
   {
     m_MenuWidget->ShowMenu();
-    m_MenuWidget->MoveWidgetToCorrectPos();
+    m_MenuWidget->MoveWidgetToCorrectPos(1.0f);
   }
-  else if( m_MenuWidget->GetLayoutIndex() == QmitkRenderWindowMenu::THREE_D  
-    && pos.x() >= this->width() - m_MenuWidget->width() - 20 
-    && pos.y() <= m_MenuWidget->height() + 20 )
-  {
-    m_MenuWidget->MoveWidgetToCorrectPos();
-    m_MenuWidget->ShowMenu();
-  }
-  //Hide Menu Widget when mouse is outside of the define region of the the right corner
-  */
-  
-  /*int min = m_MenuWidget->height() + 20;
-  int max = m_MenuWidget->height() + 64;
-
-  int y=pos.y();
-  
-  float opacity;
-  
-  if( y <= max )
-  {
-    opacity = 1.0f-(y-min)/float(max-min);
-  }
-  else if( !m_MenuWidget->GetSettingsMenuVisibilty() )
-  {
-    opacity = 0;
-  }    
-  */
-  m_MenuWidget->ShowMenu();
- // m_MenuWidget->MoveWidgetToCorrectPos(opacity);
-  m_MenuWidget->MoveWidgetToCorrectPos(1.0f);
 }
 
 void QmitkRenderWindow::HideRenderWindowMenu( )
 {
-  MITK_DEBUG << "rw: hiderenderwindowmenu";
-  
-  if ( !m_MenuWidgetActivated )
-    return;
-
- // m_MenuWidget->hide();
+  // DEPRECATED METHOD
 }
 
 
 void QmitkRenderWindow::OnChangeLayoutDesign( int layoutDesignIndex )
 {
-  
   emit SignalLayoutDesignChanged( layoutDesignIndex );
 }
 

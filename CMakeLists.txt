@@ -5,7 +5,16 @@ if(COMMAND cmake_policy)
   cmake_policy(SET CMP0003 OLD)
 endif(COMMAND cmake_policy)
 
-SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/CMake)
+OPTION(MITK_INSTALL_RPATH_RELATIVE "Use relative rpath entries when installing" OFF)
+MARK_AS_ADVANCED(MITK_INSTALL_RPATH_RELATIVE)
+
+IF(MITK_INSTALL_RPATH_RELATIVE)
+  SET(CMAKE_INSTALL_RPATH ".")
+ELSE()
+  SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/bin")
+ENDIF()
+
+SET(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/CMake ${CMAKE_MODULE_PATH} )
 SET(MITK_MODULES_CONF_DIR ${MITK_BINARY_DIR}/modulesConf CACHE INTERNAL "Modules Conf")
 
 # Clear the cache variables containing plugin base directories
@@ -61,6 +70,21 @@ ADD_SUBDIRECTORY(Utilities)
 
 OPTION(MITK_USE_BLUEBERRY "Build the BlueBerry platform" ON)
 IF(MITK_USE_BLUEBERRY)
+
+  SET(BLUEBERRY_INSTALL_RPATH_RELATIVE ${MITK_INSTALL_RPATH_RELATIVE}
+      CACHE BOOL "Use relative rpath entries when installing" FORCE)
+
+  # on Mac OSX all BlueBerry plugins get copied into every
+  # application bundle (.app directory) specified here
+  IF(APPLE)
+    IF(MITK_BUILD_org.mitk.gui.qt.extapplication)
+      SET(MACOSX_BUNDLE_NAMES ${MACOSX_BUNDLE_NAMES} ExtApp)
+    ENDIF()
+    IF(MITK_BUILD_org.mitk.gui.qt.application)
+      SET(MACOSX_BUNDLE_NAMES ${MACOSX_BUNDLE_NAMES} CoreApp)
+    ENDIF()
+  ENDIF(APPLE)
+
   SET(mbilog_DIR "${mbilog_BINARY_DIR}")
   ADD_SUBDIRECTORY(BlueBerry)
   SET(BlueBerry_DIR ${CMAKE_CURRENT_BINARY_DIR}/BlueBerry CACHE PATH "The directory containing a CMake configuration file for BlueBerry" FORCE)
@@ -195,17 +219,9 @@ CONFIGURE_FILE(${KITNAME}Config.cmake.in ${PROJECT_BINARY_DIR}/${KITNAME}Config.
 
 ADD_SUBDIRECTORY(Applications)
 
-# CPACK OPTIONS
-
-FIND_PROGRAM(NSIS_MAKENSIS NAMES makensis
-  PATHS [HKEY_LOCAL_MACHINE\\SOFTWARE\\NSIS]
-  DOC "Where is makensis.exe located"
-  )
-IF(NOT NSIS_MAKENSIS)
-  SET(CPACK_GENERATOR ZIP)
-ELSE(WIN32)
-  SET(CPACK_GENERATOR "NSIS;ZIP")
-ENDIF(NOT NSIS_MAKENSIS)
+###### CPACK OPTIONS ######
+IF(CMAKE_BINARY_DIR STREQUAL MITK_BINARY_DIR)
+INCLUDE(MITKSetupCPack)
 
 SET(MITK_CPACK_PACKAGE_EXECUTABLES "ExtApp;MITK - Ext Application\"\"CoreApp;MITK - Core Application" CACHE INTERNAL "Collecting windows shortcuts to executables")
 
@@ -213,39 +229,30 @@ CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/MITKCPackOptions.cmake.in ${PROJECT_BINARY_
 
 SET(CPACK_PROJECT_CONFIG_FILE "${PROJECT_BINARY_DIR}/MITKCPackOptions.cmake")
 
-SET(CPACK_PACKAGE_NAME "MITK")
-SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "MITK is a medical image processing tool")
-SET(CPACK_PACKAGE_VENDOR "German Cancer Research Center (DKFZ)")
-SET(CPACK_PACKAGE_DESCRIPTION_FILE "${PROJECT_SOURCE_DIR}/MITKCopyright.txt")
-SET(CPACK_RESOURCE_FILE_LICENSE "${PROJECT_SOURCE_DIR}/MITKCopyright.txt")
-SET(CPACK_PACKAGE_VERSION_MAJOR "${MITK_VERSION_MAJOR}")
-SET(CPACK_PACKAGE_VERSION_MINOR "${MITK_VERSION_MINOR}")
-# append revision number if available
-IF(SVN_INFO_WC_REVISION)
-  SET(CPACK_PACKAGE_VERSION_PATCH "${MITK_VERSION_PATCH}_r${SVN_INFO_WC_REVISION}")
-ELSE(SVN_INFO_WC_REVISION)
-  SET(CPACK_PACKAGE_VERSION_PATCH "${MITK_VERSION_PATCH}")
-ENDIF(SVN_INFO_WC_REVISION)
+# include CPack model once all variables are set
+INCLUDE(CPack)
+ENDIF()
+
 ############################# INSTALL TARGETS ########################## 
-INSTALL(FILES ${PROJECT_SOURCE_DIR}/mitk.ico DESTINATION bin)
-INSTALL(FILES ${PROJECT_SOURCE_DIR}/mitk.bmp DESTINATION bin)
-
-# directory has to be created to make sure the installer does not report
-# an error if doxygen was not invoked before.
-IF (MITK_HELPPAGES_OUTPUT_DIR)
-  FILE(MAKE_DIRECTORY ${MITK_HELPPAGES_OUTPUT_DIR}/html)
-  INSTALL(DIRECTORY ${MITK_HELPPAGES_OUTPUT_DIR}/html DESTINATION doc)
-ENDIF (MITK_HELPPAGES_OUTPUT_DIR)
-
-#OPENCV DLLs may be added elsewhere to install target
+MITK_INSTALL(FILES ${PROJECT_SOURCE_DIR}/mitk.ico )
+MITK_INSTALL(FILES ${PROJECT_SOURCE_DIR}/mitk.bmp )
 
 #STATEMACHINE XML
-INSTALL(FILES ${PROJECT_SOURCE_DIR}/Core/Code/Interactions/StateMachine.xml DESTINATION bin)
-INSTALL(FILES ${PROJECT_SOURCE_DIR}/Config/mitkLevelWindowPresets.xml DESTINATION bin)
-INSTALL(FILES ${PROJECT_SOURCE_DIR}/Config/mitkRigidRegistrationPresets.xml DESTINATION bin)
-INSTALL(FILES ${PROJECT_SOURCE_DIR}/Config/mitkRigidRegistrationTestPresets.xml DESTINATION bin)
+MITK_INSTALL(FILES ${PROJECT_SOURCE_DIR}/Core/Code/Interactions/StateMachine.xml )
+MITK_INSTALL(FILES ${PROJECT_SOURCE_DIR}/Config/mitkLevelWindowPresets.xml )
+MITK_INSTALL(FILES ${PROJECT_SOURCE_DIR}/Config/mitkRigidRegistrationPresets.xml )
+MITK_INSTALL(FILES ${PROJECT_SOURCE_DIR}/Config/mitkRigidRegistrationTestPresets.xml )
 
 IF(WIN32)
+SET(MITK_INSTALLED_VERSION_LIB bin)
+SET(MITK_INSTALLED_VERSION_ARCHIVES bin)
+SET(MITK_INSTALLED_VERSION_BIN bin)
+ELSE()
+SET(MITK_INSTALLED_VERSION_LIB lib/mitk)
+SET(MITK_INSTALLED_VERSION_ARCHIVES lib/mitk/static)
+SET(MITK_INSTALLED_VERSION_BIN bin)
+ENDIF() 
+
   #QT
   IF(MITK_USE_QT)
     SET(QT_USE_QTSVG 1)
@@ -262,90 +269,17 @@ IF(WIN32)
     SET(QT_USE_QTXMLPATTERNS 1)
 ENDIF()
 
-      INCLUDE(${QT_USE_FILE})
-      
-      SET(qtdebugdlls)
-      SET(qtreleasedlls)
-      FOREACH(qtlib ${QT_LIBRARIES})
-        GET_FILENAME_COMPONENT(qtdllname ${qtlib} NAME_WE)
-        # strip the leading "lib" from the filename for MINGW installs
-        IF(MINGW)
-          STRING(REPLACE "lib" "" qtdllname ${qtdllname})
-        ENDIF()
-        STRING(REGEX MATCH ".*d4" debugmatch ${qtdllname})
-        IF(debugmatch)
-          LIST(APPEND qtdebugdlls "${QT_INCLUDE_DIR}/../bin/${qtdllname}.dll")
-        ELSE()
-          STRING(REGEX MATCH ".*4" releasematch ${qtdllname})
-          IF(releasematch)
-            LIST(APPEND qtreleasedlls "${QT_INCLUDE_DIR}/../bin/${qtdllname}.dll")
-          ENDIF()
-        ENDIF()
-      ENDFOREACH(qtlib)
-    INSTALL(FILES ${qtdebugdlls} DESTINATION bin CONFIGURATIONS Debug)
+    FIND_PACKAGE(Qt4)
+    INCLUDE(${QT_USE_FILE})
 
-    INSTALL(FILES ${qtreleasedlls} DESTINATION bin CONFIGURATIONS Release)
-    
-    INSTALL(FILES "${QT_INCLUDE_DIR}/../bin/assistant.exe" DESTINATION bin)
-    
-    IF(QT_PLUGINS_DIR)
-      # install sqllite plugin
-      IF(EXISTS ${QT_PLUGINS_DIR}/sqldrivers/qsqlite4.dll)
-        INSTALL(FILES ${QT_PLUGINS_DIR}/sqldrivers/qsqlite4.dll DESTINATION bin/sqldrivers CONFIGURATIONS Release)
-        INSTALL(FILES ${QT_PLUGINS_DIR}/sqldrivers/qsqlited4.dll DESTINATION bin/sqldrivers CONFIGURATIONS Debug)
-      ENDIF()
-      # install imageformat plugins
-      SET(_img_formats qgif qico qjpeg qsvg qtiff)
-      FOREACH(_img_format ${_img_formats})
-        IF(EXISTS ${QT_PLUGINS_DIR}/imageformats/${_img_format}4.dll)
-          INSTALL(FILES ${QT_PLUGINS_DIR}/imageformats/${_img_format}4.dll DESTINATION bin/imageformats CONFIGURATIONS Release)
-          INSTALL(FILES ${QT_PLUGINS_DIR}/imageformats/${_img_format}d4.dll DESTINATION bin/imageformats CONFIGURATIONS Debug)
-      ENDIF()
-      ENDFOREACH()
-    ENDIF()
-    
+    # TODO: use fixup_bundle(...)	
+    MITK_INSTALL_HELPER_APP(EXECUTABLES "${QT_ASSISTANT_EXECUTABLE}" )
     
   ENDIF(MITK_USE_QT)
- 
-  IF(MITK_USE_OPEN_CV)
-  #INCLUDE(MITK_OpenCV_Config)
-    FILE(GLOB opencvdebuglllist "${OpenCV_DIR}/bin/Debug/*.dll")
-    FILE(GLOB opencvreleasedlllist "${OpenCV_DIR}/bin/Release/*.dll")
-  
-    INSTALL(FILES ${opencvdebuglllist} DESTINATION bin CONFIGURATIONS Debug)
-    INSTALL(FILES ${opencvreleasedlllist} DESTINATION bin CONFIGURATIONS Release)
-  ENDIF(MITK_USE_OPEN_CV)
+
+IF(WIN32)
  
  
-  #VTK DLLs install target
-  IF(MINGW)
-    FILE(GLOB vtkreleasedlllist ${VTK_RUNTIME_LIBRARY_DIRS}/*.dll)
-    FILE(GLOB vtkdebugdlllist ${VTK_RUNTIME_LIBRARY_DIRS}/*.dll)
-  
-  # VTKs freetype library is buggy when used with gcc, need freetype > 2.3.9
-  IF(VTK_FREETYPE_LIBRARIES)
-    INSTALL(FILES ${VTK_FREETYPE_LIBRARIES} DESTINATION bin)
-  ENDIF()
-  ELSE()
-    FILE(GLOB vtkreleasedlllist ${VTK_RUNTIME_LIBRARY_DIRS}/release/*.dll)
-    FILE(GLOB vtkdebugdlllist ${VTK_RUNTIME_LIBRARY_DIRS}/debug/*.dll)
-  ENDIF()
-  
-  INSTALL(FILES ${vtkdebugdlllist} DESTINATION bin CONFIGURATIONS Debug)
-  INSTALL(FILES ${vtkreleasedlllist} DESTINATION bin CONFIGURATIONS Release) 
-  
-  #ITK DLLs install target
-  IF(MINGW)
-    FILE(GLOB itkdebugdlllist ${ITK_LIBRARY_DIRS}/*.dll)
-    FILE(GLOB itkreleasedlllist ${ITK_LIBRARY_DIRS}/*.dll)
-  ELSE()
-    FILE(GLOB itkdebugdlllist ${ITK_LIBRARY_DIRS}/debug/*.dll)
-    FILE(GLOB itkreleasedlllist ${ITK_LIBRARY_DIRS}/release/*.dll)
-  ENDIF()
-  
-  INSTALL(FILES ${itkdebugdlllist} DESTINATION bin CONFIGURATIONS Debug)
-  INSTALL(FILES ${itkreleasedlllist} DESTINATION bin CONFIGURATIONS Release)
-  
   #DCMTK Dlls install target (shared libs on gcc only)
   IF(MINGW AND DCMTK_ofstd_LIBRARY)
     SET(_dcmtk_libs
@@ -355,18 +289,20 @@ ENDIF()
     ${DCMTK_ofstd_LIBRARY}
     )
   FOREACH(_dcmtk_lib ${_dcmtk_libs})
-    INSTALL(FILES ${_dcmtk_lib} DESTINATION bin)
+    MITK_INSTALL(FILES ${_dcmtk_lib} )
   ENDFOREACH()
   ENDIF()
   
   #BlueBerry
   IF(MITK_USE_BLUEBERRY)
     IF(MINGW)
-      INSTALL(FILES ${BLUEBERRY_PLUGINS_OUTPUT_DIR}/org.blueberry.osgi/bin/liborg_blueberry_osgid.dll DESTINATION bin CONFIGURATIONS Debug)
-      INSTALL(FILES ${BLUEBERRY_PLUGINS_OUTPUT_DIR}/org.blueberry.osgi/bin/liborg_blueberry_osgi.dll DESTINATION bin CONFIGURATIONS Release)
+      MITK_INSTALL(FILES ${BLUEBERRY_PLUGINS_OUTPUT_DIR}/org.blueberry.osgi/bin/liborg_blueberry_osgid.dll  CONFIGURATIONS Debug)
+      MITK_INSTALL(FILES ${BLUEBERRY_PLUGINS_OUTPUT_DIR}/org.blueberry.osgi/bin/liborg_blueberry_osgi.dll  CONFIGURATIONS Release)
     ELSE()
-      INSTALL(FILES ${BLUEBERRY_PLUGINS_OUTPUT_DIR}/org.blueberry.osgi/bin/debug/liborg_blueberry_osgid.dll DESTINATION bin CONFIGURATIONS Debug)
-      INSTALL(FILES ${BLUEBERRY_PLUGINS_OUTPUT_DIR}/org.blueberry.osgi/bin/release/liborg_blueberry_osgi.dll DESTINATION bin CONFIGURATIONS Release)
+      IF(NOT APPLE)
+        MITK_INSTALL(FILES ${BLUEBERRY_PLUGINS_OUTPUT_DIR}/org.blueberry.osgi/bin/debug/liborg_blueberry_osgid.dll  CONFIGURATIONS Debug)
+        MITK_INSTALL(FILES ${BLUEBERRY_PLUGINS_OUTPUT_DIR}/org.blueberry.osgi/bin/release/liborg_blueberry_osgi.dll  CONFIGURATIONS Release)
+      ENDIF(NOT APPLE)
     ENDIF()
   ENDIF()
   
@@ -374,27 +310,36 @@ ENDIF()
   IF(MINGW)
     FIND_LIBRARY(MINGW_RUNTIME_DLL "mingwm10.dll" HINTS ${CMAKE_FIND_ROOT_PATH}/sys-root/mingw/bin)
   IF (MINGW_RUNTIME_DLL)
-      INSTALL(FILES ${MINGW_RUNTIME_DLL} DESTINATION bin)
+      MITK_INSTALL(FILES ${MINGW_RUNTIME_DLL} )
     ELSE()
       MESSAGE(SEND_ERROR "Could not find mingwm10.dll which is needed for a proper install")
     ENDIF()
   
   FIND_LIBRARY(MINGW_GCC_RUNTIME_DLL "libgcc_s_dw2-1.dll" HINTS ${CMAKE_FIND_ROOT_PATH}/sys-root/mingw/bin)
   IF (MINGW_GCC_RUNTIME_DLL)
-      INSTALL(FILES ${MINGW_GCC_RUNTIME_DLL} DESTINATION bin)
+      MITK_INSTALL(FILES ${MINGW_GCC_RUNTIME_DLL} )
     ELSE()
       MESSAGE(SEND_ERROR "Could not find libgcc_s_dw2-1.dll which is needed for a proper install")
     ENDIF()
   ENDIF()
 
+ELSE(WIN32)
+
+  #DCMTK Dlls install target (shared libs on gcc only)
+  IF(DCMTK_ofstd_LIBRARY)
+    SET(_dcmtk_libs
+        ${DCMTK_dcmdata_LIBRARY}
+        ${DCMTK_dcmimgle_LIBRARY}
+        ${DCMTK_dcmnet_LIBRARY}
+        ${DCMTK_ofstd_LIBRARY}
+    )
+    FOREACH(_dcmtk_lib ${_dcmtk_libs})
+#      MITK_INSTALL(FILES ${_dcmtk_lib} DESTINATION lib)
+    ENDFOREACH()
+  ENDIF()
  
 ENDIF(WIN32)
-   
-
-# include required mfc libraries
-INCLUDE(InstallRequiredSystemLibraries)
-# include CPack model once all variables are set
-INCLUDE(CPack)
+ 
 
 
 # suppress a couple of warnings

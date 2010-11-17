@@ -111,6 +111,7 @@ void QmitkFunctionalityCoordinator::PartClosed( berry::IWorkbenchPartReference::
         m_StandaloneFuntionality = 0;
 
       m_Functionalities.erase(_QmitkFunctionality.GetPointer()); // remove as opened functionality
+
       // call PartClosed on the QmitkFunctionality
       _QmitkFunctionality->ClosePartProxy();
       //m_VisibleStandaloneFunctionalities.erase(_QmitkFunctionality.GetPointer()); // remove if necessary (should be done before in PartHidden()
@@ -126,14 +127,13 @@ void QmitkFunctionalityCoordinator::PartHidden( berry::IWorkbenchPartReference::
   {
     _QmitkFunctionality->SetVisible(false);
     _QmitkFunctionality->Hidden();
-    // try to deactivate on hide (if is activated)
-    this->DeactivateStandaloneFunctionality(_QmitkFunctionality.GetPointer());
 
     // tracking of Visible Standalone Functionalities
     m_VisibleStandaloneFunctionalities.erase(_QmitkFunctionality.GetPointer());
-    // activate Functionality if just one Standalone Functionality is visible (old one gets deactivated)
-    if(m_VisibleStandaloneFunctionalities.size() == 1)
-      this->ActivateStandaloneFunctionality(_QmitkFunctionality.GetPointer());
+
+    // activate Functionality if just one Standalone Functionality is visible
+    if( m_VisibleStandaloneFunctionalities.size() == 1 )
+      this->ActivateStandaloneFunctionality( *m_VisibleStandaloneFunctionalities.begin() );
   }
 }
 
@@ -147,16 +147,20 @@ void QmitkFunctionalityCoordinator::PartVisible( berry::IWorkbenchPartReference:
     _QmitkFunctionality->Visible();
 
     // tracking of Visible Standalone Functionalities
-    m_VisibleStandaloneFunctionalities.insert(_QmitkFunctionality.GetPointer());
-    // activate Functionality if just one Standalone Functionality is visible
-    if(m_VisibleStandaloneFunctionalities.size() == 1)
-      this->ActivateStandaloneFunctionality(_QmitkFunctionality.GetPointer());
+    if( _QmitkFunctionality->IsExclusiveFunctionality() )
+    {
+      m_VisibleStandaloneFunctionalities.insert(_QmitkFunctionality.GetPointer());
+
+      // activate Functionality if just one Standalone Functionality is visible
+      if( m_VisibleStandaloneFunctionalities.size() == 1 )
+        this->ActivateStandaloneFunctionality( *m_VisibleStandaloneFunctionalities.begin() );
+    }
   }
 }
 
 void QmitkFunctionalityCoordinator::ActivateStandaloneFunctionality( QmitkFunctionality* functionality ) 
 {
-  if(functionality && !functionality->IsActivated() && functionality->IsExclusiveFunctionality())
+  if( functionality && !functionality->IsActivated() && functionality->IsExclusiveFunctionality() )
   {
     // deactivate old one if necessary
     this->DeactivateStandaloneFunctionality(m_StandaloneFuntionality);

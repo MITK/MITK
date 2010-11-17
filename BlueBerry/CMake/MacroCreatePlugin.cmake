@@ -166,12 +166,24 @@ MACRO(MACRO_CREATE_PLUGIN)
   
   #------------------------------------------------------------#
   #------------------ Installer support -----------------------#
+  SET(install_directories "")
+  IF(NOT MACOSX_BUNDLE_NAMES)
+    SET(install_directories bin)
+  ELSE(NOT MACOSX_BUNDLE_NAMES)
+    FOREACH(bundle_name ${MACOSX_BUNDLE_NAMES})
+      LIST(APPEND install_directories ${bundle_name}.app/Contents/MacOS)
+    ENDFOREACH(bundle_name)
+  ENDIF(NOT MACOSX_BUNDLE_NAMES)
+
+FOREACH(install_subdir ${install_directories})
   
   FILE(RELATIVE_PATH _toplevel_dir "${PLUGINS_SOURCE_BASE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}")
   STRING(REGEX REPLACE ".*/(.+)/?$" "\\1" _toplevel_output_dir ${PLUGINS_OUTPUT_BASE_DIR})
   MACRO_INSTALL_PLUGIN("${PLUGINS_OUTPUT_BASE_DIR}/${_toplevel_dir}" 
                        TARGETS ${PLUGIN_TARGET}
-             DESTINATION "bin/${_toplevel_output_dir}")
+             DESTINATION "${install_subdir}/${_toplevel_output_dir}")
+
+ENDFOREACH()
 
 ENDMACRO(MACRO_CREATE_PLUGIN)
 

@@ -8,12 +8,18 @@ INCLUDE_DIRECTORIES(
 )
 LINK_DIRECTORIES(${Poco_LIBRARY_DIRS})
   
-ADD_EXECUTABLE(CoreApp CoreApp.cpp)
+ADD_EXECUTABLE(CoreApp MACOSX_BUNDLE WIN32 CoreApp.cpp)
+IF (WIN32)
+  FIND_PACKAGE(Qt4)
+  TARGET_LINK_LIBRARIES(CoreApp ${QT_QTCORE_LIBRARY} ${QT_QTMAIN_LIBRARY})
+ENDIF(WIN32)
 
 TARGET_LINK_LIBRARIES(CoreApp 
                       optimized PocoFoundation      debug PocoFoundationd 
                       optimized PocoUtil            debug PocoUtild 
                       optimized org_blueberry_osgi debug org_blueberry_osgi${BLUEBERRY_DEBUG_POSTFIX})
+
+SET_TARGET_PROPERTIES(CoreApp PROPERTIES INSTALL_RPATH "${CMAKE_INSTALL_RPATH};${CMAKE_INSTALL_RPATH}/BlueBerry/org.blueberry.osgi/bin")
 
 SET(_plugin_deps 
   ${BLUEBERRY_ENABLED_PLUGINS} 
@@ -40,5 +46,8 @@ IF(WIN32)
                ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/startCoreApp_${COREAPP_BUILD_TYPE}.bat @ONLY)
 ENDIF(WIN32)
 
-MITK_INSTALL_TARGETS(CoreApp)
+MITK_INSTALL_TARGETS(EXECUTABLES CoreApp GLOB_PLUGINS )
 
+IF(UNIX AND MITK_INSTALL_RPATH_RELATIVE AND NOT APPLE)
+  INSTALL(PROGRAMS "${MITK_SOURCE_DIR}/CMake/RunInstalledApp.sh" DESTINATION "." RENAME CoreApp.sh)
+ENDIF()

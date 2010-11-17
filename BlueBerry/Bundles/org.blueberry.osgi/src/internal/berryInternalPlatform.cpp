@@ -25,6 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <Poco/Util/PropertyFileConfiguration.h>
 #include <Poco/StringTokenizer.h>
 #include <Poco/Util/HelpFormatter.h>
+#include <Poco/Util/OptionException.h>
 
 #include <iostream>
 
@@ -80,7 +81,14 @@ void InternalPlatform::Initialize(int& argc, char** argv, Poco::Util::AbstractCo
   m_Argc = &argc;
   m_Argv = argv;
 
-  this->init(argc, argv);
+  try
+  {
+    this->init(argc, argv);
+  }
+  catch (const Poco::Util::UnknownOptionException& e)
+  { 
+    BERRY_WARN << e.displayText();
+  } 
   this->loadConfiguration();
   if (config)
   {

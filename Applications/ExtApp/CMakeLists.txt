@@ -13,7 +13,11 @@ INCLUDE_DIRECTORIES(
 )
 LINK_DIRECTORIES(${Poco_LIBRARY_DIRS})
   
-ADD_EXECUTABLE(ExtApp ExtApp.cpp)
+ADD_EXECUTABLE(ExtApp MACOSX_BUNDLE WIN32 ExtApp.cpp)
+IF (WIN32)
+  FIND_PACKAGE(Qt4)
+  TARGET_LINK_LIBRARIES(ExtApp ${QT_QTCORE_LIBRARY} ${QT_QTMAIN_LIBRARY})
+ENDIF(WIN32)
 
 TARGET_LINK_LIBRARIES(ExtApp 
                       optimized PocoFoundation      debug PocoFoundationd 
@@ -21,6 +25,7 @@ TARGET_LINK_LIBRARIES(ExtApp
                       optimized org_blueberry_osgi debug org_blueberry_osgi${BLUEBERRY_DEBUG_POSTFIX}
                       ${ALL_LIBRARIES})
 
+SET_TARGET_PROPERTIES(ExtApp PROPERTIES INSTALL_RPATH "${CMAKE_INSTALL_RPATH};${CMAKE_INSTALL_RPATH}/BlueBerry/org.blueberry.osgi/bin")
 					  
 SET(EXTAPP_REQUIRED_BUNDLES
 org.mitk.gui.qt.datamanager
@@ -39,6 +44,7 @@ SET(_plugin_deps ${BLUEBERRY_ENABLED_PLUGINS} ${MITK_CORE_ENABLED_PLUGINS} ${MIT
 IF(_plugin_deps)
   # Make sure all enabled plug-ins are up to date
   ADD_DEPENDENCIES(ExtApp ${_plugin_deps})
+  # TARGET_LINK_LIBRARIES(ExtApp ${_plugin_deps})
 ENDIF()
 
 SET(BLUEBERRY_PLUGIN_CACHE_DIR "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/plugin_cache")
@@ -55,6 +61,8 @@ IF(WIN32)
                ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/startExtApp_${EXTAPP_BUILD_TYPE}.bat @ONLY)
 ENDIF(WIN32)
 
-MITK_INSTALL_TARGETS(ExtApp)
+MITK_INSTALL_TARGETS(EXECUTABLES ExtApp GLOB_PLUGINS )
 
-
+IF(UNIX AND MITK_INSTALL_RPATH_RELATIVE AND NOT APPLE)
+  INSTALL(PROGRAMS "${MITK_SOURCE_DIR}/CMake/RunInstalledApp.sh" DESTINATION "." RENAME ExtApp.sh)
+ENDIF()

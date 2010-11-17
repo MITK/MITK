@@ -40,7 +40,7 @@ PURPOSE.  See the above copyright notices for more information.
  *
  * \sa QmitkFunctionality
  */
-class QmitkControlVisualizationPropertiesView : public QObject, public QmitkFunctionality, public berry::ISizeProvider
+class QmitkControlVisualizationPropertiesView : public QObject, public QmitkFunctionality//, public berry::ISizeProvider
 {
 
   friend struct CvpSelListener;

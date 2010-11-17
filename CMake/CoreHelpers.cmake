@@ -303,11 +303,11 @@ MACRO(MITK_CREATE_MODULE MODULE_NAME_IN)
 
 
       # install only if shared lib (for now)
-      IF(NOT MODULE_FORCE_STATIC OR MINGW)
+      IF(NOT _STATIC OR MINGW)
         IF(NOT MODULE_HEADERS_ONLY)
-          MITK_INSTALL_TARGETS(${MODULE_PROVIDES})
+         # # deprecated: MITK_INSTALL_TARGETS(${MODULE_PROVIDES})
         ENDIF()
-      ENDIF(NOT MODULE_FORCE_STATIC OR MINGW)
+      ENDIF(NOT _STATIC OR MINGW)
     ENDIF(NOT MODULE_QT_MODULE OR MITK_USE_QT)
   ENDIF(MODULE_IS_ENABLED)
 ENDIF(_MISSING_DEP)
@@ -394,23 +394,344 @@ MACRO(MITK_CHECK_MODULE RESULT_VAR)
 ENDMACRO(MITK_CHECK_MODULE)
 
 #
+# MITK specific install macro
+#
+# On Mac everything is installed for each bundle listed in MACOSX_BUNDLE_NAMES
+# by replacing the DESTINATION parameter. Everything else is passed to the CMake INSTALL command
+#
+# Usage: MITK_INSTALL( )
+#
+MACRO(MITK_INSTALL)
+
+SET(ARGS ${ARGN})
+ 
+  SET(install_directories "")
+  LIST(FIND ARGS DESTINATION _destination_index)
+    # SET(_install_DESTINATION "")
+  IF(_destination_index GREATER -1)
+    MESSAGE(SEND_ERROR "MITK_INSTALL macro must not be called with a DESTINATION parameter.")  
+### This code was a try to replace a given DESTINATION
+#      MATH(EXPR _destination_index ${_destination_index} + 1)
+#      LIST(GET ARGS ${_destination_index} _install_DESTINATION)
+#      STRING(REGEX REPLACE ^bin "" _install_DESTINATION ${_install_DESTINATION})
+  ELSE(_destination_index GREATER -1)
+  
+    IF(NOT MACOSX_BUNDLE_NAMES)
+      INSTALL(${ARGS} DESTINATION bin)
+    ELSE(NOT MACOSX_BUNDLE_NAMES)
+      FOREACH(bundle_name ${MACOSX_BUNDLE_NAMES})
+        INSTALL(${ARGS} DESTINATION ${bundle_name}.app/Contents/MacOS/${_install_DESTINATION})
+      ENDFOREACH(bundle_name)
+    ENDIF(NOT MACOSX_BUNDLE_NAMES)
+  ENDIF(_destination_index GREATER -1)
+
+ENDMACRO(MITK_INSTALL)
+
+# MITK specific cross plattform install macro
+#
+# Usage: MITK_INSTALL_HELPER_APP(target1 [target2] ....)
+#
+MACRO(MITK_INSTALL_HELPER_APP)
+  MACRO_PARSE_ARGUMENTS(_install "TARGETS;EXECUTABLES;PLUGINS;LIBRARY_DIRS" "GLOB_PLUGINS" ${ARGN})
+  LIST(APPEND _install_TARGETS ${_install_DEFAULT_ARGS})
+
+# TODO: how to supply to correct intermediate directory??
+# CMAKE_CFG_INTDIR is not expanded to actual values inside the INSTALL(CODE "...") macro ...
+SET(intermediate_dir )
+IF(WIN32 AND NOT MINGW)
+  SET(intermediate_dir Release)
+ENDIF()
+SET(DIRS 
+  ${VTK_RUNTIME_LIBRARY_DIRS}/${intermediate_dir}
+  ${ITK_LIBRARY_DIRS}/${intermediate_dir}
+  ${QT_LIBRARY_DIR} 
+  ${MITK_BINARY_DIR}/bin/${intermediate_dir} 
+  ${_install_LIBRARY_DIRS}
+  )
+
+FOREACH(_target ${_install_EXECUTABLES})
+
+SET(_qt_plugins_install_dirs "")
+SET(_qt_conf_install_dirs "")
+SET(_target_locations "")
+
+GET_FILENAME_COMPONENT(_target_name ${_target} NAME)
+
+IF(APPLE)
+    IF(NOT MACOSX_BUNDLE_NAMES)
+      SET(_qt_conf_install_dirs bin)
+      SET(_target_locations bin/${_target_name})
+      SET(${_target_locations}_qt_plugins_install_dir bin)
+      INSTALL(FILES ${_target} DESTINATION bin)
+    ELSE(NOT MACOSX_BUNDLE_NAMES)
+      FOREACH(bundle_name ${MACOSX_BUNDLE_NAMES})
+        LIST(APPEND _qt_conf_install_dirs ${bundle_name}.app/Contents/Resources)
+		SET(_current_target_location ${bundle_name}.app/Contents/MacOS/${_target_name})
+	    LIST(APPEND _target_locations ${_current_target_location})
+		SET(${_current_target_location}_qt_plugins_install_dir ${bundle_name}.app/Contents/MacOS)
+			
+		INSTALL(FILES ${_target} DESTINATION ${bundle_name}.app/Contents/MacOS/)
+      ENDFOREACH(bundle_name)
+    ENDIF(NOT MACOSX_BUNDLE_NAMES)
+ELSE()
+  SET(_target_locations bin/${_target_name})
+  SET(${_target_locations}_qt_plugins_install_dir bin)
+  SET(_qt_conf_install_dirs bin)
+  INSTALL(FILES ${_target} DESTINATION bin)
+ENDIF() 
+
+FOREACH(_target_location ${_target_locations})
+
+IF(QT_PLUGINS_DIR)
+    INSTALL(DIRECTORY "${QT_PLUGINS_DIR}" 
+	    DESTINATION ${${_target_location}_qt_plugins_install_dir} 
+		    CONFIGURATIONS Release
+		    FILES_MATCHING REGEX "[^d]4?\\${CMAKE_SHARED_LIBRARY_SUFFIX}$"
+		    )
+		    
+    INSTALL(DIRECTORY "${QT_PLUGINS_DIR}" 
+	    DESTINATION ${${_target_location}_qt_plugins_install_dir} 
+		    CONFIGURATIONS Debug
+		    FILES_MATCHING REGEX "d4?\\${CMAKE_SHARED_LIBRARY_SUFFIX}$"
+		    )
+
+ENDIF(QT_PLUGINS_DIR)
+
+  _fixup_target()
+ENDFOREACH(_target_location)
+
+
+  #--------------------------------------------------------------------------------
+  # install a qt.conf file
+  # this inserts some cmake code into the install script to write the file
+  SET(_qt_conf_plugin_install_prefix .)
+  IF(APPLE)
+    SET(_qt_conf_plugin_install_prefix ./MacOS)
+  ENDIF(APPLE)
+  FOREACH(_qt_conf_install_dir ${_qt_conf_install_dirs})
+    INSTALL(CODE "
+	file(WRITE \"\${CMAKE_INSTALL_PREFIX}/${_qt_conf_install_dir}/qt.conf\" \"
+[Paths]
+Prefix=${_qt_conf_plugin_install_prefix}
+
+\")
+	")
+  ENDFOREACH()
+
+
+
+
+ENDFOREACH(_target)
+
+ENDMACRO(MITK_INSTALL_HELPER_APP)
+
+
+
+#
 # MITK specific cross plattform install macro
 #
 # Usage: MITK_INSTALL_TARGETS(target1 [target2] ....)
 #
 MACRO(MITK_INSTALL_TARGETS)
-  IF(WIN32)
-   INSTALL(TARGETS ${ARGN} 
-     RUNTIME DESTINATION bin
-   )
-  ELSE()
-   INSTALL(TARGETS ${ARGN} 
-     RUNTIME DESTINATION bin
-     LIBRARY DESTINATION lib/mitk/
-     ARCHIVE DESTINATION lib/mitk/static
-   )
-  ENDIF()
+  MACRO_PARSE_ARGUMENTS(_install "TARGETS;EXECUTABLES;PLUGINS;LIBRARY_DIRS" "GLOB_PLUGINS" ${ARGN})
+  LIST(APPEND _install_TARGETS ${_install_DEFAULT_ARGS})
+
+# TODO: how to supply to correct intermediate directory??
+# CMAKE_CFG_INTDIR is not expanded to actual values inside the INSTALL(CODE "...") macro ...
+SET(intermediate_dir )
+IF(WIN32 AND NOT MINGW)
+  SET(intermediate_dir Release)
+ENDIF()
+SET(DIRS 
+  ${VTK_RUNTIME_LIBRARY_DIRS}/${intermediate_dir}
+  ${ITK_LIBRARY_DIRS}/${intermediate_dir}
+  ${QT_LIBRARY_DIR} 
+  ${MITK_BINARY_DIR}/bin/${intermediate_dir} 
+  ${_install_LIBRARY_DIRS}
+  )
+
+FOREACH(_target ${_install_EXECUTABLES})
+
+GET_TARGET_PROPERTY(_is_bundle ${_target} MACOSX_BUNDLE)
+
+SET(_qt_plugins_install_dirs "")
+SET(_qt_conf_install_dirs "")
+SET(_target_locations "")
+
+IF(APPLE)
+  IF(_is_bundle)
+    SET(_target_locations ${_target}.app)
+    SET(${_target_locations}_qt_plugins_install_dir ${_target}.app/Contents/MacOS)
+    SET(_bundle_dest_dir ${_target}.app/Contents/MacOS)
+    SET(_qt_plugins_for_current_bundle ${_target}.app/Contents/MacOS)
+    SET(_qt_conf_install_dirs ${_target}.app/Contents/Resources)
+    INSTALL(TARGETS ${_target} BUNDLE DESTINATION . )
+  ELSE(_is_bundle)
+    IF(NOT MACOSX_BUNDLE_NAMES)
+      SET(_qt_conf_install_dirs bin)
+      SET(_target_locations bin/${_target})
+	  SET(${_target_locations}_qt_plugins_install_dir bin)
+      INSTALL(TARGETS ${_target} RUNTIME DESTINATION bin)
+    ELSE(NOT MACOSX_BUNDLE_NAMES)
+      FOREACH(bundle_name ${MACOSX_BUNDLE_NAMES})
+        LIST(APPEND _qt_conf_install_dirs ${bundle_name}.app/Contents/Resources)
+		SET(_current_target_location ${bundle_name}.app/Contents/MacOS/${_target})
+	    LIST(APPEND _target_locations ${_current_target_location})
+		SET(${_current_target_location}_qt_plugins_install_dir ${bundle_name}.app/Contents/MacOS)
+		MESSAGE( "  SET(${_current_target_location}_qt_plugins_install_dir ${bundle_name}.app/Contents/MacOS) ")
+		
+		INSTALL(TARGETS ${_target} RUNTIME DESTINATION ${bundle_name}.app/Contents/MacOS/)
+      ENDFOREACH(bundle_name)
+    ENDIF(NOT MACOSX_BUNDLE_NAMES)
+  ENDIF(_is_bundle)
+ELSE()
+  SET(_target_locations bin/${_target}${CMAKE_EXECUTABLE_SUFFIX})
+  SET(${_target_locations}_qt_plugins_install_dir bin)
+  SET(_qt_conf_install_dirs bin)
+  INSTALL(TARGETS ${_target} RUNTIME DESTINATION bin)
+ENDIF() 
+
+MESSAGE("target locations: ${_target_locations}")
+
+FOREACH(_target_location ${_target_locations})
+MESSAGE("qt locations orig: ${${_target_location}_qt_plugins_install_dir}")
+
+IF(QT_PLUGINS_DIR)
+    INSTALL(DIRECTORY "${QT_PLUGINS_DIR}" 
+	    DESTINATION ${${_target_location}_qt_plugins_install_dir} 
+		    CONFIGURATIONS Release
+		    FILES_MATCHING REGEX "[^d]4?\\${CMAKE_SHARED_LIBRARY_SUFFIX}$"
+		    )
+		    
+    INSTALL(DIRECTORY "${QT_PLUGINS_DIR}" 
+	    DESTINATION ${${_target_location}_qt_plugins_install_dir} 
+		    CONFIGURATIONS Debug
+		    FILES_MATCHING REGEX "d4?\\${CMAKE_SHARED_LIBRARY_SUFFIX}$"
+		    )
+
+ENDIF(QT_PLUGINS_DIR)
+
+  _fixup_target()
+ENDFOREACH(_target_location)
+
+
+  #--------------------------------------------------------------------------------
+  # install a qt.conf file
+  # this inserts some cmake code into the install script to write the file
+  SET(_qt_conf_plugin_install_prefix .)
+  IF(APPLE)
+    SET(_qt_conf_plugin_install_prefix ./MacOS)
+  ENDIF(APPLE)
+  FOREACH(_qt_conf_install_dir ${_qt_conf_install_dirs})
+    INSTALL(CODE "
+	file(WRITE \"\${CMAKE_INSTALL_PREFIX}/${_qt_conf_install_dir}/qt.conf\" \"
+[Paths]
+Prefix=${_qt_conf_plugin_install_prefix}
+
+\")
+	")
+  ENDFOREACH()
+
+
+
+
+ENDFOREACH(_target)
+
 ENDMACRO(MITK_INSTALL_TARGETS)
+
+# Fix _target_location
+MACRO(_fixup_target)
+
+INSTALL(CODE "
+    MACRO(gp_item_default_embedded_path_override item default_embedded_path_var)
+      GET_FILENAME_COMPONENT(_item_name \"\${item}\" NAME)
+      GET_FILENAME_COMPONENT(_item_path \"\${item}\" PATH)
+      IF(_item_name MATCHES \"liborg\")
+         IF(APPLE)
+           SET(full_path \"full_path-NOTFOUND\")
+           MESSAGE(\"override: \${item}\")        
+           FILE (GLOB_RECURSE full_path \${CMAKE_INSTALL_PREFIX}/${_bundle_dest_dir}/\${_item_name} )
+           MESSAGE(\"find file: \${full_path}\")        
+           
+           GET_FILENAME_COMPONENT(_item_path \"\${full_path}\" PATH)
+           
+           STRING(REPLACE 
+              \${CMAKE_INSTALL_PREFIX} 
+              @executable_path/../../../ \${default_embedded_path_var} \"\${_item_path}\" ) 
+           MESSAGE(\"override result: \${\${default_embedded_path_var}}\")        
+         ELSE(APPLE)
+              SET(\${default_embedded_path_var} \"\${_item_path}\")
+         ENDIF(APPLE)
+      ENDIF()
+
+      #IF(_item_name MATCHES \"^liborg\")
+      #   IF(APPLE)
+      #     MESSAGE(\"override: \${item}\")        
+      #     STRING(REPLACE 
+      #        ${CMAKE_INSTALL_PREFIX} 
+      #        @loader_path/../ \${default_embedded_path_var} \"\${_item_path}\" ) 
+      #   ELSE(APPLE)
+      #        SET(\${default_embedded_path_var} \"\${_item_path}\")
+      #   ENDIF(APPLE)
+      #ENDIF()
+    ENDMACRO(gp_item_default_embedded_path_override)
+
+    MACRO(gp_resolved_file_type_override file type)
+      IF(NOT APPLE)
+        GET_FILENAME_COMPONENT(_file_path \"\${file}\" PATH)
+        GET_FILENAME_COMPONENT(_file_name \"\${file}\" NAME)
+        IF(_file_path MATCHES \"^\${CMAKE_INSTALL_PREFIX}\")
+          SET(\${type} \"local\")
+          # On linux, rpaths are removed from the plugins
+          # if installing more than on application. This override
+          # should prevent this.
+          IF(_file_name MATCHES \"^liborg\")
+            SET(\${type} \"system\")
+          ENDIF(_file_name MATCHES \"^liborg\")       
+
+         ENDIF()
+      ENDIF()
+    ENDMACRO(gp_resolved_file_type_override)
+
+    SET(_rpath_relative ${MITK_INSTALL_RPATH_RELATIVE})
+    IF(_rpath_relative AND NOT APPLE)
+      IF(UNIX OR MINGW)
+        MACRO(gp_resolve_item_override context item exepath dirs resolved_item_var resolved_var)
+          IF(\${item} MATCHES \"blueberry_osgi\")
+            SET(\${resolved_item_var} \"\${exepath}/BlueBerry/org.blueberry.osgi/bin/\${item}\")
+            SET(\${resolved_var} 1)
+          ENDIF()
+        ENDMACRO()
+      ENDIF()
+    ENDIF()
+
+    IF(\"${_install_GLOB_PLUGINS}\" STREQUAL \"TRUE\") 
+    file(GLOB_RECURSE PLUGINS
+      # glob for all blueberry bundles of this application
+      \"\${CMAKE_INSTALL_PREFIX}/${_bundle_dest_dir}/liborg*${CMAKE_SHARED_LIBRARY_SUFFIX}\"
+      # glob for Qt plugins
+      \"\${CMAKE_INSTALL_PREFIX}/${${_target_location}_qt_plugins_install_dir}/plugins/*${CMAKE_SHARED_LIBRARY_SUFFIX}\")    
+    ELSE() 
+    file(GLOB_RECURSE PLUGINS
+      # glob for Qt plugins
+      \"\${CMAKE_INSTALL_PREFIX}/${${_target_location}_qt_plugins_install_dir}/plugins/*${CMAKE_SHARED_LIBRARY_SUFFIX}\")    
+    ENDIF() 
+    
+    # use custom version of BundleUtilities
+    message(\"globbed plugins: \${PLUGINS}\")
+    SET(PLUGIN_DIRS ${DIRS})
+    LIST(APPEND PLUGINS ${_install_PLUGINS})
+    foreach(_plugin \${PLUGINS})
+      get_filename_component(_pluginpath \${_plugin} PATH)
+      list(APPEND PLUGIN_DIRS \${_pluginpath})
+    endforeach(_plugin)
+    list(APPEND DIRS \${PLUGIN_DIRS})
+    # use custom version of BundleUtilities
+    SET(CMAKE_MODULE_PATH ${MITK_SOURCE_DIR}/CMake ${CMAKE_MODULE_PATH} )
+    include(BundleUtilities)
+    fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/${_target_location}\" \"\${PLUGINS}\" \"\${PLUGIN_DIRS}\")
+    ")
+ENDMACRO()
 
 #
 # Create tests and testdriver for this module

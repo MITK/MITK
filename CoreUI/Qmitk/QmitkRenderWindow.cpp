@@ -30,14 +30,14 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkOverlayController.h"
 #include "QmitkRenderWindowMenu.h"
 
-QmitkRenderWindow::QmitkRenderWindow(QWidget *parent, QString /*name*/, mitk::VtkPropRenderer* /*renderer*/, mitk::RenderingManager* renderingManager )
+QmitkRenderWindow::QmitkRenderWindow(QWidget *parent, QString name, mitk::VtkPropRenderer* /*renderer*/, mitk::RenderingManager* renderingManager )
 : QVTKWidget(parent)
 , m_ResendQtEvents(true)
 , m_MenuWidget(NULL)
 , m_MenuWidgetActivated(false)
 , m_OverlayController(NULL)
 {
-  Initialize( renderingManager ); // Initialize mitkRenderWindowBase
+  Initialize( renderingManager, name.toStdString().c_str() ); // Initialize mitkRenderWindowBase
  
   setFocusPolicy(Qt::StrongFocus);
   setMouseTracking(true);

@@ -31,7 +31,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QMenuBar>
 #include <QAction>
 #include <QLabel>
-
+#include <QTimer>
 
 /**
 * \brief The QmitkRenderWindowMenu is a popup Widget which shows up when the mouse curser enter a QmitkRenderWindow. 
@@ -135,6 +135,17 @@ public slots:
   void DeferredHideMenu( );
 
 protected slots:  
+
+  ///
+  /// this function is continously called by a timer
+  /// to do the auto rotation
+  ///
+  void AutoRotateNextStep();
+  ///
+  /// this function is invoked when the auto-rotate action
+  /// is clicked
+  ///
+  void OnAutoRotationActionTriggered(); 
 
   void enterEvent( QEvent* /*e*/ );
   void leaveEvent( QEvent* /*e*/ );
@@ -299,6 +310,11 @@ protected:
   private:
   
   mitk::BaseRenderer::Pointer m_Renderer;
+
+  ///
+  /// a timer for the auto rotate action
+  ///
+  QTimer m_AutoRotationTimer;
 };
 
 #endif // QmitkRenderWindowMenu_H

@@ -489,8 +489,7 @@ IF(APPLE)
 		SET(_current_target_location ${bundle_name}.app/Contents/MacOS/${_target_name})
 	    LIST(APPEND _target_locations ${_current_target_location})
 		SET(${_current_target_location}_qt_plugins_install_dir ${bundle_name}.app/Contents/MacOS)
-		MESSAGE( "  SET(${_current_target_location}_qt_plugins_install_dir ${bundle_name}.app/Contents/MacOS) ")
-		
+			
 		INSTALL(FILES ${_target} DESTINATION ${bundle_name}.app/Contents/MacOS/)
       ENDFOREACH(bundle_name)
     ENDIF(NOT MACOSX_BUNDLE_NAMES)
@@ -501,10 +500,7 @@ ELSE()
   INSTALL(FILES ${_target} DESTINATION bin)
 ENDIF() 
 
-MESSAGE("target locations: ${_target_locations}")
-
 FOREACH(_target_location ${_target_locations})
-MESSAGE("qt locations orig: ${${_target_location}_qt_plugins_install_dir}")
 
 IF(QT_PLUGINS_DIR)
     INSTALL(DIRECTORY "${QT_PLUGINS_DIR}" 

@@ -51,8 +51,8 @@ void QmitkCreatePolygonModelAction::Run(const std::vector<mitk::DataNode*>& sele
           surfaceFilter->SetParameter("Apply median", false );  // median makes the resulting surfaces look like lego models
           surfaceFilter->SetParameter("Median kernel size", 3u );
           surfaceFilter->SetParameter("Gaussian SD", 2.5f );
-          surfaceFilter->SetParameter("Decimate mesh", true );
-          surfaceFilter->SetParameter("Decimation rate", 0.80f );
+          surfaceFilter->SetParameter("Decimate mesh", m_IsDecimated );
+          surfaceFilter->SetParameter("Decimation rate", 0.8f );
         }
         else
         {
@@ -60,7 +60,7 @@ void QmitkCreatePolygonModelAction::Run(const std::vector<mitk::DataNode*>& sele
           surfaceFilter->SetParameter("Apply median", false );
           surfaceFilter->SetParameter("Median kernel size", 3u );
           surfaceFilter->SetParameter("Gaussian SD", 1.5f );
-          surfaceFilter->SetParameter("Decimate mesh", true );
+          surfaceFilter->SetParameter("Decimate mesh", m_IsDecimated );
           surfaceFilter->SetParameter("Decimation rate", 0.8f );
         }
 
@@ -89,6 +89,11 @@ void QmitkCreatePolygonModelAction::OnSurfaceCalculationDone()
 void QmitkCreatePolygonModelAction::SetSmoothed(bool smoothed)
 {
   this->m_IsSmoothed = smoothed;
+}
+
+void QmitkCreatePolygonModelAction::SetDecimated(bool decimated)
+{
+  this->m_IsDecimated = decimated;
 }
 
 void QmitkCreatePolygonModelAction::SetDataStorage(mitk::DataStorage* dataStorage)

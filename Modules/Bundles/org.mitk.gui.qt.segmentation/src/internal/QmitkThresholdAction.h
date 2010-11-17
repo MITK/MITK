@@ -27,6 +27,7 @@ class MITK_QT_SEGMENTATION QmitkThresholdAction: public QObject, public mitk::IC
     void Run( const std::vector<mitk::DataNode*>& selectedNodes );
     void SetDataStorage(mitk::DataStorage* dataStorage);
     void SetSmoothed(bool smoothed);
+    void SetDecimated(bool decimated);
     void SetFunctionality(berry::QtViewPart* functionality);
 
     // for receiving messages

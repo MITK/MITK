@@ -93,6 +93,11 @@ void QmitkThresholdAction::SetSmoothed(bool smoothed)
   //not needed
 }
 
+void QmitkThresholdAction::SetDecimated(bool decimated)
+{
+  //not needed
+}
+
 void QmitkThresholdAction::SetFunctionality(berry::QtViewPart* functionality)
 {
   //not needed 

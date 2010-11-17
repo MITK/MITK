@@ -33,4 +33,8 @@ void QmitkStatisticsAction::SetSmoothed(bool smoothed)
   //not needed
 }
 
+void QmitkStatisticsAction::SetDecimated(bool decimated)
+{
+  //not needed
+}
 

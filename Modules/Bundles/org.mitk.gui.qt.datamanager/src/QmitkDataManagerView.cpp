@@ -133,6 +133,7 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
       prefs->GetBool("Place new nodes on top", true) );
   m_NodeTreeModel->SetShowHelperObjects(
       prefs->GetBool("Show helper objects", false) );
+  m_SurfaceDecimation = prefs->GetBool("Use surface decimation", false);
 
   //# Tree View (experimental)
   m_NodeTreeView = new QTreeView;
@@ -379,6 +380,7 @@ void QmitkDataManagerView::ContextMenuActionTriggered( bool )
     {
       contextMenuAction->SetSmoothed(true);
     }
+    contextMenuAction->SetDecimated(m_SurfaceDecimation);
   }
   if(className == "QmitkStatisticsAction")
   {
@@ -409,6 +411,8 @@ void QmitkDataManagerView::OnPreferencesChanged(const berry::IBerryPreferences* 
     m_NodeTreeModel->SetShowHelperObjects( !m_NodeTreeModel->GetShowHelperObjectsFlag() );
   
   m_NodeTreeView->expandAll();
+
+  m_SurfaceDecimation = prefs->GetBool("Use surface decimation", false);
 }
 
 void QmitkDataManagerView::NodeTableViewContextMenuRequested( const QPoint & pos )

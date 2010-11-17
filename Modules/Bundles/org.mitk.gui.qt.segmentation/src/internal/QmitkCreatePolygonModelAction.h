@@ -19,6 +19,7 @@ public:
   void Run( const std::vector<mitk::DataNode*>& selectedNodes );
   void SetDataStorage(mitk::DataStorage* dataStorage);
   void SetSmoothed(bool smoothed);
+  void SetDecimated(bool decimated);
   void SetFunctionality(berry::QtViewPart* functionality);
 
   // for receiving messages
@@ -31,6 +32,7 @@ protected:
   mitk::DataStorage::Pointer m_DataStorage;
 
   bool m_IsSmoothed;
+  bool m_IsDecimated;
 
 };
 #endif // QMITK_CREATEPOLYGONMODELACTION_H

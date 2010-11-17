@@ -127,7 +127,7 @@ bool ShowSegmentationAsSurface::ThreadedUpdateFunction()
   
   if (decimateMesh)
   {
-    surfaceFilter->SetDecimate( ImageToSurfaceFilter::DecimatePro );
+    surfaceFilter->SetDecimate( ImageToSurfaceFilter::QuadricDecimation );
     surfaceFilter->SetTargetReduction( reductionRate );
   }
   else

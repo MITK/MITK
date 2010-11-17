@@ -217,6 +217,10 @@ protected:
   /// \brief The context menu that shows up when right clicking on a node.
   ///
   QMenu* m_NodeMenu;
+  ///
+  /// \brief flag indicating whether a surface created from a selected decimation is decimated with vtkQuadricDecimation or not
+  ///
+  bool m_SurfaceDecimation;
 
   ///# Actions for the Context Menu
   /// Global Reinit Action

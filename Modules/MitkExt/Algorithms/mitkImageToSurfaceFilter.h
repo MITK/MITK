@@ -60,7 +60,7 @@ namespace mitk {
     * but was patented. So since vtk 5.x it was replaced by the (worser?) vtkDecimateProFilter
     * Maybe another Filter will come soon.
     */
-      enum DecimationType {NoDecimation,DecimatePro};
+      enum DecimationType {NoDecimation,DecimatePro,QuadricDecimation};
 
       mitkClassMacro(ImageToSurfaceFilter, SurfaceSource);
       itkNewMacro(Self);

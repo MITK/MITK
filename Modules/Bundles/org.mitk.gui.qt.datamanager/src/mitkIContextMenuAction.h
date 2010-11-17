@@ -29,6 +29,7 @@ namespace mitk
     // Setters
     virtual void SetDataStorage(mitk::DataStorage* dataStorage) = 0;
     virtual void SetSmoothed(bool smoothed) = 0;
+    virtual void SetDecimated(bool decimated) = 0;
     virtual void SetFunctionality(berry::QtViewPart* functionality) = 0;
   };
 }

@@ -24,6 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkLinearTransform.h>
 #include <vtkMath.h>
 #include <vtkMatrix4x4.h>
+#include <vtkQuadricDecimation.h>
 
 #if (VTK_MAJOR_VERSION < 5)
 #include <vtkDecimate.h>
@@ -109,6 +110,17 @@ void mitk::ImageToSurfaceFilter::CreateSurface(int time, vtkImageData *vtkimage,
     polydata->Delete();//RC--
     polydata = decimate->GetOutput();
     polydata->Register(NULL);//RC++
+    decimate->Delete();
+  }
+  else if (m_Decimate==QuadricDecimation)
+  {
+    vtkQuadricDecimation* decimate = vtkQuadricDecimation::New();
+    decimate->SetTargetReduction(m_TargetReduction);
+
+    decimate->SetInput(polydata);
+    polydata->Delete();
+    polydata = decimate->GetOutput();
+    polydata->Register(NULL);
     decimate->Delete();
   }
 #if (VTK_MAJOR_VERSION < 5)

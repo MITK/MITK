@@ -224,7 +224,6 @@ ADD_SUBDIRECTORY(Applications)
 IF(CMAKE_BINARY_DIR STREQUAL MITK_BINARY_DIR)
 INCLUDE(MITKSetupCPack)
 
-SET(MITK_CPACK_PACKAGE_EXECUTABLES "ExtApp;MITK - Ext Application\"\"CoreApp;MITK - Core Application" CACHE INTERNAL "Collecting windows shortcuts to executables")
 
 CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/MITKCPackOptions.cmake.in ${PROJECT_BINARY_DIR}/MITKCPackOptions.cmake @ONLY)
 

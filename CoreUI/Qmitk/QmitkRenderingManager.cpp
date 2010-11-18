@@ -23,12 +23,13 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkSliceNavigationController.h"
 
 #include <QApplication>
+#include <QTimer>
 
 
 QmitkRenderingManager
 ::QmitkRenderingManager()
 {
-  
+  pendingTimerCallbacks=0;
 }
 
 
@@ -61,6 +62,22 @@ QmitkRenderingManager
   QApplication::postEvent( this, new QmitkRenderingRequestEvent );
 }
 
+
+void
+QmitkRenderingManager
+::StartOrResetTimer()
+{
+  QTimer::singleShot(200, this, SLOT(TimerCallback()));
+  pendingTimerCallbacks++;
+}
+
+void
+QmitkRenderingManager
+::TimerCallback()
+{
+  if(!--pendingTimerCallbacks)
+    this->ExecutePendingHighResRenderingRequest();
+}
 
 bool 
 QmitkRenderingManager

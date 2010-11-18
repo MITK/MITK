@@ -59,6 +59,13 @@ protected:
 
   virtual void GenerateRenderingRequestEvent();
 
+  virtual void StartOrResetTimer();
+
+  int pendingTimerCallbacks;
+
+ protected slots:
+
+  void TimerCallback();
 
 private:
 

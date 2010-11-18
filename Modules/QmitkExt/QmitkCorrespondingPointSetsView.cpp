@@ -59,7 +59,6 @@ QmitkCorrespondingPointSetsView::QmitkCorrespondingPointSetsView( QWidget* paren
   QTableView::setSelectionBehavior( QAbstractItemView::SelectItems );
   QTableView::setSelectionMode( QAbstractItemView::SingleSelection );
   QTableView::setModel( m_CorrespondingPointSetsModel );
-  //QTableView::horizontalHeader()->resizeSections(QHeaderView::Stretch);
   QTableView::horizontalHeader()->resizeSection(0, (int)(this->width()/3.5));
   QTableView::horizontalHeader()->setStretchLastSection(true);
 
@@ -131,6 +130,7 @@ void QmitkCorrespondingPointSetsView::OnPointSelectionChanged(const QItemSelecti
 
     if (pointSetNode)
     {
+      this->m_CorrespondingPointSetsModel->UpdateSelection(pointSetNode);
       pointSet = dynamic_cast<mitk::PointSet*>(pointSetNode->GetData());
 
       if( pointSet->GetPointSet(m_CorrespondingPointSetsModel->GetTimeStep()))

@@ -430,7 +430,7 @@ void mitk::VtkPropRenderer::Resize(int w, int h)
 {
   BaseRenderer::Resize(w, h);
    
-  Update();
+  mitk::RenderingManager::GetInstance()->RequestUpdate(this->GetRenderWindow());
 }
 
 

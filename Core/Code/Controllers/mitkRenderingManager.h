@@ -221,8 +221,15 @@ public:
 
   /** En-/Disable depth peeling for all renderers */
   void SetDepthPeelingEnabled(bool enabled);
+
   /** Set maximum number of peels for all renderers */
   void SetMaxNumberOfPeels(int maxNumber);
+
+  /** Force a sub-class to start a timer for a pending hires-rendering request */
+  virtual void StartOrResetTimer() {};
+
+  /** To be called by a sub-class from a timer callback */
+  void ExecutePendingHighResRenderingRequest();
 
 
   virtual void DoStartRendering() {};

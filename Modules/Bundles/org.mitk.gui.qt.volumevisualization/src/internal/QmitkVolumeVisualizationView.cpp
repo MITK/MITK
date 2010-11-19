@@ -37,8 +37,19 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkBaseRenderer.h"
 #include "mitkGPUVolumeMapper3D.h"
 
+#include "mitkVtkVolumeRenderingProperty.h"
+
 #include <QToolTip>
 #include <qxtspanslider.h>
+
+enum RenderMode
+{
+  RM_CPU_COMPOSITE_RAYCAST = 0,
+  RM_CPU_MIP_RAYCAST       = 1,
+  RM_GPU_COMPOSITE_SLICING = 2,
+  RM_GPU_COMPOSITE_RAYCAST = 3,
+  RM_GPU_MIP_RAYCAST       = 4
+};
 
 QmitkVolumeVisualizationView::QmitkVolumeVisualizationView()
 : QmitkFunctionality(), 
@@ -58,17 +69,27 @@ void QmitkVolumeVisualizationView::CreateQtPartControl(QWidget* parent)
     m_Controls = new Ui::QmitkVolumeVisualizationViewControls;
     m_Controls->setupUi(parent);
 
+    m_Controls->m_RenderMode->addItem("CPU raycast");
+    m_Controls->m_RenderMode->addItem("CPU MIP raycast");
+    m_Controls->m_RenderMode->addItem("GPU slicing");
+// Only with VTK 5.6 or above
+#if ((VTK_MAJOR_VERSION > 5) || ((VTK_MAJOR_VERSION==5) && (VTK_MINOR_VERSION>=6) ))
+    m_Controls->m_RenderMode->addItem("GPU raycast");
+    m_Controls->m_RenderMode->addItem("GPU MIP raycast");
+#endif
+
     connect( m_Controls->m_EnableRenderingCB, SIGNAL( toggled(bool) ),this, SLOT( OnEnableRendering(bool) ));
     connect( m_Controls->m_EnableLOD, SIGNAL( toggled(bool) ),this, SLOT( OnEnableLOD(bool) ));
-    connect( m_Controls->m_EnableGPU, SIGNAL( toggled(bool) ),this, SLOT( OnEnableGPU(bool) ));
+    connect( m_Controls->m_RenderMode, SIGNAL( activated(int) ),this, SLOT( OnRenderMode(int) ));
 
     connect( m_Controls->m_TransferFunctionGeneratorWidget, SIGNAL( SignalUpdateCanvas( ) ),   m_Controls->m_TransferFunctionWidget, SLOT( OnUpdateCanvas( ) ) );
  
     m_Controls->m_EnableRenderingCB->setEnabled(false);
     m_Controls->m_EnableLOD->setEnabled(false);
-    m_Controls->m_EnableGPU->setEnabled(false);
+    m_Controls->m_RenderMode->setEnabled(false);
     m_Controls->m_TransferFunctionWidget->setEnabled(false);
     m_Controls->m_TransferFunctionGeneratorWidget->setEnabled(false);
+    
     m_Controls->m_SelectedImageLabel->hide();
     m_Controls->m_ErrorImageLabel->hide();
     
@@ -142,9 +163,11 @@ void QmitkVolumeVisualizationView::OnSelectionChanged( std::vector<mitk::DataNod
       m_Controls->m_ErrorImageLabel->hide();
       m_Controls->m_NoSelectedImageLabel->show();
     }
+    
+    m_SelectedNode = 0;
   }
 
-    UpdateInterface();
+  UpdateInterface();
 }
 
 
@@ -155,12 +178,17 @@ void QmitkVolumeVisualizationView::UpdateInterface()
     // turnoff all
     m_Controls->m_EnableRenderingCB->setChecked(false);
     m_Controls->m_EnableRenderingCB->setEnabled(false);
+
     m_Controls->m_EnableLOD->setChecked(false);
     m_Controls->m_EnableLOD->setEnabled(false);
-    m_Controls->m_EnableGPU->setEnabled(false);
+
+    m_Controls->m_RenderMode->setCurrentIndex(0);
+    m_Controls->m_RenderMode->setEnabled(false);
+
     m_Controls->m_TransferFunctionWidget->SetDataNode(0);
-    m_Controls->m_TransferFunctionGeneratorWidget->SetDataNode(0);
     m_Controls->m_TransferFunctionWidget->setEnabled(false);
+
+    m_Controls->m_TransferFunctionGeneratorWidget->SetDataNode(0);
     m_Controls->m_TransferFunctionGeneratorWidget->setEnabled(false);
     return;
   }
@@ -176,10 +204,14 @@ void QmitkVolumeVisualizationView::UpdateInterface()
     // turnoff all except volumerendering checkbox
     m_Controls->m_EnableLOD->setChecked(false);
     m_Controls->m_EnableLOD->setEnabled(false);
-    m_Controls->m_EnableGPU->setEnabled(false);
+
+    m_Controls->m_RenderMode->setCurrentIndex(0);
+    m_Controls->m_RenderMode->setEnabled(false);
+
     m_Controls->m_TransferFunctionWidget->SetDataNode(0);
-    m_Controls->m_TransferFunctionGeneratorWidget->SetDataNode(0);
     m_Controls->m_TransferFunctionWidget->setEnabled(false);
+
+    m_Controls->m_TransferFunctionGeneratorWidget->SetDataNode(0);
     m_Controls->m_TransferFunctionGeneratorWidget->setEnabled(false);
     return;
   }
@@ -190,11 +222,42 @@ void QmitkVolumeVisualizationView::UpdateInterface()
   m_Controls->m_EnableLOD->setEnabled(true);
   m_Controls->m_EnableLOD->setChecked(enabled);
     
-  enabled=false;
-  m_SelectedNode->GetBoolProperty("volumerendering.usegpu",enabled);
-  m_Controls->m_EnableGPU->setEnabled(true);
-  m_Controls->m_EnableGPU->setChecked(enabled);
-
+  m_Controls->m_RenderMode->setEnabled(true);
+  
+  // Determine Combo Box mode
+  {
+    bool usegpu=false;
+    bool useray=false;
+    bool usemip=false;
+    m_SelectedNode->GetBoolProperty("volumerendering.usegpu",usegpu);
+// Only with VTK 5.6 or above
+#if ((VTK_MAJOR_VERSION > 5) || ((VTK_MAJOR_VERSION==5) && (VTK_MINOR_VERSION>=6) ))
+    m_SelectedNode->GetBoolProperty("volumerendering.useray",useray);
+#endif
+    m_SelectedNode->GetBoolProperty("volumerendering.usemip",usemip);
+    
+    int mode = 0;
+    
+    if(useray)
+    {
+      if(usemip)
+        mode=RM_GPU_MIP_RAYCAST;
+      else
+        mode=RM_GPU_COMPOSITE_RAYCAST;
+    }
+    else if(usegpu)
+      mode=RM_GPU_COMPOSITE_SLICING;
+    else
+    {
+      if(usemip)
+        mode=RM_CPU_MIP_RAYCAST;
+      else
+        mode=RM_CPU_COMPOSITE_RAYCAST;
+    }
+    
+    m_Controls->m_RenderMode->setCurrentIndex(mode);
+  } 
+    
   m_Controls->m_TransferFunctionWidget->SetDataNode(m_SelectedNode);
   m_Controls->m_TransferFunctionWidget->setEnabled(true);
   m_Controls->m_TransferFunctionGeneratorWidget->SetDataNode(m_SelectedNode);
@@ -221,15 +284,26 @@ void QmitkVolumeVisualizationView::OnEnableLOD(bool state)
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-void QmitkVolumeVisualizationView::OnEnableGPU(bool state) 
+void QmitkVolumeVisualizationView::OnRenderMode(int mode) 
 {
   if(m_SelectedNode.IsNull())
     return;
 
-  m_SelectedNode->SetProperty("volumerendering.usegpu",mitk::BoolProperty::New(state));
+  bool usegpu=mode==RM_GPU_COMPOSITE_SLICING;
+// Only with VTK 5.6 or above
+#if ((VTK_MAJOR_VERSION > 5) || ((VTK_MAJOR_VERSION==5) && (VTK_MINOR_VERSION>=6) ))
+  bool useray=(mode==RM_GPU_COMPOSITE_RAYCAST)||(mode==RM_GPU_MIP_RAYCAST);
+#endif
+  bool usemip=(mode==RM_GPU_MIP_RAYCAST)||(mode==RM_CPU_MIP_RAYCAST);
+      
+  m_SelectedNode->SetProperty("volumerendering.usegpu",mitk::BoolProperty::New(usegpu));
+// Only with VTK 5.6 or above
+#if ((VTK_MAJOR_VERSION > 5) || ((VTK_MAJOR_VERSION==5) && (VTK_MINOR_VERSION>=6) ))
+  m_SelectedNode->SetProperty("volumerendering.useray",mitk::BoolProperty::New(useray));
+#endif
+  m_SelectedNode->SetProperty("volumerendering.usemip",mitk::BoolProperty::New(usemip));
+  
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-
- 
 }
 
 void QmitkVolumeVisualizationView::SetFocus()

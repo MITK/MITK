@@ -312,16 +312,17 @@ vtkMitkOpenGLVolumeTextureMapper3D::vtkMitkOpenGLVolumeTextureMapper3D()
   this->SupportsCompressedTexture    = false;
   
   prgOneComponentShade = 0;
-  
+  prgRGBAShade = 0;
 }
 
 vtkMitkOpenGLVolumeTextureMapper3D::~vtkMitkOpenGLVolumeTextureMapper3D()
 {
   //GPU_INFO << "~vtkMitkOpenGLVolumeTextureMapper3D";
-
-
   if(prgOneComponentShade)  
     vtkgl::DeleteProgramsARB( 1, &prgOneComponentShade );
+
+  if(prgRGBAShade)  
+    vtkgl::DeleteProgramsARB( 1, &prgRGBAShade );
 }
 
 // Release the graphics resources used by this texture.  
@@ -464,7 +465,7 @@ void vtkMitkOpenGLVolumeTextureMapper3D::RenderFP(vtkRenderer *ren,
       break;
       
     case 4:
-      this->RenderFourDependentShadeFP(ren,vol);
+      this->RenderRGBAShadeFP(ren,vol);
       break;
     }
   
@@ -716,16 +717,6 @@ void vtkMitkOpenGLVolumeTextureMapper3D::RenderPolygons( vtkRenderer *ren,
 // components), and the fourth component is placed in the second component
 // of volume2. The first component of volume2 is later filled in with the
 // gradient magnitude.
-
-
-/*
-static int _clamp(int value, int top)
-{
-  if(value<0) value=0;
-  if(value>top) value=top;
-  return value;
-}
-*/
 
 template <class T> 
 class ScalarGradientCompute
@@ -1736,7 +1727,7 @@ void vtkMitkOpenGLVolumeTextureMapper3D::SetupOneIndependentTextures( vtkRendere
 
 
 
-void vtkMitkOpenGLVolumeTextureMapper3D::SetupFourDependentTextures(
+void vtkMitkOpenGLVolumeTextureMapper3D::SetupRGBATextures(
   vtkRenderer *vtkNotUsed(ren),
   vtkVolume *vol )
 {
@@ -1844,7 +1835,6 @@ void vtkMitkOpenGLVolumeTextureMapper3D::RenderOneIndependentShadeFP(
 
   this->SetupOneIndependentTextures( ren, vol );
 
-
   glEnable( vtkgl::FRAGMENT_PROGRAM_ARB );
 
   vtkgl::BindProgramARB( vtkgl::FRAGMENT_PROGRAM_ARB, prgOneComponentShade );
@@ -1873,26 +1863,17 @@ void vtkMitkOpenGLVolumeTextureMapper3D::RenderOneIndependentShadeFP(
   this->RenderPolygons( ren, vol, stages );  
 
   glDisable( vtkgl::FRAGMENT_PROGRAM_ARB );
-  
 }
 
-void vtkMitkOpenGLVolumeTextureMapper3D::RenderFourDependentShadeFP(
+void vtkMitkOpenGLVolumeTextureMapper3D::RenderRGBAShadeFP(
   vtkRenderer *ren,
   vtkVolume *vol )
 {
-  this->SetupFourDependentTextures(ren, vol);
+  this->SetupRGBATextures(ren, vol);
 
   glEnable( vtkgl::FRAGMENT_PROGRAM_ARB );
 
-  GLuint fragmentProgram;
-  vtkgl::GenProgramsARB( 1, &fragmentProgram );
-
-  vtkgl::BindProgramARB( vtkgl::FRAGMENT_PROGRAM_ARB, fragmentProgram );
-
-  vtkgl::ProgramStringARB( vtkgl::FRAGMENT_PROGRAM_ARB,
-          vtkgl::PROGRAM_FORMAT_ASCII_ARB, 
-          static_cast<GLsizei>(strlen(vtkMitkVolumeTextureMapper3D_FourDependentShadeFP)),
-          vtkMitkVolumeTextureMapper3D_FourDependentShadeFP );
+  vtkgl::BindProgramARB( vtkgl::FRAGMENT_PROGRAM_ARB, prgRGBAShade );
 
   this->SetupProgramLocalsForShadingFP( ren, vol );
   
@@ -1909,13 +1890,10 @@ void vtkMitkOpenGLVolumeTextureMapper3D::RenderFourDependentShadeFP(
     glBindTexture(vtkgl::TEXTURE_3D, this->Volume2Index);   
   }
 
-
   int stages[4] = {1,1,1,0};
   this->RenderPolygons( ren, vol, stages );  
 
   glDisable( vtkgl::FRAGMENT_PROGRAM_ARB );
-  
-  vtkgl::DeleteProgramsARB( 1, &fragmentProgram );
 }
 
 
@@ -2211,15 +2189,14 @@ void vtkMitkOpenGLVolumeTextureMapper3D::SetupProgramLocalsForShadingFP(
                                      2.0, -1.0, 0.0, 0.0 );
 }
 
-int  vtkMitkOpenGLVolumeTextureMapper3D::IsRenderSupported(
-  vtkVolumeProperty *property , vtkRenderer *r)
+int  vtkMitkOpenGLVolumeTextureMapper3D::IsRenderSupported(  vtkRenderer *renderer, vtkVolumeProperty *property )
 {
   //GPU_INFO << "IsRenderSupported";
 
   if ( !this->Initialized )
     {
     //this->Initialize();
-			this->Initialize(r);
+			this->Initialize(renderer);
 		}
   
   if ( !this->RenderPossible )
@@ -2241,17 +2218,16 @@ int  vtkMitkOpenGLVolumeTextureMapper3D::IsRenderSupported(
   return 1;
 }
 
-void vtkMitkOpenGLVolumeTextureMapper3D::Initialize(vtkRenderer *r)
+void vtkMitkOpenGLVolumeTextureMapper3D::Initialize(vtkRenderer *renderer)
 {
   //GPU_INFO << "Initialize";
 
   this->Initialized = 1;
  // vtkOpenGLExtensionManager * extensions = vtkOpenGLExtensionManager::New();
   //extensions->SetRenderWindow(NULL); // set render window to the current one.
-	vtkOpenGLExtensionManager *extensions=static_cast<vtkOpenGLRenderWindow *>(r->GetRenderWindow())->GetExtensionManager();
+	vtkOpenGLExtensionManager *extensions=static_cast<vtkOpenGLRenderWindow *>(renderer->GetRenderWindow())->GetExtensionManager();
   
   int supports_texture3D=extensions->ExtensionSupported( "GL_VERSION_1_2" );
-	
   if(supports_texture3D)
     {
     extensions->LoadExtension("GL_VERSION_1_2");
@@ -2280,9 +2256,7 @@ void vtkMitkOpenGLVolumeTextureMapper3D::Initialize(vtkRenderer *r)
       }
     }
   
-  this->SupportsCompressedTexture=
-    extensions->ExtensionSupported("GL_VERSION_1_3")==1;
-  
+  this->SupportsCompressedTexture=extensions->ExtensionSupported("GL_VERSION_1_3")==1;
   if(!this->SupportsCompressedTexture)
     {
     this->SupportsCompressedTexture=
@@ -2292,19 +2266,7 @@ void vtkMitkOpenGLVolumeTextureMapper3D::Initialize(vtkRenderer *r)
       extensions->LoadCorePromotedExtension("GL_ARB_texture_compression");
       }
     }
-    
   //GPU_INFO(this->SupportsCompressedTexture) << "supporting compressed textures";
-  
-  const char *gl_version=
-    reinterpret_cast<const char *>(glGetString(GL_VERSION));
-  const char *mesa_version=strstr(gl_version,"Mesa");
-  
-  
-  // Workaround for broken Mesa
-  if(mesa_version!=0) // any Mesa
-    {
-    this->SupportsCompressedTexture=false;
-    }
   
   this->SupportsNonPowerOfTwoTextures=
         extensions->ExtensionSupported("GL_VERSION_2_0")
@@ -2312,84 +2274,21 @@ void vtkMitkOpenGLVolumeTextureMapper3D::Initialize(vtkRenderer *r)
 
   //GPU_INFO << "np2: " << (this->SupportsNonPowerOfTwoTextures?1:0);
   
-  bool brokenMesa=false;
-  
-  if(mesa_version!=0)
-    {
-    // Workaround for broken Mesa (dash16-sql):
-    // GL_VENDOR="Mesa project: www.mesa3d.org"
-    // GL_VERSION="1.4 (2.1 Mesa 7.0.4)"
-    // GL_RENDERER="Mesa GLX Indirect"
-    // there is no problem with (dash6):
-    // GL_VENDOR="Brian Paul"
-    // GL_VERSION="2.0 Mesa 7.0.4"
-    // GL_RENDERER="Mesa X11"
-    // glGetIntegerv(vtkgl::MAX_3D_TEXTURE_SIZE,&maxSize) return some
-    // uninitialized value and a loading a Luminance-alpha 16x16x16 just
-    // crashes glx.
-    int mesa_major=0;
-    int mesa_minor=0;
-    int mesa_patch=0;
-    int opengl_major=0;
-    int opengl_minor=0;
-    if(sscanf(gl_version,"%d.%d",&opengl_major, &opengl_minor)>=2)
-      {
-      if(opengl_major==1 && opengl_minor==4)
-        {
-        if(sscanf(mesa_version,"Mesa %d.%d.%d",&mesa_major,
-                  &mesa_minor,&mesa_patch)>=3)
-          {
-          brokenMesa=mesa_major==7 && mesa_minor==0 && mesa_patch==4;
-          }
-        }
-      }
-    }
-  
-  int supports_GL_NV_texture_shader2     = extensions->ExtensionSupported( "GL_NV_texture_shader2" );
-  int supports_GL_NV_register_combiners2 = extensions->ExtensionSupported( "GL_NV_register_combiners2" );
-  int supports_GL_ATI_fragment_shader    = extensions->ExtensionSupported( "GL_ATI_fragment_shader" );
   int supports_GL_ARB_fragment_program   = extensions->ExtensionSupported( "GL_ARB_fragment_program" );
-  int supports_GL_ARB_vertex_program     = extensions->ExtensionSupported( "GL_ARB_vertex_program" );
-  int supports_GL_NV_register_combiners  = extensions->ExtensionSupported( "GL_NV_register_combiners" );
-  
-  if(supports_GL_NV_texture_shader2) 
-    {
-    extensions->LoadExtension("GL_NV_texture_shader2" );
-    }
-  
-  if(supports_GL_NV_register_combiners2)  
-    {
-    extensions->LoadExtension( "GL_NV_register_combiners2" );
-    }
-  
-  if(supports_GL_ATI_fragment_shader)     
-    {
-    extensions->LoadExtension( "GL_ATI_fragment_shader" );
-    }
-  
   if(supports_GL_ARB_fragment_program)    
     {
     extensions->LoadExtension( "GL_ARB_fragment_program" );
     }
-  
+
+  int supports_GL_ARB_vertex_program     = extensions->ExtensionSupported( "GL_ARB_vertex_program" );
   if(supports_GL_ARB_vertex_program)    
     {
     extensions->LoadExtension( "GL_ARB_vertex_program" );
     }
   
-  if(supports_GL_NV_register_combiners)  
-    {
-    extensions->LoadExtension( "GL_NV_register_combiners" );
-    }
-
-  //extensions->Delete();
+  RenderPossible = 0;
   
-  
-  int canDoFP = 0;
-  // int canDoNV = 0;
-  
-  if ( !brokenMesa &&
-       supports_texture3D          &&
+  if ( supports_texture3D          &&
        supports_multitexture       &&
        supports_GL_ARB_fragment_program   &&
        supports_GL_ARB_vertex_program     &&
@@ -2402,12 +2301,11 @@ void vtkMitkOpenGLVolumeTextureMapper3D::Initialize(vtkRenderer *r)
        vtkgl::ProgramStringARB            &&
        vtkgl::ProgramLocalParameter4fARB )
     {    
-    canDoFP = 1;
+    RenderPossible = 1;
     }
     else
     {
       std::string errString = "no gpu-acceleration possible cause following extensions/methods are missing or unsupported:";
-            
       if(!supports_texture3D) errString += " EXT_TEXTURE3D";
       if(!supports_multitexture) errString += " EXT_MULTITEXTURE";
       if(!supports_GL_ARB_fragment_program) errString += " ARB_FRAGMENT_PROGRAM";
@@ -2420,12 +2318,9 @@ void vtkMitkOpenGLVolumeTextureMapper3D::Initialize(vtkRenderer *r)
       if(!vtkgl::BindProgramARB) errString += " glBindProgramARB";
       if(!vtkgl::ProgramStringARB) errString += " glProgramStringARB";
       if(!vtkgl::ProgramLocalParameter4fARB) errString += " glProgramLocalParameter4fARB";
-  
       GPU_WARN << errString;
     };
 
-  this->RenderPossible=canDoFP;  
-  
   if(RenderPossible)
   {
     vtkgl::GenProgramsARB( 1, &prgOneComponentShade );
@@ -2434,8 +2329,14 @@ void vtkMitkOpenGLVolumeTextureMapper3D::Initialize(vtkRenderer *r)
           vtkgl::PROGRAM_FORMAT_ASCII_ARB, 
           static_cast<GLsizei>(strlen(vtkMitkVolumeTextureMapper3D_OneComponentShadeFP)),
           vtkMitkVolumeTextureMapper3D_OneComponentShadeFP );
+          
+   vtkgl::GenProgramsARB( 1, &prgRGBAShade );
+   vtkgl::BindProgramARB( vtkgl::FRAGMENT_PROGRAM_ARB, prgRGBAShade );
+   vtkgl::ProgramStringARB( vtkgl::FRAGMENT_PROGRAM_ARB,
+         vtkgl::PROGRAM_FORMAT_ASCII_ARB, 
+         static_cast<GLsizei>(strlen(vtkMitkVolumeTextureMapper3D_FourDependentShadeFP)),
+         vtkMitkVolumeTextureMapper3D_FourDependentShadeFP );
   }
-
 }
 
 

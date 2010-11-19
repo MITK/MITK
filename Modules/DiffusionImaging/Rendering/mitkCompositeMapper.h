@@ -61,10 +61,11 @@ namespace mitk {
       m_ImgMapper->MitkRenderOpaqueGeometry(renderer);
       Disable2DOpenGL();
       m_OdfMapper->MitkRenderOpaqueGeometry(renderer);
-      if( mitk::RenderingManager::GetInstance()->GetNextLOD( renderer ) == 0 )
-      {
+      // KLAUS DISABLING LOD
+//      if( mitk::RenderingManager::GetInstance()->GetNextLOD( renderer ) == 0 )
+//      {
         renderer->Modified();
-      }
+//      }
     }
 
     virtual void MitkRenderTranslucentGeometry(BaseRenderer* renderer)
@@ -149,7 +150,8 @@ namespace mitk {
     virtual void GenerateData(mitk::BaseRenderer* renderer)
     {
       m_ImgMapper->GenerateData(renderer);
-      if( mitk::RenderingManager::GetInstance()->GetNextLOD( renderer ) > 0 )
+      // KLAUS DISABLING LOD
+//      if( mitk::RenderingManager::GetInstance()->GetNextLOD( renderer ) > 0 )
       {
         m_OdfMapper->GenerateData(renderer);
       }

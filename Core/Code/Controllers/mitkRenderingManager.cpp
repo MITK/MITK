@@ -721,14 +721,12 @@ RenderingManager
 ::RenderingEndCallback( vtkObject *caller, unsigned long , void *, void * )
 {
   vtkRenderWindow *renderWindow  = dynamic_cast< vtkRenderWindow * >( caller );
+
   mitk::RenderingManager* renman = mitk::BaseRenderer::GetInstance(renderWindow)->GetRenderingManager();
 
   RenderWindowList &renderWindowList = renman->m_RenderWindowList;
-  RendererBoolMap &renderingAbortedMap = renman->m_RenderingAbortedMap;
-  RendererIntMap &nextLODMap = renman->m_NextLODMap;
-  unsigned int &maxLOD = renman->m_MaxLOD;
-  bool &lodIncreaseBlocked = renman->m_LODIncreaseBlocked;
 
+  RendererIntMap &nextLODMap = renman->m_NextLODMap;
   
   if ( renderWindow )
   {
@@ -740,51 +738,10 @@ RenderingManager
       // Level-of-Detail handling
       if ( renderer->GetNumberOfVisibleLODEnabledMappers() > 0 )
       {
-        bool newRenderingRequest = false;
-
-        // Check if rendering has been aborted
-        if ( renderingAbortedMap[renderer] )
-        {
-          // YES: reset LOD counter and request next update
-          renderingAbortedMap[renderer] = false;
-          nextLODMap[renderer] = 0;
-          newRenderingRequest = true;
-        }
+        if(nextLODMap[renderer]==0)
+          renman->StartOrResetTimer();
         else
-        {
-          // NO: Make sure that LOD-increase is currently not blocked
-          // (by mouse-movement)
-          if ( !lodIncreaseBlocked )
-          {
-            // Check if the maximum LOD level has already been reached
-            if ( nextLODMap[renderer] < maxLOD )
-            {
-              // NO: increase the level for this renderer...
-              nextLODMap[renderer]++;
-
-              // ... and request new update for this window
-              newRenderingRequest = true;
-            }
-            else
-            {
-              // YES: Reset to level 0 for next rendering request (by user)
-              nextLODMap[renderer] = 0;
-            }
-          }
-        }
-
-      
-        mitk::RenderingManager* renman = mitk::BaseRenderer::GetInstance(renderWindow)->GetRenderingManager();
-
-        // Issue events queued during rendering (abort mechanism)
-        renman->DoFinishAbortRendering();
-
-        // Post new rendering request only at the end to give DoFinishAbortRendering
-        // the chance to process other events first!
-        if ( newRenderingRequest )
-        {
-          renman->RequestUpdate( renderer->GetRenderWindow() );
-        }
+          nextLODMap[renderer] = 0;
       }
     }
   }
@@ -840,25 +797,23 @@ RenderingManager
 
 void
 RenderingManager
-::SetNextLOD( unsigned int lod, BaseRenderer *renderer )
+::ExecutePendingHighResRenderingRequest()
 {
-  unsigned int newLOD = lod < m_MaxLOD ? lod : m_MaxLOD;
+  RenderWindowList::iterator it;
+  for ( it = m_RenderWindowList.begin(); it != m_RenderWindowList.end(); ++it )
+  {
+    BaseRenderer *renderer = BaseRenderer::GetInstance( it->first );
 
-  if ( renderer != NULL )
-  {
-    m_NextLODMap[renderer] = newLOD;
-  }
-  else
-  {
-    // Set next LOD for all renderers
-    RenderWindowList::iterator it;
-    for ( it = m_RenderWindowList.begin(); it != m_RenderWindowList.end(); ++it )
+    if(renderer->GetNumberOfVisibleLODEnabledMappers()>0)
     {
-      m_NextLODMap[BaseRenderer::GetInstance( it->first )] = newLOD;
+      if(m_NextLODMap[renderer]==0)
+      {
+        m_NextLODMap[renderer]=1;
+        RequestUpdate( it->first );
+      }
     }
   }
 }
-
 
 void
 RenderingManager

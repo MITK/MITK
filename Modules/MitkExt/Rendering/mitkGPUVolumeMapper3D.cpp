@@ -547,8 +547,11 @@ void mitk::GPUVolumeMapper3D::SetDefaultProperties(mitk::DataNode* node, mitk::B
   node->AddProperty( "volumerendering.cpu.diffuse",  mitk::FloatProperty::New( 0.50f ), renderer, overwrite );
   node->AddProperty( "volumerendering.cpu.specular", mitk::FloatProperty::New( 0.40f ), renderer, overwrite );
   node->AddProperty( "volumerendering.cpu.specular.power", mitk::FloatProperty::New( 16.0f ), renderer, overwrite );
-
-  node->AddProperty( "volumerendering.usegpu", mitk::BoolProperty::New( true ), renderer, overwrite );
+  bool usegpu = true;
+#ifdef __APPLE__
+  usegpu = false;
+#endif
+  node->AddProperty( "volumerendering.usegpu", mitk::BoolProperty::New( usegpu ), renderer, overwrite );
   
 // Only with VTK 5.6 or above
 #if ((VTK_MAJOR_VERSION > 5) || ((VTK_MAJOR_VERSION==5) && (VTK_MINOR_VERSION>=6) ))

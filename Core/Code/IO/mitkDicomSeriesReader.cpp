@@ -44,6 +44,12 @@ DataNode::Pointer DicomSeriesReader::LoadDicomSeries(const StringContainer &file
 
 bool DicomSeriesReader::LoadDicomSeries(const StringContainer &filenames, DataNode &node, UpdateCallBackMethod callback)
 {
+  if(filenames.size() == 0)
+  {
+    MITK_ERROR << "Calling LoadDicomSeries with empty filename string container. Aborting.";
+    return false;
+  }
+
   DcmIoType::Pointer io = DcmIoType::New();
 
   try

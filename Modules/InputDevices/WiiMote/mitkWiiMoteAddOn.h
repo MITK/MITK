@@ -1,15 +1,12 @@
 #ifndef MITK_WIIMOTEADDON_H_
 #define MITK_WIIMOTEADDON_H_
 
-#include <mitkEventMapperAddon.h>
+// export macro
 #include <mitkWiiMoteExports.h>
 
-#include "mitkWiiMoteIREvent.h"
-#include "mitkWiiMoteButtonEvent.h"
-#include "mitkWiiMoteCalibrationEvent.h"
-
-// used for Point2D
-#include "mitkVector.h"
+// mitk
+#include "mitkVector.h" // used for Point2D
+#include <mitkEventMapperAddon.h>
 
 namespace mitk {
   
@@ -45,13 +42,13 @@ namespace mitk {
 
     /**
     * Creates suitable events, when the Wiimote sends IR data <br>
-    * and forwards it for further processing.
+    * for movement and forwards it for further processing.
     */
     void WiiMoteInput(const itk::EventObject& e);
 
     /**
     * Creates suitable events, when the Wiimote sends button events <br>
-    * and forwards it for further processing.
+    * to trigger an action and forwards it for further processing.
     */
     void WiiMoteButtonPressed(const itk::EventObject& e);
 
@@ -60,6 +57,19 @@ namespace mitk {
     * to configure the sensitivity and forwards it for further processing.
     */
     void WiiMoteCalibrationInput(const itk::EventObject& e);
+
+    /**
+    * @see mitk::WiiMoteThread::SetWiiMoteSurfaceIModus(bool activated)
+    */
+    void SetWiiMoteSurfaceIModus(bool activated);
+
+    /**
+    * Creates suitable events, regardless what type of data the <br>
+    * Wiimote sends for a surface interaction. Then forwards the <br>
+    * transformed data for further processing. 
+    * 
+    */
+    void WiiMoteSurfaceInteractionInput(const itk::EventObject& e);
 
   protected:
 

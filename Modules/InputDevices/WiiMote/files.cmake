@@ -6,5 +6,7 @@ SET(CPP_FILES
   mitkWiiMoteButtonEvent.cpp
   mitkWiiMoteIREvent.cpp
   mitkWiiMoteCalibrationEvent.cpp
+  mitkWiiMoteAllDataEvent.cpp
+  mitkWiiMoteInteractor.cpp
   )
 

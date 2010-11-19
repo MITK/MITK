@@ -2912,13 +2912,13 @@
       </transition>
     </state>
   </stateMachine>
-  <stateMachine NAME="WiiMoteInteraction">
+  <stateMachine NAME="WiiMoteHeadtracking">
     <state NAME="headtracking" ID="1" START_STATE="TRUE">
-      <transition NAME="stay in dummy" NEXT_STATE_ID="1" EVENT_ID="4003"> <!--EIDWIIMOTEINPUT-->
+      <transition NAME="startState" NEXT_STATE_ID="1" EVENT_ID="4003"> <!--EIDWIIMOTEINPUT-->
         <action ID="4003" />
         <!--AcONWIIMOTEINPUT-->
       </transition>
-      <transition NAME="stay in dummy" NEXT_STATE_ID="1" EVENT_ID="4004"> <!--EIDWIIMOTEBUTTON-->
+      <transition NAME="buttonState" NEXT_STATE_ID="1" EVENT_ID="4004"> <!--EIDWIIMOTEBUTTON-->
         <action ID="4004" />
         <!--AcRESETVIEW-->
       </transition>
@@ -2937,6 +2937,14 @@
         <!--AcFINISH-->
       </transition>
     </state>
+  </stateMachine>
+  <stateMachine NAME="WiiMoteSurfaceInteraction">
+    <state NAME="headtracking" ID="1" START_STATE="TRUE">
+      <transition NAME="stay in dummy" NEXT_STATE_ID="1" EVENT_ID="4003"> <!--EIDWIIMOTEINPUT-->
+        <action ID="4003" />
+        <!--AcONWIIMOTEINPUT-->
+      </transition>
+	</state>
   </stateMachine>
   <stateMachine NAME="InteractorTestPattern">
     <!-- To Test an Interactor for the right behavior -->

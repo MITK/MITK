@@ -18,13 +18,16 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITK_WIIMOTEACTIVATOR_H_
 #define MITK_WIIMOTEACTIVATOR_H_
 
+// berry
 #include <berryIPreferences.h>
 #include <berryIPreferencesService.h>
 #include <berryPlatform.h>
 
+// mitk
 #include "mitkIInputDevice.h"
-
 #include "mitkWiiMoteVtkCameraController.h"
+#include <mitkWiiMoteInteractor.h>
+#include <mitkDataStorage.h>
 
 namespace mitk
 {
@@ -51,10 +54,27 @@ namespace mitk
 
     bool m_IsRegistered;
 
+    // listener for headtracking and interactor for surface interaction
     mitk::WiiMoteVtkCameraController::Pointer m_Controller;
+    mitk::WiiMoteInteractor::Pointer m_Interactor;
 
+    // for xml accesss
     berry::IPreferences::Pointer m_WiiMotePreferencesNode;
-     berry::IPreferencesService::Pointer m_PrefService;
+    berry::IPreferencesService::Pointer m_PrefService;
+
+    // needed for surface interaction
+    mitk::DataNode::Pointer m_Node;
+
+    /**
+    * Gets the current active data storage. <br>
+    * 
+    * @return the current data storage, if it fails <code>NULL</code>
+    */
+    mitk::DataStorage::Pointer GetDataStorage();
+
+    void AddSurfaceInteractor();
+    void RemoveSurfaceInteractor();
+
 
   }; // end class WiiMoteActivator
 } // end namespace mitk

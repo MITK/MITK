@@ -94,6 +94,7 @@ namespace mitk
     /**
     * Reads incoming data from the IR camera. After processing the data <br>
     * (e.g. computations, assigning commands...) fires Wiimote events accordingly. 
+    * 
     */
     void WiiMoteIRInput();
 
@@ -136,11 +137,13 @@ namespace mitk
     * Sets the modus for the first connected Wiimote depending <br>
     * on the given parameter.
     * 
-    * @param activateModus 
+    * @param activated 
     *             true, the Surface Interaction modus will be activated
     *             false, the Surface Interaction modus will be deactivated
     */
-    void SetWiiMoteSurfaceIModus(bool activateModus);
+    void SetWiiMoteSurfaceIModus(bool activated);
+
+    void SurfaceInteraction();
 
   protected:
 

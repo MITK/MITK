@@ -3,6 +3,8 @@
 #include "mitkWiiMoteAddOn.h"
 #include "mitkWiiMoteIREvent.h"
 #include "mitkWiiMoteButtonEvent.h"
+#include <mitkWiiMoteCalibrationEvent.h>
+#include <mitkWiiMoteAllDataEvent.h>
 
 // timelimit between two state changes to send an event
 // the chosen value is empirical
@@ -21,6 +23,7 @@ mitk::WiiMoteThread::WiiMoteThread()
 //, m_CurrentTimeStep(0)
 , m_SleepTime(SLEEPDEFAULT)
 , m_InCalibrationMode(false)
+, m_SurfaceInteraction(false)
 {
   
 }
@@ -236,21 +239,6 @@ void mitk::WiiMoteThread::DisconnectWiiMotes()
 
 void mitk::WiiMoteThread::WiiMoteIRInput()
 {
-  //// test for reading Motion Plus data
-  //short testPitch = m_WiiMotes[0].MotionPlus.Raw.Pitch;
-  //short testRoll = m_WiiMotes[0].MotionPlus.Raw.Roll;
-  //short testYaw = m_WiiMotes[0].MotionPlus.Raw.Yaw;
-
-  //bool connected = m_WiiMotes[0].MotionPlusConnected();
-  //bool enabled = m_WiiMotes[0].MotionPlusEnabled();
-  //bool extension = m_WiiMotes[0].MotionPlusHasExtension();
-
-  //float testPitchSpeed = m_WiiMotes[0].MotionPlus.Speed.Pitch;
-  //float testRollSpeed = m_WiiMotes[0].MotionPlus.Speed.Roll;
-  //float testYawSpeed = m_WiiMotes[0].MotionPlus.Speed.Yaw;
-
-  //bool visibility = m_WiiMotes[0].IR.Dot[0].bVisible;
-
   if(m_WiiMotes[0].IR.Dot[0].bVisible)
   {
     //m_CurrentTimeStep++;
@@ -343,13 +331,20 @@ void mitk::WiiMoteThread::SingleWiiMoteUpdate()
     m_WiiMoteThreadFinished->Unlock();
 
     m_WiiMoteThreadFinished->Lock();
-    if(!m_InCalibrationMode)
+    if(!m_SurfaceInteraction)
     {
-      this->WiiMoteIRInput();
+      if(!m_InCalibrationMode)
+      {
+        this->WiiMoteIRInput();
+      }
+      else
+      {
+        this->WiiMoteCalibrationInput();
+      }
     }
     else
     {
-      this->WiiMoteCalibrationInput();
+      this->SurfaceInteraction();
     }
     m_WiiMoteThreadFinished->Unlock();
 
@@ -450,6 +445,44 @@ void mitk::WiiMoteThread::MultiWiiMoteIRInput()
     MITK_INFO << "IR2 :: X: " << tempPoint2[0];
     MITK_INFO << "IR2 :: Y: " << tempPoint2[1];
   }
+}
+
+void mitk::WiiMoteThread::SetWiiMoteSurfaceIModus(bool active)
+{
+  this->m_SurfaceInteraction = active;
+}
+
+void mitk::WiiMoteThread::SurfaceInteraction()
+{
+  m_Command = ReceptorCommand::New();
+  m_Command->SetCallbackFunction
+    (mitk::WiiMoteAddOn::GetInstance(), &mitk::WiiMoteAddOn::WiiMoteSurfaceInteractionInput);
+
+  mitk::WiiMoteAllDataEvent e
+    (mitk::Type_WiiMoteInput
+    ,m_WiiMotes[0].MotionPlus.Speed.Pitch
+    ,m_WiiMotes[0].MotionPlus.Speed.Roll
+    ,m_WiiMotes[0].MotionPlus.Speed.Yaw);
+
+  mitk::CallbackFromGUIThread::GetInstance()
+    ->CallThisFromGUIThread(m_Command, e.MakeObject());
+
+  //MITK_INFO << "Speed Pitch: " << m_WiiMotes[0].MotionPlus.Speed.Pitch; 
+  //MITK_INFO << "Speed Roll: " << m_WiiMotes[0].MotionPlus.Speed.Roll;
+  //MITK_INFO << "Speed Yaw: " << m_WiiMotes[0].MotionPlus.Speed.Yaw;
+
+  //// test for reading Motion Plus data
+  //short testPitch = m_WiiMotes[0].MotionPlus.Raw.Pitch;
+  //short testRoll = m_WiiMotes[0].MotionPlus.Raw.Roll;
+  //short testYaw = m_WiiMotes[0].MotionPlus.Raw.Yaw;
+
+  //bool connected = m_WiiMotes[0].MotionPlusConnected();
+  //bool enabled = m_WiiMotes[0].MotionPlusEnabled();
+  //bool extension = m_WiiMotes[0].MotionPlusHasExtension();
+
+  //float testPitchSpeed = m_WiiMotes[0].MotionPlus.Speed.Pitch;
+  //float testRollSpeed = m_WiiMotes[0].MotionPlus.Speed.Roll;
+  //float testYawSpeed = m_WiiMotes[0].MotionPlus.Speed.Yaw;
 }
 
 

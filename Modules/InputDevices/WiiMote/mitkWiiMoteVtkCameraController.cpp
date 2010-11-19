@@ -22,7 +22,7 @@ const double YMIN = 0;
 const double YMAX = 768;
 
 mitk::WiiMoteVtkCameraController::WiiMoteVtkCameraController() 
-: CameraController("WiiMoteInteraction")
+: CameraController("WiiMoteHeadtracking")
 , m_ClippingRangeIsSet(false)
 , m_SensitivityXMIN (XMAX)
 , m_SensitivityXMAX (XMIN)

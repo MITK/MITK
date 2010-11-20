@@ -23,6 +23,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkOdfNormalizationMethodProperty.h"
 #include "mitkOdfScaleByProperty.h"
 
+#include "mitkDiffusionImage.h"
+
 #include "QmitkDataStorageComboBox.h"
 #include "QmitkStdMultiWidget.h"
 
@@ -215,14 +217,17 @@ struct CvpSelListener : ISelectionListener
     }
 
     m_View->m_Controls->m_DisplayIndex->setVisible(foundDiffusionImage);
+    m_View->m_Controls->label_channel->setVisible(foundDiffusionImage);
 
     m_View->m_FoundSingleOdfImage = (foundQBIVolume || foundTensorVolume)
                                     && !foundMultipleOdfImages;
-    m_View->m_Controls->m_ShowMaxNumber->setVisible(m_View->m_FoundSingleOdfImage);
+    m_View->m_Controls->m_NumberGlyphsFrame->setVisible(m_View->m_FoundSingleOdfImage);
+
     m_View->m_Controls->m_NormalizationDropdown->setVisible(m_View->m_FoundSingleOdfImage);
     m_View->m_Controls->label->setVisible(m_View->m_FoundSingleOdfImage);
     m_View->m_Controls->m_ScalingFactor->setVisible(m_View->m_FoundSingleOdfImage);
     m_View->m_Controls->m_AdditionalScaling->setVisible(m_View->m_FoundSingleOdfImage);
+    m_View->m_Controls->m_NormalizationScalingFrame->setVisible(m_View->m_FoundSingleOdfImage);
 
     m_View->m_Controls->OpacMinFrame->setVisible(m_View->m_FoundSingleOdfImage);
 
@@ -325,6 +330,9 @@ void QmitkControlVisualizationPropertiesView::CreateQtPartControl(QWidget *paren
     m_Controls->m_OpacitySlider->setLowerValue(0.0);
     m_Controls->m_OpacitySlider->setUpperValue(0.0);
 
+    m_Controls->m_ScalingFrame->setVisible(false);
+    m_Controls->m_NormalizationFrame->setVisible(false);
+
   }
 
   
@@ -367,6 +375,9 @@ void QmitkControlVisualizationPropertiesView::CreateConnections()
     connect( (QObject*)(m_Controls->m_AdditionalScaling), SIGNAL(currentIndexChanged(int)), this, SLOT(AdditionalScaling(int)) );
     connect( (QObject*)(m_Controls->m_IndexParam1), SIGNAL(valueChanged(double)), this, SLOT(IndexParam1Changed(double)) );
     connect( (QObject*)(m_Controls->m_IndexParam2), SIGNAL(valueChanged(double)), this, SLOT(IndexParam2Changed(double)) );
+
+    connect( (QObject*)(m_Controls->m_NormalizationCheckbox), SIGNAL(clicked()), this, SLOT(NormalizationCheckbox()) );
+    connect( (QObject*)(m_Controls->m_ScalingCheckbox), SIGNAL(clicked()), this, SLOT(ScalingCheckbox()) );
 
     connect( (QObject*)(m_Controls->m_OpacitySlider), SIGNAL(spanChanged(double,double)), this, SLOT(OpacityChanged(double,double)) );
 
@@ -827,4 +838,16 @@ void QmitkControlVisualizationPropertiesView::OpacityChanged(double l, double u)
   if(m_MultiWidget)
     m_MultiWidget->RequestUpdate();
 
+}
+
+void QmitkControlVisualizationPropertiesView::NormalizationCheckbox()
+{
+  m_Controls->m_NormalizationFrame->setVisible(
+      m_Controls->m_NormalizationCheckbox->isChecked());
+}
+
+void QmitkControlVisualizationPropertiesView::ScalingCheckbox()
+{
+  m_Controls->m_ScalingFrame->setVisible(
+      m_Controls->m_ScalingCheckbox->isChecked());
 }

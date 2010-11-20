@@ -97,6 +97,8 @@ protected slots:
   void IndexParam1Changed(double);
   void IndexParam2Changed(double);
   void OpacityChanged(double,double);
+  void NormalizationCheckbox();
+  void ScalingCheckbox();
 
 protected:
 

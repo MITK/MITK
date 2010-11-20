@@ -178,6 +178,8 @@ struct CvpSelListener : ISelectionListener
             node->GetIntProperty("DisplayChannel", val);
             m_View->m_Controls->m_DisplayIndex->setValue(val);
 
+            int maxVal = (dynamic_cast<mitk::DiffusionImage<short>* >(node->GetData()))->GetVectorImage()->GetVectorLength();
+            m_View->m_Controls->m_DisplayIndex->setMaximum(maxVal);
           }
 
           else if(QString("QBallImage").compare(node->GetData()->GetNameOfClass())==0)

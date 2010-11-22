@@ -170,4 +170,28 @@ void UnstructuredGridVtkWriter<VTKWRITER>::DoWrite(BaseData::Pointer data)
   }
 }
 
+template<class VTKWRITER>
+std::vector<std::string> UnstructuredGridVtkWriter<VTKWRITER>::GetPossibleFileExtensions()
+{
+  throw std::exception(); // no specialization available!
+}
+
+template<class VTKWRITER>
+const char* UnstructuredGridVtkWriter<VTKWRITER>::GetDefaultFilename()
+{
+  throw std::exception(); // no specialization available!
+}
+
+template<class VTKWRITER>
+const char* UnstructuredGridVtkWriter<VTKWRITER>::GetFileDialogPattern()
+{
+  throw std::exception(); // no specialization available!
+}
+
+template<class VTKWRITER>
+const char* UnstructuredGridVtkWriter<VTKWRITER>::GetDefaultExtension()
+{
+  throw std::exception(); // no specialization available!
+}
+
 }

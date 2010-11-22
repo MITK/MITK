@@ -550,6 +550,7 @@ void mitk::GPUVolumeMapper3D::SetDefaultProperties(mitk::DataNode* node, mitk::B
   bool usegpu = true;
 #ifdef __APPLE__
   usegpu = false;
+  node->AddProperty( "volumerendering.uselod", mitk::BoolProperty::New( true ), renderer, overwrite );
 #endif
   node->AddProperty( "volumerendering.usegpu", mitk::BoolProperty::New( usegpu ), renderer, overwrite );
   

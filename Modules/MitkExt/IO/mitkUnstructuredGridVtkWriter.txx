@@ -15,9 +15,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#include "mitkUnstructuredGridVtkWriter.h"
-class vtkDataObject;
-#include <vtkConfigure.h>
+#include <itkLightObject.h>
 #include <vtkUnstructuredGrid.h>
 #include <vtkLinearTransform.h>
 #include <vtkTransformFilter.h>
@@ -26,55 +24,25 @@ class vtkDataObject;
 #include <sys/types.h>
 #include <stdio.h>
 
-template <class VTKWRITER>
-mitk::UnstructuredGridVtkWriter<VTKWRITER>::UnstructuredGridVtkWriter()
-: m_WriterWriteHasReturnValue( false )
+namespace mitk {
+
+template<class VTKWRITER>
+UnstructuredGridVtkWriter<VTKWRITER>::UnstructuredGridVtkWriter()
+  : m_Success(false)
 {
-  this->SetNumberOfRequiredInputs( 1 );
-  
-  m_VtkWriter = VtkWriterType::New();
-
-  //enable to write ascii-formatted-file
-  //m_VtkWriter->SetFileTypeToASCII();
-
-  SetDefaultExtension(); // and information about the Writer's Write() method
-}
-
-template <class VTKWRITER>
-mitk::UnstructuredGridVtkWriter<VTKWRITER>::~UnstructuredGridVtkWriter()
-{
-  m_VtkWriter->Delete();
-}
-
-template <class VTKWRITER>
-void mitk::UnstructuredGridVtkWriter<VTKWRITER>::SetDefaultExtension()
-{
-  m_Extension = ".vtk";
+  this->SetNumberOfRequiredInputs(1);
 }
 
 template<class VTKWRITER>
-void mitk::UnstructuredGridVtkWriter<VTKWRITER>::ExecuteWrite( VtkWriterType* m_VtkWriter, vtkTransformFilter* /*transformPointSet*/ )
+UnstructuredGridVtkWriter<VTKWRITER>::~UnstructuredGridVtkWriter()
 {
-  struct stat fileStatus;
-  time_t timeBefore=0;
-  if (!stat(m_VtkWriter->GetFileName(),&fileStatus))
-  {
-  timeBefore = fileStatus.st_mtime;
-  }
-   if (!m_VtkWriter->Write())
-  {
-    itkExceptionMacro(<<"Error during surface writing.");
-  }
-  // check if file can be written because vtkWriter doesn't check that
-  if (stat(m_VtkWriter->GetFileName(),&fileStatus)||(timeBefore==fileStatus.st_mtime))
-  {
-    itkExceptionMacro(<<"Error during surface writing: file could not be written");
-  }
+
 }
 
-template <class VTKWRITER>
-void mitk::UnstructuredGridVtkWriter<VTKWRITER>::GenerateData()
+template<class VTKWRITER>
+void UnstructuredGridVtkWriter<VTKWRITER>::GenerateData()
 {
+  m_Success = false;
   if ( m_FileName == "" )
   {
     itkWarningMacro( << "Sorry, filename has not been set!" );
@@ -82,14 +50,21 @@ void mitk::UnstructuredGridVtkWriter<VTKWRITER>::GenerateData()
   }
 
   mitk::UnstructuredGrid::Pointer input = const_cast<mitk::UnstructuredGrid*>(this->GetInput());
-  
+
+  if (input.IsNull())
+  {
+    itkWarningMacro( << "Sorry, input to mitk::UnstructuredGridVtkWriter is NULL");
+    return;
+  }
+
+  VTKWRITER* unstructuredGridWriter = VTKWRITER::New();
   vtkTransformFilter* transformPointSet = vtkTransformFilter::New();
   vtkUnstructuredGrid * unstructuredGrid;
   Geometry3D* geometry;
 
   if(input->GetTimeSlicedGeometry()->GetTimeSteps()>1)
   {
-    
+
     int t, timesteps;
 
     timesteps = input->GetTimeSlicedGeometry()->GetTimeSteps();
@@ -100,27 +75,23 @@ void mitk::UnstructuredGridVtkWriter<VTKWRITER>::GenerateData()
       if(input->GetTimeSlicedGeometry()->IsValidTime(t))
       {
         const mitk::TimeBounds& timebounds = geometry->GetTimeBounds();
-        filename <<  m_FileName.c_str() << "_S" << std::setprecision(0) << timebounds[0] << "_E" << std::setprecision(0) << timebounds[1] << "_T" << t << m_Extension;
+        filename <<  m_FileName.c_str() << "_S" << std::setprecision(0) << timebounds[0] << "_E" << std::setprecision(0) << timebounds[1] << "_T" << t << GetDefaultExtension();
       }
       else
       {
         itkWarningMacro(<<"Error on write: TimeSlicedGeometry invalid of unstructured grid " << filename << ".");
-        filename <<  m_FileName.c_str() << "_T" << t << m_Extension;
+        filename <<  m_FileName.c_str() << "_T" << t << GetDefaultExtension();
       }
       geometry->TransferItkToVtkTransform();
       transformPointSet->SetInput(input->GetVtkUnstructuredGrid(t));
       transformPointSet->SetTransform(geometry->GetVtkTransform());
       transformPointSet->UpdateWholeExtent();
       unstructuredGrid = static_cast<vtkUnstructuredGrid*>(transformPointSet->GetOutput());
-      
-      m_VtkWriter->SetFileName(filename.str().c_str());
-#if VTK_MAJOR_VERSION >= 5 
-      m_VtkWriter->SetInput((vtkDataObject*)unstructuredGrid);
-#else
-      m_VtkWriter->SetInput(unstructuredGrid);
-#endif
-     
-      ExecuteWrite( m_VtkWriter, transformPointSet );
+
+      unstructuredGridWriter->SetFileName(filename.str().c_str());
+      unstructuredGridWriter->SetInput(unstructuredGrid);
+
+      ExecuteWrite( unstructuredGridWriter );
     }
   }
   else
@@ -131,73 +102,72 @@ void mitk::UnstructuredGridVtkWriter<VTKWRITER>::GenerateData()
     transformPointSet->SetTransform(geometry->GetVtkTransform());
     transformPointSet->UpdateWholeExtent();
     unstructuredGrid = static_cast<vtkUnstructuredGrid*>(transformPointSet->GetOutput());
-      
-    m_VtkWriter->SetFileName(m_FileName.c_str());
-#if VTK_MAJOR_VERSION >= 5 
-    m_VtkWriter->SetInput((vtkDataObject*)unstructuredGrid);
-#else
-    m_VtkWriter->SetInput(unstructuredGrid);
-#endif
-    
-    ExecuteWrite( m_VtkWriter, transformPointSet );
+
+    unstructuredGridWriter->SetFileName(m_FileName.c_str());
+    unstructuredGridWriter->SetInput(unstructuredGrid);
+
+    ExecuteWrite( unstructuredGridWriter );
   }
   transformPointSet->Delete();
-  m_MimeType = "image/ug";
+  unstructuredGridWriter->Delete();
+
+  m_Success = true;
 }
 
-template <class VTKWRITER>
-void mitk::UnstructuredGridVtkWriter<VTKWRITER>::SetInput( mitk::UnstructuredGrid* ug )
+template<class VTKWRITER>
+void UnstructuredGridVtkWriter<VTKWRITER>::ExecuteWrite( VTKWRITER* vtkWriter )
 {
-  this->ProcessObject::SetNthInput( 0, ug );
-}
-
-template <class VTKWRITER>
-const mitk::UnstructuredGrid* mitk::UnstructuredGridVtkWriter<VTKWRITER>::GetInput()
-{
-  if ( this->GetNumberOfInputs() < 1 )
+  struct stat fileStatus;
+  time_t timeBefore=0;
+  if (!stat(vtkWriter->GetFileName(), &fileStatus))
   {
-    return NULL;
+    timeBefore = fileStatus.st_mtime;
+  }
+  if (!vtkWriter->Write())
+  {
+    itkExceptionMacro( << "Error during unstructured grid writing.");
+  }
+
+  // check if file can be written because vtkWriter doesn't check that
+  if (stat(vtkWriter->GetFileName(), &fileStatus) || (timeBefore == fileStatus.st_mtime))
+  {
+    itkExceptionMacro(<<"Error during unstructured grid writing: file could not be written");
+  }
+}
+
+template<class VTKWRITER>
+void UnstructuredGridVtkWriter<VTKWRITER>::SetInput(UnstructuredGrid *input)
+{
+  this->ProcessObject::SetNthInput(0, input);
+}
+
+template<class VTKWRITER>
+const UnstructuredGrid* UnstructuredGridVtkWriter<VTKWRITER>::GetInput()
+{
+  if (this->GetNumberOfInputs() < 1)
+  {
+    return 0;
   }
   else
   {
-    return static_cast< const mitk::UnstructuredGrid * >( this->ProcessObject::GetInput( 0 ) );
+    return dynamic_cast<UnstructuredGrid*>(this->ProcessObject::GetInput(0));
   }
 }
 
-template <class VTKWRITER>
-bool mitk::UnstructuredGridVtkWriter<VTKWRITER>::CanWriteDataType( DataNode* input )
+template<class VTKWRITER>
+bool UnstructuredGridVtkWriter<VTKWRITER>::CanWriteDataType(BaseData::Pointer data)
 {
-  if ( input )
+  return (dynamic_cast<mitk::UnstructuredGrid*>(data.GetPointer()) != 0);
+}
+
+template<class VTKWRITER>
+void UnstructuredGridVtkWriter<VTKWRITER>::DoWrite(BaseData::Pointer data)
+{
+  if (CanWriteDataType(data))
   {
-    mitk::BaseData* data = input->GetData();
-    if ( data )
-    {
-       mitk::UnstructuredGrid::Pointer ug = dynamic_cast<mitk::UnstructuredGrid*>( data );
-       if( ug.IsNotNull() )
-       {
-         SetDefaultExtension();
-         return true;
-       }
-    }
+    this->SetInput(dynamic_cast<mitk::UnstructuredGrid*>(data.GetPointer()));
+    this->Update();
   }
-  return false;
 }
 
-template <class VTKWRITER>
-void mitk::UnstructuredGridVtkWriter<VTKWRITER>::SetInput( DataNode* input )
-{
-  if( input && CanWriteDataType( input ) )
-   SetInput( dynamic_cast<mitk::UnstructuredGrid*>( input->GetData() ) );
-}
-
-template <class VTKWRITER>
-std::string mitk::UnstructuredGridVtkWriter<VTKWRITER>::GetWritenMIMEType()
-{
-  return m_MimeType;
-}
-
-template <class VTKWRITER>
-std::string mitk::UnstructuredGridVtkWriter<VTKWRITER>::GetFileExtension()
-{
-  return m_Extension;
 }

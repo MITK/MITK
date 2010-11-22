@@ -28,6 +28,12 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkStlVolumeTimeSeriesIOFactory.h"
 #include "mitkVtkVolumeTimeSeriesIOFactory.h"
 
+#include "mitkUnstructuredGridVtkWriterFactory.h"
+#include "mitkUnstructuredGridVtkWriter.h"
+#include <vtkUnstructuredGridWriter.h>
+#include <vtkXMLUnstructuredGridWriter.h>
+#include <vtkXMLPUnstructuredGridWriter.h>
+
 #include "mitkCone.h"
 #include "mitkContour.h"
 #include "mitkContourMapper2D.h"
@@ -64,6 +70,12 @@ mitk::CoreExtObjectFactory::CoreExtObjectFactory()
     itk::ObjectFactoryBase::RegisterFactory( VtkUnstructuredGridIOFactory::New() );
     itk::ObjectFactoryBase::RegisterFactory( StlVolumeTimeSeriesIOFactory::New() );
     itk::ObjectFactoryBase::RegisterFactory( VtkVolumeTimeSeriesIOFactory::New() );
+
+    mitk::UnstructuredGridVtkWriterFactory::RegisterOneFactory();
+
+    m_FileWriters.push_back(mitk::UnstructuredGridVtkWriter<vtkUnstructuredGridWriter>::New().GetPointer());
+    m_FileWriters.push_back(mitk::UnstructuredGridVtkWriter<vtkXMLUnstructuredGridWriter>::New().GetPointer());
+    m_FileWriters.push_back(mitk::UnstructuredGridVtkWriter<vtkXMLPUnstructuredGridWriter>::New().GetPointer());
 
     CreateFileExtensionsMap();
 
@@ -182,12 +194,19 @@ void mitk::CoreExtObjectFactory::CreateFileExtensionsMap()
 {
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.vtu", "VTK Unstructured Grid"));
   m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.vtk", "VTK Unstructured Grid"));
+  m_FileExtensionsMap.insert(std::pair<std::string, std::string>("*.pvtu", "VTK Unstructured Grid"));
+
+  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.pvtu", "VTK Parallel XML Unstructured Grid"));
+  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.vtu", "VTK XML Unstructured Grid"));
+  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.vtk", "VTK Legacy Unstructured Grid"));
 }
 
-const char* mitk::CoreExtObjectFactory::GetSaveFileExtensions() 
-{ 
-  return "";
-};
+const char* mitk::CoreExtObjectFactory::GetSaveFileExtensions()
+{
+  std::string fileExtension;
+  this->CreateFileExtensions(m_SaveFileExtensionsMap, fileExtension);
+  return fileExtension.c_str();
+}
 
 void mitk::CoreExtObjectFactory::RegisterIOFactories() 
 {

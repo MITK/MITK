@@ -16,37 +16,13 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include "mitkUnstructuredGridVtkWriter.h"
-#include "mitkUnstructuredGridVtkWriter.txx"
 
 #include <vtkUnstructuredGridWriter.h>
 #include <vtkXMLUnstructuredGridWriter.h>
+#include <vtkXMLPUnstructuredGridWriter.h>
 
 namespace mitk {
 
-
-template<>
-void UnstructuredGridVtkWriter<vtkUnstructuredGridWriter>::SetDefaultExtension()
-{
-  m_Extension = ".vtk";
-  m_WriterWriteHasReturnValue = false;
-}
-
-template<>
-void UnstructuredGridVtkWriter<vtkXMLUnstructuredGridWriter>::SetDefaultExtension()
-{
-  m_Extension = ".vtu";
-  m_WriterWriteHasReturnValue = true;
-}
-
-template<>
-void UnstructuredGridVtkWriter<vtkXMLUnstructuredGridWriter>::ExecuteWrite( VtkWriterType* m_VtkWriter, vtkTransformFilter* transformPointSet )
-{
-  if (!m_VtkWriter->Write())
-  {
-    transformPointSet->Delete();
-    throw std::ios_base::failure("Error during unstructured grid writing.");
-  }
-}
 
 template<>
 std::vector<std::string> UnstructuredGridVtkWriter<vtkUnstructuredGridWriter>::GetPossibleFileExtensions()
@@ -64,9 +40,67 @@ std::vector<std::string> UnstructuredGridVtkWriter<vtkXMLUnstructuredGridWriter>
   return possibleFileExtensions;
 }
 
-template class MitkExt_EXPORT UnstructuredGridVtkWriter<vtkUnstructuredGridWriter>;
+template<>
+std::vector<std::string> UnstructuredGridVtkWriter<vtkXMLPUnstructuredGridWriter>::GetPossibleFileExtensions()
+{
+  std::vector<std::string> possibleFileExtensions;
+  possibleFileExtensions.push_back(".pvtu");
+  return possibleFileExtensions;
+}
 
-template class MitkExt_EXPORT UnstructuredGridVtkWriter<vtkXMLUnstructuredGridWriter>;
+template<>
+const char * UnstructuredGridVtkWriter<vtkUnstructuredGridWriter>::GetDefaultFilename()
+{
+  return "vtkUnstructuredGrid.vtk";
+}
+
+template<>
+const char * UnstructuredGridVtkWriter<vtkXMLUnstructuredGridWriter>::GetDefaultFilename()
+{
+  return "vtkUnstructuredGrid.vtu";
+}
+
+template<>
+const char * UnstructuredGridVtkWriter<vtkXMLPUnstructuredGridWriter>::GetDefaultFilename()
+{
+  return "vtkUnstructuredGrid.pvtu";
+}
+
+template<>
+const char * UnstructuredGridVtkWriter<vtkUnstructuredGridWriter>::GetFileDialogPattern()
+{
+  return "VTK Legacy Unstructured Grid (*.vtk)";
+}
+
+template<>
+const char * UnstructuredGridVtkWriter<vtkXMLUnstructuredGridWriter>::GetFileDialogPattern()
+{
+  return "VTK XML Unstructured Grid (*.vtu)";
+}
+
+template<>
+const char * UnstructuredGridVtkWriter<vtkXMLPUnstructuredGridWriter>::GetFileDialogPattern()
+{
+  return "VTK Parallel XML Unstructured Grid (*.pvtu)";
+}
+
+template<>
+const char * UnstructuredGridVtkWriter<vtkUnstructuredGridWriter>::GetDefaultExtension()
+{
+  return ".vtk";
+}
+
+template<>
+const char * UnstructuredGridVtkWriter<vtkXMLUnstructuredGridWriter>::GetDefaultExtension()
+{
+  return ".vtu";
+}
+
+template<>
+const char * UnstructuredGridVtkWriter<vtkXMLPUnstructuredGridWriter>::GetDefaultExtension()
+{
+  return ".pvtu";
+}
 
 }
 

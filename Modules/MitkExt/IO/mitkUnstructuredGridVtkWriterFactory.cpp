@@ -21,7 +21,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include "itkVersion.h"
 
 #include <mitkUnstructuredGridVtkWriter.h>
+#include <vtkUnstructuredGridWriter.h>
 #include <vtkXMLUnstructuredGridWriter.h>
+#include <vtkXMLPUnstructuredGridWriter.h>
 
 namespace mitk
 {
@@ -54,10 +56,22 @@ private:
 UnstructuredGridVtkWriterFactory::UnstructuredGridVtkWriterFactory()
 {
   this->RegisterOverride("IOWriter",
-                         "UnstructuredGridVtkWriter",
-                         "UnstructuredGrid Vtk Writer",
+                         "UnstructuredGridVtkWriter<vtkUnstructuredGridWriter>",
+                         "VTK Legacy Unstructured Grid Writer",
+                         1,
+                         mitk::CreateUnstructuredGridWriter< mitk::UnstructuredGridVtkWriter<vtkUnstructuredGridWriter> >::New());
+
+  this->RegisterOverride("IOWriter",
+                         "UnstructuredGridVtkWriter<vtkXMLUnstructuredGridWriter>",
+                         "VTK XML UnstructuredGrid Writer",
                          1,
                          mitk::CreateUnstructuredGridWriter< mitk::UnstructuredGridVtkWriter<vtkXMLUnstructuredGridWriter> >::New());
+
+  this->RegisterOverride("IOWriter",
+                         "UnstructuredGridVtkWriter<vtkXMLPUnstructuredGridWriter>",
+                         "VTK Parallel XML UnstructuredGrid Writer",
+                         1,
+                         mitk::CreateUnstructuredGridWriter< mitk::UnstructuredGridVtkWriter<vtkXMLPUnstructuredGridWriter> >::New());
 }
 
 UnstructuredGridVtkWriterFactory::~UnstructuredGridVtkWriterFactory()

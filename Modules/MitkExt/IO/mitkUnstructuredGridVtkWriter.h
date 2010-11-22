@@ -19,14 +19,11 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef _MITK_UNSTRUCTURED_GRID_VTK_WRITER__H_
 #define _MITK_UNSTRUCTURED_GRID_VTK_WRITER__H_
 
-#include <iomanip>
 
 #include <itkProcessObject.h>
-#include <mitkFileWriter.h>
-#include <mitkPointSet.h>
-#include <mitkUnstructuredGrid.h>
+#include <mitkFileWriterWithInformation.h>
 
-class vtkTransformFilter;
+#include "mitkUnstructuredGrid.h"
 
 namespace mitk
 {
@@ -45,18 +42,16 @@ namespace mitk
  * yet supported.
  * @ingroup Process
 */
-template <class VTKWRITER>
-class UnstructuredGridVtkWriter : public mitk::FileWriter
+template<class VTKWRITER>
+class UnstructuredGridVtkWriter : public mitk::FileWriterWithInformation
 {
 public:
 
-    mitkClassMacro( UnstructuredGridVtkWriter, mitk::FileWriter );
+    mitkClassMacro( UnstructuredGridVtkWriter, mitk::FileWriterWithInformation );
 
     itkNewMacro( Self );
 
     mitkWriterMacro;
-
-    typedef VTKWRITER VtkWriterType;
 
     /**
      * Sets the filename of the file to write.
@@ -68,31 +63,6 @@ public:
      * @returns the name of the file to be written to disk.
      */
     itkGetStringMacro( FileName );
-
-    /**
-     * \brief Explicitly set the extension to be added to the filename.
-     * @param _arg to be added to the filename, including a "." 
-     * (e.g., ".vtk").
-     * 
-     * Partial template specialization is used for some vtk-writer types 
-     * to set a default extension.
-     */
-    itkSetStringMacro( Extension );
-
-    /**
-     * \brief Get the extension to be added to the filename.
-     * @returns the extension to be added to the filename (e.g., 
-     * ".vtk").
-     */
-    itkGetStringMacro( Extension );
-
-    /**
-     * \brief Set the extension to be added to the filename to the default
-     * 
-     * Partial template specialization is used for some vtk-writer types 
-     * to define the default extension.
-     */
-    void SetDefaultExtension();
 
     /**
      * @warning multiple write not (yet) supported
@@ -123,37 +93,24 @@ public:
     /**
      * @returns the 0'th input object of the filter.
      */
-    const mitk::UnstructuredGrid* GetInput();
+    const UnstructuredGrid* GetInput();
+
+    /**
+     * Returns false if an error happened during writing
+     */
+    itkGetMacro( Success, bool );
 
     /**
     * @brief Return the possible file extensions for the data type associated with the writer
     */
     virtual std::vector<std::string> GetPossibleFileExtensions();
 
-    /**
-    * @brief Return the extension to be added to the filename.
-    */
-    virtual std::string GetFileExtension();
-
-    /**
-    * @brief Check if the Writer can write the Content of the DataTreenode.
-    */
-    virtual bool CanWriteDataType( DataNode* );
-
-    /**
-    * @brief Return the MimeType of the saved File.
-    */
-    virtual std::string GetWritenMIMEType();
-
-    /**
-    * @brief Set the DataTreenode as Input. Important: The Writer always have a SetInput-Function.
-    */
-    virtual void SetInput( DataNode* );
-
-    VtkWriterType* GetVtkWriter()
-    {
-      return m_VtkWriter;
-    }
+    // FileWriterWithInformation methods
+    virtual const char * GetDefaultFilename();
+    virtual const char * GetFileDialogPattern();
+    virtual const char * GetDefaultExtension();
+    virtual bool CanWriteDataType(BaseData::Pointer data);
+    virtual void DoWrite(BaseData::Pointer data);
 
 protected:
 
@@ -167,25 +124,21 @@ protected:
      */
     virtual ~UnstructuredGridVtkWriter();
 
+    void ExecuteWrite(VTKWRITER* vtkWriter);
+
     virtual void GenerateData();
       
-    void ExecuteWrite( VtkWriterType* m_VtkWriter, vtkTransformFilter* transformPointSet );
-
     std::string m_FileName;
 
     std::string m_FilePrefix;
 
     std::string m_FilePattern;
 
-    std::string m_Extension;
-
-    std::string m_MimeType;
-
-    VtkWriterType* m_VtkWriter;
-  
-    bool m_WriterWriteHasReturnValue;
+    bool m_Success;
 };
 
 }
+
+#include "mitkUnstructuredGridVtkWriter.txx"
 
 #endif // _MITK_UNSTRUCTURED_GRID_VTK_WRITER__H_

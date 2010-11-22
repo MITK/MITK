@@ -74,11 +74,12 @@ QmitkProgressBar::QmitkProgressBar(QWidget * parent, const char *  /*name*/)
   connect( this, SIGNAL(SignalProgress(unsigned int)), this, SLOT(SlotProgress(unsigned int)) );
   connect( this, SIGNAL(SignalSetPercentageVisible(bool)), this, SLOT(SlotSetPercentageVisible(bool)) );
 
-  mitk::ProgressBar::SetImplementationInstance(this);
+  mitk::ProgressBar::GetInstance()->RegisterImplementationInstance(this);
 }
 
 QmitkProgressBar::~QmitkProgressBar()
 {
+  mitk::ProgressBar::GetInstance()->UnregisterImplementationInstance(this);
 }
 
 void QmitkProgressBar::SlotProgress(unsigned int steps)

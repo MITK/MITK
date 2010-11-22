@@ -22,10 +22,11 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkOutputWindow.h>
 #include <itkCommand.h>
 
+#include <algorithm>
+
 namespace mitk
 {
 
-  ProgressBarImplementation* ProgressBar::m_Implementation = NULL;
   ProgressBar* ProgressBar::m_Instance = NULL;
 
   /**
@@ -34,9 +35,17 @@ namespace mitk
    */
   void ProgressBar::Progress(unsigned int steps)
   {
-    if (m_Implementation != NULL)
+    if ( !m_Implementations.empty() )
     {
-      m_Implementation->Progress(steps);
+      ProgressBarImplementationsListIterator iter;
+      for ( iter = m_Implementations.begin(); iter != m_Implementations.end(); iter++ )
+      {
+        // update progress for all ProgressBarImplementations
+        if ( (*iter) != NULL )
+        {
+          (*iter)->Progress(steps);
+        }
+      }
     }
   }
 
@@ -45,9 +54,17 @@ namespace mitk
    */
   void ProgressBar::AddStepsToDo(unsigned int steps)
   {
-    if (m_Implementation)
+    if ( !m_Implementations.empty() )
     {
-      m_Implementation->AddStepsToDo(steps);
+      ProgressBarImplementationsListIterator iter;
+      for ( iter = m_Implementations.begin(); iter != m_Implementations.end(); iter++ )
+      {
+        // set steps to do for all ProgressBarImplementations
+        if ( (*iter) != NULL )
+        {
+          (*iter)->AddStepsToDo(steps);
+        }
+      }
     }
   }
 
@@ -56,9 +73,17 @@ namespace mitk
    */
   void ProgressBar::SetPercentageVisible(bool visible)
   {
-    if (m_Implementation != NULL)
+    if ( !m_Implementations.empty() )
     {
-      m_Implementation->SetPercentageVisible(visible);
+      ProgressBarImplementationsListIterator iter;
+      for ( iter = m_Implementations.begin(); iter != m_Implementations.end(); iter++ )
+      {
+        // set percentage visible for all ProgressBarImplementations
+        if ( (*iter) != NULL )
+        {
+          (*iter)->SetPercentageVisible(visible);
+        }
+      }
     }
   }
 
@@ -78,13 +103,21 @@ namespace mitk
   /**
    * Set an instance of this; application must do this!See Header!
    */
-  void ProgressBar::SetImplementationInstance(ProgressBarImplementation* implementation)
+  void ProgressBar::RegisterImplementationInstance(ProgressBarImplementation* implementation)
   {
-    if ( m_Implementation == implementation )
+    if ( std::find( m_Implementations.begin(), m_Implementations.end(), implementation ) == m_Implementations.end() )
     {
-      return;
+      m_Implementations.push_back( implementation );
     }
-    m_Implementation = implementation;
+  }
+
+  void ProgressBar::UnregisterImplementationInstance(ProgressBarImplementation* implementation)
+  {
+    ProgressBarImplementationsListIterator iter = std::find( m_Implementations.begin(), m_Implementations.end(), implementation );
+    if ( iter != m_Implementations.end() )
+    {
+      m_Implementations.erase( iter );
+    }
   }
 
   ProgressBar::ProgressBar()

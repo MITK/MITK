@@ -49,7 +49,9 @@ namespace mitk
     //##Documentation
     //## @brief Supply a GUI- dependent ProgressBar. Has to be set by the application
     //## to connect the application dependent subclass of mitkProgressBar
-    static void SetImplementationInstance(ProgressBarImplementation* implementation);
+    void RegisterImplementationInstance(ProgressBarImplementation* implementation);
+
+    void UnregisterImplementationInstance(ProgressBarImplementation* implementation);
 
     //##Documentation
     //## @brief Adds steps to totalSteps.
@@ -65,12 +67,15 @@ namespace mitk
     void SetPercentageVisible (bool visible);
     
   protected:
+
+    typedef std::vector< ProgressBarImplementation* > ProgressBarImplementationsList;
+    typedef ProgressBarImplementationsList::iterator ProgressBarImplementationsListIterator;
   
     ProgressBar();
   
     virtual ~ProgressBar();
   
-    static ProgressBarImplementation* m_Implementation;
+    ProgressBarImplementationsList m_Implementations;
 
     static ProgressBar* m_Instance;
   };

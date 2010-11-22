@@ -427,13 +427,13 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
 
 	// ==== Window Menu ==========================
 	QMenu* windowMenu = menuBar->addMenu("Window");
-	windowMenu->addAction("&New Window",
-		QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onNewWindow()));
-	windowMenu->addSeparator();
+	//windowMenu->addAction("&New Window",
+	//	QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onNewWindow()));
+	//windowMenu->addSeparator();
 	QMenu* perspMenu = windowMenu->addMenu("&Open Perspective");
-	QMenu* viewMenu = windowMenu->addMenu("Show &View");
-	viewMenu->setObjectName("Show View");
-	windowMenu->addSeparator();
+	//QMenu* viewMenu = windowMenu->addMenu("Show &View");
+	//viewMenu->setObjectName("Show View");
+	//windowMenu->addSeparator();
 	resetPerspAction = windowMenu->addAction("&Reset Perspective",
 		QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onResetPerspective()));
 	closePerspAction = windowMenu->addAction("&Close Perspective",
@@ -497,28 +497,28 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
 	// ==================================================
 
 	// ==== View Toolbar ==================================
-	QToolBar* qToolbar = new QToolBar;
+	//QToolBar* qToolbar = new QToolBar;
 
-	std::map<std::string, berry::IViewDescriptor::Pointer>::const_iterator
-		MapIter;
-	for (MapIter = VDMap.begin(); MapIter != VDMap.end(); ++MapIter)
-	{
-		berry::QtShowViewAction* viewAction = new berry::QtShowViewAction(window,
-			(*MapIter).second);
-		viewActions.push_back(viewAction);
-		viewMenu->addAction(viewAction);
-		if (showViewToolbar)
-		{
-			qToolbar->addAction(viewAction);
-		}
-	}
+	//std::map<std::string, berry::IViewDescriptor::Pointer>::const_iterator
+	//	MapIter;
+	//for (MapIter = VDMap.begin(); MapIter != VDMap.end(); ++MapIter)
+	//{
+	//	berry::QtShowViewAction* viewAction = new berry::QtShowViewAction(window,
+	//		(*MapIter).second);
+	//	viewActions.push_back(viewAction);
+	//	viewMenu->addAction(viewAction);
+	//	if (showViewToolbar)
+	//	{
+	//		qToolbar->addAction(viewAction);
+	//	}
+	//}
 
-	if (showViewToolbar)
-	{
-		mainWindow->addToolBar(qToolbar);
-	}
-	else
-		delete qToolbar;
+	//if (showViewToolbar)
+	//{
+	//	mainWindow->addToolBar(qToolbar);
+	//}
+	//else
+	//	delete qToolbar;
 	// ====================================================
 
 	// ===== Help menu ====================================

@@ -28,8 +28,8 @@ void mitk::BoundingObjectToSegmentationFilter::GenerateData()
 {
   typedef itk::Image<unsigned char, 3> itkImageType;
   mitk::Image::Pointer outputImage = this->GetOutput();
-  mitk::Image::Pointer inputImage = const_cast<mitk::Image*> (this->GetInput());
-  outputImage->Initialize(this->GetInput());
+  mitk::Image::ConstPointer inputImage = this->GetInput();
+  outputImage->Initialize(inputImage);
 
   itkImageType::Pointer itkImage;
   CastToItkImage(outputImage, itkImage);
@@ -45,16 +45,17 @@ void mitk::BoundingObjectToSegmentationFilter::GenerateData()
 
     itkImageType::IndexType boIndex;
     mitk::BoundingBox::PointType min = boToIm->GetMinimum();
-    boIndex[0] = (mitk::SlicedData::IndexType::IndexValueType)(min[0]);
-    boIndex[1] = (mitk::SlicedData::IndexType::IndexValueType)(min[1]);
-    boIndex[2] = (mitk::SlicedData::IndexType::IndexValueType)(min[2]);
-
+    // add 0.5 (boGeometry is no image geometry)
+    boIndex[0] = (mitk::SlicedData::IndexType::IndexValueType)(min[0] + 0.5);
+    boIndex[1] = (mitk::SlicedData::IndexType::IndexValueType)(min[1] + 0.5);
+    boIndex[2] = (mitk::SlicedData::IndexType::IndexValueType)(min[2] + 0.5);
 
     itkImageType::SizeType boSize;
     mitk::BoundingBox::PointType max = boToIm->GetMaximum();
-    boSize[0] = (mitk::SlicedData::IndexType::IndexValueType) (max[0]-min[0]+1);
-    boSize[1] = (mitk::SlicedData::IndexType::IndexValueType) (max[1]-min[1]+1);
-    boSize[2] = (mitk::SlicedData::IndexType::IndexValueType) (max[2]-min[2]+1);
+    // add 1 because we need 0.5 for each index
+    boSize[0] = (mitk::SlicedData::IndexType::IndexValueType) ((max[0]-min[0]) + 1);
+    boSize[1] = (mitk::SlicedData::IndexType::IndexValueType) ((max[1]-min[1]) + 1);
+    boSize[2] = (mitk::SlicedData::IndexType::IndexValueType) ((max[2]-min[2]) + 1);
 
     itkImageType::RegionType region(boIndex, boSize);
 

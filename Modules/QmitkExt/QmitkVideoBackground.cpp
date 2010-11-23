@@ -43,8 +43,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 QmitkVideoBackground::QmitkVideoBackground( QObject *parent )
 : QObject(parent)
-, m_VideoSource(0)
 , m_QTimer(new QTimer(this))
+, m_VideoSource(0)
 , m_VideoSourceObserverTag(0)
 {
   this->ResetVideoBackground();
@@ -52,8 +52,8 @@ QmitkVideoBackground::QmitkVideoBackground( QObject *parent )
 
 QmitkVideoBackground::QmitkVideoBackground(mitk::VideoSource* v, int TimerDelay)
 : QObject(0)
-, m_VideoSource(0)
 , m_QTimer(new QTimer(this))
+, m_VideoSource(0)
 , m_VideoSourceObserverTag(0)
 {
   this->SetVideoSource( v );

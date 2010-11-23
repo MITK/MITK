@@ -28,6 +28,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkLevelWindowProperty.h"
 #include "mitkVtkResliceInterpolationProperty.h"
 #include "mitkVolumeCalculator.h"
+#include "mitkImageSliceSelector.h"
 
 #include "mitkAbstractTransformGeometry.h"
 #include "mitkDataNodeFactory.h"
@@ -1296,10 +1297,45 @@ void mitk::ImageMapperGL2D::SetDefaultProperties(mitk::DataNode* node, mitk::Bas
   node->AddProperty( "in plane resample extent by geometry", mitk::BoolProperty::New( false ) );
   node->AddProperty( "bounding box", mitk::BoolProperty::New( false ) );
   
-  
+  bool isBinaryImage(false);
+  if ( ! node->GetBoolProperty("binary", isBinaryImage) )
+  {
+
+    // ok, property is not set, use heuristic to determine if this
+    // is a binary image
+    mitk::Image::Pointer centralSliceImage;
+    ScalarType minValue = 0.0;
+    ScalarType maxValue = 0.0;
+    ScalarType min2ndValue = 0.0;
+    ScalarType max2ndValue = 0.0;
+    mitk::ImageSliceSelector::Pointer sliceSelector = mitk::ImageSliceSelector::New();
+
+    sliceSelector->SetInput(image);
+    sliceSelector->SetSliceNr(image->GetDimension(2)/2);
+    sliceSelector->SetTimeNr(image->GetDimension(3)/2);
+    sliceSelector->SetChannelNr(image->GetDimension(4)/2);
+    sliceSelector->Update();
+    centralSliceImage = sliceSelector->GetOutput();
+    if ( centralSliceImage.IsNotNull() && centralSliceImage->IsInitialized() )
+    {
+      minValue    = centralSliceImage->GetScalarValueMin();
+      maxValue    = centralSliceImage->GetScalarValueMax();
+      min2ndValue = centralSliceImage->GetScalarValue2ndMin();
+      max2ndValue = centralSliceImage->GetScalarValue2ndMax();
+    }
+    if ( minValue == maxValue )
+    {
+      // centralSlice is strange, lets look at all data
+      minValue    = image->GetScalarValueMin();
+      maxValue    = image->GetScalarValueMaxNoRecompute();
+      min2ndValue = image->GetScalarValue2ndMinNoRecompute();
+      max2ndValue = image->GetScalarValue2ndMaxNoRecompute();
+    }
+    isBinaryImage = ( maxValue == min2ndValue && minValue == max2ndValue );
+  }
 
   // some more properties specific for a binary...
-  if(image->GetScalarValueMax() == image->GetScalarValue2ndMin()&& image->GetScalarValueMin() == image->GetScalarValue2ndMax()) 
+  if (isBinaryImage)
   {
     node->AddProperty( "opacity", mitk::FloatProperty::New(0.3f), renderer, overwrite );
     node->AddProperty( "color", ColorProperty::New(1.0,0.0,0.0), renderer, overwrite );
@@ -1324,7 +1360,7 @@ void mitk::ImageMapperGL2D::SetDefaultProperties(mitk::DataNode* node, mitk::Bas
     {
       mitk::LevelWindowProperty::Pointer levWinProp = mitk::LevelWindowProperty::New();
       mitk::LevelWindow levelwindow;
-      levelwindow.SetAuto( image );
+      levelwindow.SetAuto( image, true, true );
       levWinProp->SetLevelWindow( levelwindow );
       node->SetProperty( "levelwindow", levWinProp, renderer );
     }

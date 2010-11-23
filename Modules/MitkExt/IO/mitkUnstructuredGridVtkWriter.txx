@@ -19,6 +19,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkUnstructuredGrid.h>
 #include <vtkLinearTransform.h>
 #include <vtkTransformFilter.h>
+#include <vtkUnstructuredGridWriter.h>
+#include <vtkXMLUnstructuredGridWriter.h>
+#include <vtkXMLPUnstructuredGridWriter.h>
+
 #include <sstream>
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -193,5 +197,41 @@ const char* UnstructuredGridVtkWriter<VTKWRITER>::GetDefaultExtension()
 {
   throw std::exception(); // no specialization available!
 }
+
+template<>
+std::vector<std::string> UnstructuredGridVtkWriter<vtkUnstructuredGridWriter>::GetPossibleFileExtensions();
+
+template<>
+std::vector<std::string> UnstructuredGridVtkWriter<vtkXMLUnstructuredGridWriter>::GetPossibleFileExtensions();
+
+template<>
+std::vector<std::string> UnstructuredGridVtkWriter<vtkXMLPUnstructuredGridWriter>::GetPossibleFileExtensions();
+
+template<>
+const char * UnstructuredGridVtkWriter<vtkUnstructuredGridWriter>::GetDefaultFilename();
+
+template<>
+const char * UnstructuredGridVtkWriter<vtkXMLUnstructuredGridWriter>::GetDefaultFilename();
+
+template<>
+const char * UnstructuredGridVtkWriter<vtkXMLPUnstructuredGridWriter>::GetDefaultFilename();
+
+template<>
+const char * UnstructuredGridVtkWriter<vtkUnstructuredGridWriter>::GetFileDialogPattern();
+
+template<>
+const char * UnstructuredGridVtkWriter<vtkXMLUnstructuredGridWriter>::GetFileDialogPattern();
+
+template<>
+const char * UnstructuredGridVtkWriter<vtkXMLPUnstructuredGridWriter>::GetFileDialogPattern();
+
+template<>
+const char * UnstructuredGridVtkWriter<vtkUnstructuredGridWriter>::GetDefaultExtension();
+
+template<>
+const char * UnstructuredGridVtkWriter<vtkXMLUnstructuredGridWriter>::GetDefaultExtension();
+
+template<>
+const char * UnstructuredGridVtkWriter<vtkXMLPUnstructuredGridWriter>::GetDefaultExtension();
 
 }

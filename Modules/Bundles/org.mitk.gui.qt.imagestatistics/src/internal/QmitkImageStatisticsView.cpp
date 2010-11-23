@@ -644,6 +644,19 @@ void QmitkImageStatistics::UpdateStatistics()
       // If a (non-closed) PlanarFigure is selected, display a line profile widget
       if ( m_SelectedPlanarFigure != NULL )
       {
+        // check whether PlanarFigure is initialized
+        const mitk::Geometry2D *planarFigureGeometry2D = m_SelectedPlanarFigure->GetGeometry2D();
+        if ( planarFigureGeometry2D == NULL )
+        {
+          // Clear statistics, histogram, and GUI
+          this->InvalidateStatisticsTableView();
+          m_Controls->m_HistogramWidget->ClearItemModel();
+          m_Controls->m_LineProfileWidget->ClearItemModel();
+          m_CurrentStatisticsValid = false;
+          m_Controls->m_ErrorMessageLabel->hide();
+          m_Controls->m_SelectedMaskLabel->setText( "None" );
+          return;
+        }
         // TODO: enable line profile widget
         m_Controls->m_StatisticsWidgetStack->setCurrentIndex( 1 );       
         m_Controls->m_LineProfileWidget->SetImage( m_SelectedImage );

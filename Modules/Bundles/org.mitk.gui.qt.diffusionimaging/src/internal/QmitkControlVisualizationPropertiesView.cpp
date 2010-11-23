@@ -23,6 +23,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkOdfNormalizationMethodProperty.h"
 #include "mitkOdfScaleByProperty.h"
 
+#include "mitkDiffusionImage.h"
+
 #include "QmitkDataStorageComboBox.h"
 #include "QmitkStdMultiWidget.h"
 
@@ -49,18 +51,46 @@ struct CvpSelListener : ISelectionListener
   void ApplySettings(mitk::DataNode::Pointer node)
   {
     bool do_vis;
-    node->GetBoolProperty("VisibleOdfs", do_vis);
+    node->GetBoolProperty("VisibleOdfs_T", do_vis);
     if(do_vis)
     {
-      m_View->m_Controls->m_VisibleOdfsON->setIcon(*m_View->m_IconGlyON);
-      m_View->m_Controls->m_VisibleOdfsON->setChecked(true);
-      m_View->m_GlyIsOn = true;
+      m_View->m_Controls->m_VisibleOdfsON_T->setIcon(*m_View->m_IconGlyON_T);
+      m_View->m_Controls->m_VisibleOdfsON_T->setChecked(true);
+      m_View->m_GlyIsOn_T = true;
     }
     else
     {
-      m_View->m_Controls->m_VisibleOdfsON->setIcon(*m_View->m_IconGlyOFF);
-      m_View->m_Controls->m_VisibleOdfsON->setChecked(false);
-      m_View->m_GlyIsOn = false;
+      m_View->m_Controls->m_VisibleOdfsON_T->setIcon(*m_View->m_IconGlyOFF_T);
+      m_View->m_Controls->m_VisibleOdfsON_T->setChecked(false);
+      m_View->m_GlyIsOn_T = false;
+    }
+
+    node->GetBoolProperty("VisibleOdfs_C", do_vis);
+    if(do_vis)
+    {
+      m_View->m_Controls->m_VisibleOdfsON_C->setIcon(*m_View->m_IconGlyON_C);
+      m_View->m_Controls->m_VisibleOdfsON_C->setChecked(true);
+      m_View->m_GlyIsOn_C = true;
+    }
+    else
+    {
+      m_View->m_Controls->m_VisibleOdfsON_C->setIcon(*m_View->m_IconGlyOFF_C);
+      m_View->m_Controls->m_VisibleOdfsON_C->setChecked(false);
+      m_View->m_GlyIsOn_C = false;
+    }
+
+    node->GetBoolProperty("VisibleOdfs_S", do_vis);
+    if(do_vis)
+    {
+      m_View->m_Controls->m_VisibleOdfsON_S->setIcon(*m_View->m_IconGlyON_S);
+      m_View->m_Controls->m_VisibleOdfsON_S->setChecked(true);
+      m_View->m_GlyIsOn_S = true;
+    }
+    else
+    {
+      m_View->m_Controls->m_VisibleOdfsON_S->setIcon(*m_View->m_IconGlyOFF_S);
+      m_View->m_Controls->m_VisibleOdfsON_S->setChecked(false);
+      m_View->m_GlyIsOn_S = false;
     }
 
     bool tex_int;
@@ -102,7 +132,9 @@ struct CvpSelListener : ISelectionListener
     // save current selection in member variable
     m_View->m_CurrentSelection = selection.Cast<const IStructuredSelection>();
 
-    m_View->m_Controls->m_VisibleOdfsON->setVisible(false);
+    m_View->m_Controls->m_VisibleOdfsON_T->setVisible(false);
+    m_View->m_Controls->m_VisibleOdfsON_S->setVisible(false);
+    m_View->m_Controls->m_VisibleOdfsON_C->setVisible(false);
     m_View->m_Controls->m_TextureIntON->setVisible(false);
 
     bool foundDiffusionImage = false;
@@ -146,6 +178,8 @@ struct CvpSelListener : ISelectionListener
             node->GetIntProperty("DisplayChannel", val);
             m_View->m_Controls->m_DisplayIndex->setValue(val);
 
+            int maxVal = (dynamic_cast<mitk::DiffusionImage<short>* >(node->GetData()))->GetVectorImage()->GetVectorLength();
+            m_View->m_Controls->m_DisplayIndex->setMaximum(maxVal);
           }
 
           else if(QString("QBallImage").compare(node->GetData()->GetNameOfClass())==0)
@@ -185,23 +219,27 @@ struct CvpSelListener : ISelectionListener
     }
 
     m_View->m_Controls->m_DisplayIndex->setVisible(foundDiffusionImage);
+    m_View->m_Controls->label_channel->setVisible(foundDiffusionImage);
 
     m_View->m_FoundSingleOdfImage = (foundQBIVolume || foundTensorVolume)
                                     && !foundMultipleOdfImages;
-    m_View->m_Controls->m_ShowMaxNumber->setVisible(m_View->m_FoundSingleOdfImage);
+    m_View->m_Controls->m_NumberGlyphsFrame->setVisible(m_View->m_FoundSingleOdfImage);
+
     m_View->m_Controls->m_NormalizationDropdown->setVisible(m_View->m_FoundSingleOdfImage);
     m_View->m_Controls->label->setVisible(m_View->m_FoundSingleOdfImage);
     m_View->m_Controls->m_ScalingFactor->setVisible(m_View->m_FoundSingleOdfImage);
     m_View->m_Controls->m_AdditionalScaling->setVisible(m_View->m_FoundSingleOdfImage);
+    m_View->m_Controls->m_NormalizationScalingFrame->setVisible(m_View->m_FoundSingleOdfImage);
 
     m_View->m_Controls->OpacMinFrame->setVisible(m_View->m_FoundSingleOdfImage);
-    m_View->m_Controls->OpacMaxFrame->setVisible(m_View->m_FoundSingleOdfImage);
 
     // changed for SPIE paper, Principle curvature scaling
     //m_View->m_Controls->params_frame->setVisible(m_View->m_FoundSingleOdfImage);
     m_View->m_Controls->params_frame->setVisible(false);
 
-    m_View->m_Controls->m_VisibleOdfsON->setVisible(m_View->m_FoundSingleOdfImage);
+    m_View->m_Controls->m_VisibleOdfsON_T->setVisible(m_View->m_FoundSingleOdfImage);
+    m_View->m_Controls->m_VisibleOdfsON_S->setVisible(m_View->m_FoundSingleOdfImage);
+    m_View->m_Controls->m_VisibleOdfsON_C->setVisible(m_View->m_FoundSingleOdfImage);
 
     bool foundAnyImage = foundDiffusionImage ||
                          foundQBIVolume || foundTensorVolume || foundImage;
@@ -246,8 +284,12 @@ QmitkControlVisualizationPropertiesView::QmitkControlVisualizationPropertiesView
   m_MultiWidget(NULL),
   m_IconTexOFF(new QIcon(":/QmitkDiffusionImaging/texIntOFFIcon.png")),
   m_IconTexON(new QIcon(":/QmitkDiffusionImaging/texIntONIcon.png")),
-  m_IconGlyOFF(new QIcon(":/QmitkDiffusionImaging/glyphsoff.png")),
-  m_IconGlyON(new QIcon(":/QmitkDiffusionImaging/glyphson.png"))
+  m_IconGlyOFF_T(new QIcon(":/QmitkDiffusionImaging/glyphsoff_T.png")),
+  m_IconGlyON_T(new QIcon(":/QmitkDiffusionImaging/glyphson_T.png")),
+  m_IconGlyOFF_C(new QIcon(":/QmitkDiffusionImaging/glyphsoff_C.png")),
+  m_IconGlyON_C(new QIcon(":/QmitkDiffusionImaging/glyphson_C.png")),
+  m_IconGlyOFF_S(new QIcon(":/QmitkDiffusionImaging/glyphsoff_S.png")),
+  m_IconGlyON_S(new QIcon(":/QmitkDiffusionImaging/glyphson_S.png"))
 {
 }
 
@@ -271,7 +313,9 @@ void QmitkControlVisualizationPropertiesView::CreateQtPartControl(QWidget *paren
     m_Controls->m_Reinit->setIcon(icon5);
 
     m_Controls->m_TextureIntON->setCheckable(true);
-    m_Controls->m_VisibleOdfsON->setCheckable(true);
+    m_Controls->m_VisibleOdfsON_T->setCheckable(true);
+    m_Controls->m_VisibleOdfsON_S->setCheckable(true);
+    m_Controls->m_VisibleOdfsON_C->setCheckable(true);
 
 #ifndef DIFFUSION_IMAGING_EXTENDED
     int size = m_Controls->m_AdditionalScaling->count();
@@ -283,6 +327,13 @@ void QmitkControlVisualizationPropertiesView::CreateQtPartControl(QWidget *paren
       }
     }
 #endif
+
+    m_Controls->m_OpacitySlider->setRange(0.0,1.0);
+    m_Controls->m_OpacitySlider->setLowerValue(0.0);
+    m_Controls->m_OpacitySlider->setUpperValue(0.0);
+
+    m_Controls->m_ScalingFrame->setVisible(false);
+    m_Controls->m_NormalizationFrame->setVisible(false);
 
   }
 
@@ -316,7 +367,10 @@ void QmitkControlVisualizationPropertiesView::CreateConnections()
     connect( (QObject*)(m_Controls->m_TextureIntON), SIGNAL(clicked()), this, SLOT(TextIntON()) );
     connect( (QObject*)(m_Controls->m_Reinit), SIGNAL(clicked()), this, SLOT(Reinit()) );
 
-    connect( (QObject*)(m_Controls->m_VisibleOdfsON), SIGNAL(clicked()), this, SLOT(VisibleOdfsON()) );
+    connect( (QObject*)(m_Controls->m_VisibleOdfsON_T), SIGNAL(clicked()), this, SLOT(VisibleOdfsON_T()) );
+    connect( (QObject*)(m_Controls->m_VisibleOdfsON_S), SIGNAL(clicked()), this, SLOT(VisibleOdfsON_S()) );
+    connect( (QObject*)(m_Controls->m_VisibleOdfsON_C), SIGNAL(clicked()), this, SLOT(VisibleOdfsON_C()) );
+
     connect( (QObject*)(m_Controls->m_ShowMaxNumber), SIGNAL(editingFinished()), this, SLOT(ShowMaxNumberChanged()) );
     connect( (QObject*)(m_Controls->m_NormalizationDropdown), SIGNAL(currentIndexChanged(int)), this, SLOT(NormalizationDropdownChanged(int)) );
     connect( (QObject*)(m_Controls->m_ScalingFactor), SIGNAL(valueChanged(double)), this, SLOT(ScalingFactorChanged(double)) );
@@ -324,8 +378,10 @@ void QmitkControlVisualizationPropertiesView::CreateConnections()
     connect( (QObject*)(m_Controls->m_IndexParam1), SIGNAL(valueChanged(double)), this, SLOT(IndexParam1Changed(double)) );
     connect( (QObject*)(m_Controls->m_IndexParam2), SIGNAL(valueChanged(double)), this, SLOT(IndexParam2Changed(double)) );
 
-    connect( (QObject*)(m_Controls->m_OpacityMinFa), SIGNAL(valueChanged(int)), this, SLOT(OpacityMinFaChanged(int)) );
-    connect( (QObject*)(m_Controls->m_OpacityMaxFa), SIGNAL(valueChanged(int)), this, SLOT(OpacityMaxFaChanged(int)) );
+    connect( (QObject*)(m_Controls->m_NormalizationCheckbox), SIGNAL(clicked()), this, SLOT(NormalizationCheckbox()) );
+    connect( (QObject*)(m_Controls->m_ScalingCheckbox), SIGNAL(clicked()), this, SLOT(ScalingCheckbox()) );
+
+    connect( (QObject*)(m_Controls->m_OpacitySlider), SIGNAL(spanChanged(double,double)), this, SLOT(OpacityChanged(double,double)) );
 
   }
 }
@@ -553,26 +609,79 @@ void QmitkControlVisualizationPropertiesView::TextIntON()
 
 }
 
-
-void QmitkControlVisualizationPropertiesView::VisibleOdfsON()
+void QmitkControlVisualizationPropertiesView::VisibleOdfsON_S()
 {
-  if(m_GlyIsOn)
+  if(m_GlyIsOn_S)
   {
-    m_Controls->m_VisibleOdfsON->setIcon(*m_IconGlyOFF);
+    m_Controls->m_VisibleOdfsON_S->setIcon(*m_IconGlyOFF_S);
   }
   else
   {
-    m_Controls->m_VisibleOdfsON->setIcon(*m_IconGlyON);
+    m_Controls->m_VisibleOdfsON_S->setIcon(*m_IconGlyON_S);
   }
 
   mitk::DataStorage::SetOfObjects::Pointer set =
       ActiveSet("QBallImage");
-  SetBoolProp(set,"VisibleOdfs", !m_GlyIsOn);
+  SetBoolProp(set,"VisibleOdfs_S", !m_GlyIsOn_S);
 
   set = ActiveSet("TensorImage");
-  SetBoolProp(set,"VisibleOdfs", !m_GlyIsOn);
+  SetBoolProp(set,"VisibleOdfs_S", !m_GlyIsOn_S);
 
-  m_GlyIsOn = !m_GlyIsOn;
+  m_GlyIsOn_S = !m_GlyIsOn_S;
+
+   VisibleOdfsON(0);
+}
+
+void QmitkControlVisualizationPropertiesView::VisibleOdfsON_T()
+{
+  if(m_GlyIsOn_T)
+  {
+    m_Controls->m_VisibleOdfsON_T->setIcon(*m_IconGlyOFF_T);
+  }
+  else
+  {
+    m_Controls->m_VisibleOdfsON_T->setIcon(*m_IconGlyON_T);
+  }
+
+  mitk::DataStorage::SetOfObjects::Pointer set =
+      ActiveSet("QBallImage");
+  SetBoolProp(set,"VisibleOdfs_T", !m_GlyIsOn_T);
+
+  set = ActiveSet("TensorImage");
+  SetBoolProp(set,"VisibleOdfs_T", !m_GlyIsOn_T);
+
+  m_GlyIsOn_T = !m_GlyIsOn_T;
+
+  VisibleOdfsON(1);
+
+}
+
+void QmitkControlVisualizationPropertiesView::VisibleOdfsON_C()
+{
+  if(m_GlyIsOn_C)
+  {
+    m_Controls->m_VisibleOdfsON_C->setIcon(*m_IconGlyOFF_C);
+  }
+  else
+  {
+    m_Controls->m_VisibleOdfsON_C->setIcon(*m_IconGlyON_C);
+  }
+
+  mitk::DataStorage::SetOfObjects::Pointer set =
+      ActiveSet("QBallImage");
+  SetBoolProp(set,"VisibleOdfs_C", !m_GlyIsOn_C);
+
+  set = ActiveSet("TensorImage");
+  SetBoolProp(set,"VisibleOdfs_C", !m_GlyIsOn_C);
+
+  m_GlyIsOn_C = !m_GlyIsOn_C;
+
+  VisibleOdfsON(2);
+
+}
+
+void QmitkControlVisualizationPropertiesView::VisibleOdfsON(int view)
+{
 
   if(m_MultiWidget)
     m_MultiWidget->RequestUpdate();
@@ -714,10 +823,10 @@ void QmitkControlVisualizationPropertiesView::IndexParam2Changed(double param2)
     m_MultiWidget->RequestUpdate();
 }
 
-void QmitkControlVisualizationPropertiesView::OpacityMinFaChanged(int v)
+void QmitkControlVisualizationPropertiesView::OpacityChanged(double l, double u)
 {
   mitk::LevelWindow olw;
-  olw.SetRangeMinMax(v*2.55, m_Controls->m_OpacityMaxFa->value()*2.55);
+  olw.SetRangeMinMax(l*255, u*255);
 
   mitk::DataStorage::SetOfObjects::Pointer set =
       ActiveSet("QBallImage");
@@ -726,26 +835,21 @@ void QmitkControlVisualizationPropertiesView::OpacityMinFaChanged(int v)
   set = ActiveSet("TensorImage");
   SetLevelWindowProp(set,"opaclevelwindow", olw);
 
-  m_Controls->m_OpacityMinFaLabel->setText(QString::number(v/100.0));
+  m_Controls->m_OpacityMinFaLabel->setText(QString::number(l,'f',2) + " : " + QString::number(u,'f',2));
 
   if(m_MultiWidget)
     m_MultiWidget->RequestUpdate();
+
 }
 
-void QmitkControlVisualizationPropertiesView::OpacityMaxFaChanged(int v)
+void QmitkControlVisualizationPropertiesView::NormalizationCheckbox()
 {
-  mitk::LevelWindow olw;
-  olw.SetRangeMinMax(m_Controls->m_OpacityMinFa->value()*2.55, v*2.55);
+  m_Controls->m_NormalizationFrame->setVisible(
+      m_Controls->m_NormalizationCheckbox->isChecked());
+}
 
-  mitk::DataStorage::SetOfObjects::Pointer set =
-      ActiveSet("QBallImage");
-  SetLevelWindowProp(set,"opaclevelwindow", olw);
-
-  set = ActiveSet("TensorImage");
-  SetLevelWindowProp(set,"opaclevelwindow", olw);
-
-  m_Controls->m_OpacityMaxFaLabel->setText(QString::number(v/100.0));
-
-  if(m_MultiWidget)
-    m_MultiWidget->RequestUpdate();
+void QmitkControlVisualizationPropertiesView::ScalingCheckbox()
+{
+  m_Controls->m_ScalingFrame->setVisible(
+      m_Controls->m_ScalingCheckbox->isChecked());
 }

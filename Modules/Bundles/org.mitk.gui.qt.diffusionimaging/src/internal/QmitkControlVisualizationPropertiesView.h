@@ -85,15 +85,20 @@ protected slots:
   void TextIntON();
   void Reinit();
 
-  void VisibleOdfsON();
+  void VisibleOdfsON(int view);
+  void VisibleOdfsON_S();
+  void VisibleOdfsON_T();
+  void VisibleOdfsON_C();
+
   void ShowMaxNumberChanged();
   void NormalizationDropdownChanged(int);
   void ScalingFactorChanged(double);
   void AdditionalScaling(int);
   void IndexParam1Changed(double);
   void IndexParam2Changed(double);
-  void OpacityMinFaChanged(int v);
-  void OpacityMaxFaChanged(int v);
+  void OpacityChanged(double,double);
+  void NormalizationCheckbox();
+  void ScalingCheckbox();
 
 protected:
 
@@ -109,10 +114,17 @@ protected:
 
   QIcon* m_IconTexOFF;
   QIcon* m_IconTexON;
-  QIcon* m_IconGlyOFF;
-  QIcon* m_IconGlyON;
+  QIcon* m_IconGlyOFF_T;
+  QIcon* m_IconGlyON_T;
+  QIcon* m_IconGlyOFF_C;
+  QIcon* m_IconGlyON_C;
+  QIcon* m_IconGlyOFF_S;
+  QIcon* m_IconGlyON_S;
+
   bool m_TexIsOn;
-  bool m_GlyIsOn;
+  bool m_GlyIsOn_T;
+  bool m_GlyIsOn_C;
+  bool m_GlyIsOn_S;
 
 };
 

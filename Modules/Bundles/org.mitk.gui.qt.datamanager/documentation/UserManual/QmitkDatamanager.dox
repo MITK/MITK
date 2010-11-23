@@ -96,4 +96,10 @@ From here the Hotkeys can also be changed. The preference page is found in "Wind
 
 \image html Preferences.bmp "Screenshot4"
 
+\section QmitkDataManagerPropertyList Property List
+
+The Property List displays all the properties the currently selected Data-Element has. Which properties these are depends on the Data-Element. Examples are opacity, shader, visibility. These properties can be changed by clicking on the appropriate field in the "value" column.
+
+\image html PropertyList.png "Screenshot5: Property List"
+
 */

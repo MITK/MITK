@@ -4,7 +4,8 @@ berry--QCTabBar::tab {
     border-top: 1px solid palette(mid); 
     border-left: 1px solid palette(mid); 
     border-bottom: 1px solid palette(mid); 
-    margin-top: -1px; 
+    margin-top: -1px;
+    padding-left: 5px
 }
 
 berry--QCTabBar::tab:only-one { 

@@ -58,7 +58,7 @@ QmitkSegmentationView::~QmitkSegmentationView()
 
 void QmitkSegmentationView::NewNodesGenerated()
 {
-  //ForceDisplayPreferencesUponAllImages();
+//  ForceDisplayPreferencesUponAllImages();
 }
 
 void QmitkSegmentationView::NewNodeObjectsGenerated(mitk::ToolManager::DataVectorType* nodes)

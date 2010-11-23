@@ -1,0 +1,85 @@
+/*=========================================================================
+
+Program:   Medical Imaging & Interaction Toolkit
+Language:  C++
+Date:      $Date$
+Version:   $Revision$
+
+Copyright (c) German Cancer Research Center, Division of Medical and
+Biological Informatics. All rights reserved.
+See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
+
+This software is distributed WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.  See the above copyright notices for more information.
+
+=========================================================================*/
+
+
+#ifndef QMITKFLOATINGPOINTSPANSLIDER_H
+#define QMITKFLOATINGPOINTSPANSLIDER_H
+
+#include <qxtspanslider.h>
+#include <QWidget>
+
+class QmitkFloatingPointSpanSlider : public QxtSpanSlider
+{
+  Q_OBJECT
+  Q_PROPERTY(double loweralue READ lowerValue WRITE setLowerValue
+             NOTIFY lowerValueChanged FINAL)
+  Q_PROPERTY(double upperValue READ upperValue WRITE setUpperValue
+             NOTIFY upperValueChanged FINAL)
+  Q_PROPERTY(double maximum READ maximum WRITE setMaximum FINAL)
+  Q_PROPERTY(double minimum READ minimum WRITE setMinimum FINAL)
+
+public:
+
+  QmitkFloatingPointSpanSlider(QWidget *parent = 0);
+
+  void setIntegerMode(bool intMode);
+
+  double lowerValue() const;
+  double upperValue() const;
+
+  double maximum() const;
+  double minimum() const;
+
+  void setMaximum(double max);
+  void setMinimum(double min);
+  void setRange(double min, double max);
+
+signals:
+
+  void lowerValueChanged(double lower);
+  void upperValueChanged(double upper);
+  void spanChanged(double lower, double upper);
+
+public slots:
+
+  void setLowerValue(double lower);
+  void setUpperValue(double upper);
+  void setSpan(double lower, double upper);
+
+private slots:
+
+  void IntSpanChanged(int lower, int upper);
+
+private:
+
+  void scaleSliderToInt();
+  inline int scaleValue(double val);
+  inline double unscaleValue(int val);
+
+  double m_LowerValue;
+  double m_UpperValue;
+
+  double m_Maximum;
+  double m_Minimum;
+
+  double offset;
+  double factor;
+
+  bool m_IntMode;
+};
+
+#endif // QMITKFLOATINGPOINTSPANSLIDER_H

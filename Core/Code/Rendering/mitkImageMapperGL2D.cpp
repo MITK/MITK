@@ -186,9 +186,9 @@ mitk::ImageMapperGL2D::Paint( mitk::BaseRenderer *renderer )
 
     // search object border in current slice
     
-    int s_x = 0;
-    int s_y = 0;
-    int s_n = 0;
+    unsigned int s_x = 0;
+    unsigned int s_y = 0;
+    unsigned int s_n = 0;
 
     for(unsigned int y=0;y<pic->n[1];y++)
       for(unsigned int x=0;x<pic->n[0];x++)
@@ -256,7 +256,6 @@ mitk::ImageMapperGL2D::Paint( mitk::BaseRenderer *renderer )
       //calc index pos
       Point2D pt2D;
       
-      // use upper right corner to position volume annotation
       pt2D[0] = s_x;
       pt2D[1] = s_y;
       

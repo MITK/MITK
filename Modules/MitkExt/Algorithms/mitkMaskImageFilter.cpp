@@ -116,12 +116,12 @@ void mitk::MaskImageFilter::InternalComputeMask(itk::Image<TPixel, VImageDimensi
   ItkMaskImageIteratorType  maskIt ( maskItkImage, inputRegionOfInterest );
   ItkOutputImageIteratorType outputIt( outputItkImage, inputRegionOfInterest );
 
-  typename ItkOutputImageType::PixelType outsideValue = itk::NumericTraits<typename ItkOutputImageType::PixelType>::min();
-  if ( m_OverrideOutsideValue )
-    outsideValue = static_cast<typename ItkOutputImageType::PixelType>( m_OutsideValue );
+  //typename ItkOutputImageType::PixelType outsideValue = itk::NumericTraits<typename ItkOutputImageType::PixelType>::min();
+  if ( !m_OverrideOutsideValue )
+    m_OutsideValue = itk::NumericTraits<typename ItkOutputImageType::PixelType>::min();
 
-  m_MinValue = (itk::NumericTraits<typename ItkOutputImageType::PixelType>::max());
-  m_MaxValue = (itk::NumericTraits<typename ItkOutputImageType::PixelType>::min());
+   m_MinValue = (float)(itk::NumericTraits<typename ItkOutputImageType::PixelType>::max());
+   m_MaxValue = (float)(itk::NumericTraits<typename ItkOutputImageType::PixelType>::min());
 
 
   for ( inputIt.GoToBegin(), maskIt.GoToBegin(), outputIt.GoToBegin(); !inputIt.IsAtEnd() && !maskIt.IsAtEnd(); ++inputIt, ++maskIt, ++outputIt)
@@ -134,7 +134,7 @@ void mitk::MaskImageFilter::InternalComputeMask(itk::Image<TPixel, VImageDimensi
     }
     else
     {
-      outputIt.Set(outsideValue);
+      outputIt.Set(m_OutsideValue);
     }
   }
 }

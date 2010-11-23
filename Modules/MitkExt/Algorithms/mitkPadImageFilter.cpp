@@ -92,7 +92,7 @@ void mitk::PadImageFilter::GenerateData()
   // padding.
   if ( m_BinaryFilter )
   {
-    typedef itk::Image< char, 3 > BinaryImageType;
+    typedef itk::Image< unsigned char, 3 > BinaryImageType;
     typedef itk::BinaryThresholdImageFilter< ImageType, BinaryImageType >
       BinaryFilterType;
     BinaryFilterType::Pointer binaryFilter = BinaryFilterType::New();
@@ -100,8 +100,8 @@ void mitk::PadImageFilter::GenerateData()
     binaryFilter->SetInput( padFilter->GetOutput() );
     binaryFilter->SetLowerThreshold( m_LowerThreshold );
     binaryFilter->SetUpperThreshold( m_UpperThreshold );
-    binaryFilter->SetInsideValue( 0 );
-    binaryFilter->SetOutsideValue( 1 );
+    binaryFilter->SetInsideValue( 1 );
+    binaryFilter->SetOutsideValue( 0 );
     binaryFilter->Update();
 
     mitk::CastToMitkImage( binaryFilter->GetOutput(), outputImage );

@@ -1,4 +1,5 @@
 SET(CPP_FILES
+  Algorithms/mitkMaskAndCutRoiImageFilter.cpp
   Algorithms/mitkBoundingObjectToSegmentationFilter.cpp
   Algorithms/vtkPointSetSlicer.cxx
   Algorithms/mitkCoreExtObjectFactory.cpp
@@ -155,6 +156,8 @@ SET(CPP_FILES
   #Interactions/mitkOpeningTool.cpp
   #Interactions/mitkClosingTool.cpp
   #Interactions/mitkBinaryThresholdULTool.cpp
+  #Interactions/mitkPixelManipulationTool.cpp
+  #Interactions/mitkRegionGrow3DTool.cpp
   Rendering/mitkContourMapper2D.cpp
   Rendering/mitkContourSetMapper2D.cpp
   Rendering/mitkContourSetVtkMapper3D.cpp

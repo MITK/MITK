@@ -2939,11 +2939,16 @@
     </state>
   </stateMachine>
   <stateMachine NAME="WiiMoteSurfaceInteraction">
-    <state NAME="headtracking" ID="1" START_STATE="TRUE">
-      <transition NAME="stay in dummy" NEXT_STATE_ID="1" EVENT_ID="4003"> <!--EIDWIIMOTEINPUT-->
-        <action ID="4003" />
-        <!--AcONWIIMOTEINPUT-->
-      </transition>
+    <state NAME="start" ID="1" START_STATE="TRUE">
+      <transition NAME="initial state" NEXT_STATE_ID="2" EVENT_ID="4004"/> <!--EIDWIIMOTEBUTTON-->
+	</state>
+	<state NAME="Surface Interaction" ID="2">
+	  <transition NAME="stop Surface Interaction" NEXT_STATE_ID="1" EVENT_ID="5551008"/> <!--EV_DONE-->
+	  <transition NAME="input for Surface Interaction" NEXT_STATE_ID="2" EVENT_ID="4003"> <!--EIDWIIMOTEINPUT-->
+	    <action ID="4003">
+		<!--AcONWIIMOTEINPUT-->
+		</action>
+	  </transition>
 	</state>
   </stateMachine>
   <stateMachine NAME="InteractorTestPattern">

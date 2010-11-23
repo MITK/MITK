@@ -52,6 +52,12 @@ namespace mitk {
     */
     void WiiMoteButtonPressed(const itk::EventObject& e);
 
+    /**
+    * Creates suitable events, when the Wiimote sends button events <br>
+    * to trigger an action and forwards it for further processing.
+    */
+    void WiiMoteButtonReleased(const itk::EventObject& e);
+
    /**
     * Creates suitable events, when the Wiimote sends IR data <br>
     * to configure the sensitivity and forwards it for further processing.

@@ -55,13 +55,15 @@ void mitk::WiiMoteAddOn::WiiMoteInput(const itk::EventObject& e)
   {
     // apparently the dynamic cast does not work here
     // reason unknown - the normal cast however works fine
-    mitk::StateEvent* se = new mitk::StateEvent(mitk::EIDWIIMOTEINPUT, (const mitk::WiiMoteIREvent*)&e);
+    mitk::StateEvent* se = new mitk::StateEvent
+      (mitk::EIDWIIMOTEINPUT, (const mitk::WiiMoteIREvent*)&e);
     this->ForwardEvent(se);
     delete se;
   }
   catch(...)
   {
-    MITK_ERROR << "Wiimote event for headtracking IR input could not be transformed";
+    MITK_ERROR << "Incoming event is not an IR input for" <<
+      "headtracking could not be transformed\n";
   }
 }
 
@@ -75,11 +77,14 @@ void mitk::WiiMoteAddOn::WiiMoteButtonPressed(const itk::EventObject &e)
 
     switch(key)
     {
-    case mitk::Key_Home:
+    case mitk::Key_Home: // view reset
       se = new mitk::StateEvent(mitk::EIDWIIMOTEBUTTON, wiiEvent);
       break;
-    case mitk::Key_A:
+    case mitk::Key_A: // calibration start/end
       se = new mitk::StateEvent(mitk::EV_INIT, wiiEvent);
+      break;
+    case mitk::Key_B: // surface interaction activation
+      se = new mitk::StateEvent(mitk::EIDWIIMOTEBUTTON, wiiEvent);
       break;
     }
 
@@ -91,7 +96,36 @@ void mitk::WiiMoteAddOn::WiiMoteButtonPressed(const itk::EventObject &e)
   }
   catch(...)
   {
-    MITK_ERROR << "Wiimote event for headtracking button pressed could not be transformed";
+    MITK_ERROR << "Incoming event is not a button event" <<
+      "and could not be transformed\n";
+  }
+}
+
+void mitk::WiiMoteAddOn::WiiMoteButtonReleased(const itk::EventObject &e)
+{
+  try
+  {
+    mitk::WiiMoteButtonEvent const* wiiEvent = (const mitk::WiiMoteButtonEvent*)(&e);
+    int key = wiiEvent->GetKey();
+    mitk::StateEvent* se;
+
+    switch(key)
+    {
+    case mitk::Key_B: // surface interaction deactivation
+      se = new mitk::StateEvent(mitk::EV_DONE, wiiEvent);
+      break;
+    }
+
+    if(se != NULL)
+    {
+      this->ForwardEvent(se);
+      delete se;
+    }
+  }
+  catch(...)
+  {
+    MITK_ERROR << "Incoming event is not a button event" <<
+      "and could not be transformed\n";
   }
 }
 
@@ -99,13 +133,15 @@ void mitk::WiiMoteAddOn::WiiMoteCalibrationInput(const itk::EventObject &e)
 {  
   try
   {
-  mitk::StateEvent* se = new mitk::StateEvent(mitk::EIDWIIMOTEINPUT, (const mitk::WiiMoteCalibrationEvent*)&e);
+  mitk::StateEvent* se = new mitk::StateEvent
+    (mitk::EIDWIIMOTEINPUT, (const mitk::WiiMoteCalibrationEvent*)&e);
   this->ForwardEvent(se);
   delete se;
   }
   catch(...)
   {
-    MITK_ERROR << "Wiimote event for headtracking calibration input could not be transformed";
+    MITK_ERROR << "Incoming event is not a calibration input for headtracking" << 
+      "and could not be transformed\n";
   }
 }
 
@@ -118,13 +154,15 @@ void mitk::WiiMoteAddOn::WiiMoteSurfaceInteractionInput(const itk::EventObject& 
 {
   try
   {
-    mitk::StateEvent* se = new mitk::StateEvent(mitk::EIDWIIMOTEINPUT, (const mitk::WiiMoteAllDataEvent*)&e);
+    mitk::StateEvent* se = new mitk::StateEvent
+      (mitk::EIDWIIMOTEINPUT, (const mitk::WiiMoteAllDataEvent*)&e);
     this->ForwardEvent(se);
     delete se;
   }
   catch(...)
   {
-    MITK_ERROR << "Wiimote event for surface interaction could not be transformed";
+    MITK_ERROR << "Incoming event is not an input for surface interaction" << 
+      "and could not be transformed\n";
   }
 }
 

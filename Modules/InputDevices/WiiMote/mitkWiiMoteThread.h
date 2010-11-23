@@ -100,12 +100,23 @@ namespace mitk
 
    /**
     * Reads incoming data from buttons. After processing the data <br>
-    * (e.g. computations, assigning commands...) fires Wiimote events accordingly. 
+    * (e.g. computations, assigning commands...) fires Wiimote events <br>
+    * that indicate a button was pressed.
     *
     * @param buttonType
     *            the type of button, that was used to trigger this event
     */
     void WiiMoteButtonPressed(int buttonType);
+
+   /**
+    * Reads incoming data from buttons. After processing the data <br>
+    * (e.g. computations, assigning commands...) fires Wiimote events <br>
+    * that indicate a button release.
+    *
+    * @param buttonType
+    *            the type of button, that was used to trigger this event
+    */
+    void WiiMoteButtonReleased(int buttonType);
 
     /**
     * Reads incoming data from the IR camera. Afterwards the raw x and y coordinates <br>
@@ -169,6 +180,8 @@ namespace mitk
     // modes
     bool m_InCalibrationMode;
     bool m_SurfaceInteraction;
+
+    bool m_ButtonBPressed;
 
     // compensate delay
     // release: Skip = 1

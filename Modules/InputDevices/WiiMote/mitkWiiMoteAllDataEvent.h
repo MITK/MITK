@@ -72,6 +72,9 @@ namespace mitk
     float m_RollSpeed;
     float m_YawSpeed; // only available using MotionPlus
 
+    // orientation data
+
+
 
   }; // end class
 } // end namespace

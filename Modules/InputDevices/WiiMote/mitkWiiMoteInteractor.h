@@ -39,6 +39,8 @@ virtual bool OnWiiMoteReleaseButton(Action* action, const mitk::StateEvent* even
 
 private:
 
+  int m_Test;
+
 };
 
 }

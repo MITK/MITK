@@ -24,6 +24,7 @@ mitk::WiiMoteThread::WiiMoteThread()
 , m_SleepTime(SLEEPDEFAULT)
 , m_InCalibrationMode(false)
 , m_SurfaceInteraction(false)
+, m_ButtonBPressed(false)
 {
   
 }
@@ -286,15 +287,21 @@ void mitk::WiiMoteThread::WiiMoteIRInput()
   //MITK_INFO << "Pitch: " << m_WiiMotes[0].Acceleration.Orientation.Pitch;
   //MITK_INFO << "Roll: " << m_WiiMotes[0].Acceleration.Orientation.Roll;
 
-  //MITK_INFO << "X: " << m_WiiMote.Acceleration.Orientation.X;
-  //MITK_INFO << "Y: " << m_WiiMote.Acceleration.Orientation.Y;
-  //MITK_INFO << "Z: " << m_WiiMote.Acceleration.Orientation.Z;
 }
 
 void mitk::WiiMoteThread::WiiMoteButtonPressed(int buttonType)
 {
   m_Command = ReceptorCommand::New(); 
   m_Command->SetCallbackFunction(mitk::WiiMoteAddOn::GetInstance(), &mitk::WiiMoteAddOn::WiiMoteButtonPressed);
+
+  mitk::WiiMoteButtonEvent e(mitk::Type_WiiMoteButton, mitk::BS_NoButton, mitk::BS_NoButton, buttonType);
+  mitk::CallbackFromGUIThread::GetInstance()->CallThisFromGUIThread(m_Command, e.MakeObject());
+}
+
+void mitk::WiiMoteThread::WiiMoteButtonReleased(int buttonType)
+{
+  m_Command = ReceptorCommand::New(); 
+  m_Command->SetCallbackFunction(mitk::WiiMoteAddOn::GetInstance(), &mitk::WiiMoteAddOn::WiiMoteButtonReleased);
 
   mitk::WiiMoteButtonEvent e(mitk::Type_WiiMoteButton, mitk::BS_NoButton, mitk::BS_NoButton, buttonType);
   mitk::CallbackFromGUIThread::GetInstance()->CallThisFromGUIThread(m_Command, e.MakeObject());
@@ -344,9 +351,49 @@ void mitk::WiiMoteThread::SingleWiiMoteUpdate()
     }
     else
     {
-      this->SurfaceInteraction();
+      // to be able to distinguish whether
+      // the button B was pressed is now released;
+      // state changes are defined in the StateMachine.xml
+      // files
+      if(m_WiiMotes[0].Button.B())
+      {
+        // case 1: button is now pressed and 
+        // was pressed before -> still surface
+        // interaction
+        if(m_ButtonBPressed)
+        {
+          this->SurfaceInteraction();
+        }
+        // case 2: button is now pressed and
+        // was not pressed before -> allow surface
+        // interaction
+        else
+        {
+          this->WiiMoteButtonPressed(mitk::Key_B);
+
+          // needed to set it true for the first
+          // time after a release or at the start
+          // of the application
+          m_ButtonBPressed = true;
+        }
+      }
+      else
+      {
+        // case 3: button is not pressed and
+        // was pressed before -> stop surface
+        // interaction
+        if(m_ButtonBPressed)
+        {
+          this->WiiMoteButtonReleased(mitk::Key_B);
+          m_ButtonBPressed = false;
+        }
+
+        // case 4: button is not pressed and
+        // was not pressed before -> no change
+      }
     }
     m_WiiMoteThreadFinished->Unlock();
+
 
     if(m_WiiMotes[0].Button.Home())
       this->WiiMoteButtonPressed(mitk::Key_Home);
@@ -375,11 +422,6 @@ void mitk::WiiMoteThread::SingleWiiMoteUpdate()
       this->ReconnectWiiMote();
       m_WiiMoteThreadFinished->Unlock();
     }
-
-    //// testing
-    //m_WiiMoteThreadFinished->Lock();
-    //m_WiiMote.SetRumble(m_WiiMote.Button.B());
-    //m_WiiMoteThreadFinished->Unlock();
   }
 }
 
@@ -454,6 +496,12 @@ void mitk::WiiMoteThread::SetWiiMoteSurfaceIModus(bool active)
 
 void mitk::WiiMoteThread::SurfaceInteraction()
 {
+  
+  //MITK_INFO << "X: " << m_WiiMotes[0].Acceleration.Orientation.X;
+  //MITK_INFO << "Y: " << m_WiiMotes[0].Acceleration.Orientation.Y;
+  //MITK_INFO << "Z: " << m_WiiMotes[0].Acceleration.Orientation.Z;
+
+
   m_Command = ReceptorCommand::New();
   m_Command->SetCallbackFunction
     (mitk::WiiMoteAddOn::GetInstance(), &mitk::WiiMoteAddOn::WiiMoteSurfaceInteractionInput);
@@ -464,8 +512,11 @@ void mitk::WiiMoteThread::SurfaceInteraction()
     ,m_WiiMotes[0].MotionPlus.Speed.Roll
     ,m_WiiMotes[0].MotionPlus.Speed.Yaw);
 
+
   mitk::CallbackFromGUIThread::GetInstance()
     ->CallThisFromGUIThread(m_Command, e.MakeObject());
+
+  itksys::SystemTools::Delay(30);
 
   //MITK_INFO << "Speed Pitch: " << m_WiiMotes[0].MotionPlus.Speed.Pitch; 
   //MITK_INFO << "Speed Roll: " << m_WiiMotes[0].MotionPlus.Speed.Roll;

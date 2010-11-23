@@ -468,6 +468,9 @@ SET(DIRS
   ${MITK_BINARY_DIR}/bin/${intermediate_dir} 
   ${_install_LIBRARY_DIRS}
   )
+IF(APPLE)
+  LIST(APPEND DIRS "/usr/lib")
+ENDIF(APPLE)
 
 FOREACH(_target ${_install_EXECUTABLES})
 
@@ -482,7 +485,7 @@ IF(APPLE)
       SET(_qt_conf_install_dirs bin)
       SET(_target_locations bin/${_target_name})
       SET(${_target_locations}_qt_plugins_install_dir bin)
-      INSTALL(FILES ${_target} DESTINATION bin)
+      INSTALL(PROGRAMS ${_target} DESTINATION bin)
     ELSE(NOT MACOSX_BUNDLE_NAMES)
       FOREACH(bundle_name ${MACOSX_BUNDLE_NAMES})
         LIST(APPEND _qt_conf_install_dirs ${bundle_name}.app/Contents/Resources)
@@ -490,14 +493,14 @@ IF(APPLE)
 	    LIST(APPEND _target_locations ${_current_target_location})
 		SET(${_current_target_location}_qt_plugins_install_dir ${bundle_name}.app/Contents/MacOS)
 			
-		INSTALL(FILES ${_target} DESTINATION ${bundle_name}.app/Contents/MacOS/)
+		INSTALL(PROGRAMS ${_target} DESTINATION ${bundle_name}.app/Contents/MacOS/)
       ENDFOREACH(bundle_name)
     ENDIF(NOT MACOSX_BUNDLE_NAMES)
 ELSE()
   SET(_target_locations bin/${_target_name})
   SET(${_target_locations}_qt_plugins_install_dir bin)
   SET(_qt_conf_install_dirs bin)
-  INSTALL(FILES ${_target} DESTINATION bin)
+  INSTALL(PROGRAMS ${_target} DESTINATION bin)
 ENDIF() 
 
 FOREACH(_target_location ${_target_locations})

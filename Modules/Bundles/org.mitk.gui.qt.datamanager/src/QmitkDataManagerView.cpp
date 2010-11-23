@@ -112,6 +112,7 @@ QmitkDataManagerView::~QmitkDataManagerView()
 
 void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
 {
+  m_CurrentRowCount = 0;
   m_Parent = parent;
   //# Preferences
   berry::IPreferencesService::Pointer prefService
@@ -150,6 +151,8 @@ void QmitkDataManagerView::CreateQtPartControl(QWidget* parent)
     , this, SLOT(NodeTableViewContextMenuRequested(const QPoint&)) );
   QObject::connect( m_NodeTreeModel, SIGNAL(rowsInserted (const QModelIndex&, int, int))
     , this, SLOT(NodeTreeViewRowsInserted ( const QModelIndex&, int, int )) );
+  QObject::connect( m_NodeTreeModel, SIGNAL(rowsRemoved (const QModelIndex&, int, int))
+    , this, SLOT(NodeTreeViewRowsRemoved( const QModelIndex&, int, int )) );
   QObject::connect( m_NodeTreeView->selectionModel()
     , SIGNAL( selectionChanged ( const QItemSelection &, const QItemSelection & ) )
     , this
@@ -909,16 +912,29 @@ void QmitkDataManagerView::OtsuFilter( bool )
 
   }
 }
-
+void QmitkDataManagerView::NodeTreeViewRowsRemoved ( 
+  const QModelIndex & parent, int start, int end )
+{
+  m_CurrentRowCount = m_NodeTreeModel->rowCount();
+}
 void QmitkDataManagerView::NodeTreeViewRowsInserted( const QModelIndex & parent, int, int )
 {
   m_NodeTreeView->setExpanded(parent, true);
-  /*std::vector<mitk::DataNode*> nodes = m_NodeTreeModel->GetNodeSet();
-  if(nodes.size() == 1)
+
+  // a new row was inserted
+  if( m_CurrentRowCount == 0 && m_NodeTreeModel->rowCount() == 1 )
   {
-    QModelIndex treeIndex = m_NodeTreeModel->GetIndex(nodes.front());
-    m_NodeTreeView->selectionModel()->select(treeIndex, QItemSelectionModel::SelectCurrent);
-  }*/
+    this->ReinitMultiWidgetEditor();
+    m_CurrentRowCount = m_NodeTreeModel->rowCount();
+    /*
+    std::vector<mitk::DataNode*> nodes = m_NodeTreeModel->GetNodeSet();
+    if(nodes.size() == 1)
+    {
+      QModelIndex treeIndex = m_NodeTreeModel->GetIndex(nodes.front());
+      m_NodeTreeView->selectionModel()->setCurrentIndex( treeIndex, QItemSelectionModel::ClearAndSelect );
+    }
+    */
+  }
 }
 
 void QmitkDataManagerView::NodeSelectionChanged( const QItemSelection & /*selected*/, const QItemSelection & /*deselected*/ )
@@ -950,10 +966,19 @@ void QmitkDataManagerView::NodeSelectionChanged( const QItemSelection & /*select
 
 void QmitkDataManagerView::ReinitMultiWidgetEditor()
 {
-  berry::IEditorPart::Pointer editor =
-    this->GetSite()->GetPage()->GetActiveEditor();
+  berry::IEditorPart::Pointer editor;
+  std::vector<berry::IEditorPart::Pointer> editors =
+    this->GetSite()->GetPage()->GetEditors();
+  for (size_t i=0; i<editors.size(); ++i)
+  {
+    if( editors.at(i).Cast<QmitkStdMultiWidgetEditor>().IsNotNull() )
+    {
+      editor = editors.at(i);
+      break;
+    }
+  }
 
-  if (editor.Cast<QmitkStdMultiWidgetEditor>().IsNull())
+  if ( editor.IsNull() )
   {
     mitk::IDataStorageService::Pointer service =
       berry::Platform::GetServiceRegistry().GetServiceById<mitk::IDataStorageService>(mitk::IDataStorageService::ID);
@@ -968,4 +993,7 @@ void QmitkDataManagerView::ReinitMultiWidgetEditor()
     // open a new multi-widget editor, but do not give it the focus
     berry::IEditorPart::Pointer editor = this->GetSite()->GetPage()->OpenEditor(editorInput, QmitkStdMultiWidgetEditor::EDITOR_ID, false);
   }
+  else
+    this->GetSite()->GetPage()->OpenEditor(editor->GetEditorInput()
+      , QmitkStdMultiWidgetEditor::EDITOR_ID, true);
 }

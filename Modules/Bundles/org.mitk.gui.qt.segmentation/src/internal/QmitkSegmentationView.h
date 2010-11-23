@@ -119,6 +119,13 @@ class QmitkSegmentationView : public QObject, public QmitkFunctionality
     // decorates a DataNode according to the user preference settings
     void ApplyDisplayOptions(mitk::DataNode* node);
 
+    /**
+    * \brief check visibility of working- and reference data
+    *
+    * This method is called each time 
+    */
+    virtual void NodeChanged(const mitk::DataNode* node);
+
     // GUI setup
     void CreateQtPartControl(QWidget* parent);
 
@@ -127,6 +134,8 @@ class QmitkSegmentationView : public QObject, public QmitkFunctionality
     QStringList GetDefaultOrganColorString();
     void UpdateOrganList(QStringList& organColors, const QString& organname, mitk::Color colorname);
     void AppendToOrganList(QStringList& organColors, const QString& organname, int r, int g, int b);
+   
+    void CheckVisibilityOfNodes();
 
     // the Qt parent of our GUI (NOT of this object)
     QWidget* m_Parent;
@@ -145,6 +154,8 @@ class QmitkSegmentationView : public QObject, public QmitkFunctionality
 
     //for temporary fix unless we support segmentation in rotated slices
     mitk::DataNode::Pointer m_TempWorkingDataNode;
+
+    int m_StackPageId;
 };
 
 #endif /*QMITKsegmentationVIEW_H_*/

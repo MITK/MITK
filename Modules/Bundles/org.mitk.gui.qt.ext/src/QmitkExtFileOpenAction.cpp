@@ -30,6 +30,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <berryIEditorPart.h>
 #include <berryIWorkbenchPage.h>
 #include <berryIPreferencesService.h>
+#include <berryIWorkbench.h>
 #include <berryPlatform.h>
 
 #include "mitkProperties.h"
@@ -107,6 +108,13 @@ void QmitkExtFileOpenAction::Run()
 
   if (fileNames.empty()) 
     return;
+
+  // check if there is an open perspective, if not open the default perspective
+  if (m_Window->GetActivePage().IsNull())
+  {
+    std::string defaultPerspId = m_Window->GetWorkbench()->GetPerspectiveRegistry()->GetDefaultPerspective();
+    m_Window->GetWorkbench()->ShowPerspective(defaultPerspId, m_Window);
+  }
 
   QFileInfo info(fileNames.at(0));
   m_LastPath = info.filePath();

@@ -169,6 +169,9 @@ public slots:
   /// When rows are inserted auto expand them
   void NodeTreeViewRowsInserted ( const QModelIndex & parent, int start, int end );
 
+  /// will setup m_CurrentRowCount
+  void NodeTreeViewRowsRemoved ( const QModelIndex & parent, int start, int end );
+
   /// Whenever the selection changes set the "selected" property respectively
   void NodeSelectionChanged( const QItemSelection & selected, const QItemSelection & deselected );
 
@@ -242,7 +245,8 @@ protected:
   berry::ISelectionListener::Pointer m_SelectionListener;
   /// berry::SelectionChangedAdapter<QmitkPropertyListView> must be a friend to call
   friend struct berry::SelectionChangedAdapter<QmitkDataManagerView>;
-
+  /// saves the current amount of rows shown in the datamanager
+  size_t m_CurrentRowCount;
 private:
   /// Reopen multi widget editor if it has been closed
   void ReinitMultiWidgetEditor();

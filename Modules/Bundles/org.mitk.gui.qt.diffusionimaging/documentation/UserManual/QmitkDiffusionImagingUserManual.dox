@@ -1,7 +1,7 @@
 /**
 \bundlemainpage{org.diffusion} MITK Diffusion Imaging (MITK-DI)
 
-This module provides means to diffusion weighted image reconstruction, visualization and quantification. Diffusion tensors are supported as well as different q-ball reconstruction schemes are supported. Q-ball imaging aims at recovering more detailed information about the orientations of fibers from diffusion MRI measurements and, in particular, to resolve the orientations of crossing fibers.
+This module provides means to diffusion weighted image reconstruction, visualization and quantification. Diffusion tensors as well as different q-ball reconstruction schemes are supported. Q-ball imaging aims at recovering more detailed information about the orientations of fibers from diffusion MRI measurements and, in particular, to resolve the orientations of crossing fibers.
 
 Available sections:
   - \ref QmitkDiffusionImagingUserManualIssues 
@@ -16,7 +16,7 @@ Available sections:
 
 \section QmitkDiffusionImagingUserManualIssues Known Issues
 
-\li <b>Dicom Import:</b> The dicom import does not cover all hardware manufacturers. In fact, it has only been thoroughly tested with Siemens dicom images. MITK-DI is also capable of reading the nrrd format, which is documented elsewhere [1, 2]. These files can be created by combining the raw image data with a corresponding textual header file. The file extension should be changed from *.nrrd to *.dwi or from *.nhdr to *.hdwi respectively in order to let MITK-DI recognize the diffusion related header information provided in the files.
+\li <b>Dicom Import:</b> The dicom import has so far only been implemented for Siemens dicom images. MITK-DI is capable of reading the nrrd format, which is documented elsewhere [1, 2]. These files can be created by combining the raw image data with a corresponding textual header file. The file extension should be changed from *.nrrd to *.dwi or from *.nhdr to *.hdwi respectively in order to let MITK-DI recognize the diffusion related header information provided in the files.
 
 \section QmitkDiffusionImagingUserManualTensorReconstruction Tensor Reconstruction
 
@@ -34,9 +34,7 @@ A few seconds (depending on the image size) after the reconstruction button is h
 
 \section QmitkDiffusionImagingUserManualQBallReconstruction Q-Ball Reconstruction
 
-The q-ball reonstruction bundle implements a variety of reconstruction methods. The button "Average redundant gradients" accumulates the information that was acquired with multiple repetitions for one gradient. Vectors do not have to be precisely equal in order to be merged, if a "Merge radius" > 0 is configured.
-
-The different reconstruction methods are described in the following:
+The q-ball reonstruction bundle implements a variety of reconstruction methods. The different reconstruction methods are described in the following:
 \li <b>Numerical:</b> The original, numerical q-ball reconstruction presented by Tuch et al. [5]
 \li <b>Standard (SH):</b> Descoteaux's reconstruction based on spherical harmonic basis functions [6]
 \li <b>Solid Angle (SH):</b> Aganj's reconstruction with solid angle consideration [7]
@@ -45,7 +43,7 @@ The different reconstruction methods are described in the following:
 
 \image html qballs1.png The q-ball resonstruction view
 
-Please recognize the tooltips in the advanced settings box. B0 threshold works the same as in tensor reconstruction. The maximum l-level configures the size of the spherical harmonics basis. Larger l-values (e.g. l=8) allow higher levels of detail, lower levels are more stable against noise (e.g. l=4). Lambda is a regularisation parameter. Set it to 0 for no regularisation. lambda = 0.006 has proven to be a stable choice under various settings. The multi lambda option lets you reconstruct different volumes with different lambdas with one click.
+B0 threshold works the same as in tensor reconstruction. The maximum l-level configures the size of the spherical harmonics basis. Larger l-values (e.g. l=8) allow higher levels of detail, lower levels are more stable against noise (e.g. l=4). Lambda is a regularisation parameter. Set it to 0 for no regularisation. lambda = 0.006 has proven to be a stable choice under various settings. 
 
 \image html qballs2.png Advanced q-ball reconstruction settings
 
@@ -55,19 +53,19 @@ This is how a q-ball image should initially look after reconstruction. Standard 
 
 \section QmitkDiffusionImagingUserManualDicomImport Dicom Import
 
-The dicom import does not cover all hardware manufacturers. In fact, it has only been thoroughly tested with Siemens dicom images. MITK-DI is also capable of reading the nrrd format, which is documented elsewhere [1, 2]. These files can be created by combining the raw image data with a corresponding textual header file. The file extension should be changed from *.nrrd to *.dwi or from *.nhdr to *.hdwi respectively in order to let MITK-DI recognize the diffusion related header information provided in the files.
+The dicom import does not cover all hardware manufacturers but only Siemens dicom images. MITK-DI is also capable of reading the nrrd format, which is documented elsewhere [1, 2]. These files can be created by combining the raw image data with a corresponding textual header file. The file extension should be changed from *.nrrd to *.dwi or from *.nhdr to *.hdwi respectively in order to let MITK-DI recognize the diffusion related header information provided in the files.
 
-In case your dicom images are readable by MITK-DI, select one or more input dicom folders and click import.
+In case your dicom images are readable by MITK-DI, select one or more input dicom folders and click import. Each input folder must only contain DICOM-images that can be combined into one vector-valued 3D output volume. Different patients must be loaded from different input-folders. The folders must not contain other acquisitions (e.g. T1,T2,localizer).
+
+In case many imports are performed at once, it is recommended to set the the optional output folder argument. This prevents the images from being kept in memory.
 
 \image html dicom1.png Dicom import
 
-The advanced settings control some import options. "Use series details" and "Consider acquisition number" tell the algorithms, if series related information in the dicom header should be used to tell appart different image volumes. "Recursive" digs into the selected folders recursively. "Avg. dupl. grad." does the same as the corresponding "Average redundant gradients" in the q-ball reconstruction view (refer to the corresponding help section for details).
-
-\image html dicom2.png Advanced settings for dicom import
-
-The quantification view allows the derivation of different scalar anisotropy measures for the reconstructed tensors (FA and RA) or q-balls (GFA).
+The option "Average duplicate gradients" accumulates the information that was acquired with multiple repetitions for one gradient. Vectors do not have to be precisely equal in order to be merged, if a "blur radius" > 0 is configured.
 
 \section QmitkDiffusionImagingUserManualQuantification Quantification
+
+The quantification view allows the derivation of different scalar anisotropy measures for the reconstructed tensors (Fractional Anisotropy, Relative Anisotropy, Axial Diffusivity, Radial Diffusivity) or q-balls (Generalized Fractional Anisotropy).
 
 \image html quantification.png Anisotropy quantification
 
@@ -75,13 +73,9 @@ The quantification view allows the derivation of different scalar anisotropy mea
 
 In this small view, the visualization of ODFs and diffusion images can be configured. Depending on the selected image in the data storage, different options are shown here.
 
-For a tensor or q-ball image, the third button from the left is of importance - it toggles the visibility of the glyphs. The spin box to its right lets you configer the number of glyphs that should maximaly be displayed. This is usefull to keep the system response time during rendering feasible. The other options configure normalization and scaling of the glyphs.
-
-\image html visualization1.png Configuring the ODF glyph visualization
+For tensor or q-ball images, the visibility of glyphs in the different render windows (T)ransversal, (S)agittal, and (C)oronal can be configured here. The maximal number of glyphs to display can also be configured here for. This is usefull to keep the system response time during rendering feasible. The other options configure normalization and scaling of the glyphs.
 
 In diffusion images, a slider lets you choose the desired image channel from the vector of images (each gradient direction one image) for rendering. Furthermore reinit can be performed and texture interpolation toggled.
-
-\image html visualization2.png Configuring the diffusion imaging visualization
 
 This is how a visualization with activated glyphs should look like:
 

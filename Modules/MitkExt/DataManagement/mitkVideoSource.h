@@ -48,20 +48,19 @@ namespace mitk
       virtual unsigned char * GetVideoTexture() = 0;
       ///
       /// advices this class to start the video capturing.
-      /// in this base implementation: toggles m_CapturingInProcess,
-      /// send out m_StartedEvent, resets m_FrameCount
+      /// in this base implementation: toggles m_CapturingInProcess, resets m_FrameCount
       /// *ATTENTION*: this should be also done in subclasses overwriting this method
       ///
       virtual void StartCapturing();
       ///
       /// advices this class to stop the video capturing.
-      /// in this base implementation: toggles m_CapturingInProcess,
-      /// send out m_StoppedEvent, resets m_FrameCount
+      /// in this base implementation: toggles m_CapturingInProcess, resets m_FrameCount
       /// *ATTENTION*: this should be also done in subclasses overwriting this method
       ///
       virtual void StopCapturing();
       ///
-      //// \return true if video capturing is active.
+      /// \return true if video capturing is active.
+      /// \see m_CapturingInProcess
       ///
       virtual bool IsCapturingEnabled() const;
       ///
@@ -72,23 +71,6 @@ namespace mitk
       /// \return the current frame height (might be 0 if unknown)
       ///
       virtual int GetImageHeight();
-
-      ///
-      /// \return advices this class to enable online rotation (has to be
-      /// implemented in subclasses)
-      ///
-      virtual void EnableRotation(bool enable);
-
-      ///
-      /// \return sets the current rotation angle
-      ///
-      virtual void SetRotationAngle(double rotationAngle);
-      
-      ///
-      /// \return the current rotation angle (might be 0)
-      ///
-      virtual double GetRotationAngle();
-
       ///
       /// \return the current frame count
       ///
@@ -123,16 +105,6 @@ namespace mitk
       /// saves if capturing is in procress
       ///
       bool m_CapturingInProcess;
-      
-      /**
-      * Angle for rotating the video image
-      **/
-      double m_RotationAngle;
-      
-      /**
-      * Flag to enable or disable video rotation used for performance enhancement.
-      **/
-      bool m_RotationEnabled;
 
       ///
       /// Saves the current frame count. Incremented in FetchFrame(). 

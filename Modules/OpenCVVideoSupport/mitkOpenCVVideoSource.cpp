@@ -28,7 +28,9 @@ mitk::OpenCVVideoSource::OpenCVVideoSource()
   m_GrabbingDeviceNumber(-1),
   m_RepeatVideo(false),
   m_UseCVCAMLib(false),
-  m_UndistortImage(false)
+  m_UndistortImage(false),
+  m_RotationAngle(0.0),
+  m_RotationEnabled(false)
 {
 }
 
@@ -406,4 +408,21 @@ void mitk::OpenCVVideoSource::Reset()
   m_UseCVCAMLib = false;
   // do not touch undistort settings
   // bool m_UndistortImage;
+}
+
+void mitk::OpenCVVideoSource::EnableRotation(bool enable= true)
+{
+  m_RotationEnabled = enable;
+  this->Modified();
+}
+
+void mitk::OpenCVVideoSource::SetRotationAngle(double rotationAngle)
+{
+  m_RotationAngle = rotationAngle;
+  this->Modified();
+}
+
+double mitk::OpenCVVideoSource::GetRotationAngle()
+{
+  return m_RotationAngle;
 }

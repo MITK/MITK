@@ -138,7 +138,21 @@ namespace mitk
 
     itkGetMacro( RepeatVideo, bool );
     itkSetMacro( RepeatVideo, bool );
+    ///
+    /// \return advices this class to enable online rotation (has to be
+    /// implemented in subclasses)
+    ///
+    virtual void EnableRotation(bool enable);
 
+    ///
+    /// \return sets the current rotation angle
+    ///
+    virtual void SetRotationAngle(double rotationAngle);
+
+    ///
+    /// \return the current rotation angle (might be 0)
+    ///
+    virtual double GetRotationAngle();
   protected:
     OpenCVVideoSource();
     virtual ~OpenCVVideoSource();
@@ -183,7 +197,16 @@ namespace mitk
 
     // On-the-fly undistortion of the captured video image
     bool m_UndistortImage;
-    mitk::UndistortCameraImage::Pointer m_UndistortCameraImage;
+    mitk::UndistortCameraImage::Pointer m_UndistortCameraImage;      
+    /**
+    * Angle for rotating the video image
+    **/
+    double m_RotationAngle;
+
+    /**
+    * Flag to enable or disable video rotation used for performance enhancement.
+    **/
+    bool m_RotationEnabled;
   };
 }
 #endif // Header

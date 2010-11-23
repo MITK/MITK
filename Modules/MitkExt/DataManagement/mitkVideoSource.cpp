@@ -24,8 +24,6 @@ mitk::VideoSource::VideoSource()
   m_CaptureWidth(0),
   m_CaptureHeight(0),
   m_CapturingInProcess(false),
-  m_RotationAngle(0.0),
-  m_RotationEnabled(false),
   m_FrameCount(0)
 { 
 }
@@ -69,23 +67,6 @@ int mitk::VideoSource::GetImageWidth()
 int mitk::VideoSource::GetImageHeight()
 {
   return m_CaptureHeight;
-}
-
-void mitk::VideoSource::EnableRotation(bool enable= true)
-{
-  m_RotationEnabled = enable;
-  this->Modified();
-}
-
-void mitk::VideoSource::SetRotationAngle(double rotationAngle)
-{
-  m_RotationAngle = rotationAngle;
-  this->Modified();
- }
-
-double mitk::VideoSource::GetRotationAngle()
-{
-  return m_RotationAngle;
 }
 
 unsigned long mitk::VideoSource::GetFrameCount() const

@@ -98,9 +98,5 @@ const char * UnstructuredGridVtkWriter<vtkXMLPUnstructuredGridWriter>::GetDefaul
   return ".pvtu";
 }
 
-template class MitkExt_EXPORT UnstructuredGridVtkWriter<vtkUnstructuredGridWriter>;
-template class MitkExt_EXPORT UnstructuredGridVtkWriter<vtkXMLUnstructuredGridWriter>;
-template class MitkExt_EXPORT UnstructuredGridVtkWriter<vtkXMLPUnstructuredGridWriter>;
-
 }
 

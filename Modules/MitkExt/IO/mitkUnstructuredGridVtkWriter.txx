@@ -234,4 +234,8 @@ const char * UnstructuredGridVtkWriter<vtkXMLUnstructuredGridWriter>::GetDefault
 template<>
 const char * UnstructuredGridVtkWriter<vtkXMLPUnstructuredGridWriter>::GetDefaultExtension();
 
+template class MitkExt_EXPORT UnstructuredGridVtkWriter<vtkUnstructuredGridWriter>;
+template class MitkExt_EXPORT UnstructuredGridVtkWriter<vtkXMLUnstructuredGridWriter>;
+template class MitkExt_EXPORT UnstructuredGridVtkWriter<vtkXMLPUnstructuredGridWriter>;
+
 }

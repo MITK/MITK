@@ -1,17 +1,20 @@
 #ifndef MITK_WIIMOTEHTREAD_H
 #define MITK_WIIMOTEHTREAD_H
 
-#include "mitkCommon.h"
-#include "itkObject.h"
-
-#include "itkMultiThreader.h"
-#include "itkFastMutexLock.h"
-#include "mitkCallbackFromGUIThread.h"
-
 #include "wiimote.h"
 
-#include "itksys/SystemTools.hxx" // used for GetTime()
+// mitk
+#include "mitkCommon.h"
+#include "mitkCallbackFromGUIThread.h"
 #include "mitkVector.h"
+
+// itk
+#include "itkObject.h"
+#include "itkMultiThreader.h"
+#include "itkFastMutexLock.h"
+
+#include "itksys/SystemTools.hxx" // used for GetTime() and Delay();
+
 
 namespace mitk
 {
@@ -30,9 +33,6 @@ namespace mitk
 
     WiiMoteThread();
     ~WiiMoteThread();
-
-    itkSetMacro(SleepTime, int);
-    itkGetConstMacro(SleepTime, int);
 
     /**
     * Allows to set report types, detects extensions and responds to connect/disconnect <br>
@@ -154,6 +154,7 @@ namespace mitk
     */
     void SetWiiMoteSurfaceIModus(bool activated);
 
+    // TODO
     void SurfaceInteraction();
 
   protected:
@@ -169,7 +170,6 @@ namespace mitk
     bool m_StopWiiMote;
 
     // access to the wiimote and parameter for callbackfromguithread
-    wiimote m_WiiMote;
     ReceptorCommandPointer m_Command;
 
     // required for computation of movement
@@ -182,16 +182,6 @@ namespace mitk
     bool m_SurfaceInteraction;
 
     bool m_ButtonBPressed;
-
-    // compensate delay
-    // release: Skip = 1
-    // debug: 
-    //int m_SkipTimeSteps;
-    //int m_CurrentTimeStep;
-
-    // to compensate delay, because normally
-    // the data arrives too fast and is queued
-    int m_SleepTime;
 
     //store all connected Wiimotes
     wiimote m_WiiMotes[4];

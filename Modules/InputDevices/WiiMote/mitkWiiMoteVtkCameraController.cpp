@@ -176,7 +176,7 @@ bool mitk::WiiMoteVtkCameraController::OnWiiMoteInput(mitk::Action* a, const mit
   //This ensures that no props are cut off
   vtkRenderer->ResetCameraClippingRange();
 
-  mitk::RenderingManager::GetInstance()->ForceImmediateUpdate(mitk::GlobalInteraction::GetInstance()->GetFocus()->GetRenderWindow());
+  mitk::RenderingManager::GetInstance()->RequestUpdate(mitk::GlobalInteraction::GetInstance()->GetFocus()->GetRenderWindow());
 
   return true;
 }

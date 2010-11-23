@@ -24,7 +24,13 @@ namespace mitk
     // in the constructor will not be usable in the
     // other thread
     WiiMoteAllDataEvent
-      (int eventType, float pitchSpeed, float rollSpeed, float yawSpeed);
+      (int eventType
+      , float pitchSpeed
+      , float rollSpeed
+      , float yawSpeed
+      , float orientationX
+      , float orientationY
+      , float orientationZ);
     ~WiiMoteAllDataEvent();
 
     void SetIRDotRawX(float xCoordinate);
@@ -44,6 +50,15 @@ namespace mitk
 
     void SetYawSpeed(float yawSpeed);
     float GetYawSpeed() const;
+
+    void SetOrientationX(float orientationX);
+    float GetOrientationX() const;
+
+    void SetOrientationY(float orientationY);
+    float GetOrientationY() const;
+
+    void SetOrientationZ(float orientationZ);
+    float GetOrientationZ() const;
 
     //itk::EventObject implementation
     typedef WiiMoteAllDataEvent Self;
@@ -67,13 +82,20 @@ namespace mitk
     int m_Button; // the name of the button
 
     // acceleration data
-    // the unit is degree per second
+    // the unit is degree
     float m_PitchSpeed;
     float m_RollSpeed;
     float m_YawSpeed; // only available using MotionPlus
 
     // orientation data
+    float m_OrientationX;
+    float m_OrientationY;
+    float m_OrientationZ;
 
+    // time between the last orientation estimate update
+    // if update age is too high the acceleration
+    // values are likely to be out of date
+    unsigned m_UpdateAge;
 
 
   }; // end class

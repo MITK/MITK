@@ -3,7 +3,13 @@
 #include <mitkInteractionConst.h>
 
 mitk::WiiMoteAllDataEvent::WiiMoteAllDataEvent
-(int eventType, float pitchSpeed, float rollSpeed, float yawSpeed) 
+(int eventType
+ , float pitchSpeed
+ , float rollSpeed
+ , float yawSpeed
+ , float orientationX
+ , float orientationY
+ , float orientationZ)
 : Event(NULL, eventType, mitk::BS_NoButton, mitk::BS_NoButton, Key_none)
 , m_IRDotRawX(0) 
 , m_IRDotRawY(0)
@@ -78,6 +84,36 @@ float mitk::WiiMoteAllDataEvent::GetYawSpeed() const
   return this->m_YawSpeed;
 }
 
+void mitk::WiiMoteAllDataEvent::SetOrientationX(float orientationX)
+{
+  this->m_OrientationX = orientationX;
+}
+
+float mitk::WiiMoteAllDataEvent::GetOrientationX() const
+{
+  return this->m_OrientationX;
+}
+
+void mitk::WiiMoteAllDataEvent::SetOrientationY(float orientationY)
+{
+  this->m_OrientationY = orientationY;
+}
+
+float mitk::WiiMoteAllDataEvent::GetOrientationY() const
+{
+  return this->m_OrientationY;
+}
+
+void mitk::WiiMoteAllDataEvent::SetOrientationZ(float orientationZ)
+{
+  this->m_OrientationZ = orientationZ;
+}
+
+float mitk::WiiMoteAllDataEvent::GetOrientationZ() const
+{
+  return this->m_OrientationZ;
+}
+
 // ------------------------- itk::EventObject Implementation -----------------------
 const char* mitk::WiiMoteAllDataEvent::GetEventName() const
 { 
@@ -92,7 +128,13 @@ bool mitk::WiiMoteAllDataEvent::CheckEvent(const itk::EventObject *e) const
 itk::EventObject* mitk::WiiMoteAllDataEvent::MakeObject() const
 { 
   return new Self
-    (this->GetType(),this->GetPitchSpeed(), this->GetRollSpeed(),this->GetYawSpeed()); 
+    (this->GetType()
+    ,this->GetPitchSpeed()
+    ,this->GetRollSpeed()
+    ,this->GetYawSpeed()
+    ,this->GetOrientationX()
+    ,this->GetOrientationY()
+    ,this->GetOrientationZ()); 
 } 
 
 

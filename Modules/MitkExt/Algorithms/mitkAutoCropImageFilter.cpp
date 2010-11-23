@@ -18,10 +18,12 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkAutoCropImageFilter.h"
 
 #include "mitkImageCast.h"
-#include <itkImageRegionConstIterator.h>
 #include "mitkImageAccessByItk.h"
 #include "mitkGeometry3D.h"
 #include "mitkStatusBar.h"
+
+#include <itkImageRegionConstIterator.h>
+#include <itkRegionOfInterestImageFilter.h>
 
 
 mitk::AutoCropImageFilter::AutoCropImageFilter()
@@ -52,19 +54,18 @@ void mitk::AutoCropImageFilter::ITKCrop3DImage( itk::Image< TPixel, VImageDimens
   }
 
   typedef itk::Image< TPixel, VImageDimension > InternalImageType;
-  typedef typename InternalImageType::Pointer            InternalImagePointer;
+  typedef typename InternalImageType::Pointer   InternalImagePointer;
 
-  typedef itk::CropImageFilter<InternalImageType,InternalImageType> FilterType;
-  typedef typename itk::CropImageFilter<InternalImageType,InternalImageType>::Pointer FilterPointer;
+  typedef itk::RegionOfInterestImageFilter < InternalImageType, InternalImageType > ROIFilterType;
+  typedef typename itk::RegionOfInterestImageFilter < InternalImageType, InternalImageType >::Pointer ROIFilterPointer; 
 
   InternalImagePointer outputItk = InternalImageType::New();
 
-  FilterPointer cropFilter = FilterType::New();
-  cropFilter->SetLowerBoundaryCropSize( m_LowerBounds );
-  cropFilter->SetUpperBoundaryCropSize( m_UpperBounds );
-  cropFilter->SetInput( inputItkImage );
-  cropFilter->Update();
-  outputItk = cropFilter->GetOutput();
+  ROIFilterPointer roiFilter = ROIFilterType::New();
+  roiFilter->SetInput(0,inputItkImage);
+  roiFilter->SetRegionOfInterest(this->GetCroppingRegion());
+  roiFilter->Update();
+  outputItk = roiFilter->GetOutput();
   outputItk->DisconnectPipeline();
 
   mitk::Image::Pointer newMitkImage = mitk::Image::New();
@@ -76,15 +77,17 @@ void mitk::AutoCropImageFilter::ITKCrop3DImage( itk::Image< TPixel, VImageDimens
 
 void mitk::AutoCropImageFilter::GenerateOutputInformation()
 {
-  mitk::Image::Pointer input = const_cast< mitk::Image * > ( this->GetInput() );
+  mitk::Image::Pointer input = const_cast<mitk::Image*> (this->GetInput());
+  mitk::Image::Pointer output = this->GetOutput();
+
   if(input->GetDimension() <= 2)
   {
     MITK_ERROR << "Only 3D any 4D images are supported." << std::endl;
     return;
   }
+
   ComputeNewImageBounds();
-  //  mitk::Image::ConstPointer input  = this->GetInput();
-  mitk::Image::Pointer output = this->GetOutput();
+
   if ((output->IsInitialized()) && (output->GetPipelineMTime() <= m_TimeOfHeaderInitialization.GetMTime()))
     return;
 
@@ -99,13 +102,15 @@ void mitk::AutoCropImageFilter::GenerateOutputInformation()
   // bounding-box of bounding-object below
   m_InputRequestedRegion = input->GetLargestPossibleRegion();
 
-  // build region out of bounding-box of cropping region size
+  // build region out of index and size calculated in ComputeNewImageBounds()
+
   mitk::SlicedData::IndexType index;
   index[0] = m_RegionIndex[0];
   index[1] = m_RegionIndex[1];
   index[2] = m_RegionIndex[2];
   index[3] = m_InputRequestedRegion.GetIndex()[3];
   index[4] = m_InputRequestedRegion.GetIndex()[4];
+
   mitk::SlicedData::SizeType  size;
   size[0] = m_RegionSize[0];
   size[1] = m_RegionSize[1];
@@ -113,10 +118,10 @@ void mitk::AutoCropImageFilter::GenerateOutputInformation()
   size[3] = m_InputRequestedRegion.GetSize()[3];
   size[4] = m_InputRequestedRegion.GetSize()[4];
 
-  mitk::SlicedData::RegionType boRegion(index, size);
+  mitk::SlicedData::RegionType cropRegion(index, size);
 
   // crop input-requested-region with cropping region computed from the image data
-  if(m_InputRequestedRegion.Crop(boRegion)==false)
+  if(m_InputRequestedRegion.Crop(cropRegion)==false)
   {
     // crop not possible => do nothing: set time size to 0.
     size.Fill(0);
@@ -128,8 +133,8 @@ void mitk::AutoCropImageFilter::GenerateOutputInformation()
   // GenerateInputRequestedRegion (there we just set the time)
   input->SetRequestedRegion(&m_InputRequestedRegion);
 
-  // PART II: initialize output image
 
+  // PART II: initialize output image
   unsigned int dimension = input->GetDimension();
   unsigned int *dimensions = new unsigned int [dimension];
   itk2vtk(m_InputRequestedRegion.GetSize(), dimensions);
@@ -138,8 +143,13 @@ void mitk::AutoCropImageFilter::GenerateOutputInformation()
   output->Initialize(mitk::PixelType( GetOutputPixelType() ), dimension, dimensions);
   delete [] dimensions;
 
+  
+  //clone the IndexToWorldTransform from the input, otherwise we will overwrite it, when adjusting the origin of the output image!!
+  itk::ScalableAffineTransform< mitk::ScalarType,3 >::Pointer cloneTransform = itk::ScalableAffineTransform< mitk::ScalarType,3 >::New();
+  cloneTransform->Compose(input->GetGeometry()->GetIndexToWorldTransform());
+  output->GetGeometry()->SetIndexToWorldTransform( cloneTransform.GetPointer() );
+
   // Set the spacing
-  output->GetGeometry()->SetIndexToWorldTransform( input->GetGeometry()->GetIndexToWorldTransform() );
   output->SetSpacing( input->GetSlicedGeometry()->GetSpacing() );
 
   // Position the output Image to match the corresponding region of the input image
@@ -160,6 +170,7 @@ void mitk::AutoCropImageFilter::GenerateOutputInformation()
 
 void mitk::AutoCropImageFilter::GenerateData()
 {
+
   mitk::Image::ConstPointer input = this->GetInput();
   mitk::Image::Pointer output = this->GetOutput();
 
@@ -199,7 +210,7 @@ void mitk::AutoCropImageFilter::GenerateData()
 
 void mitk::AutoCropImageFilter::ComputeNewImageBounds()
 {
-  mitk::Image::Pointer inputMitk = const_cast< mitk::Image * > ( this->GetInput() );
+  mitk::Image::ConstPointer inputMitk = this->GetInput();
 
   if (m_OverrideCroppingRegion)
   {
@@ -228,16 +239,14 @@ void mitk::AutoCropImageFilter::ComputeNewImageBounds()
       m_RegionIndex[i] = m_CroppingRegion.GetIndex()[i];
       m_RegionSize[i] = m_CroppingRegion.GetSize()[i];
 
-
-      m_LowerBounds[i] = m_CroppingRegion.GetIndex()[i];
-      m_UpperBounds[i] = inputMitk->GetDimension(i)-m_CroppingRegion.GetSize()[i]-m_LowerBounds[i];
     }
   }
   else
   {
     // Check if a 3D or 4D image is present
     unsigned int timeSteps = 1;
-    if (inputMitk->GetDimension() == 4 ) timeSteps = inputMitk->GetDimension(3);
+    if (inputMitk->GetDimension() == 4 ) 
+      timeSteps = inputMitk->GetDimension(3);
 
     ImageType::IndexType minima,maxima;
 
@@ -314,15 +323,7 @@ void mitk::AutoCropImageFilter::ComputeNewImageBounds()
     m_RegionIndex[1] = origRegion.GetIndex()[1];
     m_RegionIndex[2] = origRegion.GetIndex()[2];
 
-    m_LowerBounds[0] = m_RegionIndex[0];
-    m_LowerBounds[1] = m_RegionIndex[1];
-    m_LowerBounds[2] = m_RegionIndex[2];
-
-    // It is assumed that the first and the last 3D images have the same LargestPossibleRegion.
-    // If they have not, this will surely crash somewhere.
-    m_UpperBounds[0] = inputItk->GetLargestPossibleRegion().GetSize()[0]-m_RegionSize[0]-m_RegionIndex[0];
-    m_UpperBounds[1] = inputItk->GetLargestPossibleRegion().GetSize()[1]-m_RegionSize[1]-m_RegionIndex[1];
-    m_UpperBounds[2] = inputItk->GetLargestPossibleRegion().GetSize()[2]-m_RegionSize[2]-m_RegionIndex[2];
+    m_CroppingRegion = origRegion;
   }
 }
 

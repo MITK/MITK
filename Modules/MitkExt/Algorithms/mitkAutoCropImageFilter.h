@@ -24,7 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkImageTimeSelector.h"
 
 #include <itkImageRegion.h>
-#include <itkCropImageFilter.h>
+#include <itkImage.h>
 
 namespace mitk {
 
@@ -71,6 +71,8 @@ public:
 
   itkGetConstMacro(MarginFactor,float);
   itkSetMacro(MarginFactor,float);
+
+  itkGetMacro(CroppingRegion, RegionType);
   
   // Use this method to manually set a region
   void SetCroppingRegion(RegionType overrideRegion);
@@ -88,7 +90,7 @@ protected:
   // This method calculates the actual smallest box
   void ComputeNewImageBounds();
 
-  // Crops the image using the itk::CropImageFilter and creates the new output image
+  // Crops the image using the itk::RegionOfInterestImageFilter and creates the new output image
   template < typename TPixel, unsigned int VImageDimension> 
   void ITKCrop3DImage( itk::Image< TPixel, VImageDimension >* inputItkImage, unsigned int timestep );
 
@@ -109,13 +111,9 @@ protected:
 
   typedef itk::Image<float,3>    ImageType;
   typedef ImageType::Pointer      ImagePointer;
-  typedef itk::CropImageFilter<ImageType,ImageType> CropFilterType;
 
-  ImageType::RegionType::SizeType m_RegionSize;
-  ImageType::RegionType::IndexType m_RegionIndex;
-
-  CropFilterType::SizeType m_LowerBounds;
-  CropFilterType::SizeType m_UpperBounds;
+  RegionType::SizeType m_RegionSize;
+  RegionType::IndexType m_RegionIndex;
 
   mitk::ImageTimeSelector::Pointer m_TimeSelector;
 

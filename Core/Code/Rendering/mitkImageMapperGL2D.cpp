@@ -214,8 +214,8 @@ mitk::ImageMapperGL2D::Paint( mitk::BaseRenderer *renderer )
         }
         if(set)
         {
-          s_x+=x;
-          s_y+=y;
+          if ( x > s_x ) s_x = x;
+          if ( y > s_y ) s_y = y;
           s_n++;
         }
       }
@@ -256,8 +256,9 @@ mitk::ImageMapperGL2D::Paint( mitk::BaseRenderer *renderer )
       //calc index pos
       Point2D pt2D;
       
-      pt2D[0] = s_x/double(s_n);
-      pt2D[1] = s_y/double(s_n);
+      // use upper right corner to position volume annotation
+      pt2D[0] = s_x;
+      pt2D[1] = s_y;
       
       //calc index pos with spacing
       const Geometry2D *worldGeometry = renderer->GetCurrentWorldGeometry2D();

@@ -24,6 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkVtkRepresentationProperty.h"
 #include "mitkWeakPointerProperty.h"
 #include "mitkNodePredicateDataType.h"
+#include "mitkNodePredicateOr.h"
 
 #include <vtkAssembly.h>
 #include <vtkDataSetMapper.h>
@@ -502,7 +503,11 @@ void Geometry2DDataVtkMapper3D::GenerateData(BaseRenderer* renderer)
 
 
     // Traverse the data tree to find nodes resliced by ImageMapperGL2D
-    mitk::NodePredicateDataType::Pointer p = mitk::NodePredicateDataType::New("Image");
+    mitk::NodePredicateOr::Pointer p = mitk::NodePredicateOr::New();
+    p->AddPredicate(mitk::NodePredicateDataType::New("Image"));
+    p->AddPredicate(mitk::NodePredicateDataType::New("DiffusionImage"));
+    p->AddPredicate(mitk::NodePredicateDataType::New("TensorImage"));
+    p->AddPredicate(mitk::NodePredicateDataType::New("QBallImage"));
     mitk::DataStorage::SetOfObjects::ConstPointer all = m_DataStorage->GetSubset(p);
     for (mitk::DataStorage::SetOfObjects::ConstIterator it = all->Begin(); it != all->End(); ++it)
     {
@@ -568,6 +573,18 @@ void Geometry2DDataVtkMapper3D::ProcessNode( DataNode * node, BaseRenderer* rend
   {
     ImageMapperGL2D *imageMapper =
       dynamic_cast< ImageMapperGL2D * >( node->GetMapper(1) );
+
+    if(!imageMapper)
+    {
+      if(node->GetMapper(1))
+      {
+        std::string cname(node->GetMapper(1)->GetNameOfClass());
+        if(!cname.compare("CompositeMapper"))
+        {
+          imageMapper = dynamic_cast<ImageMapperGL2D* >( node->GetMapper(3) );
+        }
+      }
+    }
 
     if ( (node->IsVisible(renderer)) && imageMapper )
     {

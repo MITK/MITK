@@ -71,8 +71,8 @@ namespace mitk
     {
       try
       {
-        const std::string& locale = "en_GB.UTF-8";
-        char *currLocale = setlocale( LC_ALL, NULL );
+        const std::string& locale = "C";
+        const std::string& currLocale = setlocale( LC_ALL, NULL );
 
         if ( locale.compare(currLocale)!=0 )
         {
@@ -83,7 +83,7 @@ namespace mitk
           }
           catch(...)
           {
-            MITK_INFO << "Could not activate locale " << locale;
+            MITK_INFO << "Could not set locale " << locale;
           }
         }
 
@@ -126,7 +126,6 @@ namespace mitk
               vect3d[1] == 0.0 &&
               vect3d[2] == 0.0)
             {
-              MITK_INFO << "Reference image found..";
               continue;
             }
             ++numberOfGradientImages;;
@@ -159,6 +158,16 @@ namespace mitk
         // so that it can be assigned to the DataObject in GenerateData();
         m_OutputCache = outputForCache;
         m_CacheTime.Modified();
+
+        try
+        {
+          MITK_INFO << " ** Changing locale back from " << setlocale(LC_ALL, NULL) << " to '" << currLocale << "'";
+          setlocale(LC_ALL, currLocale.c_str());
+        }
+        catch(...)
+        {
+          MITK_INFO << "Could not reset locale " << currLocale;
+        }
       }
       catch(std::exception& e)
       {

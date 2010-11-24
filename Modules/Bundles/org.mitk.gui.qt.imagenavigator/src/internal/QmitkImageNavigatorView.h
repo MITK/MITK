@@ -67,6 +67,10 @@ protected slots:
 
 protected:
 
+  friend class ImageNavigatorPartListener;
+
+  void SetMultiWidget(QmitkStdMultiWidget* multiWidget);
+
   Ui::QmitkImageNavigatorViewControls m_Controls;
 
   QmitkStdMultiWidget* m_MultiWidget;
@@ -74,6 +78,8 @@ protected:
   QmitkStepperAdapter* m_SagittalStepper;
   QmitkStepperAdapter* m_FrontalStepper;
   QmitkStepperAdapter* m_TimeStepper;
+
+  berry::IPartListener::Pointer multiWidgetListener;
 };
 
 

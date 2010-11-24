@@ -35,13 +35,60 @@ PURPOSE.  See the above copyright notices for more information.
 
 const std::string QmitkImageNavigatorView::VIEW_ID = "org.mitk.views.imagenavigator";
 
+
+class ImageNavigatorPartListener : public berry::IPartListener
+{
+public:
+
+  ImageNavigatorPartListener(QmitkImageNavigatorView* view)
+    : m_View(view)
+  {}
+
+  berry::IPartListener::Events::Types GetPartEventTypes() const
+  {
+    return berry::IPartListener::Events::OPENED |
+        berry::IPartListener::Events::CLOSED;
+  }
+
+  void PartClosed(berry::IWorkbenchPartReference::Pointer partRef)
+  {
+    m_View->SetMultiWidget(0);
+  }
+
+  void PartOpened(berry::IWorkbenchPartReference::Pointer partRef)
+  {
+    if (partRef->GetId() == QmitkStdMultiWidgetEditor::EDITOR_ID)
+    {
+      if (partRef->GetId() == QmitkStdMultiWidgetEditor::EDITOR_ID)
+      {
+        if (QmitkStdMultiWidgetEditor::Pointer multiWidgetPart =
+            partRef->GetPart(false).Cast<QmitkStdMultiWidgetEditor>())
+        {
+          m_View->SetMultiWidget(multiWidgetPart->GetStdMultiWidget());
+        }
+        else
+        {
+          m_View->SetMultiWidget(0);
+        }
+      }
+    }
+  }
+
+private:
+
+  QmitkImageNavigatorView* m_View;
+};
+
+
 QmitkImageNavigatorView::QmitkImageNavigatorView()
 : m_MultiWidget(NULL)
 {
+  multiWidgetListener = new ImageNavigatorPartListener(this);
 }
 
 QmitkImageNavigatorView::~QmitkImageNavigatorView()
 {
+  this->GetSite()->GetPage()->RemovePartListener(multiWidgetListener);
   //delete m_TransversalStepper;
   //delete m_SagittalStepper;
   //delete m_FrontalStepper;
@@ -59,11 +106,32 @@ void QmitkImageNavigatorView::CreateQtPartControl(QWidget *parent)
   m_SagittalStepper = new QmitkStepperAdapter(m_Controls.m_SliceNavigatorSagittal, m_MultiWidget->mitkWidget2->GetSliceNavigationController()->GetSlice(), "sliceNavigatorSagittalFromSimpleExample");
   m_FrontalStepper = new QmitkStepperAdapter(m_Controls.m_SliceNavigatorFrontal, m_MultiWidget->mitkWidget3->GetSliceNavigationController()->GetSlice(), "sliceNavigatorFrontalFromSimpleExample");
   m_TimeStepper = new QmitkStepperAdapter(m_Controls.m_SliceNavigatorTime, m_MultiWidget->GetTimeNavigationController()->GetTime(), "sliceNavigatorTimeFromSimpleExample");
+
+  this->GetSite()->GetPage()->AddPartListener(multiWidgetListener);
 }
 
 void QmitkImageNavigatorView::SetFocus ()
 {
 
+}
+
+void QmitkImageNavigatorView::SetMultiWidget(QmitkStdMultiWidget* multiWidget)
+{
+  m_MultiWidget = multiWidget;
+  if (m_MultiWidget)
+  {
+    m_TransversalStepper->SetStepper(m_MultiWidget->mitkWidget1->GetSliceNavigationController()->GetSlice());
+    m_SagittalStepper->SetStepper(m_MultiWidget->mitkWidget2->GetSliceNavigationController()->GetSlice());
+    m_FrontalStepper->SetStepper(m_MultiWidget->mitkWidget3->GetSliceNavigationController()->GetSlice());
+    m_TimeStepper->SetStepper(m_MultiWidget->GetTimeNavigationController()->GetTime());
+  }
+  else
+  {
+    m_TransversalStepper->SetStepper(0);
+    m_SagittalStepper->SetStepper(0);
+    m_FrontalStepper->SetStepper(0);
+    m_TimeStepper->SetStepper(0);
+  }
 }
 
 QmitkStdMultiWidget* QmitkImageNavigatorView::GetActiveStdMultiWidget()

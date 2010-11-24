@@ -325,6 +325,7 @@ void QmitkExtWorkbenchWindowAdvisor::SetWindowIcon(const std::string& wndIcon)
 
 void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
 {
+<<<<<<< HEAD
  QmitkCommonWorkbenchWindowAdvisor::PostWindowCreate();
  // very bad hack...
  berry::IWorkbenchWindow::Pointer window =
@@ -385,22 +386,17 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
  QObject::connect(imageNavigatorAction, SIGNAL(triggered(bool)), QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onImageNavigator()));
  imageNavigatorAction->setCheckable(true);
 
- berry::IWorkbenchWindow::Pointer win =
-  berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow();
- if(win.IsNotNull())
+ // add part listener for image navigator
+ imageNavigatorPartListener = new PartListenerForImageNavigator(imageNavigatorAction);
+ window->GetPartService()->AddPartListener(imageNavigatorPartListener);
+ berry::IViewPart::Pointer imageNavigatorView =
+ window->GetActivePage()->FindView("org.mitk.views.imagenavigator");
+ imageNavigatorAction->setChecked(false);
+ if (imageNavigatorView)
  {
-  // add part listener for image navigator
-  imageNavigatorPartListener = new PartListenerForImageNavigator(imageNavigatorAction);
-  win->GetPartService()->AddPartListener(imageNavigatorPartListener);
-  berry::IViewPart::Pointer imageNavigatorView =
-   win->GetActivePage()->FindView("org.mitk.views.imagenavigator");
-  imageNavigatorAction->setChecked(false);
-  if (imageNavigatorView)
-  {
-   bool isImageNavigatorVisible = berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetActivePage()->IsPartVisible(imageNavigatorView);
+   bool isImageNavigatorVisible = window->GetActivePage()->IsPartVisible(imageNavigatorView);
    if (isImageNavigatorVisible)
-    imageNavigatorAction->setChecked(true);
-  }
+   imageNavigatorAction->setChecked(true);
  }
  imageNavigatorAction->setToolTip("Open image navigator for navigating through image");
 

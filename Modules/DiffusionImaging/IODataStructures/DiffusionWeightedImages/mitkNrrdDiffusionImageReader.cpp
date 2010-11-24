@@ -122,9 +122,9 @@ namespace mitk
             m_DiffusionVectors->InsertElement( numberOfImages, vect3d );
             ++numberOfImages;
             // If the direction is 0.0, this is a reference image
-            if (vect3d[0] < 0.1 &&
-              vect3d[1] < 0.1 &&
-              vect3d[2] < 0.1)
+            if (vect3d[0] == 0.0 &&
+              vect3d[1] == 0.0 &&
+              vect3d[2] == 0.0)
             {
               MITK_INFO << "Reference image found..";
               continue;

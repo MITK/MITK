@@ -211,7 +211,7 @@ bool mitk::RegionGrowingTool::OnMousePressedInside(Action* itkNotUsed( action ),
         newPoint[1] = cutContour.deleteCurve[ 2 * index + 1];
         newPoint[2] = 0.0;
 
-        contourInImageIndexCoordinates->AddVertex( newPoint + 0.5 );
+        contourInImageIndexCoordinates->AddVertex( newPoint );
       }
 
       free(cutContour.traceline);

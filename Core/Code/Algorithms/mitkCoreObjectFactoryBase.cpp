@@ -37,7 +37,7 @@ void mitk::CoreObjectFactoryBase::CreateFileExtensions(MultimapType fileExtensio
   // build the "all" entry (it contains all the extensions)
   // and add it to the string in the first position
   // e.g. "all (*.dcm *.DCM *.dc3 *.DC3 *.gdcm *.ima *.mhd ... *.vti *.hdr *.nrrd *.nhdr );;"
-  fileExtensions = "all (";
+  fileExtensions = "known extensions (";
   std::string lastKey = "";
   for (MultimapType::iterator it = fileExtensionsMap.begin(); it != fileExtensionsMap.end(); ++it)
   {
@@ -53,7 +53,7 @@ void mitk::CoreObjectFactoryBase::CreateFileExtensions(MultimapType fileExtensio
     }
     lastKey = aKey;
   }
-  fileExtensions.append(");;");
+  fileExtensions.append(");;all (*);;");
 
   // build the entry for each extension-group
   // e.g. "Sets of 2D slices (*.pic *.pic.gz *.bmp *.png *.dcm *.gdcm *.ima *.tiff);;"

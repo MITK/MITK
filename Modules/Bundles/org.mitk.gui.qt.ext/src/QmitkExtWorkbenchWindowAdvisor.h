@@ -84,11 +84,13 @@ private:
 
   berry::IPartListener::Pointer titlePartListener;
   berry::IPerspectiveListener::Pointer titlePerspectiveListener;
+  berry::IPerspectiveListener::Pointer menuPerspectiveListener;
   berry::IPartListener::Pointer imageNavigatorPartListener;
   berry::IPropertyChangeListener::Pointer editorPropertyListener;
   friend struct berry::PropertyChangeIntAdapter<QmitkExtWorkbenchWindowAdvisor>;
   friend class PartListenerForTitle;
   friend class PerspectiveListenerForTitle;
+  friend class PerspectiveListenerForMenu;
   friend class PartListenerForImageNavigator;
 
   berry::IEditorPart::WeakPtr lastActiveEditor;
@@ -105,6 +107,9 @@ private:
 
   // stringlist for excluding perspectives from the perspective menu entry (e.g. Welcome Perspective)
   std::vector<std::string> perspectiveExcludeList;
+
+  // maps perspective ids to QAction objects
+  std::map<std::string, QAction*> mapPerspIdToAction;
 
   // actions which will be enabled/disabled depending on the application state
   QList<QAction*> viewActions;

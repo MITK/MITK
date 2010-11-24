@@ -614,10 +614,8 @@ ELSE()
   INSTALL(TARGETS ${_target} RUNTIME DESTINATION bin)
 ENDIF() 
 
-MESSAGE("target locations: ${_target_locations}")
 
 FOREACH(_target_location ${_target_locations})
-MESSAGE("qt locations orig: ${${_target_location}_qt_plugins_install_dir}")
 
 IF(QT_PLUGINS_DIR)
     INSTALL(DIRECTORY "${QT_PLUGINS_DIR}" 

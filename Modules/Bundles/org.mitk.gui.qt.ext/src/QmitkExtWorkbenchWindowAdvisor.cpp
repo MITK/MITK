@@ -364,7 +364,6 @@ void QmitkExtWorkbenchWindowAdvisor::SetWindowIcon(const std::string& wndIcon)
 
 void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
 {
-<<<<<<< HEAD
  QmitkCommonWorkbenchWindowAdvisor::PostWindowCreate();
  // very bad hack...
  berry::IWorkbenchWindow::Pointer window =

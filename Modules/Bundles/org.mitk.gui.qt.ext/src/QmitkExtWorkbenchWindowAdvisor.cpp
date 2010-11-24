@@ -375,6 +375,7 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
  {
   mainWindow->setWindowIcon(QIcon(QString::fromStdString(windowIcon)));
  }
+ mainWindow->setContextMenuPolicy(Qt::ContextMenuPolicy::PreventContextMenu);
 
  /*mainWindow->setStyleSheet("color: white;"
  "background-color: #808080;"
@@ -385,6 +386,7 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
 
  // ==== Application menu ============================
  QMenuBar* menuBar = mainWindow->menuBar();
+ menuBar->setContextMenuPolicy(Qt::ContextMenuPolicy::PreventContextMenu);
 
  QMenu* fileMenu = menuBar->addMenu("&File");
  fileMenu->setObjectName("FileMenu");
@@ -440,7 +442,7 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
 
  // toolbar for showing file open, undo, redo and other main actions
  QToolBar* mainActionsToolBar = new QToolBar;
-
+ mainActionsToolBar->setContextMenuPolicy(Qt::ContextMenuPolicy::PreventContextMenu);
 #ifdef __APPLE__
  mainActionsToolBar->setToolButtonStyle ( Qt::ToolButtonTextUnderIcon );
 #else

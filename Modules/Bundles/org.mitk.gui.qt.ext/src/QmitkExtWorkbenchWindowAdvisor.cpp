@@ -271,6 +271,45 @@ private:
  bool perspectivesClosed;
 };
 
+class PerspectiveListenerForMenu: public berry::IPerspectiveListener
+{
+public:
+
+ PerspectiveListenerForMenu(QmitkExtWorkbenchWindowAdvisor* wa) :
+   windowAdvisor(wa)
+   {
+   }
+
+   Events::Types GetPerspectiveEventTypes() const
+   {
+    return Events::ACTIVATED | Events::DEACTIVATED;
+   }
+
+   void PerspectiveActivated(berry::IWorkbenchPage::Pointer /*page*/,
+    berry::IPerspectiveDescriptor::Pointer perspective)
+   {
+     QAction* action = windowAdvisor->mapPerspIdToAction[perspective->GetId()];
+     if (action)
+     {
+       action->setChecked(true);
+     }
+   }
+
+   void PerspectiveDeactivated(berry::IWorkbenchPage::Pointer /*page*/,
+    berry::IPerspectiveDescriptor::Pointer perspective)
+   {
+     QAction* action = windowAdvisor->mapPerspIdToAction[perspective->GetId()];
+     if (action)
+     {
+       action->setChecked(false);
+     }
+   }
+
+private:
+ QmitkExtWorkbenchWindowAdvisor* windowAdvisor;
+};
+
+
 
 QmitkExtWorkbenchWindowAdvisor::QmitkExtWorkbenchWindowAdvisor(berry::WorkbenchAdvisor* wbAdvisor,
                   berry::IWorkbenchWindowConfigurer::Pointer configurer) :
@@ -471,8 +510,9 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
         }
       }
 
-      new berry::QtOpenPerspectiveAction(window,
+      QAction* perspAction = new berry::QtOpenPerspectiveAction(window,
         *perspIt, perspGroup);
+      mapPerspIdToAction.insert(std::make_pair((*perspIt)->GetId(), perspAction));
     }
  perspMenu->addActions(perspGroup->actions());
 
@@ -563,6 +603,9 @@ void QmitkExtWorkbenchWindowAdvisor::PreWindowOpen()
  //      configurer.getWindow()));
 
  this->HookTitleUpdateListeners(configurer);
+
+ menuPerspectiveListener = new PerspectiveListenerForMenu(this);
+ configurer->GetWindow()->AddPerspectiveListener(menuPerspectiveListener);
 }
 
 //--------------------------------------------------------------------------------

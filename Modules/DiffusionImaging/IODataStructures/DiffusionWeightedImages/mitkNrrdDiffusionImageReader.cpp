@@ -71,6 +71,22 @@ namespace mitk
     {
       try
       {
+        const std::string& locale = "en_GB.UTF-8";
+        char *currLocale = setlocale( LC_ALL, NULL );
+
+        if ( locale.compare(currLocale)!=0 )
+        {
+          try
+          {
+            MITK_INFO << " ** Changing locale from " << setlocale(LC_ALL, NULL) << " to '" << locale << "'";
+            setlocale(LC_ALL, locale.c_str());
+          }
+          catch(...)
+          {
+            MITK_INFO << "Could not activate locale " << locale;
+          }
+        }
+
         itk::NrrdImageIO::Pointer io = itk::NrrdImageIO::New();
         typedef itk::ImageFileReader<ImageType> FileReaderType;
         typename FileReaderType::Pointer reader = FileReaderType::New();
@@ -99,16 +115,18 @@ namespace mitk
           itk::ExposeMetaData<std::string> (imgMetaDictionary, *itKey, metaString);
           if (itKey->find("DWMRI_gradient") != std::string::npos)
           { 
-            std::cout << *itKey << " ---> " << metaString << std::endl;      
+            std::cout << *itKey << " ---> " << metaString << std::endl;
             sscanf(metaString.c_str(), "%lf %lf %lf\n", &x, &y, &z);
+            MITK_INFO << "read values: " << x << "; " << y << "; " << z;
             vect3d[0] = x; vect3d[1] = y; vect3d[2] = z;
             m_DiffusionVectors->InsertElement( numberOfImages, vect3d );
             ++numberOfImages;
             // If the direction is 0.0, this is a reference image
-            if (vect3d[0] == 0.0 &&
-              vect3d[1] == 0.0 &&
-              vect3d[2] == 0.0)
+            if (vect3d[0] < 0.1 &&
+              vect3d[1] < 0.1 &&
+              vect3d[2] < 0.1)
             {
+              MITK_INFO << "Reference image found..";
               continue;
             }
             ++numberOfGradientImages;;

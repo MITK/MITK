@@ -503,7 +503,7 @@ void Geometry2DDataVtkMapper3D::GenerateData(BaseRenderer* renderer)
 
 
     // Traverse the data tree to find nodes resliced by ImageMapperGL2D
-    mitk::NodePredicateOr::Pointer p = mitk::NodePredicateOr::New();
+    mitk::NodePredicateOR::Pointer p = mitk::NodePredicateOR::New();
     p->AddPredicate(mitk::NodePredicateDataType::New("Image"));
     p->AddPredicate(mitk::NodePredicateDataType::New("DiffusionImage"));
     p->AddPredicate(mitk::NodePredicateDataType::New("TensorImage"));

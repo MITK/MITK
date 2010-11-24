@@ -92,6 +92,12 @@ namespace mitk {
       m_OdfMapper->SetDataNode(node);
     }
 
+    mitk::ImageMapperGL2D::Pointer GetImageMapper()
+    {
+      ImageMapperGL2D* retval = m_ImgMapper;
+      return retval;
+    }
+
     bool IsVtkBased() const
     {
       return m_OdfMapper->IsVtkBased();

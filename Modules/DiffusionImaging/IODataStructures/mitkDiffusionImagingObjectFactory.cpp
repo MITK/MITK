@@ -36,6 +36,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkCompositeMapper.h"
 #include "mitkDiffusionImageMapper.h"
+#include "mitkGPUVolumeMapper3D.h"
 
 typedef short DiffusionPixelType;
 typedef mitk::DiffusionImage<DiffusionPixelType> DiffusionImageShort;
@@ -83,12 +84,14 @@ mitk::Mapper::Pointer mitk::DiffusionImagingObjectFactory::CreateMapper(mitk::Da
     {
       newMapper = mitk::CompositeMapper::New();
       newMapper->SetDataNode(node);
+      node->SetMapper(3, ((CompositeMapper*)newMapper.GetPointer())->GetImageMapper());
     }
     classname = "TensorImage";
     if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
     {
       newMapper = mitk::CompositeMapper::New();
       newMapper->SetDataNode(node);
+      node->SetMapper(3, ((CompositeMapper*)newMapper.GetPointer())->GetImageMapper());
     }
     classname = "DiffusionImage";
     if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
@@ -99,7 +102,24 @@ mitk::Mapper::Pointer mitk::DiffusionImagingObjectFactory::CreateMapper(mitk::Da
   }
   else if ( id == mitk::BaseRenderer::Standard3D )
   {
-    // do nothing
+    std::string classname("QBallImage");
+    if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
+    {
+      newMapper = mitk::GPUVolumeMapper3D::New();
+      newMapper->SetDataNode(node);
+    }
+    classname = "TensorImage";
+    if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
+    {
+      newMapper = mitk::GPUVolumeMapper3D::New();
+      newMapper->SetDataNode(node);
+    }
+    classname = "DiffusionImage";
+    if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
+    {
+      newMapper = mitk::GPUVolumeMapper3D::New();
+      newMapper->SetDataNode(node);
+    }
   }
 
   return newMapper;
@@ -111,18 +131,21 @@ void mitk::DiffusionImagingObjectFactory::SetDefaultProperties(mitk::DataNode* n
   if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
   {
     mitk::CompositeMapper::SetDefaultProperties(node);
+    mitk::GPUVolumeMapper3D::SetDefaultProperties(node);
   }
 
   classname = "TensorImage";
   if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
   {
     mitk::CompositeMapper::SetDefaultProperties(node);
+    mitk::GPUVolumeMapper3D::SetDefaultProperties(node);
   }
 
   classname = "DiffusionImage";
   if(node->GetData() && classname.compare(node->GetData()->GetNameOfClass())==0)
   {
     mitk::DiffusionImageMapper<short>::SetDefaultProperties(node);
+    mitk::GPUVolumeMapper3D::SetDefaultProperties(node);
   }
 }
 

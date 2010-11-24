@@ -513,7 +513,6 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
 
       QAction* perspAction = new berry::QtOpenPerspectiveAction(window,
         *perspIt, perspGroup);
-      perspAction->setCheckable(false);
       mapPerspIdToAction.insert(std::make_pair((*perspIt)->GetId(), perspAction));
     }
  perspMenu->addActions(perspGroup->actions());

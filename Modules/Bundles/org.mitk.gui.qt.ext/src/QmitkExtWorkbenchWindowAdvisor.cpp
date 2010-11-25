@@ -473,13 +473,13 @@ if (!windowIcon.empty())
 
  // ==== Window Menu ==========================
  QMenu* windowMenu = menuBar->addMenu("Window");
- windowMenu->addAction("&New Window",
-  QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onNewWindow()));
- windowMenu->addSeparator();
+ //windowMenu->addAction("&New Window",
+ // QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onNewWindow()));
+ //windowMenu->addSeparator();
  QMenu* perspMenu = windowMenu->addMenu("&Open Perspective");
- QMenu* viewMenu = windowMenu->addMenu("Show &View");
- viewMenu->setObjectName("Show View");
- windowMenu->addSeparator();
+ //QMenu* viewMenu = windowMenu->addMenu("Show &View");
+ //viewMenu->setObjectName("Show View");
+ //windowMenu->addSeparator();
  resetPerspAction = windowMenu->addAction("&Reset Perspective",
   QmitkExtWorkbenchWindowAdvisorHack::undohack, SLOT(onResetPerspective()));
  closePerspAction = windowMenu->addAction("&Close Perspective",

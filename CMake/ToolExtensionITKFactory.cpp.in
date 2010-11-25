@@ -4,6 +4,7 @@
  */
 
 #include <itkObjectFactoryBase.h>
+#include <itkConfigure.h>
 
 #include "mitk@TOOL_NAME@.h"
 
@@ -23,7 +24,7 @@ class @FACTORY_NAME@ : public ::itk::ObjectFactoryBase
     /* Methods from ObjectFactoryBase */
     virtual const char* GetITKSourceVersion() const
     {
-      return ITK_SOURCE_VERSION;
+      return ITK_VERSION_STRING;
     }\
     
     virtual const char* GetDescription() const

@@ -1,7 +1,6 @@
 
 #include <itkObjectFactoryBase.h>
-
-@FACTORY_INCLUDE_LINES@
+#include <itkConfigure.h>
 
 /* No EXPORT, should not be used by any other lib, right? */
 class mitkToolExtensionITKFactoryLoader : public ::itk::ObjectFactoryBase
@@ -17,7 +16,7 @@ class mitkToolExtensionITKFactoryLoader : public ::itk::ObjectFactoryBase
     /* Methods from ObjectFactoryBase */
     virtual const char* GetITKSourceVersion() const
     {
-      return ITK_SOURCE_VERSION;
+      return ITK_VERSION_STRING;
     }\
     
     virtual const char* GetDescription() const
@@ -42,7 +41,11 @@ class mitkToolExtensionITKFactoryLoader : public ::itk::ObjectFactoryBase
 
     mitkToolExtensionITKFactoryLoader()
     {
-      @FACTORY_REGISTER_CALLS@
+      // this is a dummy factory which is here just to
+      // ensure that itkLoad can return something other
+      // than NULL.
+      // This should ensure that ITK does not unload
+      // the shared library
     }
 
     ~mitkToolExtensionITKFactoryLoader()
@@ -64,8 +67,8 @@ __declspec(dllexport)
 #endif
  itk::ObjectFactoryBase* itkLoad() 
 {
-  static mitkToolExtensionITKFactoryLoader::Pointer factory  = mitkToolExtensionITKFactoryLoader::New();
 
+  static mitkToolExtensionITKFactoryLoader::Pointer factory  = mitkToolExtensionITKFactoryLoader::New();
   return factory;
 }
 

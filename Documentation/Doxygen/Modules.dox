@@ -82,10 +82,10 @@
 */
  
 /**
-  \defgroup Reliver Classes related to InteractiveSegmentation
+  \defgroup Reliver Classes related to the Segmentation bundle
 
-  \brief A couple of classes related to InteractiveSegmentation.
-  \sa QmitkInteractiveSegmentationTechnicalPage
+  \brief A couple of classes related to the Segmentation bundle.
+  \sa QmitkSegmentationTechnicalPage
 */
 
 /**

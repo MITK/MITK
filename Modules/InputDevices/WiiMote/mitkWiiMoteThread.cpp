@@ -488,7 +488,9 @@ void mitk::WiiMoteThread::SurfaceInteraction()
     ,m_WiiMotes[0].MotionPlus.Speed.Yaw
     ,m_WiiMotes[0].Acceleration.Orientation.X
     ,m_WiiMotes[0].Acceleration.Orientation.Y
-    ,m_WiiMotes[0].Acceleration.Orientation.Z);
+    ,m_WiiMotes[0].Acceleration.Orientation.Z
+    ,m_WiiMotes[0].Acceleration.Orientation.Roll
+    ,m_WiiMotes[0].Acceleration.Orientation.Pitch);
 
 
   mitk::CallbackFromGUIThread::GetInstance()

@@ -106,8 +106,6 @@ Geometry2DDataVtkMapper3D::Geometry2DDataVtkMapper3D()
   //  m_BackgroundMapper->ImmediateModeRenderingOn();
   m_EdgeActor->SetMapper( m_EdgeMapper );
 
-  m_BackgroundMapper->SetInput(emptyPolyData);
-  m_BackgroundMapper->ImmediateModeRenderingOn();
 
   m_BackgroundActor->GetProperty()->SetAmbient( 0.5 );
   m_BackgroundActor->GetProperty()->SetColor( 0.0, 0.0, 0.0 );

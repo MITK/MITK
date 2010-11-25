@@ -36,7 +36,7 @@ class QmitkMaterialEditor;
   \class QmitkPropertyListPopUp
 
   @ingroup Widgets
-  @ingroup Reliver
+  @ingroup ToolManagerEtAl
   @ingroup Visualization
 
   \brief Displays the properties from a mitk::PropertyList.

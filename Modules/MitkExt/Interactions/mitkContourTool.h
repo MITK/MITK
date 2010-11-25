@@ -35,7 +35,7 @@ class Image;
   \sa OverwriteSliceImageFilter
   
   \ingroup Interaction
-  \ingroup Reliver
+  \ingroup ToolManagerEtAl
 
   Fills a visible contour (from FeedbackContourTool) during mouse dragging. When the mouse button
   is released, ContourTool tries to extract a slice from the working image and fill in

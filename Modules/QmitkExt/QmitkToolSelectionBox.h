@@ -37,7 +37,7 @@ class QmitkToolGUI;
   \sa mitk::ToolManager
 
   \ingroup org_mitk_gui_qt_interactivesegmentation
-  \ingroup Reliver
+  \ingroup ToolManagerEtAl
 
   There is a separate page describing the general design of QmitkInteractiveSegmentation: \ref QmitkInteractiveSegmentationTechnicalPage
 

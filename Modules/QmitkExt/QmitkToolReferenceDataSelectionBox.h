@@ -33,7 +33,7 @@ class QmitkDataStorageComboBox;
 \sa mitk::ToolManager
 \sa mitk::DataStorage
 
-\ingroup Reliver
+\ingroup ToolManagerEtAl
 \ingroup Widgets
 
 There is a separate page describing the general design of QmitkInteractiveSegmentation: \ref QmitkInteractiveSegmentationTechnicalPage

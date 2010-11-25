@@ -50,7 +50,7 @@ namespace mitk
   \sa SegTool2D
 
   \ingroup Interaction
-  \ingroup Reliver
+  \ingroup ToolManagerEtAl
 
   There is a separate page describing the \ref QmitkInteractiveSegmentationTechnicalPage.
 

@@ -31,7 +31,7 @@ namespace mitk
   /**
   \brief Calculates the segmented volumes for binary images.
 
-  \ingroup Reliver
+  \ingroup ToolManagerEtAl
   \sa mitk::Tool
   \sa QmitkInteractiveSegmentation
 

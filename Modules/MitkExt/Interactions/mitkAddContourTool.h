@@ -30,7 +30,7 @@ namespace mitk
   \sa ContourTool
   
   \ingroup Interaction
-  \ingroup Reliver
+  \ingroup ToolManagerEtAl
 
   Fills a visible contour (from FeedbackContourTool) during mouse dragging. When the mouse button
   is released, AddContourTool tries to extract a slice from the working image and fill in

@@ -82,7 +82,7 @@
 */
  
 /**
-  \defgroup Reliver Classes related to the Segmentation bundle
+  \defgroup ToolManagerEtAl Classes related to the Segmentation bundle
 
   \brief A couple of classes related to the Segmentation bundle.
   \sa QmitkSegmentationTechnicalPage

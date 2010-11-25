@@ -31,7 +31,7 @@ namespace mitk
 /**
  \brief Calculates some gray value statistics for segmentations.
 
- \ingroup Reliver
+ \ingroup ToolManagerEtAl
  \sa mitk::Tool
  \sa QmitkInteractiveSegmentation
 

@@ -34,7 +34,7 @@ namespace mitk
   \sa OverwriteSliceImageFilter
   
   \ingroup Interaction
-  \ingroup Reliver
+  \ingroup ToolManagerEtAl
 
   Simple paintbrush drawing tool. Right now there are only circular pens of varying size.
 

@@ -35,7 +35,7 @@ namespace mitk
   \sa ExtractImageFilter
 
   \ingroup Process
-  \ingroup Reliver
+  \ingroup ToolManagerEtAl
 
   There is a separate page describing the general design of QmitkInteractiveSegmentation: \ref QmitkInteractiveSegmentationTechnicalPage
 

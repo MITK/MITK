@@ -35,7 +35,7 @@ class Image;
   \sa OverwriteSliceImageFilter
   
   \ingroup Interaction
-  \ingroup Reliver
+  \ingroup ToolManagerEtAl
 
   Finds the outer contour of a shape in 2D (possibly including holes) and sets all 
   the inside pixels to a specified value. This might fill holes or erase segmentations.

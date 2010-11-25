@@ -30,7 +30,7 @@ namespace mitk
   \brief Enumerates all known organs :-)
 
   \sa QmitkInteractiveSegmentation
-  \ingroup Reliver
+  \ingroup ToolManagerEtAl
   \ingroup DataManagement
 
   Last contributor $Author$

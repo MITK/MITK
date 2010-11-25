@@ -30,7 +30,7 @@ namespace mitk
   \sa SetRegionTool
   
   \ingroup Interaction
-  \ingroup Reliver
+  \ingroup ToolManagerEtAl
 
   Finds the outer contour of a shape in 2D (possibly including holes) and sets all 
   the inside pixels to 0 (erasing a segmentation).

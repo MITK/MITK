@@ -32,7 +32,7 @@ namespace mitk
   \sa FeedbackContourTool
 
   \ingroup Interaction
-  \ingroup Reliver
+  \ingroup ToolManagerEtAl
 
   When the user presses the mouse button, RegionGrowingTool will use the gray values at that position
   to initialize a region growing algorithm (in the affected 2D slice).

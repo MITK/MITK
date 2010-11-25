@@ -35,7 +35,7 @@ class QPushButton;
 /**
   \brief Dialog for QmitkInteractiveSegmentation.
 
-  \ingroup Reliver
+  \ingroup ToolManagerEtAl
   \ingroup Widgets
 
   This dialog is used to ask a user about the type of a newly created segmentation and a name for it.

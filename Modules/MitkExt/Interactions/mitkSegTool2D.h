@@ -37,7 +37,7 @@ class BaseRenderer;
   \sa Tool
 
   \ingroup Interaction
-  \ingroup Reliver
+  \ingroup ToolManagerEtAl
 
   Implements 2D segmentation specific helper methods, that might be of use to
   all kind of 2D segmentation tools. At the moment these are:

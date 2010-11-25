@@ -40,7 +40,7 @@ class QPushButton;
 /**
   \brief GUI for slices interpolation.
 
-  \ingroup Reliver
+  \ingroup ToolManagerEtAl
   \ingroup Widgets
 
   \sa QmitkInteractiveSegmentation

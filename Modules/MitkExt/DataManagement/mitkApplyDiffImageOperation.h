@@ -40,7 +40,7 @@ namespace mitk {
  To save memory, zlib compression is used via CompressedImageContainer.
 
  @ingroup Undo
- @ingroup Reliver
+ @ingroup ToolManagerEtAl
 */
 class MitkExt_EXPORT ApplyDiffImageOperation : public Operation
 {

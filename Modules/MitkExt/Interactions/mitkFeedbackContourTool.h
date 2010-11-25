@@ -39,7 +39,7 @@ namespace mitk
   \sa Contour
 
   \ingroup Interaction
-  \ingroup Reliver
+  \ingroup ToolManagerEtAl
 
   Implements helper methods, that might be of use to all kind of 2D segmentation tools that use a contour for user feedback. 
    - Providing a feedback contour that might be added or removed from the visible scene (SetFeedbackContourVisible).

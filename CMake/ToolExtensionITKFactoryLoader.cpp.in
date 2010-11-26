@@ -1,6 +1,6 @@
 
 #include <itkObjectFactoryBase.h>
-#include <itkConfigure.h>
+#include <itkVersion.h>
 
 /* No EXPORT, should not be used by any other lib, right? */
 class mitkToolExtensionITKFactoryLoader : public ::itk::ObjectFactoryBase
@@ -16,7 +16,7 @@ class mitkToolExtensionITKFactoryLoader : public ::itk::ObjectFactoryBase
     /* Methods from ObjectFactoryBase */
     virtual const char* GetITKSourceVersion() const
     {
-      return ITK_VERSION_STRING;
+      return ITK_SOURCE_VERSION;
     }\
     
     virtual const char* GetDescription() const

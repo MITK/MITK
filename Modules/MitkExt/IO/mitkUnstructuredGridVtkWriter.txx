@@ -15,6 +15,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
+#ifndef _MITK_UNSTRUCTURED_GRID_VTKWRITER_TXX_
+#define _MITK_UNSTRUCTURED_GRID_VTKWRITER_TXX_
+
 #include <itkLightObject.h>
 #include <vtkUnstructuredGrid.h>
 #include <vtkLinearTransform.h>
@@ -234,8 +237,10 @@ const char * UnstructuredGridVtkWriter<vtkXMLUnstructuredGridWriter>::GetDefault
 template<>
 const char * UnstructuredGridVtkWriter<vtkXMLPUnstructuredGridWriter>::GetDefaultExtension();
 
-template class MitkExt_EXPORT UnstructuredGridVtkWriter<vtkUnstructuredGridWriter>;
-template class MitkExt_EXPORT UnstructuredGridVtkWriter<vtkXMLUnstructuredGridWriter>;
-template class MitkExt_EXPORT UnstructuredGridVtkWriter<vtkXMLPUnstructuredGridWriter>;
+//template class MitkExt_EXPORT UnstructuredGridVtkWriter<vtkUnstructuredGridWriter>;
+//template class MitkExt_EXPORT UnstructuredGridVtkWriter<vtkXMLUnstructuredGridWriter>;
+//template class MitkExt_EXPORT UnstructuredGridVtkWriter<vtkXMLPUnstructuredGridWriter>;
 
 }
+
+#endif

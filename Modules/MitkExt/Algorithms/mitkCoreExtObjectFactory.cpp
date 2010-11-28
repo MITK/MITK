@@ -30,9 +30,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkUnstructuredGridVtkWriterFactory.h"
 #include "mitkUnstructuredGridVtkWriter.h"
-#include <vtkUnstructuredGridWriter.h>
-#include <vtkXMLUnstructuredGridWriter.h>
-#include <vtkXMLPUnstructuredGridWriter.h>
 
 #include "mitkCone.h"
 #include "mitkContour.h"
@@ -55,6 +52,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkGPUVolumeMapper3D.h"
 
 #include "mitkVolumeDataVtkMapper3D.h"
+
 
 mitk::CoreExtObjectFactory::CoreExtObjectFactory() 
 :CoreObjectFactoryBase()

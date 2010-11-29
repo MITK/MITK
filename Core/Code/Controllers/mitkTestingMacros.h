@@ -59,8 +59,8 @@ namespace mitk {
   } catch (mitk::TestFailedException ex) {                      \
     MITK_TEST_OUTPUT(<< "Further test execution skipped.") \
     mitk::TestManager::GetInstance()->TestFailed(); \
-  } catch (itk::ExceptionObject ex) { \
-    MITK_TEST_OUTPUT(<< "ITKException occured: " << ex) \
+  } catch (std::exception ex) { \
+    MITK_TEST_OUTPUT(<< "std::exception occured " << ex.what()) \
     mitk::TestManager::GetInstance()->TestFailed(); \
   }                                                     \
   if (mitk::TestManager::GetInstance()->NumberOfFailedTests() > 0) {  \

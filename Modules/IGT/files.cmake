@@ -17,7 +17,6 @@ SET(CPP_FILES
   IGTFilters/mitkTrackingDeviceSource.cpp
   IGTFilters/mitkTimeStamp.cpp
   IGTFilters/mitkRealTimeClock.cpp
-  IGTFilters/mitkNavigationDataToVTKCameraUpdate.cpp
 
   IGTTrackingDevices/mitkClaronTool.cpp
   IGTTrackingDevices/mitkClaronTrackingDevice.cpp

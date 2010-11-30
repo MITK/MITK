@@ -17,7 +17,7 @@ SET(MODULE_TESTS
   mitkToolManagerTest.cpp
 )
 SET(MODULE_IMAGE_TESTS
-  # mitkUnstructuredGridVtkWriterTest.cpp
+  mitkUnstructuredGridVtkWriterTest.cpp
   mitkCompressedImageContainerTest.cpp  
   mitkCylindricToCartesianFilterTest.cpp
   mitkExtractImageFilterTest.cpp  

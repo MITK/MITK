@@ -237,9 +237,15 @@ const char * UnstructuredGridVtkWriter<vtkXMLUnstructuredGridWriter>::GetDefault
 template<>
 const char * UnstructuredGridVtkWriter<vtkXMLPUnstructuredGridWriter>::GetDefaultExtension();
 
-//template class MitkExt_EXPORT UnstructuredGridVtkWriter<vtkUnstructuredGridWriter>;
-//template class MitkExt_EXPORT UnstructuredGridVtkWriter<vtkXMLUnstructuredGridWriter>;
-//template class MitkExt_EXPORT UnstructuredGridVtkWriter<vtkXMLPUnstructuredGridWriter>;
+#ifndef __APPLE__
+// On MacOS, we get duplicate symbol errors during linking of mitkCoreExt.
+// It looks like the linker does not coalesce the two instantiations in
+// mitkUnstructuredGridVtkWriter.cpp and mitkCoreExtObjectFactory.cpp
+// (which both include this file)
+template class MitkExt_EXPORT UnstructuredGridVtkWriter<vtkUnstructuredGridWriter>;
+template class MitkExt_EXPORT UnstructuredGridVtkWriter<vtkXMLUnstructuredGridWriter>;
+template class MitkExt_EXPORT UnstructuredGridVtkWriter<vtkXMLPUnstructuredGridWriter>;
+#endif
 
 }
 

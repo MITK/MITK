@@ -43,7 +43,7 @@ namespace mitk
  * @ingroup Process
 */
 template<class VTKWRITER>
-class MitkExt_EXPORT UnstructuredGridVtkWriter : public mitk::FileWriterWithInformation
+class UnstructuredGridVtkWriter : public mitk::FileWriterWithInformation
 {
 public:
 

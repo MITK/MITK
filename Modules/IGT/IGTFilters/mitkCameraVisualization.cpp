@@ -103,10 +103,10 @@ void mitk::CameraVisualization::GenerateData()
 void mitk::CameraVisualization::SetRenderer(mitk::BaseRenderer*  renderer)
 {
   m_Renderer = renderer;
-  if (m_Renderer)
-  {
-    m_Renderer->GetVtkRenderer()->GetActiveCamera()->Zoom(0.4);
-  }
+//   if (m_Renderer)
+//   {
+//     m_Renderer->GetVtkRenderer()->GetActiveCamera()->Zoom(0.4);
+//   }
 }
 
 

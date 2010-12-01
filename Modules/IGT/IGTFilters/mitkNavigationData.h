@@ -38,28 +38,89 @@ namespace mitk {
     public:
       mitkClassMacro(NavigationData, itk::DataObject);
       itkNewMacro(Self);
-      typedef mitk::Point3D PositionType;         ///< Type that holds the position part of the tracking data
-      typedef mitk::Quaternion OrientationType;   ///< Type that holds the orientation part of the tracking data
-      typedef itk::Matrix<mitk::ScalarType,6,6> CovarianceMatrixType; ///< type that holds the error characterization of the position and orientation measurements
-      typedef double TimeStampType;   ///< type that holds the time at which the data was recorded
+
+      /**
+      * \brief Type that holds the position part of the tracking data
+      */
+      typedef mitk::Point3D PositionType;
+      /**
+      * \brief Type that holds the orientation part of the tracking data
+      */
+      typedef mitk::Quaternion OrientationType;
+      /**
+      * \brief type that holds the error characterization of the position and orientation measurements
+      */
+      typedef itk::Matrix<mitk::ScalarType,6,6> CovarianceMatrixType;
+      /**
+      * \brief type that holds the time at which the data was recorded
+      */
+      typedef double TimeStampType;
 
 
-      itkSetMacro(Position, PositionType);             ///< sets the position of the NavigationData object
-      itkGetConstMacro(Position, PositionType);        ///< returns position of the NavigationData object
-      itkSetMacro(Orientation, OrientationType);       ///< sets the orientation of the NavigationData object
-      itkGetConstMacro(Orientation, OrientationType);  ///< returns the orientation of the NavigationData object
-      virtual bool IsDataValid() const;                ///< returns true if the object contains valid data
-      itkSetMacro(DataValid, bool);                    ///< sets the overall error estimation of the NavigationData object
-      itkSetMacro(TimeStamp, TimeStampType);              ///< sets the timestamp of the NavigationData object
-      itkGetConstMacro(TimeStamp, TimeStampType);         ///< gets the timestamp of the NavigationData object
-      itkSetMacro(HasPosition, bool);                     ///< sets the HasPosition flag of the NavigationData object
-      itkGetConstMacro(HasPosition, bool);                ///< gets the HasPosition flag of the NavigationData object
-      itkSetMacro(HasOrientation, bool);                  ///< sets the HasOrientation flag of the NavigationData object
-      itkGetConstMacro(HasOrientation, bool);             ///< gets the HasOrientation flag of the NavigationData object
-      itkSetMacro(CovErrorMatrix, CovarianceMatrixType);  ///< sets the 6x6 Error Covariance Matrix of the NavigationData object
-      itkGetConstMacro(CovErrorMatrix, CovarianceMatrixType);  ///< gets the 6x6 Error Covariance Matrix of the NavigationData object
-      itkSetStringMacro(Name);                            ///< set the name of the NavigationData object
-      itkGetStringMacro(Name);                            ///< returns the name of the NavigationData object
+      /**
+      * \brief sets the position of the NavigationData object
+      */
+      itkSetMacro(Position, PositionType);
+      /**
+      * \brief returns position of the NavigationData object
+      */
+      itkGetConstMacro(Position, PositionType);
+      /**
+      * \brief sets the orientation of the NavigationData object
+      */
+      itkSetMacro(Orientation, OrientationType);
+      /**
+      * \brief returns the orientation of the NavigationData object
+      */
+      itkGetConstMacro(Orientation, OrientationType);
+      /**
+      * \brief returns true if the object contains valid data
+      */
+      virtual bool IsDataValid() const;
+      /**
+      * \brief sets the overall error estimation of the NavigationData object
+      */
+      itkSetMacro(DataValid, bool);
+      /**
+      * \brief sets the timestamp of the NavigationData object
+      */
+      itkSetMacro(TimeStamp, TimeStampType);
+      /**
+      * \brief gets the timestamp of the NavigationData object
+      */
+      itkGetConstMacro(TimeStamp, TimeStampType);
+      /**
+      * \brief sets the HasPosition flag of the NavigationData object
+      */
+      itkSetMacro(HasPosition, bool);
+      /**
+      * \brief gets the HasPosition flag of the NavigationData object
+      */
+      itkGetConstMacro(HasPosition, bool);
+      /**
+      * \brief sets the HasOrientation flag of the NavigationData object
+      */
+      itkSetMacro(HasOrientation, bool);
+      /**
+      * \brief gets the HasOrientation flag of the NavigationData object
+      */
+      itkGetConstMacro(HasOrientation, bool);
+      /**
+      * \brief sets the 6x6 Error Covariance Matrix of the NavigationData object
+      */
+      itkSetMacro(CovErrorMatrix, CovarianceMatrixType);
+      /**
+      * \brief gets the 6x6 Error Covariance Matrix of the NavigationData object
+      */
+      itkGetConstMacro(CovErrorMatrix, CovarianceMatrixType);
+      /**
+      * \brief set the name of the NavigationData object
+      */
+      itkSetStringMacro(Name);
+      /**
+      * \brief returns the name of the NavigationData object
+      */
+      itkGetStringMacro(Name);
 
       /** 
       * \brief Graft the data and information from one NavigationData to another. 
@@ -101,8 +162,14 @@ namespace mitk {
       NavigationData();
       virtual ~NavigationData();
 
-      PositionType m_Position;        ///< holds the position part of the tracking data
-      OrientationType m_Orientation;  ///< holds the orientation part of the tracking data
+      /**
+      * \brief holds the position part of the tracking data
+      */
+      PositionType m_Position;
+      /**
+      * \brief holds the orientation part of the tracking data
+      */
+      OrientationType m_Orientation;
 
       /**
        * \brief A 6x6 covariance matrix parameterizing the Gaussian error
@@ -112,11 +179,26 @@ namespace mitk {
        * are valid.
        */
       CovarianceMatrixType m_CovErrorMatrix;  ///< holds the error characterization of the position and orientation
-      bool m_HasPosition;     ///< defines if position part of m_CovErrorMatrix is valid
-      bool m_HasOrientation;  ///< defines if orientation part of m_CovErrorMatrix is valid
-      bool m_DataValid;       ///< defines if the object contains valid values
-      TimeStampType m_TimeStamp;  ///< contains the time at which the tracking data was recorded
-      std::string m_Name;       ///< name of the navigation data
+      /**
+      * \brief defines if position part of m_CovErrorMatrix is valid
+      */
+      bool m_HasPosition;
+      /**
+      * \brief defines if orientation part of m_CovErrorMatrix is valid
+      */
+      bool m_HasOrientation;
+      /**
+      * \brief defines if the object contains valid values
+      */
+      bool m_DataValid;
+      /**
+      * \brief contains the time at which the tracking data was recorded
+      */
+      TimeStampType m_TimeStamp;
+      /**
+      * \brief name of the navigation data
+      */
+      std::string m_Name;
     };
 } // namespace mitk
 #endif /* MITKNAVIGATIONDATA_H_HEADER_INCLUDED_ */

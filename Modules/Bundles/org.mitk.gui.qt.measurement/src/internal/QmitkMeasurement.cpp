@@ -757,7 +757,7 @@ void QmitkMeasurement::Deactivated()
 {
   this->GetActiveStdMultiWidget()->SetWidgetPlanesVisibility(true);
   //this->GetActiveStdMultiWidget()->GetRenderWindow1()->FullScreenMode(false);
-  this->SetMeasurementInfoToRenderWindow("", 0);
+  this->SetMeasurementInfoToRenderWindow("", m_LastRenderWindow);
 
   mitk::DataStorage::SetOfObjects::ConstPointer _NodeSet = this->GetDefaultDataStorage()->GetAll();
   mitk::DataNode* node = 0;

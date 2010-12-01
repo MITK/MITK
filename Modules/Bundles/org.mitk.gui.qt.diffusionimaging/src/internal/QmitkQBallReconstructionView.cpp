@@ -54,6 +54,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "berryIWorkbenchWindow.h"
 #include "berryISelectionService.h"
 
+#include <boost/version.hpp>
+
 const std::string QmitkQBallReconstructionView::VIEW_ID = 
   "org.mitk.views.qballreconstruction";
 
@@ -378,12 +380,23 @@ void QmitkQBallReconstructionView::Reconstruct(int method, int normalization)
     {
       NumericalQBallReconstruction(set, normalization);
     }
-
-    if(method == 1)
+    else
     {
-      AnalyticalQBallReconstruction(set, normalization);
+#if BOOST_VERSION / 100000 > 0
+#if BOOST_VERSION / 100 % 1000 > 34
+      if(method == 1)
+      {
+        AnalyticalQBallReconstruction(set, normalization);
+      }
+#else
+      std::cout << "ERROR: Boost 1.35 minimum required" << std::endl;
+      QMessageBox::warning(NULL,"ERROR","Boost 1.35 minimum required");
+#endif
+#else
+      std::cout << "ERROR: Boost 1.35 minimum required" << std::endl;
+      QMessageBox::warning(NULL,"ERROR","Boost 1.35 minimum required");
+#endif
     }
-
   }
 }
 

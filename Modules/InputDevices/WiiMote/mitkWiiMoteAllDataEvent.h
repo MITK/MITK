@@ -11,7 +11,7 @@ namespace mitk
 {
   /**
   * This event type is used to store all data available from the <br>
-  * Wiimote driver. This includes IR, button, and acceleration input.
+  * Wiimote driver. This includes IR, button, orientation, and acceleration input.
   */
   class mitkWiiMote_EXPORT WiiMoteAllDataEvent: public Event, itk::EventObject
   {
@@ -32,7 +32,10 @@ namespace mitk
       , float orientationY
       , float orientationZ
       , float roll
-      , float pitch);
+      , float pitch
+      , float xAcceleration
+      , float yAcceleration
+      , float zAcceleration);
     ~WiiMoteAllDataEvent();
 
     void SetIRDotRawX(float xCoordinate);
@@ -68,6 +71,15 @@ namespace mitk
     void SetPitch(float pitch);
     float GetPitch() const;
 
+    void SetXAcceleration(float xAcceleration);
+    float GetXAcceleration() const;
+
+    void SetYAcceleration(float yAcceleration);
+    float GetYAcceleration() const;
+
+    void SetZAcceleration(float zAcceleration);
+    float GetZAcceleration() const;
+
     //itk::EventObject implementation
     typedef WiiMoteAllDataEvent Self;
     typedef itk::EventObject Superclass;
@@ -90,12 +102,22 @@ namespace mitk
     int m_Button; // the name of the button
 
     // acceleration data
-    // the unit is degree
+
+    // angle speed from motion plus
+    // the unit is degree per second
     float m_PitchSpeed;
     float m_RollSpeed;
-    float m_YawSpeed; // only available using MotionPlus
+    float m_YawSpeed;
+
+    // linear acceleration from wiimote
+    // the unit is g
+    // range: -3..0..+3
+    float m_XAcceleration;
+    float m_YAcceleration;
+    float m_ZAcceleration;
 
     // orientation data
+    // the unit is g
     // range: -1..0..1
     float m_OrientationX;
     float m_OrientationY;
@@ -104,7 +126,7 @@ namespace mitk
     // range: -180..0..180 degree
     float m_Pitch;
 
-    // range: -90..0..90
+    // range: -90..0..90 degree
     float m_Roll;
 
     // time between the last orientation estimate update

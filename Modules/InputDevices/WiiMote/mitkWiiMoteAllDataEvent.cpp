@@ -11,7 +11,10 @@ mitk::WiiMoteAllDataEvent::WiiMoteAllDataEvent
  , float orientationY
  , float orientationZ
  , float roll
- , float pitch)
+ , float pitch
+ , float xAcceleration
+ , float yAcceleration
+ , float zAcceleration)
 : Event(NULL, eventType, mitk::BS_NoButton, mitk::BS_NoButton, Key_none)
 , m_IRDotRawX(0) 
 , m_IRDotRawY(0)
@@ -24,6 +27,9 @@ mitk::WiiMoteAllDataEvent::WiiMoteAllDataEvent
 , m_OrientationZ(orientationZ)
 , m_Roll(roll)
 , m_Pitch(pitch)
+, m_XAcceleration(xAcceleration)
+, m_YAcceleration(yAcceleration)
+, m_ZAcceleration(zAcceleration)
 {
 }
 
@@ -141,6 +147,36 @@ float mitk::WiiMoteAllDataEvent::GetPitch() const
   return this->m_Pitch;
 }
 
+void mitk::WiiMoteAllDataEvent::SetXAcceleration(float xAcceleration)
+{
+  this->m_XAcceleration = xAcceleration;
+}
+
+float mitk::WiiMoteAllDataEvent::GetXAcceleration() const
+{
+  return this->m_XAcceleration;
+}
+
+void mitk::WiiMoteAllDataEvent::SetYAcceleration(float yAcceleration)
+{
+  this->m_YAcceleration = yAcceleration;
+}
+
+float mitk::WiiMoteAllDataEvent::GetYAcceleration() const
+{
+  return this->m_YAcceleration;
+}
+
+void mitk::WiiMoteAllDataEvent::SetZAcceleration(float zAcceleration)
+{
+  this->m_ZAcceleration;
+}
+
+float mitk::WiiMoteAllDataEvent::GetZAcceleration() const
+{
+  return this->m_ZAcceleration;
+}
+
 // ------------------------- itk::EventObject Implementation -----------------------
 const char* mitk::WiiMoteAllDataEvent::GetEventName() const
 { 
@@ -163,7 +199,10 @@ itk::EventObject* mitk::WiiMoteAllDataEvent::MakeObject() const
     ,this->GetOrientationY()
     ,this->GetOrientationZ()
     ,this->GetRoll()
-    ,this->GetPitch()); 
+    ,this->GetPitch()
+    ,this->GetXAcceleration()
+    ,this->GetYAcceleration()
+    ,this->GetZAcceleration()); 
 } 
 
 

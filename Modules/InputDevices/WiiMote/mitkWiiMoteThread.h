@@ -186,6 +186,9 @@ namespace mitk
     //store all connected Wiimotes
     wiimote m_WiiMotes[4];
     int m_NumberDetectedWiiMotes;
+
+    // used for measuring movement
+    int m_TimeStep;
   };
 }
 

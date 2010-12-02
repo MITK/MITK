@@ -6,6 +6,8 @@
 #include <mitkWiiMoteCalibrationEvent.h>
 #include <mitkWiiMoteAllDataEvent.h>
 
+#include <time.h>
+
 // timelimit between two state changes to send an event
 // the chosen value is empirical
 const double TIMELIMIT = 0.5; 
@@ -22,7 +24,8 @@ mitk::WiiMoteThread::WiiMoteThread()
 , m_SurfaceInteraction(false)
 , m_ButtonBPressed(false)
 {
-  
+  //// used for measuring movement
+  //m_TimeStep = 0;
 }
 
 mitk::WiiMoteThread::~WiiMoteThread()
@@ -367,6 +370,9 @@ void mitk::WiiMoteThread::SingleWiiMoteUpdate()
         {
           this->WiiMoteButtonReleased(mitk::Key_B);
           m_ButtonBPressed = false;
+
+          //// reset to measure new movement
+          //m_TimeSteps = 0;
         }
 
         // case 4: button is not pressed and
@@ -490,19 +496,51 @@ void mitk::WiiMoteThread::SurfaceInteraction()
     ,m_WiiMotes[0].Acceleration.Orientation.Y
     ,m_WiiMotes[0].Acceleration.Orientation.Z
     ,m_WiiMotes[0].Acceleration.Orientation.Roll
-    ,m_WiiMotes[0].Acceleration.Orientation.Pitch);
-
+    ,m_WiiMotes[0].Acceleration.Orientation.Pitch
+    ,m_WiiMotes[0].Acceleration.X
+    ,m_WiiMotes[0].Acceleration.Y
+    ,m_WiiMotes[0].Acceleration.Z);
 
   mitk::CallbackFromGUIThread::GetInstance()
     ->CallThisFromGUIThread(m_Command, e.MakeObject());
 
-  //MITK_INFO << "X: " << m_WiiMotes[0].Acceleration.Orientation.X;
-  //MITK_INFO << "Y: " << m_WiiMotes[0].Acceleration.Orientation.Y;
-  //MITK_INFO << "Z: " << m_WiiMotes[0].Acceleration.Orientation.Z;
-
+  //double tempTime(itksys::SystemTools::GetTime());
+  //double diff = tempTime - m_LastRecordTime;
+  //
   //MITK_INFO << "Speed Pitch: " << m_WiiMotes[0].MotionPlus.Speed.Pitch; 
   //MITK_INFO << "Speed Roll: " << m_WiiMotes[0].MotionPlus.Speed.Roll;
   //MITK_INFO << "Speed Yaw: " << m_WiiMotes[0].MotionPlus.Speed.Yaw;
+
+  //MITK_INFO << "Speed X: " << m_WiiMotes[0].Acceleration.X;
+  //MITK_INFO << "Speed Y: " << m_WiiMotes[0].Acceleration.Y;
+  //MITK_INFO << "Speed Z: " << m_WiiMotes[0].Acceleration.Z;
+
+  //MITK_INFO << "Time difference: " << diff;
+
+  //std::ofstream file;
+  //file.open("C:/WiiMotionData/motion.txt",ios::app);
+
+  //file << m_TimeStep << " " 
+  //  << m_WiiMotes[0].Acceleration.X << " " 
+  //  << m_WiiMotes[0].Acceleration.Y << " "
+  //  << m_WiiMotes[0].Acceleration.Z << " "
+  //  << m_WiiMotes[0].MotionPlus.Speed.Pitch << " "
+  //  << m_WiiMotes[0].MotionPlus.Speed.Yaw << " "
+  //  << m_WiiMotes[0].MotionPlus.Speed.Roll << " "
+  //  << m_WiiMotes[0].Acceleration.Orientation.X << " " 
+  //  << m_WiiMotes[0].Acceleration.Orientation.Y << " " 
+  //  << m_WiiMotes[0].Acceleration.Orientation.Z << " " 
+  //  << m_WiiMotes[0].Acceleration.Orientation.Pitch << " " 
+  //  << m_WiiMotes[0].Acceleration.Orientation.Roll << " " 
+  //  << std::endl;
+  //file.close();
+
+  ////// remove, if not needed
+  ////// otherwise this will eventually
+  ////// disable correct functionality of Headtracking
+  ////// since it's using its m_LastRecordTime
+  //////m_LastRecordTime = tempTime;
+  //m_TimeStep++;
 
 }
 

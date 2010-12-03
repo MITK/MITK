@@ -59,11 +59,16 @@ void QmitkHotkeyLineEdit::keyPressEvent( QKeyEvent * event )
 {
   if(event->key() == Qt::Key_unknown)
     return;
+  else if(event->key() == Qt::Key_Escape)
+    m_KeySequence = QKeySequence();
 
-  m_KeySequence = QKeySequence(event->modifiers(), event->key());
-  // if no modifier was pressed the sequence is now empty
-  if(event->modifiers() == Qt::NoModifier)
-    m_KeySequence = QKeySequence(event->key());
+  else
+  {
+    m_KeySequence = QKeySequence(event->modifiers(), event->key());
+    // if no modifier was pressed the sequence is now empty
+    if(event->modifiers() == Qt::NoModifier)
+      m_KeySequence = QKeySequence(event->key());
+  }
 
   this->SetKeySequence(m_KeySequence);
 }

@@ -2,13 +2,25 @@
 #define MITKOPENCVIMAGESOURCE_H
 
 #include <cv.h>
+#include <mitkCommon.h>
 
 namespace mitk
 {
-  struct OpenCVImageSource
+  ///
+  /// interface for a class providing opencv images
+  ///
+  class OpenCVImageSource: virtual public itk::Object
   {
-    virtual const IplImage * GetImage() = 0;
-    virtual void FetchFrame() = 0;
+  public:
+    ///
+    /// provide smart pointer defs
+    ///
+    mitkClassMacro( OpenCVImageSource, itk::LightObject );
+
+    ///
+    /// \return a image as opencv 2 Mat
+    ///
+    virtual cv::Mat GetImage() = 0;
   };
 }
 

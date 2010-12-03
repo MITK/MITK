@@ -178,7 +178,7 @@ public:
   {
     unsigned int i=0;
     for(; i<m_Objects.size(); ++i)
-      if(m_Objects.at(i) == caller)
+      if( static_cast<itk::Object*>(m_Objects.at(i)) == caller )
         break;
 
     const itk::DeleteEvent* delEvent

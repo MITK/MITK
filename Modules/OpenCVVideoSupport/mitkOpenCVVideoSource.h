@@ -42,7 +42,7 @@ namespace mitk
  * Initialize via SetVideoFileInput() or SetVideoCameraInput(), start processing with StartCapturing();
  */
   class MITK_OPENCVVIDEOSUPPORT_EXPORT OpenCVVideoSource :
-      public VideoSource, public OpenCVImageSource
+      virtual public VideoSource, virtual public OpenCVImageSource
   {
   public:
     typedef itk::RGBPixel< unsigned char >    CharPixelType;
@@ -52,7 +52,7 @@ namespace mitk
     typedef itk::ImageRegionIterator< RGBPixelImageType > RGBConstIteratorType;
     typedef itk::ImageRegionIterator< HSVPixelImageType > HSVConstIteratorType;
 
-    mitkClassMacro( OpenCVVideoSource, itk::Object );
+    mitkClassMacro( OpenCVVideoSource, VideoSource );
     itkNewMacro( Self );
 
     ////##Documentation
@@ -87,9 +87,9 @@ namespace mitk
 
     virtual void GetCurrentFrameAsOpenCVImage(IplImage * image);
     ///
-    /// Return the current frame
+    /// \return a copy of the image as opencv 2 Mat
     ///
-    virtual const IplImage * GetImage();
+    virtual cv::Mat GetImage();
     virtual const IplImage * GetCurrentFrame();
     ////##Documentation
     ////## @brief returns the current video data as an ITK image.
@@ -123,9 +123,6 @@ namespace mitk
     virtual bool OnlineImageUndistortionEnabled() const;
 
     virtual void PauseCapturing();
-
-    itkGetConstMacro( CapturePaused, bool );
-
     ///
     /// Returns the video file name (maybe empty if a grabbing device is used)
     ///
@@ -179,7 +176,6 @@ namespace mitk
     unsigned char* m_CurrentVideoTexture;
 
     IplImage     * m_PauseImage;
-    bool           m_CapturePaused;
 
     ///
     /// saves the video file name (is empty if a grabbing device is used or if this is not initialized)
@@ -197,7 +193,7 @@ namespace mitk
 
     // On-the-fly undistortion of the captured video image
     bool m_UndistortImage;
-    mitk::UndistortCameraImage::Pointer m_UndistortCameraImage;      
+    mitk::UndistortCameraImage::Pointer m_UndistortCameraImage;
     /**
     * Angle for rotating the video image
     **/

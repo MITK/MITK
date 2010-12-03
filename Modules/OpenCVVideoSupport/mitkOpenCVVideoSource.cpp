@@ -24,7 +24,6 @@ mitk::OpenCVVideoSource::OpenCVVideoSource()
   m_CurrentImage(0),
   m_CurrentVideoTexture(0),
   m_PauseImage(0),
-  m_CapturePaused(false),
   m_GrabbingDeviceNumber(-1),
   m_RepeatVideo(false),
   m_UseCVCAMLib(false),
@@ -98,13 +97,14 @@ unsigned char* mitk::OpenCVVideoSource::GetVideoTexture()
   this->Modified();
 }
 
-
-//image = cvCreateImage( cvSize( m_CurrentImage->width, m_CurrentImage->height )
-                      //, m_CurrentImage->depth, m_CurrentImage->nChannels );
-
-const IplImage * mitk::OpenCVVideoSource::GetImage()
+cv::Mat mitk::OpenCVVideoSource::GetImage()
 {
-  return m_CurrentImage;
+  if(m_CurrentImage)
+  {
+    cv::Mat copy( m_CurrentImage, true );
+    return copy;
+  }
+  return cv::Mat();
 }
 
 const IplImage * mitk::OpenCVVideoSource::GetCurrentFrame()

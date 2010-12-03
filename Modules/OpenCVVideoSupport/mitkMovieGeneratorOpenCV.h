@@ -46,6 +46,8 @@ public:
     m_FourCCCodec = codec;
   }
 
+  virtual void SetFrameRate(int rate);
+
   ///
   /// if true the movie will be cutted by a 10 pixel margin
   /// in order to remove the standard mitk coloured borders
@@ -68,12 +70,12 @@ protected:
   //! name of output file
   std::string m_sFile;
 
-  //! frame rate 
+  //! frame rate
   int m_dwRate;
 
-  
+
 private:
-  
+
   CvVideoWriter*    m_aviWriter;
   IplImage *        m_currentFrame;
 

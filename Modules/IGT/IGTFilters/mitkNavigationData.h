@@ -78,7 +78,7 @@ namespace mitk {
       */
       virtual bool IsDataValid() const;
       /**
-      * \brief sets the overall error estimation of the NavigationData object
+      * \brief sets the dataValid flag of the NavigationData object indicating if the object contains valid data
       */
       itkSetMacro(DataValid, bool);
       /**

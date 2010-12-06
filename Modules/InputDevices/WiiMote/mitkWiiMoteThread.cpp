@@ -39,7 +39,9 @@ mitk::WiiMoteThread::~WiiMoteThread()
   }
 }
 
-void mitk::WiiMoteThread::OnStateChange(wiimote &remote, state_change_flags changed, const wiimote_state &newState)
+void mitk::WiiMoteThread::OnStateChange(  wiimote &remote
+                                        , state_change_flags changed
+                                        , const wiimote_state &newState)
 {
   // a MotionPlus was detected
   if(changed & MOTIONPLUS_DETECTED)
@@ -77,14 +79,18 @@ void mitk::WiiMoteThread::Run()
 ITK_THREAD_RETURN_TYPE mitk::WiiMoteThread::StartWiiMoteThread(void* pInfoStruct)
 {
   // extract this pointer from Thread Info structure
-  struct itk::MultiThreader::ThreadInfoStruct * pInfo = (struct itk::MultiThreader::ThreadInfoStruct*)pInfoStruct;
+  struct itk::MultiThreader::ThreadInfoStruct * pInfo 
+    = (struct itk::MultiThreader::ThreadInfoStruct*)pInfoStruct;
+
   if (pInfo == NULL)
     return ITK_THREAD_RETURN_VALUE;
 
   if (pInfo->UserData == NULL)
     return ITK_THREAD_RETURN_VALUE;
 
-  mitk::WiiMoteThread* wiiMoteThread = static_cast<mitk::WiiMoteThread*>(pInfo->UserData);
+  mitk::WiiMoteThread* wiiMoteThread 
+    = static_cast<mitk::WiiMoteThread*>(pInfo->UserData);
+
   if (wiiMoteThread != NULL)
     wiiMoteThread->StartWiiMote();     
 
@@ -199,7 +205,9 @@ bool mitk::WiiMoteThread::DetectWiiMotes()
         break;
       }
 
-      // ------------------------------- unclean solution, missing generic approach -------------------------------
+      MITK_INFO << "Detect WiiMotes";
+
+      // ---------------- unclean solution, missing generic approach ---------------------
 
       // uses state-change callback to get notified of extension-related 
       // events OnStateChange must be static, otherwise the this-operator 
@@ -214,7 +222,17 @@ bool mitk::WiiMoteThread::DetectWiiMotes()
       
       m_WiiMotes[0].SetReportType(wiimote::IN_BUTTONS_ACCEL_IR);
 
-      // ----------------------------------------------- END ------------------------------------------------------
+      // fixes the problem while in release
+      // the Motion Plus cannot be connected
+      // with the state change
+      if(!m_WiiMotes[0].MotionPlusEnabled() 
+        && m_WiiMotes[0].MotionPlusConnected())
+      {
+        m_WiiMotes[0].EnableMotionPlus();
+        m_WiiMotes[0].SetReportType(wiimote::IN_BUTTONS_ACCEL_IR_EXT);
+      }
+
+      // ----------------------------------- END ---------------------------------------
 
       detected++;
       connectionTrys = 0;
@@ -242,7 +260,9 @@ void mitk::WiiMoteThread::WiiMoteIRInput()
   if(m_WiiMotes[0].IR.Dot[0].bVisible)
   {
     m_Command = ReceptorCommand::New(); 
-    m_Command->SetCallbackFunction(mitk::WiiMoteAddOn::GetInstance(), &mitk::WiiMoteAddOn::WiiMoteInput);
+    m_Command->SetCallbackFunction
+      ( mitk::WiiMoteAddOn::GetInstance()
+      , &mitk::WiiMoteAddOn::WiiMoteInput );
 
     double tempTime(itksys::SystemTools::GetTime());
     float inputCoordinates[2] = {m_WiiMotes[0].IR.Dot[0].RawX, m_WiiMotes[0].IR.Dot[0].RawY};
@@ -267,7 +287,8 @@ void mitk::WiiMoteThread::WiiMoteIRInput()
       {
         mitk::Vector2D resultingVector(m_LastReadData-tempPoint);
         mitk::WiiMoteIREvent e(resultingVector, tempTime);
-        mitk::CallbackFromGUIThread::GetInstance()->CallThisFromGUIThread(m_Command, e.MakeObject());
+        mitk::CallbackFromGUIThread::GetInstance()
+          ->CallThisFromGUIThread(m_Command, e.MakeObject());
       }
     }
     m_LastRecordTime = tempTime;
@@ -278,19 +299,33 @@ void mitk::WiiMoteThread::WiiMoteIRInput()
 void mitk::WiiMoteThread::WiiMoteButtonPressed(int buttonType)
 {
   m_Command = ReceptorCommand::New(); 
-  m_Command->SetCallbackFunction(mitk::WiiMoteAddOn::GetInstance(), &mitk::WiiMoteAddOn::WiiMoteButtonPressed);
+  m_Command->SetCallbackFunction
+    ( mitk::WiiMoteAddOn::GetInstance()
+    , &mitk::WiiMoteAddOn::WiiMoteButtonPressed );
 
-  mitk::WiiMoteButtonEvent e(mitk::Type_WiiMoteButton, mitk::BS_NoButton, mitk::BS_NoButton, buttonType);
-  mitk::CallbackFromGUIThread::GetInstance()->CallThisFromGUIThread(m_Command, e.MakeObject());
+  mitk::WiiMoteButtonEvent e
+    ( mitk::Type_WiiMoteButton
+    , mitk::BS_NoButton
+    , mitk::BS_NoButton
+    , buttonType );
+  mitk::CallbackFromGUIThread::GetInstance()
+    ->CallThisFromGUIThread(m_Command, e.MakeObject());
 }
 
 void mitk::WiiMoteThread::WiiMoteButtonReleased(int buttonType)
 {
   m_Command = ReceptorCommand::New(); 
-  m_Command->SetCallbackFunction(mitk::WiiMoteAddOn::GetInstance(), &mitk::WiiMoteAddOn::WiiMoteButtonReleased);
+  m_Command->SetCallbackFunction
+    ( mitk::WiiMoteAddOn::GetInstance()
+    , &mitk::WiiMoteAddOn::WiiMoteButtonReleased );
 
-  mitk::WiiMoteButtonEvent e(mitk::Type_WiiMoteButton, mitk::BS_NoButton, mitk::BS_NoButton, buttonType);
-  mitk::CallbackFromGUIThread::GetInstance()->CallThisFromGUIThread(m_Command, e.MakeObject());
+  mitk::WiiMoteButtonEvent e
+    ( mitk::Type_WiiMoteButton
+    , mitk::BS_NoButton
+    , mitk::BS_NoButton
+    , buttonType );
+  mitk::CallbackFromGUIThread::GetInstance()
+    ->CallThisFromGUIThread(m_Command, e.MakeObject());
 }
 
 void mitk::WiiMoteThread::WiiMoteCalibrationInput()
@@ -298,10 +333,15 @@ void mitk::WiiMoteThread::WiiMoteCalibrationInput()
   if(m_WiiMotes[0].IR.Dot[0].bVisible)
   {
     m_Command = ReceptorCommand::New();
-    m_Command->SetCallbackFunction(mitk::WiiMoteAddOn::GetInstance(), &mitk::WiiMoteAddOn::WiiMoteCalibrationInput);
+    m_Command->SetCallbackFunction
+      ( mitk::WiiMoteAddOn::GetInstance()
+      , &mitk::WiiMoteAddOn::WiiMoteCalibrationInput );
 
-    mitk::WiiMoteCalibrationEvent e(m_WiiMotes[0].IR.Dot[0].RawX,m_WiiMotes[0].IR.Dot[0].RawY);
-    mitk::CallbackFromGUIThread::GetInstance()->CallThisFromGUIThread(m_Command, e.MakeObject());
+    mitk::WiiMoteCalibrationEvent e
+      ( m_WiiMotes[0].IR.Dot[0].RawX
+      , m_WiiMotes[0].IR.Dot[0].RawY );
+    mitk::CallbackFromGUIThread::GetInstance()
+      ->CallThisFromGUIThread(m_Command, e.MakeObject());
   }
 }
 
@@ -310,7 +350,7 @@ void mitk::WiiMoteThread::SingleWiiMoteUpdate()
   // update and settings process
   // the minus button is a manual abort criteria
   // it can be chosen differently, if needed
-  while(!m_WiiMotes[0].Button.Minus() && !m_StopWiiMote )
+  while(!m_WiiMotes[0].Button.Minus() && !m_StopWiiMote)
   {
     m_WiiMoteThreadFinished->Lock();
     // refreshes the state of the wiimote
@@ -459,7 +499,8 @@ void mitk::WiiMoteThread::MultiWiiMoteUpdate()
 void mitk::WiiMoteThread::MultiWiiMoteIRInput()
 {
   // testing multiple wiimotes 
-  if(m_WiiMotes[0].IR.Dot[0].bVisible && m_WiiMotes[1].IR.Dot[0].bVisible)
+  if(m_WiiMotes[0].IR.Dot[0].bVisible 
+    && m_WiiMotes[1].IR.Dot[0].bVisible)
   {
     float inputCoordinates[2] = {m_WiiMotes[0].IR.Dot[0].RawX, m_WiiMotes[0].IR.Dot[0].RawY};
     mitk::Point2D tempPoint(inputCoordinates);
@@ -485,21 +526,22 @@ void mitk::WiiMoteThread::SurfaceInteraction()
 {
   m_Command = ReceptorCommand::New();
   m_Command->SetCallbackFunction
-    (mitk::WiiMoteAddOn::GetInstance(), &mitk::WiiMoteAddOn::WiiMoteSurfaceInteractionInput);
+    ( mitk::WiiMoteAddOn::GetInstance()
+    , &mitk::WiiMoteAddOn::WiiMoteSurfaceInteractionInput );
 
   mitk::WiiMoteAllDataEvent e
-    (mitk::Type_WiiMoteInput
-    ,m_WiiMotes[0].MotionPlus.Speed.Pitch
-    ,m_WiiMotes[0].MotionPlus.Speed.Roll
-    ,m_WiiMotes[0].MotionPlus.Speed.Yaw
-    ,m_WiiMotes[0].Acceleration.Orientation.X
-    ,m_WiiMotes[0].Acceleration.Orientation.Y
-    ,m_WiiMotes[0].Acceleration.Orientation.Z
-    ,m_WiiMotes[0].Acceleration.Orientation.Roll
-    ,m_WiiMotes[0].Acceleration.Orientation.Pitch
-    ,m_WiiMotes[0].Acceleration.X
-    ,m_WiiMotes[0].Acceleration.Y
-    ,m_WiiMotes[0].Acceleration.Z);
+    ( mitk::Type_WiiMoteInput
+    , m_WiiMotes[0].MotionPlus.Speed.Pitch
+    , m_WiiMotes[0].MotionPlus.Speed.Roll
+    , m_WiiMotes[0].MotionPlus.Speed.Yaw
+    , m_WiiMotes[0].Acceleration.Orientation.X
+    , m_WiiMotes[0].Acceleration.Orientation.Y
+    , m_WiiMotes[0].Acceleration.Orientation.Z
+    , m_WiiMotes[0].Acceleration.Orientation.Roll
+    , m_WiiMotes[0].Acceleration.Orientation.Pitch
+    , m_WiiMotes[0].Acceleration.X
+    , m_WiiMotes[0].Acceleration.Y
+    , m_WiiMotes[0].Acceleration.Z );
 
   mitk::CallbackFromGUIThread::GetInstance()
     ->CallThisFromGUIThread(m_Command, e.MakeObject());

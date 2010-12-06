@@ -147,7 +147,10 @@ void mitk::WiiMoteAddOn::WiiMoteCalibrationInput(const itk::EventObject &e)
 
 void mitk::WiiMoteAddOn::SetWiiMoteSurfaceIModus(bool activated)
 {
-  m_WiiMoteThread->SetWiiMoteSurfaceIModus(activated);
+  if(m_WiiMoteThread != NULL)
+  {
+    m_WiiMoteThread->SetWiiMoteSurfaceIModus(activated);
+  }
 }
 
 void mitk::WiiMoteAddOn::WiiMoteSurfaceInteractionInput(const itk::EventObject& e)

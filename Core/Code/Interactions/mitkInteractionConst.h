@@ -368,6 +368,7 @@ enum EActions
   AcONPACENAVIGATORKEYDOWN = 4002, // On input of 3D Mouse
   AcONWIIMOTEINPUT = 4003, // used for wiimote to signal IR input
   AcRESETVIEW = 4004, // used for wiimote to reset view
+  AcONWIIMOTEBUTTONRELEASED = 4005, // stops the surface interaction
   AcCHECKPOSITION = 5000,
   AcINITIALIZECONTOUR = 5001,
   AcCALCULATENEWSEGMENTATION_SP= 5002,

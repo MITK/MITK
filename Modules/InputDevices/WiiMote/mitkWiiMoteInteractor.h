@@ -39,8 +39,20 @@ virtual bool OnWiiMoteReleaseButton(Action* action, const mitk::StateEvent* even
 
 private:
 
-  int m_Test;
+  float m_OrientationX;
+  float m_OrientationY;
+  float m_OrientationZ;
 
+  float m_xVelocity;
+  float m_yVelocity;
+  float m_zVelocity;
+
+  // refering to an angle around an axis
+  float m_xAngle;
+  float m_yAngle;
+  float m_zAngle;
+
+  bool m_InRotation;
 };
 
 }

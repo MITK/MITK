@@ -24,8 +24,8 @@ mitk::WiiMoteThread::WiiMoteThread()
 , m_SurfaceInteraction(false)
 , m_ButtonBPressed(false)
 {
-  //// used for measuring movement
-  //m_TimeStep = 0;
+  // used for measuring movement
+  m_TimeStep = 0;
 }
 
 mitk::WiiMoteThread::~WiiMoteThread()
@@ -371,8 +371,8 @@ void mitk::WiiMoteThread::SingleWiiMoteUpdate()
           this->WiiMoteButtonReleased(mitk::Key_B);
           m_ButtonBPressed = false;
 
-          //// reset to measure new movement
-          //m_TimeSteps = 0;
+          // reset to measure new movement
+          m_TimeStep = 0;
         }
 
         // case 4: button is not pressed and

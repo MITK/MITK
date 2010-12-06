@@ -2931,7 +2931,11 @@
       <transition NAME="initialState" NEXT_STATE_ID="2" EVENT_ID="4004"/> <!--EIDWIIMOTEBUTTON-->
 	</state>
 	<state NAME="Surface Interaction" ID="2">
-	  <transition NAME="Stop Surface Interaction" NEXT_STATE_ID="1" EVENT_ID="5551008"/> <!--EV_DONE-->
+	  <transition NAME="stop Surface Interaction" NEXT_STATE_ID="1" EVENT_ID="5551008"> <!--EV_DONE-->
+	   <action ID="4005">
+		<!-- AcONWIIMOTEBUTTONRELEASED -->
+		</action>
+	  </transition>
 	  <transition NAME="Input for Surface Interaction" NEXT_STATE_ID="2" EVENT_ID="4003"> <!--EIDWIIMOTEINPUT-->
 	    <action ID="4003">
 		<!--AcONWIIMOTEINPUT-->

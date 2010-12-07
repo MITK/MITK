@@ -243,7 +243,16 @@ namespace mitk
       typename FileReaderType::Pointer reader = FileReaderType::New();
       reader->SetImageIO(io);
       reader->SetFileName(filename);
-      reader->Update();
+
+      try
+      {
+        reader->Update();
+      }
+      catch(itk::ExceptionObject e)
+      {
+        MITK_WARNING << e.GetDescription();
+      }
+
       typename ImageType::Pointer img = reader->GetOutput();
       itk::MetaDataDictionary imgMetaDictionary = img->GetMetaDataDictionary();    
       std::vector<std::string> imgMetaKeys = imgMetaDictionary.GetKeys();

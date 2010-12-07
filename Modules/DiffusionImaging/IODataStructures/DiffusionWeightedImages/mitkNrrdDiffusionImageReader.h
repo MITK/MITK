@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "itkVectorContainer.h"
 #include "mitkFileReader.h"
 #include "vnl/vnl_vector_fixed.h"
+#include "vnl/vnl_matrix_fixed.h"
 #include "mitkDiffusionImageSource.h"
 #include "itkVectorImage.h"
 
@@ -40,6 +41,7 @@ namespace mitk
     typedef itk::VectorImage<TPixelType,3>     ImageType;
     typedef DiffusionImageSource<TPixelType> DiffVolSourceType;
     typedef vnl_vector_fixed< double, 3 >      GradientDirectionType;
+    typedef vnl_matrix_fixed< double, 3, 3 >      MeasurementFrameType;
     typedef itk::VectorContainer< unsigned int, 
       GradientDirectionType >                  GradientDirectionContainerType;
 

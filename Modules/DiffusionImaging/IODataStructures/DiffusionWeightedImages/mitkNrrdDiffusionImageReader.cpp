@@ -102,11 +102,15 @@ namespace mitk
         std::string metaString;
 
         GradientDirectionType vect3d;
+        MeasurementFrameType measFrame;
+
         m_DiffusionVectors = GradientDirectionContainerType::New();
 
         int numberOfImages = 0;
         int numberOfGradientImages = 0;
         bool readb0 = false;
+        bool readFrame = false;
+        double xx, xy, xz, yx, yy, yz, zx, zy, zz;
 
         for (; itKey != imgMetaKeys.end(); itKey ++)
         {
@@ -115,7 +119,7 @@ namespace mitk
           itk::ExposeMetaData<std::string> (imgMetaDictionary, *itKey, metaString);
           if (itKey->find("DWMRI_gradient") != std::string::npos)
           { 
-            std::cout << *itKey << " ---> " << metaString << std::endl;
+            MITK_INFO << *itKey << " ---> " << metaString;
             sscanf(metaString.c_str(), "%lf %lf %lf\n", &x, &y, &z);
             MITK_INFO << "read values: " << x << "; " << y << "; " << z;
             vect3d[0] = x; vect3d[1] = y; vect3d[2] = z;
@@ -132,21 +136,49 @@ namespace mitk
           }
           else if (itKey->find("DWMRI_b-value") != std::string::npos)
           {
-            std::cout << *itKey << " ---> " << metaString << std::endl;      
+            MITK_INFO << *itKey << " ---> " << metaString;
             readb0 = true;
             m_B_Value = atof(metaString.c_str());
           }
+          else if (itKey->find("measurement frame") != std::string::npos)
+          {
+            MITK_INFO << *itKey << " ---> " << metaString;
+            readFrame = true;
+            sscanf(metaString.c_str(), " ( %lf , %lf , %lf ) ( %lf , %lf , %lf ) ( %lf , %lf , %lf ) \n", &xx, &xy, &xz, &yx, &yy, &yz, &zx, &zy, &zz);
+            measFrame(0,0) = xx;
+            measFrame(0,1) = xy;
+            measFrame(0,2) = xz;
+            measFrame(1,0) = yx;
+            measFrame(1,1) = yy;
+            measFrame(1,2) = yz;
+            measFrame(2,0) = zx;
+            measFrame(2,1) = zy;
+            measFrame(2,2) = zz;
+          }
         }
 
-        std::cout << "Number of gradient images: "
+        if(readFrame)
+        {
+          MITK_INFO << "Applying Measurement Frame: (" << xx << "," << xy << "," << xz
+              << ") (" << yx << "," << yy << "," << yz << ") (" << zx << "," << zy << "," << zz  << ")";
+
+          for(int i=0; i<numberOfImages; i++)
+          {
+            vnl_vector<double> vec(3);
+            vec.copy_in(m_DiffusionVectors->ElementAt(i).data_block());
+            vec = vec.pre_multiply(measFrame);
+            m_DiffusionVectors->ElementAt(i).copy_in(vec.data_block());
+          }
+        }
+
+        MITK_INFO << "Number of gradient images: "
           << numberOfGradientImages
           << " and Number of reference images: "
-          << numberOfImages - numberOfGradientImages
-          << std::endl;
+          << numberOfImages - numberOfGradientImages;
 
         if(!readb0)
         {
-          std::cerr << "BValue not specified in header file" << std::endl;
+          MITK_INFO << "BValue not specified in header file";
         }
 
         // This call updates the output information of the associated VesselTreeData

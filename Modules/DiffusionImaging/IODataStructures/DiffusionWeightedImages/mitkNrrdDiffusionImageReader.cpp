@@ -250,7 +250,7 @@ namespace mitk
       }
       catch(itk::ExceptionObject e)
       {
-        MITK_WARNING << e.GetDescription();
+        MITK_INFO << e.GetDescription();
       }
 
       typename ImageType::Pointer img = reader->GetOutput();

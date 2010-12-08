@@ -126,7 +126,6 @@ public:
 
   QWidget* GetControls();
 
-  const mitk::DataNode::Pointer selectedImage();
 
   public slots:
 
@@ -134,7 +133,6 @@ public:
     virtual void SurroundingCheck(bool value);
     virtual void CreateNewBoundingObject();
     virtual void ChkInformationToggled( bool on );
-    virtual void OnImageSelectionChanged(const mitk::DataNode* /*node*/);
 
 protected:
 
@@ -148,6 +146,11 @@ protected:
   * Controls containing an image selection drop down, some usage information and a "crop" button
   */
   Ui::QmitkImageCropperControls * m_Controls;
+
+  /*!
+  * The parent QWidget
+  */
+  QWidget* m_ParentWidget;
 
   /*!
   * \brief A pointer to the node of the image to be croped.
@@ -180,9 +183,14 @@ protected:
   virtual void CreateBoundingObject();
 
   /*!
-  * \brief Finds the given node in the data tree and fits the cuboid to it
+  * \brief Called from superclass, handles selection changes.
   */
-  virtual void AddBoundingObjectToNode(mitk::DataNode* node);
+  virtual void OnSelectionChanged(std::vector<mitk::DataNode*> nodes);
+
+  /*!
+  * \brief Finds the given node in the data tree and optionally fits the cuboid to it
+  */
+  virtual void AddBoundingObjectToNode(mitk::DataNode* node, bool fit);
 
   /*!
   * \brief Removes the cuboid from any node and hides it from the user.

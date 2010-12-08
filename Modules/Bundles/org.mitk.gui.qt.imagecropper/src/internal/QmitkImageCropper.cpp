@@ -90,7 +90,7 @@ void QmitkImageCropper::opExchangeNodes::NodeDeleted(const itk::Object * /*calle
 
 QmitkImageCropper::QmitkImageCropper(QObject *parent)
 : QObject(parent),
-m_Controls(NULL)
+m_Controls(NULL), m_ParentWidget(0)
 {
 }
 
@@ -106,6 +106,8 @@ void QmitkImageCropper::CreateQtPartControl(QWidget* parent)
 {
   if (!m_Controls)
   {
+    m_ParentWidget = parent;
+
     // build ui elements
     m_Controls = new Ui::QmitkImageCropperControls;
     m_Controls->setupUi(parent);
@@ -114,14 +116,10 @@ void QmitkImageCropper::CreateQtPartControl(QWidget* parent)
     m_Controls->groupInfo->hide();
     m_Controls->m_SurroundingSlider->hide();
     m_Controls->m_SurroundingSpin->hide();
-    m_Controls->m_TLGrayvalue->hide();
     m_Controls->m_NewBoxButton->setEnabled(true);
 
     // create ui element connections
     this->CreateConnections();
-
-    m_Controls->cmbImage->SetDataStorage(this->GetDefaultDataStorage());
-    m_Controls->cmbImage->SetPredicate(mitk::NodePredicateDataType::New("Image"));
   }
 
 }
@@ -134,7 +132,6 @@ void QmitkImageCropper::CreateConnections()
     connect( m_Controls->m_NewBoxButton, SIGNAL(clicked()), this, SLOT(CreateNewBoundingObject()) );
     connect( m_Controls->m_EnableSurroundingCheckBox, SIGNAL(toggled(bool)), this, SLOT(SurroundingCheck(bool)) );
     connect( m_Controls->chkInformation, SIGNAL(toggled(bool)), this, SLOT(ChkInformationToggled(bool)) );
-    connect( m_Controls->cmbImage, SIGNAL(OnSelectionChanged(const mitk::DataNode*)), this, SLOT(OnImageSelectionChanged(const mitk::DataNode*)) );
   }
 }
 
@@ -175,35 +172,40 @@ void QmitkImageCropper::ExecuteOperation (mitk::Operation *operation)
 
 }
 
-void QmitkImageCropper::OnImageSelectionChanged(const mitk::DataNode* /*node*/)
-{
-  this->RemoveBoundingObjectFromNode();
-}
-
 void QmitkImageCropper::CreateNewBoundingObject()
 {
-  // 1. Get the selected image
-  // 2. If any image is selected,
-  //    attach the cuboid to it, and update the views
+  // attach the cuboid to the image and update the views
   if (this->IsVisible())
   {
-    m_ImageNode = this->selectedImage();
     if (m_ImageNode.IsNotNull())
     {
       m_ImageToCrop = dynamic_cast<mitk::Image*>(m_ImageNode->GetData());
       if(m_ImageToCrop.IsNotNull())
       {
+        if (this->GetDefaultDataStorage()->GetNamedDerivedNode("CroppingObject", m_ImageNode))
+        {
+          // We are in "Reset bounding box!" mode
+          m_CroppingObject->FitGeometry(m_ImageToCrop->GetTimeSlicedGeometry());
+          mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+          return;
+        }
+
+        bool fitCroppingObject = false;
         if(m_CroppingObject.IsNull())
+        {
           CreateBoundingObject();
+          fitCroppingObject = true;
+        }
+
         if (m_CroppingObject.IsNull())
           return;
 
-        AddBoundingObjectToNode( m_ImageNode );
+        AddBoundingObjectToNode( m_ImageNode, fitCroppingObject );
 
         m_ImageNode->SetVisibility(true);
         mitk::RenderingManager::GetInstance()->InitializeViews();
         mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-        m_Controls->m_NewBoxButton->setEnabled(false);
+        m_Controls->m_NewBoxButton->setText("Reset bounding box!");
         m_Controls->btnCrop->setEnabled(true);
       }
     }
@@ -217,8 +219,7 @@ void QmitkImageCropper::SurroundingCheck(bool value)
 {
   if(value)
   {
-    m_ImageNode = this->selectedImage();
-    if(m_ImageNode.IsNotNull())
+   if(m_ImageNode.IsNotNull())
     {
       mitk::DataNode *imageNode = m_ImageNode.GetPointer();
       if (imageNode)
@@ -243,7 +244,6 @@ void QmitkImageCropper::SurroundingCheck(bool value)
       }
       m_Controls->m_SurroundingSlider->show();
       m_Controls->m_SurroundingSpin->show();
-      m_Controls->m_TLGrayvalue->show();
     }
     else
       m_Controls->m_EnableSurroundingCheckBox->setChecked(false);
@@ -252,7 +252,6 @@ void QmitkImageCropper::SurroundingCheck(bool value)
   {
     m_Controls->m_SurroundingSlider->hide();
     m_Controls->m_SurroundingSpin->hide();
-    m_Controls->m_TLGrayvalue->hide();
   }
 }
 
@@ -285,7 +284,7 @@ void QmitkImageCropper::CropImage()
     QMessageBox::warning ( NULL,
       tr("Cropping not possible"),
       tr("Sorry, the bounding box has to be completely inside the image.\n\n"
-      "The possibility to drag it larger than the image a bug and has to be fixed."),
+      "The possibility to drag it larger than the image is a bug and has to be fixed."),
       QMessageBox::Ok,  QMessageBox::NoButton,  QMessageBox::NoButton );
     return;
   }
@@ -420,15 +419,31 @@ void QmitkImageCropper::CreateBoundingObject()
   m_AffineInteractor = mitk::AffineInteractor::New("AffineInteractions ctrl-drag", m_CroppingObjectNode);
 }
 
+void QmitkImageCropper::OnSelectionChanged(std::vector<mitk::DataNode*> nodes)
+{
+  this->RemoveBoundingObjectFromNode();
 
-void QmitkImageCropper::AddBoundingObjectToNode(mitk::DataNode* node)
+  if (nodes.size() != 1 || dynamic_cast<mitk::Image*>(nodes[0]->GetData()) == 0)
+  {
+    m_ParentWidget->setEnabled(false);
+    return;
+  }
+
+  m_ImageNode = nodes[0];
+  m_ParentWidget->setEnabled(true);
+}
+
+void QmitkImageCropper::AddBoundingObjectToNode(mitk::DataNode* node, bool fit)
 {
   m_ImageToCrop = dynamic_cast<mitk::Image*>(node->GetData());
 
   if(!this->GetDefaultDataStorage()->Exists(m_CroppingObjectNode))
   {
     this->GetDefaultDataStorage()->Add(m_CroppingObjectNode, node);
-    m_CroppingObject->FitGeometry(m_ImageToCrop->GetTimeSlicedGeometry());
+    if (fit)
+    {
+      m_CroppingObject->FitGeometry(m_ImageToCrop->GetTimeSlicedGeometry());
+    }
 
     mitk::GlobalInteraction::GetInstance()->AddInteractor( m_AffineInteractor );
   }
@@ -444,14 +459,9 @@ void QmitkImageCropper::RemoveBoundingObjectFromNode()
       this->GetDefaultDataStorage()->Remove(m_CroppingObjectNode);
       mitk::GlobalInteraction::GetInstance()->RemoveInteractor(m_AffineInteractor);
     }
+    m_Controls->m_NewBoxButton->setText("New bounding box!");
   }
 }
-
-const mitk::DataNode::Pointer QmitkImageCropper::selectedImage()
-{
-  return m_Controls->cmbImage->GetSelectedNode();
-}
-
 
 void QmitkImageCropper::ChkInformationToggled( bool on )
 {
@@ -477,8 +487,6 @@ void QmitkImageCropper::NodeRemoved(const mitk::DataNode *node)
 
   if (strcmp(name.c_str(), "CroppingObject")==0)
   {
-    m_CroppingObjectNode=NULL;
-    m_CroppingObject = NULL;
     m_Controls->btnCrop->setEnabled(false);
     m_Controls->m_NewBoxButton->setEnabled(true);
   }

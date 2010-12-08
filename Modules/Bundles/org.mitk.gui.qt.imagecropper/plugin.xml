@@ -8,7 +8,7 @@
       name="MITK General"/> 
     <view 
       id="org.mitk.views.imagecropper" 
-      name="ImageCropper" 
+      name="Image Cropper"
       category="org.mitk.views.general" 
       icon="resources/icon.xpm"
       class="QmitkImageCropper" />

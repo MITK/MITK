@@ -1,5 +1,5 @@
 /*=========================================================================
- 
+
 Program:   Medical Imaging & Interaction Toolkit
 Language:  C++
 Date:      $Date: 2008-09-18 09:35:44 +0200 (Do, 18 Sep 2008) $
@@ -8,11 +8,11 @@ Version:   $Revision: 15278 $
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #include <qregexp.h>
@@ -88,12 +88,12 @@ void CommonFunctionality::SaveToFileWriter( mitk::FileWriterWithInformation::Poi
 
 
 /**
- * Saves the given mitk::BaseData to a file. The user is prompted to
- * enter a file name. Currently only mitk::Image, mitk::Surface, mitk::PointSet and
- * mitk::VesselGraphData are supported. This function is deprecated
- * until the save-problem is solved by means of a Save-Factory or any
- * other "nice" mechanism
- */
+* Saves the given mitk::BaseData to a file. The user is prompted to
+* enter a file name. Currently only mitk::Image, mitk::Surface, mitk::PointSet and
+* mitk::VesselGraphData are supported. This function is deprecated
+* until the save-problem is solved by means of a Save-Factory or any
+* other "nice" mechanism
+*/
 void CommonFunctionality::SaveBaseData( mitk::BaseData* data, const char * aFileName )
 {
   //save initial time
@@ -106,7 +106,7 @@ void CommonFunctionality::SaveBaseData( mitk::BaseData* data, const char * aFile
     {
       mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(data);
       QString classname(data->GetNameOfClass());
-      if(image.IsNotNull() && classname.compare("Image")==0)
+      if ( image.IsNotNull() && (classname.compare("Image")==0 || classname.compare("SeedsImage")==0  ) )
       {
         fileNameUsed = CommonFunctionality::SaveImage(image, aFileName, true);
         if(!(fileNameUsed.length()>0)){
@@ -127,12 +127,27 @@ void CommonFunctionality::SaveBaseData( mitk::BaseData* data, const char * aFile
           else
             fileName = aFileName;
           fileName = itksys::SystemTools::GetFilenameWithoutExtension(fileName);
-          fileName += ".mps";
-          QString qfileName = QFileDialog::getSaveFileName(NULL, "Save file", QString(fileName.c_str()),"MITK Point-Sets (*.mps)");
+          // fileName += ".mps";
+          QString selected_suffix("MITK Point-Sets (*.mps)");
+          QString possible_suffixes("MITK Point-Sets (*.mps)");
+          QString initialFileName = QString::fromStdString(fileName);
+
+          /*QString qfileName = QFileDialog::getSaveFileName( NULL, "Save image", initialFilename ,mitk::CoreObjectFactory::GetInstance()->GetSaveFileExtensions(),&selected_suffix);
+          */
+          QString qfileName = QFileDialog::getSaveFileName(NULL, "Save file", initialFileName, possible_suffixes, &selected_suffix);
           MITK_INFO<<qfileName.toLocal8Bit().constData();
 
           mitk::PointSetWriter::Pointer writer = mitk::PointSetWriter::New();
           std::string extension = itksys::SystemTools::GetFilenameLastExtension( qfileName.toLocal8Bit().constData() );
+          if (extension == "") // if no extension has been entered manually into the filename
+          {
+            // get from combobox selected file extension
+            extension = itksys::SystemTools::GetFilenameLastExtension( selected_suffix.toLocal8Bit().constData());
+            extension = extension.substr(0, extension.size()-1);
+            qfileName += QString::fromStdString(extension);
+          }
+
+          MITK_INFO<<"extension: " << extension;
           // check if extension is valid
           if (!writer->IsExtensionValid(extension))
           {
@@ -143,7 +158,7 @@ void CommonFunctionality::SaveBaseData( mitk::BaseData* data, const char * aFile
             return;
           }
 
-          if (fileName.empty() == false )
+          if (qfileName.isEmpty() == false )
           {
             writer->SetInput( pointset );
             writer->SetFileName( qfileName.toLocal8Bit().constData() );
@@ -311,7 +326,7 @@ mitk::DataNode::Pointer CommonFunctionality::FileOpen()
 {
   return CommonFunctionality::FileOpenSpecific( mitk::CoreObjectFactory::GetInstance()->GetFileExtensions() );
 }
-  
+
 mitk::DataNode::Pointer CommonFunctionality::FileOpenSpecific( const QString& fileExtensions)
 {
   return FileOpenSpecific( fileExtensions.toLocal8Bit().constData() );
@@ -379,63 +394,68 @@ std::string CommonFunctionality::SaveSurface(mitk::Surface* surface, const char*
     fileName = aFileName;
 
   std::string selectedItemsName = itksys::SystemTools::GetFilenameWithoutExtension(fileName);
-  selectedItemsName += ".stl";
-  QString qfileName = QFileDialog::getSaveFileName(NULL, "Save surface object", QString(selectedItemsName.c_str()),"Surface Data(*.stl *.vtk *.vtp)");
-  if (!(qfileName.isEmpty()) )
-  {
-    if(qfileName.endsWith(".stl")==true)
-    {
-      mitk::SurfaceVtkWriter<vtkSTLWriter>::Pointer writer=mitk::SurfaceVtkWriter<vtkSTLWriter>::New();
-      
-      // check if surface actually consists of triangles; if not, the writer will not do anything; so, convert to triangles...
-      vtkPolyData* polys = surface->GetVtkPolyData();
-      if( polys->GetNumberOfStrips() > 0 )
-      {
-        vtkTriangleFilter* triangleFilter = vtkTriangleFilter::New();
-        triangleFilter->SetInput(polys);
-        triangleFilter->Update();
-        polys = triangleFilter->GetOutput();
-        polys->Register(NULL);
-        triangleFilter->Delete();
-        surface->SetVtkPolyData(polys);
-      }
+  //selectedItemsName += ".stl"
+  QString selected_suffix("STL File (*.stl)");
+  QString possible_suffixes("STL File (*.stl);; VTK File (*.vtk);; VTP File (*.vtp)");
+  QString qfileName = QFileDialog::getSaveFileName(NULL, "Save surface object", QString::fromStdString(selectedItemsName), possible_suffixes,
+    &selected_suffix);
 
-      writer->SetInput( surface );
-      writer->SetFileName(qfileName.toLocal8Bit().constData());
-      writer->GetVtkWriter()->SetFileTypeToBinary();
-      writer->Write();
-    }
-    else
-    if(qfileName.endsWith(".vtp")==true)
+  if (qfileName.isEmpty())
+    return "";
+
+  std::string extension = itksys::SystemTools::GetFilenameLastExtension( qfileName.toStdString() );
+  if (extension == "") // if no extension has been entered manually into the filename
+  {
+    // get from combobox selected file extension
+    extension = itksys::SystemTools::GetFilenameLastExtension( selected_suffix.toLocal8Bit().constData());
+    extension = extension.substr(0, extension.size()-1);
+    qfileName += QString::fromStdString(extension);
+  }
+
+  if(extension == ".stl" )
+  {
+    mitk::SurfaceVtkWriter<vtkSTLWriter>::Pointer writer=mitk::SurfaceVtkWriter<vtkSTLWriter>::New();
+
+    // check if surface actually consists of triangles; if not, the writer will not do anything; so, convert to triangles...
+    vtkPolyData* polys = surface->GetVtkPolyData();
+    if( polys->GetNumberOfStrips() > 0 )
     {
-      mitk::SurfaceVtkWriter<vtkXMLPolyDataWriter>::Pointer writer=mitk::SurfaceVtkWriter<vtkXMLPolyDataWriter>::New();
-      writer->SetInput( surface );
-      writer->SetFileName(qfileName.toLocal8Bit().constData());
-      writer->GetVtkWriter()->SetDataModeToBinary();
-      writer->Write();
+      vtkTriangleFilter* triangleFilter = vtkTriangleFilter::New();
+      triangleFilter->SetInput(polys);
+      triangleFilter->Update();
+      polys = triangleFilter->GetOutput();
+      polys->Register(NULL);
+      triangleFilter->Delete();
+      surface->SetVtkPolyData(polys);
     }
-    else if (qfileName.endsWith(".vtk")==true)
-    {
-      /*if (qfileName.endsWith(".vtk")==false)
-        qfileName += ".vtk";*/
-      mitk::SurfaceVtkWriter<vtkPolyDataWriter>::Pointer writer=mitk::SurfaceVtkWriter<vtkPolyDataWriter>::New();
-      writer->SetInput( surface );
-      writer->SetFileName(qfileName.toLocal8Bit().constData());
-      writer->Write();
-    }
-    else
-    {
-      // file extension not suitable for writing specified data type
-      QMessageBox::critical(NULL,"ERROR","File extension not suitable for writing Surface data. Choose .vtk, .stl or .vtp");
-      return "";
-    }
-    fileName = qfileName.toLocal8Bit().constData();
+
+    writer->SetInput( surface );
+    writer->SetFileName(qfileName.toLocal8Bit().constData());
+    writer->GetVtkWriter()->SetFileTypeToBinary();
+    writer->Write();
+  }
+  else if(extension == ".vtp")
+  {
+    mitk::SurfaceVtkWriter<vtkXMLPolyDataWriter>::Pointer writer=mitk::SurfaceVtkWriter<vtkXMLPolyDataWriter>::New();
+    writer->SetInput( surface );
+    writer->SetFileName(qfileName.toLocal8Bit().constData());
+    writer->GetVtkWriter()->SetDataModeToBinary();
+    writer->Write();
+  }
+  else if (extension == ".vtk")
+  {
+    mitk::SurfaceVtkWriter<vtkPolyDataWriter>::Pointer writer=mitk::SurfaceVtkWriter<vtkPolyDataWriter>::New();
+    writer->SetInput( surface );
+    writer->SetFileName(qfileName.toLocal8Bit().constData());
+    writer->Write();
   }
   else
   {
-    fileName.clear();
+    // file extension not suitable for writing specified data type
+    QMessageBox::critical(NULL,"ERROR","File extension not suitable for writing Surface data. Choose .vtk, .stl or .vtp");
+    return "";
   }
-  return fileName;
+  return qfileName.toLocal8Bit().constData();
 }
 
 #include "mitkImageWriter.h"
@@ -444,6 +464,7 @@ std::string CommonFunctionality::SaveSurface(mitk::Surface* surface, const char*
 std::string CommonFunctionality::SaveImage(mitk::Image* image, const char* aFileName, bool askForDifferentFilename)
 {
   static QString lastDirectory = "";
+  QString selected_suffix("DKFZ Pic (*.pic)");
 
   std::string fileName;
   if(aFileName == NULL || askForDifferentFilename)
@@ -453,9 +474,7 @@ std::string CommonFunctionality::SaveImage(mitk::Image* image, const char* aFile
 
     // prepend the last directory
     initialFilename = lastDirectory + initialFilename;
-
-    QString suffix_pic("DKFZ Pic (*.pic)");
-    QString qfileName = QFileDialog::getSaveFileName( NULL, "Save image", initialFilename ,mitk::CoreObjectFactory::GetInstance()->GetSaveFileExtensions(),&suffix_pic);
+    QString qfileName = QFileDialog::getSaveFileName( NULL, "Save image", initialFilename ,mitk::CoreObjectFactory::GetInstance()->GetSaveFileExtensions(),&selected_suffix);
     MITK_INFO<<qfileName.toLocal8Bit().constData();
     if (qfileName.isEmpty() )
       return "";
@@ -470,15 +489,20 @@ std::string CommonFunctionality::SaveImage(mitk::Image* image, const char* aFile
     std::string baseFilename = itksys::SystemTools::GetFilenameWithoutLastExtension( fileName );
     std::string extension = itksys::SystemTools::GetFilenameLastExtension( fileName );
 
-    if (extension == "")
-      extension = ".pic";
+    if (extension == "") // if no extension has been entered manually into the filename
+    {
+      // get from combobox selected file extension
+      extension = itksys::SystemTools::GetFilenameLastExtension( selected_suffix.toLocal8Bit().constData());
+      extension = extension.substr(0, extension.size()-1);
+      fileName += extension;
+    }
 
     if (extension == ".gz")
     {
       QMessageBox::critical( NULL, "SaveDialog", "Warning: You can not save an image in the compressed \n"
-                                                 ".pic.gz format. You must save as a normal .pic file.\n"
-                                                 "Please press Save again and choose a filename with a .pic ending.",
-                                                 QMessageBox::Ok, QMessageBox::NoButton, QMessageBox::NoButton);
+        ".pic.gz format. You must save as a normal .pic file.\n"
+        "Please press Save again and choose a filename with a .pic ending.",
+        QMessageBox::Ok, QMessageBox::NoButton, QMessageBox::NoButton);
       return "";
     }
     // check if extension is suitable for writing image data
@@ -534,7 +558,7 @@ std::string CommonFunctionality::SaveScreenshot( vtkRenderWindow* renderWindow ,
     itkGenericOutputMacro( << "Unsupported type of render window! The only supported type is currently QmitkRenderWindow." );
     return std::string("");
   }
-  
+
   //
   // create the screenshot before the filechooser is opened,
   // so there the file chooser will not be part of the screenshot
@@ -542,32 +566,32 @@ std::string CommonFunctionality::SaveScreenshot( vtkRenderWindow* renderWindow ,
   //QPixmap buffer = QPixmap::grabWindow( qtRenderWindow->winId() );
 
   // new Version: 
-	//// take screenshot of render window without the coloured frame of 2 pixels by cropping the raw image data
+  //// take screenshot of render window without the coloured frame of 2 pixels by cropping the raw image data
   vtkWindowToImageFilter* wti = vtkWindowToImageFilter::New();
   wti->SetInput( renderWindow );
-	wti->Update();
-	vtkImageData* imageData = wti->GetOutput();
-	int framesize = 5;
-	int* windowSize = renderWindow->GetSize();
-	int numberOfScalarComponents = imageData->GetNumberOfScalarComponents();
-	vtkImageData* processedImageData = vtkImageData::New();
-	processedImageData->SetNumberOfScalarComponents(numberOfScalarComponents);
-	processedImageData->SetExtent(0,windowSize[0]-2*framesize-1,0,windowSize[1]-2*framesize-1,0,0);
-	processedImageData->SetScalarTypeToUnsignedChar();
-	for (int i=framesize; i<windowSize[0]-framesize; i++)
-	{
-		for (int j=framesize; j<windowSize[1]-framesize; j++)
-		{
-			for (int k=0; k<numberOfScalarComponents; k++)
-			{
-				processedImageData->SetScalarComponentFromDouble(i-framesize,j-framesize,0,k,imageData->GetScalarComponentAsDouble(i,j,0,k));
-			}
-		}
-	}
+  wti->Update();
+  vtkImageData* imageData = wti->GetOutput();
+  int framesize = 5;
+  int* windowSize = renderWindow->GetSize();
+  int numberOfScalarComponents = imageData->GetNumberOfScalarComponents();
+  vtkImageData* processedImageData = vtkImageData::New();
+  processedImageData->SetNumberOfScalarComponents(numberOfScalarComponents);
+  processedImageData->SetExtent(0,windowSize[0]-2*framesize-1,0,windowSize[1]-2*framesize-1,0,0);
+  processedImageData->SetScalarTypeToUnsignedChar();
+  for (int i=framesize; i<windowSize[0]-framesize; i++)
+  {
+    for (int j=framesize; j<windowSize[1]-framesize; j++)
+    {
+      for (int k=0; k<numberOfScalarComponents; k++)
+      {
+        processedImageData->SetScalarComponentFromDouble(i-framesize,j-framesize,0,k,imageData->GetScalarComponentAsDouble(i,j,0,k));
+      }
+    }
+  }
 
-	// write new image as *.png to file
+  // write new image as *.png to file
   vtkPNGWriter* pngWriter = vtkPNGWriter::New();
-  
+
   //
   // if the provided filename is empty ask the user 
   // for the name of the file in which the screenshot
@@ -609,7 +633,7 @@ std::string CommonFunctionality::SaveScreenshot( vtkRenderWindow* renderWindow ,
   // clock_t goal = ticks + std::clock();
   // while ( goal > std::clock() );
   //
-  
+
   //
   // save the screenshot under the given filename
   //
@@ -617,7 +641,7 @@ std::string CommonFunctionality::SaveScreenshot( vtkRenderWindow* renderWindow ,
   pngWriter->SetInput(processedImageData);
   //pngWriter->SetInput( wti->GetOutput() );
   pngWriter->SetFileName( concreteFilename.c_str() );
-  
+
   pngWriter->Write();
 
   if ( pngWriter->GetErrorCode() != 0 )

@@ -164,6 +164,12 @@ ENDIF(DOXYGEN_INGROUP)
 CONFIGURE_FILE(${PLUGIN_TEMPLATE}/documentation/doxygen/modulesTemplate.dox
                ${PLUGIN_DIR}/documentation/doxygen/modules.dox @ONLY)
 
+# ----------------- documentation/Manual/Manual.dox ------------
+CONFIGURE_FILE(${PLUGIN_TEMPLATE}/documentation/Manual/Manual.dox
+               ${PLUGIN_DIR}/documentation/Manual/Manual.dox @ONLY)
+CONFIGURE_FILE(${PLUGIN_TEMPLATE}/documentation/Manual/icon.png 
+               ${PLUGIN_DIR}/documentation/Manual/icon.png @ONLY)
+
 # ----------------- resources directory ---------------------------------
 IF(GUI_SUPPORT)
   FILE(MAKE_DIRECTORY ${PLUGIN_DIR}/resources)

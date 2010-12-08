@@ -1,0 +1,13 @@
+/**
+\bundlemainpage{@PLUGIN_ID@} @PLUGIN_NAME@
+
+\image html icon.png "Icon of @PLUGIN_NAME@"
+
+Available sections:
+  - \ref @PLUGIN_ID@Overview
+
+\section @PLUGIN_ID@Overview
+This is the description for the @PLUGIN_NAME@.
+
+*/
+

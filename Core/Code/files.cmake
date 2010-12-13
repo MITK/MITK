@@ -132,6 +132,8 @@ SET(CPP_FILES
   Interactions/mitkDisplayInteractor.cpp
   Interactions/mitkDisplayPositionEvent.cpp
   Interactions/mitkDisplayVectorInteractor.cpp
+  Interactions/mitkDisplayVectorInteractorLevelWindow.cpp
+  Interactions/mitkDisplayVectorInteractorScroll.cpp
   Interactions/mitkEvent.cpp
   Interactions/mitkEventDescription.cpp
   Interactions/mitkEventMapper.cpp

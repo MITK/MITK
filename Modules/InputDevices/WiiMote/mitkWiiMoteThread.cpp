@@ -99,9 +99,6 @@ ITK_THREAD_RETURN_TYPE mitk::WiiMoteThread::StartWiiMoteThread(void* pInfoStruct
 
 void mitk::WiiMoteThread::StartWiiMote()
 {
-  // mutex lock should be inside each method, but since
-  // the driver is external, one would have to change it
- 
   // transfers the execution rights to the WiiMote thread
   m_WiiMoteThreadFinished->Lock();
 
@@ -204,8 +201,6 @@ bool mitk::WiiMoteThread::DetectWiiMotes()
         m_WiiMotes[detected].SetLEDs(0x04);
         break;
       }
-
-      MITK_INFO << "Detect WiiMotes";
 
       // ---------------- unclean solution, missing generic approach ---------------------
 
@@ -372,6 +367,27 @@ void mitk::WiiMoteThread::SingleWiiMoteUpdate()
       {
         this->WiiMoteCalibrationInput();
       }
+
+      if(m_WiiMotes[0].Button.Home())
+        this->WiiMoteButtonPressed(mitk::Key_Home);
+
+      if(m_WiiMotes[0].Button.A())
+      {
+        this->WiiMoteButtonPressed(mitk::Key_A);
+
+        // necessary to avoid sending the movement vector
+        // instead of the raw coordinates for the calibration
+        if(this->m_InCalibrationMode)
+        {
+          this->m_InCalibrationMode = false;
+        }
+        else
+        {
+          this->m_InCalibrationMode = true;
+        }
+
+        itksys::SystemTools::Delay(3000);
+      }
     }
     else
     {
@@ -418,30 +434,12 @@ void mitk::WiiMoteThread::SingleWiiMoteUpdate()
         // case 4: button is not pressed and
         // was not pressed before -> no change
       }
+
+      // reset object
+      if(m_WiiMotes[0].Button.Home())
+        this->WiiMoteButtonPressed(mitk::Key_Home);
     }
     m_WiiMoteThreadFinished->Unlock();
-
-
-    if(m_WiiMotes[0].Button.Home())
-      this->WiiMoteButtonPressed(mitk::Key_Home);
-
-    if(m_WiiMotes[0].Button.A())
-    {
-      this->WiiMoteButtonPressed(mitk::Key_A);
-
-      // necessary to avoid sending the movement vector
-      // instead of the raw coordinates for the calibration
-      if(this->m_InCalibrationMode)
-      {
-        this->m_InCalibrationMode = false;
-      }
-      else
-      {
-        this->m_InCalibrationMode = true;
-      }
- 
-      itksys::SystemTools::Delay(3000);
-    }
 
     if(m_WiiMotes[0].ConnectionLost())
     {
@@ -577,11 +575,11 @@ void mitk::WiiMoteThread::SurfaceInteraction()
   //  << std::endl;
   //file.close();
 
-  ////// remove, if not needed
-  ////// otherwise this will eventually
-  ////// disable correct functionality of Headtracking
-  ////// since it's using its m_LastRecordTime
-  //////m_LastRecordTime = tempTime;
+  //// remove, if not needed
+  //// otherwise this will eventually
+  //// disable correct functionality of Headtracking
+  //// since it's using its m_LastRecordTime
+  ////m_LastRecordTime = tempTime;
   //m_TimeStep++;
 
 }

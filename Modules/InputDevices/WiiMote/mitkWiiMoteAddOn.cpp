@@ -84,7 +84,7 @@ void mitk::WiiMoteAddOn::WiiMoteButtonPressed(const itk::EventObject &e)
       se = new mitk::StateEvent(mitk::EV_INIT, wiiEvent);
       break;
     case mitk::Key_B: // surface interaction activation
-      se = new mitk::StateEvent(mitk::EIDWIIMOTEBUTTON, wiiEvent);
+      se = new mitk::StateEvent(mitk::EIDWIIMOTEBUTTONB, wiiEvent);
       break;
     }
 

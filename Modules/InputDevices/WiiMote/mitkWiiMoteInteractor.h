@@ -6,6 +6,8 @@
 #include <mitkDataNode.h>
 #include <mitkAction.h>
 #include <mitkStateEvent.h>
+#include <mitkGeometry3D.h>
+#include <mitkWiiMoteAllDataEvent.h>
 
 // export macro
 #include <mitkWiiMoteExports.h>
@@ -29,7 +31,7 @@ WiiMoteInteractor(const char* type, DataNode* dataNode);
 virtual ~WiiMoteInteractor();
 
 // allow movement
-virtual bool OnWiiMoteActivateButton(Action* action, const mitk::StateEvent* event);
+virtual bool OnWiiMoteResetButton(Action* action, const mitk::StateEvent* event);
 
 // movement
 virtual bool OnWiiMoteInput(Action* action, const mitk::StateEvent* event);
@@ -38,6 +40,11 @@ virtual bool OnWiiMoteInput(Action* action, const mitk::StateEvent* event);
 virtual bool OnWiiMoteReleaseButton(Action* action, const mitk::StateEvent* event);
 
 private:
+
+  mitk::Geometry3D* TransformCurrentDataInGeometry3D();
+
+  // all movements are separated and fixed
+  bool FixedRotationAndTranslation(const mitk::WiiMoteAllDataEvent* event);
 
   float m_OrientationX;
   float m_OrientationY;
@@ -48,11 +55,17 @@ private:
   float m_zVelocity;
 
   // refering to an angle around an axis
-  float m_xAngle;
-  float m_yAngle;
-  float m_zAngle;
+  // which is defined in the wiimote
+  ScalarType m_xAngle;
+  ScalarType m_yAngle;
+  ScalarType m_zAngle;
 
+  // modes
   bool m_InRotation;
+  int m_TranslationMode;
+
+  // to reset the geometry
+  mitk::Geometry3D::Pointer m_OriginalGeometry;
 };
 
 }

@@ -2928,7 +2928,11 @@
   </stateMachine>
   <stateMachine NAME="WiiMoteSurfaceInteraction">
     <state NAME="start" ID="1" START_STATE="TRUE">
-      <transition NAME="initialState" NEXT_STATE_ID="2" EVENT_ID="4004"/> <!--EIDWIIMOTEBUTTON-->
+      <transition NAME="initial state" NEXT_STATE_ID="2" EVENT_ID="4005"/> <!--EIDWIIMOTEBUTTONB-->
+	  <transition NAME="reset object" NEXT_STATE_ID = "1" EVENT_ID = "4004"> <!--EIDWIIMOTEBUTTON-->
+	   <action ID = "4004" />
+	   <!--AcRESETVIEW-->
+	  </transition>
 	</state>
 	<state NAME="Surface Interaction" ID="2">
 	  <transition NAME="stop Surface Interaction" NEXT_STATE_ID="1" EVENT_ID="5551008"> <!--EV_DONE-->

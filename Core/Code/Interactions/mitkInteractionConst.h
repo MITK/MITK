@@ -84,6 +84,7 @@ enum EEventIds
   EIDSPACENAVIGATORKEYDOWN = 4002, // 3d Mouse, KeyDown
   EIDWIIMOTEINPUT = 4003, // WiiMote input
   EIDWIIMOTEBUTTON = 4004, // WiiMote home button
+  EIDWIIMOTEBUTTONB = 4005, // WiiMote b button
   EIDSTRGANDN = 10,
   EIDSTRGANDE = 11,
   EIDDELETE = 12,

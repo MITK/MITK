@@ -99,23 +99,37 @@ void mitk::ManualSegmentationToSurfaceFilter::GenerateData()
       vtkimagethreshold->SetInput(vtkimage);
       vtkimagethreshold->SetInValue( 100 );
       vtkimagethreshold->SetOutValue( 0 );
-      vtkimagethreshold->ThresholdByUpper( this->m_Threshold ); 
+      vtkimagethreshold->ThresholdByUpper( this->m_Threshold );
       thresholdExpanded = 49;
 
       vtkimagethreshold->SetOutputScalarTypeToUnsignedChar();
       vtkimagethreshold->ReleaseDataFlagOn();
 
       vtkImageGaussianSmooth *gaussian = vtkImageGaussianSmooth::New();
-      gaussian->SetInput(vtkimagethreshold->GetOutput()); 
+      gaussian->SetInput(vtkimagethreshold->GetOutput());
       gaussian->SetDimensionality(3);
       gaussian->SetRadiusFactor(0.49);
       gaussian->SetStandardDeviation( m_GaussianStandardDeviation );
       gaussian->ReleaseDataFlagOn();
       gaussian->UpdateInformation();
       gaussian->Update();
-      vtkimage = gaussian->GetOutput(); //->Out
+
+      vtkimage=vtkimagethreshold->GetOutput();
+      mitk::Image::Pointer image = mitk::Image::New();
+      image->Initialize(vtkimagethreshold->GetOutput());
+      mitk::ScalarType max = image->GetScalarValueMax();
+      MITK_INFO<<max;
+      if (max!=0) //too little slices, image smoothing eliminates all segmentation pixels
+      {
+        vtkimage = gaussian->GetOutput(); //->Out
+      }
+      else
+      {
+        MITK_INFO<<"Smoothing removes all pixels of the segmentation. Use unsmoothed result";
+      }
       gaussian->Delete();
       vtkimagethreshold->Delete();
+
     }
     ProgressBar::GetInstance()->Progress();
 

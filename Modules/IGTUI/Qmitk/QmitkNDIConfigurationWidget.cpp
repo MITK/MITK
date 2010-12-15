@@ -468,7 +468,7 @@ void QmitkNDIConfigurationWidget::UpdateTrackerFromToolTable(const QModelIndex &
       QString romfile = model->data(model->index(topLeft.row(), QmitkNDIToolDelegate::SROMCol)).toString();
       if (QFileInfo(romfile).exists())
         tool->LoadSROMFile(romfile.toLatin1());
-      m_Tracker->InitializeWiredTools();
+      m_Tracker->UpdateTool(tool);
       break;
     }
 

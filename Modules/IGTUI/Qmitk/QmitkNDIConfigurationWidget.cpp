@@ -316,12 +316,28 @@ void QmitkNDIConfigurationWidget::OnDiscoverDevices()
 {
   PortDeviceMap portsAndDevices;
   QString status = "Scanning ";
+#ifdef WIN32
   for (unsigned int i = 1; i < 10; ++i)
   {
     QString devName = QString("COM%1").arg(i);
     portsAndDevices[devName];
     status += devName + ", ";
   }
+#else
+  for(unsigned int i = 1; i < 6; ++i)
+  {
+    QString devName = QString("/dev/ttyS%1").arg(i);
+    portsAndDevices[devName];
+    status += devName + ", ";
+  }
+  for(unsigned int i = 0; i <7; ++i)
+  {
+    QString devName = QString("/dev/ttyUSB%1").arg(i);
+    portsAndDevices[devName];
+    status += devName + ", ";
+  }
+#endif
+
   status.chop(2); // remove last ", "
   status += " for NDI tracking devices...";
   m_Controls->m_DeviceStatus->setText(status);

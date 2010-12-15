@@ -108,6 +108,9 @@ ENDIF(EXISTS ${CMAKE_CURRENT_BINARY_DIR}/Utilities/vtk-bin)
 FIND_PACKAGE(VTK)
 APPLY_VTK_FLAGS()
 
+# ASK THE USER TO SHOW THE CONSOLE WINDOW FOR CoreApp, ExtApp and SandboxApp
+OPTION(MITK_SHOW_CONSOLE_WINDOW "Use this to enable or disable the console window when starting MITK GUI Applications" ON)
+MARK_AS_ADVANCED(MITK_SHOW_CONSOLE_WINDOW)
 
 # TODO: check if necessary
 OPTION(USE_ITKZLIB "Use the ITK zlib for pic compression." ON)

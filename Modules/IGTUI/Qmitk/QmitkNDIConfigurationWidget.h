@@ -78,6 +78,7 @@ public:
     void OnDiscoverDevices();
     void OnAddPassiveTool();
     void UpdateTrackerFromToolTable(const QModelIndex & topLeft, const QModelIndex & /*bottomRight*/);
+    void OnDisoverDevicesBtnInfo();
 
 protected:
   typedef QMap<QString, mitk::TrackingDeviceType> PortDeviceMap;  // key is port name (e.g. "COM1", "/dev/ttyS0"), value will be filled with the type of tracking device at this port

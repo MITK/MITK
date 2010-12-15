@@ -78,6 +78,7 @@ void QmitkNDIConfigurationWidget::CreateConnections()
   connect(m_Controls->m_AddToolBtn, SIGNAL(clicked()), this, SLOT(OnAddPassiveTool()));
   connect(m_Controls->m_DisoverDevicesBtn, SIGNAL(clicked()), this, SLOT(OnDiscoverDevices()));
   connect(m_Controls->m_ToolTable->model(), SIGNAL(dataChanged(const QModelIndex &, const QModelIndex &)), this, SLOT(UpdateTrackerFromToolTable(const QModelIndex &, const QModelIndex &)));
+  connect(m_Controls->m_DisoverDevicesBtnInfo, SIGNAL(clicked()), this, SLOT(OnDisoverDevicesBtnInfo()));
 }
 
 
@@ -317,13 +318,13 @@ void QmitkNDIConfigurationWidget::OnDiscoverDevices()
   PortDeviceMap portsAndDevices;
   QString status = "Scanning ";
 #ifdef WIN32
-  for (unsigned int i = 1; i < 10; ++i)
+  for (unsigned int i = 1; i < 20; ++i)
   {
     QString devName = QString("COM%1").arg(i);
     portsAndDevices[devName];
     status += devName + ", ";
   }
-#else
+#else //linux/posix systems
   for(unsigned int i = 1; i < 6; ++i)
   {
     QString devName = QString("/dev/ttyS%1").arg(i);
@@ -342,6 +343,7 @@ void QmitkNDIConfigurationWidget::OnDiscoverDevices()
   status += " for NDI tracking devices...";
   m_Controls->m_DeviceStatus->setText(status);
   ScanPortsForNDITrackingDevices(portsAndDevices);
+  m_Controls->m_ComPortSelector->clear();
   QString result = "The following tracking devices were found:<BR/>\n";
   for (PortDeviceMap::const_iterator it = portsAndDevices.begin(); it != portsAndDevices.end(); ++it)
   {
@@ -350,9 +352,11 @@ void QmitkNDIConfigurationWidget::OnDiscoverDevices()
     {
     case mitk::NDIPolaris:
       result += "NDI Polaris<BR/>\n";
+      m_Controls->m_ComPortSelector->addItem(it.key());
       break;
     case mitk::NDIAurora:
       result += "NDI Aurora<BR/>\n";
+      m_Controls->m_ComPortSelector->addItem(it.key());
       break;
     default:
       result += "No NDI tracking device found<BR/>\n";
@@ -563,4 +567,12 @@ void QmitkNDIConfigurationWidget::HidePolarisOptionsGroupbox( bool on )
 void QmitkNDIConfigurationWidget::HideAuroraOptionsGroupbox( bool on )
 {
   m_Controls->m_gbAuroraOptions->setHidden(on);
+}
+
+void QmitkNDIConfigurationWidget::OnDisoverDevicesBtnInfo()
+{
+  QMessageBox *infoBox = new QMessageBox(this);
+  infoBox->setText("Click \"Scan Ports\" to get a list of all connected NDI tracking devices. This will clear the selection menu below and add the ports for discovered NDI tracking devices. Use this function, if a port is not listed.");
+  infoBox->exec();
+  delete infoBox;
 }

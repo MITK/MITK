@@ -435,6 +435,33 @@ void mitk::WiiMoteThread::SingleWiiMoteUpdate()
         // was not pressed before -> no change
       }
 
+      //// used for measurements
+      //// start
+      //if(m_WiiMotes[0].Button.B())
+      //{
+      //  if(!m_ButtonBPressed)
+      //  {
+      //    m_ButtonBPressed = true;
+      //  }
+      //}
+
+      //// stop
+      //if(m_WiiMotes[0].Button.A())
+      //{
+      //  if(m_ButtonBPressed)
+      //  {
+      //    m_ButtonBPressed = false;
+      //    m_TimeStep = 0;
+      //    itksys::SystemTools::Delay(1000);
+      //  }
+      //}
+
+      //// recording
+      //if(m_ButtonBPressed)
+      //{
+      //  this->SurfaceInteraction();
+      //}
+
       // reset object
       if(m_WiiMotes[0].Button.Home())
         this->WiiMoteButtonPressed(mitk::Key_Home);
@@ -557,30 +584,33 @@ void mitk::WiiMoteThread::SurfaceInteraction()
 
   //MITK_INFO << "Time difference: " << diff;
 
-  //std::ofstream file;
-  //file.open("C:/WiiMotionData/motion.txt",ios::app);
+  //if(m_TimeStep <= 400)
+  //{
+  //  std::ofstream file;
+  //  file.open("C:/WiiMotionData/motion.txt",ios::app);
 
-  //file << m_TimeStep << " " 
-  //  << m_WiiMotes[0].Acceleration.X << " " 
-  //  << m_WiiMotes[0].Acceleration.Y << " "
-  //  << m_WiiMotes[0].Acceleration.Z << " "
-  //  << m_WiiMotes[0].MotionPlus.Speed.Pitch << " "
-  //  << m_WiiMotes[0].MotionPlus.Speed.Yaw << " "
-  //  << m_WiiMotes[0].MotionPlus.Speed.Roll << " "
-  //  << m_WiiMotes[0].Acceleration.Orientation.X << " " 
-  //  << m_WiiMotes[0].Acceleration.Orientation.Y << " " 
-  //  << m_WiiMotes[0].Acceleration.Orientation.Z << " " 
-  //  << m_WiiMotes[0].Acceleration.Orientation.Pitch << " " 
-  //  << m_WiiMotes[0].Acceleration.Orientation.Roll << " " 
-  //  << std::endl;
-  //file.close();
+  //  file << m_TimeStep << " " 
+  //    << m_WiiMotes[0].Acceleration.X << " " 
+  //    << m_WiiMotes[0].Acceleration.Y << " "
+  //    << m_WiiMotes[0].Acceleration.Z << " "
+  //    << m_WiiMotes[0].MotionPlus.Speed.Pitch << " "
+  //    << m_WiiMotes[0].MotionPlus.Speed.Yaw << " "
+  //    << m_WiiMotes[0].MotionPlus.Speed.Roll << " "
+  //    << m_WiiMotes[0].Acceleration.Orientation.X << " " 
+  //    << m_WiiMotes[0].Acceleration.Orientation.Y << " " 
+  //    << m_WiiMotes[0].Acceleration.Orientation.Z << " " 
+  //    << m_WiiMotes[0].Acceleration.Orientation.Pitch << " " 
+  //    << m_WiiMotes[0].Acceleration.Orientation.Roll << " " 
+  //    << std::endl;
+  //  file.close();
 
-  //// remove, if not needed
-  //// otherwise this will eventually
-  //// disable correct functionality of Headtracking
-  //// since it's using its m_LastRecordTime
-  ////m_LastRecordTime = tempTime;
-  //m_TimeStep++;
+  //  // remove, if not needed
+  //  // otherwise this will eventually
+  //  // disable correct functionality of Headtracking
+  //  // since it's using its m_LastRecordTime
+  //  //m_LastRecordTime = tempTime;
+  //  m_TimeStep++;
+  //}
 
 }
 

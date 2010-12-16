@@ -17,6 +17,11 @@
 #include <vtkCamera.h>
 #include <vtkTransform.h>
 #include <vtkRenderer.h>
+#include <vtkMath.h>
+
+// vnl
+#include <vnl/vnl_quaternion.h>
+#include <vnl/vnl_inverse.h>
 
 #define _USE_MATH_DEFINES // otherwise, constants will not work
 #include <math.h>
@@ -226,6 +231,20 @@ bool mitk::WiiMoteInteractor::OnWiiMoteInput(Action* action, const mitk::StateEv
   }
  
   // -------------------- rotation and translation --------------------
+
+  //// translation
+  //mitk::Vector3D movementVector;
+  //movementVector.SetElement(0,xValue);
+  //movementVector.SetElement(1,yValue);
+  //movementVector.SetElement(2,zValue);
+
+  //geometry->Translate(movementVector);
+  //geometry->Modified();
+
+  //// indicate modification of data tree node
+  //m_DataNode->Modified();
+
+
   vtkTransform* vtkTransform = vtkTransform::New();
 
   //copy m_vtkMatrix to m_VtkIndexToWorldTransform
@@ -234,28 +253,50 @@ bool mitk::WiiMoteInteractor::OnWiiMoteInput(Action* action, const mitk::StateEv
   //m_VtkIndexToWorldTransform as vtkLinearTransform*
   vtkTransform->SetMatrix(geometry->GetVtkTransform()->GetMatrix());
 
+  vnl_quaternion<double> q( vtkMath::RadiansFromDegrees( m_xAngle ), 
+    vtkMath::RadiansFromDegrees( m_zAngle ), 
+    vtkMath::RadiansFromDegrees( m_yAngle ) );
+  //q.normalize();
+  vnl_matrix_fixed<double, 4, 4> mat = q.rotation_matrix_transpose_4();
+
+  // fill translation column
+  mat(0,3) = xValue;
+  mat(1,3) = yValue;
+  mat(2,3) = zValue;
+
+  // invert matrix to apply
+  // correct order for the transformation
+  mat = vnl_inverse(mat);
+
+  vtkMatrix4x4* deltaTransform = vtkMatrix4x4::New();
+
+  // copy into matrix
+  for(size_t i=0; i<4; ++i)
+    for(size_t j=0; j<4; ++j)
+      deltaTransform->SetElement(i,j, mat(i,j));
+
+  vtkTransform->Concatenate( deltaTransform );
+
   // rotation from center is different
   // from rotation while translated
   // hence one needs the center of the object
-  double center[3];
-  vtkTransform->GetPosition(center);
+  //double center[3];
+  //vtkTransform->GetPosition(center);
 
   //vtkTransform->PostMultiply();
-
-  //vtkTransform->Translate(-center[0], -center[1], -center[2]);
-
+  /*
   vtkTransform->RotateX(m_xAngle);
-  vtkTransform->RotateZ(m_yAngle);
-  vtkTransform->RotateY(m_zAngle);
+  vtkTransform->RotateZ(m_zAngle);
+  vtkTransform->RotateY(m_yAngle);
+  vtkTransform->Translate(xValue,yValue,zValue);*/
 
-  //vtkTransform->Translate(center[0], center[1], center[2]);
-
-  //vtkTransform->Translate(xValue,yValue,zValue);
 
   //vtkTransform->PreMultiply();
  
   geometry->SetIndexToWorldTransformByVtkMatrix(vtkTransform->GetMatrix());
   geometry->Modified();
+
+  deltaTransform->Delete();
 
   m_DataNode->Modified();
 
@@ -274,7 +315,6 @@ bool mitk::WiiMoteInteractor::OnWiiMoteReleaseButton(Action* action, const mitk:
   m_yVelocity = 0;
   m_zVelocity = 0;
 
-  // adjust object for vtk transformation
   m_xAngle = 0;
   m_yAngle = 0;
   m_zAngle = 0;

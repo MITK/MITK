@@ -34,6 +34,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "berryConstants.h"
 #include "berryPlatformUI.h"
 
+#include "itkRGBAPixel.h"
+
 const std::string QmitkControlVisualizationPropertiesView::VIEW_ID = "org.mitk.views.controlvisualizationpropertiesview";
 
 using namespace berry;
@@ -142,6 +144,7 @@ struct CvpSelListener : ISelectionListener
     bool foundTensorVolume = false;
     bool foundImage = false;
     bool foundMultipleOdfImages = false;
+    bool foundRGBAImage = false;
 
     // do something with the selected items
     if(m_View->m_CurrentSelection)
@@ -199,6 +202,12 @@ struct CvpSelListener : ISelectionListener
           else if(QString("Image").compare(node->GetData()->GetNameOfClass())==0)
           {
             foundImage = true;
+            mitk::Image::Pointer img = dynamic_cast<mitk::Image*>(node->GetData());
+            if(img.IsNotNull() && img->GetPixelType().GetItkTypeId() == &typeid(itk::RGBAPixel<unsigned char>) )
+            {
+              foundRGBAImage = true;
+            }
+
             bool tex_int;
             node->GetBoolProperty("texture interpolation", tex_int);
             if(tex_int)
@@ -231,7 +240,7 @@ struct CvpSelListener : ISelectionListener
     m_View->m_Controls->m_AdditionalScaling->setVisible(m_View->m_FoundSingleOdfImage);
     m_View->m_Controls->m_NormalizationScalingFrame->setVisible(m_View->m_FoundSingleOdfImage);
 
-    m_View->m_Controls->OpacMinFrame->setVisible(m_View->m_FoundSingleOdfImage);
+    m_View->m_Controls->OpacMinFrame->setVisible(foundRGBAImage || m_View->m_FoundSingleOdfImage);
 
     // changed for SPIE paper, Principle curvature scaling
     //m_View->m_Controls->params_frame->setVisible(m_View->m_FoundSingleOdfImage);
@@ -833,6 +842,9 @@ void QmitkControlVisualizationPropertiesView::OpacityChanged(double l, double u)
   SetLevelWindowProp(set,"opaclevelwindow", olw);
 
   set = ActiveSet("TensorImage");
+  SetLevelWindowProp(set,"opaclevelwindow", olw);
+
+  set = ActiveSet("Image");
   SetLevelWindowProp(set,"opaclevelwindow", olw);
 
   m_Controls->m_OpacityMinFaLabel->setText(QString::number(l,'f',2) + " : " + QString::number(u,'f',2));

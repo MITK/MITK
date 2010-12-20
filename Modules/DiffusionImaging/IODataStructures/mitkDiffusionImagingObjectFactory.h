@@ -28,6 +28,7 @@ class MitkDiffusionImaging_EXPORT DiffusionImagingObjectFactory : public CoreObj
   public:
     mitkClassMacro(DiffusionImagingObjectFactory,CoreObjectFactoryBase);
     itkNewMacro(DiffusionImagingObjectFactory);
+
     virtual Mapper::Pointer CreateMapper(mitk::DataNode* node, MapperSlotId slotId);
     virtual void SetDefaultProperties(mitk::DataNode* node);
     virtual const char* GetFileExtensions();

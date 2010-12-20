@@ -53,9 +53,15 @@ public:
   /** Register one factory of this type  */
   static void RegisterOneFactory(void)
   {
-    NrrdQBallImageIOFactory::Pointer NrrdQBallImageIOFactory = NrrdQBallImageIOFactory::New();
-    ObjectFactoryBase::RegisterFactory(NrrdQBallImageIOFactory);
+    static bool IsRegistered = false;
+    if ( !IsRegistered )
+    {
+      NrrdQBallImageIOFactory::Pointer fac = NrrdQBallImageIOFactory::New();
+      ObjectFactoryBase::RegisterFactory( fac );
+      IsRegistered = true;
+    }
   }
+
   
 protected:
   NrrdQBallImageIOFactory();

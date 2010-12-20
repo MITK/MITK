@@ -25,30 +25,30 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk
 {
 
-template <class T>
-class CreateNrrdTensorImageWriter : public itk::CreateObjectFunctionBase
-{
-public:
+//template <class T>
+//class CreateNrrdTensorImageWriter : public itk::CreateObjectFunctionBase
+//{
+//public:
 
-  /** Standard class typedefs. */
-  typedef CreateNrrdTensorImageWriter  Self;
-  typedef itk::SmartPointer<Self>    Pointer;
+//  /** Standard class typedefs. */
+//  typedef CreateNrrdTensorImageWriter  Self;
+//  typedef itk::SmartPointer<Self>    Pointer;
 
-  /** Methods from itk:LightObject. */
-  itkFactorylessNewMacro(Self);
-  LightObject::Pointer CreateObject() { typename T::Pointer p = T::New();
-    p->Register();
-    return p.GetPointer();
-  }
+//  /** Methods from itk:LightObject. */
+//  itkFactorylessNewMacro(Self);
+//  LightObject::Pointer CreateObject() { typename T::Pointer p = T::New();
+//    p->Register();
+//    return p.GetPointer();
+//  }
 
-protected:
-  CreateNrrdTensorImageWriter() {}
-  ~CreateNrrdTensorImageWriter() {}
+//protected:
+//  CreateNrrdTensorImageWriter() {}
+//  ~CreateNrrdTensorImageWriter() {}
 
-private:
-  CreateNrrdTensorImageWriter(const Self&); //purposely not implemented
-  void operator=(const Self&); //purposely not implemented
-};
+//private:
+//  CreateNrrdTensorImageWriter(const Self&); //purposely not implemented
+//  void operator=(const Self&); //purposely not implemented
+//};
 
 NrrdTensorImageWriterFactory::NrrdTensorImageWriterFactory()
 {
@@ -57,7 +57,7 @@ NrrdTensorImageWriterFactory::NrrdTensorImageWriterFactory()
                          "NrrdTensorImageWriter",
                          "NrrdTensorImage Writer",
                          1,
-                         mitk::CreateNrrdTensorImageWriter< mitk::NrrdTensorImageWriter >::New());
+                         itk::CreateObjectFunction< mitk::NrrdTensorImageWriter >::New());
 }
 
 NrrdTensorImageWriterFactory::~NrrdTensorImageWriterFactory()

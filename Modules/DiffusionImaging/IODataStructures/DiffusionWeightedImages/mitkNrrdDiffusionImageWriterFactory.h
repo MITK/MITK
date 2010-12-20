@@ -44,8 +44,8 @@ public:
     static bool IsRegistered = false;
     if ( !IsRegistered )
     {
-      NrrdDiffusionImageWriterFactory::Pointer ugVtkWriterFactory = NrrdDiffusionImageWriterFactory::New();
-      ObjectFactoryBase::RegisterFactory( ugVtkWriterFactory );
+      NrrdDiffusionImageWriterFactory::Pointer fac = NrrdDiffusionImageWriterFactory::New();
+      ObjectFactoryBase::RegisterFactory( fac );
       IsRegistered = true;
     }
   }

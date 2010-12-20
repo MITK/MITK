@@ -53,8 +53,13 @@ public:
   /** Register one factory of this type  */
   static void RegisterOneFactory(void)
   {
-    NrrdTensorImageIOFactory::Pointer NrrdTensorImageIOFactory = NrrdTensorImageIOFactory::New();
-    ObjectFactoryBase::RegisterFactory(NrrdTensorImageIOFactory);
+    static bool IsRegistered = false;
+    if ( !IsRegistered )
+    {
+      NrrdTensorImageIOFactory::Pointer ugVtkWriterFactory = NrrdTensorImageIOFactory::New();
+      ObjectFactoryBase::RegisterFactory( ugVtkWriterFactory );
+      IsRegistered = true;
+    }
   }
   
 protected:

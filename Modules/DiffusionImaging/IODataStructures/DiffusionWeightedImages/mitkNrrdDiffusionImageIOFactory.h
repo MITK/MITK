@@ -53,10 +53,15 @@ public:
   /** Register one factory of this type  */
   static void RegisterOneFactory(void)
   {
-    NrrdDiffusionImageIOFactory::Pointer NrrdDiffusionImageIOFactory = NrrdDiffusionImageIOFactory::New();
-    ObjectFactoryBase::RegisterFactory(NrrdDiffusionImageIOFactory);
+    static bool IsRegistered = false;
+    if ( !IsRegistered )
+    {
+      NrrdDiffusionImageIOFactory::Pointer fac = NrrdDiffusionImageIOFactory::New();
+      ObjectFactoryBase::RegisterFactory( fac );
+      IsRegistered = true;
+    }
   }
-  
+
 protected:
   NrrdDiffusionImageIOFactory();
   ~NrrdDiffusionImageIOFactory();

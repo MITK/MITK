@@ -52,9 +52,10 @@ mitk::DiffusionImagingObjectFactory::DiffusionImagingObjectFactory(bool /*regist
     MITK_INFO << "DiffusionImagingObjectFactory c'tor" << std::endl;
     RegisterIOFactories();
 
-    itk::ObjectFactoryBase::RegisterFactory( NrrdDiffusionImageIOFactory::New() );
-    itk::ObjectFactoryBase::RegisterFactory( NrrdQBallImageIOFactory::New() );
-    itk::ObjectFactoryBase::RegisterFactory( NrrdTensorImageIOFactory::New() );
+
+    mitk::NrrdDiffusionImageIOFactory::RegisterOneFactory();
+    mitk::NrrdQBallImageIOFactory::RegisterOneFactory();
+    mitk::NrrdTensorImageIOFactory::RegisterOneFactory();
 
     mitk::NrrdDiffusionImageWriterFactory::RegisterOneFactory();
     mitk::NrrdQBallImageWriterFactory::RegisterOneFactory();
@@ -194,7 +195,7 @@ void mitk::DiffusionImagingObjectFactory::RegisterIOFactories()
 {
 }
 
-void RegisterDiffusionImagingObjectFactory() 
+void RegisterDiffusionImagingObjectFactory()
 {
   static bool oneDiffusionImagingObjectFactoryRegistered = false;
   if ( ! oneDiffusionImagingObjectFactoryRegistered ) {

@@ -25,30 +25,30 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk
 {
 
-template <class T>
-class CreateNrrdDiffusionImageWriter : public itk::CreateObjectFunctionBase
-{
-public:
+//template <class T>
+//class CreateNrrdDiffusionImageWriter : public itk::CreateObjectFunctionBase
+//{
+//public:
 
-  /** Standard class typedefs. */
-  typedef CreateNrrdDiffusionImageWriter  Self;
-  typedef itk::SmartPointer<Self>    Pointer;
+//  /** Standard class typedefs. */
+//  typedef CreateNrrdDiffusionImageWriter  Self;
+//  typedef itk::SmartPointer<Self>    Pointer;
 
-  /** Methods from itk:LightObject. */
-  itkFactorylessNewMacro(Self);
-  LightObject::Pointer CreateObject() { typename T::Pointer p = T::New();
-    p->Register();
-    return p.GetPointer();
-  }
+//  /** Methods from itk:LightObject. */
+//  itkFactorylessNewMacro(Self);
+//  LightObject::Pointer CreateObject() { typename T::Pointer p = T::New();
+//    p->Register();
+//    return p.GetPointer();
+//  }
 
-protected:
-  CreateNrrdDiffusionImageWriter() {}
-  ~CreateNrrdDiffusionImageWriter() {}
+//protected:
+//  CreateNrrdDiffusionImageWriter() {}
+//  ~CreateNrrdDiffusionImageWriter() {}
 
-private:
-  CreateNrrdDiffusionImageWriter(const Self&); //purposely not implemented
-  void operator=(const Self&); //purposely not implemented
-};
+//private:
+//  CreateNrrdDiffusionImageWriter(const Self&); //purposely not implemented
+//  void operator=(const Self&); //purposely not implemented
+//};
 
 NrrdDiffusionImageWriterFactory::NrrdDiffusionImageWriterFactory()
 {
@@ -57,7 +57,7 @@ NrrdDiffusionImageWriterFactory::NrrdDiffusionImageWriterFactory()
                          "NrrdDiffusionImageWriter",
                          "NrrdDiffusionImage Writer",
                          1,
-                         mitk::CreateNrrdDiffusionImageWriter< mitk::NrrdDiffusionImageWriter<DiffusionPixelType> >::New());
+                         itk::CreateObjectFunction< mitk::NrrdDiffusionImageWriter<DiffusionPixelType> >::New());
 }
 
 NrrdDiffusionImageWriterFactory::~NrrdDiffusionImageWriterFactory()

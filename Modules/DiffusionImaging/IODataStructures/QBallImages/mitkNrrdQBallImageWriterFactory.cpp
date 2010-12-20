@@ -25,30 +25,30 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk
 {
 
-template <class T>
-class CreateNrrdQBallImageWriter : public itk::CreateObjectFunctionBase
-{
-public:
+//template <class T>
+//class CreateNrrdQBallImageWriter : public itk::CreateObjectFunctionBase
+//{
+//public:
 
-  /** Standard class typedefs. */
-  typedef CreateNrrdQBallImageWriter  Self;
-  typedef itk::SmartPointer<Self>    Pointer;
+//  /** Standard class typedefs. */
+//  typedef CreateNrrdQBallImageWriter  Self;
+//  typedef itk::SmartPointer<Self>    Pointer;
 
-  /** Methods from itk:LightObject. */
-  itkFactorylessNewMacro(Self);
-  LightObject::Pointer CreateObject() { typename T::Pointer p = T::New();
-    p->Register();
-    return p.GetPointer();
-  }
+//  /** Methods from itk:LightObject. */
+//  itkFactorylessNewMacro(Self);
+//  LightObject::Pointer CreateObject() { typename T::Pointer p = T::New();
+//    p->Register();
+//    return p.GetPointer();
+//  }
 
-protected:
-  CreateNrrdQBallImageWriter() {}
-  ~CreateNrrdQBallImageWriter() {}
+//protected:
+//  CreateNrrdQBallImageWriter() {}
+//  ~CreateNrrdQBallImageWriter() {}
 
-private:
-  CreateNrrdQBallImageWriter(const Self&); //purposely not implemented
-  void operator=(const Self&); //purposely not implemented
-};
+//private:
+//  CreateNrrdQBallImageWriter(const Self&); //purposely not implemented
+//  void operator=(const Self&); //purposely not implemented
+//};
 
 NrrdQBallImageWriterFactory::NrrdQBallImageWriterFactory()
 {
@@ -57,7 +57,7 @@ NrrdQBallImageWriterFactory::NrrdQBallImageWriterFactory()
                          "NrrdQBallImageWriter",
                          "NrrdQBallImage Writer",
                          1,
-                         mitk::CreateNrrdQBallImageWriter< mitk::NrrdQBallImageWriter >::New());
+                         itk::CreateObjectFunction< mitk::NrrdQBallImageWriter >::New());
 }
 
 NrrdQBallImageWriterFactory::~NrrdQBallImageWriterFactory()

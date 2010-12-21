@@ -208,10 +208,10 @@ bool mitk::RegionGrowingTool::OnMousePressedInside(Action* itkNotUsed( action ),
       for (int index = 0; index < cutContour.deleteSize; ++index)
       {
         newPoint[0] = cutContour.deleteCurve[ 2 * index + 0 ];
-        newPoint[1] = cutContour.deleteCurve[ 2 * index + 1];
+        newPoint[1] = cutContour.deleteCurve[ 2 * index + 1 ];
         newPoint[2] = 0.0;
 
-        contourInImageIndexCoordinates->AddVertex( newPoint );
+        contourInImageIndexCoordinates->AddVertex( newPoint - 0.5 );
       }
 
       free(cutContour.traceline);
@@ -521,10 +521,10 @@ mitkIpPicDescriptor* mitk::RegionGrowingTool::PerformRegionGrowingAndUpdateConto
     for (int index = 0; index < numberOfContourPoints; ++index)
     {
       newPoint[0] = contourPoints[ 2 * index + 0 ];
-      newPoint[1] = contourPoints[ 2 * index + 1];
+      newPoint[1] = contourPoints[ 2 * index + 1 ];
       newPoint[2] = 0;
 
-      contourInImageIndexCoordinates->AddVertex( newPoint );
+      contourInImageIndexCoordinates->AddVertex( newPoint - 0.5);
     }
 
     free(contourPoints);

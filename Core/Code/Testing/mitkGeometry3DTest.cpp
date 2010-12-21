@@ -187,89 +187,82 @@ int testItkImageIsCenterBased()
 
 int testGeometry3D(bool imageGeometry)
 {
-  float bounds[ ] = {-10.0, 17.0, -12.0, 188.0, 13.0, 211.0};
-
+  // Build up a new image Geometry    
   mitk::Geometry3D::Pointer geometry3d = mitk::Geometry3D::New();
-
-  std::cout << "Initializing: ";
+  float bounds[ ] = {-10.0, 17.0, -12.0, 188.0, 13.0, 211.0};
+    
+  MITK_TEST_OUTPUT( << "Initializing");
   geometry3d->Initialize();
-  std::cout<<"[PASSED]"<<std::endl;
 
   MITK_TEST_OUTPUT(<< "Setting ImageGeometry to " << imageGeometry);
   geometry3d->SetImageGeometry(imageGeometry);
-  std::cout<<"[PASSED]"<<std::endl;
 
-  std::cout << "Setting bounds by SetFloatBounds(): ";
+  MITK_TEST_OUTPUT(<< "Setting bounds by SetFloatBounds(): " << bounds);
   geometry3d->SetFloatBounds(bounds);
-  std::cout<<"[PASSED]"<<std::endl;
  
+  MITK_TEST_OUTPUT( << "Testing AxisVectors");
   if(testGetAxisVectorVariants(geometry3d) == false)
     return EXIT_FAILURE;
 
   if(testGetAxisVectorExtent(geometry3d) == false)
     return EXIT_FAILURE;
 
-  std::cout << "Creating an AffineTransform3D transform: ";
+  MITK_TEST_OUTPUT( << "Creating an AffineTransform3D transform");
   mitk::AffineTransform3D::MatrixType matrix;
   matrix.SetIdentity();
   matrix(1,1) = 2;
   mitk::AffineTransform3D::Pointer transform;
   transform = mitk::AffineTransform3D::New();
   transform->SetMatrix(matrix);
-  std::cout<<"[PASSED]"<<std::endl;
 
-  std::cout << "Testing a SetIndexToWorldTransform: ";
+  MITK_TEST_OUTPUT( << "Testing a SetIndexToWorldTransform"); 
   geometry3d->SetIndexToWorldTransform(transform);
-  std::cout<<"[PASSED]"<<std::endl;
 
-  std::cout << "Testing correctness of value returned by GetSpacing: ";
+  MITK_TEST_OUTPUT( << "Testing correctness of value returned by GetSpacing"); 
   const mitk::Vector3D& spacing1 = geometry3d->GetSpacing();
   mitk::Vector3D expectedSpacing;
   expectedSpacing.Fill(1.0);
   expectedSpacing[1] = 2;
   if( mitk::Equal(spacing1, expectedSpacing) == false )
   {
-      std::cout<<"[FAILED]"<<std::endl;
+      MITK_TEST_OUTPUT( << " [FAILED]");
       return EXIT_FAILURE;
   }
-  std::cout<<"[PASSED]"<<std::endl;
 
-  std::cout << "Testing a Compose(transform): ";
+  MITK_TEST_OUTPUT( << "Testing a Compose(transform)");   
   geometry3d->Compose(transform);
-  std::cout<<"[PASSED]"<<std::endl;
 
-  std::cout << "Testing correctness of value returned by GetSpacing: ";
+  MITK_TEST_OUTPUT( << "Testing correctness of value returned by GetSpacing");   
   const mitk::Vector3D& spacing2 = geometry3d->GetSpacing();
   expectedSpacing[1] = 4;
   if( mitk::Equal(spacing2, expectedSpacing) == false )
   {
-      std::cout<<"[FAILED]"<<std::endl;
+      MITK_TEST_OUTPUT( << " [FAILED]");
       return EXIT_FAILURE;
   }
-  std::cout<<"[PASSED]"<<std::endl;
 
-  std::cout << "Testing correctness of SetSpacing: ";
+  MITK_TEST_OUTPUT( << "Testing correctness of SetSpacing");   
   mitk::Vector3D newspacing;
   mitk::FillVector3D(newspacing, 1.5, 2.5, 3.5);
   geometry3d->SetSpacing(newspacing);
   const mitk::Vector3D& spacing3 = geometry3d->GetSpacing();
   if( mitk::Equal(spacing3, newspacing) == false )
   {
-      std::cout<<"[FAILED]"<<std::endl;
+      MITK_TEST_OUTPUT( << " [FAILED]");
       return EXIT_FAILURE;
   }
-  std::cout<<"[PASSED]"<<std::endl;
 
+  // Seperate Test function for Index and World consistency
   testIndexAndWorldConsistency(geometry3d);
 
-  std::cout << "Testing a rotation of the geometry: ";
+  MITK_TEST_OUTPUT( << "Testing a rotation of the geometry");   
   double angle = 35.0;
   mitk::Vector3D rotationVector; mitk::FillVector3D( rotationVector, 1, 0, 0 );
   mitk::Point3D center = geometry3d->GetCenter();
   mitk::RotationOperation* op = new mitk::RotationOperation( mitk::OpROTATE, center, rotationVector, angle );
   geometry3d->ExecuteOperation(op);
 
-  MITK_TEST_OUTPUT( << " Testing mitk::GetRotation() and success of rotation");
+  MITK_TEST_OUTPUT( << "Testing mitk::GetRotation() and success of rotation");
   mitk::Matrix3D rotation;
   mitk::GetRotation(geometry3d, rotation);
   mitk::Vector3D voxelStep=rotation*newspacing;  

@@ -459,6 +459,25 @@ mitk::SlicedGeometry3D::SetImageGeometry( const bool isAnImageGeometry )
   }
 }
 
+void
+mitk::SlicedGeometry3D::ChangeImageGeometryConsideringOriginOffset( const bool isAnImageGeometry )
+{
+  mitk::Geometry3D* geometry;
+  
+  unsigned int s;
+  for ( s = 0; s < m_Slices; ++s )
+  {
+    geometry = m_Geometry2Ds[s];
+    if ( geometry!=NULL )
+    {
+      geometry->ChangeImageGeometryConsideringOriginOffset( isAnImageGeometry );
+    }
+  }
+  
+  Superclass::ChangeImageGeometryConsideringOriginOffset( isAnImageGeometry );
+}
+
+
 bool
 mitk::SlicedGeometry3D::IsValidSlice( int s ) const
 {

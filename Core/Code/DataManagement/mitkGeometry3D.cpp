@@ -623,3 +623,40 @@ void
 mitk::Geometry3D::ResetSubTransforms()
 {
 }
+
+void
+mitk::Geometry3D::ChangeImageGeometryConsideringOriginOffset( const bool isAnImageGeometry )
+{
+  // If Geometry is switched to ImageGeometry, you have to put an offset to the origin, because
+  // imageGeometries origins are pixel-center-based
+  // ... and remove the offset, if you switch an imageGeometry back to a normal geometry
+  // For more information please see the Geometry documentation page
+
+  if(m_ImageGeometry == isAnImageGeometry)
+    return;
+
+  const BoundingBox::BoundsArrayType& boundsarray = 
+    this->GetBoundingBox()->GetBounds();
+
+  Point3D  originIndex; 
+  FillVector3D(originIndex,  boundsarray[0], boundsarray[2], boundsarray[4]);
+
+  if(isAnImageGeometry == true)
+    FillVector3D( originIndex,
+      originIndex[0] + 0.5, 
+      originIndex[1] + 0.5, 
+      originIndex[2] + 0.5 );
+  else
+    FillVector3D( originIndex,
+      originIndex[0] - 0.5, 
+      originIndex[1] - 0.5, 
+      originIndex[2] - 0.5 );
+
+  Point3D originWorld; 
+  originWorld = GetIndexToWorldTransform()
+    ->TransformPoint( originIndex );
+
+  SetOrigin(originWorld);
+
+  this->SetImageGeometry(isAnImageGeometry);
+}

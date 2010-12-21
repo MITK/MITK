@@ -313,6 +313,22 @@ void mitk::TimeSlicedGeometry::SetImageGeometry(const bool isAnImageGeometry)
   }
 }
 
+
+void mitk::TimeSlicedGeometry::ChangeImageGeometryConsideringOriginOffset(const bool isAnImageGeometry)
+{
+  mitk::Geometry3D* geometry3d;
+  unsigned int t;
+  for(t=0; t<m_TimeSteps; ++t)
+  {
+    geometry3d = m_Geometry3Ds[t];
+    if(geometry3d!=NULL)
+      geometry3d->ChangeImageGeometryConsideringOriginOffset(isAnImageGeometry);
+  }
+
+  Superclass::ChangeImageGeometryConsideringOriginOffset(isAnImageGeometry);
+}
+
+
 void mitk::TimeSlicedGeometry::SetEvenlyTimed(bool on)
 {
   m_EvenlyTimed = on;

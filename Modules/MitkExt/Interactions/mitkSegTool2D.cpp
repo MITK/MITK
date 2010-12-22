@@ -24,13 +24,19 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkPlaneGeometry.h"
 
 #include "mitkExtractImageFilter.h"
+#include "mitkExtractDirectedPlaneImageFilter.h"
+
+//Include of the new ImageExtractor
+#include "mitkExtractDirectedPlaneImageFilterNew.h"
+#include "mitkPlanarCircle.h"
 
 #define ROUND(a)     ((a)>0 ? (int)((a)+0.5) : -(int)(0.5-(a)))
 
 mitk::SegTool2D::SegTool2D(const char* type)
 :Tool(type),
  m_LastEventSender(NULL),
- m_LastEventSlice(0)
+ m_LastEventSlice(0),
+ m_Contourmarkername ("Contourmarker")
 {
   // great magic numbers
   CONNECT_ACTION( 80, OnMousePressed );
@@ -158,15 +164,19 @@ mitk::Image::Pointer mitk::SegTool2D::GetAffectedImageSliceAs2DImage(const Posit
 
   // first, we determine, which slice is affected
   const PlaneGeometry* planeGeometry( dynamic_cast<const PlaneGeometry*> (positionEvent->GetSender()->GetCurrentWorldGeometry2D() ) );
+  //const PlaneGeometry* planeGeometry( dynamic_cast<const PlaneGeometry*> (positionEvent->GetSender()->GetCurrentWorldGeometry() ) );
+
 
   if ( !image || !planeGeometry ) return NULL;
 
   int affectedDimension( -1 );
   int affectedSlice( -1 );
+  DetermineAffectedImageSlice( image, planeGeometry, affectedDimension, affectedSlice );
   if ( DetermineAffectedImageSlice( image, planeGeometry, affectedDimension, affectedSlice ) )
   {
     try
     {
+	  std::cout<<"Old Reader \n";
       // now we extract the correct slice from the volume, resulting in a 2D image
       ExtractImageFilter::Pointer extractor= ExtractImageFilter::New();
       extractor->SetInput( image );
@@ -188,7 +198,31 @@ mitk::Image::Pointer mitk::SegTool2D::GetAffectedImageSliceAs2DImage(const Posit
   }
   else
   {
-    return NULL;
+	  // we probably land here because our plane is rotated, thus we have to use a different filter:
+	 /* ExtractDirectedPlaneImageFilter::Pointer extractorPlane = ExtractDirectedPlaneImageFilter::New();
+	  extractorPlane->SetInput( image );
+	  extractorPlane->SetWorldGeometry( planeGeometry );
+	  extractorPlane->SetTargetTimestep( timeStep );
+	  extractorPlane->Update( );*/
+	  ExtractDirectedPlaneImageFilterNew::Pointer newExtractor = ExtractDirectedPlaneImageFilterNew::New();
+	  //newExtractor->SetNewSpacingMustBeCalculated();
+	  newExtractor->SetInput( image );
+	  newExtractor->SetActualInputTimestep( timeStep );
+	  newExtractor->SetCurrentWorldGeometry2D( planeGeometry );
+	  newExtractor->Update();
+	  //Image::Pointer slice = extractorPlane->GetOutput();
+	  Image::Pointer slice = newExtractor->GetOutput();
+	  //slice->SetClonedGeometry( planeGeometry );
+	  return slice;
+	  /*
+	  // We need to copy the image, otherwise, when the image is used
+	  // by another filter, the ExtractImageFilter::GenerateOutputInformation( )
+	  // will be called and the image will be Initialized to 0
+	  Image::Pointer imageReoriented = Image::New();
+	  imageReoriented->Initialize( extractorPlane->GetOutput( ) );
+	  Geometry3D::Pointer geom3d = planeGeometry->GetReferenceGeometry();
+	  imageReoriented->SetGeometry( geom3d );     
+	  return imageReoriented;*/
   }
 }
 
@@ -213,6 +247,97 @@ mitk::Image::Pointer mitk::SegTool2D::GetAffectedReferenceSlice(const PositionEv
   
   return GetAffectedImageSliceAs2DImage( positionEvent, referenceImage );
 }
+
+void mitk::SegTool2D::AddContourmarker ( const PositionEvent* positionEvent)
+{
+	/*mitk::Geometry2D* currentGeometry2D = const_cast<mitk::Geometry2D*>(positionEvent->GetSender()->GetCurrentWorldGeometry2D());*/
+	mitk::PlaneGeometry* currentGeometry2D = dynamic_cast<mitk::PlaneGeometry*>( const_cast<mitk::Geometry2D*>(positionEvent->GetSender()->GetCurrentWorldGeometry2D()));
+	if ( ( currentGeometry2D != NULL ) && ( !ContourmarkerAlreadyExists( currentGeometry2D ) ) )
+	{
+		//Creating PlanarFigure which serves as marker
+		mitk::PlanarCircle::Pointer contourMarker = mitk::PlanarCircle::New();
+		//mitk::PlaneGeometry* planarFigureGeometry =
+		//dynamic_cast< mitk::PlaneGeometry* >( contourMarker->GetGeometry( positionEvent->GetSender()->GetTime() ));
+		//planarFigureGeometry = currentGeometry2D/*dynamic_cast<PlaneGeometry*>( currentGeometry2D )*/;
+		contourMarker->SetGeometry2D( currentGeometry2D );
+
+	    //Here we check which consecutive number must be the suffix to the markers name
+		std::stringstream markerStream;
+		markerStream << m_Contourmarkername;
+		int markerCount = 0;
+		mitk::DataNode* workingNode (m_ToolManager->GetWorkingData(0));
+		while (m_ToolManager->GetDataStorage()->GetNamedDerivedNode(markerStream.str().c_str(), workingNode))
+		{
+			m_ToolManager->GetDataStorage()->GetNamedDerivedNode(markerStream.str().c_str(),workingNode)->SetProperty( "visible", mitk::BoolProperty::New(false) );
+			markerCount++;
+			markerStream.str("");
+			markerStream.clear();
+			markerStream << m_Contourmarkername ;
+			markerStream << " ";
+			markerStream << markerCount;
+		}
+
+		//Now we place the figure in the image and the DataManager as a new Node
+		Point2D controlPoint2D;
+		Point3D controlPoint3D = positionEvent->GetWorldPosition();
+		//planarFigureGeometry->Map(controlPoint3D ,controlPoint2D);
+		currentGeometry2D->Map(controlPoint3D ,controlPoint2D);
+		contourMarker->PlaceFigure(controlPoint2D);
+		DataNode::Pointer rotatedContourNode = DataNode::New();
+		rotatedContourNode->SetData(contourMarker);
+		rotatedContourNode->SetProperty( "name", StringProperty::New(markerStream.str()) );
+		rotatedContourNode->SetBoolProperty( "PlanarFigureInitializedWindow", true, positionEvent->GetSender() );
+		m_ToolManager->GetDataStorage()->Add(rotatedContourNode, workingNode);
+	    Point3D centerTest1 = currentGeometry2D->GetOrigin();
+		/*positionEvent->GetSender()->GetSliceNavigationController()->ReorientSlices(currentGeometry2D->GetOrigin(), currentGeometry2D->GetNormal() );
+		positionEvent->GetSender()->RequestUpdate();
+		currentGeometry2D = dynamic_cast<mitk::PlaneGeometry*>( const_cast<mitk::Geometry2D*>(positionEvent->GetSender()->GetCurrentWorldGeometry2D()));
+		Point3D centerTest = currentGeometry2D->GetCenter();*/
+	}
+
+	
+
+	
+}
+
+bool mitk::SegTool2D::ContourmarkerAlreadyExists ( const mitk::PlaneGeometry* currentGeometry2D )
+{
+	//mitk::DataStorage::SetOfObjects::ConstPointer allNodes = m_ToolManager->GetDataStorage()->GetAll();
+	itk::VectorContainer<unsigned int, mitk::DataNode::Pointer>::ConstPointer allNodes = m_ToolManager->GetDataStorage()->GetDerivations( m_ToolManager->GetWorkingData(0) );
+	mitk::DataNode* currentNode;
+	for( int i = 0; i < allNodes->Size(); i++ )
+	{
+		currentNode = allNodes->GetElement(i);
+		std::string nodeName = currentNode->GetName();
+		const mitk::PlaneGeometry* nodeGeometry = dynamic_cast<mitk::PlaneGeometry*>( currentNode->GetData()->GetGeometry() );
+		if ( !nodeGeometry ) continue;
+		Point3D nodeCenter = nodeGeometry->GetCenter();
+		Point3D currentCenter = currentGeometry2D->GetCenter();
+		mitk::ScalarType distance1 = currentGeometry2D->DistanceFromPlane(nodeCenter);
+		mitk::ScalarType distance2 = nodeGeometry->DistanceFromPlane(currentCenter);
+		Vector3D nodeNormal = nodeGeometry->GetNormal();
+		Vector3D currentNormal = currentGeometry2D->GetNormal();
+		//Timestep...
+
+		bool isSameGeometry = ( (nodeCenter == currentCenter) && (nodeNormal == currentNormal));
+
+
+		/*bool isSameGeometry = ( ( nodeGeometry->GetOrigin() == currentGeometry2D->GetOrigin() ) && 
+			( nodeGeometry->GetBounds() == currentGeometry2D->GetBounds() ) &&
+			( nodeGeometry->GetIndexToWorldTransform()->GetMatrix() == currentGeometry2D->GetIndexToWorldTransform()->GetMatrix() ) && 
+			( nodeGeometry->GetIndexToWorldTransform()->GetOffset() == currentGeometry2D->GetIndexToWorldTransform()->GetOffset() ) &&
+			( nodeGeometry->GetSpacing() == currentGeometry2D->GetSpacing() ) &&
+			( nodeGeometry->GetTimeBounds() ) == currentGeometry2D->GetTimeBounds() ) &&
+			( nodeGeometry->GetImageGeometry() == currentGeometry2D->GetImageGeometry() );*/
+
+		int stringPosition = nodeName.find( m_Contourmarkername );
+		if ( ( stringPosition == 0 ) && ( isSameGeometry ) )
+			return true;
+	}
+
+	return false;
+}
+
 
 void mitk::SegTool2D::InteractiveSegmentationBugMessage( const std::string& message )
 {

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>241</width>
-    <height>393</height>
+    <width>246</width>
+    <height>591</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -204,8 +204,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>223</width>
-        <height>176</height>
+        <width>228</width>
+        <height>374</height>
        </rect>
       </property>
       <attribute name="icon">
@@ -496,6 +496,13 @@
         </widget>
        </item>
        <item>
+        <widget class="QCheckBox" name="cbRememberContourPositions">
+         <property name="text">
+          <string>Remember Contour Positions</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QLabel" name="lblInterpolation">
          <property name="font">
           <font>
@@ -538,8 +545,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>98</width>
-        <height>30</height>
+        <width>228</width>
+        <height>374</height>
        </rect>
       </property>
       <attribute name="label">
@@ -592,8 +599,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>98</width>
-        <height>30</height>
+        <width>228</width>
+        <height>374</height>
        </rect>
       </property>
       <attribute name="label">
@@ -646,8 +653,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>223</width>
-        <height>176</height>
+        <width>228</width>
+        <height>374</height>
        </rect>
       </property>
       <attribute name="label">

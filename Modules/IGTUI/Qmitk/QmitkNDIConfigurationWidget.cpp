@@ -299,6 +299,11 @@ void QmitkNDIConfigurationWidget::UpdateToolTable()
     else
       m_Controls->m_ToolTable->setItem(i, QmitkNDIToolDelegate::StatusCol, new QTableWidgetItem("Disabled"));                 // Status
     m_Controls->m_ToolTable->setItem(i, QmitkNDIToolDelegate::NodeCol, new QTableWidgetItem("<click to select node>"));       // Node
+    
+     // m_Controls->m_ToolTable->setItem(i, QmitkNDIToolDelegate::RepCol, new QTableWidgetItem("<click to load surface>")); 
+ 
+
+    
     /* set read-only/editable flags */
     m_Controls->m_ToolTable->item(i, QmitkNDIToolDelegate::IndexCol)->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsDragEnabled);                        // Index
     m_Controls->m_ToolTable->item(i, QmitkNDIToolDelegate::NodeCol)->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable   | Qt::ItemIsSelectable | Qt::ItemIsDragEnabled);  // Name
@@ -306,6 +311,9 @@ void QmitkNDIConfigurationWidget::UpdateToolTable()
     m_Controls->m_ToolTable->item(i, QmitkNDIToolDelegate::TypeCol)->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable   | Qt::ItemIsSelectable | Qt::ItemIsDragEnabled);  // Type
     m_Controls->m_ToolTable->item(i, QmitkNDIToolDelegate::StatusCol)->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsDragEnabled);                       // Status
     m_Controls->m_ToolTable->item(i, QmitkNDIToolDelegate::NodeCol)->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable   | Qt::ItemIsSelectable | Qt::ItemIsDragEnabled);  // Node
+   // m_Controls->m_ToolTable->item(i, QmitkNDIToolDelegate::RepCol)->setFlags(Qt::ItemIsEnabled);  
+ 
+
   }
   m_Controls->m_ToolTable->resizeColumnsToContents();
   connect(m_Controls->m_ToolTable, SIGNAL(itemChanged(QTableWidgetItem*)), this, SLOT(OnTableItemChanged(QTableWidgetItem*))); // listen to table changes again
@@ -439,6 +447,30 @@ void QmitkNDIConfigurationWidget::SetTagProperty( mitk::BaseProperty::Pointer pr
 }
 
 
+void QmitkNDIConfigurationWidget::OnTableItemClicked(const QModelIndex & topLeft )
+{
+  QString filename;
+  QTableWidgetItem* filenameItem; 
+
+  switch (topLeft.column())
+  {
+  case QmitkNDIToolDelegate::RepCol:
+
+    filename = QFileDialog::getOpenFileName(this, "Select Surface File", QDir::currentPath(),"STL files (*.stl)");
+
+    filenameItem = new QTableWidgetItem(filename);
+    m_Controls->m_ToolTable->setItem( topLeft.row(), topLeft.column(), filenameItem );
+
+    if(QFileInfo(filename).exists())
+      emit RepresentationChanged( topLeft.row(), filename.toStdString() );
+    
+    break;
+   default:
+    break;  
+  }
+}
+
+
 void QmitkNDIConfigurationWidget::UpdateTrackerFromToolTable(const QModelIndex & topLeft, const QModelIndex & /*bottomRight*/)
 {
   //Colums ID doesn't have to be processed.
@@ -569,6 +601,18 @@ void QmitkNDIConfigurationWidget::HideAuroraOptionsGroupbox( bool on )
   m_Controls->m_gbAuroraOptions->setHidden(on);
 }
 
+void QmitkNDIConfigurationWidget::ShowToolRepresentationColumn( )
+{
+  int cols = m_Controls->m_ToolTable->columnCount();
+  m_Controls->m_ToolTable->insertColumn(cols); // insert new column at end of table
+  
+  m_Controls->m_ToolTable->setHorizontalHeaderItem(cols, new QTableWidgetItem(QString("Representation"))); // inser column header for new colum
+  
+  // connect tool table to click slot  
+  connect(m_Controls->m_ToolTable, SIGNAL( clicked ( const QModelIndex & )), this, SLOT ( OnTableItemClicked( const QModelIndex & )));
+  
+}
+
 void QmitkNDIConfigurationWidget::OnDisoverDevicesBtnInfo()
 {
   QMessageBox *infoBox = new QMessageBox(this);
@@ -576,3 +620,4 @@ void QmitkNDIConfigurationWidget::OnDisoverDevicesBtnInfo()
   infoBox->exec();
   delete infoBox;
 }
+

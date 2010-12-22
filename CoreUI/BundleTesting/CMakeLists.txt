@@ -10,7 +10,7 @@ IF(MITK_USE_BLUEBERRY)
 
   SET(BLUEBERRY_TEST_APP "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/CoreApp")
   GET_TARGET_PROPERTY(_is_macosx_bundle CoreApp MACOSX_BUNDLE)
-  IF(_is_macosx_bundle) 
+  IF(APPLE AND _is_macosx_bundle) 
     SET(BLUEBERRY_TEST_APP "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/CoreApp.app/Contents/MacOS/CoreApp")
   ENDIF()
   

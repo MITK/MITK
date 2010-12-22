@@ -27,6 +27,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkRegionGrowingTool.xpm"
 
+#include "mitkOverwriteDirectedPlaneImageFilter.h"
+#include "mitkExtractDirectedPlaneImageFilterNew.h"
+
 namespace mitk {
   MITK_TOOL_MACRO(MitkExt_EXPORT, RegionGrowingTool, "Region growing tool");
 }
@@ -398,15 +401,29 @@ bool mitk::RegionGrowingTool::OnMouseReleased(Action* action, const StateEvent* 
 
               MITK_INFO << "OnMouseReleased: writing back to dimension " << affectedDimension << ", slice " << affectedSlice << " in working image" << std::endl;
 
-              OverwriteSliceImageFilter::Pointer slicewriter = OverwriteSliceImageFilter::New();
-              Image::Pointer workingImage = dynamic_cast<Image*>( m_ToolManager->GetWorkingData(0)->GetData() );
-              slicewriter->SetInput( workingImage );
-              slicewriter->SetCreateUndoInformation( true );
-              slicewriter->SetSliceImage( m_WorkingSlice );
-              slicewriter->SetSliceDimension( affectedDimension );
-              slicewriter->SetSliceIndex( affectedSlice );
-              slicewriter->SetTimeStep( positionEvent->GetSender()->GetTimeStep( workingImage ) );
-              slicewriter->Update();
+			  //If dazu gemacht
+			  Image::Pointer workingImage = dynamic_cast<Image*>( m_ToolManager->GetWorkingData(0)->GetData() );
+			  if ( affectedDimension != -1 )
+			  {
+				  OverwriteSliceImageFilter::Pointer slicewriter = OverwriteSliceImageFilter::New();
+				  slicewriter->SetInput( workingImage );
+				  slicewriter->SetCreateUndoInformation( true );
+				  slicewriter->SetSliceImage( m_WorkingSlice );
+				  slicewriter->SetSliceDimension( affectedDimension );
+				  slicewriter->SetSliceIndex( affectedSlice );
+				  slicewriter->SetTimeStep( positionEvent->GetSender()->GetTimeStep( workingImage ) );
+				  slicewriter->Update();
+			  }
+			  else
+			  {
+				  OverwriteDirectedPlaneImageFilter::Pointer slicewriter = OverwriteDirectedPlaneImageFilter::New();
+				  slicewriter->SetInput( workingImage );
+				  slicewriter->SetCreateUndoInformation( false );
+				  slicewriter->SetSliceImage( m_WorkingSlice );
+				  slicewriter->SetPlaneGeometry3D( m_WorkingSlice->GetGeometry() );
+				  slicewriter->SetTimeStep( positionEvent->GetSender()->GetTimeStep( workingImage ) );
+				  slicewriter->Update();
+			  }
             }
           }
         }

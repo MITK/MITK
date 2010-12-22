@@ -110,6 +110,8 @@ namespace mitk {
 
     static void GlyphMethod(void *arg);
 
+    bool IsPlaneRotated(mitk::BaseRenderer* renderer);
+
   private:
 
     std::vector<vtkPropAssembly*> m_PropAssemblies;

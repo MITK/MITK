@@ -64,8 +64,7 @@ public:
   QList<unsigned int> GetToolsByToolType(QString toolType) const;
   mitk::DataNode* GetNode(unsigned int index) const;
 
-  void ShowToolRepresentationColumn( ); ///< show or hide the tooltable column "Tool Representation"
-
+  
   signals:
     void ToolsAdded(QStringList tools);
     void ToolsChanged();
@@ -75,6 +74,8 @@ public:
 
   public slots:
     void SetDeviceName(const char* dev);  ///< set the device name (e.g. "COM1", "/dev/ttyS0") that will be used to connect to the tracking device
+    void ShowToolRepresentationColumn(); ///< show or hide the tooltable column "Tool Representation". This SLOT should be called after SIGNAL "Connected" is emitted
+  
   protected slots:
     void OnConnect();
     void OnDisconnect();

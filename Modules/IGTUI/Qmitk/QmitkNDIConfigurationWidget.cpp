@@ -300,10 +300,7 @@ void QmitkNDIConfigurationWidget::UpdateToolTable()
       m_Controls->m_ToolTable->setItem(i, QmitkNDIToolDelegate::StatusCol, new QTableWidgetItem("Disabled"));                 // Status
     m_Controls->m_ToolTable->setItem(i, QmitkNDIToolDelegate::NodeCol, new QTableWidgetItem("<click to select node>"));       // Node
     
-     // m_Controls->m_ToolTable->setItem(i, QmitkNDIToolDelegate::RepCol, new QTableWidgetItem("<click to load surface>")); 
- 
-
-    
+         
     /* set read-only/editable flags */
     m_Controls->m_ToolTable->item(i, QmitkNDIToolDelegate::IndexCol)->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsDragEnabled);                        // Index
     m_Controls->m_ToolTable->item(i, QmitkNDIToolDelegate::NodeCol)->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable   | Qt::ItemIsSelectable | Qt::ItemIsDragEnabled);  // Name
@@ -311,7 +308,7 @@ void QmitkNDIConfigurationWidget::UpdateToolTable()
     m_Controls->m_ToolTable->item(i, QmitkNDIToolDelegate::TypeCol)->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable   | Qt::ItemIsSelectable | Qt::ItemIsDragEnabled);  // Type
     m_Controls->m_ToolTable->item(i, QmitkNDIToolDelegate::StatusCol)->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsDragEnabled);                       // Status
     m_Controls->m_ToolTable->item(i, QmitkNDIToolDelegate::NodeCol)->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable   | Qt::ItemIsSelectable | Qt::ItemIsDragEnabled);  // Node
-   // m_Controls->m_ToolTable->item(i, QmitkNDIToolDelegate::RepCol)->setFlags(Qt::ItemIsEnabled);  
+  
  
 
   }
@@ -463,7 +460,6 @@ void QmitkNDIConfigurationWidget::OnTableItemClicked(const QModelIndex & topLeft
 
     if(QFileInfo(filename).exists())
       emit RepresentationChanged( topLeft.row(), filename.toStdString() );
-    
     break;
    default:
     break;  
@@ -601,13 +597,33 @@ void QmitkNDIConfigurationWidget::HideAuroraOptionsGroupbox( bool on )
   m_Controls->m_gbAuroraOptions->setHidden(on);
 }
 
-void QmitkNDIConfigurationWidget::ShowToolRepresentationColumn( )
+void QmitkNDIConfigurationWidget::ShowToolRepresentationColumn()
 {
   int cols = m_Controls->m_ToolTable->columnCount();
+
+  //checking if representation column is inserted at right index
+  if(cols != QmitkNDIToolDelegate::RepCol) 
+  {
+    //throw std::exception("Representation Column is not inserted at it's designated index!");
+    return;
+  }
+  
+
   m_Controls->m_ToolTable->insertColumn(cols); // insert new column at end of table
   
-  m_Controls->m_ToolTable->setHorizontalHeaderItem(cols, new QTableWidgetItem(QString("Representation"))); // inser column header for new colum
-  
+
+  m_Controls->m_ToolTable->setHorizontalHeaderItem(QmitkNDIToolDelegate::RepCol, new QTableWidgetItem(QString("Representation"))); // inser column header for new colum
+  //m_Controls->m_ToolTable->setEditTriggers(QAbstractItemView::EditTrigger::NoEditTriggers);
+
+  int rows = m_Controls->m_ToolTable->rowCount();
+
+ // make all representation colum items not editable
+  for(int i=0; i < rows; ++i) 
+  {
+    m_Controls->m_ToolTable->setItem(i, QmitkNDIToolDelegate::RepCol, new QTableWidgetItem("<click to select representation>"));       // Representation
+    m_Controls->m_ToolTable->item(i,QmitkNDIToolDelegate::RepCol)->setFlags(Qt::NoItemFlags);
+  }
+
   // connect tool table to click slot  
   connect(m_Controls->m_ToolTable, SIGNAL( clicked ( const QModelIndex & )), this, SLOT ( OnTableItemClicked( const QModelIndex & )));
   

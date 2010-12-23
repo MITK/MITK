@@ -183,6 +183,10 @@ namespace mitk
 
     bool m_ButtonBPressed;
 
+    // Default: 1 = relative to object
+    // 2 = relative to camera view
+    int m_SurfaceInteractionMode;
+
     //store all connected Wiimotes
     wiimote m_WiiMotes[4];
     int m_NumberDetectedWiiMotes;

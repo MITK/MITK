@@ -14,7 +14,8 @@ mitk::WiiMoteAllDataEvent::WiiMoteAllDataEvent
  , float pitch
  , float xAcceleration
  , float yAcceleration
- , float zAcceleration)
+ , float zAcceleration
+ , int surfaceInteractionMode)
 : Event(NULL, eventType, mitk::BS_NoButton, mitk::BS_NoButton, Key_none)
 , m_IRDotRawX(0) 
 , m_IRDotRawY(0)
@@ -30,6 +31,7 @@ mitk::WiiMoteAllDataEvent::WiiMoteAllDataEvent
 , m_XAcceleration(xAcceleration)
 , m_YAcceleration(yAcceleration)
 , m_ZAcceleration(zAcceleration)
+, m_SurfaceInteractionMode(surfaceInteractionMode)
 {
 }
 
@@ -177,6 +179,16 @@ float mitk::WiiMoteAllDataEvent::GetZAcceleration() const
   return this->m_ZAcceleration;
 }
 
+void mitk::WiiMoteAllDataEvent::SetSurfaceInteractionMode(int mode)
+{
+  this->m_SurfaceInteractionMode = mode;
+}
+
+int mitk::WiiMoteAllDataEvent::GetSurfaceInteractionMode() const
+{
+  return this->m_SurfaceInteractionMode;
+}
+
 // ------------------------- itk::EventObject Implementation -----------------------
 const char* mitk::WiiMoteAllDataEvent::GetEventName() const
 { 
@@ -202,7 +214,8 @@ itk::EventObject* mitk::WiiMoteAllDataEvent::MakeObject() const
     ,this->GetPitch()
     ,this->GetXAcceleration()
     ,this->GetYAcceleration()
-    ,this->GetZAcceleration()); 
+    ,this->GetZAcceleration()
+    ,this->GetSurfaceInteractionMode() ); 
 } 
 
 

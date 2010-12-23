@@ -23,6 +23,7 @@ mitk::WiiMoteThread::WiiMoteThread()
 , m_InCalibrationMode(false)
 , m_SurfaceInteraction(false)
 , m_ButtonBPressed(false)
+, m_SurfaceInteractionMode(1)
 {
   // used for measuring movement
   m_TimeStep = 0;
@@ -234,6 +235,9 @@ bool mitk::WiiMoteThread::DetectWiiMotes()
 
       result = true;
     } // end else
+
+    itksys::SystemTools::Delay(500);
+
   } // end while
 
   m_NumberDetectedWiiMotes = detected;
@@ -465,6 +469,16 @@ void mitk::WiiMoteThread::SingleWiiMoteUpdate()
       // reset object
       if(m_WiiMotes[0].Button.Home())
         this->WiiMoteButtonPressed(mitk::Key_Home);
+
+      // interaction modes
+
+      // surface interaction relative to object
+      if(m_WiiMotes[0].Button.One())
+        this->m_SurfaceInteractionMode = 1;
+
+      // surface interaction relative to camera
+      if(m_WiiMotes[0].Button.Two())
+        this->m_SurfaceInteractionMode = 2;
     }
     m_WiiMoteThreadFinished->Unlock();
 
@@ -566,7 +580,8 @@ void mitk::WiiMoteThread::SurfaceInteraction()
     , m_WiiMotes[0].Acceleration.Orientation.Pitch
     , m_WiiMotes[0].Acceleration.X
     , m_WiiMotes[0].Acceleration.Y
-    , m_WiiMotes[0].Acceleration.Z );
+    , m_WiiMotes[0].Acceleration.Z
+    , m_SurfaceInteractionMode );
 
   mitk::CallbackFromGUIThread::GetInstance()
     ->CallThisFromGUIThread(m_Command, e.MakeObject());

@@ -72,6 +72,8 @@ void mitk::OpenCVToMitkImageFilter::GenerateData()
 
   else if( m_OpenCVImage->depth == IPL_DEPTH_64F && m_OpenCVImage->nChannels == 3 )
     m_Image = ConvertIplToMitkImage< DoubleRGBPixelType , 2>( rgbOpenCVImage );
+
+  cvReleaseImage(&rgbOpenCVImage);
 }
 
 mitk::ImageSource::DataObjectPointer mitk::OpenCVToMitkImageFilter::MakeOutput( unsigned int idx )

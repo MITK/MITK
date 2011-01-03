@@ -362,7 +362,45 @@ void QmitkTensorReconstructionView::ItkTensorReconstruction
 
       // TENSORS TO DATATREE
       mitk::TensorImage::Pointer image = mitk::TensorImage::New();
-      image->InitializeByItk( tensorReconstructionFilter->GetOutput() );
+
+      typedef itk::Image<itk::DiffusionTensor3D<TTensorPixelType>, 3> TensorImageType;
+      TensorImageType::Pointer tensorImage;
+      tensorImage = tensorReconstructionFilter->GetOutput(); 
+
+      // Check the tensor for negative eigenvalues
+      if(m_Controls->m_CheckNegativeEigenvalues->isChecked())
+      {       
+        
+        typedef itk::ImageRegionIterator<TensorImageType> TensorImageIteratorType;
+        TensorImageIteratorType tensorIt(tensorImage, tensorImage->GetRequestedRegion());
+        tensorIt.GoToBegin();
+        while(!tensorIt.IsAtEnd())
+        {
+
+          typedef itk::DiffusionTensor3D<TTensorPixelType> TensorType;
+          TensorType tensor = tensorIt.Get();
+
+          for(int i=0; i<tensor.GetNumberOfComponents(); i++)
+          {
+            TensorType::EigenValuesArrayType ev;
+            tensor.ComputeEigenValues(ev);
+            
+            for(int i=0; i<ev.Size(); i++)
+            {
+              if(ev[i] < 0)
+              {
+                tensor.Fill(0.0);
+                tensorIt.Set(tensor);
+              }
+            }          
+          }
+
+          ++tensorIt;
+        }
+      }
+
+
+      image->InitializeByItk( tensorImage.GetPointer() );
       image->SetVolume( tensorReconstructionFilter->GetOutput()->GetBufferPointer() );
       mitk::DataNode::Pointer node=mitk::DataNode::New();
       node->SetData( image );

@@ -82,6 +82,13 @@
            </property>
           </widget>
          </item>
+         <item row="2" column="0">
+          <widget class="QCheckBox" name="m_CheckNegativeEigenvalues">
+           <property name="text">
+            <string>Check for negative eigenvalues</string>
+           </property>
+          </widget>
+         </item>
         </layout>
        </widget>
       </item>

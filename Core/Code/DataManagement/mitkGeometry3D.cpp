@@ -595,10 +595,7 @@ mitk::Point3D mitk::Geometry3D::GetCornerPoint(int id) const
       return NULL;
     }
   }
-  if(m_ImageGeometry)
-  {
-    FillVector3D(cornerpoint, cornerpoint[0]-0.5, cornerpoint[1]-0.5, cornerpoint[2]-0.5);
-  }
+
   return m_IndexToWorldTransform->TransformPoint(cornerpoint);
 }
 
@@ -611,10 +608,6 @@ mitk::Point3D mitk::Geometry3D::GetCornerPoint(bool xFront, bool yFront, bool zF
   cornerpoint[0] = (xFront ? bounds[0] : bounds[1]);
   cornerpoint[1] = (yFront ? bounds[2] : bounds[3]);
   cornerpoint[2] = (zFront ? bounds[4] : bounds[5]);
-  if(m_ImageGeometry)
-  {
-    FillVector3D(cornerpoint, cornerpoint[0]-0.5, cornerpoint[1]-0.5, cornerpoint[2]-0.5);
-  }
 
   return m_IndexToWorldTransform->TransformPoint(cornerpoint);
 }
@@ -652,11 +645,13 @@ mitk::Geometry3D::ChangeImageGeometryConsideringOriginOffset( const bool isAnIma
       originIndex[1] - 0.5, 
       originIndex[2] - 0.5 );
 
-  Point3D originWorld; 
+  Point3D originWorld;
+
   originWorld = GetIndexToWorldTransform()
     ->TransformPoint( originIndex );
-
-  SetOrigin(originWorld);
+  // instead could as well call  IndexToWorld(originIndex,originWorld);
+  
+  SetOrigin(originWorld); 
 
   this->SetImageGeometry(isAnImageGeometry);
 }

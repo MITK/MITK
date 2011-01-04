@@ -38,7 +38,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "itkDiffusionTensor3DReconstructionImageFilter.h"
 #include "itkTensorImageToDiffusionImageFilter.h"
 #include "itkPointShell.h"
-#include "itkVector.h"
+//#include "itkVector.h"
 
 #include "mitkTensorImage.h"
 #include "mitkProperties.h"
@@ -384,11 +384,12 @@ void QmitkTensorReconstructionView::ItkTensorReconstruction
         {
 
           typedef itk::DiffusionTensor3D<TTensorPixelType> TensorType;
-          typedef itk::Tensor<TTensorPixelType, 3> TensorType2;
+          //typedef itk::Tensor<TTensorPixelType, 3> TensorType2;
 
           TensorType tensor = tensorIt.Get();
-          TensorType2 tensor2;
+         // TensorType2 tensor2;
 
+          /*
           for(int i=0; i<tensor.GetNumberOfComponents(); i++)
           {
             tensor2.SetNthComponent(i, tensor.GetNthComponent(i));  
@@ -403,9 +404,9 @@ void QmitkTensorReconstructionView::ItkTensorReconstruction
               tensor.Fill(0.0);
               tensorIt.Set(tensor);              
             }            
-          }
+          }*/
 
-          /*
+          
           TensorType::EigenValuesArrayType ev;
           tensor.ComputeEigenValues(ev);        
           for(int i=0; i<ev.Size(); i++)
@@ -417,7 +418,7 @@ void QmitkTensorReconstructionView::ItkTensorReconstruction
               break;
             }
           }          
-          */
+          
 
           ++tensorIt;
         }       

@@ -24,6 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 // itk includes
 #include "itkTimeProbe.h"
+#include "itkTensor.h"
 
 // mitk includes
 #include "mitkProgressBar.h"
@@ -363,40 +364,63 @@ void QmitkTensorReconstructionView::ItkTensorReconstruction
       // TENSORS TO DATATREE
       mitk::TensorImage::Pointer image = mitk::TensorImage::New();
 
-      typedef itk::Image<itk::DiffusionTensor3D<TTensorPixelType>, 3> TensorImageType;
+      
+      typedef itk::Image<itk::DiffusionTensor3D<TTensorPixelType>, 3> TensorImageType;      
+
       TensorImageType::Pointer tensorImage;
       tensorImage = tensorReconstructionFilter->GetOutput(); 
 
+      
+
+
       // Check the tensor for negative eigenvalues
       if(m_Controls->m_CheckNegativeEigenvalues->isChecked())
-      {       
-        
+      {               
         typedef itk::ImageRegionIterator<TensorImageType> TensorImageIteratorType;
         TensorImageIteratorType tensorIt(tensorImage, tensorImage->GetRequestedRegion());
         tensorIt.GoToBegin();
+
         while(!tensorIt.IsAtEnd())
         {
 
           typedef itk::DiffusionTensor3D<TTensorPixelType> TensorType;
+          typedef itk::Tensor<TTensorPixelType, 3> TensorType2;
+
           TensorType tensor = tensorIt.Get();
+          TensorType2 tensor2;
 
           for(int i=0; i<tensor.GetNumberOfComponents(); i++)
           {
-            TensorType::EigenValuesArrayType ev;
-            tensor.ComputeEigenValues(ev);
-            
-            for(int i=0; i<ev.Size(); i++)
-            {
-              if(ev[i] < 0)
-              {
-                tensor.Fill(0.0);
-                tensorIt.Set(tensor);
-              }
-            }          
+            tensor2.SetNthComponent(i, tensor.GetNthComponent(i));  
+          }
+        
+          typedef vnl_symmetric_eigensystem< TTensorPixelType >  SymEigenSystemType;
+          SymEigenSystemType eig (tensor2.GetVnlMatrix());         
+          for(unsigned int i=0; i<eig.D.size(); i++)
+          {
+            if (eig.D[i] < 0.0 )
+            {                       
+              tensor.Fill(0.0);
+              tensorIt.Set(tensor);              
+            }            
           }
 
+          /*
+          TensorType::EigenValuesArrayType ev;
+          tensor.ComputeEigenValues(ev);        
+          for(int i=0; i<ev.Size(); i++)
+          {
+            if(ev[i] < 0.0)
+            {
+              tensor.Fill(0.0);
+              tensorIt.Set(tensor);              
+              break;
+            }
+          }          
+          */
+
           ++tensorIt;
-        }
+        }       
       }
 
 

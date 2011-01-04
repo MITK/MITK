@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>267</width>
-    <height>662</height>
+    <width>288</width>
+    <height>672</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -280,8 +280,14 @@
    </item>
    <item>
     <widget class="QCheckBox" name="m_TeemToggle">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
      <property name="text">
       <string>Teem Reconstruction</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
      </property>
     </widget>
    </item>

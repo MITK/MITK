@@ -24,7 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 // itk includes
 #include "itkTimeProbe.h"
-#include "itkTensor.h"
+//#include "itkTensor.h"
 
 // mitk includes
 #include "mitkProgressBar.h"
@@ -38,7 +38,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "itkDiffusionTensor3DReconstructionImageFilter.h"
 #include "itkTensorImageToDiffusionImageFilter.h"
 #include "itkPointShell.h"
-//#include "itkVector.h"
+#include "itkVector.h"
 
 #include "mitkTensorImage.h"
 #include "mitkProperties.h"

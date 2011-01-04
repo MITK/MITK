@@ -409,7 +409,7 @@ void QmitkTensorReconstructionView::ItkTensorReconstruction
           
           TensorType::EigenValuesArrayType ev;
           tensor.ComputeEigenValues(ev);        
-          for(int i=0; i<ev.Size(); i++)
+          for(unsigned int i=0; i<ev.Size(); i++)
           {
             if(ev[i] < 0.0)
             {

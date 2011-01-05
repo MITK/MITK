@@ -206,7 +206,7 @@ bool DicomSeriesReader::ReadPhilips3DDicom(const std::string &filename, mitk::Im
   const char *new_pixels = bv->GetPointer();
 
   // Create MITK Image + Geometry
-  typedef itk::Image<UCHAR, 4> ImageType;   //Pixeltype might be different sometimes? Maybe read it out from header
+  typedef itk::Image<unsigned char, 4> ImageType;   //Pixeltype might be different sometimes? Maybe read it out from header
   ImageType::RegionType myRegion;
   ImageType::SizeType mySize;
   ImageType::IndexType myIndex;
@@ -249,7 +249,7 @@ bool DicomSeriesReader::ReadPhilips3DDicom(const std::string &filename, mitk::Im
 
     iterator.Set( new_pixels[ adressedPixel ] );
     pixCount++;             
-    iterator++;
+    ++iterator;
 
     if (pixCount == planeSize)
     {

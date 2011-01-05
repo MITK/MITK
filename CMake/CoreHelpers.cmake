@@ -514,13 +514,13 @@ IF(NOT _qt_is_system_qt)
       INSTALL(DIRECTORY "${QT_PLUGINS_DIR}"
         DESTINATION ${${_target_location}_qt_plugins_install_dir}
           CONFIGURATIONS Release
-          FILES_MATCHING REGEX "[^d]4?\\${CMAKE_SHARED_LIBRARY_SUFFIX}$"
+          FILES_MATCHING REGEX "[^d]4?\\${CMAKE_SHARED_LIBRARY_SUFFIX}"
           )
 
       INSTALL(DIRECTORY "${QT_PLUGINS_DIR}"
         DESTINATION ${${_target_location}_qt_plugins_install_dir}
           CONFIGURATIONS Debug
-          FILES_MATCHING REGEX "d4?\\${CMAKE_SHARED_LIBRARY_SUFFIX}$"
+          FILES_MATCHING REGEX "d4?\\${CMAKE_SHARED_LIBRARY_SUFFIX}"
           )
 
   ENDIF(QT_PLUGINS_DIR)
@@ -635,13 +635,13 @@ FOREACH(_target_location ${_target_locations})
         INSTALL(DIRECTORY "${QT_PLUGINS_DIR}"
           DESTINATION ${${_target_location}_qt_plugins_install_dir}
             CONFIGURATIONS Release
-            FILES_MATCHING REGEX "[^d]4?\\${CMAKE_SHARED_LIBRARY_SUFFIX}$"
+            FILES_MATCHING REGEX "[^d]4?\\${CMAKE_SHARED_LIBRARY_SUFFIX}"
             )
 
         INSTALL(DIRECTORY "${QT_PLUGINS_DIR}"
           DESTINATION ${${_target_location}_qt_plugins_install_dir}
             CONFIGURATIONS Debug
-            FILES_MATCHING REGEX "d4?\\${CMAKE_SHARED_LIBRARY_SUFFIX}$"
+            FILES_MATCHING REGEX "d4?\\${CMAKE_SHARED_LIBRARY_SUFFIX}"
             )
 
     ENDIF(QT_PLUGINS_DIR)

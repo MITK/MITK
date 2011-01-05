@@ -229,6 +229,25 @@ void mitk::DataNodeFactory::ReadFileSeriesTypeDCM()
   std::locale l( "C" );
   std::cin.imbue(l);
 
+  #if GDCM_MAJOR_VERSION >= 2
+  if (  DicomSeriesReader::IsPhilips3DDicom(this->GetFileName()) )
+  {
+    MITK_INFO << "it is a Philips3D US Dicom file" << std::endl;
+    this->ResizeOutputs(1);
+    DataNode::Pointer node = this->GetOutput(0);
+    mitk::DicomSeriesReader::StringContainer stringvec;
+    stringvec.push_back(this->GetFileName());
+    if (DicomSeriesReader::LoadDicomSeries(stringvec, *node))
+    {
+      node->SetName(this->GetBaseFileName());
+    }
+    setlocale(LC_NUMERIC, previousCLocale);
+    std::cin.imbue(previousCppLocale);
+    return;
+
+  }
+  #endif
+      
   DicomSeriesReader::UidFileNamesMap names_map = DicomSeriesReader::GetSeries(this->GetDirectory(), this->m_UseSeriesDetails, this->m_SeriesRestrictions);
   const unsigned int size = names_map.size();
 
@@ -244,7 +263,7 @@ void mitk::DataNodeFactory::ReadFileSeriesTypeDCM()
     const std::string &uid = n_it->first;
     DataNode::Pointer node = this->GetOutput(i);
 
-    MITK_INFO << "Reading series #" << i << ": " << uid << std::endl;
+    MITK_INFO << "Readng series #" << i << ": " << uid << std::endl;
 
     if (DicomSeriesReader::LoadDicomSeries(n_it->second, *node))
     {

@@ -472,6 +472,10 @@ IF(APPLE)
   LIST(APPEND DIRS "/usr/lib")
 ENDIF(APPLE)
 
+if(QT_LIBRARY_DIR MATCHES "^(/lib/|/lib32/|/lib64/|/usr/lib/|/usr/lib32/|/usr/lib64/|/usr/X11R6/)")
+  set(_qt_is_system_qt 1)
+endif()
+
 FOREACH(_target ${_install_EXECUTABLES})
 
 SET(_qt_plugins_install_dirs "")
@@ -505,25 +509,29 @@ ENDIF()
 
 FOREACH(_target_location ${_target_locations})
 
-IF(QT_PLUGINS_DIR)
-    INSTALL(DIRECTORY "${QT_PLUGINS_DIR}" 
-	    DESTINATION ${${_target_location}_qt_plugins_install_dir} 
-		    CONFIGURATIONS Release
-		    FILES_MATCHING REGEX "[^d]4?\\${CMAKE_SHARED_LIBRARY_SUFFIX}$"
-		    )
-		    
-    INSTALL(DIRECTORY "${QT_PLUGINS_DIR}" 
-	    DESTINATION ${${_target_location}_qt_plugins_install_dir} 
-		    CONFIGURATIONS Debug
-		    FILES_MATCHING REGEX "d4?\\${CMAKE_SHARED_LIBRARY_SUFFIX}$"
-		    )
+IF(NOT _qt_is_system_qt)
+  IF(QT_PLUGINS_DIR)
+      INSTALL(DIRECTORY "${QT_PLUGINS_DIR}"
+        DESTINATION ${${_target_location}_qt_plugins_install_dir}
+          CONFIGURATIONS Release
+          FILES_MATCHING REGEX "[^d]4?\\${CMAKE_SHARED_LIBRARY_SUFFIX}$"
+          )
 
-ENDIF(QT_PLUGINS_DIR)
+      INSTALL(DIRECTORY "${QT_PLUGINS_DIR}"
+        DESTINATION ${${_target_location}_qt_plugins_install_dir}
+          CONFIGURATIONS Debug
+          FILES_MATCHING REGEX "d4?\\${CMAKE_SHARED_LIBRARY_SUFFIX}$"
+          )
+
+  ENDIF(QT_PLUGINS_DIR)
+ENDIF(NOT _qt_is_system_qt)
+
 
   _fixup_target()
 ENDFOREACH(_target_location)
 
 
+IF(NOT _qt_is_system_qt)
   #--------------------------------------------------------------------------------
   # install a qt.conf file
   # this inserts some cmake code into the install script to write the file
@@ -540,6 +548,7 @@ Prefix=${_qt_conf_plugin_install_prefix}
 \")
 	")
   ENDFOREACH()
+ENDIF(NOT _qt_is_system_qt)
 
 
 
@@ -572,6 +581,10 @@ SET(DIRS
   ${MITK_BINARY_DIR}/bin/${intermediate_dir} 
   ${_install_LIBRARY_DIRS}
   )
+
+if(QT_LIBRARY_DIR MATCHES "^(/lib/|/lib32/|/lib64/|/usr/lib/|/usr/lib32/|/usr/lib64/|/usr/X11R6/)")
+  set(_qt_is_system_qt 1)
+endif()
 
 FOREACH(_target ${_install_EXECUTABLES})
 
@@ -616,25 +629,29 @@ ENDIF()
 
 
 FOREACH(_target_location ${_target_locations})
+  IF(NOT _qt_is_system_qt)
 
-IF(QT_PLUGINS_DIR)
-    INSTALL(DIRECTORY "${QT_PLUGINS_DIR}" 
-	    DESTINATION ${${_target_location}_qt_plugins_install_dir} 
-		    CONFIGURATIONS Release
-		    FILES_MATCHING REGEX "[^d]4?\\${CMAKE_SHARED_LIBRARY_SUFFIX}$"
-		    )
-		    
-    INSTALL(DIRECTORY "${QT_PLUGINS_DIR}" 
-	    DESTINATION ${${_target_location}_qt_plugins_install_dir} 
-		    CONFIGURATIONS Debug
-		    FILES_MATCHING REGEX "d4?\\${CMAKE_SHARED_LIBRARY_SUFFIX}$"
-		    )
+    IF(QT_PLUGINS_DIR)
+        INSTALL(DIRECTORY "${QT_PLUGINS_DIR}"
+          DESTINATION ${${_target_location}_qt_plugins_install_dir}
+            CONFIGURATIONS Release
+            FILES_MATCHING REGEX "[^d]4?\\${CMAKE_SHARED_LIBRARY_SUFFIX}$"
+            )
 
-ENDIF(QT_PLUGINS_DIR)
+        INSTALL(DIRECTORY "${QT_PLUGINS_DIR}"
+          DESTINATION ${${_target_location}_qt_plugins_install_dir}
+            CONFIGURATIONS Debug
+            FILES_MATCHING REGEX "d4?\\${CMAKE_SHARED_LIBRARY_SUFFIX}$"
+            )
+
+    ENDIF(QT_PLUGINS_DIR)
+  ENDIF(NOT _qt_is_system_qt)
 
   _fixup_target()
 ENDFOREACH(_target_location)
 
+
+IF(NOT _qt_is_system_qt)
 
   #--------------------------------------------------------------------------------
   # install a qt.conf file
@@ -653,6 +670,7 @@ Prefix=${_qt_conf_plugin_install_prefix}
 	")
   ENDFOREACH()
 
+ENDIF(NOT _qt_is_system_qt)
 
 
 

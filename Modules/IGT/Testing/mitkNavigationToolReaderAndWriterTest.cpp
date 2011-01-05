@@ -100,15 +100,16 @@ class mitkNavigationToolReaderAndWriterTestClass
 
     static void TestRead()
     {
-    /*
-    mitk::DataStorage::Pointer testStorage = mitk::StandaloneDataStorage::New(); TODO: DIESE STELLE UNTER LINUX ZUM LAUFEN BRINGEN
+    mitk::DataStorage::Pointer testStorage = mitk::StandaloneDataStorage::New();
     mitk::NavigationToolReader::Pointer myReader = mitk::NavigationToolReader::New(testStorage);
     mitk::NavigationTool::Pointer readTool = myReader->DoRead(mitk::StandardFileLocations::GetInstance()->GetOptionDirectory()+Poco::Path::separator()+".."+Poco::Path::separator()+"TestTool.tool");
     MITK_TEST_OUTPUT(<<"---- Testing navigation tool reader ----");
+
+    //Test if there was created a new tool
     MITK_TEST_CONDITION_REQUIRED(readTool->GetDataNode() == testStorage->GetNamedNode(readTool->GetDataNode()->GetName()),"Test if tool was added to storage...");
-    MITK_TEST_CONDITION_REQUIRED(readTool->GetDataNode()->GetData()==testSurface,"Test if surface was restored correctly ...");
-    */
-    //MITK_TEST_CONDITION_REQUIRED();
+    
+    //Test if the surfaces do have the same number of vertexes (it would be better to test for real equality of the surfaces!)
+    MITK_TEST_CONDITION_REQUIRED(dynamic_cast<mitk::Surface*>(readTool->GetDataNode()->GetData())->GetSizeOfPolyDataSeries()==testSurface->GetSizeOfPolyDataSeries(),"Test if surface was restored correctly ...");
     }
 
     static void CleanUp()
@@ -127,7 +128,7 @@ int mitkNavigationToolReaderAndWriterTest(int /* argc */, char* /*argv*/[])
 
   mitkNavigationToolReaderAndWriterTestClass::TestInstantiation();
   mitkNavigationToolReaderAndWriterTestClass::TestWrite();
-  //mitkNavigationToolReaderAndWriterTestClass::TestRead();
+  mitkNavigationToolReaderAndWriterTestClass::TestRead();
   mitkNavigationToolReaderAndWriterTestClass::CleanUp();
 
 

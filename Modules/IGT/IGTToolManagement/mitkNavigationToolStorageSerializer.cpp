@@ -47,7 +47,7 @@ bool mitk::NavigationToolStorageSerializer::Serialize(std::string filename, mitk
     }
 
   //use SceneSerialization to save the DataStorage
-  std::string DataStorageFileName = mitk::StandardFileLocations::GetInstance()->GetOptionDirectory() + "\\" + myToolWriter->GetFileWithoutPath(filename) + ".storage";
+  std::string DataStorageFileName = mitk::StandardFileLocations::GetInstance()->GetOptionDirectory() + Poco::Path::separator() + myToolWriter->GetFileWithoutPath(filename) + ".storage";
   mitk::SceneIO::Pointer mySceneIO = mitk::SceneIO::New();
   mySceneIO->SaveScene(saveStorage->GetAll(),saveStorage,DataStorageFileName);
 

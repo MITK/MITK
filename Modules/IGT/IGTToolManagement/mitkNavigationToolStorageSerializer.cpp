@@ -66,7 +66,10 @@ bool mitk::NavigationToolStorageSerializer::Serialize(std::string filename, mitk
       {
       //check if filename already exits
       for (int j=0; j<i; j++) if (myToolWriter->GetFileWithoutPath(storage->GetTool(i)->GetCalibrationFile()) == myToolWriter->GetFileWithoutPath(storage->GetTool(j)->GetCalibrationFile())) break;
-      zipper.addFile(storage->GetTool(i)->GetCalibrationFile(),myToolWriter->GetFileWithoutPath(storage->GetTool(i)->GetCalibrationFile()));
+      
+      //add calibration file to zip archive
+      std::string calibrationFile = storage->GetTool(i)->GetCalibrationFile();
+      if (calibrationFile!="") zipper.addFile(calibrationFile,myToolWriter->GetFileWithoutPath(storage->GetTool(i)->GetCalibrationFile()));
       }
     zipper.close();
     }

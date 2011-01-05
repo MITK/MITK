@@ -73,7 +73,8 @@ mitk::DataNode::Pointer mitk::NavigationToolWriter::ConvertToDataNode(mitk::Navi
   {
   mitk::DataNode::Pointer thisTool = mitk::DataNode::New();
   //Name
-    thisTool->SetName(Tool->GetDataNode()->GetName().c_str());
+    if (Tool->GetDataNode().IsNull()) thisTool->SetName("none");
+    else thisTool->SetName(Tool->GetDataNode()->GetName().c_str());
   //Identifier
     thisTool->AddProperty("identifier",mitk::StringProperty::New(Tool->GetIdentifier().c_str()));
   //Serial Number
@@ -85,7 +86,7 @@ mitk::DataNode::Pointer mitk::NavigationToolWriter::ConvertToDataNode(mitk::Navi
   //Calibration File Name
     thisTool->AddProperty("toolfileName",mitk::StringProperty::New(GetFileWithoutPath(Tool->GetCalibrationFile())));
   //Surface
-    thisTool->SetData(Tool->GetDataNode()->GetData());
+    if (Tool->GetDataNode().IsNotNull()) if (Tool->GetDataNode()->GetData()!=NULL) thisTool->SetData(Tool->GetDataNode()->GetData());
 
   //Material is not needed, to avoid errors in scene serialization we have to do this:
     //thisTool->ReplaceProperty("material",NULL);

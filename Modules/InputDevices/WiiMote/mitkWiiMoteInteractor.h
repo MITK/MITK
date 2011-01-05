@@ -60,6 +60,10 @@ private:
   float m_yVelocity;
   float m_zVelocity;
 
+  float m_xValue;
+  float m_yValue;
+  float m_zValue;
+
   // refering to an angle around an axis
   // which is defined in the wiimote
   ScalarType m_xAngle;

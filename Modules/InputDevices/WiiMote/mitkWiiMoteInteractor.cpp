@@ -25,7 +25,7 @@
 #define _USE_MATH_DEFINES // otherwise, constants will not work
 #include <math.h>
 
-
+const double DELTATIME = 0.01;
 
 mitk::WiiMoteInteractor::WiiMoteInteractor(const char* type, DataNode* dataNode)
 : Interactor(type, dataNode)
@@ -38,6 +38,9 @@ mitk::WiiMoteInteractor::WiiMoteInteractor(const char* type, DataNode* dataNode)
 , m_xAngle (0)
 , m_yAngle (0)
 , m_zAngle (0)
+, m_xValue (0)
+, m_yValue (0)
+, m_zValue (0)
 , m_InRotation(false)
 , m_TranslationMode(1)
 , m_OriginalGeometry(NULL)
@@ -135,13 +138,15 @@ bool mitk::WiiMoteInteractor::OnWiiMoteInput(Action* action, const mitk::StateEv
   //this->FixedRotationAndTranslation(wiiMoteEvent);
 
   // -------------------- values for translation --------------------
-  float xValue = wiiMoteEvent->GetXAcceleration();
-  float yValue = wiiMoteEvent->GetYAcceleration();
-  float zValue = wiiMoteEvent->GetZAcceleration();
+  float xAccel = wiiMoteEvent->GetXAcceleration();
+  float yAccel = wiiMoteEvent->GetYAcceleration();
+  float zAccel = wiiMoteEvent->GetZAcceleration();
 
   float pitch = wiiMoteEvent->GetPitch();
   float roll = wiiMoteEvent->GetRoll();
 
+  m_OrientationX = wiiMoteEvent->GetOrientationX();
+  m_OrientationY = wiiMoteEvent->GetOrientationY();
   m_OrientationZ = wiiMoteEvent->GetOrientationZ();
 
   // substracts the proportionate force 
@@ -156,40 +161,40 @@ bool mitk::WiiMoteInteractor::OnWiiMoteInput(Action* action, const mitk::StateEv
   // x acceleration
   if(m_OrientationZ >= 0)
   {
-    xValue = xValue - sinR * cosP;
+    m_xValue = xAccel - sinR * cosP;
   }
   else
   {
-    xValue = xValue + sinR * cosP;
+    m_xValue = xAccel + sinR * cosP;
   }
 
   // against drift
-  if(std::abs(xValue) < 0.2)
+  if(std::abs(xAccel) < 0.2)
   {
-    xValue = 0;
+    m_xValue = 0;
   }
 
   // y acceleration
-  yValue = yValue + sinP;
+  m_yValue = yAccel + sinP;
 
   // against drift
-  if(std::abs(yValue) < 0.2)
+  if(std::abs(yAccel) < 0.2)
   {
-    yValue = 0;
+    m_yValue = 0;
   }
 
   // z acceleration
-  zValue = zValue - cosP * cosR;
+  m_zValue = zAccel - cosP * cosR;
 
   // against drift
-  if(std::abs(zValue) < 0.3)
+  if(std::abs(zAccel) < 0.3)
   {
-    zValue = 0;
+    m_zValue = 0;
   }
 
-  //m_xVelocity += xValue;
-  //m_yVelocity += yValue;
-  //m_zVelocity -= zValue;
+  //m_xVelocity += m_xValue;
+  //m_yVelocity += m_yValue;
+  //m_zVelocity -= m_zValue;
 
   // -------------------- values for rotation --------------------
 
@@ -204,11 +209,11 @@ bool mitk::WiiMoteInteractor::OnWiiMoteInput(Action* action, const mitk::StateEv
   {
     if(m_SurfaceInteractionMode == 1)
     {
-      m_xAngle = (pitchSpeed / 100);
+      m_xAngle = (pitchSpeed * DELTATIME);
     }
     else
     {
-      m_xAngle = (-pitchSpeed / 100);
+      m_xAngle = (-pitchSpeed * DELTATIME);
     }
   }
   else
@@ -221,7 +226,7 @@ bool mitk::WiiMoteInteractor::OnWiiMoteInput(Action* action, const mitk::StateEv
   if(std::abs(rollSpeed) > 50
     && std::abs(rollSpeed) < 1000)
   {
-    m_yAngle = (rollSpeed / 100);
+    m_yAngle = (rollSpeed * DELTATIME);
   }
   else
   {
@@ -235,11 +240,11 @@ bool mitk::WiiMoteInteractor::OnWiiMoteInput(Action* action, const mitk::StateEv
   {
     if(m_SurfaceInteractionMode == 1)
     {
-      m_zAngle = (yawSpeed / 100);
+      m_zAngle = (yawSpeed * DELTATIME);
     }
     else
     {
-      m_zAngle = (-yawSpeed / 100);
+      m_zAngle = (-yawSpeed * DELTATIME);
     }
   }
   else
@@ -261,6 +266,10 @@ bool mitk::WiiMoteInteractor::OnWiiMoteReleaseButton(Action* action, const mitk:
   m_xVelocity = 0;
   m_yVelocity = 0;
   m_zVelocity = 0;
+
+  m_xValue = 0;
+  m_yValue = 0;
+  m_zValue = 0;
 
   m_xAngle = 0;
   m_yAngle = 0;
@@ -348,23 +357,41 @@ vnl_matrix_fixed<double, 4, 4> mitk::WiiMoteInteractor::ComputeCurrentCameraPosi
 
 bool mitk::WiiMoteInteractor::DynamicRotationAndTranslation(Geometry3D* geometry)
 {
-  
-
    // computation of the delta transformation
   if(m_SurfaceInteractionMode == 1)
   {
     // necessary because the wiimote has
     // a different orientation when loaded
+    // as an object file
     ScalarType temp = m_yAngle;
     m_yAngle = m_zAngle;
     m_zAngle = temp;
   }
 
+  //vnl_quaternion<double> Rx(m_OrientationX
+  //  ,m_OrientationY
+  //  ,m_OrientationZ
+  //  , m_xAngle);
+
+  //vnl_quaternion<double> Ry(Rx.axis()[0]
+  //  , Rx.axis()[1]
+  //  , Rx.axis()[2]
+  //  , m_yAngle);
+
+  //vnl_quaternion<double> Rz(Ry.axis()[0]
+  //  , Ry.axis()[1]
+  //  , Ry.axis()[2]
+  //  , m_zAngle);
+
+
   vnl_quaternion<double> q( 
     vtkMath::RadiansFromDegrees( m_xAngle ), 
     vtkMath::RadiansFromDegrees( m_yAngle ), 
     vtkMath::RadiansFromDegrees( m_zAngle ) );
+ 
+  //q = Rz * Ry * Rx;
   //q.normalize();
+
   vnl_matrix_fixed<double, 4, 4> deltaTransformMat = q.rotation_matrix_transpose_4();
 
   // fill translation column
@@ -418,23 +445,6 @@ bool mitk::WiiMoteInteractor::DynamicRotationAndTranslation(Geometry3D* geometry
     cameraMat = this->ComputeCurrentCameraPosition(camera);
 
     vnl_matrix_fixed<double, 4, 4> newObjectMat;
-    //vnl_matrix_fixed<double, 4, 4> newCameraMat;
-    //vnl_matrix_fixed<double, 4, 4> newCameraMatInverse;
-    //vnl_matrix_fixed<double, 4, 4> newObjectToCameraMat; 
-    //vnl_matrix_fixed<double, 4, 4> deltaObjectMat;
-
-    //newCameraMat = cameraMat * deltaTransformMat; 
-
-    //newCameraMatInverse = vnl_inverse(newCameraMat);
-
-    //newObjectToCameraMat = newCameraMatInverse * objectMat;
-
-    //newObjectMat = cameraMat * newObjectToCameraMat;
-
-    //deltaObjectMat = vnl_inverse(newObjectMat) * objectMat;
-
-    //deltaObjectMat = vnl_inverse(deltaObjectMat);
-
     vnl_matrix_fixed<double, 4, 4> objectToCameraMat;
 
     objectToCameraMat = vnl_inverse(cameraMat) * objectMat;

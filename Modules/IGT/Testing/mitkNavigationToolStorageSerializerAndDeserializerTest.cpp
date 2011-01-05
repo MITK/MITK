@@ -75,11 +75,17 @@ class NavigationToolStorageSerializerAndDeserializerTestClass
     mitk::NavigationToolStorage::Pointer readStorage = myDeserializer->Deserialize(mitk::StandardFileLocations::GetInstance()->GetOptionDirectory()+Poco::Path::separator()+".."+Poco::Path::separator()+"TestStorage.storage");
     MITK_TEST_CONDITION_REQUIRED(readStorage.IsNotNull(),"Testing deserialization of tool storage");
     MITK_TEST_CONDITION_REQUIRED(readStorage->GetToolCount()==3,"Testing number of tools in storage");
-    bool allToolsCorrect = true; //TODO: why is the order of tools changed is save/load process??
-    if (!(readStorage->GetTool(0)->GetIdentifier()=="001")) allToolsCorrect = false;
-    if (!(readStorage->GetTool(1)->GetIdentifier()=="003")) allToolsCorrect = false;
-    if (!(readStorage->GetTool(2)->GetIdentifier()=="002")) allToolsCorrect = false;
-    MITK_TEST_CONDITION_REQUIRED(allToolsCorrect,"Testing if identifiers of tools where saved / loaded successfully");
+    //TODO: why is the order of tools changed is save/load process??
+    bool foundtool1 = false;
+    bool foundtool2 = false;
+    bool foundtool3 = false;
+    for(int i=0; i<3; i++)
+      {
+      if ((readStorage->GetTool(i)->GetIdentifier()=="001")) foundtool1 = true;
+      else if ((readStorage->GetTool(i)->GetIdentifier()=="002")) foundtool2 = true;
+      else if ((readStorage->GetTool(i)->GetIdentifier()=="003")) foundtool3 = true;
+      }
+    MITK_TEST_CONDITION_REQUIRED(foundtool1&&foundtool2&&foundtool3,"Testing if identifiers of tools where saved / loaded successfully");
     }
 
     static void CleanUp()

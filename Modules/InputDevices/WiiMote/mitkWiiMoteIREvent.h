@@ -30,7 +30,9 @@ namespace mitk
     * @param recordTime
     *          the time at which the data was recorded
     */
-    WiiMoteIREvent(mitk::Vector2D inputData, double recordTime);
+    WiiMoteIREvent( mitk::Vector2D inputData
+      , double recordTime
+      , int sliceNavigationValue);
     
     ~WiiMoteIREvent();
 
@@ -39,7 +41,8 @@ namespace mitk
     * in the following order: x, y, z
     */
     mitk::Vector2D GetMovementVector() const;
-    double GetRecordTime();
+    double GetRecordTime() const;
+    int GetSliceNavigationValue() const;
 
     //itk::EventObject implementation
     const char * GetEventName() const; 
@@ -50,6 +53,7 @@ namespace mitk
 
     mitk::Vector2D m_MovementVector;
     double m_RecordTime;
+    int m_SliceNavigationValue;
 
   }; // end class
 } // end namespace mitk

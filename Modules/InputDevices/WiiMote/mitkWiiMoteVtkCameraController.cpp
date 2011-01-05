@@ -3,8 +3,8 @@
 #include "mitkGlobalInteraction.h"
 #include "mitkInteractionConst.h"
 #include "mitkStateEvent.h"
+#include "mitkSurface.h"
 
-#include "mitkBaseRenderer.h"
 #include "mitkVtkPropRenderer.h"
 #include "vtkRenderer.h"
 #include "vtkCamera.h"
@@ -31,6 +31,7 @@ mitk::WiiMoteVtkCameraController::WiiMoteVtkCameraController()
 , m_SensitivityX (0)
 , m_SensitivityY (0)
 , m_Calibrated (false)
+, m_TransversalBR( NULL )
 {
   CONNECT_ACTION(mitk::AcONWIIMOTEINPUT, OnWiiMoteInput);
   CONNECT_ACTION(mitk::AcRESETVIEW, ResetView);
@@ -67,16 +68,16 @@ bool mitk::WiiMoteVtkCameraController::OnWiiMoteInput(mitk::Action* a, const mit
   if(!m_ClippingRangeIsSet)
     vtkCam->SetClippingRange(0.1, 1000);
 
-  const mitk::WiiMoteIREvent* WiiMoteIREvent;
+  const mitk::WiiMoteIREvent* wiiMoteIREvent;
 
-  if(!(WiiMoteIREvent = dynamic_cast<const mitk::WiiMoteIREvent*>(e->GetEvent())))
+  if(!(wiiMoteIREvent = dynamic_cast<const mitk::WiiMoteIREvent*>(e->GetEvent())))
   {
     MITK_ERROR << "Not a WiiMote Event!";
     return false;
   }
 
   // get data from the Wiimote
-  mitk::Vector2D tempMovementVector(WiiMoteIREvent->GetMovementVector());
+  mitk::Vector2D tempMovementVector(wiiMoteIREvent->GetMovementVector());
   float inputCoordinates[3] = {tempMovementVector[0],tempMovementVector[1], 0};
   mitk::Vector3D movementVector(inputCoordinates);
 
@@ -176,7 +177,58 @@ bool mitk::WiiMoteVtkCameraController::OnWiiMoteInput(mitk::Action* a, const mit
   //This ensures that no props are cut off
   vtkRenderer->ResetCameraClippingRange();
 
-  mitk::RenderingManager::GetInstance()->RequestUpdate(mitk::GlobalInteraction::GetInstance()->GetFocus()->GetRenderWindow());
+  // ------------ transversal scrolling -----------------------
+
+  // get renderer
+  const RenderingManager::RenderWindowVector& renderWindows 
+    = RenderingManager::GetInstance()->GetAllRegisteredRenderWindows();
+  for ( RenderingManager::RenderWindowVector::const_iterator iter = renderWindows.begin();
+    iter != renderWindows.end(); 
+    ++iter )
+  {
+    if ( mitk::BaseRenderer::GetInstance((*iter))->GetMapperID() == BaseRenderer::Standard2D )
+    {
+      if( mitk::BaseRenderer::GetInstance((*iter))->GetSliceNavigationController()
+        ->GetViewDirection() == mitk::SliceNavigationController::ViewDirection::Transversal )
+      {
+        m_TransversalBR = mitk::BaseRenderer::GetInstance((*iter));
+      }
+    }
+  }  
+
+  // adapting slice navigation
+  // sensitivity according to 
+  // slice numbers
+  SlicedGeometry3D* slicedWorldGeometry
+    = dynamic_cast<SlicedGeometry3D*>
+    (m_TransversalBR->GetSliceNavigationController()->GetCreatedWorldGeometry()->GetGeometry3D(m_TimeStep));
+
+  int sliceNumber = slicedWorldGeometry->GetSlices();
+
+  const mitk::Geometry2D* currentGeo = m_TransversalBR->GetCurrentWorldGeometry2D();
+  mitk::Point3D origin = currentGeo->GetOrigin();
+
+  int sliceValue = wiiMoteIREvent->GetSliceNavigationValue();
+  int adaptedValue = sliceValue * (sliceNumber / YMAX * 3);
+
+  if(sliceValue > 0)
+  {
+    origin.SetElement(2,adaptedValue);
+  }
+
+  //if(sliceValue > 0)
+  //{
+  //  origin.SetElement(2,origin.GetElement(2)+adaptedValue);
+  //}
+  //else if(sliceValue < 0)
+  //{
+  //  origin.SetElement(2,origin.GetElement(2)-adaptedValue);
+  //}
+
+  m_TransversalBR->GetSliceNavigationController()->SelectSliceByPoint(origin);
+
+  mitk::RenderingManager::GetInstance()
+    ->RequestUpdateAll();
 
   return true;
 }

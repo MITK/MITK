@@ -100,7 +100,7 @@ class mitkNavigationToolReaderAndWriterTestClass
 
     static void TestRead()
     {
-    mitk::DataStorage::Pointer testStorage = mitk::StandaloneDataStorage::New();
+    mitk::DataStorage::Pointer testStorage = dynamic_cast<mitk::DataStorage*>(mitk::StandaloneDataStorage::New().GetPointer());
     mitk::NavigationToolReader::Pointer myReader = mitk::NavigationToolReader::New(testStorage);
     mitk::NavigationTool::Pointer readTool = myReader->DoRead(mitk::StandardFileLocations::GetInstance()->GetOptionDirectory()+Poco::Path::separator()+".."+Poco::Path::separator()+"TestTool.tool");
     MITK_TEST_OUTPUT(<<"---- Testing navigation tool reader ----");

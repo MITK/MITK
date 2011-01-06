@@ -595,7 +595,12 @@ mitk::Point3D mitk::Geometry3D::GetCornerPoint(int id) const
       return NULL;
     }
   }
-
+  if(m_ImageGeometry)
+  {
+    // Here i have to adjust the 0.5 offset manually, because the cornerpoint is the corner of the
+    // bounding box. The bounding box itself is no image, so it is corner-based
+    FillVector3D(cornerpoint, cornerpoint[0]-0.5, cornerpoint[1]-0.5, cornerpoint[2]-0.5);
+  }
   return m_IndexToWorldTransform->TransformPoint(cornerpoint);
 }
 
@@ -608,6 +613,12 @@ mitk::Point3D mitk::Geometry3D::GetCornerPoint(bool xFront, bool yFront, bool zF
   cornerpoint[0] = (xFront ? bounds[0] : bounds[1]);
   cornerpoint[1] = (yFront ? bounds[2] : bounds[3]);
   cornerpoint[2] = (zFront ? bounds[4] : bounds[5]);
+  if(m_ImageGeometry)
+  {
+    // Here i have to adjust the 0.5 offset manually, because the cornerpoint is the corner of the
+    // bounding box. The bounding box itself is no image, so it is corner-based
+    FillVector3D(cornerpoint, cornerpoint[0]-0.5, cornerpoint[1]-0.5, cornerpoint[2]-0.5);
+  }
 
   return m_IndexToWorldTransform->TransformPoint(cornerpoint);
 }

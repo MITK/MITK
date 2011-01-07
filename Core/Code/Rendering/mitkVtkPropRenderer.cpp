@@ -263,7 +263,7 @@ void mitk::VtkPropRenderer::PrepareMapperQueue()
   // remove all text properties before mappers will add new ones
   m_TextRenderer->RemoveAllViewProps();
 
-  for ( int i=0; i<m_TextCollection.size(); i++ )
+  for ( unsigned int i=0; i<m_TextCollection.size(); i++ )
   {
     m_TextCollection[i]->Delete();
   }

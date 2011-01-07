@@ -151,11 +151,11 @@ bool mitk::PlanarFigureInteractor
     {
       if ( planarFigure->IsPlaced() )
       {
-        this->HandleEvent( &mitk::StateEvent( EIDYES, NULL ) );
+        this->HandleEvent( new mitk::StateEvent( EIDYES, NULL ) );
       }
       else
       {
-        this->HandleEvent( &mitk::StateEvent( EIDNO, NULL ) );
+        this->HandleEvent( new mitk::StateEvent( EIDNO, NULL ) );
       }
       ok = false;
       break;
@@ -250,11 +250,11 @@ bool mitk::PlanarFigureInteractor
         planarFigure->InvokeEvent( EndPlacementPlanarFigureEvent() );
         planarFigure->InvokeEvent( EndInteractionPlanarFigureEvent() );
         m_DataNode->Modified();
-        this->HandleEvent( &mitk::StateEvent( EIDYES, stateEvent->GetEvent() ) );
+        this->HandleEvent( new mitk::StateEvent( EIDYES, stateEvent->GetEvent() ) );
       }
       else
       {
-        this->HandleEvent( &mitk::StateEvent( EIDNO, stateEvent->GetEvent() ) );
+        this->HandleEvent( new mitk::StateEvent( EIDNO, stateEvent->GetEvent() ) );
       }
 
       // Update rendered scene
@@ -285,11 +285,11 @@ bool mitk::PlanarFigureInteractor
         planarFigure->InvokeEvent( EndPlacementPlanarFigureEvent() );
         planarFigure->InvokeEvent( EndInteractionPlanarFigureEvent() );
         m_DataNode->Modified();
-        this->HandleEvent( &mitk::StateEvent( EIDYES, NULL ) );
+        this->HandleEvent( new mitk::StateEvent( EIDYES, NULL ) );
       }
       else
       {
-        this->HandleEvent( &mitk::StateEvent( EIDNO, NULL ) );
+        this->HandleEvent( new mitk::StateEvent( EIDNO, NULL ) );
       }
 
       // Update rendered scene
@@ -337,7 +337,7 @@ bool mitk::PlanarFigureInteractor
           // If point is to close, do not set a new point
           if ( a * a + b * b < 25.0 )
           {
-            this->HandleEvent( &mitk::StateEvent( EIDNO, stateEvent->GetEvent() ) );
+            this->HandleEvent( new mitk::StateEvent( EIDNO, stateEvent->GetEvent() ) );
 
             ok = true;
             break;
@@ -345,7 +345,7 @@ bool mitk::PlanarFigureInteractor
         }
       }
 
-      this->HandleEvent( &mitk::StateEvent( EIDYES, stateEvent->GetEvent() ) );    
+      this->HandleEvent( new mitk::StateEvent( EIDYES, stateEvent->GetEvent() ) );    
       ok = true;
       break;
     }
@@ -433,7 +433,7 @@ bool mitk::PlanarFigureInteractor
           renderer->GetRenderingManager()->RequestUpdateAll();
         }
 
-        this->HandleEvent( &mitk::StateEvent( EIDYES, NULL ) );
+        this->HandleEvent( new mitk::StateEvent( EIDYES, NULL ) );
 
         // Return true: only this interactor is eligible to react on this event
         ok = true;
@@ -452,7 +452,7 @@ bool mitk::PlanarFigureInteractor
           renderer->GetRenderingManager()->RequestUpdateAll();
         }
 
-        this->HandleEvent( &mitk::StateEvent( EIDNO, NULL ) );
+        this->HandleEvent( new mitk::StateEvent( EIDNO, NULL ) );
 
         // Return false so that other (PlanarFigure) Interactors may react on this
         // event as well
@@ -488,14 +488,14 @@ bool mitk::PlanarFigureInteractor
       // If editing is enabled and the mouse is currently over a control point, select it
       if ( pointIndex >= 0 )
       {
-        this->HandleEvent( &mitk::StateEvent( EIDYES, NULL ) );
+        this->HandleEvent( new mitk::StateEvent( EIDYES, NULL ) );
 
         // Return true: only this interactor is eligible to react on this event
         ok = true;
       }
       else
       {
-        this->HandleEvent( &mitk::StateEvent( EIDNO, NULL ) );
+        this->HandleEvent( new mitk::StateEvent( EIDNO, NULL ) );
 
         // Return false so that other (PlanarFigure) Interactors may react on this
         // event as well
@@ -515,11 +515,11 @@ bool mitk::PlanarFigureInteractor
       // Reset the PlanarFigure if required
       if ( planarFigure->ResetOnPointSelect() )
       {
-        this->HandleEvent( &mitk::StateEvent( EIDYES, stateEvent->GetEvent() ) );
+        this->HandleEvent( new mitk::StateEvent( EIDYES, stateEvent->GetEvent() ) );
       }
       else
       {
-        this->HandleEvent( &mitk::StateEvent( EIDNO, stateEvent->GetEvent() ) );
+        this->HandleEvent( new mitk::StateEvent( EIDNO, stateEvent->GetEvent() ) );
       }
 
       ok = true;  

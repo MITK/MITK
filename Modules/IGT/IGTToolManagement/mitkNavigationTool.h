@@ -27,6 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkDataNode.h>
 #include <mitkTrackingTool.h>
 #include <mitkTrackingTypes.h>
+#include <mitkSurface.h>
 #include <MitkIGTExports.h>
 
 namespace mitk {
@@ -38,7 +39,7 @@ namespace mitk {
   *        of navigation tools the class NavigationToolStorage could be used.
   *
   * \ingroup IGT
-  */  
+  */
   class MitkIGT_EXPORT NavigationTool : public itk::Object
   {
   public:
@@ -47,7 +48,7 @@ namespace mitk {
     itkNewMacro(Self);
 
     enum NavigationToolType {Instrument, Fiducial, Skinmarker, Unknown};
-    
+
     //## getter and setter ##
     //NavigationToolType:
     itkGetMacro(Type,NavigationToolType);
@@ -73,17 +74,36 @@ namespace mitk {
     //TrackingDeviceType:
     itkGetMacro(TrackingDeviceType,mitk::TrackingDeviceType);
     itkSetMacro(TrackingDeviceType,mitk::TrackingDeviceType);
+    //ToolName (only getter):
+    /** @return Returns the name of this navigation tool. Returns an empty string if there is
+     *          no name (for example because the data node has not been set yet).
+     *
+     *          Note: There is no setter for the name,
+     *          because the name of the corresponding data node is used as tool name. So if you
+     *          want to modify the name of this navigation tool only get the data node and modify
+     *          its name.
+     */
+    std::string GetToolName();
+    //ToolSurface (only getter):
+    /** @return Returns the surface of this navigation tool. Returns NULL if there is
+     *          no surface (for example because the data node has not been set yet).
+     *
+     *          Note: There is no setter for the surface,
+     *          because the surface is the data of the corresponding data node. So if you
+     *          want to set a new surface only get the data node and modify its data.
+     */
+    mitk::Surface::Pointer GetToolSurface();
     //#######################
 
   protected:
 
     NavigationTool();
     ~NavigationTool();
-    
-    //## 	data structure of a navigation tool object ##
+
+    //## data structure of a navigation tool object ##
     std::string m_Identifier;
     NavigationToolType m_Type;
-    /** @brief This DataNode holds a toolname and a tool surface */ 
+    /** @brief This DataNode holds a toolname and a tool surface */
     mitk::DataNode::Pointer m_DataNode;
     /** @brief This member variable holds a mathamatical description of the tool */
     itk::SpatialObject<3>::Pointer m_SpatialObject;

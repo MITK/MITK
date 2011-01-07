@@ -40,6 +40,7 @@ class mitkNavigationToolTestClass
     
     //initialize a few things
     mitk::DataNode::Pointer myNode = mitk::DataNode::New();
+    myNode->SetName("TestNodeName");
     itk::SpatialObject<3>::Pointer mySpatialObject = itk::SpatialObject<3>::New();
 
     //set everything
@@ -60,6 +61,7 @@ class mitkNavigationToolTestClass
     MITK_TEST_CONDITION(myNavigationTool->GetCalibrationFile()=="Test.srom","Testing getter and setter of calibration file.");
     MITK_TEST_CONDITION(myNavigationTool->GetSerialNumber()=="0815","Testing getter and setter of serial number.");
     MITK_TEST_CONDITION(myNavigationTool->GetTrackingDeviceType()==mitk::NDIAurora,"Testing getter and setter of tracking device type.");
+    MITK_TEST_CONDITION(myNavigationTool->GetToolName()=="TestNodeName","Testing method GetToolName().");
 
     }
 

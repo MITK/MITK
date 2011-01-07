@@ -71,7 +71,7 @@ void mitk::PicFileReader::GenerateOutputInformation()
           mitkIpPicDelTag( header, "VELOCITY" );
         }
 
-        if( header == NULL)
+        if( header == NULL || header->bpe == 0)
         {
             itk::ImageFileReaderException e(__FILE__, __LINE__);
             itk::OStringStream msg;

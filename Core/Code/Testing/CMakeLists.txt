@@ -1,2 +1,7 @@
 MITK_CREATE_MODULE_TESTS()
 # MITK_INSTALL_TARGETS(EXECUTABLES MitkTestDriver)
+
+ADD_TEST(mitkPicFileReaderTest_emptyFile ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${TESTDRIVER} mitkPicFileReaderTest ${CMAKE_CURRENT_SOURCE_DIR}/Data/emptyFile.pic)
+
+ADD_TEST(mitkPicFileReaderTest_emptyGzipFile ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${TESTDRIVER} mitkPicFileReaderTest ${CMAKE_CURRENT_SOURCE_DIR}/Data/emptyFile.pic.gz)
+

@@ -325,6 +325,8 @@ void QmitkOverlayController::RemoveOverlay( QmitkOverlay* overlay )
         this->AdjustOverlayPosition();
       }
     }
+
+    overlay->deleteLater();
   }
 }
 

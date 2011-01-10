@@ -15,7 +15,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-
 #include "mitkNavigationDataRecorder.h"
 #include <fstream>
 
@@ -23,6 +22,13 @@ PURPOSE.  See the above copyright notices for more information.
 #include <tinyxml.h>
 
 #include <itksys/SystemTools.hxx>
+
+
+
+
+
+
+
 mitk::NavigationDataRecorder::NavigationDataRecorder()
 {
   m_NumberOfInputs = 0;
@@ -31,9 +37,11 @@ mitk::NavigationDataRecorder::NavigationDataRecorder()
   m_NumberOfRecordedFiles = 0;
   m_Stream = NULL;
   m_FileName = "";
+  m_SystemTimeClock = RealTimeClock::New();
 
   //To get a start time
   mitk::TimeStamp::GetInstance()->Start(this);
+  
 
 }
 
@@ -69,9 +77,20 @@ void mitk::NavigationDataRecorder::Update()
   if (m_Recording)
   {
     DataObjectPointerArray inputs = this->GetInputs(); //get all inputs
-    mitk::NavigationData::TimeStampType timestamp=0.0;
+    mitk::NavigationData::TimeStampType timestamp=0.0; // timestamp for mitk time
     timestamp = mitk::TimeStamp::GetInstance()->GetElapsed();
 
+
+    mitk::NavigationData::TimeStampType sysTimestamp = 0.0; // timestamp for system time
+    sysTimestamp = m_SystemTimeClock->GetCurrentStamp();
+
+    // cast system time double value to stringstream to avoid low precision rounding 
+    std::ostringstream strs;
+    strs.precision(15); // rounding precision for system time double value
+    strs << sysTimestamp;
+    std::string sysTimeStr = strs.str();
+      
+   
     for (unsigned int index = 0; index < inputs.size(); index++)
     {
       mitk::NavigationData* nd = dynamic_cast<mitk::NavigationData*>(inputs[index].GetPointer());
@@ -105,6 +124,7 @@ void mitk::NavigationDataRecorder::Update()
         TiXmlElement* elem = new TiXmlElement("ND");
 
         elem->SetDoubleAttribute("Time", timestamp);
+        elem->SetAttribute("SystemTime", sysTimeStr); // tag for system time
         elem->SetDoubleAttribute("Tool", index);
         elem->SetDoubleAttribute("X", position[0]);
         elem->SetDoubleAttribute("Y", position[1]);

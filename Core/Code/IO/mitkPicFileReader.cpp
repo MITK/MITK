@@ -45,6 +45,11 @@ void mitk::PicFileReader::GenerateOutputInformation()
     {
         mitkIpPicDescriptor* header=mitkIpPicGetHeader(const_cast<char *>(m_FileName.c_str()), NULL);
 
+        if ( !header )
+        {
+            throw itk::ImageFileReaderException(__FILE__, __LINE__, "File could not be read.");
+        }
+
         header=MITKipPicGetTags(const_cast<char *>(m_FileName.c_str()), header);
 
         int channels = 1;

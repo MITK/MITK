@@ -443,7 +443,6 @@ RenderingManager
 
   }
 
-
   int warningLevel = vtkObject::GetGlobalWarningDisplay();
   vtkObject::GlobalWarningDisplayOff();
 
@@ -451,6 +450,27 @@ RenderingManager
     geometry->GetBoundingBox())->GetDiagonalLength2() > mitk::eps) )
   {
     boundingBoxInitialized = true;
+  }
+
+  if (geometry.IsNotNull() )
+  {// make sure bounding box has an extent bigger than zero in any direction
+    // clone the input geometry
+    Geometry3D::Pointer modifiedGeometry = dynamic_cast<Geometry3D*>( dataGeometry->Clone().GetPointer() );
+    assert(modifiedGeometry.IsNotNull());
+    Geometry3D::BoundsArrayType newBounds = modifiedGeometry->GetBounds();
+    for( unsigned int dimension = 0; ( 2 * dimension ) < newBounds.Size() ; dimension++ )
+    {
+      //check for equality but for an epsilon
+      if( Equal( newBounds[ 2 * dimension ], newBounds[ 2 * dimension + 1 ] ) )
+      {
+        newBounds[ 2 * dimension + 1 ] += 1;
+      }
+    }
+
+    // set the newly calculated bounds array
+    modifiedGeometry->SetBounds(newBounds);
+
+    geometry = modifiedGeometry;
   }
 
   RenderWindowList::iterator it;

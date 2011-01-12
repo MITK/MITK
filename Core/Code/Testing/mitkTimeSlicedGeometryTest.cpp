@@ -34,11 +34,18 @@ void mitkTimeSlicedGeometry_ChangeImageGeometryConsideringOriginOffset_Test()
   // additional tests to check the function ChangeImageGeometryConsideringOriginOffset(..) 
 
   //first create a new timeslicedgeometry
-  mitk::TimeSlicedGeometry::Pointer geoTime = mitk::TimeSlicedGeometry::New();
+  mitk::TimeSlicedGeometry::Pointer geoTime = mitk::TimeSlicedGeometry::New();  
   mitk::Geometry3D::Pointer geo3d = mitk::Geometry3D::New();
-  geo3d->Initialize();
+  geo3d->Initialize();   
   unsigned int numOfTimeSteps = 5; 
-  geoTime->InitializeEvenlyTimed(geo3d, numOfTimeSteps);
+  geoTime->InitializeEvenlyTimed(geo3d, numOfTimeSteps);  
+ 
+  for (int i=0; i < numOfTimeSteps; i++)
+  {
+    mitk::Geometry3D::Pointer geo3d_sub = mitk::Geometry3D::New();
+    geo3d_sub->Initialize();   
+    geoTime->SetGeometry3D(geo3d_sub, i);    
+  }    
 
   MITK_TEST_OUTPUT( << "Testing whether geoTime->GetImageGeometry() is false by default");  
   MITK_TEST_CONDITION_REQUIRED( geoTime->GetImageGeometry()==false, "");
@@ -48,16 +55,20 @@ void mitkTimeSlicedGeometry_ChangeImageGeometryConsideringOriginOffset_Test()
   MITK_TEST_CONDITION_REQUIRED( subSliceGeo3D_first->GetImageGeometry()==false, "");
   MITK_TEST_CONDITION_REQUIRED( subSliceGeo3D_last->GetImageGeometry()==false, "");
 
-  // Save CornerPoints of geoTime, the included first Planegeometry, and the included last Planegeometry for later..
-  mitk::Point3D OriginofTimeGeo( geoTime->GetOrigin() ); //copy constructor
-  mitk::Point3D CornerPoint0TimeGeo = geoTime->GetCornerPoint(0);
-  mitk::Point3D CornerPoint1FirstGeometry = subSliceGeo3D_first->GetCornerPoint(1);
-  mitk::Point3D CornerPoint2LastGeometry = subSliceGeo3D_last->GetCornerPoint(2);
+  // Save some Origins and cornerpoints
+  mitk::Point3D OriginTimeGeo( geoTime->GetOrigin() ); 
+  mitk::Point3D OriginFirstGeo( subSliceGeo3D_first->GetOrigin() ); 
+  mitk::Point3D OriginLastGeo( subSliceGeo3D_last->GetOrigin() ); 
+  mitk::Point3D CornerPoint0TimeGeo(geoTime->GetCornerPoint(0));
+  mitk::Point3D CornerPoint1FirstGeo(subSliceGeo3D_first->GetCornerPoint(1));
+  mitk::Point3D CornerPoint2LastGeo(subSliceGeo3D_last->GetCornerPoint(2));
 
-  MITK_TEST_OUTPUT( << "Calling geoTime->ChangeImageGeometryConsideringOriginOffset(true)");
-  //std::cout << "vorher: " << subSliceGeo3D_first->GetCornerPoint(1) << std::endl;
+  //std::cout << "vorher Origin: " << subSliceGeo3D_first->GetOrigin() << std::endl;
+  //std::cout << "vorher Corner: " << subSliceGeo3D_first->GetCornerPoint(0) << std::endl;
+  MITK_TEST_OUTPUT( << "Calling geoTime->ChangeImageGeometryConsideringOriginOffset(true)"); 
   geoTime->ChangeImageGeometryConsideringOriginOffset(true);
-  //std::cout << "nachher: " << subSliceGeo3D_first->GetCornerPoint(1) << std::endl;
+  //std::cout << "nachher Origin: " << subSliceGeo3D_first->GetOrigin() << std::endl;
+  //std::cout << "nachher Corner: " << subSliceGeo3D_first->GetCornerPoint(0) << std::endl;
 
   MITK_TEST_OUTPUT( << "Testing whether geoTime->GetImageGeometry() is now true");
   MITK_TEST_CONDITION_REQUIRED( geoTime->GetImageGeometry()==true, "");
@@ -65,32 +76,24 @@ void mitkTimeSlicedGeometry_ChangeImageGeometryConsideringOriginOffset_Test()
   MITK_TEST_CONDITION_REQUIRED( subSliceGeo3D_first->GetImageGeometry()==true, "");
   MITK_TEST_CONDITION_REQUIRED( subSliceGeo3D_last->GetImageGeometry()==true, "");  
 
-/*
-  MITK_TEST_OUTPUT( << "Testing wether offset has been added to cornerPoints of geometry");
-
+  MITK_TEST_OUTPUT( << "Testing wether offset has been added to origins");
   // Manually adding Offset.
-  std::cout <<  "my vorher: " << CornerPoint1FirstGeometry << std::endl;
-  CornerPoint1FirstGeometry[0] += (subSliceGeo3D_first->GetSpacing()[0]) / 2;
-  CornerPoint1FirstGeometry[1] += (subSliceGeo3D_first->GetSpacing()[1]) / 2;
-  CornerPoint1FirstGeometry[2] += (subSliceGeo3D_first->GetSpacing()[2]) / 2;  
-  CornerPoint2LastGeometry[0] += (subSliceGeo3D_last->GetSpacing()[0]) / 2;
-  CornerPoint2LastGeometry[1] += (subSliceGeo3D_last->GetSpacing()[1]) / 2;
-  CornerPoint2LastGeometry[2] += (subSliceGeo3D_last->GetSpacing()[2]) / 2;
-  CornerPoint0TimeGeo[0] += (geoTime->GetSpacing()[0]) / 2;
-  CornerPoint0TimeGeo[1] += (geoTime->GetSpacing()[1]) / 2;
-  CornerPoint0TimeGeo[2] += (geoTime->GetSpacing()[2]) / 2;
-  OriginofTimeGeo[0] += (geoTime->GetSpacing()[0]) / 2;
-  OriginofTimeGeo[1] += (geoTime->GetSpacing()[1]) / 2;
-  OriginofTimeGeo[2] += (geoTime->GetSpacing()[2]) / 2;
-
-  std::cout <<  "my nachher: " << CornerPoint1FirstGeometry << std::endl;
-  std::cout <<  subSliceGeo3D_first->GetCornerPoint(1) << " and " << CornerPoint1FirstGeometry << std::endl;
-
-  MITK_TEST_CONDITION_REQUIRED( subSliceGeo3D_first->GetCornerPoint(1)==CornerPoint1FirstGeometry, "");
-  MITK_TEST_CONDITION_REQUIRED( subSliceGeo3D_last->GetCornerPoint(2)==CornerPoint2LastGeometry, "");
+  OriginTimeGeo[0] += (geoTime->GetSpacing()[0]) / 2;
+  OriginTimeGeo[1] += (geoTime->GetSpacing()[1]) / 2;
+  OriginTimeGeo[2] += (geoTime->GetSpacing()[2]) / 2;
+  OriginFirstGeo[0] += (subSliceGeo3D_first->GetSpacing()[0]) / 2;
+  OriginFirstGeo[1] += (subSliceGeo3D_first->GetSpacing()[1]) / 2;
+  OriginFirstGeo[2] += (subSliceGeo3D_first->GetSpacing()[2]) / 2;
+  OriginLastGeo[0] += (subSliceGeo3D_last->GetSpacing()[0]) / 2;
+  OriginLastGeo[1] += (subSliceGeo3D_last->GetSpacing()[1]) / 2;
+  OriginLastGeo[2] += (subSliceGeo3D_last->GetSpacing()[2]) / 2;
+  MITK_TEST_CONDITION_REQUIRED( subSliceGeo3D_first->GetCornerPoint(1)==CornerPoint1FirstGeo, "");
+  MITK_TEST_CONDITION_REQUIRED( subSliceGeo3D_last->GetCornerPoint(2)==CornerPoint2LastGeo, "");
   MITK_TEST_CONDITION_REQUIRED( geoTime->GetCornerPoint(0)==CornerPoint0TimeGeo, "");  
-  MITK_TEST_CONDITION_REQUIRED( geoTime->GetOrigin()==OriginofTimeGeo, "");
-*/
+  MITK_TEST_CONDITION_REQUIRED( geoTime->GetOrigin()==OriginTimeGeo, "");
+  MITK_TEST_CONDITION_REQUIRED( subSliceGeo3D_first->GetOrigin()==OriginFirstGeo, "");
+  MITK_TEST_CONDITION_REQUIRED( subSliceGeo3D_last->GetOrigin()==OriginLastGeo, "");
+
 
   MITK_TEST_OUTPUT( << "Calling geoTime->ChangeImageGeometryConsideringOriginOffset(false)");
   geoTime->ChangeImageGeometryConsideringOriginOffset(false);
@@ -99,29 +102,25 @@ void mitkTimeSlicedGeometry_ChangeImageGeometryConsideringOriginOffset_Test()
   MITK_TEST_OUTPUT( << "Testing whether first and last geometry in the geoTime have GetImageGeometry()==false now");
   MITK_TEST_CONDITION_REQUIRED( subSliceGeo3D_first->GetImageGeometry()==false, "");
   MITK_TEST_CONDITION_REQUIRED( subSliceGeo3D_last->GetImageGeometry()==false, "");  
-/*
-  MITK_TEST_OUTPUT( << "Testing wether offset has been added to cornerPoints of geometry");
-
+  
+  MITK_TEST_OUTPUT( << "Testing wether offset has been added to origins");
   // Manually substracting Offset.
-  CornerPoint1FirstGeometry[0] -= (subSliceGeo3D_first->GetSpacing()[0]) / 2;
-  CornerPoint1FirstGeometry[1] -= (subSliceGeo3D_first->GetSpacing()[1]) / 2;
-  CornerPoint1FirstGeometry[2] -= (subSliceGeo3D_first->GetSpacing()[2]) / 2;  
-  CornerPoint2LastGeometry[0] -= (subSliceGeo3D_last->GetSpacing()[0]) / 2;
-  CornerPoint2LastGeometry[1] -= (subSliceGeo3D_last->GetSpacing()[1]) / 2;
-  CornerPoint2LastGeometry[2] -= (subSliceGeo3D_last->GetSpacing()[2]) / 2;
-  CornerPoint0TimeGeo[0] -= (geoTime->GetSpacing()[0]) / 2;
-  CornerPoint0TimeGeo[1] -= (geoTime->GetSpacing()[1]) / 2;
-  CornerPoint0TimeGeo[2] -= (geoTime->GetSpacing()[2]) / 2;
-  OriginofTimeGeo[0] -= (geoTime->GetSpacing()[0]) / 2;
-  OriginofTimeGeo[1] -= (geoTime->GetSpacing()[1]) / 2;
-  OriginofTimeGeo[2] -= (geoTime->GetSpacing()[2]) / 2;
-
-
-  MITK_TEST_CONDITION_REQUIRED( subSliceGeo3D_first->GetCornerPoint(1)==CornerPoint1FirstGeometry, "");
-  MITK_TEST_CONDITION_REQUIRED( subSliceGeo3D_last->GetCornerPoint(2)==CornerPoint2LastGeometry, "");
+  OriginTimeGeo[0] -= (geoTime->GetSpacing()[0]) / 2;
+  OriginTimeGeo[1] -= (geoTime->GetSpacing()[1]) / 2;
+  OriginTimeGeo[2] -= (geoTime->GetSpacing()[2]) / 2;
+  OriginFirstGeo[0] -= (subSliceGeo3D_first->GetSpacing()[0]) / 2;
+  OriginFirstGeo[1] -= (subSliceGeo3D_first->GetSpacing()[1]) / 2;
+  OriginFirstGeo[2] -= (subSliceGeo3D_first->GetSpacing()[2]) / 2;
+  OriginLastGeo[0] -= (subSliceGeo3D_last->GetSpacing()[0]) / 2;
+  OriginLastGeo[1] -= (subSliceGeo3D_last->GetSpacing()[1]) / 2;
+  OriginLastGeo[2] -= (subSliceGeo3D_last->GetSpacing()[2]) / 2;
+  MITK_TEST_CONDITION_REQUIRED( subSliceGeo3D_first->GetCornerPoint(1)==CornerPoint1FirstGeo, "");
+  MITK_TEST_CONDITION_REQUIRED( subSliceGeo3D_last->GetCornerPoint(2)==CornerPoint2LastGeo, "");
   MITK_TEST_CONDITION_REQUIRED( geoTime->GetCornerPoint(0)==CornerPoint0TimeGeo, "");  
-  MITK_TEST_CONDITION_REQUIRED( geoTime->GetOrigin()==OriginofTimeGeo, "");
-*/
+  MITK_TEST_CONDITION_REQUIRED( geoTime->GetOrigin()==OriginTimeGeo, "");
+  MITK_TEST_CONDITION_REQUIRED( subSliceGeo3D_first->GetOrigin()==OriginFirstGeo, "");
+  MITK_TEST_CONDITION_REQUIRED( subSliceGeo3D_last->GetOrigin()==OriginLastGeo, "");
+
 }
 
 

@@ -596,7 +596,7 @@ void QmitkImageStatistics::UpdateStatistics()
 
       // In case of exception, print error message on GUI
       std::stringstream message;
-      message << "<font color='red'>Error in calculating histogram</font>";
+      message << "<font color='red'>Error! Unequal Dimensions of Image and Segmentation. No recompute possible </font>";
       m_Controls->m_ErrorMessageLabel->setText( message.str().c_str() );
       m_Controls->m_ErrorMessageLabel->show();
     }

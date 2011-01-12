@@ -35,9 +35,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkProgressBar.h"
 
 QmitkDnDFrameWidget::QmitkDnDFrameWidget(QWidget *parent)
-  : QWidget(parent)
+: QWidget(parent)
 {
-   setAcceptDrops(true);
+  setAcceptDrops(true);
 }
 
 void QmitkDnDFrameWidget::dragEnterEvent( QDragEnterEvent *event )
@@ -46,18 +46,18 @@ void QmitkDnDFrameWidget::dragEnterEvent( QDragEnterEvent *event )
 }
 void QmitkDnDFrameWidget::dropEvent( QDropEvent * event )
 { //open dragged files
-  
-  mitk::IDataStorageService::Pointer service = 
+
+  mitk::IDataStorageService::Pointer service =
     berry::Platform::GetServiceRegistry().GetServiceById<mitk::IDataStorageService>(mitk::IDataStorageService::ID);
-  
+
   mitk::DataStorage::Pointer ds;
   if (service.IsNotNull())
     ds = service->GetActiveDataStorage()->GetDataStorage();
   else
     return;
-  
+
   QList<QUrl> fileNames = event->mimeData()->urls();
-  
+
   bool dsmodified = false;
   for (QList<QUrl>::Iterator fileName = fileNames.begin();
     fileName != fileNames.end(); ++fileName)
@@ -67,13 +67,15 @@ void QmitkDnDFrameWidget::dropEvent( QDropEvent * event )
     try
     {
       nodeReader->SetFileName(fileName->toLocalFile().toLatin1().data());
+      if(event->dropAction()==Qt::LinkAction)
+        nodeReader->SetImageSerie(true);
       nodeReader->Update();
       for ( unsigned int i = 0 ; i < nodeReader->GetNumberOfOutputs( ); ++i )
       {
         mitk::DataNode::Pointer node;
         node = nodeReader->GetOutput(i);
         if ( node->GetData() != NULL )
-        {  
+        {
           ds->Add(node);
           dsmodified = true;
         }
@@ -85,11 +87,11 @@ void QmitkDnDFrameWidget::dropEvent( QDropEvent * event )
     }
 
   }
-  
+
   if(dsmodified)
   {
     // get all nodes that have not set "includeInBoundingBox" to false
-    mitk::NodePredicateNot::Pointer pred 
+    mitk::NodePredicateNot::Pointer pred
       = mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("includeInBoundingBox"
       , mitk::BoolProperty::New(false)));
 

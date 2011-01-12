@@ -173,7 +173,7 @@ void mitk::DataNodeFactory::GenerateData()
         this->SetOutput(i, node);
       }
     }
-    if(!usedNewDTNF && !( m_FileName != "" ) && !(m_Serie == false))
+    if(!usedNewDTNF && ( m_FileName != "" ) && !(m_Serie == false))
         ReadFileSeriesTypeITKImageSeriesReader();
   }
 }

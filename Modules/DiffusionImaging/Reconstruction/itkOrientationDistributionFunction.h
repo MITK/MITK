@@ -157,6 +157,8 @@ public:
   
   Self MaxNormalize() const;
 
+  void L2Normalize();
+
   int GetPrincipleDiffusionDirection() const;
 
   int GetNthDiffusionDirection(int n, vnl_vector_fixed<double,3> rndVec) const;

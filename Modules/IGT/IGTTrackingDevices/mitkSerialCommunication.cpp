@@ -165,14 +165,20 @@ int mitk::SerialCommunication::Receive(std::string& answer, unsigned int numberO
     if (numberOfBytesRead > 0) // data read
     {
       answer.assign(buffer, numberOfBytesRead); // copy buffer to answer
+      delete buffer;
       if (numberOfBytesRead == numberOfBytes)
+      {
         return OK;           // everything was received
+      }
       else
+      {
         return ERROR_VALUE;  // some data was received, but not as much as expected
+      }
     }
     else // error
     {
       answer = "";
+      delete buffer;
       return ERROR_VALUE;
     }
   }

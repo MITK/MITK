@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QPaintEvent>
 
 QmitkScalarBar::QmitkScalarBar(QWidget* parent): 
-QWidget( parent, Qt::Tool | Qt::FramelessWindowHint ), m_Alignment(vertical)
+QWidget( parent, Qt::Tool | Qt::FramelessWindowHint ), m_Alignment(vertical), m_MainLine(NULL)
 {
   m_NumberOfSubDivisions = 7;
 
@@ -51,15 +51,18 @@ QWidget( parent, Qt::Tool | Qt::FramelessWindowHint ), m_Alignment(vertical)
 
 QmitkScalarBar::~QmitkScalarBar()
 {
+  CleanUpLines();
 }
 
 void QmitkScalarBar::SetupGeometry( alignment align )
 {
-  m_HorizontalLines.clear();
+  this->CleanUpLines();
+
   switch ( align )
   {
   case vertical :
     { 
+      //draw subdivision
       for ( unsigned int i=0; i<m_NumberOfSubDivisions; ++i )
       {
         int y = this->height()/(m_NumberOfSubDivisions-1)*i;
@@ -73,15 +76,24 @@ void QmitkScalarBar::SetupGeometry( alignment align )
           // this is the last one -> move y 1 up to have this line completely drawn
           y = this->height() - 1;
         }
-        m_HorizontalLines.push_back( new QLine( QPoint(0,y), QPoint(width()-2,y) ) );
+        m_SubDivisionLines.push_back( new QLine( QPoint(0,y), QPoint(width()-2,y) ) );
       }
 
-      if ( m_HorizontalLines.size() > 0 )
-        m_VerticalLine = new QLine( QPoint(width()-1,0), QPoint(width()-1,height()) );
+      //draw mainline
+      if ( m_SubDivisionLines.size() > 0 )
+      {
+        m_MainLine = new QLine( QPoint(width()-1,0), QPoint(width()-1,height()) );
+      }
+      else
+      {
+        m_MainLine = new QLine( QPoint(0,0), QPoint(0,0) ); //do not draw the line
+      }
+
       break;
     }
   case horizontal :
     {
+      //draw subdivision
       for ( unsigned int i=0; i<m_NumberOfSubDivisions; ++i )
       {
         int x = this->width()/(m_NumberOfSubDivisions-1)*i;
@@ -93,13 +105,39 @@ void QmitkScalarBar::SetupGeometry( alignment align )
         {
           x = this->width() - 1;
         }
-        m_HorizontalLines.push_back( new QLine( QPoint(x,0), QPoint(x,height()) ) );
+        m_SubDivisionLines.push_back( new QLine( QPoint(x,0), QPoint(x,height()) ) );
       }
-      if ( m_HorizontalLines.size() > 0 )
-      m_VerticalLine = new QLine( QPoint(0,height()/2), QPoint(width(),height()/2) );
+
+      //draw mainline
+      if ( m_SubDivisionLines.size() > 0 )
+      {
+        m_MainLine = new QLine( QPoint(0,height()/2), QPoint(width(),height()/2) );
+      }
+      else
+      {
+        m_MainLine = new QLine( QPoint(0,0), QPoint(0,0) ); //do not draw the line
+      }
+
 
       break;
     }
+  }
+}
+
+void QmitkScalarBar::CleanUpLines()
+{
+  foreach(QLine* line, m_SubDivisionLines)
+  {
+    delete line; //QLine is not a QObject
+    line = NULL;
+  }
+
+  m_SubDivisionLines.clear();
+
+  if(m_MainLine != NULL)
+  {
+    delete m_MainLine;
+    m_MainLine = NULL;
   }
 }
 
@@ -176,9 +214,9 @@ void QmitkScalarBar::paintEvent(QPaintEvent* /*event*/)
       painter.setBrush( Qt::SolidPattern );
       painter.setRenderHint( QPainter::Antialiasing, true );
 
-      painter.drawLine( m_VerticalLine->p1(), m_VerticalLine->p2() );
+      painter.drawLine( m_MainLine->p1(), m_MainLine->p2() );
 
-      foreach( QLine* line, m_HorizontalLines )
+      foreach( QLine* line, m_SubDivisionLines )
       {
         painter.drawLine( line->p1(), line->p2() );
       }

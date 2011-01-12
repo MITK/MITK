@@ -27,7 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 QmitkScalarBarOverlay::QmitkScalarBarOverlay( const char* id ): 
-QmitkOverlay(id), m_Widget( NULL )
+QmitkOverlay(id), m_Widget( NULL ), m_ObserverTag(0)
 {
   m_Widget = new QmitkScalarBar();
   m_Widget->setStyleSheet("");
@@ -35,7 +35,10 @@ QmitkOverlay(id), m_Widget( NULL )
 
 QmitkScalarBarOverlay::~QmitkScalarBarOverlay()
 {
+  m_Widget->deleteLater();
   m_Widget = NULL;
+
+  m_PropertyList->GetProperty( m_Id )->RemoveObserver(m_ObserverTag);
 }
 
 void QmitkScalarBarOverlay::GenerateData( mitk::PropertyList::Pointer pl )
@@ -114,7 +117,7 @@ void QmitkScalarBarOverlay::SetupCallback( mitk::BaseProperty::Pointer prop )
     MemberCommandType::Pointer propModifiedCommand;
     propModifiedCommand = MemberCommandType::New();
     propModifiedCommand->SetCallbackFunction( this, &QmitkScalarBarOverlay::SetScaleFactor );
-    prop->AddObserver( itk::ModifiedEvent(), propModifiedCommand );
+    m_ObserverTag = prop->AddObserver( itk::ModifiedEvent(), propModifiedCommand );
   }
   else
   {

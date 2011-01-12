@@ -35,6 +35,7 @@ QmitkOverlay(id), m_Widget( NULL ), m_ObserverTag(0)
 
 QmitkTextOverlay::~QmitkTextOverlay()
 {
+  m_Widget->deleteLater();
   m_Widget = NULL;
 
   m_PropertyList->GetProperty( m_Id )->RemoveObserver(m_ObserverTag);

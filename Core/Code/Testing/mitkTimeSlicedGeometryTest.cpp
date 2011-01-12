@@ -37,7 +37,7 @@ void mitkTimeSlicedGeometry_ChangeImageGeometryConsideringOriginOffset_Test()
   mitk::TimeSlicedGeometry::Pointer geoTime = mitk::TimeSlicedGeometry::New();  
   mitk::Geometry3D::Pointer geo3d = mitk::Geometry3D::New();
   geo3d->Initialize();   
-  unsigned int numOfTimeSteps = 5; 
+  int numOfTimeSteps = 5; 
   geoTime->InitializeEvenlyTimed(geo3d, numOfTimeSteps);  
  
   for (int i=0; i < numOfTimeSteps; i++)

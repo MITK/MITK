@@ -8,5 +8,6 @@ SET(CPP_FILES
   mitkWiiMoteCalibrationEvent.cpp
   mitkWiiMoteAllDataEvent.cpp
   mitkWiiMoteInteractor.cpp
+  mitkKalmanFilter.cpp
   )
 

@@ -24,7 +24,12 @@ mitk::WiiMoteThread::WiiMoteThread()
 , m_SurfaceInteraction(false)
 , m_ButtonBPressed(false)
 , m_SurfaceInteractionMode(1)
+, m_Kalman(mitk::KalmanFilter::New())
 {
+  m_Kalman->SetMeasurementNoise( 0.3 );
+  m_Kalman->SetProcessNoise( 1 );
+  m_Kalman->ResetFilter();
+  
   // used for measuring movement
   m_TimeStep = 0;
 }
@@ -589,6 +594,8 @@ void mitk::WiiMoteThread::SurfaceInteraction()
     , m_WiiMotes[0].Acceleration.Y
     , m_WiiMotes[0].Acceleration.Z
     , m_SurfaceInteractionMode );
+
+  float test = m_Kalman->ProcessValue( m_WiiMotes[0].Acceleration.Z );
 
   mitk::CallbackFromGUIThread::GetInstance()
     ->CallThisFromGUIThread(m_Command, e.MakeObject());

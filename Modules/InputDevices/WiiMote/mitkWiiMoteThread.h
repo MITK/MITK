@@ -7,6 +7,7 @@
 #include "mitkCommon.h"
 #include "mitkCallbackFromGUIThread.h"
 #include "mitkVector.h"
+#include "mitkKalmanFilter.h"
 
 // itk
 #include "itkObject.h"
@@ -193,6 +194,9 @@ namespace mitk
 
     // used for measuring movement
     int m_TimeStep;
+
+    // Kalman filter
+    mitk::KalmanFilter::Pointer m_Kalman;
   };
 }
 

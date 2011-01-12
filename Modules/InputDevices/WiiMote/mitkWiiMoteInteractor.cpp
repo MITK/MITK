@@ -168,33 +168,33 @@ bool mitk::WiiMoteInteractor::OnWiiMoteInput(Action* action, const mitk::StateEv
     m_xValue = xAccel + sinR * cosP;
   }
 
-  // against drift
-  if(std::abs(xAccel) < 0.2)
-  {
-    m_xValue = 0;
-  }
+  //// against drift
+  //if(std::abs(xAccel) < 0.2)
+  //{
+  //  m_xValue = 0;
+  //}
 
   // y acceleration
   m_yValue = yAccel + sinP;
 
-  // against drift
-  if(std::abs(yAccel) < 0.2)
-  {
-    m_yValue = 0;
-  }
+  //// against drift
+  //if(std::abs(yAccel) < 0.2)
+  //{
+  //  m_yValue = 0;
+  //}
 
   // z acceleration
   m_zValue = zAccel - cosP * cosR;
 
-  // against drift
-  if(std::abs(zAccel) < 0.3)
-  {
-    m_zValue = 0;
-  }
+  //// against drift
+  //if(std::abs(zAccel) < 0.3)
+  //{
+  //  m_zValue = 0;
+  //}
 
-  //m_xVelocity += m_xValue;
-  //m_yVelocity += m_yValue;
-  //m_zVelocity -= m_zValue;
+  m_xVelocity += m_xValue;
+  m_yVelocity += m_yValue;
+  m_zVelocity -= m_zValue;
 
   // -------------------- values for rotation --------------------
 

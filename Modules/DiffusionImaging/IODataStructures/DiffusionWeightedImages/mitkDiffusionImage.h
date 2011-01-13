@@ -43,6 +43,7 @@ namespace mitk
       GradientDirectionType >                   GradientDirectionContainerType;
     typedef itk::VectorImageToImageAdaptor< TPixelType, 3 > 
                                                 AdaptorType;
+    typedef vnl_matrix_fixed< double, 3, 3 >      MeasurementFrameType;
 
     mitkClassMacro( DiffusionImage, Image );
     itkNewMacro(Self);
@@ -54,7 +55,7 @@ namespace mitk
 
     void AverageRedundantGradients(double precision);
 
-    GradientDirectionContainerType::Pointer CalcAveragedDirectionSet(double precision);
+    GradientDirectionContainerType::Pointer CalcAveragedDirectionSet(double precision, GradientDirectionContainerType::Pointer directions);
 
     void CorrectDKFZBrokenGradientScheme(double precision);
 
@@ -78,6 +79,24 @@ namespace mitk
         m_Directions->InsertElement( i, directions[i].Get_vnl_vector() );
       }
     }
+    GradientDirectionContainerType::Pointer GetOriginalDirections()
+    { return m_OriginalDirections; }
+    void SetOriginalDirections( GradientDirectionContainerType::Pointer directions )
+    { this->m_OriginalDirections = directions; }
+    void SetOriginalDirections(const std::vector<itk::Vector<double,3> > directions)
+    {
+      m_OriginalDirections = GradientDirectionContainerType::New();
+      for(unsigned int i=0; i<directions.size(); i++)
+      {
+        m_OriginalDirections->InsertElement( i, directions[i].Get_vnl_vector() );
+      }
+    }
+
+    MeasurementFrameType GetMeasurementFrame()
+    { return m_MeasurementFrame; }
+    void SetMeasurementFrame( MeasurementFrameType mFrame )
+    { this->m_MeasurementFrame = mFrame; }
+
     itkGetMacro(B_Value, float);
     itkSetMacro(B_Value, float);
 
@@ -89,10 +108,11 @@ namespace mitk
 
     typename ImageType::Pointer               m_VectorImage;
     GradientDirectionContainerType::Pointer   m_Directions;
+    GradientDirectionContainerType::Pointer   m_OriginalDirections;
     float                                     m_B_Value;
     typename AdaptorType::Pointer             m_VectorImageAdaptor;
     int                                       m_DisplayIndex;
-
+    MeasurementFrameType                      m_MeasurementFrame;
   };
 
 } // namespace mitk

@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 template<typename TPixelType>
 mitk::DiffusionImage<TPixelType>::DiffusionImage()
-: m_VectorImage(0), m_Directions(0), m_B_Value(-1.0), m_VectorImageAdaptor(0)
+: m_VectorImage(0), m_Directions(0), m_OriginalDirections(0), m_B_Value(-1.0), m_VectorImageAdaptor(0)
 {
 }
 
@@ -193,7 +193,7 @@ bool mitk::DiffusionImage<TPixelType>::AreAlike(GradientDirectionType g1,
 template<typename TPixelType>
 void mitk::DiffusionImage<TPixelType>::CorrectDKFZBrokenGradientScheme(double precision)
 {
-  GradientDirectionContainerType::Pointer directionSet = CalcAveragedDirectionSet(precision);
+  GradientDirectionContainerType::Pointer directionSet = CalcAveragedDirectionSet(precision, m_Directions);
   if(directionSet->size() < 7)
   {
     MITK_INFO << "Too few directions, assuming and correcting DKFZ-bogus sequence details.";
@@ -213,20 +213,25 @@ void mitk::DiffusionImage<TPixelType>::CorrectDKFZBrokenGradientScheme(double pr
     {
       it.Value().set(v[i++%7]);
     }
+    for(GradientDirectionContainerType::Iterator it = m_OriginalDirections->Begin();
+    it != m_OriginalDirections->End(); ++it)
+    {
+      it.Value().set(v[i++%7]);
+    }
 
   }
 }
 
 template<typename TPixelType>
 mitk::DiffusionImage<TPixelType>::GradientDirectionContainerType::Pointer
-mitk::DiffusionImage<TPixelType>::CalcAveragedDirectionSet(double precision)
+mitk::DiffusionImage<TPixelType>::CalcAveragedDirectionSet(double precision, GradientDirectionContainerType::Pointer directions)
 {
   // save old and construct new direction container
   GradientDirectionContainerType::Pointer newDirections = GradientDirectionContainerType::New();
 
   // fill new direction container
-  for(GradientDirectionContainerType::ConstIterator gdcitOld = m_Directions->Begin();
-  gdcitOld != m_Directions->End(); ++gdcitOld)
+  for(GradientDirectionContainerType::ConstIterator gdcitOld = directions->Begin();
+  gdcitOld != directions->End(); ++gdcitOld)
   {
     // already exists?
     bool found = false;
@@ -255,14 +260,19 @@ void mitk::DiffusionImage<TPixelType>::AverageRedundantGradients(double precisio
 {
 
   GradientDirectionContainerType::Pointer newDirs =
-      CalcAveragedDirectionSet(precision);
+      CalcAveragedDirectionSet(precision, m_Directions);
+
+  GradientDirectionContainerType::Pointer newOriginalDirs =
+      CalcAveragedDirectionSet(precision, m_OriginalDirections);
 
   // if sizes equal, we do not need to do anything in this function
-  if(m_Directions->size() == newDirs->size())
+  if(m_Directions->size() == newDirs->size() || m_OriginalDirections->size() == newOriginalDirs->size())
     return;
 
   GradientDirectionContainerType::Pointer oldDirections = m_Directions;
+  GradientDirectionContainerType::Pointer oldOriginalDirections = m_OriginalDirections;
   m_Directions = newDirs;
+  m_OriginalDirections = newOriginalDirs;
 
   // new image
   typename ImageType::Pointer oldImage = m_VectorImage;

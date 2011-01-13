@@ -70,8 +70,11 @@ namespace mitk
     typename OutputType::Pointer m_OutputCache;
     itk::TimeStamp m_CacheTime;
 
+    GradientDirectionContainerType::Pointer m_OriginalDiffusionVectors;
     GradientDirectionContainerType::Pointer m_DiffusionVectors;
     float m_B_Value;
+
+    MeasurementFrameType m_MeasurementFrame;
 
   private:
     void operator=(const Self&); //purposely not implemented

@@ -59,19 +59,26 @@ void mitk::NrrdDiffusionImageWriter<TPixelType>::GenerateData()
     img->GetMetaDataDictionary();
 
     //itk::MetaDataDictionary dic = input->GetImage()->GetMetaDataDictionary();
-    sprintf( valbuffer, "(%1f,%1f,%1f) (%1f,%1f,%1f) (%1f,%1f,%1f)", 1.0f,0.0f,0.0f,0.0f,1.0f,0.0f,0.0f,0.0f,1.0f);
-    itk::EncapsulateMetaData<std::string>(input->GetVectorImage()->GetMetaDataDictionary(),std::string("measurement frame"),std::string(valbuffer));
+
+    vnl_matrix_fixed<double,3,3> measurementFrame = input->GetMeasurementFrame();
+    if (measurementFrame(0,0) || measurementFrame(0,1) || measurementFrame(0,2) ||
+        measurementFrame(1,0) || measurementFrame(1,1) || measurementFrame(1,2) ||
+        measurementFrame(2,0) || measurementFrame(2,1) || measurementFrame(2,2))
+    {
+      sprintf( valbuffer, " ( %lf , %lf , %lf ) ( %lf , %lf , %lf ) ( %lf , %lf , %lf ) \n", measurementFrame(0,0), measurementFrame(0,1), measurementFrame(0,2), measurementFrame(1,0), measurementFrame(1,1), measurementFrame(1,2), measurementFrame(2,0), measurementFrame(2,1), measurementFrame(2,2));
+      itk::EncapsulateMetaData<std::string>(input->GetVectorImage()->GetMetaDataDictionary(),std::string("measurement frame"),std::string(valbuffer));
+    }
 
     sprintf( valbuffer, "DWMRI");
     itk::EncapsulateMetaData<std::string>(input->GetVectorImage()->GetMetaDataDictionary(),std::string("modality"),std::string(valbuffer));
 
-    if(input->GetDirections()->Size())
+    if(input->GetOriginalDirections()->Size())
     {
       sprintf( valbuffer, "%1f", input->GetB_Value() );
       itk::EncapsulateMetaData<std::string>(input->GetVectorImage()->GetMetaDataDictionary(),std::string("DWMRI_b-value"),std::string(valbuffer));
     }
 
-    for(unsigned int i=0; i<input->GetDirections()->Size(); i++)
+    for(unsigned int i=0; i<input->GetOriginalDirections()->Size(); i++)
     {
       sprintf( keybuffer, "DWMRI_gradient_%04d", i );
 
@@ -79,8 +86,8 @@ void mitk::NrrdDiffusionImageWriter<TPixelType>::GenerateData()
       std::string(keybuffer),tmp))
       continue;*/
 
-      sprintf( valbuffer, "%1f %1f %1f", input->GetDirections()->ElementAt(i).get(0),
-        input->GetDirections()->ElementAt(i).get(1), input->GetDirections()->ElementAt(i).get(2));
+      sprintf( valbuffer, "%1f %1f %1f", input->GetOriginalDirections()->ElementAt(i).get(0),
+        input->GetOriginalDirections()->ElementAt(i).get(1), input->GetOriginalDirections()->ElementAt(i).get(2));
 
       itk::EncapsulateMetaData<std::string>(input->GetVectorImage()->GetMetaDataDictionary(),std::string(keybuffer),std::string(valbuffer));
     }

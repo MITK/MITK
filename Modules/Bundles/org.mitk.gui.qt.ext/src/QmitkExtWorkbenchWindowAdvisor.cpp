@@ -575,9 +575,15 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
  //disabling the SizeGrip in the lower right corner
  statusBar->SetSizeGripEnabled(false);
 
+  
+  
  QmitkProgressBar *progBar = new QmitkProgressBar();
+ 
  qStatusBar->addPermanentWidget(progBar, 0);
  progBar->hide();
+// progBar->AddStepsToDo(2);
+// progBar->Progress(1);
+
  mainWindow->setStatusBar(qStatusBar);
 
  QmitkMemoryUsageIndicatorView* memoryIndicator =

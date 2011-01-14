@@ -104,6 +104,8 @@ public:
   bool setHeaderData(int section, Qt::Orientation orientation, const QVariant &value, int role = Qt::EditRole);
   bool dropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column, const QModelIndex &parent);
   Qt::DropActions supportedDropActions() const;
+  Qt::DropActions supportedDragActions() const;
+  QStringList mimeTypes() const;
   QMimeData * mimeData(const QModelIndexList & indexes) const;
 
   //# End of QAbstractItemModel

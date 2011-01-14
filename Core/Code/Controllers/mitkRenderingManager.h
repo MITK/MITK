@@ -239,7 +239,6 @@ public:
   int GetNextLOD( BaseRenderer* renderer );
 
   /** Set current LOD (NULL means all renderers)*/
-  void SetNextLOD( unsigned int lod, BaseRenderer *renderer = NULL );
   void SetMaximumLOD( unsigned int max );
 
   void SetShading( bool state, unsigned int lod );

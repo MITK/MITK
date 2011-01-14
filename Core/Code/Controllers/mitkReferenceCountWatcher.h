@@ -16,6 +16,7 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include "itkCommand.h"
+#include "mitkCommon.h"
 
 namespace mitk 
 {

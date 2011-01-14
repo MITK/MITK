@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkObjectFactoryBase.h>
 #include <itkSmartPointerForwardReference.txx>
 
-//template class itk::SmartPointerForwardReference<mitk::BaseProcess>;
+template class MITK_CORE_EXPORT itk::SmartPointerForwardReference<mitk::BaseProcess>;
 
 #define MITK_WEAKPOINTER_PROBLEM_WORKAROUND_ENABLED
 

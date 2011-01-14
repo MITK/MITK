@@ -693,7 +693,7 @@ void mbilog::BackendCout::FormatSmartWindows(const mbilog::LogMessage &l,int /*t
 
     case mbilog::Warn:
       colorTime = FOREGROUND_RED|FOREGROUND_GREEN|FOREGROUND_INTENSITY;
-      colorText = FOREGROUND_RED|FOREGROUND_GREEN;
+      //colorText = FOREGROUND_RED|FOREGROUND_GREEN;
       colorCat = FOREGROUND_BLUE | FOREGROUND_RED | FOREGROUND_INTENSITY;
       showColon = false;
       forceCat = true;
@@ -701,7 +701,7 @@ void mbilog::BackendCout::FormatSmartWindows(const mbilog::LogMessage &l,int /*t
 
     case mbilog::Error:
       colorTime = FOREGROUND_RED|FOREGROUND_INTENSITY;
-      colorText = FOREGROUND_RED;
+      //colorText = FOREGROUND_RED;
       colorCat = FOREGROUND_BLUE | FOREGROUND_RED | FOREGROUND_INTENSITY;
       showColon = false;
       forceCat = true;
@@ -709,7 +709,7 @@ void mbilog::BackendCout::FormatSmartWindows(const mbilog::LogMessage &l,int /*t
 
     case mbilog::Fatal:
       colorTime = FOREGROUND_RED|FOREGROUND_BLUE|FOREGROUND_INTENSITY;
-      colorText = FOREGROUND_RED|FOREGROUND_BLUE|FOREGROUND_INTENSITY;
+      //colorText = FOREGROUND_RED|FOREGROUND_BLUE|FOREGROUND_INTENSITY;
       colorCat = FOREGROUND_BLUE | FOREGROUND_RED | FOREGROUND_INTENSITY;
       showColon = false;
       forceCat = true;
@@ -717,7 +717,7 @@ void mbilog::BackendCout::FormatSmartWindows(const mbilog::LogMessage &l,int /*t
 
     case mbilog::Debug:
       colorTime = FOREGROUND_BLUE|FOREGROUND_INTENSITY;
-      colorText |= FOREGROUND_INTENSITY;
+      //colorText |= FOREGROUND_INTENSITY;
       showColon = false;
       break;
   }

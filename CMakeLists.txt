@@ -1,5 +1,5 @@
 PROJECT(MITK)
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
+CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
 # this should be set to NEW at some point, see bug #1402
 if(COMMAND cmake_policy)

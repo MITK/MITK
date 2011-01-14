@@ -1,5 +1,6 @@
 PROJECT(MITK)
-CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
+CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
+
 # this should be set to NEW at some point, see bug #1402
 if(COMMAND cmake_policy)
   cmake_policy(SET CMP0003 OLD)
@@ -58,6 +59,14 @@ IF(MITK_USE_QT)
   # find the package at the very beginning, so that QT4_FOUND is available
   FIND_PACKAGE(Qt4 REQUIRED)
 ENDIF()
+OPTION(MITK_USE_CTK "EXEPERIMENTAL, superbuild only: Use CTK in MITK" OFF)
+OPTION(MITK_USE_DCMTK "EXEPERIMENTAL, superbuild only: Use DCMTK in MITK" OFF)
+OPTION(MITK_USE_SUPERBUILD "EXEPERIMENTAL: Use superbuild for MITK" OFF)
+MARK_AS_ADVANCED(MITK_USE_SUPERBUILD MITK_USE_CTK MITK_USE_DCMTK)
+IF(MITK_USE_SUPERBUILD)
+  INCLUDE(SuperBuild.cmake)
+  RETURN()
+ENDIF(MITK_USE_SUPERBUILD)
 
 IF(NOT UNIX AND NOT MINGW)
   SET(MITK_WIN32_FORCE_STATIC "STATIC" CACHE INTERNAL "Use this variable to always build static libraries on non-unix platforms")
@@ -336,3 +345,4 @@ CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/MITKCTestCustom.ctest.in
 ${MITK_BINARY_DIR}/CTestCustom.ctest @ONLY)
 FILE(WRITE ${MITK_BINARY_DIR}/CTestCustom.cmake
 "INCLUDE(\"${MITK_BINARY_DIR}/CTestCustom.ctest\")\n")
+

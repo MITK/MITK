@@ -89,6 +89,9 @@ class MitkExt_EXPORT OverwriteDirectedPlaneImageFilter : public ImageToImageFilt
 
     virtual void GenerateData();
 
+	template<typename TPixel, unsigned int VImageDimension>
+	void ItkSliceOverwriting (itk::Image<TPixel, VImageDimension>* input3D);
+
     template<typename TPixel, unsigned int VImageDimension>
     void ItkImageSwitch( itk::Image<TPixel,VImageDimension>* image );
 

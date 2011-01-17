@@ -26,6 +26,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkStateEvent.h"
 #include "mitkPositionEvent.h"
 
+//ContourSet - Test
+#include "mitkContourSet.h"
+
 namespace mitk
 {
 
@@ -103,6 +106,7 @@ class MitkExt_EXPORT SegTool2D : public Tool
 	  \brief Adds a new node called @a contourmarker which holds a mitk::PlanarFigure. By selecting this node the slices will be oriented according to the planarGeometry
 	*/
 	void AddContourmarker ( const PositionEvent* );
+	void AddContour ( const mitk::Contour::Pointer );
 
     void InteractiveSegmentationBugMessage( const std::string& message );
  
@@ -112,6 +116,9 @@ class MitkExt_EXPORT SegTool2D : public Tool
     unsigned int          m_LastEventSlice;
 	//The prefix of the contourmarkernames. Suffix is a consecutive number
 	const std::string	  m_Contourmarkername;
+
+	//ContourSet - Test
+	mitk::ContourSet::Pointer m_ContourSet;
 
 	/**
 	  \brief Checks whether a marker for the currentGeometry already exists

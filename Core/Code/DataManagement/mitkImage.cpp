@@ -29,7 +29,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkImageData.h>
 
 
-//template class itk::SmartPointerForwardReference<ImageDataItem>;
+template class MITK_CORE_EXPORT itk::SmartPointerForwardReference<mitk::ImageDataItem>;
 
 
 mitk::Image::Image() : 

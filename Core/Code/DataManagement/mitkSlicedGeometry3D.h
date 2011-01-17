@@ -72,16 +72,6 @@ public:
 
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
-
-  /**
-   * \brief Re-calculate the hull of the contained geometries.
-   *
-   * The transforms, bounding-box and time-bounds of this
-   * geometry (stored in members of the super-class Geometry3D)
-   * are re-calculated from the contained geometries.
-   */
-  void UpdateInformation();
-
   
   /**
    * \brief Returns the Geometry2D of the slice (\a s).

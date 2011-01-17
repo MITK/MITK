@@ -51,6 +51,8 @@ namespace mitk
 
     // slice scrolling
     mitk::BaseRenderer::Pointer m_TransversalBR;
+    double m_InitialScrollValue;
+    int m_UpdateFrequency;
 
   }; // end class 
 } // end namespace mitk

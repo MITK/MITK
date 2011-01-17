@@ -20,10 +20,12 @@
 #define BERRYFILEEDITORINPUT_H_
 
 #include "berryIPathEditorInput.h"
+#include "berryUiDll.h"
+
 
 namespace berry {
 
-class FileEditorInput : public IPathEditorInput
+class BERRY_UI FileEditorInput : public IPathEditorInput
 {
 
 public:

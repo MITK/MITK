@@ -1,0 +1,6 @@
+
+# ToDo: Richtig machen:
+SET(ALL_INCLUDE_DIRECTORIES ${ALL_INCLUDE_DIRECTORIES} "V:/windows/source/CTK/CTK/Libs/Scripting/Python/Widgets" "V:/windows/x32/CTK/CTK-build/Libs/Scripting/Python/Widgets" "V:/windows/source/CTK/CTK/Libs/Scripting/Python/Core" "V:/windows/x32/CTK/CTK-build/Libs/Scripting/Python/Core" "D:/MITK/mitk/Wrapping/CSwig" "D:/binPython/Wrapping/CSwig/Core")
+set(ALL_LIBRARIES ${ALL_LIBRARIES} "V:/windows/x32/CTK/CTK-build/bin/Debug/CTKScriptingPythonWidgets.lib" "V:/windows/x32/CTK/CTK-build/bin/Debug/CTKScriptingPythonCore.lib" "D:/Python/PCbuild/python26_d.lib" _mitkCorePython_d.lib SwigRuntimePython.lib)
+
+MACRO_CREATE_MITK_PLUGIN(QmitkExt)

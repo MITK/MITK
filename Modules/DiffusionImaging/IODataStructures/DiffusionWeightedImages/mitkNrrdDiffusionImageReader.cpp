@@ -56,6 +56,10 @@ namespace mitk
     static_cast<OutputType*>(this->GetOutput())
       ->SetDirections(m_OutputCache->GetDirections());
     static_cast<OutputType*>(this->GetOutput())
+      ->SetOriginalDirections(m_OutputCache->GetOriginalDirections());
+    static_cast<OutputType*>(this->GetOutput())
+      ->SetMeasurementFrame(m_OutputCache->GetMeasurementFrame());
+    static_cast<OutputType*>(this->GetOutput())
       ->InitializeFromVectorImage();
   }
 
@@ -102,9 +106,9 @@ namespace mitk
         std::string metaString;
 
         GradientDirectionType vect3d;
-        MeasurementFrameType measFrame;
 
         m_DiffusionVectors = GradientDirectionContainerType::New();
+        m_OriginalDiffusionVectors = GradientDirectionContainerType::New();
 
         int numberOfImages = 0;
         int numberOfGradientImages = 0;
@@ -121,9 +125,9 @@ namespace mitk
           { 
             MITK_INFO << *itKey << " ---> " << metaString;
             sscanf(metaString.c_str(), "%lf %lf %lf\n", &x, &y, &z);
-            MITK_INFO << "read values: " << x << "; " << y << "; " << z;
             vect3d[0] = x; vect3d[1] = y; vect3d[2] = z;
             m_DiffusionVectors->InsertElement( numberOfImages, vect3d );
+            m_OriginalDiffusionVectors->InsertElement( numberOfImages, vect3d );
             ++numberOfImages;
             // If the direction is 0.0, this is a reference image
             if (vect3d[0] == 0.0 &&
@@ -143,17 +147,35 @@ namespace mitk
           else if (itKey->find("measurement frame") != std::string::npos)
           {
             MITK_INFO << *itKey << " ---> " << metaString;
-            readFrame = true;
             sscanf(metaString.c_str(), " ( %lf , %lf , %lf ) ( %lf , %lf , %lf ) ( %lf , %lf , %lf ) \n", &xx, &xy, &xz, &yx, &yy, &yz, &zx, &zy, &zz);
-            measFrame(0,0) = xx;
-            measFrame(0,1) = xy;
-            measFrame(0,2) = xz;
-            measFrame(1,0) = yx;
-            measFrame(1,1) = yy;
-            measFrame(1,2) = yz;
-            measFrame(2,0) = zx;
-            measFrame(2,1) = zy;
-            measFrame(2,2) = zz;
+
+            readFrame = true;
+            if (xx>10e-10 || xy>10e-10 || xz>10e-10 ||
+                yx>10e-10 || yy>10e-10 || yz>10e-10 ||
+                zx>10e-10 || zy>10e-10 || zz>10e-10 )
+            {
+              m_MeasurementFrame(0,0) = xx;
+              m_MeasurementFrame(0,1) = xy;
+              m_MeasurementFrame(0,2) = xz;
+              m_MeasurementFrame(1,0) = yx;
+              m_MeasurementFrame(1,1) = yy;
+              m_MeasurementFrame(1,2) = yz;
+              m_MeasurementFrame(2,0) = zx;
+              m_MeasurementFrame(2,1) = zy;
+              m_MeasurementFrame(2,2) = zz;
+            }
+            else
+            {
+              m_MeasurementFrame(0,0) = 1;
+              m_MeasurementFrame(0,1) = 0;
+              m_MeasurementFrame(0,2) = 0;
+              m_MeasurementFrame(1,0) = 0;
+              m_MeasurementFrame(1,1) = 1;
+              m_MeasurementFrame(1,2) = 0;
+              m_MeasurementFrame(2,0) = 0;
+              m_MeasurementFrame(2,1) = 0;
+              m_MeasurementFrame(2,2) = 1;
+            }
           }
         }
 
@@ -166,7 +188,7 @@ namespace mitk
           {
             vnl_vector<double> vec(3);
             vec.copy_in(m_DiffusionVectors->ElementAt(i).data_block());
-            vec = vec.pre_multiply(measFrame);
+            vec = vec.pre_multiply(m_MeasurementFrame);
             m_DiffusionVectors->ElementAt(i).copy_in(vec.data_block());
           }
         }
@@ -185,6 +207,8 @@ namespace mitk
         outputForCache->SetVectorImage(img);
         outputForCache->SetB_Value(m_B_Value);
         outputForCache->SetDirections(m_DiffusionVectors);
+        outputForCache->SetOriginalDirections(m_OriginalDiffusionVectors);
+        outputForCache->SetMeasurementFrame(m_MeasurementFrame);
 
         // Since we have already read the tree, we can store it in a cache variable
         // so that it can be assigned to the DataObject in GenerateData();

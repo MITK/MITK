@@ -127,6 +127,11 @@ Qt::DropActions QmitkDataStorageTreeModel::supportedDropActions() const
   return Qt::CopyAction | Qt::MoveAction;
 }
 
+Qt::DropActions QmitkDataStorageTreeModel::supportedDragActions() const
+{
+  return Qt::CopyAction | Qt::MoveAction;
+}
+
 bool QmitkDataStorageTreeModel::dropMimeData(const QMimeData *data,
                                      Qt::DropAction action, int /*row*/, int /*column*/, const QModelIndex &parent)
 {
@@ -170,16 +175,46 @@ bool QmitkDataStorageTreeModel::dropMimeData(const QMimeData *data,
       this->AdjustLayerProperty();
     }
   }
+  else if(data->hasFormat("application/x-mitk-datanode"))
+  {
+      QString arg = QString(data->data("application/x-mitk-datanode").data());
+      long val = arg.toLong();
+      mitk::DataNode* node = static_cast<mitk::DataNode *>((void*)val);
+
+      if(node && m_DataStorage.IsNotNull() && !m_DataStorage->Exists(node))
+      {
+          m_DataStorage->Add( node );
+          mitk::BaseData::Pointer basedata = node->GetData();
+          if (basedata.IsNotNull())
+          {
+            mitk::RenderingManager::GetInstance()->InitializeViews(
+              basedata->GetTimeSlicedGeometry(), mitk::RenderingManager::REQUEST_UPDATE_ALL, true );
+            mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+          }
+      }
+  }
   return false;
 }
 
+QStringList QmitkDataStorageTreeModel::mimeTypes() const
+{
+    QStringList types = QAbstractItemModel::mimeTypes();
+    types << "application/x-mitk-datanode";
+    return types;
+}
 
 QMimeData * QmitkDataStorageTreeModel::mimeData(const QModelIndexList & indexes) const{
   QMimeData * ret = new QMimeData;
-  long a = reinterpret_cast<long>(indexes.at(0).internalPointer());
+
+  TreeItem* treeItem = static_cast<TreeItem*>(indexes.at(0).internalPointer());
+  long a = reinterpret_cast<long>(treeItem);
+  long b = reinterpret_cast<long>(treeItem->GetDataNode().GetPointer());
 
   QString result;
+  QString result2;
   QTextStream(&result) << a;
+  QTextStream(&result2) << b;
+  ret->setData("application/x-mitk-datanode", QByteArray(result2.toAscii()));
   ret->setData("application/x-qabstractitemmodeldatalist", QByteArray(result.toAscii()));
   return ret;
 }

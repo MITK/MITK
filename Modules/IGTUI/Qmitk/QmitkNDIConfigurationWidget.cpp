@@ -257,7 +257,9 @@ std::string QmitkNDIConfigurationWidget::GetDeviceName() const
 {
   if (m_Controls == NULL)
     return NULL;
-  return m_Controls->m_ComPortSelector->currentText().toStdString();
+  QString deviceName = m_Controls->m_ComPortSelector->currentText();
+  deviceName.prepend("\\\\.\\"); // always prepend "\\.\ to all COM ports, to be able to connect to ports > 9"
+  return deviceName.toStdString();
 }
 
 
@@ -323,11 +325,15 @@ void QmitkNDIConfigurationWidget::OnDiscoverDevices()
   PortDeviceMap portsAndDevices;
   QString status = "Scanning ";
 #ifdef WIN32
+  QString devName;
   for (unsigned int i = 1; i < 20; ++i)
   {
-    QString devName = QString("COM%1").arg(i);
+    if (i<10)
+    devName = QString("COM%1").arg(i);
+    else
+      devName = QString("\\\\.\\COM%1").arg(i); // prepend "\\.\ to COM ports >9, to be able to allow connection"
     portsAndDevices[devName];
-    status += devName + ", ";
+    status += QString("COM%1").arg(i) + ", ";
   }
 #else //linux/posix systems
   for(unsigned int i = 1; i < 6; ++i)
@@ -352,16 +358,22 @@ void QmitkNDIConfigurationWidget::OnDiscoverDevices()
   QString result = "The following tracking devices were found:<BR/>\n";
   for (PortDeviceMap::const_iterator it = portsAndDevices.begin(); it != portsAndDevices.end(); ++it)
   {
-    result += it.key() + ": ";
+    QString tmpComPort = it.key();
+    if (tmpComPort.startsWith("\\"))
+    {
+      tmpComPort.remove(0,4); // remove "\\.\" for nice ui visualisation
+    }
+    result += tmpComPort + ": ";   
+
     switch (it.value())
     {
     case mitk::NDIPolaris:
       result += "NDI Polaris<BR/>\n";
-      m_Controls->m_ComPortSelector->addItem(it.key());
+      m_Controls->m_ComPortSelector->addItem(tmpComPort);
       break;
     case mitk::NDIAurora:
       result += "NDI Aurora<BR/>\n";
-      m_Controls->m_ComPortSelector->addItem(it.key());
+      m_Controls->m_ComPortSelector->addItem(tmpComPort);
       break;
     default:
       result += "No NDI tracking device found<BR/>\n";

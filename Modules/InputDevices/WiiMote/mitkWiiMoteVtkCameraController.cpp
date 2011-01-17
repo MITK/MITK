@@ -21,6 +21,10 @@ const double XMAX = 1024;
 const double YMIN = 0;
 const double YMAX = 768;
 
+// initial scroll value
+
+const int UPDATEFREQUENCY = 5;
+
 mitk::WiiMoteVtkCameraController::WiiMoteVtkCameraController() 
 : CameraController("WiiMoteHeadtracking")
 , m_ClippingRangeIsSet(false)
@@ -32,6 +36,8 @@ mitk::WiiMoteVtkCameraController::WiiMoteVtkCameraController()
 , m_SensitivityY (0)
 , m_Calibrated (false)
 , m_TransversalBR( NULL )
+, m_InitialScrollValue( 0 )
+, m_UpdateFrequency( 0 )
 {
   CONNECT_ACTION(mitk::AcONWIIMOTEINPUT, OnWiiMoteInput);
   CONNECT_ACTION(mitk::AcRESETVIEW, ResetView);
@@ -196,34 +202,55 @@ bool mitk::WiiMoteVtkCameraController::OnWiiMoteInput(mitk::Action* a, const mit
     }
   }  
 
-  // adapting slice navigation
-  // sensitivity according to 
-  // slice numbers
   SlicedGeometry3D* slicedWorldGeometry
     = dynamic_cast<SlicedGeometry3D*>
     (m_TransversalBR->GetSliceNavigationController()->GetCreatedWorldGeometry()->GetGeometry3D(m_TimeStep));
 
-  int sliceNumber = slicedWorldGeometry->GetSlices();
+  int numberOfSlices = slicedWorldGeometry->GetSlices();
 
   const mitk::Geometry2D* currentGeo = m_TransversalBR->GetCurrentWorldGeometry2D();
   mitk::Point3D origin = currentGeo->GetOrigin();
 
   int sliceValue = wiiMoteIREvent->GetSliceNavigationValue();
-  int adaptedValue = sliceValue * (sliceNumber / YMAX * 3);
 
   if(sliceValue > 0)
   {
-    origin.SetElement(2,adaptedValue);
-  }
+    if(m_InitialScrollValue == 0)
+    {
+      m_InitialScrollValue = sliceValue;
+    }
+    else if(std::abs(m_InitialScrollValue - sliceValue) > 10)
+    {
+      if(m_UpdateFrequency == UPDATEFREQUENCY /* 5 */)
+      {
+        int steppingValue;
+        int currentPos = origin.GetElement(2);
 
-  //if(sliceValue > 0)
-  //{
-  //  origin.SetElement(2,origin.GetElement(2)+adaptedValue);
-  //}
-  //else if(sliceValue < 0)
-  //{
-  //  origin.SetElement(2,origin.GetElement(2)-adaptedValue);
-  //}
+        if(sliceValue < m_InitialScrollValue)
+        {
+          /* steppingValue = m_InitialScrollValue - sliceValue;     */
+          steppingValue = currentGeo->GetSpacing()[2];
+          origin.SetElement(2, currentPos-steppingValue);
+        }
+        else if(sliceValue > m_InitialScrollValue)
+        {
+          /* steppingValue = sliceValue - m_InitialScrollValue;*/
+          steppingValue = currentGeo->GetSpacing()[2];
+          origin.SetElement(2, currentPos+steppingValue);
+        }
+
+        m_UpdateFrequency = 0;
+      }
+      else
+      {
+        m_UpdateFrequency++;
+      }
+    }
+  }
+  else
+  {
+    m_InitialScrollValue = 0;
+  }
 
   m_TransversalBR->GetSliceNavigationController()->SelectSliceByPoint(origin);
 

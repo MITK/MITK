@@ -74,7 +74,14 @@ namespace itk {
       {
       case QBAR_STANDARD:
         {
-          odf.Normalize();
+          TOdfPixelType sum = 0;
+
+          for(int i=0; i<NrOdfDirections; i++)
+          {
+            sum += odf[i];
+          }
+          odf /= sum;
+
           return odf;
           break;
         }

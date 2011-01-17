@@ -374,6 +374,26 @@ namespace itk
   }
 
   /*
+  * L2-Normalization
+  */
+  template<class T, unsigned int NOdfDirections>
+  void
+    OrientationDistributionFunction<T, NOdfDirections>
+    ::L2Normalize()
+  {
+    T sum = 0;
+    for( unsigned int i=0; i<InternalDimension; i++)
+    {
+      sum += (*this)[i]*(*this)[i];
+    }
+    sum = std::sqrt(sum);
+    for( unsigned int i=0; i<InternalDimension; i++)
+    {
+      (*this)[i] = (*this)[i] / sum;
+    }
+  }
+
+  /*
   * Normalization to PDF
   */
   template<class T, unsigned int NOdfDirections>

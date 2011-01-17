@@ -15,7 +15,7 @@ namespace mitk
     ///
     /// provide smart pointer defs
     ///
-    mitkClassMacro( OpenCVImageSource, itk::LightObject );
+    mitkClassMacro( OpenCVImageSource, itk::Object );
 
     ///
     /// \return a image as opencv 2 Mat

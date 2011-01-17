@@ -15,6 +15,7 @@ SET(CPP_FILES
   Algorithms/mitkDataNodeSource.cpp
   Algorithms/mitkGeometry2DDataToSurfaceFilter.cpp
   Algorithms/mitkHistogramGenerator.cpp
+  Algorithms/mitkImageCaster.cpp
   Algorithms/mitkImageCastPart1.cpp
   Algorithms/mitkImageCastPart2.cpp
   Algorithms/mitkImageCastPart3.cpp

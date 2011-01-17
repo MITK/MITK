@@ -41,6 +41,9 @@ A lot of file-formats can be loaded into MITK, for example
 <li> ...
 </ul>
 
+The user can also load a series of 2D images (e.g. image001.bmp, image002.bmp ...) to a MITK 3D volume. 
+To do this, just drag and drop one of those 2D data files into the Datamanager by holding the ALT key.
+
 After loading one or more data into the Datamanager they appear as Data-Elements in a sorted list inside the Datamanager. 
 Data-Elements can also be sorted hierarchically as a parent-child-relation.
 For example after using the Segmentation-Module on Data-Element1 the result is created as Data-Element2, which is a child of Data-Element1 (see Screenshot1).

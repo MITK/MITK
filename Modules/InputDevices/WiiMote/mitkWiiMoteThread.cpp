@@ -262,7 +262,7 @@ void mitk::WiiMoteThread::DisconnectWiiMotes()
 void mitk::WiiMoteThread::WiiMoteIRInput()
 {
   if( m_WiiMotes[0].IR.Dot[0].bVisible 
-    && m_WiiMotes[0].IR.Dot[1].bVisible )
+  /*  && m_WiiMotes[0].IR.Dot[1].bVisible*/ )
   {
     m_Command = ReceptorCommand::New(); 
     m_Command->SetCallbackFunction
@@ -275,9 +275,9 @@ void mitk::WiiMoteThread::WiiMoteIRInput()
 
     int sliceValue = 0;
 
-    if(m_WiiMotes[0].IR.Dot[2].bVisible)
+    if(m_WiiMotes[0].IR.Dot[1].bVisible)
     {
-      sliceValue = ( m_WiiMotes[0].IR.Dot[2].RawY  );
+      sliceValue = ( m_WiiMotes[0].IR.Dot[1].RawY  );
     }
     // if the last read data is not valid,
     // because the thread was not started

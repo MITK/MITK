@@ -26,7 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk {
 
 /**
-  \brief A filter that can extract a 2D slice from a 3D or 4D image even if the image`s axes are rotated
+  \brief A filter that can extract a 2D slice from a 3D or 4D image especially if the image`s axes are rotated
 
   \sa ContourTool
   \sa SegTool2D
@@ -65,7 +65,6 @@ public:
     */
 	itkSetMacro(CurrentWorldGeometry2D, Geometry3D* );
 
-	//Brauchen wir die überhaupt?
 	itkSetMacro(ImageGeometry, Geometry3D* );
 
 	/**
@@ -88,10 +87,6 @@ private:
 
 	template<typename TPixel, unsigned int VImageDimension>
 	void ItkSliceExtraction (itk::Image<TPixel, VImageDimension>* inputImage);
-
-	template < typename TPixel, unsigned int VImageDimension >
-        void InternalReorientImagePlane(
-            const itk::Image< TPixel, VImageDimension > *image);
 };
 
 }//namespace

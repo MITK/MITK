@@ -290,17 +290,18 @@ DicomSeriesReader::UidFileNamesMap DicomSeriesReader::GetSeries(const std::strin
     assumption about this method:
       returns a map of uid-like-key --> list(filename)
       each entry should contain filenames that have images of same
-        - TODO study instance uid
-        - TODO series instance uid
+        - series instance uid (automatically done by GDCMSeriesFileNames
         - 0020,0037 image orientation (patient)
         - 0028,0030 pixel spacing (x,y)
         - 0018,0050 slice thickness
-
   */
 
   name_generator->SetUseSeriesDetails(true);
   name_generator->AddSeriesRestriction("0020|0037"); // image orientation (patient)
   name_generator->AddSeriesRestriction("0028|0030"); // pixel spacing (x,y)
+
+  name_generator->SetLoadSequences(false); // could speed up reading, and we don't use sequences anyway
+  name_generator->SetLoadPrivateTags(false);
 
   const StringContainer::const_iterator restrictions_end = restrictions.end();
 

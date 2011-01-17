@@ -192,9 +192,12 @@ void mbilog::BackendCout::FormatFull(std::ostream &out,const LogMessage &l,int t
       break;
   }
 
-  time_t rawtime;
-  time ( &rawtime );
-  out << "|" << ctime(&rawtime);
+  out << "|";
+
+  AppendTimeStamp(out);
+
+  out << "|";
+
   
   out << "|" << std::string(l.filePath) << "(" << l.lineNumber << ")";
 

@@ -90,7 +90,6 @@ PURPOSE.  See the above copyright notices for more information.
 bool mitk::DataNodeFactory::m_TextureInterpolationActive = false;    // default value for texture interpolation if nothing is defined in global options (see QmitkMainTemplate.ui.h)
 
 mitk::DataNodeFactory::DataNodeFactory()
-: m_UseSeriesDetails(true)
 {
   m_Serie = false;
   m_OldProgress = 0;
@@ -248,7 +247,7 @@ void mitk::DataNodeFactory::ReadFileSeriesTypeDCM()
   }
   #endif
       
-  DicomSeriesReader::UidFileNamesMap names_map = DicomSeriesReader::GetSeries(this->GetDirectory(), this->m_UseSeriesDetails, this->m_SeriesRestrictions);
+  DicomSeriesReader::UidFileNamesMap names_map = DicomSeriesReader::GetSeries(this->GetDirectory(), this->m_SeriesRestrictions);
   const unsigned int size = names_map.size();
 
   this->ResizeOutputs(size);

@@ -93,9 +93,6 @@ public:
    */
   void SetImageSerie(bool serie);
 
-  itkGetMacro( UseSeriesDetails, bool );
-  itkSetMacro( UseSeriesDetails, bool );
-
   void AddSeriesRestriction(const std::string &tag)
   {m_SeriesRestrictions.push_back(tag);}
 
@@ -176,7 +173,6 @@ protected:
 
   virtual void ReadFileSeriesTypeITKImageSeriesReader();
 
-  bool m_UseSeriesDetails;
   std::vector<std::string> m_SeriesRestrictions;
   int m_OldProgress;
 };

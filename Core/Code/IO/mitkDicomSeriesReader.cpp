@@ -30,11 +30,11 @@ namespace mitk
 
 typedef itk::GDCMSeriesFileNames DcmFileNamesGeneratorType;
 
-DataNode::Pointer DicomSeriesReader::LoadDicomSeries(const StringContainer &filenames, UpdateCallBackMethod callback)
+DataNode::Pointer DicomSeriesReader::LoadDicomSeries(const StringContainer &filenames, bool sort, bool check_4d, UpdateCallBackMethod callback)
 {
   DataNode::Pointer node = DataNode::New();
 
-  if (DicomSeriesReader::LoadDicomSeries(filenames, *node, callback))
+  if (DicomSeriesReader::LoadDicomSeries(filenames, *node, sort, check_4d, callback))
   {
     return node;
   }
@@ -44,7 +44,7 @@ DataNode::Pointer DicomSeriesReader::LoadDicomSeries(const StringContainer &file
   }
 }
 
-bool DicomSeriesReader::LoadDicomSeries(const StringContainer &filenames, DataNode &node, UpdateCallBackMethod callback)
+bool DicomSeriesReader::LoadDicomSeries(const StringContainer &filenames, DataNode &node, bool sort, bool check_4d, UpdateCallBackMethod callback)
 {
   if(filenames.size() == 0)
   {
@@ -64,34 +64,34 @@ bool DicomSeriesReader::LoadDicomSeries(const StringContainer &filenames, DataNo
       switch (io->GetComponentType())
       {
       case DcmIoType::UCHAR:
-        DicomSeriesReader::LoadDicom<unsigned char>(filenames, node, callback);
+        DicomSeriesReader::LoadDicom<unsigned char>(filenames, node, sort, check_4d, callback);
         return true;
       case DcmIoType::CHAR:
-        DicomSeriesReader::LoadDicom<char>(filenames, node, callback);
+        DicomSeriesReader::LoadDicom<char>(filenames, node, sort, check_4d, callback);
         return true;
       case DcmIoType::USHORT:
-        DicomSeriesReader::LoadDicom<unsigned short>(filenames, node, callback);
+        DicomSeriesReader::LoadDicom<unsigned short>(filenames, node, sort, check_4d, callback);
         return true;
       case DcmIoType::SHORT:
-        DicomSeriesReader::LoadDicom<short>(filenames, node, callback);
+        DicomSeriesReader::LoadDicom<short>(filenames, node, sort, check_4d, callback);
         return true;
       case DcmIoType::UINT:
-        DicomSeriesReader::LoadDicom<unsigned int>(filenames, node, callback);
+        DicomSeriesReader::LoadDicom<unsigned int>(filenames, node, sort, check_4d, callback);
         return true;
       case DcmIoType::INT:
-        DicomSeriesReader::LoadDicom<int>(filenames, node, callback);
+        DicomSeriesReader::LoadDicom<int>(filenames, node, sort, check_4d, callback);
         return true;
       case DcmIoType::ULONG:
-        DicomSeriesReader::LoadDicom<long unsigned int>(filenames, node, callback);
+        DicomSeriesReader::LoadDicom<long unsigned int>(filenames, node, sort, check_4d, callback);
         return true;
       case DcmIoType::LONG:
-        DicomSeriesReader::LoadDicom<long int>(filenames, node, callback);
+        DicomSeriesReader::LoadDicom<long int>(filenames, node, sort, check_4d, callback);
         return true;
       case DcmIoType::FLOAT:
-        DicomSeriesReader::LoadDicom<float>(filenames, node, callback);
+        DicomSeriesReader::LoadDicom<float>(filenames, node, sort, check_4d, callback);
         return true;
       case DcmIoType::DOUBLE:
-        DicomSeriesReader::LoadDicom<double>(filenames, node, callback);
+        DicomSeriesReader::LoadDicom<double>(filenames, node, sort, check_4d, callback);
         return true;
       default:
         MITK_ERROR << "Unknown pixel type!";
@@ -126,7 +126,7 @@ bool DicomSeriesReader::IsPhilips3DDicom(const std::string &filename)
   if (io->CanReadFile(filename.c_str()))
   {
     //Look at header Tag 3001,0010 if it is "Philips3D"
-    gdcm::PixmapReader reader;
+    gdcm::Reader reader;
     reader.SetFileName(filename.c_str());
     reader.Read();
     gdcm::DataSet &data_set = reader.GetFile().GetDataSet();
@@ -144,7 +144,7 @@ bool DicomSeriesReader::IsPhilips3DDicom(const std::string &filename)
 
 bool DicomSeriesReader::ReadPhilips3DDicom(const std::string &filename, mitk::Image::Pointer output_image)
 {
-  // Now get PhilipsSpecific Tags     
+  // Now get PhilipsSpecific Tags
 
   gdcm::PixmapReader reader;
   reader.SetFileName(filename.c_str());
@@ -164,7 +164,7 @@ bool DicomSeriesReader::ReadPhilips3DDicom(const std::string &filename, mitk::Im
   gdcm::Attribute<0x0018,0x6026> physicalTagY;
   gdcm::Attribute<0x3001,0x1002, gdcm::VR::US, gdcm::VM::VM1> physicalTagZ; // (Philips specific)
 
-  dimTagX.Set(data_set); 
+  dimTagX.Set(data_set);
   dimTagY.Set(data_set);
   dimTagZ.Set(data_set);
   dimTagT.Set(data_set);
@@ -229,26 +229,26 @@ bool DicomSeriesReader::ReadPhilips3DDicom(const std::string &filename, mitk::Im
   myRegion.SetIndex( myIndex );
   imageItk->SetSpacing(mySpacing);
   imageItk->SetRegions( myRegion);
-  imageItk->Allocate();     
+  imageItk->Allocate();
   imageItk->FillBuffer(0);
 
   itk::ImageRegionIterator<ImageType>  iterator(imageItk, imageItk->GetLargestPossibleRegion());
-  iterator.GoToBegin();      
+  iterator.GoToBegin();
   unsigned long pixCount = 0;
   unsigned long planeSize = dimX*dimY;
-  unsigned long planeCount = 0;        
-  unsigned long timeCount = 0;        
+  unsigned long planeCount = 0;
+  unsigned long timeCount = 0;
   unsigned long numberOfSlices = dimZ;
 
   while (!iterator.IsAtEnd())
-  {          
-    unsigned long adressedPixel = 
+  {
+    unsigned long adressedPixel =
       pixCount
       + (numberOfSlices-1-planeCount)*planeSize // add offset to adress the first pixel of current plane
       + timeCount*numberOfSlices*planeSize; // add time offset
 
     iterator.Set( new_pixels[ adressedPixel ] );
-    pixCount++;             
+    pixCount++;
     ++iterator;
 
     if (pixCount == planeSize)
@@ -265,28 +265,42 @@ bool DicomSeriesReader::ReadPhilips3DDicom(const std::string &filename, mitk::Im
     {
       break;
     }
-  }            
-  mitk::CastToMitkImage(imageItk, output_image);  
+  }
+  mitk::CastToMitkImage(imageItk, output_image);
   /*
   // this works as well, but then the picture is upside down..   transversal slice[max] should be transversal slice[0] and so on.
   while (!iterator.IsAtEnd())
   {
   iterator.Set( new_pixels[pixCount] );
-  pixCount++;             
+  pixCount++;
   iterator++;
-  }                
-  mitk::CastToMitkImage(imageItk, image);                    
-  */        
+  }
+  mitk::CastToMitkImage(imageItk, image);
+  */
   return true; // actually never returns false yet.. but exception possible
 }
 #endif
 
-DicomSeriesReader::UidFileNamesMap DicomSeriesReader::GetSeries(const std::string &dir, bool additional_criteria, const StringContainer &restrictions)
+DicomSeriesReader::UidFileNamesMap DicomSeriesReader::GetSeries(const std::string &dir, const StringContainer &restrictions)
 {
   DcmFileNamesGeneratorType::Pointer name_generator = DcmFileNamesGeneratorType::New();
 
-  name_generator->SetUseSeriesDetails(additional_criteria);
-  name_generator->SetDirectory(dir.c_str());
+  /**
+
+    assumption about this method:
+      returns a map of uid-like-key --> list(filename)
+      each entry should contain filenames that have images of same
+        - TODO study instance uid
+        - TODO series instance uid
+        - 0020,0037 image orientation (patient)
+        - 0028,0030 pixel spacing (x,y)
+        - 0018,0050 slice thickness
+
+  */
+
+  name_generator->SetUseSeriesDetails(true);
+  name_generator->AddSeriesRestriction("0020|0037"); // image orientation (patient)
+  name_generator->AddSeriesRestriction("0028|0030"); // pixel spacing (x,y)
 
   const StringContainer::const_iterator restrictions_end = restrictions.end();
 
@@ -294,6 +308,8 @@ DicomSeriesReader::UidFileNamesMap DicomSeriesReader::GetSeries(const std::strin
   {
     name_generator->AddSeriesRestriction(*it);
   }
+
+  name_generator->SetDirectory(dir.c_str());
 
   UidFileNamesMap map;
   const StringContainer &series_uids = name_generator->GetSeriesUIDs();
@@ -309,13 +325,13 @@ DicomSeriesReader::UidFileNamesMap DicomSeriesReader::GetSeries(const std::strin
   return map;
 }
 
-DicomSeriesReader::StringContainer DicomSeriesReader::GetSeries(const std::string &dir, const std::string &series_uid, bool additional_criteria,
-    const StringContainer &restrictions)
+DicomSeriesReader::StringContainer DicomSeriesReader::GetSeries(const std::string &dir, const std::string &series_uid, const StringContainer &restrictions)
 {
   DcmFileNamesGeneratorType::Pointer name_generator = DcmFileNamesGeneratorType::New();
 
-  name_generator->SetUseSeriesDetails(additional_criteria);
-  name_generator->SetDirectory(dir.c_str());
+  name_generator->SetUseSeriesDetails(true);
+  name_generator->AddSeriesRestriction("0020|0037"); // image orientation (patient)
+  name_generator->AddSeriesRestriction("0028|0030"); // pixel spacing (x,y)
 
   const StringContainer::const_iterator restrictions_end = restrictions.end();
 
@@ -324,7 +340,22 @@ DicomSeriesReader::StringContainer DicomSeriesReader::GetSeries(const std::strin
     name_generator->AddSeriesRestriction(*it);
   }
 
+  name_generator->SetDirectory(dir.c_str());
+
   return name_generator->GetFileNames(series_uid);
+}
+
+DicomSeriesReader::StringContainer DicomSeriesReader::SortSeriesSlices(const StringContainer &unsortedFilenames)
+{
+#if GDCM_MAJOR_VERSION >= 2
+  gdcm::Sorter sorter;
+
+  sorter.SetSortFunction(DicomSeriesReader::GdcmSortFunction);
+  sorter.Sort(unsortedFilenames);
+  return sorter.GetFilenames();
+#else
+  return unsortedFilenames;
+#endif
 }
 
 #if GDCM_MAJOR_VERSION >= 2
@@ -332,19 +363,45 @@ bool DicomSeriesReader::GdcmSortFunction(const gdcm::DataSet &ds1, const gdcm::D
 {
   gdcm::Attribute<0x0008,0x0032> acq_time1; // Acquisition time
   gdcm::Attribute<0x0020,0x0032> image_pos1; // Image Position (Patient)
+  gdcm::Attribute<0x0020,0x0037> image_orientation1; // Image Orientation (Patient)
 
   acq_time1.Set(ds1);
   image_pos1.Set(ds1);
+  image_orientation1.Set(ds1);
 
   gdcm::Attribute<0x0008,0x0032> acq_time2;
   gdcm::Attribute<0x0020,0x0032> image_pos2;
+  gdcm::Attribute<0x0020,0x0037> image_orientation2;
 
   acq_time2.Set(ds2);
   image_pos2.Set(ds2);
+  image_orientation2.Set(ds2);
+
+  if (image_orientation1 != image_orientation2)
+  {
+    MITK_ERROR << "Dicom images have different orientations.";
+    throw std::logic_error("Dicom images have different orientations.");
+  }
 
   if (acq_time1 == acq_time2)
   {
-    return image_pos1 < image_pos2;
+    double normal[3];
+
+    normal[0] = image_orientation1[1] * image_orientation1[5] - image_orientation1[2] * image_orientation1[4];
+    normal[1] = image_orientation1[2] * image_orientation1[3] - image_orientation1[0] * image_orientation1[5];
+    normal[2] = image_orientation1[0] * image_orientation1[4] - image_orientation1[1] * image_orientation1[3];
+
+    double
+        dist1 = 0.0,
+        dist2 = 0.0;
+
+    for (unsigned char i = 0u; i < 3u; ++i)
+    {
+      dist1 += normal[i] * image_pos1[i];
+      dist2 += normal[i] * image_pos2[i];
+    }
+
+    return dist1 < dist2;
   }
 
   return acq_time1 < acq_time2;

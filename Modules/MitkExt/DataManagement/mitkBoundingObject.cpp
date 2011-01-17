@@ -43,16 +43,19 @@ void mitk::BoundingObject::FitGeometry(mitk::Geometry3D* aGeometry3D)
 {
   GetGeometry()->SetIdentity();
   GetGeometry()->Compose(aGeometry3D->GetIndexToWorldTransform());
-
-  if(aGeometry3D->GetImageGeometry())
+  
+  if (aGeometry3D->GetImageGeometry())
   {
-    mitk::Vector3D halfSpacingStep = aGeometry3D->GetSpacing()*0.5;
-    GetGeometry()->SetOrigin(aGeometry3D->GetCenter()-halfSpacingStep);
+    // remove 0.5 offset, if necessary
+    aGeometry3D->ChangeImageGeometryConsideringOriginOffset(false); 
+    GetGeometry()->SetOrigin(aGeometry3D->GetCenter());
+    aGeometry3D->ChangeImageGeometryConsideringOriginOffset(true);
   }
   else
   {
     GetGeometry()->SetOrigin(aGeometry3D->GetCenter());
   }
+  
 
   mitk::Vector3D size;
   for(unsigned int i=0; i < 3; ++i)

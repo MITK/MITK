@@ -145,6 +145,12 @@ virtual void SetBounds(const BoundsArrayType& bounds);
   //## @brief Set the bounding box (in index/unit coordinates) via a double array
   virtual void SetFloatBounds(const double bounds[6]);
 
+
+  //##Documentation
+  //## @brief When switching from an Image Geometry to a normal Geometry (and the other way around), you have to change the origin as well (See Geometry Documentation)! This function will change the "isImageGeometry" bool flag and changes the origin respectively.
+  virtual void ChangeImageGeometryConsideringOriginOffset( const bool isAnImageGeometry );
+
+
   //##Documentation
   //## @brief Get the time bounds (in ms)
   itkGetConstReferenceMacro(TimeBounds, TimeBounds);
@@ -279,7 +285,7 @@ virtual void SetBounds(const BoundsArrayType& bounds);
   virtual void Compose( const vtkMatrix4x4 * vtkmatrix, bool pre = 0 );
 
   //##Documentation
-  //## @brief Get the origin, i.e. the upper-left corner of the plane
+  //## @brief Get the origin, e.g. the upper-left corner of the plane
   const Point3D& GetOrigin() const
   {
     return m_Origin;
@@ -295,30 +301,35 @@ virtual void SetBounds(const BoundsArrayType& bounds);
   }
 
   //##Documentation
-  //## @brief Convert world coordinates (in mm) of a \em point to (continuous!) index coordinates (in units)
-  //## \warning If you need integer index coordinates (e.g., for accessing a pixel in an image),
+  //## @brief Convert world coordinates (in mm) of a \em point to (continuous!) index coordinates 
+  //## \warning If you need (discrete) integer index coordinates (e.g., for iterating easily over an image),
   //## use WorldToIndex(const mitk::Point3D& pt_mm, itk::Index<VIndexDimension> &index).
+  //## For further information about coordinates types, please see the Geometry documentation
   void WorldToIndex(const mitk::Point3D& pt_mm, mitk::Point3D& pt_units) const;
 
   //##Documentation
-  //## @brief Convert index coordinates (in units) of a \em point to world coordinates (in mm)
+  //## @brief Convert (continuous or discrete) index coordinates of a \em point to world coordinates (in mm)
+  //## For further information about coordinates types, please see the Geometry documentation
   void IndexToWorld(const mitk::Point3D& pt_units, mitk::Point3D& pt_mm) const;
 
   //##Documentation
   //## @brief Convert world coordinates (in mm) of a \em vector 
-  //## \a vec_mm (at the point \a atPt3d_mm) to (continuous!) index coordinates (in units)
-  //## \warning If you need integer index coordinates (e.g., for accessing a pixel in an image),
-  //## use WorldToIndex(const mitk::Point3D& pt_mm, itk::Index<VIndexDimension> &index).
+  //## \a vec_mm to (continuous!) index coordinates.
+  //## \warning Deprecated! First parameter (Point3D) is not used. If possible, please use void WorldToIndex(const mitk::Point3D& pt_mm, mitk::Point3D& pt_units) const.
+  //## For further information about coordinates types, please see the Geometry documentation
   void WorldToIndex(const mitk::Point3D& atPt3d_mm, const mitk::Vector3D& vec_mm, mitk::Vector3D& vec_units) const;
 
   //##Documentation
-  //## @brief Convert index coordinates (in units) of a \em vector 
-  //## \a vec_units (at the point \a atPt3d_units) to world coordinates (in mm)
+  //## @brief Convert (continuous or discrete) index coordinates of a \em vector 
+  //## \a vec_units to world coordinates (in mm)
+  //## \warning Deprecated! First parameter (Point3D) is not used. If possible, please use void IndexToWorld(const mitk::Point3D& pt_units, mitk::Point3D& pt_mm) const.
+  //## For further information about coordinates types, please see the Geometry documentation
   void IndexToWorld(const mitk::Point3D& atPt3d_units, const mitk::Vector3D& vec_units, mitk::Vector3D& vec_mm) const;
 
   //##Documentation
-  //## @brief Convert world coordinates (in mm) of a \em point to index coordinates (in units).
+  //## @brief Convert world coordinates (in mm) of a \em point to (discrete!) index coordinates.
   //## This method rounds to integer indices!
+  //## For further information about coordinates types, please see the Geometry documentation
   template <unsigned int VIndexDimension>
   void WorldToIndex(const mitk::Point3D& pt_mm, itk::Index<VIndexDimension> &index) const
   {

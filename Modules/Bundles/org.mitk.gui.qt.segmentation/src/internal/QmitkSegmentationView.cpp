@@ -34,6 +34,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkSurfaceToImageFilter.h>
 #include <vtkPolyData.h>
 
+#include "mitkVtkResliceInterpolationProperty.h"
+
 // public methods
 
 QmitkSegmentationView::QmitkSegmentationView()
@@ -42,7 +44,6 @@ QmitkSegmentationView::QmitkSegmentationView()
 ,m_MultiWidget(NULL)
 // ,m_PostProcessing(NULL)
 ,m_RenderingManagerObserverTag(0)
-//FIX from Markus,m_TempWorkingDataNode(NULL)
 {
 }
 
@@ -136,9 +137,6 @@ void QmitkSegmentationView::SetMultiWidget(QmitkStdMultiWidget* multiWidget)
 
   // save the current multiwidget as the working widget
   m_MultiWidget = multiWidget;
-
-  //connect, so we get informed when plane mode changes
-//FIX from Markus  connect(m_MultiWidget, SIGNAL(WidgetPlaneModeChange( int )), this, SLOT(OnPlaneModeChanged( int )) );
 
   if (m_MultiWidget)
   {
@@ -271,6 +269,9 @@ void QmitkSegmentationView::CreateNewSegmentation()
             mitk::DataNode::Pointer emptySegmentation =
               firstTool->CreateEmptySegmentationNode( image, dialog->GetSegmentationName().toStdString(), dialog->GetColor() );
 
+			//Here we change the reslice interpolation mode for a segmentation, so that contours in rotated slice can be shown correctly
+			emptySegmentation->SetProperty( "reslice interpolation", mitk::VtkResliceInterpolationProperty::New(VTK_RESLICE_CUBIC) );
+
             if (!emptySegmentation) return; // could be aborted by user
 
             UpdateOrganList( organColors, dialog->GetSegmentationName(), dialog->GetColor() );
@@ -357,7 +358,7 @@ void QmitkSegmentationView::ManualToolSelected(int id)
     if (id >= 0)
     {
       m_MultiWidget->DisableNavigationControllerEventListening();
-//FIX from Markus      m_MultiWidget->SetWidgetPlaneMode(0);
+	  m_MultiWidget->SetWidgetPlaneMode(0);
     }
     else
     {
@@ -545,7 +546,6 @@ void QmitkSegmentationView::OnSelectionChanged(std::vector<mitk::DataNode*> node
   else
     m_Controls->CreateSegmentationFromSurface->setEnabled(true);
 
-//FIX from Markus  m_TempWorkingDataNode = NULL;
   SetToolManagerSelection(referenceData, workingData);
   ForceDisplayPreferencesUponAllImages();
 }
@@ -597,11 +597,11 @@ void QmitkSegmentationView::OnContourMarkerSelected(const mitk::DataNode *node)
     if (selectedRenderWindow)
     {
       mitk::Point3D centerP = markerGeometry->GetOrigin();
-	 /* mitk::Point3D centerP1 = markerGeometry->GetCenter();*/
+	   selectedRenderWindow->GetSliceNavigationController()->SelectSliceByPoint(
+          centerP);
       selectedRenderWindow->GetSliceNavigationController()->ReorientSlices(
           centerP, markerGeometry->GetNormal());
-     /* selectedRenderWindow->GetSliceNavigationController()->SelectSliceByPoint(
-          centerP);*/
+     
 	}
 }
 
@@ -733,22 +733,6 @@ void QmitkSegmentationView::CheckImageAlignment()
     {
       m_Controls->lblAlignmentWarning->show();
 	}
-    //FIX from Markus  //temporary fix unless we support segmentation in rotated slices part I
-    //  if ( m_TempWorkingDataNode.IsNull() )
-    //    m_TempWorkingDataNode = m_Controls->m_ManualToolSelectionBox->GetToolManager()->GetWorkingData(0);
-    //  m_Controls->m_ManualToolSelectionBox->GetToolManager()->SetWorkingData(NULL);
-    //  m_Controls->btnNewSegmentation->setEnabled(false);
-    //}
-    //else
-    //{
-    //  m_Controls->lblAlignmentWarning->hide();
-
-    //  //temporary fix unless we support segmentation in rotated slices part II
-    //  if ( m_TempWorkingDataNode.IsNotNull() )
-    //    m_Controls->m_ManualToolSelectionBox->GetToolManager()->SetWorkingData( m_TempWorkingDataNode );
-    //  m_TempWorkingDataNode = NULL;
-    //  m_Controls->btnNewSegmentation->setEnabled(true);
-    //}
   }
 }
 
@@ -913,26 +897,26 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
 
 }
 
-void QmitkSegmentationView::OnPlaneModeChanged(int i)
-{
-  //if plane mode changes, disable all tools
-  if (m_MultiWidget)
-  {
-    mitk::ToolManager* toolManager = m_Controls->m_ManualToolSelectionBox->GetToolManager();
-
-    if (toolManager)
-    {
-      if (toolManager->GetActiveToolID() >= 0)
-      {
-        toolManager->ActivateTool(-1);
-      }
-      else
-      {
-        m_MultiWidget->EnableNavigationControllerEventListening();
-      }
-    }
-  }
-}
+//void QmitkSegmentationView::OnPlaneModeChanged(int i)
+//{
+//  //if plane mode changes, disable all tools
+//  if (m_MultiWidget)
+//  {
+//    mitk::ToolManager* toolManager = m_Controls->m_ManualToolSelectionBox->GetToolManager();
+//
+//    if (toolManager)
+//    {
+//      if (toolManager->GetActiveToolID() >= 0)
+//      {
+//        toolManager->ActivateTool(-1);
+//      }
+//      else
+//      {
+//        m_MultiWidget->EnableNavigationControllerEventListening();
+//      }
+//    }
+//  }
+//}
 
 
 // ATTENTION some methods for handling the known list of (organ names, colors) are defined in QmitkSegmentationOrganNamesHandling.cpp

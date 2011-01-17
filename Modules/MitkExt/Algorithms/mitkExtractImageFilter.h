@@ -36,7 +36,7 @@ namespace mitk
   \ingroup Process
   \ingroup ToolManagerEtAl
 
-  There is a separate page describing the general design of QmitkInteractiveSegmentation: \ref QmitkInteractiveSegmentationTechnicalPage
+  There is a separate page describing the general design of QmitkInteractiveSegmentation: \ref QmitkSegmentationTechnicalPage
 
   This class takes a 3D mitk::Image as input and tries to extract one slice from it.
 

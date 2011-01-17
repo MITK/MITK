@@ -24,6 +24,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkTestingMacros.h"
 
+#include <vtkCubeSource.h>
+#include "mitkSurface.h"
+
 
 //Propertylist Test
 
@@ -56,6 +59,63 @@ static void TestPropertyList(mitk::RenderingManager::Pointer renderingManager)
   MITK_TEST_CONDITION(prop->GetValue(), "Testing if getting the bool property" )
   
   MITK_TEST_CONDITION(propertyList == renderingManager->GetPropertyList(), "Testing if the propertylist has changed during the last tests" )
+}
+
+static void TestSurfaceLoading( mitk::RenderingManager::Pointer renderingManager )
+{
+  // create and render two dimensional surface
+  vtkCubeSource* plane = vtkCubeSource::New();
+
+  double planeBounds[] = { -1.0, 1.0, -1.0, 1.0, 0.0, 0.0 };
+  double cubeBounds[] = { -0.5, 0.5, -0.5, 0.5, -0.5, 0.5 };
+  plane->SetBounds( planeBounds ); 
+  plane->SetCenter( 0.0, 0.0, 0.0 );
+
+  vtkPolyData* polys = plane->GetOutput();
+  mitk::Surface::Pointer mitkPlane = mitk::Surface::New();
+  mitkPlane->SetVtkPolyData( polys );
+  plane->Delete();
+
+  mitk::DataNode::Pointer planeNode = mitk::DataNode::New();
+  planeNode->SetData( mitkPlane );
+
+  renderingManager->GetDataStorage()->Add( planeNode );
+
+  mitk::Geometry3D::Pointer planeGeometry = mitk::Geometry3D::New();
+  planeGeometry->SetFloatBounds( planeBounds );
+
+  MITK_TEST_CONDITION( renderingManager->InitializeViews( planeGeometry ), "Testing if two dimensional Geometry3Ds can be displayed" )
+
+  //clear rendering
+  renderingManager->GetDataStorage()->Remove( planeNode );
+
+  renderingManager->InitializeViews();
+
+  // create and render three dimensional surface
+  vtkCubeSource* cube = vtkCubeSource::New();
+  cube->SetBounds( cubeBounds ); 
+  cube->SetCenter( 0.0, 0.0, 0.0 );
+
+  vtkPolyData* polyCube = cube->GetOutput();
+  mitk::Surface::Pointer mitkCube = mitk::Surface::New();
+  mitkCube->SetVtkPolyData( polyCube );
+  cube->Delete();
+
+  mitk::DataNode::Pointer cubeNode = mitk::DataNode::New();
+  cubeNode->SetData( mitkCube );
+
+  renderingManager->GetDataStorage()->Add( cubeNode );
+
+  mitk::Geometry3D::Pointer cubeGeometry = mitk::Geometry3D::New();
+  cubeGeometry->SetFloatBounds( cubeBounds );
+
+  MITK_TEST_CONDITION( renderingManager->InitializeViews( cubeGeometry ), "Testing if three dimensional Geometry3Ds can be displayed" )
+
+    //clear rendering
+  renderingManager->GetDataStorage()->Remove( cubeNode );
+
+  renderingManager->InitializeViews();
+
 }
 
 }; //mitkDataNodeTestClass
@@ -98,6 +158,8 @@ int mitkRenderingManagerTest(int /* argc */, char* /*argv*/[])
   MITK_TEST_CONDITION_REQUIRED(br->GetDataStorage() == ds2,"Testing if change of internal DataStorage has been forwarded correctly to registered BaseRenderer") 
 
   mitkRenderingManagerTestClass::TestPropertyList(myRenderingManager);
+
+  mitkRenderingManagerTestClass::TestSurfaceLoading( myRenderingManager );
 
   // write your own tests here and use the macros from mitkTestingMacros.h !!!
   // do not write to std::cout and do not return from this function yourself!

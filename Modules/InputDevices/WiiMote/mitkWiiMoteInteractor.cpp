@@ -6,7 +6,6 @@
 #include <mitkSurface.h>
 #include <mitkRenderingManager.h>
 #include <mitkVector.h>
-#include <mitkBaseRenderer.h>
 #include <mitkGlobalInteraction.h>
 #include <mitkDataStorage.h>
 #include <mitkRenderingManager.h>
@@ -26,7 +25,7 @@
 #define _USE_MATH_DEFINES // otherwise, constants will not work
 #include <math.h>
 
-
+const double DELTATIME = 0.01;
 
 mitk::WiiMoteInteractor::WiiMoteInteractor(const char* type, DataNode* dataNode)
 : Interactor(type, dataNode)
@@ -39,9 +38,13 @@ mitk::WiiMoteInteractor::WiiMoteInteractor(const char* type, DataNode* dataNode)
 , m_xAngle (0)
 , m_yAngle (0)
 , m_zAngle (0)
+, m_xValue (0)
+, m_yValue (0)
+, m_zValue (0)
 , m_InRotation(false)
 , m_TranslationMode(1)
 , m_OriginalGeometry(NULL)
+, m_SurfaceInteractionMode(1)
 {
   // save original geometry
   mitk::Geometry3D* temp = this->TransformCurrentDataInGeometry3D();
@@ -130,19 +133,20 @@ bool mitk::WiiMoteInteractor::OnWiiMoteInput(Action* action, const mitk::StateEv
     MITK_ERROR << "Event is not wiimote event and could not be transformed\n";
   }
 
+  m_SurfaceInteractionMode = wiiMoteEvent->GetSurfaceInteractionMode();
+
   //this->FixedRotationAndTranslation(wiiMoteEvent);
 
-  Geometry3D* geometry = this->TransformCurrentDataInGeometry3D();
-
-
   // -------------------- values for translation --------------------
-  float xValue = wiiMoteEvent->GetXAcceleration();
-  float yValue = wiiMoteEvent->GetYAcceleration();
-  float zValue = wiiMoteEvent->GetZAcceleration();
+  float xAccel = wiiMoteEvent->GetXAcceleration();
+  float yAccel = wiiMoteEvent->GetYAcceleration();
+  float zAccel = wiiMoteEvent->GetZAcceleration();
 
   float pitch = wiiMoteEvent->GetPitch();
   float roll = wiiMoteEvent->GetRoll();
 
+  m_OrientationX = wiiMoteEvent->GetOrientationX();
+  m_OrientationY = wiiMoteEvent->GetOrientationY();
   m_OrientationZ = wiiMoteEvent->GetOrientationZ();
 
   // substracts the proportionate force 
@@ -157,36 +161,40 @@ bool mitk::WiiMoteInteractor::OnWiiMoteInput(Action* action, const mitk::StateEv
   // x acceleration
   if(m_OrientationZ >= 0)
   {
-    xValue = xValue - sinR * cosP;
+    m_xValue = xAccel - sinR * cosP;
   }
   else
   {
-    xValue = xValue + sinR * cosP;
+    m_xValue = xAccel + sinR * cosP;
   }
 
-  // against drift
-  if(std::abs(xValue) < 0.2)
-  {
-    xValue = 0;
-  }
+  //// against drift
+  //if(std::abs(xAccel) < 0.2)
+  //{
+  //  m_xValue = 0;
+  //}
 
   // y acceleration
-  yValue = yValue + sinP;
+  m_yValue = yAccel + sinP;
 
-  // against drift
-  if(std::abs(yValue) < 0.2)
-  {
-    yValue = 0;
-  }
+  //// against drift
+  //if(std::abs(yAccel) < 0.2)
+  //{
+  //  m_yValue = 0;
+  //}
 
   // z acceleration
-  zValue = zValue - cosP * cosR;
+  m_zValue = zAccel - cosP * cosR;
 
-  // against drift
-  if(std::abs(zValue) < 0.3)
-  {
-    zValue = 0;
-  }
+  //// against drift
+  //if(std::abs(zAccel) < 0.3)
+  //{
+  //  m_zValue = 0;
+  //}
+
+  m_xVelocity += m_xValue;
+  m_yVelocity += m_yValue;
+  m_zVelocity -= m_zValue;
 
   // -------------------- values for rotation --------------------
 
@@ -199,7 +207,14 @@ bool mitk::WiiMoteInteractor::OnWiiMoteInput(Action* action, const mitk::StateEv
   if(std::abs(pitchSpeed) > 50
     && std::abs(pitchSpeed) < 1000)
   {
-    m_xAngle = (pitchSpeed / 100);
+    if(m_SurfaceInteractionMode == 1)
+    {
+      m_xAngle = (pitchSpeed * DELTATIME);
+    }
+    else
+    {
+      m_xAngle = (-pitchSpeed * DELTATIME);
+    }
   }
   else
   {
@@ -211,7 +226,7 @@ bool mitk::WiiMoteInteractor::OnWiiMoteInput(Action* action, const mitk::StateEv
   if(std::abs(rollSpeed) > 50
     && std::abs(rollSpeed) < 1000)
   {
-    m_yAngle = (rollSpeed / 100);
+    m_yAngle = (rollSpeed * DELTATIME);
   }
   else
   {
@@ -223,7 +238,14 @@ bool mitk::WiiMoteInteractor::OnWiiMoteInput(Action* action, const mitk::StateEv
   if(std::abs(yawSpeed) > 50
     && std::abs(yawSpeed) < 1000)
   {
-    m_zAngle = (yawSpeed / 100);
+    if(m_SurfaceInteractionMode == 1)
+    {
+      m_zAngle = (yawSpeed * DELTATIME);
+    }
+    else
+    {
+      m_zAngle = (-yawSpeed * DELTATIME);
+    }
   }
   else
   {
@@ -232,81 +254,11 @@ bool mitk::WiiMoteInteractor::OnWiiMoteInput(Action* action, const mitk::StateEv
  
   // -------------------- rotation and translation --------------------
 
-  //// translation
-  //mitk::Vector3D movementVector;
-  //movementVector.SetElement(0,xValue);
-  //movementVector.SetElement(1,yValue);
-  //movementVector.SetElement(2,zValue);
+  bool result = false;
 
-  //geometry->Translate(movementVector);
-  //geometry->Modified();
+  result = this->DynamicRotationAndTranslation(this->TransformCurrentDataInGeometry3D());
 
-  //// indicate modification of data tree node
-  //m_DataNode->Modified();
-
-
-  vtkTransform* vtkTransform = vtkTransform::New();
-
-  //copy m_vtkMatrix to m_VtkIndexToWorldTransform
-  geometry->TransferItkToVtkTransform();
-
-  //m_VtkIndexToWorldTransform as vtkLinearTransform*
-  vtkTransform->SetMatrix(geometry->GetVtkTransform()->GetMatrix());
-
-  vnl_quaternion<double> q( vtkMath::RadiansFromDegrees( m_xAngle ), 
-    vtkMath::RadiansFromDegrees( m_zAngle ), 
-    vtkMath::RadiansFromDegrees( m_yAngle ) );
-  //q.normalize();
-  vnl_matrix_fixed<double, 4, 4> mat = q.rotation_matrix_transpose_4();
-
-  // fill translation column
-  mat(0,3) = xValue;
-  mat(1,3) = yValue;
-  mat(2,3) = zValue;
-
-  // invert matrix to apply
-  // correct order for the transformation
-  mat = vnl_inverse(mat);
-
-  vtkMatrix4x4* deltaTransform = vtkMatrix4x4::New();
-
-  // copy into matrix
-  for(size_t i=0; i<4; ++i)
-    for(size_t j=0; j<4; ++j)
-      deltaTransform->SetElement(i,j, mat(i,j));
-
-  vtkTransform->Concatenate( deltaTransform );
-
-  // rotation from center is different
-  // from rotation while translated
-  // hence one needs the center of the object
-  //double center[3];
-  //vtkTransform->GetPosition(center);
-
-  //vtkTransform->PostMultiply();
-  /*
-  vtkTransform->RotateX(m_xAngle);
-  vtkTransform->RotateZ(m_zAngle);
-  vtkTransform->RotateY(m_yAngle);
-  vtkTransform->Translate(xValue,yValue,zValue);*/
-
-
-  //vtkTransform->PreMultiply();
- 
-  geometry->SetIndexToWorldTransformByVtkMatrix(vtkTransform->GetMatrix());
-  geometry->Modified();
-
-  deltaTransform->Delete();
-
-  m_DataNode->Modified();
-
-  vtkTransform->Delete();
-
-  //update rendering
-  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-
- 
-  return true;
+  return result;
 }
 
 bool mitk::WiiMoteInteractor::OnWiiMoteReleaseButton(Action* action, const mitk::StateEvent* stateEvent)
@@ -315,10 +267,15 @@ bool mitk::WiiMoteInteractor::OnWiiMoteReleaseButton(Action* action, const mitk:
   m_yVelocity = 0;
   m_zVelocity = 0;
 
+  m_xValue = 0;
+  m_yValue = 0;
+  m_zValue = 0;
+
   m_xAngle = 0;
   m_yAngle = 0;
   m_zAngle = 0;
 
+  // only for fixed translation
   m_InRotation = false;
   m_TranslationMode = 1;
 
@@ -337,6 +294,212 @@ mitk::Geometry3D* mitk::WiiMoteInteractor::TransformCurrentDataInGeometry3D()
   Geometry3D* geometry = surface->GetUpdatedTimeSlicedGeometry()->GetGeometry3D( m_TimeStep );
   return geometry;
 }
+
+vnl_matrix_fixed<double, 4, 4> mitk::WiiMoteInteractor::ComputeCurrentCameraPosition( vtkCamera* vtkCamera )                                                          
+{
+  vnl_matrix_fixed<double, 4, 4> cameraMat;
+
+   //first we need the position of the camera
+  mitk::Vector3D camPosition;
+  double camPositionTemp[3];
+  vtkCamera->GetPosition(camPositionTemp);
+  camPosition[0] = camPositionTemp[0]; 
+  camPosition[1] = camPositionTemp[1]; 
+  camPosition[2] = camPositionTemp[2]; 
+
+  //then the upvector of the camera
+  mitk::Vector3D upCamVector;
+  double upCamTemp[3];
+  vtkCamera->GetViewUp(upCamTemp);
+  upCamVector[0] = upCamTemp[0]; 
+  upCamVector[1] = upCamTemp[1]; 
+  upCamVector[2] = upCamTemp[2]; 
+  upCamVector.Normalize();
+
+  //then the vector to which the camera is heading at (focalpoint)
+  mitk::Vector3D focalPoint;
+  double focalPointTemp[3];
+  vtkCamera->GetFocalPoint(focalPointTemp);
+  focalPoint[0] = focalPointTemp[0]; 
+  focalPoint[1] = focalPointTemp[1]; 
+  focalPoint[2] = focalPointTemp[2]; 
+  mitk::Vector3D focalVector;
+  focalVector = focalPoint - camPosition;
+  focalVector.Normalize();
+
+  //orthogonal vector to focalVector and upCamVector
+  mitk::Vector3D crossVector;
+  crossVector = CrossProduct(upCamVector, focalVector);
+  crossVector.Normalize();
+
+  cameraMat.put(0,0,crossVector[0]);
+  cameraMat.put(1,0,crossVector[1]);
+  cameraMat.put(2,0,crossVector[2]);
+  cameraMat.put(3,0,0);
+
+  cameraMat.put(0,1,focalVector[0]);
+  cameraMat.put(1,1,focalVector[1]);
+  cameraMat.put(2,1,focalVector[2]);
+  cameraMat.put(3,1,0);
+
+  cameraMat.put(0,2,upCamVector[0]);
+  cameraMat.put(1,2,upCamVector[1]);
+  cameraMat.put(2,2,upCamVector[2]);
+  cameraMat.put(3,2,0);
+
+  cameraMat.put(0,3,camPosition[0]);
+  cameraMat.put(1,3,camPosition[1]);
+  cameraMat.put(2,3,camPosition[2]);
+  cameraMat.put(3,3,1);
+
+  return cameraMat;
+}
+
+bool mitk::WiiMoteInteractor::DynamicRotationAndTranslation(Geometry3D* geometry)
+{
+   // computation of the delta transformation
+  if(m_SurfaceInteractionMode == 1)
+  {
+    // necessary because the wiimote has
+    // a different orientation when loaded
+    // as an object file
+    ScalarType temp = m_yAngle;
+    m_yAngle = m_zAngle;
+    m_zAngle = temp;
+  }
+
+  //vnl_quaternion<double> Rx(m_OrientationX
+  //  ,m_OrientationY
+  //  ,m_OrientationZ
+  //  , m_xAngle);
+
+  //vnl_quaternion<double> Ry(Rx.axis()[0]
+  //  , Rx.axis()[1]
+  //  , Rx.axis()[2]
+  //  , m_yAngle);
+
+  //vnl_quaternion<double> Rz(Ry.axis()[0]
+  //  , Ry.axis()[1]
+  //  , Ry.axis()[2]
+  //  , m_zAngle);
+
+
+  vnl_quaternion<double> q( 
+    vtkMath::RadiansFromDegrees( m_xAngle ), 
+    vtkMath::RadiansFromDegrees( m_yAngle ), 
+    vtkMath::RadiansFromDegrees( m_zAngle ) );
+ 
+  //q = Rz * Ry * Rx;
+  //q.normalize();
+
+  vnl_matrix_fixed<double, 4, 4> deltaTransformMat = q.rotation_matrix_transpose_4();
+
+  // fill translation column
+  deltaTransformMat(0,3) = m_xVelocity;
+  deltaTransformMat(1,3) = m_yVelocity;
+  deltaTransformMat(2,3) = m_zVelocity;
+
+  // invert matrix to apply
+  // correct order for the transformation
+  deltaTransformMat = vnl_inverse(deltaTransformMat);
+
+  vtkMatrix4x4* deltaTransform = vtkMatrix4x4::New();
+
+  // copy into matrix
+  for(size_t i=0; i<4; ++i)
+    for(size_t j=0; j<4; ++j)
+      deltaTransform->SetElement(i,j, deltaTransformMat(i,j));
+
+  vtkMatrix4x4* objectTransform = vtkMatrix4x4::New();
+
+  if(m_SurfaceInteractionMode == 2)
+  {
+    // additional computation for transformation
+    // relative to the camera view
+
+    // get renderer
+    const RenderingManager::RenderWindowVector& renderWindows 
+      = RenderingManager::GetInstance()->GetAllRegisteredRenderWindows();
+    for ( RenderingManager::RenderWindowVector::const_iterator iter = renderWindows.begin();
+      iter != renderWindows.end(); 
+      ++iter )
+    {
+      if ( mitk::BaseRenderer::GetInstance((*iter))->GetMapperID() == BaseRenderer::Standard3D )
+      {
+        m_BaseRenderer = mitk::BaseRenderer::GetInstance((*iter));
+      }
+    }  
+
+    vtkCamera* camera 
+      = m_BaseRenderer->GetVtkRenderer()->GetActiveCamera();
+
+    //vtkMatrix4x4* cameraMat = vtkMatrix4x4::New();
+    vnl_matrix_fixed<double, 4, 4> cameraMat;
+    vnl_matrix_fixed<double, 4, 4> objectMat;
+
+    // copy object matrix
+    for(size_t i=0; i<4; ++i)
+      for(size_t j=0; j<4; ++j)
+        objectMat.put(i,j, geometry->GetVtkTransform()->GetMatrix()->GetElement(i,j));
+
+    cameraMat = this->ComputeCurrentCameraPosition(camera);
+
+    vnl_matrix_fixed<double, 4, 4> newObjectMat;
+    vnl_matrix_fixed<double, 4, 4> objectToCameraMat;
+
+    objectToCameraMat = vnl_inverse(cameraMat) * objectMat;
+
+    newObjectMat = vnl_inverse(objectToCameraMat) 
+      * deltaTransformMat
+      * objectToCameraMat
+      * vnl_inverse(objectMat);
+
+    newObjectMat = vnl_inverse(newObjectMat);
+    newObjectMat.put(0,3,objectMat(0,3)+deltaTransformMat(0,3));
+    newObjectMat.put(1,3,objectMat(1,3)+deltaTransformMat(1,3));
+    newObjectMat.put(2,3,objectMat(2,3)+deltaTransformMat(2,3));
+
+
+    // copy result
+    for(size_t i=0; i<4; ++i)
+      for(size_t j=0; j<4; ++j)
+        objectTransform->SetElement(i,j, newObjectMat(i,j));
+  }
+
+  //copy m_vtkMatrix to m_VtkIndexToWorldTransform
+  geometry->TransferItkToVtkTransform();
+
+  vtkTransform* vtkTransform = vtkTransform::New();
+
+  if(m_SurfaceInteractionMode == 1)
+  {
+    //m_VtkIndexToWorldTransform as vtkLinearTransform*
+    vtkTransform->SetMatrix( geometry->GetVtkTransform()->GetMatrix() );
+
+    vtkTransform->Concatenate( deltaTransform );
+
+    geometry->SetIndexToWorldTransformByVtkMatrix( vtkTransform->GetMatrix() );
+
+  }
+  else
+  {
+    geometry->SetIndexToWorldTransformByVtkMatrix( objectTransform );
+  }
+
+  geometry->Modified();
+  m_DataNode->Modified();
+
+  vtkTransform->Delete();
+  objectTransform->Delete();
+
+  deltaTransform->Delete();
+
+  //update rendering
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+
+  return true;
+}
+
 
 bool mitk::WiiMoteInteractor::FixedRotationAndTranslation(const mitk::WiiMoteAllDataEvent* wiiMoteEvent)
 {

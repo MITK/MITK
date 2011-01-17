@@ -79,6 +79,10 @@ public:
   virtual bool SetGeometry3D(mitk::Geometry3D* geometry3D, int t);
 
   //##Documentation
+  //## @brief When switching from an Image Geometry to a normal Geometry (and the other way around), you have to change the origin as well (See Geometry Documentation)! This function will change the "isImageGeometry" bool flag and changes the origin respectively.
+  virtual void ChangeImageGeometryConsideringOriginOffset( const bool isAnImageGeometry );
+
+  //##Documentation
   //## @brief Get the Geometry3D at time @a t
   virtual mitk::Geometry3D* GetGeometry3D(int t) const;
 

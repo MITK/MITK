@@ -28,3 +28,16 @@ mitk::NavigationTool::~NavigationTool()
   {
 
   }
+
+std::string mitk::NavigationTool::GetToolName()
+  {
+  if (this->m_DataNode.IsNull()) {return "";}
+  else {return m_DataNode->GetName();}
+  }
+
+mitk::Surface::Pointer mitk::NavigationTool::GetToolSurface()
+  {
+  if (this->m_DataNode.IsNull()) {return NULL;}
+  else if (this->m_DataNode->GetData() == NULL) {return NULL;}
+  else {return dynamic_cast<mitk::Surface*>(m_DataNode->GetData());}
+  }

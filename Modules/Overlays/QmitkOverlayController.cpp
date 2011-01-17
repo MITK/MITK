@@ -277,10 +277,11 @@ void QmitkOverlayController::AddOverlay( QmitkOverlay* overlay )
     // local properties have priority as they are not overwritten if preset in both 
     m_PropertyList->ConcatenatePropertyList( m_RenderWindow->GetRenderer()->GetRenderingManager()->GetPropertyList(), false );
 
-    // setting up the overlay with the correct properties ...
-    this->UpdateOverlayData( overlay );
-    // ... and add it to the OverlayContainer in the RenderWindow
+    // add the overlay to the OverlayContainer in the RenderWindow ...
     overlay->GetWidget()->setParent( m_PositionedOverlays[ pos ] );
+
+    // ... and set it up with the correct properties
+    this->UpdateOverlayData( overlay );
     
     // add overlay to list of all overlays and correctly put it into the layering
     m_AllOverlays.push_back( overlay );
@@ -324,6 +325,8 @@ void QmitkOverlayController::RemoveOverlay( QmitkOverlay* overlay )
         this->AdjustOverlayPosition();
       }
     }
+
+    overlay->deleteLater();
   }
 }
 

@@ -63,16 +63,17 @@ class Overlays_EXPORT QmitkScalarBar : public QWidget
     void paintEvent(QPaintEvent* event);
 
     void SetupGeometry( alignment align );
-
+   
+    void CleanUpLines();
     //void moveEvent(QMoveEvent*);
 
     alignment m_Alignment;
     
     double m_ScaleFactor;
 
-    QLine* m_VerticalLine;
+    QLine* m_MainLine;
 
-    std::vector<QLine*> m_HorizontalLines;
+    std::vector<QLine*> m_SubDivisionLines;
 
     QPen m_Pen;
 

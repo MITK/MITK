@@ -458,6 +458,8 @@ public:
   //## @sa GetDimension(int i);
   unsigned int* GetDimensions() const;
 
+  //##Documentation
+  //## @brief Sets a geometry to an image.
   virtual void SetGeometry(Geometry3D* aGeometry3D);
 
   virtual const HistogramType* GetScalarHistogram(int t=0) const;

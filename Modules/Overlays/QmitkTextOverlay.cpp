@@ -27,7 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 QmitkTextOverlay::QmitkTextOverlay( const char* id ): 
-QmitkOverlay(id), m_Widget( NULL )
+QmitkOverlay(id), m_Widget( NULL ), m_ObserverTag(0)
 {
   m_Widget = new QLabel();
   m_Widget->setStyleSheet("");
@@ -35,7 +35,10 @@ QmitkOverlay(id), m_Widget( NULL )
 
 QmitkTextOverlay::~QmitkTextOverlay()
 {
+  m_Widget->deleteLater();
   m_Widget = NULL;
+
+  m_PropertyList->GetProperty( m_Id )->RemoveObserver(m_ObserverTag);
 }
 
 void QmitkTextOverlay::GenerateData( mitk::PropertyList::Pointer pl )
@@ -147,7 +150,7 @@ void QmitkTextOverlay::SetupCallback( mitk::BaseProperty::Pointer prop )
     MemberCommandType::Pointer propModifiedCommand;
     propModifiedCommand = MemberCommandType::New();
     propModifiedCommand->SetCallbackFunction( this, &QmitkTextOverlay::SetText );
-    prop->AddObserver( itk::ModifiedEvent(), propModifiedCommand );
+    m_ObserverTag = prop->AddObserver( itk::ModifiedEvent(), propModifiedCommand );
   }
   else
   {

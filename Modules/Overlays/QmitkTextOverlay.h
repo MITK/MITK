@@ -109,6 +109,8 @@ PURPOSE.  See the above copyright notices for more information.
     QLabel* m_Widget;  
 
     mitk::PropertyList::Pointer m_PropertyList;
+
+    unsigned long m_ObserverTag;
   };
 
 

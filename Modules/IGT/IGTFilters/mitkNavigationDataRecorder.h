@@ -24,6 +24,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <iostream>
 
+#include <mitkRealTimeClock.h>
+
 namespace mitk
 {
 
@@ -138,6 +140,8 @@ protected:
     bool m_Recording; ///< indicates whether the recording is started or not
 
     unsigned int m_NumberOfRecordedFiles; ///< necessary for the naming of the file if there is more than one start-stop cycle
+
+    mitk::RealTimeClock::Pointer m_SystemTimeClock;  ///< system time clock for system time tag in output xml file
 
 };
 

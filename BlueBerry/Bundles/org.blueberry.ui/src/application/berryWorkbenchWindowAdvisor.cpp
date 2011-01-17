@@ -91,8 +91,8 @@ void WorkbenchWindowAdvisor::OpenIntro()
     introManager
     ->ShowIntro(GetWindowConfigurer()->GetWindow(), false);
 
-   /* workbenchPrefs->PutBool(WorkbenchPreferenceConstants::SHOW_INTRO, false);
-    workbenchPrefs->Flush();*/
+    workbenchPrefs->PutBool(WorkbenchPreferenceConstants::SHOW_INTRO, false);
+    workbenchPrefs->Flush();
   }
 }
 

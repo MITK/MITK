@@ -137,7 +137,7 @@ void mitk::WiiMoteActivator::AddSurfaceInteractor()
 
     // model was designed by Patrick Grubb
     std::string fileName = MITK_ROOT;
-    fileName += "/Modules/InputDevices/WiiMote/WiiMoteModel.obj"; 
+    fileName += "Modules/InputDevices/WiiMote/WiiMoteModel.obj"; 
 
     try
     {

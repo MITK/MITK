@@ -101,7 +101,9 @@ cv::Mat mitk::OpenCVVideoSource::GetImage()
 {
   if(m_CurrentImage)
   {
-    cv::Mat copy( m_CurrentImage, true );
+    IplImage* iplCopy = cvCloneImage( m_CurrentImage );
+    cv::Mat copy( iplCopy, false );
+    cvReleaseImageHeader(&iplCopy);
     return copy;
   }
   return cv::Mat();

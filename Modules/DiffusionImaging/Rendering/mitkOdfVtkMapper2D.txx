@@ -784,6 +784,8 @@ template<class T, int N>
 bool mitk::OdfVtkMapper2D<T,N>
 ::IsVisibleOdfs(mitk::BaseRenderer* renderer)
 {
+  if(this->IsPlaneRotated(renderer))
+    return false;
   bool retval = false;
   switch(GetIndex(renderer))
   {
@@ -906,7 +908,7 @@ void  mitk::OdfVtkMapper2D<T,N>
 ::GenerateData()
 {
   mitk::Image::Pointer input = const_cast<mitk::Image*>( this->GetInput() );
-  if ( input.IsNull() )  return ;
+  if ( input.IsNull() ) return ;
 
   std::string classname("TensorImage");
   if(classname.compare(input->GetNameOfClass())==0)
@@ -1046,6 +1048,40 @@ void  mitk::OdfVtkMapper2D<T,N>
   this->GetDataNode()->GetFloatProperty( "IndexParam2", m_IndexParam2);
 }
 
+template <class T, int N>
+bool mitk::OdfVtkMapper2D<T,N>
+::IsPlaneRotated(mitk::BaseRenderer* renderer)
+{
+  Geometry2D::ConstPointer worldGeometry =
+    renderer->GetCurrentWorldGeometry2D();
+  PlaneGeometry::ConstPointer worldPlaneGeometry =
+    dynamic_cast<const PlaneGeometry*>( worldGeometry.GetPointer() );
+
+  vtkFloatingPointType vnormal[ 3 ];
+  Vector3D normal = worldPlaneGeometry->GetNormal(); normal.Normalize();
+  vnl2vtk( normal.Get_vnl_vector(), vnormal );
+
+  vtkLinearTransform * vtktransform =
+    this->GetDataNode()->GetVtkTransform(this->GetTimestep());
+
+  vtkTransform* inversetransform = vtkTransform::New();
+  inversetransform->Identity();
+  inversetransform->Concatenate(vtktransform->GetLinearInverse());
+  double* n = inversetransform->TransformNormal(vnormal);
+
+  int nonZeros = 0;
+  for (int j=0; j<3; j++)
+  {
+    if (fabs(n[j])>1e-7){
+      nonZeros++;
+    }
+  }
+  if(nonZeros>1)
+    return true;
+
+  return false;
+}
+
 template<class T, int N>
 void  mitk::OdfVtkMapper2D<T,N>
 ::GenerateData( mitk::BaseRenderer *renderer )
@@ -1071,7 +1107,7 @@ void  mitk::OdfVtkMapper2D<T,N>
     m_OdfsActors[1]->VisibilityOn();
     m_OdfsActors[2]->VisibilityOn();
 
-    OdfDisplayGeometry* dispGeo = 
+    OdfDisplayGeometry* dispGeo =
       MeasureDisplayedGeometry( renderer);
     
     if(!m_LastDisplayGeometry || !dispGeo->Equals(m_LastDisplayGeometry))

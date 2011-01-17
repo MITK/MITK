@@ -328,7 +328,7 @@ bool mitk::PlanarFigureInteractor
         if ( renderer->GetDisplayGeometry()->Distance( previousPoint3D ) < 0.1 )
         {
           mitk::Point2D previousDisplayPosition;
-          renderer->GetCurrentWorldGeometry2D()->Map( previousPoint3D, previousDisplayPosition );
+          projectionPlane->Map( previousPoint3D, previousDisplayPosition );
           renderer->GetDisplayGeometry()->WorldToDisplay( previousDisplayPosition, previousDisplayPosition );
 
           double a = currentDisplayPosition[0] - previousDisplayPosition[0];
@@ -396,13 +396,13 @@ bool mitk::PlanarFigureInteractor
       bool isHovering = mitk::PlanarFigureInteractor::IsPositionOverFigure(
         stateEvent, planarFigure,
         planarFigureGeometry,
-        renderer->GetCurrentWorldGeometry2D(),
+        projectionPlane,
         renderer->GetDisplayGeometry() );
 
       int pointIndex = mitk::PlanarFigureInteractor::IsPositionInsideMarker(
         stateEvent, planarFigure,
         planarFigureGeometry,
-        renderer->GetCurrentWorldGeometry2D(),
+        projectionPlane,
         renderer->GetDisplayGeometry() );
 
       if ( pointIndex >= 0 )
@@ -429,6 +429,8 @@ bool mitk::PlanarFigureInteractor
 
           // Set bool property to indicate that planar figure is currently in "hovering" mode
           m_DataNode->SetBoolProperty( "planarfigure.ishovering", true );
+          
+          renderer->GetRenderingManager()->RequestUpdateAll();
         }
 
         this->HandleEvent( new mitk::StateEvent( EIDYES, NULL ) );
@@ -446,6 +448,8 @@ bool mitk::PlanarFigureInteractor
 
           // Set bool property to indicate that planar figure is no longer in "hovering" mode
           m_DataNode->SetBoolProperty( "planarfigure.ishovering", false );
+          
+          renderer->GetRenderingManager()->RequestUpdateAll();
         }
 
         this->HandleEvent( new mitk::StateEvent( EIDNO, NULL ) );
@@ -456,7 +460,7 @@ bool mitk::PlanarFigureInteractor
       }
 
       // Update rendered scene
-       renderer->GetRenderingManager()->RequestUpdateAll();
+       //renderer->GetRenderingManager()->RequestUpdateAll();
       break;
     }
 
@@ -477,7 +481,7 @@ bool mitk::PlanarFigureInteractor
         pointIndex = mitk::PlanarFigureInteractor::IsPositionInsideMarker(
           stateEvent, planarFigure,
           planarFigureGeometry,
-          renderer->GetCurrentWorldGeometry2D(),
+          projectionPlane,
           renderer->GetDisplayGeometry() );
       }
 

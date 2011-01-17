@@ -317,8 +317,16 @@ ENDIF(_MISSING_DEP)
 ENDMACRO(MITK_CREATE_MODULE)
 
 MACRO(MITK_USE_MODULE)
-  SET(DEPENDS "${ARGN}") 
+  SET(DEPENDS "")
   SET(DEPENDS_BEFORE "not initialized")
+  # check for each parameter if it is a package (3rd party)
+  FOREACH(package ${ARGN})
+    IF(EXISTS "${MITK_SOURCE_DIR}/CMake/MITK_${package}_Config.cmake") 
+      LIST(APPEND PACKAGE_DEPENDS ${package})
+    ELSE() 
+      LIST(APPEND DEPENDS ${package}) 
+    ENDIF() 
+  ENDFOREACH(package)
   WHILE(NOT "${DEPENDS}" STREQUAL "${DEPENDS_BEFORE}")
     SET(DEPENDS_BEFORE ${DEPENDS})
     FOREACH(dependency ${DEPENDS})
@@ -360,10 +368,20 @@ ENDMACRO(MITK_USE_MODULE)
 # check if all required modules exist and stores missing module names in RESULT_VAR.
 MACRO(MITK_CHECK_MODULE RESULT_VAR)
   SET(${RESULT_VAR} "")
-  SET(DEPENDS "${ARGN}") 
+  SET(DEPENDS "")
   SET(DEPENDS_BEFORE "not initialized")
   SET(PACKAGE_DEPENDS "")
   
+  
+  # check for each parameter if it is a package (3rd party)
+  FOREACH(package ${ARGN})
+    IF(EXISTS "${MITK_SOURCE_DIR}/CMake/MITK_${package}_Config.cmake") 
+      LIST(APPEND PACKAGE_DEPENDS ${package})
+    ELSE() 
+      LIST(APPEND DEPENDS ${package}) 
+    ENDIF() 
+  ENDFOREACH(package)
+
   # create a list of all lowercase module names
   FILE(GLOB _ALL_MODULES RELATIVE ${MITK_MODULES_CONF_DIR} ${MITK_MODULES_CONF_DIR}/*Config.cmake)
   SET(_ALL_MODULES_LOWERCASE "")
@@ -371,7 +389,7 @@ MACRO(MITK_CHECK_MODULE RESULT_VAR)
     STRING(TOLOWER ${_module} _lowermodule)
     LIST(APPEND _ALL_MODULES_LOWERCASE ${_lowermodule})
   ENDFOREACH(_module ${_ALL_MODULES})
-  
+
   WHILE(NOT "${DEPENDS}" STREQUAL "${DEPENDS_BEFORE}")
     SET(DEPENDS_BEFORE ${DEPENDS})
     FOREACH(dependency ${DEPENDS})
@@ -472,6 +490,10 @@ IF(APPLE)
   LIST(APPEND DIRS "/usr/lib")
 ENDIF(APPLE)
 
+if(QT_LIBRARY_DIR MATCHES "^(/lib/|/lib32/|/lib64/|/usr/lib/|/usr/lib32/|/usr/lib64/|/usr/X11R6/)")
+  set(_qt_is_system_qt 1)
+endif()
+
 FOREACH(_target ${_install_EXECUTABLES})
 
 SET(_qt_plugins_install_dirs "")
@@ -505,25 +527,29 @@ ENDIF()
 
 FOREACH(_target_location ${_target_locations})
 
-IF(QT_PLUGINS_DIR)
-    INSTALL(DIRECTORY "${QT_PLUGINS_DIR}" 
-	    DESTINATION ${${_target_location}_qt_plugins_install_dir} 
-		    CONFIGURATIONS Release
-		    FILES_MATCHING REGEX "[^d]4?\\${CMAKE_SHARED_LIBRARY_SUFFIX}$"
-		    )
-		    
-    INSTALL(DIRECTORY "${QT_PLUGINS_DIR}" 
-	    DESTINATION ${${_target_location}_qt_plugins_install_dir} 
-		    CONFIGURATIONS Debug
-		    FILES_MATCHING REGEX "d4?\\${CMAKE_SHARED_LIBRARY_SUFFIX}$"
-		    )
+IF(NOT _qt_is_system_qt)
+  IF(QT_PLUGINS_DIR)
+      INSTALL(DIRECTORY "${QT_PLUGINS_DIR}"
+        DESTINATION ${${_target_location}_qt_plugins_install_dir}
+          CONFIGURATIONS Release
+          FILES_MATCHING REGEX "[^d]4?\\${CMAKE_SHARED_LIBRARY_SUFFIX}"
+          )
 
-ENDIF(QT_PLUGINS_DIR)
+      INSTALL(DIRECTORY "${QT_PLUGINS_DIR}"
+        DESTINATION ${${_target_location}_qt_plugins_install_dir}
+          CONFIGURATIONS Debug
+          FILES_MATCHING REGEX "d4?\\${CMAKE_SHARED_LIBRARY_SUFFIX}"
+          )
+
+  ENDIF(QT_PLUGINS_DIR)
+ENDIF(NOT _qt_is_system_qt)
+
 
   _fixup_target()
 ENDFOREACH(_target_location)
 
 
+IF(NOT _qt_is_system_qt)
   #--------------------------------------------------------------------------------
   # install a qt.conf file
   # this inserts some cmake code into the install script to write the file
@@ -540,6 +566,7 @@ Prefix=${_qt_conf_plugin_install_prefix}
 \")
 	")
   ENDFOREACH()
+ENDIF(NOT _qt_is_system_qt)
 
 
 
@@ -572,6 +599,10 @@ SET(DIRS
   ${MITK_BINARY_DIR}/bin/${intermediate_dir} 
   ${_install_LIBRARY_DIRS}
   )
+
+if(QT_LIBRARY_DIR MATCHES "^(/lib/|/lib32/|/lib64/|/usr/lib/|/usr/lib32/|/usr/lib64/|/usr/X11R6/)")
+  set(_qt_is_system_qt 1)
+endif()
 
 FOREACH(_target ${_install_EXECUTABLES})
 
@@ -616,25 +647,29 @@ ENDIF()
 
 
 FOREACH(_target_location ${_target_locations})
+  IF(NOT _qt_is_system_qt)
 
-IF(QT_PLUGINS_DIR)
-    INSTALL(DIRECTORY "${QT_PLUGINS_DIR}" 
-	    DESTINATION ${${_target_location}_qt_plugins_install_dir} 
-		    CONFIGURATIONS Release
-		    FILES_MATCHING REGEX "[^d]4?\\${CMAKE_SHARED_LIBRARY_SUFFIX}$"
-		    )
-		    
-    INSTALL(DIRECTORY "${QT_PLUGINS_DIR}" 
-	    DESTINATION ${${_target_location}_qt_plugins_install_dir} 
-		    CONFIGURATIONS Debug
-		    FILES_MATCHING REGEX "d4?\\${CMAKE_SHARED_LIBRARY_SUFFIX}$"
-		    )
+    IF(QT_PLUGINS_DIR)
+        INSTALL(DIRECTORY "${QT_PLUGINS_DIR}"
+          DESTINATION ${${_target_location}_qt_plugins_install_dir}
+            CONFIGURATIONS Release
+            FILES_MATCHING REGEX "[^d]4?\\${CMAKE_SHARED_LIBRARY_SUFFIX}"
+            )
 
-ENDIF(QT_PLUGINS_DIR)
+        INSTALL(DIRECTORY "${QT_PLUGINS_DIR}"
+          DESTINATION ${${_target_location}_qt_plugins_install_dir}
+            CONFIGURATIONS Debug
+            FILES_MATCHING REGEX "d4?\\${CMAKE_SHARED_LIBRARY_SUFFIX}"
+            )
+
+    ENDIF(QT_PLUGINS_DIR)
+  ENDIF(NOT _qt_is_system_qt)
 
   _fixup_target()
 ENDFOREACH(_target_location)
 
+
+IF(NOT _qt_is_system_qt)
 
   #--------------------------------------------------------------------------------
   # install a qt.conf file
@@ -653,6 +688,7 @@ Prefix=${_qt_conf_plugin_install_prefix}
 	")
   ENDFOREACH()
 
+ENDIF(NOT _qt_is_system_qt)
 
 
 

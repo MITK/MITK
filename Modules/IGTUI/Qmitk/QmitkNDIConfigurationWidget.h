@@ -64,13 +64,18 @@ public:
   QList<unsigned int> GetToolsByToolType(QString toolType) const;
   mitk::DataNode* GetNode(unsigned int index) const;
 
+  
   signals:
     void ToolsAdded(QStringList tools);
     void ToolsChanged();
     void Connected();
     void Disconnected();
+    void RepresentationChanged( const int & row , const std::string & filename ); // returns the row number of the clicked tableitem for changing tool representation 
+
   public slots:
     void SetDeviceName(const char* dev);  ///< set the device name (e.g. "COM1", "/dev/ttyS0") that will be used to connect to the tracking device
+    void ShowToolRepresentationColumn(); ///< show or hide the tooltable column "Tool Representation". This SLOT should be called after SIGNAL "Connected" is emitted
+  
   protected slots:
     void OnConnect();
     void OnDisconnect();
@@ -78,6 +83,7 @@ public:
     void OnDiscoverDevices();
     void OnAddPassiveTool();
     void UpdateTrackerFromToolTable(const QModelIndex & topLeft, const QModelIndex & /*bottomRight*/);
+    void OnTableItemClicked(const QModelIndex & topLeft); ///< for clicking on tooltable items
     void OnDisoverDevicesBtnInfo();
 
 protected:
@@ -104,7 +110,7 @@ protected:
   virtual void CreateConnections(); ///< \brief Creation of the connections of main and control widget  
   void HidePolarisOptionsGroupbox( bool on ); ///< show or hide polaris options in the UI
   void HideAuroraOptionsGroupbox( bool on ); ///< show or hide aurora options in the UI
-
+  
   Ui::QmitkNDIConfigurationWidget* m_Controls;  ///< gui widgets
   mitk::NDITrackingDevice::Pointer m_Tracker;   ///< tracking device object
   mitk::TrackingDeviceSource::Pointer m_Source;

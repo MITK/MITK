@@ -362,6 +362,7 @@ void mitk::Geometry3D::BackTransform(const mitk::Point3D &in, mitk::Point3D& out
 void mitk::Geometry3D::BackTransform(const mitk::Point3D &/*at*/, const mitk::Vector3D &in, mitk::Vector3D& out) const
 {
   // Get WorldToIndex transform
+
   if (m_IndexToWorldTransformLastModified != m_IndexToWorldTransform->GetMTime())
   {
     m_InvertedTransform = TransformType::New();
@@ -597,6 +598,8 @@ mitk::Point3D mitk::Geometry3D::GetCornerPoint(int id) const
   }
   if(m_ImageGeometry)
   {
+    // Here i have to adjust the 0.5 offset manually, because the cornerpoint is the corner of the
+    // bounding box. The bounding box itself is no image, so it is corner-based
     FillVector3D(cornerpoint, cornerpoint[0]-0.5, cornerpoint[1]-0.5, cornerpoint[2]-0.5);
   }
   return m_IndexToWorldTransform->TransformPoint(cornerpoint);
@@ -613,6 +616,8 @@ mitk::Point3D mitk::Geometry3D::GetCornerPoint(bool xFront, bool yFront, bool zF
   cornerpoint[2] = (zFront ? bounds[4] : bounds[5]);
   if(m_ImageGeometry)
   {
+    // Here i have to adjust the 0.5 offset manually, because the cornerpoint is the corner of the
+    // bounding box. The bounding box itself is no image, so it is corner-based
     FillVector3D(cornerpoint, cornerpoint[0]-0.5, cornerpoint[1]-0.5, cornerpoint[2]-0.5);
   }
 
@@ -622,4 +627,43 @@ mitk::Point3D mitk::Geometry3D::GetCornerPoint(bool xFront, bool yFront, bool zF
 void
 mitk::Geometry3D::ResetSubTransforms()
 {
+}
+
+void
+mitk::Geometry3D::ChangeImageGeometryConsideringOriginOffset( const bool isAnImageGeometry )
+{
+  // If Geometry is switched to ImageGeometry, you have to put an offset to the origin, because
+  // imageGeometries origins are pixel-center-based
+  // ... and remove the offset, if you switch an imageGeometry back to a normal geometry
+  // For more information please see the Geometry documentation page
+
+  if(m_ImageGeometry == isAnImageGeometry)
+    return;
+
+  const BoundingBox::BoundsArrayType& boundsarray = 
+    this->GetBoundingBox()->GetBounds();
+
+  Point3D  originIndex; 
+  FillVector3D(originIndex,  boundsarray[0], boundsarray[2], boundsarray[4]);
+
+  if(isAnImageGeometry == true)
+    FillVector3D( originIndex,
+      originIndex[0] + 0.5, 
+      originIndex[1] + 0.5, 
+      originIndex[2] + 0.5 );
+  else
+    FillVector3D( originIndex,
+      originIndex[0] - 0.5, 
+      originIndex[1] - 0.5, 
+      originIndex[2] - 0.5 );
+
+  Point3D originWorld;
+
+  originWorld = GetIndexToWorldTransform()
+    ->TransformPoint( originIndex );
+  // instead could as well call  IndexToWorld(originIndex,originWorld);
+  
+  SetOrigin(originWorld); 
+
+  this->SetImageGeometry(isAnImageGeometry);
 }

@@ -8,6 +8,7 @@
 #include <mitkStateEvent.h>
 #include <mitkGeometry3D.h>
 #include <mitkWiiMoteAllDataEvent.h>
+#include <mitkBaseRenderer.h>
 
 // export macro
 #include <mitkWiiMoteExports.h>
@@ -46,6 +47,11 @@ private:
   // all movements are separated and fixed
   bool FixedRotationAndTranslation(const mitk::WiiMoteAllDataEvent* event);
 
+  vnl_matrix_fixed<double, 4, 4> ComputeCurrentCameraPosition(vtkCamera* vtkCamera);
+
+  // combined movements and different interaction modes
+  bool DynamicRotationAndTranslation(Geometry3D* geometry);
+
   float m_OrientationX;
   float m_OrientationY;
   float m_OrientationZ;
@@ -53,6 +59,10 @@ private:
   float m_xVelocity;
   float m_yVelocity;
   float m_zVelocity;
+
+  float m_xValue;
+  float m_yValue;
+  float m_zValue;
 
   // refering to an angle around an axis
   // which is defined in the wiimote
@@ -64,8 +74,14 @@ private:
   bool m_InRotation;
   int m_TranslationMode;
 
+  // default: 1 = relative to object
+  // 2 = relative to camera view
+  int m_SurfaceInteractionMode;
+
   // to reset the geometry
   mitk::Geometry3D::Pointer m_OriginalGeometry;
+
+  mitk::BaseRenderer::Pointer m_BaseRenderer;
 };
 
 }

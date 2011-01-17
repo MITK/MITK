@@ -211,10 +211,10 @@ bool mitk::RegionGrowingTool::OnMousePressedInside(Action* itkNotUsed( action ),
       for (int index = 0; index < cutContour.deleteSize; ++index)
       {
         newPoint[0] = cutContour.deleteCurve[ 2 * index + 0 ];
-        newPoint[1] = cutContour.deleteCurve[ 2 * index + 1];
+        newPoint[1] = cutContour.deleteCurve[ 2 * index + 1 ];
         newPoint[2] = 0.0;
 
-        contourInImageIndexCoordinates->AddVertex( newPoint );
+        contourInImageIndexCoordinates->AddVertex( newPoint - 0.5 );
       }
 
       free(cutContour.traceline);
@@ -413,6 +413,11 @@ bool mitk::RegionGrowingTool::OnMouseReleased(Action* action, const StateEvent* 
 				  slicewriter->SetSliceIndex( affectedSlice );
 				  slicewriter->SetTimeStep( positionEvent->GetSender()->GetTimeStep( workingImage ) );
 				  slicewriter->Update();
+
+				  if ( m_ToolManager->GetRememberContourPosition() )
+				  {
+					  this->AddContourmarker(positionEvent);
+				  }
 			  }
 			  else
 			  {
@@ -423,6 +428,11 @@ bool mitk::RegionGrowingTool::OnMouseReleased(Action* action, const StateEvent* 
 				  slicewriter->SetPlaneGeometry3D( m_WorkingSlice->GetGeometry() );
 				  slicewriter->SetTimeStep( positionEvent->GetSender()->GetTimeStep( workingImage ) );
 				  slicewriter->Update();
+
+				  if ( m_ToolManager->GetRememberContourPosition() )
+				  {
+					  this->AddContourmarker(positionEvent);
+				  }
 			  }
             }
           }
@@ -538,10 +548,10 @@ mitkIpPicDescriptor* mitk::RegionGrowingTool::PerformRegionGrowingAndUpdateConto
     for (int index = 0; index < numberOfContourPoints; ++index)
     {
       newPoint[0] = contourPoints[ 2 * index + 0 ];
-      newPoint[1] = contourPoints[ 2 * index + 1];
+      newPoint[1] = contourPoints[ 2 * index + 1 ];
       newPoint[2] = 0;
 
-      contourInImageIndexCoordinates->AddVertex( newPoint );
+      contourInImageIndexCoordinates->AddVertex( newPoint - 0.5);
     }
 
     free(contourPoints);

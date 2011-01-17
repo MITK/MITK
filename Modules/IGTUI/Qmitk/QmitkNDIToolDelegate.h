@@ -55,7 +55,8 @@ class MitkIGTUI_EXPORT QmitkNDIToolDelegate : public QStyledItemDelegate
       SROMCol,
       TypeCol,
       StatusCol,
-      NodeCol
+      NodeCol,
+      RepCol
     };  ///< columns in tool table
     enum NDIItemDataRole
     {

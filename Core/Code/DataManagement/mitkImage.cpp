@@ -765,6 +765,7 @@ void mitk::Image::Initialize(const mitk::PixelType& type, unsigned int dimension
 
   TimeSlicedGeometry::Pointer timeSliceGeometry = TimeSlicedGeometry::New();
   timeSliceGeometry->InitializeEvenlyTimed(slicedGeometry, m_Dimensions[3]);
+  timeSliceGeometry->ImageGeometryOn();
 
   SetGeometry(timeSliceGeometry);
 
@@ -997,6 +998,7 @@ void mitk::Image::Initialize(const mitkIpPicDescriptor* pic, int channels, int t
 
   TimeSlicedGeometry::Pointer timeSliceGeometry = TimeSlicedGeometry::New();
   timeSliceGeometry->InitializeEvenlyTimed(slicedGeometry, m_Dimensions[3]);
+  timeSliceGeometry->ImageGeometryOn();
 
   SetGeometry(timeSliceGeometry);  
 
@@ -1168,6 +1170,12 @@ void mitk::Image::Clear()
 
 void mitk::Image::SetGeometry(Geometry3D* aGeometry3D)
 {
+  // Please be aware of the 0.5 offset/pixel-center issue! See Geometry documentation for further information
+  
+  if(aGeometry3D->GetImageGeometry()==false)
+  {
+    MITK_INFO << "WARNING: Applied a non-image geometry onto an image. Please be SURE that this geometry is pixel-center-based! If it is not, you need to call Geometry3D->ChangeImageGeometryConsideringOriginOffset(true) before calling image->setGeometry(..)\n";
+  }  
   Superclass::SetGeometry(aGeometry3D);
   GetTimeSlicedGeometry()->ImageGeometryOn();
 }

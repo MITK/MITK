@@ -87,8 +87,6 @@ class QmitkSegmentationView : public QObject, public QmitkFunctionality
 
     void OnSurfaceSelectionChanged();
 
-    void OnPlaneModeChanged(int);
-
 	//called when the checkbox Remember Contour Positions is selected/deselected
 	void CheckboxRememberContourPositionsStateChanged(int state);
 
@@ -150,8 +148,6 @@ class QmitkSegmentationView : public QObject, public QmitkFunctionality
     unsigned long m_SlicesRotationObserverTag1;
     unsigned long m_SlicesRotationObserverTag2;
 
-    //for temporary fix unless we support segmentation in rotated slices
-    mitk::DataNode::Pointer m_TempWorkingDataNode;
 
 };
 

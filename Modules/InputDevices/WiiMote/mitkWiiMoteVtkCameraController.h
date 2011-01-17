@@ -1,12 +1,14 @@
 #ifndef MITK_WIIMOTEVTKCAMERACONTROLLER_H
 #define MITK_WIIMOTEVTKCAMERACONTROLLER_H
 
-#include "mitkCameraController.h"
+// export
 #include "mitkWiiMoteExports.h"
 
+// mitk
+#include "mitkCameraController.h"
 #include "mitkAction.h"
 #include "mitkEvent.h"
-
+#include "mitkBaseRenderer.h"
 #include "mitkWiiMoteIREvent.h"
 #include "mitkWiiMoteCalibrationEvent.h"
 
@@ -46,6 +48,9 @@ namespace mitk
     bool InitCalibration(mitk::Action* a, const mitk::StateEvent* e);
     bool Calibration(mitk::Action* a, const mitk::StateEvent* e);
     bool FinishCalibration(mitk::Action* a, const mitk::StateEvent* e);
+
+    // slice scrolling
+    mitk::BaseRenderer::Pointer m_TransversalBR;
 
   }; // end class 
 } // end namespace mitk

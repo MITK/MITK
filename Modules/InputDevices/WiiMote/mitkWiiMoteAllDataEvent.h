@@ -35,7 +35,8 @@ namespace mitk
       , float pitch
       , float xAcceleration
       , float yAcceleration
-      , float zAcceleration);
+      , float zAcceleration
+      , int surfaceInteractionMode);
     ~WiiMoteAllDataEvent();
 
     void SetIRDotRawX(float xCoordinate);
@@ -79,6 +80,9 @@ namespace mitk
 
     void SetZAcceleration(float zAcceleration);
     float GetZAcceleration() const;
+
+    void SetSurfaceInteractionMode(int mode);
+    int GetSurfaceInteractionMode() const;
 
     //itk::EventObject implementation
     typedef WiiMoteAllDataEvent Self;
@@ -133,6 +137,9 @@ namespace mitk
     // if update age is too high the acceleration
     // values are likely to be out of date
     unsigned m_UpdateAge;
+
+    // surface interaction mode
+    int m_SurfaceInteractionMode;
 
 
   }; // end class

@@ -60,15 +60,19 @@ void QmitkToolTrackingStatusWidget::SetNavigationDatas(std::vector<mitk::Navigat
 
 void QmitkToolTrackingStatusWidget::AddNavigationData(mitk::NavigationData::Pointer nd)
 {
-   if(m_NavigationDatas == NULL)
-     m_NavigationDatas = new std::vector<mitk::NavigationData::Pointer>();
+  if(m_NavigationDatas == NULL)
+    m_NavigationDatas = new std::vector<mitk::NavigationData::Pointer>();
 
-   m_NavigationDatas->push_back(nd);
+  m_NavigationDatas->push_back(nd);
 }
 
 
 void QmitkToolTrackingStatusWidget::Refresh()
 {
+
+  if(m_NavigationDatas == NULL || m_NavigationDatas->size() <= 0)
+    return;
+
   mitk::NavigationData* navData; 
 
   for(unsigned int i = 0; i < m_NavigationDatas->size(); i++)
@@ -89,9 +93,15 @@ void QmitkToolTrackingStatusWidget::Refresh()
 
 void QmitkToolTrackingStatusWidget::ShowStatusLabels()
 {
+
+  if(m_NavigationDatas == NULL || m_NavigationDatas->size() <= 0)
+    return;
+
+
   m_StatusLabels = new QVector<QLabel*>();
   mitk::NavigationData* navData;
   QLabel* label;
+
 
   for(unsigned int i = 0; i < m_NavigationDatas->size(); i++)
   {
@@ -102,7 +112,6 @@ void QmitkToolTrackingStatusWidget::ShowStatusLabels()
     label = new QLabel(name, this);
     label->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
     label->setFrameStyle(QFrame::Panel | QFrame::Sunken);
-
 
     m_StatusLabels->append(label);
     m_Controls->m_GridLayout->addWidget(m_StatusLabels->at(i),0,i);
@@ -120,8 +129,10 @@ void QmitkToolTrackingStatusWidget::RemoveStatusLabels()
     delete actWidget;
   }
 
-  m_StatusLabels->clear();
-  m_NavigationDatas->clear();
+  if(m_StatusLabels != NULL && m_StatusLabels->size() > 0)
+    m_StatusLabels->clear();
+  if(m_NavigationDatas != NULL && m_NavigationDatas->size() > 0)
+    m_NavigationDatas->clear();
 
 }
 

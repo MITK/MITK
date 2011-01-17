@@ -96,12 +96,12 @@ void QmitkTrackingSourcesCheckBoxPanelWidget::ClearPanel()
     delete actWidget;
   }
 
-  if(m_SourceCheckboxes != NULL || m_NavigationDatas != NULL)
-  {
+  if(m_SourceCheckboxes != NULL)
     m_SourceCheckboxes->clear();
-    m_NavigationDatas->clear();
-  }
 
+  if(m_NavigationDatas != NULL)
+    m_NavigationDatas->clear();
+  
   
 }
 

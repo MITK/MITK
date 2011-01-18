@@ -38,6 +38,8 @@ mitk::WiiMoteVtkCameraController::WiiMoteVtkCameraController()
 , m_TransversalBR( NULL )
 , m_InitialScrollValue( 0 )
 , m_UpdateFrequency( 0 )
+, m_CurrentElevationAngle ( 0 )
+, m_CurrentAzimuthAngle ( 0 )
 {
   CONNECT_ACTION(mitk::AcONWIIMOTEINPUT, OnWiiMoteInput);
   CONNECT_ACTION(mitk::AcRESETVIEW, ResetView);
@@ -113,8 +115,44 @@ bool mitk::WiiMoteVtkCameraController::OnWiiMoteInput(mitk::Action* a, const mit
   // inverts y direction to simulate a 3D View
   // x direction is already inverted
   movementVector[1] *= -1;
-  vtkCam->Elevation((double)movementVector[1]);
-  vtkCam->Azimuth((double)movementVector[0]);
+
+  m_CurrentElevationAngle += movementVector[1];
+
+  MITK_INFO << "Elevation angle: " << m_CurrentElevationAngle;
+
+  // avoids flipping of the surface 
+  // through the elevation function
+  if(m_CurrentElevationAngle < 70
+    && m_CurrentElevationAngle > -70)
+  {
+    vtkCam->Elevation((double)movementVector[1]);
+  }
+  else if( m_CurrentElevationAngle > 70 )
+  {
+    m_CurrentElevationAngle = 70;
+  }
+  else if( m_CurrentElevationAngle < -70 )
+  {
+    m_CurrentElevationAngle = -70;
+  }
+
+  m_CurrentAzimuthAngle += movementVector[0];
+
+  // avoids spinning of the surface
+  if(m_CurrentAzimuthAngle < 70
+    && m_CurrentAzimuthAngle > -70)
+  {
+    vtkCam->Azimuth((double)movementVector[0]);
+  }
+  else if( m_CurrentAzimuthAngle > 70 )
+  {
+    m_CurrentAzimuthAngle = 70;
+  }
+  else if( m_CurrentAzimuthAngle < -70 )
+  {
+    m_CurrentAzimuthAngle = -70;
+  }
+ 
 
   ////compute the global space coordinates from the relative mouse coordinate
   ////first we need the position of the camera
@@ -354,7 +392,10 @@ bool mitk::WiiMoteVtkCameraController::FinishCalibration(mitk::Action *a, const 
 {
   // checks if one of the properties was not set at all during the calibration
   // should that happen, the computation will not be executed
-  if( m_SensitivityXMAX != XMIN && m_SensitivityXMIN != XMAX && m_SensitivityYMAX != YMIN && m_SensitivityYMIN != YMAX )
+  if( m_SensitivityXMAX != XMIN 
+    && m_SensitivityXMIN != XMAX 
+    && m_SensitivityYMAX != YMIN 
+    && m_SensitivityYMIN != YMAX )
   {
     // computation of the sensitivity out of the calibration data
     m_SensitivityX = XMAX / (m_SensitivityXMAX - m_SensitivityXMIN);
@@ -368,7 +409,8 @@ bool mitk::WiiMoteVtkCameraController::FinishCalibration(mitk::Action *a, const 
 
   if(!m_Calibrated)
   {
-    MITK_INFO << "Calibration was unsuccesful - please repeat the process and move in all directions!";
+    MITK_INFO << "Calibration was unsuccesful - " 
+      << "please repeat the process and move in all directions!";
   }
   else
   {

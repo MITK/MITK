@@ -35,6 +35,8 @@ namespace mitk
     bool ResetView(mitk::Action* a, const mitk::StateEvent* e);
 
     bool m_ClippingRangeIsSet;
+    double m_CurrentElevationAngle;
+    double m_CurrentAzimuthAngle;
     
     // calibration 
     bool m_Calibrated;

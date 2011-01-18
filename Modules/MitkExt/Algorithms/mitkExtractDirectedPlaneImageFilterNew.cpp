@@ -109,7 +109,7 @@ void mitk::ExtractDirectedPlaneImageFilterNew::ItkSliceExtraction (itk::Image<TP
     //Creating an itk::Image that represents the sampled slice
     typename SliceImageType::Pointer resultSlice = SliceImageType::New();
 
-    SliceImageType::IndexType start;
+    typename SliceImageType::IndexType start;
 
     start[0] = 0;
     start[1] = 0;
@@ -121,7 +121,7 @@ void mitk::ExtractDirectedPlaneImageFilterNew::ItkSliceExtraction (itk::Image<TP
     //Calculation the sample-spacing, i.e the half of the smallest spacing existing in the original image
     Vector3D newPixelSpacing = m_ImageGeometry->GetSpacing();
     float minSpacing = newPixelSpacing[0];
-    for (int i = 1; i < newPixelSpacing.Size(); i++)
+    for (unsigned int i = 1; i < newPixelSpacing.Size(); i++)
     {
         if (newPixelSpacing[i] < minSpacing )
         {
@@ -138,7 +138,7 @@ void mitk::ExtractDirectedPlaneImageFilterNew::ItkSliceExtraction (itk::Image<TP
     pixelSpacing[1] =  newPixelSpacing[1];
 
     //Calculating the size of the sampled slice
-    SliceImageType::SizeType size;
+    typename SliceImageType::SizeType size;
     Vector2D extentInMM;
     extentInMM[0] = m_CurrentWorldGeometry2D->GetExtentInMM(0);
     extentInMM[1] = m_CurrentWorldGeometry2D->GetExtentInMM(1);
@@ -151,7 +151,7 @@ void mitk::ExtractDirectedPlaneImageFilterNew::ItkSliceExtraction (itk::Image<TP
     size[1] = (maxExtent+yTranlation)/newPixelSpacing[1];
 
     //Creating an ImageRegion Object
-    SliceImageType::RegionType region;
+    typename SliceImageType::RegionType region;
 
     region.SetSize( size );
     region.SetIndex( start );
@@ -197,7 +197,7 @@ void mitk::ExtractDirectedPlaneImageFilterNew::ItkSliceExtraction (itk::Image<TP
     */
     Point3D currentSliceIndexPointIn2D;
     Point3D currentImageWorldPointIn3D;
-    InputImageType::IndexType inputIndex;
+    typename InputImageType::IndexType inputIndex;
 
     SliceIterator sliceIterator ( resultSlice, resultSlice->GetLargestPossibleRegion() );
     sliceIterator.GoToBegin();

@@ -34,6 +34,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkSurfaceToImageFilter.h>
 #include <vtkPolyData.h>
 
+#include "mitkVtkResliceInterpolationProperty.h"
+
 // public methods
 
 QmitkSegmentationView::QmitkSegmentationView()
@@ -42,7 +44,6 @@ QmitkSegmentationView::QmitkSegmentationView()
 ,m_MultiWidget(NULL)
 // ,m_PostProcessing(NULL)
 ,m_RenderingManagerObserverTag(0)
-,m_TempWorkingDataNode(NULL)
 {
 }
 
@@ -136,9 +137,6 @@ void QmitkSegmentationView::SetMultiWidget(QmitkStdMultiWidget* multiWidget)
 
   // save the current multiwidget as the working widget
   m_MultiWidget = multiWidget;
-
-  //connect, so we get informed when plane mode changes
-  connect(m_MultiWidget, SIGNAL(WidgetPlaneModeChange( int )), this, SLOT(OnPlaneModeChanged( int )) );
 
   if (m_MultiWidget)
   {
@@ -270,6 +268,9 @@ void QmitkSegmentationView::CreateNewSegmentation()
           {
             mitk::DataNode::Pointer emptySegmentation =
               firstTool->CreateEmptySegmentationNode( image, dialog->GetSegmentationName().toStdString(), dialog->GetColor() );
+
+            //Here we change the reslice interpolation mode for a segmentation, so that contours in rotated slice can be shown correctly
+            emptySegmentation->SetProperty( "reslice interpolation", mitk::VtkResliceInterpolationProperty::New(VTK_RESLICE_CUBIC) );
 
             if (!emptySegmentation) return; // could be aborted by user
 
@@ -411,7 +412,7 @@ void QmitkSegmentationView::ToolboxStackPageChanged(int id)
 void QmitkSegmentationView::OnComboBoxSelectionChanged( const mitk::DataNode* node )
 {
   mitk::DataNode* selectedNode = const_cast<mitk::DataNode*>(node);
-  if( selectedNode != NULL )
+ if( selectedNode != NULL )
   {
     m_Controls->refImageSelector->show();
     m_Controls->lblReferenceImageSelectionWarning->hide();
@@ -422,6 +423,19 @@ void QmitkSegmentationView::OnComboBoxSelectionChanged( const mitk::DataNode* no
     m_Controls->refImageSelector->hide();
     m_Controls->lblReferenceImageSelectionWarning->show();
   }
+}
+
+//to remember the contour positions
+void QmitkSegmentationView::CheckboxRememberContourPositionsStateChanged (int state)
+{
+    if(state == Qt::Checked)
+    {
+        m_Controls->m_ManualToolSelectionBox->GetToolManager()->SetRememberContourPosition( true );
+    }
+    else
+    {
+        m_Controls->m_ManualToolSelectionBox->GetToolManager()->SetRememberContourPosition( false );
+    }
 }
 void QmitkSegmentationView::OnSelectionChanged(mitk::DataNode* node)
 {
@@ -444,6 +458,17 @@ void QmitkSegmentationView::OnSurfaceSelectionChanged()
 
 void QmitkSegmentationView::OnSelectionChanged(std::vector<mitk::DataNode*> nodes)
 {
+    // if the selected node is a contourmarker
+    if ( !nodes.empty() )
+    {
+        std::string markerName = "Contourmarker";
+        unsigned int numberOfNodes = nodes.size();
+        std::string nodeName = nodes.at( 0 )->GetName();
+        if ( ( numberOfNodes == 1 ) && ( nodeName.find( markerName ) == 0) )
+        {
+            this->OnContourMarkerSelected( nodes.at( 0 ) );
+        }
+    }
   // if Image and Surface are selected, enable button
   if ( (m_Controls->refImageSelector->GetSelectedNode().IsNull()) ||
        (m_Controls->MaskSurfaces->GetSelectedNode().IsNull()))
@@ -521,9 +546,63 @@ void QmitkSegmentationView::OnSelectionChanged(std::vector<mitk::DataNode*> node
   else
     m_Controls->CreateSegmentationFromSurface->setEnabled(true);
 
-  m_TempWorkingDataNode = NULL;
   SetToolManagerSelection(referenceData, workingData);
   ForceDisplayPreferencesUponAllImages();
+}
+
+//New since rotated contour drawing is allowed. Effects a reorientation of the plane of the affected widget to the marker`s position
+void QmitkSegmentationView::OnContourMarkerSelected(const mitk::DataNode *node)
+{
+    
+    const mitk::PlaneGeometry* markerGeometry =
+            dynamic_cast<const mitk::PlaneGeometry*> ( node->GetData()->GetGeometry() );
+
+    QmitkRenderWindow* selectedRenderWindow = 0;
+    QmitkRenderWindow* RenderWindow1 =
+        this->GetActiveStdMultiWidget()->GetRenderWindow1();
+    QmitkRenderWindow* RenderWindow2 =
+        this->GetActiveStdMultiWidget()->GetRenderWindow2();
+    QmitkRenderWindow* RenderWindow3 =
+        this->GetActiveStdMultiWidget()->GetRenderWindow3();
+    QmitkRenderWindow* RenderWindow4 =
+        this->GetActiveStdMultiWidget()->GetRenderWindow4();
+    bool PlanarFigureInitializedWindow = false;
+
+    // find initialized renderwindow
+    if (node->GetBoolProperty("PlanarFigureInitializedWindow",
+        PlanarFigureInitializedWindow, RenderWindow1->GetRenderer()))
+    {
+        selectedRenderWindow = RenderWindow1;
+    }
+    if (!selectedRenderWindow && node->GetBoolProperty(
+        "PlanarFigureInitializedWindow", PlanarFigureInitializedWindow,
+        RenderWindow2->GetRenderer()))
+    {
+        selectedRenderWindow = RenderWindow2;
+    }
+    if (!selectedRenderWindow && node->GetBoolProperty(
+        "PlanarFigureInitializedWindow", PlanarFigureInitializedWindow,
+        RenderWindow3->GetRenderer()))
+    {
+        selectedRenderWindow = RenderWindow3;
+    }
+    if (!selectedRenderWindow && node->GetBoolProperty(
+        "PlanarFigureInitializedWindow", PlanarFigureInitializedWindow,
+        RenderWindow4->GetRenderer()))
+    {
+        selectedRenderWindow = RenderWindow4;
+    }
+
+    // make node visible
+    if (selectedRenderWindow)
+    {
+      mitk::Point3D centerP = markerGeometry->GetOrigin();
+       selectedRenderWindow->GetSliceNavigationController()->SelectSliceByPoint(
+          centerP);
+      selectedRenderWindow->GetSliceNavigationController()->ReorientSlices(
+          centerP, markerGeometry->GetNormal());
+     
+    }
 }
 
 
@@ -653,22 +732,6 @@ void QmitkSegmentationView::CheckImageAlignment()
     if (wrongAlignment)
     {
       m_Controls->lblAlignmentWarning->show();
-
-      //temporary fix unless we support segmentation in rotated slices part I
-      if ( m_TempWorkingDataNode.IsNull() )
-        m_TempWorkingDataNode = m_Controls->m_ManualToolSelectionBox->GetToolManager()->GetWorkingData(0);
-      m_Controls->m_ManualToolSelectionBox->GetToolManager()->SetWorkingData(NULL);
-      m_Controls->btnNewSegmentation->setEnabled(false);
-    }
-    else
-    {
-      m_Controls->lblAlignmentWarning->hide();
-
-      //temporary fix unless we support segmentation in rotated slices part II
-      if ( m_TempWorkingDataNode.IsNotNull() )
-        m_Controls->m_ManualToolSelectionBox->GetToolManager()->SetWorkingData( m_TempWorkingDataNode );
-      m_TempWorkingDataNode = NULL;
-      m_Controls->btnNewSegmentation->setEnabled(true);
     }
   }
 }
@@ -819,6 +882,8 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
   connect( m_Controls->CreateSegmentationFromSurface, SIGNAL(clicked()), this, SLOT(CreateSegmentationFromSurface()) );
   connect( m_Controls->m_ManualToolSelectionBox, SIGNAL(ToolSelected(int)), this, SLOT(ManualToolSelected(int)) );
   connect( m_Controls->widgetStack, SIGNAL(currentChanged(int)), this, SLOT(ToolboxStackPageChanged(int)) );
+  //To remember the position of each contour
+  connect( m_Controls->cbRememberContourPositions, SIGNAL(stateChanged(int)), this, SLOT(CheckboxRememberContourPositionsStateChanged(int)));
 
 
   connect(m_Controls->MaskSurfaces,  SIGNAL( OnSelectionChanged( const mitk::DataNode* ) ), 
@@ -832,26 +897,26 @@ void QmitkSegmentationView::CreateQtPartControl(QWidget* parent)
 
 }
 
-void QmitkSegmentationView::OnPlaneModeChanged(int i)
-{
-  //if plane mode changes, disable all tools
-  if (m_MultiWidget)
-  {
-    mitk::ToolManager* toolManager = m_Controls->m_ManualToolSelectionBox->GetToolManager();
-
-    if (toolManager)
-    {
-      if (toolManager->GetActiveToolID() >= 0)
-      {
-        toolManager->ActivateTool(-1);
-      }
-      else
-      {
-        m_MultiWidget->EnableNavigationControllerEventListening();
-      }
-    }
-  }
-}
+//void QmitkSegmentationView::OnPlaneModeChanged(int i)
+//{
+//  //if plane mode changes, disable all tools
+//  if (m_MultiWidget)
+//  {
+//    mitk::ToolManager* toolManager = m_Controls->m_ManualToolSelectionBox->GetToolManager();
+//
+//    if (toolManager)
+//    {
+//      if (toolManager->GetActiveToolID() >= 0)
+//      {
+//        toolManager->ActivateTool(-1);
+//      }
+//      else
+//      {
+//        m_MultiWidget->EnableNavigationControllerEventListening();
+//      }
+//    }
+//  }
+//}
 
 
 // ATTENTION some methods for handling the known list of (organ names, colors) are defined in QmitkSegmentationOrganNamesHandling.cpp

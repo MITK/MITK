@@ -15,6 +15,7 @@ SET(CPP_FILES
   Algorithms/mitkDiffImageApplier.cpp
   Algorithms/mitkDopplerToStrainRateFilter.cpp
   Algorithms/mitkExtractDirectedPlaneImageFilter.cpp
+  Algorithms/mitkExtractDirectedPlaneImageFilterNew.cpp
   Algorithms/mitkExtractImageFilter.cpp
   Algorithms/mitkGeometryClipImageFilter.cpp
   Algorithms/mitkGeometryDataSource.cpp
@@ -30,6 +31,7 @@ SET(CPP_FILES
   Algorithms/mitkMeshSource.cpp
   Algorithms/mitkNonBlockingAlgorithm.cpp
   Algorithms/mitkOverwriteSliceImageFilter.cpp
+  Algorithms/mitkOverwriteDirectedPlaneImageFilter.cpp
   Algorithms/mitkPadImageFilter.cpp
   Algorithms/mitkPlaneCutFilter.cpp
   Algorithms/mitkPlaneFit.cpp

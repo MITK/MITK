@@ -24,6 +24,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkBaseRenderer.h"
 
+#include "mitkOverwriteDirectedPlaneImageFilter.h"
+
 mitk::SetRegionTool::SetRegionTool(int paintingPixelValue)
 :FeedbackContourTool("PressMoveReleaseWithCTRLInversion"),
  m_PaintingPixelValue(paintingPixelValue),
@@ -254,24 +256,25 @@ bool mitk::SetRegionTool::OnMouseReleased(Action* action, const StateEvent* stat
 
   int affectedDimension( -1 );
   int affectedSlice( -1 );
-  if ( FeedbackContourTool::DetermineAffectedImageSlice( image, planeGeometry, affectedDimension, affectedSlice ) )
-  {
-    // 2. Slice is known, now we try to get it as a 2D image and project the contour into index coordinates of this slice
-    Image::Pointer slice = FeedbackContourTool::GetAffectedImageSliceAs2DImage( positionEvent, image );
+  FeedbackContourTool::DetermineAffectedImageSlice( image, planeGeometry, affectedDimension, affectedSlice );
 
-    if ( slice.IsNull() )
-    {
+  Image::Pointer slice = FeedbackContourTool::GetAffectedImageSliceAs2DImage( positionEvent, image );
+
+  if ( slice.IsNull() )
+  {
       MITK_ERROR << "Unable to extract slice." << std::endl;
       return false;
-    }
-      
-    Contour* feedbackContour( FeedbackContourTool::GetFeedbackContour() );
-    Contour::Pointer projectedContour = FeedbackContourTool::ProjectContourTo2DSlice( slice, feedbackContour, false, false ); // false: don't add 0.5 (done by FillContourInSlice)
-                                                                                                                   // false: don't constrain the contour to the image's inside
-    if (projectedContour.IsNull()) return false;
+  }
 
-    FeedbackContourTool::FillContourInSlice( projectedContour, slice, m_PaintingPixelValue );
+  Contour* feedbackContour( FeedbackContourTool::GetFeedbackContour() );
+  Contour::Pointer projectedContour = FeedbackContourTool::ProjectContourTo2DSlice( slice, feedbackContour, false, false ); // false: don't add 0.5 (done by FillContourInSlice)
+  // false: don't constrain the contour to the image's inside
+  if (projectedContour.IsNull()) return false;
 
+  FeedbackContourTool::FillContourInSlice( projectedContour, slice, m_PaintingPixelValue );
+
+  if ( affectedDimension != -1 )
+  {
     // 5. Write the modified 2D working data slice back into the image
     OverwriteSliceImageFilter::Pointer slicewriter = OverwriteSliceImageFilter::New();
     slicewriter->SetInput( image );
@@ -281,15 +284,34 @@ bool mitk::SetRegionTool::OnMouseReleased(Action* action, const StateEvent* stat
     slicewriter->SetSliceIndex( affectedSlice );
     slicewriter->SetTimeStep( positionEvent->GetSender()->GetTimeStep( image ) );
     slicewriter->Update();
+    if ( m_ToolManager->GetRememberContourPosition() )
+    {
+        this->AddContourmarker(positionEvent);
+    }
+  }
+  else if ( affectedDimension == -1 )
+  {
+      OverwriteDirectedPlaneImageFilter::Pointer slicewriter = OverwriteDirectedPlaneImageFilter::New();
+      slicewriter->SetInput( image );
+      slicewriter->SetCreateUndoInformation( false );
+      slicewriter->SetSliceImage( slice );
+      slicewriter->SetPlaneGeometry3D( slice->GetGeometry() );
+      slicewriter->SetTimeStep( positionEvent->GetSender()->GetTimeStep( image ) );
+      slicewriter->Update();
 
-    // 6. Make sure the result is drawn again --> is visible then. 
-    assert( positionEvent->GetSender()->GetRenderWindow() );
-    mitk::RenderingManager::GetInstance()->RequestUpdate(positionEvent->GetSender()->GetRenderWindow());
+      if ( m_ToolManager->GetRememberContourPosition() )
+      {
+          this->AddContourmarker(positionEvent);
+      }
   }
   else
   {
     MITK_ERROR << "FeedbackContourTool could not determine which slice of the image you are drawing on." << std::endl;
   }
+
+  // 6. Make sure the result is drawn again --> is visible then. 
+  assert( positionEvent->GetSender()->GetRenderWindow() );
+  mitk::RenderingManager::GetInstance()->RequestUpdate(positionEvent->GetSender()->GetRenderWindow());
 
   m_WholeImageContourInWorldCoordinates = NULL;
   m_SegmentationContourInWorldCoordinates = NULL;

@@ -28,7 +28,8 @@ mitk::ToolManager::ToolManager(DataStorage* storage)
 :m_ActiveTool(NULL),
  m_ActiveToolID(-1),
  m_RegisteredClients(0),
- m_DataStorage(storage)
+ m_DataStorage(storage),
+ m_RememberContourPosition (false)
 {
   CoreObjectFactory::GetInstance(); // to make sure a CoreObjectFactory was instantiated (and in turn, possible tools are registered) - bug 1029
 

@@ -151,7 +151,6 @@ void mitk::ExtractDirectedPlaneImageFilter::GenerateData()
   {
     const PlaneGeometry *planeGeometry =
       static_cast< const PlaneGeometry * >( m_WorldGeometry );
-
     origin = planeGeometry->GetOrigin();
     right  = planeGeometry->GetAxisVector( 0 );
     bottom = planeGeometry->GetAxisVector( 1 );
@@ -190,11 +189,11 @@ void mitk::ExtractDirectedPlaneImageFilter::GenerateData()
     bottom.Normalize();
     normal.Normalize();
 
-    origin += right * ( mmPerPixel[0] * 0.5 );
-    origin += bottom * ( mmPerPixel[1] * 0.5 );
+    //origin += right * ( mmPerPixel[0] * 0.5 );
+    //origin += bottom * ( mmPerPixel[1] * 0.5 );
 
-    widthInMM -= mmPerPixel[0];
-    heightInMM -= mmPerPixel[1];
+    //widthInMM -= mmPerPixel[0];
+    //heightInMM -= mmPerPixel[1];
 
     // Use inverse transform of the input geometry for reslicing the 3D image
     m_Reslicer->SetResliceTransform( 
@@ -279,6 +278,9 @@ void mitk::ExtractDirectedPlaneImageFilter::GenerateData()
 
   m_Reslicer->SetInput( unitSpacingImageFilter->GetOutput() );
   unitSpacingImageFilter->Delete();
+  
+  //m_Reslicer->SetInput( inputData );
+
   m_Reslicer->SetOutputDimensionality( 2 );
   m_Reslicer->SetOutputOrigin( 0.0, 0.0, 0.0 );
 
@@ -313,10 +315,10 @@ void mitk::ExtractDirectedPlaneImageFilter::GenerateData()
   int xMin, xMax, yMin, yMax;
   if ( boundsInitialized )
   {
-    xMin = static_cast< int >( bounds[0] / mmPerPixel[0] + 0.5 );
-    xMax = static_cast< int >( bounds[1] / mmPerPixel[0] + 0.5 );
-    yMin = static_cast< int >( bounds[2] / mmPerPixel[1] + 0.5 );
-    yMax = static_cast< int >( bounds[3] / mmPerPixel[1] + 0.5 );
+    xMin = static_cast< int >( bounds[0] / mmPerPixel[0] );//+ 0.5 );
+    xMax = static_cast< int >( bounds[1] / mmPerPixel[0] );//+ 0.5 );
+    yMin = static_cast< int >( bounds[2] / mmPerPixel[1] );//+ 0.5);
+    yMax = static_cast< int >( bounds[3] / mmPerPixel[1] );//+ 0.5 );
   }
   else
   {
@@ -324,8 +326,8 @@ void mitk::ExtractDirectedPlaneImageFilter::GenerateData()
     // maximum plane size; so the overlap is just ignored
 
     xMin = yMin = 0;
-    xMax = static_cast< int >( extent[0] - pixelsPerMM[0] + 0.5 );
-    yMax = static_cast< int >( extent[1] - pixelsPerMM[1] + 0.5 );
+    xMax = static_cast< int >( extent[0] - pixelsPerMM[0] );//+ 0.5 );
+    yMax = static_cast< int >( extent[1] - pixelsPerMM[1] );//+ 0.5 );
   }
 
   m_Reslicer->SetOutputSpacing( mmPerPixel[0], mmPerPixel[1], 1.0 );

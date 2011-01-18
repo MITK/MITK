@@ -87,7 +87,8 @@ class QmitkSegmentationView : public QObject, public QmitkFunctionality
 
     void OnSurfaceSelectionChanged();
 
-    void OnPlaneModeChanged(int);
+    //called when the checkbox Remember Contour Positions is selected/deselected
+    void CheckboxRememberContourPositionsStateChanged(int state);
 
   protected:
 
@@ -129,6 +130,9 @@ class QmitkSegmentationView : public QObject, public QmitkFunctionality
     void UpdateOrganList(QStringList& organColors, const QString& organname, mitk::Color colorname);
     void AppendToOrganList(QStringList& organColors, const QString& organname, int r, int g, int b);
 
+    // If a contourmarker is selected, the plane in the related widget will be reoriented according to the marker`s geometry
+    void OnContourMarkerSelected (const mitk::DataNode* node);
+
     // the Qt parent of our GUI (NOT of this object)
     QWidget* m_Parent;
 
@@ -144,8 +148,7 @@ class QmitkSegmentationView : public QObject, public QmitkFunctionality
     unsigned long m_SlicesRotationObserverTag1;
     unsigned long m_SlicesRotationObserverTag2;
 
-    //for temporary fix unless we support segmentation in rotated slices
-    mitk::DataNode::Pointer m_TempWorkingDataNode;
+
 };
 
 #endif /*QMITKsegmentationVIEW_H_*/

@@ -19,10 +19,13 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkToolManager.h"
 #include "mitkOverwriteSliceImageFilter.h"
+#include "mitkOverwriteDirectedPlaneImageFilter.h"
 
 #include "mitkBaseRenderer.h"
 #include "mitkRenderingManager.h"
 //#include "mitkProperties.h"
+#include "mitkPlanarCircle.h"
+
 
 mitk::ContourTool::ContourTool(int paintingPixelValue)
 :FeedbackContourTool("PressMoveReleaseWithCTRLInversion"),
@@ -109,8 +112,8 @@ bool mitk::ContourTool::OnMouseReleased(Action* action, const StateEvent* stateE
 
   int affectedDimension( -1 );
   int affectedSlice( -1 );
-  if ( SegTool2D::DetermineAffectedImageSlice( image, planeGeometry, affectedDimension, affectedSlice ) )
-  {
+  SegTool2D::DetermineAffectedImageSlice( image, planeGeometry, affectedDimension, affectedSlice );
+  
     // 2. Slice is known, now we try to get it as a 2D image and project the contour into index coordinates of this slice
     Image::Pointer slice = SegTool2D::GetAffectedImageSliceAs2DImage( positionEvent, image );
 
@@ -118,56 +121,51 @@ bool mitk::ContourTool::OnMouseReleased(Action* action, const StateEvent* stateE
     {
       MITK_ERROR << "Unable to extract slice." << std::endl;
       return false;
-    }
-
-    /*
-    DataNode::Pointer debugNode = DataNode::New();
-    debugNode->SetData( slice );
-    debugNode->SetProperty( "name", StringProperty::New("extracted slice") );
-    debugNode->SetProperty( "color", ColorProperty::New(1.0, 0.0, 0.0) );
-    debugNode->SetProperty( "layer", FloatProperty::New(100) );
-    m_ToolManager->GetDataStorage()->Add( debugNode );
-    */
-
+    }    
+   
     Contour* feedbackContour( FeedbackContourTool::GetFeedbackContour() );
     Contour::Pointer projectedContour = FeedbackContourTool::ProjectContourTo2DSlice( slice, feedbackContour, true, false ); // true: actually no idea why this is neccessary, but it works :-(
-                                                                                                                   // false: don't constrain the contour to the image's inside
-    /*
-    Contour::Pointer back = FeedbackContourTool::BackProjectContourFrom2DSlice( slice, projectedContour, true ); // true: actually no idea why this is neccessary, but it works :-(
-    for (unsigned int idx = 0; idx < back->GetNumberOfPoints(); ++idx)
-    {
-      Point3D before = feedbackContour->GetPoints()->ElementAt(idx);
-      Point3D inbtw = projectedContour->GetPoints()->ElementAt(idx);
-      Point3D after = back->GetPoints()->ElementAt(idx);
-
-      MITK_DEBUG << "before " << before << " zwischen " << inbtw << " after " << after;
-    }
-  */
 
     if (projectedContour.IsNull()) return false;
 
     FeedbackContourTool::FillContourInSlice( projectedContour, slice, m_PaintingPixelValue );
 
-    // 5. Write the modified 2D working data slice back into the image
-    OverwriteSliceImageFilter::Pointer slicewriter = OverwriteSliceImageFilter::New();
-    slicewriter->SetInput( image );
-    slicewriter->SetCreateUndoInformation( true );
-    slicewriter->SetSliceImage( slice );
-    slicewriter->SetSliceDimension( affectedDimension );
-    slicewriter->SetSliceIndex( affectedSlice );
-    slicewriter->SetTimeStep( positionEvent->GetSender()->GetTimeStep( image ) );
-    slicewriter->Update();
+    // 3. Write the modified 2D working data slice back into the image
+    if (affectedDimension != -1) {
+      OverwriteSliceImageFilter::Pointer slicewriter = OverwriteSliceImageFilter::New();
+      slicewriter->SetInput( image );
+      slicewriter->SetCreateUndoInformation( true );
+      slicewriter->SetSliceImage( slice );
+      slicewriter->SetSliceDimension( affectedDimension );
+      slicewriter->SetSliceIndex( affectedSlice );
+      slicewriter->SetTimeStep( positionEvent->GetSender()->GetTimeStep( image ) );
+      slicewriter->Update();
+      if ( m_ToolManager->GetRememberContourPosition() )
+      {
+         this->AddContourmarker(positionEvent);
+      }
+    }
+    else {
+      OverwriteDirectedPlaneImageFilter::Pointer slicewriter = OverwriteDirectedPlaneImageFilter::New();
+      slicewriter->SetInput( image );
+      slicewriter->SetCreateUndoInformation( false );
+      slicewriter->SetSliceImage( slice );
+      slicewriter->SetPlaneGeometry3D( slice->GetGeometry() );
+      slicewriter->SetTimeStep( positionEvent->GetSender()->GetTimeStep( image ) );
+      slicewriter->Update();
 
-    // 6. Make sure the result is drawn again --> is visible then. 
+      if ( m_ToolManager->GetRememberContourPosition() )
+      {
+         this->AddContourmarker(positionEvent);
+      }
+      
+    }
+
+    // 4. Make sure the result is drawn again --> is visible then. 
     assert( positionEvent->GetSender()->GetRenderWindow() );
 
     mitk::RenderingManager::GetInstance()->RequestUpdate( positionEvent->GetSender()->GetRenderWindow() );
-  }
-  else
-  {
-    InteractiveSegmentationBugMessage( "FeedbackContourTool could not determine which slice of the image you are drawing on." );
-  }
-
+ 
   return true;
 }
 

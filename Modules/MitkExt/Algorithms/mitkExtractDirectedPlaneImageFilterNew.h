@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "MitkExtExports.h"
 #include "mitkImageToImageFilter.h"
-#include "ItkImage.h"
+#include "itkImage.h"
 #include "mitkITKImageImport.h"
 
 namespace mitk {

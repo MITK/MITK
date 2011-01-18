@@ -123,7 +123,7 @@ void mitk::OverwriteDirectedPlaneImageFilter::ItkSliceOverwriting( itk::Image<TP
     typedef itk::ImageSliceIteratorWithIndex< VolumeImageType > OutputSliceIteratorType;
     typedef itk::ImageRegionConstIterator< SliceImageType >     SliceIteratorType;
 
-    SliceImageType::Pointer sliceImage = SliceImageType::New();
+    typename SliceImageType::Pointer sliceImage = SliceImageType::New();
     CastToItkImage(m_SliceImage,sliceImage);
 
     SliceIteratorType sliceIterator( sliceImage, sliceImage->GetLargestPossibleRegion() );
@@ -222,7 +222,7 @@ void mitk::OverwriteDirectedPlaneImageFilter::ItkSliceOverwriting( itk::Image<TP
 //*/
 
 // basically copied from mitk/Core/Algorithms/mitkImageAccessByItk.h
-//#define myMITKOverwriteDirectedPlaneImageFilterAccessByItk(mitkImage, itkImageTypeFunction, pixeltype, dimension, itkimage2)            \
+/*#define myMITKOverwriteDirectedPlaneImageFilterAccessByItk(mitkImage, itkImageTypeFunction, pixeltype, dimension, itkimage2)            \
 //  if ( typeId == typeid(pixeltype) )                                                    \
 //{                                                                                        \
 //    typedef itk::Image<pixeltype, dimension> ImageType;                                   \
@@ -243,7 +243,7 @@ void mitk::OverwriteDirectedPlaneImageFilter::ItkSliceOverwriting( itk::Image<TP
 //    myMITKOverwriteDirectedPlaneImageFilterAccessByItk(mitkImage, itkImageTypeFunction, unsigned short, dimension, itkimage2) else    \
 //    myMITKOverwriteDirectedPlaneImageFilterAccessByItk(mitkImage, itkImageTypeFunction, char,           dimension, itkimage2) else   \
 //    myMITKOverwriteDirectedPlaneImageFilterAccessByItk(mitkImage, itkImageTypeFunction, unsigned char,  dimension, itkimage2)       \
-//}
+//}*/
 //
 //    
 //template<typename TPixel, unsigned int VImageDimension>

@@ -271,7 +271,7 @@ bool mitk::SegTool2D::ContourmarkerAlreadyExists ( const mitk::PlaneGeometry* cu
 {
     itk::VectorContainer<unsigned int, mitk::DataNode::Pointer>::ConstPointer allNodes = m_ToolManager->GetDataStorage()->GetDerivations( m_ToolManager->GetWorkingData(0) );
     mitk::DataNode* currentNode;
-    for( int i = 0; i < allNodes->Size(); i++ )
+    for( unsigned int i = 0; i < allNodes->Size(); i++ )
     {
         currentNode = allNodes->GetElement(i);
         std::string nodeName = currentNode->GetName();
@@ -279,8 +279,8 @@ bool mitk::SegTool2D::ContourmarkerAlreadyExists ( const mitk::PlaneGeometry* cu
         if ( !nodeGeometry ) continue;
         Point3D nodeCenter = nodeGeometry->GetCenter();
         Point3D currentCenter = currentGeometry2D->GetCenter();
-        mitk::ScalarType distance1 = currentGeometry2D->DistanceFromPlane(nodeCenter);
-        mitk::ScalarType distance2 = nodeGeometry->DistanceFromPlane(currentCenter);
+        /*mitk::ScalarType distance1 = currentGeometry2D->DistanceFromPlane(nodeCenter);
+        mitk::ScalarType distance2 = nodeGeometry->DistanceFromPlane(currentCenter);*/
         Vector3D nodeNormal = nodeGeometry->GetNormal();
         Vector3D currentNormal = currentGeometry2D->GetNormal();
         //Timestep...

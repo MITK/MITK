@@ -4,6 +4,7 @@ SET(SRC_CPP_FILES
 
 SET(INTERNAL_CPP_FILES
   QmitkImageCropper.cpp
+  mitkImageCropperEventInterface.cpp
 )
 
 SET(UI_FILES

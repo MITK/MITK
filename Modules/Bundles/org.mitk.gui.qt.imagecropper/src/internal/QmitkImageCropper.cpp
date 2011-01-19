@@ -92,6 +92,8 @@ QmitkImageCropper::QmitkImageCropper(QObject *parent)
 : QObject(parent),
 m_Controls(NULL), m_ParentWidget(0)
 {
+   m_Interface = new mitk::ImageCropperEventInterface;
+   m_Interface->SetImageCropper( this );
 }
 
 
@@ -100,6 +102,9 @@ QmitkImageCropper::~QmitkImageCropper()
   //delete smart pointer objects
   m_CroppingObjectNode = NULL;
   m_CroppingObject = NULL;
+
+  m_Interface->Delete();
+
 }
 
 void QmitkImageCropper::CreateQtPartControl(QWidget* parent)
@@ -313,8 +318,9 @@ void QmitkImageCropper::CropImage()
     //       because nothing happens in the render window.
     //       As a result the undo action will happen together with the last action
     //       recognized by MITK.
-    mitk::UndoController::GetCurrentUndoModel()->SetOperationEvent(
-      new mitk::OperationEvent(this, doOp, undoOp, "Crop image") ); // tell the undo controller about the action
+    mitk::OperationEvent* operationEvent = new mitk::OperationEvent( m_Interface, doOp, undoOp, "Crop image");
+    mitk::UndoController::GetCurrentUndoModel()->SetOperationEvent( operationEvent ); // tell the undo controller about the action
+    
     ExecuteOperation(doOp); // execute action
   }
 

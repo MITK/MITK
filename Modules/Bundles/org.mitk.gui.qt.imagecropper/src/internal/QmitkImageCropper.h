@@ -31,7 +31,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkImage.h>
 #include <QProgressDialog>
 
+#include "mitkImageCropperEventInterface.h"
+
 #include "ui_QmitkImageCropperControls.h"
+
 
 /*!
 \ingroup org_mitk_gui_qt_imagecropper_internal
@@ -209,5 +212,8 @@ private:
 
   QProgressDialog *progress;
   mitk::Image::Pointer m_surrImage;
+
+  //Interface class for undo redo
+  mitk::ImageCropperEventInterface* m_Interface;
 };
 #endif // !defined(QMITK_IMAGECROPPER_H__INCLUDED)

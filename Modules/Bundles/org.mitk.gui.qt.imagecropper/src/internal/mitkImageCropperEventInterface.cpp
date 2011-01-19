@@ -15,9 +15,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
+#include "QmitkImageCropper.h"
 #include "mitkImageCropperEventInterface.h"
 
-#include "QmitkImageCropper.h"
 
 mitk::ImageCropperEventInterface::ImageCropperEventInterface()
 {

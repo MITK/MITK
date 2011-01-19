@@ -121,6 +121,7 @@ mitkIpPicGetHeader( const char *infile_name, mitkIpPicDescriptor *pic )
     }
   else if( strncmp( mitkIpPicVERSION, tag_name, 4 ) != 0 )
     {
+      /*
       if( pic == NULL )
         pic = _mitkIpPicOldGetHeader( infile,
                                   NULL );
@@ -130,6 +131,8 @@ mitkIpPicGetHeader( const char *infile_name, mitkIpPicDescriptor *pic )
       if( infile != stdin )
         mitkIpPicFClose( infile );
       return( pic );
+      */
+      return ( NULL );
     }
 
   if( pic == NULL )

@@ -27,7 +27,15 @@ mitk::NodePredicateSource::~NodePredicateSource()
 }
 
 
-bool mitk::NodePredicateSource::CheckNode(const mitk::DataNode*) const
+bool mitk::NodePredicateSource::CheckNode(const mitk::DataNode* node) const
 {
-  throw std::logic_error("NodePredicateSourceis not implemented");
+  if(m_DataStorage && m_BaseNode)
+  {
+    const mitk::DataStorage::SetOfObjects::STLContainerType sources = 
+      m_DataStorage->GetSources(node, 0, !m_SearchAllSources)->CastToSTLConstContainer();
+
+    return std::find(sources.begin(), sources.end(), m_BaseNode) != sources.end();
+  }
+
+  return false;
 }

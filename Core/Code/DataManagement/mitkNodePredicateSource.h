@@ -29,9 +29,8 @@ namespace mitk {
     //##Documentation
     //## @brief Predicate that evaluates if the given node is a direct or indirect source node of a specific node
     //## 
-    //## @warning This class seems to be obsolete since mitk::DataStorage::GetDerivations(). 
-    //##          Since there is no real use case up until now, NodePredicateSource is NOT WORKING YET.
-    //##          If you need it working, inform us.
+    //## @warning Calling CheckNode() can be computationally quite expensive for a large DataStorage.
+    //##          Alternatively mitk::StandaloneDataStorage::GetSources() can be used 
     //## 
     //## @ingroup DataStorage
     class MITK_CORE_EXPORT NodePredicateSource : public NodePredicateBase

@@ -464,7 +464,7 @@ std::string CommonFunctionality::SaveSurface(mitk::Surface* surface, const char*
 std::string CommonFunctionality::SaveImage(mitk::Image* image, const char* aFileName, bool askForDifferentFilename)
 {
   static QString lastDirectory = "";
-  QString selected_suffix("DKFZ Pic (*.pic)");
+  QString selected_suffix("Nearly Raw Raster Data (*.nrrd)");
 
   std::string fileName;
   if(aFileName == NULL || askForDifferentFilename)

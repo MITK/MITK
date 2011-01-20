@@ -35,8 +35,8 @@ void mitk::ExtractDirectedPlaneImageFilterNew::GenerateData(){
 
     if ( !inputImage )
     {
-        MITK_ERROR << "mitk::ExExtractDirectedPlaneImageFilterNew: No input available. Please set the input!" << std::endl;
-        itkExceptionMacro("mitk::ExExtractDirectedPlaneImageFilterNew: No input available. Please set the input!");
+        MITK_ERROR << "mitk::ExtractDirectedPlaneImageFilterNew: No input available. Please set the input!" << std::endl;
+        itkExceptionMacro("mitk::ExtractDirectedPlaneImageFilterNew: No input available. Please set the input!");
         return;
     }
 
@@ -55,8 +55,8 @@ void mitk::ExtractDirectedPlaneImageFilterNew::GenerateData(){
 
     if ( inputImage->GetDimension() > 4 || inputImage->GetDimension() < 2)
     {
-        MITK_ERROR << "mitk::ExExtractDirectedPlaneImageFilterNew:GenerateData works only with 3D and 3D+t images, sorry." << std::endl;
-        itkExceptionMacro("mitk::ExExtractDirectedPlaneImageFilterNew works only with 3D and 3D+t images, sorry.");
+        MITK_ERROR << "mitk::ExtractDirectedPlaneImageFilterNew:GenerateData works only with 3D and 3D+t images, sorry." << std::endl;
+        itkExceptionMacro("mitk::ExtractDirectedPlaneImageFilterNew works only with 3D and 3D+t images, sorry.");
         return;
     }
     else if ( inputImage->GetDimension() == 4 )
@@ -77,7 +77,7 @@ void mitk::ExtractDirectedPlaneImageFilterNew::GenerateData(){
 
     if ( !m_CurrentWorldGeometry2D )
     {
-        MITK_ERROR<< "mitk::ExExtractDirectedPlaneImageFilterNew::GenerateData has no CurrentWorldGeometry2D set" << std::endl;
+        MITK_ERROR<< "mitk::ExtractDirectedPlaneImageFilterNew::GenerateData has no CurrentWorldGeometry2D set" << std::endl;
         return;
     }
 
@@ -174,6 +174,7 @@ void mitk::ExtractDirectedPlaneImageFilterNew::ItkSliceExtraction (itk::Image<TP
 
     //Putting it together for the new geometry
     mitk::Geometry3D::Pointer newSliceGeometryTest = dynamic_cast<Geometry3D*>(m_CurrentWorldGeometry2D->Clone().GetPointer());
+    newSliceGeometryTest->ChangeImageGeometryConsideringOriginOffset(true);
 
     //Workaround because of BUG (#6505)
     newSliceGeometryTest->GetIndexToWorldTransform()->SetMatrix(m_CurrentWorldGeometry2D->GetIndexToWorldTransform()->GetMatrix());

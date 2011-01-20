@@ -1,4 +1,4 @@
-
+namespace mitk{
 /**
 \page GeometryOverviewPage Geometry Overview
 
@@ -13,7 +13,7 @@ Available sections:
 
 Geometries are used to describe the geometrical properties of data objects in space and time.\n
 To use the geometry classes in the right way you have to understand the three different coordinate types present in MITK:\n\n
-<img src="../CoordinateTypes.png">
+\image html CoordinateTypes.png
 <center><b>The different coordinate types\n\n</b></center>
 
 
@@ -23,25 +23,25 @@ To use the geometry classes in the right way you have to understand the three di
 		- World coordinates are always measured in mm
 		- <b> If you are dealing with an image geometry, the origin of an image is pointing to the CENTER of the bottom-left-back voxel.\n 
 		  If you are NOT dealing with an image geometry (no defined discrete Voxels), the origin is pointing to the bottom-left-back CORNER</b>
-		- Index coordinates can be converted to world coordinates by calling mitk::Geometry3D::IndexToWorld(const mitk::Point3D &pt_units, mitk::Point3D &pt_mm)\n\n
-<img src="../worldcoordinateSystem.png">
+		- Index coordinates can be converted to world coordinates by calling Geometry3D::IndexToWorld()\n\n
+\image html worldcoordinateSystem.png
 <center><b>Corner-based coordinates\n\n</b></center>
-<img src="../WorldcoordinateSystemCenterBased.png">
+\image html WorldcoordinateSystemCenterBased.png
 <center><b>Center-based image-coordinates\n\n</b></center>\n
 	-# Continuous index coordinates:
 		- Dividing world coordinates through the pixel spacing and simultanously taking the offset into account leads to continuous index coordinates inside your dataobject.\n
 		  So continuous coordinates can be float values!
-		- They can be obtained by calling mitk::Geometry3D:: WorldToIndex(const mitk::Point3D &pt_mm, mitk::Point3D &pt_units), where &pt_mm is a point in worldcoordinates.\n 		
+		- They can be obtained by calling Geometry3D::WorldToIndex(), where &pt_mm is a point in worldcoordinates.\n 		
 	-# Index coordinate system:
 		- Index coordinates are discrete values that address voxels of a data object explicitly.
 		- Basically they are continuous index coordinates which are rounded from half integer up.
 		- E.g. (0,0) specifies the very first pixel of a 2D image, (0,1) the pixel of the next column in the same row
 		- If you have world coordinates, they can be converted to discrete index coordinates by calling
-          mitk::Geometry3D:: WorldToIndex (const mitk::Point3D &pt_mm, itk::Index< VIndexDimension > &index)\n\n  
+          Geometry3D::WorldToIndex()\n\n  
 
 \section Section_2 The Geometry Concept
 
-As the superclass of all MITK geometries mitk::Geometry3D holds:
+As the superclass of all MITK geometries Geometry3D holds:
 	- a spacial bounding box which is axes-parallel in index coordinates (often discrete indices of pixels), to be accessed by Geometry3D::GetBoundingBox()
 	- a time related bounding box which holds the temporal validity of the considered data object in milliseconds (start and end time), to be accessed by Geometry3D::GetTimeBounds().\n 
 	  The default for 3D geometries is minus infinity to plus infinity, meaning the object is always displayed independent of displayed time in MITK.
@@ -59,8 +59,8 @@ class and its sub-classes.
 
 TimeSlicedGeometry describes a spatiotemporal geometry consisting of spatial geometries exising at different times, and allocates each geometry at a valid time step a discrete number. It contains a list of Geometry3D instances to be accessed by\n
 TimeSlicedGeometry::GetGeometry3D(t), with t between 0 and TimeSlicedGeometry::GetTimeSteps().\n
-To convert between world time in milliseconds and the integer timestep number use mitk:TimeSlicedGeometry::MSToTimeStep(), for conversion in the opposite direction\n
-mitk:TimeSlicedGeometry::TimeStepToMS().
+To convert between world time in milliseconds and the integer timestep number use TimeSlicedGeometry::MSToTimeStep(), for conversion in the opposite direction\n
+TimeSlicedGeometry::TimeStepToMS().
 
 Often all Geometry3D instances contained in a TimeSlicedGeometry have the same temporal extent.\n
 The initialization for this case can be done using TimeSlicedGeometry::InitializeEvenlyTimed(Geometry3D *geometry3D, unsigned int timeSteps). 
@@ -81,26 +81,26 @@ Comparable to TimeSlicedGeometry the class SlicedGeometry3D contains a list of G
 SlicedGeometry3D::InitializeEvenlySpaced (Geometry2D *geometry2D, unsigned int slices) initializes a stack of slices with the same thickness, one starting at the position where the previous one ends.
 
 Geometry2D provides methods for working with 2D manifolds (i.e., simply spoken, an object that can be described using a 2D coordinate-system) in 3D space.\n
-For example it allows mapping of a 3D point on the 2D manifold using Geometry2D::Map. A subclass of mitk::Geometry2D called mitk::PlaneGeometry, explicitly describes a 2D rectangular plane.\n
+For example it allows mapping of a 3D point on the 2D manifold using Geometry2D::Map(). A subclass of Geometry2D called PlaneGeometry, explicitly describes a 2D rectangular plane.\n
 Another important subclass of Geometry2D is the DisplayGeometry which describes the geometry of the display (the monitor screen). Basically it represents a rectangular view on a 2D world geometry\n
 The DisplayGeometry converts between screen and world coordinates, processes input events (e.g. mouse click) and provides methods for zooming and panning.\n
-<img src="../DisplayGeometry.png">
+\image html DisplayGeometry.png
 <center><b>Display Geometry\n\n</b></center>
 Finally there is the AbstractTransformGeometry which describes a 2D manifold in 3D space, defined by a vtkAbstractTransform. It is a abstract superclass for arbitrary user defined geometries\n
 An example is the ThinPlateSplineCurvedGeometry.\n
 
 \subsection Subsection_21 IMPORTANT: Putting it together for an Image
 
-Please read this section accurately if you are working with mitk::Images!
+Please read this section accurately if you are working with Images!
 
 The definition of the position of the corners of an image is different than the one of other data objects:
 
 As mentioned in the previous section, world coordinates of data objects (e.g. surfaces ) usually specify the bottom left back corner of an object.
 
-In contrast to that a geometry of an mitk::Image is center-based, which means that the world coordinates of a voxel belonging to an image points to the center of that voxel. 
+In contrast to that a geometry of an Image is center-based, which means that the world coordinates of a voxel belonging to an image points to the center of that voxel. 
 E.g:
 
-<img src="../PixelCenterBased.png">
+\image html PixelCenterBased.png
 <center><b>Center-based voxel\n\n</b></center>
 
 If the origin of e.g. a surface lies at (15,10,0) in world coordinates, the origin`s world coordinates for an image are internally calculated like the following:
@@ -124,12 +124,11 @@ An image has a TimeSlicedGeometry, which contains one or more SlicedGeometry3D i
 As a reminder: Geometry instances referring to images need a slightly different definition of corners, see Geometry3D::SetImageGeometry. This is usualy automatically called by Image.\n\n
 
 \section Section_3 Connection between MITK, ITK and VTK Geometries
-<img src="../ITK_VTK_MITK_Geometries.png">
+\image html ITK_VTK_MITK_Geometries.png
 \n\n
 	- VTK transformation for rendering
 	- ITK transformation for calculations
 	- Both automatically updated when one is changed\n
 Attention:<b>Not</b> automatically updated when changed hardcoded. Example: geometry->GetVtkMatrix()->Rotate(....)
-
-
 */
+}

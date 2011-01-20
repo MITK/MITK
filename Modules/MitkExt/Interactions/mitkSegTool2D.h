@@ -117,9 +117,6 @@ class MitkExt_EXPORT SegTool2D : public Tool
     //The prefix of the contourmarkernames. Suffix is a consecutive number
     const std::string     m_Contourmarkername;
 
-    //ContourSet - Test
-    mitk::ContourSet::Pointer m_ContourSet;
-
     /**
       \brief Checks whether a marker for the currentGeometry already exists
     */

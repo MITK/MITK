@@ -88,8 +88,8 @@ bool mitk::DisplayVectorInteractorLevelWindow::ExecuteAction(Action* action, mit
 
       mitk::LevelWindow lv = mitk::LevelWindow();
       node->GetLevelWindow(lv);
-      double level = lv.GetLevel();
-      double window = lv.GetWindow();
+      int level = lv.GetLevel();
+      int window = lv.GetWindow();
 
       level += ( m_CurrentDisplayCoordinate[0] - m_LastDisplayCoordinate[0] )*2;
       window += ( m_CurrentDisplayCoordinate[1] - m_LastDisplayCoordinate[1] )*2;

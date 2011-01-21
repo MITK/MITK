@@ -1119,8 +1119,9 @@ bool mitk::NDITrackingDevice::DiscoverWiredTools()
   /* if there are port handles that need to be initialized, initialize them. Furthermore instantiate tools for each handle that has no tool yet. */
   std::string ph;
   
-  ///* we need to remember the ports which are occupied to be able to readout the serial numbers of the connected tools later*/
-  //std::vector<int> occupiedPorts;
+  /* we need to remember the ports which are occupied to be able to readout the serial numbers of the connected tools later */
+  std::vector<int> occupiedPorts = std::vector<int>();
+  int numberOfToolsAtStart = this->GetToolCount(); //also remember the number of tools at start to identify the automatically detected tools later
 
   for (unsigned int i = 0; i < portHandle.size(); i += 2)
   {
@@ -1133,8 +1134,6 @@ bool mitk::NDITrackingDevice::DiscoverWiredTools()
     newTool->SetPortHandle(ph.c_str());
     newTool->SetTrackingPriority(mitk::NDIPassiveTool::Dynamic);
 
-    
-    
     //set a name for identification
     newTool->SetToolName((std::string("Port ") + ph).c_str());
 
@@ -1159,18 +1158,18 @@ bool mitk::NDITrackingDevice::DiscoverWiredTools()
     //we have to temporarily unlock m_ModeMutex here to avoid a deadlock with another lock inside InternalAddTool() 
     if (this->InternalAddTool(newTool) == false)
       this->SetErrorMessage("Error while adding new tool");
-    //else occupiedPorts.push_back(i);
+    else occupiedPorts.push_back(i);
   }
   
   
-  //after initialization readout serial numbers of tools
-  //for (unsigned int i = 0; i < this->GetToolCount(); i += 2)
-  //  {
-  //  ph = portHandle.substr(occupiedPorts.at(i), 2);
-  //  std::string portInfo;
-  //  NDIErrorCode returnvaluePort = m_DeviceProtocol->PHINF(ph, &portInfo);
-  //  if ((returnvaluePort==NDIOKAY) && (portInfo.size()>31)) dynamic_cast<mitk::NDIPassiveTool*>(this->GetTool(i))->SetSerialNumber(portInfo.substr(23,8));
-  //  }
+  // after initialization readout serial numbers of automatically detected tools
+  for (unsigned int i = 0; i < occupiedPorts.size(); i++)
+    {
+    ph = portHandle.substr(occupiedPorts.at(i), 2);
+    std::string portInfo;
+    NDIErrorCode returnvaluePort = m_DeviceProtocol->PHINF(ph, &portInfo);
+    if ((returnvaluePort==NDIOKAY) && (portInfo.size()>31)) dynamic_cast<mitk::NDIPassiveTool*>(this->GetTool(i+numberOfToolsAtStart))->SetSerialNumber(portInfo.substr(23,8));
+    }
 
   return true;
 }

@@ -97,6 +97,7 @@ template <> void MITK_CORE_EXPORT CastToItkImage<itkImageDTID3>(const mitk::Imag
 #define TYPE_N_VEC(N_DIRS)                                                                   \
   _TYPE_N_VEC(N_DIRS,double)                                                                 \
   _TYPE_N_VEC(N_DIRS,float)                                                                  \
+  _TYPE_N_VEC(N_DIRS,short)                                                                  \
 
 #define _TYPE_N_VEC(N_DIRS,PIXTYPE)                                                                                                                                                                \
   template <> void MITK_CORE_EXPORT CastToItkImage<itk::Image<itk::Vector<PIXTYPE,N_DIRS>, 2> >(const mitk::Image * mitkImage, itk::SmartPointer<itk::Image<itk::Vector<PIXTYPE,N_DIRS>, 2> >& itkOutputImage)                                       \
@@ -130,6 +131,7 @@ template <> void MITK_CORE_EXPORT CastToItkImage<itkImageDTID3>(const mitk::Imag
 //TYPE_TEN_VECS(0)
 //TYPE_N_VEC(11)
 //TYPE_N_VEC(12)
+TYPE_N_VEC(2)
 TYPE_N_VEC(3)
 TYPE_N_VEC(6)
 TYPE_N_VEC(42)

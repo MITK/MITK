@@ -52,6 +52,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define N_VEC(N_DIRS)       \
   _N_VEC(N_DIRS,double)     \
   _N_VEC(N_DIRS,float)      \
+  _N_VEC(N_DIRS,short)      \
 
 #define _N_VEC(N_DIRS,PIXTYPE)                                                          \
   else if ( *m_TypeId == typeid( itk::Vector<PIXTYPE,N_DIRS> ))  \
@@ -242,6 +243,7 @@ void mitk::PixelType::Initialize( const std::type_info& aTypeId, int numberOfCom
      //N_VEC(11)
      //N_VEC(12)
      if(false){}
+     N_VEC(2)
      N_VEC(3)
      N_VEC(6)
      N_VEC(42)

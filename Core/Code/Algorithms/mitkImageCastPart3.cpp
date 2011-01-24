@@ -83,6 +83,7 @@ template void MITK_CORE_EXPORT _CastToItkImage2Access(itkImageDTID3*,  itk::Smar
 #define CAST_N_VEC(N_DIRS)                                                                   \
   _CAST_N_VEC(N_DIRS,double)                                                                 \
   _CAST_N_VEC(N_DIRS,float)                                                                  \
+  _CAST_N_VEC(N_DIRS,short)                                                                  \
 
 #define _CAST_N_VEC(N_DIRS,PIXTYPE)                                                                         \
   template void MITK_CORE_EXPORT _CastToItkImage2Access(itk::Image<itk::Vector<PIXTYPE,N_DIRS>, 2> *,  itk::SmartPointer<itk::Image<itk::Vector<PIXTYPE,N_DIRS>, 2> >&);  \
@@ -102,6 +103,7 @@ template void MITK_CORE_EXPORT _CastToItkImage2Access(itkImageDTID3*,  itk::Smar
 //CAST_TEN_VECS(0)
 //CAST_N_VEC(11)
 //CAST_N_VEC(12)
+CAST_N_VEC(2)
 CAST_N_VEC(3)
 CAST_N_VEC(6)
 CAST_N_VEC(42)

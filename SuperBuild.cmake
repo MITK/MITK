@@ -73,7 +73,11 @@ endif(MITK_USE_QT)
 # ----------------------------------------- 
 # VTK
 #
-
+IF(WIN32)
+  OPTION(VTK_USE_SYSTEM_FREETYPE OFF)
+ELSE(WIN32)
+  OPTION(VTK_USE_SYSTEM_FREETYPE ON)
+ENDIF(WIN32)
 IF(NOT DEFINED VTK_DIR)
     SET(proj vtk)
     SET(VTK_DEPENDS ${proj})
@@ -88,7 +92,7 @@ IF(NOT DEFINED VTK_DIR)
         -DVTK_WRAP_JAVA:BOOL=OFF
         -DBUILD_SHARED_LIBS:BOOL=ON 
         -DVTK_USE_PARALLEL:BOOL=ON
-        -DVTK_USE_SYSTEM_FREETYPE:BOOL=ON
+        -DVTK_USE_SYSTEM_FREETYPE:BOOL=${VTK_USE_SYSTEM_FREETYPE}
         ${vtk_QT_ARGS}
       )
   SET(VTK_DIR ${ep_build_dir}/${proj})
@@ -99,10 +103,12 @@ IF(MITK_USE_DCMTK)
 
   IF(NOT DEFINED DCMTK_DIR)
   SET(proj DCMTK)
-IF(UNIX)
-  SET(DCMTK_CXX_FLAGS "-fPIC")
-ENDIF(UNIX)
-
+  IF(UNIX)
+    SET(DCMTK_CXX_FLAGS "-fPIC")
+  ENDIF(UNIX)
+  IF(DCMTK_DICOM_ROOT_ID)
+    SET(DCMTK_CXX_FLAGS "${DCMTK_CXX_FLAGS} -DSITE_UID_ROOT=\\\"${DCMTK_DICOM_ROOT_ID}\\\"")
+  ENDIF()
   ExternalProject_Add(${proj}
     URL http://mitk.org/download/thirdparty/dcmtk-3.6.0.tar.gz
       CMAKE_GENERATOR ${gen}
@@ -116,7 +122,6 @@ ENDIF(UNIX)
 
   ENDIF()
 ENDIF()     
-
 
 # ----------------------------------------- 
 # CTK

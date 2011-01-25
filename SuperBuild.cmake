@@ -144,6 +144,25 @@ IF(NOT DEFINED CTK_DIR)
 ENDIF()
 ENDIF(MITK_USE_CTK)
 
+## -----------------------------------------
+# GDCM
+#
+IF(NOT DEFINED GDCM_DIR)
+  SET(proj GDCM)
+  ExternalProject_Add(${proj}
+     URL http://mitk.org/download/thirdparty/gdcm-2.0.14.tar.gz 
+     INSTALL_COMMAND ""
+     CMAKE_GENERATOR ${gen}
+     CMAKE_ARGS
+       ${ep_common_args}
+       -DBUILD_SHARED_LIBS:BOOL=ON 
+       -DBUILD_TESTING:BOOL=OFF
+       -DBUILD_EXAMPLES:BOOL=OFF
+     )
+  SET(GDCM_DIR ${ep_build_dir}/${proj})
+   
+ENDIF(NOT DEFINED GDCM_DIR)
+
 ## ----------------------------------------- 
 # ITK
 #
@@ -157,6 +176,9 @@ IF(NOT DEFINED ITK_DIR)
        ${ep_common_args}
        -DBUILD_TESTING:BOOL=OFF
        -DBUILD_EXAMPLES:BOOL=OFF
+       -DITK_USE_SYSTEM_GDCM:BOOL=ON
+       -DGDCM_DIR:PATH=${GDCM_DIR}
+     DEPENDS GDCM
      )
 
   SET(ITK_DIR ${ep_build_dir}/${proj})

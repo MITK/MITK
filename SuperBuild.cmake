@@ -25,12 +25,6 @@ SET(ep_source_dir ${ep_base}/Source)
 SET(ep_build_shared_libs ON)
 SET(ep_build_testing OFF)
 
-SET(ep_common_args
-  -DCMAKE_INSTALL_PREFIX:PATH=${ep_install_dir}
-  -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
-  -DBUILD_TESTING:BOOL=${ep_build_testing}
-  )
-
 # Compute -G arg for configuring external projects with the same CMake generator:
 IF(CMAKE_EXTRA_GENERATOR)
   SET(gen "${CMAKE_EXTRA_GENERATOR} - ${CMAKE_GENERATOR}")
@@ -43,9 +37,20 @@ set(sep "^^")
 
 ##
 
+IF(MSVC90 OR MSVC10)
+  SET(ep_common_C_FLAGS "${CMAKE_C_FLAGS} /bigobj /MP")
+  SET(ep_common_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj /MP")
+ELSE()
+  SET(ep_common_C_FLAGS "${CMAKE_C_FLAGS} -DLINUX_EXTRA")
+  SET(ep_common_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DLINUX_EXTRA")
+ENDIF()
+
 SET(ep_common_args 
+  -DBUILD_TESTING:BOOL=${ep_build_testing}
+  -DCMAKE_INSTALL_PREFIX:PATH=${ep_install_dir}
   -DBUILD_SHARED_LIBS:BOOL=ON
   -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
+  "-DCMAKE_CXX_FLAGS:STRING=${ep_common_CXX_FLAGS}"
 )
 
 
@@ -104,8 +109,8 @@ ENDIF(UNIX)
       CMAKE_ARGS
          ${ep_common_args}
          -DBUILD_SHARED_LIBS:BOOL=OFF
-         -DCMAKE_CXX_FLAGS:STRING=${DCMTK_CXX_FLAGS}
-         -DCMAKE_C_FLAGS:STRING=${DCMTK_CXX_FLAGS}
+         "-DCMAKE_CXX_FLAGS:STRING=${ep_common_CXX_FLAGS} ${DCMTK_CXX_FLAGS}"
+         "-DCMAKE_C_FLAGS:STRING=${ep_common_C_FLAGS} ${DCMTK_C_FLAGS}"
          -DCMAKE_INSTALL_PREFIX:PATH=${CMAKE_CURRENT_BINARY_DIR}/DCMTK-prefix/install
   )
 
@@ -145,7 +150,6 @@ IF(NOT DEFINED ITK_DIR)
      CMAKE_GENERATOR ${gen}
      CMAKE_ARGS
        ${ep_common_args}
-       -DBUILD_SHARED_LIBS:BOOL=ON 
        -DBUILD_TESTING:BOOL=OFF
        -DBUILD_EXAMPLES:BOOL=OFF
      )

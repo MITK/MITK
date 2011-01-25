@@ -61,6 +61,7 @@ void QmitkPointListWidget::SetupConnections()
     connect(this->m_RemovePointBtn, SIGNAL(clicked()), this, SLOT(RemoveSelectedPoint()));
     connect(this->m_ToggleAddPoint, SIGNAL(toggled(bool)), this, SLOT(OnBtnAddPoint(bool)));
     connect(this->m_PointListView, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(OnListDoubleClick()));
+    connect(this->m_PointListView, SIGNAL(SignalPointSelectionChanged()), this, SLOT(OnPointSelectionChanged()));
 }
 
 void QmitkPointListWidget::SetupUi()
@@ -342,6 +343,11 @@ void QmitkPointListWidget::OnBtnAddPoint(bool checked)
 void QmitkPointListWidget::OnListDoubleClick()
 {
     ;
+}
+
+void QmitkPointListWidget::OnPointSelectionChanged()
+{
+  emit this->PointSelectionChanged();
 }
 
 void QmitkPointListWidget::DeactivateInteractor(bool /*deactivate*/)

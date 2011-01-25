@@ -80,6 +80,10 @@ protected slots:
     void MoveSelectedPointUp();
     void OnBtnAddPoint(bool checked);
     //void OnBtnSetPointsMode(bool checked);
+    /*!
+    \brief pass through signal from PointListView that point selection has changed
+    */
+    void OnPointSelectionChanged();
 
     void OnListDoubleClick();
 

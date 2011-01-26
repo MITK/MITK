@@ -38,6 +38,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkInteractionConst.h"
 #include "mitkDataStorage.h"
 
+#include "mitkNodePredicateNot.h"
+#include "mitkNodePredicateProperty.h"
+
 //#include "QmitkNavigationToolBar.h"
 
 #include "mitkVtkLayerController.h"
@@ -2003,7 +2006,21 @@ void QmitkStdMultiWidget::ResetCrosshair()
 {
   if (m_DataStorage.IsNotNull())
   {
-    mitk::RenderingManager::GetInstance()->InitializeViews( m_DataStorage->ComputeVisibleBoundingGeometry3D() );
+    mitk::NodePredicateNot::Pointer pred
+    = mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("includeInBoundingBox"
+    , mitk::BoolProperty::New(false)));
+
+    mitk::NodePredicateNot::Pointer pred2
+    = mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("includeInBoundingBox"
+    , mitk::BoolProperty::New(true)));
+
+    mitk::DataStorage::SetOfObjects::ConstPointer rs = m_DataStorage->GetSubset(pred);
+    mitk::DataStorage::SetOfObjects::ConstPointer rs2 = m_DataStorage->GetSubset(pred2);
+    // calculate bounding geometry of these nodes
+    mitk::TimeSlicedGeometry::Pointer bounds = m_DataStorage->ComputeBoundingGeometry3D(rs, "visible");
+    
+    mitk::RenderingManager::GetInstance()->InitializeViews(bounds);
+    //mitk::RenderingManager::GetInstance()->InitializeViews( m_DataStorage->ComputeVisibleBoundingGeometry3D() );
     // reset interactor to normal slicing
     this->SetWidgetPlaneMode(PLANE_MODE_SLICING);
   }

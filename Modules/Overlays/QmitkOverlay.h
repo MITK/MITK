@@ -19,39 +19,40 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKOVERLAY_H_HEADER_INCLUDED_C10DC4EB
 #define MITKOVERLAY_H_HEADER_INCLUDED_C10DC4EB
 
-// MITK-Stuff
+// MITK
 #include "mitkCommon.h"
 #include "mitkPropertyList.h"
 
-// QT-Stuff
+// Qt
 #include <QWidget>
 
 #include "OverlaysExports.h"
 
 
-/** \class  QmitkOverlay
-* \brief Abstract base class for all overlay-objects in MITK
-*
-* This class is the basis for all classes representing objects that can be visualized as overlays in MITK.
-* It encapsulates an ID, as well as a display-position and a layer.
-* 
-* The ID is used to access mitkProperties in a PropertyList that holds information that is needed for the visualization,
-* e.g. text for TextOverlays or scaleFactor for ScalarBarOverlays ...
-*
-* The display-position encodes where on the screen the overlay will be positioned at:
-* \sa DisplayPosition
-* 0 - 1 - 2
-* |   |   |
-* 3 -   - 4
-* |   |   |
-* 5 - 6 - 7
-*
-* The layer is needed if several overlays shall be put in the same position.
-* In this case the layer defines the order in which the objects are layouted.
-*
-* \ingroup Qmitk
-*/
+/**
+ \brief Abstract base class for all overlay-objects in MITK
 
+ This class is the basis for all classes representing objects that can be visualized as overlays in MITK.
+ It encapsulates an ID, as well as a display-position and a layer.
+ 
+ The ID is used to access mitkProperties in a PropertyList that holds information that is needed for the visualization,
+ e.g. text for TextOverlays or scaleFactor for ScalarBarOverlays ...
+
+ The display-position encodes where on the screen the overlay will be positioned at 
+ (see and USE the constants defined by DisplayPosition):
+\verbatim
+ 0 - 1 - 2
+ |   |   |
+ 3 -   - 4
+ |   |   |
+ 5 - 6 - 7
+\endverbatim
+
+ The layer is needed if several overlays shall be put in the same position.
+ In this case the layer defines the order in which the objects are layouted.
+
+ \ingroup Qmitk
+*/
 class Overlays_EXPORT QmitkOverlay : public QObject
 {
   Q_OBJECT 

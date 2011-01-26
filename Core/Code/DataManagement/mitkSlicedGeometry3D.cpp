@@ -544,6 +544,7 @@ mitk::SlicedGeometry3D::SetSpacing( const mitk::Vector3D &aSpacing )
     this->IndexToWorld( origin, bottomDV, bottomDV );
 
     mitk::PlaneGeometry::Pointer planeGeometry = mitk::PlaneGeometry::New();
+    planeGeometry->SetImageGeometry( this->GetImageGeometry() );
 
     planeGeometry->SetReferenceGeometry( m_ReferenceGeometry );
     planeGeometry->InitializeStandardPlane(

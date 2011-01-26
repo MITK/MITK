@@ -9,8 +9,7 @@ SET(INTERNAL_CPP_FILES
   QmitkDiffusionQuantificationView.cpp
   QmitkTensorReconstructionView.cpp
   QmitkDiffusionImagingPublicPerspective.cpp
-  QmitkControlVisualizationPropertiesView.cpp
-  #QmitkTbssView.cpp
+  QmitkControlVisualizationPropertiesView.cpp  
 )
 
 SET(UI_FILES
@@ -19,8 +18,7 @@ SET(UI_FILES
   src/internal/QmitkDiffusionDicomImportViewControls.ui
   src/internal/QmitkDiffusionQuantificationViewControls.ui
   src/internal/QmitkTensorReconstructionViewControls.ui
-  src/internal/QmitkControlVisualizationPropertiesViewControls.ui
-  #src/internal/QmitkTbssViewControls.ui
+  src/internal/QmitkControlVisualizationPropertiesViewControls.ui  
 )
 
 SET(MOC_H_FILES
@@ -29,8 +27,7 @@ SET(MOC_H_FILES
   src/internal/QmitkDiffusionDicomImportView.h
   src/internal/QmitkDiffusionQuantificationView.h
   src/internal/QmitkTensorReconstructionView.h
-  src/internal/QmitkControlVisualizationPropertiesView.h
-  #src/internal/QmitkTbssView.h
+  src/internal/QmitkControlVisualizationPropertiesView.h  
 )
 
 SET(RESOURCE_FILES

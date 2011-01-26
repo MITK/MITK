@@ -101,7 +101,7 @@ typedef itk::GrayscaleMorphologicalOpeningImageFilter<ImageType, ImageType, Ball
 typedef itk::GrayscaleMorphologicalClosingImageFilter<ImageType, ImageType, BallType>   ClosingFilterType;
 
 typedef itk::MedianImageFilter< ImageType, ImageType >                                  MedianFilterType;
-typedef itk::DiscreteGaussianImageFilter< ImageType, ImageType>							            GaussianFilterType;
+typedef itk::DiscreteGaussianImageFilter< ImageType, ImageType>                         GaussianFilterType;
 typedef itk::TotalVariationDenoisingImageFilter<FloatImageType, FloatImageType>         TotalVariationFilterType;
 typedef itk::TotalVariationDenoisingImageFilter<VectorImageType, VectorImageType>       VectorTotalVariationFilterType;
 
@@ -112,7 +112,7 @@ typedef itk::GradientMagnitudeRecursiveGaussianImageFilter< ImageType, ImageType
 typedef itk::LaplacianImageFilter< FloatImageType, FloatImageType >                     LaplacianFilterType;
 typedef itk::SobelEdgeDetectionImageFilter< FloatImageType, FloatImageType >            SobelFilterType;
 
-typedef itk::ResampleImageFilter< ImageType, FloatImageType >                           ResampleImageFilterType;
+typedef itk::ResampleImageFilter< ImageType, ImageType >                                ResampleImageFilterType;
 
 typedef itk::AddImageFilter< ImageType, ImageType, ImageType >                          AddFilterType;
 typedef itk::SubtractImageFilter< ImageType, ImageType, ImageType >                     SubtractFilterType;
@@ -187,7 +187,7 @@ void QmitkBasicImageProcessing::Activated()
   this->m_Controls->cbWhat1->insertItem( NOACTIONSELECTED, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "Please select operation", 0, QApplication::UnicodeUTF8) ));
   this->m_Controls->cbWhat1->insertItem( CATEGORY_DENOISING, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "--- Denoising ---", 0, QApplication::UnicodeUTF8) ));
   this->m_Controls->cbWhat1->insertItem( GAUSSIAN, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "Gaussian", 0, QApplication::UnicodeUTF8) ));
-  this->m_Controls->cbWhat1->insertItem( MEDIAN,	 QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "Median", 0, QApplication::UnicodeUTF8) ));
+  this->m_Controls->cbWhat1->insertItem( MEDIAN, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "Median", 0, QApplication::UnicodeUTF8) ));
   this->m_Controls->cbWhat1->insertItem( TOTALVARIATION, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "Total Variation", 0, QApplication::UnicodeUTF8) ));
   this->m_Controls->cbWhat1->insertItem( CATEGORY_MORPHOLOGICAL, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "--- Morphological ---", 0, QApplication::UnicodeUTF8) ));
   this->m_Controls->cbWhat1->insertItem( DILATION, QString( QApplication::translate("QmitkBasicImageProcessingViewControls", "Dilation", 0, QApplication::UnicodeUTF8) ));
@@ -560,7 +560,7 @@ void QmitkBasicImageProcessing::StartButtonClicked()
   int param2 = m_Controls->sbParam2->value();
 
   try{
-	
+
   switch (m_SelectedAction)
   {
 

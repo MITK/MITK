@@ -18,8 +18,6 @@ ENDIF()
 SET(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/CMake ${CMAKE_MODULE_PATH} )
 SET(MITK_MODULES_CONF_DIR ${MITK_BINARY_DIR}/modulesConf CACHE INTERNAL "Modules Conf")
 
-OPTION(MITK_USE_CTK "Use CTK" OFF)
-
 OPTION(BUILD_SHARED_LIBS "Build MITK with shared libraries." ON)
 
 # Clear the cache variables containing plugin base directories
@@ -61,6 +59,9 @@ IF(MITK_USE_QT)
   # find the package at the very beginning, so that QT4_FOUND is available
   FIND_PACKAGE(Qt4 REQUIRED)
 ENDIF()
+OPTION(MITK_BUILD_TUTORIAL "Build the MITK tutorial" ON)
+OPTION(MITK_USE_GDCMIO "Use the GDCMIO class instead of ImageIO2 for DICOM" ON)
+OPTION(MITK_USE_BLUEBERRY "Build the BlueBerry platform" ON)
 OPTION(MITK_USE_CTK "EXEPERIMENTAL, superbuild only: Use CTK in MITK" OFF)
 OPTION(MITK_USE_DCMTK "EXEPERIMENTAL, superbuild only: Use DCMTK in MITK" OFF)
 OPTION(MITK_USE_SUPERBUILD "EXEPERIMENTAL: Use superbuild for MITK" OFF)
@@ -81,7 +82,6 @@ ENDIF()
 
 ADD_SUBDIRECTORY(Utilities)
 
-OPTION(MITK_USE_BLUEBERRY "Build the BlueBerry platform" ON)
 IF(MITK_USE_BLUEBERRY)
 
   SET(BLUEBERRY_INSTALL_RPATH_RELATIVE ${MITK_INSTALL_RPATH_RELATIVE}
@@ -198,7 +198,6 @@ CONFIGURE_FILE(mitkVersion.h.in ${PROJECT_BINARY_DIR}/mitkVersion.h)
 # TODO: check what could be moved to subdirectories
 #### mitkConfig.h ####
 
-OPTION(MITK_USE_GDCMIO "Use the GDCMIO class instead of ImageIO2 for DICOM" ON)
 SET(MITK_CONFIG_H ${PROJECT_BINARY_DIR}/mitkConfig.h)
 CONFIGURE_FILE(mitkConfig.h.in ${MITK_CONFIG_H})
 SET(MITK_TESTING_CONFIG_H ${PROJECT_BINARY_DIR}/mitkTestingConfig.h)

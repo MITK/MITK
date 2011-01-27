@@ -567,7 +567,11 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
         typedef mitk::DiffusionImage<PixelValueType> DiffVolumesType;
         DiffVolumesType::Pointer diffImage = DiffVolumesType::New();
         diffImage->SetDirections(directions);
-        diffImage->CorrectDKFZBrokenGradientScheme(m_Controls->m_Blur->value());
+        diffImage->SetOriginalDirections(directions);
+        if(m_Controls->m_DicomLoadDKFZ->isChecked())
+        {
+          diffImage->CorrectDKFZBrokenGradientScheme(m_Controls->m_Blur->value());
+        }
         diffImage->SetVectorImage(vecImage);
         diffImage->SetB_Value(maxb);
         diffImage->InitializeFromVectorImage();

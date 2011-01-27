@@ -150,6 +150,13 @@ p, li { white-space: pre-wrap; }
        </widget>
       </item>
       <item>
+       <widget class="QCheckBox" name="m_DicomLoadDKFZ">
+        <property name="text">
+         <string>Correct DKFZ Gradient Scheme</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QFrame" name="frame">
         <property name="frameShape">
          <enum>QFrame::NoFrame</enum>

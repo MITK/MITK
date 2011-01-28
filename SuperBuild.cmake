@@ -50,6 +50,7 @@ SET(ep_common_args
   -DCMAKE_INSTALL_PREFIX:PATH=${ep_install_dir}
   -DBUILD_SHARED_LIBS:BOOL=ON
   -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
+  "-DCMAKE_C_FLAGS:STRING=${ep_common_CXX_FLAGS}"
   "-DCMAKE_CXX_FLAGS:STRING=${ep_common_CXX_FLAGS}"
 )
 
@@ -105,15 +106,18 @@ IF(MITK_USE_DCMTK)
   SET(proj DCMTK)
   IF(UNIX)
     SET(DCMTK_CXX_FLAGS "-fPIC")
+    SET(DCMTK_C_FLAGS "-fPIC")
   ENDIF(UNIX)
   IF(DCMTK_DICOM_ROOT_ID)
     SET(DCMTK_CXX_FLAGS "${DCMTK_CXX_FLAGS} -DSITE_UID_ROOT=\\\"${DCMTK_DICOM_ROOT_ID}\\\"")
+    SET(DCMTK_C_FLAGS "${DCMTK_CXX_FLAGS} -DSITE_UID_ROOT=\\\"${DCMTK_DICOM_ROOT_ID}\\\"")
   ENDIF()
   ExternalProject_Add(${proj}
     URL http://mitk.org/download/thirdparty/dcmtk-3.6.0.tar.gz
       CMAKE_GENERATOR ${gen}
       CMAKE_ARGS
          ${ep_common_args}
+         -DDCMTK_OVERWRITE_WIN32_COMPILER_FLAGS:BOOL=OFF
          -DBUILD_SHARED_LIBS:BOOL=OFF
          "-DCMAKE_CXX_FLAGS:STRING=${ep_common_CXX_FLAGS} ${DCMTK_CXX_FLAGS}"
          "-DCMAKE_C_FLAGS:STRING=${ep_common_C_FLAGS} ${DCMTK_C_FLAGS}"

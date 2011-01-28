@@ -826,6 +826,7 @@ void ImageStatisticsCalculator::InternalCalculateMaskFromPlanarFigure(
   bool outOfBounds = false;
   vtkPoints *points = vtkPoints::New();
   typename PlanarFigure::VertexContainerType::ConstIterator it;
+  const Vector3D& imageSpacing3D = imageGeometry3D->GetSpacing();
   for ( it = planarFigurePolyline->Begin();
         it != planarFigurePolyline->End();
         ++it )
@@ -835,6 +836,11 @@ void ImageStatisticsCalculator::InternalCalculateMaskFromPlanarFigure(
     // Convert 2D point back to the local index coordinates of the selected
     // image
     planarFigureGeometry2D->Map( it->Value(), point3D );
+    
+    // Ensure correct pixel center
+    point3D[0] -= 0.5 / imageSpacing3D[0];
+    point3D[1] -= 0.5 / imageSpacing3D[0];
+    point3D[2] -= 0.5 / imageSpacing3D[0];
 
     // Polygons (partially) outside of the image bounds can not be processed
     // further due to a bug in vtkPolyDataToImageStencil
@@ -846,7 +852,7 @@ void ImageStatisticsCalculator::InternalCalculateMaskFromPlanarFigure(
     imageGeometry3D->WorldToIndex( point3D, point3D );
 
     // Add point to polyline array
-    points->InsertNextPoint( point3D[i0] - 0.5, point3D[i1] - 0.5, -0.5 );
+    points->InsertNextPoint( point3D[i0], point3D[i1], -0.5 );
   }
   polyline->SetPoints( points );
   points->Delete();

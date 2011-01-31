@@ -104,7 +104,7 @@ DicomSeriesReader::LoadDicomSeries(const StringContainer &filenames, DataNode &n
   }
   catch(itk::MemoryAllocationError& e)
   {
-    MITK_ERROR << "Out of memory. Cannot load DICOM series.";
+    MITK_ERROR << "Out of memory. Cannot load DICOM series: " << e.what();
   }
   catch(std::exception& e)
   {
@@ -373,7 +373,10 @@ DicomSeriesReader::GetSeries(const std::string &dir, const StringContainer &rest
     MITK_DEBUG << "File " << fileIter->first << std::endl;
     if ( std::string(fileIter->first).empty() ) continue; // TODO understand why Scanner has empty string entries
 
-    std::string moreUniqueSeriesId = CreateMoreUniqueSeriesIdentifier( fileIter->second );
+    // we const_cast here, because I could not use a map.at() function in CreateMoreUniqueSeriesIdentifier.
+    // doing the same thing with find would make the code less readable. Since we forget the Scanner results
+    // anyway after this function, we can simply tolerate empty map entries introduced by bad operator[] access
+    std::string moreUniqueSeriesId = CreateMoreUniqueSeriesIdentifier( const_cast<gdcm::Scanner::TagToValue&>(fileIter->second) );
     map [ moreUniqueSeriesId ].push_back( fileIter->first );
   }
 
@@ -389,7 +392,7 @@ DicomSeriesReader::GetSeries(const std::string &dir, const StringContainer &rest
 
 #if GDCM_MAJOR_VERSION >= 2
 std::string 
-DicomSeriesReader::CreateMoreUniqueSeriesIdentifier( const gdcm::Scanner::TagToValue& tagValueMap )
+DicomSeriesReader::CreateMoreUniqueSeriesIdentifier( gdcm::Scanner::TagToValue& tagValueMap )
 {
   const gdcm::Tag tagSeriesInstanceUID(0x0020,0x000e); // Series Instance UID
   const gdcm::Tag tagImageOrientation(0x0020, 0x0037); // image orientation
@@ -402,13 +405,13 @@ DicomSeriesReader::CreateMoreUniqueSeriesIdentifier( const gdcm::Scanner::TagToV
  
   try
   {
-    constructedID = tagValueMap.at( tagSeriesInstanceUID );
+    constructedID = tagValueMap[ tagSeriesInstanceUID ];
 
-    constructedID += IDifyTagValue( tagValueMap.at(tagNumberOfRows) );
-    constructedID += IDifyTagValue( tagValueMap.at(tagNumberOfColumns) );
-    constructedID += IDifyTagValue( tagValueMap.at(tagPixelSpacing) );
-    constructedID += IDifyTagValue( tagValueMap.at(tagSliceThickness) );
-    constructedID += IDifyTagValue( tagValueMap.at(tagImageOrientation) );
+    constructedID += IDifyTagValue( tagValueMap[ tagNumberOfRows ] );
+    constructedID += IDifyTagValue( tagValueMap[ tagNumberOfColumns ] );
+    constructedID += IDifyTagValue( tagValueMap[ tagPixelSpacing ] );
+    constructedID += IDifyTagValue( tagValueMap[ tagSliceThickness ] );
+    constructedID += IDifyTagValue( tagValueMap[ tagImageOrientation ] );
 
     constructedID.resize( constructedID.length() - 1 ); // cut of trailing '.'
 
@@ -418,6 +421,7 @@ DicomSeriesReader::CreateMoreUniqueSeriesIdentifier( const gdcm::Scanner::TagToV
   catch (std::exception& e)
   {
     MITK_ERROR << "CreateMoreUniqueSeriesIdentifier() could not access all required DICOM tags. You are calling it wrongly. Using partial ID.";
+    MITK_ERROR << "Error from exception: " << e.what();
     return constructedID; 
   }
 }
@@ -426,6 +430,7 @@ std::string
 DicomSeriesReader::IDifyTagValue(const std::string& value)
 {
   std::string IDifiedValue( value );
+  if (value.empty()) throw std::logic_error("IDifyTagValue() illegaly called with empty tag value");
 
   // Eliminate non-alnum characters, including whitespace...
   //   that may have been introduced by concats.

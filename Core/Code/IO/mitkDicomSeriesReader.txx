@@ -41,81 +41,79 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
 
 #if GDCM_MAJOR_VERSION >= 2
 
-    /******** For Philips 3D+t images ********/
+    /* special case for Philips 3D+t ultrasound images */ 
     if ( DicomSeriesReader::IsPhilips3DDicom(filenames.front().c_str())  )
     {
       ReadPhilips3DDicom(filenames.front().c_str(), image);
-      node.SetData(image);
-      setlocale(LC_NUMERIC, previousCLocale);
-      std::cin.imbue(previousCppLocale);
-      return;
-    }
-
-    /******** For 4D data split in multiple files ***************/
-    bool canLoadAs4D(true);
-    std::list<StringContainer> imageBlocks = SortIntoBlocksFor3DplusT( filenames, sort, canLoadAs4D );
-    unsigned int volume_count = imageBlocks.size();
-
-    if (!canLoadAs4D || !load4D)
-    {
-      image = LoadDICOMByITK<PixelType>( imageBlocks.front() , command ); // load first 3D block
     }
     else
     {
-      // It is 3D+t! Read it and store into mitk image
-      typedef itk::Image<PixelType, 4> ImageType;
-      typedef itk::ImageSeriesReader<ImageType> ReaderType;
+      /* default case: assume "normal" image blocks, possibly 3D+t */
+      bool canLoadAs4D(true);
+      std::list<StringContainer> imageBlocks = SortIntoBlocksFor3DplusT( filenames, sort, canLoadAs4D );
+      unsigned int volume_count = imageBlocks.size();
 
-      DcmIoType::Pointer io = DcmIoType::New();
-      typename ReaderType::Pointer reader = ReaderType::New();
-
-      reader->SetImageIO(io);
-      reader->ReverseOrderOff();
-
-      if (command)
+      if (!canLoadAs4D || !load4D)
       {
-        reader->AddObserver(itk::ProgressEvent(), command);
+        image = LoadDICOMByITK<PixelType>( imageBlocks.front() , command ); // load first 3D block
       }
+      else
+      {
+        // It is 3D+t! Read it and store into mitk image
+        typedef itk::Image<PixelType, 4> ImageType;
+        typedef itk::ImageSeriesReader<ImageType> ReaderType;
 
-      const std::list<StringContainer>::const_iterator df_end = imageBlocks.end();
-      unsigned int act_volume = 1u;
+        DcmIoType::Pointer io = DcmIoType::New();
+        typename ReaderType::Pointer reader = ReaderType::New();
 
-      reader->SetFileNames(imageBlocks.front());
-      reader->Update();
-      image->InitializeByItk(reader->GetOutput(), 1, volume_count);
-      image->SetImportVolume(reader->GetOutput()->GetBufferPointer(), 0u);
+        reader->SetImageIO(io);
+        reader->ReverseOrderOff();
 
-      MITK_DEBUG << "Volume dimension: [" << image->GetDimension(0) << ", " 
-                                          << image->GetDimension(1) << ", " 
-                                          << image->GetDimension(2) << ", " 
-                                          << image->GetDimension(3) << "]";
+        if (command)
+        {
+          reader->AddObserver(itk::ProgressEvent(), command);
+        }
+
+        const std::list<StringContainer>::const_iterator df_end = imageBlocks.end();
+        unsigned int act_volume = 1u;
+
+        reader->SetFileNames(imageBlocks.front());
+        reader->Update();
+        image->InitializeByItk(reader->GetOutput(), 1, volume_count);
+        image->SetImportVolume(reader->GetOutput()->GetBufferPointer(), 0u);
+
+        MITK_DEBUG << "Volume dimension: [" << image->GetDimension(0) << ", " 
+                                            << image->GetDimension(1) << ", " 
+                                            << image->GetDimension(2) << ", " 
+                                            << image->GetDimension(3) << "]";
 
 #if (GDCM_MAJOR_VERSION == 2) && (GDCM_MINOR_VERSION < 1) && (GDCM_BUILD_VERSION < 15)
-      // workaround for a GDCM 2 bug until version 2.0.15:
-      // GDCM read spacing vector wrongly. Instead of "row spacing, column spacing", it misinterprets the DICOM tag as "column spacing, row spacing".
-      // this is undone here, until we use a GDCM that has this issue fixed.
-      // From the commit comments, GDCM 2.0.15 fixed the spacing interpretation with bug 2901181
-      // http://sourceforge.net/tracker/index.php?func=detail&aid=2901181&group_id=137895&atid=739587
+        // workaround for a GDCM 2 bug until version 2.0.15:
+        // GDCM read spacing vector wrongly. Instead of "row spacing, column spacing", it misinterprets the DICOM tag as "column spacing, row spacing".
+        // this is undone here, until we use a GDCM that has this issue fixed.
+        // From the commit comments, GDCM 2.0.15 fixed the spacing interpretation with bug 2901181
+        // http://sourceforge.net/tracker/index.php?func=detail&aid=2901181&group_id=137895&atid=739587
 
 
-      Vector3D correctedImageSpacing = image->GetGeometry()->GetSpacing();
-      std::swap( correctedImageSpacing[0], correctedImageSpacing[1] );
-      image->GetGeometry()->SetSpacing( correctedImageSpacing );
+        Vector3D correctedImageSpacing = image->GetGeometry()->GetSpacing();
+        std::swap( correctedImageSpacing[0], correctedImageSpacing[1] );
+        image->GetGeometry()->SetSpacing( correctedImageSpacing );
 #endif
 
-      MITK_DEBUG << "Volume spacing: [" << image->GetGeometry()->GetSpacing()[0] << ", " 
-                                        << image->GetGeometry()->GetSpacing()[1] << ", " 
-                                        << image->GetGeometry()->GetSpacing()[2] << "]";
+        MITK_DEBUG << "Volume spacing: [" << image->GetGeometry()->GetSpacing()[0] << ", " 
+                                          << image->GetGeometry()->GetSpacing()[1] << ", " 
+                                          << image->GetGeometry()->GetSpacing()[2] << "]";
 
-      for (std::list<StringContainer>::iterator df_it = ++imageBlocks.begin(); df_it != df_end; ++df_it)
-      {
-        reader->SetFileNames(*df_it);
-        reader->Update();
-        image->SetImportVolume(reader->GetOutput()->GetBufferPointer(), act_volume++);
+        for (std::list<StringContainer>::iterator df_it = ++imageBlocks.begin(); df_it != df_end; ++df_it)
+        {
+          reader->SetFileNames(*df_it);
+          reader->Update();
+          image->SetImportVolume(reader->GetOutput()->GetBufferPointer(), act_volume++);
+        }
       }
     }
-
 #else
+    // no GDCM2
     image = LoadDICOMByITK<PixelType>( filenames, command );
 #endif
 

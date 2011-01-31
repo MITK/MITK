@@ -249,7 +249,7 @@ protected:
   Image::Pointer 
   LoadDICOMByITK( const StringContainer&, CallbackCommand* command = NULL);
 
-  
+#if GDCM_MAJOR_VERSION >= 2
   /**
     \brief Sort files into time step blocks of a 3D+t image.
 
@@ -265,7 +265,6 @@ protected:
   std::list<StringContainer> 
   SortIntoBlocksFor3DplusT( const StringContainer& presortedFilenames, bool sort, bool& canLoadAs4D );
 
-#if GDCM_MAJOR_VERSION >= 2
   /*
    \brief Defines spatial sorting for sorting by GDCM 2.
 

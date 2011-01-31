@@ -181,6 +181,8 @@ Image::Pointer DicomSeriesReader::LoadDICOMByITK( const StringContainer& filenam
   return image;
 }
   
+#if GDCM_MAJOR_VERSION >= 2
+
 std::list<DicomSeriesReader::StringContainer> 
 DicomSeriesReader::SortIntoBlocksFor3DplusT( const StringContainer& presortedFilenames, bool sort, bool& canLoadAs4D )
 {
@@ -271,7 +273,7 @@ DicomSeriesReader::SortIntoBlocksFor3DplusT( const StringContainer& presortedFil
 
   return imageBlocks;
 }
-
+#endif
 
 }
 

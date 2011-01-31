@@ -1,3 +1,19 @@
+/*=========================================================================
+
+Program:   Medical Imaging & Interaction Toolkit
+Language:  C++
+Date:      $Date$
+Version:   $Revision: 28959 $
+
+Copyright (c) German Cancer Research Center, Division of Medical and
+Biological Informatics. All rights reserved.
+See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
+
+This software is distributed WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.  See the above copyright notices for more information.
+
+=========================================================================*/
 #ifndef MITKClOSINGTOOL_H
 #define MITKClOSINGTOOL_H
 
@@ -7,7 +23,7 @@
 //itk
 #include <itkBinaryBallStructuringElement.h>
 #include <itkBinaryCrossStructuringElement.h>
-#include <V:\windows\source\ITK3160\Code\Review\itkBinaryMorphologicalClosingImageFilter.h>
+#include <itkGrayscaleMorphologicalClosingImageFilter.h>
 
 #include "mitkClosingTool.xpm"
 
@@ -18,8 +34,8 @@ namespace mitk {
     typedef itk::Image< unsigned char, 3 > SegmentationType;
     typedef itk::BinaryBallStructuringElement< SegmentationType::PixelType, 3 > BallType;
     typedef itk::BinaryCrossStructuringElement< SegmentationType::PixelType, 3 > CrossType;
-    typedef itk::BinaryMorphologicalClosingImageFilter< SegmentationType, SegmentationType, BallType > BallClosingFilterType;
-    //typedef itk::BinaryCloseImageFilter< SegmentationType, SegmentationType, CrossType > CrossCloseFilterType;
+    typedef itk::GrayscaleMorphologicalClosingImageFilter< SegmentationType, SegmentationType, BallType > BallClosingFilterType;
+    typedef itk::GrayscaleMorphologicalClosingImageFilter< SegmentationType, SegmentationType, CrossType > CrossClosingFilterType;
 
   public:
     mitkClassMacro(ClosingTool, MorphologicTool);
@@ -37,6 +53,9 @@ namespace mitk {
 
     BallType m_Ball;
     BallClosingFilterType::Pointer m_BallClosingFilter;
+
+    CrossType m_Cross;
+    CrossClosingFilterType::Pointer m_CrossClosingFilter;
 
   };//class
 

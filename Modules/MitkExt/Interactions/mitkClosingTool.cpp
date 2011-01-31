@@ -1,3 +1,19 @@
+/*=========================================================================
+
+Program:   Medical Imaging & Interaction Toolkit
+Language:  C++
+Date:      $Date$
+Version:   $Revision: 28959 $
+
+Copyright (c) German Cancer Research Center, Division of Medical and
+Biological Informatics. All rights reserved.
+See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
+
+This software is distributed WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.  See the above copyright notices for more information.
+
+=========================================================================*/
 #include "mitkClosingTool.h"
 #include "mitkImageCast.h"
 #include "mitkRenderingManager.h"
@@ -30,17 +46,44 @@ mitk::Image::Pointer mitk::ClosingTool::ApplyFilter(mitk::Image::Pointer image)
 {
   SegmentationType::Pointer itkImage = SegmentationType::New();
   mitk::CastToItkImage(image, itkImage);
-  m_Ball.SetRadius( m_Radius);
-  m_Ball.CreateStructuringElement();
-  m_BallClosingFilter = BallClosingFilterType::New();
-  m_BallClosingFilter->SetKernel(m_Ball);
-  m_BallClosingFilter->SetInput(itkImage);
-  //m_BallClosingFilter->SetRadius(1);
-  m_BallClosingFilter->SetForegroundValue(1);
-  //m_BallClosingFilter->SetBackgroundValue(0);
-  m_BallClosingFilter->UpdateLargestPossibleRegion();
-
   mitk::Image::Pointer new_image = mitk::Image::New();
-  mitk::CastToMitkImage(m_BallClosingFilter->GetOutput(), new_image);
+  
+  switch(m_StructElement)
+  {
+    case(BALL):
+
+      m_Ball.SetRadius( m_Radius);
+      m_Ball.CreateStructuringElement();
+
+      m_BallClosingFilter = BallClosingFilterType::New();
+      m_BallClosingFilter->SetKernel(m_Ball);
+      m_BallClosingFilter->SetInput(itkImage);
+      //m_BallClosingFilter->SetForegroundValue(1);
+      //m_BallClosingFilter->SetBackgroundValue(0);
+      m_BallClosingFilter->UpdateLargestPossibleRegion();
+
+      mitk::CastToMitkImage(m_BallClosingFilter->GetOutput(), new_image);
+      break;
+
+    case(CROSS):
+      
+      m_Cross.SetRadius(m_Radius);
+      m_Cross.CreateStructuringElement();
+
+      m_CrossClosingFilter = CrossClosingFilterType::New();
+      m_CrossClosingFilter->SetKernel(m_Cross);
+      m_CrossClosingFilter->SetInput(itkImage);
+      //m_CrossClosingFilter->SetForegroundValue(1);
+      //m_CrossClosingFilter->SetBackgroundValue(0);
+      m_CrossClosingFilter->SetSafeBorder(true);
+      m_CrossClosingFilter->UpdateLargestPossibleRegion();
+
+      mitk::CastToMitkImage(m_CrossClosingFilter->GetOutput(), new_image);
+      break;
+
+    default:
+      break;
+  }
+  
   return new_image;
 }

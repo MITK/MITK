@@ -1,3 +1,19 @@
+/*=========================================================================
+
+Program:   Medical Imaging & Interaction Toolkit
+Language:  C++
+Date:      $Date$
+Version:   $Revision: 28959 $
+
+Copyright (c) German Cancer Research Center, Division of Medical and
+Biological Informatics. All rights reserved.
+See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
+
+This software is distributed WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.  See the above copyright notices for more information.
+
+=========================================================================*/
 #ifndef QMITKMORPHOLOGICTOOLGUI_H
 #define QMITKMORPHOLOGICTOOLGUI_H
 
@@ -20,8 +36,9 @@ public:
 
     void OnNewToolAssociated(mitk::Tool*);
     void OnSliderValueChanged(int value);
-    void OnSpinBoxValueChanged(int value);
+    void OnSpinBoxValueChanged();
     void OnCheckStateChanged(int state);
+    void OnStructElementChanged(int id);
     void OnAcceptPreview();
 
 protected:

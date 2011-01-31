@@ -1,3 +1,19 @@
+/*=========================================================================
+
+Program:   Medical Imaging & Interaction Toolkit
+Language:  C++
+Date:      $Date$
+Version:   $Revision: 28959 $
+
+Copyright (c) German Cancer Research Center, Division of Medical and
+Biological Informatics. All rights reserved.
+See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
+
+This software is distributed WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.  See the above copyright notices for more information.
+
+=========================================================================*/
 #ifndef MITKOPENINGTOOL_H
 #define MITKOPENINGTOOL_H
 
@@ -7,7 +23,7 @@
 //itk
 #include <itkBinaryBallStructuringElement.h>
 #include <itkBinaryCrossStructuringElement.h>
-#include <V:\windows\source\ITK3160\Code\Review\itkBinaryMorphologicalOpeningImageFilter.h>
+#include <itkGrayscaleMorphologicalOpeningImageFilter.h>
 
 #include "mitkOpeningTool.xpm"
 
@@ -18,8 +34,8 @@ namespace mitk {
     typedef itk::Image< unsigned char, 3 > SegmentationType;
     typedef itk::BinaryBallStructuringElement< SegmentationType::PixelType, 3 > BallType;
     typedef itk::BinaryCrossStructuringElement< SegmentationType::PixelType, 3 > CrossType;
-    typedef itk::BinaryMorphologicalOpeningImageFilter< SegmentationType, SegmentationType, BallType > BallOpeningFilterType;
-    //typedef itk::BinaryOpenImageFilter< SegmentationType, SegmentationType, CrossType > CrossOpenFilterType;
+    typedef itk::GrayscaleMorphologicalOpeningImageFilter<SegmentationType, SegmentationType, BallType > BallOpeningFilterType;
+    typedef itk::GrayscaleMorphologicalOpeningImageFilter< SegmentationType, SegmentationType, CrossType > CrossOpeningFilterType;
 
   public:
     mitkClassMacro(OpeningTool, MorphologicTool);
@@ -37,6 +53,9 @@ namespace mitk {
 
     BallType m_Ball;
     BallOpeningFilterType::Pointer m_BallOpeningFilter;
+
+    CrossType m_Cross;
+    CrossOpeningFilterType::Pointer m_CrossOpeningFilter;
 
   };//class
 

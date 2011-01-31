@@ -1,3 +1,19 @@
+/*=========================================================================
+
+Program:   Medical Imaging & Interaction Toolkit
+Language:  C++
+Date:      $Date$
+Version:   $Revision: 28959 $
+
+Copyright (c) German Cancer Research Center, Division of Medical and
+Biological Informatics. All rights reserved.
+See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
+
+This software is distributed WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.  See the above copyright notices for more information.
+
+=========================================================================*/
 #include "QmitkMorphologicToolGUI.h"
 #include "QmitkNewSegmentationDialog.h"
 #include <QBoxLayout>
@@ -15,6 +31,7 @@ m_Slider(NULL)
 
   QBoxLayout* layout1 = new QHBoxLayout();
   QBoxLayout* layout2 = new QHBoxLayout();
+  QBoxLayout* layout3 = new QHBoxLayout();
 
   QLabel* label = new QLabel( "radius:", this );
   QFont f = label->font();
@@ -35,20 +52,26 @@ m_Slider(NULL)
   m_SpinBox->setMaximum(15);
   m_SpinBox->setMinimum(0);
   m_SpinBox->setSingleStep(1);
-  connect(m_SpinBox, SIGNAL(valueChanged(int)), this, SLOT(OnSpinBoxValueChanged(int)) );
+  connect(m_SpinBox, SIGNAL(editingFinished()), this, SLOT(OnSpinBoxValueChanged()) );
   m_SpinBox->setValue(0);
   layout1->addWidget(m_SpinBox);
 
-  mainLayout->addLayout(layout1);
-
+  QLabel* label1 = new QLabel("structuring element:", this);
   QButtonGroup* group = new QButtonGroup(this);
-  QRadioButton* crossRadioButton = new QRadioButton();
-  QRadioButton* ballRadioButton = new QRadioButton();
-  group->addButton(crossRadioButton);
-  group->addButton(ballRadioButton);
+  QRadioButton* crossRadioButton = new QRadioButton("cross");
+  QRadioButton* ballRadioButton = new QRadioButton("ball");
+  ballRadioButton->setChecked(true);
+
+  group->addButton(ballRadioButton, 1);
+  group->addButton(crossRadioButton, 2);
+
+  layout3->addWidget(label1);
+  layout3->addWidget(ballRadioButton);
+  layout3->addWidget(crossRadioButton);
+  connect(group, SIGNAL(buttonClicked(int)), this, SLOT(OnStructElementChanged(int)) );
 
   m_CheckBox = new QCheckBox("Preview" ,this);
-  m_CheckBox->setCheckState(Qt::CheckState::Checked);
+  m_CheckBox->setCheckState(Qt::Checked);
   connect(m_CheckBox, SIGNAL(stateChanged(int)), this, SLOT(OnCheckStateChanged(int)) );
 
   layout2->addWidget(m_CheckBox);
@@ -57,6 +80,8 @@ m_Slider(NULL)
   connect(okButton, SIGNAL(clicked()), this, SLOT(OnAcceptPreview()) );
   layout2->addWidget(okButton);
 
+  mainLayout->addLayout(layout3);
+  mainLayout->addLayout(layout1);
   mainLayout->addLayout(layout2);
 
    connect( this, SIGNAL(NewToolAssociated(mitk::Tool*)), this, SLOT(OnNewToolAssociated(mitk::Tool*)) );
@@ -74,9 +99,9 @@ void QmitkMorphologicToolGUI::OnSliderValueChanged(int value)
     m_MorphologicTool->SetRadius(value);
 }
 
-void QmitkMorphologicToolGUI::OnSpinBoxValueChanged(int value)
+void QmitkMorphologicToolGUI::OnSpinBoxValueChanged()
 {
-  m_Slider->setValue(value);
+  m_Slider->setValue(m_SpinBox->value());
 }
 
 void QmitkMorphologicToolGUI::OnCheckStateChanged(int state)
@@ -112,4 +137,11 @@ void QmitkMorphologicToolGUI::OnAcceptPreview()
       m_MorphologicTool->CancelPreviewing();
     }
   }
+}
+
+void QmitkMorphologicToolGUI::OnStructElementChanged(int id)
+{
+  if (m_MorphologicTool.IsNotNull())
+    m_MorphologicTool->SetStructuringElementType(id);
+  
 }

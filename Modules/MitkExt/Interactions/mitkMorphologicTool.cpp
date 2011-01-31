@@ -1,15 +1,31 @@
+/*=========================================================================
+
+Program:   Medical Imaging & Interaction Toolkit
+Language:  C++
+Date:      $Date$
+Version:   $Revision: 28959 $
+
+Copyright (c) German Cancer Research Center, Division of Medical and
+Biological Informatics. All rights reserved.
+See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
+
+This software is distributed WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.  See the above copyright notices for more information.
+
+=========================================================================*/
 #include "mitkMorphologicTool.h"
 #include "mitkToolManager.h"
 #include "mitkRenderingManager.h"
 #include "mitkBoundingObject.h"
 #include "mitkImageCast.h"
-#include "mitkBoundingObjectToSegmentationFilter.h"
 
-#include "itkMaskImageFilter.h"
+#include "mitkMaskAndCutRoiImageFilter.h"
 
 mitk::MorphologicTool::MorphologicTool() : Tool("dummy"),
 m_Radius(0),
-m_Preview(true)
+m_Preview(true),
+m_StructElement(BALL)
 {
   this->SupportRoiOn();
 
@@ -17,6 +33,7 @@ m_Preview(true)
   m_FeedbackNode->SetColor(1.0,1.0,1.0);
   m_FeedbackNode->SetName("feedback node");
   m_FeedbackNode->SetProperty("helper object", mitk::BoolProperty::New("true"));
+  m_FeedbackNode->SetProperty("opacity", mitk::FloatProperty::New(1.0));
 }
 
 mitk::MorphologicTool::~MorphologicTool()
@@ -68,6 +85,27 @@ void mitk::MorphologicTool::SetRadius(unsigned int value)
 
 void mitk::MorphologicTool::UpdatePreview()
 {
+  mitk::DataNode::Pointer node = m_ToolManager->GetRoiData(0);
+
+  if (node.IsNotNull())
+  {
+    mitk::DataNode::Pointer new_node = mitk::DataNode::New();
+    mitk::Image::Pointer image = dynamic_cast<mitk::Image*> (m_NodeToProceed->GetData());
+    mitk::Image::Pointer maskedImage = mitk::Image::New();
+
+    mitk::MaskAndCutRoiImageFilter::Pointer roiFilter = mitk::MaskAndCutRoiImageFilter::New();
+    roiFilter->SetInput(image);
+    roiFilter->SetRegionOfInterestByNode(node);
+    roiFilter->Update();
+
+    maskedImage = roiFilter->GetImage();
+    new_node->SetData(maskedImage);
+
+    m_NodeToProceed = new_node;
+
+  }
+  else
+    m_NodeToProceed = m_OriginalNode;
 
   mitk::Image::Pointer image = dynamic_cast<mitk::Image*>( m_NodeToProceed->GetData() );
 
@@ -88,35 +126,21 @@ mitk::Image::Pointer mitk::MorphologicTool::ApplyFilter(mitk::Image::Pointer ima
   return image;
 }
 
-void mitk::MorphologicTool::SetupPreviewNodeFor(mitk::DataNode* nodeToProceed)
-{
-  if (nodeToProceed)
-  {
-    mitk::Image::Pointer image = dynamic_cast<Image*>( nodeToProceed->GetData() );
-    if (image.IsNotNull())
-    {
-      // initialize and a new node with the same image as our reference image
-      m_FeedbackNode->SetData( image );
-
-      if (mitk::DataStorage* ds = m_ToolManager->GetDataStorage())
-      {
-        if (ds->Exists(m_FeedbackNode))
-          ds->Remove(m_FeedbackNode);
-        ds->Add( m_FeedbackNode, nodeToProceed );
-      }
-    }
-  }
-}
-
 void mitk::MorphologicTool::Activated()
 {
-  m_ToolManager->RoiDataChanged += mitk::MessageDelegate<mitk::MorphologicTool>(this, &mitk::MorphologicTool::OnRoiDataChanged);
+  m_ToolManager->RoiDataChanged += mitk::MessageDelegate<mitk::MorphologicTool>(this, &mitk::MorphologicTool::UpdatePreview);
 
   m_OriginalNode = m_ToolManager->GetReferenceData(0);
   m_NodeToProceed = m_OriginalNode;
 
-  if( m_NodeToProceed != NULL)
-    SetupPreviewNodeFor(m_NodeToProceed);
+  if( m_NodeToProceed.IsNotNull())
+  {
+    if (mitk::DataStorage* ds = m_ToolManager->GetDataStorage())
+    {
+      if (!ds->Exists(m_FeedbackNode))
+        ds->Add( m_FeedbackNode, m_OriginalNode );
+    }
+  }
   //if no referencedata is set deactivate tool
   else
     m_ToolManager->ActivateTool(-1);
@@ -124,66 +148,26 @@ void mitk::MorphologicTool::Activated()
 
 void mitk::MorphologicTool::Deactivated()
 {
-  m_ToolManager->RoiDataChanged -= mitk::MessageDelegate<mitk::MorphologicTool>(this, &mitk::MorphologicTool::OnRoiDataChanged);
-
-  m_NodeToProceed = NULL;
+  m_ToolManager->RoiDataChanged -= mitk::MessageDelegate<mitk::MorphologicTool>(this, &mitk::MorphologicTool::UpdatePreview);
 
   if (mitk::DataStorage* ds = m_ToolManager->GetDataStorage())
   {
     ds->Remove(m_FeedbackNode);
-    mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
+
+  m_NodeToProceed = NULL;
+  m_OriginalNode = NULL;
   m_FeedbackNode->SetData(NULL);
+
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-void mitk::MorphologicTool::OnRoiDataChanged()
+void mitk::MorphologicTool::SetStructuringElementType(int id)
 {
-  typedef itk::Image<int, 3> ItkImageType;
-  typedef itk::Image<unsigned char, 3> ItkMaskType;
-  typedef itk::MaskImageFilter<ItkImageType, ItkMaskType, ItkImageType> MaskFilterType;
-  mitk::DataNode* node = m_ToolManager->GetRoiData(0);
-  if (node == NULL)
-  {
-    this->SetupPreviewNodeFor(m_OriginalNode);
-    m_NodeToProceed = m_OriginalNode;
-    return;
-  }
-
-  mitk::DataNode::Pointer new_node = mitk::DataNode::New();
-  mitk::Image* image = dynamic_cast<mitk::Image*> (m_OriginalNode->GetData());
-  mitk::Image::Pointer new_image = mitk::Image::New();
-
-  mitk::Image::Pointer roi;
-  mitk::BoundingObject* boundingObject = dynamic_cast<mitk::BoundingObject*> (node->GetData());
-
-  if (boundingObject)
-  {
-    mitk::BoundingObjectToSegmentationFilter::Pointer filter = mitk::BoundingObjectToSegmentationFilter::New();
-    filter->SetBoundingObject( boundingObject);
-    filter->SetInput(image);
-    filter->Update();
-    roi = filter->GetOutput();
-  }
+  if (id==2)
+    m_StructElement = CROSS;
   else
-    roi =  dynamic_cast<mitk::Image*> (node->GetData());
+    m_StructElement = BALL;
 
-  if (roi)
-  {
-    MaskFilterType::Pointer filter = MaskFilterType::New();
-    ItkMaskType::Pointer itkRoi = ItkMaskType::New();
-    ItkImageType::Pointer itkImage = ItkImageType::New();
-    mitk::CastToItkImage(image, itkImage);
-    mitk::CastToItkImage(roi, itkRoi);
-    filter->SetInput1(itkImage);
-    filter->SetInput2(itkRoi);
-    filter->SetOutsideValue(0);
-    filter->Update();
-    mitk::CastToMitkImage(filter->GetOutput(),new_image);
-  }
-  new_node->SetData(new_image);
-
-  this->SetupPreviewNodeFor(new_node);
-  m_NodeToProceed = new_node;
-
-  UpdatePreview();
+  this->UpdatePreview();
 }

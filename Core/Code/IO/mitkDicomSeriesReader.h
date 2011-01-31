@@ -85,6 +85,12 @@ public:
   * Read a Philips3D Ultrasound DICOM file and put into an mitk image
   */
   static bool ReadPhilips3DDicom(const std::string &filename, mitk::Image::Pointer output_image);
+     
+  /**
+    Construct a UID that takes into account sorting criteria from GetSeries().
+  */
+  static std::string CreateMoreUniqueSeriesIdentifier( const gdcm::Scanner::TagToValue& tagValueMap );
+  static std::string IDifyTagValue(const std::string& value);
 #endif
 
   /**
@@ -168,6 +174,26 @@ protected:
   */
   template <typename PixelType>
   static void LoadDicom(const StringContainer &filenames, DataNode &node, bool sort, bool check_4d, UpdateCallBackMethod callback);
+
+  /**
+    Feed files into itk::ImageSeriesReader and retrieve a 3D MITK image.
+
+    \param command can be used for progress reporting
+  */
+  template <typename PixelType>
+  static Image::Pointer LoadDICOMByITK( const StringContainer&, CallbackCommand* command = NULL);
+
+  
+  /**
+    Called by LoadDicom. Expects to be fed a single list of filenames that have been sorted by
+    GetSeries previously (one map entry). This method will check how many timestep can be filled
+    with given files.
+
+    Assumption is that the number of time steps is determined by how often the first position in
+    space repeats. I.e. if the first three files in the input parameter all describe the same
+    location in space, we'll construct three lists of files. and sort the remaining files into them.
+  */
+  static std::list<StringContainer> SortIntoBlocksFor3DplusT( const StringContainer& presortedFilenames, bool sort, bool& canLoadAs4D );
 
 #if GDCM_MAJOR_VERSION >= 2
   /*

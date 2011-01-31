@@ -23,6 +23,8 @@ PURPOSE.  See the above copyright notices for more information.
   #include <gdcmAttribute.h>
   #include <gdcmPixmapReader.h>
   #include <gdcmStringFilter.h>
+  #include <gdcmDirectory.h>
+  #include <gdcmScanner.h>
 #endif
 
 namespace mitk
@@ -283,7 +285,7 @@ bool DicomSeriesReader::ReadPhilips3DDicom(const std::string &filename, mitk::Im
 
 DicomSeriesReader::UidFileNamesMap DicomSeriesReader::GetSeries(const std::string &dir, const StringContainer &restrictions)
 {
-  DcmFileNamesGeneratorType::Pointer name_generator = DcmFileNamesGeneratorType::New();
+  UidFileNamesMap map; // result variable
 
   /**
 
@@ -295,6 +297,10 @@ DicomSeriesReader::UidFileNamesMap DicomSeriesReader::GetSeries(const std::strin
         - 0028,0030 pixel spacing (x,y)
         - 0018,0050 slice thickness
   */
+
+
+#if GDCM_MAJOR_VERSION < 2
+  DcmFileNamesGeneratorType::Pointer name_generator = DcmFileNamesGeneratorType::New();
 
   name_generator->SetUseSeriesDetails(true);
   name_generator->AddSeriesRestriction("0020|0037"); // image orientation (patient)
@@ -312,7 +318,6 @@ DicomSeriesReader::UidFileNamesMap DicomSeriesReader::GetSeries(const std::strin
 
   name_generator->SetDirectory(dir.c_str());
 
-  UidFileNamesMap map;
   const StringContainer &series_uids = name_generator->GetSeriesUIDs();
   const StringContainer::const_iterator series_end = series_uids.end();
 
@@ -323,8 +328,122 @@ DicomSeriesReader::UidFileNamesMap DicomSeriesReader::GetSeries(const std::strin
     map[uid] = name_generator->GetFileNames(uid);
   }
 
+#else
+
+  // set directory
+  gdcm::Directory gDirectory;
+  gDirectory.Load( dir.c_str(), false ); // non-recursive
+  const gdcm::Directory::FilenamesType &gAllFiles = gDirectory.GetFilenames();
+
+  // scann for relevant tags in dicom files
+  gdcm::Scanner scanner;
+  const gdcm::Tag tagSeriesInstanceUID(0x0020,0x000e); // Series Instance UID
+    scanner.AddTag( tagSeriesInstanceUID );
+
+  const gdcm::Tag tagImageOrientation(0x0020, 0x0037); // image orientation
+    scanner.AddTag( tagImageOrientation );
+
+  const gdcm::Tag tagPixelSpacing(0x0028, 0x0030); // pixel spacing
+    scanner.AddTag( tagPixelSpacing );
+    
+  const gdcm::Tag tagSliceThickness(0x0018, 0x0050); // slice thickness
+    scanner.AddTag( tagSliceThickness );
+
+  const gdcm::Tag tagNumberOfRows(0x0028, 0x0010); // number rows
+    scanner.AddTag( tagNumberOfRows );
+
+  const gdcm::Tag tagNumberOfColumns(0x0028, 0x0011); // number cols
+    scanner.AddTag( tagNumberOfColumns );
+
+  // TODO add further restrictions from arguments
+
+  // let GDCM scan files
+  if ( !scanner.Scan( gDirectory.GetFilenames() ) )
+  {
+    MITK_ERROR << "gdcm::Scanner failed scanning " << dir;
+    return map;
+  }
+
+  // assign files IDs that will separate them for loading into image blocks
+  for (gdcm::Scanner::ConstIterator fileIter = scanner.Begin();
+       fileIter != scanner.End();
+       ++fileIter)
+  {
+    MITK_DEBUG << "File " << fileIter->first << std::endl;
+    if ( std::string(fileIter->first).empty() ) continue; // TODO understand why Scanner has empty string entries
+
+    std::string moreUniqueSeriesId = CreateMoreUniqueSeriesIdentifier( fileIter->second );
+    map [ moreUniqueSeriesId ].push_back( fileIter->first );
+  }
+
+#endif
+
+  for ( UidFileNamesMap::const_iterator i = map.begin(); i != map.end(); ++i )
+  {
+    MITK_INFO << "Entry " << i->first << " with " << i->second.size() << " files";
+  }
+
   return map;
 }
+
+#if GDCM_MAJOR_VERSION >= 2
+std::string DicomSeriesReader::CreateMoreUniqueSeriesIdentifier( const gdcm::Scanner::TagToValue& tagValueMap )
+{
+  const gdcm::Tag tagSeriesInstanceUID(0x0020,0x000e); // Series Instance UID
+  const gdcm::Tag tagImageOrientation(0x0020, 0x0037); // image orientation
+  const gdcm::Tag tagPixelSpacing(0x0028, 0x0030); // pixel spacing
+  const gdcm::Tag tagSliceThickness(0x0018, 0x0050); // slice thickness
+  const gdcm::Tag tagNumberOfRows(0x0028, 0x0010); // number rows
+  const gdcm::Tag tagNumberOfColumns(0x0028, 0x0011); // number cols
+    
+  std::string constructedID;
+ 
+  try
+  {
+    constructedID = tagValueMap.at( tagSeriesInstanceUID );
+
+    constructedID += IDifyTagValue( tagValueMap.at(tagNumberOfRows) );
+    constructedID += IDifyTagValue( tagValueMap.at(tagNumberOfColumns) );
+    constructedID += IDifyTagValue( tagValueMap.at(tagPixelSpacing) );
+    constructedID += IDifyTagValue( tagValueMap.at(tagSliceThickness) );
+    constructedID += IDifyTagValue( tagValueMap.at(tagImageOrientation) );
+
+    constructedID.resize( constructedID.length() - 1 ); // cut of trailing '.'
+
+    MITK_DEBUG << "ID: " << constructedID;
+    return constructedID;
+  }
+  catch (std::exception& e)
+  {
+    MITK_ERROR << "CreateMoreUniqueSeriesIdentifier() could not access all required DICOM tags. You are calling it wrongly. Using partial ID.";
+    return constructedID; 
+  }
+}
+
+std::string DicomSeriesReader::IDifyTagValue(const std::string& value)
+{
+  std::string IDifiedValue( value );
+
+  // Eliminate non-alnum characters, including whitespace...
+  //   that may have been introduced by concats.
+  for(std::size_t i=0; i<IDifiedValue.size(); i++)
+  {
+    while(i<IDifiedValue.size() 
+      && !( IDifiedValue[i] == '.'
+        || (IDifiedValue[i] >= 'a' && IDifiedValue[i] <= 'z')
+        || (IDifiedValue[i] >= '0' && IDifiedValue[i] <= '9')
+        || (IDifiedValue[i] >= 'A' && IDifiedValue[i] <= 'Z')))
+    {
+      IDifiedValue.erase(i, 1);
+    }
+  }
+
+
+  IDifiedValue += ".";
+  return IDifiedValue;
+}
+
+#endif
 
 DicomSeriesReader::StringContainer DicomSeriesReader::GetSeries(const std::string &dir, const std::string &series_uid, const StringContainer &restrictions)
 {
@@ -381,31 +500,35 @@ bool DicomSeriesReader::GdcmSortFunction(const gdcm::DataSet &ds1, const gdcm::D
   if (image_orientation1 != image_orientation2)
   {
     MITK_ERROR << "Dicom images have different orientations.";
-    throw std::logic_error("Dicom images have different orientations.");
+    throw std::logic_error("Dicom images have different orientations. Call GetSeries() first to separate images.");
   }
 
-  if (acq_time1 == acq_time2)
+  double normal[3];
+
+  normal[0] = image_orientation1[1] * image_orientation1[5] - image_orientation1[2] * image_orientation1[4];
+  normal[1] = image_orientation1[2] * image_orientation1[3] - image_orientation1[0] * image_orientation1[5];
+  normal[2] = image_orientation1[0] * image_orientation1[4] - image_orientation1[1] * image_orientation1[3];
+
+  double
+      dist1 = 0.0,
+      dist2 = 0.0;
+
+  for (unsigned char i = 0u; i < 3u; ++i)
   {
-    double normal[3];
+    dist1 += normal[i] * image_pos1[i];
+    dist2 += normal[i] * image_pos2[i];
+  }
 
-    normal[0] = image_orientation1[1] * image_orientation1[5] - image_orientation1[2] * image_orientation1[4];
-    normal[1] = image_orientation1[2] * image_orientation1[3] - image_orientation1[0] * image_orientation1[5];
-    normal[2] = image_orientation1[0] * image_orientation1[4] - image_orientation1[1] * image_orientation1[3];
-
-    double
-        dist1 = 0.0,
-        dist2 = 0.0;
-
-    for (unsigned char i = 0u; i < 3u; ++i)
-    {
-      dist1 += normal[i] * image_pos1[i];
-      dist2 += normal[i] * image_pos2[i];
-    }
-
+  if ( fabs(dist1 - dist2) < mitk::eps)
+  {
+    // exception: same position: compare by acquisition time
+    return acq_time1 < acq_time2;
+  }
+  else
+  {
+    // default: compare position
     return dist1 < dist2;
   }
-
-  return acq_time1 < acq_time2;
 }
 #endif
 

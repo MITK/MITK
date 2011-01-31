@@ -211,17 +211,14 @@ std::string mitk::DataNodeFactory::GetBaseFilePrefix()
 
 std::string mitk::DataNodeFactory::GetDirectory()
 {
-  if ( m_FileName != "" )
-    return itksys::SystemTools::GetFilenamePath( m_FileName );
-  else if ( m_FilePrefix != "" )
-    return itksys::SystemTools::GetFilenamePath( m_FilePrefix );
-  else
-    return std::string( "" );
+  if ( !m_FileName.empty() )   return itksys::SystemTools::GetFilenamePath( m_FileName );
+  if ( !m_FilePrefix.empty() ) return itksys::SystemTools::GetFilenamePath( m_FilePrefix );
+  
+  return std::string();
 }
 
 void mitk::DataNodeFactory::ReadFileSeriesTypeDCM()
 {
-  MITK_INFO << "loading image series with prefix " << m_FilePrefix << " and pattern " << m_FilePattern << " as DICOM..." << std::endl;
   const char* previousCLocale = setlocale(LC_NUMERIC, NULL);
   setlocale(LC_NUMERIC, "C");
   std::locale previousCppLocale( std::cin.getloc() );
@@ -262,7 +259,7 @@ void mitk::DataNodeFactory::ReadFileSeriesTypeDCM()
     const std::string &uid = n_it->first;
     DataNode::Pointer node = this->GetOutput(i);
 
-    MITK_INFO << "Readng series #" << i << ": " << uid << std::endl;
+    MITK_INFO << "Reading series " << i << ": " << uid << std::endl;
 
     if (DicomSeriesReader::LoadDicomSeries(n_it->second, *node))
     {
@@ -271,7 +268,7 @@ void mitk::DataNodeFactory::ReadFileSeriesTypeDCM()
     }
     else
     {
-      MITK_ERROR << "skipping series #" << i << " due to exception" << std::endl;
+      MITK_ERROR << "Skipping series " << i << " due to exception" << std::endl;
     }
 
     ProgressBar::GetInstance()->Progress();

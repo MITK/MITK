@@ -32,7 +32,8 @@ namespace mitk
 
 typedef itk::GDCMSeriesFileNames DcmFileNamesGeneratorType;
 
-DataNode::Pointer DicomSeriesReader::LoadDicomSeries(const StringContainer &filenames, bool sort, bool check_4d, UpdateCallBackMethod callback)
+DataNode::Pointer 
+DicomSeriesReader::LoadDicomSeries(const StringContainer &filenames, bool sort, bool check_4d, UpdateCallBackMethod callback)
 {
   DataNode::Pointer node = DataNode::New();
 
@@ -42,13 +43,14 @@ DataNode::Pointer DicomSeriesReader::LoadDicomSeries(const StringContainer &file
   }
   else
   {
-    return 0;
+    return NULL;
   }
 }
 
-bool DicomSeriesReader::LoadDicomSeries(const StringContainer &filenames, DataNode &node, bool sort, bool check_4d, UpdateCallBackMethod callback)
+bool 
+DicomSeriesReader::LoadDicomSeries(const StringContainer &filenames, DataNode &node, bool sort, bool check_4d, UpdateCallBackMethod callback)
 {
-  if(filenames.size() == 0)
+  if( filenames.empty() )
   {
     MITK_ERROR << "Calling LoadDicomSeries with empty filename string container. Aborting.";
     return false;
@@ -96,24 +98,29 @@ bool DicomSeriesReader::LoadDicomSeries(const StringContainer &filenames, DataNo
         DicomSeriesReader::LoadDicom<double>(filenames, node, sort, check_4d, callback);
         return true;
       default:
-        MITK_ERROR << "Unknown pixel type!";
+        MITK_ERROR << "Found unsupported DICOM pixel type: (enum value) " << io->GetComponentType();
       }
     }
   }
-  catch(itk::MemoryAllocationError e)
+  catch(itk::MemoryAllocationError& e)
   {
-    MITK_ERROR << "Memory allocation!";
+    MITK_ERROR << "Out of memory. Cannot load DICOM series.";
+  }
+  catch(std::exception& e)
+  {
+    MITK_ERROR << "Error encountered when loading DICOM series:" << e.what();
   }
   catch(...)
   {
-    MITK_ERROR << "Unknown!";
+    MITK_ERROR << "Unspecified error encountered when loading DICOM series.";
   }
 
   return false;
 }
 
 
-bool DicomSeriesReader::IsDicom(const std::string &filename)
+bool 
+DicomSeriesReader::IsDicom(const std::string &filename)
 {
   DcmIoType::Pointer io = DcmIoType::New();
 
@@ -121,7 +128,8 @@ bool DicomSeriesReader::IsDicom(const std::string &filename)
 }
 
 #if GDCM_MAJOR_VERSION >= 2
-bool DicomSeriesReader::IsPhilips3DDicom(const std::string &filename)
+bool 
+DicomSeriesReader::IsPhilips3DDicom(const std::string &filename)
 {
   DcmIoType::Pointer io = DcmIoType::New();
 
@@ -144,7 +152,8 @@ bool DicomSeriesReader::IsPhilips3DDicom(const std::string &filename)
   return false;
 }
 
-bool DicomSeriesReader::ReadPhilips3DDicom(const std::string &filename, mitk::Image::Pointer output_image)
+bool 
+DicomSeriesReader::ReadPhilips3DDicom(const std::string &filename, mitk::Image::Pointer output_image)
 {
   // Now get PhilipsSpecific Tags
 
@@ -269,26 +278,16 @@ bool DicomSeriesReader::ReadPhilips3DDicom(const std::string &filename, mitk::Im
     }
   }
   mitk::CastToMitkImage(imageItk, output_image);
-  /*
-  // this works as well, but then the picture is upside down..   transversal slice[max] should be transversal slice[0] and so on.
-  while (!iterator.IsAtEnd())
-  {
-  iterator.Set( new_pixels[pixCount] );
-  pixCount++;
-  iterator++;
-  }
-  mitk::CastToMitkImage(imageItk, image);
-  */
   return true; // actually never returns false yet.. but exception possible
 }
 #endif
 
-DicomSeriesReader::UidFileNamesMap DicomSeriesReader::GetSeries(const std::string &dir, const StringContainer &restrictions)
+DicomSeriesReader::UidFileNamesMap 
+DicomSeriesReader::GetSeries(const std::string &dir, const StringContainer &restrictions)
 {
   UidFileNamesMap map; // result variable
 
   /**
-
     assumption about this method:
       returns a map of uid-like-key --> list(filename)
       each entry should contain filenames that have images of same
@@ -300,6 +299,8 @@ DicomSeriesReader::UidFileNamesMap DicomSeriesReader::GetSeries(const std::strin
 
 
 #if GDCM_MAJOR_VERSION < 2
+  // old GDCM: let itk::GDCMSeriesFileNames do the sorting
+
   DcmFileNamesGeneratorType::Pointer name_generator = DcmFileNamesGeneratorType::New();
 
   name_generator->SetUseSeriesDetails(true);
@@ -309,26 +310,26 @@ DicomSeriesReader::UidFileNamesMap DicomSeriesReader::GetSeries(const std::strin
   name_generator->SetLoadSequences(false); // could speed up reading, and we don't use sequences anyway
   name_generator->SetLoadPrivateTags(false);
 
-  const StringContainer::const_iterator restrictions_end = restrictions.end();
-
-  for(StringContainer::const_iterator it = restrictions.begin(); it != restrictions_end; ++it)
+  for(StringContainer::const_iterator it = restrictions.begin(); 
+      it != restrictions.end(); 
+      ++it)
   {
     name_generator->AddSeriesRestriction(*it);
   }
 
   name_generator->SetDirectory(dir.c_str());
+  const StringContainer& series_uids = name_generator->GetSeriesUIDs();
 
-  const StringContainer &series_uids = name_generator->GetSeriesUIDs();
-  const StringContainer::const_iterator series_end = series_uids.end();
-
-  for(StringContainer::const_iterator it = series_uids.begin(); it != series_end; ++it)
+  for(StringContainer::const_iterator it = series_uids.begin(); 
+      it != series_uids.end(); 
+      ++it)
   {
-    const std::string &uid = *it;
-
+    const std::string& uid = *it;
     map[uid] = name_generator->GetFileNames(uid);
   }
 
 #else
+  // new GDCM: use GDCM directly, itk::GDCMSeriesFileNames does not work with GDCM 2
 
   // set directory
   gdcm::Directory gDirectory;
@@ -380,14 +381,15 @@ DicomSeriesReader::UidFileNamesMap DicomSeriesReader::GetSeries(const std::strin
 
   for ( UidFileNamesMap::const_iterator i = map.begin(); i != map.end(); ++i )
   {
-    MITK_INFO << "Entry " << i->first << " with " << i->second.size() << " files";
+    MITK_DEBUG << "Entry " << i->first << " with " << i->second.size() << " files";
   }
 
   return map;
 }
 
 #if GDCM_MAJOR_VERSION >= 2
-std::string DicomSeriesReader::CreateMoreUniqueSeriesIdentifier( const gdcm::Scanner::TagToValue& tagValueMap )
+std::string 
+DicomSeriesReader::CreateMoreUniqueSeriesIdentifier( const gdcm::Scanner::TagToValue& tagValueMap )
 {
   const gdcm::Tag tagSeriesInstanceUID(0x0020,0x000e); // Series Instance UID
   const gdcm::Tag tagImageOrientation(0x0020, 0x0037); // image orientation
@@ -420,7 +422,8 @@ std::string DicomSeriesReader::CreateMoreUniqueSeriesIdentifier( const gdcm::Sca
   }
 }
 
-std::string DicomSeriesReader::IDifyTagValue(const std::string& value)
+std::string 
+DicomSeriesReader::IDifyTagValue(const std::string& value)
 {
   std::string IDifiedValue( value );
 
@@ -442,30 +445,29 @@ std::string DicomSeriesReader::IDifyTagValue(const std::string& value)
   IDifiedValue += ".";
   return IDifiedValue;
 }
-
 #endif
 
-DicomSeriesReader::StringContainer DicomSeriesReader::GetSeries(const std::string &dir, const std::string &series_uid, const StringContainer &restrictions)
+DicomSeriesReader::StringContainer 
+DicomSeriesReader::GetSeries(const std::string &dir, const std::string &series_uid, const StringContainer &restrictions)
 {
-  DcmFileNamesGeneratorType::Pointer name_generator = DcmFileNamesGeneratorType::New();
+  UidFileNamesMap allSeries = GetSeries(dir, restrictions);
+  StringContainer resultingFileList;
 
-  name_generator->SetUseSeriesDetails(true);
-  name_generator->AddSeriesRestriction("0020|0037"); // image orientation (patient)
-  name_generator->AddSeriesRestriction("0028|0030"); // pixel spacing (x,y)
-
-  const StringContainer::const_iterator restrictions_end = restrictions.end();
-
-  for(StringContainer::const_iterator it = restrictions.begin(); it != restrictions_end; ++it)
+  for ( UidFileNamesMap::const_iterator idIter = allSeries.begin(); 
+        idIter != allSeries.end(); 
+        ++idIter )
   {
-    name_generator->AddSeriesRestriction(*it);
+    if ( idIter->first.find( series_uid ) == 0 ) // this ID starts with given series_uid
+    {
+      resultingFileList.insert( resultingFileList.end(), idIter->second.begin(), idIter->second.end() ); // append
+    }
   }
 
-  name_generator->SetDirectory(dir.c_str());
-
-  return name_generator->GetFileNames(series_uid);
+  return resultingFileList;
 }
 
-DicomSeriesReader::StringContainer DicomSeriesReader::SortSeriesSlices(const StringContainer &unsortedFilenames)
+DicomSeriesReader::StringContainer 
+DicomSeriesReader::SortSeriesSlices(const StringContainer &unsortedFilenames)
 {
 #if GDCM_MAJOR_VERSION >= 2
   gdcm::Sorter sorter;
@@ -479,7 +481,8 @@ DicomSeriesReader::StringContainer DicomSeriesReader::SortSeriesSlices(const Str
 }
 
 #if GDCM_MAJOR_VERSION >= 2
-bool DicomSeriesReader::GdcmSortFunction(const gdcm::DataSet &ds1, const gdcm::DataSet &ds2)
+bool 
+DicomSeriesReader::GdcmSortFunction(const gdcm::DataSet &ds1, const gdcm::DataSet &ds2)
 {
   gdcm::Attribute<0x0008,0x0032> acq_time1; // Acquisition time
   gdcm::Attribute<0x0020,0x0032> image_pos1; // Image Position (Patient)
@@ -535,3 +538,4 @@ bool DicomSeriesReader::GdcmSortFunction(const gdcm::DataSet &ds1, const gdcm::D
 }
 
 #include <mitkDicomSeriesReader.txx>
+

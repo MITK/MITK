@@ -15,133 +15,189 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#ifndef MITKDICOMSERIESREADER_H_
-#define MITKDICOMSERIESREADER_H_
+#ifndef mitkDicomSeriesReader_h
+#define mitkDicomSeriesReader_h
 
-#include <mitkDataNode.h>
-#include <mitkConfig.h>
+#include "mitkDataNode.h"
+#include "mitkConfig.h"
 
 #ifdef MITK_USE_GDCMIO
-#include <itkGDCMImageIO.h>
+  #include <itkGDCMImageIO.h>
 #else
-#include <itkDICOMImageIO2.h>
+  #include <itkDICOMImageIO2.h>
 #endif
+
+#include <itkImageSeriesReader.h>
+#include <itkCommand.h>
 
 #include <gdcmConfigure.h>
 
 #if GDCM_MAJOR_VERSION >= 2
-#include <gdcmDataSet.h>
-#include <gdcmRAWCodec.h>
-#include <gdcmSorter.h>
-#include <gdcmScanner.h>
-#include <gdcmPixmapReader.h>
-#include <gdcmStringFilter.h>
+  #include <gdcmDataSet.h>
+  #include <gdcmRAWCodec.h>
+  #include <gdcmSorter.h>
+  #include <gdcmScanner.h>
+  #include <gdcmPixmapReader.h>
+  #include <gdcmStringFilter.h>
 #endif
-#include <itkImageSeriesReader.h>
-#include <itkCommand.h>
+
 
 namespace mitk
 {
 
-/**
-* Provides functions for loading DICOM series.
-* The series is specified through an enumeration of all files contained in it.
-* A method for the creation of file name enumerations of all series contained in
-* a particular directory is also provided.
-* After loading the series, the generated DataNode is not named. The caller is
-* responsible for given the node a name.
+/** 
+ \brief Find and load DICOM image files (regular CT/MR, no specialties).
+
+ The series is specified through an enumeration of all files contained in it.
+
+ A method for the creation of file name enumerations of all series contained in
+ a particular directory is also provided.
+
+ After loading the series, the generated DataNode is not named. The caller is
+ responsible for given the node a name.
+
+ \b Usage
+
+\code
+
+ // only directory known here: /home/me/dicom
+
+ DicomSeriesReader::UidFileNamesMap allImageBlocks = DicomSeriesReader::GetSeries("/home/me/dicom/");
+
+ // file now divided into groups of identical image size, orientation, spacing, etc.
+ // each of these lists should be loadable as an mitk::Image.
+
+ // optional step: sorting
+ std::string seriesToLoad = allImageBlocks[...]; // decide for yourself
+  
+ DicomSeriesReader::StringContainer oneBlockSorted = DicomSeriesReader::SortSeriesSlices( seriesToLoad );
+
+ // final step: load into DataNode (can result in 3D+t image)
+ DataNode::Pointer node = DicomSeriesReader::LoadDicomSeries( oneBlockSorted ); // would sort again, but we could set the sort flag to false
+
+ Image::Pointer image = dynamic_cast<mitk::Image*>( node.GetData() );
+\endcode
+
 */
 class MITK_CORE_EXPORT DicomSeriesReader
 {
 public:
+
+  /** 
+    \brief For lists of filenames 
+  */
   typedef std::vector<std::string> StringContainer;
+
+  /** 
+    \brief For multiple lists of filenames, assigned an ID each 
+  */
   typedef std::map<std::string, StringContainer> UidFileNamesMap;
+
+  /** 
+    \brief Interface for the progress callback 
+  */
   typedef void (*UpdateCallBackMethod)(float);
 
   /**
-  * Loads a DICOM series composed by the file names enumerated in the file names container.
-  * If a callback method is supplied, it will be called after every progress update with a progress value in [0,1].
+   \brief Checks if a specific file contains DICOM information.
   */
-  static DataNode::Pointer LoadDicomSeries(const StringContainer &filenames, bool sort = true, bool check_4d = true, UpdateCallBackMethod callback = 0);
+  static 
+  bool 
+  IsDicom(const std::string &filename);
 
   /**
-  * Loads a DICOM series composed by the file names enumerated in the file names container.
-  * If a callback method is supplied, it will be called after every progress update with a progress value in [0,1].
+   \brief Find all series (and sub-series -- see details) in a particular directory.
+  
+   For each series, an enumeration of the files contained in it is created.
+  
+   \return The resulting map will map SeriesInstanceUID to UNSORTED lists of file names.
+  
+   SeriesInstanceUID will be CHANGED to be unique for each set of file names
+   that should be loadable as a single mitk::Image. This implies that
+   Image orientation, slice thickness, pixel spacing, rows, and columns
+   must be the same for each file (i.e. the image slice contained in the file).
+  
+   If this separation logic requires that a SeriesInstanceUID must be made more specialized,
+   it will follow the same logic as itk::GDCMSeriesFileNames to enhance the UID with
+   more digits and dots.
+  
+   Optionally, more tags can be used to separate files into different logical series by setting
+   the restrictions parameter.
   */
-  static bool LoadDicomSeries(const StringContainer &filenames, DataNode &node, bool sort = true, bool check_4d = true, UpdateCallBackMethod callback = 0);
+  static UidFileNamesMap GetSeries(const std::string &dir, 
+                                   const StringContainer &restrictions = StringContainer());
 
   /**
-  * Checks if a specific file is a DICOM.
+   \brief see other GetSeries().
+
+   This differs only by having an additional restriction to a single known DICOM series.
+   Internally, it uses the other GetSeries() method. 
   */
-  static bool IsDicom(const std::string &filename);
+  static StringContainer GetSeries(const std::string &dir, 
+                                   const std::string &series_uid,
+                                   const StringContainer &restrictions = StringContainer());
+
+  /**
+    Sort a set of file names in an order that is meaningful for loading them into an mitk::Image.
+   
+    \warning This method assumes that input files are similar in basic properties such as slice thicknes, image orientation, pixel spacing, rows, columns. It should always be ok to put the result of a call to GetSeries(..) into this method.
+   
+    Sorting order is determined by
+   
+     1. image position along its normal (distance from world origin)
+     2. acquisition time
+   
+    If P<n> denotes a position and T<n> denotes a time step, this method will order slices from three timesteps like this:
+\verbatim
+  P1T1 P1T2 P1T3 P2T1 P2T2 P2T3 P3T1 P3T2 P3T3
+\endverbatim
+   
+   */
+  static StringContainer SortSeriesSlices(const StringContainer &unsortedFilenames);
+
+  /**
+   Loads a DICOM series composed by the file names enumerated in the file names container.
+   If a callback method is supplied, it will be called after every progress update with a progress value in [0,1].
+
+   \param filenames The filenames to load.
+   \param sort Whether files should be sorted spatially (true) or not (false - maybe useful if presorted)
+   \param load4D Whether to load the files as 3D+t (if possible)
+  */
+  static DataNode::Pointer LoadDicomSeries(const StringContainer &filenames, 
+                                           bool sort = true, 
+                                           bool load4D = true, 
+                                           UpdateCallBackMethod callback = 0);
+
+  /**
+    \brief See LoadDicomSeries! Just a slightly different interface.
+  */
+  static bool LoadDicomSeries(const StringContainer &filenames, 
+                              DataNode &node, 
+                              bool sort = true, 
+                              bool load4D = true, 
+                              UpdateCallBackMethod callback = 0);
+
+protected:
 
 #if GDCM_MAJOR_VERSION >= 2
+public:
   /**
-  * Checks if a specific file is a Philips3D Ultrasound DICOM file.
+   \brief Checks if a specific file is a Philips3D ultrasound DICOM file.
   */
   static bool IsPhilips3DDicom(const std::string &filename);
+protected:
 
   /**
-  * Read a Philips3D Ultrasound DICOM file and put into an mitk image
+   \brief Read a Philips3D ultrasound DICOM file and put into an mitk::Image.
   */
   static bool ReadPhilips3DDicom(const std::string &filename, mitk::Image::Pointer output_image);
      
   /**
-    Construct a UID that takes into account sorting criteria from GetSeries().
+    \brief Construct a UID that takes into account sorting criteria from GetSeries().
   */
   static std::string CreateMoreUniqueSeriesIdentifier( const gdcm::Scanner::TagToValue& tagValueMap );
   static std::string IDifyTagValue(const std::string& value);
 #endif
-
-  /**
-  * \brief Find all series (and sub-series -- see details) in a particular directory.
-  *
-  * For each series, an enumeration of the files contained in it is created.
-  *
-  * \return The resulting map will map SeriesInstanceUID to UNSORTED lists of file names.
-  *
-  * SeriesInstanceUID will be FORCED to be unique for each set of file names
-  * that should be loadable as a single mitk::Image. This implies that
-  * Image orientation, slice thickness, pixel spacing, rows, and columns
-  * must be the same for each file (i.e. the image slice contained in the file).
-  *
-  * If this separation logic requires that a SeriesInstanceUID must be made more specialized,
-  * it will follow the same logic as itk::GDCMSeriesFileNames to enhance the UID with
-  * more digits and dots.
-  *
-  * Optionally, more tags can be used to separate files into different logical series by setting
-  * the restrictions parameter.
-  */
-  static UidFileNamesMap GetSeries(const std::string &dir, const StringContainer &restrictions = StringContainer());
-
-  /**
-  * Find a particular series in a directory.
-  * For each series, an enumeration of the files contained in it is created.
-  * Optionally, more criteria (restrictions) can be used to distinguish between different series, and series
-  * restrictions can be specified.
-  */
-  static StringContainer GetSeries(const std::string &dir, const std::string &series_uid,
-                                   const StringContainer &restrictions = StringContainer());
-
-  /**
-   * Sort a set of file names in an order that is meaningful for loading them into an mitk::Image.
-   *
-   * \warning This method assumes that input files are similar in basic properties such as slice thicknes, image orientation, pixel spacing, rows, columns.
-   *
-   * It should always be ok to put the result of a call to GetSeries(..) into this method.(..).
-   *
-   * Sorting order is determined by
-   *
-   *  1. TODO
-   *  2.
-   */
-  static StringContainer SortSeriesSlices(const StringContainer &unsortedFilenames);
-protected:
-  inline DicomSeriesReader()
-  {}
-
-  inline ~DicomSeriesReader()
-  {}
 
 #ifdef MITK_USE_GDCMIO
   typedef itk::GDCMImageIO DcmIoType;
@@ -149,42 +205,54 @@ protected:
   typedef itk::DICOMImageIO2 DcmIoType;
 #endif
 
+  /**
+    \brief Progress callback for DicomSeriesReader.
+  */
   class CallbackCommand : public itk::Command
   {
   public:
-    inline CallbackCommand(UpdateCallBackMethod callback)
+    CallbackCommand(UpdateCallBackMethod callback)
       : m_Callback(callback)
-    {}
+    {
+    }
 
-    inline void Execute(const itk::Object *caller, const itk::EventObject&)
+    void Execute(const itk::Object *caller, const itk::EventObject&)
     {
       (*this->m_Callback)(static_cast<const itk::ProcessObject*>(caller)->GetProgress());
     }
 
-    inline void Execute(itk::Object *caller, const itk::EventObject&)
+    void Execute(itk::Object *caller, const itk::EventObject&)
     {
       (*this->m_Callback)(static_cast<itk::ProcessObject*>(caller)->GetProgress());
     }
+
   protected:
+
     UpdateCallBackMethod m_Callback;
   };
 
   /**
-  * Performs the loading of a series and creates an image having the specified pixel type.
+   \brief Performs the loading of a series and creates an image having the specified pixel type.
   */
   template <typename PixelType>
-  static void LoadDicom(const StringContainer &filenames, DataNode &node, bool sort, bool check_4d, UpdateCallBackMethod callback);
+  static 
+  void 
+  LoadDicom(const StringContainer &filenames, DataNode &node, bool sort, bool check_4d, UpdateCallBackMethod callback);
 
   /**
-    Feed files into itk::ImageSeriesReader and retrieve a 3D MITK image.
+    \brief Feed files into itk::ImageSeriesReader and retrieve a 3D MITK image.
 
     \param command can be used for progress reporting
   */
   template <typename PixelType>
-  static Image::Pointer LoadDICOMByITK( const StringContainer&, CallbackCommand* command = NULL);
+  static 
+  Image::Pointer 
+  LoadDICOMByITK( const StringContainer&, CallbackCommand* command = NULL);
 
   
   /**
+    \brief Sort files into time step blocks of a 3D+t image.
+
     Called by LoadDicom. Expects to be fed a single list of filenames that have been sorted by
     GetSeries previously (one map entry). This method will check how many timestep can be filled
     with given files.
@@ -193,14 +261,20 @@ protected:
     space repeats. I.e. if the first three files in the input parameter all describe the same
     location in space, we'll construct three lists of files. and sort the remaining files into them.
   */
-  static std::list<StringContainer> SortIntoBlocksFor3DplusT( const StringContainer& presortedFilenames, bool sort, bool& canLoadAs4D );
+  static 
+  std::list<StringContainer> 
+  SortIntoBlocksFor3DplusT( const StringContainer& presortedFilenames, bool sort, bool& canLoadAs4D );
 
 #if GDCM_MAJOR_VERSION >= 2
   /*
-  * Auxiliary sort function for Gdcm Dicom sorting. It is used for sorting
-  * 4D Dicom data.
+   \brief Defines spatial sorting for sorting by GDCM 2.
+
+   Sorts by image position along image normal (distance from world origin).
+   In cases of conflict, acquisition time is used as a secondary sort criterium.
   */
-  static bool GdcmSortFunction(const gdcm::DataSet &ds1, const gdcm::DataSet &ds2);
+  static 
+  bool 
+  GdcmSortFunction(const gdcm::DataSet &ds1, const gdcm::DataSet &ds2);
 #endif
 };
 

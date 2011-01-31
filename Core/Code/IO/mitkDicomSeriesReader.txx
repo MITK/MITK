@@ -26,7 +26,7 @@ namespace mitk
 {
 
 template <typename PixelType>
-void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &node, bool sort, bool check_4d, UpdateCallBackMethod callback)
+void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &node, bool sort, bool load4D, UpdateCallBackMethod callback)
 {
   const char* previousCLocale = setlocale(LC_NUMERIC, NULL);
   setlocale(LC_NUMERIC, "C");
@@ -56,7 +56,7 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
     std::list<StringContainer> imageBlocks = SortIntoBlocksFor3DplusT( filenames, sort, canLoadAs4D );
     unsigned int volume_count = imageBlocks.size();
 
-    if (!canLoadAs4D)
+    if (!canLoadAs4D || !load4D)
     {
       image = LoadDICOMByITK<PixelType>( imageBlocks.front() , command ); // load first 3D block
     }
@@ -148,12 +148,10 @@ Image::Pointer DicomSeriesReader::LoadDICOMByITK( const StringContainer& filenam
   reader->SetImageIO(io);
   reader->ReverseOrderOff();
 
-  /*
   if (command)
   {
     reader->AddObserver(itk::ProgressEvent(), command);
   }
-  */
 
   reader->SetFileNames(filenames);
   reader->Update();
@@ -222,7 +220,7 @@ DicomSeriesReader::SortIntoBlocksFor3DplusT( const StringContainer& presortedFil
     }
     else
     {
-      //break; // enough information to know the number of image blocks
+      break; // enough information to know the number of image blocks
     }
   }
 

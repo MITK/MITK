@@ -595,7 +595,7 @@ void mitk::WiiMoteThread::SurfaceInteraction()
     , m_WiiMotes[0].Acceleration.Z
     , m_SurfaceInteractionMode );
 
-  float test = m_Kalman->ProcessValue( m_WiiMotes[0].Acceleration.Z );
+  //float test = m_Kalman->ProcessValue( m_WiiMotes[0].Acceleration.Z );
 
   mitk::CallbackFromGUIThread::GetInstance()
     ->CallThisFromGUIThread(m_Command, e.MakeObject());

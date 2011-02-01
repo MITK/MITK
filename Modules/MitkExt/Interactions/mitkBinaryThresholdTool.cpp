@@ -34,8 +34,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkImageCast.h"
 #include "mitkImageTimeSelector.h"
 #include <itkImageRegionIterator.h>
-#include <itkMaskImageFilter.h>
 #include <itkBinaryThresholdImageFilter.h>
+#include "mitkPadImageFilter.h"
+#include "mitkMaskAndCutRoiImageFilter.h"
 
 namespace mitk {
   MITK_TOOL_MACRO(MitkExt_EXPORT, BinaryThresholdTool, "Thresholding tool");
@@ -43,8 +44,8 @@ namespace mitk {
 
 mitk::BinaryThresholdTool::BinaryThresholdTool()
 :m_SensibleMinimumThresholdValue(-100),
- m_SensibleMaximumThresholdValue(+100),
- m_CurrentThresholdValue(1)
+m_SensibleMaximumThresholdValue(+100),
+m_CurrentThresholdValue(1)
 {
   this->SupportRoiOn();
 
@@ -153,11 +154,14 @@ void mitk::BinaryThresholdTool::SetupPreviewNodeFor( DataNode* nodeForThresholdi
       {
         if (storage->Exists(m_ThresholdFeedbackNode))
           storage->Remove(m_ThresholdFeedbackNode);
-        storage->Add( m_ThresholdFeedbackNode, nodeForThresholding );
+        storage->Add( m_ThresholdFeedbackNode, m_OriginalImageNode );
       }
 
-      m_SensibleMinimumThresholdValue = static_cast<int>( originalImage->GetScalarValueMin() );
-      m_SensibleMaximumThresholdValue = static_cast<int>( originalImage->GetScalarValueMax() );
+      if (image.GetPointer() == originalImage.GetPointer())
+      {
+        m_SensibleMinimumThresholdValue = static_cast<int>( originalImage->GetScalarValueMin() );
+        m_SensibleMaximumThresholdValue = static_cast<int>( originalImage->GetScalarValueMax() );
+      }
 
       LevelWindowProperty::Pointer lwp = dynamic_cast<LevelWindowProperty*>( m_ThresholdFeedbackNode->GetProperty( "levelwindow" ));
       if (lwp)
@@ -206,7 +210,20 @@ void mitk::BinaryThresholdTool::CreateNewSegmentationFromThreshold(DataNode* nod
           }
         }
 
-        if (DataStorage* storage = m_ToolManager->GetDataStorage())
+        if (m_OriginalImageNode.GetPointer() != m_NodeForThresholding.GetPointer())
+        {
+          mitk::PadImageFilter::Pointer padFilter = mitk::PadImageFilter::New();
+
+          padFilter->SetInput(0, dynamic_cast<mitk::Image*> (emptySegmentation->GetData()));
+          padFilter->SetInput(1, dynamic_cast<mitk::Image*> (m_OriginalImageNode->GetData()));
+          padFilter->SetBinaryFilter(true);
+          padFilter->SetUpperThreshold(1);
+          padFilter->SetLowerThreshold(1);
+          padFilter->Update();
+
+          emptySegmentation->SetData(padFilter->GetOutput());
+        }
+        if (DataStorage::Pointer storage = m_ToolManager->GetDataStorage())
         {
           storage->Add( emptySegmentation, m_OriginalImageNode ); // add as a child, because the segmentation "derives" from the original
         }
@@ -258,50 +275,36 @@ void mitk::BinaryThresholdTool::ITKThresholding( itk::Image<TPixel, VImageDimens
 
 void mitk::BinaryThresholdTool::OnRoiDataChanged()
 {
-  typedef itk::Image<int, 3> ItkImageType;
-  typedef itk::Image<unsigned char, 3> ItkMaskType;
-  typedef itk::MaskImageFilter<ItkImageType, ItkMaskType, ItkImageType> MaskFilterType;
-  mitk::DataNode* node = m_ToolManager->GetRoiData(0);
-  if (node == NULL)
+  mitk::DataNode::Pointer node = m_ToolManager->GetRoiData(0);
+
+  if (node.IsNotNull())
   {
-    this->SetupPreviewNodeFor(m_OriginalImageNode);
-    m_NodeForThresholding = m_OriginalImageNode;
+    mitk::Image::Pointer image = dynamic_cast<mitk::Image*> (m_NodeForThresholding->GetData());
+
+    if (image.IsNull())
+      return;
+
+    mitk::MaskAndCutRoiImageFilter::Pointer roiFilter = mitk::MaskAndCutRoiImageFilter::New();
+
+    roiFilter->SetInput(image);
+    roiFilter->SetRegionOfInterestByNode(node);
+    roiFilter->Update();
+
+    mitk::DataNode::Pointer tmpNode = mitk::DataNode::New();
+    mitk::Image::Pointer tmpImage = roiFilter->GetImage();
+
+    tmpNode->SetData(tmpImage);
+
+    m_SensibleMaximumThresholdValue = static_cast<int> (roiFilter->GetMaxValue());
+    m_SensibleMinimumThresholdValue = static_cast<int> (roiFilter->GetMinValue());
+    SetupPreviewNodeFor( tmpNode );
+    m_NodeForThresholding = tmpNode;
+
     return;
   }
-
-  mitk::DataNode::Pointer new_node = mitk::DataNode::New();
-  mitk::Image* image = dynamic_cast<mitk::Image*> (m_OriginalImageNode->GetData());
-  mitk::Image::Pointer new_image = mitk::Image::New();
-
-  mitk::Image::Pointer roi;
-  mitk::BoundingObject* boundingObject = dynamic_cast<mitk::BoundingObject*> (node->GetData());
-
-  if (boundingObject)
-  {
-    mitk::BoundingObjectToSegmentationFilter::Pointer filter = mitk::BoundingObjectToSegmentationFilter::New();
-    filter->SetBoundingObject( boundingObject);
-    filter->SetInput(image);
-    filter->Update();
-    roi = filter->GetOutput();
-  }
   else
-    roi =  dynamic_cast<mitk::Image*> (node->GetData());
-
-  if (roi)
-  {
-    MaskFilterType::Pointer filter = MaskFilterType::New();
-    ItkMaskType::Pointer itkRoi = ItkMaskType::New();
-    ItkImageType::Pointer itkImage = ItkImageType::New();
-    mitk::CastToItkImage(image, itkImage);
-    mitk::CastToItkImage(roi, itkRoi);
-    filter->SetInput1(itkImage);
-    filter->SetInput2(itkRoi);
-    filter->SetOutsideValue(-32765);
-    filter->Update();
-    mitk::CastToMitkImage(filter->GetOutput(),new_image);
+  {this->SetupPreviewNodeFor(m_OriginalImageNode);
+  m_NodeForThresholding = m_OriginalImageNode;
+  return;
   }
-  new_node->SetData(new_image);
-
-  this->SetupPreviewNodeFor(new_node);
-  m_NodeForThresholding = new_node;
 }

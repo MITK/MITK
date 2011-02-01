@@ -2,7 +2,7 @@
 
 Program:   Medical Imaging & Interaction Toolkit
 Language:  C++
-Date:      $Date: 2010-03-31 16:40:27 +0200 (Mi, 31 Mrz 2010) $
+Date:      $Date$
 Version:   $Revision: 1.12 $
 
 Copyright (c) German Cancer Research Center, Division of Medical and
@@ -44,7 +44,7 @@ m_RangeSlider(NULL)
   m_LowerSpinner->setMinimum(-2048);
   m_LowerSpinner->setMaximum(0);
   m_LowerSpinner->setValue(-2048);
-  connect(m_LowerSpinner, SIGNAL(valueChanged(int)), this, SLOT(OnLowerSpinnerChanged(int)) );
+  connect(m_LowerSpinner, SIGNAL(editingFinished()), this, SLOT(OnOneSpinnerChanged()) );
 
   m_RangeSlider = new QxtSpanSlider(Qt::Horizontal, this );
   m_RangeSlider->setMaximum(2048);
@@ -56,7 +56,7 @@ m_RangeSlider(NULL)
   m_UpperSpinner->setMaximum(2048);
   m_UpperSpinner->setValue(2048);
 
-  connect(m_UpperSpinner, SIGNAL(valueChanged(int)), this, SLOT(OnUpperSpinnerChanged(int)) );
+  connect(m_UpperSpinner, SIGNAL(editingFinished()), this, SLOT(OnOneSpinnerChanged()) );
   connect(m_RangeSlider, SIGNAL(spanChanged(int, int)  ),this, SLOT( OnSpanChanged(int , int ) ));
 
   layout->addWidget(m_LowerSpinner);
@@ -161,13 +161,8 @@ void QmitkBinaryThresholdULToolGUI::OnSpanChanged(int lower, int upper)
     m_UpperSpinner->setValue(upper);
 }
 
-void QmitkBinaryThresholdULToolGUI::OnLowerSpinnerChanged(int value)
+void QmitkBinaryThresholdULToolGUI::OnOneSpinnerChanged()
 {
-  m_RangeSlider->setLowerValue(value);
+  m_RangeSlider->setLowerValue(m_LowerSpinner->value());
+  m_RangeSlider->setUpperValue(m_UpperSpinner->value());
 }
-
-void QmitkBinaryThresholdULToolGUI::OnUpperSpinnerChanged(int value)
-{
-  m_RangeSlider->setUpperValue(value);
-}
-

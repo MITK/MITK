@@ -2,7 +2,7 @@
 
 Program:   Medical Imaging & Interaction Toolkit
 Language:  C++
-Date:      $Date: 2010-03-31 16:40:27 +0200 (Mi, 31 Mrz 2010) $
+Date:      $Date$
 Version:   $Revision: 1.0 $
 
 Copyright (c) German Cancer Research Center, Division of Medical and
@@ -64,7 +64,7 @@ namespace mitk
     BinaryThresholdULTool(); // purposely hidden
     virtual ~BinaryThresholdULTool();
 
-    void SetupPreviewNodeFor( DataNode* nodeForThresholding );
+    void SetupPreviewNode();
 
     void CreateNewSegmentationFromThreshold(DataNode* node, const std::string& organType, const Color& color);
 

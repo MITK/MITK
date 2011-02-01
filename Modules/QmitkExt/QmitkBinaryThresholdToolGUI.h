@@ -55,7 +55,7 @@ class QmitkExt_EXPORT QmitkBinaryThresholdToolGUI : public QmitkToolGUI
 
     void OnSliderValueChanged(int value);
     void OnAcceptThresholdPreview();
-    void OnSpinnerValueChanged(int);
+    void OnSpinnerValueChanged();
 
   protected:
     QmitkBinaryThresholdToolGUI();

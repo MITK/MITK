@@ -2,7 +2,7 @@
 
 Program:   Medical Imaging & Interaction Toolkit
 Language:  C++
-Date:      $Date: 2010-03-31 16:40:27 +0200 (Mi, 31 Mrz 2010) $
+Date:      $Date$
 Version:   $Revision: 1.0 $
 
 Copyright (c) German Cancer Research Center, Division of Medical and
@@ -55,8 +55,7 @@ class QmitkExt_EXPORT QmitkBinaryThresholdULToolGUI : public QmitkToolGUI
 
     void OnSpanChanged(int lower, int upper);
     void OnAcceptThresholdPreview();
-    void OnUpperSpinnerChanged(int);
-    void OnLowerSpinnerChanged(int);
+    void OnOneSpinnerChanged();
 
   protected:
     QmitkBinaryThresholdULToolGUI();

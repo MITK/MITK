@@ -47,7 +47,7 @@ QmitkBinaryThresholdToolGUI::QmitkBinaryThresholdToolGUI()
   m_Spinner->setMinimum(5);
   m_Spinner->setValue(1);
 
-  connect(m_Spinner, SIGNAL(valueChanged(int)), this, SLOT(OnSpinnerValueChanged(int)) );
+  connect(m_Spinner, SIGNAL(editingFinished()), this, SLOT(OnSpinnerValueChanged()) );
   layout->addWidget(m_Spinner);
 
   //m_Slider = new QSlider( 5, 20, 1, 1, Qt::Horizontal, this );
@@ -141,7 +141,7 @@ void QmitkBinaryThresholdToolGUI::OnThresholdingValueChanged(int current)
   m_Spinner->setValue(current);
 }
 
-void QmitkBinaryThresholdToolGUI::OnSpinnerValueChanged(int value)
+void QmitkBinaryThresholdToolGUI::OnSpinnerValueChanged()
 {
-  m_Slider->setValue(value);
+  m_Slider->setValue(m_Spinner->value());
 }

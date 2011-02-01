@@ -62,14 +62,13 @@ mitk::Contour::Pointer mitk::ContourUtils::ProjectContourTo2DSlice(Image* slice,
   return projectedContour;
 }
 
-mitk::Contour::Pointer mitk::ContourUtils::BackProjectContourFrom2DSlice(Image* slice, Contour* contourIn2D, bool itkNotUsed( correctionForIpSegmentation ) )
+mitk::Contour::Pointer mitk::ContourUtils::BackProjectContourFrom2DSlice(const Geometry3D* sliceGeometry, Contour* contourIn2D, bool itkNotUsed( correctionForIpSegmentation ) )
 {
-  if ( !slice || !contourIn2D ) return NULL;
+  if ( !sliceGeometry || !contourIn2D ) return NULL;
 
   Contour::Pointer worldContour = Contour::New();
 
   const Contour::PathType::VertexListType* pointsIn2D = contourIn2D->GetContourPath()->GetVertexList();
-  const Geometry3D* sliceGeometry = slice->GetGeometry();
   for ( Contour::PathType::VertexListType::const_iterator iter = pointsIn2D->begin(); 
         iter != pointsIn2D->end();
         ++iter )

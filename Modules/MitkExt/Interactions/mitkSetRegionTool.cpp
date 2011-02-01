@@ -193,7 +193,7 @@ bool mitk::SetRegionTool::OnMousePressed (Action* action, const StateEvent* stat
       contourInImageIndexCoordinates->AddVertex( newPoint - 0.5 );
     }
 
-    m_SegmentationContourInWorldCoordinates = FeedbackContourTool::BackProjectContourFrom2DSlice( workingSlice, contourInImageIndexCoordinates, true ); // true, correct the result from ipMITKSegmentationGetContour8N
+    m_SegmentationContourInWorldCoordinates = FeedbackContourTool::BackProjectContourFrom2DSlice( workingSlice->GetGeometry(), contourInImageIndexCoordinates, true ); // true, correct the result from ipMITKSegmentationGetContour8N
 
     // 3. Show the contour
     FeedbackContourTool::SetFeedbackContour( *m_SegmentationContourInWorldCoordinates );
@@ -217,7 +217,7 @@ bool mitk::SetRegionTool::OnMousePressed (Action* action, const StateEvent* stat
     newPoint[0] = 0; newPoint[1] = originalPicSlice->n[1]; newPoint[2] = 0.0;
     contourInImageIndexCoordinates->AddVertex( newPoint );
 
-    m_WholeImageContourInWorldCoordinates = FeedbackContourTool::BackProjectContourFrom2DSlice( workingSlice, contourInImageIndexCoordinates, true ); // true, correct the result from ipMITKSegmentationGetContour8N
+    m_WholeImageContourInWorldCoordinates = FeedbackContourTool::BackProjectContourFrom2DSlice( workingSlice->GetGeometry(), contourInImageIndexCoordinates, true ); // true, correct the result from ipMITKSegmentationGetContour8N
 
     // 3. Show the contour
     FeedbackContourTool::SetFeedbackContour( *m_SegmentationContourInWorldCoordinates );

@@ -221,7 +221,7 @@ bool mitk::RegionGrowingTool::OnMousePressedInside(Action* itkNotUsed( action ),
       free(cutContour.deleteCurve); // perhaps visualize this for fun?
       free(cutContour.onGradient);
 
-      Contour::Pointer contourInWorldCoordinates = FeedbackContourTool::BackProjectContourFrom2DSlice( m_WorkingSlice, contourInImageIndexCoordinates, true ); // true: sub 0.5 for ipSegmentation correction
+      Contour::Pointer contourInWorldCoordinates = FeedbackContourTool::BackProjectContourFrom2DSlice( m_WorkingSlice->GetGeometry(), contourInImageIndexCoordinates, true ); // true: sub 0.5 for ipSegmentation correction
 
       FeedbackContourTool::SetFeedbackContour( *contourInWorldCoordinates );
       FeedbackContourTool::SetFeedbackContourVisible(true);
@@ -556,7 +556,7 @@ mitkIpPicDescriptor* mitk::RegionGrowingTool::PerformRegionGrowingAndUpdateConto
 
     free(contourPoints);
 
-    Contour::Pointer contourInWorldCoordinates = FeedbackContourTool::BackProjectContourFrom2DSlice( m_ReferenceSlice, contourInImageIndexCoordinates, true );   // true: sub 0.5 for ipSegmentation correctio
+    Contour::Pointer contourInWorldCoordinates = FeedbackContourTool::BackProjectContourFrom2DSlice( m_ReferenceSlice->GetGeometry(), contourInImageIndexCoordinates, true );   // true: sub 0.5 for ipSegmentation correctio
 
     FeedbackContourTool::SetFeedbackContour( *contourInWorldCoordinates );
   }

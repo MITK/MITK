@@ -277,11 +277,10 @@ bool mitk::PaintbrushTool::OnMouseMoved   (Action* itkNotUsed(action), const Sta
     contour->AddVertex( point );
   }
   
-  Image::Pointer slice = SegTool2D::GetAffectedImageSliceAs2DImage( positionEvent, image );
-  if ( slice.IsNull() ) return false;
-
   if (leftMouseButtonPressed)
   {
+    Image::Pointer slice = SegTool2D::GetAffectedImageSliceAs2DImage( positionEvent, image );
+    if ( slice.IsNull() ) return false;
     FeedbackContourTool::FillContourInSlice( contour, slice, m_PaintingPixelValue );
 
     OverwriteSliceImageFilter::Pointer slicewriter = OverwriteSliceImageFilter::New();
@@ -308,7 +307,7 @@ bool mitk::PaintbrushTool::OnMouseMoved   (Action* itkNotUsed(action), const Sta
     displayContour->AddVertex( point );
   }
 
-  displayContour = FeedbackContourTool::BackProjectContourFrom2DSlice( slice, displayContour );
+  displayContour = FeedbackContourTool::BackProjectContourFrom2DSlice( planeGeometry, displayContour );
   SetFeedbackContour( *displayContour );
   assert( positionEvent->GetSender()->GetRenderWindow() );
 

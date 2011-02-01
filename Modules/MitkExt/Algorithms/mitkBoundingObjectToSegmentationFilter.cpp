@@ -1,3 +1,19 @@
+/*=========================================================================
+ 
+Program:   Medical Imaging & Interaction Toolkit
+Language:  C++
+Date:      $Date$
+Version:   $Revision: 27918 $
+ 
+Copyright (c) German Cancer Research Center, Division of Medical and
+Biological Informatics. All rights reserved.
+See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
+ 
+This software is distributed WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.  See the above copyright notices for more information.
+ 
+=========================================================================*/
 #include "mitkBoundingObjectToSegmentationFilter.h"
 #include "mitkImageCast.h"
 
@@ -37,21 +53,41 @@ void mitk::BoundingObjectToSegmentationFilter::GenerateData()
 
   for (unsigned int i=0; i<m_boundingObjectGroup->GetCount(); i++)
   {
-    //create region for boundingobject
-    mitk::BoundingObject* boundingObject = m_boundingObjectGroup->GetBoundingObjects().at(i);
-    mitk::Geometry3D* boGeometry = boundingObject->GetGeometry();
-    mitk::Geometry3D* inputImageGeometry = inputImage->GetSlicedGeometry();
+     //create region for boundingobject
+    mitk::BoundingObject::Pointer boundingObject = m_boundingObjectGroup->GetBoundingObjects().at(i);
+    mitk::Geometry3D::Pointer boGeometry = boundingObject->GetGeometry();
+    mitk::Geometry3D::Pointer inputImageGeometry = inputImage->GetSlicedGeometry();
     mitk::BoundingBox::Pointer boToIm = boGeometry->CalculateBoundingBoxRelativeToTransform(inputImageGeometry->GetIndexToWorldTransform());
 
+    mitk::BoundingBox::ConstPointer imgBB = inputImageGeometry->GetBoundingBox();
+    mitk::BoundingBox::PointType minImg = imgBB->GetMinimum();
+    mitk::BoundingBox::PointType maxImg = imgBB->GetMaximum();
+
     itkImageType::IndexType boIndex;
+    itkImageType::SizeType boSize;
+
     mitk::BoundingBox::PointType min = boToIm->GetMinimum();
+    mitk::BoundingBox::PointType max = boToIm->GetMaximum();
+
+    //check if boundingbox is inside imageregion
+    for (int i =0; i<3; i++)
+    {
+      if (min [i] < minImg[i])
+        min[i] = minImg[i];
+      if (max [i] < minImg[i])
+        max[i] = minImg[i];
+      if (max[i] > maxImg[i])
+        max[i] = maxImg[i];
+      if (min [i] > maxImg[i])
+        min[i] = maxImg[i]-1;
+    }
+
+
     // add 0.5 (boGeometry is no image geometry)
     boIndex[0] = (mitk::SlicedData::IndexType::IndexValueType)(min[0] + 0.5);
     boIndex[1] = (mitk::SlicedData::IndexType::IndexValueType)(min[1] + 0.5);
     boIndex[2] = (mitk::SlicedData::IndexType::IndexValueType)(min[2] + 0.5);
 
-    itkImageType::SizeType boSize;
-    mitk::BoundingBox::PointType max = boToIm->GetMaximum();
     // add 1 because we need 0.5 for each index
     boSize[0] = (mitk::SlicedData::IndexType::IndexValueType) ((max[0]-min[0]) + 1);
     boSize[1] = (mitk::SlicedData::IndexType::IndexValueType) ((max[1]-min[1]) + 1);

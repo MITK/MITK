@@ -29,7 +29,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkContour.h>
 #include <mitkContourSet.h>
 #include <mitkItkBaseDataAdapter.h>
-#include <mitkPointData.h>
 #include <mitkMesh.h>
 #include <mitkSeedsImage.h>
 #include <mitkBoundingObject.h>

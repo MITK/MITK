@@ -223,6 +223,10 @@ void mitk::ExtractDirectedPlaneImageFilterNew::ItkSliceExtraction (itk::Image<TP
             resultSlice->SetPixel( sliceIterator.GetIndex(), inputImage->GetPixel(inputIndex) );
 
         }
+        else
+        {
+            resultSlice->SetPixel( sliceIterator.GetIndex(), 0);
+        }
 
         ++sliceIterator;
     }

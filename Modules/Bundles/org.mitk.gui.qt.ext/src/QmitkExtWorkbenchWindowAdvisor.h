@@ -47,6 +47,8 @@ public:
 
     void PreWindowOpen();
 
+    void PostWindowClose();
+
     void ShowViewToolbar(bool show);
 
     void ShowVersionInfo(bool show);

@@ -26,6 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QFile>
 #include <QRegExp>
 #include <QTextStream>
+#include <QSettings>
 
 #include <berryPlatform.h>
 #include <berryPlatformUI.h>
@@ -557,7 +558,17 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
  else
   delete qToolbar;
 
- 
+ Poco::Path path;
+ berry::IBundle::Pointer bundle = berry::Platform::GetBundle("org.mitk.gui.qt.ext");
+ berry::Platform::GetStatePath(path, bundle);
+
+ QString qPath = QString::fromStdString(path.toString());
+ qPath.append("PreferencesQt.ini");
+
+ QSettings settings(qPath, QSettings::IniFormat);
+ mainWindow->restoreState(settings.value("ToolbarPosition").toByteArray());
+
+
  // ====================================================
 
  // ===== Help menu ====================================
@@ -942,4 +953,20 @@ void QmitkExtWorkbenchWindowAdvisor::SetPerspectiveExcludeList(std::vector<std::
 std::vector<std::string> QmitkExtWorkbenchWindowAdvisor::GetPerspectiveExcludeList()
 {
   return this->perspectiveExcludeList;
+}
+
+void QmitkExtWorkbenchWindowAdvisor::PostWindowClose()
+{
+ Poco::Path path;
+ berry::IBundle::Pointer bundle = berry::Platform::GetBundle("org.mitk.gui.qt.ext");
+ berry::Platform::GetStatePath(path, bundle);
+
+ QString qPath = QString::fromStdString(path.toString());
+ qPath.append("PreferencesQt.ini");
+
+ berry::IWorkbenchWindow::Pointer window = this->GetWindowConfigurer()->GetWindow();
+ QMainWindow* mainWindow = static_cast<QMainWindow*> (window->GetShell()->GetControl());
+
+ QSettings settings(qPath, QSettings::IniFormat);
+ settings.setValue("ToolbarPosition", mainWindow->saveState());
 }

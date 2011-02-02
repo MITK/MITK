@@ -60,7 +60,6 @@ PURPOSE.  See the above copyright notices for more information.
 /*
 #include <mitkContour.h>
 #include <mitkContourSet.h>
-#include <mitkPointData.h>
 #include <mitkMesh.h>
 #include <mitkCone.h>
 #include <mitkCuboid.h>
@@ -170,8 +169,6 @@ int mitkPropertySerializationTest(int /* argc */, char* /*argv*/[])
   node->SetData(mitk::Contour::New());
   TestAllProperties(node->GetPropertyList());
   node->SetData(mitk::ContourSet::New());
-  TestAllProperties(node->GetPropertyList());
-  node->SetData(mitk::PointData::New());
   TestAllProperties(node->GetPropertyList());
   node->SetData(mitk::Mesh::New());
   TestAllProperties(node->GetPropertyList());

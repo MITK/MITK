@@ -89,7 +89,6 @@ SET(CPP_FILES
   DataManagement/mitkOrganTypeProperty.cpp
   DataManagement/mitkPlaneLandmarkProjector.cpp
   DataManagement/mitkPlane.cpp
-  DataManagement/mitkPointData.cpp
   DataManagement/mitkPropertyManager.cpp
   DataManagement/mitkPropertyObserver.cpp
   DataManagement/mitkSeedsImage.cpp
@@ -171,7 +170,7 @@ SET(CPP_FILES
   Rendering/mitkMeshMapper2D.cpp
   Rendering/mitkMeshVtkMapper3D.cpp
   Rendering/mitkNativeRenderWindowInteractor.cpp
-  Rendering/mitkPointDataVtkMapper3D.cpp
+
   Rendering/mitkSplineMapper2D.cpp
   Rendering/mitkSplineVtkMapper3D.cpp
   Rendering/mitkUnstructuredGridMapper2D.cpp

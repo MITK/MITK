@@ -49,7 +49,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkContourSetVtkMapper3D.h>
 #include <mitkContourVtkMapper3D.h>
 #include <mitkMeshVtkMapper3D.h>
-#include <mitkPointDataVtkMapper3D.h>
 #include <mitkUnstructuredGridVtkMapper3D.h>
 #include <mitkLineVtkMapper3D.h>
 #include <mitkSplineVtkMapper3D.h>
@@ -104,10 +103,6 @@ static void TestDataSetting(mitk::DataNode::Pointer dataNode)
   dataNode->SetData(baseData);
   MITK_TEST_CONDITION( baseData == dataNode->GetData(), "Testing if a ItkBaseDataAdapter object was set correctly" )
 
-  baseData = mitk::PointData::New();
-  dataNode->SetData(baseData);
-  MITK_TEST_CONDITION( baseData == dataNode->GetData(), "Testing if a PointSet object was set correctly" )
-  
   baseData = mitk::Mesh::New();
   dataNode->SetData(baseData);
   MITK_TEST_CONDITION( baseData == dataNode->GetData(), "Testing if a Mesh object was set correctly" )
@@ -180,11 +175,6 @@ static void TestMapperSetting(mitk::DataNode::Pointer dataNode)
   mapper = mitk::MeshVtkMapper3D::New();
   dataNode->SetMapper(1,mapper);
   MITK_TEST_CONDITION( mapper == dataNode->GetMapper(1), "Testing if a MeshVtkMapper3D was set correctly" )
-  MITK_TEST_CONDITION( dataNode == mapper->GetDataNode(), "Testing if the mapper returns the right DataNode" )
-
-  mapper = mitk::PointDataVtkMapper3D::New();
-  dataNode->SetMapper(1,mapper);
-  MITK_TEST_CONDITION( mapper == dataNode->GetMapper(1), "Testing if a PointDataVtkMapper3D was set correctly" )
   MITK_TEST_CONDITION( dataNode == mapper->GetDataNode(), "Testing if the mapper returns the right DataNode" )
 
   mapper = mitk::UnstructuredGridVtkMapper3D::New();

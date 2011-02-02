@@ -43,7 +43,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkMeshMapper2D.h"
 #include "mitkMeshVtkMapper3D.h"
 #include "mitkUnstructuredGridMapper2D.h"
-#include "mitkPointDataVtkMapper3D.h"
 #include "mitkEnhancedPointSetVtkMapper3D.h"
 #include "mitkSeedsImage.h"
 #include "mitkUnstructuredGrid.h"
@@ -93,11 +92,6 @@ mitk::Mapper::Pointer mitk::CoreExtObjectFactory::CreateMapper(mitk::DataNode* n
       newMapper = mitk::MeshMapper2D::New();
       newMapper->SetDataNode(node);
     }
-    else if((dynamic_cast<PointData*>(data)!=NULL))
-    {
-      newMapper = mitk::PolyDataGLMapper2D::New();
-      newMapper->SetDataNode(node);
-    }
     else if((dynamic_cast<Contour*>(data)!=NULL))
     {
       newMapper = mitk::ContourMapper2D::New();
@@ -124,11 +118,6 @@ mitk::Mapper::Pointer mitk::CoreExtObjectFactory::CreateMapper(mitk::DataNode* n
     else if((dynamic_cast<Mesh*>(data)!=NULL))
     {
       newMapper = mitk::MeshVtkMapper3D::New();
-      newMapper->SetDataNode(node);
-    }
-    else if((dynamic_cast<PointData*>(data)!=NULL))
-    {
-      newMapper = mitk::PointDataVtkMapper3D::New();
       newMapper->SetDataNode(node);
     }
     else if((dynamic_cast<Contour*>(data)!=NULL))

@@ -94,7 +94,7 @@ void mitk::ExtractImageFilter::GenerateData()
    }
  
   PlaneGeometry::Pointer planeGeometry = PlaneGeometry::New();
-  planeGeometry->InitializeStandardPlane( inputImageGeometry, orientation, (ScalarType)m_SliceIndex + 0.5 , true, false );
+  planeGeometry->InitializeStandardPlane( inputImageGeometry, orientation, (ScalarType)m_SliceIndex, true, false );
   Image::Pointer resultImage = ImageToImageFilter::GetOutput();
   planeGeometry->ChangeImageGeometryConsideringOriginOffset(true);
   resultImage->SetGeometry( planeGeometry );

@@ -839,8 +839,7 @@ void ImageStatisticsCalculator::InternalCalculateMaskFromPlanarFigure(
     
     // Ensure correct pixel center
     point3D[0] -= 0.5 / imageSpacing3D[0];
-    point3D[1] -= 0.5 / imageSpacing3D[0];
-    point3D[2] -= 0.5 / imageSpacing3D[0];
+    point3D[1] -= 0.5 / imageSpacing3D[1];
 
     // Polygons (partially) outside of the image bounds can not be processed
     // further due to a bug in vtkPolyDataToImageStencil

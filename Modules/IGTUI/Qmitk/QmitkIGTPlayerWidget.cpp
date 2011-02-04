@@ -202,7 +202,7 @@ const std::vector<mitk::NavigationData::Pointer> QmitkIGTPlayerWidget::GetNaviga
 
   if(m_Player.IsNotNull())
   {
-    for(int i=0; i < m_Player->GetNumberOfOutputs(); ++i)
+    for(unsigned int i=0; i < m_Player->GetNumberOfOutputs(); ++i)
     {
       navDatas.push_back(m_Player->GetOutput(i));
     }

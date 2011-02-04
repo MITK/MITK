@@ -75,7 +75,7 @@ void QmitkIGTLoggerWidget::CreateConnections()
   if ( m_Controls )
   {     
     connect( (QObject*)(m_Controls->m_pbLoadDir), SIGNAL(clicked()), this, SLOT(OnChangePressed()) );
-    connect( (QObject*)(m_Controls->m_pbStartRecording), SIGNAL(clicked()), this, SLOT(OnStartRecording()) );
+    connect( (QObject*)(m_Controls->m_pbStartRecording), SIGNAL(clicked(bool)), this, SLOT(OnStartRecording(bool)) );
     connect( m_RecordingTimer, SIGNAL(timeout()), this, SLOT(OnRecording()) );    
     connect( (QObject*)(m_Controls->m_leRecordingValue), SIGNAL(editingFinished()), this, SLOT(UpdateRecordingTime()) );
     connect( (QObject*)(m_Controls->m_cbRecordingType), SIGNAL(activated(int)), this, SLOT(UpdateRecordingTime()) );
@@ -89,7 +89,7 @@ void QmitkIGTLoggerWidget::SetDataStorage(mitk::DataStorage* dataStorage)
   m_DataStorage = dataStorage;
 }
 
-void QmitkIGTLoggerWidget::OnStartRecording()
+void QmitkIGTLoggerWidget::OnStartRecording(bool recording)
 {
 
   if (m_Recorder.IsNull())
@@ -102,6 +102,9 @@ void QmitkIGTLoggerWidget::OnStartRecording()
     QMessageBox::warning(NULL, "Warning", QString("Please specify filename!"));
     return;
   }
+
+  if(recording)
+  {
 
   if (!m_RecordingActivated)
   {   
@@ -138,6 +141,13 @@ void QmitkIGTLoggerWidget::OnStartRecording()
     this->StopRecording();   
   }
 
+  }
+  else
+  {
+    this->StopRecording(); 
+    m_Controls->m_pbStartRecording->setChecked(false);
+  }
+
 }
 
 void QmitkIGTLoggerWidget::StopRecording()
@@ -146,9 +156,12 @@ void QmitkIGTLoggerWidget::StopRecording()
   m_Recorder->StopRecording();
   mitk::StatusBar::GetInstance()->DisplayText("Recording STOPPED", 2000); // Display  message for 2s in status bar
   m_Controls->m_pbStartRecording->setText("Start recording");
+  m_Controls->m_pbStartRecording->setChecked(false);
   m_Controls->m_leRecordingValue->setEnabled(true);
   m_Controls->m_cbRecordingType->setEnabled(true);
   m_RecordingActivated = false;
+
+ 
 }
 
 void QmitkIGTLoggerWidget::OnRecording()

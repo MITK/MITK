@@ -52,7 +52,7 @@ class MitkIGTUI_EXPORT QmitkIGTLoggerWidget : public QWidget
 
   protected slots:    
     void OnChangePressed();
-    void OnStartRecording();    
+    void OnStartRecording(bool recording);    
     void OnRecording();    
     void UpdateRecordingTime();
     void StopRecording();

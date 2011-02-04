@@ -10,6 +10,7 @@ SET(CPP_FILES
   Qmitk/QmitkToolDistanceWidget.cpp
   Qmitk/QmitkToolTrackingStatusWidget.cpp
   Qmitk/QmitkTrackingSourcesCheckBoxPanelWidget.cpp
+  Qmitk/QmitkIGTPlayerWidget.cpp
 )
 
 SET(UI_FILES
@@ -22,6 +23,7 @@ SET(UI_FILES
   Qmitk/QmitkToolDistanceWidgetControls.ui
   Qmitk/QmitkToolTrackingStatusWidgetControls.ui
   Qmitk/QmitkTrackingSourcesCheckBoxPanelWidgetControls.ui
+  Qmitk/QmitkIGTPlayerWidgetControls.ui
 )
 
 SET(MOC_H_FILES
@@ -36,6 +38,11 @@ SET(MOC_H_FILES
   Qmitk/QmitkToolDistanceWidget.h
   Qmitk/QmitkToolTrackingStatusWidget.h
   Qmitk/QmitkTrackingSourcesCheckBoxPanelWidget.h
+  Qmitk/QmitkIGTPlayerWidget.h
+)
+
+SET(QRC_FILES
+  resources/IGTUI.qrc
 )
 
 

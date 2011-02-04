@@ -93,6 +93,14 @@ namespace mitk {
     */
     void Resume();
 
+
+    /**
+    * \brief This method checks if player arrived at end of file.
+    * 
+    *\warning This method is not tested yet. It is not save to use!
+    */
+    const bool IsAtEnd();
+
     /**
     * \brief The PlayerMode is used for generating a presetted output stream. You do not need to
     * set it if you want to use your own stream.
@@ -183,6 +191,12 @@ namespace mitk {
     TiXmlElement * m_parentElement;
 
     TiXmlNode * m_currentNode;
+
+    bool m_StreamEnd; ///< stores if the input stream arrived at end
+
+
+    
+
   };
 } // namespace mitk
 

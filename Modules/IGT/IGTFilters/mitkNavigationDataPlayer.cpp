@@ -40,6 +40,9 @@ mitk::NavigationDataPlayer::NavigationDataPlayer()
   m_parentElement = NULL;
   m_currentNode = NULL;
 
+  m_StreamEnd = false;
+
+
   //To get a start time
   mitk::TimeStamp::GetInstance()->Start(this);
 
@@ -85,7 +88,7 @@ void mitk::NavigationDataPlayer::GenerateData()
   //now we make a little time arithmetic 
   //to get the elapsed time since the start of the player
   TimeStampType timeSinceStart = now - m_StartPlayingTimeStamp;
-  
+ 
   //init the vectors
   std::vector< NavigationData::Pointer > nextCandidates; 
   std::vector< NavigationData::Pointer > lastCandidates; 
@@ -93,6 +96,7 @@ void mitk::NavigationDataPlayer::GenerateData()
 
   for (unsigned int index=0; index < m_NumberOfOutputs; index++)
   {
+  
     nextCandidates.push_back(m_NextToPlayNavigationData.at(index));
     lastCandidates.push_back(m_NextToPlayNavigationData.at(index));
     
@@ -115,7 +119,10 @@ void mitk::NavigationDataPlayer::GenerateData()
   // The loop will stop when a suitable NavigationData is found or we reach EOF.
   // The timestamps of each recorded NavigationData should be equal 
   // therefore we take always the time from the first.
-  while(nextCandidates[0]->GetTimeStamp() < currentTimeOfData[0])
+
+
+  
+  while( nextCandidates[0]->GetTimeStamp() < currentTimeOfData[0])
   {
     for (unsigned int index=0; index < m_NumberOfOutputs; index++)
     {
@@ -136,6 +143,7 @@ void mitk::NavigationDataPlayer::GenerateData()
       {
         if (nextCandidates.at(index).IsNull())
         {
+          m_StreamEnd = true;
           StopPlaying();
           return; //the case if no NavigationData is found, e.g. EOF, bad stream
         }
@@ -153,8 +161,10 @@ void mitk::NavigationDataPlayer::GenerateData()
     output->Graft(lastCandidates.at(index));
     m_NextToPlayNavigationData[index] = nextCandidates.at(index);
   }
-  
 }
+
+
+
 
 
 void mitk::NavigationDataPlayer::UpdateOutputInformation()
@@ -168,12 +178,16 @@ void mitk::NavigationDataPlayer::InitPlayer()
 {
   if (m_Stream == NULL)
   { 
+    m_StreamEnd = true;
+
     StopPlaying();
     std::cout << "Playing not possible. Wrong file name or path? " << std::endl;
     return;
   }
   if (!m_Stream->good())
   {
+    m_StreamEnd = true;
+
     StopPlaying();
     std::cout << "Playing not possible. Stream is not good!" << std::endl;
     return;
@@ -184,6 +198,8 @@ void mitk::NavigationDataPlayer::InitPlayer()
   //check if we have a valid version
   if (m_FileVersion < 1)
   {
+    m_StreamEnd = true;
+
     StopPlaying();
     std::cout << "Playing not possible. Stream is not good!" << std::endl;
     return;
@@ -458,6 +474,8 @@ void mitk::NavigationDataPlayer::GetFirstData()
 
         if (m_NextToPlayNavigationData[index].IsNull())
         {
+          m_StreamEnd = true;
+
           StopPlaying();
           std::cout << "XML File is corrupt or has no NavigationData" << std::endl;
           return;
@@ -488,7 +506,7 @@ void mitk::NavigationDataPlayer::Pause()
   }
   else
   {
-    std::cout << "Player is either not started or already in paused" << std::endl;
+    std::cout << "Player is either not started or already is paused" << std::endl;
   }
 
 }
@@ -500,8 +518,11 @@ void mitk::NavigationDataPlayer::Resume()
   if(!m_Playing && m_Pause)
   { 
     m_Playing = true;
+    m_Pause = false;
     mitk::NavigationData::TimeStampType now = mitk::TimeStamp::GetInstance()->GetElapsed();
-    m_StartPlayingTimeStamp = now + (m_PauseTimeStamp - m_StartPlayingTimeStamp);
+    
+    // in this case m_StartPlayingTimeStamp is set to the total elapsed time with NO playback
+    m_StartPlayingTimeStamp = now - (m_PauseTimeStamp - m_StartPlayingTimeStamp);    
   }
   else
   {
@@ -546,6 +567,7 @@ void mitk::NavigationDataPlayer::SetStream( std::istream* stream )
 {
   if (!stream->good())
   {
+    m_StreamEnd = true;
     std::cout << "The stream is not good" << std::endl;
     return;
   }
@@ -556,3 +578,7 @@ void mitk::NavigationDataPlayer::SetStream( std::istream* stream )
   InitPlayer();
 }
 
+const bool mitk::NavigationDataPlayer::IsAtEnd()
+{
+  return this->m_StreamEnd;
+}

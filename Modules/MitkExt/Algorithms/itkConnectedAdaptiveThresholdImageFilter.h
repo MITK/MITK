@@ -36,6 +36,7 @@ namespace itk
     typedef TOutputImage OutputImageType;
     typedef typename OutputImageType::Pointer OutputImagePointer;
     typedef typename InputImageType::IndexType    IndexType;
+    typedef typename InputImageType::PixelType    PixelType;
 
 
     void SetGrowingDirectionIsUpwards(bool upwards)
@@ -94,9 +95,9 @@ namespace itk
   private:
     OutputImagePointer m_OutoutImageMaskFineSegmentation;
     bool m_GrowingDirectionIsUpwards;
-    int m_SeedpointValue;
-    int m_DetectedLeakagePoint;
-    int m_InitValue ;
+    PixelType m_SeedpointValue;
+    PixelType m_DetectedLeakagePoint;
+    PixelType m_InitValue ;
     unsigned int m_AdjLowerTh;
     unsigned int m_AdjUpperTh;
     itk::Index<3> m_SeedPointIndex;

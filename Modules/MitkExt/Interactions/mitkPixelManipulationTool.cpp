@@ -157,11 +157,13 @@ void mitk::PixelManipulationTool::AddImageToDataStorage(mitk::Image::Pointer ima
   if (image.IsNotNull())
   {
     mitk::DataNode::Pointer node = mitk::DataNode::New();
-    node->SetName("");
+    std::string name = m_OriginalImageNode->GetName();
+    name.append("_modified");
+    node->SetName(name);
     node->SetProperty("binary", mitk::BoolProperty::New(false));
     node->SetData(image);
 
     if (m_ToolManager)
-      m_ToolManager->GetDataStorage()->Add(node);
+      m_ToolManager->GetDataStorage()->Add(node, m_OriginalImageNode);
   }
 }

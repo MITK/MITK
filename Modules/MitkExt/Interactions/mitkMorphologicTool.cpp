@@ -64,7 +64,7 @@ void mitk::MorphologicTool::AcceptPreview(const std::string& name, const Color& 
 
     if (mitk::DataStorage* ds = m_ToolManager->GetDataStorage())
     {
-      ds->Add(resultNode);
+      ds->Add(resultNode, m_OriginalNode);
     }
   }
 

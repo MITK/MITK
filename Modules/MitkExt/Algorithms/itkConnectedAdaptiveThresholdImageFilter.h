@@ -2,7 +2,6 @@
 #define __itkConnectedAdaptiveThresholdImageFilter_h
 
 #include "itkImage.h"
-#include "MitkSBExports.h"
 #include "itkConnectedThresholdImageFilter.h"
 
 

@@ -19,7 +19,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkTool.h"
 #include "mitkPointSet.h"
-#include "mitkRegionGrow3DTool.xpm"
 #include "MitkExtExports.h"
 #include "mitkStateEvent.h"
 

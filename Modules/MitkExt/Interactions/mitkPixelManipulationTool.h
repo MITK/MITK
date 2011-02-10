@@ -18,7 +18,6 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKPIXELMANIPULATIONTOOL_H
 
 #include "mitkTool.h"
-#include "mitkPixelManipulationTool.xpm"
 #include "MitkExtExports.h"
 
 #include "itkImage.h"

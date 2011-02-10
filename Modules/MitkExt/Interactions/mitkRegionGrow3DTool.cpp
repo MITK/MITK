@@ -29,6 +29,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkMaskAndCutRoiImageFilter.h"
 #include "mitkPadImageFilter.h"
 
+#include "mitkRegionGrow3DTool.xpm"
+
 namespace mitk {
   MITK_TOOL_MACRO(MitkExt_EXPORT, RegionGrow3DTool, "RegionGrower 3D");
 }
@@ -201,7 +203,7 @@ void mitk::RegionGrow3DTool::StartRegionGrowing(itk::Image<TPixel, VImageDimensi
   IndexType seedIndex;
   imageGeometry->WorldToIndex( seedPoint, seedIndex);// convert world coordinates to image indices
 
-  int seedValue = itkImage->GetPixel(seedIndex);
+  //int seedValue = itkImage->GetPixel(seedIndex);
 
   regionGrower->SetInput( itkImage );
   regionGrower->AddSeed( seedIndex );

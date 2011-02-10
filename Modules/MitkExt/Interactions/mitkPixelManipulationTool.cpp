@@ -23,6 +23,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkBoundingObjectToSegmentationFilter.h"
 #include <itkImageRegionIterator.h>
 
+#include "mitkPixelManipulationTool.xpm"
+
 namespace mitk {
   MITK_TOOL_MACRO(MitkExt_EXPORT, PixelManipulationTool, "Pixel manipulation tool");
 }
@@ -48,7 +50,7 @@ void mitk::PixelManipulationTool::Activated()
     mitk::Image::Pointer image = dynamic_cast<mitk::Image*> (m_OriginalImageNode->GetData());
     if ( image.IsNotNull())
     {
-      mitk::ScalarType scalar = image->GetScalarValueMax();
+      //mitk::ScalarType scalar = image->GetScalarValueMax();
     }
   }
   else

@@ -1,5 +1,5 @@
 /* XPM */
-static char * btnPyramid_xpm[] = {
+static const char * btnPyramid_xpm[] = {
 "48 48 469 2",
 "  	c None",
 ". 	c #2E3436",

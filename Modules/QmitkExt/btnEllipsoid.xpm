@@ -1,5 +1,5 @@
 /* XPM */
-static char * btnEllipsoid_xpm[] = {
+static const char * btnEllipsoid_xpm[] = {
 "48 48 650 2",
 "  	c None",
 ". 	c #2E3436",

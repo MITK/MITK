@@ -90,7 +90,7 @@ void mitk::RegionGrow3DTool::Activated()
 {
   if (m_ToolManager)
   {
-    m_ToolManager->RoiDataChanged += mitk::MessageDelegate<mitk::RegionGrow3DTool>(this, &mitk::RegionGrow3DTool::OnRoiDataChanged);
+    m_ToolManager->RoiDataChanged += mitk::MessageDelegate<mitk::RegionGrow3DTool>(this, &mitk::RegionGrow3DTool::UpdatePreview);
     m_OriginalImageNode = m_ToolManager->GetReferenceData(0);
     m_NodeToProceed = m_OriginalImageNode;
 
@@ -111,7 +111,7 @@ void mitk::RegionGrow3DTool::Activated()
 
 void mitk::RegionGrow3DTool::Deactivated()
 {
-  m_ToolManager->RoiDataChanged -= mitk::MessageDelegate<mitk::RegionGrow3DTool>(this, &mitk::RegionGrow3DTool::OnRoiDataChanged);
+  m_ToolManager->RoiDataChanged -= mitk::MessageDelegate<mitk::RegionGrow3DTool>(this, &mitk::RegionGrow3DTool::UpdatePreview);
   if (mitk::DataStorage* ds = m_ToolManager->GetDataStorage())
   {
     ds->Remove(m_PointSetNode);
@@ -395,7 +395,7 @@ void mitk::RegionGrow3DTool::SetupPreviewNodeFor( DataNode* nodeToProceed)
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
-void mitk::RegionGrow3DTool::OnRoiDataChanged()
+void mitk::RegionGrow3DTool::UpdatePreview()
 {
   typedef itk::Image<int, 3> ItkImageType;
   typedef itk::Image<unsigned char, 3> ItkMaskType;
@@ -417,13 +417,13 @@ void mitk::RegionGrow3DTool::OnRoiDataChanged()
   mitk::MaskAndCutRoiImageFilter::Pointer roiFilter = mitk::MaskAndCutRoiImageFilter::New();
   roiFilter->SetInput(dynamic_cast<mitk::Image*> (m_NodeToProceed->GetData()));
 
-  roiFilter->SetRegionOfInterestByNode(node);
+  roiFilter->SetRegionOfInterest(node->GetData());
   roiFilter->Update();
 
   mitk::DataNode::Pointer new_node = mitk::DataNode::New();
-  mitk::Image::Pointer tmpImage = roiFilter->GetImage();
-  tmpImage->DisconnectPipeline();
+  mitk::Image::Pointer tmpImage = roiFilter->GetOutput();
   new_node->SetData(tmpImage);
+
   m_RoiMax = roiFilter->GetMaxValue();
   m_RoiMin = roiFilter->GetMinValue();
 

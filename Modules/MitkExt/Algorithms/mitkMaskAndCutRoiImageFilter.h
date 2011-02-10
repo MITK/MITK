@@ -28,6 +28,13 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk
 {
+  /**
+  \brief Cuts a region of interest (ROI) out of an image
+
+  In the first step, this filter reduces the image region of the given ROI to a minimum. Using this region, a subvolume ist cut out of the given input image.
+  The ROI is then used to mask the subvolume. Pixel inside the ROI will have their original value, pixel outside will be replaced by m_OutsideValue
+
+  */
   class MitkExt_EXPORT MaskAndCutRoiImageFilter : public ImageToImageFilter
   {
       typedef itk::Image<short, 3> ItkImageType;
@@ -42,10 +49,13 @@ namespace mitk
     itkGetMacro(MaxValue, mitk::ScalarType);
     itkGetMacro(MinValue, mitk::ScalarType);
 
-    void SetRegionOfInterest(Image::Pointer image);
-    void SetRegionOfInterest(BoundingObject::Pointer boundingObject);
-    void SetRegionOfInterestByNode(mitk::DataNode::Pointer node);
-    mitk::Image::Pointer GetImage();
+    void SetRegionOfInterest(mitk::BaseData* roi);
+    //void SetRegionOfInterest(Image::Pointer image);
+    //void SetRegionOfInterest(BoundingObject::Pointer boundingObject);
+    //void SetRegionOfInterestByNode(mitk::DataNode::Pointer node);
+
+    //temporary fix for bug #
+    mitk::Image::Pointer GetOutput();
 
   protected:
     MaskAndCutRoiImageFilter();
@@ -56,6 +66,8 @@ namespace mitk
     ROIFilterType::Pointer m_RoiFilter;
     mitk::AutoCropImageFilter::Pointer m_CropFilter;
     mitk::MaskImageFilter::Pointer m_MaskFilter;
+
+    //needed for temporary fix
     mitk::Image::Pointer m_outputImage;
 
     mitk::ScalarType m_MaxValue;

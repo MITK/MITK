@@ -275,11 +275,11 @@ void mitk::BinaryThresholdULTool::OnRoiDataChanged()
       return;
 
     roiFilter->SetInput(image);
-    roiFilter->SetRegionOfInterestByNode(node);
+    roiFilter->SetRegionOfInterest(node->GetData());
     roiFilter->Update();
 
     mitk::DataNode::Pointer tmpNode = mitk::DataNode::New();
-    tmpNode->SetData(roiFilter->GetImage());
+    tmpNode->SetData(roiFilter->GetOutput());
 
     m_SensibleMinimumThresholdValue = static_cast<int>( roiFilter->GetMinValue());
     m_SensibleMaximumThresholdValue = static_cast<int>( roiFilter->GetMaxValue());

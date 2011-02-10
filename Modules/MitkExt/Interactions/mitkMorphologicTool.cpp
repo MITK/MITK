@@ -95,10 +95,10 @@ void mitk::MorphologicTool::UpdatePreview()
 
     mitk::MaskAndCutRoiImageFilter::Pointer roiFilter = mitk::MaskAndCutRoiImageFilter::New();
     roiFilter->SetInput(image);
-    roiFilter->SetRegionOfInterestByNode(node);
+    roiFilter->SetRegionOfInterest(node->GetData());
     roiFilter->Update();
 
-    maskedImage = roiFilter->GetImage();
+    maskedImage = roiFilter->GetOutput();
     new_node->SetData(maskedImage);
 
     m_NodeToProceed = new_node;

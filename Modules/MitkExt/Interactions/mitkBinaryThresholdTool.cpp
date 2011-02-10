@@ -287,11 +287,11 @@ void mitk::BinaryThresholdTool::OnRoiDataChanged()
     mitk::MaskAndCutRoiImageFilter::Pointer roiFilter = mitk::MaskAndCutRoiImageFilter::New();
 
     roiFilter->SetInput(image);
-    roiFilter->SetRegionOfInterestByNode(node);
+    roiFilter->SetRegionOfInterest(node->GetData());
     roiFilter->Update();
 
     mitk::DataNode::Pointer tmpNode = mitk::DataNode::New();
-    mitk::Image::Pointer tmpImage = roiFilter->GetImage();
+    mitk::Image::Pointer tmpImage = roiFilter->GetOutput();
 
     tmpNode->SetData(tmpImage);
 
@@ -303,8 +303,9 @@ void mitk::BinaryThresholdTool::OnRoiDataChanged()
     return;
   }
   else
-  {this->SetupPreviewNodeFor(m_OriginalImageNode);
-  m_NodeForThresholding = m_OriginalImageNode;
-  return;
+  {
+    this->SetupPreviewNodeFor(m_OriginalImageNode);
+    m_NodeForThresholding = m_OriginalImageNode;
+    return;
   }
 }

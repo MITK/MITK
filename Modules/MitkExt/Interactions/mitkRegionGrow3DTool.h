@@ -58,7 +58,7 @@ namespace mitk{
     virtual ~RegionGrow3DTool();
 
     void SetupPreviewNodeFor(mitk::DataNode* nodeToProceed);
-    void OnRoiDataChanged();
+    void UpdatePreview();
     template < typename TPixel, unsigned int VImageDimension >
     void StartRegionGrowing( itk::Image< TPixel, VImageDimension >* itkImage, mitk::Geometry3D* imageGeometry, mitk::PointSet::PointType seedPoint );
 

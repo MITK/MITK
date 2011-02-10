@@ -22,6 +22,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk
 {
+  /**
+  \brief Superclass for tools using morphologic operations to modify a segmentation
+  */
   class MitkExt_EXPORT MorphologicTool : public Tool
   {
   public:

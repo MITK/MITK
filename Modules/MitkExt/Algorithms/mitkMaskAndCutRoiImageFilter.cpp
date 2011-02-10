@@ -32,41 +32,30 @@ mitk::MaskAndCutRoiImageFilter::~MaskAndCutRoiImageFilter()
 
 }
 
-void mitk::MaskAndCutRoiImageFilter::SetRegionOfInterest(mitk::Image::Pointer image)
+void mitk::MaskAndCutRoiImageFilter::SetRegionOfInterest(mitk::BaseData* roi)
 {
+  mitk::Image::Pointer image = dynamic_cast<mitk::Image*> (roi);
+
   if (image.IsNotNull())
   {
     this->SetInput(1, image);
+    return;
   }
-}
 
-void mitk::MaskAndCutRoiImageFilter::SetRegionOfInterest(mitk::BoundingObject::Pointer boundingObject)
-{
+  mitk::BoundingObject::Pointer boundingObject = dynamic_cast<mitk::BoundingObject*> (roi);
   if (boundingObject.IsNotNull() && this->GetInput(0) != NULL)
   {
     mitk::BoundingObjectToSegmentationFilter::Pointer filter = mitk::BoundingObjectToSegmentationFilter::New();
     filter->SetBoundingObject( boundingObject);
     filter->SetInput(this->GetInput(0));
     filter->Update();
-    this->SetRegionOfInterest(filter->GetOutput());
+
+    this->SetInput(1, filter->GetOutput());
+    return;
   }
-
 }
 
-void mitk::MaskAndCutRoiImageFilter::SetRegionOfInterestByNode(mitk::DataNode::Pointer node)
-{
-  mitk::BoundingObject::Pointer boundingObject = dynamic_cast<mitk::BoundingObject*> (node->GetData());
-  if (boundingObject)
-  {
-   this->SetRegionOfInterest(boundingObject);
-   return;
- }
-  mitk::Image::Pointer image = dynamic_cast<mitk::Image*> (node->GetData());
-  if (image)
-    this->SetRegionOfInterest(image);
-}
-
-mitk::Image::Pointer mitk::MaskAndCutRoiImageFilter::GetImage()
+mitk::Image::Pointer mitk::MaskAndCutRoiImageFilter::GetOutput()
 {
     return m_outputImage;
 }
@@ -76,6 +65,8 @@ void mitk::MaskAndCutRoiImageFilter::GenerateData()
 
   mitk::Image::ConstPointer  inputImage = this->GetInput(0);
   mitk::Image::ConstPointer  maskImage = this->GetInput(1);
+  //mitk::Image::Pointer outputImage = this->GetOutput();
+  //temporary fix for bug #
   m_outputImage = this->GetOutput();
 
   ItkImageType::Pointer itkImage = ItkImageType::New();
@@ -98,10 +89,12 @@ void mitk::MaskAndCutRoiImageFilter::GenerateData()
   m_MaskFilter->SetInput(0,tmpImage);
   m_MaskFilter->SetMask(m_CropFilter->GetOutput());
 
-  //maskFilter->SetOutsideValue(0);
+  m_MaskFilter->SetOutsideValue(-32765);
   m_MaskFilter->Update();
   m_MaxValue = m_MaskFilter->GetMaxValue();
   m_MinValue = m_MaskFilter->GetMinValue();
+
+  //temporary fix for bug #
   m_outputImage = m_MaskFilter->GetOutput();
   m_outputImage->DisconnectPipeline();
 }

@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 QmitkToolRoiDataSelectionBox::QmitkToolRoiDataSelectionBox(QWidget* parent, mitk::DataStorage* storage)
 :QWidget(parent),
 m_SelfCall(false),
-m_lastSelection(NULL),
+m_lastSelection(mitk::DataNode::New()),
 m_lastSelectedName(tr("none"))
 {
 
@@ -82,7 +82,7 @@ void QmitkToolRoiDataSelectionBox::OnToolManagerRoiDataModified()
 {
   if (m_SelfCall)
     return;
-  //UpdateComboBoxData();
+  UpdateComboBoxData();
 }
 
 void QmitkToolRoiDataSelectionBox::OnRoiDataSelectionChanged()
@@ -109,12 +109,22 @@ void QmitkToolRoiDataSelectionBox::OnRoiDataSelectionChanged(const QString& name
   else
   {
     selection = m_ToolManager->GetDataStorage()->GetNamedNode(name.toLocal8Bit().data());
+
+    if (m_lastSelection.IsNotNull())
+      m_lastSelection->SetProperty("outline binary", mitk::BoolProperty::New(false));
   }
 
   if (selection == m_lastSelection)
     return;
 
   m_lastSelection = selection;
+
+  if (m_lastSelection.IsNotNull())
+  {
+    m_lastSelection->SetProperty("outline binary", mitk::BoolProperty::New(true));
+    m_lastSelection->SetProperty("outline width", mitk::FloatProperty::New(2.0));
+  }
+
   m_SelfCall = true;
   m_ToolManager->SetRoiData(selection);
   m_SelfCall = false;

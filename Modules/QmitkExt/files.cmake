@@ -99,14 +99,14 @@ SET(CPP_FILES
  QmitkPointListViewWidget.cpp
  QmitkVideoBackground.cpp
  QmitkHotkeyLineEdit.cpp
-
- #QmitkErodeToolGUI.cpp
- #QmitkDilateToolGUI.cpp
- #QmitkMorphologicToolGUI.cpp
- #QmitkOpeningToolGUI.cpp
- #QmitkClosingToolGUI.cpp
- #QmitkBinaryThresholdULToolGUI.cpp
- #QmitkPixelManipulationToolGUI.cpp
+ QmitkErodeToolGUI.cpp
+ QmitkDilateToolGUI.cpp
+ QmitkMorphologicToolGUI.cpp
+ QmitkOpeningToolGUI.cpp
+ QmitkClosingToolGUI.cpp
+ QmitkBinaryThresholdULToolGUI.cpp
+ QmitkPixelManipulationToolGUI.cpp
+ QmitkRegionGrow3DToolGUI.cpp
  QmitkToolRoiDataSelectionBox.cpp
  QmitkBoundingObjectWidget.cpp
 )
@@ -197,13 +197,14 @@ SET(MOC_H_FILES
  QmitkFileChooser.h
  QmitkHotkeyLineEdit.h
  QmitkAboutDialog/QmitkAboutDialog.h
- #QmitkErodeToolGUI.h
- #QmitkDilateToolGUI.h
- #QmitkMorphologicToolGUI.h
- #QmitkOpeningToolGUI.h
- #QmitkClosingToolGUI.h
- #QmitkBinaryThresholdULToolGUI.h
- #QmitkPixelManipulationToolGUI.h
+ QmitkErodeToolGUI.h
+ QmitkDilateToolGUI.h
+ QmitkMorphologicToolGUI.h
+ QmitkOpeningToolGUI.h
+ QmitkClosingToolGUI.h
+ QmitkBinaryThresholdULToolGUI.h
+ QmitkPixelManipulationToolGUI.h
+ QmitkRegionGrow3DToolGUI.h
  QmitkToolRoiDataSelectionBox.h
  QmitkBoundingObjectWidget.h
 )

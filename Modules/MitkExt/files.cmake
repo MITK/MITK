@@ -151,14 +151,14 @@ SET(CPP_FILES
   Interactions/mitkSubtractContourTool.cpp
   Interactions/mitkDrawPaintbrushTool.cpp
   Interactions/mitkErasePaintbrushTool.cpp
-  #Interactions/mitkMorphologicTool.cpp
-  #Interactions/mitkErodeTool.cpp
-  #Interactions/mitkDilateTool.cpp
-  #Interactions/mitkOpeningTool.cpp
-  #Interactions/mitkClosingTool.cpp
-  #Interactions/mitkBinaryThresholdULTool.cpp
-  #Interactions/mitkPixelManipulationTool.cpp
-  #Interactions/mitkRegionGrow3DTool.cpp
+  Interactions/mitkMorphologicTool.cpp
+  Interactions/mitkErodeTool.cpp
+  Interactions/mitkDilateTool.cpp
+  Interactions/mitkOpeningTool.cpp
+  Interactions/mitkClosingTool.cpp
+  Interactions/mitkBinaryThresholdULTool.cpp
+  Interactions/mitkPixelManipulationTool.cpp
+  Interactions/mitkRegionGrow3DTool.cpp
   Rendering/mitkContourMapper2D.cpp
   Rendering/mitkContourSetMapper2D.cpp
   Rendering/mitkContourSetVtkMapper3D.cpp

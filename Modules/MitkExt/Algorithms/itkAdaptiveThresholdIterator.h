@@ -3,7 +3,6 @@
 #define __itkAdaptiveThresholdIterator_h
 
 #include "itkIndex.h"
-#include "MitkSBExports.h"
 #include "itkSize.h"
 #include "itkConditionalConstIterator.h"
 #include "itkImage.h"

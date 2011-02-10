@@ -1,3 +1,19 @@
+/*=========================================================================
+
+Program:   Medical Imaging & Interaction Toolkit
+Language:  C++
+Date:      $Date: 2008-09-12 15:46:48 +0200 (Fr, 12 Sep 2008) $
+Version:   $Revision: 15236 $
+
+Copyright (c) German Cancer Research Center, Division of Medical and
+Biological Informatics. All rights reserved.
+See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
+
+This software is distributed WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.  See the above copyright notices for more information.
+
+=========================================================================*/
 #include "QmitkToolRoiDataSelectionBox.h"
 #include <mitkProperties.h>
 #include <QBoxLayout>
@@ -21,7 +37,7 @@ m_lastSelectedName(tr("none"))
 
   //connect signals
   connect(m_segmentationComboBox, SIGNAL(activated(const QString&)), this, SLOT(OnRoiDataSelectionChanged(const QString&)) );
-  connect(m_boundingObjectWidget, SIGNAL(BoundingObjectsChanged(const QString&)), this, SLOT(OnRoiDataSelectionChanged(const QString&)) );
+  connect(m_boundingObjectWidget, SIGNAL(BoundingObjectsChanged()), this, SLOT(OnRoiDataSelectionChanged()));
 
   //create ToolManager
   m_ToolManager = mitk::ToolManager::New(storage);
@@ -69,6 +85,11 @@ void QmitkToolRoiDataSelectionBox::OnToolManagerRoiDataModified()
   //UpdateComboBoxData();
 }
 
+void QmitkToolRoiDataSelectionBox::OnRoiDataSelectionChanged()
+{
+  this->OnRoiDataSelectionChanged(tr("bounding objects"));
+}
+
 void QmitkToolRoiDataSelectionBox::OnRoiDataSelectionChanged(const QString& name)
 {
   if (name.compare(tr("")) == 0)
@@ -78,7 +99,8 @@ void QmitkToolRoiDataSelectionBox::OnRoiDataSelectionChanged(const QString& name
   m_boundingObjectWidget->setEnabled(false);
   mitk::DataNode::Pointer selection = NULL;
 
-  if ( name.compare(tr("none"))==0);
+  if ( name.compare(tr("none"))==0)
+    m_segmentationComboBox->setCurrentIndex(0);
   else if (name.compare(tr("bounding objects"))==0)
   {
     m_boundingObjectWidget->setEnabled(true);

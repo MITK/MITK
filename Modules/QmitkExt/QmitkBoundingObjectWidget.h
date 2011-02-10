@@ -47,9 +47,11 @@ public:
 
   void setEnabled(bool flag);
 
+  void OnBoundingObjectModified( const itk::EventObject& e);
+
 signals:
   //signal when bo has changed
-  void BoundingObjectsChanged(const QString&);
+  void BoundingObjectsChanged();
 
   protected slots:
     void CreateBoundingObject(int type);
@@ -59,7 +61,7 @@ signals:
     void SelectionChanged();
     void OnItemDoubleClicked(QTreeWidgetItem* item, int col);
     void OnItemDataChanged(QTreeWidgetItem* item, int col);
-
+    
 protected:
 
   void AddItem(mitk::DataNode* node);
@@ -72,6 +74,7 @@ protected:
   QPushButton* m_SaveButton;
   QPushButton* m_LoadButton;
   QTreeWidgetItem* m_lastSelectedItem;
+  unsigned long m_lastAffineObserver;
 
   typedef std::map< QTreeWidgetItem*, mitk::DataNode* > ItemNodeMapType;
   ItemNodeMapType m_ItemNodeMap;

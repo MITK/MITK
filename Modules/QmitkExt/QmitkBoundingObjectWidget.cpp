@@ -32,10 +32,16 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QStringList>
 #include <QInputDialog>
 
+#include "btnCube.xpm"
+#include "btnCylinder.xpm"
+#include "btnEllipsoid.xpm"
+#include "btnPyramid.xpm"
+
 
 QmitkBoundingObjectWidget::QmitkBoundingObjectWidget (QWidget* parent, Qt::WindowFlags f ):QWidget( parent, f ),
 m_DataStorage(NULL),
 m_lastSelectedItem(NULL),
+m_lastAffineObserver(NULL),
 m_ItemNodeMap()
 {
 
@@ -47,10 +53,10 @@ m_ItemNodeMap()
   boList << tr("add") << tr("cube") << tr("cone") << tr("ellipse") << tr("cylinder");
   m_addComboBox = new QComboBox();
   m_addComboBox->addItems(boList);
-  m_addComboBox->setItemIcon(1, QIcon(":/QmitkSegmentationConstructionKitView/Cube_48.png"));
-  m_addComboBox->setItemIcon(2, QIcon(":/QmitkSegmentationConstructionKitView/Pyramid_48.png"));
-  m_addComboBox->setItemIcon(3, QIcon(":/QmitkSegmentationConstructionKitView/Ellipsoid_48.png"));
-  m_addComboBox->setItemIcon(4, QIcon(":/QmitkSegmentationConstructionKitView/Cylinder_48.png"));
+  m_addComboBox->setItemIcon(1, QIcon(btnCube_xpm));
+  m_addComboBox->setItemIcon(2, QIcon(btnPyramid_xpm));
+  m_addComboBox->setItemIcon(3, QIcon(btnEllipsoid_xpm));
+  m_addComboBox->setItemIcon(4, QIcon(btnCylinder_xpm));
 
   buttonLayout->addWidget(m_addComboBox);
 
@@ -132,11 +138,16 @@ void QmitkBoundingObjectWidget::SelectionChanged()
     m_TreeWidget->closePersistentEditor(m_lastSelectedItem, 0);
 
     ItemNodeMapType::iterator it = m_ItemNodeMap.find(m_lastSelectedItem);
+
     if (it != m_ItemNodeMap.end())
     {
       mitk::DataNode* last_node = it->second;
-      mitk::AffineInteractor::Pointer last_interactor = dynamic_cast<mitk::AffineInteractor*> (last_node->GetInteractor());
 
+      //remove observer
+      last_node->RemoveObserver(m_lastAffineObserver);
+
+      //get and remove interactor
+      mitk::AffineInteractor::Pointer last_interactor = dynamic_cast<mitk::AffineInteractor*> (last_node->GetInteractor());
       if (last_interactor)
         mitk::GlobalInteraction::GetInstance()->RemoveInteractor(last_interactor);
     }
@@ -152,6 +163,11 @@ void QmitkBoundingObjectWidget::SelectionChanged()
   new_node->SetInteractor(new_interactor);
 
   mitk::GlobalInteraction::GetInstance()->AddInteractor(new_interactor);
+
+  //create observer for node
+  itk::ReceptorMemberCommand<QmitkBoundingObjectWidget>::Pointer command = itk::ReceptorMemberCommand<QmitkBoundingObjectWidget>::New();
+  command->SetCallbackFunction(this, &QmitkBoundingObjectWidget::OnBoundingObjectModified);
+  m_lastAffineObserver = new_node->AddObserver(mitk::AffineInteractionEvent(), command);
 
   m_lastSelectedItem = selectedItem;
 }
@@ -229,7 +245,7 @@ void QmitkBoundingObjectWidget::OnItemDataChanged(QTreeWidgetItem *item, int col
     mitk::BoundingObject* boundingObject = dynamic_cast<mitk::BoundingObject*> (node->GetData());
     if (boundingObject)
       boundingObject->SetPositive(!(item->checkState(1)));
-    emit BoundingObjectsChanged(tr("bounding objects"));
+    emit BoundingObjectsChanged();
   }
   //visible
   else if (col == 2)
@@ -388,7 +404,7 @@ void QmitkBoundingObjectWidget::CreateBoundingObject(int type)
 
     mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 
-    emit BoundingObjectsChanged(tr("bounding objects"));
+    emit BoundingObjectsChanged();
 
     AddItem(node);
   }
@@ -429,4 +445,9 @@ mitk::DataNode::Pointer QmitkBoundingObjectWidget::GetSelectedBoundingObjectNode
   mitk::DataNode* node = m_ItemNodeMap.find(item)->second;
 
   return node;
+}
+
+void QmitkBoundingObjectWidget::OnBoundingObjectModified(const itk::EventObject& e)
+{
+  emit BoundingObjectsChanged();
 }

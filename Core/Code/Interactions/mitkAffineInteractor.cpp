@@ -172,6 +172,7 @@ bool mitk::AffineInteractor::ExecuteAction(Action* action, mitk::StateEvent cons
   case AcTRANSLATEEND:
     {
       m_UndoController->SetOperationEvent(new UndoStackItem("Move object"));
+      m_DataNode->InvokeEvent(TranslateEvent());
       break;
     }
   case AcROTATE:
@@ -213,6 +214,7 @@ bool mitk::AffineInteractor::ExecuteAction(Action* action, mitk::StateEvent cons
   case AcROTATEEND:
     {
       m_UndoController->SetOperationEvent(new UndoStackItem("Rotate object"));
+      m_DataNode->InvokeEvent(RotateEvent());
       break;
     }
   case AcSCALE:
@@ -275,6 +277,7 @@ bool mitk::AffineInteractor::ExecuteAction(Action* action, mitk::StateEvent cons
   case AcSCALEEND:
     {
       m_UndoController->SetOperationEvent(new UndoStackItem("Scale object"));
+      m_DataNode->InvokeEvent(ScaleEvent());
       break;
     }
   default:

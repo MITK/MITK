@@ -32,6 +32,13 @@ class DisplayPositionEvent;
 //## An object of this class can translate, rotate and scale the data objects
 //## by modifying its geometry.
 //## @ingroup Interaction
+
+//create events for interactions
+itkEventMacro(AffineInteractionEvent, itk::AnyEvent);
+itkEventMacro(ScaleEvent, AffineInteractionEvent);
+itkEventMacro(RotateEvent, AffineInteractionEvent);
+itkEventMacro(TranslateEvent, AffineInteractionEvent);
+
 class MITK_CORE_EXPORT AffineInteractor : public Interactor
 {
 public:

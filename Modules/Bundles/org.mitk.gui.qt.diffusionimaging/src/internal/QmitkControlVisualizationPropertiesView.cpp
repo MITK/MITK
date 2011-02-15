@@ -181,8 +181,12 @@ struct CvpSelListener : ISelectionListener
             node->GetIntProperty("DisplayChannel", val);
             m_View->m_Controls->m_DisplayIndex->setValue(val);
 
+            QString label = "Channel %1";
+            label = label.arg(val);
+            m_View->m_Controls->label_channel->setText(label);
+
             int maxVal = (dynamic_cast<mitk::DiffusionImage<short>* >(node->GetData()))->GetVectorImage()->GetVectorLength();
-            m_View->m_Controls->m_DisplayIndex->setMaximum(maxVal);
+            m_View->m_Controls->m_DisplayIndex->setMaximum(maxVal-1);
           }
 
           else if(QString("QBallImage").compare(node->GetData()->GetNameOfClass())==0)
@@ -551,6 +555,11 @@ void QmitkControlVisualizationPropertiesView::SetEnumProp(
 
 void QmitkControlVisualizationPropertiesView::DisplayIndexChanged(int dispIndex)
 {
+
+  QString label = "Channel %1";
+  label = label.arg(dispIndex);
+  m_Controls->label_channel->setText(label);
+
   mitk::DataStorage::SetOfObjects::Pointer set =
       ActiveSet("DiffusionImage");
 

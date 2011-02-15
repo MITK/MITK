@@ -51,7 +51,7 @@ mitk::DiffusionImageMapper<TPixelType>::GenerateData( mitk::BaseRenderer *render
 template<class TPixelType>
 void mitk::DiffusionImageMapper<TPixelType>::SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite)
 {
-  node->AddProperty( "DisplayChannel", mitk::IntProperty::New( true ), renderer, overwrite );
+  node->AddProperty( "DisplayChannel", mitk::IntProperty::New( 0 ), renderer, overwrite );
   Superclass::SetDefaultProperties(node, renderer, overwrite);
 }
 

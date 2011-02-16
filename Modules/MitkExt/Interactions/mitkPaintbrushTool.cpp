@@ -203,11 +203,13 @@ bool mitk::PaintbrushTool::OnMouseMoved   (Action* itkNotUsed(action), const Sta
 
   Image* image = dynamic_cast<Image*>(workingNode->GetData());
   const PlaneGeometry* planeGeometry( dynamic_cast<const PlaneGeometry*> (positionEvent->GetSender()->GetCurrentWorldGeometry2D() ) );
-  if ( !image || !planeGeometry ) return false;
+  if ( !image || !planeGeometry ) 
+    return false;
 
   int affectedDimension( -1 );
   int affectedSlice( -1 );
-  if ( !SegTool2D::DetermineAffectedImageSlice( image, planeGeometry, affectedDimension, affectedSlice ) ) return false;
+  if ( !SegTool2D::DetermineAffectedImageSlice( image, planeGeometry, affectedDimension, affectedSlice ) ) 
+    return false;
     
   Point3D worldCoordinates = positionEvent->GetWorldPosition();
   Point3D indexCoordinates;
@@ -277,12 +279,14 @@ bool mitk::PaintbrushTool::OnMouseMoved   (Action* itkNotUsed(action), const Sta
     contour->AddVertex( point );
   }
   
+  Image::Pointer slice = SegTool2D::GetAffectedImageSliceAs2DImage( positionEvent, image );
+  if ( slice.IsNull() ) 
+    return false;
+
   if (leftMouseButtonPressed)
   {
-    Image::Pointer slice = SegTool2D::GetAffectedImageSliceAs2DImage( positionEvent, image );
-    if ( slice.IsNull() ) return false;
-    FeedbackContourTool::FillContourInSlice( contour, slice, m_PaintingPixelValue );
 
+    FeedbackContourTool::FillContourInSlice( contour, slice, m_PaintingPixelValue );
     OverwriteSliceImageFilter::Pointer slicewriter = OverwriteSliceImageFilter::New();
     slicewriter->SetInput( image );
     slicewriter->SetCreateUndoInformation( true );
@@ -307,7 +311,7 @@ bool mitk::PaintbrushTool::OnMouseMoved   (Action* itkNotUsed(action), const Sta
     displayContour->AddVertex( point );
   }
 
-  displayContour = FeedbackContourTool::BackProjectContourFrom2DSlice( planeGeometry, displayContour );
+  displayContour = FeedbackContourTool::BackProjectContourFrom2DSlice( slice->GetGeometry(), displayContour );
   SetFeedbackContour( *displayContour );
   assert( positionEvent->GetSender()->GetRenderWindow() );
 

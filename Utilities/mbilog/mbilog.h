@@ -144,21 +144,45 @@ namespace mbilog {
       template <class T> inline PseudoStream& operator<<(const T& data) 
       {
         if(!disabled)
+        {
+          std::locale C("C");
+          std::locale originalLocale = ss.getloc();
+          ss.imbue(C);
+
           ss << data;
+
+          ss.imbue( originalLocale );
+        }
         return *this;
       }
       
       template <class T> inline PseudoStream& operator<<(T& data)
       {
         if(!disabled)
+        {
+          std::locale C("C");
+          std::locale originalLocale = ss.getloc();
+          ss.imbue(C);
+
           ss << data;
+
+          ss.imbue( originalLocale );
+        }
         return *this;
       }
 
       inline PseudoStream& operator<<(std::ostream& (*func)(std::ostream&))
       {
         if(!disabled)
+        {
+          std::locale C("C");
+          std::locale originalLocale = ss.getloc();
+          ss.imbue(C);
+
           ss << func;
+
+          ss.imbue( originalLocale );
+        }
         return *this;
       }
 

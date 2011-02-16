@@ -90,7 +90,15 @@ void mbilog::BackendCout::AppendTimeStamp(std::ostream& out)
   time_t rawtime = time(NULL);
   std::string timestring( ctime(&rawtime) );
   timestring.replace( timestring.length() -1, 1," "); // replace \n by " " (separates date/time from following output of relative time since start)
+
+  std::locale C("C");
+  std::locale originalLocale = out.getloc();
+  out.imbue(C);
+
   out << timestring;
+
+  out.imbue( originalLocale );
+
 }
 
 void mbilog::BackendCout::FormatSmart(std::ostream &out, const LogMessage &l,int /*threadID*/)
@@ -133,7 +141,13 @@ void mbilog::BackendCout::FormatSmart(std::ostream &out, const LogMessage &l,int
     out << std::endl;
   }
 
+  std::locale C("C");
+  std::locale originalLocale = out.getloc();
+  out.imbue(C);
+
   out << std::fixed << std::setprecision(3) << ((double)std::clock())/CLOCKS_PER_SEC;
+
+  out.imbue( originalLocale );
 
   out << c_close << " ";
   
@@ -726,7 +740,15 @@ void mbilog::BackendCout::FormatSmartWindows(const mbilog::LogMessage &l,int /*t
   }
 
   ChangeColor( colorTime );
+
+  std::locale C("C");
+  std::locale originalLocale = std::cout.getloc();
+  std::cout.imbue(C);
+
   std::cout << std::fixed << std::setprecision(2) << ((double)std::clock())/CLOCKS_PER_SEC << " ";
+
+  std::cout.imbue( originalLocale );
+
   
   // category
   {

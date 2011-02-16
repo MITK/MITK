@@ -17,7 +17,7 @@ namespace mitk
 /// but for a list of itk objects
 ///
 template <class T>
-class Set: public itk::DataObject
+class Set: virtual public itk::Object
 {
 public:
   typedef mitk::SetObserver<T> Observer;

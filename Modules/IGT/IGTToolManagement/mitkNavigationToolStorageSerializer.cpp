@@ -17,6 +17,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 //Poco headers
 #include "Poco/Zip/Compress.h"
+#include "Poco/Path.h"
+#include "Poco/File.h"
 
 #include "mitkNavigationToolStorageSerializer.h"
 #include "mitkNavigationToolWriter.h"
@@ -24,55 +26,59 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkSceneIO.h>
 #include <mitkStandardFileLocations.h>
 
+#include <sstream>
+
 mitk::NavigationToolStorageSerializer::NavigationToolStorageSerializer()
   {
-
+  //create temp directory
+  m_tempDirectory = mitk::StandardFileLocations::GetInstance()->GetOptionDirectory() + Poco::Path::separator() + "tempNavigationToolSerializer";
+  Poco::File myFile(m_tempDirectory);  
+  myFile.createDirectory();
   }
 
 mitk::NavigationToolStorageSerializer::~NavigationToolStorageSerializer()
   {
-
+  //remove temp directory
+  Poco::File myFile(m_tempDirectory);
+  if (myFile.exists()) myFile.remove();
   }
 
 bool mitk::NavigationToolStorageSerializer::Serialize(std::string filename, mitk::NavigationToolStorage::Pointer storage)
   {
-  //convert whole data to a mitk::DataStorage
-  mitk::StandaloneDataStorage::Pointer saveStorage = mitk::StandaloneDataStorage::New();
+  //save every tool to temp directory
   mitk::NavigationToolWriter::Pointer myToolWriter = mitk::NavigationToolWriter::New();
-
   for(int i=0; i<storage->GetToolCount();i++)
-    {
-    mitk::DataNode::Pointer thisTool = myToolWriter->ConvertToDataNode(storage->GetTool(i));
-    saveStorage->Add(thisTool);
+    {   
+    std::string fileName = m_tempDirectory + Poco::Path::separator() + "NavigationTool" + convertIntToString(i) + ".tool";
+    if (!myToolWriter->DoWrite(fileName,storage->GetTool(i))) return false;
     }
 
-  //use SceneSerialization to save the DataStorage
-  std::string DataStorageFileName = mitk::StandardFileLocations::GetInstance()->GetOptionDirectory() + Poco::Path::separator() + myToolWriter->GetFileWithoutPath(filename) + ".storage";
-  mitk::SceneIO::Pointer mySceneIO = mitk::SceneIO::New();
-  mySceneIO->SaveScene(saveStorage->GetAll(),saveStorage,DataStorageFileName);
-
-  //then put the storage and the toolfiles into a zip-archive
+  //add all files to zip archive
   std::ofstream file( filename.c_str(), std::ios::binary | std::ios::out);
   if (!file.good())
     {
     m_ErrorMessage = "Could not open a zip file for writing: '" + filename + "'";
     return false;
     }
-  else
-    {
-    Poco::Zip::Compress zipper( file, true );
-    zipper.addFile(DataStorageFileName,myToolWriter->GetFileWithoutPath(DataStorageFileName));
-    for (int i=0; i<storage->GetToolCount();i++)
+  Poco::Zip::Compress zipper( file, true );
+  for (int i=0; i<storage->GetToolCount();i++)
       {
-      //check if filename already exits
-      for (int j=0; j<i; j++) if (myToolWriter->GetFileWithoutPath(storage->GetTool(i)->GetCalibrationFile()) == myToolWriter->GetFileWithoutPath(storage->GetTool(j)->GetCalibrationFile())) break;
-      
-      //add calibration file to zip archive
-      std::string calibrationFile = storage->GetTool(i)->GetCalibrationFile();
-      if (calibrationFile!="") zipper.addFile(calibrationFile,myToolWriter->GetFileWithoutPath(storage->GetTool(i)->GetCalibrationFile()));
+      std::string fileName = m_tempDirectory + Poco::Path::separator() + "NavigationTool" + convertIntToString(i) + ".tool";
+      zipper.addFile(fileName,myToolWriter->GetFileWithoutPath(fileName));
+      //delete file:
+      std::remove(fileName.c_str());
       }
-    zipper.close();
-    }
-
+  zipper.close();
+  file.close();
+  
   return true;
+  }
+
+std::string mitk::NavigationToolStorageSerializer::convertIntToString(int i)
+  {
+  std::string s;
+  std::stringstream out;
+  out << i;
+  s = out.str();
+  return s;
   }

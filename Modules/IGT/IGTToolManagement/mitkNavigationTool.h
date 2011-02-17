@@ -67,7 +67,7 @@ namespace mitk {
     itkSetMacro(TrackingTool,mitk::TrackingTool::Pointer);
     //CalibrationFile:
     itkGetMacro(CalibrationFile,std::string);
-    itkSetMacro(CalibrationFile,std::string);
+    void SetCalibrationFile(const std::string filename); //itkSetMacro(CalibrationFile,std::string);
     //SerialNumber:
     itkGetMacro(SerialNumber,std::string);
     itkSetMacro(SerialNumber,std::string);

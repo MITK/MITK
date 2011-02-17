@@ -58,6 +58,12 @@ namespace mitk {
 
     mitk::DataStorage::Pointer m_DataStorage;
 
+    std::string m_tempDirectory;
+
+    std::string convertIntToString(int i);
+
+    bool decomressFiles(std::string file,std::string path);
+
   };
 } // namespace mitk
 #endif //NAVIGATIONTOOLSTORAGEDESERIALIZER

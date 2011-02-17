@@ -62,9 +62,12 @@ bool mitk::NavigationToolWriter::DoWrite(std::string FileName,mitk::NavigationTo
     {
     Poco::Zip::Compress zipper( file, true );
     zipper.addFile(DataStorageFileName,GetFileWithoutPath(DataStorageFileName));
-    zipper.addFile(Tool->GetCalibrationFile(),GetFileWithoutPath(Tool->GetCalibrationFile()));
+    if (Tool->GetCalibrationFile()!="none") zipper.addFile(Tool->GetCalibrationFile(),GetFileWithoutPath(Tool->GetCalibrationFile()));
     zipper.close();
     }
+  
+  //delete the data storage
+  std::remove(DataStorageFileName.c_str());
 
   return true;
   }
@@ -89,7 +92,7 @@ mitk::DataNode::Pointer mitk::NavigationToolWriter::ConvertToDataNode(mitk::Navi
     if (Tool->GetDataNode().IsNotNull()) if (Tool->GetDataNode()->GetData()!=NULL) thisTool->SetData(Tool->GetDataNode()->GetData());
 
   //Material is not needed, to avoid errors in scene serialization we have to do this:
-    //thisTool->ReplaceProperty("material",NULL);
+    thisTool->ReplaceProperty("material",NULL);
 
   return thisTool;
   }

@@ -16,17 +16,37 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include "mitkNavigationTool.h"
+#include "Poco/File.h"
 
 mitk::NavigationTool::NavigationTool()
   {
     m_Type = mitk::NavigationTool::Unknown;
     m_Identifier = "None";
     m_TrackingDeviceType = mitk::TrackingSystemNotSpecified;
+    m_CalibrationFile = "none";
+    m_SerialNumber = "";
   }
  
 mitk::NavigationTool::~NavigationTool()
   {
+  
+  }
 
+void mitk::NavigationTool::SetCalibrationFile(const std::string filename)
+  {
+  //check if file does exist:
+  if (filename=="")
+    {
+    m_CalibrationFile = "none";
+    }
+  else
+    {
+    Poco::File myFile(filename);
+    if (myFile.exists()) 
+      m_CalibrationFile = filename;
+    else
+      m_CalibrationFile = "none";
+    }
   }
 
 std::string mitk::NavigationTool::GetToolName()

@@ -47,7 +47,7 @@ mitk::NavigationTool::Pointer mitk::NavigationToolReader::DoRead(std::string fil
     return NULL;
     }
 
-  std::string tempDirectory = mitk::StandardFileLocations::GetInstance()->GetOptionDirectory() + "\\" +GetFileWithoutPath(filename);
+  std::string tempDirectory = mitk::StandardFileLocations::GetInstance()->GetOptionDirectory() + Poco::Path::separator() + "toolFilesByNavigationToolReader" + Poco::Path::separator() + GetFileWithoutPath(filename);
   Poco::Zip::Decompress unzipper( file, Poco::Path( tempDirectory ) );
   unzipper.decompressAllFiles();
   
@@ -105,8 +105,15 @@ mitk::NavigationTool::Pointer mitk::NavigationToolReader::ConvertDataNodeToNavig
   //Calibration File Name
   std::string calibration_filename;
   node->GetStringProperty("toolfileName",calibration_filename);
-  std::string calibration_filename_with_path = toolPath + Poco::Path::separator() + calibration_filename;
-  returnValue->SetCalibrationFile(calibration_filename_with_path);
+  if (calibration_filename=="none")
+    {
+    returnValue->SetCalibrationFile("none");
+    }
+  else
+    {
+    std::string calibration_filename_with_path = toolPath + Poco::Path::separator() + calibration_filename;
+    returnValue->SetCalibrationFile(calibration_filename_with_path);
+    }
   
   return returnValue;
   }

@@ -18,6 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 //Poco headers
 #include "Poco/Zip/Decompress.h"
 #include "Poco/Path.h"
+#include "Poco/File.h"
 
 #include "mitkNavigationToolStorageDeserializer.h"
 #include <mitkSceneIO.h>
@@ -27,45 +28,59 @@ PURPOSE.  See the above copyright notices for more information.
 mitk::NavigationToolStorageDeserializer::NavigationToolStorageDeserializer(mitk::DataStorage::Pointer dataStorage)
   {
   m_DataStorage = dataStorage;
+  //create temp directory for this reader
+  m_tempDirectory = mitk::StandardFileLocations::GetInstance()->GetOptionDirectory() + Poco::Path::separator() + "tempNavigationToolDeserializer";
+  Poco::File myFile(m_tempDirectory);  
+  myFile.createDirectory();
   }
 
 mitk::NavigationToolStorageDeserializer::~NavigationToolStorageDeserializer()
   {
-
+  //remove temp directory
+  Poco::File myFile(m_tempDirectory);
+  if (myFile.exists()) myFile.remove();
   }
 
 mitk::NavigationToolStorage::Pointer mitk::NavigationToolStorageDeserializer::Deserialize(std::string filename)
   {
   //decomress zip file into temporary directory
+  decomressFiles(filename,m_tempDirectory);
+  
+  //now read all files and convert them to navigation tools
+  mitk::NavigationToolStorage::Pointer returnValue = mitk::NavigationToolStorage::New();
+  bool cont = true;
+  for (int i=0; cont==true; i++)
+    {
+    std::string fileName = m_tempDirectory + Poco::Path::separator() + "NavigationTool" + convertIntToString(i) + ".tool";
+    mitk::NavigationToolReader::Pointer myReader = mitk::NavigationToolReader::New(m_DataStorage);
+    mitk::NavigationTool::Pointer readTool = myReader->DoRead(fileName);
+    if (readTool.IsNull()) cont = false;
+    else returnValue->AddTool(readTool);
+    //delete file
+    std::remove(fileName.c_str());
+    }
+  return returnValue;
+  }
+
+std::string mitk::NavigationToolStorageDeserializer::convertIntToString(int i)
+  {
+  std::string s;
+  std::stringstream out;
+  out << i;
+  s = out.str();
+  return s;
+  }
+
+bool mitk::NavigationToolStorageDeserializer::decomressFiles(std::string filename,std::string path)
+  {
   std::ifstream file( filename.c_str(), std::ios::binary );
   if (!file.good())
     {
     m_ErrorMessage = "Cannot open '" + filename + "' for reading";
-    return NULL;
+    return false;
     }
-  mitk::NavigationToolReader::Pointer myReader = mitk::NavigationToolReader::New(m_DataStorage);
-  std::string tempDirectory = mitk::StandardFileLocations::GetInstance()->GetOptionDirectory() + Poco::Path::separator() + myReader->GetFileWithoutPath(filename);
-  Poco::Zip::Decompress unzipper( file, Poco::Path( tempDirectory ) );
+  Poco::Zip::Decompress unzipper( file, Poco::Path( path ) );
   unzipper.decompressAllFiles();
-
-
-  //create DataNodes using the decomressed storage
-  mitk::SceneIO::Pointer mySceneIO = mitk::SceneIO::New();
-  mitk::DataStorage::Pointer readStorage = mySceneIO->LoadScene(tempDirectory + Poco::Path::separator() + myReader->GetFileWithoutPath(filename) + ".storage");
-  mitk::NavigationToolStorage::Pointer returnValue = mitk::NavigationToolStorage::New();
-
-  for(unsigned int i=0; i<readStorage->GetAll()->Size(); i++)
-    {
-    mitk::NavigationTool::Pointer newTool = myReader->ConvertDataNodeToNavigationTool(readStorage->GetAll()->ElementAt(i),tempDirectory);
-    if (!returnValue->AddTool(newTool))
-      {
-      m_ErrorMessage = "Error can't parse data storage!";
-      return NULL;
-      }
-    }
-
-  //delete decompressed storage which is not needed any more
-  std::remove((std::string(tempDirectory + Poco::Path::separator() + myReader->GetFileWithoutPath(filename) + ".storage")).c_str());
-
-  return returnValue;
+  file.close();
+  return true;
   }

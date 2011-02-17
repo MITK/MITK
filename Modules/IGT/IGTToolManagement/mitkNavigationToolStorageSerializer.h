@@ -54,6 +54,10 @@ namespace mitk {
 
     std::string m_ErrorMessage;
 
+    std::string convertIntToString(int i);
+
+    std::string m_tempDirectory;
+
   };
 } // namespace mitk
 #endif //NAVIGATIONTOOLSTORAGESERIALIZER

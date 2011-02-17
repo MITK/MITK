@@ -1,5 +1,6 @@
 SET(_ctk_plugins
   org.blueberry.osgi:ON
+  org.blueberry.compat:ON
 )
 
 SET(_ctk_plugins_include_dirs
@@ -29,6 +30,7 @@ SET(_default_plugins
 
 SET(_exclude_plugins
   org.blueberry.osgi
+  org.blueberry.compat
 )
 
 MACRO_COLLECT_PLUGINS(OUTPUT_DIR ${BLUEBERRY_PLUGINS_OUTPUT_DIR}

@@ -1,5 +1,5 @@
 PROJECT(BlueBerry)
-CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
+CMAKE_MINIMUM_REQUIRED(VERSION 2.8.2)
 
 SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/CMake/")
 
@@ -42,13 +42,12 @@ IF(NOT DESIRED_QT_VERSION)
 ENDIF()
 
 IF(BLUEBERRY_USE_QT AND NOT DESIRED_QT_VERSION EQUAL 4)
-  MESSAGE("Attention: Qt4 is required to build the BlueBerry Qt plug-ins.")
+  MESSAGE("Attention: Qt4 GUI libraries are required to build the BlueBerry Qt plug-ins.")
 ENDIF()
 
 IF(BLUEBERRY_USE_QT AND DESIRED_QT_VERSION EQUAL 4)
-  SET(QT_MT_REQUIRED 1)
   SET(BUILD_QT_PLUGINS 1)
-  FIND_PACKAGE(Qt REQUIRED)
+  FIND_PACKAGE(Qt4 4.6.2 REQUIRED)
 
   IF(QT_QMAKE_CHANGED)
     SET(QT_HELPGENERATOR_EXECUTABLE NOTFOUND)
@@ -115,7 +114,25 @@ IF(BLUEBERRY_USE_QT AND DESIRED_QT_VERSION EQUAL 4)
   ENDIF()
 
   INCLUDE(${QT_USE_FILE})
+ELSE()
+  FIND_PACKAGE(Qt4 4.6.2 COMPONENTS QtCore REQUIRED)
+  INCLUDE(${QT_USE_FILE})
 ENDIF()
+
+# =========  CTK specific CMake stuff ============
+CMAKE_POLICY(SET CMP0012 NEW)
+
+FIND_PACKAGE(CTK)
+SET(CTK_PLUGIN_LIBRARIES ${CTK_PLUGIN_LIBRARIES} CACHE INTERNAL "CTK plugins" FORCE)
+
+# Extract all library names starting with org_blueberry_
+MACRO(GetMyTargetLibraries all_target_libraries varname)
+  SET(re_ctkplugin "^org_blueberry_[a-zA-Z0-9_]+$")
+  SET(_tmp_list)
+  LIST(APPEND _tmp_list ${all_target_libraries})
+  ctkMacroListFilter(_tmp_list re_ctkplugin OUTPUT_VARIABLE ${varname})
+ENDMACRO()
+# ================================================
 
 OPTION(BLUEBERRY_BUILD_ALL_PLUGINS "Build all BlueBerry plugins (overriding selection)" OFF)
 MARK_AS_ADVANCED(BLUEBERRY_BUILD_ALL_PLUGINS)
@@ -168,7 +185,6 @@ CONFIGURE_FILE(BlueBerryConfig.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/BlueBerryCon
 ADD_SUBDIRECTORY(Bundles)
 
 ADD_SUBDIRECTORY(Documentation)
-
 
 # Testing options
 

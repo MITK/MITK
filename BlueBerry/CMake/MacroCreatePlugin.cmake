@@ -145,7 +145,13 @@ MACRO(MACRO_CREATE_PLUGIN)
   # to lib1, instead of lib1d in debug configurations
   SET(_debug_linklibs "")
   FOREACH(_linklib ${PLUGIN_LINK_LIBRARIES})
-    SET(_debug_linklibs ${_debug_linklibs} optimized "${_linklib}" debug "${_linklib}${BLUEBERRY_DEBUG_POSTFIX}")
+    # Use a hack to test if the dependency is a BlueBerry bundle
+    STRING(REPLACE . _ _symbolic_name ${_linklib})
+    IF(EXISTS "${${_symbolic_name}_OUT_DIR}")
+      SET(_debug_linklibs ${_debug_linklibs} optimized "${_linklib}" debug "${_linklib}${BLUEBERRY_DEBUG_POSTFIX}")
+    ELSE()
+      SET(_debug_linklibs ${_debug_linklibs} ${_linklib})
+    ENDIF()
   ENDFOREACH(_linklib)
   
   TARGET_LINK_LIBRARIES(${PLUGIN_TARGET} ${_debug_linklibs})

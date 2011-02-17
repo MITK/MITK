@@ -24,6 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "berryIExtensionPoint.h"
 #include "berryIConfigurationElement.h"
 
+#include <QObject>
 
 namespace berry {
 
@@ -55,5 +56,7 @@ public:
 };
 
 }  // namespace berry
+
+Q_DECLARE_INTERFACE(berry::IExtensionPointService, "org.blueberry.service.IExtensionPoint")
 
 #endif /*BERRYIEXTENSIONPOINTSERVICE_H_*/

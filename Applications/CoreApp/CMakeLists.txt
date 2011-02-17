@@ -2,7 +2,7 @@ FIND_PACKAGE(BlueBerry REQUIRED)
 
 INCLUDE_DIRECTORIES(
   ${BLUEBERRY_PLUGIN_SOURCE_DIRS}
-  ${org.blueberry.osgi_BIN_DIR} # needed for generated berryConfig.h
+  ${org_blueberry_osgi_BINARY_DIR} # needed for generated berryConfig.h
   ${Poco_INCLUDE_DIRS}
 )
 LINK_DIRECTORIES(${Poco_LIBRARY_DIRS}
@@ -23,7 +23,7 @@ ENDIF(WIN32)
 TARGET_LINK_LIBRARIES(CoreApp 
                       optimized PocoFoundation      debug PocoFoundationd 
                       optimized PocoUtil            debug PocoUtild 
-                      optimized org_blueberry_osgi debug org_blueberry_osgi${BLUEBERRY_DEBUG_POSTFIX})
+                      org_blueberry_osgi)
 
 SET_TARGET_PROPERTIES(CoreApp PROPERTIES INSTALL_RPATH "${CMAKE_INSTALL_RPATH};${CMAKE_INSTALL_RPATH}/BlueBerry/org.blueberry.osgi/bin")
 

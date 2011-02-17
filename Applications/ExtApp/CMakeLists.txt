@@ -5,7 +5,7 @@ MITK_USE_MODULE(MitkExt)
 
 INCLUDE_DIRECTORIES(
   ${BLUEBERRY_PLUGIN_SOURCE_DIRS} 
-  ${org.blueberry.osgi_BIN_DIR} # needed for generated berryConfig.h 
+  ${org_blueberry_osgi_BINARY_DIR} # needed for generated berryConfig.h
   ${Poco_INCLUDE_DIRS}
   ${ALL_INCLUDE_DIRECTORIES}
 )
@@ -27,7 +27,7 @@ ENDIF(WIN32)
 TARGET_LINK_LIBRARIES(ExtApp 
                       optimized PocoFoundation      debug PocoFoundationd 
                       optimized PocoUtil            debug PocoUtild 
-                      optimized org_blueberry_osgi debug org_blueberry_osgi${BLUEBERRY_DEBUG_POSTFIX}
+                      org_blueberry_osgi
                       ${ALL_LIBRARIES})
 
 SET_TARGET_PROPERTIES(ExtApp PROPERTIES INSTALL_RPATH "${CMAKE_INSTALL_RPATH};${CMAKE_INSTALL_RPATH}/BlueBerry/org.blueberry.osgi/bin")

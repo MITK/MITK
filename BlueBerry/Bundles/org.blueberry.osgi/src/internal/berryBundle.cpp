@@ -27,17 +27,29 @@ PURPOSE.  See the above copyright notices for more information.
 #include "../berryIBundleContext.h"
 #include "../berryPlatformException.h"
 
+#include <ctkPluginContext.h>
+
 #include <iostream>
 
 namespace berry {
 
-Bundle::Bundle(BundleLoader& loader, IBundleStorage::Pointer storage) :
+Bundle::Bundle(BundleLoader& loader, IBundleStorage::Pointer storage, bool initialize) :
   m_BundleLoader(loader)
 {
+  {
+    Poco::Mutex::ScopedLock lock(m_Mutex);
+    m_Storage = storage;
+  }
 
+  if (initialize)
+  {
+    init();
+  }
+}
+
+void Bundle::init()
+{
   Poco::Mutex::ScopedLock lock(m_Mutex);
-  m_Storage = storage;
-
   try
   {
     this->LoadManifest();
@@ -177,6 +189,8 @@ Bundle::Resolve()
 {
   if (m_State == BUNDLE_INSTALLED)
   {
+    ctkPluginContext* context = InternalPlatform::GetInstance()->GetCTKPluginFrameworkContext();
+
     //const BundleManifest::Dependencies& dependencies =;
     IBundleManifest::Dependencies::const_iterator iter;
     for (iter =  this->GetRequiredBundles().begin(); iter !=  this->GetRequiredBundles().end(); ++iter)
@@ -184,7 +198,27 @@ Bundle::Resolve()
       //BERRY_INFO << "Checking dependency:" << iter->symbolicName << ";\n";
       IBundle::Pointer bundle = m_BundleLoader.FindBundle(iter->symbolicName);
       if (bundle.IsNull())
-        throw BundleResolveException("The bundle " + this->GetSymbolicName() + " depends on missing bundle:", iter->symbolicName);
+      {
+        // Check if we have a CTK Plugin dependency
+        bool resolved = false;
+        if (context)
+        {
+          QString symbolicName = QString::fromStdString(iter->symbolicName);
+          foreach (QSharedPointer<ctkPlugin> plugin, context->getPlugins())
+          {
+            if (plugin->getSymbolicName() == symbolicName)
+            {
+              resolved = true;
+              break;
+            }
+          }
+        }
+
+        if (!resolved)
+        {
+          throw BundleResolveException("The bundle " + this->GetSymbolicName() + " depends on missing bundle:", iter->symbolicName);
+        }
+      }
       else if (!bundle->IsResolved())
       {
         bundle->Resolve();

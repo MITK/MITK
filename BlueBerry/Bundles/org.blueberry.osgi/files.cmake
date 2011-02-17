@@ -9,6 +9,7 @@ SET(INTERNAL_CPP_FILES
   berryBundleDirectory.cpp
   berryBundleManifest.cpp
   berryCodeCache.cpp
+  berryCTKPluginActivator.cpp
   berryDefaultActivator.cpp
   berryConfigurationElement.cpp
   berryExtension.cpp
@@ -18,6 +19,7 @@ SET(INTERNAL_CPP_FILES
   berryPlatformLogChannel.cpp
   berrySystemBundle.cpp
   berrySystemBundleActivator.cpp
+  berrySystemBundleManifest.cpp
 )
 
 SET(SERVICE_CPP_FILES

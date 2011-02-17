@@ -30,16 +30,12 @@ namespace berry {
 
 void SystemBundleActivator::Start(IBundleContext::Pointer context)
 {
-  SystemBundle::Pointer systemBundle = context->GetThisBundle().Cast<SystemBundle>();
-  Service::Pointer service(new ExtensionPointService(&systemBundle->GetBundleLoader()));
-  Platform::GetServiceRegistry().RegisterService(
-      IExtensionPointService::SERVICE_ID, service);
-  //BERRY_INFO << "Extension point service registered\n";
+
 }
 
 void SystemBundleActivator::Stop(IBundleContext::Pointer /*context*/)
 {
-  Platform::GetServiceRegistry().UnRegisterService(IExtensionPointService::SERVICE_ID);
+
 }
 
 }

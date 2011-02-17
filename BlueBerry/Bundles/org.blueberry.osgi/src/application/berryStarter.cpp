@@ -82,7 +82,7 @@ int Starter::Run(int& argc, char** argv,
     if (extensions.size() == 0)
     {
       BERRY_FATAL
-          << "No extensions configured into extension-point 'org.blueberry.core.runtime.applications' found. Aborting.\n";
+          << "No extensions configured into extension-point '" << Starter::XP_APPLICATIONS << "' found. Aborting.\n";
       returnCode = 0;
     }
     else if (extensions.size() == 1)

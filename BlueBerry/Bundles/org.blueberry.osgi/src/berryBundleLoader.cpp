@@ -314,7 +314,7 @@ void BundleLoader::ReadAllContributions()
   BundleMap::iterator iter;
   for (iter = m_BundleMap.begin(); iter != m_BundleMap.end(); ++iter)
   {
-    if (iter->second.m_Bundle->IsResolved())
+    if (iter->second.m_Bundle && iter->second.m_Bundle->IsResolved())
       this->ReadContributions(iter->second.m_Bundle);
   }
 }
@@ -342,7 +342,10 @@ void BundleLoader::ReadDependentContributions(IBundle::Pointer bundle)
   IBundleManifest::Dependencies::const_iterator iter;
   for (iter = deps.begin(); iter != deps.end(); ++iter)
   {
-    this->ReadContributions(m_BundleMap[iter->symbolicName].m_Bundle);
+    if (IBundle::Pointer depBundle = m_BundleMap[iter->symbolicName].m_Bundle)
+    {
+      this->ReadContributions(depBundle);
+    }
   }
 
 }
@@ -356,7 +359,7 @@ BundleLoader::StartAllBundles()
   {
     try
     {
-      if  (iter->second.m_Bundle->GetActivationPolicy() == IBundleManifest::EAGER  &&
+      if  (iter->second.m_Bundle && iter->second.m_Bundle->GetActivationPolicy() == IBundleManifest::EAGER  &&
         !iter->second.m_Bundle->IsSystemBundle())
         this->StartBundle(iter->second.m_Bundle);
     }
@@ -413,7 +416,10 @@ BundleLoader::StartDependencies(Bundle::Pointer bundle)
   IBundleManifest::Dependencies::const_iterator iter;
   for (iter = deps.begin(); iter != deps.end(); ++iter)
   {
-    this->StartBundle(m_BundleMap[iter->symbolicName].m_Bundle);
+    if (Bundle::Pointer depBundle = m_BundleMap[iter->symbolicName].m_Bundle)
+    {
+      this->StartBundle(depBundle);
+    }
   }
 }
 

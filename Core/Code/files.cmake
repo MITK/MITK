@@ -219,6 +219,7 @@ SET(CPP_FILES
   Rendering/mitkRenderWindow.cpp
   Rendering/mitkRenderWindowBase.cpp
   Rendering/mitkShaderRepository.cpp
+  Rendering/mitkImageVtkMapper2D.cpp
 
   Rendering/mitkImageMapperGL2D.cpp
   Rendering/vtkMitkThickSlicesFilter.cpp

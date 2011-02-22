@@ -29,8 +29,9 @@ SET(IPFUNC_FILES
   ExtrR.c
   ExtrROI.c   Extrema.c   FillArea.c   Frame.c   GaussF.c   Grad.c   Grav.c   Hist.c   Histo.c   HitMiss.c   HitMissI.c   Inertia.c   Inv.c   LN.c   Label.c   Laplace.c   LevWind.c   Log.c   MakePicName.c   Malloc.c   Mean.c   MeanC.c   MeanF.c   MeanR.c   MeanROI.c   Median.c   Morph.c   MultC.c   MultI.c   Norm.c   NormXY.c   Not.c   OpCl.c   Open.c   Or.c   Pot.c   Range.c   Rank.c   Refl.c   RegGrow.c   Roberts.c   Rotate.c   SDev.c   SDevC.c   SDevR.c   SDevROI.c   ScBl.c   ScFact.c   ScNN.c   Scale.c   SelInv.c   SelMM.c   Select.c   SetErrno.c   SetTag.c   Shp.c   Skewness.c   SkewnessR.c   Sobel.c   Sqrt.c   SubC.c   SubI.c   Thresh.c   Transpose.c   Var.c   VarC.c   VarR.c   VarROI.c   Window.c   WindowR.c   Xchange.c   ZeroCr.c   _BorderX.c   _DrawPoly.c   ipGetANew.c
   )  
-FIND_PACKAGE(ITK)
-INCLUDE_DIRECTORIES(. .. ../ipPic)
+
+INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}
+                    ${CMAKE_CURRENT_SOURCE_DIR}/../ipPic)
 
 ADD_LIBRARY(mitkIpFunc ${MITK_WIN32_FORCE_STATIC} ${IPFUNC_FILES})
 TARGET_LINK_LIBRARIES(mitkIpFunc mitkIpPic )
@@ -39,7 +40,7 @@ IF(UNIX)
 ENDIF(UNIX)
 
 MITK_CREATE_MODULE_CONF(mitkIpFunc
-  INCLUDE_DIRS ..
+  INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}
   DEPENDS mitkIpPic
 )
 

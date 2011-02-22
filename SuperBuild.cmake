@@ -1,9 +1,8 @@
-#PROJECT(MITK-super)
-cmake_minimum_required(VERSION 2.8.2)
-MESSAGE("In super build")
+
 #-----------------------------------------------------------------------------
 # Convenient macro allowing to download a file
-#
+#-----------------------------------------------------------------------------
+
 MACRO(downloadFile url dest)
   FILE(DOWNLOAD ${url} ${dest} STATUS status)
   LIST(GET status 0 error_code)
@@ -13,14 +12,35 @@ MACRO(downloadFile url dest)
   ENDIF()
 ENDMACRO()
 
+#-----------------------------------------------------------------------------
+# MITK Prerequisites
+#-----------------------------------------------------------------------------
+
+#----------------------------- Qt ---------------------------
+if(MITK_USE_QT)
+  find_package(Qt4 REQUIRED)
+  set(vtk_QT_ARGS
+      ${ep_common_args}
+      -DDESIRED_QT_VERSION:STRING=4
+      -DVTK_USE_GUISUPPORT:BOOL=ON
+      -DVTK_USE_QVTK_QTOPENGL:BOOL=ON
+      -DVTK_USE_QT:BOOL=ON
+      -DQT_QMAKE_EXECUTABLE:FILEPATH=${QT_QMAKE_EXECUTABLE}
+     )
+endif()
+
+#-----------------------------------------------------------------------------
+# External project settings
+#-----------------------------------------------------------------------------
+
 INCLUDE(ExternalProject)
 
 SET(ep_base "${CMAKE_BINARY_DIR}/CMakeExternals")
 SET_PROPERTY(DIRECTORY PROPERTY EP_BASE ${ep_base})
 
 SET(ep_install_dir ${ep_base}/Install)
-SET(ep_build_dir ${ep_base}/Build)
-SET(ep_source_dir ${ep_base}/Source)
+#SET(ep_build_dir ${ep_base}/Build)
+#SET(ep_source_dir ${ep_base}/Source)
 #SET(ep_parallelism_level)
 SET(ep_build_shared_libs ON)
 SET(ep_build_testing OFF)
@@ -54,160 +74,101 @@ SET(ep_common_args
   "-DCMAKE_CXX_FLAGS:STRING=${ep_common_CXX_FLAGS}"
 )
 
+#-----------------------------------------------------------------------------
+# ExternalProjects 
+#-----------------------------------------------------------------------------
 
+SET(external_projects
+  VTK
+  GDCM
+  ITK
+  Boost
+  DCMTK
+  CTK
+  )
+  
+# Include external projects
+FOREACH(p ${external_projects})
+  INCLUDE(CMakeExternals/${p}.cmake)
+ENDFOREACH()
 
 #-----------------------------------------------------------------------------
-# Prerequisites
-#
+# Set superbuild boolean args
+#-----------------------------------------------------------------------------
 
-if(MITK_USE_QT)
-  set(vtk_QT_ARGS
-      ${ep_common_args}
-      -DDESIRED_QT_VERSION:STRING=4
-      -DVTK_USE_GUISUPPORT:BOOL=ON
-      -DVTK_USE_QVTK_QTOPENGL:BOOL=ON
-      -DVTK_USE_QT:BOOL=ON
-      -DQT_QMAKE_EXECUTABLE:FILEPATH=${QT_QMAKE_EXECUTABLE}
-     )
-endif(MITK_USE_QT)
-
-# ----------------------------------------- 
-# VTK
-#
-IF(WIN32)
-  OPTION(VTK_USE_SYSTEM_FREETYPE OFF)
-ELSE(WIN32)
-  OPTION(VTK_USE_SYSTEM_FREETYPE ON)
-ENDIF(WIN32)
-IF(NOT DEFINED VTK_DIR)
-    SET(proj vtk)
-    SET(VTK_DEPENDS ${proj})
-    ExternalProject_Add(${proj}
-      URL http://mitk.org/download/thirdparty/vtk-5.6.1.tar.gz
-      INSTALL_COMMAND ""
-      CMAKE_GENERATOR ${gen}
-      CMAKE_ARGS
-        ${ep_common_args}
-        -DVTK_WRAP_TCL:BOOL=OFF
-        -DVTK_WRAP_PYTHON:BOOL=OFF
-        -DVTK_WRAP_JAVA:BOOL=OFF
-        -DBUILD_SHARED_LIBS:BOOL=ON 
-        -DVTK_USE_PARALLEL:BOOL=ON
-        -DVTK_USE_SYSTEM_FREETYPE:BOOL=${VTK_USE_SYSTEM_FREETYPE}
-        ${vtk_QT_ARGS}
-      )
-  SET(VTK_DIR ${ep_build_dir}/${proj})
-ENDIF()
-## ----------------------------------------
-# DCMTK
-IF(MITK_USE_DCMTK)
-
-  IF(NOT DEFINED DCMTK_DIR)
-  SET(proj DCMTK)
-  IF(UNIX)
-    SET(DCMTK_CXX_FLAGS "-fPIC")
-    SET(DCMTK_C_FLAGS "-fPIC")
-  ENDIF(UNIX)
-  IF(DCMTK_DICOM_ROOT_ID)
-    SET(DCMTK_CXX_FLAGS "${DCMTK_CXX_FLAGS} -DSITE_UID_ROOT=\\\"${DCMTK_DICOM_ROOT_ID}\\\"")
-    SET(DCMTK_C_FLAGS "${DCMTK_CXX_FLAGS} -DSITE_UID_ROOT=\\\"${DCMTK_DICOM_ROOT_ID}\\\"")
-  ENDIF()
-  ExternalProject_Add(${proj}
-    URL http://mitk.org/download/thirdparty/dcmtk-3.6.0.tar.gz
-      CMAKE_GENERATOR ${gen}
-      CMAKE_ARGS
-         ${ep_common_args}
-         -DDCMTK_OVERWRITE_WIN32_COMPILER_FLAGS:BOOL=OFF
-         -DBUILD_SHARED_LIBS:BOOL=OFF
-         "-DCMAKE_CXX_FLAGS:STRING=${ep_common_CXX_FLAGS} ${DCMTK_CXX_FLAGS}"
-         "-DCMAKE_C_FLAGS:STRING=${ep_common_C_FLAGS} ${DCMTK_C_FLAGS}"
-         -DCMAKE_INSTALL_PREFIX:PATH=${ep_install_dir}/${proj}
+SET(mitk_cmake_boolean_args
+  BUILD_SHARED_LIBS
+  WITH_COVERAGE
+  BUILD_TESTING
+  
+  MITK_USE_QT
+  MITK_INSTALL_RPATH_RELATIVE
+  MITK_BUILD_ALL_PLUGINS
+  MITK_BUILD_TUTORIAL
+  MITK_USE_Boost
+  MITK_USE_GDCMIO
+  MITK_USE_BLUEBERRY
+  MITK_USE_CTK
+  MITK_USE_DCMTK  
   )
-    SET(DCMTK_DIR {ep_install_dir}/${proj})
-  ENDIF()
-ENDIF()     
+  
+#-----------------------------------------------------------------------------
+# Generate cmake variable names for MITK bundles
+#-----------------------------------------------------------------------------
 
-# ----------------------------------------- 
-# CTK
-#
-IF(MITK_USE_CTK)
-IF(NOT DEFINED CTK_DIR)
-    SET(proj CTK)
-    # SET(CTK_DEPENDS ${proj})
-    ExternalProject_Add(${proj}
-      GIT_REPOSITORY git://github.com/commontk/CTK.git
-      INSTALL_COMMAND ""
-      CMAKE_GENERATOR ${gen}
-      CMAKE_ARGS
-        ${ep_common_args}
-        -DDESIRED_QT_VERSION:STRING=4
-        -DQT_QMAKE_EXECUTABLE:FILEPATH=${QT_QMAKE_EXECUTABLE}
-        -DCTK_LIB_DICOM/Widgets:BOOL=ON
-      )
-  SET(CTK_DIR ${ep_build_dir}/${proj})
-ENDIF()
-ENDIF(MITK_USE_CTK)
+INCLUDE(mitkSuperBuildPlugins)
+FOREACH(plugin ${MITK_SUPERBUILD_PLUGINS})
+  LIST(APPEND mitk_cmake_boolean_args MITK_BUILD_${plugin})
+  OPTION(MITK_BUILD_${plugin} "Build the MITK ${plugin} plugin" OFF)
+ENDFOREACH()
 
-## -----------------------------------------
-# GDCM
-#
-IF(NOT DEFINED GDCM_DIR)
-  SET(proj GDCM)
-  ExternalProject_Add(${proj}
-     URL http://mitk.org/download/thirdparty/gdcm-2.0.14.tar.gz 
-     INSTALL_COMMAND ""
-     CMAKE_GENERATOR ${gen}
-     CMAKE_ARGS
-       ${ep_common_args}
-       -DBUILD_SHARED_LIBS:BOOL=ON 
-       -DGDCM_BUILD_SHARED_LIBS:BOOL=ON 
-       -DBUILD_TESTING:BOOL=OFF
-       -DBUILD_EXAMPLES:BOOL=OFF
-     )
-  SET(GDCM_DIR ${ep_build_dir}/${proj})
-   
-ENDIF(NOT DEFINED GDCM_DIR)
+#-----------------------------------------------------------------------------
+# Create the final variable containing superbuild boolean args
+#-----------------------------------------------------------------------------
 
-## ----------------------------------------- 
-# ITK
-#
-IF(NOT DEFINED ITK_DIR)
-  SET(proj ITK)
-  ExternalProject_Add(${proj}
-     URL http://mitk.org/download/thirdparty/InsightToolkit-3.20.0.tar.gz 
-     INSTALL_COMMAND ""
-     CMAKE_GENERATOR ${gen}
-     CMAKE_ARGS
-       ${ep_common_args}
-       -DBUILD_TESTING:BOOL=OFF
-       -DBUILD_EXAMPLES:BOOL=OFF
-       -DITK_USE_SYSTEM_GDCM:BOOL=ON
-       -DGDCM_DIR:PATH=${GDCM_DIR}
-     DEPENDS GDCM
-     )
+SET(mitk_superbuild_boolean_args)
+FOREACH(mitk_cmake_arg ${mitk_cmake_boolean_args})
+  LIST(APPEND mitk_superbuild_boolean_args -D${mitk_cmake_arg}:BOOL=${${mitk_cmake_arg}})
+ENDFOREACH()
 
-  SET(ITK_DIR ${ep_build_dir}/${proj})
+#-----------------------------------------------------------------------------
+# MITK Utilities
+#-----------------------------------------------------------------------------
 
-ENDIF()
-
+set(proj MITK-Utilities)
+ExternalProject_Add(${proj}
+  DOWNLOAD_COMMAND ""
+  CONFIGURE_COMMAND ""
+  BUILD_COMMAND ""
+  INSTALL_COMMAND ""
+  DEPENDS
+    # Mandatory dependencies
+    ${VTK_DEPENDS}
+    ${ITK_DEPENDS}
+    # Optionnal dependencies
+    ${Boost_DEPENDS}
+    ${CTK_DEPENDS}
+    ${DCMTK_DEPENDS}
+    
+)
 
 #-----------------------------------------------------------------------------
 # MITK Configure
-#
+#-----------------------------------------------------------------------------
+
 SET(proj MITK-Configure)
 
 ExternalProject_Add(${proj}
   DOWNLOAD_COMMAND ""
   CMAKE_GENERATOR ${gen}
   CMAKE_ARGS
-    ${ctk_superbuild_boolean_args}
+    ${mitk_superbuild_boolean_args}
     -DMITK_USE_SUPERBUILD:BOOL=OFF
-    -DWITH_COVERAGE:BOOL=${WITH_COVERAGE}
     -DCTEST_USE_LAUNCHERS:BOOL=${CTEST_USE_LAUNCHERS}
     -DMITK_SUPERBUILD_BINARY_DIR:PATH=${MITK_BINARY_DIR}
     -DCMAKE_INSTALL_PREFIX:PATH=${ep_install_dir}
     -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
-	"-DCMAKE_CXX_FLAGS:STRING=${ep_common_CXX_FLAGS} ${MITK_CXX_FLAGS}"
+    "-DCMAKE_CXX_FLAGS:STRING=${ep_common_CXX_FLAGS} ${MITK_CXX_FLAGS}"
     "-DCMAKE_C_FLAGS:STRING=${ep_common_C_FLAGS} ${MITK_C_FLAGS}"
     -DMITK_CXX_FLAGS:STRING=${MITK_CXX_FLAGS}
     -DMITK_C_FLAGS:STRING=${MITK_C_FLAGS}
@@ -217,10 +178,9 @@ ExternalProject_Add(${proj}
     -DDCMTK_DIR:PATH=${DCMTK_DIR}
     -DVTK_DIR:PATH=${VTK_DIR}     # FindVTK expects VTK_DIR
     -DITK_DIR:PATH=${ITK_DIR}     # FindITK expects ITK_DIR
-    -DBUILD_TESTING:BOOL=${BUILD_TESTING}
-    -DMITK_USE_BLUEBERRY:BOOL=${MITK_USE_BLUEBERRY}
-    -DBUILD_EXAMPLES:BOOL=${BUILD_EXAMPLES}
-    -DMITK_BUILD_TUTORIAL:BOOL=${MITK_BUILD_TUTORIAL}
+    -DGDCM_DIR:PATH=${GDCM_DIR}
+    -DBOOST_ROOT:PATH=${BOOST_ROOT}
+    -DMITK_USE_Boost:BOOL=${MITK_USE_Boost}
     -DMITK_USE_GDCMIO:BOOL=${MITK_USE_GDCMIO}
     -DMITK_USE_DCMTK:BOOL=${MITK_USE_DCMTK}
     -DMITK_USE_QT:BOOL=${MITK_USE_QT}
@@ -230,14 +190,14 @@ ExternalProject_Add(${proj}
   BUILD_COMMAND ""
   INSTALL_COMMAND ""
   DEPENDS
-    vtk
-    ITK
+    MITK-Utilities
   )
 
 
 #-----------------------------------------------------------------------------
 # MITK
-#
+#-----------------------------------------------------------------------------
+
 #MESSAGE(STATUS SUPERBUILD_EXCLUDE_MITKBUILD_TARGET:${SUPERBUILD_EXCLUDE_MITKBUILD_TARGET})
 IF(NOT DEFINED SUPERBUILD_EXCLUDE_MITKBUILD_TARGET OR NOT SUPERBUILD_EXCLUDE_MITKBUILD_TARGET)
   SET(proj MITK-build)
@@ -254,7 +214,8 @@ ENDIF()
 
 #-----------------------------------------------------------------------------
 # Custom target allowing to drive the build of MITK project itself
-#
+#-----------------------------------------------------------------------------
+
 ADD_CUSTOM_TARGET(MITK
   COMMAND ${CMAKE_COMMAND} --build ${CMAKE_CURRENT_BINARY_DIR}/MITK-build
   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/MITK-build

@@ -15,8 +15,8 @@ IF(DOXYGEN_DOT_EXECUTABLE AND USE_DOT)
   SET(HAVE_DOT "YES")
 ENDIF()
 
-SET(MITK_DOXYGEN_OUTPUT_DIR ${MITK_BINARY_DIR}/Documentation/Doxygen CACHE PATH "Output directory for doxygen generated documentation." )
-SET(MITK_HELPPAGES_OUTPUT_DIR ${MITK_BINARY_DIR}/Documentation/helpPages CACHE PATH "Output directory for html help pages." )
+SET(MITK_DOXYGEN_OUTPUT_DIR ${PROJECT_BINARY_DIR}/Documentation/Doxygen CACHE PATH "Output directory for doxygen generated documentation." )
+SET(MITK_HELPPAGES_OUTPUT_DIR ${PROJECT_BINARY_DIR}/Documentation/helpPages CACHE PATH "Output directory for html help pages." )
   
 SET(BUILD_QCH_FILES_BOOL "NO")
 IF(BUILD_MITK_QCH_FILES)
@@ -73,19 +73,19 @@ CONFIGURE_FILE(doxygen.conf.in
 CONFIGURE_FILE(helpPages.conf.in
                ${CMAKE_CURRENT_BINARY_DIR}/helpPages.conf)
 
-			   
+
 IF(BUILD_ITK_QCH_FILE)
-	# add the command to generate the ITK documantation
-	add_custom_command(TARGET doc
-					   POST_BUILD
-					   ${DOXYGEN}  ${CMAKE_CURRENT_BINARY_DIR}/doxygen.itk.conf)
+  # add the command to generate the ITK documantation
+  add_custom_command(TARGET doc
+                     POST_BUILD
+                     ${DOXYGEN}  ${CMAKE_CURRENT_BINARY_DIR}/doxygen.itk.conf)
 ENDIF(BUILD_ITK_QCH_FILE)
 
 IF(BUILD_VTK_QCH_FILE)
-	# add the command to generate the VTK documantation
-	add_custom_command(TARGET doc
-					   POST_BUIL
-					   ${DOXYGEN}  ${CMAKE_CURRENT_BINARY_DIR}/doxygen.vtk.conf)
+  # add the command to generate the VTK documantation
+  add_custom_command(TARGET doc
+                     POST_BUILD
+                     ${DOXYGEN}  ${CMAKE_CURRENT_BINARY_DIR}/doxygen.vtk.conf)
 ENDIF(BUILD_VTK_QCH_FILE)
 
 # CONFIGURE_FILE(${PROJECT_SOURCE_DIR}/Documentation/doxygen.conf.in
@@ -101,15 +101,22 @@ IF (MITK_USE_BLUEBERRY)
   # convert the extension points schema files into html
   FIND_PACKAGE(Ant)
   IF(ANT_FOUND AND BLUEBERRY_DOC_TOOLS_DIR)
-    FILE(GLOB_RECURSE _plugin_xmls
-                      ${CMAKE_CURRENT_SOURCE_DIR}/../CoreUI/Bundles/plugin.xml
-                      ${CMAKE_CURRENT_SOURCE_DIR}/../Modules/Bundles/plugin.xml)
+
+    LIST(APPEND MITK_XP_GLOB_EXPRESSIONS
+         ${MITK_SOURCE_DIR}/CoreUI/Bundles/plugin.xml
+         ${MITK_SOURCE_DIR}/Modules/Bundles/plugin.xml)
+
+    FILE(GLOB_RECURSE _plugin_xmls ${MITK_XP_GLOB_EXPRESSIONS})
+                      
     MACRO_CONVERT_SCHEMA(INPUT ${_plugin_xmls} 
                          OUTPUT_DIR "${MITK_DOXYGEN_OUTPUT_DIR}/html/extension-points/html"
                          TARGET_NAME mitkXPDoc
                          )
 
-    ADD_DEPENDENCIES(doc mitkXPDoc BlueBerryDoc)
+    ADD_DEPENDENCIES(doc mitkXPDoc)
+    IF(${PROJECT_NAME} STREQUAL "MITK")
+      ADD_DEPENDENCIES(doc BlueBerryDoc)
+    ENDIF()
   ENDIF(ANT_FOUND AND BLUEBERRY_DOC_TOOLS_DIR)
 ENDIF (MITK_USE_BLUEBERRY)
 
@@ -121,13 +128,13 @@ ELSE(DOXYGEN_FOUND)
 # copy blank documentation page to prevent QtHelp from being shown 
 # copy the .qhc and .qch files to $MITK_BIN/mitk/bin/ExtBundles/resources/
 
-CONFIGURE_FILE( pregenerated/MITKBlankPage.qch
-				${MITK_BINARY_DIR}/bin/ExtBundles/org.mitk.gui.qt.extapplication/resources/MITKBlankPage.qch
-				COPYONLY )
-				
-CONFIGURE_FILE( pregenerated/MitkExtQtHelpCollection.qhc
-				${MITK_BINARY_DIR}/bin/ExtBundles/org.mitk.gui.qt.extapplication/resources/MitkExtQtHelpCollection.qhc
-				COPYONLY )				
+CONFIGURE_FILE(pregenerated/MITKBlankPage.qch
+               ${MITK_BINARY_DIR}/bin/ExtBundles/org.mitk.gui.qt.extapplication/resources/MITKBlankPage.qch
+               COPYONLY)
+
+CONFIGURE_FILE(pregenerated/MitkExtQtHelpCollection.qhc
+               ${MITK_BINARY_DIR}/bin/ExtBundles/org.mitk.gui.qt.extapplication/resources/MitkExtQtHelpCollection.qhc
+               COPYONLY)
 
 ENDIF(DOXYGEN_FOUND)
 

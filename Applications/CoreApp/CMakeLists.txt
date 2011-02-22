@@ -1,12 +1,13 @@
-SET(MITK_USE_BLUEBERRY 1)
-FIND_PACKAGE(MITK)
+FIND_PACKAGE(BlueBerry REQUIRED)
 
 INCLUDE_DIRECTORIES(
   ${BLUEBERRY_PLUGIN_SOURCE_DIRS}
   ${org.blueberry.osgi_BIN_DIR} # needed for generated berryConfig.h
   ${Poco_INCLUDE_DIRS}
 )
-LINK_DIRECTORIES(${Poco_LIBRARY_DIRS})
+LINK_DIRECTORIES(${Poco_LIBRARY_DIRS}
+                 ${BLUEBERRY_PLUGINS_OUTPUT_DIR}/org.blueberry.osgi/bin
+                )
 
 IF(MITK_SHOW_CONSOLE_WINDOW)
   ADD_EXECUTABLE(CoreApp MACOSX_BUNDLE CoreApp.cpp)

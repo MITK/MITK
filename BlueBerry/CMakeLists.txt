@@ -94,13 +94,13 @@ IF(BLUEBERRY_USE_QT AND DESIRED_QT_VERSION EQUAL 4)
     ENDIF()
   ELSE(BLUEBERRY_USE_QT_HELP)
   
-	CONFIGURE_FILE( ../Documentation/pregenerated/MITKBlankPage.qch
-				${MITK_BINARY_DIR}/bin/ExtBundles/org.mitk.gui.qt.extapplication/resources/MITKBlankPage.qch
-				COPYONLY )
-				
-	CONFIGURE_FILE( ../Documentation/pregenerated/MitkExtQtHelpCollection.qhc
-				${MITK_BINARY_DIR}/bin/ExtBundles/org.mitk.gui.qt.extapplication/resources/MitkExtQtHelpCollection.qhc
-				COPYONLY )
+    CONFIGURE_FILE(../Documentation/pregenerated/MITKBlankPage.qch
+                   ${MITK_BINARY_DIR}/bin/ExtBundles/org.mitk.gui.qt.extapplication/resources/MITKBlankPage.qch
+                   COPYONLY)
+
+    CONFIGURE_FILE(../Documentation/pregenerated/MitkExtQtHelpCollection.qhc
+                   ${MITK_BINARY_DIR}/bin/ExtBundles/org.mitk.gui.qt.extapplication/resources/MitkExtQtHelpCollection.qhc
+                   COPYONLY)
   
   ENDIF(BLUEBERRY_USE_QT_HELP)
 

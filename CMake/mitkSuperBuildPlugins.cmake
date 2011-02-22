@@ -1,0 +1,14 @@
+set(MITK_SUPERBUILD_PLUGINS
+  org.mitk.gui.qt.basicimageprocessing
+  org.mitk.gui.qt.datamanager
+  org.mitk.gui.qt.diffusionimaging
+  org.mitk.gui.qt.imagecropper
+  org.mitk.gui.qt.imagestatistics
+  org.mitk.gui.qt.isosurface
+  org.mitk.gui.qt.materialeditor
+  org.mitk.gui.qt.measurement
+  org.mitk.gui.qt.regiongrowing
+  org.mitk.gui.qt.segmentation
+  org.mitk.gui.qt.simplemeasurement
+  org.mitk.gui.qt.volumevisualization
+)

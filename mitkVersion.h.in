@@ -3,5 +3,6 @@
   this file is generated. Do not change!
 */
 
-#define MITK_SVN_REVISION "@MITK_SVN_REVISION@"
+#define MITK_REVISION "@MITK_WC_REVISION_HASH@"
+#define MITK_REVISION_NAME "@MITK_WC_REVISION_NAME@"
 

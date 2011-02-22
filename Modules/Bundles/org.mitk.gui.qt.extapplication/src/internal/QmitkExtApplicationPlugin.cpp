@@ -50,8 +50,8 @@ QString QmitkExtApplicationPlugin::GetQtHelpCollectionFile() const
 
   std::string collectionFilename;
   std::string na = "n/a";
-  if (na != MITK_SVN_REVISION)
-    collectionFilename = "MitkExtQtHelpCollection_" MITK_SVN_REVISION ".qhc";
+  if (na != MITK_REVISION)
+    collectionFilename = "MitkExtQtHelpCollection_" MITK_REVISION ".qhc";
   else
     collectionFilename = "MitkExtQtHelpCollection.qhc";
 

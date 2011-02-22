@@ -30,8 +30,8 @@ QmitkAboutDialog::QmitkAboutDialog(QWidget* parent, Qt::WindowFlags f)
   Ui::QmitkAboutDialog gui;
   gui.setupUi(this);
 
-  QString mitkRevision(MITK_SVN_REVISION);
-  mitkRevision.replace( QRegExp("[^0-9]+(\\d+).*"), "\\1");
+  QString mitkRevision(MITK_REVISION);
+  //mitkRevision.replace( QRegExp("[^0-9]+(\\d+).*"), "\\1");
   QString itkVersion = "%1.%2.%3";
   itkVersion = itkVersion.arg(ITK_VERSION_MAJOR).arg(ITK_VERSION_MINOR).arg(ITK_VERSION_PATCH);
   QString vtkVersion = "%1.%2.%3";

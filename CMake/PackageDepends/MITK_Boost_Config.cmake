@@ -1,7 +1,6 @@
-OPTION(MITK_USE_Boost OFF)
 IF(MITK_USE_Boost)
 
-FIND_PACKAGE(Boost)
+FIND_PACKAGE(Boost REQUIRED)
 
 #here we could also choose the desired components:
 #FIND_PACKAGE(Boost COMPONENTS graph math/special_functions)

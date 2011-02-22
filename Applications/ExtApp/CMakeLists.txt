@@ -1,6 +1,4 @@
-SET(MITK_USE_BLUEBERRY 1)
-SET(MITK_USE_EXT 1)
-FIND_PACKAGE(MITK)
+FIND_PACKAGE(BlueBerry REQUIRED)
 
 # TODO: this can be removed after resolving factory issues, it's only necessary for the registration call in main()
 MITK_USE_MODULE(MitkExt)
@@ -11,7 +9,9 @@ INCLUDE_DIRECTORIES(
   ${Poco_INCLUDE_DIRS}
   ${ALL_INCLUDE_DIRECTORIES}
 )
-LINK_DIRECTORIES(${Poco_LIBRARY_DIRS})
+LINK_DIRECTORIES(${Poco_LIBRARY_DIRS}
+                 ${BLUEBERRY_PLUGINS_OUTPUT_DIR}/org.blueberry.osgi/bin
+                )
   
 IF(MITK_SHOW_CONSOLE_WINDOW)
   ADD_EXECUTABLE(ExtApp MACOSX_BUNDLE ExtApp.cpp)
@@ -31,7 +31,7 @@ TARGET_LINK_LIBRARIES(ExtApp
                       ${ALL_LIBRARIES})
 
 SET_TARGET_PROPERTIES(ExtApp PROPERTIES INSTALL_RPATH "${CMAKE_INSTALL_RPATH};${CMAKE_INSTALL_RPATH}/BlueBerry/org.blueberry.osgi/bin")
-					  
+
 SET(EXTAPP_REQUIRED_BUNDLES
 org.mitk.gui.qt.datamanager
 org.mitk.gui.qt.imagenavigator
@@ -43,7 +43,7 @@ FOREACH(EXTAPP_REQUIRED_BUNDLE ${EXTAPP_REQUIRED_BUNDLES})
 ENDFOREACH()
 
 #MESSAGE(STATUS ${MITK_MODULES_ENABLED_PLUGINS})
-					  
+
 SET(_plugin_deps ${BLUEBERRY_ENABLED_PLUGINS} ${MITK_CORE_ENABLED_PLUGINS} ${MITK_MODULES_ENABLED_PLUGINS})
 
 IF(_plugin_deps)

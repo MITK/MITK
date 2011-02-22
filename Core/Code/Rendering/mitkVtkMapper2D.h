@@ -35,7 +35,7 @@ namespace mitk {
   {
   public:
     mitkClassMacro(VtkMapper2D,Mapper2D);
-    virtual vtkProp* GetProp(mitk::BaseRenderer* renderer) = 0;
+    virtual vtkProp* GetVtkProp(mitk::BaseRenderer* renderer) = 0;
 
   protected:
     VtkMapper2D();

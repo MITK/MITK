@@ -1,10 +1,4 @@
 /*=========================================================================
-
-Program:   Medical Imaging & Interaction Toolkit
-Language:  C++
-Date:      $Date$
-Version:   $Revision$
-
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
@@ -25,7 +19,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 //VTK includes
 #include <vtkSmartPointer.h>
-#include <vtkActor.h>
+#include <vtkImageActor.h>
+#include <vtkActor2D.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkImageData.h>
 
@@ -38,17 +33,32 @@ namespace mitk {
   {
   public:
     mitkClassMacro(ImageVtkMapper2D,VtkMapper2D);
+    itkNewMacro(Self);
+    virtual const mitk::Image* GetInput();
+
+    virtual void MitkRenderOverlay(BaseRenderer* renderer);
+    virtual void MitkRenderOpaqueGeometry(BaseRenderer* renderer);
+    virtual void MitkRenderTranslucentGeometry(BaseRenderer* renderer);
+    virtual void MitkRenderVolumetricGeometry(BaseRenderer* renderer) ;
+
+    virtual vtkProp* GetVtkProp(mitk::BaseRenderer* renderer);
 
   protected:
     ImageVtkMapper2D();
 
     virtual ~ImageVtkMapper2D();
-  private:
-        vtkSmartPointer<vtkImageData> m_VtkImage;
 
-//        mitk::Image* GetInput();
-        vtkSmartPointer<vtkActor> m_VtkActor;
-        vtkSmartPointer<vtkPolyDataMapper> m_VtkMapper;
+    virtual void GenerateData(BaseRenderer* renderer);
+  private:
+    vtkSmartPointer<vtkImageData> m_VtkImage;
+
+    vtkSmartPointer<vtkImageActor> m_VtkActor;
+    vtkSmartPointer<vtkPolyDataMapper> m_VtkMapper;
+
+    int m_TimeStep;
+    bool m_VtkBased;
+
+    vtkImageData *GenerateTestImageForTSFilter();
   };
 
 } // namespace mitk

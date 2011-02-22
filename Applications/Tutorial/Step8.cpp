@@ -21,6 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkGlobalInteraction.h"
 #include "mitkRenderingManager.h"
+#include <mitkImageVtkMapper2D.h>
 
 #include <QHBoxLayout>
 #include <QVBoxLayout>
@@ -49,6 +50,9 @@ void Step8::SetupWidgets()
 	QHBoxLayout* hlayout = new QHBoxLayout(viewParent);
 	hlayout->setMargin(0);
 
+	mitk::ImageVtkMapper2D::Pointer mapper = mitk::ImageVtkMapper2D::New();
+	m_ResultNode->SetMapper(mitk::BaseRenderer::Extended2D, mapper);
+
 	//*************************************************************************
 	// Part Ia: create and initialize QmitkStdMultiWidget
 	//*************************************************************************
@@ -66,8 +70,8 @@ void Step8::SetupWidgets()
 	mitk::RenderingManager::GetInstance()->InitializeViews(geo);
 
 	// Initialize bottom-right view as 3D view
-	multiWidget->GetRenderWindow4()->GetRenderer()->SetMapperID(
-			mitk::BaseRenderer::Standard3D);
+	multiWidget->GetRenderWindow1()->GetRenderer()->SetMapperID(
+			mitk::BaseRenderer::Extended2D);
 
 	// Enable standard handler for levelwindow-slider
 	multiWidget->EnableStandardLevelWindow();

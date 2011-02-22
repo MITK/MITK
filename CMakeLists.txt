@@ -397,5 +397,5 @@ set(IPFUNC_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Utilities/ipFunc)
 set(UTILITIES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Utilities)
 
 configure_file(mitkConfig.h.in ${MITK_BINARY_DIR}/mitkConfig.h)
-configure_file(MITKConfig.cmake.in ${MITK_BINARY_DIR}/MITKConfig.cmake)
+configure_file(MITKConfig.cmake.in ${MITK_BINARY_DIR}/MITKConfig.cmake @ONLY)
 

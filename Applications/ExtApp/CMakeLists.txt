@@ -58,12 +58,11 @@ CONFIGURE_FILE(ExtApp.ini
                ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/ExtApp.ini)
 
 IF(WIN32)
-  SET(EXTAPP_BUILD_TYPE debug)
-  CONFIGURE_FILE(startExtApp.bat.in
-               ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/startExtApp_${EXTAPP_BUILD_TYPE}.bat @ONLY)
-  SET(EXTAPP_BUILD_TYPE release)
-  CONFIGURE_FILE(startExtApp.bat.in
-               ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/startExtApp_${EXTAPP_BUILD_TYPE}.bat @ONLY)
+  FOREACH(EXTAPP_BUILD_TYPE debug release)
+    mitkFunctionCreateWindowsBatchScript(startExtApp.bat.in
+      ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/startExtApp_${EXTAPP_BUILD_TYPE}.bat
+      ${EXTAPP_BUILD_TYPE})
+  ENDFOREACH()
 ENDIF(WIN32)
 
 MITK_INSTALL_TARGETS(EXECUTABLES ExtApp GLOB_PLUGINS )

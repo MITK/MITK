@@ -139,6 +139,7 @@ include(MacroParseArguments)
 include(mitkFunctionSuppressWarnings) # includes several functions
 include(mitkFunctionOrganizeSources)
 include(mitkFunctionGetVersion)
+include(mitkFunctionCreateWindowsBatchScript)
 include(mitkMacroCreateModuleConf)
 include(mitkMacroCreateModule)
 include(mitkMacroCheckModule)

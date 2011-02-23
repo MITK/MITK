@@ -44,12 +44,11 @@ CONFIGURE_FILE(CoreApp.ini
                ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/CoreApp.ini)
 
 IF(WIN32)
-  SET(COREAPP_BUILD_TYPE debug)
-  CONFIGURE_FILE(startCoreApp.bat.in
-               ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/startCoreApp_${COREAPP_BUILD_TYPE}.bat @ONLY)
-  SET(COREAPP_BUILD_TYPE release)
-  CONFIGURE_FILE(startCoreApp.bat.in
-               ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/startCoreApp_${COREAPP_BUILD_TYPE}.bat @ONLY)
+  FOREACH(COREAPP_BUILD_TYPE debug release)
+    mitkFunctionCreateWindowsBatchScript(startCoreApp.bat.in
+      ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/startCoreApp_${COREAPP_BUILD_TYPE}.bat
+      ${COREAPP_BUILD_TYPE})
+  ENDFOREACH()
 ENDIF(WIN32)
 
 MITK_INSTALL_TARGETS(EXECUTABLES CoreApp GLOB_PLUGINS )

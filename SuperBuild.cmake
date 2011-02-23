@@ -131,6 +131,10 @@ FOREACH(mitk_cmake_arg ${mitk_cmake_boolean_args})
   LIST(APPEND mitk_superbuild_boolean_args -D${mitk_cmake_arg}:BOOL=${${mitk_cmake_arg}})
 ENDFOREACH()
 
+IF(MITK_BUILD_ALL_PLUGINS)
+  LIST(APPEND mitk_superbuild_boolean_args -DBLUEBERRY_BUILD_ALL_PLUGINS:BOOL=ON)
+ENDIF()
+
 #-----------------------------------------------------------------------------
 # MITK Utilities
 #-----------------------------------------------------------------------------

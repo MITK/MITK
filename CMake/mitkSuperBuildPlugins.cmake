@@ -1,6 +1,5 @@
 set(MITK_SUPERBUILD_PLUGINS
   org.mitk.gui.qt.basicimageprocessing
-  org.mitk.gui.qt.diffusionimaging
   org.mitk.gui.qt.imagecropper
   org.mitk.gui.qt.imagestatistics
   org.mitk.gui.qt.isosurface

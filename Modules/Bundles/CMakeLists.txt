@@ -13,6 +13,8 @@ IF(MITK_USE_BLUEBERRY)
   
   IF(QT4_FOUND)
     LIST(APPEND _mitk_bundles_default "org.mitk.gui.qt.ext" "org.mitk.gui.qt.extapplication")
+    # ExtApp required bundles
+    LIST(APPEND _mitk_bundles_default "org.mitk.gui.qt.imagenavigator" "org.mitk.gui.qt.datamanager")
   ENDIF()
   
   SET(PLUGIN_EXCLUDE_LIST 

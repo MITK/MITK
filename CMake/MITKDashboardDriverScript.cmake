@@ -82,7 +82,7 @@ if(empty_binary_directory)
 endif()
 
 if(NOT EXISTS "${CTEST_SOURCE_DIRECTORY}")
-  set(CTEST_CHECKOUT_COMMAND "${CTEST_GIT_COMMAND} clone ${GIT_REPOSITORY} ${CTEST_SOURCE_DIRECTORY}")
+  set(CTEST_CHECKOUT_COMMAND "${CTEST_GIT_COMMAND} clone -b bug-7014-dashboard-script ${GIT_REPOSITORY} ${CTEST_SOURCE_DIRECTORY}")
 endif()
 
 set(CTEST_UPDATE_COMMAND "${CTEST_GIT_COMMAND}")
@@ -124,7 +124,9 @@ ${ADDITIONNAL_CMAKECACHE_OPTION}
     set_property(GLOBAL PROPERTY SubProject SuperBuild)
     set_property(GLOBAL PROPERTY Label SuperBuild)
      
-    ctest_configure(BUILD "${CTEST_BINARY_DIRECTORY}")
+    ctest_configure(BUILD "${CTEST_BINARY_DIRECTORY}"
+      OPTIONS "-DCTEST_USE_LAUNCHERS=${CTEST_USE_LAUNCHERS}"
+    )
     ctest_read_custom_files("${CTEST_BINARY_DIRECTORY}")
     ctest_submit(PARTS Configure)
     ctest_submit(FILES "${CTEST_BINARY_DIRECTORY}/Project.xml")
@@ -138,7 +140,8 @@ ${ADDITIONNAL_CMAKECACHE_OPTION}
       BUILD "${CTEST_BINARY_DIRECTORY}" 
       INCLUDE_LABEL "SuperBuild"
       PARALLEL_LEVEL 8
-      EXCLUDE ${TEST_TO_EXCLUDE_REGEX})
+      #EXCLUDE ${TEST_TO_EXCLUDE_REGEX}
+      )
     # runs only tests that have a LABELS property matching "${subproject}"
     ctest_submit(PARTS Test)
       
@@ -152,7 +155,9 @@ ${ADDITIONNAL_CMAKECACHE_OPTION}
       message("----------- [ Build ${subproject} ] -----------")
     
       # Configure target
-      ctest_configure(BUILD "${CTEST_BINARY_DIRECTORY}")
+      ctest_configure(BUILD "${CTEST_BINARY_DIRECTORY}"
+        OPTIONS "-DCTEST_USE_LAUNCHERS=${CTEST_USE_LAUNCHERS}"
+      )
       ctest_read_custom_files("${CTEST_BINARY_DIRECTORY}")
       ctest_submit(PARTS Configure)
      
@@ -168,7 +173,8 @@ ${ADDITIONNAL_CMAKECACHE_OPTION}
         APPEND
         # INCLUDE_LABEL "${subproject}"
         PARALLEL_LEVEL 8
-        EXCLUDE ${TEST_TO_EXCLUDE_REGEX})
+        #EXCLUDE ${TEST_TO_EXCLUDE_REGEX}
+        )
       # runs only tests that have a LABELS property matching "${subproject}"
       
       ctest_submit(PARTS Test)

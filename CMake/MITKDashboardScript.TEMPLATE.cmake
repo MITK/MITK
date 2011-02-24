@@ -12,21 +12,29 @@ cmake_minimum_required(VERSION 2.8.2)
 #
 # Dashboard properties
 #
-set(MY_OPERATING_SYSTEM "Linux") # Windows, Linux, Darwin... 
-set(MY_COMPILER "g++4.3.3")
-set(MY_QT_VERSION "4.6.2")
-set(QT_QMAKE_EXECUTABLE "$ENV{QTDIR}/bin/qmake")
-set(CTEST_SITE "mbi007") # for example: mymachine.kitware, mymachine.dkfz, ...
-set(CTEST_DASHBOARD_ROOT "/opt/dartclients")
 set(CTEST_CMAKE_COMMAND "/usr/bin/cmake")
 set(CTEST_CMAKE_GENERATOR "Unix Makefiles")
+set(QT_QMAKE_EXECUTABLE "$ENV{QTDIR}/bin/qmake")
+set(CTEST_DASHBOARD_ROOT "/opt/dartclients")
+
+
+#
+# Some properties are determined by the script itself -- do not modify
+#
+set(MY_OPERATING_SYSTEM "${CMAKE_HOST_SYSTEM}") # Windows 7, Linux-2.6.32, Darwin... 
+set(MY_COMPILER ${CMAKE_BUILD_TOOL})
+site_name(CTEST_SITE)
+# TODO: query by executing qmake
+execute_process(COMMAND qmake --version
+                OUTPUT_VARIABLE MY_QT_VERSION)
+string(REGEX REPLACE ".*Qt version ([0-9.]+) .*" "\\1" MY_QT_VERSION ${MY_QT_VERSION})
 
 #
 # Dashboard options
 #
 set(WITH_KWSTYLE FALSE)
 set(WITH_MEMCHECK FALSE)
-set(WITH_COVERAGE TRUE)
+set(WITH_COVERAGE FALSE)
 set(WITH_DOCUMENTATION FALSE)
 #set(DOCUMENTATION_ARCHIVES_OUTPUT_DIRECTORY ) # for example: $ENV{HOME}/Projects/Doxygen
 set(CTEST_BUILD_CONFIGURATION "Release")
@@ -80,15 +88,15 @@ set(CTEST_NOTES_FILES "${CTEST_SCRIPT_DIRECTORY}/${CTEST_SCRIPT_NAME}")
 # Project specific properties
 #
 set(CTEST_PROJECT_NAME "MITK")
-set(CTEST_BUILD_NAME "${MY_OPERATING_SYSTEM}-${MY_COMPILER}-QT${MY_QT_VERSION}-${CTEST_BUILD_CONFIGURATION}")
+set(CTEST_BUILD_NAME "${MY_OPERATING_SYSTEM}-${MY_COMPILER}-Qt-${MY_QT_VERSION}-${CTEST_BUILD_CONFIGURATION}")
 
 #
 # Display build info
 #
-message("site name: ${CTEST_SITE}")
-message("build name: ${CTEST_BUILD_NAME}")
-message("script mode: ${SCRIPT_MODE}")
-message("coverage: ${WITH_COVERAGE}, memcheck: ${WITH_MEMCHECK}")
+message("Site name: ${CTEST_SITE}")
+message("Build name: ${CTEST_BUILD_NAME}")
+message("Script Mode: ${SCRIPT_MODE}")
+message("Coverage: ${WITH_COVERAGE}, MemCheck: ${WITH_MEMCHECK}")
 
 #
 # Convenient macro allowing to download a file
@@ -105,7 +113,7 @@ ENDMACRO()
 #
 # Download and include dashboard driver script 
 #
-set(url file:///home/zelzer/git/MITK/CMake/MITKDashboardDriverScript.cmake)
+set(url file:///home/maleike/lesion/MITK/CMake/MITKDashboardDriverScript.cmake)
 set(dest ${CTEST_SCRIPT_DIRECTORY}/${CTEST_SCRIPT_NAME}.driver)
 downloadFile(${url} ${dest})
 INCLUDE(${dest})

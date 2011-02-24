@@ -405,6 +405,8 @@ bool mitk::PlanarFigureInteractor
         projectionPlane,
         renderer->GetDisplayGeometry() );
 
+      int initiallySelectedControlPoint = planarFigure->GetSelectedControlPoint();
+
       if ( pointIndex >= 0 )
       {
         // If mouse is above control point, mark it as selected
@@ -419,6 +421,7 @@ bool mitk::PlanarFigureInteractor
         planarFigure->DeselectControlPoint();
       }
 
+      bool renderingUpdateNeeded = false;
       if ( isHovering )
       {
         if ( !m_IsHovering )
@@ -430,7 +433,13 @@ bool mitk::PlanarFigureInteractor
           // Set bool property to indicate that planar figure is currently in "hovering" mode
           m_DataNode->SetBoolProperty( "planarfigure.ishovering", true );
           
-          renderer->GetRenderingManager()->RequestUpdateAll();
+          renderingUpdateNeeded = true;
+        }
+
+        if ( planarFigure->GetSelectedControlPoint() != initiallySelectedControlPoint  )
+        {
+          // the selected control point has changed -> rendering update necessary
+          renderingUpdateNeeded = true;
         }
 
         this->HandleEvent( new mitk::StateEvent( EIDYES, NULL ) );
@@ -449,7 +458,7 @@ bool mitk::PlanarFigureInteractor
           // Set bool property to indicate that planar figure is no longer in "hovering" mode
           m_DataNode->SetBoolProperty( "planarfigure.ishovering", false );
           
-          renderer->GetRenderingManager()->RequestUpdateAll();
+          renderingUpdateNeeded = true;
         }
 
         this->HandleEvent( new mitk::StateEvent( EIDNO, NULL ) );
@@ -459,8 +468,11 @@ bool mitk::PlanarFigureInteractor
         ok = false;
       }
 
-      // Update rendered scene
-       //renderer->GetRenderingManager()->RequestUpdateAll();
+      // Update rendered scene if necessray
+      if ( renderingUpdateNeeded )
+      {
+        renderer->GetRenderingManager()->RequestUpdateAll();
+      }
       break;
     }
 

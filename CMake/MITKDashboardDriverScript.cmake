@@ -171,7 +171,7 @@ ${ADDITIONNAL_CMAKECACHE_OPTION}
       ctest_test(
         BUILD "${mitk_build_dir}"
         APPEND
-        # INCLUDE_LABEL "${subproject}"
+        INCLUDE_LABEL "${subproject}"
         PARALLEL_LEVEL 8
         #EXCLUDE ${TEST_TO_EXCLUDE_REGEX}
         )

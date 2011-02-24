@@ -35,7 +35,7 @@ IF(MITK_USE_DCMTK)
          -DCMAKE_INSTALL_PREFIX:PATH=${CMAKE_CURRENT_BINARY_DIR}/${proj}-install
       DEPENDS ${proj_DEPENDENCIES}
       )
-    SET(DCMTK_DIR {CMAKE_CURRENT_BINARY_DIR}/${proj}-install)
+    SET(DCMTK_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-install)
     
   ELSE()
   

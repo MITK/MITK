@@ -158,7 +158,7 @@ SET(WRAP_SOURCES_TEST
 	wrap_mitkEventDescription
 	wrap_mitkEventMapper
 	wrap_mitkGlobalInteraction
-	#wrap_mitkInteractor
+	wrap_mitkInteractor
 	wrap_mitkKeyEvent
 	#wrap_mitkMessage //Macros;Templates: can be wrapped; TODO: instantiate the needed templates
 	wrap_mitkMouseMovePointSetInteractor
@@ -167,7 +167,7 @@ SET(WRAP_SOURCES_TEST
 	wrap_mitkPositionTracker
 	wrap_mitkState
 	wrap_mitkStateEvent
-	#wrap_mitkStateMachine
+	wrap_mitkStateMachine
 	wrap_mitkStateMachineFactory
 	wrap_mitkTransition
 	wrap_mitkWheelEvent

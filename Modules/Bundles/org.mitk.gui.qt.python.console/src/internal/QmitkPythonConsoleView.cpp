@@ -32,7 +32,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkIDataStorageReference.h>
 #include <mitkIDataStorageService.h>
 #include <mitkDataStorageEditorInput.h>
-#include "Python.h"
+#include <dPython.h>
 #include <QMetaType>
 //#include <wrap_mitkDataStoragePython.cxx>
 

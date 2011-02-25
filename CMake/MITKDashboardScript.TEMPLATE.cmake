@@ -12,22 +12,13 @@ cmake_minimum_required(VERSION 2.8.2)
 #
 # Dashboard properties
 #
+set(MY_COMPILER "g++4.4.5")
+
 set(CTEST_CMAKE_COMMAND "/usr/bin/cmake")
 set(CTEST_CMAKE_GENERATOR "Unix Makefiles")
-set(QT_QMAKE_EXECUTABLE "$ENV{QTDIR}/bin/qmake")
 set(CTEST_DASHBOARD_ROOT "/opt/dartclients")
 
-
-#
-# Some properties are determined by the script itself -- do not modify
-#
-set(MY_OPERATING_SYSTEM "${CMAKE_HOST_SYSTEM}") # Windows 7, Linux-2.6.32, Darwin... 
-set(MY_COMPILER ${CMAKE_BUILD_TOOL})
-site_name(CTEST_SITE)
-# TODO: query by executing qmake
-execute_process(COMMAND qmake --version
-                OUTPUT_VARIABLE MY_QT_VERSION)
-string(REGEX REPLACE ".*Qt version ([0-9.]+) .*" "\\1" MY_QT_VERSION ${MY_QT_VERSION})
+set(QT_QMAKE_EXECUTABLE "/usr/bin/qmake")
 
 #
 # Dashboard options
@@ -84,6 +75,16 @@ find_program(CTEST_GIT_COMMAND NAMES git)
 ##########################################
 
 set(CTEST_NOTES_FILES "${CTEST_SCRIPT_DIRECTORY}/${CTEST_SCRIPT_NAME}")
+
+#
+# Automatically determined properties
+#
+set(MY_OPERATING_SYSTEM "${CMAKE_HOST_SYSTEM}") # Windows 7, Linux-2.6.32, Darwin... 
+site_name(CTEST_SITE)
+
+execute_process(COMMAND qmake --version
+                OUTPUT_VARIABLE MY_QT_VERSION)
+string(REGEX REPLACE ".*Qt version ([0-9.]+) .*" "\\1" MY_QT_VERSION ${MY_QT_VERSION})
 
 #
 # Project specific properties

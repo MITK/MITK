@@ -45,6 +45,12 @@ if (NOT DEFINED GIT_REPOSITORY OR GIT_REPOSITORY STREQUAL "")
   set(GIT_REPOSITORY git@mbits:MITK)
 endif()
 
+if (NOT DEFINED GIT_BRANCH OR GIT_BRANCH STREQUAL "")
+  set(GIT_BRANCH "")
+else()
+  set(GIT_BRANCH "-b ${GIT_BRANCH}")
+endif()
+
 # Should binary directory be cleaned?
 set(empty_binary_directory FALSE)
 
@@ -82,7 +88,7 @@ if(empty_binary_directory)
 endif()
 
 if(NOT EXISTS "${CTEST_SOURCE_DIRECTORY}")
-  set(CTEST_CHECKOUT_COMMAND "${CTEST_GIT_COMMAND} clone -b bug-7014-dashboard-script ${GIT_REPOSITORY} ${CTEST_SOURCE_DIRECTORY}")
+  set(CTEST_CHECKOUT_COMMAND "${CTEST_GIT_COMMAND} clone ${GIT_BRANCH} ${GIT_REPOSITORY} ${CTEST_SOURCE_DIRECTORY}")
 endif()
 
 set(CTEST_UPDATE_COMMAND "${CTEST_GIT_COMMAND}")

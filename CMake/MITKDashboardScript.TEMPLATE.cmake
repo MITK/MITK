@@ -77,6 +77,7 @@ find_program(CTEST_GIT_COMMAND NAMES git)
 # Git repository - Overwrite the default value provided by the driver script
 #
 # set(GIT_REPOSITORY "/home/username/MITK")
+# set(GIT_BRANCH "bug-xxx-description")
 
 ##########################################
 # WARNING: DO NOT EDIT BEYOND THIS POINT #

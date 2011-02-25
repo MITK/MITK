@@ -224,4 +224,9 @@ ADD_CUSTOM_TARGET(MITK
   COMMAND ${CMAKE_COMMAND} --build ${CMAKE_CURRENT_BINARY_DIR}/MITK-build
   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/MITK-build
 )
-  
+
+#-----------------------------------------------------------------------------
+# Project.xml for CDash
+#-----------------------------------------------------------------------------
+
+CONFIGURE_FILE(MITKSuperBuild.xml "${MITK_BINARY_DIR}/Project.xml" COPYONlY)

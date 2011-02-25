@@ -1,0 +1,9 @@
+<Project name="MITK">
+  <SubProject name="SuperBuild">
+  <SubProject name="MITK">
+    <Dependency name="SuperBuild"/>
+  </SubProject>
+  <SubProject name="Documentation">
+    <Dependency name="MITK"/>
+  </SubProject>
+</Project>

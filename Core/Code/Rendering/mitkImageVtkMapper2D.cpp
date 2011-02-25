@@ -29,6 +29,11 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkImageCanvasSource2D.h>
 #include <vtkImageShiftScale.h>
 #include <vtkImageCast.h>
+#include <vtkImageReslice.h>
+#include <vtkLinearTransform.h>
+#include <vtkMatrix4x4.h>
+
+
 
 mitk::ImageVtkMapper2D::ImageVtkMapper2D()
 {
@@ -68,6 +73,7 @@ void mitk::ImageVtkMapper2D::GenerateData(mitk::BaseRenderer* renderer)
 //  imageShiftSacle->SetOutputScalarTypeToUnsignedChar();
 //  imageShiftSacle->ClampOverflowOn();
 //  imageShiftSacle->SetInput(image);
+
   vtkSmartPointer<vtkImageCast> imageCast = vtkSmartPointer<vtkImageCast>::New();
   imageCast->SetOutputScalarTypeToUnsignedChar();
   imageCast->ClampOverflowOn();
@@ -75,67 +81,11 @@ void mitk::ImageVtkMapper2D::GenerateData(mitk::BaseRenderer* renderer)
 //  m_VtkImage->SetScalarTypeToUnsignedChar();;
   m_VtkImage = imageCast->GetOutput();
 
-
-
-
   if( m_VtkImage )
   {
-//    vtkSmartPointer<vtkImageQuantizeRGBToIndex> quant =
-//      vtkSmartPointer<vtkImageQuantizeRGBToIndex>::New();
-//    quant->SetInputConnection(reader->GetOutputPort());
-//    quant->SetNumberOfColors(16);
-
-//    vtkSmartPointer<vtkImageToPolyDataFilter> i2pd =
-//      vtkSmartPointer<vtkImageToPolyDataFilter>::New();
-//    i2pd->SetInputConnection(quant->GetOutputPort());
-//    i2pd->SetLookupTable(quant->GetLookupTable());
-//    i2pd->SetColorModeToLUT();
-//    i2pd->SetOutputStyleToPolygonalize();
-//    i2pd->SetError(0);
-//    i2pd->DecimationOn();
-//    i2pd->SetDecimationError(0.0);
-//    i2pd->SetSubImageSize(25);
-
-//    // Need a triangle filter because the polygons are complex and concave
-//    vtkSmartPointer<vtkTriangleFilter> tf =
-//      vtkSmartPointer<vtkTriangleFilter>::New();
-//    tf->SetInputConnection(i2pd->GetOutputPort());#include <vtkImageCast.h>
-
-
-//    vtkSmartPointer<vtkPolyDataMapper> mapper =
-//      vtkSmartPointer<vtkPolyDataMapper>::New();
-//    mapper->SetInputConnection(tf->GetOutputPort());
-
-//    vtkSmartPointer<vtkActor> actor =
-//      vtkSmartPointer<vtkActor>::New();
-//    actor->SetMapper(mapper);
-//    actor->GetProperty()->SetRepresentationToWireframe();
-
 
     m_VtkActor->SetInput(m_VtkImage);
-    MITK_INFO << "VTK image ist da";
-    // make sure, that we have point data with more than 1 component (as vectors)
-    //    vtkPointData* pointData = m_VtkImage->GetPointData();
-    //    if ( pointData == NULL )
-    //    {
-    //      itkWarningMacro( << "m_VtkImage->GetPointData() returns NULL!" );
-    //      return ;
-    //    }
-    //    if ( pointData->GetNumberOfArrays() == 0 )
-    //    {
-    //      itkWarningMacro( << "m_VtkImage->GetPointData()->GetNumberOfArrays() is 0!" );
-    //      return ;
-    //    }
-    //    else if ( pointData->GetArray(0)->GetNumberOfComponents() != N
-    //      && pointData->GetArray(0)->GetNumberOfComponents() != 6 /*for tensor visualization*/)
-    //    {
-    //      itkWarningMacro( << "number of components != number of directions in ODF!" );
-    //      return;
-    //    }
-    //    else if ( pointData->GetArrayName( 0 ) == NULL )
-    //    {
-    //      m_VtkImage->GetPointData()->GetArray(0)->SetName("vector");
-    //    }MITK_INFO << "VTK image ist da";
+
   }
   else
   {

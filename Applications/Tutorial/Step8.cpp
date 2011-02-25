@@ -26,6 +26,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 
+#include <vtkInteractorStyle.h>
+#include <vtkInteractorStyleImage.h>
+
+
 //##Documentation
 //## @brief As Step6, but with QmitkStdMultiWidget as widget
 Step8::Step8(int argc, char* argv[], QWidget *parent) :
@@ -69,9 +73,19 @@ void Step8::SetupWidgets()
 			m_DataStorage->GetAll());
 	mitk::RenderingManager::GetInstance()->InitializeViews(geo);
 
+	// Setup render window interactor
+//  vtkSmartPointer<vtkRenderWindowInteractor> renderWindowInteractor = vtkSmartPointer<vtkRenderWindowInteractor>::New();
+//  vtkSmartPointer<vtkInteractorStyleTrackballCamera> style = vtkSmartPointer<vtkInteractorStyleTrackballCamera>::New();
+	vtkSmartPointer<vtkInteractorStyleImage> style = vtkSmartPointer<vtkInteractorStyleImage>::New();
+//		renderWindowInteractor->SetInteractorStyle(style);
+
 	// Initialize bottom-right view as 3D view
 	multiWidget->GetRenderWindow1()->GetRenderer()->SetMapperID(
 			mitk::BaseRenderer::Extended2D);
+	multiWidget->GetRenderWindow1()->GetRenderWindow()->GetInteractor()->SetInteractorStyle(style);
+//	renderWindowInteractor->Start();
+
+
 
 	// Enable standard handler for levelwindow-slider
 	multiWidget->EnableStandardLevelWindow();
@@ -87,6 +101,10 @@ void Step8::SetupWidgets()
 
 	// Moving the cut-planes to click-point
 	multiWidget->EnableNavigationControllerEventListening();
+
+  mitk::SliceNavigationController::Pointer sliceNavi = multiWidget->GetRenderWindow2()->GetSliceNavigationController();
+  sliceNavi->SetViewDirection(mitk::SliceNavigationController::Transversal);
+  sliceNavi->Update();
 
 	// Zooming and panning
 	mitk::GlobalInteraction::GetInstance()->AddListener(

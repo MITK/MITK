@@ -146,7 +146,7 @@ ${ADDITIONNAL_CMAKECACHE_OPTION}
       BUILD "${CTEST_BINARY_DIRECTORY}" 
       INCLUDE_LABEL "SuperBuild"
       PARALLEL_LEVEL 8
-      #EXCLUDE ${TEST_TO_EXCLUDE_REGEX}
+      EXCLUDE ${TEST_TO_EXCLUDE_REGEX}
       )
     # runs only tests that have a LABELS property matching "${subproject}"
     ctest_submit(PARTS Test)
@@ -179,7 +179,7 @@ ${ADDITIONNAL_CMAKECACHE_OPTION}
         APPEND
         INCLUDE_LABEL "${subproject}"
         PARALLEL_LEVEL 8
-        #EXCLUDE ${TEST_TO_EXCLUDE_REGEX}
+        EXCLUDE ${TEST_TO_EXCLUDE_REGEX}
         )
       # runs only tests that have a LABELS property matching "${subproject}"
       
@@ -188,7 +188,7 @@ ${ADDITIONNAL_CMAKECACHE_OPTION}
       # Coverage per sub-project
       if (WITH_COVERAGE AND CTEST_COVERAGE_COMMAND)
         message("----------- [ Coverage ${subproject} ] -----------")
-        ctest_coverage(BUILD "${mitk_build_dir}") # LABELS "${subproject}")
+        ctest_coverage(BUILD "${mitk_build_dir}" LABELS "${subproject}")
         ctest_submit(PARTS Coverage)
       endif ()
 

@@ -45,6 +45,12 @@ if (NOT DEFINED GIT_REPOSITORY OR GIT_REPOSITORY STREQUAL "")
   set(GIT_REPOSITORY git@mbits:MITK)
 endif()
 
+if (NOT DEFINED GIT_BRANCH OR GIT_BRANCH STREQUAL "")
+  set(GIT_BRANCH "")
+else()
+  set(GIT_BRANCH "-b ${GIT_BRANCH}")
+endif()
+
 # Should binary directory be cleaned?
 set(empty_binary_directory FALSE)
 
@@ -82,7 +88,7 @@ if(empty_binary_directory)
 endif()
 
 if(NOT EXISTS "${CTEST_SOURCE_DIRECTORY}")
-  set(CTEST_CHECKOUT_COMMAND "${CTEST_GIT_COMMAND} clone -b bug-7014-dashboard-script ${GIT_REPOSITORY} ${CTEST_SOURCE_DIRECTORY}")
+  set(CTEST_CHECKOUT_COMMAND "${CTEST_GIT_COMMAND} clone ${GIT_BRANCH} ${GIT_REPOSITORY} ${CTEST_SOURCE_DIRECTORY}")
 endif()
 
 set(CTEST_UPDATE_COMMAND "${CTEST_GIT_COMMAND}")
@@ -140,7 +146,7 @@ ${ADDITIONNAL_CMAKECACHE_OPTION}
       BUILD "${CTEST_BINARY_DIRECTORY}" 
       INCLUDE_LABEL "SuperBuild"
       PARALLEL_LEVEL 8
-      #EXCLUDE ${TEST_TO_EXCLUDE_REGEX}
+      EXCLUDE ${TEST_TO_EXCLUDE_REGEX}
       )
     # runs only tests that have a LABELS property matching "${subproject}"
     ctest_submit(PARTS Test)
@@ -173,7 +179,7 @@ ${ADDITIONNAL_CMAKECACHE_OPTION}
         APPEND
         INCLUDE_LABEL "${subproject}"
         PARALLEL_LEVEL 8
-        #EXCLUDE ${TEST_TO_EXCLUDE_REGEX}
+        EXCLUDE ${TEST_TO_EXCLUDE_REGEX}
         )
       # runs only tests that have a LABELS property matching "${subproject}"
       
@@ -182,7 +188,7 @@ ${ADDITIONNAL_CMAKECACHE_OPTION}
       # Coverage per sub-project
       if (WITH_COVERAGE AND CTEST_COVERAGE_COMMAND)
         message("----------- [ Coverage ${subproject} ] -----------")
-        ctest_coverage(BUILD "${mitk_build_dir}") # LABELS "${subproject}")
+        ctest_coverage(BUILD "${mitk_build_dir}" LABELS "${subproject}")
         ctest_submit(PARTS Coverage)
       endif ()
 

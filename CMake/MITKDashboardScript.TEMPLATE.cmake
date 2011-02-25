@@ -104,7 +104,7 @@ message("Coverage: ${WITH_COVERAGE}, MemCheck: ${WITH_MEMCHECK}")
 # Convenient macro allowing to download a file
 #
 MACRO(downloadFile url dest)
-  FILE(DOWNLOAD ${url} ${dest} STATUS status)
+  FILE(DOWNLOAD "${url}" "${dest}" STATUS status)
   LIST(GET status 0 error_code)
   LIST(GET status 1 error_msg)
   IF(error_code)
@@ -122,7 +122,7 @@ else()
 endif()
 set(url "http://mbits/git/?p=MITK.git;a=blob_plain;f=CMake/MITKDashboardDriverScript.cmake;hb=${hb}")
 set(dest ${CTEST_SCRIPT_DIRECTORY}/${CTEST_SCRIPT_NAME}.driver)
-downloadFile(${url} ${dest})
+downloadFile("${url}" "${dest}")
 INCLUDE(${dest})
 
 

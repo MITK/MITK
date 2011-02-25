@@ -25,12 +25,17 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkImageQuantizeRGBToIndex.h>
 #include <vtkImageToPolyDataFilter.h>
 #include <vtkTriangleFilter.h>
+#include <vtkImageDataGeometryFilter.h>
+#include <vtkImageCanvasSource2D.h>
+#include <vtkImageShiftScale.h>
+#include <vtkImageCast.h>
 
 mitk::ImageVtkMapper2D::ImageVtkMapper2D()
 {
   this->m_VtkBased = true;
   this->m_TimeStep = 0;
   this->m_VtkActor = vtkSmartPointer<vtkImageActor>::New();
+  this->m_VtkImage = vtkImageData::New();
 //  m_VtkActor->SetVisibility(1);
   this->m_VtkMapper = vtkPolyDataMapper::New();
 }
@@ -56,7 +61,22 @@ void mitk::ImageVtkMapper2D::GenerateData(mitk::BaseRenderer* renderer)
   mitk::Image::Pointer input = const_cast<mitk::Image*>( this->GetInput() );
   if ( input.IsNull() ) return ;
 
-  m_VtkImage = this->GenerateTestImageForTSFilter();// input->GetVtkImageData(m_TimeStep, 0);
+//  m_VtkImage = this->GenerateTestImageForTSFilter();
+
+  vtkSmartPointer<vtkImageData> image = input->GetVtkImageData(m_TimeStep, 0);
+//  vtkSmartPointer<vtkImageShiftScale> imageShiftSacle = vtkImageShiftScale::New();
+//  imageShiftSacle->SetOutputScalarTypeToUnsignedChar();
+//  imageShiftSacle->ClampOverflowOn();
+//  imageShiftSacle->SetInput(image);
+  vtkSmartPointer<vtkImageCast> imageCast = vtkSmartPointer<vtkImageCast>::New();
+  imageCast->SetOutputScalarTypeToUnsignedChar();
+  imageCast->ClampOverflowOn();
+  imageCast->SetInput(image);
+//  m_VtkImage->SetScalarTypeToUnsignedChar();;
+  m_VtkImage = imageCast->GetOutput();
+
+
+
 
   if( m_VtkImage )
   {
@@ -79,7 +99,8 @@ void mitk::ImageVtkMapper2D::GenerateData(mitk::BaseRenderer* renderer)
 //    // Need a triangle filter because the polygons are complex and concave
 //    vtkSmartPointer<vtkTriangleFilter> tf =
 //      vtkSmartPointer<vtkTriangleFilter>::New();
-//    tf->SetInputConnection(i2pd->GetOutputPort());
+//    tf->SetInputConnection(i2pd->GetOutputPort());#include <vtkImageCast.h>
+
 
 //    vtkSmartPointer<vtkPolyDataMapper> mapper =
 //      vtkSmartPointer<vtkPolyDataMapper>::New();
@@ -188,7 +209,6 @@ vtkImageData *mitk::ImageVtkMapper2D::GenerateTestImageForTSFilter()
 //    -213,800,
 //    1000,-20
   };
-
   vtkImageData *i = vtkImageData::New();
 
   i->SetExtent(0,1,0,1,0,0);

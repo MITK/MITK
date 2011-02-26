@@ -8,6 +8,7 @@ IF(ITK_GDCM_DIR)
 ENDIF(ITK_GDCM_DIR)
 
 MITK_CREATE_MODULE( MitkDiffusionImaging
+  SUBPROJECTS MITK-DTI
   INCLUDE_DIRS Algorithms DicomImport IODataStructures/DiffusionWeightedImages IODataStructures/QBallImages IODataStructures/TensorImages IODataStructures Reconstruction Tractography Rendering  ${CMAKE_CURRENT_BINARY_DIR}
   DEPENDS MitkExt
   PACKAGE_DEPENDS Boost

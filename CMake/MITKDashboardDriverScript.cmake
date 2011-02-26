@@ -109,6 +109,7 @@ MACRO(run_ctest)
     file(WRITE "${CTEST_BINARY_DIRECTORY}/CMakeCache.txt" "
 CTEST_USE_LAUNCHERS:BOOL=${CTEST_USE_LAUNCHERS}
 BUILD_TESTING:BOOL=TRUE
+BLUEBERRY_BUILD_TESTING:BOOL=TRUE
 BLUEBERRY_BUILD_ALL_PLUGINS:BOOL=TRUE
 MITK_BUILD_ALL_PLUGINS:BOOL=TRUE
 CMAKE_BUILD_TYPE:STRING=${CTEST_BUILD_CONFIGURATION}
@@ -153,7 +154,8 @@ ${ADDITIONNAL_CMAKECACHE_OPTION}
       
     set(mitk_build_dir "${CTEST_BINARY_DIRECTORY}/MITK-build")
     
-    set(CTEST_PROJECT_SUBPROJECTS MITK)
+    # To get CTEST_PROJECT_SUBPROJECTS definition
+    include("${CTEST_BINARY_DIRECTORY}/CTestConfigSubProject.cmake")
     
     foreach(subproject ${CTEST_PROJECT_SUBPROJECTS})
       set_property(GLOBAL PROPERTY SubProject ${subproject})
@@ -169,9 +171,26 @@ ${ADDITIONNAL_CMAKECACHE_OPTION}
      
       # Build target
       set(CTEST_BUILD_TARGET "${subproject}")
-      ctest_build(BUILD "${CTEST_BINARY_DIRECTORY}" APPEND)
+      ctest_build(BUILD "${mitk_build_dir}" APPEND)
       ctest_submit(PARTS Build)
-      
+    endforeach()
+    
+    # Build the rest of the project
+    set_property(GLOBAL PROPERTY SubProject SuperBuild)
+    set_property(GLOBAL PROPERTY Label SuperBuild)
+    
+    message("----------- [ Build All ] -----------")
+    set(CTEST_BUILD_TARGET)
+    ctest_build(BUILD "${mitk_build_dir}" APPEND)
+    ctest_submit(PARTS Build)
+    
+    # HACK Unfortunately ctest_coverage ignores the build argument, try to force it...
+    file(READ ${mitk_build_dir}/CMakeFiles/TargetDirectories.txt mitk_build_coverage_dirs)
+    file(APPEND "${CTEST_BINARY_DIRECTORY}/CMakeFiles/TargetDirectories.txt" "${mitk_build_coverage_dirs}")
+    
+    foreach(subproject ${CTEST_PROJECT_SUBPROJECTS})
+      set_property(GLOBAL PROPERTY SubProject ${subproject})
+      set_property(GLOBAL PROPERTY Label ${subproject})
       message("----------- [ Test ${subproject} ] -----------")
 
       ctest_test(
@@ -209,10 +228,6 @@ ${ADDITIONNAL_CMAKECACHE_OPTION}
       ctest_submit(PARTS Build)
       set(CTEST_USE_LAUNCHERS 1)
     endif()
-    
-    # HACK Unfortunately ctest_coverage ignores the build argument, try to force it...
-    file(READ ${mitk_build_dir}/CMakeFiles/TargetDirectories.txt mitk_build_coverage_dirs)
-    file(APPEND "${CTEST_BINARY_DIRECTORY}/CMakeFiles/TargetDirectories.txt" "${mitk_build_coverage_dirs}")
     
     set_property(GLOBAL PROPERTY SubProject SuperBuild)
     set_property(GLOBAL PROPERTY Label SuperBuild)

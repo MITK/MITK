@@ -1,11 +1,11 @@
-MITK_INSTALL(FILES ${PROJECT_SOURCE_DIR}/mitk.ico )
-MITK_INSTALL(FILES ${PROJECT_SOURCE_DIR}/mitk.bmp )
+MITK_INSTALL(FILES ${MITK_SOURCE_DIR}/mitk.ico )
+MITK_INSTALL(FILES ${MITK_SOURCE_DIR}/mitk.bmp )
 
 #STATEMACHINE XML
-MITK_INSTALL(FILES ${PROJECT_SOURCE_DIR}/Core/Code/Interactions/StateMachine.xml )
-MITK_INSTALL(FILES ${PROJECT_SOURCE_DIR}/Config/mitkLevelWindowPresets.xml )
-MITK_INSTALL(FILES ${PROJECT_SOURCE_DIR}/Config/mitkRigidRegistrationPresets.xml )
-MITK_INSTALL(FILES ${PROJECT_SOURCE_DIR}/Config/mitkRigidRegistrationTestPresets.xml )
+MITK_INSTALL(FILES ${MITK_SOURCE_DIR}/Core/Code/Interactions/StateMachine.xml )
+MITK_INSTALL(FILES ${MITK_SOURCE_DIR}/Config/mitkLevelWindowPresets.xml )
+MITK_INSTALL(FILES ${MITK_SOURCE_DIR}/Config/mitkRigidRegistrationPresets.xml )
+MITK_INSTALL(FILES ${MITK_SOURCE_DIR}/Config/mitkRigidRegistrationTestPresets.xml )
 
 #QT
 if(MITK_USE_QT)

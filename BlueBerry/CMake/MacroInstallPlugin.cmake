@@ -52,10 +52,24 @@ MACRO(MACRO_INSTALL_PLUGIN _plugin_dir)
   SET_TARGET_PROPERTIES(${_INSTALL_TARGETS}
                         PROPERTIES INSTALL_RPATH "${_target_install_rpath}")
   
-  INSTALL(TARGETS ${_INSTALL_TARGETS}
-          RUNTIME DESTINATION ${_plugin_install_dir}/bin
-          LIBRARY DESTINATION ${_plugin_install_dir}/bin
-          #ARCHIVE DESTINATION ${_plugin_install_dir}/bin
-  )
-
+  FOREACH(_install_target ${_INSTALL_TARGETS})
+    GET_TARGET_PROPERTY(_is_imported ${_install_target} IMPORTED)
+    IF(_is_imported)
+      GET_TARGET_PROPERTY(_import_loc_debug ${_install_target} IMPORTED_LOCATION_DEBUG)
+      GET_TARGET_PROPERTY(_import_loc_release ${_install_target} IMPORTED_LOCATION_RELEASE)
+      INSTALL(FILES ${_import_loc_debug}
+              DESTINATION ${_plugin_install_dir}/bin
+              CONFIGURATIONS Debug)
+      INSTALL(FILES ${_import_loc_release}
+              DESTINATION ${_plugin_install_dir}/bin
+              CONFIGURATIONS Release)
+    ELSE()
+      INSTALL(TARGETS ${_INSTALL_TARGETS}
+              RUNTIME DESTINATION ${_plugin_install_dir}/bin
+              LIBRARY DESTINATION ${_plugin_install_dir}/bin
+              #ARCHIVE DESTINATION ${_plugin_install_dir}/bin
+              )
+    ENDIF()
+  ENDFOREACH()
+  
 ENDMACRO()

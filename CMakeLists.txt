@@ -417,6 +417,28 @@ include(mitkInstallRules)
 # Last configuration steps
 #-----------------------------------------------------------------------------
 
+set(MITK_EXPORTS_FILE "${MITK_BINARY_DIR}/MitkExports.cmake")
+file(REMOVE ${MITK_EXPORTS_FILE})
+
+if(MITK_USE_BLUEBERRY)
+  set(enabled_plugins
+    ${BLUEBERRY_ENABLED_PLUGINS}
+    ${MITK_CORE_ENABLED_PLUGINS}
+    ${MITK_MODULES_ENABLED_PLUGINS}
+    )
+
+  # This is for installation support of external projects depending on
+  # MITK plugins. The export file should not be used for linking to MITK
+  # libraries without using LINK_DIRECTORIES, since the exports are incomplete
+  # yet(depending libraries are not exported).
+  foreach(plugin ${enabled_plugins})
+    string(REPLACE "." "_" plugin_target ${plugin})
+    export(TARGETS ${plugin_target}
+           APPEND
+           FILE ${MITK_EXPORTS_FILE})
+  endforeach()
+endif()
+
 configure_file(${MITK_SOURCE_DIR}/CMake/ToolExtensionITKFactory.cpp.in
                ${MITK_BINARY_DIR}/ToolExtensionITKFactory.cpp.in COPYONLY)
 configure_file(${MITK_SOURCE_DIR}/CMake/ToolExtensionITKFactoryLoader.cpp.in

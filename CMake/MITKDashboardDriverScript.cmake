@@ -29,6 +29,8 @@ set(expected_variables
   CTEST_MEMORYCHECK_COMMAND
   CTEST_GIT_COMMAND
   QT_QMAKE_EXECUTABLE
+  PROJECT_BUILD_DIR
+  SUPERBUILD_TARGETS
   )
 if(WITH_DOCUMENTATION)
   list(APPEND expected_variables DOCUMENTATION_ARCHIVES_OUTPUT_DIRECTORY)
@@ -87,8 +89,12 @@ if(empty_binary_directory)
   ctest_empty_binary_directory(${CTEST_BINARY_DIRECTORY})
 endif()
 
-if(NOT EXISTS "${CTEST_SOURCE_DIRECTORY}")
-  set(CTEST_CHECKOUT_COMMAND "${CTEST_GIT_COMMAND} clone ${GIT_BRANCH} ${GIT_REPOSITORY} ${CTEST_SOURCE_DIRECTORY}")
+if(NOT DEFINED CTEST_CHECKOUT_DIR)
+  set(CTEST_CHECKOUT_DIR ${CTEST_SOURCE_DIRECTORY})
+endif()
+
+if(NOT EXISTS "${CTEST_CHECKOUT_DIR}")
+  set(CTEST_CHECKOUT_COMMAND "${CTEST_GIT_COMMAND} clone ${GIT_BRANCH} ${GIT_REPOSITORY} ${CTEST_CHECKOUT_DIR}")
 endif()
 
 set(CTEST_UPDATE_COMMAND "${CTEST_GIT_COMMAND}")
@@ -98,7 +104,7 @@ set(CTEST_UPDATE_COMMAND "${CTEST_GIT_COMMAND}")
 #
 MACRO(run_ctest)
   ctest_start(${model})
-  ctest_update(SOURCE "${CTEST_SOURCE_DIRECTORY}" RETURN_VALUE res)
+  ctest_update(SOURCE "${CTEST_CHECKOUT_DIR}" RETURN_VALUE res)
 
   # force a build if this is the first run and the build dir is empty
   if(NOT EXISTS "${CTEST_BINARY_DIRECTORY}/CMakeCache.txt")
@@ -112,6 +118,7 @@ BUILD_TESTING:BOOL=TRUE
 BLUEBERRY_BUILD_TESTING:BOOL=TRUE
 BLUEBERRY_BUILD_ALL_PLUGINS:BOOL=TRUE
 MITK_BUILD_ALL_PLUGINS:BOOL=TRUE
+MITK_CTEST_SCRIPT_MODE:BOOL=TRUE
 CMAKE_BUILD_TYPE:STRING=${CTEST_BUILD_CONFIGURATION}
 QT_QMAKE_EXECUTABLE:FILEPATH=${QT_QMAKE_EXECUTABLE}
 SUPERBUILD_EXCLUDE_MITKBUILD_TARGET:BOOL=TRUE
@@ -126,7 +133,7 @@ ${ADDITIONNAL_CMAKECACHE_OPTION}
   
     ctest_submit(PARTS Update)
       
-    message("Configure SuperBuild")
+    message("----------- [ Configure SuperBuild ] -----------")
     
     set_property(GLOBAL PROPERTY SubProject SuperBuild)
     set_property(GLOBAL PROPERTY Label SuperBuild)
@@ -137,12 +144,91 @@ ${ADDITIONNAL_CMAKECACHE_OPTION}
     ctest_read_custom_files("${CTEST_BINARY_DIRECTORY}")
     ctest_submit(PARTS Configure)
     ctest_submit(FILES "${CTEST_BINARY_DIRECTORY}/Project.xml")
+    
+    # To get CTEST_PROJECT_SUBPROJECTS and CTEST_PROJECT_EXTERNALS definition
+    include("${CTEST_BINARY_DIRECTORY}/CTestConfigSubProject.cmake")
 
-    # Build top level
-    message("----------- [ Build SuperBuild ] -----------")
+    # Build top level (either all or the supplied targets at
+    # superbuild level
+    if(SUPERBUILD_TARGETS)
+      foreach(superbuild_target ${SUPERBUILD_TARGETS})
+        message("----------- [ Build ${superbuild_target} - SuperBuild ] -----------")
+        set(CTEST_BUILD_TARGET "${superbuild_target}")
+        ctest_build(BUILD "${CTEST_BINARY_DIRECTORY}" APPEND)
+        ctest_submit(PARTS Build)
+        
+        ctest_test(
+          BUILD "${CTEST_BINARY_DIRECTORY}"
+          INCLUDE_LABEL "SuperBuild"
+          PARALLEL_LEVEL 8
+          EXCLUDE ${TEST_TO_EXCLUDE_REGEX}
+          )
+        # runs only tests that have a LABELS property matching "${subproject}"
+        ctest_submit(PARTS Test)
+      endforeach()
+      
+      # HACK Unfortunately ctest_coverage ignores the build argument, back-up the original dirs
+      file(READ "${CTEST_BINARY_DIRECTORY}/CMakeFiles/TargetDirectories.txt" old_coverage_dirs)
+      
+      # explicitly build requested external projects as subprojects
+      foreach(external_project_with_build_dir ${CTEST_PROJECT_EXTERNALS})
+        string(REPLACE "^^" ";" external_project_with_build_dir_list "${external_project_with_build_dir}")
+        list(GET external_project_with_build_dir_list 0 external_project)
+        list(GET external_project_with_build_dir_list 1 external_project_build_dir)
+                
+        set_property(GLOBAL PROPERTY SubProject ${external_project})
+        set_property(GLOBAL PROPERTY Label ${external_project})
+        message("----------- [ Build ${external_project} ] -----------")
+       
+        # Build target
+        set(CTEST_BUILD_TARGET "${external_project}")
+        ctest_build(BUILD "${CTEST_BINARY_DIRECTORY}" APPEND)
+        ctest_submit(PARTS Build)
+        
+        # HACK Unfortunately ctest_coverage ignores the build argument, try to force it...
+        file(READ "${CTEST_BINARY_DIRECTORY}/${external_project_build_dir}/CMakeFiles/TargetDirectories.txt" mitk_build_coverage_dirs)
+        file(APPEND "${CTEST_BINARY_DIRECTORY}/CMakeFiles/TargetDirectories.txt" "${mitk_build_coverage_dirs}")
+        
+        message("----------- [ Test ${external_project} ] -----------")
+
+        ctest_test(
+          BUILD "${CTEST_BINARY_DIRECTORY}/${external_project_build_dir}"
+          APPEND
+          INCLUDE_LABEL "${external_project}"
+          PARALLEL_LEVEL 8
+          EXCLUDE ${TEST_TO_EXCLUDE_REGEX}
+          )
+        # runs only tests that have a LABELS property matching "${external_project}"
+        
+        ctest_submit(PARTS Test)
+
+        # Coverage per external project
+        if (WITH_COVERAGE AND CTEST_COVERAGE_COMMAND)
+          message("----------- [ Coverage ${external_project} ] -----------")
+          ctest_coverage(BUILD "${CTEST_BINARY_DIRECTORY}/${external_project_build_dir}" LABELS "${external_project}")
+          ctest_submit(PARTS Coverage)
+        endif ()
+
+        #if (WITH_MEMCHECK AND CTEST_MEMORYCHECK_COMMAND)
+        #  ctest_memcheck(BUILD "${build_dir}" INCLUDE_LABEL "${subproject}")
+        #  ctest_submit(PARTS MemCheck)
+        #endif ()
+        
+        # restore old coverage dirs
+        file(WRITE "${CTEST_BINARY_DIRECTORY}/CMakeFiles/TargetDirectories.txt" "${old_coverage_dirs}")
+      
+      endforeach()
+      
+      message("----------- [ Finish SuperBuild ] -----------")
+    else()
+       message("----------- [ Build SuperBuild ] -----------")
+    endif()
+    
+    # build everything at superbuild level which has not yet been built
+    set(CTEST_BUILD_TARGET)
     ctest_build(BUILD "${CTEST_BINARY_DIRECTORY}" APPEND)
     ctest_submit(PARTS Build)
-    
+     
     ctest_test(
       BUILD "${CTEST_BINARY_DIRECTORY}" 
       INCLUDE_LABEL "SuperBuild"
@@ -151,27 +237,26 @@ ${ADDITIONNAL_CMAKECACHE_OPTION}
       )
     # runs only tests that have a LABELS property matching "${subproject}"
     ctest_submit(PARTS Test)
-      
-    set(mitk_build_dir "${CTEST_BINARY_DIRECTORY}/MITK-build")
     
-    # To get CTEST_PROJECT_SUBPROJECTS definition
-    include("${CTEST_BINARY_DIRECTORY}/CTestConfigSubProject.cmake")
+    
+    set(build_dir "${CTEST_BINARY_DIRECTORY}/${PROJECT_BUILD_DIR}")
+    
+    message("----------- [ Configure ${build_dir} ] -----------")
+    # Configure target
+    ctest_configure(BUILD "${build_dir}"
+      OPTIONS "-DCTEST_USE_LAUNCHERS=${CTEST_USE_LAUNCHERS}"
+    )
+    ctest_read_custom_files("${CTEST_BINARY_DIRECTORY}")
+    ctest_submit(PARTS Configure)
     
     foreach(subproject ${CTEST_PROJECT_SUBPROJECTS})
       set_property(GLOBAL PROPERTY SubProject ${subproject})
       set_property(GLOBAL PROPERTY Label ${subproject})
       message("----------- [ Build ${subproject} ] -----------")
-    
-      # Configure target
-      ctest_configure(BUILD "${CTEST_BINARY_DIRECTORY}"
-        OPTIONS "-DCTEST_USE_LAUNCHERS=${CTEST_USE_LAUNCHERS}"
-      )
-      ctest_read_custom_files("${CTEST_BINARY_DIRECTORY}")
-      ctest_submit(PARTS Configure)
      
       # Build target
       set(CTEST_BUILD_TARGET "${subproject}")
-      ctest_build(BUILD "${mitk_build_dir}" APPEND)
+      ctest_build(BUILD "${build_dir}" APPEND)
       ctest_submit(PARTS Build)
     endforeach()
     
@@ -181,11 +266,11 @@ ${ADDITIONNAL_CMAKECACHE_OPTION}
     
     message("----------- [ Build All ] -----------")
     set(CTEST_BUILD_TARGET)
-    ctest_build(BUILD "${mitk_build_dir}" APPEND)
+    ctest_build(BUILD "${build_dir}" APPEND)
     ctest_submit(PARTS Build)
     
     # HACK Unfortunately ctest_coverage ignores the build argument, try to force it...
-    file(READ ${mitk_build_dir}/CMakeFiles/TargetDirectories.txt mitk_build_coverage_dirs)
+    file(READ ${build_dir}/CMakeFiles/TargetDirectories.txt mitk_build_coverage_dirs)
     file(APPEND "${CTEST_BINARY_DIRECTORY}/CMakeFiles/TargetDirectories.txt" "${mitk_build_coverage_dirs}")
     
     foreach(subproject ${CTEST_PROJECT_SUBPROJECTS})
@@ -194,7 +279,7 @@ ${ADDITIONNAL_CMAKECACHE_OPTION}
       message("----------- [ Test ${subproject} ] -----------")
 
       ctest_test(
-        BUILD "${mitk_build_dir}"
+        BUILD "${build_dir}"
         APPEND
         INCLUDE_LABEL "${subproject}"
         PARALLEL_LEVEL 8
@@ -207,12 +292,12 @@ ${ADDITIONNAL_CMAKECACHE_OPTION}
       # Coverage per sub-project
       if (WITH_COVERAGE AND CTEST_COVERAGE_COMMAND)
         message("----------- [ Coverage ${subproject} ] -----------")
-        ctest_coverage(BUILD "${mitk_build_dir}" LABELS "${subproject}")
+        ctest_coverage(BUILD "${build_dir}" LABELS "${subproject}")
         ctest_submit(PARTS Coverage)
       endif ()
 
       #if (WITH_MEMCHECK AND CTEST_MEMORYCHECK_COMMAND)
-      #  ctest_memcheck(BUILD "${mitk_build_dir}" INCLUDE_LABEL "${subproject}")
+      #  ctest_memcheck(BUILD "${build_dir}" INCLUDE_LABEL "${subproject}")
       #  ctest_submit(PARTS MemCheck)
       #endif ()
     endforeach()
@@ -224,7 +309,7 @@ ${ADDITIONNAL_CMAKECACHE_OPTION}
       set_property(GLOBAL PROPERTY SubProject Documentation)
       set_property(GLOBAL PROPERTY Label Documentation)
       set(CTEST_BUILD_TARGET "doc")
-      ctest_build(BUILD "${mitk_build_dir}" APPEND)
+      ctest_build(BUILD "${build_dir}" APPEND)
       ctest_submit(PARTS Build)
       set(CTEST_USE_LAUNCHERS 1)
     endif()
@@ -235,14 +320,14 @@ ${ADDITIONNAL_CMAKECACHE_OPTION}
     # Global coverage ... 
     if (WITH_COVERAGE AND CTEST_COVERAGE_COMMAND)
       message("----------- [ Global coverage ] -----------")
-      ctest_coverage(BUILD "${mitk_build_dir}" APPEND)
+      ctest_coverage(BUILD "${build_dir}" APPEND)
       ctest_submit(PARTS Coverage)
     endif ()
     
     # Global dynamic analysis ...
     if (WITH_MEMCHECK AND CTEST_MEMORYCHECK_COMMAND)
         message("----------- [ Global memcheck ] -----------")
-        ctest_memcheck(BUILD "${mitk_build_dir}")
+        ctest_memcheck(BUILD "${build_dir}")
         ctest_submit(PARTS MemCheck)
       endif ()
     

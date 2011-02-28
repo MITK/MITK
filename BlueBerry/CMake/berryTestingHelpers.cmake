@@ -18,6 +18,12 @@ MACRO(MACRO_TEST_PLUGIN)
 
   ADD_TEST(${BUNDLE-SYMBOLICNAME} ${BLUEBERRY_TEST_APP} ${_cla_switch}BlueBerry.application=coretestapplication ${_cla_switch}BlueBerry.testplugin=${BUNDLE-SYMBOLICNAME})
   
+  SET(_labels ${ARGN})
+  IF(NOT _labels)
+    SET(_labels BlueBerry)
+  ENDIF()
+  SET_PROPERTY(TEST ${BUNDLE-SYMBOLICNAME} PROPERTY LABELS ${_labels})
+  
 ENDMACRO(MACRO_TEST_PLUGIN)
 
 # Variables:
@@ -44,6 +50,12 @@ MACRO(MACRO_TEST_UIPLUGIN)
     ENDIF()
         
     ADD_TEST(${BUNDLE-SYMBOLICNAME} ${BLUEBERRY_TEST_APP} ${_cla_switch}BlueBerry.application=uitestapplication ${_app_id_arg} ${_cla_switch}BlueBerry.testplugin=${BUNDLE-SYMBOLICNAME})
+    
+    SET(_labels ${ARGN})
+    IF(NOT _labels)
+      SET(_labels BlueBerry)
+    ENDIF()
+    SET_PROPERTY(TEST ${BUNDLE-SYMBOLICNAME} PROPERTY LABELS ${_labels})
   ENDIF()
   
 ENDMACRO(MACRO_TEST_UIPLUGIN)

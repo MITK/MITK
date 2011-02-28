@@ -1,4 +1,5 @@
 MITK_CREATE_MODULE(MitkDeformableRegistration
+  SUBPROJECTS MITK-Registration
   DEPENDS Mitk MitkRigidRegistration
   PROVIDES MitkDeformableRegistration
   EXPORT_DEFINE MITK_DEFORMABLEREGISTRATION_EXPORT

@@ -42,6 +42,7 @@ set(CMAKE_MODULE_PATH
 #-----------------------------------------------------------------------------
 
 include(mitkMacroEmptyExternalProject)
+include(mitkFunctionGenerateProjectXml)
 
 #-----------------------------------------------------------------------------
 # Superbuild Option - Enabled by default
@@ -115,6 +116,28 @@ set(ADDITIONAL_C_FLAGS "" CACHE STRING "Additional C Flags")
 mark_as_advanced(ADDITIONAL_C_FLAGS)
 set(ADDITIONAL_CXX_FLAGS "" CACHE STRING "Additional CXX Flags")
 mark_as_advanced(ADDITIONAL_CXX_FLAGS)
+
+#-----------------------------------------------------------------------------
+# Project.xml
+#-----------------------------------------------------------------------------
+
+# A list of topologically ordered targets
+set(CTEST_PROJECT_SUBPROJECTS
+  MITK-Core
+  MITK-CoreUI
+  MITK-IGT
+  MITK-DTI
+  MITK-Registration
+  MITK-Modules # all modules not contained in a specific subproject
+  MITK-Plugins # all plugins not contained in a specific subproject
+  )
+
+# Configure CTestConfigSubProject.cmake that could be used by CTest scripts
+configure_file(${MITK_SOURCE_DIR}/CTestConfigSubProject.cmake.in
+               ${MITK_BINARY_DIR}/CTestConfigSubProject.cmake)
+
+# Generate Project.xml file expected by the CTest driver script
+mitkFunctionGenerateProjectXml(${MITK_BINARY_DIR} ${PROJECT_NAME} "${CTEST_PROJECT_SUBPROJECTS}" ${MITK_USE_SUPERBUILD})
 
 #-----------------------------------------------------------------------------
 # Superbuild script
@@ -245,6 +268,8 @@ if(BUILD_TESTING)
   enable_testing()
   include(CTest)
   mark_as_advanced(TCL_TCLSH DART_ROOT)
+  
+  option(MITK_ENABLE_GUI_TESTING OFF "Enable the MITK GUI tests")
     
   # Setup file for setting custom ctest vars
   configure_file(
@@ -309,6 +334,14 @@ set(CMAKE_C_FLAGS ${MITK_C_FLAGS})
 if(MITK_USE_QT)
   add_definitions(-DQWT_DLL)
 endif()
+
+#-----------------------------------------------------------------------------
+# Add custom targets representing CDash subprojects
+#-----------------------------------------------------------------------------
+
+foreach(subproject ${CTEST_PROJECT_SUBPROJECTS})
+  add_custom_target(${subproject})
+endforeach()
 
 #-----------------------------------------------------------------------------
 # Add subdirectories
@@ -397,9 +430,6 @@ configure_file(mitkConfig.h.in ${MITK_BINARY_DIR}/mitkConfig.h)
 set(VECMATH_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Utilities/vecmath)
 set(IPFUNC_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Utilities/ipFunc)
 set(UTILITIES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Utilities)
-
-# Project.xml for CDash
-CONFIGURE_FILE(MITKProject.xml "${MITK_BINARY_DIR}/Project.xml" COPYONlY)
 
 configure_file(mitkConfig.h.in ${MITK_BINARY_DIR}/mitkConfig.h)
 configure_file(MITKConfig.cmake.in ${MITK_BINARY_DIR}/MITKConfig.cmake @ONLY)

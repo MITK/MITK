@@ -1,4 +1,5 @@
 MITK_CREATE_MODULE(MitkDeformableRegistrationUI
+  SUBPROJECTS MITK-Registration
   DEPENDS Qmitk MitkDeformableRegistration
   QT_MODULE
   PROVIDES MitkDeformableRegistrationUI

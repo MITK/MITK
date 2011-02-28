@@ -1,6 +1,0 @@
-<Project name="MITK">
-  <SubProject name="MITK"/>
-  <SubProject name="Documentation">
-    <Dependency name="MITK"/>
-  </SubProject>
-</Project>

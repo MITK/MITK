@@ -61,6 +61,7 @@ public:
     return 2;
   }
 
+  void SetArrowTipScaleFactor( float scale );
 
 protected:
   PlanarArrow();
@@ -77,9 +78,12 @@ protected:
 
 
   virtual void PrintSelf( std::ostream &os, itk::Indent indent ) const;
-
+ 
   // Feature identifiers
   const unsigned int FEATURE_ID_LENGTH;
+
+  // ScaleFactor defining size of helper-lines in relation to display size
+  float m_ArrowTipScaleFactor;
 
 
 private:

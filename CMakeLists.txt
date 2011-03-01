@@ -122,7 +122,12 @@ mark_as_advanced(ADDITIONAL_CXX_FLAGS)
 #-----------------------------------------------------------------------------
 
 # A list of topologically ordered targets
-set(CTEST_PROJECT_SUBPROJECTS
+set(CTEST_PROJECT_SUBPROJECTS)
+if(MITK_USE_BLUEBERRY)
+  list(APPEND CTEST_PROJECT_SUBPROJECTS BlueBerry)
+endif()
+
+list(APPEND CTEST_PROJECT_SUBPROJECTS
   MITK-Core
   MITK-CoreUI
   MITK-IGT
@@ -340,7 +345,9 @@ endif()
 #-----------------------------------------------------------------------------
 
 foreach(subproject ${CTEST_PROJECT_SUBPROJECTS})
-  add_custom_target(${subproject})
+  if(NOT TARGET ${subproject})
+    add_custom_target(${subproject})
+  endif()
 endforeach()
 
 #-----------------------------------------------------------------------------

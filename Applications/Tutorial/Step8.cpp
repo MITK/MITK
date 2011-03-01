@@ -76,13 +76,13 @@ void Step8::SetupWidgets()
 	// Setup render window interactor
 //  vtkSmartPointer<vtkRenderWindowInteractor> renderWindowInteractor = vtkSmartPointer<vtkRenderWindowInteractor>::New();
 //  vtkSmartPointer<vtkInteractorStyleTrackballCamera> style = vtkSmartPointer<vtkInteractorStyleTrackballCamera>::New();
-	vtkSmartPointer<vtkInteractorStyleImage> style = vtkSmartPointer<vtkInteractorStyleImage>::New();
+	vtkSmartPointer<vtkInteractorStyleTrackballCamera> style = vtkSmartPointer<vtkInteractorStyleTrackballCamera>::New();
 //		renderWindowInteractor->SetInteractorStyle(style);
 
 	// Initialize bottom-right view as 3D view
 	multiWidget->GetRenderWindow1()->GetRenderer()->SetMapperID(
 			mitk::BaseRenderer::Extended2D);
-	multiWidget->GetRenderWindow1()->GetRenderWindow()->GetInteractor()->SetInteractorStyle(style);
+//	multiWidget->GetRenderWindow1()->GetRenderWindow()->GetInteractor()->SetInteractorStyle(style);
 //	renderWindowInteractor->Start();
 
 

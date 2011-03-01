@@ -25,6 +25,7 @@ mitk::PlanarArrow::PlanarArrow()
 {
   // Directed arrow has two control points
   this->ResetNumberOfControlPoints( 2 );
+  m_ArrowTipScaleFactor = -1.0;
 
   m_PolyLines->InsertElement( 0, VertexContainerType::New());
 
@@ -95,7 +96,13 @@ void mitk::PlanarArrow::GenerateHelperPolyLine(double mmPerDisplayUnit, unsigned
   m_HelperPolyLinesToBePainted->SetElement( 1, true );
  
   //Fixed size depending on screen size for the angle
-  double nonScalingLength = displayHeight * mmPerDisplayUnit * 0.015;
+  float scaleFactor = 0.015;
+  if ( m_ArrowTipScaleFactor > 0.0 )
+  {
+    scaleFactor = m_ArrowTipScaleFactor;
+  }
+  double nonScalingLength = displayHeight * mmPerDisplayUnit * scaleFactor;
+
 
   // Calculate arrow peak
   const Point2D& p1 = m_ControlPoints->ElementAt( 0 );
@@ -133,4 +140,10 @@ void mitk::PlanarArrow::EvaluateFeaturesInternal()
 void mitk::PlanarArrow::PrintSelf( std::ostream& os, itk::Indent indent) const
 {
   Superclass::PrintSelf( os, indent );
+}
+
+void mitk::PlanarArrow::SetArrowTipScaleFactor( float scale )
+{
+  MITK_INFO << "SetArrowTipScaleFactor: " << m_ArrowTipScaleFactor;
+  m_ArrowTipScaleFactor = scale;
 }

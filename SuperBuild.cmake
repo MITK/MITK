@@ -39,7 +39,7 @@ SET_PROPERTY(DIRECTORY PROPERTY EP_BASE ${ep_base})
 
 SET(ep_install_dir ${ep_base}/Install)
 #SET(ep_build_dir ${ep_base}/Build)
-#SET(ep_source_dir ${ep_base}/Source)
+SET(ep_source_dir ${ep_base}/Source)
 #SET(ep_parallelism_level)
 SET(ep_build_shared_libs ON)
 SET(ep_build_testing OFF)
@@ -95,6 +95,7 @@ SET(external_projects
   Boost
   DCMTK
   CTK
+  MITKData
   )
   
 # Include external projects

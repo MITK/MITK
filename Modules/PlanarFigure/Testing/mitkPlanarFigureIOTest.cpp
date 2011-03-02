@@ -1,18 +1,12 @@
 /*=========================================================================
- 
-Program:   Medical Imaging & Interaction Toolkit
-Language:  C++
-Date:      $Date$
-Version:   $Revision: 1.12 $
- 
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #include "mitkTestingMacros.h"
@@ -113,6 +107,89 @@ public:
     planarRectangle->SetCurrentControlPoint( p1 );
     planarFigures.push_back( planarRectangle.GetPointer() );
 
+    //create preciseGeometry which is using float coordinates
+    mitk::PlaneGeometry::Pointer preciseGeometry = mitk::PlaneGeometry::New();
+    mitk::Vector3D right;
+    right[0] = 0.0;
+    right[1] = 1.23456;
+    right[2] = 0.0;
+
+    mitk::Vector3D down;
+    down[0] = 1.23456;
+    down[1] = 0.0;
+    down[2] = 0.0;
+
+    mitk::Vector3D spacing;
+    spacing[0] = 0.0123456;
+    spacing[1] = 0.0123456;
+    spacing[2] = 1.123456;
+    preciseGeometry->InitializeStandardPlane( right, down, &spacing );
+
+    //convert points into the precise coordinates
+    mitk::Point2D p0precise; p0precise[0] = p0[0] * spacing[0]; p0precise[1] = p0[1] * spacing[1];
+    mitk::Point2D p1precise; p1precise[0] = p1[0] * spacing[0]; p1precise[1] = p1[1] * spacing[1];
+    mitk::Point2D p2precise; p2precise[0] = p2[0] * spacing[0]; p2precise[1] = p2[1] * spacing[1];
+    mitk::Point2D p3precise; p3precise[0] = p3[0] * spacing[0]; p3precise[1] = p3[1] * spacing[1];
+
+    //Now all PlanarFigures are create using the precise Geometry
+    // Create PlanarCross
+    mitk::PlanarCross::Pointer nochncross = mitk::PlanarCross::New();
+    nochncross->SetSingleLineMode( false );
+    nochncross->SetGeometry2D( preciseGeometry );
+    nochncross->PlaceFigure( p0precise );
+    nochncross->SetCurrentControlPoint( p1precise );
+    nochncross->AddControlPoint( p2precise );
+    nochncross->AddControlPoint( p3precise );
+    planarFigures.push_back( nochncross.GetPointer() );
+
+    // Create PlanarAngle
+    mitk::PlanarAngle::Pointer planarAnglePrecise = mitk::PlanarAngle::New();
+    planarAnglePrecise->SetGeometry2D( preciseGeometry );
+    planarAnglePrecise->PlaceFigure( p0precise );
+    planarAnglePrecise->SetCurrentControlPoint( p1precise );
+    planarAnglePrecise->AddControlPoint( p2precise );
+    planarFigures.push_back( planarAnglePrecise.GetPointer() );
+
+    // Create PlanarCircle
+    mitk::PlanarCircle::Pointer planarCirclePrecise = mitk::PlanarCircle::New();
+    planarCirclePrecise->SetGeometry2D( preciseGeometry );
+    planarCirclePrecise->PlaceFigure( p0precise );
+    planarCirclePrecise->SetCurrentControlPoint( p1precise );
+    planarFigures.push_back( planarCirclePrecise.GetPointer() );
+
+    // Create PlanarFourPointAngle
+    mitk::PlanarFourPointAngle::Pointer planarFourPointAnglePrecise = mitk::PlanarFourPointAngle::New();
+    planarFourPointAnglePrecise->SetGeometry2D( preciseGeometry );
+    planarFourPointAnglePrecise->PlaceFigure( p0precise );
+    planarFourPointAnglePrecise->SetCurrentControlPoint( p1precise );
+    planarFourPointAnglePrecise->AddControlPoint( p2precise );
+    planarFourPointAnglePrecise->AddControlPoint( p3precise );
+    planarFigures.push_back( planarFourPointAnglePrecise.GetPointer() );
+
+    // Create PlanarLine
+    mitk::PlanarLine::Pointer planarLinePrecise = mitk::PlanarLine::New();
+    planarLinePrecise->SetGeometry2D( preciseGeometry );
+    planarLinePrecise->PlaceFigure( p0precise );
+    planarLinePrecise->SetCurrentControlPoint( p1precise );
+    planarFigures.push_back( planarLinePrecise.GetPointer() );
+
+    // Create PlanarPolygon
+    mitk::PlanarPolygon::Pointer planarPolygonPrecise = mitk::PlanarPolygon::New();
+    planarPolygonPrecise->SetClosed( false );
+    planarPolygonPrecise->SetGeometry2D( preciseGeometry );
+    planarPolygonPrecise->PlaceFigure( p0precise );
+    planarPolygonPrecise->SetCurrentControlPoint( p1precise );
+    planarPolygonPrecise->AddControlPoint( p2precise );
+    planarPolygonPrecise->AddControlPoint( p3precise );
+    planarFigures.push_back( planarPolygonPrecise.GetPointer() );
+
+    // Create PlanarRectangle
+    mitk::PlanarRectangle::Pointer planarRectanglePrecise = mitk::PlanarRectangle::New();
+    planarRectanglePrecise->SetGeometry2D( preciseGeometry );
+    planarRectanglePrecise->PlaceFigure( p0precise );
+    planarRectanglePrecise->SetCurrentControlPoint( p1precise );
+    planarFigures.push_back( planarRectanglePrecise.GetPointer() );
+
     return planarFigures;
   }
 
@@ -153,7 +230,7 @@ public:
       { 
         copiedFigure    = mitk::PlanarFourPointAngle::New(); 
       }
-  
+
       copiedFigure->DeepCopy((*it1));
       copiedPlanarFigures.push_back(copiedFigure.GetPointer());
     }
@@ -179,8 +256,8 @@ public:
 
       // Test if (at least) on PlanarFigure of the first type was found in the second list
       MITK_TEST_CONDITION_REQUIRED( 
-        planarFigureFound,
-        "Testing if " << (*it1)->GetNameOfClass() << " has a counterpart" );
+          planarFigureFound,
+          "Testing if " << (*it1)->GetNameOfClass() << " has a counterpart" );
     }
   }
 
@@ -195,9 +272,10 @@ public:
     const char* figureName = figure1->GetNameOfClass();
 
     // Test for equal number of control points
-    MITK_TEST_CONDITION_REQUIRED( 
-      figure1->GetNumberOfControlPoints() == figure2->GetNumberOfControlPoints(),
-      figureName << ": Testing number of control points" );
+    if(figure1->GetNumberOfControlPoints() != figure2->GetNumberOfControlPoints())
+    {
+      return false;
+    }
 
     // Test if all control points are equal
     for ( unsigned int i = 0; i < figure1->GetNumberOfControlPoints(); ++i )
@@ -205,20 +283,21 @@ public:
       mitk::Point2D& point1 = figure1->GetControlPoint( i );
       mitk::Point2D& point2 = figure2->GetControlPoint( i );
 
-      MITK_TEST_CONDITION_REQUIRED( 
-        point1.EuclideanDistanceTo( point2 ) < mitk::eps, 
-        figureName << ": Testing equality of control point " << i );
+      if(point1.EuclideanDistanceTo( point2 ) >= mitk::eps)
+      {
+        return false;
+      }
     }
-
 
     // Test for equal number of properties
     typedef mitk::PropertyList::PropertyMap PropertyMap;
     const PropertyMap* properties1 = figure1->GetPropertyList()->GetMap();
     const PropertyMap* properties2 = figure2->GetPropertyList()->GetMap();
 
-    MITK_TEST_CONDITION_REQUIRED( 
-      properties1->size() == properties2->size(),
-      figureName << ": Testing number of properties" );
+    if(properties1->size() != properties2->size())
+    {
+      return false;
+    }
 
     MITK_INFO << "List 1:";
     for (PropertyMap::const_iterator i1 = properties1->begin(); i1 != properties1->end(); ++i1)
@@ -235,68 +314,55 @@ public:
     MITK_INFO << "-------";
 
     // Test if all properties are equal
-    MITK_TEST_CONDITION_REQUIRED( 
-      std::equal( properties1->begin(), properties1->end(), properties2->begin(), PropertyMapEntryCompare() ),
-      figureName << ": Testing equality of properties");
- 
+    if(!std::equal( properties1->begin(), properties1->end(), properties2->begin(), PropertyMapEntryCompare() ))
+    {
+      return false;
+    }
+
     // Test if Geometry is equal
     const mitk::PlaneGeometry* planeGeometry1 = dynamic_cast<const mitk::PlaneGeometry*>(figure1->GetGeometry2D());
     const mitk::PlaneGeometry* planeGeometry2 = dynamic_cast<const mitk::PlaneGeometry*>(figure2->GetGeometry2D());
 
     // Test Geometry transform parameters
-    bool parametersEqual = true;
     typedef mitk::AffineGeometryFrame3D::TransformType TransformType;
     const TransformType* affineGeometry1 = planeGeometry1->GetIndexToWorldTransform();
     const TransformType::ParametersType& parameters1 = affineGeometry1->GetParameters();
     const TransformType::ParametersType& parameters2 = planeGeometry2->GetIndexToWorldTransform()->GetParameters();
     for ( unsigned int i = 0; i < affineGeometry1->GetNumberOfParameters(); ++i )
     {
-      if ( fabs(parameters1.GetElement( i ) - parameters2.GetElement( i )) > mitk::eps )
+      if ( fabs(parameters1.GetElement( i ) - parameters2.GetElement( i )) >= mitk::eps )
       {
-        parametersEqual = false;
+        return false;
       }
     }
 
-    MITK_TEST_CONDITION_REQUIRED( 
-      parametersEqual,
-      figureName << ": Testing if Geometry transform parameters are equal");
-
-
     // Test Geometry bounds
-    bool boundsEqual = true;
     typedef mitk::Geometry3D::BoundsArrayType BoundsArrayType;
     const BoundsArrayType& bounds1 = planeGeometry1->GetBounds();
     const BoundsArrayType& bounds2 = planeGeometry2->GetBounds();
     for ( unsigned int i = 0; i < 6; ++i )
     {
-      if ( fabs(bounds1.GetElement( i ) - bounds2.GetElement( i )) > mitk::eps )
+      if ( fabs(bounds1.GetElement( i ) - bounds2.GetElement( i )) >= mitk::eps )
       {
-        boundsEqual = false;
+        return false;
       };
     }
-
-    MITK_TEST_CONDITION_REQUIRED( 
-      boundsEqual,
-      figureName << ": Testing if Geometry bounds are equal");
-
 
     // Test Geometry spacing and origin
     mitk::Vector3D spacing1 = planeGeometry1->GetSpacing();
     mitk::Vector3D spacing2 = planeGeometry2->GetSpacing();
-
-    MITK_TEST_CONDITION_REQUIRED( 
-      (spacing1 - spacing2).GetNorm() < mitk::eps,
-      figureName << ": Testing if Geometry spacing is equal");
-
+    if((spacing1 - spacing2).GetNorm() >= mitk::eps)
+    {
+      return false;
+    }
 
     mitk::Point3D origin1 = planeGeometry1->GetOrigin();
     mitk::Point3D origin2 = planeGeometry2->GetOrigin();
 
-    MITK_TEST_CONDITION_REQUIRED( 
-      origin1.EuclideanDistanceTo( origin2 ) < mitk::eps,
-      figureName << ": Testing if Geometry origin are equal");
-
-
+    if(origin1.EuclideanDistanceTo( origin2 ) >= mitk::eps)
+    {
+      return false;
+    }
     return true;
   }
 
@@ -312,8 +378,8 @@ public:
     unsigned int i;
     PlanarFigureList::iterator it;
     for ( it = planarFigures.begin(), i = 0;
-          it != planarFigures.end();
-          ++it, ++i )
+    it != planarFigures.end();
+    ++it, ++i )
     {
       writer->SetInput( i, *it );
     }
@@ -321,8 +387,8 @@ public:
     writer->Update();
 
     MITK_TEST_CONDITION_REQUIRED( 
-      writer->GetSuccess(),
-      "Testing if writing was successful");
+        writer->GetSuccess(),
+        "Testing if writing was successful");
   }
   
 
@@ -334,8 +400,8 @@ public:
     reader->Update();
 
     MITK_TEST_CONDITION_REQUIRED( 
-      reader->GetSuccess(),
-      "Testing if reading was successful");
+        reader->GetSuccess(),
+        "Testing if reading was successful");
 
 
     // Store them in the list and return it
@@ -360,8 +426,8 @@ public:
 
     bool success = true;
     for ( it = planarFigures.begin(), i = 0;
-          it != planarFigures.end();
-          ++it, ++i )
+    it != planarFigures.end();
+    ++it, ++i )
     {
       mitk::PlanarFigureWriter::Pointer writer = mitk::PlanarFigureWriter::New();
       writer->SetWriteToMemory( true );
@@ -369,7 +435,7 @@ public:
       writer->Update();
 
       pfMemoryWriters.push_back(writer);
-    
+
       if(!writer->GetSuccess())
         success = false;
     }
@@ -409,8 +475,8 @@ private:
   {
   public:
     bool operator()(
-      const mitk::PropertyList::PropertyMap::value_type &entry1,
-      const mitk::PropertyList::PropertyMap::value_type &entry2 )
+        const mitk::PropertyList::PropertyMap::value_type &entry1,
+        const mitk::PropertyList::PropertyMap::value_type &entry2 )
     {
       MITK_INFO << "Comparing " << entry1.first << "(" << entry1.second.first->GetValueAsString() << ") and " << entry2.first << "(" << entry2.second.first->GetValueAsString() << ")";
       // Compare property objects contained in the map entries (see mitk::PropertyList)
@@ -419,7 +485,7 @@ private:
   };
   
 }; // end test helper class
-  
+
 
 /** \brief Test for PlanarFigure reader and writer classes.
  *
@@ -432,16 +498,17 @@ private:
  */
 int mitkPlanarFigureIOTest(int /* argc */, char* /*argv*/[])
 {
-  MITK_TEST_BEGIN("PlanarFigureIO")
+  MITK_TEST_BEGIN("PlanarFigureIO");
 
   // Create a number of PlanarFigure objects
-  PlanarFigureIOTestClass::PlanarFigureList originalPlanarFigures = 
-    PlanarFigureIOTestClass::CreatePlanarFigures();
+  PlanarFigureIOTestClass::PlanarFigureList originalPlanarFigures =
+      PlanarFigureIOTestClass::CreatePlanarFigures();
 
   // Create a number of "deep-copied" planar figures to test the DeepCopy function
-   PlanarFigureIOTestClass::PlanarFigureList copiedPlanarFigures = 
-    PlanarFigureIOTestClass::CreateDeepCopiedPlanarFigures(originalPlanarFigures);
+  PlanarFigureIOTestClass::PlanarFigureList copiedPlanarFigures =
+      PlanarFigureIOTestClass::CreateDeepCopiedPlanarFigures(originalPlanarFigures);
 
+  PlanarFigureIOTestClass::VerifyPlanarFigures(originalPlanarFigures, copiedPlanarFigures );
 
   // Write PlanarFigure objects into temp file
   // tmpname
@@ -462,15 +529,15 @@ int mitkPlanarFigureIOTest(int /* argc */, char* /*argv*/[])
 
   // Write PlanarFigure objects to memory buffers
   PlanarFigureIOTestClass::PlanarFigureToMemoryWriterList writersWithMemoryBuffers =
-    PlanarFigureIOTestClass::SerializePlanarFiguresToMemoryBuffers( originalPlanarFigures );
+      PlanarFigureIOTestClass::SerializePlanarFiguresToMemoryBuffers( originalPlanarFigures );
 
   // Read PlanarFigure objects from temp file
   PlanarFigureIOTestClass::PlanarFigureList retrievedPlanarFigures =
-  PlanarFigureIOTestClass::DeserializePlanarFigures( fileName );
+      PlanarFigureIOTestClass::DeserializePlanarFigures( fileName );
 
   // Read PlanarFigure objects from memory buffers
   PlanarFigureIOTestClass::PlanarFigureList retrievedPlanarFiguresFromMemory =
-    PlanarFigureIOTestClass::DeserializePlanarFiguresFromMemoryBuffers( writersWithMemoryBuffers );
+      PlanarFigureIOTestClass::DeserializePlanarFiguresFromMemoryBuffers( writersWithMemoryBuffers );
 
   PlanarFigureIOTestClass::PlanarFigureToMemoryWriterList::iterator it = writersWithMemoryBuffers.begin();
   while(it != writersWithMemoryBuffers.end())
@@ -496,4 +563,4 @@ int mitkPlanarFigureIOTest(int /* argc */, char* /*argv*/[])
 
 
   MITK_TEST_END()
-}
+    }

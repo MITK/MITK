@@ -4,8 +4,9 @@ IF(NOT MITK_VTK_Config_INCLUDED)
   IF(VTK_FOUND AND NOT VTK_BUILD_SHARED_LIBS)
     MESSAGE(FATAL_ERROR "MITK only supports a VTK which was built with shared libraries. Turn on BUILD_SHARED_LIBS in your VTK config.")
   ENDIF()
-  
+
   INCLUDE(${VTK_USE_FILE})
+    LIST(APPEND ALL_INCLUDE_DIRECTORIES ${VTK_INCLUDE_DIRS})
   IF(VTK_FOR_MITK_LIBRARIES)
     LIST(APPEND ALL_LIBRARIES ${VTK_FOR_MITK_LIBRARIES})
   ELSE()
@@ -13,8 +14,8 @@ IF(NOT MITK_VTK_Config_INCLUDED)
     # the VTK_FOR_MITK_LIBRARIES variable is not yet set.
     # Supply the VTK libraries manually
     LIST(APPEND ALL_LIBRARIES
-      vtkGraphics 
-      vtkCommon 
+      vtkGraphics
+      vtkCommon
       vtkFiltering
       vtkftgl
       vtkGraphics

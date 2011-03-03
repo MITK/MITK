@@ -39,10 +39,9 @@ mitk::ImageVtkMapper2D::ImageVtkMapper2D()
 {
   this->m_VtkBased = true;
   this->m_TimeStep = 0;
-  this->m_VtkActor = vtkSmartPointer<vtkImageActor>::New();
-  this->m_VtkImage = vtkImageData::New();
-//  m_VtkActor->SetVisibility(1);
-  this->m_VtkMapper = vtkPolyDataMapper::New();
+  this->m_VtkActor = vtkSmartPointer<vtkActor2D>::New();
+  this->m_VtkImage = vtkSmartPointer<vtkImageData>::New();
+  this->m_VtkMapper = vtkSmartPointer<vtkImageMapper>::New();
 }
 
 
@@ -74,17 +73,20 @@ void mitk::ImageVtkMapper2D::GenerateData(mitk::BaseRenderer* renderer)
 //  imageShiftSacle->ClampOverflowOn();
 //  imageShiftSacle->SetInput(image);
 
-  vtkSmartPointer<vtkImageCast> imageCast = vtkSmartPointer<vtkImageCast>::New();
-  imageCast->SetOutputScalarTypeToUnsignedChar();
-  imageCast->ClampOverflowOn();
-  imageCast->SetInput(image);
+//  vtkSmartPointer<vtkImageCast> imageCast = vtkSmartPointer<vtkImageCast>::New();
+//  imageCast->SetOutputScalarTypeToUnsignedChar();
+//  imageCast->ClampOverflowOn();
+//  imageCast->SetInput(image);
 //  m_VtkImage->SetScalarTypeToUnsignedChar();;
-  m_VtkImage = imageCast->GetOutput();
+  m_VtkImage = image;
 
   if( m_VtkImage )
   {
 
-    m_VtkActor->SetInput(m_VtkImage);
+    m_VtkMapper->SetInput(m_VtkImage);
+    m_VtkMapper->SetColorLevel(0);
+    m_VtkMapper->SetColorWindow(250);
+    m_VtkActor->SetMapper(m_VtkMapper);
 
   }
   else

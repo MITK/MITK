@@ -135,7 +135,7 @@ m_Node(NULL)
   mitkWidget2 = new QmitkRenderWindow(mitkWidget2Container, "stdmulti.widget2");
   mitkWidget2->setMaximumSize(2000,2000);
   mitkWidget2->setEnabled( TRUE );
-  mitkWidget2->SetLayoutIndex( SAGITTAL );
+  mitkWidget2->SetLayoutIndex( TRANSVERSAL );
   mitkWidgetLayout2->addWidget(mitkWidget2); 
 
   //Create RenderWindows 3
@@ -239,7 +239,7 @@ void QmitkStdMultiWidget::InitializeWidget()
   mitkWidget1->GetSliceNavigationController()->SetDefaultViewDirection(
     mitk::SliceNavigationController::Transversal );
   mitkWidget2->GetSliceNavigationController()->SetDefaultViewDirection(
-    mitk::SliceNavigationController::Sagittal );
+    mitk::SliceNavigationController::Transversal );
   mitkWidget3->GetSliceNavigationController()->SetDefaultViewDirection(
     mitk::SliceNavigationController::Frontal );
   mitkWidget4->GetSliceNavigationController()->SetDefaultViewDirection(

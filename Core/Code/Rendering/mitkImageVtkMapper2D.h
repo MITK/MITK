@@ -23,6 +23,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkActor2D.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkImageData.h>
+#include <vtkMapper2D.h>
+#include <vtkImageMapper.h>
 
 namespace mitk {
 
@@ -52,8 +54,8 @@ namespace mitk {
   private:
     vtkSmartPointer<vtkImageData> m_VtkImage;
 
-    vtkSmartPointer<vtkImageActor> m_VtkActor;
-    vtkSmartPointer<vtkPolyDataMapper> m_VtkMapper;
+    vtkSmartPointer<vtkActor2D> m_VtkActor;
+    vtkSmartPointer<vtkImageMapper> m_VtkMapper;
 
     int m_TimeStep;
     bool m_VtkBased;

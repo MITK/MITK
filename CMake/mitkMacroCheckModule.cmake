@@ -8,13 +8,13 @@ MACRO(MITK_CHECK_MODULE RESULT_VAR)
   
   
   # check for each parameter if it is a package (3rd party)
-  FOREACH(package ${ARGN})
-    IF(EXISTS "${MITK_SOURCE_DIR}/CMake/MITK_${package}_Config.cmake") 
+  FOREACH(dir ${MODULES_PACKAGE_DEPENDS_DIRS})
+    IF(EXISTS "${dir}/MITK_${package}_Config.cmake") 
       LIST(APPEND PACKAGE_DEPENDS ${package})
     ELSE() 
       LIST(APPEND DEPENDS ${package}) 
-    ENDIF() 
-  ENDFOREACH(package)
+    ENDIF()
+  ENDFOREACH()
 
   # create a list of all lowercase module names
   FILE(GLOB _ALL_MODULES RELATIVE ${MITK_MODULES_CONF_DIR} ${MITK_MODULES_CONF_DIR}/*Config.cmake)

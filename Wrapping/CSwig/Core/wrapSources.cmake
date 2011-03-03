@@ -104,15 +104,15 @@ SET(WRAP_SOURCES_TEST
 	wrap_mitkMemoryUtilities
 	wrap_mitkModalityProperty
 	wrap_mitkModeOperation
-	wrap_mitkNodePredicateAnd
+	wrap_mitkNodePredicateAND
 	wrap_mitkNodePredicateBase
 	wrap_mitkNodePredicateCompositeBase
 	wrap_mitkNodePredicateData
 	wrap_mitkNodePredicateDataType
 	wrap_mitkNodePredicateDimension
 	wrap_mitkNodePredicateFirstLevel
-	wrap_mitkNodePredicateNot
-	wrap_mitkNodePredicateOr
+	wrap_mitkNodePredicateNOT
+	wrap_mitkNodePredicateOR
 	wrap_mitkNodePredicateProperty
 	wrap_mitkNodePredicateSource
 	wrap_mitkPlaneOrientationProperty

@@ -411,10 +411,10 @@ MACRO(MITK_WRAP_LIBRARY WRAP_SOURCES LIBRARY_NAME DIRECTORY DEPEND_LIBRARY EXTRA
   FILE(APPEND ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/mitk.py
         "from ${LIBRARY_NAME}Python import *\n")
 
-  SET(DEPENDENCIES Mitk)
+  SET(DEPENDENCIES mitkIpPic mbilog tinyxml)
   SET(DEPENDS ${DEPENDENCIES})
   MITK_CHECK_MODULE(_MISSING_DEP ${DEPENDENCIES})
-  MITK_USE_MODULE("${DEPENDENCIES}")
+  MITK_USE_MODULE("Mitk")
 
   SET(ALL_INCLUDE_DIRECTORIES ${ALL_INCLUDE_DIRECTORIES} ${MITK_INCLUDE_DIRS} ${MITK_WRAP_SOURCE_DIR})
   #  "D:/MITK/mitk/CoreUI/Bundles/org.mitk.gui.qt.common/src" "D:/MITK/mitk/BlueBerry/Bundles/org.blueberry.ui.qt/src" "D:/MITK/mitk/BlueBerry/Bundles/org.blueberry.ui/src" "D:/MITK/mitk/BlueBerry/Bundles/org.blueberry.core.runtime/src" "D:/MITK/mitk/CoreUI/Bundles/org.mitk.gui.common/src" "D:/MITK/mitk/BlueBerry/Bundles/org.blueberry.osgi/src" "D:/MITK/mitk/BlueBerry/Bundles/org.blueberry.osgi/src/service" "D:/MITK/mitk/Utilities/Poco/Foundation/include" "D:/binPython/BlueBerry/Bundles/org.blueberry.osgi" "D:/MITK/mitk/Utilities/Poco/Util/include" "V:/windows/x32/QT-4.6.2_VC9.0_Bin/include/QtGui" "V:/windows/x32/QT-4.6.2_VC9.0_Bin/include"

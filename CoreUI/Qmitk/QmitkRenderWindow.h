@@ -127,6 +127,8 @@ signals:
 
   void Moved();
 
+  void Resized();
+
 protected slots:  
 
   void OnChangeLayoutDesign(int layoutDesignIndex);

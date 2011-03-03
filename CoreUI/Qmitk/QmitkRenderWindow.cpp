@@ -187,6 +187,8 @@ void QmitkRenderWindow::resizeEvent(QResizeEvent* event)
   this->resizeMitkEvent(event->size().width(), event->size().height());
   
   QVTKWidget::resizeEvent(event);
+  
+  emit Resized();
 }
 
 

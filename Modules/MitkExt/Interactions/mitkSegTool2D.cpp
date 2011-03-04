@@ -238,6 +238,10 @@ void mitk::SegTool2D::AddContourmarker ( const PositionEvent* positionEvent )
         mitk::PlanarCircle::Pointer contourMarker = mitk::PlanarCircle::New();
         contourMarker->SetGeometry2D( currentGeometry2D );
 
+        mitk::Contour::Pointer test = mitk::Contour::New();
+        const mitk::Geometry3D* tempGeo = positionEvent->GetSender()->GetSliceNavigationController()->GetCreatedWorldGeometry();
+        test->SetGeometry(const_cast<mitk::Geometry3D*>( tempGeo ));
+
         //Here we check which consecutive number must be the suffix to the markers name
         std::stringstream markerStream;
         markerStream << m_Contourmarkername;
@@ -260,7 +264,8 @@ void mitk::SegTool2D::AddContourmarker ( const PositionEvent* positionEvent )
         currentGeometry2D->Map(controlPoint3D ,controlPoint2D);
         contourMarker->PlaceFigure(controlPoint2D);
         DataNode::Pointer rotatedContourNode = DataNode::New();
-        rotatedContourNode->SetData(contourMarker);
+        //rotatedContourNode->SetData(contourMarker);
+        rotatedContourNode->SetData(test);
         rotatedContourNode->SetProperty( "name", StringProperty::New(markerStream.str()) );
         rotatedContourNode->SetBoolProperty( "PlanarFigureInitializedWindow", true, positionEvent->GetSender() );
         rotatedContourNode->SetProperty( "includeInBoundingBox", BoolProperty::New(false));

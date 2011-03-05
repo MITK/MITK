@@ -32,6 +32,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkImageReslice.h>
 #include <vtkLinearTransform.h>
 #include <vtkMatrix4x4.h>
+#include <vtkProperty2D.h>
+#include <vtkImageBlend.h>
 
 
 
@@ -39,9 +41,9 @@ mitk::ImageVtkMapper2D::ImageVtkMapper2D()
 {
   this->m_VtkBased = true;
   this->m_TimeStep = 0;
-  this->m_VtkActor = vtkSmartPointer<vtkActor2D>::New();
+  this->m_VtkActor = vtkSmartPointer<vtkActor>::New();
   this->m_VtkImage = vtkSmartPointer<vtkImageData>::New();
-  this->m_VtkMapper = vtkSmartPointer<vtkImageMapper>::New();
+  this->m_VtkMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
 }
 
 
@@ -73,20 +75,43 @@ void mitk::ImageVtkMapper2D::GenerateData(mitk::BaseRenderer* renderer)
 //  imageShiftSacle->ClampOverflowOn();
 //  imageShiftSacle->SetInput(image);
 
-//  vtkSmartPointer<vtkImageCast> imageCast = vtkSmartPointer<vtkImageCast>::New();
-//  imageCast->SetOutputScalarTypeToUnsignedChar();
-//  imageCast->ClampOverflowOn();
-//  imageCast->SetInput(image);
-//  m_VtkImage->SetScalarTypeToUnsignedChar();;
-  m_VtkImage = image;
+  vtkSmartPointer<vtkImageCast> imageCast = vtkSmartPointer<vtkImageCast>::New();
+  imageCast->SetOutputScalarTypeToUnsignedChar();
+  imageCast->ClampOverflowOn();
+  imageCast->SetInput(image);
+  m_VtkImage->SetScalarTypeToUnsignedChar();;
+
+
+  float opacity = 1.0f;
+  GetOpacity(opacity, renderer);
+  MITK_INFO << opacity;
+//  m_VtkActor->GetProperty()->SetOpacity(opacity);
+//  MITK_INFO << m_VtkActor->GetProperty()->GetOpacity();
+
+  vtkSmartPointer<vtkImageBlend> blend =
+    vtkSmartPointer<vtkImageBlend>::New();
+//  blend->AddInputConnection(image->GetOutputPort());
+  blend->AddInputConnection(image->GetProducerPort());
+  blend->SetOpacity(0,opacity);
+
+  m_VtkImage = blend->GetOutput(0);
 
   if( m_VtkImage )
   {
+    mitk::LevelWindow levelWindow;
+    GetLevelWindow(levelWindow, renderer);
+//    double range =
+    m_VtkMapper->SetInputConnection(blend->GetOutputPort());
+    m_VtkMapper->SetColorLevel(levelWindow.GetLowerWindowBound());
+    m_VtkMapper->SetColorWindow(levelWindow.GetUpperWindowBound());
 
-    m_VtkMapper->SetInput(m_VtkImage);
-    m_VtkMapper->SetColorLevel(0);
-    m_VtkMapper->SetColorWindow(250);
+
+
+
     m_VtkActor->SetMapper(m_VtkMapper);
+
+//    m_VtkActor->SetVisibility(0);
+
 
   }
   else
@@ -142,10 +167,7 @@ void mitk::ImageVtkMapper2D::MitkRenderVolumetricGeometry(BaseRenderer* renderer
 
 vtkProp* mitk::ImageVtkMapper2D::GetVtkProp(mitk::BaseRenderer* renderer)
 {
-  if(m_VtkActor)
-    MITK_INFO << "VTK actor wird returned";
-  else
-    MITK_INFO << "nix";
+  m_VtkActor->GetProperty()->SetColor(0,1,0);
   return m_VtkActor;
 }
 

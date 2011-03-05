@@ -99,7 +99,7 @@ float mitk::OdfVtkMapper2D<T,N>::m_IndexParam2;
 //
 //void bla(vtkPolyData* poly)
 //{
-//
+//m_OdfsActors
 //  // map to graphics library
 //  vtkPolyDataMapper *map = vtkPolyDataMapper::New();
 //  map->SetInput(poly);
@@ -275,7 +275,7 @@ mitk::Image* mitk::OdfVtkMapper2D<T,N>
 
 template<class T, int N>
 vtkProp*  mitk::OdfVtkMapper2D<T,N>
-::GetProp(mitk::BaseRenderer* renderer)
+::GetVtkProp(mitk::BaseRenderer* renderer)
 {
   return m_PropAssemblies[GetIndex(renderer)];
 }
@@ -810,9 +810,9 @@ void  mitk::OdfVtkMapper2D<T,N>
   if ( this->IsVisibleOdfs(renderer)==false )
     return;
 
-  if ( this->GetProp(renderer)->GetVisibility() )
+  if ( this->GetVtkProp(renderer)->GetVisibility() )
   {
-    this->GetProp(renderer)->RenderOverlay(renderer->GetVtkRenderer());
+    this->GetVtkProp(renderer)->RenderOverlay(renderer->GetVtkRenderer());
   }
 }
 
@@ -824,7 +824,7 @@ void  mitk::OdfVtkMapper2D<T,N>
   if ( this->IsVisibleOdfs( renderer )==false )
     return;
 
-  if ( this->GetProp(renderer)->GetVisibility() )
+  if ( this->GetVtkProp(renderer)->GetVisibility() )
   {
 
     // adapt cam pos
@@ -873,7 +873,7 @@ void  mitk::OdfVtkMapper2D<T,N>
 
     }
 
-    this->GetProp(renderer)->RenderOpaqueGeometry( renderer->GetVtkRenderer() );
+    this->GetVtkProp(renderer)->RenderOpaqueGeometry( renderer->GetVtkRenderer() );
 
     if(this->GetDataNode()->IsOn("DoRefresh",NULL))
     {
@@ -894,12 +894,12 @@ void  mitk::OdfVtkMapper2D<T,N>
   if ( this->IsVisibleOdfs(renderer)==false )
     return;
 
-  if ( this->GetProp(renderer)->GetVisibility() )
+  if ( this->GetVtkProp(renderer)->GetVisibility() )
     //BUG (#1551) changed VTK_MINOR_VERSION FROM 3 to 2 cause RenderTranslucentGeometry was changed in minor version 2
 #if ( ( VTK_MAJOR_VERSION >= 5 ) && ( VTK_MINOR_VERSION>=2)  )
-    this->GetProp(renderer)->RenderTranslucentPolygonalGeometry(renderer->GetVtkRenderer());
+    this->GetVtkProp(renderer)->RenderTranslucentPolygonalGeometry(renderer->GetVtkRenderer());
 #else
-    this->GetProp(renderer)->RenderTranslucentGeometry(renderer->GetVtkRenderer());
+    this->GetVtkProp(renderer)->RenderTranslucentGeometry(renderer->GetVtkRenderer());
 #endif
 }
 

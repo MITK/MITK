@@ -75,7 +75,7 @@ namespace mitk {
     mitkClassMacro(OdfVtkMapper2D,VtkMapper2D);
     itkNewMacro(Self);
 
-    virtual vtkProp* GetProp(mitk::BaseRenderer* renderer);
+    virtual vtkProp* GetVtkProp(mitk::BaseRenderer* renderer);
 
     bool IsVisibleOdfs(mitk::BaseRenderer* renderer);
 

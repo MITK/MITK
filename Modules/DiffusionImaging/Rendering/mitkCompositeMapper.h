@@ -131,9 +131,9 @@ namespace mitk {
       return m_ImgMapper->IsLODEnabled(renderer) || m_OdfMapper->IsLODEnabled(renderer);
     }
 
-    vtkProp* GetProp(mitk::BaseRenderer* renderer)
+    vtkProp* GetVtkProp(mitk::BaseRenderer* renderer)
     {
-      return m_OdfMapper->GetProp(renderer);
+      return m_OdfMapper->GetVtkProp(renderer);
     }
 
     void SetGeometry3D(const mitk::Geometry3D* aGeometry3D)

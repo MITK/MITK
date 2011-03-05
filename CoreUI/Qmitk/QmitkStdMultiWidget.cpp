@@ -232,6 +232,7 @@ void QmitkStdMultiWidget::InitializeWidget()
   planeNode->SetProperty("layer",layer);
 
   mitk::BaseRenderer::GetInstance(mitkWidget4->GetRenderWindow())->SetMapperID(mitk::BaseRenderer::Standard3D);
+  mitk::BaseRenderer::GetInstance(mitkWidget1->GetRenderWindow())->SetMapperID(mitk::BaseRenderer::Extended2D);
   // Set plane mode (slicing/rotation behavior) to slicing (default)
   m_PlaneMode = PLANE_MODE_SLICING;
 

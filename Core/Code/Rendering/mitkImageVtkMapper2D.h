@@ -25,6 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkImageData.h>
 #include <vtkMapper2D.h>
 #include <vtkImageMapper.h>
+#include <vtkOpenGLImageMapper.h>
 
 namespace mitk {
 
@@ -55,7 +56,7 @@ namespace mitk {
     vtkSmartPointer<vtkImageData> m_VtkImage;
 
     vtkSmartPointer<vtkActor2D> m_VtkActor;
-    vtkSmartPointer<vtkImageMapper> m_VtkMapper;
+    vtkSmartPointer<vtkOpenGLImageMapper> m_VtkMapper;
 
     int m_TimeStep;
     bool m_VtkBased;

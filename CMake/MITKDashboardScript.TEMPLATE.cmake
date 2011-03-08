@@ -12,13 +12,23 @@ cmake_minimum_required(VERSION 2.8.2)
 #
 # Dashboard properties
 #
+
 set(MY_COMPILER "g++4.4.5")
+# For Windows, e.g.
+#set(MY_COMPILER "VC9.0")
 
 set(CTEST_CMAKE_COMMAND "/usr/bin/cmake")
 set(CTEST_CMAKE_GENERATOR "Unix Makefiles")
 set(CTEST_DASHBOARD_ROOT "/opt/dartclients")
+# For Windows, e.g.
+#set(CTEST_CMAKE_COMMAND "cmake")
+#set(CTEST_CMAKE_GENERATOR "Visual Studio 9 2008 Win64")
+#set(CTEST_DASHBOARD_ROOT "C:/dartclients")
 
-set(QT_QMAKE_EXECUTABLE "/usr/bin/qmake")
+# The directory containing the Qt binaries
+set(QT_BINARY_DIR "/usr/bin/")
+# For Windows, e.g.
+#set(QT_BINARY_DIR "V:/windows/x64/QT-4.7.0_VC9.0_Bin/bin")
 
 #
 # Dashboard options
@@ -30,7 +40,11 @@ set(WITH_DOCUMENTATION FALSE)
 #set(DOCUMENTATION_ARCHIVES_OUTPUT_DIRECTORY ) # for example: $ENV{HOME}/Projects/Doxygen
 set(CTEST_BUILD_CONFIGURATION "Release")
 set(CTEST_TEST_TIMEOUT 500)
-set(CTEST_BUILD_FLAGS "-j4") # Use multiple CPU cores to build
+if(UNIX OR MINGW)
+  set(CTEST_BUILD_FLAGS "-j4") # Use multiple CPU cores to build
+else()
+  set(CTEST_BUILD_FLAGS "")
+endif()
 
 # experimental: 
 #     - run_ctest() macro will be called *ONE* time
@@ -51,7 +65,7 @@ set(CTEST_SOURCE_DIRECTORY "${CTEST_DASHBOARD_ROOT}/MITK")
 set(CTEST_BINARY_DIRECTORY "${CTEST_DASHBOARD_ROOT}/MITK-Superbuild-${CTEST_BUILD_CONFIGURATION}-${SCRIPT_MODE}")
 
 set(ADDITIONNAL_CMAKECACHE_OPTION "
-#MITK_USE_Boost:BOOL=ON
+MITK_USE_Boost:BOOL=ON
 ")
 
 # List of test that should be explicitly disabled on this machine
@@ -67,8 +81,10 @@ find_program(CTEST_GIT_COMMAND NAMES git)
 #
 # Git repository - Overwrite the default value provided by the driver script
 #
-# set(GIT_REPOSITORY "/home/username/MITK")
-# set(GIT_BRANCH "bug-xxx-description")
+# The git repository containing MITK code
+#set(GIT_REPOSITORY "/home/username/MITK")
+# The branch of the MITK git repository to check out
+#set(GIT_BRANCH "bug-xxx-label")
 
 ##########################################
 # WARNING: DO NOT EDIT BEYOND THIS POINT #
@@ -82,16 +98,37 @@ set(CTEST_NOTES_FILES "${CTEST_SCRIPT_DIRECTORY}/${CTEST_SCRIPT_NAME}")
 set(MY_OPERATING_SYSTEM "${CMAKE_HOST_SYSTEM}") # Windows 7, Linux-2.6.32, Darwin... 
 site_name(CTEST_SITE)
 
-execute_process(COMMAND qmake --version
-                OUTPUT_VARIABLE MY_QT_VERSION)
+if(QT_BINARY_DIR)
+  set(QT_QMAKE_EXECUTABLE "${QT_BINARY_DIR}/qmake")
+else()
+  set(QT_QMAKE_EXECUTABLE "qmake")
+endif()
+
+execute_process(COMMAND ${QT_QMAKE_EXECUTABLE} --version
+                OUTPUT_VARIABLE MY_QT_VERSION
+				RESULT_VARIABLE qmake_error)
+if(qmake_error)
+  message(FATAL_ERROR "Error when executing ${QT_QMAKE_EXECUTABLE} --version\n${qmake_error}")
+endif()
+
 string(REGEX REPLACE ".*Qt version ([0-9.]+) .*" "\\1" MY_QT_VERSION ${MY_QT_VERSION})
 
 #
 # Project specific properties
 #
-set(CTEST_PROJECT_NAME "MITK")
 set(CTEST_BUILD_NAME "${MY_OPERATING_SYSTEM}-${MY_COMPILER}-Qt-${MY_QT_VERSION}-${CTEST_BUILD_CONFIGURATION}")
 set(PROJECT_BUILD_DIR "MITK-build")
+
+set(CTEST_PATH "$ENV{PATH}")
+if(WIN32)
+  set(VTK_BINARY_DIR "${CTEST_BINARY_DIRECTORY}/VTK-build/bin/${CTEST_BUILD_CONFIGURATION}")
+  set(ITK_BINARY_DIR "${CTEST_BINARY_DIRECTORY}/ITK-build/bin/${CTEST_BUILD_CONFIGURATION}")
+  set(GDCM_BINARY_DIR "${CTEST_BINARY_DIRECTORY}/GDCM-build/bin/${CTEST_BUILD_CONFIGURATION}")
+  set(BLUEBERRY_OSGI_DIR "${CTEST_BINARY_DIRECTORY}/MITK-build/bin/BlueBerry/org.blueberry.osgi/bin/${CTEST_BUILD_CONFIGURATION}")
+  set(CTEST_PATH "${CTEST_PATH};${QT_BINARY_DIR};${VTK_BINARY_DIR};${ITK_BINARY_DIR};${GDCM_BINARY_DIR};${BLUEBERRY_OSGI_DIR}")
+endif()
+set(ENV{PATH} "${CTEST_PATH}")
+
 set(SUPERBUILD_TARGETS "")
 
 #

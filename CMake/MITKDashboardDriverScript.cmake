@@ -41,11 +41,6 @@ foreach(var ${expected_variables})
   endif()
 endforeach()
 
-# If the dashscript doesn't define a GIT_REPOSITORY variable, let's define it here.
-if (NOT DEFINED GIT_REPOSITORY OR GIT_REPOSITORY STREQUAL "")
-  set(GIT_REPOSITORY git@mbits:MITK)
-endif()
-
 if (NOT DEFINED GIT_BRANCH OR GIT_BRANCH STREQUAL "")
   set(GIT_BRANCH "")
 else()

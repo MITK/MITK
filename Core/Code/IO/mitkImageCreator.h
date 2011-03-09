@@ -28,7 +28,7 @@ namespace mitk {
         static mitk::Image::Pointer CreateRandomImage(unsigned int dimX,
                                                     unsigned int dimY,
                                                     unsigned int dimZ = 1,
-                                                    unsigned int dimT = 0,
+                                                    unsigned int dimT = 1,
                                                     unsigned int channels = 1,
                                                     const double randomMax = 1000.0f, const double randMin = 0.0f)
     {
@@ -37,8 +37,7 @@ namespace mitk {
       mitk::Image::Pointer output = mitk::Image::New();
       unsigned int* dimensions = new unsigned int[4];
       unsigned int numberOfDimensions = 0;
-      unsigned int bufferSize = 0;
-      bufferSize = dimX*dimY;
+      unsigned int bufferSize = dimX*dimY;
 
       if(dimT == 0)
       {
@@ -68,23 +67,29 @@ namespace mitk {
       TPixelType* imageBuffer = (TPixelType*)output->GetData();
       itk::Statistics::MersenneTwisterRandomVariateGenerator::Pointer randomGenerator = itk::Statistics::MersenneTwisterRandomVariateGenerator::New();
 
+      //for all time steps
       for(unsigned int t = 0; t < dimT; t++)
-      {
+      { //for all slices
         for(unsigned int s = 0; s < dimZ; s++)
-        {
+        { //for all pixels
           for(unsigned int i = 0; i < bufferSize; i++)
           {
             if(type == typeid(int)) //call integer function
             {
+              MITK_INFO << "1";
               imageBuffer[i] = (TPixelType)randomGenerator->GetIntegerVariate((int)randomMax);
               //TODO random generator does not support integer values in a given range (e.g. from 5-10)
               //range is always [0, (int)randomMax]
-            }else if((type == typeid(double)) || (type == typeid(float)))
+            }else if((type == typeid(double)) || (type == typeid(float))) //call integer function
             {
+              MITK_INFO << "2";
               imageBuffer[i] = (TPixelType)randomGenerator->GetUniformVariate(randMin,randomMax);
             }else if(type == typeid(unsigned char))
             {
+              MITK_INFO << "3";
               imageBuffer[i] = ((int)randomGenerator->GetIntegerVariate((int)randomMax)) % 256;
+            }else{
+              MITK_INFO << "4";
             }
             //TODO call different methods for other datatypes
           }

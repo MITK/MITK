@@ -160,6 +160,7 @@ SET(CPP_FILES
   IO/mitkFileSeriesReader.cpp
   IO/mitkFileWriter.cpp
   IO/mitkIpPicGet.c 
+  IO/mitkImageCreator.cpp
   IO/mitkImageWriter.cpp
   IO/mitkImageWriterFactory.cpp
   IO/mitkItkImageFileIOFactory.cpp

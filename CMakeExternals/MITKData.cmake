@@ -10,7 +10,7 @@ ENDIF()
 IF(BUILD_TESTING)
   SET(proj MITK-Data)
   ExternalProject_Add(${proj}
-    GIT_REPOSITORY ssh://git@mbits/MITK-Data
+    GIT_REPOSITORY http://mbits/git/MITK-Data.git
     GIT_TAG "origin/master"
     CONFIGURE_COMMAND ""
     BUILD_COMMAND ""
@@ -18,4 +18,5 @@ IF(BUILD_TESTING)
   )
   SET(MITK_DATA_DIR ${ep_source_dir}/${proj})
 ENDIF(BUILD_TESTING)
+
  

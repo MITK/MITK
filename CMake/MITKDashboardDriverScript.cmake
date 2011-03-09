@@ -41,11 +41,6 @@ foreach(var ${expected_variables})
   endif()
 endforeach()
 
-# If the dashscript doesn't define a GIT_REPOSITORY variable, let's define it here.
-if (NOT DEFINED GIT_REPOSITORY OR GIT_REPOSITORY STREQUAL "")
-  set(GIT_REPOSITORY git@mbits:MITK)
-endif()
-
 if (NOT DEFINED GIT_BRANCH OR GIT_BRANCH STREQUAL "")
   set(GIT_BRANCH "")
 else()
@@ -111,6 +106,10 @@ MACRO(run_ctest)
 
   ctest_start(${model})
   ctest_update(SOURCE "${CTEST_CHECKOUT_DIR}" RETURN_VALUE res)
+  
+  if(COMMAND MITK_OVERRIDE_FORCE_BUILD)
+    MITK_OVERRIDE_FORCE_BUILD(force_build)
+  endif()
 
   # force a build if this is the first run and the build dir is empty
   if(NOT EXISTS "${CTEST_BINARY_DIRECTORY}/CMakeCache.txt")

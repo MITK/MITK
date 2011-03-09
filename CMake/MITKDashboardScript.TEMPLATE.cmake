@@ -106,7 +106,7 @@ endif()
 
 execute_process(COMMAND ${QT_QMAKE_EXECUTABLE} --version
                 OUTPUT_VARIABLE MY_QT_VERSION
-				RESULT_VARIABLE qmake_error)
+                RESULT_VARIABLE qmake_error)
 if(qmake_error)
   message(FATAL_ERROR "Error when executing ${QT_QMAKE_EXECUTABLE} --version\n${qmake_error}")
 endif()

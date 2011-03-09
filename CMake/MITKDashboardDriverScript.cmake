@@ -83,6 +83,10 @@ endif()
 
 set(CTEST_USE_LAUNCHERS 1)
 
+if(NOT DARTCLIENT_ERROR_FILE)
+  set(DARTCLIENT_ERROR_FILE "${CTEST_BINARY_DIRECTORY}/dartclient_error.txt")
+endif()
+
 if(empty_binary_directory)
   message("Directory ${CTEST_BINARY_DIRECTORY} cleaned !")
   ctest_empty_binary_directory(${CTEST_BINARY_DIRECTORY})
@@ -103,6 +107,8 @@ set(CTEST_UPDATE_COMMAND "${CTEST_GIT_COMMAND}")
 # run_ctest macro
 #
 MACRO(run_ctest)
+  set(dartclient_error)
+
   ctest_start(${model})
   ctest_update(SOURCE "${CTEST_CHECKOUT_DIR}" RETURN_VALUE res)
 
@@ -129,7 +135,12 @@ ${ADDITIONNAL_CMAKECACHE_OPTION}
 ")
   endif()
   
-  if (res GREATER 0 OR force_build)
+  if(NOT dartclient_error AND res LESS 0)
+    # update error
+    set(dartclient_error "Update or checkout error") 
+  endif()
+  
+  if(res GREATER 0 OR force_build)
   
     ctest_submit(PARTS Update)
       
@@ -140,7 +151,13 @@ ${ADDITIONNAL_CMAKECACHE_OPTION}
      
     ctest_configure(BUILD "${CTEST_BINARY_DIRECTORY}"
       OPTIONS "-DCTEST_USE_LAUNCHERS=${CTEST_USE_LAUNCHERS}"
+      RETURN_VALUE res
     )
+    
+    if(NOT dartclient_error AND res)
+      set(dartclient_error "SuperBuild configure error (code ${res})")
+    endif()
+    
     ctest_read_custom_files("${CTEST_BINARY_DIRECTORY}")
     ctest_submit(PARTS Configure)
     ctest_submit(FILES "${CTEST_BINARY_DIRECTORY}/Project.xml")
@@ -154,17 +171,32 @@ ${ADDITIONNAL_CMAKECACHE_OPTION}
       foreach(superbuild_target ${SUPERBUILD_TARGETS})
         message("----------- [ Build ${superbuild_target} - SuperBuild ] -----------")
         set(CTEST_BUILD_TARGET "${superbuild_target}")
-        ctest_build(BUILD "${CTEST_BINARY_DIRECTORY}" APPEND)
+        ctest_build(BUILD "${CTEST_BINARY_DIRECTORY}" APPEND
+          RETURN_VALUE res
+          NUMBER_ERRORS num_errors
+          NUMBER_WARNINGS num_warnings)
         ctest_submit(PARTS Build)
         
+        if(NOT dartclient_error AND res)
+          set(dartclient_error "Build error for ${superbuild_target} (code ${res}): Warnings ${num_warnings}, Errors ${num_errors}")
+        elseif(NOT dartclient_error AND num_warnings)
+          set(dartclient_error "Warnings for ${superbuild_target}: ${num_warnings}")
+        endif()
+        
+        # runs only tests that have a LABELS property matching "SuperBuild"
         ctest_test(
           BUILD "${CTEST_BINARY_DIRECTORY}"
           INCLUDE_LABEL "SuperBuild"
           PARALLEL_LEVEL 8
           EXCLUDE ${TEST_TO_EXCLUDE_REGEX}
+          RETURN_VALUE res
           )
-        # runs only tests that have a LABELS property matching "${subproject}"
+        
         ctest_submit(PARTS Test)
+        
+        if(NOT dartclient_error AND res)
+          set(dartclient_error "Test failures for ${superbuild_target} (code ${res})")
+        endif()
       endforeach()
       
       # HACK Unfortunately ctest_coverage ignores the build argument, back-up the original dirs
@@ -182,8 +214,17 @@ ${ADDITIONNAL_CMAKECACHE_OPTION}
        
         # Build target
         set(CTEST_BUILD_TARGET "${external_project}")
-        ctest_build(BUILD "${CTEST_BINARY_DIRECTORY}" APPEND)
+        ctest_build(BUILD "${CTEST_BINARY_DIRECTORY}" APPEND
+          RETURN_VALUE res
+          NUMBER_ERRORS num_errors
+          NUMBER_WARNINGS num_warnings)
         ctest_submit(PARTS Build)
+        
+        if(NOT dartclient_error AND res)
+          set(dartclient_error "Build error for ${external_project} (code ${res}): Warnings ${num_warnings}, Errors ${num_errors}")
+        elseif(NOT dartclient_error AND num_warnings)
+          set(dartclient_error "Warnings for ${external_project}: ${num_warnings}")
+        endif()
         
         # HACK Unfortunately ctest_coverage ignores the build argument, try to force it...
         file(READ "${CTEST_BINARY_DIRECTORY}/${external_project_build_dir}/CMakeFiles/TargetDirectories.txt" mitk_build_coverage_dirs)
@@ -191,16 +232,21 @@ ${ADDITIONNAL_CMAKECACHE_OPTION}
         
         message("----------- [ Test ${external_project} ] -----------")
 
+        # runs only tests that have a LABELS property matching "${external_project}"
         ctest_test(
           BUILD "${CTEST_BINARY_DIRECTORY}/${external_project_build_dir}"
           APPEND
           INCLUDE_LABEL "${external_project}"
           PARALLEL_LEVEL 8
           EXCLUDE ${TEST_TO_EXCLUDE_REGEX}
+          RETURN_VALUE res
           )
-        # runs only tests that have a LABELS property matching "${external_project}"
         
         ctest_submit(PARTS Test)
+        
+        if(NOT dartclient_error AND res)
+          set(dartclient_error "Test failures for ${external_project} (code ${res})")
+        endif()
 
         # Coverage per external project
         if (WITH_COVERAGE AND CTEST_COVERAGE_COMMAND)
@@ -226,18 +272,33 @@ ${ADDITIONNAL_CMAKECACHE_OPTION}
     
     # build everything at superbuild level which has not yet been built
     set(CTEST_BUILD_TARGET)
-    ctest_build(BUILD "${CTEST_BINARY_DIRECTORY}" APPEND)
+    ctest_build(BUILD "${CTEST_BINARY_DIRECTORY}" APPEND
+      RETURN_VALUE res
+      NUMBER_ERRORS num_errors
+      NUMBER_WARNINGS num_warnings)
+      
     ctest_submit(PARTS Build)
-     
+    
+    if(NOT dartclient_error AND res)
+      set(dartclient_error "Build error for SuperBuild (code ${res}): Warnings ${num_warnings}, Errors ${num_errors}")
+    elseif(NOT dartclient_error AND num_warnings)
+      set(dartclient_error "Warnings for SuperBuild: ${num_warnings}")
+    endif()
+    
+    # runs only tests that have a LABELS property matching "SuperBuild" 
     ctest_test(
       BUILD "${CTEST_BINARY_DIRECTORY}" 
       INCLUDE_LABEL "SuperBuild"
       PARALLEL_LEVEL 8
       EXCLUDE ${TEST_TO_EXCLUDE_REGEX}
+      RETURN_VALUE res
       )
-    # runs only tests that have a LABELS property matching "${subproject}"
+    
     ctest_submit(PARTS Test)
     
+    if(NOT dartclient_error AND res)
+      set(dartclient_error "Test failures for SuperBuild (code ${res})")
+    endif()
     
     set(build_dir "${CTEST_BINARY_DIRECTORY}/${PROJECT_BUILD_DIR}")
     
@@ -245,9 +306,14 @@ ${ADDITIONNAL_CMAKECACHE_OPTION}
     # Configure target
     ctest_configure(BUILD "${build_dir}"
       OPTIONS "-DCTEST_USE_LAUNCHERS=${CTEST_USE_LAUNCHERS}"
+      RETURN_VALUE res
     )
     ctest_read_custom_files("${CTEST_BINARY_DIRECTORY}")
     ctest_submit(PARTS Configure)
+    
+    if(NOT dartclient_error AND res)
+      set(dartclient_error "Configure error in ${build_dir} (code ${res})")
+    endif()
     
     foreach(subproject ${CTEST_PROJECT_SUBPROJECTS})
       set_property(GLOBAL PROPERTY SubProject ${subproject})
@@ -256,8 +322,17 @@ ${ADDITIONNAL_CMAKECACHE_OPTION}
      
       # Build target
       set(CTEST_BUILD_TARGET "${subproject}")
-      ctest_build(BUILD "${build_dir}" APPEND)
+      ctest_build(BUILD "${build_dir}" APPEND
+        RETURN_VALUE res
+        NUMBER_ERRORS num_errors
+        NUMBER_WARNINGS num_warnings)
       ctest_submit(PARTS Build)
+      
+      if(NOT dartclient_error AND res)
+        set(dartclient_error "Build error for ${subproject} (code ${res}): Warnings ${num_warnings}, Errors ${num_errors}")
+      elseif(NOT dartclient_error AND num_warnings)
+        set(dartclient_error "Warnings for ${subproject}: ${num_warnings}")
+      endif()
     endforeach()
     
     # Build the rest of the project
@@ -266,8 +341,17 @@ ${ADDITIONNAL_CMAKECACHE_OPTION}
     
     message("----------- [ Build All ] -----------")
     set(CTEST_BUILD_TARGET)
-    ctest_build(BUILD "${build_dir}" APPEND)
+    ctest_build(BUILD "${build_dir}" APPEND
+      RETURN_VALUE res
+      NUMBER_ERRORS num_errors
+      NUMBER_WARNINGS num_warnings)
     ctest_submit(PARTS Build)
+  
+    if(NOT dartclient_error AND res)
+      set(dartclient_error "Build error (code ${res}): Warnings ${num_warnings}, Errors ${num_errors}")
+    elseif(NOT dartclient_error AND num_warnings)
+      set(dartclient_error "Warnings: ${num_warnings}")
+    endif()
     
     # HACK Unfortunately ctest_coverage ignores the build argument, try to force it...
     file(READ ${build_dir}/CMakeFiles/TargetDirectories.txt mitk_build_coverage_dirs)
@@ -278,16 +362,21 @@ ${ADDITIONNAL_CMAKECACHE_OPTION}
       set_property(GLOBAL PROPERTY Label ${subproject})
       message("----------- [ Test ${subproject} ] -----------")
 
+      # runs only tests that have a LABELS property matching "${subproject}"
       ctest_test(
         BUILD "${build_dir}"
         APPEND
         INCLUDE_LABEL "${subproject}"
         PARALLEL_LEVEL 8
         EXCLUDE ${TEST_TO_EXCLUDE_REGEX}
+        RETURN_VALUE res
         )
-      # runs only tests that have a LABELS property matching "${subproject}"
       
       ctest_submit(PARTS Test)
+      
+      if(NOT dartclient_error AND res)
+        set(dartclient_error "Test failures for ${subproject} (code ${res})")
+      endif()
 
       # Coverage per sub-project
       if (WITH_COVERAGE AND CTEST_COVERAGE_COMMAND)
@@ -326,14 +415,24 @@ ${ADDITIONNAL_CMAKECACHE_OPTION}
     
     # Global dynamic analysis ...
     if (WITH_MEMCHECK AND CTEST_MEMORYCHECK_COMMAND)
-        message("----------- [ Global memcheck ] -----------")
-        ctest_memcheck(BUILD "${build_dir}")
-        ctest_submit(PARTS MemCheck)
-      endif ()
+      message("----------- [ Global memcheck ] -----------")
+      ctest_memcheck(BUILD "${build_dir}")
+      ctest_submit(PARTS MemCheck)
+    endif ()
     
     # Note should be at the end
     ctest_submit(PARTS Notes)
   
+  endif()
+  
+  # Clear the CTEST_CHECKOUT_COMMAND variable to prevent continuous clients
+  # to try to checkout again
+  set(CTEST_CHECKOUT_COMMAND "")
+  
+  if(dartclient_error)
+    file(WRITE ${DARTCLIENT_ERROR_FILE} "${dartclient_error}")
+  else()
+    file(REMOVE ${DARTCLIENT_ERROR_FILE})
   endif()
 endmacro()
 

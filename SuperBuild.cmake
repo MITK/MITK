@@ -39,7 +39,7 @@ SET_PROPERTY(DIRECTORY PROPERTY EP_BASE ${ep_base})
 
 SET(ep_install_dir ${ep_base}/Install)
 #SET(ep_build_dir ${ep_base}/Build)
-#SET(ep_source_dir ${ep_base}/Source)
+SET(ep_source_dir ${ep_base}/Source)
 #SET(ep_parallelism_level)
 SET(ep_build_shared_libs ON)
 SET(ep_build_testing OFF)
@@ -95,6 +95,7 @@ SET(external_projects
   Boost
   DCMTK
   CTK
+  MITKData
   )
   
 # Include external projects
@@ -163,7 +164,7 @@ ExternalProject_Add(${proj}
     ${Boost_DEPENDS}
     ${CTK_DEPENDS}
     ${DCMTK_DEPENDS}
-    
+    ${MITK-Data_DEPENDS}
 )
 
 #-----------------------------------------------------------------------------
@@ -193,6 +194,7 @@ ExternalProject_Add(${proj}
     -DMITK_USE_GDCMIO:BOOL=${MITK_USE_GDCMIO}
     -DMITK_USE_DCMTK:BOOL=${MITK_USE_DCMTK}
     -DMITK_USE_QT:BOOL=${MITK_USE_QT}
+    -DMITK_DATA_DIR:PATH=${MITK_DATA_DIR}
 
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}
   BINARY_DIR ${CMAKE_BINARY_DIR}/MITK-build

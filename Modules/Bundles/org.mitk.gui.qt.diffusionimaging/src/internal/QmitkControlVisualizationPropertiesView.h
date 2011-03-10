@@ -100,6 +100,10 @@ protected slots:
   void NormalizationCheckbox();
   void ScalingCheckbox();
 
+  void OnThickSlicesModeSelected( QAction* action );
+  void OnTSNumChanged(int num);
+  void OnMenuAboutToShow ();
+
 protected:
 
   Ui::QmitkControlVisualizationPropertiesViewControls* m_Controls;
@@ -126,6 +130,9 @@ protected:
   bool m_GlyIsOn_C;
   bool m_GlyIsOn_S;
 
+  int currentThickSlicesMode;
+  QLabel* m_TSLabel;
+  QMenu* m_MyMenu;
 };
 
 

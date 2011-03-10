@@ -391,7 +391,6 @@ void QmitkControlVisualizationPropertiesView::CreateConnections()
     connect( (QObject*)(m_Controls->m_IndexParam1), SIGNAL(valueChanged(double)), this, SLOT(IndexParam1Changed(double)) );
     connect( (QObject*)(m_Controls->m_IndexParam2), SIGNAL(valueChanged(double)), this, SLOT(IndexParam2Changed(double)) );
 
-    connect( (QObject*)(m_Controls->m_NormalizationCheckbox), SIGNAL(clicked()), this, SLOT(NormalizationCheckbox()) );
     connect( (QObject*)(m_Controls->m_ScalingCheckbox), SIGNAL(clicked()), this, SLOT(ScalingCheckbox()) );
 
     connect( (QObject*)(m_Controls->m_OpacitySlider), SIGNAL(spanChanged(double,double)), this, SLOT(OpacityChanged(double,double)) );
@@ -861,12 +860,6 @@ void QmitkControlVisualizationPropertiesView::OpacityChanged(double l, double u)
   if(m_MultiWidget)
     m_MultiWidget->RequestUpdate();
 
-}
-
-void QmitkControlVisualizationPropertiesView::NormalizationCheckbox()
-{
-  m_Controls->m_NormalizationFrame->setVisible(
-      m_Controls->m_NormalizationCheckbox->isChecked());
 }
 
 void QmitkControlVisualizationPropertiesView::ScalingCheckbox()

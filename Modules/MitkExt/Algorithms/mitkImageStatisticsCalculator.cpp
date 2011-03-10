@@ -56,7 +56,10 @@ namespace mitk
 
 ImageStatisticsCalculator::ImageStatisticsCalculator()
 : m_MaskingMode( MASKING_MODE_NONE ),
-  m_MaskingModeChanged( false )
+  m_MaskingModeChanged( false ),
+  m_DoIgnorePixelValue(false),
+  m_IgnorePixelValue(0.0),
+  m_IgnorePixelValueChanged(false)
 { 
   m_EmptyHistogram = HistogramType::New();
   HistogramType::SizeType histogramSize;
@@ -197,7 +200,38 @@ void ImageStatisticsCalculator::SetMaskingModeToPlanarFigure()
   }
 }
 
+void ImageStatisticsCalculator::SetIgnorePixelValue(double value)
+{
+  if ( m_IgnorePixelValue != value )
+  {
+    m_IgnorePixelValue = value;
+    if(m_DoIgnorePixelValue)
+    {
+      m_IgnorePixelValueChanged = true;
+    }
+    this->Modified();
+  }
+}
 
+double ImageStatisticsCalculator::GetIgnorePixelValue()
+{
+  return m_IgnorePixelValue;
+}
+
+void ImageStatisticsCalculator::SetDoIgnorePixelValue(bool value)
+{
+  if ( m_DoIgnorePixelValue != value )
+  {
+    m_DoIgnorePixelValue = value;
+    m_IgnorePixelValueChanged = true;
+    this->Modified();
+  }
+}
+
+bool ImageStatisticsCalculator::GetDoIgnorePixelValue()
+{
+  return m_DoIgnorePixelValue;
+}
 
 bool ImageStatisticsCalculator::ComputeStatistics( unsigned int timeStep )
 {
@@ -234,7 +268,8 @@ bool ImageStatisticsCalculator::ComputeStatistics( unsigned int timeStep )
   bool maskedImageStatisticsCalculationTrigger = m_MaskedImageStatisticsCalculationTriggerVector[timeStep];
   bool planarFigureStatisticsCalculationTrigger = m_PlanarFigureStatisticsCalculationTriggerVector[timeStep];
 
-  if ( ((m_MaskingMode != MASKING_MODE_NONE) || (imageMTime > m_Image->GetMTime() && !imageStatisticsCalculationTrigger))
+  if ( !m_IgnorePixelValueChanged
+    && ((m_MaskingMode != MASKING_MODE_NONE) || (imageMTime > m_Image->GetMTime() && !imageStatisticsCalculationTrigger))
     && ((m_MaskingMode != MASKING_MODE_IMAGE) || (maskedImageMTime > m_ImageMask->GetMTime() && !maskedImageStatisticsCalculationTrigger))
     && ((m_MaskingMode != MASKING_MODE_PLANARFIGURE) || (planarFigureMTime > m_PlanarFigure->GetMTime() && !planarFigureStatisticsCalculationTrigger)) )
   {
@@ -252,7 +287,7 @@ bool ImageStatisticsCalculator::ComputeStatistics( unsigned int timeStep )
 
   // Reset state changed flag
   m_MaskingModeChanged = false;
-
+  m_IgnorePixelValueChanged = false;
 
   // Depending on masking mode, extract and/or generate the required image
   // and mask data from the user input
@@ -265,13 +300,25 @@ bool ImageStatisticsCalculator::ComputeStatistics( unsigned int timeStep )
   {
   case MASKING_MODE_NONE:
   default:
-    statistics = &m_ImageStatisticsVector[timeStep];
+    {
+   if(!m_DoIgnorePixelValue)
+      {
+      statistics = &m_ImageStatisticsVector[timeStep];
     histogram = &m_ImageHistogramVector[timeStep];
 
     m_ImageStatisticsTimeStampVector[timeStep].Modified();
     m_ImageStatisticsCalculationTriggerVector[timeStep] = false;
-    break;
+  }
+   else
+   {
+     statistics = &m_MaskedImageStatisticsVector[timeStep];
+     histogram = &m_MaskedImageHistogramVector[timeStep];
 
+     m_MaskedImageStatisticsTimeStampVector[timeStep].Modified();
+     m_MaskedImageStatisticsCalculationTriggerVector[timeStep] = false;
+   }
+    break;
+  }
   case MASKING_MODE_IMAGE:
     statistics = &m_MaskedImageStatisticsVector[timeStep];
     histogram = &m_MaskedImageHistogramVector[timeStep];
@@ -292,7 +339,7 @@ bool ImageStatisticsCalculator::ComputeStatistics( unsigned int timeStep )
   // Calculate statistics and histogram(s)
   if ( m_InternalImage->GetDimension() == 3 )
   {
-    if ( m_MaskingMode == MASKING_MODE_NONE )
+    if ( m_MaskingMode == MASKING_MODE_NONE && !m_DoIgnorePixelValue )
     {
       AccessFixedDimensionByItk_2( 
         m_InternalImage,
@@ -314,7 +361,7 @@ bool ImageStatisticsCalculator::ComputeStatistics( unsigned int timeStep )
   }
   else if ( m_InternalImage->GetDimension() == 2 )
   {
-    if ( m_MaskingMode == MASKING_MODE_NONE )
+    if ( m_MaskingMode == MASKING_MODE_NONE && !m_DoIgnorePixelValue )
     {
       AccessFixedDimensionByItk_2( 
         m_InternalImage,
@@ -360,7 +407,12 @@ ImageStatisticsCalculator::GetHistogram( unsigned int timeStep ) const
   {
   case MASKING_MODE_NONE:
   default:
-    return m_ImageHistogramVector[timeStep];
+    {
+      if(m_DoIgnorePixelValue)
+        return m_MaskedImageHistogramVector[timeStep];
+
+      return m_ImageHistogramVector[timeStep];
+    }
 
   case MASKING_MODE_IMAGE:
     return m_MaskedImageHistogramVector[timeStep];
@@ -383,8 +435,12 @@ ImageStatisticsCalculator::GetStatistics( unsigned int timeStep ) const
   {
   case MASKING_MODE_NONE:
   default:
-    return m_ImageStatisticsVector[timeStep];
+    {
+      if(m_DoIgnorePixelValue)
+        return m_MaskedImageStatisticsVector[timeStep];
 
+      return m_ImageStatisticsVector[timeStep];
+    }
   case MASKING_MODE_IMAGE:
     return m_MaskedImageStatisticsVector[timeStep];
 
@@ -420,6 +476,13 @@ void ImageStatisticsCalculator::ExtractImageAndMask( unsigned int timeStep )
       m_InternalImage = timeSliceImage;
       m_InternalImageMask2D = NULL;
       m_InternalImageMask3D = NULL;
+
+      if(m_DoIgnorePixelValue)
+      {
+        CastToItkImage( timeSliceImage, m_InternalImageMask3D );
+        m_InternalImageMask3D->FillBuffer(1);
+      }
+
       break;
     }
 
@@ -514,6 +577,26 @@ void ImageStatisticsCalculator::ExtractImageAndMask( unsigned int timeStep )
         2, axis );
     }
   }
+
+  if(m_DoIgnorePixelValue)
+  {
+    if ( m_InternalImage->GetDimension() == 3 )
+    {
+      AccessFixedDimensionByItk_1(
+          m_InternalImage,
+          InternalMaskIgnoredPixels,
+          3,
+          m_InternalImageMask3D.GetPointer() );
+    }
+    else if ( m_InternalImage->GetDimension() == 2 )
+    {
+      AccessFixedDimensionByItk_1(
+          m_InternalImage,
+          InternalMaskIgnoredPixels,
+          2,
+          m_InternalImageMask2D.GetPointer() );
+    }
+  }
 }
 
 
@@ -601,8 +684,35 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsUnmasked(
     + statistics.Sigma * statistics.Sigma );
 }
 
-
 template < typename TPixel, unsigned int VImageDimension >
+    void ImageStatisticsCalculator::InternalMaskIgnoredPixels(
+        const itk::Image< TPixel, VImageDimension > *image,
+        itk::Image< unsigned short, VImageDimension > *maskImage )
+{
+  typedef itk::Image< TPixel, VImageDimension > ImageType;
+  typedef itk::Image< unsigned short, VImageDimension > MaskImageType;
+
+  itk::ImageRegionIterator<MaskImageType>
+      itmask(maskImage, maskImage->GetLargestPossibleRegion());
+  itk::ImageRegionConstIterator<ImageType>
+      itimage(image, image->GetLargestPossibleRegion());
+
+  itmask = itmask.Begin();
+  itimage = itimage.Begin();
+
+  while( !itmask.IsAtEnd() )
+  {
+    if(m_IgnorePixelValue == itimage.Get())
+    {
+      itmask.Set(0);
+    }
+
+    ++itmask;
+    ++itimage;
+  }
+}
+
+    template < typename TPixel, unsigned int VImageDimension >
 void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
   const itk::Image< TPixel, VImageDimension > *image,
   itk::Image< unsigned short, VImageDimension > *maskImage,

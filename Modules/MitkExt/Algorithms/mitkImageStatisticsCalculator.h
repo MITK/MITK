@@ -121,7 +121,17 @@ public:
   /** \brief Set/Get operation mode for masking */
   void SetMaskingModeToPlanarFigure();
 
+  /** \brief Set a pixel value for pixels that will be ignored in the statistics */
+  void SetIgnorePixelValue(double value);
 
+  /** \brief Get the pixel value for pixels that will be ignored in the statistics */
+  double GetIgnorePixelValue();
+
+  /** \brief Set wether a pixel value should be ignored in the statistics */
+  void SetDoIgnorePixelValue(bool doit);
+
+  /** \brief Get wether a pixel value will be ignored in the statistics */
+  bool GetDoIgnorePixelValue();
 
   /** \brief Compute statistics (together with histogram) for the current
    * masking mode.
@@ -189,6 +199,10 @@ protected:
   void InternalCalculateMaskFromPlanarFigure(
     const itk::Image< TPixel, VImageDimension > *image, unsigned int axis );
 
+  template < typename TPixel, unsigned int VImageDimension >
+      void InternalMaskIgnoredPixels(
+          const itk::Image< TPixel, VImageDimension > *image,
+          itk::Image< unsigned short, VImageDimension > *maskImage );
 
   /** Connection from ITK to VTK */
   template <typename ITK_Exporter, typename VTK_Importer>
@@ -274,6 +288,9 @@ protected:
   BoolVectorType m_MaskedImageStatisticsCalculationTriggerVector;
   BoolVectorType m_PlanarFigureStatisticsCalculationTriggerVector;
 
+  double m_IgnorePixelValue;
+  bool m_DoIgnorePixelValue;
+  bool m_IgnorePixelValueChanged;
 };
 
 }

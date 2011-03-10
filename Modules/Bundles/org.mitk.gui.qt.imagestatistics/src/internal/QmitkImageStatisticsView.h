@@ -84,6 +84,8 @@ protected slots:
 
   void ClipboardStatisticsButtonClicked();
 
+  void IgnoreZerosCheckboxClicked(  );
+
 
 protected:
 

@@ -15,7 +15,7 @@ IF(BUILD_TESTING)
   SET(MITK-Data_DEPENDS ${proj})
 
   ExternalProject_Add(${proj}
-    GIT_REPOSITORY http://mbits/git/MITK-Data.git
+    GIT_REPOSITORY http://git.mitk.org/MITK-Data.git
     GIT_TAG "origin/master"
     CONFIGURE_COMMAND ""
     BUILD_COMMAND ""

@@ -191,7 +191,7 @@ void QmitkQBallReconstructionView::CreateQtPartControl(QWidget *parent)
     items << "2" << "4" << "6" << "8";
     m_Controls->m_QBallReconstructionMaxLLevelComboBox->addItems(items);
     m_Controls->m_QBallReconstructionMaxLLevelComboBox->setCurrentIndex(1);
-    m_Controls->m_Description->setText("Spherical harmonics recon. (Desoteaux2007)");
+    MethodChoosen(m_Controls->m_QBallReconstructionMethodComboBox->currentIndex());
 
     m_Controls->m_QBallReconstructionNumberThreadsSpinbox->setValue(8);
 

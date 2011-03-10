@@ -164,7 +164,7 @@ ExternalProject_Add(${proj}
     ${Boost_DEPENDS}
     ${CTK_DEPENDS}
     ${DCMTK_DEPENDS}
-    
+    ${MITK-Data_DEPENDS}
 )
 
 #-----------------------------------------------------------------------------

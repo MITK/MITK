@@ -601,7 +601,7 @@ namespace itk
     int maxidx = -1;
     for( unsigned int i=0; i<InternalDimension; i++) 
     {
-      if((*this)[i] > max )
+      if((*this)[i] >= max )
       {
         max = (*this)[i];
         maxidx = i;

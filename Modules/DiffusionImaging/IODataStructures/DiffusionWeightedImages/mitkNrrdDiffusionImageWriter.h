@@ -97,7 +97,7 @@ public:
 
     // FileWriterWithInformation methods
     virtual const char * GetDefaultFilename() { return "DiffusionWeightedImages.dwi"; }
-    virtual const char * GetFileDialogPattern() { return "Diffusion Weighted Images (*.dwi *.hdwi)"; }
+    virtual const char * GetFileDialogPattern() { return "Diffusion Weighted Images (*.dwi *.hdwi *.fsl)"; }
     virtual const char * GetDefaultExtension() { return ".dwi"; }
     virtual bool CanWriteDataType(BaseData::Pointer data) { return (dynamic_cast<mitk::DiffusionImage<TPixelType>*>(data.GetPointer()) != NULL); };  
     virtual void DoWrite(BaseData::Pointer data) { 

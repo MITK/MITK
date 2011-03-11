@@ -10,6 +10,6 @@ function(mitkFunctionAddTestLabel test_name)
     set(label ${ARGN})
   endif()
   set_property(TEST ${test_name} APPEND PROPERTY LABELS ${label})
-endfunction(add_test_label)
+endfunction(mitkFunctionAddTestLabel)
 
 

@@ -316,7 +316,7 @@ namespace mitk
               char* pch = strtok (const_cast<char*>(line.c_str())," ");
               while (pch != NULL)
               {
-                bvec_entries.push_back(strtof(pch, NULL));
+                bvec_entries.push_back(atof(pch));
                 pch = strtok (NULL, " ");
               }
             }
@@ -339,7 +339,7 @@ namespace mitk
               char* pch = strtok (const_cast<char*>(line.c_str())," ");
               while (pch != NULL)
               {
-                bval_entries.push_back(strtof(pch, NULL));
+                bval_entries.push_back(atof(pch));
                 pch = strtok (NULL, " ");
               }
             }

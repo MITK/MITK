@@ -265,7 +265,7 @@ void mitk::SegTool2D::AddContourmarker ( const PositionEvent* positionEvent )
         contourMarker->PlaceFigure(controlPoint2D);
         DataNode::Pointer rotatedContourNode = DataNode::New();
         //rotatedContourNode->SetData(contourMarker);
-        rotatedContourNode->SetData(test);
+        rotatedContourNode->SetData(contourMarker);
         rotatedContourNode->SetProperty( "name", StringProperty::New(markerStream.str()) );
         rotatedContourNode->SetBoolProperty( "PlanarFigureInitializedWindow", true, positionEvent->GetSender() );
         rotatedContourNode->SetProperty( "includeInBoundingBox", BoolProperty::New(false));

@@ -602,14 +602,15 @@ void QmitkSegmentationView::OnContourMarkerSelected(const mitk::DataNode *node)
     // make node visible
     if (selectedRenderWindow)
     {
-      //mitk::Point3D centerP = markerGeometry->GetOrigin();
-      // /*selectedRenderWindow->GetSliceNavigationController()->SelectSliceByPoint(
-      //    centerP);*/
-      //selectedRenderWindow->GetSliceNavigationController()->ReorientSlices(
-      //    centerP, markerGeometry->GetNormal());
+      mitk::Point3D centerP = markerGeometry->GetOrigin();
+       /*selectedRenderWindow->GetSliceNavigationController()->SelectSliceByPoint(
+          centerP);*/
+      mitk::Vector3D normal = markerGeometry->GetNormal();
+      selectedRenderWindow->GetSliceNavigationController()->ReorientSlices(
+          centerP, normal);
 
-      selectedRenderWindow->GetSliceNavigationController()->SetInputWorldGeometry(node->GetData()->GetGeometry());
-      selectedRenderWindow->GetSliceNavigationController()->Update();
+      /*selectedRenderWindow->GetSliceNavigationController()->SetInputWorldGeometry(node->GetData()->GetGeometry());
+      selectedRenderWindow->GetSliceNavigationController()->Update();*/
 
       //selectedRenderWindow->GetRenderer()->GetMapperID()
 

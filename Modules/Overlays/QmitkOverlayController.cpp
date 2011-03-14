@@ -35,7 +35,7 @@ QmitkOverlayController::QmitkOverlayController( QmitkRenderWindow* rw, mitk::Pro
     return;
   }
 
-  connect( rw, SIGNAL( Moved() ), this, SLOT( AdjustOverlayPosition() ) );
+  connect( rw, SIGNAL( moved() ), this, SLOT( AdjustOverlayPosition() ) );
 
   this->InitializeOverlayLayout();
   this->AdjustOverlayPosition();

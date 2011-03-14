@@ -187,6 +187,8 @@ void QmitkRenderWindow::resizeEvent(QResizeEvent* event)
   this->resizeMitkEvent(event->size().width(), event->size().height());
   
   QVTKWidget::resizeEvent(event);
+  
+  emit resized();
 }
 
 
@@ -195,7 +197,7 @@ void QmitkRenderWindow::moveEvent( QMoveEvent* event )
   QVTKWidget::moveEvent( event );
 
   // after a move the overlays need to be positioned
-  emit Moved();
+  emit moved();
 }
 
 

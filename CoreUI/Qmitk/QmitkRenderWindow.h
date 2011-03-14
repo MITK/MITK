@@ -125,9 +125,9 @@ signals:
 
   void SignalLayoutDesignChanged( int layoutDesignIndex );
 
-  void Moved();
+  void moved();
 
-  void Resized();
+  void resized();
 
 protected slots:  
 

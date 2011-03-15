@@ -18,7 +18,8 @@ MACRO(MITK_INSTALL_TARGETS)
     ${VTK_RUNTIME_LIBRARY_DIRS}/${intermediate_dir}
     ${ITK_LIBRARY_DIRS}/${intermediate_dir}
     ${QT_LIBRARY_DIR} 
-    ${MITK_BINARY_DIR}/bin/${intermediate_dir} 
+    ${QT_LIBRARY_DIR}/../bin
+    ${MITK_DIR}/bin/${intermediate_dir} 
     ${_install_LIBRARY_DIRS}
     )
 

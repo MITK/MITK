@@ -420,6 +420,7 @@ MACRO(MITK_WRAP_LIBRARY WRAP_SOURCES LIBRARY_NAME DIRECTORY DEPEND_LIBRARY EXTRA
   #  "D:/MITK/mitk/CoreUI/Bundles/org.mitk.gui.qt.common/src" "D:/MITK/mitk/BlueBerry/Bundles/org.blueberry.ui.qt/src" "D:/MITK/mitk/BlueBerry/Bundles/org.blueberry.ui/src" "D:/MITK/mitk/BlueBerry/Bundles/org.blueberry.core.runtime/src" "D:/MITK/mitk/CoreUI/Bundles/org.mitk.gui.common/src" "D:/MITK/mitk/BlueBerry/Bundles/org.blueberry.osgi/src" "D:/MITK/mitk/BlueBerry/Bundles/org.blueberry.osgi/src/service" "D:/MITK/mitk/Utilities/Poco/Foundation/include" "D:/binPython/BlueBerry/Bundles/org.blueberry.osgi" "D:/MITK/mitk/Utilities/Poco/Util/include" "V:/windows/x32/QT-4.6.2_VC9.0_Bin/include/QtGui" "V:/windows/x32/QT-4.6.2_VC9.0_Bin/include"
   INCLUDE_DIRECTORIES(${ALL_INCLUDE_DIRECTORIES})
 
+
   IF(MITK_USE_PYTHON)
     IF(MITK_SWIG_FILE)
       SET(SWIG_INC ${SWIG_INC} ${PYTHON_INCLUDE_PATH})

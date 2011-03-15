@@ -144,6 +144,5 @@ void mitk::PlanarArrow::PrintSelf( std::ostream& os, itk::Indent indent) const
 
 void mitk::PlanarArrow::SetArrowTipScaleFactor( float scale )
 {
-  MITK_INFO << "SetArrowTipScaleFactor: " << m_ArrowTipScaleFactor;
   m_ArrowTipScaleFactor = scale;
 }

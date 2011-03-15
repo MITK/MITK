@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkImage.h>
 #include <itkCastImageFilter.h>
 
-namespace mitk 
+namespace mitk
 {
   ///
   /// \brief This class is just a proxy for global functions which are needed by the
@@ -31,6 +31,28 @@ namespace mitk
   public:
       static void CastToItkImage(const mitk::Image*, itk::SmartPointer<itk::Image<short, 3> >&);
       static void CastToMitkImage(const itk::Image<short, 3>*, itk::SmartPointer<mitk::Image>&);
+
+      static void CastToItkImage(const mitk::Image*, itk::SmartPointer<itk::Image<unsigned short, 3> >&);
+      static void CastToMitkImage(const itk::Image<unsigned short, 3>*, itk::SmartPointer<mitk::Image>&);
+
+      static void CastToItkImage(const mitk::Image*, itk::SmartPointer<itk::Image<char, 3> >&);
+      static void CastToMitkImage(const itk::Image<char, 3>*, itk::SmartPointer<mitk::Image>&);
+
+      static void CastToItkImage(const mitk::Image*, itk::SmartPointer<itk::Image<unsigned char, 3> >&);
+      static void CastToMitkImage(const itk::Image<unsigned char, 3>*, itk::SmartPointer<mitk::Image>&);
+
+      static void CastToItkImage(const mitk::Image*, itk::SmartPointer<itk::Image<int, 3> >&);
+      static void CastToMitkImage(const itk::Image<int, 3>*, itk::SmartPointer<mitk::Image>&);
+
+      static void CastToItkImage(const mitk::Image*, itk::SmartPointer<itk::Image<unsigned int, 3> >&);
+      static void CastToMitkImage(const itk::Image<unsigned int, 3>*, itk::SmartPointer<mitk::Image>&);
+
+      static void CastToItkImage(const mitk::Image*, itk::SmartPointer<itk::Image<float, 3> >&);
+      static void CastToMitkImage(const itk::Image<float, 3>*, itk::SmartPointer<mitk::Image>&);
+
+      static void CastToItkImage(const mitk::Image*, itk::SmartPointer<itk::Image<double, 3> >&);
+      static void CastToMitkImage(const itk::Image<double, 3>*, itk::SmartPointer<mitk::Image>&);
+
       static void CastBaseData(mitk::BaseData* const, itk::SmartPointer<mitk::Image>&);
   };
 }

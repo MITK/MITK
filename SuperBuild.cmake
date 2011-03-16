@@ -165,7 +165,7 @@ ExternalProject_Add(${proj}
     ${Boost_DEPENDS}
     ${CTK_DEPENDS}
     ${DCMTK_DEPENDS}
-    
+    ${OpenCV_DEPENDS}
 )
 
 #-----------------------------------------------------------------------------

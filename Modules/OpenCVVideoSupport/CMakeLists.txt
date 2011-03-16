@@ -1,4 +1,3 @@
-OPTION(MITK_USE_OPEN_CV "Use Intel's OpenCV library" OFF)
 
 IF(MITK_USE_OPEN_CV)
 

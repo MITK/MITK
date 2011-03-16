@@ -95,6 +95,7 @@ SET(external_projects
   Boost
   DCMTK
   CTK
+  OpenCV
   )
   
 # Include external projects
@@ -119,7 +120,8 @@ SET(mitk_cmake_boolean_args
   MITK_USE_GDCMIO
   MITK_USE_BLUEBERRY
   MITK_USE_CTK
-  MITK_USE_DCMTK  
+  MITK_USE_DCMTK
+  MITK_USE_OPEN_CV
   )
   
 #-----------------------------------------------------------------------------
@@ -187,12 +189,9 @@ ExternalProject_Add(${proj}
     -DDCMTK_DIR:PATH=${DCMTK_DIR}
     -DVTK_DIR:PATH=${VTK_DIR}     # FindVTK expects VTK_DIR
     -DITK_DIR:PATH=${ITK_DIR}     # FindITK expects ITK_DIR
+    -DOpenCV_DIR:PATH=${OpenCV_DIR}
     -DGDCM_DIR:PATH=${GDCM_DIR}
     -DBOOST_ROOT:PATH=${BOOST_ROOT}
-    -DMITK_USE_Boost:BOOL=${MITK_USE_Boost}
-    -DMITK_USE_GDCMIO:BOOL=${MITK_USE_GDCMIO}
-    -DMITK_USE_DCMTK:BOOL=${MITK_USE_DCMTK}
-    -DMITK_USE_QT:BOOL=${MITK_USE_QT}
 
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}
   BINARY_DIR ${CMAKE_BINARY_DIR}/MITK-build

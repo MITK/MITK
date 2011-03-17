@@ -31,15 +31,18 @@ mitk::TrackingDeviceSource::TrackingDeviceSource()
 
 mitk::TrackingDeviceSource::~TrackingDeviceSource()
 {
-  if (m_TrackingDevice->GetState() == mitk::TrackingDevice::Tracking)
+  if (m_TrackingDevice.IsNotNull())
   {
-    this->StopTracking();
+    if (m_TrackingDevice->GetState() == mitk::TrackingDevice::Tracking)
+    {
+      this->StopTracking();
+    }
+    if (m_TrackingDevice->GetState() == mitk::TrackingDevice::Ready)
+    {
+      this->Disconnect();
+    }
+    m_TrackingDevice = NULL;
   }
-  if (m_TrackingDevice->GetState() == mitk::TrackingDevice::Ready)
-  {
-    this->Disconnect();
-  }
-  m_TrackingDevice = NULL;
 }
 
 

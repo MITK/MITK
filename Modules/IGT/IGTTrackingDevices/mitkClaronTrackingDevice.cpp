@@ -64,7 +64,9 @@ mitk::TrackingTool* mitk::ClaronTrackingDevice::AddTool( const char* toolName, c
 {
   mitk::ClaronTool::Pointer t = mitk::ClaronTool::New();
   if (t->LoadFile(fileName) == false)
+  {
     return NULL;
+  }
   t->SetToolName(toolName);
   if (this->InternalAddTool(t) == false)
     return NULL;
@@ -104,13 +106,13 @@ bool mitk::ClaronTrackingDevice::StartTracking()
   //##################################################################################
 
   //be sure that the temp-directory is empty at start: delete all files in the tool files directory
-  itksys::SystemTools::RemoveADirectory(m_ToolfilesDir.c_str());
-  itksys::SystemTools::MakeDirectory(m_ToolfilesDir.c_str());
+  //itksys::SystemTools::RemoveADirectory(m_ToolfilesDir.c_str());
+  //itksys::SystemTools::MakeDirectory(m_ToolfilesDir.c_str());
 
   //copy all toolfiles into the temp directory
   for (unsigned int i=0; i<m_AllTools.size(); i++)
   {
-    itksys::SystemTools::CopyAFile(m_AllTools[i]->GetFile().c_str(), m_ToolfilesDir.c_str());
+    //itksys::SystemTools::CopyAFile(m_AllTools[i]->GetFile().c_str(), m_ToolfilesDir.c_str());
   }
   this->SetState(Tracking);            // go to mode Tracking
   this->m_StopTrackingMutex->Lock();  // update the local copy of m_StopTracking
@@ -141,8 +143,8 @@ bool mitk::ClaronTrackingDevice::StopTracking()
 {
   Superclass::StopTracking();
   //delete all files in the tool files directory
-  itksys::SystemTools::RemoveADirectory(m_ToolfilesDir.c_str());
-  itksys::SystemTools::MakeDirectory(m_ToolfilesDir.c_str());
+  //itksys::SystemTools::RemoveADirectory(m_ToolfilesDir.c_str());
+  //itksys::SystemTools::MakeDirectory(m_ToolfilesDir.c_str());
   return true;
 }
 
@@ -201,7 +203,7 @@ bool mitk::ClaronTrackingDevice::CloseConnection()
   returnValue = m_Device->StopTracking();
 
   //delete the temporary directory
-  itksys::SystemTools::RemoveADirectory(m_ToolfilesDir.c_str());
+  //itksys::SystemTools::RemoveADirectory(m_ToolfilesDir.c_str());
 
   this->SetState(Setup);
   return returnValue;

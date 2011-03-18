@@ -320,19 +320,39 @@ void QmitkToFConnectionWidget::OnConnectCamera()
 
 void QmitkToFConnectionWidget::OnChangeIntegrationTimeSpinBox(int value)
 {
-  if (this->m_ToFImageGrabber != NULL && this->m_ToFImageGrabber->IsCameraActive())
+  if (this->m_ToFImageGrabber != NULL)
   {
+    // stop camera if active
+    bool active = m_ToFImageGrabber->IsCameraActive();
+    if (active)
+    {
+      m_ToFImageGrabber->StopCamera();
+    }
     this->m_IntegrationTime = m_Controls->m_IntegrationTimeSpinBox->value();
     this->m_IntegrationTime = this->m_ToFImageGrabber->SetIntegrationTime(this->m_IntegrationTime);
+    if (active)
+    {
+      m_ToFImageGrabber->StartCamera();
+    }
   }
 }
 
 void QmitkToFConnectionWidget::OnChangeModulationFrequencySpinBox(int value)
 {
-  if (this->m_ToFImageGrabber != NULL && this->m_ToFImageGrabber->IsCameraActive())
+  if (this->m_ToFImageGrabber != NULL)
   {
+    // stop camera if active
+    bool active = m_ToFImageGrabber->IsCameraActive();
+    if (active)
+    {
+      m_ToFImageGrabber->StopCamera();
+    }
     this->m_ModulationFrequency = m_Controls->m_ModulationFrequencySpinBox->value();
     this->m_ModulationFrequency = this->m_ToFImageGrabber->SetModulationFrequency(this->m_ModulationFrequency);
+    if (active)
+    {
+      m_ToFImageGrabber->StartCamera();
+    }
   }
 }
 

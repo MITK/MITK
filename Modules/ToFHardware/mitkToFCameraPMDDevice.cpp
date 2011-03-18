@@ -127,7 +127,7 @@ namespace mitk
     m_CameraActive = false;
     m_CameraActiveMutex->Unlock();
     itksys::SystemTools::Delay(100);
-    if ((m_ThreadID != 0) && (m_MultiThreader.IsNotNull()))
+    if (m_MultiThreader.IsNotNull())
     {
       m_MultiThreader->TerminateThread(m_ThreadID);
     }

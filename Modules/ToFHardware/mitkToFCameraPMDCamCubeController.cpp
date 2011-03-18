@@ -36,14 +36,6 @@ namespace mitk
     m_SourceParam = SOURCE_PARAM;
     m_ProcPlugin = MITK_TOF_PMDCAMCUBE_PROCESSING_PLUGIN;
     m_ProcParam = PROC_PARAM;
-
-    m_CaptureWidth  = 0;
-    m_CaptureHeight = 0;
-    m_PixelNumber = m_CaptureWidth * m_CaptureHeight;
-    m_PMDRes = 0;
-    m_ConnectionCheck = false;
-
-    this->m_SourceDataSize = 0;
   }
 
   ToFCameraPMDCamCubeController::~ToFCameraPMDCamCubeController()
@@ -63,10 +55,6 @@ namespace mitk
 
       // get image properties from camera
       this->UpdateCamera();
-/*
-      PMDDataDescription dd;
-      m_PMDRes = pmdGetSourceDataDescription(m_PMDHandle, &dd);
-*/
       m_PMDRes = pmdGetSourceDataDescription(m_PMDHandle, &m_DataDescription);
       ErrorText(m_PMDRes);
       m_CaptureWidth = m_DataDescription.img.numColumns;
@@ -90,12 +78,12 @@ namespace mitk
     else return m_ConnectionCheck;
   }
 
-  void mitk::ToFCameraPMDCamCubeController::SetDistanceOffset( float offset )
+  bool mitk::ToFCameraPMDCamCubeController::SetDistanceOffset( float offset )
   {
     std::stringstream command;
     command<<"SetSoftOffset "<<offset;
     this->m_PMDRes = pmdSourceCommand(m_PMDHandle,0,0,command.str().c_str());
-    ErrorText(this->m_PMDRes);
+    return ErrorText(this->m_PMDRes);
   }
 
   float mitk::ToFCameraPMDCamCubeController::GetDistanceOffset()
@@ -106,7 +94,7 @@ namespace mitk
     return atof(offset);
   }
 
-  void mitk::ToFCameraPMDCamCubeController::SetRegionOfInterest( unsigned int leftUpperCornerX, unsigned int leftUpperCornerY, unsigned int width, unsigned int height )
+  bool mitk::ToFCameraPMDCamCubeController::SetRegionOfInterest( unsigned int leftUpperCornerX, unsigned int leftUpperCornerY, unsigned int width, unsigned int height )
   {
     // check if leftUpperCornerX and width are divisible by 3 otherwise round to the next value divisible by 3
     unsigned int factor = leftUpperCornerX/3;
@@ -116,12 +104,12 @@ namespace mitk
     std::stringstream command;
     command<<"SetROI "<<leftUpperCornerX<<" "<<leftUpperCornerY<<" "<<width<<" "<<height;
     this->m_PMDRes = pmdSourceCommand(m_PMDHandle,0,0,command.str().c_str());
-    ErrorText(this->m_PMDRes);
+    return ErrorText(this->m_PMDRes);
   }
 
-  void mitk::ToFCameraPMDCamCubeController::SetRegionOfInterest( unsigned int roi[4] )
+  bool  mitk::ToFCameraPMDCamCubeController::SetRegionOfInterest( unsigned int roi[4] )
   {
-    this->SetRegionOfInterest(roi[0],roi[1],roi[2],roi[3]);
+    return this->SetRegionOfInterest(roi[0],roi[1],roi[2],roi[3]);
   }
 
   unsigned int* mitk::ToFCameraPMDCamCubeController::GetRegionOfInterest()
@@ -159,82 +147,81 @@ namespace mitk
     return NULL;
   }
 
-  void mitk::ToFCameraPMDCamCubeController::SetExposureMode( int mode )
+  bool mitk::ToFCameraPMDCamCubeController::SetExposureMode( int mode )
   {
     if (mode==0) // normal mode
     {
       this->m_PMDRes = pmdSourceCommand(m_PMDHandle, 0, 0, "SetExposureMode Normal");
-      ErrorText(this->m_PMDRes);
+      return ErrorText(this->m_PMDRes);
     }
     else if (mode==1) // SMB mode
     {
       this->m_PMDRes = pmdSourceCommand(m_PMDHandle, 0, 0, "SetExposureMode SMB");
-      ErrorText(this->m_PMDRes);
+      return ErrorText(this->m_PMDRes);
     }
   }
 
-  void mitk::ToFCameraPMDCamCubeController::SetFieldOfView( float fov )
+  bool mitk::ToFCameraPMDCamCubeController::SetFieldOfView( float fov )
   {
     std::stringstream commandStream;
     commandStream<<"SetFOV "<<fov;
     this->m_PMDRes = pmdProcessingCommand(m_PMDHandle, 0, 0, commandStream.str().c_str());
-    ErrorText(this->m_PMDRes);
+    return ErrorText(this->m_PMDRes);
   }
 
-  void mitk::ToFCameraPMDCamCubeController::SetFPNCalibration( bool on )
+  bool mitk::ToFCameraPMDCamCubeController::SetFPNCalibration( bool on )
   {
     if(on)
     {
       this->m_PMDRes=pmdSourceCommand(m_PMDHandle,0,0,"SetFPNCalibration On");
-      this->ErrorText(this->m_PMDRes);
+      return this->ErrorText(this->m_PMDRes);
     }
     else
     {
       this->m_PMDRes=pmdSourceCommand(m_PMDHandle,0,0,"SetFPNCalibration Off");
-      this->ErrorText(this->m_PMDRes);
+      return this->ErrorText(this->m_PMDRes);
     }
   }
 
-  void mitk::ToFCameraPMDCamCubeController::SetFPPNCalibration( bool on )
+  bool mitk::ToFCameraPMDCamCubeController::SetFPPNCalibration( bool on )
   {
     if(on)
     {
       this->m_PMDRes=pmdProcessingCommand(m_PMDHandle,0,0,"SetFPPNCalibration On");
-      this->ErrorText(this->m_PMDRes);
+      return this->ErrorText(this->m_PMDRes);
     }
     else
     {
       this->m_PMDRes=pmdProcessingCommand(m_PMDHandle,0,0,"SetFPPNCalibration Off");
-      this->ErrorText(this->m_PMDRes);
+      return this->ErrorText(this->m_PMDRes);
     }
   }
 
-  void mitk::ToFCameraPMDCamCubeController::SetLinearityCalibration( bool on )
+  bool mitk::ToFCameraPMDCamCubeController::SetLinearityCalibration( bool on )
   {
     if(on)
     {
       this->m_PMDRes=pmdProcessingCommand(m_PMDHandle,0,0,"SetLinearityCalibration On");
-      this->ErrorText(this->m_PMDRes);
+      return this->ErrorText(this->m_PMDRes);
     }
     else
     {
       this->m_PMDRes=pmdProcessingCommand(m_PMDHandle,0,0,"SetLinearityCalibration Off");
-      this->ErrorText(this->m_PMDRes);
+      return this->ErrorText(this->m_PMDRes);
     }
   }
 
-  void mitk::ToFCameraPMDCamCubeController::SetLensCalibration( bool on )
+  bool mitk::ToFCameraPMDCamCubeController::SetLensCalibration( bool on )
   {
     if (on)
     {
       this->m_PMDRes = pmdProcessingCommand(m_PMDHandle, 0, 0, "SetLensCalibration On");
-      ErrorText(this->m_PMDRes);
+      return ErrorText(this->m_PMDRes);
     }
     else
     {
       this->m_PMDRes = pmdProcessingCommand(m_PMDHandle, 0, 0, "SetLensCalibration Off");
-      ErrorText(this->m_PMDRes);
+      return ErrorText(this->m_PMDRes);
     }
   }
-
 }

@@ -36,9 +36,10 @@ namespace mitk
     return false;
   }
 
-  void mitk::ToFCameraPMDCamBoardController::SetDistanceOffset( float offset )
+  bool mitk::ToFCameraPMDCamBoardController::SetDistanceOffset( float offset )
   {
     MITK_WARN("ToF") << "Error: PMD CamBoard currently not available";
+    return false;
   }
 
   float mitk::ToFCameraPMDCamBoardController::GetDistanceOffset()
@@ -47,14 +48,16 @@ namespace mitk
     return 0.0;
   }
 
-  void mitk::ToFCameraPMDCamBoardController::SetRegionOfInterest( unsigned int leftUpperCornerX, unsigned int leftUpperCornerY, unsigned int width, unsigned int height )
+  bool mitk::ToFCameraPMDCamBoardController::SetRegionOfInterest( unsigned int leftUpperCornerX, unsigned int leftUpperCornerY, unsigned int width, unsigned int height )
   {
     MITK_WARN("ToF") << "Error: PMD CamBoard currently not available";
+    return false;
   }
 
-  void mitk::ToFCameraPMDCamBoardController::SetRegionOfInterest( unsigned int roi[4] )
+  bool mitk::ToFCameraPMDCamBoardController::SetRegionOfInterest( unsigned int roi[4] )
   {
     MITK_WARN("ToF") << "Error: PMD CamBoard currently not available";
+    return false;
   }
 
   unsigned int* mitk::ToFCameraPMDCamBoardController::GetRegionOfInterest()
@@ -63,33 +66,39 @@ namespace mitk
     return NULL;
   }
 
-  void mitk::ToFCameraPMDCamBoardController::SetExposureMode( int mode )
+  bool mitk::ToFCameraPMDCamBoardController::SetExposureMode( int mode )
   {
     MITK_WARN("ToF") << "Error: PMD CamBoard currently not available";
+    return false;
   }
 
-  void mitk::ToFCameraPMDCamBoardController::SetFieldOfView( float fov )
+  bool mitk::ToFCameraPMDCamBoardController::SetFieldOfView( float fov )
   {
     MITK_WARN("ToF") << "Error: PMD CamBoard currently not available";
+    return false;
   }
 
-  void mitk::ToFCameraPMDCamBoardController::SetFPNCalibration( bool on )
+  bool mitk::ToFCameraPMDCamBoardController::SetFPNCalibration( bool on )
   {
     MITK_WARN("ToF") << "Error: PMD CamBoard currently not available";
+    return false;
   }
 
-  void mitk::ToFCameraPMDCamBoardController::SetFPPNCalibration( bool on )
+  bool mitk::ToFCameraPMDCamBoardController::SetFPPNCalibration( bool on )
   {
     MITK_WARN("ToF") << "Error: PMD CamBoard currently not available";
+    return false;
   }
 
-  void mitk::ToFCameraPMDCamBoardController::SetLinearityCalibration( bool on )
+  bool mitk::ToFCameraPMDCamBoardController::SetLinearityCalibration( bool on )
   {
     MITK_WARN("ToF") << "Error: PMD CamBoard currently not available";
+    return false;
   }
 
-  void mitk::ToFCameraPMDCamBoardController::SetLensCalibration( bool on )
+  bool mitk::ToFCameraPMDCamBoardController::SetLensCalibration( bool on )
   {
     MITK_WARN("ToF") << "Error: PMD CamBoard currently not available";
+    return false;
   }
 }

@@ -34,7 +34,7 @@ namespace mitk
     return false;
   }
 
-  void mitk::ToFCameraPMDCamCubeController::SetDistanceOffset( float offset )
+  bool mitk::ToFCameraPMDCamCubeController::SetDistanceOffset( float offset )
   {
     MITK_WARN("ToF") << "Error: PMD Camcube currently not available";
   }
@@ -45,12 +45,12 @@ namespace mitk
     return 0.0f;
   }
 
-  void mitk::ToFCameraPMDCamCubeController::SetRegionOfInterest( unsigned int leftUpperCornerX, unsigned int leftUpperCornerY, unsigned int width, unsigned int height )
+  bool mitk::ToFCameraPMDCamCubeController::SetRegionOfInterest( unsigned int leftUpperCornerX, unsigned int leftUpperCornerY, unsigned int width, unsigned int height )
   {
     MITK_WARN("ToF") << "Error: PMD Camcube currently not available";
   }
 
-  void mitk::ToFCameraPMDCamCubeController::SetRegionOfInterest( unsigned int roi[4] )
+  bool mitk::ToFCameraPMDCamCubeController::SetRegionOfInterest( unsigned int roi[4] )
   {
     MITK_WARN("ToF") << "Error: PMD Camcube currently not available";
   }
@@ -61,32 +61,32 @@ namespace mitk
     return NULL;
   }
 
-  void mitk::ToFCameraPMDCamCubeController::SetExposureMode( int mode )
+  bool mitk::ToFCameraPMDCamCubeController::SetExposureMode( int mode )
   {
     MITK_WARN("ToF") << "Error: PMD Camcube currently not available";
   }
 
-  void mitk::ToFCameraPMDCamCubeController::SetFieldOfView( float fov )
+  bool mitk::ToFCameraPMDCamCubeController::SetFieldOfView( float fov )
   {
     MITK_WARN("ToF") << "Error: PMD Camcube currently not available";
   }
 
-  void mitk::ToFCameraPMDCamCubeController::SetFPNCalibration( bool on )
+  bool mitk::ToFCameraPMDCamCubeController::SetFPNCalibration( bool on )
   {
     MITK_WARN("ToF") << "Error: PMD Camcube currently not available";
   }
 
-  void mitk::ToFCameraPMDCamCubeController::SetFPPNCalibration( bool on )
+  bool mitk::ToFCameraPMDCamCubeController::SetFPPNCalibration( bool on )
   {
     MITK_WARN("ToF") << "Error: PMD Camcube currently not available";
   }
 
-  void mitk::ToFCameraPMDCamCubeController::SetLinearityCalibration( bool on )
+  bool mitk::ToFCameraPMDCamCubeController::SetLinearityCalibration( bool on )
   {
     MITK_WARN("ToF") << "Error: PMD Camcube currently not available";
   }
 
-  void mitk::ToFCameraPMDCamCubeController::SetLensCalibration( bool on )
+  bool mitk::ToFCameraPMDCamCubeController::SetLensCalibration( bool on )
   {
     MITK_WARN("ToF") << "Error: PMD Camcube currently not available";
   }

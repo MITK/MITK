@@ -153,6 +153,11 @@ namespace mitk
       this->m_PMDRes = pmdSourceCommand(m_PMDHandle, 0, 0, "SetExposureMode SMB");
       return ErrorText(this->m_PMDRes);
     }
+    else
+    {
+      MITK_ERROR<<"Specified exposure mode not supported. Exposure mode must be 0 (Normal) or 1 (SMB)";
+      return false;
+    }
   }
 
   bool mitk::ToFCameraPMDCamBoardController::SetFieldOfView( float fov )

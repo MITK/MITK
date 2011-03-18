@@ -42,7 +42,7 @@ namespace mitk
     itkNewMacro( Self );
 
     /*!
-    \brief opens a connection to the ToF camera
+    \brief opens a connection to the PMD O3 ToF camera
     */
     virtual bool OpenCameraConnection();
 

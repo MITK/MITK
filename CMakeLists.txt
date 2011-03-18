@@ -1,6 +1,18 @@
 cmake_minimum_required(VERSION 2.8.2)
 
-project(MITK)
+#-----------------------------------------------------------------------------
+# Superbuild Option - Enabled by default
+#-----------------------------------------------------------------------------
+
+option(MITK_USE_SUPERBUILD "Build MITK and the projects it depends on via SuperBuild.cmake." ON)
+
+if(MITK_USE_SUPERBUILD)
+  project(MITK-superbuild)
+  set(MITK_SOURCE_DIR ${PROJECT_SOURCE_DIR})
+  set(MITK_BINARY_DIR ${PROJECT_BINARY_DIR})
+else()
+  project(MITK)
+endif()
 
 #-----------------------------------------------------------------------------
 # See http://cmake.org/cmake/help/cmake-2-8-docs.html#section_Policies for details
@@ -43,12 +55,6 @@ set(CMAKE_MODULE_PATH
 
 include(mitkMacroEmptyExternalProject)
 include(mitkFunctionGenerateProjectXml)
-
-#-----------------------------------------------------------------------------
-# Superbuild Option - Enabled by default
-#-----------------------------------------------------------------------------
-
-option(MITK_USE_SUPERBUILD "Build MITK and the projects it depends on via SuperBuild.cmake." ON)
 
 #-----------------------------------------------------------------------------
 # Output directories.

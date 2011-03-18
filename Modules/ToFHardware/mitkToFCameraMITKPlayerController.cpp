@@ -23,19 +23,13 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk
 {
 
-  ToFCameraMITKPlayerController::ToFCameraMITKPlayerController()
+  ToFCameraMITKPlayerController::ToFCameraMITKPlayerController():m_PixelNumber(0),m_NumberOfBytes(0),
+    m_CaptureWidth(0),m_CaptureHeight(0),m_ConnectionCheck(false),m_InputFileName(""),
+    m_ToFImageType(ToFImageType3D),m_DistanceInfile(NULL),m_AmplitudeInfile(NULL),m_IntensityInfile(NULL),
+    m_IntensityArray(NULL),m_DistanceArray(NULL),m_AmplitudeArray(NULL),
+    m_DistanceImageFileName(""),m_AmplitudeImageFileName(""),m_IntensityImageFileName(""),
+    m_PixelStartInFile(0),m_CurrentFrame(-1),m_NumOfFrames(0)
   {
-    this->m_CaptureWidth  = 0;
-    this->m_CaptureHeight = 0;
-    this->m_PixelNumber = 0;
-    this->m_NumberOfBytes = 0;
-    this->m_NumOfFrames = 0;
-    this->m_CurrentFrame = -1;
-    this->m_ConnectionCheck = false;
-    this->m_DistanceInfile = NULL;
-    this->m_AmplitudeInfile = NULL;
-    this->m_IntensityInfile = NULL;
-    this->m_PixelStartInFile = 0;
   }
 
   ToFCameraMITKPlayerController::~ToFCameraMITKPlayerController()
@@ -56,7 +50,6 @@ namespace mitk
         {
           MITK_ERROR << "Error opening ToF data file " << this->m_InputFileName;
           return false;
-//          throw std::logic_error("Error opening ToF data file: No pic file");
         }
         info = mitkIpPicGetTags(const_cast<char *>(this->m_DistanceImageFileName.c_str()), pic);
         this->m_PixelStartInFile = info->info->pixel_start_in_file;
@@ -77,7 +70,6 @@ namespace mitk
         {
           MITK_ERROR << "Error opening ToF data file: Invalid dimension.";
           return false;
-//          throw std::logic_error("Error opening ToF data file: Invalid dimension.");
         }
 
         this->m_CaptureWidth = pic->n[0];
@@ -93,8 +85,6 @@ namespace mitk
           this->m_NumOfFrames = pic->n[2];
         }
 
-        //this->m_DistanceImageFileName.assign(this->m_InputFileName);
-
         // allocate buffer
         this->m_DistanceArray = new float[this->m_PixelNumber];
         for(int i=0; i<this->m_PixelNumber; i++) {this->m_DistanceArray[i]=0.0;}
@@ -107,8 +97,6 @@ namespace mitk
         OpenPicFileToData(&(this->m_AmplitudeInfile), this->m_AmplitudeImageFileName.c_str());
         OpenPicFileToData(&(this->m_IntensityInfile), this->m_IntensityImageFileName.c_str());
 
-        //MITK_INFO << "Integration Time: " << this->GetIntegrationTime();
-        //MITK_INFO << "Modulation Frequence: " << this->GetModulationFrequency();
         MITK_INFO << "NumOfFrames: " << this->m_NumOfFrames;
 
         this->m_ConnectionCheck = true;

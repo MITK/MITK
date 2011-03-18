@@ -1,0 +1,19 @@
+<RCC>
+  <qresource prefix="images">
+    <file>powerGreen.png</file>
+    <file>open.png</file>
+    <file>doc.png</file>
+    <file>SaveAs.png</file>
+    <file>powerRed.png</file>
+    <file>pause.png</file>
+    <file>stop.png</file>
+    <file>rec.png</file>
+    <file>play.png</file>
+    <file>widget1.png</file>
+    <file>widget2.png</file>
+    <file>widget3.png</file>
+    <file>widget4.png</file>
+    <file>grayscale.png</file>
+    <file>color.png</file>
+  </qresource>
+</RCC>

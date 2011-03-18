@@ -13,7 +13,7 @@ cmake_minimum_required(VERSION 2.8.2)
 # Dashboard properties
 #
 
-set(MY_COMPILER "g++4.4.5")
+set(MY_COMPILER "gcc-4.4.5")
 # For Windows, e.g.
 #set(MY_COMPILER "VC9.0")
 

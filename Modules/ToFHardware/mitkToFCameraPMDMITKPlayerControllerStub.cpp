@@ -52,14 +52,16 @@ namespace mitk
     return false;
   }
 
-  void ToFCameraPMDMITKPlayerController::UpdateCamera()
+  bool ToFCameraPMDMITKPlayerController::UpdateCamera()
   {
     MITK_WARN("ToF") << "Error: MITK TOF Player currently not available. Did you set the directory to your PMD processing plugin?";
+    return false;
   }
 
-  void ToFCameraPMDMITKPlayerController::GetSourceData(char* sourceDataArray)
+  bool ToFCameraPMDMITKPlayerController::GetSourceData(char* sourceDataArray)
   {
     MITK_WARN("ToF") << "Error: MITK TOF Player currently not available. Did you set the directory to your PMD processing plugin?";
+    return false;
   }
 
   int ToFCameraPMDMITKPlayerController::SetIntegrationTime(unsigned int integrationTime)

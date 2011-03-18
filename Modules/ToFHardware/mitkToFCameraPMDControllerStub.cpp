@@ -40,44 +40,52 @@ namespace mitk
     return false;
   }
 
-  void ToFCameraPMDController::UpdateCamera()
+  bool ToFCameraPMDController::UpdateCamera()
   {
     MITK_WARN("ToF") << "Error: PMD devices currently not available";
+    return false;
   }
 
-  void ToFCameraPMDController::GetAmplitudes(float* amplitudeArray)
+  bool ToFCameraPMDController::GetAmplitudes(float* amplitudeArray)
   {
     MITK_WARN("ToF") << "Error: PMD devices currently not available";
+    return false;
   }
 
-  void ToFCameraPMDController::GetAmplitudes(char* sourceData, float* amplitudeArray)
+  bool ToFCameraPMDController::GetAmplitudes(char* sourceData, float* amplitudeArray)
   {
     MITK_WARN("ToF") << "Error: PMD devices currently not available";
+    return false;
   }
 
-  void ToFCameraPMDController::GetIntensities(float* intensityArray)
+  bool ToFCameraPMDController::GetIntensities(float* intensityArray)
   {
     MITK_WARN("ToF") << "Error: PMD devices currently not available";
+    return false;
   }
 
-  void ToFCameraPMDController::GetIntensities(char* sourceData, float* intensityArray)
+  bool ToFCameraPMDController::GetIntensities(char* sourceData, float* intensityArray)
   {
     MITK_WARN("ToF") << "Error: PMD devices currently not available";
+    return false;
   }
 
-  void ToFCameraPMDController::GetDistances(float* distanceArray)
+  bool ToFCameraPMDController::GetDistances(float* distanceArray)
   {
     MITK_WARN("ToF") << "Error: PMD devices currently not available";
+    return false;
   }
 
-  void ToFCameraPMDController::GetSourceData(char* sourceDataArray)
+  bool ToFCameraPMDController::GetSourceData(char* sourceDataArray)
   {
     MITK_WARN("ToF") << "Error: PMD devices currently not available";
+    return false;
   }
 
-  void ToFCameraPMDController::GetDistances(char* sourceData, float* distanceArray)
+  bool ToFCameraPMDController::GetDistances(char* sourceData, float* distanceArray)
   {
     MITK_WARN("ToF") << "Error: PMD devices currently not available";
+    return false;
   }
 
   int ToFCameraPMDController::SetIntegrationTime(unsigned int integrationTime)

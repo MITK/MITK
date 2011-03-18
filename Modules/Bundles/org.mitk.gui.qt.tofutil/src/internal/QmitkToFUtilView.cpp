@@ -135,6 +135,7 @@ void QmitkToFUtilView::CreateQtPartControl( QWidget *parent )
     connect( (QObject*)(m_Controls->m_ToFConnectionWidget), SIGNAL(ToFCameraConnected()), this, SLOT(OnToFCameraConnected()) );
     connect( (QObject*)(m_Controls->m_ToFConnectionWidget), SIGNAL(ToFCameraDisconnected()), this, SLOT(OnToFCameraDisconnected()) );
     connect( (QObject*)(m_Controls->m_ToFConnectionWidget), SIGNAL(ToFCameraStop()), this, SLOT(OnToFCameraStop()) );
+    connect( (QObject*)(m_Controls->m_ToFConnectionWidget), SIGNAL(ToFCameraSelected(int)), this, SLOT(OnToFCameraSelected(int)) );
     connect( (QObject*)(m_Controls->m_ToFRecorderWidget), SIGNAL(ToFCameraStarted()), this, SLOT(OnToFCameraStarted()) );
     connect( (QObject*)(m_Controls->m_ToFRecorderWidget), SIGNAL(ToFCameraStopped()), this, SLOT(OnToFCameraStopped()) );
     connect( (QObject*)(m_Controls->m_SurfaceCheckBox), SIGNAL(toggled(bool)), this, SLOT(OnSurfaceCheckBoxChecked(bool)) );
@@ -477,6 +478,26 @@ void QmitkToFUtilView::OnToFCameraStopped()
   this->m_Frametimer->stop();
   //this->m_SurfaceWorkerThread.SetAbort(true);
   //this->m_FilterWorkerThread.SetAbort(true);
+}
+
+void QmitkToFUtilView::OnToFCameraSelected(int index)
+{
+  if ((index==1)||(index==2))
+  {
+    MITK_INFO<<"Surface representation currently not available for CamBoard and O3. Intrinsic parameters missing.";
+    this->m_Controls->m_SurfaceCheckBox->setEnabled(false);
+    this->m_Controls->m_TextureCheckBox->setEnabled(false);
+    this->m_Controls->m_VideoTextureCheckBox->setEnabled(false);
+    this->m_Controls->m_SurfaceCheckBox->setChecked(false);
+    this->m_Controls->m_TextureCheckBox->setChecked(false);
+    this->m_Controls->m_VideoTextureCheckBox->setChecked(false);
+  }
+  else
+  {
+    this->m_Controls->m_SurfaceCheckBox->setEnabled(true);
+    this->m_Controls->m_TextureCheckBox->setEnabled(true);
+    this->m_Controls->m_VideoTextureCheckBox->setEnabled(true);
+  }
 }
 
 void QmitkToFUtilView::InitImage(mitk::Image::Pointer image, int numOfChannel)

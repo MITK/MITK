@@ -54,10 +54,23 @@ int mitkToFCameraPMDControllerTest(int /* argc */, char* /*argv*/[])
   // initialize test
   mitk::ToFCameraPMDControllerTest::Pointer testObject = mitk::ToFCameraPMDControllerTest::New();
   MITK_TEST_CONDITION_REQUIRED(!(testObject.GetPointer() == NULL) ,"Testing initialization class");
-  MITK_TEST_CONDITION_REQUIRED(testObject->GetCaptureHeight()== 0 ,"Testing initialization of CaptureHeight");
-  MITK_TEST_CONDITION_REQUIRED(testObject->GetCaptureWidth()== 0 ,"Testing initialization of CaptureWidth"); 
+  MITK_TEST_CONDITION_REQUIRED(testObject->GetCaptureHeight()== 200 ,"Testing initialization of CaptureHeight");
+  MITK_TEST_CONDITION_REQUIRED(testObject->GetCaptureWidth()== 200 ,"Testing initialization of CaptureWidth"); 
+  int numberOfPixels = testObject->GetCaptureHeight()*testObject->GetCaptureWidth();
+  float* dataArray = new float[numberOfPixels];
+  char* sourceArray = new char[numberOfPixels];
+  MITK_TEST_CONDITION_REQUIRED(testObject->OpenCameraConnection(),"Testing OpenCameraConnection()");
+  MITK_TEST_CONDITION_REQUIRED(!testObject->UpdateCamera(),"Testing UpdateCamera() with no camera connected");
+  MITK_TEST_CONDITION_REQUIRED(!testObject->GetAmplitudes(dataArray),"Testing GetAmplitudes(float*) with no camera connected");
+  MITK_TEST_CONDITION_REQUIRED(!testObject->GetAmplitudes(sourceArray,dataArray),"Testing GetAmplitudes(char*,float*) with no camera connected");
+  MITK_TEST_CONDITION_REQUIRED(!testObject->GetIntensities(dataArray),"Testing GetIntensities(float*) with no camera connected");
+  MITK_TEST_CONDITION_REQUIRED(!testObject->GetIntensities(sourceArray,dataArray),"Testing GetIntensities(char*,float*) with no camera connected");
+  MITK_TEST_CONDITION_REQUIRED(!testObject->GetDistances(dataArray),"Testing GetDistances(float*) with no camera connected");
+  MITK_TEST_CONDITION_REQUIRED(!testObject->GetDistances(sourceArray,dataArray),"Testing GetDistances(char*,float*) with no camera connected");
+  MITK_TEST_CONDITION_REQUIRED(!testObject->GetSourceData(sourceArray),"Testing GetSourceData(char*) with no camera connected");
   MITK_TEST_CONDITION_REQUIRED(testObject->CloseCameraConnection(),"Testing closing of connection");
-
+  delete [] dataArray;
+  delete [] sourceArray;
   MITK_TEST_END();
 }
 

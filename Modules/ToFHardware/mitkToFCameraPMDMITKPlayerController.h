@@ -53,11 +53,11 @@ namespace mitk
     /*!
     \brief calls update on the camera -> a new ToF-image is aquired
     */
-    void UpdateCamera();
+    bool UpdateCamera();
     /*!
     \brief returns the raw data from the ToF camera measuring
     */
-    void GetSourceData(char* sourceDataArray);
+    bool GetSourceData(char* sourceDataArray);
     /*!
     \brief get the modulation frequency as specified in the PMDDataDescription
     */

@@ -54,44 +54,44 @@ namespace mitk
     \brief Gets the current amplitude array from the device
     \param amplitudeArray float array where the amplitude data will be saved
     */
-    virtual void GetAmplitudes(float* amplitudeArray);
+    virtual bool GetAmplitudes(float* amplitudeArray);
     /*!
     \brief Calculates the current amplitude data from the raw source data using the processing plugin of the PMDSDK
     \param sourceData raw data array
     \param amplitudeArray float array where the amplitude data will be saved
     */
-    virtual void GetAmplitudes(char* sourceData, float* amplitudeArray);
+    virtual bool GetAmplitudes(char* sourceData, float* amplitudeArray);
     /*!
     \brief Gets the current intensity array from the device
     \param intensityArray float array where the intensity data will be saved
     */
-    virtual void GetIntensities(float* intensityArray);
+    virtual bool GetIntensities(float* intensityArray);
     /*!
     \brief Calculates the current intensity data from the raw source data using the processing plugin of the PMDSDK
     \param sourceData raw data array
     \param intensityArray float array where the intensity data will be saved
     */
-    virtual void GetIntensities(char* sourceData, float* intensityArray);
+    virtual bool GetIntensities(char* sourceData, float* intensityArray);
     /*!
     \brief Gets the current distance array from the device
     \param distanceArray float array where the distance data will be saved
     */
-    virtual void GetDistances(float* distanceArray);
+    virtual bool GetDistances(float* distanceArray);
     /*!
     \brief Calculates the current distance data from the raw source data using the processing plugin of the PMDSDK
     \param sourceData raw data array
     \param distanceArray float array where the distance data will be saved
     */
-    virtual void GetDistances(char* sourceData, float* distanceArray);
+    virtual bool GetDistances(char* sourceData, float* distanceArray);
     /*!
     \brief Gets the PMD raw data from the ToF device.
     \param sourceDataArray array where the raw data will be saved
     */
-    virtual void GetSourceData(char* sourceDataArray);
+    virtual bool GetSourceData(char* sourceDataArray);
     /*!
     \brief calls update on the camera -> a new ToF-image is aquired
     */
-    virtual void UpdateCamera();
+    virtual bool UpdateCamera();
     /*!
     \brief Returns the currently set modulation frequency.
     \return modulation frequency

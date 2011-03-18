@@ -29,14 +29,10 @@ struct SourceDataStruct {
 
 namespace mitk
 {
-  ToFCameraPMDController::ToFCameraPMDController()
+  ToFCameraPMDController::ToFCameraPMDController(): m_PMDRes(0), m_PixelNumber(40000), m_NumberOfBytes(0), 
+    m_CaptureWidth(200), m_CaptureHeight(200), m_SourceDataSize(0), m_SourceDataStructSize(0), m_ConnectionCheck(false), 
+    m_InputFileName("")
   {
-    m_CaptureWidth  = 0;
-    m_CaptureHeight = 0;
-    m_PixelNumber = 0; //m_CaptureWidth * m_CaptureHeight;
-    m_NumberOfBytes = 0;
-    m_PMDRes = 0;
-    m_ConnectionCheck = false;
   }
 
   ToFCameraPMDController::~ToFCameraPMDController()
@@ -62,62 +58,59 @@ namespace mitk
     else return true;
   }
 
-  void ToFCameraPMDController::UpdateCamera()
+  bool ToFCameraPMDController::UpdateCamera()
   {
     m_PMDRes = pmdUpdate(m_PMDHandle);                
-    ErrorText(m_PMDRes);
+    return ErrorText(m_PMDRes);
   }
 
-  void ToFCameraPMDController::GetAmplitudes(float* amplitudeArray)
+  bool ToFCameraPMDController::GetAmplitudes(float* amplitudeArray)
   {
     this->m_PMDRes = pmdGetAmplitudes(m_PMDHandle, amplitudeArray, this->m_NumberOfBytes);
-    ErrorText(this->m_PMDRes);
+    return ErrorText(this->m_PMDRes);
   }
 
-  void ToFCameraPMDController::GetAmplitudes(char* sourceData, float* amplitudeArray)
+  bool ToFCameraPMDController::GetAmplitudes(char* sourceData, float* amplitudeArray)
   {
     this->m_PMDRes = pmdCalcAmplitudes(m_PMDHandle, amplitudeArray, this->m_NumberOfBytes, m_DataDescription, &((SourceDataStruct*)sourceData)->sourceData);
-    ErrorText(this->m_PMDRes);
+    return ErrorText(this->m_PMDRes);
   }
 
-  void ToFCameraPMDController::GetIntensities(float* intensityArray)
+  bool ToFCameraPMDController::GetIntensities(float* intensityArray)
   {
     this->m_PMDRes = pmdGetIntensities(m_PMDHandle, intensityArray, this->m_NumberOfBytes);
-    ErrorText(this->m_PMDRes);
+    return ErrorText(this->m_PMDRes);
   }
 
-  void ToFCameraPMDController::GetIntensities(char* sourceData, float* intensityArray)
+  bool ToFCameraPMDController::GetIntensities(char* sourceData, float* intensityArray)
   {
     this->m_PMDRes = pmdCalcIntensities(m_PMDHandle, intensityArray, this->m_NumberOfBytes, m_DataDescription, &((SourceDataStruct*)sourceData)->sourceData);
-    ErrorText(this->m_PMDRes);
+    return ErrorText(this->m_PMDRes);
   }
 
-  void ToFCameraPMDController::GetDistances(float* distanceArray)
+  bool ToFCameraPMDController::GetDistances(float* distanceArray)
   {
     this->m_PMDRes = pmdGetDistances(m_PMDHandle, distanceArray, this->m_NumberOfBytes);
-    ErrorText(this->m_PMDRes);
+    return ErrorText(this->m_PMDRes);
   }
 
-  void ToFCameraPMDController::GetSourceData(char* sourceDataArray)
+  bool ToFCameraPMDController::GetSourceData(char* sourceDataArray)
   {
-    //this->m_PMDRes = pmdGetSourceDataDescription(m_PMDHandle, &((SourceDataStruct*)sourceDataArray)->dataDescription);
     this->m_PMDRes = pmdGetSourceDataDescription(m_PMDHandle, &m_DataDescription);
-    ErrorText(this->m_PMDRes);
+    if (!ErrorText(this->m_PMDRes))
+    {
+      return false;
+    }
     memcpy(&((SourceDataStruct*)sourceDataArray)->dataDescription, &m_DataDescription, sizeof(m_DataDescription));
     this->m_PMDRes = pmdGetSourceData(m_PMDHandle, &((SourceDataStruct*)sourceDataArray)->sourceData, this->m_SourceDataSize);
-    ErrorText(this->m_PMDRes);
+    return ErrorText(this->m_PMDRes);
   }
 
 
-  void ToFCameraPMDController::GetDistances(char* sourceData, float* distanceArray)
+  bool ToFCameraPMDController::GetDistances(char* sourceData, float* distanceArray)
   {
-/*
-    PMDDataDescription dd;
-    this->m_PMDRes = pmdGetSourceDataDescription(m_PMDHandle, &dd);
-    ErrorText(this->m_PMDRes);
-*/
     this->m_PMDRes = pmdCalcDistances(m_PMDHandle, distanceArray, this->m_NumberOfBytes, m_DataDescription, &((SourceDataStruct*)sourceData)->sourceData);
-    ErrorText(this->m_PMDRes);
+    return ErrorText(this->m_PMDRes);
   }
 
   int ToFCameraPMDController::SetIntegrationTime(unsigned int integrationTime)
@@ -168,5 +161,4 @@ namespace mitk
   {
     this->m_InputFileName = inputFileName;
   }
-
 }

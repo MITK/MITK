@@ -153,25 +153,32 @@ namespace mitk
     return m_ConnectionCheck;
   }
 
-  void ToFCameraPMDMITKPlayerController::UpdateCamera()
+  bool ToFCameraPMDMITKPlayerController::UpdateCamera()
   {
     this->m_CurrentFrame = (this->m_CurrentFrame + 1) % this->m_NumOfFrames;
     itksys::SystemTools::Delay(40);
+    return true;
   }
 
-  void ToFCameraPMDMITKPlayerController::GetSourceData(char* sourceDataArray)
+  bool ToFCameraPMDMITKPlayerController::GetSourceData(char* sourceDataArray)
   {
     if(this->m_CurrentFrame < 0)
     {
       MITK_ERROR<<"Invalid source data request, update camera before data retrieval!";
-      return;
+      return false;
     }
     SourceDataStruct* sourceDataStruct = (SourceDataStruct*) this->m_MitkImage->GetSliceData(0, this->m_CurrentFrame, 0)->GetData();
-    memcpy(&m_DataDescription, &(sourceDataStruct->dataDescription), sizeof(m_DataDescription));
-
-    memcpy(&((SourceDataStruct*)sourceDataArray)->dataDescription, &m_DataDescription, sizeof(m_DataDescription));
-
-    memcpy(&((SourceDataStruct*)sourceDataArray)->sourceData, &sourceDataStruct->sourceData, this->m_SourceDataSize);
+    if (sourceDataStruct)
+    {
+      memcpy(&m_DataDescription, &(sourceDataStruct->dataDescription), sizeof(m_DataDescription));
+      memcpy(&((SourceDataStruct*)sourceDataArray)->dataDescription, &m_DataDescription, sizeof(m_DataDescription));
+      memcpy(&((SourceDataStruct*)sourceDataArray)->sourceData, &sourceDataStruct->sourceData, this->m_SourceDataSize);
+      return true;
+    }
+    else
+    {
+      return false;
+    }
   }
 
   int ToFCameraPMDMITKPlayerController::SetIntegrationTime(unsigned int integrationTime)

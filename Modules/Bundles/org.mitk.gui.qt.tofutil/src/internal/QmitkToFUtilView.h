@@ -85,6 +85,8 @@ class QmitkToFUtilView : public QObject, public QmitkFunctionality
 
     void OnToFCameraStop();
 
+    void OnToFCameraSelected(int index);
+
     void OnSurfaceCheckBoxChecked(bool checked);
 
     void OnTextureCheckBoxChecked(bool checked);

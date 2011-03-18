@@ -78,6 +78,10 @@ class mitkTOFUI_EXPORT QmitkToFConnectionWidget :public QWidget
     \brief signal that is emitted when the ToF camera is stopped
     */
     void ToFCameraStop();
+    /*!
+    \brief signal that is emitted when a ToF camera is selected in the combo box
+    */
+    void ToFCameraSelected(int);
 
   protected slots:
   

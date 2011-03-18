@@ -1,20 +1,29 @@
 SET(LIBPOSTFIX "Ext")
-ADD_SUBDIRECTORY(SceneSerializationBase)
-ADD_SUBDIRECTORY(PlanarFigure)
-ADD_SUBDIRECTORY(MitkExt)
-ADD_SUBDIRECTORY(SceneSerialization)
-ADD_SUBDIRECTORY(QmitkExt)
-ADD_SUBDIRECTORY(DiffusionImaging)
-ADD_SUBDIRECTORY(GPGPU)
-ADD_SUBDIRECTORY(IGT)
-ADD_SUBDIRECTORY(IGTUI)
-ADD_SUBDIRECTORY(RigidRegistration)
-ADD_SUBDIRECTORY(RigidRegistrationUI)
-ADD_SUBDIRECTORY(DeformableRegistration)
-ADD_SUBDIRECTORY(DeformableRegistrationUI)
-ADD_SUBDIRECTORY(OpenCVVideoSupport)
-ADD_SUBDIRECTORY(Overlays)
-ADD_SUBDIRECTORY(InputDevices)
+
+SET(module_dirs
+    SceneSerializationBase
+    PlanarFigure
+    MitkExt
+    SceneSerialization
+    QmitkExt
+    DiffusionImaging
+    GPGPU
+    IGT
+    IGTUI
+    RigidRegistration
+    RigidRegistrationUI
+    DeformableRegistration
+    DeformableRegistrationUI
+    OpenCVVideoSupport
+    Overlays
+    InputDevices
+)
+
+SET(MITK_DEFAULT_SUBPROJECTS MITK-Modules)
+
+FOREACH(module_dir ${module_dirs})
+  ADD_SUBDIRECTORY(${module_dir})
+ENDFOREACH()
 
 IF(MITK_USE_BLUEBERRY)
   ADD_SUBDIRECTORY(Bundles)

@@ -16,3 +16,8 @@ MACRO_COLLECT_PLUGINS(OUTPUT_DIR ${BLUEBERRY_PLUGINS_OUTPUT_DIR}
                       PLUGIN_DEFAULT_ON ${_default_plugins}
                       ${BLUEBERRY_BUILD_ALL_PLUGINS_OPTION})
             
+add_dependencies(BlueBerry ${BLUEBERRY_ENABLED_PLUGINS})
+foreach(plugin ${BLUEBERRY_ENABLED_PLUGINS})
+  string(REPLACE "." "_" plugin_target ${plugin})
+  set_property(TARGET ${plugin_target} PROPERTY LABELS BlueBerry)
+endforeach()

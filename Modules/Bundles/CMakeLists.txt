@@ -6,6 +6,8 @@ IF(MITK_USE_BLUEBERRY)
 
   INCLUDE("${MITK_BINARY_DIR}/Bundles/MITKCoreBundleList.cmake")
   
+  SET(MITK_DEFAULT_SUBPROJECTS MITK-Plugins)
+  
   SET(_mitk_bundles_default 
       "org.mitk.core.ext" 
       "org.mitk.planarfigure"

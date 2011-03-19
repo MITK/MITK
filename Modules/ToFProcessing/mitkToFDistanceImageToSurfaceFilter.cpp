@@ -28,6 +28,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkPolyData.h>
 #include <vtkPointData.h>
 #include <vtkFloatArray.h>
+#include <vtkPolyDataNormals.h>
 #include <vtkCleanPolyData.h>
 #include <vtkSmartPointer.h>
 
@@ -191,10 +192,13 @@ void mitk::ToFDistanceImageToSurfaceFilter::GenerateData()
   vtkSmartPointer<vtkPolyData> mesh = vtkSmartPointer<vtkPolyData>::New();
   mesh->SetPoints(points);
   mesh->SetPolys(polys);
-  mesh->GetPointData()->SetScalars(scalarArray);
-  if (this->m_TextureImageHeight > 0.0 && this->m_TextureImageWidth > 0.0)
+  if (scalarArray->GetNumberOfTuples()>0)
   {
-    mesh->GetPointData()->SetTCoords(textureCoords);
+    mesh->GetPointData()->SetScalars(scalarArray);
+    if (this->m_TextureImageHeight > 0.0 && this->m_TextureImageWidth > 0.0)
+    {
+      mesh->GetPointData()->SetTCoords(textureCoords);
+    }
   }
   output->SetVtkPolyData(mesh);
 }

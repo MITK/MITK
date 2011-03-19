@@ -138,6 +138,7 @@ list(APPEND CTEST_PROJECT_SUBPROJECTS
   MITK-Core
   MITK-CoreUI
   MITK-IGT
+  MITK-ToF
   MITK-DTI
   MITK-Registration
   MITK-Modules # all modules not contained in a specific subproject

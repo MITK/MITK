@@ -1,0 +1,13 @@
+/**
+\bundlemainpage{org.mitk.gui.qt.toftutorial} ToFTutorial
+
+\image html icon.png "Icon of ToFTutorial"
+
+Available sections:
+  - \ref org.mitk.gui.qt.toftutorialOverview
+
+\section org.mitk.gui.qt.toftutorialOverview
+This is the description for the ToFTutorial.
+
+*/
+

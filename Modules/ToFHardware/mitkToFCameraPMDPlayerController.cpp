@@ -34,12 +34,6 @@ namespace mitk
     m_ProcPlugin = MITK_TOF_PMDCAMCUBE_PROCESSING_PLUGIN;
     m_ProcParam = PROC_PARAM;
 
-    m_CaptureWidth  = 0;
-    m_CaptureHeight = 0;
-    m_PixelNumber = m_CaptureWidth * m_CaptureHeight;
-    m_PMDRes = 0;
-    m_ConnectionCheck = false;
-
     this->m_NumOfFrames = 0;
   }
 

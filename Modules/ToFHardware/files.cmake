@@ -43,7 +43,7 @@ ENDIF(MITK_USE_TOF_PMDCAMCUBE)
 
 IF(MITK_USE_TOF_PMDO3)
 SET(CPP_FILES ${CPP_FILES}
-  mitkToFCameraPMDO3ControllerStub.cpp
+  mitkToFCameraPMDO3Controller.cpp
   mitkToFCameraPMDController.cpp
 )
 ELSE()

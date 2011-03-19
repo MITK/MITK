@@ -127,19 +127,22 @@ namespace mitk
 
   bool ToFCameraMITKPlayerController::CloseCameraConnection()
   {
+    bool returnValue = false;
     if (this->m_ConnectionCheck)
     {
       if(!fclose(this->m_DistanceInfile) && !fclose(this->m_AmplitudeInfile) &&
          !fclose(this->m_IntensityInfile))
       {
         this->m_ConnectionCheck = false;
+        returnValue = true;
       }
       else
       {
         this->m_ConnectionCheck = true;
+        returnValue = false;
       }
     }
-    return !this->m_ConnectionCheck;
+    return returnValue;
   } 
 
   void ToFCameraMITKPlayerController::UpdateCamera()

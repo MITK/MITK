@@ -26,8 +26,8 @@ int mitkToFCameraPMDO3ControllerTest(int /* argc */, char* /*argv*/[])
   MITK_TEST_BEGIN("ToFCameraPMDO3Controller");
   mitk::ToFCameraPMDO3Controller::Pointer testObject = mitk::ToFCameraPMDO3Controller::New();
   MITK_TEST_CONDITION_REQUIRED(!testObject.GetPointer()==NULL,"Testing initialzation!");
-  MITK_TEST_CONDITION_REQUIRED(testObject->GetCaptureHeight()== 200 ,"Testing initialization of CaptureHeight");
-  MITK_TEST_CONDITION_REQUIRED(testObject->GetCaptureWidth()== 200 ,"Testing initialization of CaptureWidth");
+  MITK_TEST_CONDITION_REQUIRED(testObject->GetCaptureHeight()== 48 ,"Testing initialization of CaptureHeight");
+  MITK_TEST_CONDITION_REQUIRED(testObject->GetCaptureWidth()== 64 ,"Testing initialization of CaptureWidth");
   MITK_TEST_CONDITION_REQUIRED(!testObject->OpenCameraConnection(),"Testing OpenCameraConnection!");
   MITK_TEST_CONDITION_REQUIRED(testObject->CloseCameraConnection(),"Testing closing of camera connection!");
 

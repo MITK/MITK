@@ -42,7 +42,7 @@ typedef itk::Image<float, 2> ItkImageType2D;
 /*!
   \brief QmitkToFUtilView 
 
-  \warning  This application module is not yet documented. Use "svn blame/praise/annotate" and ask the author to provide basic documentation.
+  \warning  This application is still under active development. Complete documentation will be added when class is finished.
 
   \sa QmitkFunctionality
   \ingroup Functionalities

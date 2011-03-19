@@ -34,8 +34,8 @@ int mitkToFCameraPMDPlayerControllerTest(int /* argc */, char* /*argv*/[])
   mitk::ToFCameraPMDPlayerController::Pointer testObject = mitk::ToFCameraPMDPlayerController::New();
 
   MITK_TEST_CONDITION_REQUIRED( !(testObject.GetPointer() == NULL),"Testing object initialization!");
-  MITK_TEST_CONDITION_REQUIRED( testObject->GetCaptureHeight()== 0,"Testing member variable init 1!");
-  MITK_TEST_CONDITION_REQUIRED( testObject->GetCaptureWidth() == 0 ,"Testing member variable init 2!");
+  MITK_TEST_CONDITION_REQUIRED( testObject->GetCaptureHeight()== 200,"Testing member variable init 1!");
+  MITK_TEST_CONDITION_REQUIRED( testObject->GetCaptureWidth() == 200 ,"Testing member variable init 2!");
   
   //testing the creation of a connection without valid data
   

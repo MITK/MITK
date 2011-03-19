@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>395</width>
+    <width>421</width>
     <height>671</height>
    </rect>
   </property>
@@ -245,7 +245,7 @@
       <item row="1" column="0" colspan="3">
        <widget class="QGroupBox" name="m_MappingGroupBox">
         <property name="title">
-         <string>Grayvalue/color mapping</string>
+         <string>Gray value/color mapping</string>
         </property>
         <layout class="QGridLayout" name="gridLayout">
          <item row="0" column="0" colspan="5">

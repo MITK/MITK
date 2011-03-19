@@ -104,6 +104,9 @@ set(CTEST_UPDATE_COMMAND "${CTEST_GIT_COMMAND}")
 MACRO(run_ctest)
   set(dartclient_error)
 
+  set_property(GLOBAL PROPERTY SubProject SuperBuild)
+  set_property(GLOBAL PROPERTY Label SuperBuild)
+
   ctest_start(${model})
   ctest_update(SOURCE "${CTEST_CHECKOUT_DIR}" RETURN_VALUE res)
   
@@ -145,9 +148,6 @@ ${ADDITIONNAL_CMAKECACHE_OPTION}
       
     message("----------- [ Configure SuperBuild ] -----------")
     
-    set_property(GLOBAL PROPERTY SubProject SuperBuild)
-    set_property(GLOBAL PROPERTY Label SuperBuild)
-     
     ctest_configure(BUILD "${CTEST_BINARY_DIRECTORY}"
       OPTIONS "-DCTEST_USE_LAUNCHERS=${CTEST_USE_LAUNCHERS}"
       RETURN_VALUE res
@@ -263,6 +263,10 @@ ${ADDITIONNAL_CMAKECACHE_OPTION}
         file(WRITE "${CTEST_BINARY_DIRECTORY}/CMakeFiles/TargetDirectories.txt" "${old_coverage_dirs}")
       
       endforeach()
+
+      # switch back to SuperBuild label
+      set_property(GLOBAL PROPERTY SubProject SuperBuild)
+      set_property(GLOBAL PROPERTY Label SuperBuild)
       
       message("----------- [ Finish SuperBuild ] -----------")
     else()

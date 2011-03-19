@@ -99,6 +99,7 @@ struct DqSelListener : ISelectionListener
       m_View->m_Controls->m_RAButton->setEnabled(foundTensorVolume);
       m_View->m_Controls->m_ADButton->setEnabled(foundTensorVolume);
       m_View->m_Controls->m_RDButton->setEnabled(foundTensorVolume);
+      m_View->m_Controls->m_MDButton->setEnabled(foundTensorVolume);
       m_View->m_Controls->m_ClusteringAnisotropy->setEnabled(foundTensorVolume);
     }
   }
@@ -180,6 +181,7 @@ void QmitkDiffusionQuantificationView::CreateConnections()
     connect( (QObject*)(m_Controls->m_RAButton), SIGNAL(clicked()), this, SLOT(RA()) );
     connect( (QObject*)(m_Controls->m_ADButton), SIGNAL(clicked()), this, SLOT(AD()) );
     connect( (QObject*)(m_Controls->m_RDButton), SIGNAL(clicked()), this, SLOT(RD()) );
+    connect( (QObject*)(m_Controls->m_MDButton), SIGNAL(clicked()), this, SLOT(MD()) );
     connect( (QObject*)(m_Controls->m_ClusteringAnisotropy), SIGNAL(clicked()), this, SLOT(ClusterAnisotropy()) );
   }
 }
@@ -244,6 +246,11 @@ void QmitkDiffusionQuantificationView::RD()
 void QmitkDiffusionQuantificationView::ClusterAnisotropy()
 {
   TensorQuantify(4);
+}
+
+void QmitkDiffusionQuantificationView::MD()
+{
+  TensorQuantify(5);
 }
 
 void QmitkDiffusionQuantificationView::QBIQuantify(int method)
@@ -621,6 +628,15 @@ void QmitkDiffusionQuantificationView::TensorQuantification(
       measurementsCalculator->Update();
       multi->SetInput(measurementsCalculator->GetOutput());
       nodename = QString(nodename.c_str()).append("_CA").toStdString();
+    }
+    else if(method == 5) // MD (Mean Diffusivity, (Lambda1+Lambda2+Lambda3)/3 )
+    {
+      MeasurementsType::Pointer measurementsCalculator = MeasurementsType::New();
+      measurementsCalculator->SetInput(itkvol.GetPointer() );
+      measurementsCalculator->SetMeasure(MeasurementsType::MD);
+      measurementsCalculator->Update();
+      multi->SetInput(measurementsCalculator->GetOutput());
+      nodename = QString(nodename.c_str()).append("_MD").toStdString();
     }
 
     multi->Update();

@@ -78,6 +78,7 @@ protected slots:
   void AD();
   void RD();
   void ClusterAnisotropy();
+  void MD();
 
   void QBIQuantify(int method);
   void QBIQuantification(mitk::DataStorage::SetOfObjects::Pointer inImages, 

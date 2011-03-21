@@ -174,6 +174,10 @@ ExternalProject_Add(${proj}
 # MITK Configure
 #-----------------------------------------------------------------------------
 
+IF(MITK_INITIAL_CACHE_FILE)
+  SET(mitk_initial_cache_arg -C "${MITK_INITIAL_CACHE_FILE}")
+ENDIF()
+
 SET(proj MITK-Configure)
 
 ExternalProject_Add(${proj}
@@ -195,6 +199,7 @@ ExternalProject_Add(${proj}
     -DGDCM_DIR:PATH=${GDCM_DIR}
     -DBOOST_ROOT:PATH=${BOOST_ROOT}
     -DMITK_DATA_DIR:PATH=${MITK_DATA_DIR}
+    ${mitk_initial_cache_arg}
 
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}
   BINARY_DIR ${CMAKE_BINARY_DIR}/MITK-build

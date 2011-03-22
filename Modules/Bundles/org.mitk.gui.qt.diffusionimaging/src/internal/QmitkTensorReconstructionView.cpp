@@ -762,6 +762,7 @@ void QmitkTensorReconstructionView::DoTensorsToDWI
       image->SetVectorImage( filter->GetOutput() );
       image->SetB_Value(bVal);
       image->SetDirections(gradientList);
+      image->SetOriginalDirections(gradientList);
       image->InitializeFromVectorImage();
       mitk::DataNode::Pointer node=mitk::DataNode::New();
       node->SetData( image );

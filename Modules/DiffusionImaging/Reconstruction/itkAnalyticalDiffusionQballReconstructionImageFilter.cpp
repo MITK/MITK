@@ -80,7 +80,8 @@ namespace itk {
           {
             sum += odf[i];
           }
-          odf /= sum;
+          if(sum>0)
+            odf /= sum;
 
           return odf;
           break;
@@ -124,7 +125,16 @@ namespace itk {
           for(int i=0; i<NrOdfDirections; i++)
           {
             odf[i] = odf[i] < 0 ? 0 : odf[i];
+            odf[i] *= QBALL_ANAL_RECON_PI*4/NrOdfDirections;
           }
+          TOdfPixelType sum = 0;
+          for(int i=0; i<NrOdfDirections; i++)
+          {
+            sum += odf[i];
+          }
+          if(sum>0)
+            odf /= sum;
+
           break;
         }
       case QBAR_NONNEG_SOLID_ANGLE:
@@ -196,14 +206,17 @@ namespace itk {
         case QBAR_NONNEG_SOLID_ANGLE:
           {
             int n = vec.size();
+            double b0f = (double)b0;
             for(int i=0; i<n; i++)
             {
-              float meas = vec[i];
-              if(meas >= b0)
-              {
-                meas = b0 - 0.0001;
-              }
-              vec[i] = log(-log(meas/b0));
+              double meas = (double)vec[i];
+              if (meas==0)
+                meas = 0.001;
+              if (b0f==0)
+                b0f = 0.01;
+              if(meas >= b0f)
+                meas = b0f - 0.001;
+              vec[i] = log(-log(meas/b0f));
             }
             return vec;
             break;
@@ -251,6 +264,14 @@ namespace itk {
         m_BZeroImage->SetBufferedRegion( img->GetLargestPossibleRegion() );
         m_BZeroImage->Allocate();
 
+        m_ODFSumImage = BZeroImageType::New();
+        m_ODFSumImage->SetSpacing( img->GetSpacing() );   // Set the image spacing
+        m_ODFSumImage->SetOrigin( img->GetOrigin() );     // Set the image origin
+        m_ODFSumImage->SetDirection( img->GetDirection() );  // Set the image direction
+        m_ODFSumImage->SetLargestPossibleRegion( img->GetLargestPossibleRegion());
+        m_ODFSumImage->SetBufferedRegion( img->GetLargestPossibleRegion() );
+        m_ODFSumImage->Allocate();
+
         if(m_NormalizationMethod == QBAR_SOLID_ANGLE ||
           m_NormalizationMethod == QBAR_NONNEG_SOLID_ANGLE)
         {
@@ -272,6 +293,9 @@ namespace itk {
 
         ImageRegionIterator< BZeroImageType > oit2(m_BZeroImage, outputRegionForThread);
         oit2.GoToBegin();
+
+        ImageRegionIterator< BlaImage > oit3(m_ODFSumImage, outputRegionForThread);
+        oit3.GoToBegin();
 
         typedef ImageRegionConstIterator< GradientImagesType > GradientIteratorType;
         typedef typename GradientImagesType::PixelType         GradientVectorType;
@@ -382,8 +406,15 @@ namespace itk {
           oit.Set( odf );
           ++oit;
           oit2.Set( b0 );
+          float sum = 0;
+          for (int k=0; k<odf.Size(); k++)
+            sum += (float) odf[k];
+          oit3.Set( sum-1 );
+          ++oit3;
           ++oit2;
           ++git; // Gradient  image iterator
+
+
         }
 
         std::cout << "One Thread finished reconstruction" << std::endl;

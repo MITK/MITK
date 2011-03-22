@@ -691,6 +691,16 @@ void QmitkQBallReconstructionView::TemplatedAnalyticalQBallReconstruction(
   newname = newname.append("_QA%1").arg(normalization);
   SetDefaultNodeProperties(node, newname.toStdString());
   nodes->push_back(node);
+
+
+//  mitk::Image::Pointer image5 = mitk::Image::New();
+//  image5->InitializeByItk( filter->GetODFSumImage().GetPointer() );
+//  image5->SetVolume( filter->GetODFSumImage()->GetBufferPointer() );
+//  mitk::DataNode::Pointer node5=mitk::DataNode::New();
+//  node5->SetData( image5 );
+//  node5->SetProperty( "name", mitk::StringProperty::New(
+//    QString(nodename.c_str()).append("_ODF").toStdString()) );
+//  nodes->push_back(node5);
   
   // B-Zero TO DATATREE
   if(m_Controls->m_OutputB0Image->isChecked())

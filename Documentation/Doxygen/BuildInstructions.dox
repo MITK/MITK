@@ -1,149 +1,114 @@
 /**
 \page BuildInstructionsPage Build Instructions
 
+\section BIZero Introduction
+
+The MITK build system (which is based on CMake) supports a "superbuild" process, meaning that it will download, configure, and build
+all required third-party libraries (except Qt) automatically. These instructions will show you how to use the MITK superbuild.
+
+For more advanced users, the last sections explain how to inject custom build libraries into the supebuild process.
+
 \section BIOne Prerequisites
 
 You need:
-  -# A svn client, either command line or a graphical client (look <a href="http://subversion.tigris.org/links.html#clients">here [subversion.tigris.org]</a> for a list)
-  -# <a href="http://www.cmake.org">CMake</a>
-  -# Qt 4.x (version 4.5 or above is recommended, we cannot guarantee compatibility with lower versions)
-  -# An appropriate version of VTK that is linked against the above Qt version.
-  -# ITK
-  
-\ref BuildToolkits "How to build ITK, VTK and QT"
+  -# Git from http://git-scm.com (there are also numerous third-party graphical clients available)
+  -# <a href="http://www.cmake.org">CMake</a> (version 2.8.2 or higher)
+  -# <a href="http://qt.nokia.com">Qt</a> 4.x if you plan to develop Qt-based applications 
+  (version 4.5 or above is recommended, we cannot guarantee compatibility with lower versions)
   
 \section BITwo Get a source tree
 
-Since MITK is under active development we recommend to use subversion to get
-the most recent version. To make sure you get a stable tree, check the <a
-href="http://cdash.mitk.org/index.php?project=MITK">MITK
-dashboard</a> before checking out. If the build tree is not clean, you can specify an older revision for the checkout or get a stable tar ball from <a href="http://www.mitk.org">mitk.org</a>
+Since MITK is under active development we recommend to use git to get
+the most recent version. To make sure you get a stable tree, check the
+<a href="http://cdash.mitk.org/index.php?project=MITK">MITK dashboard</a>
+before checking out. If the build tree is not clean, you can specify an
+older revision for the checkout or get a stable tar ball from
+<a href="http://www.mitk.org">www.mitk.org</a>
 
-To checkout MITK's current subversion repository do:
+To clone MITK's current git repository do:
 
-<tt>
-svn co http://svn2.mitk.org/trunk/mitk ./mitk
-</tt>
-
-If you prefer a graphical client, use <tt>svn://mbi.dkfz-heidelberg.de/mitkExt/trunk/mitk</tt> as the repository URL for the trunk.
+\code
+git clone http://git.mitk.org/MITK.git
+\endcode
 
 \section BIThree Build MITK with CMake
 
-Create a new directory for the binary tree, change to it and call CMake:
+Create a new directory for the superbuild binary tree, change to it and call CMake:
 
-In the shell:
-<tt>
-mkdir mitkBinary<br>
-cd mitkBinary<br>
-ccmake ../mitk</tt> (assuming you are still in the directory you did the checkout in)<br>
-<tt>make<br>
-</tt>
-
-If you use <B>Windows</B>, then you just start the CMake GUI and enter the location of the source and of the binary tree. 
-CMake will create a Visual Studio solution in the root of your binary tree.
-
-Essential variables to configure are ITK_DIR and VTK_DIR. If not configured by CMake you have to set DESIRED_QT_VERSION to your QT version.
-
-\note "Installing" MITK via cmake (or using "make install") is not yet supported. You can find the application in <tt>&lt;binary_dir&gt;/mitk/bin</tt> and the libraries in <tt>&lt;binary_dir&gt;/mitk/lib</tt>.
-
-\subsection BIThree_w_BF Using a batchfile
-
-We recommend using a batchfile to set the desired environment variables and parameters.
-
-Using Windows 32 bit and Microsoft Visual Studio 2008 it could look like this:
-
+In the shell (assuming you current directory is the same as the one where you
+issued the git clone command):
 \code
-
-@echo off
-REM ------------- Configuration options --------------
-
-REM Set MITK Binary dir
-@SET MITK_DIR=C:\svn\mitkBinary
-
-REM Choose toolkit versions
-@SET VTK_DIR=V:\windows\x32\VTK-5.4.0_Qt451_VC9.0_Bin
-@SET ITK_DIR=V:\windows\x32\ITK-3.14.0_VC9.0_Bin
-@SET QT_DIR=V:\windows\x32\QT-4.5.1_VC9.0_Bin
-REM @SET BOOST_DIR=V:\windows\x32\boost REM Only needed by MBI members
-@SET OSGI_RUNTIME=%MITK_DIR%\bin\BlueBerry\org.blueberry.osgi
-@SET CMAKE_DIR="C:\Program Files (x86)\CMake 2.6\bin"
-
-REM ----------- Setup configuration ---------------
-
-REM Disable VS2005 Secure C Runtime Library Warnings, Disable Microsoft c++ extensions, enable minimal rebuild
-@set CL=/D_CRT_SECURE_NO_DEPRECATE /D_CRT_NONSTDC_NO_DEPRECATE
-REM @set LINK=/LARGEADDRESSAWARE
-
-@call "C:\Program Files (x86)\Microsoft Visual Studio 9.0\Common7\Tools\vsvars32.bat" 
-
-IF NOT DEFINED BUILDTYPE (SET BUILDTYPE=Debug)
-
-REM Setup path for toolkit directories
-@set PATH=%ITK_DIR%\bin\%BUILDTYPE%;%OSGI_RUNTIME%\bin\%BUILDTYPE%;%VTK_DIR%\bin\%BUILDTYPE%;%QT_DIR%\bin;%CMAKE_DIR%;%PATH%
-
-REM Print startup commands
-@echo.
-@echo.
-@echo Using Visual Studio 9 settings
-@echo libraries directories: 
-@echo %VTK_DIR%
-@echo %ITK_DIR%
-@echo %QT_DIR%
-@echo.
-
-REM | Change to working directory
-cd %MITK_DIR%
-
-REM | Cosmetics
-TITLE=QT4-Extern 32 Bit-%BUILDTYPE%
-
-REM | Aliases, invoke by %alias%
-set start=MITK.sln
-
-REM | Change to shell
-call cmd
-
+mkdir MITK-superbuild
+cd MITK-superbuild
+ccmake ../MITK
 \endcode
 
-Usually you need to change the file paths to fit your setup.
+If you use <B>Windows</B>, then you just start the CMake GUI and enter the location of the source and of the binary tree,
+choose a suitable generator and configure the project.
 
-For other system configurations, please adjust:
-  - The editor call, for 64 Bit Windows using MSVS 2008 \code call "C:\Program Files (x86)\Microsoft Visual Studio 9.0\VC\vcvarsall.bat" amd64 \endcode
-  - 64 Bit Windows MSVS needs the /bigobj /MP flag \code @set CL=/D_CRT_SECURE_NO_DEPRECATE /D_CRT_NONSTDC_NO_DEPRECATE /bigobj /MP \endcode
-  - Other operating systems may need to change the environment variables
+CMake will present you a couple of options, these are the most important ones:
 
-To configure MITK do:
-  - Run the batchfile
-  - start cmake from the called command line \code C:\svn\mitkBinary>cmake-gui  \endcode
-  - set source and binary directories
-  - press <B>Configure</B>
-  - make sure ITK_DIR, VTK_DIR and DESIRED_QT_VERSION fit your system
-  - press <B>Configure</B>
-  - disable MITK_USE_BLUEBERRY if you want to use MITK as a toolkit without the application framework
-  - press <B>Configure</B> twice
-  - press <B>Generate</B>
-  - start Visual Studio from the called command line \code C:\svn\mitkBinary>%start%  \endcode
-  - build it with e.g. Microsoft Visual Studio (Set ExtApp as StartUp Project)
-  
-\section BIFour MITK specific configuration variables  
+ - <tt><b>MITK_USE_Boost</b></tt> Build MITK code which depends on Boost (this will download Boost 1.45.0)
+ - <tt><b>MITK_USE_OpenCV</b></tt> Build MITK code which depends on OpenCV (this will download and build OpenCV 2.2)
+ - <tt><b>MITK_USE_QT</b></tt> Build MITK code which depends on Qt
+ - <tt><b>QT_QMAKE_EXECUTABLE</b></tt> The path to the qmake executable of your Qt installation
+ 
+If you are satisfied with the configuration of your MITK superbuild, generate the project files with 
+CMake by pressing "Generate".
 
- - \b USE_QT: this can be set to OFF to build only the Qt-independent classes of MITK
- - \b MITK_BUILD_TUTORIAL: Build the tutorial applications (Step1 to n)
- - \b MITK_DOXYGEN_OUTPUT_DIR: specify the directory where the doxygen documentation will we generated. 
- - \b USE_ITKZLIB: This should be ON in nearly all cases.
- - \b MITK_USE_TD_MOUSE: (Win32 only) Set to ON if a 3Dconnexion mouse is available and the vendor driver is installed.
-  
-\section BIFive Documentation
+<b>Linux</b> users usually just enter "make" (optionally supplying the number threads to be used for
+a parallel build):
+\code
+make -j4
+\endcode
 
-If you have the <a href="http://www.doxygen.org">Doxygen</a> documentation tool installed, you get  a new project (Visual Studio) or "make" target named "doc". You can build this to generate the HTML documentation of MITK in the Documentation/Doxygen directory of your binary tree or in the MITK_DOXYGEN_OUTPUT_DIR if specified. See below.
+<b>Windows</b> users using Visual Studio can open the generated <tt>MITK-superbuild.sln</tt> solution file
+in the <tt>MITK-superbuild</tt> directory and start the build by building the <tt>BUILD_ALL</tt> project.
 
-\section BISix Extend MITK on your own (using the application framework BlueBerry)
+\section BIFour Customize your MITK superbuild
+
+The MITK superbuild configured MITK with all needed external libraries. The build directories of these libraries,
+and of MITK itself are located inside the <tt>MITK-superbuild</tt> directory. For example, the directory layout may
+look like:
+
+\code
+MITK-superbuild
+ |- ITK-build
+ |- VTK-build
+ |- MITK-build
+\endcode
+
+To change the configuration of the MITK build, choose the MITK-build directory as the binary directory in the
+CMake GUI. After generating the project files, build the MITK project by either issuing "make" in the MITK-build
+directory (Linux), or by opening MITK-build/MITK.sln and building the project with Visual Studio.
+
+You may also change the configuration of any project configured via the superbuild process. Make sure to also build
+the changed project and also the projects which depend on it.
+
+\section BIFive Running Applications
+
+On Linux, just execute the application you want to run. MITK executables are located in
+<tt>MITK-superbuild/MITK-build/bin</tt>
+
+On Windows, the <tt>PATH</tt> environment variable must contain the directories containging third-party libraries.
+The MITK build system generated Windows Batch files in the <tt>MITK-build</tt> directory which set up a correct
+environment and opens the appropriate Visual Studio solution file. Use (and maybe modify/enhance) these Batch files
+to be able to start and debug MITK applications from inside Visual Studio.
+
+\section BISix Documentation
+
+If you have the <a href="http://www.doxygen.org">Doxygen</a> documentation tool installed, you get a new project
+(Visual Studio) or "make" target named "doc". You can build this to generate the HTML documentation of MITK in 
+the Documentation/Doxygen directory of your MITK-build binary tree or in the <tt>MITK_DOXYGEN_OUTPUT_DIR</tt> CMake variable
+(if specified).
+
+\section BISeven Extend MITK on your own (using the application framework BlueBerry)
 
 \ref NewPluginPage
 
-\section BISeven Use MITK in your own project (as a toolkit)
+\section BIEight Use MITK in your own project (as a toolkit)
 
-In the binary tree the MITKConfig.cmake file is generated. You can include it in your own project with
+In the MITK-build binary tree the MITKConfig.cmake file is generated. You can include it in your own project with
 
 FIND_PACKAGE(MITK)
 
@@ -162,5 +127,34 @@ LINK_DIRECTORIES(${MITK_LINK_DIRECTORIES})
 ADD_EXECUTABLE(MyApp MyApp.cpp)
 TARGET_LINK_LIBRARIES(Step1 ${QMITK_LIBRARIES})
 
-\note IMPORTANT: do not include the ITK_USE_FILE in your project when using MITK. There's a conflict in the ITK and MITK tree classes which will be resolved soon. 
+\note IMPORTANT: do not include the ITK_USE_FILE in your project when using MITK. There's a conflict in the ITK
+ and MITK tree classes which will be resolved soon. 
+
+\section BINine Superbuild Customization
+
+You can inject pre-build third-party libraries into the MITK superbuild by setting certain CMake variables before
+the first configure step. MITK will then use these third-party libraries instead of downloading and building them
+itself. Note you must take care to configure those libraries with all options MITK requires.
+
+The following variables are supported:
+
+ - <tt><b>BOOST_ROOT</b></tt> Set this variable to your custom Boost installation
+ - <tt><b>CTK_DIR</b></tt> Set this variable to your CTK binary tree (the directory containing the CTKConfig.cmake file)
+ - <tt><b>DCMTK_DIR</b></tt> Set this variable to your DCMTK binary tree (the directory containing the DCMTKConfig.cmake file)
+ - <tt><b>GDCM_DIR</b></tt> Set this variable to your GDCM binary tree (the directory containing the GDCMConfig.cmake file)
+ - <tt><b>ITK_DIR</b></tt> Set this variable to your ITK binary tree (the directory containing the ITKConfig.cmake file)
+ - <tt><b>OpenCV_DIR</b></tt> Set this variable to your OpenCV binary tree (the directory containing the OpenCVConfig.cmake file)
+ - <tt><b>VTK_DIR</b></tt> Set this variable to your VTK binary tree (the directory containing the VTKConfig.cmake file)
+ 
+To set CMake options before the first configure step is invoked, either supply them on the command line, i.e.
+
+\code
+ccmake -DITK_DIR:PATH=/opt/ITK-release ../MITK
+\endcode
+
+or add them in the CMake GUI by pressing "Add Entry" (before pressing "Configure" the first time).
+
+See the following link for more information about how to configure third-party libraries:
+\ref BuildToolkits "How to build ITK, VTK and QT"
+
 */

@@ -122,7 +122,7 @@ SET(mitk_cmake_boolean_args
   MITK_USE_BLUEBERRY
   MITK_USE_CTK
   MITK_USE_DCMTK
-  MITK_USE_OPEN_CV
+  MITK_USE_OpenCV
   )
   
 #-----------------------------------------------------------------------------

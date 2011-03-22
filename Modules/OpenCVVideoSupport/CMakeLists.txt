@@ -1,5 +1,5 @@
 
-IF(MITK_USE_OPEN_CV)
+IF(MITK_USE_OpenCV)
 
 #MESSAGE( STATUS "Creating Module mitkOpenCVVideoSupport" )
 
@@ -39,9 +39,9 @@ ENDIF(WIN32)
     ADD_SUBDIRECTORY(Testing)
   ENDIF(BUILD_TESTING)  
   
-ELSE(MITK_USE_OPEN_CV)
+ELSE(MITK_USE_OpenCV)
 
     MESSAGE( STATUS "Not creating Module mitkOpenCVVideoSupport" )
 
-ENDIF(MITK_USE_OPEN_CV)
+ENDIF(MITK_USE_OpenCV)
 

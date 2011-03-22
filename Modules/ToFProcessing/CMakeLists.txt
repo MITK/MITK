@@ -1,6 +1,6 @@
-#OPTION(MITK_USE_OPEN_CV "Use Intel's OpenCV library" OFF)
+#OPTION(MITK_USE_OpenCV "Use Intel's OpenCV library" OFF)
 
-IF(MITK_USE_OPEN_CV)
+IF(MITK_USE_OpenCV)
 
 MITK_CREATE_MODULE(mitkToFProcessing
     SUBPROJECTS MITK-ToF
@@ -15,10 +15,10 @@ IF(BUILD_TESTING)
 
 ENDIF(BUILD_TESTING)
 
-ELSE(MITK_USE_OPEN_CV)
+ELSE(MITK_USE_OpenCV)
 
-    MESSAGE( "Not creating Module mitkToFProcessing. Set MITK_USE_OPEN_CV to ON." )
+    MESSAGE( "Not creating Module mitkToFProcessing. Set MITK_USE_OpenCV to ON." )
 
-ENDIF(MITK_USE_OPEN_CV)
+ENDIF(MITK_USE_OpenCV)
 
 

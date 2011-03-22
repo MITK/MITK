@@ -69,7 +69,7 @@ SET(MITK_USE_Boost @MITK_USE_Boost@)
 SET(MITK_USE_CTK @MITK_USE_CTK@)
 SET(MITK_USE_GDCMIO @MITK_USE_GDCMIO@)
 SET(MITK_USE_DCMTK @MITK_USE_DCMTK@)
-SET(MITK_USE_OPEN_CV @MITK_USE_OPEN_CV@)
+SET(MITK_USE_OpenCV @MITK_USE_OpenCV@)
 
 # There is no PocoConfig.cmake, so we set Poco specific CMake variables
 # here. This way the call to FIND_PACKAGE(Poco) in BlueBerryConfig.cmake

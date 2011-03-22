@@ -32,11 +32,42 @@ int mitkNDIPolarisHardwareTest(int argc , char* argv[])
 
   int comPort = *argv[1] - '0';
 
-  // let's create an object of our class
+  //create a polaris tracking device
   mitk::NDITrackingDevice::Pointer myNDITrackingDevice = mitk::NDITrackingDevice::New();
+  myNDITrackingDevice->SetType(mitk::NDIPolaris);
 
-  //TODO: set port!
-
+  //set port
+  switch (comPort)
+    {
+    case 1:
+      myNDITrackingDevice->SetPortNumber(mitk::SerialCommunication::COM1);
+      break;
+    case 2:
+      myNDITrackingDevice->SetPortNumber(mitk::SerialCommunication::COM2);
+      break;
+    case 3:
+      myNDITrackingDevice->SetPortNumber(mitk::SerialCommunication::COM3);
+      break;
+    case 4:
+      myNDITrackingDevice->SetPortNumber(mitk::SerialCommunication::COM4);
+      break;
+    case 5:
+      myNDITrackingDevice->SetPortNumber(mitk::SerialCommunication::COM5);
+      break;
+    case 6:
+      myNDITrackingDevice->SetPortNumber(mitk::SerialCommunication::COM6);
+      break;
+    case 7:
+      myNDITrackingDevice->SetPortNumber(mitk::SerialCommunication::COM7);
+      break;
+    case 8:
+      myNDITrackingDevice->SetPortNumber(mitk::SerialCommunication::COM8);
+      break;
+    case 9:
+      myNDITrackingDevice->SetPortNumber(mitk::SerialCommunication::COM9);
+      break;
+    }
+  
   //TODO: add tools
 
   //OpenConnection
@@ -47,7 +78,8 @@ int mitkNDIPolarisHardwareTest(int argc , char* argv[])
 
   //TODO: test if tools are updated correctly
 
-  //TODO: stop tracking
+  //Stop tracking
+  MITK_TEST_CONDITION( (myNDITrackingDevice->StopTracking()), "Testing method StopTracking().");
 
   //CloseConnection
   MITK_TEST_CONDITION( (myNDITrackingDevice->CloseConnection()), "Testing behavior of method CloseConnection().");

@@ -24,16 +24,30 @@ SET(MODULE_TESTS
    mitkTrackingToolTest.cpp
    mitkVirtualTrackingDeviceTest.cpp
 
-   # ------------------ Deavtivated Tests ----------------------------------
    mitkTrackingDeviceSourceTest.cpp
-   #mitkNavigationDataPlayerTest.cpp  # deactivated, see bug 3073
-   #mitkNavigationDataSourceTest.cpp   # deactivated because of  bug #2323
-   mitkNavigationToolReaderAndWriterTest.cpp #deactivated, see bug #3461
-   # -----------------------------------------------------------------------
 
    # ------------------ Navigation Tool Management Tests -------------------
    mitkNavigationToolStorageTest.cpp
    mitkNavigationToolStorageSerializerAndDeserializerTest.cpp
    mitkNavigationToolTest.cpp
+   mitkNavigationToolReaderAndWriterTest.cpp #deactivated, see bug #3461
+   # -----------------------------------------------------------------------
+
+   # ------------------ Deavtivated Tests ----------------------------------
+   #mitkNavigationDataPlayerTest.cpp  # deactivated, see bug 3073
+   #mitkNavigationDataSourceTest.cpp   # deactivated because of  bug #2323
    # -----------------------------------------------------------------------
 )
+
+SET(MODULE_CUSTOM_TESTS
+  mitkNDIAuroraHardwareTest.cpp
+  mitkNDIPolarisHardwareTest.cpp
+)
+
+IF(MITK_NDI_AURORA_CONNECTED)
+   ADD_TEST(mitkNDIAuroraHardwareTest ${MITK_NDI_AURORA_COM_PORT})
+ENDIF(MITK_NDI_AURORA_CONNECTED)
+
+IF(MITK_NDI_POLARIS_CONNECTED)
+   ADD_TEST(mitkNDIPolarisHardwareTest ${MITK_NDI_POLARIS_COM_PORT})
+ENDIF(MITK_NDI_POLARIS_CONNECTED)

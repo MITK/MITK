@@ -9,7 +9,7 @@ For building ITK please refer to the ITK documentation
 
 \section buildQT QT
 
-QT uses the same path for source and binaries. For detailed build instructions please refer to
+For detailed build instructions please refer to
 
 <a>http://doc.trolltech.com/4.5/installation.html</a>
 

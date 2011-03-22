@@ -28,6 +28,8 @@ int mitkNDIAuroraHardwareTest(int  argc , char* argv[])
   // always start with this!
   MITK_TEST_BEGIN("NDIAuroraHardware (An NDI tracking device has to be connected to this system!)");
 
+  if (argc<2) {MITK_TEST_FAILED_MSG(<<"Error: test must be called with the com port as second parameter!");}
+  
   int comPort = *argv[1] - '0';
 
   // let's create an object of our class

@@ -312,8 +312,9 @@ if(BUILD_TESTING)
   if(NOT EXISTS ${MITK_TEST_OUTPUT_DIR})
     file(MAKE_DIRECTORY ${MITK_TEST_OUTPUT_DIR})
   endif()
-  configure_file(mitkTestingConfig.h.in ${MITK_BINARY_DIR}/mitkTestingConfig.h)
 endif()
+
+configure_file(mitkTestingConfig.h.in ${MITK_BINARY_DIR}/mitkTestingConfig.h)
 
 #-----------------------------------------------------------------------------
 # MITK_SUPERBUILD_BINARY_DIR

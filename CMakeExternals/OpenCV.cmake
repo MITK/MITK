@@ -2,7 +2,7 @@
 # OpenCV
 #-----------------------------------------------------------------------------
 
-IF(MITK_USE_OPEN_CV)
+IF(MITK_USE_OpenCV)
 
 # Sanity checks
 IF(DEFINED OpenCV_DIR AND NOT EXISTS ${OpenCV_DIR})

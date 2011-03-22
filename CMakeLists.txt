@@ -107,7 +107,7 @@ option(MITK_USE_GDCMIO "Use the GDCMIO class instead of ImageIO2 for DICOM" ON)
 option(MITK_USE_BLUEBERRY "Build the BlueBerry platform" ON)
 option(MITK_USE_CTK "EXEPERIMENTAL, superbuild only: Use CTK in MITK" OFF)
 option(MITK_USE_DCMTK "EXEPERIMENTAL, superbuild only: Use DCMTK in MITK" OFF)
-option(MITK_USE_OPEN_CV "Use Intel's OpenCV library" OFF)
+option(MITK_USE_OpenCV "Use Intel's OpenCV library" OFF)
   
 mark_as_advanced(MITK_INSTALL_RPATH_RELATIVE
                  MITK_BUILD_ALL_PLUGINS

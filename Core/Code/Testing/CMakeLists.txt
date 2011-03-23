@@ -6,3 +6,6 @@ SET_PROPERTY(TEST mitkPicFileReaderTest_emptyFile PROPERTY LABELS MITK-Core)
 
 ADD_TEST(mitkPicFileReaderTest_emptyGzipFile ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${TESTDRIVER} mitkPicFileReaderTest ${CMAKE_CURRENT_SOURCE_DIR}/Data/emptyFile.pic.gz)
 SET_PROPERTY(TEST mitkPicFileReaderTest_emptyGzipFile PROPERTY LABELS MITK-Core)
+
+ADD_TEST(mitkDICOMLocaleTest ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${TESTDRIVER} mitkDICOMLocaleTest ${MITK_DATA_DIR}/spacing-ok.dcm)
+SET_PROPERTY(TEST mitkDICOMLocaleTest PROPERTY LABELS MITK-Core)

@@ -21,12 +21,9 @@ PURPOSE.  See the above copyright notices for more information.
  - The machine or current user has a German locale.
  - This esp. means that stream IO expects the decimal separator as a comma: ","
  - DICOM files use a point "." as the decimal separator to be locale independent
- - The parser used by MITK (ITK's GDCM) seems to use the current locale instead of the "C" or "POSIX" locale
+ - The parser used by MITK (ITK's GDC) seems to use the current locale instead of the "C" or "POSIX" locale
  - This leads to spacings (and probably other numbers) being trimmed/rounded,
    e.g. the correct spacing of 0.314 is read as 1.0 etc.
-
- MITK shold work around this behavior. This test is meant to verify any workaround
- and will be activated once such a workaround is available.
 
 */
 
@@ -57,12 +54,8 @@ bool mitkDICOMLocaleTestChangeLocale(const std::string& locale)
 
 }
 
-void mitkDICOMLocaleTestWithReferenceImage()
+void mitkDICOMLocaleTestWithReferenceImage(std::string filename)
 {
-  mitk::StandardFileLocations::Pointer locator = mitk::StandardFileLocations::GetInstance();
-  MITK_TEST_CONDITION_REQUIRED(locator.IsNotNull(),"Instantiating StandardFileLocations");
-  std::string filename = locator->FindFile("spacing-ok.dcm", "Core/Code/Testing/Data/");
-
   mitk::Image::Pointer image;
   mitk::DataNodeFactory::Pointer factory = mitk::DataNodeFactory::New();
   factory->SetFileName( filename );
@@ -77,21 +70,21 @@ void mitkDICOMLocaleTestWithReferenceImage()
   
     return;
   }  
-    
-  MITK_TEST_OUTPUT(<< "File "<< filename << " could be loaded." );
-
-  MITK_TEST_OUTPUT(<< "MITK image reports pixel spacing of " << image->GetGeometry()->GetSpacing()[0] << " " << image->GetGeometry()->GetSpacing()[1] );
-  MITK_TEST_CONDITION_REQUIRED(image->GetGeometry()->GetSpacing()[0] - 0.3141592 < 0.0000001, "correct x spacing");
-  MITK_TEST_CONDITION_REQUIRED(image->GetGeometry()->GetSpacing()[1] - 0.3141592 < 0.0000001, "correct y spacing");
+  MITK_TEST_CONDITION_REQUIRED(mitk::Equal(image->GetGeometry()->GetSpacing()[0], 0.3141592), "correct x spacing");
+  MITK_TEST_CONDITION_REQUIRED(mitk::Equal(image->GetGeometry()->GetSpacing()[1], 0.3141592), "correct y spacing");
 }
 
-int mitkDICOMLocaleTest(int /*argc*/, char* /*argv*/ [])
+int mitkDICOMLocaleTest(int argc, char* argv[])
 {
   MITK_TEST_BEGIN("DICOMLocaleTest");
 
+  MITK_TEST_CONDITION_REQUIRED(argc >= 2, "Test if a file to load has been specified");
+
+  std::string filename = argv[1];
+
   // load a reference DICOM file with the "C" locale being set
   mitkDICOMLocaleTestChangeLocale("C");
-  mitkDICOMLocaleTestWithReferenceImage();
+  mitkDICOMLocaleTestWithReferenceImage(filename);
   // load a reference DICOM file with German locales being set
   typedef std::list<std::string> StringList;
   StringList alllocales;
@@ -116,7 +109,7 @@ int mitkDICOMLocaleTest(int /*argc*/, char* /*argv*/ [])
     if ( mitkDICOMLocaleTestChangeLocale(*iter) )
     {
       ++numberOfTestedGermanLocales;
-      mitkDICOMLocaleTestWithReferenceImage();
+      mitkDICOMLocaleTestWithReferenceImage(filename);
     }
   }
 

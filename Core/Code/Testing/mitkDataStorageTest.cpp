@@ -37,12 +37,11 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkNodePredicateOr.h"
 #include "mitkNodePredicateSource.h"
 #include "mitkMessage.h"
-#include "mitkStandardFileLocations.h"
 #include "mitkPicFileReader.h"
 #include "mitkTestingMacros.h"
 
 
-void TestDataStorage(mitk::DataStorage* ds);
+void TestDataStorage(mitk::DataStorage* ds, std::string filename);
 
 namespace mitk
 {
@@ -129,7 +128,7 @@ struct ItkDeleteEventListener
 //## main testing method
 //## NOTE: the current Singleton implementation of DataTreeStorage will lead to crashes if a testcase fails
 //##       and therefore mitk::DataStorage::ShutdownSingleton() is not called.
-int mitkDataStorageTest(int /*argc*/, char* /*argv*/[])
+int mitkDataStorageTest(int argc, char* argv[])
 {
   MITK_TEST_BEGIN("DataStorageTest");
 
@@ -166,7 +165,7 @@ int mitkDataStorageTest(int /*argc*/, char* /*argv*/[])
   }
 
   MITK_TEST_OUTPUT( << "Testing StandaloneDataStorage: ");
-  TestDataStorage(sds);
+  TestDataStorage(sds,argv[1]);
   // TODO: Add specific StandaloneDataStorage Tests here
   sds = NULL;
 
@@ -176,15 +175,10 @@ int mitkDataStorageTest(int /*argc*/, char* /*argv*/[])
 //##Documentation
 //## @brief Test for the DataStorage class and its associated classes (e.g. the predicate classes)
 //## This method will be called once for each subclass of DataStorage
-void TestDataStorage( mitk::DataStorage* ds )
+void TestDataStorage( mitk::DataStorage* ds, std::string filename )
 {
   /* DataStorage valid? */
   MITK_TEST_CONDITION_REQUIRED(ds != NULL, "DataStorage valid?");
-
-  // load test image
-  mitk::StandardFileLocations::Pointer locator = mitk::StandardFileLocations::GetInstance();
-  MITK_TEST_CONDITION_REQUIRED(locator.IsNotNull(),"Instantiating StandardFileLocations");
-  std::string filename = locator->FindFile("US4DCyl.pic.gz", "Core/Code/Testing/Data/");
 
   mitk::PicFileReader::Pointer reader = mitk::PicFileReader::New();
   reader -> SetFileName(filename.c_str());

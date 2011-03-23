@@ -49,7 +49,6 @@ void ReaderLocaleTest(mitk::Point3D & refPoint, std::string filename)
 {
   MITK_TEST_OUTPUT(<< "---- Reader Test ---- ");
   
-  /* reader doesn't work
   mitk::PointSetReader::Pointer reader = mitk::PointSetReader::New();
   reader -> SetFileName(filename.c_str());
   reader -> Update();
@@ -67,7 +66,7 @@ void ReaderLocaleTest(mitk::Point3D & refPoint, std::string filename)
     MITK_TEST_FAILED_MSG(<< "File "<< filename << " can not be read - test will not applied." );
     return;
   }
-  */
+  
 }
 
 void WriterLocaleTest(mitk::Point3D & refPoint, std::string filename)
@@ -84,8 +83,6 @@ void WriterLocaleTest(mitk::Point3D & refPoint, std::string filename)
   mitk::PointSetWriter::Pointer writer = mitk::PointSetWriter::New();
   writer -> SetFileName(testFileName.c_str());
   writer -> SetInput(refPointSet);
-
-  /* writer doesn't work
   writer -> Write();
 
   //compare two .mps files
@@ -118,7 +115,7 @@ void WriterLocaleTest(mitk::Point3D & refPoint, std::string filename)
     refStream.close();
   }
   MITK_TEST_CONDITION_REQUIRED(!differ, "Write point set correct");
-  */
+  
 }
 
 int mitkPointSetLocaleTest(int argc, char* argv[])

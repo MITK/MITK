@@ -54,7 +54,6 @@ SET(MODULE_TESTS
   #mitkPicFileIOTest.cpp
   mitkStepperTest.cpp
   itkTotalVariationDenoisingImageFilterTest.cpp
-  mitkDICOMLocaleTest.cpp
   mitkPointSetLocaleTest.cpp
   mitkRenderingManagerTest.cpp
   vtkMitkThickSlicesFilterTest.cpp
@@ -88,5 +87,6 @@ SET(MODULE_CUSTOM_TESTS
     #mitkLabeledImageToSurfaceFilterTest.cpp
     #mitkExternalToolsTest.cpp
     mitkDicomSeriesReaderTest.cpp
+    mitkDICOMLocaleTest.cpp
 )
 

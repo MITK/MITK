@@ -12,3 +12,6 @@ SET_PROPERTY(TEST mitkDICOMLocaleTest PROPERTY LABELS MITK-Core)
 
 ADD_TEST(mitkEventMapperTest ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${TESTDRIVER} mitkEventMapperTest ${MITK_DATA_DIR}/TestStateMachine1.xml ${MITK_DATA_DIR}/TestStateMachine2.xml)
 SET_PROPERTY(TEST mitkEventMapperTest PROPERTY LABELS MITK-Core)
+
+ADD_TEST(mitkNodeDependentPointSetInteractorTest ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${TESTDRIVER} mitkNodeDependentPointSetInteractorTest ${MITK_DATA_DIR}/Pic3D.pic.gz ${MITK_DATA_DIR}/BallBinary30x30x30.pic.gz)
+SET_PROPERTY(TEST mitkNodeDependentPointSetInteractorTest PROPERTY LABELS MITK-Core)

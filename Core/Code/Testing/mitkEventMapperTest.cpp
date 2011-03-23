@@ -20,11 +20,12 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkEvent.h>
 #include <mitkInteractionConst.h>
 #include "mitkTestingMacros.h"
-#include <mitkStandardFileLocations.h>
 #include <mitkStateEvent.h>
-int mitkEventMapperTest(int /*argc*/, char* /*argv*/[])
+int mitkEventMapperTest(int argc, char* argv[])
 {
-  MITK_TEST_BEGIN("EventMapper")
+  MITK_TEST_BEGIN("EventMapper");
+
+  MITK_TEST_CONDITION_REQUIRED(argc >= 3, "Test if a file to load has been specified");
 
   //construct IDs to be checked
   mitk::Event* mouseButtonPressEvent = new mitk::Event(NULL, mitk::Type_MouseButtonPress, mitk::BS_LeftButton, mitk::BS_NoButton, mitk::Key_none);
@@ -48,7 +49,8 @@ int mitkEventMapperTest(int /*argc*/, char* /*argv*/[])
   eventMapper->RefreshStateEvent(&stateEvent);
   MITK_TEST_CONDITION_REQUIRED(stateEvent.GetId() == mouseButtonPressID,"Testing event mapping of standard xml-file: ") 
   
-  std::string xmlFileName1( mitk::StandardFileLocations::GetInstance()->FindFile("TestStateMachine1.xml", "Core/Code/Testing/Data") );
+//  std::string xmlFileName1( "TestStateMachine1.xml" );
+  std::string xmlFileName1( argv[1] );
   MITK_TEST_CONDITION_REQUIRED(!xmlFileName1.empty(),"Getting xml file 1: ") 
   MITK_TEST_CONDITION_REQUIRED(eventMapper->LoadBehavior(xmlFileName1),"Parsing xml file 1 should throw warning: ") 
   //test dubicate file loading
@@ -64,7 +66,8 @@ int mitkEventMapperTest(int /*argc*/, char* /*argv*/[])
   MITK_TEST_CONDITION_REQUIRED(stateEvent.GetId() == mouseButtonPressID,"Testing if standard information still available: ") 
 
   
-  std::string xmlFileName2( mitk::StandardFileLocations::GetInstance()->FindFile("TestStateMachine2.xml", "Core/Code/Testing/Data") );
+//  std::string xmlFileName2( "TestStateMachine2.xml" );
+  std::string xmlFileName2( argv[2] );
   MITK_TEST_CONDITION_REQUIRED(!xmlFileName2.empty(),"Getting xml file 2: ") 
   MITK_TEST_CONDITION_REQUIRED(eventMapper->LoadBehavior(xmlFileName2),"Parsing xml file 2. Warning of double entry should be thrown: ") 
 

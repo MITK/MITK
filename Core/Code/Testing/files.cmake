@@ -31,7 +31,6 @@ SET(MODULE_TESTS
   mitkPointSetFileIOTest.cpp
   mitkPointSetTest.cpp
   mitkPointSetInteractorTest.cpp
-  mitkNodeDependentPointSetInteractorTest.cpp
   mitkPropertyListTest.cpp
   #mitkRegistrationBaseTest.cpp
   #mitkSegmentationInterpolationTest.cpp
@@ -88,5 +87,6 @@ SET(MODULE_CUSTOM_TESTS
     mitkDicomSeriesReaderTest.cpp
     mitkDICOMLocaleTest.cpp
     mitkEventMapperTest.cpp
+    mitkNodeDependentPointSetInteractorTest.cpp
 )
 

@@ -38,7 +38,7 @@ void SendPositionEvent(mitk::BaseRenderer* sender, int type, int button, int but
 }
 
 //test related to tutorial Step5.cpp
-int mitkNodeDependentPointSetInteractorTest(int /*argc*/, char* /*argv*/[])
+int mitkNodeDependentPointSetInteractorTest(int argc, char* argv[])
 {
   MITK_TEST_BEGIN("NodeDependentPointSetInteractor");
 
@@ -54,8 +54,6 @@ int mitkNodeDependentPointSetInteractorTest(int /*argc*/, char* /*argv*/[])
   //associated interactor may not change the data
   mitk::DataNode::Pointer node1, node2;      
   mitk::DataNodeFactory::Pointer nodeReader = mitk::DataNodeFactory::New();
-  mitk::StandardFileLocations::Pointer locator = mitk::StandardFileLocations::GetInstance();
-  MITK_TEST_CONDITION_REQUIRED(locator.IsNotNull(),"Instantiating StandardFileLocations");
   
   MITK_TEST_CONDITION_REQUIRED(argc >= 3, "Test if a files to load has been specified");
 

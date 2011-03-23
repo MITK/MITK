@@ -32,8 +32,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkTestingMacros.h>
 
 
-int mitkImageTest(int /*argc*/, char* /*argv*/[])
+int mitkImageTest(int argc, char* argv[])
 {
+
   MITK_TEST_BEGIN(mitkImageTest);
 
   //Create Image out of nowhere
@@ -423,11 +424,11 @@ int mitkImageTest(int /*argc*/, char* /*argv*/[])
   
   mitk::DataNode::Pointer node;      
   mitk::DataNodeFactory::Pointer nodeReader = mitk::DataNodeFactory::New();
-  mitk::StandardFileLocations::Pointer locator = mitk::StandardFileLocations::GetInstance();
-  MITK_TEST_CONDITION_REQUIRED(locator.IsNotNull(),"Instantiating StandardFileLocations") 
+  //mitk::StandardFileLocations::Pointer locator = mitk::StandardFileLocations::GetInstance();
+  //MITK_TEST_CONDITION_REQUIRED(locator.IsNotNull(),"Instantiating StandardFileLocations") 
   try
   {
-    const std::string filename = locator->FindFile("brain.mhd", "Core/Code/Testing/Data");   
+    const std::string filename = std::string(argv[1]);   
     nodeReader->SetFileName(filename);
     nodeReader->Update();
     node = nodeReader->GetOutput();      

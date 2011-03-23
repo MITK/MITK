@@ -4,7 +4,6 @@ SET(MODULE_TESTS
   mitkCoreObjectFactoryTest.cpp 
   mitkPointSetWriterTest.cpp
   mitkMaterialTest.cpp
-  mitkDataNodeTest.cpp
   mitkActionTest.cpp
   mitkDataStorageTest.cpp
   mitkEnumerationPropertyTest.cpp
@@ -86,6 +85,7 @@ SET(MODULE_TESTIMAGES
 SET(MODULE_CUSTOM_TESTS 
     #mitkLabeledImageToSurfaceFilterTest.cpp
     #mitkExternalToolsTest.cpp
+    mitkDataNodeTest.cpp
     mitkDicomSeriesReaderTest.cpp
     mitkDICOMLocaleTest.cpp
 )

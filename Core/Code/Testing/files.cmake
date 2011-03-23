@@ -5,7 +5,6 @@ SET(MODULE_TESTS
   mitkPointSetWriterTest.cpp
   mitkMaterialTest.cpp
   mitkActionTest.cpp
-  mitkDataStorageTest.cpp
   mitkEnumerationPropertyTest.cpp
   mitkEventMapperTest.cpp
   mitkEventTest.cpp
@@ -38,7 +37,6 @@ SET(MODULE_TESTS
   mitkSlicedGeometry3DTest.cpp
   mitkSliceNavigationControllerTest.cpp
   mitkStateMachineTest.cpp
-  mitkStateMachineFactoryTest.cpp
   mitkStateTest.cpp
   mitkSurfaceTest.cpp
   mitkSurfaceToSurfaceFilterTest.cpp
@@ -85,8 +83,10 @@ SET(MODULE_TESTIMAGES
 SET(MODULE_CUSTOM_TESTS 
     #mitkLabeledImageToSurfaceFilterTest.cpp
     #mitkExternalToolsTest.cpp
+    mitkDataStorageTest.cpp
     mitkDataNodeTest.cpp
     mitkDicomSeriesReaderTest.cpp
     mitkDICOMLocaleTest.cpp
+    mitkStateMachineFactoryTest.cpp
 )
 

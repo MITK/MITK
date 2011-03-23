@@ -8,7 +8,6 @@ SET(MODULE_TESTS
   mitkActionTest.cpp
   mitkDataStorageTest.cpp
   mitkEnumerationPropertyTest.cpp
-  mitkEventMapperTest.cpp
   mitkEventTest.cpp
   mitkFocusManagerTest.cpp
   mitkGenericPropertyTest.cpp
@@ -88,5 +87,6 @@ SET(MODULE_CUSTOM_TESTS
     #mitkExternalToolsTest.cpp
     mitkDicomSeriesReaderTest.cpp
     mitkDICOMLocaleTest.cpp
+    mitkEventMapperTest.cpp
 )
 

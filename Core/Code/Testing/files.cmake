@@ -1,7 +1,7 @@
 
 # tests with no extra command line parameter
 SET(MODULE_TESTS
-  mitkCoreObjectFactoryTest.cpp 
+  mitkCoreObjectFactoryTest.cpp
   mitkPointSetWriterTest.cpp
   mitkMaterialTest.cpp
   mitkDataNodeTest.cpp
@@ -55,7 +55,6 @@ SET(MODULE_TESTS
   mitkStepperTest.cpp
   itkTotalVariationDenoisingImageFilterTest.cpp
   mitkDICOMLocaleTest.cpp
-  mitkPointSetLocaleTest.cpp
   mitkRenderingManagerTest.cpp
   vtkMitkThickSlicesFilterTest.cpp
   mitkNodePredicateSourceTest.cpp
@@ -84,9 +83,9 @@ SET(MODULE_TESTIMAGES
   ball.stl
 )
 
-SET(MODULE_CUSTOM_TESTS 
+SET(MODULE_CUSTOM_TESTS
     #mitkLabeledImageToSurfaceFilterTest.cpp
     #mitkExternalToolsTest.cpp
     mitkDicomSeriesReaderTest.cpp
+    mitkPointSetLocaleTest.cpp
 )
-

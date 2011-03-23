@@ -57,17 +57,22 @@ int mitkNodeDependentPointSetInteractorTest(int /*argc*/, char* /*argv*/[])
   mitk::StandardFileLocations::Pointer locator = mitk::StandardFileLocations::GetInstance();
   MITK_TEST_CONDITION_REQUIRED(locator.IsNotNull(),"Instantiating StandardFileLocations");
   
+  MITK_TEST_CONDITION_REQUIRED(argc >= 3, "Test if a files to load has been specified");
+
+
   try
   {
     //file 1
-    const std::string filename1 = locator->FindFile("Pic3D.pic.gz", "Core/Code/Testing/Data");   
+//    const std::string filename1 = locator->FindFile("Pic3D.pic.gz", "Core/Code/Testing/Data");
+    const std::string filename1 = argv[1];
     nodeReader->SetFileName(filename1);
     nodeReader->Update();
     node1 = nodeReader->GetOutput();
     ds->Add(node1);
 
     //file 2
-    const std::string filename2 = locator->FindFile("BallBinary30x30x30.pic.gz", "Core/Code/Testing/Data");   
+//    const std::string filename2 = locator->FindFile("BallBinary30x30x30.pic.gz", "Core/Code/Testing/Data");
+    const std::string filename2 = argv[2];
     nodeReader->SetFileName(filename2);
     nodeReader->Update();
     node2 = nodeReader->GetOutput();

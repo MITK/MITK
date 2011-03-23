@@ -15,3 +15,6 @@ SET_PROPERTY(TEST mitkEventMapperTest PROPERTY LABELS MITK-Core)
 
 ADD_TEST(mitkNodeDependentPointSetInteractorTest ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${TESTDRIVER} mitkNodeDependentPointSetInteractorTest ${MITK_DATA_DIR}/Pic3D.pic.gz ${MITK_DATA_DIR}/BallBinary30x30x30.pic.gz)
 SET_PROPERTY(TEST mitkNodeDependentPointSetInteractorTest PROPERTY LABELS MITK-Core)
+
+ADD_TEST(mitkDataStorageTest_US4DCyl ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${TESTDRIVER} mitDataStorageTest ${MITK_DATA_DIR}/US4DCyl.pic.gz)
+SET_PROPERTY(TEST mitkDataStorageTest_US4DCyl PROPERTY LABELS MITK-Core)

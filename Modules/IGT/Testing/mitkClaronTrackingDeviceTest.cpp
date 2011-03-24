@@ -70,9 +70,9 @@ public:
     unsigned int max = 100;
 
     testInstance = mitk::ClaronTrackingDevice::New();
-    for (unsigned int i = 0; i < max; i++) 
+    for (unsigned int i = 0; i < max; i++)
       testInstance->AddTool("Tool", toolFileName.c_str());
-    if ((testInstance->GetToolCount() != max)) 
+    if ((testInstance->GetToolCount() != max))
       failed = true;
     MITK_TEST_CONDITION(!failed, "Testing tool configuration (maximum of 100 tools):");
   }
@@ -118,9 +118,9 @@ public:
 };
 
 /**
-* This function is testing the Class ClaronTrackingDevice. For most tests we would need the MicronTracker hardware, so only a few
-* simple tests, which can run without the hardware are implemented yet (2009, January, 23rd). As soon as there is a working
-* concept to test the tracking classes which are very close to the hardware on all systems more tests are needed here.
+* This function is testing methods of the class ClaronTrackingDevice which are independent from the hardware. For more tests we would need 
+* the MicronTracker hardware, so only a few simple tests, which can run without the hardware are tested here. More tests can be found in the 
+* class ClaronTrackingDeviceHardwareTests which tests the interaction with the hardware. 
 */
 int mitkClaronTrackingDeviceTest(int /* argc */, char* /*argv*/[])
 {

@@ -609,7 +609,8 @@ FILE_PATTERNS          = *.h \
                          *.cpp \
                          *.dox \
                          *.txx \
-                         *.cxx
+                         *.cxx \
+                         *.cmake
 
 # The RECURSIVE tag can be used to turn specify whether or not subdirectories
 # should be searched for input files as well. Possible values are YES and NO.
@@ -634,7 +635,9 @@ EXCLUDE                = @MITK_SOURCE_DIR@/Utilities/vecmath/ \
                          @MITK_SOURCE_DIR@/Deprecated/ \
                          @MITK_SOURCE_DIR@/Build/ \
                          @MITK_SOURCE_DIR@/Core/Testing/ \
-                         @MITK_SOURCE_DIR@/CMake/ \
+                         @MITK_SOURCE_DIR@/CMake/PackageDepends \
+                         @MITK_SOURCE_DIR@/CMake/QBundleTemplate \
+                         @MITK_SOURCE_DIR@/CMakeExternals \
                          @MITK_SOURCE_DIR@/Modules/QmitkExt/vtkQtChartHeaders/ \
                          @MITK_DOXYGEN_ADDITIONAL_EXCLUDE_DIRS@
 
@@ -651,7 +654,9 @@ EXCLUDE_SYMLINKS       = NO
 # for example use the pattern */test/*
 
 EXCLUDE_PATTERNS       = moc_* \
-                         Register*
+                         Register* \
+                         */files.cmake \
+                         @MITK_BINARY_DIR@/*.cmake
 
 # The EXCLUDE_SYMBOLS tag can be used to specify one or more symbol names
 # (namespaces, classes, functions, etc.) that should be excluded from the
@@ -713,7 +718,7 @@ INPUT_FILTER           =
 # info on how filters are used. If FILTER_PATTERNS is empty, INPUT_FILTER
 # is applied to all files.
 
-FILTER_PATTERNS        =
+FILTER_PATTERNS        = *.cmake=@CMakeDoxygenFilter_EXECUTABLE@
 
 # If the FILTER_SOURCE_FILES tag is set to YES, the input filter (if set using
 # INPUT_FILTER) will be used to filter the input files when producing source

@@ -59,6 +59,10 @@ IF(MITK_USE_BLUEBERRY)
   SET(MITK_DOXYGEN_ENABLED_SECTIONS "${MITK_DOXYGEN_ENABLED_SECTIONS} BLUEBERRY")
 ENDIF(MITK_USE_BLUEBERRY)
 
+# Compile a doxygen input filter for processing CMake scripts
+INCLUDE(mitkFunctionCMakeDoxygenFilterCompile)
+mitkFunctionCMakeDoxygenFilterCompile(NAMESPACE "CMake")
+
 # Configure some doxygen options
 IF(NOT MITK_DOXYGEN_GENERATE_TODOLIST)
   SET(MITK_DOXYGEN_GENERATE_TODOLIST "NO")

@@ -14,7 +14,6 @@ SET(MODULE_TESTS
   mitkGlobalInteractionTest.cpp
   mitkImageDataItemTest.cpp
   #mitkImageMapper2DTest.cpp
-  mitkImageTest.cpp
   mitkImageGeneratorTest.cpp
   mitkBaseDataTest.cpp
   #mitkImageToItkTest.cpp
@@ -88,5 +87,6 @@ SET(MODULE_CUSTOM_TESTS
     mitkDICOMLocaleTest.cpp
     mitkEventMapperTest.cpp
     mitkNodeDependentPointSetInteractorTest.cpp
+	mitkImageTest.cpp
 )
 

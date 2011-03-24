@@ -1,7 +1,7 @@
 SET( VIDEOINPUT_LIB "" CACHE FILEPATH "Search for the videoInput.lib file" )
 SET( VIDEOINPUT_HEADER_DIR "" CACHE PATH "The path containing VideoInput.h" )
 
-message(STATUS "now in videoinput")
+#message(STATUS "now in videoinput")
 
 IF(CMAKE_CL_64)
   SET( STRMBASD_LIB "" CACHE FILEPATH "Search for the strmbasd.lib file. Provided by DirectShow, if not found, download Microsoft Platform SDK and go to the Samples_Multimedia_DirectShow_BaseClasses folder and compile the BaseClasses solution to generate the strmbasd.lib. Place it in the same folder as the videoInput.lib")

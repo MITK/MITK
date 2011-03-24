@@ -29,6 +29,12 @@ public:
 int mitkClaronTrackingDeviceHardwareTest(int argc, char* argv[])
 {
   MITK_TEST_BEGIN("ClaronTrackingDeviceHardware");
+
+  mitk::ClaronTrackingDevice::Pointer myDevice = mitk::ClaronTrackingDevice::New();
+  MITK_TEST_CONDITION(myDevice->OpenConnection(),"Opening connection to Tracking Device (MicronTracker).");
+  MITK_TEST_CONDITION(myDevice->StartTracking(),"...start tracking");
+  MITK_TEST_CONDITION(myDevice->StopTracking(),"...stop tracking");
+  MITK_TEST_CONDITION(myDevice->CloseConnection(),"...close connection");
   //TODO: test hardware here
   MITK_TEST_END();
 }

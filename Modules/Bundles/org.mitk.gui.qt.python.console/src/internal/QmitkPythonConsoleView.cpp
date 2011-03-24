@@ -31,6 +31,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkCoreObjectFactory.h"
 #include <mitkIDataStorageReference.h>
 #include <mitkIDataStorageService.h>
+#include <mitkRenderingManager.h>
 #include <mitkDataStorageEditorInput.h>
 #include <dPython.h>
 #include <QMetaType>
@@ -135,6 +136,7 @@ void QmitkPythonConsoleView::SetCommandHistory(const QString& command)
 {
   QmitkPythonMediator::getInstance()->SetCommandHistory(command);
   QmitkPythonMediator::getInstance()->update();
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
 }
 
 void QmitkPythonConsoleView::update()

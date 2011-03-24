@@ -238,6 +238,7 @@ SET(WRAP_SOURCES_TEST
 	wrap_vtkMitkRectangleProp
 	wrap_vtkMitkRenderProp
 	wrap_vtkMitkThickSlicesFilter
+	wrap_mitkManufacturerLogo
 	
 	wrap_mitkCommonSuperclasses
 	wrap_mitkImageCaster

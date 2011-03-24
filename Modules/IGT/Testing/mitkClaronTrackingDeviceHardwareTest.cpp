@@ -23,11 +23,13 @@ PURPOSE.  See the above copyright notices for more information.
 class mitkClaronTrackingDeviceHardwareTestClass
 {
 public:
+};
 
 /** This function is testing the Class ClaronTrackingDevice in interaction with the hardware. So a MicronTracker Tracking System has to be installed and connected to run this test. */
-int mitkClaronTrackingHardwareDeviceTest(int /* argc */, char* /*argv*/[])
+int mitkClaronTrackingDeviceHardwareTest(int argc, char* argv[])
 {
   MITK_TEST_BEGIN("ClaronTrackingDeviceHardware");
   //TODO: test hardware here
   MITK_TEST_END();
 }
+

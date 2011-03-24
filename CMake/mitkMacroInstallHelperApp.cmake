@@ -1,7 +1,7 @@
-# MITK specific cross plattform install macro
-#
-# Usage: MITK_INSTALL_HELPER_APP(target1 [target2] ....)
-#
+#! MITK specific cross plattform install macro
+#!
+#! Usage: MITK_INSTALL_HELPER_APP(target1 [target2] ....)
+#!
 MACRO(MITK_INSTALL_HELPER_APP)
   MACRO_PARSE_ARGUMENTS(_install "TARGETS;EXECUTABLES;PLUGINS;LIBRARY_DIRS" "GLOB_PLUGINS" ${ARGN})
   LIST(APPEND _install_TARGETS ${_install_DEFAULT_ARGS})

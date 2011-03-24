@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>281</width>
-    <height>402</height>
+    <height>443</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -198,6 +198,16 @@
         </property>
         <property name="text">
          <string>RD (Radial Diffusivity)</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCommandLinkButton" name="m_MDButton">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>MD (Mean Diffusivity)</string>
         </property>
        </widget>
       </item>

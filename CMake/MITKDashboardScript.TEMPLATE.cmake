@@ -13,7 +13,7 @@ cmake_minimum_required(VERSION 2.8.2)
 # Dashboard properties
 #
 
-set(MY_COMPILER "g++4.4.5")
+set(MY_COMPILER "gcc-4.4.5")
 # For Windows, e.g.
 #set(MY_COMPILER "VC9.0")
 
@@ -66,6 +66,7 @@ set(CTEST_BINARY_DIRECTORY "${CTEST_DASHBOARD_ROOT}/MITK-Superbuild-${CTEST_BUIL
 
 set(ADDITIONNAL_CMAKECACHE_OPTION "
 MITK_USE_Boost:BOOL=ON
+MITK_USE_OPEN_CV:BOOL=ON
 ")
 
 # List of test that should be explicitly disabled on this machine

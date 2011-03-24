@@ -31,9 +31,6 @@ set(expected_variables
   PROJECT_BUILD_DIR
   SUPERBUILD_TARGETS
   )
-if(WITH_DOCUMENTATION)
-  list(APPEND expected_variables DOCUMENTATION_ARCHIVES_OUTPUT_DIRECTORY)
-endif()
 
 foreach(var ${expected_variables})
   if(NOT DEFINED ${var})
@@ -104,6 +101,9 @@ set(CTEST_UPDATE_COMMAND "${CTEST_GIT_COMMAND}")
 MACRO(run_ctest)
   set(dartclient_error)
 
+  set_property(GLOBAL PROPERTY SubProject SuperBuild)
+  set_property(GLOBAL PROPERTY Label SuperBuild)
+
   ctest_start(${model})
   ctest_update(SOURCE "${CTEST_CHECKOUT_DIR}" RETURN_VALUE res)
   
@@ -128,8 +128,7 @@ CMAKE_BUILD_TYPE:STRING=${CTEST_BUILD_CONFIGURATION}
 QT_QMAKE_EXECUTABLE:FILEPATH=${QT_QMAKE_EXECUTABLE}
 SUPERBUILD_EXCLUDE_MITKBUILD_TARGET:BOOL=TRUE
 WITH_COVERAGE:BOOL=${WITH_COVERAGE}
-#DOCUMENTATION_TARGET_IN_ALL:BOOL=${WITH_DOCUMENTATION}
-DOCUMENTATION_ARCHIVES_OUTPUT_DIRECTORY:PATH=${DOCUMENTATION_ARCHIVES_OUTPUT_DIRECTORY}
+MITK_DOXYGEN_OUTPUT_DIR:PATH=${MITK_DOXYGEN_OUTPUT_DIR}
 ${ADDITIONNAL_CMAKECACHE_OPTION}
 ")
   endif()
@@ -145,9 +144,6 @@ ${ADDITIONNAL_CMAKECACHE_OPTION}
       
     message("----------- [ Configure SuperBuild ] -----------")
     
-    set_property(GLOBAL PROPERTY SubProject SuperBuild)
-    set_property(GLOBAL PROPERTY Label SuperBuild)
-     
     ctest_configure(BUILD "${CTEST_BINARY_DIRECTORY}"
       OPTIONS "-DCTEST_USE_LAUNCHERS=${CTEST_USE_LAUNCHERS}"
       RETURN_VALUE res
@@ -263,6 +259,10 @@ ${ADDITIONNAL_CMAKECACHE_OPTION}
         file(WRITE "${CTEST_BINARY_DIRECTORY}/CMakeFiles/TargetDirectories.txt" "${old_coverage_dirs}")
       
       endforeach()
+
+      # switch back to SuperBuild label
+      set_property(GLOBAL PROPERTY SubProject SuperBuild)
+      set_property(GLOBAL PROPERTY Label SuperBuild)
       
       message("----------- [ Finish SuperBuild ] -----------")
     else()

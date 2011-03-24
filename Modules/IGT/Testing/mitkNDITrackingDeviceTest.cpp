@@ -17,20 +17,20 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkNDITrackingDevice.h"
 #include "mitkNDIPassiveTool.h"
-//#include "mitkSerialCommunication.h"
-//#include "mitkNDIPassiveToolTest.cpp"
 #include "mitkTestingMacros.h"
 #include "mitkTrackingTypes.h"
 #include "mitkTrackingTool.h"
 #include "mitkStandardFileLocations.h"
 
-
+/** @brief This test makes general tests of the methods of class NDITrackingDevice. The tracking device need not to be connected to the system to run this tests. 
+ *         A few methods which needs the tracking device to be connected are not tested here.
+ */
 int mitkNDITrackingDeviceTest(int /* argc */, char* /*argv*/[])
 {
   // always start with this!
   MITK_TEST_BEGIN("NDITrackingDevice");
 
-  // let's create an object of our class  
+  // let's create an object of our class
   mitk::NDITrackingDevice::Pointer myNDITrackingDevice = mitk::NDITrackingDevice::New();
 
   // first test: did this work?
@@ -38,46 +38,40 @@ int mitkNDITrackingDeviceTest(int /* argc */, char* /*argv*/[])
   // it makes no sense to continue without an object.
   MITK_TEST_CONDITION_REQUIRED(myNDITrackingDevice.IsNotNull(),"Testing instantiation\n");
 
-
+  //test method GetState
   MITK_TEST_CONDITION_REQUIRED(myNDITrackingDevice->GetState() == mitk::TrackingDevice::Setup ,"Checking tracking device state == setup.\n");
 
-  //OpenConnection
-  //MITK_TEST_CONDITION( (!myNDITrackingDevice->OpenConnection()), "Testing behavior of method OpenConnection() (Errors should occur because Tracking Device is not activated).");
-  // <-- this test is dangerous. It implies that no tracking device is connected to the dartclient pc, which could be wrong.
-
-  //CloseConnection
+  //test method CloseConnection
   MITK_TEST_CONDITION( (myNDITrackingDevice->CloseConnection()), "Testing behavior of method CloseConnection().");
 
-  //StartTracking
+  //test method StartTracking
   MITK_TEST_CONDITION( (!myNDITrackingDevice->StartTracking()), "Testing behavior of method StartTracking().");
 
-  //Beep(unsigned char count)
+  //test method Beep(unsigned char count)
   MITK_TEST_CONDITION( (myNDITrackingDevice->Beep(3)== false), "Testing behavior of method Beep(). No Tracking device initialized!");
 
-  //AddTool( const char* toolName, const char* fileName, TrackingPriority p /*= NDIPassiveTool::Dynamic*/ )
+  //test method AddTool( const char* toolName, const char* fileName, TrackingPriority p /*= NDIPassiveTool::Dynamic*/ )
   std::string file = mitk::StandardFileLocations::GetInstance()->FindFile("SROMFile.rom", "Modules/IGT/Testing/Data");
   const char *name = file.c_str();
-
   MITK_TEST_CONDITION( (myNDITrackingDevice->AddTool("Tool0", name))!=NULL, "Testing AddTool() for tool 0.");
 
-  //GetToolCount()
+  //test method GetToolCount()
   MITK_TEST_CONDITION( (myNDITrackingDevice->GetToolCount())==1, "Testing GetToolCount() for one tool.");
 
-  //GetTool(unsigned int toolNumber)
+  //test method GetTool(unsigned int toolNumber)
   MITK_TEST_CONDITION( (myNDITrackingDevice->GetTool(0))!=NULL, "Testing GetTool() for tool 0.");
-
   mitk::TrackingTool::Pointer testtool = myNDITrackingDevice->GetTool(0);
 
-  //UpdateTool(mitk::TrackingTool* tool)
+  //test method UpdateTool(mitk::TrackingTool* tool)
   MITK_TEST_CONDITION( (!myNDITrackingDevice->UpdateTool(testtool)), "Testing behavior of method UpdateTool().\n");
 
-  //RemoveTool(mitk::TrackingTool* tool)
+  //test method RemoveTool(mitk::TrackingTool* tool)
   MITK_TEST_CONDITION( (myNDITrackingDevice->RemoveTool(testtool)), "Testing RemoveTool()for tool 0.");
 
-  //SetOperationMode(OperationMode mode)
+  //test method SetOperationMode(OperationMode mode)
   MITK_TEST_CONDITION( (myNDITrackingDevice->SetOperationMode( mitk::MarkerTracking3D )== true ), "Testing behavior of method SetOperationMode().\n");
 
-  //GetOperationMode()
+  //test method GetOperationMode()
   myNDITrackingDevice->SetOperationMode(mitk::MarkerTracking3D);
   MITK_TEST_CONDITION( (myNDITrackingDevice->GetOperationMode()==2),"" );
 
@@ -87,7 +81,7 @@ int mitkNDITrackingDeviceTest(int /* argc */, char* /*argv*/[])
   myNDITrackingDevice->SetOperationMode(mitk::HybridTracking);
   MITK_TEST_CONDITION( (myNDITrackingDevice->GetOperationMode()==3), "Testing behavior of method GetOperationMode().\n");
 
-  //GetMarkerPositions(MarkerPointContainerType* markerpositions)
+  //test method GetMarkerPositions(MarkerPointContainerType* markerpositions)
   mitk::MarkerPointContainerType* markerpositions = new mitk::MarkerPointContainerType();
   MITK_TEST_CONDITION( (!myNDITrackingDevice->GetMarkerPositions(markerpositions)), "Testing behavior of method GetMarkerPositions().\n");
   delete markerpositions;

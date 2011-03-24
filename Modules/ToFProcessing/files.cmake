@@ -1,0 +1,10 @@
+SET(CPP_FILES
+  mitkPinholeCameraModel.cpp
+  mitkToFCompositeFilter.cpp
+  mitkToFDistanceImageToPointSetFilter.cpp
+  mitkToFDistanceImageToSurfaceFilter.cpp
+  mitkToFProcessingCommon.cpp  
+  mitkToFSurfaceVtkMapper3D.cpp
+  mitkToFVisualizationFilter.cpp
+  mitkToFTestingCommon.cpp
+)

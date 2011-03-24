@@ -7,12 +7,11 @@ IF(DEFINED MITK_DATA_DIR AND NOT EXISTS ${MITK_DATA_DIR})
   MESSAGE(FATAL_ERROR "MITK_DATA_DIR variable is defined but corresponds to non-existing directory")
 ENDIF()
 
-SET(MITK-Data_DEPENDS)
+SET(proj MITK-Data)
+SET(proj_DEPENDENCIES)
+SET(MITK-Data_DEPENDS ${proj})
 
 IF(BUILD_TESTING)
-  SET(proj MITK-Data)
-  SET(proj_DEPENDENCIES)
-  SET(MITK-Data_DEPENDS ${proj})
 
   ExternalProject_Add(${proj}
     GIT_REPOSITORY http://git.mitk.org/MITK-Data.git

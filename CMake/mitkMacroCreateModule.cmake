@@ -2,19 +2,23 @@
 #
 # MITK_CREATE_MODULE 
 #
-# Creates a module for the automatic module dependeny system within MITK.
-# Configurations are generated in the moduleConf directory. 
-#
-# USAGE:
-#
-# MITK_CREATE_MODULE( <moduleName>
-#     [INCLUDE_DIRS <include directories>]
-#     [INTERNAL_INCLUDE_DIRS <internally used include directories>]
-#     [DEPENDS <modules we need>]
-#     [PROVIDES <library name which is built>]
-#     [PACKAGE_DEPENDS <packages we need, like ITK, VTK, QT>]
-#     [EXPORT_DEFINE <declspec macro name for dll exports>]
-#     [QT_MODULE]
+#! Creates a module for the automatic module dependency system within MITK.
+#! Configurations are generated in the moduleConf directory. 
+#!
+#! USAGE:
+#!
+#! \code
+#! MITK_CREATE_MODULE( <moduleName>
+#!     [INCLUDE_DIRS <include directories>]
+#!     [INTERNAL_INCLUDE_DIRS <internally used include directories>]
+#!     [DEPENDS <modules we need>]
+#!     [PROVIDES <library name which is built>]
+#!     [PACKAGE_DEPENDS <packages we need, like ITK, VTK, QT>]
+#!     [EXPORT_DEFINE <declspec macro name for dll exports>]
+#!     [QT_MODULE]
+#! \endcode
+#!
+#! \param MODULE_NAME_IN The name for the new module
 #
 ##################################################################
 MACRO(MITK_CREATE_MODULE MODULE_NAME_IN)

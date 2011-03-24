@@ -18,6 +18,7 @@
 #
 ###########################################################################
 
+#! \brief Get the gcc version
 FUNCTION(mitkFunctionGetGccVersion path_to_gcc output_var)
   IF(CMAKE_COMPILER_IS_GNUCXX)
     EXECUTE_PROCESS(

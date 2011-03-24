@@ -1,9 +1,12 @@
-#
-# Extracts the current git revision hash and branch/tag name
-# and provides these in
-# MITK_WC_REVISION_HASH
-# MITK_WC_REVISION_NAME
-#
+#!
+#! Extracts the current git revision hash and branch/tag name
+#! and provides these in ${prefix}_WC_REVISION_HASH and
+#! ${prefix}_WC_REVISION_NAME
+#!
+#! \param source_dir The directory containing a git repository
+#! \param prefix A prefix to prepend to the variables containing
+#!               the revision hash and name.
+#!
 function(mitkFunctionGetVersion source_dir prefix)
   find_package(Git)
   if(GIT_FOUND)

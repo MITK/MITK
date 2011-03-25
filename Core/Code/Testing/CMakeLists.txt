@@ -18,3 +18,6 @@ SET_PROPERTY(TEST mitkNodeDependentPointSetInteractorTest PROPERTY LABELS MITK-C
 
 ADD_TEST(mitkDataStorageTest_US4DCyl ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${TESTDRIVER} mitkDataStorageTest ${MITK_DATA_DIR}/US4DCyl.pic.gz)
 SET_PROPERTY(TEST mitkDataStorageTest_US4DCyl PROPERTY LABELS MITK-Core)
+
+ADD_TEST(mitkStateMachineFactoryTest_TestStateMachine1_2 ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${TESTDRIVER} mitkStateMachineFactoryTest ${MITK_DATA_DIR}/TestStateMachine1.xml ${MITK_DATA_DIR}/TestStateMachine2.xml)
+SET_PROPERTY(TEST mitkStateMachineFactoryTest_TestStateMachine1_2 PROPERTY LABELS MITK-Core)

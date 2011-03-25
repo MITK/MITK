@@ -19,9 +19,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkStateMachineFactory.h>
 #include <mitkState.h>
 #include "mitkTestingMacros.h"
-#include <mitkStandardFileLocations.h>
 #include <mitkInteractionConst.h>
-int mitkStateMachineFactoryTest(int /*argc*/, char* /*argv*/[])
+int mitkStateMachineFactoryTest(int argc, char* argv[])
 {
   MITK_TEST_BEGIN("StateMachineFactory")
   //create statemachinefactory
@@ -34,7 +33,7 @@ int mitkStateMachineFactoryTest(int /*argc*/, char* /*argv*/[])
   mitk::State::Pointer state = statemachineFactory->GetStartState("global");
   MITK_TEST_CONDITION_REQUIRED(state.IsNotNull(),"Testing GetStartState() of GlobalInteraction state machine pattern: ") 
 
-  std::string xmlFileName1( mitk::StandardFileLocations::GetInstance()->FindFile("TestStateMachine1.xml", "Core/Code/Testing/Data") );
+  std::string xmlFileName1 = argv[1];
   MITK_TEST_CONDITION_REQUIRED(!xmlFileName1.empty(),"Getting xml file 1: ") 
   MITK_TEST_CONDITION_REQUIRED(statemachineFactory->LoadBehavior(xmlFileName1),"Parsing xml file 1: ") 
   state = statemachineFactory->GetStartState("test1");
@@ -44,7 +43,7 @@ int mitkStateMachineFactoryTest(int /*argc*/, char* /*argv*/[])
   state = statemachineFactory->GetStartState("global");
   MITK_TEST_CONDITION_REQUIRED(state.IsNotNull(),"Testing if previous loaded state machine patterns are still accessible: ") 
   
-  std::string xmlFileName2( mitk::StandardFileLocations::GetInstance()->FindFile("TestStateMachine2.xml", "Core/Code/Testing/Data") );
+  std::string xmlFileName2 = argv[2];
   MITK_TEST_CONDITION_REQUIRED(!xmlFileName2.empty(),"Getting xml file 2: ") 
   MITK_TEST_CONDITION_REQUIRED(statemachineFactory->LoadBehavior(xmlFileName2),"Parsing xml file 2. Schould throw a fatal error due to already existing pattern name: ") 
   state = statemachineFactory->GetStartState("test4");

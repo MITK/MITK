@@ -35,7 +35,6 @@ SET(MODULE_TESTS
   mitkSlicedGeometry3DTest.cpp
   mitkSliceNavigationControllerTest.cpp
   mitkStateMachineTest.cpp
-  mitkStateMachineFactoryTest.cpp
   mitkStateTest.cpp
   mitkSurfaceTest.cpp
   mitkSurfaceToSurfaceFilterTest.cpp
@@ -88,5 +87,6 @@ SET(MODULE_CUSTOM_TESTS
     mitkDICOMLocaleTest.cpp
     mitkEventMapperTest.cpp
     mitkNodeDependentPointSetInteractorTest.cpp
+    mitkStateMachineFactoryTest.cpp
 )
 

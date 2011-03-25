@@ -40,6 +40,7 @@ mitk::ClaronTrackingDevice::ClaronTrackingDevice(): mitk::TrackingDevice()
   {
 #ifdef MITK_MICRON_TRACKER_TEMP_DIR
     m_ToolfilesDir = std::string(MITK_MICRON_TRACKER_TEMP_DIR);
+	m_ToolfilesDir.append("/MT-tools");
 #endif
 #ifdef MITK_MICRON_TRACKER_CALIBRATION_DIR
     m_CalibrationDir = std::string(MITK_MICRON_TRACKER_CALIBRATION_DIR);
@@ -106,13 +107,13 @@ bool mitk::ClaronTrackingDevice::StartTracking()
   //##################################################################################
 
   //be sure that the temp-directory is empty at start: delete all files in the tool files directory
-  //itksys::SystemTools::RemoveADirectory(m_ToolfilesDir.c_str());
-  //itksys::SystemTools::MakeDirectory(m_ToolfilesDir.c_str());
+  itksys::SystemTools::RemoveADirectory(m_ToolfilesDir.c_str());
+  itksys::SystemTools::MakeDirectory(m_ToolfilesDir.c_str());
 
   //copy all toolfiles into the temp directory
   for (unsigned int i=0; i<m_AllTools.size(); i++)
   {
-    //itksys::SystemTools::CopyAFile(m_AllTools[i]->GetFile().c_str(), m_ToolfilesDir.c_str());
+    itksys::SystemTools::CopyAFile(m_AllTools[i]->GetFile().c_str(), m_ToolfilesDir.c_str());
   }
   this->SetState(Tracking);            // go to mode Tracking
   this->m_StopTrackingMutex->Lock();  // update the local copy of m_StopTracking
@@ -143,8 +144,7 @@ bool mitk::ClaronTrackingDevice::StopTracking()
 {
   Superclass::StopTracking();
   //delete all files in the tool files directory
-  //itksys::SystemTools::RemoveADirectory(m_ToolfilesDir.c_str());
-  //itksys::SystemTools::MakeDirectory(m_ToolfilesDir.c_str());
+  itksys::SystemTools::RemoveADirectory(m_ToolfilesDir.c_str());
   return true;
 }
 
@@ -171,7 +171,6 @@ bool mitk::ClaronTrackingDevice::OpenConnection()
   itksys::SystemTools::MakeDirectory(m_ToolfilesDir.c_str());
 
   m_Device->Initialize(m_CalibrationDir,m_ToolfilesDir);
-  //m_Device = new ClaronInterface(m_CalibrationDir, m_ToolfilesDir);
   returnValue = m_Device->StartTracking();
 
   if (returnValue)
@@ -203,7 +202,7 @@ bool mitk::ClaronTrackingDevice::CloseConnection()
   returnValue = m_Device->StopTracking();
 
   //delete the temporary directory
-  //itksys::SystemTools::RemoveADirectory(m_ToolfilesDir.c_str());
+  itksys::SystemTools::RemoveADirectory(m_ToolfilesDir.c_str());
 
   this->SetState(Setup);
   return returnValue;

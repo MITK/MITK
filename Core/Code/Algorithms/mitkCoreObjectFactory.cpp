@@ -213,7 +213,6 @@ mitk::Mapper::Pointer mitk::CoreObjectFactory::CreateMapper(mitk::DataNode* node
     {
       if((dynamic_cast<Image*>(data)!=NULL))
       {
-        mitk::Image::Pointer image = dynamic_cast<mitk::Image*>(data);
         newMapper = mitk::ImageVtkMapper2D::New();
         newMapper->SetDataNode(node);
       }

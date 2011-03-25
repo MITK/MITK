@@ -15,6 +15,6 @@ IF(MITK_NDI_POLARIS_CONNECTED)
 ENDIF(MITK_NDI_POLARIS_CONNECTED)
 
 IF(MITK_CLARON_MICRONTRACKER_CONNECTED)
-   ADD_TEST(mitkClaronTrackingDeviceHardwareTest ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${TESTDRIVER}  mitkClaronTrackingDeviceHardwareTest)
+   ADD_TEST(mitkClaronTrackingDeviceHardwareTest ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${TESTDRIVER}  mitkClaronTrackingDeviceHardwareTest ${MITK_DATA_DIR}/IGT-Data/MicronTrackerToolfiles/Tool_11 ${MITK_DATA_DIR}/IGT-Data/MicronTrackerToolfiles/Tool_12 ${MITK_DATA_DIR}/IGT-Data/MicronTrackerToolfiles/Tool_13)
    SET_PROPERTY(TEST mitkClaronTrackingDeviceHardwareTest PROPERTY LABELS MITK-IGT MITK)
 ENDIF(MITK_CLARON_MICRONTRACKER_CONNECTED)

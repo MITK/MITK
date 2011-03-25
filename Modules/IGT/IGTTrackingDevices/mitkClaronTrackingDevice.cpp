@@ -40,6 +40,7 @@ mitk::ClaronTrackingDevice::ClaronTrackingDevice(): mitk::TrackingDevice()
   {
 #ifdef MITK_MICRON_TRACKER_TEMP_DIR
     m_ToolfilesDir = std::string(MITK_MICRON_TRACKER_TEMP_DIR);
+	m_ToolfilesDir.append("/MT-tools");
 #endif
 #ifdef MITK_MICRON_TRACKER_CALIBRATION_DIR
     m_CalibrationDir = std::string(MITK_MICRON_TRACKER_CALIBRATION_DIR);
@@ -64,7 +65,9 @@ mitk::TrackingTool* mitk::ClaronTrackingDevice::AddTool( const char* toolName, c
 {
   mitk::ClaronTool::Pointer t = mitk::ClaronTool::New();
   if (t->LoadFile(fileName) == false)
+  {
     return NULL;
+  }
   t->SetToolName(toolName);
   if (this->InternalAddTool(t) == false)
     return NULL;
@@ -142,7 +145,6 @@ bool mitk::ClaronTrackingDevice::StopTracking()
   Superclass::StopTracking();
   //delete all files in the tool files directory
   itksys::SystemTools::RemoveADirectory(m_ToolfilesDir.c_str());
-  itksys::SystemTools::MakeDirectory(m_ToolfilesDir.c_str());
   return true;
 }
 
@@ -169,7 +171,6 @@ bool mitk::ClaronTrackingDevice::OpenConnection()
   itksys::SystemTools::MakeDirectory(m_ToolfilesDir.c_str());
 
   m_Device->Initialize(m_CalibrationDir,m_ToolfilesDir);
-  //m_Device = new ClaronInterface(m_CalibrationDir, m_ToolfilesDir);
   returnValue = m_Device->StartTracking();
 
   if (returnValue)

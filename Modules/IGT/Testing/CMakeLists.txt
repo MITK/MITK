@@ -1,20 +1,17 @@
 IF(BUILD_TESTING)
-  INCLUDE(MITKIGTTrackingDeviceHardwareTesting.cmake)
+ INCLUDE(MITKIGTTrackingDeviceHardwareTesting.cmake)
 ENDIF(BUILD_TESTING)
 
 MITK_CREATE_MODULE_TESTS()
 
 IF(MITK_NDI_AURORA_CONNECTED)
-   ADD_TEST(mitkNDIAuroraHardwareTest ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${TESTDRIVER} mitkNDIAuroraHardwareTest ${MITK_NDI_AURORA_COM_PORT})
-   SET_PROPERTY(TEST mitkNDIAuroraHardwareTest PROPERTY LABELS MITK-IGT MITK)
+  mitkAddCustomModuleTest(mitkNDIAuroraHardwareTest mitkNDIAuroraHardwareTest ${MITK_NDI_AURORA_COM_PORT})
 ENDIF(MITK_NDI_AURORA_CONNECTED)
 
 IF(MITK_NDI_POLARIS_CONNECTED)
-   ADD_TEST(mitkNDIPolarisHardwareTest ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${TESTDRIVER} mitkNDIPolarisHardwareTest ${MITK_NDI_POLARIS_COM_PORT})
-   SET_PROPERTY(TEST mitkNDIPolarisHardwareTest PROPERTY LABELS MITK-IGT MITK)
+  mitkAddCustomModuleTest(mitkNDIPolarisHardwareTest mitkNDIPolarisHardwareTest ${MITK_NDI_POLARIS_COM_PORT})
 ENDIF(MITK_NDI_POLARIS_CONNECTED)
 
 IF(MITK_CLARON_MICRONTRACKER_CONNECTED)
-   ADD_TEST(mitkClaronTrackingDeviceHardwareTest ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${TESTDRIVER}  mitkClaronTrackingDeviceHardwareTest ${MITK_DATA_DIR}/IGT-Data/MicronTrackerToolfiles/Tool_11 ${MITK_DATA_DIR}/IGT-Data/MicronTrackerToolfiles/Tool_12 ${MITK_DATA_DIR}/IGT-Data/MicronTrackerToolfiles/Tool_13)
-   SET_PROPERTY(TEST mitkClaronTrackingDeviceHardwareTest PROPERTY LABELS MITK-IGT MITK)
+  mitkAddCustomModuleTest(mitkClaronTrackingDeviceHardwareTest  mitkClaronTrackingDeviceHardwareTest ${MITK_DATA_DIR}/IGT-Data/MicronTrackerToolfiles/Tool_11 ${MITK_DATA_DIR}/IGT-Data/MicronTrackerToolfiles/Tool_12 ${MITK_DATA_DIR}/IGT-Data/MicronTrackerToolfiles/Tool_13)
 ENDIF(MITK_CLARON_MICRONTRACKER_CONNECTED)

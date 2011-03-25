@@ -66,7 +66,7 @@ foreach(type LIBRARY RUNTIME ARCHIVE)
      AND NOT EXISTS ${MITK_CMAKE_${type}_OUTPUT_DIRECTORY})
     message(FATAL_ERROR "MITK_CMAKE_${type}_OUTPUT_DIRECTORY is set to a non-existing directory [${MITK_CMAKE_${type}_OUTPUT_DIRECTORY}]")
   endif()
-  
+
   if(MITK_USE_SUPERBUILD)
     set(output_dir ${MITK_BINARY_DIR}/bin)
     if(NOT DEFINED MITK_CMAKE_${type}_OUTPUT_DIRECTORY)
@@ -242,10 +242,10 @@ set(MITK_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${VISIBILITY_CXX_FLAGS} ${COVERAGE_CXX_FL
 
 if(CMAKE_COMPILER_IS_GNUCXX)
   set(cflags "-Wall -Wextra -Wpointer-arith -Winvalid-pch -Wcast-align -Wwrite-strings -D_FORTIFY_SOURCE=2")
-  
+
   mitkFunctionCheckCompilerFlags("-fdiagnostics-show-option" cflags)
   mitkFunctionCheckCompilerFlags("-Wl,--no-undefined" cflags)
-  
+
   mitkFunctionGetGccVersion(${CMAKE_CXX_COMPILER} GCC_VERSION)
   # With older version of gcc supporting the flag -fstack-protector-all, an extra dependency to libssp.so
   # is introduced. If gcc is smaller than 4.4.0 and the build type is Release let's not include the flag.
@@ -255,11 +255,11 @@ if(CMAKE_COMPILER_IS_GNUCXX)
   endif()
   if(MINGW)
     # suppress warnings about auto imported symbols
-    set(MITK_CXX_FLAGS "-Wl,--enable-auto-import ${MITK_CXX_FLAGS}")  
+    set(MITK_CXX_FLAGS "-Wl,--enable-auto-import ${MITK_CXX_FLAGS}")
     # we need to define a Windows version
     set(MITK_CXX_FLAGS "-D_WIN32_WINNT=0x0500 ${MITK_CXX_FLAGS}")
   endif()
-  
+
   set(MITK_C_FLAGS "${cflags} ${MITK_C_FLAGS}")
   #set(MITK_CXX_FLAGS "${cflags} -Woverloaded-virtual -Wold-style-cast -Wstrict-null-sentinel -Wsign-promo ${MITK_CXX_FLAGS}")
   set(MITK_CXX_FLAGS "${cflags} -Woverloaded-virtual -Wstrict-null-sentinel ${MITK_CXX_FLAGS}")
@@ -281,9 +281,9 @@ if(BUILD_TESTING)
   enable_testing()
   include(CTest)
   mark_as_advanced(TCL_TCLSH DART_ROOT)
-  
+
   option(MITK_ENABLE_GUI_TESTING OFF "Enable the MITK GUI tests")
-    
+
   # Setup file for setting custom ctest vars
   configure_file(
     CMake/CTestCustom.cmake.in
@@ -308,7 +308,7 @@ if(BUILD_TESTING)
         return EXIT_FAILURE;
         }
       ")
-      
+
   set(MITK_TEST_OUTPUT_DIR "${MITK_BINARY_DIR}/test_output")
   if(NOT EXISTS ${MITK_TEST_OUTPUT_DIR})
     file(MAKE_DIRECTORY ${MITK_TEST_OUTPUT_DIR})
@@ -360,17 +360,6 @@ foreach(subproject ${CTEST_PROJECT_SUBPROJECTS})
 endforeach()
 
 #-----------------------------------------------------------------------------
-# Add subdirectories
-#-----------------------------------------------------------------------------
-
-link_directories(${MITK_LINK_DIRECTORIES})
-
-add_subdirectory(Core)
-add_subdirectory(CoreUI)
-add_subdirectory(Modules)
-add_subdirectory(Applications)
-
-#-----------------------------------------------------------------------------
 # Python Wrapping
 #-----------------------------------------------------------------------------
 
@@ -380,6 +369,17 @@ option(MITK_USE_PYTHON "Build cswig Python wrapper support (requires CableSwig).
 if(MITK_USE_PYTHON)
   add_subdirectory(Wrapping)
 endif()
+
+#-----------------------------------------------------------------------------
+# Add subdirectories
+#-----------------------------------------------------------------------------
+
+link_directories(${MITK_LINK_DIRECTORIES})
+
+add_subdirectory(Core)
+add_subdirectory(CoreUI)
+add_subdirectory(Modules)
+add_subdirectory(Applications)
 
 #-----------------------------------------------------------------------------
 # Documentation

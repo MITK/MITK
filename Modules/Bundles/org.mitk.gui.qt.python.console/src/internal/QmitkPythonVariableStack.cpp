@@ -33,9 +33,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <QMessageBox>
 #include <QStringList>
+#include <mitkImageCaster.h>
 #include "QmitkPythonMediator.h"
-
-
 
 const std::string QmitkPythonVariableStack::VIEW_ID = "org.mitk.views.pythonvariablestack";
 
@@ -58,9 +57,18 @@ void QmitkPythonVariableStack::CreateQtPartControl(QWidget *parent)
     m_Controls->setupUi( parent );
   }
   m_treeModel = new QmitkPythonVariableStackTreeWidget();
+  m_Controls->tableView->setSelectionBehavior( QAbstractItemView::SelectRows );
+  m_Controls->tableView->setAlternatingRowColors(true);
+  m_Controls->tableView->setDragEnabled(true);
+  m_Controls->tableView->setDropIndicatorShown(true);
+  m_Controls->tableView->setAcceptDrops(true);
   m_Controls->tableView->setModel( m_treeModel);
   QmitkPythonMediator::getInstance()->setClient(m_treeModel);
   //QmitkPythonMediator::getInstance()->update();
+  // add the multiwidget to the dings
+  mitk::BaseRenderer* renderer  = mitk::BaseRenderer::GetInstance(
+      this->GetActiveStdMultiWidget()->GetRenderWindow4()->GetVtkRenderWindow() );
+  mitk::RendererAccess::Set3DRenderer( renderer->GetVtkRenderer() );
 }
 
 QmitkPythonVariableStackTreeWidget* QmitkPythonVariableStack::getModel()

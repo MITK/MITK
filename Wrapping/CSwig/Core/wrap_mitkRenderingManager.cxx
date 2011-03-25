@@ -17,6 +17,7 @@ namespace _cable_
          typedef std::vector< bool > BoolVector;
          typedef itk::SmartPointer< mitk::DataStorage > DataStoragePointer;
          typedef itk::SmartPointer< mitk::GlobalInteraction > GlobalInteractionPointer;
+         typedef mitk::RenderingManager::RequestType RenderingManager_RequestType;
      }
 }
 

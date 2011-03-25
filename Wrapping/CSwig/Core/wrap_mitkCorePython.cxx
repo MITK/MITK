@@ -11,8 +11,8 @@
   Copyright (c) Insight Software Consortium. All rights reserved.
   See ITKCopyright.txt or http://www.itk.org/HTML/Copyright.htm for details.
 
-     This software is distributed WITHOUT ANY WARRANTY; without even 
-     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR 
+     This software is distributed WITHOUT ANY WARRANTY; without even
+     the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
      PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
@@ -75,7 +75,7 @@ namespace _cable_
     "VerboseLimitedLinearUndo",
     "VtkInteractorCameraController",
     "VtkLayerController",
-    
+
 
     //DataManagement:
     //"VtkAbstractTransform",
@@ -168,7 +168,7 @@ namespace _cable_
     "EventDescription",
     "EventMapper",
     "GlobalInteraction",
-    //"Interactor",
+    "Interactor",
     "KeyEvent",
     //"Message",
     "MouseMovePointSetInteractor",
@@ -177,11 +177,11 @@ namespace _cable_
     "PositionTracker",
     "State",
     "StateEvent",
-    //"StateMachine",
+    "StateMachine",
     "StateMachineFactory",
     "Transition",
     "WheelEvent",
-   
+
     //IO:
     "BaseDataIO",
     "DicomSeriesReader",
@@ -251,7 +251,7 @@ namespace _cable_
 
     "CommonSuperclasses",
     "ImageCaster",
-	//"QmitkFunctionality"
+  //"QmitkFunctionality"
   };
 }
 #endif

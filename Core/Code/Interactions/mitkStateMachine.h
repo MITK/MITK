@@ -175,6 +175,16 @@ bool LightSwitch::DoSwitchOff(Action*, const StateEvent*)
     void EnableUndo(bool enable);
 
     /**
+    * @brief A statemachine is also an OperationActor due to the UndoMechanism.
+    *
+    * The statechange is done in ExecuteOperation, so that the statechange can be undone by UndoMechanism.
+    * Is set private here and in superclass it is set public, so UndoController
+    * can reach ist, but it can't be overwritten by a subclass
+    * *ATTENTION*: THIS METHOD SHOULD NOT BE CALLED FROM OTHER CLASSES DIRECTLY!
+    **/
+    virtual void ExecuteOperation(Operation* operation);
+
+    /**
     * @brief Friend so that UndoModel can call ExecuteOperation for Undo.
     **/
     friend class UndoModel;
@@ -228,15 +238,6 @@ bool LightSwitch::DoSwitchOff(Action*, const StateEvent*)
     * @brief holds an UndoController, that can be accessed from all StateMachines. For ExecuteAction
     **/
     UndoController* m_UndoController;
-
-    /**
-    * @brief A statemachine is also an OperationActor due to the UndoMechanism.
-    *
-    * The statechange is done in ExecuteOperation, so that the statechange can be undone by UndoMechanism.
-    * Is set private here and in superclass it is set public, so UndoController
-    * can reach ist, but it can't be overwritten by a subclass
-    **/
-    virtual void ExecuteOperation(Operation* operation);
 
     /**
     * @brief Resets the current state from the given timeStep to the StartState with undo functionality! Use carefully!

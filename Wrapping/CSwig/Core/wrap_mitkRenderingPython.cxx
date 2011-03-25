@@ -33,6 +33,7 @@ namespace _cable_
       "GradientBackground",
       "ImageMapper2D",
       "LogoRendering",
+      "ManufacturerLogo",
       "Mapper",
       "Mapper2D",
       "Mapper3D",

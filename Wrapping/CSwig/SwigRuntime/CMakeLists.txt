@@ -4,7 +4,7 @@ MACRO(CREATE_SWIG_RUNTIME lang_option lang_postfix lang_link_libs)
   SET(source_file "${CMAKE_CURRENT_BINARY_DIR}/swigrun${lang_postfix}.cxx")
   SET(lib_name "SwigRuntime${lang_postfix}")
   
-  ADD_LIBRARY(${lib_name} SHARED "${source_file}")
+  ADD_LIBRARY(${lib_name} SHARED "${source_file}") 
   TARGET_LINK_LIBRARIES(${lib_name} ${lang_link_libs})
 
   # work around linkage problem on some solaris systems
@@ -36,7 +36,11 @@ MACRO(CREATE_SWIG_RUNTIME lang_option lang_postfix lang_link_libs)
 ENDMACRO(CREATE_SWIG_RUNTIME)
 
 IF(MITK_USE_PYTHON)
-   SET(PYLIBS debug ${PYTHON_DEBUG_LIBRARY} optimized ${PYTHON_LIBRARY})
-   CREATE_SWIG_RUNTIME(-python Python "${PYLIBS}")
+  SET(PYLIBS ${PYTHON_LIBRARY})
+  IF(PYTHON_DEBUG_LIBRARY)
+     SET(PYLIBS debug ${PYTHON_DEBUG_LIBRARY} optimized ${PYTHON_LIBRARY})
+  ENDIF()
+  #message(warning "PYLIBS: ${PYLIBS}")
+  CREATE_SWIG_RUNTIME(-python Python "${PYLIBS}")
 ENDIF(MITK_USE_PYTHON)
 

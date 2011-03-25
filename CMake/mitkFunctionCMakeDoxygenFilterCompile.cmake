@@ -68,15 +68,7 @@ function(mitkFunctionCMakeDoxygenFilterCompile)
     set(compile_defs "${compile_defs} -DUSE_NAMESPACE=${FILTER_NAMESPACE}")
   endif()
 
-  set(cmake_doxygen_filter_url "https://github.com/saschazelzer/CMakeDoxygenFilter/raw/master/CMakeDoxygenFilter.cpp")
-  set(cmake_doxygen_filter_src "${CMAKE_CURRENT_BINARY_DIR}/CMakeDoxygenFilter.cpp")
-
-  file(DOWNLOAD "${cmake_doxygen_filter_url}" "${cmake_doxygen_filter_src}" STATUS status)
-  list(GET status 0 error_code)
-  list(GET status 1 error_msg)
-  if(error_code)
-    message(FATAL_ERROR "error: Failed to download ${cmake_doxygen_filter_url} - ${error_msg}")
-  endif()
+  set(cmake_doxygen_filter_src "${CMAKE_CURRENT_SOURCE_DIR}/CMakeDoxygenFilter.cpp")
 
   try_compile(result_var 
               "${CMAKE_CURRENT_BINARY_DIR}"

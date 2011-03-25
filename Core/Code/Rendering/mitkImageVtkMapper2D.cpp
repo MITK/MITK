@@ -72,7 +72,7 @@ void mitk::ImageVtkMapper2D::GenerateData(mitk::BaseRenderer* renderer)
   if ( input.IsNull() ) return ;
 
 
-  vtkSmartPointer<vtkImageData> image = input->GetVtkImageData();
+  vtkSmartPointer<vtkImageData> image = input->GetVtkImageData(0,0);
 //  image->SetScalarTypeToUnsignedChar();
 //  vtkSmartPointer<vtkImageShiftScale> imageShiftSacle = vtkImageShiftScale::New();
 //  imageShiftSacle->SetOutputScalarTypeToUnsignedChar();

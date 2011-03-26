@@ -33,16 +33,16 @@ struct ci_char_traits : public std::char_traits<char>
     //  that we don't need to override
 {
   static bool eq(char c1, char c2)
-  { return std::toupper(c1) == std::toupper(c2); }
+  { return toupper(c1) == toupper(c2); }
 
   static bool ne(char c1, char c2)
-  { return std::toupper(c1) != std::toupper(c2); }
+  { return toupper(c1) != toupper(c2); }
 
   static bool lt(char c1, char c2)
-  { return std::toupper(c1) <  std::toupper(c2); }
+  { return toupper(c1) <  toupper(c2); }
 
   static bool gt(char c1, char c2)
-  { return std::toupper(c1) >  std::toupper(c2); }
+  { return toupper(c1) >  toupper(c2); }
 
   static int compare(const char* s1, const char* s2, std::size_t n)
   {
@@ -57,7 +57,7 @@ struct ci_char_traits : public std::char_traits<char>
 
   static const char* find(const char* s, int n, char a)
   {
-    while (n-- > 0 && std::toupper(*s) != std::toupper(a))
+    while (n-- > 0 && toupper(*s) != toupper(a))
     {
       ++s;
     }
@@ -96,15 +96,15 @@ public:
   int getToken()
   {
     // skip whitespace
-    while (std::isspace(_lastChar))
+    while (isspace(_lastChar))
     {
       _lastChar = getChar();
     }
 
-    if (std::isalpha(_lastChar) || _lastChar == '_')
+    if (isalpha(_lastChar) || _lastChar == '_')
     {
       _identifier = _lastChar;
-      while (std::isalnum(_lastChar = getChar()) || _lastChar == '-' || _lastChar == '_')
+      while (isalnum(_lastChar = getChar()) || _lastChar == '-' || _lastChar == '_')
       {
         _identifier += _lastChar;
       }

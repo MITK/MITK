@@ -157,9 +157,6 @@ MACRO(run_ctest)
   
   ctest_start(${model})
 
-  set_property(GLOBAL PROPERTY SubProject SuperBuild)
-  set_property(GLOBAL PROPERTY Label SuperBuild)
-
   ctest_update(SOURCE "${CTEST_CHECKOUT_DIR}" RETURN_VALUE res)
   
   if(res LESS 0)
@@ -194,12 +191,11 @@ ${ADDITIONNAL_CMAKECACHE_OPTION}
   endif()
   
   if(res GREATER 0 OR force_build)
-  
-    ctest_submit(FILES "${CTEST_BINARY_DIRECTORY}/Project.xml")
-  
-    ctest_submit(PARTS Update)
-      
+    
     message("----------- [ Configure SuperBuild ] -----------")
+    
+    set_property(GLOBAL PROPERTY SubProject SuperBuild)
+    set_property(GLOBAL PROPERTY Label SuperBuild)
     
     ctest_configure(BUILD "${CTEST_BINARY_DIRECTORY}"
       OPTIONS "-DCTEST_USE_LAUNCHERS=${CTEST_USE_LAUNCHERS}"
@@ -210,8 +206,17 @@ ${ADDITIONNAL_CMAKECACHE_OPTION}
       math(EXPR build_errors "${build_errors} + 1") 
     endif()
     
+    # Project.xml is generated during the superbuild configure step
+    ctest_submit(FILES "${CTEST_BINARY_DIRECTORY}/Project.xml")
+    
     ctest_read_custom_files("${CTEST_BINARY_DIRECTORY}")
+    
     ctest_submit(PARTS Configure)
+    
+    # submit the update results *after* the submitting the Configure info,
+    # otherwise CDash is somehow confused and cannot add the update info
+    # to the superbuild project
+    ctest_submit(PARTS Update)
     
     # To get CTEST_PROJECT_SUBPROJECTS and CTEST_PROJECT_EXTERNALS definition
     include("${CTEST_BINARY_DIRECTORY}/CTestConfigSubProject.cmake")

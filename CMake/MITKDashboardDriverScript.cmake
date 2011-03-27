@@ -7,7 +7,6 @@
 #-----------------------------------------------------------------------------
 # The following variable are expected to be define in the top-level script:
 set(expected_variables
-  ADDITIONNAL_CMAKECACHE_OPTION
   CTEST_NOTES_FILES
   CTEST_SITE
   CTEST_DASHBOARD_ROOT

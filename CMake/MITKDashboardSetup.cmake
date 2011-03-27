@@ -36,8 +36,9 @@ if(WIN32)
   set(VTK_BINARY_DIR "${CTEST_BINARY_DIRECTORY}/VTK-build/bin/${CTEST_BUILD_CONFIGURATION}")
   set(ITK_BINARY_DIR "${CTEST_BINARY_DIRECTORY}/ITK-build/bin/${CTEST_BUILD_CONFIGURATION}")
   set(GDCM_BINARY_DIR "${CTEST_BINARY_DIRECTORY}/GDCM-build/bin/${CTEST_BUILD_CONFIGURATION}")
+  set(OPENCV_BINARY_DIR "${CTEST_BINARY_DIRECTORY}/OpenCV-build/bin/${CTEST_BUILD_CONFIGURATION}")
   set(BLUEBERRY_OSGI_DIR "${CTEST_BINARY_DIRECTORY}/MITK-build/bin/BlueBerry/org.blueberry.osgi/bin/${CTEST_BUILD_CONFIGURATION}")
-  set(CTEST_PATH "${CTEST_PATH};${QT_BINARY_DIR};${VTK_BINARY_DIR};${ITK_BINARY_DIR};${GDCM_BINARY_DIR};${BLUEBERRY_OSGI_DIR}")
+  set(CTEST_PATH "${CTEST_PATH};${QT_BINARY_DIR};${VTK_BINARY_DIR};${ITK_BINARY_DIR};${GDCM_BINARY_DIR};${OPENCV_BINARY_DIR};${BLUEBERRY_OSGI_DIR}")
 endif()
 set(ENV{PATH} "${CTEST_PATH}")
 
@@ -55,6 +56,31 @@ message("Site name: ${CTEST_SITE}")
 message("Build name: ${CTEST_BUILD_NAME}")
 message("Script Mode: ${SCRIPT_MODE}")
 message("Coverage: ${WITH_COVERAGE}, MemCheck: ${WITH_MEMCHECK}")
+
+#
+# Set initial cache options
+#
+
+set(CTEST_USE_LAUNCHERS 1)
+
+set(INITIAL_CMAKECACHE_OPTIONS "
+BLUEBERRY_BUILD_TESTING:BOOL=TRUE
+BLUEBERRY_BUILD_ALL_PLUGINS:BOOL=TRUE
+MITK_BUILD_ALL_PLUGINS:BOOL=TRUE
+SUPERBUILD_EXCLUDE_MITKBUILD_TARGET:BOOL=TRUE
+${ADDITIONAL_CMAKECACHE_OPTION}
+")
+
+# Write a cache file for populating the MITK initial cache (not the superbuild cache).
+# This can be used to provide variables which are not passed through the
+# superbuild process to the MITK configure step)
+if(MITK_INITIAL_CACHE)
+  set(mitk_cache_file "${CTEST_BINARY_DIRECTORY}/mitk_initial_cache.txt")
+  file(WRITE "${mitk_cache_file}" "${MITK_INITIAL_CACHE}")
+  set(INITIAL_CMAKECACHE_OPTIONS "${INITIAL_CMAKECACHE_OPTIONS}
+MITK_INITIAL_CACHE_FILE::INTERNAL=${mitk_cache_file}
+")
+endif()
 
 
 #

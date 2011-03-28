@@ -346,6 +346,21 @@ ${INITIAL_CMAKECACHE_OPTIONS}
     
     # Note should be at the end
     ctest_submit(PARTS Notes)
+    
+    # Send status to the "CDash Web Admin"
+    if(NOT MITK_NO_CDASH_WEBADMIN)
+      set(cdash_admin_url "http://mbits/cdashadmin-web/index.php?pw=4da12ca9c06d46d3171d7f73974c900f")
+      file(DOWNLOAD
+           "${cdash_admin_url}&action=submit&name=${CTEST_BUILD_NAME}&hasTestErrors=${test_errors}&hasBuildErrors=${build_errors}&hasBuildWarnings=${build_warnings}"
+           "${CTEST_BINARY_DIRECTORY}/cdashadmin.txt"
+           STATUS status
+           )
+      list(GET status 0 error_code)
+      list(GET status 1 error_msg)
+      if(error_code)
+        message(FATAL_ERROR "error: Failed to communicate with cdashadmin-web - ${error_msg}")
+      endif()
+    endif()
   
   endif()
   
@@ -353,20 +368,6 @@ ${INITIAL_CMAKECACHE_OPTIONS}
   # to try to checkout again
   set(CTEST_CHECKOUT_COMMAND "")
   
-  # Send status to the "CDash Web Admin"
-  if(NOT MITK_NO_CDASH_WEBADMIN)
-    set(cdash_admin_url "http://mbits/cdashadmin-web/index.php?pw=4da12ca9c06d46d3171d7f73974c900f")
-    file(DOWNLOAD
-         "${cdash_admin_url}&action=submit&name=${CTEST_BUILD_NAME}&hasTestErrors=${test_errors}&hasBuildErrors=${build_errors}&hasBuildWarnings=${build_warnings}"
-         "${CTEST_BINARY_DIRECTORY}/cdashadmin.txt"
-         STATUS status
-         )
-    list(GET status 0 error_code)
-    list(GET status 1 error_msg)
-    if(error_code)
-      message(FATAL_ERROR "error: Failed to communicate with cdashadmin-web - ${error_msg}")
-    endif()
-  endif()
 endmacro()
 
 if(SCRIPT_MODE STREQUAL "continuous")

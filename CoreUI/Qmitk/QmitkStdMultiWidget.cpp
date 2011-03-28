@@ -45,6 +45,11 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkVtkLayerController.h"
 
+//vtk
+//#include <vtkSmartPointer.h>
+//#include <vtkInteractorStyleImage.h>
+//#include <vtkRenderWindowInteractor.h>
+
 QmitkStdMultiWidget::QmitkStdMultiWidget(QWidget* parent, Qt::WindowFlags f)
 : QWidget(parent, f), 
 mitkWidget1(NULL),
@@ -130,6 +135,15 @@ m_Node(NULL)
   mitkWidget1->setMaximumSize(2000,2000);
   mitkWidget1->SetLayoutIndex( TRANSVERSAL );
   mitkWidgetLayout1->addWidget(mitkWidget1); 
+
+//  vtkSmartPointer<vtkInteractorStyleImage> imageStyle = vtkSmartPointer<vtkInteractorStyleImage>::New();
+//  imageStyle->SetInteractionModeToImage3D();
+
+//  vtkSmartPointer<vtkRenderWindowInteractor> renderWindowInteractor = vtkSmartPointer<vtkRenderWindowInteractor>::New();
+
+//  renderWindowInteractor->SetInteractorStyle(imageStyle);
+//  renderWindowInteractor->SetRenderWindow(renderWindow);
+//  mitkWidget1->GetRenderWindow()->SetInteractor(renderWindowInteractor);
 
   //Create RenderWindows 2
   mitkWidget2 = new QmitkRenderWindow(mitkWidget2Container, "stdmulti.widget2");

@@ -155,6 +155,7 @@ RenderingManager
     if ( m_DataStorage.IsNotNull() )
       mitk::BaseRenderer::GetInstance( renderWindow )->SetDataStorage( m_DataStorage.GetPointer() );
 
+
     // Register vtkRenderWindow instance
     renderWindow->Register( NULL );
 

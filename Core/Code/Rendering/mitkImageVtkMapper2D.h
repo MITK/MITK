@@ -63,8 +63,6 @@ namespace mitk {
 
     int m_TimeStep;
     bool m_VtkBased;
-
-    vtkImageData *GenerateTestImageForTSFilter();
   };
 
 } // namespace mitk

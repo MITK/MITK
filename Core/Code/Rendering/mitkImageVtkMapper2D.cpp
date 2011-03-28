@@ -155,3 +155,8 @@ void mitk::ImageVtkMapper2D::MitkRenderVolumetricGeometry(BaseRenderer* renderer
   if ( GetVtkProp(renderer)->GetVisibility() )
     GetVtkProp(renderer)->RenderVolumetricGeometry(renderer->GetVtkRenderer());
 }
+
+vtkProp* mitk::ImageVtkMapper2D::GetVtkProp(mitk::BaseRenderer* renderer)
+{
+  return m_VtkActor;
+}

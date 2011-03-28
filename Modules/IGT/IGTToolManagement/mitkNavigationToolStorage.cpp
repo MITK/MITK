@@ -55,6 +55,12 @@ mitk::NavigationTool::Pointer mitk::NavigationToolStorage::GetTool(std::string i
   for (int i=0; i<GetToolCount(); i++) if ((GetTool(i)->GetIdentifier())==identifier) return GetTool(i);
   return NULL;
   }
+
+mitk::NavigationTool::Pointer mitk::NavigationToolStorage::GetToolByName(std::string name)
+  {
+  for (int i=0; i<GetToolCount(); i++) if ((GetTool(i)->GetToolName())==name) return GetTool(i);
+  return NULL;
+  }
     
 int mitk::NavigationToolStorage::GetToolCount()
   {

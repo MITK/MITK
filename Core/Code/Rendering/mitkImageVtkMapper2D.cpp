@@ -106,7 +106,6 @@ void mitk::ImageVtkMapper2D::GenerateData(mitk::BaseRenderer* renderer)
   {
     mitk::LevelWindow levelWindow;
     GetLevelWindow(levelWindow, renderer);
-//    double range =
 
 //    const mitk::VtkPropRenderer* glRenderer = dynamic_cast<const mitk::VtkPropRenderer*>(renderer);
 //    if (glRenderer == NULL)
@@ -116,8 +115,11 @@ void mitk::ImageVtkMapper2D::GenerateData(mitk::BaseRenderer* renderer)
     vtkSmartPointer<vtkImageProperty> ip = vtkSmartPointer<vtkImageProperty>::New();
     ip->SetColorLevel(levelWindow.GetLevel());
     ip->SetColorWindow(levelWindow.GetWindow());
-    ip->SetInterpolationTypeToLinear();
-    ip->SetOpacity(0.99);
+    ip->SetInterpolationTypeToNearest();
+
+    float opacity = 0;
+    GetOpacity(opacity, renderer);
+    ip->SetOpacity(opacity);
 
 
 //    vtkSmartPointer<vtkRenderWindowInteractor> renderWindowInteractor = vtkSmartPointer<vtkRenderWindowInteractor>::New();

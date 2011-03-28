@@ -113,10 +113,11 @@ void mitk::ImageVtkMapper2D::GenerateData(mitk::BaseRenderer* renderer)
 //      return;
 //    vtkRenderer* vtkRenderer = glRenderer->GetVtkRenderer();
 
-//    vtkSmartPointer<vtkImageProperty> ip = vtkSmartPointer<vtkImageProperty>::New();
-//    ip->SetColorLevel(1000);
-//    ip->SetColorWindow(2000);
-//    ip->SetInterpolationTypeToLinear();
+    vtkSmartPointer<vtkImageProperty> ip = vtkSmartPointer<vtkImageProperty>::New();
+    ip->SetColorLevel(1000);
+    ip->SetColorWindow(2000);
+    ip->SetInterpolationTypeToLinear();
+    ip->SetOpacity(0.99);
 
 
 //    vtkSmartPointer<vtkRenderWindowInteractor> renderWindowInteractor = vtkSmartPointer<vtkRenderWindowInteractor>::New();
@@ -131,9 +132,9 @@ void mitk::ImageVtkMapper2D::GenerateData(mitk::BaseRenderer* renderer)
 //    m_VtkMapper->SetColorWindow(levelWindow.GetUpperWindowBound());
 
     m_VtkActor->SetMapper(m_VtkMapper);
-//    m_VtkActor->SetProperty(ip);
+    m_VtkActor->SetProperty(ip);
 
-//    m_VtkActor->SetVisibility(1);
+    m_VtkActor->SetVisibility(1);
 
 
   }
@@ -156,13 +157,14 @@ void mitk::ImageVtkMapper2D::MitkRenderOverlay(BaseRenderer* renderer)
 }
 void mitk::ImageVtkMapper2D::MitkRenderOpaqueGeometry(BaseRenderer* renderer)
 {
-  if ( this->IsVisible( renderer )==false )
-    return;
+  MitkRenderTranslucentGeometry(renderer);
+//  if ( this->IsVisible( renderer )==false )
+//    return;
 
-  if ( this->GetVtkProp(renderer)->GetVisibility() )
-  {
-    this->GetVtkProp(renderer)->RenderOpaqueGeometry( renderer->GetVtkRenderer() );
-  }
+//  if ( this->GetVtkProp(renderer)->GetVisibility() )
+//  {
+//    this->GetVtkProp(renderer)->RenderOpaqueGeometry( renderer->GetVtkRenderer() );
+//  }
 }
 
 void mitk::ImageVtkMapper2D::MitkRenderTranslucentGeometry(BaseRenderer* renderer)

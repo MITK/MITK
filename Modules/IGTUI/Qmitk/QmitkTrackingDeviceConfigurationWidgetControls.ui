@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>339</width>
-    <height>315</height>
+    <width>338</width>
+    <height>318</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -219,6 +219,9 @@ p, li { white-space: pre-wrap; }
              <property name="orientation">
               <enum>Qt::Vertical</enum>
              </property>
+             <property name="sizeType">
+              <enum>QSizePolicy::Expanding</enum>
+             </property>
              <property name="sizeHint" stdset="0">
               <size>
                <width>115</width>
@@ -239,13 +242,13 @@ p, li { white-space: pre-wrap; }
              <property name="minimumSize">
               <size>
                <width>120</width>
-               <height>0</height>
+               <height>80</height>
               </size>
              </property>
              <property name="maximumSize">
               <size>
                <width>120</width>
-               <height>200</height>
+               <height>80</height>
               </size>
              </property>
              <property name="baseSize">
@@ -379,13 +382,13 @@ p, li { white-space: pre-wrap; }
              <property name="minimumSize">
               <size>
                <width>120</width>
-               <height>0</height>
+               <height>80</height>
               </size>
              </property>
              <property name="maximumSize">
               <size>
                <width>120</width>
-               <height>16777215</height>
+               <height>80</height>
               </size>
              </property>
              <property name="html">
@@ -426,7 +429,7 @@ p, li { white-space: pre-wrap; }
       </layout>
      </widget>
      <widget class="QWidget" name="microntracker_page">
-      <layout class="QVBoxLayout" name="verticalLayout_10">
+      <layout class="QVBoxLayout" name="verticalLayout_11">
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_5">
          <item>
@@ -458,17 +461,34 @@ p, li { white-space: pre-wrap; }
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_13">
          <item>
-          <spacer name="horizontalSpacer_10">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
+          <layout class="QVBoxLayout" name="verticalLayout_10">
+           <item>
+            <spacer name="horizontalSpacer_10">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <spacer name="verticalSpacer_4">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
          </item>
          <item>
           <layout class="QVBoxLayout" name="verticalLayout_9">
@@ -477,13 +497,13 @@ p, li { white-space: pre-wrap; }
              <property name="minimumSize">
               <size>
                <width>120</width>
-               <height>0</height>
+               <height>80</height>
               </size>
              </property>
              <property name="maximumSize">
               <size>
                <width>120</width>
-               <height>16777215</height>
+               <height>80</height>
               </size>
              </property>
              <property name="baseSize">

@@ -61,14 +61,18 @@ class QmitkMITKIGTTrackingToolboxView : public QObject, public QmitkFunctionalit
 
   protected slots:
 
-	void OnLoadTools();
+	  void OnLoadTools();
 
-	void OnStartTracking();
+	  void OnStartTracking();
 
-	void OnStopTracking();
+	  void OnStopTracking();
 
-  /** @brief Slot for tracking timer */
-  void UpdateTrackingTimer();
+    void OnEnableLoggingClicked();
+
+    void OnChooseFileClicked();
+
+    /** @brief Slot for tracking timer */
+    void UpdateTrackingTimer();
   
    
   protected:
@@ -77,17 +81,25 @@ class QmitkMITKIGTTrackingToolboxView : public QObject, public QmitkFunctionalit
 
     QmitkStdMultiWidget* m_MultiWidget;
 
-	void MessageBox(std::string s);
+    bool m_tracking;
 
-	//stores the loaded tools
-	mitk::NavigationToolStorage::Pointer m_toolStorage;
+  	void MessageBox(std::string s);
 
-	//members for the filter pipeline
-	mitk::TrackingDeviceSource::Pointer m_TrackingDeviceSource;
-	mitk::NavigationDataObjectVisualizationFilter::Pointer m_ToolVisualizationFilter;
-	mitk::NavigationDataRecorder::Pointer m_loggingFilter;
+    bool m_logging;
 
-  QTimer* m_TrackingTimer;
+    void StartLogging();
+
+    void StopLogging();
+
+	  //stores the loaded tools
+	  mitk::NavigationToolStorage::Pointer m_toolStorage;
+
+	  //members for the filter pipeline
+	  mitk::TrackingDeviceSource::Pointer m_TrackingDeviceSource;
+	  mitk::NavigationDataObjectVisualizationFilter::Pointer m_ToolVisualizationFilter;
+	  mitk::NavigationDataRecorder::Pointer m_loggingFilter;
+
+    QTimer* m_TrackingTimer;
 	
 };
 

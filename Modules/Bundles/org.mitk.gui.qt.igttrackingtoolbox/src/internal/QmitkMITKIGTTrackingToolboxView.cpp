@@ -41,6 +41,7 @@ QmitkMITKIGTTrackingToolboxView::QmitkMITKIGTTrackingToolboxView()
 , m_MultiWidget( NULL )
 {
   m_TrackingTimer = new QTimer(this);	
+  m_tracking = false;
 }
 
 QmitkMITKIGTTrackingToolboxView::~QmitkMITKIGTTrackingToolboxView()
@@ -62,6 +63,10 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl( QWidget *parent )
     connect( m_Controls->m_StartTracking, SIGNAL(clicked()), this, SLOT(OnStartTracking()) );
     connect( m_Controls->m_StopTracking, SIGNAL(clicked()), this, SLOT(OnStopTracking()) );
     connect( m_TrackingTimer, SIGNAL(timeout()), this, SLOT(UpdateTrackingTimer()));
+    connect( m_Controls->m_EnableLogging, SIGNAL(clicked()), this, SLOT(OnEnableLoggingClicked()));
+    connect( m_Controls->m_ChooseFile, SIGNAL(clicked()), this, SLOT(OnChooseFileClicked()));
+
+    this->m_Controls->m_configurationWidget->EnableAdvancedUserControl(false);
   }
 }
 
@@ -104,12 +109,7 @@ void QmitkMITKIGTTrackingToolboxView::OnLoadTools()
 void QmitkMITKIGTTrackingToolboxView::OnStartTracking()
 {
 //check if everything is ready to start tracking
-if (!this->m_Controls->m_configurationWidget->GetTrackingDeviceConfigured())
-  {
-  MessageBox("Error: Tracking Device Not Configured!");
-  return;
-  }
-else if (this->m_toolStorage.IsNull())
+if (this->m_toolStorage.IsNull())
   {
   MessageBox("Error: No Tools Loaded Yet!");
   return;
@@ -120,19 +120,29 @@ else if (this->m_toolStorage->GetToolCount() == 0)
   return;
   }
 
+//set configuration finished
+this->m_Controls->m_configurationWidget->ConfigurationFinished();
+
 //build the IGT pipeline
 mitk::TrackingDeviceSourceConfigurator::Pointer myTrackingDeviceSourceFactory = mitk::TrackingDeviceSourceConfigurator::New(this->m_toolStorage,this->m_Controls->m_configurationWidget->GetTrackingDevice());
 m_TrackingDeviceSource = myTrackingDeviceSourceFactory->CreateTrackingDeviceSource(this->m_ToolVisualizationFilter);
 m_TrackingDeviceSource->Connect();
 m_TrackingDeviceSource->StartTracking();
 m_TrackingTimer->start(100);
+m_Controls->m_TrackingControlLabel->setText("Status: tracking");
+if (this->m_Controls->m_EnableLogging->isChecked()) StartLogging();
+m_tracking=true;
 }
 
 void QmitkMITKIGTTrackingToolboxView::OnStopTracking()
 {
+if (!m_tracking) return;
 m_TrackingTimer->stop();
 m_TrackingDeviceSource->StopTracking();
 m_TrackingDeviceSource->Disconnect();
+this->m_Controls->m_configurationWidget->Reset();
+m_Controls->m_TrackingControlLabel->setText("Status: stopped");
+if (m_logging) StopLogging();
 }
 
 void QmitkMITKIGTTrackingToolboxView::MessageBox(std::string s)
@@ -146,6 +156,41 @@ void QmitkMITKIGTTrackingToolboxView::UpdateTrackingTimer()
   {
   m_ToolVisualizationFilter->Update();
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+  if (m_logging) this->m_loggingFilter->Update();
+  }
+
+void QmitkMITKIGTTrackingToolboxView::OnEnableLoggingClicked()
+  {
+  if (this->m_tracking && this->m_Controls->m_EnableLogging->isChecked() && !this->m_logging) StartLogging();
+  else if (!this->m_Controls->m_EnableLogging->isChecked() && this->m_logging) StopLogging();
+  }
+
+void QmitkMITKIGTTrackingToolboxView::OnChooseFileClicked()
+  {
+  QString filename = QFileDialog::getSaveFileName(NULL,tr("Choose Logging File"), "/", "*.*");
+  this->m_Controls->m_LoggingFileName->setText(filename);
+  }
+
+void QmitkMITKIGTTrackingToolboxView::StartLogging()
+  {
+  //initialize logging filter
+  m_loggingFilter = mitk::NavigationDataRecorder::New();
+  m_loggingFilter->SetRecordingMode(mitk::NavigationDataRecorder::NormalFile);
+  if (m_Controls->m_xmlFormat->isChecked()) m_loggingFilter->SetOutputFormat(mitk::NavigationDataRecorder::xml);
+  else if (m_Controls->m_csvFormat->isChecked()) m_loggingFilter->SetOutputFormat(mitk::NavigationDataRecorder::csv);
+  m_loggingFilter->SetFileName(m_Controls->m_LoggingFileName->text().toStdString().c_str());
+  
+  //connect filter
+  for(int i=0; i<m_ToolVisualizationFilter->GetNumberOfOutputs(); i++){m_loggingFilter->AddNavigationData(m_ToolVisualizationFilter->GetOutput(i));}
+  
+  m_loggingFilter->StartRecording();
+  m_logging = true;
+  }
+
+void QmitkMITKIGTTrackingToolboxView::StopLogging()
+  {
+  m_loggingFilter->StopRecording();
+  m_logging = false;
   }
 
 

@@ -25,6 +25,10 @@ PURPOSE.  See the above copyright notices for more information.
 
 // Qt
 #include <QMessageBox>
+#include <qfiledialog.h>
+
+// MITK
+#include <mitkNavigationToolStorageDeserializer.h>
 
 
 
@@ -35,6 +39,7 @@ QmitkMITKIGTTrackingToolboxView::QmitkMITKIGTTrackingToolboxView()
 , m_Controls( 0 )
 , m_MultiWidget( NULL )
 {
+	
 }
 
 QmitkMITKIGTTrackingToolboxView::~QmitkMITKIGTTrackingToolboxView()
@@ -51,7 +56,7 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl( QWidget *parent )
     m_Controls = new Ui::QmitkMITKIGTTrackingToolboxViewControls;
     m_Controls->setupUi( parent );
  
-    connect( m_Controls->btnPerformImageProcessing, SIGNAL(clicked()), this, SLOT(DoImageProcessing()) );
+    connect( m_Controls->m_LoadTools, SIGNAL(clicked()), this, SLOT(OnLoadTools()) );
   }
 }
 
@@ -67,66 +72,42 @@ void QmitkMITKIGTTrackingToolboxView::StdMultiWidgetNotAvailable()
   m_MultiWidget = NULL;
 }
 
-
-void QmitkMITKIGTTrackingToolboxView::OnSelectionChanged( std::vector<mitk::DataNode*> nodes )
-{ 
-  // iterate all selected objects, adjust warning visibility
-  for( std::vector<mitk::DataNode*>::iterator it = nodes.begin();
-       it != nodes.end();
-       ++it )
-  {
-    mitk::DataNode::Pointer node = *it;
-  
-    if( node.IsNotNull() && dynamic_cast<mitk::Image*>(node->GetData()) )
-    {
-      m_Controls->lblWarning->setVisible( false );
-      return;
-    }
-  }
-
-  m_Controls->lblWarning->setVisible( true );
-}
-
-
-void QmitkMITKIGTTrackingToolboxView::DoImageProcessing()
+void QmitkMITKIGTTrackingToolboxView::OnLoadTools()
 {
-  std::vector<mitk::DataNode*> nodes = this->GetDataManagerSelection();
-  if (nodes.empty()) return;
-
-  mitk::DataNode* node = nodes.front();
-
-  if (!node)
-  {
-    // Nothing selected. Inform the user and return
-    QMessageBox::information( NULL, "Template", "Please load and select an image before starting image processing.");
-    return;
-  }
-
-  // here we have a valid mitk::DataNode
-
-  // a node itself is not very useful, we need its data item (the image)
-  mitk::BaseData* data = node->GetData();
-  if (data)
-  {
-    // test if this data item is an image or not (could also be a surface or something totally different)
-    mitk::Image* image = dynamic_cast<mitk::Image*>( data );
-    if (image)
-    {
-      std::stringstream message;
-      std::string name;
-      message << "Performing image processing for image ";
-      if (node->GetName(name))
-      {
-        // a property called "name" was found for this DataNode
-        message << "'" << name << "'";
-      }
-      message << ".";
-      MITK_INFO << message.str();
-
-      // TODO actually do something here...
+  //read in filename
+  QString filename = QFileDialog::getOpenFileName(NULL,tr("Open Toolfile"), "/", tr("All Files (*.*)")); //later perhaps: tr("Toolfile (*.tfl)"
+  if (filename.isNull()) return;
+  
+  //initialize tool storage
+  m_toolStorage = mitk::NavigationToolStorage::New();
+  
+  //read tool storage from disk
+  mitk::NavigationToolStorageDeserializer::Pointer myDeserializer = mitk::NavigationToolStorageDeserializer::New(GetDataStorage());
+  m_toolStorage = myDeserializer->Deserialize(filename.toStdString());
+  if (m_toolStorage.IsNull()) 
+	{
+	MessageBox(myDeserializer->GetErrorMessage());
+	m_toolStorage = NULL;
+	return;
     }
-  }
+
+  //update label
+  QString toolLabel = QString("Loaded Tools: ") + QString::number(m_toolStorage->GetToolCount()) + " Tools from " + filename;
+  m_Controls->m_toolLabel->setText(toolLabel);
 }
+
+void QmitkMITKIGTTrackingToolboxView::OnStartTracking()
+{}
+
+void QmitkMITKIGTTrackingToolboxView::OnStopTracking()
+{}
+
+void QmitkMITKIGTTrackingToolboxView::MessageBox(std::string s)
+  {
+  QMessageBox msgBox;
+  msgBox.setText(s.c_str());
+  msgBox.exec();
+  }
 
 
 

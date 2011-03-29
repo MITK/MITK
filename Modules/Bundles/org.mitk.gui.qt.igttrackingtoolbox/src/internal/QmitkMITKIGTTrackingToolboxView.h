@@ -24,6 +24,12 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "ui_QmitkMITKIGTTrackingToolboxViewControls.h"
 
+//mitk headers
+#include <mitkNavigationToolStorage.h>
+#include <mitkTrackingDeviceSource.h>
+#include <mitkNavigationDataObjectVisualizationFilter.h>
+#include <mitkNavigationDataRecorder.h>
+
 
 
 /*!
@@ -53,18 +59,30 @@ class QmitkMITKIGTTrackingToolboxView : public QObject, public QmitkFunctionalit
     virtual void StdMultiWidgetNotAvailable();
 
   protected slots:
+
+	void OnLoadTools();
+
+	void OnStartTracking();
+
+	void OnStopTracking();
   
-    /// \brief Called when the user clicks the GUI button
-    void DoImageProcessing();
-
+   
   protected:
-
-    /// \brief called by QmitkFunctionality when DataManager's selection has changed
-    virtual void OnSelectionChanged( std::vector<mitk::DataNode*> nodes );
 
     Ui::QmitkMITKIGTTrackingToolboxViewControls* m_Controls;
 
     QmitkStdMultiWidget* m_MultiWidget;
+
+	void MessageBox(std::string s);
+
+	//stores the loaded tools
+	mitk::NavigationToolStorage::Pointer m_toolStorage;
+
+	//members for the filter pipeline
+	mitk::TrackingDeviceSource::Pointer m_TrackingDeviceSource;
+	mitk::NavigationDataObjectVisualizationFilter::Pointer m_ToolVisualizationFilter;
+	mitk::NavigationDataRecorder::Pointer m_loggingFilter;
+	
 };
 
 

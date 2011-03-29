@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>222</width>
-    <height>161</height>
+    <width>596</width>
+    <height>445</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -21,7 +21,7 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QmitkNavigationToolManagementWidget" name="widget" native="true"/>
+    <widget class="QmitkNavigationToolManagementWidget" name="m_toolManagerWidget" native="true"/>
    </item>
    <item>
     <spacer name="spacer1">

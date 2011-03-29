@@ -51,6 +51,8 @@ void QmitkMITKIGTNavigationToolManagerView::CreateQtPartControl( QWidget *parent
     m_Controls = new Ui::QmitkMITKIGTNavigationToolManagerViewControls;
     m_Controls->setupUi( parent );
   }
+  m_Controls->m_toolManagerWidget->Initialize(this->GetDataStorage());
+
 }
 
 

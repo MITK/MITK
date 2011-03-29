@@ -147,10 +147,24 @@ void mitk::Geometry3D::IndexToWorld(const mitk::Point3D &pt_units, mitk::Point3D
 
 void mitk::Geometry3D::WorldToIndex(const mitk::Point3D &atPt3d_mm, const mitk::Vector3D &vec_mm, mitk::Vector3D &vec_units) const
 {
-  BackTransform(atPt3d_mm, vec_mm, vec_units);
+  MITK_INFO<<"Warning! Call of the deprecated function Geometry3D::WorldToIndex(point, vec, vec). Use Geometry3D::WorldToIndex(vec, vec) instead!";
+  //BackTransform(atPt3d_mm, vec_mm, vec_units);
+  this->WorldToIndex(vec_mm, vec_units);
+}
+
+void mitk::Geometry3D::WorldToIndex( const mitk::Vector3D &vec_mm, mitk::Vector3D &vec_units) const
+{
+  BackTransform( vec_mm, vec_units);
 }
 
 void mitk::Geometry3D::IndexToWorld(const mitk::Point3D &/*atPt3d_units*/, const mitk::Vector3D &vec_units, mitk::Vector3D &vec_mm) const
+{
+  MITK_INFO<<"Warning! Call of the deprecated function Geometry3D::IndexToWorld(point, vec, vec). Use Geometry3D::IndexToWorld(vec, vec) instead!";
+  //vec_mm = m_IndexToWorldTransform->TransformVector(vec_units);
+  this->IndexToWorld(vec_units, vec_mm);
+}
+
+void mitk::Geometry3D::IndexToWorld(const mitk::Vector3D &vec_units, mitk::Vector3D &vec_mm) const
 {
   vec_mm = m_IndexToWorldTransform->TransformVector(vec_units);
 }
@@ -360,6 +374,41 @@ void mitk::Geometry3D::BackTransform(const mitk::Point3D &in, mitk::Point3D& out
 }
 
 void mitk::Geometry3D::BackTransform(const mitk::Point3D &/*at*/, const mitk::Vector3D &in, mitk::Vector3D& out) const
+{
+  MITK_INFO<<"Warning! Call of the deprecated function Geometry3D::BackTransform(point, vec, vec). Use Geometry3D::BackTransform(vec, vec) instead!";
+  //// Get WorldToIndex transform
+  //if (m_IndexToWorldTransformLastModified != m_IndexToWorldTransform->GetMTime())
+  //{
+  //  m_InvertedTransform = TransformType::New();
+  //  if (!m_IndexToWorldTransform->GetInverse( m_InvertedTransform.GetPointer() ))
+  //  {
+  //    itkExceptionMacro( "Internal ITK matrix inversion error, cannot proceed." );
+  //  }
+  //  m_IndexToWorldTransformLastModified = m_IndexToWorldTransform->GetMTime();
+  //}
+
+  //// Check for valid matrix inversion
+  //const TransformType::MatrixType& inverse = m_InvertedTransform->GetMatrix();
+  //if(inverse.GetVnlMatrix().has_nans())
+  //{
+  //  itkExceptionMacro( "Internal ITK matrix inversion error, cannot proceed. Matrix was: " << std::endl 
+  //    << m_IndexToWorldTransform->GetMatrix() << "Suggested inverted matrix is:" << std::endl
+  //    << inverse );
+  //}
+
+  //// Transform vector
+  //for (unsigned int i = 0; i < 3; i++)
+  //{
+  //  out[i] = 0.0;
+  //  for (unsigned int j = 0; j < 3; j++)
+  //  {
+  //    out[i] += inverse[i][j]*in[j];
+  //  }
+  //}
+  this->BackTransform(in, out);
+}
+
+void mitk::Geometry3D::BackTransform(const mitk::Vector3D& in, mitk::Vector3D& out) const
 {
   // Get WorldToIndex transform
   if (m_IndexToWorldTransformLastModified != m_IndexToWorldTransform->GetMTime())

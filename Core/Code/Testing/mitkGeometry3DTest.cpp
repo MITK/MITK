@@ -129,6 +129,54 @@ int testIndexAndWorldConsistency(mitk::Geometry3D* geometry3d)
   return EXIT_SUCCESS;
 }
 
+int testIndexAndWorldConsistencyForVectors(mitk::Geometry3D* geometry3d)
+{
+  MITK_TEST_OUTPUT( << "Testing consistency of index and world coordinate systems for vectors: ");
+  mitk::Vector3D xAxisMM = geometry3d->GetAxisVector(0);
+  mitk::Vector3D xAxisContinuousIndex;
+  mitk::Vector3D xAxisContinuousIndexDeprecated;
+
+  mitk::Point3D p, pIndex, origin;
+  origin = geometry3d->GetOrigin();
+  p[0] = xAxisMM[0];
+  p[1] = xAxisMM[1];
+  p[2] = xAxisMM[2];
+
+  geometry3d->WorldToIndex(p,pIndex);
+
+  geometry3d->WorldToIndex(origin, xAxisMM, xAxisContinuousIndexDeprecated);
+  geometry3d->WorldToIndex(xAxisMM,xAxisContinuousIndex);
+  MITK_TEST_CONDITION_REQUIRED(xAxisContinuousIndex[0] == pIndex[0],"");
+  MITK_TEST_CONDITION_REQUIRED(xAxisContinuousIndex[1] == pIndex[1],"");
+  MITK_TEST_CONDITION_REQUIRED(xAxisContinuousIndex[2] == pIndex[2],"");
+
+  MITK_TEST_CONDITION_REQUIRED(xAxisContinuousIndex[0] == xAxisContinuousIndexDeprecated[0],"");
+  MITK_TEST_CONDITION_REQUIRED(xAxisContinuousIndex[1] == xAxisContinuousIndexDeprecated[1],"");
+  MITK_TEST_CONDITION_REQUIRED(xAxisContinuousIndex[2] == xAxisContinuousIndexDeprecated[2],"");
+
+  MITK_TEST_CONDITION_REQUIRED(xAxisContinuousIndexDeprecated[0] == pIndex[0],"");
+  MITK_TEST_CONDITION_REQUIRED(xAxisContinuousIndexDeprecated[1] == pIndex[1],"");
+  MITK_TEST_CONDITION_REQUIRED(xAxisContinuousIndexDeprecated[2] == pIndex[2],"");
+
+  
+  geometry3d->IndexToWorld(xAxisContinuousIndex,xAxisContinuousIndex);
+  geometry3d->IndexToWorld(xAxisContinuousIndexDeprecated,xAxisContinuousIndexDeprecated);
+  geometry3d->IndexToWorld(pIndex,p);
+
+  MITK_TEST_CONDITION_REQUIRED(xAxisContinuousIndex == xAxisMM,"");
+  MITK_TEST_CONDITION_REQUIRED(xAxisContinuousIndex[0] == p[0],"");
+  MITK_TEST_CONDITION_REQUIRED(xAxisContinuousIndex[1] == p[1],"");
+  MITK_TEST_CONDITION_REQUIRED(xAxisContinuousIndex[2] == p[2],"");
+
+  MITK_TEST_CONDITION_REQUIRED(xAxisContinuousIndexDeprecated == xAxisMM,"");
+  MITK_TEST_CONDITION_REQUIRED(xAxisContinuousIndexDeprecated[0] == p[0],"");
+  MITK_TEST_CONDITION_REQUIRED(xAxisContinuousIndexDeprecated[1] == p[1],"");
+  MITK_TEST_CONDITION_REQUIRED(xAxisContinuousIndexDeprecated[2] == p[2],"");
+
+  return EXIT_SUCCESS;
+}
+
+
 #include <itkImage.h>
 
 int testItkImageIsCenterBased()
@@ -254,6 +302,7 @@ int testGeometry3D(bool imageGeometry)
 
   // Seperate Test function for Index and World consistency
   testIndexAndWorldConsistency(geometry3d);
+  testIndexAndWorldConsistencyForVectors(geometry3d);
 
   MITK_TEST_OUTPUT( << "Testing a rotation of the geometry");   
   double angle = 35.0;

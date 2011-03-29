@@ -34,6 +34,8 @@ QmitkTrackingDeviceConfigurationWidget::QmitkTrackingDeviceConfigurationWidget(Q
   ResetOutput();
   AddOutput("<br>NDI Polaris selected");
   this->m_TrackingDeviceConfigurated = false;
+
+  m_AdvancedUserControl = true;
 }
 
 
@@ -204,11 +206,27 @@ mitk::TrackingDevice::Pointer QmitkTrackingDeviceConfigurationWidget::ConfigureN
 
 mitk::TrackingDevice::Pointer QmitkTrackingDeviceConfigurationWidget::GetTrackingDevice()
   {
+  if (!m_AdvancedUserControl) m_TrackingDevice = ConstructTrackingDevice();
   return this->m_TrackingDevice;
   }
 
 bool QmitkTrackingDeviceConfigurationWidget::GetTrackingDeviceConfigured()
   {
   return this->m_TrackingDeviceConfigurated;
+  }
+
+void QmitkTrackingDeviceConfigurationWidget::ConfigurationFinished()
+  {
+  Finished();
+
+  }
+
+void QmitkTrackingDeviceConfigurationWidget::EnableAdvancedUserControl(bool enable)
+  {
+  m_AdvancedUserControl = enable;
+  m_Controls->configuration_finished_label->setVisible(enable);
+  m_Controls->m_finishedLine->setVisible(enable);
+  m_Controls->m_resetButton->setVisible(enable);
+  m_Controls->m_finishedButton->setVisible(enable);
   }
 

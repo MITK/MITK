@@ -112,10 +112,28 @@ public:
     };
 
     /**Documentation
+    * \brief Determines the output format
+    * 
+    * xml:  XML format, also default, can be read by NavigationDataPlayer
+    * csv:  use to export in excel, matlab, etc.
+    */
+	enum OutputFormat
+	{
+	  xml,
+	  csv
+	};
+
+    /**Documentation
     * \brief Sets the recording mode which causes different types of output streams
     * see enum RecordingMode
     */
     void SetRecordingMode(RecordingMode mode);
+
+	/**Documentation
+    * \brief Sets the output format which causes different formats of output streams. The XML format is default.
+    *  Also see enum OutputFormat for more information.
+    */
+	itkSetMacro(OutputFormatMember,mitk::NavigationDataRecorder::OutputFormat);
 
 protected:
 
@@ -136,6 +154,8 @@ protected:
     std::ostream* m_Stream; ///< the output stream
 
     RecordingMode m_RecordingMode; ///< stores the mode see enum RecordingMode
+
+	OutputFormat m_OutputFormatMember; ///< stores the output format; see enum OutputFormat
 
     bool m_Recording; ///< indicates whether the recording is started or not
 

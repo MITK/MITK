@@ -38,6 +38,7 @@ mitk::NavigationDataRecorder::NavigationDataRecorder()
   m_Stream = NULL;
   m_FileName = "";
   m_SystemTimeClock = RealTimeClock::New();
+  m_OutputFormatMember = mitk::NavigationDataRecorder::xml;
 
   //To get a start time
   mitk::TimeStamp::GetInstance()->Start(this);

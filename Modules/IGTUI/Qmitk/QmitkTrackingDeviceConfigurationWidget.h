@@ -23,6 +23,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include "ui_QmitkTrackingDeviceConfigurationWidgetControls.h"
 #include "mitkTrackingDevice.h"
 
+
+//itk headers
+
  /** Documentation:
   *   \brief An object of this class offers an UI to configurate
   *          a tracking device. If the user finished the configuration process and
@@ -65,6 +68,11 @@ class MitkIGTUI_EXPORT QmitkTrackingDeviceConfigurationWidget : public QWidget
      *        button "reset" is shown or not.
      */
     void EnableUserReset(bool enable);
+
+	/** @return Returns true if the tracking device is completely configured (you can get it by calling GetTrackingDevice() in this case). 
+	 *          Returns false if configuration is not finished.
+	 */
+	bool GetTrackingDeviceConfigured();
 
   signals:
 

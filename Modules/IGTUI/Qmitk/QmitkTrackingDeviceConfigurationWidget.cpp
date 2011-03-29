@@ -204,3 +204,8 @@ mitk::TrackingDevice::Pointer QmitkTrackingDeviceConfigurationWidget::GetTrackin
   return this->m_TrackingDevice;
   }
 
+bool QmitkTrackingDeviceConfigurationWidget::GetTrackingDeviceConfigured()
+  {
+  return this->m_TrackingDeviceConfigurated;
+  }
+

@@ -30,7 +30,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkNavigationDataObjectVisualizationFilter.h>
 #include <mitkNavigationDataRecorder.h>
 
-
+//QT headers
+#include <QTimer>
 
 /*!
   \brief QmitkMITKIGTTrackingToolboxView 
@@ -65,6 +66,9 @@ class QmitkMITKIGTTrackingToolboxView : public QObject, public QmitkFunctionalit
 	void OnStartTracking();
 
 	void OnStopTracking();
+
+  /** @brief Slot for tracking timer */
+  void UpdateTrackingTimer();
   
    
   protected:
@@ -82,6 +86,8 @@ class QmitkMITKIGTTrackingToolboxView : public QObject, public QmitkFunctionalit
 	mitk::TrackingDeviceSource::Pointer m_TrackingDeviceSource;
 	mitk::NavigationDataObjectVisualizationFilter::Pointer m_ToolVisualizationFilter;
 	mitk::NavigationDataRecorder::Pointer m_loggingFilter;
+
+  QTimer* m_TrackingTimer;
 	
 };
 

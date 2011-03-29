@@ -29,6 +29,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 // MITK
 #include <mitkNavigationToolStorageDeserializer.h>
+#include <mitkTrackingDeviceSourceConfigurator.h>
 
 
 
@@ -39,11 +40,12 @@ QmitkMITKIGTTrackingToolboxView::QmitkMITKIGTTrackingToolboxView()
 , m_Controls( 0 )
 , m_MultiWidget( NULL )
 {
-	
+  m_TrackingTimer = new QTimer(this);	
 }
 
 QmitkMITKIGTTrackingToolboxView::~QmitkMITKIGTTrackingToolboxView()
 {
+  
 }
 
 
@@ -57,6 +59,9 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl( QWidget *parent )
     m_Controls->setupUi( parent );
  
     connect( m_Controls->m_LoadTools, SIGNAL(clicked()), this, SLOT(OnLoadTools()) );
+    connect( m_Controls->m_StartTracking, SIGNAL(clicked()), this, SLOT(OnStartTracking()) );
+    connect( m_Controls->m_StopTracking, SIGNAL(clicked()), this, SLOT(OnStopTracking()) );
+    connect( m_TrackingTimer, SIGNAL(timeout()), this, SLOT(UpdateTrackingTimer()));
   }
 }
 
@@ -89,7 +94,7 @@ void QmitkMITKIGTTrackingToolboxView::OnLoadTools()
 	MessageBox(myDeserializer->GetErrorMessage());
 	m_toolStorage = NULL;
 	return;
-    }
+  }
 
   //update label
   QString toolLabel = QString("Loaded Tools: ") + QString::number(m_toolStorage->GetToolCount()) + " Tools from " + filename;
@@ -97,16 +102,50 @@ void QmitkMITKIGTTrackingToolboxView::OnLoadTools()
 }
 
 void QmitkMITKIGTTrackingToolboxView::OnStartTracking()
-{}
+{
+//check if everything is ready to start tracking
+if (!this->m_Controls->m_configurationWidget->GetTrackingDeviceConfigured())
+  {
+  MessageBox("Error: Tracking Device Not Configured!");
+  return;
+  }
+else if (this->m_toolStorage.IsNull())
+  {
+  MessageBox("Error: No Tools Loaded Yet!");
+  return;
+  }
+else if (this->m_toolStorage->GetToolCount() == 0)
+  {
+  MessageBox("Error: No Way To Track Without Tools!");
+  return;
+  }
+
+//build the IGT pipeline
+mitk::TrackingDeviceSourceConfigurator::Pointer myTrackingDeviceSourceFactory = mitk::TrackingDeviceSourceConfigurator::New(this->m_toolStorage,this->m_Controls->m_configurationWidget->GetTrackingDevice());
+m_TrackingDeviceSource = myTrackingDeviceSourceFactory->CreateTrackingDeviceSource(this->m_ToolVisualizationFilter);
+m_TrackingDeviceSource->Connect();
+m_TrackingDeviceSource->StartTracking();
+m_TrackingTimer->start(100);
+}
 
 void QmitkMITKIGTTrackingToolboxView::OnStopTracking()
-{}
+{
+m_TrackingTimer->stop();
+m_TrackingDeviceSource->StopTracking();
+m_TrackingDeviceSource->Disconnect();
+}
 
 void QmitkMITKIGTTrackingToolboxView::MessageBox(std::string s)
   {
   QMessageBox msgBox;
   msgBox.setText(s.c_str());
   msgBox.exec();
+  }
+
+void QmitkMITKIGTTrackingToolboxView::UpdateTrackingTimer()
+  {
+  m_ToolVisualizationFilter->Update();
+  mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   }
 
 

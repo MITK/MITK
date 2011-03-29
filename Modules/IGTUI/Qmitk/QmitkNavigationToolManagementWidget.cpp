@@ -334,3 +334,20 @@ void QmitkNavigationToolManagementWidget::MessageBox(std::string s)
   msgBox.setText(s.c_str());
   msgBox.exec();
   }
+
+void QmitkNavigationToolManagementWidget::EnableSingleToolSave(bool enable)
+  {
+  if (enable)
+    {
+    m_Controls->m_LoadSingleTool->setVisible(true);
+    m_Controls->m_SaveSingleTool->setVisible(true);
+    m_Controls->m_singleToolLabel->setVisible(true);
+    }
+  else
+    {
+    m_Controls->m_LoadSingleTool->setVisible(false);
+    m_Controls->m_SaveSingleTool->setVisible(false);
+    m_Controls->m_singleToolLabel->setVisible(false);
+    }
+
+  }

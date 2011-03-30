@@ -242,7 +242,10 @@ namespace berry
     template <class T>
     static std::string ToString(const T& obj, int precision = 12 )
     {
-      std::ostringstream s; s.precision(precision); s << obj; return s.str();
+      std::ostringstream s;
+      std::locale C("C");
+      s.imbue(C);
+      s.precision(precision); s << obj; return s.str();
     }
     ///
     /// Sets the dirty flag recursively on all child nodes.

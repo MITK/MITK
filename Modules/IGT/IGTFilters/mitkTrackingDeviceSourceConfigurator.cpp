@@ -70,22 +70,18 @@ mitk::TrackingDeviceSource::Pointer mitk::TrackingDeviceSourceConfigurator::Crea
 {
   if (!this->IsCreateTrackingDeviceSourcePossible()) return NULL;
   mitk::TrackingDeviceSource::Pointer returnValue;
-  if (m_TrackingDevice->GetType()==mitk::NDIAurora)
-    {
-    returnValue = CreateNDIAuroraTrackingDeviceSource(m_TrackingDevice,m_NavigationTools);
-    visualizationFilter = CreateNavigationDataObjectVisualizationFilter(returnValue,m_NavigationTools); 
-    }
-  else if (m_TrackingDevice->GetType()==mitk::NDIPolaris)
-    {
-    returnValue = CreateNDIPolarisTrackingDeviceSource(m_TrackingDevice,m_NavigationTools);
-    visualizationFilter = CreateNavigationDataObjectVisualizationFilter(returnValue,m_NavigationTools); 
-    }
-  else if (m_TrackingDevice->GetType()==mitk::ClaronMicron)
-    {
-    returnValue = CreateMicronTrackerTrackingDeviceSource(m_TrackingDevice,m_NavigationTools);
-    visualizationFilter = CreateNavigationDataObjectVisualizationFilter(returnValue,m_NavigationTools); 
-    }
-  //TODO: insert other tracking systems?    
+  
+  //create tracking device source
+  if (m_TrackingDevice->GetType()==mitk::NDIAurora) {returnValue = CreateNDIAuroraTrackingDeviceSource(m_TrackingDevice,m_NavigationTools);}
+  else if (m_TrackingDevice->GetType()==mitk::NDIPolaris) {returnValue = CreateNDIPolarisTrackingDeviceSource(m_TrackingDevice,m_NavigationTools);}
+  else if (m_TrackingDevice->GetType()==mitk::ClaronMicron) {returnValue = CreateMicronTrackerTrackingDeviceSource(m_TrackingDevice,m_NavigationTools);}
+    //TODO: insert other tracking systems? 
+  if (returnValue.IsNull()) return NULL;
+
+  //create visualization filter
+  visualizationFilter = CreateNavigationDataObjectVisualizationFilter(returnValue,m_NavigationTools);
+  if (visualizationFilter.IsNull()) return NULL;
+  
   return returnValue;
 }
     
@@ -117,15 +113,49 @@ mitk::TrackingDeviceSource::Pointer mitk::TrackingDeviceSourceConfigurator::Crea
 
 mitk::TrackingDeviceSource::Pointer mitk::TrackingDeviceSourceConfigurator::CreateNDIAuroraTrackingDeviceSource(mitk::TrackingDevice::Pointer trackingDevice, mitk::NavigationToolStorage::Pointer navigationTools)
   {
+  mitk::TrackingDeviceSource::Pointer returnValue = mitk::TrackingDeviceSource::New();
   mitk::NDITrackingDevice::Pointer thisDevice = dynamic_cast<mitk::NDITrackingDevice*>(trackingDevice.GetPointer());
-  for (int i=0; i<navigationTools->GetToolCount(); i++)
+
+  //connect to aurora to dectect tools automatically
+  thisDevice->OpenConnection();
+  thisDevice->StartTracking();
+  thisDevice->StopTracking();
+  thisDevice->CloseConnection();
+  
+  //now search for automatically detected tools in the tool storage and save them
+  mitk::NavigationToolStorage::Pointer newToolStorageInRightOrder = mitk::NavigationToolStorage::New();
+  for (int i=0; i<thisDevice->GetToolCount(); i++)
       {
-      //TODO here: create a tracking tool for every navigation tool
-      //           check if some tools are already connected to the aurora
-      //           also: new class, which handles the visualization of tool surfaces? => NavigationDataObjectVisual
-    
+      bool toolFound = false;
+      for (int j=0; j<navigationTools->GetToolCount(); j++)
+        {
+          if ((dynamic_cast<mitk::NDIPassiveTool*>(thisDevice->GetTool(i)))->GetSerialNumber() == navigationTools->GetTool(j)->GetSerialNumber())
+            {
+            //add tool in right order
+            newToolStorageInRightOrder->AddTool(navigationTools->GetTool(j));
+            //adapt name of tool
+            dynamic_cast<mitk::NDIPassiveTool*>(thisDevice->GetTool(i))->SetToolName(navigationTools->GetTool(j)->GetToolName());
+            toolFound = true;
+            break;
+            }
+        }
+      if (!toolFound)
+        {
+        this->m_ErrorMessage = "Error: did not find every automatically detected tool in the loaded tool storage: aborting initialization.";
+        return NULL;
+        }
       }
-  return NULL;
+  
+  //delete all tools from the tool storage
+  navigationTools->DeleteAllTools();
+
+  //and add only the detected tools in the right order
+  for (int i=0; i<newToolStorageInRightOrder->GetToolCount(); i++)
+      {
+      navigationTools->AddTool(newToolStorageInRightOrder->GetTool(i));   
+      }
+  returnValue->SetTrackingDevice(thisDevice);
+  return returnValue;
   }
 
 mitk::TrackingDeviceSource::Pointer mitk::TrackingDeviceSourceConfigurator::CreateMicronTrackerTrackingDeviceSource(mitk::TrackingDevice::Pointer trackingDevice, mitk::NavigationToolStorage::Pointer navigationTools)  
@@ -153,7 +183,12 @@ mitk::NavigationDataObjectVisualizationFilter::Pointer mitk::TrackingDeviceSourc
   for (int i=0; i<trackingDeviceSource->GetNumberOfOutputs(); i++)
     {
     mitk::NavigationTool::Pointer currentTool = navigationTools->GetToolByName(trackingDeviceSource->GetOutput(i)->GetName());
-    returnValue->SetInput(i,trackingDeviceSource->GetOutput(i)); //is this the right way to connect the filters?
+    if (currentTool.IsNull())
+      {
+      this->m_ErrorMessage = "Error: did not find correspondig tool in tracking device after initialization.";
+      return NULL;
+      }
+    returnValue->SetInput(i,trackingDeviceSource->GetOutput(i));
     returnValue->SetRepresentationObject(i,currentTool->GetDataNode()->GetData());
     }
   return returnValue;

@@ -34,6 +34,11 @@ bool mitk::NavigationToolStorage::DeleteTool(int number)
     m_ToolCollection.erase(it);
     return true;
   }
+bool mitk::NavigationToolStorage::DeleteAllTools()
+  {
+  while(m_ToolCollection.size() > 0) if (!DeleteTool(0)) return false;
+  return true;
+  }
 
 bool mitk::NavigationToolStorage::AddTool(mitk::NavigationTool::Pointer tool)
   {

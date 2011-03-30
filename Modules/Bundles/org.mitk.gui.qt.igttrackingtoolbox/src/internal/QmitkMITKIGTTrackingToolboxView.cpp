@@ -42,6 +42,7 @@ QmitkMITKIGTTrackingToolboxView::QmitkMITKIGTTrackingToolboxView()
 {
   m_TrackingTimer = new QTimer(this);	
   m_tracking = false;
+  m_logging = false;
 }
 
 QmitkMITKIGTTrackingToolboxView::~QmitkMITKIGTTrackingToolboxView()
@@ -120,18 +121,28 @@ else if (this->m_toolStorage->GetToolCount() == 0)
   return;
   }
 
-//set configuration finished
-this->m_Controls->m_configurationWidget->ConfigurationFinished();
-
 //build the IGT pipeline
 mitk::TrackingDeviceSourceConfigurator::Pointer myTrackingDeviceSourceFactory = mitk::TrackingDeviceSourceConfigurator::New(this->m_toolStorage,this->m_Controls->m_configurationWidget->GetTrackingDevice());
 m_TrackingDeviceSource = myTrackingDeviceSourceFactory->CreateTrackingDeviceSource(this->m_ToolVisualizationFilter);
+if (m_TrackingDeviceSource.IsNull()) 
+  {
+  MessageBox(myTrackingDeviceSourceFactory->GetErrorMessage());
+  return;
+  }
+
+//set configuration finished
+this->m_Controls->m_configurationWidget->ConfigurationFinished();
+
+//initialize tracking
 m_TrackingDeviceSource->Connect();
 m_TrackingDeviceSource->StartTracking();
 m_TrackingTimer->start(100);
 m_Controls->m_TrackingControlLabel->setText("Status: tracking");
+
+//start logging if logging is on
 if (this->m_Controls->m_EnableLogging->isChecked()) StartLogging();
-m_tracking=true;
+
+m_tracking = true;
 }
 
 void QmitkMITKIGTTrackingToolboxView::OnStopTracking()
@@ -155,6 +166,7 @@ void QmitkMITKIGTTrackingToolboxView::MessageBox(std::string s)
 void QmitkMITKIGTTrackingToolboxView::UpdateTrackingTimer()
   {
   m_ToolVisualizationFilter->Update();
+  std::cout << "Position" << m_ToolVisualizationFilter->GetOutput(0)->GetPosition() << std::endl;
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   if (m_logging) this->m_loggingFilter->Update();
   }

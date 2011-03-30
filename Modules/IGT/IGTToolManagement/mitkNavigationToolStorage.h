@@ -78,6 +78,11 @@ namespace mitk {
     bool DeleteTool(int number);
 
     /**
+     * @brief Deletes all tools from the collection.
+     */
+    bool DeleteAllTools();
+
+    /**
      * @return Returns the number of tools stored in the storage.
      */
     int GetToolCount();

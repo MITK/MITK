@@ -94,6 +94,22 @@ void mitk::SiemensDicomDiffusionImageHeaderReader::Update()
   // check if there are filenames
   if(m_DicomFilenames.size())
   {
+    const std::string& locale = "C";
+    const std::string& currLocale = setlocale( LC_ALL, NULL );
+
+    if ( locale.compare(currLocale)!=0 )
+    {
+      try
+      {
+        MITK_INFO << " ** Changing locale from " << setlocale(LC_ALL, NULL) << " to '" << locale << "'";
+        setlocale(LC_ALL, locale.c_str());
+      }
+      catch(...)
+      {
+        MITK_INFO << "Could not set locale " << locale;
+      }
+    }
+
     // adapted from slicer
     // DicomToNrrdConverter.cxx
 
@@ -334,6 +350,15 @@ void mitk::SiemensDicomDiffusionImageHeaderReader::Update()
       vect3d.fill( 0.0 );
       this->m_Output->DiffusionVector = vect3d;
 
+    }
+    try
+    {
+      MITK_INFO << " ** Changing locale back from " << setlocale(LC_ALL, NULL) << " to '" << currLocale << "'";
+      setlocale(LC_ALL, currLocale.c_str());
+    }
+    catch(...)
+    {
+      MITK_INFO << "Could not reset locale " << currLocale;
     }
   }
 }

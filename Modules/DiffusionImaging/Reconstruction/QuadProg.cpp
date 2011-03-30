@@ -74,6 +74,11 @@ double QuadProg::solve_quadprog(Matrix<double>& G, Vector<double>& g0,
                       Vector<double>& x)
 {
   std::ostringstream msg;
+
+  std::locale C("C");
+  std::locale originalLocale = msg.getloc();
+  msg.imbue(C);
+
   {
     //Ensure that the dimensions of the matrices and vectors can be
     //safely converted from unsigned int into to int without overflow.
@@ -484,6 +489,8 @@ l2a:/* Step 2a: determine step direction */
   print_vector("s", s, m);
 #endif
   goto l2a;
+
+  msg.imbue( originalLocale );
 }
 
 inline void compute_d(Vector<double>& d, const Matrix<double>& J, const Vector<double>& np)
@@ -712,6 +719,7 @@ void cholesky_decomposition(Matrix<double>& A)
 {
   register int i, j, k, n = A.nrows();
   register double sum;
+  std::locale C("C");
 	
   for (i = 0; i < n; i++)
   {
@@ -725,6 +733,7 @@ void cholesky_decomposition(Matrix<double>& A)
 	      if (sum <= 0.0)
         {
           std::ostringstream os;
+          os.imbue(C);
           // raise error
           print_matrix("A", A);
           os << "Error in cholesky decomposition, sum: " << sum;
@@ -783,6 +792,9 @@ inline void backward_elimination(const Matrix<double>& U, Vector<double>& x, con
 void print_matrix(const char* name, const Matrix<double>& A, int n, int m)
 {
   std::ostringstream s;
+  std::locale C("C");
+  s.imbue(C);
+
   std::string t;
   if (n == -1)
     n = A.nrows();
@@ -807,6 +819,9 @@ template<typename T>
 void print_vector(const char* name, const Vector<T>& v, int n)
 {
   std::ostringstream s;
+  std::locale C("C");
+  s.imbue(C);
+
   std::string t;
   if (n == -1)
     n = v.size();

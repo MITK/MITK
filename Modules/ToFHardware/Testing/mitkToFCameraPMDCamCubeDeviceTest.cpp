@@ -27,10 +27,11 @@ int mitkToFCameraPMDCamCubeDeviceTest(int /* argc */, char* /*argv*/[])
 
   mitk::ToFCameraPMDCamCubeDevice::Pointer tofCameraPMDCamCubeDevice = mitk::ToFCameraPMDCamCubeDevice::New();
   // No hardware attached for automatic testing -> test correct error handling
-  MITK_TEST_CONDITION_REQUIRED(!tofCameraPMDCamCubeDevice->ConnectCamera(), "Test ConnectCamera()");
-  MITK_TEST_CONDITION_REQUIRED(!tofCameraPMDCamCubeDevice->IsCameraActive(), "Test IsCameraActive()");
+  MITK_TEST_CONDITION_REQUIRED(tofCameraPMDCamCubeDevice->ConnectCamera(), "Test ConnectCamera()");
+  MITK_TEST_CONDITION_REQUIRED(!tofCameraPMDCamCubeDevice->IsCameraActive(), "Test IsCameraActive() before StartCamera()");
   MITK_TEST_OUTPUT(<<"Call StartCamera()");
   tofCameraPMDCamCubeDevice->StartCamera();
+  MITK_TEST_CONDITION_REQUIRED(tofCameraPMDCamCubeDevice->IsCameraActive(), "Test IsCameraActive() after StartCamera()");
   MITK_TEST_OUTPUT(<<"Call UpdateCamera()");
   tofCameraPMDCamCubeDevice->UpdateCamera();
   int numberOfPixels = tofCameraPMDCamCubeDevice->GetCaptureWidth()*tofCameraPMDCamCubeDevice->GetCaptureHeight();
@@ -45,14 +46,17 @@ int mitkToFCameraPMDCamCubeDeviceTest(int /* argc */, char* /*argv*/[])
   tofCameraPMDCamCubeDevice->GetAmplitudes(amplitudes,imageSequence);
   tofCameraPMDCamCubeDevice->GetIntensities(intensities,imageSequence);
   tofCameraPMDCamCubeDevice->GetAllImages(distances,amplitudes,intensities,sourceData,requiredImageSequence,imageSequence);
+  MITK_TEST_CONDITION_REQUIRED(tofCameraPMDCamCubeDevice->IsCameraActive(), "Test IsCameraActive() before StopCamera()");
   MITK_TEST_OUTPUT(<<"Call StopCamera()");
   tofCameraPMDCamCubeDevice->StopCamera();
+  MITK_TEST_CONDITION_REQUIRED(!tofCameraPMDCamCubeDevice->IsCameraActive(), "Test IsCameraActive() after StopCamera()");
 
   MITK_TEST_CONDITION_REQUIRED(tofCameraPMDCamCubeDevice->DisconnectCamera(), "Test DisonnectCamera()");
   delete[] distances;
   delete[] amplitudes;
   delete[] intensities;
   delete[] sourceData;
+
   MITK_TEST_END();
 
 }

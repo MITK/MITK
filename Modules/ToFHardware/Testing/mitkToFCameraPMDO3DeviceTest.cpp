@@ -27,10 +27,11 @@ int mitkToFCameraPMDO3DeviceTest(int /* argc */, char* /*argv*/[])
 
   mitk::ToFCameraPMDO3Device::Pointer tofCameraPMDO3Device = mitk::ToFCameraPMDO3Device::New();
   // No hardware attached for automatic testing -> test correct error handling
-  MITK_TEST_CONDITION_REQUIRED(!tofCameraPMDO3Device->ConnectCamera(), "Test ConnectCamera()");
-  MITK_TEST_CONDITION_REQUIRED(!tofCameraPMDO3Device->IsCameraActive(), "Test IsCameraActive()");
+  MITK_TEST_CONDITION_REQUIRED(tofCameraPMDO3Device->ConnectCamera(), "Test ConnectCamera()");
+  MITK_TEST_CONDITION_REQUIRED(!tofCameraPMDO3Device->IsCameraActive(), "Test IsCameraActive() before StartCamera()");
   MITK_TEST_OUTPUT(<<"Call StartCamera()");
   tofCameraPMDO3Device->StartCamera();
+  MITK_TEST_CONDITION_REQUIRED(tofCameraPMDO3Device->IsCameraActive(), "Test IsCameraActive() after StartCamera()");
   MITK_TEST_OUTPUT(<<"Call UpdateCamera()");
   tofCameraPMDO3Device->UpdateCamera();
   int numberOfPixels = tofCameraPMDO3Device->GetCaptureWidth()*tofCameraPMDO3Device->GetCaptureHeight();
@@ -45,8 +46,10 @@ int mitkToFCameraPMDO3DeviceTest(int /* argc */, char* /*argv*/[])
   tofCameraPMDO3Device->GetAmplitudes(amplitudes,imageSequence);
   tofCameraPMDO3Device->GetIntensities(intensities,imageSequence);
   tofCameraPMDO3Device->GetAllImages(distances,amplitudes,intensities,sourceData,requiredImageSequence,imageSequence);
+  MITK_TEST_CONDITION_REQUIRED(tofCameraPMDO3Device->IsCameraActive(), "Test IsCameraActive() before StopCamera()");
   MITK_TEST_OUTPUT(<<"Call StopCamera()");
   tofCameraPMDO3Device->StopCamera();
+  MITK_TEST_CONDITION_REQUIRED(!tofCameraPMDO3Device->IsCameraActive(), "Test IsCameraActive() after StopCamera()");
 
   MITK_TEST_CONDITION_REQUIRED(tofCameraPMDO3Device->DisconnectCamera(), "Test DisonnectCamera()");
   delete[] distances;

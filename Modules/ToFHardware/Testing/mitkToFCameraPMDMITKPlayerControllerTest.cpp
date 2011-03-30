@@ -28,12 +28,12 @@ int mitkToFCameraPMDMITKPlayerControllerTest(int /* argc */, char* /*argv*/[])
 
   mitk::ToFCameraPMDMITKPlayerController::Pointer testObject = mitk::ToFCameraPMDMITKPlayerController::New();
   MITK_TEST_CONDITION_REQUIRED(!(testObject.GetPointer() == NULL) ,"Testing initialization class");
-  MITK_TEST_CONDITION_REQUIRED(testObject->GetCaptureHeight()== 0 ,"Testing initialization of CaptureHeight");
-  MITK_TEST_CONDITION_REQUIRED(testObject->GetCaptureWidth()== 0 ,"Testing initialization of CaptureWidth"); 
+  MITK_TEST_CONDITION_REQUIRED(testObject->GetCaptureHeight()== 200 ,"Testing initialization of CaptureHeight");
+  MITK_TEST_CONDITION_REQUIRED(testObject->GetCaptureWidth()== 200 ,"Testing initialization of CaptureWidth");
   // test empty file behavior
   std::string testFile = "";
   testObject->SetInputFileName(testFile);
-  MITK_TEST_CONDITION_REQUIRED(!testObject->OpenCameraConnection(),"Testing open camera without valid data"); 
+  MITK_TEST_CONDITION_REQUIRED(testObject->OpenCameraConnection(),"Testing open camera without valid data");
   //MITK_TEST_CONDITION_REQUIRED(!testObject->CloseCameraConnection(),"Testing closing of connection");
 
   //test valid data behavior

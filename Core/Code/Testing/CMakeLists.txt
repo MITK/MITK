@@ -17,3 +17,8 @@ mitkAddCustomModuleTest(mitkStateMachineFactoryTest_TestStateMachine1_2 mitkStat
 
 ADD_TEST(mitkPointSetLocaleTest  ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${TESTDRIVER} mitkPointSetLocaleTest ${MITK_DATA_DIR}/pointSet.mps)
 SET_PROPERTY(TEST mitkPointSetLocaleTest PROPERTY LABELS MITK-Core)
+ADD_TEST(mitkPicFileReaderTest_emptyGzipFile ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${TESTDRIVER} mitkPicFileReaderTest ${CMAKE_CURRENT_SOURCE_DIR}/Data/emptyFile.pic.gz)
+SET_PROPERTY(TEST mitkPicFileReaderTest_emptyGzipFile PROPERTY LABELS MITK-Core)
+
+ADD_TEST(mitkImageTest_brainImage ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${TESTDRIVER} mitkImageTest ${MITK_DATA_DIR}/brain.mhd)
+SET_PROPERTY(TEST mitkImageTest_brainImage PROPERTY LABELS MITK-Core)

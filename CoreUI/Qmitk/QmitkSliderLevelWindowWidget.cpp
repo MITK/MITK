@@ -305,8 +305,8 @@ void QmitkSliderLevelWindowWidget::mouseMoveEvent( QMouseEvent* mouseEvent )
         else
           value = m_LevelWindow.GetWindow() - ( ( 2 * diff ) );
 
-        if ( value < 1 )
-          value = 1;
+        if ( value < 0 )
+          value = 0;
 
         m_LevelWindow.SetLevelWindow( m_LevelWindow.GetLevel(), value );
       } 
@@ -323,8 +323,8 @@ void QmitkSliderLevelWindowWidget::mouseMoveEvent( QMouseEvent* mouseEvent )
           
           value = m_LevelWindow.GetWindow() - ( ( diff ) );
 
-          if ( value < 1 )
-            value = 1;
+          if ( value < 0 )
+            value = 0;
           float oldWindow;
           float oldLevel;
           float newLevel;
@@ -345,8 +345,8 @@ void QmitkSliderLevelWindowWidget::mouseMoveEvent( QMouseEvent* mouseEvent )
           
           value = m_LevelWindow.GetWindow() + ( ( diff ) );
 
-          if ( value < 1 )
-            value = 1;
+          if ( value < 0 )
+            value = 0;
           float oldWindow;
           float oldLevel;
           float newLevel;
@@ -375,8 +375,8 @@ void QmitkSliderLevelWindowWidget::mouseMoveEvent( QMouseEvent* mouseEvent )
     else
       window = m_LevelWindow.GetWindow() - ( ( 2 * diff ) );
 
-    if ( window < 1 )
-      window = 1;
+    if ( window < 0 )
+      window = 0;
 
     if ( level - wh < minv )
       m_LevelWindow.SetLevelWindow( m_LevelWindow.GetRangeMin() + wh, m_LevelWindow.GetWindow() );

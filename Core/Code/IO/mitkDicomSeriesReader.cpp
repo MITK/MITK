@@ -167,11 +167,11 @@ DicomSeriesReader::ReadPhilips3DDicom(const std::string &filename, mitk::Image::
   gdcm::Attribute<0x0028,0x0011> dimTagX; // coloumns || sagittal
   gdcm::Attribute<0x3001,0x1001, gdcm::VR::UL, gdcm::VM::VM1> dimTagZ; //I have no idea what is VM1. // (Philips specific) // transversal
   gdcm::Attribute<0x0028,0x0010> dimTagY; // rows || coronal
-  gdcm::Attribute<0x0028,0x0008> dimTagT;
-  gdcm::Attribute<0x0018,0x602c> spaceTagX;
+  gdcm::Attribute<0x0028,0x0008> dimTagT; // how many frames
+  gdcm::Attribute<0x0018,0x602c> spaceTagX; // Spacing in X , unit is "physicalTagx" (usually centimeter)
   gdcm::Attribute<0x0018,0x602e> spaceTagY;
   gdcm::Attribute<0x3001,0x1003, gdcm::VR::FD, gdcm::VM::VM1> spaceTagZ; // (Philips specific)
-  gdcm::Attribute<0x0018,0x6024> physicalTagX;
+  gdcm::Attribute<0x0018,0x6024> physicalTagX; // if 3, then spacing params are centimeter
   gdcm::Attribute<0x0018,0x6026> physicalTagY;
   gdcm::Attribute<0x3001,0x1002, gdcm::VR::US, gdcm::VM::VM1> physicalTagZ; // (Philips specific)
 
@@ -199,6 +199,15 @@ DicomSeriesReader::ReadPhilips3DDicom(const std::string &filename, mitk::Image::
     spaceX = spaceTagX.GetValue(),
     spaceY = spaceTagY.GetValue(),
     spaceZ = spaceTagZ.GetValue();
+
+  if (physicalX == 3) // spacing parameter in cm, have to convert it to mm.
+    spaceX = spaceX * 10;
+
+  if (physicalY == 3) // spacing parameter in cm, have to convert it to mm.
+    spaceY = spaceY * 10;
+  
+  if (physicalZ == 3) // spacing parameter in cm, have to convert it to mm.
+    spaceZ = spaceZ * 10;
 
   // Ok, got all necessary Tags!
   // Now read Pixeldata (7fe0,0010) X x Y x Z x T Elements
@@ -228,9 +237,9 @@ DicomSeriesReader::ReadPhilips3DDicom(const std::string &filename, mitk::Image::
   mySpacing[1] = spaceY;
   mySpacing[2] = spaceZ;
   mySpacing[3] = 1;
-  myIndex[0] = physicalX;
-  myIndex[1] = physicalY;
-  myIndex[2] = physicalZ;
+  myIndex[0] = 0;
+  myIndex[1] = 0;
+  myIndex[2] = 0;
   myIndex[3] = 0;
   mySize[0] = dimX;
   mySize[1] = dimY;

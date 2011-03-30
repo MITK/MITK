@@ -204,6 +204,22 @@ mitk::DicomDiffusionImageHeaderReader::GetOutput()
 
 void mitk::DicomDiffusionImageHeaderReader::ReadPublicTags()
 {
+  const std::string& locale = "C";
+  const std::string& currLocale = setlocale( LC_ALL, NULL );
+
+  if ( locale.compare(currLocale)!=0 )
+  {
+    try
+    {
+      MITK_INFO << " ** Changing locale from " << setlocale(LC_ALL, NULL) << " to '" << locale << "'";
+      setlocale(LC_ALL, locale.c_str());
+    }
+    catch(...)
+    {
+      MITK_INFO << "Could not set locale " << locale;
+    }
+  }
+
   VolumeReaderType::DictionaryArrayRawPointer inputDict 
     = m_VolumeReader->GetMetaDataDictionaryArray();
 
@@ -304,6 +320,15 @@ void mitk::DicomDiffusionImageHeaderReader::ReadPublicTags()
   this->m_Output->ySlice = ySlice;
   this->m_Output->zSlice = zSlice;
 
+  try
+  {
+    MITK_INFO << " ** Changing locale back from " << setlocale(LC_ALL, NULL) << " to '" << currLocale << "'";
+    setlocale(LC_ALL, currLocale.c_str());
+  }
+  catch(...)
+  {
+    MITK_INFO << "Could not reset locale " << currLocale;
+  }
 }
 
 //  nRows, nCols, xRes, yRes, xOrigin,yOrigin, 

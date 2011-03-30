@@ -823,6 +823,10 @@ namespace itk {
     NrBasisFunctionCenters>
     ::PrintSelf(std::ostream& os, Indent indent) const
   {
+    std::locale C("C");
+    std::locale originalLocale = os.getloc();
+    os.imbue(C);
+
     Superclass::PrintSelf(os,indent);
 
     os << indent << "OdfReconstructionMatrix: " << m_ReconstructionMatrix << std::endl;
@@ -850,6 +854,8 @@ namespace itk {
     {
       os << indent << "A multicomponent gradient image has been supplied" << std::endl;
     }
+
+    os.imbue( originalLocale );
   }
 
 }

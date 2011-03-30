@@ -17,14 +17,16 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef __itkAnalyticalDiffusionQballReconstructionImageFilter_cpp
 #define __itkAnalyticalDiffusionQballReconstructionImageFilter_cpp
 
-#include "itkAnalyticalDiffusionQballReconstructionImageFilter.h"
-#include "itkImageRegionConstIterator.h"
-#include "itkImageRegionConstIteratorWithIndex.h"
-#include "itkImageRegionIterator.h"
-#include "itkArray.h"
-#include "vnl/vnl_vector.h"
+#include <itkAnalyticalDiffusionQballReconstructionImageFilter.h>
+#include <itkImageRegionConstIterator.h>
+#include <itkImageRegionConstIteratorWithIndex.h>
+#include <itkImageRegionIterator.h>
+#include <itkArray.h>
+#include <vnl/vnl_vector.h>
 
 #include <boost/version.hpp>
+#include <stdio.h>
+#include <locale>
 
 #if BOOST_VERSION / 100000 > 0
 #if BOOST_VERSION / 100 % 1000 > 34
@@ -426,6 +428,10 @@ namespace itk {
       {
         vnl_matrix<double> A = (*pA);
         ofstream myfile;
+        std::locale C("C");
+        std::locale originalLocale = myfile.getloc();
+        myfile.imbue(C);
+
         myfile.open (fname.c_str());
         myfile << "A1=[";
         for(int i=0; i<A.rows(); i++)
@@ -440,6 +446,7 @@ namespace itk {
         myfile << "];";
         myfile.close();
 
+        myfile.imbue( originalLocale );
       }
 
       template< class T, class TG, class TO, int L, int NODF>
@@ -858,6 +865,10 @@ namespace itk {
       void AnalyticalDiffusionQballReconstructionImageFilter<T,TG,TO,L,NODF>
         ::PrintSelf(std::ostream& os, Indent indent) const
       {
+        std::locale C("C");
+        std::locale originalLocale = os.getloc();
+        os.imbue(C);
+
         Superclass::PrintSelf(os,indent);
 
         os << indent << "OdfReconstructionMatrix: " << m_ReconstructionMatrix << std::endl;
@@ -877,6 +888,8 @@ namespace itk {
           m_NumberOfBaselineImages << std::endl;
         os << indent << "Threshold for reference B0 image: " << m_Threshold << std::endl;
         os << indent << "BValue: " << m_BValue << std::endl;
+
+        os.imbue( originalLocale );
       }
 
 }

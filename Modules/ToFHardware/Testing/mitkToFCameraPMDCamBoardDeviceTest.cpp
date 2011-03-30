@@ -27,10 +27,11 @@ int mitkToFCameraPMDCamBoardDeviceTest(int /* argc */, char* /*argv*/[])
 
   mitk::ToFCameraPMDCamBoardDevice::Pointer tofCameraPMDCamBoardDevice = mitk::ToFCameraPMDCamBoardDevice::New();
   // No hardware attached for automatic testing -> test correct error handling
-  MITK_TEST_CONDITION_REQUIRED(!tofCameraPMDCamBoardDevice->ConnectCamera(), "Test ConnectCamera()");
-  MITK_TEST_CONDITION_REQUIRED(!tofCameraPMDCamBoardDevice->IsCameraActive(), "Test IsCameraActive()");
+  MITK_TEST_CONDITION_REQUIRED(tofCameraPMDCamBoardDevice->ConnectCamera(), "Test ConnectCamera()");
+  MITK_TEST_CONDITION_REQUIRED(!tofCameraPMDCamBoardDevice->IsCameraActive(), "Test IsCameraActive() before StartCamera()");
   MITK_TEST_OUTPUT(<<"Call StartCamera()");
   tofCameraPMDCamBoardDevice->StartCamera();
+  MITK_TEST_CONDITION_REQUIRED(tofCameraPMDCamBoardDevice->IsCameraActive(), "Test IsCameraActive() after StartCamera()");
   MITK_TEST_OUTPUT(<<"Call UpdateCamera()");
   tofCameraPMDCamBoardDevice->UpdateCamera();
   int numberOfPixels = tofCameraPMDCamBoardDevice->GetCaptureWidth()*tofCameraPMDCamBoardDevice->GetCaptureHeight();
@@ -45,8 +46,10 @@ int mitkToFCameraPMDCamBoardDeviceTest(int /* argc */, char* /*argv*/[])
   tofCameraPMDCamBoardDevice->GetAmplitudes(amplitudes,imageSequence);
   tofCameraPMDCamBoardDevice->GetIntensities(intensities,imageSequence);
   tofCameraPMDCamBoardDevice->GetAllImages(distances,amplitudes,intensities,sourceData,requiredImageSequence,imageSequence);
+  MITK_TEST_CONDITION_REQUIRED(tofCameraPMDCamBoardDevice->IsCameraActive(), "Test IsCameraActive() before StopCamera()");
   MITK_TEST_OUTPUT(<<"Call StopCamera()");
   tofCameraPMDCamBoardDevice->StopCamera();
+  MITK_TEST_CONDITION_REQUIRED(!tofCameraPMDCamBoardDevice->IsCameraActive(), "Test IsCameraActive() after StopCamera()");
 
   MITK_TEST_CONDITION_REQUIRED(tofCameraPMDCamBoardDevice->DisconnectCamera(), "Test DisonnectCamera()");
   delete[] distances;

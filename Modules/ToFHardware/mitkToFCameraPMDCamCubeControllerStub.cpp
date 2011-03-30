@@ -31,12 +31,13 @@ namespace mitk
   bool ToFCameraPMDCamCubeController::OpenCameraConnection()
   {
     MITK_WARN("ToF") << "Error: PMD Camcube currently not available";
-    return false;
+    return true;
   }
 
   bool mitk::ToFCameraPMDCamCubeController::SetDistanceOffset( float offset )
   {
     MITK_WARN("ToF") << "Error: PMD Camcube currently not available";
+    return true;
   }
 
   float mitk::ToFCameraPMDCamCubeController::GetDistanceOffset()
@@ -48,11 +49,13 @@ namespace mitk
   bool mitk::ToFCameraPMDCamCubeController::SetRegionOfInterest( unsigned int leftUpperCornerX, unsigned int leftUpperCornerY, unsigned int width, unsigned int height )
   {
     MITK_WARN("ToF") << "Error: PMD Camcube currently not available";
+    return true;
   }
 
   bool mitk::ToFCameraPMDCamCubeController::SetRegionOfInterest( unsigned int roi[4] )
   {
     MITK_WARN("ToF") << "Error: PMD Camcube currently not available";
+    return true;
   }
 
   unsigned int* mitk::ToFCameraPMDCamCubeController::GetRegionOfInterest()
@@ -64,30 +67,36 @@ namespace mitk
   bool mitk::ToFCameraPMDCamCubeController::SetExposureMode( int mode )
   {
     MITK_WARN("ToF") << "Error: PMD Camcube currently not available";
+    return true;
   }
 
   bool mitk::ToFCameraPMDCamCubeController::SetFieldOfView( float fov )
   {
     MITK_WARN("ToF") << "Error: PMD Camcube currently not available";
+    return true;
   }
 
   bool mitk::ToFCameraPMDCamCubeController::SetFPNCalibration( bool on )
   {
     MITK_WARN("ToF") << "Error: PMD Camcube currently not available";
+    return true;
   }
 
   bool mitk::ToFCameraPMDCamCubeController::SetFPPNCalibration( bool on )
   {
     MITK_WARN("ToF") << "Error: PMD Camcube currently not available";
+    return true;
   }
 
   bool mitk::ToFCameraPMDCamCubeController::SetLinearityCalibration( bool on )
   {
     MITK_WARN("ToF") << "Error: PMD Camcube currently not available";
+    return true;
   }
 
   bool mitk::ToFCameraPMDCamCubeController::SetLensCalibration( bool on )
   {
     MITK_WARN("ToF") << "Error: PMD Camcube currently not available";
+    return true;
   }
 }

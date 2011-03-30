@@ -30,6 +30,6 @@ namespace mitk
   bool ToFCameraPMDO3Controller::OpenCameraConnection()
   {
     MITK_WARN("ToF") << "Error: PMD O3 camera currently not available.";
-    return false;
+    return true;
   }
 }

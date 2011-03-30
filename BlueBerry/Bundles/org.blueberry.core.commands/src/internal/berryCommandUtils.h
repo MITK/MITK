@@ -143,6 +143,8 @@ public:
   static std::string ToString(const std::vector<T>& vec)
   {
     std::stringstream str;
+    std::locale C("C");
+    str.imbue(C);
     str << "[";
     for (unsigned int i = 0; i < vec.size(); ++i)
     {

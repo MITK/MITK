@@ -130,6 +130,12 @@ if (m_TrackingDeviceSource.IsNull())
   MessageBox(myTrackingDeviceSourceFactory->GetErrorMessage());
   return;
   }
+for(int i=0; i<m_ToolVisualizationFilter->GetNumberOfOutputs(); i++) //connect the tool visualization widget
+  m_Controls->m_TrackingToolsStatusWidget->AddNavigationData(m_ToolVisualizationFilter->GetOutput(i));
+
+m_Controls->m_TrackingToolsStatusWidget->SetShowPositions(true);
+m_Controls->m_TrackingToolsStatusWidget->ShowStatusLabels();
+m_Controls->m_TrackingToolsStatusWidget->SetTextAlignment(Qt::AlignLeft);
 
 //set configuration finished
 this->m_Controls->m_configurationWidget->ConfigurationFinished();
@@ -170,6 +176,7 @@ void QmitkMITKIGTTrackingToolboxView::UpdateTrackingTimer()
   std::cout << "Position" << m_ToolVisualizationFilter->GetOutput(0)->GetPosition() << std::endl;
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   if (m_logging) this->m_loggingFilter->Update();
+  m_Controls->m_TrackingToolsStatusWidget->Refresh();
   }
 
 void QmitkMITKIGTTrackingToolboxView::OnEnableLoggingClicked()

@@ -31,6 +31,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qfiledialog.h>
 #include <qmessagebox.h>
 
+//poco headers
+#include <Poco/Path.h>
+
 const std::string QmitkNavigationToolManagementWidget::VIEW_ID = "org.mitk.views.navigationtoolmanagementwidget";
 
 QmitkNavigationToolManagementWidget::QmitkNavigationToolManagementWidget(QWidget* parent, Qt::WindowFlags f)
@@ -188,12 +191,14 @@ void QmitkNavigationToolManagementWidget::OnLoadStorage()
   {
     mitk::NavigationToolStorageDeserializer::Pointer myDeserializer = mitk::NavigationToolStorageDeserializer::New(m_DataStorage);
     std::string filename = QFileDialog::getOpenFileName(NULL,tr("Open Navigation Tool"), "/", "*.*").toAscii().data();
+    if (filename == "") return;
     mitk::NavigationToolStorage::Pointer tempStorage = myDeserializer->Deserialize(filename);
     if (tempStorage.IsNull()) MessageBox("Error" + myDeserializer->GetErrorMessage());
     else 
       {
       m_NavigationToolStorage = tempStorage;
-      m_Controls->m_StorageName->setText(filename.c_str());
+      Poco::Path myPath = Poco::Path(filename.c_str());
+      m_Controls->m_StorageName->setText(myPath.getFileName().c_str());
       }
     UpdateToolTable();
   }

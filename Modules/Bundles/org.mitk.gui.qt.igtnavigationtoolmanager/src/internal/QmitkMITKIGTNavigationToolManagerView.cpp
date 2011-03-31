@@ -64,9 +64,9 @@ void QmitkMITKIGTNavigationToolManagerView::StdMultiWidgetAvailable (QmitkStdMul
 
 
 void QmitkMITKIGTNavigationToolManagerView::StdMultiWidgetNotAvailable()
-{
+  {
   m_MultiWidget = NULL;
-}
+  }
 
 
 

@@ -69,7 +69,10 @@ void mitkDICOMLocaleTestWithReferenceImage(std::string filename)
     MITK_TEST_FAILED_MSG(<< "File "<< filename << " is not an image - test will not be applied." );
   
     return;
-  }  
+  }
+
+  MITK_INFO << "bug-7210-tmp output 0" << image->GetGeometry()->GetSpacing()[0];
+  MITK_INFO << "bug-7210-tmp output 1" << image->GetGeometry()->GetSpacing()[1];
   MITK_TEST_CONDITION_REQUIRED(mitk::Equal(image->GetGeometry()->GetSpacing()[0], 0.3141592), "correct x spacing");
   MITK_TEST_CONDITION_REQUIRED(mitk::Equal(image->GetGeometry()->GetSpacing()[1], 0.3141592), "correct y spacing");
 }

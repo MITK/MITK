@@ -25,6 +25,18 @@ QmitkToolTrackingStatusWidget::QmitkToolTrackingStatusWidget(QWidget* parent)
 : QWidget(parent), m_Controls(NULL), m_StatusLabels (NULL), m_NavigationDatas(NULL)
 {
   this->CreateQtPartControl( this );
+  m_ShowPositions = false;
+  m_Alignment = Qt::AlignHCenter;
+}
+
+void QmitkToolTrackingStatusWidget::SetShowPositions(bool enable)
+{
+  m_ShowPositions = enable;
+}
+
+void QmitkToolTrackingStatusWidget::SetTextAlignment(Qt::AlignmentFlag alignment)
+{
+  m_Alignment = alignment;
 }
 
 QmitkToolTrackingStatusWidget::~QmitkToolTrackingStatusWidget()
@@ -79,11 +91,19 @@ void QmitkToolTrackingStatusWidget::Refresh()
   {
     navData = m_NavigationDatas->at(i).GetPointer();
     QString name(navData->GetName());
+    QString pos = "";
+    if (m_ShowPositions)
+      {
+      mitk::Point3D position = navData->GetPosition();
+      pos = " [" + QString::number(position[0]) + ";" + QString::number(position[1]) + ";" + QString::number(position[2]) + "]";
+      }
 
     if(name.compare(m_StatusLabels->at(i)->text()) == 0)
     {
+      m_StatusLabels->at(i)->setText(name+pos);
       if(navData->IsDataValid())
         m_StatusLabels->at(i)->setStyleSheet("QLabel{background-color: #8bff8b }");
+      
       else
         m_StatusLabels->at(i)->setStyleSheet("QLabel{background-color: #ff7878 }");
     }
@@ -108,9 +128,10 @@ void QmitkToolTrackingStatusWidget::ShowStatusLabels()
     navData = m_NavigationDatas->at(i).GetPointer();
 
     QString name(navData->GetName());
+    std::cout << "Name: " <<name.toStdString();
 
     label = new QLabel(name, this);
-    label->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+    label->setAlignment(m_Alignment | Qt::AlignVCenter);
     label->setFrameStyle(QFrame::Panel | QFrame::Sunken);
 
     m_StatusLabels->append(label);

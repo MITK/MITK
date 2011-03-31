@@ -77,6 +77,12 @@ public:
   */ 
   void RemoveStatusLabels();
 
+  /** @brief Enables / disables if the tool positions are shown. Default is off.*/
+  void SetShowPositions(bool enable);
+
+  /** @brief Sets the text alignment of the tool labels. Default is center. Example: Use Qt::AlignLeft for left alignment. */
+  void SetTextAlignment(Qt::AlignmentFlag alignment);
+
 protected:
   void CreateConnections();
   void CreateQtPartControl( QWidget *parent );
@@ -91,6 +97,10 @@ private:
   QVector< QLabel* >* m_StatusLabels;
 
   std::vector<mitk::NavigationData::Pointer>*  m_NavigationDatas; 
+
+  bool m_ShowPositions;
+
+  Qt::AlignmentFlag m_Alignment;
 
 };
 #endif // _QmitkToolTrackingStatusWidget_H_INCLUDED

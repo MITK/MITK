@@ -78,6 +78,9 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl( QWidget *parent )
     TrackingVolumeNode = mitk::DataNode::New();
     TrackingVolumeNode->SetName("TrackingVolume");
     this->GetDataStorage()->Add(TrackingVolumeNode);
+
+    //initialize buttons
+    m_Controls->m_StopTracking->setEnabled(false);
   }
 }
 
@@ -188,6 +191,9 @@ if (m_Controls->m_ShowTrackingVolume->isChecked())
   }
 
 m_tracking = true;
+m_Controls->m_StopTracking->setEnabled(true);
+m_Controls->m_StartTracking->setEnabled(false);
+
 }
 
 void QmitkMITKIGTTrackingToolboxView::OnStopTracking()
@@ -203,6 +209,9 @@ this->m_Controls->m_LoadTools->setEnabled(true);
 m_Controls->m_TrackingToolsStatusWidget->RemoveStatusLabels();
 m_Controls->m_TrackingToolsStatusWidget->PreShowTools(m_toolStorage);
 TrackingVolumeNode->SetData(NULL);
+m_tracking = false;
+m_Controls->m_StopTracking->setEnabled(false);
+m_Controls->m_StartTracking->setEnabled(true);
 }
 
 void QmitkMITKIGTTrackingToolboxView::MessageBox(std::string s)

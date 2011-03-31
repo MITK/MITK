@@ -91,6 +91,8 @@ class QmitkMITKIGTTrackingToolboxView : public QObject, public QmitkFunctionalit
 
     void StopLogging();
 
+    mitk::DataNode::Pointer TrackingVolumeNode;
+
 	  //stores the loaded tools
 	  mitk::NavigationToolStorage::Pointer m_toolStorage;
 

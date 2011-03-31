@@ -30,6 +30,7 @@ PURPOSE.  See the above copyright notices for more information.
 // MITK
 #include <mitkNavigationToolStorageDeserializer.h>
 #include <mitkTrackingDeviceSourceConfigurator.h>
+#include <mitkTrackingVolume.h>
 
 
 
@@ -72,6 +73,11 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl( QWidget *parent )
     m_Controls->m_configurationWidget->EnableAdvancedUserControl(false);
     m_Controls->m_TrackingToolsStatusWidget->SetShowPositions(true);
     m_Controls->m_TrackingToolsStatusWidget->SetTextAlignment(Qt::AlignLeft);
+
+    //initialize tracking volume node
+    TrackingVolumeNode = mitk::DataNode::New();
+    TrackingVolumeNode->SetName("TrackingVolume");
+    this->GetDataStorage()->Add(TrackingVolumeNode);
   }
 }
 
@@ -139,10 +145,6 @@ if (m_TrackingDeviceSource.IsNull())
   return;
   }
 
-
-//set configuration finished
-this->m_Controls->m_configurationWidget->ConfigurationFinished();
-
 //initialize tracking
 try 
   {
@@ -170,6 +172,21 @@ m_Controls->m_TrackingToolsStatusWidget->ShowStatusLabels();
 //disable loading new tools
 this->m_Controls->m_LoadTools->setEnabled(false);
 
+//set configuration finished
+this->m_Controls->m_configurationWidget->ConfigurationFinished();
+
+//show tracking volume
+if (m_Controls->m_ShowTrackingVolume->isChecked())
+  {
+  mitk::TrackingVolume::Pointer volumeSurface = mitk::TrackingVolume::New();
+  volumeSurface->SetTrackingDeviceType(m_TrackingDeviceSource->GetTrackingDevice()->GetType());
+  TrackingVolumeNode->SetData(volumeSurface);
+  TrackingVolumeNode->SetOpacity(0.25);
+  mitk::Color red;
+  red.SetRed(1);
+  TrackingVolumeNode->SetColor(red);
+  }
+
 m_tracking = true;
 }
 
@@ -185,6 +202,7 @@ if (m_logging) StopLogging();
 this->m_Controls->m_LoadTools->setEnabled(true);
 m_Controls->m_TrackingToolsStatusWidget->RemoveStatusLabels();
 m_Controls->m_TrackingToolsStatusWidget->PreShowTools(m_toolStorage);
+TrackingVolumeNode->SetData(NULL);
 }
 
 void QmitkMITKIGTTrackingToolboxView::MessageBox(std::string s)

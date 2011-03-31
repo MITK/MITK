@@ -24,7 +24,7 @@
 #include "vnl/algo/vnl_svd.h"
 #include "itkVectorContainer.h"
 #include "itkVectorImage.h"
-#include "QuadProg.h"
+//#include "QuadProg.h"
 
 namespace itk{
 /** \class AnalyticalDiffusionQballReconstructionImageFilter
@@ -285,8 +285,8 @@ private:
 
   int                                               m_NumberCoefficients;
 
-  QuadProgPP::Matrix<double>                        m_G, m_CE, m_CI;
-  QuadProgPP::Vector<double>                        m_g0, m_ce0, m_ci0, m_x;
+//  QuadProgPP::Matrix<double>                        m_G, m_CE, m_CI;
+//  QuadProgPP::Vector<double>                        m_g0, m_ce0, m_ci0, m_x;
   vnl_matrix<double>*                               m_B_t;
   vnl_vector<double>*                               m_LP;
   BlaImage::Pointer m_ODFSumImage;

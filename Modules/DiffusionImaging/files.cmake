@@ -1,9 +1,5 @@
 SET(CPP_FILES 
 
-  # Reconstruction
-  Reconstruction/QuadProg.cpp
-  Reconstruction/Array.cpp
-
   # Algorithms
   Algorithms/itkDiffusionQballGeneralizedFaImageFilter.h
   Algorithms/itkDiffusionQballPrepareVisualizationImageFilter.h

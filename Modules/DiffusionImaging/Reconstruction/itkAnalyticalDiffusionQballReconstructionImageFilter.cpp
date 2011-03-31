@@ -377,24 +377,26 @@ namespace itk {
               * .5*|| Bc-s ||^2 == .5*c'B'Bc - x'B's + .5*s's
               */
 
-              QuadProgPP::Matrix<double>& G(m_G);
-              int lenb = B.size();
-              vnl_vector<double>* s = new vnl_vector<double>(lenb);
-              for (int ii=0; ii<lenb; ii++) (*s)(ii) = B(ii);
-              vnl_vector<double> g0_ = -1.0 * (*m_B_t) * (*s);
-              QuadProgPP::Vector<double> g0(g0_.data_block(),m_NumberCoefficients);
-              try
-              {
-                QuadProgPP::QuadProg::solve_quadprog(G,g0,m_CE,m_ce0,m_CI,m_ci0,m_x);
-              }
-              catch(...)
-              {
-                m_x = 0;
-              }
-              vnl_vector<TO> coeffs(m_NumberCoefficients);
-              for (int ii=0; ii<m_NumberCoefficients; ii++) coeffs(ii) = (*m_LP)(ii) * m_x[ii];
-              coeffs[0] += 1.0/(2.0*sqrt(QBALL_ANAL_RECON_PI));                
-              odf = ( (*m_SphericalHarmonicBasisMatrix) * coeffs ).data_block();
+              itkExceptionMacro( << "Nonnegative Solid Angle not yet implemented");
+
+//              QuadProgPP::Matrix<double>& G(m_G);
+//              int lenb = B.size();
+//              vnl_vector<double>* s = new vnl_vector<double>(lenb);
+//              for (int ii=0; ii<lenb; ii++) (*s)(ii) = B(ii);
+//              vnl_vector<double> g0_ = -1.0 * (*m_B_t) * (*s);
+//              QuadProgPP::Vector<double> g0(g0_.data_block(),m_NumberCoefficients);
+//              try
+//              {
+//                QuadProgPP::QuadProg::solve_quadprog(G,g0,m_CE,m_ce0,m_CI,m_ci0,m_x);
+//              }
+//              catch(...)
+//              {
+//                m_x = 0;
+//              }
+//              vnl_vector<TO> coeffs(m_NumberCoefficients);
+//              for (int ii=0; ii<m_NumberCoefficients; ii++) coeffs(ii) = (*m_LP)(ii) * m_x[ii];
+//              coeffs[0] += 1.0/(2.0*sqrt(QBALL_ANAL_RECON_PI));
+//              odf = ( (*m_SphericalHarmonicBasisMatrix) * coeffs ).data_block();
 
             }
             else
@@ -754,12 +756,12 @@ namespace itk {
           temp = fac1 * (*P) * (*_L) * temp;
           break;
         case QBAR_NONNEG_SOLID_ANGLE:
-          m_G = QuadProgPP::Matrix<double>(B_t_B.data_block(), B_t_B.rows(), B_t_B.cols());
-          m_CE = QuadProgPP::Matrix<double>((double)0,m_NumberCoefficients,0);
-          m_ce0 = QuadProgPP::Vector<double>((double)0,0);
-          m_ci0 = QuadProgPP::Vector<double>(4*QBALL_ANAL_RECON_PI, NODF);
-          m_x = QuadProgPP::Vector<double>(m_NumberCoefficients);
-          (*m_LP) *= fac1;
+//          m_G = QuadProgPP::Matrix<double>(B_t_B.data_block(), B_t_B.rows(), B_t_B.cols());
+//          m_CE = QuadProgPP::Matrix<double>((double)0,m_NumberCoefficients,0);
+//          m_ce0 = QuadProgPP::Vector<double>((double)0,0);
+//          m_ci0 = QuadProgPP::Vector<double>(4*QBALL_ANAL_RECON_PI, NODF);
+//          m_x = QuadProgPP::Vector<double>(m_NumberCoefficients);
+//          (*m_LP) *= fac1;
           break;
         }
 
@@ -812,9 +814,9 @@ namespace itk {
 
         if(m_NormalizationMethod == QBAR_NONNEG_SOLID_ANGLE)
         {
-          vnl_matrix<double> CI_t =
-            (*sphericalHarmonicBasisMatrix2) * (*P) * (*_L);
-          m_CI = QuadProgPP::Matrix<double>(CI_t.transpose().data_block(), m_NumberCoefficients, NOdfDirections);
+//          vnl_matrix<double> CI_t =
+//            (*sphericalHarmonicBasisMatrix2) * (*P) * (*_L);
+//          m_CI = QuadProgPP::Matrix<double>(CI_t.transpose().data_block(), m_NumberCoefficients, NOdfDirections);
         }
 
         m_ReconstructionMatrix = new vnl_matrix<TO>(NOdfDirections,m_NumberOfGradientDirections);

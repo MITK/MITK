@@ -88,6 +88,13 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkAndImageFilter.h>
 #include <itkXorImageFilter.h>
 
+//vtk
+#include <vtkInteractorStyle.h>
+#include <vtkInteractorStyleImage.h>
+#include <vtkRenderWindowInteractor.h>
+#include <vtkSmartPointer.h>
+#include <vtkCamera.h>
+
 
 // Convenient Definitions
 typedef itk::Image<short, 3>                                                            ImageType;
@@ -173,6 +180,9 @@ void QmitkBasicImageProcessing::CreateConnections()
 
     connect( (QObject*)(m_Controls->rBOneImOp), SIGNAL( clicked() ), this, SLOT( ChangeGUI() ) );
     connect( (QObject*)(m_Controls->rBTwoImOp), SIGNAL( clicked() ), this, SLOT( ChangeGUI() ) );
+
+
+    connect( (QObject*)(m_Controls->m_testButton), SIGNAL( clicked() ), this, SLOT( TestButtonClicked() ) );
   }
 
   m_TimeStepperAdapter = new QmitkStepperAdapter((QObject*) m_Controls->sliceNavigatorTime, 
@@ -874,6 +884,21 @@ void QmitkBasicImageProcessing::SelectAction2(int operation)
   m_Controls->tlImage2->setEnabled(true);
   m_Controls->m_ImageSelector2->setEnabled(true);
   m_Controls->btnDoIt2->setEnabled(true);
+}
+
+
+void QmitkBasicImageProcessing::TestButtonClicked()
+{
+//  vtkSmartPointer<vtkInteractorStyleImage> imgStyle = vtkSmartPointer<vtkInteractorStyleImage>::New();
+//  vtkSmartPointer<vtkRenderWindowInteractor> interactor = vtkSmartPointer<vtkRenderWindowInteractor>::New();
+//  interactor->SetInteractorStyle(imgStyle);
+
+//  GetActiveStdMultiWidget()->GetRenderWindow4()->GetRenderWindow()->SetInteractor(interactor);
+
+  vtkSmartPointer<vtkCamera> vtkCam = GetActiveStdMultiWidget()->GetRenderWindow1()->GetRenderer()->GetCameraController();
+  vtkCam->SetFocalPoint(100.0, 100.0, 100.0);
+
+  QMessageBox::critical(0, "Opening Perspective Failed", QString("The perspective could not be opened.\nSee the log for details."));
 }
 
 void QmitkBasicImageProcessing::StartButton2Clicked() 

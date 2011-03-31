@@ -111,6 +111,8 @@ public:
     */
     void ChangeGUI();
 
+    void TestButtonClicked();
+
 private: 
 
   /*

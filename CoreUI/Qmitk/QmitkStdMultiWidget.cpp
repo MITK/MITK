@@ -137,15 +137,6 @@ m_Node(NULL)
   mitkWidget1->SetLayoutIndex( TRANSVERSAL );
   mitkWidgetLayout1->addWidget(mitkWidget1); 
 
-  vtkSmartPointer<vtkInteractorStyleTrackballCamera> imageStyle = vtkSmartPointer<vtkInteractorStyleTrackballCamera>::New();
-//  imageStyle->SetInteractionModeToImage3D();
-
-  vtkSmartPointer<vtkRenderWindowInteractor> renderWindowInteractor = vtkSmartPointer<vtkRenderWindowInteractor>::New();
-
-  renderWindowInteractor->SetInteractorStyle(imageStyle);
-//  renderWindowInteractor->SetRenderWindow(mitkWidget1->GetRenderWindow());
-  mitkWidget1->GetRenderWindow()->SetInteractor(renderWindowInteractor);
-
   //Create RenderWindows 2
   mitkWidget2 = new QmitkRenderWindow(mitkWidget2Container, "stdmulti.widget2");
   mitkWidget2->setMaximumSize(2000,2000);

@@ -112,6 +112,7 @@ void QmitkMITKIGTTrackingToolboxView::OnLoadTools()
   m_Controls->m_toolLabel->setText(toolLabel);
 
   //update tool preview
+  m_Controls->m_TrackingToolsStatusWidget->RemoveStatusLabels();
   m_Controls->m_TrackingToolsStatusWidget->PreShowTools(m_toolStorage);
 }
 
@@ -137,26 +138,36 @@ if (m_TrackingDeviceSource.IsNull())
   MessageBox(myTrackingDeviceSourceFactory->GetErrorMessage());
   return;
   }
-std::cout << "Number of Outputs" << m_TrackingDeviceSource->GetNumberOfOutputs();
-for(int i=0; i<m_TrackingDeviceSource->GetNumberOfOutputs(); i++) //connect the tool visualization widget
-  {
-    m_Controls->m_TrackingToolsStatusWidget->AddNavigationData(m_TrackingDeviceSource->GetOutput(i));
-  }
 
-m_Controls->m_TrackingToolsStatusWidget->ShowStatusLabels();
 
 //set configuration finished
 this->m_Controls->m_configurationWidget->ConfigurationFinished();
 
 //initialize tracking
-m_TrackingDeviceSource->Connect();
-m_TrackingDeviceSource->StartTracking();
+try 
+  {
+  m_TrackingDeviceSource->Connect();
+  m_TrackingDeviceSource->StartTracking();
+  }
+catch (...)
+  {
+  MessageBox("Error while starting the tracking device!");
+  return;
+  }
 m_TrackingTimer->start(100);
 m_Controls->m_TrackingControlLabel->setText("Status: tracking");
 
 //start logging if logging is on
 if (this->m_Controls->m_EnableLogging->isChecked()) StartLogging();
 
+//connect the tool visualization widget
+for(int i=0; i<m_TrackingDeviceSource->GetNumberOfOutputs(); i++) 
+  {
+    m_Controls->m_TrackingToolsStatusWidget->AddNavigationData(m_TrackingDeviceSource->GetOutput(i));
+  }
+m_Controls->m_TrackingToolsStatusWidget->ShowStatusLabels();
+
+//disable loading new tools
 this->m_Controls->m_LoadTools->setEnabled(false);
 
 m_tracking = true;

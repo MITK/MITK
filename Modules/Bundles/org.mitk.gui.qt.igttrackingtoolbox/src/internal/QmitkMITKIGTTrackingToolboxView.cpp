@@ -103,7 +103,8 @@ void QmitkMITKIGTTrackingToolboxView::OnLoadTools()
   }
 
   //update label
-  QString toolLabel = QString("Loaded Tools: ") + QString::number(m_toolStorage->GetToolCount()) + " Tools from " + filename;
+  Poco::Path myPath = Poco::Path(filename.toStdString()); //use this to seperate filename from path
+  QString toolLabel = QString("Loaded Tools: ") + QString::number(m_toolStorage->GetToolCount()) + " Tools from " + myPath.getFileName().c_str();
   m_Controls->m_toolLabel->setText(toolLabel);
 }
 

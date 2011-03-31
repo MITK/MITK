@@ -27,7 +27,14 @@ QmitkToolTrackingStatusWidget::QmitkToolTrackingStatusWidget(QWidget* parent)
   this->CreateQtPartControl( this );
   m_ShowPositions = false;
   m_Alignment = Qt::AlignHCenter;
+  m_Style = QmitkToolTrackingStatusWidget::VerticalUpperStyle;
 }
+
+
+void QmitkToolTrackingStatusWidget::SetStyle(QmitkToolTrackingStatusWidget::Style newStyle)
+  {
+  m_Style = newStyle;
+  }
 
 void QmitkToolTrackingStatusWidget::SetShowPositions(bool enable)
 {
@@ -98,7 +105,7 @@ void QmitkToolTrackingStatusWidget::Refresh()
       pos = " [" + QString::number(position[0]) + ";" + QString::number(position[1]) + ";" + QString::number(position[2]) + "]";
       }
 
-    if(name.compare(m_StatusLabels->at(i)->text()) == 0)
+    if(name.compare(m_StatusLabels->at(i)->objectName()) == 0)
     {
       m_StatusLabels->at(i)->setText(name+pos);
       if(navData->IsDataValid())
@@ -113,6 +120,7 @@ void QmitkToolTrackingStatusWidget::Refresh()
 
 void QmitkToolTrackingStatusWidget::ShowStatusLabels()
 {
+  RemoveGuiLabels(); 
 
   if(m_NavigationDatas == NULL || m_NavigationDatas->size() <= 0)
     return;
@@ -128,34 +136,77 @@ void QmitkToolTrackingStatusWidget::ShowStatusLabels()
     navData = m_NavigationDatas->at(i).GetPointer();
 
     QString name(navData->GetName());
-    std::cout << "Name: " <<name.toStdString();
-
+   
     label = new QLabel(name, this);
+    label->setObjectName(name);
     label->setAlignment(m_Alignment | Qt::AlignVCenter);
     label->setFrameStyle(QFrame::Panel | QFrame::Sunken);
 
     m_StatusLabels->append(label);
-    m_Controls->m_GridLayout->addWidget(m_StatusLabels->at(i),0,i);
+    if (m_Style == QmitkToolTrackingStatusWidget::VerticalUpperStyle) m_Controls->m_VerticalLayout->addWidget(m_StatusLabels->at(i));
+    else m_Controls->m_GridLayout->addWidget(m_StatusLabels->at(i),0,i);
+    
   }
 }
+
+void QmitkToolTrackingStatusWidget::PreShowTools(mitk::NavigationToolStorage::Pointer toolStorage)
+  {
+  QLabel* label;
+
+  for(unsigned int i = 0; i < toolStorage->GetToolCount(); i++)
+    {
+    QString name(toolStorage->GetTool(i)->GetToolName().c_str());
+   
+    label = new QLabel(name, this);
+    label->setObjectName(name);
+    label->setAlignment(m_Alignment | Qt::AlignVCenter);
+    label->setFrameStyle(QFrame::Panel | QFrame::Sunken);
+    if (m_Style == QmitkToolTrackingStatusWidget::VerticalUpperStyle) m_Controls->m_VerticalLayout->addWidget(label);
+    else m_Controls->m_GridLayout->addWidget(label);
+    
+    }
+
+  }
 
 
 void QmitkToolTrackingStatusWidget::RemoveStatusLabels()
 {
+  //remove GUI elements
+  RemoveGuiLabels();  
 
-  while(m_Controls->m_GridLayout->count() > 0)
-  {
-    QWidget* actWidget = m_Controls->m_GridLayout->itemAt(0)->widget();
-    m_Controls->m_GridLayout->removeWidget(actWidget);
-    delete actWidget;
-  }
-
+  //clear members
   if(m_StatusLabels != NULL && m_StatusLabels->size() > 0)
-    m_StatusLabels->clear();
+    {
+    delete m_StatusLabels;
+    m_StatusLabels = new QVector< QLabel* >();
+    }
+
   if(m_NavigationDatas != NULL && m_NavigationDatas->size() > 0)
-    m_NavigationDatas->clear();
+    {
+    delete m_NavigationDatas;
+    m_NavigationDatas = new std::vector<mitk::NavigationData::Pointer>();
+    }
 
 }
+
+void QmitkToolTrackingStatusWidget::RemoveGuiLabels()
+  {
+  while(m_Controls->m_GridLayout->count() > 0 || m_Controls->m_VerticalLayout->count() > 0)
+    {
+    if (m_Controls->m_GridLayout->count() > 0)
+      {
+      QWidget* actWidget = m_Controls->m_GridLayout->itemAt(0)->widget();
+      m_Controls->m_GridLayout->removeWidget(actWidget);
+      delete actWidget;
+      }
+    else if (m_Controls->m_VerticalLayout->count() > 0)
+      {
+      QWidget* actWidget = m_Controls->m_VerticalLayout->itemAt(0)->widget();
+      m_Controls->m_VerticalLayout->removeWidget(actWidget);
+      delete actWidget;
+      }
+    }
+  }
 
 
 

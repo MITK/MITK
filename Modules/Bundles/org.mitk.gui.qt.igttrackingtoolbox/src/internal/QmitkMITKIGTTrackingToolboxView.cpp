@@ -60,6 +60,7 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl( QWidget *parent )
     m_Controls = new Ui::QmitkMITKIGTTrackingToolboxViewControls;
     m_Controls->setupUi( parent );
  
+    //create connections
     connect( m_Controls->m_LoadTools, SIGNAL(clicked()), this, SLOT(OnLoadTools()) );
     connect( m_Controls->m_StartTracking, SIGNAL(clicked()), this, SLOT(OnStartTracking()) );
     connect( m_Controls->m_StopTracking, SIGNAL(clicked()), this, SLOT(OnStopTracking()) );
@@ -67,7 +68,10 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl( QWidget *parent )
     connect( m_Controls->m_EnableLogging, SIGNAL(clicked()), this, SLOT(OnEnableLoggingClicked()));
     connect( m_Controls->m_ChooseFile, SIGNAL(clicked()), this, SLOT(OnChooseFileClicked()));
 
-    this->m_Controls->m_configurationWidget->EnableAdvancedUserControl(false);
+    //initialize widgets
+    m_Controls->m_configurationWidget->EnableAdvancedUserControl(false);
+    m_Controls->m_TrackingToolsStatusWidget->SetShowPositions(true);
+    m_Controls->m_TrackingToolsStatusWidget->SetTextAlignment(Qt::AlignLeft);
   }
 }
 
@@ -106,6 +110,9 @@ void QmitkMITKIGTTrackingToolboxView::OnLoadTools()
   Poco::Path myPath = Poco::Path(filename.toStdString()); //use this to seperate filename from path
   QString toolLabel = QString("Loaded Tools: ") + QString::number(m_toolStorage->GetToolCount()) + " Tools from " + myPath.getFileName().c_str();
   m_Controls->m_toolLabel->setText(toolLabel);
+
+  //update tool preview
+  m_Controls->m_TrackingToolsStatusWidget->PreShowTools(m_toolStorage);
 }
 
 void QmitkMITKIGTTrackingToolboxView::OnStartTracking()
@@ -130,12 +137,13 @@ if (m_TrackingDeviceSource.IsNull())
   MessageBox(myTrackingDeviceSourceFactory->GetErrorMessage());
   return;
   }
-for(int i=0; i<m_ToolVisualizationFilter->GetNumberOfOutputs(); i++) //connect the tool visualization widget
-  m_Controls->m_TrackingToolsStatusWidget->AddNavigationData(m_ToolVisualizationFilter->GetOutput(i));
+std::cout << "Number of Outputs" << m_TrackingDeviceSource->GetNumberOfOutputs();
+for(int i=0; i<m_TrackingDeviceSource->GetNumberOfOutputs(); i++) //connect the tool visualization widget
+  {
+    m_Controls->m_TrackingToolsStatusWidget->AddNavigationData(m_TrackingDeviceSource->GetOutput(i));
+  }
 
-m_Controls->m_TrackingToolsStatusWidget->SetShowPositions(true);
 m_Controls->m_TrackingToolsStatusWidget->ShowStatusLabels();
-m_Controls->m_TrackingToolsStatusWidget->SetTextAlignment(Qt::AlignLeft);
 
 //set configuration finished
 this->m_Controls->m_configurationWidget->ConfigurationFinished();
@@ -149,6 +157,8 @@ m_Controls->m_TrackingControlLabel->setText("Status: tracking");
 //start logging if logging is on
 if (this->m_Controls->m_EnableLogging->isChecked()) StartLogging();
 
+this->m_Controls->m_LoadTools->setEnabled(false);
+
 m_tracking = true;
 }
 
@@ -161,6 +171,9 @@ m_TrackingDeviceSource->Disconnect();
 this->m_Controls->m_configurationWidget->Reset();
 m_Controls->m_TrackingControlLabel->setText("Status: stopped");
 if (m_logging) StopLogging();
+this->m_Controls->m_LoadTools->setEnabled(true);
+m_Controls->m_TrackingToolsStatusWidget->RemoveStatusLabels();
+m_Controls->m_TrackingToolsStatusWidget->PreShowTools(m_toolStorage);
 }
 
 void QmitkMITKIGTTrackingToolboxView::MessageBox(std::string s)
@@ -173,7 +186,7 @@ void QmitkMITKIGTTrackingToolboxView::MessageBox(std::string s)
 void QmitkMITKIGTTrackingToolboxView::UpdateTrackingTimer()
   {
   m_ToolVisualizationFilter->Update();
-  std::cout << "Position" << m_ToolVisualizationFilter->GetOutput(0)->GetPosition() << std::endl;
+  //std::cout << "Position" << m_ToolVisualizationFilter->GetOutput(0)->GetPosition() << std::endl;
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
   if (m_logging) this->m_loggingFilter->Update();
   m_Controls->m_TrackingToolsStatusWidget->Refresh();

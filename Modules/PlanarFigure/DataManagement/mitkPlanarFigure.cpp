@@ -20,14 +20,18 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkGeometry2D.h"
 #include "mitkProperties.h"
 
+#include "algorithm"
+
 
 mitk::PlanarFigure::PlanarFigure()
 : m_FigurePlaced( false ),
+  m_HoveringControlPointVisible( false ),
   m_SelectedControlPoint( -1 ),
   m_Geometry2D( NULL ),
   m_FeaturesMTime( 0 )
 {
   m_ControlPoints = VertexContainerType::New();
+  m_HoveringControlPoint = VertexContainerType::New();
   m_PolyLines = VertexContainerVectorType::New();
   m_HelperPolyLines = VertexContainerVectorType::New();
   m_HelperPolyLinesToBePainted = BoolContainerType::New();
@@ -73,6 +77,7 @@ void mitk::PlanarFigure::PlaceFigure( const mitk::Point2D& point )
   for ( unsigned int i = 0; i < this->GetNumberOfControlPoints(); ++i )
   {
     m_ControlPoints->InsertElement( i, this->ApplyControlPointConstraints( i, point ) );
+    m_NewControlPoints.push_back( point );
   }
 
   m_FigurePlaced = true;
@@ -86,6 +91,7 @@ bool mitk::PlanarFigure::AddControlPoint( const mitk::Point2D& point )
   {
     m_ControlPoints->InsertElement( m_NumberOfControlPoints, 
       this->ApplyControlPointConstraints( m_NumberOfControlPoints, point ) );
+    m_NewControlPoints.push_back( point );
     ++m_NumberOfControlPoints;
     ++m_SelectedControlPoint;
     return true;
@@ -102,14 +108,21 @@ bool mitk::PlanarFigure::SetControlPoint( unsigned int index, const Point2D& poi
   if (createIfDoesNotExist)
   {
     m_ControlPoints->InsertElement( index, this->ApplyControlPointConstraints( index, point ) );
+
     if ( m_NumberOfControlPoints <= index )
     {
+      m_NewControlPoints.push_back( point );
       m_NumberOfControlPoints = index + 1;
-    }   
+    }
+    else
+    {
+      m_NewControlPoints.at( index ) = point;
+    }
     return true;
   }
   else if ( index < m_NumberOfControlPoints )
   {
+    m_NewControlPoints.at( index ) = point;
     m_ControlPoints->InsertElement( index, this->ApplyControlPointConstraints( index, point ) );
     return true;
   }
@@ -156,6 +169,38 @@ bool mitk::PlanarFigure::SelectControlPoint( unsigned int index )
 void mitk::PlanarFigure::DeselectControlPoint()
 {
   m_SelectedControlPoint = -1;
+}
+
+void mitk::PlanarFigure::SetHoveringControlPoint( const Point2D& point )
+{
+  if ( m_HoveringControlPoint->Size() == 0 )
+  {
+    m_HoveringControlPoint->InsertElement( 0, point );
+  }
+  else
+  {
+    m_HoveringControlPoint->SetElement( 0, point );
+  }
+  m_HoveringControlPointVisible = true;
+}
+
+void mitk::PlanarFigure::ResetHoveringContolPoint()
+{
+  if ( m_HoveringControlPoint->Size() > 0 )
+  {
+    m_HoveringControlPointVisible = false;
+    m_HoveringControlPoint->DeleteIndex( 0 );
+  }
+}
+
+mitk::PlanarFigure::VertexContainerType::Pointer mitk::PlanarFigure::GetHoveringControlPoint()
+{
+  return m_HoveringControlPoint;
+}
+
+bool mitk::PlanarFigure::IsHoveringControlPointVisible()
+{
+  return m_HoveringControlPointVisible;
 }
 
 
@@ -482,6 +527,32 @@ bool mitk::PlanarFigure::IsHelperToBePainted(unsigned int index)
 bool mitk::PlanarFigure::ResetOnPointSelect()
 {
   return false;
+}
+
+void mitk::PlanarFigure::RemoveControlPoint( unsigned int index )
+{
+  if ( index > m_NumberOfControlPoints )
+    return;
+
+  if ( (m_NumberOfControlPoints -1)  < this->GetMinimumNumberOfControlPoints() )
+    return;
+
+  typedef std::vector<mitk::Point2D> vectortype;
+  vectortype vector = m_ControlPoints->CastToSTLContainer();
+  vectortype::iterator iter;
+
+  iter = std::find( vector.begin(), vector.end(), vector.at(index) );
+  //vector.erase( iter );
+
+  if ( iter != vector.end() )
+  {
+    m_ControlPoints->erase( iter );
+    m_NumberOfControlPoints--;
+  }
+
+  //if ( m_ControlPoints->Size() < m_NumberOfControlPoints )
+  //{
+  //}
 }
 
 void mitk::PlanarFigure::RemoveLastControlPoint()

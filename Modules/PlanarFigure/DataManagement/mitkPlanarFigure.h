@@ -23,6 +23,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkBaseData.h"
 #include "mitkCommon.h"
 
+#include <deque>
+
 
 namespace mitk 
 {
@@ -56,10 +58,24 @@ class PlanarFigure_EXPORT PlanarFigure : public BaseData
 public:
   mitkClassMacro( PlanarFigure, BaseData );
 
+  struct PolyLineElement
+  {
+    PolyLineElement( Point2D point, int index )
+      : Point( point ), Index( index )
+    {
+    };
+
+    Point2D Point;
+    int Index;
+    bool IsToBePainted;
+  };
 
   typedef itk::VectorContainer< unsigned long, mitk::Point2D > VertexContainerType;
   typedef itk::VectorContainer< unsigned long, VertexContainerType::Pointer> VertexContainerVectorType;
   typedef itk::VectorContainer< unsigned long, bool>  BoolContainerType;
+
+  typedef std::deque< Point2D > ControlPointListType;
+  typedef std::list< PolyLineElement > PolyLineType;
 
 
   /** \brief Sets the 2D geometry on which this figure will be placed.
@@ -226,12 +242,20 @@ public:
    * execute any reset / initialization statements required. */
   virtual bool ResetOnPointSelect();
 
+  virtual void RemoveControlPoint( unsigned int index );
+
   /** \brief Removes last control point */
   virtual void RemoveLastControlPoint();
 
   /** \brief Copies contents and state of a figre provided as parameter to the current object. 
              Requires a matching type of both figures. */
   void DeepCopy(Self::Pointer oldFigure);
+
+  void SetHoveringControlPoint( const Point2D& point );
+  void ResetHoveringContolPoint();
+  bool IsHoveringControlPointVisible();
+
+  mitk::PlanarFigure::VertexContainerType::Pointer GetHoveringControlPoint();
 
 
 protected:
@@ -285,10 +309,10 @@ protected:
   virtual void InitializeTimeSlicedGeometry( unsigned int timeSteps = 1 );
 
   virtual void PrintSelf( std::ostream& os, itk::Indent indent ) const;
-
-
+ 
   VertexContainerType::Pointer m_ControlPoints;
   unsigned int m_NumberOfControlPoints;
+  VertexContainerType::Pointer m_HoveringControlPoint;
 
   VertexContainerVectorType::Pointer m_PolyLines;
   VertexContainerVectorType::Pointer m_HelperPolyLines;
@@ -297,9 +321,10 @@ protected:
 
   bool m_FigurePlaced;
 
+  bool m_HoveringControlPointVisible;
+
   // Currently selected control point; -1 means no point selected
   int m_SelectedControlPoint;
-
 
 private:
 
@@ -317,6 +342,9 @@ private:
   };
 
   Geometry2D *m_Geometry2D;
+
+  ControlPointListType m_NewControlPoints;
+   PolyLineType m_NewPolyLine;
 
 
   // Vector of features available for this geometric figure

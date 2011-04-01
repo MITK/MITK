@@ -153,6 +153,7 @@ public:
   /** \brief Return currently selected control point. */
   virtual int GetSelectedControlPoint() const { return m_SelectedControlPoint; }
 
+  //ControlPointListType::const_iterator GetSelectedControlPoint() const;
 
   
   /** \brief Returns 2D control points vector. */
@@ -164,25 +165,39 @@ public:
 
 
   /** \brief Returns specified control point in 2D world coordinates. */
-  Point2D& GetControlPoint( unsigned int index ) const;
+  Point2D GetControlPoint( unsigned int index ) const;
 
 
   /** \brief Returns specified control point in world coordinates. */
   Point3D GetWorldControlPoint( unsigned int index ) const;
 
 
-  /** \brief Returns the polyline representing the planar figure
-   * (for rendering, measurements, etc.). */
-  VertexContainerType *GetPolyLine(unsigned int index);
+  void SetNumberOfPolyLines( unsigned int numberOfPolyLines );
+  void SetNumberOfHelperPolyLines( unsigned int numberOfHelperPolyLines );
+
+  void AppendPointToPolyLine( unsigned int index, PolyLineElement element );
+  void AppendPointToHelperPolyLine( unsigned int index, PolyLineElement element );
+
+  const PolyLineType GetPolyline( int index ) const;
+
+  PolyLineType::const_iterator GetFirstElementOfPolyLine( unsigned int index ) const;
+  PolyLineType::const_iterator GetLastElementOfPolyLine( unsigned int index ) const;
 
   /** \brief Returns the polyline representing the planar figure
    * (for rendering, measurements, etc.). */
-  const VertexContainerType *GetPolyLine(unsigned int index) const;
+  PolyLineType GetPolyLine(unsigned int index);
+
+  /** \brief Returns the polyline representing the planar figure
+   * (for rendering, measurments, etc.). */
+  const PolyLineType GetPolyLine(unsigned int index) const;
 
   /** \brief Returns the polyline that should be drawn the same size at every scale
    * (for text, angles, etc.). */
-  const VertexContainerType *GetHelperPolyLine(unsigned int index, double mmPerDisplayUnit, unsigned int displayHeight);
+  //const VertexContainerType *GetHelperPolyLine(unsigned int index, double mmPerDisplayUnit, unsigned int displayHeight);
 
+  const mitk::PlanarFigure::PolyLineType GetHelperPolyLine( unsigned int index, double mmPerDisplayUnit, unsigned int displayHeight );
+ 
+  
   /** \brief Returns the number of features available for this PlanarFigure
    * (such as, radius, area, ...). */
   virtual unsigned int GetNumberOfFeatures() const;
@@ -309,7 +324,7 @@ protected:
   virtual void InitializeTimeSlicedGeometry( unsigned int timeSteps = 1 );
 
   virtual void PrintSelf( std::ostream& os, itk::Indent indent ) const;
- 
+
   VertexContainerType::Pointer m_ControlPoints;
   unsigned int m_NumberOfControlPoints;
   VertexContainerType::Pointer m_HoveringControlPoint;
@@ -319,12 +334,16 @@ protected:
   BoolContainerType::Pointer         m_HelperPolyLinesToBePainted;
 
 
+
+
+
   bool m_FigurePlaced;
 
   bool m_HoveringControlPointVisible;
 
   // Currently selected control point; -1 means no point selected
   int m_SelectedControlPoint;
+  ControlPointListType m_NewControlPoints;
 
 private:
 
@@ -343,8 +362,14 @@ private:
 
   Geometry2D *m_Geometry2D;
 
-  ControlPointListType m_NewControlPoints;
-   PolyLineType m_NewPolyLine;
+  std::vector<PolyLineType> m_NewPolyLines;
+  std::vector<PolyLineType> m_NewHelperPolyLines;
+
+
+  bool m_ControlPointsModified;
+  bool m_PolyLineUpToDate;
+  bool m_HelperLinesUpToDate;
+  bool m_FeaturesUpToDate;
 
 
   // Vector of features available for this geometric figure

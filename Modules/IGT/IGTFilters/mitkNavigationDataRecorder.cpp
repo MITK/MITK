@@ -31,6 +31,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 mitk::NavigationDataRecorder::NavigationDataRecorder()
 {
+  //set default values
   m_NumberOfInputs = 0;
   m_RecordingMode = NormalFile;
   m_Recording = false;
@@ -91,12 +92,15 @@ void mitk::NavigationDataRecorder::Update()
     strs << sysTimestamp;
     std::string sysTimeStr = strs.str();
 
-    //write csv header if first line
-    if ((m_OutputFormat == mitk::NavigationDataRecorder::csv) && m_firstLine)
+    //if csv-mode: write csv header and timpstamp at beginning
+    if (m_OutputFormat == mitk::NavigationDataRecorder::csv)
       {
-      m_firstLine = false;
-      *m_Stream << "TimeStamp";
-      for (unsigned int index = 0; index < inputs.size(); index++){ *m_Stream << ";Valid_Tool" << index <<
+      //write header only when it's the first line 
+      if (m_firstLine)
+        {
+        m_firstLine = false;
+        *m_Stream << "TimeStamp";
+        for (unsigned int index = 0; index < inputs.size(); index++){ *m_Stream << ";Valid_Tool" << index <<
                                                                                 ";X_Tool" << index <<
                                                                                 ";Y_Tool" << index <<
                                                                                 ";Z_Tool" << index <<
@@ -104,10 +108,13 @@ void mitk::NavigationDataRecorder::Update()
                                                                                 ";QY_Tool" << index <<
                                                                                 ";QZ_Tool" << index <<
                                                                                 ";QR_Tool" << index;}
-      *m_Stream << "\n";
+        *m_Stream << "\n";
+        }
+      //write timestamp (always)
+      *m_Stream << timestamp;  
       }
-      
-    *m_Stream << timestamp;
+    
+    //write tool data for every tool
     for (unsigned int index = 0; index < inputs.size(); index++)
     {
       mitk::NavigationData* nd = dynamic_cast<mitk::NavigationData*>(inputs[index].GetPointer());
@@ -138,7 +145,7 @@ void mitk::NavigationDataRecorder::Update()
       //a timestamp is never < 0! this case happens only if you are using the timestamp of the nd object instead of getting a new one
       if (timestamp >= 0)
       { 
-        if (this->m_OutputFormat = mitk::NavigationDataRecorder::xml)
+        if (this->m_OutputFormat == mitk::NavigationDataRecorder::xml)
           {
           TiXmlElement* elem = new TiXmlElement("ND");
 
@@ -186,7 +193,7 @@ void mitk::NavigationDataRecorder::Update()
 
           delete elem;
           }
-        else if (this->m_OutputFormat = mitk::NavigationDataRecorder::csv)
+        else if (this->m_OutputFormat == mitk::NavigationDataRecorder::csv)
           {
           *m_Stream << ";" << dataValid << ";" << position[0] << ";" << position[1] << ";" << position[2] << ";" << orientation[0] << ";" << orientation[1] << ";" << orientation[2] << ";" << orientation[3];
           }
@@ -280,7 +287,7 @@ void mitk::NavigationDataRecorder::StopRecording()
     return;
   }
  
-  if (m_Stream && m_OutputFormat == mitk::NavigationDataRecorder::xml)
+  if ((m_Stream) && (m_OutputFormat == mitk::NavigationDataRecorder::xml))
   {
     *m_Stream << "</Data>" << std::endl;
   }

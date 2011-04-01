@@ -35,6 +35,7 @@ mitk::PlanarPolygon::PlanarPolygon()
   this->SetProperty( "closed", mitk::BoolProperty::New( true ) );
 
   m_PolyLines->InsertElement( 0, VertexContainerType::New());
+  this->SetNumberOfPolyLines( 1 );
 }
 
 
@@ -93,24 +94,33 @@ void mitk::PlanarPolygon::SetClosed( bool closed )
 
 void mitk::PlanarPolygon::GeneratePolyLine()
 {
-  // if more elements are needed that have been reserved -> reserve
-  if ( m_PolyLines->ElementAt( 0 )->size() < this->GetNumberOfControlPoints() )
+  ControlPointListType::const_iterator iter = m_NewControlPoints.begin();
+  
+  for ( int i=0; i<m_NewControlPoints.size(); i++ )
   {
-    m_PolyLines->ElementAt( 0 )->Reserve( this->GetNumberOfControlPoints() );
+    Point2D pnt = m_NewControlPoints.at( i );
+    PolyLineElement elem(pnt,i);
+    this->AppendPointToPolyLine( 0, elem );
   }
-  // if more elements have been reserved/set before than are needed now -> clear vector
-  else if (m_PolyLines->ElementAt( 0 )->size() > this->GetNumberOfControlPoints())
-  {
-    m_PolyLines->ElementAt( 0 )->clear();
-  }
+
+  //// if more elements are needed that have been reserved -> reserve
+  //if ( m_PolyLines->ElementAt( 0 )->size() < this->GetNumberOfControlPoints() )
+  //{
+  //  m_PolyLines->ElementAt( 0 )->Reserve( this->GetNumberOfControlPoints() );
+  //}
+  //// if more elements have been reserved/set before than are needed now -> clear vector
+  //else if (m_PolyLines->ElementAt( 0 )->size() > this->GetNumberOfControlPoints())
+  //{
+  //  m_PolyLines->ElementAt( 0 )->clear();
+  //}
 
 
   // TODO: start polygon at specified initalize point...
-  m_PolyLines->ElementAt( 0 )->Reserve( this->GetNumberOfControlPoints() );
-  for ( unsigned int i = 0; i < this->GetNumberOfControlPoints(); ++i )
-  {
-    m_PolyLines->ElementAt( 0 )->ElementAt( i ) = m_ControlPoints->ElementAt( i );  
-  }
+  //m_PolyLines->ElementAt( 0 )->Reserve( this->GetNumberOfControlPoints() );
+  //for ( unsigned int i = 0; i < this->GetNumberOfControlPoints(); ++i )
+  //{
+  //  m_PolyLines->ElementAt( 0 )->ElementAt( i ) = m_ControlPoints->ElementAt( i );  
+  //}
 }
 
 void mitk::PlanarPolygon::GenerateHelperPolyLine(double /*mmPerDisplayUnit*/, unsigned int /*displayHeight*/)

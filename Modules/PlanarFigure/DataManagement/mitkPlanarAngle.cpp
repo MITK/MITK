@@ -26,8 +26,12 @@ mitk::PlanarAngle::PlanarAngle()
   // Start with two control points
   this->ResetNumberOfControlPoints( 2 );
 
-  m_PolyLines->InsertElement( 0, VertexContainerType::New());
-  m_HelperPolyLines->InsertElement( 0, VertexContainerType::New());
+  this->SetNumberOfPolyLines(1);
+  this->SetNumberOfHelperPolyLines(1);
+
+
+  //m_PolyLines->InsertElement( 0, VertexContainerType::New());
+  //m_HelperPolyLines->InsertElement( 0, VertexContainerType::New());
   m_HelperPolyLinesToBePainted->InsertElement( 0, false );
 }
 
@@ -67,26 +71,33 @@ mitk::PlanarAngle::~PlanarAngle()
 void mitk::PlanarAngle::GeneratePolyLine()
 {
   // Generate poly-line for angle
-  m_PolyLines->ElementAt( 0 )->Reserve( m_ControlPoints->Size() );
-
-  for ( unsigned int i = 0; i < m_ControlPoints->Size(); ++i )
+  for ( int i=0; i<this->GetNumberOfControlPoints(); i++ )
   {
-    m_PolyLines->ElementAt( 0 )->ElementAt( i ) = m_ControlPoints->ElementAt( i );
+    mitk::PlanarFigure::PolyLineElement element( this->GetControlPoint( i ), i );
+    this->AppendPointToPolyLine( 0, element );
   }
+
+  //m_PolyLines->ElementAt( 0 )->Reserve( m_ControlPoints->Size() );
+
+  //for ( unsigned int i = 0; i < m_ControlPoints->Size(); ++i )
+  //{
+  //  m_PolyLines->ElementAt( 0 )->ElementAt( i ) = m_ControlPoints->ElementAt( i );
+  //}
 }
 
 void mitk::PlanarAngle::GenerateHelperPolyLine(double mmPerDisplayUnit, unsigned int displayHeight)
 {
   // Generate helper-poly-line for angle
-  if ( m_ControlPoints->Size() < 3)
+  if ( this->GetNumberOfControlPoints() < 3)
   {
     m_HelperPolyLinesToBePainted->SetElement(0, false);
     return; //We do not need to draw an angle as there are no two arms yet
   }
+
   m_HelperPolyLines->ElementAt( 0 )->Reserve( 3 );
-  const Point2D &centerPoint = m_ControlPoints->ElementAt( 1 );
-  const Point2D &boundaryPointOne = m_ControlPoints->ElementAt( 0 );
-  const Point2D &boundaryPointTwo = m_ControlPoints->ElementAt( 2 );
+  const Point2D centerPoint = this->GetControlPoint( 1 );
+  const Point2D boundaryPointOne = this->GetControlPoint( 0 );
+  const Point2D boundaryPointTwo = this->GetControlPoint( 2 );
 
   double radius = centerPoint.EuclideanDistanceTo( boundaryPointOne );
   if ( radius > centerPoint.EuclideanDistanceTo( boundaryPointTwo ) )

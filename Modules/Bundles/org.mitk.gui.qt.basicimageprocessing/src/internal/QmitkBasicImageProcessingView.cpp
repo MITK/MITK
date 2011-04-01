@@ -177,6 +177,9 @@ void QmitkBasicImageProcessing::CreateConnections()
 
 
     connect( (QObject*)(m_Controls->m_testButton), SIGNAL( clicked() ), this, SLOT( TestButtonClicked() ) );
+    connect( (QObject*)(m_Controls->viewX), SIGNAL( clicked() ), this, SLOT( ViewXClicked() ) );
+    connect( (QObject*)(m_Controls->viewY), SIGNAL( clicked() ), this, SLOT( ViewYClicked() ) );
+    connect( (QObject*)(m_Controls->viewZ), SIGNAL( clicked() ), this, SLOT( ViewZClicked() ) );
   }
 
   m_TimeStepperAdapter = new QmitkStepperAdapter((QObject*) m_Controls->sliceNavigatorTime, 
@@ -883,7 +886,6 @@ void QmitkBasicImageProcessing::SelectAction2(int operation)
 
 void QmitkBasicImageProcessing::TestButtonClicked()
 {
-
   vtkSmartPointer<vtkCamera> vtkCam = vtkSmartPointer<vtkCamera>::New();
 
   vtkCam->SetFocalPoint(-10.0, -10.0, 1);
@@ -893,9 +895,7 @@ void QmitkBasicImageProcessing::TestButtonClicked()
   GetActiveStdMultiWidget()->GetRenderWindow1()->GetRenderer()->GetVtkRenderer()->SetActiveCamera(vtkCam);
   GetActiveStdMultiWidget()->GetRenderWindow1()->GetRenderer()->GetVtkRenderer()->ResetCamera();
 
-  MITK_INFO << GetActiveStdMultiWidget()->GetRenderWindow1()->GetRenderer()->GetVtkRenderer()->GetActiveCamera()->GetDistance();
-
-  for(int i = 0; i <= 49; i++)
+  for(int i = 0; i <= 25; i++)
   {
     vtkCam->SetDistance(900+i*3);
     vtkCam->Modified();
@@ -904,6 +904,49 @@ void QmitkBasicImageProcessing::TestButtonClicked()
   }
   QMessageBox::critical(0, "Opening Perspective Failed", QString("The perspective could not be opened.\nSee the log for details."));
 }
+
+void QmitkBasicImageProcessing::ViewZClicked()
+{
+
+  vtkSmartPointer<vtkCamera> vtkCam = vtkSmartPointer<vtkCamera>::New();
+
+  vtkCam->SetFocalPoint(0.0, 0.0, 1.0);
+  vtkCam->SetPosition(0.0, 0.0, 0.0);
+  vtkCam->SetViewUp(0.0, -1.0, 0.0);
+  vtkCam->SetParallelProjection(1);
+  GetActiveStdMultiWidget()->GetRenderWindow1()->GetRenderer()->GetVtkRenderer()->SetActiveCamera(vtkCam);
+  GetActiveStdMultiWidget()->GetRenderWindow1()->GetRenderer()->GetVtkRenderer()->ResetCamera();
+  GetActiveStdMultiWidget()->ForceImmediateUpdate();
+}
+
+void QmitkBasicImageProcessing::ViewXClicked()
+{
+
+  vtkSmartPointer<vtkCamera> vtkCam = vtkSmartPointer<vtkCamera>::New();
+
+  vtkCam->SetFocalPoint(-1.0, 0.0, 0.0);
+  vtkCam->SetPosition(0.0, 0.0, 0.0);
+  vtkCam->SetViewUp(0.0, 0.0, 1.0);
+  vtkCam->SetParallelProjection(1);
+  GetActiveStdMultiWidget()->GetRenderWindow1()->GetRenderer()->GetVtkRenderer()->SetActiveCamera(vtkCam);
+  GetActiveStdMultiWidget()->GetRenderWindow1()->GetRenderer()->GetVtkRenderer()->ResetCamera();
+  GetActiveStdMultiWidget()->ForceImmediateUpdate();
+}
+
+void QmitkBasicImageProcessing::ViewYClicked()
+{
+
+  vtkSmartPointer<vtkCamera> vtkCam = vtkSmartPointer<vtkCamera>::New();
+
+  vtkCam->SetFocalPoint(0.0, 1.0, 0.0);
+  vtkCam->SetPosition(0.0, 0.0, 0.0);
+  vtkCam->SetViewUp(-1.0, 0.0, 0.0);
+  vtkCam->SetParallelProjection(1);
+  GetActiveStdMultiWidget()->GetRenderWindow1()->GetRenderer()->GetVtkRenderer()->SetActiveCamera(vtkCam);
+  GetActiveStdMultiWidget()->GetRenderWindow1()->GetRenderer()->GetVtkRenderer()->ResetCamera();
+  GetActiveStdMultiWidget()->ForceImmediateUpdate();
+}
+
 
 void QmitkBasicImageProcessing::StartButton2Clicked() 
 {

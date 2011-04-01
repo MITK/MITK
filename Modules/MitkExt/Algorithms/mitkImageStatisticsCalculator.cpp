@@ -905,7 +905,7 @@ void ImageStatisticsCalculator::InternalCalculateMaskFromPlanarFigure(
   // that the extrusion filter, which afterwards elevates all points by +0.5
   // in z-direction, creates a 3D object which is cut by the the plane z=0)
   const mitk::Geometry2D *planarFigureGeometry2D = m_PlanarFigure->GetGeometry2D();
-  const typename PlanarFigure::VertexContainerType *planarFigurePolyline = m_PlanarFigure->GetPolyLine( 0 );
+  const typename PlanarFigure::PolyLineType planarFigurePolyline = m_PlanarFigure->GetPolyLine( 0 );
   const mitk::Geometry3D *imageGeometry3D = m_Image->GetGeometry( 0 );
 
   vtkPolyData *polyline = vtkPolyData::New();
@@ -935,17 +935,17 @@ void ImageStatisticsCalculator::InternalCalculateMaskFromPlanarFigure(
   // Create VTK polydata object of polyline contour
   bool outOfBounds = false;
   vtkPoints *points = vtkPoints::New();
-  typename PlanarFigure::VertexContainerType::ConstIterator it;
+  typename PlanarFigure::PolyLineType::const_iterator it;
   const Vector3D& imageSpacing3D = imageGeometry3D->GetSpacing();
-  for ( it = planarFigurePolyline->Begin();
-        it != planarFigurePolyline->End();
+  for ( it = planarFigurePolyline.begin();
+        it != planarFigurePolyline.end();
         ++it )
   {
     Point3D point3D;
 
     // Convert 2D point back to the local index coordinates of the selected
     // image
-    planarFigureGeometry2D->Map( it->Value(), point3D );
+    planarFigureGeometry2D->Map( it->Point, point3D );
     
     // Ensure correct pixel center
     point3D[0] -= 0.5 / imageSpacing3D[0];
@@ -972,7 +972,7 @@ void ImageStatisticsCalculator::InternalCalculateMaskFromPlanarFigure(
     throw std::runtime_error( "Figure at least partially outside of image bounds!" );
   }
 
-  unsigned int numberOfPoints = planarFigurePolyline->Size();
+  unsigned int numberOfPoints = planarFigurePolyline.size();
   vtkIdType *ptIds = new vtkIdType[numberOfPoints];
   for ( vtkIdType i = 0; i < numberOfPoints; ++i )
   {

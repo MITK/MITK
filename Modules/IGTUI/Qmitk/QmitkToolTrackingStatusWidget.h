@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "MitkIGTUIExports.h"
 
 #include <mitkNavigationDataSource.h>
+#include <mitkNavigationToolStorage.h>
 #include <QVector>
 #include <QLabel>
 
@@ -42,12 +43,17 @@ public:
 
   typedef std::vector< mitk::NavigationData::Pointer > NavigationDataPointerArray;
 
-
+  enum Style
+    {
+    GridLowerStyle,
+    VerticalUpperStyle
+    };
 
   /*!  
   \brief default constructor  
   */ 
   QmitkToolTrackingStatusWidget( QWidget* parent );
+
 
   /*!  
   \brief default destructor  
@@ -77,6 +83,23 @@ public:
   */ 
   void RemoveStatusLabels();
 
+  /** @brief Enables / disables if the tool positions are shown. Default is off.*/
+  void SetShowPositions(bool enable);
+
+  /** @brief Sets the text alignment of the tool labels. Default is center. Example: Use Qt::AlignLeft for left alignment. */
+  void SetTextAlignment(Qt::AlignmentFlag alignment);
+
+  /** @brief Sets the alignment style of this widget:
+    *         GridLowerStyle: Tool labels are at the lower side of the widget in grid alignment
+    *         VerticalUpperStyle: Tool labels are at the upper side in a vertical alignment (default)
+    */
+  void SetStyle(QmitkToolTrackingStatusWidget::Style newStyle);
+
+  /** @brief Shows tool labels for the tools in the tool storage. This method can be called BEFORE connecting the navigation data to
+   *         make a preview of the tools.
+   */
+  void PreShowTools(mitk::NavigationToolStorage::Pointer toolStorage);
+
 protected:
   void CreateConnections();
   void CreateQtPartControl( QWidget *parent );
@@ -91,6 +114,14 @@ private:
   QVector< QLabel* >* m_StatusLabels;
 
   std::vector<mitk::NavigationData::Pointer>*  m_NavigationDatas; 
+
+  bool m_ShowPositions;
+
+  Qt::AlignmentFlag m_Alignment;
+
+  QmitkToolTrackingStatusWidget::Style m_Style;
+
+  void RemoveGuiLabels();
 
 };
 #endif // _QmitkToolTrackingStatusWidget_H_INCLUDED

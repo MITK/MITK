@@ -243,7 +243,6 @@ void mitk::ClaronTrackingDevice::TrackTools()
       for(itAllTools = allTools.begin(); itAllTools != allTools.end(); itAllTools++)
       {
         mitk::ClaronTool::Pointer currentTool = *itAllTools;
-
         //test if current tool was detected
         std::vector<mitk::ClaronTool::Pointer>::iterator itDetectedTools;
         bool foundTool = false;

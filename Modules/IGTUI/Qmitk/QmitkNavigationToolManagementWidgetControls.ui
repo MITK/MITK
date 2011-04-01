@@ -1,69 +1,70 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>QmitkNavigationToolManagementWidgetControls</class>
- <widget class="QWidget" name="QmitkNavigationToolManagementWidgetControls" >
-  <property name="geometry" >
+ <widget class="QWidget" name="QmitkNavigationToolManagementWidgetControls">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>360</width>
+    <width>346</width>
     <height>534</height>
    </rect>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_3" >
+  <layout class="QVBoxLayout" name="verticalLayout_3">
    <item>
-    <widget class="QLabel" name="widget_title_label" >
-     <property name="text" >
-      <string>&lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
-&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
+    <widget class="QLabel" name="widget_title_label">
+     <property name="text">
+      <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style>&lt;/head>&lt;body style=" font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;">
-&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;">&lt;span style=" font-size:14pt; font-weight:600;">Navigation Tool Management&lt;/span>&lt;/p>&lt;/body>&lt;/html></string>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;span style=&quot; font-size:14pt; font-weight:600;&quot;&gt;Navigation Tool Management&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
     </widget>
    </item>
    <item>
-    <widget class="Line" name="line" >
-     <property name="orientation" >
+    <widget class="Line" name="line">
+     <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
     </widget>
    </item>
    <item>
-    <widget class="QStackedWidget" name="m_MainWidgets" >
-     <property name="currentIndex" >
+    <widget class="QStackedWidget" name="m_MainWidgets">
+     <property name="currentIndex">
       <number>0</number>
      </property>
-     <widget class="QWidget" name="main_page" >
-      <layout class="QVBoxLayout" name="verticalLayout" >
+     <widget class="QWidget" name="main_page">
+      <layout class="QVBoxLayout" name="verticalLayout">
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout" >
+        <layout class="QHBoxLayout" name="horizontalLayout">
          <item>
-          <widget class="QLabel" name="label_10" >
-           <property name="text" >
-            <string>&lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
-&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
+          <widget class="QLabel" name="label_10">
+           <property name="text">
+            <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style>&lt;/head>&lt;body style=" font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;">
-&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">&lt;span style=" font-size:8pt; font-weight:600;">Filename:&lt;/span>&lt;/p>&lt;/body>&lt;/html></string>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;Filename:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QLabel" name="m_StorageName" >
-           <property name="text" >
-            <string>&lt;NO NAME></string>
+          <widget class="QLabel" name="m_StorageName">
+           <property name="text">
+            <string>&lt;NO NAME&gt;</string>
            </property>
           </widget>
          </item>
          <item>
-          <spacer name="horizontalSpacer" >
-           <property name="orientation" >
+          <spacer name="horizontalSpacer">
+           <property name="orientation">
             <enum>Qt::Horizontal</enum>
            </property>
-           <property name="sizeHint" stdset="0" >
+           <property name="sizeHint" stdset="0">
             <size>
              <width>40</width>
              <height>20</height>
@@ -74,24 +75,24 @@ p, li { white-space: pre-wrap; }
         </layout>
        </item>
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_4" >
+        <layout class="QHBoxLayout" name="horizontalLayout_4">
          <item>
-          <widget class="QLabel" name="label_11" >
-           <property name="text" >
-            <string>&lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
-&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
+          <widget class="QLabel" name="label_11">
+           <property name="text">
+            <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style>&lt;/head>&lt;body style=" font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;">
-&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">&lt;span style=" font-size:8pt; font-weight:600;">Tools:&lt;/span>&lt;/p>&lt;/body>&lt;/html></string>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt; font-weight:600;&quot;&gt;Tools:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
            </property>
           </widget>
          </item>
          <item>
-          <spacer name="horizontalSpacer_4" >
-           <property name="orientation" >
+          <spacer name="horizontalSpacer_4">
+           <property name="orientation">
             <enum>Qt::Horizontal</enum>
            </property>
-           <property name="sizeHint" stdset="0" >
+           <property name="sizeHint" stdset="0">
             <size>
              <width>40</width>
              <height>20</height>
@@ -100,22 +101,22 @@ p, li { white-space: pre-wrap; }
           </spacer>
          </item>
          <item>
-          <widget class="QPushButton" name="m_AddTool" >
-           <property name="text" >
+          <widget class="QPushButton" name="m_AddTool">
+           <property name="text">
             <string>Add</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="m_DeleteTool" >
-           <property name="text" >
+          <widget class="QPushButton" name="m_DeleteTool">
+           <property name="text">
             <string>Delete</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="m_EditTool" >
-           <property name="text" >
+          <widget class="QPushButton" name="m_EditTool">
+           <property name="text">
             <string>Edit</string>
            </property>
           </widget>
@@ -123,16 +124,16 @@ p, li { white-space: pre-wrap; }
         </layout>
        </item>
        <item>
-        <widget class="QListWidget" name="m_ToolList" />
+        <widget class="QListWidget" name="m_ToolList"/>
        </item>
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_2" >
+        <layout class="QHBoxLayout" name="horizontalLayout_2">
          <item>
-          <spacer name="horizontalSpacer_2" >
-           <property name="orientation" >
+          <spacer name="horizontalSpacer_2">
+           <property name="orientation">
             <enum>Qt::Horizontal</enum>
            </property>
-           <property name="sizeHint" stdset="0" >
+           <property name="sizeHint" stdset="0">
             <size>
              <width>40</width>
              <height>20</height>
@@ -141,22 +142,22 @@ p, li { white-space: pre-wrap; }
           </spacer>
          </item>
          <item>
-          <widget class="QLabel" name="label" >
-           <property name="text" >
+          <widget class="QLabel" name="m_singleToolLabel">
+           <property name="text">
             <string>single tool (selected):</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="m_LoadSingleTool" >
-           <property name="text" >
+          <widget class="QPushButton" name="m_LoadSingleTool">
+           <property name="text">
             <string>Load</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="m_SaveSingleTool" >
-           <property name="text" >
+          <widget class="QPushButton" name="m_SaveSingleTool">
+           <property name="text">
             <string>Save</string>
            </property>
           </widget>
@@ -164,13 +165,13 @@ p, li { white-space: pre-wrap; }
         </layout>
        </item>
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_3" >
+        <layout class="QHBoxLayout" name="horizontalLayout_3">
          <item>
-          <spacer name="horizontalSpacer_3" >
-           <property name="orientation" >
+          <spacer name="horizontalSpacer_3">
+           <property name="orientation">
             <enum>Qt::Horizontal</enum>
            </property>
-           <property name="sizeHint" stdset="0" >
+           <property name="sizeHint" stdset="0">
             <size>
              <width>40</width>
              <height>20</height>
@@ -179,22 +180,22 @@ p, li { white-space: pre-wrap; }
           </spacer>
          </item>
          <item>
-          <widget class="QLabel" name="label_2" >
-           <property name="text" >
+          <widget class="QLabel" name="label_2">
+           <property name="text">
             <string>whole storage:</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="m_LoadStorage" >
-           <property name="text" >
+          <widget class="QPushButton" name="m_LoadStorage">
+           <property name="text">
             <string>Load</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="m_SaveStorage" >
-           <property name="text" >
+          <widget class="QPushButton" name="m_SaveStorage">
+           <property name="text">
             <string>Save</string>
            </property>
           </widget>
@@ -203,131 +204,131 @@ p, li { white-space: pre-wrap; }
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="new_tool_page" >
-      <layout class="QVBoxLayout" name="verticalLayout_2" >
+     <widget class="QWidget" name="new_tool_page">
+      <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
-        <widget class="QLabel" name="AddToolLabel" >
-         <property name="text" >
-          <string>&lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
-&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
+        <widget class="QLabel" name="AddToolLabel">
+         <property name="text">
+          <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style>&lt;/head>&lt;body style=" font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;">
-&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">&lt;span style=" font-size:8pt; font-weight:600; text-decoration: underline;">Add Tool&lt;/span>&lt;/p>&lt;/body>&lt;/html></string>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt; font-weight:600; text-decoration: underline;&quot;&gt;Add Tool&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
         </widget>
        </item>
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_11" >
+        <layout class="QHBoxLayout" name="horizontalLayout_11">
          <item>
-          <widget class="QLabel" name="label_3" >
-           <property name="minimumSize" >
+          <widget class="QLabel" name="label_3">
+           <property name="minimumSize">
             <size>
              <width>100</width>
              <height>0</height>
             </size>
            </property>
-           <property name="text" >
+           <property name="text">
             <string>Name:</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="m_ToolNameEdit" />
+          <widget class="QLineEdit" name="m_ToolNameEdit"/>
          </item>
         </layout>
        </item>
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_10" >
+        <layout class="QHBoxLayout" name="horizontalLayout_10">
          <item>
-          <widget class="QLabel" name="label_4" >
-           <property name="minimumSize" >
+          <widget class="QLabel" name="label_4">
+           <property name="minimumSize">
             <size>
              <width>100</width>
              <height>0</height>
             </size>
            </property>
-           <property name="text" >
+           <property name="text">
             <string>Identifier:</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="m_IdentifierEdit" />
+          <widget class="QLineEdit" name="m_IdentifierEdit"/>
          </item>
         </layout>
        </item>
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_9" >
+        <layout class="QHBoxLayout" name="horizontalLayout_9">
          <item>
-          <widget class="QLabel" name="label_5" >
-           <property name="minimumSize" >
+          <widget class="QLabel" name="label_5">
+           <property name="minimumSize">
             <size>
              <width>100</width>
              <height>0</height>
             </size>
            </property>
-           <property name="text" >
+           <property name="text">
             <string>Serial Number:</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="m_SerialNumberEdit" />
+          <widget class="QLineEdit" name="m_SerialNumberEdit"/>
          </item>
         </layout>
        </item>
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_8" >
+        <layout class="QHBoxLayout" name="horizontalLayout_8">
          <item>
-          <widget class="QLabel" name="label_6" >
-           <property name="minimumSize" >
+          <widget class="QLabel" name="label_6">
+           <property name="minimumSize">
             <size>
              <width>100</width>
              <height>0</height>
             </size>
            </property>
-           <property name="text" >
+           <property name="text">
             <string>Tracking Device:</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QComboBox" name="m_TrackingDeviceTypeChooser" >
-           <property name="minimumSize" >
+          <widget class="QComboBox" name="m_TrackingDeviceTypeChooser">
+           <property name="minimumSize">
             <size>
              <width>150</width>
              <height>0</height>
             </size>
            </property>
-           <property name="maximumSize" >
+           <property name="maximumSize">
             <size>
              <width>150</width>
              <height>16777215</height>
             </size>
            </property>
            <item>
-            <property name="text" >
+            <property name="text">
              <string>NDI Aurora</string>
             </property>
            </item>
            <item>
-            <property name="text" >
+            <property name="text">
              <string>NDI Polaris</string>
             </property>
            </item>
            <item>
-            <property name="text" >
+            <property name="text">
              <string>Claron Technology Micron Tracker</string>
             </property>
            </item>
           </widget>
          </item>
          <item>
-          <spacer name="horizontalSpacer_6" >
-           <property name="orientation" >
+          <spacer name="horizontalSpacer_6">
+           <property name="orientation">
             <enum>Qt::Horizontal</enum>
            </property>
-           <property name="sizeHint" stdset="0" >
+           <property name="sizeHint" stdset="0">
             <size>
              <width>40</width>
              <height>20</height>
@@ -338,62 +339,62 @@ p, li { white-space: pre-wrap; }
         </layout>
        </item>
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_7" >
+        <layout class="QHBoxLayout" name="horizontalLayout_7">
          <item>
-          <widget class="QLabel" name="label_7" >
-           <property name="minimumSize" >
+          <widget class="QLabel" name="label_7">
+           <property name="minimumSize">
             <size>
              <width>100</width>
              <height>0</height>
             </size>
            </property>
-           <property name="text" >
+           <property name="text">
             <string>Tool Type:</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QComboBox" name="m_ToolTypeChooser" >
-           <property name="minimumSize" >
+          <widget class="QComboBox" name="m_ToolTypeChooser">
+           <property name="minimumSize">
             <size>
              <width>150</width>
              <height>0</height>
             </size>
            </property>
-           <property name="maximumSize" >
+           <property name="maximumSize">
             <size>
              <width>150</width>
              <height>16777215</height>
             </size>
            </property>
            <item>
-            <property name="text" >
+            <property name="text">
              <string>Instrument</string>
             </property>
            </item>
            <item>
-            <property name="text" >
+            <property name="text">
              <string>Fiducial</string>
             </property>
            </item>
            <item>
-            <property name="text" >
+            <property name="text">
              <string>Skinmarker</string>
             </property>
            </item>
            <item>
-            <property name="text" >
+            <property name="text">
              <string>Unkown</string>
             </property>
            </item>
           </widget>
          </item>
          <item>
-          <spacer name="horizontalSpacer_7" >
-           <property name="orientation" >
+          <spacer name="horizontalSpacer_7">
+           <property name="orientation">
             <enum>Qt::Horizontal</enum>
            </property>
-           <property name="sizeHint" stdset="0" >
+           <property name="sizeHint" stdset="0">
             <size>
              <width>40</width>
              <height>20</height>
@@ -404,32 +405,32 @@ p, li { white-space: pre-wrap; }
         </layout>
        </item>
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_6" >
+        <layout class="QHBoxLayout" name="horizontalLayout_6">
          <item>
-          <widget class="QLabel" name="label_8" >
-           <property name="minimumSize" >
+          <widget class="QLabel" name="label_8">
+           <property name="minimumSize">
             <size>
              <width>100</width>
              <height>0</height>
             </size>
            </property>
-           <property name="text" >
+           <property name="text">
             <string>Calibration File:</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="m_CalibrationFileName" />
+          <widget class="QLineEdit" name="m_CalibrationFileName"/>
          </item>
          <item>
-          <widget class="QPushButton" name="m_LoadCalibrationFile" >
-           <property name="maximumSize" >
+          <widget class="QPushButton" name="m_LoadCalibrationFile">
+           <property name="maximumSize">
             <size>
              <width>40</width>
              <height>16777215</height>
             </size>
            </property>
-           <property name="text" >
+           <property name="text">
             <string>Load</string>
            </property>
           </widget>
@@ -437,29 +438,29 @@ p, li { white-space: pre-wrap; }
         </layout>
        </item>
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_5" >
+        <layout class="QHBoxLayout" name="horizontalLayout_5">
          <item>
-          <widget class="QLabel" name="label_9" >
-           <property name="minimumSize" >
+          <widget class="QLabel" name="label_9">
+           <property name="minimumSize">
             <size>
              <width>100</width>
              <height>0</height>
             </size>
            </property>
-           <property name="text" >
+           <property name="text">
             <string>Surface:</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QmitkDataStorageComboBox" name="m_SurfaceChooser" >
-           <property name="minimumSize" >
+          <widget class="QmitkDataStorageComboBox" name="m_SurfaceChooser">
+           <property name="minimumSize">
             <size>
              <width>150</width>
              <height>0</height>
             </size>
            </property>
-           <property name="maximumSize" >
+           <property name="maximumSize">
             <size>
              <width>150</width>
              <height>16777215</height>
@@ -468,11 +469,11 @@ p, li { white-space: pre-wrap; }
           </widget>
          </item>
          <item>
-          <spacer name="horizontalSpacer_8" >
-           <property name="orientation" >
+          <spacer name="horizontalSpacer_8">
+           <property name="orientation">
             <enum>Qt::Horizontal</enum>
            </property>
-           <property name="sizeHint" stdset="0" >
+           <property name="sizeHint" stdset="0">
             <size>
              <width>40</width>
              <height>20</height>
@@ -481,14 +482,14 @@ p, li { white-space: pre-wrap; }
           </spacer>
          </item>
          <item>
-          <widget class="QPushButton" name="m_LoadSurface" >
-           <property name="maximumSize" >
+          <widget class="QPushButton" name="m_LoadSurface">
+           <property name="maximumSize">
             <size>
              <width>40</width>
              <height>16777215</height>
             </size>
            </property>
-           <property name="text" >
+           <property name="text">
             <string>Load</string>
            </property>
           </widget>
@@ -496,11 +497,11 @@ p, li { white-space: pre-wrap; }
         </layout>
        </item>
        <item>
-        <spacer name="verticalSpacer" >
-         <property name="orientation" >
+        <spacer name="verticalSpacer">
+         <property name="orientation">
           <enum>Qt::Vertical</enum>
          </property>
-         <property name="sizeHint" stdset="0" >
+         <property name="sizeHint" stdset="0">
           <size>
            <width>20</width>
            <height>40</height>
@@ -509,20 +510,20 @@ p, li { white-space: pre-wrap; }
         </spacer>
        </item>
        <item>
-        <widget class="Line" name="line_2" >
-         <property name="orientation" >
+        <widget class="Line" name="line_2">
+         <property name="orientation">
           <enum>Qt::Horizontal</enum>
          </property>
         </widget>
        </item>
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_12" >
+        <layout class="QHBoxLayout" name="horizontalLayout_12">
          <item>
-          <spacer name="horizontalSpacer_5" >
-           <property name="orientation" >
+          <spacer name="horizontalSpacer_5">
+           <property name="orientation">
             <enum>Qt::Horizontal</enum>
            </property>
-           <property name="sizeHint" stdset="0" >
+           <property name="sizeHint" stdset="0">
             <size>
              <width>40</width>
              <height>20</height>
@@ -531,15 +532,15 @@ p, li { white-space: pre-wrap; }
           </spacer>
          </item>
          <item>
-          <widget class="QPushButton" name="m_AddToolCancel" >
-           <property name="text" >
+          <widget class="QPushButton" name="m_AddToolCancel">
+           <property name="text">
             <string>cancel</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="m_AddToolSave" >
-           <property name="text" >
+          <widget class="QPushButton" name="m_AddToolSave">
+           <property name="text">
             <string>save</string>
            </property>
           </widget>

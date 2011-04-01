@@ -208,7 +208,11 @@ void QmitkNavigationToolManagementWidget::OnSaveStorage()
     mitk::NavigationToolStorageSerializer::Pointer mySerializer = mitk::NavigationToolStorageSerializer::New();
     std::string filename = QFileDialog::getSaveFileName(NULL,tr("Save Navigation Tool"), "/", "*.*").toAscii().data();
     if (!mySerializer->Serialize(filename,m_NavigationToolStorage)) MessageBox("Error: " + mySerializer->GetErrorMessage());
-    else m_Controls->m_StorageName->setText(QString(filename.c_str()));
+    else 
+      {
+      Poco::Path myPath = Poco::Path(filename.c_str());
+      m_Controls->m_StorageName->setText(myPath.getFileName().c_str());
+      }
   }
 
 

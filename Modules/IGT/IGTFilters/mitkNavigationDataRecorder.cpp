@@ -279,7 +279,8 @@ void mitk::NavigationDataRecorder::StopRecording()
     std::cout << "You have to start a recording first" << std::endl;
     return;
   }
-  if (m_Stream)
+ 
+  if (m_Stream && m_OutputFormat == mitk::NavigationDataRecorder::xml)
   {
     *m_Stream << "</Data>" << std::endl;
   }

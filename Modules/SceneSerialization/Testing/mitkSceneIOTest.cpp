@@ -40,14 +40,6 @@ class SceneIOTestClass
 {
   public:
 
-/// returns full path to a test file
-static std::string LocateFile(const std::string& filename)
-{
-  mitk::StandardFileLocations::Pointer locator = mitk::StandardFileLocations::GetInstance();
-  MITK_TEST_CONDITION_REQUIRED(locator.IsNotNull(),"Instantiating StandardFileLocations") 
-  return locator->FindFile(filename.c_str(), "Core/Code/Testing/Data");
-}
-
 static mitk::BaseData::Pointer LoadBaseData(const std::string& filename)
 {
   mitk::DataNodeFactory::Pointer factory = mitk::DataNodeFactory::New();
@@ -112,9 +104,9 @@ static mitk::PointSet::Pointer CreatePointSet()
   return ps;
 }
 
-static void FillStorage(mitk::DataStorage* storage)
+static void FillStorage(mitk::DataStorage* storage, std::string imageName, std::string surfaceName)
 {
-  mitk::Image::Pointer image = LoadImage( LocateFile("Pic3D.pic.gz") );
+  mitk::Image::Pointer image = LoadImage(imageName);
   MITK_TEST_CONDITION_REQUIRED(image.IsNotNull(),"Loading test image Pic3D.pic.gz");
 
   image->SetProperty("image type", mitk::StringProperty::New("test image") );
@@ -131,7 +123,7 @@ static void FillStorage(mitk::DataStorage* storage)
   storage->Add( imagechildnode, imagenode );
 
   
-  mitk::Surface::Pointer surface = LoadSurface( LocateFile("binary.stl") );
+  mitk::Surface::Pointer surface = LoadSurface(surfaceName );
   MITK_TEST_CONDITION_REQUIRED(surface.IsNotNull(),"Loading test surface binary.stl");
   
   surface->SetProperty("surface type", mitk::StringProperty::New("test surface") );
@@ -210,7 +202,7 @@ static void VerifyStorage(mitk::DataStorage* storage)
 }
 }; // end test helper class
   
-int mitkSceneIOTest(int /* argc */, char* /*argv*/[])
+int mitkSceneIOTest(int  argc, char* argv[])
 {
   MITK_TEST_BEGIN("SceneIO")
   std::string sceneFileName;
@@ -236,7 +228,10 @@ int mitkSceneIOTest(int /* argc */, char* /*argv*/[])
     mitk::DataStorage::Pointer storage = mitk::StandaloneDataStorage::New().GetPointer();
     MITK_TEST_CONDITION_REQUIRED(storage.IsNotNull(),"StandaloneDataStorage instantiation");
 
-    SceneIOTestClass::FillStorage(storage);
+    std::cout << "ImageName: " << argv[1] << std::endl;
+    std::cout << "SurfaceName: " << argv[2] << std::endl;
+
+    SceneIOTestClass::FillStorage(storage, argv[1], argv[2]);
 
     // attempt to save it
     Poco::Path newname( Poco::TemporaryFile::tempName() );

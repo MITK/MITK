@@ -1,0 +1,24 @@
+/**
+
+\bundlemainpage{org.igttrackingtoolbox} The MITK-IGT Tracking Toolbox
+
+\image html icon.png "Icon of the Module"
+
+\section QmitkMITKIGTTrackingToolboxIntroduction Introduction
+
+The MITK-IGT Tracking Toolbox is a bundle which allows you to connect to a tracking device, track and visualize navigation tools and write the tracked data into a log file.
+
+Available sections:
+  - \ref QmitkDataManagerIntroduction 
+
+List example
+
+<ul>
+<li> one
+<li> two
+<li> three
+<li> ...
+</ul>
+
+
+*/

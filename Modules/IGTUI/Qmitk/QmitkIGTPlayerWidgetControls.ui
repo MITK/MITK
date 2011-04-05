@@ -15,7 +15,7 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_3">
    <item>
-    <widget class="QGroupBox" name="groupBox">
+    <widget class="QGroupBox" name="m_settingsGB">
      <property name="title">
       <string>Settings</string>
      </property>
@@ -42,6 +42,9 @@
             <width>150</width>
             <height>0</height>
            </size>
+          </property>
+          <property name="readOnly">
+           <bool>true</bool>
           </property>
          </widget>
         </item>
@@ -120,7 +123,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="groupBox_2">
+    <widget class="QGroupBox" name="m_playerGB">
      <property name="title">
       <string>Player</string>
      </property>

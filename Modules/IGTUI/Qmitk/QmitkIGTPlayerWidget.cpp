@@ -71,8 +71,6 @@ void QmitkIGTPlayerWidget::CreateConnections()
   if ( m_Controls )
   {     
     connect( (QObject*)(m_Controls->m_pbLoadDir), SIGNAL(clicked()), this, SLOT(OnSelectPressed()) ); // open file dialog
-    connect( (QObject*)(m_Controls->m_leInputFile), SIGNAL(editingFinished()), this, SLOT(UpdateInputFileName()) ); // for manual file name input
-
     connect( (QObject*) (m_Controls->m_cbPointSetMode), SIGNAL(clicked(bool)), this, SLOT(OnChangeWidgetView(bool)) ); // widget view switcher
 
     connect( (QObject*)(m_Controls->m_pbPlay), SIGNAL(clicked(bool)), this, SLOT(OnPlayButtonClicked(bool)) ); // play button
@@ -95,6 +93,17 @@ bool QmitkIGTPlayerWidget::CheckInputFileValid()
   }
 
   return true;
+}
+
+
+unsigned int QmitkIGTPlayerWidget::GetNumberOfTools()
+{
+  unsigned int result = 0;
+  
+  if(m_Player.IsNotNull())
+    result = m_Player->GetNumberOfOutputs();
+
+  return result;
 }
 
 
@@ -158,7 +167,7 @@ void QmitkIGTPlayerWidget::StopPlaying()
     m_Player->StopPlaying();
   m_Player = NULL;
   m_StartTime = -1;  // set starttime back
-
+  this->ResetLCDNumbers();
   m_Controls->m_pbPlay->setChecked(false); // set play button unchecked
 
 
@@ -212,15 +221,15 @@ const std::vector<mitk::NavigationData::Pointer> QmitkIGTPlayerWidget::GetNaviga
 }
 
 
-void QmitkIGTPlayerWidget::UpdateInputFileName()
+void QmitkIGTPlayerWidget::SetInputFileName(const QString& inputFileName)
 {
-
   this->OnGoToEnd(); /// stops playing and resets lcd numbers
 
   QString oldName = m_CmpFilename;
   m_CmpFilename.clear();
 
-  m_CmpFilename = m_Controls->m_leInputFile->text();
+  m_CmpFilename = inputFileName;
+
   QFile file(m_CmpFilename);
   if(m_CmpFilename.isEmpty() || !file.exists())  
   {    
@@ -248,6 +257,7 @@ void QmitkIGTPlayerWidget::OnSelectPressed()
   {
     m_CmpFilename=oldName;
   }
+  
   m_Controls->m_leInputFile->setText(m_CmpFilename);
 }
 

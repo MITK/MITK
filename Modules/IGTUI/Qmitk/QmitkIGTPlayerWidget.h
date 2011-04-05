@@ -86,11 +86,26 @@ public:
   */ 
   void SetWidgetViewToPointSetPlayback();
 
+
   /*!  
   \brief Sets the update rate of this widget's playing timer
   */ 
   void SetUpdateRate(unsigned int msecs);
 
+
+  /*!
+  \brief Returns the number of different tools from the current playing stream.
+  *
+  * Retuns 0 if playback file is invalid.
+  */
+  unsigned int GetNumberOfTools();
+
+  /*!  
+  \brief Stops the playback
+  */ 
+  void StopPlaying();
+
+ 
 
 signals:
   /*!  
@@ -120,6 +135,7 @@ signals:
   void PlayerUpdated();
 
 
+
   protected slots:   
     /*!  
     \brief Starts or pauses the playback
@@ -136,7 +152,7 @@ signals:
     /*!  
     \brief Updates the input filename
     */ 
-    void UpdateInputFileName();
+    void SetInputFileName(const QString& inputFileName);
     /*!  
     \brief Opens file open dialog for searching the input file
     */ 
@@ -163,16 +179,6 @@ protected:
 
 
   virtual void CreateQtPartControl(QWidget *parent);
-
-  /*!  
-  \brief Sets the filename of the input file
-  */ 
-  void SetInputFileName();
-
-  /*!  
-  \brief Stops the playback
-  */ 
-  void StopPlaying();
 
   /*!  
   \brief Checks if an imput file with the set filename exists

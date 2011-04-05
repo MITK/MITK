@@ -261,6 +261,8 @@ void mitk::PlanarCross::GeneratePolyLine()
 {
   this->SetNumberOfPolyLines( 1 );
 
+  this->ClearPolyLines();
+
   //m_PolyLines->Initialize();
 
   //m_PolyLines->InsertElement( 0, VertexContainerType::New() );
@@ -306,6 +308,8 @@ void mitk::PlanarCross::GenerateHelperPolyLine(double /*mmPerDisplayUnit*/, unsi
   }
 
   m_HelperPolyLinesToBePainted->SetElement( 0, true );
+
+  this->ClearHelperPolyLines();
 
   // Calculate cross point of first line (p1 to p2) and orthogonal line through
   // the third control point (p3)

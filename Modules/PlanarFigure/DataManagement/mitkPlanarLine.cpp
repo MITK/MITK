@@ -39,6 +39,7 @@ mitk::PlanarLine::~PlanarLine()
 
 void mitk::PlanarLine::GeneratePolyLine()
 {
+  this->ClearPolyLines();
   // TODO: start line at specified start point...
   // Generate poly-line 
   this->AppendPointToPolyLine( 0 , mitk::PlanarFigure::PolyLineElement( this->GetControlPoint(0), 0) );

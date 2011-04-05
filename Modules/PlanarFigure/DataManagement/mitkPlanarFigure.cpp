@@ -73,9 +73,6 @@ bool mitk::PlanarFigure::IsClosed() const
 
 void mitk::PlanarFigure::PlaceFigure( const mitk::Point2D& point )
 {
-  //m_ControlPoints.clear();
-  //m_NumberOfControlPoints = 2;
-
   for ( unsigned int i = 0; i < this->GetNumberOfControlPoints(); ++i )
   {
     m_ControlPoints.push_back( point );
@@ -627,12 +624,18 @@ void mitk::PlanarFigure::SetNumberOfHelperPolyLines( unsigned int numberOfHerlpe
 
 void mitk::PlanarFigure::AppendPointToPolyLine( unsigned int index, PolyLineElement element )
 {
-  m_PolyLines.at( index ).push_back( element );
+  if ( index < m_PolyLines.size() )
+    m_PolyLines.at( index ).push_back( element );
+  else
+    MITK_ERROR << "Tried to add point to PolyLine " << index+1 << ", although only " << m_PolyLines.size() << " exists";
 }
 
 void mitk::PlanarFigure::AppendPointToHelperPolyLine( unsigned int index, PolyLineElement element )
 {
-  m_HelperPolyLines.at( index ).push_back( element );
+  if ( index < m_HelperPolyLines.size() )
+    m_HelperPolyLines.at( index ).push_back( element );
+  else
+    MITK_ERROR << "Tried to add point to HelperPolyLine " << index+1 << ", although only " << m_HelperPolyLines.size() << " exists";
 }
 
 const mitk::PlanarFigure::PolyLineType mitk::PlanarFigure::GetPolyline( int index ) const

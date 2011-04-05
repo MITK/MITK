@@ -46,9 +46,11 @@ namespace mitk
 {
 
 /** 
- \brief Find and load DICOM image files (regular CT/MR, no specialties).
+ \brief Central DICOM image loading class for MITK.
 
- The series is specified through an enumeration of all files contained in it.
+ \section DicomSeriesReader_usage Usage
+ 
+ The DICOM series is specified through an enumeration of all files contained in it.
 
  A method for the creation of file name enumerations of all series contained in
  a particular directory is also provided.
@@ -56,7 +58,7 @@ namespace mitk
  After loading the series, the generated DataNode is not named. The caller is
  responsible for given the node a name.
 
- \b Usage
+  Example:
 
 \code
 
@@ -77,6 +79,23 @@ namespace mitk
 
  Image::Pointer image = dynamic_cast<mitk::Image*>( node.GetData() );
 \endcode
+ 
+ \section DicomSeriesReader_sorting Sorting into 3D+t blocks
+
+ TODO: describe strategy of sorting images into blocks of 3D image stacks
+
+ \section DicomSeriesReader_limitations Assumptions and limitations
+
+ The class is mostly updated for working properly with GDCM 2.0.14 and MITK_USE_GDCMIO ON.
+ The other version are kept here for compatibility and may be removed in the future.
+
+ \b Assumptions
+  - expected to work for CT Image and MR Image
+  - special treatment for a certain type of Philips 3D ultrasound (recogized by tag 3001,0010 set to "Philips3D")
+
+ \b Limitations
+  - Secondary Capture images are expected to have the (0018,2010) tag describing the pixel spacing.
+    If only the (0028,0030) tag is set, the spacing will be misinterpreted as (1,1)
 
 */
 class MITK_CORE_EXPORT DicomSeriesReader

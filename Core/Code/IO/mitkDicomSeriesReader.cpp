@@ -539,6 +539,26 @@ DicomSeriesReader::GdcmSortFunction(const gdcm::DataSet &ds1, const gdcm::DataSe
   }
 }
 #endif
+  
+std::string DicomSeriesReader::GetConfigurationString()
+{
+  std::stringstream configuration;
+  configuration << "MITK_USE_GDCMIO: ";
+#ifdef MITK_USE_GDCMIO
+  configuration << "true";
+#else
+  configuration << "false";
+#endif
+  configuration << "\n";
+
+  configuration << "GDCM_VERSION: ";
+#ifdef GDCM_MAJOR_VERSION
+  configuration << GDCM_VERSION;
+#endif
+  //configuration << "\n";
+
+  return configuration.str();
+}
 
 }
 

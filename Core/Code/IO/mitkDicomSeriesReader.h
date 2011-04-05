@@ -177,6 +177,14 @@ public:
                               bool load4D = true, 
                               UpdateCallBackMethod callback = 0);
 
+  /**
+    \brief Provide combination of preprocessor defines that was active during compilation.
+
+    Since this class is a combination of several possible implementations, separated only
+    by ifdef's, calling instances might want to know which flags were active at compile time.
+  */
+  static std::string GetConfigurationString();
+
 protected:
 
 #if GDCM_MAJOR_VERSION >= 2

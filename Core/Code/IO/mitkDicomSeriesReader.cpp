@@ -400,6 +400,23 @@ DicomSeriesReader::GetSeries(const std::string &dir, const StringContainer &rest
 }
 
 #if GDCM_MAJOR_VERSION >= 2
+
+std::string
+DicomSeriesReader::CreateSeriesIdentifierPart( gdcm::Scanner::TagToValue& tagValueMap, const gdcm::Tag& tag )
+{
+  std::string result;
+  try
+  {
+    result = IDifyTagValue( tagValueMap[ tag ] );
+  }
+  catch (std::exception& e)
+  {
+    MITK_ERROR << "Could not access tag " << tag << ": " << e.what();
+  }
+   
+  return result;
+}
+
 std::string 
 DicomSeriesReader::CreateMoreUniqueSeriesIdentifier( gdcm::Scanner::TagToValue& tagValueMap )
 {
@@ -415,24 +432,23 @@ DicomSeriesReader::CreateMoreUniqueSeriesIdentifier( gdcm::Scanner::TagToValue& 
   try
   {
     constructedID = tagValueMap[ tagSeriesInstanceUID ];
-
-    constructedID += IDifyTagValue( tagValueMap[ tagNumberOfRows ] );
-    constructedID += IDifyTagValue( tagValueMap[ tagNumberOfColumns ] );
-    constructedID += IDifyTagValue( tagValueMap[ tagPixelSpacing ] );
-    constructedID += IDifyTagValue( tagValueMap[ tagSliceThickness ] );
-    constructedID += IDifyTagValue( tagValueMap[ tagImageOrientation ] );
-
-    constructedID.resize( constructedID.length() - 1 ); // cut of trailing '.'
-
-    MITK_DEBUG << "ID: " << constructedID;
-    return constructedID;
   }
   catch (std::exception& e)
   {
-    MITK_ERROR << "CreateMoreUniqueSeriesIdentifier() could not access all required DICOM tags. You are calling it wrongly. Using partial ID.";
+    MITK_ERROR << "CreateMoreUniqueSeriesIdentifier() could not access series instance UID. Something is seriously wrong with this image.";
     MITK_ERROR << "Error from exception: " << e.what();
-    return constructedID; 
   }
+ 
+  constructedID += CreateSeriesIdentifierPart( tagValueMap, tagNumberOfRows );
+  constructedID += CreateSeriesIdentifierPart( tagValueMap, tagNumberOfColumns );
+  constructedID += CreateSeriesIdentifierPart( tagValueMap, tagPixelSpacing );
+  constructedID += CreateSeriesIdentifierPart( tagValueMap, tagSliceThickness );
+  constructedID += CreateSeriesIdentifierPart( tagValueMap, tagImageOrientation );
+
+  constructedID.resize( constructedID.length() - 1 ); // cut of trailing '.'
+
+  MITK_DEBUG << "ID: " << constructedID;
+  return constructedID; 
 }
 
 std::string 
@@ -498,19 +514,15 @@ DicomSeriesReader::SortSeriesSlices(const StringContainer &unsortedFilenames)
 bool 
 DicomSeriesReader::GdcmSortFunction(const gdcm::DataSet &ds1, const gdcm::DataSet &ds2)
 {
-  gdcm::Attribute<0x0008,0x0032> acq_time1; // Acquisition time
   gdcm::Attribute<0x0020,0x0032> image_pos1; // Image Position (Patient)
   gdcm::Attribute<0x0020,0x0037> image_orientation1; // Image Orientation (Patient)
 
-  acq_time1.Set(ds1);
   image_pos1.Set(ds1);
   image_orientation1.Set(ds1);
 
-  gdcm::Attribute<0x0008,0x0032> acq_time2;
   gdcm::Attribute<0x0020,0x0032> image_pos2;
   gdcm::Attribute<0x0020,0x0037> image_orientation2;
 
-  acq_time2.Set(ds2);
   image_pos2.Set(ds2);
   image_orientation2.Set(ds2);
 
@@ -538,6 +550,15 @@ DicomSeriesReader::GdcmSortFunction(const gdcm::DataSet &ds1, const gdcm::DataSe
 
   if ( fabs(dist1 - dist2) < mitk::eps)
   {
+    gdcm::Attribute<0x0008,0x0032> acq_time1; // Acquisition time (may be missing, so we check existence first)
+    gdcm::Attribute<0x0008,0x0032> acq_time2;
+
+    if (ds1.FindDataElement(gdcm::Tag(0x0008,0x0032)))
+      acq_time1.Set(ds1);
+
+    if (ds2.FindDataElement(gdcm::Tag(0x0008,0x0032)))
+      acq_time2.Set(ds2);
+
     // exception: same position: compare by acquisition time
     return acq_time1 < acq_time2;
   }
@@ -548,6 +569,26 @@ DicomSeriesReader::GdcmSortFunction(const gdcm::DataSet &ds1, const gdcm::DataSe
   }
 }
 #endif
+  
+std::string DicomSeriesReader::GetConfigurationString()
+{
+  std::stringstream configuration;
+  configuration << "MITK_USE_GDCMIO: ";
+#ifdef MITK_USE_GDCMIO
+  configuration << "true";
+#else
+  configuration << "false";
+#endif
+  configuration << "\n";
+
+  configuration << "GDCM_VERSION: ";
+#ifdef GDCM_MAJOR_VERSION
+  configuration << GDCM_VERSION;
+#endif
+  //configuration << "\n";
+
+  return configuration.str();
+}
 
 }
 

@@ -164,7 +164,7 @@ mitk::Mapper::Pointer mitk::CoreObjectFactory::CreateMapper(mitk::DataNode* node
     {
       if((dynamic_cast<Image*>(data)!=NULL))
       {
-        newMapper = mitk::ImageVtkMapper2D::New();
+        newMapper = mitk::ImageMapperGL2D::New();
         newMapper->SetDataNode(node);
       }
       else if((dynamic_cast<Geometry2DData*>(data)!=NULL))

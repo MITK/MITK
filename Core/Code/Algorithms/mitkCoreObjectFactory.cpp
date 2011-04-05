@@ -164,7 +164,7 @@ mitk::Mapper::Pointer mitk::CoreObjectFactory::CreateMapper(mitk::DataNode* node
     {
       if((dynamic_cast<Image*>(data)!=NULL))
       {
-        newMapper = mitk::ImageMapperGL2D::New();
+        newMapper = mitk::ImageVtkMapper2D::New();
         newMapper->SetDataNode(node);
       }
       else if((dynamic_cast<Geometry2DData*>(data)!=NULL))
@@ -209,14 +209,14 @@ mitk::Mapper::Pointer mitk::CoreObjectFactory::CreateMapper(mitk::DataNode* node
         newMapper->SetDataNode(node);
       }
     }
-    else if ( id == mitk::BaseRenderer::Extended2D )
-    {
-      if((dynamic_cast<Image*>(data)!=NULL))
-      {
-        newMapper = mitk::ImageVtkMapper2D::New();
-        newMapper->SetDataNode(node);
-      }
-    }
+//    else if ( id == mitk::BaseRenderer::Extended2D )
+//    {
+//      if((dynamic_cast<Image*>(data)!=NULL))
+//      {
+//        newMapper = mitk::ImageVtkMapper2D::New();
+//        newMapper->SetDataNode(node);
+//      }
+//    }
   }
 
   return newMapper;

@@ -37,7 +37,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkImage.h>
 #include <vtkImageProperty.h>
 #include <vtkOpenGLImageResliceMapper.h>
+#include <vtkCamera.h>
 #include <mitkVtkPropRenderer.h>
+#include <vtkInteractorStyleImage.h>
+#include <vtkRenderWindowInteractor.h>
 
 
 
@@ -86,7 +89,7 @@ void mitk::ImageVtkMapper2D::GenerateData(mitk::BaseRenderer* renderer)
     vtkSmartPointer<vtkImageProperty> ip = vtkSmartPointer<vtkImageProperty>::New();
     ip->SetColorLevel(levelWindow.GetLevel());
     ip->SetColorWindow(levelWindow.GetWindow());
-    ip->SetInterpolationTypeToNearest();
+    ip->SetInterpolationTypeToCubic();
 
     float opacity = 0;
     GetOpacity(opacity, renderer);
@@ -99,6 +102,28 @@ void mitk::ImageVtkMapper2D::GenerateData(mitk::BaseRenderer* renderer)
 //    renderWindowInteractor->SetRenderWindow(renderWindow);
 
     m_VtkMapper->SetInput(m_VtkImage);
+
+//    vtkSmartPointer<vtkCamera> vtkCam = renderer->GetVtkRenderer()->GetActiveCamera();
+
+//    vtkCam->SetFocalPoint(0.0, 0.0, 1.0);
+//    vtkCam->SetPosition(0.0, 0.0, 0.0);
+//    vtkCam->SetViewUp(0.0, -1.0, 0.0);
+////    vtkCam->SetParallelProjection(1);
+//    vtkCam->SetDistance(950+renderer->GetSlice());
+//    vtkCam->Modified();
+//    renderer->GetVtkRenderer()->ResetCamera();
+
+//    vtkSmartPointer<vtkInteractorStyleImage> style = vtkSmartPointer<vtkInteractorStyleImage>::New();
+//    vtkSmartPointer<vtkRenderWindowInteractor> interactor = vtkSmartPointer<vtkRenderWindowInteractor>::New();
+//    interactor->SetInteractorStyle(style);
+
+//    renderer->GetVtkRenderer()->GetRenderWindow()->SetInteractor(interactor);
+
+
+
+//    GetActiveStdMultiWidget()->GetRenderWindow1()->GetRenderer()->GetVtkRenderer()->SetActiveCamera(vtkCam);
+//    GetActiveStdMultiWidget()->GetRenderWindow1()->GetRenderer()->GetVtkRenderer()->ResetCamera();
+//    GetActiveStdMultiWidget()->ForceImmediateUpdate();
 
     m_VtkActor->SetMapper(m_VtkMapper);
     m_VtkActor->SetProperty(ip);

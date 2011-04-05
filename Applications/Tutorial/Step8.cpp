@@ -54,8 +54,8 @@ void Step8::SetupWidgets()
 	QHBoxLayout* hlayout = new QHBoxLayout(viewParent);
 	hlayout->setMargin(0);
 
-	mitk::ImageVtkMapper2D::Pointer mapper = mitk::ImageVtkMapper2D::New();
-	m_ResultNode->SetMapper(mitk::BaseRenderer::Extended2D, mapper);
+//	mitk::ImageVtkMapper2D::Pointer mapper = mitk::ImageVtkMapper2D::New();
+//	m_ResultNode->SetMapper(mitk::BaseRenderer::Extended2D, mapper);
 
 	//*************************************************************************
 	// Part Ia: create and initialize QmitkStdMultiWidget

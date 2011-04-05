@@ -14,6 +14,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define IMAGEVTKMAPPER2D_H_HEADER_INCLUDED_C1C5453B
 
 //MITK includes
+#include "mitkVtkMapper3D.h"
 #include "mitkVtkMapper2D.h"
 #include <mitkImage.h>
 

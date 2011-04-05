@@ -94,7 +94,7 @@ public:
   //## @brief MapperSlotId defines which kind of mapper (e.g., 2D or 3D) shoud be used.
   typedef int MapperSlotId;
 
-  enum StandardMapperSlot{Standard2D=1, Standard3D=2, Extended2D=3};
+  enum StandardMapperSlot{Standard2D=1, Standard3D=2};
 
 
   virtual void SetDataStorage( DataStorage* storage );  ///< set the datastorage that will be used for rendering

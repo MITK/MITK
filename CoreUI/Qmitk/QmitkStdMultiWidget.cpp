@@ -141,7 +141,7 @@ m_Node(NULL)
   mitkWidget2 = new QmitkRenderWindow(mitkWidget2Container, "stdmulti.widget2");
   mitkWidget2->setMaximumSize(2000,2000);
   mitkWidget2->setEnabled( TRUE );
-  mitkWidget2->SetLayoutIndex( TRANSVERSAL );
+  mitkWidget2->SetLayoutIndex( SAGITTAL );
   mitkWidgetLayout2->addWidget(mitkWidget2); 
 
   //Create RenderWindows 3
@@ -238,7 +238,7 @@ void QmitkStdMultiWidget::InitializeWidget()
   planeNode->SetProperty("layer",layer);
 
   mitk::BaseRenderer::GetInstance(mitkWidget4->GetRenderWindow())->SetMapperID(mitk::BaseRenderer::Standard3D);
-  mitk::BaseRenderer::GetInstance(mitkWidget1->GetRenderWindow())->SetMapperID(mitk::BaseRenderer::Extended2D);
+//  mitk::BaseRenderer::GetInstance(mitkWidget1->GetRenderWindow())->SetMapperID(mitk::BaseRenderer::Extended2D);
   // Set plane mode (slicing/rotation behavior) to slicing (default)
   m_PlaneMode = PLANE_MODE_SLICING;
 
@@ -246,7 +246,7 @@ void QmitkStdMultiWidget::InitializeWidget()
   mitkWidget1->GetSliceNavigationController()->SetDefaultViewDirection(
     mitk::SliceNavigationController::Transversal );
   mitkWidget2->GetSliceNavigationController()->SetDefaultViewDirection(
-    mitk::SliceNavigationController::Transversal );
+    mitk::SliceNavigationController::Sagittal );
   mitkWidget3->GetSliceNavigationController()->SetDefaultViewDirection(
     mitk::SliceNavigationController::Frontal );
   mitkWidget4->GetSliceNavigationController()->SetDefaultViewDirection(

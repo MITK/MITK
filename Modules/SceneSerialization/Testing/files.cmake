@@ -1,5 +1,5 @@
 
-SET(MODULE_TESTS 
+SET(MODULE_CUSTOM_TESTS
   mitkSceneIOTest.cpp
 )
 

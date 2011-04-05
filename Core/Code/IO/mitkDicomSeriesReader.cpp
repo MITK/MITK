@@ -505,19 +505,15 @@ DicomSeriesReader::SortSeriesSlices(const StringContainer &unsortedFilenames)
 bool 
 DicomSeriesReader::GdcmSortFunction(const gdcm::DataSet &ds1, const gdcm::DataSet &ds2)
 {
-  gdcm::Attribute<0x0008,0x0032> acq_time1; // Acquisition time
   gdcm::Attribute<0x0020,0x0032> image_pos1; // Image Position (Patient)
   gdcm::Attribute<0x0020,0x0037> image_orientation1; // Image Orientation (Patient)
 
-  acq_time1.Set(ds1);
   image_pos1.Set(ds1);
   image_orientation1.Set(ds1);
 
-  gdcm::Attribute<0x0008,0x0032> acq_time2;
   gdcm::Attribute<0x0020,0x0032> image_pos2;
   gdcm::Attribute<0x0020,0x0037> image_orientation2;
 
-  acq_time2.Set(ds2);
   image_pos2.Set(ds2);
   image_orientation2.Set(ds2);
 
@@ -545,6 +541,15 @@ DicomSeriesReader::GdcmSortFunction(const gdcm::DataSet &ds1, const gdcm::DataSe
 
   if ( fabs(dist1 - dist2) < mitk::eps)
   {
+    gdcm::Attribute<0x0008,0x0032> acq_time1; // Acquisition time (may be missing, so we check existence first)
+    gdcm::Attribute<0x0008,0x0032> acq_time2;
+
+    if (ds1.FindDataElement(gdcm::Tag(0x0008,0x0032)))
+      acq_time1.Set(ds1);
+
+    if (ds2.FindDataElement(gdcm::Tag(0x0008,0x0032)))
+      acq_time2.Set(ds2);
+
     // exception: same position: compare by acquisition time
     return acq_time1 < acq_time2;
   }

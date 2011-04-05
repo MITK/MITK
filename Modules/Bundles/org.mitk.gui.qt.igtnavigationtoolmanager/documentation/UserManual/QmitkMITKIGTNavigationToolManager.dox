@@ -1,0 +1,23 @@
+/**
+
+\bundlemainpage{org.igtnavigationtoolmanager} The MITK-IGT Navigation Tool Manager
+
+\image html icon.png "Icon of the Module"
+
+\section QmitkMITKIGTNavigationToolManager Introduction
+
+
+Available sections:
+  - \ref QmitkMITKIGTNavigationToolManager
+
+List example
+
+<ul>
+<li> one
+<li> two
+<li> three
+<li> ...
+</ul>
+
+
+*/

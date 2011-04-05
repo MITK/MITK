@@ -729,27 +729,42 @@ int mitk::PlanarFigureInteractor::IsPositionInsideMarker(
 
   // Iterate over all control points of planar figure, and check if
   // any one is close to the current display position
-  typedef mitk::PlanarFigure::VertexContainerType VertexContainerType;
-  const VertexContainerType *controlPoints = planarFigure->GetControlPoints();
-
   mitk::Point2D worldPoint2D, displayControlPoint;
   mitk::Point3D worldPoint3D;
 
-  VertexContainerType::ConstIterator it;
-  for ( it = controlPoints->Begin(); it != controlPoints->End(); ++it )
+  int numberOfControlPoints = planarFigure->GetNumberOfControlPoints();
+  for ( int i=0; i<numberOfControlPoints; i++ )
   {
     Point2D displayControlPoint;
-    if ( this->TransformObjectToDisplay( it->Value(), displayControlPoint,
+    if ( this->TransformObjectToDisplay( planarFigure->GetControlPoint(i), displayControlPoint,
       planarFigureGeometry, rendererGeometry, displayGeometry ) )
     {
       // TODO: variable size of markers
-      if ( (abs(displayPosition[0] - displayControlPoint[0]) < 4 )
-        && (abs(displayPosition[1] - displayControlPoint[1]) < 4 ) )
+      if ( displayPosition.SquaredEuclideanDistanceTo( displayControlPoint ) < 20.0 )
       {
-        return it->Index();
+        return i;
       }
-    }
+    }      
+    //if ( (displayPosition[0] - displayControlPoint[0] < 4 )
+    //  && (displayPosition[1] - displayControlPoint[1] < 4 ) )
+
   }
+
+
+  //for ( it = controlPoints.begin(); it != controlPoints.end(); ++it )
+  //{
+  //  Point2D displayControlPoint;
+  //  if ( this->TransformObjectToDisplay( it->Point, displayControlPoint,
+  //    planarFigureGeometry, rendererGeometry, displayGeometry ) )
+  //  {
+  //    // TODO: variable size of markers
+  //    if ( (abs(displayPosition[0] - displayControlPoint[0]) < 4 )
+  //      && (abs(displayPosition[1] - displayControlPoint[1]) < 4 ) )
+  //    {
+  //      return index;
+  //    }
+  //  }
+  //}
 
   return -1;
 }

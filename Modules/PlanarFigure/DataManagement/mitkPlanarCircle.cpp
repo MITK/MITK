@@ -49,8 +49,8 @@ bool mitk::PlanarCircle::SetControlPoint( unsigned int index, const Point2D &poi
 
     boundaryPoint[0] += vec[0];
     boundaryPoint[1] += vec[1];
-    SetControlPoint( 0, point );
-    SetControlPoint( 1, boundaryPoint );
+    PlanarFigure::SetControlPoint( 0, point );
+    PlanarFigure::SetControlPoint( 1, boundaryPoint );
   }
   else if ( index == 1 )
   {

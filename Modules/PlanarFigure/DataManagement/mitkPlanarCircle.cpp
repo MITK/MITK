@@ -29,9 +29,8 @@ mitk::PlanarCircle::PlanarCircle()
 {
   // Circle has two control points
   this->ResetNumberOfControlPoints( 2 );
+  this->SetNumberOfPolyLines( 1 );
   this->SetProperty( "closed", mitk::BoolProperty::New(true) );
-
-  m_PolyLines->InsertElement( 0, VertexContainerType::New());
 }
 
 
@@ -39,50 +38,23 @@ mitk::PlanarCircle::~PlanarCircle()
 {
 }
 
-
-//void mitk::PlanarCircle::Initialize()
-//{
-//  // Default initialization of circle control points
-//
-//  mitk::Geometry2D *geometry2D = 
-//    dynamic_cast< mitk::Geometry2D * >( this->GetGeometry( 0 ) );
-//
-//  if ( geometry2D == NULL )
-//  {
-//    MITK_ERROR << "Missing Geometry2D for PlanarCircle";
-//    return;
-//  }
-//
-//  mitk::ScalarType width = geometry2D->GetBounds()[1];
-//  mitk::ScalarType height = geometry2D->GetBounds()[3];
-//  
-//  mitk::Point2D &centerPoint = m_ControlPoints->ElementAt( 0 );
-//  mitk::Point2D &boundaryPoint = m_ControlPoints->ElementAt( 1 );
-//
-//  centerPoint[0] = width / 2.0;
-//  centerPoint[1] = height / 2.0;
-//
-//  boundaryPoint[0] = centerPoint[0] + 20.0;
-//  boundaryPoint[1] = centerPoint[1];
-//}
-
 bool mitk::PlanarCircle::SetControlPoint( unsigned int index, const Point2D &point, bool /*createIfDoesNotExist*/ )
 {
   // moving center point
   if(index == 0)
   {
-    const Point2D &centerPoint = m_ControlPoints->ElementAt( 0 );
-    Point2D boundaryPoint = m_ControlPoints->ElementAt( 1 );
+    const Point2D &centerPoint = GetControlPoint( 0 );
+    Point2D boundaryPoint = GetControlPoint( 1 );
     vnl_vector<float> vec = (point.GetVnlVector() - centerPoint.GetVnlVector());
 
     boundaryPoint[0] += vec[0];
     boundaryPoint[1] += vec[1];
-    m_ControlPoints->InsertElement( 0, point );
-    m_ControlPoints->InsertElement( 1, boundaryPoint );
+    SetControlPoint( 0, point );
+    SetControlPoint( 1, boundaryPoint );
   }
   else if ( index == 1 )
   {
-    m_ControlPoints->InsertElement( index, point );
+    PlanarFigure::SetControlPoint( index, point );
     return true;
   }
   return false;
@@ -91,20 +63,28 @@ bool mitk::PlanarCircle::SetControlPoint( unsigned int index, const Point2D &poi
 void mitk::PlanarCircle::GeneratePolyLine()
 {
   // TODO: start circle at specified boundary point...
+  
+  // clear the PolyLine-Contrainer, it will be reconstructed soon enough...
+  this->ClearPolyLines();
 
-  const Point2D &centerPoint = m_ControlPoints->ElementAt( 0 );
-  const Point2D &boundaryPoint = m_ControlPoints->ElementAt( 1 );
+  const Point2D &centerPoint = GetControlPoint( 0 );
+  const Point2D &boundaryPoint = GetControlPoint( 1 );
 
   double radius = centerPoint.EuclideanDistanceTo( boundaryPoint );
 
   // Generate poly-line with 64 segments
-  m_PolyLines->ElementAt( 0 )->Reserve( 64 );
   for ( int t = 0; t < 64; ++t )
   {
     double alpha = (double) t * vnl_math::pi / 32.0;
 
-    m_PolyLines->ElementAt( 0 )->ElementAt( t )[0] = centerPoint[0] + radius * cos( alpha );
-    m_PolyLines->ElementAt( 0 )->ElementAt( t )[1] = centerPoint[1] + radius * sin( alpha );
+    // construct the new polyline point ...
+    Point2D polyLinePoint;
+    polyLinePoint[0] = centerPoint[0] + radius * cos( alpha );
+    polyLinePoint[1] = centerPoint[1] + radius * sin( alpha );
+
+    // ... and append it to the PolyLine. 
+    // No extending supported here, so we can set the index of the PolyLineElement to '0'
+    AppendPointToPolyLine( 0, PolyLineElement( polyLinePoint, 0 ) );
   }
 }
 

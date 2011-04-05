@@ -204,6 +204,7 @@ protected:
     \brief Construct a UID that takes into account sorting criteria from GetSeries().
   */
   static std::string CreateMoreUniqueSeriesIdentifier( gdcm::Scanner::TagToValue& tagValueMap );
+  static std::string CreateSeriesIdentifierPart( gdcm::Scanner::TagToValue& tagValueMap, const gdcm::Tag& tag );
   static std::string IDifyTagValue(const std::string& value);
 #endif
 

@@ -391,6 +391,23 @@ DicomSeriesReader::GetSeries(const std::string &dir, const StringContainer &rest
 }
 
 #if GDCM_MAJOR_VERSION >= 2
+
+std::string
+DicomSeriesReader::CreateSeriesIdentifierPart( gdcm::Scanner::TagToValue& tagValueMap, const gdcm::Tag& tag )
+{
+  std::string result;
+  try
+  {
+    result = IDifyTagValue( tagValueMap[ tag ] );
+  }
+  catch (std::exception& e)
+  {
+    MITK_ERROR << "Could not access tag " << tag << ": " << e.what();
+  }
+   
+  return result;
+}
+
 std::string 
 DicomSeriesReader::CreateMoreUniqueSeriesIdentifier( gdcm::Scanner::TagToValue& tagValueMap )
 {
@@ -406,24 +423,23 @@ DicomSeriesReader::CreateMoreUniqueSeriesIdentifier( gdcm::Scanner::TagToValue& 
   try
   {
     constructedID = tagValueMap[ tagSeriesInstanceUID ];
-
-    constructedID += IDifyTagValue( tagValueMap[ tagNumberOfRows ] );
-    constructedID += IDifyTagValue( tagValueMap[ tagNumberOfColumns ] );
-    constructedID += IDifyTagValue( tagValueMap[ tagPixelSpacing ] );
-    constructedID += IDifyTagValue( tagValueMap[ tagSliceThickness ] );
-    constructedID += IDifyTagValue( tagValueMap[ tagImageOrientation ] );
-
-    constructedID.resize( constructedID.length() - 1 ); // cut of trailing '.'
-
-    MITK_DEBUG << "ID: " << constructedID;
-    return constructedID;
   }
   catch (std::exception& e)
   {
-    MITK_ERROR << "CreateMoreUniqueSeriesIdentifier() could not access all required DICOM tags. You are calling it wrongly. Using partial ID.";
+    MITK_ERROR << "CreateMoreUniqueSeriesIdentifier() could not access series instance UID. Something is seriously wrong with this image.";
     MITK_ERROR << "Error from exception: " << e.what();
-    return constructedID; 
   }
+ 
+  constructedID += CreateSeriesIdentifierPart( tagValueMap, tagNumberOfRows );
+  constructedID += CreateSeriesIdentifierPart( tagValueMap, tagNumberOfColumns );
+  constructedID += CreateSeriesIdentifierPart( tagValueMap, tagPixelSpacing );
+  constructedID += CreateSeriesIdentifierPart( tagValueMap, tagSliceThickness );
+  constructedID += CreateSeriesIdentifierPart( tagValueMap, tagImageOrientation );
+
+  constructedID.resize( constructedID.length() - 1 ); // cut of trailing '.'
+
+  MITK_DEBUG << "ID: " << constructedID;
+  return constructedID; 
 }
 
 std::string 

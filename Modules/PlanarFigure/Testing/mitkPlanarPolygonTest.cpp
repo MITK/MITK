@@ -65,12 +65,14 @@ static void TestPlanarPolygonPlacement( mitk::PlanarPolygon::Pointer planarPolyg
   MITK_TEST_CONDITION( planarPolygon->IsClosed(), "planar polygon should be closed after function call, right?" );
   
   // Test for number of polylines
-  const mitk::PlanarFigure::VertexContainerType* polyLine0 = planarPolygon->GetPolyLine( 0 );
+  const mitk::PlanarFigure::PolyLineType polyLine0 = planarPolygon->GetPolyLine( 0 );
+  mitk::PlanarFigure::PolyLineType::const_iterator iter = polyLine0.begin();
   MITK_TEST_CONDITION( planarPolygon->GetPolyLinesSize() == 1, "Number of polylines after placement" );
 
   // Get polylines and check if the generated coordinates are OK
-  const mitk::Point2D& pp0 = polyLine0->ElementAt( 0 );
-  const mitk::Point2D& pp1 = polyLine0->ElementAt( 1 );
+  const mitk::Point2D& pp0 = iter->Point;
+  ++iter;
+  const mitk::Point2D& pp1 = iter->Point;
   MITK_TEST_CONDITION( ((pp0 == p0) && (pp1 == p1))
     || ((pp0 == p1) && (pp1 == p0)), "Correct polyline 1" );
 

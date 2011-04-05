@@ -88,18 +88,23 @@ static void TestPlanarCrossPlacement( mitk::PlanarCross::Pointer planarCross )
 
 
   // Test for number of polylines
-  const mitk::PlanarFigure::VertexContainerType* polyLine0 = planarCross->GetPolyLine( 0 );
-  const mitk::PlanarFigure::VertexContainerType* polyLine1 = planarCross->GetPolyLine( 1 );
+  const mitk::PlanarFigure::PolyLineType polyLine0 = planarCross->GetPolyLine( 0 );
+  const mitk::PlanarFigure::PolyLineType polyLine1 = planarCross->GetPolyLine( 1 );
   MITK_TEST_CONDITION( planarCross->GetPolyLinesSize() == 2, "Number of polylines after placement" );
 
+  mitk::PlanarFigure::PolyLineType::const_iterator iter0 = polyLine0.begin();
+  mitk::PlanarFigure::PolyLineType::const_iterator iter1 = polyLine1.begin();
+  
   // Get polylines and check if the generated coordinates are OK
-  const mitk::Point2D& pp0 = polyLine0->ElementAt( 0 );
-  const mitk::Point2D& pp1 = polyLine0->ElementAt( 1 );
+  const mitk::Point2D& pp0 = iter0->Point;
+  iter0++;
+  const mitk::Point2D& pp1 = iter0->Point;
   MITK_TEST_CONDITION( ((pp0 == p0) && (pp1 == p1))
     || ((pp0 == p1) && (pp1 == p0)), "Correct polyline 1" );
 
-  const mitk::Point2D& pp2 = polyLine1->ElementAt( 0 );
-  const mitk::Point2D& pp3 = polyLine1->ElementAt( 1 );
+  const mitk::Point2D& pp2 = iter1->Point;
+  iter1++;
+  const mitk::Point2D& pp3 = iter1->Point;
   MITK_TEST_CONDITION( ((pp2 == p2) && (pp3 == p3))
     || ((pp2 == p3) && (pp3 == p2)), "Correct polyline 2" );
 
@@ -146,12 +151,14 @@ static void TestPlanarCrossPlacementSingleLine(mitk::PlanarCross::Pointer planar
 
 
   // Test for number of polylines
-  const mitk::PlanarFigure::VertexContainerType* polyLine0 = planarCross->GetPolyLine( 0 );
+  const mitk::PlanarFigure::PolyLineType polyLine0 = planarCross->GetPolyLine( 0 );
+  const mitk::PlanarFigure::PolyLineType::const_iterator iter = polyLine0.begin();
   MITK_TEST_CONDITION( planarCross->GetPolyLinesSize() == 1, "Number of polylines after placement" );
 
   // Get polylines and check if the generated coordinates are OK
-  const mitk::Point2D& pp0 = polyLine0->ElementAt( 0 );
-  const mitk::Point2D& pp1 = polyLine0->ElementAt( 1 );
+  const mitk::Point2D& pp0 = iter->Point;
+  iter++;
+  const mitk::Point2D& pp1 = iter->Point;
   MITK_TEST_CONDITION( ((pp0 == p0) && (pp1 == p1))
     || ((pp0 == p1) && (pp1 == p0)), "Correct polyline 1" );
 

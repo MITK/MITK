@@ -745,26 +745,7 @@ int mitk::PlanarFigureInteractor::IsPositionInsideMarker(
         return i;
       }
     }      
-    //if ( (displayPosition[0] - displayControlPoint[0] < 4 )
-    //  && (displayPosition[1] - displayControlPoint[1] < 4 ) )
-
   }
-
-
-  //for ( it = controlPoints.begin(); it != controlPoints.end(); ++it )
-  //{
-  //  Point2D displayControlPoint;
-  //  if ( this->TransformObjectToDisplay( it->Point, displayControlPoint,
-  //    planarFigureGeometry, rendererGeometry, displayGeometry ) )
-  //  {
-  //    // TODO: variable size of markers
-  //    if ( (abs(displayPosition[0] - displayControlPoint[0]) < 4 )
-  //      && (abs(displayPosition[1] - displayControlPoint[1]) < 4 ) )
-  //    {
-  //      return index;
-  //    }
-  //  }
-  //}
 
   return -1;
 }

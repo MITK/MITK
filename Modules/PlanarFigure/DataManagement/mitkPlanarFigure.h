@@ -47,6 +47,8 @@ class Geometry2D;
  *   <li>"planarfigure.ishovering": true if the mouse "hovers" over the planar figure
  *   <li>"planarfigure.iseditable": true if the planar figure can be edited (otherwise,
  *       it can only be picked/selected, but its control points cannot be edited); default is true
+ *   <li>"planarfigure.isextendable": true if new control points can be inserted into the list of control points;
+ *        default is false
  * </ul>
  *
  *

@@ -303,22 +303,7 @@ void mitk::PlanarFigureMapper2D::PaintPolyLine(
       firstPoint = displayPoint;
 
     glVertex2f( displayPoint[0], displayPoint[1] );
-
   }
-
-  //for ( VertexContainerType::ConstIterator it = vertices->Begin(); it != vertices->End(); ++it )
-  //{
-  //  // Draw this 2D point as OpenGL vertex
-  //  mitk::Point2D displayPoint;
-  //  this->TransformObjectToDisplay( it->Value(), displayPoint,
-  //    planarFigureGeometry2D, rendererGeometry2D, displayGeometry );
-
-  //  if(it == vertices->Begin())
-  //    firstPoint = displayPoint;
-
-  //  glVertex2f( displayPoint[0], displayPoint[1] );
-
-  //}
 
   glEnd();
 }
@@ -342,12 +327,6 @@ void mitk::PlanarFigureMapper2D::DrawMainLines(
       figure->IsClosed(),    
       color, opacity, lineWidth, firstPoint,
       planarFigureGeometry2D, rendererGeometry2D, displayGeometry );
-
-    //const VertexContainerType* polyLine = figure->GetPolyLine(loop);
-    //this->PaintPolyLine( polyLine,
-    //  figure->IsClosed(),    
-    //  color, opacity, lineWidth, firstPoint,
-    //  planarFigureGeometry2D, rendererGeometry2D, displayGeometry );
   }
 }
 
@@ -377,24 +356,6 @@ void mitk::PlanarFigureMapper2D::DrawHelperLines(
     this->PaintPolyLine( helperPolyLine, false,
       color, opacity, lineWidth, firstPoint,
       planarFigureGeometry2D, rendererGeometry2D, displayGeometry );
-
-
-
-    //// Get (and possibly generate) helper polyline (this needs to be done before
-    //// checking if the helper polyline has to be painted!)
-    //const VertexContainerType *polyLine = figure->GetHelperPolyLine( loop,
-    //  displayGeometry->GetScaleFactorMMPerDisplayUnit(),
-    //  displayGeometry->GetDisplayHeight() );
-
-    //// Check if the current helper objects is to be painted
-    //if ( !figure->IsHelperToBePainted( loop ) )
-    //{
-    //  continue;
-    //}
-
-    //this->PaintPolyLine( polyLine, false,
-    //  color, opacity, lineWidth, firstPoint,
-    //  planarFigureGeometry2D, rendererGeometry2D, displayGeometry );
   }
 }
 

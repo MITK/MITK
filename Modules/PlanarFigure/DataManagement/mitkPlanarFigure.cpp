@@ -25,18 +25,14 @@ PURPOSE.  See the above copyright notices for more information.
 
 mitk::PlanarFigure::PlanarFigure()
 : m_FigurePlaced( false ),
-  m_HoveringControlPointVisible( false ),
-  m_SelectedControlPoint( -1 ),
-  m_Geometry2D( NULL ),
-  m_PolyLineUpToDate(false),
-  m_HelperLinesUpToDate(false),
-  m_FeaturesUpToDate(false),
-  m_FeaturesMTime( 0 )
+m_PreviewControlPointVisible( false ),
+m_SelectedControlPoint( -1 ),
+m_Geometry2D( NULL ),
+m_PolyLineUpToDate(false),
+m_HelperLinesUpToDate(false),
+m_FeaturesUpToDate(false),
+m_FeaturesMTime( 0 )
 {
-  m_ControlPoints = VertexContainerType::New();
-  m_HoveringControlPoint = VertexContainerType::New();
-  m_PolyLines = VertexContainerVectorType::New();
-  m_HelperPolyLines = VertexContainerVectorType::New();
   m_HelperPolyLinesToBePainted = BoolContainerType::New();
 
   this->SetProperty( "closed", mitk::BoolProperty::New( false ) );
@@ -77,10 +73,12 @@ bool mitk::PlanarFigure::IsClosed() const
 
 void mitk::PlanarFigure::PlaceFigure( const mitk::Point2D& point )
 {
+  //m_ControlPoints.clear();
+  //m_NumberOfControlPoints = 2;
+
   for ( unsigned int i = 0; i < this->GetNumberOfControlPoints(); ++i )
   {
-    m_ControlPoints->InsertElement( i, this->ApplyControlPointConstraints( i, point ) );
-    m_NewControlPoints.push_back( point );
+    m_ControlPoints.push_back( point );
   }
 
   m_FigurePlaced = true;
@@ -88,15 +86,27 @@ void mitk::PlanarFigure::PlaceFigure( const mitk::Point2D& point )
 }
 
 
-bool mitk::PlanarFigure::AddControlPoint( const mitk::Point2D& point )
+bool mitk::PlanarFigure::AddControlPoint( const mitk::Point2D& point, int position )
 {
   if ( m_NumberOfControlPoints < this->GetMaximumNumberOfControlPoints() )
   {
-    m_ControlPoints->InsertElement( m_NumberOfControlPoints, 
-      this->ApplyControlPointConstraints( m_NumberOfControlPoints, point ) );
-    m_NewControlPoints.push_back( point );
+    if ( position == -1 || position > m_NumberOfControlPoints-1 )
+    {
+      m_ControlPoints.push_back( this->ApplyControlPointConstraints( m_NumberOfControlPoints, point ) );
+      m_SelectedControlPoint = m_NumberOfControlPoints;
+    }
+    else
+    {
+      ControlPointListType::iterator iter = m_ControlPoints.begin() + position;
+      m_ControlPoints.insert( iter, this->ApplyControlPointConstraints( m_NumberOfControlPoints, point ) );
+      m_SelectedControlPoint = m_NumberOfControlPoints;
+    }
+
+    m_PolyLineUpToDate = false;
+    m_HelperLinesUpToDate = false;
+    m_FeaturesUpToDate = false;
+
     ++m_NumberOfControlPoints;
-    ++m_SelectedControlPoint;
     return true;
   }
   else
@@ -111,29 +121,26 @@ bool mitk::PlanarFigure::SetControlPoint( unsigned int index, const Point2D& poi
   bool controlPointSetCorrectly = false;
   if (createIfDoesNotExist)
   {
-    m_ControlPoints->InsertElement( index, this->ApplyControlPointConstraints( index, point ) );
-
     if ( m_NumberOfControlPoints <= index )
     {
-      m_NewControlPoints.push_back( point );
-      m_NumberOfControlPoints = index + 1;
+      m_ControlPoints.push_back( this->ApplyControlPointConstraints( index, point ) );
+      m_NumberOfControlPoints++;
     }
     else
     {
-      m_NewControlPoints.at( index ) = point;
+      m_ControlPoints.at( index ) = this->ApplyControlPointConstraints( index, point );
     }
     controlPointSetCorrectly = true;
   }
   else if ( index < m_NumberOfControlPoints )
   {
-    m_ControlPoints->InsertElement( index, this->ApplyControlPointConstraints( index, point ) );
-    m_NewControlPoints.at( index ) = point;
+    m_ControlPoints.at( index ) = this->ApplyControlPointConstraints( index, point );
     controlPointSetCorrectly = true;
   }
-  //else
-  //{
-  //  return false;
-  //}
+  else
+  {
+    return false;
+  }
 
   if ( controlPointSetCorrectly )
   {
@@ -163,8 +170,6 @@ unsigned int mitk::PlanarFigure::GetNumberOfControlPoints() const
 }
 
 
-
-
 bool mitk::PlanarFigure::SelectControlPoint( unsigned int index )
 {
   if ( index < this->GetNumberOfControlPoints() )
@@ -184,59 +189,32 @@ void mitk::PlanarFigure::DeselectControlPoint()
   m_SelectedControlPoint = -1;
 }
 
-void mitk::PlanarFigure::SetHoveringControlPoint( const Point2D& point )
+void mitk::PlanarFigure::SetPreviewControlPoint( const Point2D& point )
 {
-  if ( m_HoveringControlPoint->Size() == 0 )
-  {
-    m_HoveringControlPoint->InsertElement( 0, point );
-  }
-  else
-  {
-    m_HoveringControlPoint->SetElement( 0, point );
-  }
-  m_HoveringControlPointVisible = true;
+  m_PreviewControlPoint = point;
+  m_PreviewControlPointVisible = true;
 }
 
-void mitk::PlanarFigure::ResetHoveringContolPoint()
+void mitk::PlanarFigure::ResetPreviewContolPoint()
 {
-  if ( m_HoveringControlPoint->Size() > 0 )
-  {
-    m_HoveringControlPointVisible = false;
-    m_HoveringControlPoint->DeleteIndex( 0 );
-  }
+  m_PreviewControlPointVisible = false;
 }
 
-mitk::PlanarFigure::VertexContainerType::Pointer mitk::PlanarFigure::GetHoveringControlPoint()
+mitk::Point2D mitk::PlanarFigure::GetPreviewControlPoint()
 {
-  return m_HoveringControlPoint;
+  return m_PreviewControlPoint;
 }
 
-bool mitk::PlanarFigure::IsHoveringControlPointVisible()
+bool mitk::PlanarFigure::IsPreviewControlPointVisible()
 {
-  return m_HoveringControlPointVisible;
+  return m_PreviewControlPointVisible;
 }
-
-
-const mitk::PlanarFigure::VertexContainerType *
-mitk::PlanarFigure::GetControlPoints() const
-{
-  return m_ControlPoints;
-}
-
-
-mitk::PlanarFigure::VertexContainerType *
-mitk::PlanarFigure::GetControlPoints()
-{
-  return m_ControlPoints;
-}
-
 
 mitk::Point2D mitk::PlanarFigure::GetControlPoint( unsigned int index ) const
 {
   if ( index < m_NumberOfControlPoints )
   {
-    //return m_ControlPoints->ElementAt( index );
-    return m_NewControlPoints.at( index );
+    return m_ControlPoints.at( index );
   }
 
   itkExceptionMacro( << "GetControlPoint(): Invalid index!" );
@@ -248,8 +226,7 @@ mitk::Point3D mitk::PlanarFigure::GetWorldControlPoint( unsigned int index ) con
   Point3D point3D;
   if ( (m_Geometry2D != NULL) && (index < m_NumberOfControlPoints) )
   {
-    //m_Geometry2D->Map( m_ControlPoints->ElementAt( index ), point3D );
-    m_Geometry2D->Map( m_NewControlPoints.at( index ), point3D );
+    m_Geometry2D->Map( m_ControlPoints.at( index ), point3D );
     return point3D;
   }
 
@@ -257,11 +234,11 @@ mitk::Point3D mitk::PlanarFigure::GetWorldControlPoint( unsigned int index ) con
 }
 
 
-mitk::PlanarFigure::PolyLineType
+const mitk::PlanarFigure::PolyLineType
 mitk::PlanarFigure::GetPolyLine(unsigned int index)
 {
   mitk::PlanarFigure::PolyLineType polyLine;
-  if ( m_NewPolyLines.size() > index )
+  if ( m_PolyLines.size() > index )
   {
     if ( !m_PolyLineUpToDate )
     {
@@ -269,45 +246,32 @@ mitk::PlanarFigure::GetPolyLine(unsigned int index)
       m_PolyLineUpToDate = true;
     }
 
-    polyLine = m_NewPolyLines.at( index );
+    polyLine = m_PolyLines.at( index );
   }
 
   return polyLine;
-
-  //if ( !m_PolyLines->IndexExists( index ) || !m_PolyLineUpToDate ) // (m_PolyLines->ElementAt( index )->GetMTime() < m_ControlPoints->GetMTime()) )
-  //{
-  //  this->GeneratePolyLine();
-  //  m_PolyLineUpToDate = true;
-  //}
-
-  //return m_PolyLines->ElementAt( index );
 }
 
 
 const mitk::PlanarFigure::PolyLineType
 mitk::PlanarFigure::GetPolyLine(unsigned int index) const
 {
-  return m_NewPolyLines.at( index );
-  //return m_PolyLines->ElementAt( index );
+  return m_PolyLines.at( index );
 }
 
-
-//const mitk::PlanarFigure::VertexContainerType *
-//mitk::PlanarFigure::GetHelperPolyLine(unsigned int index, double mmPerDisplayUnit, unsigned int displayHeight)
-//{
-//  if ((m_HelperPolyLines->ElementAt( index )) && !m_HelperLinesUpToDate ) //(m_HelperPolyLines->ElementAt( index )->GetMTime() < m_ControlPoints->GetMTime()) )
-//  {
-//    this->GenerateHelperPolyLine(mmPerDisplayUnit, displayHeight);
-//    m_HelperLinesUpToDate = true;
-//  }
-//
-//  return m_HelperPolyLines->ElementAt( index );
-//}
+void mitk::PlanarFigure::ClearPolyLines()
+{
+  for ( int i=0; i<m_PolyLines.size(); i++ )
+  {
+    m_PolyLines.at( i ).clear();
+  }
+  m_PolyLineUpToDate = false;  
+}
 
 const mitk::PlanarFigure::PolyLineType mitk::PlanarFigure::GetHelperPolyLine( unsigned int index, double mmPerDisplayUnit, unsigned int displayHeight )
 {
   mitk::PlanarFigure::PolyLineType helperPolyLine;
-  if ( index < m_NewHelperPolyLines.size() )
+  if ( index < m_HelperPolyLines.size() )
   {
     if ( !m_HelperLinesUpToDate )
     {
@@ -315,19 +279,19 @@ const mitk::PlanarFigure::PolyLineType mitk::PlanarFigure::GetHelperPolyLine( un
       m_HelperLinesUpToDate = true;
     }
 
-    helperPolyLine = m_NewHelperPolyLines.at(index);
+    helperPolyLine = m_HelperPolyLines.at(index);
   }
 
   return helperPolyLine;
+}
 
-  //if ((m_HelperPolyLines->ElementAt( index )) && !m_HelperLinesUpToDate ) //(m_HelperPolyLines->ElementAt( index )->GetMTime() < m_ControlPoints->GetMTime()) )
-  //{
-  //  this->GenerateHelperPolyLine(mmPerDisplayUnit, displayHeight);
-  //  m_HelperLinesUpToDate = true;
-  //}
-
-  //return m_HelperPolyLines->ElementAt( index );
-
+void mitk::PlanarFigure::ClearHelperPolyLines()
+{
+  for ( int i=0; i<m_HelperPolyLines.size(); i++ )
+  {
+    m_HelperPolyLines.at(i).clear();
+  }
+  m_HelperLinesUpToDate = false;
 }
 
 /** \brief Returns the number of features available for this PlanarFigure
@@ -392,12 +356,11 @@ bool mitk::PlanarFigure::IsFeatureActive( unsigned int index ) const
 
 void mitk::PlanarFigure::EvaluateFeatures()
 {
-  if ( !m_FeaturesUpToDate ) //m_FeaturesMTime < m_ControlPoints->GetMTime() )
+  if ( !m_FeaturesUpToDate )
   {
     this->EvaluateFeaturesInternal();
-    
+
     m_FeaturesUpToDate = true;
-    //m_FeaturesMTime = m_ControlPoints->GetMTime();
   }
 }
 
@@ -455,7 +418,7 @@ mitk::Point2D mitk::PlanarFigure::ApplyControlPointConstraints( unsigned int /*i
   if ( indexPoint[0] > bounds[1] ) { indexPoint[0] = bounds[1]; }
   if ( indexPoint[1] < bounds[2] ) { indexPoint[1] = bounds[2]; }
   if ( indexPoint[1] > bounds[3] ) { indexPoint[1] = bounds[3]; }
-  
+
   Point2D constrainedPoint;
   m_Geometry2D->IndexToWorld( indexPoint, constrainedPoint );
 
@@ -466,7 +429,7 @@ mitk::Point2D mitk::PlanarFigure::ApplyControlPointConstraints( unsigned int /*i
 unsigned int mitk::PlanarFigure::AddFeature( const char *featureName, const char *unitName )
 {
   unsigned int index = m_Features.size();
-  
+
   Feature newFeature( featureName, unitName );
   m_Features.push_back( newFeature );
 
@@ -542,7 +505,7 @@ void mitk::PlanarFigure::PrintSelf( std::ostream& os, itk::Indent indent) const
 {
   Superclass::PrintSelf( os, indent );
   os << indent << this->GetNameOfClass() << ":\n";
-  
+
   if (this->IsClosed())
     os << indent << "This figure is closed\n";
   else
@@ -554,8 +517,8 @@ void mitk::PlanarFigure::PrintSelf( std::ostream& os, itk::Indent indent) const
   mitk::PlanarFigure::VertexContainerType::ConstIterator it;  
   for ( unsigned int i = 0; i < this->GetNumberOfControlPoints(); ++i )
   {
-    os << indent.GetNextIndent() << i << ": " << m_ControlPoints->ElementAt( i ) << std::endl;
-    os << indent.GetNextIndent() << i << ": " << m_NewControlPoints.at( i ) << std::endl;
+    //os << indent.GetNextIndent() << i << ": " << m_ControlPoints->ElementAt( i ) << std::endl;
+    os << indent.GetNextIndent() << i << ": " << m_ControlPoints.at( i ) << std::endl;
   }
   os << indent << "Geometry:\n";
   this->GetGeometry2D()->Print(os, indent.GetNextIndent());
@@ -564,20 +527,18 @@ void mitk::PlanarFigure::PrintSelf( std::ostream& os, itk::Indent indent) const
 
 unsigned short mitk::PlanarFigure::GetPolyLinesSize()
 {
-  if ( !m_PolyLineUpToDate ) //m_PolyLines->GetMTime() < m_ControlPoints->GetMTime() )
+  if ( !m_PolyLineUpToDate )
   {
     this->GeneratePolyLine();
     m_PolyLineUpToDate = true;
   }
-  return m_NewPolyLines.size();
-  //return m_PolyLines->size();
+  return m_PolyLines.size();
 }
 
 
 unsigned short mitk::PlanarFigure::GetHelperPolyLinesSize()
 {
-  return m_NewHelperPolyLines.size();
-  //return m_HelperPolyLines->size();
+  return m_HelperPolyLines.size();
 }
 
 
@@ -594,39 +555,27 @@ bool mitk::PlanarFigure::ResetOnPointSelect()
 
 void mitk::PlanarFigure::RemoveControlPoint( unsigned int index )
 {
-  if ( index > m_NewControlPoints.size() )
+  if ( index > m_ControlPoints.size() )
     return;
 
-  if ( (m_NewControlPoints.size() -1)  < this->GetMinimumNumberOfControlPoints() )
+  if ( (m_ControlPoints.size() -1)  < this->GetMinimumNumberOfControlPoints() )
     return;
 
   ControlPointListType::iterator iter;
-  iter = m_NewControlPoints.begin() + index;
+  iter = m_ControlPoints.begin() + index;
 
-  m_NewControlPoints.erase( iter );
+  m_ControlPoints.erase( iter );
 
   m_PolyLineUpToDate = false;
   m_HelperLinesUpToDate = false;
   m_FeaturesUpToDate = false;
 
-  //if ( iter != vector.end() )
-  //{
-  //  m_ControlPoints->erase( iter );
-  //  m_NumberOfControlPoints--;
-  //}
-
-  //if ( m_ControlPoints->Size() < m_NumberOfControlPoints )
-  //{
-  //}
+  --m_NumberOfControlPoints;
 }
 
 void mitk::PlanarFigure::RemoveLastControlPoint()
 {
-  RemoveControlPoint( m_NewControlPoints.size()-1 );
-
-  //m_ControlPoints->DeleteIndex( this->GetNumberOfControlPoints()-1 );
-  //this->ResetNumberOfControlPoints( this->GetNumberOfControlPoints()-1 );
-  //this->GeneratePolyLine();
+  RemoveControlPoint( m_ControlPoints.size()-1 );
 }
 
 void mitk::PlanarFigure::DeepCopy(Self::Pointer oldFigure)
@@ -638,6 +587,10 @@ void mitk::PlanarFigure::DeepCopy(Self::Pointer oldFigure)
     itkExceptionMacro( << "DeepCopy(): Inconsistent type of source and destination figure!" );
     return;
   }
+
+  m_ControlPoints.clear();
+  this->ClearPolyLines();
+  this->ClearHelperPolyLines();
 
   // clone base data members
   SetPropertyList(oldFigure->GetPropertyList()->Clone());  
@@ -651,11 +604,10 @@ void mitk::PlanarFigure::DeepCopy(Self::Pointer oldFigure)
 
   //copy geometry 2D of planar figure
   SetGeometry2D((mitk::Geometry2D*)oldFigure->m_Geometry2D->Clone().GetPointer());
-  
-  m_ControlPoints = VertexContainerType::New();
-  for(unsigned long index=0; index < oldFigure->m_ControlPoints->Size(); index++)
+
+  for(unsigned long index=0; index < oldFigure->GetNumberOfControlPoints(); index++)
   {
-    m_ControlPoints->InsertElement(index, oldFigure->m_ControlPoints->ElementAt( index ));
+    m_ControlPoints.push_back( oldFigure->GetControlPoint( index ));
   }
 
   //After setting the control points we can generate the polylines
@@ -664,42 +616,27 @@ void mitk::PlanarFigure::DeepCopy(Self::Pointer oldFigure)
 
 void mitk::PlanarFigure::SetNumberOfPolyLines( unsigned int numberOfPolyLines )
 {
-  m_NewPolyLines.resize(numberOfPolyLines);
+  m_PolyLines.resize(numberOfPolyLines);
 }
 
 void mitk::PlanarFigure::SetNumberOfHelperPolyLines( unsigned int numberOfHerlperPolyLines )
 {
-  m_NewHelperPolyLines.resize(numberOfHerlperPolyLines);
+  m_HelperPolyLines.resize(numberOfHerlperPolyLines);
 }
 
 
 void mitk::PlanarFigure::AppendPointToPolyLine( unsigned int index, PolyLineElement element )
 {
-  m_NewPolyLines.at( index ).push_back( element );
+  m_PolyLines.at( index ).push_back( element );
 }
 
 void mitk::PlanarFigure::AppendPointToHelperPolyLine( unsigned int index, PolyLineElement element )
 {
-  m_NewHelperPolyLines.at( index ).push_back( element );
-}
-
-
-mitk::PlanarFigure::PolyLineType::const_iterator mitk::PlanarFigure::GetFirstElementOfPolyLine( unsigned int index ) const
-{
-  return m_NewPolyLines.at( index ).begin();
-}
-
-mitk::PlanarFigure::PolyLineType::const_iterator mitk::PlanarFigure::GetLastElementOfPolyLine( unsigned int index ) const
-{
-  return m_NewPolyLines.at( index ).end();
+  m_HelperPolyLines.at( index ).push_back( element );
 }
 
 const mitk::PlanarFigure::PolyLineType mitk::PlanarFigure::GetPolyline( int index ) const
 {
-  return m_NewPolyLines.at( index );
+  return m_PolyLines.at( index );
 }
 
-//ControlPointListType::const_iterator mitk::PlanarFigure::GetSelectedControlPoint() const
-//{
-//  return m_NewControlPoints.begin();
-//}

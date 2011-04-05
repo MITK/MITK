@@ -67,7 +67,6 @@ public:
 
     Point2D Point;
     int Index;
-    bool IsToBePainted;
   };
 
   typedef itk::VectorContainer< unsigned long, mitk::Point2D > VertexContainerType;
@@ -115,7 +114,7 @@ public:
   virtual void PlaceFigure( const Point2D& point );
 
 
-  virtual bool AddControlPoint( const Point2D& point );
+  virtual bool AddControlPoint( const Point2D& point, int index = -1 );
 
   virtual bool SetControlPoint( unsigned int index, const Point2D& point, bool createIfDoesNotExist = false);
 
@@ -153,17 +152,6 @@ public:
   /** \brief Return currently selected control point. */
   virtual int GetSelectedControlPoint() const { return m_SelectedControlPoint; }
 
-  //ControlPointListType::const_iterator GetSelectedControlPoint() const;
-
-  
-  /** \brief Returns 2D control points vector. */
-  const VertexContainerType *GetControlPoints() const;
-
-  
-  /** \brief Returns 2D control points vector. */
-  VertexContainerType *GetControlPoints();
-
-
   /** \brief Returns specified control point in 2D world coordinates. */
   Point2D GetControlPoint( unsigned int index ) const;
 
@@ -172,20 +160,33 @@ public:
   Point3D GetWorldControlPoint( unsigned int index ) const;
 
 
+  /** \brief defines the number of PolyLines that will be available */
   void SetNumberOfPolyLines( unsigned int numberOfPolyLines );
-  void SetNumberOfHelperPolyLines( unsigned int numberOfHelperPolyLines );
 
-  void AppendPointToPolyLine( unsigned int index, PolyLineElement element );
-  void AppendPointToHelperPolyLine( unsigned int index, PolyLineElement element );
-
+  /** \brief returns the PolyLine for the given index. */
   const PolyLineType GetPolyline( int index ) const;
 
-  PolyLineType::const_iterator GetFirstElementOfPolyLine( unsigned int index ) const;
-  PolyLineType::const_iterator GetLastElementOfPolyLine( unsigned int index ) const;
+  /** \brief Append a point to the PolyLine # index */
+  void AppendPointToPolyLine( unsigned int index, PolyLineElement element );
+
+  /** \brief clears the list of PolyLines. Call before re-calculating a new Polyline. */
+  void ClearPolyLines();
+
+
+  /** \brief defines the number of HelperPolyLines that will be available */
+  void SetNumberOfHelperPolyLines( unsigned int numberOfHelperPolyLines );
+
+  /** \brief Append a point to the HelperPolyLine # index */
+  void AppendPointToHelperPolyLine( unsigned int index, PolyLineElement element );
+
+  /** \brief clears the list of HelperPolyLines. Call before re-calculating a new HelperPolyline. */
+  void ClearHelperPolyLines();
+
+
 
   /** \brief Returns the polyline representing the planar figure
    * (for rendering, measurements, etc.). */
-  PolyLineType GetPolyLine(unsigned int index);
+  const PolyLineType GetPolyLine(unsigned int index);
 
   /** \brief Returns the polyline representing the planar figure
    * (for rendering, measurments, etc.). */
@@ -193,10 +194,22 @@ public:
 
   /** \brief Returns the polyline that should be drawn the same size at every scale
    * (for text, angles, etc.). */
-  //const VertexContainerType *GetHelperPolyLine(unsigned int index, double mmPerDisplayUnit, unsigned int displayHeight);
-
-  const mitk::PlanarFigure::PolyLineType GetHelperPolyLine( unsigned int index, double mmPerDisplayUnit, unsigned int displayHeight );
+  const PolyLineType GetHelperPolyLine( unsigned int index, double mmPerDisplayUnit, unsigned int displayHeight );
  
+  
+  /** \brief Sets the position of the PreviewControlPoint. Automatically sets it visible.*/
+  void SetPreviewControlPoint( const Point2D& point );
+  
+  /** \brief Marks the PreviewControlPoint as invisible.*/
+  void ResetPreviewContolPoint();
+  
+  /** \brief Returns whether or not the PreviewControlPoint is visible.*/
+  bool IsPreviewControlPointVisible();
+
+  /** \brief Returns the coordinates of the PreviewControlPoint. */
+  Point2D GetPreviewControlPoint();
+
+
   
   /** \brief Returns the number of features available for this PlanarFigure
    * (such as, radius, area, ...). */
@@ -266,12 +279,6 @@ public:
              Requires a matching type of both figures. */
   void DeepCopy(Self::Pointer oldFigure);
 
-  void SetHoveringControlPoint( const Point2D& point );
-  void ResetHoveringContolPoint();
-  bool IsHoveringControlPointVisible();
-
-  mitk::PlanarFigure::VertexContainerType::Pointer GetHoveringControlPoint();
-
 
 protected:
   PlanarFigure();
@@ -325,25 +332,24 @@ protected:
 
   virtual void PrintSelf( std::ostream& os, itk::Indent indent ) const;
 
-  VertexContainerType::Pointer m_ControlPoints;
+  ControlPointListType m_ControlPoints;
   unsigned int m_NumberOfControlPoints;
-  VertexContainerType::Pointer m_HoveringControlPoint;
-
-  VertexContainerVectorType::Pointer m_PolyLines;
-  VertexContainerVectorType::Pointer m_HelperPolyLines;
-  BoolContainerType::Pointer         m_HelperPolyLinesToBePainted;
-
-
-
-
-
-  bool m_FigurePlaced;
-
-  bool m_HoveringControlPointVisible;
 
   // Currently selected control point; -1 means no point selected
   int m_SelectedControlPoint;
-  ControlPointListType m_NewControlPoints;
+
+
+  std::vector<PolyLineType> m_PolyLines;
+  std::vector<PolyLineType> m_HelperPolyLines;
+  BoolContainerType::Pointer m_HelperPolyLinesToBePainted;
+
+  // this point is used to store the coordiantes an additional 'ControlPoint' that is rendered
+  // when the mouse cursor is above the figure (and not a control-point) and when the 
+  // property 'planarfigure.isextendable' is set to true
+  Point2D m_PreviewControlPoint;
+  bool m_PreviewControlPointVisible;
+
+  bool m_FigurePlaced;
 
 private:
 
@@ -362,11 +368,7 @@ private:
 
   Geometry2D *m_Geometry2D;
 
-  std::vector<PolyLineType> m_NewPolyLines;
-  std::vector<PolyLineType> m_NewHelperPolyLines;
 
-
-  bool m_ControlPointsModified;
   bool m_PolyLineUpToDate;
   bool m_HelperLinesUpToDate;
   bool m_FeaturesUpToDate;

@@ -5,7 +5,9 @@ mitkAddCustomModuleTest(mitkPicFileReaderTest_emptyFile mitkPicFileReaderTest ${
 
 mitkAddCustomModuleTest(mitkPicFileReaderTest_emptyGzipFile mitkPicFileReaderTest ${CMAKE_CURRENT_SOURCE_DIR}/Data/emptyFile.pic.gz)
 
-mitkAddCustomModuleTest(mitkDICOMLocaleTest_spacingOk mitkDICOMLocaleTest ${MITK_DATA_DIR}/spacing-ok-sc.dcm)
+mitkAddCustomModuleTest(mitkDICOMLocaleTest_spacingOk_CT mitkDICOMLocaleTest ${MITK_DATA_DIR}/spacing-ok-ct.dcm)
+mitkAddCustomModuleTest(mitkDICOMLocaleTest_spacingOk_MR mitkDICOMLocaleTest ${MITK_DATA_DIR}/spacing-ok-mr.dcm)
+mitkAddCustomModuleTest(mitkDICOMLocaleTest_spacingOk_SC mitkDICOMLocaleTest ${MITK_DATA_DIR}/spacing-ok-sc.dcm)
 
 mitkAddCustomModuleTest(mitkEventMapperTest_Test1And2 mitkEventMapperTest ${MITK_DATA_DIR}/TestStateMachine1.xml ${MITK_DATA_DIR}/TestStateMachine2.xml)
 

@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
  - The machine or current user has a German locale.
  - This esp. means that stream IO expects the decimal separator as a comma: ","
  - DICOM files use a point "." as the decimal separator to be locale independent
- - The parser used by MITK (ITK's GDC) seems to use the current locale instead of the "C" or "POSIX" locale
+ - The parser used by MITK (ITK's GDCM) seems to use the current locale instead of the "C" or "POSIX" locale
  - This leads to spacings (and probably other numbers) being trimmed/rounded,
    e.g. the correct spacing of 0.314 is read as 1.0 etc.
 

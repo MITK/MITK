@@ -662,24 +662,24 @@ bool mitk::PlanarFigureInteractor::IsPositionOverFigure(
 
   // Iterate over all polylines of planar figure, and check if
   // any one is close to the current display position
-  typedef mitk::PlanarFigure::VertexContainerType VertexContainerType;
+  typedef mitk::PlanarFigure::PolyLineType VertexContainerType;
 
   mitk::Point2D worldPoint2D, displayControlPoint;
   mitk::Point3D worldPoint3D;
 
   for ( unsigned short loop = 0; loop < planarFigure->GetPolyLinesSize(); ++loop )
   {
-    const VertexContainerType* polyLine = planarFigure->GetPolyLine( loop );
+    const VertexContainerType polyLine = planarFigure->GetPolyLine( loop );
 
     Point2D polyLinePoint;
     Point2D firstPolyLinePoint;
     Point2D previousPolyLinePoint;
 
     bool firstPoint = true;
-    for ( VertexContainerType::ConstIterator it = polyLine->Begin(); it != polyLine->End(); ++it )
+    for ( VertexContainerType::const_iterator it = polyLine.begin(); it != polyLine.end(); ++it )
     {
       // Get plane coordinates of this point of polyline (if possible)
-      if ( !this->TransformObjectToDisplay( it->Value(), polyLinePoint,
+      if ( !this->TransformObjectToDisplay( it->Point, polyLinePoint,
         planarFigureGeometry, rendererGeometry, displayGeometry ) )
       {
         break; // Poly line invalid (not on current 2D plane) --> skip it
@@ -729,26 +729,22 @@ int mitk::PlanarFigureInteractor::IsPositionInsideMarker(
 
   // Iterate over all control points of planar figure, and check if
   // any one is close to the current display position
-  typedef mitk::PlanarFigure::VertexContainerType VertexContainerType;
-  const VertexContainerType *controlPoints = planarFigure->GetControlPoints();
-
   mitk::Point2D worldPoint2D, displayControlPoint;
   mitk::Point3D worldPoint3D;
 
-  VertexContainerType::ConstIterator it;
-  for ( it = controlPoints->Begin(); it != controlPoints->End(); ++it )
+  int numberOfControlPoints = planarFigure->GetNumberOfControlPoints();
+  for ( int i=0; i<numberOfControlPoints; i++ )
   {
     Point2D displayControlPoint;
-    if ( this->TransformObjectToDisplay( it->Value(), displayControlPoint,
+    if ( this->TransformObjectToDisplay( planarFigure->GetControlPoint(i), displayControlPoint,
       planarFigureGeometry, rendererGeometry, displayGeometry ) )
     {
       // TODO: variable size of markers
-      if ( (abs(displayPosition[0] - displayControlPoint[0]) < 4 )
-        && (abs(displayPosition[1] - displayControlPoint[1]) < 4 ) )
+      if ( displayPosition.SquaredEuclideanDistanceTo( displayControlPoint ) < 20.0 )
       {
-        return it->Index();
+        return i;
       }
-    }
+    }      
   }
 
   return -1;

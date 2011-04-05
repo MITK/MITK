@@ -26,8 +26,9 @@ mitk::PlanarAngle::PlanarAngle()
   // Start with two control points
   this->ResetNumberOfControlPoints( 2 );
 
-  m_PolyLines->InsertElement( 0, VertexContainerType::New());
-  m_HelperPolyLines->InsertElement( 0, VertexContainerType::New());
+  this->SetNumberOfPolyLines(1);
+  this->SetNumberOfHelperPolyLines(1);
+
   m_HelperPolyLinesToBePainted->InsertElement( 0, false );
 }
 
@@ -36,57 +37,33 @@ mitk::PlanarAngle::~PlanarAngle()
 {
 }
 
-
-//void mitk::PlanarAngle::Initialize()
-//{
-//  // Default initialization of line control points
-//
-//  mitk::Geometry2D *geometry2D = 
-//    dynamic_cast< mitk::Geometry2D * >( this->GetGeometry( 0 ) );
-//
-//  if ( geometry2D == NULL )
-//  {
-//    MITK_ERROR << "Missing Geometry2D for PlanarLine";
-//    return;
-//  }
-//
-//  mitk::ScalarType width = geometry2D->GetBounds()[1];
-//  mitk::ScalarType height = geometry2D->GetBounds()[3];
-//  
-//  mitk::Point2D &startPoint = m_ControlPoints->ElementAt( 0 );
-//  mitk::Point2D &endPoint = m_ControlPoints->ElementAt( 1 );
-//
-//  startPoint[0] = width / 2.0;
-//  startPoint[1] = height / 2.0;
-//
-//  endPoint[0] = startPoint[0] + 20.0;
-//  endPoint[1] = startPoint[1] + 20.0;
-//}
-
-
 void mitk::PlanarAngle::GeneratePolyLine()
 {
-  // Generate poly-line for angle
-  m_PolyLines->ElementAt( 0 )->Reserve( m_ControlPoints->Size() );
+  this->ClearPolyLines();
 
-  for ( unsigned int i = 0; i < m_ControlPoints->Size(); ++i )
+  // Generate poly-line for angle
+  for ( int i=0; i<this->GetNumberOfControlPoints(); i++ )
   {
-    m_PolyLines->ElementAt( 0 )->ElementAt( i ) = m_ControlPoints->ElementAt( i );
+    mitk::PlanarFigure::PolyLineElement element( this->GetControlPoint( i ), i );
+    this->AppendPointToPolyLine( 0, element );
   }
 }
 
 void mitk::PlanarAngle::GenerateHelperPolyLine(double mmPerDisplayUnit, unsigned int displayHeight)
 {
   // Generate helper-poly-line for angle
-  if ( m_ControlPoints->Size() < 3)
+  if ( this->GetNumberOfControlPoints() < 3)
   {
     m_HelperPolyLinesToBePainted->SetElement(0, false);
     return; //We do not need to draw an angle as there are no two arms yet
   }
-  m_HelperPolyLines->ElementAt( 0 )->Reserve( 3 );
-  const Point2D &centerPoint = m_ControlPoints->ElementAt( 1 );
-  const Point2D &boundaryPointOne = m_ControlPoints->ElementAt( 0 );
-  const Point2D &boundaryPointTwo = m_ControlPoints->ElementAt( 2 );
+
+  this->ClearHelperPolyLines();
+
+  const Point2D centerPoint = this->GetControlPoint( 1 );
+  const Point2D boundaryPointOne = this->GetControlPoint( 0 );
+  const Point2D boundaryPointTwo = this->GetControlPoint( 2 );
+
 
   double radius = centerPoint.EuclideanDistanceTo( boundaryPointOne );
   if ( radius > centerPoint.EuclideanDistanceTo( boundaryPointTwo ) )
@@ -155,13 +132,15 @@ void mitk::PlanarAngle::GenerateHelperPolyLine(double mmPerDisplayUnit, unsigned
     }
   }
   // Generate poly-line with 16 segments
-  m_HelperPolyLines->ElementAt( 0 )->Reserve( 16 );
   for ( int t = 0; t < 16; ++t )
   {
     double alpha = (double) t * angle / 15.0 + testAngle;
 
-    m_HelperPolyLines->ElementAt( 0 )->ElementAt( t )[0] = centerPoint[0] + radius * cos( alpha );
-    m_HelperPolyLines->ElementAt( 0 )->ElementAt( t )[1] = centerPoint[1] + radius * sin( alpha );
+    Point2D polyLinePoint;
+    polyLinePoint[0] = centerPoint[0] + radius * cos( alpha );
+    polyLinePoint[1] = centerPoint[1] + radius * sin( alpha );
+
+    AppendPointToHelperPolyLine( 0, PolyLineElement( polyLinePoint, t ) );
   }
 }
 

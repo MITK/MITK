@@ -69,9 +69,12 @@ void mitk::PlanarFigureWriter::GenerateData()
     pfElement->SetAttribute("type", pf->GetNameOfClass());
     document.LinkEndChild(pfElement);
 
-    PlanarFigure::VertexContainerType* vertices = pf->GetControlPoints();
-    if (vertices == NULL)
+    if ( pf->GetNumberOfControlPoints() == 0 )
       continue;
+
+    //PlanarFigure::VertexContainerType* vertices = pf->GetControlPoints();
+    //if (vertices == NULL)
+    //  continue;
 
     // Serialize property list of PlanarFigure
     mitk::PropertyList::Pointer propertyList = pf->GetPropertyList();

@@ -154,8 +154,7 @@ protected:
     const mitk::Geometry2D *rendererGeometry,
     const mitk::DisplayGeometry *displayGeometry );
 
-  void PaintPolyLine(
-    const VertexContainerType* vertices, 
+  void PaintPolyLine( mitk::PlanarFigure::PolyLineType vertices,
     bool closed,
     float* color, 
     float opacity, 

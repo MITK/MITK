@@ -23,6 +23,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkBaseData.h"
 #include "mitkCommon.h"
 
+#include <deque>
+
 
 namespace mitk 
 {
@@ -45,6 +47,8 @@ class Geometry2D;
  *   <li>"planarfigure.ishovering": true if the mouse "hovers" over the planar figure
  *   <li>"planarfigure.iseditable": true if the planar figure can be edited (otherwise,
  *       it can only be picked/selected, but its control points cannot be edited); default is true
+ *   <li>"planarfigure.isextendable": true if new control points can be inserted into the list of control points;
+ *        default is false
  * </ul>
  *
  *
@@ -56,10 +60,23 @@ class PlanarFigure_EXPORT PlanarFigure : public BaseData
 public:
   mitkClassMacro( PlanarFigure, BaseData );
 
+  struct PolyLineElement
+  {
+    PolyLineElement( Point2D point, int index )
+      : Point( point ), Index( index )
+    {
+    };
+
+    Point2D Point;
+    int Index;
+  };
 
   typedef itk::VectorContainer< unsigned long, mitk::Point2D > VertexContainerType;
   typedef itk::VectorContainer< unsigned long, VertexContainerType::Pointer> VertexContainerVectorType;
   typedef itk::VectorContainer< unsigned long, bool>  BoolContainerType;
+
+  typedef std::deque< Point2D > ControlPointListType;
+  typedef std::list< PolyLineElement > PolyLineType;
 
 
   /** \brief Sets the 2D geometry on which this figure will be placed.
@@ -99,7 +116,7 @@ public:
   virtual void PlaceFigure( const Point2D& point );
 
 
-  virtual bool AddControlPoint( const Point2D& point );
+  virtual bool AddControlPoint( const Point2D& point, int index = -1 );
 
   virtual bool SetControlPoint( unsigned int index, const Point2D& point, bool createIfDoesNotExist = false);
 
@@ -137,36 +154,65 @@ public:
   /** \brief Return currently selected control point. */
   virtual int GetSelectedControlPoint() const { return m_SelectedControlPoint; }
 
-
-  
-  /** \brief Returns 2D control points vector. */
-  const VertexContainerType *GetControlPoints() const;
-
-  
-  /** \brief Returns 2D control points vector. */
-  VertexContainerType *GetControlPoints();
-
-
   /** \brief Returns specified control point in 2D world coordinates. */
-  Point2D& GetControlPoint( unsigned int index ) const;
+  Point2D GetControlPoint( unsigned int index ) const;
 
 
   /** \brief Returns specified control point in world coordinates. */
   Point3D GetWorldControlPoint( unsigned int index ) const;
 
 
-  /** \brief Returns the polyline representing the planar figure
-   * (for rendering, measurements, etc.). */
-  VertexContainerType *GetPolyLine(unsigned int index);
+  /** \brief defines the number of PolyLines that will be available */
+  void SetNumberOfPolyLines( unsigned int numberOfPolyLines );
+
+  /** \brief returns the PolyLine for the given index. */
+  const PolyLineType GetPolyline( int index ) const;
+
+  /** \brief Append a point to the PolyLine # index */
+  void AppendPointToPolyLine( unsigned int index, PolyLineElement element );
+
+  /** \brief clears the list of PolyLines. Call before re-calculating a new Polyline. */
+  void ClearPolyLines();
+
+
+  /** \brief defines the number of HelperPolyLines that will be available */
+  void SetNumberOfHelperPolyLines( unsigned int numberOfHelperPolyLines );
+
+  /** \brief Append a point to the HelperPolyLine # index */
+  void AppendPointToHelperPolyLine( unsigned int index, PolyLineElement element );
+
+  /** \brief clears the list of HelperPolyLines. Call before re-calculating a new HelperPolyline. */
+  void ClearHelperPolyLines();
+
+
 
   /** \brief Returns the polyline representing the planar figure
    * (for rendering, measurements, etc.). */
-  const VertexContainerType *GetPolyLine(unsigned int index) const;
+  const PolyLineType GetPolyLine(unsigned int index);
+
+  /** \brief Returns the polyline representing the planar figure
+   * (for rendering, measurments, etc.). */
+  const PolyLineType GetPolyLine(unsigned int index) const;
 
   /** \brief Returns the polyline that should be drawn the same size at every scale
    * (for text, angles, etc.). */
-  const VertexContainerType *GetHelperPolyLine(unsigned int index, double mmPerDisplayUnit, unsigned int displayHeight);
+  const PolyLineType GetHelperPolyLine( unsigned int index, double mmPerDisplayUnit, unsigned int displayHeight );
+ 
+  
+  /** \brief Sets the position of the PreviewControlPoint. Automatically sets it visible.*/
+  void SetPreviewControlPoint( const Point2D& point );
+  
+  /** \brief Marks the PreviewControlPoint as invisible.*/
+  void ResetPreviewContolPoint();
+  
+  /** \brief Returns whether or not the PreviewControlPoint is visible.*/
+  bool IsPreviewControlPointVisible();
 
+  /** \brief Returns the coordinates of the PreviewControlPoint. */
+  Point2D GetPreviewControlPoint();
+
+
+  
   /** \brief Returns the number of features available for this PlanarFigure
    * (such as, radius, area, ...). */
   virtual unsigned int GetNumberOfFeatures() const;
@@ -225,6 +271,8 @@ public:
    * Default return value is false. Subclasses can overwrite this method and
    * execute any reset / initialization statements required. */
   virtual bool ResetOnPointSelect();
+
+  virtual void RemoveControlPoint( unsigned int index );
 
   /** \brief Removes last control point */
   virtual void RemoveLastControlPoint();
@@ -286,20 +334,24 @@ protected:
 
   virtual void PrintSelf( std::ostream& os, itk::Indent indent ) const;
 
-
-  VertexContainerType::Pointer m_ControlPoints;
+  ControlPointListType m_ControlPoints;
   unsigned int m_NumberOfControlPoints;
-
-  VertexContainerVectorType::Pointer m_PolyLines;
-  VertexContainerVectorType::Pointer m_HelperPolyLines;
-  BoolContainerType::Pointer         m_HelperPolyLinesToBePainted;
-
-
-  bool m_FigurePlaced;
 
   // Currently selected control point; -1 means no point selected
   int m_SelectedControlPoint;
 
+
+  std::vector<PolyLineType> m_PolyLines;
+  std::vector<PolyLineType> m_HelperPolyLines;
+  BoolContainerType::Pointer m_HelperPolyLinesToBePainted;
+
+  // this point is used to store the coordiantes an additional 'ControlPoint' that is rendered
+  // when the mouse cursor is above the figure (and not a control-point) and when the 
+  // property 'planarfigure.isextendable' is set to true
+  Point2D m_PreviewControlPoint;
+  bool m_PreviewControlPointVisible;
+
+  bool m_FigurePlaced;
 
 private:
 
@@ -317,6 +369,11 @@ private:
   };
 
   Geometry2D *m_Geometry2D;
+
+
+  bool m_PolyLineUpToDate;
+  bool m_HelperLinesUpToDate;
+  bool m_FeaturesUpToDate;
 
 
   // Vector of features available for this geometric figure

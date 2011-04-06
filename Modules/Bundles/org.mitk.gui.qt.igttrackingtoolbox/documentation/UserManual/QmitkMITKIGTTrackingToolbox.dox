@@ -9,7 +9,21 @@
 The MITK-IGT Tracking Toolbox is a bundle which allows you to connect to a tracking device, track and visualize navigation tools and write the tracked data into a log file.
 
 Available sections:
-  - \ref QmitkDataManagerIntroduction 
+  - \ref QmitkMITKIGTTrackingToolboxIntroduction 
+
+\section QmitkMITKIGTTrackingToolboxWorkflow General workflow Introduction
+
+\section QmitkMITKIGTTrackingToolboxConnecting Connecting to a tracking device
+
+\section QmitkMITKIGTTrackingToolboxLoadingTools Loading tools
+
+\section QmitkMITKIGTTrackingToolboxIntroduction Start/stop tracking
+
+\section Visualization Options
+
+\section Logging
+
+
 
 List example
 

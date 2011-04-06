@@ -265,6 +265,21 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
       displayGeometry );
   }
 
+  if ( planarFigure->IsPreviewControlPointVisible() )
+  {
+    this->DrawMarker( planarFigure->GetPreviewControlPoint(),
+      m_MarkerlineColor[PF_HOVER],
+      m_MarkerlineOpacity[PF_HOVER],
+      m_MarkerColor[PF_HOVER],
+      m_MarkerOpacity[PF_HOVER],
+      m_LineWidth,
+      m_ControlPointShape,
+      planarFigureGeometry2D, 
+      rendererGeometry2D, 
+      displayGeometry 
+      );
+  }
+
   glLineWidth( 1.0f );
 }
 

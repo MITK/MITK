@@ -3527,128 +3527,14 @@
       <transition NAME="finish" NEXT_STATE_ID="0" EVENT_ID="507" />
     </state>
   </stateMachine>
-  <stateMachine NAME="LeftClickLevelWindow">
-    <state NAME="neutral" ID="0" START_STATE="TRUE" X_POS="288" Y_POS="81" WIDTH="100" HEIGHT="50">
-      <transition NAME="initmove" NEXT_STATE_ID="1" EVENT_ID="1">
-        <action ID="9" />
-      </transition>
-    </state>
-    <state NAME="levelwindow" ID="1" X_POS="584" Y_POS="432" WIDTH="100" HEIGHT="50">
-      <transition NAME="levelwindow" NEXT_STATE_ID="1" EVENT_ID="530">
-        <action ID="1014" />
-      </transition>
-      <transition NAME="finish" NEXT_STATE_ID="0" EVENT_ID="505" />
-    </state>
-  </stateMachine>
-  <stateMachine NAME="PlanarFigureInteractor">
-    <!-- Behaviour of a set of Points. a defined number of points can be set/removed/selected/deselectd/moved -->
-    <state NAME="Start" ID="42" START_STATE="TRUE" X_POS="997" Y_POS="592" WIDTH="100" HEIGHT="50">
-      <transition NAME="name" EVENT_ID="0" NEXT_STATE_ID="49">
-        <action ID="31" />
-      </transition>
-    </state>
-    <state NAME="FigurePlaced" ID="45" X_POS="440" Y_POS="476" WIDTH="100" HEIGHT="50">
-      <transition NAME="name" EVENT_ID="520" NEXT_STATE_ID="45">
-        <action ID="90" />
-      </transition>
-      <transition NAME="name" EVENT_ID="8" NEXT_STATE_ID="54">
-        <action ID="33" />
-      </transition>
-      <transition NAME="name" EVENT_ID="530" NEXT_STATE_ID="57">
-        <action ID="90" />
-      </transition>
-      <transition NAME="name" EVENT_ID="1" NEXT_STATE_ID="58">
-        <action ID="21" />
-      </transition>
-    </state>
-    <state NAME="ControlPointSelected" ID="47" X_POS="27" Y_POS="571" WIDTH="100" HEIGHT="50">
-      <transition NAME="name" EVENT_ID="530" NEXT_STATE_ID="47">
-        <action ID="90" />
-      </transition>
-      <transition NAME="name" EVENT_ID="505" NEXT_STATE_ID="52">
-        <action ID="76" />
-      </transition>
-    </state>
-    <state NAME="IsLastControlPoint" ID="48" X_POS="731" Y_POS="588" WIDTH="100" HEIGHT="50">
-      <transition NAME="name" EVENT_ID="1004" NEXT_STATE_ID="42" />
-      <transition NAME="name" EVENT_ID="1003" NEXT_STATE_ID="45">
-        <action ID="10" />
-      </transition>
-    </state>
-    <state NAME="IsPlaced" ID="49" X_POS="931" Y_POS="57" WIDTH="100" HEIGHT="50">
-      <transition NAME="name" EVENT_ID="1003" NEXT_STATE_ID="50" />
-      <transition NAME="name" EVENT_ID="1004" NEXT_STATE_ID="51" />
-    </state>
-    <state NAME="PlaceFigure" ID="50" X_POS="497" Y_POS="149" WIDTH="100" HEIGHT="50">
-      <transition NAME="name" EVENT_ID="1" NEXT_STATE_ID="45">
-        <action ID="11" />
-      </transition>
-    </state>
-    <state NAME="EditFigure" ID="51" X_POS="433" Y_POS="55" WIDTH="100" HEIGHT="50">
-      <transition NAME="name" EVENT_ID="520" NEXT_STATE_ID="52">
-        <action ID="34" />
-      </transition>
-    </state>
-    <state NAME="IsOverFigure" ID="52" X_POS="46" Y_POS="114" WIDTH="100" HEIGHT="50">
-      <transition NAME="name" EVENT_ID="1003" NEXT_STATE_ID="51" />
-      <transition NAME="name" EVENT_ID="1004" NEXT_STATE_ID="53" />
-    </state>
-    <state NAME="FigureHover" ID="53" X_POS="159" Y_POS="367" WIDTH="115" HEIGHT="50">
-      <transition NAME="name" EVENT_ID="520" NEXT_STATE_ID="52">
-        <action ID="34" />
-      </transition>
-      <transition NAME="name" EVENT_ID="1" NEXT_STATE_ID="59">
-        <action ID="60" />
-      </transition>
-    </state>
-    <state NAME="IsMinFigureFinished" ID="54" X_POS="623" Y_POS="823" WIDTH="110" HEIGHT="50">
-      <transition NAME="name" EVENT_ID="1004" NEXT_STATE_ID="42" />
-      <transition NAME="name" EVENT_ID="1003" NEXT_STATE_ID="45" />
-    </state>
-    <state NAME="ResetFigure" ID="55" X_POS="321" Y_POS="801" WIDTH="100" HEIGHT="50">
-      <transition NAME="name" EVENT_ID="1003" NEXT_STATE_ID="47" />
-      <transition NAME="name" EVENT_ID="1004" NEXT_STATE_ID="45" />
-    </state>
-    <state NAME="FigurePlacedByDrag" ID="57" X_POS="714" Y_POS="247" WIDTH="100" HEIGHT="50">
-      <transition NAME="name" EVENT_ID="530" NEXT_STATE_ID="57">
-        <action ID="90" />
-      </transition>
-      <transition NAME="name" EVENT_ID="505" NEXT_STATE_ID="58">
-        <action ID="21" />
-      </transition>
-    </state>
-    <state NAME="IsPointValid" ID="58" X_POS="841" Y_POS="411" WIDTH="100" HEIGHT="50">
-      <transition NAME="name" EVENT_ID="1004" NEXT_STATE_ID="48">
-        <action ID="32" />
-      </transition>
-      <transition NAME="name" EVENT_ID="1003" NEXT_STATE_ID="45" />
-    </state>
-    <state NAME="FigureSelected" ID="59" X_POS="242" Y_POS="570" WIDTH="100" HEIGHT="50">
-      <transition NAME="name" EVENT_ID="1004" NEXT_STATE_ID="55">
-        <action ID="66" />
-      </transition>
-      <transition NAME="name" EVENT_ID="1003" NEXT_STATE_ID="51" />
-    </state>
-  </stateMachine>
-  <stateMachine NAME="ToolCallbackInteraction">
-    <state NAME="neutral" ID="0" START_STATE="TRUE" X_POS="288" Y_POS="81" WIDTH="100" HEIGHT="50">
-      <transition NAME="initmove" NEXT_STATE_ID="1" EVENT_ID="1">
-        <action ID="9" />
-      </transition>
-    </state>
-    <state NAME="InInteraction" ID="1" X_POS="288" Y_POS="81" WIDTH="100" HEIGHT="50">
-      <transition NAME="finishmove" NEXT_STATE_ID="0" EVENT_ID="1003">
-      </transition>
-    </state>
-  </stateMachine>
   <stateMachine NAME="BinaryImageInteractor">
     <state NAME="neutral" ID="1" START_STATE="TRUE" X_POS="138" Y_POS="318" WIDTH="100" HEIGHT="50">
-      <transition NAME="move" EVENT_ID="520" NEXT_STATE_ID="2">
+      <transition NAME="name" EVENT_ID="520" NEXT_STATE_ID="2">
         <action ID="30" />
       </transition>
     </state>
     <state NAME="IsOverImage" ID="2" X_POS="447" Y_POS="185" WIDTH="100" HEIGHT="50">
-      <transition NAME="isNotOverImage" EVENT_ID="1003" NEXT_STATE_ID="1" />
+      <transition NAME="name" EVENT_ID="1003" NEXT_STATE_ID="1" />
       <transition NAME="isOverImage" EVENT_ID="1004" NEXT_STATE_ID="3" />
     </state>
     <state NAME="PickImage" ID="3" X_POS="803" Y_POS="350" WIDTH="100" HEIGHT="50">
@@ -3662,6 +3548,113 @@
     <state NAME="SelectImage" ID="4" X_POS="594" Y_POS="542" WIDTH="100" HEIGHT="50">
       <transition NAME="name" EVENT_ID="505" NEXT_STATE_ID="2">
         <action ID="30" />
+      </transition>
+    </state>
+  </stateMachine>
+  <stateMachine NAME="PlanarFigureInteractor">
+    <!-- Behaviour of a set of Points. a defined number of points can be set/removed/selected/deselectd/moved -->
+    <state NAME="Start" ID="42" START_STATE="TRUE" X_POS="1368" Y_POS="736" WIDTH="100" HEIGHT="50">
+      <transition NAME="name" EVENT_ID="0" NEXT_STATE_ID="49">
+        <action ID="31" />
+      </transition>
+    </state>
+    <state NAME="FigurePlaced" ID="45" X_POS="836" Y_POS="715" WIDTH="100" HEIGHT="50">
+      <transition NAME="name" EVENT_ID="520" NEXT_STATE_ID="45">
+        <action ID="90" />
+      </transition>
+      <transition NAME="name" EVENT_ID="8" NEXT_STATE_ID="54">
+        <action ID="33" />
+      </transition>
+      <transition NAME="name" EVENT_ID="530" NEXT_STATE_ID="57">
+        <action ID="90" />
+      </transition>
+      <transition NAME="name" EVENT_ID="1" NEXT_STATE_ID="58">
+        <action ID="21" />
+      </transition>
+    </state>
+    <state NAME="ControlPointSelected" ID="47" X_POS="74" Y_POS="665" WIDTH="128" HEIGHT="50">
+      <transition NAME="name" EVENT_ID="530" NEXT_STATE_ID="47">
+        <action ID="90" />
+      </transition>
+      <transition NAME="name" EVENT_ID="505" NEXT_STATE_ID="52">
+        <action ID="76" />
+      </transition>
+    </state>
+    <state NAME="IsLastControlPoint" ID="48" X_POS="1102" Y_POS="732" WIDTH="100" HEIGHT="50">
+      <transition NAME="name" EVENT_ID="1004" NEXT_STATE_ID="42" />
+      <transition NAME="name" EVENT_ID="1003" NEXT_STATE_ID="45">
+        <action ID="10" />
+      </transition>
+    </state>
+    <state NAME="IsPlaced" ID="49" X_POS="1302" Y_POS="201" WIDTH="100" HEIGHT="50">
+      <transition NAME="name" EVENT_ID="1003" NEXT_STATE_ID="50" />
+      <transition NAME="name" EVENT_ID="1004" NEXT_STATE_ID="51" />
+    </state>
+    <state NAME="PlaceFigure" ID="50" X_POS="868" Y_POS="293" WIDTH="100" HEIGHT="50">
+      <transition NAME="name" EVENT_ID="1" NEXT_STATE_ID="45">
+        <action ID="11" />
+      </transition>
+    </state>
+    <state NAME="EditFigure" ID="51" X_POS="804" Y_POS="199" WIDTH="100" HEIGHT="50">
+      <transition NAME="name" EVENT_ID="520" NEXT_STATE_ID="52">
+        <action ID="341" />
+      </transition>
+    </state>
+    <state NAME="IsOverFigure" ID="52" X_POS="340" Y_POS="170" WIDTH="100" HEIGHT="50">
+      <transition NAME="name" EVENT_ID="1003" NEXT_STATE_ID="51" />
+      <transition NAME="name" EVENT_ID="1004" NEXT_STATE_ID="53" />
+    </state>
+    <state NAME="FigureHover" ID="53" X_POS="563" Y_POS="326" WIDTH="115" HEIGHT="50">
+      <transition NAME="name" EVENT_ID="520" NEXT_STATE_ID="52">
+        <action ID="341" />
+      </transition>
+      <transition NAME="name" EVENT_ID="2" NEXT_STATE_ID="60">
+        <action ID="60" />
+      </transition>
+      <transition NAME="name" EVENT_ID="1" NEXT_STATE_ID="65">
+        <action ID="34" />
+      </transition>
+    </state>
+    <state NAME="IsMinFigureFinished" ID="54" X_POS="972" Y_POS="929" WIDTH="110" HEIGHT="50">
+      <transition NAME="name" EVENT_ID="1004" NEXT_STATE_ID="42" />
+      <transition NAME="name" EVENT_ID="1003" NEXT_STATE_ID="45" />
+    </state>
+    <state NAME="ResetFigure" ID="55" X_POS="610" Y_POS="934" WIDTH="100" HEIGHT="50">
+      <transition NAME="name" EVENT_ID="1003" NEXT_STATE_ID="47" />
+      <transition NAME="name" EVENT_ID="1004" NEXT_STATE_ID="45" />
+    </state>
+    <state NAME="FigurePlacedByDrag" ID="57" X_POS="1047" Y_POS="391" WIDTH="138" HEIGHT="50">
+      <transition NAME="name" EVENT_ID="530" NEXT_STATE_ID="57">
+        <action ID="90" />
+      </transition>
+      <transition NAME="name" EVENT_ID="505" NEXT_STATE_ID="58">
+        <action ID="21" />
+      </transition>
+    </state>
+    <state NAME="IsPointValid" ID="58" X_POS="1212" Y_POS="555" WIDTH="100" HEIGHT="50">
+      <transition NAME="name" EVENT_ID="1004" NEXT_STATE_ID="48">
+        <action ID="32" />
+      </transition>
+      <transition NAME="name" EVENT_ID="1003" NEXT_STATE_ID="45" />
+    </state>
+    <state NAME="FigureSelectedForDelete" ID="60" X_POS="308" Y_POS="532" WIDTH="132" HEIGHT="50">
+      <transition NAME="name" EVENT_ID="1004" NEXT_STATE_ID="52">
+        <action ID="100" />
+      </transition>
+      <transition NAME="name" EVENT_ID="1003" NEXT_STATE_ID="53" />
+    </state>
+    <state NAME="IsOverControlPoint" ID="59" X_POS="586" Y_POS="636" WIDTH="120" HEIGHT="50">
+      <transition NAME="name" EVENT_ID="1004" NEXT_STATE_ID="55">
+        <action ID="66" />
+      </transition>
+      <transition NAME="name" EVENT_ID="1003" NEXT_STATE_ID="47">
+        <action ID="10" />
+      </transition>
+    </state>
+    <state NAME="FigureSeleced" ID="65" X_POS="740" Y_POS="487" WIDTH="100" HEIGHT="50">
+      <transition NAME="name" EVENT_ID="1003" NEXT_STATE_ID="53" />
+      <transition NAME="name" EVENT_ID="1004" NEXT_STATE_ID="59">
+        <action ID="60" />
       </transition>
     </state>
   </stateMachine>

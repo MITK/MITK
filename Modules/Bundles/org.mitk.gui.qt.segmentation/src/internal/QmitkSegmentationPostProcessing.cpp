@@ -417,7 +417,7 @@ mitk::Image::Pointer QmitkSegmentationPostProcessing::IncreaseCroppedImageSize( 
 
   mitk::Vector3D newTransVectorInmm = image->GetGeometry()->GetSpacing();
 
-  image->GetGeometry()->IndexToWorld(mitkOriginPoint, transVector, newTransVectorInmm);
+  image->GetGeometry()->IndexToWorld(transVector, newTransVectorInmm);
   paddedImage->GetGeometry()->Translate(newTransVectorInmm);
   //paddedImage->SetRequestedRegionToLargestPossibleRegion();
 

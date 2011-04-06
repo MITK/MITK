@@ -147,7 +147,7 @@ void mitk::Geometry3D::IndexToWorld(const mitk::Point3D &pt_units, mitk::Point3D
 
 void mitk::Geometry3D::WorldToIndex(const mitk::Point3D &atPt3d_mm, const mitk::Vector3D &vec_mm, mitk::Vector3D &vec_units) const
 {
-  MITK_INFO<<"Warning! Call of the deprecated function Geometry3D::WorldToIndex(point, vec, vec). Use Geometry3D::WorldToIndex(vec, vec) instead!";
+  MITK_WARN<<"Warning! Call of the deprecated function Geometry3D::WorldToIndex(point, vec, vec). Use Geometry3D::WorldToIndex(vec, vec) instead!";
   //BackTransform(atPt3d_mm, vec_mm, vec_units);
   this->WorldToIndex(vec_mm, vec_units);
 }
@@ -159,7 +159,7 @@ void mitk::Geometry3D::WorldToIndex( const mitk::Vector3D &vec_mm, mitk::Vector3
 
 void mitk::Geometry3D::IndexToWorld(const mitk::Point3D &/*atPt3d_units*/, const mitk::Vector3D &vec_units, mitk::Vector3D &vec_mm) const
 {
-  MITK_INFO<<"Warning! Call of the deprecated function Geometry3D::IndexToWorld(point, vec, vec). Use Geometry3D::IndexToWorld(vec, vec) instead!";
+  MITK_WARN<<"Warning! Call of the deprecated function Geometry3D::IndexToWorld(point, vec, vec). Use Geometry3D::IndexToWorld(vec, vec) instead!";
   //vec_mm = m_IndexToWorldTransform->TransformVector(vec_units);
   this->IndexToWorld(vec_units, vec_mm);
 }

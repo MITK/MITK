@@ -152,7 +152,7 @@ static void TestPlanarCrossPlacementSingleLine(mitk::PlanarCross::Pointer planar
 
   // Test for number of polylines
   const mitk::PlanarFigure::PolyLineType polyLine0 = planarCross->GetPolyLine( 0 );
-  const mitk::PlanarFigure::PolyLineType::const_iterator iter = polyLine0.begin();
+  mitk::PlanarFigure::PolyLineType::const_iterator iter = polyLine0.begin();
   MITK_TEST_CONDITION( planarCross->GetPolyLinesSize() == 1, "Number of polylines after placement" );
 
   // Get polylines and check if the generated coordinates are OK

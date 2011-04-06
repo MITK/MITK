@@ -40,8 +40,8 @@ PURPOSE.  See the above copyright notices for more information.
 mitk::PlanarFigureInteractor
 ::PlanarFigureInteractor(const char * type, DataNode* dataNode, int /* n */ )
 : Interactor( type, dataNode ),
-  m_Precision( 6.5 ),
-  m_IsHovering( false )
+m_Precision( 6.5 ),
+m_IsHovering( false )
 {
 }
 
@@ -59,7 +59,7 @@ float mitk::PlanarFigureInteractor
 ::CanHandleEvent(StateEvent const* stateEvent) const
 {
   float returnValue = 0.5;
-  
+
 
   // If it is a key event that can be handled in the current state,
   // then return 0.5
@@ -162,14 +162,14 @@ bool mitk::PlanarFigureInteractor
     }
 
   case AcADD:
-    {
+    {         
       // Invoke event to notify listeners that placement of this PF starts now
       planarFigure->InvokeEvent( StartPlacementPlanarFigureEvent() );
 
       // Use Geometry2D of the renderer clicked on for this PlanarFigure
       mitk::PlaneGeometry *planeGeometry = const_cast< mitk::PlaneGeometry * >(
         dynamic_cast< const mitk::PlaneGeometry * >(
-          renderer->GetSliceNavigationController()->GetCurrentPlaneGeometry() ) );
+        renderer->GetSliceNavigationController()->GetCurrentPlaneGeometry() ) );
       if ( planeGeometry != NULL )
       {
         planarFigureGeometry = planeGeometry;
@@ -241,7 +241,7 @@ bool mitk::PlanarFigureInteractor
   case AcCHECKNMINUS1:
     {
       if ( planarFigure->GetNumberOfControlPoints() >=
-           planarFigure->GetMaximumNumberOfControlPoints() )
+        planarFigure->GetMaximumNumberOfControlPoints() )
       {
         // Initial placement finished: deselect control point and send an
         // event to notify application listeners
@@ -321,7 +321,7 @@ bool mitk::PlanarFigureInteractor
       int previousIndex = planarFigure->GetNumberOfControlPoints() - 2;
       if ( previousIndex >= 0 )
       {
-        
+
         // Try to convert previous point to current display coordinates
         mitk::Point3D previousPoint3D;
         planarFigureGeometry->Map( planarFigure->GetControlPoint( previousIndex ), previousPoint3D );
@@ -350,12 +350,20 @@ bool mitk::PlanarFigureInteractor
       break;
     }
 
-  
+
   case AcADDPOINT:
     {
+      bool selected = false;
+      m_DataNode->GetBoolProperty("selected", selected);
+      if ( !selected )
+      {
+        ok = false;
+        break;
+      }
+
       // Extract point in 2D world coordinates (relative to Geometry2D of
       // PlanarFigure)
-      Point2D point2D;
+      Point2D point2D, projectedPoint;
       if ( !this->TransformPositionEventToPoint2D( stateEvent, point2D,
         planarFigureGeometry ) )
       {
@@ -363,8 +371,30 @@ bool mitk::PlanarFigureInteractor
         break;
       }
 
+      // TODO: check segement of polyline we clicked in
+      int previousIndex = this->IsPositionOverFigure(
+        stateEvent, planarFigure,
+        planarFigureGeometry,
+        projectionPlane,
+        renderer->GetDisplayGeometry(),
+        projectedPoint
+        );
+
       // Add point as new control point
-      planarFigure->AddControlPoint( point2D );
+      renderer->GetDisplayGeometry()->DisplayToWorld( projectedPoint, projectedPoint );
+      
+      if ( planarFigure->IsPreviewControlPointVisible() )
+      {
+        point2D = planarFigure->GetPreviewControlPoint();
+      }
+
+      planarFigure->AddControlPoint( point2D, previousIndex );
+
+      if ( planarFigure->IsPreviewControlPointVisible() )
+      {
+        planarFigure->SelectControlPoint( previousIndex );
+        planarFigure->ResetPreviewContolPoint();
+      }
 
       // Re-evaluate features
       planarFigure->EvaluateFeatures();
@@ -391,13 +421,17 @@ bool mitk::PlanarFigureInteractor
       // falls through
     }
 
-  case AcCHECKSELECTED:
+  case AcCHECKHOVERING:
     {
-      bool isHovering = mitk::PlanarFigureInteractor::IsPositionOverFigure(
+      mitk::Point2D pointProjectedOntoLine;
+      int previousControlPoint = mitk::PlanarFigureInteractor::IsPositionOverFigure(
         stateEvent, planarFigure,
         planarFigureGeometry,
         projectionPlane,
-        renderer->GetDisplayGeometry() );
+        renderer->GetDisplayGeometry(),
+        pointProjectedOntoLine
+        );
+      bool isHovering = ( previousControlPoint != -1 );
 
       int pointIndex = mitk::PlanarFigureInteractor::IsPositionInsideMarker(
         stateEvent, planarFigure,
@@ -421,7 +455,7 @@ bool mitk::PlanarFigureInteractor
         planarFigure->DeselectControlPoint();
       }
 
-      bool renderingUpdateNeeded = false;
+      bool renderingUpdateNeeded = true;
       if ( isHovering )
       {
         if ( !m_IsHovering )
@@ -432,8 +466,29 @@ bool mitk::PlanarFigureInteractor
 
           // Set bool property to indicate that planar figure is currently in "hovering" mode
           m_DataNode->SetBoolProperty( "planarfigure.ishovering", true );
-          
+
           renderingUpdateNeeded = true;
+        }
+
+        bool selected = false;
+        bool isExtendable = false;
+        m_DataNode->GetBoolProperty("selected", selected);
+        m_DataNode->GetBoolProperty("planarfigure.isextendable", isExtendable);
+        if ( selected && isHovering && isExtendable && pointIndex == -1 )
+        {
+          const mitk::PositionEvent *positionEvent = 
+            dynamic_cast< const mitk::PositionEvent * > ( stateEvent->GetEvent() );
+          if ( positionEvent != NULL )
+          {
+            renderer->GetDisplayGeometry()->DisplayToWorld( pointProjectedOntoLine, pointProjectedOntoLine );
+            planarFigure->SetPreviewControlPoint( pointProjectedOntoLine );
+
+            renderingUpdateNeeded = true;
+          }
+        }
+        else
+        {
+          planarFigure->ResetPreviewContolPoint();
         }
 
         if ( planarFigure->GetSelectedControlPoint() != initiallySelectedControlPoint  )
@@ -442,7 +497,7 @@ bool mitk::PlanarFigureInteractor
           renderingUpdateNeeded = true;
         }
 
-        this->HandleEvent( new mitk::StateEvent( EIDYES, NULL ) );
+        this->HandleEvent( new mitk::StateEvent( EIDYES, stateEvent->GetEvent() ) );
 
         // Return true: only this interactor is eligible to react on this event
         ok = true;
@@ -451,13 +506,15 @@ bool mitk::PlanarFigureInteractor
       {
         if ( m_IsHovering )
         {
+          planarFigure->ResetPreviewContolPoint();
+
           // Invoke end-hover event once the mouse is exiting the figure area
           m_IsHovering = false;
           planarFigure->InvokeEvent( EndHoverPlanarFigureEvent() );
 
           // Set bool property to indicate that planar figure is no longer in "hovering" mode
           m_DataNode->SetBoolProperty( "planarfigure.ishovering", false );
-          
+
           renderingUpdateNeeded = true;
         }
 
@@ -476,10 +533,27 @@ bool mitk::PlanarFigureInteractor
       break;
     }
 
+  case AcCHECKSELECTED:
+    {
+      bool selected = false;
+      m_DataNode->GetBoolProperty("selected", selected);
+
+      if ( selected )
+      {
+        this->HandleEvent( new mitk::StateEvent( EIDYES, stateEvent->GetEvent() ) );
+      }
+      else
+      {
+        // Invoke event to notify listeners that this planar figure should be selected
+        planarFigure->InvokeEvent( SelectPlanarFigureEvent() );
+        this->HandleEvent( new mitk::StateEvent( EIDNO, NULL ) );
+      }
+    }
+
   case AcSELECTPICKEDOBJECT:
     {
-      // Invoke event to notify listeners that this planar figure should be selected
-      planarFigure->InvokeEvent( SelectPlanarFigureEvent() );
+      //// Invoke event to notify listeners that this planar figure should be selected
+      //planarFigure->InvokeEvent( SelectPlanarFigureEvent() );
 
       // Check if planar figure is marked as "editable"
       bool isEditable = true;
@@ -500,14 +574,14 @@ bool mitk::PlanarFigureInteractor
       // If editing is enabled and the mouse is currently over a control point, select it
       if ( pointIndex >= 0 )
       {
-        this->HandleEvent( new mitk::StateEvent( EIDYES, NULL ) );
+        this->HandleEvent( new mitk::StateEvent( EIDYES, stateEvent->GetEvent() ) );
 
         // Return true: only this interactor is eligible to react on this event
         ok = true;
       }
       else
       {
-        this->HandleEvent( new mitk::StateEvent( EIDNO, NULL ) );
+        this->HandleEvent( new mitk::StateEvent( EIDNO, stateEvent->GetEvent() ) );
 
         // Return false so that other (PlanarFigure) Interactors may react on this
         // event as well
@@ -538,21 +612,35 @@ bool mitk::PlanarFigureInteractor
       break;
     }
 
-  //case AcMOVEPOINT:
-  //case AcMOVESELECTED:
-  //  {
-  //    // Update the display
-  //    renderer->GetRenderingManager()->RequestUpdateAll();
+  case AcREMOVEPOINT:
+    {
+      int selectedControlPoint = planarFigure->GetSelectedControlPoint();
+      planarFigure->RemoveControlPoint( selectedControlPoint );
 
-  //    ok = true;
-  //    break;
-  //  }
+      // Re-evaluate features
+      planarFigure->EvaluateFeatures();
+      planarFigure->Modified();
 
-  //case AcFINISHMOVE:
-  //  {
-  //    ok = true;
-  //    break;
-  //  }
+      planarFigure->InvokeEvent( EndInteractionPlanarFigureEvent() );
+      renderer->GetRenderingManager()->RequestUpdateAll();
+      this->HandleEvent( new mitk::StateEvent( EIDYES, NULL ) );
+    }
+
+    //case AcMOVEPOINT:
+    //case AcMOVESELECTED:
+    //  {
+    //    // Update the display
+    //    renderer->GetRenderingManager()->RequestUpdateAll();
+
+    //    ok = true;
+    //    break;
+    //  }
+
+    //case AcFINISHMOVE:
+    //  {
+    //    ok = true;
+    //    break;
+    //  }
 
 
 
@@ -618,7 +706,10 @@ bool mitk::PlanarFigureInteractor::TransformObjectToDisplay(
 
 bool mitk::PlanarFigureInteractor::IsPointNearLine(
   const mitk::Point2D& point,
-  const mitk::Point2D& startPoint, const mitk::Point2D& endPoint ) const
+  const mitk::Point2D& startPoint, 
+  const mitk::Point2D& endPoint,
+  mitk::Point2D& projectedPoint
+  ) const
 {
   mitk::Vector2D n1 = endPoint - startPoint;
   n1.Normalize();
@@ -629,12 +720,15 @@ bool mitk::PlanarFigureInteractor::IsPointNearLine(
 
   // Determine projection of specified point onto line defined by start / end point
   mitk::Point2D crossPoint = startPoint + n1 * l1;
+  projectedPoint = crossPoint;
 
   // Point is inside encompassing rectangle IF
   // - its distance to its projected point is small enough
   // - it is not further outside of the line than the defined tolerance
   if ( (crossPoint.SquaredEuclideanDistanceTo( point ) < 20.0 )
-    && ( l1 > -5.0 ) && ( l2 > -5.0 ) )
+    && ( l1 > 0.0 ) && ( l2 > 0.0 ) 
+    || endPoint.SquaredEuclideanDistanceTo( point ) < 20.0 
+    || startPoint.SquaredEuclideanDistanceTo( point ) < 20.0 )
   {
     return true;
   }
@@ -643,11 +737,12 @@ bool mitk::PlanarFigureInteractor::IsPointNearLine(
 }
 
 
-bool mitk::PlanarFigureInteractor::IsPositionOverFigure(
+int mitk::PlanarFigureInteractor::IsPositionOverFigure(
   const StateEvent *stateEvent, PlanarFigure *planarFigure,
   const Geometry2D *planarFigureGeometry,
   const Geometry2D *rendererGeometry,
-  const DisplayGeometry *displayGeometry ) const
+  const DisplayGeometry *displayGeometry,
+  Point2D& pointProjectedOntoLine ) const
 {
   // Extract display position
   const mitk::PositionEvent *positionEvent = 
@@ -666,10 +761,13 @@ bool mitk::PlanarFigureInteractor::IsPositionOverFigure(
 
   mitk::Point2D worldPoint2D, displayControlPoint;
   mitk::Point3D worldPoint3D;
+  int previousControlPoint = -1;
 
   for ( unsigned short loop = 0; loop < planarFigure->GetPolyLinesSize(); ++loop )
   {
     const VertexContainerType polyLine = planarFigure->GetPolyLine( loop );
+
+    int tempControlPoint = -1;
 
     Point2D polyLinePoint;
     Point2D firstPolyLinePoint;
@@ -685,28 +783,32 @@ bool mitk::PlanarFigureInteractor::IsPositionOverFigure(
         break; // Poly line invalid (not on current 2D plane) --> skip it
       }
 
+      tempControlPoint = it->Index;
+
       if ( firstPoint )
       {
         firstPolyLinePoint = polyLinePoint;
         firstPoint = false;
       }
-      else if ( this->IsPointNearLine( displayPosition, previousPolyLinePoint, polyLinePoint ) )
+      else if ( this->IsPointNearLine( displayPosition, previousPolyLinePoint, polyLinePoint, pointProjectedOntoLine ) )
       {
         // Return true if the display position is close enough to this line segment
-        return true;
+        previousControlPoint = tempControlPoint;
+        return previousControlPoint;
       }
       previousPolyLinePoint = polyLinePoint;
     }
 
     // For closed figures, also check last line segment
     if ( planarFigure->IsClosed()
-      && this->IsPointNearLine( displayPosition, polyLinePoint, firstPolyLinePoint ) )
+      && this->IsPointNearLine( displayPosition, polyLinePoint, firstPolyLinePoint, pointProjectedOntoLine ) )
     {
-      return true;
+      previousControlPoint = 0;
+      return previousControlPoint;
     }
   }
 
-  return false;
+  return previousControlPoint;
 }
 
 
@@ -744,8 +846,24 @@ int mitk::PlanarFigureInteractor::IsPositionInsideMarker(
       {
         return i;
       }
-    }      
+    }
   }
+
+
+  //for ( it = controlPoints.begin(); it != controlPoints.end(); ++it )
+  //{
+  //  Point2D displayControlPoint;
+  //  if ( this->TransformObjectToDisplay( it->Point, displayControlPoint,
+  //    planarFigureGeometry, rendererGeometry, displayGeometry ) )
+  //  {
+  //    // TODO: variable size of markers
+  //    if ( (abs(displayPosition[0] - displayControlPoint[0]) < 4 )
+  //      && (abs(displayPosition[1] - displayControlPoint[1]) < 4 ) )
+  //    {
+  //      return index;
+  //    }
+  //  }
+  //}
 
   return -1;
 }

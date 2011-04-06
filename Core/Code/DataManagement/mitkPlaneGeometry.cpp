@@ -612,7 +612,7 @@ bool PlaneGeometry::IntersectionPoint(
   diff = this->GetOrigin() - line.GetPoint();
   t = ( planeNormal * diff ) / t;
 
-  intersectionPoint = line.GetPoint() + line.GetDirection() * t;
+  intersectionPoint = line.GetPoint() + lineDirection * t;
   return true;
 }
 

@@ -39,6 +39,11 @@ DicomSeriesReader::LoadDicomSeries(const StringContainer &filenames, bool sort, 
 
   if (DicomSeriesReader::LoadDicomSeries(filenames, *node, sort, check_4d, callback))
   {
+    if( filenames.empty() )
+    {
+      return NULL;
+    }
+
     return node;
   }
   else

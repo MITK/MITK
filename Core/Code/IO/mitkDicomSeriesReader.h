@@ -70,14 +70,14 @@ namespace mitk
  // each of these lists should be loadable as an mitk::Image.
 
  // optional step: sorting
- std::string seriesToLoad = allImageBlocks[...]; // decide for yourself
+ DicomSeriesReader::StringContainer seriesToLoad = allImageBlocks[...]; // decide for yourself
   
  DicomSeriesReader::StringContainer oneBlockSorted = DicomSeriesReader::SortSeriesSlices( seriesToLoad );
 
  // final step: load into DataNode (can result in 3D+t image)
  DataNode::Pointer node = DicomSeriesReader::LoadDicomSeries( oneBlockSorted ); // would sort again, but we could set the sort flag to false
 
- Image::Pointer image = dynamic_cast<mitk::Image*>( node.GetData() );
+ Image::Pointer image = dynamic_cast<mitk::Image*>( node->GetData() );
 \endcode
  
  \section DicomSeriesReader_sorting Sorting into 3D+t blocks
@@ -96,6 +96,52 @@ namespace mitk
  \b Limitations
   - Secondary Capture images are expected to have the (0018,2010) tag describing the pixel spacing.
     If only the (0028,0030) tag is set, the spacing will be misinterpreted as (1,1)
+
+ \section DicomSeriesReader_internal Internal structure
+
+ only valid for gdcm 2.0.14+
+
+ map<string, StringContainer> GetSeries(dir)
+
+  - scan for DICOM files in dir (gdcm::Scanner)
+  - read Series Instance UID, image orientation, pixel spacing, slice thickness, number rows, number cols
+  - sort all files into groups of files that match in mentioned attributes
+  - resulting groups are named as "SeriesInstanceUID + UID like string made up of attribute values"
+
+
+ StringContainer SortSeriesSlices(StringContainer)
+
+  - use gdcm::Sorter to sort spatially
+    - sort by
+      1. distance along slice normal direction
+      2. acquisition time (if present)
+      3. by input order
+
+ list<StringContainer> SortIntoBlocksFor3DplusT(StringContainer)
+
+  - re-sort spatially sorted files (calls SortSeriesSlices unless explicitly told not to)
+  - count how many images are at the position of the first image
+    - assume this many 3D image blocks
+  - for each block iterate all files in input, always skip "expected number of image blocks"
+    - count how many images can be sorted into the first block
+    - expect this many images for all other blocks
+    - verify expectation, note image series as "cannot load as 3D+t" if expectation not met
+
+ DataNode LoadDicom(StringContainer)
+
+  - exception for Philips3D
+  - if either
+      (
+      - sorting by SortIntoBlocksFor3DplusT cannot form a valid 3D+t block OR
+      - method is invoked to not load 3D+t
+      )
+    - load only first block resulting from SortIntoBlocksFor3DplusT
+  - else
+    - create mitk::Image with multiple time step, assign result of loading each image block to one time step
+
+
+
+
 
 */
 class MITK_CORE_EXPORT DicomSeriesReader

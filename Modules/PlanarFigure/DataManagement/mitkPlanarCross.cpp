@@ -85,8 +85,6 @@ bool mitk::PlanarCross::ResetOnPointSelect()
       //Point2D tmpPoint = m_ControlPoints->ElementAt( 0 );
       this->SetControlPoint( 0, this->GetControlPoint( 1 ) );
       this->SetControlPoint( 1, tmpPoint );
-      //m_ControlPoints->InsertElement( 0, m_ControlPoints->ElementAt( 1 ) );
-      //m_ControlPoints->InsertElement( 1, tmpPoint );
       // FALLS THROUGH!
     }
 
@@ -104,9 +102,6 @@ bool mitk::PlanarCross::ResetOnPointSelect()
       this->SetControlPoint( 0, this->GetControlPoint( 3 ) );
       this->SetControlPoint( 1, this->GetControlPoint( 2 ) );
 
-      //m_ControlPoints->InsertElement( 0, m_ControlPoints->ElementAt( 3 ) );
-      //m_ControlPoints->InsertElement( 1, m_ControlPoints->ElementAt( 2 ) );
-
       // Adjust selected control point, reset number of control points to two
       this->ResetNumberOfControlPoints( 2 );
       this->SelectControlPoint( 1 );
@@ -119,9 +114,6 @@ bool mitk::PlanarCross::ResetOnPointSelect()
 
       this->SetControlPoint( 0, this->GetControlPoint( 2 ) );
       this->SetControlPoint( 1, this->GetControlPoint( 3 ) );
-
-      //m_ControlPoints->InsertElement( 0, m_ControlPoints->ElementAt( 2 ) );
-      //m_ControlPoints->InsertElement( 1, m_ControlPoints->ElementAt( 3 ) );
 
       // Adjust selected control point, reset number of control points to two
       this->ResetNumberOfControlPoints( 2 );
@@ -180,9 +172,6 @@ mitk::Point2D mitk::PlanarCross::InternalApplyControlPointConstraints( unsigned 
       const Point2D p1 = this->GetControlPoint( 0 );
       const Point2D p2 = this->GetControlPoint( 1 );
 
-      //const Point2D& p1 = m_ControlPoints->ElementAt( 0 );
-      //const Point2D& p2 = m_ControlPoints->ElementAt( 1 );
-
       Vector2D n1 = p2 - p1;
       n1.Normalize();
 
@@ -218,10 +207,6 @@ mitk::Point2D mitk::PlanarCross::InternalApplyControlPointConstraints( unsigned 
       const Point2D p2 = this->GetControlPoint( 1 );
       const Point2D p3 = this->GetControlPoint( 2 );
      
-      //const Point2D& p1 = m_ControlPoints->ElementAt( 0 );
-      //const Point2D& p2 = m_ControlPoints->ElementAt( 1 );
-      //const Point2D& p3 = m_ControlPoints->ElementAt( 2 );
-
       // Calculate distance of original point from orthogonal line the corrected
       // point should lie on to project the point onto this line
       Vector2D n1 = p2 - p1;
@@ -263,15 +248,9 @@ void mitk::PlanarCross::GeneratePolyLine()
 
   this->ClearPolyLines();
 
-  //m_PolyLines->Initialize();
-
-  //m_PolyLines->InsertElement( 0, VertexContainerType::New() );
-  //m_PolyLines->ElementAt( 0 )->Reserve( 2 );
   if ( this->GetNumberOfControlPoints() > 2)
   {
     this->SetNumberOfPolyLines( 2 );
-    //m_PolyLines->InsertElement( 1, VertexContainerType::New() );
-    //m_PolyLines->ElementAt( 1 )->Reserve( this->GetNumberOfControlPoints() - 2 );
   }
 
   for ( unsigned int i = 0; i < this->GetNumberOfControlPoints(); ++i )
@@ -284,16 +263,6 @@ void mitk::PlanarCross::GeneratePolyLine()
     {
       this->AppendPointToPolyLine( 1, mitk::PlanarFigure::PolyLineElement( this->GetControlPoint( i ), i ) );
     }
-
-
-    //if (i < 2)
-    //{
-    //  m_PolyLines->ElementAt( 0 )->ElementAt( i ) = m_ControlPoints->ElementAt( i );
-    //}
-    //if (i > 1)
-    //{
-    //  m_PolyLines->ElementAt( 1 )->ElementAt( i-2 ) = m_ControlPoints->ElementAt( i );
-    //}
   }
 }
 
@@ -317,10 +286,6 @@ void mitk::PlanarCross::GenerateHelperPolyLine(double /*mmPerDisplayUnit*/, unsi
   const Point2D p2 = this->GetControlPoint( 1 );
   const Point2D p3 = this->GetControlPoint( 2 );
 
-  //const Point2D& p1 = m_ControlPoints->ElementAt( 0 );
-  //const Point2D& p2 = m_ControlPoints->ElementAt( 1 );
-  //const Point2D& p3 = m_ControlPoints->ElementAt( 2 );
-
   Vector2D n1 = p2 - p1;
   n1.Normalize();
 
@@ -337,9 +302,6 @@ void mitk::PlanarCross::GenerateHelperPolyLine(double /*mmPerDisplayUnit*/, unsi
     v0[1] = -n1[0];
     this->AppendPointToHelperPolyLine( 0, mitk::PlanarFigure::PolyLineElement( p3 - v0 * 10000.0, 0 ) ) ;
     this->AppendPointToHelperPolyLine( 0, mitk::PlanarFigure::PolyLineElement( p3 + v0 * 10000.0, 0 ) ) ;
-
-    //m_HelperPolyLines->ElementAt( 0 )->ElementAt( 0 ) = p3 - v0 * 10000.0;
-    //m_HelperPolyLines->ElementAt( 0 )->ElementAt( 1 ) = p3 + v0 * 10000.0;
   }
   else
   {
@@ -347,9 +309,6 @@ void mitk::PlanarCross::GenerateHelperPolyLine(double /*mmPerDisplayUnit*/, unsi
     // first line, open-ended only on the other side
     this->AppendPointToHelperPolyLine( 0, mitk::PlanarFigure::PolyLineElement( p3, 0 ) ) ;
     this->AppendPointToHelperPolyLine( 0, mitk::PlanarFigure::PolyLineElement( p3 + v2 * 10000.0, 0 ) ) ;
-
-    //m_HelperPolyLines->ElementAt( 0 )->ElementAt( 0 ) = p3;
-    //m_HelperPolyLines->ElementAt( 0 )->ElementAt( 1 ) = p3 + v2 * 10000.0;
   }
 }
 

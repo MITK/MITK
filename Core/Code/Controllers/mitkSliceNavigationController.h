@@ -441,6 +441,7 @@ class MITK_CORE_EXPORT SliceNavigationController : public BaseController
     {
       std::string value;
       std::stringstream stream;
+      stream.imbue(std::locale::classic());
       stream<<s<<"; Pixelvalue: ";
 
       if ( (p[0]>=0 && p[1] >=0 && p[2]>=0) && (unsigned int)p[0] < pic->n[0] && (unsigned int)p[1] < pic->n[1] && (unsigned int)p[2] < pic->n[2] )

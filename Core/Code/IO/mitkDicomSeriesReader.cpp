@@ -57,8 +57,9 @@ DicomSeriesReader::LoadDicomSeries(const StringContainer &filenames, DataNode &n
 {
   if( filenames.empty() )
   {
-    MITK_ERROR << "Calling LoadDicomSeries with empty filename string container. Aborting.";
-    return false;
+    MITK_WARN << "Calling LoadDicomSeries with empty filename string container. Probably invalid application logic.";
+    node.SetData(NULL);
+    return true; // this is not actually an error but the result is very simple
   }
 
   DcmIoType::Pointer io = DcmIoType::New();

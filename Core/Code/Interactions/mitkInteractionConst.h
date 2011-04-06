@@ -241,6 +241,7 @@ enum EActions
   AcCHECKNUMBEROFPOINTS = 330, //check the number of elements in the data
   AcCHECKSELECTED = 34,  // check if the given element is selected or not
   AcCHECKONESELECTED = 340, //check if there is an element that is selected
+  AcCHECKHOVERING = 341, //check if there is an element that is selected
   AcCHECKGREATERZERO = 35,  // check if the current number of elements is greater than 0
   AcCHECKGREATERTWO = 36,  // check if the current number of elements is greater than two
   AcCHECKOPERATION = 37,  // check if the operation is of one spectial type

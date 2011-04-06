@@ -29,7 +29,7 @@ public:
 static void TestPlanarPolygonPlacement( mitk::PlanarPolygon::Pointer planarPolygon )
 {
   // Test for correct minimum number of control points in cross-mode
-  MITK_TEST_CONDITION( planarPolygon->GetMinimumNumberOfControlPoints() == 2, "Minimum number of control points" );
+  MITK_TEST_CONDITION( planarPolygon->GetMinimumNumberOfControlPoints() == 3, "Minimum number of control points" );
 
   // Test for correct maximum number of control points in cross-mode
   MITK_TEST_CONDITION( planarPolygon->GetMaximumNumberOfControlPoints() == 1000, "Maximum number of control points" );

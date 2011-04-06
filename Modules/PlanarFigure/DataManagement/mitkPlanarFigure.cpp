@@ -75,7 +75,7 @@ void mitk::PlanarFigure::PlaceFigure( const mitk::Point2D& point )
 {
   for ( unsigned int i = 0; i < this->GetNumberOfControlPoints(); ++i )
   {
-    m_ControlPoints.push_back( point );
+    m_ControlPoints.push_back( this->ApplyControlPointConstraints( i, point ) );
   }
 
   m_FigurePlaced = true;
@@ -235,18 +235,13 @@ const mitk::PlanarFigure::PolyLineType
 mitk::PlanarFigure::GetPolyLine(unsigned int index)
 {
   mitk::PlanarFigure::PolyLineType polyLine;
-  if ( m_PolyLines.size() > index )
-  {
-    if ( !m_PolyLineUpToDate )
+  if ( m_PolyLines.size() > index || !m_PolyLineUpToDate )
     {
       this->GeneratePolyLine();
       m_PolyLineUpToDate = true;
     }
 
-    polyLine = m_PolyLines.at( index );
-  }
-
-  return polyLine;
+  return m_PolyLines.at( index );;
 }
 
 

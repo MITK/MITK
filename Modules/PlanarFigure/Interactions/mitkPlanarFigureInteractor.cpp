@@ -213,11 +213,15 @@ bool mitk::PlanarFigureInteractor
 
   case AcMOVEPOINT:
     {
+
+      bool isEditable = false;
+      m_DataNode->GetBoolProperty( "planarfigure.iseditable", isEditable );
+
       // Extract point in 2D world coordinates (relative to Geometry2D of
       // PlanarFigure)
       Point2D point2D;
       if ( !this->TransformPositionEventToPoint2D( stateEvent, point2D,
-        planarFigureGeometry ) )
+        planarFigureGeometry ) || !isEditable )
       {
         ok = false;
         break;
@@ -353,9 +357,12 @@ bool mitk::PlanarFigureInteractor
 
   case AcADDPOINT:
     {
-      bool selected = false;
+      bool selected = false;      
+      bool isEditable = true;
       m_DataNode->GetBoolProperty("selected", selected);
-      if ( !selected )
+      m_DataNode->GetBoolProperty( "planarfigure.iseditable", isEditable );
+
+      if ( !selected || !isEditable )
       {
         ok = false;
         break;
@@ -614,16 +621,26 @@ bool mitk::PlanarFigureInteractor
 
   case AcREMOVEPOINT:
     {
-      int selectedControlPoint = planarFigure->GetSelectedControlPoint();
-      planarFigure->RemoveControlPoint( selectedControlPoint );
+      bool isExtendable = false;
+      m_DataNode->GetBoolProperty("planarfigure.isextendable", isExtendable);
+      
+      if ( isExtendable )
+      {
+        int selectedControlPoint = planarFigure->GetSelectedControlPoint();
+        planarFigure->RemoveControlPoint( selectedControlPoint );
 
-      // Re-evaluate features
-      planarFigure->EvaluateFeatures();
-      planarFigure->Modified();
+        // Re-evaluate features
+        planarFigure->EvaluateFeatures();
+        planarFigure->Modified();
 
-      planarFigure->InvokeEvent( EndInteractionPlanarFigureEvent() );
-      renderer->GetRenderingManager()->RequestUpdateAll();
-      this->HandleEvent( new mitk::StateEvent( EIDYES, NULL ) );
+        planarFigure->InvokeEvent( EndInteractionPlanarFigureEvent() );
+        renderer->GetRenderingManager()->RequestUpdateAll();
+        this->HandleEvent( new mitk::StateEvent( EIDYES, NULL ) );
+      }
+      else
+      {
+        this->HandleEvent( new mitk::StateEvent( EIDNO, NULL ) );
+      }
     }
 
     //case AcMOVEPOINT:

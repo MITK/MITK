@@ -45,6 +45,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkLinearTransform.h>
 #include <vtkImageReslice.h>
 #include <vtkImageChangeInformation.h>
+#include <vtkPlaneSource.h>
+#include <vtkPolyDataMapper.h>
+#include <vtkTexture.h>
+#include <vtkImageCanvasSource2D.h>
 
 #include "vtkMitkThickSlicesFilter.h"
 #include "itkRGBAPixel.h"
@@ -54,8 +58,10 @@ int mitk::ImageMapperGL2D::numRenderer = 0;
 
 mitk::ImageMapperGL2D::ImageMapperGL2D()
 {
+  m_VtkActor = vtkSmartPointer<vtkActor>::New();
+  m_VtkBased = true;
+  Disable2DOpenGL();
 }
-
 
 mitk::ImageMapperGL2D::~ImageMapperGL2D()
 {
@@ -77,10 +83,10 @@ mitk::ImageMapperGL2D::Paint( mitk::BaseRenderer *renderer )
   RendererInfo &rendererInfo = this->AccessRendererInfo( renderer );
   iil4mitkPicImage *image = rendererInfo.Get_iil4mitkImage();
 
-  if ( ( image == NULL ) || ( image->image() == NULL ) )
-  {
-    return;
-  }
+//  if ( ( image == NULL ) || ( image->image() == NULL ) )
+//  {
+//    return;
+//  }
 
   const mitk::DisplayGeometry *displayGeometry = renderer->GetDisplayGeometry();
 
@@ -99,11 +105,11 @@ mitk::ImageMapperGL2D::Paint( mitk::BaseRenderer *renderer )
   Vector2D diag = ( topLeft - bottomRight );
   //float size = diag.GetNorm();
 
-  glMatrixMode( GL_PROJECTION );
-  glLoadIdentity();
-  glOrtho( topLeft[0], bottomRight[0], topLeft[1], bottomRight[1], 0.0, 1.0 );
-  glMatrixMode( GL_MODELVIEW );
-  glDepthMask(GL_FALSE);
+//  glMatrixMode( GL_PROJECTION );
+//  glLoadIdentity();
+//  glOrtho( topLeft[0], bottomRight[0], topLeft[1], bottomRight[1], 0.0, 1.0 );
+//  glMatrixMode( GL_MODELVIEW );
+//  glDepthMask(GL_FALSE);
 
   // Define clipping planes to clip the image according to the bounds
   // correlating to the current world geometry. The "extent" of the bounds
@@ -128,33 +134,33 @@ mitk::ImageMapperGL2D::Paint( mitk::BaseRenderer *renderer )
 
   // IW commented out the previous lines and reverted to rev. 9358
   // (version before rev. 9443) See bug #625
-  GLdouble eqn0[4] = {0.0, 1.0, 0.0, 0.0};
-  GLdouble eqn1[4] = {1.0, 0.0, 0.0, 0.0};
-  GLdouble eqn2[4] = {-1.0, 0.0 , 0.0, image->width()};
-  GLdouble eqn3[4] = {0, -1.0, 0.0, image->height() };
+//  GLdouble eqn0[4] = {0.0, 1.0, 0.0, 0.0};
+//  GLdouble eqn1[4] = {1.0, 0.0, 0.0, 0.0};
+//  GLdouble eqn2[4] = {-1.0, 0.0 , 0.0, image->width()};
+//  GLdouble eqn3[4] = {0, -1.0, 0.0, image->height() };
 
-  glClipPlane( GL_CLIP_PLANE0, eqn0 );
-  glEnable( GL_CLIP_PLANE0 );
-  glClipPlane( GL_CLIP_PLANE1, eqn1 );
-  glEnable( GL_CLIP_PLANE1 );
-  glClipPlane( GL_CLIP_PLANE2, eqn2 );
-  glEnable( GL_CLIP_PLANE2 );
-  glClipPlane( GL_CLIP_PLANE3, eqn3 );
-  glEnable( GL_CLIP_PLANE3 );
+//  glClipPlane( GL_CLIP_PLANE0, eqn0 );
+//  glEnable( GL_CLIP_PLANE0 );
+//  glClipPlane( GL_CLIP_PLANE1, eqn1 );
+//  glEnable( GL_CLIP_PLANE1 );
+//  glClipPlane( GL_CLIP_PLANE2, eqn2 );
+//  glEnable( GL_CLIP_PLANE2 );
+//  glClipPlane( GL_CLIP_PLANE3, eqn3 );
+//  glEnable( GL_CLIP_PLANE3 );
 
 
   // Render the image
-  image->setInterpolation( rendererInfo.m_TextureInterpolation );
+//  image->setInterpolation( rendererInfo.m_TextureInterpolation );
 
 
-  image->display( renderer->GetRenderWindow() );
+//  image->display( renderer->GetRenderWindow() );
 
 
-  // Disable the utilized clipping planes
-  glDisable( GL_CLIP_PLANE0 );
-  glDisable( GL_CLIP_PLANE1 );
-  glDisable( GL_CLIP_PLANE2 );
-  glDisable( GL_CLIP_PLANE3 );
+//  // Disable the utilized clipping planes
+//  glDisable( GL_CLIP_PLANE0 );
+//  glDisable( GL_CLIP_PLANE1 );
+//  glDisable( GL_CLIP_PLANE2 );
+//  glDisable( GL_CLIP_PLANE3 );
 
 
   // display volume property, if it exists and should be displayed
@@ -306,15 +312,15 @@ mitk::ImageMapperGL2D::Paint( mitk::BaseRenderer *renderer )
   }
 
   //glPushMatrix();
-  glMatrixMode( GL_PROJECTION );
-  glLoadIdentity();
-  glOrtho(
-    0.0, displayGeometry->GetDisplayWidth(),
-    0.0, displayGeometry->GetDisplayHeight(),
-    0.0, 1.0
-    );
+//  glMatrixMode( GL_PROJECTION );
+//  glLoadIdentity();
+//  glOrtho(
+//    0.0, displayGeometry->GetDisplayWidth(),
+//    0.0, displayGeometry->GetDisplayHeight(),
+//    0.0, 1.0
+//    );
 
-  glDepthMask(GL_TRUE);
+//  glDepthMask(GL_TRUE);
   //glMatrixMode( GL_MODELVIEW );
   //glPopMatrix();
 }
@@ -324,6 +330,54 @@ const mitk::ImageMapperGL2D::InputImageType *
 mitk::ImageMapperGL2D::GetInput( void )
 {
   return static_cast< const mitk::ImageMapperGL2D::InputImageType * >( this->GetData() );
+}
+
+vtkProp* mitk::ImageMapperGL2D::GetVtkProp(mitk::BaseRenderer* renderer){
+    return m_VtkActor;
+}
+
+void mitk::ImageMapperGL2D::MitkRenderOverlay(BaseRenderer* renderer)
+{
+  if ( this->IsVisible(renderer)==false )
+    return;
+
+  if ( this->GetVtkProp(renderer)->GetVisibility() )
+  {
+    this->GetVtkProp(renderer)->RenderOverlay(renderer->GetVtkRenderer());
+  }
+}
+void mitk::ImageMapperGL2D::MitkRenderOpaqueGeometry(BaseRenderer* renderer)
+{
+  if ( this->IsVisible( renderer )==false )
+    return;
+
+  if ( this->GetVtkProp(renderer)->GetVisibility() )
+  {
+    this->GetVtkProp(renderer)->RenderOpaqueGeometry( renderer->GetVtkRenderer() );
+  }
+}
+
+void mitk::ImageMapperGL2D::MitkRenderTranslucentGeometry(BaseRenderer* renderer)
+{
+  if ( this->IsVisible(renderer)==false )
+    return;
+
+  if ( this->GetVtkProp(renderer)->GetVisibility() )
+//BUG (#1551) changed VTK_MINOR_VERSION FROM 3 to 2 cause RenderTranslucentGeometry was changed in minor version 2
+#if ( ( VTK_MAJOR_VERSION >= 5 ) && ( VTK_MINOR_VERSION>=2)  )
+    this->GetVtkProp(renderer)->RenderTranslucentPolygonalGeometry(renderer->GetVtkRenderer());
+#else
+    this->GetVtkProp(renderer)->RenderTranslucentGeometry(renderer->GetVtkRenderer());
+#endif
+}
+
+void mitk::ImageMapperGL2D::MitkRenderVolumetricGeometry(BaseRenderer* renderer)
+{
+  if(IsVisible(renderer)==false)
+    return;
+
+  if ( GetVtkProp(renderer)->GetVisibility() )
+    GetVtkProp(renderer)->RenderVolumetricGeometry(renderer->GetVtkRenderer());
 }
 
 
@@ -353,10 +407,10 @@ mitk::ImageMapperGL2D::GenerateData( mitk::BaseRenderer *renderer )
   rendererInfo.Squeeze();
 
 
-  iil4mitkPicImage *image = new iil4mitkPicImage( 512 );
-  rendererInfo.Set_iil4mitkImage( image );
+//  iil4mitkPicImage *image = new iil4mitkPicImage( 512 );
+//  rendererInfo.Set_iil4mitkImage( image );
 
-  this->ApplyProperties( renderer );
+//  this->ApplyProperties( renderer );
 
   const Geometry2D *worldGeometry = renderer->GetCurrentWorldGeometry2D();
 
@@ -759,9 +813,9 @@ mitk::ImageMapperGL2D::GenerateData( mitk::BaseRenderer *renderer )
   else if ( pic->bpe == 32 && reslicedImage->GetScalarType()==VTK_UNSIGNED_CHAR ) // RGBA image
     m_iil4mitkMode = iil4mitkImage::RGBA;
 
-  image->setImage( pic, m_iil4mitkMode );
-  image->setInterpolation( false );
-  image->setRegion( 0, 0, pic->n[0], pic->n[1] );
+//  image->setImage( pic, m_iil4mitkMode );
+//  image->setInterpolation( false );
+//  image->setRegion( 0, 0, pic->n[0], pic->n[1] );
 
 
   // 3. Store the result in a VTK image
@@ -782,6 +836,31 @@ mitk::ImageMapperGL2D::GenerateData( mitk::BaseRenderer *renderer )
     }
     rendererInfo.m_Image = NULL;
   }
+  vtkSmartPointer<vtkImageCanvasSource2D> imageSource = vtkSmartPointer<vtkImageCanvasSource2D>::New();
+  imageSource->SetScalarTypeToUnsignedChar();
+  imageSource->SetExtent(0, 20, 0, 20, 0, 0);
+  imageSource->SetInput(reslicedImage);
+//  imageSource->SetNumberOfScalarComponents(3);
+//  imageSource->SetDrawColor(127,255,100);
+//  imageSource->FillBox(0,20,0,20);
+//  imageSource->SetDrawColor(20,20,20);
+//  imageSource->DrawSegment(0, 0, 19, 19);
+//  imageSource->DrawSegment(19, 0, 0, 19);
+  imageSource->Update();
+
+  vtkSmartPointer<vtkPlaneSource> plane = vtkSmartPointer<vtkPlaneSource>::New();
+  plane->SetCenter(0.0, 0.0, 0.0);
+  plane->SetNormal(0.0, 0.0, 1.0);
+
+  vtkSmartPointer<vtkTexture> texture = vtkSmartPointer<vtkTexture>::New();
+  texture->SetInputConnection(imageSource->GetOutputPort());
+
+  vtkSmartPointer<vtkPolyDataMapper> planeMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+  planeMapper->SetInputConnection(plane->GetOutputPort());
+
+  //create a textured plane (the actor)
+  m_VtkActor->SetMapper(planeMapper);
+  m_VtkActor->SetTexture(texture);
 
   // We have been modified
   rendererInfo.m_LastUpdateTime.Modified();

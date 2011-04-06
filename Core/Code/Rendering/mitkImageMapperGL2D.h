@@ -30,6 +30,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkEventObject.h>
 
 #include <vtkSystemIncludes.h>
+#include <vtkSmartPointer.h>
+#include <vtkPolyDataMapper.h>
+#include <vtkActor.h>
+#include <mitkVtkMapper2D.h>
 
 
 class iil4mitkPicImage;
@@ -95,13 +99,13 @@ namespace mitk {
 
  * \ingroup Mapper
  */
-class MITK_CORE_EXPORT ImageMapperGL2D : public GLMapper2D
+class MITK_CORE_EXPORT ImageMapperGL2D : public VtkMapper2D
 {
 
 public:
   
   /** Standard class typedefs. */
-  mitkClassMacro( ImageMapperGL2D,GLMapper2D );
+  mitkClassMacro( ImageMapperGL2D,VtkMapper2D );
   
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
@@ -115,6 +119,9 @@ public:
   /** \brief Get the Image to map */
   const InputImageType *GetInput(void);
 
+
+  void Disable2DOpenGL();
+
   /** \brief Calls Update() for all associated renderers. */
   virtual void GenerateAllData();
 
@@ -126,6 +133,13 @@ public:
   virtual void Update(mitk::BaseRenderer * renderer);
 
   virtual void ApplyProperties(mitk::BaseRenderer* renderer);
+
+  virtual vtkProp* GetVtkProp(mitk::BaseRenderer* renderer);
+
+  virtual void MitkRenderOverlay(BaseRenderer* renderer);
+  virtual void MitkRenderOpaqueGeometry(BaseRenderer* renderer);
+  virtual void MitkRenderTranslucentGeometry(BaseRenderer* renderer);
+  virtual void MitkRenderVolumetricGeometry(BaseRenderer* renderer);
 
   /** \brief Internal storage class for data needed for rendering into a
    * renderer
@@ -290,6 +304,8 @@ protected:
 
 private:
   int m_iil4mitkMode;
+
+  vtkSmartPointer<vtkActor> m_VtkActor;
 
 };
 

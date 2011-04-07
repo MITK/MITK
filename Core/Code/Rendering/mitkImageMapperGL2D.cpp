@@ -35,6 +35,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkResliceMethodProperty.h"
 
+#include <vtkDataSetMapper.h>
+#include <vtkProperty.h>
 #include <vtkTransform.h>
 #include <vtkGeneralTransform.h>
 #include <vtkMatrix4x4.h>
@@ -49,6 +51,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkPolyDataMapper.h>
 #include <vtkTexture.h>
 #include <vtkImageCanvasSource2D.h>
+#include <vtkTextureMapToPlane.h>
+#include <vtkOpenGLPolyDataMapper.h>
 
 #include "vtkMitkThickSlicesFilter.h"
 #include "itkRGBAPixel.h"
@@ -60,7 +64,6 @@ mitk::ImageMapperGL2D::ImageMapperGL2D()
 {
   m_VtkActor = vtkSmartPointer<vtkActor>::New();
   m_VtkBased = true;
-  Disable2DOpenGL();
 }
 
 mitk::ImageMapperGL2D::~ImageMapperGL2D()
@@ -765,6 +768,7 @@ mitk::ImageMapperGL2D::GenerateData( mitk::BaseRenderer *renderer )
 
   // 1. Check the result
   vtkImageData* reslicedImage = 0;
+//  reslicedImage->SetScalarTypeToUnsignedChar();
   
   if(thickSlicesMode>0)
   {
@@ -836,31 +840,72 @@ mitk::ImageMapperGL2D::GenerateData( mitk::BaseRenderer *renderer )
     }
     rendererInfo.m_Image = NULL;
   }
-  vtkSmartPointer<vtkImageCanvasSource2D> imageSource = vtkSmartPointer<vtkImageCanvasSource2D>::New();
-  imageSource->SetScalarTypeToUnsignedChar();
-  imageSource->SetExtent(0, 20, 0, 20, 0, 0);
-  imageSource->SetInput(reslicedImage);
-//  imageSource->SetNumberOfScalarComponents(3);
-//  imageSource->SetDrawColor(127,255,100);
+//  vtkSmartPointer<vtkImageCanvasSource2D> imageSource = vtkSmartPointer<vtkImageCanvasSource2D>::New();
+//  imageSource->SetScalarTypeToShort();
+//  imageSource->SetExtent(0, input->GetDimension(0), 0, input->GetDimension(1), 0, 0);
+//  imageSource->SetScalarTypeToShort();
+//  imageSource->SetNumberOfScalarComponents(1);
+//  imageSource->SetInput(reslicedImage);
+//  imageSource->SetDrawColor(255,255,255);
 //  imageSource->FillBox(0,20,0,20);
 //  imageSource->SetDrawColor(20,20,20);
 //  imageSource->DrawSegment(0, 0, 19, 19);
 //  imageSource->DrawSegment(19, 0, 0, 19);
-  imageSource->Update();
+//  imageSource->Update();
+
+//  Point3D origin = input->GetGeometry()->GetOrigin();
 
   vtkSmartPointer<vtkPlaneSource> plane = vtkSmartPointer<vtkPlaneSource>::New();
+//  plane->SetResolution(input->GetDimension(0), input->GetDimension(1));
+//  plane->SetOrigin(origin[0], origin[1], origin[2]);
   plane->SetCenter(0.0, 0.0, 0.0);
   plane->SetNormal(0.0, 0.0, 1.0);
 
+//  vtkSmartPointer<vtkTextureMapToPlane> texturePlane = vtkSmartPointer<vtkTextureMapToPlane>::New();
+//  texturePlane->SetInput(plane->GetOutput());
+
+  vtkSmartPointer<vtkLookupTable> lut = vtkSmartPointer<vtkLookupTable>::New();
+  lut->SetTableRange( -1024.0, 4095.0 );
+  lut->SetSaturationRange( 0.0, 0.0 );
+  lut->SetHueRange( 0.0, 0.0 );
+  lut->SetValueRange( 0.0, 1.0 );
+//  lut->SetTableValue( 0, 0.0, 0.0, 0.0, 0.0 );
+  lut->Build();
+
   vtkSmartPointer<vtkTexture> texture = vtkSmartPointer<vtkTexture>::New();
-  texture->SetInputConnection(imageSource->GetOutputPort());
+//  texture->SetQualityTo16Bit();
+  texture->SetInput(reslicedImage);
+  texture->InterpolateOn();
+//  texture->SetLookupTable( lut );
+  texture->RepeatOff();
 
   vtkSmartPointer<vtkPolyDataMapper> planeMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
   planeMapper->SetInputConnection(plane->GetOutputPort());
 
+//  vtkSmartPointer<vtkDataSetMapper> planeMapper = vtkSmartPointer<vtkDataSetMapper>::New();
+//  planeMapper->SetInputConnection(plane->GetOutputPort());
+
+//  vtkSmartPointer<vtkTransform> transform =
+//    vtkSmartPointer<vtkTransform>::New();
+//  transform->PostMultiply(); //this is the key line
+//  transform->RotateY(90.0);
+
   //create a textured plane (the actor)
+//  m_VtkActor->SetOrigin(origin[0], origin[1], origin[2]);
   m_VtkActor->SetMapper(planeMapper);
   m_VtkActor->SetTexture(texture);
+//  m_VtkActor->SetUserTransform(transform);
+
+  float opacity = 0;
+  GetOpacity(opacity, renderer);
+
+  m_VtkActor->GetProperty()->SetOpacity(opacity);
+
+
+//  vtkCam->
+//  vtkSmartPointer<vtkCamera> vtkCam = vtkSmartPointer<vtkCamera>::New();
+
+// renderer->GetVtkRenderer()->ResetCamera();
 
   // We have been modified
   rendererInfo.m_LastUpdateTime.Modified();

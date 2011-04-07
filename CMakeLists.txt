@@ -236,8 +236,8 @@ endif()
 # MITK C/CXX Flags
 #-----------------------------------------------------------------------------
 
-set(MITK_C_FLAGS "${CMAKE_C_FLAGS} ${COVERAGE_C_FLAGS} ${ADDITIONAL_C_FLAGS}")
-set(MITK_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${VISIBILITY_CXX_FLAGS} ${COVERAGE_CXX_FLAGS} ${ADDITIONAL_CXX_FLAGS}")
+set(MITK_C_FLAGS "${COVERAGE_C_FLAGS} ${ADDITIONAL_C_FLAGS}")
+set(MITK_CXX_FLAGS "${VISIBILITY_CXX_FLAGS} ${COVERAGE_CXX_FLAGS} ${ADDITIONAL_CXX_FLAGS}")
 
 if(CMAKE_COMPILER_IS_GNUCXX)
   set(cflags "-Wall -Wextra -Wpointer-arith -Winvalid-pch -Wcast-align -Wwrite-strings -D_FORTIFY_SOURCE=2")
@@ -341,8 +341,8 @@ endif()
 # Set C/CXX Flags for MITK code
 #-----------------------------------------------------------------------------
 
-set(CMAKE_CXX_FLAGS ${MITK_CXX_FLAGS})
-set(CMAKE_C_FLAGS ${MITK_C_FLAGS})
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${MITK_CXX_FLAGS}" CACHE STRING "CMake CXX Flags" FORCE)
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${MITK_C_FLAGS}" CACHE STRING "CMake C Flags" FORCE)
 
 if(MITK_USE_QT)
   add_definitions(-DQWT_DLL)

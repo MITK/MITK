@@ -602,7 +602,7 @@ mitk::ImageMapperGL2D::GenerateData( mitk::BaseRenderer *renderer )
       {
         thickSlicesNum = intProperty->GetValue(); 
         if(thickSlicesNum < 1) thickSlicesNum=1;
-        if(thickSlicesNum > 10) thickSlicesNum=10;
+        if(thickSlicesNum > 100) thickSlicesNum=100;
       }
     }
     else

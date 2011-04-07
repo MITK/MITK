@@ -395,6 +395,14 @@ DicomSeriesReader::GetSeries(const std::string &dir, const StringContainer &rest
     map [ moreUniqueSeriesId ].push_back( fileIter->first );
   }
 
+  /* TODO at this point:
+
+    sort slices spatially SortSeriesSlices
+    sort into blocks of equal spacing
+
+  */
+
+
 #endif
 
   for ( UidFileNamesMap::const_iterator i = map.begin(); i != map.end(); ++i )

@@ -421,11 +421,11 @@ DicomSeriesReader::CreateSeriesIdentifierPart( gdcm::Scanner::TagToValue& tagVal
   std::string result;
   try
   {
-    result = IDifyTagValue( tagValueMap[ tag ] );
+    result = IDifyTagValue( tagValueMap[ tag ] ? tagValueMap[ tag ] : std::string("") );
   }
   catch (std::exception& e)
   {
-    MITK_ERROR << "Could not access tag " << tag << ": " << e.what();
+    MITK_WARN << "Could not access tag " << tag << ": " << e.what();
   }
    
   return result;

@@ -1,10 +1,4 @@
 /*=========================================================================
-
-Program:   Medical Imaging & Interaction Toolkit
-Language:  C++
-Date:      $Date$
-Version:   $Revision$
-
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
@@ -14,7 +8,7 @@ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
-     
+
 #include "mitkImageMapperGL2D.h"
 #include "widget.h"
 #include "picimage.h"
@@ -53,9 +47,13 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkImageCanvasSource2D.h>
 #include <vtkTextureMapToPlane.h>
 #include <vtkOpenGLPolyDataMapper.h>
+#include <vtkCamera.h>
+#include <vtkRenderWindowInteractor.h>
+#include <vtkInteractorStyleImage.h>
 
 #include "vtkMitkThickSlicesFilter.h"
 #include "itkRGBAPixel.h"
+#include <itkFixedArray.h>
 
 
 int mitk::ImageMapperGL2D::numRenderer = 0;
@@ -74,7 +72,7 @@ mitk::ImageMapperGL2D::~ImageMapperGL2D()
 
 
 void
-mitk::ImageMapperGL2D::Paint( mitk::BaseRenderer *renderer )
+    mitk::ImageMapperGL2D::Paint( mitk::BaseRenderer *renderer )
 {
   if ( !this->IsVisible( renderer ) )
   {
@@ -86,10 +84,10 @@ mitk::ImageMapperGL2D::Paint( mitk::BaseRenderer *renderer )
   RendererInfo &rendererInfo = this->AccessRendererInfo( renderer );
   iil4mitkPicImage *image = rendererInfo.Get_iil4mitkImage();
 
-//  if ( ( image == NULL ) || ( image->image() == NULL ) )
-//  {
-//    return;
-//  }
+  //  if ( ( image == NULL ) || ( image->image() == NULL ) )
+  //  {
+  //    return;
+  //  }
 
   const mitk::DisplayGeometry *displayGeometry = renderer->GetDisplayGeometry();
 
@@ -108,11 +106,11 @@ mitk::ImageMapperGL2D::Paint( mitk::BaseRenderer *renderer )
   Vector2D diag = ( topLeft - bottomRight );
   //float size = diag.GetNorm();
 
-//  glMatrixMode( GL_PROJECTION );
-//  glLoadIdentity();
-//  glOrtho( topLeft[0], bottomRight[0], topLeft[1], bottomRight[1], 0.0, 1.0 );
-//  glMatrixMode( GL_MODELVIEW );
-//  glDepthMask(GL_FALSE);
+  //  glMatrixMode( GL_PROJECTION );
+  //  glLoadIdentity();
+  //  glOrtho( topLeft[0], bottomRight[0], topLeft[1], bottomRight[1], 0.0, 1.0 );
+  //  glMatrixMode( GL_MODELVIEW );
+  //  glDepthMask(GL_FALSE);
 
   // Define clipping planes to clip the image according to the bounds
   // correlating to the current world geometry. The "extent" of the bounds
@@ -137,33 +135,33 @@ mitk::ImageMapperGL2D::Paint( mitk::BaseRenderer *renderer )
 
   // IW commented out the previous lines and reverted to rev. 9358
   // (version before rev. 9443) See bug #625
-//  GLdouble eqn0[4] = {0.0, 1.0, 0.0, 0.0};
-//  GLdouble eqn1[4] = {1.0, 0.0, 0.0, 0.0};
-//  GLdouble eqn2[4] = {-1.0, 0.0 , 0.0, image->width()};
-//  GLdouble eqn3[4] = {0, -1.0, 0.0, image->height() };
+  //  GLdouble eqn0[4] = {0.0, 1.0, 0.0, 0.0};
+  //  GLdouble eqn1[4] = {1.0, 0.0, 0.0, 0.0};
+  //  GLdouble eqn2[4] = {-1.0, 0.0 , 0.0, image->width()};
+  //  GLdouble eqn3[4] = {0, -1.0, 0.0, image->height() };
 
-//  glClipPlane( GL_CLIP_PLANE0, eqn0 );
-//  glEnable( GL_CLIP_PLANE0 );
-//  glClipPlane( GL_CLIP_PLANE1, eqn1 );
-//  glEnable( GL_CLIP_PLANE1 );
-//  glClipPlane( GL_CLIP_PLANE2, eqn2 );
-//  glEnable( GL_CLIP_PLANE2 );
-//  glClipPlane( GL_CLIP_PLANE3, eqn3 );
-//  glEnable( GL_CLIP_PLANE3 );
+  //  glClipPlane( GL_CLIP_PLANE0, eqn0 );
+  //  glEnable( GL_CLIP_PLANE0 );
+  //  glClipPlane( GL_CLIP_PLANE1, eqn1 );
+  //  glEnable( GL_CLIP_PLANE1 );
+  //  glClipPlane( GL_CLIP_PLANE2, eqn2 );
+  //  glEnable( GL_CLIP_PLANE2 );
+  //  glClipPlane( GL_CLIP_PLANE3, eqn3 );
+  //  glEnable( GL_CLIP_PLANE3 );
 
 
   // Render the image
-//  image->setInterpolation( rendererInfo.m_TextureInterpolation );
+  //  image->setInterpolation( rendererInfo.m_TextureInterpolation );
 
 
-//  image->display( renderer->GetRenderWindow() );
+  //  image->display( renderer->GetRenderWindow() );
 
 
-//  // Disable the utilized clipping planes
-//  glDisable( GL_CLIP_PLANE0 );
-//  glDisable( GL_CLIP_PLANE1 );
-//  glDisable( GL_CLIP_PLANE2 );
-//  glDisable( GL_CLIP_PLANE3 );
+  //  // Disable the utilized clipping planes
+  //  glDisable( GL_CLIP_PLANE0 );
+  //  glDisable( GL_CLIP_PLANE1 );
+  //  glDisable( GL_CLIP_PLANE2 );
+  //  glDisable( GL_CLIP_PLANE3 );
 
 
   // display volume property, if it exists and should be displayed
@@ -179,17 +177,17 @@ mitk::ImageMapperGL2D::Paint( mitk::BaseRenderer *renderer )
   // 2.1 The image has a volume stored as property (3D case) OR
   // 2.2 The image is 3D or 4D and binary, so the volume can be calculated ]
   if (
-    (node->GetBoolProperty("showVolume", shouldShowVolume)) &&
-    (shouldShowVolume) && 
-    (
-    (node->GetFloatProperty("volume", segmentationVolume) ) 
-    || 
-    (mitkimage != NULL &&
-    mitkimage->GetDimension() >= 3 &&
-    node->GetBoolProperty("binary", binary) &&
-    binary)
-    )
-    )
+      (node->GetBoolProperty("showVolume", shouldShowVolume)) &&
+      (shouldShowVolume) &&
+      (
+          (node->GetFloatProperty("volume", segmentationVolume) )
+          ||
+          (mitkimage != NULL &&
+           mitkimage->GetDimension() >= 3 &&
+           node->GetBoolProperty("binary", binary) &&
+           binary)
+          )
+      )
   {
     // calculate screen position for text by searching for the object border
     mitkIpPicDescriptor* pic = image->image();
@@ -203,32 +201,32 @@ mitk::ImageMapperGL2D::Paint( mitk::BaseRenderer *renderer )
     for(unsigned int y=0;y<pic->n[1];y++)
       for(unsigned int x=0;x<pic->n[0];x++)
       {
-        bool set=false;
-        switch ( pic->bpe )
-        {
-        case 8: {
-            mitkIpInt1_t *current = static_cast< mitkIpInt1_t *>( pic->data );
-            current += y*pic->n[0] + x;
-            if(current[0]) set=true;
-            break; }
-        case 16: {
-            mitkIpInt2_t *current = static_cast< mitkIpInt2_t *>( pic->data );
-            current += y*pic->n[0] + x;
-            if(current[0]) set=true;
-            break; }
-        case 24: {
-            mitkIpInt1_t *current = static_cast< mitkIpInt1_t *>( pic->data );
-            current += ( y*pic->n[0] + x )*3;
-            if(current[0]||current[1]||current[2]) set=true;
-            break; }
-        }
-        if(set)
-        {
-          if ( x > s_x ) s_x = x;
-          if ( y > s_y ) s_y = y;
-          s_n++;
-        }
+      bool set=false;
+      switch ( pic->bpe )
+      {
+      case 8: {
+          mitkIpInt1_t *current = static_cast< mitkIpInt1_t *>( pic->data );
+          current += y*pic->n[0] + x;
+          if(current[0]) set=true;
+          break; }
+      case 16: {
+          mitkIpInt2_t *current = static_cast< mitkIpInt2_t *>( pic->data );
+          current += y*pic->n[0] + x;
+          if(current[0]) set=true;
+          break; }
+      case 24: {
+          mitkIpInt1_t *current = static_cast< mitkIpInt1_t *>( pic->data );
+          current += ( y*pic->n[0] + x )*3;
+          if(current[0]||current[1]||current[2]) set=true;
+          break; }
       }
+      if(set)
+      {
+        if ( x > s_x ) s_x = x;
+        if ( y > s_y ) s_y = y;
+        s_n++;
+      }
+    }
     
     // if an object has been found, draw annotation
     if ( s_n>0 )
@@ -241,7 +239,7 @@ mitk::ImageMapperGL2D::Paint( mitk::BaseRenderer *renderer )
         {
           // if yes, get the volume from image statistics
           segmentationVolume = mitk::VolumeCalculator::ComputeVolume(
-            mitkimage->GetSlicedGeometry()->GetSpacing(), mitkimage->GetCountOfMaxValuedVoxelsNoRecompute(renderer->GetTimeStep()));
+              mitkimage->GetSlicedGeometry()->GetSpacing(), mitkimage->GetCountOfMaxValuedVoxelsNoRecompute(renderer->GetTimeStep()));
         }
       }
 
@@ -288,55 +286,57 @@ mitk::ImageMapperGL2D::Paint( mitk::BaseRenderer *renderer )
       bool selected = false;
       GetDataNode()->GetBoolProperty("binaryimage.ishovering", hover, renderer);
       GetDataNode()->GetBoolProperty("selected", selected, renderer);
-  
+
       if(hover)
       {
         mitk::ColorProperty::Pointer colorprop = dynamic_cast<mitk::ColorProperty*>(GetDataNode()->GetProperty
-                                              ("binaryimage.hoveringcolor", renderer));
+                                                                                    ("binaryimage.hoveringcolor", renderer));
         if(colorprop.IsNotNull())
-           annotationColor = colorprop->GetColor();
+          annotationColor = colorprop->GetColor();
 
       }
       if(selected)
       {
         mitk::ColorProperty::Pointer colorprop = dynamic_cast<mitk::ColorProperty*>(GetDataNode()->GetProperty
-                                              ("binaryimage.selectedcolor", renderer));
+                                                                                    ("binaryimage.selectedcolor", renderer));
         if(colorprop.IsNotNull())
           annotationColor = colorprop->GetColor();
 
       }
-            
+
       OpenGLrenderer->WriteSimpleText(volumeString.str(), pt2D[0]+1, pt2D[1]-1,0,0,0); //this is a shadow 
       OpenGLrenderer->WriteSimpleText(volumeString.str(), pt2D[0]  , pt2D[1]  ,annotationColor.GetRed() 
-                                                                              ,annotationColor.GetGreen()
-                                                                              ,annotationColor.GetBlue());
+                                      ,annotationColor.GetGreen()
+                                      ,annotationColor.GetBlue());
     }
 
   }
 
   //glPushMatrix();
-//  glMatrixMode( GL_PROJECTION );
-//  glLoadIdentity();
-//  glOrtho(
-//    0.0, displayGeometry->GetDisplayWidth(),
-//    0.0, displayGeometry->GetDisplayHeight(),
-//    0.0, 1.0
-//    );
+  //  glMatrixMode( GL_PROJECTION );
+  //  glLoadIdentity();
+  //  glOrtho(
+  //    0.0, displayGeometry->GetDisplayWidth(),
+  //    0.0, displayGeometry->GetDisplayHeight(),
+  //    0.0, 1.0
+  //    );
 
-//  glDepthMask(GL_TRUE);
+  //  glDepthMask(GL_TRUE);
   //glMatrixMode( GL_MODELVIEW );
   //glPopMatrix();
 }
 
 
 const mitk::ImageMapperGL2D::InputImageType *
-mitk::ImageMapperGL2D::GetInput( void )
+    mitk::ImageMapperGL2D::GetInput( void )
 {
   return static_cast< const mitk::ImageMapperGL2D::InputImageType * >( this->GetData() );
 }
 
-vtkProp* mitk::ImageMapperGL2D::GetVtkProp(mitk::BaseRenderer* renderer){
-    return m_VtkActor;
+vtkProp* mitk::ImageMapperGL2D::GetVtkProp(mitk::BaseRenderer* renderer)
+{
+  m_VtkActor->SetUserTransform( this->GetDataNode()->GetVtkTransform() );
+  return m_VtkActor;
 }
 
 void mitk::ImageMapperGL2D::MitkRenderOverlay(BaseRenderer* renderer)
@@ -366,11 +366,11 @@ void mitk::ImageMapperGL2D::MitkRenderTranslucentGeometry(BaseRenderer* renderer
     return;
 
   if ( this->GetVtkProp(renderer)->GetVisibility() )
-//BUG (#1551) changed VTK_MINOR_VERSION FROM 3 to 2 cause RenderTranslucentGeometry was changed in minor version 2
+    //BUG (#1551) changed VTK_MINOR_VERSION FROM 3 to 2 cause RenderTranslucentGeometry was changed in minor version 2
 #if ( ( VTK_MAJOR_VERSION >= 5 ) && ( VTK_MINOR_VERSION>=2)  )
     this->GetVtkProp(renderer)->RenderTranslucentPolygonalGeometry(renderer->GetVtkRenderer());
 #else
-    this->GetVtkProp(renderer)->RenderTranslucentGeometry(renderer->GetVtkRenderer());
+  this->GetVtkProp(renderer)->RenderTranslucentGeometry(renderer->GetVtkRenderer());
 #endif
 }
 
@@ -385,7 +385,7 @@ void mitk::ImageMapperGL2D::MitkRenderVolumetricGeometry(BaseRenderer* renderer)
 
 
 int
-mitk::ImageMapperGL2D::GetAssociatedChannelNr( mitk::BaseRenderer *renderer )
+    mitk::ImageMapperGL2D::GetAssociatedChannelNr( mitk::BaseRenderer *renderer )
 {
   RendererInfo &rendererInfo = this->AccessRendererInfo( renderer );
 
@@ -394,11 +394,11 @@ mitk::ImageMapperGL2D::GetAssociatedChannelNr( mitk::BaseRenderer *renderer )
 
 
 void
-mitk::ImageMapperGL2D::GenerateData( mitk::BaseRenderer *renderer )
+    mitk::ImageMapperGL2D::GenerateData( mitk::BaseRenderer *renderer )
 {
   mitk::Image *input = const_cast< mitk::ImageMapperGL2D::InputImageType * >(
-    this->GetInput()
-    );
+      this->GetInput()
+      );
   input->Update();
 
   if ( input == NULL )
@@ -410,10 +410,10 @@ mitk::ImageMapperGL2D::GenerateData( mitk::BaseRenderer *renderer )
   rendererInfo.Squeeze();
 
 
-//  iil4mitkPicImage *image = new iil4mitkPicImage( 512 );
-//  rendererInfo.Set_iil4mitkImage( image );
+  //  iil4mitkPicImage *image = new iil4mitkPicImage( 512 );
+  //  rendererInfo.Set_iil4mitkImage( image );
 
-//  this->ApplyProperties( renderer );
+  //  this->ApplyProperties( renderer );
 
   const Geometry2D *worldGeometry = renderer->GetCurrentWorldGeometry2D();
 
@@ -471,7 +471,7 @@ mitk::ImageMapperGL2D::GenerateData( mitk::BaseRenderer *renderer )
   if ( dynamic_cast< const PlaneGeometry * >( worldGeometry ) != NULL )
   {
     const PlaneGeometry *planeGeometry =
-      static_cast< const PlaneGeometry * >( worldGeometry );
+        static_cast< const PlaneGeometry * >( worldGeometry );
 
     origin = planeGeometry->GetOrigin();
     right  = planeGeometry->GetAxisVector( 0 );
@@ -480,9 +480,9 @@ mitk::ImageMapperGL2D::GenerateData( mitk::BaseRenderer *renderer )
 
     bool inPlaneResampleExtentByGeometry = false;
     GetDataNode()->GetBoolProperty(
-      "in plane resample extent by geometry",
-      inPlaneResampleExtentByGeometry, renderer
-      );
+        "in plane resample extent by geometry",
+        inPlaneResampleExtentByGeometry, renderer
+        );
 
     if ( inPlaneResampleExtentByGeometry )
     {
@@ -525,7 +525,7 @@ mitk::ImageMapperGL2D::GenerateData( mitk::BaseRenderer *renderer )
 
     // Use inverse transform of the input geometry for reslicing the 3D image
     rendererInfo.m_Reslicer->SetResliceTransform(
-      inputGeometry->GetVtkTransform()->GetLinearInverse() ); 
+        inputGeometry->GetVtkTransform()->GetLinearInverse() );
 
     // Set background level to TRANSLUCENT (see Geometry2DDataVtkMapper3D)
     rendererInfo.m_Reslicer->SetBackgroundLevel( -32768 );
@@ -546,7 +546,7 @@ mitk::ImageMapperGL2D::GenerateData( mitk::BaseRenderer *renderer )
       // correct position during 3D mapping.
 
       boundsInitialized = this->CalculateClippedPlaneBounds(
-        rendererInfo.m_ReferenceGeometry, planeGeometry, bounds );
+          rendererInfo.m_ReferenceGeometry, planeGeometry, bounds );
     }
   }
 
@@ -554,7 +554,7 @@ mitk::ImageMapperGL2D::GenerateData( mitk::BaseRenderer *renderer )
   else if ( dynamic_cast< const AbstractTransformGeometry * >( worldGeometry ) )
   {
     const mitk::AbstractTransformGeometry* abstractGeometry =
-      dynamic_cast< const AbstractTransformGeometry * >(worldGeometry);
+        dynamic_cast< const AbstractTransformGeometry * >(worldGeometry);
 
     rendererInfo.m_Extent[0] = abstractGeometry->GetParametricExtent(0);
     rendererInfo.m_Extent[1] = abstractGeometry->GetParametricExtent(1);
@@ -581,10 +581,10 @@ mitk::ImageMapperGL2D::GenerateData( mitk::BaseRenderer *renderer )
     vtkGeneralTransform *composedResliceTransform = vtkGeneralTransform::New();
     composedResliceTransform->Identity();
     composedResliceTransform->Concatenate(
-      inputGeometry->GetVtkTransform()->GetLinearInverse() );
+        inputGeometry->GetVtkTransform()->GetLinearInverse() );
     composedResliceTransform->Concatenate(
-      abstractGeometry->GetVtkAbstractTransform()
-      );
+        abstractGeometry->GetVtkAbstractTransform()
+        );
 
     rendererInfo.m_Reslicer->SetResliceTransform( composedResliceTransform );
     composedResliceTransform->UnRegister( NULL ); // decrease RC
@@ -611,7 +611,7 @@ mitk::ImageMapperGL2D::GenerateData( mitk::BaseRenderer *renderer )
   {
     VtkResliceInterpolationProperty *resliceInterpolationProperty;
     this->GetDataNode()->GetProperty(
-      resliceInterpolationProperty, "reslice interpolation" );
+        resliceInterpolationProperty, "reslice interpolation" );
 
     int interpolationMode = VTK_RESLICE_NEAREST;
     if ( resliceInterpolationProperty != NULL )
@@ -717,9 +717,9 @@ mitk::ImageMapperGL2D::GenerateData( mitk::BaseRenderer *renderer )
 
     xMin = yMin = 0;
     xMax = static_cast< int >( rendererInfo.m_Extent[0]
-    - rendererInfo.m_PixelsPerMM[0] + 0.5 );
+                               - rendererInfo.m_PixelsPerMM[0] + 0.5 );
     yMax = static_cast< int >( rendererInfo.m_Extent[1] 
-    - rendererInfo.m_PixelsPerMM[1] + 0.5 );
+                               - rendererInfo.m_PixelsPerMM[1] + 0.5 );
   }
 
 
@@ -757,7 +757,7 @@ mitk::ImageMapperGL2D::GenerateData( mitk::BaseRenderer *renderer )
   // xMax and yMax are meant exclusive until now, whereas 
   // SetOutputExtent wants an inclusive bound. Thus, we need 
   // to subtract 1.
-      
+
   // Do the reslicing. Modified() is called to make sure that the reslicer is
   // executed even though the input geometry information did not change; this
   // is necessary when the input /em data, but not the /em geometry changes.
@@ -768,7 +768,7 @@ mitk::ImageMapperGL2D::GenerateData( mitk::BaseRenderer *renderer )
 
   // 1. Check the result
   vtkImageData* reslicedImage = 0;
-//  reslicedImage->SetScalarTypeToUnsignedChar();
+  //  reslicedImage->SetScalarTypeToUnsignedChar();
   
   if(thickSlicesMode>0)
   {
@@ -817,9 +817,9 @@ mitk::ImageMapperGL2D::GenerateData( mitk::BaseRenderer *renderer )
   else if ( pic->bpe == 32 && reslicedImage->GetScalarType()==VTK_UNSIGNED_CHAR ) // RGBA image
     m_iil4mitkMode = iil4mitkImage::RGBA;
 
-//  image->setImage( pic, m_iil4mitkMode );
-//  image->setInterpolation( false );
-//  image->setRegion( 0, 0, pic->n[0], pic->n[1] );
+  //  image->setImage( pic, m_iil4mitkMode );
+  //  image->setInterpolation( false );
+  //  image->setRegion( 0, 0, pic->n[0], pic->n[1] );
 
 
   // 3. Store the result in a VTK image
@@ -840,72 +840,87 @@ mitk::ImageMapperGL2D::GenerateData( mitk::BaseRenderer *renderer )
     }
     rendererInfo.m_Image = NULL;
   }
-//  vtkSmartPointer<vtkImageCanvasSource2D> imageSource = vtkSmartPointer<vtkImageCanvasSource2D>::New();
-//  imageSource->SetScalarTypeToShort();
-//  imageSource->SetExtent(0, input->GetDimension(0), 0, input->GetDimension(1), 0, 0);
-//  imageSource->SetScalarTypeToShort();
-//  imageSource->SetNumberOfScalarComponents(1);
-//  imageSource->SetInput(reslicedImage);
-//  imageSource->SetDrawColor(255,255,255);
-//  imageSource->FillBox(0,20,0,20);
-//  imageSource->SetDrawColor(20,20,20);
-//  imageSource->DrawSegment(0, 0, 19, 19);
-//  imageSource->DrawSegment(19, 0, 0, 19);
-//  imageSource->Update();
 
-//  Point3D origin = input->GetGeometry()->GetOrigin();
+  mitk::Point3D originNew, rightNew, bottomNew;
 
   vtkSmartPointer<vtkPlaneSource> plane = vtkSmartPointer<vtkPlaneSource>::New();
-//  plane->SetResolution(input->GetDimension(0), input->GetDimension(1));
-//  plane->SetOrigin(origin[0], origin[1], origin[2]);
   plane->SetCenter(0.0, 0.0, 0.0);
-  plane->SetNormal(0.0, 0.0, 1.0);
+  plane->SetNormal(0.0, -1.0, 0.0);
+//  plane->SetResolution(256, 256);
 
-//  vtkSmartPointer<vtkTextureMapToPlane> texturePlane = vtkSmartPointer<vtkTextureMapToPlane>::New();
-//  texturePlane->SetInput(plane->GetOutput());
+  // Does the Geometry2DData contain a PlaneGeometry?
 
-  vtkSmartPointer<vtkLookupTable> lut = vtkSmartPointer<vtkLookupTable>::New();
-  lut->SetTableRange( -1024.0, 4095.0 );
-  lut->SetSaturationRange( 0.0, 0.0 );
-  lut->SetHueRange( 0.0, 0.0 );
-  lut->SetValueRange( 0.0, 1.0 );
-//  lut->SetTableValue( 0, 0.0, 0.0, 0.0, 0.0 );
-  lut->Build();
+//  renderer->GetDisplayGeometryData()
+
+//    mitk::PlaneGeometry *planeGeometry =
+//      dynamic_cast< PlaneGeometry * >( input->GetGeometry2D() );
+
+//        // Take the coordinate axes and origin directly from the input geometry.
+//        originNew = planeGeometry->GetOrigin();
+//        rightNew = planeGeometry->GetCornerPoint( false, true );
+//        bottomNew = planeGeometry->GetCornerPoint( true, false );
+
+
+//      // Since the plane is planar, there is no need to subdivide the grid
+//      // (cf. AbstractTransformGeometry case)
+//      plane->SetXResolution( 1 );
+//      plane->SetYResolution( 1 );
+
+//      plane->SetOrigin( originNew[0], originNew[1], originNew[2] );
+//      plane->SetPoint1( rightNew[0], rightNew[1], rightNew[2] );
+//      plane->SetPoint2( bottomNew[0], bottomNew[1], bottomNew[2] );
+
+
+  ScalarType windowMin = 0.0;
+  ScalarType windowMax = 255.0;
+  LevelWindow levelWindow;
+
+  GetLevelWindow(levelWindow, renderer);
+
+  windowMin = levelWindow.GetLowerWindowBound();
+  windowMax = levelWindow.GetUpperWindowBound();
+
+  vtkSmartPointer<vtkLookupTable> lookupTable = vtkSmartPointer<vtkLookupTable>::New();
+  lookupTable->SetSaturationRange( 0.0, 0.0 );
+  lookupTable->SetHueRange( 0.0, 0.0 );
+  lookupTable->SetValueRange( 0.0, 1.0 );
+  lookupTable->SetRange( windowMin, windowMax );
+  lookupTable->Build();
 
   vtkSmartPointer<vtkTexture> texture = vtkSmartPointer<vtkTexture>::New();
-//  texture->SetQualityTo16Bit();
   texture->SetInput(reslicedImage);
   texture->InterpolateOn();
-//  texture->SetLookupTable( lut );
+  texture->SetLookupTable( lookupTable );
   texture->RepeatOff();
+  //  texture->MapColorScalarsThroughLookupTableOn();
 
   vtkSmartPointer<vtkPolyDataMapper> planeMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
   planeMapper->SetInputConnection(plane->GetOutputPort());
-
-//  vtkSmartPointer<vtkDataSetMapper> planeMapper = vtkSmartPointer<vtkDataSetMapper>::New();
-//  planeMapper->SetInputConnection(plane->GetOutputPort());
-
-//  vtkSmartPointer<vtkTransform> transform =
-//    vtkSmartPointer<vtkTransform>::New();
-//  transform->PostMultiply(); //this is the key line
-//  transform->RotateY(90.0);
+//  planeMapper->ScalarVisibilityOff();
 
   //create a textured plane (the actor)
-//  m_VtkActor->SetOrigin(origin[0], origin[1], origin[2]);
   m_VtkActor->SetMapper(planeMapper);
   m_VtkActor->SetTexture(texture);
-//  m_VtkActor->SetUserTransform(transform);
+
+  static bool rotated = 0;
+//  if(!rotated){
+//    m_VtkActor->RotateX(90);
+//    m_VtkActor->RotateZ(90);
+//    rotated = 1;
+//  }
+
+  //  m_VtkActor->GetProperty()->SetColor(1.0, 1.0, 1.0);
+  //  m_VtkActor->SetUserTransform(transform);
 
   float opacity = 0;
   GetOpacity(opacity, renderer);
 
   m_VtkActor->GetProperty()->SetOpacity(opacity);
 
+  renderer->GetVtkRenderer()->ResetCamera(m_VtkActor->GetBounds());
+  renderer->GetVtkRenderer()->GetActiveCamera()->SetParallelProjection(1);
 
-//  vtkCam->
-//  vtkSmartPointer<vtkCamera> vtkCam = vtkSmartPointer<vtkCamera>::New();
-
-// renderer->GetVtkRenderer()->ResetCamera();
+  renderer->GetVtkRenderer()->GetRenderWindow()->SetInteractor(NULL);
 
   // We have been modified
   rendererInfo.m_LastUpdateTime.Modified();
@@ -913,7 +928,7 @@ mitk::ImageMapperGL2D::GenerateData( mitk::BaseRenderer *renderer )
 
 
 double
-mitk::ImageMapperGL2D::CalculateSpacing( const mitk::Geometry3D *geometry, const mitk::Vector3D &d ) const
+    mitk::ImageMapperGL2D::CalculateSpacing( const mitk::Geometry3D *geometry, const mitk::Vector3D &d ) const
 {
   // The following can be derived from the ellipsoid equation
   //
@@ -925,8 +940,8 @@ mitk::ImageMapperGL2D::CalculateSpacing( const mitk::Geometry3D *geometry, const
   const mitk::Vector3D &spacing = geometry->GetSpacing();
 
   double scaling = d[0]*d[0] / (spacing[0] * spacing[0])
-    + d[1]*d[1] / (spacing[1] * spacing[1])
-    + d[2]*d[2] / (spacing[2] * spacing[2]);
+                   + d[1]*d[1] / (spacing[1] * spacing[1])
+                   + d[2]*d[2] / (spacing[2] * spacing[2]);
 
   scaling = sqrt( scaling );
 
@@ -934,9 +949,9 @@ mitk::ImageMapperGL2D::CalculateSpacing( const mitk::Geometry3D *geometry, const
 }
 
 bool
-mitk::ImageMapperGL2D
-::LineIntersectZero( vtkPoints *points, int p1, int p2,
-                    vtkFloatingPointType *bounds )
+    mitk::ImageMapperGL2D
+    ::LineIntersectZero( vtkPoints *points, int p1, int p2,
+                         vtkFloatingPointType *bounds )
 {
   vtkFloatingPointType point1[3];
   vtkFloatingPointType point2[3];
@@ -961,9 +976,9 @@ mitk::ImageMapperGL2D
 
 
 bool 
-mitk::ImageMapperGL2D
-::CalculateClippedPlaneBounds( const Geometry3D *boundingGeometry, 
-                              const PlaneGeometry *planeGeometry, vtkFloatingPointType *bounds )
+    mitk::ImageMapperGL2D
+    ::CalculateClippedPlaneBounds( const Geometry3D *boundingGeometry,
+                                   const PlaneGeometry *planeGeometry, vtkFloatingPointType *bounds )
 {
   // Clip the plane with the bounding geometry. To do so, the corner points 
   // of the bounding box are transformed by the inverse transformation 
@@ -1005,8 +1020,8 @@ mitk::ImageMapperGL2D
   vtkTransform *transform = vtkTransform::New();
   transform->Identity();
   transform->Concatenate(
-    planeGeometry->GetVtkTransform()->GetLinearInverse()
-    );
+      planeGeometry->GetVtkTransform()->GetLinearInverse()
+      );
 
   transform->Concatenate( boundingGeometry->GetVtkTransform() );
 
@@ -1036,7 +1051,7 @@ mitk::ImageMapperGL2D
 
   if ( (bounds[0] > 9999999.0) || (bounds[2] > 9999999.0)
     || (bounds[1] < -9999999.0) || (bounds[3] < -9999999.0) )
-  {
+    {
     return false;
   }
   else
@@ -1057,7 +1072,7 @@ mitk::ImageMapperGL2D
 
 
 void
-mitk::ImageMapperGL2D::GenerateAllData()
+    mitk::ImageMapperGL2D::GenerateAllData()
 {
   RendererInfoMap::iterator it, end = m_RendererInfo.end();
 
@@ -1069,7 +1084,7 @@ mitk::ImageMapperGL2D::GenerateAllData()
 
 
 void 
-mitk::ImageMapperGL2D::Clear()
+    mitk::ImageMapperGL2D::Clear()
 {
   RendererInfoMap::iterator it, end = m_RendererInfo.end();
   for ( it = m_RendererInfo.begin(); it != end; ++it )
@@ -1082,7 +1097,7 @@ mitk::ImageMapperGL2D::Clear()
 
 
 void
-mitk::ImageMapperGL2D::ApplyProperties(mitk::BaseRenderer* renderer)
+    mitk::ImageMapperGL2D::ApplyProperties(mitk::BaseRenderer* renderer)
 {
   RendererInfo &rendererInfo = this->AccessRendererInfo( renderer );
   iil4mitkPicImage *image = rendererInfo.Get_iil4mitkImage();
@@ -1101,7 +1116,7 @@ mitk::ImageMapperGL2D::ApplyProperties(mitk::BaseRenderer* renderer)
   if(hover && !selected)
   {
     mitk::ColorProperty::Pointer colorprop = dynamic_cast<mitk::ColorProperty*>(GetDataNode()->GetProperty
-                                              ("binaryimage.hoveringcolor", renderer));
+                                                                                ("binaryimage.hoveringcolor", renderer));
     if(colorprop.IsNotNull())
       memcpy(rgba, colorprop->GetColor().GetDataPointer(), 3*sizeof(float));
     else
@@ -1110,8 +1125,8 @@ mitk::ImageMapperGL2D::ApplyProperties(mitk::BaseRenderer* renderer)
   }
   if(selected)
   {
-     mitk::ColorProperty::Pointer colorprop = dynamic_cast<mitk::ColorProperty*>(GetDataNode()->GetProperty
-                                              ("binaryimage.selectedcolor", renderer));
+    mitk::ColorProperty::Pointer colorprop = dynamic_cast<mitk::ColorProperty*>(GetDataNode()->GetProperty
+                                                                                ("binaryimage.selectedcolor", renderer));
     if(colorprop.IsNotNull())
       memcpy(rgba, colorprop->GetColor().GetDataPointer(), 3*sizeof(float));
     else
@@ -1120,7 +1135,7 @@ mitk::ImageMapperGL2D::ApplyProperties(mitk::BaseRenderer* renderer)
   }
   if(!hover && !selected)
   {
-     GetColor( rgba, renderer );
+    GetColor( rgba, renderer );
   }
 
   // check for opacity prop and use it for rendering if it exists
@@ -1130,8 +1145,8 @@ mitk::ImageMapperGL2D::ApplyProperties(mitk::BaseRenderer* renderer)
   // check for interpolation properties
   bool textureInterpolation = false;
   GetDataNode()->GetBoolProperty(
-    "texture interpolation", textureInterpolation, renderer
-    );
+      "texture interpolation", textureInterpolation, renderer
+      );
 
   rendererInfo.m_TextureInterpolation = textureInterpolation;
 
@@ -1143,7 +1158,7 @@ mitk::ImageMapperGL2D::ApplyProperties(mitk::BaseRenderer* renderer)
 
   if ( binary )
   {
-   
+
     image->setExtrema(0, 1);
     image->setOpacityExtrema( 0.0, 255.0 );
     image->setBinary(true);
@@ -1197,7 +1212,7 @@ mitk::ImageMapperGL2D::ApplyProperties(mitk::BaseRenderer* renderer)
   if ( !useColor )
   {
     LookupTableProp = dynamic_cast<mitk::LookupTableProperty*>(
-      this->GetDataNode()->GetProperty("LookupTable"));
+        this->GetDataNode()->GetProperty("LookupTable"));
 
     if ( LookupTableProp.IsNull() )
     {
@@ -1218,7 +1233,7 @@ mitk::ImageMapperGL2D::ApplyProperties(mitk::BaseRenderer* renderer)
     // only update the lut, when the properties have changed...
     if ( LookupTableProp->GetLookupTable()->GetMTime()
       <= this->GetDataNode()->GetPropertyList()->GetMTime() )
-    {
+      {
       LookupTableProp->GetLookupTable()->ChangeOpacityForAll( opacity );
       LookupTableProp->GetLookupTable()->ChangeOpacity(0, 0.0);
     }
@@ -1227,11 +1242,11 @@ mitk::ImageMapperGL2D::ApplyProperties(mitk::BaseRenderer* renderer)
 }
 
 void
-mitk::ImageMapperGL2D::Update(mitk::BaseRenderer* renderer)
+    mitk::ImageMapperGL2D::Update(mitk::BaseRenderer* renderer)
 {
   mitk::Image* data  = const_cast<mitk::ImageMapperGL2D::InputImageType *>(
-    this->GetInput()
-    );
+      this->GetInput()
+      );
 
   if ( data == NULL )
   {
@@ -1251,7 +1266,7 @@ mitk::ImageMapperGL2D::Update(mitk::BaseRenderer* renderer)
   if ( ( dataTimeGeometry == NULL )
     || ( dataTimeGeometry->GetTimeSteps() == 0 )
     || ( !dataTimeGeometry->IsValidTime( this->GetTimestep() ) ) )
-  {
+    {
     return;
   }
 
@@ -1267,21 +1282,21 @@ mitk::ImageMapperGL2D::Update(mitk::BaseRenderer* renderer)
     || (rendererInfo.m_LastUpdateTime < node->GetMTime())
     || (rendererInfo.m_LastUpdateTime < data->GetPipelineMTime())
     || (rendererInfo.m_LastUpdateTime
-    < renderer->GetCurrentWorldGeometry2DUpdateTime())
+        < renderer->GetCurrentWorldGeometry2DUpdateTime())
     || (rendererInfo.m_LastUpdateTime
-    < renderer->GetDisplayGeometryUpdateTime()) )
-  {
+        < renderer->GetDisplayGeometryUpdateTime()) )
+    {
     this->GenerateData( renderer );
   }
   else if ( rendererInfo.m_LastUpdateTime
-    < renderer->GetCurrentWorldGeometry2D()->GetMTime() )
+            < renderer->GetCurrentWorldGeometry2D()->GetMTime() )
   {
     this->GenerateData( renderer );
   }
   else if ( (rendererInfo.m_LastUpdateTime < node->GetPropertyList()->GetMTime())
     || (rendererInfo.m_LastUpdateTime
-    < node->GetPropertyList(renderer)->GetMTime()) )
-  {
+        < node->GetPropertyList(renderer)->GetMTime()) )
+    {
     this->GenerateData( renderer );
 
     // since we have checked that nothing important has changed, we can set
@@ -1292,8 +1307,8 @@ mitk::ImageMapperGL2D::Update(mitk::BaseRenderer* renderer)
 
 
 void
-mitk::ImageMapperGL2D
-::DeleteRendererCallback( itk::Object *object, const itk::EventObject & )
+    mitk::ImageMapperGL2D
+    ::DeleteRendererCallback( itk::Object *object, const itk::EventObject & )
 {
   mitk::BaseRenderer *renderer = dynamic_cast< mitk::BaseRenderer* >( object );
   if ( renderer )
@@ -1304,25 +1319,25 @@ mitk::ImageMapperGL2D
 
 
 mitk::ImageMapperGL2D::RendererInfo
-::RendererInfo()
-: m_RendererID(-1), 
-m_iil4mitkImage(NULL), 
-m_Renderer(NULL),
-m_Pic(NULL), 
-m_UnitSpacingImageFilter( NULL ),
-m_Reslicer( NULL ),
-m_TSFilter( NULL ),
-m_Image(NULL),
-m_ReferenceGeometry(NULL), 
-m_TextureInterpolation(true),
-m_ObserverID( 0 )
+    ::RendererInfo()
+      : m_RendererID(-1),
+      m_iil4mitkImage(NULL),
+      m_Renderer(NULL),
+      m_Pic(NULL),
+      m_UnitSpacingImageFilter( NULL ),
+      m_Reslicer( NULL ),
+      m_TSFilter( NULL ),
+      m_Image(NULL),
+      m_ReferenceGeometry(NULL),
+      m_TextureInterpolation(true),
+      m_ObserverID( 0 )
 {
   m_PixelsPerMM.Fill(0);
 };
 
 
 mitk::ImageMapperGL2D::RendererInfo
-::~RendererInfo()
+    ::~RendererInfo()
 {
   this->Squeeze();
 
@@ -1346,8 +1361,8 @@ mitk::ImageMapperGL2D::RendererInfo
 
 
 void
-mitk::ImageMapperGL2D::RendererInfo
-::Set_iil4mitkImage( iil4mitkPicImage *iil4mitkImage )
+    mitk::ImageMapperGL2D::RendererInfo
+    ::Set_iil4mitkImage( iil4mitkPicImage *iil4mitkImage )
 {
   assert( iil4mitkImage != NULL );
 
@@ -1356,7 +1371,7 @@ mitk::ImageMapperGL2D::RendererInfo
 }
 
 void
-mitk::ImageMapperGL2D::RendererInfo::Squeeze()
+    mitk::ImageMapperGL2D::RendererInfo::Squeeze()
 {
   delete m_iil4mitkImage;
   m_iil4mitkImage = NULL;
@@ -1373,7 +1388,7 @@ mitk::ImageMapperGL2D::RendererInfo::Squeeze()
 }
 
 void
-mitk::ImageMapperGL2D::RendererInfo::RemoveObserver()
+    mitk::ImageMapperGL2D::RendererInfo::RemoveObserver()
 {
   if ( m_ObserverID != 0 )
   {
@@ -1384,7 +1399,7 @@ mitk::ImageMapperGL2D::RendererInfo::RemoveObserver()
 
 
 void mitk::ImageMapperGL2D::RendererInfo::Initialize( int rendererID, mitk::BaseRenderer *renderer, 
-                                                   unsigned long observerID )
+                                                      unsigned long observerID )
 {
   // increase ID by one to avoid 0 ID, has to be decreased before remove of the observer
   m_ObserverID = observerID+1;
@@ -1490,7 +1505,7 @@ void mitk::ImageMapperGL2D::SetDefaultProperties(mitk::DataNode* node, mitk::Bas
     }
     if(((overwrite) || (node->GetProperty("opaclevelwindow", renderer)==NULL))
       && (image->GetPixelType().GetItkTypeId() && *(image->GetPixelType().GetItkTypeId()) == typeid(itk::RGBAPixel<unsigned char>)))
-    {
+      {
       mitk::LevelWindow opaclevwin;
       opaclevwin.SetRangeMinMax(0,255);
       opaclevwin.SetWindowBounds(0,255);

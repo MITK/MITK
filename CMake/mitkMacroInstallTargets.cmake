@@ -19,7 +19,7 @@ MACRO(MITK_INSTALL_TARGETS)
     ${ITK_LIBRARY_DIRS}/${intermediate_dir}
     ${QT_LIBRARY_DIR} 
     ${QT_LIBRARY_DIR}/../bin
-    ${MITK_DIR}/bin/${intermediate_dir} 
+    ${MITK_BINARY_DIR}/bin/${intermediate_dir} 
     ${_install_LIBRARY_DIRS}
     )
 

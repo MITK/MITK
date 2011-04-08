@@ -134,6 +134,10 @@ signals:
   */ 
   void PlayerUpdated();
 
+  
+  void InputFileChanged();
+
+
 
 
   protected slots:   

@@ -33,8 +33,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkConeSource.h> 
 
 
-
-
 const std::string QmitkNavigationDataPlayerView::VIEW_ID = "org.mitk.views.navigationdataplayer";
 
 QmitkNavigationDataPlayerView::QmitkNavigationDataPlayerView()
@@ -47,7 +45,6 @@ QmitkNavigationDataPlayerView::QmitkNavigationDataPlayerView()
 
   m_RepresentationObjectsSet = new std::set<mitk::DataNode::Pointer>();
 }
-
 
 
 
@@ -86,6 +83,7 @@ void QmitkNavigationDataPlayerView::CreateConnections()
 {
    connect( (QObject*) m_PlayerWidget, SIGNAL(PlayingStarted()), this, SLOT(CreatePlaybackVisualization()) );
    connect( (QObject*) m_PlayerWidget, SIGNAL(PlayerUpdated()), this, SLOT(PerformPlaybackVisualization()) );
+   connect( (QObject*) m_PlayerWidget, SIGNAL(InputFileChanged()), this, SLOT(Reinit()) );
 }
 
 

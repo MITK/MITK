@@ -66,6 +66,7 @@ public:
   virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget);
   virtual void StdMultiWidgetNotAvailable();
 
+
   protected slots:
     void CreatePlaybackVisualization();
     void PerformPlaybackVisualization();

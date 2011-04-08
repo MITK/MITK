@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKNavigationDataPlayer_H_HEADER_INCLUDED_
 #define MITKNavigationDataPlayer_H_HEADER_INCLUDED_
 
+#include <mitkNavigationDataPlayerBase.h>
 #include <mitkNavigationDataSource.h>
 #include <mitkNavigationDataRecorder.h> //for the Recording Mode enum
 #include "mitkTrackingDevice.h"
@@ -41,10 +42,10 @@ namespace mitk {
   *
   * \ingroup IGT
   */
-  class MitkIGT_EXPORT NavigationDataPlayer : public NavigationDataSource
+  class MitkIGT_EXPORT NavigationDataPlayer : public NavigationDataPlayerBase
   {
   public:
-    mitkClassMacro(NavigationDataPlayer, NavigationDataSource);
+    mitkClassMacro(NavigationDataPlayer, NavigationDataPlayerBase);
     itkNewMacro(Self);
 
     /**

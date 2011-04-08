@@ -247,17 +247,20 @@ void QmitkIGTPlayerWidget::SetPlayer( mitk::NavigationDataPlayer::Pointer player
 
 void QmitkIGTPlayerWidget::OnSelectPressed()
 {
-  this->OnGoToEnd(); /// stops playing and resets lcd numbers
+  
 
   QString oldName = m_CmpFilename;
   m_CmpFilename.clear();
   m_CmpFilename = QFileDialog::getOpenFileName(this, "Load tracking data", QDir::currentPath(),"XML files (*.xml)");
 
   if (m_CmpFilename.isEmpty())//if something went wrong or user pressed cancel in the save dialog
-  {
     m_CmpFilename=oldName;
+  else
+  {
+    this->OnGoToEnd(); /// stops playing and resets lcd numbers
+    emit InputFileChanged();
   }
-  
+
   m_Controls->m_leInputFile->setText(m_CmpFilename);
 }
 

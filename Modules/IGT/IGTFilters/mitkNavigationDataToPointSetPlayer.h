@@ -16,10 +16,10 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 
-#ifndef MITKNavigationDataSequentialPlayer_H_HEADER_INCLUDED_
-#define MITKNavigationDataSequentialPlayer_H_HEADER_INCLUDED_
+#ifndef MITKNavigationDataToPointSetPlayer_H_HEADER_INCLUDED_
+#define MITKNavigationDataToPointSetPlayer_H_HEADER_INCLUDED_
 
-#include <mitkNavigationDataPlayerBase.h>
+#include <mitkNavigationDataSource.h>
 #include "tinyxml.h"
 
 
@@ -33,11 +33,11 @@ namespace mitk
   *
   * \ingroup IGT
   */
-  class MitkIGT_EXPORT NavigationDataSequentialPlayer
-    : public NavigationDataPlayerBase
+  class MitkIGT_EXPORT NavigationDataToPointSetPlayer
+    : public NavigationDataSource
   {
   public:
-    mitkClassMacro(NavigationDataSequentialPlayer, NavigationDataPlayerBase);
+    mitkClassMacro(NavigationDataToPointSetPlayer, NavigationDataSource);
     itkNewMacro(Self);
 
     /**
@@ -88,8 +88,8 @@ namespace mitk
     virtual void UpdateOutputInformation();
 
   protected:
-    NavigationDataSequentialPlayer();
-    virtual ~NavigationDataSequentialPlayer();
+    NavigationDataToPointSetPlayer();
+    virtual ~NavigationDataToPointSetPlayer();
     void ReinitXML();
     mitk::NavigationData::Pointer ReadVersion1();
     ///
@@ -108,4 +108,4 @@ namespace mitk
   };
 } // namespace mitk
 
-#endif /* MITKNavigationDataSequentialPlayer_H_HEADER_INCLUDED_ */
+#endif /* MITKNavigationDataToPointSetPlayer_H_HEADER_INCLUDED_ */

@@ -185,6 +185,11 @@ ${INITIAL_CMAKECACHE_OPTIONS}
   
   if(res GREATER 0 OR force_build)
     
+    if(CTEST_PROJECT_NAME_SUPERBUILD)
+      set(ctest_project_name_orig ${CTEST_PROJECT_NAME})
+      set(CTEST_PROJECT_NAME ${CTEST_PROJECT_NAME_SUPERBUILD})
+    endif()
+
     message("----------- [ Configure SuperBuild ] -----------")
     
     set_property(GLOBAL PROPERTY SubProject SuperBuild)
@@ -274,6 +279,9 @@ ${INITIAL_CMAKECACHE_OPTIONS}
     #func_test("SuperBuild" "${CTEST_BINARY_DIRECTORY}")
     
     set(build_dir "${CTEST_BINARY_DIRECTORY}/${PROJECT_BUILD_DIR}")
+    if(CTEST_PROJECT_NAME_SUPERBUILD)
+      set(CTEST_PROJECT_NAME ${ctest_project_name_orig})
+    endif()
     
     message("----------- [ Configure ${build_dir} ] -----------")
     # Configure target

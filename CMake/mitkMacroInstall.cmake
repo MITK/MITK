@@ -116,9 +116,9 @@ MACRO(_fixup_target)
     ENDIF() 
     
     # use custom version of BundleUtilities
-    message(\"globbed plugins: \${PLUGINS}\")
+    message(\"globbed plugins: \${GLOBBED_QT_PLUGINS} \${GLOBBED_BLUEBERRY_PLUGINS}\")
     SET(PLUGIN_DIRS ${DIRS})
-    SET(PLUGINS ${_install_PLUGINS})
+    SET(PLUGINS ${_install_PLUGINS} \${GLOBBED_QT_PLUGINS} \${GLOBBED_BLUEBERRY_PLUGINS})
     if (PLUGINS)
 	  list(REMOVE_DUPLICATES PLUGINS)
 	endif (PLUGINS)

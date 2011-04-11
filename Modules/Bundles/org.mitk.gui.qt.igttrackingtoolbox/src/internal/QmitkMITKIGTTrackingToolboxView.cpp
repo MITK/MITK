@@ -44,6 +44,7 @@ QmitkMITKIGTTrackingToolboxView::QmitkMITKIGTTrackingToolboxView()
   m_TrackingTimer = new QTimer(this);	
   m_tracking = false;
   m_logging = false;
+  m_loggedFrames = 0;
 }
 
 QmitkMITKIGTTrackingToolboxView::~QmitkMITKIGTTrackingToolboxView()
@@ -66,8 +67,9 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl( QWidget *parent )
     connect( m_Controls->m_StartTracking, SIGNAL(clicked()), this, SLOT(OnStartTracking()) );
     connect( m_Controls->m_StopTracking, SIGNAL(clicked()), this, SLOT(OnStopTracking()) );
     connect( m_TrackingTimer, SIGNAL(timeout()), this, SLOT(UpdateTrackingTimer()));
-    connect( m_Controls->m_EnableLogging, SIGNAL(clicked()), this, SLOT(OnEnableLoggingClicked()));
     connect( m_Controls->m_ChooseFile, SIGNAL(clicked()), this, SLOT(OnChooseFileClicked()));
+    connect( m_Controls->m_StartLogging, SIGNAL(clicked()), this, SLOT(StartLogging()));
+    connect( m_Controls->m_StopLogging, SIGNAL(clicked()), this, SLOT(StopLogging()));
 
     //initialize widgets
     m_Controls->m_configurationWidget->EnableAdvancedUserControl(false);
@@ -159,11 +161,8 @@ catch (...)
   MessageBox("Error while starting the tracking device!");
   return;
   }
-m_TrackingTimer->start(100);
+m_TrackingTimer->start(1000/(m_Controls->m_UpdateRate->value()));
 m_Controls->m_TrackingControlLabel->setText("Status: tracking");
-
-//start logging if logging is on
-if (this->m_Controls->m_EnableLogging->isChecked()) StartLogging();
 
 //connect the tool visualization widget
 for(int i=0; i<m_TrackingDeviceSource->GetNumberOfOutputs(); i++) 
@@ -224,16 +223,20 @@ void QmitkMITKIGTTrackingToolboxView::MessageBox(std::string s)
 void QmitkMITKIGTTrackingToolboxView::UpdateTrackingTimer()
   {
   m_ToolVisualizationFilter->Update();
-  //std::cout << "Position" << m_ToolVisualizationFilter->GetOutput(0)->GetPosition() << std::endl;
   mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-  if (m_logging) this->m_loggingFilter->Update();
+  if (m_logging) 
+    {
+    this->m_loggingFilter->Update();
+    m_loggedFrames = this->m_loggingFilter->GetRecordCounter();
+    this->m_Controls->m_LoggedFramesLabel->setText("Logged Frames: "+QString::number(m_loggedFrames));
+    //check if logging stopped automatically
+    if((m_loggedFrames>1)&&(!m_loggingFilter->GetRecording())) 
+      {
+      m_Controls->m_LoggingLabel->setText("Logging OFF");
+      m_logging = false;
+      }
+    }
   m_Controls->m_TrackingToolsStatusWidget->Refresh();
-  }
-
-void QmitkMITKIGTTrackingToolboxView::OnEnableLoggingClicked()
-  {
-  if (this->m_tracking && this->m_Controls->m_EnableLogging->isChecked() && !this->m_logging) StartLogging();
-  else if (!this->m_Controls->m_EnableLogging->isChecked() && this->m_logging) StopLogging();
   }
 
 void QmitkMITKIGTTrackingToolboxView::OnChooseFileClicked()
@@ -250,16 +253,26 @@ void QmitkMITKIGTTrackingToolboxView::StartLogging()
   if (m_Controls->m_xmlFormat->isChecked()) m_loggingFilter->SetOutputFormat(mitk::NavigationDataRecorder::xml);
   else if (m_Controls->m_csvFormat->isChecked()) m_loggingFilter->SetOutputFormat(mitk::NavigationDataRecorder::csv);
   m_loggingFilter->SetFileName(m_Controls->m_LoggingFileName->text().toStdString().c_str());
+  if (m_Controls->m_LoggingLimit->isChecked()){m_loggingFilter->SetRecordCountLimit(m_Controls->m_LoggedFramesLimit->value());}
   
   //connect filter
   for(int i=0; i<m_ToolVisualizationFilter->GetNumberOfOutputs(); i++){m_loggingFilter->AddNavigationData(m_ToolVisualizationFilter->GetOutput(i));}
-  
+ 
+  //start filter
   m_loggingFilter->StartRecording();
+
+  //update labels / logging variables
+  this->m_Controls->m_LoggingLabel->setText("Logging ON");
+  this->m_Controls->m_LoggedFramesLabel->setText("Logged Frames: 0");
+  m_loggedFrames = 0;
   m_logging = true;
   }
 
 void QmitkMITKIGTTrackingToolboxView::StopLogging()
   {
+  //update label
+  this->m_Controls->m_LoggingLabel->setText("Logging OFF");
+
   m_loggingFilter->StopRecording();
   m_logging = false;
   }

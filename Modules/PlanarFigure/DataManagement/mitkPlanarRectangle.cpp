@@ -91,7 +91,7 @@ void mitk::PlanarRectangle::GeneratePolyLine()
   // TODO: start polygon at specified initalize point...
 
   ClearPolyLines();
-  PolyLineType polyLine = GetPolyline( 0 );
+  PolyLineType polyLine = GetPolyLine( 0 );
  
   for ( unsigned int i = 0; i < this->GetNumberOfControlPoints(); ++i )
   {
@@ -144,8 +144,6 @@ void mitk::PlanarRectangle::PrintSelf( std::ostream& os, itk::Indent indent) con
   os << indent << "Number of control points: " << this->GetNumberOfControlPoints() << std::endl;
 
   os << indent << "Control points:" << std::endl;
-
-  mitk::PlanarFigure::VertexContainerType::ConstIterator it;
 
   for ( unsigned int i = 0; i < this->GetNumberOfControlPoints(); ++i )
   {

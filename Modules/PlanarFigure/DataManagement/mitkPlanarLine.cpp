@@ -27,8 +27,6 @@ mitk::PlanarLine::PlanarLine()
   this->ResetNumberOfControlPoints( 2 );
 
   this->SetNumberOfPolyLines( 1 );
-
-  //m_PolyLines->InsertElement( 0, VertexContainerType::New());
 }
 
 
@@ -44,10 +42,6 @@ void mitk::PlanarLine::GeneratePolyLine()
   // Generate poly-line 
   this->AppendPointToPolyLine( 0 , mitk::PlanarFigure::PolyLineElement( this->GetControlPoint(0), 0) );
   this->AppendPointToPolyLine( 0 , mitk::PlanarFigure::PolyLineElement( this->GetControlPoint(1), 0) );
-  
-  //m_PolyLines->ElementAt( 0 )->Reserve( 2 );
-  //m_PolyLines->ElementAt( 0 )->ElementAt( 0 ) = m_ControlPoints->ElementAt( 0 );
-  //m_PolyLines->ElementAt( 0 )->ElementAt( 1 ) = m_ControlPoints->ElementAt( 1 );
 }
 
 void mitk::PlanarLine::GenerateHelperPolyLine(double /*mmPerDisplayUnit*/, unsigned int /*displayHeight*/)

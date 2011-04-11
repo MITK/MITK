@@ -64,7 +64,8 @@ foreach(type LIBRARY RUNTIME ARCHIVE)
   # Make sure the directory exists
   if(DEFINED MITK_CMAKE_${type}_OUTPUT_DIRECTORY
      AND NOT EXISTS ${MITK_CMAKE_${type}_OUTPUT_DIRECTORY})
-    message(FATAL_ERROR "MITK_CMAKE_${type}_OUTPUT_DIRECTORY is set to a non-existing directory [${MITK_CMAKE_${type}_OUTPUT_DIRECTORY}]")
+    message("Creating directory MITK_CMAKE_${type}_OUTPUT_DIRECTORY: ${MITK_CMAKE_${type}_OUTPUT_DIRECTORY}")
+    file(MAKE_DIRECTORY "${MITK_CMAKE_${type}_OUTPUT_DIRECTORY}")
   endif()
 
   if(MITK_USE_SUPERBUILD)

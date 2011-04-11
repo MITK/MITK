@@ -213,8 +213,7 @@ bool mitk::PlanarFigureInteractor
 
   case AcMOVEPOINT:
     {
-
-      bool isEditable = false;
+      bool isEditable = true;
       m_DataNode->GetBoolProperty( "planarfigure.iseditable", isEditable );
 
       // Extract point in 2D world coordinates (relative to Geometry2D of

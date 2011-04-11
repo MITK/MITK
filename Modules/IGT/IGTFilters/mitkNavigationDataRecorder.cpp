@@ -302,7 +302,6 @@ void mitk::NavigationDataRecorder::StopRecording()
   m_NumberOfRecordedFiles++;
   m_Recording = false;
   m_Stream->flush();
-  Sleep(100); //give the stream some time to write everything
   delete m_Stream;
   m_Stream = NULL;   
 }

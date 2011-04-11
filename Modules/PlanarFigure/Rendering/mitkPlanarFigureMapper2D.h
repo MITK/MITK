@@ -122,8 +122,6 @@ public:
 
 protected:
   
-  typedef PlanarFigure::VertexContainerType VertexContainerType;
-
   enum PlanarFigureDisplayMode
   {
     PF_DEFAULT = 0,

@@ -71,8 +71,6 @@ public:
     int Index;
   };
 
-  typedef itk::VectorContainer< unsigned long, mitk::Point2D > VertexContainerType;
-  typedef itk::VectorContainer< unsigned long, VertexContainerType::Pointer> VertexContainerVectorType;
   typedef itk::VectorContainer< unsigned long, bool>  BoolContainerType;
 
   typedef std::deque< Point2D > ControlPointListType;
@@ -160,30 +158,6 @@ public:
 
   /** \brief Returns specified control point in world coordinates. */
   Point3D GetWorldControlPoint( unsigned int index ) const;
-
-
-  /** \brief defines the number of PolyLines that will be available */
-  void SetNumberOfPolyLines( unsigned int numberOfPolyLines );
-
-  /** \brief returns the PolyLine for the given index. */
-  const PolyLineType GetPolyline( int index ) const;
-
-  /** \brief Append a point to the PolyLine # index */
-  void AppendPointToPolyLine( unsigned int index, PolyLineElement element );
-
-  /** \brief clears the list of PolyLines. Call before re-calculating a new Polyline. */
-  void ClearPolyLines();
-
-
-  /** \brief defines the number of HelperPolyLines that will be available */
-  void SetNumberOfHelperPolyLines( unsigned int numberOfHelperPolyLines );
-
-  /** \brief Append a point to the HelperPolyLine # index */
-  void AppendPointToHelperPolyLine( unsigned int index, PolyLineElement element );
-
-  /** \brief clears the list of HelperPolyLines. Call before re-calculating a new HelperPolyline. */
-  void ClearHelperPolyLines();
-
 
 
   /** \brief Returns the polyline representing the planar figure
@@ -331,6 +305,27 @@ protected:
   /** \brief Initializes the TimeSlicedGeometry describing the (time-resolved)
    * geometry of this figure. Note that each time step holds one Geometry2D. */
   virtual void InitializeTimeSlicedGeometry( unsigned int timeSteps = 1 );
+
+  /** \brief defines the number of PolyLines that will be available */
+  void SetNumberOfPolyLines( unsigned int numberOfPolyLines );
+
+  /** \brief Append a point to the PolyLine # index */
+  void AppendPointToPolyLine( unsigned int index, PolyLineElement element );
+
+  /** \brief clears the list of PolyLines. Call before re-calculating a new Polyline. */
+  void ClearPolyLines();
+
+
+  /** \brief defines the number of HelperPolyLines that will be available */
+  void SetNumberOfHelperPolyLines( unsigned int numberOfHelperPolyLines );
+
+  /** \brief Append a point to the HelperPolyLine # index */
+  void AppendPointToHelperPolyLine( unsigned int index, PolyLineElement element );
+
+  /** \brief clears the list of HelperPolyLines. Call before re-calculating a new HelperPolyline. */
+  void ClearHelperPolyLines();
+
+
 
   virtual void PrintSelf( std::ostream& os, itk::Indent indent ) const;
 

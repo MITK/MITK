@@ -33,8 +33,6 @@ mitk::PlanarCross::PlanarCross()
 
   // Create helper polyline object (for drawing the orthogonal orientation line)
   this->SetNumberOfHelperPolyLines( 1 );
-  //m_HelperPolyLines->InsertElement( 0, VertexContainerType::New());
-  //m_HelperPolyLines->ElementAt( 0 )->Reserve( 2 );
   m_HelperPolyLinesToBePainted->InsertElement( 0, false );
 }
 
@@ -82,7 +80,6 @@ bool mitk::PlanarCross::ResetOnPointSelect()
     {
       // Control point 0 selected: exchange points 0 and 1
       Point2D tmpPoint = this->GetControlPoint( 0 );
-      //Point2D tmpPoint = m_ControlPoints->ElementAt( 0 );
       this->SetControlPoint( 0, this->GetControlPoint( 1 ) );
       this->SetControlPoint( 1, tmpPoint );
       // FALLS THROUGH!

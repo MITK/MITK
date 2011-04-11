@@ -336,7 +336,7 @@ void mitk::PlanarFigureMapper2D::DrawMainLines(
 {
   for ( unsigned short loop = 0; loop < figure->GetPolyLinesSize(); ++loop )
   {
-    PlanarFigure::PolyLineType polyline = figure->GetPolyline(loop);
+    PlanarFigure::PolyLineType polyline = figure->GetPolyLine(loop);
 
     this->PaintPolyLine( polyline, 
       figure->IsClosed(),    

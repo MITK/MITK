@@ -506,7 +506,7 @@ void mitk::PlanarFigure::PrintSelf( std::ostream& os, itk::Indent indent) const
   os << indent << "Maximum number of control points: " << this->GetMaximumNumberOfControlPoints() << std::endl;
   os << indent << "Current number of control points: " << this->GetNumberOfControlPoints() << std::endl;
   os << indent << "Control points:" << std::endl;
-  mitk::PlanarFigure::VertexContainerType::ConstIterator it;  
+
   for ( unsigned int i = 0; i < this->GetNumberOfControlPoints(); ++i )
   {
     //os << indent.GetNextIndent() << i << ": " << m_ControlPoints->ElementAt( i ) << std::endl;
@@ -620,21 +620,23 @@ void mitk::PlanarFigure::SetNumberOfHelperPolyLines( unsigned int numberOfHerlpe
 void mitk::PlanarFigure::AppendPointToPolyLine( unsigned int index, PolyLineElement element )
 {
   if ( index < m_PolyLines.size() )
+  {
     m_PolyLines.at( index ).push_back( element );
+  }
   else
+  {
     MITK_ERROR << "Tried to add point to PolyLine " << index+1 << ", although only " << m_PolyLines.size() << " exists";
+  }
 }
 
 void mitk::PlanarFigure::AppendPointToHelperPolyLine( unsigned int index, PolyLineElement element )
 {
   if ( index < m_HelperPolyLines.size() )
+  {
     m_HelperPolyLines.at( index ).push_back( element );
+  }
   else
+  {
     MITK_ERROR << "Tried to add point to HelperPolyLine " << index+1 << ", although only " << m_HelperPolyLines.size() << " exists";
+  }
 }
-
-const mitk::PlanarFigure::PolyLineType mitk::PlanarFigure::GetPolyline( int index ) const
-{
-  return m_PolyLines.at( index );
-}
-

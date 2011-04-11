@@ -72,6 +72,16 @@ public:
     itkGetMacro(Recording,bool);
 
     /**
+    * \brief Returns the number of data sets / frames which were recorded by the NavigationDataRecorder since start
+    */
+    itkGetMacro(RecordCounter,int);
+
+    /**
+    * \brief Sets a limit of recorded data sets / frames. Recording will be stopped if the number is reached. -1 disables the limit, -1 is default value as well.
+    */
+    itkSetMacro(RecordCountLimit,int);
+
+    /**
     * \brief Adds the input NavigationDatas
     */
     virtual void AddNavigationData(const NavigationData* nd);
@@ -158,6 +168,10 @@ protected:
   	OutputFormatEnum m_OutputFormat; ///< stores the output format; see enum OutputFormat
 
     bool m_Recording; ///< indicates whether the recording is started or not
+
+    int m_RecordCounter; ///< counts the number of frames which are recorded since StartRecording
+
+    int m_RecordCountLimit; ///< limits the number of frames, recording will be stopped if the limit is reached. -1 disables the limit
 
     bool m_firstLine; //for the csv writer to detect wether the header must be written
 

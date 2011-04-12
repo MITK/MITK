@@ -91,7 +91,6 @@ void mitk::PlanarRectangle::GeneratePolyLine()
   // TODO: start polygon at specified initalize point...
 
   ClearPolyLines();
-  PolyLineType polyLine = GetPolyLine( 0 );
  
   for ( unsigned int i = 0; i < this->GetNumberOfControlPoints(); ++i )
   {

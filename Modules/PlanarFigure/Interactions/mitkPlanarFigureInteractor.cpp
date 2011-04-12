@@ -478,9 +478,12 @@ bool mitk::PlanarFigureInteractor
 
         bool selected = false;
         bool isExtendable = false;
+        bool isEditable = true;
         m_DataNode->GetBoolProperty("selected", selected);
         m_DataNode->GetBoolProperty("planarfigure.isextendable", isExtendable);
-        if ( selected && isHovering && isExtendable && pointIndex == -1 )
+        m_DataNode->GetBoolProperty( "planarfigure.iseditable", isEditable );
+
+        if ( selected && isHovering && isExtendable && pointIndex == -1 && isEditable )
         {
           const mitk::PositionEvent *positionEvent = 
             dynamic_cast< const mitk::PositionEvent * > ( stateEvent->GetEvent() );

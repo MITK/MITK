@@ -53,11 +53,14 @@ int mitkToFCameraPMDPlayerControllerTest(int /* argc */, char* /*argv*/[])
   // the platform we are working on!
   std::string  platformVar = MITK_TOF_PLATFORM;
 
- if( platformVar == "W32")
+  if( platformVar == "W32")
   {
-    MITK_TEST_CONDITION_REQUIRED( testObject->OpenCameraConnection(),"Testing OpenConnection with valid data!");
-    MITK_TEST_CONDITION_REQUIRED( !testObject->GetIntegrationTime() == 0, "Testing passing of integration time from PMD data!");
-    MITK_TEST_CONDITION_REQUIRED( !testObject->GetModulationFrequency() == 0, "Testing passing of modulation frequency from PMD data!");
+    if(std::string(MITK_TOF_PMDFILE_SOURCE_PLUGIN) != "")
+    {
+      MITK_TEST_CONDITION_REQUIRED( testObject->OpenCameraConnection(),"Testing OpenConnection with valid data!");
+      MITK_TEST_CONDITION_REQUIRED( !testObject->GetIntegrationTime() == 0, "Testing passing of integration time from PMD data!");
+      MITK_TEST_CONDITION_REQUIRED( !testObject->GetModulationFrequency() == 0, "Testing passing of modulation frequency from PMD data!")
+    }
     // testing disconnection 
     MITK_TEST_CONDITION_REQUIRED ( testObject->CloseCameraConnection(), "Testing CloseConnection with data!");
   }

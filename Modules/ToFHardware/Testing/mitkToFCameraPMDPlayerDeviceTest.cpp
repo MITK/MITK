@@ -35,7 +35,10 @@ int mitkToFCameraPMDPlayerDeviceTest(int /* argc */, char* /*argv*/[])
   // PMDPlayerController only available for W32 systems
   if (platform=="W32")
   {
-    MITK_TEST_CONDITION_REQUIRED(tofCameraPMDPlayerDevice->ConnectCamera(),"Test ConnectCamera()");
+    if(std::string(MITK_TOF_PMDFILE_SOURCE_PLUGIN) != "")
+    {
+      MITK_TEST_CONDITION_REQUIRED(tofCameraPMDPlayerDevice->ConnectCamera(),"Test ConnectCamera()");
+    }
     tofCameraPMDPlayerDevice->StartCamera();
     tofCameraPMDPlayerDevice->UpdateCamera();
     float* distances = new float[40000];

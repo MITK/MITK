@@ -270,7 +270,8 @@ const mitk::PlanarFigure::PolyLineType mitk::PlanarFigure::GetHelperPolyLine( un
   mitk::PlanarFigure::PolyLineType helperPolyLine;
   if ( index < m_HelperPolyLines.size() )
   {
-    if ( !m_HelperLinesUpToDate )
+    // m_HelperLinesUpToDate does not cover changes in zoom-level
+    if ( true /*!m_HelperLinesUpToDate*/ )
     {
       this->GenerateHelperPolyLine(mmPerDisplayUnit, displayHeight);
       m_HelperLinesUpToDate = true;

@@ -127,6 +127,7 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
     this->DrawMainLines( planarFigure,
       m_OutlineColor[lineDisplayMode],
       m_OutlineOpacity[lineDisplayMode],
+      m_DrawShadow,
       m_OutlineWidth,
       firstPoint,
       planarFigureGeometry2D, rendererGeometry2D, displayGeometry );
@@ -135,6 +136,7 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
     this->DrawHelperLines( planarFigure,
       m_OutlineColor[lineDisplayMode],
       m_OutlineOpacity[lineDisplayMode],
+      m_DrawShadow,
       m_OutlineWidth,
       firstPoint,
       planarFigureGeometry2D, rendererGeometry2D, displayGeometry );
@@ -145,6 +147,7 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
   this->DrawMainLines( planarFigure,
     m_LineColor[lineDisplayMode],
     m_LineOpacity[lineDisplayMode],
+    m_DrawShadow,
     m_LineWidth,
     firstPoint,
     planarFigureGeometry2D, rendererGeometry2D, displayGeometry );
@@ -224,6 +227,7 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
   this->DrawHelperLines( planarFigure,
     m_HelperlineColor[lineDisplayMode],
     m_HelperlineOpacity[lineDisplayMode],
+    m_DrawShadow,
     m_LineWidth,
     firstPoint,
     planarFigureGeometry2D, rendererGeometry2D, displayGeometry );
@@ -328,6 +332,7 @@ void mitk::PlanarFigureMapper2D::DrawMainLines(
   mitk::PlanarFigure* figure, 
   float* color, 
   float opacity, 
+  bool drawShadow,
   float lineWidth, 
   Point2D& firstPoint,
   const Geometry2D* planarFigureGeometry2D, 
@@ -337,6 +342,19 @@ void mitk::PlanarFigureMapper2D::DrawMainLines(
   for ( unsigned short loop = 0; loop < figure->GetPolyLinesSize(); ++loop )
   {
     PlanarFigure::PolyLineType polyline = figure->GetPolyLine(loop);
+
+    if ( drawShadow )
+    {
+      float* shadow = new float[3];
+      shadow[0] = 0;
+      shadow[1] = 0;
+      shadow[2] = 0;
+
+      this->PaintPolyLine( polyline, 
+        figure->IsClosed(),    
+        shadow, 0.8, lineWidth*1.2, firstPoint,
+        planarFigureGeometry2D, rendererGeometry2D, displayGeometry );
+    }
 
     this->PaintPolyLine( polyline, 
       figure->IsClosed(),    
@@ -349,6 +367,7 @@ void mitk::PlanarFigureMapper2D::DrawHelperLines(
   mitk::PlanarFigure* figure,
   float* color, 
   float opacity, 
+  bool drawShadow,
   float lineWidth, 
   Point2D& firstPoint,
   const Geometry2D* planarFigureGeometry2D, 
@@ -366,6 +385,18 @@ void mitk::PlanarFigureMapper2D::DrawHelperLines(
     if ( !figure->IsHelperToBePainted( loop ) )
     {
       continue;
+    }
+
+    if ( drawShadow )
+    {
+      float* shadow = new float[3];
+      shadow[0] = 0;
+      shadow[1] = 0;
+      shadow[2] = 0;
+
+      this->PaintPolyLine( helperPolyLine, false,
+        shadow, 0.8, lineWidth*1.2, firstPoint,
+        planarFigureGeometry2D, rendererGeometry2D, displayGeometry );
     }
 
     this->PaintPolyLine( helperPolyLine, false,
@@ -474,6 +505,7 @@ void mitk::PlanarFigureMapper2D::InitializeDefaultPlanarFigureProperties()
   m_IsHovering = false;
   m_DrawOutline = false;
   m_DrawQuantities = false;
+  m_DrawShadow = false;
 
   m_LineWidth = 1.0;
   m_OutlineWidth = 4.0;
@@ -527,6 +559,7 @@ void mitk::PlanarFigureMapper2D::InitializePlanarFigurePropertiesFromDataNode( c
   node->GetBoolProperty( "planarfigure.ishovering", m_IsHovering );
   node->GetBoolProperty( "planarfigure.drawoutline", m_DrawOutline );
   node->GetBoolProperty( "planarfigure.drawquantities", m_DrawQuantities );
+  node->GetBoolProperty( "planarfigure.drawshadow", m_DrawShadow );
 
   node->GetFloatProperty( "planarfigure.line.width", m_LineWidth );
   node->GetFloatProperty( "planarfigure.outline.width", m_OutlineWidth );

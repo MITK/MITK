@@ -14,8 +14,14 @@ SET(proj_DEPENDENCIES)
 SET(OpenCV_DEPENDS ${proj})
 
 IF(NOT DEFINED OpenCV_DIR)
+  IF(WIN32)
+    SET(opencv_url http://mitk.org/download/thirdparty/OpenCV-2.2.0-win.tar.bz2)
+  ELSE()
+    SET(opencv_url http://mitk.org/download/thirdparty/OpenCV-2.2.0.tar.bz2)
+  ENDIF()
+
   ExternalProject_Add(${proj}
-     URL http://mitk.org/download/thirdparty/OpenCV-2.2.0.tar.bz2
+     URL ${opencv_url}
      BINARY_DIR ${proj}-build
      INSTALL_COMMAND ""
      CMAKE_GENERATOR ${gen}

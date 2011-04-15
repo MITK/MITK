@@ -14,8 +14,18 @@ SET(proj_DEPENDENCIES)
 SET(OpenCV_DEPENDS ${proj})
 
 IF(NOT DEFINED OpenCV_DIR)
+
+  OPTION(OpenCV_BUILD_NEW_PYTHON_SUPPORT "Build OpenCV Python wrappers" OFF)
+  MARK_AS_ADVANCED(OpenCV_BUILD_NEW_PYTHON_SUPPORT)
+
+  IF(WIN32)
+    SET(opencv_url http://mitk.org/download/thirdparty/OpenCV-2.2.0-win.tar.bz2)
+  ELSE()
+    SET(opencv_url http://mitk.org/download/thirdparty/OpenCV-2.2.0.tar.bz2)
+  ENDIF()
+
   ExternalProject_Add(${proj}
-     URL http://mitk.org/download/thirdparty/OpenCV-2.2.0.tar.bz2
+     URL ${opencv_url}
      BINARY_DIR ${proj}-build
      INSTALL_COMMAND ""
      CMAKE_GENERATOR ${gen}
@@ -24,6 +34,7 @@ IF(NOT DEFINED OpenCV_DIR)
        -DBUILD_TESTS:BOOL=OFF
        -DBUILD_EXAMPLES:BOOL=OFF
        -DBUILD_DOXYGEN_DOCS:BOOL=OFF
+       -DBUILD_NEW_PYTHON_SUPPORT:BOOL=${OpenCV_BUILD_NEW_PYTHON_SUPPORT}
      DEPENDS ${proj_DEPENDENCIES}
     )
 

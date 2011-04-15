@@ -174,6 +174,7 @@ MACRO(run_ctest)
     # Write initial cache.
     file(WRITE "${CTEST_BINARY_DIRECTORY}/CMakeCache.txt" "
 CTEST_USE_LAUNCHERS:BOOL=${CTEST_USE_LAUNCHERS}
+CTEST_PROJECT_ADDITIONAL_TARGETS:INTERNAL=\"${CTEST_PROJECT_ADDITIONAL_TARGETS}\"
 BUILD_TESTING:BOOL=TRUE
 MITK_CTEST_SCRIPT_MODE:BOOL=TRUE
 CMAKE_BUILD_TYPE:STRING=${CTEST_BUILD_CONFIGURATION}
@@ -195,10 +196,7 @@ ${INITIAL_CMAKECACHE_OPTIONS}
     set_property(GLOBAL PROPERTY SubProject SuperBuild)
     set_property(GLOBAL PROPERTY Label SuperBuild)
     
-    ctest_configure(BUILD "${CTEST_BINARY_DIRECTORY}"
-      OPTIONS "-DCTEST_USE_LAUNCHERS=${CTEST_USE_LAUNCHERS}"
-      RETURN_VALUE res
-    )
+    ctest_configure(BUILD "${CTEST_BINARY_DIRECTORY}" RETURN_VALUE res)
     
     if(res)
       math(EXPR build_errors "${build_errors} + 1") 
@@ -324,6 +322,22 @@ ${INITIAL_CMAKECACHE_OPTIONS}
       # runs only tests that have a LABELS property matching "${subproject}"
       func_test(${subproject} "${build_dir}")
     endforeach()
+    
+    # Build any additional target which is not build by "all"
+    # i.e. the "package" target
+    if(CTEST_PROJECT_ADDITIONAL_TARGETS)
+      foreach(additional_target ${CTEST_PROJECT_ADDITIONAL_TARGETS})
+        set_property(GLOBAL PROPERTY SubProject ${additional_target})
+        set_property(GLOBAL PROPERTY Label ${additional_target})
+        
+        message("----------- [ Build ${additional_target} ] -----------")
+        func_build_target(${additional_target} "${build_dir}")
+        
+        message("----------- [ Test ${additional_target} ] -----------")
+        # runs only tests that have a LABELS property matching "${subproject}"
+        func_test(${additional_target} "${build_dir}")
+      endforeach()
+    endif()
     
     if (WITH_DOCUMENTATION)
       message("----------- [ Build Documentation ] -----------")

@@ -149,9 +149,17 @@ list(APPEND CTEST_PROJECT_SUBPROJECTS
 # Configure CTestConfigSubProject.cmake that could be used by CTest scripts
 configure_file(${MITK_SOURCE_DIR}/CTestConfigSubProject.cmake.in
                ${MITK_BINARY_DIR}/CTestConfigSubProject.cmake)
+               
+if(CTEST_PROJECT_ADDITIONAL_TARGETS)
+  # those targets will be executed at the end of the ctest driver script
+  # and they also get their own subproject label
+  set(subproject_list "${CTEST_PROJECT_SUBPROJECTS};${CTEST_PROJECT_ADDITIONAL_TARGETS}")
+else()
+  set(subproject_list "${CTEST_PROJECT_SUBPROJECTS}")
+endif()
 
 # Generate Project.xml file expected by the CTest driver script
-mitkFunctionGenerateProjectXml(${MITK_BINARY_DIR} ${PROJECT_NAME} "${CTEST_PROJECT_SUBPROJECTS}" ${MITK_USE_SUPERBUILD})
+mitkFunctionGenerateProjectXml(${MITK_BINARY_DIR} ${PROJECT_NAME} "${subproject_list}" ${MITK_USE_SUPERBUILD})
 
 #-----------------------------------------------------------------------------
 # Superbuild script

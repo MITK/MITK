@@ -387,6 +387,7 @@ void mitk::PlanarFigureMapper2D::DrawHelperLines(
       continue;
     }
 
+    // check if shadow shall be painted around the figure
     if ( drawShadow )
     {
       float* shadow = new float[3];
@@ -394,11 +395,14 @@ void mitk::PlanarFigureMapper2D::DrawHelperLines(
       shadow[1] = 0;
       shadow[2] = 0;
 
+      // paint shadow by painting the figure twice
+      // one in black with a slightly broader line-width ...
       this->PaintPolyLine( helperPolyLine, false,
         shadow, 0.8, lineWidth*1.2, firstPoint,
         planarFigureGeometry2D, rendererGeometry2D, displayGeometry );
     }
 
+    // ... and once normally above the shadow.
     this->PaintPolyLine( helperPolyLine, false,
       color, opacity, lineWidth, firstPoint,
       planarFigureGeometry2D, rendererGeometry2D, displayGeometry );

@@ -335,7 +335,6 @@ const mitk::ImageMapperGL2D::InputImageType *
 
 vtkProp* mitk::ImageMapperGL2D::GetVtkProp(mitk::BaseRenderer* renderer)
 {
-  m_VtkActor->SetUserTransform( this->GetDataNode()->GetVtkTransform() );
   return m_VtkActor;
 }
 
@@ -354,14 +353,18 @@ void mitk::ImageMapperGL2D::MitkRenderOpaqueGeometry(BaseRenderer* renderer)
   if ( this->IsVisible( renderer )==false )
     return;
 
+    MITK_INFO << "RenderOpaque";
+
   if ( this->GetVtkProp(renderer)->GetVisibility() )
   {
     this->GetVtkProp(renderer)->RenderOpaqueGeometry( renderer->GetVtkRenderer() );
   }
+  MitkRenderTranslucentGeometry(renderer);
 }
 
 void mitk::ImageMapperGL2D::MitkRenderTranslucentGeometry(BaseRenderer* renderer)
 {
+  MITK_INFO << "RenderTranslucent";
   if ( this->IsVisible(renderer)==false )
     return;
 
@@ -898,6 +901,12 @@ void
   planeMapper->SetInputConnection(plane->GetOutputPort());
 //  planeMapper->ScalarVisibilityOff();
 
+  float opacity = 0;
+  GetOpacity(opacity, renderer);
+//  MITK_INFO << opacity;
+
+  m_VtkActor->GetProperty()->SetOpacity(opacity);
+
   //create a textured plane (the actor)
   m_VtkActor->SetMapper(planeMapper);
   m_VtkActor->SetTexture(texture);
@@ -912,13 +921,10 @@ void
   //  m_VtkActor->GetProperty()->SetColor(1.0, 1.0, 1.0);
   //  m_VtkActor->SetUserTransform(transform);
 
-  float opacity = 0;
-  GetOpacity(opacity, renderer);
 
-  m_VtkActor->GetProperty()->SetOpacity(opacity);
 
   renderer->GetVtkRenderer()->ResetCamera(m_VtkActor->GetBounds());
-  renderer->GetVtkRenderer()->GetActiveCamera()->SetParallelProjection(1);
+//  renderer->GetVtkRenderer()->GetActiveCamera()->SetParallelProjection(1);
 
   renderer->GetVtkRenderer()->GetRenderWindow()->SetInteractor(NULL);
 

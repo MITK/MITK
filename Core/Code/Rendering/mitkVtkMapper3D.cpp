@@ -80,6 +80,8 @@ void VtkMapper3D::MitkRenderTranslucentGeometry(BaseRenderer* renderer)
   if ( this->IsVisible(renderer)==false ) 
     return;
   
+  MITK_INFO << "Render Translucent";
+
  /* if(dynamic_cast<vtkLODProp3D*>(m_Prop3D) != NULL)
   {
     if(  dynamic_cast<BoolProperty*>(GetDataNode()->

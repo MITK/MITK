@@ -80,8 +80,8 @@ void Step8::SetupWidgets()
 //		renderWindowInteractor->SetInteractorStyle(style);
 
 	// Initialize bottom-right view as 3D view
-	multiWidget->GetRenderWindow1()->GetRenderer()->SetMapperID(
-			mitk::BaseRenderer::Extended2D);
+//	multiWidget->GetRenderWindow1()->GetRenderer()->SetMapperID(
+//			mitk::BaseRenderer::Extended2D);
 //	multiWidget->GetRenderWindow1()->GetRenderWindow()->GetInteractor()->SetInteractorStyle(style);
 //	renderWindowInteractor->Start();
 

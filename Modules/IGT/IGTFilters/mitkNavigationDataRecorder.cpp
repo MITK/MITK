@@ -201,7 +201,10 @@ void mitk::NavigationDataRecorder::Update()
           }
       }
     }
-    if (this->m_OutputFormat = mitk::NavigationDataRecorder::csv) *m_Stream << "\n";
+    if (this->m_OutputFormat == mitk::NavigationDataRecorder::csv) 
+    {
+      *m_Stream << "\n";
+    }
   }
   m_RecordCounter++;
   if ((m_RecordCountLimit<=m_RecordCounter)&&(m_RecordCountLimit != -1)) {StopRecording();}

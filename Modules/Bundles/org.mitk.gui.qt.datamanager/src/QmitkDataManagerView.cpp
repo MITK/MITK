@@ -416,6 +416,15 @@ void QmitkDataManagerView::OnPreferencesChanged(const berry::IBerryPreferences* 
   m_NodeTreeView->expandAll();
 
   m_SurfaceDecimation = prefs->GetBool("Use surface decimation", false);
+
+  // Set preferences respecting zooming and padding
+  bool constrainedZooming = prefs->GetBool("Use constrained zooming and padding", false);
+
+  mitk::RenderingManager::GetInstance()->SetConstrainedPaddingZooming(constrainedZooming);
+
+  this->GlobalReinit();
+
+
 }
 
 void QmitkDataManagerView::NodeTableViewContextMenuRequested( const QPoint & pos )
@@ -804,7 +813,7 @@ void QmitkDataManagerView::GlobalReinit( bool )
   mitk::DataStorage::SetOfObjects::ConstPointer rs = this->GetDataStorage()->GetSubset(pred);
   // calculate bounding geometry of these nodes
   mitk::TimeSlicedGeometry::Pointer bounds = this->GetDataStorage()->ComputeBoundingGeometry3D(rs, "visible");
-  
+
   // initialize the views to the bounding geometry
   mitk::RenderingManager::GetInstance()->InitializeViews(bounds);
 }

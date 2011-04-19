@@ -88,6 +88,36 @@ static void TestPlanarPolygonPlacement( mitk::PlanarPolygon::Pointer planarPolyg
   double length1 = 50.0 * 50.0 ; // area
   MITK_TEST_CONDITION( fabs( planarPolygon->GetQuantity( 1 ) - length1) < mitk::eps, "Size of short axis diameter" );
 }
+
+static void TestPlanarPolygonEditing( mitk::PlanarPolygon::Pointer planarPolygon )
+{
+  int initialNumberOfControlPoints = planarPolygon->GetNumberOfControlPoints();
+
+  mitk::Point2D pnt;
+  pnt[0] = 75.0; pnt[1] = 25.0;
+  planarPolygon->AddControlPoint( pnt);
+
+  MITK_TEST_CONDITION( planarPolygon->GetNumberOfControlPoints() == initialNumberOfControlPoints+1, "A new control-point shall be added" );
+  MITK_TEST_CONDITION( planarPolygon->GetControlPoint( planarPolygon->GetNumberOfControlPoints()-1 ) == pnt, "Control-point shall be added at the end." );
+  
+
+  planarPolygon->RemoveControlPoint( 3 );
+  MITK_TEST_CONDITION( planarPolygon->GetNumberOfControlPoints() == initialNumberOfControlPoints, "A control-point has been removed" );
+  MITK_TEST_CONDITION( planarPolygon->GetControlPoint( 3 ) == pnt, "It shall be possible to remove any control-point." );
+
+  planarPolygon->RemoveControlPoint( 0 );
+  planarPolygon->RemoveControlPoint( 0 );
+  planarPolygon->RemoveControlPoint( 0 );
+  MITK_TEST_CONDITION( planarPolygon->GetNumberOfControlPoints() == 3, "Control-points cannot be removed if only three points remain." );
+
+  mitk::Point2D pnt1;
+  pnt1[0] = 33.0; pnt1[1] = 33.0;
+  planarPolygon->AddControlPoint( pnt1, 0 );
+  MITK_TEST_CONDITION( planarPolygon->GetNumberOfControlPoints() == 4, "A control-point has been added" );
+  MITK_TEST_CONDITION( planarPolygon->GetControlPoint( 0 ) == pnt1, "It shall be possible to insert a control-point at any position." );
+  
+}
+
 };
 /**
  * mitkplanarPolygonTest tests the methods and behavior of mitk::PlanarPolygon with sub-tests:
@@ -114,6 +144,8 @@ int mitkPlanarPolygonTest(int /* argc */, char* /*argv*/[])
 
   // Test placement of planarPolygon by control points
   mitkPlanarPolygonTestClass::TestPlanarPolygonPlacement( planarPolygon );
+
+  mitkPlanarPolygonTestClass::TestPlanarPolygonEditing( planarPolygon );
 
   // always end with this!
   MITK_TEST_END();

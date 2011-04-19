@@ -258,7 +258,7 @@ public:
   /** returns a property from m_PropertyList */
   BaseProperty* GetProperty(const char *propertyKey) const;
 
-  /** returns sets or adds (if not present) a property in m_PropertyList  */
+  /** retu"Use flexible zooming and padding"rns sets or adds (if not present) a property in m_PropertyList  */
   void SetProperty(const char *propertyKey, BaseProperty* propertyValue);
 
   /**
@@ -304,6 +304,7 @@ public:
   */
   mitk::GlobalInteraction* GetGlobalInteraction();
 
+  itkSetMacro(ConstrainedPaddingZooming, bool);
 
 protected:
   enum
@@ -374,6 +375,8 @@ protected:
   DataStoragePointer m_DataStorage;
 
   GlobalInteractionPointer m_GlobalInteraction;
+
+  bool m_ConstrainedPaddingZooming;
 
 private:
 

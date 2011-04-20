@@ -353,7 +353,7 @@ void mitk::ImageMapperGL2D::MitkRenderOpaqueGeometry(BaseRenderer* renderer)
   if ( this->IsVisible( renderer )==false )
     return;
 
-    MITK_INFO << "RenderOpaque";
+  //    MITK_INFO << "RenderOpaque";
 
   if ( this->GetVtkProp(renderer)->GetVisibility() )
   {
@@ -364,7 +364,7 @@ void mitk::ImageMapperGL2D::MitkRenderOpaqueGeometry(BaseRenderer* renderer)
 
 void mitk::ImageMapperGL2D::MitkRenderTranslucentGeometry(BaseRenderer* renderer)
 {
-  MITK_INFO << "RenderTranslucent";
+  //  MITK_INFO << "RenderTranslucent";
   if ( this->IsVisible(renderer)==false )
     return;
 
@@ -849,29 +849,29 @@ void
   vtkSmartPointer<vtkPlaneSource> plane = vtkSmartPointer<vtkPlaneSource>::New();
   plane->SetCenter(0.0, 0.0, 0.0);
   plane->SetNormal(0.0, -1.0, 0.0);
-//  plane->SetResolution(256, 256);
+  //  plane->SetResolution(256, 256);
 
   // Does the Geometry2DData contain a PlaneGeometry?
 
-//  renderer->GetDisplayGeometryData()
+  //  renderer->GetDisplayGeometryData()
 
-//    mitk::PlaneGeometry *planeGeometry =
-//      dynamic_cast< PlaneGeometry * >( input->GetGeometry2D() );
+  //    mitk::PlaneGeometry *planeGeometry =
+  //      dynamic_cast< PlaneGeometry * >( input->GetGeometry2D() );
 
-//        // Take the coordinate axes and origin directly from the input geometry.
-//        originNew = planeGeometry->GetOrigin();
-//        rightNew = planeGeometry->GetCornerPoint( false, true );
-//        bottomNew = planeGeometry->GetCornerPoint( true, false );
+  //        // Take the coordinate axes and origin directly from the input geometry.
+  //        originNew = planeGeometry->GetOrigin();
+  //        rightNew = planeGeometry->GetCornerPoint( false, true );
+  //        bottomNew = planeGeometry->GetCornerPoint( true, false );
 
 
-//      // Since the plane is planar, there is no need to subdivide the grid
-//      // (cf. AbstractTransformGeometry case)
-//      plane->SetXResolution( 1 );
-//      plane->SetYResolution( 1 );
+  //      // Since the plane is planar, there is no need to subdivide the grid
+  //      // (cf. AbstractTransformGeometry case)
+  //      plane->SetXResolution( 1 );
+  //      plane->SetYResolution( 1 );
 
-//      plane->SetOrigin( originNew[0], originNew[1], originNew[2] );
-//      plane->SetPoint1( rightNew[0], rightNew[1], rightNew[2] );
-//      plane->SetPoint2( bottomNew[0], bottomNew[1], bottomNew[2] );
+  //      plane->SetOrigin( originNew[0], originNew[1], originNew[2] );
+  //      plane->SetPoint1( rightNew[0], rightNew[1], rightNew[2] );
+  //      plane->SetPoint2( bottomNew[0], bottomNew[1], bottomNew[2] );
 
 
   ScalarType windowMin = 0.0;
@@ -899,11 +899,11 @@ void
 
   vtkSmartPointer<vtkPolyDataMapper> planeMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
   planeMapper->SetInputConnection(plane->GetOutputPort());
-//  planeMapper->ScalarVisibilityOff();
+  //  planeMapper->ScalarVisibilityOff();
 
   float opacity = 0;
   GetOpacity(opacity, renderer);
-//  MITK_INFO << opacity;
+  //  MITK_INFO << opacity;
 
   m_VtkActor->GetProperty()->SetOpacity(opacity);
 
@@ -911,22 +911,28 @@ void
   m_VtkActor->SetMapper(planeMapper);
   m_VtkActor->SetTexture(texture);
 
-  static bool rotated = 0;
-//  if(!rotated){
-//    m_VtkActor->RotateX(90);
-//    m_VtkActor->RotateZ(90);
-//    rotated = 1;
-//  }
+  static bool reseted = 0;
+  //  if(!rotated){
+  //    m_VtkActor->RotateX(90);
+  //    m_VtkActor->RotateZ(90);
+  //    rotated = 1;
+  //  }
 
   //  m_VtkActor->GetProperty()->SetColor(1.0, 1.0, 1.0);
   //  m_VtkActor->SetUserTransform(transform);
 
 
+  if(!reseted)
+  {
+    renderer->GetVtkRenderer()->ResetCamera(m_VtkActor->GetBounds());
+    reseted = 1;
+  }
+  //  renderer->GetVtkRenderer()->GetActiveCamera()->SetParallelProjection(1);
 
-  renderer->GetVtkRenderer()->ResetCamera(m_VtkActor->GetBounds());
-//  renderer->GetVtkRenderer()->GetActiveCamera()->SetParallelProjection(1);
 
   renderer->GetVtkRenderer()->GetRenderWindow()->SetInteractor(NULL);
+  //  vtkSmartPointer<vtkInteractorStyleImage> imgStyle = vtkSmartPointer<vtkInteractorStyleImage>::New();
+  //  renderer->GetVtkRenderer()->GetRenderWindow()->GetInteractor()->SetInteractorStyle(imgStyle);;
 
   // We have been modified
   rendererInfo.m_LastUpdateTime.Modified();

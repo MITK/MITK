@@ -24,12 +24,16 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QmitkFunctionality.h>
 #include <QmitkIGTPlayerWidget.h>
 
+#include <vtkCardinalSpline.h>
+#include <mitkSplineVtkMapper3D.h>
+
 // ui
 #include "ui_QmitkNavigationDataPlayerViewControls.h"
 
 //mitk
 #include <mitkColorSequenceCycleH.h>
 #include <mitkNavigationDataObjectVisualizationFilter.h>
+
 
 
 
@@ -71,14 +75,20 @@ public:
     void CreatePlaybackVisualization();
     void PerformPlaybackVisualization();
     void Reinit();
+    void OnShowTrajectory(int index);
+    void OnPlayingStarted();
 
 protected:
 
   void CreateBundleWidgets(QWidget* parent);
   void RenderScene();
-  mitk::DataNode::Pointer CreateRepresentationObject( const std::string name , const mitk::Color color );
+  mitk::DataNode::Pointer CreateRepresentationObject( const std::string& name , const mitk::Color color );
   void AddRepresentationObject(mitk::DataStorage* ds, mitk::DataNode::Pointer reprObject);
   void RemoveRepresentationObject(mitk::DataStorage* ds, mitk::DataNode::Pointer reprObject);
+
+  void AddTrajectory(mitk::DataStorage* ds, mitk::DataNode::Pointer trajectoryNode);
+
+  mitk::DataNode::Pointer CreateTrajectory( mitk::PointSet::Pointer points, const std::string& name, const mitk::Color color );
 
   Ui::QmitkNavigationDataPlayerViewControls* m_Controls;
   
@@ -89,9 +99,24 @@ protected:
   mitk::NavigationDataObjectVisualizationFilter::Pointer m_Visualizer; // this filter visualizes the navigation data
 
 
-  std::set<mitk::DataNode::Pointer>* m_RepresentationObjectsSet;
+  std::vector<mitk::DataNode::Pointer>* m_RepresentationObjects;
+
+  mitk::DataNode::Pointer m_Trajectory;
+  mitk::PointSet::Pointer m_TrajectoryPointSet;
+  int m_TrajectoryIndex;
+
   
   bool m_ReloadData;
+  bool m_ShowTrajectory;
+
+  vtkCardinalSpline *m_TrajectorySpline;
+  mitk::SplineVtkMapper3D::Pointer m_SplineMapper;
+
+
+private:
+
+  mitk::Color GetColorCircleColor(int index);
+
 
 };
 

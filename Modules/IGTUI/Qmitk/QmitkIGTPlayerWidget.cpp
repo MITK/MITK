@@ -62,7 +62,8 @@ void QmitkIGTPlayerWidget::CreateQtPartControl(QWidget *parent)
     m_Controls->setupUi(parent);
 
     m_PlayingTimer = new QTimer(this); // initialize update timer
-  }
+
+   }
 
 }
 
@@ -70,16 +71,20 @@ void QmitkIGTPlayerWidget::CreateConnections()
 {
   if ( m_Controls )
   {     
-    connect( (QObject*)(m_Controls->m_pbLoadDir), SIGNAL(clicked()), this, SLOT(OnSelectPressed()) ); // open file dialog
-    connect( (QObject*) (m_Controls->m_cbPointSetMode), SIGNAL(clicked(bool)), this, SLOT(OnChangeWidgetView(bool)) ); // widget view switcher
+    connect( (QObject*)(m_Controls->selectPushButton), SIGNAL(clicked()), this, SLOT(OnSelectPressed()) ); // open file dialog
+    //connect( (QObject*) (m_Controls->m_cbPointSetMode), SIGNAL(clicked(bool)), this, SLOT(OnChangeWidgetView(bool)) ); // widget view switcher
 
-    connect( (QObject*)(m_Controls->m_pbPlay), SIGNAL(clicked(bool)), this, SLOT(OnPlayButtonClicked(bool)) ); // play button
+    connect( (QObject*)(m_Controls->playPushButton), SIGNAL(clicked(bool)), this, SLOT(OnPlayButtonClicked(bool)) ); // play button
     connect( (QObject*)(m_PlayingTimer), SIGNAL(timeout()), this, SLOT(OnPlaying()) ); // update timer
 
-    connect( (QObject*) (m_Controls->m_pbBegin), SIGNAL(clicked()), this, SLOT(OnGoToBegin()) ); // reset player and go to begin
-    connect( (QObject*) (m_Controls->m_pbEnd), SIGNAL(clicked()), this, SLOT(OnGoToEnd()) ); // reset player
+    connect( (QObject*) (m_Controls->beginPushButton), SIGNAL(clicked()), this, SLOT(OnGoToBegin()) ); // reset player and go to begin
+    connect( (QObject*) (m_Controls->stopPushButton), SIGNAL(clicked()), this, SLOT(OnGoToEnd()) ); // reset player
+
+    // passing signal from ui component
+    connect( (QObject*) (m_Controls->trajectorySelectComboBox), SIGNAL(currentIndexChanged(int)), this, SLOT(SignalCurrentTrajectoryChanged(int)) );
   }
 }
+
 
 
 bool QmitkIGTPlayerWidget::CheckInputFileValid()
@@ -145,7 +150,7 @@ void QmitkIGTPlayerWidget::OnPlayButtonClicked(bool checked)
   }
 
   else
-    m_Controls->m_pbPlay->setChecked(false); // uncheck play button if file unvalid
+    m_Controls->playPushButton->setChecked(false); // uncheck play button if file unvalid
 }
 
 QTimer*  QmitkIGTPlayerWidget::GetPlayingTimer()
@@ -168,7 +173,7 @@ void QmitkIGTPlayerWidget::StopPlaying()
   m_Player = NULL;
   m_StartTime = -1;  // set starttime back
   this->ResetLCDNumbers();
-  m_Controls->m_pbPlay->setChecked(false); // set play button unchecked
+  m_Controls->playPushButton->setChecked(false); // set play button unchecked
 
 
 }
@@ -194,9 +199,9 @@ void QmitkIGTPlayerWidget::OnPlaying()
     int min = (msc-s) / 60;
 
     // set lcd numbers
-    m_Controls->m_lcdNrMsec->display(ms);
-    m_Controls->m_lcdNrSec->display(s);
-    m_Controls->m_lcdNrMin->display(min);    
+    m_Controls->msecLCDNumber->display(ms);
+    m_Controls->secLCDNumber->display(s);
+    m_Controls->minLCDNumber->display(min);    
 
     emit PlayerUpdated(); // player successfully updated
   }
@@ -215,9 +220,51 @@ const std::vector<mitk::NavigationData::Pointer> QmitkIGTPlayerWidget::GetNaviga
     {
       navDatas.push_back(m_Player->GetOutput(i));
     }
+  } 
+ 
+  return navDatas;    
+}
+
+const mitk::PointSet::Pointer QmitkIGTPlayerWidget::GetNavigationDatasPointSet()
+{
+  mitk::PointSet::Pointer result = mitk::PointSet::New();
+  
+  mitk::PointSet::PointType pointType;
+
+  if(m_Player.IsNotNull())
+  {
+    for(unsigned int i=0; i < m_Player->GetNumberOfOutputs(); ++i)
+    {
+      mitk::NavigationData::PositionType position = m_Player->GetOutput(i)->GetPosition();
+      
+      pointType[0] = position[0];
+      pointType[1] = position[1];
+      pointType[2] = position[2];
+
+      result->InsertPoint(i,pointType);
+    }
   }
 
-  return navDatas;    
+  return result;
+}
+
+const mitk::PointSet::PointType QmitkIGTPlayerWidget::GetNavigationDataPoint(unsigned int index)
+{
+  if( index > this->GetNumberOfTools() || index < 0 )
+    throw std::out_of_range("Tool Index out of range!");
+
+  mitk::PointSet::PointType result;
+
+  if(m_Player.IsNotNull())
+  {
+    mitk::NavigationData::PositionType position = m_Player->GetOutput(index)->GetPosition();
+
+    result[0] = position[0];
+    result[1] = position[1];
+    result[2] = position[2];
+  }
+
+  return result;  
 }
 
 
@@ -235,7 +282,7 @@ void QmitkIGTPlayerWidget::SetInputFileName(const QString& inputFileName)
   {    
     QMessageBox::warning(NULL, "Warning", QString("Please enter valid path! Using previous path again."));
     m_CmpFilename=oldName;
-    m_Controls->m_leInputFile->setText(m_CmpFilename);
+    m_Controls->inputFileLineEdit->setText(m_CmpFilename);
   }
 }
 
@@ -261,7 +308,7 @@ void QmitkIGTPlayerWidget::OnSelectPressed()
     emit InputFileChanged();
   }
 
-  m_Controls->m_leInputFile->setText(m_CmpFilename);
+  m_Controls->inputFileLineEdit->setText(m_CmpFilename);
 }
 
 
@@ -286,55 +333,49 @@ void QmitkIGTPlayerWidget::OnGoToBegin()
   m_StartTime = -1;  // set starttime back
 
   //reset view elements
-  m_Controls->m_pbPlay->setChecked(false);
+  m_Controls->playPushButton->setChecked(false);
   this->ResetLCDNumbers();
  
 }
 
-
-
-void QmitkIGTPlayerWidget::SetWidgetViewToNormalPlayback()
-{
-  m_Controls->m_lblResolution->setHidden(true);
-  m_Controls->m_sbResolution->setHidden(true);
-  m_Controls->m_hsPlaybackPosition->setHidden(true);
-  m_Controls->m_pbFrameBackward->setHidden(true);
-  m_Controls->m_pbFastBackward->setHidden(true);
-  m_Controls->m_pbFrameForward->setHidden(true);
-  m_Controls->m_pbFastForward->setHidden(true);
-  m_Controls->m_lblSample->setHidden(true);
-  m_Controls->m_lcdNrSample->setHidden(true);
-
-}
-
-
-void QmitkIGTPlayerWidget::SetWidgetViewToPointSetPlayback()
-{
-  m_Controls->m_lblResolution->setVisible(true);
-  m_Controls->m_sbResolution->setVisible(true);
-  m_Controls->m_hsPlaybackPosition->setHidden(false);
-  m_Controls->m_pbFrameBackward->setVisible(true);
-  m_Controls->m_pbFastBackward->setVisible(true);
-  m_Controls->m_pbFrameForward->setVisible(true);
-  m_Controls->m_pbFastForward->setVisible(true);
-  m_Controls->m_lblSample->setVisible(true);
-  m_Controls->m_lcdNrSample->setVisible(true);
-}
-
-
-void QmitkIGTPlayerWidget::OnChangeWidgetView(bool pointSetPlaybackView)
-{
-  if(pointSetPlaybackView)
-    this->SetWidgetViewToPointSetPlayback();
-
-  else
-    this->SetWidgetViewToNormalPlayback();    
-}
-
-
 void QmitkIGTPlayerWidget::ResetLCDNumbers()
 {
-    m_Controls->m_lcdNrMin->display(QString("00"));
-    m_Controls->m_lcdNrSec->display(QString("00"));
-    m_Controls->m_lcdNrMsec->display(QString("000")); 
+    m_Controls->minLCDNumber->display(QString("00"));
+    m_Controls->secLCDNumber->display(QString("00"));
+    m_Controls->msecLCDNumber->display(QString("000")); 
 }
+
+
+
+void QmitkIGTPlayerWidget::SetTrajectoryNames(const QStringList toolNames)
+{ 
+  QComboBox* cBox = m_Controls->trajectorySelectComboBox;
+ 
+  if(cBox->count() > 0)
+    this->ClearTrajectorySelectCombobox();
+    
+  disconnect( (QObject*) (m_Controls->trajectorySelectComboBox), SIGNAL(currentIndexChanged(int)), this, SIGNAL(SignalCurrentTrajectoryChanged(int)) );
+
+  if(!toolNames.isEmpty())
+    m_Controls->trajectorySelectComboBox->insertItems(0, toolNames);
+
+  connect( (QObject*) (m_Controls->trajectorySelectComboBox), SIGNAL(currentIndexChanged(int)), this, SIGNAL(SignalCurrentTrajectoryChanged(int)) );
+
+}
+
+
+int QmitkIGTPlayerWidget::GetResolution()
+{
+   return m_Controls->resolutionSpinBox->value();
+}
+
+void QmitkIGTPlayerWidget::ClearTrajectorySelectCombobox()
+{
+  disconnect( (QObject*) (m_Controls->trajectorySelectComboBox), SIGNAL(currentIndexChanged(int)), this, SIGNAL(SignalCurrentTrajectoryChanged(int)) );
+  
+  m_Controls->trajectorySelectComboBox->clear();
+  
+  connect( (QObject*) (m_Controls->trajectorySelectComboBox), SIGNAL(currentIndexChanged(int)), this, SIGNAL(SignalCurrentTrajectoryChanged(int)) );
+}
+
+

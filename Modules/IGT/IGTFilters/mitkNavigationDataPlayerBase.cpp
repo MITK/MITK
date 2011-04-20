@@ -24,6 +24,9 @@ mitk::NavigationDataPlayerBase::~NavigationDataPlayerBase()
 {
 }
 
+
+
+
 void mitk::NavigationDataPlayerBase::UpdateOutputInformation()
 {
   this->Modified();  // make sure that we need to be updated

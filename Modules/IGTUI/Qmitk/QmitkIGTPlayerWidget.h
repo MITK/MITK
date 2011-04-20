@@ -27,6 +27,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkNavigationDataPlayer.h"
 #include <mitkTimeStamp.h>
 
+#include <mitkPointSet.h>
+
 
 
 //ui header
@@ -76,15 +78,21 @@ public:
   */ 
   const std::vector<mitk::NavigationData::Pointer> GetNavigationDatas();
 
-  /*!  
-  \brief Sets the widget's look for the normal playback
-  */ 
-  void SetWidgetViewToNormalPlayback();
 
-  /*!  
-  \brief Sets the widget's look for the PointSet playback
-  */ 
-  void SetWidgetViewToPointSetPlayback();
+  const mitk::PointSet::Pointer GetNavigationDatasPointSet();
+
+
+  const mitk::PointSet::PointType GetNavigationDataPoint(unsigned int index);
+
+  ///*!  
+  //\brief Sets the widget's look for the normal playback
+  //*/ 
+  //void SetWidgetViewToNormalPlayback();
+
+  ///*!  
+  //\brief Sets the widget's look for the PointSet playback
+  //*/ 
+  //void SetWidgetViewToPointSetPlayback();
 
 
   /*!  
@@ -105,7 +113,13 @@ public:
   */ 
   void StopPlaying();
 
- 
+
+  void SetTrajectoryNames(const QStringList toolNames);
+
+  int GetResolution();
+  
+  void ClearTrajectorySelectCombobox();
+
 
 signals:
   /*!  
@@ -136,6 +150,9 @@ signals:
 
   
   void InputFileChanged();
+
+
+  void SignalCurrentTrajectoryChanged(int index);
 
 
 
@@ -169,10 +186,13 @@ signals:
     \brief Stops the playback and resets the player to the beginning
     */ 
     void OnGoToBegin();
-    /*!  
-    \brief Switches between the normal playback view and the PointSet playback view
-    */ 
-    void OnChangeWidgetView(bool pointSetPlaybackView);
+
+
+
+    ///*!  
+    //\brief Switches between the normal playback view and the PointSet playback view
+    //*/ 
+    //void OnChangeWidgetView(bool pointSetPlaybackView);
 
 
 
@@ -202,7 +222,6 @@ protected:
   QTimer* m_PlayingTimer; ///< update timer
 
   mitk::NavigationData::TimeStampType m_StartTime; ///< start time of playback needed for time display
-
 
 };
 #endif

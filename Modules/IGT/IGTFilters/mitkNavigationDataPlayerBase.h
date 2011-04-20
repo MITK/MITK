@@ -43,6 +43,12 @@ namespace mitk{
     */
     virtual void UpdateOutputInformation();
 
+   /**
+    * \brief This method checks if player arrived at end of file.
+    * 
+    *\warning This method is not tested yet. It is not save to use!
+    */
+    const bool IsAtEnd();
 
   protected:
     virtual ~NavigationDataPlayerBase();

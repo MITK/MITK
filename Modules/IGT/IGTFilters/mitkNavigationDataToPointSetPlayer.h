@@ -19,7 +19,9 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKNavigationDataToPointSetPlayer_H_HEADER_INCLUDED_
 #define MITKNavigationDataToPointSetPlayer_H_HEADER_INCLUDED_
 
-#include <mitkNavigationDataSource.h>
+#include <mitkNavigationDataPlayerBase.h>
+#include <mitkNavigationDataToPointSetFilter.h>
+#include <mitkPointSet.h>
 #include "tinyxml.h"
 
 
@@ -34,10 +36,10 @@ namespace mitk
   * \ingroup IGT
   */
   class MitkIGT_EXPORT NavigationDataToPointSetPlayer
-    : public NavigationDataSource
+    : public NavigationDataPlayerBase
   {
   public:
-    mitkClassMacro(NavigationDataToPointSetPlayer, NavigationDataSource);
+    mitkClassMacro(NavigationDataToPointSetPlayer, NavigationDataPlayerBase);
     itkNewMacro(Self);
 
     /**
@@ -87,6 +89,47 @@ namespace mitk
     */
     virtual void UpdateOutputInformation();
 
+
+
+    /**
+    * \brief This method starts the player. 
+    *
+    * Before the stream has to be set. Either with a PlayingMode (SetStream(PlayerMode)) and FileName. Or
+    * with an own inputstream (SetStream(istream*)).
+    */
+    void StartPlaying();
+
+    /**
+    * \brief Stops the player and closes the stream. After a call of StopPlaying()
+    * StartPlaying() must be called to get new output data
+    *
+    * \warning the output is generated in this method because we know first about the number of output after
+    * reading the first lines of the XML file. Therefore you should assign your output after the call of this method
+    */
+    void StopPlaying();
+
+    /**
+    * \brief This method pauses the player. If you want to play again call Resume()
+    * 
+    *\warning This method is not tested yet. It is not save to use!
+    */
+    void Pause();
+
+    /**
+    * \brief This method resumes the player when it was paused. 
+    * 
+    *\warning This method is not tested yet. It is not save to use!
+    */
+    void Resume();
+
+
+   
+
+
+
+
+    const bool IsAtEnd();
+
   protected:
     NavigationDataToPointSetPlayer();
     virtual ~NavigationDataToPointSetPlayer();
@@ -97,6 +140,9 @@ namespace mitk
     ///
     virtual void GenerateData();
 
+
+    NavigationDataToPointSetFilter::Pointer m_PointSetFilter;
+
     std::string m_FileName;
     std::string m_XMLString;
     TiXmlDocument* m_Doc;
@@ -105,6 +151,8 @@ namespace mitk
     bool m_Repeat;
     unsigned int m_NumberOfSnapshots;
     int m_LastGoTo;
+
+    std::vector<PointSet> m_NDPointSet;
   };
 } // namespace mitk
 

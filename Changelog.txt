@@ -108,3 +108,4 @@ Minor interface changes to lower command complexibility (-classes::method):
 - mitkDataNode::GetInteractor(): now returns a standard C-Pointer, not a SmartPointer. 
 - mitkDataNode::GetPropertyList() and ::GetProperty(): now returns a standard C-Pointer, not a SmartPointer. 
 - mitkPropertyList::GetProperty(): now returns a standard C-Pointer, not a SmartPointer.
+

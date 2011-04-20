@@ -85,8 +85,10 @@ void mitk::PlanarFigure::PlaceFigure( const mitk::Point2D& point )
 
 bool mitk::PlanarFigure::AddControlPoint( const mitk::Point2D& point, int position )
 {
+  // if we already have the maximum number of control points, do nothing
   if ( m_NumberOfControlPoints < this->GetMaximumNumberOfControlPoints() )
   {
+    // if position has not been defined or position would be the last control point, just append the new one
     if ( position == -1 || position > m_NumberOfControlPoints-1 )
     {
       m_ControlPoints.push_back( this->ApplyControlPointConstraints( m_NumberOfControlPoints, point ) );
@@ -94,15 +96,18 @@ bool mitk::PlanarFigure::AddControlPoint( const mitk::Point2D& point, int positi
     }
     else
     {
+      // insert the point at the given position
       ControlPointListType::iterator iter = m_ControlPoints.begin() + position;
       m_ControlPoints.insert( iter, this->ApplyControlPointConstraints( m_NumberOfControlPoints, point ) );
       m_SelectedControlPoint = m_NumberOfControlPoints;
     }
 
+    // polylines & helperpolylines need to be repainted
     m_PolyLineUpToDate = false;
     m_HelperLinesUpToDate = false;
     m_FeaturesUpToDate = false;
 
+    // one control point more
     ++m_NumberOfControlPoints;
     return true;
   }

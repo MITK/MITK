@@ -58,6 +58,7 @@ class Contour;
 * <li>Line widths of planar figure elements
 *   <ul>
 *     <li>"planarfigure.line.width": width of "line" segments (float value, in mm)
+*     <li>"planarfigure.shadow.widthmodifier": the width of the shadow is defined by width of the "line" * this modifier
 *     <li>"planarfigure.outline.width": width of "outline" segments (float value, in mm)
 *     <li>"planarfigure.helperline.width": width of "helperline" segments (float value, in mm)
 *   </ul>
@@ -208,6 +209,8 @@ private:
   bool m_DrawQuantities;
   bool m_DrawShadow;
 
+  // the width of the shadow is defined as 'm_LineWidth * m_ShadowLineWidthModifier'
+  float m_ShadowLineWidthModifier;
   float m_LineWidth;
   float m_OutlineWidth;
   float m_HelperlineWidth;

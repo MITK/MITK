@@ -352,7 +352,7 @@ void mitk::PlanarFigureMapper2D::DrawMainLines(
 
       this->PaintPolyLine( polyline, 
         figure->IsClosed(),    
-        shadow, 0.8, lineWidth*1.2, firstPoint,
+        shadow, 0.8, lineWidth*m_ShadowLineWidthModifier, firstPoint,
         planarFigureGeometry2D, rendererGeometry2D, displayGeometry );
     }
 
@@ -398,7 +398,7 @@ void mitk::PlanarFigureMapper2D::DrawHelperLines(
       // paint shadow by painting the figure twice
       // one in black with a slightly broader line-width ...
       this->PaintPolyLine( helperPolyLine, false,
-        shadow, 0.8, lineWidth*1.2, firstPoint,
+        shadow, 0.8, lineWidth*m_ShadowLineWidthModifier, firstPoint,
         planarFigureGeometry2D, rendererGeometry2D, displayGeometry );
     }
 
@@ -511,6 +511,7 @@ void mitk::PlanarFigureMapper2D::InitializeDefaultPlanarFigureProperties()
   m_DrawQuantities = false;
   m_DrawShadow = false;
 
+  m_ShadowLineWidthModifier = 1.2;
   m_LineWidth = 1.0;
   m_OutlineWidth = 4.0;
   m_HelperlineWidth = 2.0;
@@ -564,8 +565,9 @@ void mitk::PlanarFigureMapper2D::InitializePlanarFigurePropertiesFromDataNode( c
   node->GetBoolProperty( "planarfigure.drawoutline", m_DrawOutline );
   node->GetBoolProperty( "planarfigure.drawquantities", m_DrawQuantities );
   node->GetBoolProperty( "planarfigure.drawshadow", m_DrawShadow );
-
+  
   node->GetFloatProperty( "planarfigure.line.width", m_LineWidth );
+  node->GetFloatProperty( "planarfigure.shadow.widthmodifier", m_ShadowLineWidthModifier );
   node->GetFloatProperty( "planarfigure.outline.width", m_OutlineWidth );
   node->GetFloatProperty( "planarfigure.helperline.width", m_HelperlineWidth );
 

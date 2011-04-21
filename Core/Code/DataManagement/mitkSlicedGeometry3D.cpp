@@ -520,10 +520,8 @@ mitk::SlicedGeometry3D::SetSpacing( const mitk::Vector3D &aSpacing )
     if (planeGeometry != NULL )
     {
       this->WorldToIndex( planeGeometry->GetOrigin(), origin );
-      this->WorldToIndex( planeGeometry->GetOrigin(),
-        planeGeometry->GetAxisVector(0), rightDV );
-      this->WorldToIndex( planeGeometry->GetOrigin(),
-        planeGeometry->GetAxisVector(1), bottomDV );
+      this->WorldToIndex( planeGeometry->GetAxisVector(0), rightDV );
+      this->WorldToIndex( planeGeometry->GetAxisVector(1), bottomDV );
 
       bounds = planeGeometry->GetBounds();
       hasEvenlySpacedPlaneGeometry = true;
@@ -540,8 +538,8 @@ mitk::SlicedGeometry3D::SetSpacing( const mitk::Vector3D &aSpacing )
   {
     //create planeGeometry according to new spacing
     this->IndexToWorld( origin, origin );
-    this->IndexToWorld( origin, rightDV, rightDV );
-    this->IndexToWorld( origin, bottomDV, bottomDV );
+    this->IndexToWorld( rightDV, rightDV );
+    this->IndexToWorld( bottomDV, bottomDV );
 
     mitk::PlaneGeometry::Pointer planeGeometry = mitk::PlaneGeometry::New();
     planeGeometry->SetImageGeometry( this->GetImageGeometry() );

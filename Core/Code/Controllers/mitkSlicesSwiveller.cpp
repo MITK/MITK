@@ -358,9 +358,9 @@ bool SlicesSwiveller
           ScalarType xVector[] = { 1.0, 0.0, 0.0 };
           ScalarType yVector[] = { 0.0, 1.0, 0.0 };
           clickedGeometry->Geometry3D::IndexToWorld( 
-            Point3D(), Vector3D( xVector), m_RotationPlaneXVector );
+            Vector3D( xVector), m_RotationPlaneXVector );
           clickedGeometry->Geometry3D::IndexToWorld( 
-            Point3D(), Vector3D( yVector), m_RotationPlaneYVector );
+            Vector3D( yVector), m_RotationPlaneYVector );
 
           m_RotationPlaneNormal.Normalize();
           m_RotationPlaneXVector.Normalize();

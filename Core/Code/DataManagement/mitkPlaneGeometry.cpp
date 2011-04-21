@@ -104,18 +104,29 @@ void PlaneGeometry::WorldToIndex( const Point2D &pt_mm, Point2D &pt_units ) cons
   pt_units[1]=pt_mm[1]*(1.0/m_ScaleFactorMMPerUnitY);
 }
 
-
-void PlaneGeometry::IndexToWorld( const Point2D &/*atPt2d_units*/, 
+void PlaneGeometry::IndexToWorld( const Point2D &atPt2d_units, 
   const Vector2D &vec_units, Vector2D &vec_mm) const
+{
+  MITK_WARN<<"Warning! Call of the deprecated function PlaneGeometry::IndexToWorld(point, vec, vec). Use PlaneGeometry::IndexToWorld(vec, vec) instead!";
+  this->IndexToWorld(vec_units, vec_mm);
+}
+
+void PlaneGeometry::IndexToWorld(const Vector2D &vec_units, Vector2D &vec_mm) const
 {
   vec_mm[0] = m_ScaleFactorMMPerUnitX * vec_units[0];
   vec_mm[1] = m_ScaleFactorMMPerUnitY * vec_units[1];
 }
 
+void
+PlaneGeometry::WorldToIndex( const Point2D &atPt2d_mm,
+  const Vector2D &vec_mm, Vector2D &vec_units) const
+{
+  MITK_WARN<<"Warning! Call of the deprecated function PlaneGeometry::WorldToIndex(point, vec, vec). Use PlaneGeometry::WorldToIndex(vec, vec) instead!";
+  this->WorldToIndex(vec_mm, vec_units);
+}
 
 void
-PlaneGeometry::WorldToIndex( const Point2D &/*atPt2d_mm*/,
-  const Vector2D &vec_mm, Vector2D &vec_units) const
+PlaneGeometry::WorldToIndex( const Vector2D &vec_mm, Vector2D &vec_units) const
 {
   vec_units[0] = vec_mm[0] * ( 1.0 / m_ScaleFactorMMPerUnitX );
   vec_units[1] = vec_mm[1] * ( 1.0 / m_ScaleFactorMMPerUnitY );

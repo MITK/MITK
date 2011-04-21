@@ -377,6 +377,11 @@ private:
 
   unsigned long m_FeaturesMTime;
 
+  // this pair is used to store the mmInDisplayUnits (m_DisplaySize.first) and the displayHeight (m_DisplaySize.second)
+  // that the helperPolyLines have been calculated for. 
+  // It's used to determine whether or not GetHelperPolyLine() needs to recalculate the HelperPolyLines.
+  std::pair<double, unsigned int> m_DisplaySize;
+
 };
 
 } // namespace mitk

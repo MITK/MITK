@@ -113,7 +113,16 @@ public:
    */
   virtual void PlaceFigure( const Point2D& point );
 
-
+  /**
+  * \brief Adds / inserts new control-points
+  *
+  * This method adds a new control-point with the coordinates defined by point at the given index.
+  * If 'index' == -1 or index is greater than the number of control-points the new point is appended 
+  * to the back of the list of control points.
+  * If a control-point already exists for 'index', an additional point is inserted at that position.
+  * It is not possible to add more points if the maximum number of control-points (GetMaximumNumberOfControlPoints())
+  * has been reached.
+  */
   virtual bool AddControlPoint( const Point2D& point, int index = -1 );
 
   virtual bool SetControlPoint( unsigned int index, const Point2D& point, bool createIfDoesNotExist = false);
@@ -246,6 +255,7 @@ public:
    * execute any reset / initialization statements required. */
   virtual bool ResetOnPointSelect();
 
+  /** \brief removes the point with the given index from the list of controlpoints. */
   virtual void RemoveControlPoint( unsigned int index );
 
   /** \brief Removes last control point */

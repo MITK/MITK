@@ -24,7 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QmitkFunctionality.h>
 #include <QmitkIGTPlayerWidget.h>
 
-#include <vtkCardinalSpline.h>
+#include <mitkLineVtkMapper3D.h>
 #include <mitkSplineVtkMapper3D.h>
 
 // ui
@@ -77,8 +77,14 @@ public:
     void Reinit();
     void OnShowTrajectory(int index);
     void OnPlayingStarted();
+    void OnEnableSplineTrajectoryMapper(bool enable);
 
 protected:
+
+  enum TrajectoryStyle {
+    Points = 1,
+    Splines = 2    
+  };
 
   void CreateBundleWidgets(QWidget* parent);
   void RenderScene();
@@ -90,6 +96,9 @@ protected:
 
   mitk::DataNode::Pointer CreateTrajectory( mitk::PointSet::Pointer points, const std::string& name, const mitk::Color color );
 
+  
+
+
   Ui::QmitkNavigationDataPlayerViewControls* m_Controls;
   
   QmitkStdMultiWidget* m_MultiWidget;
@@ -99,24 +108,31 @@ protected:
   mitk::NavigationDataObjectVisualizationFilter::Pointer m_Visualizer; // this filter visualizes the navigation data
 
 
+
   std::vector<mitk::DataNode::Pointer>* m_RepresentationObjects;
 
   mitk::DataNode::Pointer m_Trajectory;
   mitk::PointSet::Pointer m_TrajectoryPointSet;
   int m_TrajectoryIndex;
 
+
+
+
   
   bool m_ReloadData;
   bool m_ShowTrajectory;
 
-  vtkCardinalSpline *m_TrajectorySpline;
-  mitk::SplineVtkMapper3D::Pointer m_SplineMapper;
+
+  mitk::SplineVtkMapper3D::Pointer m_SplineMapper; // spline trajectory mapper
+  mitk::PointSetVtkMapper3D::Pointer m_PointSetMapper; // standard trajectroy mapper
+
+ 
 
 
 private:
-
   mitk::Color GetColorCircleColor(int index);
 
+  mitk::PointSetVtkMapper3D::Pointer GetTrajectoryMapper(TrajectoryStyle style);
 
 };
 

@@ -44,12 +44,15 @@ QmitkNavigationDataPlayerView::QmitkNavigationDataPlayerView()
 , m_TrajectoryIndex( -1 )
 , m_ReloadData( true )
 , m_ShowTrajectory( false )
-, m_TrajectorySpline( NULL )
+, m_SplineMapper( NULL )
+, m_PointSetMapper( NULL )
 {
 
   m_RepresentationObjects = new std::vector<mitk::DataNode::Pointer>();
   m_TrajectoryPointSet = mitk::PointSet::New();
-  m_SplineMapper = mitk::SplineVtkMapper3D::New();
+
+  
+
 }
 
 
@@ -93,6 +96,9 @@ void QmitkNavigationDataPlayerView::CreateConnections()
    connect( m_PlayerWidget, SIGNAL(InputFileChanged()), this, SLOT(Reinit()) );
    connect( m_PlayerWidget, SIGNAL(SignalCurrentTrajectoryChanged(int)), this, SLOT (OnShowTrajectory(int)) );
    connect( m_PlayerWidget, SIGNAL(PlayingStarted()), this, SLOT(OnPlayingStarted()) );
+
+   connect( m_PlayerWidget, SIGNAL(SignalSplineModeToggled(bool)), this, SLOT(OnEnableSplineTrajectoryMapper(bool)) );
+
 }
 
 
@@ -165,10 +171,18 @@ mitk::DataNode::Pointer QmitkNavigationDataPlayerView::CreateTrajectory( mitk::P
   result->SetName(name);
   result->SetColor(color);
 
- /* result->SetProperty("contourcolor", mitk::ColorProperty::New(color));
-  result->SetBoolProperty("show contour", true);
-  result->SetBoolProperty("updateDataOnRender", false);*/
+  mitk::PointSetVtkMapper3D::Pointer mapper;
 
+  if(m_PlayerWidget->IsTrajectoryInSplineMode())
+    mapper = this->GetTrajectoryMapper(Splines);
+  else
+    mapper = this->GetTrajectoryMapper(Points);
+
+  result->SetMapper(mitk::BaseRenderer::Standard3D, mapper);
+
+  result->SetProperty("contourcolor", mitk::ColorProperty::New(color));
+  result->SetBoolProperty("show contour", true);
+  result->SetBoolProperty("updateDataOnRender", false);
 
 
   return result;
@@ -215,14 +229,36 @@ void QmitkNavigationDataPlayerView::PerformPlaybackVisualization()
     return;
 
   static int update = 0;
+  static int counter = -1;
   update++;
+  
 
   for(unsigned int i = 0 ; i < m_PlayerWidget->GetNavigationDatas().size(); ++i)
   {
     m_Visualizer->SetInput(i, m_PlayerWidget->GetNavigationDatas().at(i));
 
     if(m_ShowTrajectory && (i == m_TrajectoryIndex) && (update % m_PlayerWidget->GetResolution() == 0) )
-      m_TrajectoryPointSet->InsertPoint(update,  m_PlayerWidget->GetNavigationDataPoint(i));
+    {
+      mitk::PointSet::PointType lastPoint;
+
+      if(counter == -1)
+      {
+        lastPoint[0] = -1;
+        lastPoint[1] = -1;
+        lastPoint[2] = -1;
+      }
+      else
+        lastPoint = m_TrajectoryPointSet->GetPoint(counter);
+
+      mitk::PointSet::PointType currentPoint = m_PlayerWidget->GetNavigationDataPoint(i);
+
+      bool diff0 = lastPoint[0] != currentPoint[0];
+      bool diff1 = lastPoint[1] != currentPoint[1];
+      bool diff2 = lastPoint[2] != currentPoint[2];
+
+      if(diff0 || diff1 || diff2)
+        m_TrajectoryPointSet->InsertPoint(++counter,  currentPoint);
+    }
   }
 
   this->RenderScene();
@@ -358,12 +394,23 @@ void QmitkNavigationDataPlayerView::OnShowTrajectory(int index)
     m_TrajectoryIndex = index-1;
 
     mitk::DataNode::Pointer trajectory = this->CreateTrajectory( m_TrajectoryPointSet, prefix.append(name), color );
-    trajectory->SetMapper(mitk::BaseRenderer::Standard3D, m_SplineMapper);
-    
     this->AddTrajectory(this->GetDefaultDataStorage(), trajectory);
   }
 
   
+}
+
+
+void QmitkNavigationDataPlayerView::OnEnableSplineTrajectoryMapper(bool enable)
+{
+  if(m_Trajectory.IsNull())
+    return;
+
+  if(enable)
+      m_Trajectory->SetMapper(mitk::BaseRenderer::Standard3D, this->GetTrajectoryMapper(Splines));
+  
+  else
+     m_Trajectory->SetMapper(mitk::BaseRenderer::Standard3D, this->GetTrajectoryMapper(Points));
 }
 
 
@@ -380,4 +427,24 @@ mitk::Color QmitkNavigationDataPlayerView::GetColorCircleColor(int index)
   }
 
   return result;
+}
+
+
+mitk::PointSetVtkMapper3D::Pointer QmitkNavigationDataPlayerView::GetTrajectoryMapper(TrajectoryStyle style)
+{
+  if(style == Points)
+  { 
+    if(m_PointSetMapper.IsNull())
+      m_PointSetMapper = mitk::PointSetVtkMapper3D::New();
+
+    return m_PointSetMapper;
+  }
+
+  else if(style == Splines)
+  {
+    if(m_SplineMapper.IsNull())
+      m_SplineMapper = mitk::SplineVtkMapper3D::New();
+
+    return m_SplineMapper;
+  }
 }

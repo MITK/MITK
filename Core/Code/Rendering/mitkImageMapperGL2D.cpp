@@ -60,7 +60,7 @@ int mitk::ImageMapperGL2D::numRenderer = 0;
 
 mitk::ImageMapperGL2D::ImageMapperGL2D()
 {
-  m_VtkActor = vtkSmartPointer<vtkActor>::New();
+//  m_VtkActor = vtkSmartPointer<vtkActor>::New();
   m_VtkBased = true;
 }
 
@@ -71,9 +71,9 @@ mitk::ImageMapperGL2D::~ImageMapperGL2D()
 }
 
 
-void
-    mitk::ImageMapperGL2D::Paint( mitk::BaseRenderer *renderer )
+void mitk::ImageMapperGL2D::Paint( mitk::BaseRenderer *renderer )
 {
+
   if ( !this->IsVisible( renderer ) )
   {
     return;
@@ -335,7 +335,7 @@ const mitk::ImageMapperGL2D::InputImageType *
 
 vtkProp* mitk::ImageMapperGL2D::GetVtkProp(mitk::BaseRenderer* renderer)
 {
-  return m_VtkActor;
+  return m_LSH.GetLocalStorage(renderer)->m_Actor;
 }
 
 void mitk::ImageMapperGL2D::MitkRenderOverlay(BaseRenderer* renderer)
@@ -399,6 +399,17 @@ int
 void
     mitk::ImageMapperGL2D::GenerateData( mitk::BaseRenderer *renderer )
 {
+
+  LocalStorage *ls = m_LSH.GetLocalStorage(renderer);
+
+  bool visible = IsVisible(renderer);
+
+  if(visible==false)
+  {
+    ls->m_Actor->VisibilityOff();
+    return;
+  }
+
   mitk::Image *input = const_cast< mitk::ImageMapperGL2D::InputImageType * >(
       this->GetInput()
       );
@@ -846,9 +857,9 @@ void
 
   mitk::Point3D originNew, rightNew, bottomNew;
 
-  vtkSmartPointer<vtkPlaneSource> plane = vtkSmartPointer<vtkPlaneSource>::New();
-  plane->SetCenter(0.0, 0.0, 0.0);
-  plane->SetNormal(0.0, -1.0, 0.0);
+//  vtkSmartPointer<vtkPlaneSource> plane = vtkSmartPointer<vtkPlaneSource>::New();
+  ls->m_Plane->SetCenter(0.0, 0.0, 0.0);
+  ls->m_Plane->SetNormal(0.0, -1.0, 0.0);
   //  plane->SetResolution(256, 256);
 
   // Does the Geometry2DData contain a PlaneGeometry?
@@ -873,6 +884,7 @@ void
   //      plane->SetPoint1( rightNew[0], rightNew[1], rightNew[2] );
   //      plane->SetPoint2( bottomNew[0], bottomNew[1], bottomNew[2] );
 
+  ls->m_ReslicedImage = reslicedImage;
 
   ScalarType windowMin = 0.0;
   ScalarType windowMax = 255.0;
@@ -883,33 +895,30 @@ void
   windowMin = levelWindow.GetLowerWindowBound();
   windowMax = levelWindow.GetUpperWindowBound();
 
-  vtkSmartPointer<vtkLookupTable> lookupTable = vtkSmartPointer<vtkLookupTable>::New();
-  lookupTable->SetSaturationRange( 0.0, 0.0 );
-  lookupTable->SetHueRange( 0.0, 0.0 );
-  lookupTable->SetValueRange( 0.0, 1.0 );
-  lookupTable->SetRange( windowMin, windowMax );
-  lookupTable->Build();
+  ls->m_LookupTable->SetSaturationRange( 0.0, 0.0 );
+  ls->m_LookupTable->SetHueRange( 0.0, 0.0 );
+  ls->m_LookupTable->SetValueRange( 0.0, 1.0 );
+  ls->m_LookupTable->SetRange( windowMin, windowMax );
+  ls->m_LookupTable->Build();
 
-  vtkSmartPointer<vtkTexture> texture = vtkSmartPointer<vtkTexture>::New();
-  texture->SetInput(reslicedImage);
-  texture->InterpolateOn();
-  texture->SetLookupTable( lookupTable );
-  texture->RepeatOff();
+  ls->m_Texture->SetInput(ls->m_ReslicedImage);
+  ls->m_Texture->InterpolateOn();
+  ls->m_Texture->SetLookupTable( ls->m_LookupTable );
+  ls->m_Texture->RepeatOff();
   //  texture->MapColorScalarsThroughLookupTableOn();
 
-  vtkSmartPointer<vtkPolyDataMapper> planeMapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-  planeMapper->SetInputConnection(plane->GetOutputPort());
+  ls->m_Mapper->SetInputConnection(ls->m_Plane->GetOutputPort());
   //  planeMapper->ScalarVisibilityOff();
 
   float opacity = 0;
   GetOpacity(opacity, renderer);
   //  MITK_INFO << opacity;
 
-  m_VtkActor->GetProperty()->SetOpacity(opacity);
+  ls->m_Actor->GetProperty()->SetOpacity(opacity);
 
   //create a textured plane (the actor)
-  m_VtkActor->SetMapper(planeMapper);
-  m_VtkActor->SetTexture(texture);
+  ls->m_Actor->SetMapper(ls->m_Mapper);
+  ls->m_Actor->SetTexture(ls->m_Texture);
 
   static bool reseted = 0;
   //  if(!rotated){
@@ -922,11 +931,11 @@ void
   //  m_VtkActor->SetUserTransform(transform);
 
 
-  if(!reseted)
-  {
-    renderer->GetVtkRenderer()->ResetCamera(m_VtkActor->GetBounds());
-    reseted = 1;
-  }
+//  if(!reseted)
+//  {
+    renderer->GetVtkRenderer()->ResetCamera(ls->m_Actor->GetBounds());
+//    reseted = 1;
+//  }
   //  renderer->GetVtkRenderer()->GetActiveCamera()->SetParallelProjection(1);
 
 

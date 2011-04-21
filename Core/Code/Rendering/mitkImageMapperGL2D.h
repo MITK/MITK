@@ -34,6 +34,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkPolyDataMapper.h>
 #include <vtkActor.h>
 #include <mitkVtkMapper2D.h>
+#include <vtkPlaneSource.h>
+#include <vtkImageData.h>
+#include <vtkLookupTable.h>
 
 
 class iil4mitkPicImage;
@@ -140,6 +143,35 @@ public:
   virtual void MitkRenderOpaqueGeometry(BaseRenderer* renderer);
   virtual void MitkRenderTranslucentGeometry(BaseRenderer* renderer);
   virtual void MitkRenderVolumetricGeometry(BaseRenderer* renderer);
+
+  class LocalStorage : public mitk::Mapper::BaseLocalStorage
+  {
+    public:
+
+      vtkSmartPointer<vtkActor> m_Actor;
+      vtkSmartPointer<vtkPolyDataMapper> m_Mapper;
+      vtkSmartPointer<vtkImageData> m_ReslicedImage;
+      vtkSmartPointer<vtkPlaneSource> m_Plane;
+      vtkSmartPointer<vtkTexture> m_Texture;
+      vtkSmartPointer<vtkLookupTable> m_LookupTable;
+
+      LocalStorage()
+      {
+        m_Mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+        m_Actor = vtkSmartPointer<vtkActor>::New();
+        m_ReslicedImage = vtkSmartPointer<vtkImageData>::New();
+        m_Plane = vtkSmartPointer<vtkPlaneSource>::New();
+        m_Texture = vtkSmartPointer<vtkTexture>::New();
+        m_LookupTable = vtkSmartPointer<vtkLookupTable>::New();
+      }
+
+      ~LocalStorage()
+      {
+      }
+  };
+
+  mitk::Mapper::LocalStorageHandler<LocalStorage> m_LSH;
+
 
   /** \brief Internal storage class for data needed for rendering into a
    * renderer
@@ -305,7 +337,7 @@ protected:
 private:
   int m_iil4mitkMode;
 
-  vtkSmartPointer<vtkActor> m_VtkActor;
+//  vtkSmartPointer<vtkActor> m_VtkActor;
 
 };
 

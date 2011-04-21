@@ -78,21 +78,15 @@ public:
   */ 
   const std::vector<mitk::NavigationData::Pointer> GetNavigationDatas();
 
-
+  /*!  
+  \brief Returns a PointSet of the current NavigationDatas for all recorded tools.
+  */
   const mitk::PointSet::Pointer GetNavigationDatasPointSet();
 
-
+  /*!  
+  \brief Returns a PointType of the current NavigationData for a specific tool with the given index.
+  */
   const mitk::PointSet::PointType GetNavigationDataPoint(unsigned int index);
-
-  ///*!  
-  //\brief Sets the widget's look for the normal playback
-  //*/ 
-  //void SetWidgetViewToNormalPlayback();
-
-  ///*!  
-  //\brief Sets the widget's look for the PointSet playback
-  //*/ 
-  //void SetWidgetViewToPointSetPlayback();
 
 
   /*!  
@@ -113,46 +107,68 @@ public:
   */ 
   void StopPlaying();
 
-
+  /*!
+  \brief Sets the given tool names list to the trajectory select combobox.
+  */
   void SetTrajectoryNames(const QStringList toolNames);
 
+  /*!
+  \brief Returns the current resolution value from the resolution spinbox.
+  */
   int GetResolution();
   
+  /*!
+  \brief Clears all items in the trajectory selection combobox.
+  */
   void ClearTrajectorySelectCombobox();
+
+  /*!
+  \brief Returns whether spline mode checkbox is selected.
+  */
+  bool IsTrajectoryInSplineMode();
 
 
 signals:
   /*!  
-  \brief This signal is emitted when the player starts the playback
+  \brief This signal is emitted when the player starts the playback.
   */ 
-  void PlayingStarted();
+  void SignalPlayingStarted();
   /*!  
-  \brief This signal is emitted when the player resumes after a pause
+  \brief This signal is emitted when the player resumes after a pause.
   */ 
-  void PlayingResumed();
+  void SignalPlayingResumed();
   /*!  
-  \brief This signal is emitted when the player stops
+  \brief This signal is emitted when the player stops.
   */ 
-  void PlayingStopped();
+  void SignalPlayingStopped();
   /*!  
-  \brief This signal is emitted when the player is paused
+  \brief This signal is emitted when the player is paused.
   */ 
-  void PlayingPaused();
+  void SignalPlayingPaused();
   /*!  
-  \brief This signal is emitted when the player reaches the end of the playback
+  \brief This signal is emitted when the player reaches the end of the playback.
   */ 
-  void PlayingEnded();
+  void SignalPlayingEnded();
 
   /*!  
-  \brief This signal is emitted every time the player updated the NavigationDatas
+  \brief This signal is emitted every time the player updated the NavigationDatas.
   */ 
-  void PlayerUpdated();
+  void SignalPlayerUpdated();
 
-  
-  void InputFileChanged();
+  /*!  
+  \brief This signal is emitted if the input file for the replay was changed.
+  */ 
+  void SignalInputFileChanged();
 
-
+  /*!  
+  \brief This signal is emitted if the index of the current selected trajectory select combobox item changes.
+  */
   void SignalCurrentTrajectoryChanged(int index);
+
+  /*!  
+  \brief This signal is emitted if the spline mode checkbox is toggled or untoggled.
+  */
+  void SignalSplineModeToggled(bool checked);
 
 
 
@@ -186,14 +202,6 @@ signals:
     \brief Stops the playback and resets the player to the beginning
     */ 
     void OnGoToBegin();
-
-
-
-    ///*!  
-    //\brief Switches between the normal playback view and the PointSet playback view
-    //*/ 
-    //void OnChangeWidgetView(bool pointSetPlaybackView);
-
 
 
 protected:

@@ -28,8 +28,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkNavigationToolStorageSerializer.h>
 
 
-
-
 //qt headers
 #include <qfiledialog.h>
 #include <qmessagebox.h>
@@ -42,7 +40,8 @@ QmitkIGTPlayerWidget::QmitkIGTPlayerWidget(QWidget* parent, Qt::WindowFlags f)
   m_Controls = NULL;
   CreateQtPartControl(this);
   CreateConnections();
-  this->ResetLCDNumbers();
+
+  this->ResetLCDNumbers(); // reset lcd numbers at start
 }
 
 
@@ -72,26 +71,30 @@ void QmitkIGTPlayerWidget::CreateConnections()
   if ( m_Controls )
   {     
     connect( (QObject*)(m_Controls->selectPushButton), SIGNAL(clicked()), this, SLOT(OnSelectPressed()) ); // open file dialog
-    //connect( (QObject*) (m_Controls->m_cbPointSetMode), SIGNAL(clicked(bool)), this, SLOT(OnChangeWidgetView(bool)) ); // widget view switcher
-
     connect( (QObject*)(m_Controls->playPushButton), SIGNAL(clicked(bool)), this, SLOT(OnPlayButtonClicked(bool)) ); // play button
     connect( (QObject*)(m_PlayingTimer), SIGNAL(timeout()), this, SLOT(OnPlaying()) ); // update timer
-
     connect( (QObject*) (m_Controls->beginPushButton), SIGNAL(clicked()), this, SLOT(OnGoToBegin()) ); // reset player and go to begin
     connect( (QObject*) (m_Controls->stopPushButton), SIGNAL(clicked()), this, SLOT(OnGoToEnd()) ); // reset player
-
-    // passing signal from ui component
-    connect( (QObject*) (m_Controls->trajectorySelectComboBox), SIGNAL(currentIndexChanged(int)), this, SLOT(SignalCurrentTrajectoryChanged(int)) );
+    // pass this widgets protected combobox signal to public signal
+    connect( (QObject*) (m_Controls->trajectorySelectComboBox), SIGNAL(currentIndexChanged(int)), this, SIGNAL(SignalCurrentTrajectoryChanged(int)) );
+    // pass this widgets protected checkbox signal to public signal
+    connect( m_Controls->splineModeCheckBox, SIGNAL(toggled(bool)), this, SIGNAL(SignalSplineModeToggled(bool)) );
   }
 }
 
+
+bool QmitkIGTPlayerWidget::IsTrajectoryInSplineMode()
+{ 
+  return m_Controls->splineModeCheckBox->isChecked();
+}
 
 
 bool QmitkIGTPlayerWidget::CheckInputFileValid()
 {
   QFile file(m_CmpFilename);
 
-  if(!file.exists())
+  // check if file exists
+  if(!file.exists()) 
   {
     QMessageBox::warning(NULL, "IGTPlayer: Error", "No valid input file was loaded. Please load input file first!");
     return false;
@@ -105,6 +108,7 @@ unsigned int QmitkIGTPlayerWidget::GetNumberOfTools()
 {
   unsigned int result = 0;
   
+  // at the moment this works only if player is initialized
   if(m_Player.IsNotNull())
     result = m_Player->GetNumberOfOutputs();
 
@@ -114,7 +118,7 @@ unsigned int QmitkIGTPlayerWidget::GetNumberOfTools()
 
 void QmitkIGTPlayerWidget::SetUpdateRate(unsigned int msecs)
 {
-  m_PlayingTimer->setInterval((int) msecs);
+  m_PlayingTimer->setInterval((int) msecs); // set update timer update rate
 }
 
 void QmitkIGTPlayerWidget::OnPlayButtonClicked(bool checked)
@@ -131,13 +135,13 @@ void QmitkIGTPlayerWidget::OnPlayButtonClicked(bool checked)
         m_Player->StartPlaying();
         m_PlayingTimer->start(100);
 
-        emit PlayingStarted();
+        emit SignalPlayingStarted();
       }
       else // resume play
       {
         m_Player->Resume();  
         m_PlayingTimer->start(100);
-        emit PlayingResumed();
+        emit SignalPlayingResumed();
       }
     }
 
@@ -145,7 +149,7 @@ void QmitkIGTPlayerWidget::OnPlayButtonClicked(bool checked)
     {
       m_Player->Pause();
       m_PlayingTimer->stop();
-      emit PlayingPaused();
+      emit SignalPlayingPaused();
     }
   }
 
@@ -167,7 +171,7 @@ void QmitkIGTPlayerWidget::OnStopPlaying()
 void QmitkIGTPlayerWidget::StopPlaying()
 {
   m_PlayingTimer->stop();
-  emit PlayingStopped();
+  emit SignalPlayingStopped();
   if(m_Player.IsNotNull())
     m_Player->StopPlaying();
   m_Player = NULL;
@@ -203,7 +207,7 @@ void QmitkIGTPlayerWidget::OnPlaying()
     m_Controls->secLCDNumber->display(s);
     m_Controls->minLCDNumber->display(min);    
 
-    emit PlayerUpdated(); // player successfully updated
+    emit SignalPlayerUpdated(); // player successfully updated
   }
   else
     this->StopPlaying(); // if player is at EOF
@@ -218,7 +222,7 @@ const std::vector<mitk::NavigationData::Pointer> QmitkIGTPlayerWidget::GetNaviga
   {
     for(unsigned int i=0; i < m_Player->GetNumberOfOutputs(); ++i)
     {
-      navDatas.push_back(m_Player->GetOutput(i));
+      navDatas.push_back(m_Player->GetOutput(i)); // push back current navigation data for each tool
     }
   } 
  
@@ -241,7 +245,7 @@ const mitk::PointSet::Pointer QmitkIGTPlayerWidget::GetNavigationDatasPointSet()
       pointType[1] = position[1];
       pointType[2] = position[2];
 
-      result->InsertPoint(i,pointType);
+      result->InsertPoint(i,pointType);  // insert current ND as Pointtype in PointSet for return
     }
   }
 
@@ -257,8 +261,8 @@ const mitk::PointSet::PointType QmitkIGTPlayerWidget::GetNavigationDataPoint(uns
 
   if(m_Player.IsNotNull())
   {
+    // create return PointType from current ND for tool index
     mitk::NavigationData::PositionType position = m_Player->GetOutput(index)->GetPosition();
-
     result[0] = position[0];
     result[1] = position[1];
     result[2] = position[2];
@@ -295,7 +299,6 @@ void QmitkIGTPlayerWidget::SetPlayer( mitk::NavigationDataPlayer::Pointer player
 void QmitkIGTPlayerWidget::OnSelectPressed()
 {
   
-
   QString oldName = m_CmpFilename;
   m_CmpFilename.clear();
   m_CmpFilename = QFileDialog::getOpenFileName(this, "Load tracking data", QDir::currentPath(),"XML files (*.xml)");
@@ -305,7 +308,7 @@ void QmitkIGTPlayerWidget::OnSelectPressed()
   else
   {
     this->OnGoToEnd(); /// stops playing and resets lcd numbers
-    emit InputFileChanged();
+    emit SignalInputFileChanged();
   }
 
   m_Controls->inputFileLineEdit->setText(m_CmpFilename);
@@ -354,13 +357,14 @@ void QmitkIGTPlayerWidget::SetTrajectoryNames(const QStringList toolNames)
   if(cBox->count() > 0)
     this->ClearTrajectorySelectCombobox();
     
+  // before making changed to QComboBox it is recommended to disconnet it's SIGNALS and SLOTS
   disconnect( (QObject*) (m_Controls->trajectorySelectComboBox), SIGNAL(currentIndexChanged(int)), this, SIGNAL(SignalCurrentTrajectoryChanged(int)) );
 
   if(!toolNames.isEmpty())
-    m_Controls->trajectorySelectComboBox->insertItems(0, toolNames);
+    m_Controls->trajectorySelectComboBox->insertItems(0, toolNames); // adding current tool names to combobox
 
+  // reconnect after performed changes
   connect( (QObject*) (m_Controls->trajectorySelectComboBox), SIGNAL(currentIndexChanged(int)), this, SIGNAL(SignalCurrentTrajectoryChanged(int)) );
-
 }
 
 
@@ -371,10 +375,12 @@ int QmitkIGTPlayerWidget::GetResolution()
 
 void QmitkIGTPlayerWidget::ClearTrajectorySelectCombobox()
 {
+  // before making changed to QComboBox it is recommended to disconnet it's SIGNALS and SLOTS
   disconnect( (QObject*) (m_Controls->trajectorySelectComboBox), SIGNAL(currentIndexChanged(int)), this, SIGNAL(SignalCurrentTrajectoryChanged(int)) );
   
   m_Controls->trajectorySelectComboBox->clear();
   
+  // reconnect after performed changes
   connect( (QObject*) (m_Controls->trajectorySelectComboBox), SIGNAL(currentIndexChanged(int)), this, SIGNAL(SignalCurrentTrajectoryChanged(int)) );
 }
 

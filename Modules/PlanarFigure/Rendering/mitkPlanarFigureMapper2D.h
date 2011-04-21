@@ -52,6 +52,7 @@ class Contour;
 *   <ul>
 *     <li>"planarfigure.drawoutline": if true, the "outline" lines is drawn
 *     <li>"planarfigure.drawquantities": if true, the quantities (text) associated with the planar figure is drawn
+*     <li>"planarfigure.drawshadow": if true, a black shadow is drawn around the planar figure
 *     <li>"planarfigure.controlpointshape": style of the control points (enum)
 *   </ul>
 * <li>Line widths of planar figure elements
@@ -165,6 +166,7 @@ protected:
   void DrawMainLines( mitk::PlanarFigure* figure, 
     float* color, 
     float opacity, 
+    bool drawShadow,
     float lineWidth, 
     Point2D& firstPoint,
     const Geometry2D* planarFigureGeometry2D, 
@@ -174,6 +176,7 @@ protected:
   void DrawHelperLines( mitk::PlanarFigure* figure,
     float* color, 
     float opacity, 
+    bool drawShadow,
     float lineWidth, 
     Point2D& firstPoint,
     const Geometry2D* planarFigureGeometry2D, 
@@ -203,6 +206,7 @@ private:
   bool m_IsHovering;
   bool m_DrawOutline;
   bool m_DrawQuantities;
+  bool m_DrawShadow;
 
   float m_LineWidth;
   float m_OutlineWidth;

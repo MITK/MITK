@@ -35,6 +35,9 @@ m_FeaturesMTime( 0 )
 {
   m_HelperPolyLinesToBePainted = BoolContainerType::New();
 
+  m_DisplaySize.first = 0.0;
+  m_DisplaySize.second = 0;
+
   this->SetProperty( "closed", mitk::BoolProperty::New( false ) );
 
   // Currently only single-time-step geometries are supported
@@ -265,15 +268,23 @@ void mitk::PlanarFigure::ClearPolyLines()
   m_PolyLineUpToDate = false;  
 }
 
-const mitk::PlanarFigure::PolyLineType mitk::PlanarFigure::GetHelperPolyLine( unsigned int index, double mmPerDisplayUnit, unsigned int displayHeight )
+const mitk::PlanarFigure::PolyLineType mitk::PlanarFigure::GetHelperPolyLine( unsigned int index, 
+                                                                             double mmPerDisplayUnit, 
+                                                                             unsigned int displayHeight )
 {
   mitk::PlanarFigure::PolyLineType helperPolyLine;
   if ( index < m_HelperPolyLines.size() )
   {
-    if ( !m_HelperLinesUpToDate )
+    // m_HelperLinesUpToDate does not cover changes in zoom-level, so we have to check previous values of the 
+    // two parameters as well
+    if ( !m_HelperLinesUpToDate || m_DisplaySize.first != mmPerDisplayUnit || m_DisplaySize.second != displayHeight )
     {
       this->GenerateHelperPolyLine(mmPerDisplayUnit, displayHeight);
       m_HelperLinesUpToDate = true;
+      
+      // store these parameters to be able to check next time if somebody zoomed in or out 
+      m_DisplaySize.first = mmPerDisplayUnit;
+      m_DisplaySize.second = displayHeight;
     }
 
     helperPolyLine = m_HelperPolyLines.at(index);

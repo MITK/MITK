@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef DiffusionImageMapper_H_HEADER_INCLUDED
 #define DiffusionImageMapper_H_HEADER_INCLUDED
 
-#include "mitkImageMapperGL2D.h"
+#include "mitkImageVtkMapper2D.h"
 
 namespace mitk {
 
@@ -27,11 +27,11 @@ namespace mitk {
   //## @brief Mapper for raw diffusion weighted images
   //## @ingroup Mapper
   template<class TPixelType>
-  class DiffusionImageMapper : public ImageMapperGL2D
+  class DiffusionImageMapper : public ImageVtkMapper2D
   {
   public:
 
-    mitkClassMacro(DiffusionImageMapper,ImageMapperGL2D);
+    mitkClassMacro(DiffusionImageMapper,ImageVtkMapper2D);
     itkNewMacro(Self);
 
     void GenerateData( mitk::BaseRenderer *renderer );

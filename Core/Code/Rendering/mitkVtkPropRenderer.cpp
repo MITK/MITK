@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 // MAPPERS
 #include "mitkMapper.h"
-#include "mitkImageMapperGL2D.h"
+#include "mitkImageVtkMapper2D.h"
 #include "mitkVtkMapper2D.h"
 #include "mitkVtkMapper3D.h"
 #include "mitkGeometry2DDataVtkMapper3D.h"

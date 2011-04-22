@@ -17,7 +17,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkGeometry2DDataVtkMapper3D.h"
 
-#include "mitkImageMapperGL2D.h"
+#include "mitkImageVtkMapper2D.h"
 #include "mitkLookupTableProperty.h"
 #include "mitkSmartPointerProperty.h"
 #include "mitkSurface.h"
@@ -296,7 +296,7 @@ void
   Geometry2DDataVtkMapper3D::ImageMapperDeletedCallback(
   itk::Object *caller, const itk::EventObject& /*event*/ )
 {
-  ImageMapperGL2D *imageMapper = dynamic_cast< ImageMapperGL2D * >( caller );
+  ImageVtkMapper2D *imageMapper = dynamic_cast< ImageVtkMapper2D * >( caller );
   if ( (imageMapper != NULL) )
   {
     if ( m_ImageActors.count( imageMapper ) > 0)
@@ -500,7 +500,7 @@ void Geometry2DDataVtkMapper3D::GenerateData(BaseRenderer* renderer)
     LayerSortedActorList layerSortedActors;
 
 
-    // Traverse the data tree to find nodes resliced by ImageMapperGL2D
+    // Traverse the data tree to find nodes resliced by ImageVtkMapper2D
     mitk::NodePredicateOr::Pointer p = mitk::NodePredicateOr::New();
     p->AddPredicate(mitk::NodePredicateDataType::New("Image"));
     p->AddPredicate(mitk::NodePredicateDataType::New("DiffusionImage"));
@@ -569,8 +569,8 @@ void Geometry2DDataVtkMapper3D::ProcessNode( DataNode * node, BaseRenderer* rend
 {
   if ( node != NULL )
   {
-    ImageMapperGL2D *imageMapper =
-      dynamic_cast< ImageMapperGL2D * >( node->GetMapper(1) );
+    ImageVtkMapper2D *imageMapper =
+      dynamic_cast< ImageVtkMapper2D * >( node->GetMapper(1) );
 
     if(!imageMapper)
     {
@@ -579,7 +579,7 @@ void Geometry2DDataVtkMapper3D::ProcessNode( DataNode * node, BaseRenderer* rend
         std::string cname(node->GetMapper(1)->GetNameOfClass());
         if(!cname.compare("CompositeMapper"))
         {
-          imageMapper = dynamic_cast<ImageMapperGL2D* >( node->GetMapper(3) );
+          imageMapper = dynamic_cast<ImageVtkMapper2D* >( node->GetMapper(3) );
         }
       }
     }
@@ -596,7 +596,7 @@ void Geometry2DDataVtkMapper3D::ProcessNode( DataNode * node, BaseRenderer* rend
         {
           // If it has not been initialized already in a previous pass,
           // generate an actor, a lookup table and a texture object to
-          // render the image associated with the ImageMapperGL2D.
+          // render the image associated with the ImageVtkMapper2D.
           vtkActor *imageActor;
           vtkDataSetMapper *dataSetMapper = NULL;
           vtkLookupTable *lookupTable;
@@ -673,7 +673,7 @@ void Geometry2DDataVtkMapper3D::ProcessNode( DataNode * node, BaseRenderer* rend
           renderer->GetRenderWindow()->MakeCurrent();
 
           // Retrieve and update image to be mapped
-          const ImageMapperGL2D::RendererInfo *rit =
+          const ImageVtkMapper2D::RendererInfo *rit =
             imageMapper->GetRendererInfo( planeRenderer );
           if(rit->m_Image != NULL)
           {

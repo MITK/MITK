@@ -22,16 +22,16 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkGLMapper2D.h"
 #include "mitkVtkMapper2D.h"
 #include "mitkQBallImage.h"
-#include "mitkImageMapperGL2D.h"
+#include "mitkImageVtkMapper2D.h"
 #include "mitkOdfVtkMapper2D.h"
 #include "mitkLevelWindowProperty.h"
 
 namespace mitk {
 
-  class CopyImageMapper2D : public ImageMapperGL2D
+  class CopyImageMapper2D : public ImageVtkMapper2D
   {
   public:
-    mitkClassMacro(CopyImageMapper2D,ImageMapperGL2D);
+    mitkClassMacro(CopyImageMapper2D,ImageVtkMapper2D);
     itkNewMacro(Self);
 
     friend class CompositeMapper;
@@ -92,9 +92,9 @@ namespace mitk {
       m_OdfMapper->SetDataNode(node);
     }
 
-    mitk::ImageMapperGL2D::Pointer GetImageMapper()
+    mitk::ImageVtkMapper2D::Pointer GetImageMapper()
     {
-      ImageMapperGL2D* retval = m_ImgMapper;
+      ImageVtkMapper2D* retval = m_ImgMapper;
       return retval;
     }
 

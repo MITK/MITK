@@ -38,7 +38,7 @@ mitk::DiffusionImageMapper<TPixelType>::GenerateData( mitk::BaseRenderer *render
 {
   int displayIndex(0);
   this->GetDataNode()->GetIntProperty( "DisplayChannel", displayIndex, renderer );
-  InputImageType *input = const_cast< InputImageType* >(
+  mitk::Image *input = const_cast< mitk::Image* >(
     this->GetInput()
     );
   mitk::DiffusionImage<TPixelType> *input2 = dynamic_cast< mitk::DiffusionImage<TPixelType>* >(

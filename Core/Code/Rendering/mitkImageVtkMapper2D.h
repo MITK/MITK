@@ -125,25 +125,42 @@ public:
   virtual void MitkRenderTranslucentGeometry(BaseRenderer* renderer);
   virtual void MitkRenderVolumetricGeometry(BaseRenderer* renderer);
 
+  /** \brief Internal class holding the mapper, actor, etc. for each of the 3 2D render windows */
   class LocalStorage : public mitk::Mapper::BaseLocalStorage
   {
     public:
-
+    /** \brief Actor of a 2D render window. */
       vtkSmartPointer<vtkActor> m_Actor;
+      /** \brief Mapper of a 2D render window. */
       vtkSmartPointer<vtkPolyDataMapper> m_Mapper;
+      /** \brief Current slice of a 2D render window. */
       vtkSmartPointer<vtkImageData> m_ReslicedImage;
+      /** \brief Plane on which the slice is rendered as texture. */
       vtkSmartPointer<vtkPlaneSource> m_Plane;
+      /** \brief The texture which is used to render the current slice. */
       vtkSmartPointer<vtkTexture> m_Texture;
+      /** \brief The lookuptable for colors and level window */
       vtkSmartPointer<vtkLookupTable> m_LookupTable;
 
+      /** \brief Constructor of the local storage. Do as much actions as possible in here to avoid double executions. */
       LocalStorage()
       {
-        m_Mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-        m_Actor = vtkSmartPointer<vtkActor>::New();
         m_ReslicedImage = vtkSmartPointer<vtkImageData>::New();
         m_Plane = vtkSmartPointer<vtkPlaneSource>::New();
         m_Texture = vtkSmartPointer<vtkTexture>::New();
         m_LookupTable = vtkSmartPointer<vtkLookupTable>::New();
+        m_Mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+        m_Actor = vtkSmartPointer<vtkActor>::New();
+        //always the same actions for each render window:
+        //set up the plane
+        m_Plane->SetCenter(0.0, 0.0, 0.0);
+        m_Plane->SetNormal(0.0, -1.0, 0.0);
+        //connect the plane to the mapper
+        m_Mapper->SetInputConnection(m_Plane->GetOutputPort());
+        //set the mapper for the actor
+        m_Actor->SetMapper(m_Mapper);
+        //set the texture for the actor
+        m_Actor->SetTexture(m_Texture);
       }
 
       ~LocalStorage()
@@ -151,8 +168,8 @@ public:
       }
   };
 
+  /** \brief This member holds all three LocalStorages for the three 2D render windows. */
   mitk::Mapper::LocalStorageHandler<LocalStorage> m_LSH;
-
 
   /** \brief Internal storage class for data needed for rendering into a
    * renderer
@@ -231,13 +248,6 @@ public:
 
     void Squeeze();
   }; // RendererInfo
-
-
-
-  /** \brief Get the internal id of the renderer
-   * \sa RendererInfo
-   */
-  virtual int GetAssociatedChannelNr( mitk::BaseRenderer *renderer );
 
   /** \brief Get the RendererInfo for \a renderer */
   const RendererInfo *GetRendererInfo( mitk::BaseRenderer *renderer )

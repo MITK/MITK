@@ -60,7 +60,6 @@ int mitk::ImageMapperGL2D::numRenderer = 0;
 
 mitk::ImageMapperGL2D::ImageMapperGL2D()
 {
-//  m_VtkActor = vtkSmartPointer<vtkActor>::New();
   m_VtkBased = true;
 }
 
@@ -84,11 +83,6 @@ void mitk::ImageMapperGL2D::Paint( mitk::BaseRenderer *renderer )
   RendererInfo &rendererInfo = this->AccessRendererInfo( renderer );
   iil4mitkPicImage *image = rendererInfo.Get_iil4mitkImage();
 
-  //  if ( ( image == NULL ) || ( image->image() == NULL ) )
-  //  {
-  //    return;
-  //  }
-
   const mitk::DisplayGeometry *displayGeometry = renderer->GetDisplayGeometry();
 
   Vector2D topLeft = displayGeometry->GetOriginInMM();
@@ -104,65 +98,6 @@ void mitk::ImageMapperGL2D::Paint( mitk::BaseRenderer *renderer )
   bottomRight += rendererInfo.m_Overlap;
 
   Vector2D diag = ( topLeft - bottomRight );
-  //float size = diag.GetNorm();
-
-  //  glMatrixMode( GL_PROJECTION );
-  //  glLoadIdentity();
-  //  glOrtho( topLeft[0], bottomRight[0], topLeft[1], bottomRight[1], 0.0, 1.0 );
-  //  glMatrixMode( GL_MODELVIEW );
-  //  glDepthMask(GL_FALSE);
-
-  // Define clipping planes to clip the image according to the bounds
-  // correlating to the current world geometry. The "extent" of the bounds
-  // needs to be enlarged by an "overlap" factor, in order to make the
-  // remaining area are large enough to cover rotated planes also.
-  //
-  // Note that this can be improved on, by not merely using a large enough
-  // rectangle for clipping, but using the side surfaces of the transformed
-  // 3D bounds as clipping planes instead. This would clip even rotates
-  // planes at their exact intersection lines with the 3D bounding box.
-  //GLdouble eqn0[4] = {  1.0,  0.0,  0.0, 0.0 };
-  //GLdouble eqn1[4] = {  -1.0,  0.0,  0.0, rendererInfo.m_Extent[0]
-  //  + 2.0 * rendererInfo.m_Overlap[0]/* - rendererInfo.m_PixelsPerMM[0]*/ };
-  //MITK_INFO << "X: " << rendererInfo.m_Extent[0]
-  //  + 2.0 * rendererInfo.m_Overlap[0] - rendererInfo.m_PixelsPerMM[0] << std::endl;
-
-  //GLdouble eqn2[4] = {  0.0,  1.0,  0.0, 0.0 };
-  //GLdouble eqn3[4] = {  0.0, -1.0,  0.0, rendererInfo.m_Extent[1]
-  //  + 2.0 * rendererInfo.m_Overlap[1]/* - rendererInfo.m_PixelsPerMM[1]*/ };
-  //MITK_INFO << "Y:" << rendererInfo.m_Extent[1]
-  //  + 2.0 * rendererInfo.m_Overlap[1] - rendererInfo.m_PixelsPerMM[1] << std::endl;
-
-  // IW commented out the previous lines and reverted to rev. 9358
-  // (version before rev. 9443) See bug #625
-  //  GLdouble eqn0[4] = {0.0, 1.0, 0.0, 0.0};
-  //  GLdouble eqn1[4] = {1.0, 0.0, 0.0, 0.0};
-  //  GLdouble eqn2[4] = {-1.0, 0.0 , 0.0, image->width()};
-  //  GLdouble eqn3[4] = {0, -1.0, 0.0, image->height() };
-
-  //  glClipPlane( GL_CLIP_PLANE0, eqn0 );
-  //  glEnable( GL_CLIP_PLANE0 );
-  //  glClipPlane( GL_CLIP_PLANE1, eqn1 );
-  //  glEnable( GL_CLIP_PLANE1 );
-  //  glClipPlane( GL_CLIP_PLANE2, eqn2 );
-  //  glEnable( GL_CLIP_PLANE2 );
-  //  glClipPlane( GL_CLIP_PLANE3, eqn3 );
-  //  glEnable( GL_CLIP_PLANE3 );
-
-
-  // Render the image
-  //  image->setInterpolation( rendererInfo.m_TextureInterpolation );
-
-
-  //  image->display( renderer->GetRenderWindow() );
-
-
-  //  // Disable the utilized clipping planes
-  //  glDisable( GL_CLIP_PLANE0 );
-  //  glDisable( GL_CLIP_PLANE1 );
-  //  glDisable( GL_CLIP_PLANE2 );
-  //  glDisable( GL_CLIP_PLANE3 );
-
 
   // display volume property, if it exists and should be displayed
   bool shouldShowVolume = false, binary = false;
@@ -311,19 +246,6 @@ void mitk::ImageMapperGL2D::Paint( mitk::BaseRenderer *renderer )
     }
 
   }
-
-  //glPushMatrix();
-  //  glMatrixMode( GL_PROJECTION );
-  //  glLoadIdentity();
-  //  glOrtho(
-  //    0.0, displayGeometry->GetDisplayWidth(),
-  //    0.0, displayGeometry->GetDisplayHeight(),
-  //    0.0, 1.0
-  //    );
-
-  //  glDepthMask(GL_TRUE);
-  //glMatrixMode( GL_MODELVIEW );
-  //glPopMatrix();
 }
 
 
@@ -353,8 +275,6 @@ void mitk::ImageMapperGL2D::MitkRenderOpaqueGeometry(BaseRenderer* renderer)
   if ( this->IsVisible( renderer )==false )
     return;
 
-  //    MITK_INFO << "RenderOpaque";
-
   if ( this->GetVtkProp(renderer)->GetVisibility() )
   {
     this->GetVtkProp(renderer)->RenderOpaqueGeometry( renderer->GetVtkRenderer() );
@@ -364,7 +284,6 @@ void mitk::ImageMapperGL2D::MitkRenderOpaqueGeometry(BaseRenderer* renderer)
 
 void mitk::ImageMapperGL2D::MitkRenderTranslucentGeometry(BaseRenderer* renderer)
 {
-  //  MITK_INFO << "RenderTranslucent";
   if ( this->IsVisible(renderer)==false )
     return;
 
@@ -423,10 +342,7 @@ void
   RendererInfo &rendererInfo = this->AccessRendererInfo( renderer );
   rendererInfo.Squeeze();
 
-
-  //  iil4mitkPicImage *image = new iil4mitkPicImage( 512 );
-  //  rendererInfo.Set_iil4mitkImage( image );
-
+  //TODO ApplyProperties is called here?
   //  this->ApplyProperties( renderer );
 
   const Geometry2D *worldGeometry = renderer->GetCurrentWorldGeometry2D();
@@ -684,8 +600,6 @@ void
   
   rendererInfo.m_UnitSpacingImageFilter->SetInput( inputData );
   rendererInfo.m_Reslicer->SetInput( rendererInfo.m_UnitSpacingImageFilter->GetOutput() );
-  //rendererInfo.m_Reslicer->SetOutputOrigin( 0.0, 0.0, 0.0 );
-  //rendererInfo.m_Reslicer->SetOutputDimensionality( 3 );
   
   rendererInfo.m_PixelsPerMM[0] = 1.0 / mmPerPixel[0];
   rendererInfo.m_PixelsPerMM[1] = 1.0 / mmPerPixel[1];
@@ -782,7 +696,6 @@ void
 
   // 1. Check the result
   vtkImageData* reslicedImage = 0;
-  //  reslicedImage->SetScalarTypeToUnsignedChar();
   
   if(thickSlicesMode>0)
   {
@@ -804,7 +717,6 @@ void
     MITK_WARN << "reslicer returned empty image";
     return;
   }
-
 
   // 2. Convert the resampling result to PIC image format
   mitkIpPicDescriptor *pic = Pic2vtk::convert( reslicedImage );
@@ -831,11 +743,6 @@ void
   else if ( pic->bpe == 32 && reslicedImage->GetScalarType()==VTK_UNSIGNED_CHAR ) // RGBA image
     m_iil4mitkMode = iil4mitkImage::RGBA;
 
-  //  image->setImage( pic, m_iil4mitkMode );
-  //  image->setInterpolation( false );
-  //  image->setRegion( 0, 0, pic->n[0], pic->n[1] );
-
-
   // 3. Store the result in a VTK image
   if ( imageIs2D )
   {
@@ -857,10 +764,8 @@ void
 
   mitk::Point3D originNew, rightNew, bottomNew;
 
-//  vtkSmartPointer<vtkPlaneSource> plane = vtkSmartPointer<vtkPlaneSource>::New();
   ls->m_Plane->SetCenter(0.0, 0.0, 0.0);
   ls->m_Plane->SetNormal(0.0, -1.0, 0.0);
-  //  plane->SetResolution(256, 256);
 
   // Does the Geometry2DData contain a PlaneGeometry?
 
@@ -905,14 +810,11 @@ void
   ls->m_Texture->InterpolateOn();
   ls->m_Texture->SetLookupTable( ls->m_LookupTable );
   ls->m_Texture->RepeatOff();
-  //  texture->MapColorScalarsThroughLookupTableOn();
 
   ls->m_Mapper->SetInputConnection(ls->m_Plane->GetOutputPort());
-  //  planeMapper->ScalarVisibilityOff();
 
   float opacity = 0;
   GetOpacity(opacity, renderer);
-  //  MITK_INFO << opacity;
 
   ls->m_Actor->GetProperty()->SetOpacity(opacity);
 
@@ -920,28 +822,13 @@ void
   ls->m_Actor->SetMapper(ls->m_Mapper);
   ls->m_Actor->SetTexture(ls->m_Texture);
 
-  static bool reseted = 0;
-  //  if(!rotated){
-  //    m_VtkActor->RotateX(90);
-  //    m_VtkActor->RotateZ(90);
-  //    rotated = 1;
-  //  }
-
   //  m_VtkActor->GetProperty()->SetColor(1.0, 1.0, 1.0);
   //  m_VtkActor->SetUserTransform(transform);
 
-
-//  if(!reseted)
-//  {
-    renderer->GetVtkRenderer()->ResetCamera(ls->m_Actor->GetBounds());
-//    reseted = 1;
-//  }
-  //  renderer->GetVtkRenderer()->GetActiveCamera()->SetParallelProjection(1);
-
+  renderer->GetVtkRenderer()->ResetCamera(ls->m_Actor->GetBounds());
+  renderer->GetVtkRenderer()->RemoveAllLights();
 
   renderer->GetVtkRenderer()->GetRenderWindow()->SetInteractor(NULL);
-  //  vtkSmartPointer<vtkInteractorStyleImage> imgStyle = vtkSmartPointer<vtkInteractorStyleImage>::New();
-  //  renderer->GetVtkRenderer()->GetRenderWindow()->GetInteractor()->SetInteractorStyle(imgStyle);;
 
   // We have been modified
   rendererInfo.m_LastUpdateTime.Modified();
@@ -1199,10 +1086,6 @@ void
     }
     else
     { 
-      //this->GetDataNode()->SetBoolProperty( "outline binary", false, renderer );
-      //this->GetDataNode()->SetFloatProperty( "opacity", 0.3, renderer );
-      //set opacity
-      //rgba[3] = 0.3;
       MITK_WARN << "Type of all binary images should be (un)signed char. Outline does not work on other pixel types!";
     }
   }
@@ -1545,8 +1428,6 @@ void mitk::ImageMapperGL2D::SetDefaultProperties(mitk::DataNode* node, mitk::Bas
       mitkLutProp->SetLookupTable(mitkLut);
       node->SetProperty( "LookupTable", mitkLutProp );
     }
-  }
-
+  }  
   Superclass::SetDefaultProperties(node, renderer, overwrite);
 }
-

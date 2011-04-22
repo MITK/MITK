@@ -336,9 +336,6 @@ protected:
 
 private:
   int m_iil4mitkMode;
-
-//  vtkSmartPointer<vtkActor> m_VtkActor;
-
 };
 
 } // namespace mitk

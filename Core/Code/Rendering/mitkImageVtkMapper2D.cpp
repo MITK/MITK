@@ -245,10 +245,10 @@ void mitk::ImageVtkMapper2D::Paint( mitk::BaseRenderer *renderer )
 }
 
 
-const mitk::ImageVtkMapper2D::InputImageType *
+const mitk::Image *
     mitk::ImageVtkMapper2D::GetInput( void )
 {
-  return static_cast< const mitk::ImageVtkMapper2D::InputImageType * >( this->GetData() );
+  return static_cast< const mitk::Image * >( this->GetData() );
 }
 
 vtkProp* mitk::ImageVtkMapper2D::GetVtkProp(mitk::BaseRenderer* renderer)
@@ -325,7 +325,7 @@ void
     return;
   }
 
-  mitk::Image *input = const_cast< mitk::ImageVtkMapper2D::InputImageType * >(
+  mitk::Image *input = const_cast< mitk::Image * >(
       this->GetInput()
       );
   input->Update();
@@ -1144,7 +1144,7 @@ void
 void
     mitk::ImageVtkMapper2D::Update(mitk::BaseRenderer* renderer)
 {
-  mitk::Image* data  = const_cast<mitk::ImageVtkMapper2D::InputImageType *>(
+  mitk::Image* data  = const_cast<mitk::Image *>(
       this->GetInput()
       );
 

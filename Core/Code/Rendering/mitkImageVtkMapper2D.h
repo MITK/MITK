@@ -103,17 +103,8 @@ public:
   /** Method for creation through the object factory. */
   itkNewMacro(Self);
 
-  /** Some convenient typedefs. */
-  typedef mitk::Image                    InputImageType;
-  typedef InputImageType::Pointer        InputImagePointer;
-  typedef InputImageType::ConstPointer   InputImageConstPointer;
-  typedef SlicedData::RegionType         InputImageRegionType;
-
   /** \brief Get the Image to map */
-  const InputImageType *GetInput(void);
-
-
-  void Disable2DOpenGL();
+  const mitk::Image *GetInput(void);
 
   /** \brief Calls Update() for all associated renderers. */
   virtual void GenerateAllData();

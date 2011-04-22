@@ -15,32 +15,21 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-
 #ifndef MITKIMAGEVTKMAPPER2D_H_HEADER_INCLUDED_C10E906E
 #define MITKIMAGEVTKMAPPER2D_H_HEADER_INCLUDED_C10E906E
 
 //MITK Rendering
 #include "mitkCommon.h"
-#include "mitkGLMapper2D.h"
 #include "mitkBaseRenderer.h"
 #include "mitkVtkMapper2D.h"
 
-#include <map>
-#include <assert.h>
-
-//ITK
-#include <itkCommand.h>
-#include <itkEventObject.h>
-
 //VTK TODO use "class" instead?
-#include <vtkSystemIncludes.h>
 #include <vtkSmartPointer.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkActor.h>
 #include <vtkPlaneSource.h>
 #include <vtkImageData.h>
 #include <vtkLookupTable.h>
-
 
 class iil4mitkPicImage;
 class Vtk2itk;
@@ -52,8 +41,6 @@ class vtkPoints;
 class vtkMitkThickSlicesFilter;
 
 namespace mitk {
-
-
 
 /** \brief Mapper to resample and display 2D slices of a 3D image.
  *

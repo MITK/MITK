@@ -9,27 +9,30 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#include "mitkImageVtkMapper2D.h"
-#include "widget.h"
+//TODO remove these if possible
 #include "picimage.h"
 #include "pic2vtk.h"
-#include "mitkTimeSlicedGeometry.h"
-#include "mitkPlaneGeometry.h"
-#include "mitkDataNode.h"
+
+//MITK
+#include <mitkAbstractTransformGeometry.h>
+#include <mitkDataNode.h>
+#include <mitkDataNodeFactory.h>
+#include <mitkImageSliceSelector.h>
+#include <mitkLevelWindowProperty.h>
+#include <mitkLookupTableProperty.h>
+#include <mitkPlaneGeometry.h>
+#include <mitkProperties.h>
+#include <mitkResliceMethodProperty.h>
+#include <mitkTimeSlicedGeometry.h>
+#include <mitkVolumeCalculator.h>
+#include <mitkVtkResliceInterpolationProperty.h>
+
+//MITK Rendering
+#include "mitkImageVtkMapper2D.h"
 #include "mitkVtkPropRenderer.h"
-#include "mitkLookupTableProperty.h"
-#include "mitkProperties.h"
-#include "mitkLevelWindowProperty.h"
-#include "mitkVtkResliceInterpolationProperty.h"
-#include "mitkVolumeCalculator.h"
-#include "mitkImageSliceSelector.h"
+#include "vtkMitkThickSlicesFilter.h"
 
-#include "mitkAbstractTransformGeometry.h"
-#include "mitkDataNodeFactory.h"
-
-#include "mitkResliceMethodProperty.h"
-
-#include <vtkDataSetMapper.h>
+//VTK
 #include <vtkProperty.h>
 #include <vtkTransform.h>
 #include <vtkGeneralTransform.h>
@@ -44,17 +47,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkPlaneSource.h>
 #include <vtkPolyDataMapper.h>
 #include <vtkTexture.h>
-#include <vtkImageCanvasSource2D.h>
-#include <vtkTextureMapToPlane.h>
-#include <vtkOpenGLPolyDataMapper.h>
 #include <vtkCamera.h>
-#include <vtkRenderWindowInteractor.h>
-#include <vtkInteractorStyleImage.h>
 
-#include "vtkMitkThickSlicesFilter.h"
-#include "itkRGBAPixel.h"
-#include <itkFixedArray.h>
-
+//ITK
+#include <itkRGBAPixel.h>
 
 int mitk::ImageVtkMapper2D::numRenderer = 0;
 

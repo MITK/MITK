@@ -169,6 +169,7 @@ protected:
     float opacity, 
     bool drawShadow,
     float lineWidth, 
+    float shadowWidthFactor,
     Point2D& firstPoint,
     const Geometry2D* planarFigureGeometry2D, 
     const Geometry2D* rendererGeometry2D, 
@@ -179,6 +180,7 @@ protected:
     float opacity, 
     bool drawShadow,
     float lineWidth, 
+    float shadowWidthFactor,
     Point2D& firstPoint,
     const Geometry2D* planarFigureGeometry2D, 
     const Geometry2D* rendererGeometry2D, 
@@ -209,9 +211,9 @@ private:
   bool m_DrawQuantities;
   bool m_DrawShadow;
 
-  // the width of the shadow is defined as 'm_LineWidth * m_ShadowLineWidthModifier'
-  float m_ShadowLineWidthModifier;
+  // the width of the shadow is defined as 'm_LineWidth * m_ShadowWidthFactor'
   float m_LineWidth;
+  float m_ShadowWidthFactor;
   float m_OutlineWidth;
   float m_HelperlineWidth;
   float m_PointWidth;

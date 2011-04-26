@@ -50,21 +50,29 @@ mitk::TestDICOMLoading::ImageList mitk::TestDICOMLoading::LoadFiles( const Strin
   {
     MITK_DEBUG << "File " << *iter;
   }
-
-  StringContainer sortedFiles = DicomSeriesReader::SortSeriesSlices( files );
-
-  DataNode::Pointer node = DicomSeriesReader::LoadDicomSeries( sortedFiles );
- 
+   
   ImageList result;
 
-  if (node.IsNotNull())
+  DicomSeriesReader::UidFileNamesMap seriesInFiles = DicomSeriesReader::GetSeries( files );
+
+  // TODO sort series UIDs, implementation of map iterator might differ on different platforms (or verify this is a standard topic??)
+  for (DicomSeriesReader::UidFileNamesMap::const_iterator seriesIter = seriesInFiles.begin();
+       seriesIter != seriesInFiles.end();
+       ++seriesIter)
   {
-    Image::Pointer image = dynamic_cast<mitk::Image*>( node->GetData() );
-  
-    result.push_back( image );
-  }
-  else
-  {
+    StringContainer files = seriesIter->second;
+
+    DataNode::Pointer node = DicomSeriesReader::LoadDicomSeries( files );
+
+    if (node.IsNotNull())
+    {
+      Image::Pointer image = dynamic_cast<mitk::Image*>( node->GetData() );
+    
+      result.push_back( image );
+    }
+    else
+    {
+    }
   }
 
   return result;

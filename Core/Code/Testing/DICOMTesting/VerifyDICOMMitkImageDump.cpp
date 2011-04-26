@@ -82,6 +82,13 @@ int main(int argc, char** argv)
   {
     std::string imageDump = loader.DumpImageInformation( *imageIter );
 
+    if (imageCounter >= expectedDumps.size())
+    {
+      MITK_ERROR << "Loader produces more images than expected. Aborting after image " << (imageCounter-1);
+      MITK_INFO << "Image " << imageCounter << " loaded as:\n" << imageDump;
+      return EXIT_FAILURE;
+    }
+
     bool loadedAsExpected = loader.CompareImageInformationDumps( expectedDumps[imageCounter], imageDump );
     MITK_INFO << "Image " << imageCounter << " loads as expected.";
     // TODO compare against reference

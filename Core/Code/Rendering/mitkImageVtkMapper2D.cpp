@@ -65,6 +65,56 @@ mitk::ImageVtkMapper2D::~ImageVtkMapper2D()
   this->InvokeEvent( itk::DeleteEvent() ); //TODO <- what is this doing exactly?
 }
 
+void mitk::ImageVtkMapper2D::AdjustToDisplayGeometry(mitk::BaseRenderer* renderer)
+{
+  mitk::DisplayGeometry::Pointer displayGeometry = renderer->GetDisplayGeometry();
+  mitk::DataNode::Pointer dataNode = this->GetDataNode();
+  LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
+
+    MITK_INFO << "Point1: " << localStorage->m_Plane->GetPoint1()[0] << " " << localStorage->m_Plane->GetPoint1()[1] << " " << localStorage->m_Plane->GetPoint1()[2];
+    MITK_INFO << "Point2: " << localStorage->m_Plane->GetPoint2()[0] << " " << localStorage->m_Plane->GetPoint2()[1] << " " << localStorage->m_Plane->GetPoint2()[2];
+
+
+//  mitk::PlaneGeometry *planeGeometry =
+//      dynamic_cast< PlaneGeometry * >( this->GetInput()->GetGeometry2D() );
+
+  // Take the coordinate axes and origin directly from the input geometry.
+  mitk::Point3D origin = displayGeometry->GetOrigin();
+  mitk::Point3D right = displayGeometry->GetCornerPoint( false, true );
+  mitk::Point3D bottom = displayGeometry->GetCornerPoint( true, false );
+
+  MITK_INFO << "origin " << origin << " right " << right << " bottom " << bottom;
+
+  // Since the plane is planar, there is no need to subdivide the grid
+  // (cf. AbstractTransformGeometry case)
+  localStorage->m_Plane->SetXResolution( 1 );
+  localStorage->m_Plane->SetYResolution( 1 );
+
+  localStorage->m_Plane->SetOrigin( origin[0], origin[1], origin[2] );
+  localStorage->m_Plane->SetPoint1( right[0], right[1], right[2] );
+  localStorage->m_Plane->SetPoint2( bottom[0], bottom[1], bottom[2] );
+  localStorage->m_Plane->Modified();
+
+
+  MITK_INFO << "Point1: " << localStorage->m_Plane->GetPoint1()[0] << " " << localStorage->m_Plane->GetPoint1()[1] << " " << localStorage->m_Plane->GetPoint1()[2];
+  MITK_INFO << "Point2: " << localStorage->m_Plane->GetPoint2()[0] << " " << localStorage->m_Plane->GetPoint2()[1] << " " << localStorage->m_Plane->GetPoint2()[2];
+
+  //  localStorage->m_Plane->SetPoint1(10.0, -10.0, 0.0);
+  //  localStorage->m_Plane->SetPoint2(-10.0, 10.0, 0.0);
+
+
+  //  localStorage->m_Plane->SetXResolution(2);
+  //  localStorage->m_Plane->SetYResolution(2);
+
+  //  vtkSmartPointer<vtkImageData> img = localStorage->m_ReslicedImage;
+  //  MITK_INFO << "Spacing bisher: " << img->GetSpacing()[0] << " " << img->GetSpacing()[1] << " " << img->GetSpacing()[2];
+  //  MITK_INFO << "Extent bisher: " << img->GetExtent()[0] << " " << img->GetExtent()[1] << " " << img->GetExtent()[2] << " " << img->GetExtent()[3] << " " << img->GetExtent()[4] << " " << img->GetExtent()[5];
+  //  img->SetSpacing(1.0, 1.0, 1.0);
+  //  img->SetExtent(0, 100, 0, 100, 0, 100);
+  //  img->Modified();
+  //  localStorage->m_ReslicedImage = img;
+}
+
 //TODO: do we need paint, update AND generateData?
 void mitk::ImageVtkMapper2D::Paint( mitk::BaseRenderer *renderer )
 {
@@ -183,7 +233,6 @@ void mitk::ImageVtkMapper2D::MitkRenderVolumetricGeometry(BaseRenderer* renderer
 
 void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
 {
-
   LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
 
   bool visible = IsVisible(renderer);
@@ -658,9 +707,63 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
   //apply the properties after the slice was set
   this->ApplyProperties( renderer );
 
-  renderer->GetVtkRenderer()->ResetCamera(localStorage->m_Actor->GetBounds());
-  renderer->GetVtkRenderer()->RemoveAllLights();
+  this->AdjustToDisplayGeometry(renderer);
 
+  mitk::DisplayGeometry::Pointer dispGeo = renderer->GetDisplayGeometry();
+
+  const double PI = 3.14159265;
+  double viewAngle = renderer->GetVtkRenderer()->GetActiveCamera()->GetViewAngle();
+  viewAngle = viewAngle * (PI/180.0);
+  viewAngle /= 2;
+  double dist = 0.5/tan(viewAngle);
+
+  mitk::Vector3D normal2;
+  normal2[0] = 0.0;
+  normal2[1] = 0.0;
+  normal2[2] = 1.0;
+
+  mitk::Point3D mfoc;
+  mfoc[0]=0.5;
+  mfoc[1]=0.5;
+  mfoc[2]=0.0;
+
+  mitk::Point3D mpos;
+  mpos[0]=mfoc[0]+dist*normal2[0];
+  mpos[1]=mfoc[1]+dist*normal2[1];
+  mpos[2]=mfoc[2]+dist*normal2[2];
+
+  MITK_INFO << "dist " << dist;
+  MITK_INFO << "angle " << viewAngle;
+  MITK_INFO << "mpos " << mpos;
+
+  mitk::Point3D mup;
+  mup[0]=0.0;
+  mup[1]=1.0;
+  mup[2]=0.0;
+
+  renderer->GetVtkRenderer()->GetActiveCamera()->SetParallelProjection(true);
+  renderer->GetVtkRenderer()->GetActiveCamera()->SetParallelScale(dist/3.74);
+
+  vtkCamera*   camera = renderer->GetVtkRenderer()->GetActiveCamera();
+  if (camera)
+  {
+    camera->SetPosition(mpos[0],mpos[1],mpos[2]);
+    camera->SetFocalPoint(mfoc[0], mfoc[1],mfoc[2]);
+    camera->SetViewUp(mup[0],mup[1],mup[2]);
+  }
+  renderer->GetVtkRenderer()->ResetCameraClippingRange();
+
+//  renderer->GetVtkRenderer()->GetActiveCamera()->SetViewUp(0.0, 1.0, 0.0);
+//  renderer->GetVtkRenderer()->GetActiveCamera()->SetPosition(0.5, 0.5, 2.0);
+//  renderer->GetVtkRenderer()->GetActiveCamera()->SetFocalPoint(0.5, 0.5, 0.0);
+//  renderer->GetVtkRenderer()->GetActiveCamera()->SetClippingRange(0.0, 100.0);
+  renderer->GetVtkRenderer()->GetActiveCamera()->Modified();
+//  renderer->GetVtkRenderer()->ResetCamera(localStorage->m_Actor->GetBounds());
+  MITK_INFO << "bounds: " << localStorage->m_Actor->GetBounds()[0] << " " << localStorage->m_Actor->GetBounds()[1] << " " << localStorage->m_Actor->GetBounds()[2] << " " << localStorage->m_Actor->GetBounds()[3] << " " << localStorage->m_Actor->GetBounds()[4] << " " << localStorage->m_Actor->GetBounds()[5];
+  MITK_INFO << "up: " << renderer->GetVtkRenderer()->GetActiveCamera()->GetViewUp()[0] << " " << renderer->GetVtkRenderer()->GetActiveCamera()->GetViewUp()[1] << " "  <<  renderer->GetVtkRenderer()->GetActiveCamera()->GetViewUp()[2];
+  MITK_INFO << "pos: " << renderer->GetVtkRenderer()->GetActiveCamera()->GetPosition()[0] << " " << renderer->GetVtkRenderer()->GetActiveCamera()->GetPosition()[1] << " "  <<  renderer->GetVtkRenderer()->GetActiveCamera()->GetPosition()[2];
+  MITK_INFO << "focal: " << renderer->GetVtkRenderer()->GetActiveCamera()->GetFocalPoint()[0] << " " << renderer->GetVtkRenderer()->GetActiveCamera()->GetFocalPoint()[1] << " "  <<  renderer->GetVtkRenderer()->GetActiveCamera()->GetFocalPoint()[2];
+  renderer->GetVtkRenderer()->RemoveAllLights();
   renderer->GetVtkRenderer()->GetRenderWindow()->SetInteractor(NULL);
 
   // We have been modified

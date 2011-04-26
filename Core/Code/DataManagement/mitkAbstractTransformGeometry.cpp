@@ -140,13 +140,26 @@ void mitk::AbstractTransformGeometry::WorldToIndex(const mitk::Point2D &pt_mm, m
 
 void mitk::AbstractTransformGeometry::IndexToWorld(const mitk::Point2D &atPt2d_units, const mitk::Vector2D &vec_units, mitk::Vector2D &vec_mm) const
 {
-  m_Plane->IndexToWorld(atPt2d_units, vec_units, vec_mm);
+  MITK_WARN<<"Warning! Call of the deprecated function AbstractTransformGeometry::IndexToWorld(point, vec, vec). Use AbstractTransformGeometry::IndexToWorld(vec, vec) instead!";
+  this->IndexToWorld(vec_units, vec_mm);
+}
+
+void mitk::AbstractTransformGeometry::IndexToWorld(const mitk::Vector2D &vec_units, mitk::Vector2D &vec_mm) const
+{
+  m_Plane->IndexToWorld(vec_units, vec_mm);
 }
 
 void mitk::AbstractTransformGeometry::WorldToIndex(const mitk::Point2D &atPt2d_mm, const mitk::Vector2D &vec_mm, mitk::Vector2D &vec_units) const
 {
-  m_Plane->WorldToIndex(atPt2d_mm, vec_mm, vec_units);
+  MITK_WARN<<"Warning! Call of the deprecated function AbstractTransformGeometry::WorldToIndex(point, vec, vec). Use AbstractTransformGeometry::WorldToIndex(vec, vec) instead!";
+  this->WorldToIndex(vec_mm, vec_units);
 }
+
+void mitk::AbstractTransformGeometry::WorldToIndex(const mitk::Vector2D &vec_mm, mitk::Vector2D &vec_units) const
+{
+  m_Plane->WorldToIndex(vec_mm, vec_units);
+}
+
 
 bool mitk::AbstractTransformGeometry::IsAbove(const mitk::Point3D& pt3d_mm) const
 {

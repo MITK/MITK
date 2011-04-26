@@ -310,7 +310,11 @@ void mitk::CalculateGrayValueStatisticsTool::ITKHistogramming(
   histogramQuantileValues[4] = m_ITKHistogram->Quantile(0, 0.95);
 
   // report histogram values
-report     << "         Minimum:" << minimum
+  std::locale C("C");
+  std::locale originalLocale = report.getloc();
+  report.imbue(C);
+
+  report   << "         Minimum:" << minimum
            << "\n  5% quantile: " << histogramQuantileValues[0]
            << "\n 25% quantile: " << histogramQuantileValues[1]
            << "\n 50% quantile: " << histogramQuantileValues[2]
@@ -320,6 +324,8 @@ report     << "         Minimum:" << minimum
            << "\n         Mean: " << mean
            << "\n           SD: " << sd
            << "\n";
+
+  report.imbue(originalLocale);
 }
 
 std::string mitk::CalculateGrayValueStatisticsTool::GetReport() const

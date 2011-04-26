@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>444</width>
-    <height>131</height>
+    <height>134</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -127,6 +127,28 @@
         </property>
         <property name="text">
          <string/>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QToolButton" name="m_TSMenu">
+        <property name="toolTip">
+         <string comment="Toggle visibility of ODF glyphs" extracomment="Toggle visibility of ODF glyphs">Multislice Projection</string>
+        </property>
+        <property name="statusTip">
+         <string comment="Toggle visibility of ODF glyphs" extracomment="Toggle visibility of ODF glyphs">Multislice Projection</string>
+        </property>
+        <property name="whatsThis">
+         <string comment="Toggle visibility of ODF glyphs" extracomment="Toggle visibility of ODF glyphs">Multislice Projection</string>
+        </property>
+        <property name="text">
+         <string>MIP</string>
+        </property>
+        <property name="popupMode">
+         <enum>QToolButton::MenuButtonPopup</enum>
+        </property>
+        <property name="arrowType">
+         <enum>Qt::NoArrow</enum>
         </property>
        </widget>
       </item>

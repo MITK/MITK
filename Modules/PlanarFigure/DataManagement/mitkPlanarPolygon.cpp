@@ -30,11 +30,10 @@ mitk::PlanarPolygon::PlanarPolygon()
 {
   // Polygon has at least two control points
   this->ResetNumberOfControlPoints( 2 );
+  this->SetNumberOfPolyLines( 1 );
 
   // Polygon is closed by default
   this->SetProperty( "closed", mitk::BoolProperty::New( true ) );
-
-  m_PolyLines->InsertElement( 0, VertexContainerType::New());
 }
 
 
@@ -64,52 +63,15 @@ void mitk::PlanarPolygon::SetClosed( bool closed )
 }
 
 
-//void mitk::PlanarPolygon::Initialize()
-//{
-//  // Default initialization of circle control points
-//
-//  mitk::Geometry2D *geometry2D = 
-//    dynamic_cast< mitk::Geometry2D * >( this->GetGeometry( 0 ) );
-//
-//  if ( geometry2D == NULL )
-//  {
-//    MITK_ERROR << "Missing Geometry2D for PlanarCircle";
-//    return;
-//  }
-//
-//  mitk::ScalarType width = geometry2D->GetBounds()[1];
-//  mitk::ScalarType height = geometry2D->GetBounds()[3];
-//  
-//  mitk::Point2D &centerPoint = m_ControlPoints->ElementAt( 0 );
-//  mitk::Point2D &boundaryPoint = m_ControlPoints->ElementAt( 1 );
-//
-//  centerPoint[0] = width / 2.0;
-//  centerPoint[1] = height / 2.0;
-//
-//  boundaryPoint[0] = centerPoint[0] + 20.0;
-//  boundaryPoint[1] = centerPoint[1];
-//}
-
-
 void mitk::PlanarPolygon::GeneratePolyLine()
 {
-  // if more elements are needed that have been reserved -> reserve
-  if ( m_PolyLines->ElementAt( 0 )->size() < this->GetNumberOfControlPoints() )
+  this->ClearPolyLines();
+    
+  for ( int i=0; i<m_ControlPoints.size(); i++ )
   {
-    m_PolyLines->ElementAt( 0 )->Reserve( this->GetNumberOfControlPoints() );
-  }
-  // if more elements have been reserved/set before than are needed now -> clear vector
-  else if (m_PolyLines->ElementAt( 0 )->size() > this->GetNumberOfControlPoints())
-  {
-    m_PolyLines->ElementAt( 0 )->clear();
-  }
-
-
-  // TODO: start polygon at specified initalize point...
-  m_PolyLines->ElementAt( 0 )->Reserve( this->GetNumberOfControlPoints() );
-  for ( unsigned int i = 0; i < this->GetNumberOfControlPoints(); ++i )
-  {
-    m_PolyLines->ElementAt( 0 )->ElementAt( i ) = m_ControlPoints->ElementAt( i );  
+    Point2D pnt = m_ControlPoints.at( i );
+    PolyLineElement elem(pnt,i);
+    this->AppendPointToPolyLine( 0, elem );
   }
 }
 

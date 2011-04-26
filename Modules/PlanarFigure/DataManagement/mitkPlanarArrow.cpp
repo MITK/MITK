@@ -27,13 +27,16 @@ mitk::PlanarArrow::PlanarArrow()
   this->ResetNumberOfControlPoints( 2 );
   m_ArrowTipScaleFactor = -1.0;
 
-  m_PolyLines->InsertElement( 0, VertexContainerType::New());
+  this->SetNumberOfPolyLines( 1 );
+  this->SetNumberOfHelperPolyLines( 2 );
+
+  //m_PolyLines->InsertElement( 0, VertexContainerType::New());
 
   // Create helper polyline object (for drawing the orthogonal orientation line)
-  m_HelperPolyLines->InsertElement( 0, VertexContainerType::New());
-  m_HelperPolyLines->InsertElement( 1, VertexContainerType::New());
-  m_HelperPolyLines->ElementAt( 0 )->Reserve( 2 );
-  m_HelperPolyLines->ElementAt( 1 )->Reserve( 2 );
+  //m_HelperPolyLines->InsertElement( 0, VertexContainerType::New());
+  //m_HelperPolyLines->InsertElement( 1, VertexContainerType::New());
+  //m_HelperPolyLines->ElementAt( 0 )->Reserve( 2 );
+  //m_HelperPolyLines->ElementAt( 1 )->Reserve( 2 );
   m_HelperPolyLinesToBePainted->InsertElement( 0, false );
   m_HelperPolyLinesToBePainted->InsertElement( 1, false );
 }
@@ -43,46 +46,23 @@ mitk::PlanarArrow::~PlanarArrow()
 {
 }
 
-
-//void mitk::PlanarArrow::Initialize()
-//{
-//  // Default initialization of line control points
-//
-//  mitk::Geometry2D *geometry2D = 
-//    dynamic_cast< mitk::Geometry2D * >( this->GetGeometry( 0 ) );
-//
-//  if ( geometry2D == NULL )
-//  {
-//    MITK_ERROR << "Missing Geometry2D for PlanarArrow";
-//    return;
-//  }
-//
-//  mitk::ScalarType width = geometry2D->GetBounds()[1];
-//  mitk::ScalarType height = geometry2D->GetBounds()[3];
-//  
-//  mitk::Point2D &startPoint = m_ControlPoints->ElementAt( 0 );
-//  mitk::Point2D &endPoint = m_ControlPoints->ElementAt( 1 );
-//
-//  startPoint[0] = width / 2.0;
-//  startPoint[1] = height / 2.0;
-//
-//  endPoint[0] = startPoint[0] + 20.0;
-//  endPoint[1] = startPoint[1] + 20.0;
-//}
-
-
 void mitk::PlanarArrow::GeneratePolyLine()
 {
+  this->ClearPolyLines();
+
+  this->AppendPointToPolyLine( 0, PolyLineElement( this->GetControlPoint( 0 ), 0 ));
+  this->AppendPointToPolyLine( 0, PolyLineElement( this->GetControlPoint( 1 ), 0 ));
+
   // TODO: start line at specified start point...
   // Generate poly-line 
-  m_PolyLines->ElementAt( 0 )->Reserve( 2 );
-  m_PolyLines->ElementAt( 0 )->ElementAt( 0 ) = m_ControlPoints->ElementAt( 0 );
-  m_PolyLines->ElementAt( 0 )->ElementAt( 1 ) = m_ControlPoints->ElementAt( 1 );
+  //m_PolyLines->ElementAt( 0 )->Reserve( 2 );
+  //m_PolyLines->ElementAt( 0 )->ElementAt( 0 ) = m_ControlPoints->ElementAt( 0 );
+  //m_PolyLines->ElementAt( 0 )->ElementAt( 1 ) = m_ControlPoints->ElementAt( 1 );
 }
 
 void mitk::PlanarArrow::GenerateHelperPolyLine(double mmPerDisplayUnit, unsigned int displayHeight)
 {
-   // Generate helper polyline (orientation line orthogonal to first line)
+  // Generate helper polyline (orientation line orthogonal to first line)
   // if the third control point is currently being set
   if ( this->GetNumberOfControlPoints() != 2 )
   {
@@ -91,6 +71,8 @@ void mitk::PlanarArrow::GenerateHelperPolyLine(double mmPerDisplayUnit, unsigned
  
     return;
   }
+
+  this->ClearHelperPolyLines();
 
   m_HelperPolyLinesToBePainted->SetElement( 0, true );
   m_HelperPolyLinesToBePainted->SetElement( 1, true );
@@ -105,8 +87,11 @@ void mitk::PlanarArrow::GenerateHelperPolyLine(double mmPerDisplayUnit, unsigned
 
 
   // Calculate arrow peak
-  const Point2D& p1 = m_ControlPoints->ElementAt( 0 );
-  const Point2D& p2 = m_ControlPoints->ElementAt( 1 );
+  const Point2D p1 = this->GetControlPoint( 0 );
+  const Point2D p2 = this->GetControlPoint( 1 );
+
+  //const Point2D& p1 = m_ControlPoints->ElementAt( 0 );
+  //const Point2D& p2 = m_ControlPoints->ElementAt( 1 );
   Vector2D n1 = p1 - p2;
   n1.Normalize();
  
@@ -118,10 +103,15 @@ void mitk::PlanarArrow::GenerateHelperPolyLine(double mmPerDisplayUnit, unsigned
   temp2[0] = n1[0] * cos(-degrees) - n1[1] * sin(-degrees);
   temp2[1] = n1[0] * sin(-degrees) + n1[1] * cos(-degrees);
 
-  m_HelperPolyLines->ElementAt( 0 )->ElementAt( 0 ) = p1;
-  m_HelperPolyLines->ElementAt( 0 )->ElementAt( 1 ) = p1 - temp * nonScalingLength;
-  m_HelperPolyLines->ElementAt( 1 )->ElementAt( 0 ) = p1;
-  m_HelperPolyLines->ElementAt( 1 )->ElementAt( 1 ) = p1 - temp2 * nonScalingLength;
+  this->AppendPointToHelperPolyLine( 0, PolyLineElement( p1, 0 ));
+  this->AppendPointToHelperPolyLine( 0, PolyLineElement( p1 - temp * nonScalingLength, 0 ));
+  this->AppendPointToHelperPolyLine( 1, PolyLineElement( p1, 0 ));
+  this->AppendPointToHelperPolyLine( 1, PolyLineElement( p1 - temp2 * nonScalingLength, 0 ));
+
+  //m_HelperPolyLines->ElementAt( 0 )->ElementAt( 0 ) = p1;
+  //m_HelperPolyLines->ElementAt( 0 )->ElementAt( 1 ) = p1 - temp * nonScalingLength;
+  //m_HelperPolyLines->ElementAt( 1 )->ElementAt( 0 ) = p1;
+  //m_HelperPolyLines->ElementAt( 1 )->ElementAt( 1 ) = p1 - temp2 * nonScalingLength;
  
 }
 

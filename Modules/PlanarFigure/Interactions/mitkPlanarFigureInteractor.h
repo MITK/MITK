@@ -107,15 +107,16 @@ protected:
    * Proximity is defined as the rectangle around the line with pre-defined distance
    * from the line. */
   bool IsPointNearLine( const mitk::Point2D& point,
-    const mitk::Point2D& startPoint, const mitk::Point2D& endPoint ) const;
+    const mitk::Point2D& startPoint, const mitk::Point2D& endPoint, mitk::Point2D& projectedPoint ) const;
 
   /** \brief Returns true if the point contained in the passed event (in display coordinates)
    * is over the planar figure (with a pre-defined tolerance range); false otherwise. */
-  bool IsPositionOverFigure(
+  int IsPositionOverFigure(
     const StateEvent *StateEvent, PlanarFigure *planarFigure,
     const Geometry2D *planarFigureGeometry,
     const Geometry2D *rendererGeometry,
-    const DisplayGeometry *displayGeometry ) const;
+    const DisplayGeometry *displayGeometry,
+    Point2D& pointProjectedOntoLine) const;
 
   /** \brief Returns the index of the marker (control point) over which the point contained
    * in the passed event (in display coordinates) currently is; -1 if the point is not over

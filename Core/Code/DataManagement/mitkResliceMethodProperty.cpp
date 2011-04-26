@@ -42,5 +42,6 @@ void mitk::ResliceMethodProperty::AddThickSlicesTypes()
   AddEnum( "disabled", (IdType) 0 );
   AddEnum( "mip", (IdType) 1 );
   AddEnum( "sum", (IdType) 2 );
+  AddEnum( "weighted", (IdType) 3 );
 }
 

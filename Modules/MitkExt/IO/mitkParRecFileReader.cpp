@@ -117,19 +117,25 @@ void mitk::ParRecFileReader::GenerateOutputInformation()
         if(strstr(s,"FOV (ap,fh,rl) [mm]"))
         {
           p=s+strcspn(s,"0123456789");
+          char *oldLocale = setlocale(LC_ALL, 0);
           sscanf(p,"%f %f %f", &thickness[0], &thickness[1], &thickness[2]);
+          setlocale(LC_ALL, oldLocale);
         }
         else
         if(strstr(s,"Slice thickness [mm]"))
         {
           p=s+strcspn(s,"0123456789");
+          char *oldLocale = setlocale(LC_ALL, 0);
           sscanf(p,"%f", &sliceThickness);
+          setlocale(LC_ALL, oldLocale);
         }
         else
         if(strstr(s,"Slice gap [mm]"))
         {
           p=s+strcspn(s,"-0123456789");
+          char *oldLocale = setlocale(LC_ALL, 0);
           sscanf(p,"%f", &sliceGap);
+          setlocale(LC_ALL, oldLocale);
         }
       }
       fclose(f);

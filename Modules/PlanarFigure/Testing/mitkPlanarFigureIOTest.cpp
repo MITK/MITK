@@ -280,8 +280,8 @@ public:
     // Test if all control points are equal
     for ( unsigned int i = 0; i < figure1->GetNumberOfControlPoints(); ++i )
     {
-      mitk::Point2D& point1 = figure1->GetControlPoint( i );
-      mitk::Point2D& point2 = figure2->GetControlPoint( i );
+      mitk::Point2D point1 = figure1->GetControlPoint( i );
+      mitk::Point2D point2 = figure2->GetControlPoint( i );
 
       if(point1.EuclideanDistanceTo( point2 ) >= mitk::eps)
       {

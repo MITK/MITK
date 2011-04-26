@@ -48,12 +48,15 @@ static void TestPlanarArrowPlacement( mitk::PlanarArrow::Pointer PlanarArrow )
   MITK_TEST_CONDITION( PlanarArrow->GetNumberOfControlPoints() == 2, "Number of control points after placement" );
 
   // Test for number of polylines
-  const mitk::PlanarFigure::VertexContainerType* polyLine0 = PlanarArrow->GetPolyLine( 0 );
+  const mitk::PlanarFigure::PolyLineType polyLine0 = PlanarArrow->GetPolyLine( 0 );
+  mitk::PlanarFigure::PolyLineType::const_iterator iter = polyLine0.begin();
   MITK_TEST_CONDITION( PlanarArrow->GetPolyLinesSize() == 1, "Number of polylines after placement" );
+  
 
   // Get polylines and check if the generated coordinates are OK
-  const mitk::Point2D& pp0 = polyLine0->ElementAt( 0 );
-  const mitk::Point2D& pp1 = polyLine0->ElementAt( 1 );
+  const mitk::Point2D& pp0 = iter->Point;
+  iter++;
+  const mitk::Point2D& pp1 = iter->Point;
   MITK_TEST_CONDITION( (pp0 == p0) && (pp1 == p1), "Correct polyline 1" );
 
     

@@ -173,6 +173,9 @@
       <action NAME="AcCHECKONESELECTED" ID="340">
         <!--check if there is an element that is selected-->
       </action>
+      <action NAME="AcCHECKHOVERING" ID="341">
+        <!--check if the cursor is above the given element-->
+      </action>
       <action NAME="AcCHECKGREATERZERO" ID="35">
         <!--check if the current number of elements is greater than 0-->
       </action>

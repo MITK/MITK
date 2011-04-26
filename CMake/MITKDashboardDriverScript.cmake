@@ -350,8 +350,9 @@ ${INITIAL_CMAKECACHE_OPTIONS}
     # Send status to the "CDash Web Admin"
     if(NOT MITK_NO_CDASH_WEBADMIN)
       set(cdash_admin_url "http://mbits/cdashadmin-web/index.php?pw=4da12ca9c06d46d3171d7f73974c900f")
+      string(REGEX REPLACE ".*\\?project=(.*)&?" "\\1" _ctest_project "${CTEST_DROP_LOCATION}")
       file(DOWNLOAD
-           "${cdash_admin_url}&action=submit&name=${CTEST_BUILD_NAME}&hasTestErrors=${test_errors}&hasBuildErrors=${build_errors}&hasBuildWarnings=${build_warnings}"
+           "${cdash_admin_url}&action=submit&name=${CTEST_BUILD_NAME}&hasTestErrors=${test_errors}&hasBuildErrors=${build_errors}&hasBuildWarnings=${build_warnings}&ctestDropSite=${CTEST_DROP_SITE}&ctestProject=${_ctest_project}"
            "${CTEST_BINARY_DIRECTORY}/cdashadmin.txt"
            STATUS status
            )

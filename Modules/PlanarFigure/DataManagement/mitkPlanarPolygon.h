@@ -54,10 +54,10 @@ public:
   //virtual void Initialize();
 
 
-  /** \brief Polygon has 2 control points per definition. */
+  /** \brief Polygon has 3 control points per definition. */
   unsigned int GetMinimumNumberOfControlPoints() const
   {
-    return 2;
+    return 3;
   }
 
 

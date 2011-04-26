@@ -26,7 +26,7 @@ mitk::PlanarLine::PlanarLine()
   // Line has two control points
   this->ResetNumberOfControlPoints( 2 );
 
-  m_PolyLines->InsertElement( 0, VertexContainerType::New());
+  this->SetNumberOfPolyLines( 1 );
 }
 
 
@@ -35,40 +35,13 @@ mitk::PlanarLine::~PlanarLine()
 }
 
 
-//void mitk::PlanarLine::Initialize()
-//{
-//  // Default initialization of line control points
-//
-//  mitk::Geometry2D *geometry2D = 
-//    dynamic_cast< mitk::Geometry2D * >( this->GetGeometry( 0 ) );
-//
-//  if ( geometry2D == NULL )
-//  {
-//    MITK_ERROR << "Missing Geometry2D for PlanarLine";
-//    return;
-//  }
-//
-//  mitk::ScalarType width = geometry2D->GetBounds()[1];
-//  mitk::ScalarType height = geometry2D->GetBounds()[3];
-//  
-//  mitk::Point2D &startPoint = m_ControlPoints->ElementAt( 0 );
-//  mitk::Point2D &endPoint = m_ControlPoints->ElementAt( 1 );
-//
-//  startPoint[0] = width / 2.0;
-//  startPoint[1] = height / 2.0;
-//
-//  endPoint[0] = startPoint[0] + 20.0;
-//  endPoint[1] = startPoint[1] + 20.0;
-//}
-
-
 void mitk::PlanarLine::GeneratePolyLine()
 {
+  this->ClearPolyLines();
   // TODO: start line at specified start point...
   // Generate poly-line 
-  m_PolyLines->ElementAt( 0 )->Reserve( 2 );
-  m_PolyLines->ElementAt( 0 )->ElementAt( 0 ) = m_ControlPoints->ElementAt( 0 );
-  m_PolyLines->ElementAt( 0 )->ElementAt( 1 ) = m_ControlPoints->ElementAt( 1 );
+  this->AppendPointToPolyLine( 0 , mitk::PlanarFigure::PolyLineElement( this->GetControlPoint(0), 0) );
+  this->AppendPointToPolyLine( 0 , mitk::PlanarFigure::PolyLineElement( this->GetControlPoint(1), 0) );
 }
 
 void mitk::PlanarLine::GenerateHelperPolyLine(double /*mmPerDisplayUnit*/, unsigned int /*displayHeight*/)

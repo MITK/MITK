@@ -237,6 +237,55 @@ void vtkMitkThickSlicesFilterExecute(vtkMitkThickSlicesFilter *self,
         }
       }
       break;
+
+  case vtkMitkThickSlicesFilter::WEIGHTED:
+    {
+      const int size = _maxZ-_minZ;
+      std::vector<double> weights(size);
+      double mean = 0.5 * double(_minZ + _maxZ);
+      double sigma_sq = double(size) / 6.0;
+      sigma_sq *= sigma_sq;
+      double sum = 0;
+      int i=0;
+      for(int z = _minZ+1; z<= _maxZ;z++)
+      {
+        double val = exp(-(((double)z-mean)/sigma_sq));
+        weights[i++] = val;
+        sum += val;
+      }
+      for(i=0; i<size; i++)
+      {
+        weights[i] /= sum;
+      }
+
+      for (idxY = 0; idxY <= maxY; idxY++)
+      {
+        useYMin = ((idxY + outExt[2]) <= wholeExtent[2]) ? 0 : -inIncs[1];
+        useYMax = ((idxY + outExt[2]) >= wholeExtent[3]) ? 0 : inIncs[1];
+        for (idxX = 0; idxX <= maxX; idxX++)
+        {
+          useXMin = ((idxX + outExt[0]) <= wholeExtent[0]) ? 0 : -inIncs[0];
+          useXMax = ((idxX + outExt[0]) >= wholeExtent[1]) ? 0 : inIncs[0];
+
+          T mip = inPtr[_minZ*inIncs[2]];
+          i=0;
+          double mymip = 0;
+          for(int z = _minZ+1; z<= _maxZ;z++)
+          {
+            double value = inPtr[z*inIncs[2]];
+            mymip+=value*weights[i++];
+          }
+          mip = mymip;
+          // do X axis
+          *outPtr = mip;
+          outPtr++;
+          inPtr++;
+        }
+        outPtr += outIncY;
+        inPtr += inIncY;
+      }
+    }
+    break;
   }
   
 }

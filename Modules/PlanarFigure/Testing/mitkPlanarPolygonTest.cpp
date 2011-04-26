@@ -29,7 +29,7 @@ public:
 static void TestPlanarPolygonPlacement( mitk::PlanarPolygon::Pointer planarPolygon )
 {
   // Test for correct minimum number of control points in cross-mode
-  MITK_TEST_CONDITION( planarPolygon->GetMinimumNumberOfControlPoints() == 2, "Minimum number of control points" );
+  MITK_TEST_CONDITION( planarPolygon->GetMinimumNumberOfControlPoints() == 3, "Minimum number of control points" );
 
   // Test for correct maximum number of control points in cross-mode
   MITK_TEST_CONDITION( planarPolygon->GetMaximumNumberOfControlPoints() == 1000, "Maximum number of control points" );
@@ -65,12 +65,14 @@ static void TestPlanarPolygonPlacement( mitk::PlanarPolygon::Pointer planarPolyg
   MITK_TEST_CONDITION( planarPolygon->IsClosed(), "planar polygon should be closed after function call, right?" );
   
   // Test for number of polylines
-  const mitk::PlanarFigure::VertexContainerType* polyLine0 = planarPolygon->GetPolyLine( 0 );
+  const mitk::PlanarFigure::PolyLineType polyLine0 = planarPolygon->GetPolyLine( 0 );
+  mitk::PlanarFigure::PolyLineType::const_iterator iter = polyLine0.begin();
   MITK_TEST_CONDITION( planarPolygon->GetPolyLinesSize() == 1, "Number of polylines after placement" );
 
   // Get polylines and check if the generated coordinates are OK
-  const mitk::Point2D& pp0 = polyLine0->ElementAt( 0 );
-  const mitk::Point2D& pp1 = polyLine0->ElementAt( 1 );
+  const mitk::Point2D& pp0 = iter->Point;
+  ++iter;
+  const mitk::Point2D& pp1 = iter->Point;
   MITK_TEST_CONDITION( ((pp0 == p0) && (pp1 == p1))
     || ((pp0 == p1) && (pp1 == p0)), "Correct polyline 1" );
 
@@ -86,6 +88,36 @@ static void TestPlanarPolygonPlacement( mitk::PlanarPolygon::Pointer planarPolyg
   double length1 = 50.0 * 50.0 ; // area
   MITK_TEST_CONDITION( fabs( planarPolygon->GetQuantity( 1 ) - length1) < mitk::eps, "Size of short axis diameter" );
 }
+
+static void TestPlanarPolygonEditing( mitk::PlanarPolygon::Pointer planarPolygon )
+{
+  int initialNumberOfControlPoints = planarPolygon->GetNumberOfControlPoints();
+
+  mitk::Point2D pnt;
+  pnt[0] = 75.0; pnt[1] = 25.0;
+  planarPolygon->AddControlPoint( pnt);
+
+  MITK_TEST_CONDITION( planarPolygon->GetNumberOfControlPoints() == initialNumberOfControlPoints+1, "A new control-point shall be added" );
+  MITK_TEST_CONDITION( planarPolygon->GetControlPoint( planarPolygon->GetNumberOfControlPoints()-1 ) == pnt, "Control-point shall be added at the end." );
+  
+
+  planarPolygon->RemoveControlPoint( 3 );
+  MITK_TEST_CONDITION( planarPolygon->GetNumberOfControlPoints() == initialNumberOfControlPoints, "A control-point has been removed" );
+  MITK_TEST_CONDITION( planarPolygon->GetControlPoint( 3 ) == pnt, "It shall be possible to remove any control-point." );
+
+  planarPolygon->RemoveControlPoint( 0 );
+  planarPolygon->RemoveControlPoint( 0 );
+  planarPolygon->RemoveControlPoint( 0 );
+  MITK_TEST_CONDITION( planarPolygon->GetNumberOfControlPoints() == 3, "Control-points cannot be removed if only three points remain." );
+
+  mitk::Point2D pnt1;
+  pnt1[0] = 33.0; pnt1[1] = 33.0;
+  planarPolygon->AddControlPoint( pnt1, 0 );
+  MITK_TEST_CONDITION( planarPolygon->GetNumberOfControlPoints() == 4, "A control-point has been added" );
+  MITK_TEST_CONDITION( planarPolygon->GetControlPoint( 0 ) == pnt1, "It shall be possible to insert a control-point at any position." );
+  
+}
+
 };
 /**
  * mitkplanarPolygonTest tests the methods and behavior of mitk::PlanarPolygon with sub-tests:
@@ -112,6 +144,8 @@ int mitkPlanarPolygonTest(int /* argc */, char* /*argv*/[])
 
   // Test placement of planarPolygon by control points
   mitkPlanarPolygonTestClass::TestPlanarPolygonPlacement( planarPolygon );
+
+  mitkPlanarPolygonTestClass::TestPlanarPolygonEditing( planarPolygon );
 
   // always end with this!
   MITK_TEST_END();

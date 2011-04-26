@@ -53,7 +53,8 @@ public:
   
   enum {
     MIP=0,
-    SUM
+    SUM,
+    WEIGHTED
   };
 
 protected:

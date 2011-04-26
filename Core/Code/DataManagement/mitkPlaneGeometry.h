@@ -50,11 +50,33 @@ public:
   
   virtual void WorldToIndex(const Point2D &pt_mm, Point2D &pt_units) const;
 
-  virtual void IndexToWorld(const Point2D &atPt2d_units, 
-    const Vector2D &vec_units, Vector2D &vec_mm) const;
+
+  //##Documentation
+  //## @brief Convert (continuous or discrete) index coordinates of a \em vector 
+  //## \a vec_units to world coordinates (in mm)
+  //## @deprecated First parameter (Point2D) is not used. If possible, please use void IndexToWorld(const mitk::Vector2D& vec_units, mitk::Vector2D& vec_mm) const.
+  //## For further information about coordinates types, please see the Geometry documentation
+  virtual void IndexToWorld(const mitk::Point2D &atPt2d_untis, const mitk::Vector2D &vec_units, mitk::Vector2D &vec_mm) const;
+
+  //##Documentation
+  //## @brief Convert (continuous or discrete) index coordinates of a \em vector 
+  //## \a vec_units to world coordinates (in mm)
+  //## For further information about coordinates types, please see the Geometry documentation
+  virtual void IndexToWorld(const mitk::Vector2D &vec_units, mitk::Vector2D &vec_mm) const;
   
-  virtual void WorldToIndex(const Point2D &atPt2d_mm, 
-    const Vector2D &vec_mm, Vector2D &vec_units) const;
+  //##Documentation
+  //## @brief Convert world coordinates (in mm) of a \em vector 
+  //## \a vec_mm to (continuous!) index coordinates.
+  //## @deprecated First parameter (Point2D) is not used. If possible, please use void WorldToIndex(const mitk::Vector2D& vec_mm, mitk::Vector2D& vec_units) const.
+  //## For further information about coordinates types, please see the Geometry documentation
+  virtual void WorldToIndex(const mitk::Point2D &atPt2d_mm, const mitk::Vector2D &vec_mm, mitk::Vector2D &vec_units) const;
+
+  //##Documentation
+  //## @brief Convert world coordinates (in mm) of a \em vector 
+  //## \a vec_mm to (continuous!) index coordinates.
+  //## For further information about coordinates types, please see the Geometry documentation
+  virtual void WorldToIndex(const mitk::Vector2D &vec_mm, mitk::Vector2D &vec_units) const;
+
 
   virtual void Initialize();
 

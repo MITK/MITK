@@ -16,11 +16,8 @@ int main(int argc, char** argv)
         imageIter != images.end();
         ++imageIter )
   {
-    std::cout << "--------------------------------------------------------------------------------\n";
-    std::cout << "-- Image " << ++imageCounter;
-    std::cout << "--------------------------------------------------------------------------------\n";
+    std::cout << "-- Image " << ++imageCounter << "\n";
     std::cout << loader.DumpImageInformation( *imageIter ) << "\n";
-    std::cout << "--------------------------------------------------------------------------------\n";
   }
 }
 

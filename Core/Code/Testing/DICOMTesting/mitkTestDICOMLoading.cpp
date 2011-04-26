@@ -1,4 +1,4 @@
-#define MBILOG_ENABLE_DEBUG
+//#define MBILOG_ENABLE_DEBUG
 
 #include "mitkTestDICOMLoading.h"
 
@@ -162,10 +162,6 @@ mitk::TestDICOMLoading::DumpImageInformation( const Image* image )
   
   ResetUserLocale();
 
-  MITK_DEBUG << "\n----------------------------------------\n" 
-            << result.str() 
-            << "----------------------------------------\n";
-
   return result.str();
 }
 
@@ -196,9 +192,11 @@ mitk::TestDICOMLoading::CompareImageInformationDumps( const std::string& referen
     const std::string& refKey = refIter->first;
     const std::string& refValue = refIter->second;
     
-    if ( reference.find(refKey) != reference.end() )
+    if ( test.find(refKey) != test.end() )
     {
       const std::string& testValue = test[refKey];
+
+      MITK_DEBUG << refKey << ": " << refValue << " == " << testValue << "?";
 
       testResult &= CompareSpacedValueFields( refValue, testValue );
     }
@@ -244,12 +242,10 @@ mitk::TestDICOMLoading::ParseDump( const std::string& dump )
   while (true)
   {
     std::string::size_type newLinePos = shredder.find( '\n' );
-    if (newLinePos == std::string::npos) break;
+    if (newLinePos == std::string::npos || newLinePos == 0) break;
 
     std::string line = shredder.substr( 0, newLinePos );
     shredder = shredder.erase( 0, newLinePos+1 );
-
-    MITK_DEBUG << "Line: '" << line << "'";
 
     std::string::size_type keyPosition = line.find_first_not_of( ' ' );
     std::string::size_type colonPosition = line.find( ':' );

@@ -203,6 +203,15 @@ public:
                                    const StringContainer &restrictions = StringContainer());
 
   /**
+   \brief see other GetSeries().
+
+   Instead of a directory name, provide an explicit list of file names.
+  */
+  static
+  UidFileNamesMap 
+  GetSeries(const StringContainer& files, const StringContainer &restrictions = StringContainer());
+
+  /**
     Sort a set of file names in an order that is meaningful for loading them into an mitk::Image.
    
     \warning This method assumes that input files are similar in basic properties such as slice thicknes, image orientation, pixel spacing, rows, columns. It should always be ok to put the result of a call to GetSeries(..) into this method.

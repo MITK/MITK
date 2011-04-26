@@ -296,9 +296,9 @@ DicomSeriesReader::ReadPhilips3DDicom(const std::string &filename, mitk::Image::
   return true; // actually never returns false yet.. but exception possible
 }
 #endif
-
+  
 DicomSeriesReader::UidFileNamesMap 
-DicomSeriesReader::GetSeries(const std::string &dir, const StringContainer &restrictions)
+DicomSeriesReader::GetSeries(const StringContainer& files, const StringContainer &restrictions)
 {
   UidFileNamesMap map; // result variable
 
@@ -347,9 +347,7 @@ DicomSeriesReader::GetSeries(const std::string &dir, const StringContainer &rest
   // new GDCM: use GDCM directly, itk::GDCMSeriesFileNames does not work with GDCM 2
 
   // set directory
-  gdcm::Directory gDirectory;
-  gDirectory.Load( dir.c_str(), false ); // non-recursive
-  const gdcm::Directory::FilenamesType &gAllFiles = gDirectory.GetFilenames();
+  //const gdcm::Directory::FilenamesType &gAllFiles = gDirectory.GetFilenames();
 
   // scann for relevant tags in dicom files
   gdcm::Scanner scanner;
@@ -374,9 +372,10 @@ DicomSeriesReader::GetSeries(const std::string &dir, const StringContainer &rest
   // TODO add further restrictions from arguments
 
   // let GDCM scan files
-  if ( !scanner.Scan( gDirectory.GetFilenames() ) )
+  if ( !scanner.Scan( files ) )
   {
-    MITK_ERROR << "gdcm::Scanner failed scanning " << dir;
+    // TODO re-activate error output
+    //MITK_ERROR << "gdcm::Scanner failedscanning " << files;
     return map;
   }
 
@@ -411,6 +410,14 @@ DicomSeriesReader::GetSeries(const std::string &dir, const StringContainer &rest
   }
 
   return map;
+}
+
+DicomSeriesReader::UidFileNamesMap 
+DicomSeriesReader::GetSeries(const std::string &dir, const StringContainer &restrictions)
+{
+  StringContainer dummyFileList;
+  dummyFileList.push_back(dir);
+  return GetSeries(dummyFileList, restrictions);
 }
 
 #if GDCM_MAJOR_VERSION >= 2

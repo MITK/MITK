@@ -89,9 +89,9 @@ void mitk::BoundingObjectToSegmentationFilter::GenerateData()
     boIndex[2] = (mitk::SlicedData::IndexType::IndexValueType)(min[2] + 0.5);
 
     // add 1 because we need 0.5 for each index
-    boSize[0] = (mitk::SlicedData::IndexType::IndexValueType) ((max[0]-min[0]) + 1);
-    boSize[1] = (mitk::SlicedData::IndexType::IndexValueType) ((max[1]-min[1]) + 1);
-    boSize[2] = (mitk::SlicedData::IndexType::IndexValueType) ((max[2]-min[2]) + 1);
+    boSize[0] = (mitk::SlicedData::IndexType::IndexValueType) (max[0]-min[0]);
+    boSize[1] = (mitk::SlicedData::IndexType::IndexValueType) (max[1]-min[1]);
+    boSize[2] = (mitk::SlicedData::IndexType::IndexValueType) (max[2]-min[2]);
 
     itkImageType::RegionType region(boIndex, boSize);
 

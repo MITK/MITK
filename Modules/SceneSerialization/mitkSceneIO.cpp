@@ -30,6 +30,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkBaseRenderer.h"
 #include "mitkRenderingManager.h"
 #include "mitkStandaloneDataStorage.h"
+#include <mitkStandardFileLocations.h>
 
 #include <itkObjectFactoryBase.h>
 
@@ -39,7 +40,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include <sstream>
 
 #include "itksys/SystemTools.hxx"
-    
+ 
+int mitk::SceneIO::tempDiretoryID = 0;
+
 mitk::SceneIO::SceneIO()
 :m_WorkingDirectory(""),
  m_UnzipErrors(0)
@@ -52,7 +55,9 @@ mitk::SceneIO::~SceneIO()
 
 std::string mitk::SceneIO::CreateEmptyTempDirectory()
 {
-  std::string uniquename = Poco::TemporaryFile::tempName();
+  char uniqueNumber = '0' + mitk::SceneIO::tempDiretoryID;
+  std::string uniquename = mitk::StandardFileLocations::GetInstance()->GetOptionDirectory() + Poco::Path::separator() + "SceneIOTempDirectory" + uniqueNumber;  //old method (didn't work on dart client): Poco::TemporaryFile::tempName();
+  mitk::SceneIO::tempDiretoryID++;
   Poco::File tempdir( uniquename );
   try
   {

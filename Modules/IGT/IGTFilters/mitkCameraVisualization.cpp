@@ -35,6 +35,7 @@ m_Renderer(NULL), m_FocalLength(10.0), m_ViewAngle(30.0)
   m_ViewUpInToolCoordinates[0] = 1;
   m_ViewUpInToolCoordinates[1] = 0;
   m_ViewUpInToolCoordinates[2] = 0;
+  m_DirectionOfProjection.Fill(0);
 }
 
 
@@ -69,6 +70,7 @@ void mitk::CameraVisualization::GenerateData()
   const NavigationData* navigationData = this->GetInput();
   // get position from NavigationData to move the camera to this position
   Point3D cameraPosition = navigationData->GetPosition();
+  m_TipPosition = cameraPosition;
 
   //calculate the transform from the quaternions
   static itk::QuaternionRigidTransform<double>::Pointer quatTransform = itk::QuaternionRigidTransform<double>::New();
@@ -85,9 +87,9 @@ void mitk::CameraVisualization::GenerateData()
   static AffineTransform3D::MatrixType m;
   mitk::TransferMatrix(quatTransform->GetMatrix(), m);
 
-  Vector3D directionOfProjection = m*m_DirectionOfProjectionInToolCoordinates;
-  directionOfProjection.Normalize();
-  Point3D focalPoint = cameraPosition + m_FocalLength*directionOfProjection;
+  m_DirectionOfProjection = m*m_DirectionOfProjectionInToolCoordinates;
+  m_DirectionOfProjection.Normalize();
+  Point3D focalPoint = cameraPosition + m_FocalLength*m_DirectionOfProjection;
   // compute current view up vector
   Vector3D viewUp = m*m_ViewUpInToolCoordinates;
 

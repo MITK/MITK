@@ -549,9 +549,9 @@ DicomSeriesReader::GetSeries(const StringContainer& files, const StringContainer
 DicomSeriesReader::UidFileNamesMap 
 DicomSeriesReader::GetSeries(const std::string &dir, const StringContainer &restrictions)
 {
-  StringContainer dummyFileList;
-  dummyFileList.push_back(dir);
-  return GetSeries(dummyFileList, restrictions);
+  gdcm::Directory directoryLister;
+  directoryLister.Load( dir.c_str(), false ); // non-recursive
+  return GetSeries(directoryLister.GetFilenames(), restrictions);
 }
 
 #if GDCM_MAJOR_VERSION >= 2

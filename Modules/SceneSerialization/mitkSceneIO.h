@@ -111,6 +111,8 @@ class SceneSerialization_EXPORT SceneIO : public itk::Object
 
     std::string  m_WorkingDirectory;
     unsigned int m_UnzipErrors;
+
+    static int tempDiretoryID;
 };
 
 }

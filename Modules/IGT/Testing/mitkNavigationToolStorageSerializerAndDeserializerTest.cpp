@@ -207,8 +207,8 @@ int mitkNavigationToolStorageSerializerAndDeserializerTest(int /* argc */, char*
 {
   MITK_TEST_BEGIN("NavigationToolStorageSerializerAndDeserializer");
 
-  NavigationToolStorageSerializerAndDeserializerTestClass::TestInstantiationSerializer();
-  NavigationToolStorageSerializerAndDeserializerTestClass::TestInstantiationDeserializer();
+  //NavigationToolStorageSerializerAndDeserializerTestClass::TestInstantiationSerializer();
+  //NavigationToolStorageSerializerAndDeserializerTestClass::TestInstantiationDeserializer();
   NavigationToolStorageSerializerAndDeserializerTestClass::TestWriteSimpleToolStorage();
   NavigationToolStorageSerializerAndDeserializerTestClass::TestReadSimpleToolStorage();
   NavigationToolStorageSerializerAndDeserializerTestClass::TestWriteComplexToolStorage();

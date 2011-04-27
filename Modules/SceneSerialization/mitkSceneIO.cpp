@@ -55,26 +55,22 @@ mitk::SceneIO::~SceneIO()
 
 std::string mitk::SceneIO::CreateEmptyTempDirectory()
 {
+  mitk::SceneIO::tempDiretoryID++;
   char uniqueNumber = '0' + mitk::SceneIO::tempDiretoryID;
   std::string uniquename = mitk::StandardFileLocations::GetInstance()->GetOptionDirectory() + Poco::Path::separator() + "SceneIOTempDirectory" + uniqueNumber;  //old method (didn't work on dart client): Poco::TemporaryFile::tempName();
-  mitk::SceneIO::tempDiretoryID++;
   Poco::File tempdir( uniquename );
-  tempdir.createDirectory();
-  /*
+  
   try
   {
-    if (!tempdir.createDirectory())
-    {
-      MITK_ERROR << "Could not create temporary directory " << uniquename;
-      return "";
-    }
+    bool existsNot = tempdir.createDirectory();
+    if (!existsNot) {MITK_ERROR << "Warning: Directory already exitsts: " << uniquename;}
   }
   catch( std::exception& e )
   {
-      MITK_ERROR << "Could not create temporary directory " << uniquename << ":" << e.what();
-      return "";
+    MITK_ERROR << "Could not create temporary directory " << uniquename << ":" << e.what();
+    return "";
   }
-  */
+  
       
   return uniquename;
 }

@@ -59,6 +59,8 @@ std::string mitk::SceneIO::CreateEmptyTempDirectory()
   std::string uniquename = mitk::StandardFileLocations::GetInstance()->GetOptionDirectory() + Poco::Path::separator() + "SceneIOTempDirectory" + uniqueNumber;  //old method (didn't work on dart client): Poco::TemporaryFile::tempName();
   mitk::SceneIO::tempDiretoryID++;
   Poco::File tempdir( uniquename );
+  tempdir.createDirectory();
+  /*
   try
   {
     if (!tempdir.createDirectory())
@@ -72,6 +74,7 @@ std::string mitk::SceneIO::CreateEmptyTempDirectory()
       MITK_ERROR << "Could not create temporary directory " << uniquename << ":" << e.what();
       return "";
   }
+  */
       
   return uniquename;
 }

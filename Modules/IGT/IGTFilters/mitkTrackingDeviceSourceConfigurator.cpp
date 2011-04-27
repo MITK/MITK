@@ -124,19 +124,31 @@ mitk::TrackingDeviceSource::Pointer mitk::TrackingDeviceSourceConfigurator::Crea
   
   //now search for automatically detected tools in the tool storage and save them
   mitk::NavigationToolStorage::Pointer newToolStorageInRightOrder = mitk::NavigationToolStorage::New();
+  std::vector<int> alreadyFoundTools = std::vector<int>();
   for (int i=0; i<thisDevice->GetToolCount(); i++)
       {
       bool toolFound = false;
       for (int j=0; j<navigationTools->GetToolCount(); j++)
         {
+          //check if the serial number is the same to identify the tool
           if ((dynamic_cast<mitk::NDIPassiveTool*>(thisDevice->GetTool(i)))->GetSerialNumber() == navigationTools->GetTool(j)->GetSerialNumber())
             {
-            //add tool in right order
-            newToolStorageInRightOrder->AddTool(navigationTools->GetTool(j));
-            //adapt name of tool
-            dynamic_cast<mitk::NDIPassiveTool*>(thisDevice->GetTool(i))->SetToolName(navigationTools->GetTool(j)->GetToolName());
-            toolFound = true;
-            break;
+            //check if this tool was already added to make sure that every tool is only added once (in case of same serial numbers)
+            bool toolAlreadyAdded = false;
+            for(int k=0; k<alreadyFoundTools.size(); k++) if (alreadyFoundTools.at(k) == j) toolAlreadyAdded = true;
+            
+            if(!toolAlreadyAdded)
+              {
+              //add tool in right order
+              newToolStorageInRightOrder->AddTool(navigationTools->GetTool(j));
+              //adapt name of tool
+              dynamic_cast<mitk::NDIPassiveTool*>(thisDevice->GetTool(i))->SetToolName(navigationTools->GetTool(j)->GetToolName());
+              //rember that this tool was already found
+              alreadyFoundTools.push_back(j);
+
+              toolFound = true;
+              break;
+              }
             }
         }
       if (!toolFound)

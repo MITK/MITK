@@ -58,7 +58,9 @@ std::string mitk::SceneIO::CreateEmptyTempDirectory()
   mitk::SceneIO::tempDiretoryID++;
   std::stringstream uniqueNumber;
   uniqueNumber << mitk::SceneIO::tempDiretoryID;
-  std::string uniquename = mitk::StandardFileLocations::GetInstance()->GetOptionDirectory() + Poco::Path::separator() + "SceneIOTempDirectory" + uniqueNumber.str() + Poco::Path::separator(); //+ uniqueNumber;  //old method (didn't work on dart client): Poco::TemporaryFile::tempName();
+  std::string returnValue = mitk::StandardFileLocations::GetInstance()->GetOptionDirectory() + Poco::Path::separator() + "SceneIOTempDirectory" + uniqueNumber.str();
+  //old method (didn't work on dart client): Poco::TemporaryFile::tempName();
+  std::string uniquename = returnValue + Poco::Path::separator();
   Poco::File tempdir( uniquename );
   
   try
@@ -73,7 +75,7 @@ std::string mitk::SceneIO::CreateEmptyTempDirectory()
   }
   
       
-  return uniquename;
+  return returnValue;
 }
 
 mitk::DataStorage::Pointer mitk::SceneIO::LoadScene( const std::string& filename, 

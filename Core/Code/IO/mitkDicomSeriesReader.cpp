@@ -15,6 +15,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
+#define MBILOG_ENABLE_DEBUG
+
 #include <mitkDicomSeriesReader.h>
 
 #include <itkGDCMSeriesFileNames.h>
@@ -296,6 +298,92 @@ DicomSeriesReader::ReadPhilips3DDicom(const std::string &filename, mitk::Image::
   return true; // actually never returns false yet.. but exception possible
 }
 #endif
+
+DicomSeriesReader::TwoStringContainers
+DicomSeriesReader::AnalyzeFileForITKImageSeriesReaderSpacingAssumption(
+    const StringContainer& files,
+    const gdcm::Scanner::MappingType& tagValueMappings_)
+{
+  // result.first = files that fit ITK's assumption
+  // result.second = files that do not fit
+  TwoStringContainers result;
+ 
+  // we const_cast here, because I could not use a map.at(), which would make the code much more readable
+  gdcm::Scanner::MappingType& tagValueMappings = const_cast<gdcm::Scanner::MappingType&>(tagValueMappings_);
+  const gdcm::Tag tagImagePositionPatient(0x0020,0x0032); // Image Position (Patient)
+
+  Vector3D fromFirstToSecondOrigin; fromFirstToSecondOrigin.Fill(0.0);
+  Point3D thisOrigin; thisOrigin.Fill(0.0);
+  Point3D lastOrigin; lastOrigin.Fill(0.0);
+
+  MITK_DEBUG << "Analyzing files for z-spacing assumption of ITK's ImageSeriesReader ";
+  unsigned int fileIndex(0);
+  for (StringContainer::const_iterator fileIter = files.begin();
+       fileIter != files.end();
+       ++fileIter, ++fileIndex)
+  {
+    // Read tag value into point3D. PLEASE replace this by appropriate GDCM code if you figure out how to do that
+    std::string thisOriginString = tagValueMappings[fileIter->c_str()][tagImagePositionPatient];
+    
+    std::istringstream originReader(thisOriginString);
+    std::string coordinate;
+    unsigned int dim(0);
+    while( std::getline( originReader, coordinate, '\\' ) )
+    {
+      thisOrigin[dim++] = atof(coordinate.c_str());
+    }
+
+    if (dim != 3)
+    {
+      MITK_ERROR << "Reader implementation made wrong assumption on tag (0020,0032). Found " << dim << "instead of 3 values.";
+    }
+    
+    MITK_DEBUG << "  " << fileIndex << " " << *fileIter;
+    MITK_DEBUG << "    Origin at " << thisOriginString << "(" << thisOrigin[0] << "," << thisOrigin[1] << "," << thisOrigin[2] << ")";
+    MITK_DEBUG << "    Last origin at " << "(" << lastOrigin[0] << "," << lastOrigin[1] << "," << lastOrigin[2] << ")";
+
+    // fill in vector value as soon as possible
+    if (fileIndex == 1)
+    {
+      fromFirstToSecondOrigin = thisOrigin - lastOrigin;
+    }
+    else if (fileIndex > 1)
+    {
+      Point3D assumedOrigin = lastOrigin + fromFirstToSecondOrigin;
+
+      Vector3D originError = assumedOrigin - thisOrigin;
+      double norm = originError.GetNorm();
+
+      if (norm > mitk::eps)
+      {
+        MITK_WARN << "File " << *fileIter << " breaks the distance pattern. Expected position (" 
+                                          << assumedOrigin[0] << ","
+                                          << assumedOrigin[1] << ","
+                                          << assumedOrigin[2] << "), got position ("
+                                          << thisOrigin[0] << ","
+                                          << thisOrigin[1] << ","
+                                          << thisOrigin[2] << ")";
+
+        // At this point we know we deviated from the expectation of ITK's ImageSeriesReader
+        // We split the input file list at this point, i.e. all files up to this one (excluding it)
+        // are returned as group 1, the remaining files (including the faulty one) are group 2
+        
+        result.first.assign( files.begin(), fileIter );
+        result.second.assign( fileIter, files.end() );
+
+        return result; // stop processing with first split
+      }
+    }
+
+    lastOrigin = thisOrigin;
+  }
+  
+  // default: all files match our expectations: return unchanged list
+  result.first = files;
+ 
+  return result;
+}
+
   
 DicomSeriesReader::UidFileNamesMap 
 DicomSeriesReader::GetSeries(const StringContainer& files, const StringContainer &restrictions)
@@ -346,10 +434,11 @@ DicomSeriesReader::GetSeries(const StringContainer& files, const StringContainer
 #else
   // new GDCM: use GDCM directly, itk::GDCMSeriesFileNames does not work with GDCM 2
 
-  // set directory
-  //const gdcm::Directory::FilenamesType &gAllFiles = gDirectory.GetFilenames();
+  // PART I: scan files for sorting relevant DICOM tags, 
+  //         separate images that differ in any of those 
+  //         attributes (they cannot possibly form a 3D block)
 
-  // scann for relevant tags in dicom files
+  // scan for relevant tags in dicom files
   gdcm::Scanner scanner;
   const gdcm::Tag tagSeriesInstanceUID(0x0020,0x000e); // Series Instance UID
     scanner.AddTag( tagSeriesInstanceUID );
@@ -368,6 +457,11 @@ DicomSeriesReader::GetSeries(const StringContainer& files, const StringContainer
 
   const gdcm::Tag tagNumberOfColumns(0x0028, 0x0011); // number cols
     scanner.AddTag( tagNumberOfColumns );
+  
+  // additional tags read in this scan to allow later analysis
+  // THESE tag are not used for initial separating of files
+  const gdcm::Tag tagImagePositionPatient(0x0020,0x0032); // Image Position (Patient)
+    scanner.AddTag( tagImagePositionPatient );
 
   // TODO add further restrictions from arguments
 
@@ -384,7 +478,7 @@ DicomSeriesReader::GetSeries(const StringContainer& files, const StringContainer
        fileIter != scanner.End();
        ++fileIter)
   {
-    MITK_DEBUG << "File " << fileIter->first << std::endl;
+    MITK_DEBUG << "Read file " << fileIter->first << std::endl;
     if ( std::string(fileIter->first).empty() ) continue; // TODO understand why Scanner has empty string entries
 
     // we const_cast here, because I could not use a map.at() function in CreateMoreUniqueSeriesIdentifier.
@@ -393,12 +487,58 @@ DicomSeriesReader::GetSeries(const StringContainer& files, const StringContainer
     std::string moreUniqueSeriesId = CreateMoreUniqueSeriesIdentifier( const_cast<gdcm::Scanner::TagToValue&>(fileIter->second) );
     map [ moreUniqueSeriesId ].push_back( fileIter->first );
   }
+  
+  // PART II: analyze pre-sorted images for valid blocks, 
+  //          separate into multiple blocks if necessary.
+  //          
+  //          Analysis performs the following steps:
+  //            * sort slices spatially
+  //            * imitate itk::ImageSeriesReader: use the distance between the first two images as z-spacing
+  //            * check what images actually fulfill ITK's z-spacing assumption
+  //            * separate all images that fail the test into new blocks, re-iterate analysis for these blocks
 
+  for ( UidFileNamesMap::const_iterator groupIter = map.begin(); groupIter != map.end(); ++groupIter )
+  {
+    // sort each slice group spatially
+    map[ groupIter->first ] = SortSeriesSlices( groupIter->second  );
+  }
+
+  for ( UidFileNamesMap::const_iterator groupIter = map.begin(); groupIter != map.end(); ++groupIter )
+  {
+    std::string groupUID = groupIter->first;
+    unsigned int subgroup(0);
+    MITK_DEBUG << "Analyze group " << groupUID;
+    TwoStringContainers analysisResult = AnalyzeFileForITKImageSeriesReaderSpacingAssumption( groupIter->second, scanner.GetMappings() );
+    map[ groupUID ] = analysisResult.first;
+
+    if ( !analysisResult.second.empty() )
+    {
+      MITK_DEBUG << "  " << analysisResult.second.size() << " files do not fit ITK's spacing assumption";
+      MITK_DEBUG << "  Expected group: ";
+      for (StringContainer::const_iterator fileIter = analysisResult.first.begin();
+           fileIter != analysisResult.first.end();
+           ++fileIter) MITK_DEBUG << "    " << *fileIter;
+      MITK_DEBUG << "  Unexpected group: ";
+      for (StringContainer::const_iterator fileIter = analysisResult.second.begin();
+           fileIter != analysisResult.second.end();
+           ++fileIter) MITK_DEBUG << "    " << *fileIter;
+
+      map[ groupUID ] = analysisResult.first;
+      std::stringstream newGroupUID;
+      newGroupUID << groupUID << '.' << ++subgroup;
+      map[ newGroupUID.str() ] = analysisResult.second;
+      // TODO recurse
+    }
+    else
+    {
+      MITK_DEBUG << "  All files fit ITK's spacing assumption";
+    }
+  }
 #endif
 
-  for ( UidFileNamesMap::const_iterator i = map.begin(); i != map.end(); ++i )
+  for ( UidFileNamesMap::const_iterator groupIter = map.begin(); groupIter != map.end(); ++groupIter )
   {
-    MITK_DEBUG << "Entry " << i->first << " with " << i->second.size() << " files";
+    MITK_DEBUG << "Entry " << groupIter->first << " with " << groupIter->second.size() << " files";
   }
 
   return map;
@@ -460,7 +600,6 @@ DicomSeriesReader::CreateMoreUniqueSeriesIdentifier( gdcm::Scanner::TagToValue& 
 
   constructedID.resize( constructedID.length() - 1 ); // cut of trailing '.'
 
-  MITK_DEBUG << "ID: " << constructedID;
   return constructedID; 
 }
 

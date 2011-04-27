@@ -69,7 +69,7 @@ namespace mitk
  // file now divided into groups of identical image size, orientation, spacing, etc.
  // each of these lists should be loadable as an mitk::Image.
 
- // optional step: sorting
+ // optional step: sorting (this is also done by LoadDicomSeries if not explicitly suppressed)
  DicomSeriesReader::StringContainer seriesToLoad = allImageBlocks[...]; // decide for yourself
   
  DicomSeriesReader::StringContainer oneBlockSorted = DicomSeriesReader::SortSeriesSlices( seriesToLoad );
@@ -79,6 +79,27 @@ namespace mitk
 
  Image::Pointer image = dynamic_cast<mitk::Image*>( node->GetData() );
 \endcode
+
+TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
+ <b>Necessary changes (bug 7285)</b>
+
+ * GetSeries should by default
+   * sort slices
+   * determine if slice groups contain gaps (this is only done fast if slices are sorted previously)
+     of if slices are not equally spaced
+     * if gap, split into two parts 
+     * if non-continous: split into continuous groups
+       * this is a little tricky: create (all?) possible sortings, then determine the one with minimum number of groups
+ * If somebody demands it, this check could be explicitly disabled by a flag
+ * The SortSeriesSlices method can be removed (take care of existing callers), since this is done by GetSeries
+ * LoadDicomSeries changes
+   * remove parameter "bool sort" (now expected to be done previously)
+
+ * handle titled geometries!
+   * ImageSeriesReader will definitely calculate a wrong spacing
+   * either we load each slice separately
+   * or ...?
+TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
  
  \section DicomSeriesReader_sorting Sorting into 3D+t blocks
 
@@ -152,6 +173,7 @@ public:
     \brief For lists of filenames 
   */
   typedef std::vector<std::string> StringContainer;
+  typedef std::pair<StringContainer, StringContainer> TwoStringContainers;
 
   /** 
     \brief For multiple lists of filenames, assigned an ID each 
@@ -210,6 +232,15 @@ public:
   static
   UidFileNamesMap 
   GetSeries(const StringContainer& files, const StringContainer &restrictions = StringContainer());
+
+  /**
+    relevant code that is matched here is in 
+    itkImageSeriesReader.txx (ImageSeriesReader<TOutputImage>::GenerateOutputInformation(void)), lines 176 to 245 (as of ITK 3.20)
+
+  */
+  static
+  TwoStringContainers
+  AnalyzeFileForITKImageSeriesReaderSpacingAssumption(const StringContainer& files, const gdcm::Scanner::MappingType& tagValueMappings);
 
   /**
     Sort a set of file names in an order that is meaningful for loading them into an mitk::Image.

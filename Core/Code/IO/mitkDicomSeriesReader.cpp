@@ -311,6 +311,7 @@ DicomSeriesReader::AnalyzeFileForITKImageSeriesReaderSpacingAssumption(
   // we const_cast here, because I could not use a map.at(), which would make the code much more readable
   gdcm::Scanner::MappingType& tagValueMappings = const_cast<gdcm::Scanner::MappingType&>(tagValueMappings_);
   const gdcm::Tag tagImagePositionPatient(0x0020,0x0032); // Image Position (Patient)
+  const gdcm::Tag tagImageOrientation(0x0020, 0x0037); // image orientation
 
   Vector3D fromFirstToSecondOrigin; fromFirstToSecondOrigin.Fill(0.0);
   Point3D thisOrigin; thisOrigin.Fill(0.0);
@@ -346,6 +347,73 @@ DicomSeriesReader::AnalyzeFileForITKImageSeriesReaderSpacingAssumption(
     if (fileIndex == 1)
     {
       fromFirstToSecondOrigin = thisOrigin - lastOrigin;
+
+      // Now make sure this direction is along the normal vector of the first slice
+      // If this is NOT the case, then we have a data set with a tilted gantry geometry,
+      // which cannot be loaded into a single mitk::Image at the moment
+
+      // Again ugly code to read tag Image Orientation into two Vectors
+      Vector3D right; right.Fill(0.0);
+      Vector3D up; right.Fill(0.0); // might be down as, but it is just a name at this point
+      std::string thisOrientationString = tagValueMappings[fileIter->c_str()][tagImageOrientation];
+
+      MITK_INFO << "Orientation " << thisOrientationString;
+      
+      std::istringstream orientationReader(thisOrientationString);
+      std::string coordinate;
+      unsigned int dim(0);
+      while( std::getline( orientationReader, coordinate, '\\' ) )
+      {
+        if (dim<3)
+        {
+          right[dim++] = atof(coordinate.c_str());
+        }
+        else
+        {
+          up[dim++ - 3] = atof(coordinate.c_str());
+        }
+      }
+
+      if (dim != 6)
+      {
+        MITK_ERROR << "Reader implementation made wrong assumption on tag (0020,0037). Found " << dim << "instead of 6 values.";
+      }
+
+      MITK_DEBUG << "Tilt check: right vector (" << right[0] << "," << right[1] << "," << right[2] << "), "
+                                   "up vector (" << up[0] << "," << up[1] << "," << up[2] << ")";
+
+      /* 
+         Determine if line (thisOrigin + l * normal) contains lastOrigin.
+
+         Done by calculating the distance of lastOrigin from line (thisOrigin + l *normal)
+
+         E.g. http://mathworld.wolfram.com/Point-LineDistance3-Dimensional.html
+
+         squared distance = | (pointAlongNormal - thisOrign) x (thisOrigin - lastOrigin) | ^ 2
+                            /
+                            |pointAlongNormal - thisOrigin| ^ 2
+
+         ( x meaning the cross product )
+      */
+
+      Vector3D normal = itk::CrossProduct(right, up);
+      Point3D pointAlongNormal = thisOrigin + normal;
+      
+      double numerator = itk::CrossProduct( pointAlongNormal - thisOrigin , thisOrigin - lastOrigin ).GetSquaredNorm();
+      double denominator = (pointAlongNormal - thisOrigin).GetSquaredNorm();
+
+      double distance = sqrt(numerator / denominator);
+
+      if (distance > mitk::eps)
+      {
+        MITK_WARN << "Series seems to contain a tilted geometry. Will load as many single slices.";
+        MITK_WARN << "Distance of expected origin from actual origin: " << distance;
+
+        result.first.assign( files.begin(), fileIter );
+        result.second.assign( fileIter, files.end() );
+
+        return result; // stop processing with first split
+      }
     }
     else if (fileIndex > 1)
     {

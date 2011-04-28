@@ -70,7 +70,20 @@ std::string mitk::SceneIO::CreateEmptyTempDirectory()
   try
   {
     bool existsNot = tempdir.createDirectory();
-    if (!existsNot) {MITK_ERROR << "Warning: Directory already exitsts: " << uniquename;}
+    if (!existsNot) 
+      {
+      MITK_ERROR << "Warning: Directory already exitsts: " << uniquename << " (choosing another)";
+      srand ( time(NULL) );
+      randomNumber = rand() % 10000 + 1;
+      uniqueNumber << randomNumber;
+      returnValue = mitk::StandardFileLocations::GetInstance()->GetOptionDirectory() + Poco::Path::separator() + "SceneIOTempDirectory" + uniqueNumber.str();
+      uniquename = returnValue + Poco::Path::separator();
+      Poco::File tempdir2( uniquename );
+      if (!tempdir2.createDirectory())
+        {
+        MITK_ERROR << "Warning: Second directory also already exitsts: " << uniquename;
+        }
+      }
   }
   catch( std::exception& e )
   {

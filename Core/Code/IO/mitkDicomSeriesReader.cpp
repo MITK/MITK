@@ -354,9 +354,11 @@ DicomSeriesReader::AnalyzeFileForITKImageSeriesReaderSpacingAssumption(
       Vector3D originError = assumedOrigin - thisOrigin;
       double norm = originError.GetNorm();
 
-      if (norm > mitk::eps)
+      if (norm > 3 * mitk::sqrteps)
       {
-        MITK_WARN << "File " << *fileIter << " breaks the inter-slice distance pattern.";
+        MITK_WARN << "File " << *fileIter << " breaks the inter-slice distance pattern (diff = " 
+                             << norm << ", allowed " 
+                             << 3 * (mitk::sqrteps)<< ").";
         MITK_WARN << "Expected position (" << assumedOrigin[0] << ","
                                           << assumedOrigin[1] << ","
                                           << assumedOrigin[2] << "), got position ("

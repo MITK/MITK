@@ -90,8 +90,16 @@ int main(int argc, char** argv)
     }
 
     bool loadedAsExpected = loader.CompareImageInformationDumps( expectedDumps[imageCounter], imageDump );
-    MITK_INFO << "Image " << imageCounter << " loads as expected.";
-    // TODO compare against reference
+    if (loadedAsExpected)
+    {
+      MITK_INFO << "Image " << imageCounter << " loads as expected.";
+    }
+    else
+    {
+      MITK_ERROR << "Image " << imageCounter << " did not load as expected.";
+      MITK_INFO << "Expected: \n" << expectedDumps[imageCounter] << "\nGot:\n" << imageDump;
+      return EXIT_FAILURE;
+    }
   }
 
   return EXIT_SUCCESS;

@@ -153,8 +153,8 @@ public:
         m_Actor = vtkSmartPointer<vtkActor>::New();
         //always the same actions for each render window:
         //set up the plane
-        m_Plane->SetCenter(0.0, 0.0, 0.0);
-        m_Plane->SetNormal(0.0, 0.0, 1.0);
+//        m_Plane->SetCenter(0.0, 0.0, 0.0);
+//        m_Plane->SetNormal(0.0, 0.0, 1.0);
         //connect the plane to the mapper
         m_Mapper->SetInputConnection(m_Plane->GetOutputPort());
         //set the mapper for the actor
@@ -262,7 +262,10 @@ public:
 
 protected:
   //Adjust the geometry of each slice to the displayGeometry in order to render in the full render window
-  void AdjustToDisplayGeometry(mitk::BaseRenderer* renderer);
+  void AdjustToDisplayGeometry(mitk::BaseRenderer* renderer, double originArray[3]);
+
+  //set the camera to view the textured plane
+  void AdjustCamera(mitk::BaseRenderer* renderer);
 
   ImageVtkMapper2D();
 

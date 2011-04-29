@@ -311,10 +311,14 @@ DicomSeriesReader::AnalyzeFileForITKImageSeriesReaderSpacingAssumption(
   // we const_cast here, because I could not use a map.at(), which would make the code much more readable
   gdcm::Scanner::MappingType& tagValueMappings = const_cast<gdcm::Scanner::MappingType&>(tagValueMappings_);
   const gdcm::Tag tagImagePositionPatient(0x0020,0x0032); // Image Position (Patient)
+  const gdcm::Tag tagImageOrientation(0x0020, 0x0037); // image orientation
 
   Vector3D fromFirstToSecondOrigin; fromFirstToSecondOrigin.Fill(0.0);
-  Point3D thisOrigin; thisOrigin.Fill(0.0);
-  Point3D lastOrigin; lastOrigin.Fill(0.0);
+  bool fromFirstToSecondOriginInitialized(false);
+  Point3D thisOrigin;
+  Point3D lastOrigin;
+  Point3D lastDifferentOrigin;
+  bool lastOriginInitialized(false);
 
   MITK_DEBUG << "Analyzing files for z-spacing assumption of ITK's ImageSeriesReader ";
   unsigned int fileIndex(0);
@@ -342,53 +346,139 @@ DicomSeriesReader::AnalyzeFileForITKImageSeriesReaderSpacingAssumption(
                        << " at " 
                        << thisOriginString << "(" << thisOrigin[0] << "," << thisOrigin[1] << "," << thisOrigin[2] << ")";
 
-    // fill in vector value as soon as possible
-    if (fileIndex == 1)
+    if ( lastOriginInitialized && (thisOrigin == lastOrigin) )
     {
-      fromFirstToSecondOrigin = thisOrigin - lastOrigin;
+      MITK_DEBUG << "Sort away " << *fileIter << " for separate time step";
+      // TODO sort away this slice, we already have one occupying this position
+      result.second.push_back( *fileIter );
     }
-    else if (fileIndex > 1)
+    else
     {
-      Point3D assumedOrigin = lastOrigin + fromFirstToSecondOrigin;
-
-      Vector3D originError = assumedOrigin - thisOrigin;
-      double norm = originError.GetNorm();
-
-      if (norm > 3 * mitk::sqrteps)
+      // fill in vector value as soon as possible
+      if (!fromFirstToSecondOriginInitialized && lastOriginInitialized) // calculate vector as soon as possible when we get a new position
       {
-        MITK_WARN << "File " << *fileIter << " breaks the inter-slice distance pattern (diff = " 
-                             << norm << ", allowed " 
-                             << 3 * (mitk::sqrteps)<< ").";
-        MITK_WARN << "Expected position (" << assumedOrigin[0] << ","
-                                          << assumedOrigin[1] << ","
-                                          << assumedOrigin[2] << "), got position ("
-                                          << thisOrigin[0] << ","
-                                          << thisOrigin[1] << ","
-                                          << thisOrigin[2] << ")";
+        fromFirstToSecondOrigin = thisOrigin - lastDifferentOrigin;
+        fromFirstToSecondOriginInitialized = true;
 
-        // At this point we know we deviated from the expectation of ITK's ImageSeriesReader
-        // We split the input file list at this point, i.e. all files up to this one (excluding it)
-        // are returned as group 1, the remaining files (including the faulty one) are group 2
+        // Now make sure this direction is along the normal vector of the first slice
+        // If this is NOT the case, then we have a data set with a tilted gantry geometry,
+        // which cannot be loaded into a single mitk::Image at the moment
+
+        // Again ugly code to read tag Image Orientation into two Vectors
+        Vector3D right; right.Fill(0.0);
+        Vector3D up; right.Fill(0.0); // might be down as, but it is just a name at this point
+        std::string thisOrientationString = tagValueMappings[fileIter->c_str()][tagImageOrientation];
         
-        result.first.assign( files.begin(), fileIter );
-        result.second.assign( fileIter, files.end() );
+        std::istringstream orientationReader(thisOrientationString);
+        std::string coordinate;
+        unsigned int dim(0);
+        while( std::getline( orientationReader, coordinate, '\\' ) )
+        {
+          if (dim<3)
+          {
+            right[dim++] = atof(coordinate.c_str());
+          }
+          else
+          {
+            up[dim++ - 3] = atof(coordinate.c_str());
+          }
+        }
 
-        return result; // stop processing with first split
+        if (dim != 6)
+        {
+          MITK_ERROR << "Reader implementation made wrong assumption on tag (0020,0037). Found " << dim << "instead of 6 values.";
+        }
+
+        MITK_DEBUG << "Tilt check: right vector (" << right[0] << "," << right[1] << "," << right[2] << "), "
+                                     "up vector (" << up[0] << "," << up[1] << "," << up[2] << ")";
+
+        /* 
+           Determine if line (thisOrigin + l * normal) contains lastDifferentOrigin.
+
+           Done by calculating the distance of lastDifferentOrigin from line (thisOrigin + l *normal)
+
+           E.g. http://mathworld.wolfram.com/Point-LineDistance3-Dimensional.html
+
+           squared distance = | (pointAlongNormal - thisOrign) x (thisOrigin - lastDifferentOrigin) | ^ 2
+                              /
+                              |pointAlongNormal - thisOrigin| ^ 2
+
+           ( x meaning the cross product )
+        */
+
+        Vector3D normal = itk::CrossProduct(right, up);
+        Point3D pointAlongNormal = thisOrigin + normal;
+        
+        double numerator = itk::CrossProduct( pointAlongNormal - thisOrigin , thisOrigin - lastDifferentOrigin ).GetSquaredNorm();
+        double denominator = (pointAlongNormal - thisOrigin).GetSquaredNorm();
+
+        double distance = sqrt(numerator / denominator);
+
+        if (distance > 0.001)
+        {
+          MITK_WARN << "Series seems to contain a tilted geometry. Will load as many single slices.";
+          MITK_WARN << "Distance of expected origin from actual origin: " << distance;
+
+          result.first.assign( files.begin(), fileIter );
+          result.second.insert( result.second.end(), fileIter, files.end() );
+
+          return result; // stop processing with first split
+        }
       }
+      else if (fromFirstToSecondOriginInitialized) // we already know the offset between slices
+      {
+        Point3D assumedOrigin = lastDifferentOrigin + fromFirstToSecondOrigin;
+
+        Vector3D originError = assumedOrigin - thisOrigin;
+        double norm = originError.GetNorm();
+
+        if (norm > 3 * mitk::sqrteps)
+        {
+          MITK_WARN << "File " << *fileIter << " breaks the inter-slice distance pattern (diff = " 
+                               << norm << ", allowed " 
+                               << 3 * (mitk::sqrteps)<< ").";
+          MITK_WARN << "Expected position (" << assumedOrigin[0] << ","
+                                            << assumedOrigin[1] << ","
+                                            << assumedOrigin[2] << "), got position ("
+                                            << thisOrigin[0] << ","
+                                            << thisOrigin[1] << ","
+                                            << thisOrigin[2] << ")";
+
+          // At this point we know we deviated from the expectation of ITK's ImageSeriesReader
+          // We split the input file list at this point, i.e. all files up to this one (excluding it)
+          // are returned as group 1, the remaining files (including the faulty one) are group 2
+          
+          result.first.assign( files.begin(), fileIter );
+          result.second.insert( result.second.end(), fileIter, files.end() );
+
+          return result; // stop processing with first split
+        }
+      }
+
+      result.first.push_back(*fileIter);
     }
 
-    lastOrigin = thisOrigin;
+    // recored current origin for reference in later iterations
+    if ( !lastOriginInitialized || thisOrigin != lastOrigin )
+    {
+      lastDifferentOrigin = thisOrigin;
+    }
+
+    lastOrigin = thisOrigin; 
+    lastOriginInitialized = true;
   }
   
-  // default: all files match our expectations: return unchanged list
-  result.first = files;
- 
   return result;
 }
 
-  
 DicomSeriesReader::UidFileNamesMap 
 DicomSeriesReader::GetSeries(const StringContainer& files, const StringContainer &restrictions)
+{
+  return GetSeries(files, true, restrictions);
+}
+  
+DicomSeriesReader::UidFileNamesMap 
+DicomSeriesReader::GetSeries(const StringContainer& files, bool sortTo3DPlust, const StringContainer &restrictions)
 {
   UidFileNamesMap map; // result variable
 
@@ -504,9 +594,10 @@ DicomSeriesReader::GetSeries(const StringContainer& files, const StringContainer
     map[ groupIter->first ] = SortSeriesSlices( groupIter->second  );
   }
 
-  UidFileNamesMap enhancedMap; // additional results generated by this analysis step
+  UidFileNamesMap mapOf3DPlusTBlocks; // sorting results generated by this analysis step
   for ( UidFileNamesMap::const_iterator groupIter = map.begin(); groupIter != map.end(); ++groupIter )
   {
+    UidFileNamesMap mapOf3DBlocks;      // intermediate result for only this group(!)
     StringContainer filesStillToAnalyze = groupIter->second;
     std::string groupUID = groupIter->first;
     unsigned int subgroup(0);
@@ -516,35 +607,86 @@ DicomSeriesReader::GetSeries(const StringContainer& files, const StringContainer
     {
       TwoStringContainers analysisResult = AnalyzeFileForITKImageSeriesReaderSpacingAssumption( filesStillToAnalyze, scanner.GetMappings() );
 
-      if (subgroup > 0) // record what has already been sorted out
-      {
-        // enhance the UID for additional groups
-        std::stringstream newGroupUID;
-        newGroupUID << groupUID << '.' << subgroup;
-        enhancedMap[ newGroupUID.str() ] = analysisResult.first;
-        MITK_INFO << "Sorted group " << newGroupUID.str() << " with " << enhancedMap[ newGroupUID.str() ].size() << " files";
-      }
-      else
-      {
-        map[ groupUID ] = analysisResult.first;
-        MITK_INFO << "Sorted group " << groupUID << " with " << map[ groupUID ].size() << " files";
-      }
+      // enhance the UID for additional groups
+      std::stringstream newGroupUID;
+      newGroupUID << groupUID << '.' << subgroup;
+      mapOf3DBlocks[ newGroupUID.str() ] = analysisResult.first;
+      MITK_INFO << "Sorted 3D group " << newGroupUID.str() << " with " << mapOf3DBlocks[ newGroupUID.str() ].size() << " files";
+      
       ++subgroup;
         
       filesStillToAnalyze = analysisResult.second; // remember what needs further analysis
     }
+
+    // end of grouping, now post-process groups
+  
+    // PART III: attempt to group blocks to 3D+t blocks if requested
+    //           inspect entries of mapOf3DBlocks
+    //            - if number of files is identical to previous entry, collect for 3D+t block
+    //            - as soon as number of files changes from previous entry, record collected blocks as 3D+t block, start a new one, continue
+
+    // decide whether or not to group 3D blocks into 3D+t blocks where possible
+    if ( !sortTo3DPlust )
+    {
+      // copy 3D blocks to output
+      // TODO avoid collisions (or prove impossibility)
+      mapOf3DPlusTBlocks.insert( mapOf3DBlocks.begin(), mapOf3DBlocks.end() );
+    }
+    else
+    {
+      // sort 3D+t (as described in "PART III")
+
+      unsigned int numberOfFilesInPreviousBlock(0);
+      std::string previousBlockKey;
+
+      for ( UidFileNamesMap::const_iterator block3DIter = mapOf3DBlocks.begin();
+            block3DIter != mapOf3DBlocks.end();
+            ++block3DIter )
+      {
+        unsigned int numberOfFilesInThisBlock = block3DIter->second.size();
+        std::string thisBlockKey = block3DIter->first;
+        
+        if (numberOfFilesInPreviousBlock == 0)
+        {
+          numberOfFilesInPreviousBlock = numberOfFilesInThisBlock;
+          mapOf3DPlusTBlocks[thisBlockKey].insert( mapOf3DPlusTBlocks[thisBlockKey].end(), 
+                                                   block3DIter->second.begin(), 
+                                                   block3DIter->second.end() );
+          MITK_INFO << "3D+t group " << thisBlockKey << " started";
+          previousBlockKey = thisBlockKey;
+        }
+        else
+        {
+          // check whether this and the previous block share a comon origin 
+          std::string thisOriginString = scanner.GetValue( mapOf3DBlocks[thisBlockKey].front().c_str(), tagImagePositionPatient );
+          std::string previousOriginString = scanner.GetValue( mapOf3DBlocks[previousBlockKey].front().c_str(), tagImagePositionPatient );
+          // TODO should be safe, but a little try/catch or other error handling wouldn't hurt
+          
+          bool identicalOrigins(thisOriginString == previousOriginString);
+
+          if (identicalOrigins && (numberOfFilesInPreviousBlock == numberOfFilesInThisBlock))
+          {
+            // group with previous block
+            mapOf3DPlusTBlocks[previousBlockKey].insert( mapOf3DPlusTBlocks[previousBlockKey].end(), 
+                                                         block3DIter->second.begin(), 
+                                                         block3DIter->second.end() );
+            MITK_INFO << "3D+t group " << previousBlockKey << " enhanced with another timestep";
+          }
+          else
+          {
+            // start a new block
+            mapOf3DPlusTBlocks[thisBlockKey].insert( mapOf3DPlusTBlocks[thisBlockKey].end(), 
+                                                     block3DIter->second.begin(), 
+                                                     block3DIter->second.end() );
+            MITK_INFO << "3D+t group " << thisBlockKey << " started";
+            previousBlockKey = thisBlockKey;
+          }
+        }
+        
+        numberOfFilesInPreviousBlock = numberOfFilesInThisBlock;
+      }
+    }
   }
-
-  // add newly generated results TODO avoid collisions (or prove impossibility)
-  map.insert( enhancedMap.begin(), enhancedMap.end() );
-
-  /* TODO at this point:
-
-    sort slices spatially SortSeriesSlices
-    sort into blocks of equal spacing
-
-  */
-
 
 #endif
 
@@ -553,7 +695,7 @@ DicomSeriesReader::GetSeries(const StringContainer& files, const StringContainer
     MITK_DEBUG << "Slice group " << groupIter->first << " with " << groupIter->second.size() << " files";
   }
 
-  return map;
+  return mapOf3DPlusTBlocks;
 }
 
 DicomSeriesReader::UidFileNamesMap 
@@ -723,6 +865,7 @@ DicomSeriesReader::GdcmSortFunction(const gdcm::DataSet &ds1, const gdcm::DataSe
     if (ds2.FindDataElement(gdcm::Tag(0x0008,0x0032)))
       acq_time2.Set(ds2);
 
+    // TODO this could lead to comparison of unset times (does Attribute initialize to good defaults?)
     // exception: same position: compare by acquisition time
     return acq_time1 < acq_time2;
   }

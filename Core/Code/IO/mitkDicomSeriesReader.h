@@ -99,6 +99,21 @@ TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
    * ImageSeriesReader will definitely calculate a wrong spacing
    * either we load each slice separately
    * or ...?
+
+
+ 3D+t handling:
+  * the "block sorting" in GetSeries will separate images that occupy the identical position in space
+    * this process will keep the initial sorting that organized slices by 1. position 2. acquisition time
+    * i.e. after block sorting, there are multiple blocks that cover identical positions and 
+      have identical properties regarding orientation, dimensions, spacing etc.
+  * depending on arguments passed to GetSeries, it will attempt to group as many image blocks as possible to
+    a single, large 3D+t image group (default behavior is to do this).
+  * LoadDicomSeries expects(!) that the filenames passed either form a valid 3D block or a 3D+t block
+    as sorted by GetSeries()
+
+  * TODO later, when dicom tags are loaded for each mitk::Image slice, there should be a verification
+    step for correct positions (optional if time-consuming)
+
 TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
  
  \section DicomSeriesReader_sorting Sorting into 3D+t blocks
@@ -217,6 +232,8 @@ public:
   /**
    \brief see other GetSeries().
 
+   \warning Untested, could or could not work.
+
    This differs only by having an additional restriction to a single known DICOM series.
    Internally, it uses the other GetSeries() method. 
   */
@@ -228,6 +245,15 @@ public:
    \brief see other GetSeries().
 
    Instead of a directory name, provide an explicit list of file names.
+  */
+  static
+  UidFileNamesMap 
+  GetSeries(const StringContainer& files, bool sortTo3DPlust, const StringContainer &restrictions = StringContainer());
+  
+  /**
+    \brief Legacy interface.
+
+    Use GetSeries(const StringContainer& files, bool sortTo3DPlust, const StringContainer &restrictions) instead.
   */
   static
   UidFileNamesMap 

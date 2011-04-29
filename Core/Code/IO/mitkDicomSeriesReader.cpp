@@ -15,7 +15,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-//#define MBILOG_ENABLE_DEBUG
+// uncomment for learning more about the internal sorting mechanisms
+//#define MBILOG_ENABLE_DEBUG 
 
 #include <mitkDicomSeriesReader.h>
 
@@ -305,13 +306,13 @@ DicomSeriesReader::AnalyzeFileForITKImageSeriesReaderSpacingAssumption(
     const gdcm::Scanner::MappingType& tagValueMappings_)
 {
   // result.first = files that fit ITK's assumption
-  // result.second = files that do not fit
+  // result.second = files that do not fit, should be run through AnalyzeFileForITKImageSeriesReaderSpacingAssumption() again
   TwoStringContainers result;
  
   // we const_cast here, because I could not use a map.at(), which would make the code much more readable
   gdcm::Scanner::MappingType& tagValueMappings = const_cast<gdcm::Scanner::MappingType&>(tagValueMappings_);
   const gdcm::Tag tagImagePositionPatient(0x0020,0x0032); // Image Position (Patient)
-  const gdcm::Tag tagImageOrientation(0x0020, 0x0037); // image orientation
+  const gdcm::Tag    tagImageOrientation(0x0020, 0x0037); // Image Orientation
 
   Vector3D fromFirstToSecondOrigin; fromFirstToSecondOrigin.Fill(0.0);
   bool fromFirstToSecondOriginInitialized(false);
@@ -332,10 +333,7 @@ DicomSeriesReader::AnalyzeFileForITKImageSeriesReaderSpacingAssumption(
     std::istringstream originReader(thisOriginString);
     std::string coordinate;
     unsigned int dim(0);
-    while( std::getline( originReader, coordinate, '\\' ) )
-    {
-      thisOrigin[dim++] = atof(coordinate.c_str());
-    }
+    while( std::getline( originReader, coordinate, '\\' ) ) thisOrigin[dim++] = atof(coordinate.c_str());
 
     if (dim != 3)
     {
@@ -348,41 +346,31 @@ DicomSeriesReader::AnalyzeFileForITKImageSeriesReaderSpacingAssumption(
 
     if ( lastOriginInitialized && (thisOrigin == lastOrigin) )
     {
-      MITK_DEBUG << "Sort away " << *fileIter << " for separate time step";
-      // TODO sort away this slice, we already have one occupying this position
+      MITK_DEBUG << "Sort away " << *fileIter << " for separate time step"; // we already have one occupying this position
       result.second.push_back( *fileIter );
     }
     else
     {
-      // fill in vector value as soon as possible
       if (!fromFirstToSecondOriginInitialized && lastOriginInitialized) // calculate vector as soon as possible when we get a new position
       {
         fromFirstToSecondOrigin = thisOrigin - lastDifferentOrigin;
         fromFirstToSecondOriginInitialized = true;
 
         // Now make sure this direction is along the normal vector of the first slice
-        // If this is NOT the case, then we have a data set with a tilted gantry geometry,
+        // If this is NOT the case, then we have a data set with a TILTED GANTRY geometry,
         // which cannot be loaded into a single mitk::Image at the moment
 
-        // Again ugly code to read tag Image Orientation into two Vectors
+        // Again ugly code to read tag Image Orientation into two vEctors
         Vector3D right; right.Fill(0.0);
-        Vector3D up; right.Fill(0.0); // might be down as, but it is just a name at this point
+        Vector3D up; right.Fill(0.0); // might be down as well, but it is just a name at this point
         std::string thisOrientationString = tagValueMappings[fileIter->c_str()][tagImageOrientation];
         
         std::istringstream orientationReader(thisOrientationString);
         std::string coordinate;
         unsigned int dim(0);
         while( std::getline( orientationReader, coordinate, '\\' ) )
-        {
-          if (dim<3)
-          {
-            right[dim++] = atof(coordinate.c_str());
-          }
-          else
-          {
-            up[dim++ - 3] = atof(coordinate.c_str());
-          }
-        }
+          if (dim<3) right[dim++] = atof(coordinate.c_str());
+          else      up[dim++ - 3] = atof(coordinate.c_str());
 
         if (dim != 6)
         {
@@ -414,10 +402,10 @@ DicomSeriesReader::AnalyzeFileForITKImageSeriesReaderSpacingAssumption(
 
         double distance = sqrt(numerator / denominator);
 
-        if (distance > 0.001)
+        if (distance > 0.001) // mitk::eps is too small; 1/1000 of a mm should be enough to detect tilt
         {
-          MITK_WARN << "Series seems to contain a tilted geometry. Will load as many single slices.";
-          MITK_WARN << "Distance of expected origin from actual origin: " << distance;
+          MITK_WARN << "Series seems to contain a tilted geometry. Will load series as many single slices.";
+          MITK_WARN << "Distance of expected slice origin from actual slice origin: " << distance;
 
           result.first.assign( files.begin(), fileIter );
           result.second.insert( result.second.end(), fileIter, files.end() );
@@ -480,8 +468,6 @@ DicomSeriesReader::GetSeries(const StringContainer& files, const StringContainer
 DicomSeriesReader::UidFileNamesMap 
 DicomSeriesReader::GetSeries(const StringContainer& files, bool sortTo3DPlust, const StringContainer &restrictions)
 {
-  UidFileNamesMap map; // result variable
-
   /**
     assumption about this method:
       returns a map of uid-like-key --> list(filename)
@@ -492,6 +478,7 @@ DicomSeriesReader::GetSeries(const StringContainer& files, bool sortTo3DPlust, c
         - 0018,0050 slice thickness
   */
 
+UidFileNamesMap map; // preliminary result, refined into the final result mapOf3DPlusTBlocks
 
 #if GDCM_MAJOR_VERSION < 2
   // old GDCM: let itk::GDCMSeriesFileNames do the sorting
@@ -524,7 +511,7 @@ DicomSeriesReader::GetSeries(const StringContainer& files, bool sortTo3DPlust, c
   }
 
 #else
-  // new GDCM: use GDCM directly, itk::GDCMSeriesFileNames does not work with GDCM 2
+  // use GDCM directly, itk::GDCMSeriesFileNames does not work with GDCM 2
 
   // PART I: scan files for sorting relevant DICOM tags, 
   //         separate images that differ in any of those 
@@ -579,7 +566,7 @@ DicomSeriesReader::GetSeries(const StringContainer& files, bool sortTo3DPlust, c
     map [ moreUniqueSeriesId ].push_back( fileIter->first );
   }
   
-  // PART II: analyze pre-sorted images for valid blocks, 
+  // PART II: analyze pre-sorted images for valid blocks (i.e. blocks of equal z-spacing), 
   //          separate into multiple blocks if necessary.
   //          
   //          Analysis performs the following steps:
@@ -590,11 +577,10 @@ DicomSeriesReader::GetSeries(const StringContainer& files, bool sortTo3DPlust, c
 
   for ( UidFileNamesMap::const_iterator groupIter = map.begin(); groupIter != map.end(); ++groupIter )
   {
-    // sort each slice group spatially
-    map[ groupIter->first ] = SortSeriesSlices( groupIter->second  );
+    map[ groupIter->first ] = SortSeriesSlices( groupIter->second  ); // sort each slice group spatially
   }
 
-  UidFileNamesMap mapOf3DPlusTBlocks; // sorting results generated by this analysis step
+  UidFileNamesMap mapOf3DPlusTBlocks; // final result of this function
   for ( UidFileNamesMap::const_iterator groupIter = map.begin(); groupIter != map.end(); ++groupIter )
   {
     UidFileNamesMap mapOf3DBlocks;      // intermediate result for only this group(!)

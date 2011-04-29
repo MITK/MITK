@@ -232,6 +232,8 @@ public:
   /**
    \brief see other GetSeries().
 
+   \warning Untested, could or could not work.
+
    This differs only by having an additional restriction to a single known DICOM series.
    Internally, it uses the other GetSeries() method. 
   */
@@ -243,6 +245,15 @@ public:
    \brief see other GetSeries().
 
    Instead of a directory name, provide an explicit list of file names.
+  */
+  static
+  UidFileNamesMap 
+  GetSeries(const StringContainer& files, bool sortTo3DPlust, const StringContainer &restrictions = StringContainer());
+  
+  /**
+    \brief Legacy interface.
+
+    Use GetSeries(const StringContainer& files, bool sortTo3DPlust, const StringContainer &restrictions) instead.
   */
   static
   UidFileNamesMap 

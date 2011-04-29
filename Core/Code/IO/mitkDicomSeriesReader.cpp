@@ -471,9 +471,14 @@ DicomSeriesReader::AnalyzeFileForITKImageSeriesReaderSpacingAssumption(
   return result;
 }
 
-  
 DicomSeriesReader::UidFileNamesMap 
 DicomSeriesReader::GetSeries(const StringContainer& files, const StringContainer &restrictions)
+{
+  return GetSeries(files, true, restrictions);
+}
+  
+DicomSeriesReader::UidFileNamesMap 
+DicomSeriesReader::GetSeries(const StringContainer& files, bool sortTo3DPlust, const StringContainer &restrictions)
 {
   UidFileNamesMap map; // result variable
 
@@ -621,7 +626,6 @@ DicomSeriesReader::GetSeries(const StringContainer& files, const StringContainer
     //            - as soon as number of files changes from previous entry, record collected blocks as 3D+t block, start a new one, continue
 
     // decide whether or not to group 3D blocks into 3D+t blocks where possible
-    bool sortTo3DPlust(true);
     if ( !sortTo3DPlust )
     {
       // copy 3D blocks to output
@@ -653,7 +657,14 @@ DicomSeriesReader::GetSeries(const StringContainer& files, const StringContainer
         }
         else
         {
-          if (numberOfFilesInPreviousBlock == numberOfFilesInThisBlock)
+          // check whether this and the previous block share a comon origin 
+          std::string thisOriginString = scanner.GetValue( mapOf3DBlocks[thisBlockKey].front().c_str(), tagImagePositionPatient );
+          std::string previousOriginString = scanner.GetValue( mapOf3DBlocks[previousBlockKey].front().c_str(), tagImagePositionPatient );
+          // TODO should be safe, but a little try/catch or other error handling wouldn't hurt
+          
+          bool identicalOrigins(thisOriginString == previousOriginString);
+
+          if (identicalOrigins && (numberOfFilesInPreviousBlock == numberOfFilesInThisBlock))
           {
             // group with previous block
             mapOf3DPlusTBlocks[previousBlockKey].insert( mapOf3DPlusTBlocks[previousBlockKey].end(), 

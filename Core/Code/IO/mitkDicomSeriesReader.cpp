@@ -658,11 +658,15 @@ DicomSeriesReader::GetSeries(const StringContainer& files, bool sortTo3DPlust, c
         else
         {
           // check whether this and the previous block share a comon origin 
+          // TODO should be safe, but a little try/catch or other error handling wouldn't hurt
           std::string thisOriginString = scanner.GetValue( mapOf3DBlocks[thisBlockKey].front().c_str(), tagImagePositionPatient );
           std::string previousOriginString = scanner.GetValue( mapOf3DBlocks[previousBlockKey].front().c_str(), tagImagePositionPatient );
-          // TODO should be safe, but a little try/catch or other error handling wouldn't hurt
           
-          bool identicalOrigins(thisOriginString == previousOriginString);
+          // also compare last origin, because this might differ if z-spacing is different
+          std::string thisDestinationString = scanner.GetValue( mapOf3DBlocks[thisBlockKey].back().c_str(), tagImagePositionPatient );
+          std::string previousDestinationString = scanner.GetValue( mapOf3DBlocks[previousBlockKey].back().c_str(), tagImagePositionPatient );
+          
+          bool identicalOrigins( (thisOriginString == previousOriginString) && (thisDestinationString == previousDestinationString) );
 
           if (identicalOrigins && (numberOfFilesInPreviousBlock == numberOfFilesInThisBlock))
           {

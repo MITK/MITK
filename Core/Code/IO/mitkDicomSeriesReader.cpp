@@ -454,6 +454,8 @@ DicomSeriesReader::AnalyzeFileForITKImageSeriesReaderSpacingAssumption(
           return result; // stop processing with first split
         }
       }
+
+      result.first.push_back(*fileIter);
     }
 
     // recored current origin for reference in later iterations
@@ -466,9 +468,6 @@ DicomSeriesReader::AnalyzeFileForITKImageSeriesReaderSpacingAssumption(
     lastOriginInitialized = true;
   }
   
-  // default: all files match our expectations: return unchanged list
-  result.first = files;
- 
   return result;
 }
 

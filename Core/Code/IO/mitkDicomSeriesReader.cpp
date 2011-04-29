@@ -414,7 +414,7 @@ DicomSeriesReader::AnalyzeFileForITKImageSeriesReaderSpacingAssumption(
 
         double distance = sqrt(numerator / denominator);
 
-        if (distance > mitk::eps)
+        if (distance > 0.001)
         {
           MITK_WARN << "Series seems to contain a tilted geometry. Will load as many single slices.";
           MITK_WARN << "Distance of expected origin from actual origin: " << distance;

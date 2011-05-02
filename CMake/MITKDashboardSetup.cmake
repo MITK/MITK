@@ -81,7 +81,7 @@ ${ADDITIONAL_CMAKECACHE_OPTION}
 # This can be used to provide variables which are not passed through the
 # superbuild process to the MITK configure step)
 if(MITK_INITIAL_CACHE)
-  set(mitk_cache_file "${CTEST_BINARY_DIRECTORY}/mitk_initial_cache.txt")
+  set(mitk_cache_file "${CTEST_SCRIPT_DIRECTORY}/mitk_initial_cache.txt")
   file(WRITE "${mitk_cache_file}" "${MITK_INITIAL_CACHE}")
   set(INITIAL_CMAKECACHE_OPTIONS "${INITIAL_CMAKECACHE_OPTIONS}
 MITK_INITIAL_CACHE_FILE::INTERNAL=${mitk_cache_file}

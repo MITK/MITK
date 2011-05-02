@@ -45,6 +45,8 @@ class mitkDICOMTesting_EXPORT TestDICOMLoading
 
     void ResetUserLocale();
 
+    std::string TypeIDToString( const std::type_info& );
+
     KeyValueMap ParseDump( const std::string& dump );
 
     bool CompareSpacedValueFields( const std::string& reference, 

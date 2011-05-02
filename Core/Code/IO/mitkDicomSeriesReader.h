@@ -48,10 +48,19 @@ namespace mitk
 /** 
  \brief Loading DICOM images as MITK images.
 
- \section DicomSeriesReader_usage Purpose
+ - \ref DicomSeriesReader_purpose
+ - \ref DicomSeriesReader_limitations
+ - \ref DicomSeriesReader_usage
+ - \ref DicomSeriesReader_sorting
+   - \ref DicomSeriesReader_sorting1
+   - \ref DicomSeriesReader_sorting2
+   - \ref DicomSeriesReader_sorting3
+   - \ref DicomSeriesReader_sorting4
+
+ \section DicomSeriesReader_purpose Purpose
 
  DicomSeriesReader serves as a central class for loading DICOM images as mitk::Image.
- As the term "DICOM image" covers a huge variety of possible modalities and possible
+ As the term "DICOM image" covers a huge variety of possible modalities and 
  implementations, and since MITK assumes that 3D images are made up of continuous blocks
  of slices without any gaps or changes in orientation, the loading mechanism must
  implement a number of decisions and compromises.
@@ -121,43 +130,7 @@ namespace mitk
  Image::Pointer image = dynamic_cast<mitk::Image*>( node->GetData() );
 \endcode
 
-TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
- <b>Necessary changes (bug 7285)</b>
-
- * GetSeries should by default
-   * sort slices
-   * determine if slice groups contain gaps (this is only done fast if slices are sorted previously)
-     of if slices are not equally spaced
-     * if gap, split into two parts 
-     * if non-continous: split into continuous groups
-       * this is a little tricky: create (all?) possible sortings, then determine the one with minimum number of groups
- * If somebody demands it, this check could be explicitly disabled by a flag
- * The SortSeriesSlices method can be removed (take care of existing callers), since this is done by GetSeries
- * LoadDicomSeries changes
-   * remove parameter "bool sort" (now expected to be done previously)
-
- * handle titled geometries!
-   * ImageSeriesReader will definitely calculate a wrong spacing
-   * either we load each slice separately
-   * or ...?
-
-
- 3D+t handling:
-  * the "block sorting" in GetSeries will separate images that occupy the identical position in space
-    * this process will keep the initial sorting that organized slices by 1. position 2. acquisition time
-    * i.e. after block sorting, there are multiple blocks that cover identical positions and 
-      have identical properties regarding orientation, dimensions, spacing etc.
-  * depending on arguments passed to GetSeries, it will attempt to group as many image blocks as possible to
-    a single, large 3D+t image group (default behavior is to do this).
-  * LoadDicomSeries expects(!) that the filenames passed either form a valid 3D block or a 3D+t block
-    as sorted by GetSeries()
-
-  * TODO later, when dicom tags are loaded for each mitk::Image slice, there should be a verification
-    step for correct positions (optional if time-consuming)
-
-TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO TODO
- 
- \section DicomSeriesReader_sorting Logic for sorting slices into 3D+t blocks
+ \section DicomSeriesReader_sorting Logic for sorting 2D slices from DICOM images into 3D+t blocks for mitk::Image
 
  The general sorting mechanism (implemented in GetSeries) groups and sorts a set of DICOM files, each assumed to contain a single CT/MR slice.
  In the following we refer to those file groups as "blocks", since this is what they are meant to become when loaded into an mitk::Image.

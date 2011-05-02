@@ -3,10 +3,12 @@
 
 #include "mitkDicomSeriesReader.h"
 
+#include "mitkDICOMTestingExports.h"
+
 namespace mitk
 {
 
-class TestDICOMLoading
+class mitkDICOMTesting_EXPORT TestDICOMLoading
 {
   public:
 

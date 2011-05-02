@@ -50,10 +50,9 @@ foreach(input ${allInputs})
   endforeach(raw ${rawDicomFiles})
 
   #message(STATUS "  Load ${dicomFiles}")
-
-  add_test(NAME ${testname}
-           COMMAND ${VERIFY_DUMP_CMD} ${expecteddump} ${dicomFiles})
-  mitkFunctionAddTestLabel(${testname}) #not yet in branch
+  add_test(${testname}
+           ${VERIFY_DUMP_CMD} ${expecteddump} ${dicomFiles})
+  mitkFunctionAddTestLabel(${testname})
 
 endforeach(input allInputs)
 

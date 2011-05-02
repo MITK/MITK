@@ -4,8 +4,14 @@
 
 \section DICOMTesting_introduction Introduction
 
-Since loading a set of DICOM images is not a trivial task, MITK implements some tests
-which verify its DICOM loading ability.
+Reading DICOM data into mitk::Images is a complicated business since DICOM and MITK have very different ideas of images.
+
+DicomSeriesReader brings DICOM and MITK as close together as possible by offering methods to load DICOM CT and MR images
+into mitk::Images, optionally grouping slices to 3D+t images.
+
+Since there are so many possible sources for mistakes with any change to this loading process, testing the many 
+assumptions implemented in DicomSeriesReader is worthwhile. This document describes what kind of tests are implemented 
+and what how.
 
 \section DICOMTesting_problem Problem description
 
@@ -32,12 +38,44 @@ For more background information, see David Clunie's most valuable posts on comp.
 
 \section DICOMTesting_testidea Test principle
 
-The test idea is simple: load known sets of DICOM files, 
-analyze relevant aspects of the generated mitk::Image 
-objects and compare against stored expected results:
- - number of 3D images generated
- - origin, orientation
- - pixel type, spacing, extent
+The general idea for DICOM loaing tests is to run a set of known DICOM files through DicomSeriesReader's methods 
+GetSeries() and LoadDicomSeries() to generate mitk::Images. These images are then compared to expected image properties,
+such as the number of individual mitk::Images, positions, orientations, spacings, etc.
+
+Stored expectations look like this (should be self-explanatory):
+\verbatim
+-- Image 1
+Pixeltype: s
+BitsPerPixel: 16
+Dimension: 4
+Dimensions: 64 64 6 1 
+Geometry: 
+  Matrix: 5.25 0 0 0 5.2468 0.139598 0 -0.183222 3.99757 
+  Offset: -159.672 -309.974 -69.0122 
+  Center: 0 0 0 
+  Translation: -159.672 -309.974 -69.0122 
+  Scale: 1 1 1 
+  Origin: -159.672 -309.974 -69.0122 
+  Spacing: 5.25 5.25 4 
+  TimeBounds: 0 1 
+
+-- Image 2
+Pixeltype: s
+BitsPerPixel: 16
+Dimension: 4
+Dimensions: 64 64 41 1 
+Geometry: 
+  Matrix: 5.25 0 0 0 5.25 0 0 0 4 
+  Offset: -160.672 -311.672 -285 
+  Center: 0 0 0 
+  Translation: -160.672 -311.672 -285 
+  Scale: 1 1 1 
+  Origin: -160.672 -311.672 -285 
+  Spacing: 5.25 5.25 4 
+  TimeBounds: 0 1 
+\endverbatim
+
+
 
 \section DICOMTesting_implementation Implementation
 
@@ -61,7 +99,35 @@ load images, then verify the expected result structure.
 
 <b>Class TestDICOMLoading</b>
 
-\section DICOMTesting_testlist Specific tests
+\section PageDICOMLoadingTests_testcaseimplementation Test case implementation
+
+Individual test cases are stored in the MITK-Data repository and constructed by Core/Code/Testing/DICOMTesting/Testing/CMakeLists.txt
+
+The CMake file parses given directories for subdirectories containing specific test cases. Each directory contains two files:
+ - File "input": lists DICOM files that should be loaded for this test case
+ - File "expected.dump": contains the image properties in the above mentioned dump format
+
+Each test case is translated into a CTest test which evaluates the return value of a call to VerifyDICOMMitkImageDump.
+
+\section PageDICOMLoadingTests_testcases Implemented test cases
+
+From test set TinyCTAbdomen (see description.txt in this directory for details on test images):
+
+ - singleslice : just a single slice (should work and contain meaningful spacing)
+ - two_slices : two slices, spacing should be calculated correctly
+ - all : load a "normal" series as a single 3D block
+ - 3D_and_T : load a small set of slices with multiple time-steps
+ - diff_orientation : load a set of files containing two differently oriented image blocks
+ - diff_orientation_gaps : load a set of files containing two differently oriented image blocks, each missing slices, so blocks must be split
+ - diff_spacing : load a set of files containint two set of slices with different spacings
+ - gap : load slices that cannot form a single 3D block, because single slices are missing
+ - gaps : slices missing in differnt locations, so multiple splits needed
+ - unsorted_gaps : as before, just file names are unsorted
+ - single_negative_spacing : from reported bug related to single MR images with misleading spacing information
+ - tilted_gantry : slice origins do not align along first slice normal (happens with tilted gantries)
+
+
+\section DICOMTesting_othertests Specific other tests
 
 This list is meant to provide an up-to-date list of all implemented DICOM loading tests.
 <b>If you ever find this outdated, please update it or make the persons who invalidated the list update it.</b>

@@ -871,11 +871,7 @@ std::string DicomSeriesReader::GetConfigurationString()
 {
   std::stringstream configuration;
   configuration << "MITK_USE_GDCMIO: ";
-#ifdef MITK_USE_GDCMIO
   configuration << "true";
-#else
-  configuration << "false";
-#endif
   configuration << "\n";
 
   configuration << "GDCM_VERSION: ";

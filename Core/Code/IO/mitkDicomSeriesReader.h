@@ -21,11 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkDataNode.h"
 #include "mitkConfig.h"
 
-#ifdef MITK_USE_GDCMIO
-  #include <itkGDCMImageIO.h>
-#else
-  #include <itkDICOMImageIO2.h>
-#endif
+#include <itkGDCMImageIO.h>
 
 #include <itkImageSeriesReader.h>
 #include <itkCommand.h>
@@ -355,11 +351,7 @@ protected:
   static std::string IDifyTagValue(const std::string& value);
 #endif
 
-#ifdef MITK_USE_GDCMIO
   typedef itk::GDCMImageIO DcmIoType;
-#else
-  typedef itk::DICOMImageIO2 DcmIoType;
-#endif
 
   /**
     \brief Progress callback for DicomSeriesReader.

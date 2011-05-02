@@ -39,8 +39,6 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
     mitk::Image::Pointer image = mitk::Image::New();
     CallbackCommand *command = callback ? new CallbackCommand(callback) : 0;
 
-#if GDCM_MAJOR_VERSION >= 2
-
     /* special case for Philips 3D+t ultrasound images */ 
     if ( DicomSeriesReader::IsPhilips3DDicom(filenames.front().c_str())  )
     {
@@ -112,10 +110,6 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
         }
       }
     }
-#else
-    // no GDCM2
-    image = LoadDICOMByITK<PixelType>( filenames, command );
-#endif
 
     node.SetData( image );
     setlocale(LC_NUMERIC, previousCLocale);
@@ -181,8 +175,6 @@ Image::Pointer DicomSeriesReader::LoadDICOMByITK( const StringContainer& filenam
   return image;
 }
   
-#if GDCM_MAJOR_VERSION >= 2
-
 std::list<DicomSeriesReader::StringContainer> 
 DicomSeriesReader::SortIntoBlocksFor3DplusT( const StringContainer& presortedFilenames, bool sort, bool& canLoadAs4D )
 {
@@ -273,7 +265,6 @@ DicomSeriesReader::SortIntoBlocksFor3DplusT( const StringContainer& presortedFil
 
   return imageBlocks;
 }
-#endif
 
 }
 

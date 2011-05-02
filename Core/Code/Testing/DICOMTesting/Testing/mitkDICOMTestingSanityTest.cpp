@@ -3,7 +3,7 @@
 #include "mitkTestDICOMLoading.h"
 #include "mitkTestingMacros.h"
 
-int mitkDICOMTestingSanityTest(int argc, char** argv)
+int mitkDICOMTestingSanityTest(int argc, char** const argv)
 {
   MITK_TEST_BEGIN("DICOMTestingSanity")
 

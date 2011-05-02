@@ -10,8 +10,6 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 //TODO remove these if possible
-#include "picimage.h"
-#include "pic2vtk.h"
 #include <mitkSurface.h>
 
 //MITK
@@ -49,6 +47,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkPolyDataMapper.h>
 #include <vtkTexture.h>
 #include <vtkCamera.h>
+#include <vtkTransformPolyDataFilter.h>
 
 //ITK
 #include <itkRGBAPixel.h>
@@ -76,24 +75,42 @@ void mitk::ImageVtkMapper2D::AdjustCamera(mitk::BaseRenderer* renderer)
   //scale the rendered object. TODO How to achieve the correct scale?
   renderer->GetVtkRenderer()->GetActiveCamera()->SetParallelScale(100);
 
+  double planeCenter[4];
+  planeCenter[0] = localStorage->m_Plane->GetCenter()[0];
+  planeCenter[1] = localStorage->m_Plane->GetCenter()[1];
+  planeCenter[2] = localStorage->m_Plane->GetCenter()[2];
+  planeCenter[3] = 1.0;
+
+  double planeNormal[4];
+  planeNormal[0] = localStorage->m_Plane->GetNormal()[0];
+  planeNormal[1] = localStorage->m_Plane->GetNormal()[1];
+  planeNormal[2] = localStorage->m_Plane->GetNormal()[2];
+  planeNormal[3] = 1.0;
+
+  double planeNormalTransformed[4];
+  double planeCenterTransformed[4];
+
+  localStorage->m_TransformMatrix->MultiplyPoint(planeCenter, planeCenterTransformed);
+  localStorage->m_TransformMatrix->MultiplyPoint(planeNormal, planeNormalTransformed);
+
   //set the camera position at the plane center and normal TODO not ok for zooming and panning
   mitk::Point3D cameraPosition;
-  cameraPosition[0] = localStorage->m_Plane->GetCenter()[0] + localStorage->m_Plane->GetNormal()[0];
-  cameraPosition[1] = localStorage->m_Plane->GetCenter()[1] + localStorage->m_Plane->GetNormal()[1];
-  cameraPosition[2] = localStorage->m_Plane->GetCenter()[2] + localStorage->m_Plane->GetNormal()[2];
+  cameraPosition[0] = planeCenterTransformed[0] + planeNormalTransformed[0];
+  cameraPosition[1] = planeCenterTransformed[1] + planeNormalTransformed[1];
+  cameraPosition[2] = planeCenterTransformed[2] + planeNormalTransformed[2];
 
   //define which direction is "up" for the camera
   mitk::Point3D cameraUpVector;
-  cameraUpVector[0]=0.0;
-  cameraUpVector[1]=-1.0;
-  cameraUpVector[2]=0.0;
+  cameraUpVector[0]=cameraPosition[2];
+  cameraUpVector[1]=0.0;
+  cameraUpVector[2]=cameraPosition[0];
 
   //set the camera corresponding to the textured plane
   vtkSmartPointer<vtkCamera> camera = renderer->GetVtkRenderer()->GetActiveCamera();
   if (camera)
   {
     camera->SetPosition( cameraPosition[0], cameraPosition[1], cameraPosition[2]); //set the camera position on the textured plane normal
-    camera->SetFocalPoint(localStorage->m_Plane->GetCenter()); //set the focal point to the center of the textured plane
+    camera->SetFocalPoint( planeCenterTransformed[0], planeCenterTransformed[1], planeCenterTransformed[2]); //set the focal point to the center of the textured plane
     camera->SetViewUp(cameraUpVector[0],cameraUpVector[1],cameraUpVector[2]);
   }
   //reset the clipping range TODO why? really needed if everything is correct?
@@ -108,71 +125,41 @@ void mitk::ImageVtkMapper2D::AdjustCamera(mitk::BaseRenderer* renderer)
   MITK_INFO << "focal point: " << renderer->GetVtkRenderer()->GetActiveCamera()->GetFocalPoint()[0] << " " << renderer->GetVtkRenderer()->GetActiveCamera()->GetFocalPoint()[1] << " "  <<  renderer->GetVtkRenderer()->GetActiveCamera()->GetFocalPoint()[2];
 }
 
-void mitk::ImageVtkMapper2D::AdjustToDisplayGeometry(mitk::BaseRenderer* renderer, double originArray[3])
+void mitk::ImageVtkMapper2D::AdjustToDisplayGeometry(mitk::BaseRenderer* renderer, mitk::ScalarType spacing[2])
 {
   //TODO this method is not correct for each plane. Currently only for the transversal plane
   LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
 
-  mitk::DisplayGeometry::Pointer displayGeometry = renderer->GetDisplayGeometry();
+//  mitk::DisplayGeometry::Pointer displayGeometry = renderer->GetDisplayGeometry();
 
-  mitk::Geometry3D::Pointer geo = this->GetDataNode()->GetData()->GetGeometry();
+//  mitk::Geometry3D::Pointer geo = this->GetDataNode()->GetData()->GetGeometry();
 
-  //set the 2 points defining the textured plane. The origin O is set later
-  // p1
-  // ^
-  // |
-  // |
-  // O - - - > p2
-  mitk::Point3D p1, p1w;
-  p1[0] = 1.0 * localStorage->m_ReslicedImage->GetSpacing()[0];
-  //max in Y direction
-  p1[1] = (localStorage->m_Texture->GetInput()->GetDimensions()[1]-1) * localStorage->m_ReslicedImage->GetSpacing()[1];
-  p1[2] = 1.0 * localStorage->m_ReslicedImage->GetSpacing()[2];
-  geo->IndexToWorld(p1, p1w); //conversion to world coordinates
+////  MITK_INFO << "img origin " << localStorage->m_ReslicedImage->GetOrigin()[0] << " " << localStorage->m_ReslicedImage->GetOrigin()[1] << " " <<  localStorage->m_ReslicedImage->GetOrigin()[2];
+////  MITK_INFO << "img dim " << localStorage->m_ReslicedImage->GetDimensions()[0] << " " << localStorage->m_ReslicedImage->GetDimensions()[1] << " " <<  localStorage->m_ReslicedImage->GetDimensions()[2];
 
-  //second point
-  mitk::Point3D p2, p2w;
-  p2[0] = (localStorage->m_Texture->GetInput()->GetDimensions()[0]-1) * localStorage->m_ReslicedImage->GetSpacing()[0];
-  p2[1] = 1.0 * localStorage->m_ReslicedImage->GetSpacing()[1];
-  p2[2] = 1.0 * localStorage->m_ReslicedImage->GetSpacing()[2];
-  geo->IndexToWorld(p2, p2w);
+//  double planeOrigin[3];
+//  planeOrigin[0] = 1.0 * originArray[0];
+//  planeOrigin[1] = 1.0 * originArray[1];
+//  planeOrigin[2] = 1.0 * originArray[2];
 
-  MITK_INFO << "p1w " << p1w;
-  MITK_INFO << "p2w " << p2w;
+//  localStorage->m_Plane->SetOrigin(planeOrigin);
 
-  double dh = displayGeometry->GetSizeInMM()[1];
-  double dw = displayGeometry->GetSizeInMM()[0];
+//  double point1[3];
+//  point1[0] = (planeOrigin[0] + (localStorage->m_ReslicedImage->GetDimensions()[0]-1)) * localStorage->m_ReslicedImage->GetSpacing()[0];
+//  point1[1] = planeOrigin[1] * localStorage->m_ReslicedImage->GetSpacing()[1];// + (localStorage->m_ReslicedImage->GetDimensions()[1]-1);
+//  point1[2] = planeOrigin[2] * localStorage->m_ReslicedImage->GetSpacing()[2];// + (localStorage->m_ReslicedImage->GetDimensions()[2]-1);
 
-  MITK_INFO << "dw vor " << dw;
-  MITK_INFO << "dh vor " << dh;
+//  double point2[3];
+//  point2[0] = planeOrigin[0] * localStorage->m_ReslicedImage->GetSpacing()[0];// + (localStorage->m_ReslicedImage->GetDimensions()[0]-1);
+//  point2[1] = (planeOrigin[1] + (localStorage->m_ReslicedImage->GetDimensions()[1]-1)) * localStorage->m_ReslicedImage->GetSpacing()[1];
+//  point2[2] = planeOrigin[2] * localStorage->m_ReslicedImage->GetSpacing()[2];// + (localStorage->m_ReslicedImage->GetDimensions()[2]-1);
 
-  MITK_INFO << (p2[0]/p1[1]) << " " << (dw/dh);
+  localStorage->m_Plane->SetPoint1((localStorage->m_ReslicedImage->GetDimensions()[0]-1)*spacing[0], 0.0, 0.0);
+  localStorage->m_Plane->SetPoint2(0.0, (localStorage->m_ReslicedImage->GetDimensions()[1]-1)*spacing[1], 0.0);
 
-  if(p2[0]/p1[1] > dw/dh)
-  {
-    dh = p1[1]/p2[0]*dw;
-  }
-  else
-  {
-    dw = p2[0]/p1[1]*dh;
-  }
-
-  MITK_INFO << "dw nach " << dw;
-  MITK_INFO << "dh nach " << dh;
-
-  MITK_INFO << "originArray " << originArray[0] << " " << originArray[1] << " " << originArray[2];
-
-  mitk::Point3D ptmp, originInWorld;
-  ptmp[0] = originArray[0];
-  ptmp[1] = originArray[1];
-  ptmp[2] = originArray[2]/3;
-  geo->IndexToWorld(ptmp, originInWorld);
-
-  localStorage->m_Plane->SetOrigin(originInWorld[0], originInWorld[1], originInWorld[2]);
-
-  //transversal
-  localStorage->m_Plane->SetPoint1(originInWorld[0]+dw, originInWorld[1], originInWorld[2]);
-  localStorage->m_Plane->SetPoint2(originInWorld[0], originInWorld[1]-dh, originInWorld[2]);
+//  //transversal
+//  localStorage->m_Plane->SetPoint1(point1);
+//  localStorage->m_Plane->SetPoint2(point2);
 
   //saggital
   //  localStorage->m_Plane->SetPoint1(originInWorld[0], originInWorld[1]+dw, originInWorld[2]);
@@ -728,9 +715,8 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
   //apply the properties after the slice was set
   this->ApplyProperties( renderer );
   //set the size and position of textured plane according to the render window
-  this->AdjustToDisplayGeometry( renderer, originArray );
+  this->AdjustToDisplayGeometry( renderer, mmPerPixel );
   //set the camera position in order to view the textured plane
-  this->AdjustCamera( renderer );
 
   //turn the light out in the scene in order to render correct grey values. TODO How to turn it on if you need it?
   renderer->GetVtkRenderer()->RemoveAllLights();
@@ -754,6 +740,23 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
   //TODO remove this later
   renderer->GetVtkRenderer()->SetBackground(1,1,1);
   MITK_INFO << "reslice axis " << rendererInfo.m_Reslicer->GetResliceAxes()[0];
+//  MITK_INFO << "transform " << inputGeometry->GetVtkTransform()[0];
+
+//  MITK_INFO << "transform " << rendererInfo.m_Reslicer->GetResliceTransform()[0];
+
+
+
+//  transformFilter->SetTransform(inputGeometry->GetVtkTransform());
+//  transformFilter->SetInputConnection(localStorage->m_Plane->GetOutputPort());
+
+  vtkSmartPointer<vtkTransform> trans = vtkSmartPointer<vtkTransform>::New();
+  trans->SetMatrix(rendererInfo.m_Reslicer->GetResliceAxes());
+  localStorage->m_TransformMatrix = rendererInfo.m_Reslicer->GetResliceAxes();
+
+  localStorage->m_TransformFilter->SetTransform(trans);
+  localStorage->m_TransformFilter->Update();
+
+  this->AdjustCamera( renderer );
 
   // We have been modified
   rendererInfo.m_LastUpdateTime.Modified();
@@ -1140,12 +1143,11 @@ void mitk::ImageVtkMapper2D::Update(mitk::BaseRenderer* renderer)
   const DataNode *node = this->GetDataNode();
 
   RendererInfo& rendererInfo = AccessRendererInfo( renderer );
-  iil4mitkPicImage* image = rendererInfo.Get_iil4mitkImage();
 
   data->UpdateOutputInformation();
 
-  if ( (image == NULL)
-    || (rendererInfo.m_LastUpdateTime < node->GetMTime())
+  if ( //TODO old version was iilImage == NULL. I guess this can be removed?
+       (rendererInfo.m_LastUpdateTime < node->GetMTime())
     || (rendererInfo.m_LastUpdateTime < data->GetPipelineMTime())
     || (rendererInfo.m_LastUpdateTime
         < renderer->GetCurrentWorldGeometry2DUpdateTime())
@@ -1182,9 +1184,7 @@ void mitk::ImageVtkMapper2D::DeleteRendererCallback( itk::Object *object, const 
 
 mitk::ImageVtkMapper2D::RendererInfo::RendererInfo()
   : m_RendererID(-1),
-  m_iil4mitkImage(NULL),
   m_Renderer(NULL),
-  m_Pic(NULL),
   m_UnitSpacingImageFilter( NULL ),
   m_Reslicer( NULL ),
   m_TSFilter( NULL ),
@@ -1220,13 +1220,6 @@ mitk::ImageVtkMapper2D::RendererInfo::~RendererInfo()
 
 void mitk::ImageVtkMapper2D::RendererInfo::Squeeze()
 {
-  delete m_iil4mitkImage;
-  m_iil4mitkImage = NULL;
-  if ( m_Pic != NULL )
-  {
-    mitkIpPicFree(m_Pic);
-    m_Pic = NULL;
-  }
   if ( m_Image != NULL )
   {
     m_Image->Delete();

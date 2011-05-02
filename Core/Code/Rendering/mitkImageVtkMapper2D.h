@@ -30,8 +30,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkPlaneSource.h>
 #include <vtkImageData.h>
 #include <vtkLookupTable.h>
+#include <vtkTransformPolyDataFilter.h>
+#include <vtkMatrix4x4.h>
 
-class iil4mitkPicImage;
 class Vtk2itk;
 class vtkImageReslice;
 class vtkLookupTable;
@@ -141,6 +142,10 @@ public:
       vtkSmartPointer<vtkTexture> m_Texture;
       /** \brief The lookuptable for colors and level window */
       vtkSmartPointer<vtkLookupTable> m_LookupTable;
+      /** \brief transform the plane */
+      vtkSmartPointer<vtkTransformPolyDataFilter> m_TransformFilter;
+      /** \brief the transformation matrix of the plane */
+      vtkSmartPointer<vtkMatrix4x4> m_TransformMatrix;
 
       /** \brief Constructor of the local storage. Do as much actions as possible in here to avoid double executions. */
       LocalStorage()
@@ -151,12 +156,15 @@ public:
         m_LookupTable = vtkSmartPointer<vtkLookupTable>::New();
         m_Mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
         m_Actor = vtkSmartPointer<vtkActor>::New();
+        m_TransformFilter = vtkSmartPointer<vtkTransformPolyDataFilter>::New();
+        m_TransformMatrix = vtkSmartPointer<vtkMatrix4x4>::New();
         //always the same actions for each render window:
         //set up the plane
 //        m_Plane->SetCenter(0.0, 0.0, 0.0);
 //        m_Plane->SetNormal(0.0, 0.0, 1.0);
+        m_TransformFilter->SetInputConnection(m_Plane->GetOutputPort());
         //connect the plane to the mapper
-        m_Mapper->SetInputConnection(m_Plane->GetOutputPort());
+        m_Mapper->SetInputConnection(m_TransformFilter->GetOutputPort());
         //set the mapper for the actor
         m_Actor->SetMapper(m_Mapper);
         //set the texture for the actor
@@ -179,17 +187,11 @@ public:
     /** \brief internal id of the renderer the data is stored for */
     int m_RendererID;
 
-    /** \brief stored iil4mitkPicImage containing the texture to display for
-     * 2D rendering (cf. m_Image) */
-    iil4mitkPicImage* m_iil4mitkImage;
     mitk::BaseRenderer* m_Renderer;
 
   public:
     /** \brief timestamp of last update of stored data */
     itk::TimeStamp m_LastUpdateTime;
-
-    /** \brief stored data as a mitkIpPicDescriptor */
-    mitkIpPicDescriptor *m_Pic;
 
     /** \brief number of pixels per mm in x- and y-direction of the resampled */
     Vector2D m_PixelsPerMM;
@@ -209,7 +211,7 @@ public:
     /** \brief Thickslices post filtering */
     vtkMitkThickSlicesFilter *m_TSFilter;
 
-    /** \brief Extracted image for 3D rendering (cf. m_iil4mitkImage) */
+    /** \brief Extracted image for 3D rendering */
     vtkImageData *m_Image;
 
     /** \brief Reference geometry associated with the world geometry */
@@ -231,13 +233,6 @@ public:
 
     void Initialize( int rendererID, mitk::BaseRenderer *renderer, 
       unsigned long observerID );
-
-    void Set_iil4mitkImage(iil4mitkPicImage* iil4mitkImage);
-
-    inline iil4mitkPicImage* Get_iil4mitkImage() const
-    {
-      return m_iil4mitkImage;
-    }
 
     inline int GetRendererID() const
     {
@@ -262,7 +257,7 @@ public:
 
 protected:
   //Adjust the geometry of each slice to the displayGeometry in order to render in the full render window
-  void AdjustToDisplayGeometry(mitk::BaseRenderer* renderer, double originArray[3]);
+  void AdjustToDisplayGeometry(mitk::BaseRenderer* renderer, mitk::ScalarType spacing[2]);
 
   //set the camera to view the textured plane
   void AdjustCamera(mitk::BaseRenderer* renderer);

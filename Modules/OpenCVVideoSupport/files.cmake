@@ -7,8 +7,8 @@ SET(CPP_FILES
     mitkImageToOpenCVImageFilter.cpp
 )
 
-IF(MITK_USE_VIDEOINPUT_LIB)
+IF(MITK_USE_videoInput)
   SET(CPP_FILES ${CPP_FILES}
     mitkVideoInputSource.cpp
   )
-ENDIF(MITK_USE_VIDEOINPUT_LIB)
+ENDIF(MITK_USE_videoInput)

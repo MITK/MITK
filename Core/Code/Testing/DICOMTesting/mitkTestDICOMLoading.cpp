@@ -5,8 +5,8 @@
 #include <stack>
 
 mitk::TestDICOMLoading::TestDICOMLoading()
+:m_PreviousCLocale(NULL)
 {
-  MITK_INFO << "TestDICOMLoading()";
 }
 
 void mitk::TestDICOMLoading::SetDefaultLocale()

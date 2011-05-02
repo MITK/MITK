@@ -1,6 +1,7 @@
 
 MITK_CREATE_MODULE_TESTS(LABELS MITK-Core)
 
+
 include(mitkFunctionAddTestLabel)
 
 # verify minimum expectations:
@@ -11,7 +12,7 @@ mitkAddCustomModuleTest(mitkDICOMTestingSanityTest_CTImage mitkDICOMTestingSanit
 mitkAddCustomModuleTest(mitkDICOMTestingSanityTest_MRImage mitkDICOMTestingSanityTest 1 ${MITK_DATA_DIR}/spacing-ok-mr.dcm)
 mitkAddCustomModuleTest(mitkDICOMTestingSanityTest_SCImage mitkDICOMTestingSanityTest 1 ${MITK_DATA_DIR}/spacing-ok-sc.dcm)
 
-set(VERIFY_DUMP_CMD VerifyDICOMMitkImageDump)
+set(VERIFY_DUMP_CMD  ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/VerifyDICOMMitkImageDump)
 
 set(CT_ABDOMEN_DIR ${MITK_DATA_DIR}/TinyCTAbdomen)
 

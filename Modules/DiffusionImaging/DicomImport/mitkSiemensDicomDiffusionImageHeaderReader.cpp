@@ -14,23 +14,11 @@ PURPOSE.  See the above copyright notices for more information.
 #include "gdcmGlobal.h"
 //#include <gdcmVersion.h>
 
-#if  GDCM_MAJOR_VERSION >= 2
-#define DGDCM2
-#endif
-
-#ifndef DGDCM2
-
-#include "gdcm.h"
-
-#else
-
 #include "gdcmFile.h"
 #include "gdcmImageReader.h"
 #include "gdcmDictEntry.h"
 #include "gdcmDicts.h"
 #include "gdcmTag.h"
-
-#endif
 
 mitk::SiemensDicomDiffusionImageHeaderReader::SiemensDicomDiffusionImageHeaderReader()
 {

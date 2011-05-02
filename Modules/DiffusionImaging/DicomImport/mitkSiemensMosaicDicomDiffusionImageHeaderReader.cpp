@@ -15,24 +15,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "gdcmGlobal.h"
 //#include "gdcmVersion.h"
 
-#if  GDCM_MAJOR_VERSION >= 2
-#define DGDCM2
-#endif
-
-#ifndef DGDCM2
-
-#include "gdcm.h"
-
-// relevant Siemens private tags
-const gdcm::DictEntry SiemensMosiacParameters( 0x0051, 0x100b, "IS", "1", "Mosiac Matrix Size" );
-const gdcm::DictEntry SiemensDictNMosiac( 0x0019, 0x100a, "US", "1", "Number of Images In Mosaic" );
-const gdcm::DictEntry SiemensDictBValue( 0x0019, 0x100c, "IS", "1", "B Value of diffusion weighting" );
-const gdcm::DictEntry SiemensDictDiffusionDirection( 0x0019, 0x100e, "FD", "3", "Diffusion Gradient Direction" );
-const gdcm::DictEntry SiemensDictDiffusionMatrix( 0x0019, 0x1027, "FD", "6", "Diffusion Matrix" );
-const gdcm::DictEntry SiemensDictShadowInfo( 0x0029, 0x1010, "OB", "1", "Siemens DWI Info" );
-
-#else
-
 #include "gdcmFile.h"
 #include "gdcmImageReader.h"
 #include "gdcmDict.h"
@@ -42,8 +24,6 @@ const gdcm::DictEntry SiemensDictShadowInfo( 0x0029, 0x1010, "OB", "1", "Siemens
 #include "gdcmDict.h"
 #include "gdcmFile.h"
 #include "gdcmSerieHelper.h"
-
-#endif
 
 
 mitk::SiemensMosaicDicomDiffusionImageHeaderReader::SiemensMosaicDicomDiffusionImageHeaderReader()

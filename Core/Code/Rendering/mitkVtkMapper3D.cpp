@@ -80,8 +80,6 @@ void VtkMapper3D::MitkRenderTranslucentGeometry(BaseRenderer* renderer)
   if ( this->IsVisible(renderer)==false ) 
     return;
   
-  MITK_INFO << "Render Translucent";
-
  /* if(dynamic_cast<vtkLODProp3D*>(m_Prop3D) != NULL)
   {
     if(  dynamic_cast<BoolProperty*>(GetDataNode()->
@@ -92,12 +90,7 @@ void VtkMapper3D::MitkRenderTranslucentGeometry(BaseRenderer* renderer)
   }*/
   
   if ( this->GetVtkProp(renderer)->GetVisibility() )
-//BUG (#1551) changed VTK_MINOR_VERSION FROM 3 to 2 cause RenderTranslucentGeometry was changed in minor version 2
-#if ( ( VTK_MAJOR_VERSION >= 5 ) && ( VTK_MINOR_VERSION>=2)  )
     this->GetVtkProp(renderer)->RenderTranslucentPolygonalGeometry(renderer->GetVtkRenderer());
-#else
-    this->GetVtkProp(renderer)->RenderTranslucentGeometry(renderer->GetVtkRenderer());
-#endif
 
 }
 

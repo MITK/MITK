@@ -238,8 +238,7 @@ void mitk::ImageVtkMapper2D::MitkRenderOpaqueGeometry(BaseRenderer* renderer)
   {
     this->GetVtkProp(renderer)->RenderOpaqueGeometry( renderer->GetVtkRenderer() );
   }
-  //TODO figure out this bug ...
-  MitkRenderTranslucentGeometry(renderer);
+  vtkSmartPointer<vtkProp> prop = this->GetVtkProp(renderer);
 }
 
 void mitk::ImageVtkMapper2D::MitkRenderTranslucentGeometry(BaseRenderer* renderer)
@@ -712,22 +711,19 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
   //TODO remove this later
   renderer->GetVtkRenderer()->SetBackground(1,1,1);
   MITK_INFO << "reslice axis " << rendererInfo.m_Reslicer->GetResliceAxes()[0];
-//  MITK_INFO << "transform " << inputGeometry->GetVtkTransform()[0];
 
-//  MITK_INFO << "transform " << rendererInfo.m_Reslicer->GetResliceTransform()[0];
-
-
-
-//  transformFilter->SetTransform(inputGeometry->GetVtkTransform());
-//  transformFilter->SetInputConnection(localStorage->m_Plane->GetOutputPort());
-
+  //get the transformation matrix of the reslicer in order to render the slice as transversal, coronal or saggital
   vtkSmartPointer<vtkTransform> trans = vtkSmartPointer<vtkTransform>::New();
   trans->SetMatrix(rendererInfo.m_Reslicer->GetResliceAxes());
   localStorage->m_TransformMatrix = rendererInfo.m_Reslicer->GetResliceAxes();
 
+  //transform the plane to the corresponding view (transversal, coronal or saggital)
   localStorage->m_TransformFilter->SetTransform(trans);
+  localStorage->m_TransformFilter->SetInputConnection(localStorage->m_Plane->GetOutputPort());
   localStorage->m_TransformFilter->Update();
+  localStorage->m_Mapper->SetInputConnection(localStorage->m_TransformFilter->GetOutputPort());
 
+  //set up the camera to view the transformed plane
   this->AdjustCamera( renderer );
 
   // We have been modified
@@ -944,6 +940,8 @@ void mitk::ImageVtkMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
   GetColor( rgb, renderer );
   double rgbConv[3] = {(double)rgb[0], (double)rgb[1], (double)rgb[2]};
   localStorage->m_Actor->GetProperty()->SetColor(rgbConv);
+
+  localStorage->m_Actor->GetProperty()->Modified();
   //  m_VtkActor->SetUserTransform(transform);
 
   //  RendererInfo &rendererInfo = this->AccessRendererInfo( renderer );

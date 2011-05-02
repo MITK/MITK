@@ -159,12 +159,6 @@ public:
         m_TransformFilter = vtkSmartPointer<vtkTransformPolyDataFilter>::New();
         m_TransformMatrix = vtkSmartPointer<vtkMatrix4x4>::New();
         //always the same actions for each render window:
-        //set up the plane
-//        m_Plane->SetCenter(0.0, 0.0, 0.0);
-//        m_Plane->SetNormal(0.0, 0.0, 1.0);
-        m_TransformFilter->SetInputConnection(m_Plane->GetOutputPort());
-        //connect the plane to the mapper
-        m_Mapper->SetInputConnection(m_TransformFilter->GetOutputPort());
         //set the mapper for the actor
         m_Actor->SetMapper(m_Mapper);
         //set the texture for the actor

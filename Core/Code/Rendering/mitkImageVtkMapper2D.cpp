@@ -75,43 +75,53 @@ void mitk::ImageVtkMapper2D::AdjustCamera(mitk::BaseRenderer* renderer)
   //scale the rendered object. TODO How to achieve the correct scale?
   renderer->GetVtkRenderer()->GetActiveCamera()->SetParallelScale(100);
 
+  //the center of the plane in homogeneous coordinates
   double planeCenter[4];
   planeCenter[0] = localStorage->m_Plane->GetCenter()[0];
   planeCenter[1] = localStorage->m_Plane->GetCenter()[1];
   planeCenter[2] = localStorage->m_Plane->GetCenter()[2];
   planeCenter[3] = 1.0;
 
+  //the normal of the plane in homogeneous coordinates
   double planeNormal[4];
   planeNormal[0] = localStorage->m_Plane->GetNormal()[0];
   planeNormal[1] = localStorage->m_Plane->GetNormal()[1];
   planeNormal[2] = localStorage->m_Plane->GetNormal()[2];
   planeNormal[3] = 1.0;
 
+  //define which direction is "up" for the camera
+  double cameraUp[4];
+  cameraUp[0] = 0.0;
+  cameraUp[1] = 1.0;
+  cameraUp[2] = 0.0;
+  cameraUp[3] = 1.0;
+
+  //variables for transformed vectors/points
   double planeNormalTransformed[4];
   double planeCenterTransformed[4];
+  double cameraUpTransformed[4];
 
+  //Transform everything to the current position (Transveral, coronal and saggital plane).
+  //This is necessary, because the vtkTransformFilter does not manipulate the vtkPlaneSource,
+  //and thus, the plane normal and center are not placed correctly.
+  //(Without this all three planes would have the same normal/center and consequently the same camera position).
   localStorage->m_TransformMatrix->MultiplyPoint(planeCenter, planeCenterTransformed);
   localStorage->m_TransformMatrix->MultiplyPoint(planeNormal, planeNormalTransformed);
+  localStorage->m_TransformMatrix->MultiplyPoint(cameraUp, cameraUpTransformed);
 
-  //set the camera position at the plane center and normal TODO not ok for zooming and panning
-  mitk::Point3D cameraPosition;
+  //set the camera position at the plane center and normal TODO not ok for zooming and panning??
+  double cameraPosition[3];
   cameraPosition[0] = planeCenterTransformed[0] + planeNormalTransformed[0];
   cameraPosition[1] = planeCenterTransformed[1] + planeNormalTransformed[1];
   cameraPosition[2] = planeCenterTransformed[2] + planeNormalTransformed[2];
-
-  //define which direction is "up" for the camera
-  mitk::Point3D cameraUpVector;
-  cameraUpVector[0]=cameraPosition[2];
-  cameraUpVector[1]=0.0;
-  cameraUpVector[2]=cameraPosition[0];
 
   //set the camera corresponding to the textured plane
   vtkSmartPointer<vtkCamera> camera = renderer->GetVtkRenderer()->GetActiveCamera();
   if (camera)
   {
-    camera->SetPosition( cameraPosition[0], cameraPosition[1], cameraPosition[2]); //set the camera position on the textured plane normal
+    camera->SetPosition( cameraPosition ); //set the camera position on the textured plane normal
     camera->SetFocalPoint( planeCenterTransformed[0], planeCenterTransformed[1], planeCenterTransformed[2]); //set the focal point to the center of the textured plane
-    camera->SetViewUp(cameraUpVector[0],cameraUpVector[1],cameraUpVector[2]);
+    camera->SetViewUp(cameraUpTransformed[0],cameraUpTransformed[1],cameraUpTransformed[2]);
   }
   //reset the clipping range TODO why? really needed if everything is correct?
   renderer->GetVtkRenderer()->ResetCameraClippingRange();
@@ -125,54 +135,16 @@ void mitk::ImageVtkMapper2D::AdjustCamera(mitk::BaseRenderer* renderer)
   MITK_INFO << "focal point: " << renderer->GetVtkRenderer()->GetActiveCamera()->GetFocalPoint()[0] << " " << renderer->GetVtkRenderer()->GetActiveCamera()->GetFocalPoint()[1] << " "  <<  renderer->GetVtkRenderer()->GetActiveCamera()->GetFocalPoint()[2];
 }
 
+//set the two points defining the textured plane according to the dimension and spacing
 void mitk::ImageVtkMapper2D::AdjustToDisplayGeometry(mitk::BaseRenderer* renderer, mitk::ScalarType spacing[2])
 {
-  //TODO this method is not correct for each plane. Currently only for the transversal plane
   LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
 
-//  mitk::DisplayGeometry::Pointer displayGeometry = renderer->GetDisplayGeometry();
-
-//  mitk::Geometry3D::Pointer geo = this->GetDataNode()->GetData()->GetGeometry();
-
-////  MITK_INFO << "img origin " << localStorage->m_ReslicedImage->GetOrigin()[0] << " " << localStorage->m_ReslicedImage->GetOrigin()[1] << " " <<  localStorage->m_ReslicedImage->GetOrigin()[2];
-////  MITK_INFO << "img dim " << localStorage->m_ReslicedImage->GetDimensions()[0] << " " << localStorage->m_ReslicedImage->GetDimensions()[1] << " " <<  localStorage->m_ReslicedImage->GetDimensions()[2];
-
-//  double planeOrigin[3];
-//  planeOrigin[0] = 1.0 * originArray[0];
-//  planeOrigin[1] = 1.0 * originArray[1];
-//  planeOrigin[2] = 1.0 * originArray[2];
-
-//  localStorage->m_Plane->SetOrigin(planeOrigin);
-
-//  double point1[3];
-//  point1[0] = (planeOrigin[0] + (localStorage->m_ReslicedImage->GetDimensions()[0]-1)) * localStorage->m_ReslicedImage->GetSpacing()[0];
-//  point1[1] = planeOrigin[1] * localStorage->m_ReslicedImage->GetSpacing()[1];// + (localStorage->m_ReslicedImage->GetDimensions()[1]-1);
-//  point1[2] = planeOrigin[2] * localStorage->m_ReslicedImage->GetSpacing()[2];// + (localStorage->m_ReslicedImage->GetDimensions()[2]-1);
-
-//  double point2[3];
-//  point2[0] = planeOrigin[0] * localStorage->m_ReslicedImage->GetSpacing()[0];// + (localStorage->m_ReslicedImage->GetDimensions()[0]-1);
-//  point2[1] = (planeOrigin[1] + (localStorage->m_ReslicedImage->GetDimensions()[1]-1)) * localStorage->m_ReslicedImage->GetSpacing()[1];
-//  point2[2] = planeOrigin[2] * localStorage->m_ReslicedImage->GetSpacing()[2];// + (localStorage->m_ReslicedImage->GetDimensions()[2]-1);
-
+  //These two points define the axes of the plane in combination with the origin (0/0/0).
+  //Point 1 is the x-axis and point 2 the y-axis.
+  //Each plane is transformed according to the view (transversal, coronal and saggital) afterwards.
   localStorage->m_Plane->SetPoint1((localStorage->m_ReslicedImage->GetDimensions()[0]-1)*spacing[0], 0.0, 0.0);
   localStorage->m_Plane->SetPoint2(0.0, (localStorage->m_ReslicedImage->GetDimensions()[1]-1)*spacing[1], 0.0);
-
-//  //transversal
-//  localStorage->m_Plane->SetPoint1(point1);
-//  localStorage->m_Plane->SetPoint2(point2);
-
-  //saggital
-  //  localStorage->m_Plane->SetPoint1(originInWorld[0], originInWorld[1]+dw, originInWorld[2]);
-  //  localStorage->m_Plane->SetPoint2(originInWorld[0], originInWorld[1], originInWorld[2]+dh);
-
-  //coronal
-//    localStorage->m_Plane->SetPoint1(originInWorld[0], originInWorld[1], originInWorld[2]+dh);
-//    localStorage->m_Plane->SetPoint2(originInWorld[0]+dw, originInWorld[1], originInWorld[2]);
-
-  //  localStorage->m_Plane->SetCenter(originInWorld[0], originInWorld[1], originInWorld[2]);
-  //  localStorage->m_Plane->SetPoint2(localStorage->m_Texture->GetInput()->GetExtent()[2],
-  //                                   localStorage->m_Texture->GetInput()->GetExtent()[3],
-  //                                   localStorage->m_Texture->GetInput()->GetExtent()[5]);
 }
 
 //TODO: do we need paint, update AND generateData?

@@ -69,8 +69,7 @@ void mitk::CameraVisualization::GenerateData()
 
   const NavigationData* navigationData = this->GetInput();
   // get position from NavigationData to move the camera to this position
-  Point3D cameraPosition = navigationData->GetPosition();
-  m_TipPosition = cameraPosition;
+  m_CameraPosition = navigationData->GetPosition();
 
   //calculate the transform from the quaternions
   static itk::QuaternionRigidTransform<double>::Pointer quatTransform = itk::QuaternionRigidTransform<double>::New();
@@ -89,11 +88,11 @@ void mitk::CameraVisualization::GenerateData()
 
   m_DirectionOfProjection = m*m_DirectionOfProjectionInToolCoordinates;
   m_DirectionOfProjection.Normalize();
-  Point3D focalPoint = cameraPosition + m_FocalLength*m_DirectionOfProjection;
+  Point3D focalPoint = m_CameraPosition + m_FocalLength*m_DirectionOfProjection;
   // compute current view up vector
   Vector3D viewUp = m*m_ViewUpInToolCoordinates;
 
-  m_Renderer->GetVtkRenderer()->GetActiveCamera()->SetPosition(cameraPosition[0],cameraPosition[1],cameraPosition[2]);
+  m_Renderer->GetVtkRenderer()->GetActiveCamera()->SetPosition(m_CameraPosition[0],m_CameraPosition[1],m_CameraPosition[2]);
   m_Renderer->GetVtkRenderer()->GetActiveCamera()->SetFocalPoint(focalPoint[0],focalPoint[1],focalPoint[2]);
   m_Renderer->GetVtkRenderer()->GetActiveCamera()->SetViewUp(viewUp[0],viewUp[1],viewUp[2]);
   m_Renderer->GetVtkRenderer()->ResetCameraClippingRange();

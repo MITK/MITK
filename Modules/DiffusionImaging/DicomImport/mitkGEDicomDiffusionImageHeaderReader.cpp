@@ -70,17 +70,6 @@ void mitk::GEDicomDiffusionImageHeaderReader::Update()
     VolumeReaderType::DictionaryArrayRawPointer inputDict 
       = m_VolumeReader->GetMetaDataDictionaryArray();
 
-#ifndef DGDCM2
-    if(gdcm::Global::GetDicts()->GetDefaultPubDict()->GetEntry(GEDictBValue.GetKey()) == 0)
-      gdcm::Global::GetDicts()->GetDefaultPubDict()->AddEntry(GEDictBValue);
-    if(gdcm::Global::GetDicts()->GetDefaultPubDict()->GetEntry(GEDictXGradient.GetKey()) == 0)
-      gdcm::Global::GetDicts()->GetDefaultPubDict()->AddEntry(GEDictXGradient);
-    if(gdcm::Global::GetDicts()->GetDefaultPubDict()->GetEntry(GEDictYGradient.GetKey()) == 0)
-      gdcm::Global::GetDicts()->GetDefaultPubDict()->AddEntry(GEDictYGradient);
-    if(gdcm::Global::GetDicts()->GetDefaultPubDict()->GetEntry(GEDictZGradient.GetKey()) == 0)
-      gdcm::Global::GetDicts()->GetDefaultPubDict()->AddEntry(GEDictZGradient);
-#endif
-
     ReadPublicTags();
 
     //int mMosaic;   // number of raws in each mosaic block;

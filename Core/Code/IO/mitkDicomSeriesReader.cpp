@@ -598,7 +598,7 @@ UidFileNamesMap map; // preliminary result, refined into the final result mapOf3
       std::stringstream newGroupUID;
       newGroupUID << groupUID << '.' << subgroup;
       mapOf3DBlocks[ newGroupUID.str() ] = analysisResult.first;
-      MITK_INFO << "Sorted 3D group " << newGroupUID.str() << " with " << mapOf3DBlocks[ newGroupUID.str() ].size() << " files";
+      MITK_DEBUG << "Sorted 3D group " << newGroupUID.str() << " with " << mapOf3DBlocks[ newGroupUID.str() ].size() << " files";
       
       ++subgroup;
         
@@ -639,7 +639,7 @@ UidFileNamesMap map; // preliminary result, refined into the final result mapOf3
           mapOf3DPlusTBlocks[thisBlockKey].insert( mapOf3DPlusTBlocks[thisBlockKey].end(), 
                                                    block3DIter->second.begin(), 
                                                    block3DIter->second.end() );
-          MITK_INFO << "3D+t group " << thisBlockKey << " started";
+          MITK_DEBUG << "3D+t group " << thisBlockKey << " started";
           previousBlockKey = thisBlockKey;
         }
         else
@@ -661,7 +661,7 @@ UidFileNamesMap map; // preliminary result, refined into the final result mapOf3
             mapOf3DPlusTBlocks[previousBlockKey].insert( mapOf3DPlusTBlocks[previousBlockKey].end(), 
                                                          block3DIter->second.begin(), 
                                                          block3DIter->second.end() );
-            MITK_INFO << "3D+t group " << previousBlockKey << " enhanced with another timestep";
+            MITK_DEBUG << "3D+t group " << previousBlockKey << " enhanced with another timestep";
           }
           else
           {
@@ -669,7 +669,7 @@ UidFileNamesMap map; // preliminary result, refined into the final result mapOf3
             mapOf3DPlusTBlocks[thisBlockKey].insert( mapOf3DPlusTBlocks[thisBlockKey].end(), 
                                                      block3DIter->second.begin(), 
                                                      block3DIter->second.end() );
-            MITK_INFO << "3D+t group " << thisBlockKey << " started";
+            MITK_DEBUG << "3D+t group " << thisBlockKey << " started";
             previousBlockKey = thisBlockKey;
           }
         }

@@ -188,10 +188,8 @@ DicomSeriesReader::SortIntoBlocksFor3DplusT( const StringContainer& presortedFil
 {
   std::list<StringContainer> imageBlocks;
 
-  // sort only if requested (default)
-  StringContainer sorted_filenames = sort
-    ? DicomSeriesReader::SortSeriesSlices(presortedFilenames)
-    : presortedFilenames;
+  // ignore sort request, because most likely re-sorting is now needed due to changes in GetSeries(bug #8022)
+  StringContainer sorted_filenames = DicomSeriesReader::SortSeriesSlices(presortedFilenames);
 
   gdcm::Tag ippTag(0x0020,0x0032); //Image position (Patient)
   gdcm::Scanner scanner;

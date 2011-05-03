@@ -21,25 +21,19 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkDataNode.h"
 #include "mitkConfig.h"
 
-#ifdef MITK_USE_GDCMIO
-  #include <itkGDCMImageIO.h>
-#else
-  #include <itkDICOMImageIO2.h>
-#endif
+#include <itkGDCMImageIO.h>
 
 #include <itkImageSeriesReader.h>
 #include <itkCommand.h>
 
 #include <gdcmConfigure.h>
 
-#if GDCM_MAJOR_VERSION >= 2
-  #include <gdcmDataSet.h>
-  #include <gdcmRAWCodec.h>
-  #include <gdcmSorter.h>
-  #include <gdcmScanner.h>
-  #include <gdcmPixmapReader.h>
-  #include <gdcmStringFilter.h>
-#endif
+#include <gdcmDataSet.h>
+#include <gdcmRAWCodec.h>
+#include <gdcmSorter.h>
+#include <gdcmScanner.h>
+#include <gdcmPixmapReader.h>
+#include <gdcmStringFilter.h>
 
 
 namespace mitk
@@ -330,8 +324,6 @@ protected:
    */
   static StringContainer SortSeriesSlices(const StringContainer &unsortedFilenames);
 
-
-#if GDCM_MAJOR_VERSION >= 2
 public:
   /**
    \brief Checks if a specific file is a Philips3D ultrasound DICOM file.
@@ -358,13 +350,8 @@ protected:
     \brief Helper for CreateMoreUniqueSeriesIdentifier
   */
   static std::string IDifyTagValue(const std::string& value);
-#endif
 
-#ifdef MITK_USE_GDCMIO
   typedef itk::GDCMImageIO DcmIoType;
-#else
-  typedef itk::DICOMImageIO2 DcmIoType;
-#endif
 
   /**
     \brief Progress callback for DicomSeriesReader.
@@ -410,7 +397,6 @@ protected:
   Image::Pointer 
   LoadDICOMByITK( const StringContainer&, CallbackCommand* command = NULL);
 
-#if GDCM_MAJOR_VERSION >= 2
   /**
     \brief Sort files into time step blocks of a 3D+t image.
 
@@ -437,7 +423,6 @@ protected:
   static 
   bool 
   GdcmSortFunction(const gdcm::DataSet &ds1, const gdcm::DataSet &ds2);
-#endif
 };
 
 }

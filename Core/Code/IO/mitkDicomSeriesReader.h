@@ -56,6 +56,7 @@ namespace mitk
    - \ref DicomSeriesReader_sorting2
    - \ref DicomSeriesReader_sorting3
    - \ref DicomSeriesReader_sorting4
+ - \ref DicomSeriesReader_tests
 
  \section DicomSeriesReader_purpose Purpose
 
@@ -172,6 +173,10 @@ namespace mitk
 
  This last step depends on an option of GetSeries(). When requested, image blocks from the previous step are merged again
  whenever two blocks occupy the same portion of space (i.e. same origin, number of slices and z-spacing).
+ 
+ \section DicomSeriesReader_tests Tests regarding DICOM loading
+
+ A number of tests have been implemented to check our assumptions regarding DICOM loading. Please see \ref DICOMTesting
 
 */
 class MITK_CORE_EXPORT DicomSeriesReader

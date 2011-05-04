@@ -42,7 +42,8 @@ QmitkBoundingObjectWidget::QmitkBoundingObjectWidget (QWidget* parent, Qt::Windo
 m_DataStorage(NULL),
 m_lastSelectedItem(NULL),
 m_lastAffineObserver(NULL),
-m_ItemNodeMap()
+m_ItemNodeMap(),
+m_BoundingObjectCounter(1)
 {
 
   QBoxLayout* mainLayout = new QVBoxLayout(this);
@@ -286,6 +287,22 @@ void QmitkBoundingObjectWidget::RemoveItem()
   }
 }
 
+void QmitkBoundingObjectWidget::RemoveAllItems()
+{
+  ItemNodeMapType::iterator it = m_ItemNodeMap.begin();
+
+  while( it != m_ItemNodeMap.end() )
+  {
+    m_TreeWidget->takeTopLevelItem( m_TreeWidget->indexOfTopLevelItem(it->first) );
+    m_ItemNodeMap.erase(m_ItemNodeMap.find(it->first));
+
+    ++it;
+  }
+
+  m_BoundingObjectCounter = 1;
+}
+
+
 mitk::BoundingObject::Pointer QmitkBoundingObjectWidget::GetSelectedBoundingObject()
 {
   mitk::BoundingObject* boundingObject;
@@ -354,9 +371,8 @@ void QmitkBoundingObjectWidget::CreateBoundingObject(int type)
   if (type != 0)
   {
     mitk::BoundingObject::Pointer boundingObject;
-    static int i = 1;
     QString name;
-    name.setNum(i);
+    name.setNum(m_BoundingObjectCounter);
 
     switch (type-1)
     {
@@ -380,7 +396,7 @@ void QmitkBoundingObjectWidget::CreateBoundingObject(int type)
       return;
       break;
     }
-    i++;
+    m_BoundingObjectCounter++;
     m_addComboBox->setCurrentIndex(0);
 
     // set initial size

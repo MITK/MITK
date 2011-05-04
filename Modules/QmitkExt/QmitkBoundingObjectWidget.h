@@ -49,11 +49,13 @@ public:
 
   void OnBoundingObjectModified( const itk::EventObject& e);
 
+  void RemoveAllItems();
+
 signals:
   //signal when bo has changed
   void BoundingObjectsChanged();
 
-  protected slots:
+protected slots:
     void CreateBoundingObject(int type);
     void OnDelButtonClicked();
  /*   void OnLoadButtonClicked();
@@ -78,6 +80,8 @@ protected:
 
   typedef std::map< QTreeWidgetItem*, mitk::DataNode* > ItemNodeMapType;
   ItemNodeMapType m_ItemNodeMap;
+
+  unsigned int m_BoundingObjectCounter;
 
   enum BoundingObjectType{
     CUBOID,

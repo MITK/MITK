@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "itksys/SystemTools.hxx"
 #include "mitkTestingMacros.h"
 #include "mitkTrackingTool.h"
+#include <iomanip>
 
 
 int mitkVirtualTrackingDeviceTest(int /* argc */, char* /*argv*/[])
@@ -101,14 +102,21 @@ int mitkVirtualTrackingDeviceTest(int /* argc */, char* /*argv*/[])
   tracker->GetToolByName("Tool1")->GetPosition(posAfter1);
   MITK_TEST_CONDITION( mitk::Equal(posBefore1, posAfter1) == false, "Testing if tracking is producing new position values in tool 1.");
 
-
   // add tool while tracking is in progress
   tracker->AddTool("while Running");
 
+  itksys::SystemTools::Delay(100); // wait for tracking thread to start generating positions
   tracker->GetToolByName("while Running")->GetPosition(posBefore0);
   itksys::SystemTools::Delay(100); // wait for tracking thread to start generating positions
   tracker->GetToolByName("while Running")->GetPosition(posAfter0);
-  MITK_TEST_CONDITION( mitk::Equal(posBefore0, posAfter0) == false, "Testing if tracking is producing new position values for 'while running' tool.");
+  bool randomNumberFail = mitk::Equal(posBefore0, posAfter0);
+  if(randomNumberFail) //this value should never be true because in 100ms the generator should produce 2 new values with refreshrate 43ms
+  {
+    //output for debugging purposes
+    MITK_INFO << std::setprecision(16) << "Value of posBefore0 " << posBefore0;
+    MITK_INFO << std::setprecision(16) << "Value of posAfter0 " << posAfter0;
+  }
+  MITK_TEST_CONDITION( randomNumberFail == false, "Testing if tracking is producing new position values for 'while running' tool.");
 
   // always end with this!
   MITK_TEST_END();

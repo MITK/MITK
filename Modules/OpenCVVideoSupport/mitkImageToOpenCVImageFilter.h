@@ -85,7 +85,7 @@ namespace mitk
   {
     typedef itk::Image<TPixel, VImageDimension> ImageType;
 
-    const unsigned int numberOfPixels = m_OpenCVImage->width * m_OpenCVImage->height;
+    const unsigned int numberOfPixels = m_Image->GetDimension(0) * m_Image->GetDimension(1);
     const unsigned int numberOfBytes = numberOfPixels * sizeof( typename ImageType::PixelType );
 
     const typename ImageType::PixelType * itkBuffer = image->GetBufferPointer();

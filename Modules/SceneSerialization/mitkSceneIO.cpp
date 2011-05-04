@@ -40,6 +40,12 @@ PURPOSE.  See the above copyright notices for more information.
 #include <sstream>
 
 #include "itksys/SystemTools.hxx"
+
+#ifdef WIN32
+  #include <windows.h>
+#else
+  #include <sys/time.h>
+#endif
  
 int mitk::SceneIO::tempDiretoryID = 0;
 
@@ -58,9 +64,20 @@ std::string mitk::SceneIO::CreateEmptyTempDirectory()
   mitk::SceneIO::tempDiretoryID++;
   std::stringstream uniqueNumber;
   
-  srand ( time(NULL) );
+#ifdef WIN32
+  SYSTEMTIME st;
+
+  GetSystemTime(&st);
+  srand ( st.wMilliseconds );
+#else
+  timeval time_microsec;
+
+  gettimeofday(&time_microsec, 0);
+  srand ( time_microsec.tv_usec );
+#endif
+
   int randomNumber = rand() % 1000 + 1;
-  
+
   uniqueNumber << mitk::SceneIO::tempDiretoryID << randomNumber;
   std::string returnValue = mitk::StandardFileLocations::GetInstance()->GetOptionDirectory() + Poco::Path::separator() + "SceneIOTempDirectory" + uniqueNumber.str();
   //old method (didn't work on dart client): Poco::TemporaryFile::tempName();
@@ -73,7 +90,19 @@ std::string mitk::SceneIO::CreateEmptyTempDirectory()
     if (!existsNot) 
       {
       MITK_ERROR << "Warning: Directory already exitsts: " << uniquename << " (choosing another)";
-      srand ( time(NULL) );
+
+#ifdef WIN32
+      SYSTEMTIME st;
+
+      GetSystemTime(&st);
+      srand ( st.wMilliseconds );
+#else
+      timeval time_microsec;
+
+      gettimeofday(&time_microsec, 0);
+      srand ( time_microsec.tv_usec );
+#endif
+
       randomNumber = rand() % 10000 + 1;
       uniqueNumber << randomNumber;
       returnValue = mitk::StandardFileLocations::GetInstance()->GetOptionDirectory() + Poco::Path::separator() + "SceneIOTempDirectory" + uniqueNumber.str();

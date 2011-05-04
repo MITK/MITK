@@ -52,7 +52,7 @@ PURPOSE.  See the above copyright notices for more information.
 //ITK
 #include <itkRGBAPixel.h>
 
-int mitk::ImageVtkMapper2D::numRenderer = 0; //TODO what is this?
+int mitk::ImageVtkMapper2D::numRenderer = 0; //Number of renderers data is stored for.
 
 mitk::ImageVtkMapper2D::ImageVtkMapper2D()
 {
@@ -73,7 +73,7 @@ void mitk::ImageVtkMapper2D::AdjustCamera(mitk::BaseRenderer* renderer)
   renderer->GetVtkRenderer()->GetActiveCamera()->SetParallelProjection(true);
 
   //scale the rendered object. TODO How to achieve the correct scale?
-  renderer->GetVtkRenderer()->GetActiveCamera()->SetParallelScale(100);
+//  renderer->GetVtkRenderer()->GetActiveCamera()->SetParallelScale(100);
 
   //the center of the plane in homogeneous coordinates
   double planeCenter[4];
@@ -100,28 +100,38 @@ void mitk::ImageVtkMapper2D::AdjustCamera(mitk::BaseRenderer* renderer)
   double planeNormalTransformed[4];
   double planeCenterTransformed[4];
   double cameraUpTransformed[4];
+  double cameraPositionTransformed[4];
 
   //Transform everything to the current position (Transveral, coronal and saggital plane).
   //This is necessary, because the vtkTransformFilter does not manipulate the vtkPlaneSource,
   //and thus, the plane normal and center are not placed correctly.
   //(Without this all three planes would have the same normal/center and consequently the same camera position).
   localStorage->m_TransformMatrix->MultiplyPoint(planeCenter, planeCenterTransformed);
-  localStorage->m_TransformMatrix->MultiplyPoint(planeNormal, planeNormalTransformed);
+//  localStorage->m_TransformMatrix->MultiplyPoint(planeNormal, planeNormalTransformed);
   localStorage->m_TransformMatrix->MultiplyPoint(cameraUp, cameraUpTransformed);
 
   //set the camera position at the plane center and normal TODO not ok for zooming and panning??
-  double cameraPosition[3];
-  cameraPosition[0] = planeCenterTransformed[0] + planeNormalTransformed[0];
-  cameraPosition[1] = planeCenterTransformed[1] + planeNormalTransformed[1];
-  cameraPosition[2] = planeCenterTransformed[2] + planeNormalTransformed[2];
+//  double cameraPosition[3];
+//  cameraPosition[0] = planeCenterTransformed[0] + planeNormalTransformed[0];
+//  cameraPosition[1] = planeCenterTransformed[1] + planeNormalTransformed[1];
+//  cameraPosition[2] = planeCenterTransformed[2] + planeNormalTransformed[2];
+
+  double cameraPosition[4];
+  cameraPosition[0] = planeCenter[0] + planeNormal[0];
+  cameraPosition[1] = planeCenter[1] + planeNormal[1];
+  cameraPosition[2] = planeCenter[2] + planeNormal[2];
+  cameraPosition[3] = 1.0;
+  localStorage->m_TransformMatrix->MultiplyPoint(cameraPosition, cameraPositionTransformed);
 
   //set the camera corresponding to the textured plane
   vtkSmartPointer<vtkCamera> camera = renderer->GetVtkRenderer()->GetActiveCamera();
   if (camera)
   {
-    camera->SetPosition( cameraPosition ); //set the camera position on the textured plane normal
+    camera->SetPosition( cameraPositionTransformed[0], cameraPositionTransformed[1], cameraPositionTransformed[2] ); //set the camera position on the textured plane normal
     camera->SetFocalPoint( planeCenterTransformed[0], planeCenterTransformed[1], planeCenterTransformed[2]); //set the focal point to the center of the textured plane
+//    camera->SetFocalPoint( planeCenter[0], planeCenter[1], planeCenter[2]); //set the focal point to the center of the textured plane
     camera->SetViewUp(cameraUpTransformed[0],cameraUpTransformed[1],cameraUpTransformed[2]);
+//    camera->SetViewUp(cameraUp[0],cameraUp[1],cameraUp[2]);
   }
   //reset the clipping range TODO why? really needed if everything is correct?
   renderer->GetVtkRenderer()->ResetCameraClippingRange();
@@ -695,6 +705,40 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
   //remove the VTK interaction
   renderer->GetVtkRenderer()->GetRenderWindow()->SetInteractor(NULL);
 
+//  MITK_INFO << "vtk transform " << inputGeometry->GetVtkTransform()[0];
+//  MITK_INFO << "vtk transform inverse" << inputGeometry->GetVtkTransform()->GetLinearInverse()[0];
+
+
+  //get the transformation matrix of the reslicer in order to render the slice as transversal, coronal or saggital
+  vtkSmartPointer<vtkTransform> trans = vtkSmartPointer<vtkTransform>::New();
+  vtkSmartPointer<vtkMatrix4x4> matrix = rendererInfo.m_Reslicer->GetResliceAxes();
+//  for(int i = 0; i<4; i++)
+//  {
+//    for(int j = 0; j<4; j++)
+//    {
+//      if(matrix->GetElement(i,j) == 255.0)
+//      {
+//          matrix->SetElement(i,j, 0.0);
+//      }
+//    }
+//  }
+
+  trans->SetMatrix(matrix);
+//  localStorage->m_TransformMatrix = rendererInfo.m_Reslicer->GetResliceAxes();
+  localStorage->m_TransformMatrix = matrix;
+
+  //transform the plane to the corresponding view (transversal, coronal or saggital)
+  localStorage->m_TransformFilter->SetTransform(trans);
+  localStorage->m_TransformFilter->SetInputConnection(localStorage->m_Plane->GetOutputPort());
+  localStorage->m_TransformFilter->Update();
+  localStorage->m_Mapper->SetInputConnection(localStorage->m_TransformFilter->GetOutputPort());
+
+  //set up the camera to view the transformed plane
+  this->AdjustCamera( renderer );
+
+  // We have been modified
+  rendererInfo.m_LastUpdateTime.Modified();
+
   //TODO remove this later
   static int counter = 0;
   if(counter < 3)
@@ -710,24 +754,10 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
   }
   //TODO remove this later
   renderer->GetVtkRenderer()->SetBackground(1,1,1);
-  MITK_INFO << "reslice axis " << rendererInfo.m_Reslicer->GetResliceAxes()[0];
 
-  //get the transformation matrix of the reslicer in order to render the slice as transversal, coronal or saggital
-  vtkSmartPointer<vtkTransform> trans = vtkSmartPointer<vtkTransform>::New();
-  trans->SetMatrix(rendererInfo.m_Reslicer->GetResliceAxes());
-  localStorage->m_TransformMatrix = rendererInfo.m_Reslicer->GetResliceAxes();
-
-  //transform the plane to the corresponding view (transversal, coronal or saggital)
-  localStorage->m_TransformFilter->SetTransform(trans);
-  localStorage->m_TransformFilter->SetInputConnection(localStorage->m_Plane->GetOutputPort());
-  localStorage->m_TransformFilter->Update();
-  localStorage->m_Mapper->SetInputConnection(localStorage->m_TransformFilter->GetOutputPort());
-
-  //set up the camera to view the transformed plane
-  this->AdjustCamera( renderer );
-
-  // We have been modified
-  rendererInfo.m_LastUpdateTime.Modified();
+//  MITK_INFO << rendererInfo.m_Reslicer->GetResliceTransform()->GetMatrix();
+  MITK_INFO << "matrix " << matrix[0];
+  MITK_INFO << "################################# Next RW";
 }
 
 

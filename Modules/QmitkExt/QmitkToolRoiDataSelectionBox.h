@@ -50,6 +50,8 @@ public:
 
   void OnToolManagerRoiDataModified();
 
+  void DataStorageChanged(const mitk::DataNode* node );
+
   mitk::ToolManager::DataVectorType GetSelection();
 
   void UpdateComboBoxData();
@@ -57,8 +59,11 @@ public:
   void setEnabled(bool);
 
 signals:
+  
   void RoiDataSelected(const mitk::DataNode* node);
-  protected slots:
+
+protected slots:
+
     void OnRoiDataSelectionChanged(const QString& name);
     void OnRoiDataSelectionChanged();
 

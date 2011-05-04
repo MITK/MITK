@@ -45,10 +45,16 @@ m_lastSelectedName(tr("none"))
   //setup message delegates
   m_ToolManager->RoiDataChanged += mitk::MessageDelegate<QmitkToolRoiDataSelectionBox> (this, &QmitkToolRoiDataSelectionBox::OnToolManagerRoiDataModified);
 
+  mainLayout->deleteLater();
+  label->deleteLater();
 }
 
 QmitkToolRoiDataSelectionBox::~QmitkToolRoiDataSelectionBox()
 {
+  delete m_segmentationComboBox;
+  delete m_boundingObjectWidget;
+
+  m_ToolManager->GetDataStorage()->RemoveNodeEvent.RemoveListener( mitk::MessageDelegate1<QmitkToolRoiDataSelectionBox , const mitk::DataNode*>( this, &QmitkToolRoiDataSelectionBox::DataStorageChanged ) );  
 }
 
 void QmitkToolRoiDataSelectionBox::SetDataStorage(mitk::DataStorage &storage)
@@ -56,6 +62,9 @@ void QmitkToolRoiDataSelectionBox::SetDataStorage(mitk::DataStorage &storage)
   m_ToolManager->SetDataStorage(storage);
   m_boundingObjectWidget->SetDataStorage(&storage);
   UpdateComboBoxData();
+
+  storage.RemoveNodeEvent.AddListener( mitk::MessageDelegate1<QmitkToolRoiDataSelectionBox , const mitk::DataNode*>( this, &QmitkToolRoiDataSelectionBox::DataStorageChanged ) );
+
 }
 
 mitk::DataStorage* QmitkToolRoiDataSelectionBox::GetDataStorage()
@@ -84,6 +93,18 @@ void QmitkToolRoiDataSelectionBox::OnToolManagerRoiDataModified()
     return;
   UpdateComboBoxData();
 }
+
+void QmitkToolRoiDataSelectionBox::DataStorageChanged(const mitk::DataNode* node )
+{
+  if (m_SelfCall) 
+    return;
+
+  if ( this->GetDataStorage()->GetAll()->size() == 1 )
+  {
+    m_boundingObjectWidget->RemoveAllItems();
+  }
+}
+
 
 void QmitkToolRoiDataSelectionBox::OnRoiDataSelectionChanged()
 {

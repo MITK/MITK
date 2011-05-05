@@ -80,6 +80,8 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
         image->InitializeByItk(reader->GetOutput(), 1, volume_count);
         image->SetImportVolume(reader->GetOutput()->GetBufferPointer(), 0u);
 
+        DicomSeriesReader::CopyMetaDataToImageProperties( imageBlocks.front(), io, image );
+
         MITK_DEBUG << "Volume dimension: [" << image->GetDimension(0) << ", " 
                                             << image->GetDimension(1) << ", " 
                                             << image->GetDimension(2) << ", " 

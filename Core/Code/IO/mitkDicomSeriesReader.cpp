@@ -22,13 +22,11 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <itkGDCMSeriesFileNames.h>
 
-#if GDCM_MAJOR_VERSION >= 2
-  #include <gdcmAttribute.h>
-  #include <gdcmPixmapReader.h>
-  #include <gdcmStringFilter.h>
-  #include <gdcmDirectory.h>
-  #include <gdcmScanner.h>
-#endif
+#include <gdcmAttribute.h>
+#include <gdcmPixmapReader.h>
+#include <gdcmStringFilter.h>
+#include <gdcmDirectory.h>
+#include <gdcmScanner.h>
 
 namespace mitk
 {
@@ -136,7 +134,6 @@ DicomSeriesReader::IsDicom(const std::string &filename)
   return io->CanReadFile(filename.c_str());
 }
 
-#if GDCM_MAJOR_VERSION >= 2
 bool 
 DicomSeriesReader::IsPhilips3DDicom(const std::string &filename)
 {
@@ -298,7 +295,6 @@ DicomSeriesReader::ReadPhilips3DDicom(const std::string &filename, mitk::Image::
   mitk::CastToMitkImage(imageItk, output_image);
   return true; // actually never returns false yet.. but exception possible
 }
-#endif
 
 DicomSeriesReader::TwoStringContainers
 DicomSeriesReader::AnalyzeFileForITKImageSeriesReaderSpacingAssumption(
@@ -479,39 +475,8 @@ DicomSeriesReader::GetSeries(const StringContainer& files, bool sortTo3DPlust, c
         - 0018,0050 slice thickness
   */
 
-UidFileNamesMap map; // preliminary result, refined into the final result mapOf3DPlusTBlocks
+  UidFileNamesMap map; // preliminary result, refined into the final result mapOf3DPlusTBlocks
 
-#if GDCM_MAJOR_VERSION < 2
-  // old GDCM: let itk::GDCMSeriesFileNames do the sorting
-
-  DcmFileNamesGeneratorType::Pointer name_generator = DcmFileNamesGeneratorType::New();
-
-  name_generator->SetUseSeriesDetails(true);
-  name_generator->AddSeriesRestriction("0020|0037"); // image orientation (patient)
-  name_generator->AddSeriesRestriction("0028|0030"); // pixel spacing (x,y)
-
-  name_generator->SetLoadSequences(false); // could speed up reading, and we don't use sequences anyway
-  name_generator->SetLoadPrivateTags(false);
-
-  for(StringContainer::const_iterator it = restrictions.begin(); 
-      it != restrictions.end(); 
-      ++it)
-  {
-    name_generator->AddSeriesRestriction(*it);
-  }
-
-  name_generator->SetDirectory(dir.c_str());
-  const StringContainer& series_uids = name_generator->GetSeriesUIDs();
-
-  for(StringContainer::const_iterator it = series_uids.begin(); 
-      it != series_uids.end(); 
-      ++it)
-  {
-    const std::string& uid = *it;
-    map[uid] = name_generator->GetFileNames(uid);
-  }
-
-#else
   // use GDCM directly, itk::GDCMSeriesFileNames does not work with GDCM 2
 
   // PART I: scan files for sorting relevant DICOM tags, 
@@ -679,8 +644,6 @@ UidFileNamesMap map; // preliminary result, refined into the final result mapOf3
     }
   }
 
-#endif
-
   for ( UidFileNamesMap::const_iterator groupIter = map.begin(); groupIter != map.end(); ++groupIter )
   {
     MITK_DEBUG << "Slice group " << groupIter->first << " with " << groupIter->second.size() << " files";
@@ -696,8 +659,6 @@ DicomSeriesReader::GetSeries(const std::string &dir, const StringContainer &rest
   directoryLister.Load( dir.c_str(), false ); // non-recursive
   return GetSeries(directoryLister.GetFilenames(), restrictions);
 }
-
-#if GDCM_MAJOR_VERSION >= 2
 
 std::string
 DicomSeriesReader::CreateSeriesIdentifierPart( gdcm::Scanner::TagToValue& tagValueMap, const gdcm::Tag& tag )
@@ -772,7 +733,6 @@ DicomSeriesReader::IDifyTagValue(const std::string& value)
   IDifiedValue += ".";
   return IDifiedValue;
 }
-#endif
 
 DicomSeriesReader::StringContainer 
 DicomSeriesReader::GetSeries(const std::string &dir, const std::string &series_uid, const StringContainer &restrictions)
@@ -796,18 +756,13 @@ DicomSeriesReader::GetSeries(const std::string &dir, const std::string &series_u
 DicomSeriesReader::StringContainer 
 DicomSeriesReader::SortSeriesSlices(const StringContainer &unsortedFilenames)
 {
-#if GDCM_MAJOR_VERSION >= 2
   gdcm::Sorter sorter;
 
   sorter.SetSortFunction(DicomSeriesReader::GdcmSortFunction);
   sorter.Sort(unsortedFilenames);
   return sorter.GetFilenames();
-#else
-  return unsortedFilenames;
-#endif
 }
 
-#if GDCM_MAJOR_VERSION >= 2
 bool 
 DicomSeriesReader::GdcmSortFunction(const gdcm::DataSet &ds1, const gdcm::DataSet &ds2)
 {
@@ -866,17 +821,12 @@ DicomSeriesReader::GdcmSortFunction(const gdcm::DataSet &ds1, const gdcm::DataSe
     return dist1 < dist2;
   }
 }
-#endif
   
 std::string DicomSeriesReader::GetConfigurationString()
 {
   std::stringstream configuration;
   configuration << "MITK_USE_GDCMIO: ";
-#ifdef MITK_USE_GDCMIO
   configuration << "true";
-#else
-  configuration << "false";
-#endif
   configuration << "\n";
 
   configuration << "GDCM_VERSION: ";

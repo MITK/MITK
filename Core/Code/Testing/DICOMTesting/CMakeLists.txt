@@ -1,5 +1,4 @@
 if (BUILD_TESTING)
-if (MITK_USE_GDCMIO)
 if (GDCM_DIR)
 
 # clear variables from prior files.cmake
@@ -30,6 +29,5 @@ target_link_libraries(VerifyDICOMMitkImageDump ${ALL_LIBRARIES})
 
 add_subdirectory(Testing)
 
-endif()
 endif()
 endif()

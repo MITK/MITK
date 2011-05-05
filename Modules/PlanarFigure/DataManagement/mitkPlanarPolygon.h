@@ -67,7 +67,9 @@ public:
     return 1000;
   }
 
-  
+  std::vector<mitk::Point2D> CheckForLineIntersection( const Point2D& p1, const Point2D& p2 ) const;
+
+
 protected:
   PlanarPolygon();
   virtual ~PlanarPolygon();
@@ -80,8 +82,9 @@ protected:
 
   /** \brief Calculates feature quantities of the planar figure. */
   virtual void EvaluateFeaturesInternal();
-
-  bool CheckForLineIntersection(Point2D p1, Point2D p2, Point2D p3, Point2D p4);
+  
+  bool CheckForLineIntersection(const mitk::Point2D& p1, const mitk::Point2D& p2, const mitk::Point2D& p3, const mitk::Point2D& p4, Point2D& intersection) const ;
+  bool CheckForLineIntersection( const mitk::Point2D& p1, const mitk::Point2D& p2, const mitk::Point2D& p3, const mitk::Point2D& p4 ) const;
 
   virtual void PrintSelf( std::ostream &os, itk::Indent indent ) const;
 

@@ -172,7 +172,7 @@ void mitk::PlanarPolygon::PrintSelf( std::ostream& os, itk::Indent indent) const
 
 // based on
 // http://flassari.is/2008/11/line-line-intersection-in-cplusplus/
-bool mitk::PlanarPolygon::CheckForLineIntersection(Point2D p1, Point2D p2, Point2D p3, Point2D p4) 
+bool mitk::PlanarPolygon::CheckForLineIntersection( const mitk::Point2D& p1, const mitk::Point2D& p2, const mitk::Point2D& p3, const mitk::Point2D& p4, Point2D& intersection ) const
 {
   // do not check for intersections with control points
   if(p1 == p2 || p1 == p3 || p1 == p4 ||
@@ -204,5 +204,42 @@ bool mitk::PlanarPolygon::CheckForLineIntersection(Point2D p1, Point2D p2, Point
    
   // point of intersection
   Point2D ret; ret[0] = x; ret[1] = y;
+  intersection = ret;
   return true;
+}
+
+bool mitk::PlanarPolygon::CheckForLineIntersection( const mitk::Point2D& p1, const mitk::Point2D& p2, const mitk::Point2D& p3, const mitk::Point2D& p4 ) const
+{
+  mitk::Point2D intersection;
+  return mitk::PlanarPolygon::CheckForLineIntersection( p1, p2, p3, p4, intersection );
+
+}
+
+std::vector<mitk::Point2D> mitk::PlanarPolygon::CheckForLineIntersection( const mitk::Point2D& p1, const mitk::Point2D& p2 ) const
+{
+  std::vector<mitk::Point2D> intersectionList;
+
+
+  for ( int i=0; i<this->GetNumberOfControlPoints()-1; i++ )
+  {
+    mitk::Point2D pnt1 = this->GetControlPoint( i );
+    mitk::Point2D pnt2 = this->GetControlPoint( i+1 );
+    mitk::Point2D intersection;
+
+    if ( mitk::PlanarPolygon::CheckForLineIntersection( pnt1, pnt2, p1, p2, intersection ) )
+    {
+      intersectionList.push_back( intersection );
+    }
+  }
+
+  if ( this->IsClosed() )
+  {
+    mitk::Point2D intersection;
+    if ( mitk::PlanarPolygon::CheckForLineIntersection( this->GetControlPoint(this->GetNumberOfControlPoints()-1), this->GetControlPoint(0), p1, p2, intersection ) )
+    {
+      intersectionList.push_back( intersection );
+    }
+  }
+
+  return intersectionList;
 }

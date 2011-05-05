@@ -4,7 +4,6 @@ Program:   Medical Imaging & Interaction Toolkit
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
-
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
@@ -428,7 +427,7 @@ protected:
   std::list<StringContainer> 
   SortIntoBlocksFor3DplusT( const StringContainer& presortedFilenames, bool sort, bool& canLoadAs4D );
 
-  /*
+  /**
    \brief Defines spatial sorting for sorting by GDCM 2.
 
    Sorts by image position along image normal (distance from world origin).
@@ -437,7 +436,16 @@ protected:
   static 
   bool 
   GdcmSortFunction(const gdcm::DataSet &ds1, const gdcm::DataSet &ds2);
+
 #endif
+
+
+  /**
+    \brief Copy information about files and DICOM tags from ITK's MetaDataDictionary
+           and from the list of input files to the PropertyList of mitk::Image.
+    \todo Tag copy must follow; image level will cause some additional files parsing, probably.
+  */
+  static void CopyMetaDataToImageProperties( const StringContainer& files, DcmIoType* io, Image* image );
 };
 
 }

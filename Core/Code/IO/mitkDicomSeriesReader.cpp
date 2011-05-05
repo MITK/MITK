@@ -30,6 +30,8 @@ PURPOSE.  See the above copyright notices for more information.
   #include <gdcmScanner.h>
 #endif
 
+#include "mitkProperties.h"
+
 namespace mitk
 {
 
@@ -887,8 +889,43 @@ std::string DicomSeriesReader::GetConfigurationString()
 
   return configuration.str();
 }
+  
+void DicomSeriesReader::CopyMetaDataToImageProperties( const StringContainer& files, DcmIoType* io, Image* image )
+{
+  if (!io || !image) return;
 
+  StringLookupTable filesForSlices;
+
+  unsigned int slice(0);
+  for ( StringContainer::const_iterator fIter = files.begin();
+        fIter != files.end();
+        ++fIter, ++slice )
+  {
+    filesForSlices.SetTableValue( slice, *fIter );
+  }
+
+  image->SetProperty( "files", StringLookupTableProperty::New( filesForSlices ) );
+
+  /*
+     TODO
+
+     DICOM tags for patient, study, series level can easily be copied from
+     io->GetMetaDataDictionary to appropriate mitk::Image::m_PropertyList entries.
+
+     Keys should follow the format "dicom.patient.gggg.eeee", 
+     values the raw strings from ITK initially, no type specific handling.
+
+     Image level attributes will cause an additional run of the files
+     through gdcm::Scanner probably. Tags of interest would be:
+
+     (0020,1041) Slice Location (for verification of loading)
+     (0020,0013) Instance Number (for display and visual reference against PACS for users)
+     (0008,0018) SOP Instance UID (for real reference to PACS in applications)
+
+  */
 }
+
+} // end namespace mitk
 
 #include <mitkDicomSeriesReader.txx>
 

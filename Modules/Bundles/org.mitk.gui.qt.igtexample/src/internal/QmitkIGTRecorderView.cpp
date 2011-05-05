@@ -24,7 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkInternalTrackingTool.h"
 #include "mitkNDIPassiveTool.h"
 #include "mitkNDITrackingDevice.h"
-#include "mitkTrackingVolume.h"
+#include "mitkTrackingVolumeGenerator.h"
 
 #include "mitkProperties.h"
 
@@ -148,8 +148,9 @@ void QmitkIGTRecorderView::OnStartRecording()
 
   if (this->GetDefaultDataStorage()->GetNamedNode("Tracking Volume") == NULL) // add tracking volume node
   {
-    mitk::TrackingVolume::Pointer tv = mitk::TrackingVolume::New();
-    tv->SetTrackingDeviceType(tracker->GetType());
+    mitk::TrackingVolumeGenerator::Pointer tvGenerator = mitk::TrackingVolumeGenerator::New();
+    tvGenerator->SetTrackingDeviceType(tracker->GetType());
+    mitk::Surface::Pointer tv = tvGenerator->GetOutput();
     mitk::DataNode::Pointer n = mitk::DataNode::New();
     n->SetData(tv);
     n->SetName("Tracking Volume");

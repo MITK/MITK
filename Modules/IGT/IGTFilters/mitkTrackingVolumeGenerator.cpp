@@ -1,3 +1,20 @@
+/*=========================================================================
+
+Program:   Medical Imaging & Interaction Toolkit
+Language:  C++
+Date:      $Date: 2011-01-18 13:22:38 +0100 (Di, 18 Jan 2011) $
+Version:   $Revision: 28959 $
+
+Copyright (c) German Cancer Research Center, Division of Medical and
+Biological Informatics. All rights reserved.
+See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
+
+This software is distributed WITHOUT ANY WARRANTY; without even
+the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.  See the above copyright notices for more information.
+
+=========================================================================*/
+
 #include "mitkTrackingVolumeGenerator.h"
 #include "mitkSTLFileReader.h"
 #include "mitkStandardFileLocations.h"
@@ -5,23 +22,32 @@
 #include <vtkCubeSource.h>
 #include <mitkTrackingTypes.h>
 #include <mitkTrackingDevice.h>
+#include <mitkVirtualTrackingDevice.h>
 
 mitk::TrackingVolumeGenerator::TrackingVolumeGenerator()
 {
     std::string m_VolumeDir = MITK_ROOT;
-    m_VolumeDir += "Modules/IGT/IGTTrackingDevices/TrackingVolumeData";
+    m_VolumeDir += "Modules/IGT/IGTTrackingDevices/TrackingVolumeData"; //folder which contains the trackingdevices configs
     mitk::StandardFileLocations::GetInstance()->AddDirectoryForSearch( m_VolumeDir.c_str(), false );
+}
 
-    MITK_INFO << "Konstruktor geht";
-
+void mitk::TrackingVolumeGenerator::SetVolumeManually(vtkPolyData* volume)
+{
+  this->m_Surface->SetVtkPolyData(volume);
 }
 
 
-
-mitk::Surface::Pointer mitk::TrackingVolumeGenerator::SetTrackingDevice(mitk::TrackingDevice::Pointer tracker)
+bool mitk::TrackingVolumeGenerator::SetTrackingDevice (mitk::TrackingDevice::Pointer tracker)
 {
-    MITK_INFO << "es geht";
     TrackingDeviceType type = tracker->GetType();
+
+   return SetTrackingDeviceType(type);
+}
+
+bool mitk::TrackingVolumeGenerator::SetTrackingDeviceType(TrackingDeviceType type)
+{
+    //mitk::VirtualTrackingDevice::Pointer tr = mitk::VirtualTrackingDevice::New() ;
+    //type = tr->GetType();
     // get filename / perform custom initiation
     std::string filename = "";
 
@@ -29,21 +55,18 @@ mitk::Surface::Pointer mitk::TrackingVolumeGenerator::SetTrackingDevice(mitk::Tr
     {
     case mitk::ClaronMicron:
       filename = mitk::StandardFileLocations::GetInstance()->FindFile("ClaronMicron.stl");
-      MITK_INFO << "Claron";
       break;
     case mitk::IntuitiveDaVinci:
       filename = mitk::StandardFileLocations::GetInstance()->FindFile("IntuitiveDaVinci.stl");
       break;
     case mitk::NDIAurora:
       filename = mitk::StandardFileLocations::GetInstance()->FindFile("NDIAurora.stl");
-      MITK_INFO << "Aurora";
       break;
     case mitk::NDIPolaris:
       filename = mitk::StandardFileLocations::GetInstance()->FindFile("NDIPolaris.stl");
-      MITK_INFO << "Polaris";
       break;
     case mitk::VirtualTracker:
-      {/*
+      {
         vtkCubeSource* cs = vtkCubeSource::New();
         double bounds[6];
          bounds[0] = bounds[2] = bounds[4] = -400.0;  // initialize bounds to -400 ... +400 cube. This is the default value of the
@@ -51,17 +74,19 @@ mitk::Surface::Pointer mitk::TrackingVolumeGenerator::SetTrackingDevice(mitk::Tr
         // the tracking volume polydata has be updated manually
         cs->SetBounds(bounds);
         cs->GetOutput()->Update();
-        this->SetVtkPolyData(cs->GetOutput());
-        cs->Delete();*/
-        MITK_INFO << "Virtual Tracker !";
-        return NULL;
+
+        m_Surface = this->mitk::SurfaceSource::GetOutput (); //get a surface
+        m_Surface->SetVtkPolyData(cs->GetOutput()); //set the visible trackingvolume
+
+        cs->Delete();
+        return true;
       }
     default:
-      return NULL;
+      return false;
     }
 
     if (filename.empty())
-      return NULL;
+      return false;
 
     mitk::STLFileReader::Pointer stlReader = mitk::STLFileReader::New();
     try
@@ -71,19 +96,22 @@ mitk::Surface::Pointer mitk::TrackingVolumeGenerator::SetTrackingDevice(mitk::Tr
     }
     catch (...)
     {
-          return NULL;
+          return false;
     }
     if ( stlReader->GetOutput() == NULL )
       return false;
-    mitk::Surface::Pointer nerv = this->GetOutput ();
 
+    m_Surface = this->mitk::SurfaceSource::GetOutput (); //get a surface
+    m_Surface->SetVtkPolyData( stlReader->GetOutput()->GetVtkPolyData());//set the visible trackingvolume
 
-    nerv->SetVtkPolyData( stlReader->GetOutput()->GetVtkPolyData());
     stlReader = NULL;
 
-    MITK_INFO << "seems to work";
+    return true;
 
-    return nerv;
+}
 
+mitk::Surface* mitk::TrackingVolumeGenerator::GetOutput ()
+{
+    return this->m_Surface;
 }
 

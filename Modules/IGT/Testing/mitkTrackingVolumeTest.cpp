@@ -15,7 +15,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#include "mitkTrackingVolume.h"
+#include <mitkTrackingVolumeGenerator.h>
 #include "mitkCommon.h"
 #include "mitkTestingMacros.h"
 #include "vtkPolyData.h"
@@ -28,36 +28,37 @@ class mitkTrackingVolumeTestClass
     static void TestInstantiation()
     {
     // let's create an object of our class  
-    mitk::TrackingVolume::Pointer myTrackingVolume = mitk::TrackingVolume::New();
-    MITK_TEST_CONDITION_REQUIRED(myTrackingVolume.IsNotNull(),"Testing instantiation")
+    mitk::TrackingVolumeGenerator::Pointer myTVGenerator = mitk::TrackingVolumeGenerator::New();
+    MITK_TEST_CONDITION_REQUIRED(myTVGenerator.IsNotNull(),"Testing instantiation")
+
     }
 
     static void TestClaronTrackingVolume()
     {
     MITK_TEST_OUTPUT(<< "---- Testing MicronTracker 2 Tracking Volume ----")
-    mitk::TrackingVolume::Pointer myTrackingVolume = mitk::TrackingVolume::New();
-    MITK_TEST_CONDITION(myTrackingVolume->SetTrackingDeviceType(mitk::ClaronMicron),"loading MicronTracker Volume data:")
+    mitk::TrackingVolumeGenerator::Pointer myTVGenerator = mitk::TrackingVolumeGenerator::New ();
+    MITK_TEST_CONDITION(myTVGenerator->SetTrackingDeviceType(mitk::ClaronMicron),"loading MicronTracker Volume data:")
     }
 
     static void TestNDIAuroraTrackingVolume()
     {
     MITK_TEST_OUTPUT(<< "---- Testing NDI Aurora Tracking Volume ----")
-    mitk::TrackingVolume::Pointer myTrackingVolume = mitk::TrackingVolume::New();
-    MITK_TEST_CONDITION(myTrackingVolume->SetTrackingDeviceType(mitk::NDIAurora),"loading Aurora Volume data:")
+    mitk::TrackingVolumeGenerator::Pointer myTVGenerator = mitk::TrackingVolumeGenerator::New ();
+    MITK_TEST_CONDITION(myTVGenerator->SetTrackingDeviceType(mitk::NDIAurora),"loading Aurora Volume data:")
     }
 
     static void TestNDIPolarisTrackingVolume()
     {
     MITK_TEST_OUTPUT(<< "---- Testing NDI Polaris Tracking Volume ----")
-    mitk::TrackingVolume::Pointer myTrackingVolume = mitk::TrackingVolume::New();
-    MITK_TEST_CONDITION(myTrackingVolume->SetTrackingDeviceType(mitk::NDIPolaris),"loading Polaris Volume data:")
+    mitk::TrackingVolumeGenerator::Pointer myTVGenerator = mitk::TrackingVolumeGenerator::New ();
+    MITK_TEST_CONDITION(myTVGenerator->SetTrackingDeviceType(mitk::NDIPolaris),"loading Polaris Volume data:")
     }
 
     static void TestIntuitiveDaVinciTrackingVolume()
     {
     MITK_TEST_OUTPUT(<< "---- Testing Intuitive Da Vinci Tracking Volume ----")
-    mitk::TrackingVolume::Pointer myTrackingVolume = mitk::TrackingVolume::New();
-    MITK_TEST_CONDITION(myTrackingVolume->SetTrackingDeviceType(mitk::IntuitiveDaVinci),"loading Da Vinci Volume data:")
+    mitk::TrackingVolumeGenerator::Pointer myTVGenerator = mitk::TrackingVolumeGenerator::New ();
+    MITK_TEST_CONDITION(myTVGenerator->SetTrackingDeviceType(mitk::IntuitiveDaVinci),"loading Da Vinci Volume data:")
     }
 
     
@@ -78,11 +79,11 @@ class mitkTrackingVolumeTestClass
     static void TestManualVolume()
     {
     MITK_TEST_OUTPUT(<< "---- Testing Manual Volume definition ----")
-    mitk::TrackingVolume::Pointer myTrackingVolume = mitk::TrackingVolume::New();
+    mitk::TrackingVolumeGenerator::Pointer myTVGenerator = mitk::TrackingVolumeGenerator::New();
     try
       {
       vtkPolyData* myPolyData = vtkPolyData::New();
-      myTrackingVolume->SetVolumeManually(myPolyData);
+      myTVGenerator->SetVolumeManually(myPolyData);
       myPolyData->Delete();
       }
     catch(...)

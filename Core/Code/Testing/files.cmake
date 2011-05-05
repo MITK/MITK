@@ -57,7 +57,6 @@ SET(MODULE_TESTS
 SET(MODULE_IMAGE_TESTS
   mitkSurfaceVtkWriterTest.cpp
   mitkPicFileWriterTest.cpp
-  mitkImageWriterTest.cpp
   #mitkImageSliceSelectorTest.cpp
   mitkImageTimeSelectorTest.cpp
   mitkPicFileReaderTest.cpp
@@ -88,4 +87,5 @@ SET(MODULE_CUSTOM_TESTS
     mitkStateMachineFactoryTest.cpp
     mitkPointSetLocaleTest.cpp
     mitkImageTest.cpp
+	mitkImageWriterTest.cpp
 )

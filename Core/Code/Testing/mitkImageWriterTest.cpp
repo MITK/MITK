@@ -129,6 +129,23 @@ int mitkImageWriterTest(int  argc , char* argv[])
     MITK_TEST_FAILED_MSG(<< "Exception during .pic file writing");
   }
 
+  //testing more component image writing as nrrd files
+  try
+  {
+    myImageWriter->SetExtension(".nrrd");
+    myImageWriter->Update();
+    std::fstream fin;
+    fin.open("test.nrrd",std::ios::in);
+    MITK_TEST_CONDITION_REQUIRED(fin.is_open(),"Write .nrrd file");
+    fin.close();
+    remove("test.nrrd");
+  }
+  catch(...)
+  {
+    MITK_TEST_FAILED_MSG(<< "Exception during .nrrd file writing");
+  }
+
+
   // test for exception handling
   try
   {

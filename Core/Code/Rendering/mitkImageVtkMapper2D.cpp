@@ -72,8 +72,17 @@ void mitk::ImageVtkMapper2D::AdjustCamera(mitk::BaseRenderer* renderer)
   //activate parallel projection for 2D
   renderer->GetVtkRenderer()->GetActiveCamera()->SetParallelProjection(true);
 
+  const mitk::DisplayGeometry *displayGeometry = renderer->GetDisplayGeometry();
+
+  Vector2D topLeft = displayGeometry->GetOriginInMM();  //camera position
+  Vector2D bottomRight = topLeft + displayGeometry->GetSizeInMM(); // --> parral
+
+  MITK_INFO << "origin in mm " << topLeft[0] << " " << topLeft[1];
+  MITK_INFO << "bottomRight in mm " << bottomRight[0] << " " << bottomRight[1];
+  MITK_INFO << "size in mm " << displayGeometry->GetSizeInMM()[0] << " " << displayGeometry->GetSizeInMM()[1];
+
   //scale the rendered object. TODO How to achieve the correct scale?
-//  renderer->GetVtkRenderer()->GetActiveCamera()->SetParallelScale(100);
+  renderer->GetVtkRenderer()->GetActiveCamera()->SetParallelScale(displayGeometry->GetSizeInMM()[0]);
 
   //the center of the plane in homogeneous coordinates
   double planeCenter[4];
@@ -136,13 +145,13 @@ void mitk::ImageVtkMapper2D::AdjustCamera(mitk::BaseRenderer* renderer)
   //reset the clipping range TODO why? really needed if everything is correct?
   renderer->GetVtkRenderer()->ResetCameraClippingRange();
 
-  //  renderer->GetVtkRenderer()->ResetCamera(localStorage->m_Actor->GetBounds());
+//    renderer->GetVtkRenderer()->ResetCamera(localStorage->m_Actor->GetBounds());
   //TODO remove this output
-  MITK_INFO << "view plane normal: " << camera->GetViewPlaneNormal()[0] << " " << camera->GetViewPlaneNormal()[1] << " " << camera->GetViewPlaneNormal()[2];
-  MITK_INFO << "bounds of the actor: " << localStorage->m_Actor->GetBounds()[0] << " " << localStorage->m_Actor->GetBounds()[1] << " " << localStorage->m_Actor->GetBounds()[2] << " " << localStorage->m_Actor->GetBounds()[3] << " " << localStorage->m_Actor->GetBounds()[4] << " " << localStorage->m_Actor->GetBounds()[5];
-  MITK_INFO << "camera up vector: " << renderer->GetVtkRenderer()->GetActiveCamera()->GetViewUp()[0] << " " << renderer->GetVtkRenderer()->GetActiveCamera()->GetViewUp()[1] << " "  <<  renderer->GetVtkRenderer()->GetActiveCamera()->GetViewUp()[2];
-  MITK_INFO << "camera position: " << renderer->GetVtkRenderer()->GetActiveCamera()->GetPosition()[0] << " " << renderer->GetVtkRenderer()->GetActiveCamera()->GetPosition()[1] << " "  <<  renderer->GetVtkRenderer()->GetActiveCamera()->GetPosition()[2];
-  MITK_INFO << "focal point: " << renderer->GetVtkRenderer()->GetActiveCamera()->GetFocalPoint()[0] << " " << renderer->GetVtkRenderer()->GetActiveCamera()->GetFocalPoint()[1] << " "  <<  renderer->GetVtkRenderer()->GetActiveCamera()->GetFocalPoint()[2];
+//  MITK_INFO << "view plane normal: " << camera->GetViewPlaneNormal()[0] << " " << camera->GetViewPlaneNormal()[1] << " " << camera->GetViewPlaneNormal()[2];
+//  MITK_INFO << "bounds of the actor: " << localStorage->m_Actor->GetBounds()[0] << " " << localStorage->m_Actor->GetBounds()[1] << " " << localStorage->m_Actor->GetBounds()[2] << " " << localStorage->m_Actor->GetBounds()[3] << " " << localStorage->m_Actor->GetBounds()[4] << " " << localStorage->m_Actor->GetBounds()[5];
+//  MITK_INFO << "camera up vector: " << renderer->GetVtkRenderer()->GetActiveCamera()->GetViewUp()[0] << " " << renderer->GetVtkRenderer()->GetActiveCamera()->GetViewUp()[1] << " "  <<  renderer->GetVtkRenderer()->GetActiveCamera()->GetViewUp()[2];
+//  MITK_INFO << "camera position: " << renderer->GetVtkRenderer()->GetActiveCamera()->GetPosition()[0] << " " << renderer->GetVtkRenderer()->GetActiveCamera()->GetPosition()[1] << " "  <<  renderer->GetVtkRenderer()->GetActiveCamera()->GetPosition()[2];
+//  MITK_INFO << "focal point: " << renderer->GetVtkRenderer()->GetActiveCamera()->GetFocalPoint()[0] << " " << renderer->GetVtkRenderer()->GetActiveCamera()->GetFocalPoint()[1] << " "  <<  renderer->GetVtkRenderer()->GetActiveCamera()->GetFocalPoint()[2];
 }
 
 //set the two points defining the textured plane according to the dimension and spacing
@@ -158,64 +167,73 @@ void mitk::ImageVtkMapper2D::AdjustToDisplayGeometry(mitk::BaseRenderer* rendere
 }
 
 //TODO: do we need paint, update AND generateData?
-void mitk::ImageVtkMapper2D::Paint( mitk::BaseRenderer *renderer )
-{
+//void mitk::ImageVtkMapper2D::Paint( mitk::BaseRenderer *renderer )
+//{
 
-  if ( !this->IsVisible( renderer ) )
-  {
-    return;
-  }
+//  MITK_INFO << "!!!!!!! PAINT";
 
-  this->Update( renderer );
+//  if ( !this->IsVisible( renderer ) )
+//  {
+//    return;
+//  }
 
-  //#################### Draw volume stuff ########################################
-  //TODO why is this in paint?
+//  this->Update( renderer );
 
-  RendererInfo &rendererInfo = this->AccessRendererInfo( renderer );
+//  //#################### Draw volume stuff ########################################
+//  //TODO why is this in paint?
 
-  const mitk::DisplayGeometry *displayGeometry = renderer->GetDisplayGeometry();
+//  RendererInfo &rendererInfo = this->AccessRendererInfo( renderer );
 
-  Vector2D topLeft = displayGeometry->GetOriginInMM();
-  Vector2D bottomRight = topLeft + displayGeometry->GetSizeInMM();
+//  const mitk::DisplayGeometry *displayGeometry = renderer->GetDisplayGeometry();
 
-  topLeft[0] *= rendererInfo.m_PixelsPerMM[0];
-  topLeft[1] *= rendererInfo.m_PixelsPerMM[1];
+//  Vector2D topLeft = displayGeometry->GetOriginInMM();
+//  Vector2D bottomRight = topLeft + displayGeometry->GetSizeInMM();
 
-  bottomRight[0] *= rendererInfo.m_PixelsPerMM[0];
-  bottomRight[1] *= rendererInfo.m_PixelsPerMM[1];
+//  topLeft[0] *= rendererInfo.m_PixelsPerMM[0];
+//  topLeft[1] *= rendererInfo.m_PixelsPerMM[1];
 
-  topLeft += rendererInfo.m_Overlap;
-  bottomRight += rendererInfo.m_Overlap;
+//  bottomRight[0] *= rendererInfo.m_PixelsPerMM[0];
+//  bottomRight[1] *= rendererInfo.m_PixelsPerMM[1];
 
-  // display volume property, if it exists and should be displayed
-  bool shouldShowVolume = false, binary = false;
-  float segmentationVolume = -1.0;
+//  MITK_INFO << "origin in mm " << topLeft[0] << " " << topLeft[1];
+//  MITK_INFO << "bottomRight in mm " << bottomRight[0] << " " << bottomRight[1];
+//  MITK_INFO << "size in mm " << displayGeometry->GetSizeInMM()[0] << " " << displayGeometry->GetSizeInMM()[1];
 
-  mitk::DataNode *node = this->GetDataNode();
-  mitk::Image* mitkimage = dynamic_cast<mitk::Image*>(node->GetData());
+////  this->AdjustCamera( renderer, rendererInfo.m_PixelsPerMM[0] );
 
-  // Check if a volume in ml can be drawn in the image.
-  // This is the case if: 
-  // 1. The property "showVolume" is true AND [
-  // 2.1 The image has a volume stored as property (3D case) OR
-  // 2.2 The image is 3D or 4D and binary, so the volume can be calculated ]
-  if (
-      (node->GetBoolProperty("showVolume", shouldShowVolume)) &&
-      (shouldShowVolume) &&
-      (
-          (node->GetFloatProperty("volume", segmentationVolume) )
-          ||
-          (mitkimage != NULL &&
-           mitkimage->GetDimension() >= 3 &&
-           node->GetBoolProperty("binary", binary) &&
-           binary)
-          )
-      )
-  {
-    //TODO implement draw volume with VTK
-  }
-  //#################### Draw volume stuff end ########################################
-}
+
+//  topLeft += rendererInfo.m_Overlap;
+//  bottomRight += rendererInfo.m_Overlap;
+
+//  // display volume property, if it exists and should be displayed
+//  bool shouldShowVolume = false, binary = false;
+//  float segmentationVolume = -1.0;
+
+//  mitk::DataNode *node = this->GetDataNode();
+//  mitk::Image* mitkimage = dynamic_cast<mitk::Image*>(node->GetData());
+
+//  // Check if a volume in ml can be drawn in the image.
+//  // This is the case if:
+//  // 1. The property "showVolume" is true AND [
+//  // 2.1 The image has a volume stored as property (3D case) OR
+//  // 2.2 The image is 3D or 4D and binary, so the volume can be calculated ]
+//  if (
+//      (node->GetBoolProperty("showVolume", shouldShowVolume)) &&
+//      (shouldShowVolume) &&
+//      (
+//          (node->GetFloatProperty("volume", segmentationVolume) )
+//          ||
+//          (mitkimage != NULL &&
+//           mitkimage->GetDimension() >= 3 &&
+//           node->GetBoolProperty("binary", binary) &&
+//           binary)
+//          )
+//      )
+//  {
+//    //TODO implement draw volume with VTK
+//  }
+//  //#################### Draw volume stuff end ########################################
+//}
 
 
 const mitk::Image* mitk::ImageVtkMapper2D::GetInput( void )
@@ -241,6 +259,7 @@ void mitk::ImageVtkMapper2D::MitkRenderOverlay(BaseRenderer* renderer)
 }
 void mitk::ImageVtkMapper2D::MitkRenderOpaqueGeometry(BaseRenderer* renderer)
 {
+  MITK_INFO << "######## RenderOpaque ############";
   if ( this->IsVisible( renderer )==false )
     return;
 
@@ -248,7 +267,7 @@ void mitk::ImageVtkMapper2D::MitkRenderOpaqueGeometry(BaseRenderer* renderer)
   {
     this->GetVtkProp(renderer)->RenderOpaqueGeometry( renderer->GetVtkRenderer() );
   }
-  vtkSmartPointer<vtkProp> prop = this->GetVtkProp(renderer);
+  MITK_INFO << "######## Ende RenderOpaque ############";
 }
 
 void mitk::ImageVtkMapper2D::MitkRenderTranslucentGeometry(BaseRenderer* renderer)
@@ -274,6 +293,7 @@ void mitk::ImageVtkMapper2D::MitkRenderVolumetricGeometry(BaseRenderer* renderer
 
 void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
 {
+  MITK_INFO << "----- Generate Data ------";
   LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
 
   bool visible = IsVisible(renderer);
@@ -629,7 +649,7 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
   rendererInfo.m_Reslicer->SetOutputOrigin( 0.0, 0.0, 0.0 );
   rendererInfo.m_Reslicer->SetOutputSpacing( mmPerPixel[0], mmPerPixel[1], dataZSpacing );
 
-  // xMax and yMax are meant exclusive until now, whereas 
+  // xMax and yMax are meant exclusive until now, whereas
   // SetOutputExtent wants an inclusive bound. Thus, we need 
   // to subtract 1.
 
@@ -712,16 +732,6 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
   //get the transformation matrix of the reslicer in order to render the slice as transversal, coronal or saggital
   vtkSmartPointer<vtkTransform> trans = vtkSmartPointer<vtkTransform>::New();
   vtkSmartPointer<vtkMatrix4x4> matrix = rendererInfo.m_Reslicer->GetResliceAxes();
-//  for(int i = 0; i<4; i++)
-//  {
-//    for(int j = 0; j<4; j++)
-//    {
-//      if(matrix->GetElement(i,j) == 255.0)
-//      {
-//          matrix->SetElement(i,j, 0.0);
-//      }
-//    }
-//  }
 
   trans->SetMatrix(matrix);
 //  localStorage->m_TransformMatrix = rendererInfo.m_Reslicer->GetResliceAxes();
@@ -734,7 +744,7 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
   localStorage->m_Mapper->SetInputConnection(localStorage->m_TransformFilter->GetOutputPort());
 
   //set up the camera to view the transformed plane
-  this->AdjustCamera( renderer );
+  this->AdjustCamera( renderer);
 
   // We have been modified
   rendererInfo.m_LastUpdateTime.Modified();
@@ -756,8 +766,7 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
   renderer->GetVtkRenderer()->SetBackground(1,1,1);
 
 //  MITK_INFO << rendererInfo.m_Reslicer->GetResliceTransform()->GetMatrix();
-  MITK_INFO << "matrix " << matrix[0];
-  MITK_INFO << "################################# Next RW";
+  MITK_INFO << "--------------- Ende Generate ------------";
 }
 
 
@@ -1114,6 +1123,7 @@ void mitk::ImageVtkMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
 
 void mitk::ImageVtkMapper2D::Update(mitk::BaseRenderer* renderer)
 {
+  MITK_INFO << "||||||||||||||| Update ||||||||||";
   mitk::Image* data  = const_cast<mitk::Image *>(
       this->GetInput()
       );
@@ -1146,31 +1156,34 @@ void mitk::ImageVtkMapper2D::Update(mitk::BaseRenderer* renderer)
 
   data->UpdateOutputInformation();
 
-  if ( //TODO old version was iilImage == NULL. I guess this can be removed?
-       (rendererInfo.m_LastUpdateTime < node->GetMTime())
-    || (rendererInfo.m_LastUpdateTime < data->GetPipelineMTime())
-    || (rendererInfo.m_LastUpdateTime
-        < renderer->GetCurrentWorldGeometry2DUpdateTime())
-    || (rendererInfo.m_LastUpdateTime
-        < renderer->GetDisplayGeometryUpdateTime()) )
-    {
-    this->GenerateData( renderer );
-  }
-  else if ( rendererInfo.m_LastUpdateTime
-            < renderer->GetCurrentWorldGeometry2D()->GetMTime() )
-  {
-    this->GenerateData( renderer );
-  }
-  else if ( (rendererInfo.m_LastUpdateTime < node->GetPropertyList()->GetMTime())
-    || (rendererInfo.m_LastUpdateTime
-        < node->GetPropertyList(renderer)->GetMTime()) )
-    {
-    this->GenerateData( renderer );
+  this->GenerateData( renderer );
 
-    // since we have checked that nothing important has changed, we can set
-    // m_LastUpdateTime to the current time
-    rendererInfo.m_LastUpdateTime.Modified();
-  }
+//  if ( //TODO old version was iilImage == NULL. I guess this can be removed?
+//       (rendererInfo.m_LastUpdateTime < node->GetMTime())
+//    || (rendererInfo.m_LastUpdateTime < data->GetPipelineMTime())
+//    || (rendererInfo.m_LastUpdateTime
+//        < renderer->GetCurrentWorldGeometry2DUpdateTime())
+//    || (rendererInfo.m_LastUpdateTime
+//        < renderer->GetDisplayGeometryUpdateTime()) )
+//    {
+//    this->GenerateData( renderer );
+//  }
+//  else if ( rendererInfo.m_LastUpdateTime
+//            < renderer->GetCurrentWorldGeometry2D()->GetMTime() )
+//  {
+//    this->GenerateData( renderer );
+//  }
+//  else if ( (rendererInfo.m_LastUpdateTime < node->GetPropertyList()->GetMTime())
+//    || (rendererInfo.m_LastUpdateTime
+//        < node->GetPropertyList(renderer)->GetMTime()) )
+//    {
+//    this->GenerateData( renderer );
+
+//    // since we have checked that nothing important has changed, we can set
+//    // m_LastUpdateTime to the current time
+//    rendererInfo.m_LastUpdateTime.Modified();
+//  }
+  MITK_INFO << "||||||||||||||| Update Ende ||||||||||";
 }
 
 void mitk::ImageVtkMapper2D::DeleteRendererCallback( itk::Object *object, const itk::EventObject & )

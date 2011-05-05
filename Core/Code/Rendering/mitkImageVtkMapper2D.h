@@ -111,7 +111,7 @@ public:
   virtual void GenerateAllData();
 
   /** \brief Renders the (priorly) resampled image onto the screen. */
-  virtual void Paint( mitk::BaseRenderer *renderer );
+//  virtual void Paint( mitk::BaseRenderer *renderer );
 
   /** \brief Checks whether this mapper needs to update itself and generate
    * data. */

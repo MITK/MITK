@@ -15,6 +15,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
+//TODO unnötige importe entfernen
 #include "mitkTrackingVolumeGenerator.h"
 #include "mitkSTLFileReader.h"
 #include "mitkStandardFileLocations.h"
@@ -23,95 +24,75 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkTrackingTypes.h>
 #include <mitkTrackingDevice.h>
 #include <mitkVirtualTrackingDevice.h>
+#include <vtkSmartPointer.h>
 
 mitk::TrackingVolumeGenerator::TrackingVolumeGenerator()
 {
-    std::string m_VolumeDir = MITK_ROOT;
-    m_VolumeDir += "Modules/IGT/IGTTrackingDevices/TrackingVolumeData"; //folder which contains the trackingdevices configs
-    mitk::StandardFileLocations::GetInstance()->AddDirectoryForSearch( m_VolumeDir.c_str(), false );
-}
+    std::string volumeDir = MITK_ROOT;
+    volumeDir += "Modules/IGT/IGTTrackingDevices/TrackingVolumeData"; //folder which contains the trackingdevices configs
+    mitk::StandardFileLocations::GetInstance()->AddDirectoryForSearch( volumeDir.c_str(), false ); //add this directory to StdFileLocations for the search
 
-void mitk::TrackingVolumeGenerator::SetVolumeManually(vtkPolyData* volume)
-{
-  this->m_Surface->SetVtkPolyData(volume);
+    m_TrackingDeviceType ;
 }
 
 
-bool mitk::TrackingVolumeGenerator::SetTrackingDevice (mitk::TrackingDevice::Pointer tracker)
+void mitk::TrackingVolumeGenerator::SetTrackingDevice (mitk::TrackingDevice::Pointer tracker)
 {
-    TrackingDeviceType type = tracker->GetType();
-
-   return SetTrackingDeviceType(type);
+    this->m_TrackingDeviceType = tracker->GetType();
 }
 
-bool mitk::TrackingVolumeGenerator::SetTrackingDeviceType(TrackingDeviceType type)
+void mitk::TrackingVolumeGenerator::GenerateData()
 {
-    //mitk::VirtualTrackingDevice::Pointer tr = mitk::VirtualTrackingDevice::New() ;
-    //type = tr->GetType();
-    // get filename / perform custom initiation
+    mitk::Surface::Pointer output = this->GetOutput();
+
     std::string filename = "";
 
-    switch(type)
+    switch(m_TrackingDeviceType)
     {
     case mitk::ClaronMicron:
-      filename = mitk::StandardFileLocations::GetInstance()->FindFile("ClaronMicron.stl");
-      break;
+        filename = mitk::StandardFileLocations::GetInstance()->FindFile("ClaronMicron.stl");
+        break;
     case mitk::IntuitiveDaVinci:
-      filename = mitk::StandardFileLocations::GetInstance()->FindFile("IntuitiveDaVinci.stl");
-      break;
-    case mitk::NDIAurora:
-      filename = mitk::StandardFileLocations::GetInstance()->FindFile("NDIAurora.stl");
-      break;
+        filename = mitk::StandardFileLocations::GetInstance()->FindFile("IntuitiveDaVinci.stl");
+        break;
     case mitk::NDIPolaris:
-      filename = mitk::StandardFileLocations::GetInstance()->FindFile("NDIPolaris.stl");
-      break;
+        filename = mitk::StandardFileLocations::GetInstance()->FindFile("NDIPolaris.stl");
+        break;
+    case mitk::NDIAurora:
+        filename = mitk::StandardFileLocations::GetInstance()->FindFile("NDIAurora.stl");
+        break;
     case mitk::VirtualTracker:
-      {
-        vtkCubeSource* cs = vtkCubeSource::New();
-        double bounds[6];
-         bounds[0] = bounds[2] = bounds[4] = -400.0;  // initialize bounds to -400 ... +400 cube. This is the default value of the
-         bounds[1] = bounds[3] = bounds[5] =  400.0;  // virtual tracking device, but it can be changed. In that case,
-        // the tracking volume polydata has be updated manually
-        cs->SetBounds(bounds);
-        cs->GetOutput()->Update();
+        {
+           vtkSmartPointer<vtkCubeSource> cubeSource = vtkSmartPointer<vtkCubeSource>::New();
+            double bounds[6];
+            bounds[0] = bounds[2] = bounds[4] = -400.0;  // initialize bounds to -400 ... +400 cube. This is the default value of the
+            bounds[1] = bounds[3] = bounds[5] =  400.0;  // virtual tracking device, but it can be changed. In that case,
+            // the tracking volume polydata has be updated manually
+            cubeSource->SetBounds(bounds);
+            cubeSource->GetOutput()->Update();
 
-        m_Surface = this->mitk::SurfaceSource::GetOutput (); //get a surface
-        m_Surface->SetVtkPolyData(cs->GetOutput()); //set the visible trackingvolume
-
-        cs->Delete();
-        return true;
-      }
+            output->SetVtkPolyData(cubeSource->GetOutput()); //set the vtkCubeSource as polyData of the surface
+            return;
+        }
     default:
-      return false;
+        return;
     }
 
     if (filename.empty())
-      return false;
+    {
+        MITK_ERROR << "Filename is empty";
+        return;
+    }
 
     mitk::STLFileReader::Pointer stlReader = mitk::STLFileReader::New();
-    try
-    {
-      stlReader->SetFileName( filename.c_str() );
-      stlReader->Update();
-    }
-    catch (...)
-    {
-          return false;
-    }
-    if ( stlReader->GetOutput() == NULL )
-      return false;
+    stlReader->SetFileName( filename.c_str() );
+    stlReader->Update();
 
-    m_Surface = this->mitk::SurfaceSource::GetOutput (); //get a surface
-    m_Surface->SetVtkPolyData( stlReader->GetOutput()->GetVtkPolyData());//set the visible trackingvolume
+    if ( stlReader->GetOutput() == NULL)
+        return ;
 
-    stlReader = NULL;
-
-    return true;
-
+    output->SetVtkPolyData( stlReader->GetOutput()->GetVtkPolyData());//set the visible trackingvolume
 }
 
-mitk::Surface* mitk::TrackingVolumeGenerator::GetOutput ()
-{
-    return this->m_Surface;
-}
+
 

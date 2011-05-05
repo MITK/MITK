@@ -23,9 +23,11 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <mitkSurfaceSource.h>
 #include <mitkSurface.h>
-#include <vtkPolyData.h>
+//#include <vtkPolyData.h>
 #include "mitkTrackingTypes.h"
 #include "mitkTrackingDevice.h"
+
+class vtkPolyData;
 
 namespace mitk
 {
@@ -47,7 +49,7 @@ namespace mitk
     *  \ingroup IGT
     */
 
-    class MitkIGT_EXPORT TrackingVolumeGenerator : public mitk::SurfaceSource
+class MitkIGT_EXPORT TrackingVolumeGenerator : public mitk::SurfaceSource
   {
   public:
 
@@ -56,42 +58,30 @@ namespace mitk
 
 
       /**
-      * \brief       Sets the trackingvolume explicitly. Only use this method if your specific
-      *              trackingvolume is not supported by this class. The type is set to
-      *              TrackingSystemNotSpecified if doing this.
-      * \param volume  The new tracking volume as vtkPolyData.
-      */
-      void SetVolumeManually(vtkPolyData* volume);
-
-      /**
       * \brief        Sets the tracking device of the volume. After doing this
       *               the tracking volume gets generatet and set to the correct dimensions in the correct
       *               coordinate system.
-      * \param type   The type of the tracking device (something like NDIAurora or NDIPolaris).
+      * \param type   The type of the tracking device (currently supported:NDIAurora, NDIPolaris, ClaronMicron, IntuitiveDaVinci and the VirtualTracker).
       * \return       Returns true if the type was set successfull, false if not.
       */
-      bool SetTrackingDeviceType(mitk::TrackingDeviceType type);
+      itkSetMacro(TrackingDeviceType, mitk::TrackingDeviceType);
+      itkGetMacro(TrackingDeviceType, mitk::TrackingDeviceType);
+
 
       /**
       * \brief        Sets the tracking device of the volume. After doing this
       *               the tracking volume gets generatet and is set to the correct dimensions in the correct
       *               coordinate system.
-      * \param tracker  The tracking device the tracking volume have to be created for
+      * \param tracker  The tracking device the tracking volume has to be created for
       * \return        Returns true if the type was set successfull, false if not.
       */
-      bool SetTrackingDevice(mitk::TrackingDevice::Pointer tracker);
+      void SetTrackingDevice(mitk::TrackingDevice::Pointer tracker);
 
-
-      /**
-      * \brief      Returns the generatet tracking volume
-      * \return     Returns the tracking volume if generated yet, otherwise null
-      */
-      mitk::Surface* GetOutput();
+      void GenerateData();
 
   protected:
       TrackingVolumeGenerator();
-     // mitk::TrackingDevice::Pointer m_TrackingDevice;
-      mitk::Surface::Pointer m_Surface;
+      mitk::TrackingDeviceType m_TrackingDeviceType;
   };
 }
 #endif // MITKTRACKINGVOLUMEGENERATOR_H

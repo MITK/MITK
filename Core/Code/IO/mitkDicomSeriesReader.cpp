@@ -15,6 +15,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
+// uncomment for learning more about the internal sorting mechanisms
+//#define MBILOG_ENABLE_DEBUG 
+
 #include <mitkDicomSeriesReader.h>
 
 #include <itkGDCMSeriesFileNames.h>
@@ -39,6 +42,11 @@ DicomSeriesReader::LoadDicomSeries(const StringContainer &filenames, bool sort, 
 
   if (DicomSeriesReader::LoadDicomSeries(filenames, *node, sort, check_4d, callback))
   {
+    if( filenames.empty() )
+    {
+      return NULL;
+    }
+
     return node;
   }
   else
@@ -52,8 +60,9 @@ DicomSeriesReader::LoadDicomSeries(const StringContainer &filenames, DataNode &n
 {
   if( filenames.empty() )
   {
-    MITK_ERROR << "Calling LoadDicomSeries with empty filename string container. Aborting.";
-    return false;
+    MITK_WARN << "Calling LoadDicomSeries with empty filename string container. Probably invalid application logic.";
+    node.SetData(NULL);
+    return true; // this is not actually an error but the result is very simple
   }
 
   DcmIoType::Pointer io = DcmIoType::New();
@@ -291,11 +300,174 @@ DicomSeriesReader::ReadPhilips3DDicom(const std::string &filename, mitk::Image::
 }
 #endif
 
-DicomSeriesReader::UidFileNamesMap 
-DicomSeriesReader::GetSeries(const std::string &dir, const StringContainer &restrictions)
+DicomSeriesReader::TwoStringContainers
+DicomSeriesReader::AnalyzeFileForITKImageSeriesReaderSpacingAssumption(
+    const StringContainer& files,
+    const gdcm::Scanner::MappingType& tagValueMappings_)
 {
-  UidFileNamesMap map; // result variable
+  // result.first = files that fit ITK's assumption
+  // result.second = files that do not fit, should be run through AnalyzeFileForITKImageSeriesReaderSpacingAssumption() again
+  TwoStringContainers result;
+ 
+  // we const_cast here, because I could not use a map.at(), which would make the code much more readable
+  gdcm::Scanner::MappingType& tagValueMappings = const_cast<gdcm::Scanner::MappingType&>(tagValueMappings_);
+  const gdcm::Tag tagImagePositionPatient(0x0020,0x0032); // Image Position (Patient)
+  const gdcm::Tag    tagImageOrientation(0x0020, 0x0037); // Image Orientation
 
+  Vector3D fromFirstToSecondOrigin; fromFirstToSecondOrigin.Fill(0.0);
+  bool fromFirstToSecondOriginInitialized(false);
+  Point3D thisOrigin;
+  Point3D lastOrigin;
+  Point3D lastDifferentOrigin;
+  bool lastOriginInitialized(false);
+
+  MITK_DEBUG << "Analyzing files for z-spacing assumption of ITK's ImageSeriesReader ";
+  unsigned int fileIndex(0);
+  for (StringContainer::const_iterator fileIter = files.begin();
+       fileIter != files.end();
+       ++fileIter, ++fileIndex)
+  {
+    // Read tag value into point3D. PLEASE replace this by appropriate GDCM code if you figure out how to do that
+    std::string thisOriginString = tagValueMappings[fileIter->c_str()][tagImagePositionPatient];
+    
+    std::istringstream originReader(thisOriginString);
+    std::string coordinate;
+    unsigned int dim(0);
+    while( std::getline( originReader, coordinate, '\\' ) ) thisOrigin[dim++] = atof(coordinate.c_str());
+
+    if (dim != 3)
+    {
+      MITK_ERROR << "Reader implementation made wrong assumption on tag (0020,0032). Found " << dim << "instead of 3 values.";
+    }
+    
+    MITK_DEBUG << "  " << fileIndex << " " << *fileIter 
+                       << " at " 
+                       << thisOriginString << "(" << thisOrigin[0] << "," << thisOrigin[1] << "," << thisOrigin[2] << ")";
+
+    if ( lastOriginInitialized && (thisOrigin == lastOrigin) )
+    {
+      MITK_DEBUG << "Sort away " << *fileIter << " for separate time step"; // we already have one occupying this position
+      result.second.push_back( *fileIter );
+    }
+    else
+    {
+      if (!fromFirstToSecondOriginInitialized && lastOriginInitialized) // calculate vector as soon as possible when we get a new position
+      {
+        fromFirstToSecondOrigin = thisOrigin - lastDifferentOrigin;
+        fromFirstToSecondOriginInitialized = true;
+
+        // Now make sure this direction is along the normal vector of the first slice
+        // If this is NOT the case, then we have a data set with a TILTED GANTRY geometry,
+        // which cannot be loaded into a single mitk::Image at the moment
+
+        // Again ugly code to read tag Image Orientation into two vEctors
+        Vector3D right; right.Fill(0.0);
+        Vector3D up; right.Fill(0.0); // might be down as well, but it is just a name at this point
+        std::string thisOrientationString = tagValueMappings[fileIter->c_str()][tagImageOrientation];
+        
+        std::istringstream orientationReader(thisOrientationString);
+        std::string coordinate;
+        unsigned int dim(0);
+        while( std::getline( orientationReader, coordinate, '\\' ) )
+          if (dim<3) right[dim++] = atof(coordinate.c_str());
+          else      up[dim++ - 3] = atof(coordinate.c_str());
+
+        if (dim != 6)
+        {
+          MITK_ERROR << "Reader implementation made wrong assumption on tag (0020,0037). Found " << dim << "instead of 6 values.";
+        }
+
+        MITK_DEBUG << "Tilt check: right vector (" << right[0] << "," << right[1] << "," << right[2] << "), "
+                                     "up vector (" << up[0] << "," << up[1] << "," << up[2] << ")";
+
+        /* 
+           Determine if line (thisOrigin + l * normal) contains lastDifferentOrigin.
+
+           Done by calculating the distance of lastDifferentOrigin from line (thisOrigin + l *normal)
+
+           E.g. http://mathworld.wolfram.com/Point-LineDistance3-Dimensional.html
+
+           squared distance = | (pointAlongNormal - thisOrign) x (thisOrigin - lastDifferentOrigin) | ^ 2
+                              /
+                              |pointAlongNormal - thisOrigin| ^ 2
+
+           ( x meaning the cross product )
+        */
+
+        Vector3D normal = itk::CrossProduct(right, up);
+        Point3D pointAlongNormal = thisOrigin + normal;
+        
+        double numerator = itk::CrossProduct( pointAlongNormal - thisOrigin , thisOrigin - lastDifferentOrigin ).GetSquaredNorm();
+        double denominator = (pointAlongNormal - thisOrigin).GetSquaredNorm();
+
+        double distance = sqrt(numerator / denominator);
+
+        if (distance > 0.001) // mitk::eps is too small; 1/1000 of a mm should be enough to detect tilt
+        {
+          MITK_WARN << "Series seems to contain a tilted geometry. Will load series as many single slices.";
+          MITK_WARN << "Distance of expected slice origin from actual slice origin: " << distance;
+
+          result.first.assign( files.begin(), fileIter );
+          result.second.insert( result.second.end(), fileIter, files.end() );
+
+          return result; // stop processing with first split
+        }
+      }
+      else if (fromFirstToSecondOriginInitialized) // we already know the offset between slices
+      {
+        Point3D assumedOrigin = lastDifferentOrigin + fromFirstToSecondOrigin;
+
+        Vector3D originError = assumedOrigin - thisOrigin;
+        double norm = originError.GetNorm();
+
+        if (norm > 3 * mitk::sqrteps)
+        {
+          MITK_WARN << "File " << *fileIter << " breaks the inter-slice distance pattern (diff = " 
+                               << norm << ", allowed " 
+                               << 3 * (mitk::sqrteps)<< ").";
+          MITK_WARN << "Expected position (" << assumedOrigin[0] << ","
+                                            << assumedOrigin[1] << ","
+                                            << assumedOrigin[2] << "), got position ("
+                                            << thisOrigin[0] << ","
+                                            << thisOrigin[1] << ","
+                                            << thisOrigin[2] << ")";
+
+          // At this point we know we deviated from the expectation of ITK's ImageSeriesReader
+          // We split the input file list at this point, i.e. all files up to this one (excluding it)
+          // are returned as group 1, the remaining files (including the faulty one) are group 2
+          
+          result.first.assign( files.begin(), fileIter );
+          result.second.insert( result.second.end(), fileIter, files.end() );
+
+          return result; // stop processing with first split
+        }
+      }
+
+      result.first.push_back(*fileIter);
+    }
+
+    // recored current origin for reference in later iterations
+    if ( !lastOriginInitialized || thisOrigin != lastOrigin )
+    {
+      lastDifferentOrigin = thisOrigin;
+    }
+
+    lastOrigin = thisOrigin; 
+    lastOriginInitialized = true;
+  }
+  
+  return result;
+}
+
+DicomSeriesReader::UidFileNamesMap 
+DicomSeriesReader::GetSeries(const StringContainer& files, const StringContainer &restrictions)
+{
+  return GetSeries(files, true, restrictions);
+}
+  
+DicomSeriesReader::UidFileNamesMap 
+DicomSeriesReader::GetSeries(const StringContainer& files, bool sortTo3DPlust, const StringContainer &restrictions)
+{
   /**
     assumption about this method:
       returns a map of uid-like-key --> list(filename)
@@ -306,6 +478,7 @@ DicomSeriesReader::GetSeries(const std::string &dir, const StringContainer &rest
         - 0018,0050 slice thickness
   */
 
+UidFileNamesMap map; // preliminary result, refined into the final result mapOf3DPlusTBlocks
 
 #if GDCM_MAJOR_VERSION < 2
   // old GDCM: let itk::GDCMSeriesFileNames do the sorting
@@ -338,14 +511,13 @@ DicomSeriesReader::GetSeries(const std::string &dir, const StringContainer &rest
   }
 
 #else
-  // new GDCM: use GDCM directly, itk::GDCMSeriesFileNames does not work with GDCM 2
+  // use GDCM directly, itk::GDCMSeriesFileNames does not work with GDCM 2
 
-  // set directory
-  gdcm::Directory gDirectory;
-  gDirectory.Load( dir.c_str(), false ); // non-recursive
-  const gdcm::Directory::FilenamesType &gAllFiles = gDirectory.GetFilenames();
+  // PART I: scan files for sorting relevant DICOM tags, 
+  //         separate images that differ in any of those 
+  //         attributes (they cannot possibly form a 3D block)
 
-  // scann for relevant tags in dicom files
+  // scan for relevant tags in dicom files
   gdcm::Scanner scanner;
   const gdcm::Tag tagSeriesInstanceUID(0x0020,0x000e); // Series Instance UID
     scanner.AddTag( tagSeriesInstanceUID );
@@ -364,13 +536,18 @@ DicomSeriesReader::GetSeries(const std::string &dir, const StringContainer &rest
 
   const gdcm::Tag tagNumberOfColumns(0x0028, 0x0011); // number cols
     scanner.AddTag( tagNumberOfColumns );
+  
+  // additional tags read in this scan to allow later analysis
+  // THESE tag are not used for initial separating of files
+  const gdcm::Tag tagImagePositionPatient(0x0020,0x0032); // Image Position (Patient)
+    scanner.AddTag( tagImagePositionPatient );
 
   // TODO add further restrictions from arguments
 
   // let GDCM scan files
-  if ( !scanner.Scan( gDirectory.GetFilenames() ) )
+  if ( !scanner.Scan( files ) )
   {
-    MITK_ERROR << "gdcm::Scanner failed scanning " << dir;
+    MITK_ERROR << "gdcm::Scanner failed when scanning " << files.size() << " input files.";
     return map;
   }
 
@@ -379,7 +556,7 @@ DicomSeriesReader::GetSeries(const std::string &dir, const StringContainer &rest
        fileIter != scanner.End();
        ++fileIter)
   {
-    MITK_DEBUG << "File " << fileIter->first << std::endl;
+    MITK_DEBUG << "Read file " << fileIter->first << std::endl;
     if ( std::string(fileIter->first).empty() ) continue; // TODO understand why Scanner has empty string entries
 
     // we const_cast here, because I could not use a map.at() function in CreateMoreUniqueSeriesIdentifier.
@@ -388,15 +565,135 @@ DicomSeriesReader::GetSeries(const std::string &dir, const StringContainer &rest
     std::string moreUniqueSeriesId = CreateMoreUniqueSeriesIdentifier( const_cast<gdcm::Scanner::TagToValue&>(fileIter->second) );
     map [ moreUniqueSeriesId ].push_back( fileIter->first );
   }
+  
+  // PART II: analyze pre-sorted images for valid blocks (i.e. blocks of equal z-spacing), 
+  //          separate into multiple blocks if necessary.
+  //          
+  //          Analysis performs the following steps:
+  //            * sort slices spatially
+  //            * imitate itk::ImageSeriesReader: use the distance between the first two images as z-spacing
+  //            * check what images actually fulfill ITK's z-spacing assumption
+  //            * separate all images that fail the test into new blocks, re-iterate analysis for these blocks
+
+  for ( UidFileNamesMap::const_iterator groupIter = map.begin(); groupIter != map.end(); ++groupIter )
+  {
+    map[ groupIter->first ] = SortSeriesSlices( groupIter->second  ); // sort each slice group spatially
+  }
+
+  UidFileNamesMap mapOf3DPlusTBlocks; // final result of this function
+  for ( UidFileNamesMap::const_iterator groupIter = map.begin(); groupIter != map.end(); ++groupIter )
+  {
+    UidFileNamesMap mapOf3DBlocks;      // intermediate result for only this group(!)
+    StringContainer filesStillToAnalyze = groupIter->second;
+    std::string groupUID = groupIter->first;
+    unsigned int subgroup(0);
+    MITK_DEBUG << "Analyze group " << groupUID;
+
+    while (!filesStillToAnalyze.empty()) // repeat until all files are grouped somehow 
+    {
+      TwoStringContainers analysisResult = AnalyzeFileForITKImageSeriesReaderSpacingAssumption( filesStillToAnalyze, scanner.GetMappings() );
+
+      // enhance the UID for additional groups
+      std::stringstream newGroupUID;
+      newGroupUID << groupUID << '.' << subgroup;
+      mapOf3DBlocks[ newGroupUID.str() ] = analysisResult.first;
+      MITK_INFO << "Sorted 3D group " << newGroupUID.str() << " with " << mapOf3DBlocks[ newGroupUID.str() ].size() << " files";
+      
+      ++subgroup;
+        
+      filesStillToAnalyze = analysisResult.second; // remember what needs further analysis
+    }
+
+    // end of grouping, now post-process groups
+  
+    // PART III: attempt to group blocks to 3D+t blocks if requested
+    //           inspect entries of mapOf3DBlocks
+    //            - if number of files is identical to previous entry, collect for 3D+t block
+    //            - as soon as number of files changes from previous entry, record collected blocks as 3D+t block, start a new one, continue
+
+    // decide whether or not to group 3D blocks into 3D+t blocks where possible
+    if ( !sortTo3DPlust )
+    {
+      // copy 3D blocks to output
+      // TODO avoid collisions (or prove impossibility)
+      mapOf3DPlusTBlocks.insert( mapOf3DBlocks.begin(), mapOf3DBlocks.end() );
+    }
+    else
+    {
+      // sort 3D+t (as described in "PART III")
+
+      unsigned int numberOfFilesInPreviousBlock(0);
+      std::string previousBlockKey;
+
+      for ( UidFileNamesMap::const_iterator block3DIter = mapOf3DBlocks.begin();
+            block3DIter != mapOf3DBlocks.end();
+            ++block3DIter )
+      {
+        unsigned int numberOfFilesInThisBlock = block3DIter->second.size();
+        std::string thisBlockKey = block3DIter->first;
+        
+        if (numberOfFilesInPreviousBlock == 0)
+        {
+          numberOfFilesInPreviousBlock = numberOfFilesInThisBlock;
+          mapOf3DPlusTBlocks[thisBlockKey].insert( mapOf3DPlusTBlocks[thisBlockKey].end(), 
+                                                   block3DIter->second.begin(), 
+                                                   block3DIter->second.end() );
+          MITK_INFO << "3D+t group " << thisBlockKey << " started";
+          previousBlockKey = thisBlockKey;
+        }
+        else
+        {
+          // check whether this and the previous block share a comon origin 
+          // TODO should be safe, but a little try/catch or other error handling wouldn't hurt
+          std::string thisOriginString = scanner.GetValue( mapOf3DBlocks[thisBlockKey].front().c_str(), tagImagePositionPatient );
+          std::string previousOriginString = scanner.GetValue( mapOf3DBlocks[previousBlockKey].front().c_str(), tagImagePositionPatient );
+          
+          // also compare last origin, because this might differ if z-spacing is different
+          std::string thisDestinationString = scanner.GetValue( mapOf3DBlocks[thisBlockKey].back().c_str(), tagImagePositionPatient );
+          std::string previousDestinationString = scanner.GetValue( mapOf3DBlocks[previousBlockKey].back().c_str(), tagImagePositionPatient );
+          
+          bool identicalOrigins( (thisOriginString == previousOriginString) && (thisDestinationString == previousDestinationString) );
+
+          if (identicalOrigins && (numberOfFilesInPreviousBlock == numberOfFilesInThisBlock))
+          {
+            // group with previous block
+            mapOf3DPlusTBlocks[previousBlockKey].insert( mapOf3DPlusTBlocks[previousBlockKey].end(), 
+                                                         block3DIter->second.begin(), 
+                                                         block3DIter->second.end() );
+            MITK_INFO << "3D+t group " << previousBlockKey << " enhanced with another timestep";
+          }
+          else
+          {
+            // start a new block
+            mapOf3DPlusTBlocks[thisBlockKey].insert( mapOf3DPlusTBlocks[thisBlockKey].end(), 
+                                                     block3DIter->second.begin(), 
+                                                     block3DIter->second.end() );
+            MITK_INFO << "3D+t group " << thisBlockKey << " started";
+            previousBlockKey = thisBlockKey;
+          }
+        }
+        
+        numberOfFilesInPreviousBlock = numberOfFilesInThisBlock;
+      }
+    }
+  }
 
 #endif
 
-  for ( UidFileNamesMap::const_iterator i = map.begin(); i != map.end(); ++i )
+  for ( UidFileNamesMap::const_iterator groupIter = map.begin(); groupIter != map.end(); ++groupIter )
   {
-    MITK_DEBUG << "Entry " << i->first << " with " << i->second.size() << " files";
+    MITK_DEBUG << "Slice group " << groupIter->first << " with " << groupIter->second.size() << " files";
   }
 
-  return map;
+  return mapOf3DPlusTBlocks;
+}
+
+DicomSeriesReader::UidFileNamesMap 
+DicomSeriesReader::GetSeries(const std::string &dir, const StringContainer &restrictions)
+{
+  gdcm::Directory directoryLister;
+  directoryLister.Load( dir.c_str(), false ); // non-recursive
+  return GetSeries(directoryLister.GetFilenames(), restrictions);
 }
 
 #if GDCM_MAJOR_VERSION >= 2
@@ -447,7 +744,6 @@ DicomSeriesReader::CreateMoreUniqueSeriesIdentifier( gdcm::Scanner::TagToValue& 
 
   constructedID.resize( constructedID.length() - 1 ); // cut of trailing '.'
 
-  MITK_DEBUG << "ID: " << constructedID;
   return constructedID; 
 }
 
@@ -559,6 +855,7 @@ DicomSeriesReader::GdcmSortFunction(const gdcm::DataSet &ds1, const gdcm::DataSe
     if (ds2.FindDataElement(gdcm::Tag(0x0008,0x0032)))
       acq_time2.Set(ds2);
 
+    // TODO this could lead to comparison of unset times (does Attribute initialize to good defaults?)
     // exception: same position: compare by acquisition time
     return acq_time1 < acq_time2;
   }

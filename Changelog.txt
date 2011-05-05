@@ -110,3 +110,4 @@ Minor interface changes to lower command complexibility (-classes::method):
 - mitkPropertyList::GetProperty(): now returns a standard C-Pointer, not a SmartPointer.
 
 
+ 

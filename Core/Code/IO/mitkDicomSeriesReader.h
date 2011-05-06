@@ -136,7 +136,6 @@ namespace mitk
 
    - (0020,0037) Image Orientation
    - (0028,0030) Pixel Spacing
-   - (0028,0030) Pixel Spacing
    - (0018,0050) Slice Thickness
    - (0028,0010) Number Of Rows
    - (0028,0011) Number Of Columns

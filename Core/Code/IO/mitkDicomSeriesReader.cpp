@@ -477,7 +477,7 @@ DicomSeriesReader::GetSeries(const StringContainer& files, bool sortTo3DPlust, c
         - 0018,0050 slice thickness
   */
 
-  UidFileNamesMap map; // preliminary result, refined into the final result mapOf3DPlusTBlocks
+  UidFileNamesMap groupsOfSimilarImages; // preliminary result, refined into the final result mapOf3DPlusTBlocks
 
   // use GDCM directly, itk::GDCMSeriesFileNames does not work with GDCM 2
 
@@ -516,7 +516,7 @@ DicomSeriesReader::GetSeries(const StringContainer& files, bool sortTo3DPlust, c
   if ( !scanner.Scan( files ) )
   {
     MITK_ERROR << "gdcm::Scanner failed when scanning " << files.size() << " input files.";
-    return map;
+    return groupsOfSimilarImages;
   }
 
   // assign files IDs that will separate them for loading into image blocks
@@ -531,25 +531,26 @@ DicomSeriesReader::GetSeries(const StringContainer& files, bool sortTo3DPlust, c
     // doing the same thing with find would make the code less readable. Since we forget the Scanner results
     // anyway after this function, we can simply tolerate empty map entries introduced by bad operator[] access
     std::string moreUniqueSeriesId = CreateMoreUniqueSeriesIdentifier( const_cast<gdcm::Scanner::TagToValue&>(fileIter->second) );
-    map [ moreUniqueSeriesId ].push_back( fileIter->first );
+    groupsOfSimilarImages [ moreUniqueSeriesId ].push_back( fileIter->first );
   }
   
+  // PART III: sort slices spatially
+
+  for ( UidFileNamesMap::const_iterator groupIter = groupsOfSimilarImages.begin(); groupIter != groupsOfSimilarImages.end(); ++groupIter )
+  {
+    groupsOfSimilarImages[ groupIter->first ] = SortSeriesSlices( groupIter->second  ); // sort each slice group spatially
+  }
+
   // PART II: analyze pre-sorted images for valid blocks (i.e. blocks of equal z-spacing), 
   //          separate into multiple blocks if necessary.
   //          
   //          Analysis performs the following steps:
-  //            * sort slices spatially
   //            * imitate itk::ImageSeriesReader: use the distance between the first two images as z-spacing
   //            * check what images actually fulfill ITK's z-spacing assumption
   //            * separate all images that fail the test into new blocks, re-iterate analysis for these blocks
 
-  for ( UidFileNamesMap::const_iterator groupIter = map.begin(); groupIter != map.end(); ++groupIter )
-  {
-    map[ groupIter->first ] = SortSeriesSlices( groupIter->second  ); // sort each slice group spatially
-  }
-
   UidFileNamesMap mapOf3DPlusTBlocks; // final result of this function
-  for ( UidFileNamesMap::const_iterator groupIter = map.begin(); groupIter != map.end(); ++groupIter )
+  for ( UidFileNamesMap::const_iterator groupIter = groupsOfSimilarImages.begin(); groupIter != groupsOfSimilarImages.end(); ++groupIter )
   {
     UidFileNamesMap mapOf3DBlocks;      // intermediate result for only this group(!)
     StringContainer filesStillToAnalyze = groupIter->second;
@@ -574,7 +575,7 @@ DicomSeriesReader::GetSeries(const StringContainer& files, bool sortTo3DPlust, c
 
     // end of grouping, now post-process groups
   
-    // PART III: attempt to group blocks to 3D+t blocks if requested
+    // PART IV: attempt to group blocks to 3D+t blocks if requested
     //           inspect entries of mapOf3DBlocks
     //            - if number of files is identical to previous entry, collect for 3D+t block
     //            - as soon as number of files changes from previous entry, record collected blocks as 3D+t block, start a new one, continue
@@ -588,7 +589,7 @@ DicomSeriesReader::GetSeries(const StringContainer& files, bool sortTo3DPlust, c
     }
     else
     {
-      // sort 3D+t (as described in "PART III")
+      // sort 3D+t (as described in "PART IV")
 
       unsigned int numberOfFilesInPreviousBlock(0);
       std::string previousBlockKey;
@@ -646,7 +647,7 @@ DicomSeriesReader::GetSeries(const StringContainer& files, bool sortTo3DPlust, c
     }
   }
 
-  for ( UidFileNamesMap::const_iterator groupIter = map.begin(); groupIter != map.end(); ++groupIter )
+  for ( UidFileNamesMap::const_iterator groupIter = groupsOfSimilarImages.begin(); groupIter != groupsOfSimilarImages.end(); ++groupIter )
   {
     MITK_DEBUG << "Slice group " << groupIter->first << " with " << groupIter->second.size() << " files";
   }

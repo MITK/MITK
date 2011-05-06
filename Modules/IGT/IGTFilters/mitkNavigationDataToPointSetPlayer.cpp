@@ -15,7 +15,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#include "mitkNavigationDataSequentialPlayer.h"
+#include "mitkNavigationDataToPointSetPlayer.h"
 
 //for the pause
 #include <itksys/SystemTools.hxx>
@@ -24,7 +24,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include <fstream>
 #include <sstream>
 
-mitk::NavigationDataSequentialPlayer::NavigationDataSequentialPlayer()
+#include <math.h>
+
+mitk::NavigationDataToPointSetPlayer::NavigationDataToPointSetPlayer()
   : m_Doc(new TiXmlDocument)
   , m_DataElem(0)
   , m_CurrentElem(0)
@@ -35,13 +37,16 @@ mitk::NavigationDataSequentialPlayer::NavigationDataSequentialPlayer()
 }
 
 
-mitk::NavigationDataSequentialPlayer::~NavigationDataSequentialPlayer()
+mitk::NavigationDataToPointSetPlayer::~NavigationDataToPointSetPlayer()
 {
   delete m_Doc;
 }
 
-void mitk::NavigationDataSequentialPlayer::ReinitXML()
+void mitk::NavigationDataToPointSetPlayer::ReinitXML()
 {
+  m_NDPointSet.clear();
+  m_PointSetFilter = mitk::NavigationDataToPointSetFilter::New();
+
   m_DataElem = m_Doc->FirstChildElement("Data");
   int toolcount;
   if(!m_DataElem)
@@ -69,52 +74,30 @@ void mitk::NavigationDataSequentialPlayer::ReinitXML()
     }
 
     // find out _NumberOfSnapshots
+
+    NavigationData::Pointer nd;
+
     m_NumberOfSnapshots = 0;
     TiXmlElement* nextND = m_DataElem->FirstChildElement("ND");
+    
     while(nextND)
     {
       ++m_NumberOfSnapshots;
       nextND = nextND->NextSiblingElement("ND");
-    }
+    }   
+
     // e.g. 12 nd found and 2 tools used => number of snapshots is 12:2=6
     m_NumberOfSnapshots = m_NumberOfSnapshots/toolcount;
 
+    /*NavigationData::TimeStampType recordedTime = (lastTimestamp-firstTimestamp) / 1000;
+    int frameRate = static_cast<int>(floor(1000 / (float) (m_NumberOfSnapshots/recordedTime) + 0.5));*/
+    
   }
 }
 
-void mitk::NavigationDataSequentialPlayer::GoToSnapshot(int i)
-{
-  assert(m_DataElem);
 
-  int numOfUpdateCalls = 0;
 
-  // i.e. number of snapshots 10
-  // goto(7), m_LastGoTo=3 => numOfUpdateCalls = 4
-  if(m_LastGoTo <= i)
-    numOfUpdateCalls = i - m_LastGoTo;
-  // goto(4), m_LastGoTo=7 => numOfUpdateCalls = 7
-  else
-  {
-    if(!m_Repeat)
-    {
-      MITK_WARN << "cannot go back to snapshot " << i << " because the "
-          << this->GetNameOfClass() << " is configured to not repeat the"
-          << " navigation data";
-
-    }
-    else
-    {
-      numOfUpdateCalls = (m_NumberOfSnapshots - m_LastGoTo) + i;
-    }
-  }
-
-  for(int j=0; j<numOfUpdateCalls; ++j)
-    this->Update();
-
-  m_LastGoTo = i;
-}
-
-void mitk::NavigationDataSequentialPlayer::
+void mitk::NavigationDataToPointSetPlayer::
     SetFileName(const std::string& _FileName)
 {
   m_FileName = _FileName;
@@ -127,23 +110,15 @@ void mitk::NavigationDataSequentialPlayer::
     throw std::invalid_argument(s.str());
   }
   else
+  {
     this->ReinitXML();
+  }
 
   this->Modified();
 }
 
-void mitk::NavigationDataSequentialPlayer::
-    SetXMLString(const std::string& _XMLString)
-{
-  m_XMLString = _XMLString;
 
-  m_Doc->Parse( m_XMLString.c_str() );
-  this->ReinitXML();
-
-  this->Modified();
-}
-
-void mitk::NavigationDataSequentialPlayer::GenerateData()
+void mitk::NavigationDataToPointSetPlayer::GenerateData()
 {
   assert(m_DataElem);
 
@@ -172,9 +147,37 @@ void mitk::NavigationDataSequentialPlayer::GenerateData()
   }
 }
 
-mitk::NavigationData::Pointer mitk::NavigationDataSequentialPlayer::ReadVersion1()
-{
 
+void mitk::NavigationDataToPointSetPlayer::StartPlaying()
+{
+  //TODO
+}
+
+void mitk::NavigationDataToPointSetPlayer::StopPlaying()
+{
+  //TODO
+}
+
+void mitk::NavigationDataToPointSetPlayer::Pause()
+{
+  //TODO
+}
+
+void mitk::NavigationDataToPointSetPlayer::Resume()
+{
+  //TODO
+}
+
+
+//TODO
+const bool mitk::NavigationDataToPointSetPlayer::IsAtEnd()
+{
+  bool result = false;
+  return result;
+}
+
+mitk::NavigationData::Pointer mitk::NavigationDataToPointSetPlayer::ReadVersion1()
+{
   TiXmlElement* elem = m_CurrentElem;
 
   if(!elem)
@@ -183,7 +186,7 @@ mitk::NavigationData::Pointer mitk::NavigationDataSequentialPlayer::ReadVersion1
   return this->ReadNavigationData(elem);
 }
 
-void mitk::NavigationDataSequentialPlayer::UpdateOutputInformation()
+void mitk::NavigationDataToPointSetPlayer::UpdateOutputInformation()
 {
   this->Modified();  // make sure that we need to be updated
   Superclass::UpdateOutputInformation();

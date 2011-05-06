@@ -27,6 +27,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkNavigationDataPlayer.h"
 #include <mitkTimeStamp.h>
 
+#include <mitkPointSet.h>
+
 
 
 //ui header
@@ -77,14 +79,15 @@ public:
   const std::vector<mitk::NavigationData::Pointer> GetNavigationDatas();
 
   /*!  
-  \brief Sets the widget's look for the normal playback
-  */ 
-  void SetWidgetViewToNormalPlayback();
+  \brief Returns a PointSet of the current NavigationDatas for all recorded tools.
+  */
+  const mitk::PointSet::Pointer GetNavigationDatasPointSet();
 
   /*!  
-  \brief Sets the widget's look for the PointSet playback
-  */ 
-  void SetWidgetViewToPointSetPlayback();
+  \brief Returns a PointType of the current NavigationData for a specific tool with the given index.
+  */
+  const mitk::PointSet::PointType GetNavigationDataPoint(unsigned int index);
+
 
   /*!  
   \brief Sets the update rate of this widget's playing timer
@@ -92,32 +95,82 @@ public:
   void SetUpdateRate(unsigned int msecs);
 
 
-signals:
-  /*!  
-  \brief This signal is emitted when the player starts the playback
-  */ 
-  void PlayingStarted();
-  /*!  
-  \brief This signal is emitted when the player resumes after a pause
-  */ 
-  void PlayingResumed();
-  /*!  
-  \brief This signal is emitted when the player stops
-  */ 
-  void PlayingStopped();
-  /*!  
-  \brief This signal is emitted when the player is paused
-  */ 
-  void PlayingPaused();
-  /*!  
-  \brief This signal is emitted when the player reaches the end of the playback
-  */ 
-  void PlayingEnded();
+  /*!
+  \brief Returns the number of different tools from the current playing stream.
+  *
+  * Retuns 0 if playback file is invalid.
+  */
+  unsigned int GetNumberOfTools();
 
   /*!  
-  \brief This signal is emitted every time the player updated the NavigationDatas
+  \brief Stops the playback
   */ 
-  void PlayerUpdated();
+  void StopPlaying();
+
+  /*!
+  \brief Sets the given tool names list to the trajectory select combobox.
+  */
+  void SetTrajectoryNames(const QStringList toolNames);
+
+  /*!
+  \brief Returns the current resolution value from the resolution spinbox.
+  */
+  int GetResolution();
+  
+  /*!
+  \brief Clears all items in the trajectory selection combobox.
+  */
+  void ClearTrajectorySelectCombobox();
+
+  /*!
+  \brief Returns whether spline mode checkbox is selected.
+  */
+  bool IsTrajectoryInSplineMode();
+
+
+signals:
+  /*!  
+  \brief This signal is emitted when the player starts the playback.
+  */ 
+  void SignalPlayingStarted();
+  /*!  
+  \brief This signal is emitted when the player resumes after a pause.
+  */ 
+  void SignalPlayingResumed();
+  /*!  
+  \brief This signal is emitted when the player stops.
+  */ 
+  void SignalPlayingStopped();
+  /*!  
+  \brief This signal is emitted when the player is paused.
+  */ 
+  void SignalPlayingPaused();
+  /*!  
+  \brief This signal is emitted when the player reaches the end of the playback.
+  */ 
+  void SignalPlayingEnded();
+
+  /*!  
+  \brief This signal is emitted every time the player updated the NavigationDatas.
+  */ 
+  void SignalPlayerUpdated();
+
+  /*!  
+  \brief This signal is emitted if the input file for the replay was changed.
+  */ 
+  void SignalInputFileChanged();
+
+  /*!  
+  \brief This signal is emitted if the index of the current selected trajectory select combobox item changes.
+  */
+  void SignalCurrentTrajectoryChanged(int index);
+
+  /*!  
+  \brief This signal is emitted if the spline mode checkbox is toggled or untoggled.
+  */
+  void SignalSplineModeToggled(bool checked);
+
+
 
 
   protected slots:   
@@ -136,7 +189,7 @@ signals:
     /*!  
     \brief Updates the input filename
     */ 
-    void UpdateInputFileName();
+    void SetInputFileName(const QString& inputFileName);
     /*!  
     \brief Opens file open dialog for searching the input file
     */ 
@@ -149,11 +202,6 @@ signals:
     \brief Stops the playback and resets the player to the beginning
     */ 
     void OnGoToBegin();
-    /*!  
-    \brief Switches between the normal playback view and the PointSet playback view
-    */ 
-    void OnChangeWidgetView(bool pointSetPlaybackView);
-
 
 
 protected:
@@ -163,16 +211,6 @@ protected:
 
 
   virtual void CreateQtPartControl(QWidget *parent);
-
-  /*!  
-  \brief Sets the filename of the input file
-  */ 
-  void SetInputFileName();
-
-  /*!  
-  \brief Stops the playback
-  */ 
-  void StopPlaying();
 
   /*!  
   \brief Checks if an imput file with the set filename exists
@@ -192,7 +230,6 @@ protected:
   QTimer* m_PlayingTimer; ///< update timer
 
   mitk::NavigationData::TimeStampType m_StartTime; ///< start time of playback needed for time display
-
 
 };
 #endif

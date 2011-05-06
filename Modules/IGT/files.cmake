@@ -4,6 +4,7 @@ SET(CPP_FILES
   IGTFilters/mitkNavigationDataTransformFilter.cpp
   IGTFilters/mitkNavigationDataRecorder.cpp
   IGTFilters/mitkNavigationDataPlayer.cpp
+  IGTFilters/mitkNavigationDataPlayerBase.cpp
   IGTFilters/mitkNavigationDataObjectVisualizationFilter.cpp
   IGTFilters/mitkCameraVisualization.cpp
   IGTFilters/mitkNavigationData.cpp
@@ -14,6 +15,7 @@ SET(CPP_FILES
   IGTFilters/mitkNavigationDataToNavigationDataFilter.cpp
   IGTFilters/mitkNavigationDataToOpenGLFilter.cpp
   IGTFilters/mitkNavigationDataToPointSetFilter.cpp
+
   IGTFilters/mitkTrackingDeviceSource.cpp
   IGTFilters/mitkTimeStamp.cpp
   IGTFilters/mitkRealTimeClock.cpp

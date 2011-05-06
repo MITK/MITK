@@ -1,0 +1,13 @@
+/**
+\bundlemainpage{org.mitk.gui.qt.navigationdataplayer} NavigationData Player
+
+\image html icon.png "Icon of NavigationData Player"
+
+Available sections:
+  - \ref org.mitk.gui.qt.navigationdataplayerOverview
+
+\section org.mitk.gui.qt.navigationdataplayerOverview
+This is the description for the NavigationData Player.
+
+*/
+

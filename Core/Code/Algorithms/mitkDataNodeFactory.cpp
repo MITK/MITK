@@ -225,7 +225,6 @@ void mitk::DataNodeFactory::ReadFileSeriesTypeDCM()
   std::locale l( "C" );
   std::cin.imbue(l);
 
-  #if GDCM_MAJOR_VERSION >= 2
   if (  DicomSeriesReader::IsPhilips3DDicom(this->GetFileName()) )
   {
     MITK_INFO << "it is a Philips3D US Dicom file" << std::endl;
@@ -242,7 +241,6 @@ void mitk::DataNodeFactory::ReadFileSeriesTypeDCM()
     return;
 
   }
-  #endif
       
   DicomSeriesReader::UidFileNamesMap names_map = DicomSeriesReader::GetSeries(this->GetDirectory(), this->m_SeriesRestrictions);
   const unsigned int size = names_map.size();

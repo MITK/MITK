@@ -72,7 +72,6 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
           reader->AddObserver(itk::ProgressEvent(), command);
         }
 
-        const std::list<StringContainer>::const_iterator df_end = imageBlocks.end();
         unsigned int act_volume = 1u;
 
         reader->SetFileNames(imageBlocks.front());
@@ -104,7 +103,7 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
                                           << image->GetGeometry()->GetSpacing()[1] << ", " 
                                           << image->GetGeometry()->GetSpacing()[2] << "]";
 
-        for (std::list<StringContainer>::iterator df_it = ++imageBlocks.begin(); df_it != df_end; ++df_it)
+        for (std::list<StringContainer>::iterator df_it = ++imageBlocks.begin(); df_it != imageBlocks.end(); ++df_it)
         {
           reader->SetFileNames(*df_it);
           reader->Update();

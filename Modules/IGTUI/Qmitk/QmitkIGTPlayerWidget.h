@@ -25,6 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "MitkIGTUIExports.h"
 #include "mitkNavigationTool.h"
 #include "mitkNavigationDataPlayer.h"
+#include "mitkNavigationDataSequentialPlayer.h"
 #include <mitkTimeStamp.h>
 
 #include <mitkPointSet.h>
@@ -64,9 +65,14 @@ public:
   ~QmitkIGTPlayerWidget();
 
   /*!  
-  \brief Sets the player for this player widget 
+  \brief Sets the real time player for this player widget 
   */ 
-  void SetPlayer(mitk::NavigationDataPlayer::Pointer player);
+  void SetRealTimePlayer(mitk::NavigationDataPlayer::Pointer player);
+
+   /*!  
+  \brief Sets the sequential player for this player widget 
+  */ 
+  void SetSequentialPlayer(mitk::NavigationDataSequentialPlayer::Pointer player);
 
   /*!  
   \brief Returns the playing timer of this widget  
@@ -127,6 +133,15 @@ public:
   */
   bool IsTrajectoryInSplineMode();
 
+  
+  enum PlaybackMode {       ///< playback mode enum
+      RealTimeMode = 1,
+      SequentialMode = 2
+  };
+
+
+  PlaybackMode GetCurrentPlaybackMode();
+
 
 signals:
   /*!  
@@ -168,9 +183,7 @@ signals:
   /*!  
   \brief This signal is emitted if the spline mode checkbox is toggled or untoggled.
   */
-  void SignalSplineModeToggled(bool checked);
-
-
+  void SignalSplineModeToggled(bool toggled);
 
 
   protected slots:   
@@ -202,6 +215,19 @@ signals:
     \brief Stops the playback and resets the player to the beginning
     */ 
     void OnGoToBegin();
+    /*!  
+    \brief Switches widget between realtime and sequential mode
+    */ 
+    void OnSequencialModeToggled(bool toggled);
+    /*!  
+    \brief Pauses playback when slider is pressed by user
+    */ 
+    void OnSliderPressed();
+    /*!  
+    \brief Moves player position to the position selected with the slider
+    */ 
+    void OnSliderReleased();
+
 
 
 protected:
@@ -209,7 +235,7 @@ protected:
   /// \brief Creation of the connections
   virtual void CreateConnections();
 
-
+  /// \brief Creation of the Qt control
   virtual void CreateQtPartControl(QWidget *parent);
 
   /*!  
@@ -224,12 +250,13 @@ protected:
 
   Ui::QmitkIGTPlayerWidgetControls* m_Controls;
 
-  mitk::NavigationDataPlayer::Pointer m_Player; ///< plays NDs from a XML file
-
+  mitk::NavigationDataPlayer::Pointer m_RealTimePlayer; ///< plays NDs from a XML file
+  mitk::NavigationDataSequentialPlayer::Pointer m_SequentialPlayer;
+ 
   QString m_CmpFilename; ///< filename of the input file
   QTimer* m_PlayingTimer; ///< update timer
 
   mitk::NavigationData::TimeStampType m_StartTime; ///< start time of playback needed for time display
-
+  unsigned int m_CurrentSequentialPointNumber; ///< current point number
 };
 #endif

@@ -182,6 +182,7 @@ if (m_Controls->m_ShowTrackingVolume->isChecked())
   {
   mitk::TrackingVolumeGenerator::Pointer volumeGenerator= mitk::TrackingVolumeGenerator::New();
   volumeGenerator->SetTrackingDeviceType(m_TrackingDeviceSource->GetTrackingDevice()->GetType());
+  volumeGenerator->Update();
 
   mitk::Surface::Pointer volumeSurface = volumeGenerator->GetOutput();
 

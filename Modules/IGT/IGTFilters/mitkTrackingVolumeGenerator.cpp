@@ -15,7 +15,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-//TODO unnötige importe entfernen
 #include "mitkTrackingVolumeGenerator.h"
 #include "mitkSTLFileReader.h"
 #include "mitkStandardFileLocations.h"
@@ -25,6 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkTrackingDevice.h>
 #include <mitkVirtualTrackingDevice.h>
 #include <vtkSmartPointer.h>
+#include <mitkSurface.h>
 
 mitk::TrackingVolumeGenerator::TrackingVolumeGenerator()
 {
@@ -43,7 +43,7 @@ void mitk::TrackingVolumeGenerator::SetTrackingDevice (mitk::TrackingDevice::Poi
 
 void mitk::TrackingVolumeGenerator::GenerateData()
 {
-    mitk::Surface::Pointer output = this->GetOutput();
+    mitk::Surface::Pointer output = this->GetOutput();//the surface wich represents the tracking volume
 
     std::string filename = "";
 
@@ -75,7 +75,11 @@ void mitk::TrackingVolumeGenerator::GenerateData()
             return;
         }
     default:
-        return;
+        {
+            MITK_INFO<< "No STL to given TrackingDevice found";
+            return;
+        }
+
     }
 
     if (filename.empty())
@@ -89,8 +93,10 @@ void mitk::TrackingVolumeGenerator::GenerateData()
     stlReader->Update();
 
     if ( stlReader->GetOutput() == NULL)
+    {
+        MITK_ERROR << "Error while reading file";
         return ;
-
+    }
     output->SetVtkPolyData( stlReader->GetOutput()->GetVtkPolyData());//set the visible trackingvolume
 }
 

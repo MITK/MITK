@@ -150,7 +150,9 @@ void QmitkIGTRecorderView::OnStartRecording()
   {
     mitk::TrackingVolumeGenerator::Pointer tvGenerator = mitk::TrackingVolumeGenerator::New();
     tvGenerator->SetTrackingDeviceType(tracker->GetType());
+    tvGenerator->Update();
     mitk::Surface::Pointer tv = tvGenerator->GetOutput();
+
     mitk::DataNode::Pointer n = mitk::DataNode::New();
     n->SetData(tv);
     n->SetName("Tracking Volume");

@@ -37,7 +37,7 @@ class mitkTrackingVolumeTestClass
     {
      MITK_TEST_OUTPUT(<<"---- Testing Trackingsystem not specified ----")
      mitk::TrackingVolumeGenerator::Pointer myTVGenerator = mitk::TrackingVolumeGenerator::New();
-     MITK_TEST_CONDITION((myTVGenerator->GetTrackingDeviceType() == mitk::TrackingSystemNotSpecified), "Trackling System not specified:")
+     MITK_TEST_CONDITION((myTVGenerator->GetTrackingDeviceType() == mitk::TrackingSystemNotSpecified), "Tracking System not specified:")
     }
 
     static void TestClaronTrackingVolume()

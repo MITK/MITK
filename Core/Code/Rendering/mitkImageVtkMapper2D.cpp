@@ -65,83 +65,46 @@ mitk::ImageVtkMapper2D::~ImageVtkMapper2D()
   this->InvokeEvent( itk::DeleteEvent() ); //TODO <- what is this doing exactly?
 }
 
-void mitk::ImageVtkMapper2D::AdjustCamera(mitk::BaseRenderer* renderer)
+void mitk::ImageVtkMapper2D::AdjustCamera(mitk::BaseRenderer* renderer, mitk::ScalarType heightInMM)
 {
   LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
 
   //activate parallel projection for 2D
   renderer->GetVtkRenderer()->GetActiveCamera()->SetParallelProjection(true);
 
-  const mitk::DisplayGeometry *displayGeometry = renderer->GetDisplayGeometry();
+  const mitk::DisplayGeometry* displayGeometry = renderer->GetDisplayGeometry();
 
-  Vector2D topLeft = displayGeometry->GetOriginInMM();  //camera position
-  Vector2D bottomRight = topLeft + displayGeometry->GetSizeInMM(); //
-  Vector2D center = topLeft + displayGeometry->GetSizeInMM()/2;
-
-  MITK_INFO << "origin in mm " << topLeft[0] << " " << topLeft[1];
-  MITK_INFO << "bottomRight in mm " << bottomRight[0] << " " << bottomRight[1];
-  MITK_INFO << "size in mm " << displayGeometry->GetSizeInMM()[0] << " " << displayGeometry->GetSizeInMM()[1];
+  Vector2D displayGeometryOriginInMM = displayGeometry->GetOriginInMM();  //top left of the render window
+  Vector2D displayGeometryCenterInMM = displayGeometryOriginInMM + displayGeometry->GetSizeInMM()/2; //center of the render window
 
   //scale the rendered object. TODO How to achieve the correct scale?
-  renderer->GetVtkRenderer()->GetActiveCamera()->SetParallelScale(displayGeometry->GetSizeInMM()[0]/2.74);
+  renderer->GetVtkRenderer()->GetActiveCamera()->SetParallelScale(displayGeometry->GetSizeInMM()[1] / 2.1);
 
-  //the center of the plane in homogeneous coordinates
-  double planeCenter[4];
-  planeCenter[0] = localStorage->m_Plane->GetCenter()[0] + topLeft[0]/1.0;
-  planeCenter[1] = localStorage->m_Plane->GetCenter()[1] + topLeft[1]/1.0;
-  planeCenter[2] = localStorage->m_Plane->GetCenter()[2];
-  planeCenter[3] = 1.0;
+  //the center of the view-plane
+  double viewPlaneCenter[3];
+  viewPlaneCenter[0] = displayGeometryCenterInMM[0];
+  viewPlaneCenter[1] = displayGeometryCenterInMM[1];
+  viewPlaneCenter[2] = 0.0; //the view-plane is located in the XY-plane with Z=0.0
 
-  //the normal of the plane in homogeneous coordinates
-  double planeNormal[4];
-  planeNormal[0] = localStorage->m_Plane->GetNormal()[0];
-  planeNormal[1] = localStorage->m_Plane->GetNormal()[1];
-  planeNormal[2] = localStorage->m_Plane->GetNormal()[2];
-  planeNormal[3] = 1.0;
-
-  //define which direction is "up" for the camera
-  double cameraUp[4];
+  //define which direction is "up" for the camera (like default for vtk (0.0, 1.0, 0.0)
+  double cameraUp[3];
   cameraUp[0] = 0.0;
   cameraUp[1] = 1.0;
   cameraUp[2] = 0.0;
-  cameraUp[3] = 1.0;
 
-  //variables for transformed vectors/points
-  double planeNormalTransformed[4];
-  double planeCenterTransformed[4];
-  double cameraUpTransformed[4];
-  double cameraPositionTransformed[4];
-
-  //Transform everything to the current position (Transveral, coronal and saggital plane).
-  //This is necessary, because the vtkTransformFilter does not manipulate the vtkPlaneSource,
-  //and thus, the plane normal and center are not placed correctly.
-  //(Without this all three planes would have the same normal/center and consequently the same camera position).
-  localStorage->m_TransformMatrix->MultiplyPoint(planeCenter, planeCenterTransformed);
-  //  localStorage->m_TransformMatrix->MultiplyPoint(planeNormal, planeNormalTransformed);
-  localStorage->m_TransformMatrix->MultiplyPoint(cameraUp, cameraUpTransformed);
-
-  //set the camera position at the plane center and normal TODO not ok for zooming and panning??
-  //  double cameraPosition[3];
-  //  cameraPosition[0] = planeCenterTransformed[0] + planeNormalTransformed[0];
-  //  cameraPosition[1] = planeCenterTransformed[1] + planeNormalTransformed[1];
-  //  cameraPosition[2] = planeCenterTransformed[2] + planeNormalTransformed[2];
-
-  double cameraPosition[4];
-  cameraPosition[0] = planeCenter[0];
-  cameraPosition[1] = planeCenter[1];
-  cameraPosition[2] = planeCenter[2] + 1;
-  cameraPosition[3] = 1.0;
-  localStorage->m_TransformMatrix->MultiplyPoint(cameraPosition, cameraPositionTransformed);
+  //the position of the camera (center[0], center[1], 1.0)
+  double cameraPosition[3];
+  cameraPosition[0] = viewPlaneCenter[0];
+  cameraPosition[1] = viewPlaneCenter[1];
+  cameraPosition[2] = viewPlaneCenter[2] + 1.0; //planeCenter[2] should be 0.0. Therefore, the camera is located in the XY-plane with Z=1.0
 
   //set the camera corresponding to the textured plane
   vtkSmartPointer<vtkCamera> camera = renderer->GetVtkRenderer()->GetActiveCamera();
   if (camera)
   {
-    camera->SetPosition( cameraPositionTransformed[0], cameraPositionTransformed[1], cameraPositionTransformed[2] ); //set the camera position on the textured plane normal
-    camera->SetFocalPoint( planeCenterTransformed[0], planeCenterTransformed[1], planeCenterTransformed[2]); //set the focal point to the center of the textured plane
-    //    camera->SetFocalPoint( planeCenter[0], planeCenter[1], planeCenter[2]); //set the focal point to the center of the textured plane
-    camera->SetViewUp(cameraUpTransformed[0],cameraUpTransformed[1],cameraUpTransformed[2]);
-    //    camera->SetViewUp(cameraUp[0],cameraUp[1],cameraUp[2]);
+    camera->SetPosition( cameraPosition ); //set the camera position on the textured plane normal (in our case this is the view plane normal)
+    camera->SetFocalPoint( viewPlaneCenter ); //set the focal point to the center of the textured plane
+    camera->SetViewUp( cameraUp ); //set the view-up for the camera
   }
   //reset the clipping range TODO why? really needed if everything is correct?
   renderer->GetVtkRenderer()->ResetCameraClippingRange();
@@ -167,76 +130,6 @@ void mitk::ImageVtkMapper2D::AdjustToDisplayGeometry(mitk::BaseRenderer* rendere
   localStorage->m_Plane->SetPoint2(0.0, (localStorage->m_ReslicedImage->GetDimensions()[1]-1)*spacing[1], 0.0);
 }
 
-//TODO: do we need paint, update AND generateData?
-//void mitk::ImageVtkMapper2D::Paint( mitk::BaseRenderer *renderer )
-//{
-
-//  MITK_INFO << "!!!!!!! PAINT";
-
-//  if ( !this->IsVisible( renderer ) )
-//  {
-//    return;
-//  }
-
-//  this->Update( renderer );
-
-//  //#################### Draw volume stuff ########################################
-//  //TODO why is this in paint?
-
-//  RendererInfo &rendererInfo = this->AccessRendererInfo( renderer );
-
-//  const mitk::DisplayGeometry *displayGeometry = renderer->GetDisplayGeometry();
-
-//  Vector2D topLeft = displayGeometry->GetOriginInMM();
-//  Vector2D bottomRight = topLeft + displayGeometry->GetSizeInMM();
-
-//  topLeft[0] *= rendererInfo.m_PixelsPerMM[0];
-//  topLeft[1] *= rendererInfo.m_PixelsPerMM[1];
-
-//  bottomRight[0] *= rendererInfo.m_PixelsPerMM[0];
-//  bottomRight[1] *= rendererInfo.m_PixelsPerMM[1];
-
-//  MITK_INFO << "origin in mm " << topLeft[0] << " " << topLeft[1];
-//  MITK_INFO << "bottomRight in mm " << bottomRight[0] << " " << bottomRight[1];
-//  MITK_INFO << "size in mm " << displayGeometry->GetSizeInMM()[0] << " " << displayGeometry->GetSizeInMM()[1];
-
-////  this->AdjustCamera( renderer, rendererInfo.m_PixelsPerMM[0] );
-
-
-//  topLeft += rendererInfo.m_Overlap;
-//  bottomRight += rendererInfo.m_Overlap;
-
-//  // display volume property, if it exists and should be displayed
-//  bool shouldShowVolume = false, binary = false;
-//  float segmentationVolume = -1.0;
-
-//  mitk::DataNode *node = this->GetDataNode();
-//  mitk::Image* mitkimage = dynamic_cast<mitk::Image*>(node->GetData());
-
-//  // Check if a volume in ml can be drawn in the image.
-//  // This is the case if:
-//  // 1. The property "showVolume" is true AND [
-//  // 2.1 The image has a volume stored as property (3D case) OR
-//  // 2.2 The image is 3D or 4D and binary, so the volume can be calculated ]
-//  if (
-//      (node->GetBoolProperty("showVolume", shouldShowVolume)) &&
-//      (shouldShowVolume) &&
-//      (
-//          (node->GetFloatProperty("volume", segmentationVolume) )
-//          ||
-//          (mitkimage != NULL &&
-//           mitkimage->GetDimension() >= 3 &&
-//           node->GetBoolProperty("binary", binary) &&
-//           binary)
-//          )
-//      )
-//  {
-//    //TODO implement draw volume with VTK
-//  }
-//  //#################### Draw volume stuff end ########################################
-//}
-
-
 const mitk::Image* mitk::ImageVtkMapper2D::GetInput( void )
 {
   return static_cast< const mitk::Image * >( this->GetData() );
@@ -258,6 +151,7 @@ void mitk::ImageVtkMapper2D::MitkRenderOverlay(BaseRenderer* renderer)
     this->GetVtkProp(renderer)->RenderOverlay(renderer->GetVtkRenderer());
   }
 }
+
 void mitk::ImageVtkMapper2D::MitkRenderOpaqueGeometry(BaseRenderer* renderer)
 {
   MITK_INFO << "######## RenderOpaque ############";
@@ -443,7 +337,10 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
       rendererInfo.m_ReferenceGeometry = worldGeometry->GetReferenceGeometry();
 
       // Calculate the actual bounds of the transformed plane clipped by the
-      // dataset bounding box; this is required for drawing the texture at the
+      // dataset bounding box; this is required for drawing t  //Transform everything to the current position (Transveral, coronal and saggital plane).
+      //This is necessary, because the vtkTransformFilter does not manipulate the vtkPlaneSource,
+      //and thus, the plane normal and center are not placed correctly.
+      //(Without this all three planes would have the same normal/center and consequently the same camera position).he texture at the
       // correct position during 3D mapping.
 
       boundsInitialized = this->CalculateClippedPlaneBounds(
@@ -726,16 +623,11 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
   //remove the VTK interaction
   renderer->GetVtkRenderer()->GetRenderWindow()->SetInteractor(NULL);
 
-  //  MITK_INFO << "vtk transform " << inputGeometry->GetVtkTransform()[0];
-  //  MITK_INFO << "vtk transform inverse" << inputGeometry->GetVtkTransform()->GetLinearInverse()[0];
-
-
   //get the transformation matrix of the reslicer in order to render the slice as transversal, coronal or saggital
   vtkSmartPointer<vtkTransform> trans = vtkSmartPointer<vtkTransform>::New();
   vtkSmartPointer<vtkMatrix4x4> matrix = rendererInfo.m_Reslicer->GetResliceAxes();
 
   trans->SetMatrix(matrix);
-  //  localStorage->m_TransformMatrix = rendererInfo.m_Reslicer->GetResliceAxes();
   localStorage->m_TransformMatrix = matrix;
 
   //transform the plane to the corresponding view (transversal, coronal or saggital)
@@ -745,7 +637,7 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
   localStorage->m_Mapper->SetInputConnection(localStorage->m_TransformFilter->GetOutputPort());
 
   //set up the camera to view the transformed plane
-  this->AdjustCamera( renderer);
+  this->AdjustCamera( renderer, heightInMM );
 
   // We have been modified
   rendererInfo.m_LastUpdateTime.Modified();
@@ -766,7 +658,11 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
   //TODO remove this later
   renderer->GetVtkRenderer()->SetBackground(1,1,1);
 
-  //  MITK_INFO << rendererInfo.m_Reslicer->GetResliceTransform()->GetMatrix();
+  //Transform the camera to the current position (transveral, coronal and saggital plane).
+  //This is necessary, because the vtkTransformFilter does not manipulate the vtkCamera.
+  //(Without not all three planes would be visible).
+  renderer->GetVtkRenderer()->GetActiveCamera()->ApplyTransform(trans);
+
   MITK_INFO << "--------------- Ende Generate ------------";
 }
 
@@ -930,7 +826,6 @@ void mitk::ImageVtkMapper2D::Clear()
   }
   m_RendererInfo.clear();
 }
-
 
 void mitk::ImageVtkMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
 {
@@ -1161,7 +1056,7 @@ void mitk::ImageVtkMapper2D::Update(mitk::BaseRenderer* renderer)
     || (rendererInfo.m_LastUpdateTime < renderer->GetCurrentWorldGeometry2D()->GetMTime())
     || (rendererInfo.m_LastUpdateTime < node->GetPropertyList()->GetMTime()) //was a property modified?
     || (rendererInfo.m_LastUpdateTime < node->GetPropertyList(renderer)->GetMTime()) )
-  {
+    {
     this->GenerateData( renderer );
   }
   // since we have checked that nothing important has changed, we can set

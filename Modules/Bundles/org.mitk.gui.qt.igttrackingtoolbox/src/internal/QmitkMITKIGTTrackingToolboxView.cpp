@@ -30,7 +30,7 @@ PURPOSE.  See the above copyright notices for more information.
 // MITK
 #include <mitkNavigationToolStorageDeserializer.h>
 #include <mitkTrackingDeviceSourceConfigurator.h>
-#include <mitkTrackingVolume.h>
+#include <mitkTrackingVolumeGenerator.h>
 
 
 
@@ -180,8 +180,12 @@ this->m_Controls->m_configurationWidget->ConfigurationFinished();
 //show tracking volume
 if (m_Controls->m_ShowTrackingVolume->isChecked())
   {
-  mitk::TrackingVolume::Pointer volumeSurface = mitk::TrackingVolume::New();
-  volumeSurface->SetTrackingDeviceType(m_TrackingDeviceSource->GetTrackingDevice()->GetType());
+  mitk::TrackingVolumeGenerator::Pointer volumeGenerator= mitk::TrackingVolumeGenerator::New();
+  volumeGenerator->SetTrackingDeviceType(m_TrackingDeviceSource->GetTrackingDevice()->GetType());
+  volumeGenerator->Update();
+
+  mitk::Surface::Pointer volumeSurface = volumeGenerator->GetOutput();
+
   TrackingVolumeNode->SetData(volumeSurface);
   TrackingVolumeNode->SetOpacity(0.25);
   mitk::Color red;

@@ -17,6 +17,7 @@ SET(CPP_FILES
   IGTFilters/mitkNavigationDataToPointSetFilter.cpp
 
   IGTFilters/mitkTrackingDeviceSource.cpp
+  IGTFilters/mitkTrackingVolumeGenerator.cpp
   IGTFilters/mitkTimeStamp.cpp
   IGTFilters/mitkRealTimeClock.cpp
   IGTFilters/mitkTrackingDeviceSourceConfigurator.cpp
@@ -30,7 +31,6 @@ SET(CPP_FILES
   IGTTrackingDevices/mitkSerialCommunication.cpp
   IGTTrackingDevices/mitkTrackingDevice.cpp
   IGTTrackingDevices/mitkTrackingTool.cpp
-  IGTTrackingDevices/mitkTrackingVolume.cpp
   IGTTrackingDevices/mitkVirtualTrackingDevice.cpp
   IGTTrackingDevices/mitkVirtualTrackingTool.cpp
 

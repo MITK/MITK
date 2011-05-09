@@ -61,6 +61,7 @@ void mitk::TrackingVolumeGenerator::GenerateData()
     case mitk::NDIAurora:
         filename = mitk::StandardFileLocations::GetInstance()->FindFile("NDIAurora.stl");
         break;
+    case mitk::TrackingSystemNotSpecified:
     case mitk::VirtualTracker:
         {
            vtkSmartPointer<vtkCubeSource> cubeSource = vtkSmartPointer<vtkCubeSource>::New();

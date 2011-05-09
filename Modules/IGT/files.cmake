@@ -29,7 +29,6 @@ SET(CPP_FILES
   IGTTrackingDevices/mitkSerialCommunication.cpp
   IGTTrackingDevices/mitkTrackingDevice.cpp
   IGTTrackingDevices/mitkTrackingTool.cpp
-  IGTTrackingDevices/mitkTrackingVolume.cpp
   IGTTrackingDevices/mitkVirtualTrackingDevice.cpp
   IGTTrackingDevices/mitkVirtualTrackingTool.cpp
 

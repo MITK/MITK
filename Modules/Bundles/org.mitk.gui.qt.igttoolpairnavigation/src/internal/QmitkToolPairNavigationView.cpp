@@ -20,7 +20,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkUpdateTimerWidget.h"
 #include "QmitkToolDistanceWidget.h"
 #include "mitkNodePredicateDataType.h"
-#include <mitkTrackingVolume.h>
 #include "QmitkDataStorageComboBox.h"
 #include "QmitkStdMultiWidget.h"
 #include <mitkCone.h>

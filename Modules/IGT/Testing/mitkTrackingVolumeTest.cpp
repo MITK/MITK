@@ -29,36 +29,47 @@ class mitkTrackingVolumeTestClass
     {
     // let's create an object of our class  
     mitk::TrackingVolumeGenerator::Pointer myTVGenerator = mitk::TrackingVolumeGenerator::New();
-    //MITK_TEST_CONDITION_REQUIRED(myTVGenerator.IsNotNull(),"Testing instantiation")
+    MITK_TEST_CONDITION_REQUIRED(myTVGenerator.IsNotNull(),"Testing instantiation")
 
+    }
+
+    static void TestTrackingSystemNotSpecified()
+    {
+     MITK_TEST_OUTPUT(<<"---- Testing Trackingsystem not specified ----")
+     mitk::TrackingVolumeGenerator::Pointer myTVGenerator = mitk::TrackingVolumeGenerator::New();
+     MITK_TEST_CONDITION((myTVGenerator->GetTrackingDeviceType() == mitk::TrackingSystemNotSpecified), "Trackling System not specified:")
     }
 
     static void TestClaronTrackingVolume()
     {
     MITK_TEST_OUTPUT(<< "---- Testing MicronTracker 2 Tracking Volume ----")
     mitk::TrackingVolumeGenerator::Pointer myTVGenerator = mitk::TrackingVolumeGenerator::New ();
-    //MITK_TEST_CONDITION(myTVGenerator->SetTrackingDeviceType(mitk::ClaronMicron),"loading MicronTracker Volume data:")
+    myTVGenerator->SetTrackingDeviceType(mitk::ClaronMicron);
+    MITK_TEST_CONDITION((myTVGenerator->GetTrackingDeviceType() == mitk::ClaronMicron),"loading MicronTracker Volume data:")
     }
 
     static void TestNDIAuroraTrackingVolume()
     {
     MITK_TEST_OUTPUT(<< "---- Testing NDI Aurora Tracking Volume ----")
     mitk::TrackingVolumeGenerator::Pointer myTVGenerator = mitk::TrackingVolumeGenerator::New ();
-    //MITK_TEST_CONDITION(myTVGenerator->SetTrackingDeviceType(mitk::NDIAurora),"loading Aurora Volume data:")
+    myTVGenerator->SetTrackingDeviceType(mitk::NDIAurora);
+    MITK_TEST_CONDITION((myTVGenerator->GetTrackingDeviceType() == mitk::NDIAurora),"loading Aurora Volume data:")
     }
 
     static void TestNDIPolarisTrackingVolume()
     {
     MITK_TEST_OUTPUT(<< "---- Testing NDI Polaris Tracking Volume ----")
     mitk::TrackingVolumeGenerator::Pointer myTVGenerator = mitk::TrackingVolumeGenerator::New ();
-    //MITK_TEST_CONDITION(myTVGenerator->SetTrackingDeviceType(mitk::NDIPolaris),"loading Polaris Volume data:")
+    myTVGenerator->SetTrackingDeviceType(mitk::NDIPolaris);
+    MITK_TEST_CONDITION((myTVGenerator->GetTrackingDeviceType() == mitk::NDIPolaris),"loading Polaris Volume data:")
     }
 
     static void TestIntuitiveDaVinciTrackingVolume()
     {
     MITK_TEST_OUTPUT(<< "---- Testing Intuitive Da Vinci Tracking Volume ----")
     mitk::TrackingVolumeGenerator::Pointer myTVGenerator = mitk::TrackingVolumeGenerator::New ();
-    //MITK_TEST_CONDITION(myTVGenerator->SetTrackingDeviceType(mitk::IntuitiveDaVinci),"loading Da Vinci Volume data:")
+    myTVGenerator->SetTrackingDeviceType(mitk::IntuitiveDaVinci);
+    MITK_TEST_CONDITION((myTVGenerator->GetTrackingDeviceType() == mitk::IntuitiveDaVinci),"loading Da Vinci Volume data:")
     }
 
     
@@ -74,24 +85,7 @@ class mitkTrackingVolumeTestClass
     MITK_TEST_CONDITION(myTrackingVolume->IsInside(p1)==false,"... successfull")
     }
     */
-   
 
-    static void TestManualVolume()
-    {
-    MITK_TEST_OUTPUT(<< "---- Testing Manual Volume definition ----")
-   // mitk::TrackingVolumeGenerator::Pointer myTVGenerator = mitk::TrackingVolumeGenerator::New();
-    try
-      {
-     // vtkPolyData* myPolyData = vtkPolyData::New();
-      //myTVGenerator->SetVolumeManually(myPolyData);
-     // myPolyData->Delete();
-      }
-    catch(...)
-      {
-      MITK_TEST_FAILED_MSG(<< "Failed loading manual volume!");
-      }
-    
-    }
 
   };
 
@@ -101,13 +95,13 @@ int mitkTrackingVolumeTest(int /* argc */, char* /*argv*/[])
   MITK_TEST_BEGIN("TrackingVolume")
 
   mitkTrackingVolumeTestClass::TestInstantiation();
+  mitkTrackingVolumeTestClass::TestTrackingSystemNotSpecified ();
   mitkTrackingVolumeTestClass::TestClaronTrackingVolume();
   mitkTrackingVolumeTestClass::TestNDIAuroraTrackingVolume();
   mitkTrackingVolumeTestClass::TestNDIPolarisTrackingVolume();
   mitkTrackingVolumeTestClass::TestIntuitiveDaVinciTrackingVolume();
   //mitkTrackingVolumeTestClass::TestIsInside(); Activate this code when method isInside() is implemented!
-  mitkTrackingVolumeTestClass::TestManualVolume();
-    
+
   MITK_TEST_END() 
 }
 

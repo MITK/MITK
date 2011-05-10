@@ -25,5 +25,5 @@ SET_PROPERTY(TEST mitkPicFileReaderTest_emptyGzipFile PROPERTY LABELS MITK-Core)
 ADD_TEST(mitkImageTest_brainImage ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${TESTDRIVER} mitkImageTest ${MITK_DATA_DIR}/brain.mhd)
 SET_PROPERTY(TEST mitkImageTest_brainImage PROPERTY LABELS MITK-Core)
 
-add_subdirectory(DICOMTesting)
+#add_subdirectory(DICOMTesting)
 

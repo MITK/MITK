@@ -6,6 +6,7 @@ SET(MODULE_TESTS
   mitkCoreExtObjectFactoryTest
   mitkDataNodeExtTest.cpp
   mitkExternalToolsTest.cpp
+  mitkImageStatisticsCalculatorTest.cpp
   mitkMeshTest.cpp
   mitkMultiStepperTest.cpp
   mitkOrganTypePropertyTest.cpp

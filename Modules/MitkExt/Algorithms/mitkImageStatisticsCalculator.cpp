@@ -767,7 +767,6 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
     offset[i] = (int) indexCoordDistance + image->GetBufferedRegion().GetIndex()[i];
   }
 
-
   // Adapt the origin and region (index/size) of the mask so that the origin of both are the same
   typename ChangeInformationFilterType::Pointer adaptMaskFilter;
   adaptMaskFilter = ChangeInformationFilterType::New();
@@ -947,10 +946,6 @@ void ImageStatisticsCalculator::InternalCalculateMaskFromPlanarFigure(
     // image
     planarFigureGeometry2D->Map( it->Point, point3D );
     
-    // Ensure correct pixel center
-    point3D[0] -= 0.5 / imageSpacing3D[0];
-    point3D[1] -= 0.5 / imageSpacing3D[1];
-
     // Polygons (partially) outside of the image bounds can not be processed
     // further due to a bug in vtkPolyDataToImageStencil
     if ( !imageGeometry3D->IsInside( point3D ) )

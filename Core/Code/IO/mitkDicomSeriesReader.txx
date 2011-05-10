@@ -51,7 +51,7 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
       std::list<StringContainer> imageBlocks = SortIntoBlocksFor3DplusT( filenames, sort, canLoadAs4D );
       unsigned int volume_count = imageBlocks.size();
 
-      if (!canLoadAs4D || !load4D)
+      if (volume_count == 1 || !canLoadAs4D || !load4D)
       {
         image = LoadDICOMByITK<PixelType>( imageBlocks.front() , command ); // load first 3D block
       }

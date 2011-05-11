@@ -125,6 +125,7 @@ From test set TinyCTAbdomen (see description.txt in this directory for details o
  - unsorted_gaps : as before, just file names are unsorted
  - single_negative_spacing : from reported bug related to single MR images with misleading spacing information
  - tilted_gantry : slice origins do not align along first slice normal (happens with tilted gantries)
+ - interleaved : two volumes of slices with origins along the same line. The volumes' slices interleave in their border region. This test is meant to correctly sort apart the two blocks instead of generating many two-slices groups in the interleaved region.
 
 
 \section DICOMTesting_othertests Specific other tests

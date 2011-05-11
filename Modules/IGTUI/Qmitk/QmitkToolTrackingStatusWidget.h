@@ -86,6 +86,9 @@ public:
   /** @brief Enables / disables if the tool positions are shown. Default is off.*/
   void SetShowPositions(bool enable);
 
+  /** @brief Enables / disables if the tool quaternions are shown. Default is off.*/
+  void SetShowQuaternions(bool enable);
+
   /** @brief Sets the text alignment of the tool labels. Default is center. Example: Use Qt::AlignLeft for left alignment. */
   void SetTextAlignment(Qt::AlignmentFlag alignment);
 
@@ -116,6 +119,8 @@ private:
   std::vector<mitk::NavigationData::Pointer>*  m_NavigationDatas; 
 
   bool m_ShowPositions;
+
+  bool m_ShowQuaternions;
 
   Qt::AlignmentFlag m_Alignment;
 

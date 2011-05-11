@@ -325,6 +325,8 @@ DicomSeriesReader::AnalyzeFileForITKImageSeriesReaderSpacingAssumption(
        fileIter != files.end();
        ++fileIter, ++fileIndex)
   {
+    bool fileFitsIntoPattern(false);
+
     // Read tag value into point3D. PLEASE replace this by appropriate GDCM code if you figure out how to do that
     std::string thisOriginString = tagValueMappings[fileIter->c_str()][tagImagePositionPatient];
     
@@ -346,6 +348,7 @@ DicomSeriesReader::AnalyzeFileForITKImageSeriesReaderSpacingAssumption(
     {
       MITK_DEBUG << "Sort away " << *fileIter << " for separate time step"; // we already have one occupying this position
       result.second.push_back( *fileIter );
+      fileFitsIntoPattern = false;
     }
     else
     {
@@ -405,10 +408,23 @@ DicomSeriesReader::AnalyzeFileForITKImageSeriesReaderSpacingAssumption(
           MITK_WARN << "Series seems to contain a tilted geometry. Will load series as many single slices.";
           MITK_WARN << "Distance of expected slice origin from actual slice origin: " << distance;
 
+          /* Pessimistic approach: split block right here
+
           result.first.assign( files.begin(), fileIter );
           result.second.insert( result.second.end(), fileIter, files.end() );
 
           return result; // stop processing with first split
+          */
+
+          /* optimistic approach: save file for later, check all further files */
+          
+          result.second.push_back(*fileIter);
+          fileFitsIntoPattern = false;
+        }
+        else
+        {
+          result.first.push_back(*fileIter); // this file is good for current block
+          fileFitsIntoPattern = true;
         }
       }
       else if (fromFirstToSecondOriginInitialized) // we already know the offset between slices
@@ -435,18 +451,34 @@ DicomSeriesReader::AnalyzeFileForITKImageSeriesReaderSpacingAssumption(
           // We split the input file list at this point, i.e. all files up to this one (excluding it)
           // are returned as group 1, the remaining files (including the faulty one) are group 2
           
+          /*
+             Pessimistic approach: split right here:
+
           result.first.assign( files.begin(), fileIter );
           result.second.insert( result.second.end(), fileIter, files.end() );
 
           return result; // stop processing with first split
+          */
+
+          /* Optimistic approach: check if any of the remaining slices fits in */
+          result.second.push_back( *fileIter ); // sort away for further analysis
+          fileFitsIntoPattern = false;
+        }
+        else
+        {
+          result.first.push_back(*fileIter); // this file is good for current block
+          fileFitsIntoPattern = true;
         }
       }
-
-      result.first.push_back(*fileIter);
+      else // this should be the very first slice
+      {
+        result.first.push_back(*fileIter); // this file is good for current block
+        fileFitsIntoPattern = true;
+      }
     }
 
     // recored current origin for reference in later iterations
-    if ( !lastOriginInitialized || thisOrigin != lastOrigin )
+    if ( !lastOriginInitialized || fileFitsIntoPattern && (thisOrigin != lastOrigin) )
     {
       lastDifferentOrigin = thisOrigin;
     }

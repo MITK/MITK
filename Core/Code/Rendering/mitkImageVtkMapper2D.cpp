@@ -65,7 +65,7 @@ mitk::ImageVtkMapper2D::~ImageVtkMapper2D()
   this->InvokeEvent( itk::DeleteEvent() ); //TODO <- what is this doing exactly?
 }
 
-void mitk::ImageVtkMapper2D::AdjustCamera(mitk::BaseRenderer* renderer, mitk::ScalarType heightInMM)
+void mitk::ImageVtkMapper2D::AdjustCamera(mitk::BaseRenderer* renderer, mitk::ScalarType spacing[2])
 {
   LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
 
@@ -74,11 +74,26 @@ void mitk::ImageVtkMapper2D::AdjustCamera(mitk::BaseRenderer* renderer, mitk::Sc
 
   const mitk::DisplayGeometry* displayGeometry = renderer->GetDisplayGeometry();
 
+  double imageHeightInMM = localStorage->m_ReslicedImage->GetDimensions()[1] * spacing[1];
+  double displayHeightInMM = displayGeometry->GetSizeInMM()[1];
+  double factor = displayHeightInMM/imageHeightInMM;
+
+  MITK_INFO << "imageHeightInMM " << imageHeightInMM;
+  MITK_INFO << "displayHeightInMM " << displayHeightInMM;
+  MITK_INFO << "factor " << factor;
+  MITK_INFO << "1/factor " << 1/factor;
+
   Vector2D displayGeometryOriginInMM = displayGeometry->GetOriginInMM();  //top left of the render window
   Vector2D displayGeometryCenterInMM = displayGeometryOriginInMM + displayGeometry->GetSizeInMM()/2; //center of the render window
 
   //scale the rendered object. TODO How to achieve the correct scale?
-  renderer->GetVtkRenderer()->GetActiveCamera()->SetParallelScale(displayGeometry->GetSizeInMM()[1] / 2.1);
+  renderer->GetVtkRenderer()->GetActiveCamera()->SetParallelScale(imageHeightInMM);
+  renderer->GetVtkRenderer()->GetActiveCamera()->Zoom(1/displayGeometry->GetScaleFactorMMPerDisplayUnit());
+
+//  renderer->GetVtkRenderer()->GetActiveCamera()->GetParallelScale()*(1/factor)
+
+//    MITK_INFO << "SCALE " << renderer->GetVtkRenderer()->GetActiveCamera()->GetParallelScale();
+    MITK_INFO << "#### Ende ####";
 
   //the center of the view-plane
   double viewPlaneCenter[3];
@@ -86,7 +101,7 @@ void mitk::ImageVtkMapper2D::AdjustCamera(mitk::BaseRenderer* renderer, mitk::Sc
   viewPlaneCenter[1] = displayGeometryCenterInMM[1];
   viewPlaneCenter[2] = 0.0; //the view-plane is located in the XY-plane with Z=0.0
 
-  //define which direction is "up" for the camera (like default for vtk (0.0, 1.0, 0.0)
+  //define which direction is "up" for the ciamera (like default for vtk (0.0, 1.0, 0.0)
   double cameraUp[3];
   cameraUp[0] = 0.0;
   cameraUp[1] = 1.0;
@@ -122,6 +137,10 @@ void mitk::ImageVtkMapper2D::AdjustCamera(mitk::BaseRenderer* renderer, mitk::Sc
 void mitk::ImageVtkMapper2D::AdjustToDisplayGeometry(mitk::BaseRenderer* renderer, mitk::ScalarType spacing[2])
 {
   LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
+
+  MITK_INFO << "#### Anfang ####";
+  MITK_INFO << "Spacing[0] " << spacing[0];
+  MITK_INFO << "Spacing[1] " << spacing[1];
 
   //These two points define the axes of the plane in combination with the origin (0/0/0).
   //Point 1 is the x-axis and point 2 the y-axis.
@@ -637,7 +656,7 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
   localStorage->m_Mapper->SetInputConnection(localStorage->m_TransformFilter->GetOutputPort());
 
   //set up the camera to view the transformed plane
-  this->AdjustCamera( renderer, heightInMM );
+  this->AdjustCamera( renderer, mmPerPixel );
 
   // We have been modified
   rendererInfo.m_LastUpdateTime.Modified();

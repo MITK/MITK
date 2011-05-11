@@ -295,7 +295,7 @@ static mitk::Image::Pointer GetTestImage()
 {
   mitk::StandardFileLocations::Pointer locator = mitk::StandardFileLocations::GetInstance();
 
-  const std::string filename = locator->FindFile("testimage.dcm", "Modules\\MitkExt\\Testing\\Data");
+  const std::string filename = locator->FindFile("testimage.dcm", "Modules/MitkExt/Testing/Data");
   if (filename.empty())
   {
     MITK_ERROR << "Could not find test file";

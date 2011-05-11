@@ -22,6 +22,14 @@ PURPOSE.  See the above copyright notices for more information.
 #include <iostream>
 #include <fstream>
 
+std::string AppendExtension(const std::string &filename, const char *extension)
+{
+  std::string new_filename = filename;
+
+  new_filename += extension;
+  return new_filename;
+}
+
 /**
 *  test for "ImageWriter".
 *  
@@ -78,11 +86,17 @@ int mitkImageWriterTest(int  argc , char* argv[])
 
   MITK_TEST_CONDITION_REQUIRED(image.IsNotNull(),"loaded image not NULL")
 
+  std::stringstream filename_stream;
+
+  filename_stream << "test" << getpid();
+
+  std::string filename = filename_stream.str();
+
   // test set/get methods
   myImageWriter->SetInput(image);
   MITK_TEST_CONDITION_REQUIRED(myImageWriter->GetInput()==image,"test Set/GetInput()");
-  myImageWriter->SetFileName("test");
-  MITK_TEST_CONDITION_REQUIRED(!strcmp(myImageWriter->GetFileName(),"test"),"test Set/GetFileName()");
+  myImageWriter->SetFileName(filename);
+  MITK_TEST_CONDITION_REQUIRED(!strcmp(myImageWriter->GetFileName(),filename.c_str()),"test Set/GetFileName()");
   myImageWriter->SetExtension(".pic");
   MITK_TEST_CONDITION_REQUIRED(!strcmp(myImageWriter->GetExtension(),".pic"),"test Set/GetExtension()");
   myImageWriter->SetFilePrefix("pref");
@@ -98,14 +112,14 @@ int mitkImageWriterTest(int  argc , char* argv[])
       myImageWriter->SetExtension(".mhd");
       myImageWriter->Update();
       std::fstream fin, fin2;
-      fin.open("test.mhd",std::ios::in);
-      fin2.open("test.raw",std::ios::in);
+      fin.open(AppendExtension(filename, ".mhd").c_str(),std::ios::in);
+      fin2.open(AppendExtension(filename, ".raw").c_str(),std::ios::in);
       MITK_TEST_CONDITION_REQUIRED(fin.is_open(),"Write .mhd file");
       MITK_TEST_CONDITION_REQUIRED(fin2.is_open(),"Write .raw file");
       fin.close();
       fin2.close();
-      remove("test.mhd");
-      remove("test.raw");
+      remove(AppendExtension(filename, ".mhd").c_str());
+      remove(AppendExtension(filename, ".raw").c_str());
     }
     catch (...)
     {
@@ -119,10 +133,10 @@ int mitkImageWriterTest(int  argc , char* argv[])
     myImageWriter->SetExtension(".pic");
     myImageWriter->Update();
     std::fstream fin;
-    fin.open("test.pic",std::ios::in);
+    fin.open(AppendExtension(filename, ".pic").c_str(),std::ios::in);
     MITK_TEST_CONDITION_REQUIRED(fin.is_open(),"Write .pic file");
     fin.close();
-    remove("test.pic");
+    remove(AppendExtension(filename, ".pic").c_str());
   }
   catch (...)
   {
@@ -135,10 +149,10 @@ int mitkImageWriterTest(int  argc , char* argv[])
     myImageWriter->SetExtension(".nrrd");
     myImageWriter->Update();
     std::fstream fin;
-    fin.open("test.nrrd",std::ios::in);
+    fin.open(AppendExtension(filename, ".nrrd").c_str(),std::ios::in);
     MITK_TEST_CONDITION_REQUIRED(fin.is_open(),"Write .nrrd file");
     fin.close();
-    remove("test.nrrd");
+    remove(AppendExtension(filename, ".nrrd").c_str());
   }
   catch(...)
   {

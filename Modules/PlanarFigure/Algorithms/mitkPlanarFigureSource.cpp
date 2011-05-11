@@ -45,7 +45,6 @@ mitk::PlanarFigureSource::DataObjectPointer mitk::PlanarFigureSource::MakeOutput
 
 void mitk::PlanarFigureSource::SetOutput( OutputType* output )
 {
-    itkWarningMacro( << "SetOutput(): This method is slated to be removed from ITK.  Please use GraftOutput() in possible combination with DisconnectPipeline() instead." );
     this->SetNthOutput( 0, output );
 }
 

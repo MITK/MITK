@@ -350,8 +350,8 @@ endif()
 # Set C/CXX Flags for MITK code
 #-----------------------------------------------------------------------------
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${MITK_CXX_FLAGS}" CACHE STRING "CMake CXX Flags" FORCE)
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${MITK_C_FLAGS}" CACHE STRING "CMake C Flags" FORCE)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${MITK_CXX_FLAGS}")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${MITK_C_FLAGS}")
 
 if(MITK_USE_QT)
   add_definitions(-DQWT_DLL)

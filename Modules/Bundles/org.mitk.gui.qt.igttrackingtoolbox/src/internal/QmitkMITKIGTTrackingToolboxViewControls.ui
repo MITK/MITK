@@ -263,6 +263,13 @@ p, li { white-space: pre-wrap; }
         </layout>
        </item>
        <item>
+        <widget class="QCheckBox" name="m_ShowToolQuaternions">
+         <property name="text">
+          <string>Show Tool Quaternions</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <spacer name="verticalSpacer_3">
          <property name="orientation">
           <enum>Qt::Vertical</enum>

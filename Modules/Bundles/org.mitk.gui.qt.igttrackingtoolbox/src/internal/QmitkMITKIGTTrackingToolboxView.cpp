@@ -170,6 +170,8 @@ for(int i=0; i<m_TrackingDeviceSource->GetNumberOfOutputs(); i++)
     m_Controls->m_TrackingToolsStatusWidget->AddNavigationData(m_TrackingDeviceSource->GetOutput(i));
   }
 m_Controls->m_TrackingToolsStatusWidget->ShowStatusLabels();
+if (m_Controls->m_ShowToolQuaternions->isChecked()) {m_Controls->m_TrackingToolsStatusWidget->SetShowQuaternions(true);}
+else {m_Controls->m_TrackingToolsStatusWidget->SetShowQuaternions(false);}
 
 //disable loading new tools
 this->m_Controls->m_LoadTools->setEnabled(false);

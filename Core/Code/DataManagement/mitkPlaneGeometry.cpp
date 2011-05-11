@@ -18,6 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkPlaneGeometry.h"
 #include "mitkPlaneOperation.h"
+#include "mitkAxisRotationOperation.h"
 #include "mitkInteractionConst.h"
 #include "mitkLine.h"
 
@@ -722,8 +723,27 @@ PlaneGeometry::ExecuteOperation( Operation *operation )
       transform->Translate( -center[0], -center[1], -center[2] );
       break;
     }
+  case OpROTATEAXIS:
+    {
+    AxisRotationOperation *op = dynamic_cast< mitk::AxisRotationOperation* >(operation);
+    if(op == NULL)
+    {
+      return;
+    }
 
+    const mitk::ScalarType width = op->GetWidth();
+    InitializeStandardPlane( width ,op->GetHeight(), op->GetXAxis().Get_vnl_vector(), op->GetYAxis().Get_vnl_vector(), &op->GetSpacing());
+    itk::Vector<double, 3> offset;
+    offset[0] = op->GetPoint()[0];
+    offset[1] = op->GetPoint()[1];
+    offset[2] = op->GetPoint()[2];
+    m_IndexToWorldTransform->SetOffset(offset);
+    TransferItkToVtkTransform();
+    this->Modified();
+    transform->Delete();
+    return;
 
+    }
   default:
     Superclass::ExecuteOperation( operation );
     transform->Delete();

@@ -400,6 +400,9 @@ class MITK_CORE_EXPORT SliceNavigationController : public BaseController
     void ReorientSlices( 
       const mitk::Point3D &point, const mitk::Vector3D &normal );
 
+    void ReorientSlicesByAxis( 
+      const Point3D center, const Vector3D xaxis, const Vector3D yaxis, const float width, const float height, const Vector3D spacing);
+
 
     virtual bool ExecuteAction( 
       Action* action, mitk::StateEvent const* stateEvent);

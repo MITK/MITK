@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkPlaneGeometry.h"
 #include "mitkRotationOperation.h"
 #include "mitkPlaneOperation.h"
+#include "mitkAxisRotationOperation.h"
 #include "mitkInteractionConst.h"
 #include "mitkSliceNavigationController.h"
 
@@ -835,6 +836,56 @@ mitk::SlicedGeometry3D::ExecuteOperation(Operation* operation)
       }
     }
     break;
+
+  case OpROTATEAXIS:
+    if ( m_EvenlySpaced )
+    {
+      // Save first slice
+      Geometry2D::Pointer geometry2D = m_Geometry2Ds[0];
+
+      PlaneGeometry *planeGeometry = dynamic_cast< PlaneGeometry * >( 
+        geometry2D.GetPointer() );
+
+      //PlaneOperation *planeOp = dynamic_cast< PlaneOperation * >( operation );
+      AxisRotationOperation *axisRotationOp = dynamic_cast< AxisRotationOperation* >( operation );
+
+      // Need a PlaneGeometry, a PlaneOperation and a reference frame to
+      // carry out the re-orientation
+      if ( m_ReferenceGeometry && planeGeometry && axisRotationOp )
+      {
+        // Clear all generated geometries and then rotate only the first slice.
+        // The other slices will be re-generated on demand
+        Point3D center = m_ReferenceGeometry->GetCenter();
+
+        // Rotate first slice
+        geometry2D->ExecuteOperation( axisRotationOp );
+
+        // Clear the slice stack and adjust it according to the center of
+        // rotation and plane position (see documentation of ReinitializePlanes)
+        this->ReinitializePlanes( center, axisRotationOp->GetPoint() );
+        this->SetOrigin(axisRotationOp->GetPoint());
+
+        if ( m_SliceNavigationController )
+        {
+          m_SliceNavigationController->SelectSliceByPoint( axisRotationOp->GetPoint() );
+          m_SliceNavigationController->AdjustSliceStepperRange();
+        }
+
+        Geometry3D::ExecuteOperation( axisRotationOp );
+      }
+    }
+    else
+    {
+      // Reach through to all slices
+      for (std::vector<Geometry2D::Pointer>::iterator iter = m_Geometry2Ds.begin();
+          iter != m_Geometry2Ds.end();
+          ++iter)
+      {
+        (*iter)->ExecuteOperation(operation);
+      }
+    }
+    break;
+
   }
 
   this->Modified();

@@ -602,67 +602,19 @@ void QmitkSegmentationView::OnContourMarkerSelected(const mitk::DataNode *node)
     // make node visible
     if (selectedRenderWindow)
     {
-      mitk::Point3D centerP = markerGeometry->GetOrigin();
+      mitk::Point3D origin = markerGeometry->GetOrigin();
+      float width = markerGeometry->GetExtent(0);
+      float height = markerGeometry->GetExtent(1);
+      float xMM = markerGeometry->GetExtentInMM(0);
+      float yMM = markerGeometry->GetExtentInMM(1);
+      mitk::Vector3D xaxis = markerGeometry->GetAxisVector(0);
+      mitk::Vector3D yaxis = markerGeometry->GetAxisVector(1);
+      mitk::Vector3D spacing = markerGeometry->GetSpacing();
        /*selectedRenderWindow->GetSliceNavigationController()->SelectSliceByPoint(
           centerP);*/
       mitk::Vector3D normal = markerGeometry->GetNormal();
-      selectedRenderWindow->GetSliceNavigationController()->ReorientSlices(
-          centerP, normal);
-
-      /*selectedRenderWindow->GetSliceNavigationController()->SetInputWorldGeometry(node->GetData()->GetGeometry());
-      selectedRenderWindow->GetSliceNavigationController()->Update();*/
-
-      //selectedRenderWindow->GetRenderer()->GetMapperID()
-
- //     mitk::SliceNavigationController::Pointer sliceNavigator = selectedRenderWindow->GetRenderer()->GetSliceNavigationController();
-
- //     mitk::SlicedGeometry3D::Pointer slicedGeo = dynamic_cast<mitk::SlicedGeometry3D*>
- //       (sliceNavigator->GetCreatedWorldGeometry()->GetGeometry3D(selectedRenderWindow->GetRenderer()->GetTimeStep()));
-
- //     unsigned int numberOfSlices = slicedGeo->GetSlices();
-      
- //     mitk::AffineTransform3D* transform = markerGeometry->GetIndexToWorldTransform();
-      //
-      //mitk::Geometry2D* bulbb = const_cast<mitk::Geometry2D*>(selectedRenderWindow->GetRenderer()->GetCurrentWorldGeometry2D());
-
-      //unsigned int tempPos = sliceNavigator->GetSlice()->GetPos();
-
-      ////sliceNavigator->GetSlice()->First();
-    // for (unsigned int i = 0; i < numberOfSlices; i++)
-    //  {
-        /*sliceNavigator->Update();
-        selectedRenderWindow->GetRenderer()->SetSlice(sliceNavigator->GetSlice()->GetPos());
-        mitk::Geometry2D* bulbb = const_cast<mitk::Geometry2D*>(selectedRenderWindow->GetRenderer()->GetCurrentWorldGeometry2D());
-        bulbb->SetIndexToWorldTransform(transform);
-
-        bulbb->TransferItkToVtkTransform();
-
-        bulbb->Modified();
-        sliceNavigator->GetSlice()->Next();*/
-
-  //      slicedGeo->GetGeometry2D(i)->SetIndexToWorldTransform(transform);
-  //      slicedGeo->GetGeometry2D(i)->TransferItkToVtkTransform();
-        //slicedGeo->RE
-        //slicedGeo->Modified();
-        
-   //   }
-   //   slicedGeo->Modified();
-      /*mitk::Point3D centerP = markerGeometry->GetOrigin();
-      selectedRenderWindow->GetSliceNavigationController()->SelectSliceByPoint(
-         centerP);
-      selectedRenderWindow->GetRenderer()->SetSlice(tempPos);*/
-     
-      //mitk::RenderingManager::GetInstance()->RequestUpdateAll();*/
-      //this->GetActiveStdMultiWidget()->RequestUpdate();
-      //mitk::GlobalInteraction::GetInstance()->GetR
-
-   //   sliceNavigator->AdjustSliceStepperRange();
-   //   sliceNavigator->Modified();
-  //    selectedRenderWindow->GetRenderer()->Modified();
-
-      //TEST
-      //mitk::RotationOperation
-           
+      selectedRenderWindow->GetSliceNavigationController()->ReorientSlicesByAxis(
+          origin, xaxis, yaxis, width, height, spacing);           
     }
 }
 

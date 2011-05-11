@@ -16,11 +16,11 @@ Care has to be taken regarding the involved coordinate systems, see \ref ItkToMi
 
 For limitations on ITK-type conversion see the section \ref Limitations.
 
-VTK-based access to MITK images is straightforward: simply ask your mitk::Image vor a \a vtkImageData by calling Image:GetVtkImageData.
+VTK-based access to MITK images is straightforward: simply ask your mitk::Image for a \a vtkImageData by calling Image:GetVtkImageData.
 Similarily, to get a \a vtkPolyData from the MITK class for storing surfaces, mitk::Surface,  call Surface::GetVtkPolyData.
 
 \section MitkToItk MITK to ITK adaptors
-Pixel type and dimension of MITK images can be specified at run time whereas whereas ITK images are templated over the pixel type and the dimension, thus in ITK both need to be specified at compile time.
+Pixel type and dimension of MITK images can be specified at run time whereas ITK images are templated over the pixel type and the dimension, thus in ITK both need to be specified at compile time.
 
 There two different situations, which are covered in the following sub-sections:
 \li Either you know the pixel type/dimension the ITK image should have at compile time for some reason (e.g., you always create MITK images of a specific pixel type/dimension)
@@ -64,6 +64,16 @@ An example is again given in \ref Step6Page.
 Another workaround is to reduce the created code by fixing either the type (AccessFixedTypeByItk) or dimension (AccessFixedDimensionByItk).
 
 There are variants for additional parameters for AccessByItk... and InstantiateAccessFunction..., e.g., AccessFixedTypeByItk_2 allows to pass two additional parameters to the access-function.
+
+
+\link mitkImage.h \endlink
+
+\link mitkImageCast.h \endlink
+
+\link mitkImageToItk.h \endlink
+
+\link mitkITKImageImport.h \endlink
+
 
 \section ItkToMitk ITK to MITK adaptors
 Converting ITK images to MITK is easier than the other way round. Basically, you have three options:

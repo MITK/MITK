@@ -156,10 +156,12 @@ namespace mitk
 
  To achieve such grouping, the inter-slice distance is calculated from the first two different slice positions of a block. 
  Following slices are added to a block as long as they can be added by adding the calculated inter-slice distance to the
- last slice of the block. If an unexpected gap is detected, the block is split up.
+ last slice of the block. Slices that do not fit into the expected distance pattern, are set aside for further analysis.
+ This grouping is done until each file has been assigned to a group.
 
- Slices that share a position in space are also separated during this step. So the result of this step is a set
- of blocks that contain only slices with equal z spacing and uniqe slices at each position.
+ Slices that share a position in space are also sorted into separate blocks during this step. 
+ So the result of this step is a set of blocks that contain only slices with equal z spacing 
+ and uniqe slices at each position.
 
  \subsection DicomSeriesReader_sorting4 Step 4 (optional): group 3D blocks as 3D+t when possible
 

@@ -193,6 +193,111 @@ int mitkNavigationDataObjectVisualizationFilterTest(int /* argc */, char* /*argv
   mitk::Surface::Pointer anotherSurface = mitk::Surface::New();
   myFilter->SetRepresentationObject(0, anotherSurface);
   MITK_TEST_CONDITION(myFilter->GetRepresentationObject(0) == anotherSurface, "Overwriting BaseData index 0");
+  
+  // test Set/GetTransformPosition()
+  myFilter->SetTransformPosition(0,true);
+  MITK_TEST_CONDITION(myFilter->GetTransformPosition(0)==true,"test Set/GetTransformPosition(0,true)");
+  myFilter->SetTransformPosition(1,true);
+  MITK_TEST_CONDITION(myFilter->GetTransformPosition(1)==true,"test Set/GetTransformPosition(1,true)");
+  myFilter->SetTransformPosition(2,true);
+  MITK_TEST_CONDITION(myFilter->GetTransformPosition(2)==true,"test Set/GetTransformPosition(2,true)");
+  myFilter->SetTransformPosition(3,true);
+  MITK_TEST_CONDITION(myFilter->GetTransformPosition(3)==true,"test Set/GetTransformPosition(3,true)");
+
+  myFilter->SetTransformPosition(0,false);
+  MITK_TEST_CONDITION(myFilter->GetTransformPosition(0)==false,"test Set/GetTransformPosition(0,false)");
+  myFilter->SetTransformPosition(1,false);
+  MITK_TEST_CONDITION(myFilter->GetTransformPosition(1)==false,"test Set/GetTransformPosition(1,false)");
+  myFilter->SetTransformPosition(2,false);
+  MITK_TEST_CONDITION(myFilter->GetTransformPosition(2)==false,"test Set/GetTransformPosition(2,false)");
+  myFilter->SetTransformPosition(3,false);
+  MITK_TEST_CONDITION(myFilter->GetTransformPosition(3)==false,"test Set/GetTransformPosition(3,false)");
+
+  // test Set/GetTransformOrientation()
+  myFilter->SetTransformOrientation(0,true);
+  MITK_TEST_CONDITION(myFilter->GetTransformOrientation(0)==true,"test Set/GetTransformOrientation(0,true)");
+  myFilter->SetTransformOrientation(1,true);
+  MITK_TEST_CONDITION(myFilter->GetTransformOrientation(1)==true,"test Set/GetTransformOrientation(1,true)");
+  myFilter->SetTransformOrientation(2,true);
+  MITK_TEST_CONDITION(myFilter->GetTransformOrientation(2)==true,"test Set/GetTransformOrientation(2,true)");
+  myFilter->SetTransformOrientation(3,true);
+  MITK_TEST_CONDITION(myFilter->GetTransformOrientation(3)==true,"test Set/GetTransformOrientation(3,true)");
+
+  myFilter->SetTransformOrientation(0,false);
+  MITK_TEST_CONDITION(myFilter->GetTransformOrientation(0)==false,"test Set/GetTransformOrientation(0,false)");
+  myFilter->SetTransformOrientation(1,false);
+  MITK_TEST_CONDITION(myFilter->GetTransformOrientation(1)==false,"test Set/GetTransformOrientation(1,false)");
+  myFilter->SetTransformOrientation(2,false);
+  MITK_TEST_CONDITION(myFilter->GetTransformOrientation(2)==false,"test Set/GetTransformOrientation(2,false)");
+  myFilter->SetTransformOrientation(3,false);
+  MITK_TEST_CONDITION(myFilter->GetTransformOrientation(3)==false,"test Set/GetTransformOrientation(3,false)");
+
+  // test the convenience methods to set/getTransformOrientation/Position
+  myFilter->TransformOrientationOn(0);
+  MITK_TEST_CONDITION(myFilter->GetTransformOrientation(0)==true,"test TransformOrientationOn()");
+  myFilter->TransformOrientationOff(0);
+  MITK_TEST_CONDITION(myFilter->GetTransformOrientation(0)==false,"test TransformOrientationOff()");
+  myFilter->TransformOrientationOff(1);
+  MITK_TEST_CONDITION(myFilter->GetTransformOrientation(1)==false,"test TransformOrientationOff()");
+  myFilter->TransformOrientationOn(1);
+  MITK_TEST_CONDITION(myFilter->GetTransformOrientation(1)==true,"test TransformOrientationOn()");
+  myFilter->TransformOrientationOn(2);
+  MITK_TEST_CONDITION(myFilter->GetTransformOrientation(2)==true,"test TransformOrientationOn()");
+  myFilter->TransformOrientationOff(2);
+  MITK_TEST_CONDITION(myFilter->GetTransformOrientation(2)==false,"test TransformOrientationOff()");
+  myFilter->TransformOrientationOn(3);
+  MITK_TEST_CONDITION(myFilter->GetTransformOrientation(3)==true,"test TransformOrientationOn()");
+  myFilter->TransformOrientationOff(3);
+  MITK_TEST_CONDITION(myFilter->GetTransformOrientation(3)==false,"test TransformOrientationOff()");
+
+  myFilter->TransformPositionOn(0);
+  MITK_TEST_CONDITION(myFilter->GetTransformPosition(0)==true,"test TransformPositionOn()");
+  myFilter->TransformPositionOff(0);
+  MITK_TEST_CONDITION(myFilter->GetTransformPosition(0)==false,"test TransformPositionOff()");
+  myFilter->TransformPositionOff(1);
+  MITK_TEST_CONDITION(myFilter->GetTransformPosition(1)==false,"test TransformPositionOff()");
+  myFilter->TransformPositionOn(1);
+  MITK_TEST_CONDITION(myFilter->GetTransformPosition(1)==true,"test TransformPositionOn()");
+  myFilter->TransformPositionOn(2);
+  MITK_TEST_CONDITION(myFilter->GetTransformPosition(2)==true,"test TransformPositionOn()");
+  myFilter->TransformPositionOff(2);
+  MITK_TEST_CONDITION(myFilter->GetTransformPosition(2)==false,"test TransformPositionOff()");
+  myFilter->TransformPositionOn(3);
+  MITK_TEST_CONDITION(myFilter->GetTransformPosition(3)==true,"test TransformPositionOn()");
+  myFilter->TransformPositionOff(3);
+  MITK_TEST_CONDITION(myFilter->GetTransformPosition(3)==false,"test TransformPositionOff()");
+  // update position and orientation
+  mitk::NavigationData::PositionType updatedPos1, updatedPos2, zero;
+  mitk::FillVector3D(updatedPos1, 3.2, 1.5, 2.8);
+  mitk::FillVector3D(updatedPos2, 4.3, 5.2, 6.0);
+  mitk::FillVector3D(zero, 0.0, 0.0, 0.0);
+  mitk::NavigationData::OrientationType updatedOri1(0.7, 0.5, 0.1, 0.4);
+  mitk::NavigationData::OrientationType updatedOri2(0.2, 0.7, 0.6, 0.1);
+  nd1->SetPosition(updatedPos1);
+  nd1->SetOrientation(updatedOri1);
+  nd2->SetPosition(updatedPos2);
+  nd2->SetOrientation(updatedOri2);
+  myFilter->SetRepresentationObject(0,mitkToolData1);
+  myFilter->SetRepresentationObject(1,mitkToolData2);
+  myFilter->TransformPositionOn(0);
+  myFilter->TransformOrientationOff(0);
+  myFilter->TransformPositionOff(1);
+  myFilter->TransformOrientationOn(1);
+  myFilter->Update();
+
+  // test positions and orientations
+  mitk::AffineTransform3D::Pointer updatedAffineTransform1 = mitkToolData1->GetGeometry()->GetIndexToWorldTransform();
+  mitk::AffineTransform3D::OutputVectorType updatedOffset1 = updatedAffineTransform1->GetOffset();
+  MITK_TEST_CONDITION(mitk::Equal(updatedOffset1.Get_vnl_vector(),updatedPos1.Get_vnl_vector()), "Testing updated position 1");  
+  mitk::AffineTransform3D::Pointer updatedAffineTransform2 = mitkToolData2->GetGeometry()->GetIndexToWorldTransform();
+  mitk::AffineTransform3D::OutputVectorType updatedOffset2 = updatedAffineTransform2->GetOffset();
+  MITK_TEST_CONDITION(mitk::Equal(updatedOffset2.Get_vnl_vector(),zero.Get_vnl_vector()), "Testing updated position 2");
+
+  //mitk::AffineTransform3D::Pointer identityTransform = mitk::AffineTransform3D::New();
+  //identityTransform->SetIdentity();
+  //mitk::AffineTransform3D::MatrixType::InternalMatrixType identityMatrix = identityTransform->GetMatrix().GetVnlMatrix();
+  //mitk::AffineTransform3D::MatrixType::InternalMatrixType uM1 = updatedAffineTransform1->GetMatrix().GetVnlMatrix();
+  //MITK_TEST_CONDITION(mitk::Equal(uM1,identityMatrix), "Testing updated orientation 1");  
 
   // always end with this!
   MITK_TEST_END();

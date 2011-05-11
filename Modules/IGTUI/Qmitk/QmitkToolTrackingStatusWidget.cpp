@@ -26,6 +26,7 @@ QmitkToolTrackingStatusWidget::QmitkToolTrackingStatusWidget(QWidget* parent)
 {
   this->CreateQtPartControl( this );
   m_ShowPositions = false;
+  m_ShowQuaternions = false;
   m_Alignment = Qt::AlignHCenter;
   m_Style = QmitkToolTrackingStatusWidget::VerticalUpperStyle;
 }
@@ -39,6 +40,11 @@ void QmitkToolTrackingStatusWidget::SetStyle(QmitkToolTrackingStatusWidget::Styl
 void QmitkToolTrackingStatusWidget::SetShowPositions(bool enable)
 {
   m_ShowPositions = enable;
+}
+
+void QmitkToolTrackingStatusWidget::SetShowQuaternions(bool enable)
+{
+  m_ShowQuaternions = enable;
 }
 
 void QmitkToolTrackingStatusWidget::SetTextAlignment(Qt::AlignmentFlag alignment)
@@ -99,21 +105,27 @@ void QmitkToolTrackingStatusWidget::Refresh()
     navData = m_NavigationDatas->at(i).GetPointer();
     QString name(navData->GetName());
     QString pos = "";
+    QString quat = "";
     if (m_ShowPositions)
       {
       mitk::Point3D position = navData->GetPosition();
       pos = " [" + QString::number(position[0]) + ";" + QString::number(position[1]) + ";" + QString::number(position[2]) + "]";
       }
+    if (m_ShowQuaternions)
+      {
+      mitk::Quaternion quaternion = navData->GetOrientation();
+      quat = " / [qx:" + QString::number(quaternion.x()) + ";qy:" + QString::number(quaternion.y()) + ";qz:" + QString::number(quaternion.z()) + ";qr:" + QString::number(quaternion.r()) + "]";
+      }
 
     if(name.compare(m_StatusLabels->at(i)->objectName()) == 0)
-    {
-      m_StatusLabels->at(i)->setText(name+pos);
+      {
+      m_StatusLabels->at(i)->setText(name+pos+quat);
       if(navData->IsDataValid())
         m_StatusLabels->at(i)->setStyleSheet("QLabel{background-color: #8bff8b }");
       
       else
         m_StatusLabels->at(i)->setStyleSheet("QLabel{background-color: #ff7878 }");
-    }
+      }
   }
 }
 

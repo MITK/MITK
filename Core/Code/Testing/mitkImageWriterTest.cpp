@@ -18,9 +18,12 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkImageWriter.h"
 #include "mitkDataNodeFactory.h"
 #include "mitkTestingMacros.h"
-
 #include <iostream>
 #include <fstream>
+
+#ifdef WIN32
+#include "process.h"
+#endif
 
 std::string AppendExtension(const std::string &filename, const char *extension)
 {
@@ -88,7 +91,12 @@ int mitkImageWriterTest(int  argc , char* argv[])
 
   std::stringstream filename_stream;
 
+#ifdef WIN32
+  filename_stream << "test" << _getpid();
+#else
   filename_stream << "test" << getpid();
+#endif
+  
 
   std::string filename = filename_stream.str();
 

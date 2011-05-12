@@ -12,7 +12,7 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkImageStencilRaster.h"
+#include "mitkvtkImageStencilRaster.h"
 
 #include "vtkImageStencilSource.h"
 #include "vtkInformation.h"

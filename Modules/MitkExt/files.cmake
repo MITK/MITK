@@ -51,8 +51,6 @@ SET(CPP_FILES
   Algorithms/mitkSurfaceToImageFilter.cpp
   Algorithms/mitkUnstructuredGridHistogram.cpp
   Algorithms/mitkUnstructuredGridSource.cpp
-  Algorithms/vtkImageStencilRaster.cxx
-  Algorithms/vtkLassoStencilSource.cxx
   Algorithms/mitkVolumeVisualizationImagePreprocessor.cpp
   Controllers/mitkMovieGenerator.cpp
   Controllers/mitkMultiStepper.cpp
@@ -195,4 +193,14 @@ IF(WIN32 AND NOT MINGW)
     ${CPP_FILES}
   )
 ENDIF(WIN32 AND NOT MINGW)
+
+IF ( ${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION} VERSION_LESS 5.8 )
+  MESSAGE(STATUS "Using VTK 5.8 classes from MITK respository")
+  SET(CPP_FILES ${CPP_FILES}
+    Algorithms/vtkImageStencilRaster.cxx
+    Algorithms/vtkLassoStencilSource.cxx
+    )
+ENDIF ( ${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION} VERSION_LESS 5.8 )
+
+
 

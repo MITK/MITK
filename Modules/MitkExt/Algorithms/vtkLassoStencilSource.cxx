@@ -12,7 +12,7 @@
      PURPOSE.  See the above copyright notice for more information.
 
 =========================================================================*/
-#include "vtkLassoStencilSource.h"
+#include "mitkvtkLassoStencilSource.h"
 
 #include "vtkMath.h"
 #include "vtkPoints.h"
@@ -26,7 +26,7 @@
 #include "vtkStreamingDemandDrivenPipeline.h"
 #include "vtkSmartPointer.h"
 
-#include "vtkImageStencilRaster.h"
+#include "mitkvtkImageStencilRaster.h"
 
 #include <math.h>
 #include <vtkstd/map>

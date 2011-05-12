@@ -24,6 +24,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkDicomSeriesReader.h"
 #include <itkGDCMSeriesFileNames.h>
 
+#include "vtkStreamingDemandDrivenPipeline.h"
+
 
 //#include <QtCore>
 
@@ -63,9 +65,12 @@ static const mitk::ImageStatisticsCalculator::Statistics TestStatistics( mitk::I
 
 
 // returns a vector of defined test-cases
-static std::vector<testCase> InitializeTestCases( mitk::Geometry2D::Pointer geom )
+static std::vector<testCase> InitializeTestCases( mitk::Geometry2D::Pointer geom, mitk::Image::Pointer image )
 {
   std::vector<testCase> testCases;
+
+  mitk::Geometry2D::Pointer pfGeom = dynamic_cast<mitk::Geometry2D*> (geom->Clone().GetPointer());
+  pfGeom->ChangeImageGeometryConsideringOriginOffset( true );
 
   {
     /*****************************
@@ -121,6 +126,59 @@ static std::vector<testCase> InitializeTestCases( mitk::Geometry2D::Pointer geom
     testCases.push_back( test );
   }
 
+  {
+    /*****************************
+    * half pixel in diagonal-direction (white) 
+    * -> mean of 255 expected
+    ******************************/
+    mitk::PlanarPolygon::Pointer figure1 = mitk::PlanarPolygon::New();
+    figure1->SetGeometry2D( geom );
+    mitk::Point2D pnt1; pnt1[0] = 10.5 ; pnt1[1] = 3.5;
+    figure1->PlaceFigure( pnt1 );
+
+    mitk::Point2D pnt2; pnt2[0] = 9.5; pnt2[1] = 3.5;
+    figure1->SetControlPoint( 1, pnt2, true );
+    mitk::Point2D pnt3; pnt3[0] = 9.5; pnt3[1] = 4.5;
+    figure1->SetControlPoint( 2, pnt3, true );
+    figure1->GetPolyLine(0);
+
+    testCase test;
+    test.id = testCases.size();
+    test.figure = figure1;
+    test.mean = 255.0;
+    test.sd = 0.0;
+
+    testCases.push_back( test );
+  }
+
+
+  {
+    /*****************************
+    * one pixel (white) + 2 half pixels (white) + 1 half pixel (black)
+    * -> mean of 191.25 expected
+    ******************************/
+    mitk::PlanarPolygon::Pointer figure1 = mitk::PlanarPolygon::New();
+    figure1->SetGeometry2D( geom );
+    mitk::Point2D pnt1; pnt1[0] = 1.1; pnt1[1] = 1.1;
+    figure1->PlaceFigure( pnt1 );
+
+    mitk::Point2D pnt2; pnt2[0] = 2.0; pnt2[1] = 2.0;
+    figure1->SetControlPoint( 1, pnt2, true );
+    mitk::Point2D pnt3; pnt3[0] = 3.0; pnt3[1] = 1.0;
+    figure1->SetControlPoint( 2, pnt3, true );
+    mitk::Point2D pnt4; pnt4[0] = 2.0; pnt4[1] = 0.0;
+    figure1->SetControlPoint( 3, pnt4, true );
+    figure1->GetPolyLine(0);
+
+    testCase test;
+    test.id = testCases.size();
+    test.figure = figure1;
+    test.mean = 191.25;
+    test.sd = 127.5;
+
+    testCases.push_back( test );
+  }
+
 
   {
     /*****************************
@@ -143,8 +201,8 @@ static std::vector<testCase> InitializeTestCases( mitk::Geometry2D::Pointer geom
     testCase test;
     test.id = testCases.size();
     test.figure = figure1;
-    test.mean = 191.5;
-    test.sd = 89.8025;
+    test.mean = 191.50;
+    test.sd = 89.80;
 
     testCases.push_back( test );
   }
@@ -171,7 +229,7 @@ static std::vector<testCase> InitializeTestCases( mitk::Geometry2D::Pointer geom
     test.id = testCases.size();
     test.figure = figure1;
     test.mean = 191.5;
-    test.sd = 89.8025;
+    test.sd = 89.80;
 
     testCases.push_back( test );
   }
@@ -179,7 +237,7 @@ static std::vector<testCase> InitializeTestCases( mitk::Geometry2D::Pointer geom
   {
     /*****************************
     * half pixel (black) + whole pixel (white) + half pixel (gray) in x-direction 
-    * -> mean of 127.67 expected
+    * -> mean of 127.66 expected
     ******************************/
     mitk::PlanarPolygon::Pointer figure1 = mitk::PlanarPolygon::New();
     figure1->SetGeometry2D( geom );
@@ -197,7 +255,7 @@ static std::vector<testCase> InitializeTestCases( mitk::Geometry2D::Pointer geom
     testCase test;
     test.id = testCases.size();
     test.figure = figure1;
-    test.mean = 127.67;
+    test.mean = 127.66;
     test.sd = 127.5;
 
     testCases.push_back( test );
@@ -253,15 +311,15 @@ static std::vector<testCase> InitializeTestCases( mitk::Geometry2D::Pointer geom
     test.id = testCases.size();
     test.figure = figure2;
     test.mean = 191.5;
-    test.sd = 89.8025;
+    test.sd = 89.80;
 
     testCases.push_back( test );
   }
 
   {
     /*****************************
-    * whole pixel (gray) + whole pixel (white) + whole pixel (black) in y-direction
-    * -> mean of 127.67 expected
+    * 2 whole pixel (white) + 2 whole pixel (black) in y-direction
+    * -> mean of 127.66 expected
     ******************************/
     mitk::PlanarPolygon::Pointer figure2 = mitk::PlanarPolygon::New();
     figure2->SetGeometry2D( geom );
@@ -279,8 +337,62 @@ static std::vector<testCase> InitializeTestCases( mitk::Geometry2D::Pointer geom
     testCase test;
     test.id = testCases.size();
     test.figure = figure2;
-    test.mean = 127.67;
+    test.mean = 127.66;
     test.sd = 127.5;
+
+    testCases.push_back( test );
+  }
+
+
+  {
+    /*****************************
+    * 9 whole pixels (white) + 3 half pixels (white) 
+    * + 3 whole pixel (black) [ + 3 slightly less than half pixels (black)]
+    * -> mean of 204.0 expected
+    ******************************/
+    mitk::PlanarPolygon::Pointer figure2 = mitk::PlanarPolygon::New();
+    figure2->SetGeometry2D( geom );
+    mitk::Point2D pnt1; pnt1[0] = 0.5; pnt1[1] = 0.5;
+    figure2->PlaceFigure( pnt1 );
+
+    mitk::Point2D pnt2; pnt2[0] = 3.5; pnt2[1] = 3.5;
+    figure2->SetControlPoint( 1, pnt2, true );
+    mitk::Point2D pnt3; pnt3[0] = 8.4999; pnt3[1] = 3.5;
+    figure2->SetControlPoint( 2, pnt3, true );
+    mitk::Point2D pnt4; pnt4[0] = 5.4999; pnt4[1] = 0.5;
+    figure2->SetControlPoint( 3, pnt4, true );
+    figure2->GetPolyLine(0);
+
+    testCase test;
+    test.id = testCases.size();
+    test.figure = figure2;
+    test.mean = 204.0;
+    test.sd = 105.58;
+
+    testCases.push_back( test );
+  }
+
+  {
+    /*****************************
+    * half pixel (white) + whole pixel (white) + half pixel (black)
+    * -> mean of 212.66 expected
+    ******************************/
+    mitk::PlanarPolygon::Pointer figure2 = mitk::PlanarPolygon::New();
+    figure2->SetGeometry2D( geom );
+    mitk::Point2D pnt1; pnt1[0] = 9.5; pnt1[1] = 0.5;
+    figure2->PlaceFigure( pnt1 );
+
+    mitk::Point2D pnt2; pnt2[0] = 9.5; pnt2[1] = 2.5;
+    figure2->SetControlPoint( 1, pnt2, true );
+    mitk::Point2D pnt3; pnt3[0] = 11.5; pnt3[1] = 2.5;
+    figure2->SetControlPoint( 2, pnt3, true );
+    figure2->GetPolyLine(0);
+
+    testCase test;
+    test.id = testCases.size();
+    test.figure = figure2;
+    test.mean = 212.66;
+    test.sd = 73.32;
 
     testCases.push_back( test );
   }
@@ -332,19 +444,23 @@ int mitkImageStatisticsCalculatorTest(int argc, char* argv[])
 
   mitk::Geometry2D::Pointer geom = image->GetSlicedGeometry()->GetGeometry2D(0);
 
-  std::vector<mitkImageStatisticsCalculatorTestClass::testCase> allTestCases = mitkImageStatisticsCalculatorTestClass::InitializeTestCases( geom );
+  std::vector<mitkImageStatisticsCalculatorTestClass::testCase> allTestCases = mitkImageStatisticsCalculatorTestClass::InitializeTestCases( geom, image );
   for ( int i=0; i<allTestCases.size(); i++ )
   {
     mitkImageStatisticsCalculatorTestClass::testCase test = allTestCases[i];
 
     const mitk::ImageStatisticsCalculator::Statistics stats = mitkImageStatisticsCalculatorTestClass::TestStatistics( image, test.figure );
 
-    MITK_TEST_CONDITION( int(stats.Mean) == int(test.mean),
-      "Calculated mean grayvalue '"<< stats.Mean <<"'  is equal to the desired value '"
+    int tmpMean = stats.Mean * 100;
+    double calculatedMean = tmpMean / 100.0;
+    MITK_TEST_CONDITION( calculatedMean == test.mean,
+      "Calculated mean grayvalue '"<< calculatedMean <<"'  is equal to the desired value '"
       << test.mean <<"' for testcase #" << test.id );
 
-    MITK_TEST_CONDITION( int(stats.Sigma) == int(test.sd),
-      "Calculated grayvalue sd '"<< stats.Sigma <<"'  is equal to the desired value '"
+    int tmpSD = stats.Sigma * 100;
+    double calculatedSD = tmpSD / 100.0;
+    MITK_TEST_CONDITION( calculatedSD == test.sd,
+      "Calculated grayvalue sd '"<< calculatedSD <<"'  is equal to the desired value '"
       << test.sd <<"' for testcase #" << test.id );
 
 

@@ -51,8 +51,6 @@ SET(CPP_FILES
   Algorithms/mitkSurfaceToImageFilter.cpp
   Algorithms/mitkUnstructuredGridHistogram.cpp
   Algorithms/mitkUnstructuredGridSource.cpp
-  Algorithms/vtkImageStencilRaster.cxx
-  Algorithms/vtkLassoStencilSource.cxx
   Algorithms/mitkVolumeVisualizationImagePreprocessor.cpp
   Controllers/mitkMovieGenerator.cpp
   Controllers/mitkMultiStepper.cpp

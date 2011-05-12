@@ -612,7 +612,6 @@ void QmitkToFUtilView::OnUpdateCamera()
   //this->m_MitkIntensityImage->SetSlice(this->m_MitkAllImage->GetSliceData(0, 0, 2)->GetData(), 0, 0, 0);
 
   mitk::ToFImageGrabber* aToFImageGrabber = dynamic_cast<mitk::ToFImageGrabber*>(m_ToFImageGrabber);
-  aToFImageGrabber->Modified();
   aToFImageGrabber->Update();
   this->m_MitkDistanceImage = aToFImageGrabber->GetOutput(0);
   this->m_MitkAmplitudeImage = aToFImageGrabber->GetOutput(1);

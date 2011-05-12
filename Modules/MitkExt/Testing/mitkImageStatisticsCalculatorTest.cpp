@@ -65,12 +65,9 @@ static const mitk::ImageStatisticsCalculator::Statistics TestStatistics( mitk::I
 
 
 // returns a vector of defined test-cases
-static std::vector<testCase> InitializeTestCases( mitk::Geometry2D::Pointer geom, mitk::Image::Pointer image )
+static std::vector<testCase> InitializeTestCases( mitk::Geometry2D::Pointer geom )
 {
   std::vector<testCase> testCases;
-
-  mitk::Geometry2D::Pointer pfGeom = dynamic_cast<mitk::Geometry2D*> (geom->Clone().GetPointer());
-  pfGeom->ChangeImageGeometryConsideringOriginOffset( true );
 
   {
     /*****************************
@@ -444,12 +441,16 @@ int mitkImageStatisticsCalculatorTest(int argc, char* argv[])
 
   mitk::Geometry2D::Pointer geom = image->GetSlicedGeometry()->GetGeometry2D(0);
 
-  std::vector<mitkImageStatisticsCalculatorTestClass::testCase> allTestCases = mitkImageStatisticsCalculatorTestClass::InitializeTestCases( geom, image );
+  std::vector<mitkImageStatisticsCalculatorTestClass::testCase> allTestCases = 
+    mitkImageStatisticsCalculatorTestClass::InitializeTestCases( geom );
+
+
   for ( int i=0; i<allTestCases.size(); i++ )
   {
     mitkImageStatisticsCalculatorTestClass::testCase test = allTestCases[i];
 
-    const mitk::ImageStatisticsCalculator::Statistics stats = mitkImageStatisticsCalculatorTestClass::TestStatistics( image, test.figure );
+    const mitk::ImageStatisticsCalculator::Statistics stats = 
+      mitkImageStatisticsCalculatorTestClass::TestStatistics( image, test.figure );
 
     int tmpMean = stats.Mean * 100;
     double calculatedMean = tmpMean / 100.0;
@@ -462,12 +463,6 @@ int mitkImageStatisticsCalculatorTest(int argc, char* argv[])
     MITK_TEST_CONDITION( calculatedSD == test.sd,
       "Calculated grayvalue sd '"<< calculatedSD <<"'  is equal to the desired value '"
       << test.sd <<"' for testcase #" << test.id );
-
-
-    //MITK_TEST_CONDITION( int(stats.Sigma) == int(test.sd),
-    //  qPrintable( QString("Calculated grayvalue sd '%1'  is equal to the desired value '%2' for testcase #%3")
-    //  .arg(stats.Sigma).arg( test.sd ).arg( test.id ) ) );
-
   }
  
 

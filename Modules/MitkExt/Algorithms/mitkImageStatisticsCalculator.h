@@ -29,7 +29,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkImageTimeSelector.h"
 #include "mitkPlanarFigure.h"
 
-
+#include <vtkSmartPointer.h>
 
 namespace mitk
 {
@@ -206,7 +206,7 @@ protected:
 
   /** Connection from ITK to VTK */
   template <typename ITK_Exporter, typename VTK_Importer>
-  void ConnectPipelines(ITK_Exporter exporter, VTK_Importer* importer)
+  void ConnectPipelines(ITK_Exporter exporter, vtkSmartPointer<VTK_Importer> importer)
   {
     importer->SetUpdateInformationCallback(exporter->GetUpdateInformationCallback());
 
@@ -227,7 +227,7 @@ protected:
 
   /** Connection from VTK to ITK */
   template <typename VTK_Exporter, typename ITK_Importer>
-  void ConnectPipelines(VTK_Exporter* exporter, ITK_Importer importer)
+  void ConnectPipelines(vtkSmartPointer<VTK_Exporter> exporter, ITK_Importer importer)
   {
     importer->SetUpdateInformationCallback(exporter->GetUpdateInformationCallback());
 

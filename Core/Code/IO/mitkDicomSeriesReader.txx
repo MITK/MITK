@@ -199,7 +199,7 @@ DicomSeriesReader::SortIntoBlocksFor3DplusT( const StringContainer& presortedFil
        ++fileIter)
   {
     std::string position = scanner.GetValue( fileIter->c_str(), ippTag);
-    MITK_DEBUG << "File " << *fileIter << " at " << position;
+    MITK_DEBUG << "  " << *fileIter << " at " << position;
     if (firstPosition.empty())
     {
       firstPosition = position;
@@ -215,7 +215,7 @@ DicomSeriesReader::SortIntoBlocksFor3DplusT( const StringContainer& presortedFil
     }
   }
 
-  MITK_DEBUG << "Assuming " << numberOfBlocks << " image blocks";
+  MITK_DEBUG << "  ==> Assuming " << numberOfBlocks << " time steps";
 
   if (numberOfBlocks == 0) return imageBlocks; // only possible if called with no files
 

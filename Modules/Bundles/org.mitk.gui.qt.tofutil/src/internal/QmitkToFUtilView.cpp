@@ -495,7 +495,7 @@ void QmitkToFUtilView::OnToFCameraSelected(int index)
   else
   {
     this->m_Controls->m_SurfaceCheckBox->setEnabled(true);
-    this->m_Controls->m_TextureCheckBox->setEnabled(true);
+    this->m_Controls->m_TextureCheckBox->setEnabled(false); // TODO enable when bug 8106 is solved
     this->m_Controls->m_VideoTextureCheckBox->setEnabled(true);
   }
 }

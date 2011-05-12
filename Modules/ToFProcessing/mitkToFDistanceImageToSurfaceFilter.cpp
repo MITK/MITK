@@ -173,17 +173,17 @@ void mitk::ToFDistanceImageToSurfaceFilter::GenerateData()
           }
         }
 
-        if (scalarFloatData)
-        {          
-          scalarArray->InsertTuple1(pixelID, scalarFloatData[pixel[0]+pixel[1]*xDimension]);
-        }
-        if (this->m_TextureImageHeight > 0.0 && this->m_TextureImageWidth > 0.0)
-        {
+        //if (scalarFloatData)
+        //{          
+        //  scalarArray->InsertTuple1(pixelID, scalarFloatData[pixel[0]+pixel[1]*xDimension]);
+        //}
+        //if (this->m_TextureImageHeight > 0.0 && this->m_TextureImageWidth > 0.0)
+        //{
 
-          float xNorm = (((float)pixel[0])/xDimension)*textureScaleCorrection1 + textureScaleCorrection2 ; // correct video texture scale 640 * 480!! 
-          float yNorm = 1.0 - ((float)pixel[1])/yDimension; //flip y-axis
-          textureCoords->InsertTuple2(pixelID, xNorm, yNorm);
-        }
+        //  float xNorm = (((float)pixel[0])/xDimension)*textureScaleCorrection1 + textureScaleCorrection2 ; // correct video texture scale 640 * 480!! 
+        //  float yNorm = 1.0 - ((float)pixel[1])/yDimension; //flip y-axis
+        //  textureCoords->InsertTuple2(pixelID, xNorm, yNorm);
+        //}
       }
       pointCount++;
     }

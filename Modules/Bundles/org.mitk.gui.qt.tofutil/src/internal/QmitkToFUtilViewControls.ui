@@ -89,7 +89,7 @@
       <item row="0" column="1">
        <widget class="QCheckBox" name="m_TextureCheckBox">
         <property name="enabled">
-         <bool>true</bool>
+         <bool>false</bool>
         </property>
         <property name="text">
          <string>Texture</string>
@@ -118,7 +118,6 @@
   <zorder>m_ToFVisualisationSettingsWidget</zorder>
   <zorder>groupBox_3</zorder>
   <zorder>verticalSpacer</zorder>
-  <zorder>m_TextureCheckBox</zorder>
   <zorder>m_ToFCompositeFilterWidget</zorder>
  </widget>
  <layoutdefault spacing="6" margin="11"/>

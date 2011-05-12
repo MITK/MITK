@@ -207,4 +207,10 @@ namespace mitk
   {
     this->m_ToFCameraDevice->SetProperty(propertyKey, propertyValue);
   }
+
+  void ToFImageGrabber::UpdateOutputInformation()
+  {
+    this->Modified();  // make sure that we need to be updated
+    Superclass::UpdateOutputInformation();
+  }
 }

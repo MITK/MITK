@@ -189,6 +189,7 @@ namespace mitk
         toFCameraDevice->m_Controller->GetDistances(toFCameraDevice->m_DistanceDataBuffer[toFCameraDevice->m_FreePos]);
         toFCameraDevice->m_Controller->GetAmplitudes(toFCameraDevice->m_AmplitudeDataBuffer[toFCameraDevice->m_FreePos]);
         toFCameraDevice->m_Controller->GetIntensities(toFCameraDevice->m_IntensityDataBuffer[toFCameraDevice->m_FreePos]);
+        toFCameraDevice->Modified();
         /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
          TODO Buffer Handling currently only works for buffer size 1
          !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/

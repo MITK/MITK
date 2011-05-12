@@ -179,6 +179,8 @@ namespace mitk
         toFCameraDevice->UpdateCamera();
         // get the source data from the camera and write it at the next free position in the buffer
         toFCameraDevice->m_Controller->GetSourceData(toFCameraDevice->m_SourceDataBuffer[toFCameraDevice->m_FreePos]);
+        // call modified to indicate that cameraDevice was modified
+        toFCameraDevice->Modified();
 
         /*!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
          TODO Buffer Handling currently only works for buffer size 1

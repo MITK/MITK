@@ -63,6 +63,19 @@ void QmitkTrackingDeviceConfigurationWidget::CreateConnections()
     connect( (QObject*)(m_Controls->m_testConnectionMicronTracker), SIGNAL(clicked()), this, SLOT(TestConnection()) );
     connect( (QObject*)(m_Controls->m_resetButton), SIGNAL(clicked()), this, SLOT(ResetByUser()) );
     connect( (QObject*)(m_Controls->m_finishedButton), SIGNAL(clicked()), this, SLOT(Finished()) );
+
+    //set a few UI components depending on Windows / Linux
+    #ifdef WIN32
+    m_Controls->portTypeLabelPolaris->setVisible(false);
+    m_Controls->portTypePolaris->setVisible(false);
+    m_Controls->portTypeLabelAurora->setVisible(false);
+    m_Controls->portTypeAurora->setVisible(false);
+    #else
+    m_Controls->comPortLabelAurora->setText("Port Nr:");
+    m_Controls->m_comPortLabelPolaris->setText("Port Nr:");
+    m_Controls->m_comPortSpinBoxAurora->setPrefix("");
+    m_Controls->m_comPortSpinBoxPolaris->setPrefix("");
+    #endif
   }
 }
 
@@ -196,10 +209,25 @@ mitk::TrackingDevice::Pointer QmitkTrackingDeviceConfigurationWidget::ConfigureN
 mitk::TrackingDevice::Pointer QmitkTrackingDeviceConfigurationWidget::ConfigureNDI6DTrackingDevice()
   {
   mitk::NDITrackingDevice::Pointer tempTrackingDevice = mitk::NDITrackingDevice::New();
-  int comPort = 0;
-  if (m_Controls->m_trackingDeviceChooser->currentIndex()==1) comPort = m_Controls->m_comPortSpinBoxAurora->value();
-  else comPort = m_Controls->m_comPortSpinBoxPolaris->value();
-  tempTrackingDevice->SetPortNumber(static_cast<mitk::SerialCommunication::PortNumber>(comPort)); //set the com port
+    
+  //build prefix (depends on linux/win)
+  QString prefix = "";
+  #ifdef WIN32
+  prefix ="COM";
+  #else
+  if (m_Controls->m_trackingDeviceChooser->currentIndex()==1) //Aurora
+    prefix = m_Controls->portTypeAurora->currentText();  
+  else //Polaris
+    prefix = m_Controls->portTypePolaris->currentText();
+  #endif
+  //get port
+  int port = 0;
+  if (m_Controls->m_trackingDeviceChooser->currentIndex()==1) port = m_Controls->m_portSpinBoxAurora->value();
+  else port = m_Controls->m_portSpinBoxPolaris->value();
+  //build port name string
+  QString portName = prefix + QString::number(port);
+
+  tempTrackingDevice->SetDeviceName(portName.toStdString()); //set the port name
   mitk::TrackingDevice::Pointer returnValue = static_cast<mitk::TrackingDevice*>(tempTrackingDevice);
   return returnValue;
   }

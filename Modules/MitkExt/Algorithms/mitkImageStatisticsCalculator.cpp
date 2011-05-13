@@ -997,12 +997,6 @@ void ImageStatisticsCalculator::InternalCalculateMaskFromPlanarFigure(
   this->ConnectPipelines( vtkExporter, itkImporter );
   itkImporter->Update();
 
-  //typedef itk::ImageFileWriter< MaskImage2DType > FileWriterType;
-  //FileWriterType::Pointer writer = FileWriterType::New();
-  //writer->SetInput( itkImporter->GetOutput() );
-  //writer->SetFileName( "d:/test/test.mhd" );
-  //writer->Update();
-
   // Store mask
   m_InternalImageMask2D = itkImporter->GetOutput();
 

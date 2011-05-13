@@ -74,7 +74,7 @@ void mitk::ImageVtkMapper2D::AdjustCamera(mitk::BaseRenderer* renderer, mitk::Sc
 
   const mitk::DisplayGeometry* displayGeometry = renderer->GetDisplayGeometry();
 
-  double imageHeightInMM = localStorage->m_ReslicedImage->GetDimensions()[1] * spacing[1];
+  double imageHeightInMM = localStorage->m_ReslicedImage->GetDimensions()[1];
   double displayHeightInMM = displayGeometry->GetSizeInMM()[1];
   double factor = displayHeightInMM/imageHeightInMM;
 
@@ -82,13 +82,14 @@ void mitk::ImageVtkMapper2D::AdjustCamera(mitk::BaseRenderer* renderer, mitk::Sc
   MITK_INFO << "displayHeightInMM " << displayHeightInMM;
   MITK_INFO << "factor " << factor;
   MITK_INFO << "1/factor " << 1/factor;
+  MITK_INFO << "disp->GetFac" << displayGeometry->GetScaleFactorMMPerDisplayUnit();
 
   Vector2D displayGeometryOriginInMM = displayGeometry->GetOriginInMM();  //top left of the render window
   Vector2D displayGeometryCenterInMM = displayGeometryOriginInMM + displayGeometry->GetSizeInMM()/2; //center of the render window
 
   //scale the rendered object. TODO How to achieve the correct scale?
-  renderer->GetVtkRenderer()->GetActiveCamera()->SetParallelScale(imageHeightInMM);
-  renderer->GetVtkRenderer()->GetActiveCamera()->Zoom(1/displayGeometry->GetScaleFactorMMPerDisplayUnit());
+  renderer->GetVtkRenderer()->GetActiveCamera()->SetParallelScale(imageHeightInMM / 2);
+  renderer->GetVtkRenderer()->GetActiveCamera()->Zoom(1/factor);
 
 //  renderer->GetVtkRenderer()->GetActiveCamera()->GetParallelScale()*(1/factor)
 
@@ -111,7 +112,7 @@ void mitk::ImageVtkMapper2D::AdjustCamera(mitk::BaseRenderer* renderer, mitk::Sc
   double cameraPosition[3];
   cameraPosition[0] = viewPlaneCenter[0];
   cameraPosition[1] = viewPlaneCenter[1];
-  cameraPosition[2] = viewPlaneCenter[2] + 1.0; //planeCenter[2] should be 0.0. Therefore, the camera is located in the XY-plane with Z=1.0
+  cameraPosition[2] = viewPlaneCenter[2] + 1000.0; //planeCenter[2] should be 0.0. Therefore, the camera is located in the XY-plane with Z=1.0
 
   //set the camera corresponding to the textured plane
   vtkSmartPointer<vtkCamera> camera = renderer->GetVtkRenderer()->GetActiveCamera();
@@ -138,15 +139,11 @@ void mitk::ImageVtkMapper2D::AdjustToDisplayGeometry(mitk::BaseRenderer* rendere
 {
   LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
 
-  MITK_INFO << "#### Anfang ####";
-  MITK_INFO << "Spacing[0] " << spacing[0];
-  MITK_INFO << "Spacing[1] " << spacing[1];
-
   //These two points define the axes of the plane in combination with the origin (0/0/0).
   //Point 1 is the x-axis and point 2 the y-axis.
   //Each plane is transformed according to the view (transversal, coronal and saggital) afterwards.
-  localStorage->m_Plane->SetPoint1((localStorage->m_ReslicedImage->GetDimensions()[0]-1)*spacing[0], 0.0, 0.0);
-  localStorage->m_Plane->SetPoint2(0.0, (localStorage->m_ReslicedImage->GetDimensions()[1]-1)*spacing[1], 0.0);
+  localStorage->m_Plane->SetPoint1((localStorage->m_ReslicedImage->GetDimensions()[0])*spacing[0], 0.0, 0.0);
+  localStorage->m_Plane->SetPoint2(0.0, (localStorage->m_ReslicedImage->GetDimensions()[1])*spacing[1], 0.0);
 }
 
 const mitk::Image* mitk::ImageVtkMapper2D::GetInput( void )
@@ -356,12 +353,8 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
       rendererInfo.m_ReferenceGeometry = worldGeometry->GetReferenceGeometry();
 
       // Calculate the actual bounds of the transformed plane clipped by the
-      // dataset bounding box; this is required for drawing t  //Transform everything to the current position (Transveral, coronal and saggital plane).
-      //This is necessary, because the vtkTransformFilter does not manipulate the vtkPlaneSource,
-      //and thus, the plane normal and center are not placed correctly.
-      //(Without this all three planes would have the same normal/center and consequently the same camera position).he texture at the
+      // dataset bounding box; this is required for drawing the texture at the
       // correct position during 3D mapping.
-
       boundsInitialized = this->CalculateClippedPlaneBounds(
           rendererInfo.m_ReferenceGeometry, planeGeometry, bounds );
     }
@@ -658,9 +651,6 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
   //set up the camera to view the transformed plane
   this->AdjustCamera( renderer, mmPerPixel );
 
-  // We have been modified
-  rendererInfo.m_LastUpdateTime.Modified();
-
   //TODO remove this later
   static int counter = 0;
   if(counter < 3)
@@ -675,36 +665,16 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
     counter++;
   }
   //TODO remove this later
-  renderer->GetVtkRenderer()->SetBackground(1,1,1);
+  renderer->GetVtkRenderer()->SetBackground(1, 1, 1);
 
   //Transform the camera to the current position (transveral, coronal and saggital plane).
   //This is necessary, because the vtkTransformFilter does not manipulate the vtkCamera.
   //(Without not all three planes would be visible).
   renderer->GetVtkRenderer()->GetActiveCamera()->ApplyTransform(trans);
 
+  // We have been modified
+  rendererInfo.m_LastUpdateTime.Modified();
   MITK_INFO << "--------------- Ende Generate ------------";
-}
-
-
-double mitk::ImageVtkMapper2D::CalculateSpacing( const mitk::Geometry3D *geometry,
-                                                 const mitk::Vector3D &d ) const
-{
-  // The following can be derived from the ellipsoid equation
-  //
-  //   1 = x^2/a^2 + y^2/b^2 + z^2/c^2
-  //
-  // where (a,b,c) = spacing of original volume (ellipsoid radii)
-  // and   (x,y,z) = scaled coordinates of vector d (according to ellipsoid)
-  //
-  const mitk::Vector3D &spacing = geometry->GetSpacing();
-
-  double scaling = d[0]*d[0] / (spacing[0] * spacing[0])
-                   + d[1]*d[1] / (spacing[1] * spacing[1])
-                   + d[2]*d[2] / (spacing[2] * spacing[2]);
-
-  scaling = sqrt( scaling );
-
-  return ( sqrt( d[0]*d[0] + d[1]*d[1] + d[2]*d[2] ) / scaling );
 }
 
 bool mitk::ImageVtkMapper2D::LineIntersectZero( vtkPoints *points, int p1, int p2,
@@ -730,7 +700,6 @@ bool mitk::ImageVtkMapper2D::LineIntersectZero( vtkPoints *points, int p1, int p
   }
   return false;
 }
-
 
 bool mitk::ImageVtkMapper2D::CalculateClippedPlaneBounds( const Geometry3D *boundingGeometry,
                                                           const PlaneGeometry *planeGeometry, vtkFloatingPointType *bounds )
@@ -833,7 +802,6 @@ void mitk::ImageVtkMapper2D::GenerateAllData()
     this->Update( it->first );
   }
 }
-
 
 void mitk::ImageVtkMapper2D::Clear()
 {
@@ -1146,7 +1114,6 @@ void mitk::ImageVtkMapper2D::RendererInfo::RemoveObserver()
     m_Renderer->RemoveObserver( m_ObserverID-1 );
   }
 }
-
 
 void mitk::ImageVtkMapper2D::RendererInfo::Initialize( int rendererID, mitk::BaseRenderer *renderer,
                                                        unsigned long observerID )

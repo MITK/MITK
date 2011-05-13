@@ -293,10 +293,6 @@ protected:
 
   void DeleteRendererCallback( itk::Object *object, const itk::EventObject & );
 
-
-  double CalculateSpacing( const mitk::Geometry3D *geometry, 
-    const mitk::Vector3D &d ) const;
-
   bool LineIntersectZero( vtkPoints *points, int p1, int p2, 
     vtkFloatingPointType *bounds );
 

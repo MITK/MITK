@@ -78,23 +78,20 @@ void mitk::ImageVtkMapper2D::AdjustCamera(mitk::BaseRenderer* renderer, mitk::Sc
   double displayHeightInMM = displayGeometry->GetSizeInMM()[1];
   double factor = displayHeightInMM/imageHeightInMM;
 
-  MITK_INFO << "imageHeightInMM " << imageHeightInMM;
-  MITK_INFO << "displayHeightInMM " << displayHeightInMM;
-  MITK_INFO << "factor " << factor;
-  MITK_INFO << "1/factor " << 1/factor;
-  MITK_INFO << "disp->GetFac" << displayGeometry->GetScaleFactorMMPerDisplayUnit();
+//  MITK_INFO << "imageHeightInMM " << imageHeightInMM;
+//  MITK_INFO << "displayHeightInMM " << displayHeightInMM;
+//  MITK_INFO << "factor " << factor;
+//  MITK_INFO << "1/factor " << 1/factor;
+//  MITK_INFO << "disp->GetFac" << displayGeometry->GetScaleFactorMMPerDisplayUnit();
 
   Vector2D displayGeometryOriginInMM = displayGeometry->GetOriginInMM();  //top left of the render window
   Vector2D displayGeometryCenterInMM = displayGeometryOriginInMM + displayGeometry->GetSizeInMM()/2; //center of the render window
 
-  //scale the rendered object. TODO How to achieve the correct scale?
+  //scale the rendered object.
   renderer->GetVtkRenderer()->GetActiveCamera()->SetParallelScale(imageHeightInMM / 2);
+  //zooming with the factor calculated by dividing displayHeight through imegeHeight. The factor is inverse, because the VTK zoom method is working inversely.
   renderer->GetVtkRenderer()->GetActiveCamera()->Zoom(1/factor);
 
-//  renderer->GetVtkRenderer()->GetActiveCamera()->GetParallelScale()*(1/factor)
-
-//    MITK_INFO << "SCALE " << renderer->GetVtkRenderer()->GetActiveCamera()->GetParallelScale();
-    MITK_INFO << "#### Ende ####";
 
   //the center of the view-plane
   double viewPlaneCenter[3];
@@ -171,7 +168,6 @@ void mitk::ImageVtkMapper2D::MitkRenderOverlay(BaseRenderer* renderer)
 
 void mitk::ImageVtkMapper2D::MitkRenderOpaqueGeometry(BaseRenderer* renderer)
 {
-  MITK_INFO << "######## RenderOpaque ############";
   if ( this->IsVisible( renderer )==false )
     return;
 
@@ -179,7 +175,6 @@ void mitk::ImageVtkMapper2D::MitkRenderOpaqueGeometry(BaseRenderer* renderer)
   {
     this->GetVtkProp(renderer)->RenderOpaqueGeometry( renderer->GetVtkRenderer() );
   }
-  MITK_INFO << "######## Ende RenderOpaque ############";
 }
 
 void mitk::ImageVtkMapper2D::MitkRenderTranslucentGeometry(BaseRenderer* renderer)

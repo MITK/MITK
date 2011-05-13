@@ -308,7 +308,6 @@ protected:
 protected:
   typedef std::map<BaseRenderer*,RendererInfo> RendererInfoMap;
 
-
   /** \brief Map of instances of RendererInfo
    * \sa RendererInfo
    */

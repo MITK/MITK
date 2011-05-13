@@ -138,7 +138,8 @@ void mitk::ImageVtkMapper2D::AdjustCamera(mitk::BaseRenderer* renderer, mitk::Sc
 void mitk::ImageVtkMapper2D::AdjustToDisplayGeometry(mitk::BaseRenderer* renderer, mitk::ScalarType spacing[2])
 {
   LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
-
+  //set the origin to (0; 0; 0), because the default origin can be anywhere
+  localStorage->m_Plane->SetOrigin(0.0, 0.0, 0.0);
   //These two points define the axes of the plane in combination with the origin (0/0/0).
   //Point 1 is the x-axis and point 2 the y-axis.
   //Each plane is transformed according to the view (transversal, coronal and saggital) afterwards.

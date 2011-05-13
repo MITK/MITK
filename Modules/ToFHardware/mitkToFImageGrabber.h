@@ -46,10 +46,6 @@ namespace mitk
 
     itkNewMacro( Self );
 
-    /**
-    * \brief Used for pipeline update
-    */
-    virtual void UpdateOutputInformation();
     /*!
     \brief Establish a connection to the ToF camera
     \param device specifies the actually used ToF Camera. 0: PMD O3D, 1: PMD CamCube 2.0
@@ -132,6 +128,11 @@ namespace mitk
 
   protected:
 
+    ///
+    /// called when the ToFCameraDevice was modified
+    ///
+    void OnToFCameraDeviceModified();
+
     ToFCameraDevice::Pointer m_ToFCameraDevice; ///< Device allowing acces to ToF image data
     int m_CaptureWidth; ///< Width of the captured ToF image
     int m_CaptureHeight; ///< Height of the captured ToF image
@@ -142,6 +143,7 @@ namespace mitk
     float* m_DistanceArray; ///< member holding the current distance array
     float* m_AmplitudeArray; ///< member holding the current amplitude array
     char* m_SourceDataArray;///< member holding the current source data array
+    unsigned long m_DeviceObserverTag; ///< tag of the oberver for the the ToFCameraDevice
 
     ToFImageGrabber();
 

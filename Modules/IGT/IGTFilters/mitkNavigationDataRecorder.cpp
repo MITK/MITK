@@ -40,6 +40,8 @@ mitk::NavigationDataRecorder::NavigationDataRecorder()
   m_FileName = "";
   m_SystemTimeClock = RealTimeClock::New();
   m_OutputFormat = mitk::NavigationDataRecorder::xml;
+  m_RecordCounter = 0;
+  m_RecordCountLimit = -1;
 
   //To get a start time
   mitk::TimeStamp::GetInstance()->Start(this);
@@ -201,6 +203,8 @@ void mitk::NavigationDataRecorder::Update()
     }
     if (this->m_OutputFormat = mitk::NavigationDataRecorder::csv) *m_Stream << "\n";
   }
+  m_RecordCounter++;
+  if ((m_RecordCountLimit<=m_RecordCounter)&&(m_RecordCountLimit != -1)) {StopRecording();}
 }
 
 void mitk::NavigationDataRecorder::StartRecording()
@@ -210,6 +214,8 @@ void mitk::NavigationDataRecorder::StartRecording()
     std::cout << "Already recording please stop before start new recording session" << std::endl;
     return;
   }
+  
+
   if (m_Stream == NULL)
   {
     std::stringstream ss;
@@ -248,6 +254,7 @@ void mitk::NavigationDataRecorder::StartRecording()
         break;
     }
     m_firstLine = true;
+    m_RecordCounter = 0;
     StartRecording(stream);
   }
 
@@ -293,6 +300,7 @@ void mitk::NavigationDataRecorder::StopRecording()
   }
 
   m_NumberOfRecordedFiles++;
-  m_Stream = NULL;
   m_Recording = false;
+  m_Stream->flush();
+  m_Stream = NULL;   
 }

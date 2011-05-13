@@ -64,7 +64,8 @@ foreach(type LIBRARY RUNTIME ARCHIVE)
   # Make sure the directory exists
   if(DEFINED MITK_CMAKE_${type}_OUTPUT_DIRECTORY
      AND NOT EXISTS ${MITK_CMAKE_${type}_OUTPUT_DIRECTORY})
-    message(FATAL_ERROR "MITK_CMAKE_${type}_OUTPUT_DIRECTORY is set to a non-existing directory [${MITK_CMAKE_${type}_OUTPUT_DIRECTORY}]")
+    message("Creating directory MITK_CMAKE_${type}_OUTPUT_DIRECTORY: ${MITK_CMAKE_${type}_OUTPUT_DIRECTORY}")
+    file(MAKE_DIRECTORY "${MITK_CMAKE_${type}_OUTPUT_DIRECTORY}")
   endif()
 
   if(MITK_USE_SUPERBUILD)
@@ -211,6 +212,29 @@ mark_as_advanced(USE_ITKZLIB)
 #-----------------------------------------------------------------------------
 
 mitkFunctionGetVersion(${MITK_SOURCE_DIR} MITK)
+
+#-----------------------------------------------------------------------------
+# Installation preparation
+#
+# These should be set before any MITK install macros are used
+#-----------------------------------------------------------------------------
+
+if(MITK_INSTALL_RPATH_RELATIVE)
+  set(CMAKE_INSTALL_RPATH ".")
+else()
+  set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/bin")
+endif()
+
+# on Mac OSX all BlueBerry plugins get copied into every
+# application bundle (.app directory) specified here
+if(APPLE)
+  if(MITK_BUILD_org.mitk.gui.qt.extapplication)
+    set(MACOSX_BUNDLE_NAMES ${MACOSX_BUNDLE_NAMES} ExtApp)
+  endif()
+  if(MITK_BUILD_org.mitk.gui.qt.application)
+    set(MACOSX_BUNDLE_NAMES ${MACOSX_BUNDLE_NAMES} CoreApp)
+  endif()
+endif(APPLE)
 
 #-----------------------------------------------------------------------------
 # Set symbol visibility Flags
@@ -391,22 +415,6 @@ add_subdirectory(Documentation)
 # Installation
 #-----------------------------------------------------------------------------
 
-if(MITK_INSTALL_RPATH_RELATIVE)
-  set(CMAKE_INSTALL_RPATH ".")
-else()
-  set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/bin")
-endif()
-
-# on Mac OSX all BlueBerry plugins get copied into every
-# application bundle (.app directory) specified here
-if(APPLE)
-  if(MITK_BUILD_org.mitk.gui.qt.extapplication)
-    set(MACOSX_BUNDLE_NAMES ${MACOSX_BUNDLE_NAMES} ExtApp)
-  endif()
-  if(MITK_BUILD_org.mitk.gui.qt.application)
-    set(MACOSX_BUNDLE_NAMES ${MACOSX_BUNDLE_NAMES} CoreApp)
-  endif()
-endif(APPLE)
 
 # set MITK cpack variables
 include(mitkSetupCPack)

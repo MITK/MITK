@@ -18,6 +18,16 @@ SET(proj_DEPENDENCIES )
 SET(VTK_DEPENDS ${proj})
 
 IF(NOT DEFINED VTK_DIR)
+
+  SET(additional_cmake_args )
+  IF(MINGW)
+    SET(additional_cmake_args
+        -DCMAKE_USE_WIN32_THREADS:BOOL=ON
+        -DCMAKE_USE_PTHREADS:BOOL=OFF
+        -DVTK_USE_VIDEO4WINDOWS:BOOL=OFF # no header files provided by MinGW
+        )
+  ENDIF()
+
   ExternalProject_Add(${proj}
     URL http://mitk.org/download/thirdparty/vtk-5.6.1.tar.gz
     BINARY_DIR ${proj}-build
@@ -25,6 +35,7 @@ IF(NOT DEFINED VTK_DIR)
     CMAKE_GENERATOR ${gen}
     CMAKE_ARGS
         ${ep_common_args}
+        ${additional_cmake_args}
         -DVTK_WRAP_TCL:BOOL=OFF
         -DVTK_WRAP_PYTHON:BOOL=OFF
         -DVTK_WRAP_JAVA:BOOL=OFF

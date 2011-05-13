@@ -67,9 +67,11 @@ class QmitkMITKIGTTrackingToolboxView : public QObject, public QmitkFunctionalit
 
 	  void OnStopTracking();
 
-    void OnEnableLoggingClicked();
-
     void OnChooseFileClicked();
+    
+    void StartLogging();
+
+    void StopLogging();
 
     /** @brief Slot for tracking timer */
     void UpdateTrackingTimer();
@@ -87,9 +89,9 @@ class QmitkMITKIGTTrackingToolboxView : public QObject, public QmitkFunctionalit
 
     bool m_logging;
 
-    void StartLogging();
+    int m_loggedFrames;
 
-    void StopLogging();
+    
 
     mitk::DataNode::Pointer TrackingVolumeNode;
 

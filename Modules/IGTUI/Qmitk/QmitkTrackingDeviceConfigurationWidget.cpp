@@ -73,8 +73,8 @@ void QmitkTrackingDeviceConfigurationWidget::CreateConnections()
     #else
     m_Controls->comPortLabelAurora->setText("Port Nr:");
     m_Controls->m_comPortLabelPolaris->setText("Port Nr:");
-    m_Controls->m_comPortSpinBoxAurora->setPrefix("");
-    m_Controls->m_comPortSpinBoxPolaris->setPrefix("");
+    m_Controls->m_portSpinBoxAurora->setPrefix("");
+    m_Controls->m_portSpinBoxPolaris->setPrefix("");
     #endif
   }
 }

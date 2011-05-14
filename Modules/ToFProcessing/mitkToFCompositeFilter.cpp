@@ -42,44 +42,44 @@ mitk::ToFCompositeFilter::~ToFCompositeFilter()
 
 void mitk::ToFCompositeFilter::SetInput(  mitk::Image* distanceImage )
 {
-  if (distanceImage)
-  {
-    this->SetInput(0, distanceImage);
-    if (distanceImage->GetData())
-    {
-      this->m_ImageWidth = distanceImage->GetDimension(0);
-      this->m_ImageHeight = distanceImage->GetDimension(1);
-      this->m_ImageSize = this->m_ImageWidth * this->m_ImageHeight * sizeof(float);
-
-      if (this->m_IplDistanceImage != NULL)
-      {
-        cvReleaseImage(&(this->m_IplDistanceImage));
-      }
-      float* distanceFloatData = (float*)distanceImage->GetSliceData(0, 0, 0)->GetData();
-      this->m_IplDistanceImage = cvCreateImage(cvSize(this->m_ImageWidth, this->m_ImageHeight), IPL_DEPTH_32F, 1);
-      memcpy(this->m_IplDistanceImage->imageData, (void*)distanceFloatData, this->m_ImageSize);
-
-      if (this->m_IplOutputImage != NULL)
-      {
-        cvReleaseImage(&(this->m_IplOutputImage));
-      }
-      this->m_IplOutputImage = cvCreateImage(cvSize(this->m_ImageWidth, this->m_ImageHeight), IPL_DEPTH_32F, 1);
-
-      CreateItkImage(this->m_ItkInputImage);
-    }
-  }
-  else
-  {
-    MITK_ERROR<<"Input image is not defined. Check if it is initialized correctly.";
-  }
+  this->SetInput(0, distanceImage);
 }
 
 void mitk::ToFCompositeFilter::SetInput( unsigned int idx,  mitk::Image* distanceImage )
 {
   if ((distanceImage == NULL) && (idx == this->GetNumberOfInputs() - 1)) // if the last input is set to NULL, reduce the number of inputs by one
+  {
     this->SetNumberOfInputs(this->GetNumberOfInputs() - 1);
+  }
   else
+  {
+    if (idx==0) //create IPL image holding distance data
+    {
+      if (distanceImage->GetData())
+      {
+        this->m_ImageWidth = distanceImage->GetDimension(0);
+        this->m_ImageHeight = distanceImage->GetDimension(1);
+        this->m_ImageSize = this->m_ImageWidth * this->m_ImageHeight * sizeof(float);
+
+        if (this->m_IplDistanceImage != NULL)
+        {
+          cvReleaseImage(&(this->m_IplDistanceImage));
+        }
+        float* distanceFloatData = (float*)distanceImage->GetSliceData(0, 0, 0)->GetData();
+        this->m_IplDistanceImage = cvCreateImage(cvSize(this->m_ImageWidth, this->m_ImageHeight), IPL_DEPTH_32F, 1);
+        memcpy(this->m_IplDistanceImage->imageData, (void*)distanceFloatData, this->m_ImageSize);
+
+        if (this->m_IplOutputImage != NULL)
+        {
+          cvReleaseImage(&(this->m_IplOutputImage));
+        }
+        this->m_IplOutputImage = cvCreateImage(cvSize(this->m_ImageWidth, this->m_ImageHeight), IPL_DEPTH_32F, 1);
+
+        CreateItkImage(this->m_ItkInputImage);
+      }
+    }
     this->ProcessObject::SetNthInput(idx, distanceImage);   // Process object is not const-correct so the const_cast is required here
+  }
 
   this->CreateOutputsForAllInputs();
 }
@@ -98,11 +98,26 @@ void mitk::ToFCompositeFilter::SetInput( unsigned int idx,  mitk::Image* distanc
 
 void mitk::ToFCompositeFilter::GenerateData()
 {
+  // copy input 1...n to output 1...n
+  for (unsigned int idx=0; idx<this->GetNumberOfOutputs(); idx++)
+  {
+    mitk::Image::Pointer outputImage = this->GetOutput(idx);
+    mitk::Image::Pointer inputImage = this->GetInput(idx);
+    if (outputImage.IsNotNull()&&inputImage.IsNotNull())
+    {
+      outputImage->CopyInformation(inputImage);
+      outputImage->Initialize(inputImage);
+      outputImage->SetSlice(inputImage->GetSliceData()->GetData());
+    }
+  }
   mitk::Image::Pointer outputDistanceImage = this->GetOutput(0);
   float* outputDistanceFloatData = (float*)outputDistanceImage->GetSliceData(0, 0, 0)->GetData();
 
   mitk::Image::Pointer inputDistanceImage = this->GetInput();
 
+  // copy initial distance image to ipl image
+  float* distanceFloatData = (float*)inputDistanceImage->GetSliceData(0, 0, 0)->GetData();
+  memcpy(this->m_IplDistanceImage->imageData, (void*)distanceFloatData, this->m_ImageSize);
   if (m_ApplyThresholdFilter)
   {
     ProcessThresholdFilter(this->m_IplDistanceImage, this->m_ThresholdFilterMin, this->m_ThresholdFilterMax);
@@ -128,7 +143,6 @@ void mitk::ToFCompositeFilter::GenerateData()
     //memcpy( distanceFloatData, this->m_OutputIplImage->imageData, distanceImageSize );
   }
   memcpy( outputDistanceFloatData, this->m_IplDistanceImage->imageData, this->m_ImageSize );
-
 }
 
 void mitk::ToFCompositeFilter::CreateOutputsForAllInputs()

@@ -430,6 +430,30 @@ void QmitkToFUtilView::OnToFCameraStarted()
   //this->m_FilterWorkerThread.SetAbort(false);
   //this->m_FilterWorkerThread.StartProcessing(this->m_ToFImageGrabber, this->m_MitkAllImage);
   //this->m_SurfaceWorkerThread.SetAbort(false);
+  
+  // initial update of image grabber
+  this->m_ToFImageGrabber->Update();
+
+  this->m_ToFCompositeFilter->SetInput(0,this->m_ToFImageGrabber->GetOutput(0));
+  this->m_ToFCompositeFilter->SetInput(1,this->m_ToFImageGrabber->GetOutput(1));
+  this->m_ToFCompositeFilter->SetInput(2,this->m_ToFImageGrabber->GetOutput(2));
+  // initial update of composite filter
+  this->m_ToFCompositeFilter->Update();
+  this->m_ToFVisualizationFilter->SetInput(0,this->m_ToFCompositeFilter->GetOutput(0));
+  this->m_ToFVisualizationFilter->SetInput(1,this->m_ToFCompositeFilter->GetOutput(1));
+  this->m_ToFVisualizationFilter->SetInput(2,this->m_ToFCompositeFilter->GetOutput(2));
+  // initial update of visualization filter
+  this->m_ToFVisualizationFilter->Update();
+  //this->m_MitkDistanceImage = m_ToFVisualizationFilter->GetOutput(0);
+  //this->m_MitkAmplitudeImage = m_ToFVisualizationFilter->GetOutput(1);
+  //this->m_MitkIntensityImage = m_ToFVisualizationFilter->GetOutput(2);
+  this->m_MitkDistanceImage = m_ToFCompositeFilter->GetOutput(0);
+  this->m_MitkAmplitudeImage = m_ToFCompositeFilter->GetOutput(1);
+  this->m_MitkIntensityImage = m_ToFCompositeFilter->GetOutput(2);
+  this->m_ToFDistanceImageToSurfaceFilter->SetInput(0,this->m_ToFCompositeFilter->GetOutput(0));
+  this->m_ToFDistanceImageToSurfaceFilter->SetInput(1,this->m_ToFCompositeFilter->GetOutput(1));
+  this->m_ToFDistanceImageToSurfaceFilter->SetInput(2,this->m_ToFCompositeFilter->GetOutput(2));
+  this->m_Surface = this->m_ToFDistanceImageToSurfaceFilter->GetOutput(0);
 
   this->m_Frametimer->start(0);
 
@@ -495,7 +519,7 @@ void QmitkToFUtilView::OnToFCameraSelected(int index)
   else
   {
     this->m_Controls->m_SurfaceCheckBox->setEnabled(true);
-    this->m_Controls->m_TextureCheckBox->setEnabled(false); // TODO enable when bug 8106 is solved
+    this->m_Controls->m_TextureCheckBox->setEnabled(true); // TODO enable when bug 8106 is solved
     this->m_Controls->m_VideoTextureCheckBox->setEnabled(true);
   }
 }
@@ -606,40 +630,10 @@ void QmitkToFUtilView::OnUpdateCamera()
 {
   int currentImageSequence = 0;
 
-  //m_ToFImageGrabber->GetAllImages(this->m_MitkAllImage, this->m_ImageSequence+1, currentImageSequence);
-  //this->m_MitkDistanceImage->SetSlice(this->m_MitkAllImage->GetSliceData(0, 0, 0)->GetData(), 0, 0, 0);
-  //this->m_MitkAmplitudeImage->SetSlice(this->m_MitkAllImage->GetSliceData(0, 0, 1)->GetData(), 0, 0, 0);
-  //this->m_MitkIntensityImage->SetSlice(this->m_MitkAllImage->GetSliceData(0, 0, 2)->GetData(), 0, 0, 0);
-
-  mitk::ToFImageGrabber* aToFImageGrabber = dynamic_cast<mitk::ToFImageGrabber*>(m_ToFImageGrabber);
-  aToFImageGrabber->Update();
-  this->m_MitkDistanceImage = aToFImageGrabber->GetOutput(0);
-  this->m_MitkAmplitudeImage = aToFImageGrabber->GetOutput(1);
-  this->m_MitkIntensityImage = aToFImageGrabber->GetOutput(2);
-
-  int distanceImageSize = this->m_ToFCaptureWidth * this->m_ToFCaptureHeight * sizeof(float);
-
-  float* distanceFloatData = (float*)this->m_MitkDistanceImage->GetData();
-  this->m_IplDistanceImage->imageData = (char*)distanceFloatData;
-
-  float* intensityFloatData = (float*)this->m_MitkIntensityImage->GetData();
-  this->m_IplIntensityImage->imageData = (char*)intensityFloatData;
-
-  this->m_ToFCompositeFilter->SetInput(this->m_MitkDistanceImage);
-
-  this->m_ToFCompositeFilter->Modified();
-  this->m_ToFCompositeFilter->Update();
-  this->m_MitkDistanceImage = this->m_ToFCompositeFilter->GetOutput();
-
-  this->m_ToFVisualizationFilter->SetInput(0, this->m_MitkDistanceImage);
-  this->m_ToFVisualizationFilter->SetInput(1, this->m_MitkAmplitudeImage);
-  this->m_ToFVisualizationFilter->SetInput(2, this->m_MitkIntensityImage);
-  this->m_ToFVisualizationFilter->Modified();
-  this->m_ToFVisualizationFilter->Update();
-  mitk::Image::Pointer myImage = this->m_ToFVisualizationFilter->GetOutput();
-
-  this->m_DistanceImageNode->SetData(myImage);
-
+  // update pipeline
+  this->m_MitkDistanceImage->Update();
+  // update distance image node
+  this->m_DistanceImageNode->SetData(this->m_MitkDistanceImage);
 
   if (!this->m_TransferFunctionInitialized)
   {
@@ -671,14 +665,10 @@ void QmitkToFUtilView::OnUpdateCamera()
   RenderWidget(m_MultiWidget->mitkWidget3, this->m_QmitkToFImageBackground3, this->m_Widget3ImageType, imageType, 
     colorTransferFunction, this->m_VideoTexture, this->m_Widget3Texture );
 
-
   if (m_Controls->m_SurfaceCheckBox->isChecked())
   {
-    this->m_ToFDistanceImageToSurfaceFilter->SetInput(this->m_MitkDistanceImage);
-    this->m_ToFDistanceImageToSurfaceFilter->SetScalarImage(this->m_IplIntensityImage);
-    this->m_ToFDistanceImageToSurfaceFilter->Modified();
-    this->m_ToFDistanceImageToSurfaceFilter->Update();
-    this->m_Surface = this->m_ToFDistanceImageToSurfaceFilter->GetOutput();
+    // update surface
+    this->m_Surface->Update();
 
     colorTransferFunction = m_Controls->m_ToFVisualisationSettingsWidget->GetColorTransferFunctionByImageType("Intensity");
  
@@ -922,8 +912,7 @@ void QmitkToFUtilView::OnSurfaceCheckBoxChecked(bool checked)
 
 void QmitkToFUtilView::PrepareImageForBackground(vtkLookupTable* lut, float* floatData, unsigned char* image)
 {
-  vtkFloatArray* floatArrayDist;
-  floatArrayDist = vtkFloatArray::New();
+  vtkSmartPointer<vtkFloatArray> floatArrayDist = vtkFloatArray::New();
   floatArrayDist->Initialize();
   int numOfPixel = this->m_ToFCaptureWidth * this->m_ToFCaptureHeight;
   float* flippedFloatData = new float[numOfPixel];
@@ -944,8 +933,7 @@ void QmitkToFUtilView::PrepareImageForBackground(vtkLookupTable* lut, float* flo
 
 void QmitkToFUtilView::PrepareImageForBackground(vtkColorTransferFunction* colorTransferFunction, float* floatData, unsigned char* image)
 {
-  vtkFloatArray* floatArrayDist;
-  floatArrayDist = vtkFloatArray::New();
+  vtkSmartPointer<vtkFloatArray> floatArrayDist = vtkFloatArray::New();
   floatArrayDist->Initialize();
   int numOfPixel = this->m_ToFCaptureWidth * this->m_ToFCaptureHeight;
   float* flippedFloatData = new float[numOfPixel];

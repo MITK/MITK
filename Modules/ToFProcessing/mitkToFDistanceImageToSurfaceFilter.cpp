@@ -99,9 +99,9 @@ void mitk::ToFDistanceImageToSurfaceFilter::GenerateData()
   int pointCount = 0;
   vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
   points->SetDataTypeToDouble();
+  vtkSmartPointer<vtkCellArray> polys = vtkSmartPointer<vtkCellArray>::New();
   vtkSmartPointer<vtkFloatArray> scalarArray = vtkSmartPointer<vtkFloatArray>::New();
   vtkSmartPointer<vtkFloatArray> textureCoords = vtkSmartPointer<vtkFloatArray>::New();
-  vtkSmartPointer<vtkCellArray> polys = vtkSmartPointer<vtkCellArray>::New();
   textureCoords->SetNumberOfComponents(2);
 
   float textureScaleCorrection1 = 0.0;
@@ -114,9 +114,13 @@ void mitk::ToFDistanceImageToSurfaceFilter::GenerateData()
 
   float* scalarFloatData = NULL;
 
-  if (this->m_IplScalarImage)
+  if (this->m_IplScalarImage) // if scalar image is defined use it for texturing
   {
     scalarFloatData = (float*)this->m_IplScalarImage->imageData;
+  }
+  else if ((this->GetNumberOfInputs()>2)&&this->GetInput(2)) // otherwise use intensity image (input(2))
+  {
+    scalarFloatData = (float*)this->GetInput(2)->GetData();
   }
 
   float* inputFloatData = (float*)(input->GetSliceData(0, 0, 0)->GetData());
@@ -173,17 +177,17 @@ void mitk::ToFDistanceImageToSurfaceFilter::GenerateData()
           }
         }
 
-        //if (scalarFloatData)
-        //{          
-        //  scalarArray->InsertTuple1(pixelID, scalarFloatData[pixel[0]+pixel[1]*xDimension]);
-        //}
-        //if (this->m_TextureImageHeight > 0.0 && this->m_TextureImageWidth > 0.0)
-        //{
+        if (scalarFloatData)
+        {          
+          scalarArray->InsertTuple1(pixelID, scalarFloatData[pixel[0]+pixel[1]*xDimension]);
+        }
+        if (this->m_TextureImageHeight > 0.0 && this->m_TextureImageWidth > 0.0)
+        {
 
-        //  float xNorm = (((float)pixel[0])/xDimension)*textureScaleCorrection1 + textureScaleCorrection2 ; // correct video texture scale 640 * 480!! 
-        //  float yNorm = 1.0 - ((float)pixel[1])/yDimension; //flip y-axis
-        //  textureCoords->InsertTuple2(pixelID, xNorm, yNorm);
-        //}
+          float xNorm = (((float)pixel[0])/xDimension)*textureScaleCorrection1 + textureScaleCorrection2 ; // correct video texture scale 640 * 480!! 
+          float yNorm = 1.0 - ((float)pixel[1])/yDimension; //flip y-axis
+          textureCoords->InsertTuple2(pixelID, xNorm, yNorm);
+        }
       }
       pointCount++;
     }
@@ -224,6 +228,7 @@ void mitk::ToFDistanceImageToSurfaceFilter::GenerateOutputInformation()
 void mitk::ToFDistanceImageToSurfaceFilter::SetScalarImage(IplImage* iplScalarImage)
 {
   this->m_IplScalarImage = iplScalarImage;
+  this->Modified();
 }
 
 IplImage* mitk::ToFDistanceImageToSurfaceFilter::GetScalarImage()

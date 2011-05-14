@@ -18,6 +18,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkToFImageGrabber.h"
 #include "mitkToFCameraPMDCamCubeDevice.h"
 
+#include "itkCommand.h"
+
 
 namespace mitk
 {
@@ -39,6 +41,10 @@ namespace mitk
   {
     if (m_IntensityArray||m_AmplitudeArray||m_DistanceArray)
     {
+      if (m_ToFCameraDevice)
+      {
+        m_ToFCameraDevice->RemoveObserver(m_DeviceObserverTag);
+      }
       this->DisconnectCamera();
     }
   }
@@ -134,6 +140,10 @@ namespace mitk
   void ToFImageGrabber::SetCameraDevice(ToFCameraDevice* aToFCameraDevice)
   {
     m_ToFCameraDevice = aToFCameraDevice;
+    itk::SimpleMemberCommand<ToFImageGrabber>::Pointer modifiedCommand = itk::SimpleMemberCommand<ToFImageGrabber>::New();
+    modifiedCommand->SetCallbackFunction(this, &ToFImageGrabber::OnToFCameraDeviceModified);
+    m_DeviceObserverTag = m_ToFCameraDevice->AddObserver(itk::ModifiedEvent(), modifiedCommand);
+    this->Modified();
   }
 
   ToFCameraDevice* ToFImageGrabber::GetCameraDevice()
@@ -159,12 +169,14 @@ namespace mitk
   int ToFImageGrabber::SetModulationFrequency(int modulationFrequency)
   {
     this->m_ToFCameraDevice->SetProperty("ModulationFrequency",mitk::IntProperty::New(modulationFrequency));
+    this->Modified();
     return modulationFrequency;
   }
 
   int ToFImageGrabber::SetIntegrationTime(int integrationTime)
   {
     this->m_ToFCameraDevice->SetProperty("IntegrationTime",mitk::IntProperty::New(integrationTime));
+    this->Modified();
     return integrationTime;
   }
 
@@ -208,9 +220,8 @@ namespace mitk
     this->m_ToFCameraDevice->SetProperty(propertyKey, propertyValue);
   }
 
-  void ToFImageGrabber::UpdateOutputInformation()
+  void ToFImageGrabber::OnToFCameraDeviceModified()
   {
-    this->Modified();  // make sure that we need to be updated
-    Superclass::UpdateOutputInformation();
+    this->Modified();
   }
 }

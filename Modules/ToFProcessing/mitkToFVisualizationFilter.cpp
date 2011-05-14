@@ -127,6 +127,18 @@ void mitk::ToFVisualizationFilter::GenerateData()
   image = (unsigned char*)outputImageWidget1->GetData();
   floatData = GetDataFromImageByImageType(this->m_Widget1ImageType);
   ConvertFloatImageToRGBImage(this->m_Widget1ColorTransferFunction, floatData, image);
+  // copy input 0...n to output 0...n
+  for (unsigned int idx=0; idx<this->GetNumberOfOutputs(); idx++)
+  {
+    mitk::Image::Pointer outputImage = this->GetOutput(idx);
+    mitk::Image::Pointer inputImage = this->GetInput(idx);
+    if (outputImage.IsNotNull()&&inputImage.IsNotNull())
+    {
+      outputImage->CopyInformation(inputImage);
+      outputImage->Initialize(inputImage);
+      outputImage->SetSlice(inputImage->GetSliceData()->GetData());
+    }
+  }
 }
 
 void mitk::ToFVisualizationFilter::InitImage(mitk::Image::Pointer image)

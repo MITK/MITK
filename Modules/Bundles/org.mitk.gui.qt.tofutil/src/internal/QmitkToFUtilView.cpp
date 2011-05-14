@@ -444,10 +444,15 @@ void QmitkToFUtilView::OnToFCameraStarted()
   this->m_ToFVisualizationFilter->SetInput(2,this->m_ToFCompositeFilter->GetOutput(2));
   // initial update of visualization filter
   this->m_ToFVisualizationFilter->Update();
-  this->m_MitkDistanceImage = m_ToFVisualizationFilter->GetOutput(0);
-  this->m_MitkAmplitudeImage = m_ToFVisualizationFilter->GetOutput(1);
-  this->m_MitkIntensityImage = m_ToFVisualizationFilter->GetOutput(2);
-  this->m_ToFDistanceImageToSurfaceFilter->SetInput(0,this->m_ToFVisualizationFilter->GetOutput(0));
+  //this->m_MitkDistanceImage = m_ToFVisualizationFilter->GetOutput(0);
+  //this->m_MitkAmplitudeImage = m_ToFVisualizationFilter->GetOutput(1);
+  //this->m_MitkIntensityImage = m_ToFVisualizationFilter->GetOutput(2);
+  this->m_MitkDistanceImage = m_ToFCompositeFilter->GetOutput(0);
+  this->m_MitkAmplitudeImage = m_ToFCompositeFilter->GetOutput(1);
+  this->m_MitkIntensityImage = m_ToFCompositeFilter->GetOutput(2);
+  this->m_ToFDistanceImageToSurfaceFilter->SetInput(0,this->m_ToFCompositeFilter->GetOutput(0));
+  this->m_ToFDistanceImageToSurfaceFilter->SetInput(1,this->m_ToFCompositeFilter->GetOutput(1));
+  this->m_ToFDistanceImageToSurfaceFilter->SetInput(2,this->m_ToFCompositeFilter->GetOutput(2));
   this->m_Surface = this->m_ToFDistanceImageToSurfaceFilter->GetOutput(0);
 
   this->m_Frametimer->start(0);
@@ -627,15 +632,7 @@ void QmitkToFUtilView::OnUpdateCamera()
 
   // update pipeline
   this->m_MitkDistanceImage->Update();
-
-  int distanceImageSize = this->m_ToFCaptureWidth * this->m_ToFCaptureHeight * sizeof(float);
-
-  float* distanceFloatData = (float*)this->m_MitkDistanceImage->GetData();
-  this->m_IplDistanceImage->imageData = (char*)distanceFloatData;
-
-  float* intensityFloatData = (float*)this->m_MitkIntensityImage->GetData();
-  this->m_IplIntensityImage->imageData = (char*)intensityFloatData;
-
+  // update distance image node
   this->m_DistanceImageNode->SetData(this->m_MitkDistanceImage);
 
   if (!this->m_TransferFunctionInitialized)
@@ -668,10 +665,8 @@ void QmitkToFUtilView::OnUpdateCamera()
   RenderWidget(m_MultiWidget->mitkWidget3, this->m_QmitkToFImageBackground3, this->m_Widget3ImageType, imageType, 
     colorTransferFunction, this->m_VideoTexture, this->m_Widget3Texture );
 
-
   if (m_Controls->m_SurfaceCheckBox->isChecked())
   {
-    this->m_ToFDistanceImageToSurfaceFilter->SetScalarImage(this->m_IplIntensityImage);
     // update surface
     this->m_Surface->Update();
 
@@ -917,8 +912,7 @@ void QmitkToFUtilView::OnSurfaceCheckBoxChecked(bool checked)
 
 void QmitkToFUtilView::PrepareImageForBackground(vtkLookupTable* lut, float* floatData, unsigned char* image)
 {
-  vtkFloatArray* floatArrayDist;
-  floatArrayDist = vtkFloatArray::New();
+  vtkSmartPointer<vtkFloatArray> floatArrayDist = vtkFloatArray::New();
   floatArrayDist->Initialize();
   int numOfPixel = this->m_ToFCaptureWidth * this->m_ToFCaptureHeight;
   float* flippedFloatData = new float[numOfPixel];
@@ -939,8 +933,7 @@ void QmitkToFUtilView::PrepareImageForBackground(vtkLookupTable* lut, float* flo
 
 void QmitkToFUtilView::PrepareImageForBackground(vtkColorTransferFunction* colorTransferFunction, float* floatData, unsigned char* image)
 {
-  vtkFloatArray* floatArrayDist;
-  floatArrayDist = vtkFloatArray::New();
+  vtkSmartPointer<vtkFloatArray> floatArrayDist = vtkFloatArray::New();
   floatArrayDist->Initialize();
   int numOfPixel = this->m_ToFCaptureWidth * this->m_ToFCaptureHeight;
   float* flippedFloatData = new float[numOfPixel];

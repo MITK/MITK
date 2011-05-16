@@ -11,5 +11,7 @@
 	 <file>firstframe.png</file>
 	 <file>lastframe.png</file>
 	 <file>stop.png</file>
+	 <file>powerGreen.png</file>
+	 <file>powerRed.png</file>
  </qresource>
  </RCC>

@@ -15,19 +15,27 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#include "mitkCoreServicesPlugin.h"
+#include "mitkPluginActivator.h"
 
 #include "internal/mitkDataStorageService.h"
 
 namespace mitk
 {
 
-const std::string CoreServicesPlugin::PLUGIN_ID = "org.mitk.core.services";
+const std::string org_mitk_core_services_Activator::PLUGIN_ID = "org.mitk.core.services";
 
-void CoreServicesPlugin::Start(berry::IBundleContext::Pointer context)
+void org_mitk_core_services_Activator::start(ctkPluginContext* context)
 {
-  DataStorageService::Pointer service(new DataStorageService());
-  context->RegisterService(IDataStorageService::ID, service);
+  DataStorageService* service = new DataStorageService();
+  dataStorageService = IDataStorageService::Pointer(service);
+  context->registerService<mitk::IDataStorageService>(service);
+}
+
+void org_mitk_core_services_Activator::stop(ctkPluginContext* context)
+{
+  dataStorageService = 0;
 }
 
 }
+
+Q_EXPORT_PLUGIN2(org_mitk_core_services, mitk::org_mitk_core_services_Activator)

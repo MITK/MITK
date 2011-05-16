@@ -25,6 +25,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <string>
 
+#include <QtPlugin>
+
 namespace mitk
 {
 
@@ -44,5 +46,7 @@ struct MITK_CORE_SERVICES_PLUGIN IDataStorageService : public berry::Service
 };
 
 }
+
+Q_DECLARE_INTERFACE(mitk::IDataStorageService, "org.mitk.service.IDataStorageService")
 
 #endif /*MITKIDATASTORAGESERVICE_H_*/

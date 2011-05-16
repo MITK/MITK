@@ -357,7 +357,46 @@ endforeach()
 link_directories(${MITK_LINK_DIRECTORIES})
 
 add_subdirectory(Core)
-add_subdirectory(CoreUI)
+
+
+SET(mitk_core_plugins
+  CoreUI/Bundles/org.mitk.core.services:ON
+)
+
+#SET(_ctk_plugins_include_dirs
+#  ${Poco_INCLUDE_DIRS}
+#)
+
+#SET(_ctk_plugins_link_dirs
+#  ${Poco_LIBRARY_DIR}
+#)
+
+#INCLUDE_DIRECTORIES(${_ctk_plugins_include_dirs})
+#LINK_DIRECTORIES(${_ctk_plugins_link_dirs})
+
+set(MITK_DEFAULT_SUBPROJECTS MITK-CoreUI)
+
+if(MITK_USE_QT AND QT4_FOUND)
+  add_subdirectory(CoreUI/Qmitk)
+endif()
+
+if(MITK_USE_BLUEBERRY)
+  ctkMacroSetupExternalPlugins(${mitk_core_plugins}
+                               BUILD_OPTION_PREFIX MITK_BUILD_
+                               BUILD_ALL ${MITK_BUILD_ALL_PLUGINS}
+                               COMPACT_OPTIONS)
+
+  add_subdirectory(CoreUI/Bundles)
+
+  # Needed for BlueBerry plugins to find CTK plugins
+  #LINK_DIRECTORIES(${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/plugins)
+
+  SET(MITK_CORE_PLUGIN_USE_FILE "${MITK_BINARY_DIR}/MitkCorePluginUseFile.cmake")
+  #SET(BB_PLUGIN_USE_FILE ${BB_PLUGIN_USE_FILE} PARENT_SCOPE)
+  ctkFunctionGeneratePluginUseFile(${MITK_CORE_PLUGIN_USE_FILE})
+endif()
+
+#add_subdirectory(CoreUI)
 add_subdirectory(Modules)
 add_subdirectory(Applications)
 

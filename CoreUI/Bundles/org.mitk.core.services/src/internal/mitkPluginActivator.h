@@ -22,19 +22,30 @@ PURPOSE.  See the above copyright notices for more information.
 #include <berryIBundleContext.h>
 
 #include "mitkCoreServicesPluginDll.h"
+#include "mitkIDataStorageService.h"
 
 namespace mitk
 {
 
-class MITK_CORE_SERVICES_PLUGIN CoreServicesPlugin : public berry::Plugin
+class MITK_CORE_SERVICES_PLUGIN org_mitk_core_services_Activator : public QObject, public ctkPluginActivator
 {
+  Q_OBJECT
+  Q_INTERFACES(ctkPluginActivator)
+
 public:
   
   static const std::string PLUGIN_ID;
   
-  void Start(berry::IBundleContext::Pointer context);
+  void start(ctkPluginContext* context);
+  void stop(ctkPluginContext* context);
+
+private:
+
+  mitk::IDataStorageService::Pointer dataStorageService;
   
 };
+
+typedef org_mitk_core_services_Activator PluginActivator;
 
 }
 

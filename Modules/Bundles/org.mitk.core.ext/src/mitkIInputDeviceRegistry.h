@@ -25,6 +25,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vector>
 #include <string>
 
+#include <QtPlugin>
+
 #include "mitkIInputDeviceDescriptor.h"
 
 namespace mitk 
@@ -69,5 +71,7 @@ namespace mitk
 
 	}; // end struct IInputDeviceRegistry
 } // end namespace mitk
+
+Q_DECLARE_INTERFACE(mitk::IInputDeviceRegistry, "org.mitk.service.IInputDeviceRegistry")
 
 #endif /*MITKIINPUTDEVICEREGISTRY_H_*/

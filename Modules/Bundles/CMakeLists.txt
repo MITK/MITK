@@ -17,6 +17,10 @@ IF(MITK_USE_BLUEBERRY)
     LIST(APPEND _mitk_bundles_default "org.mitk.gui.qt.ext" "org.mitk.gui.qt.extapplication")
     # ExtApp required bundles
     LIST(APPEND _mitk_bundles_default "org.mitk.gui.qt.imagenavigator" "org.mitk.gui.qt.datamanager")
+
+    # BlueBerry depends on CTK which depends on Qt, so we
+    # need the Qt include direcotries
+    INCLUDE(${QT_USE_FILE})
   ENDIF()
   
   SET(PLUGIN_EXCLUDE_LIST 

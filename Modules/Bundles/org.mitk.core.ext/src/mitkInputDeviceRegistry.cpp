@@ -73,7 +73,7 @@ std::vector<mitk::InputDeviceRegistry::InputDeviceDescriptorPtr> mitk::InputDevi
   return temp;
 }
 
-bool mitk::InputDeviceRegistry::IsA(const std::type_info& type)
+bool mitk::InputDeviceRegistry::IsA(const std::type_info& type) const
 {
   std::string name(GetType().name());
   return name == type.name() || berry::Service::IsA(type);

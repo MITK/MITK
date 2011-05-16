@@ -92,20 +92,20 @@ class MitkIGTUI_EXPORT QmitkIGTConnectionWidget : public QWidget
     \brief Remove the tool nodes currently associated to the tools hold in the NavigationToolStorage from the DataStorage
     */
     void RemoveToolNodes();
-    /*!
-    \brief Construct TrackingDevice according to the selection in the ComboBox.
-    \return Preconfigured TrackingDevice to be used in a TrackingDeviceSource
-    */
-    mitk::TrackingDevice::Pointer ConstructTrackingDevice();
-    /* @return Returns a configured NDI 5D tracking device. Unfortunately the NDI 5D tracking device is not yet in the open source part
-     *        so this method only returns NULL at the moment.
-     */
-    virtual mitk::TrackingDevice::Pointer ConfigureNDI5DTrackingDevice();
+    ///*!
+    //\brief Construct TrackingDevice according to the selection in the ComboBox.
+    //\return Preconfigured TrackingDevice to be used in a TrackingDeviceSource
+    //*/
+    //mitk::TrackingDevice::Pointer ConstructTrackingDevice();
+    ///* @return Returns a configured NDI 5D tracking device. Unfortunately the NDI 5D tracking device is not yet in the open source part
+    // *        so this method only returns NULL at the moment.
+    // */
+    //virtual mitk::TrackingDevice::Pointer ConfigureNDI5DTrackingDevice();
 
-    /* @return Returns a configured NDI 6D tracking device. 
-     *         The type (which means Aurora/Polaris) will not be set in the returnvalue. You have to this later.
-     */
-    mitk::TrackingDevice::Pointer ConfigureNDI6DTrackingDevice();
+    ///* @return Returns a configured NDI 6D tracking device. 
+    // *         The type (which means Aurora/Polaris) will not be set in the returnvalue. You have to this later.
+    // */
+    //mitk::TrackingDevice::Pointer ConfigureNDI6DTrackingDevice();
 
     Ui::QmitkIGTConnectionWidgetControls* m_Controls;
 

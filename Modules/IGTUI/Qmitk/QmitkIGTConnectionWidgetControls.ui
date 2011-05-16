@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>443</width>
+    <width>378</width>
     <height>189</height>
    </rect>
   </property>
@@ -19,7 +19,7 @@
   <property name="windowTitle">
    <string>QmitkIGTConnection</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout_4">
+  <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="0">
     <widget class="QLabel" name="label">
      <property name="font">
@@ -34,262 +34,57 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="0" colspan="2">
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <item>
-      <widget class="QComboBox" name="selectTrackingDeviceComboBox">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>10</pointsize>
-        </font>
-       </property>
-       <property name="currentIndex">
-        <number>0</number>
-       </property>
-       <property name="maxVisibleItems">
-        <number>7</number>
-       </property>
-       <property name="insertPolicy">
-        <enum>QComboBox::InsertAtBottom</enum>
-       </property>
-       <property name="sizeAdjustPolicy">
-        <enum>QComboBox::AdjustToContents</enum>
-       </property>
-       <property name="frame">
-        <bool>true</bool>
-       </property>
-       <item>
-        <property name="text">
-         <string>NDI Polaris</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>NDI Aurora</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Micron Tracker</string>
-        </property>
-       </item>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="connectButton">
-       <property name="enabled">
-        <bool>true</bool>
-       </property>
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>0</width>
-         <height>50</height>
-        </size>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>10</pointsize>
-        </font>
-       </property>
-       <property name="toolTip">
-        <string>Connect to camera</string>
-       </property>
-       <property name="text">
-        <string>Connect</string>
-       </property>
-       <property name="icon">
-        <iconset resource="../resources/IGTUI.qrc">
-         <normaloff>:/IGTUI/powerRed.png</normaloff>
-         <normalon>:/IGTUI/powerGreen.png</normalon>:/IGTUI/powerRed.png</iconset>
-       </property>
-       <property name="iconSize">
-        <size>
-         <width>30</width>
-         <height>30</height>
-        </size>
-       </property>
-       <property name="checkable">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-    </layout>
+   <item row="1" column="0" rowspan="2">
+    <widget class="QmitkTrackingDeviceConfigurationWidget" name="trackingDeviceConfigurationWidget" native="true"/>
    </item>
-   <item row="2" column="0" colspan="2">
-    <widget class="QStackedWidget" name="deviceConfigurationWidget">
-     <property name="currentIndex">
-      <number>0</number>
+   <item row="1" column="1" colspan="2">
+    <widget class="QPushButton" name="connectButton">
+     <property name="enabled">
+      <bool>true</bool>
      </property>
-     <widget class="QWidget" name="page">
-      <layout class="QGridLayout" name="gridLayout_3">
-       <item row="0" column="0">
-        <widget class="QGroupBox" name="groupBox">
-         <property name="title">
-          <string>NDI Polaris configuration</string>
-         </property>
-         <layout class="QGridLayout" name="gridLayout_5">
-          <item row="0" column="0">
-           <widget class="QLabel" name="comPortLabelPolaris">
-            <property name="text">
-             <string>COM Port:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="QSpinBox" name="comPortPolaris">
-            <property name="prefix">
-             <string>COM </string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="2">
-           <widget class="QLabel" name="portTypeLabelPolaris">
-            <property name="text">
-             <string>Port type:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="3">
-           <widget class="QComboBox" name="portTypePolaris">
-            <item>
-             <property name="text">
-              <string>/dev/ttyUSB</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>/dev/ttyS</string>
-             </property>
-            </item>
-           </widget>
-          </item>
-          <item row="0" column="4">
-           <spacer name="horizontalSpacer_2">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>40</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-          <item row="0" column="5">
-           <widget class="QLabel" name="label_4">
-            <property name="text">
-             <string>Mode:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="6">
-           <widget class="QRadioButton" name="polarisMode5D">
-            <property name="text">
-             <string>5D</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="7">
-           <widget class="QRadioButton" name="polarisMode6D">
-            <property name="text">
-             <string>6D</string>
-            </property>
-            <property name="checked">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-         </layout>
-         <zorder>comPortLabelPolaris</zorder>
-         <zorder>comPortPolaris</zorder>
-         <zorder>portTypeLabelPolaris</zorder>
-         <zorder>portTypePolaris</zorder>
-         <zorder>horizontalSpacer_2</zorder>
-         <zorder>label_4</zorder>
-         <zorder>polarisMode5D</zorder>
-         <zorder>polarisMode6D</zorder>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="page_2">
-      <layout class="QGridLayout" name="gridLayout_2">
-       <item row="0" column="0">
-        <widget class="QGroupBox" name="groupBox_2">
-         <property name="title">
-          <string>NDI Aurora configuration</string>
-         </property>
-         <layout class="QGridLayout" name="gridLayout">
-          <item row="0" column="0">
-           <widget class="QLabel" name="comPortLabelAurora">
-            <property name="text">
-             <string>COM Port:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="QSpinBox" name="comPortAurora">
-            <property name="prefix">
-             <string>COM </string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="2">
-           <widget class="QLabel" name="portTypeLabelAurora">
-            <property name="text">
-             <string>Port type:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="3">
-           <widget class="QComboBox" name="portTypeAurora">
-            <item>
-             <property name="text">
-              <string>/dev/ttyUSB</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>/dev/ttyS</string>
-             </property>
-            </item>
-           </widget>
-          </item>
-          <item row="0" column="4">
-           <spacer name="horizontalSpacer">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>213</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-         </layout>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="page_3"/>
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>50</height>
+      </size>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+      </font>
+     </property>
+     <property name="toolTip">
+      <string>Connect to camera</string>
+     </property>
+     <property name="text">
+      <string>Connect</string>
+     </property>
+     <property name="icon">
+      <iconset resource="../resources/IGTUI.qrc">
+       <normaloff>:/IGTUI/powerRed.png</normaloff>
+       <normalon>:/IGTUI/powerGreen.png</normalon>:/IGTUI/powerRed.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>30</width>
+       <height>30</height>
+      </size>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
+     </property>
     </widget>
    </item>
-   <item row="3" column="1">
+   <item row="2" column="1" colspan="2">
+    <widget class="QmitkToolTrackingStatusWidget" name="widget" native="true"/>
+   </item>
+   <item row="3" column="2">
     <spacer name="verticalSpacer">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -305,6 +100,20 @@
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>QmitkTrackingDeviceConfigurationWidget</class>
+   <extends>QWidget</extends>
+   <header>QmitkTrackingDeviceConfigurationWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QmitkToolTrackingStatusWidget</class>
+   <extends>QWidget</extends>
+   <header>QmitkToolTrackingStatusWidget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="../resources/QmitkToFUtilWidget.qrc"/>
   <include location="../resources/IGTUI.qrc"/>

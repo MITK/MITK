@@ -16,6 +16,8 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include "QmitkIGTConnectionWidget.h"
+#include "QmitkTrackingDeviceConfigurationWidget.h"
+
 #include "mitkClaronTrackingDevice.h"
 #include "mitkNDITrackingDevice.h"
 
@@ -52,6 +54,8 @@ void QmitkIGTConnectionWidget::CreateQtPartControl(QWidget *parent)
   // create GUI widgets
   m_Controls = new Ui::QmitkIGTConnectionWidgetControls;
   m_Controls->setupUi(parent);
+  // configure trackingDeviceConfigurationWidget
+  m_Controls->trackingDeviceConfigurationWidget->EnableAdvancedUserControl(false);
   }
 }
 
@@ -59,28 +63,28 @@ void QmitkIGTConnectionWidget::CreateConnections()
 {
   if ( m_Controls )
   {
-    connect( (QObject*)(m_Controls->selectTrackingDeviceComboBox), SIGNAL(currentIndexChanged(int)), this, SLOT(OnTrackingDeviceChanged()) );
+    //connect( (QObject*)(m_Controls->selectTrackingDeviceComboBox), SIGNAL(currentIndexChanged(int)), this, SLOT(OnTrackingDeviceChanged()) );
     connect( (QObject*)(m_Controls->connectButton), SIGNAL(clicked()), this, SLOT(OnConnect()) );
 
-    //set a few UI components depending on Windows / Linux
-    #ifdef WIN32
-    m_Controls->portTypeLabelPolaris->setVisible(false);
-    m_Controls->portTypePolaris->setVisible(false);
-    m_Controls->portTypeLabelAurora->setVisible(false);
-    m_Controls->portTypeAurora->setVisible(false);
-    #else
-    m_Controls->comPortLabelAurora->setText("Port Nr:");
-    m_Controls->comPortLabelPolaris->setText("Port Nr:");
-    m_Controls->comPortAurora->setPrefix("");
-    m_Controls->comPortPolaris->setPrefix("");
-    #endif
+    ////set a few UI components depending on Windows / Linux
+    //#ifdef WIN32
+    //m_Controls->portTypeLabelPolaris->setVisible(false);
+    //m_Controls->portTypePolaris->setVisible(false);
+    //m_Controls->portTypeLabelAurora->setVisible(false);
+    //m_Controls->portTypeAurora->setVisible(false);
+    //#else
+    //m_Controls->comPortLabelAurora->setText("Port Nr:");
+    //m_Controls->comPortLabelPolaris->setText("Port Nr:");
+    //m_Controls->comPortAurora->setPrefix("");
+    //m_Controls->comPortPolaris->setPrefix("");
+    //#endif
   }
 }
 
 void QmitkIGTConnectionWidget::OnTrackingDeviceChanged()
 {
-  //show the correspondig widget for configuring the TrackingDevice
-  m_Controls->deviceConfigurationWidget->setCurrentIndex(m_Controls->selectTrackingDeviceComboBox->currentIndex());
+  ////show the correspondig widget for configuring the TrackingDevice
+  //m_Controls->deviceConfigurationWidget->setCurrentIndex(m_Controls->selectTrackingDeviceComboBox->currentIndex());
 }
 
 void QmitkIGTConnectionWidget::OnConnect()
@@ -92,7 +96,7 @@ void QmitkIGTConnectionWidget::OnConnect()
     if (LoadToolfile(fileName))
     {
       // create TrackingDevice
-      m_TrackingDevice = this->ConstructTrackingDevice();
+      m_TrackingDevice = m_Controls->trackingDeviceConfigurationWidget->GetTrackingDevice();
       if (m_TrackingDevice.IsNotNull())
       {
         // Create TrackingDeviceSource and add tools 
@@ -170,12 +174,12 @@ bool QmitkIGTConnectionWidget::LoadToolfile(QString qFilename)
       }
       else lastDevice = tempStorage->GetTool(i)->GetTrackingDeviceType();
     }
-    // check if tool device type and tracking device type are equal
-    if (lastDevice!=m_Controls->selectTrackingDeviceComboBox->currentIndex())
-    {
-      m_ErrorMessage = "Error: Tools are not applicable for the chosen device";
-      return false;
-    }
+    //// check if tool device type and tracking device type are equal
+    //if (lastDevice!=m_Controls->trackingDeviceConfigurationWidget->)
+    //{
+    //  m_ErrorMessage = "Error: Tools are not applicable for the chosen device";
+    //  return false;
+    //}
 
     m_NavigationToolStorage = tempStorage;
     return true;
@@ -209,69 +213,69 @@ void QmitkIGTConnectionWidget::SetDataStorage( mitk::DataStorage::Pointer dataSt
   m_DataStorage = dataStorage;
 }
 
-mitk::TrackingDevice::Pointer QmitkIGTConnectionWidget::ConstructTrackingDevice()
-  {
-  mitk::TrackingDevice::Pointer returnValue;
-  //#### Step 1: configure tracking device:
-  if (m_Controls->selectTrackingDeviceComboBox->currentIndex()==0)//NDI Polaris
-      {
-      if(m_Controls->polarisMode5D->isChecked()) //5D Tracking
-        {
-        //not yet in the open source part so we'll only get NULL here.
-        returnValue = ConfigureNDI5DTrackingDevice();
-        }
-      else //6D Tracking
-        {
-        returnValue = ConfigureNDI6DTrackingDevice();
-        returnValue->SetType(mitk::NDIPolaris);
-        }
-      }
-  else if (m_Controls->selectTrackingDeviceComboBox->currentIndex()==1)//NDI Aurora
-        {
-        returnValue = ConfigureNDI6DTrackingDevice();
-        returnValue->SetType(mitk::NDIAurora);
-        }
-  else if (m_Controls->selectTrackingDeviceComboBox->currentIndex()==2)//ClaronTechnology MicronTracker 2
-        {
-        returnValue = mitk::ClaronTrackingDevice::New();
-        }
-  else
-  {
-    returnValue = NULL;
-  }
-  return returnValue;
-  }
-
-mitk::TrackingDevice::Pointer QmitkIGTConnectionWidget::ConfigureNDI5DTrackingDevice()
-  {
-  return NULL;
-  }
-
-mitk::TrackingDevice::Pointer QmitkIGTConnectionWidget::ConfigureNDI6DTrackingDevice()
-  {
-  mitk::NDITrackingDevice::Pointer tempTrackingDevice = mitk::NDITrackingDevice::New();
-    
-  //build prefix (depends on linux/win)
-  QString prefix = "";
-  #ifdef WIN32
-  prefix ="COM";
-  #else
-  if (m_Controls->selectTrackingDeviceComboBox->currentIndex()==1) //Aurora
-    prefix = m_Controls->portTypeAurora->currentText();  
-  else //Polaris
-    prefix = m_Controls->portTypePolaris->currentText();
-  #endif
-  //get port
-  int port = 0;
-  if (m_Controls->selectTrackingDeviceComboBox->currentIndex()==1) port = m_Controls->comPortAurora->value();
-  else port = m_Controls->comPortPolaris->value();
-  //build port name string
-  QString portName = prefix + QString::number(port);
-
-  tempTrackingDevice->SetDeviceName(portName.toStdString()); //set the port name
-  mitk::TrackingDevice::Pointer returnValue = static_cast<mitk::TrackingDevice*>(tempTrackingDevice);
-  return returnValue;
-  }
+//mitk::TrackingDevice::Pointer QmitkIGTConnectionWidget::ConstructTrackingDevice()
+//  {
+//  mitk::TrackingDevice::Pointer returnValue;
+//  //#### Step 1: configure tracking device:
+//  if (m_Controls->selectTrackingDeviceComboBox->currentIndex()==0)//NDI Polaris
+//      {
+//      if(m_Controls->polarisMode5D->isChecked()) //5D Tracking
+//        {
+//        //not yet in the open source part so we'll only get NULL here.
+//        returnValue = ConfigureNDI5DTrackingDevice();
+//        }
+//      else //6D Tracking
+//        {
+//        returnValue = ConfigureNDI6DTrackingDevice();
+//        returnValue->SetType(mitk::NDIPolaris);
+//        }
+//      }
+//  else if (m_Controls->selectTrackingDeviceComboBox->currentIndex()==1)//NDI Aurora
+//        {
+//        returnValue = ConfigureNDI6DTrackingDevice();
+//        returnValue->SetType(mitk::NDIAurora);
+//        }
+//  else if (m_Controls->selectTrackingDeviceComboBox->currentIndex()==2)//ClaronTechnology MicronTracker 2
+//        {
+//        returnValue = mitk::ClaronTrackingDevice::New();
+//        }
+//  else
+//  {
+//    returnValue = NULL;
+//  }
+//  return returnValue;
+//  }
+//
+//mitk::TrackingDevice::Pointer QmitkIGTConnectionWidget::ConfigureNDI5DTrackingDevice()
+//  {
+//  return NULL;
+//  }
+//
+//mitk::TrackingDevice::Pointer QmitkIGTConnectionWidget::ConfigureNDI6DTrackingDevice()
+//  {
+//  mitk::NDITrackingDevice::Pointer tempTrackingDevice = mitk::NDITrackingDevice::New();
+//    
+//  //build prefix (depends on linux/win)
+//  QString prefix = "";
+//  #ifdef WIN32
+//  prefix ="COM";
+//  #else
+//  if (m_Controls->selectTrackingDeviceComboBox->currentIndex()==1) //Aurora
+//    prefix = m_Controls->portTypeAurora->currentText();  
+//  else //Polaris
+//    prefix = m_Controls->portTypePolaris->currentText();
+//  #endif
+//  //get port
+//  int port = 0;
+//  if (m_Controls->selectTrackingDeviceComboBox->currentIndex()==1) port = m_Controls->comPortAurora->value();
+//  else port = m_Controls->comPortPolaris->value();
+//  //build port name string
+//  QString portName = prefix + QString::number(port);
+//
+//  tempTrackingDevice->SetDeviceName(portName.toStdString()); //set the port name
+//  mitk::TrackingDevice::Pointer returnValue = static_cast<mitk::TrackingDevice*>(tempTrackingDevice);
+//  return returnValue;
+//  }
 
 mitk::NavigationToolStorage::Pointer QmitkIGTConnectionWidget::GetNavigationToolStorage()
 {

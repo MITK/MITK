@@ -35,8 +35,6 @@ QmitkTrackingDeviceConfigurationWidget::QmitkTrackingDeviceConfigurationWidget(Q
   AddOutput("<br>NDI Polaris selected");
   this->m_TrackingDeviceConfigurated = false;
 
-  this->SetGUIStyle(QmitkTrackingDeviceConfigurationWidget::SIMPLE);
-
   m_AdvancedUserControl = true;
 }
 

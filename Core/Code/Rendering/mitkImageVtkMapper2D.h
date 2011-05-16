@@ -250,11 +250,11 @@ public:
   static void SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer = NULL, bool overwrite = false);
 
 protected:
-  //Adjust the geometry of each slice to the displayGeometry in order to render in the full render window
-  void AdjustToDisplayGeometry(mitk::BaseRenderer* renderer, mitk::ScalarType spacing[2]);
+  //Generate a plane with size of the image in mm
+  void GeneratePlane(mitk::BaseRenderer* renderer, mitk::ScalarType spacing[2]);
 
   //set the camera to view the textured plane
-  void AdjustCamera(mitk::BaseRenderer* renderer, mitk::ScalarType spacing[2]);
+  void AdjustCamera(mitk::BaseRenderer* renderer);
 
   ImageVtkMapper2D();
 

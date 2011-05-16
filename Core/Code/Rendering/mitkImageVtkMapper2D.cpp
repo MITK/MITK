@@ -65,7 +65,7 @@ mitk::ImageVtkMapper2D::~ImageVtkMapper2D()
   this->InvokeEvent( itk::DeleteEvent() ); //TODO <- what is this doing exactly?
 }
 
-void mitk::ImageVtkMapper2D::AdjustCamera(mitk::BaseRenderer* renderer, mitk::ScalarType spacing[2])
+void mitk::ImageVtkMapper2D::AdjustCamera(mitk::BaseRenderer* renderer)
 {
   LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
 
@@ -74,24 +74,22 @@ void mitk::ImageVtkMapper2D::AdjustCamera(mitk::BaseRenderer* renderer, mitk::Sc
 
   const mitk::DisplayGeometry* displayGeometry = renderer->GetDisplayGeometry();
 
-  double imageHeightInMM = localStorage->m_ReslicedImage->GetDimensions()[1];
-  double displayHeightInMM = displayGeometry->GetSizeInMM()[1];
-  double factor = displayHeightInMM/imageHeightInMM;
-
-//  MITK_INFO << "imageHeightInMM " << imageHeightInMM;
-//  MITK_INFO << "displayHeightInMM " << displayHeightInMM;
-//  MITK_INFO << "factor " << factor;
-//  MITK_INFO << "1/factor " << 1/factor;
-//  MITK_INFO << "disp->GetFac" << displayGeometry->GetScaleFactorMMPerDisplayUnit();
+  double imageHeightInMM = localStorage->m_ReslicedImage->GetDimensions()[1]; //the height of the current slice in mm
+  double displayHeightInMM = displayGeometry->GetSizeInMM()[1]; //the display height in mm (gets smaller when you zoom in)
+  double zoomFactor = displayHeightInMM/imageHeightInMM; //determine how much of the image can be displayed
 
   Vector2D displayGeometryOriginInMM = displayGeometry->GetOriginInMM();  //top left of the render window
   Vector2D displayGeometryCenterInMM = displayGeometryOriginInMM + displayGeometry->GetSizeInMM()/2; //center of the render window
 
-  //scale the rendered object.
+  //Scale the rendered object:
+  //The image is scaled by a single factor, because in an orthographic projection sizes
+  //are preserved (so you cannot scale X and Y axis with different parameters). The
+  //parameter sets the size of the total display-volume. If you set this to the image
+  //height, the image plus a border with the size of the image will be rendered.
+  //Therefore, the size is imageHeightInMM / 2.
   renderer->GetVtkRenderer()->GetActiveCamera()->SetParallelScale(imageHeightInMM / 2);
   //zooming with the factor calculated by dividing displayHeight through imegeHeight. The factor is inverse, because the VTK zoom method is working inversely.
-  renderer->GetVtkRenderer()->GetActiveCamera()->Zoom(1/factor);
-
+  renderer->GetVtkRenderer()->GetActiveCamera()->Zoom(1/zoomFactor);
 
   //the center of the view-plane
   double viewPlaneCenter[3];
@@ -105,11 +103,11 @@ void mitk::ImageVtkMapper2D::AdjustCamera(mitk::BaseRenderer* renderer, mitk::Sc
   cameraUp[1] = 1.0;
   cameraUp[2] = 0.0;
 
-  //the position of the camera (center[0], center[1], 1.0)
+  //the position of the camera (center[0], center[1], 1000)
   double cameraPosition[3];
   cameraPosition[0] = viewPlaneCenter[0];
   cameraPosition[1] = viewPlaneCenter[1];
-  cameraPosition[2] = viewPlaneCenter[2] + 1000.0; //planeCenter[2] should be 0.0. Therefore, the camera is located in the XY-plane with Z=1.0
+  cameraPosition[2] = viewPlaneCenter[2] + 1000.0; //Reason for 1000 => VTK seems to calculate the clipping planes wrong for Z=1
 
   //set the camera corresponding to the textured plane
   vtkSmartPointer<vtkCamera> camera = renderer->GetVtkRenderer()->GetActiveCamera();
@@ -121,18 +119,10 @@ void mitk::ImageVtkMapper2D::AdjustCamera(mitk::BaseRenderer* renderer, mitk::Sc
   }
   //reset the clipping range TODO why? really needed if everything is correct?
   renderer->GetVtkRenderer()->ResetCameraClippingRange();
-
-  //    renderer->GetVtkRenderer()->ResetCamera(localStorage->m_Actor->GetBounds());
-  //TODO remove this output
-  //  MITK_INFO << "view plane normal: " << camera->GetViewPlaneNormal()[0] << " " << camera->GetViewPlaneNormal()[1] << " " << camera->GetViewPlaneNormal()[2];
-  //  MITK_INFO << "bounds of the actor: " << localStorage->m_Actor->GetBounds()[0] << " " << localStorage->m_Actor->GetBounds()[1] << " " << localStorage->m_Actor->GetBounds()[2] << " " << localStorage->m_Actor->GetBounds()[3] << " " << localStorage->m_Actor->GetBounds()[4] << " " << localStorage->m_Actor->GetBounds()[5];
-  //  MITK_INFO << "camera up vector: " << renderer->GetVtkRenderer()->GetActiveCamera()->GetViewUp()[0] << " " << renderer->GetVtkRenderer()->GetActiveCamera()->GetViewUp()[1] << " "  <<  renderer->GetVtkRenderer()->GetActiveCamera()->GetViewUp()[2];
-  //  MITK_INFO << "camera position: " << renderer->GetVtkRenderer()->GetActiveCamera()->GetPosition()[0] << " " << renderer->GetVtkRenderer()->GetActiveCamera()->GetPosition()[1] << " "  <<  renderer->GetVtkRenderer()->GetActiveCamera()->GetPosition()[2];
-  //  MITK_INFO << "focal point: " << renderer->GetVtkRenderer()->GetActiveCamera()->GetFocalPoint()[0] << " " << renderer->GetVtkRenderer()->GetActiveCamera()->GetFocalPoint()[1] << " "  <<  renderer->GetVtkRenderer()->GetActiveCamera()->GetFocalPoint()[2];
 }
 
 //set the two points defining the textured plane according to the dimension and spacing
-void mitk::ImageVtkMapper2D::AdjustToDisplayGeometry(mitk::BaseRenderer* renderer, mitk::ScalarType spacing[2])
+void mitk::ImageVtkMapper2D::GeneratePlane(mitk::BaseRenderer* renderer, mitk::ScalarType spacing[2])
 {
   LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
   //set the origin to (0; 0; 0), because the default origin can be anywhere
@@ -200,7 +190,6 @@ void mitk::ImageVtkMapper2D::MitkRenderVolumetricGeometry(BaseRenderer* renderer
 
 void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
 {
-  MITK_INFO << "----- Generate Data ------";
   LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
 
   bool visible = IsVisible(renderer);
@@ -264,6 +253,7 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
   const TimeSlicedGeometry *inputTimeGeometry = input->GetTimeSlicedGeometry();
   const Geometry3D* inputGeometry = inputTimeGeometry->GetGeometry3D( this->GetTimestep() );
 
+  //Spacing of the slice
   ScalarType mmPerPixel[2];
 
   // Bounds information for reslicing (only reuqired if reference geometry 
@@ -498,6 +488,8 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
 
   rendererInfo.m_Reslicer->SetResliceAxesDirectionCosines( cosines );
 
+
+
   int xMin, xMax, yMin, yMax;
   if ( boundsInitialized )
   {
@@ -520,9 +512,9 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
 
     xMin = yMin = 0;
     xMax = static_cast< int >( rendererInfo.m_Extent[0]
-                               - rendererInfo.m_PixelsPerMM[0] + 0.5 );
+                               - rendererInfo.m_PixelsPerMM[0] + 0.5 + 1.0);
     yMax = static_cast< int >( rendererInfo.m_Extent[1] 
-                               - rendererInfo.m_PixelsPerMM[1] + 0.5 );
+                               - rendererInfo.m_PixelsPerMM[1] + 0.5 + 1.0);
   }
 
   // Disallow huge dimensions
@@ -533,7 +525,6 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
 
   // Calculate dataset spacing in plane z direction (NOT spacing of current
   // world geometry)
-
   double dataZSpacing = 1.0;
   
   normal.Normalize();    
@@ -598,7 +589,7 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
   {
     if ( rendererInfo.m_Image == NULL )
     {
-      rendererInfo.m_Image = vtkImageData::New();//reslicedImage;
+      rendererInfo.m_Image = vtkImageData::New();
     }
     rendererInfo.m_Image->DeepCopy( reslicedImage );
     rendererInfo.m_Image->Update();
@@ -621,9 +612,8 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
 
   //apply the properties after the slice was set
   this->ApplyProperties( renderer );
-  //set the size and position of textured plane according to the render window
-  this->AdjustToDisplayGeometry( renderer, mmPerPixel );
-  //set the camera position in order to view the textured plane
+  //set the size textured plane
+  this->GeneratePlane( renderer, mmPerPixel );
 
   //turn the light out in the scene in order to render correct grey values. TODO How to turn it on if you need it?
   renderer->GetVtkRenderer()->RemoveAllLights();
@@ -645,7 +635,7 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
   localStorage->m_Mapper->SetInputConnection(localStorage->m_TransformFilter->GetOutputPort());
 
   //set up the camera to view the transformed plane
-  this->AdjustCamera( renderer, mmPerPixel );
+  this->AdjustCamera( renderer );
 
   //TODO remove this later
   static int counter = 0;
@@ -670,7 +660,6 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
 
   // We have been modified
   rendererInfo.m_LastUpdateTime.Modified();
-  MITK_INFO << "--------------- Ende Generate ------------";
 }
 
 bool mitk::ImageVtkMapper2D::LineIntersectZero( vtkPoints *points, int p1, int p2,
@@ -1002,7 +991,6 @@ void mitk::ImageVtkMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
 
 void mitk::ImageVtkMapper2D::Update(mitk::BaseRenderer* renderer)
 {
-  //  MITK_INFO << "||||||||||||||| Update ||||||||||";
   if ( !this->IsVisible( renderer ) )
   {
     return;
@@ -1045,7 +1033,6 @@ void mitk::ImageVtkMapper2D::Update(mitk::BaseRenderer* renderer)
   // since we have checked that nothing important has changed, we can set
   // m_LastUpdateTime to the current time
   rendererInfo.m_LastUpdateTime.Modified();
-  //  MITK_INFO << "||||||||||||||| Update Ende ||||||||||";
 }
 
 void mitk::ImageVtkMapper2D::DeleteRendererCallback( itk::Object *object, const itk::EventObject & )

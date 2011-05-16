@@ -319,12 +319,15 @@ DicomSeriesReader::AnalyzeFileForITKImageSeriesReaderSpacingAssumption(
   Point3D lastDifferentOrigin;
   bool lastOriginInitialized(false);
 
+  MITK_DEBUG << "--------------------------------------------------------------------------------";
   MITK_DEBUG << "Analyzing files for z-spacing assumption of ITK's ImageSeriesReader ";
   unsigned int fileIndex(0);
   for (StringContainer::const_iterator fileIter = files.begin();
        fileIter != files.end();
        ++fileIter, ++fileIndex)
   {
+    bool fileFitsIntoPattern(false);
+
     // Read tag value into point3D. PLEASE replace this by appropriate GDCM code if you figure out how to do that
     std::string thisOriginString = tagValueMappings[fileIter->c_str()][tagImagePositionPatient];
     
@@ -344,8 +347,9 @@ DicomSeriesReader::AnalyzeFileForITKImageSeriesReaderSpacingAssumption(
 
     if ( lastOriginInitialized && (thisOrigin == lastOrigin) )
     {
-      MITK_DEBUG << "Sort away " << *fileIter << " for separate time step"; // we already have one occupying this position
+      MITK_DEBUG << "    ==> Sort away " << *fileIter << " for separate time step"; // we already have one occupying this position
       result.second.push_back( *fileIter );
+      fileFitsIntoPattern = false;
     }
     else
     {
@@ -375,8 +379,6 @@ DicomSeriesReader::AnalyzeFileForITKImageSeriesReaderSpacingAssumption(
           MITK_ERROR << "Reader implementation made wrong assumption on tag (0020,0037). Found " << dim << "instead of 6 values.";
         }
 
-        MITK_DEBUG << "Tilt check: right vector (" << right[0] << "," << right[1] << "," << right[2] << "), "
-                                     "up vector (" << up[0] << "," << up[1] << "," << up[2] << ")";
 
         /* 
            Determine if line (thisOrigin + l * normal) contains lastDifferentOrigin.
@@ -390,6 +392,9 @@ DicomSeriesReader::AnalyzeFileForITKImageSeriesReaderSpacingAssumption(
                               |pointAlongNormal - thisOrigin| ^ 2
 
            ( x meaning the cross product )
+
+        MITK_DEBUG << "Tilt check: right vector (" << right[0] << "," << right[1] << "," << right[2] << "), "
+                                     "up vector (" << up[0] << "," << up[1] << "," << up[2] << ")";
         */
 
         Vector3D normal = itk::CrossProduct(right, up);
@@ -402,13 +407,27 @@ DicomSeriesReader::AnalyzeFileForITKImageSeriesReaderSpacingAssumption(
 
         if (distance > 0.001) // mitk::eps is too small; 1/1000 of a mm should be enough to detect tilt
         {
-          MITK_WARN << "Series seems to contain a tilted geometry. Will load series as many single slices.";
-          MITK_WARN << "Distance of expected slice origin from actual slice origin: " << distance;
+          MITK_DEBUG << "  Series might contain a tilted geometry";
+          MITK_DEBUG << "  Distance of expected slice origin from actual slice origin: " << distance;
+          MITK_DEBUG  << "    ==> Sort away " << *fileIter << " for later analysis";
+
+          /* Pessimistic approach: split block right here
 
           result.first.assign( files.begin(), fileIter );
           result.second.insert( result.second.end(), fileIter, files.end() );
 
           return result; // stop processing with first split
+          */
+
+          /* optimistic approach: save file for later, check all further files */
+          
+          result.second.push_back(*fileIter);
+          fileFitsIntoPattern = false;
+        }
+        else
+        {
+          result.first.push_back(*fileIter); // this file is good for current block
+          fileFitsIntoPattern = true;
         }
       }
       else if (fromFirstToSecondOriginInitialized) // we already know the offset between slices
@@ -421,32 +440,49 @@ DicomSeriesReader::AnalyzeFileForITKImageSeriesReaderSpacingAssumption(
 
         if (norm > toleratedError)
         {
-          MITK_WARN << "File " << *fileIter << " breaks the inter-slice distance pattern (diff = " 
+          MITK_DEBUG << "  File does not fit into the inter-slice distance pattern (diff = " 
                                << norm << ", allowed " 
                                << toleratedError << ").";
-          MITK_WARN << "Expected position (" << assumedOrigin[0] << ","
+          MITK_DEBUG << "  Expected position (" << assumedOrigin[0] << ","
                                             << assumedOrigin[1] << ","
                                             << assumedOrigin[2] << "), got position ("
                                             << thisOrigin[0] << ","
                                             << thisOrigin[1] << ","
                                             << thisOrigin[2] << ")";
+          MITK_DEBUG  << "    ==> Sort away " << *fileIter << " for later analysis";
 
           // At this point we know we deviated from the expectation of ITK's ImageSeriesReader
           // We split the input file list at this point, i.e. all files up to this one (excluding it)
           // are returned as group 1, the remaining files (including the faulty one) are group 2
           
+          /*
+             Pessimistic approach: split right here:
+
           result.first.assign( files.begin(), fileIter );
           result.second.insert( result.second.end(), fileIter, files.end() );
 
           return result; // stop processing with first split
+          */
+
+          /* Optimistic approach: check if any of the remaining slices fits in */
+          result.second.push_back( *fileIter ); // sort away for further analysis
+          fileFitsIntoPattern = false;
+        }
+        else
+        {
+          result.first.push_back(*fileIter); // this file is good for current block
+          fileFitsIntoPattern = true;
         }
       }
-
-      result.first.push_back(*fileIter);
+      else // this should be the very first slice
+      {
+        result.first.push_back(*fileIter); // this file is good for current block
+        fileFitsIntoPattern = true;
+      }
     }
 
     // recored current origin for reference in later iterations
-    if ( !lastOriginInitialized || thisOrigin != lastOrigin )
+    if ( !lastOriginInitialized || fileFitsIntoPattern && (thisOrigin != lastOrigin) )
     {
       lastDifferentOrigin = thisOrigin;
     }
@@ -524,7 +560,7 @@ DicomSeriesReader::GetSeries(const StringContainer& files, bool sortTo3DPlust, c
        fileIter != scanner.End();
        ++fileIter)
   {
-    MITK_DEBUG << "Read file " << fileIter->first << std::endl;
+    //MITK_DEBUG << "Scan file " << fileIter->first << std::endl;
     if ( std::string(fileIter->first).empty() ) continue; // TODO understand why Scanner has empty string entries
 
     // we const_cast here, because I could not use a map.at() function in CreateMoreUniqueSeriesIdentifier.
@@ -566,7 +602,7 @@ DicomSeriesReader::GetSeries(const StringContainer& files, bool sortTo3DPlust, c
       std::stringstream newGroupUID;
       newGroupUID << groupUID << '.' << subgroup;
       mapOf3DBlocks[ newGroupUID.str() ] = analysisResult.first;
-      MITK_DEBUG << "Sorted 3D group " << newGroupUID.str() << " with " << mapOf3DBlocks[ newGroupUID.str() ].size() << " files";
+      MITK_DEBUG << "Result: sorted 3D group " << newGroupUID.str() << " with " << mapOf3DBlocks[ newGroupUID.str() ].size() << " files";
       
       ++subgroup;
         
@@ -590,6 +626,9 @@ DicomSeriesReader::GetSeries(const StringContainer& files, bool sortTo3DPlust, c
     else
     {
       // sort 3D+t (as described in "PART IV")
+      
+      MITK_DEBUG << "================================================================================";
+      MITK_DEBUG << "3D+t analysis:";
 
       unsigned int numberOfFilesInPreviousBlock(0);
       std::string previousBlockKey;
@@ -607,7 +646,7 @@ DicomSeriesReader::GetSeries(const StringContainer& files, bool sortTo3DPlust, c
           mapOf3DPlusTBlocks[thisBlockKey].insert( mapOf3DPlusTBlocks[thisBlockKey].end(), 
                                                    block3DIter->second.begin(), 
                                                    block3DIter->second.end() );
-          MITK_DEBUG << "3D+t group " << thisBlockKey << " started";
+          MITK_DEBUG << "  3D+t group " << thisBlockKey << " started";
           previousBlockKey = thisBlockKey;
         }
         else
@@ -629,7 +668,7 @@ DicomSeriesReader::GetSeries(const StringContainer& files, bool sortTo3DPlust, c
             mapOf3DPlusTBlocks[previousBlockKey].insert( mapOf3DPlusTBlocks[previousBlockKey].end(), 
                                                          block3DIter->second.begin(), 
                                                          block3DIter->second.end() );
-            MITK_DEBUG << "3D+t group " << previousBlockKey << " enhanced with another timestep";
+            MITK_DEBUG << "  --> group enhanced with another timestep";
           }
           else
           {
@@ -637,8 +676,9 @@ DicomSeriesReader::GetSeries(const StringContainer& files, bool sortTo3DPlust, c
             mapOf3DPlusTBlocks[thisBlockKey].insert( mapOf3DPlusTBlocks[thisBlockKey].end(), 
                                                      block3DIter->second.begin(), 
                                                      block3DIter->second.end() );
-            MITK_DEBUG << "3D+t group " << thisBlockKey << " started";
+            MITK_DEBUG << "  ==> group closed with " << mapOf3DPlusTBlocks[previousBlockKey].size() / numberOfFilesInPreviousBlock << " time steps";
             previousBlockKey = thisBlockKey;
+            MITK_DEBUG << "  3D+t group " << thisBlockKey << " started";
           }
         }
         
@@ -647,10 +687,14 @@ DicomSeriesReader::GetSeries(const StringContainer& files, bool sortTo3DPlust, c
     }
   }
 
-  for ( UidFileNamesMap::const_iterator groupIter = groupsOfSimilarImages.begin(); groupIter != groupsOfSimilarImages.end(); ++groupIter )
+  MITK_DEBUG << "================================================================================";
+  MITK_DEBUG << "Summary: ";
+  for ( UidFileNamesMap::const_iterator groupIter = mapOf3DPlusTBlocks.begin(); groupIter != mapOf3DPlusTBlocks.end(); ++groupIter )
   {
-    MITK_DEBUG << "Slice group " << groupIter->first << " with " << groupIter->second.size() << " files";
+    MITK_DEBUG << "  Image volume " << groupIter->first << " with " << groupIter->second.size() << " files";
   }
+  MITK_DEBUG << "Done. ";
+  MITK_DEBUG << "================================================================================";
 
   return mapOf3DPlusTBlocks;
 }

@@ -201,14 +201,99 @@ mitk::TestDICOMLoading::DumpImageInformation( const Image* image )
   return result.str();
 }
 
+std::string 
+mitk::TestDICOMLoading::trim(const std::string& pString, 
+                             const std::string& pWhitespace)
+{
+  const size_t beginStr = pString.find_first_not_of(pWhitespace);
+  if (beginStr == std::string::npos)
+  {
+    // no content
+    return "";
+  }
+
+  const size_t endStr = pString.find_last_not_of(pWhitespace);
+  const size_t range = endStr - beginStr + 1;
+
+  return pString.substr(beginStr, range);
+}
+
+std::string 
+mitk::TestDICOMLoading::reduce(const std::string& pString, 
+                               const std::string& pFill,
+                               const std::string& pWhitespace)
+{
+  // trim first
+  std::string result(trim(pString, pWhitespace));
+
+  // replace sub ranges
+  size_t beginSpace = result.find_first_of(pWhitespace);
+  while (beginSpace != std::string::npos)
+  {
+    const size_t endSpace =
+      result.find_first_not_of(pWhitespace, beginSpace);
+    const size_t range = endSpace - beginSpace;
+
+    result.replace(beginSpace, range, pFill);
+
+    const size_t newStart = beginSpace + pFill.length();
+    beginSpace = result.find_first_of(pWhitespace, newStart);
+  }
+
+  return result;
+}
+
+
 bool
 mitk::TestDICOMLoading::CompareSpacedValueFields( const std::string& reference, 
                                                   const std::string& test,
                                                   double eps )
 {
-  // TODO this should better do a real comparison and tolerate float differences up to 'eps'
+  bool result(true);
 
-  return reference == test;
+  // tokenize string, compare each token, if possible by float comparison
+  std::stringstream referenceStream(reduce(reference));
+  std::stringstream testStream(reduce(test));
+
+  std::string refToken;
+  std::string testToken;
+  while ( std::getline( referenceStream,  refToken, ' ' ) && 
+          std::getline (     testStream, testToken, ' ' ) )
+  {
+    float refNumber;
+    float testNumber;
+    if ( this->StringToNumber(refToken, refNumber) )
+    {
+      MITK_DEBUG << "Reference Token '" << refToken << "'" << " value " << refNumber
+                 << ", test Token '" << refToken << "'" << " value " << refNumber;
+      if ( this->StringToNumber(testToken, testNumber) )
+      {
+        result &= ( fabs(refNumber - testNumber) < mitk::eps );
+      }
+      else
+      {
+        MITK_ERROR << refNumber << " cannot be compared to '" << testToken << "'";
+      }
+    }
+    else
+    {
+      MITK_DEBUG << "Token '" << refToken << "'" << " handled as string";
+      result &= refToken == testToken;
+    }
+  }
+
+  if ( std::getline( referenceStream, refToken, ' ' ) )
+  {
+    MITK_ERROR << "Reference string still had values when test string was already parsed: ref '" << reference << "', test '" << test << "'";
+    result = false;
+  }
+  else if ( std::getline( testStream, testToken, ' ' ) )
+  {
+    MITK_ERROR << "Test string still had values when reference string was already parsed: ref '" << reference << "', test '" << test << "'";
+    result = false;
+  }
+
+  return result;
 }
 
 bool
@@ -232,9 +317,10 @@ mitk::TestDICOMLoading::CompareImageInformationDumps( const std::string& referen
     {
       const std::string& testValue = test[refKey];
 
-      MITK_DEBUG << refKey << ": " << refValue << " == " << testValue << "?";
-
-      testResult &= CompareSpacedValueFields( refValue, testValue );
+      bool thisTestResult = CompareSpacedValueFields( refValue, testValue );
+      testResult &= thisTestResult;
+      
+      MITK_DEBUG << refKey << ": '" << refValue << "' == '" << testValue << "' ? " << (thisTestResult?"YES":"NO");
     }
     else
     {

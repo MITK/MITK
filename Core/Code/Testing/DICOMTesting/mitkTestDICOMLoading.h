@@ -53,6 +53,32 @@ class mitkDICOMTesting_EXPORT TestDICOMLoading
                                    const std::string& test,
                                    double eps = mitk::eps );
 
+    /**
+       Compress whitespace in string 
+       \param pString input string
+       \param pFill replacement whitespace (only whitespace in string after reduction)
+       \param pWhitespace characters handled as whitespace
+     */
+    std::string reduce(const std::string& pString, 
+                       const std::string& pFill = " ", 
+                       const std::string& pWhitespace = " \t");
+
+    /** 
+       Remove leading and trailing whitespace
+       \param pString input string
+       \param pWhitespace characters handled as whitespace
+    */
+    std::string trim(const std::string& pString, 
+                     const std::string& pWhitespace = " \t");
+
+    template<typename T>
+    bool StringToNumber(const std::string& s, T& value)
+    {
+      std::stringstream stream(s);
+      stream >> value;
+      return !stream.fail();
+    }
+
     const char* m_PreviousCLocale;
     std::locale m_PreviousCppLocale;
 

@@ -1,10 +1,14 @@
 FIND_PACKAGE(BlueBerry REQUIRED)
 
+INCLUDE(${QT_USE_FILE})
+
 INCLUDE_DIRECTORIES(
   ${BLUEBERRY_PLUGIN_SOURCE_DIRS}
-  ${org_blueberry_osgi_BINARY_DIR} # needed for generated berryConfig.h
+  ${org_blueberry_osgi_INCLUDE_DIRS}
   ${Poco_INCLUDE_DIRS}
+  ${mbilog_INCLUDE_DIRS}
 )
+
 LINK_DIRECTORIES(${Poco_LIBRARY_DIRS}
                  ${BLUEBERRY_PLUGINS_OUTPUT_DIR}/org.blueberry.osgi/bin
                 )

@@ -19,7 +19,7 @@
   <property name="windowTitle">
    <string>QmitkIGTConnection</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout">
+  <layout class="QGridLayout" name="gridLayout_2">
    <item row="0" column="0">
     <widget class="QLabel" name="label">
      <property name="font">
@@ -34,57 +34,60 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="0" rowspan="2">
+   <item row="1" column="0">
     <widget class="QmitkTrackingDeviceConfigurationWidget" name="trackingDeviceConfigurationWidget" native="true"/>
    </item>
-   <item row="1" column="1" colspan="2">
-    <widget class="QPushButton" name="connectButton">
-     <property name="enabled">
-      <bool>true</bool>
-     </property>
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>50</height>
-      </size>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>10</pointsize>
-      </font>
-     </property>
-     <property name="toolTip">
-      <string>Connect to camera</string>
-     </property>
-     <property name="text">
-      <string>Connect</string>
-     </property>
-     <property name="icon">
-      <iconset resource="../resources/IGTUI.qrc">
-       <normaloff>:/IGTUI/powerRed.png</normaloff>
-       <normalon>:/IGTUI/powerGreen.png</normalon>:/IGTUI/powerRed.png</iconset>
-     </property>
-     <property name="iconSize">
-      <size>
-       <width>30</width>
-       <height>30</height>
-      </size>
-     </property>
-     <property name="checkable">
-      <bool>true</bool>
-     </property>
+   <item row="1" column="1">
+    <widget class="QWidget" name="widget" native="true">
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="0" column="0">
+       <widget class="QPushButton" name="connectButton">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>50</height>
+         </size>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="toolTip">
+         <string>Connect to camera</string>
+        </property>
+        <property name="text">
+         <string>Connect</string>
+        </property>
+        <property name="icon">
+         <iconset resource="../resources/IGTUI.qrc">
+          <normaloff>:/IGTUI/powerRed.png</normaloff>
+          <normalon>:/IGTUI/powerGreen.png</normalon>:/IGTUI/powerRed.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>30</width>
+          <height>30</height>
+         </size>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </widget>
    </item>
-   <item row="2" column="1" colspan="2">
-    <widget class="QmitkToolTrackingStatusWidget" name="widget" native="true"/>
-   </item>
-   <item row="3" column="2">
+   <item row="2" column="1">
     <spacer name="verticalSpacer">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -105,12 +108,6 @@
    <class>QmitkTrackingDeviceConfigurationWidget</class>
    <extends>QWidget</extends>
    <header>QmitkTrackingDeviceConfigurationWidget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>QmitkToolTrackingStatusWidget</class>
-   <extends>QWidget</extends>
-   <header>QmitkToolTrackingStatusWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

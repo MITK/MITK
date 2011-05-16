@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef BERRYIVIEWREGISTRY_H_
 #define BERRYIVIEWREGISTRY_H_
 
-#include "berryUiDll.h"
+#include <org_blueberry_ui_Export.h>
 
 #include "berryIViewDescriptor.h"
 #include "berryIViewCategory.h"

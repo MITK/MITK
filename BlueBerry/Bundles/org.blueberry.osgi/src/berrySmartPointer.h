@@ -21,7 +21,7 @@
 #include <iostream>
 #include <stdexcept>
 
-#include "berryOSGiDll.h"
+#include <org_blueberry_osgi_Export.h>
 #include "berryException.h"
 
 #include <berryConfig.h>

@@ -19,7 +19,7 @@
 #ifndef BERRYCONSTANTS_H_
 #define BERRYCONSTANTS_H_
 
-#include "berryUiDll.h"
+#include <org_blueberry_ui_Export.h>
 
 namespace berry
 {

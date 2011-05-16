@@ -23,15 +23,20 @@
 #include <berryTestableObject.h>
 #include <berryPlatformException.h>
 
-#include "berryUITestDll.h"
+#include <org_blueberry_uitest_Export.h>
 
 namespace berry
 {
 
-class BERRY_UITEST_EXPORT UITestApplication: public IApplication, public ITestHarness
+class BERRY_UITEST_EXPORT UITestApplication: public QObject, public IApplication, public ITestHarness
 {
+  Q_OBJECT
+  Q_INTERFACES(berry::IApplication berry::ITestHarness)
 
 public:
+
+  UITestApplication();
+  UITestApplication(const UITestApplication& other);
 
   int Start();
 

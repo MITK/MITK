@@ -38,4 +38,9 @@ OSGiCoreTestSuite::OSGiCoreTestSuite()
   addTest(MessageTest::Suite());
 }
 
+OSGiCoreTestSuite::OSGiCoreTestSuite(const OSGiCoreTestSuite& other)
+{
+  Q_UNUSED(other)
+}
+
 }

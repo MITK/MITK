@@ -22,7 +22,9 @@
 #include <berryObject.h>
 #include <berryMacros.h>
 
-#include "../berryUiDll.h"
+#include <org_blueberry_ui_Export.h>
+
+#include <QtPlugin>
 
 namespace berry {
 
@@ -43,5 +45,7 @@ struct BERRY_UI ITestHarness : public virtual Object {
 };
 
 }
+
+Q_DECLARE_INTERFACE(berry::ITestHarness, "org.blueberry.ITestHarness")
 
 #endif /* BERRYITESTHARNESS_H_ */

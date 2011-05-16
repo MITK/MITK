@@ -9,14 +9,18 @@ SET(INTERNAL_CPP_FILES
   berryQtPlatformLogModel.cpp
 )
 
-SET(CPP_FILES manifest.cpp)
+SET(CPP_FILES )
 
 SET(MOC_H_FILES
+  src/internal/berryLogView.h
+  src/internal/berryQtLogPlugin.h
   src/internal/berryQtLogView.h
   src/internal/berryQtPlatformLogModel.h
 )
 
-SET(RESOURCE_FILES
+SET(CACHED_RESOURCE_FILES
+  plugin.xml
+  
   resources/Logging.png
 )
 

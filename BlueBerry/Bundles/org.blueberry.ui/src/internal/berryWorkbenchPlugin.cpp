@@ -37,7 +37,7 @@ char WorkbenchPlugin::PREFERENCE_PAGE_CATEGORY_SEPARATOR = '/';
 WorkbenchPlugin* WorkbenchPlugin::inst = 0;
 
 WorkbenchPlugin::WorkbenchPlugin()
- : AbstractUIPlugin()
+ : AbstractUICTKPlugin()
 {
   inst = this;
   presentationFactory = 0;
@@ -265,10 +265,10 @@ void WorkbenchPlugin::Log(const std::string& clazz,
 }
 
 
-void WorkbenchPlugin::Start(IBundleContext::Pointer context)
+void WorkbenchPlugin::start(ctkPluginContext* context)
 {
   //context.addBundleListener(getBundleListener());
-  AbstractUIPlugin::Start(context);
+  AbstractUICTKPlugin::start(context);
   bundleContext = context;
 
 
@@ -302,21 +302,25 @@ void WorkbenchPlugin::Start(IBundleContext::Pointer context)
 //  return bundleContext.IsNull() ? std::vector<IBundle::Pointer>() : bundleContext->GetBundles();
 //}
 
-IBundleContext::Pointer WorkbenchPlugin::GetBundleContext()
+ctkPluginContext* WorkbenchPlugin::GetPluginContext()
 {
   return bundleContext;
 }
 
-void WorkbenchPlugin::Stop(IBundleContext::Pointer context)
+void WorkbenchPlugin::stop(ctkPluginContext* context)
 {
-  AbstractUIPlugin::Stop(context);
+  AbstractUICTKPlugin::stop(context);
 
   delete perspRegistry;
 }
 
 bool WorkbenchPlugin::GetDataPath(Poco::Path& path)
 {
-  return this->GetStatePath(path);
+  QFileInfo fileInfo = bundleContext->getDataFile("");
+  path.assign(fileInfo.absolutePath().toStdString());
+  return fileInfo.isWritable();
 }
 
 }
+
+Q_EXPORT_PLUGIN2(org_blueberry_ui, berry::WorkbenchPlugin)

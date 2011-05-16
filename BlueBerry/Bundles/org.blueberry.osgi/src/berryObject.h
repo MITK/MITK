@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <Poco/Mutex.h>
 #include <string>
 
-#include "berryOSGiDll.h"
+#include <org_blueberry_osgi_Export.h>
 #include "berryMacros.h"
 #include "berryMessage.h"
 

@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <berryMacros.h>
 #include <berryObject.h>
-#include "berryCommandsDll.h"
+#include <org_blueberry_core_commands_Export.h>
 
 #include "berryIStateListener.h"
 

@@ -187,4 +187,17 @@ IBundle::Pointer Platform::GetBundle(const std::string& id)
   return InternalPlatform::GetInstance()->GetBundle(id);
 }
 
+QSharedPointer<ctkPlugin> Platform::GetCTKPlugin(const QString& symbolicName)
+{
+  QList<QSharedPointer<ctkPlugin> > plugins =
+      InternalPlatform::GetInstance()->GetCTKPluginFrameworkContext()->getPlugins();
+
+  foreach(QSharedPointer<ctkPlugin> plugin, plugins)
+  {
+    if (plugin->getSymbolicName() == symbolicName)
+      return plugin;
+  }
+  return QSharedPointer<ctkPlugin>(0);
+}
+
 }

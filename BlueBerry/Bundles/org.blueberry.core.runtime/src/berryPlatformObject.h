@@ -19,7 +19,7 @@
 #ifndef BERRYPLATFORMOBJECT_H_
 #define BERRYPLATFORMOBJECT_H_
 
-#include "berryRuntimeDll.h"
+#include <org_blueberry_core_runtime_Export.h>
 
 #include <berryObject.h>
 

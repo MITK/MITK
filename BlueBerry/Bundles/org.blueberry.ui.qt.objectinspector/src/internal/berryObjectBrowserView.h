@@ -44,12 +44,14 @@ namespace berry {
 class ObjectBrowserView : public QObject, public berry::QtViewPart
 {
   Q_OBJECT
+  Q_INTERFACES(berry::IViewPart)
 
 public:
 
   static const std::string VIEW_ID;
 
   ObjectBrowserView();
+  ObjectBrowserView(const ObjectBrowserView& other);
 
   void Init(IViewSite::Pointer site, IMemento::Pointer memento);
 

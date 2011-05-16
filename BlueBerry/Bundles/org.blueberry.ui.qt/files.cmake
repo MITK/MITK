@@ -66,17 +66,27 @@ SET(MOC_H_FILES
   src/internal/defaultpresentation/berryNativeTabFolder.h
   src/internal/defaultpresentation/berryNativeTabItem.h
   src/internal/defaultpresentation/berryQCTabBar.h
+  src/internal/defaultpresentation/berryQtWorkbenchPresentationFactory.h
   
   src/internal/berryQtDisplay.h
+  src/internal/berryQtDnDTweaklet.h
   src/internal/berryQtGlobalEventFilter.h
+  src/internal/berryQtImageTweaklet.h
   src/internal/berryQtMainWindowControl.h
+  src/internal/berryQtMessageDialogTweaklet.h
   src/internal/berryQtOpenPerspectiveAction.h
   src/internal/berryQtPerspectiveSwitcher.h
   src/internal/berryQtSash.h
   src/internal/berryQtShowViewAction.h
+  src/internal/berryQtStyleManager.h
   src/internal/berryQtStylePreferencePage.h
   src/internal/berryQtTracker.h
+  src/internal/berryQtWidgetsTweaklet.h
   src/internal/berryQtWidgetsTweakletImpl.h
+  src/internal/berryQtWorkbenchTweaklet.h
+  src/internal/berryQtWorkbenchPageTweaklet.h
+
+  src/internal/berryQtPluginActivator.h
 )
 
 SET(UI_FILES
@@ -85,11 +95,15 @@ SET(UI_FILES
   src/internal/berryQtStatusPart.ui
 )
 
-SET(RES_FILES
+SET(QRC_FILES
   resources/org_blueberry_ui_qt.qrc
 )
 
-SET(CPP_FILES manifest.cpp)
+SET(CACHED_RESOURCE_FILES
+  plugin.xml
+)
+
+SET(CPP_FILES )
 
 foreach(file ${SRC_CPP_FILES})
   SET(CPP_FILES ${CPP_FILES} src/${file})

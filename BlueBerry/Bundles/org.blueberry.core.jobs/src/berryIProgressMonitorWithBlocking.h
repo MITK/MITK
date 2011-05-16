@@ -19,7 +19,7 @@
 #define _BERRY_IPROGRESSMONITORWITHBLOCKING_H
 
 #include "berryObject.h"
-#include "berryJobsDll.h"
+#include <org_blueberry_core_jobs_Export.h>
 #include "berryIStatus.h"
 #include "berryIProgressMonitor.h"
 

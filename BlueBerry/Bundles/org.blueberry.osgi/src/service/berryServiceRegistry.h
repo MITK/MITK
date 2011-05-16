@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef BERRYSERVICEREGISTRY_H_
 #define BERRYSERVICEREGISTRY_H_
 
-#include "../berryOSGiDll.h"
+#include <org_blueberry_osgi_Export.h>
 
 #include "berryService.h"
 

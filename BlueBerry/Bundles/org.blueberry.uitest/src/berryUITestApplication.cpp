@@ -63,6 +63,17 @@ void UITestApplication::TestRunnable::run()
   }
 }
 
+UITestApplication::UITestApplication()
+{
+
+}
+
+UITestApplication::UITestApplication(const UITestApplication& other)
+{
+  Q_UNUSED(other)
+  throw std::logic_error("Copy constructor not implemented");
+}
+
 int UITestApplication::Start()
 {
   // Get the plug-in to test

@@ -107,5 +107,7 @@ typedef uint _Flags;
 
 #endif /* BERRY_NO_TYPESAFE_FLAGS */
 
+#define BERRY_REGISTER_EXTENSION_CLASS(_ClassType)\
+qRegisterMetaType<_ClassType>(_ClassType::staticMetaObject.className());
 
 #endif /*__BERRY_MACROS_H__*/

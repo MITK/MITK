@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef BERRYPLATFORMEVENT_H_
 #define BERRYPLATFORMEVENT_H_
 
-#include "../berryOSGiDll.h"
+#include <org_blueberry_osgi_Export.h>
 
 #include "../berryIBundle.h"
 

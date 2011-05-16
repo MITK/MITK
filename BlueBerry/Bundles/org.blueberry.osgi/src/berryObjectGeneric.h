@@ -20,7 +20,7 @@
 #define BERRYOBJECTGENERIC_H_
 
 #include <sstream>
-#include "berryOSGiDll.h"
+#include <org_blueberry_osgi_Export.h>
 #include "berryMacros.h"
 #include "berryObject.h"
 

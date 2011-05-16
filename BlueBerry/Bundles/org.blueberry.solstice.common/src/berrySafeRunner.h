@@ -19,7 +19,7 @@
 #ifndef BERRYSAFERUNNER_H_
 #define BERRYSAFERUNNER_H_
 
-#include "berryCommonRuntimeDll.h"
+#include <org_blueberry_solstice_common_Export.h>
 
 #include "berryISafeRunnable.h"
 

@@ -21,11 +21,19 @@
 
 #include <berryIApplication.h>
 
+#include <QObject>
+
 namespace berry {
 
-class CoreTestApplication : public IApplication
+class CoreTestApplication : public QObject, public IApplication
 {
+  Q_OBJECT
+  Q_INTERFACES(berry::IApplication)
+
 public:
+
+  CoreTestApplication();
+  CoreTestApplication(const CoreTestApplication& other);
 
   int Start();
   void Stop();

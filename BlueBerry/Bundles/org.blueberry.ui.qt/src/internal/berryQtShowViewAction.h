@@ -31,7 +31,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <berryIViewDescriptor.h>
 
 //TODO should be removed later
-#include "../berryUiQtDll.h"
+#include <org_blueberry_ui_qt_Export.h>
 
 namespace berry
 {

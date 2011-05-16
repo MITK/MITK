@@ -19,7 +19,7 @@
 #ifndef BERRYQTITEMSELECTION_H_
 #define BERRYQTITEMSELECTION_H_
 
-#include "berryUiQtDll.h"
+#include <org_blueberry_ui_qt_Export.h>
 
 #include <berryIStructuredSelection.h>
 

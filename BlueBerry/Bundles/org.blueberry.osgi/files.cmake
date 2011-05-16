@@ -1,3 +1,13 @@
+# Files which should be processed by Qts moc
+SET(MOC_H_FILES
+  src/internal/berryCTKPluginActivator.h
+  src/internal/berryExtensionPointService.h
+)
+
+SET(CACHED_RESOURCE_FILES
+  plugin.xml
+)
+
 SET(EVENT_CPP_FILES
   berryBundleEvent.cpp
   berryPlatformEvent.cpp

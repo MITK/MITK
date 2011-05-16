@@ -1,7 +1,7 @@
 #ifndef BERRYXMLPREFERENCES_H_
 #define BERRYXMLPREFERENCES_H_
 
-#include "../berryRuntimeDll.h"
+#include <org_blueberry_core_runtime_Export.h>
 #include "berryAbstractPreferencesStorage.h"
 
 #include "Poco/Path.h"

@@ -1,30 +1,24 @@
-/*=============================================================================
+/*=========================================================================
 
-  Library: CTK
+ Program:   BlueBerry Platform
+ Language:  C++
+ Date:      $Date$
+ Version:   $Revision$
 
-  Copyright (c) German Cancer Research Center,
-    Division of Medical and Biological Informatics
+ Copyright (c) German Cancer Research Center, Division of Medical and
+ Biological Informatics. All rights reserved.
+ See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
 
-  Licensed under the Apache License, Version 2.0 (the "License");
-  you may not use this file except in compliance with the License.
-  You may obtain a copy of the License at
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notices for more information.
 
-    http://www.apache.org/licenses/LICENSE-2.0
-
-  Unless required by applicable law or agreed to in writing, software
-  distributed under the License is distributed on an "AS IS" BASIS,
-  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  See the License for the specific language governing permissions and
-  limitations under the License.
-
-=============================================================================*/
+ =========================================================================*/
 
 
 #include "berryCTKPluginListener_p.h"
 
 #include <ctkPlugin.h>
-
-#include <QDebug>
 
 const QString berry::CTKPluginListener::PLUGIN_MANIFEST = "plugin.xml";
 
@@ -37,13 +31,59 @@ CTKPluginListener::CTKPluginListener(IExtensionPointService::Pointer registry)
 
 void CTKPluginListener::processPlugins(const QList<QSharedPointer<ctkPlugin> >& plugins)
 {
-  foreach (QSharedPointer<ctkPlugin> plugin, plugins)
+  // sort the plugins according to their dependencies
+  const QList<QSharedPointer<ctkPlugin> > sortedPlugins = sortPlugins(plugins);
+
+  foreach (QSharedPointer<ctkPlugin> plugin, sortedPlugins)
   {
     if (isPluginResolved(plugin))
       addPlugin(plugin);
     else
       removePlugin(plugin);
   }
+}
+
+QList<QSharedPointer<ctkPlugin> >
+CTKPluginListener::sortPlugins(const QList<QSharedPointer<ctkPlugin> >& plugins)
+{
+  QList<QSharedPointer<ctkPlugin> > sortedPlugins(plugins);
+
+  QHash<long, QStringList> mapPluginIdToDeps;
+  foreach(QSharedPointer<ctkPlugin> plugin, sortedPlugins)
+  {
+    QString requirePlugin = plugin->getHeaders()[ctkPluginConstants::REQUIRE_PLUGIN];
+    QStringList requiredList = requirePlugin.split(QRegExp("\\s*,\\s*"), QString::SkipEmptyParts);
+
+    QStringList requiredSymbolicNames;
+    foreach(QString require, requiredList)
+    {
+      requiredSymbolicNames.append(require.split(';').front());
+    }
+    mapPluginIdToDeps[plugin->getPluginId()] = requiredSymbolicNames;
+  }
+
+  QStringList symbolicNames;
+  for (int i = 0; i < sortedPlugins.size();)
+  {
+    QStringList currDeps = mapPluginIdToDeps[sortedPlugins.at(i)->getPluginId()];
+    bool moved = false;
+    foreach(QString currDep, currDeps)
+    {
+      if (!symbolicNames.contains(currDep))
+      {
+        sortedPlugins.move(i, sortedPlugins.size()-1);
+        moved = true;
+        break;
+      }
+    }
+    if (!moved)
+    {
+      symbolicNames.append(sortedPlugins.at(i)->getSymbolicName());
+      ++i;
+    }
+  }
+
+  return sortedPlugins;
 }
 
 void CTKPluginListener::pluginChanged(const ctkPluginEvent& event)
@@ -95,18 +135,15 @@ QString CTKPluginListener::getExtensionPath(QSharedPointer<ctkPlugin> plugin)
 
 void CTKPluginListener::addPlugin(QSharedPointer<ctkPlugin> plugin)
 {
-  qDebug() << "**** CTKPluginListener adding plugin:" << plugin->getSymbolicName();
   // if the given plugin already exists in the registry then return.
   // note that this does not work for update cases.
   std::string contributor = plugin->getSymbolicName().toStdString();
   if (registry->HasContributionFrom(contributor))
   {
-    qDebug() << "    Contributor already registered:" << plugin->getSymbolicName();
     return;
   }
 
   QString pluginManifest = getExtensionPath(plugin);
-  qDebug() << "    plugin.xml path:" << pluginManifest;
   if (pluginManifest.isEmpty())
     return;
 

@@ -25,7 +25,7 @@
 #include <vector>
 #include <berryIBundle.h>
 
-#include "berryUiQtDll.h"
+#include <org_blueberry_ui_qt_Export.h>
 
 namespace berry {
 

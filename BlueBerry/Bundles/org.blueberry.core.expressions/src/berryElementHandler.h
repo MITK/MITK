@@ -24,7 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <berryMacros.h>
 
 #include "berryExpression.h"
-#include "berryExpressionsDll.h"
+#include <org_blueberry_core_expressions_Export.h>
 
 #include "internal/berryCompositeExpression.h"
 

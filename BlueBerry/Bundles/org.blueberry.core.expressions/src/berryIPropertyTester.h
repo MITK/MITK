@@ -21,12 +21,14 @@ PURPOSE.  See the above copyright notices for more information.
 #include <berryMacros.h>
 #include <berryObject.h>
 
-#include "berryExpressionsDll.h"
+#include <org_blueberry_core_expressions_Export.h>
 
 #include <Poco/Any.h>
 
 #include <string>
 #include <vector>
+
+#include <QObject>
 
 namespace berry {
 
@@ -105,5 +107,7 @@ struct BERRY_EXPRESSIONS IPropertyTester : public Object {
 };
 
 }  // namespace berry
+
+Q_DECLARE_INTERFACE(berry::IPropertyTester, "org.blueberry.IPropertyTester")
 
 #endif /*BERRYIPROPERTYTESTER_H_*/

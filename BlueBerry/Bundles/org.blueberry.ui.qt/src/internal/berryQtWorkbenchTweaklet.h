@@ -20,16 +20,21 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <berryWorkbenchTweaklet.h>
 
-#include "../berryUiQtDll.h"
+#include <org_blueberry_ui_qt_Export.h>
 
 namespace berry {
 
-class BERRY_UI_QT QtWorkbenchTweaklet : public WorkbenchTweaklet
+class BERRY_UI_QT QtWorkbenchTweaklet : public QObject, public WorkbenchTweaklet
 {
+  Q_OBJECT
+  Q_INTERFACES(berry::WorkbenchTweaklet)
 
 public:
 
   berryObjectMacro(QtWorkbenchTweaklet);
+
+  QtWorkbenchTweaklet();
+  QtWorkbenchTweaklet(const QtWorkbenchTweaklet& other);
 
   Display* CreateDisplay();
 

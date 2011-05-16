@@ -18,13 +18,13 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef BERRYIEXTENSIONPOINTSERVICE_H_
 #define BERRYIEXTENSIONPOINTSERVICE_H_
 
-#include "../berryOSGiDll.h"
+#include <org_blueberry_osgi_Export.h>
 
 #include "berryService.h"
 #include "berryIExtensionPoint.h"
 #include "berryIConfigurationElement.h"
 
-#include <QObject>
+#include <QtPlugin>
 
 namespace berry {
 
@@ -32,7 +32,7 @@ struct IBundle;
 
 struct BERRY_OSGI IExtensionPointService : public Service
 {
-  berryObjectMacro(IExtensionPointService);
+  berryInterfaceMacro(IExtensionPointService, berry);
   
 public:
   static std::string SERVICE_ID;

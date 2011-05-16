@@ -24,9 +24,15 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace berry {
 
-class LogView : public QtViewPart
+class LogView : public QObject, public QtViewPart
 {
+  Q_OBJECT
+  Q_INTERFACES(berry::IViewPart)
+
 public:
+
+  LogView();
+  LogView(const LogView& other);
 
   void SetFocus();
 

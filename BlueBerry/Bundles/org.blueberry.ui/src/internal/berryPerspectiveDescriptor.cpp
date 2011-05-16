@@ -163,7 +163,7 @@ ImageDescriptor::Pointer PerspectiveDescriptor::GetImageDescriptor() const
     configElement->GetAttribute(WorkbenchRegistryConstants::ATT_ICON, icon);
     if (!icon.empty())
     {
-      imageDescriptor = AbstractUIPlugin::ImageDescriptorFromPlugin(
+      imageDescriptor = AbstractUICTKPlugin::ImageDescriptorFromPlugin(
           configElement->GetContributor(), icon);
     }
 

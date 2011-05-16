@@ -342,9 +342,14 @@ void BundleLoader::ReadDependentContributions(IBundle::Pointer bundle)
   IBundleManifest::Dependencies::const_iterator iter;
   for (iter = deps.begin(); iter != deps.end(); ++iter)
   {
-    if (IBundle::Pointer depBundle = m_BundleMap[iter->symbolicName].m_Bundle)
+    BundleMap::const_iterator depIter = m_BundleMap.find(iter->symbolicName);
+    if (depIter != m_BundleMap.end())
     {
-      this->ReadContributions(depBundle);
+      // only read contributions from legacy BlueBerry bundles
+      if (IBundle::Pointer depBundle = depIter->second.m_Bundle)
+      {
+        this->ReadContributions(depBundle);
+      }
     }
   }
 
@@ -414,11 +419,27 @@ BundleLoader::StartDependencies(Bundle::Pointer bundle)
   const IBundleManifest::Dependencies& deps = bundle->GetRequiredBundles();
 
   IBundleManifest::Dependencies::const_iterator iter;
+  QList<QSharedPointer<ctkPlugin> > ctkPlugins = CTKPluginActivator::getPluginContext()->getPlugins();
   for (iter = deps.begin(); iter != deps.end(); ++iter)
   {
-    if (Bundle::Pointer depBundle = m_BundleMap[iter->symbolicName].m_Bundle)
+    BundleMap::const_iterator depIter = m_BundleMap.find(iter->symbolicName);
+    if (depIter != m_BundleMap.end())
     {
-      this->StartBundle(depBundle);
+      if (Bundle::Pointer depBundle = depIter->second.m_Bundle)
+      {
+        this->StartBundle(depBundle);
+      }
+    }
+    else
+    {
+      foreach (QSharedPointer<ctkPlugin> ctkPlugin, ctkPlugins)
+      {
+        if (ctkPlugin->getSymbolicName() == QString::fromStdString(iter->symbolicName))
+        {
+          ctkPlugin->start(0);
+          break;
+        }
+      }
     }
   }
 }

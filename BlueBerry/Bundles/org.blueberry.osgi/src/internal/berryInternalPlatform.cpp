@@ -33,8 +33,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <ctkPluginContext.h>
 #include <ctkPlugin.h>
 
-#include <QCoreApplication>
-
 #include <iostream>
 
 #include "../berryPlatform.h"
@@ -168,8 +166,9 @@ void InternalPlatform::Initialize(int& argc, char** argv, Poco::Util::AbstractCo
   m_BundleLoader = new BundleLoader(m_CodeCache, *m_PlatformLogger);
 
   // Initialize the CTK Plugin Framework
-  QCoreApplication app(argc, argv);
-  m_ctkPluginFrameworkFactory = new ctkPluginFrameworkFactory();
+  ctkProperties fwProps;
+  fwProps.insert(ctkPluginConstants::FRAMEWORK_STORAGE, QString::fromStdString(userFile.path()));
+  m_ctkPluginFrameworkFactory = new ctkPluginFrameworkFactory(fwProps);
   QSharedPointer<ctkPluginFramework> pfw = m_ctkPluginFrameworkFactory->getFramework();
   pfw->init();
   ctkPluginContext* pfwContext = pfw->getPluginContext();

@@ -19,8 +19,8 @@
 
 #include "berryIWorkbenchPartConstants.h"
 #include "berryImageDescriptor.h"
-#include "berrySafeRunner.h"
-#include "util/berrySafeRunnable.h"
+#include <berrySafeRunner.h>
+#include <util/berrySafeRunnable.h>
 
 #include "internal/berryWorkbenchPlugin.h"
 
@@ -299,7 +299,7 @@ void WorkbenchPart::SetInitializationData(IConfigurationElement::Pointer cfig,
     return;
   }
 
-  m_ImageDescriptor = AbstractUIPlugin::ImageDescriptorFromPlugin(
+  m_ImageDescriptor = AbstractUICTKPlugin::ImageDescriptorFromPlugin(
      m_ConfigElement->GetContributor(), strIcon);
 
   if (!m_ImageDescriptor) {

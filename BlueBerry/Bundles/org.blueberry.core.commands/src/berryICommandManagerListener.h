@@ -18,7 +18,7 @@
 #ifndef BERRYICOMMANDMANAGERLISTENER_H_
 #define BERRYICOMMANDMANAGERLISTENER_H_
 
-#include "berryCommandsDll.h"
+#include <org_blueberry_core_commands_Export.h>
 
 #include <berryObject.h>
 #include <berryMacros.h>

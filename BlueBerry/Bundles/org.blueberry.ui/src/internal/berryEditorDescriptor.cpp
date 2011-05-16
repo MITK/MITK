@@ -142,7 +142,7 @@ SmartPointer<ImageDescriptor> EditorDescriptor::GetImageDescriptor() const
       std::string command(this->GetFileName());
       if (!imageFileName.empty() && configurationElement)
       {
-        imageDesc = AbstractUIPlugin::ImageDescriptorFromPlugin(
+        imageDesc = AbstractUICTKPlugin::ImageDescriptorFromPlugin(
             configurationElement->GetContributor(), imageFileName);
       }
       else if (!command.empty())

@@ -10,8 +10,10 @@ INCLUDE(berryPluginHelpers)
 INCLUDE(MacroCollectPlugins)
 INCLUDE(MacroParseManifest)
 INCLUDE(MacroCreatePlugin)
+INCLUDE(MacroCreateCTKPlugin)
 INCLUDE(MacroCreateQtHelp)
 INCLUDE(MacroInstallPlugin)
+INCLUDE(MacroInstallCTKPlugin)
 
 OPTION(BLUEBERRY_INSTALL_RPATH_RELATIVE "Use relative rpath entries when installing" OFF)
 MARK_AS_ADVANCED(BLUEBERRY_INSTALL_RPATH_RELATIVE)
@@ -122,7 +124,7 @@ ENDIF()
 # =========  CTK specific CMake stuff ============
 CMAKE_POLICY(SET CMP0012 NEW)
 
-FIND_PACKAGE(CTK)
+FIND_PACKAGE(CTK REQUIRED)
 SET(CTK_PLUGIN_LIBRARIES ${CTK_PLUGIN_LIBRARIES} CACHE INTERNAL "CTK plugins" FORCE)
 
 # Extract all library names starting with org_blueberry_
@@ -158,13 +160,11 @@ SET(BLUEBERRY_PLUGINS_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Bundles)
 SET(BLUEBERRY_PLUGINS_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/Bundles)
 
 SET(OSGI_APP solstice)
+SET(OSGI_UI_APP solstice_ui)
 
 # Force should be removed after everybody has configured their old binary tree
 SET(BLUEBERRY_PLUGINS_OUTPUT_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/BlueBerry CACHE PATH "Directory where to build the BlueBerry Bundles" FORCE)
 MARK_AS_ADVANCED(BLUEBERRY_PLUGINS_OUTPUT_DIR)
-
-SET(BLUEBERRY_TEST_PLUGINS_OUTPUT_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/BlueBerryTests CACHE PATH "Directory where to build the BlueBerry test bundles")
-MARK_AS_ADVANCED(BLUEBERRY_TEST_PLUGINS_OUTPUT_DIR)
 
 # Clear the cache variables
 SET(BLUEBERRY_PLUGIN_SOURCE_DIRS "" CACHE INTERNAL "List of base plugin source directories" FORCE)
@@ -177,14 +177,6 @@ ELSE ()
 ENDIF ()
 
 SET(BLUEBERRY_DEBUG_POSTFIX d)
-
-ADD_CUSTOM_TARGET(BlueBerry)
-
-CONFIGURE_FILE(BlueBerryConfig.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/BlueBerryConfig.cmake @ONLY)
-
-ADD_SUBDIRECTORY(Bundles)
-
-ADD_SUBDIRECTORY(Documentation)
 
 # Testing options
 
@@ -201,5 +193,89 @@ MARK_AS_ADVANCED(BLUEBERRY_ENABLE_GUI_TESTING)
 
 IF(BLUEBERRY_BUILD_TESTING)
   ENABLE_TESTING()
-  ADD_SUBDIRECTORY(Testing)
 ENDIF()
+
+# Add CTK plugins
+
+SET(_ctk_plugins
+  Bundles/org.blueberry.osgi:ON
+  Bundles/org.blueberry.compat:ON
+  Bundles/org.blueberry.core.runtime:ON
+  Bundles/org.blueberry.core.expressions:ON
+  Bundles/org.blueberry.solstice.common:ON
+  Bundles/org.blueberry.core.commands:ON
+  Bundles/org.blueberry.core.jobs:OFF
+  Bundles/org.blueberry.ui:ON
+  Bundles/org.blueberry.ui.qt:ON
+  Bundles/org.blueberry.ui.qt.log:OFF
+  Bundles/org.blueberry.ui.qt.objectinspector:OFF
+)
+
+SET(_ctk_test_plugins )
+
+SET(_ctk_plugins_include_dirs
+  ${Poco_INCLUDE_DIRS}
+)
+
+SET(_ctk_plugins_link_dirs
+  ${Poco_LIBRARY_DIR}
+)
+
+INCLUDE_DIRECTORIES(${_ctk_plugins_include_dirs})
+LINK_DIRECTORIES(${_ctk_plugins_link_dirs})
+
+IF(BLUEBERRY_BUILD_TESTING)
+  INCLUDE(berryTestingHelpers)
+
+  SET(BLUEBERRY_TEST_APP "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${OSGI_APP}")
+  GET_TARGET_PROPERTY(_is_macosx_bundle ${OSGI_APP} MACOSX_BUNDLE)
+  IF(APPLE AND _is_macosx_bundle) 
+    SET(BLUEBERRY_TEST_APP "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${OSGI_APP}.app/Contents/MacOS/${OSGI_APP}")
+  ENDIF()
+  
+  SET(_ctk_test_plugins
+    Bundles/org.blueberry.test:OFF
+    Bundles/org.blueberry.uitest:OFF
+    Testing/org.blueberry.core.runtime.tests:OFF
+    Testing/org.blueberry.osgi.tests:OFF
+  )
+  
+  IF(BLUEBERRY_ENABLE_GUI_TESTING)
+    LIST(APPEND _ctk_test_plugins Testing/org.blueberry.ui.tests:OFF)
+
+    SET(BLUEBERRY_UI_TEST_APP "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${OSGI_UI_APP}")
+    GET_TARGET_PROPERTY(_is_macosx_bundle ${OSGI_UI_APP} MACOSX_BUNDLE)
+    IF(APPLE AND _is_macosx_bundle)
+      SET(BLUEBERRY_UI_TEST_APP "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${OSGI_UI_APP}.app/Contents/MacOS/${OSGI_UI_APP}")
+    ENDIF()
+  ENDIF()
+ENDIF()
+
+ADD_CUSTOM_TARGET(BlueBerry)
+
+ctkMacroSetupExternalPlugins(${_ctk_plugins} ${_ctk_test_plugins}
+                             BUILD_OPTION_PREFIX BLUEBERRY_BUILD_
+                             BUILD_ALL ${BLUEBERRY_BUILD_ALL_PLUGINS}
+                             COMPACT_OPTIONS)
+
+
+ctkMacroGetAllProjectTargetLibraries("${CTK_PLUGIN_LIBRARIES}" _enabled_plugin_targets)
+add_dependencies(BlueBerry ${_enabled_plugin_targets})
+set_property(TARGET ${_enabled_plugin_targets} PROPERTY LABELS BlueBerry)
+
+                             
+SET(BB_PLUGIN_USE_FILE "${BlueBerry_BINARY_DIR}/BlueBerryPluginUseFile.cmake")
+ctkFunctionGeneratePluginUseFile(${BB_PLUGIN_USE_FILE})
+
+# CTK Plugin Exports
+SET(BB_PLUGIN_EXPORTS_FILE "${CMAKE_CURRENT_BINARY_DIR}/BlueBerryPluginExports.cmake")
+GetMyTargetLibraries("${CTK_PLUGIN_LIBRARIES}" my_plugin_targets)
+export(TARGETS ${my_plugin_targets} mbilog
+       FILE ${BB_PLUGIN_EXPORTS_FILE})
+
+
+ADD_SUBDIRECTORY(Documentation)
+
+CONFIGURE_FILE(BlueBerryConfig.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/BlueBerryConfig.cmake @ONLY)
+
+

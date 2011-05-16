@@ -20,6 +20,8 @@
 
 #include <Poco/String.h>
 
+Q_DECLARE_INTERFACE(CppUnit::Test, "CppUnit.Test")
+
 namespace berry
 {
 
@@ -32,7 +34,13 @@ TestDescriptor::TestDescriptor(IConfigurationElement::Pointer elem) :
 CppUnit::Test* TestDescriptor::CreateTest()
 {
   CppUnit::Test* test = configElem->CreateExecutableExtension<CppUnit::Test> (
-      TestRegistry::ATT_CLASS, TestRegistry::TEST_MANIFEST);
+      TestRegistry::ATT_CLASS);
+  if (test == 0)
+  {
+    // Try legacy BlueBerry manifests instead
+    test = configElem->CreateExecutableExtension<CppUnit::Test> (
+        TestRegistry::ATT_CLASS, TestRegistry::TEST_MANIFEST);
+  }
   return test;
 }
 

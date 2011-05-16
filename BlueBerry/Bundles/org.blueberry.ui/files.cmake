@@ -1,6 +1,15 @@
+SET(MOC_H_FILES
+  src/internal/berryWorkbenchPlugin.h
+)
+
+SET(CACHED_RESOURCE_FILES
+  plugin.xml
+)
+
 SET(SRC_CPP_FILES
   berryAbstractSourceProvider.cpp
   berryAbstractUIPlugin.cpp
+  berryAbstractUICTKPlugin.cpp
   berryConstants.cpp
   berryDisplay.cpp
   berryEditorPart.cpp
@@ -205,7 +214,7 @@ SET(INTERNAL_CPP_FILES
   berryWWinPartService.cpp
 )
 
-SET(CPP_FILES manifest.cpp)
+SET(CPP_FILES )
 
 foreach(file ${SRC_CPP_FILES})
   SET(CPP_FILES ${CPP_FILES} src/${file})

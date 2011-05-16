@@ -29,6 +29,8 @@
 
 #include <vector>
 
+#include <QCoreApplication>
+
 namespace berry
 {
 
@@ -37,6 +39,12 @@ const std::string Starter::XP_APPLICATIONS = "org.blueberry.osgi.applications";
 int Starter::Run(int& argc, char** argv,
     Poco::Util::AbstractConfiguration* config)
 {
+
+  // The CTK PluginFramework needs a QCoreApplication
+  if (!qApp)
+  {
+    BERRY_FATAL << "No QCoreApplication instance found. You need to create one prior to calling Starter::Run()";
+  }
 
   InternalPlatform* platform = InternalPlatform::GetInstance();
 

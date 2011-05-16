@@ -23,7 +23,7 @@
 #include <Poco/HashMap.h>
 #include <set>
 
-#include "berryOSGiDll.h"
+#include <org_blueberry_osgi_Export.h>
 
 namespace berry {
 

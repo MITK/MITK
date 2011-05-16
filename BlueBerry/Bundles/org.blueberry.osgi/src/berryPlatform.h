@@ -157,7 +157,7 @@ PURPOSE.  See the above copyright notices for more information.
 #endif
 
 
-#include "berryOSGiDll.h"
+#include <org_blueberry_osgi_Export.h>
 
 #include "event/berryPlatformEvents.h"
 #include "service/berryServiceRegistry.h"
@@ -329,6 +329,8 @@ public:
    * highest version, or <tt>null</tt> if no bundle is found.
    */
   static IBundle::Pointer GetBundle(const std::string& id);
+
+  static QSharedPointer<ctkPlugin> GetCTKPlugin(const QString& symbolicName);
 
 private:
   Platform();

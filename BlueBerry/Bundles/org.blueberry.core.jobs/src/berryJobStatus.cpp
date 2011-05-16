@@ -17,7 +17,7 @@
 
 #include "berryJobStatus.h"
 #include "internal/berryJobManager.h"
-#include "berryJobsDll.h"
+#include <org_blueberry_core_jobs_Export.h>
 
 namespace berry
 {

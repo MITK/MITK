@@ -87,7 +87,7 @@ class MitkIGTUI_EXPORT QmitkTrackingDeviceConfigurationWidget : public QWidget
 	  bool GetTrackingDeviceConfigured();
 
     /** @brief Sets the style of this widget. Default is ADVANCED. Caution: The style can only be set once at startup! */
-    void SetStyle(Style style);
+    void SetGUIStyle(Style style);
 
     /** @brief Enables/disables the advanced user controls which means the reset and finished button. When disabled you'll get NO
       *        signals from this widget and you've to check by yourself if the configuration is finished. Default value is false.

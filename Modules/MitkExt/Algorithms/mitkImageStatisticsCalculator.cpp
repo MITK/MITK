@@ -44,10 +44,16 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkImageExport.h>
 #include <vtkImageData.h>
 
+#if ( ( VTK_MAJOR_VERSION <= 5 ) && ( VTK_MINOR_VERSION<=8)  )
+  #include "mitkvtkLassoStencilSource.h"
+#else
+  #include "vtkLassoStencilSource.h"
+#endif
+
+
 #include <vtkMetaImageWriter.h>
 
 #include <exception>
-
 
 
 
@@ -767,7 +773,6 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
     offset[i] = (int) indexCoordDistance + image->GetBufferedRegion().GetIndex()[i];
   }
 
-
   // Adapt the origin and region (index/size) of the mask so that the origin of both are the same
   typename ChangeInformationFilterType::Pointer adaptMaskFilter;
   adaptMaskFilter = ChangeInformationFilterType::New();
@@ -900,16 +905,12 @@ void ImageStatisticsCalculator::InternalCalculateMaskFromPlanarFigure(
   castFilter->Update();
   castFilter->GetOutput()->FillBuffer( 1 );
 
-  // Generate VTK polygon from (closed) PlanarFigure polyline
-  // (The polyline points are shifted by -0.5 in z-direction to make sure
-  // that the extrusion filter, which afterwards elevates all points by +0.5
-  // in z-direction, creates a 3D object which is cut by the the plane z=0)
+  // all PolylinePoints of the PlanarFigure are stored in a vtkPoints object.
+  // These points are used by the vtkLassoStencilSource to create
+  // a vtkImageStencil.
   const mitk::Geometry2D *planarFigureGeometry2D = m_PlanarFigure->GetGeometry2D();
   const typename PlanarFigure::PolyLineType planarFigurePolyline = m_PlanarFigure->GetPolyLine( 0 );
   const mitk::Geometry3D *imageGeometry3D = m_Image->GetGeometry( 0 );
-
-  vtkPolyData *polyline = vtkPolyData::New();
-  polyline->Allocate( 1, 1 );
 
   // Determine x- and y-dimensions depending on principal axis
   int i0, i1;
@@ -932,9 +933,9 @@ void ImageStatisticsCalculator::InternalCalculateMaskFromPlanarFigure(
       break;
   }
 
-  // Create VTK polydata object of polyline contour
+  // store the polyline contour as vtkPoints object
   bool outOfBounds = false;
-  vtkPoints *points = vtkPoints::New();
+  vtkSmartPointer<vtkPoints> points = vtkPoints::New();
   typename PlanarFigure::PolyLineType::const_iterator it;
   const Vector3D& imageSpacing3D = imageGeometry3D->GetSpacing();
   for ( it = planarFigurePolyline.begin();
@@ -947,10 +948,6 @@ void ImageStatisticsCalculator::InternalCalculateMaskFromPlanarFigure(
     // image
     planarFigureGeometry2D->Map( it->Point, point3D );
     
-    // Ensure correct pixel center
-    point3D[0] -= 0.5 / imageSpacing3D[0];
-    point3D[1] -= 0.5 / imageSpacing3D[1];
-
     // Polygons (partially) outside of the image bounds can not be processed
     // further due to a bug in vtkPolyDataToImageStencil
     if ( !imageGeometry3D->IsInside( point3D ) )
@@ -960,39 +957,18 @@ void ImageStatisticsCalculator::InternalCalculateMaskFromPlanarFigure(
 
     imageGeometry3D->WorldToIndex( point3D, point3D );
 
-    // Add point to polyline array
-    points->InsertNextPoint( point3D[i0], point3D[i1], -0.5 );
+    points->InsertNextPoint( point3D[i0], point3D[i1], 0 );
   }
-  polyline->SetPoints( points );
-  points->Delete();
 
   if ( outOfBounds )
   {
-    polyline->Delete();
     throw std::runtime_error( "Figure at least partially outside of image bounds!" );
   }
 
-  unsigned int numberOfPoints = planarFigurePolyline.size();
-  vtkIdType *ptIds = new vtkIdType[numberOfPoints];
-  for ( vtkIdType i = 0; i < numberOfPoints; ++i )
-  {
-    ptIds[i] = i;
-  }
-  polyline->InsertNextCell( VTK_POLY_LINE, numberOfPoints, ptIds );
-
-
-  // Extrude the generated contour polygon
-  vtkLinearExtrusionFilter *extrudeFilter = vtkLinearExtrusionFilter::New();
-  extrudeFilter->SetInput( polyline );
-  extrudeFilter->SetScaleFactor( 1 );
-  extrudeFilter->SetExtrusionTypeToNormalExtrusion();
-  extrudeFilter->SetVector( 0.0, 0.0, 1.0 );
-
-  // Make a stencil from the extruded polygon
-  vtkPolyDataToImageStencil *polyDataToImageStencil = vtkPolyDataToImageStencil::New();
-  polyDataToImageStencil->SetInput( extrudeFilter->GetOutput() );
-
-
+  // create a vtkLassoStencilSource and set the points of the Polygon
+  vtkSmartPointer<vtkLassoStencilSource> lassoStencil = vtkLassoStencilSource::New();
+  lassoStencil->SetShapeToPolygon();
+  lassoStencil->SetPoints( points );
 
   // Export from ITK to VTK (to use a VTK filter)
   typedef itk::VTKImageImport< MaskImage2DType > ImageImportType;
@@ -1001,49 +977,33 @@ void ImageStatisticsCalculator::InternalCalculateMaskFromPlanarFigure(
   typename ImageExportType::Pointer itkExporter = ImageExportType::New();
   itkExporter->SetInput( castFilter->GetOutput() );
 
-  vtkImageImport *vtkImporter = vtkImageImport::New();
+  vtkSmartPointer<vtkImageImport> vtkImporter = vtkImageImport::New();
   this->ConnectPipelines( itkExporter, vtkImporter );
-  vtkImporter->Update();
-
 
   // Apply the generated image stencil to the input image
-  vtkImageStencil *imageStencilFilter = vtkImageStencil::New();
-  imageStencilFilter->SetInput( vtkImporter->GetOutput() );
-  imageStencilFilter->SetStencil( polyDataToImageStencil->GetOutput() );
+  vtkSmartPointer<vtkImageStencil> imageStencilFilter = vtkImageStencil::New();
+  imageStencilFilter->SetInputConnection( vtkImporter->GetOutputPort() );
+  imageStencilFilter->SetStencil( lassoStencil->GetOutput() );
   imageStencilFilter->ReverseStencilOff();
   imageStencilFilter->SetBackgroundValue( 0 );
   imageStencilFilter->Update();
 
-
   // Export from VTK back to ITK
-  vtkImageExport *vtkExporter = vtkImageExport::New();
-  vtkExporter->SetInput( imageStencilFilter->GetOutput() );
+  vtkSmartPointer<vtkImageExport> vtkExporter = vtkImageExport::New();
+  vtkExporter->SetInputConnection( imageStencilFilter->GetOutputPort() );
   vtkExporter->Update();
 
   typename ImageImportType::Pointer itkImporter = ImageImportType::New();
   this->ConnectPipelines( vtkExporter, itkImporter );
   itkImporter->Update();
 
-
-  //typedef itk::ImageFileWriter< MaskImage2DType > FileWriterType;
-  //FileWriterType::Pointer writer = FileWriterType::New();
-  //writer->SetInput( itkImporter->GetOutput() );
-  //writer->SetFileName( "c:/test.mhd" );
-  //writer->Update();
-
-
   // Store mask
   m_InternalImageMask2D = itkImporter->GetOutput();
 
-
   // Clean up VTK objects
-  polyline->Delete();
-  extrudeFilter->Delete();
-  polyDataToImageStencil->Delete();
   vtkImporter->Delete();
   imageStencilFilter->Delete();
   //vtkExporter->Delete(); // TODO: crashes when outcommented; memory leak??
-  delete[] ptIds;
 }
 
 

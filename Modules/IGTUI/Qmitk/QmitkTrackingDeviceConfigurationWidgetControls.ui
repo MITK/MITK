@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>358</width>
-    <height>784</height>
+    <width>344</width>
+    <height>339</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,6 +16,9 @@
   <layout class="QVBoxLayout" name="verticalLayout_13">
    <item>
     <widget class="QStackedWidget" name="mainWidget">
+     <property name="lineWidth">
+      <number>0</number>
+     </property>
      <property name="currentIndex">
       <number>0</number>
      </property>
@@ -663,7 +666,11 @@ p, li { white-space: pre-wrap; }
      <widget class="QWidget" name="page_3">
       <layout class="QVBoxLayout" name="verticalLayout_15">
        <item>
-        <layout class="QVBoxLayout" name="simpleLayout"/>
+        <layout class="QVBoxLayout" name="simpleLayout">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+        </layout>
        </item>
        <item>
         <spacer name="verticalSpacer_6">
@@ -693,7 +700,7 @@ p, li { white-space: pre-wrap; }
             <x>0</x>
             <y>0</y>
             <width>320</width>
-            <height>298</height>
+            <height>740</height>
            </rect>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_4">

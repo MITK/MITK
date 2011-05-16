@@ -47,7 +47,7 @@ switch(style)
   case QmitkTrackingDeviceConfigurationWidget::SIMPLE:
 
     //move all UI elements to an empty dummy layout
-    m_Controls->dummyLayout->addItem(m_Controls->mainLayout);
+    //m_Controls->dummyLayout->addItem(m_Controls->mainLayout);
     m_Controls->dummyLayout->addWidget(m_Controls->widget_title_label);
     m_Controls->dummyLayout->addWidget(m_Controls->choose_tracking_device_label);
     m_Controls->dummyLayout->addWidget(m_Controls->polaris_label);
@@ -65,21 +65,32 @@ switch(style)
     m_Controls->dummyLayout->addWidget(m_Controls->line);
     m_Controls->dummyLayout->addWidget(m_Controls->configuration_finished_label);
     m_Controls->dummyLayout->addItem(m_Controls->horizontalLayout_4);
-    m_Controls->dummyLayout->addWidget(m_Controls->configuration_finished_label);
+    m_Controls->mainLayout->removeItem(m_Controls->horizontalLayout_4);
+    m_Controls->dummyLayout->addWidget(m_Controls->configuration_finished_label);  
     m_Controls->dummyLayout->addItem(m_Controls->verticalSpacer_2);
+    m_Controls->verticalLayout_3->removeItem(m_Controls->verticalSpacer_2);
     m_Controls->dummyLayout->addItem(m_Controls->horizontalSpacer_9);
+    m_Controls->horizontalLayout_9->removeItem(m_Controls->horizontalSpacer_9);
     m_Controls->dummyLayout->addItem(m_Controls->horizontalSpacer_3);
+    m_Controls->horizontalLayout_11->removeItem(m_Controls->horizontalSpacer_3);
     m_Controls->dummyLayout->addItem(m_Controls->verticalSpacer_3);
+    m_Controls->verticalLayout_7->removeItem(m_Controls->verticalSpacer_3);
     m_Controls->dummyLayout->addItem(m_Controls->verticalSpacer_4);
+    m_Controls->verticalLayout_10->removeItem(m_Controls->verticalSpacer_4);
     m_Controls->dummyLayout->addItem(m_Controls->horizontalSpacer_10);
-    m_Controls->dummyLayout->addItem(m_Controls->horizontalSpacer_10);
+    m_Controls->verticalLayout_10->removeItem(m_Controls->horizontalSpacer_10);
 
+    //set height to min
     m_Controls->m_outputTextPolaris->setMinimumHeight(0);
     m_Controls->m_outputTextPolaris->setMaximumHeight(0);
     m_Controls->m_outputTextMicronTracker->setMinimumHeight(0);
     m_Controls->m_outputTextMicronTracker->setMaximumHeight(0);
     m_Controls->m_outputTextAurora->setMinimumHeight(0);
     m_Controls->m_outputTextAurora->setMaximumHeight(0);
+    m_Controls->m_finishedButton->setMinimumHeight(0);
+    m_Controls->m_finishedButton->setMaximumHeight(0);
+    m_Controls->m_resetButton->setMinimumHeight(0);
+    m_Controls->m_resetButton->setMaximumHeight(0);
 
  
     //set the height of the tracking device combo box

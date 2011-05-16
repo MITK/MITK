@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>443</width>
-    <height>180</height>
+    <height>189</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -30,7 +30,7 @@
       </font>
      </property>
      <property name="text">
-      <string>Connect Tracking Device</string>
+      <string>Tracking Device Connection</string>
      </property>
     </widget>
    </item>
@@ -213,11 +213,6 @@
            </widget>
           </item>
          </layout>
-         <zorder>portTypeLabelPolaris</zorder>
-         <zorder>comPortPolaris</zorder>
-         <zorder>portTypePolaris</zorder>
-         <zorder>comPortLabelPolaris</zorder>
-         <zorder>horizontalSpacer_2</zorder>
          <zorder>comPortLabelPolaris</zorder>
          <zorder>comPortPolaris</zorder>
          <zorder>portTypeLabelPolaris</zorder>

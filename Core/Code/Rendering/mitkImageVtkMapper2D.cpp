@@ -512,9 +512,9 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
 
     xMin = yMin = 0;
     xMax = static_cast< int >( rendererInfo.m_Extent[0]
-                               - rendererInfo.m_PixelsPerMM[0] + 0.5 + 1.0);
+                               - rendererInfo.m_PixelsPerMM[0] + 0.5);
     yMax = static_cast< int >( rendererInfo.m_Extent[1] 
-                               - rendererInfo.m_PixelsPerMM[1] + 0.5 + 1.0);
+                               - rendererInfo.m_PixelsPerMM[1] + 0.5);
   }
 
   // Disallow huge dimensions

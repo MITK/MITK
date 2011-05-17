@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>378</width>
-    <height>189</height>
+    <width>289</width>
+    <height>296</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -19,8 +19,8 @@
   <property name="windowTitle">
    <string>QmitkIGTConnection</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout_2">
-   <item row="0" column="0">
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="0" colspan="2">
     <widget class="QLabel" name="label">
      <property name="font">
       <font>
@@ -34,57 +34,58 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="0">
-    <widget class="QmitkTrackingDeviceConfigurationWidget" name="trackingDeviceConfigurationWidget" native="true"/>
+   <item row="1" column="0" rowspan="2">
+    <widget class="QmitkTrackingDeviceConfigurationWidget" name="trackingDeviceConfigurationWidget" native="true">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+    </widget>
    </item>
    <item row="1" column="1">
-    <widget class="QWidget" name="widget" native="true">
-     <layout class="QGridLayout" name="gridLayout">
-      <item row="0" column="0">
-       <widget class="QPushButton" name="connectButton">
-        <property name="enabled">
-         <bool>true</bool>
-        </property>
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>50</height>
-         </size>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>10</pointsize>
-         </font>
-        </property>
-        <property name="toolTip">
-         <string>Connect to camera</string>
-        </property>
-        <property name="text">
-         <string>Connect</string>
-        </property>
-        <property name="icon">
-         <iconset resource="../resources/IGTUI.qrc">
-          <normaloff>:/IGTUI/powerRed.png</normaloff>
-          <normalon>:/IGTUI/powerGreen.png</normalon>:/IGTUI/powerRed.png</iconset>
-        </property>
-        <property name="iconSize">
-         <size>
-          <width>30</width>
-          <height>30</height>
-         </size>
-        </property>
-        <property name="checkable">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-     </layout>
+    <widget class="QPushButton" name="connectButton">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>50</height>
+      </size>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>10</pointsize>
+      </font>
+     </property>
+     <property name="toolTip">
+      <string>Connect to camera</string>
+     </property>
+     <property name="text">
+      <string>Connect</string>
+     </property>
+     <property name="icon">
+      <iconset resource="../resources/IGTUI.qrc">
+       <normaloff>:/IGTUI/powerRed.png</normaloff>
+       <normalon>:/IGTUI/powerGreen.png</normalon>:/IGTUI/powerRed.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>30</width>
+       <height>30</height>
+      </size>
+     </property>
+     <property name="checkable">
+      <bool>true</bool>
+     </property>
     </widget>
    </item>
    <item row="2" column="1">
@@ -95,7 +96,7 @@
      <property name="sizeHint" stdset="0">
       <size>
        <width>20</width>
-       <height>0</height>
+       <height>195</height>
       </size>
      </property>
     </spacer>

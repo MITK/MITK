@@ -44,6 +44,12 @@ IViewPart::Pointer ViewDescriptor::CreateView()
 {
   IViewPart::Pointer part(configElement->CreateExecutableExtension<IViewPart> (
       WorkbenchRegistryConstants::ATT_CLASS));
+  if (part.IsNull())
+  {
+    // support legacy BlueBerry extensions
+    part = configElement->CreateExecutableExtension<IViewPart> (
+          WorkbenchRegistryConstants::ATT_CLASS, IViewPart::GetManifestName());
+  }
   return part;
 }
 

@@ -103,7 +103,13 @@ PropertyTesterDescriptor::IsDeclaringPluginActive()
 IPropertyTester*
 PropertyTesterDescriptor::Instantiate()
 {
-  return fConfigElement->CreateExecutableExtension<IPropertyTester>(CLASS);
+  IPropertyTester* tester = fConfigElement->CreateExecutableExtension<IPropertyTester>(CLASS);
+  if (tester == 0)
+  {
+    // support legacy BlueBerry extension
+    tester = fConfigElement->CreateExecutableExtension<IPropertyTester>(CLASS, IPropertyTester::GetManifestName());
+  }
+  return tester;
 }
 
 bool

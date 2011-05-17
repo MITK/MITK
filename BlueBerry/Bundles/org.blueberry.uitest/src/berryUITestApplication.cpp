@@ -156,6 +156,11 @@ IApplication* UITestApplication::GetApplication() throw (CoreException)
       if (runs.size() > 0)
       {
         app = runs[0]->CreateExecutableExtension<IApplication> ("class"); //$NON-NLS-1$
+        if (app == 0)
+        {
+          // support legacy BlueBerry extensions
+          app = runs[0]->CreateExecutableExtension<IApplication> ("class", IApplication::GetManifestName());
+        }
       }
     }
     return app;

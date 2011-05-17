@@ -311,7 +311,13 @@ private:
 
         // Create the extension.
         try {
-            return targetElement->CreateExecutableExtension<C>("class"); //$NON-NLS-1$
+            C* impl = targetElement->CreateExecutableExtension<C>("class"); //$NON-NLS-1$
+            if (impl == 0)
+            {
+              // support legacy BlueBerry extensions
+              impl = targetElement->CreateExecutableExtension<C>("class", C::GetManifestName());
+            }
+            return impl;
         } catch (CoreException e) {
             // log it since we cannot safely display a dialog.
             WorkbenchPlugin::Log("Unable to create extension: " + targetID //$NON-NLS-1$

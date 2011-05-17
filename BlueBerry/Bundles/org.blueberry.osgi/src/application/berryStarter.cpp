@@ -97,11 +97,16 @@ int Starter::Run(int& argc, char** argv,
     {
       if (!argApplication.empty())
         BERRY_INFO(consoleLog)
-            << "One 'org.blueberry.core.runtime.applications' extension found, ignoring "
+            << "One '" << Starter::XP_APPLICATIONS << "' extension found, ignoring "
             << Platform::ARG_APPLICATION << " argument.\n";
       std::vector<IConfigurationElement::Pointer> runs(
           extensions[0]->GetChildren("run"));
       app = runs.front()->CreateExecutableExtension<IApplication> ("class");
+      if (app == 0)
+      {
+        // support legacy BlueBerry extensions
+        app = runs.front()->CreateExecutableExtension<IApplication> ("class", IApplication::GetManifestName());
+      }
     }
     else
     {
@@ -135,8 +140,13 @@ int Starter::Run(int& argc, char** argv,
             {
               std::vector<IConfigurationElement::Pointer> runs(
                   (*iter)->GetChildren("run"));
-              app = runs.front()->CreateExecutableExtension<IApplication> (
-                  "class");
+              app = runs.front()->CreateExecutableExtension<IApplication> ("class");
+              if (app == 0)
+              {
+                // try legacy BlueBerry extensions
+                app = runs.front()->CreateExecutableExtension<IApplication> (
+                  "class", IApplication::GetManifestName());
+              }
               break;
             }
           }

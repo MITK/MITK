@@ -34,9 +34,12 @@ PURPOSE.  See the above copyright notices for more information.
   *   \brief Simple and fast access to a pre-configured TrackingDeviceSource.
   *   
   *   This widget creates a fully configured, connected and started TrackingDeviceSource.
-  *   Clicking connect requires to specify a NavigationToolStorage that holds all tools to be used
+  *   Clicking "Connect" requires to specify a NavigationToolStorage that holds all tools to be used
   *   in the application. Corresponding surfaces are added to the DataStorage that has to be set for
   *   the widget.
+  *
+  *   Inputs: DataStorage
+  *   Outputs: TrackingDeviceSource, NavigationToolStorage
   *
   *   \ingroup IGTUI
   */
@@ -64,11 +67,16 @@ class MitkIGTUI_EXPORT QmitkIGTConnectionWidget : public QWidget
     
     
   signals:
+    /*!
+    \brief signal emitted when TrackingDevice was successfully connected
+    */
+    void TrackingDeviceConnected();
+    /*!
+    \brief signal emitted when TrackingDevice was successfully disconnected
+    */
+    void TrackingDeviceDisconnected();
 
   protected slots:
-    /* @brief This method is called when the user changes the selection of the trackingdevice (m_trackingDeviceChooser).
-    It then sets the correct widget for the selected tracking device.*/
-    void OnTrackingDeviceChanged();
     /*!
     \brief Asks the user to specify a tool file and finally connects the TrackingDeviceSource
     */
@@ -92,25 +100,11 @@ class MitkIGTUI_EXPORT QmitkIGTConnectionWidget : public QWidget
     \brief Remove the tool nodes currently associated to the tools hold in the NavigationToolStorage from the DataStorage
     */
     void RemoveToolNodes();
-    ///*!
-    //\brief Construct TrackingDevice according to the selection in the ComboBox.
-    //\return Preconfigured TrackingDevice to be used in a TrackingDeviceSource
-    //*/
-    //mitk::TrackingDevice::Pointer ConstructTrackingDevice();
-    ///* @return Returns a configured NDI 5D tracking device. Unfortunately the NDI 5D tracking device is not yet in the open source part
-    // *        so this method only returns NULL at the moment.
-    // */
-    //virtual mitk::TrackingDevice::Pointer ConfigureNDI5DTrackingDevice();
-
-    ///* @return Returns a configured NDI 6D tracking device. 
-    // *         The type (which means Aurora/Polaris) will not be set in the returnvalue. You have to this later.
-    // */
-    //mitk::TrackingDevice::Pointer ConfigureNDI6DTrackingDevice();
 
     Ui::QmitkIGTConnectionWidgetControls* m_Controls;
 
     mitk::DataStorage::Pointer m_DataStorage; ///< data storage to put navigation tools
-    mitk::TrackingDevice::Pointer m_TrackingDevice; ///< holds an instance of the currently chosen tracking device which may be of type NDI Polaris, NDI Aurora or Claron MicronTracker
+    mitk::TrackingDevice::Pointer m_TrackingDevice; ///< tracking device currently connected
     mitk::TrackingDeviceSource::Pointer m_TrackingDeviceSource; ///< holds the preconfigured source of the IGT pipeline which is provided by this widget for further processing
     mitk::NavigationToolStorage::Pointer m_NavigationToolStorage; ///< holds all navigation tools currently loaded
 

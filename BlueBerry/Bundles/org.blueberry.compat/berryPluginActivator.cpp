@@ -23,7 +23,6 @@
 #include <berryIExtensionPointService.h>
 
 #include <QtPlugin>
-#include <QDebug>
 
 namespace berry {
 
@@ -49,9 +48,8 @@ void org_blueberry_compat_Activator::start(ctkPluginContext* context)
 
   // register a listener to catch new plugin installations/resolutions.
   pluginListener = new CTKPluginListener(xpService);
-  qDebug() << "------- Connecting plugin listener ----------";
   context->connectPluginListener(pluginListener, SLOT(pluginChanged(ctkPluginEvent)), Qt::DirectConnection);
-  qDebug() << "-------- Intial plugin processing ------------";
+
   // populate the registry with all the currently installed plugins.
   // There is a small window here while processPlugins is being
   // called where the pluginListener may receive a ctkPluginEvent

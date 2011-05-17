@@ -30,7 +30,6 @@ void org_blueberry_core_runtime_Activator::start(ctkPluginContext* context)
 {
   m_PreferencesService = new PreferencesService();
   m_PrefServiceReg = context->registerService<IPreferencesService>(m_PreferencesService.GetPointer());
-  std::cout << "?????????? Registered pref service\n";
 }
 
 void org_blueberry_core_runtime_Activator::stop(ctkPluginContext* context)

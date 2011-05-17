@@ -88,6 +88,9 @@ void QmitkIGTConnectionWidget::OnConnect()
         // change button text
         m_Controls->connectButton->setText("Disconnect");
         m_Controls->connectButton->setChecked(true);
+        // disable configuration widget
+        m_Controls->trackingDeviceConfigurationWidget->setEnabled(false);
+        // emit connected signal
         emit TrackingDeviceConnected();
       }
       else
@@ -125,6 +128,9 @@ void QmitkIGTConnectionWidget::OnConnect()
     m_TrackingDeviceSource = NULL;
     // change button text
     m_Controls->connectButton->setText("Connect");
+    // enable configuration widget
+    m_Controls->trackingDeviceConfigurationWidget->setEnabled(true);
+    // emit disconnected signal
     emit TrackingDeviceDisconnected();
   }
 }

@@ -21,6 +21,16 @@
        <property name="text">
         <string>Start </string>
        </property>
+       <property name="icon">
+        <iconset resource="../resources/IGTUI.qrc">
+         <normaloff>:/IGTUI/play2.png</normaloff>:/IGTUI/play2.png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>30</width>
+         <height>30</height>
+        </size>
+       </property>
        <property name="checkable">
         <bool>false</bool>
        </property>
@@ -30,6 +40,16 @@
       <widget class="QPushButton" name="m_StopNavigationBtn">
        <property name="text">
         <string>Stop </string>
+       </property>
+       <property name="icon">
+        <iconset resource="../resources/IGTUI.qrc">
+         <normaloff>:/IGTUI/stop2.png</normaloff>:/IGTUI/stop2.png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>30</width>
+         <height>30</height>
+        </size>
        </property>
        <property name="checkable">
         <bool>false</bool>

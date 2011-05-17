@@ -28,13 +28,13 @@ QtLogPlugin* QtLogPlugin::instance = 0;
 QtLogPlugin::QtLogPlugin()
 {
   instance = this;
-  
-  BERRY_REGISTER_EXTENSION_CLASS(berry::LogView)
 }
 
 void 
-QtLogPlugin::start(ctkPluginContext* /*context*/)
+QtLogPlugin::start(ctkPluginContext* context)
 {
+  BERRY_REGISTER_EXTENSION_CLASS(berry::LogView, context)
+
   m_LogModel = new QtPlatformLogModel();
 }
 

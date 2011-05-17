@@ -29,7 +29,7 @@ void org_blueberry_osgi_tests_Activator::start(ctkPluginContext* context)
 {
   Q_UNUSED(context)
   
-  BERRY_REGISTER_EXTENSION_CLASS(OSGiCoreTestSuite)
+  BERRY_REGISTER_EXTENSION_CLASS(OSGiCoreTestSuite, context)
 }
 
 void org_blueberry_osgi_tests_Activator::stop(ctkPluginContext* context)

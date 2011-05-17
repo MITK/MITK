@@ -107,7 +107,11 @@ typedef uint _Flags;
 
 #endif /* BERRY_NO_TYPESAFE_FLAGS */
 
-#define BERRY_REGISTER_EXTENSION_CLASS(_ClassType)\
-qRegisterMetaType<_ClassType>(_ClassType::staticMetaObject.className());
+#define BERRY_REGISTER_EXTENSION_CLASS(_ClassType, _PluginContext)\
+{\
+  QString typeName = _PluginContext->getPlugin()->getSymbolicName();\
+  typeName = (typeName + "_") + _ClassType::staticMetaObject.className();\
+  qRegisterMetaType<_ClassType>(typeName.toAscii().data());\
+}
 
 #endif /*__BERRY_MACROS_H__*/

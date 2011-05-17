@@ -26,9 +26,7 @@ namespace berry {
 
 void org_blueberry_ui_qt_objectinspector_Activator::start(ctkPluginContext* context)
 {
-  Q_UNUSED(context)
-  
-  BERRY_REGISTER_EXTENSION_CLASS(berry::ObjectBrowserView)
+  BERRY_REGISTER_EXTENSION_CLASS(berry::ObjectBrowserView, context)
 }
 
 void org_blueberry_ui_qt_objectinspector_Activator::stop(ctkPluginContext* context)

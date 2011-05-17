@@ -26,6 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "../berryPlatformException.h"
 
 #include "berryIExecutableExtension.h"
+#include "berryIExtension.h"
 
 #include <vector>
 #include <string>
@@ -89,10 +90,11 @@ public:
       {
         plugin->start(0);
 
-        int metaTypeId = QMetaType::type(className.c_str());
+        QString typeName = plugin->getSymbolicName() + "_" + QString::fromStdString(className);
+        int metaTypeId = QMetaType::type(typeName.toAscii().data());
         if (metaTypeId == 0)
         {
-          BERRY_WARN << "The class " << className << " was not registered as a Qt MetaType using qRegisterMetaType. "
+          BERRY_WARN << "The class " << className << " was not registered as a Qt MetaType using BERRY_REGISTER_EXTENSION_CLASS(type, pluginContext). "
                         "Legacy BlueBerry bundles should use CreateExecutableExtension<C>(propertyName, C::GetManifestName()) instead.";
         }
         else
@@ -112,6 +114,13 @@ public:
           }
           return interface;
         }
+      }
+      else
+      {
+        BERRY_WARN << "Trying to create an executable extension (from "
+                   << this->GetDeclaringExtension()->GetUniqueIdentifier()
+                   << " in " << contributor << ") from a non-CTK plug-in. "
+                      "Use the CreateExecutableExtension<C>(propertyName, manifestName) method instead.";
       }
     }
     return 0;

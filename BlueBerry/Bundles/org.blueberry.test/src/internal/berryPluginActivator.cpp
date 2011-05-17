@@ -26,12 +26,12 @@ namespace berry {
 
 org_blueberry_test_Activator::org_blueberry_test_Activator()
 {
-  BERRY_REGISTER_EXTENSION_CLASS(CoreTestApplication)
+
 }
 
 void org_blueberry_test_Activator::start(ctkPluginContext* context)
 {
-  Q_UNUSED(context)
+  BERRY_REGISTER_EXTENSION_CLASS(CoreTestApplication, context)
 }
 
 void org_blueberry_test_Activator::stop(ctkPluginContext* context)

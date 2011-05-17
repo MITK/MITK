@@ -27,13 +27,13 @@ namespace berry {
 
 org_blueberry_uitest_Activator::org_blueberry_uitest_Activator()
 {
-  BERRY_REGISTER_EXTENSION_CLASS(UITestApplication)
-  BERRY_REGISTER_EXTENSION_CLASS(EmptyPerspective)
+
 }
 
 void org_blueberry_uitest_Activator::start(ctkPluginContext* context)
 {
-  Q_UNUSED(context)
+  BERRY_REGISTER_EXTENSION_CLASS(UITestApplication, context)
+  BERRY_REGISTER_EXTENSION_CLASS(EmptyPerspective, context)
 }
 
 void org_blueberry_uitest_Activator::stop(ctkPluginContext* context)

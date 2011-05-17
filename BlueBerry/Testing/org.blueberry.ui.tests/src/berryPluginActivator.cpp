@@ -29,11 +29,9 @@ namespace berry {
 
 void org_blueberry_ui_tests_Activator::start(ctkPluginContext* context)
 {
-  Q_UNUSED(context)
-  
-  BERRY_REGISTER_EXTENSION_CLASS(UiTestSuite)
-  BERRY_REGISTER_EXTENSION_CLASS(MockViewPart)
-  BERRY_REGISTER_EXTENSION_CLASS(SaveableMockViewPart)
+  BERRY_REGISTER_EXTENSION_CLASS(UiTestSuite, context)
+  BERRY_REGISTER_EXTENSION_CLASS(MockViewPart, context)
+  BERRY_REGISTER_EXTENSION_CLASS(SaveableMockViewPart, context)
 }
 
 void org_blueberry_ui_tests_Activator::stop(ctkPluginContext* context)

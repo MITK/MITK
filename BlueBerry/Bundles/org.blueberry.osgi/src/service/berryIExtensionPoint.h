@@ -21,6 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <org_blueberry_osgi_Export.h>
 
 #include "berryIExtension.h"
+#include "berryIConfigurationElement.h"
 
 #include <vector>
 

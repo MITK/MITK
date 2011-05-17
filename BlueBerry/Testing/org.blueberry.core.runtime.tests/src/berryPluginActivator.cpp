@@ -29,7 +29,7 @@ void org_blueberry_core_runtime_tests_Activator::start(ctkPluginContext* context
 {
   Q_UNUSED(context)
   
-  BERRY_REGISTER_EXTENSION_CLASS(CoreRuntimeTestSuite)
+  BERRY_REGISTER_EXTENSION_CLASS(CoreRuntimeTestSuite, context)
 }
 
 void org_blueberry_core_runtime_tests_Activator::stop(ctkPluginContext* context)

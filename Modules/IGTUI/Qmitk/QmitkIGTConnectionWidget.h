@@ -40,6 +40,7 @@ PURPOSE.  See the above copyright notices for more information.
   *
   *   Inputs: DataStorage
   *   Outputs: TrackingDeviceSource, NavigationToolStorage
+  *   Signals: TrackingDeviceConnected, TrackingDeviceDisconnected
   *
   *   \ingroup IGTUI
   */

@@ -55,7 +55,7 @@ void QmitkIGTConnectionWidget::CreateQtPartControl(QWidget *parent)
   m_Controls = new Ui::QmitkIGTConnectionWidgetControls;
   m_Controls->setupUi(parent);
   // configure trackingDeviceConfigurationWidget
-  m_Controls->trackingDeviceConfigurationWidget->EnableAdvancedUserControl(false);
+  m_Controls->trackingDeviceConfigurationWidget->SetGUIStyle(QmitkTrackingDeviceConfigurationWidget::SIMPLE);
   }
 }
 

@@ -663,6 +663,7 @@ SliceNavigationController
                 }
 
                 std::stringstream stream;
+                stream.imbue(std::locale::classic());
 
                 // get the position and gray value from the image and build up status bar text                
                 if(image3D.IsNotNull())

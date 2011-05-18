@@ -129,6 +129,7 @@ std::string QmitkMemoryUsageIndicatorView::FormatMemorySize( size_t size )
     descriptor = "GB";
   }
   std::ostringstream str;
+  str.imbue(std::locale::classic());
   str << std::fixed << std::setprecision(2) << val << " " << descriptor;
   return str.str();
 }
@@ -136,6 +137,7 @@ std::string QmitkMemoryUsageIndicatorView::FormatMemorySize( size_t size )
 std::string QmitkMemoryUsageIndicatorView::FormatPercentage( double val )
 {
   std::ostringstream str;
+  str.imbue(std::locale::classic());
   str << std::fixed << std::setprecision(2) << val << " " << "%";
   return str.str();
 }
@@ -143,6 +145,7 @@ std::string QmitkMemoryUsageIndicatorView::FormatPercentage( double val )
 std::string QmitkMemoryUsageIndicatorView::GetMemoryDescription( size_t processSize, float percentage )
 {
   std::ostringstream str;
+  str.imbue(std::locale::classic());
   str << FormatMemorySize(processSize) << " (" << FormatPercentage( percentage ) <<")" ;
   return str.str();
 }

@@ -756,8 +756,15 @@ void Geometry2DDataVtkMapper3D::ProcessNode( DataNode * node, BaseRenderer* rend
             // Apply color property (of the node, not of the plane)
             float rgb[3] = { 1.0, 1.0, 1.0 };
             node->GetColor( rgb, renderer );
-            imageActor->GetProperty()->SetColor( rgb[0], rgb[1], rgb[2] );
-            //m_BackgroundActor->GetProperty()->SetColor(1,1,1);
+
+            if(useColor)
+            {
+              imageActor->GetProperty()->SetColor( rgb[0], rgb[1], rgb[2] );
+            }
+            else
+            {
+              imageActor->GetProperty()->SetColor( 1, 1, 1 );
+            }
 
             // Apply opacity property (of the node, not of the plane)
             float opacity = 0.999;

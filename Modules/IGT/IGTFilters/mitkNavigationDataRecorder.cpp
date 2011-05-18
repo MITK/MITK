@@ -149,7 +149,7 @@ void mitk::NavigationDataRecorder::Update()
       { 
         if (this->m_OutputFormat == mitk::NavigationDataRecorder::xml)
           {
-          TiXmlElement* elem = new TiXmlElement("ND");
+          TiXmlElement* elem = new TiXmlElement("NavigationData");
 
           elem->SetDoubleAttribute("Time", timestamp);
           elem->SetAttribute("SystemTime", sysTimeStr); // tag for system time

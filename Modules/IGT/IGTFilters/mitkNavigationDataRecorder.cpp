@@ -149,7 +149,7 @@ void mitk::NavigationDataRecorder::Update()
       { 
         if (this->m_OutputFormat == mitk::NavigationDataRecorder::xml)
           {
-          TiXmlElement* elem = new TiXmlElement("ND");
+          TiXmlElement* elem = new TiXmlElement("NavigationData");
 
           elem->SetDoubleAttribute("Time", timestamp);
           elem->SetAttribute("SystemTime", sysTimeStr); // tag for system time
@@ -281,7 +281,7 @@ void mitk::NavigationDataRecorder::StartRecording(std::ostream* stream)
   {
     if (m_OutputFormat == mitk::NavigationDataRecorder::xml)
       {
-      *m_Stream << "<?xml version=\"1.0\" ?>" << std::endl;
+      *m_Stream << "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" << std::endl;
       /**m_Stream << "<Version Ver=\"1\" />" << std::endl;*/
       // should be a generic version, meaning a member variable, which has the actual version
       *m_Stream << "    " << "<Data ToolCount=\"" << (m_NumberOfInputs) << "\" version=\"1.0\">" << std::endl;

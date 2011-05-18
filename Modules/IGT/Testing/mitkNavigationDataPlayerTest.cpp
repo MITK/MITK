@@ -59,8 +59,10 @@ int mitkNavigationDataPlayerTest(int /* argc */, char* /*argv*/[])
   pnt[2] = 3;
 
   MITK_TEST_CONDITION_REQUIRED( nd->GetPosition() == pnt, "Testing position of replayed NavigaionData" );
-  //MITK_TEST_CONDITION_REQUIRED( nd->GetTimeStamp() == 3068.94, "Testing for correct TimeStamp" );
 
+  player = mitk::NavigationDataPlayer::New();
+  player->SetFileName( file );
+  player->SetStream( mitk::NavigationDataPlayer::NormalFile );
 
   std::vector<double> times, refTimes;
   refTimes.resize(5);
@@ -69,38 +71,47 @@ int mitkNavigationDataPlayerTest(int /* argc */, char* /*argv*/[])
   refTimes[2] = 174.4;
   refTimes[3] = 275.0;
   refTimes[4] = 385.39;
+  std::vector<mitk::Point3D> points, refPoints;
+  refPoints.resize(5);
+  refPoints[0][0] = 1; refPoints[0][1] = 0; refPoints[0][2] = 3;
+  refPoints[1][0] = 2; refPoints[1][1] = 1; refPoints[1][2] = 4;
+  refPoints[2][0] = 3; refPoints[2][1] = 2; refPoints[2][2] = 5;
+  refPoints[3][0] = 4; refPoints[3][1] = 3; refPoints[3][2] = 6;
+  refPoints[4][0] = 5; refPoints[4][1] = 4; refPoints[4][2] = 7;
 
   mitk::TimeStamp::Pointer timer = mitk::TimeStamp::GetInstance();
   timer->Initialize();
 
   itk::Object::Pointer obj = itk::Object::New();
-  timer->Start( obj );
-
+  
   mitk::Point3D oldPos;
   oldPos[0] = 1;
   oldPos[1] = 0;
   oldPos[2] = 3;
-  //pnt = oldPos;
+
+  timer->Start( obj );
   player->StartPlaying();
   while( times.size()<5 )
   {
     player->Update();
-    pnt = nd->GetPosition();
+    pnt = player->GetOutput()->GetPosition();
     if ( pnt != oldPos )
-    {
+    { 
       times.push_back( timer->GetElapsed(obj) );
+      points.push_back(oldPos);
       oldPos = pnt;
     }
   }
+  player->StopPlaying();
 
   // if this test fails, it may be because the dartclient runs on a virtual machine.
   // Under these circumstances, it may be impossible to achieve a time-accuracy of 10ms
   for ( int i=0;i<5;i++ )
   {
-    std::cout << "ref: " << refTimes[i] << "  /  time elapsed: " << times[i] << std::endl;
-    MITK_TEST_CONDITION_REQUIRED( (times[i]>refTimes[i]-15 && times[i]<refTimes[i]+15), "checking for more or less correct time-line"  );
+    if ((times[i]>refTimes[i]-50 && times[i]<refTimes[i]+50)) {MITK_TEST_OUTPUT(<< "ref: " << refTimes[i] << "  /  time elapsed: " << times[i]);}
+    MITK_TEST_CONDITION_REQUIRED( (times[i]>refTimes[i]-50 && times[i]<refTimes[i]+50), "checking for more or less correct time-line"  );
+    MITK_TEST_CONDITION_REQUIRED(points[i] == refPoints[i], "checking if the point coordinates are correct")
   }
-
 
   // always end with this!
   MITK_TEST_END();

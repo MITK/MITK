@@ -34,7 +34,7 @@ SET(MODULE_TESTS
    # -----------------------------------------------------------------------
 
    # ------------------ Deavtivated Tests ----------------------------------
-   #mitkNavigationDataPlayerTest.cpp  # deactivated, see bug 3073
+   mitkNavigationDataPlayerTest.cpp  # deactivated, see bug 3073
    #mitkNavigationDataSourceTest.cpp   # deactivated because of  bug #2323
    # -----------------------------------------------------------------------
 )

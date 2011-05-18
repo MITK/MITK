@@ -59,6 +59,7 @@ namespace mitk {
 
     itkGetObjectMacro(Spline, SplineType);
 
+
   protected:
     itkNewMacro(Self);
     VirtualTrackingTool();

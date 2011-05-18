@@ -21,9 +21,13 @@
 #include <ctkPluginActivator.h>
 #include <QObject>
 
+#include <org_blueberry_osgi_Export.h>
+
 namespace berry {
 
-class org_blueberry_osgi_Activator : public QObject, public ctkPluginActivator
+// We need to export this activator, because it is referenced
+// in the templated method berry::ServiceRegistry::GetServiceById<>(...)
+class BERRY_OSGI org_blueberry_osgi_Activator : public QObject, public ctkPluginActivator
 {
   Q_OBJECT
   Q_INTERFACES(ctkPluginActivator)

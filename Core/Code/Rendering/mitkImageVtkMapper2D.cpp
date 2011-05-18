@@ -48,6 +48,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkTexture.h>
 #include <vtkCamera.h>
 #include <vtkTransformPolyDataFilter.h>
+#include <vtkImageMapToColors.h>
 
 //ITK
 #include <itkRGBAPixel.h>
@@ -76,7 +77,8 @@ void mitk::ImageVtkMapper2D::AdjustCamera(mitk::BaseRenderer* renderer)
 
   double imageHeightInMM = localStorage->m_ReslicedImage->GetDimensions()[1]; //the height of the current slice in mm
   double displayHeightInMM = displayGeometry->GetSizeInMM()[1]; //the display height in mm (gets smaller when you zoom in)
-  double zoomFactor = displayHeightInMM/imageHeightInMM; //determine how much of the image can be displayed
+//  double zoomFactor = displayHeightInMM/imageHeightInMM; //determine how much of the image can be displayed
+  double zoomFactor = imageHeightInMM/displayHeightInMM; //determine how much of the image can be displayed
 
   Vector2D displayGeometryOriginInMM = displayGeometry->GetOriginInMM();  //top left of the render window
   Vector2D displayGeometryCenterInMM = displayGeometryOriginInMM + displayGeometry->GetSizeInMM()/2; //center of the render window
@@ -89,7 +91,7 @@ void mitk::ImageVtkMapper2D::AdjustCamera(mitk::BaseRenderer* renderer)
   //Therefore, the size is imageHeightInMM / 2.
   renderer->GetVtkRenderer()->GetActiveCamera()->SetParallelScale(imageHeightInMM / 2);
   //zooming with the factor calculated by dividing displayHeight through imegeHeight. The factor is inverse, because the VTK zoom method is working inversely.
-  renderer->GetVtkRenderer()->GetActiveCamera()->Zoom(1/zoomFactor);
+  renderer->GetVtkRenderer()->GetActiveCamera()->Zoom(zoomFactor);
 
   //the center of the view-plane
   double viewPlaneCenter[3];
@@ -343,9 +345,9 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
       // correct position during 3D mapping.
       boundsInitialized = this->CalculateClippedPlaneBounds(
           rendererInfo.m_ReferenceGeometry, planeGeometry, bounds );
+      MITK_INFO << "boundsinitialized " << boundsInitialized;
     }
   }
-
   // Do we have an AbstractTransformGeometry?
   else if ( dynamic_cast< const AbstractTransformGeometry * >( worldGeometry ) )
   {
@@ -848,13 +850,72 @@ void mitk::ImageVtkMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
   double rgbConv[3] = {(double)rgb[0], (double)rgb[1], (double)rgb[2]};
   localStorage->m_Actor->GetProperty()->SetColor(rgbConv);
 
-  localStorage->m_Actor->GetProperty()->Modified();
-  //  m_VtkActor->SetUserTransform(transform);
+    bool binary = false;
+    this->GetDataNode()->GetBoolProperty( "binary", binary, renderer );
+  if( binary )
+  {
+    localStorage->m_Texture->MapColorScalarsThroughLookupTableOn();
 
-  //  RendererInfo &rendererInfo = this->AccessRendererInfo( renderer );
-  //  iil4mitkPicImage *image = rendererInfo.Get_iil4mitkImage();
+//    vtkSmartPointer<vtkLookupTable> lookupTable =
+//      vtkSmartPointer<vtkLookupTable>::New();
+//    lookupTable->SetNumberOfTableValues(2);
+//    lookupTable->SetRange(0.0,1.0);
+//    lookupTable->SetTableValue( 0, 0.0, 0.0, 0.0, 0.0 ); //label 0 is transparent
+//    lookupTable->SetTableValue( 1, 0.0, 1.0, 0.0, 1.0 ); //label 1 is opaque and green
+//    lookupTable->Build();
 
-  //  assert( image != NULL );
+//    vtkSmartPointer<vtkImageMapToColors> mapTransparency =
+//      vtkSmartPointer<vtkImageMapToColors>::New();
+//    mapTransparency->SetLookupTable(lookupTable);
+//    mapTransparency->SetInput(localStorage->m_ReslicedImage);
+//    mapTransparency->PassAlphaToOutputOn();
+
+//    localStorage->m_Texture->SetInputConnection(mapTransparency->GetOutputPort());
+  }
+  else
+  {
+    localStorage->m_Texture->MapColorScalarsThroughLookupTableOff();
+  }
+
+
+
+  ///#################### mein versuch
+//  bool binary = false;
+//  this->GetDataNode()->GetBoolProperty( "binary", binary, renderer );
+
+//  if ( binary )
+//  {
+//    vtkSmartPointer<vtkImageData> image = localStorage->m_ReslicedImage;;
+//    {
+//      // Specify the size of the image data
+//      //        image->SetNumberOfScalarComponents(4);
+//      //        image->SetScalarTypeToUnsignedChar();
+
+//      MITK_INFO << "scalar type " << image->GetScalarTypeAsString();
+
+//      int* dims = image->GetDimensions();
+
+//      MITK_INFO << "dims " << dims[0] << " " << dims[1];
+
+//      // Fill every entry of the image with "2"
+//      for (int y = 0; y < dims[1]; y++)
+//      {
+//        for (int x = 0; x < dims[0]; x++)
+//        {
+//          unsigned char* pixel = static_cast<unsigned char*>(image->GetScalarPointer(x,y,0));
+//          //            MITK_INFO << "pixe " << (int)pixel[0] << " " <<  (int)pixel[1] << " " <<  (int)pixel[2] << " " <<  (int)pixel[3];
+//          if(pixel[0]>0 || pixel[1]>0 || pixel[2]>0)
+//          {
+//            pixel[3] = 255;
+//          }
+//          else
+//          {
+//            pixel[3] = 0;
+//          }
+//        }
+//      }
+//    }
+//  }
 
 
   //  float opacity = 1.0f;

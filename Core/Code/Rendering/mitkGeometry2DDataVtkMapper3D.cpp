@@ -54,9 +54,6 @@ Geometry2DDataVtkMapper3D::Geometry2DDataVtkMapper3D()
   m_EdgeTuber = vtkTubeFilter::New();
   m_EdgeMapper = vtkPolyDataMapper::New();
 
-  // Disable OGL Displaylist for the "Edge". Workaround for Bug #1787
-  // m_EdgeMapper->ImmediateModeRenderingOn();
-
   m_SurfaceCreator = Geometry2DDataToSurfaceFilter::New();
   m_SurfaceCreatorBoundingBox = BoundingBox::New();
   m_SurfaceCreatorPointsContainer = BoundingBox::PointsContainer::New();
@@ -103,9 +100,8 @@ Geometry2DDataVtkMapper3D::Geometry2DDataVtkMapper3D()
   m_EdgeMapper->ScalarVisibilityOff();
 
   m_BackgroundMapper->SetInput(emptyPolyData);
-  //  m_BackgroundMapper->ImmediateModeRenderingOn();
-  m_EdgeActor->SetMapper( m_EdgeMapper );
 
+  m_EdgeActor->SetMapper( m_EdgeMapper );
 
   m_BackgroundActor->GetProperty()->SetAmbient( 0.5 );
   m_BackgroundActor->GetProperty()->SetColor( 0.0, 0.0, 0.0 );
@@ -124,7 +120,6 @@ Geometry2DDataVtkMapper3D::Geometry2DDataVtkMapper3D()
   m_FrontNormalsMapper->SetInput( m_FrontHedgeHog->GetOutput() );
   m_BackNormalsMapper = vtkPolyDataMapper::New();
 
-
   m_Prop3DAssembly->AddPart( m_EdgeActor );
   m_Prop3DAssembly->AddPart( m_ImageAssembly );
   m_FrontNormalsActor = vtkActor::New();
@@ -140,16 +135,10 @@ Geometry2DDataVtkMapper3D::Geometry2DDataVtkMapper3D()
   m_DefaultLookupTable->Build();
   m_DefaultLookupTable->SetTableValue( 0, 0.0, 0.0, 0.0, 0.0 );
 
-
-
-
-
   m_ImageMapperDeletedCommand = MemberCommandType::New();
-
   m_ImageMapperDeletedCommand->SetCallbackFunction(
     this, &Geometry2DDataVtkMapper3D::ImageMapperDeletedCallback );
 }
-
 
 Geometry2DDataVtkMapper3D::~Geometry2DDataVtkMapper3D()
 {
@@ -187,7 +176,6 @@ Geometry2DDataVtkMapper3D::~Geometry2DDataVtkMapper3D()
   m_DataStorage = NULL;
 }
 
-
 vtkProp* Geometry2DDataVtkMapper3D::GetVtkProp(mitk::BaseRenderer * /*renderer*/)
 {
   if ( (this->GetDataNode() != NULL )
@@ -202,19 +190,16 @@ vtkProp* Geometry2DDataVtkMapper3D::GetVtkProp(mitk::BaseRenderer * /*renderer*/
   return m_Prop3DAssembly;
 }
 
-
 void Geometry2DDataVtkMapper3D::UpdateVtkTransform(mitk::BaseRenderer * /*renderer*/)
 {
   m_ImageAssembly->SetUserTransform(
     this->GetDataNode()->GetVtkTransform(this->GetTimestep()) );
 }
 
-const Geometry2DData *
-  Geometry2DDataVtkMapper3D::GetInput()
+const Geometry2DData* Geometry2DDataVtkMapper3D::GetInput()
 {
   return static_cast<const Geometry2DData * > ( GetData() );
 }
-
 
 void Geometry2DDataVtkMapper3D::SetDataStorageForTexture(mitk::DataStorage* storage)
 {
@@ -228,60 +213,7 @@ void Geometry2DDataVtkMapper3D::SetDataStorageForTexture(mitk::DataStorage* stor
   }
 }
 
-//
-// METHOD COMMENTED OUT SINCE IT IS CURRENTLY UNUSED
-//
-//void
-//Geometry2DDataVtkMapper3D::BuildPaddedLookupTable(
-//  vtkLookupTable *inputLookupTable, vtkLookupTable *outputLookupTable,
-//  vtkFloatingPointType min, vtkFloatingPointType max )
-//{
-//  // Copy the table values from the input lookup table
-//  vtkUnsignedCharArray *inputTable = vtkUnsignedCharArray::New();
-//  inputTable->DeepCopy( inputLookupTable->GetTable() );
-//
-//  vtkUnsignedCharArray *outputTable = outputLookupTable->GetTable();
-//
-//  // Calculate the size of one lookup table "bin"
-//  vtkFloatingPointType binSize = (max - min) / 256.0;
-//
-//  // Calculate the extended table size, assuming the range [-32767, max],
-//  // increased by 1.
-//  int tableSize = (int) ((max + 32767) / binSize) + 1;
-//  outputLookupTable->SetNumberOfTableValues( tableSize );
-//
-//  unsigned char *inputPtr = inputTable->WritePointer( 0, 0 );
-//  unsigned char *outputPtr = outputTable->WritePointer( 0, 0 );
-//
-//  // Initialize the first (translucent) bin.
-//  *outputPtr++ = 0; *outputPtr++ = 0; *outputPtr++ = 0; *outputPtr++ = 0;
-//
-//  int i;
-//  for ( i = 1; i < tableSize; ++i )
-//  {
-//    *outputPtr++ = *inputPtr++;
-//    *outputPtr++ = *inputPtr++;
-//    *outputPtr++ = *inputPtr++;
-//    *outputPtr++ = *inputPtr++;
-//
-//    // While filling the padded part of the table, use the default value
-//    // (the first value of the input table)
-//    if ( i < (tableSize - 256) )
-//    {
-//      inputPtr -= 4;
-//    }
-//  }
-//
-//  // Apply the new table range; the lower boundary is decreased by binSize
-//  // since we have one additional translucent bin.
-//  outputLookupTable->SetTableRange( -32767.0 - binSize, max );
-//
-//  inputTable->Delete();
-//}
-
-
-int
-  Geometry2DDataVtkMapper3D::FindPowerOfTwo( int i )
+int Geometry2DDataVtkMapper3D::FindPowerOfTwo( int i )
 {
   int size;
 
@@ -292,9 +224,8 @@ int
   return size;
 }
 
-void
-  Geometry2DDataVtkMapper3D::ImageMapperDeletedCallback(
-  itk::Object *caller, const itk::EventObject& /*event*/ )
+void Geometry2DDataVtkMapper3D::ImageMapperDeletedCallback(
+    itk::Object *caller, const itk::EventObject& /*event*/ )
 {
   ImageMapperGL2D *imageMapper = dynamic_cast< ImageMapperGL2D * >( caller );
   if ( (imageMapper != NULL) )
@@ -311,7 +242,6 @@ void
     }
   }
 }
-
 
 void Geometry2DDataVtkMapper3D::GenerateData(BaseRenderer* renderer)
 {
@@ -499,7 +429,6 @@ void Geometry2DDataVtkMapper3D::GenerateData(BaseRenderer* renderer)
 
     LayerSortedActorList layerSortedActors;
 
-
     // Traverse the data tree to find nodes resliced by ImageMapperGL2D
     mitk::NodePredicateOr::Pointer p = mitk::NodePredicateOr::New();
     p->AddPredicate(mitk::NodePredicateDataType::New("Image"));
@@ -513,7 +442,6 @@ void Geometry2DDataVtkMapper3D::GenerateData(BaseRenderer* renderer)
       if (node != NULL)
         this->ProcessNode(node, renderer, surface, layerSortedActors);
     }
-
 
     // Add all image actors to the assembly, sorted according to
     // layer property
@@ -537,7 +465,6 @@ void Geometry2DDataVtkMapper3D::GenerateData(BaseRenderer* renderer)
       extent = extentY;
     if ( extent < extentZ ) 
       extent = extentZ;
-
 
     // Adjust the radius according to extent
     m_EdgeTuber->SetRadius( tubeRadius );
@@ -564,8 +491,8 @@ void Geometry2DDataVtkMapper3D::GenerateData(BaseRenderer* renderer)
     m_BackgroundActor->GetProperty()->SetRepresentation( representationProperty->GetVtkRepresentation() );
 }
 
-
-void Geometry2DDataVtkMapper3D::ProcessNode( DataNode * node, BaseRenderer* renderer, Surface * surface, LayerSortedActorList &layerSortedActors )
+void Geometry2DDataVtkMapper3D::ProcessNode( DataNode * node, BaseRenderer* renderer,
+                                             Surface * surface, LayerSortedActorList &layerSortedActors )
 {
   if ( node != NULL )
   {
@@ -787,7 +714,6 @@ void Geometry2DDataVtkMapper3D::ProcessNode( DataNode * node, BaseRenderer* rend
   }
 }
 
-
 void Geometry2DDataVtkMapper3D::ActorInfo::Initialize(vtkActor* actor, itk::Object* sender, itk::Command* command)
 {
   m_Actor = actor;
@@ -797,11 +723,9 @@ void Geometry2DDataVtkMapper3D::ActorInfo::Initialize(vtkActor* actor, itk::Obje
   m_ObserverID = sender->AddObserver( itk::DeleteEvent(), command );
 }
 
-
 Geometry2DDataVtkMapper3D::ActorInfo::ActorInfo() : m_Actor(NULL), m_Sender(NULL), m_ObserverID(0)
 {
 }
-
 
 Geometry2DDataVtkMapper3D::ActorInfo::~ActorInfo()
 {

@@ -125,7 +125,7 @@ ENDIF()
 CMAKE_POLICY(SET CMP0012 NEW)
 
 FIND_PACKAGE(CTK REQUIRED)
-SET(CTK_PLUGIN_LIBRARIES ${CTK_PLUGIN_LIBRARIES} CACHE INTERNAL "CTK plugins" FORCE)
+SET(CTK_PLUGIN_LIBRARIES "${CTK_PLUGIN_LIBRARIES}" CACHE INTERNAL "CTK plugins" FORCE)
 
 # Extract all library names starting with org_blueberry_
 MACRO(GetMyTargetLibraries all_target_libraries varname)
@@ -270,7 +270,7 @@ ctkFunctionGeneratePluginUseFile(${BB_PLUGIN_USE_FILE})
 # CTK Plugin Exports
 SET(BB_PLUGIN_EXPORTS_FILE "${CMAKE_CURRENT_BINARY_DIR}/BlueBerryPluginExports.cmake")
 GetMyTargetLibraries("${CTK_PLUGIN_LIBRARIES}" my_plugin_targets)
-export(TARGETS ${my_plugin_targets} mbilog
+export(TARGETS ${my_plugin_targets} mbilog PocoFoundation PocoUtil PocoXML
        FILE ${BB_PLUGIN_EXPORTS_FILE})
 
 

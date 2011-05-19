@@ -190,6 +190,7 @@ int mitk::VtkPropRenderer::Render(mitk::VtkPropRenderer::RenderType type)
   for(MappersMapType::iterator it = m_MappersMap.begin(); it != m_MappersMap.end(); it++)
   {
     Mapper * mapper = (*it).second;
+//    MITK_INFO << "name " << mapper->GetNameOfClass();
     if((mapper->IsVtkBased() == true) )
     {
       sthVtkBased = true;
@@ -212,6 +213,10 @@ int mitk::VtkPropRenderer::Render(mitk::VtkPropRenderer::RenderType type)
       lastVtkBased = false;
     }
 
+    //Es ist in GL_ENABLE_BIT gefunden: GL_TEXTURE_2D
+    GLboolean mode;
+    GLenum bit = GL_TEXTURE_2D;
+    glGetBooleanv(bit, &mode);
     switch(type)
     {
       case mitk::VtkPropRenderer::Opaque: mapper->MitkRenderOpaqueGeometry(this); break;
@@ -222,6 +227,10 @@ int mitk::VtkPropRenderer::Render(mitk::VtkPropRenderer::RenderType type)
       case mitk::VtkPropRenderer::Volumetric:    mapper->MitkRenderVolumetricGeometry(this); break;
       #endif
     }
+    if(mode)
+      glEnable(bit);
+    else
+      glDisable(bit);
   }
   
   if (lastVtkBased == false)
@@ -331,13 +340,14 @@ void mitk::VtkPropRenderer::Enable2DOpenGL()
   );
   glMatrixMode( GL_MODELVIEW );  
   glPushMatrix();  
-  glLoadIdentity();  
+  glLoadIdentity();
    
   // Make sure depth testing and lighting are disabled for 2D rendering until  
   // we are finished rendering in 2D  
-  glPushAttrib( GL_DEPTH_BUFFER_BIT | GL_LIGHTING_BIT );  
+  glPushAttrib( GL_DEPTH_BUFFER_BIT | GL_LIGHTING_BIT | GL_COLOR_BUFFER_BIT );
   glDisable( GL_DEPTH_TEST );  
-  glDisable( GL_LIGHTING );  
+  glDisable( GL_LIGHTING );
+  MITK_INFO << "Enable";
 }
 
 /*!
@@ -347,11 +357,12 @@ Enable2DOpenGL() and Disable2DOpenGL() are used to switch between 2D rendering (
 */
 void mitk::VtkPropRenderer::Disable2DOpenGL()
 {
-  glPopAttrib();  
+  glPopAttrib();
   glMatrixMode( GL_PROJECTION );  
   glPopMatrix();  
   glMatrixMode( GL_MODELVIEW );  
   glPopMatrix(); 
+  MITK_INFO << "Disable";
 }
 
 void mitk::VtkPropRenderer::Update(mitk::DataNode* datatreenode)

@@ -77,7 +77,7 @@ void mitk::ImageVtkMapper2D::AdjustCamera(mitk::BaseRenderer* renderer)
 
   double imageHeightInMM = localStorage->m_ReslicedImage->GetDimensions()[1]; //the height of the current slice in mm
   double displayHeightInMM = displayGeometry->GetSizeInMM()[1]; //the display height in mm (gets smaller when you zoom in)
-//  double zoomFactor = displayHeightInMM/imageHeightInMM; //determine how much of the image can be displayed
+  //  double zoomFactor = displayHeightInMM/imageHeightInMM; //determine how much of the image can be displayed
   double zoomFactor = imageHeightInMM/displayHeightInMM; //determine how much of the image can be displayed
 
   Vector2D displayGeometryOriginInMM = displayGeometry->GetOriginInMM();  //top left of the render window
@@ -806,28 +806,12 @@ void mitk::ImageVtkMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
   //get the current localStorage for the corresponding renderer
   LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
 
-  ScalarType windowMin = 0.0;
-  ScalarType windowMax = 255.0;
-
-  //get the level window
-  LevelWindow levelWindow;
-  GetLevelWindow(levelWindow, renderer);
-  windowMin = levelWindow.GetLowerWindowBound();
-  windowMax = levelWindow.GetUpperWindowBound();
-
-  //set up the lookuptable with the level window range
-  localStorage->m_LookupTable->SetSaturationRange( 0.0, 0.0 );
-  localStorage->m_LookupTable->SetHueRange( 0.0, 0.0 );
-  localStorage->m_LookupTable->SetValueRange( 0.0, 1.0 );
-  localStorage->m_LookupTable->SetRange( windowMin, windowMax );
-  localStorage->m_LookupTable->Build();
-
-  //set the lookuptable for the texture
-  localStorage->m_Texture->SetLookupTable( localStorage->m_LookupTable );
+  RendererInfo &rendererInfo = this->AccessRendererInfo( renderer );
 
   // check for interpolation properties
   bool textureInterpolation = false;
   GetDataNode()->GetBoolProperty( "texture interpolation", textureInterpolation, renderer );
+  rendererInfo.m_TextureInterpolation = textureInterpolation;
   if(textureInterpolation)
   { //texture interpolation on
     localStorage->m_Texture->InterpolateOn();
@@ -839,215 +823,175 @@ void mitk::ImageVtkMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
   //do not repeat the texture (the image)
   localStorage->m_Texture->RepeatOff();
 
-  //get the opacity and set it for the actor
-  float opacity = 0;
-  GetOpacity(opacity, renderer);
-  localStorage->m_Actor->GetProperty()->SetOpacity(opacity);
+//  //get the opacity and set it for the actor
+//  float opacity = 0;
+//  GetOpacity(opacity, renderer);
+//  localStorage->m_Actor->GetProperty()->SetOpacity(opacity);
 
-  //get the color and set it for the actor
-  float rgb[3] = { 1.0f, 1.0f, 1.0f };
-  GetColor( rgb, renderer );
-  double rgbConv[3] = {(double)rgb[0], (double)rgb[1], (double)rgb[2]};
-  localStorage->m_Actor->GetProperty()->SetColor(rgbConv);
+//  //get the color and set it for the actor
+//  float rgb[3] = { 1.0f, 1.0f, 1.0f };
+//  GetColor( rgb, renderer );
+//  double rgbConv[3] = {(double)rgb[0], (double)rgb[1], (double)rgb[2]};
+//  localStorage->m_Actor->GetProperty()->SetColor(rgbConv);
 
-    bool binary = false;
-    this->GetDataNode()->GetBoolProperty( "binary", binary, renderer );
-  if( binary )
+  //    bool binary = false;
+  //    this->GetDataNode()->GetBoolProperty( "binary", binary, renderer );
+  //  if( binary )
+  //  {
+
+
+  float rgba[4]= { 1.0f, 1.0f, 1.0f, 1.0f };
+  float opacity = 1.0f;
+
+  // check for color prop and use it for rendering if it exists
+  // binary image hovering & binary image selection
+  bool hover    = false;
+  bool selected = false;
+  GetDataNode()->GetBoolProperty("binaryimage.ishovering", hover, renderer);
+  GetDataNode()->GetBoolProperty("selected", selected, renderer);
+  if(hover && !selected)
   {
+    mitk::ColorProperty::Pointer colorprop = dynamic_cast<mitk::ColorProperty*>(GetDataNode()->GetProperty
+                                                                                ("binaryimage.hoveringcolor", renderer));
+    if(colorprop.IsNotNull())
+      memcpy(rgba, colorprop->GetColor().GetDataPointer(), 3*sizeof(float));
+    else
+      GetColor( rgba, renderer );
+
+  }
+  if(selected)
+  {
+    mitk::ColorProperty::Pointer colorprop = dynamic_cast<mitk::ColorProperty*>(GetDataNode()->GetProperty
+                                                                                ("binaryimage.selectedcolor", renderer));
+    if(colorprop.IsNotNull())
+      memcpy(rgba, colorprop->GetColor().GetDataPointer(), 3*sizeof(float));
+    else
+      GetColor( rgba, renderer );
+
+  }
+  if(!hover && !selected)
+  {
+    GetColor( rgba, renderer );
+  }
+
+  // check for opacity prop and use it for rendering if it exists
+  GetOpacity( opacity, renderer );
+  rgba[3] = opacity;
+
+//  mitk::LevelWindow levelWindow;
+  mitk::LevelWindow opacLevelWindow;
+
+  bool binary = false;
+  this->GetDataNode()->GetBoolProperty( "binary", binary, renderer );
+
+  if ( binary )
+  {    
     localStorage->m_Texture->MapColorScalarsThroughLookupTableOn();
 
-//    vtkSmartPointer<vtkLookupTable> lookupTable =
-//      vtkSmartPointer<vtkLookupTable>::New();
-//    lookupTable->SetNumberOfTableValues(2);
-//    lookupTable->SetRange(0.0,1.0);
-//    lookupTable->SetTableValue( 0, 0.0, 0.0, 0.0, 0.0 ); //label 0 is transparent
-//    lookupTable->SetTableValue( 1, 0.0, 1.0, 0.0, 1.0 ); //label 1 is opaque and green
-//    lookupTable->Build();
+//    image->setExtrema(0, 1);
+//    image->setOpacityExtrema( 0.0, 255.0 );
+//    image->setBinary(true);
 
-//    vtkSmartPointer<vtkImageMapToColors> mapTransparency =
-//      vtkSmartPointer<vtkImageMapToColors>::New();
-//    mapTransparency->SetLookupTable(lookupTable);
-//    mapTransparency->SetInput(localStorage->m_ReslicedImage);
-//    mapTransparency->PassAlphaToOutputOn();
-
-//    localStorage->m_Texture->SetInputConnection(mapTransparency->GetOutputPort());
+    bool binaryOutline = false;
+    if ( this->GetInput()->GetPixelType().GetBpe() <= 8 )
+    {
+      if (this->GetDataNode()->GetBoolProperty( "outline binary", binaryOutline, renderer ))
+      {
+//        image->setOutline(binaryOutline);
+        float binaryOutlineWidth(1.0);
+        if (this->GetDataNode()->GetFloatProperty( "outline width", binaryOutlineWidth, renderer ))
+        {
+//          image->setOutlineWidth(binaryOutlineWidth);
+        }
+      }
+    }
+    else
+    {
+      MITK_WARN << "Type of all binary images should be (un)signed char. Outline does not work on other pixel types!";
+    }
   }
   else
   {
     localStorage->m_Texture->MapColorScalarsThroughLookupTableOff();
+    LevelWindow levelWindow;
+    if( !this->GetLevelWindow( levelWindow, renderer, "levelWindow" ) )
+    {
+      this->GetLevelWindow( levelWindow, renderer );
+    }
+//    image->setExtrema( levelWindow.GetLowerWindowBound(), levelWindow.GetUpperWindowBound() );
+
+
+      ScalarType windowMin = 0.0;
+      ScalarType windowMax = 255.0;
+
+      //get the level window
+    //  GetLevelWindow(levelWindow, renderer);
+      windowMin = levelWindow.GetLowerWindowBound();
+      windowMax = levelWindow.GetUpperWindowBound();
+
+      //set up the lookuptable with the level window range
+      localStorage->m_LookupTable->SetSaturationRange( 0.0, 0.0 );
+      localStorage->m_LookupTable->SetHueRange( 0.0, 0.0 );
+      localStorage->m_LookupTable->SetValueRange( 0.0, 1.0 );
+      localStorage->m_LookupTable->SetRange( windowMin, windowMax );
+      localStorage->m_LookupTable->Build();
+
+
+      //set the lookuptable for the texture
+      localStorage->m_Texture->SetLookupTable( localStorage->m_LookupTable );
+
+    // obtain opacity level window
+    if( this->GetLevelWindow( opacLevelWindow, renderer, "opaclevelwindow" ) )
+    {
+      MITK_INFO << "opace " << opacLevelWindow.GetLowerWindowBound() << " " << opacLevelWindow.GetUpperWindowBound();
+//      image->setOpacityExtrema( opacLevelWindow.GetLowerWindowBound(), opacLevelWindow.GetUpperWindowBound() );
+//      localStorage->m_LookupTable->SetRange(opacLevelWindow.GetLowerWindowBound(), opacLevelWindow.GetLowerWindowBound());
+    }
+    else
+    {
+//      image->setOpacityExtrema( 0.0, 255.0 );
+//      localStorage->m_LookupTable->SetRange(0.0, 255.0);
+    }
   }
 
+  bool useColor = false;
+  GetDataNode()->GetBoolProperty( "use color", useColor, renderer );
+  mitk::LookupTableProperty::Pointer LookupTableProp;
 
+  if ( !useColor )
+  {
+    LookupTableProp = dynamic_cast<mitk::LookupTableProperty*>(
+        this->GetDataNode()->GetProperty("LookupTable"));
 
-  ///#################### mein versuch
-//  bool binary = false;
-//  this->GetDataNode()->GetBoolProperty( "binary", binary, renderer );
+    if ( LookupTableProp.IsNull() )
+    {
+      useColor = true;
+    }
+  }
 
-//  if ( binary )
-//  {
-//    vtkSmartPointer<vtkImageData> image = localStorage->m_ReslicedImage;;
-//    {
-//      // Specify the size of the image data
-//      //        image->SetNumberOfScalarComponents(4);
-//      //        image->SetScalarTypeToUnsignedChar();
-
-//      MITK_INFO << "scalar type " << image->GetScalarTypeAsString();
-
-//      int* dims = image->GetDimensions();
-
-//      MITK_INFO << "dims " << dims[0] << " " << dims[1];
-
-//      // Fill every entry of the image with "2"
-//      for (int y = 0; y < dims[1]; y++)
-//      {
-//        for (int x = 0; x < dims[0]; x++)
-//        {
-//          unsigned char* pixel = static_cast<unsigned char*>(image->GetScalarPointer(x,y,0));
-//          //            MITK_INFO << "pixe " << (int)pixel[0] << " " <<  (int)pixel[1] << " " <<  (int)pixel[2] << " " <<  (int)pixel[3];
-//          if(pixel[0]>0 || pixel[1]>0 || pixel[2]>0)
-//          {
-//            pixel[3] = 255;
-//          }
-//          else
-//          {
-//            pixel[3] = 0;
-//          }
-//        }
-//      }
-//    }
-//  }
-
-
-  //  float opacity = 1.0f;
-
-  //  // check for color prop and use it for rendering if it exists
-  //  // binary image hovering & binary image selection
-  //  bool hover    = false;
-  //  bool selected = false;
-  //  GetDataNode()->GetBoolProperty("binaryimage.ishovering", hover, renderer);
-  //  GetDataNode()->GetBoolProperty("selected", selected, renderer);
-  //  if(hover && !selected)
-  //  {
-  //    mitk::ColorProperty::Pointer colorprop = dynamic_cast<mitk::ColorProperty*>(GetDataNode()->GetProperty
-  //                                                                                ("binaryimage.hoveringcolor", renderer));
-  //    if(colorprop.IsNotNull())
-  //      memcpy(rgba, colorprop->GetColor().GetDataPointer(), 3*sizeof(float));
-  //    else
-  //      GetColor( rgba, renderer );
-
-  //  }
-  //  if(selected)
-  //  {
-  //    mitk::ColorProperty::Pointer colorprop = dynamic_cast<mitk::ColorProperty*>(GetDataNode()->GetProperty
-  //                                                                                ("binaryimage.selectedcolor", renderer));
-  //    if(colorprop.IsNotNull())
-  //      memcpy(rgba, colorprop->GetColor().GetDataPointer(), 3*sizeof(float));
-  //    else
-  //      GetColor( rgba, renderer );
-
-  //  }
-  //  if(!hover && !selected)
-  //  {
-  //    GetColor( rgba, renderer );
-  //  }
-
-  //  // check for opacity prop and use it for rendering if it exists
-  //  GetOpacity( opacity, renderer );
-  //  rgba[3] = opacity;
-
-  //  // check for interpolation properties
-  //  bool textureInterpolation = false;
-  //  GetDataNode()->GetBoolProperty(
-  //      "texture interpolation", textureInterpolation, renderer
-  //      );
-
-  //  rendererInfo.m_TextureInterpolation = textureInterpolation;
-
-  //  mitk::LevelWindow levelWindow;
-  //  mitk::LevelWindow opacLevelWindow;
-
-  //  bool binary = false;
-  //  this->GetDataNode()->GetBoolProperty( "binary", binary, renderer );
-
-  //  if ( binary )
-  //  {
-
-  //    image->setExtrema(0, 1);
-  //    image->setOpacityExtrema( 0.0, 255.0 );
-  //    image->setBinary(true);
-
-  //    bool binaryOutline = false;
-  //    if ( this->GetInput()->GetPixelType().GetBpe() <= 8 )
-  //    {
-  //      if (this->GetDataNode()->GetBoolProperty( "outline binary", binaryOutline, renderer ))
-  //      {
-  //        image->setOutline(binaryOutline);
-  //        float binaryOutlineWidth(1.0);
-  //        if (this->GetDataNode()->GetFloatProperty( "outline width", binaryOutlineWidth, renderer ))
-  //        {
-  //          image->setOutlineWidth(binaryOutlineWidth);
-  //        }
-  //      }
-  //    }
-  //    else
-  //    {
-  //      MITK_WARN << "Type of all binary images should be (un)signed char. Outline does not work on other pixel types!";
-  //    }
-  //  }
-  //  else
-  //  {
-  //    if( !this->GetLevelWindow( levelWindow, renderer, "levelWindow" ) )
-  //    {
-  //      this->GetLevelWindow( levelWindow, renderer );
-  //    }
-
-  //    image->setExtrema( levelWindow.GetLowerWindowBound(), levelWindow.GetUpperWindowBound() );
-
-  //    // obtain opacity level window
-  //    if( this->GetLevelWindow( opacLevelWindow, renderer, "opaclevelwindow" ) )
-  //    {
-  //      image->setOpacityExtrema( opacLevelWindow.GetLowerWindowBound(), opacLevelWindow.GetUpperWindowBound() );
-  //    }
-  //    else
-  //    {
-  //      image->setOpacityExtrema( 0.0, 255.0 );
-  //    }
-  //  }
-
-  //  bool useColor = false;
-  //  GetDataNode()->GetBoolProperty( "use color", useColor, renderer );
-  //  mitk::LookupTableProperty::Pointer LookupTableProp;
-
-  //  if ( !useColor )
-  //  {
-  //    LookupTableProp = dynamic_cast<mitk::LookupTableProperty*>(
-  //        this->GetDataNode()->GetProperty("LookupTable"));
-
-  //    if ( LookupTableProp.IsNull() )
-  //    {
-  //      useColor = true;
-  //    }
-  //  }
-
-  //  if ( useColor || binary )
-  //  {
-  //    // If lookup table use is NOT requested (or we have a binary image...):
-  //    m_iil4mitkMode = iil4mitkImage::INTENSITY_ALPHA;
-  //    image->setColor( rgba[0], rgba[1], rgba[2], rgba[3] );
-  //  }
-  //  else
-  //  {
-  //    // If lookup table use is requested:
-  //    m_iil4mitkMode = iil4mitkImage::COLOR_ALPHA;
-  //    // only update the lut, when the properties have changed...
-  //    if ( LookupTableProp->GetLookupTable()->GetMTime()
-  //      <= this->GetDataNode()->GetPropertyList()->GetMTime() )
-  //      {
-  //      LookupTableProp->GetLookupTable()->ChangeOpacityForAll( opacity );
-  //      LookupTableProp->GetLookupTable()->ChangeOpacity(0, 0.0);
-  //    }
-  //    image->setColors(LookupTableProp->GetLookupTable()->GetRawLookupTable());
-  //  }
+  if ( useColor || binary )
+  {
+    // If lookup table use is NOT requested (or we have a binary image...):
+//    image->setColor( rgba[0], rgba[1], rgba[2], rgba[3] );
+      double rgbConv[3] = {(double)rgba[0], (double)rgba[1], (double)rgba[2]};
+      localStorage->m_Actor->GetProperty()->SetColor(rgbConv);
+      localStorage->m_Actor->GetProperty()->SetOpacity(rgba[3]);
+//      localStorage->m_Texture->SetLookupTable( localStorage->m_LookupTable );
+//      localStorage->m_LookupTable->Build();
+  }
+  else
+  {
+    // If lookup table use is requested:
+    // only update the lut, when the properties have changed...
+    if ( LookupTableProp->GetLookupTable()->GetMTime()
+      <= this->GetDataNode()->GetPropertyList()->GetMTime() )
+      {
+      LookupTableProp->GetLookupTable()->ChangeOpacityForAll( opacity );
+      LookupTableProp->GetLookupTable()->ChangeOpacity(0, 0.0);
+    }
+//    image->setColors(LookupTableProp->GetLookupTable()->GetRawLookupTable());
+    localStorage->m_Texture->SetLookupTable(LookupTableProp->GetLookupTable()->GetVtkLookupTable());
+  }
 }
 
 void mitk::ImageVtkMapper2D::Update(mitk::BaseRenderer* renderer)

@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkStatusBarImplementation.h>
 #include <mitkCommon.h>
 #include <QStatusBar>
-#include "mitkQtCommonDll.h"
+#include <org_mitk_gui_qt_common_Export.h>
 #include <QLabel>
 
 //##Documentation

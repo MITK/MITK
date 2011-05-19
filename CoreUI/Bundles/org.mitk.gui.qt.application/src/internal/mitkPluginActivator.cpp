@@ -15,17 +15,29 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#include <Poco/ClassLibrary.h>
 
-#include <berryIApplication.h>
+#include "mitkPluginActivator.h"
 
-#include "src/QmitkApplication.h"
-#include "src/QmitkDefaultPerspective.h"
+#include "../QmitkApplication.h"
+#include "../QmitkDefaultPerspective.h"
 
-POCO_BEGIN_NAMED_MANIFEST(berryIApplication, berry::IApplication)
-  POCO_EXPORT_CLASS(QmitkApplication)
-POCO_END_MANIFEST
+#include <QtPlugin>
 
-POCO_BEGIN_NAMED_MANIFEST(berryIPerspectiveFactory, berry::IPerspectiveFactory)
-  POCO_EXPORT_CLASS(QmitkDefaultPerspective)
-POCO_END_MANIFEST
+namespace mitk {
+
+void org_mitk_gui_qt_application_Activator::start(ctkPluginContext* context)
+{
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkApplication, context)
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkDefaultPerspective, context)
+}
+
+void org_mitk_gui_qt_application_Activator::stop(ctkPluginContext* context)
+{
+  Q_UNUSED(context)
+}
+
+}
+
+Q_EXPORT_PLUGIN2(org_mitk_gui_qt_application, mitk::org_mitk_gui_qt_application_Activator)
+
+

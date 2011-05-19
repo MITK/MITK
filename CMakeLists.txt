@@ -358,46 +358,45 @@ link_directories(${MITK_LINK_DIRECTORIES})
 
 add_subdirectory(Core)
 
-
-SET(mitk_core_plugins
-  CoreUI/Bundles/org.mitk.core.services:ON
-)
-
-#SET(_ctk_plugins_include_dirs
-#  ${Poco_INCLUDE_DIRS}
-#)
-
-#SET(_ctk_plugins_link_dirs
-#  ${Poco_LIBRARY_DIR}
-#)
-
-#INCLUDE_DIRECTORIES(${_ctk_plugins_include_dirs})
-#LINK_DIRECTORIES(${_ctk_plugins_link_dirs})
-
 set(MITK_DEFAULT_SUBPROJECTS MITK-CoreUI)
 
 if(MITK_USE_QT AND QT4_FOUND)
   add_subdirectory(CoreUI/Qmitk)
 endif()
 
+add_subdirectory(Modules)
+
 if(MITK_USE_BLUEBERRY)
+
+  set(mitk_core_plugins
+    CoreUI/Bundles/org.mitk.core.services:ON
+    CoreUI/Bundles/org.mitk.gui.common:ON
+    CoreUI/Bundles/org.mitk.gui.qt.common:ON
+    CoreUI/Bundles/org.mitk.gui.qt.application:ON
+  )
+
   ctkMacroSetupExternalPlugins(${mitk_core_plugins}
                                BUILD_OPTION_PREFIX MITK_BUILD_
                                BUILD_ALL ${MITK_BUILD_ALL_PLUGINS}
                                COMPACT_OPTIONS)
 
-  add_subdirectory(CoreUI/Bundles)
+  set(MITK_COREAPP_PROVISIONING_FILE "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/CoreApp.provisioning")
+  if(EXISTS "${MITK_COREAPP_PROVISIONING_FILE}")
+    file(REMOVE "${MITK_COREAPP_PROVISIONING_FILE}")
+  endif()
+  file(APPEND "${MITK_COREAPP_PROVISIONING_FILE}" "READ file://${BLUEBERRY_PLUGIN_PROVISIONING_FILE}\n")
 
-  # Needed for BlueBerry plugins to find CTK plugins
-  #LINK_DIRECTORIES(${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/plugins)
+  FunctionCreateProvisioningInfo(prov_info "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/plugins" ${mitk_core_plugins})
+  file(APPEND "${MITK_COREAPP_PROVISIONING_FILE}" "${prov_info}")
 
-  SET(MITK_CORE_PLUGIN_USE_FILE "${MITK_BINARY_DIR}/MitkCorePluginUseFile.cmake")
-  #SET(BB_PLUGIN_USE_FILE ${BB_PLUGIN_USE_FILE} PARENT_SCOPE)
+  set(MITK_CORE_PLUGIN_USE_FILE "${MITK_BINARY_DIR}/MitkCorePluginUseFile.cmake")
   ctkFunctionGeneratePluginUseFile(${MITK_CORE_PLUGIN_USE_FILE})
 endif()
 
-#add_subdirectory(CoreUI)
-add_subdirectory(Modules)
+if(MITK_USE_BLUEBERRY)
+  add_subdirectory(Modules/Bundles)
+endif()
+
 add_subdirectory(Applications)
 
 #-----------------------------------------------------------------------------

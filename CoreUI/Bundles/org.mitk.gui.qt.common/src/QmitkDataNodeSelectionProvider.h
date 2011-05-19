@@ -19,7 +19,7 @@
 #ifndef QMITKDATATREENODESELECTIONPROVIDER_H_
 #define QMITKDATATREENODESELECTIONPROVIDER_H_
 
-#include "mitkQtCommonDll.h"
+#include <org_mitk_gui_qt_common_Export.h>
 
 #include <berryQtSelectionProvider.h>
 #include <mitkDataNodeSelection.h>

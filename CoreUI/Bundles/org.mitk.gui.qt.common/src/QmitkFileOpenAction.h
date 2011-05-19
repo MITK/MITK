@@ -28,7 +28,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QAction>
 #include <QIcon>
 
-#include "mitkQtCommonDll.h"
+#include <org_mitk_gui_qt_common_Export.h>
 
 #include <berryIWorkbenchWindow.h>
 #include <berryIPreferences.h>

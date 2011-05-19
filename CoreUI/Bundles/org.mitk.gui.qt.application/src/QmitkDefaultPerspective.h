@@ -21,13 +21,22 @@
 
 #include <berryIPerspectiveFactory.h>
 
-#include "mitkQtAppDll.h"
+#include <QObject>
 
-struct MITK_QT_APP QmitkDefaultPerspective : public berry::IPerspectiveFactory
+#include <org_mitk_gui_qt_application_Export.h>
+
+struct MITK_QT_APP QmitkDefaultPerspective : public QObject, public berry::IPerspectiveFactory
 {
+
+  QmitkDefaultPerspective();
+  QmitkDefaultPerspective(const QmitkDefaultPerspective& other);
 
   void CreateInitialLayout(berry::IPageLayout::Pointer /*layout*/);
 
+private:
+
+  Q_OBJECT
+  Q_INTERFACES(berry::IPerspectiveFactory)
 };
 
 #endif /* QMITKDEFAULTPERSPECTIVE_H_ */

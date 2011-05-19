@@ -1,41 +1,39 @@
 /*=========================================================================
- 
+
 Program:   Medical Imaging & Interaction Toolkit
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
-#ifndef QMITKAPPLICATION_H_
-#define QMITKAPPLICATION_H_
 
-#include <berryIApplication.h>
+#include "mitkPluginActivator.h"
 
-#include <QObject>
+#include <QtPlugin>
 
-#include <org_mitk_gui_qt_application_Export.h>
+namespace mitk {
 
-class MITK_QT_APP QmitkApplication : public QObject, public berry::IApplication
+void org_mitk_gui_common_Activator::start(ctkPluginContext* context)
 {
-  Q_OBJECT
-  Q_INTERFACES(berry::IApplication)
-  
-public:
-  
-  QmitkApplication();
-  QmitkApplication(const QmitkApplication& other);
-  
-  int Start();
-  void Stop();
-};
+  Q_UNUSED(context)
+}
 
-#endif /*QMITKAPPLICATION_H_*/
+void org_mitk_gui_common_Activator::stop(ctkPluginContext* context)
+{
+  Q_UNUSED(context)
+}
+
+}
+
+Q_EXPORT_PLUGIN2(org_mitk_gui_common, mitk::org_mitk_gui_common_Activator)
+
+

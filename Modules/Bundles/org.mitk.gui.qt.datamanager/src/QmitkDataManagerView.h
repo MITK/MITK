@@ -36,7 +36,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <berryIPreferencesService.h>
 
 #include <mitkDataStorage.h>
-#include "mitkQtCommonDll.h"
 #include "mitkQtDataManagerDll.h"
 
 // Forward declarations

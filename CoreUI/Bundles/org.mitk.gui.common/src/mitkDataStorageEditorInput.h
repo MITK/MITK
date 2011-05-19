@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <berryIEditorInput.h>
 #include <mitkIDataStorageReference.h>
 
-#include "mitkGUICommonPluginDll.h"
+#include <org_mitk_gui_common_Export.h>
 
 namespace mitk
 {

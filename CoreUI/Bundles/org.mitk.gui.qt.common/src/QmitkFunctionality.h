@@ -35,7 +35,7 @@
 #include <berryISelectionChangedListener.h>
 
 //# mitk stuff
-#include "mitkQtCommonDll.h"
+#include <org_mitk_gui_qt_common_Export.h>
 #include "mitkDataNodeSelection.h"
 #include <mitkDataStorage.h>
 #include <mitkDataNodeSelection.h>

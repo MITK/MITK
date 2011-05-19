@@ -24,16 +24,21 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QmitkStdMultiWidget.h>
 #include <QmitkDnDFrameWidget.h>
 
-#include "mitkQtCommonDll.h"
+#include <org_mitk_gui_qt_common_Export.h>
 
-class MITK_QT_COMMON QmitkStdMultiWidgetEditor : public berry::QtEditorPart, virtual public berry::IPartListener
+class MITK_QT_COMMON QmitkStdMultiWidgetEditor : public QObject,
+  public berry::QtEditorPart, virtual public berry::IPartListener
 {
+  Q_OBJECT
+  Q_INTERFACES(berry::IEditorPart)
+  
 public:
   berryObjectMacro(QmitkStdMultiWidgetEditor);
 
   static const std::string EDITOR_ID;
 
   QmitkStdMultiWidgetEditor();
+  QmitkStdMultiWidgetEditor(const QmitkStdMultiWidgetEditor& other);
   ~QmitkStdMultiWidgetEditor();
 
   QmitkStdMultiWidget* GetStdMultiWidget();

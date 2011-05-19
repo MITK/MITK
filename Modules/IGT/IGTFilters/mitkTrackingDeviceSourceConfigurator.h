@@ -62,6 +62,27 @@ namespace mitk {
      */
     mitk::TrackingDeviceSource::Pointer CreateTrackingDeviceSource(mitk::NavigationDataObjectVisualizationFilter::Pointer &visualizationFilter);
     
+    /** @return Returns the internal number of the corresponding tool in the tool storage of a output navigation data. Returns -1 if there was an error. */
+    int GetToolNumberInToolStorage(int outputID);
+
+    /** @return Returns the identifier of the corresponding tool in the tool storage of a output navigation data. Returns an empty string if there was an error.*/
+    std::string GetToolIdentifierInToolStorage(int outputID);
+
+    /** @return Returns a vector with all internal numbers of the corresponding tools in the tool storage of all outputs. 
+      *         The order is the same like the order of the outputs. Returns an empty vector if there was an error.
+      */
+    std::vector<int> GetToolNumbersInToolStorage();
+
+    /** @return Returns a vector with all identifier of the corresponding tools in the tool storage of all outputs. 
+      *         The order is the same like the order of the outputs. Returns an empty vector if there was an error.
+      */
+    std::vector<std::string> GetToolIdentifiersInToolStorage();
+
+    /** @return Returns a modified navigation tool storage which holds the tools currently in use in
+      *         the same order like the output ids of the pipline.
+      */
+    mitk::NavigationToolStorage::Pointer GetUpdatedNavigationToolStorage();
+
     /** @return Returns the current error message. Returns an empty string if there was no error.
      */
     std::string GetErrorMessage();
@@ -73,6 +94,7 @@ namespace mitk {
     mitk::NavigationToolStorage::Pointer m_NavigationTools;
     mitk::TrackingDevice::Pointer m_TrackingDevice;
     std::string m_ErrorMessage;
+    std::vector<int> m_ToolCorrespondencesInToolStorage;
 
     mitk::TrackingDeviceSource::Pointer CreateNDIPolarisTrackingDeviceSource(mitk::TrackingDevice::Pointer trackingDevice, mitk::NavigationToolStorage::Pointer navigationTools);
     mitk::TrackingDeviceSource::Pointer CreateNDIAuroraTrackingDeviceSource(mitk::TrackingDevice::Pointer trackingDevice, mitk::NavigationToolStorage::Pointer navigationTools);

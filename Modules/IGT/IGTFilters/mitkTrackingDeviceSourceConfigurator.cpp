@@ -23,9 +23,21 @@ PURPOSE.  See the above copyright notices for more information.
 
 mitk::TrackingDeviceSourceConfigurator::TrackingDeviceSourceConfigurator(mitk::NavigationToolStorage::Pointer NavigationTools, mitk::TrackingDevice::Pointer TrackingDevice)
 {
-m_NavigationTools = NavigationTools;
+//make a copy of the navigation tool storage because we will modify the storage
+m_NavigationTools = mitk::NavigationToolStorage::New();
+for (int i=0; i<NavigationTools->GetToolCount(); i++)
+      {
+      m_NavigationTools->AddTool(NavigationTools->GetTool(i));   
+      }
+
 m_TrackingDevice = TrackingDevice;
+m_ToolCorrespondencesInToolStorage = std::vector<int>();
 m_ErrorMessage = "";
+}
+
+mitk::NavigationToolStorage::Pointer mitk::TrackingDeviceSourceConfigurator::GetUpdatedNavigationToolStorage()
+{
+return m_NavigationTools;
 }
 
 
@@ -96,10 +108,12 @@ mitk::TrackingDeviceSource::Pointer mitk::TrackingDeviceSourceConfigurator::Crea
   {
   mitk::TrackingDeviceSource::Pointer returnValue = mitk::TrackingDeviceSource::New();
   mitk::NDITrackingDevice::Pointer thisDevice = dynamic_cast<mitk::NDITrackingDevice*>(trackingDevice.GetPointer());
+  m_ToolCorrespondencesInToolStorage = std::vector<int>();
   //add the tools to the tracking device
   for (int i=0; i<navigationTools->GetToolCount(); i++)
       {
         mitk::NavigationTool::Pointer thisNavigationTool = m_NavigationTools->GetTool(i);
+        m_ToolCorrespondencesInToolStorage.push_back(i);
         bool toolAddSuccess = thisDevice->AddTool(thisNavigationTool->GetToolName().c_str(),thisNavigationTool->GetCalibrationFile().c_str());
         if (!toolAddSuccess)
           {
@@ -119,12 +133,11 @@ mitk::TrackingDeviceSource::Pointer mitk::TrackingDeviceSourceConfigurator::Crea
   //connect to aurora to dectect tools automatically
   thisDevice->OpenConnection();
   thisDevice->StartTracking();
-  //thisDevice->StopTracking();
-  //thisDevice->CloseConnection();
   
   //now search for automatically detected tools in the tool storage and save them
   mitk::NavigationToolStorage::Pointer newToolStorageInRightOrder = mitk::NavigationToolStorage::New();
   std::vector<int> alreadyFoundTools = std::vector<int>();
+  m_ToolCorrespondencesInToolStorage = std::vector<int>();
   for (int i=0; i<thisDevice->GetToolCount(); i++)
       {
       bool toolFound = false;
@@ -174,10 +187,12 @@ mitk::TrackingDeviceSource::Pointer mitk::TrackingDeviceSourceConfigurator::Crea
   {
   mitk::TrackingDeviceSource::Pointer returnValue = mitk::TrackingDeviceSource::New();
   mitk::ClaronTrackingDevice::Pointer thisDevice = dynamic_cast<mitk::ClaronTrackingDevice*>(trackingDevice.GetPointer());
+  m_ToolCorrespondencesInToolStorage = std::vector<int>();
   //add the tools to the tracking device
   for (int i=0; i<navigationTools->GetToolCount(); i++)
       {
         mitk::NavigationTool::Pointer thisNavigationTool = m_NavigationTools->GetTool(i);
+        m_ToolCorrespondencesInToolStorage.push_back(i);
         bool toolAddSuccess = thisDevice->AddTool(thisNavigationTool->GetToolName().c_str(),thisNavigationTool->GetCalibrationFile().c_str());
         if (!toolAddSuccess)
           {
@@ -203,5 +218,30 @@ mitk::NavigationDataObjectVisualizationFilter::Pointer mitk::TrackingDeviceSourc
     returnValue->SetInput(i,trackingDeviceSource->GetOutput(i));
     returnValue->SetRepresentationObject(i,currentTool->GetDataNode()->GetData());
     }
+  return returnValue;
+  }
+
+int mitk::TrackingDeviceSourceConfigurator::GetToolNumberInToolStorage(int outputID)
+  {
+  if (outputID < m_ToolCorrespondencesInToolStorage.size()) return m_ToolCorrespondencesInToolStorage.at(outputID);
+  else return -1;
+  }
+
+std::string mitk::TrackingDeviceSourceConfigurator::GetToolIdentifierInToolStorage(int outputID)
+  {
+  if (outputID < m_ToolCorrespondencesInToolStorage.size()) return m_NavigationTools->GetTool(m_ToolCorrespondencesInToolStorage.at(outputID))->GetIdentifier();
+  else return "";
+  }
+
+std::vector<int> mitk::TrackingDeviceSourceConfigurator::GetToolNumbersInToolStorage()
+  {
+  return m_ToolCorrespondencesInToolStorage;
+  }
+
+std::vector<std::string> mitk::TrackingDeviceSourceConfigurator::GetToolIdentifiersInToolStorage()
+  {
+  std::vector<std::string> returnValue = std::vector<std::string>();
+  for (int i=0; i<m_ToolCorrespondencesInToolStorage.size(); i++)
+    {returnValue.push_back(m_NavigationTools->GetTool(m_ToolCorrespondencesInToolStorage.at(i))->GetIdentifier());}
   return returnValue;
   }

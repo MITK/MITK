@@ -222,6 +222,7 @@ public:
   static std::string ARG_HOME;
   static std::string ARG_PLUGIN_CACHE;
   static std::string ARG_PLUGIN_DIRS;
+  static std::string ARG_PROVISIONING;
 
   static std::string ARG_CONSOLELOG;
   static std::string ARG_TESTPLUGIN;

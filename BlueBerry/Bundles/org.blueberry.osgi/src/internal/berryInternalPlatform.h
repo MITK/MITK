@@ -71,7 +71,7 @@ private:
   Poco::Logger* m_PlatformLogger;
 
   ctkPluginFrameworkFactory* m_ctkPluginFrameworkFactory;
-  QList<long> m_InstalledCTKPlugins;
+  QList<long> m_CTKPluginsToStart;
 
   PlatformEvents m_Events;
   PlatformEvent m_EventStarted;

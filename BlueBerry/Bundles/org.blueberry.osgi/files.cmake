@@ -27,6 +27,7 @@ SET(INTERNAL_CPP_FILES
   berryExtensionPointService.cpp
   berryInternalPlatform.cpp
   berryPlatformLogChannel.cpp
+  berryProvisioningInfo.cpp
   berrySystemBundle.cpp
   berrySystemBundleActivator.cpp
   berrySystemBundleManifest.cpp

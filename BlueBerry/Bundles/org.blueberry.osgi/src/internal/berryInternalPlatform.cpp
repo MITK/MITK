@@ -45,6 +45,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include "../berryBundleLoader.h"
 #include "berrySystemBundle.h"
 #include "berryBundleDirectory.h"
+#include "berryProvisioningInfo.h"
+
+#include <QDebug>
 
 namespace berry {
 
@@ -172,17 +175,25 @@ void InternalPlatform::Initialize(int& argc, char** argv, Poco::Util::AbstractCo
   QSharedPointer<ctkPluginFramework> pfw = m_ctkPluginFrameworkFactory->getFramework();
   pfw->init();
   ctkPluginContext* pfwContext = pfw->getPluginContext();
-  QString pluginDir = QString::fromStdString(m_InstancePath.toString());
-#ifdef CMAKE_INTDIR
-  pluginDir +=  "/../plugins/" CMAKE_INTDIR;
-#else
-  pluginDir += "/plugins";
-#endif
-  ctkPluginFrameworkLauncher::addSearchPath(pluginDir);
-  QStringList symbolicNames = ctkPluginFrameworkLauncher::getPluginSymbolicNames(pluginDir);
-  foreach (QString symbolicName, symbolicNames)
+
+  std::string provisioningFile = this->GetConfiguration().getString(Platform::ARG_PROVISIONING);
+  if (!provisioningFile.empty())
   {
-    m_InstalledCTKPlugins << ctkPluginFrameworkLauncher::install(symbolicName, pfwContext);
+    ProvisioningInfo provInfo(QString::fromStdString(provisioningFile));
+    foreach(QString pluginPath, provInfo.getPluginDirs())
+    {
+      ctkPluginFrameworkLauncher::addSearchPath(pluginPath);
+    }
+
+    QList<QUrl> pluginsToStart = provInfo.getPluginsToStart();
+    foreach(QUrl pluginUrl, provInfo.getPluginsToInstall())
+    {
+      QSharedPointer<ctkPlugin> plugin = pfwContext->installPlugin(pluginUrl);
+      if (pluginsToStart.contains(pluginUrl))
+      {
+        m_CTKPluginsToStart << plugin->getPluginId();
+      }
+    }
   }
 
   m_Initialized = true;
@@ -430,7 +441,7 @@ int InternalPlatform::main(const std::vector<std::string>& args)
   m_BundleLoader->LoadBundle(systemBundle);
 
   m_ctkPluginFrameworkFactory->getFramework()->start();
-  foreach(long pluginId, m_InstalledCTKPlugins)
+  foreach(long pluginId, m_CTKPluginsToStart)
   {
     context->getPlugin(pluginId)->start();
   }

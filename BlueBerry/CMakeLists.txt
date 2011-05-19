@@ -14,6 +14,7 @@ INCLUDE(MacroCreateCTKPlugin)
 INCLUDE(MacroCreateQtHelp)
 INCLUDE(MacroInstallPlugin)
 INCLUDE(MacroInstallCTKPlugin)
+INCLUDE(FunctionCreateProvisioningInfo)
 
 OPTION(BLUEBERRY_INSTALL_RPATH_RELATIVE "Use relative rpath entries when installing" OFF)
 MARK_AS_ADVANCED(BLUEBERRY_INSTALL_RPATH_RELATIVE)
@@ -195,6 +196,7 @@ IF(BLUEBERRY_BUILD_TESTING)
   ENABLE_TESTING()
 ENDIF()
 
+
 # Add CTK plugins
 
 SET(_ctk_plugins
@@ -258,6 +260,13 @@ ctkMacroSetupExternalPlugins(${_ctk_plugins} ${_ctk_test_plugins}
                              BUILD_ALL ${BLUEBERRY_BUILD_ALL_PLUGINS}
                              COMPACT_OPTIONS)
 
+SET(BLUEBERRY_PROVISIONING_FILE "${BlueBerry_BINARY_DIR}/BlueBerry.provisioning")
+IF(EXISTS "${BLUEBERRY_PROVISIONING_FILE}")
+  FILE(REMOVE "${BLUEBERRY_PROVISIONING_FILE}")
+ENDIF()
+
+FunctionCreateProvisioningInfo(prov_info "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/plugins" ${_ctk_plugins})
+file(APPEND "${BLUEBERRY_PROVISIONING_FILE}" "${prov_info}")
 
 ctkMacroGetAllProjectTargetLibraries("${CTK_PLUGIN_LIBRARIES}" _enabled_plugin_targets)
 add_dependencies(BlueBerry ${_enabled_plugin_targets})

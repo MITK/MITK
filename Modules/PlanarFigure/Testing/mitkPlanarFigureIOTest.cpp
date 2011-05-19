@@ -478,9 +478,9 @@ private:
         const mitk::PropertyList::PropertyMap::value_type &entry1,
         const mitk::PropertyList::PropertyMap::value_type &entry2 )
     {
-      MITK_INFO << "Comparing " << entry1.first << "(" << entry1.second.first->GetValueAsString() << ") and " << entry2.first << "(" << entry2.second.first->GetValueAsString() << ")";
+      MITK_INFO << "Comparing " << entry1.first << "(" << entry1.second->GetValueAsString() << ") and " << entry2.first << "(" << entry2.second->GetValueAsString() << ")";
       // Compare property objects contained in the map entries (see mitk::PropertyList)
-      return *(entry1.second.first) == *(entry2.second.first);
+      return *(entry1.second) == *(entry2.second);
     }
   };
   

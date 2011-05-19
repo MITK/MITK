@@ -170,7 +170,7 @@ const mitk::DataNode::GroupTagList mitk::DataStorage::GetGroupTags() const
   {
     mitk::PropertyList* pl = nodeIt.Value()->GetPropertyList();
     for (mitk::PropertyList::PropertyMap::const_iterator propIt = pl->GetMap()->begin(); propIt != pl->GetMap()->end(); propIt++)
-      if (dynamic_cast<mitk::GroupTagProperty*>(propIt->second.first.GetPointer()) != NULL)
+      if (dynamic_cast<mitk::GroupTagProperty*>(propIt->second.GetPointer()) != NULL)
         result.insert(propIt->first);
   }
 

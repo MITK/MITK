@@ -262,8 +262,8 @@ mitk::DataNode::GroupTagList mitk::DataNode::GetGroupTags() const
         groupIter != propertyMap->end();
         ++groupIter )
   {
-    const BaseProperty* bp = groupIter->second.first;
-    if ( dynamic_cast<const GroupTagProperty*>(bp) && groupIter->second.second )
+    const BaseProperty* bp = groupIter->second;
+    if ( dynamic_cast<const GroupTagProperty*>(bp) )
     {
       groups.insert( groupIter->first );
     }

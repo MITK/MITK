@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKIINPUTDEVICEREGISTRY_H_
 #define MITKIINPUTDEVICEREGISTRY_H_
 
-#include "mitkCoreExtDll.h"
+#include <org_mitk_core_ext_Export.h>
 
 #include <berryService.h>
 

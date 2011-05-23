@@ -19,9 +19,9 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKCOREEXTACTIVATOR_H_ 
 #define MITKCOREEXTACTIVATOR_H_ 
 
-#include <berryPlugin.h>
+#include <ctkPluginActivator.h>
 
-#include <mitkCoreExtDll.h>
+#include <org_mitk_core_ext_Export.h>
 
 namespace mitk
 {
@@ -36,8 +36,10 @@ namespace mitk
   * @brief The plug-in activator for the CoreExt module
   * @ingroup org_mitk_core_ext_internal
   */
-  class MITKCOREEXT_EXPORT CoreExtActivator : public berry::Plugin
+  class CoreExtActivator : public QObject, public ctkPluginActivator
   {
+    Q_OBJECT
+    Q_INTERFACES(ctkPluginActivator)
 
   public:
 
@@ -47,7 +49,9 @@ namespace mitk
     * @param context 
     *			the context for the bundle
     */
-    void Start(berry::IBundleContext::Pointer context);
+    void start(ctkPluginContext* context);
+    
+    void stop(ctkPluginContext* context);
 
     /**
     * Activates the input device modules.

@@ -22,14 +22,24 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkInputDeviceRegistry.h"
 
+#include <berryPlatform.h>
 #include <berryIPreferencesService.h>
+
+#include <QtPlugin>
 
 namespace mitk
 {
-  void CoreExtActivator::Start(berry::IBundleContext::Pointer /*context*/)
+  void CoreExtActivator::start(ctkPluginContext* context)
   {
+    Q_UNUSED(context)
+    
     RegisterCoreExtObjectFactory();
     this->StartInputDeviceModules();
+  }
+  
+  void CoreExtActivator::stop(ctkPluginContext* context)
+  {
+    Q_UNUSED(context)
   }
 
   void mitk::CoreExtActivator::StartInputDeviceModules()
@@ -54,3 +64,5 @@ namespace mitk
     }
   } // end method StartInputDeviceModules
 } // end namespace mitk
+
+Q_EXPORT_PLUGIN2(org_mitk_core_ext, mitk::CoreExtActivator)

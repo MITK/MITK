@@ -18,9 +18,10 @@
 #ifndef MITKDATASTORAGEACCESSRULE_H_HEADER_INCLUDED_ 
 #define MITKDATASTORAGEACCESSRULE_H_HEADER_INCLUDED_ 
 
+#include <org_mitk_core_jobs_Export.h>
+
 #include "berryISchedulingRule.h"
 #include "berryObject.h"
-#include "mitkJobsDll.h"
 #include "mitkDataNode.h"
 #include "mitkDataStorage.h"
 #include "mitkStandaloneDataStorage.h"

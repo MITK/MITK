@@ -9,7 +9,6 @@ IF(MITK_USE_BLUEBERRY)
   SET(MITK_DEFAULT_SUBPROJECTS MITK-Plugins)
   
   SET(_mitk_bundles_default 
-      "org.mitk.core.ext" 
       "org.mitk.planarfigure"
   )
   
@@ -23,8 +22,10 @@ IF(MITK_USE_BLUEBERRY)
     INCLUDE(${QT_USE_FILE})
   ENDIF()
   
-  SET(PLUGIN_EXCLUDE_LIST 
+  SET(PLUGIN_EXCLUDE_LIST
+    org.mitk.core.ext
     org.mitk.gui.qt.volumetry
+    org.mitk.core.jobs
   )
 
   MACRO_COLLECT_PLUGINS(OUTPUT_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/ExtBundles

@@ -2,11 +2,15 @@ SET(SRC_CPP_FILES
 
 )
 SET(INTERNAL_CPP_FILES
-	mitkDataStorageAccessRule.cpp
-
+  mitkDataStorageAccessRule.cpp
+  mitkPluginActivator.cpp
 )
 
-SET(CPP_FILES )# manifest.cpp)
+SET(MOC_H_FILES
+  src/internal/mitkPluginActivator.h
+)
+
+SET(CPP_FILES )
 
 foreach(file ${SRC_CPP_FILES})
   SET(CPP_FILES ${CPP_FILES} src/${file})

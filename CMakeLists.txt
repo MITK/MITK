@@ -374,8 +374,13 @@ if(MITK_USE_BLUEBERRY)
     CoreUI/Bundles/org.mitk.gui.qt.common:ON
     CoreUI/Bundles/org.mitk.gui.qt.application:ON
   )
+  
+  set(mitk_ext_plugins
+    Modules/Bundles/org.mitk.core.ext:ON
+    Modules/Bundles/org.mitk.core.jobs:OFF
+  )
 
-  ctkMacroSetupExternalPlugins(${mitk_core_plugins}
+  ctkMacroSetupExternalPlugins(${mitk_core_plugins} ${mitk_ext_plugins}
                                BUILD_OPTION_PREFIX MITK_BUILD_
                                BUILD_ALL ${MITK_BUILD_ALL_PLUGINS}
                                COMPACT_OPTIONS)
@@ -388,6 +393,17 @@ if(MITK_USE_BLUEBERRY)
 
   FunctionCreateProvisioningInfo(prov_info "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/plugins" ${mitk_core_plugins})
   file(APPEND "${MITK_COREAPP_PROVISIONING_FILE}" "${prov_info}")
+
+  
+  set(MITK_EXTAPP_PROVISIONING_FILE "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/ExtApp.provisioning")
+  if(EXISTS "${MITK_EXTAPP_PROVISIONING_FILE}")
+    file(REMOVE "${MITK_EXTAPP_PROVISIONING_FILE}")
+  endif()
+  file(APPEND "${MITK_EXTAPP_PROVISIONING_FILE}" "READ file://${MITK_COREAPP_PROVISIONING_FILE}\n")
+
+  FunctionCreateProvisioningInfo(prov_info "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/plugins" ${mitk_ext_plugins})
+  file(APPEND "${MITK_EXTAPP_PROVISIONING_FILE}" "${prov_info}")
+    
 
   set(MITK_CORE_PLUGIN_USE_FILE "${MITK_BINARY_DIR}/MitkCorePluginUseFile.cmake")
   ctkFunctionGeneratePluginUseFile(${MITK_CORE_PLUGIN_USE_FILE})

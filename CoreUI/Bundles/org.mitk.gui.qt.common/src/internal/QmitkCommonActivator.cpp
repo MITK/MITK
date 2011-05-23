@@ -51,3 +51,5 @@ QmitkCommonActivator::stop(ctkPluginContext* context)
 {
   Q_UNUSED(context)
 }
+
+Q_EXPORT_PLUGIN2(org_mitk_gui_qt_common, QmitkCommonActivator)

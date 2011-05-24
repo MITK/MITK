@@ -44,7 +44,7 @@ struct TrSelListener;
  *
  * \sa QmitkFunctionality
  */
-class QmitkTensorReconstructionView : public QObject, public QmitkFunctionality
+class QmitkTensorReconstructionView : public QmitkFunctionality
 {
 
   friend struct TrSelListener;
@@ -57,6 +57,7 @@ class QmitkTensorReconstructionView : public QObject, public QmitkFunctionality
   static const std::string VIEW_ID;
 
   QmitkTensorReconstructionView();
+  QmitkTensorReconstructionView(const QmitkTensorReconstructionView& other);
   virtual ~QmitkTensorReconstructionView();
 
   virtual void CreateQtPartControl(QWidget *parent);

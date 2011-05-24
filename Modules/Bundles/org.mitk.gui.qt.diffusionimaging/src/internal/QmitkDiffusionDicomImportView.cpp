@@ -55,6 +55,12 @@ QmitkDiffusionDicomImport::QmitkDiffusionDicomImport(QObject* /*parent*/, const 
 {
 }
 
+QmitkDiffusionDicomImport::QmitkDiffusionDicomImport(const QmitkDiffusionDicomImport& other)
+{
+  Q_UNUSED(other)
+  throw std::runtime_error("Copy constructor not implemented");
+}
+
 QmitkDiffusionDicomImport::~QmitkDiffusionDicomImport()
 {}
 

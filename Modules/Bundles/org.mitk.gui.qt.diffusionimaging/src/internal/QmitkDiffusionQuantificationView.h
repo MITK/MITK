@@ -39,7 +39,7 @@ PURPOSE.  See the above copyright notices for more information.
  *
  * \sa QmitkFunctionality
  */
-class QmitkDiffusionQuantificationView : public QObject, public QmitkFunctionality
+class QmitkDiffusionQuantificationView : public QmitkFunctionality
 {
 
   friend struct DqSelListener;
@@ -52,6 +52,7 @@ class QmitkDiffusionQuantificationView : public QObject, public QmitkFunctionali
   static const std::string VIEW_ID;
 
   QmitkDiffusionQuantificationView();
+  QmitkDiffusionQuantificationView(const QmitkDiffusionQuantificationView& other);
   virtual ~QmitkDiffusionQuantificationView();
 
   virtual void CreateQtPartControl(QWidget *parent);

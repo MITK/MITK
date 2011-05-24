@@ -44,7 +44,7 @@ struct PrpSelListener;
  *
  * \sa QmitkFunctionality
  */
-class QmitkPreprocessingView : public QObject, public QmitkFunctionality
+class QmitkPreprocessingView : public QmitkFunctionality
 {
 
   friend struct PrpSelListener;
@@ -57,6 +57,7 @@ class QmitkPreprocessingView : public QObject, public QmitkFunctionality
   static const std::string VIEW_ID;
 
   QmitkPreprocessingView();
+  QmitkPreprocessingView(const QmitkPreprocessingView& other);
   virtual ~QmitkPreprocessingView();
 
   virtual void CreateQtPartControl(QWidget *parent);

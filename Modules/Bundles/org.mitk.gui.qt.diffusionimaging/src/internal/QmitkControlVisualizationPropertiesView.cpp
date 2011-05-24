@@ -306,6 +306,12 @@ QmitkControlVisualizationPropertiesView::QmitkControlVisualizationPropertiesView
 {
 }
 
+QmitkControlVisualizationPropertiesView::QmitkControlVisualizationPropertiesView(const QmitkControlVisualizationPropertiesView& other)
+{
+  Q_UNUSED(other)
+  throw std::runtime_error("Copy constructor not implemented");
+}
+
 QmitkControlVisualizationPropertiesView::~QmitkControlVisualizationPropertiesView()
 {
   this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->RemovePostSelectionListener(/*"org.mitk.views.datamanager",*/ m_SelListener);

@@ -40,7 +40,7 @@ PURPOSE.  See the above copyright notices for more information.
  *
  * \sa QmitkFunctionality
  */
-class QmitkControlVisualizationPropertiesView : public QObject, public QmitkFunctionality//, public berry::ISizeProvider
+class QmitkControlVisualizationPropertiesView : public QmitkFunctionality//, public berry::ISizeProvider
 {
 
   friend struct CvpSelListener;
@@ -53,6 +53,7 @@ class QmitkControlVisualizationPropertiesView : public QObject, public QmitkFunc
   static const std::string VIEW_ID;
 
   QmitkControlVisualizationPropertiesView();
+  QmitkControlVisualizationPropertiesView(const QmitkControlVisualizationPropertiesView& other);
   virtual ~QmitkControlVisualizationPropertiesView();
 
   virtual void CreateQtPartControl(QWidget *parent);

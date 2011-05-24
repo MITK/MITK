@@ -19,12 +19,7 @@
 #ifndef MITKDIFFUSIONIMAGINGACTIVATOR_H_ 
 #define MITKDIFFUSIONIMAGINGACTIVATOR_H_ 
 
-#include <berryPlugin.h>
-
-#include <mitkDiffusionImagingDll.h>
-
-//#include <QSlider>
-//#include <QObject>
+#include <ctkPluginActivator.h>
 
 namespace mitk
 {
@@ -34,30 +29,24 @@ namespace mitk
  *
  * \brief The plug-in activator for the diffusion imaging module
  *
- * When the plug-in is started by the framework, it initialzes sandbox
+ * When the plug-in is started by the framework, it initialzes diffusion imaging
  * specific things.
  */
-class ORG_MITK_DIFFUSIONIMAGING_EXPORT DiffusionImagingActivator : 
-  /*public QObject, */public berry::Plugin
+class DiffusionImagingActivator : 
+  public QObject, public ctkPluginActivator
 {
 
-  //Q_OBJECT
+  Q_OBJECT
+  Q_INTERFACES(ctkPluginActivator)
 
 public:
 
   /**
-   * Registers sandbox core object factories.
+   * Registers diffusion imaging object factories.
    */
-  void Start(berry::IBundleContext::Pointer context);
-
-  //void OpactiyChanged(int value);
-  //void OpactiyActionChanged();
-
-  //void CreateQtPartControl(QWidget *){}
-
-private:
-
-  //QSlider* m_OpacitySlider;
+  void start(ctkPluginContext* context);
+  
+  void stop(ctkPluginContext* context);
 
 };
 

@@ -141,6 +141,12 @@ m_MultiWidget(NULL)
 {
 }
 
+QmitkTensorReconstructionView::QmitkTensorReconstructionView(const QmitkTensorReconstructionView& other)
+{
+  Q_UNUSED(other)
+  throw std::runtime_error("Copy constructor not implemented");
+}
+
 QmitkTensorReconstructionView::~QmitkTensorReconstructionView()
 {
   this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->RemovePostSelectionListener(/*"org.mitk.views.datamanager",*/ m_SelListener);

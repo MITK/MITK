@@ -136,6 +136,12 @@ QmitkQBallReconstructionView::QmitkQBallReconstructionView()
 {
 }
 
+QmitkQBallReconstructionView::QmitkQBallReconstructionView(const QmitkQBallReconstructionView& other)
+{
+  Q_UNUSED(other);
+  throw std::runtime_error("Copy constructor not implemented");
+}
+
 //void QmitkQBallReconstructionView::OpactiyChanged(int value)
 //{
 //  if (m_CurrentSelection)

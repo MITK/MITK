@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef QmitkCommonWorkbenchWindowAdvisor_h
 #define QmitkCommonWorkbenchWindowAdvisor_h
 
-#include "mitkQtCommonExtDll.h"
+#include <org_mitk_gui_qt_ext_Export.h>
 
 #include <berryWorkbenchWindowAdvisor.h>
 #include <QmitkFunctionalityCoordinator.h>

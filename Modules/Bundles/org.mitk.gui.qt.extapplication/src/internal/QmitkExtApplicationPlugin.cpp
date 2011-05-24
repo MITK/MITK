@@ -16,10 +16,14 @@
  =========================================================================*/
 
 #include "QmitkExtApplicationPlugin.h"
+#include "QmitkExtDefaultPerspective.h"
+#include "../QmitkExtApplication.h"
 
 #include <mitkVersion.h>
 
 #include <QFileInfo>
+#include <QDateTime>
+#include <QtPlugin>
 
 QmitkExtApplicationPlugin* QmitkExtApplicationPlugin::inst = 0;
 
@@ -33,32 +37,56 @@ QmitkExtApplicationPlugin* QmitkExtApplicationPlugin::GetDefault()
   return inst;
 }
 
-void QmitkExtApplicationPlugin::Start(berry::IBundleContext::Pointer context)
+void QmitkExtApplicationPlugin::start(ctkPluginContext* context)
 {
+  berry::AbstractUICTKPlugin::start(context);
+  
   this->context = context;
+  
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkExtDefaultPerspective, context);
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkExtApplication, context);
 }
 
-berry::IBundleContext::Pointer QmitkExtApplicationPlugin::GetBundleContext() const
+ctkPluginContext* QmitkExtApplicationPlugin::GetPluginContext() const
 {
   return context;
 }
 
 QString QmitkExtApplicationPlugin::GetQtHelpCollectionFile() const
 {
-  Poco::Path collectionPath = context->GetThisBundle()->GetPath();
-  collectionPath.pushDirectory("resources");
-
-  std::string collectionFilename;
-  std::string na = "n/a";
+  QString collectionFilename;
+  QString na("n/a");
   if (na != MITK_REVISION)
     collectionFilename = "MitkExtQtHelpCollection_" MITK_REVISION ".qhc";
   else
     collectionFilename = "MitkExtQtHelpCollection.qhc";
 
-  collectionPath.setFileName(collectionFilename);
+  QFileInfo collectionFileInfo = context->getDataFile(collectionFilename);
+  QFileInfo pluginFileInfo = QFileInfo(QUrl(context->getPlugin()->getLocation()).toLocalFile());
 
-  QString collectionFile = QString::fromStdString(collectionPath.toString());
-  if (QFileInfo(collectionFile).exists())
-    return collectionFile;
-  return QString("");
+  if (!collectionFileInfo.exists() ||
+      pluginFileInfo.lastModified() > collectionFileInfo.lastModified())
+  {
+    // extract the qhc file from the plug-in
+    QByteArray content = context->getPlugin()->getResource(collectionFilename);
+    if (content.isEmpty())
+    {
+      BERRY_WARN << "Could not get plug-in resource: " << collectionFilename.toStdString();
+    }
+    else
+    {
+      QFile file(collectionFileInfo.canonicalFilePath());
+      file.open(QIODevice::WriteOnly);
+      file.write(content);
+    }
+  }
+
+  if (collectionFileInfo.exists())
+  {
+    return collectionFileInfo.absoluteFilePath();
+  }
+
+  return QString();
 }
+
+Q_EXPORT_PLUGIN2(org_mitk_gui_qt_extapplication, QmitkExtApplicationPlugin)

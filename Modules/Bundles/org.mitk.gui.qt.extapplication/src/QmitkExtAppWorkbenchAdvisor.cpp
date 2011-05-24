@@ -34,11 +34,11 @@ QmitkExtAppWorkbenchAdvisor::Initialize(berry::IWorkbenchConfigurer::Pointer con
   QString collectionFile = QmitkExtApplicationPlugin::GetDefault()->GetQtHelpCollectionFile();
   if (!collectionFile.isEmpty())
   {
-    berry::IBundleContext::Pointer context = QmitkExtApplicationPlugin::GetDefault()->GetBundleContext();
+    ctkPluginContext* context = QmitkExtApplicationPlugin::GetDefault()->GetPluginContext();
     typedef std::vector<berry::IBundle::Pointer> BundleContainer;
-    BundleContainer bundles;
-    context->ListBundles(bundles);
-    berry::QtAssistantUtil::RegisterQCHFiles(collectionFile, bundles);
+    BundleContainer bundles = berry::Platform::GetBundles();
+    QList<QSharedPointer<ctkPlugin> > plugins = context->getPlugins();
+    berry::QtAssistantUtil::RegisterQCHFiles(collectionFile, bundles, plugins);
   }
 
   berry::QtAssistantUtil::SetHelpColletionFile(collectionFile);

@@ -26,6 +26,8 @@ IF(MITK_USE_BLUEBERRY)
     org.mitk.core.ext
     org.mitk.gui.qt.volumetry
     org.mitk.core.jobs
+    org.mitk.gui.qt.ext
+    org.mitk.gui.qt.extapplication
   )
 
   MACRO_COLLECT_PLUGINS(OUTPUT_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/ExtBundles

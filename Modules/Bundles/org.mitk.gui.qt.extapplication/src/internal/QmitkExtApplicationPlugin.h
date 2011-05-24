@@ -19,21 +19,24 @@
 #ifndef QMITKEXTAPPLICATIONPLUGIN_H_
 #define QMITKEXTAPPLICATIONPLUGIN_H_
 
-#include <berryAbstractUIPlugin.h>
+#include <berryAbstractUICTKPlugin.h>
 
 #include <QString>
 
-class QmitkExtApplicationPlugin : public berry::AbstractUIPlugin
+class QmitkExtApplicationPlugin : public QObject, public berry::AbstractUICTKPlugin
 {
+  Q_OBJECT
+  Q_INTERFACES(ctkPluginActivator)
+  
 public:
 
   QmitkExtApplicationPlugin();
 
   static QmitkExtApplicationPlugin* GetDefault();
 
-  berry::IBundleContext::Pointer GetBundleContext() const;
+  ctkPluginContext* GetPluginContext() const;
 
-  void Start(berry::IBundleContext::Pointer);
+  void start(ctkPluginContext*);
 
   QString GetQtHelpCollectionFile() const;
 
@@ -41,7 +44,7 @@ private:
 
   static QmitkExtApplicationPlugin* inst;
 
-  berry::IBundleContext::Pointer context;
+  ctkPluginContext* context;
 };
 
 #endif /* QMITKEXTAPPLICATIONPLUGIN_H_ */

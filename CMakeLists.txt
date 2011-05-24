@@ -378,6 +378,8 @@ if(MITK_USE_BLUEBERRY)
   set(mitk_ext_plugins
     Modules/Bundles/org.mitk.core.ext:ON
     Modules/Bundles/org.mitk.core.jobs:OFF
+    Modules/Bundles/org.mitk.gui.qt.ext:ON
+    Modules/Bundles/org.mitk.gui.qt.extapplication:ON
   )
 
   ctkMacroSetupExternalPlugins(${mitk_core_plugins} ${mitk_ext_plugins}

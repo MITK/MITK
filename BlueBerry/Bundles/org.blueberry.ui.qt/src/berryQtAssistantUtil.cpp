@@ -115,9 +115,30 @@ void QtAssistantUtil::CloseAssistant()
 bool QtAssistantUtil::RegisterQCHFiles(const QString& collectionFile,
     const std::vector<IBundle::Pointer>& bundles)
 {
-  QString assistantExec = GetAssistantExecutable();
+  QStringList qchFiles = ExtractQCHFiles(bundles);
+  return CallQtAssistant(collectionFile, qchFiles);
+}
 
-  QList<QStringList> argsVector;
+bool QtAssistantUtil::RegisterQCHFiles(const QString& collectionFile,
+                                       const std::vector<IBundle::Pointer>& bundles,
+                                       const QList<QSharedPointer<ctkPlugin> >& plugins)
+{
+  QStringList qchFiles = ExtractQCHFiles(plugins);
+  qchFiles << ExtractQCHFiles(bundles);
+
+  return CallQtAssistant(collectionFile, qchFiles);
+}
+
+bool QtAssistantUtil::RegisterQCHFiles(const QString& collectionFile,
+                                       const QList<QSharedPointer<ctkPlugin> >& plugins)
+{
+  QStringList qchFiles = ExtractQCHFiles(plugins);
+  return CallQtAssistant(collectionFile, qchFiles);
+}
+
+QStringList QtAssistantUtil::ExtractQCHFiles(const std::vector<IBundle::Pointer>& bundles)
+{
+  QStringList result;
 
   for (std::size_t i = 0; i < bundles.size(); ++i)
   {
@@ -130,15 +151,10 @@ bool QtAssistantUtil::RegisterQCHFiles(const QString& collectionFile,
       if (resource.endsWith(".qch"))
       {
         qchFileFound = true;
-        QStringList args;
-        args << QLatin1String("-collectionFile") << collectionFile;
         Poco::Path qchPath = bundles[i]->GetPath();
         qchPath.pushDirectory("resources");
         qchPath.setFileName(resourceFiles[j]);
-        args << QLatin1String("-register") << QString::fromStdString(qchPath.toString());
-        args << QLatin1String("-quiet");
-      //BERRY_INFO << "Registering " << qchPath.toString() << " with " << collectionFile.toStdString();
-        argsVector.push_back(args);
+        result << QString::fromStdString(qchPath.toString());
       }
     }
 
@@ -148,15 +164,40 @@ bool QtAssistantUtil::RegisterQCHFiles(const QString& collectionFile,
     }
   }
 
+  return result;
+}
+
+QStringList QtAssistantUtil::ExtractQCHFiles(const QList<QSharedPointer<ctkPlugin> >& plugins)
+{
+  // TODO
+  return QStringList();
+}
+
+bool QtAssistantUtil::CallQtAssistant(const QString& collectionFile, const QStringList& qchFiles)
+{
   bool success = true;
+
+  if (qchFiles.isEmpty())
+  {
+    BERRY_WARN << "No .qch files found. Help contents will not be available.";
+    return success;
+  }
+
+  QList<QStringList> argsVector;
+  foreach (QString qchFile, qchFiles)
+  {
+    QStringList args;
+    args << QLatin1String("-collectionFile") << collectionFile;
+    args << QLatin1String("-register") << qchFile;
+    args << QLatin1String("-quiet");
+    //BERRY_INFO << "Registering " << qchPath.toString() << " with " << collectionFile.toStdString();
+    argsVector.push_back(args);
+  }
+
   QProgressDialog progress("Registering help files...", "Abort Registration", 0, argsVector.size());
   progress.setWindowModality(Qt::WindowModal);
 
-  if (argsVector.isEmpty())
-  {
-    BERRY_WARN << "No .qch files found. Help contents will not be available.";
-  }
-
+  QString assistantExec = GetAssistantExecutable();
   QString errorString;
   int exitCode = 0;
   for (int i = 0; i < argsVector.size(); ++i)

@@ -24,6 +24,9 @@
 
 #include <vector>
 #include <berryIBundle.h>
+#include <ctkPlugin.h>
+
+#include <QSharedPointer>
 
 #include <org_blueberry_ui_qt_Export.h>
 
@@ -42,7 +45,12 @@ public:
      */
   static void OpenActivePartHelp();
 
+  // for legacy BlueBerry bundle support
   static bool RegisterQCHFiles(const QString& collectionFile, const std::vector<IBundle::Pointer>& bundles);
+  static bool RegisterQCHFiles(const QString& collectionFile, const std::vector<IBundle::Pointer>& bundles,
+                               const QList<QSharedPointer<ctkPlugin> >& plugins);
+
+  static bool RegisterQCHFiles(const QString& collectionFile, const QList<QSharedPointer<ctkPlugin> >& plugins);
 
   static void SetHelpColletionFile(const QString& file);
   static void SetDefaultHelpUrl(const QString& defaultUrl);
@@ -56,6 +64,9 @@ private:
   static QStringList registeredBundles;
 
   static QString GetAssistantExecutable();
+  static QStringList ExtractQCHFiles(const std::vector<IBundle::Pointer>& bundles);
+  static QStringList ExtractQCHFiles(const QList<QSharedPointer<ctkPlugin> >& plugins);
+  static bool CallQtAssistant(const QString& collectionFile, const QStringList& qchFiles);
 
 };
 

@@ -42,7 +42,7 @@ For more informations see: \ref QmitkDeformableRegistrationUserManual
 \ingroup DeformableRegistration
 */
 
-class DEFORMABLEREGISTRATION_EXPORT QmitkDeformableRegistrationView : public QObject, public QmitkFunctionality
+class DEFORMABLEREGISTRATION_EXPORT QmitkDeformableRegistrationView : public QmitkFunctionality
 {  
 
   friend struct SelListenerDeformableRegistration;

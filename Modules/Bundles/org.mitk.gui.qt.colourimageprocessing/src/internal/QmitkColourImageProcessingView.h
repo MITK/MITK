@@ -32,7 +32,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "ui_QmitkColourImageProcessingViewControls.h"
 
-class QmitkColourImageProcessingView : public QObject, public QmitkFunctionality
+class QmitkColourImageProcessingView : public QmitkFunctionality
 {
 
   Q_OBJECT

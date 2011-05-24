@@ -35,7 +35,7 @@ PURPOSE.  See the above copyright notices for more information.
  *
  * \sa QmitkFunctionality
  */
-class QmitkSimpleExampleView : public QObject, public QmitkFunctionality
+class QmitkSimpleExampleView : public QmitkFunctionality
 {
 
   // this is needed for all Qt objects that should have a MOC object (everything that derives from QObject)

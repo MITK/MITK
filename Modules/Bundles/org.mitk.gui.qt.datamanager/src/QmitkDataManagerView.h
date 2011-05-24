@@ -58,7 +58,7 @@ class QmitkDataStorageTreeModel;
 ///
 /// \TODO: complete PACS support, in save dialog show regular filename
 ///
-class MITK_QT_DATAMANAGER QmitkDataManagerView : public QObject, public berry::QtViewPart
+class MITK_QT_DATAMANAGER QmitkDataManagerView : public berry::QtViewPart
 {
   Q_OBJECT
 

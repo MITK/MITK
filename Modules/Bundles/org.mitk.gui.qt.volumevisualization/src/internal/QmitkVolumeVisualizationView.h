@@ -38,7 +38,7 @@ PURPOSE.  See the above copyright notices for more information.
 /**
  * \ingroup org_mitk_gui_qt_volumevisualization_internal
  */
-class QmitkVolumeVisualizationView : public QObject, public QmitkFunctionality
+class QmitkVolumeVisualizationView : public QmitkFunctionality
 {
   Q_OBJECT
 

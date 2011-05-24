@@ -5,6 +5,7 @@ SET(SRC_CPP_FILES
   QmitkFileOpenAction.cpp
   QmitkFileExitAction.cpp
   QmitkFunctionality.cpp
+  QmitkFunctionality2.cpp
   QmitkStatusBar.cpp
   QmitkStdMultiWidgetEditor.cpp
   QmitkPreferencesDialog.cpp
@@ -14,6 +15,7 @@ SET(SRC_CPP_FILES
 SET(INTERNAL_CPP_FILES
   QmitkDataNodeSelection.cpp
   QmitkCommonActivator.cpp
+  QmitkFunctionalityUtil.cpp
 )
 
 SET(MOC_H_FILES

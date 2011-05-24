@@ -27,22 +27,28 @@
 
 //# blueberry stuff
 #include <berryQtViewPart.h>
-#include <berryIWorkbenchPartReference.h>
 #include <berryIPreferencesService.h>
-#include <berryIBerryPreferences.h>
 #include <berryISelectionListener.h>
-#include <berryISelectionProvider.h>
-#include <berryISelectionChangedListener.h>
+
+#include <berryIPreferences.h>
 
 //# mitk stuff
 #include <org_mitk_gui_qt_common_Export.h>
 #include "mitkDataNodeSelection.h"
 #include <mitkDataStorage.h>
-#include <mitkDataNodeSelection.h>
 
 //# forward declarations
 class QmitkStdMultiWidget;
-class QScrollArea;
+
+namespace mitk {
+  class DataNode;
+}
+
+namespace berry {
+  struct IBerryPreferences;
+}
+
+class QmitkFunctionalitySelectionProvider;
 
 ///
 /// \class QmitkFunctionality
@@ -317,64 +323,6 @@ public:
   ///
   void ClosePartProxy();
 
-  ///
-  /// Internal class for selection providing
-  ///
-  class SelectionProvider: virtual public berry::Object, virtual public berry::ISelectionProvider
-  {
-  public:
-    ///
-    /// Creates smartpointer typedefs
-    ///
-    berryObjectMacro(QmitkFunctionality::SelectionProvider)
-    ///
-    /// Create a selection provider for the given _Functionality
-    ///
-    berryNewMacro1Param(QmitkFunctionality::SelectionProvider, QmitkFunctionality*)
-    //# ISelectionProvider methods
-    ///
-    /// \see ISelectionProvider::AddSelectionChangedListener()
-    ///
-    virtual void AddSelectionChangedListener(berry::ISelectionChangedListener::Pointer listener);
-    ///
-    /// \see ISelectionProvider::GetSelection()
-    ///
-    virtual berry::ISelection::ConstPointer GetSelection() const;
-    ///
-    /// \see ISelectionProvider::RemoveSelectionChangedListener()
-    ///
-    virtual void RemoveSelectionChangedListener(berry::ISelectionChangedListener::Pointer listener);
-    ///
-    /// \see ISelectionProvider::SetSelection()
-    ///
-    virtual void SetSelection(berry::ISelection::Pointer selection);
-    ///
-    /// Sends the nodes as selected to the workbench
-    ///
-    void FireNodesSelected( std::vector<mitk::DataNode::Pointer> nodes );
-  protected:
-    ///
-    /// nothing to do here
-    ///
-    SelectionProvider(QmitkFunctionality* _Functionality);
-    ///
-    /// nothing to do here
-    ///
-    virtual ~SelectionProvider();
-    ///
-    /// the functionality parent
-    ///
-    QmitkFunctionality* m_Functionality;
-    ///
-    /// Holds the current selection (selection made by m_Functionality !!!)
-    ///
-    mitk::DataNodeSelection::Pointer m_CurrentSelection;
-    ///
-    /// The selection events other parts can listen too
-    ///
-    berry::ISelectionChangedListener::Events m_SelectionEvents;
-  };
-
 //# other protected methods which should not be overwritten (or which are deprecated)
 protected:
   ///
@@ -419,7 +367,7 @@ private:
   ///
   /// Holds the current selection (selection made by this Functionality !!!)
   ///
-  SelectionProvider* m_SelectionProvider;
+  QmitkFunctionalitySelectionProvider* m_SelectionProvider;
   ///
   /// object to observe BlueBerry selections 
   ///

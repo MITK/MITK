@@ -18,8 +18,13 @@
 #include "berryAbstractUICTKPlugin.h"
 
 #include "internal/berryBundleUtility.h"
+#include "internal/berryWorkbenchPlugin.h"
+
 #include "berryImageDescriptor.h"
 #include "berryPlatformUI.h"
+
+#include <QIcon>
+#include <QImage>
 
 namespace berry
 {
@@ -240,14 +245,21 @@ SmartPointer<ImageDescriptor> AbstractUICTKPlugin::ImageDescriptorFromPlugin(
     throw Poco::InvalidArgumentException();
   }
 
-  // if the bundle is not ready then there is no image
-  IBundle::Pointer bundle = Platform::GetBundle(pluginId);
-  if (!BundleUtility::IsReady(bundle))
+  // if the plug-in is not ready then there is no image
+  QSharedPointer<ctkPlugin> plugin = BundleUtility::FindPlugin(QString::fromStdString(pluginId));
+  if (!BundleUtility::IsReady(plugin))
   {
     return ImageDescriptor::Pointer(0);
   }
 
-  return ImageDescriptor::CreateFromFile(imageFilePath, pluginId);
+  QByteArray imgContent = plugin->getResource(QString::fromStdString(imageFilePath));
+  QImage image = QImage::fromData(imgContent);
+  QPixmap pixmap = QPixmap::fromImage(image);
+  QIcon* icon = new QIcon(pixmap);
+  if (icon->isNull())
+    return ImageDescriptor::Pointer(0);
+
+  return ImageDescriptor::CreateFromImage(icon);
 }
 
 }

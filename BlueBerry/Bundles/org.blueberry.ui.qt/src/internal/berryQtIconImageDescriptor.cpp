@@ -27,9 +27,14 @@ QtIconImageDescriptor::QtIconImageDescriptor(void* img)
 
 }
 
+QtIconImageDescriptor::~QtIconImageDescriptor()
+{
+  delete icon;
+}
+
 void* QtIconImageDescriptor::CreateImage(bool returnMissingImageOnError)
 {
-  if (icon) return icon;
+  if (icon) return new QIcon(*icon);
 
   if (returnMissingImageOnError)
     return GetMissingImageDescriptor()->CreateImage();

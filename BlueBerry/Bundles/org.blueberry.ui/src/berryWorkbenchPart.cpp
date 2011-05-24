@@ -17,6 +17,7 @@
 
 #include "berryWorkbenchPart.h"
 
+#include "berryAbstractUIPlugin.h"
 #include "berryIWorkbenchPartConstants.h"
 #include "berryImageDescriptor.h"
 #include <berrySafeRunner.h>
@@ -301,6 +302,13 @@ void WorkbenchPart::SetInitializationData(IConfigurationElement::Pointer cfig,
 
   m_ImageDescriptor = AbstractUICTKPlugin::ImageDescriptorFromPlugin(
      m_ConfigElement->GetContributor(), strIcon);
+
+  if (!m_ImageDescriptor)
+  {
+    // try legacy BlueBerry code
+    m_ImageDescriptor = AbstractUIPlugin::ImageDescriptorFromPlugin(
+       m_ConfigElement->GetContributor(), strIcon);
+  }
 
   if (!m_ImageDescriptor) {
     return;

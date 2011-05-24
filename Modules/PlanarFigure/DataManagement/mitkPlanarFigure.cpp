@@ -94,6 +94,11 @@ bool mitk::PlanarFigure::AddControlPoint( const mitk::Point2D& point, int positi
     // if position has not been defined or position would be the last control point, just append the new one
     if ( position == -1 || position > m_NumberOfControlPoints-1 )
     {
+      if ( m_ControlPoints.size() > this->GetMaximumNumberOfControlPoints()-1 )
+      {
+        m_ControlPoints.resize( this->GetMaximumNumberOfControlPoints()-1 );
+      }
+
       m_ControlPoints.push_back( this->ApplyControlPointConstraints( m_NumberOfControlPoints, point ) );
       m_SelectedControlPoint = m_NumberOfControlPoints;
     }

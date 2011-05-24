@@ -136,6 +136,8 @@ public:
 
   IBundle::Pointer GetBundle(const std::string& id);
 
+  std::vector<IBundle::Pointer> GetBundles() const;
+
   Poco::Logger* GetLogger();
 };
 

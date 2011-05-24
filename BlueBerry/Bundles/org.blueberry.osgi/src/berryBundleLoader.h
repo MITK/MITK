@@ -88,6 +88,8 @@ public:
   BundleEvents& GetEvents();
   IBundle::Pointer FindBundle(const std::string& symbolicName);
 
+  std::vector<IBundle::Pointer> GetBundles() const;
+
   Bundle::Pointer LoadBundle(const Poco::Path& path);
   void LoadBundle(Bundle::Pointer bundle);
 

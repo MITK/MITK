@@ -101,6 +101,17 @@ BundleLoader::FindBundle(const std::string& symbolicName)
   return iter->second.m_Bundle;
 }
 
+std::vector<IBundle::Pointer> BundleLoader::GetBundles() const
+{
+  std::vector<IBundle::Pointer> result;
+  BundleMap::const_iterator end = m_BundleMap.end();
+  for (BundleMap::const_iterator it = m_BundleMap.begin(); it != end; ++it)
+  {
+    result.push_back(it->second.m_Bundle);
+  }
+  return result;
+}
+
 Bundle::Pointer
 BundleLoader::LoadBundle(const Poco::Path& path)
 {

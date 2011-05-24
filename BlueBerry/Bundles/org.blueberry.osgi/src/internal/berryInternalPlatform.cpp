@@ -376,6 +376,11 @@ IBundle::Pointer InternalPlatform::GetBundle(const std::string& id)
   return m_BundleLoader->FindBundle(id);
 }
 
+std::vector<IBundle::Pointer> InternalPlatform::GetBundles() const
+{
+  return m_BundleLoader->GetBundles();
+}
+
 Poco::Logger* InternalPlatform::GetLogger()
 {
   return m_PlatformLogger;

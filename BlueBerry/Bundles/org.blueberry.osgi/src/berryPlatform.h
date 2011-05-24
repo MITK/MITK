@@ -331,6 +331,8 @@ public:
    */
   static IBundle::Pointer GetBundle(const std::string& id);
 
+  static std::vector<IBundle::Pointer> GetBundles();
+
   static QSharedPointer<ctkPlugin> GetCTKPlugin(const QString& symbolicName);
 
 private:

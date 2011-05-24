@@ -188,6 +188,11 @@ IBundle::Pointer Platform::GetBundle(const std::string& id)
   return InternalPlatform::GetInstance()->GetBundle(id);
 }
 
+std::vector<IBundle::Pointer> Platform::GetBundles()
+{
+  return InternalPlatform::GetInstance()->GetBundles();
+}
+
 QSharedPointer<ctkPlugin> Platform::GetCTKPlugin(const QString& symbolicName)
 {
   QList<QSharedPointer<ctkPlugin> > plugins =

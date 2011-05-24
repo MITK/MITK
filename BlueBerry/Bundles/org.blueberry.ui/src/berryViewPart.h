@@ -70,6 +70,8 @@ namespace berry {
  */
 class BERRY_UI ViewPart : public WorkbenchPart, public IViewPart
 {
+  Q_OBJECT
+  Q_INTERFACES(berry::IViewPart)
 
 protected:
   ViewPart();

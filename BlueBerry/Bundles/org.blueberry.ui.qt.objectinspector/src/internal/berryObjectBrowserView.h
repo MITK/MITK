@@ -41,10 +41,9 @@ namespace berry {
  *
  * \sa berry::QtViewPart
  */
-class ObjectBrowserView : public QObject, public berry::QtViewPart
+class ObjectBrowserView : public berry::QtViewPart
 {
   Q_OBJECT
-  Q_INTERFACES(berry::IViewPart)
 
 public:
 

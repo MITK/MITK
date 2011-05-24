@@ -24,10 +24,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace berry {
 
-class LogView : public QObject, public QtViewPart
+class LogView : public QtViewPart
 {
   Q_OBJECT
-  Q_INTERFACES(berry::IViewPart)
 
 public:
 

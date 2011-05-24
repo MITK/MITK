@@ -76,6 +76,9 @@ namespace berry {
  */
 class BERRY_UI EditorPart : public WorkbenchPart , public IEditorPart {
 
+  Q_OBJECT
+  Q_INTERFACES(berry::IEditorPart)
+
 public:
   berryObjectMacro(EditorPart);
 

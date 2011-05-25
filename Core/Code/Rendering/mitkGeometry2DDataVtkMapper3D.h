@@ -166,15 +166,6 @@ protected:
   /** Cleans the polyline in order to avoid phantom boundaries */
   vtkCleanPolyData *m_Cleaner;
 
-  /** \brief Whether or not to display normals */
-  bool m_DisplayNormals;
-
-  /** \brief Whether to color front and back */
-  bool m_ColorTwoSides;
-
-  /** \brief Whether or not to invert normals */
-  bool m_InvertNormals;
-
   /** Internal flag, if actors for normals are already added to m_Prop3DAssembly*/
   bool m_NormalsActorAdded;
 

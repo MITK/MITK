@@ -45,10 +45,7 @@ namespace mitk
 {
 
   Geometry2DDataVtkMapper3D::Geometry2DDataVtkMapper3D()
-    : m_DisplayNormals(false),
-    m_ColorTwoSides(false),
-    m_InvertNormals(true),
-    m_NormalsActorAdded(false),
+    : m_NormalsActorAdded(false),
     m_DataStorage(NULL)
   {
     m_EdgeTuber = vtkTubeFilter::New();
@@ -342,12 +339,15 @@ namespace mitk
 
       // add a graphical representation of the surface normals if requested
       DataNode* node = this->GetDataNode();
-      node->GetBoolProperty("draw normals 3D", m_DisplayNormals, renderer);
-      node->GetBoolProperty("color two sides", m_ColorTwoSides, renderer);
-      node->GetBoolProperty("invert normals", m_InvertNormals, renderer);
+      bool displayNormals = false;
+      bool colorTwoSides = false;
+      bool invertNormals = false;
+      node->GetBoolProperty("draw normals 3D", displayNormals, renderer);
+      node->GetBoolProperty("color two sides", colorTwoSides, renderer);
+      node->GetBoolProperty("invert normals", invertNormals, renderer);
 
       //if we want to draw the display normals or render two sides we have to get the colors
-      if( m_DisplayNormals ||  m_ColorTwoSides )
+      if( displayNormals || colorTwoSides )
       {
         //get colors
         float frontColor[3] = { 0.0, 0.0, 1.0 };
@@ -355,20 +355,20 @@ namespace mitk
         float backColor[3] = { 1.0, 0.0, 0.0 };
         node->GetColor( backColor, renderer, "back color" );
 
-        if ( m_DisplayNormals )
+        if ( displayNormals )
         {
           m_NormalsTransformer->SetInput( surface->GetVtkPolyData() );
           m_NormalsTransformer->SetTransform(node->GetVtkTransform(this->GetTimestep()) );
 
           m_FrontHedgeHog->SetInput( m_NormalsTransformer->GetOutput() );
           m_FrontHedgeHog->SetVectorModeToUseNormal();
-          m_FrontHedgeHog->SetScaleFactor( m_InvertNormals ? 1.0 : -1.0 );
+          m_FrontHedgeHog->SetScaleFactor( invertNormals ? 1.0 : -1.0 );
 
           m_FrontNormalsActor->GetProperty()->SetColor( frontColor[0], frontColor[1], frontColor[2] );
 
           m_BackHedgeHog->SetInput( m_NormalsTransformer->GetOutput() );
           m_BackHedgeHog->SetVectorModeToUseNormal();
-          m_BackHedgeHog->SetScaleFactor( m_InvertNormals ? -1.0 : 1.0 );
+          m_BackHedgeHog->SetScaleFactor( invertNormals ? -1.0 : 1.0 );
 
           m_BackNormalsActor->GetProperty()->SetColor( backColor[0], backColor[1], backColor[2] );
 
@@ -388,9 +388,9 @@ namespace mitk
           m_NormalsActorAdded = false;
         }
 
-        if ( m_ColorTwoSides )
+        if ( colorTwoSides )
         {
-          if ( !m_InvertNormals )
+          if ( !invertNormals )
           {
             m_BackgroundActor->GetProperty()->SetColor( backColor[0], backColor[1], backColor[2] );
             m_BackgroundActor->GetBackfaceProperty()->SetColor( frontColor[0], frontColor[1], frontColor[2] );

@@ -15,8 +15,12 @@ SET(OpenCV_DEPENDS ${proj})
 
 IF(NOT DEFINED OpenCV_DIR)
 
-  OPTION(OpenCV_BUILD_NEW_PYTHON_SUPPORT "Build OpenCV Python wrappers" OFF)
-  MARK_AS_ADVANCED(OpenCV_BUILD_NEW_PYTHON_SUPPORT)
+  SET(additional_cmake_args )
+  IF(MITK_USE_Python)
+    LIST(APPEND additional_cmake_args
+         -DBUILD_NEW_PYTHON_SUPPORT:BOOL=ON
+        )
+  ENDIF()
 
   IF(WIN32)
     SET(opencv_url http://mitk.org/download/thirdparty/OpenCV-2.2.0-win.tar.bz2)
@@ -34,7 +38,7 @@ IF(NOT DEFINED OpenCV_DIR)
        -DBUILD_TESTS:BOOL=OFF
        -DBUILD_EXAMPLES:BOOL=OFF
        -DBUILD_DOXYGEN_DOCS:BOOL=OFF
-       -DBUILD_NEW_PYTHON_SUPPORT:BOOL=${OpenCV_BUILD_NEW_PYTHON_SUPPORT}
+       ${additional_cmake_args}
      DEPENDS ${proj_DEPENDENCIES}
     )
 

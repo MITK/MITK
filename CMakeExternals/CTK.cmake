@@ -13,6 +13,14 @@ IF(MITK_USE_CTK)
   SET(proj_DEPENDENCIES )
   SET(CTK_DEPENDS ${proj})
 
+  SET(additional_cmake_args)
+  IF(MITK_USE_Python)
+    LIST(APPEND additional_cmake_args
+         -DCTK_LIB_Scripting/Python/Widgets:BOOL=ON
+        )
+  ENDIF()
+
+
   IF(NOT DEFINED CTK_DIR)
     ExternalProject_Add(${proj}
       GIT_REPOSITORY git://github.com/commontk/CTK.git
@@ -21,6 +29,7 @@ IF(MITK_USE_CTK)
       CMAKE_GENERATOR ${gen}
       CMAKE_ARGS
         ${ep_common_args}
+        ${additional_cmake_args}
         -DDESIRED_QT_VERSION:STRING=4
         -DQT_QMAKE_EXECUTABLE:FILEPATH=${QT_QMAKE_EXECUTABLE}
         -DCTK_LIB_DICOM/Widgets:BOOL=ON

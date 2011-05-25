@@ -12,6 +12,10 @@ IF(MITK_USE_BLUEBERRY)
       "org.mitk.core.ext" 
       "org.mitk.planarfigure"
   )
+
+  IF(MITK_USE_Python)
+    LIST(APPEND _mitk_bundles_default org.mitk.gui.qt.python.console)
+  ENDIF()
   
   IF(QT4_FOUND)
     LIST(APPEND _mitk_bundles_default "org.mitk.gui.qt.ext" "org.mitk.gui.qt.extapplication")

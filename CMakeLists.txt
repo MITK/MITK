@@ -105,9 +105,10 @@ option(MITK_BUILD_ALL_PLUGINS "Build all MITK plugins" OFF)
 option(MITK_BUILD_TUTORIAL "Build the MITK tutorial" ON)
 option(MITK_USE_Boost "Use the Boost C++ library" OFF)
 option(MITK_USE_BLUEBERRY "Build the BlueBerry platform" ON)
-option(MITK_USE_CTK "EXEPERIMENTAL, superbuild only: Use CTK in MITK" OFF)
+option(MITK_USE_CTK "Use CTK in MITK" ${MITK_USE_BLUEBERRY})
 option(MITK_USE_DCMTK "EXEPERIMENTAL, superbuild only: Use DCMTK in MITK" OFF)
 option(MITK_USE_OpenCV "Use Intel's OpenCV library" OFF)
+option(MITK_USE_Python "Use Python wrapping in MITK" OFF)
   
 mark_as_advanced(MITK_INSTALL_RPATH_RELATIVE
                  MITK_BUILD_ALL_PLUGINS

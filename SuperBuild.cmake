@@ -91,6 +91,7 @@ SET(ep_common_args
 SET(external_projects
   VTK
   GDCM
+  CableSwig
   ITK
   Boost
   DCMTK
@@ -122,6 +123,7 @@ SET(mitk_cmake_boolean_args
   MITK_USE_CTK
   MITK_USE_DCMTK
   MITK_USE_OpenCV
+  MITK_USE_Python
   )
   
 #-----------------------------------------------------------------------------

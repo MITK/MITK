@@ -28,6 +28,14 @@ IF(NOT DEFINED VTK_DIR)
         )
   ENDIF()
 
+  IF(MITK_USE_Python)
+    LIST(APPEND additional_cmake_args
+         -DVTK_WRAP_PYTHON:BOOL=ON
+         -DVTK_USE_TK:BOOL=OFF
+         -DVTK_WINDOWS_PYTHON_DEBUGGABLE:BOOL=OFF
+        )
+  ENDIF()
+
   ExternalProject_Add(${proj}
     URL http://mitk.org/download/thirdparty/vtk-5.6.1.tar.gz
     BINARY_DIR ${proj}-build

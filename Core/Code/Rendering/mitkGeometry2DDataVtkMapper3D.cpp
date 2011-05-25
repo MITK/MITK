@@ -469,13 +469,17 @@ namespace mitk
   {
     if ( node != NULL )
     {
-      ImageMapperGL2D *imageMapper = dynamic_cast< ImageMapperGL2D * >( node->GetMapper(1) );
+      //we need to get the information from the 2D mapper to render the texture on the 3D plane
+      ImageMapperGL2D *imageMapper = dynamic_cast< ImageMapperGL2D * >( node->GetMapper(1) ); //GetMapper(1) provides the 2D mapper for the data node
 
+      //if there is a 2D mapper, which is not the standard image mapper...
       if(!imageMapper && node->GetMapper(1))
-      {
+      { //... check if it is the composite mapper
         std::string cname(node->GetMapper(1)->GetNameOfClass());
-        if(!cname.compare("CompositeMapper"))
+        if(!cname.compare("CompositeMapper")) //string.compare returns 0 if the two strings are equal.
         {
+          //get the standard image mapper.
+          //This is a special case in MITK and does only work for the CompositeMapper.
           imageMapper = dynamic_cast<ImageMapperGL2D* >( node->GetMapper(3) );
         }
       }
@@ -488,6 +492,7 @@ namespace mitk
         if ( rendererProp.IsNotNull() )
         {
           BaseRenderer::Pointer planeRenderer = dynamic_cast< BaseRenderer * >(rendererProp->GetWeakPointer().GetPointer());
+
           if ( planeRenderer.IsNotNull() )
           {
             // If it has not been initialized already in a previous pass,
@@ -500,14 +505,13 @@ namespace mitk
             if ( m_ImageActors.count( imageMapper ) == 0 )
             {
               dataSetMapper = vtkDataSetMapper::New();
+              //Enable rendering without copying the image.
               dataSetMapper->ImmediateModeRenderingOn();
 
               lookupTable = vtkLookupTable::New();
               lookupTable->DeepCopy( m_DefaultLookupTable );
-              lookupTable->SetRange( -1024.0, 4095.0 );
 
               texture = vtkTexture::New();
-              texture->InterpolateOn();
               texture->SetLookupTable( lookupTable );
               texture->RepeatOff();
 
@@ -544,7 +548,7 @@ namespace mitk
 
             // Set poly data new each time its object changes (e.g. when
             // switching between planar and curved geometries)
-            if ( dataSetMapper != NULL && dataSetMapper->GetInput() != surface->GetVtkPolyData() )
+            if ( (dataSetMapper != NULL) && (dataSetMapper->GetInput() != surface->GetVtkPolyData()) )
             {
               dataSetMapper->SetInput( surface->GetVtkPolyData() );
             }
@@ -567,10 +571,12 @@ namespace mitk
             // Retrieve and update image to be mapped
             const ImageMapperGL2D::RendererInfo *rit = imageMapper->GetRendererInfo( planeRenderer );
             if(rit->m_Image != NULL)
-            {
+            {              
               rit->m_Image->Update();
+              //set the 2D image as texture for the 3D plane
               texture->SetInput( rit->m_Image );
-              // check for level-window-prop and use it if it exists
+
+              //default level window
               ScalarType windowMin = 0.0;
               ScalarType windowMax = 255.0;
               LevelWindow levelWindow;
@@ -584,20 +590,20 @@ namespace mitk
 
               // VTK (mis-)interprets unsigned char (binary) images as color images;
               // So, we must manually turn on their mapping through a (gray scale) lookup table;
+              texture->SetMapColorScalarsThroughLookupTable(binary);
+
+              //if we have a binary image, the range is just 0 to 1
               if( binary )
               {
-                texture->MapColorScalarsThroughLookupTableOn();
                 windowMin = 0;
                 windowMax = 1;
                 useColor = true;
               }
-              else
-                texture->MapColorScalarsThroughLookupTableOff();
 
+              // check for level-window-prop and use it if it exists
               if( !binary &&
                   ( node->GetLevelWindow( levelWindow, planeRenderer, "levelWindow" )
-                    || node->GetLevelWindow( levelWindow, planeRenderer ) )
-                  )
+                    || node->GetLevelWindow( levelWindow, planeRenderer ) ) )
               {
                 windowMin = levelWindow.GetLowerWindowBound();
                 windowMax = levelWindow.GetUpperWindowBound();

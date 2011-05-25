@@ -3,7 +3,7 @@
 
 \image html ImageGuidedTherapy.png "Icon of the Module"
 
-\section QmitkIGTExampleViewUserManualSummary Summary
+\section QmitkIGTTutorialUserManualSummary Summary
 
 This module is not meant as a end-user module. It contains tutorial program code that explains how to use the MITK-IGT component.
 

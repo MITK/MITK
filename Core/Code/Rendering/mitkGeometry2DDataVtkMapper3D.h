@@ -65,6 +65,18 @@ class DataStorage;
  *   - \b "invert normals": (BoolProperty) Inverts front/back for display.
  *   - \b "front color": (ColorProperty) Color for front side of the plane
  *   - \b "back color": (ColorProperty) Color for back side of the plane
+ *   - \b "material.representation": (BoolProperty) Choose the representation to draw the mesh in (Surface, Wireframe, Point Cloud)
+ *   - \b "surfacegeometry": TODO: Add documentation
+ *   - \b "LookupTable": (LookupTableProperty) Set the lookuptable to render with.
+ *
+ *  Note: The following properties are set for each image individually, and thus, also influence the rendering of this mapper:
+ *
+ *   - \b "texture interpolation": (BoolProperty) Turn on/off the texture interpolation of each image
+ *   - \b "use color": (BoolProperty) Decide whether we want to use the color property or a lookuptable.
+ *   - \b "binary": (BoolProperty) Binary image handling: Color the value=1.0 with the color property and make the background (value=0.0) of the image translucent.
+ *   - \b "layer": (IntProperty) Controls what image is considered "on top" of another. In the case that two should inhabit the same space, higher layer occludes lower layer.
+ *   - \b "opacity": (FloatProperty) Set the opacity for each rendered image.
+ *   - \b "color": (FloatProperty) Set the color for each rendered image.
  *
  *  The internal filter pipeline which combines a (sometimes deformed) 2D surface
  *  with a nice frame and image textures is illustrated in the following sketch:

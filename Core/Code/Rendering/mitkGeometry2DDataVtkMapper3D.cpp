@@ -411,11 +411,9 @@ namespace mitk
 
       // Traverse the data tree to find nodes resliced by ImageMapperGL2D
       mitk::NodePredicateOr::Pointer p = mitk::NodePredicateOr::New();
-      p->AddPredicate(mitk::NodePredicateDataType::New("Image"));
-      p->AddPredicate(mitk::NodePredicateDataType::New("DiffusionImage"));
-      p->AddPredicate(mitk::NodePredicateDataType::New("TensorImage"));
-      p->AddPredicate(mitk::NodePredicateDataType::New("QBallImage"));
-      mitk::DataStorage::SetOfObjects::ConstPointer all = m_DataStorage->GetSubset(p);
+      //use a predicate to get all data nodes which are "images" or inherit from mitk::Image
+      mitk::TNodePredicateDataType< mitk::Image >::Pointer predicateAllImages = mitk::TNodePredicateDataType< mitk::Image >::New();
+      mitk::DataStorage::SetOfObjects::ConstPointer all = m_DataStorage->GetSubset(predicateAllImages);
       //process all found images
       for (mitk::DataStorage::SetOfObjects::ConstIterator it = all->Begin(); it != all->End(); ++it)
       {
@@ -616,8 +614,9 @@ namespace mitk
               LookupTableProperty::Pointer lookupTableProp;
               lookupTableProp = dynamic_cast< LookupTableProperty * >(node->GetPropertyList()->GetProperty( "LookupTable" ));
 
-              // If there is a lookup table supplied, use it; otherwise,
-              // use the default grayscale table
+              // If there is a lookup table supplied and we don't
+              // want to use the color property, use it;
+              //otherwise, use the default grayscale table
               if ( lookupTableProp.IsNotNull()  && !useColor )
               {
                 lookupTableSource = lookupTableProp->GetLookupTable()->GetVtkLookupTable();
@@ -651,15 +650,17 @@ namespace mitk
                 lookupTable->SetRange( windowMin, windowMax );
               }
 
-              // Apply color property (of the node, not of the plane)
+              //get the color
               float rgb[3] = { 1.0, 1.0, 1.0 };
               node->GetColor( rgb, renderer );
 
+              // Apply color property (of the node, not of the plane)
+              // if we want to use the color
               if(useColor)
               {
                 imageActor->GetProperty()->SetColor( rgb[0], rgb[1], rgb[2] );
               }
-              else
+              else //else default color = white to avoid site effects from the lookuptable
               {
                 imageActor->GetProperty()->SetColor( 1, 1, 1 );
               }

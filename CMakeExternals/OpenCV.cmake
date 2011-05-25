@@ -3,47 +3,105 @@
 #-----------------------------------------------------------------------------
 
 IF(MITK_USE_OpenCV)
+if (UNIX)
 
-# Sanity checks
-IF(DEFINED OpenCV_DIR AND NOT EXISTS ${OpenCV_DIR})
-  MESSAGE(FATAL_ERROR "OpenCV_DIR variable is defined but corresponds to non-existing directory")
-ENDIF()
+  include(${MITK_SOURCE_DIR}/CMake/mitkMacroGetLinuxDistribution.cmake)
+  GetLinuxDistribution()
 
-SET(proj OpenCV)
-SET(proj_DEPENDENCIES)
-SET(OpenCV_DEPENDS ${proj})
+  if("${LINUX_DISTRIBUTION}" MATCHES "^[Uu][Bb][Uu][Nn][Tt][Uu].*" AND "${LINUX_RELEASE}" MATCHES "11.04")
 
-IF(NOT DEFINED OpenCV_DIR)
+    message("using system opencv")
+    set(OpenCV_DIR "/usr/share/opencv/")
+  else()
 
-  OPTION(OpenCV_BUILD_NEW_PYTHON_SUPPORT "Build OpenCV Python wrappers" OFF)
-  MARK_AS_ADVANCED(OpenCV_BUILD_NEW_PYTHON_SUPPORT)
+    # Sanity checks
+    IF(DEFINED OpenCV_DIR AND NOT EXISTS ${OpenCV_DIR})
+      MESSAGE(FATAL_ERROR "OpenCV_DIR variable is defined but corresponds to non-existing directory")
+    ENDIF()
 
-  IF(WIN32)
-    SET(opencv_url http://mitk.org/download/thirdparty/OpenCV-2.2.0-win.tar.bz2)
-  ELSE()
-    SET(opencv_url http://mitk.org/download/thirdparty/OpenCV-2.2.0.tar.bz2)
+    SET(proj OpenCV)
+    SET(proj_DEPENDENCIES)
+    SET(OpenCV_DEPENDS ${proj})
+
+    IF(NOT DEFINED OpenCV_DIR)
+
+      OPTION(OpenCV_BUILD_NEW_PYTHON_SUPPORT "Build OpenCV Python wrappers" OFF)
+      MARK_AS_ADVANCED(OpenCV_BUILD_NEW_PYTHON_SUPPORT)
+
+      IF(WIN32)
+	SET(opencv_url http://mitk.org/download/thirdparty/OpenCV-2.2.0-win.tar.bz2)
+      ELSE()
+	SET(opencv_url http://mitk.org/download/thirdparty/OpenCV-2.2.0.tar.bz2)
+      ENDIF()
+
+      ExternalProject_Add(${proj}
+	URL ${opencv_url}
+	BINARY_DIR ${proj}-build
+	INSTALL_COMMAND ""
+	CMAKE_GENERATOR ${gen}
+	CMAKE_ARGS
+	  ${ep_common_args}
+	  -DBUILD_TESTS:BOOL=OFF
+	  -DBUILD_EXAMPLES:BOOL=OFF
+	  -DBUILD_DOXYGEN_DOCS:BOOL=OFF
+	  -DBUILD_NEW_PYTHON_SUPPORT:BOOL=${OpenCV_BUILD_NEW_PYTHON_SUPPORT}
+	DEPENDS ${proj_DEPENDENCIES}
+	)
+
+      SET(OpenCV_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-build)
+
+    ELSE()
+
+      mitkMacroEmptyExternalProject(${proj} "${proj_DEPENDENCIES}")
+
+    ENDIF()
+
+  endif()
+
+else()
+
+  # Sanity checks
+  IF(DEFINED OpenCV_DIR AND NOT EXISTS ${OpenCV_DIR})
+    MESSAGE(FATAL_ERROR "OpenCV_DIR variable is defined but corresponds to non-existing directory")
   ENDIF()
 
-  ExternalProject_Add(${proj}
-     URL ${opencv_url}
-     BINARY_DIR ${proj}-build
-     INSTALL_COMMAND ""
-     CMAKE_GENERATOR ${gen}
-     CMAKE_ARGS
-       ${ep_common_args}
-       -DBUILD_TESTS:BOOL=OFF
-       -DBUILD_EXAMPLES:BOOL=OFF
-       -DBUILD_DOXYGEN_DOCS:BOOL=OFF
-       -DBUILD_NEW_PYTHON_SUPPORT:BOOL=${OpenCV_BUILD_NEW_PYTHON_SUPPORT}
-     DEPENDS ${proj_DEPENDENCIES}
-    )
+  SET(proj OpenCV)
+  SET(proj_DEPENDENCIES)
+  SET(OpenCV_DEPENDS ${proj})
 
-  SET(OpenCV_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-build)
+  IF(NOT DEFINED OpenCV_DIR)
 
-ELSE()
+    OPTION(OpenCV_BUILD_NEW_PYTHON_SUPPORT "Build OpenCV Python wrappers" OFF)
+    MARK_AS_ADVANCED(OpenCV_BUILD_NEW_PYTHON_SUPPORT)
 
-  mitkMacroEmptyExternalProject(${proj} "${proj_DEPENDENCIES}")
+    IF(WIN32)
+      SET(opencv_url http://mitk.org/download/thirdparty/OpenCV-2.2.0-win.tar.bz2)
+    ELSE()
+      SET(opencv_url http://mitk.org/download/thirdparty/OpenCV-2.2.0.tar.bz2)
+    ENDIF()
 
-ENDIF()
+    ExternalProject_Add(${proj}
+      URL ${opencv_url}
+      BINARY_DIR ${proj}-build
+      INSTALL_COMMAND ""
+      CMAKE_GENERATOR ${gen}
+      CMAKE_ARGS
+	${ep_common_args}
+	-DBUILD_TESTS:BOOL=OFF
+	-DBUILD_EXAMPLES:BOOL=OFF
+	-DBUILD_DOXYGEN_DOCS:BOOL=OFF
+	-DBUILD_NEW_PYTHON_SUPPORT:BOOL=${OpenCV_BUILD_NEW_PYTHON_SUPPORT}
+      DEPENDS ${proj_DEPENDENCIES}
+      )
 
-ENDIF()
+    SET(OpenCV_DIR ${CMAKE_CURRENT_BINARY_DIR}/${proj}-build)
+
+  ELSE()
+
+    mitkMacroEmptyExternalProject(${proj} "${proj_DEPENDENCIES}")
+
+  ENDIF()
+
+endif()
+
+endif()

@@ -1,36 +1,42 @@
 macro(GetLinuxDistribution)
 
-if( UNIX )
+message("determin linux distribution")
+execute_process(COMMAND lsb_release -a OUTPUT_VARIABLE _out ERROR_VARIABLE _err RESULT_VARIABLE _result)
 
-execute_process(COMMAND lsb_release -a OUTPUT_VARIABLE _out)
-message("********************")
+string(COMPARE EQUAL "${_out}" "" _ok)
 
-string(REPLACE "\\n" ";" _out ${_out})
+if(_ok)
+  string(REGEX REPLACE "\n" ";" _out ${_err})
+else()
+  string(REGEX REPLACE "\n" ";" _out ${_out})
+endif()
 
 foreach(_i ${_out})
-    message("************")
-    message("${_i}")
+
   if("${_i}" MATCHES "^[Rr][Ee][Ll][Ee][Aa][Ss][Ee].*")
-    message("1release: ${_i}")
-    string(REPLACE ":" ";" _i ${_i})
-    message("2release: ${_i}")
-    list(GET ${_i} -1 _i)
-    message("3release: ${_i}")
-    string(STRIP ${_i} _i)
-    message("4release: ${_i}")
+    string(REGEX REPLACE ":" ";" _i ${_i})
+    list(GET _i -1 _i)
+    string(STRIP ${_i} _release)
+    message("release: ${_release}")
   endif()
+
+  if("${_i}" MATCHES "^[Dd][Ii][Ss][Tt][Rr][Ii][Bb][Uu][Tt][Oo][Rr].*")
+    string(REGEX REPLACE ":" ";" _i ${_i})
+    list(GET _i -1 _i)
+    string(STRIP ${_i} _distrib)
+    message("distibutor: ${_distrib}")
+  endif()
+
 endforeach(_i)
 
-#string(REGEX REPLACE ".*Distributor ID:[^0-9a-zA-Z]*([0-9a-zA-Z]+).*" "\\1" dis_id "${test}")
-#message("dis_id: ${dis_id}")
+string(COMPARE EQUAL "${_distrib}" "" _ok1)
+string(COMPARE EQUAL "${_release}" "" _ok2)
 
-#string(REGEX REPLACE ".*Release:[ \\t]*(.*)\\n+.*" "\\1" release "${test}")
-# ([0-9]+.[0-9]+).*" "\\1" release "${test}")
-#message("release: ${release}")
-
-SET(LINUX_DISTRIBUTION ${dis_id})
-SET(LINUX_RELEASE ${release})
-
+if(${_ok1} OR ${_ok2})
+  message(SEND_ERROR "could not determine linux release!")
 endif()
+
+SET(LINUX_DISTRIBUTION ${_distrib})
+SET(LINUX_RELEASE ${_release})
 
 endmacro()

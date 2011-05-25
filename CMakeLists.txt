@@ -195,6 +195,7 @@ include(mitkMacroInstall)
 include(mitkMacroInstallHelperApp)
 include(mitkMacroInstallTargets)
 include(mitkMacroGenerateToolsLibrary)
+include(mitkMacroGetLinuxDistribution)
 
 #-----------------------------------------------------------------------------
 # Prerequesites

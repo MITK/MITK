@@ -95,10 +95,15 @@ public:
   /**
    * \brief All images found when traversing the (sub-) tree starting at
    * \a iterator which are resliced by an ImageMapperGL2D will be mapped.
+   * This method is used to set the data storage to traverse. This offers
+   * the possibility to use this mapper for other data storages (not only
+   * the default data storage).
    */
   virtual void SetDataStorageForTexture(mitk::DataStorage* storage);
 
 protected:
+
+  typedef std::multimap< int, vtkActor * > LayerSortedActorList;
 
   Geometry2DDataVtkMapper3D();
 
@@ -106,36 +111,7 @@ protected:
 
   virtual void GenerateData(BaseRenderer* renderer);
 
-  typedef std::multimap< int, vtkActor * > LayerSortedActorList;
-
   void ProcessNode( DataNode * node, BaseRenderer* renderer, Surface * surface, LayerSortedActorList &layerSortedActors );
-
-  /*
-   * \brief Construct an extended lookup table from the given one.
-   *
-   * In order to overlay differently sized images over each other, it is
-   * necessary to have a special translucent value, so that the empty
-   * surroundings of the smaller image do not occlude the bigger image.
-   *
-   * The smallest possible short (-32768) is used for this. Due to the
-   * implementation of vtkLookupTable, the lookup table needs to be extended
-   * so that this value is included. Entries between -32768 and the actual
-   * table minimum will be set to the lowest entry in the input lookup table.
-   * From this point onward, the input lookup is just copied into the output
-   * lookup table.
-   *
-   * See also mitk::ImageMapperGL2D, where -32768 is defined as BackgroundLevel
-   * for resampling.
-   *
-   * NOTE: This method is currently not used; to make sure that the plane is
-   * not rendered with translucent "holes", a black background plane is first
-   * rendered under all other planes.
-   */
-  //virtual void BuildPaddedLookupTable(
-  //  vtkLookupTable *inputLookupTable, vtkLookupTable *outputLookupTable,
-  //  vtkFloatingPointType min, vtkFloatingPointType max );
-
-  int FindPowerOfTwo( int i );
 
   void ImageMapperDeletedCallback( itk::Object *caller, const itk::EventObject &event );
 
@@ -246,7 +222,6 @@ protected:
 
   /** \brief List holding some lookup table properties of the previous pass */
   LookupTablePropertiesList m_LookupTableProperties;
-
 
   // responsiblity to remove the observer upon its destruction
   typedef itk::MemberCommand< Geometry2DDataVtkMapper3D > MemberCommandType;

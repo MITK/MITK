@@ -203,22 +203,11 @@ namespace mitk
 
   void Geometry2DDataVtkMapper3D::SetDataStorageForTexture(mitk::DataStorage* storage)
   {
-    if (storage != NULL && m_DataStorage != storage )
+    if(storage != NULL && m_DataStorage != storage )
     {
       m_DataStorage = storage;
       this->Modified();
     }
-  }
-
-  int Geometry2DDataVtkMapper3D::FindPowerOfTwo( int i )
-  {
-    int size;
-
-    for ( --i, size = 1; i > 0; size *= 2 )
-    {
-      i /= 2;
-    }
-    return size;
   }
 
   void Geometry2DDataVtkMapper3D::ImageMapperDeletedCallback(
@@ -281,7 +270,7 @@ namespace mitk
       if ( (surfacecreatorprop.IsNull())
         || (surfacecreatorprop->GetSmartPointer().IsNull())
         || ((m_SurfaceCreator = dynamic_cast<Geometry2DDataToSurfaceFilter*>
-           (surfacecreatorprop->GetSmartPointer().GetPointer())).IsNull() ) )
+             (surfacecreatorprop->GetSmartPointer().GetPointer())).IsNull() ) )
         {
         m_SurfaceCreator->PlaceByGeometryOn();
         surfacecreatorprop = SmartPointerProperty::New( m_SurfaceCreator );

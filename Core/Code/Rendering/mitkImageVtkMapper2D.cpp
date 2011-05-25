@@ -812,39 +812,19 @@ void mitk::ImageVtkMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
   bool textureInterpolation = false;
   GetDataNode()->GetBoolProperty( "texture interpolation", textureInterpolation, renderer );
   rendererInfo.m_TextureInterpolation = textureInterpolation;
-  if(textureInterpolation)
-  { //texture interpolation on
-    localStorage->m_Texture->InterpolateOn();
-  }
-  else
-  { //texture interpolation off
-    localStorage->m_Texture->InterpolateOff();
-  }
+
+  //set the interpolation modus according to the property
+  localStorage->m_Texture->SetInterpolate(textureInterpolation);
+
   //do not repeat the texture (the image)
   localStorage->m_Texture->RepeatOff();
-
-//  //get the opacity and set it for the actor
-//  float opacity = 0;
-//  GetOpacity(opacity, renderer);
-//  localStorage->m_Actor->GetProperty()->SetOpacity(opacity);
-
-//  //get the color and set it for the actor
-//  float rgb[3] = { 1.0f, 1.0f, 1.0f };
-//  GetColor( rgb, renderer );
-//  double rgbConv[3] = {(double)rgb[0], (double)rgb[1], (double)rgb[2]};
-//  localStorage->m_Actor->GetProperty()->SetColor(rgbConv);
-
-  //    bool binary = false;
-  //    this->GetDataNode()->GetBoolProperty( "binary", binary, renderer );
-  //  if( binary )
-  //  {
-
 
   float rgba[4]= { 1.0f, 1.0f, 1.0f, 1.0f };
   float opacity = 1.0f;
 
   // check for color prop and use it for rendering if it exists
   // binary image hovering & binary image selection
+  //TODO do we need this?
   bool hover    = false;
   bool selected = false;
   GetDataNode()->GetBoolProperty("binaryimage.ishovering", hover, renderer);
@@ -873,6 +853,7 @@ void mitk::ImageVtkMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
   {
     GetColor( rgba, renderer );
   }
+  //END TODO do we need this?
 
   // check for opacity prop and use it for rendering if it exists
   GetOpacity( opacity, renderer );
@@ -881,16 +862,27 @@ void mitk::ImageVtkMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
 //  mitk::LevelWindow levelWindow;
   mitk::LevelWindow opacLevelWindow;
 
+  //binary image handling
   bool binary = false;
   this->GetDataNode()->GetBoolProperty( "binary", binary, renderer );
-
+  localStorage->m_Texture->SetMapColorScalarsThroughLookupTable(binary);
   if ( binary )
   {    
-    localStorage->m_Texture->MapColorScalarsThroughLookupTableOn();
-
 //    image->setExtrema(0, 1);
-//    image->setOpacityExtrema( 0.0, 255.0 );
-//    image->setBinary(true);
+//    image->setOpacityExtrema( 0.0, 255.0 );//    image->setBinary(true);
+
+    localStorage->m_LookupTable->SetSaturationRange( 0.0, 0.0 );
+    localStorage->m_LookupTable->SetHueRange( 0.0, 0.0 );
+    localStorage->m_LookupTable->SetValueRange( 0.0, 1.0 );
+//    localStorage->m_LookupTable->SetAlphaRange();
+//    localStorage->m_LookupTable->SetRange( 0.0, 1.0 );
+    localStorage->m_LookupTable->Build();
+    localStorage->m_LookupTable->SetTableValue(0, 0.0, 0.0, 0.0, 0.0);
+    localStorage->m_LookupTable->SetTableValue(1, rgba[0], rgba[1], rgba[2], rgba[3]);
+
+
+    //set the lookuptable for the texture
+    localStorage->m_Texture->SetLookupTable( localStorage->m_LookupTable );
 
     bool binaryOutline = false;
     if ( this->GetInput()->GetPixelType().GetBpe() <= 8 )
@@ -909,10 +901,10 @@ void mitk::ImageVtkMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
     {
       MITK_WARN << "Type of all binary images should be (un)signed char. Outline does not work on other pixel types!";
     }
-  }
+  } //END binary image handling
   else
   {
-    localStorage->m_Texture->MapColorScalarsThroughLookupTableOff();
+//    localStorage->m_Texture->MapColorScalarsThroughLookupTableOff();
     LevelWindow levelWindow;
     if( !this->GetLevelWindow( levelWindow, renderer, "levelWindow" ) )
     {
@@ -933,8 +925,8 @@ void mitk::ImageVtkMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
       localStorage->m_LookupTable->SetSaturationRange( 0.0, 0.0 );
       localStorage->m_LookupTable->SetHueRange( 0.0, 0.0 );
       localStorage->m_LookupTable->SetValueRange( 0.0, 1.0 );
-      localStorage->m_LookupTable->SetRange( windowMin, windowMax );
-      localStorage->m_LookupTable->Build();
+      localStorage->m_LookupTable->SetRange( windowMin, windowMax );      
+      localStorage->m_LookupTable->Build();      
 
 
       //set the lookuptable for the texture

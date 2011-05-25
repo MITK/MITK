@@ -113,3 +113,16 @@
   
   \brief This group includes all MITK Plugins
 */
+
+/**
+  \page MITKProperties MITK Properties
+  
+  Very general information on MITK properties and an overview of some which are not specific to a certain module can be found in \ref PropertiesPage .
+  
+  For more specific information on a properties introduced by a certain module consults the appropriate module page.
+  
+  See also:
+  
+  \subpage PropertiesPage
+  
+*/

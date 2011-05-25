@@ -1,0 +1,102 @@
+/**
+\page PropertiesPage The MITK Property Concept
+
+\section PropertyConcept The Concept Behind MITK Properties
+
+TODO:
+What information to they contain?
+Why use them?
+How to use them?
+What should not be stored in there?
+Where can they be accessed?
+
+\section ListOfIndependentProperty A List Of Module Independent Properties
+
+TODO:
+\subsection FileManagement File Management
+  path - The physical path the file was loaded from
+  name - The node name in the datamanager
+  selected - Whether the node is selected in the datamanager
+
+\subsection GenericRenderingProperty Generic Rendering Properties
+color - color the surface, grey value image, whatever should be rendered in
+(usually white)
+in plane resample extent by geometry - Toggles:
+         Resampling grid corresponds to the current world geometry. This
+         means that the spacing of the output 2D image depends on the
+         currently selected world geometry, and *not* on the image itself.
+
+         Resampling grid corresponds to the input geometry. This means that
+         the spacing of the output 2D image is directly derived from the
+         associated input image, regardless of the currently selected world
+         geometry.
+layer - controls what image is considered "on top" of another in case two
+should inhabit the same space, higher layer occludes lower layer
+levelwindow - contains the level window of the image
+LookupTable - contains lookuptable for use in coloring image
+opacity - alpha value of the node/image/surface
+reslice interpolation - Select interpolation mode (Nearest, Linear, Cubic)
+texture interpolation - toggle interpolation
+TransferFunction - contains transfer function for use in coloring image
+use color - Toggle whether LUT is used (off) or not (on) - Should be redone and
+renamed, this is counterintuitive
+visible - toggle node/image/surface being rendered at all
+
+\subsection SurfaceRenderingProperties Surface Rendering Properties
+..Surfacerendering:
+back color - in 2D, color of the normals outside the surface
+back normal lenth (px) - in 2D, length of the normals in pixels - Missing "g"?
+(When decreasing it the color using the front color is shorter?)
+draw normals 2d - Boolean: in 2D, toggles the presence of normals
+front color - in 2D, color of the normals inside the surface
+front normal lenth (px) - in 2D, length of the normals in pixels - Missing "g"?
+(When decreasing it the color using the back color is shorter?)
+invert normals - in 2D, switch front/back normals
+line width - in 2D, controls the thickness of the line where the surface
+intersects the plane (and normals)
+material.ambientCoefficient - in 3D ambient lighting
+material.diffuseCoefficient - in 3D scattering of light
+material.interpolation - Choose which interpolation algorithm to use for
+surface construction
+material.representation - Choose the representation to draw the mesh in
+(Surface, Wireframe, Point Cloud)
+material.specularCoefficient - in-/decrease non-scattered reflection
+material.specularPower - control percentage of non-scattered reflection - ???
+difference to specularCoefficient?
+material.wireframeLineWidth - width of the wires if wireframe representation is
+selected
+shader - which shader to use for surface rendering, currently the options are
+"fixed" and "mitkShaderLightning"
+
+\subsection VolumeRenderingProperties Volume Rendering Properties
+volumerendering - Boolean: Should the volume be rendered or not
+volumerendering configuration - Choice between Composite und MIP - ???
+volumerendering.cpu.ambient - ambient lighting
+volumerendering.cpu.diffuse - in-/decrease light dispersion
+volumerendering.cpu.specular - in-/decrease non-scattered reflection
+volumerendering.cpu.specular.power - control percentage of non-scattered
+reflection - ??? difference to just specular?
+volumerendering.gpu.ambient - same as cpu with gpu
+volumerendering.gpu.diffuse - same as cpu with gpu
+volumerendering.gpu.reducesliceartifacts - presumably what the name suggests -
+???
+volumerendering.gpu.specular - same as cpu with gpu
+volumerendering.gpu.specular.power - same as cpu with gpu
+volumerendering.gpu.usetexturecompression - presumably what the name suggests -
+???
+volumerendering.ray.ambient - same as cpu with ray
+volumerendering.ray.diffuse - same as cpu with ray
+volumerendering.ray.specular - same as cpu with ray
+volumerendering.ray.specular.power - same as cpu with ray
+volumerendering.usegpu - Boolean: Whether to use the GPU for rendering or not
+volumerendering.uselod - Boolean: Whether to use the Level Of Detail mechanism
+or not
+volumerendering.usemip - Boolean: Whether to utilize maximum intensity
+projection
+volumerendering.useray - Boolean: Whether to use raycasting or not
+
+Additional comment:
+uselod can be active with usegpu, usemip, useray, but any of the latter can not
+be used with another one of them.
+
+*/

@@ -193,7 +193,7 @@ void mitk::PlanarFigureMapper2D::Paint( mitk::BaseRenderer *renderer )
     bool firstActiveFeature = true;
     for ( unsigned int i = 0; i < planarFigure->GetNumberOfFeatures(); ++i )
     {     
-      if( planarFigure->IsFeatureActive(i) )
+      if( planarFigure->IsFeatureActive(i) && planarFigure->IsFeatureVisible( i ) )
       {
         if ( ! firstActiveFeature ) 
         {

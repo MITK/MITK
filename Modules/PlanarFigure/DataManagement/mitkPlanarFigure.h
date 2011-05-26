@@ -219,6 +219,13 @@ public:
   * polygon. */
   bool IsFeatureActive( unsigned int index ) const;
 
+  /** \brief Returns true if the feature with the specified index exists and is set visible */
+  bool IsFeatureVisible( unsigned int index ) const;
+  
+  /** \brief Defines if the feature with the specified index will be shown as an 
+  * overlay in the RenderWindow */
+  void SetFeatureVisible( unsigned int index, bool visible );
+
 
   /** \brief Calculates quantities of all features of this planar figure. */
   virtual void EvaluateFeatures();
@@ -363,7 +370,7 @@ private:
   struct Feature
   {
     Feature( const char *name, const char *unit ) 
-    : Name( name ), Unit( unit ), Quantity( 0.0 ), Active( true )
+    : Name( name ), Unit( unit ), Quantity( 0.0 ), Active( true ), Visible( true )
     {
     };
 
@@ -371,6 +378,7 @@ private:
     std::string Unit;
     double Quantity;
     bool Active;
+    bool Visible;
   };
 
   Geometry2D *m_Geometry2D;

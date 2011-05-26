@@ -368,6 +368,26 @@ bool mitk::PlanarFigure::IsFeatureActive( unsigned int index ) const
   }
 }
 
+bool mitk::PlanarFigure::IsFeatureVisible( unsigned int index ) const
+{
+  if ( index < m_Features.size() )
+  {
+    return m_Features[index].Visible;
+  }
+  else
+  {
+    return false;
+  }
+}
+
+void mitk::PlanarFigure::SetFeatureVisible( unsigned int index, bool visible )
+{
+  if ( index < m_Features.size() )
+  {
+    m_Features[index].Visible = visible;
+  }
+}
+
 
 void mitk::PlanarFigure::EvaluateFeatures()
 {
@@ -663,3 +683,4 @@ void mitk::PlanarFigure::AppendPointToHelperPolyLine( unsigned int index, PolyLi
     MITK_ERROR << "Tried to add point to HelperPolyLine " << index+1 << ", although only " << m_HelperPolyLines.size() << " exists";
   }
 }
+

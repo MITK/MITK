@@ -9,8 +9,6 @@ if (UNIX)
   GetLinuxDistribution()
 
   if("${LINUX_DISTRIBUTION}" MATCHES "^[Uu][Bb][Uu][Nn][Tt][Uu].*" AND "${LINUX_RELEASE}" MATCHES "11.04")
-
-    message("using system opencv")
     set(OpenCV_DIR "/usr/share/opencv/")
   else()
 

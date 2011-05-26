@@ -158,7 +158,17 @@ public:
         m_Actor = vtkSmartPointer<vtkActor>::New();
         m_TransformFilter = vtkSmartPointer<vtkTransformPolyDataFilter>::New();
         m_TransformMatrix = vtkSmartPointer<vtkMatrix4x4>::New();
-        //always the same actions for each render window:
+        //the following actions are always the same and thus can be performed
+        //in the constructor for each image (i.e. the image-corresponding local storage)
+
+        //built a default lookuptable
+        m_LookupTable->SetSaturationRange( 0.0, 0.0 );
+        m_LookupTable->SetHueRange( 0.0, 0.0 );
+        m_LookupTable->SetValueRange( 0.0, 1.0 );
+        m_LookupTable->Build();
+        //map all black values to transparent
+        m_LookupTable->SetTableValue(0, 0.0, 0.0, 0.0, 0.0);
+
         //set the mapper for the actor
         m_Actor->SetMapper(m_Mapper);
         //set the texture for the actor

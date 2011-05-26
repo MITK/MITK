@@ -859,131 +859,110 @@ void mitk::ImageVtkMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
   GetOpacity( opacity, renderer );
   rgba[3] = opacity;
 
-//  mitk::LevelWindow levelWindow;
-  mitk::LevelWindow opacLevelWindow;
-
   //binary image handling
   bool binary = false;
   this->GetDataNode()->GetBoolProperty( "binary", binary, renderer );
   localStorage->m_Texture->SetMapColorScalarsThroughLookupTable(binary);
   if ( binary )
   {    
-//    image->setExtrema(0, 1);
-//    image->setOpacityExtrema( 0.0, 255.0 );//    image->setBinary(true);
-
-    localStorage->m_LookupTable->SetSaturationRange( 0.0, 0.0 );
-    localStorage->m_LookupTable->SetHueRange( 0.0, 0.0 );
-    localStorage->m_LookupTable->SetValueRange( 0.0, 1.0 );
-//    localStorage->m_LookupTable->SetAlphaRange();
-//    localStorage->m_LookupTable->SetRange( 0.0, 1.0 );
-    localStorage->m_LookupTable->Build();
-    localStorage->m_LookupTable->SetTableValue(0, 0.0, 0.0, 0.0, 0.0);
+    localStorage->m_LookupTable->SetAlphaRange(0.0, 1.0);
+    //0 is already mapped to transparent.
+    //1 is now mapped to the current color and alpha
     localStorage->m_LookupTable->SetTableValue(1, rgba[0], rgba[1], rgba[2], rgba[3]);
-
-
-    //set the lookuptable for the texture
-    localStorage->m_Texture->SetLookupTable( localStorage->m_LookupTable );
 
     bool binaryOutline = false;
     if ( this->GetInput()->GetPixelType().GetBpe() <= 8 )
     {
       if (this->GetDataNode()->GetBoolProperty( "outline binary", binaryOutline, renderer ))
       {
-//        image->setOutline(binaryOutline);
+        //        image->setOutline(binaryOutline);
         float binaryOutlineWidth(1.0);
         if (this->GetDataNode()->GetFloatProperty( "outline width", binaryOutlineWidth, renderer ))
         {
-//          image->setOutlineWidth(binaryOutlineWidth);
+          //          image->setOutlineWidth(binaryOutlineWidth);
         }
       }
     }
     else
     {
+      //TODO still true for MITK with VTK rendering?
       MITK_WARN << "Type of all binary images should be (un)signed char. Outline does not work on other pixel types!";
     }
   } //END binary image handling
   else
   {
-//    localStorage->m_Texture->MapColorScalarsThroughLookupTableOff();
+    //TODO this is stupid and should be removed (we only need "levelwindow")
     LevelWindow levelWindow;
     if( !this->GetLevelWindow( levelWindow, renderer, "levelWindow" ) )
     {
       this->GetLevelWindow( levelWindow, renderer );
     }
-//    image->setExtrema( levelWindow.GetLowerWindowBound(), levelWindow.GetUpperWindowBound() );
 
+    ScalarType windowMin = 0.0;
+    ScalarType windowMax = 255.0;
 
-      ScalarType windowMin = 0.0;
-      ScalarType windowMax = 255.0;
-
-      //get the level window
+    //get the level window
     //  GetLevelWindow(levelWindow, renderer);
-      windowMin = levelWindow.GetLowerWindowBound();
-      windowMax = levelWindow.GetUpperWindowBound();
+    windowMin = levelWindow.GetLowerWindowBound();
+    windowMax = levelWindow.GetUpperWindowBound();
 
-      //set up the lookuptable with the level window range
-      localStorage->m_LookupTable->SetSaturationRange( 0.0, 0.0 );
-      localStorage->m_LookupTable->SetHueRange( 0.0, 0.0 );
-      localStorage->m_LookupTable->SetValueRange( 0.0, 1.0 );
-      localStorage->m_LookupTable->SetRange( windowMin, windowMax );      
-      localStorage->m_LookupTable->Build();      
+    //set up the lookuptable with the level window range
+    localStorage->m_LookupTable->SetRange( windowMin, windowMax );
 
-
-      //set the lookuptable for the texture
-      localStorage->m_Texture->SetLookupTable( localStorage->m_LookupTable );
-
-    // obtain opacity level window
+    // obtain and apply opacity level window
+    mitk::LevelWindow opacLevelWindow;
     if( this->GetLevelWindow( opacLevelWindow, renderer, "opaclevelwindow" ) )
     {
-      MITK_INFO << "opace " << opacLevelWindow.GetLowerWindowBound() << " " << opacLevelWindow.GetUpperWindowBound();
-//      image->setOpacityExtrema( opacLevelWindow.GetLowerWindowBound(), opacLevelWindow.GetUpperWindowBound() );
-//      localStorage->m_LookupTable->SetRange(opacLevelWindow.GetLowerWindowBound(), opacLevelWindow.GetLowerWindowBound());
+      localStorage->m_LookupTable->SetAlphaRange(opacLevelWindow.GetLowerWindowBound()/255.0, opacLevelWindow.GetLowerWindowBound()/255.0);
     }
     else
     {
-//      image->setOpacityExtrema( 0.0, 255.0 );
-//      localStorage->m_LookupTable->SetRange(0.0, 255.0);
+      localStorage->m_LookupTable->SetAlphaRange(0.0, 1.0);
     }
   }
 
-  bool useColor = false;
-  GetDataNode()->GetBoolProperty( "use color", useColor, renderer );
-  mitk::LookupTableProperty::Pointer LookupTableProp;
+  //use color means that we want to use the color from the property list and not a lookuptable
+  bool useColor = true;
+  this->GetDataNode()->GetBoolProperty( "use color", useColor, renderer );
 
-  if ( !useColor )
+  //BEGIN PROPERTY user-defined lut
+  //currently we do not allow a lookuptable if it is a binary image
+  if((!useColor) && (!binary))
   {
-    LookupTableProp = dynamic_cast<mitk::LookupTableProperty*>(
-        this->GetDataNode()->GetProperty("LookupTable"));
-
+    // If lookup table use is requested...
+    mitk::LookupTableProperty::Pointer LookupTableProp;
+    LookupTableProp = dynamic_cast<mitk::LookupTableProperty*>
+                      (this->GetDataNode()->GetProperty("LookupTable"));
+    //...check if there is a lookuptable provided by the user
     if ( LookupTableProp.IsNull() )
     {
-      useColor = true;
+      MITK_WARN << "The use of a lookuptable is requested, but there is no lookuptable supplied by the user! The default lookuptable will be used instead.";
     }
-  }
+    else
+    {
+      // If lookup table use is requested and supplied by the user:
+      // only update the lut, when the properties have changed...
+      if( LookupTableProp->GetLookupTable()->GetMTime()
+        <= this->GetDataNode()->GetPropertyList()->GetMTime() )
+        {
+        LookupTableProp->GetLookupTable()->ChangeOpacityForAll( opacity );
+        LookupTableProp->GetLookupTable()->ChangeOpacity(0, 0.0);
+      }
+      //    image->setColors(LookupTableProp->GetLookupTable()->GetRawLookupTable());
+      //TODO figure out if this is the same as setting up the table or do we need to set the color and opacity of the actor?
+      //we use the user defined lookuptable
+      localStorage->m_Texture->SetLookupTable(LookupTableProp->GetLookupTable()->GetVtkLookupTable());
+      return; //User-defined lut is used. We can return here.
+    }
+  } //END PROPERTY user-defined lut
 
-  if ( useColor || binary )
-  {
-    // If lookup table use is NOT requested (or we have a binary image...):
-//    image->setColor( rgba[0], rgba[1], rgba[2], rgba[3] );
-      double rgbConv[3] = {(double)rgba[0], (double)rgba[1], (double)rgba[2]};
-      localStorage->m_Actor->GetProperty()->SetColor(rgbConv);
-      localStorage->m_Actor->GetProperty()->SetOpacity(rgba[3]);
-//      localStorage->m_Texture->SetLookupTable( localStorage->m_LookupTable );
-//      localStorage->m_LookupTable->Build();
-  }
-  else
-  {
-    // If lookup table use is requested:
-    // only update the lut, when the properties have changed...
-    if ( LookupTableProp->GetLookupTable()->GetMTime()
-      <= this->GetDataNode()->GetPropertyList()->GetMTime() )
-      {
-      LookupTableProp->GetLookupTable()->ChangeOpacityForAll( opacity );
-      LookupTableProp->GetLookupTable()->ChangeOpacity(0, 0.0);
-    }
-//    image->setColors(LookupTableProp->GetLookupTable()->GetRawLookupTable());
-    localStorage->m_Texture->SetLookupTable(LookupTableProp->GetLookupTable()->GetVtkLookupTable());
-  }
+  //If lookup table use is NOT requested (or we have a binary image)
+  //we use the internal lookuptable for binary images or level window
+  localStorage->m_Texture->SetLookupTable( localStorage->m_LookupTable );
+  //set the color and the opacity according to the properties
+  double rgbConv[3] = {(double)rgba[0], (double)rgba[1], (double)rgba[2]}; //conversion to double for VTK
+  localStorage->m_Actor->GetProperty()->SetColor(rgbConv);
+  localStorage->m_Actor->GetProperty()->SetOpacity(rgba[3]);
 }
 
 void mitk::ImageVtkMapper2D::Update(mitk::BaseRenderer* renderer)

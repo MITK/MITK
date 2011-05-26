@@ -1,6 +1,5 @@
 macro(GetLinuxDistribution)
 
-message("determin linux distribution")
 execute_process(COMMAND lsb_release -a OUTPUT_VARIABLE _out ERROR_VARIABLE _err RESULT_VARIABLE _result)
 
 string(COMPARE EQUAL "${_out}" "" _ok)
@@ -17,14 +16,12 @@ foreach(_i ${_out})
     string(REGEX REPLACE ":" ";" _i ${_i})
     list(GET _i -1 _i)
     string(STRIP ${_i} _release)
-    message("release: ${_release}")
   endif()
 
   if("${_i}" MATCHES "^[Dd][Ii][Ss][Tt][Rr][Ii][Bb][Uu][Tt][Oo][Rr].*")
     string(REGEX REPLACE ":" ";" _i ${_i})
     list(GET _i -1 _i)
     string(STRIP ${_i} _distrib)
-    message("distibutor: ${_distrib}")
   endif()
 
 endforeach(_i)

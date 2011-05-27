@@ -17,7 +17,7 @@
 
 #include "berryQtPluginActivator.h"
 
-#include "internal/berryQtStyleManager.h"
+#include "berryQtStyleManager.h"
 
 #include "berryQtDnDTweaklet.h"
 #include "berryQtImageTweaklet.h"
@@ -29,6 +29,16 @@
 #include "defaultpresentation/berryQtWorkbenchPresentationFactory.h"
 
 namespace berry {
+
+QtPluginActivator::QtPluginActivator()
+{
+
+}
+
+QtPluginActivator::~QtPluginActivator()
+{
+
+}
 
 void
 QtPluginActivator::start(ctkPluginContext* context)
@@ -48,6 +58,7 @@ QtPluginActivator::start(ctkPluginContext* context)
   QtStyleManager* manager = new QtStyleManager();
   styleManager = IQtStyleManager::Pointer(manager);
   context->registerService<berry::IQtStyleManager>(manager);
+
 }
 
 void QtPluginActivator::stop(ctkPluginContext* context)

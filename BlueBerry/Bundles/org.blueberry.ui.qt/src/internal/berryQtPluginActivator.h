@@ -32,12 +32,16 @@ class QtPluginActivator : public QObject, public AbstractUICTKPlugin
 
 public:
 
+  QtPluginActivator();
+  ~QtPluginActivator();
+
   void start(ctkPluginContext* context);
   void stop(ctkPluginContext* context);
 
 private:
 
   IQtStyleManager::Pointer styleManager;
+
 };
 
 }

@@ -51,8 +51,8 @@ typename S::Pointer ServiceRegistry::GetServiceById(const std::string& id)
       {
         return SmartPointer<S>();
       }
-      BERRY_WARN << "Getting a CTK Service object through the BlueBerry service registry.\n"
-                    "You should use a ctkPluginContext or ctkServiceTracker instance instead!";
+      //BERRY_WARN << "Getting a CTK Service object through the BlueBerry service registry.\n"
+      //              "You should use a ctkPluginContext or ctkServiceTracker instance instead!";
       return typename S::Pointer(service);
     }
     catch (const ctkServiceException& exc)

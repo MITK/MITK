@@ -41,6 +41,18 @@ MACRO(MACRO_CREATE_CTK_PLUGIN)
     SET(is_test_plugin)
   ENDIF()
 
+  #------------------------------------------------------------#
+  #------------------ Qt Help support -------------------------#
+
+  SET(PLUGIN_GENERATED_QCH_FILES )
+  IF (BLUEBERRY_USE_QT_HELP AND
+      EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/documentation/UserManual")
+    SET(PLUGIN_DOXYGEN_INPUT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/documentation/UserManual")
+    SET(PLUGIN_DOXYGEN_OUTPUT_DIR "${CMAKE_CURRENT_BINARY_DIR}/documentation/UserManual")
+    _FUNCTION_CREATE_CTK_QT_COMPRESSED_HELP(PLUGIN_GENERATED_QCH_FILES )
+    LIST(APPEND _PLUGIN_CACHED_RESOURCE_FILES ${PLUGIN_GENERATED_QCH_FILES})
+  ENDIF()
+
   # Compute the plugin dependencies
   ctkFunctionGetTargetLibraries(_PLUGIN_target_libraries)
 
@@ -70,18 +82,6 @@ MACRO(MACRO_CREATE_CTK_PLUGIN)
     optimized PocoUtil debug PocoUtild
     optimized PocoXML debug PocoXMLd
   )
-
-
-  #------------------------------------------------------------#
-  #------------------ Qt Help support -------------------------#
-  
-  SET(PLUGIN_GENERATED_QCH_FILES )
-  IF (BLUEBERRY_USE_QT_HELP AND
-      EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/documentation/UserManual")
-    SET(PLUGIN_DOXYGEN_INPUT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/documentation/UserManual")
-    SET(PLUGIN_DOXYGEN_OUTPUT_DIR "${CMAKE_CURRENT_BINARY_DIR}/documentation/UserManual")
-    _MACRO_CREATE_QT_COMPRESSED_HELP(PLUGIN_GENERATED_QCH_FILES )
-  ENDIF()
 
   SET(_PLUGIN_META_FILES "${CMAKE_CURRENT_SOURCE_DIR}/manifest_headers.cmake")
   IF(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/plugin.xml")

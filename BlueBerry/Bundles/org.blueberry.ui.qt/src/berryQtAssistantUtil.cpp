@@ -38,9 +38,14 @@ QString QtAssistantUtil::helpCollectionFile;
 QString QtAssistantUtil::defaultHelpUrl;
 QStringList QtAssistantUtil::registeredBundles;
 
-void QtAssistantUtil::SetHelpColletionFile(const QString& file)
+void QtAssistantUtil::SetHelpCollectionFile(const QString& file)
 {
   helpCollectionFile = file;
+}
+
+QString QtAssistantUtil::GetHelpCollectionFile()
+{
+  return helpCollectionFile;
 }
 
 void QtAssistantUtil::OpenActivePartHelp()
@@ -112,28 +117,20 @@ void QtAssistantUtil::CloseAssistant()
   delete assistantProcess;
 }
 
-bool QtAssistantUtil::RegisterQCHFiles(const QString& collectionFile,
-    const std::vector<IBundle::Pointer>& bundles)
+bool QtAssistantUtil::RegisterQCHFiles(const std::vector<IBundle::Pointer>& bundles)
 {
   QStringList qchFiles = ExtractQCHFiles(bundles);
-  return CallQtAssistant(collectionFile, qchFiles);
+  return CallQtAssistant(qchFiles);
 }
 
-bool QtAssistantUtil::RegisterQCHFiles(const QString& collectionFile,
-                                       const std::vector<IBundle::Pointer>& bundles,
-                                       const QList<QSharedPointer<ctkPlugin> >& plugins)
+bool QtAssistantUtil::RegisterQCHFiles(const QStringList& qchFiles)
 {
-  QStringList qchFiles = ExtractQCHFiles(plugins);
-  qchFiles << ExtractQCHFiles(bundles);
-
-  return CallQtAssistant(collectionFile, qchFiles);
+  return CallQtAssistant(qchFiles, true);
 }
 
-bool QtAssistantUtil::RegisterQCHFiles(const QString& collectionFile,
-                                       const QList<QSharedPointer<ctkPlugin> >& plugins)
+bool QtAssistantUtil::UnregisterQCHFiles(const QStringList& qchFiles)
 {
-  QStringList qchFiles = ExtractQCHFiles(plugins);
-  return CallQtAssistant(collectionFile, qchFiles);
+  return CallQtAssistant(qchFiles, false);
 }
 
 QStringList QtAssistantUtil::ExtractQCHFiles(const std::vector<IBundle::Pointer>& bundles)
@@ -167,28 +164,30 @@ QStringList QtAssistantUtil::ExtractQCHFiles(const std::vector<IBundle::Pointer>
   return result;
 }
 
-QStringList QtAssistantUtil::ExtractQCHFiles(const QList<QSharedPointer<ctkPlugin> >& plugins)
+bool QtAssistantUtil::CallQtAssistant(const QStringList& qchFiles, bool registerFile)
 {
-  // TODO
-  return QStringList();
-}
+  if (qchFiles.empty()) return true;
 
-bool QtAssistantUtil::CallQtAssistant(const QString& collectionFile, const QStringList& qchFiles)
-{
   bool success = true;
-
-  if (qchFiles.isEmpty())
-  {
-    BERRY_WARN << "No .qch files found. Help contents will not be available.";
-    return success;
-  }
 
   QList<QStringList> argsVector;
   foreach (QString qchFile, qchFiles)
   {
     QStringList args;
-    args << QLatin1String("-collectionFile") << collectionFile;
-    args << QLatin1String("-register") << qchFile;
+    if (!helpCollectionFile.isEmpty())
+    {
+      args << QLatin1String("-collectionFile") << helpCollectionFile;
+    }
+
+    if (registerFile)
+    {
+      args << QLatin1String("-register");
+    }
+    else
+    {
+      args << QLatin1String("-unregister");
+    }
+    args << qchFile;
     args << QLatin1String("-quiet");
     //BERRY_INFO << "Registering " << qchPath.toString() << " with " << collectionFile.toStdString();
     argsVector.push_back(args);

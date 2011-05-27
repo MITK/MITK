@@ -1,6 +1,7 @@
 SET(SRC_CPP_FILES
   berryIQtPreferencePage.cpp
   berryIQtStyleManager.cpp
+  berryQCHPluginListener.cpp
   berryQtAssistantUtil.cpp
   berryQModelIndexObject.cpp
   berryQtEditorPart.cpp
@@ -61,6 +62,7 @@ SET(INTERNAL_CPP_FILES
 )
 
 SET(MOC_H_FILES
+  src/berryQCHPluginListener.h
   src/berryQtSelectionProvider.h
   
   src/internal/defaultpresentation/berryNativeTabFolder.h

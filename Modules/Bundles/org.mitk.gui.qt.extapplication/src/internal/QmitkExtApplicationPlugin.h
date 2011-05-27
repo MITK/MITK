@@ -23,6 +23,8 @@
 
 #include <QString>
 
+#include <berryQCHPluginListener.h>
+
 class QmitkExtApplicationPlugin : public QObject, public berry::AbstractUICTKPlugin
 {
   Q_OBJECT
@@ -31,6 +33,7 @@ class QmitkExtApplicationPlugin : public QObject, public berry::AbstractUICTKPlu
 public:
 
   QmitkExtApplicationPlugin();
+  ~QmitkExtApplicationPlugin();
 
   static QmitkExtApplicationPlugin* GetDefault();
 
@@ -45,6 +48,9 @@ private:
   static QmitkExtApplicationPlugin* inst;
 
   ctkPluginContext* context;
+  berry::QCHPluginListener* pluginListener;
+
+  mutable QString helpCollectionFile;
 };
 
 #endif /* QMITKEXTAPPLICATIONPLUGIN_H_ */

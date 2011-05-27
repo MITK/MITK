@@ -118,7 +118,7 @@ public:
       else
       {
         BERRY_WARN << "Trying to create an executable extension (from "
-                   << this->GetDeclaringExtension()->GetUniqueIdentifier()
+                   << this->GetDeclaringExtension()->GetExtensionPointIdentifier()
                    << " in " << contributor << ") from a non-CTK plug-in. "
                       "Use the CreateExecutableExtension<C>(propertyName, manifestName) method instead.";
       }

@@ -35,6 +35,7 @@ QtOpenPerspectiveAction::QtOpenPerspectiveAction(
   this->setText(QString(descr->GetLabel().c_str()));
   this->setToolTip(QString(descr->GetLabel().c_str()));
   this->setCheckable(true);
+  this->setIconVisibleInMenu(true);
 
   group->addAction(this);
 

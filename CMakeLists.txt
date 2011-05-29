@@ -358,8 +358,6 @@ link_directories(${MITK_LINK_DIRECTORIES})
 
 add_subdirectory(Core)
 
-set(MITK_DEFAULT_SUBPROJECTS MITK-CoreUI)
-
 if(MITK_USE_QT AND QT4_FOUND)
   add_subdirectory(CoreUI/Qmitk)
 endif()
@@ -367,6 +365,8 @@ endif()
 add_subdirectory(Modules)
 
 if(MITK_USE_BLUEBERRY)
+
+  set(MITK_DEFAULT_SUBPROJECTS MITK-Plugins)
 
   set(mitk_core_plugins
     CoreUI/Bundles/org.mitk.core.services:ON

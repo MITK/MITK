@@ -10,8 +10,8 @@ function(FunctionCreateProvisioningInfo info_var out_dir)
     
     if(${${plugin_name_with_dirs}_option_name})
       set(out_var "${out_var}\nSTART ${plugin_url}")
-    else()
-      set(out_var "${out_var}\nSTOP ${plugin_url}")
+    #else()
+    #  set(out_var "${out_var}\nSTOP ${plugin_url}")
     endif()
   endforeach()
 

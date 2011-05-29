@@ -234,10 +234,13 @@ IF(BLUEBERRY_BUILD_TESTING)
   IF(APPLE AND _is_macosx_bundle) 
     SET(BLUEBERRY_TEST_APP "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${OSGI_APP}.app/Contents/MacOS/${OSGI_APP}")
   ENDIF()
-  
-  SET(_ctk_test_plugins
+
+  LIST(APPEND _ctk_plugins
     Bundles/org.blueberry.test:OFF
     Bundles/org.blueberry.uitest:OFF
+  )
+
+  SET(_ctk_test_plugins
     Testing/org.blueberry.core.runtime.tests:OFF
     Testing/org.blueberry.osgi.tests:OFF
   )
@@ -253,6 +256,8 @@ IF(BLUEBERRY_BUILD_TESTING)
   ENDIF()
 ENDIF()
 
+SET(BLUEBERRY_TESTING_PROVISIONING_FILE "${BlueBerry_BINARY_DIR}/BlueBerryTesting.provisioning")
+
 ADD_CUSTOM_TARGET(BlueBerry)
 
 ctkMacroSetupExternalPlugins(${_ctk_plugins} ${_ctk_test_plugins}
@@ -267,6 +272,14 @@ ENDIF()
 
 FunctionCreateProvisioningInfo(prov_info "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/plugins" ${_ctk_plugins})
 file(APPEND "${BLUEBERRY_PROVISIONING_FILE}" "${prov_info}")
+
+IF(EXISTS "${BLUEBERRY_TESTING_PROVISIONING_FILE}")
+  FILE(REMOVE "${BLUEBERRY_TESTING_PROVISIONING_FILE}")
+ENDIF()
+FunctionCreateProvisioningInfo(prov_testing_info "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/plugins" ${_ctk_plugins})
+file(APPEND "${BLUEBERRY_TESTING_PROVISIONING_FILE}" "${prov_testing_info}")
+FunctionCreateProvisioningInfo(prov_testing_info "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/test_plugins" ${_ctk_test_plugins})
+file(APPEND "${BLUEBERRY_TESTING_PROVISIONING_FILE}" "${prov_testing_info}")
 
 ctkMacroGetAllProjectTargetLibraries("${CTK_PLUGIN_LIBRARIES}" _enabled_plugin_targets)
 add_dependencies(BlueBerry ${_enabled_plugin_targets})

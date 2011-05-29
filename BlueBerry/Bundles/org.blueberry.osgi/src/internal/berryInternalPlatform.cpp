@@ -216,7 +216,7 @@ void InternalPlatform::Initialize(int& argc, char** argv, Poco::Util::AbstractCo
     // the real plugins as directories)
     std::vector<std::string> pluginBaseDirs;
 
-    Poco::StringTokenizer tokenizer(this->GetConfiguration().getString(Platform::ARG_PLUGIN_DIRS), ";",
+    Poco::StringTokenizer tokenizer(this->GetConfiguration().getString(Platform::ARG_PLUGIN_DIRS, ""), ";",
                                     Poco::StringTokenizer::TOK_IGNORE_EMPTY | Poco::StringTokenizer::TOK_TRIM);
 
     for (Poco::StringTokenizer::Iterator token = tokenizer.begin();

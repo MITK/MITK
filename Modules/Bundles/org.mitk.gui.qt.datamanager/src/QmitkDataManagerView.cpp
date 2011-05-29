@@ -92,6 +92,12 @@ QmitkDataManagerView::QmitkDataManagerView()
 {
 }
 
+QmitkDataManagerView::QmitkDataManagerView(const QmitkDataManagerView& other)
+{
+  Q_UNUSED(other)
+  throw std::runtime_error("Copy constructor not implemented");
+}
+
 
 QmitkDataManagerView::~QmitkDataManagerView()
 {

@@ -30,6 +30,7 @@ IF(MITK_USE_BLUEBERRY)
     org.mitk.gui.qt.diffusionimaging
     org.mitk.gui.qt.ext
     org.mitk.gui.qt.extapplication
+    org.mitk.gui.qt.datamanager
   )
 
   MACRO_COLLECT_PLUGINS(OUTPUT_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/ExtBundles

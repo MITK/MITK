@@ -20,17 +20,20 @@
 #define QMITKDATAMANAGERPREFERENCEPAGE_H_
 
 #include "berryIQtPreferencePage.h"
-#include "mitkQtDataManagerDll.h"
+#include <org_mitk_gui_qt_datamanager_Export.h>
 #include <berryIPreferences.h>
 
 class QWidget;
 class QCheckBox;
 
-struct MITK_QT_DATAMANAGER QmitkDataManagerPreferencePage : public berry::IQtPreferencePage
+struct MITK_QT_DATAMANAGER QmitkDataManagerPreferencePage : public QObject, public berry::IQtPreferencePage
 {
+  Q_OBJECT
+  Q_INTERFACES(berry::IPreferencePage)
 
 public:
   QmitkDataManagerPreferencePage();
+  QmitkDataManagerPreferencePage(const QmitkDataManagerPreferencePage& other);
 
   void Init(berry::IWorkbench::Pointer workbench);
 

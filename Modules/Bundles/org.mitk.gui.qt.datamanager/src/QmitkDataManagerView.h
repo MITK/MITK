@@ -36,7 +36,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <berryIPreferencesService.h>
 
 #include <mitkDataStorage.h>
-#include "mitkQtDataManagerDll.h"
+#include <org_mitk_gui_qt_datamanager_Export.h>
 
 // Forward declarations
 class QMenu;
@@ -69,6 +69,9 @@ public:
   /// \brief Standard ctor.
   ///
   QmitkDataManagerView();
+
+  QmitkDataManagerView(const QmitkDataManagerView& other);
+
   ///
   /// \brief Standard dtor.
   ///

@@ -368,25 +368,19 @@ if(MITK_USE_BLUEBERRY)
 
   set(MITK_DEFAULT_SUBPROJECTS MITK-Plugins)
 
-  set(mitk_core_plugins
-    CoreUI/Bundles/org.mitk.core.services:ON
-    CoreUI/Bundles/org.mitk.gui.common:ON
-    CoreUI/Bundles/org.mitk.gui.qt.common:ON
-    CoreUI/Bundles/org.mitk.gui.qt.application:ON
-  )
-  
-  set(mitk_ext_plugins
-    Modules/Bundles/org.mitk.core.ext:ON
-    Modules/Bundles/org.mitk.core.jobs:OFF
-    Modules/Bundles/org.mitk.diffusionimaging:OFF
-    Modules/Bundles/org.mitk.gui.qt.diffusionimaging:OFF
-    Modules/Bundles/org.mitk.gui.qt.ext:ON
-    Modules/Bundles/org.mitk.gui.qt.extapplication:ON
-    Modules/Bundles/org.mitk.planarfigure:ON
-    Modules/Bundles/org.mitk.gui.qt.datamanager:ON
-  )
+  include("${CMAKE_CURRENT_SOURCE_DIR}/CoreUI/Bundles/PluginList.cmake")
+  set(mitk_core_plugins_fullpath )
+  foreach(core_plugin ${MITK_CORE_PLUGINS})
+    list(APPEND mitk_core_plugins_fullpath CoreUI/Bundles/${core_plugin})
+  endforeach()
 
-  ctkMacroSetupExternalPlugins(${mitk_core_plugins} ${mitk_ext_plugins}
+  include("${CMAKE_CURRENT_SOURCE_DIR}/Modules/Bundles/PluginList.cmake")
+  set(mitk_ext_plugins_fullpath )
+  foreach(ext_plugin ${MITK_EXT_PLUGINS})
+    list(APPEND mitk_ext_plugins_fullpath Modules/Bundles/${ext_plugin})
+  endforeach()
+
+  ctkMacroSetupExternalPlugins(${mitk_core_plugins_fullpath} ${mitk_ext_plugins_fullpath}
                                BUILD_OPTION_PREFIX MITK_BUILD_
                                BUILD_ALL ${MITK_BUILD_ALL_PLUGINS}
                                COMPACT_OPTIONS)
@@ -397,7 +391,7 @@ if(MITK_USE_BLUEBERRY)
   endif()
   file(APPEND "${MITK_COREAPP_PROVISIONING_FILE}" "READ file://${BLUEBERRY_PLUGIN_PROVISIONING_FILE}\n")
 
-  FunctionCreateProvisioningInfo(prov_info "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/plugins" ${mitk_core_plugins})
+  FunctionCreateProvisioningInfo(prov_info "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/plugins" ${mitk_core_plugins_fullpath})
   file(APPEND "${MITK_COREAPP_PROVISIONING_FILE}" "${prov_info}")
 
   
@@ -407,12 +401,12 @@ if(MITK_USE_BLUEBERRY)
   endif()
   file(APPEND "${MITK_EXTAPP_PROVISIONING_FILE}" "READ file://${MITK_COREAPP_PROVISIONING_FILE}\n")
 
-  FunctionCreateProvisioningInfo(prov_info "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/plugins" ${mitk_ext_plugins})
+  FunctionCreateProvisioningInfo(prov_info "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/plugins" ${mitk_ext_plugins_fullpath})
   file(APPEND "${MITK_EXTAPP_PROVISIONING_FILE}" "${prov_info}")
     
 
-  set(MITK_CORE_PLUGIN_USE_FILE "${MITK_BINARY_DIR}/MitkCorePluginUseFile.cmake")
-  ctkFunctionGeneratePluginUseFile(${MITK_CORE_PLUGIN_USE_FILE})
+  set(MITK_PLUGIN_USE_FILE "${MITK_BINARY_DIR}/MitkPluginUseFile.cmake")
+  ctkFunctionGeneratePluginUseFile(${MITK_PLUGIN_USE_FILE})
 endif()
 
 if(MITK_USE_BLUEBERRY)

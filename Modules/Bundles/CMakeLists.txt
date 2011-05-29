@@ -9,7 +9,7 @@ IF(MITK_USE_BLUEBERRY)
   SET(MITK_DEFAULT_SUBPROJECTS MITK-Plugins)
   
   SET(_mitk_bundles_default 
-      "org.mitk.planarfigure"
+
   )
   
   IF(QT4_FOUND)

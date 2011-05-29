@@ -459,7 +459,8 @@ int InternalPlatform::main(const std::vector<std::string>& args)
   m_ctkPluginFrameworkFactory->getFramework()->start();
   foreach(long pluginId, m_CTKPluginsToStart)
   {
-    context->getPlugin(pluginId)->start();
+    // do not change the autostart setting of this plugin
+    context->getPlugin(pluginId)->start(ctkPlugin::START_TRANSIENT | ctkPlugin::START_ACTIVATION_POLICY);
   }
 
   m_BundleLoader->StartSystemBundle(systemBundle);

@@ -88,13 +88,14 @@ public:
       QSharedPointer<ctkPlugin> plugin = Platform::GetCTKPlugin(QString::fromStdString(contributor));
       if (!plugin.isNull())
       {
-        plugin->start(0);
+        // immediately start the plugin but do not change the plugins autostart setting
+        plugin->start(ctkPlugin::START_TRANSIENT);
 
         QString typeName = plugin->getSymbolicName() + "_" + QString::fromStdString(className);
         int metaTypeId = QMetaType::type(typeName.toAscii().data());
         if (metaTypeId == 0)
         {
-          BERRY_WARN << "The class " << className << " was not registered as a Qt MetaType using BERRY_REGISTER_EXTENSION_CLASS(type, pluginContext). "
+          BERRY_WARN << "The class " << className << " was not registered as a Qt MetaType using BERRY_REGISTER_EXTENSION_CLASS(type, pluginContext) or you forgot to run Qt's moc on the header file. "
                         "Legacy BlueBerry bundles should use CreateExecutableExtension<C>(propertyName, C::GetManifestName()) instead.";
         }
         else

@@ -189,7 +189,7 @@ bool QtAssistantUtil::CallQtAssistant(const QStringList& qchFiles, bool register
     }
     args << qchFile;
     args << QLatin1String("-quiet");
-    //BERRY_INFO << "Registering " << qchPath.toString() << " with " << collectionFile.toStdString();
+    //BERRY_INFO << "Registering " << qchFile.toStdString() << " with " << helpCollectionFile.toStdString();
     argsVector.push_back(args);
   }
 

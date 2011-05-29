@@ -90,7 +90,7 @@ void QCHPluginListener::removePlugin(QSharedPointer<ctkPlugin> plugin)
   // bail out if system plugin
   if (plugin->getPluginId() == 0) return;
 
-  QFileInfo qchDirInfo = plugin->getPluginContext()->getDataFile("qch_files/");
+  QFileInfo qchDirInfo = context->getDataFile("qch_files/" + QString::number(plugin->getPluginId()));
   if (qchDirInfo.exists())
   {
     QDir qchDir(qchDirInfo.absoluteFilePath());
@@ -110,10 +110,7 @@ void QCHPluginListener::addPlugin(QSharedPointer<ctkPlugin> plugin)
   // bail out if system plugin
   if (plugin->getPluginId() == 0) return;
 
-  // if the given plugin already exists in the registry then return.
-  // note that this does not work for update cases.
-
-  QFileInfo qchDirInfo = plugin->getPluginContext()->getDataFile("qch_files");
+  QFileInfo qchDirInfo = context->getDataFile("qch_files/" + QString::number(plugin->getPluginId()));
   QUrl location(plugin->getLocation());
   QFileInfo pluginFileInfo(location.toLocalFile());
 
@@ -123,7 +120,7 @@ void QCHPluginListener::addPlugin(QSharedPointer<ctkPlugin> plugin)
 
     if (!qchDirInfo.exists())
     {
-      QDir().mkdir(qchDirInfo.absoluteFilePath());
+      QDir().mkpath(qchDirInfo.absoluteFilePath());
     }
 
     QStringList localQCHFiles;

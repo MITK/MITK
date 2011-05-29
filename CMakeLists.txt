@@ -382,6 +382,7 @@ if(MITK_USE_BLUEBERRY)
     Modules/Bundles/org.mitk.gui.qt.diffusionimaging:OFF
     Modules/Bundles/org.mitk.gui.qt.ext:ON
     Modules/Bundles/org.mitk.gui.qt.extapplication:ON
+    Modules/Bundles/org.mitk.planarfigure:ON
     Modules/Bundles/org.mitk.gui.qt.datamanager:ON
   )
 

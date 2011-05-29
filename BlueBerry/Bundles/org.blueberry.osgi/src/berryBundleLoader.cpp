@@ -52,6 +52,11 @@ BundleLoader::~BundleLoader()
 
 }
 
+void BundleLoader::SetCTKPlugins(const QStringList& installedCTKPlugins)
+{
+  this->installedCTKPlugins = installedCTKPlugins;
+}
+
 Poco::Logger&
 BundleLoader::GetLogger() const
 {
@@ -70,6 +75,14 @@ BundleLoader::CreateBundle(const Poco::Path& path)
 {
   BundleDirectory::Pointer bundleStorage(new BundleDirectory(path));
   Bundle::Pointer bundle(new Bundle(*this, bundleStorage));
+
+  if (bundle->GetState() == IBundle::BUNDLE_INSTALLED &&
+      installedCTKPlugins.contains(QString::fromStdString(bundle->GetSymbolicName())))
+  {
+    BERRY_WARN << "Ignoring legacy BlueBerry bundle " << bundle->GetSymbolicName()
+               << " because a CTK plug-in with the same name already exists.";
+    return Bundle::Pointer(0);
+  }
 
   if (bundle->GetState() == IBundle::BUNDLE_INSTALLED &&
       bundle->IsSystemBundle()) {
@@ -116,7 +129,7 @@ Bundle::Pointer
 BundleLoader::LoadBundle(const Poco::Path& path)
 {
   Bundle::Pointer bundle = this->CreateBundle(path);
-  this->LoadBundle(bundle);
+  if (bundle) this->LoadBundle(bundle);
   return bundle;
 }
 

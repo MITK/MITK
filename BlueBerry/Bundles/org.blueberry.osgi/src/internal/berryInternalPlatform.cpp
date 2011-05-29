@@ -196,6 +196,14 @@ void InternalPlatform::Initialize(int& argc, char** argv, Poco::Util::AbstractCo
     }
   }
 
+  // tell the BundleLoader about the installed CTK plug-ins
+  QStringList installedCTKPlugins;
+  foreach(QSharedPointer<ctkPlugin> plugin, pfwContext->getPlugins())
+  {
+    installedCTKPlugins << plugin->getSymbolicName();
+  }
+  m_BundleLoader->SetCTKPlugins(installedCTKPlugins);
+
   m_Initialized = true;
 
   // Clear the CodeCache
@@ -253,7 +261,10 @@ void InternalPlatform::Initialize(int& argc, char** argv, Poco::Util::AbstractCo
       try
       {
       Bundle::Pointer bundle = m_BundleLoader->LoadBundle(*pathIter);
-      BERRY_INFO(m_ConsoleLog) << "Bundle state (" << pathIter->toString() << "): " << bundle->GetStateString() << std::endl;
+      if (bundle)
+      {
+        BERRY_INFO(m_ConsoleLog) << "Bundle state (" << pathIter->toString() << "): " << bundle->GetStateString() << std::endl;
+      }
       }
       catch (const BundleStateException& exc)
       {

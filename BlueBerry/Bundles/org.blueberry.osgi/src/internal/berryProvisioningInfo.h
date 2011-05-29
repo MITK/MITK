@@ -41,7 +41,8 @@ private:
       UNKNOWN,
       READ,
       INSTALL,
-      START
+      START,
+      STOP
     };
 
     QSet<QString> pluginDirs;

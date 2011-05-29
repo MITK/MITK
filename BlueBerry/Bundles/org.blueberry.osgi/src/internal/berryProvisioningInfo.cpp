@@ -87,10 +87,14 @@ void ProvisioningInfo::readProvisioningFile(const QString& filePath)
       {
         key = START;
       }
+      else if (keyword.compare("STOP", Qt::CaseInsensitive) == 0)
+      {
+        key = STOP;
+      }
 
       if (key == UNKNOWN)
       {
-        BERRY_WARN << "Keyword " << keyword.toStdString() << " in line"
+        BERRY_WARN << "Keyword " << keyword.toStdString() << " in line "
                       << count << " of provisioning file "
                       << filePath.toStdString() << " unknown";
         continue;
@@ -126,6 +130,10 @@ void ProvisioningInfo::readProvisioningFile(const QString& filePath)
       case START:
       {
         this->addPluginToStart(value);
+        break;
+      }
+      case STOP:
+      {
         break;
       }
       }

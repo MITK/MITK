@@ -24,17 +24,14 @@ ADD_SUBDIRECTORY(Bundles)
 # Now build a custom executable to start the
 # BlueBerry Workbench with our plug-ins
 INCLUDE_DIRECTORIES(
-  ${BLUEBERRY_PLUGIN_SOURCE_DIRS}
-  ${org.blueberry.osgi_BIN_DIR}
+  ${org_blueberry_osgi_INCLUDE_DIRS}
   ${Poco_INCLUDE_DIRS}
+  ${mbilog_INCLUDE_DIRS}
 )
 
 LINK_DIRECTORIES("${org.blueberry.osgi_OUT_DIR}/bin" ${Poco_LIBRARY_DIR})
 ADD_EXECUTABLE(@CUSTOM_PROJECT_EXECUTABLE@ @CUSTOM_PROJECT_EXECUTABLE@.cpp)
-TARGET_LINK_LIBRARIES(@CUSTOM_PROJECT_EXECUTABLE@ 
-                      optimized PocoFoundation      debug PocoFoundationd 
-                      optimized PocoUtil            debug PocoUtild 
-                      optimized org_blueberry_osgi debug org_blueberry_osgi${BLUEBERRY_DEBUG_POSTFIX})
+TARGET_LINK_LIBRARIES(@CUSTOM_PROJECT_EXECUTABLE@ org_blueberry_osgi)
 
 IF(@CUSTOM_PROJECT_NAME@_ENABLED_PLUGINS)
   ADD_DEPENDENCIES(@CUSTOM_PROJECT_EXECUTABLE@ ${@CUSTOM_PROJECT_NAME@_ENABLED_PLUGINS})

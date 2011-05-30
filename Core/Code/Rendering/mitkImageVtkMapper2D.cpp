@@ -868,20 +868,29 @@ void mitk::ImageVtkMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
   localStorage->m_Texture->SetMapColorScalarsThroughLookupTable(binary);
   if ( binary )
   {    
+    MITK_INFO << "binary";
     localStorage->m_LookupTable->SetAlphaRange(0.0, 1.0);
+    localStorage->m_LookupTable->SetRange(0.0, 1.0);
     //0 is already mapped to transparent.
     //1 is now mapped to the current color and alpha
-    localStorage->m_LookupTable->SetTableValue(1, rgba[0], rgba[1], rgba[2], rgba[3]);
+//    localStorage->m_LookupTable->SetTableValue(1, rgba[0], rgba[1], rgba[2], rgba[3]);
 
     bool binaryOutline = false;
+    this->GetDataNode()->GetBoolProperty( "outline binary", binaryOutline, renderer );
     if ( this->GetInput()->GetPixelType().GetBpe() <= 8 )
     {
-      if (this->GetDataNode()->GetBoolProperty( "outline binary", binaryOutline, renderer ))
+      if (binaryOutline)
       {
-        //        image->setOutline(binaryOutline);
+        MITK_INFO << "binary outline";
+//                image->setOutline(binaryOutline);
         vtkSmartPointer<vtkContourFilter> contourFilter = vtkSmartPointer<vtkContourFilter>::New();
         contourFilter->SetInput(localStorage->m_ReslicedImage);
+//        contourFilter->SetNumberOfContours(1);
+//        contourFilter->SetValue(0, 0.0);
+//        contourFilter->SetValue(0, 1.0);
+        contourFilter->GenerateValues(1, 0.0, 0.0);
         localStorage->m_Texture->SetInputConnection(contourFilter->GetOutputPort());
+
         float binaryOutlineWidth(1.0);
         if (this->GetDataNode()->GetFloatProperty( "outline width", binaryOutlineWidth, renderer ))
         {

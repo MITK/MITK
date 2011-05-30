@@ -1,10 +1,5 @@
 
 IF(MITK_USE_BLUEBERRY)
-
-  # INCLUDE("${MITK_BINARY_DIR}/mitkExtConfig.cmake")
-  # INCLUDE("${MITK_BINARY_DIR}/QmitkExtConfig.cmake")
-
-  INCLUDE("${MITK_BINARY_DIR}/Bundles/MITKCoreBundleList.cmake")
   
   SET(MITK_DEFAULT_SUBPROJECTS MITK-Plugins)
   
@@ -13,9 +8,7 @@ IF(MITK_USE_BLUEBERRY)
   )
   
   IF(QT4_FOUND)
-    LIST(APPEND _mitk_bundles_default "org.mitk.gui.qt.ext" "org.mitk.gui.qt.extapplication")
-    # ExtApp required bundles
-    LIST(APPEND _mitk_bundles_default "org.mitk.gui.qt.imagenavigator" "org.mitk.gui.qt.datamanager")
+    LIST(APPEND _mitk_bundles_default "org.mitk.gui.qt.imagenavigator")
 
     # BlueBerry depends on CTK which depends on Qt, so we
     # need the Qt include direcotries

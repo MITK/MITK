@@ -49,6 +49,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkCamera.h>
 #include <vtkTransformPolyDataFilter.h>
 #include <vtkImageMapToColors.h>
+#include <vtkContourFilter.h>
 
 //ITK
 #include <itkRGBAPixel.h>
@@ -143,6 +144,7 @@ const mitk::Image* mitk::ImageVtkMapper2D::GetInput( void )
 
 vtkProp* mitk::ImageVtkMapper2D::GetVtkProp(mitk::BaseRenderer* renderer)
 {
+  MITK_INFO << "get Prop";
   //return the actor corresponding to the renderer
   return m_LSH.GetLocalStorage(renderer)->m_Actor;
 }
@@ -803,6 +805,7 @@ void mitk::ImageVtkMapper2D::Clear()
 
 void mitk::ImageVtkMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
 {
+  MITK_INFO << "apply props";
   //get the current localStorage for the corresponding renderer
   LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
 
@@ -876,6 +879,9 @@ void mitk::ImageVtkMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
       if (this->GetDataNode()->GetBoolProperty( "outline binary", binaryOutline, renderer ))
       {
         //        image->setOutline(binaryOutline);
+        vtkSmartPointer<vtkContourFilter> contourFilter = vtkSmartPointer<vtkContourFilter>::New();
+        contourFilter->SetInput(localStorage->m_ReslicedImage);
+        localStorage->m_Texture->SetInputConnection(contourFilter->GetOutputPort());
         float binaryOutlineWidth(1.0);
         if (this->GetDataNode()->GetFloatProperty( "outline width", binaryOutlineWidth, renderer ))
         {
@@ -963,6 +969,7 @@ void mitk::ImageVtkMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
   double rgbConv[3] = {(double)rgba[0], (double)rgba[1], (double)rgba[2]}; //conversion to double for VTK
   localStorage->m_Actor->GetProperty()->SetColor(rgbConv);
   localStorage->m_Actor->GetProperty()->SetOpacity(rgba[3]);
+  MITK_INFO << "END apply props";
 }
 
 void mitk::ImageVtkMapper2D::Update(mitk::BaseRenderer* renderer)

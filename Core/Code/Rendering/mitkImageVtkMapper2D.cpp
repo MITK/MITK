@@ -883,13 +883,13 @@ void mitk::ImageVtkMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
       {
         MITK_INFO << "binary outline";
 //                image->setOutline(binaryOutline);
-        vtkSmartPointer<vtkContourFilter> contourFilter = vtkSmartPointer<vtkContourFilter>::New();
-        contourFilter->SetInput(localStorage->m_ReslicedImage);
+//        vtkSmartPointer<vtkContourFilter> contourFilter = vtkSmartPointer<vtkContourFilter>::New();
+//        contourFilter->SetInput(localStorage->m_ReslicedImage);
 //        contourFilter->SetNumberOfContours(1);
 //        contourFilter->SetValue(0, 0.0);
 //        contourFilter->SetValue(0, 1.0);
-        contourFilter->GenerateValues(1, 0.0, 0.0);
-        localStorage->m_Texture->SetInputConnection(contourFilter->GetOutputPort());
+//        contourFilter->GenerateValues(1, 0.0, 0.0);
+//        localStorage->m_Texture->SetInputConnection(contourFilter->GetOutputPort());
 
         float binaryOutlineWidth(1.0);
         if (this->GetDataNode()->GetFloatProperty( "outline width", binaryOutlineWidth, renderer ))

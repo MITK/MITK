@@ -386,23 +386,22 @@ if(MITK_USE_BLUEBERRY)
                                COMPACT_OPTIONS)
 
   set(MITK_COREAPP_PROVISIONING_FILE "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/CoreApp.provisioning")
-  if(EXISTS "${MITK_COREAPP_PROVISIONING_FILE}")
-    file(REMOVE "${MITK_COREAPP_PROVISIONING_FILE}")
-  endif()
-  file(APPEND "${MITK_COREAPP_PROVISIONING_FILE}" "READ file://${BLUEBERRY_PLUGIN_PROVISIONING_FILE}\n")
+  FunctionCreateProvisioningInfo(
+    OUTPUT prov_info
+    INCLUDE "${BLUEBERRY_PLUGIN_PROVISIONING_FILE}"
+    PLUGIN_DIR "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/plugins"
+    PLUGINS ${mitk_core_plugins_fullpath}
+  )
+  file(WRITE "${MITK_COREAPP_PROVISIONING_FILE}" "${prov_info}")
 
-  FunctionCreateProvisioningInfo(prov_info "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/plugins" ${mitk_core_plugins_fullpath})
-  file(APPEND "${MITK_COREAPP_PROVISIONING_FILE}" "${prov_info}")
-
-  
   set(MITK_EXTAPP_PROVISIONING_FILE "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/ExtApp.provisioning")
-  if(EXISTS "${MITK_EXTAPP_PROVISIONING_FILE}")
-    file(REMOVE "${MITK_EXTAPP_PROVISIONING_FILE}")
-  endif()
-  file(APPEND "${MITK_EXTAPP_PROVISIONING_FILE}" "READ file://${MITK_COREAPP_PROVISIONING_FILE}\n")
-
-  FunctionCreateProvisioningInfo(prov_info "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/plugins" ${mitk_ext_plugins_fullpath})
-  file(APPEND "${MITK_EXTAPP_PROVISIONING_FILE}" "${prov_info}")
+  FunctionCreateProvisioningInfo(
+    OUTPUT prov_info
+    INCLUDE "${MITK_COREAPP_PROVISIONING_FILE}"
+    PLUGIN_DIR "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/plugins"
+    PLUGINS ${mitk_ext_plugins_fullpath}
+  )
+  file(WRITE "${MITK_EXTAPP_PROVISIONING_FILE}" "${prov_info}")
 
   set(MITK_PLUGIN_USE_FILE "${MITK_BINARY_DIR}/MitkPluginUseFile.cmake")
   ctkFunctionGeneratePluginUseFile(${MITK_PLUGIN_USE_FILE})
@@ -517,4 +516,3 @@ set(UTILITIES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Utilities)
 
 configure_file(mitkConfig.h.in ${MITK_BINARY_DIR}/mitkConfig.h)
 configure_file(MITKConfig.cmake.in ${MITK_BINARY_DIR}/MITKConfig.cmake @ONLY)
-

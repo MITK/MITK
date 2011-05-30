@@ -266,20 +266,20 @@ ctkMacroSetupExternalPlugins(${_ctk_plugins} ${_ctk_test_plugins}
                              COMPACT_OPTIONS)
 
 SET(BLUEBERRY_PROVISIONING_FILE "${BlueBerry_BINARY_DIR}/BlueBerry.provisioning")
-IF(EXISTS "${BLUEBERRY_PROVISIONING_FILE}")
-  FILE(REMOVE "${BLUEBERRY_PROVISIONING_FILE}")
-ENDIF()
+FunctionCreateProvisioningInfo(
+  OUTPUT prov_info 
+  PLUGIN_DIR "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/plugins"
+  PLUGINS  ${_ctk_plugins}
+)
+file(WRITE "${BLUEBERRY_PROVISIONING_FILE}" "${prov_info}")
 
-FunctionCreateProvisioningInfo(prov_info "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/plugins" ${_ctk_plugins})
-file(APPEND "${BLUEBERRY_PROVISIONING_FILE}" "${prov_info}")
+FunctionCreateProvisioningInfo(
+  OUTPUT prov_testing_info
+  PLUGIN_DIR "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/test_plugins"
+  PLUGINS ${_ctk_test_plugins}
+)
+file(WRITE "${BLUEBERRY_TESTING_PROVISIONING_FILE}" "${prov_info}\n${prov_testing_info}")
 
-IF(EXISTS "${BLUEBERRY_TESTING_PROVISIONING_FILE}")
-  FILE(REMOVE "${BLUEBERRY_TESTING_PROVISIONING_FILE}")
-ENDIF()
-FunctionCreateProvisioningInfo(prov_testing_info "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/plugins" ${_ctk_plugins})
-file(APPEND "${BLUEBERRY_TESTING_PROVISIONING_FILE}" "${prov_testing_info}")
-FunctionCreateProvisioningInfo(prov_testing_info "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/test_plugins" ${_ctk_test_plugins})
-file(APPEND "${BLUEBERRY_TESTING_PROVISIONING_FILE}" "${prov_testing_info}")
 
 ctkMacroGetAllProjectTargetLibraries("${CTK_PLUGIN_LIBRARIES}" _enabled_plugin_targets)
 add_dependencies(BlueBerry ${_enabled_plugin_targets})

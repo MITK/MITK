@@ -403,13 +403,14 @@ if(MITK_USE_BLUEBERRY)
 
   FunctionCreateProvisioningInfo(prov_info "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/plugins" ${mitk_ext_plugins_fullpath})
   file(APPEND "${MITK_EXTAPP_PROVISIONING_FILE}" "${prov_info}")
-    
 
   set(MITK_PLUGIN_USE_FILE "${MITK_BINARY_DIR}/MitkPluginUseFile.cmake")
   ctkFunctionGeneratePluginUseFile(${MITK_PLUGIN_USE_FILE})
-endif()
 
-if(MITK_USE_BLUEBERRY)
+  # Used in the export command further below
+  GetMyTargetLibraries("${CTK_PLUGIN_LIBRARIES}" MITK_PLUGIN_TARGETS)
+
+  # add legacy BlueBerry bundles
   add_subdirectory(Modules/Bundles)
 endif()
 
@@ -483,8 +484,8 @@ file(REMOVE ${MITK_EXPORTS_FILE})
 
 if(MITK_USE_BLUEBERRY)
   set(enabled_plugins
-    ${BLUEBERRY_ENABLED_PLUGINS}
-    ${MITK_CORE_ENABLED_PLUGINS}
+    ${BLUEBERRY_PLUGIN_TARGETS}
+    ${MITK_PLUGIN_TARGETS}
     ${MITK_MODULES_ENABLED_PLUGINS}
     )
 

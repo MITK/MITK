@@ -25,6 +25,12 @@ QmitkMockFunctionality::QmitkMockFunctionality()
 
 }
 
+QmitkMockFunctionality::QmitkMockFunctionality(const QmitkMockFunctionality& other)
+{
+  Q_UNUSED(other)
+  throw std::runtime_error("Copy constructor not implemented");
+}
+
 QmitkMockFunctionality::~QmitkMockFunctionality()
 {
   callTrace->Add("FunctionalityDestructor");

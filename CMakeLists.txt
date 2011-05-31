@@ -374,6 +374,24 @@ if(MITK_USE_BLUEBERRY)
     list(APPEND mitk_core_plugins_fullpath CoreUI/Bundles/${core_plugin})
   endforeach()
 
+  if(BUILD_TESTING)
+    include(berryTestingHelpers)
+
+    include("${CMAKE_CURRENT_SOURCE_DIR}/CoreUI/BundleTesting/PluginList.cmake")
+    foreach(core_test_plugin ${MITK_CORE_TEST_PLUGINS})
+      list(APPEND mitk_core_plugins_fullpath CoreUI/BundleTesting/${core_test_plugin})
+    endforeach()
+
+    set(BLUEBERRY_UI_TEST_APP "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/CoreApp")
+    get_target_property(_is_macosx_bundle CoreApp MACOSX_BUNDLE)
+    if(APPLE AND _is_macosx_bundle)
+      set(BLUEBERRY_UI_TEST_APP "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/CoreApp.app/Contents/MacOS/CoreApp")
+    endif()
+
+    set(BLUEBERRY_TEST_APP_ID "org.mitk.qt.application")
+  endif()
+
+
   include("${CMAKE_CURRENT_SOURCE_DIR}/Modules/Bundles/PluginList.cmake")
   set(mitk_ext_plugins_fullpath )
   foreach(ext_plugin ${MITK_EXT_PLUGINS})

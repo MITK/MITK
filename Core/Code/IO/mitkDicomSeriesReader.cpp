@@ -835,7 +835,7 @@ DicomSeriesReader::SortSeriesSlices(const StringContainer &unsortedFilenames)
   catch(std::logic_error& e)
   {
     MITK_WARN << "Sorting error. Leaving series unsorted."; 
-    return StringContainer(unsortedFilenames);
+    return unsortedFilenames;
   }
 }
 

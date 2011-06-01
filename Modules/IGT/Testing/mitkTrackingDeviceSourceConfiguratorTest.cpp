@@ -31,7 +31,7 @@ public:
     // let's create an object of our class
     mitk::TrackingDeviceSourceConfigurator::Pointer testInstance;
     mitk::NavigationToolStorage::Pointer emptyStorage = mitk::NavigationToolStorage::New();
-    mitk::TrackingDevice::Pointer dummyDevice = mitk::ClaronTrackingDevice::New();
+    mitk::TrackingDevice::Pointer dummyDevice = dynamic_cast<mitk::TrackingDevice*>(mitk::ClaronTrackingDevice::New().GetPointer());
     testInstance = mitk::TrackingDeviceSourceConfigurator::New(emptyStorage,dummyDevice);
     MITK_TEST_CONDITION_REQUIRED(testInstance.IsNotNull(),"Testing instantiation:");
   }
@@ -60,7 +60,7 @@ public:
     secondTool->SetDataNode(secondNode);
     claronStorage->AddTool(secondTool);
     
-    mitk::TrackingDevice::Pointer testDevice = mitk::ClaronTrackingDevice::New();
+    mitk::TrackingDevice::Pointer testDevice = dynamic_cast<mitk::TrackingDevice*>(mitk::ClaronTrackingDevice::New().GetPointer());
 
     testInstance = mitk::TrackingDeviceSourceConfigurator::New(claronStorage,testDevice);
 
@@ -126,7 +126,7 @@ public:
     secondTool->SetIdentifier("Tool#2");
     claronStorage->AddTool(secondTool);
     
-    mitk::TrackingDevice::Pointer testDevice = mitk::ClaronTrackingDevice::New();
+    mitk::TrackingDevice::Pointer testDevice = dynamic_cast<mitk::TrackingDevice*>(mitk::ClaronTrackingDevice::New().GetPointer());
 
     testInstance = mitk::TrackingDeviceSourceConfigurator::New(claronStorage,testDevice);
 

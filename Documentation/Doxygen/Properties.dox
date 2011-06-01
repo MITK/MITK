@@ -47,6 +47,7 @@ visible - toggle node/image/surface being rendered at all
 back color - in 2D, color of the normals outside the surface
 back normal lenth (px) - in 2D, length of the normals in pixels - Missing "g"?
 (When decreasing it the color using the front color is shorter?)
+color mode - surface - ???
 draw normals 2d - Boolean: in 2D, toggles the presence of normals
 front color - in 2D, color of the normals inside the surface
 front normal lenth (px) - in 2D, length of the normals in pixels - Missing "g"?
@@ -64,6 +65,8 @@ material.specularCoefficient - in-/decrease non-scattered reflection
 material.specularPower - control percentage of non-scattered reflection - ???
 difference to specularCoefficient?
 material.wireframeLineWidth - width of the wires if wireframe representation is
+scalar mode - surface - ???
+scalar visibility - surface - ???
 selected
 shader - which shader to use for surface rendering, currently the options are
 "fixed" and "mitkShaderLightning"

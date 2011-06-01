@@ -34,7 +34,7 @@ PURPOSE.  See the above copyright notices for more information.
   \sa QmitkFunctionality
   \ingroup Functionalities
 */
-class QmitkMITKIGTNavigationToolManagerView : public QObject, public QmitkFunctionality
+class QmitkMITKIGTNavigationToolManagerView : public QmitkFunctionality
 {  
   // this is needed for all Qt objects that should have a Qt meta-object
   // (everything that derives from QObject and wants to have signal/slots)

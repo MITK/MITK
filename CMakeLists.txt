@@ -378,8 +378,9 @@ if(MITK_USE_BLUEBERRY)
     include(berryTestingHelpers)
 
     include("${CMAKE_CURRENT_SOURCE_DIR}/CoreUI/BundleTesting/PluginList.cmake")
+    set(mitk_core_test_plugins_fullpath )
     foreach(core_test_plugin ${MITK_CORE_TEST_PLUGINS})
-      list(APPEND mitk_core_plugins_fullpath CoreUI/BundleTesting/${core_test_plugin})
+      list(APPEND mitk_core_test_plugins_fullpath CoreUI/BundleTesting/${core_test_plugin})
     endforeach()
 
     set(BLUEBERRY_UI_TEST_APP "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/CoreApp")
@@ -391,17 +392,20 @@ if(MITK_USE_BLUEBERRY)
     set(BLUEBERRY_TEST_APP_ID "org.mitk.qt.application")
   endif()
 
-
   include("${CMAKE_CURRENT_SOURCE_DIR}/Modules/Bundles/PluginList.cmake")
   set(mitk_ext_plugins_fullpath )
   foreach(ext_plugin ${MITK_EXT_PLUGINS})
     list(APPEND mitk_ext_plugins_fullpath Modules/Bundles/${ext_plugin})
   endforeach()
 
-  ctkMacroSetupExternalPlugins(${mitk_core_plugins_fullpath} ${mitk_ext_plugins_fullpath}
+  ctkMacroSetupExternalPlugins(${mitk_core_plugins_fullpath} ${mitk_core_test_plugins_fullpath} ${mitk_ext_plugins_fullpath}
                                BUILD_OPTION_PREFIX MITK_BUILD_
                                BUILD_ALL ${MITK_BUILD_ALL_PLUGINS}
                                COMPACT_OPTIONS)
+
+  ctkFunctionExtractPluginTargets("${mitk_core_plugins_fullpath}" ON MITK_CORE_ENABLED_PLUGINS)
+  ctkFunctionExtractPluginTargets("${mitk_ext_plugins_fullpath}" ON MITK_EXT_ENABLED_PLUGINS)
+  list(APPEND MITK_EXT_ENABLED_PLUGINS ${MITK_CORE_ENABLED_PLUGINS})
 
   set(MITK_COREAPP_PROVISIONING_FILE "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/CoreApp.provisioning")
   FunctionCreateProvisioningInfo(

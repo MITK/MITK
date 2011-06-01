@@ -77,6 +77,7 @@ void mitk::TrackingVolumeGenerator::GenerateData()
         }
     default:
         {
+            output->SetVtkPolyData(vtkPolyData::New());
             MITK_ERROR<< "No STL to given TrackingDevice found";
             return;
         }

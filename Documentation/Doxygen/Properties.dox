@@ -19,8 +19,22 @@ TODO:
   selected - Whether the node is selected in the datamanager
 
 \subsection GenericRenderingProperty Generic Rendering Properties
-color - color the surface, grey value image, whatever should be rendered in
-(usually white)
+color - Color the surface, grey value image, whatever should be rendered in
+(default is usually white). There is a special mitk::ColorProperty and you
+can use the Getter/Setter methods to access it. The color is defined with 
+three values (RGB) in the range between 0.0 and 1.0. 
+\info If you are inside a mapper you can use the following code to access 
+the color:
+\code
+float rgb[3]={1.0f, 1.0f, 1.0f};
+GetColor( rgb, BaseRenderer );
+\endcode
+(The BaseRenderer is usually known inside a mapper).
+\endinfo
+\warning
+This property will not effect images if you set the property "use color" 
+to true. In that case a user-defined lookuptable will be used.
+
 in plane resample extent by geometry - Toggles:
          Resampling grid corresponds to the current world geometry. This
          means that the spacing of the output 2D image depends on the
@@ -30,16 +44,37 @@ in plane resample extent by geometry - Toggles:
          the spacing of the output 2D image is directly derived from the
          associated input image, regardless of the currently selected world
          geometry.
-layer - controls what image is considered "on top" of another in case two
-should inhabit the same space, higher layer occludes lower layer
+
+layer - Controls which image is considered "on top" of another. In the case 
+that two should inhabit the same space, the higher layer occludes lower layer.
+TODO Does this also apply for surfaces, points, etc.?
+
 levelwindow - contains the level window of the image
+
 LookupTable - contains lookuptable for use in coloring image
-opacity - alpha value of the node/image/surface
+
+opacity - Alpha (or transparency) value of the node/image/surface etc.. The
+range of the opacity is between 0.0 and 1.0. 
+\info If you are inside a mapper you can use the following code to access 
+the opacity:
+\code
+float opacity=1.0f;
+GetOpacity( opacity, BaseRenderer );
+\endcode
+(The BaseRenderer is usually known inside a mapper).
+\endinfo
+
 reslice interpolation - Select interpolation mode (Nearest, Linear, Cubic)
+
 texture interpolation - toggle interpolation
+
 TransferFunction - contains transfer function for use in coloring image
-use color - Toggle whether LUT is used (off) or not (on) - Should be redone and
-renamed, this is counterintuitive
+
+use color - This property toggles the use of a user-defined lookuptable 
+for the rendering. True: use the LUT; False: use the color propery
+TODO Provide an example how to set a lookuptable.
+TODO Should be redone and renamed, this is counterintuitive
+
 visible - toggle node/image/surface being rendered at all
 
 \subsection SurfaceRenderingProperties Surface Rendering Properties

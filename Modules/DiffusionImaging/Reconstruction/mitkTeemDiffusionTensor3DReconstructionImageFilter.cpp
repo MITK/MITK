@@ -47,12 +47,21 @@ mitk::TeemDiffusionTensor3DReconstructionImageFilter<D,T>
 void file_replace(std::string filename, std::string what, std::string with)
 {
   ofstream myfile2;
+
+  std::locale C("C");
+  std::locale originalLocale2 = myfile2.getloc();
+  myfile2.imbue(C);
+
   char filename2[512];
   sprintf(filename2, "%s2",filename.c_str());
   myfile2.open (filename2);
 
   std::string line;
   ifstream myfile (filename.c_str());
+
+  std::locale originalLocale = myfile.getloc();
+  myfile.imbue(C);
+
   if (myfile.is_open())
   {
     while (! myfile.eof() )
@@ -67,6 +76,8 @@ void file_replace(std::string filename, std::string what, std::string with)
   itksys::SystemTools::RemoveFile(filename.c_str());
   rename(filename2,filename.c_str());
 
+  myfile.imbue( originalLocale );
+  myfile2.imbue( originalLocale2 );
 }
 
 // do the work

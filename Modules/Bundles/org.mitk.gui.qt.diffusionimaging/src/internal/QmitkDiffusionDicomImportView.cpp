@@ -33,18 +33,12 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkDiffusionImage.h"
 #include "mitkNrrdDiffusionImageWriter.h"
 
-#if  GDCM_MAJOR_VERSION >= 2
-#define DGDCM2
-#endif
-
-#ifdef DGDCM2
 #include "gdcmDirectory.h"
 #include "gdcmScanner.h"
 #include "gdcmSorter.h"
 #include "gdcmIPPSorter.h"
 #include "gdcmAttribute.h"
 #include "gdcmVersion.h"
-#endif
 
 const std::string QmitkDiffusionDicomImport::VIEW_ID = "org.mitk.views.diffusiondicomimport";
 
@@ -76,9 +70,7 @@ void QmitkDiffusionDicomImport::CreateQtPartControl(QWidget *parent)
     m_Controls->m_DicomLoadRecursiveCheckbox->setChecked(true);
     m_Controls->m_DicomLoadAverageDuplicatesCheckbox->setChecked(false);
 
-#ifdef DGDCM2
     m_Controls->m_DicomLoadRecursiveCheckbox->setVisible(false);
-#endif
 
     AverageClicked();
   }
@@ -156,7 +148,6 @@ void QmitkDiffusionDicomImport::DicomLoadAddFolderNames()
   m_Controls->listWidget->addItems(w->selectedFiles());
 }
 
-#ifdef DGDCM2
 bool SortBySeriesUID(gdcm::DataSet const & ds1, gdcm::DataSet const & ds2 )
 {
   gdcm::Attribute<0x0020,0x000e> at1;
@@ -187,7 +178,6 @@ bool SortBySeqName(gdcm::DataSet const & ds1, gdcm::DataSet const & ds2 )
   return std::lexicographical_compare(str1.begin(), str1.end(),
                                       str2.begin(), str2.end() );
 }
-#endif
 
 void QmitkDiffusionDicomImport::Status(QString status)
 {
@@ -286,11 +276,7 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
       return;
     }
 
-#ifndef DGDCM2
-    Status(QString("GDCM 1.x used for DICOM parsing and sorting!"));
-#else
     Status(QString("GDCM %1 used for DICOM parsing and sorting!").arg(gdcm::Version::GetVersion()));
-#endif
 
     PrintMemoryUsage();
     QString status;
@@ -309,33 +295,6 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
       clock.Start(folderName.toAscii());
       std::vector<std::string> seriesUIDs(0);
       std::vector<std::vector<std::string> > seriesFilenames(0);
-#ifndef DGDCM2
-      Status(QString("Parsing directory %1").arg(folderName));
-      typedef itk::GDCMSeriesFileNames InputNamesType;
-      InputNamesType::Pointer inputNames = InputNamesType::New();
-
-      //////////////////////////////////////////////////////
-      ////
-      //// if you get seg-faults around here, make sure
-      //// to set the itk GDCM_DIR variable in cmake
-      //// correctly when building ITK
-      //// ( e.g. [itk binary dir]/Utilities/gdcm
-      ////   if not using system gdcm )
-      ////
-      //////////////////////////////////////////////////////
-
-      inputNames->SetRecursive(m_Controls->m_DicomLoadRecursiveCheckbox->isChecked());
-      inputNames->SetUseSeriesDetails(true);
-      inputNames->AddSeriesRestriction( "0020|0012" );
-      inputNames->SetInputDirectory( folderName.toAscii() );
-      mitk::ProgressBar::GetInstance()->Progress();
-      seriesUIDs = inputNames->GetSeriesUIDs();
-      unsigned int size = seriesUIDs.size();
-      for ( unsigned int i = 0 ; i < size ; ++i )
-      {
-        seriesFilenames.push_back(inputNames->GetFileNames(seriesUIDs[i]));
-      }
-#else
 
       Status("== Initial Directory Scan ==");
       gdcm::Directory d;
@@ -494,8 +453,6 @@ void QmitkDiffusionDicomImport::DicomLoadStartLoad()
 
       int slices = nfiles/nTotalAcquis;
       Status(QString("Series is composed of %1 different 3D volumes with %2 slices.").arg(nTotalAcquis).arg(slices));
-
-#endif
 
       // READING HEADER-INFOS
       PrintMemoryUsage();

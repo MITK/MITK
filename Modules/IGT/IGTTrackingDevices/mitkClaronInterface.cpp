@@ -60,6 +60,7 @@ bool mitk::ClaronInterface::StartTracking()
     MTC(Cameras_HistogramEqualizeImagesSet(true)); //set the histogram equalizing
     MTC( Cameras_ItemGet(0, &CurrCamera) ); //Obtain a handle to the first/only camera in the array
 
+    MITK_INFO<<markerDir;
     //Step 2: Load the marker templates
     MTC( Markers_LoadTemplates(markerDir) ); //Path to directory where the marker templates are
     printf("Loaded %d marker templates\n",Markers_TemplatesCount());

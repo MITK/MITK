@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkPlaneGeometry.h"
 #include "mitkRotationOperation.h"
 #include "mitkInteractionConst.h"
+#include "mitkLine.h"
 
 #include "mitkTestingMacros.h"
 
@@ -127,6 +128,92 @@ int TestCase1210()
   
   return EXIT_SUCCESS;
 }
+
+
+
+/**
+ * @brief This method tests method IntersectionPoint
+ *
+ * See also bug #7151. (ref 2 this test: iggy)
+ * This test was written due to incorrect calculation of the intersection point 
+ * between a given line and plane. This only occured when the pointdistance of 
+ * the line was less than 1.
+ * Test Behavour:
+ * ==============
+ * we have a given line and a given plane.
+ * we let the line intersect the plane.
+ * when testing several positions on the line the resulting intersection point must be the same
+ * we test a position where the distance between the correspoinding points is < 0 and another position where the distance is > 0.
+ * 
+ */
+int TestIntersectionPoint()
+{
+    //init plane with its parameter
+    mitk::PlaneGeometry::Pointer myPlaneGeometry = mitk::PlaneGeometry::New();
+    
+    mitk::Point3D origin;
+    origin[0] = 0.0; 
+    origin[1] = 2.0;
+    origin[2] = 0.0;
+    
+    mitk::Vector3D normal;
+    normal[0] = 0.0;
+    normal[1] = 1.0;
+    normal[2] = 0.0;
+    
+    myPlaneGeometry->InitializePlane(origin,normal);
+    
+    //generate points and line for intersection testing
+    //point distance of given line > 1
+    mitk::Point3D pointP1;
+    pointP1[0] = 2.0;
+    pointP1[1] = 1.0;
+    pointP1[2] = 0.0;
+    
+    mitk::Point3D pointP2;
+    pointP2[0] = 2.0;
+    pointP2[1] = 4.0;
+    pointP2[2] = 0.0;
+    
+    mitk::Vector3D lineDirection;
+    lineDirection[0] = pointP2[0] - pointP1[0];
+    lineDirection[1] = pointP2[1] - pointP1[1];
+    lineDirection[2] = pointP2[2] - pointP1[2];
+    
+    mitk::Line3D xingline( pointP1, lineDirection );
+    mitk::Point3D calcXingPoint;
+    myPlaneGeometry->IntersectionPoint(xingline, calcXingPoint);
+    
+    //point distance of given line < 1
+    mitk::Point3D pointP3;
+    pointP3[0] = 2.0;
+    pointP3[1] = 2.2;
+    pointP3[2] = 0.0;
+    
+    mitk::Point3D pointP4;
+    pointP4[0] = 2.0;
+    pointP4[1] = 1.7;
+    pointP4[2] = 0.0;
+    
+    mitk::Vector3D lineDirection2;
+    lineDirection2[0] = pointP4[0] - pointP3[0];
+    lineDirection2[1] = pointP4[1] - pointP3[1];
+    lineDirection2[2] = pointP4[2] - pointP3[2];
+    
+    mitk::Line3D xingline2( pointP3, lineDirection2 );
+    mitk::Point3D calcXingPoint2;
+    myPlaneGeometry->IntersectionPoint( xingline2, calcXingPoint2 );
+
+    //intersection points must be the same    
+    if (calcXingPoint == calcXingPoint2) {
+        return EXIT_SUCCESS;
+        
+    } else {
+        return EXIT_FAILURE;
+    }
+    
+}
+
 
 /**
  * @brief This method tests method ProjectPointOntoPlane.
@@ -906,6 +993,19 @@ int mitkPlaneGeometryTest(int /*argc*/, char* /*argv*/[])
     return result;
 
 
+  // testing mitk::PlaneGeometry::IntersectionPoint()
+  std::cout << std::endl;
+  std::cout << "Testing IntersectionPoint using given plane and given line:  ";
+    result = TestIntersectionPoint();
+    if (result != EXIT_SUCCESS) {
+        std::cout << "[FAILED]" << std::endl;
+        return result;
+    }
+  
+  std::cout<<"[PASSED]"<<std::endl<<std::endl;
+    
+  
+  
   std::cout<<"[TEST DONE]"<<std::endl;
   return EXIT_SUCCESS;
 }

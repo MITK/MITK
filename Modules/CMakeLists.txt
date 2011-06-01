@@ -17,6 +17,9 @@ SET(module_dirs
     OpenCVVideoSupport
     Overlays
     InputDevices
+    ToFHardware
+    ToFProcessing
+    ToFUI
 )
 
 SET(MITK_DEFAULT_SUBPROJECTS MITK-Modules)

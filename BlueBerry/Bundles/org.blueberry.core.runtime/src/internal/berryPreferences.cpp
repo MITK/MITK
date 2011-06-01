@@ -63,6 +63,8 @@ namespace berry
   {
     Poco::ScopedLock<Poco::Mutex> scopedMutex(m_Mutex);
     ostringstream s;
+    std::locale C("C");
+    s.imbue(C);
     s << "Preferences[" << m_Path << "]";
     return s.str();
   }
@@ -394,7 +396,10 @@ namespace berry
     Poco::ScopedLock<Poco::Mutex> scopedMutex(m_Mutex);
     if(m_Removed) 
     {
-      ostringstream s; s << "no node at '" << m_Path << "'";
+      ostringstream s;
+      std::locale C("C");
+      s.imbue(C);
+      s << "no node at '" << m_Path << "'";
       throw Poco::IllegalStateException(s.str());
     }
   }
@@ -403,13 +408,19 @@ namespace berry
   {
     if(pathName.find("//") != string::npos) 
     {
-      ostringstream s; s << "Illegal // in m_Path m_Name '" << pathName << "'";
+      ostringstream s;
+      std::locale C("C");
+      s.imbue(C);
+      s << "Illegal // in m_Path m_Name '" << pathName << "'";
       throw invalid_argument(s.str());
     }
     string::size_type strLength = pathName.length();
     if(pathName.length() > 1 && pathName[strLength-1] == '/')
     {
-      ostringstream s; s << "Trailing / in m_Path m_Name '" << pathName << "'";
+      ostringstream s;
+      std::locale C("C");
+      s.imbue(C);
+      s << "Trailing / in m_Path m_Name '" << pathName << "'";
       throw invalid_argument(s.str());
     }
   }
@@ -595,12 +606,20 @@ namespace Base64
 
 ostream& operator<<( ostream& os,const berry::Preferences& m )
 {
+  std::locale C("C");
+  std::locale originalLocale = os.getloc();
+  os.imbue(C);
   os << m.ToString();
+  os.imbue(originalLocale);
   return os;
 }
 
 ostream& operator<<( ostream& os,const berry::Preferences* m )
 {
+  std::locale C("C");
+  std::locale originalLocale = os.getloc();
+  os.imbue(C);
   os << m->ToString();
+  os.imbue(originalLocale);
   return os;
 }

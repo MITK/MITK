@@ -21,22 +21,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "gdcmGlobal.h"
 //#include "gdcmVersion.h"
 
-#if  GDCM_MAJOR_VERSION >= 2
-  #define DGDCM2
-#endif
-
-#ifndef DGDCM2
-
-#include "gdcm.h"
-// relevant Siemens private tags
-// relevant GE private tags
-const gdcm::DictEntry GEDictBValue( 0x0043, 0x1039, "IS", "1", "B Value of diffusion weighting" );
-const gdcm::DictEntry GEDictXGradient( 0x0019, 0x10bb, "DS", "1", "X component of gradient direction" );
-const gdcm::DictEntry GEDictYGradient( 0x0019, 0x10bc, "DS", "1", "Y component of gradient direction" );
-const gdcm::DictEntry GEDictZGradient( 0x0019, 0x10bd, "DS", "1", "Z component of gradient direction" );
-
-#else
-
 #include "gdcmDict.h"
 #include "gdcmDicts.h"
 #include "gdcmDictEntry.h"
@@ -48,8 +32,6 @@ const gdcm::DictEntry GEDictZGradient( 0x0019, 0x10bd, "DS", "1", "Z component o
 //const gdcm::DictEntry GEDictXGradient( "0019,10bb", gdcm::VR::DS, gdcm::VM::VM1 , "X component of gradient direction" );
 //const gdcm::DictEntry GEDictYGradient( "0019,10bc", gdcm::VR::DS, gdcm::VM::VM1 , "Y component of gradient direction" );
 //const gdcm::DictEntry GEDictZGradient( "0019,10bd", gdcm::VR::DS, gdcm::VM::VM1 , "Z component of gradient direction" );
-
-#endif
 
 mitk::GEDicomDiffusionImageHeaderReader::GEDicomDiffusionImageHeaderReader()
 {
@@ -66,22 +48,27 @@ void mitk::GEDicomDiffusionImageHeaderReader::Update()
   // check if there are filenames
   if(m_DicomFilenames.size())
   {
+    const std::string& locale = "C";
+    const std::string& currLocale = setlocale( LC_ALL, NULL );
+
+    if ( locale.compare(currLocale)!=0 )
+    {
+      try
+      {
+        MITK_INFO << " ** Changing locale from " << setlocale(LC_ALL, NULL) << " to '" << locale << "'";
+        setlocale(LC_ALL, locale.c_str());
+      }
+      catch(...)
+      {
+        MITK_INFO << "Could not set locale " << locale;
+      }
+    }
+
     // adapted from namic-sandbox
     // DicomToNrrdConverter.cxx
 
     VolumeReaderType::DictionaryArrayRawPointer inputDict 
       = m_VolumeReader->GetMetaDataDictionaryArray();
-
-#ifndef DGDCM2
-    if(gdcm::Global::GetDicts()->GetDefaultPubDict()->GetEntry(GEDictBValue.GetKey()) == 0)
-      gdcm::Global::GetDicts()->GetDefaultPubDict()->AddEntry(GEDictBValue);
-    if(gdcm::Global::GetDicts()->GetDefaultPubDict()->GetEntry(GEDictXGradient.GetKey()) == 0)
-      gdcm::Global::GetDicts()->GetDefaultPubDict()->AddEntry(GEDictXGradient);
-    if(gdcm::Global::GetDicts()->GetDefaultPubDict()->GetEntry(GEDictYGradient.GetKey()) == 0)
-      gdcm::Global::GetDicts()->GetDefaultPubDict()->AddEntry(GEDictYGradient);
-    if(gdcm::Global::GetDicts()->GetDefaultPubDict()->GetEntry(GEDictZGradient.GetKey()) == 0)
-      gdcm::Global::GetDicts()->GetDefaultPubDict()->AddEntry(GEDictZGradient);
-#endif
 
     ReadPublicTags();
 
@@ -156,6 +143,15 @@ void mitk::GEDicomDiffusionImageHeaderReader::Update()
 
     TransformGradients();
 
+    try
+    {
+      MITK_INFO << " ** Changing locale back from " << setlocale(LC_ALL, NULL) << " to '" << currLocale << "'";
+      setlocale(LC_ALL, currLocale.c_str());
+    }
+    catch(...)
+    {
+      MITK_INFO << "Could not reset locale " << currLocale;
+    }
   }
 }
 

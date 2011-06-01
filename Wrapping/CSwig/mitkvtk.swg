@@ -4,6 +4,8 @@
 #include "vtkImageImport.h"
 #include "vtkImageExport.h"
 #include "vtkImageData.h"
+#include "vtkRenderWindow.h"
+#include "vtkRenderer.h"
 %}
 
 #ifdef SWIGPYTHON
@@ -29,6 +31,28 @@
 %typemap(in) vtkImageData* {
   $1 = NULL;
   $1 = (vtkImageData*) vtkPythonGetPointerFromObject ( $input, "vtkImageData" );
+  if ( $1 == NULL ) { SWIG_fail; }
+}
+
+%typemap(out) vtkRenderWindow* {
+  PyImport_ImportModule("vtk");
+  $result = vtkPythonGetObjectFromPointer ( (vtkRenderWindow*)$1 );
+}
+
+%typemap(in) vtkRenderWindow* {
+  $1 = NULL;
+  $1 = (vtkRenderWindow*) vtkPythonGetPointerFromObject ( $input, "vtkRenderWindow" );
+  if ( $1 == NULL ) { SWIG_fail; }
+}
+
+%typemap(out) vtkRenderer* {
+  PyImport_ImportModule("vtk");
+  $result = vtkPythonGetObjectFromPointer ( (vtkRenderer*)$1 );
+}
+
+%typemap(in) vtkRenderer* {
+  $1 = NULL;
+  $1 = (vtkRenderer*) vtkPythonGetPointerFromObject ( $input, "vtkRenderer" );
   if ( $1 == NULL ) { SWIG_fail; }
 }
 

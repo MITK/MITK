@@ -25,9 +25,7 @@ mitk::PlanarFourPointAngle::PlanarFourPointAngle()
 {
   // Four point angle has two control points
   this->ResetNumberOfControlPoints( 2 );
-
-  m_PolyLines->InsertElement( 0, VertexContainerType::New());
-  m_PolyLines->InsertElement( 1, VertexContainerType::New());
+  this->SetNumberOfPolyLines( 2 );
 }
 
 
@@ -38,24 +36,14 @@ mitk::PlanarFourPointAngle::~PlanarFourPointAngle()
 
 void mitk::PlanarFourPointAngle::GeneratePolyLine()
 {
+  this->ClearPolyLines();
   // TODO: start line at specified start point...
   // Generate poly-line 
-  m_PolyLines->ElementAt( 0 )->Reserve( 2 );
-  if (m_ControlPoints->Size() > 2)
-  {
-    m_PolyLines->ElementAt( 1 )->Reserve( this->GetNumberOfControlPoints() - 2 );
-  }
-
+  
   for ( unsigned int i = 0; i < this->GetNumberOfControlPoints(); ++i )
   {
-    if (i < 2)
-    {
-      m_PolyLines->ElementAt( 0 )->ElementAt( i ) = m_ControlPoints->ElementAt( i );
-    }
-    if (i > 1)
-    {
-      m_PolyLines->ElementAt( 1 )->ElementAt( i-2 ) = m_ControlPoints->ElementAt( i );
-    }
+    int index = i/2;
+    this->AppendPointToPolyLine( index, PolyLineElement( GetControlPoint( i ), i ) );
   }
 }
 

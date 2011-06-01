@@ -136,9 +136,14 @@ void QmitkImageStatistics::CreateConnections()
   {
     connect( (QObject*)(m_Controls->m_ButtonCopyHistogramToClipboard), SIGNAL(clicked()),(QObject*) this, SLOT(ClipboardHistogramButtonClicked()));
     connect( (QObject*)(m_Controls->m_ButtonCopyStatisticsToClipboard), SIGNAL(clicked()),(QObject*) this, SLOT(ClipboardStatisticsButtonClicked()));
+    connect( (QObject*)(m_Controls->m_IgnoreZerosCheckbox), SIGNAL(clicked()),(QObject*) this, SLOT(IgnoreZerosCheckboxClicked()));
   }
 }
 
+void QmitkImageStatistics::IgnoreZerosCheckboxClicked(  )
+{
+  UpdateStatistics();
+}
 
 void QmitkImageStatistics::StdMultiWidgetAvailable( QmitkStdMultiWidget& stdMultiWidget )
 {
@@ -470,6 +475,7 @@ void QmitkImageStatistics::OnSelectionChanged( std::vector<mitk::DataNode*> node
 
 void QmitkImageStatistics::UpdateStatistics()
 {
+
   // Remove any cached images that are no longer referenced elsewhere
   this->RemoveOrphanImages();
 
@@ -546,6 +552,16 @@ void QmitkImageStatistics::UpdateStatistics()
       maskName = "None";
       maskType = "";
       maskDimension = 0;
+    }
+
+    if(m_Controls->m_IgnoreZerosCheckbox->isChecked())
+    {
+      m_CurrentStatisticsCalculator->SetIgnorePixelValue(0);
+      m_CurrentStatisticsCalculator->SetDoIgnorePixelValue(true);
+    }
+    else
+    {
+      m_CurrentStatisticsCalculator->SetDoIgnorePixelValue(false);
     }
 
     std::stringstream maskLabel;

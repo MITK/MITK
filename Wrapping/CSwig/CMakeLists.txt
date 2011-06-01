@@ -43,7 +43,7 @@ SET(IGNORE_WARNINGS -w362 -w389 -w503 -w508 -w509 -w516)
 # define macros for wrapping commands
 MACRO(GCCXML_CREATE_XML_FILE Source Bin Input Output Library)
 # if the make program is not an IDE then include
-# the depend file in a way that will make cmake 
+# the depend file in a way that will make cmake
 # re-run if it changes
    SET(CABLE_SWIG_DEPEND)
    SET(CABLE_SWIG_DEPEND_REGENERATE)
@@ -86,10 +86,10 @@ MACRO(GCCXML_CREATE_XML_FILE Source Bin Input Output Library)
        ${MITK_SOURCE_DIR}/Wrapping/CSwig/empty.depend.in
        ${Bin}/${Output}.depend @ONLY IMMEDIATE)
    ENDIF(CABLE_SWIG_DEPEND_REGENERATE)
-	SET(OutDir "Debug")
-   
+  SET(OutDir "Debug")
+
    IF(WIN32)
-	 SET(OS -DWIN32)
+   SET(OS -DWIN32)
    ENDIF(WIN32)
 
    ADD_CUSTOM_COMMAND(
@@ -98,12 +98,12 @@ MACRO(GCCXML_CREATE_XML_FILE Source Bin Input Output Library)
    COMMAND ${GCCXML}
    ARGS -fxml-start=_cable_
         -fxml=${Bin}/${Output} --gccxml-gcc-options ${SWIG_INC_FILE}
-		${OS}
+    ${OS}
         -DCSWIG -DCABLE_CONFIGURATION ${Source}/${Input}
    TARGET ${Library}
    OUTPUTS ${Bin}/${Output}
    DEPENDS ${GCCXML} ${CABLE_SWIG_DEPEND})
-   
+
 ENDMACRO(GCCXML_CREATE_XML_FILE)
 
 
@@ -114,7 +114,7 @@ MACRO(CINDEX_CREATE_IDX_FILE Bin Input Output Library)
    COMMAND ${CABLE_INDEX}
    ARGS ${Bin}/${Input} ${Bin}/${Output}
    TARGET ${Library}
-   OUTPUTS ${Bin}/${Output} 
+   OUTPUTS ${Bin}/${Output}
    DEPENDS ${Bin}/${Input} ${CABLE_INDEX}
 )
 ENDMACRO(CINDEX_CREATE_IDX_FILE)
@@ -147,9 +147,9 @@ MACRO(CSWIG_CREATE_PYTHON_CXX_FILE Bin MasterIdx InputIdx InputXml OutputPythonC
           -I${MITK_SWIG_DEFAULT_LIB}
           -I${MITK_SWIG_DEFAULT_LIB}/python
           -noruntime
-		  -dirprot
-		  #-keyword
-		  ${CINDEX} ${IGNORE_WARNINGS} -depend ${Bin}/${InputXml}.depend
+      -dirprot
+      #-keyword
+      ${CINDEX} ${IGNORE_WARNINGS} -depend ${Bin}/${InputXml}.depend
           -outdir "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${CFG_INTDIR}/${LIB_PYTHON_FILES}"
           -o ${Bin}/${OutputPythonCxx} -python -c++ ${Bin}/${InputXml}
      TARGET ${Library}
@@ -263,7 +263,7 @@ IF(PYTHON_EXECUTABLE AND MITK_USE_PYTHON)
     mitk
     )
   # Done listing files.
-       
+
   # Now copy these files if necessary.
   SET(MITK_PYTHON_SOURCE_FILES)
   SET(MITK_PYTHON_OUTPUT_FILES)
@@ -283,9 +283,9 @@ IF(PYTHON_EXECUTABLE AND MITK_USE_PYTHON)
   #ELSE ("${MITK_BINARY_DIR}" MATCHES "^${MITK_SOURCE_DIR}$")
     #IF(MITK_CSWIG_CONFIGURATION_TYPES)
       #FOREACH(file ${MITK_PYTHON_FILES})
-	#SET(src "${MITK_SOURCE_DIR}/Wrapping/CSwig/Python/${file}.py")
-	#SET(tgt "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${file}.py")
-	#ADD_CUSTOM_COMMAND(SOURCE ${src}
+  #SET(src "${MITK_SOURCE_DIR}/Wrapping/CSwig/Python/${file}.py")
+  #SET(tgt "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${file}.py")
+  #ADD_CUSTOM_COMMAND(SOURCE ${src}
                            #COMMAND ${CMAKE_COMMAND}
                            #ARGS -E copy ${src} ${tgt}
                            #OUTPUTS ${tgt}
@@ -348,14 +348,14 @@ IF(MITK_USE_PYTHON)
     ELSE(MITK_CSWIG_CONFIGURATION_TYPES)
       SET(_FROMDIR ${EXECUTABLE_OUTPUT_PATH})
     ENDIF(MITK_CSWIG_CONFIGURATION_TYPES)
-	IF(MITK_INSTALL_LIBRARY_DIR)
+  IF(MITK_INSTALL_LIBRARY_DIR)
     INSTALL(
       DIRECTORY ${_FROMDIR}/
       DESTINATION ${MITK_INSTALL_LIBRARY_DIR}
       COMPONENT "RuntimeLibraries"
       FILES_MATCHING PATTERN "*.py"
       )
-	ENDIF(MITK_INSTALL_LIBRARY_DIR)
+  ENDIF(MITK_INSTALL_LIBRARY_DIR)
   ENDIF("${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}" STREQUAL "2.4")
 
   # Install the package python files.
@@ -370,7 +370,7 @@ IF(MITK_USE_PYTHON)
         #COMPONENT RuntimeLibraries)
     #ENDIF(MITK_CSWIG_CONFIGURATION_TYPES)
   #ENDFOREACH(file)
-  
+
   SET(MITK_CSWIG_PACKAGE_DIR "os.path.dirname(selfpath)")
   SET(MITK_CSWIG_DATA_ROOT "os.path.join(os.path.dirname(selfpath),'Data')")
   SET(MITK_CSWIG_TEST_ROOT "'<NO_DEFAULT>'")
@@ -391,50 +391,51 @@ MACRO(MITK_WRAP_LIBRARY WRAP_SOURCES LIBRARY_NAME DIRECTORY DEPEND_LIBRARY EXTRA
     SET(ALL_IDX_FILES ${ALL_IDX_FILES} ${MITK_WRAP_BINARY_DIR}/${DIRECTORY}/${Source}.idx )
     SET(INDEX_FILE_CONTENT "${INDEX_FILE_CONTENT}${MITK_CSWIG_BINARY_DIR}/${DIRECTORY}/${Source}.idx\n")
   ENDFOREACH(Source)
-  # add the package wrappers 
+  # add the package wrappers
   SET(WRAP_PYTHON_SOURCES ${WRAP_PYTHON_SOURCES} wrap_${LIBRARY_NAME}PythonPython.cxx)
   IF(MITK_EXTRA_PYTHON_WRAP)
     FOREACH( extraPython ${MITK_EXTRA_PYTHON_WRAP})
       SET(WRAP_PYTHON_SOURCES ${WRAP_PYTHON_SOURCES} ${extraPython}Python.cxx)
     ENDFOREACH( extraPython )
   ENDIF(MITK_EXTRA_PYTHON_WRAP)
-  
+
   # set the generated sources as generated
   SET_SOURCE_FILES_PROPERTIES(
-    ${WRAP_PYTHON_SOURCES} 
+    ${WRAP_PYTHON_SOURCES}
     GENERATED )
   SET(EXTRA_LIBS ${MITK_LINK_LIBRARIES})
   IF("${MITK_LINK_LIBRARIES}" MATCHES "^$")
     #SET(EXTRA_LIBS ${LIBRARY_NAME})
   ENDIF("${MITK_LINK_LIBRARIES}" MATCHES "^$")
-  
+
   FILE(APPEND ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/mitk.py
         "from ${LIBRARY_NAME}Python import *\n")
-  
+
   SET(DEPENDENCIES mitkIpPic mbilog tinyxml)
   SET(DEPENDS ${DEPENDENCIES})
   MITK_CHECK_MODULE(_MISSING_DEP ${DEPENDENCIES})
-  MITK_USE_MODULE("${DEPENDENCIES}")
-  
+  MITK_USE_MODULE("Mitk")
+
   SET(ALL_INCLUDE_DIRECTORIES ${ALL_INCLUDE_DIRECTORIES} ${MITK_INCLUDE_DIRS} ${MITK_WRAP_SOURCE_DIR})
   #  "D:/MITK/mitk/CoreUI/Bundles/org.mitk.gui.qt.common/src" "D:/MITK/mitk/BlueBerry/Bundles/org.blueberry.ui.qt/src" "D:/MITK/mitk/BlueBerry/Bundles/org.blueberry.ui/src" "D:/MITK/mitk/BlueBerry/Bundles/org.blueberry.core.runtime/src" "D:/MITK/mitk/CoreUI/Bundles/org.mitk.gui.common/src" "D:/MITK/mitk/BlueBerry/Bundles/org.blueberry.osgi/src" "D:/MITK/mitk/BlueBerry/Bundles/org.blueberry.osgi/src/service" "D:/MITK/mitk/Utilities/Poco/Foundation/include" "D:/binPython/BlueBerry/Bundles/org.blueberry.osgi" "D:/MITK/mitk/Utilities/Poco/Util/include" "V:/windows/x32/QT-4.6.2_VC9.0_Bin/include/QtGui" "V:/windows/x32/QT-4.6.2_VC9.0_Bin/include"
   INCLUDE_DIRECTORIES(${ALL_INCLUDE_DIRECTORIES})
 
-  IF(MITK_USE_PYTHON)  
+
+  IF(MITK_USE_PYTHON)
     IF(MITK_SWIG_FILE)
       SET(SWIG_INC ${SWIG_INC} ${PYTHON_INCLUDE_PATH})
       SET_SOURCE_FILES_PROPERTIES(${MITK_SWIG_FILE_CXX}Python.cxx GENERATED)
       SET(WRAP_FILE ${MITK_SWIG_FILE_CXX}Python.cxx )
     ENDIF(MITK_SWIG_FILE)
-    
+
     ADD_LIBRARY(_${LIBRARY_NAME}Python SHARED
       ${WRAP_PYTHON_SOURCES}
       ${MITK_EXTRA_PYTHON_SOURCES}
       ${WRAP_FILE}
       ${EXTRA_SOURCES})
-	  
-	#TARGET_LINK_LIBRARIES(_${LIBRARY_NAME}Python ${DEPENDENCIES})
-	
+
+  #TARGET_LINK_LIBRARIES(_${LIBRARY_NAME}Python ${DEPENDENCIES})
+
     IF(MITK_WRAP_NEEDS_DEPEND)
       FOREACH(lib ${DEPEND_LIBRARY})
         ADD_DEPENDENCIES(_${LIBRARY_NAME}Python _${lib}Python)
@@ -443,7 +444,7 @@ MACRO(MITK_WRAP_LIBRARY WRAP_SOURCES LIBRARY_NAME DIRECTORY DEPEND_LIBRARY EXTRA
     IF(MITK_LIBRARY_PROPERTIES)
       SET_TARGET_PROPERTIES( _${LIBRARY_NAME}Python PROPERTIES PREFIX "" ${MITK_LIBRARY_PROPERTIES})
     ELSE(MITK_LIBRARY_PROPERTIES)
-	SET_TARGET_PROPERTIES( _${LIBRARY_NAME}Python PROPERTIES PREFIX "")
+  SET_TARGET_PROPERTIES( _${LIBRARY_NAME}Python PROPERTIES PREFIX "")
     ENDIF(MITK_LIBRARY_PROPERTIES)
 
     # Python extension modules on Windows must have the extension ".pyd"
@@ -452,23 +453,23 @@ MACRO(MITK_WRAP_LIBRARY WRAP_SOURCES LIBRARY_NAME DIRECTORY DEPEND_LIBRARY EXTRA
     IF(WIN32 AND NOT CYGWIN)
       SET_TARGET_PROPERTIES(_${LIBRARY_NAME}Python PROPERTIES DEBUG_POSTFIX "_d" SUFFIX ".pyd")
     ENDIF(WIN32 AND NOT CYGWIN)
-    
+
     IF(PYTHON_DEBUG_LIBRARY)
       TARGET_LINK_LIBRARIES(_${LIBRARY_NAME}Python ${DEPENDENCIES} ${EXTRA_LIBS} SwigRuntimePython debug ${PYTHON_DEBUG_LIBRARY} optimized ${PYTHON_LIBRARY})
     ELSE(PYTHON_DEBUG_LIBRARY)
-	  TARGET_LINK_LIBRARIES(_${LIBRARY_NAME}Python ${DEPENDENCIES} ${EXTRA_LIBS} SwigRuntimePython ${PYTHON_LIBRARY})
+    TARGET_LINK_LIBRARIES(_${LIBRARY_NAME}Python ${DEPENDENCIES} ${EXTRA_LIBS} SwigRuntimePython ${PYTHON_LIBRARY})
     ENDIF(PYTHON_DEBUG_LIBRARY)
-	IF(MITK_INSTALL_LIBRARY_DIR)
+  IF(MITK_INSTALL_LIBRARY_DIR)
     INSTALL(TARGETS _${LIBRARY_NAME}Python
       RUNTIME DESTINATION ${MITK_INSTALL_BIN_DIR} COMPONENT RuntimeLibraries
       LIBRARY DESTINATION ${MITK_INSTALL_LIBRARY_DIR} COMPONENT RuntimeLibraries
       ARCHIVE DESTINATION ${MITK_INSTALL_LIBRARY_DIR} COMPONENT Development)
-	ENDIF(MITK_INSTALL_LIBRARY_DIR)
+  ENDIF(MITK_INSTALL_LIBRARY_DIR)
     IF(MITK_SWIG_FILE)
       ADD_CUSTOM_COMMAND(
         COMMENT "run native swig on ${MITK_SWIG_FILE}"
         SOURCE ${MITK_SWIG_FILE}
-        COMMAND ${CSWIG} 
+        COMMAND ${CSWIG}
         ARGS -nocable -noruntime ${IGNORE_WARNINGS} -o ${WRAP_FILE}
          -outdir "${EXECUTABLE_OUTPUT_PATH}/${CMAKE_CFG_INTDIR}"
          -python -c++ ${MITK_SWIG_FILE}
@@ -491,18 +492,18 @@ MACRO(MITK_WRAP_LIBRARY WRAP_SOURCES LIBRARY_NAME DIRECTORY DEPEND_LIBRARY EXTRA
   ENDFOREACH(dir)
   CONFIGURE_FILE(${MITK_CSWIG_SOURCE_DIR}/SwigInc.txt.in ${SWIG_INC_FILE}
     @ONLY IMMEDIATE)
-  
+
   FOREACH(Source ${WRAP_SOURCES})
-       
+
     IF(MITK_USE_PYTHON)
       # python
-      WRAP_PYTHON_SOURCES(${MITK_CSWIG_SOURCE_DIR}/${DIRECTORY} ${MITK_CSWIG_BINARY_DIR}/${DIRECTORY} 
+      WRAP_PYTHON_SOURCES(${MITK_CSWIG_SOURCE_DIR}/${DIRECTORY} ${MITK_CSWIG_BINARY_DIR}/${DIRECTORY}
         ${Source} _${LIBRARY_NAME}Python "${MASTER_INDEX_FILES}" "${ALL_IDX_FILES}")
     ENDIF(MITK_USE_PYTHON)
-    
+
   ENDFOREACH(Source)
-  
-  
+
+
   # wrap the package files for python
   IF(MITK_USE_PYTHON)
     # python

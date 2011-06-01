@@ -17,14 +17,16 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef __itkAnalyticalDiffusionQballReconstructionImageFilter_cpp
 #define __itkAnalyticalDiffusionQballReconstructionImageFilter_cpp
 
-#include "itkAnalyticalDiffusionQballReconstructionImageFilter.h"
-#include "itkImageRegionConstIterator.h"
-#include "itkImageRegionConstIteratorWithIndex.h"
-#include "itkImageRegionIterator.h"
-#include "itkArray.h"
-#include "vnl/vnl_vector.h"
+#include <itkAnalyticalDiffusionQballReconstructionImageFilter.h>
+#include <itkImageRegionConstIterator.h>
+#include <itkImageRegionConstIteratorWithIndex.h>
+#include <itkImageRegionIterator.h>
+#include <itkArray.h>
+#include <vnl/vnl_vector.h>
 
 #include <boost/version.hpp>
+#include <stdio.h>
+#include <locale>
 
 #if BOOST_VERSION / 100000 > 0
 #if BOOST_VERSION / 100 % 1000 > 34
@@ -80,7 +82,8 @@ namespace itk {
           {
             sum += odf[i];
           }
-          odf /= sum;
+          if(sum>0)
+            odf /= sum;
 
           return odf;
           break;
@@ -124,7 +127,16 @@ namespace itk {
           for(int i=0; i<NrOdfDirections; i++)
           {
             odf[i] = odf[i] < 0 ? 0 : odf[i];
+            odf[i] *= QBALL_ANAL_RECON_PI*4/NrOdfDirections;
           }
+          TOdfPixelType sum = 0;
+          for(int i=0; i<NrOdfDirections; i++)
+          {
+            sum += odf[i];
+          }
+          if(sum>0)
+            odf /= sum;
+
           break;
         }
       case QBAR_NONNEG_SOLID_ANGLE:
@@ -196,14 +208,17 @@ namespace itk {
         case QBAR_NONNEG_SOLID_ANGLE:
           {
             int n = vec.size();
+            double b0f = (double)b0;
             for(int i=0; i<n; i++)
             {
-              float meas = vec[i];
-              if(meas >= b0)
-              {
-                meas = b0 - 0.0001;
-              }
-              vec[i] = log(-log(meas/b0));
+              double meas = (double)vec[i];
+              if (meas==0)
+                meas = 0.001;
+              if (b0f==0)
+                b0f = 0.01;
+              if(meas >= b0f)
+                meas = b0f - 0.001;
+              vec[i] = log(-log(meas/b0f));
             }
             return vec;
             break;
@@ -251,6 +266,14 @@ namespace itk {
         m_BZeroImage->SetBufferedRegion( img->GetLargestPossibleRegion() );
         m_BZeroImage->Allocate();
 
+        m_ODFSumImage = BZeroImageType::New();
+        m_ODFSumImage->SetSpacing( img->GetSpacing() );   // Set the image spacing
+        m_ODFSumImage->SetOrigin( img->GetOrigin() );     // Set the image origin
+        m_ODFSumImage->SetDirection( img->GetDirection() );  // Set the image direction
+        m_ODFSumImage->SetLargestPossibleRegion( img->GetLargestPossibleRegion());
+        m_ODFSumImage->SetBufferedRegion( img->GetLargestPossibleRegion() );
+        m_ODFSumImage->Allocate();
+
         if(m_NormalizationMethod == QBAR_SOLID_ANGLE ||
           m_NormalizationMethod == QBAR_NONNEG_SOLID_ANGLE)
         {
@@ -272,6 +295,9 @@ namespace itk {
 
         ImageRegionIterator< BZeroImageType > oit2(m_BZeroImage, outputRegionForThread);
         oit2.GoToBegin();
+
+        ImageRegionIterator< BlaImage > oit3(m_ODFSumImage, outputRegionForThread);
+        oit3.GoToBegin();
 
         typedef ImageRegionConstIterator< GradientImagesType > GradientIteratorType;
         typedef typename GradientImagesType::PixelType         GradientVectorType;
@@ -351,24 +377,26 @@ namespace itk {
               * .5*|| Bc-s ||^2 == .5*c'B'Bc - x'B's + .5*s's
               */
 
-              QuadProgPP::Matrix<double>& G(m_G);
-              int lenb = B.size();
-              vnl_vector<double>* s = new vnl_vector<double>(lenb);
-              for (int ii=0; ii<lenb; ii++) (*s)(ii) = B(ii);
-              vnl_vector<double> g0_ = -1.0 * (*m_B_t) * (*s);
-              QuadProgPP::Vector<double> g0(g0_.data_block(),m_NumberCoefficients);
-              try
-              {
-                QuadProgPP::QuadProg::solve_quadprog(G,g0,m_CE,m_ce0,m_CI,m_ci0,m_x);
-              }
-              catch(...)
-              {
-                m_x = 0;
-              }
-              vnl_vector<TO> coeffs(m_NumberCoefficients);
-              for (int ii=0; ii<m_NumberCoefficients; ii++) coeffs(ii) = (*m_LP)(ii) * m_x[ii];
-              coeffs[0] += 1.0/(2.0*sqrt(QBALL_ANAL_RECON_PI));                
-              odf = ( (*m_SphericalHarmonicBasisMatrix) * coeffs ).data_block();
+              itkExceptionMacro( << "Nonnegative Solid Angle not yet implemented");
+
+//              QuadProgPP::Matrix<double>& G(m_G);
+//              int lenb = B.size();
+//              vnl_vector<double>* s = new vnl_vector<double>(lenb);
+//              for (int ii=0; ii<lenb; ii++) (*s)(ii) = B(ii);
+//              vnl_vector<double> g0_ = -1.0 * (*m_B_t) * (*s);
+//              QuadProgPP::Vector<double> g0(g0_.data_block(),m_NumberCoefficients);
+//              try
+//              {
+//                QuadProgPP::QuadProg::solve_quadprog(G,g0,m_CE,m_ce0,m_CI,m_ci0,m_x);
+//              }
+//              catch(...)
+//              {
+//                m_x = 0;
+//              }
+//              vnl_vector<TO> coeffs(m_NumberCoefficients);
+//              for (int ii=0; ii<m_NumberCoefficients; ii++) coeffs(ii) = (*m_LP)(ii) * m_x[ii];
+//              coeffs[0] += 1.0/(2.0*sqrt(QBALL_ANAL_RECON_PI));
+//              odf = ( (*m_SphericalHarmonicBasisMatrix) * coeffs ).data_block();
 
             }
             else
@@ -382,8 +410,15 @@ namespace itk {
           oit.Set( odf );
           ++oit;
           oit2.Set( b0 );
+          float sum = 0;
+          for (int k=0; k<odf.Size(); k++)
+            sum += (float) odf[k];
+          oit3.Set( sum-1 );
+          ++oit3;
           ++oit2;
           ++git; // Gradient  image iterator
+
+
         }
 
         std::cout << "One Thread finished reconstruction" << std::endl;
@@ -395,6 +430,10 @@ namespace itk {
       {
         vnl_matrix<double> A = (*pA);
         ofstream myfile;
+        std::locale C("C");
+        std::locale originalLocale = myfile.getloc();
+        myfile.imbue(C);
+
         myfile.open (fname.c_str());
         myfile << "A1=[";
         for(int i=0; i<A.rows(); i++)
@@ -409,6 +448,7 @@ namespace itk {
         myfile << "];";
         myfile.close();
 
+        myfile.imbue( originalLocale );
       }
 
       template< class T, class TG, class TO, int L, int NODF>
@@ -716,12 +756,12 @@ namespace itk {
           temp = fac1 * (*P) * (*_L) * temp;
           break;
         case QBAR_NONNEG_SOLID_ANGLE:
-          m_G = QuadProgPP::Matrix<double>(B_t_B.data_block(), B_t_B.rows(), B_t_B.cols());
-          m_CE = QuadProgPP::Matrix<double>((double)0,m_NumberCoefficients,0);
-          m_ce0 = QuadProgPP::Vector<double>((double)0,0);
-          m_ci0 = QuadProgPP::Vector<double>(4*QBALL_ANAL_RECON_PI, NODF);
-          m_x = QuadProgPP::Vector<double>(m_NumberCoefficients);
-          (*m_LP) *= fac1;
+//          m_G = QuadProgPP::Matrix<double>(B_t_B.data_block(), B_t_B.rows(), B_t_B.cols());
+//          m_CE = QuadProgPP::Matrix<double>((double)0,m_NumberCoefficients,0);
+//          m_ce0 = QuadProgPP::Vector<double>((double)0,0);
+//          m_ci0 = QuadProgPP::Vector<double>(4*QBALL_ANAL_RECON_PI, NODF);
+//          m_x = QuadProgPP::Vector<double>(m_NumberCoefficients);
+//          (*m_LP) *= fac1;
           break;
         }
 
@@ -774,9 +814,9 @@ namespace itk {
 
         if(m_NormalizationMethod == QBAR_NONNEG_SOLID_ANGLE)
         {
-          vnl_matrix<double> CI_t =
-            (*sphericalHarmonicBasisMatrix2) * (*P) * (*_L);
-          m_CI = QuadProgPP::Matrix<double>(CI_t.transpose().data_block(), m_NumberCoefficients, NOdfDirections);
+//          vnl_matrix<double> CI_t =
+//            (*sphericalHarmonicBasisMatrix2) * (*P) * (*_L);
+//          m_CI = QuadProgPP::Matrix<double>(CI_t.transpose().data_block(), m_NumberCoefficients, NOdfDirections);
         }
 
         m_ReconstructionMatrix = new vnl_matrix<TO>(NOdfDirections,m_NumberOfGradientDirections);
@@ -827,6 +867,10 @@ namespace itk {
       void AnalyticalDiffusionQballReconstructionImageFilter<T,TG,TO,L,NODF>
         ::PrintSelf(std::ostream& os, Indent indent) const
       {
+        std::locale C("C");
+        std::locale originalLocale = os.getloc();
+        os.imbue(C);
+
         Superclass::PrintSelf(os,indent);
 
         os << indent << "OdfReconstructionMatrix: " << m_ReconstructionMatrix << std::endl;
@@ -846,6 +890,8 @@ namespace itk {
           m_NumberOfBaselineImages << std::endl;
         os << indent << "Threshold for reference B0 image: " << m_Threshold << std::endl;
         os << indent << "BValue: " << m_BValue << std::endl;
+
+        os.imbue( originalLocale );
       }
 
 }

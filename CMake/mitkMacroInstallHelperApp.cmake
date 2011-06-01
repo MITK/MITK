@@ -1,7 +1,7 @@
-# MITK specific cross plattform install macro
-#
-# Usage: MITK_INSTALL_HELPER_APP(target1 [target2] ....)
-#
+#! MITK specific cross plattform install macro
+#!
+#! Usage: MITK_INSTALL_HELPER_APP(target1 [target2] ....)
+#!
 MACRO(MITK_INSTALL_HELPER_APP)
   MACRO_PARSE_ARGUMENTS(_install "TARGETS;EXECUTABLES;PLUGINS;LIBRARY_DIRS" "GLOB_PLUGINS" ${ARGN})
   LIST(APPEND _install_TARGETS ${_install_DEFAULT_ARGS})
@@ -16,7 +16,8 @@ MACRO(MITK_INSTALL_HELPER_APP)
   SET(DIRS 
     ${VTK_RUNTIME_LIBRARY_DIRS}/${intermediate_dir}
     ${ITK_LIBRARY_DIRS}/${intermediate_dir}
-    ${QT_LIBRARY_DIR} 
+    ${QT_LIBRARY_DIR}
+	${QT_LIBRARY_DIR}/../bin
     ${MITK_BINARY_DIR}/bin/${intermediate_dir} 
     ${_install_LIBRARY_DIRS}
     )
@@ -63,17 +64,26 @@ MACRO(MITK_INSTALL_HELPER_APP)
     FOREACH(_target_location ${_target_locations})
       IF(NOT _qt_is_system_qt)
         IF(QT_PLUGINS_DIR)
-          INSTALL(DIRECTORY "${QT_PLUGINS_DIR}"
-                  DESTINATION ${${_target_location}_qt_plugins_install_dir}
-                  CONFIGURATIONS Release
-                  FILES_MATCHING REGEX "[^d]4?\\${CMAKE_SHARED_LIBRARY_SUFFIX}"
-                 )
+          IF(WIN32)
+            INSTALL(DIRECTORY "${QT_PLUGINS_DIR}"
+                    DESTINATION ${${_target_location}_qt_plugins_install_dir}
+                    CONFIGURATIONS Release
+                    FILES_MATCHING REGEX "[^4d]4?${CMAKE_SHARED_LIBRARY_SUFFIX}"
+                   )
 
-          INSTALL(DIRECTORY "${QT_PLUGINS_DIR}"
-                  DESTINATION ${${_target_location}_qt_plugins_install_dir}
-                  CONFIGURATIONS Debug
-                  FILES_MATCHING REGEX "d4?\\${CMAKE_SHARED_LIBRARY_SUFFIX}"
-                 )
+            INSTALL(DIRECTORY "${QT_PLUGINS_DIR}"
+                    DESTINATION ${${_target_location}_qt_plugins_install_dir}
+                    CONFIGURATIONS Debug
+                    FILES_MATCHING REGEX "d4?${CMAKE_SHARED_LIBRARY_SUFFIX}"
+                   )
+          ELSE(WIN32)
+            # install everything, see bug 7143
+            INSTALL(DIRECTORY "${QT_PLUGINS_DIR}"
+                    DESTINATION ${${_target_location}_qt_plugins_install_dir}
+                    FILES_MATCHING REGEX "${CMAKE_SHARED_LIBRARY_SUFFIX}"
+                   )
+ 
+          ENDIF(WIN32)
         ENDIF()
       ENDIF()
       _fixup_target()

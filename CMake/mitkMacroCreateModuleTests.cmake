@@ -61,7 +61,7 @@ MACRO(MITK_CREATE_MODULE_TESTS)
       ELSE(EXISTS ${image})
         # todo: maybe search other paths as well
         # yes, please in mitk/Testing/Data, too
-        SET(IMAGE_FULL_PATH ${MITK_SOURCE_DIR}/Core/Code/Testing/Data/${image})
+        SET(IMAGE_FULL_PATH ${MITK_DATA_DIR}/${image})
       ENDIF(EXISTS ${image})
 
       IF(EXISTS ${IMAGE_FULL_PATH})
@@ -71,7 +71,7 @@ MACRO(MITK_CREATE_MODULE_TESTS)
           ADD_TEST(${TName}_${ImageName} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${TESTDRIVER} ${TName} ${IMAGE_FULL_PATH})
           # Add labels for CDash subproject support
           IF(MODULE_SUBPROJECTS)
-            SET_PROPERTY(TEST ${TName} PROPERTY LABELS ${MODULE_SUBPROJECTS} MITK)
+            SET_PROPERTY(TEST ${TName}_${ImageName} PROPERTY LABELS ${MODULE_SUBPROJECTS} MITK)
           ENDIF()
         ENDFOREACH( test )
       ELSE(EXISTS ${IMAGE_FULL_PATH})

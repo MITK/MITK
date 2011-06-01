@@ -29,7 +29,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkImageTimeSelector.h"
 #include "mitkPlanarFigure.h"
 
-
+#include <vtkSmartPointer.h>
 
 namespace mitk
 {
@@ -103,7 +103,7 @@ public:
   void SetImageMask( const mitk::Image *imageMask );
 
   /** \brief Set planar figure for masking. */
-  void SetPlanarFigure( const mitk::PlanarFigure *planarFigure );
+  void SetPlanarFigure( mitk::PlanarFigure *planarFigure );
 
 
   /** \brief Set/Get operation mode for masking */
@@ -121,7 +121,17 @@ public:
   /** \brief Set/Get operation mode for masking */
   void SetMaskingModeToPlanarFigure();
 
+  /** \brief Set a pixel value for pixels that will be ignored in the statistics */
+  void SetIgnorePixelValue(double value);
 
+  /** \brief Get the pixel value for pixels that will be ignored in the statistics */
+  double GetIgnorePixelValue();
+
+  /** \brief Set wether a pixel value should be ignored in the statistics */
+  void SetDoIgnorePixelValue(bool doit);
+
+  /** \brief Get wether a pixel value will be ignored in the statistics */
+  bool GetDoIgnorePixelValue();
 
   /** \brief Compute statistics (together with histogram) for the current
    * masking mode.
@@ -189,10 +199,14 @@ protected:
   void InternalCalculateMaskFromPlanarFigure(
     const itk::Image< TPixel, VImageDimension > *image, unsigned int axis );
 
+  template < typename TPixel, unsigned int VImageDimension >
+      void InternalMaskIgnoredPixels(
+          const itk::Image< TPixel, VImageDimension > *image,
+          itk::Image< unsigned short, VImageDimension > *maskImage );
 
   /** Connection from ITK to VTK */
   template <typename ITK_Exporter, typename VTK_Importer>
-  void ConnectPipelines(ITK_Exporter exporter, VTK_Importer* importer)
+  void ConnectPipelines(ITK_Exporter exporter, vtkSmartPointer<VTK_Importer> importer)
   {
     importer->SetUpdateInformationCallback(exporter->GetUpdateInformationCallback());
 
@@ -213,7 +227,7 @@ protected:
 
   /** Connection from VTK to ITK */
   template <typename VTK_Exporter, typename ITK_Importer>
-  void ConnectPipelines(VTK_Exporter* exporter, ITK_Importer importer)
+  void ConnectPipelines(vtkSmartPointer<VTK_Exporter> exporter, ITK_Importer importer)
   {
     importer->SetUpdateInformationCallback(exporter->GetUpdateInformationCallback());
 
@@ -243,7 +257,7 @@ protected:
 
   mitk::Image::ConstPointer m_ImageMask;
 
-  mitk::PlanarFigure::ConstPointer m_PlanarFigure;
+  mitk::PlanarFigure::Pointer m_PlanarFigure;
 
   HistogramVectorType m_ImageHistogramVector;
   HistogramVectorType m_MaskedImageHistogramVector;
@@ -274,6 +288,9 @@ protected:
   BoolVectorType m_MaskedImageStatisticsCalculationTriggerVector;
   BoolVectorType m_PlanarFigureStatisticsCalculationTriggerVector;
 
+  double m_IgnorePixelValue;
+  bool m_DoIgnorePixelValue;
+  bool m_IgnorePixelValueChanged;
 };
 
 }

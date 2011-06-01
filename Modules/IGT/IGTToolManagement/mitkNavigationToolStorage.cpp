@@ -34,6 +34,11 @@ bool mitk::NavigationToolStorage::DeleteTool(int number)
     m_ToolCollection.erase(it);
     return true;
   }
+bool mitk::NavigationToolStorage::DeleteAllTools()
+  {
+  while(m_ToolCollection.size() > 0) if (!DeleteTool(0)) return false;
+  return true;
+  }
 
 bool mitk::NavigationToolStorage::AddTool(mitk::NavigationTool::Pointer tool)
   {
@@ -53,6 +58,12 @@ mitk::NavigationTool::Pointer mitk::NavigationToolStorage::GetTool(int number)
 mitk::NavigationTool::Pointer mitk::NavigationToolStorage::GetTool(std::string identifier)
   {
   for (int i=0; i<GetToolCount(); i++) if ((GetTool(i)->GetIdentifier())==identifier) return GetTool(i);
+  return NULL;
+  }
+
+mitk::NavigationTool::Pointer mitk::NavigationToolStorage::GetToolByName(std::string name)
+  {
+  for (int i=0; i<GetToolCount(); i++) if ((GetTool(i)->GetToolName())==name) return GetTool(i);
   return NULL;
   }
     

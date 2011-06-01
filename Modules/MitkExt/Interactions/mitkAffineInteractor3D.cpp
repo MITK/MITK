@@ -396,7 +396,7 @@ bool AffineInteractor3D
 
         Vector3D transformedObjectNormal;
         data->GetGeometry( timeStep )->IndexToWorld(
-          origin, m_ObjectNormal, transformedObjectNormal );
+          m_ObjectNormal, transformedObjectNormal );
 
         data->GetGeometry( timeStep )->SetOrigin(
           origin + transformedObjectNormal * (interactionMove * transformedObjectNormal) );

@@ -2,8 +2,8 @@
 
 Program:   Medical Imaging & Interaction Toolkit
 Language:  C++
-Date:      $Date$
-Version:   $Revision$
+Date:      $Date: 2011-01-18 13:22:38 +0100 (Di, 18 Jan 2011) $
+Version:   $Revision: 28959 $
 
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
@@ -24,7 +24,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QValidator>
 #include <QLayout>
 #include <QLineEdit>
+#include <limits>
 
+using namespace std;
 
 /**
 * Constructor
@@ -63,11 +65,13 @@ QmitkLineEditLevelWindowWidget::QmitkLineEditLevelWindowWidget(QWidget* parent, 
   connect( m_WindowInput, SIGNAL(editingFinished()), this, SLOT( SetWindowValue() ) );
 
   // Validator for both LineEdit-widgets, to limit the valid input-range to int.
-  QValidator* validatorWindowInput = new QIntValidator(1, 20000000, this);
+  //QValidator* validatorWindowInput = new QIntValidator(1, 20000000, this);
+  QValidator* validatorWindowInput = new QDoubleValidator(0, numeric_limits<double>::max(), 2, this);
   m_WindowInput->setValidator(validatorWindowInput);
 
-  QValidator* validatorLevelInput = new QIntValidator(-10000000, 10000000, this);
-  m_LevelInput->setValidator(validatorLevelInput);
+  //QValidator* validatorLevelInput = new QIntValidator(-10000000, 10000000, this);
+  QValidator* validatorLevelInput = new QDoubleValidator(numeric_limits<double>::min(), numeric_limits<double>::max(), 2, this);
+  //m_LevelInput->setValidator(validatorLevelInput);
   
   this->hide();
 }
@@ -151,17 +155,22 @@ void QmitkLineEditLevelWindowWidget::contextMenuEvent( QContextMenuEvent * )
 
 void QmitkLineEditLevelWindowWidget::validLevel()
 {
-  int level = m_LevelInput->text().toInt();
-  if ( level + (int)(m_LevelWindow.GetWindow()/2) > (int)(m_LevelWindow.GetRangeMax()))
+  double level =m_LevelInput->text().toDouble();
+  
+  if ( level + m_LevelWindow.GetWindow()/2 > m_LevelWindow.GetRangeMax())
   {
-    level = (int)(m_LevelWindow.GetRangeMax() - m_LevelWindow.GetWindow()/2);
+    level = m_LevelWindow.GetRangeMax() - m_LevelWindow.GetWindow()/2;
   }
-  if (level - (int)(m_LevelWindow.GetWindow()/2) < (int)(m_LevelWindow.GetRangeMin()))
+  if (level - m_LevelWindow.GetWindow()/2 < m_LevelWindow.GetRangeMin())
   {
-    level = (int)(m_LevelWindow.GetRangeMin() + m_LevelWindow.GetWindow()/2);
+    level = m_LevelWindow.GetRangeMin() + m_LevelWindow.GetWindow()/2;
   }
-  QString qLevel;
-  qLevel.setNum(level);
+  
+  std::stringstream ss;
+  ss << std::setprecision(2) << level;
+  QString qLevel(ss.str().c_str());
+
+  //qLevel.setNum(level);
   m_LevelInput->setText(qLevel);
   m_LevelWindow.SetLevelWindow(level, m_LevelWindow.GetWindow());
   m_Manager->SetLevelWindow(m_LevelWindow);
@@ -170,14 +179,14 @@ void QmitkLineEditLevelWindowWidget::validLevel()
 
 void QmitkLineEditLevelWindowWidget::validWindow()
 {
-  int window = m_WindowInput->text().toInt();
-  if ( (int)(m_LevelWindow.GetLevel()) + window/2 > (int)(m_LevelWindow.GetRangeMax()))
+  double window = m_WindowInput->text().toDouble();
+  if ( m_LevelWindow.GetLevel() + window/2 > m_LevelWindow.GetRangeMax())
   {
-    window = (int)((m_LevelWindow.GetRangeMax() - m_LevelWindow.GetLevel())*2);
+    window = (m_LevelWindow.GetRangeMax() - m_LevelWindow.GetLevel())*2;
   }
-  if ((int)(m_LevelWindow.GetLevel()) - window/2 < (int)(m_LevelWindow.GetRangeMin()))
+  if (m_LevelWindow.GetLevel() - window/2 < m_LevelWindow.GetRangeMin())
   {
-    window = (int)((m_LevelWindow.GetLevel() - m_LevelWindow.GetRangeMin())*2);
+    window = (m_LevelWindow.GetLevel() - m_LevelWindow.GetRangeMin())*2;
   }
   QString qWindow;
   qWindow.setNum(window);

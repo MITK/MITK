@@ -341,7 +341,6 @@ void mitk::CoreObjectFactory::CreateFileExtensionsMap()
   m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.nii", "NIfTI format"));
   m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.nrrd", "Nearly Raw Raster Data"));
   m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.nhdr", "NRRD Vector Images"));
-  m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.spr", "Stimulate Files"));
   m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.lsm", "Microscope Images"));
   m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.dwi", "Diffusion Weighted Images"));
   m_SaveFileExtensionsMap.insert(std::pair<std::string, std::string>("*.hdwi", "Diffusion Weighted Images"));

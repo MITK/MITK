@@ -34,7 +34,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QList>
 #include <QUrl>
 
-#include "Python.h"
+#include <dPython.h>
 
 
 QmitkCTKPythonShell::QmitkCTKPythonShell(ctkAbstractPythonManager* pythonManager, QWidget* _parent)

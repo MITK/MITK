@@ -47,14 +47,16 @@ CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/@CUSTOM_PROJECT_EXECUTABLE@.ini"
 # If we are under Windows, create two batch files which correctly
 # set up the environment for the application and for VS 2008
 IF(WIN32)
-  SET(APP_BUILD_TYPE debug)
-  CONFIGURE_FILE(start@CUSTOM_PROJECT_EXECUTABLE@.bat.in
-               ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/start@CUSTOM_PROJECT_EXECUTABLE@_${APP_BUILD_TYPE}.bat @ONLY)
-  SET(APP_BUILD_TYPE release)
-  CONFIGURE_FILE(start@CUSTOM_PROJECT_EXECUTABLE@.bat.in
-               ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/start@CUSTOM_PROJECT_EXECUTABLE@_${APP_BUILD_TYPE}.bat @ONLY)
-               
-  # Configure VS batch file
-  CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/startVS2008.bat.in"
-               "${PROJECT_BINARY_DIR}/startVS2008.bat" @ONLY)
+  INCLUDE(mitkFunctionCreateWindowsBatchScript)
+  
+  FOREACH(APP_BUILD_TYPE debug release)
+    mitkFunctionCreateWindowsBatchScript(start@CUSTOM_PROJECT_EXECUTABLE@.bat.in
+      ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/start@CUSTOM_PROJECT_EXECUTABLE@_${APP_BUILD_TYPE}.bat
+      ${APP_BUILD_TYPE})
+      
+    # Configure VS batch file
+    mitkFunctionCreateWindowsBatchScript("${CMAKE_CURRENT_SOURCE_DIR}/startVS2008.bat.in"
+      "${PROJECT_BINARY_DIR}/startVS2008_${APP_BUILD_TYPE}.bat"
+      ${APP_BUILD_TYPE})
+  ENDFOREACH()
 ENDIF(WIN32)

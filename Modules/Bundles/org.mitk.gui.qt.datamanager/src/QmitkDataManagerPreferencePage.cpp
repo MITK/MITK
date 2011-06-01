@@ -52,12 +52,14 @@ void QmitkDataManagerPreferencePage::CreateQtControl(QWidget* parent)
   m_DataManagerPreferencesNode = prefService->GetSystemPreferences()->Node(QmitkDataManagerView::VIEW_ID);
 
   m_MainControl = new QWidget(parent);
+  m_EnableFlexibleZooming = new QCheckBox;
   m_EnableSingleEditing = new QCheckBox;
   m_PlaceNewNodesOnTop = new QCheckBox;
   m_ShowHelperObjects = new QCheckBox;
   m_UseSurfaceDecimation = new QCheckBox;
 
   QFormLayout *formLayout = new QFormLayout;
+  formLayout->addRow("&Use constrained zooming and padding", m_EnableFlexibleZooming);
   formLayout->addRow("&Single click property editing:", m_EnableSingleEditing);
   formLayout->addRow("&Place new nodes on top:", m_PlaceNewNodesOnTop);
   formLayout->addRow("&Show helper objects:", m_ShowHelperObjects);
@@ -74,6 +76,8 @@ QWidget* QmitkDataManagerPreferencePage::GetQtControl() const
 
 bool QmitkDataManagerPreferencePage::PerformOk()
 {
+  m_DataManagerPreferencesNode->PutBool("Use constrained zooming and padding"
+                                        , m_EnableFlexibleZooming->isChecked());
   m_DataManagerPreferencesNode->PutBool("Single click property editing"
                                         , m_EnableSingleEditing->isChecked());
   m_DataManagerPreferencesNode->PutBool("Place new nodes on top"
@@ -92,6 +96,7 @@ void QmitkDataManagerPreferencePage::PerformCancel()
 
 void QmitkDataManagerPreferencePage::Update()
 {
+  m_EnableFlexibleZooming->setChecked(m_DataManagerPreferencesNode->GetBool("Use constrained zooming and padding", true));
   m_EnableSingleEditing->setChecked(m_DataManagerPreferencesNode->GetBool("Single click property editing", true));
   m_PlaceNewNodesOnTop->setChecked(m_DataManagerPreferencesNode->GetBool("Place new nodes on top", true));
   m_ShowHelperObjects->setChecked(m_DataManagerPreferencesNode->GetBool("Show helper objects", false));

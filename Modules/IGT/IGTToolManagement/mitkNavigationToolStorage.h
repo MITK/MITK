@@ -63,12 +63,24 @@ namespace mitk {
      *         tracking tool with this identifier in the storage.
      */
     mitk::NavigationTool::Pointer GetTool(std::string identifier);
+
+    /**
+     * @return Returns the tracking tool with the given name.
+     *         Returns NULL if there is no
+     *         tracking tool with this name in the storage.
+     */
+    mitk::NavigationTool::Pointer GetToolByName(std::string name);
     
 
     /**
      * @brief Deletes a tool from the collection.
      */
     bool DeleteTool(int number);
+
+    /**
+     * @brief Deletes all tools from the collection.
+     */
+    bool DeleteAllTools();
 
     /**
      * @return Returns the number of tools stored in the storage.

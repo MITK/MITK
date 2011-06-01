@@ -12,13 +12,23 @@ cmake_minimum_required(VERSION 2.8.2)
 #
 # Dashboard properties
 #
-set(MY_COMPILER "g++4.4.5")
+
+set(MY_COMPILER "gcc-4.4.5")
+# For Windows, e.g.
+#set(MY_COMPILER "VC9.0")
 
 set(CTEST_CMAKE_COMMAND "/usr/bin/cmake")
 set(CTEST_CMAKE_GENERATOR "Unix Makefiles")
 set(CTEST_DASHBOARD_ROOT "/opt/dartclients")
+# For Windows, e.g.
+#set(CTEST_CMAKE_COMMAND "cmake")
+#set(CTEST_CMAKE_GENERATOR "Visual Studio 9 2008 Win64")
+#set(CTEST_DASHBOARD_ROOT "C:/dartclients")
 
-set(QT_QMAKE_EXECUTABLE "/usr/bin/qmake")
+# The directory containing the Qt binaries
+set(QT_BINARY_DIR "/usr/bin/")
+# For Windows, e.g.
+#set(QT_BINARY_DIR "V:/windows/x64/QT-4.7.0_VC9.0_Bin/bin")
 
 #
 # Dashboard options
@@ -30,7 +40,11 @@ set(WITH_DOCUMENTATION FALSE)
 #set(DOCUMENTATION_ARCHIVES_OUTPUT_DIRECTORY ) # for example: $ENV{HOME}/Projects/Doxygen
 set(CTEST_BUILD_CONFIGURATION "Release")
 set(CTEST_TEST_TIMEOUT 500)
-set(CTEST_BUILD_FLAGS "-j4") # Use multiple CPU cores to build
+if(UNIX OR MINGW)
+  set(CTEST_BUILD_FLAGS "-j4") # Use multiple CPU cores to build
+else()
+  set(CTEST_BUILD_FLAGS "")
+endif()
 
 # experimental: 
 #     - run_ctest() macro will be called *ONE* time
@@ -50,8 +64,9 @@ set(SCRIPT_MODE "experimental") # "experimental", "continuous", "nightly"
 set(CTEST_SOURCE_DIRECTORY "${CTEST_DASHBOARD_ROOT}/MITK")
 set(CTEST_BINARY_DIRECTORY "${CTEST_DASHBOARD_ROOT}/MITK-Superbuild-${CTEST_BUILD_CONFIGURATION}-${SCRIPT_MODE}")
 
-set(ADDITIONNAL_CMAKECACHE_OPTION "
-#MITK_USE_Boost:BOOL=ON
+set(ADDITIONAL_CMAKECACHE_OPTION "
+MITK_USE_Boost:BOOL=ON
+MITK_USE_OpenCV:BOOL=ON
 ")
 
 # List of test that should be explicitly disabled on this machine
@@ -67,64 +82,38 @@ find_program(CTEST_GIT_COMMAND NAMES git)
 #
 # Git repository - Overwrite the default value provided by the driver script
 #
-# set(GIT_REPOSITORY "/home/username/MITK")
-# set(GIT_BRANCH "bug-xxx-description")
+# The git repository containing MITK code
+#set(GIT_REPOSITORY "/home/username/MITK")
+# The branch of the MITK git repository to check out
+#set(GIT_BRANCH "bug-xxx-label")
 
 ##########################################
 # WARNING: DO NOT EDIT BEYOND THIS POINT #
 ##########################################
 
-set(CTEST_NOTES_FILES "${CTEST_SCRIPT_DIRECTORY}/${CTEST_SCRIPT_NAME}")
-
-#
-# Automatically determined properties
-#
-set(MY_OPERATING_SYSTEM "${CMAKE_HOST_SYSTEM}") # Windows 7, Linux-2.6.32, Darwin... 
-site_name(CTEST_SITE)
-
-execute_process(COMMAND qmake --version
-                OUTPUT_VARIABLE MY_QT_VERSION)
-string(REGEX REPLACE ".*Qt version ([0-9.]+) .*" "\\1" MY_QT_VERSION ${MY_QT_VERSION})
-
-#
-# Project specific properties
-#
-set(CTEST_PROJECT_NAME "MITK")
-set(CTEST_BUILD_NAME "${MY_OPERATING_SYSTEM}-${MY_COMPILER}-Qt-${MY_QT_VERSION}-${CTEST_BUILD_CONFIGURATION}")
-set(PROJECT_BUILD_DIR "MITK-build")
-set(SUPERBUILD_TARGETS "")
-
-#
-# Display build info
-#
-message("Site name: ${CTEST_SITE}")
-message("Build name: ${CTEST_BUILD_NAME}")
-message("Script Mode: ${SCRIPT_MODE}")
-message("Coverage: ${WITH_COVERAGE}, MemCheck: ${WITH_MEMCHECK}")
-
 #
 # Convenient macro allowing to download a file
 #
-MACRO(downloadFile url dest)
-  FILE(DOWNLOAD "${url}" "${dest}" STATUS status)
-  LIST(GET status 0 error_code)
-  LIST(GET status 1 error_msg)
-  IF(error_code)
-    MESSAGE(FATAL_ERROR "error: Failed to download ${url} - ${error_msg}")
-  ENDIF()
-ENDMACRO()
+macro(downloadFile url dest)
+  file(DOWNLOAD "${url}" "${dest}" STATUS status)
+  list(GET status 0 error_code)
+  list(GET status 1 error_msg)
+  if(error_code)
+    message(FATAL_ERROR "error: Failed to download ${url} - ${error_msg}")
+  endif()
+endmacro()
 
 #
-# Download and include dashboard driver script 
+# Download and include setup script
 #
 if(NOT DEFINED GIT_BRANCH OR GIT_BRANCH STREQUAL "")
   set(hb "HEAD")
 else()
   set(hb "refs/heads/${GIT_BRANCH}")
 endif()
-set(url "http://mbits/git/?p=MITK.git;a=blob_plain;f=CMake/MITKDashboardDriverScript.cmake;hb=${hb}")
-set(dest ${CTEST_SCRIPT_DIRECTORY}/${CTEST_SCRIPT_NAME}.driver)
+set(url "http://mbits/gitweb/?p=MITK.git;a=blob_plain;f=CMake/MITKDashboardSetup.cmake;hb=${hb}")
+set(dest ${CTEST_SCRIPT_DIRECTORY}/${CTEST_SCRIPT_NAME}.setup)
 downloadFile("${url}" "${dest}")
-INCLUDE(${dest})
+include(${dest})
 
 

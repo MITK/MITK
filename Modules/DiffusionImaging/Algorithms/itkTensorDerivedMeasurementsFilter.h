@@ -42,7 +42,8 @@ public:
     RD,// Radial diffusivity
     CA, // Clustering anisotropy 1-(λ2+λ3)/(2*λ1)
     L2,
-    L3
+    L3,
+    MD // mean diffusivity
   };
 
   typedef itk::DiffusionTensor3D<TPixel>          TensorType;

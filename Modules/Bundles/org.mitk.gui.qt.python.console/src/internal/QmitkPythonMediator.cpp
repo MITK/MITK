@@ -16,7 +16,7 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include "QmitkPythonMediator.h"
-#include "Python.h"
+#include <dPython.h>
 
 QmitkPythonMediator *QmitkPythonMediator::m_mediatorInstance = 0;
 

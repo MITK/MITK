@@ -31,6 +31,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qfiledialog.h>
 #include <qmessagebox.h>
 
+//poco headers
+#include <Poco/Path.h>
+
 const std::string QmitkNavigationToolManagementWidget::VIEW_ID = "org.mitk.views.navigationtoolmanagementwidget";
 
 QmitkNavigationToolManagementWidget::QmitkNavigationToolManagementWidget(QWidget* parent, Qt::WindowFlags f)
@@ -188,12 +191,14 @@ void QmitkNavigationToolManagementWidget::OnLoadStorage()
   {
     mitk::NavigationToolStorageDeserializer::Pointer myDeserializer = mitk::NavigationToolStorageDeserializer::New(m_DataStorage);
     std::string filename = QFileDialog::getOpenFileName(NULL,tr("Open Navigation Tool"), "/", "*.*").toAscii().data();
+    if (filename == "") return;
     mitk::NavigationToolStorage::Pointer tempStorage = myDeserializer->Deserialize(filename);
     if (tempStorage.IsNull()) MessageBox("Error" + myDeserializer->GetErrorMessage());
     else 
       {
       m_NavigationToolStorage = tempStorage;
-      m_Controls->m_StorageName->setText(filename.c_str());
+      Poco::Path myPath = Poco::Path(filename.c_str());
+      m_Controls->m_StorageName->setText(myPath.getFileName().c_str());
       }
     UpdateToolTable();
   }
@@ -203,7 +208,11 @@ void QmitkNavigationToolManagementWidget::OnSaveStorage()
     mitk::NavigationToolStorageSerializer::Pointer mySerializer = mitk::NavigationToolStorageSerializer::New();
     std::string filename = QFileDialog::getSaveFileName(NULL,tr("Save Navigation Tool"), "/", "*.*").toAscii().data();
     if (!mySerializer->Serialize(filename,m_NavigationToolStorage)) MessageBox("Error: " + mySerializer->GetErrorMessage());
-    else m_Controls->m_StorageName->setText(QString(filename.c_str()));
+    else 
+      {
+      Poco::Path myPath = Poco::Path(filename.c_str());
+      m_Controls->m_StorageName->setText(myPath.getFileName().c_str());
+      }
   }
 
 
@@ -333,4 +342,21 @@ void QmitkNavigationToolManagementWidget::MessageBox(std::string s)
   QMessageBox msgBox;
   msgBox.setText(s.c_str());
   msgBox.exec();
+  }
+
+void QmitkNavigationToolManagementWidget::EnableSingleToolSave(bool enable)
+  {
+  if (enable)
+    {
+    m_Controls->m_LoadSingleTool->setVisible(true);
+    m_Controls->m_SaveSingleTool->setVisible(true);
+    m_Controls->m_singleToolLabel->setVisible(true);
+    }
+  else
+    {
+    m_Controls->m_LoadSingleTool->setVisible(false);
+    m_Controls->m_SaveSingleTool->setVisible(false);
+    m_Controls->m_singleToolLabel->setVisible(false);
+    }
+
   }

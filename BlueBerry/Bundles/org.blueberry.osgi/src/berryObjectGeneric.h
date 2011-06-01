@@ -62,7 +62,11 @@ class BERRY_OSGI ObjectGeneric : public Object
     virtual std::string GetValueAsString() const
     {
       std::stringstream myStr;
+      std::locale originalLocale = myStr.getloc();
+      std::locale C("C");
+      myStr.imbue(C);
       myStr << GetValue() ;
+      myStr.imbue(originalLocale);
       return myStr.str();
     }
 

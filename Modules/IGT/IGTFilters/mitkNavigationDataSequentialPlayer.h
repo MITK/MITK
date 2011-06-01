@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKNavigationDataSequentialPlayer_H_HEADER_INCLUDED_
 #define MITKNavigationDataSequentialPlayer_H_HEADER_INCLUDED_
 
-#include <mitkNavigationDataSource.h>
+#include <mitkNavigationDataPlayerBase.h>
 #include "tinyxml.h"
 
 
@@ -34,10 +34,10 @@ namespace mitk
   * \ingroup IGT
   */
   class MitkIGT_EXPORT NavigationDataSequentialPlayer
-    : public NavigationDataSource
+    : public NavigationDataPlayerBase
   {
   public:
-    mitkClassMacro(NavigationDataSequentialPlayer, NavigationDataSource);
+    mitkClassMacro(NavigationDataSequentialPlayer, NavigationDataPlayerBase);
     itkNewMacro(Self);
 
     /**

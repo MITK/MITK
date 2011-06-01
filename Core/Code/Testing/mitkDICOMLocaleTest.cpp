@@ -25,13 +25,11 @@ PURPOSE.  See the above copyright notices for more information.
  - This leads to spacings (and probably other numbers) being trimmed/rounded,
    e.g. the correct spacing of 0.314 is read as 1.0 etc.
 
- MITK shold work around this behavior. This test is meant to verify any workaround
- and will be activated once such a workaround is available.
-
 */
 
 #include "mitkDataNodeFactory.h"
 #include "mitkStandardFileLocations.h"
+#include "mitkDicomSeriesReader.h"
 
 #include "mitkTestingMacros.h"
 
@@ -57,17 +55,13 @@ bool mitkDICOMLocaleTestChangeLocale(const std::string& locale)
 
 }
 
-void mitkDICOMLocaleTestWithReferenceImage()
+void mitkDICOMLocaleTestWithReferenceImage(std::string filename)
 {
-  mitk::StandardFileLocations::Pointer locator = mitk::StandardFileLocations::GetInstance();
-  MITK_TEST_CONDITION_REQUIRED(locator.IsNotNull(),"Instantiating StandardFileLocations");
-  std::string filename = locator->FindFile("spacing-ok.dcm", "Core/Code/Testing/Data/");
-
   mitk::Image::Pointer image;
   mitk::DataNodeFactory::Pointer factory = mitk::DataNodeFactory::New();
   factory->SetFileName( filename );
   factory->Update();
-  MITK_TEST_CONDITION_REQUIRED(factory->GetNumberOfOutputs() > 0, "file loaded");
+  MITK_TEST_CONDITION_REQUIRED(factory->GetNumberOfOutputs() > 0, "file " << filename << " loaded");
 
   mitk::DataNode::Pointer node = factory->GetOutput( 0 );
   image = dynamic_cast<mitk::Image*>(node->GetData());
@@ -77,21 +71,28 @@ void mitkDICOMLocaleTestWithReferenceImage()
   
     return;
   }  
-    
-  MITK_TEST_OUTPUT(<< "File "<< filename << " could be loaded." );
 
-  MITK_TEST_OUTPUT(<< "MITK image reports pixel spacing of " << image->GetGeometry()->GetSpacing()[0] << " " << image->GetGeometry()->GetSpacing()[1] );
-  MITK_TEST_CONDITION_REQUIRED(image->GetGeometry()->GetSpacing()[0] - 0.3141592 < 0.0000001, "correct x spacing");
-  MITK_TEST_CONDITION_REQUIRED(image->GetGeometry()->GetSpacing()[1] - 0.3141592 < 0.0000001, "correct y spacing");
+  // note importance of minor differences in spacings:
+  // DICOM has order y-spacing, x-spacing, while in MITK we assume x-spacing, y-spacing (both meant for 0 and 1 index in array)
+  MITK_TEST_CONDITION_REQUIRED(mitk::Equal(image->GetGeometry()->GetSpacing()[0], 0.3141592), "correct x spacing? found " 
+                               << image->GetGeometry()->GetSpacing()[0]);
+  MITK_TEST_CONDITION_REQUIRED(mitk::Equal(image->GetGeometry()->GetSpacing()[1], 0.3411592), "correct y spacing? found " 
+                               << image->GetGeometry()->GetSpacing()[1]);
 }
 
-int mitkDICOMLocaleTest(int /*argc*/, char* /*argv*/ [])
+int mitkDICOMLocaleTest(int argc, char* argv[])
 {
   MITK_TEST_BEGIN("DICOMLocaleTest");
 
+  MITK_TEST_CONDITION_REQUIRED(argc >= 2, "File to load has been specified on commandline");
+  
+  MITK_TEST_OUTPUT(<< "Configuration: \n" << mitk::DicomSeriesReader::GetConfigurationString() );
+
+  std::string filename = argv[1];
+
   // load a reference DICOM file with the "C" locale being set
   mitkDICOMLocaleTestChangeLocale("C");
-  mitkDICOMLocaleTestWithReferenceImage();
+  mitkDICOMLocaleTestWithReferenceImage(filename);
   // load a reference DICOM file with German locales being set
   typedef std::list<std::string> StringList;
   StringList alllocales;
@@ -101,8 +102,8 @@ int mitkDICOMLocaleTest(int /*argc*/, char* /*argv*/ [])
   alllocales.push_back("de_DE@euro");
   alllocales.push_back("German_Germany");
 
-  // QuickFix for MAC OS X
-  // See for more the Bug #3894 comments
+  // supressing this test to be run on MacOS X
+  // See bug #3894
 #if defined (__APPLE__) || defined(MACOSX)
   alllocales.push_back("C");
 #endif
@@ -116,7 +117,7 @@ int mitkDICOMLocaleTest(int /*argc*/, char* /*argv*/ [])
     if ( mitkDICOMLocaleTestChangeLocale(*iter) )
     {
       ++numberOfTestedGermanLocales;
-      mitkDICOMLocaleTestWithReferenceImage();
+      mitkDICOMLocaleTestWithReferenceImage(filename);
     }
   }
 

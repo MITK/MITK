@@ -609,7 +609,8 @@ FILE_PATTERNS          = *.h \
                          *.cpp \
                          *.dox \
                          *.txx \
-                         *.cxx
+                         *.cxx \
+                         *.cmake
 
 # The RECURSIVE tag can be used to turn specify whether or not subdirectories
 # should be searched for input files as well. Possible values are YES and NO.
@@ -630,11 +631,12 @@ EXCLUDE                = @MITK_SOURCE_DIR@/Utilities/vecmath/ \
                          @MITK_SOURCE_DIR@/Utilities/tinyxml/ \
                          @MITK_SOURCE_DIR@/Utilities/Poco/ \
                          @MITK_SOURCE_DIR@/BlueBerry/ \
-                         @MITK_SOURCE_DIR@/BlueBerry2/ \
                          @MITK_SOURCE_DIR@/Deprecated/ \
                          @MITK_SOURCE_DIR@/Build/ \
                          @MITK_SOURCE_DIR@/Core/Testing/ \
-                         @MITK_SOURCE_DIR@/CMake/ \
+                         @MITK_SOURCE_DIR@/CMake/PackageDepends \
+                         @MITK_SOURCE_DIR@/CMake/QBundleTemplate \
+                         @MITK_SOURCE_DIR@/CMakeExternals \
                          @MITK_SOURCE_DIR@/Modules/QmitkExt/vtkQtChartHeaders/ \
                          @MITK_DOXYGEN_ADDITIONAL_EXCLUDE_DIRS@
 
@@ -651,7 +653,9 @@ EXCLUDE_SYMLINKS       = NO
 # for example use the pattern */test/*
 
 EXCLUDE_PATTERNS       = moc_* \
-                         Register*
+                         Register* \
+                         */files.cmake \
+                         @MITK_BINARY_DIR@/*.cmake
 
 # The EXCLUDE_SYMBOLS tag can be used to specify one or more symbol names
 # (namespaces, classes, functions, etc.) that should be excluded from the
@@ -691,8 +695,7 @@ IMAGE_PATH             = @MITK_SOURCE_DIR@/Documentation/Doxygen/ \
                          @MITK_SOURCE_DIR@/Documentation/Doxygen/Modules/ \
                          @MITK_SOURCE_DIR@/Documentation/Doxygen/Tutorial/ \
                          @MITK_SOURCE_DIR@/Core/DataStructures/ \
-                         @MITK_SOURCE_DIR@ \
-                         @USERMANUAL_DIRS@
+                         @MITK_SOURCE_DIR@ 
 
 # The INPUT_FILTER tag can be used to specify a program that doxygen should
 # invoke to filter for each input file. Doxygen will invoke the filter program
@@ -714,7 +717,7 @@ INPUT_FILTER           =
 # info on how filters are used. If FILTER_PATTERNS is empty, INPUT_FILTER
 # is applied to all files.
 
-FILTER_PATTERNS        =
+FILTER_PATTERNS        = *.cmake=@CMakeDoxygenFilter_EXECUTABLE@
 
 # If the FILTER_SOURCE_FILES tag is set to YES, the input filter (if set using
 # INPUT_FILTER) will be used to filter the input files when producing source
@@ -930,7 +933,7 @@ DOCSET_PUBLISHER_NAME  = Publisher
 # Microsoft HTML help workshop to generate a compiled HTML help file (.chm)
 # of the generated HTML documentation.
 
-GENERATE_HTMLHELP      = @BUILD_QCH_FILES_BOOL@
+GENERATE_HTMLHELP      = NO
 
 # If the GENERATE_HTMLHELP tag is set to YES, the CHM_FILE tag can
 # be used to specify the file name of the resulting .chm file. You
@@ -974,13 +977,13 @@ TOC_EXPAND             = NO
 # that can be used as input for Qt's qhelpgenerator to generate a
 # Qt Compressed Help (.qch) of the generated HTML documentation.
 
-GENERATE_QHP           = @BUILD_QCH_FILES_BOOL@
+GENERATE_QHP           = @MITK_DOXYGEN_GENERATE_QHP@
 
 # If the QHG_LOCATION tag is specified, the QCH_FILE tag can
 # be used to specify the file name of the resulting .qch file.
 # The path specified is relative to the HTML output folder.
 
-QCH_FILE               = @MITK_BINARY_DIR@
+QCH_FILE               = @MITK_DOXYGEN_QCH_FILE@
 
 # The QHP_NAMESPACE tag specifies the namespace to use when generating
 # Qt Help Project output. For more information please see
@@ -992,7 +995,7 @@ QHP_NAMESPACE          = "org.mitk"
 # Qt Help Project output. For more information please see
 # http://doc.trolltech.com/qthelpproject.html#virtual-folders
 
-QHP_VIRTUAL_FOLDER     =
+QHP_VIRTUAL_FOLDER     = MITK
 
 # If QHP_CUST_FILTER_NAME is set, it specifies the name of a custom filter to
 # add. For more information please see
@@ -1020,7 +1023,7 @@ QHP_SECT_FILTER_ATTRS  =
 # If non-empty doxygen will try to run qhelpgenerator on the generated
 # .qhp file.
 
-QHG_LOCATION           = @QHELPGENERATOR_DIR@
+QHG_LOCATION           = @QT_HELPGENERATOR_EXECUTABLE@
 
 # If the GENERATE_ECLIPSEHELP tag is set to YES, additional index files
 #  will be generated, which together with the HTML files, form an Eclipse help
@@ -1504,12 +1507,12 @@ SKIP_FUNCTION_MACROS   = YES
 # If a tag file is not located in the directory in which doxygen
 # is run, you must also specify the path to the tagfile here.
 
-TAGFILES               = @BLUEBERRY_TAGFILE@
+TAGFILES               = @BLUEBERRY_DOXYGEN_TAGFILE@
 
 # When a file name is specified after GENERATE_TAGFILE, doxygen will create
 # a tag file that is based on the input files it reads.
 
-GENERATE_TAGFILE       =
+GENERATE_TAGFILE       = @MITK_DOXYGEN_TAGFILE_NAME@
 
 # If the ALLEXTERNALS tag is set to YES all external classes will be listed
 # in the class index. If set to NO only the inherited external classes
@@ -1568,7 +1571,7 @@ HAVE_DOT               = @HAVE_DOT@
 # explicitly to a value larger than 0 to get control over the balance
 # between CPU load and processing speed.
 
-DOT_NUM_THREADS        = 0
+DOT_NUM_THREADS        = @MITK_DOXYGEN_DOT_NUM_THREADS@
 
 # By default doxygen will write a font called FreeSans.ttf to the output
 # directory and reference it in all dot files that doxygen generates. This

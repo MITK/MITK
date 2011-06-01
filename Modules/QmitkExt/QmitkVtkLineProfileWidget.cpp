@@ -305,17 +305,17 @@ void QmitkVtkLineProfileWidget::CreatePathFromPlanarFigure()
 
   // Get first poly-line of PlanarFigure (other possible poly-lines in PlanarFigure
   // are not supported)
-  typedef mitk::PlanarFigure::VertexContainerType VertexContainerType;
-  const VertexContainerType *vertexContainer = m_PlanarFigure->GetPolyLine( 0 );
+  typedef mitk::PlanarFigure::PolyLineType VertexContainerType;
+  const VertexContainerType vertexContainer = m_PlanarFigure->GetPolyLine( 0 );
 
   MITK_INFO << "WorldToIndex:";
 
-  VertexContainerType::ConstIterator it;
-  for ( it = vertexContainer->Begin(); it != vertexContainer->End(); ++it )
+  VertexContainerType::const_iterator it;
+  for ( it = vertexContainer.begin(); it != vertexContainer.end(); ++it )
   {
     // Map PlanarFigure 2D point to 3D point
     mitk::Point3D point3D;
-    planarFigureGeometry2D->Map( it->Value(), point3D );
+    planarFigureGeometry2D->Map( it->Point, point3D );
 
     // Convert world to index coordinates
     mitk::Point3D indexPoint3D;

@@ -72,6 +72,16 @@ public:
     itkGetMacro(Recording,bool);
 
     /**
+    * \brief Returns the number of data sets / frames which were recorded by the NavigationDataRecorder since start
+    */
+    itkGetMacro(RecordCounter,int);
+
+    /**
+    * \brief Sets a limit of recorded data sets / frames. Recording will be stopped if the number is reached. -1 disables the limit, -1 is default value as well.
+    */
+    itkSetMacro(RecordCountLimit,int);
+
+    /**
     * \brief Adds the input NavigationDatas
     */
     virtual void AddNavigationData(const NavigationData* nd);
@@ -112,10 +122,28 @@ public:
     };
 
     /**Documentation
+    * \brief Determines the output format
+    * 
+    * xml:  XML format, also default, can be read by NavigationDataPlayer
+    * csv:  use to export in excel, matlab, etc.
+    */
+	enum OutputFormatEnum
+	{
+	  xml,
+	  csv
+	};
+
+    /**Documentation
     * \brief Sets the recording mode which causes different types of output streams
     * see enum RecordingMode
     */
     void SetRecordingMode(RecordingMode mode);
+
+	/**Documentation
+    * \brief Sets the output format which causes different formats of output streams. The XML format is default.
+    *  Also see enum OutputFormat for more information.
+    */
+	itkSetMacro(OutputFormat,mitk::NavigationDataRecorder::OutputFormatEnum);
 
 protected:
 
@@ -137,7 +165,15 @@ protected:
 
     RecordingMode m_RecordingMode; ///< stores the mode see enum RecordingMode
 
+  	OutputFormatEnum m_OutputFormat; ///< stores the output format; see enum OutputFormat
+
     bool m_Recording; ///< indicates whether the recording is started or not
+
+    int m_RecordCounter; ///< counts the number of frames which are recorded since StartRecording
+
+    int m_RecordCountLimit; ///< limits the number of frames, recording will be stopped if the limit is reached. -1 disables the limit
+
+    bool m_firstLine; //for the csv writer to detect wether the header must be written
 
     unsigned int m_NumberOfRecordedFiles; ///< necessary for the naming of the file if there is more than one start-stop cycle
 

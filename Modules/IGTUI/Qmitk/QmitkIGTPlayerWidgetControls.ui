@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>398</width>
+    <width>416</width>
     <height>689</height>
    </rect>
   </property>
@@ -15,7 +15,7 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_3">
    <item>
-    <widget class="QGroupBox" name="groupBox">
+    <widget class="QGroupBox" name="settingsGroupBox">
      <property name="title">
       <string>Settings</string>
      </property>
@@ -27,26 +27,118 @@
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
       <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_6">
-        <item>
+       <layout class="QGridLayout" name="gridLayout_2">
+        <item row="0" column="0">
          <widget class="QLabel" name="label_2">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="text">
            <string>Input File</string>
           </property>
          </widget>
         </item>
-        <item>
-         <widget class="QLineEdit" name="m_leInputFile">
+        <item row="0" column="1" colspan="3">
+         <widget class="QLineEdit" name="inputFileLineEdit">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+            <horstretch>2</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="minimumSize">
            <size>
             <width>150</width>
             <height>0</height>
            </size>
           </property>
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
          </widget>
         </item>
-        <item>
-         <widget class="QPushButton" name="m_pbLoadDir">
+        <item row="2" column="0">
+         <widget class="QLabel" name="label">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>Trajectory </string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1" colspan="2">
+         <widget class="QComboBox" name="trajectorySelectComboBox">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+            <horstretch>4</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="5">
+         <widget class="QSpinBox" name="resolutionSpinBox">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimum">
+           <number>1</number>
+          </property>
+          <property name="maximum">
+           <number>25</number>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="4">
+         <widget class="QLabel" name="resolutionLabel">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>Res.: 1:</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="3">
+         <widget class="QCheckBox" name="splineModeCheckBox">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="layoutDirection">
+           <enum>Qt::LeftToRight</enum>
+          </property>
+          <property name="text">
+           <string>Splines</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="4" colspan="2">
+         <widget class="QPushButton" name="selectPushButton">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="maximumSize">
            <size>
             <width>90</width>
@@ -69,58 +161,11 @@
         </item>
        </layout>
       </item>
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_5">
-        <item>
-         <widget class="QCheckBox" name="m_cbPointSetMode">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="text">
-           <string>Playback in PointSet Mode</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <spacer name="horizontalSpacer">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item>
-         <widget class="QLabel" name="m_lblResolution">
-          <property name="text">
-           <string>Resolution 1 :</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QSpinBox" name="m_sbResolution">
-          <property name="minimum">
-           <number>1</number>
-          </property>
-          <property name="maximum">
-           <number>10</number>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
      </layout>
     </widget>
    </item>
    <item>
-    <widget class="QGroupBox" name="groupBox_2">
+    <widget class="QGroupBox" name="playerGroupBox">
      <property name="title">
       <string>Player</string>
      </property>
@@ -129,12 +174,15 @@
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_2">
       <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_2">
-        <item>
-         <widget class="QLCDNumber" name="m_lcdNrMin">
+       <layout class="QGridLayout" name="gridLayout">
+        <item row="1" column="0">
+         <widget class="QLCDNumber" name="minLCDNumber">
           <property name="styleSheet">
            <string notr="true">background-color: rgb(60, 60, 60);
 color: rgb(250, 250, 250);</string>
+          </property>
+          <property name="frameShadow">
+           <enum>QFrame::Raised</enum>
           </property>
           <property name="numDigits">
            <number>3</number>
@@ -147,15 +195,15 @@ color: rgb(250, 250, 250);</string>
           </property>
          </widget>
         </item>
-        <item>
-         <widget class="QLabel" name="label_3">
+        <item row="1" column="1">
+         <widget class="QLabel" name="minLabel">
           <property name="text">
            <string>min</string>
           </property>
          </widget>
         </item>
-        <item>
-         <widget class="QLCDNumber" name="m_lcdNrSec">
+        <item row="1" column="2">
+         <widget class="QLCDNumber" name="secLCDNumber">
           <property name="styleSheet">
            <string notr="true">background-color: rgb(60, 60, 60);
 color: rgb(250, 250, 250);</string>
@@ -171,15 +219,15 @@ color: rgb(250, 250, 250);</string>
           </property>
          </widget>
         </item>
-        <item>
-         <widget class="QLabel" name="label_4">
+        <item row="1" column="3">
+         <widget class="QLabel" name="secLabel">
           <property name="text">
            <string>sec</string>
           </property>
          </widget>
         </item>
-        <item>
-         <widget class="QLCDNumber" name="m_lcdNrMsec">
+        <item row="1" column="4">
+         <widget class="QLCDNumber" name="msecLCDNumber">
           <property name="styleSheet">
            <string notr="true">background-color: rgb(60, 60, 60);
 color: rgb(250, 250, 250);</string>
@@ -195,14 +243,14 @@ color: rgb(250, 250, 250);</string>
           </property>
          </widget>
         </item>
-        <item>
-         <widget class="QLabel" name="label_5">
+        <item row="1" column="5">
+         <widget class="QLabel" name="msecLabel">
           <property name="text">
            <string>msec</string>
           </property>
          </widget>
         </item>
-        <item>
+        <item row="1" column="6">
          <spacer name="horizontalSpacer_3">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
@@ -215,131 +263,85 @@ color: rgb(250, 250, 250);</string>
           </property>
          </spacer>
         </item>
-        <item>
-         <widget class="QLabel" name="m_lblSample">
+        <item row="1" column="7">
+         <widget class="QLabel" name="sampleLabel">
           <property name="text">
            <string>Sample</string>
           </property>
          </widget>
         </item>
-        <item>
-         <widget class="QLCDNumber" name="m_lcdNrSample">
+        <item row="1" column="8">
+         <widget class="QLCDNumber" name="sampleLCDNumber">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="autoFillBackground">
+           <bool>false</bool>
+          </property>
           <property name="styleSheet">
-           <string notr="true">background-color: rgb(60, 60, 60);
-color: rgb(250, 250, 250);</string>
+           <string notr="true">background-color: rgb(60,60,60)</string>
           </property>
           <property name="numDigits">
-           <number>8</number>
+           <number>10</number>
           </property>
           <property name="segmentStyle">
-           <enum>QLCDNumber::Flat</enum>
+           <enum>QLCDNumber::Outline</enum>
           </property>
          </widget>
         </item>
        </layout>
       </item>
       <item>
-       <widget class="QSlider" name="m_hsPlaybackPosition">
-        <property name="styleSheet">
-         <string notr="true">color: rgb(170, 0, 0);</string>
-        </property>
-        <property name="minimum">
-         <number>0</number>
-        </property>
-        <property name="maximum">
-         <number>100</number>
-        </property>
-        <property name="sliderPosition">
-         <number>5</number>
-        </property>
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="invertedAppearance">
-         <bool>false</bool>
-        </property>
-        <property name="invertedControls">
-         <bool>false</bool>
-        </property>
-        <property name="tickPosition">
-         <enum>QSlider::NoTicks</enum>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout">
+       <layout class="QHBoxLayout" name="horizontalLayout_3">
         <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_3">
-          <item>
-           <widget class="QPushButton" name="m_pbBegin">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-            <property name="icon">
-             <iconset resource="../resources/IGTUI.qrc">
-              <normaloff>:/IGTUI/firstframe.png</normaloff>:/IGTUI/firstframe.png</iconset>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="m_pbFastBackward">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-            <property name="icon">
-             <iconset resource="../resources/IGTUI.qrc">
-              <normaloff>:/IGTUI/fastbackward.png</normaloff>:/IGTUI/fastbackward.png</iconset>
-            </property>
-            <property name="iconSize">
-             <size>
-              <width>20</width>
-              <height>16</height>
-             </size>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="m_pbFrameBackward">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="sizeIncrement">
-             <size>
-              <width>0</width>
-              <height>0</height>
-             </size>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-            <property name="icon">
-             <iconset resource="../resources/IGTUI.qrc">
-              <normaloff>:/IGTUI/previousframe.png</normaloff>:/IGTUI/previousframe.png</iconset>
-            </property>
-           </widget>
-          </item>
-         </layout>
+         <widget class="QSlider" name="samplePositionHorizontalSlider">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+         </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="m_pbPlay">
+         <widget class="QCheckBox" name="sequencialModeCheckBox">
+          <property name="layoutDirection">
+           <enum>Qt::LeftToRight</enum>
+          </property>
+          <property name="text">
+           <string>Sequential Mode</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_8">
+        <item>
+         <widget class="QPushButton" name="beginPushButton">
           <property name="sizePolicy">
-           <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-            <horstretch>0</horstretch>
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>1</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="icon">
+           <iconset resource="../resources/IGTUI.qrc">
+            <normaloff>:/IGTUI/firstframe.png</normaloff>:/IGTUI/firstframe.png</iconset>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="playPushButton">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>4</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
@@ -369,65 +371,21 @@ color: rgb(250, 250, 250);</string>
          </widget>
         </item>
         <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_4">
-          <item>
-           <widget class="QPushButton" name="m_pbFrameForward">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-            <property name="icon">
-             <iconset resource="../resources/IGTUI.qrc">
-              <normaloff>:/IGTUI/nextframe.png</normaloff>:/IGTUI/nextframe.png</iconset>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="m_pbFastForward">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-            <property name="icon">
-             <iconset resource="../resources/IGTUI.qrc">
-              <normaloff>:/IGTUI/fastforward.png</normaloff>:/IGTUI/fastforward.png</iconset>
-            </property>
-            <property name="iconSize">
-             <size>
-              <width>20</width>
-              <height>16</height>
-             </size>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="m_pbEnd">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-            <property name="icon">
-             <iconset resource="../resources/IGTUI.qrc">
-              <normaloff>:/IGTUI/stop.png</normaloff>:/IGTUI/stop.png</iconset>
-            </property>
-           </widget>
-          </item>
-         </layout>
+         <widget class="QPushButton" name="stopPushButton">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>1</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="icon">
+           <iconset resource="../resources/IGTUI.qrc">
+            <normaloff>:/IGTUI/stop.png</normaloff>:/IGTUI/stop.png</iconset>
+          </property>
+         </widget>
         </item>
        </layout>
       </item>

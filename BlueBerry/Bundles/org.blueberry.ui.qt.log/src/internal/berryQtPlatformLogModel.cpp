@@ -169,6 +169,8 @@ QtPlatformLogModel::data(const QModelIndex& index, int role) const
     
       case 0: {
         std::stringstream ss;
+        std::locale C("C");
+        ss.imbue(C);
         ss << std::setw(7) << std::setprecision(3) << std::fixed << ((double)msg->time)/CLOCKS_PER_SEC;
         return QVariant(QString(ss.str().c_str()));
       }
@@ -213,6 +215,8 @@ QtPlatformLogModel::data(const QModelIndex& index, int role) const
       case 7: 
       {
         std::stringstream out;
+        std::locale C("C");
+        out.imbue(C);
         out << msg->message.lineNumber;
         return QVariant(QString(out.str().c_str()));
       }

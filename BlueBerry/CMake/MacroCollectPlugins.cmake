@@ -150,7 +150,9 @@ SET(${BUNDLE-SYMBOLICNAME}_OUT_DIR \"${${BUNDLE-SYMBOLICNAME}_OUT_DIR}\")")
             LIST(APPEND ENABLED_PLUGINS_RELATIVE_DIRS "${dir_relative_entry}")
             LIST(APPEND ENABLED_PLUGINS_ABSOLUTE_DIRS "${CMAKE_CURRENT_SOURCE_DIR}/${dir_relative_entry}")
             STRING(REPLACE . _ _plugin_target ${BUNDLE-SYMBOLICNAME})
-                
+               
+            SET(${dir_relative_entry}_forced_build ${_COLLECT_FORCE_BUILD_ALL})
+            
             # record that this bundle is being build.
             SET(_BUILD_${BUNDLE-SYMBOLICNAME} 1)
             SET(BLUEBERRY_BUNDLE_VARIABLES "${BLUEBERRY_BUNDLE_VARIABLES}
@@ -175,6 +177,11 @@ LINK_DIRECTORIES(${Poco_LIBRARY_DIR})
 SET(PLUGIN_TARGETS "" CACHE INTERNAL "Temporary list of plug-in targets")
 FOREACH(_subdir ${ENABLED_PLUGINS_RELATIVE_DIRS})
   INCLUDE("${CMAKE_CURRENT_BINARY_DIR}/${_subdir}/Manifest.cmake")
+  IF(${_subdir}_forced_build)
+    SET(CURRENT_PLUGIN_BUILD_FORCED ON)
+  ELSE()
+    SET(CURRENT_PLUGIN_BUILD_FORCED OFF)
+  ENDIF()
   #MACRO_PARSE_MANIFEST("${CMAKE_CURRENT_SOURCE_DIR}/${_subdir}/META-INF/MANIFEST.MF")
   ADD_SUBDIRECTORY(${_subdir})
 ENDFOREACH(_subdir ${ENABLED_PLUGINS_RELATIVE_DIRS})

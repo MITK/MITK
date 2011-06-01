@@ -58,6 +58,7 @@ public:
 
 protected:
   QWidget* m_MainControl;
+  QCheckBox* m_EnableFlexibleZooming;
   QCheckBox* m_EnableSingleEditing;
   QCheckBox* m_PlaceNewNodesOnTop;
   QCheckBox* m_ShowHelperObjects;

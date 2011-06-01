@@ -44,6 +44,7 @@ RenderingManager
   m_LODAbortMechanismEnabled( false ),
   m_ClippingPlaneEnabled( false ),
   m_TimeNavigationController( NULL ),
+  m_ConstrainedPaddingZooming ( true ),
   m_DataStorage( NULL )
 {
   m_ShadingEnabled.assign( 3, false );
@@ -478,6 +479,9 @@ RenderingManager
   {
     mitk::BaseRenderer *baseRenderer =
       mitk::BaseRenderer::GetInstance( it->first );
+
+    baseRenderer->GetDisplayGeometry()->SetConstrainZoomingAndPanning(m_ConstrainedPaddingZooming);
+
     int id = baseRenderer->GetMapperID();
     if ( ((type == REQUEST_UPDATE_ALL)
       || ((type == REQUEST_UPDATE_2DWINDOWS) && (id == 1))

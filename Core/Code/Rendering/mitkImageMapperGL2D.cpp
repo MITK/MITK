@@ -441,8 +441,8 @@ mitk::ImageMapperGL2D::GenerateData( mitk::BaseRenderer *renderer )
       // the spacing of the output 2D image is directly derived from the
       // associated input image, regardless of the currently selected world
       // geometry.
-      inputGeometry->WorldToIndex( origin, right, rightInIndex );
-      inputGeometry->WorldToIndex( origin, bottom, bottomInIndex );
+      inputGeometry->WorldToIndex( right, rightInIndex );
+      inputGeometry->WorldToIndex( bottom, bottomInIndex );
       rendererInfo.m_Extent[0] = rightInIndex.GetNorm();
       rendererInfo.m_Extent[1] = bottomInIndex.GetNorm();
     }
@@ -602,7 +602,7 @@ mitk::ImageMapperGL2D::GenerateData( mitk::BaseRenderer *renderer )
       {
         thickSlicesNum = intProperty->GetValue(); 
         if(thickSlicesNum < 1) thickSlicesNum=1;
-        if(thickSlicesNum > 10) thickSlicesNum=10;
+        if(thickSlicesNum > 100) thickSlicesNum=100;
       }
     }
     else
@@ -680,7 +680,7 @@ mitk::ImageMapperGL2D::GenerateData( mitk::BaseRenderer *renderer )
   
   normal.Normalize();    
   Vector3D normInIndex;
-  inputGeometry->WorldToIndex( origin, normal, normInIndex );
+  inputGeometry->WorldToIndex( normal, normInIndex );
   
   if(thickSlicesMode > 0)
   {

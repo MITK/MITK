@@ -37,17 +37,21 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkPoints.h>
 #include <vtkCellArray.h>
 #include <vtkPolyData.h>
-#include <vtkLinearExtrusionFilter.h>
-#include <vtkPolyDataToImageStencil.h>
 #include <vtkImageStencil.h>
 #include <vtkImageImport.h>
 #include <vtkImageExport.h>
 #include <vtkImageData.h>
 
+#if ( ( VTK_MAJOR_VERSION <= 5 ) && ( VTK_MINOR_VERSION<=8)  )
+  #include "mitkvtkLassoStencilSource.h"
+#else
+  #include "vtkLassoStencilSource.h"
+#endif
+
+
 #include <vtkMetaImageWriter.h>
 
 #include <exception>
-
 
 
 
@@ -56,7 +60,10 @@ namespace mitk
 
 ImageStatisticsCalculator::ImageStatisticsCalculator()
 : m_MaskingMode( MASKING_MODE_NONE ),
-  m_MaskingModeChanged( false )
+  m_MaskingModeChanged( false ),
+  m_DoIgnorePixelValue(false),
+  m_IgnorePixelValue(0.0),
+  m_IgnorePixelValueChanged(false)
 { 
   m_EmptyHistogram = HistogramType::New();
   HistogramType::SizeType histogramSize;
@@ -133,7 +140,7 @@ void ImageStatisticsCalculator::SetImageMask( const mitk::Image *imageMask )
 }
 
 
-void ImageStatisticsCalculator::SetPlanarFigure( const mitk::PlanarFigure *planarFigure )
+void ImageStatisticsCalculator::SetPlanarFigure( mitk::PlanarFigure *planarFigure )
 {
   if ( m_Image.IsNull() )
   {
@@ -197,7 +204,38 @@ void ImageStatisticsCalculator::SetMaskingModeToPlanarFigure()
   }
 }
 
+void ImageStatisticsCalculator::SetIgnorePixelValue(double value)
+{
+  if ( m_IgnorePixelValue != value )
+  {
+    m_IgnorePixelValue = value;
+    if(m_DoIgnorePixelValue)
+    {
+      m_IgnorePixelValueChanged = true;
+    }
+    this->Modified();
+  }
+}
 
+double ImageStatisticsCalculator::GetIgnorePixelValue()
+{
+  return m_IgnorePixelValue;
+}
+
+void ImageStatisticsCalculator::SetDoIgnorePixelValue(bool value)
+{
+  if ( m_DoIgnorePixelValue != value )
+  {
+    m_DoIgnorePixelValue = value;
+    m_IgnorePixelValueChanged = true;
+    this->Modified();
+  }
+}
+
+bool ImageStatisticsCalculator::GetDoIgnorePixelValue()
+{
+  return m_DoIgnorePixelValue;
+}
 
 bool ImageStatisticsCalculator::ComputeStatistics( unsigned int timeStep )
 {
@@ -234,7 +272,8 @@ bool ImageStatisticsCalculator::ComputeStatistics( unsigned int timeStep )
   bool maskedImageStatisticsCalculationTrigger = m_MaskedImageStatisticsCalculationTriggerVector[timeStep];
   bool planarFigureStatisticsCalculationTrigger = m_PlanarFigureStatisticsCalculationTriggerVector[timeStep];
 
-  if ( ((m_MaskingMode != MASKING_MODE_NONE) || (imageMTime > m_Image->GetMTime() && !imageStatisticsCalculationTrigger))
+  if ( !m_IgnorePixelValueChanged
+    && ((m_MaskingMode != MASKING_MODE_NONE) || (imageMTime > m_Image->GetMTime() && !imageStatisticsCalculationTrigger))
     && ((m_MaskingMode != MASKING_MODE_IMAGE) || (maskedImageMTime > m_ImageMask->GetMTime() && !maskedImageStatisticsCalculationTrigger))
     && ((m_MaskingMode != MASKING_MODE_PLANARFIGURE) || (planarFigureMTime > m_PlanarFigure->GetMTime() && !planarFigureStatisticsCalculationTrigger)) )
   {
@@ -252,7 +291,7 @@ bool ImageStatisticsCalculator::ComputeStatistics( unsigned int timeStep )
 
   // Reset state changed flag
   m_MaskingModeChanged = false;
-
+  m_IgnorePixelValueChanged = false;
 
   // Depending on masking mode, extract and/or generate the required image
   // and mask data from the user input
@@ -265,13 +304,25 @@ bool ImageStatisticsCalculator::ComputeStatistics( unsigned int timeStep )
   {
   case MASKING_MODE_NONE:
   default:
-    statistics = &m_ImageStatisticsVector[timeStep];
+    {
+   if(!m_DoIgnorePixelValue)
+      {
+      statistics = &m_ImageStatisticsVector[timeStep];
     histogram = &m_ImageHistogramVector[timeStep];
 
     m_ImageStatisticsTimeStampVector[timeStep].Modified();
     m_ImageStatisticsCalculationTriggerVector[timeStep] = false;
-    break;
+  }
+   else
+   {
+     statistics = &m_MaskedImageStatisticsVector[timeStep];
+     histogram = &m_MaskedImageHistogramVector[timeStep];
 
+     m_MaskedImageStatisticsTimeStampVector[timeStep].Modified();
+     m_MaskedImageStatisticsCalculationTriggerVector[timeStep] = false;
+   }
+    break;
+  }
   case MASKING_MODE_IMAGE:
     statistics = &m_MaskedImageStatisticsVector[timeStep];
     histogram = &m_MaskedImageHistogramVector[timeStep];
@@ -292,7 +343,7 @@ bool ImageStatisticsCalculator::ComputeStatistics( unsigned int timeStep )
   // Calculate statistics and histogram(s)
   if ( m_InternalImage->GetDimension() == 3 )
   {
-    if ( m_MaskingMode == MASKING_MODE_NONE )
+    if ( m_MaskingMode == MASKING_MODE_NONE && !m_DoIgnorePixelValue )
     {
       AccessFixedDimensionByItk_2( 
         m_InternalImage,
@@ -314,7 +365,7 @@ bool ImageStatisticsCalculator::ComputeStatistics( unsigned int timeStep )
   }
   else if ( m_InternalImage->GetDimension() == 2 )
   {
-    if ( m_MaskingMode == MASKING_MODE_NONE )
+    if ( m_MaskingMode == MASKING_MODE_NONE && !m_DoIgnorePixelValue )
     {
       AccessFixedDimensionByItk_2( 
         m_InternalImage,
@@ -360,7 +411,12 @@ ImageStatisticsCalculator::GetHistogram( unsigned int timeStep ) const
   {
   case MASKING_MODE_NONE:
   default:
-    return m_ImageHistogramVector[timeStep];
+    {
+      if(m_DoIgnorePixelValue)
+        return m_MaskedImageHistogramVector[timeStep];
+
+      return m_ImageHistogramVector[timeStep];
+    }
 
   case MASKING_MODE_IMAGE:
     return m_MaskedImageHistogramVector[timeStep];
@@ -383,8 +439,12 @@ ImageStatisticsCalculator::GetStatistics( unsigned int timeStep ) const
   {
   case MASKING_MODE_NONE:
   default:
-    return m_ImageStatisticsVector[timeStep];
+    {
+      if(m_DoIgnorePixelValue)
+        return m_MaskedImageStatisticsVector[timeStep];
 
+      return m_ImageStatisticsVector[timeStep];
+    }
   case MASKING_MODE_IMAGE:
     return m_MaskedImageStatisticsVector[timeStep];
 
@@ -420,6 +480,13 @@ void ImageStatisticsCalculator::ExtractImageAndMask( unsigned int timeStep )
       m_InternalImage = timeSliceImage;
       m_InternalImageMask2D = NULL;
       m_InternalImageMask3D = NULL;
+
+      if(m_DoIgnorePixelValue)
+      {
+        CastToItkImage( timeSliceImage, m_InternalImageMask3D );
+        m_InternalImageMask3D->FillBuffer(1);
+      }
+
       break;
     }
 
@@ -514,6 +581,26 @@ void ImageStatisticsCalculator::ExtractImageAndMask( unsigned int timeStep )
         2, axis );
     }
   }
+
+  if(m_DoIgnorePixelValue)
+  {
+    if ( m_InternalImage->GetDimension() == 3 )
+    {
+      AccessFixedDimensionByItk_1(
+          m_InternalImage,
+          InternalMaskIgnoredPixels,
+          3,
+          m_InternalImageMask3D.GetPointer() );
+    }
+    else if ( m_InternalImage->GetDimension() == 2 )
+    {
+      AccessFixedDimensionByItk_1(
+          m_InternalImage,
+          InternalMaskIgnoredPixels,
+          2,
+          m_InternalImageMask2D.GetPointer() );
+    }
+  }
 }
 
 
@@ -601,8 +688,35 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsUnmasked(
     + statistics.Sigma * statistics.Sigma );
 }
 
-
 template < typename TPixel, unsigned int VImageDimension >
+    void ImageStatisticsCalculator::InternalMaskIgnoredPixels(
+        const itk::Image< TPixel, VImageDimension > *image,
+        itk::Image< unsigned short, VImageDimension > *maskImage )
+{
+  typedef itk::Image< TPixel, VImageDimension > ImageType;
+  typedef itk::Image< unsigned short, VImageDimension > MaskImageType;
+
+  itk::ImageRegionIterator<MaskImageType>
+      itmask(maskImage, maskImage->GetLargestPossibleRegion());
+  itk::ImageRegionConstIterator<ImageType>
+      itimage(image, image->GetLargestPossibleRegion());
+
+  itmask = itmask.Begin();
+  itimage = itimage.Begin();
+
+  while( !itmask.IsAtEnd() )
+  {
+    if(m_IgnorePixelValue == itimage.Get())
+    {
+      itmask.Set(0);
+    }
+
+    ++itmask;
+    ++itimage;
+  }
+}
+
+    template < typename TPixel, unsigned int VImageDimension >
 void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
   const itk::Image< TPixel, VImageDimension > *image,
   itk::Image< unsigned short, VImageDimension > *maskImage,
@@ -656,7 +770,6 @@ void ImageStatisticsCalculator::InternalCalculateStatisticsMasked(
 
     offset[i] = (int) indexCoordDistance + image->GetBufferedRegion().GetIndex()[i];
   }
-
 
   // Adapt the origin and region (index/size) of the mask so that the origin of both are the same
   typename ChangeInformationFilterType::Pointer adaptMaskFilter;
@@ -790,16 +903,12 @@ void ImageStatisticsCalculator::InternalCalculateMaskFromPlanarFigure(
   castFilter->Update();
   castFilter->GetOutput()->FillBuffer( 1 );
 
-  // Generate VTK polygon from (closed) PlanarFigure polyline
-  // (The polyline points are shifted by -0.5 in z-direction to make sure
-  // that the extrusion filter, which afterwards elevates all points by +0.5
-  // in z-direction, creates a 3D object which is cut by the the plane z=0)
+  // all PolylinePoints of the PlanarFigure are stored in a vtkPoints object.
+  // These points are used by the vtkLassoStencilSource to create
+  // a vtkImageStencil.
   const mitk::Geometry2D *planarFigureGeometry2D = m_PlanarFigure->GetGeometry2D();
-  const typename PlanarFigure::VertexContainerType *planarFigurePolyline = m_PlanarFigure->GetPolyLine( 0 );
+  const typename PlanarFigure::PolyLineType planarFigurePolyline = m_PlanarFigure->GetPolyLine( 0 );
   const mitk::Geometry3D *imageGeometry3D = m_Image->GetGeometry( 0 );
-
-  vtkPolyData *polyline = vtkPolyData::New();
-  polyline->Allocate( 1, 1 );
 
   // Determine x- and y-dimensions depending on principal axis
   int i0, i1;
@@ -822,25 +931,21 @@ void ImageStatisticsCalculator::InternalCalculateMaskFromPlanarFigure(
       break;
   }
 
-  // Create VTK polydata object of polyline contour
+  // store the polyline contour as vtkPoints object
   bool outOfBounds = false;
-  vtkPoints *points = vtkPoints::New();
-  typename PlanarFigure::VertexContainerType::ConstIterator it;
+  vtkSmartPointer<vtkPoints> points = vtkPoints::New();
+  typename PlanarFigure::PolyLineType::const_iterator it;
   const Vector3D& imageSpacing3D = imageGeometry3D->GetSpacing();
-  for ( it = planarFigurePolyline->Begin();
-        it != planarFigurePolyline->End();
+  for ( it = planarFigurePolyline.begin();
+        it != planarFigurePolyline.end();
         ++it )
   {
     Point3D point3D;
 
     // Convert 2D point back to the local index coordinates of the selected
     // image
-    planarFigureGeometry2D->Map( it->Value(), point3D );
+    planarFigureGeometry2D->Map( it->Point, point3D );
     
-    // Ensure correct pixel center
-    point3D[0] -= 0.5 / imageSpacing3D[0];
-    point3D[1] -= 0.5 / imageSpacing3D[1];
-
     // Polygons (partially) outside of the image bounds can not be processed
     // further due to a bug in vtkPolyDataToImageStencil
     if ( !imageGeometry3D->IsInside( point3D ) )
@@ -850,39 +955,18 @@ void ImageStatisticsCalculator::InternalCalculateMaskFromPlanarFigure(
 
     imageGeometry3D->WorldToIndex( point3D, point3D );
 
-    // Add point to polyline array
-    points->InsertNextPoint( point3D[i0], point3D[i1], -0.5 );
+    points->InsertNextPoint( point3D[i0], point3D[i1], 0 );
   }
-  polyline->SetPoints( points );
-  points->Delete();
 
   if ( outOfBounds )
   {
-    polyline->Delete();
     throw std::runtime_error( "Figure at least partially outside of image bounds!" );
   }
 
-  unsigned int numberOfPoints = planarFigurePolyline->Size();
-  vtkIdType *ptIds = new vtkIdType[numberOfPoints];
-  for ( vtkIdType i = 0; i < numberOfPoints; ++i )
-  {
-    ptIds[i] = i;
-  }
-  polyline->InsertNextCell( VTK_POLY_LINE, numberOfPoints, ptIds );
-
-
-  // Extrude the generated contour polygon
-  vtkLinearExtrusionFilter *extrudeFilter = vtkLinearExtrusionFilter::New();
-  extrudeFilter->SetInput( polyline );
-  extrudeFilter->SetScaleFactor( 1 );
-  extrudeFilter->SetExtrusionTypeToNormalExtrusion();
-  extrudeFilter->SetVector( 0.0, 0.0, 1.0 );
-
-  // Make a stencil from the extruded polygon
-  vtkPolyDataToImageStencil *polyDataToImageStencil = vtkPolyDataToImageStencil::New();
-  polyDataToImageStencil->SetInput( extrudeFilter->GetOutput() );
-
-
+  // create a vtkLassoStencilSource and set the points of the Polygon
+  vtkSmartPointer<vtkLassoStencilSource> lassoStencil = vtkLassoStencilSource::New();
+  lassoStencil->SetShapeToPolygon();
+  lassoStencil->SetPoints( points );
 
   // Export from ITK to VTK (to use a VTK filter)
   typedef itk::VTKImageImport< MaskImage2DType > ImageImportType;
@@ -891,49 +975,33 @@ void ImageStatisticsCalculator::InternalCalculateMaskFromPlanarFigure(
   typename ImageExportType::Pointer itkExporter = ImageExportType::New();
   itkExporter->SetInput( castFilter->GetOutput() );
 
-  vtkImageImport *vtkImporter = vtkImageImport::New();
+  vtkSmartPointer<vtkImageImport> vtkImporter = vtkImageImport::New();
   this->ConnectPipelines( itkExporter, vtkImporter );
-  vtkImporter->Update();
-
 
   // Apply the generated image stencil to the input image
-  vtkImageStencil *imageStencilFilter = vtkImageStencil::New();
-  imageStencilFilter->SetInput( vtkImporter->GetOutput() );
-  imageStencilFilter->SetStencil( polyDataToImageStencil->GetOutput() );
+  vtkSmartPointer<vtkImageStencil> imageStencilFilter = vtkImageStencil::New();
+  imageStencilFilter->SetInputConnection( vtkImporter->GetOutputPort() );
+  imageStencilFilter->SetStencil( lassoStencil->GetOutput() );
   imageStencilFilter->ReverseStencilOff();
   imageStencilFilter->SetBackgroundValue( 0 );
   imageStencilFilter->Update();
 
-
   // Export from VTK back to ITK
-  vtkImageExport *vtkExporter = vtkImageExport::New();
-  vtkExporter->SetInput( imageStencilFilter->GetOutput() );
+  vtkSmartPointer<vtkImageExport> vtkExporter = vtkImageExport::New();
+  vtkExporter->SetInputConnection( imageStencilFilter->GetOutputPort() );
   vtkExporter->Update();
 
   typename ImageImportType::Pointer itkImporter = ImageImportType::New();
   this->ConnectPipelines( vtkExporter, itkImporter );
   itkImporter->Update();
 
-
-  //typedef itk::ImageFileWriter< MaskImage2DType > FileWriterType;
-  //FileWriterType::Pointer writer = FileWriterType::New();
-  //writer->SetInput( itkImporter->GetOutput() );
-  //writer->SetFileName( "c:/test.mhd" );
-  //writer->Update();
-
-
   // Store mask
   m_InternalImageMask2D = itkImporter->GetOutput();
 
-
   // Clean up VTK objects
-  polyline->Delete();
-  extrudeFilter->Delete();
-  polyDataToImageStencil->Delete();
   vtkImporter->Delete();
   imageStencilFilter->Delete();
   //vtkExporter->Delete(); // TODO: crashes when outcommented; memory leak??
-  delete[] ptIds;
 }
 
 

@@ -315,16 +315,28 @@ virtual void SetBounds(const BoundsArrayType& bounds);
   //##Documentation
   //## @brief Convert world coordinates (in mm) of a \em vector 
   //## \a vec_mm to (continuous!) index coordinates.
-  //## \warning Deprecated! First parameter (Point3D) is not used. If possible, please use void WorldToIndex(const mitk::Point3D& pt_mm, mitk::Point3D& pt_units) const.
+  //## @deprecated First parameter (Point3D) is not used. If possible, please use void WorldToIndex(const mitk::Vector3D& vec_mm, mitk::Vector3D& vec_units) const.
   //## For further information about coordinates types, please see the Geometry documentation
   void WorldToIndex(const mitk::Point3D& atPt3d_mm, const mitk::Vector3D& vec_mm, mitk::Vector3D& vec_units) const;
 
   //##Documentation
+  //## @brief Convert world coordinates (in mm) of a \em vector 
+  //## \a vec_mm to (continuous!) index coordinates.
+  //## For further information about coordinates types, please see the Geometry documentation
+  void WorldToIndex(const mitk::Vector3D& vec_mm, mitk::Vector3D& vec_units) const;
+
+  //##Documentation
   //## @brief Convert (continuous or discrete) index coordinates of a \em vector 
   //## \a vec_units to world coordinates (in mm)
-  //## \warning Deprecated! First parameter (Point3D) is not used. If possible, please use void IndexToWorld(const mitk::Point3D& pt_units, mitk::Point3D& pt_mm) const.
+  //## @deprecated First parameter (Point3D) is not used. If possible, please use void IndexToWorld(const mitk::Vector3D& vec_units, mitk::Vector3D& vec_mm) const.
   //## For further information about coordinates types, please see the Geometry documentation
   void IndexToWorld(const mitk::Point3D& atPt3d_units, const mitk::Vector3D& vec_units, mitk::Vector3D& vec_mm) const;
+
+  //##Documentation
+  //## @brief Convert (continuous or discrete) index coordinates of a \em vector 
+  //## \a vec_units to world coordinates (in mm)
+  //## For further information about coordinates types, please see the Geometry documentation
+  void IndexToWorld(const mitk::Vector3D& vec_units, mitk::Vector3D& vec_mm) const;
 
   //##Documentation
   //## @brief Convert world coordinates (in mm) of a \em point to (discrete!) index coordinates.
@@ -618,7 +630,12 @@ protected:
   virtual void PrintSelf(std::ostream& os, itk::Indent indent) const;
 
   virtual void BackTransform(const mitk::Point3D& in, mitk::Point3D& out) const;
+  //##Documentation
+  //## @brief Deprecated
   virtual void BackTransform(const mitk::Point3D& at, const mitk::Vector3D& in, mitk::Vector3D& out) const;
+
+  //Without redundant parameter Point3D
+  virtual void BackTransform(const mitk::Vector3D& in, mitk::Vector3D& out) const;
 
   //##Documentation
   //## @brief Set the parametric bounds

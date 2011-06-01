@@ -1,14 +1,11 @@
 
 # tests with no extra command line parameter
 SET(MODULE_TESTS
-  mitkCoreObjectFactoryTest.cpp 
+  mitkCoreObjectFactoryTest.cpp
   mitkPointSetWriterTest.cpp
   mitkMaterialTest.cpp
-  mitkDataNodeTest.cpp
   mitkActionTest.cpp
-  mitkDataStorageTest.cpp
   mitkEnumerationPropertyTest.cpp
-  mitkEventMapperTest.cpp
   mitkEventTest.cpp
   mitkFocusManagerTest.cpp
   mitkGenericPropertyTest.cpp
@@ -17,7 +14,7 @@ SET(MODULE_TESTS
   mitkGlobalInteractionTest.cpp
   mitkImageDataItemTest.cpp
   #mitkImageMapper2DTest.cpp
-  mitkImageTest.cpp
+  mitkImageGeneratorTest.cpp
   mitkBaseDataTest.cpp
   #mitkImageToItkTest.cpp
   mitkInteractorTest.cpp
@@ -31,14 +28,12 @@ SET(MODULE_TESTS
   mitkPointSetFileIOTest.cpp
   mitkPointSetTest.cpp
   mitkPointSetInteractorTest.cpp
-  mitkNodeDependentPointSetInteractorTest.cpp
   mitkPropertyListTest.cpp
   #mitkRegistrationBaseTest.cpp
   #mitkSegmentationInterpolationTest.cpp
   mitkSlicedGeometry3DTest.cpp
   mitkSliceNavigationControllerTest.cpp
   mitkStateMachineTest.cpp
-  mitkStateMachineFactoryTest.cpp
   mitkStateTest.cpp
   mitkSurfaceTest.cpp
   mitkSurfaceToSurfaceFilterTest.cpp
@@ -53,8 +48,6 @@ SET(MODULE_TESTS
   #mitkPicFileIOTest.cpp
   mitkStepperTest.cpp
   itkTotalVariationDenoisingImageFilterTest.cpp
-  mitkDICOMLocaleTest.cpp
-  mitkPointSetLocaleTest.cpp
   mitkRenderingManagerTest.cpp
   vtkMitkThickSlicesFilterTest.cpp
   mitkNodePredicateSourceTest.cpp
@@ -64,7 +57,6 @@ SET(MODULE_TESTS
 SET(MODULE_IMAGE_TESTS
   mitkSurfaceVtkWriterTest.cpp
   mitkPicFileWriterTest.cpp
-  mitkImageWriterTest.cpp
   #mitkImageSliceSelectorTest.cpp
   mitkImageTimeSelectorTest.cpp
   mitkPicFileReaderTest.cpp
@@ -83,9 +75,17 @@ SET(MODULE_TESTIMAGES
   ball.stl
 )
 
-SET(MODULE_CUSTOM_TESTS 
+SET(MODULE_CUSTOM_TESTS
     #mitkLabeledImageToSurfaceFilterTest.cpp
     #mitkExternalToolsTest.cpp
+    mitkDataStorageTest.cpp
+    mitkDataNodeTest.cpp
     mitkDicomSeriesReaderTest.cpp
+    mitkDICOMLocaleTest.cpp
+    mitkEventMapperTest.cpp
+    mitkNodeDependentPointSetInteractorTest.cpp
+    mitkStateMachineFactoryTest.cpp
+    mitkPointSetLocaleTest.cpp
+    mitkImageTest.cpp
+	mitkImageWriterTest.cpp
 )
-

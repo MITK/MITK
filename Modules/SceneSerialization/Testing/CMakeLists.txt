@@ -1,3 +1,4 @@
 
-MITK_CREATE_MODULE_TESTS()
-  
+MITK_CREATE_MODULE_TESTS(LABELS MITK-Modules)
+ADD_TEST(mitkSceneIOTest_Pic3D.pic.gz_binary.stl ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${TESTDRIVER} mitkSceneIOTest ${MITK_DATA_DIR}/Pic3D.pic.gz ${MITK_DATA_DIR}/binary.stl)
+SET_PROPERTY(TEST mitkSceneIOTest_Pic3D.pic.gz_binary.stl PROPERTY LABELS MITK-Modules)

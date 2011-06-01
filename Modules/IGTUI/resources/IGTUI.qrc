@@ -3,6 +3,7 @@
      <file>record.png</file>
 	 <file>stop_recording.png</file>
 	 <file>play.png</file>
+	 <file>play2.png</file>
 	 <file>pause.png</file>
 	 <file>fastbackward.png</file>
 	 <file>fastforward.png</file>
@@ -11,5 +12,8 @@
 	 <file>firstframe.png</file>
 	 <file>lastframe.png</file>
 	 <file>stop.png</file>
+	 <file>stop2.png</file>
+	 <file>powerGreen.png</file>
+	 <file>powerRed.png</file>
  </qresource>
  </RCC>

@@ -39,7 +39,7 @@ SET_PROPERTY(DIRECTORY PROPERTY EP_BASE ${ep_base})
 
 SET(ep_install_dir ${ep_base}/Install)
 #SET(ep_build_dir ${ep_base}/Build)
-#SET(ep_source_dir ${ep_base}/Source)
+SET(ep_source_dir ${ep_base}/Source)
 #SET(ep_parallelism_level)
 SET(ep_build_shared_libs ON)
 SET(ep_build_testing OFF)
@@ -95,6 +95,8 @@ SET(external_projects
   Boost
   DCMTK
   CTK
+  OpenCV
+  MITKData
   )
   
 # Include external projects
@@ -116,10 +118,10 @@ SET(mitk_cmake_boolean_args
   MITK_BUILD_ALL_PLUGINS
   MITK_BUILD_TUTORIAL
   MITK_USE_Boost
-  MITK_USE_GDCMIO
   MITK_USE_BLUEBERRY
   MITK_USE_CTK
-  MITK_USE_DCMTK  
+  MITK_USE_DCMTK
+  MITK_USE_OpenCV
   )
   
 #-----------------------------------------------------------------------------
@@ -163,12 +165,17 @@ ExternalProject_Add(${proj}
     ${Boost_DEPENDS}
     ${CTK_DEPENDS}
     ${DCMTK_DEPENDS}
-    
+    ${OpenCV_DEPENDS}
+    ${MITK-Data_DEPENDS}
 )
 
 #-----------------------------------------------------------------------------
 # MITK Configure
 #-----------------------------------------------------------------------------
+
+IF(MITK_INITIAL_CACHE_FILE)
+  SET(mitk_initial_cache_arg -C "${MITK_INITIAL_CACHE_FILE}")
+ENDIF()
 
 SET(proj MITK-Configure)
 
@@ -179,6 +186,9 @@ ExternalProject_Add(${proj}
     ${ep_common_args}
     ${mitk_superbuild_boolean_args}
     -DMITK_USE_SUPERBUILD:BOOL=OFF
+    -DMITK_CMAKE_LIBRARY_OUTPUT_DIRECTORY:PATH=${MITK_CMAKE_LIBRARY_OUTPUT_DIRECTORY}
+    -DMITK_CMAKE_RUNTIME_OUTPUT_DIRECTORY:PATH=${MITK_CMAKE_RUNTIME_OUTPUT_DIRECTORY}
+    -DMITK_CMAKE_ARCHIVE_OUTPUT_DIRECTORY:PATH=${MITK_CMAKE_ARCHIVE_OUTPUT_DIRECTORY}
     -DCTEST_USE_LAUNCHERS:BOOL=${CTEST_USE_LAUNCHERS}
     -DMITK_SUPERBUILD_BINARY_DIR:PATH=${MITK_BINARY_DIR}
     -DQT_QMAKE_EXECUTABLE:FILEPATH=${QT_QMAKE_EXECUTABLE}
@@ -187,12 +197,11 @@ ExternalProject_Add(${proj}
     -DDCMTK_DIR:PATH=${DCMTK_DIR}
     -DVTK_DIR:PATH=${VTK_DIR}     # FindVTK expects VTK_DIR
     -DITK_DIR:PATH=${ITK_DIR}     # FindITK expects ITK_DIR
+    -DOpenCV_DIR:PATH=${OpenCV_DIR}
     -DGDCM_DIR:PATH=${GDCM_DIR}
     -DBOOST_ROOT:PATH=${BOOST_ROOT}
-    -DMITK_USE_Boost:BOOL=${MITK_USE_Boost}
-    -DMITK_USE_GDCMIO:BOOL=${MITK_USE_GDCMIO}
-    -DMITK_USE_DCMTK:BOOL=${MITK_USE_DCMTK}
-    -DMITK_USE_QT:BOOL=${MITK_USE_QT}
+    -DMITK_DATA_DIR:PATH=${MITK_DATA_DIR}
+    ${mitk_initial_cache_arg}
 
   SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}
   BINARY_DIR ${CMAKE_BINARY_DIR}/MITK-build

@@ -25,15 +25,15 @@ PURPOSE.  See the above copyright notices for more information.
 #include <fstream>
 #include <itkSmartPointerForwardReference.txx>
 #include <mitkDataNodeFactory.h>
-#include <mitkStandardFileLocations.h>
 
 #include <vtkImageData.h>
 
 #include <mitkTestingMacros.h>
 
 
-int mitkImageTest(int /*argc*/, char* /*argv*/[])
+int mitkImageTest(int argc, char* argv[])
 {
+
   MITK_TEST_BEGIN(mitkImageTest);
 
   //Create Image out of nowhere
@@ -418,16 +418,14 @@ int mitkImageTest(int /*argc*/, char* /*argv*/[])
   //vecImg->Initialize(PixelType(typeid(float), 6, itk::ImageIOBase::SYMMETRICSECONDRANKTENSOR), *imgMem->GetGeometry(), 2 /* #channels */, 0 /*tDim*/, false /*shiftBoundingBoxMinimumToZero*/ );
   //vecImg->Initialize(PixelType(typeid(itk::Vector<float,6>)), *imgMem->GetGeometry(), 2 /* #channels */, 0 /*tDim*/, false /*shiftBoundingBoxMinimumToZero*/ );
 
-
   // testing access by index coordinates and by world coordinates
   
   mitk::DataNode::Pointer node;      
   mitk::DataNodeFactory::Pointer nodeReader = mitk::DataNodeFactory::New();
-  mitk::StandardFileLocations::Pointer locator = mitk::StandardFileLocations::GetInstance();
-  MITK_TEST_CONDITION_REQUIRED(locator.IsNotNull(),"Instantiating StandardFileLocations") 
+  MITK_TEST_CONDITION_REQUIRED(argc == 2, "Check if test image is accessible!"); 
   try
   {
-    const std::string filename = locator->FindFile("brain.mhd", "Core/Code/Testing/Data");   
+    const std::string filename = std::string(argv[1]);   
     nodeReader->SetFileName(filename);
     nodeReader->Update();
     node = nodeReader->GetOutput();      

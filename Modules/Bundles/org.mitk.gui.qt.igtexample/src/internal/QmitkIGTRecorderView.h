@@ -19,7 +19,6 @@ PURPOSE.  See the above copyright notices for more information.
 #define QmitkIGTRecorderView_H__INCLUDED
 
 #include "QmitkFunctionality.h"
-#include "mitkTestingConfig.h"
 
 #include "mitkTrackingDeviceSource.h"
 #include "mitkTrackingDevice.h"

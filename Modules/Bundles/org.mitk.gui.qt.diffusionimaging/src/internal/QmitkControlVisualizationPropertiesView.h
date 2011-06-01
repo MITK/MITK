@@ -98,8 +98,11 @@ protected slots:
   void IndexParam1Changed(double);
   void IndexParam2Changed(double);
   void OpacityChanged(double,double);
-  void NormalizationCheckbox();
   void ScalingCheckbox();
+
+  void OnThickSlicesModeSelected( QAction* action );
+  void OnTSNumChanged(int num);
+  void OnMenuAboutToShow ();
 
 protected:
 
@@ -127,6 +130,9 @@ protected:
   bool m_GlyIsOn_C;
   bool m_GlyIsOn_S;
 
+  int currentThickSlicesMode;
+  QLabel* m_TSLabel;
+  QMenu* m_MyMenu;
 };
 
 

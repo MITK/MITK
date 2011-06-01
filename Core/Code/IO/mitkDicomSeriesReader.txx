@@ -39,8 +39,6 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
     mitk::Image::Pointer image = mitk::Image::New();
     CallbackCommand *command = callback ? new CallbackCommand(callback) : 0;
 
-#if GDCM_MAJOR_VERSION >= 2
-
     /* special case for Philips 3D+t ultrasound images */ 
     if ( DicomSeriesReader::IsPhilips3DDicom(filenames.front().c_str())  )
     {
@@ -53,7 +51,7 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
       std::list<StringContainer> imageBlocks = SortIntoBlocksFor3DplusT( filenames, sort, canLoadAs4D );
       unsigned int volume_count = imageBlocks.size();
 
-      if (!canLoadAs4D || !load4D)
+      if (volume_count == 1 || !canLoadAs4D || !load4D)
       {
         image = LoadDICOMByITK<PixelType>( imageBlocks.front() , command ); // load first 3D block
       }
@@ -74,13 +72,14 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
           reader->AddObserver(itk::ProgressEvent(), command);
         }
 
-        const std::list<StringContainer>::const_iterator df_end = imageBlocks.end();
         unsigned int act_volume = 1u;
 
         reader->SetFileNames(imageBlocks.front());
         reader->Update();
         image->InitializeByItk(reader->GetOutput(), 1, volume_count);
         image->SetImportVolume(reader->GetOutput()->GetBufferPointer(), 0u);
+
+        DicomSeriesReader::CopyMetaDataToImageProperties( imageBlocks.front(), io, image );
 
         MITK_DEBUG << "Volume dimension: [" << image->GetDimension(0) << ", " 
                                             << image->GetDimension(1) << ", " 
@@ -104,7 +103,7 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
                                           << image->GetGeometry()->GetSpacing()[1] << ", " 
                                           << image->GetGeometry()->GetSpacing()[2] << "]";
 
-        for (std::list<StringContainer>::iterator df_it = ++imageBlocks.begin(); df_it != df_end; ++df_it)
+        for (std::list<StringContainer>::iterator df_it = ++imageBlocks.begin(); df_it != imageBlocks.end(); ++df_it)
         {
           reader->SetFileNames(*df_it);
           reader->Update();
@@ -112,10 +111,6 @@ void DicomSeriesReader::LoadDicom(const StringContainer &filenames, DataNode &no
         }
       }
     }
-#else
-    // no GDCM2
-    image = LoadDICOMByITK<PixelType>( filenames, command );
-#endif
 
     node.SetData( image );
     setlocale(LC_NUMERIC, previousCLocale);
@@ -181,17 +176,13 @@ Image::Pointer DicomSeriesReader::LoadDICOMByITK( const StringContainer& filenam
   return image;
 }
   
-#if GDCM_MAJOR_VERSION >= 2
-
 std::list<DicomSeriesReader::StringContainer> 
 DicomSeriesReader::SortIntoBlocksFor3DplusT( const StringContainer& presortedFilenames, bool sort, bool& canLoadAs4D )
 {
   std::list<StringContainer> imageBlocks;
 
-  // sort only if requested (default)
-  StringContainer sorted_filenames = sort
-    ? DicomSeriesReader::SortSeriesSlices(presortedFilenames)
-    : presortedFilenames;
+  // ignore sort request, because most likely re-sorting is now needed due to changes in GetSeries(bug #8022)
+  StringContainer sorted_filenames = DicomSeriesReader::SortSeriesSlices(presortedFilenames);
 
   gdcm::Tag ippTag(0x0020,0x0032); //Image position (Patient)
   gdcm::Scanner scanner;
@@ -208,7 +199,7 @@ DicomSeriesReader::SortIntoBlocksFor3DplusT( const StringContainer& presortedFil
        ++fileIter)
   {
     std::string position = scanner.GetValue( fileIter->c_str(), ippTag);
-    MITK_DEBUG << "File " << *fileIter << " at " << position;
+    MITK_DEBUG << "  " << *fileIter << " at " << position;
     if (firstPosition.empty())
     {
       firstPosition = position;
@@ -224,7 +215,7 @@ DicomSeriesReader::SortIntoBlocksFor3DplusT( const StringContainer& presortedFil
     }
   }
 
-  MITK_DEBUG << "Assuming " << numberOfBlocks << " image blocks";
+  MITK_DEBUG << "  ==> Assuming " << numberOfBlocks << " time steps";
 
   if (numberOfBlocks == 0) return imageBlocks; // only possible if called with no files
 
@@ -273,7 +264,6 @@ DicomSeriesReader::SortIntoBlocksFor3DplusT( const StringContainer& presortedFil
 
   return imageBlocks;
 }
-#endif
 
 }
 

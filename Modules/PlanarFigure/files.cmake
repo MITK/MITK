@@ -2,6 +2,7 @@ SET(CPP_FILES
   Algorithms/mitkImageToPlanarFigureFilter.cpp
   Algorithms/mitkPlanarFigureObjectFactory.cpp
   Algorithms/mitkPlanarFigureSource.cpp
+  Algorithms/mitkPlanarFigureToPlanarFigureFilter.cpp
   DataManagement/mitkPlanarAngle.cpp
   DataManagement/mitkPlanarCircle.cpp
   DataManagement/mitkPlanarCross.cpp

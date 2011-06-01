@@ -31,6 +31,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 mitk::NavigationDataRecorder::NavigationDataRecorder()
 {
+  //set default values
   m_NumberOfInputs = 0;
   m_RecordingMode = NormalFile;
   m_Recording = false;
@@ -38,6 +39,9 @@ mitk::NavigationDataRecorder::NavigationDataRecorder()
   m_Stream = NULL;
   m_FileName = "";
   m_SystemTimeClock = RealTimeClock::New();
+  m_OutputFormat = mitk::NavigationDataRecorder::xml;
+  m_RecordCounter = 0;
+  m_RecordCountLimit = -1;
 
   //To get a start time
   mitk::TimeStamp::GetInstance()->Start(this);
@@ -89,8 +93,30 @@ void mitk::NavigationDataRecorder::Update()
     strs.precision(15); // rounding precision for system time double value
     strs << sysTimestamp;
     std::string sysTimeStr = strs.str();
-      
-   
+
+    //if csv-mode: write csv header and timpstamp at beginning
+    if (m_OutputFormat == mitk::NavigationDataRecorder::csv)
+      {
+      //write header only when it's the first line 
+      if (m_firstLine)
+        {
+        m_firstLine = false;
+        *m_Stream << "TimeStamp";
+        for (unsigned int index = 0; index < inputs.size(); index++){ *m_Stream << ";Valid_Tool" << index <<
+                                                                                ";X_Tool" << index <<
+                                                                                ";Y_Tool" << index <<
+                                                                                ";Z_Tool" << index <<
+                                                                                ";QX_Tool" << index <<
+                                                                                ";QY_Tool" << index <<
+                                                                                ";QZ_Tool" << index <<
+                                                                                ";QR_Tool" << index;}
+        *m_Stream << "\n";
+        }
+      //write timestamp (always)
+      *m_Stream << timestamp;  
+      }
+    
+    //write tool data for every tool
     for (unsigned int index = 0; index < inputs.size(); index++)
     {
       mitk::NavigationData* nd = dynamic_cast<mitk::NavigationData*>(inputs[index].GetPointer());
@@ -121,54 +147,67 @@ void mitk::NavigationDataRecorder::Update()
       //a timestamp is never < 0! this case happens only if you are using the timestamp of the nd object instead of getting a new one
       if (timestamp >= 0)
       { 
-        TiXmlElement* elem = new TiXmlElement("ND");
+        if (this->m_OutputFormat == mitk::NavigationDataRecorder::xml)
+          {
+          TiXmlElement* elem = new TiXmlElement("NavigationData");
 
-        elem->SetDoubleAttribute("Time", timestamp);
-        elem->SetAttribute("SystemTime", sysTimeStr); // tag for system time
-        elem->SetDoubleAttribute("Tool", index);
-        elem->SetDoubleAttribute("X", position[0]);
-        elem->SetDoubleAttribute("Y", position[1]);
-        elem->SetDoubleAttribute("Z", position[2]);
+          elem->SetDoubleAttribute("Time", timestamp);
+          elem->SetAttribute("SystemTime", sysTimeStr); // tag for system time
+          elem->SetDoubleAttribute("Tool", index);
+          elem->SetDoubleAttribute("X", position[0]);
+          elem->SetDoubleAttribute("Y", position[1]);
+          elem->SetDoubleAttribute("Z", position[2]);
 
-        elem->SetDoubleAttribute("QX", orientation[0]);
-        elem->SetDoubleAttribute("QY", orientation[1]);
-        elem->SetDoubleAttribute("QZ", orientation[2]);
-        elem->SetDoubleAttribute("QR", orientation[3]);
+          elem->SetDoubleAttribute("QX", orientation[0]);
+          elem->SetDoubleAttribute("QY", orientation[1]);
+          elem->SetDoubleAttribute("QZ", orientation[2]);
+          elem->SetDoubleAttribute("QR", orientation[3]);
 
-        elem->SetDoubleAttribute("C00", matrix[0][0]);
-        elem->SetDoubleAttribute("C01", matrix[0][1]);
-        elem->SetDoubleAttribute("C02", matrix[0][2]);
-        elem->SetDoubleAttribute("C03", matrix[0][3]);
-        elem->SetDoubleAttribute("C04", matrix[0][4]);
-        elem->SetDoubleAttribute("C05", matrix[0][5]);
-        elem->SetDoubleAttribute("C10", matrix[1][0]);
-        elem->SetDoubleAttribute("C11", matrix[1][1]);
-        elem->SetDoubleAttribute("C12", matrix[1][2]);
-        elem->SetDoubleAttribute("C13", matrix[1][3]);
-        elem->SetDoubleAttribute("C14", matrix[1][4]);
-        elem->SetDoubleAttribute("C15", matrix[1][5]);
+          elem->SetDoubleAttribute("C00", matrix[0][0]);
+          elem->SetDoubleAttribute("C01", matrix[0][1]);
+          elem->SetDoubleAttribute("C02", matrix[0][2]);
+          elem->SetDoubleAttribute("C03", matrix[0][3]);
+          elem->SetDoubleAttribute("C04", matrix[0][4]);
+          elem->SetDoubleAttribute("C05", matrix[0][5]);
+          elem->SetDoubleAttribute("C10", matrix[1][0]);
+          elem->SetDoubleAttribute("C11", matrix[1][1]);
+          elem->SetDoubleAttribute("C12", matrix[1][2]);
+          elem->SetDoubleAttribute("C13", matrix[1][3]);
+          elem->SetDoubleAttribute("C14", matrix[1][4]);
+          elem->SetDoubleAttribute("C15", matrix[1][5]);
 
-        if (dataValid)
-          elem->SetAttribute("Valid",1);
-        else
-          elem->SetAttribute("Valid",0);
+          if (dataValid)
+            elem->SetAttribute("Valid",1);
+          else
+            elem->SetAttribute("Valid",0);
 
-        if (hasOrientation)
-          elem->SetAttribute("hO",1);
-        else
-          elem->SetAttribute("hO",0);
+          if (hasOrientation)
+            elem->SetAttribute("hO",1);
+          else
+            elem->SetAttribute("hO",0);
 
-        if (hasPosition)
-          elem->SetAttribute("hP",1);
-        else
-          elem->SetAttribute("hP",0);
-        
-        *m_Stream << "        " << *elem << std::endl;
+          if (hasPosition)
+            elem->SetAttribute("hP",1);
+          else
+            elem->SetAttribute("hP",0);
+          
+          *m_Stream << "        " << *elem << std::endl;
 
-        delete elem;
+          delete elem;
+          }
+        else if (this->m_OutputFormat == mitk::NavigationDataRecorder::csv)
+          {
+          *m_Stream << ";" << dataValid << ";" << position[0] << ";" << position[1] << ";" << position[2] << ";" << orientation[0] << ";" << orientation[1] << ";" << orientation[2] << ";" << orientation[3];
+          }
       }
     }
+    if (this->m_OutputFormat == mitk::NavigationDataRecorder::csv) 
+    {
+      *m_Stream << "\n";
+    }
   }
+  m_RecordCounter++;
+  if ((m_RecordCountLimit<=m_RecordCounter)&&(m_RecordCountLimit != -1)) {StopRecording();}
 }
 
 void mitk::NavigationDataRecorder::StartRecording()
@@ -178,6 +217,8 @@ void mitk::NavigationDataRecorder::StartRecording()
     std::cout << "Already recording please stop before start new recording session" << std::endl;
     return;
   }
+  
+
   if (m_Stream == NULL)
   {
     std::stringstream ss;
@@ -186,7 +227,8 @@ void mitk::NavigationDataRecorder::StartRecording()
     //An existing extension will be cut and replaced with .xml
     std::string tmpPath = itksys::SystemTools::GetFilenamePath(m_FileName);
     m_FileName = itksys::SystemTools::GetFilenameWithoutExtension(m_FileName);
-    ss << tmpPath << "/" <<  m_FileName << "-" << m_NumberOfRecordedFiles << ".xml";
+    if (m_OutputFormat == mitk::NavigationDataRecorder::csv) ss << tmpPath << "/" <<  m_FileName << "-" << m_NumberOfRecordedFiles << ".csv";
+    else ss << tmpPath << "/" <<  m_FileName << "-" << m_NumberOfRecordedFiles << ".xml";
     switch(m_RecordingMode)
     {
       case Console:
@@ -214,6 +256,8 @@ void mitk::NavigationDataRecorder::StartRecording()
         stream = &std::cout;
         break;
     }
+    m_firstLine = true;
+    m_RecordCounter = 0;
     StartRecording(stream);
   }
 
@@ -235,11 +279,13 @@ void mitk::NavigationDataRecorder::StartRecording(std::ostream* stream)
   //TODO store date and GMT time
   if (m_Stream)
   {
-    *m_Stream << "<?xml version=\"1.0\" ?>" << std::endl;
-    /**m_Stream << "<Version Ver=\"1\" />" << std::endl;*/
-    // should be a generic version, meaning a member variable, which has the actual version
-    *m_Stream << "    " << "<Data ToolCount=\"" << (m_NumberOfInputs) << "\" version=\"1.0\">" << std::endl;
-
+    if (m_OutputFormat == mitk::NavigationDataRecorder::xml)
+      {
+      *m_Stream << "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>" << std::endl;
+      /**m_Stream << "<Version Ver=\"1\" />" << std::endl;*/
+      // should be a generic version, meaning a member variable, which has the actual version
+      *m_Stream << "    " << "<Data ToolCount=\"" << (m_NumberOfInputs) << "\" version=\"1.0\">" << std::endl;
+      }
     m_Recording = true;
   }
 }
@@ -250,12 +296,14 @@ void mitk::NavigationDataRecorder::StopRecording()
     std::cout << "You have to start a recording first" << std::endl;
     return;
   }
-  if (m_Stream)
+ 
+  if ((m_Stream) && (m_OutputFormat == mitk::NavigationDataRecorder::xml))
   {
     *m_Stream << "</Data>" << std::endl;
   }
 
   m_NumberOfRecordedFiles++;
-  m_Stream = NULL;
   m_Recording = false;
+  m_Stream->flush();
+  m_Stream = NULL;   
 }

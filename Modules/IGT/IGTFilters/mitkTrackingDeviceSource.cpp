@@ -31,15 +31,18 @@ mitk::TrackingDeviceSource::TrackingDeviceSource()
 
 mitk::TrackingDeviceSource::~TrackingDeviceSource()
 {
-  if (m_TrackingDevice->GetState() == mitk::TrackingDevice::Tracking)
+  if (m_TrackingDevice.IsNotNull())
   {
-    this->StopTracking();
+    if (m_TrackingDevice->GetState() == mitk::TrackingDevice::Tracking)
+    {
+      this->StopTracking();
+    }
+    if (m_TrackingDevice->GetState() == mitk::TrackingDevice::Ready)
+    {
+      this->Disconnect();
+    }
+    m_TrackingDevice = NULL;
   }
-  if (m_TrackingDevice->GetState() == mitk::TrackingDevice::Ready)
-  {
-    this->Disconnect();
-  }
-  m_TrackingDevice = NULL;
 }
 
 
@@ -149,6 +152,8 @@ void mitk::TrackingDeviceSource::StartTracking()
 {
   if (m_TrackingDevice.IsNull())
     throw std::invalid_argument("mitk::TrackingDeviceSource: No tracking device set");
+  if (m_TrackingDevice->GetState() == mitk::TrackingDevice::Tracking)
+    return;
   if (m_TrackingDevice->StartTracking() == false)
     throw std::runtime_error("mitk::TrackingDeviceSource: Could not start tracking");
 }

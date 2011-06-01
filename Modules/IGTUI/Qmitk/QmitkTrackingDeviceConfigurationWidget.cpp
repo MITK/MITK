@@ -33,6 +33,88 @@ QmitkTrackingDeviceConfigurationWidget::QmitkTrackingDeviceConfigurationWidget(Q
   //reset a few things
   ResetOutput();
   AddOutput("<br>NDI Polaris selected");
+  this->m_TrackingDeviceConfigurated = false;
+
+  m_AdvancedUserControl = true;
+}
+
+void QmitkTrackingDeviceConfigurationWidget::SetGUIStyle(QmitkTrackingDeviceConfigurationWidget::Style style)
+{
+switch(style)
+  {
+  case QmitkTrackingDeviceConfigurationWidget::SIMPLE:
+
+    //move all UI elements to an empty dummy layout
+    //m_Controls->dummyLayout->addItem(m_Controls->mainLayout);
+    m_Controls->dummyLayout->addWidget(m_Controls->widget_title_label);
+    m_Controls->dummyLayout->addWidget(m_Controls->choose_tracking_device_label);
+    m_Controls->dummyLayout->addWidget(m_Controls->polaris_label);
+    m_Controls->dummyLayout->addWidget( m_Controls->aurora_label);
+    m_Controls->dummyLayout->addWidget(m_Controls->aurora_label);
+    m_Controls->dummyLayout->addWidget(m_Controls->microntracker_label);
+    m_Controls->dummyLayout->addWidget(m_Controls->m_testConnectionMicronTracker);
+    m_Controls->dummyLayout->addWidget(m_Controls->m_outputTextMicronTracker);
+    m_Controls->dummyLayout->addWidget(m_Controls->m_outputTextAurora);
+    m_Controls->dummyLayout->addWidget(m_Controls->m_testConnectionAurora);
+    m_Controls->dummyLayout->addWidget(m_Controls->m_outputTextPolaris);
+    m_Controls->dummyLayout->addWidget(m_Controls->m_testConnectionPolaris);
+    m_Controls->dummyLayout->addWidget(m_Controls->m_polarisTrackingModeBox);
+    m_Controls->dummyLayout->addWidget(m_Controls->m_finishedLine);
+    m_Controls->dummyLayout->addWidget(m_Controls->line);
+    m_Controls->dummyLayout->addWidget(m_Controls->configuration_finished_label);
+    m_Controls->dummyLayout->addItem(m_Controls->horizontalLayout_4);
+    m_Controls->mainLayout->removeItem(m_Controls->horizontalLayout_4);
+    m_Controls->dummyLayout->addWidget(m_Controls->configuration_finished_label);  
+    m_Controls->dummyLayout->addItem(m_Controls->verticalSpacer_2);
+    m_Controls->verticalLayout_3->removeItem(m_Controls->verticalSpacer_2);
+    m_Controls->dummyLayout->addItem(m_Controls->horizontalSpacer_9);
+    m_Controls->horizontalLayout_9->removeItem(m_Controls->horizontalSpacer_9);
+    m_Controls->dummyLayout->addItem(m_Controls->horizontalSpacer_3);
+    m_Controls->horizontalLayout_11->removeItem(m_Controls->horizontalSpacer_3);
+    m_Controls->dummyLayout->addItem(m_Controls->verticalSpacer_3);
+    m_Controls->verticalLayout_7->removeItem(m_Controls->verticalSpacer_3);
+    m_Controls->dummyLayout->addItem(m_Controls->verticalSpacer_4);
+    m_Controls->verticalLayout_10->removeItem(m_Controls->verticalSpacer_4);
+    m_Controls->dummyLayout->addItem(m_Controls->horizontalSpacer_10);
+    m_Controls->verticalLayout_10->removeItem(m_Controls->horizontalSpacer_10);
+
+    //set height to min
+    m_Controls->m_outputTextPolaris->setMinimumHeight(0);
+    m_Controls->m_outputTextPolaris->setMaximumHeight(0);
+    m_Controls->m_outputTextMicronTracker->setMinimumHeight(0);
+    m_Controls->m_outputTextMicronTracker->setMaximumHeight(0);
+    m_Controls->m_outputTextAurora->setMinimumHeight(0);
+    m_Controls->m_outputTextAurora->setMaximumHeight(0);
+    m_Controls->m_finishedButton->setMinimumHeight(0);
+    m_Controls->m_finishedButton->setMaximumHeight(0);
+    m_Controls->m_resetButton->setMinimumHeight(0);
+    m_Controls->m_resetButton->setMaximumHeight(0);
+
+ 
+    //set the height of the tracking device combo box
+    m_Controls->m_trackingDeviceChooser->setMinimumHeight(50);
+
+    //move back the used elemets to the main layout
+    m_Controls->simpleLayout->addWidget(m_Controls->m_trackingDeviceChooser);
+    m_Controls->simpleLayout->addWidget(m_Controls->m_TrackingSystemWidget);
+
+    m_Controls->mainWidget->setCurrentIndex(1);
+
+    this->setMaximumHeight(150);
+
+    this->EnableAdvancedUserControl(false);
+    
+
+    break;
+
+  case QmitkTrackingDeviceConfigurationWidget::ADVANCED:
+
+    //default at the moment => start settings are advanced
+
+    break;
+
+  }
+
 }
 
 
@@ -60,6 +142,19 @@ void QmitkTrackingDeviceConfigurationWidget::CreateConnections()
     connect( (QObject*)(m_Controls->m_testConnectionMicronTracker), SIGNAL(clicked()), this, SLOT(TestConnection()) );
     connect( (QObject*)(m_Controls->m_resetButton), SIGNAL(clicked()), this, SLOT(ResetByUser()) );
     connect( (QObject*)(m_Controls->m_finishedButton), SIGNAL(clicked()), this, SLOT(Finished()) );
+
+    //set a few UI components depending on Windows / Linux
+    #ifdef WIN32
+    m_Controls->portTypeLabelPolaris->setVisible(false);
+    m_Controls->portTypePolaris->setVisible(false);
+    m_Controls->portTypeLabelAurora->setVisible(false);
+    m_Controls->portTypeAurora->setVisible(false);
+    #else
+    m_Controls->comPortLabelAurora->setText("Port Nr:");
+    m_Controls->m_comPortLabelPolaris->setText("Port Nr:");
+    m_Controls->m_portSpinBoxAurora->setPrefix("");
+    m_Controls->m_portSpinBoxPolaris->setPrefix("");
+    #endif
   }
 }
 
@@ -115,6 +210,7 @@ void QmitkTrackingDeviceConfigurationWidget::Finished()
   m_Controls->m_trackingDeviceChooser->setEnabled(false);
   m_Controls->choose_tracking_device_label->setEnabled(false);
   m_Controls->configuration_finished_label->setText("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\np, li { white-space: pre-wrap; }\n</style></head><body style=\" font-family:\'MS Shell Dlg 2\'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n<p align=\"right\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;\"><span style=\" font-weight:600;\">Configuration finished</span></p></body></html>");
+  this->m_TrackingDeviceConfigurated = true;
   emit TrackingDeviceConfigurationFinished();
   }
 
@@ -125,6 +221,7 @@ void QmitkTrackingDeviceConfigurationWidget::Reset()
   m_Controls->m_trackingDeviceChooser->setEnabled(true);
   m_Controls->choose_tracking_device_label->setEnabled(true);
   m_Controls->configuration_finished_label->setText("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\np, li { white-space: pre-wrap; }\n</style></head><body style=\" font-family:\'MS Shell Dlg 2\'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n<p align=\"right\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;\"><span style=\" font-weight:600;\">Press \"Finished\" to confirm configuration</span></p></body></html>");
+  this->m_TrackingDeviceConfigurated = false;
   emit TrackingDeviceConfigurationReseted();
   }
 
@@ -191,16 +288,52 @@ mitk::TrackingDevice::Pointer QmitkTrackingDeviceConfigurationWidget::ConfigureN
 mitk::TrackingDevice::Pointer QmitkTrackingDeviceConfigurationWidget::ConfigureNDI6DTrackingDevice()
   {
   mitk::NDITrackingDevice::Pointer tempTrackingDevice = mitk::NDITrackingDevice::New();
-  int comPort = 0;
-  if (m_Controls->m_trackingDeviceChooser->currentIndex()==1) comPort = m_Controls->m_comPortSpinBoxAurora->value();
-  else comPort = m_Controls->m_comPortSpinBoxPolaris->value();
-  tempTrackingDevice->SetPortNumber(static_cast<mitk::SerialCommunication::PortNumber>(comPort)); //set the com port
+    
+  //build prefix (depends on linux/win)
+  QString prefix = "";
+  #ifdef WIN32
+  prefix ="COM";
+  #else
+  if (m_Controls->m_trackingDeviceChooser->currentIndex()==1) //Aurora
+    prefix = m_Controls->portTypeAurora->currentText();  
+  else //Polaris
+    prefix = m_Controls->portTypePolaris->currentText();
+  #endif
+  //get port
+  int port = 0;
+  if (m_Controls->m_trackingDeviceChooser->currentIndex()==1) port = m_Controls->m_portSpinBoxAurora->value();
+  else port = m_Controls->m_portSpinBoxPolaris->value();
+  //build port name string
+  QString portName = prefix + QString::number(port);
+
+  tempTrackingDevice->SetDeviceName(portName.toStdString()); //set the port name
   mitk::TrackingDevice::Pointer returnValue = static_cast<mitk::TrackingDevice*>(tempTrackingDevice);
   return returnValue;
   }
 
 mitk::TrackingDevice::Pointer QmitkTrackingDeviceConfigurationWidget::GetTrackingDevice()
   {
+  if (!m_AdvancedUserControl) m_TrackingDevice = ConstructTrackingDevice();
   return this->m_TrackingDevice;
+  }
+
+bool QmitkTrackingDeviceConfigurationWidget::GetTrackingDeviceConfigured()
+  {
+  return this->m_TrackingDeviceConfigurated;
+  }
+
+void QmitkTrackingDeviceConfigurationWidget::ConfigurationFinished()
+  {
+  Finished();
+
+  }
+
+void QmitkTrackingDeviceConfigurationWidget::EnableAdvancedUserControl(bool enable)
+  {
+  m_AdvancedUserControl = enable;
+  m_Controls->configuration_finished_label->setVisible(enable);
+  m_Controls->m_finishedLine->setVisible(enable);
+  m_Controls->m_resetButton->setVisible(enable);
+  m_Controls->m_finishedButton->setVisible(enable);
   }
 

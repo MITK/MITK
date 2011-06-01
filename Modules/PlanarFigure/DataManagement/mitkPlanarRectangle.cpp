@@ -28,8 +28,7 @@ mitk::PlanarRectangle::PlanarRectangle()
   // Rectangle has four control points
   this->ResetNumberOfControlPoints( 4 );
   this->SetProperty( "closed", mitk::BoolProperty::New(true) );
-
-  m_PolyLines->InsertElement( 0, VertexContainerType::New());
+  this->SetNumberOfPolyLines( 1 );
 }
 
 
@@ -37,32 +36,6 @@ mitk::PlanarRectangle::~PlanarRectangle()
 {
 }
 
-
-//void mitk::PlanarRectangle::Initialize()
-//{
-//  // Default initialization of circle control points
-//
-//  mitk::Geometry2D *geometry2D = 
-//    dynamic_cast< mitk::Geometry2D * >( this->GetGeometry( 0 ) );
-//
-//  if ( geometry2D == NULL )
-//  {
-//    MITK_ERROR << "Missing Geometry2D for PlanarCircle";
-//    return;
-//  }
-//
-//  mitk::ScalarType width = geometry2D->GetBounds()[1];
-//  mitk::ScalarType height = geometry2D->GetBounds()[3];
-//  
-//  mitk::Point2D &centerPoint = m_ControlPoints->ElementAt( 0 );
-//  mitk::Point2D &boundaryPoint = m_ControlPoints->ElementAt( 1 );
-//
-//  centerPoint[0] = width / 2.0;
-//  centerPoint[1] = height / 2.0;
-//
-//  boundaryPoint[0] = centerPoint[0] + 20.0;
-//  boundaryPoint[1] = centerPoint[1];
-//}
 
 bool mitk::PlanarRectangle::SetControlPoint( unsigned int index, const Point2D &point, bool createIfDoesNotExist )
 {
@@ -72,18 +45,7 @@ bool mitk::PlanarRectangle::SetControlPoint( unsigned int index, const Point2D &
   // is moved in the same x direction
   // and the lower left point (index=2) is moved in the same y direction
   // the upper left point (index=0) is left untouched
-  bool set = false;
-
-  if (createIfDoesNotExist)
-  {
-    m_ControlPoints->InsertElement( index, point );
-    set = true;
-  }
-  else if ( index < this->GetNumberOfControlPoints() )
-  {
-    m_ControlPoints->InsertElement( index, point );
-    set = true;
-  }
+  bool set = PlanarFigure::SetControlPoint( index, point, createIfDoesNotExist );
 
   if(set)
   {
@@ -106,8 +68,13 @@ bool mitk::PlanarRectangle::SetControlPoint( unsigned int index, const Point2D &
       verticalCorrespondingPointIndex = 0;
     }
 
-    m_ControlPoints->ElementAt( verticalCorrespondingPointIndex ).SetElement(0, point[0]);
-    m_ControlPoints->ElementAt( horizontalCorrespondingPointIndex ).SetElement(1, point[1]);
+    Point2D verticalCorrespondingPoint = GetControlPoint( verticalCorrespondingPointIndex );
+    verticalCorrespondingPoint[0] = point[0];
+    PlanarFigure::SetControlPoint( verticalCorrespondingPointIndex, verticalCorrespondingPoint );
+
+    Point2D horizontalCorrespondingPoint = GetControlPoint( horizontalCorrespondingPointIndex );
+    horizontalCorrespondingPoint[1] = point[1];
+    PlanarFigure::SetControlPoint( horizontalCorrespondingPointIndex, horizontalCorrespondingPoint );
   }
 
   return set;
@@ -115,22 +82,19 @@ bool mitk::PlanarRectangle::SetControlPoint( unsigned int index, const Point2D &
 
 void mitk::PlanarRectangle::PlaceFigure( const mitk::Point2D &point )
 {
-  for ( unsigned int i = 0; i < this->GetNumberOfControlPoints(); ++i )
-  {
-    m_ControlPoints->InsertElement( i, point );
-  }
-
-  m_FigurePlaced = true;
+  PlanarFigure::PlaceFigure( point );
   m_SelectedControlPoint = 3;
 }
 
 void mitk::PlanarRectangle::GeneratePolyLine()
 {
   // TODO: start polygon at specified initalize point...
-  m_PolyLines->ElementAt( 0 )->Reserve( this->GetNumberOfControlPoints() );
+
+  ClearPolyLines();
+ 
   for ( unsigned int i = 0; i < this->GetNumberOfControlPoints(); ++i )
   {
-    m_PolyLines->ElementAt( 0 )->ElementAt( i ) = m_ControlPoints->ElementAt( i );  
+    AppendPointToPolyLine( 0, PolyLineElement( GetControlPoint(i), i ) );
   }
 }
 
@@ -180,10 +144,8 @@ void mitk::PlanarRectangle::PrintSelf( std::ostream& os, itk::Indent indent) con
 
   os << indent << "Control points:" << std::endl;
 
-  mitk::PlanarFigure::VertexContainerType::ConstIterator it;
-
   for ( unsigned int i = 0; i < this->GetNumberOfControlPoints(); ++i )
   {
-    os << indent << indent << i << ": " << m_ControlPoints->ElementAt( i ) << std::endl;
+    os << indent << indent << i << ": " <<GetControlPoint( i ) << std::endl;
   }
 }

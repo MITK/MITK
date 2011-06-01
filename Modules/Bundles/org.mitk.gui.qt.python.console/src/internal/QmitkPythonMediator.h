@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <iostream>
 #include <vector>
 #include <QStringList>
-#include "Python.h"
+#include <dPython.h>
 #include "mitkCommon.h"
 
 class QmitkPythonClient

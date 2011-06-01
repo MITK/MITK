@@ -125,7 +125,7 @@ void berry::PreferencesService::ImportPreferences( Poco::File f, std::string nam
   map<string, AbstractPreferencesStorage::Pointer>::iterator it
     = m_PreferencesStorages.find(name); 
 
-  if(it->second == 0)
+  if(it == m_PreferencesStorages.end() || it->second == 0)
   {
     this->GetUserPreferences(name);
   }

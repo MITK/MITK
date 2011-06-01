@@ -72,7 +72,7 @@ namespace itk {
           // itk::SymmetricEigenAnalysis defaults are not touched in the tensor implementation
           typename TensorType::EigenValuesArrayType evs;
           tensor.ComputeEigenValues(evs);
-          outputIt.Set((evs[0]+evs[1])/2);
+          outputIt.Set((evs[0]+evs[1])/2.0);
           
           break;
         }
@@ -87,7 +87,7 @@ namespace itk {
             outputIt.Set(0);
             break;
           }
-          outputIt.Set(1-(evs[0]+evs[1])/(2*evs[2]));
+          outputIt.Set(1.0-(evs[0]+evs[1])/(2.0*evs[2]));
           break;
         }
       case L2:
@@ -106,6 +106,13 @@ namespace itk {
           typename TensorType::EigenValuesArrayType evs;
           tensor.ComputeEigenValues(evs);
           outputIt.Set(evs[0]);
+          break;
+        }
+      case MD:
+        {
+          typename TensorType::EigenValuesArrayType evs;
+          tensor.ComputeEigenValues(evs);
+          outputIt.Set((evs[0]+evs[0]+evs[0])/3.0);
           break;
         }
       }

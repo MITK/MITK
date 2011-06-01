@@ -58,7 +58,8 @@ namespace mitk {
     itkGetConstObjectMacro(TrackingDevice, mitk::TrackingDevice);
 
     /**
-    * \brief Establishes a connection to the tracking device
+    * \brief Establishes a connection to the tracking device. If there is already a connection
+    *        the method does nothing.
     * \warning. Will throw a std::invalid_argument exception if no tracking device was 
     * set with SetTrackingDevice(). Will throw a std::runtime_error if the tracking device 
     * returns an error.
@@ -75,7 +76,8 @@ namespace mitk {
 
     /**
     * \brief starts tracking. 
-    * This needs to be called before Update() or GetOutput()->Update().
+    * This needs to be called before Update() or GetOutput()->Update(). If the device is already tracking
+    * the method does nothing.
     * \warning. Will throw a std::invalid_argument exception if no tracking device was 
     * set with SetTrackingDevice(). Will throw a std::runtime_error if the tracking device 
     * returns an error.

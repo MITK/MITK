@@ -23,6 +23,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include "ui_QmitkTrackingDeviceConfigurationWidgetControls.h"
 #include "mitkTrackingDevice.h"
 
+
+//itk headers
+
  /** Documentation:
   *   \brief An object of this class offers an UI to configurate
   *          a tracking device. If the user finished the configuration process and
@@ -56,9 +59,21 @@ class MitkIGTUI_EXPORT QmitkTrackingDeviceConfigurationWidget : public QWidget
      */ 
     mitk::TrackingDevice::Pointer GetTrackingDevice();
     
+    enum Style
+      {
+      SIMPLE,
+      ADVANCED,
+      };
+
     /* @brief Resets the UI to allow the user for configurating a new tracking device.
      */
     void Reset();
+
+    /** @brief External call to disable this widget when configuration is finished. This is also called by the "finished" button,
+      *        but if you disable the advanced user control you might want to call this when the configuration is finished.
+      *        If you want to configure a new device call the Reset() funktion later.
+      */
+    void ConfigurationFinished();
 
     /* @brief Sets our unsets the possibility to reset the UI and start
      *        a new configuration by the user. Concretely this means the
@@ -66,6 +81,21 @@ class MitkIGTUI_EXPORT QmitkTrackingDeviceConfigurationWidget : public QWidget
      */
     void EnableUserReset(bool enable);
 
+	  /** @return Returns true if the tracking device is completely configured (you can get it by calling GetTrackingDevice() in this case).
+	    *          Returns false if configuration is not finished.
+	    */
+	  bool GetTrackingDeviceConfigured();
+
+    /** @brief Sets the style of this widget. Default is ADVANCED. Caution: The style can only be set once at startup! */
+    void SetGUIStyle(Style style);
+
+    /** @brief Enables/disables the advanced user controls which means the reset and finished button. When disabled you'll get NO
+      *        signals from this widget and you've to check by yourself if the configuration is finished. Default value is false.
+      *        Advanced user control is only availiable when style is ADVANCED.
+      */
+    void EnableAdvancedUserControl(bool enable);
+
+    
   signals:
 
     /* @brief This signal is sent if the user has finished the configuration of the tracking device.
@@ -91,12 +121,16 @@ class MitkIGTUI_EXPORT QmitkTrackingDeviceConfigurationWidget : public QWidget
     std::stringstream m_output;
 
     mitk::TrackingDevice::Pointer m_TrackingDevice;
+    
     bool m_TrackingDeviceConfigurated;
+
+    bool m_AdvancedUserControl;
 
     //######################### internal help methods #######################################
     void ResetOutput();
     void AddOutput(std::string s);
     mitk::TrackingDevice::Pointer ConstructTrackingDevice();
+    
 
   protected slots:
     /* @brief This method is called when the user changes the selection of the trackingdevice (m_trackingDeviceChooser).

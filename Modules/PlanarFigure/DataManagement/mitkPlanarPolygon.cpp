@@ -30,11 +30,10 @@ mitk::PlanarPolygon::PlanarPolygon()
 {
   // Polygon has at least two control points
   this->ResetNumberOfControlPoints( 2 );
+  this->SetNumberOfPolyLines( 1 );
 
   // Polygon is closed by default
   this->SetProperty( "closed", mitk::BoolProperty::New( true ) );
-
-  m_PolyLines->InsertElement( 0, VertexContainerType::New());
 }
 
 
@@ -64,52 +63,15 @@ void mitk::PlanarPolygon::SetClosed( bool closed )
 }
 
 
-//void mitk::PlanarPolygon::Initialize()
-//{
-//  // Default initialization of circle control points
-//
-//  mitk::Geometry2D *geometry2D = 
-//    dynamic_cast< mitk::Geometry2D * >( this->GetGeometry( 0 ) );
-//
-//  if ( geometry2D == NULL )
-//  {
-//    MITK_ERROR << "Missing Geometry2D for PlanarCircle";
-//    return;
-//  }
-//
-//  mitk::ScalarType width = geometry2D->GetBounds()[1];
-//  mitk::ScalarType height = geometry2D->GetBounds()[3];
-//  
-//  mitk::Point2D &centerPoint = m_ControlPoints->ElementAt( 0 );
-//  mitk::Point2D &boundaryPoint = m_ControlPoints->ElementAt( 1 );
-//
-//  centerPoint[0] = width / 2.0;
-//  centerPoint[1] = height / 2.0;
-//
-//  boundaryPoint[0] = centerPoint[0] + 20.0;
-//  boundaryPoint[1] = centerPoint[1];
-//}
-
-
 void mitk::PlanarPolygon::GeneratePolyLine()
 {
-  // if more elements are needed that have been reserved -> reserve
-  if ( m_PolyLines->ElementAt( 0 )->size() < this->GetNumberOfControlPoints() )
+  this->ClearPolyLines();
+    
+  for ( int i=0; i<m_ControlPoints.size(); i++ )
   {
-    m_PolyLines->ElementAt( 0 )->Reserve( this->GetNumberOfControlPoints() );
-  }
-  // if more elements have been reserved/set before than are needed now -> clear vector
-  else if (m_PolyLines->ElementAt( 0 )->size() > this->GetNumberOfControlPoints())
-  {
-    m_PolyLines->ElementAt( 0 )->clear();
-  }
-
-
-  // TODO: start polygon at specified initalize point...
-  m_PolyLines->ElementAt( 0 )->Reserve( this->GetNumberOfControlPoints() );
-  for ( unsigned int i = 0; i < this->GetNumberOfControlPoints(); ++i )
-  {
-    m_PolyLines->ElementAt( 0 )->ElementAt( i ) = m_ControlPoints->ElementAt( i );  
+    Point2D pnt = m_ControlPoints.at( i );
+    PolyLineElement elem(pnt,i);
+    this->AppendPointToPolyLine( 0, elem );
   }
 }
 
@@ -210,7 +172,7 @@ void mitk::PlanarPolygon::PrintSelf( std::ostream& os, itk::Indent indent) const
 
 // based on
 // http://flassari.is/2008/11/line-line-intersection-in-cplusplus/
-bool mitk::PlanarPolygon::CheckForLineIntersection(Point2D p1, Point2D p2, Point2D p3, Point2D p4) 
+bool mitk::PlanarPolygon::CheckForLineIntersection( const mitk::Point2D& p1, const mitk::Point2D& p2, const mitk::Point2D& p3, const mitk::Point2D& p4, Point2D& intersection ) const
 {
   // do not check for intersections with control points
   if(p1 == p2 || p1 == p3 || p1 == p4 ||
@@ -221,26 +183,83 @@ bool mitk::PlanarPolygon::CheckForLineIntersection(Point2D p1, Point2D p2, Point
 
   // Store the values for fast access and easy
   // equations-to-code conversion
-  float x1 = p1[0], x2 = p2[0], x3 = p3[0], x4 = p4[0];
-  float y1 = p1[1], y2 = p2[1], y3 = p3[1], y4 = p4[1];
+  double x1 = p1[0], x2 = p2[0], x3 = p3[0], x4 = p4[0];
+  double y1 = p1[1], y2 = p2[1], y3 = p3[1], y4 = p4[1];
    
-  float d = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
+  double d = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
   // If d is zero, there is no intersection
   //if (d < mitk::eps) return false;
   if (d == 0) return false;
    
   // Get the x and y
-  float pre = (x1*y2 - y1*x2), post = (x3*y4 - y3*x4);
-  float x = ( pre * (x3 - x4) - (x1 - x2) * post ) / d;
-  float y = ( pre * (y3 - y4) - (y1 - y2) * post ) / d;
-   
-  // Check if the x and y coordinates are within both lines
-  if ( x < std::min(x1, x2) || x > std::max(x1, x2) ||
-  x < std::min(x3, x4) || x > std::max(x3, x4) ) return false;
-  if ( y < std::min(y1, y2) || y > std::max(y1, y2) ||
-  y < std::min(y3, y4) || y > std::max(y3, y4) ) return false;
+  double pre = (x1*y2 - y1*x2);
+  double post = (x3*y4 - y3*x4);
+  double x = ( pre * (x3 - x4) - (x1 - x2) * post ) / d;
+  double y = ( pre * (y3 - y4) - (y1 - y2) * post ) / d;
+
+  double tolerance = 0.001;
+  // Check if the x coordinates are within both lines, including tolerance
+  if ( x < ( std::min(x1, x2) - tolerance )
+    || x > ( std::max(x1, x2) + tolerance )
+    || x < ( std::min(x3, x4) - tolerance )
+    || x > ( std::max(x3, x4) + tolerance )
+    ) 
+  {
+    return false;
+  }
+
+  // Check if the y coordinates are within both lines, including tolerance
+  if ( y < ( std::min(y1, y2) - tolerance )
+    || y > ( std::max(y1, y2) + tolerance )
+    || y < ( std::min(y3, y4) - tolerance )
+    || y > ( std::max(y3, y4) + tolerance )
+    ) 
+  {
+    return false;
+  }
    
   // point of intersection
   Point2D ret; ret[0] = x; ret[1] = y;
+  intersection = ret;
   return true;
+}
+
+bool mitk::PlanarPolygon::CheckForLineIntersection( const mitk::Point2D& p1, const mitk::Point2D& p2, const mitk::Point2D& p3, const mitk::Point2D& p4 ) const
+{
+  mitk::Point2D intersection;
+  return mitk::PlanarPolygon::CheckForLineIntersection( p1, p2, p3, p4, intersection );
+
+}
+
+std::vector<mitk::Point2D> mitk::PlanarPolygon::CheckForLineIntersection( const mitk::Point2D& p1, const mitk::Point2D& p2 ) const
+{
+  std::vector<mitk::Point2D> intersectionList;
+
+
+  for ( int i=0; i<this->GetNumberOfControlPoints()-1; i++ )
+  {
+    mitk::Point2D pnt1 = this->GetControlPoint( i );
+    mitk::Point2D pnt2 = this->GetControlPoint( i+1 );
+    mitk::Point2D intersection;
+
+    if ( mitk::PlanarPolygon::CheckForLineIntersection( p1, p2, pnt1, pnt2, intersection ) )
+    {
+      intersectionList.push_back( intersection );
+    }
+  }
+
+  if ( this->IsClosed() )
+  {
+    mitk::Point2D intersection, lastControlPoint, firstControlPoint;
+    lastControlPoint = this->GetControlPoint(this->GetNumberOfControlPoints()-1);
+    firstControlPoint = this->GetControlPoint(0);
+
+    if ( mitk::PlanarPolygon::CheckForLineIntersection( lastControlPoint,
+      firstControlPoint, p1, p2, intersection ) )
+    {
+      intersectionList.push_back( intersection );
+    }
+  }
+
+  return intersectionList;
 }

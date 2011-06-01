@@ -26,14 +26,14 @@ your new project. The generator uses the CMake GUI for configuration.
 
 \par Windows
 \li Start the CMake GUI
-\li Choose \c \<MITK-SRC-DIR\>/mitk/Build/Tools/BundleGenerator as source directory
+\li Choose \c \<MITK-SRC-DIR\>/Build/Tools/BundleGenerator as source directory
 \li Choose a directory for the source code of your project and/or plug-in (create it if it doesn't exist)
 \li Press "Configure" and don't care about the generator
 \li Follow the steps for "All"
 
 \par Linux
 \li Create a directory for the source code of your project and/or plug-in and cd into it. 
-\li Start <tt>ccmake</tt> with <tt>\<MITK-SRC-DIR\>/mitk/Build/Tools/BundleGenerator</tt> as source directory
+\li Start <tt>ccmake</tt> with <tt>\<MITK-SRC-DIR\>/Build/Tools/BundleGenerator</tt> as source directory
 \li Press "Configure" 
 
 \par All
@@ -81,8 +81,8 @@ the supplied \b startVS2008.bat file in your binary tree to start Visual Studio 
 
 \par
 If you did not want to create a new project (because you already have one), copy your new plug-in from the temporary directory
-in your project's source tree. (Hint for MBI members: put it in \c mitk/Bundles or \c mbi-sb/Bundles !)
-Switch back to the configuration of your projects (MBI: MITK) build. On Windows you can just switch the "Where to build the binaries" combobox back 
+in your project's source tree. (Hint for MBI members: put it in \c \<MITK-SRC-DIR\>/Modules/Bundles or \c \<MITK-MBI-SRC-DIR\>/mbi-sb/Bundles !)
+Switch back to the CMake configuration of your custom project (MBI: MITK). On Windows you can just switch the "Where to build the binaries" combobox back 
 to your projects (MBI: MITKs) binary directory. After pressing "Configure" a new build option for your plug-in should appear.
 
 \section BuildSystem Build system for plug-ins

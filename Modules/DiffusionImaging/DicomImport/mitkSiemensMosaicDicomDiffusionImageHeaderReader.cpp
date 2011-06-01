@@ -15,24 +15,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "gdcmGlobal.h"
 //#include "gdcmVersion.h"
 
-#if  GDCM_MAJOR_VERSION >= 2
-#define DGDCM2
-#endif
-
-#ifndef DGDCM2
-
-#include "gdcm.h"
-
-// relevant Siemens private tags
-const gdcm::DictEntry SiemensMosiacParameters( 0x0051, 0x100b, "IS", "1", "Mosiac Matrix Size" );
-const gdcm::DictEntry SiemensDictNMosiac( 0x0019, 0x100a, "US", "1", "Number of Images In Mosaic" );
-const gdcm::DictEntry SiemensDictBValue( 0x0019, 0x100c, "IS", "1", "B Value of diffusion weighting" );
-const gdcm::DictEntry SiemensDictDiffusionDirection( 0x0019, 0x100e, "FD", "3", "Diffusion Gradient Direction" );
-const gdcm::DictEntry SiemensDictDiffusionMatrix( 0x0019, 0x1027, "FD", "6", "Diffusion Matrix" );
-const gdcm::DictEntry SiemensDictShadowInfo( 0x0029, 0x1010, "OB", "1", "Siemens DWI Info" );
-
-#else
-
 #include "gdcmFile.h"
 #include "gdcmImageReader.h"
 #include "gdcmDict.h"
@@ -42,8 +24,6 @@ const gdcm::DictEntry SiemensDictShadowInfo( 0x0029, 0x1010, "OB", "1", "Siemens
 #include "gdcmDict.h"
 #include "gdcmFile.h"
 #include "gdcmSerieHelper.h"
-
-#endif
 
 
 mitk::SiemensMosaicDicomDiffusionImageHeaderReader::SiemensMosaicDicomDiffusionImageHeaderReader()
@@ -98,21 +78,6 @@ void mitk::SiemensMosaicDicomDiffusionImageHeaderReader::Update()
     VolumeReaderType::DictionaryArrayRawPointer inputDict
         = m_VolumeReader->GetMetaDataDictionaryArray();
 
-#ifndef DGDCM2
-    if(gdcm::Global::GetDicts()->GetDefaultPubDict()->GetEntry(SiemensMosiacParameters.GetKey()) == 0)
-      gdcm::Global::GetDicts()->GetDefaultPubDict()->AddEntry(SiemensMosiacParameters);
-    if(gdcm::Global::GetDicts()->GetDefaultPubDict()->GetEntry(SiemensDictNMosiac.GetKey()) == 0)
-      gdcm::Global::GetDicts()->GetDefaultPubDict()->AddEntry(SiemensDictNMosiac);
-    if(gdcm::Global::GetDicts()->GetDefaultPubDict()->GetEntry(SiemensDictBValue.GetKey()) == 0)
-      gdcm::Global::GetDicts()->GetDefaultPubDict()->AddEntry(SiemensDictBValue);
-    if(gdcm::Global::GetDicts()->GetDefaultPubDict()->GetEntry(SiemensDictDiffusionDirection.GetKey()) == 0)
-      gdcm::Global::GetDicts()->GetDefaultPubDict()->AddEntry(SiemensDictDiffusionDirection);
-    if(gdcm::Global::GetDicts()->GetDefaultPubDict()->GetEntry(SiemensDictDiffusionMatrix.GetKey()) == 0)
-      gdcm::Global::GetDicts()->GetDefaultPubDict()->AddEntry(SiemensDictDiffusionMatrix);
-    if(gdcm::Global::GetDicts()->GetDefaultPubDict()->GetEntry(SiemensDictShadowInfo.GetKey()) == 0)
-      gdcm::Global::GetDicts()->GetDefaultPubDict()->AddEntry(SiemensDictShadowInfo);
-#endif
-
     ReadPublicTags();
 
     int mMosaic = 0;   // number of raws in each mosaic block;
@@ -125,38 +90,6 @@ void mitk::SiemensMosaicDicomDiffusionImageHeaderReader::Update()
     // for siemens mosaic image, figure out mosaic slice order from 0029|1010
     std::string tag;
     tag.clear();
-
-#ifndef DGDCM2
-
-    gdcm::File *header0 = new gdcm::File;
-    gdcm::BinEntry* binEntry;
-
-    header0->SetMaxSizeLoadEntry(65536);
-    header0->SetFileName( m_DicomFilenames[0] );
-    header0->SetLoadMode( gdcm::LD_ALL );
-    header0->Load();
-
-    // copy information stored in 0029,1010 into a string for parsing
-    gdcm::DocEntry* docEntry = header0->GetFirstEntry();
-    while(docEntry)
-    {
-      if ( docEntry->GetKey() == "0029|1010"  )
-      {
-        binEntry = dynamic_cast<gdcm::BinEntry*> ( docEntry );
-        int binLength = binEntry->GetFullLength();
-        tag.resize( binLength );
-        uint8_t * tagString = binEntry->GetBinArea();
-
-        for (int n = 0; n < binLength; n++)
-        {
-          tag[n] = *(tagString+n);
-        }
-        break;
-      }
-      docEntry = header0->GetNextEntry();
-    }
-
-#else
 
     gdcm::ImageReader reader;
     reader.SetFileName( m_DicomFilenames[0].c_str() );
@@ -179,8 +112,6 @@ void mitk::SiemensMosaicDicomDiffusionImageHeaderReader::Update()
         tag = std::string(ref.GetByteValue()->GetPointer(),ref.GetByteValue()->GetLength());
       }
     }
-
-#endif
 
     // parse SliceNormalVector from 0029,1010 tag
     std::vector<double> valueArray(0);
@@ -224,39 +155,6 @@ void mitk::SiemensMosaicDicomDiffusionImageHeaderReader::Update()
 
     for (int k = 0; k < m_nSlice; k += nStride )
     {
-
-#ifndef DGDCM2
-
-      gdcm::File *header0 = new gdcm::File;
-      gdcm::BinEntry* binEntry;
-
-      header0->SetMaxSizeLoadEntry(65536);
-      header0->SetFileName( m_DicomFilenames[0] );
-      header0->SetLoadMode( gdcm::LD_ALL );
-      header0->Load();
-
-      // copy information stored in 0029,1010 into a string for parsing
-      gdcm::DocEntry* docEntry = header0->GetFirstEntry();
-      while(docEntry)
-      {
-        if ( docEntry->GetKey() == "0029|1010"  )
-        {
-          binEntry = dynamic_cast<gdcm::BinEntry*> ( docEntry );
-          int binLength = binEntry->GetFullLength();
-          tag.resize( binLength );
-          uint8_t * tagString = binEntry->GetBinArea();
-
-          for (int n = 0; n < binLength; n++)
-          {
-            tag[n] = *(tagString+n);
-          }
-          break;
-        }
-        docEntry = header0->GetNextEntry();
-      }
-
-#else
-
       gdcm::ImageReader reader;
       reader.SetFileName( m_DicomFilenames[0].c_str() );
       if( !reader.Read() )
@@ -278,8 +176,6 @@ void mitk::SiemensMosaicDicomDiffusionImageHeaderReader::Update()
           tag = std::string(ref.GetByteValue()->GetPointer(),ref.GetByteValue()->GetLength());
         }
       }
-
-#endif
 
       // parse B_value from 0029,1010 tag
       std::vector<double> valueArray(0);

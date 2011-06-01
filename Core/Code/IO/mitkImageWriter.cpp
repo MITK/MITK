@@ -86,7 +86,7 @@ void mitk::ImageWriter::WriteByITK(mitk::Image* image, const std::string& fileNa
 
   // Set the necessary information for imageIO
   imageIO->SetNumberOfDimensions(dimension);
-  imageIO->SetPixelTypeInfo( *(pixelType.GetItkTypeId()) );
+  imageIO->SetPixelTypeInfo( *(pixelType.GetTypeId()) );
 
   if(pixelType.GetNumberOfComponents() > 1)
     imageIO->SetNumberOfComponents(pixelType.GetNumberOfComponents());
@@ -204,9 +204,12 @@ void mitk::ImageWriter::GenerateData()
       //if Extension not in Filename
       ::itk::OStringStream filename;
       filename <<  m_FileName.c_str() << m_Extension;
-      m_FileName = filename.str().c_str();
+      picWriter->SetFileName( filename.str().c_str() );
     }
-    picWriter->SetFileName( m_FileName.c_str() );
+    else
+    {
+      picWriter->SetFileName( m_FileName.c_str() );
+    }
     picWriter->SetInput( input );
     picWriter->Write();
   }

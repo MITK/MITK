@@ -16,7 +16,8 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include "mitkMovieGeneratorOpenCV.h"
-#include <GL/gl.h>
+//#include <GL/gl.h>
+#include "mitkGL.h"
 #include <iostream>
 
 

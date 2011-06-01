@@ -1,6 +1,18 @@
 cmake_minimum_required(VERSION 2.8.2)
 
-project(MITK)
+#-----------------------------------------------------------------------------
+# Superbuild Option - Enabled by default
+#-----------------------------------------------------------------------------
+
+option(MITK_USE_SUPERBUILD "Build MITK and the projects it depends on via SuperBuild.cmake." ON)
+
+if(MITK_USE_SUPERBUILD)
+  project(MITK-superbuild)
+  set(MITK_SOURCE_DIR ${PROJECT_SOURCE_DIR})
+  set(MITK_BINARY_DIR ${PROJECT_BINARY_DIR})
+else()
+  project(MITK)
+endif()
 
 #-----------------------------------------------------------------------------
 # See http://cmake.org/cmake/help/cmake-2-8-docs.html#section_Policies for details
@@ -45,12 +57,6 @@ include(mitkMacroEmptyExternalProject)
 include(mitkFunctionGenerateProjectXml)
 
 #-----------------------------------------------------------------------------
-# Superbuild Option - Enabled by default
-#-----------------------------------------------------------------------------
-
-option(MITK_USE_SUPERBUILD "Build MITK and the projects it depends on via SuperBuild.cmake." ON)
-
-#-----------------------------------------------------------------------------
 # Output directories.
 #-----------------------------------------------------------------------------
 
@@ -58,9 +64,10 @@ foreach(type LIBRARY RUNTIME ARCHIVE)
   # Make sure the directory exists
   if(DEFINED MITK_CMAKE_${type}_OUTPUT_DIRECTORY
      AND NOT EXISTS ${MITK_CMAKE_${type}_OUTPUT_DIRECTORY})
-    message(FATAL_ERROR "MITK_CMAKE_${type}_OUTPUT_DIRECTORY is set to a non-existing directory [${MITK_CMAKE_${type}_OUTPUT_DIRECTORY}]")
+    message("Creating directory MITK_CMAKE_${type}_OUTPUT_DIRECTORY: ${MITK_CMAKE_${type}_OUTPUT_DIRECTORY}")
+    file(MAKE_DIRECTORY "${MITK_CMAKE_${type}_OUTPUT_DIRECTORY}")
   endif()
-  
+
   if(MITK_USE_SUPERBUILD)
     set(output_dir ${MITK_BINARY_DIR}/bin)
     if(NOT DEFINED MITK_CMAKE_${type}_OUTPUT_DIRECTORY)
@@ -97,10 +104,10 @@ option(MITK_INSTALL_RPATH_RELATIVE "Use relative rpath entries for installation 
 option(MITK_BUILD_ALL_PLUGINS "Build all MITK plugins" OFF)
 option(MITK_BUILD_TUTORIAL "Build the MITK tutorial" ON)
 option(MITK_USE_Boost "Use the Boost C++ library" OFF)
-option(MITK_USE_GDCMIO "Use the GDCMIO class instead of ImageIO2 for DICOM" ON)
 option(MITK_USE_BLUEBERRY "Build the BlueBerry platform" ON)
 option(MITK_USE_CTK "EXEPERIMENTAL, superbuild only: Use CTK in MITK" OFF)
 option(MITK_USE_DCMTK "EXEPERIMENTAL, superbuild only: Use DCMTK in MITK" OFF)
+option(MITK_USE_OpenCV "Use Intel's OpenCV library" OFF)
   
 mark_as_advanced(MITK_INSTALL_RPATH_RELATIVE
                  MITK_BUILD_ALL_PLUGINS
@@ -131,6 +138,7 @@ list(APPEND CTEST_PROJECT_SUBPROJECTS
   MITK-Core
   MITK-CoreUI
   MITK-IGT
+  MITK-ToF
   MITK-DTI
   MITK-Registration
   MITK-Modules # all modules not contained in a specific subproject
@@ -140,9 +148,17 @@ list(APPEND CTEST_PROJECT_SUBPROJECTS
 # Configure CTestConfigSubProject.cmake that could be used by CTest scripts
 configure_file(${MITK_SOURCE_DIR}/CTestConfigSubProject.cmake.in
                ${MITK_BINARY_DIR}/CTestConfigSubProject.cmake)
+               
+if(CTEST_PROJECT_ADDITIONAL_TARGETS)
+  # those targets will be executed at the end of the ctest driver script
+  # and they also get their own subproject label
+  set(subproject_list "${CTEST_PROJECT_SUBPROJECTS};${CTEST_PROJECT_ADDITIONAL_TARGETS}")
+else()
+  set(subproject_list "${CTEST_PROJECT_SUBPROJECTS}")
+endif()
 
 # Generate Project.xml file expected by the CTest driver script
-mitkFunctionGenerateProjectXml(${MITK_BINARY_DIR} ${PROJECT_NAME} "${CTEST_PROJECT_SUBPROJECTS}" ${MITK_USE_SUPERBUILD})
+mitkFunctionGenerateProjectXml(${MITK_BINARY_DIR} ${PROJECT_NAME} "${subproject_list}" ${MITK_USE_SUPERBUILD})
 
 #-----------------------------------------------------------------------------
 # Superbuild script
@@ -172,12 +188,14 @@ include(mitkMacroCreateModuleConf)
 include(mitkMacroCreateModule)
 include(mitkMacroCheckModule)
 include(mitkMacroCreateModuleTests)
+include(mitkFunctionAddCustomModuleTest)
 include(mitkMacroUseModule)
 include(mitkMacroMultiplexPicType)
 include(mitkMacroInstall)
 include(mitkMacroInstallHelperApp)
 include(mitkMacroInstallTargets)
 include(mitkMacroGenerateToolsLibrary)
+include(mitkMacroGetLinuxDistribution)
 
 #-----------------------------------------------------------------------------
 # Prerequesites
@@ -205,6 +223,29 @@ mark_as_advanced(USE_ITKZLIB)
 mitkFunctionGetVersion(${MITK_SOURCE_DIR} MITK)
 
 #-----------------------------------------------------------------------------
+# Installation preparation
+#
+# These should be set before any MITK install macros are used
+#-----------------------------------------------------------------------------
+
+if(MITK_INSTALL_RPATH_RELATIVE)
+  set(CMAKE_INSTALL_RPATH ".")
+else()
+  set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/bin")
+endif()
+
+# on Mac OSX all BlueBerry plugins get copied into every
+# application bundle (.app directory) specified here
+if(APPLE)
+  if(MITK_BUILD_org.mitk.gui.qt.extapplication)
+    set(MACOSX_BUNDLE_NAMES ${MACOSX_BUNDLE_NAMES} ExtApp)
+  endif()
+  if(MITK_BUILD_org.mitk.gui.qt.application)
+    set(MACOSX_BUNDLE_NAMES ${MACOSX_BUNDLE_NAMES} CoreApp)
+  endif()
+endif(APPLE)
+
+#-----------------------------------------------------------------------------
 # Set symbol visibility Flags
 #-----------------------------------------------------------------------------
 
@@ -229,15 +270,15 @@ endif()
 # MITK C/CXX Flags
 #-----------------------------------------------------------------------------
 
-set(MITK_C_FLAGS "${CMAKE_C_FLAGS} ${COVERAGE_C_FLAGS} ${ADDITIONAL_C_FLAGS}")
-set(MITK_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${VISIBILITY_CXX_FLAGS} ${COVERAGE_CXX_FLAGS} ${ADDITIONAL_CXX_FLAGS}")
+set(MITK_C_FLAGS "${COVERAGE_C_FLAGS} ${ADDITIONAL_C_FLAGS}")
+set(MITK_CXX_FLAGS "${VISIBILITY_CXX_FLAGS} ${COVERAGE_CXX_FLAGS} ${ADDITIONAL_CXX_FLAGS}")
 
 if(CMAKE_COMPILER_IS_GNUCXX)
   set(cflags "-Wall -Wextra -Wpointer-arith -Winvalid-pch -Wcast-align -Wwrite-strings -D_FORTIFY_SOURCE=2")
-  
+
   mitkFunctionCheckCompilerFlags("-fdiagnostics-show-option" cflags)
   mitkFunctionCheckCompilerFlags("-Wl,--no-undefined" cflags)
-  
+
   mitkFunctionGetGccVersion(${CMAKE_CXX_COMPILER} GCC_VERSION)
   # With older version of gcc supporting the flag -fstack-protector-all, an extra dependency to libssp.so
   # is introduced. If gcc is smaller than 4.4.0 and the build type is Release let's not include the flag.
@@ -247,11 +288,11 @@ if(CMAKE_COMPILER_IS_GNUCXX)
   endif()
   if(MINGW)
     # suppress warnings about auto imported symbols
-    set(MITK_CXX_FLAGS "-Wl,--enable-auto-import ${MITK_CXX_FLAGS}")  
+    set(MITK_CXX_FLAGS "-Wl,--enable-auto-import ${MITK_CXX_FLAGS}")
     # we need to define a Windows version
     set(MITK_CXX_FLAGS "-D_WIN32_WINNT=0x0500 ${MITK_CXX_FLAGS}")
   endif()
-  
+
   set(MITK_C_FLAGS "${cflags} ${MITK_C_FLAGS}")
   #set(MITK_CXX_FLAGS "${cflags} -Woverloaded-virtual -Wold-style-cast -Wstrict-null-sentinel -Wsign-promo ${MITK_CXX_FLAGS}")
   set(MITK_CXX_FLAGS "${cflags} -Woverloaded-virtual -Wstrict-null-sentinel ${MITK_CXX_FLAGS}")
@@ -273,9 +314,9 @@ if(BUILD_TESTING)
   enable_testing()
   include(CTest)
   mark_as_advanced(TCL_TCLSH DART_ROOT)
-  
+
   option(MITK_ENABLE_GUI_TESTING OFF "Enable the MITK GUI tests")
-    
+
   # Setup file for setting custom ctest vars
   configure_file(
     CMake/CTestCustom.cmake.in
@@ -300,13 +341,14 @@ if(BUILD_TESTING)
         return EXIT_FAILURE;
         }
       ")
-      
+
   set(MITK_TEST_OUTPUT_DIR "${MITK_BINARY_DIR}/test_output")
   if(NOT EXISTS ${MITK_TEST_OUTPUT_DIR})
     file(MAKE_DIRECTORY ${MITK_TEST_OUTPUT_DIR})
   endif()
-  configure_file(mitkTestingConfig.h.in ${MITK_BINARY_DIR}/mitkTestingConfig.h)
 endif()
+
+configure_file(mitkTestingConfig.h.in ${MITK_BINARY_DIR}/mitkTestingConfig.h)
 
 #-----------------------------------------------------------------------------
 # MITK_SUPERBUILD_BINARY_DIR
@@ -333,8 +375,8 @@ endif()
 # Set C/CXX Flags for MITK code
 #-----------------------------------------------------------------------------
 
-set(CMAKE_CXX_FLAGS ${MITK_CXX_FLAGS})
-set(CMAKE_C_FLAGS ${MITK_C_FLAGS})
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${MITK_CXX_FLAGS}")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${MITK_C_FLAGS}")
 
 if(MITK_USE_QT)
   add_definitions(-DQWT_DLL)
@@ -458,22 +500,6 @@ add_subdirectory(Documentation)
 # Installation
 #-----------------------------------------------------------------------------
 
-if(MITK_INSTALL_RPATH_RELATIVE)
-  set(CMAKE_INSTALL_RPATH ".")
-else()
-  set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/bin")
-endif()
-
-# on Mac OSX all BlueBerry plugins get copied into every
-# application bundle (.app directory) specified here
-if(APPLE)
-  if(MITK_BUILD_org.mitk.gui.qt.extapplication)
-    set(MACOSX_BUNDLE_NAMES ${MACOSX_BUNDLE_NAMES} ExtApp)
-  endif()
-  if(MITK_BUILD_org.mitk.gui.qt.application)
-    set(MACOSX_BUNDLE_NAMES ${MACOSX_BUNDLE_NAMES} CoreApp)
-  endif()
-endif(APPLE)
 
 # set MITK cpack variables
 include(mitkSetupCPack)

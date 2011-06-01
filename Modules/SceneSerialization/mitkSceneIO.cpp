@@ -30,6 +30,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkBaseRenderer.h"
 #include "mitkRenderingManager.h"
 #include "mitkStandaloneDataStorage.h"
+#include <mitkStandardFileLocations.h>
 
 #include <itkObjectFactoryBase.h>
 
@@ -39,7 +40,15 @@ PURPOSE.  See the above copyright notices for more information.
 #include <sstream>
 
 #include "itksys/SystemTools.hxx"
-    
+
+#ifdef WIN32
+  #include <windows.h>
+#else
+  #include <sys/time.h>
+#endif
+ 
+int mitk::SceneIO::tempDiretoryID = 0;
+
 mitk::SceneIO::SceneIO()
 :m_WorkingDirectory(""),
  m_UnzipErrors(0)
@@ -52,23 +61,67 @@ mitk::SceneIO::~SceneIO()
 
 std::string mitk::SceneIO::CreateEmptyTempDirectory()
 {
-  std::string uniquename = Poco::TemporaryFile::tempName();
+  mitk::SceneIO::tempDiretoryID++;
+  std::stringstream uniqueNumber;
+  
+#ifdef WIN32
+  SYSTEMTIME st;
+
+  GetSystemTime(&st);
+  srand ( st.wMilliseconds );
+#else
+  timeval time_microsec;
+
+  gettimeofday(&time_microsec, 0);
+  srand ( time_microsec.tv_usec );
+#endif
+
+  int randomNumber = rand() % 1000 + 1;
+
+  uniqueNumber << mitk::SceneIO::tempDiretoryID << randomNumber;
+  std::string returnValue = mitk::StandardFileLocations::GetInstance()->GetOptionDirectory() + Poco::Path::separator() + "SceneIOTempDirectory" + uniqueNumber.str();
+  //old method (didn't work on dart client): Poco::TemporaryFile::tempName();
+  std::string uniquename = returnValue + Poco::Path::separator();
   Poco::File tempdir( uniquename );
+  
   try
   {
-    if (!tempdir.createDirectory())
-    {
-      MITK_ERROR << "Could not create temporary directory " << uniquename;
-      return "";
-    }
+    bool existsNot = tempdir.createDirectory();
+    if (!existsNot) 
+      {
+      MITK_ERROR << "Warning: Directory already exitsts: " << uniquename << " (choosing another)";
+
+#ifdef WIN32
+      SYSTEMTIME st;
+
+      GetSystemTime(&st);
+      srand ( st.wMilliseconds );
+#else
+      timeval time_microsec;
+
+      gettimeofday(&time_microsec, 0);
+      srand ( time_microsec.tv_usec );
+#endif
+
+      randomNumber = rand() % 10000 + 1;
+      uniqueNumber << randomNumber;
+      returnValue = mitk::StandardFileLocations::GetInstance()->GetOptionDirectory() + Poco::Path::separator() + "SceneIOTempDirectory" + uniqueNumber.str();
+      uniquename = returnValue + Poco::Path::separator();
+      Poco::File tempdir2( uniquename );
+      if (!tempdir2.createDirectory())
+        {
+        MITK_ERROR << "Warning: Second directory also already exitsts: " << uniquename;
+        }
+      }
   }
   catch( std::exception& e )
   {
-      MITK_ERROR << "Could not create temporary directory " << uniquename << ":" << e.what();
-      return "";
+    MITK_ERROR << "Could not create temporary directory " << uniquename << ":" << e.what();
+    return "";
   }
+  
       
-  return uniquename;
+  return returnValue;
 }
 
 mitk::DataStorage::Pointer mitk::SceneIO::LoadScene( const std::string& filename, 

@@ -14,23 +14,11 @@ PURPOSE.  See the above copyright notices for more information.
 #include "gdcmGlobal.h"
 //#include <gdcmVersion.h>
 
-#if  GDCM_MAJOR_VERSION >= 2
-#define DGDCM2
-#endif
-
-#ifndef DGDCM2
-
-#include "gdcm.h"
-
-#else
-
 #include "gdcmFile.h"
 #include "gdcmImageReader.h"
 #include "gdcmDictEntry.h"
 #include "gdcmDicts.h"
 #include "gdcmTag.h"
-
-#endif
 
 mitk::SiemensDicomDiffusionImageHeaderReader::SiemensDicomDiffusionImageHeaderReader()
 {
@@ -94,36 +82,27 @@ void mitk::SiemensDicomDiffusionImageHeaderReader::Update()
   // check if there are filenames
   if(m_DicomFilenames.size())
   {
+    const std::string& locale = "C";
+    const std::string& currLocale = setlocale( LC_ALL, NULL );
+
+    if ( locale.compare(currLocale)!=0 )
+    {
+      try
+      {
+        MITK_INFO << " ** Changing locale from " << setlocale(LC_ALL, NULL) << " to '" << locale << "'";
+        setlocale(LC_ALL, locale.c_str());
+      }
+      catch(...)
+      {
+        MITK_INFO << "Could not set locale " << locale;
+      }
+    }
+
     // adapted from slicer
     // DicomToNrrdConverter.cxx
 
     VolumeReaderType::DictionaryArrayRawPointer 
         inputDict = m_VolumeReader->GetMetaDataDictionaryArray();
-
-#ifndef DGDCM2
-
-    // relevant Siemens private tags
-    gdcm::DictEntry SiemensDictBValue( 0x0019, 0x100c, "IS", "1", "B Value of diffusion weighting" );
-    gdcm::DictEntry SiemensDictDiffusionDirection( 0x0019, 0x100e, "FD", "3", "Diffusion Gradient Direction" );
-    gdcm::DictEntry SiemensDictDiffusionMatrix( 0x0019, 0x1027, "FD", "6", "Diffusion Matrix" );
-    gdcm::DictEntry SiemensDictShadowInfo( 0x0029, 0x1010, "OB", "1", "Siemens DWI Info" );
-
-    //if(gdcm::Global::GetDicts()->GetDefaultPubDict()->GetEntry(SiemensMosiacParameters.GetKey()) == 0)
-    //  gdcm::Global::GetDicts()->GetDefaultPubDict()->AddEntry(SiemensMosiacParameters);
-    //if(gdcm::Global::GetDicts()->GetDefaultPubDict()->GetEntry(SiemensDictNMosiac.GetKey()) == 0)
-    //  gdcm::Global::GetDicts()->GetDefaultPubDict()->AddEntry(SiemensDictNMosiac);
-    //
-
-    if(gdcm::Global::GetDicts()->GetDefaultPubDict()->GetEntry(SiemensDictBValue.GetName())==0)
-      gdcm::Global::GetDicts()->GetDefaultPubDict()->AddEntry(SiemensDictBValue);
-    if(gdcm::Global::GetDicts()->GetDefaultPubDict()->GetEntry(SiemensDictDiffusionDirection.GetName()) == 0)
-      gdcm::Global::GetDicts()->GetDefaultPubDict()->AddEntry(SiemensDictDiffusionDirection);
-    if(gdcm::Global::GetDicts()->GetDefaultPubDict()->GetEntry(SiemensDictDiffusionMatrix.GetName()) == 0)
-      gdcm::Global::GetDicts()->GetDefaultPubDict()->AddEntry(SiemensDictDiffusionMatrix);
-    if(gdcm::Global::GetDicts()->GetDefaultPubDict()->GetEntry(SiemensDictShadowInfo.GetName()) == 0)
-      gdcm::Global::GetDicts()->GetDefaultPubDict()->AddEntry(SiemensDictShadowInfo);
-
-#else
 
     //    gdcm::DictEntry SiemensDictBValue( "0019,100c", "B Value of diffusion weighting", gdcm::VR::IS, gdcm::VM::VM1 );
     //    gdcm::DictEntry SiemensDictDiffusionDirection( "0019,100e", "Diffusion Gradient Direction", gdcm::VR::FD, gdcm::VM::VM3 );
@@ -138,8 +117,6 @@ void mitk::SiemensDicomDiffusionImageHeaderReader::Update()
     //      gdcm::Global::GetDicts()->GetDefaultPubDict()->AddEntry(SiemensDictDiffusionMatrix);
     //    if(gdcm::Global::GetDicts()->GetDefaultPubDict()->GetEntry(SiemensDictShadowInfo.GetName()) == 0)
     //      gdcm::Global::GetDicts()->GetDefaultPubDict()->AddEntry(SiemensDictShadowInfo);
-
-#endif
 
     ReadPublicTags();
 
@@ -188,38 +165,6 @@ void mitk::SiemensDicomDiffusionImageHeaderReader::Update()
     for (int k = 0; k < m_nSlice; k += nStride )
     {
 
-#ifndef DGDCM2
-
-      gdcm::File *header0 = new gdcm::File;
-      gdcm::BinEntry* binEntry;
-
-      header0->SetMaxSizeLoadEntry(65536);
-      header0->SetFileName( m_DicomFilenames[k] );
-      header0->SetLoadMode( gdcm::LD_ALL );
-      header0->Load();
-
-      // copy information stored in 0029,1010 into a string for parsing
-      gdcm::DocEntry* docEntry = header0->GetFirstEntry();
-      while(docEntry)
-      {
-        if ( docEntry->GetKey() == "0029|1010"  )
-        {
-          binEntry = dynamic_cast<gdcm::BinEntry*> ( docEntry );
-          int binLength = binEntry->GetFullLength();
-          tag.resize( binLength );
-          uint8_t * tagString = binEntry->GetBinArea();
-
-          for (int n = 0; n < binLength; n++)
-          {
-            tag[n] = *(tagString+n);
-          }
-          break;
-        }
-        docEntry = header0->GetNextEntry();
-      }
-
-#else
-
       gdcm::ImageReader reader;
       reader.SetFileName( m_DicomFilenames[k].c_str() );
       if( !reader.Read() )
@@ -242,8 +187,6 @@ void mitk::SiemensDicomDiffusionImageHeaderReader::Update()
         }
       }
 
-#endif
-
       // parse B_value from 0029,1010 tag
       std::vector<double> valueArray(0);
       vnl_vector_fixed<double, 3> vect3d;
@@ -253,10 +196,7 @@ void mitk::SiemensDicomDiffusionImageHeaderReader::Update()
         tag.clear();
         MITK_INFO << "Reading diffusion info from 0019|100c and 0019|100e tags" << std::endl;
         bool success = false;
-#ifndef DGDCM2
-        success = itk::ExposeMetaData<std::string> ( *(*inputDict)[0], "0019|100c", tag );
-        this->m_Output->bValue = atof( tag.c_str() );
-#else
+
         for(it = ds.Begin(); it != ds.End(); ++it)
         {
           const gdcm::DataElement &ref = *it;
@@ -266,7 +206,7 @@ void mitk::SiemensDicomDiffusionImageHeaderReader::Update()
             success = true;
           }
         }
-#endif
+
         tag.clear();
         if(success)
         {
@@ -275,9 +215,7 @@ void mitk::SiemensDicomDiffusionImageHeaderReader::Update()
             MITK_INFO << "BV: 0 (Baseline image)";
             continue;
           }
-#ifndef DGDCM2
-          success = itk::ExposeMetaData<std::string> ( *(*inputDict)[k], "0019|100e",  tag);
-#else
+
           success = false;
           for(it = ds.Begin(); it != ds.End(); ++it)
           {
@@ -287,7 +225,7 @@ void mitk::SiemensDicomDiffusionImageHeaderReader::Update()
               success = true;
             }
           }
-#endif
+
           if(success)
           {
             memcpy( &vect3d[0], tag.c_str()+0, 8 );
@@ -334,6 +272,15 @@ void mitk::SiemensDicomDiffusionImageHeaderReader::Update()
       vect3d.fill( 0.0 );
       this->m_Output->DiffusionVector = vect3d;
 
+    }
+    try
+    {
+      MITK_INFO << " ** Changing locale back from " << setlocale(LC_ALL, NULL) << " to '" << currLocale << "'";
+      setlocale(LC_ALL, currLocale.c_str());
+    }
+    catch(...)
+    {
+      MITK_INFO << "Could not reset locale " << currLocale;
     }
   }
 }

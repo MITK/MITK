@@ -2,19 +2,23 @@
 #
 # MITK_CREATE_MODULE 
 #
-# Creates a module for the automatic module dependeny system within MITK.
-# Configurations are generated in the moduleConf directory. 
-#
-# USAGE:
-#
-# MITK_CREATE_MODULE( <moduleName>
-#     [INCLUDE_DIRS <include directories>]
-#     [INTERNAL_INCLUDE_DIRS <internally used include directories>]
-#     [DEPENDS <modules we need>]
-#     [PROVIDES <library name which is built>]
-#     [PACKAGE_DEPENDS <packages we need, like ITK, VTK, QT>]
-#     [EXPORT_DEFINE <declspec macro name for dll exports>]
-#     [QT_MODULE]
+#! Creates a module for the automatic module dependency system within MITK.
+#! Configurations are generated in the moduleConf directory. 
+#!
+#! USAGE:
+#!
+#! \code
+#! MITK_CREATE_MODULE( <moduleName>
+#!     [INCLUDE_DIRS <include directories>]
+#!     [INTERNAL_INCLUDE_DIRS <internally used include directories>]
+#!     [DEPENDS <modules we need>]
+#!     [PROVIDES <library name which is built>]
+#!     [PACKAGE_DEPENDS <packages we need, like ITK, VTK, QT>]
+#!     [EXPORT_DEFINE <declspec macro name for dll exports>]
+#!     [QT_MODULE]
+#! \endcode
+#!
+#! \param MODULE_NAME_IN The name for the new module
 #
 ##################################################################
 MACRO(MITK_CREATE_MODULE MODULE_NAME_IN)
@@ -113,6 +117,10 @@ MACRO(MITK_CREATE_MODULE MODULE_NAME_IN)
             IF(ALL_LIBRARIES)
               TARGET_LINK_LIBRARIES(${MODULE_PROVIDES} ${ALL_LIBRARIES})
             ENDIF(ALL_LIBRARIES)  
+
+            IF(MINGW)
+              TARGET_LINK_LIBRARIES(${MODULE_PROVIDES} ssp) # add stack smash protection lib
+            ENDIF()
           ENDIF()
       
         ELSE(NOT MODULE_QT_MODULE)
@@ -155,6 +163,9 @@ MACRO(MITK_CREATE_MODULE MODULE_NAME_IN)
             ENDIF(ALL_LIBRARY_DIRS)
             ADD_LIBRARY(${MODULE_PROVIDES} ${coverage_sources} ${CPP_FILES_GENERATED} ${Q${KITNAME}_GENERATED_CPP} ${DOX_FILES} ${UI_FILES} ${QRC_FILES})
             TARGET_LINK_LIBRARIES(${MODULE_PROVIDES} ${QT_LIBRARIES} ${ALL_LIBRARIES} QVTK)
+            IF(MINGW)
+              TARGET_LINK_LIBRARIES(${MODULE_PROVIDES} ssp) # add stack smash protection lib
+            ENDIF()
             IF(MODULE_SUBPROJECTS)
               SET_PROPERTY(TARGET ${MODULE_PROVIDES} PROPERTY LABELS ${MODULE_SUBPROJECTS} MITK)
               FOREACH(subproject ${MODULE_SUBPROJECTS})
@@ -165,6 +176,9 @@ MACRO(MITK_CREATE_MODULE MODULE_NAME_IN)
       
         ENDIF(NOT MODULE_QT_MODULE) 
 
+        #IF(NOT MODULE_HEADERS_ONLY AND TARGET EP_MITK)
+        #  ADD_DEPENDENCIES(${MODULE_PROVIDES} EP_MITK)
+        #ENDIF()
 
         # install only if shared lib (for now)
         IF(NOT _STATIC OR MINGW)

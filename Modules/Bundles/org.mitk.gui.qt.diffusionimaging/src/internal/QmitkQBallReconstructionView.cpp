@@ -197,7 +197,7 @@ void QmitkQBallReconstructionView::CreateQtPartControl(QWidget *parent)
     items << "2" << "4" << "6" << "8";
     m_Controls->m_QBallReconstructionMaxLLevelComboBox->addItems(items);
     m_Controls->m_QBallReconstructionMaxLLevelComboBox->setCurrentIndex(1);
-    m_Controls->m_Description->setText("Spherical harmonics recon. (Desoteaux2007)");
+    MethodChoosen(m_Controls->m_QBallReconstructionMethodComboBox->currentIndex());
 
     m_Controls->m_QBallReconstructionNumberThreadsSpinbox->setValue(8);
 
@@ -697,6 +697,16 @@ void QmitkQBallReconstructionView::TemplatedAnalyticalQBallReconstruction(
   newname = newname.append("_QA%1").arg(normalization);
   SetDefaultNodeProperties(node, newname.toStdString());
   nodes->push_back(node);
+
+
+//  mitk::Image::Pointer image5 = mitk::Image::New();
+//  image5->InitializeByItk( filter->GetODFSumImage().GetPointer() );
+//  image5->SetVolume( filter->GetODFSumImage()->GetBufferPointer() );
+//  mitk::DataNode::Pointer node5=mitk::DataNode::New();
+//  node5->SetData( image5 );
+//  node5->SetProperty( "name", mitk::StringProperty::New(
+//    QString(nodename.c_str()).append("_ODF").toStdString()) );
+//  nodes->push_back(node5);
   
   // B-Zero TO DATATREE
   if(m_Controls->m_OutputB0Image->isChecked())

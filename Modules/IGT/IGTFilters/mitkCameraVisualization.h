@@ -126,6 +126,8 @@ namespace mitk {
 
     Vector3D m_DirectionOfProjectionInToolCoordinates; ///< vector of the direction of projection in tool coordinates
     Vector3D m_ViewUpInToolCoordinates; ///< view up vector in tool coordinates
+    Vector3D m_DirectionOfProjection; ///< vector of the current direction of view of the camera in world coordinates
+    Point3D m_CameraPosition; ///< current position of the camera
     float m_FocalLength; ///< focal length of the camera: distance between camera position and focal point.
     float m_ViewAngle; ///< view angle of the camera: angular height of the camera view measured in degrees.
   };

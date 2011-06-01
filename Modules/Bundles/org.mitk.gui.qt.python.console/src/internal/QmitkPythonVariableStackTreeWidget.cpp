@@ -105,7 +105,6 @@ Qt::ItemFlags QmitkPythonVariableStackTreeWidget::flags(const QModelIndex &index
         return Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled | flags;
     else
         return Qt::ItemIsDropEnabled | flags;
-
 }
 
 int QmitkPythonVariableStackTreeWidget::rowCount(const QModelIndex &) const
@@ -153,7 +152,8 @@ std::vector<QStringList> QmitkPythonVariableStackTreeWidget::getVariableStack()
     return m_variableStack;
 }
 
-QMimeData * QmitkPythonVariableStackTreeWidget::mimeData(const QModelIndexList & indexes) const{
+QMimeData * QmitkPythonVariableStackTreeWidget::mimeData(const QModelIndexList & indexes) const
+{
 
     QMimeData * ret = new QMimeData;
     QString name = m_variableStack[indexes.at(0).row()][0];

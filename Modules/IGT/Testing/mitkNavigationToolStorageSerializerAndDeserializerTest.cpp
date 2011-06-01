@@ -32,12 +32,15 @@ class NavigationToolStorageSerializerAndDeserializerTestClass
   {
   public:
 
-    static void TestInstantiation()
+    static void TestInstantiationSerializer()
     {
     // let's create objects of our classes
     mitk::NavigationToolStorageSerializer::Pointer testSerializer = mitk::NavigationToolStorageSerializer::New();
-    MITK_TEST_CONDITION_REQUIRED(testSerializer.IsNotNull(),"Testing instantiation of NavigationToolStorageSerializer")
-
+    MITK_TEST_CONDITION_REQUIRED(testSerializer.IsNotNull(),"Testing instantiation of NavigationToolStorageSerializer");
+    }
+    
+    static void TestInstantiationDeserializer()
+    {
     mitk::DataStorage::Pointer tempStorage = dynamic_cast<mitk::DataStorage*>(mitk::StandaloneDataStorage::New().GetPointer()); //needed for deserializer!
     mitk::NavigationToolStorageDeserializer::Pointer testDeserializer = mitk::NavigationToolStorageDeserializer::New(tempStorage);
     MITK_TEST_CONDITION_REQUIRED(testDeserializer.IsNotNull(),"Testing instantiation of NavigationToolStorageDeserializer")
@@ -204,7 +207,8 @@ int mitkNavigationToolStorageSerializerAndDeserializerTest(int /* argc */, char*
 {
   MITK_TEST_BEGIN("NavigationToolStorageSerializerAndDeserializer");
 
-  NavigationToolStorageSerializerAndDeserializerTestClass::TestInstantiation();
+  //NavigationToolStorageSerializerAndDeserializerTestClass::TestInstantiationSerializer();
+  //NavigationToolStorageSerializerAndDeserializerTestClass::TestInstantiationDeserializer();
   NavigationToolStorageSerializerAndDeserializerTestClass::TestWriteSimpleToolStorage();
   NavigationToolStorageSerializerAndDeserializerTestClass::TestReadSimpleToolStorage();
   NavigationToolStorageSerializerAndDeserializerTestClass::TestWriteComplexToolStorage();

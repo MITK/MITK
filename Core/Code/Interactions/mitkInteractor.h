@@ -104,6 +104,10 @@ public:
   **/
   virtual void DataChanged(){};
 
+  //##Documentation
+  //## @brief adds handling of operations used for mode change. Unrecognized Operations are send to Superclass.
+  //## *ATTENTION*: THIS METHOD SHOULD NOT BE CALLED FROM OTHER CLASSES DIRECTLY!
+  virtual void ExecuteOperation(Operation* operation);
 
   static const std::string XML_NODE_NAME;
 
@@ -125,10 +129,6 @@ protected:
   bool OnModeSelect(Action* action, StateEvent const*);
   bool OnModeDeselect(Action* action, StateEvent const*);
   bool OnModeSubSelect(Action* action, StateEvent const*);
-
-  //##Documentation
-  //## @brief adds handling of operations used for mode change. Unrecognized Operations are send to Superclass.
-  virtual void ExecuteOperation(Operation* operation);
 
   //##Documentation
   virtual const std::string& GetXMLNodeName() const;

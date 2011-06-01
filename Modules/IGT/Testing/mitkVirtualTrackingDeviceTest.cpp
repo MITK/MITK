@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "itksys/SystemTools.hxx"
 #include "mitkTestingMacros.h"
 #include "mitkTrackingTool.h"
+#include <iomanip>
 
 
 int mitkVirtualTrackingDeviceTest(int /* argc */, char* /*argv*/[])
@@ -101,14 +102,23 @@ int mitkVirtualTrackingDeviceTest(int /* argc */, char* /*argv*/[])
   tracker->GetToolByName("Tool1")->GetPosition(posAfter1);
   MITK_TEST_CONDITION( mitk::Equal(posBefore1, posAfter1) == false, "Testing if tracking is producing new position values in tool 1.");
 
-
   // add tool while tracking is in progress
   tracker->AddTool("while Running");
 
+  itksys::SystemTools::Delay(100); // wait for tracking thread to start generating positions
   tracker->GetToolByName("while Running")->GetPosition(posBefore0);
+  unsigned long tmpMTime = tracker->GetToolByName("while Running")->GetMTime();
   itksys::SystemTools::Delay(100); // wait for tracking thread to start generating positions
   tracker->GetToolByName("while Running")->GetPosition(posAfter0);
-  MITK_TEST_CONDITION( mitk::Equal(posBefore0, posAfter0) == false, "Testing if tracking is producing new position values for 'while running' tool.");
+  if(tracker->GetToolByName("while Running")->GetMTime() == tmpMTime) //tool not modified yet
+  {
+    //hence the tool was not modified, the position has to be equal
+      MITK_TEST_CONDITION( mitk::Equal(posBefore0, posAfter0) == true, "Testing if the position values for the 'while running' tool remain the same.");
+  }
+  else //tool was modified => position should be changed
+  {
+      MITK_TEST_CONDITION( mitk::Equal(posBefore0, posAfter0) == false, "Testing if tracking is producing new position values for 'while running' tool.");
+  }
 
   // always end with this!
   MITK_TEST_END();

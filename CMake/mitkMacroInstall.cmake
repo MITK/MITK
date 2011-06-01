@@ -82,6 +82,9 @@ MACRO(_fixup_target)
             SET(\${type} \"system\")
           ENDIF()
         ENDIF()
+        IF(_file_name MATCHES gdiplus)
+            SET(\${type} \"system\")
+        ENDIF(_file_name MATCHES gdiplus)
       ENDIF()
     ENDMACRO(gp_resolved_file_type_override)
 
@@ -98,23 +101,28 @@ MACRO(_fixup_target)
     ENDIF()
 
     IF(\"${_install_GLOB_PLUGINS}\" STREQUAL \"TRUE\") 
-      file(GLOB_RECURSE PLUGINS
+      file(GLOB_RECURSE GLOBBED_BLUEBERRY_PLUGINS
       # glob for all blueberry bundles of this application
       \"\${CMAKE_INSTALL_PREFIX}/${_bundle_dest_dir}/liborg*${CMAKE_SHARED_LIBRARY_SUFFIX}\"
+	  )
+      file(GLOB_RECURSE GLOBBED_QT_PLUGINS
       # glob for Qt plugins
-      \"\${CMAKE_INSTALL_PREFIX}/${${_target_location}_qt_plugins_install_dir}/plugins/*${CMAKE_SHARED_LIBRARY_SUFFIX}\")    
+      \"\${CMAKE_INSTALL_PREFIX}/${${_target_location}_qt_plugins_install_dir}/plugins/*${CMAKE_SHARED_LIBRARY_SUFFIX}\"
+	  )    
     ELSE() 
-    file(GLOB_RECURSE PLUGINS
+    file(GLOB_RECURSE GLOBBED_QT_PLUGINS
       # glob for Qt plugins
       \"\${CMAKE_INSTALL_PREFIX}/${${_target_location}_qt_plugins_install_dir}/plugins/*${CMAKE_SHARED_LIBRARY_SUFFIX}\")    
     ENDIF() 
     
     # use custom version of BundleUtilities
-    message(\"globbed plugins: \${PLUGINS}\")
+    message(\"globbed plugins: \${GLOBBED_QT_PLUGINS} \${GLOBBED_BLUEBERRY_PLUGINS}\")
     SET(PLUGIN_DIRS ${DIRS})
-    LIST(APPEND PLUGINS ${_install_PLUGINS})
-    list(REMOVE_DUPLICATES PLUGINS)
-    foreach(_plugin \${PLUGINS})
+    SET(PLUGINS ${_install_PLUGINS} \${GLOBBED_QT_PLUGINS} \${GLOBBED_BLUEBERRY_PLUGINS})
+    if (PLUGINS)
+	  list(REMOVE_DUPLICATES PLUGINS)
+	endif (PLUGINS)
+    foreach(_plugin \${GLOBBED_BLUEBERRY_PLUGINS})
       get_filename_component(_pluginpath \${_plugin} PATH)
       list(APPEND PLUGIN_DIRS \${_pluginpath})
       list(REMOVE_DUPLICATES PLUGIN_DIRS)

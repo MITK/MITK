@@ -10,6 +10,7 @@ namespace _cable_
      namespace wrappers
      {
          typedef mitk::ImageCaster ImageCaster;
+         typedef mitk::RendererAccess RendererAccess;
      }
 }
 

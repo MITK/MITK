@@ -19,7 +19,6 @@ PURPOSE.  See the above copyright notices for more information.
 #define QmitkIGTExampleView_H__INCLUDED
 
 #include "QmitkFunctionality.h"
-#include "mitkTestingConfig.h"
 
 #include "mitkTrackingDeviceSource.h"
 #include "mitkNavigationDataDisplacementFilter.h"

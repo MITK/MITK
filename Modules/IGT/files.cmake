@@ -4,6 +4,7 @@ SET(CPP_FILES
   IGTFilters/mitkNavigationDataTransformFilter.cpp
   IGTFilters/mitkNavigationDataRecorder.cpp
   IGTFilters/mitkNavigationDataPlayer.cpp
+  IGTFilters/mitkNavigationDataPlayerBase.cpp
   IGTFilters/mitkNavigationDataObjectVisualizationFilter.cpp
   IGTFilters/mitkCameraVisualization.cpp
   IGTFilters/mitkNavigationData.cpp
@@ -14,9 +15,12 @@ SET(CPP_FILES
   IGTFilters/mitkNavigationDataToNavigationDataFilter.cpp
   IGTFilters/mitkNavigationDataToOpenGLFilter.cpp
   IGTFilters/mitkNavigationDataToPointSetFilter.cpp
+
   IGTFilters/mitkTrackingDeviceSource.cpp
+  IGTFilters/mitkTrackingVolumeGenerator.cpp
   IGTFilters/mitkTimeStamp.cpp
   IGTFilters/mitkRealTimeClock.cpp
+  IGTFilters/mitkTrackingDeviceSourceConfigurator.cpp
 
   IGTTrackingDevices/mitkClaronTool.cpp
   IGTTrackingDevices/mitkClaronTrackingDevice.cpp
@@ -27,10 +31,9 @@ SET(CPP_FILES
   IGTTrackingDevices/mitkSerialCommunication.cpp
   IGTTrackingDevices/mitkTrackingDevice.cpp
   IGTTrackingDevices/mitkTrackingTool.cpp
-  IGTTrackingDevices/mitkTrackingVolume.cpp
   IGTTrackingDevices/mitkVirtualTrackingDevice.cpp
   IGTTrackingDevices/mitkVirtualTrackingTool.cpp
-  
+
   IGTToolManagement/mitkNavigationToolStorage.cpp
   IGTToolManagement/mitkNavigationToolStorageSerializer.cpp
   IGTToolManagement/mitkNavigationToolStorageDeserializer.cpp

@@ -181,7 +181,7 @@ SET(BLUEBERRY_DEBUG_POSTFIX d)
 
 # Testing options
 
-OPTION(BLUEBERRY_BUILD_TESTING "Build the BlueBerry tests." OFF)
+OPTION(BLUEBERRY_BUILD_TESTING "Build the BlueBerry tests." ${BUILD_TESTING})
 
 IF(WIN32)
   SET(_gui_testing_default "ON")
@@ -236,17 +236,17 @@ IF(BLUEBERRY_BUILD_TESTING)
   ENDIF()
 
   LIST(APPEND _ctk_plugins
-    Bundles/org.blueberry.test:OFF
-    Bundles/org.blueberry.uitest:OFF
+    Bundles/org.blueberry.test:ON
+    Bundles/org.blueberry.uitest:ON
   )
 
   SET(_ctk_test_plugins
-    Testing/org.blueberry.core.runtime.tests:OFF
-    Testing/org.blueberry.osgi.tests:OFF
+    Testing/org.blueberry.core.runtime.tests:ON
+    Testing/org.blueberry.osgi.tests:ON
   )
   
   IF(BLUEBERRY_ENABLE_GUI_TESTING)
-    LIST(APPEND _ctk_test_plugins Testing/org.blueberry.ui.tests:OFF)
+    LIST(APPEND _ctk_test_plugins Testing/org.blueberry.ui.tests:ON)
 
     SET(BLUEBERRY_UI_TEST_APP "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${OSGI_UI_APP}")
     GET_TARGET_PROPERTY(_is_macosx_bundle ${OSGI_UI_APP} MACOSX_BUNDLE)

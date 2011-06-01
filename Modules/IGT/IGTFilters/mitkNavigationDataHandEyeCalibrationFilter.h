@@ -51,7 +51,7 @@ namespace mitk {
     * \param index index corresponding to the NavigationData and hand-eye transformation to be applied to this BaseData
     * \param data BaseData to be associated to the index 
     */
-    void SetObjectToTransform(unsigned int index, BaseData::Pointer data);
+    void SetObjectToTransform(unsigned int index, BaseData* data);
 
     /**
     * \brief Set the transformation of the HandEyeCalibration that should be applied to the BaseData

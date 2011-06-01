@@ -32,7 +32,7 @@ mitk::NavigationDataHandEyeCalibrationFilter::~NavigationDataHandEyeCalibrationF
   m_HandEyeTransformations.clear();
 }
 
-void mitk::NavigationDataHandEyeCalibrationFilter::SetObjectToTransform(unsigned int index, BaseData::Pointer data)
+void mitk::NavigationDataHandEyeCalibrationFilter::SetObjectToTransform(unsigned int index, BaseData* data)
 {
   m_ObjectsToTransform[index] = data;
 }

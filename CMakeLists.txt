@@ -398,8 +398,8 @@ endforeach()
 
 set(MITK_WRAPPING_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Wrapping)
 set(MITK_WRAPPING_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/Wrapping)
-option(MITK_USE_PYTHON "Build cswig Python wrapper support (requires CableSwig)." OFF)
-if(MITK_USE_PYTHON)
+option(MITK_USE_Python "Build cswig Python wrapper support (requires CableSwig)." OFF)
+if(MITK_USE_Python)
   add_subdirectory(Wrapping)
 endif()
 

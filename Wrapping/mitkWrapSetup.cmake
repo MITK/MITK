@@ -1,14 +1,14 @@
 #-----------------------------------------------------------------------------
 # wrapper config
-OPTION(MITK_USE_PYTHON "Build cswig Python wrapper support (requires CableSwig)." OFF)
+OPTION(MITK_USE_Python "Build cswig Python wrapper support (requires CableSwig)." OFF)
 
 #-----------------------------------------------------------------------------
 # Do we need CableSwig?
 SET(MITK_NEED_CableSwig 0)
 
-IF(MITK_USE_PYTHON)
+IF(MITK_USE_Python)
   SET(MITK_NEED_CableSwig 1)
-ENDIF(MITK_USE_PYTHON)
+ENDIF(MITK_USE_Python)
 
 IF(MITK_NEED_CableSwig)
 

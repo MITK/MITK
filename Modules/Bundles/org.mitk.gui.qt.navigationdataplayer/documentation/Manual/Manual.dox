@@ -4,9 +4,9 @@
 \image html icon.png "Icon of NavigationData Player"
 
 Available sections:
-  - \ref org.mitk.gui.qt.navigationdataplayerOverview
+  - \ref NavigationDataPlayerOverview
 
-\section org.mitk.gui.qt.navigationdataplayerOverview
+\section NavigationDataPlayerOverview
 This is the description for the NavigationData Player.
 
 */

@@ -213,10 +213,11 @@ int mitk::VtkPropRenderer::Render(mitk::VtkPropRenderer::RenderType type)
       lastVtkBased = false;
     }
 
-    //Es ist in GL_ENABLE_BIT gefunden: GL_TEXTURE_2D
+    //Workarround for bug GL_TEXTURE_2D
     GLboolean mode;
     GLenum bit = GL_TEXTURE_2D;
     glGetBooleanv(bit, &mode);
+
     switch(type)
     {
       case mitk::VtkPropRenderer::Opaque: mapper->MitkRenderOpaqueGeometry(this); break;
@@ -329,7 +330,7 @@ void mitk::VtkPropRenderer::Enable2DOpenGL()
   // Save a copy of the projection matrix so that we can restore it  
   // when it's time to do 3D rendering again.  
   glMatrixMode( GL_PROJECTION );  
-  glPushMatrix();  
+  glPushMatrix();
   glLoadIdentity();  
    
   // Set up the orthographic projection  
@@ -344,10 +345,9 @@ void mitk::VtkPropRenderer::Enable2DOpenGL()
    
   // Make sure depth testing and lighting are disabled for 2D rendering until  
   // we are finished rendering in 2D  
-  glPushAttrib( GL_DEPTH_BUFFER_BIT | GL_LIGHTING_BIT | GL_COLOR_BUFFER_BIT );
+  glPushAttrib( GL_DEPTH_BUFFER_BIT | GL_LIGHTING_BIT );
   glDisable( GL_DEPTH_TEST );  
   glDisable( GL_LIGHTING );
-  MITK_INFO << "Enable";
 }
 
 /*!
@@ -362,7 +362,6 @@ void mitk::VtkPropRenderer::Disable2DOpenGL()
   glPopMatrix();  
   glMatrixMode( GL_MODELVIEW );  
   glPopMatrix(); 
-  MITK_INFO << "Disable";
 }
 
 void mitk::VtkPropRenderer::Update(mitk::DataNode* datatreenode)

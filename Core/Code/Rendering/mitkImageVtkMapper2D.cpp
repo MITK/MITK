@@ -805,7 +805,6 @@ void mitk::ImageVtkMapper2D::Clear()
 
 void mitk::ImageVtkMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
 {
-  MITK_INFO << "apply props";
   //get the current localStorage for the corresponding renderer
   LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
 
@@ -868,7 +867,6 @@ void mitk::ImageVtkMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
   localStorage->m_Texture->SetMapColorScalarsThroughLookupTable(binary);
   if ( binary )
   {    
-    MITK_INFO << "binary";
     localStorage->m_LookupTable->SetAlphaRange(0.0, 1.0);
     localStorage->m_LookupTable->SetRange(0.0, 1.0);
     //0 is already mapped to transparent.
@@ -881,7 +879,6 @@ void mitk::ImageVtkMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
     {
       if (binaryOutline)
       {
-        MITK_INFO << "binary outline";
 //                image->setOutline(binaryOutline);
 //        vtkSmartPointer<vtkContourFilter> contourFilter = vtkSmartPointer<vtkContourFilter>::New();
 //        contourFilter->SetInput(localStorage->m_ReslicedImage);
@@ -978,7 +975,6 @@ void mitk::ImageVtkMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
   double rgbConv[3] = {(double)rgba[0], (double)rgba[1], (double)rgba[2]}; //conversion to double for VTK
   localStorage->m_Actor->GetProperty()->SetColor(rgbConv);
   localStorage->m_Actor->GetProperty()->SetOpacity(rgba[3]);
-  MITK_INFO << "END apply props";
 }
 
 void mitk::ImageVtkMapper2D::Update(mitk::BaseRenderer* renderer)

@@ -27,7 +27,10 @@ PURPOSE.  See the above copyright notices for more information.
 namespace mitk {
 
   /**
-  * \brief Class that reads NavigationData from input and transfers the information to the geometry of the associated BaseData
+  * \brief IGT filter applying a Hand-Eye transformation to a given BaseData according to the current NavigationDataTransformation.
+  *        The resulting BaseData is then given in tracking coordinates.
+  *
+  * Inputs: NavigationData(s), object(s) to transform (BaseData), hand-eye transformation (itk::QuaternionRigidTransform)
   *
   * Derived from NavigationDataToNavigationDataFilter
   *

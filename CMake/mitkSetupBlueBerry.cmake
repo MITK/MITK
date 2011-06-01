@@ -7,8 +7,6 @@ mark_as_advanced(BLUEBERRY_USE_QT)
 # Clear the cache variables containing plugin base directories
 set(MITK_MODULES_PLUGIN_SOURCE_DIRS "" CACHE INTERNAL "List of base plugin source directories" FORCE)
 set(MITK_MODULES_PLUGIN_OUTPUT_DIRS "" CACHE INTERNAL "List of base plugin output directories" FORCE)
-set(MITK_CORE_PLUGIN_OUTPUT_DIRS "" CACHE INTERNAL "List of base plugin output directories" FORCE)
-set(MITK_CORE_PLUGIN_SOURCE_DIRS "" CACHE INTERNAL "List of base plugin source directories" FORCE)
 
 set(mbilog_DIR "${mbilog_BINARY_DIR}")
 

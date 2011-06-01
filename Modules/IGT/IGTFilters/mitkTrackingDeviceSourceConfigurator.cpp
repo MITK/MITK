@@ -24,11 +24,14 @@ PURPOSE.  See the above copyright notices for more information.
 mitk::TrackingDeviceSourceConfigurator::TrackingDeviceSourceConfigurator(mitk::NavigationToolStorage::Pointer NavigationTools, mitk::TrackingDevice::Pointer TrackingDevice)
 {
 //make a copy of the navigation tool storage because we will modify the storage
-m_NavigationTools = mitk::NavigationToolStorage::New();
-for (int i=0; i<NavigationTools->GetToolCount(); i++)
+if (NavigationTools.IsNotNull())
+  {
+  m_NavigationTools = mitk::NavigationToolStorage::New();
+  for (int i=0; i<NavigationTools->GetToolCount(); i++)
       {
       m_NavigationTools->AddTool(NavigationTools->GetTool(i));   
       }
+  }
 
 m_TrackingDevice = TrackingDevice;
 m_ToolCorrespondencesInToolStorage = std::vector<int>();

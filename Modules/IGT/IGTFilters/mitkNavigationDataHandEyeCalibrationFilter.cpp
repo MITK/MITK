@@ -66,14 +66,12 @@ void mitk::NavigationDataHandEyeCalibrationFilter::GenerateData()
     mitk::BaseData::Pointer objectToTransform = m_ObjectsToTransform[index];
     if (!objectToTransform)
     {
-      itkWarningMacro("NavigationDataHandEyeCalibrationFilter: No BaseData associated with input.");
       continue;
     }
     // get the transformation of the hand-eye calibration for current input index
     QuaternionRigidTransformType::Pointer handEyeTransform = m_HandEyeTransformations[index];
     if (!handEyeTransform)
     {
-      itkWarningMacro("NavigationDataHandEyeCalibrationFilter: No hand-eye transformation associated with input.");
       continue;
     }
     // get the transformation of the current navigation data

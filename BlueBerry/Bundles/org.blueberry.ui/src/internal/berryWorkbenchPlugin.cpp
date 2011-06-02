@@ -23,6 +23,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "berryWorkbench.h"
 #include "berryPlatform.h"
 
+#include "intro/berryEditorIntroAdapterPart.h"
+
 #include "../berryImageDescriptor.h"
 
 #include <Poco/String.h>
@@ -271,6 +273,7 @@ void WorkbenchPlugin::start(ctkPluginContext* context)
   AbstractUICTKPlugin::start(context);
   bundleContext = context;
 
+  BERRY_REGISTER_EXTENSION_CLASS(EditorIntroAdapterPart, context)
 
   // The UI plugin needs to be initialized so that it can install the callback in PrefUtil,
   // which needs to be done as early as possible, before the workbench

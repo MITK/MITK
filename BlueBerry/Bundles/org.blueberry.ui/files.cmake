@@ -1,5 +1,6 @@
 SET(MOC_H_FILES
   src/internal/berryWorkbenchPlugin.h
+  src/internal/intro/berryEditorIntroAdapterPart.h
   src/berryWorkbenchPart.h
   src/berryEditorPart.h
   src/berryViewPart.h

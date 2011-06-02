@@ -31,6 +31,12 @@ EditorIntroAdapterPart::EditorIntroAdapterPart() :
 
 }
 
+EditorIntroAdapterPart::EditorIntroAdapterPart(const EditorIntroAdapterPart& other)
+{
+  Q_UNUSED(other)
+  throw std::runtime_error("Copy constructor not implemented");
+}
+
 void EditorIntroAdapterPart::SetStandby(bool standby)
 {
   //        final Control control = ((PartSite) getSite()).getPane().getControl();

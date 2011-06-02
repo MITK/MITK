@@ -482,6 +482,29 @@ if(MITK_USE_BLUEBERRY)
   add_subdirectory(Modules/Bundles)
 endif()
 
+# Construct a list of paths containing runtime directories
+# for MITK applications on Windows
+set(MITK_RUNTIME_PATH 
+    "${VTK_LIBRARY_DIRS}/@VS_BUILD_TYPE@;${ITK_LIBRARY_DIRS}/@VS_BUILD_TYPE@;${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/@VS_BUILD_TYPE@"
+    )
+if(QT4_FOUND)
+  set(MITK_RUNTIME_PATH "${MITK_RUNTIME_PATH};${QT_LIBRARY_DIR}/../bin")
+endif()
+if(MITK_USE_BLUEBERRY)
+  set(MITK_RUNTIME_PATH "${MITK_RUNTIME_PATH};${CTK_RUNTIME_LIBRARY_DIRS}/@VS_BUILD_TYPE@;${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/plugins/@VS_BUILD_TYPE@")
+endif()
+if(GDCM_DIR)
+  set(MITK_RUNTIME_PATH "${MITK_RUNTIME_PATH};${GDCM_DIR}/bin/@VS_BUILD_TYPE@")
+endif()
+if(OpenCV_DIR)
+  set(MITK_RUNTIME_PATH "${MITK_RUNTIME_PATH};${OpenCV_DIR}/bin/@VS_BUILD_TYPE@")
+endif()
+# DCMTK is statically build
+#if(DCMTK_DIR)
+#  set(MITK_RUNTIME_PATH "${MITK_RUNTIME_PATH};${DCMTK_DIR}/bin/@VS_BUILD_TYPE@")
+#endif()
+
+# Add applications directory
 add_subdirectory(Applications)
 
 #-----------------------------------------------------------------------------
@@ -569,3 +592,16 @@ set(UTILITIES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Utilities)
 
 configure_file(mitkConfig.h.in ${MITK_BINARY_DIR}/mitkConfig.h)
 configure_file(MITKConfig.cmake.in ${MITK_BINARY_DIR}/MITKConfig.cmake @ONLY)
+
+# If we are under Windows, create two batch files which correctly
+# set up the environment for the application and for Visual Studio
+if(WIN32)
+  include(mitkFunctionCreateWindowsBatchScript)
+  
+  set(VS_SOLUTION_FILE "${PROJECT_BINARY_DIR}/${PROJECT_NAME}.sln")
+  foreach(VS_BUILD_TYPE debug release)
+    mitkFunctionCreateWindowsBatchScript("${MITK_SOURCE_DIR}/CMake/StartVS.bat.in"
+      ${PROJECT_BINARY_DIR}/StartVS_${VS_BUILD_TYPE}.bat
+      ${VS_BUILD_TYPE})
+  endforeach()
+endif(WIN32)

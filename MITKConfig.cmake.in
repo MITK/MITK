@@ -5,6 +5,7 @@ SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "@MITK_SOURCE_DIR@/CMake")
 # Include MITK macros
 include(MacroParseArguments)
 include(mitkFunctionOrganizeSources)
+include(mitkFunctionCreateWindowsBatchScript)
 include(mitkMacroCreateModuleConf)
 include(mitkMacroCreateModule)
 include(mitkMacroCheckModule)
@@ -61,6 +62,7 @@ SET(OpenCV_DIR "@OpenCV_DIR@")
 SET(MITK_QMAKE_EXECUTABLE "@QT_QMAKE_EXECUTABLE@")
 SET(MITK_INSTALL_RPATH_RELATIVE @MITK_INSTALL_RPATH_RELATIVE@)
 SET(MITK_DATA_DIR "@MITK_DATA_DIR@")
+SET(MITK_RUNTIME_PATH "@MITK_RUNTIME_PATH@")
 
 # MITK use variables
 SET(MITK_USE_QT @MITK_USE_QT@)

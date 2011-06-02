@@ -18,5 +18,8 @@ function(mitkFunctionCreateWindowsBatchScript in out build_type)
     endforeach()
   endif()
   
+  set(VS_BUILD_TYPE ${build_type})
   configure_file(${in} ${out} @ONLY)
+  # substitute again
+  configure_file(${out} ${out} @ONLY)
 endfunction()

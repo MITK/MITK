@@ -25,7 +25,7 @@ namespace berry
 JobStatus::JobStatus(const Status::Severity& serverity, Job::Pointer sptr_job,
     const std::string& message) :
   m_myJob(sptr_job), m_internalStatus(new Status(serverity,
-      JobManager::PI_JOBS, 1, message))
+      JobManager::PI_JOBS(), 1, message))
 {
 }
 

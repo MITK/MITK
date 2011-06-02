@@ -147,7 +147,7 @@ void JobListeners::HandleException(const std::exception& e)
     //std::string pluginId = JobOSGiUtils.getDefault().getBundleId(listener);
     std::string pluginId;
     if (pluginId.empty())
-      pluginId = JobManager::PI_JOBS;
+      pluginId = JobManager::PI_JOBS();
     std::string message = "Problems occurred when invoking code from plug-in: "
         + pluginId;
     std::cerr << message << std::endl;

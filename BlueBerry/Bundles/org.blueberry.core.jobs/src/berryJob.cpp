@@ -27,7 +27,7 @@ namespace berry
 
 
 
-const IStatus::Pointer Job::ASYNC_FINISH(new Status ( IStatus::OK_TYPE, JobManager::PI_JOBS, 1, "") ) ;
+const IStatus::Pointer Job::ASYNC_FINISH(new Status ( IStatus::OK_TYPE, JobManager::PI_JOBS(), 1, "") ) ;
 
 Job::Job(std::string name) :
   InternalJob(name)

@@ -71,7 +71,7 @@ public:
   /**
    * The unique identifier constant of this plug-in.
    */
-  static const std::string PI_JOBS;
+  static const std::string& PI_JOBS();
 
   static bool DEBUG;
   static bool DEBUG_BEGIN_END;

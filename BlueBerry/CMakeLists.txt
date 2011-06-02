@@ -292,7 +292,11 @@ ctkFunctionGeneratePluginUseFile(${BB_PLUGIN_USE_FILE})
 # CTK Plugin Exports
 SET(BB_PLUGIN_EXPORTS_FILE "${CMAKE_CURRENT_BINARY_DIR}/BlueBerryPluginExports.cmake")
 GetMyTargetLibraries("${CTK_PLUGIN_LIBRARIES}" my_plugin_targets)
-export(TARGETS ${my_plugin_targets} mbilog PocoFoundation PocoUtil PocoXML
+SET(additional_export_targets mbilog PocoFoundation PocoUtil PocoXML)
+IF(BLUEBERRY_BUILD_TESTING)
+  LIST(APPEND additional_export_targets CppUnit)
+ENDIF()
+export(TARGETS ${my_plugin_targets} ${additional_export_targets}
        FILE ${BB_PLUGIN_EXPORTS_FILE})
 
 

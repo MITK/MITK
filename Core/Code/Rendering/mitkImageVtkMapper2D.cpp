@@ -191,16 +191,7 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
 {
   LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
 
-  bool visible = IsVisible(renderer);
-
-  if(visible==false)
-  {
-    localStorage->m_Actor->VisibilityOff();
-    return;
-  }
-
-  mitk::Image *input = const_cast< mitk::Image * >( this->GetInput() );
-  input->Update();
+  mitk::Image *input = const_cast< mitk::Image * >( this->GetInput() ); //TODO WTF CONST CAST?!?!?111
 
   if ( input == NULL )
   {
@@ -210,35 +201,29 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
   RendererInfo &rendererInfo = this->AccessRendererInfo( renderer );
   rendererInfo.Squeeze();
 
-  //TODO ApplyProperties is called here? Control flow correct?
-  //  this->ApplyProperties( renderer );
-
+  //check if there is a valid worldGeometry TODO: Move to Update()?
   const Geometry2D *worldGeometry = renderer->GetCurrentWorldGeometry2D();
-
   if( ( worldGeometry == NULL ) || ( !worldGeometry->IsValid() ) || ( !worldGeometry->GetReferenceGeometry() ))
   {
     return;
   }
 
-  // check if there is something to display.
-  if ( ! input->IsVolumeSet( this->GetTimestep() ) ) return;
+  // check if there is something to display. TODO: Move to Update()?
+  if ( !input->IsVolumeSet( this->GetTimestep() ) ) return;
 
-  Image::RegionType requestedRegion = input->GetLargestPossibleRegion();
-  requestedRegion.SetIndex( 3, this->GetTimestep() );
-  requestedRegion.SetSize( 3, 1 );
-  requestedRegion.SetSize( 4, 1 );
-  input->SetRequestedRegion( &requestedRegion );
+  //TODO what it this?
+//  Image::RegionType requestedRegion = input->GetLargestPossibleRegion();
+//  requestedRegion.SetIndex( 3, this->GetTimestep() );
+//  requestedRegion.SetSize( 3, 1 );
+//  requestedRegion.SetSize( 4, 1 );
+//  input->SetRequestedRegion( &requestedRegion );
   input->Update();
 
   vtkImageData* inputData = input->GetVtkImageData( this->GetTimestep() );
-
   if ( inputData == NULL )
   {
     return;
   }
-
-  vtkFloatingPointType spacing[3];
-  inputData->GetSpacing( spacing );
 
   // how big the area is in physical coordinates: widthInMM x heightInMM pixels
   mitk::ScalarType widthInMM, heightInMM;
@@ -257,30 +242,26 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
 
   // Bounds information for reslicing (only reuqired if reference geometry 
   // is present)
+  // TODO: we dont have to calculate the bounds if we reslice axis-parallel
   vtkFloatingPointType bounds[6];
   bool boundsInitialized = false;
-
   for ( int i = 0; i < 6; ++i )
   {
     bounds[i] = 0.0;
   }
 
   // Do we have a simple PlaneGeometry?
-  if ( dynamic_cast< const PlaneGeometry * >( worldGeometry ) != NULL )
+  // This is the "regular" case (e.g. slicing through an image axis-parallel or even oblique)
+  const PlaneGeometry *planeGeometry = dynamic_cast< const PlaneGeometry * >( worldGeometry );
+  if ( planeGeometry != NULL )
   {
-    const PlaneGeometry *planeGeometry =
-        static_cast< const PlaneGeometry * >( worldGeometry );
-
     origin = planeGeometry->GetOrigin();
     right  = planeGeometry->GetAxisVector( 0 );
     bottom = planeGeometry->GetAxisVector( 1 );
     normal = planeGeometry->GetNormal();
 
     bool inPlaneResampleExtentByGeometry = false;
-    GetDataNode()->GetBoolProperty(
-        "in plane resample extent by geometry",
-        inPlaneResampleExtentByGeometry, renderer
-        );
+    GetDataNode()->GetBoolProperty("in plane resample extent by geometry", inPlaneResampleExtentByGeometry, renderer);
 
     if ( inPlaneResampleExtentByGeometry )
     {

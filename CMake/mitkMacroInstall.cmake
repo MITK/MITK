@@ -93,7 +93,7 @@ MACRO(_fixup_target)
       IF(UNIX OR MINGW)
         MACRO(gp_resolve_item_override context item exepath dirs resolved_item_var resolved_var)
           IF(\${item} MATCHES \"blueberry_osgi\")
-            SET(\${resolved_item_var} \"\${exepath}/BlueBerry/org.blueberry.osgi/bin/\${item}\")
+            SET(\${resolved_item_var} \"\${exepath}/plugins/\${item}\")
             SET(\${resolved_var} 1)
           ENDIF()
         ENDMACRO()
@@ -102,36 +102,33 @@ MACRO(_fixup_target)
 
     IF(\"${_install_GLOB_PLUGINS}\" STREQUAL \"TRUE\") 
       file(GLOB_RECURSE GLOBBED_BLUEBERRY_PLUGINS
-      # glob for all blueberry bundles of this application
-      \"\${CMAKE_INSTALL_PREFIX}/${_bundle_dest_dir}/liborg*${CMAKE_SHARED_LIBRARY_SUFFIX}\"
-	  )
-      file(GLOB_RECURSE GLOBBED_QT_PLUGINS
-      # glob for Qt plugins
-      \"\${CMAKE_INSTALL_PREFIX}/${${_target_location}_qt_plugins_install_dir}/plugins/*${CMAKE_SHARED_LIBRARY_SUFFIX}\"
-	  )    
-    ELSE() 
+        # glob for all blueberry bundles of this application
+        \"\${CMAKE_INSTALL_PREFIX}/${_bundle_dest_dir}/liborg*${CMAKE_SHARED_LIBRARY_SUFFIX}\")
+    ENDIF()
+
     file(GLOB_RECURSE GLOBBED_QT_PLUGINS
       # glob for Qt plugins
       \"\${CMAKE_INSTALL_PREFIX}/${${_target_location}_qt_plugins_install_dir}/plugins/*${CMAKE_SHARED_LIBRARY_SUFFIX}\")    
-    ENDIF() 
     
     # use custom version of BundleUtilities
     message(\"globbed plugins: \${GLOBBED_QT_PLUGINS} \${GLOBBED_BLUEBERRY_PLUGINS}\")
-    SET(PLUGIN_DIRS ${DIRS})
+    SET(PLUGIN_DIRS)
     SET(PLUGINS ${_install_PLUGINS} \${GLOBBED_QT_PLUGINS} \${GLOBBED_BLUEBERRY_PLUGINS})
-    if (PLUGINS)
-	  list(REMOVE_DUPLICATES PLUGINS)
-	endif (PLUGINS)
+    if(PLUGINS)
+      list(REMOVE_DUPLICATES PLUGINS)
+    endif(PLUGINS)
     foreach(_plugin \${GLOBBED_BLUEBERRY_PLUGINS})
       get_filename_component(_pluginpath \${_plugin} PATH)
       list(APPEND PLUGIN_DIRS \${_pluginpath})
-      list(REMOVE_DUPLICATES PLUGIN_DIRS)
     endforeach(_plugin)
+    set(DIRS ${DIRS})
     list(APPEND DIRS \${PLUGIN_DIRS})
+    list(REMOVE_DUPLICATES DIRS)
+
     # use custom version of BundleUtilities
     SET(CMAKE_MODULE_PATH ${MITK_SOURCE_DIR}/CMake ${CMAKE_MODULE_PATH} )
     include(BundleUtilities)
-    list(REMOVE_DUPLICATES PLUGIN_DIRS)
-    fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/${_target_location}\" \"\${PLUGINS}\" \"\${PLUGIN_DIRS}\")
+    
+    fixup_bundle(\"\${CMAKE_INSTALL_PREFIX}/${_target_location}\" \"\${PLUGINS}\" \"\${DIRS}\")
   ")
 ENDMACRO()

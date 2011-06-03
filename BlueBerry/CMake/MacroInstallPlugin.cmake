@@ -13,11 +13,16 @@ MACRO(MACRO_INSTALL_PLUGIN _plugin_dir)
   
   # Check if target names have been specified
   IF(NOT _INSTALL_TARGETS)
-    # no targets specified. get the main target from the plug-ins manifest
-    MACRO_PARSE_MANIFEST("${_plugin_dir}/META-INF/MANIFEST.MF")
-  STRING(REPLACE "." "_" _INSTALL_TARGETS ${BUNDLE-SYMBOLICNAME})
+    # no targets specified. get the main target from the plug-ins manifest if it exists
+    IF(EXISTS "${_plugin_dir}/META-INF/MANIFEST.MF")
+      MACRO_PARSE_MANIFEST("${_plugin_dir}/META-INF/MANIFEST.MF")
+      STRING(REPLACE "." "_" _INSTALL_TARGETS ${BUNDLE-SYMBOLICNAME})
+    ENDIF()
   ENDIF()
  
+  # Only continue if _INSTALL_TARGETS is set
+  IF(_INSTALL_TARGETS)
+
   IF(NOT _INSTALL_DESTINATION)
     SET(_INSTALL_DESTINATION "bin/")
   ELSE()
@@ -73,5 +78,7 @@ MACRO(MACRO_INSTALL_PLUGIN _plugin_dir)
               )
     ENDIF()
   ENDFOREACH()
+
+  ENDIF() # _INSTALL_TARGETS
   
 ENDMACRO()

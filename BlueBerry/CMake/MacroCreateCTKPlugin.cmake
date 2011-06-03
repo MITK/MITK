@@ -117,7 +117,7 @@ MACRO(MACRO_CREATE_CTK_PLUGIN)
     FOREACH(install_subdir ${install_directories})
 
       MACRO_INSTALL_CTK_PLUGIN(TARGETS ${PLUGIN_TARGET}
-                               DESTINATION ctk_plugins)
+                               DESTINATION bin/plugins)
 
     ENDFOREACH()
   ENDIF()

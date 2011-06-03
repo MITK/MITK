@@ -34,7 +34,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkSurfaceToImageFilter.h>
 #include <vtkPolyData.h>
 
+//For Segmentation in rotated slices
 #include "mitkVtkResliceInterpolationProperty.h"
+#include "mitkPlanarCircle.h"
 
 // public methods
 
@@ -613,6 +615,7 @@ void QmitkSegmentationView::OnContourMarkerSelected(const mitk::DataNode *node)
        /*selectedRenderWindow->GetSliceNavigationController()->SelectSliceByPoint(
           centerP);*/
       mitk::Vector3D normal = markerGeometry->GetNormal();
+      //mitk::Point3D pointOfRotation = dynamic_cast<mitk::PlanarCircle*>(node->GetData())->
       selectedRenderWindow->GetSliceNavigationController()->ReorientSlicesByAxis(
           origin, xaxis, yaxis, width, height, spacing);           
     }

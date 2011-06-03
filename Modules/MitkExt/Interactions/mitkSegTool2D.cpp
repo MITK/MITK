@@ -237,7 +237,9 @@ void mitk::SegTool2D::AddContourmarker ( const PositionEvent* positionEvent )
         //Creating PlanarFigure which serves as marker
         mitk::PlanarCircle::Pointer contourMarker = mitk::PlanarCircle::New();
         contourMarker->SetGeometry2D( currentGeometry2D );
-
+        //currentGeometry2D->SetOrigin(positionEvent->GetWorldPosition());
+        //contourMarker->SetGeometry(dynamic_cast<mitk::Geometry3D*>(currentGeometry2D->Clone().GetPointer()));
+        //contourMarker->GetGeometry()->SetOrigin(positionEvent->GetWorldPosition());
         mitk::Contour::Pointer test = mitk::Contour::New();
         const mitk::Geometry3D* tempGeo = positionEvent->GetSender()->GetSliceNavigationController()->GetCreatedWorldGeometry();
         test->SetGeometry(const_cast<mitk::Geometry3D*>( tempGeo ));
@@ -267,6 +269,7 @@ void mitk::SegTool2D::AddContourmarker ( const PositionEvent* positionEvent )
         //rotatedContourNode->SetData(contourMarker);
         rotatedContourNode->SetData(contourMarker);
         rotatedContourNode->SetProperty( "name", StringProperty::New(markerStream.str()) );
+        rotatedContourNode->SetProperty( "isContourMarker", BoolProperty::New(true));
         rotatedContourNode->SetBoolProperty( "PlanarFigureInitializedWindow", true, positionEvent->GetSender() );
         rotatedContourNode->SetProperty( "includeInBoundingBox", BoolProperty::New(false));
         m_ToolManager->GetDataStorage()->Add(rotatedContourNode, workingNode);
@@ -275,6 +278,8 @@ void mitk::SegTool2D::AddContourmarker ( const PositionEvent* positionEvent )
 
 bool mitk::SegTool2D::ContourmarkerAlreadyExists ( const mitk::PlaneGeometry* currentGeometry2D )
 {
+  //For debugging
+  std::ofstream file("C:/Users/fetzer/Desktop/equationSystem/rotationfile.txt");
     itk::VectorContainer<unsigned int, mitk::DataNode::Pointer>::ConstPointer allNodes = m_ToolManager->GetDataStorage()->GetDerivations( m_ToolManager->GetWorkingData(0) );
     mitk::DataNode* currentNode;
     for( unsigned int i = 0; i < allNodes->Size(); i++ )
@@ -290,6 +295,22 @@ bool mitk::SegTool2D::ContourmarkerAlreadyExists ( const mitk::PlaneGeometry* cu
         Vector3D nodeNormal = nodeGeometry->GetNormal();
         Vector3D currentNormal = currentGeometry2D->GetNormal();
         //Timestep...
+
+        //Debugging
+        Vector3D cAxisX = currentGeometry2D->GetAxisVector(0);
+        Vector3D cAxisY = currentGeometry2D->GetAxisVector(1);
+        Vector3D cAxisZ = currentGeometry2D->GetAxisVector(2);
+        Vector3D cNormal = currentGeometry2D->GetNormal();
+        Point3D cOrigin = currentGeometry2D->GetOrigin();
+
+        Vector3D nAxisX = nodeGeometry->GetAxisVector(0);
+        Vector3D nAxisy = nodeGeometry->GetAxisVector(1);
+        Vector3D nAxisZ = nodeGeometry->GetAxisVector(2);
+        Vector3D nNormal = nodeGeometry->GetNormal();
+        Point3D nOrigin = nodeGeometry->GetOrigin();
+
+        file<<"Current Geometry: \n"<<"*************\n\n"<<"X= "<<cAxisX<<"\n"<<"Y= "<<cAxisY<<"\n"<<"Z= "<<cAxisZ<<"\n"<<"N= "<<cNormal<<"\n"<<"O= "<<cOrigin<<"\n";
+        file<<"Node Geometry: \n"<<"*************\n\n"<<"X= "<<nAxisX<<"\n"<<"Y= "<<nAxisy<<"\n"<<"Z= "<<nAxisZ<<"\n"<<"N= "<<nNormal<<"\n"<<"O= "<<nOrigin<<"\n";
 
         bool isSameGeometry = ( (nodeCenter == currentCenter) && (nodeNormal == currentNormal));
 

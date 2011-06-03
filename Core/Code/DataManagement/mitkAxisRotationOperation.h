@@ -43,7 +43,7 @@ class MITK_CORE_EXPORT AxisRotationOperation : public PointOperation
   //## @param index is e.g. the position in a list which describes the element to change
   //PointOperation(OperationType operationType,  Point3D point, int index = -1, bool selected = true, PointSpecificationType type = PTUNDEFINED);
 
-  AxisRotationOperation(OperationType operationType, Point3D center, Vector3D xaxis, Vector3D yaxis, float width, float height, Vector3D spacing);
+  AxisRotationOperation(OperationType operationType, Point3D center, Vector3D xaxis, Vector3D yaxis, float width, float height, Vector3D spacing/*, Point3D pointOfRotation*/);
  
   //##Documentation
   //##@brief Operation that handles all actions on one Point.
@@ -65,6 +65,8 @@ class MITK_CORE_EXPORT AxisRotationOperation : public PointOperation
 
   Vector3D GetSpacing();
 
+  Point3D GetPointOfRotation();
+
   private:
 
     
@@ -77,6 +79,8 @@ class MITK_CORE_EXPORT AxisRotationOperation : public PointOperation
     float m_Width;
 
     float m_Height;
+
+    Point3D m_PointOfRotation;
 
 };
 }//namespace mitk

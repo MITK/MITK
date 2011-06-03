@@ -863,7 +863,7 @@ mitk::SlicedGeometry3D::ExecuteOperation(Operation* operation)
         // Clear the slice stack and adjust it according to the center of
         // rotation and plane position (see documentation of ReinitializePlanes)
         this->ReinitializePlanes( center, axisRotationOp->GetPoint() );
-        this->SetOrigin(axisRotationOp->GetPoint());
+        //this->SetOrigin(axisRotationOp->GetPoint());
 
         if ( m_SliceNavigationController )
         {

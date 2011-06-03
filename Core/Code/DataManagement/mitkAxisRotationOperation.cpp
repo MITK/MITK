@@ -22,8 +22,8 @@ namespace mitk
 {
 
 AxisRotationOperation
-::AxisRotationOperation( OperationType operationType, Point3D center, Vector3D xaxis, Vector3D yaxis, float width, float height, Vector3D spacing )
-: PointOperation(operationType, center), m_XAxis( xaxis ), m_YAxis( yaxis), m_Width( width ), m_Height( height ), m_Spacing( spacing )
+::AxisRotationOperation( OperationType operationType, Point3D center, Vector3D xaxis, Vector3D yaxis, float width, float height, Vector3D spacing/*, Point3D pointOfRotation */)
+: PointOperation(operationType, center), m_XAxis( xaxis ), m_YAxis( yaxis), m_Width( width ), m_Height( height ), m_Spacing( spacing )/*, m_PointOfRotation ( pointOfRotation )*/
 {
 }
 
@@ -55,6 +55,11 @@ float AxisRotationOperation::GetWidth()
 float AxisRotationOperation::GetHeight()
 {
   return m_Height;
+}
+
+Point3D AxisRotationOperation::GetPointOfRotation()
+{
+  return m_PointOfRotation;
 }
 
 

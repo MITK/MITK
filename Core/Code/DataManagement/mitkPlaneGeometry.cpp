@@ -733,11 +733,11 @@ PlaneGeometry::ExecuteOperation( Operation *operation )
 
     const mitk::ScalarType width = op->GetWidth();
     InitializeStandardPlane( width ,op->GetHeight(), op->GetXAxis().Get_vnl_vector(), op->GetYAxis().Get_vnl_vector(), &op->GetSpacing());
-    itk::Vector<double, 3> offset;
+   /* itk::Vector<double, 3> offset;
     offset[0] = op->GetPoint()[0];
     offset[1] = op->GetPoint()[1];
     offset[2] = op->GetPoint()[2];
-    m_IndexToWorldTransform->SetOffset(offset);
+    m_IndexToWorldTransform->SetOffset(offset);*/
     TransferItkToVtkTransform();
     this->Modified();
     transform->Delete();

@@ -34,13 +34,11 @@ PURPOSE.  See the above copyright notices for more information.
 //VTK
 #include <vtkProperty.h>
 #include <vtkTransform.h>
-#include <vtkGeneralTransform.h>
 #include <vtkMatrix4x4.h>
 #include <vtkLookupTable.h>
 #include <vtkImageData.h>
 #include <vtkPoints.h>
-#include <vtkFloatArray.h>
-#include <vtkLinearTransform.h>
+#include <vtkGeneralTransform.h>
 #include <vtkImageReslice.h>
 #include <vtkImageChangeInformation.h>
 #include <vtkPlaneSource.h>
@@ -48,7 +46,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkTexture.h>
 #include <vtkCamera.h>
 #include <vtkTransformPolyDataFilter.h>
-#include <vtkContourFilter.h>
 
 //ITK
 #include <itkRGBAPixel.h>
@@ -1200,4 +1197,31 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::Ba
     }
   }  
   Superclass::SetDefaultProperties(node, renderer, overwrite);
+}
+
+mitk::ImageVtkMapper2D::LocalStorage::LocalStorage()
+{
+  m_ReslicedImage = vtkSmartPointer<vtkImageData>::New();
+  m_Plane = vtkSmartPointer<vtkPlaneSource>::New();
+  m_Texture = vtkSmartPointer<vtkTexture>::New();
+  m_LookupTable = vtkSmartPointer<vtkLookupTable>::New();
+  m_Mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
+  m_Actor = vtkSmartPointer<vtkActor>::New();
+  m_TransformFilter = vtkSmartPointer<vtkTransformPolyDataFilter>::New();
+
+  //the following actions are always the same and thus can be performed
+  //in the constructor for each image (i.e. the image-corresponding local storage)
+
+  //built a default lookuptable
+  m_LookupTable->SetSaturationRange( 0.0, 0.0 );
+  m_LookupTable->SetHueRange( 0.0, 0.0 );
+  m_LookupTable->SetValueRange( 0.0, 1.0 );
+  m_LookupTable->Build();
+  //map all black values to transparent
+  m_LookupTable->SetTableValue(0, 0.0, 0.0, 0.0, 0.0);
+
+  //set the mapper for the actor
+  m_Actor->SetMapper(m_Mapper);
+  //set the texture for the actor
+  m_Actor->SetTexture(m_Texture);
 }

@@ -3,7 +3,7 @@ Program:   Medical Imaging & Interaction Toolkit
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
-  
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
@@ -22,26 +22,22 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkBaseRenderer.h"
 #include "mitkVtkMapper2D.h"
 
-//VTK TODO use "class" instead?
+//VTK
 #include <vtkSmartPointer.h>
-#include <vtkPolyDataMapper.h>
-#include <vtkActor.h>
-#include <vtkPlaneSource.h>
-#include <vtkImageData.h>
-#include <vtkLookupTable.h>
-#include <vtkTransformPolyDataFilter.h>
-#include <vtkMatrix4x4.h>
 
-class Vtk2itk;
-class vtkImageReslice;
+class vtkActor;
+class vtkPolyDataMapper;
+class vtkPlaneSource;
+class vtkImageData;
+class vtkTransformPolyDataFilter;
 class vtkLookupTable;
-class vtkGeneralTransform;
+class vtkImageReslice;
 class vtkImageChangeInformation;
 class vtkPoints;
 class vtkMitkThickSlicesFilter;
 
 namespace mitk {
-  
+
   /** \brief Mapper to resample and display 2D slices of a 3D image.
  *
  * Currently implemented for mapping on PlaneGeometry and
@@ -56,7 +52,7 @@ namespace mitk {
  * requested direction. This results in a stretched version when used for texture
  * mapping.
  *
- 
+
  * Properties that can be set for images and influence the imageMapper2D are:
  *
  *   - \b "modality": (mitkModalityProperty) Modality of the image
@@ -73,9 +69,9 @@ namespace mitk {
  *   - \b "volume annotation color": (ColorProperty) color of the volume annotation
  *   - \b "volume annotation unit": (StringProperty) annotation unit as string (does not implicit convert the unit!) 
           unit is ml/cm3
-          
+
  * The default properties are:
- 
+
  *   - \b "opacity", mitk::FloatProperty::New(0.3f), renderer, overwrite )
  *   - \b "color", ColorProperty::New(1.0,0.0,0.0), renderer, overwrite )
  *   - \b "use color", mitk::BoolProperty::New( true ), renderer, overwrite )
@@ -86,10 +82,10 @@ namespace mitk {
  *   - \b "in plane resample extent by geometry", mitk::BoolProperty::New( false ) )
  *   - \b "bounding box", mitk::BoolProperty::New( false ) )
  *   - \b "layer", mitk::IntProperty::New(10), renderer, overwrite)
- 
+
  * If the modality-property is set for an image, the mapper uses modality-specific default properties,
  * e.g. color maps, if they are defined.
- 
+
  * \ingroup Mapper
  */
   class MITK_CORE_EXPORT ImageVtkMapper2D : public VtkMapper2D
@@ -142,32 +138,7 @@ namespace mitk {
       vtkSmartPointer<vtkTransformPolyDataFilter> m_TransformFilter;
 
       /** \brief Constructor of the local storage. Do as much actions as possible in here to avoid double executions. */
-      LocalStorage()
-      {
-        m_ReslicedImage = vtkSmartPointer<vtkImageData>::New();
-        m_Plane = vtkSmartPointer<vtkPlaneSource>::New();
-        m_Texture = vtkSmartPointer<vtkTexture>::New();
-        m_LookupTable = vtkSmartPointer<vtkLookupTable>::New();
-        m_Mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
-        m_Actor = vtkSmartPointer<vtkActor>::New();
-        m_TransformFilter = vtkSmartPointer<vtkTransformPolyDataFilter>::New();
-
-        //the following actions are always the same and thus can be performed
-        //in the constructor for each image (i.e. the image-corresponding local storage)
-
-        //built a default lookuptable
-        m_LookupTable->SetSaturationRange( 0.0, 0.0 );
-        m_LookupTable->SetHueRange( 0.0, 0.0 );
-        m_LookupTable->SetValueRange( 0.0, 1.0 );
-        m_LookupTable->Build();
-        //map all black values to transparent
-        m_LookupTable->SetTableValue(0, 0.0, 0.0, 0.0, 0.0);
-
-        //set the mapper for the actor
-        m_Actor->SetMapper(m_Mapper);
-        //set the texture for the actor
-        m_Actor->SetTexture(m_Texture);
-      }
+      LocalStorage();
 
       ~LocalStorage()
       {

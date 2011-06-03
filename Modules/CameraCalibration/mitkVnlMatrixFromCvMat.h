@@ -3,7 +3,6 @@
 
 #include <vnl/vnl_matrix.h>
 #include <cv.h>
-#include <mitkEndoTrackingExports.h>
 #include <mitkObservable.h>
 #include <mitkAlgorithm.h>
 #include <mitkEndoMacros.h>

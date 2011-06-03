@@ -41,6 +41,8 @@ namespace mitk {
 
     itkNewMacro(Self);
 
+    mitkCloneMacro(Surface);
+
     virtual void SetVtkPolyData(vtkPolyData* polydata, unsigned int t = 0);
 
     virtual vtkPolyData* GetVtkPolyData(unsigned int t = 0);
@@ -96,6 +98,7 @@ namespace mitk {
     typedef std::vector< vtkPolyData* > VTKPolyDataSeries;
 
     Surface();
+    Surface(const Surface& other);
 
     virtual ~Surface();
 

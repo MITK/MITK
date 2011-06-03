@@ -95,6 +95,13 @@ static Pointer New(typea _arga, typeb _argb, typec _argc, typed _argd) \
     return this->m_##name.GetPointer(); \
   }
 
+#define mitkCloneMacro(classname) \
+  virtual Pointer Clone() const \
+{ \
+  Pointer smartPtr = new classname(*this); \
+  return smartPtr;  \
+}
+
 /** provide a macro for adding MS specific __declspec(dllexport/-import)
  *  to classes.
  *  This is needed for the export of symbols, when you build a DLL. Then write

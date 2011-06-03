@@ -144,7 +144,6 @@ const mitk::Image* mitk::ImageVtkMapper2D::GetInput( void )
 
 vtkProp* mitk::ImageVtkMapper2D::GetVtkProp(mitk::BaseRenderer* renderer)
 {
-  MITK_INFO << "get Prop";
   //return the actor corresponding to the renderer
   return m_LSH.GetLocalStorage(renderer)->m_Actor;
 }
@@ -347,7 +346,6 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
       // correct position during 3D mapping.
       boundsInitialized = this->CalculateClippedPlaneBounds(
           rendererInfo.m_ReferenceGeometry, planeGeometry, bounds );
-      MITK_INFO << "boundsinitialized " << boundsInitialized;
     }
   }
   // Do we have an AbstractTransformGeometry?

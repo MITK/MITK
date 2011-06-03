@@ -298,6 +298,7 @@ void mitk::VtkPropRenderer::PrepareMapperQueue()
     if ( node.IsNull() )
       continue;
     mitk::Mapper::Pointer mapper = node->GetMapper(m_MapperID);
+
     if ( mapper.IsNull() )
       continue;
 
@@ -310,6 +311,7 @@ void mitk::VtkPropRenderer::PrepareMapperQueue()
     int layer = 1;
     node->GetIntProperty("layer", layer, this);
     int nr = (layer<<16) + mapperNo;
+//    MITK_INFO << "Layer Number " << nr << " Mapper type " << mapper->GetNameOfClass();
     m_MappersMap.insert( std::pair< int, Mapper * >( nr, mapper ) );
     mapperNo++;
   }  

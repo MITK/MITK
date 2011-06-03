@@ -9,9 +9,7 @@ INCLUDE_DIRECTORIES(
   ${mbilog_INCLUDE_DIRS}
 )
 
-LINK_DIRECTORIES(${Poco_LIBRARY_DIRS}
-                 ${BLUEBERRY_PLUGINS_OUTPUT_DIR}/org.blueberry.osgi/bin
-                )
+LINK_DIRECTORIES(${Poco_LIBRARY_DIRS})
 
 IF(MITK_SHOW_CONSOLE_WINDOW)
   ADD_EXECUTABLE(CoreApp MACOSX_BUNDLE CoreApp.cpp)
@@ -29,7 +27,7 @@ TARGET_LINK_LIBRARIES(CoreApp
                       optimized PocoUtil            debug PocoUtild 
                       org_blueberry_osgi)
 
-SET_TARGET_PROPERTIES(CoreApp PROPERTIES INSTALL_RPATH "${CMAKE_INSTALL_RPATH};${CMAKE_INSTALL_RPATH}/BlueBerry/org.blueberry.osgi/bin")
+SET_TARGET_PROPERTIES(CoreApp PROPERTIES INSTALL_RPATH "${CMAKE_INSTALL_RPATH};${CMAKE_INSTALL_RPATH}/plugins")
 
 # subproject support
 ADD_DEPENDENCIES(MITK-CoreUI CoreApp)

@@ -18,7 +18,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkToFDistanceImageToSurfaceFilter.h>
 #include <mitkInstantiateAccessFunctions.h>
 #include <mitkSurface.h>
-//#include <mitkPinholeCameraModel.h>
 
 #include <itkImage.h>
 

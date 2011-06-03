@@ -22,7 +22,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkPointSet.h>
 #include <mitkToFProcessingCommon.h>
 #include <mitkVector.h>
-#include <mitkPinholeCameraModel.h>
 
 #include <itkImage.h>
 #include <itkImageRegionIterator.h>

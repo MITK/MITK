@@ -22,6 +22,18 @@ MACRO(MITK_INSTALL_TARGETS)
     ${MITK_BINARY_DIR}/bin/${intermediate_dir} 
     ${_install_LIBRARY_DIRS}
     )
+  
+  IF(GDCM_DIR)
+    LIST(APPEND DIRS ${GDCM_DIR}/bin/${intermediate_dir})
+  ENDIF()
+  IF(OpenCV_DIR)
+    LIST(APPEND DIRS ${OpenCV_DIR}/bin/${intermediate_dir})
+  ENDIF()
+  IF(MITK_USE_BLUEBERRY)
+    LIST(APPEND DIRS 
+         ${CTK_RUNTIME_LIBRARY_DIRS}/${intermediate_dir}
+         ${MITK_BINARY_DIR}/bin/plugins/${intermediate_dir})
+  ENDIF()
 
   if(QT_LIBRARY_DIR MATCHES "^(/lib/|/lib32/|/lib64/|/usr/lib/|/usr/lib32/|/usr/lib64/|/usr/X11R6/)")
     set(_qt_is_system_qt 1)

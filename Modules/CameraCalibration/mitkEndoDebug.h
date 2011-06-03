@@ -4,7 +4,7 @@
 #include <set>
 #include <string>
 #include <iostream>
-#include <mitkEndoTrackingExports.h>
+#include <hmitkCameraCalibrationExport.h>
 
 namespace mitk
 {
@@ -17,7 +17,7 @@ namespace mitk
   /// class responsible for handling debug matters
   /// in endotracking
   ///
-  struct mitkEndoTracking_EXPORT EndoDebug
+  struct mitkCameraCalibration_EXPORT EndoDebug
   {
     ///
     /// singleton class

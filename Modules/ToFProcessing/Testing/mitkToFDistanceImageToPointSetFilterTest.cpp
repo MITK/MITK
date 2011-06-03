@@ -122,48 +122,33 @@ int mitkToFDistanceImageToPointSetFilterTest(int /* argc */, char* /*argv*/[])
   MITK_INFO<<"Create test image";
   mitk::Image::Pointer image = CreateTestImageWithPointSet(1000.0f,dimX,dimY,subSet);
   //initialize intrinsic parameters
-  mitk::ScalarType focalLength = 10;
-  mitk::Point2D interPixelDistance;
-  interPixelDistance[0] = 0.05;
-  interPixelDistance[1] = 0.05;
-  mitk::Point2D principalPoint;
-  principalPoint[0] = 100;
-  principalPoint[1] = 100;
+  //initialize intrinsic parameters with some arbitrary values
+  mitk::ToFProcessingCommon::ToFPoint2D interPixelDistance;
+  interPixelDistance[0] = 0.04564;
+  interPixelDistance[1] = 0.0451564;
+  mitk::ToFProcessingCommon::ToFScalarType focalLengthX = 295.78960;
+  mitk::ToFProcessingCommon::ToFScalarType focalLengthY = 296.348535;
+  mitk::ToFProcessingCommon::ToFScalarType focalLength = (focalLengthX*interPixelDistance[0]+focalLengthY*interPixelDistance[1])/2.0;
+  mitk::ToFProcessingCommon::ToFScalarType k1=-0.36,k2=-0.14,p1=0.001,p2=-0.00;
+  mitk::ToFProcessingCommon::ToFPoint2D principalPoint;
+  principalPoint[0] = 103.576546;
+  principalPoint[1] = 100.1532;
+  mitk::CameraIntrinsics::Pointer cameraIntrinsics = mitk::CameraIntrinsics::New();
+  cameraIntrinsics->SetFocalLength(focalLengthX,focalLengthY);
+  cameraIntrinsics->SetPrincipalPoint(principalPoint[0],principalPoint[1]);
+  cameraIntrinsics->SetDistorsionCoeffs(k1,k2,p1,p2);
+  // test SetCameraIntrinsics()
+  filter->SetCameraIntrinsics(cameraIntrinsics);
+  MITK_TEST_CONDITION_REQUIRED((focalLengthX==filter->GetCameraIntrinsics()->GetFocalLengthX()),"Testing SetCameraIntrinsics with focalLength");
+  mitk::ToFProcessingCommon::ToFPoint2D pp;
+  pp[0] = filter->GetCameraIntrinsics()->GetPrincipalPointX();
+  pp[1] = filter->GetCameraIntrinsics()->GetPrincipalPointY();
+  MITK_TEST_CONDITION_REQUIRED(mitk::Equal(principalPoint,pp),"Testing SetCameraIntrinsics with principalPoint()");
+  // test SetInterPixelDistance()
 
-  mitk::PinholeCameraModel::Pointer camera = mitk::PinholeCameraModel::New();
-  camera->SetFocalLength(focalLength);
-  camera->SetPrincipalPoint(principalPoint);
-  camera->SetInterPixelDistance(interPixelDistance);
-
-
-  // test setter/getter of intrinsic parameters
-  filter->SetCameraModel(camera);
-  MITK_TEST_CONDITION_REQUIRED((focalLength==filter->GetCameraModel()->GetFocalLength()),"Testing Set/GetFocalLength()");
-//  filter->SetInterPixelDistance(interPixelDistance);
-  MITK_TEST_CONDITION_REQUIRED((interPixelDistance==filter->GetCameraModel()->GetInterPixelDistance()),"Testing Set/GetInterPixelDistance()");
-//  filter->SetPrincipalPoint(principalPoint);
-  mitk::Point2D pp = filter->GetCameraModel()->GetPrincipalPoint();
-  MITK_TEST_CONDITION_REQUIRED(mitk::Equal(principalPoint,pp),"Testing Set/GetPrincipalPoint()");
-  // test SetIntrinsicParameters()
-  mitk::PinholeCameraModel::Pointer cameraIntrinics = mitk::PinholeCameraModel::New();
-  mitk::Point2D imageArea;
-  imageArea[0] = dimX*interPixelDistance[0];
-  imageArea[1] = dimY*interPixelDistance[1];
-  cameraIntrinics->SetImageArea(imageArea);
-  cameraIntrinics->SetFocalLength(10);
-  mitk::Point2D pixelSize;
-  pixelSize[0] = interPixelDistance[0];
-  pixelSize[1] = interPixelDistance[1];
-  cameraIntrinics->SetInterPixelDistance(pixelSize);
-  mitk::Point2D imageShift;
-  imageShift[0] = (principalPoint[0] - dimX/2)*interPixelDistance[0];
-  imageShift[1] = (principalPoint[1] - dimX/2)*interPixelDistance[1];
-  cameraIntrinics->SetImageShift(imageShift);
-  filter->SetCameraModel(cameraIntrinics);
-  MITK_TEST_CONDITION_REQUIRED((focalLength==filter->GetCameraModel()->GetFocalLength()),"Testing SetIntrinsicParameters() - focal length");
-  MITK_TEST_CONDITION_REQUIRED((interPixelDistance==filter->GetCameraModel()->GetInterPixelDistance()),"Testing SetIntrinsicParameters() - inter pixel distance");
-  pp = camera->GetPrincipalPoint();
-  MITK_TEST_CONDITION_REQUIRED(mitk::Equal(principalPoint,pp),"Testing SetIntrinsicParameters() - principal point");
+  filter->SetInterPixelDistance(interPixelDistance);
+  mitk::ToFProcessingCommon::ToFPoint2D ipD = filter->GetInterPixelDistance();
+  MITK_TEST_CONDITION_REQUIRED(mitk::Equal(ipD,interPixelDistance),"Testing Set/GetInterPixelDistance()");
 
   // test Set/GetInput()
   filter->SetInput(image);
@@ -182,8 +167,7 @@ int mitkToFDistanceImageToPointSetFilterTest(int /* argc */, char* /*argv*/[])
       index[1] = j;
       index[2] = 0;
       mitk::ScalarType distance = image->GetPixelValueByIndex(index);
-      mitk::Point3D coordinate = mitk::ToFProcessingCommon::IndexToCartesianCoordinates(i,j,distance,cameraIntrinics->GetFocalLength(),cameraIntrinics->GetInterPixelDistance(),
-                                                                                        cameraIntrinics->GetPrincipalPoint());
+      mitk::Point3D coordinate = mitk::ToFProcessingCommon::IndexToCartesianCoordinates(i,j,distance,focalLength,interPixelDistance,principalPoint);
       expectedResult->InsertPoint(counter,coordinate);
       counter++;
     }
@@ -198,8 +182,8 @@ int mitkToFDistanceImageToPointSetFilterTest(int /* argc */, char* /*argv*/[])
     mitk::Point3D resultPoint = result->GetPoint(i);
     if (!mitk::Equal(expectedPoint,resultPoint))
     {
-      MITK_INFO << "erwartet " << expectedPoint;
-      MITK_INFO << "result " << resultPoint;
+      //MITK_INFO << "erwartet " << expectedPoint;
+      //MITK_INFO << "result " << resultPoint;
       pointSetsEqual = false;
     }
   }
@@ -209,7 +193,8 @@ int mitkToFDistanceImageToPointSetFilterTest(int /* argc */, char* /*argv*/[])
   MITK_INFO<<"Test filter with subset";
   filter = mitk::ToFDistanceImageToPointSetFilter::New();
   filter->SetInput(image);
-  filter->SetCameraModel(cameraIntrinics);
+  filter->SetInterPixelDistance(interPixelDistance);
+  filter->SetCameraIntrinsics(cameraIntrinsics);
   expectedResult = mitk::PointSet::New();
   counter = 0;
   for (unsigned int i=0; i<subSet->GetSize(); i++)
@@ -221,8 +206,7 @@ int mitkToFDistanceImageToPointSetFilterTest(int /* argc */, char* /*argv*/[])
     index[2] = 0;
     mitk::ScalarType distance = image->GetPixelValueByIndex(index);
     mitk::Point3D coordinate = mitk::ToFProcessingCommon::IndexToCartesianCoordinates(point[0],point[1],
-                                                                                      distance,cameraIntrinics->GetFocalLength(),cameraIntrinics->GetInterPixelDistance(),
-                                                                                      cameraIntrinics->GetPrincipalPoint());
+                                                                                      distance,focalLength,interPixelDistance,principalPoint);
     expectedResult->InsertPoint(counter,coordinate);
     counter++;
   }

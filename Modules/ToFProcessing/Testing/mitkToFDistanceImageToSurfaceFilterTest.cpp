@@ -50,8 +50,8 @@ int mitkToFDistanceImageToSurfaceFilterTest(int /* argc */, char* /*argv*/[])
   unsigned int dimY =204;
   mitk::Image::Pointer image = mitk::ToFTestingCommon::CreateTestImage(dimX,dimY);
   //initialize intrinsic parameters with some arbitrary values
-  ToFScalarType focalLengthX = 13.654368;
-  ToFScalarType focalLengthY = 13.854;
+  ToFScalarType focalLengthX = 295.78960;
+  ToFScalarType focalLengthY = 296.348535;
   ToFScalarType k1=-0.36,k2=-0.14,p1=0.001,p2=-0.00;
   ToFPoint2D principalPoint;
   principalPoint[0] = 103.576546;

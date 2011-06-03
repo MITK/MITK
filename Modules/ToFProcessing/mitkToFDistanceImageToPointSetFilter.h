@@ -19,11 +19,12 @@ PURPOSE.  See the above copyright notices for more information.
 #define __mitkToFDistanceImageToPointSetFilter_h
 
 
+#include <mitkCameraIntrinsics.h>
 #include "mitkImage.h"
 #include "mitkPointSet.h"
 #include <mitkPointSetSource.h> 
 #include "mitkImageSource.h"
-#include <mitkPinholeCameraModel.h>
+#include <mitkToFProcessingCommon.h>
 #include "mitkToFProcessingExports.h"
 
 namespace mitk
@@ -45,14 +46,15 @@ namespace mitk
   class mitkToFProcessing_EXPORT ToFDistanceImageToPointSetFilter : public PointSetSource
   {
   public:
-    typedef mitk::PinholeCameraModel::ToFScalarType ToFScalarType;
 
     mitkClassMacro( ToFDistanceImageToPointSetFilter , PointSetSource );
     itkNewMacro( Self );
 
-    itkSetMacro(CameraModel,mitk::PinholeCameraModel::Pointer);
+    itkSetMacro(CameraIntrinsics,mitk::CameraIntrinsics::Pointer);
 
-    itkGetMacro(CameraModel,mitk::PinholeCameraModel::Pointer);
+    itkGetMacro(CameraIntrinsics,mitk::CameraIntrinsics::Pointer);
+    itkSetMacro(InterPixelDistance,mitk::ToFProcessingCommon::ToFPoint2D);
+    itkGetMacro(InterPixelDistance,mitk::ToFProcessingCommon::ToFPoint2D);
 
 
     /*!
@@ -116,7 +118,8 @@ namespace mitk
     void CreateOutputsForAllInputs();
 
     std::vector<Index3D> m_Subset; ///< If this subset is specified only the contained indizes are converted to cartesian coordinates
-    mitk::PinholeCameraModel::Pointer m_CameraModel; ///< Pinhole camera model holding the intrinsic parameters needed for PointSet calculation
+    mitk::CameraIntrinsics::Pointer m_CameraIntrinsics; ///< Member holding the intrinsic parameters needed for PointSet calculation
+    ToFProcessingCommon::ToFPoint2D m_InterPixelDistance; ///< distance in mm between two adjacent pixels on the ToF camera chip
   };
 } //END mitk namespace
 #endif

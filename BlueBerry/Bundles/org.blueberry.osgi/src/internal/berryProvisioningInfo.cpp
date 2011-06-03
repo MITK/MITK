@@ -23,6 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QFile>
 #include <QFileInfo>
 #include <QTextStream>
+#include <QCoreApplication>
 
 namespace berry {
 
@@ -66,6 +67,7 @@ void ProvisioningInfo::readProvisioningFile(const QString& filePath)
     {
       QString keyword = line.section(sep, 0, 0);
       QString value = line.mid(keyword.size()).trimmed();
+      value = substituteKeywords(value);
 
       if (keyword.isEmpty())
       {
@@ -194,6 +196,23 @@ void ProvisioningInfo::addPluginToStart(const QString& file)
   {
     pluginsToStart.append(pluginUrl);
   }
+}
+
+QString ProvisioningInfo::substituteKeywords(const QString& value) const
+{
+  QString appPath = QCoreApplication::applicationDirPath();
+  if (appPath.endsWith('/'))
+  {
+    appPath.chop(1);
+  }
+
+#ifdef CMAKE_INTDIR
+  // Strip the intermediate dir from the application path
+  QString intDir(CMAKE_INTDIR);
+  appPath.chop(intDir.size()+1);
+#endif
+
+  return QString(value).replace("@EXECUTABLE_DIR", appPath, Qt::CaseInsensitive);
 }
 
 }

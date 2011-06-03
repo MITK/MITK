@@ -189,6 +189,7 @@ include(mitkFunctionSuppressWarnings) # includes several functions
 include(mitkFunctionOrganizeSources)
 include(mitkFunctionGetVersion)
 include(mitkFunctionCreateWindowsBatchScript)
+include(mitkFunctionInstallProvisioningFiles)
 include(mitkMacroCreateModuleConf)
 include(mitkMacroCreateModule)
 include(mitkMacroCheckModule)
@@ -455,22 +456,20 @@ if(MITK_USE_BLUEBERRY)
   list(APPEND MITK_EXT_ENABLED_PLUGINS ${MITK_CORE_ENABLED_PLUGINS})
 
   set(MITK_COREAPP_PROVISIONING_FILE "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/CoreApp.provisioning")
-  FunctionCreateProvisioningInfo(
-    OUTPUT prov_info
+  FunctionCreateProvisioningFile(
+    FILE ${MITK_COREAPP_PROVISIONING_FILE}
     INCLUDE "${BLUEBERRY_PLUGIN_PROVISIONING_FILE}"
     PLUGIN_DIR "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/plugins"
     PLUGINS ${mitk_core_plugins_fullpath}
   )
-  file(WRITE "${MITK_COREAPP_PROVISIONING_FILE}" "${prov_info}")
 
   set(MITK_EXTAPP_PROVISIONING_FILE "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/ExtApp.provisioning")
-  FunctionCreateProvisioningInfo(
-    OUTPUT prov_info
-    INCLUDE "${MITK_COREAPP_PROVISIONING_FILE}"
+  FunctionCreateProvisioningFile(
+    FILE ${MITK_EXTAPP_PROVISIONING_FILE}
+    INCLUDE "${BLUEBERRY_PLUGIN_PROVISIONING_FILE}"
     PLUGIN_DIR "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/plugins"
-    PLUGINS ${mitk_ext_plugins_fullpath}
+    PLUGINS ${mitk_core_plugins_fullpath} ${mitk_ext_plugins_fullpath}
   )
-  file(WRITE "${MITK_EXTAPP_PROVISIONING_FILE}" "${prov_info}")
 
   set(MITK_PLUGIN_USE_FILE "${MITK_BINARY_DIR}/MitkPluginUseFile.cmake")
   ctkFunctionGeneratePluginUseFile(${MITK_PLUGIN_USE_FILE})

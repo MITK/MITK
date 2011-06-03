@@ -6,6 +6,7 @@ SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "@MITK_SOURCE_DIR@/CMake")
 include(MacroParseArguments)
 include(mitkFunctionOrganizeSources)
 include(mitkFunctionCreateWindowsBatchScript)
+include(mitkFunctionInstallProvisioningFiles)
 include(mitkMacroCreateModuleConf)
 include(mitkMacroCreateModule)
 include(mitkMacroCheckModule)
@@ -121,5 +122,8 @@ IF(MITK_USE_BLUEBERRY)
   #SET(CTK_PLUGIN_LIBRARIES ${CTK_PLUGIN_LIBRARIES} @MITK_PLUGIN_TARGETS@)
 
   SET(MITK_PLUGIN_PROVISIONING_FILE "@MITK_EXTAPP_PROVISIONING_FILE@")
+  SET(MITK_PROVISIONING_FILES
+      "${BLUEBERRY_PLUGIN_PROVISIOING_FILE}"
+      "${MITK_PLUGIN_PROVISIONING_FILE}")
 
 ENDIF(MITK_USE_BLUEBERRY)

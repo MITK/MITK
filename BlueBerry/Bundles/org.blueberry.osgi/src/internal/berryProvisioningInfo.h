@@ -54,6 +54,8 @@ private:
     void readProvisioningFile(const QString& file);
     QUrl addPluginToInstall(const QString& file);
     void addPluginToStart(const QString& file);
+
+    QString substituteKeywords(const QString& value) const;
 };
 
 }

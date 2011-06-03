@@ -76,16 +76,11 @@ int main(int argc, char** argv)
   Poco::Path basePath(argv[0]);
   basePath.setFileName("");
   
-  Poco::Path BlueBerryPath(basePath);
-  BlueBerryPath.pushDirectory("BlueBerry");
-
-  Poco::Path corePath(basePath);
-  corePath.pushDirectory("CoreBundles");
-
-  std::string pluginDirs = BlueBerryPath.toString() + ";" + corePath.toString();
+  Poco::Path provFile(basePath);
+  provFile.setFileName("CoreApp.provisioning");
 
   Poco::Util::MapConfiguration* coreConfig(new Poco::Util::MapConfiguration());
-  coreConfig->setString(berry::Platform::ARG_PLUGIN_DIRS, pluginDirs);
+  coreConfig->setString(berry::Platform::ARG_PROVISIONING, provFile.toString());
   coreConfig->setString(berry::Platform::ARG_APPLICATION, "org.mitk.qt.application");
   return berry::Starter::Run(argc, argv, coreConfig);
 }

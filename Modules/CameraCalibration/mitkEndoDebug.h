@@ -4,7 +4,7 @@
 #include <set>
 #include <string>
 #include <iostream>
-#include <hmitkCameraCalibrationExport.h>
+#include <mitkCameraCalibrationExports.h>
 
 namespace mitk
 {

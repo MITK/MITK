@@ -48,7 +48,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkTexture.h>
 #include <vtkCamera.h>
 #include <vtkTransformPolyDataFilter.h>
-#include <vtkImageMapToColors.h>
 #include <vtkContourFilter.h>
 
 //ITK
@@ -628,7 +627,6 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
   vtkSmartPointer<vtkMatrix4x4> matrix = rendererInfo.m_Reslicer->GetResliceAxes();
 
   trans->SetMatrix(matrix);
-  localStorage->m_TransformMatrix = matrix;
 
   //transform the plane to the corresponding view (transversal, coronal or saggital)
   localStorage->m_TransformFilter->SetTransform(trans);
@@ -869,7 +867,6 @@ void mitk::ImageVtkMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
     localStorage->m_LookupTable->SetRange(0.0, 1.0);
     //0 is already mapped to transparent.
     //1 is now mapped to the current color and alpha
-//    localStorage->m_LookupTable->SetTableValue(1, rgba[0], rgba[1], rgba[2], rgba[3]);
 
     bool binaryOutline = false;
     this->GetDataNode()->GetBoolProperty( "outline binary", binaryOutline, renderer );
@@ -877,15 +874,6 @@ void mitk::ImageVtkMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
     {
       if (binaryOutline)
       {
-//                image->setOutline(binaryOutline);
-//        vtkSmartPointer<vtkContourFilter> contourFilter = vtkSmartPointer<vtkContourFilter>::New();
-//        contourFilter->SetInput(localStorage->m_ReslicedImage);
-//        contourFilter->SetNumberOfContours(1);
-//        contourFilter->SetValue(0, 0.0);
-//        contourFilter->SetValue(0, 1.0);
-//        contourFilter->GenerateValues(1, 0.0, 0.0);
-//        localStorage->m_Texture->SetInputConnection(contourFilter->GetOutputPort());
-
         float binaryOutlineWidth(1.0);
         if (this->GetDataNode()->GetFloatProperty( "outline width", binaryOutlineWidth, renderer ))
         {

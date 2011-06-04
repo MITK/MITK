@@ -4,9 +4,9 @@
 \image html icon.png "Icon of MITK-IGT Tracking Toolbox"
 
 Available sections:
-  - \ref org.mitk.gui.qt.igttrackingtoolboxOverview
+  - \ref IGTTrackingToolboxOverview
 
-\section org.mitk.gui.qt.igttrackingtoolboxOverview
+\section IGTTrackingToolboxOverview
 This is the description for the MITK-IGT Tracking Toolbox.
 
 */

@@ -25,6 +25,7 @@ SET(MODULE_TESTS
    mitkVirtualTrackingDeviceTest.cpp
    mitkNavigationDataPlayerTest.cpp
    mitkTrackingDeviceSourceTest.cpp
+   mitkTrackingDeviceSourceConfiguratorTest.cpp
 
    # ------------------ Navigation Tool Management Tests -------------------
    mitkNavigationToolStorageTest.cpp
@@ -34,7 +35,7 @@ SET(MODULE_TESTS
    # -----------------------------------------------------------------------
 
    # ------------------ Deavtivated Tests ----------------------------------
-   
+
    # -----------------------------------------------------------------------
 )
 

@@ -1,5 +1,4 @@
 SET(CPP_FILES
-  mitkPinholeCameraModel.cpp
   mitkToFCompositeFilter.cpp
   mitkToFDistanceImageToPointSetFilter.cpp
   mitkToFDistanceImageToSurfaceFilter.cpp

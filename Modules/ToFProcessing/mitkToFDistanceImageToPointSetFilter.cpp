@@ -22,9 +22,13 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkToFProcessingCommon.h"
 
 mitk::ToFDistanceImageToPointSetFilter::ToFDistanceImageToPointSetFilter()
-: m_CameraModel(), m_Subset(NULL)
+: m_CameraIntrinsics(), m_Subset(NULL), m_InterPixelDistance()
 {
-  m_CameraModel = mitk::PinholeCameraModel::New();
+  m_InterPixelDistance.Fill(0.045);
+  m_CameraIntrinsics = mitk::CameraIntrinsics::New();
+  m_CameraIntrinsics->SetFocalLength(295.78960196187319,296.1255427948447);
+  m_CameraIntrinsics->SetPrincipalPoint(113.29063841714108,97.243216122015184);
+  m_CameraIntrinsics->SetDistorsionCoeffs(-0.36874385358645773f,-0.14339503290129013,0.0033210108720361795,-0.004277703352074105);
 }
 
 mitk::ToFDistanceImageToPointSetFilter::~ToFDistanceImageToPointSetFilter()
@@ -104,6 +108,11 @@ void mitk::ToFDistanceImageToPointSetFilter::SetSubset( mitk::PointSet::Pointer 
 
 void mitk::ToFDistanceImageToPointSetFilter::GenerateData()
 {
+  mitk::ToFProcessingCommon::ToFScalarType focalLength = (m_CameraIntrinsics->GetFocalLengthX()*m_InterPixelDistance[0]+m_CameraIntrinsics->GetFocalLengthY()*m_InterPixelDistance[1])/2.0;
+  mitk::ToFProcessingCommon::ToFPoint2D principalPoint;
+  principalPoint[0] = m_CameraIntrinsics->GetPrincipalPointX();
+  principalPoint[1] = m_CameraIntrinsics->GetPrincipalPointY();
+
   mitk::PointSet::Pointer output = this->GetOutput();
   assert(output);
   mitk::Image::Pointer input = this->GetInput();
@@ -114,10 +123,10 @@ void mitk::ToFDistanceImageToPointSetFilter::GenerateData()
     for (unsigned int i=0; i<m_Subset.size(); i++)
     {
       mitk::Index3D currentIndex = m_Subset.at(i);;
-      ToFScalarType distance = (double)input->GetPixelValueByIndex(currentIndex);
+      mitk::ToFProcessingCommon::ToFScalarType distance = (double)input->GetPixelValueByIndex(currentIndex);
+
       mitk::Point3D currentPoint =
-          mitk::ToFProcessingCommon::IndexToCartesianCoordinates(currentIndex,distance,m_CameraModel->GetFocalLength(),
-                                                                 m_CameraModel->GetInterPixelDistance(),m_CameraModel->GetPrincipalPoint());
+          mitk::ToFProcessingCommon::IndexToCartesianCoordinates(currentIndex,distance,focalLength,m_InterPixelDistance,principalPoint);
       output->InsertPoint(i,currentPoint);
     }
   }
@@ -134,9 +143,9 @@ void mitk::ToFDistanceImageToPointSetFilter::GenerateData()
         pixel[0] = i;
         pixel[1] = j;
         pixel[2] = 0;
-        ToFScalarType distance = (double)input->GetPixelValueByIndex(pixel);
+        mitk::ToFProcessingCommon::ToFScalarType distance = (double)input->GetPixelValueByIndex(pixel);
         mitk::Point3D currentPoint = 
-          mitk::ToFProcessingCommon::IndexToCartesianCoordinates(i,j,distance,m_CameraModel->GetFocalLength(),m_CameraModel->GetInterPixelDistance(),m_CameraModel->GetPrincipalPoint());
+          mitk::ToFProcessingCommon::IndexToCartesianCoordinates(i,j,distance,focalLength,m_InterPixelDistance,principalPoint);
 
         if (distance!=0)
         {

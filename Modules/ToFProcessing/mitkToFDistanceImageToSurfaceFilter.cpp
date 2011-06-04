@@ -18,8 +18,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkToFDistanceImageToSurfaceFilter.h>
 #include <mitkInstantiateAccessFunctions.h>
 #include <mitkSurface.h>
-#include <mitkPinholeCameraModel.h>
-#include <mitkToFProcessingCommon.h>
 
 #include <itkImage.h>
 
@@ -34,25 +32,29 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <math.h>
 
-mitk::ToFDistanceImageToSurfaceFilter::ToFDistanceImageToSurfaceFilter(): m_CameraModel(),
-m_TextureImageWidth(0), m_TextureImageHeight(0), m_IplScalarImage(NULL)
+mitk::ToFDistanceImageToSurfaceFilter::ToFDistanceImageToSurfaceFilter(): m_CameraIntrinsics(),
+m_TextureImageWidth(0), m_TextureImageHeight(0), m_IplScalarImage(NULL), m_InterPixelDistance()
 {
-  m_CameraModel = mitk::PinholeCameraModel::New();
+  m_InterPixelDistance.Fill(0.045);
+  m_CameraIntrinsics = mitk::CameraIntrinsics::New();
+  m_CameraIntrinsics->SetFocalLength(295.78960196187319,296.1255427948447);
+  m_CameraIntrinsics->SetPrincipalPoint(113.29063841714108,97.243216122015184);
+  m_CameraIntrinsics->SetDistorsionCoeffs(-0.36874385358645773f,-0.14339503290129013,0.0033210108720361795,-0.004277703352074105);
 }
 
 mitk::ToFDistanceImageToSurfaceFilter::~ToFDistanceImageToSurfaceFilter()
 {
 }
 
-void mitk::ToFDistanceImageToSurfaceFilter::SetInput( Image* distanceImage, mitk::PinholeCameraModel::Pointer CameraModel )
+void mitk::ToFDistanceImageToSurfaceFilter::SetInput( Image* distanceImage, mitk::CameraIntrinsics::Pointer cameraIntrinsics )
 {
-  this->SetCameraModel(CameraModel);
+  this->SetCameraIntrinsics(cameraIntrinsics);
   this->SetInput(0,distanceImage);
 }
 
-void mitk::ToFDistanceImageToSurfaceFilter::SetInput( unsigned int idx,  Image* distanceImage, mitk::PinholeCameraModel::Pointer CameraModel )
+void mitk::ToFDistanceImageToSurfaceFilter::SetInput( unsigned int idx,  Image* distanceImage, mitk::CameraIntrinsics::Pointer cameraIntrinsics )
 {
-  this->SetCameraModel(CameraModel);
+  this->SetCameraIntrinsics(cameraIntrinsics);
   this->SetInput(idx,distanceImage);
 }
 
@@ -138,11 +140,15 @@ void mitk::ToFDistanceImageToSurfaceFilter::GenerateData()
 
       unsigned int pixelID = pixel[0]+pixel[1]*yDimension;
 
-      ToFScalarType distance = (double)inputFloatData[pixelID];
-      //ToFScalarType distance = input->GetPixelValueByIndex(pixel); //TODO: float array zugriff
+      mitk::ToFProcessingCommon::ToFScalarType distance = (double)inputFloatData[pixelID];
+
+      mitk::ToFProcessingCommon::ToFScalarType focalLength = (m_CameraIntrinsics->GetFocalLengthX()*m_InterPixelDistance[0]+m_CameraIntrinsics->GetFocalLengthY()*m_InterPixelDistance[1])/2.0;
+      mitk::ToFProcessingCommon::ToFPoint2D principalPoint;
+      principalPoint[0] = m_CameraIntrinsics->GetPrincipalPointX();
+      principalPoint[1] = m_CameraIntrinsics->GetPrincipalPointY();
 
       mitk::ToFProcessingCommon::ToFPoint3D cartesianCoordinates =
-          mitk::ToFProcessingCommon::IndexToCartesianCoordinates(i,j,distance,m_CameraModel->GetFocalLength(),m_CameraModel->GetInterPixelDistance(),m_CameraModel->GetPrincipalPoint());
+          mitk::ToFProcessingCommon::IndexToCartesianCoordinates(i,j,distance,focalLength,m_InterPixelDistance,principalPoint);
 
       //TODO: why epsilon here and what value should it have?
 //      if (cartesianCoordinates[2] == 0)

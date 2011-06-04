@@ -64,7 +64,7 @@ The structure is the following (from \ref ExampleA) :
 \endcode
 
 The identification numbers (ID) inside a state machine has to be unique. Each state machine has to have one state, that is defined as the start-state of that state machine. This means, initially, the current state of the state machine is the start-state. 
-The Event-Ids seen above are also defined in the statemachine.xml file. They specify a unique number for a combination of input-conditions (key, mouse and so on). See \ref Events for further informations.
+The Event-Ids seen above are also defined in the statemachine.xml file. They specify a unique number for a combination of input-conditions (key, mouse and so on). See \ref InteractionEvents for further informations.
 
 So a state machine is defined through a few lines of xml-code, which is loaded at runtime. This allows us to change the sequence in interaction in the xml-file and restart the application, where the changes are applied right away. 
 The definition of one single state machine is called the \a statemachine-pattern. Since this pattern is build up during startup with objects (states, transitions and actions) and these objects only hold information about what interaction may be done at the current state, we can also reuse the pattern. 
@@ -80,7 +80,7 @@ During startup all state machine-patterns are checked for not having states, tha
 
 See mitk::StateMachineFactory
 
-\subsection Events Events
+\subsection InteractionEvents Events
 During runtime, events are thrown from e.g. the mouse to the operation system, are then send to your graphical user interface and from there it has to be send to the MITK-object called \a mitkEventMapper. This class maps the events received with an internal list of all events that can be understood in MITK. The definition of all understandable events is also located in the XML-File the state machines are defined in. If the received event can be found in the list, an internal mitk-eventnumber is added to the event and send to the object \a mitkGlobalInteraction. 
 
 See mitk::Event, mitk::GlobalInteraction

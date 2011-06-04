@@ -1197,8 +1197,21 @@ int TiXmlAttribute::QueryIntValue( int* ival ) const
 
 int TiXmlAttribute::QueryDoubleValue( double* dval ) const
 {
+	//save old locale
+	char * oldLocale;
+	oldLocale = setlocale( LC_ALL, 0 );
+
+	//set new locale
+	setlocale( LC_ALL, "C" );
+
 	if ( TIXML_SSCANF( value.c_str(), "%lf", dval ) == 1 )
+	{
+		//restore locale
+		setlocale( LC_ALL, oldLocale );
 		return TIXML_SUCCESS;
+	}
+	//restore locale
+	setlocale( LC_ALL, oldLocale );
 	return TIXML_WRONG_TYPE;
 }
 
@@ -1216,12 +1229,24 @@ void TiXmlAttribute::SetIntValue( int _value )
 void TiXmlAttribute::SetDoubleValue( double _value )
 {
 	char buf [256];
+
+	//save old locale
+	char * oldLocale;
+	oldLocale = setlocale( LC_ALL, 0 );
+
+	//set new locale
+	setlocale( LC_ALL, "C" );
+
 	#if defined(TIXML_SNPRINTF)		
 		TIXML_SNPRINTF( buf, sizeof(buf), "%g", _value);
 	#else
 		sprintf (buf, "%g", _value);
 	#endif
 	SetValue (buf);
+
+	//restore locale
+	setlocale( LC_ALL, oldLocale );
+
 }
 
 int TiXmlAttribute::IntValue() const

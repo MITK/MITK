@@ -22,6 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkNavigationDataToNavigationDataFilter.h"
 #include "mitkNavigationData.h"
 #include "mitkBaseData.h"
+#include "mitkTransform.h"
 #include "itkQuaternionRigidTransform.h"
 
 namespace mitk {
@@ -36,7 +37,7 @@ namespace mitk {
   *
   * \ingroup IGT
   */
-  class MitkIGT_EXPORT NavigationDataHandEyeCalibrationFilter : public NavigationDataToNavigationDataFilter
+  class mitkCameraCalibration_EXPORT NavigationDataHandEyeCalibrationFilter : public NavigationDataToNavigationDataFilter
   {
   public:
     mitkClassMacro(NavigationDataHandEyeCalibrationFilter, NavigationDataToNavigationDataFilter);
@@ -64,7 +65,7 @@ namespace mitk {
     * \param handEyeTransform transformation of a previously performed hand-eye calibration corresponding to the NavigationData
     *                         at index
     */
-    void SetHandEyeTransformation(unsigned int index, QuaternionRigidTransformType::Pointer handEyeTransform);
+    void SetHandEyeTransformation(unsigned int index, Transform::Pointer handEyeTransform);
     /*
     * \brief Transfer the information from the input to the associated BaseData
     */
@@ -89,7 +90,7 @@ namespace mitk {
     /** 
     * \brief Map of the hand-eye transformations that should be applied to the BaseDatas 
     */
-    std::map<int,QuaternionRigidTransformType::Pointer> m_HandEyeTransformations;
+    std::map<int,Transform::Pointer> m_HandEyeTransformations;
   };
 } // namespace mitk
 #endif /* MITKNavigationDataHandEyeCalibrationFilter_H_HEADER_INCLUDED_ */

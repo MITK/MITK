@@ -3,5 +3,6 @@ SET(CPP_FILES
  mitkTransform.cpp
  mitkCameraIntrinsics.cpp
  mitkXMLSerializable.cpp
+ mitkNavigationDataHandEyeCalibrationFilter.cpp
 )
 

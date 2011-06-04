@@ -37,7 +37,7 @@ void mitk::NavigationDataHandEyeCalibrationFilter::SetObjectToTransform(unsigned
   m_ObjectsToTransform[index] = data;
 }
 
-void mitk::NavigationDataHandEyeCalibrationFilter::SetHandEyeTransformation(unsigned int index, QuaternionRigidTransformType::Pointer handEyeTransformation)
+void mitk::NavigationDataHandEyeCalibrationFilter::SetHandEyeTransformation(unsigned int index, mitk::Transform::Pointer handEyeTransformation)
 {
   m_HandEyeTransformations[index] = handEyeTransformation;
 }
@@ -69,10 +69,15 @@ void mitk::NavigationDataHandEyeCalibrationFilter::GenerateData()
       continue;
     }
     // get the transformation of the hand-eye calibration for current input index
-    QuaternionRigidTransformType::Pointer handEyeTransform = m_HandEyeTransformations[index];
-    if (!handEyeTransform)
+    QuaternionRigidTransformType::Pointer handEyeTransform = QuaternionRigidTransformType::New();;
+    if (!m_HandEyeTransformations[index])
     {
       continue;
+    }
+    else
+    {
+      handEyeTransform->SetRotation(m_HandEyeTransformations[index]->GetOrientation());
+      handEyeTransform->SetOffset(m_HandEyeTransformations[index]->GetPosition().GetVectorFromOrigin());
     }
     // get the transformation of the current navigation data
     QuaternionRigidTransformType::Pointer ndTransform = QuaternionRigidTransformType::New();

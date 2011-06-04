@@ -15,7 +15,6 @@ SET(CPP_FILES
   IGTFilters/mitkNavigationDataToNavigationDataFilter.cpp
   IGTFilters/mitkNavigationDataToOpenGLFilter.cpp
   IGTFilters/mitkNavigationDataToPointSetFilter.cpp
-  IGTFilters/mitkNavigationDataHandEyeCalibrationFilter.cpp
 
   IGTFilters/mitkTrackingDeviceSource.cpp
   IGTFilters/mitkTrackingVolumeGenerator.cpp

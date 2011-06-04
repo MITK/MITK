@@ -32,9 +32,6 @@ namespace mitk
     m_CurrentOpenCVIntensityImage = NULL;
     m_CurrentOpenCVAmplitudeImage = NULL;
     m_CurrentOpenCVDistanceImage = NULL;
-    m_CurrentMITKIntensityImage = NULL;
-    m_CurrentMITKAmplitudeImage = NULL;
-    m_CurrentMITKDistanceImage = NULL;
     m_ImageType = 0;
     m_ImageDepth = IPL_DEPTH_32F;
     m_ImageGrabber = NULL;
@@ -48,31 +45,41 @@ namespace mitk
   {
     m_ImageGrabber->Update();
     unsigned int numOfPixel = m_ImageGrabber->GetCaptureWidth()*m_ImageGrabber->GetCaptureHeight();
-    // get current images
-    int requiredImageSequence = 0;
-    int deliveredImageSequence = 0;
-    m_CurrentMITKIntensityImage = m_ImageGrabber->GetOutput(2);
-    m_CurrentMITKAmplitudeImage = m_ImageGrabber->GetOutput(1);
-    m_CurrentMITKDistanceImage = m_ImageGrabber->GetOutput(0);
+    // copy current mitk images
+    unsigned int dimensions[4];
+    dimensions[0] = this->m_ImageGrabber->GetCaptureWidth();
+    dimensions[1] = this->m_ImageGrabber->GetCaptureHeight();
+    dimensions[2] = 1;
+    dimensions[3] = 1;
+    mitk::Image::Pointer currentMITKIntensityImage = mitk::Image::New();
+    currentMITKIntensityImage->Initialize(mitk::PixelType(typeid(float)), 2, dimensions);
+    currentMITKIntensityImage->SetSlice((float*)m_ImageGrabber->GetOutput(2)->GetSliceData()->GetData(),0,0,0);
+    mitk::Image::Pointer currentMITKAmplitudeImage = mitk::Image::New();
+    currentMITKAmplitudeImage->Initialize(mitk::PixelType(typeid(float)), 2, dimensions);
+    currentMITKAmplitudeImage->SetSlice((float*)m_ImageGrabber->GetOutput(1)->GetSliceData()->GetData(),0,0,0);
+    mitk::Image::Pointer currentMITKDistanceImage = mitk::Image::New();
+    currentMITKDistanceImage->Initialize(mitk::PixelType(typeid(float)), 2, dimensions);    
+    currentMITKDistanceImage->SetSlice((float*)m_ImageGrabber->GetOutput(0)->GetSliceData()->GetData(),0,0,0);
+    // copy mitk images to OpenCV images
     if (m_ImageDepth==IPL_DEPTH_32F)
     {
       if (m_ImageType==1)
       {
-        float* amplitudeFloatData = (float*)m_CurrentMITKAmplitudeImage->GetSliceData(0, 0, 0)->GetData();
+        float* amplitudeFloatData = (float*)currentMITKAmplitudeImage->GetSliceData(0, 0, 0)->GetData();
         memcpy(m_CurrentOpenCVAmplitudeImage->imageData,(unsigned char*)amplitudeFloatData,numOfPixel*sizeof(float));
         cv::Mat image(m_CurrentOpenCVAmplitudeImage);
         return image;
       }
       else if (m_ImageType==2)
       {
-        float* intensityFloatData = (float*)m_CurrentMITKIntensityImage->GetSliceData(0, 0, 0)->GetData();
+        float* intensityFloatData = (float*)currentMITKIntensityImage->GetSliceData(0, 0, 0)->GetData();
         memcpy(m_CurrentOpenCVIntensityImage->imageData,(unsigned char*)intensityFloatData,numOfPixel*sizeof(float));
         cv::Mat image(m_CurrentOpenCVIntensityImage);
         return image;
       }
       else
       {
-        float* distanceFloatData = (float*)m_CurrentMITKDistanceImage->GetSliceData(0, 0, 0)->GetData();
+        float* distanceFloatData = (float*)currentMITKDistanceImage->GetSliceData(0, 0, 0)->GetData();
         memcpy(m_CurrentOpenCVDistanceImage->imageData,(unsigned char*)distanceFloatData,numOfPixel*sizeof(float));
         cv::Mat image(m_CurrentOpenCVDistanceImage);
         return image;
@@ -82,19 +89,19 @@ namespace mitk
     {
       if (m_ImageType==1)
       {
-        this->MapScalars(m_CurrentMITKAmplitudeImage, m_CurrentOpenCVAmplitudeImage);
+        this->MapScalars(currentMITKAmplitudeImage, m_CurrentOpenCVAmplitudeImage);
         cv::Mat image(m_CurrentOpenCVAmplitudeImage);
         return image;
       }
       else if (m_ImageType==2)
       {
-        this->MapScalars(m_CurrentMITKIntensityImage, m_CurrentOpenCVIntensityImage);
+        this->MapScalars(currentMITKIntensityImage, m_CurrentOpenCVIntensityImage);
         cv::Mat image(m_CurrentOpenCVIntensityImage);
         return image;
       }
       else
       {
-        this->MapScalars(m_CurrentMITKDistanceImage, m_CurrentOpenCVDistanceImage);
+        this->MapScalars(currentMITKDistanceImage, m_CurrentOpenCVDistanceImage);
         cv::Mat image(m_CurrentOpenCVDistanceImage);
         return image;
       }
@@ -114,18 +121,6 @@ namespace mitk
   void ToFOpenCVImageGrabber::SetToFImageGrabber(ToFImageGrabber::Pointer imageGrabber)
   {
     m_ImageGrabber = imageGrabber;
-    // initialize mitk images
-    unsigned int dimensions[4];
-    dimensions[0] = this->m_ImageGrabber->GetCaptureWidth();
-    dimensions[1] = this->m_ImageGrabber->GetCaptureHeight();
-    dimensions[2] = 1;
-    dimensions[3] = 1;
-    m_CurrentMITKIntensityImage = mitk::Image::New();
-    m_CurrentMITKIntensityImage->Initialize(mitk::PixelType(typeid(float)), 2, dimensions);
-    m_CurrentMITKAmplitudeImage = mitk::Image::New();
-    m_CurrentMITKAmplitudeImage->Initialize(mitk::PixelType(typeid(float)), 2, dimensions);
-    m_CurrentMITKDistanceImage = mitk::Image::New();
-    m_CurrentMITKDistanceImage->Initialize(mitk::PixelType(typeid(float)), 2, dimensions);
 
     //initialize OpenCV images
     m_CurrentOpenCVIntensityImage = cvCreateImage(cvSize(m_ImageGrabber->GetCaptureWidth(), m_ImageGrabber->GetCaptureHeight()), m_ImageDepth, 1);

@@ -94,9 +94,6 @@ namespace mitk
     Warning: Changing from default (IPL_DEPTH_32F) results in a mapping of the pixel value through a lookup table
     */
     unsigned int m_ImageDepth; 
-    mitk::Image::Pointer m_CurrentMITKIntensityImage; ///< MITK image holding the current intensity data
-    mitk::Image::Pointer m_CurrentMITKAmplitudeImage; ///< MITK image holding the current amplitude data
-    mitk::Image::Pointer m_CurrentMITKDistanceImage; ///< MITK image holding the current distance data
     IplImage* m_CurrentOpenCVIntensityImage; ///< OpenCV image holding the current intensity data
     IplImage* m_CurrentOpenCVAmplitudeImage; ///< OpenCV image holding the current amplitude data
     IplImage* m_CurrentOpenCVDistanceImage; ///< OpenCV image holding the current distance data

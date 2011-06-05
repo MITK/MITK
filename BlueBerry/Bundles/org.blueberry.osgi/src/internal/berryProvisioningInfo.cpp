@@ -209,7 +209,18 @@ QString ProvisioningInfo::substituteKeywords(const QString& value) const
 #ifdef CMAKE_INTDIR
   // Strip the intermediate dir from the application path
   QString intDir(CMAKE_INTDIR);
-  appPath.chop(intDir.size()+1);
+  if (appPath.endsWith(intDir))
+  {
+    appPath.chop(intDir.size()+1);
+  }
+#endif
+  
+#ifdef _WIN32
+  if (value.contains("@EXECUTABLE_DIR") && value.contains("blueberry_osgi"))
+  {
+    // special case for org_blueberry_osgi in install trees for Windows
+    return QString(value).replace("@EXECUTABLE_DIR", appPath, Qt::CaseInsensitive).replace("plugins/", "");
+  }
 #endif
 
   return QString(value).replace("@EXECUTABLE_DIR", appPath, Qt::CaseInsensitive);

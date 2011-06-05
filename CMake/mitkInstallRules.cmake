@@ -33,13 +33,15 @@ if(WIN32)
   endif()
   
   #BlueBerry
+  # Since this file is also included from external projects, you
+  # can only use variables which are made available through MITKConfig.cmake
   if(MITK_USE_BLUEBERRY)
     if(MINGW)
-      MITK_INSTALL(FILES ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/plugins/liborg_blueberry_osgi.dll)
+      MITK_INSTALL(FILES ${MITK_BINARY_DIR}/bin/plugins/liborg_blueberry_osgi.dll)
     else()
       if(NOT APPLE)
-        MITK_INSTALL(FILES ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/plugins/debug/liborg_blueberry_osgi.dll CONFIGURATIONS Debug)
-        MITK_INSTALL(FILES ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/plugins/release/liborg_blueberry_osgi.dll CONFIGURATIONS Release)
+        MITK_INSTALL(FILES ${MITK_BINARY_DIR}/bin/plugins/debug/liborg_blueberry_osgi.dll CONFIGURATIONS Debug)
+        MITK_INSTALL(FILES ${MITK_BINARY_DIR}/bin/plugins/release/liborg_blueberry_osgi.dll CONFIGURATIONS Release)
       endif(NOT APPLE)
     endif()
   endif()

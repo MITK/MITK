@@ -34,7 +34,14 @@ if(WIN32)
   
   #BlueBerry
   if(MITK_USE_BLUEBERRY)
-    MITK_INSTALL(FILES ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/plugins/liborg_blueberry_osgi.dll)
+    if(MINGW)
+      MITK_INSTALL(FILES ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/plugins/liborg_blueberry_osgi.dll)
+    else()
+      if(NOT APPLE)
+        MITK_INSTALL(FILES ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/plugins/debug/liborg_blueberry_osgi.dll CONFIGURATIONS Debug)
+        MITK_INSTALL(FILES ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/plugins/release/liborg_blueberry_osgi.dll CONFIGURATIONS Release)
+      endif(NOT APPLE)
+    endif()
   endif()
   
   #MinGW dll

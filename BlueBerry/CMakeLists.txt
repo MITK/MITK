@@ -241,7 +241,7 @@ IF(BLUEBERRY_BUILD_TESTING)
   )
 
   SET(_ctk_test_plugins
-    Testing/org.blueberry.core.runtime.tests:ON
+#    Testing/org.blueberry.core.runtime.tests:ON
     Testing/org.blueberry.osgi.tests:ON
   )
   

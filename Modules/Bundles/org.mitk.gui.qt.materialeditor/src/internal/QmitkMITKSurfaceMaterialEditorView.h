@@ -51,7 +51,7 @@ PURPOSE.  See the above copyright notices for more information.
   \sa QmitkFunctionality
   \ingroup Functionalities
 */
-class QmitkMITKSurfaceMaterialEditorView : public QObject, public QmitkFunctionality
+class QmitkMITKSurfaceMaterialEditorView : public QmitkFunctionality
 {  
 
   // this is needed for all Qt objects that should have a MOC object (everything that derives from QObject)

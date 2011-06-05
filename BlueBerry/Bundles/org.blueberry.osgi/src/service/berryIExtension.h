@@ -18,9 +18,15 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef BERRYIEXTENSION_H_
 #define BERRYIEXTENSION_H_
 
-#include "berryIConfigurationElement.h"
+#include <org_blueberry_osgi_Export.h>
+
+#include <berrySmartPointer.h>
+
+#include <vector>
 
 namespace berry {
+
+struct IConfigurationElement;
 
 /**
  * An extension declared in a host.
@@ -42,7 +48,7 @@ struct BERRY_OSGI IExtension {
    *
    * @return the configuration elements declared by this extension 
    */
-  virtual const std::vector<IConfigurationElement::Pointer> GetConfigurationElements() const = 0;
+  virtual const std::vector<SmartPointer<IConfigurationElement> > GetConfigurationElements() const = 0;
   
   virtual std::string GetNamespace() const = 0;
   

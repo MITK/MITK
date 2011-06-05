@@ -19,7 +19,7 @@
 #ifndef BERRYQTWORKBENCHADVISOR_H_
 #define BERRYQTWORKBENCHADVISOR_H_
 
-#include "../berryUiQtDll.h"
+#include <org_blueberry_ui_qt_Export.h>
 
 #include <berryWorkbenchAdvisor.h>
 

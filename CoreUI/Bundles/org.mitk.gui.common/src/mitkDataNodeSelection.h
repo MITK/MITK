@@ -21,7 +21,7 @@
 
 #include <berryIStructuredSelection.h>
 #include <mitkDataNode.h>
-#include "mitkGUICommonPluginDll.h"
+#include <org_mitk_gui_common_Export.h>
 
 
 namespace mitk {

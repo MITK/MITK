@@ -62,4 +62,6 @@ struct BERRY_UI IEditorMatchingStrategy : public Object {
 
 }
 
+Q_DECLARE_INTERFACE(berry::IEditorMatchingStrategy, "org.blueberry.IEditorMatchingStrategy")
+
 #endif /*BERRYIEDITORMATCHINGSTRATEGY_H_*/

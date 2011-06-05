@@ -17,7 +17,14 @@
 
 #include "berryStarter.h"
 
+#include <QCoreApplication>
+
 int main(int argc, char** argv)
 {
+  // Create a QCoreApplication instance first
+  QCoreApplication app(argc, argv);
+  app.setApplicationName("solstice");
+  app.setOrganizationName("DKFZ");
+
   return berry::Starter::Run(argc, argv, 0);
 }

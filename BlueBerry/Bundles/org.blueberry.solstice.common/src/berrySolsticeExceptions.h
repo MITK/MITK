@@ -19,7 +19,7 @@
 #ifndef BERRYSOLSTICEEXCEPTIONS_H_
 #define BERRYSOLSTICEEXCEPTIONS_H_
 
-#include "berryCommonRuntimeDll.h"
+#include <org_blueberry_solstice_common_Export.h>
 #include <Poco/Exception.h>
 
 namespace berry {

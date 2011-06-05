@@ -47,12 +47,25 @@ bool BundleUtility::IsReady(IBundle::Pointer bundle)
   return bundle && IsReady(bundle->GetState());
 }
 
+bool BundleUtility::IsReady(QSharedPointer<ctkPlugin> plugin)
+{
+  return !plugin.isNull() && IsReady(plugin->getState());
+}
+
 bool BundleUtility::IsReady(IBundle::State bundleState)
 {
   return (bundleState == IBundle::BUNDLE_RESOLVED ||
           bundleState == IBundle::BUNDLE_STARTING ||
           bundleState == IBundle::BUNDLE_ACTIVE ||
           bundleState == IBundle::BUNDLE_STOPPING);
+}
+
+bool BundleUtility::IsReady(ctkPlugin::State pluginState)
+{
+  return (pluginState == ctkPlugin::RESOLVED ||
+          pluginState == ctkPlugin::STARTING ||
+          pluginState == ctkPlugin::ACTIVE ||
+          pluginState == ctkPlugin::STOPPING);
 }
 
 bool BundleUtility::IsActive(const std::string& bundleId)
@@ -68,6 +81,19 @@ bool BundleUtility::IsActivated(const std::string& bundleId)
 bool BundleUtility::IsReady(const std::string& bundleId)
 {
   return IsReady(Platform::GetBundle(bundleId));
+}
+
+QSharedPointer<ctkPlugin> BundleUtility::FindPlugin(const QString& symbolicName)
+{
+  ctkPluginContext* context = WorkbenchPlugin::GetDefault()->GetPluginContext();
+  foreach (QSharedPointer<ctkPlugin> plugin, context->getPlugins())
+  {
+    if (plugin->getSymbolicName() == symbolicName)
+    {
+      return plugin;
+    }
+  }
+  return QSharedPointer<ctkPlugin>();
 }
 
 //void BundleUtility::Log(const std::string& bundleId,

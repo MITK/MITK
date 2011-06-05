@@ -41,7 +41,7 @@ namespace berry {
  *
  * \sa berry::QtViewPart
  */
-class ObjectBrowserView : public QObject, public berry::QtViewPart
+class ObjectBrowserView : public berry::QtViewPart
 {
   Q_OBJECT
 
@@ -50,6 +50,7 @@ public:
   static const std::string VIEW_ID;
 
   ObjectBrowserView();
+  ObjectBrowserView(const ObjectBrowserView& other);
 
   void Init(IViewSite::Pointer site, IMemento::Pointer memento);
 

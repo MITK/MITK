@@ -50,7 +50,7 @@ time slider. The result is also a 3D image.
 \ingroup Bundles
 */
 
-class BASICIMAGEPROCESSING_EXPORT QmitkBasicImageProcessing : public QObject, public QmitkFunctionality
+class BASICIMAGEPROCESSING_EXPORT QmitkBasicImageProcessing : public QmitkFunctionality
 {  
   Q_OBJECT
 

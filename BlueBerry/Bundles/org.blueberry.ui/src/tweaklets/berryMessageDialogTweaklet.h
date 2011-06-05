@@ -19,7 +19,7 @@
 #ifndef BERRYMESSAGEDIALOGTWEAKLET_H_
 #define BERRYMESSAGEDIALOGTWEAKLET_H_
 
-#include "../berryUiDll.h"
+#include <org_blueberry_ui_Export.h>
 #include "../berryShell.h"
 
 #include "../dialogs/berryIDialog.h"
@@ -155,5 +155,6 @@ struct BERRY_UI MessageDialogTweaklet : public Object
 
 }
 
+Q_DECLARE_INTERFACE(berry::MessageDialogTweaklet, "org.blueberry.MessageDialogTweaklet")
 
 #endif /* BERRYMESSAGEDIALOGTWEAKLET_H_ */

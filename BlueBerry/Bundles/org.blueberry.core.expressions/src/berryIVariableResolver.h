@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef BERRYIVARIABLERESOLVER_H_
 #define BERRYIVARIABLERESOLVER_H_
 
-#include "berryExpressionsDll.h"
+#include <org_blueberry_core_expressions_Export.h>
 
 namespace berry {
 

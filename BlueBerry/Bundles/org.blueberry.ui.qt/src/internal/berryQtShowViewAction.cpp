@@ -30,6 +30,7 @@ QtShowViewAction::QtShowViewAction(IWorkbenchWindow::Pointer window,
   this->setParent(static_cast<QWidget*>(window->GetShell()->GetControl()));
   this->setText(QString(desc->GetLabel().c_str()));
   this->setToolTip(QString(desc->GetLabel().c_str()));
+  this->setIconVisibleInMenu(true);
 
   QIcon* icon = static_cast<QIcon*>(desc->GetImageDescriptor()->CreateImage());
   this->setIcon(*icon);

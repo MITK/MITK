@@ -31,6 +31,15 @@
 namespace berry
 {
 
+QtWorkbenchPresentationFactory::QtWorkbenchPresentationFactory()
+{}
+
+QtWorkbenchPresentationFactory::QtWorkbenchPresentationFactory(
+  const QtWorkbenchPresentationFactory& other)
+{
+
+}
+
 StackPresentation::Pointer QtWorkbenchPresentationFactory::CreateEditorPresentation(
     void* parent, IStackPresentationSite::Pointer site)
 {

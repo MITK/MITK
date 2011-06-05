@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef BERRYIPARTSERVICE_H_
 #define BERRYIPARTSERVICE_H_
 
-#include "berryUiDll.h"
+#include <org_blueberry_ui_Export.h>
 
 #include "berryIWorkbenchPart.h"
 #include "berryIWorkbenchPartReference.h"

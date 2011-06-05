@@ -19,12 +19,14 @@
 #ifndef BERRYISOURCEPROVIDER_H_
 #define BERRYISOURCEPROVIDER_H_
 
-#include "berryUiDll.h"
+#include <org_blueberry_ui_Export.h>
 #include "berryISourceProviderListener.h"
 
 #include <map>
 #include <vector>
 #include <string>
+
+#include <QObject>
 
 namespace berry {
 
@@ -98,5 +100,7 @@ struct BERRY_UI ISourceProvider : public virtual Object {
 };
 
 }
+
+Q_DECLARE_INTERFACE(berry::ISourceProvider, "org.blueberry.ISourceProvider")
 
 #endif /* BERRYISOURCEPROVIDER_H_ */

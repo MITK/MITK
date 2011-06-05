@@ -43,7 +43,7 @@ class QmitkToolDistanceWidget;
  *
  * \sa QmitkFunctionality
  */
-class QmitkToolPairNavigationView : public QObject, public QmitkFunctionality
+class QmitkToolPairNavigationView : public QmitkFunctionality
 {
 
   // this is needed for all Qt objects that should have a MOC object (everything that derives from QObject)

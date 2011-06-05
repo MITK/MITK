@@ -58,6 +58,7 @@ std::string Platform::ARG_APPLICATION = "BlueBerry.application";
 std::string Platform::ARG_HOME = "BlueBerry.home";
 std::string Platform::ARG_PLUGIN_CACHE = "BlueBerry.plugin_cache_dir";
 std::string Platform::ARG_PLUGIN_DIRS = "BlueBerry.plugin_dirs";
+std::string Platform::ARG_PROVISIONING = "BlueBerry.provisioning";
 std::string Platform::ARG_CONSOLELOG = "BlueBerry.consoleLog";
 std::string Platform::ARG_TESTPLUGIN = "BlueBerry.testplugin";
 std::string Platform::ARG_TESTAPPLICATION = "BlueBerry.testapplication";
@@ -185,6 +186,24 @@ ServiceRegistry& Platform::GetServiceRegistry()
 IBundle::Pointer Platform::GetBundle(const std::string& id)
 {
   return InternalPlatform::GetInstance()->GetBundle(id);
+}
+
+std::vector<IBundle::Pointer> Platform::GetBundles()
+{
+  return InternalPlatform::GetInstance()->GetBundles();
+}
+
+QSharedPointer<ctkPlugin> Platform::GetCTKPlugin(const QString& symbolicName)
+{
+  QList<QSharedPointer<ctkPlugin> > plugins =
+      InternalPlatform::GetInstance()->GetCTKPluginFrameworkContext()->getPlugins();
+
+  foreach(QSharedPointer<ctkPlugin> plugin, plugins)
+  {
+    if (plugin->getSymbolicName() == symbolicName)
+      return plugin;
+  }
+  return QSharedPointer<ctkPlugin>(0);
 }
 
 }

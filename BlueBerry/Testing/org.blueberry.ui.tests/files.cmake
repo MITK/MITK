@@ -1,5 +1,19 @@
+SET(MOC_H_FILES
+  src/berryPluginActivator.h
+  src/berryUiTestSuite.h
+  
+  src/api/berryMockViewPart.h
+  src/api/berrySaveableMockViewPart.h
+)
+
+SET(CACHED_RESOURCE_FILES
+  plugin.xml
+  icons/view.gif
+)
+
 SET(SRC_CPP_FILES
 
+  berryPluginActivator.cpp
   berryUiTestSuite.cpp
 
   # API Tests
@@ -19,12 +33,7 @@ SET(INTERNAL_CPP_FILES
   
 )
 
-SET(CPP_FILES manifest.cpp)
-
-SET(RESOURCE_FILES
-
-  icons/view.gif
-)
+SET(CPP_FILES )
 
 foreach(file ${SRC_CPP_FILES})
   SET(CPP_FILES ${CPP_FILES} src/${file})

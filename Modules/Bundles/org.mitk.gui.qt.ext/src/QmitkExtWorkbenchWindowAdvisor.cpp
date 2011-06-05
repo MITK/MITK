@@ -56,6 +56,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 // UGLYYY
 #include "internal/QmitkExtWorkbenchWindowAdvisorHack.h"
+#include "internal/QmitkCommonExtPlugin.h"
 #include "mitkUndoController.h"
 #include "mitkVerboseLimitedLinearUndo.h"
 #include <QToolBar>
@@ -66,6 +67,8 @@ PURPOSE.  See the above copyright notices for more information.
 QmitkExtWorkbenchWindowAdvisorHack
 * QmitkExtWorkbenchWindowAdvisorHack::undohack =
 new QmitkExtWorkbenchWindowAdvisorHack();
+
+QString QmitkExtWorkbenchWindowAdvisor::QT_SETTINGS_FILENAME = "QtSettings.ini";
 
 class PartListenerForTitle: public berry::IPartListener
 {
@@ -558,14 +561,7 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
  else
   delete qToolbar;
 
- Poco::Path path;
- berry::IBundle::Pointer bundle = berry::Platform::GetBundle("org.mitk.gui.qt.ext");
- berry::Platform::GetStatePath(path, bundle);
-
- QString qPath = QString::fromStdString(path.toString());
- qPath.append("PreferencesQt.ini");
-
- QSettings settings(qPath, QSettings::IniFormat);
+ QSettings settings(GetQSettingsFile(), QSettings::IniFormat);
  mainWindow->restoreState(settings.value("ToolbarPosition").toByteArray());
 
 
@@ -957,16 +953,15 @@ std::vector<std::string> QmitkExtWorkbenchWindowAdvisor::GetPerspectiveExcludeLi
 
 void QmitkExtWorkbenchWindowAdvisor::PostWindowClose()
 {
- Poco::Path path;
- berry::IBundle::Pointer bundle = berry::Platform::GetBundle("org.mitk.gui.qt.ext");
- berry::Platform::GetStatePath(path, bundle);
+  berry::IWorkbenchWindow::Pointer window = this->GetWindowConfigurer()->GetWindow();
+  QMainWindow* mainWindow = static_cast<QMainWindow*> (window->GetShell()->GetControl());
 
- QString qPath = QString::fromStdString(path.toString());
- qPath.append("PreferencesQt.ini");
+  QSettings settings(GetQSettingsFile(), QSettings::IniFormat);
+  settings.setValue("ToolbarPosition", mainWindow->saveState());
+}
 
- berry::IWorkbenchWindow::Pointer window = this->GetWindowConfigurer()->GetWindow();
- QMainWindow* mainWindow = static_cast<QMainWindow*> (window->GetShell()->GetControl());
-
- QSettings settings(qPath, QSettings::IniFormat);
- settings.setValue("ToolbarPosition", mainWindow->saveState());
+QString QmitkExtWorkbenchWindowAdvisor::GetQSettingsFile() const
+{
+  QFileInfo settingsInfo = QmitkCommonExtPlugin::getContext()->getDataFile(QT_SETTINGS_FILENAME);
+  return settingsInfo.canonicalFilePath();
 }

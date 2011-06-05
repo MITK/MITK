@@ -28,6 +28,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <typeinfo>
 #include <map>
 
+#include <QStringList>
+
 #include "event/berryBundleEvents.h"
 #include "berryIBundleActivator.h"
 
@@ -70,6 +72,8 @@ private:
 
   bool m_ConsoleLog;
 
+  QStringList installedCTKPlugins;
+
   IBundleActivator* LoadActivator(BundleInfo& bundleInfo);
 
   friend class InternalPlatform;
@@ -82,11 +86,15 @@ public:
   BundleLoader(CodeCache* codeCache, Poco::Logger& logger); //, BundleFactory* bundleFactory, BundleContextFactory* bundleContextFactory);
   virtual ~BundleLoader();
 
+  void SetCTKPlugins(const QStringList& installedCTKPlugins);
+
   SmartPointer<IBundleContext> GetContextForBundle(IBundle::ConstPointer bundle);
   Bundle::Pointer CreateBundle(const Poco::Path& path);
 
   BundleEvents& GetEvents();
   IBundle::Pointer FindBundle(const std::string& symbolicName);
+
+  std::vector<IBundle::Pointer> GetBundles() const;
 
   Bundle::Pointer LoadBundle(const Poco::Path& path);
   void LoadBundle(Bundle::Pointer bundle);

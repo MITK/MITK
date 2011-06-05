@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "internal/berryPropertyTesterDescriptor.h"
 
-#include "berryExpressionsDll.h"
+#include <org_blueberry_core_expressions_Export.h>
 
 #include <string>
 

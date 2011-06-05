@@ -3,7 +3,7 @@
 
 #include <string>
 
-#include "berryUiDll.h"
+#include <org_blueberry_ui_Export.h>
 
 namespace berry
 {

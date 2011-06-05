@@ -1,7 +1,7 @@
 #ifndef BERRYIPREFERENCES_H_
 #define BERRYIPREFERENCES_H_
 
-#include "berryRuntimeDll.h"
+#include <org_blueberry_core_runtime_Export.h>
 #include "berryObject.h"
 #include "berryBackingStoreException.h"
 

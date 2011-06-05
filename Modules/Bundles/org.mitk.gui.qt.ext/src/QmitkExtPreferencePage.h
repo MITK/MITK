@@ -26,8 +26,10 @@ PURPOSE.  See the above copyright notices for more information.
 class QWidget;
 class QCheckBox;
 
-class QmitkExtPreferencePage : public berry::IQtPreferencePage
+class QmitkExtPreferencePage : public QObject, public berry::IQtPreferencePage
 {
+  Q_OBJECT
+  Q_INTERFACES(berry::IPreferencePage)
 
 public:
 
@@ -35,6 +37,8 @@ public:
   * Default constructor
   */
   QmitkExtPreferencePage();
+
+  QmitkExtPreferencePage(const QmitkExtPreferencePage& other);
 
   /**
   * @see berry::IPreferencePage::Init(berry::IWorkbench::Pointer workbench)

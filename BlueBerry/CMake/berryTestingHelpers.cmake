@@ -16,6 +16,9 @@ MACRO(MACRO_TEST_PLUGIN)
     ENDIF()
   ENDIF()
 
+  IF(NOT BUNDLE-SYMBOLICNAME)
+    STRING(REPLACE "_" "." BUNDLE-SYMBOLICNAME ${PROJECT_NAME})
+  ENDIF()
   ADD_TEST(${BUNDLE-SYMBOLICNAME} ${BLUEBERRY_TEST_APP} ${_cla_switch}BlueBerry.application=coretestapplication ${_cla_switch}BlueBerry.testplugin=${BUNDLE-SYMBOLICNAME})
   
   SET(_labels ${ARGN})
@@ -28,7 +31,7 @@ ENDMACRO(MACRO_TEST_PLUGIN)
 
 # Variables:
 #
-# - BLUEBERRY_TEST_APP contains the name of the executable which will start the OSGi framework
+# - BLUEBERRY_UI_TEST_APP contains the name of the executable which will start the OSGi framework
 # - BLUEBERRY_TEST_APP_ID contains the application id of the application to test. If empty,
 #                          a minimalistic default application will be started
 MACRO(MACRO_TEST_UIPLUGIN)
@@ -42,6 +45,10 @@ MACRO(MACRO_TEST_UIPLUGIN)
     ENDIF()
   ENDIF()
 
+  IF(NOT BUNDLE-SYMBOLICNAME)
+    STRING(REPLACE "_" "." BUNDLE-SYMBOLICNAME ${PROJECT_NAME})
+  ENDIF()
+  
   IF(BLUEBERRY_ENABLE_GUI_TESTING)
     IF(BLUEBERRY_TEST_APP_ID)
       SET(_app_id_arg "${_cla_switch}BlueBerry.testapplication=${BLUEBERRY_TEST_APP_ID}")
@@ -49,7 +56,7 @@ MACRO(MACRO_TEST_UIPLUGIN)
       SET(_app_id_arg )
     ENDIF()
         
-    ADD_TEST(${BUNDLE-SYMBOLICNAME} ${BLUEBERRY_TEST_APP} ${_cla_switch}BlueBerry.application=uitestapplication ${_app_id_arg} ${_cla_switch}BlueBerry.testplugin=${BUNDLE-SYMBOLICNAME})
+    ADD_TEST(${BUNDLE-SYMBOLICNAME} ${BLUEBERRY_UI_TEST_APP} ${_cla_switch}BlueBerry.application=uitestapplication ${_app_id_arg} ${_cla_switch}BlueBerry.testplugin=${BUNDLE-SYMBOLICNAME})
     
     SET(_labels ${ARGN})
     IF(NOT _labels)

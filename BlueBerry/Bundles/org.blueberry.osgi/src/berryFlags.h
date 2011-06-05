@@ -19,7 +19,7 @@
 #ifndef BERRYFLAGS_H_
 #define BERRYFLAGS_H_
 
-#include "berryOSGiDll.h"
+#include <org_blueberry_osgi_Export.h>
 
 namespace berry {
 

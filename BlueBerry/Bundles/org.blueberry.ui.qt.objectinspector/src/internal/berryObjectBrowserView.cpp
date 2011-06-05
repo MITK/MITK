@@ -49,6 +49,14 @@ ObjectBrowserView::ObjectBrowserView() :
 #endif
 }
 
+ObjectBrowserView::ObjectBrowserView(const ObjectBrowserView& other)
+  : m_ActionToggleBreakpoint(this), m_ActionEnableBreakpoint(this),
+    m_ActionDisableBreakpoint(this)
+{
+  Q_UNUSED(other)
+  throw std::runtime_error("Copy constructor not implemented");
+}
+
 void ObjectBrowserView::Init(IViewSite::Pointer site, IMemento::Pointer memento)
 {
   QtViewPart::Init(site, memento);

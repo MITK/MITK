@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef BERRYPLATFORMUI_H_
 #define BERRYPLATFORMUI_H_
 
-#include "berryUiDll.h"
+#include <org_blueberry_ui_Export.h>
 
 #include "berryDisplay.h"
 #include "application/berryWorkbenchAdvisor.h"

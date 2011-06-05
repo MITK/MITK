@@ -5,9 +5,9 @@ SET(SRC_CPP_FILES
   QmitkFileOpenAction.cpp
   QmitkFileExitAction.cpp
   QmitkFunctionality.cpp
+  QmitkFunctionality2.cpp
   QmitkStatusBar.cpp
   QmitkStdMultiWidgetEditor.cpp
-  QmitkGeneralPreferencePage.cpp
   QmitkPreferencesDialog.cpp
   QmitkFunctionalityCoordinator.cpp
 )
@@ -15,6 +15,7 @@ SET(SRC_CPP_FILES
 SET(INTERNAL_CPP_FILES
   QmitkDataNodeSelection.cpp
   QmitkCommonActivator.cpp
+  QmitkFunctionalityUtil.cpp
 )
 
 SET(MOC_H_FILES
@@ -22,15 +23,22 @@ SET(MOC_H_FILES
   src/QmitkFileOpenAction.h
   src/QmitkFileExitAction.h
   src/QmitkPreferencesDialog.h
+  src/QmitkStdMultiWidgetEditor.h
   src/QmitkDnDFrameWidget.h
+  
+  src/internal/QmitkCommonActivator.h
+)
+
+SET(CACHED_RESOURCE_FILES
+  plugin.xml
 )
 
 # todo: add some qt style sheet resources
-SET(RES_FILES
+SET(QRC_FILES
   resources/resources.qrc
 )
 
-SET(CPP_FILES manifest.cpp)
+SET(CPP_FILES )
 
 foreach(file ${SRC_CPP_FILES})
   SET(CPP_FILES ${CPP_FILES} src/${file})

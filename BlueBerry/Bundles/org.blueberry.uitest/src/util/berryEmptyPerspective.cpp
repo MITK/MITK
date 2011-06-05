@@ -26,6 +26,16 @@ const std::string EmptyPerspective::PERSP_ID =
 const std::string EmptyPerspective::PERSP_ID2 =
     "org.blueberry.uitest.util.EmptyPerspective2";
 
+EmptyPerspective::EmptyPerspective()
+{
+
+}
+
+EmptyPerspective::EmptyPerspective(const EmptyPerspective& other)
+{
+  Q_UNUSED(other)
+}
+
 std::string EmptyPerspective::GetLastPerspective()
 {
   return LastPerspective;
@@ -34,11 +44,6 @@ std::string EmptyPerspective::GetLastPerspective()
 void EmptyPerspective::SetLastPerspective(const std::string& perspId)
 {
   LastPerspective = perspId;
-}
-
-EmptyPerspective::EmptyPerspective()
-{
-
 }
 
 void EmptyPerspective::CreateInitialLayout(IPageLayout::Pointer layout)

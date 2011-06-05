@@ -36,8 +36,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <berryIPreferencesService.h>
 
 #include <mitkDataStorage.h>
-#include "mitkQtCommonDll.h"
-#include "mitkQtDataManagerDll.h"
+#include <org_mitk_gui_qt_datamanager_Export.h>
 
 // Forward declarations
 class QMenu;
@@ -59,7 +58,7 @@ class QmitkDataStorageTreeModel;
 ///
 /// \TODO: complete PACS support, in save dialog show regular filename
 ///
-class MITK_QT_DATAMANAGER QmitkDataManagerView : public QObject, public berry::QtViewPart
+class MITK_QT_DATAMANAGER QmitkDataManagerView : public berry::QtViewPart
 {
   Q_OBJECT
 
@@ -70,6 +69,9 @@ public:
   /// \brief Standard ctor.
   ///
   QmitkDataManagerView();
+
+  QmitkDataManagerView(const QmitkDataManagerView& other);
+
   ///
   /// \brief Standard dtor.
   ///

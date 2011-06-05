@@ -22,6 +22,8 @@
 #include "berryIPreferences.h"
 #include "berryIWorkbench.h"
 
+#include <QObject>
+
 namespace berry
 {
 
@@ -100,5 +102,7 @@ struct IPreferencePage: virtual public Object
 };
 
 }
+
+Q_DECLARE_INTERFACE(berry::IPreferencePage, "org.blueberry.IPreferencePage")
 
 #endif /*BERRYIPREFERENCEPAGE_H_*/

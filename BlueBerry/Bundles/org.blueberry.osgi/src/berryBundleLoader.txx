@@ -35,7 +35,16 @@ template<class C>
 C* BundleLoader::LoadClass(const std::string& bundleName, const std::string& className, const std::string& manifestName)
 {
   BERRY_INFO(m_ConsoleLog) << "Trying to load class " << className << " with manifest name " << manifestName << " from bundle " << bundleName;
-  BundleInfo& bundleInfo = m_BundleMap[bundleName];
+
+  BundleMap::iterator bundleIter = m_BundleMap.find(bundleName);
+
+  if (bundleIter == m_BundleMap.end())
+  {
+    BERRY_INFO(m_ConsoleLog) << "This bundle is not a legacy BlueBerry bundle. Cannot load classes from it.";
+    return 0;
+  }
+
+  BundleInfo& bundleInfo = bundleIter->second;
 
   // check that bundle is started
   if (!bundleInfo.m_Bundle->IsStarted()) this->StartBundle(bundleInfo.m_Bundle);
@@ -57,7 +66,7 @@ C* BundleLoader::LoadClass(const std::string& bundleName, const std::string& cla
   if (!cl->isLibraryLoaded(libPath.toString()))
   {
     BERRY_INFO(m_ConsoleLog) << "Loading library: " << libPath.toString();
-    
+
     try {
     cl->loadLibrary(libPath.toString(), manifestName);
     }

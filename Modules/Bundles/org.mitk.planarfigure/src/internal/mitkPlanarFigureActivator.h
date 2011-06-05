@@ -19,12 +19,8 @@
 #ifndef MITKPLANARFIGUREACTIVATOR_H_ 
 #define MITKPLANARFIGUREACTIVATOR_H_ 
 
-#include <berryPlugin.h>
+#include <ctkPluginActivator.h>
 
-#include <mitkPlanarFigureDll.h>
-
-//#include <QSlider>
-//#include <QObject>
 
 namespace mitk
 {
@@ -36,21 +32,20 @@ namespace mitk
  *
  * When the plug-in is started by the framework, it initialzes planar figure specific things.
  */
-class ORG_MITK_PLANARFIGURE_EXPORT PlanarFigureActivator : 
-  /*public QObject, */public berry::Plugin
+class PlanarFigureActivator : 
+  public QObject, public ctkPluginActivator
 {
 
-  //Q_OBJECT
+  Q_OBJECT
+  Q_INTERFACES(ctkPluginActivator)
 
 public:
 
   /**
    * Registers sandbox core object factories.
    */
-  void Start(berry::IBundleContext::Pointer context);
-
-
-private:
+  void start(ctkPluginContext* context);
+  void stop(ctkPluginContext* context);
 
 };
 

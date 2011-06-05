@@ -19,35 +19,38 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKCOREEXTACTIVATOR_H_ 
 #define MITKCOREEXTACTIVATOR_H_ 
 
-#include <berryPlugin.h>
+#include <ctkPluginActivator.h>
 
-#include <mitkCoreExtDll.h>
+#include <org_mitk_core_ext_Export.h>
 
 namespace mitk
 {
   /**
-  * When the plug-in is started by the framework, it initializes CoreExt module itself. <br> 
-  * Furthermore through every other bundle, that is included in <code>mitk::CoreExtActivator::Start</code>,<br>
-  * another module will be activated in the process. This can be done by adding a method to <br>
-  * <code>mitk::CoreExtActivator::Start</code>,which initializes an Activator of the desired bundle.
-  * 
-  * E.g. <code>mitk::CoreExtActivator::StartInputDevicesModules</code>
-  *
-  * @brief The plug-in activator for the CoreExt module
+  * @brief The activator class for the org.mitk.core.ext plug-in.
   * @ingroup org_mitk_core_ext_internal
+  *
+  * When the plug-in is started by the framework, it calls a global function to initialize
+  * the mitkCoreExt module.
+  *
   */
-  class MITKCOREEXT_EXPORT CoreExtActivator : public berry::Plugin
+  class CoreExtActivator : public QObject, public ctkPluginActivator
   {
+    Q_OBJECT
+    Q_INTERFACES(ctkPluginActivator)
 
   public:
 
     /**
-    * Registers sandbox core object factories.
+    * Starts this plug-in and registers object factories.
     *
     * @param context 
-    *			the context for the bundle
+    *        The context for the plug-in.
     */
-    void Start(berry::IBundleContext::Pointer context);
+    void start(ctkPluginContext* context);
+    
+    void stop(ctkPluginContext* context);
+
+  private:
 
     /**
     * Activates the input device modules.

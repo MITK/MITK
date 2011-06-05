@@ -20,18 +20,21 @@
 #define QMITKDATAMANAGERHOTKEYSPREFPAGE_H_
 
 #include "berryIQtPreferencePage.h"
-#include "mitkQtDataManagerDll.h"
+#include <org_mitk_gui_qt_datamanager_Export.h>
 
 #include <map>
 #include <QWidget>
 
 class QmitkHotkeyLineEdit;
 
-struct MITK_QT_DATAMANAGER QmitkDataManagerHotkeysPrefPage : public berry::IQtPreferencePage
+struct MITK_QT_DATAMANAGER QmitkDataManagerHotkeysPrefPage : public QObject, public berry::IQtPreferencePage
 {
+  Q_OBJECT
+  Q_INTERFACES(berry::IPreferencePage)
 
 public:
   QmitkDataManagerHotkeysPrefPage();
+  QmitkDataManagerHotkeysPrefPage(const QmitkDataManagerHotkeysPrefPage& other);
 
   void Init(berry::IWorkbench::Pointer workbench);
 

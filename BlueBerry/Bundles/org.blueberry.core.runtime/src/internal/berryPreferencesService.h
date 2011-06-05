@@ -1,21 +1,25 @@
 #ifndef BERRYPREFERENCESSERVICE_H_
 #define BERRYPREFERENCESSERVICE_H_
 
-#include "berryRuntimeDll.h"
-//#include "berryService.h"
-#include "berryIBerryPreferencesService.h"
+#include <org_blueberry_core_runtime_Export.h>
+#include "../berryIBerryPreferencesService.h"
 #include "berryAbstractPreferencesStorage.h"
 
 #include <vector>
 #include <map>
+
+#include <QObject>
 
 namespace berry 
 {
   /**
   * Implementation of the IPreferencesService Interface
   */
-  class BERRY_RUNTIME PreferencesService : public IBerryPreferencesService
+  class BERRY_RUNTIME PreferencesService : public QObject, public IBerryPreferencesService
   {
+    Q_OBJECT
+    Q_INTERFACES(berry::IPreferencesService)
+
   public:
     berryObjectMacro(PreferencesService)
 

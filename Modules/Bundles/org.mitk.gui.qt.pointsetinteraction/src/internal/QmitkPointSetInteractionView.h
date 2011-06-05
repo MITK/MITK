@@ -32,7 +32,7 @@ class QmitkPointSetInteractionControls;
 /*!
 \brief QmitkPointSetInteractionView
 */
-class QmitkPointSetInteractionView : public QObject, public QmitkFunctionality
+class QmitkPointSetInteractionView : public QmitkFunctionality
 {
   Q_OBJECT
 

@@ -52,7 +52,7 @@ which implements moving and scaling the cuboid.
 
 */
 
-class QmitkImageCropper : public QObject, public QmitkFunctionality, public mitk::OperationActor
+class QmitkImageCropper : public QmitkFunctionality, public mitk::OperationActor
 {
 
   /// Operation base class, which holds pointers to a node of the data tree (mitk::DataNode)

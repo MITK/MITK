@@ -18,7 +18,7 @@
 #ifndef _BERRY_ISCHEDULING_RULE_H_
 #define _BERRY_ISCHEDULING_RULE_H_
 
-#include "berryJobsDll.h"
+#include <org_blueberry_core_jobs_Export.h>
 #include <berryObject.h>
 
 namespace berry

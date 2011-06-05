@@ -20,8 +20,10 @@
 
 #include <berryMacros.h>
 
-#include "berryUiDll.h"
+#include <org_blueberry_ui_Export.h>
 #include "berryIPageLayout.h"
+
+#include <QObject>
 
 namespace berry {
 
@@ -103,5 +105,6 @@ struct BERRY_UI IPerspectiveFactory : public Object {
 
 }
 
+Q_DECLARE_INTERFACE(berry::IPerspectiveFactory, "org.blueberry.IPerspectiveFactory")
 
 #endif /* BERRYIPERSPECTIVEFACTORY_H_ */

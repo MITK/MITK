@@ -18,6 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "berryLog.h"
 
 #include "berrySystemBundle.h"
+#include "berrySystemBundleManifest.h"
 
 #include "Poco/Exception.h"
 
@@ -26,8 +27,9 @@ PURPOSE.  See the above copyright notices for more information.
 namespace berry {
 
 SystemBundle::SystemBundle(BundleLoader& loader, IBundleStorage::Pointer storage)
- : Bundle(loader, storage)
+ : Bundle(loader, storage, false)
 {
+  this->init();
   m_State = BUNDLE_RESOLVED;
 }
 
@@ -65,6 +67,11 @@ void SystemBundle::Resume()
 BundleLoader& SystemBundle::GetBundleLoader()
 {
   return m_BundleLoader;
+}
+
+void SystemBundle::LoadManifest()
+{
+  m_Manifest = new SystemBundleManifest();
 }
 
 }

@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef BERRYUIEXCEPTIONS_H_
 #define BERRYUIEXCEPTIONS_H_
 
-#include "berryUiDll.h"
+#include <org_blueberry_ui_Export.h>
 
 #include <berryPlatformException.h>
 

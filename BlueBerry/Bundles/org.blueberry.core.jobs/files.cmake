@@ -1,3 +1,7 @@
+SET(MOC_H_FILES
+  src/internal/berryPluginActivator.h
+)
+
 SET(SRC_CPP_FILES
   berryIJobChangeListener.cpp
   berryIJobManager.cpp
@@ -16,6 +20,7 @@ SET(INTERNAL_CPP_FILES
   berryJobListeners.cpp
   berryJobManager.cpp
   berryJobQueue.cpp
+  berryPluginActivator.cpp
   berryWorker.cpp
   berryWorkerPool.cpp
 )

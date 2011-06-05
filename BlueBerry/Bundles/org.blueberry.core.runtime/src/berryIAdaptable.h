@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef _BERRY_IADAPTABLE_H_
 #define _BERRY_IADAPTABLE_H_
 
-#include "berryRuntimeDll.h"
+#include <org_blueberry_core_runtime_Export.h>
 
 #include <berryMacros.h>
 #include <berryObject.h>

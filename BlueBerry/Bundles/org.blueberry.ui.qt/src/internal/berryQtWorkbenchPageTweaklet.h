@@ -21,17 +21,22 @@
 
 #include <berryWorkbenchPageTweaklet.h>
 
-#include "../berryUiQtDll.h"
+#include <org_blueberry_ui_qt_Export.h>
 
 namespace berry
 {
 
-class BERRY_UI_QT QtWorkbenchPageTweaklet : public WorkbenchPageTweaklet
+class BERRY_UI_QT QtWorkbenchPageTweaklet : public QObject, public WorkbenchPageTweaklet
 {
+  Q_OBJECT
+  Q_INTERFACES(berry::WorkbenchPageTweaklet)
 
 public:
 
   berryObjectMacro(QtWorkbenchPageTweaklet);
+
+  QtWorkbenchPageTweaklet();
+  QtWorkbenchPageTweaklet(const QtWorkbenchPageTweaklet& other);
 
   void* CreateClientComposite(void* pageControl);
   void* CreatePaneControl(void* parent);

@@ -22,7 +22,9 @@
 #include <berryMacros.h>
 #include <berryObject.h>
 
-#include "berryUiDll.h"
+#include <org_blueberry_ui_Export.h>
+
+#include <QtPlugin>
 
 namespace berry {
 
@@ -113,6 +115,8 @@ struct BERRY_UI ISaveablePart : public virtual Object {
 };
 
 }
+
+Q_DECLARE_INTERFACE(berry::ISaveablePart, "org.blueberry.ISaveablePart")
 
 
 #endif /* BERRYISAVEABLEPART_H_ */

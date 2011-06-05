@@ -20,7 +20,7 @@
 
 #include <string>
 #include "berryObject.h"
-#include "berryJobsDll.h"
+#include <org_blueberry_core_jobs_Export.h>
 
 namespace berry
 {

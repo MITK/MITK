@@ -40,7 +40,7 @@ namespace mitk {
   \sa QmitkFunctionality
   \ingroup Functionalities
 */
-class QmitkUGVisualizationView : public QObject, public QmitkFunctionality
+class QmitkUGVisualizationView : public QmitkFunctionality
 {  
   // this is needed for all Qt objects that should have a Qt meta-object
   // (everything that derives from QObject and wants to have signal/slots)

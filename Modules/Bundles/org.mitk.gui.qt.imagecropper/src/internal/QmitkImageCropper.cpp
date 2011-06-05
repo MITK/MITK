@@ -89,8 +89,7 @@ void QmitkImageCropper::opExchangeNodes::NodeDeleted(const itk::Object * /*calle
 }
 
 QmitkImageCropper::QmitkImageCropper(QObject *parent)
-: QObject(parent),
-m_Controls(NULL), m_ParentWidget(0)
+: m_Controls(NULL), m_ParentWidget(0)
 {
    m_Interface = new mitk::ImageCropperEventInterface;
    m_Interface->SetImageCropper( this );

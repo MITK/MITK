@@ -19,9 +19,16 @@
 
 #include "api/QmitkUiApiTestSuite.h"
 
+#include <stdexcept>
+
 QmitkQtCommonTestSuite::QmitkQtCommonTestSuite()
 : CppUnit::TestSuite("QmitkQtCommonTestSuite")
 {
   addTest(new QmitkUiApiTestSuite());
 }
 
+QmitkQtCommonTestSuite::QmitkQtCommonTestSuite(const QmitkQtCommonTestSuite& other)
+{
+  Q_UNUSED(other)
+  throw std::runtime_error("Copy constructor not implemented");
+}

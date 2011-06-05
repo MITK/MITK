@@ -1,3 +1,10 @@
+SET(MOC_H_FILES
+  src/QmitkQtCommonTestSuite.h
+  src/api/QmitkMockFunctionality.h
+  
+  src/internal/mitkPluginActivator.h
+)
+
 SET(SRC_CPP_FILES
 
   QmitkQtCommonTestSuite.cpp
@@ -10,10 +17,10 @@ SET(SRC_CPP_FILES
 )
 
 SET(INTERNAL_CPP_FILES
-  
+  mitkPluginActivator.cpp
 )
 
-SET(CPP_FILES manifest.cpp)
+SET(CPP_FILES )
 
 SET(RESOURCE_FILES
 

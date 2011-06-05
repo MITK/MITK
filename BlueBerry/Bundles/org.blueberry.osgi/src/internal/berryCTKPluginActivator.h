@@ -1,0 +1,52 @@
+/*=========================================================================
+
+ Program:   BlueBerry Platform
+ Language:  C++
+ Date:      $Date$
+ Version:   $Revision$
+
+ Copyright (c) German Cancer Research Center, Division of Medical and
+ Biological Informatics. All rights reserved.
+ See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
+
+ This software is distributed WITHOUT ANY WARRANTY; without even
+ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ PURPOSE.  See the above copyright notices for more information.
+
+ =========================================================================*/
+
+#ifndef BERRYCTKPLUGINACTIVATOR_H
+#define BERRYCTKPLUGINACTIVATOR_H
+
+#include <ctkPluginActivator.h>
+#include <QObject>
+
+#include <org_blueberry_osgi_Export.h>
+
+namespace berry {
+
+// We need to export this activator, because it is referenced
+// in the templated method berry::ServiceRegistry::GetServiceById<>(...)
+class BERRY_OSGI org_blueberry_osgi_Activator : public QObject, public ctkPluginActivator
+{
+  Q_OBJECT
+  Q_INTERFACES(ctkPluginActivator)
+
+public:
+
+  void start(ctkPluginContext* context);
+  void stop(ctkPluginContext* context);
+
+  static ctkPluginContext* getPluginContext();
+
+private:
+
+  static ctkPluginContext* context;
+
+};
+
+typedef org_blueberry_osgi_Activator CTKPluginActivator;
+
+}
+
+#endif // BERRYCTKPLUGINACTIVATOR_H

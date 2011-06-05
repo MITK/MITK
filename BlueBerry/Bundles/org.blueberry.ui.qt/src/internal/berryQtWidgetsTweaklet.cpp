@@ -24,6 +24,16 @@
 namespace berry
 {
 
+QtWidgetsTweaklet::QtWidgetsTweaklet()
+{
+
+}
+
+QtWidgetsTweaklet::QtWidgetsTweaklet(const QtWidgetsTweaklet& other)
+{
+  Q_UNUSED(other)
+}
+
 void QtWidgetsTweaklet::AddSelectionListener(void* widget,
     GuiTk::ISelectionListener::Pointer listener)
 {

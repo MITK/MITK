@@ -25,8 +25,10 @@
 
 namespace berry {
 
-class QtStyleManager : public IQtStyleManager
+class QtStyleManager : public QObject, public IQtStyleManager
 {
+  Q_OBJECT
+  Q_INTERFACES(berry::IQtStyleManager)
 
 public:
 

@@ -87,8 +87,19 @@ class classname ## Factory : public ::itk::ObjectFactoryBase \
  \
     classname ## RegistrationMethod() \
     { \
-      itk::ObjectFactoryBase::RegisterFactory( classname ## Factory::New() ); \
+      m_Factory = classname ## Factory::New(); \
+      itk::ObjectFactoryBase::RegisterFactory( m_Factory ); \
     } \
+ \
+    ~classname ## RegistrationMethod() \
+    { \
+      itk::ObjectFactoryBase::UnRegisterFactory( m_Factory ); \
+    } \
+ \
+    private: \
+ \
+    classname ## Factory::Pointer m_Factory; \
+ \
   }; \
 } \
  \

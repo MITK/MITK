@@ -24,7 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <berryIEditorPart.h>
 #include <berryIWorkbenchPage.h>
 #include <berryWorkbenchAdvisor.h>
-#include "mitkQtCommonExtDll.h"
+#include <org_mitk_gui_qt_ext_Export.h>
 #include "QmitkCommonWorkbenchWindowAdvisor.h"
 
 #include <QList>
@@ -75,6 +75,8 @@ private:
 
   void RecomputeTitle();
 
+  QString GetQSettingsFile() const;
+
   /**
    * Updates the window title. Format will be: [pageInput -]
    * [currentPerspective -] [editorInput -] [workspaceLocation -] productName
@@ -83,6 +85,8 @@ private:
   void UpdateTitle(bool editorHidden);
 
   void PropertyChange(berry::Object::Pointer /*source*/, int propId);
+
+  static QString QT_SETTINGS_FILENAME;
 
   berry::IPartListener::Pointer titlePartListener;
   berry::IPerspectiveListener::Pointer titlePerspectiveListener;

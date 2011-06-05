@@ -22,7 +22,7 @@
 #include <berryIBerryPreferencesService.h>
 #include <berryIQtPreferencePage.h>
 #include <berryIConfigurationElement.h>
-#include "mitkQtCommonDll.h"
+#include <org_mitk_gui_qt_common_Export.h>
 
 #include <QDialog>
 

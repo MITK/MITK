@@ -203,7 +203,7 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
 
   //check if there is a valid worldGeometry TODO: Move to Update()?
   const Geometry2D *worldGeometry = renderer->GetCurrentWorldGeometry2D();
-  if( ( worldGeometry == NULL ) || ( !worldGeometry->IsValid() ) || ( !worldGeometry->GetReferenceGeometry() ))
+  if( ( worldGeometry == NULL ) || ( !worldGeometry->IsValid() ) || ( !worldGeometry->HasReferenceGeometry() ))
   {
     return;
   }
@@ -212,11 +212,11 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
   if ( !input->IsVolumeSet( this->GetTimestep() ) ) return;
 
   //TODO what it this?
-//  Image::RegionType requestedRegion = input->GetLargestPossibleRegion();
-//  requestedRegion.SetIndex( 3, this->GetTimestep() );
-//  requestedRegion.SetSize( 3, 1 );
-//  requestedRegion.SetSize( 4, 1 );
-//  input->SetRequestedRegion( &requestedRegion );
+  //  Image::RegionType requestedRegion = input->GetLargestPossibleRegion();
+  //  requestedRegion.SetIndex( 3, this->GetTimestep() );
+  //  requestedRegion.SetSize( 3, 1 );
+  //  requestedRegion.SetSize( 4, 1 );
+  //  input->SetRequestedRegion( &requestedRegion );
   input->Update();
 
   vtkImageData* inputData = input->GetVtkImageData( this->GetTimestep() );
@@ -255,6 +255,7 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
   const PlaneGeometry *planeGeometry = dynamic_cast< const PlaneGeometry * >( worldGeometry );
   if ( planeGeometry != NULL )
   {
+    //TODO Can getCornerPoint be used instead?
     origin = planeGeometry->GetOrigin();
     right  = planeGeometry->GetAxisVector( 0 );
     bottom = planeGeometry->GetAxisVector( 1 );
@@ -306,7 +307,7 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
         inputGeometry->GetVtkTransform()->GetLinearInverse() );
 
     // Set background level to TRANSLUCENT (see Geometry2DDataVtkMapper3D)
-    rendererInfo.m_Reslicer->SetBackgroundLevel( -32768 );
+    rendererInfo.m_Reslicer->SetBackgroundLevel( -32768 ); //TODO why -32768 and not 0.0???
 
     // If a reference geometry does exist (as would usually be the case for
     // PlaneGeometry), store it in rendererInfo so that we have access to it
@@ -314,7 +315,7 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
     //
     // Note: this is currently not strictly required, but could facilitate
     // correct plane clipping.
-    if ( worldGeometry->GetReferenceGeometry() )
+    if ( worldGeometry->HasReferenceGeometry() ) //TODO wurde vorher schon geprüft ...
     {
       rendererInfo.m_ReferenceGeometry = worldGeometry->GetReferenceGeometry();
 
@@ -322,55 +323,61 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
       // dataset bounding box; this is required for drawing the texture at the
       // correct position during 3D mapping.
       boundsInitialized = this->CalculateClippedPlaneBounds(
-          rendererInfo.m_ReferenceGeometry, planeGeometry, bounds );
+          rendererInfo.m_ReferenceGeometry, planeGeometry, bounds ); //TODO braucht man nicht immer
     }
-  }
-  // Do we have an AbstractTransformGeometry?
-  else if ( dynamic_cast< const AbstractTransformGeometry * >( worldGeometry ) )
-  {
-    const mitk::AbstractTransformGeometry* abstractGeometry =
-        dynamic_cast< const AbstractTransformGeometry * >(worldGeometry);
-
-    rendererInfo.m_Extent[0] = abstractGeometry->GetParametricExtent(0);
-    rendererInfo.m_Extent[1] = abstractGeometry->GetParametricExtent(1);
-
-    widthInMM = abstractGeometry->GetParametricExtentInMM(0);
-    heightInMM = abstractGeometry->GetParametricExtentInMM(1);
-
-    mmPerPixel[0] = widthInMM / rendererInfo.m_Extent[0];
-    mmPerPixel[1] = heightInMM / rendererInfo.m_Extent[1];
-
-    origin = abstractGeometry->GetPlane()->GetOrigin();
-
-    right = abstractGeometry->GetPlane()->GetAxisVector(0);
-    right.Normalize();
-
-    bottom = abstractGeometry->GetPlane()->GetAxisVector(1);
-    bottom.Normalize();
-
-    normal = abstractGeometry->GetPlane()->GetNormal();
-    normal.Normalize();
-
-    // Use a combination of the InputGeometry *and* the possible non-rigid
-    // AbstractTransformGeometry for reslicing the 3D Image
-    vtkGeneralTransform *composedResliceTransform = vtkGeneralTransform::New();
-    composedResliceTransform->Identity();
-    composedResliceTransform->Concatenate(
-        inputGeometry->GetVtkTransform()->GetLinearInverse() );
-    composedResliceTransform->Concatenate(
-        abstractGeometry->GetVtkAbstractTransform()
-        );
-
-    rendererInfo.m_Reslicer->SetResliceTransform( composedResliceTransform );
-    composedResliceTransform->UnRegister( NULL ); // decrease RC
-
-    // Set background level to BLACK instead of translucent, to avoid
-    // boundary artifacts (see Geometry2DDataVtkMapper3D)
-    rendererInfo.m_Reslicer->SetBackgroundLevel( -1023 );
   }
   else
   {
-    return;
+    // Do we have an AbstractTransformGeometry?
+    // This is the case for AbstractTransformGeometry's (e.g. a thin-plate-spline transform)
+    const mitk::AbstractTransformGeometry* abstractGeometry =
+        dynamic_cast< const AbstractTransformGeometry * >(worldGeometry);
+
+    if(abstractGeometry != NULL)
+    {
+
+      rendererInfo.m_Extent[0] = abstractGeometry->GetParametricExtent(0);
+      rendererInfo.m_Extent[1] = abstractGeometry->GetParametricExtent(1);
+
+      widthInMM = abstractGeometry->GetParametricExtentInMM(0);
+      heightInMM = abstractGeometry->GetParametricExtentInMM(1);
+
+      mmPerPixel[0] = widthInMM / rendererInfo.m_Extent[0];
+      mmPerPixel[1] = heightInMM / rendererInfo.m_Extent[1];
+
+      origin = abstractGeometry->GetPlane()->GetOrigin();
+
+      right = abstractGeometry->GetPlane()->GetAxisVector(0);
+      right.Normalize();
+
+      bottom = abstractGeometry->GetPlane()->GetAxisVector(1);
+      bottom.Normalize();
+
+      normal = abstractGeometry->GetPlane()->GetNormal();
+      normal.Normalize();
+
+      // Use a combination of the InputGeometry *and* the possible non-rigid
+      // AbstractTransformGeometry for reslicing the 3D Image
+      vtkGeneralTransform *composedResliceTransform = vtkGeneralTransform::New();
+      composedResliceTransform->Identity();
+      composedResliceTransform->Concatenate(
+          inputGeometry->GetVtkTransform()->GetLinearInverse() );
+      composedResliceTransform->Concatenate(
+          abstractGeometry->GetVtkAbstractTransform()
+          );
+
+      rendererInfo.m_Reslicer->SetResliceTransform( composedResliceTransform );
+      composedResliceTransform->UnRegister( NULL ); // decrease RC
+
+      // Set background level to BLACK instead of translucent, to avoid
+      // boundary artifacts (see Geometry2DDataVtkMapper3D)
+      rendererInfo.m_Reslicer->SetBackgroundLevel( -1023 );
+    }
+    else
+    {
+      //no geometry => we can't reslice
+      return;
+    }
   }
 
   // Make sure that the image to display has a certain minimum size.
@@ -398,11 +405,9 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
     case VTK_RESLICE_NEAREST:
       rendererInfo.m_Reslicer->SetInterpolationModeToNearestNeighbor();
       break;
-
     case VTK_RESLICE_LINEAR:
       rendererInfo.m_Reslicer->SetInterpolationModeToLinear();
       break;
-
     case VTK_RESLICE_CUBIC:
       rendererInfo.m_Reslicer->SetInterpolationModeToCubic();
       break;
@@ -413,10 +418,10 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
     rendererInfo.m_Reslicer->SetInterpolationModeToNearestNeighbor();
   }
 
+  //Begin Thickslicing
   int thickSlicesMode = 0;
-  
   int thickSlicesNum = 1;
-  
+
   // Thick slices parameters
   if( inputData->GetNumberOfScalarComponents() == 1 ) // for now only single component are allowed
   {
@@ -424,14 +429,14 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
     if(dn)
     {
       ResliceMethodProperty *resliceMethodEnumProperty=0;
-      
+
       if( dn->GetProperty( resliceMethodEnumProperty, "reslice.thickslices" ) && resliceMethodEnumProperty )
-        thickSlicesMode = resliceMethodEnumProperty->GetValueAsId(); 
+        thickSlicesMode = resliceMethodEnumProperty->GetValueAsId();
 
       IntProperty *intProperty=0;
       if( dn->GetProperty( intProperty, "reslice.thickslices.num" ) && intProperty )
       {
-        thickSlicesNum = intProperty->GetValue(); 
+        thickSlicesNum = intProperty->GetValue();
         if(thickSlicesNum < 1) thickSlicesNum=1;
         if(thickSlicesNum > 10) thickSlicesNum=10;
       }
@@ -441,10 +446,10 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
       MITK_WARN << "no associated widget plane data tree node found";
     }
   }
-  
+
   rendererInfo.m_UnitSpacingImageFilter->SetInput( inputData );
   rendererInfo.m_Reslicer->SetInput( rendererInfo.m_UnitSpacingImageFilter->GetOutput() );
-  
+
   rendererInfo.m_PixelsPerMM[0] = 1.0 / mmPerPixel[0];
   rendererInfo.m_PixelsPerMM[1] = 1.0 / mmPerPixel[1];
 
@@ -460,10 +465,10 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
   vnl2vtk( right.Get_vnl_vector(), cosines );
 
   // direction of the Y-axis of the sampled result
-  vnl2vtk( bottom.Get_vnl_vector(), cosines + 3 );
+  vnl2vtk( bottom.Get_vnl_vector(), cosines + 3 );//fill next 3 elements
 
   // normal of the plane
-  vnl2vtk( normal.Get_vnl_vector(), cosines + 6 );
+  vnl2vtk( normal.Get_vnl_vector(), cosines + 6 );//fill the last 3 elements
 
   rendererInfo.m_Reslicer->SetResliceAxesDirectionCosines( cosines );
 
@@ -492,7 +497,7 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
     xMin = yMin = 0;
     xMax = static_cast< int >( rendererInfo.m_Extent[0]
                                - rendererInfo.m_PixelsPerMM[0] + 0.5);
-    yMax = static_cast< int >( rendererInfo.m_Extent[1] 
+    yMax = static_cast< int >( rendererInfo.m_Extent[1]
                                - rendererInfo.m_PixelsPerMM[1] + 0.5);
   }
 
@@ -505,17 +510,16 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
   // Calculate dataset spacing in plane z direction (NOT spacing of current
   // world geometry)
   double dataZSpacing = 1.0;
-  
-  normal.Normalize();    
+
   Vector3D normInIndex;
   inputGeometry->WorldToIndex( origin, normal, normInIndex );
-  
+
   if(thickSlicesMode > 0)
   {
     dataZSpacing = 1.0 / normInIndex.GetNorm();
     rendererInfo.m_Reslicer->SetOutputDimensionality( 3 );
     rendererInfo.m_Reslicer->SetOutputExtent( xMin, xMax-1, yMin, yMax-1, -thickSlicesNum, 0+thickSlicesNum );
-  }  
+  }
   else
   {
     rendererInfo.m_Reslicer->SetOutputDimensionality( 2 );
@@ -526,20 +530,19 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
   rendererInfo.m_Reslicer->SetOutputSpacing( mmPerPixel[0], mmPerPixel[1], dataZSpacing );
 
   // xMax and yMax are meant exclusive until now, whereas
-  // SetOutputExtent wants an inclusive bound. Thus, we need 
+  // SetOutputExtent wants an inclusive bound. Thus, we need
   // to subtract 1.
 
   // Do the reslicing. Modified() is called to make sure that the reslicer is
   // executed even though the input geometry information did not change; this
   // is necessary when the input /em data, but not the /em geometry changes.
 
-  // The reslicing result is used both for 2D and for 3D mapping. 2D mapping
-  // currently uses PIC data structures, while 3D mapping uses VTK data. Thus,
-  // the reslicing result needs to be stored twice.
+  // The reslicing result is used both for 2D and for 3D mapping.
+  // The reslicing result is stored also for the 3D mapping.
 
-  // 1. Check the result
+  // Check the result
   vtkImageData* reslicedImage = 0;
-  
+
   if(thickSlicesMode>0)
   {
     rendererInfo.m_TSFilter->SetThickSliceMode( thickSlicesMode-1 );
@@ -553,7 +556,7 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
     rendererInfo.m_Reslicer->Modified();
     rendererInfo.m_Reslicer->Update();
     reslicedImage = rendererInfo.m_Reslicer->GetOutput();
-  }  
+  }
 
   if((reslicedImage == NULL) || (reslicedImage->GetDataDimension() < 1))
   {
@@ -561,26 +564,15 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
     return;
   }
 
-  bool imageIs2D = true;
+  // Store the result in a VTK image
+  if ( rendererInfo.m_Image == NULL )
+  {
+    rendererInfo.m_Image = vtkImageData::New();
+  }
 
-  // 3. Store the result in a VTK image
-  if ( imageIs2D )
-  {
-    if ( rendererInfo.m_Image == NULL )
-    {
-      rendererInfo.m_Image = vtkImageData::New();
-    }
-    rendererInfo.m_Image->DeepCopy( reslicedImage );
-    rendererInfo.m_Image->Update();
-  }
-  else
-  {
-    if ( rendererInfo.m_Image != NULL )
-    {
-      rendererInfo.m_Image->Delete();
-    }
-    rendererInfo.m_Image = NULL;
-  }
+  //TODO image is stored 2x. Do we still need that?
+  rendererInfo.m_Image->DeepCopy( reslicedImage );
+//  rendererInfo.m_Image->Update();
 
   //TODO how does the reslicer know for which render window it is reslicing for?
   //set the current slice for the localStorage
@@ -667,10 +659,10 @@ bool mitk::ImageVtkMapper2D::LineIntersectZero( vtkPoints *points, int p1, int p
 bool mitk::ImageVtkMapper2D::CalculateClippedPlaneBounds( const Geometry3D *boundingGeometry,
                                                           const PlaneGeometry *planeGeometry, vtkFloatingPointType *bounds )
 {
-  // Clip the plane with the bounding geometry. To do so, the corner points 
-  // of the bounding box are transformed by the inverse transformation 
-  // matrix, and the transformed bounding box edges derived therefrom are 
-  // clipped with the plane z=0. The resulting min/max values are taken as 
+  // Clip the plane with the bounding geometry. To do so, the corner points
+  // of the bounding box are transformed by the inverse transformation
+  // matrix, and the transformed bounding box edges derived therefrom are
+  // clipped with the plane z=0. The resulting min/max values are taken as
   // bounds for the image reslicer.
   const mitk::BoundingBox *boundingBox = boundingGeometry->GetBoundingBox();
 
@@ -840,7 +832,7 @@ void mitk::ImageVtkMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
   this->GetDataNode()->GetBoolProperty( "binary", binary, renderer );
   localStorage->m_Texture->SetMapColorScalarsThroughLookupTable(binary);
   if ( binary )
-  {    
+  {
     localStorage->m_LookupTable->SetAlphaRange(0.0, 1.0);
     localStorage->m_LookupTable->SetRange(0.0, 1.0);
     //0 is already mapped to transparent.
@@ -1087,7 +1079,7 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::Ba
   node->AddProperty( "texture interpolation", mitk::BoolProperty::New( mitk::DataNodeFactory::m_TextureInterpolationActive ) );  // set to user configurable default value (see global options)
   node->AddProperty( "in plane resample extent by geometry", mitk::BoolProperty::New( false ) );
   node->AddProperty( "bounding box", mitk::BoolProperty::New( false ) );
-  
+
   bool isBinaryImage(false);
   if ( ! node->GetBoolProperty("binary", isBinaryImage) )
   {
@@ -1176,7 +1168,7 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::Ba
       mitkLutProp->SetLookupTable(mitkLut);
       node->SetProperty( "LookupTable", mitkLutProp );
     }
-  }  
+  }
   Superclass::SetDefaultProperties(node, renderer, overwrite);
 }
 

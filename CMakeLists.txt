@@ -428,7 +428,7 @@ if(MITK_USE_BLUEBERRY)
     include("${CMAKE_CURRENT_SOURCE_DIR}/CoreUI/BundleTesting/PluginList.cmake")
     set(mitk_core_test_plugins_fullpath )
     foreach(core_test_plugin ${MITK_CORE_TEST_PLUGINS})
-      list(APPEND mitk_core_test_plugins_fullpath CoreUI/BundleTesting/${core_test_plugin})
+    #  list(APPEND mitk_core_test_plugins_fullpath CoreUI/BundleTesting/${core_test_plugin})
     endforeach()
 
     set(BLUEBERRY_UI_TEST_APP "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/CoreApp")

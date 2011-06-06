@@ -242,11 +242,11 @@ IF(BLUEBERRY_BUILD_TESTING)
 
   SET(_ctk_test_plugins
 #    Testing/org.blueberry.core.runtime.tests:ON
-    Testing/org.blueberry.osgi.tests:ON
+#    Testing/org.blueberry.osgi.tests:ON
   )
   
   IF(BLUEBERRY_ENABLE_GUI_TESTING)
-    LIST(APPEND _ctk_test_plugins Testing/org.blueberry.ui.tests:ON)
+#    LIST(APPEND _ctk_test_plugins Testing/org.blueberry.ui.tests:ON)
 
     SET(BLUEBERRY_UI_TEST_APP "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${OSGI_UI_APP}")
     GET_TARGET_PROPERTY(_is_macosx_bundle ${OSGI_UI_APP} MACOSX_BUNDLE)

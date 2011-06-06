@@ -112,6 +112,7 @@ void mitk::ColorProperty::SetColor( float red, float green, float blue )
 
 std::string mitk::ColorProperty::GetValueAsString() const {
   std::stringstream myStr;
+  myStr.imbue(std::locale::classic());
   myStr << GetValue() ;
   return myStr.str(); 
 }

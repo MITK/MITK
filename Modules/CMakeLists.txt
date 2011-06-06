@@ -9,6 +9,7 @@ SET(module_dirs
     DiffusionImaging
     GPGPU
     IGT
+    CameraCalibration
     IGTUI
     RigidRegistration
     RigidRegistrationUI

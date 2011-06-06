@@ -264,6 +264,7 @@ void mitk::VirtualTrackingDevice::TrackTools()
 
         currentTool->SetTrackingError( 2 * (rand() / (RAND_MAX + 1.0)));  // tracking error in 0 .. 2 Range
         currentTool->SetDataValid(true);
+        currentTool->Modified();
       }
       itksys::SystemTools::Delay(m_RefreshRate);
       /* Update the local copy of m_StopTracking */

@@ -31,8 +31,8 @@ namespace mitk
 
   void NrrdTensorImageReader
     ::GenerateData()
-  {    
-    if ( m_FileName == "") 
+  {
+    if ( m_FileName == "")
     {
       throw itk::ImageFileReaderException(__FILE__, __LINE__, "Sorry, the filename is empty!");
     }
@@ -65,14 +65,41 @@ namespace mitk
 
         typedef ImageType::PixelType  VarPixType;
         typedef VecImgType::PixelType FixPixType;
+        int numComponents = img->GetNumberOfComponentsPerPixel();
 
-        while (!it.IsAtEnd())
+        if (numComponents==6)
         {
-          VarPixType vec = it.Get();
-          FixPixType fixVec(vec.GetDataPointer());
-          ot.Set(fixVec);
-          ++ot;
-          ++it;
+          while (!it.IsAtEnd())
+          {
+            VarPixType vec = it.Get();
+            FixPixType fixVec(vec.GetDataPointer());
+            ot.Set(fixVec);
+            ++ot;
+            ++it;
+          }
+        }
+        else if(numComponents==9)
+        {
+          while (!it.IsAtEnd())
+          {
+            VarPixType vec = it.Get();
+            itk::DiffusionTensor3D<float> tensor;
+            tensor.SetElement(0, vec.GetElement(0));
+            tensor.SetElement(1, vec.GetElement(1));
+            tensor.SetElement(2, vec.GetElement(2));
+            tensor.SetElement(3, vec.GetElement(4));
+            tensor.SetElement(4, vec.GetElement(5));
+            tensor.SetElement(5, vec.GetElement(8));
+
+            FixPixType fixVec(tensor);
+            ot.Set(fixVec);
+            ++ot;
+            ++it;
+          }
+        }
+        else
+        {
+          throw itk::ImageFileReaderException(__FILE__, __LINE__, "Image has wrong number of pixel components!");
         }
 
         this->GetOutput()->InitializeByItk(vecImg.GetPointer());
@@ -81,7 +108,7 @@ namespace mitk
       }
       catch(std::exception& e)
       {
-        throw itk::ImageFileReaderException(__FILE__, __LINE__, e.what());                    
+        throw itk::ImageFileReaderException(__FILE__, __LINE__, e.what());
       }
       catch(...)
       {
@@ -96,51 +123,51 @@ namespace mitk
   }
 
 
-  
+
   const char* NrrdTensorImageReader
     ::GetFileName() const
   {
     return m_FileName.c_str();
   }
 
-  
+
   void NrrdTensorImageReader
     ::SetFileName(const char* aFileName)
   {
     m_FileName = aFileName;
   }
 
-  
+
   const char* NrrdTensorImageReader
     ::GetFilePrefix() const
   {
     return m_FilePrefix.c_str();
   }
 
-  
+
   void NrrdTensorImageReader
     ::SetFilePrefix(const char* aFilePrefix)
   {
     m_FilePrefix = aFilePrefix;
   }
 
-  
+
   const char* NrrdTensorImageReader
     ::GetFilePattern() const
   {
     return m_FilePattern.c_str();
   }
 
-  
+
   void NrrdTensorImageReader
     ::SetFilePattern(const char* aFilePattern)
   {
     m_FilePattern = aFilePattern;
   }
 
-  
+
   bool NrrdTensorImageReader
-    ::CanReadFile(const std::string filename, const std::string /*filePrefix*/, const std::string /*filePattern*/) 
+    ::CanReadFile(const std::string filename, const std::string /*filePrefix*/, const std::string /*filePattern*/)
   {
     // First check the extension
     if(  filename == "" )

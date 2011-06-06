@@ -27,6 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QMessageBox>
 
 // mitk includes
+#include <mitkCameraIntrinsics.h> // class holding the intrinsic parameters of the according camera
 #include <mitkSurface.h>
 
 // MITK-ToF related includes
@@ -34,7 +35,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkToFDistanceImageToSurfaceFilter.h> // filter from module ToFProcessing that calculates a surface from the given range image
 #include <mitkToFImageGrabberCreator.h> // creator class that provides pre-configured ToFCameraDevices
 #include <mitkToFImageGrabber.h> // allows access to images provided by the ToF camera
-#include <mitkPinholeCameraModel.h> // class representing a pinhole camera and holding the intrinsic parameters of the according camera
 
 
 
@@ -147,14 +147,14 @@ void QmitkToFTutorialView::OnStep2()
     mitk::Image::Pointer distanceImage = dynamic_cast<mitk::Image*>(distanceNode->GetData());
     if (distanceImage.IsNotNull())
     {
-      // create pinhole camera model that holds intrinsic parameters of the ToF camera
-      mitk::PinholeCameraModel::Pointer cameraIntrinsics = mitk::PinholeCameraModel::New();
+      // create object of CameraIntrinsics that holds intrinsic parameters of the ToF camera
+      mitk::CameraIntrinsics::Pointer cameraIntrinsics = mitk::CameraIntrinsics::New();
       // change focal length and use defaults for other parameters such as inter pixel distance or principal point
-      cameraIntrinsics->SetFocalLength(13.3);
+      cameraIntrinsics->SetFocalLength(13.3,13.3);
       // set up filter for surface calculation
       mitk::ToFDistanceImageToSurfaceFilter::Pointer surfaceFilter = mitk::ToFDistanceImageToSurfaceFilter::New();
       // apply intrinsic parameters to filter
-      surfaceFilter->SetCameraModel(cameraIntrinsics);
+      surfaceFilter->SetCameraIntrinsics(cameraIntrinsics);
       // set distance image as input
       surfaceFilter->SetInput(distanceImage);
       // update the filter

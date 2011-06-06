@@ -77,6 +77,7 @@ void mitk::TrackingVolumeGenerator::GenerateData()
         }
     default:
         {
+            output->SetVtkPolyData(vtkPolyData::New()); //initialize with empty poly data (otherwise old surfaces may be returned) => so an empty surface is returned
             MITK_ERROR<< "No STL to given TrackingDevice found";
             return;
         }

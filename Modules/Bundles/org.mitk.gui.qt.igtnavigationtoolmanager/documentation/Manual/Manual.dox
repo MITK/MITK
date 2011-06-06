@@ -4,9 +4,9 @@
 \image html icon.png "Icon of MITK-IGT Navigation Tool Manager"
 
 Available sections:
-  - \ref org.mitk.gui.qt.igtnavigationtoolmanagerOverview
+  - \ref IGTNavigationToolManagerOverview
 
-\section org.mitk.gui.qt.igtnavigationtoolmanagerOverview
+\section IGTNavigationToolManagerOverview
 This is the description for the MITK-IGT Navigation Tool Manager.
 
 */

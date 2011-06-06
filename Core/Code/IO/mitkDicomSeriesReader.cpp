@@ -327,10 +327,14 @@ DicomSeriesReader::AnalyzeFileForITKImageSeriesReaderSpacingAssumption(
        ++fileIter, ++fileIndex)
   {
     bool fileFitsIntoPattern(false);
-
+    std::string thisOriginString;
     // Read tag value into point3D. PLEASE replace this by appropriate GDCM code if you figure out how to do that
-    std::string thisOriginString = tagValueMappings[fileIter->c_str()][tagImagePositionPatient];
-    
+    const char* value = tagValueMappings[fileIter->c_str()][tagImagePositionPatient];
+    if (value)
+    {
+      thisOriginString = value;
+    }
+
     std::istringstream originReader(thisOriginString);
     std::string coordinate;
     unsigned int dim(0);
@@ -340,9 +344,9 @@ DicomSeriesReader::AnalyzeFileForITKImageSeriesReaderSpacingAssumption(
     {
       MITK_ERROR << "Reader implementation made wrong assumption on tag (0020,0032). Found " << dim << "instead of 3 values.";
     }
-    
-    MITK_DEBUG << "  " << fileIndex << " " << *fileIter 
-                       << " at " 
+
+    MITK_DEBUG << "  " << fileIndex << " " << *fileIter
+                       << " at "
                        << thisOriginString << "(" << thisOrigin[0] << "," << thisOrigin[1] << "," << thisOrigin[2] << ")";
 
     if ( lastOriginInitialized && (thisOrigin == lastOrigin) )
@@ -365,8 +369,12 @@ DicomSeriesReader::AnalyzeFileForITKImageSeriesReaderSpacingAssumption(
         // Again ugly code to read tag Image Orientation into two vEctors
         Vector3D right; right.Fill(0.0);
         Vector3D up; right.Fill(0.0); // might be down as well, but it is just a name at this point
-        std::string thisOrientationString = tagValueMappings[fileIter->c_str()][tagImageOrientation];
-        
+        std::string thisOrientationString;
+        const char* value = tagValueMappings[fileIter->c_str()][tagImageOrientation];
+        if (value)
+        {
+          thisOrientationString = value;
+        }
         std::istringstream orientationReader(thisOrientationString);
         std::string coordinate;
         unsigned int dim(0);
@@ -574,7 +582,13 @@ DicomSeriesReader::GetSeries(const StringContainer& files, bool sortTo3DPlust, c
 
   for ( UidFileNamesMap::const_iterator groupIter = groupsOfSimilarImages.begin(); groupIter != groupsOfSimilarImages.end(); ++groupIter )
   {
+    try
+    {
     groupsOfSimilarImages[ groupIter->first ] = SortSeriesSlices( groupIter->second  ); // sort each slice group spatially
+    } catch(...)
+    {
+       MITK_ERROR << "Catched something.";
+    }
   }
 
   // PART II: analyze pre-sorted images for valid blocks (i.e. blocks of equal z-spacing), 
@@ -651,16 +665,23 @@ DicomSeriesReader::GetSeries(const StringContainer& files, bool sortTo3DPlust, c
         }
         else
         {
-          // check whether this and the previous block share a comon origin 
-          // TODO should be safe, but a little try/catch or other error handling wouldn't hurt
-          std::string thisOriginString = scanner.GetValue( mapOf3DBlocks[thisBlockKey].front().c_str(), tagImagePositionPatient );
-          std::string previousOriginString = scanner.GetValue( mapOf3DBlocks[previousBlockKey].front().c_str(), tagImagePositionPatient );
-          
-          // also compare last origin, because this might differ if z-spacing is different
-          std::string thisDestinationString = scanner.GetValue( mapOf3DBlocks[thisBlockKey].back().c_str(), tagImagePositionPatient );
-          std::string previousDestinationString = scanner.GetValue( mapOf3DBlocks[previousBlockKey].back().c_str(), tagImagePositionPatient );
-          
-          bool identicalOrigins( (thisOriginString == previousOriginString) && (thisDestinationString == previousDestinationString) );
+          bool identicalOrigins;
+          try {
+            // check whether this and the previous block share a comon origin
+            // TODO should be safe, but a little try/catch or other error handling wouldn't hurt
+            std::string thisOriginString = scanner.GetValue( mapOf3DBlocks[thisBlockKey].front().c_str(), tagImagePositionPatient );
+            std::string previousOriginString = scanner.GetValue( mapOf3DBlocks[previousBlockKey].front().c_str(), tagImagePositionPatient );
+
+            // also compare last origin, because this might differ if z-spacing is different
+            std::string thisDestinationString = scanner.GetValue( mapOf3DBlocks[thisBlockKey].back().c_str(), tagImagePositionPatient );
+            std::string previousDestinationString = scanner.GetValue( mapOf3DBlocks[previousBlockKey].back().c_str(), tagImagePositionPatient );
+
+            identicalOrigins =  ( (thisOriginString == previousOriginString) && (thisDestinationString == previousDestinationString) );
+
+          } catch(...)
+          {
+            identicalOrigins = false;
+          }
 
           if (identicalOrigins && (numberOfFilesInPreviousBlock == numberOfFilesInThisBlock))
           {
@@ -806,13 +827,34 @@ DicomSeriesReader::SortSeriesSlices(const StringContainer &unsortedFilenames)
   gdcm::Sorter sorter;
 
   sorter.SetSortFunction(DicomSeriesReader::GdcmSortFunction);
-  sorter.Sort(unsortedFilenames);
-  return sorter.GetFilenames();
+  try
+  {
+    sorter.Sort(unsortedFilenames);
+    return sorter.GetFilenames();
+  }
+  catch(std::logic_error& e)
+  {
+    MITK_WARN << "Sorting error. Leaving series unsorted."; 
+    return unsortedFilenames;
+  }
 }
 
 bool 
 DicomSeriesReader::GdcmSortFunction(const gdcm::DataSet &ds1, const gdcm::DataSet &ds2)
 {
+  // make sure we habe Image Position and Orientation
+  if ( ! ( 
+      ds1.FindDataElement(gdcm::Tag(0x0020,0x0032)) &&
+      ds1.FindDataElement(gdcm::Tag(0x0020,0x0037)) &&
+      ds2.FindDataElement(gdcm::Tag(0x0020,0x0032)) &&
+      ds2.FindDataElement(gdcm::Tag(0x0020,0x0037)) 
+        )
+      )
+      {
+        MITK_WARN << "Dicom images are missing attributes for a meaningful sorting.";
+        throw std::logic_error("Dicom images are missing attributes for a meaningful sorting.");
+      }
+  
   gdcm::Attribute<0x0020,0x0032> image_pos1; // Image Position (Patient)
   gdcm::Attribute<0x0020,0x0037> image_orientation1; // Image Orientation (Patient)
 

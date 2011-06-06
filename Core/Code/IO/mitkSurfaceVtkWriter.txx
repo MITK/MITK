@@ -84,6 +84,7 @@ void mitk::SurfaceVtkWriter<VTKWRITER>::GenerateData()
     if( input->GetVtkPolyData(t) == NULL ) continue;
 
     ::itk::OStringStream filename;
+    filename.imbue(::std::locale::classic());
     geometry = input->GetGeometry(t);
     if ( timesteps > 1 )
     {

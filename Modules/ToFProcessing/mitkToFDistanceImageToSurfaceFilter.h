@@ -22,7 +22,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkImage.h>
 #include <mitkSurfaceSource.h>
 #include <mitkToFProcessingExports.h>
-#include "mitkPinholeCameraModel.h"
+#include <mitkToFProcessingCommon.h>
+#include <mitkCameraIntrinsics.h>
+#include "mitkCameraIntrinsics.h"
 #include <mitkPointSet.h>
 #include <cv.h>
 
@@ -34,7 +36,7 @@ namespace mitk
   * measured distance for each pixel corresponds to the distance between the object point and the corresponding image point on the
   * image plane.
   *
-  * <img src="PinholeCameraModel.png" alt="Pinhole camera model">
+  * <img src="CameraIntrinsics.png" alt="Pinhole camera model">
   * <img src="ImagePlane.png" alt="Image plane">
   *
   * @ingroup SurfaceFilters
@@ -43,14 +45,15 @@ namespace mitk
   class mitkToFProcessing_EXPORT ToFDistanceImageToSurfaceFilter : public SurfaceSource
   {
   public:
-    typedef mitk::PinholeCameraModel::ToFScalarType ToFScalarType;
 
     mitkClassMacro( ToFDistanceImageToSurfaceFilter , SurfaceSource );
     itkNewMacro( Self );
 
 
-    itkSetMacro(CameraModel, mitk::PinholeCameraModel::Pointer);
-    itkGetMacro(CameraModel, mitk::PinholeCameraModel::Pointer);
+    itkSetMacro(CameraIntrinsics, mitk::CameraIntrinsics::Pointer);
+    itkGetMacro(CameraIntrinsics, mitk::CameraIntrinsics::Pointer);
+    itkSetMacro(InterPixelDistance,ToFProcessingCommon::ToFPoint2D);
+    itkGetMacro(InterPixelDistance,ToFProcessingCommon::ToFPoint2D);
     /*!
     \brief Set scalar image used as texture of the surface.
     \param iplScalarImage OpenCV image for texturing
@@ -81,7 +84,7 @@ namespace mitk
     \brief Sets the input of this filter and the intrinsic parameters
     \param distanceImage input is the distance image of e.g. a ToF camera
     */
-    virtual void SetInput( Image* distanceImage, mitk::PinholeCameraModel::Pointer CameraModel );
+    virtual void SetInput( Image* distanceImage, mitk::CameraIntrinsics::Pointer cameraIntrinsics );
 
     /*!
     \brief Sets the input of this filter at idx
@@ -94,9 +97,9 @@ namespace mitk
     \brief Sets the input of this filter at idx and the intrinsic parameters
     \param idx number of the current input
     \param distanceImage input is the distance image of e.g. a ToF camera
-    \param CameraModel This is the camera model which holds parameters like focal length, pixel size, etc. which are needed for the reconstruction of the surface.
+    \param cameraIntrinsics This is the camera model which holds parameters like focal length, pixel size, etc. which are needed for the reconstruction of the surface.
     */
-    virtual void SetInput( unsigned int idx,  Image* distanceImage, mitk::PinholeCameraModel::Pointer CameraModel );
+    virtual void SetInput( unsigned int idx,  Image* distanceImage, mitk::CameraIntrinsics::Pointer cameraIntrinsics );
 
     /*!
     \brief Returns the input of this filter
@@ -134,10 +137,12 @@ namespace mitk
 
     IplImage* m_IplScalarImage; ///< Scalar image used for surface texturing
 
-    mitk::PinholeCameraModel::Pointer m_CameraModel; ///< Specifies the intrinsic parameters
+    mitk::CameraIntrinsics::Pointer m_CameraIntrinsics; ///< Specifies the intrinsic parameters
+    //mitk::CameraIntrinsics::Pointer m_CameraModel; ///< Specifies the intrinsic parameters
 
     int m_TextureImageWidth; ///< Width (x-dimension) of the texture image
     int m_TextureImageHeight; ///< Height (y-dimension) of the texture image
+    ToFProcessingCommon::ToFPoint2D m_InterPixelDistance; ///< distance in mm between two adjacent pixels on the ToF camera chip
 
   };
 } //END mitk namespace

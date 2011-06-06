@@ -238,7 +238,7 @@ std::string mitk::PACSPlugin::GuessMIMEType( const std::string& filename )
     return std::string("application/pdf");
   }
 
-  if ( firstLine.substr( 0, 5 ) == "{\rtf" )
+  if ( firstLine.substr( 0, 5 ) == "{\\rtf" )
   {
     return std::string("text/richtext");
   }

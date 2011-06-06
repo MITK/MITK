@@ -16,6 +16,8 @@ SET(module_dirs
     DeformableRegistrationUI
     OpenCVVideoSupport
     Overlays
+    ImageExtraction
+    ImageStatistics
     InputDevices
     ToFHardware
     ToFProcessing

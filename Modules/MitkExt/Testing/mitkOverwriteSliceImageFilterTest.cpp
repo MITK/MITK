@@ -21,6 +21,13 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkDataNodeFactory.h"
 #include "mitkCompareImageSliceTestHelper.h"
 
+unsigned int CompareImageSliceTestHelper::m_Dimension0 = 0;
+unsigned int CompareImageSliceTestHelper::m_Dimension1 = 0;
+unsigned int CompareImageSliceTestHelper::m_SliceDimension = 0;
+unsigned int CompareImageSliceTestHelper::m_SliceIndex = 0;
+bool CompareImageSliceTestHelper::m_ComparisonResult = false;
+mitk::Image* CompareImageSliceTestHelper::m_SliceImage = NULL;
+
 class mitkOverwriteSliceImageFilterTestClass
 {
 

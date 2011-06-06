@@ -3,7 +3,6 @@ SET(CPP_FILES
   Algorithms/mitkBoundingObjectToSegmentationFilter.cpp
   Algorithms/vtkPointSetSlicer.cxx
   Algorithms/mitkCoreExtObjectFactory.cpp
-  Algorithms/mitkImageStatisticsCalculator.cpp
   Algorithms/mitkAngleCorrectByPointFilter.cpp
   Algorithms/mitkAutoCropImageFilter.cpp
   Algorithms/mitkBoundingObjectCutter.cpp
@@ -14,9 +13,6 @@ SET(CPP_FILES
   Algorithms/mitkCylindricToCartesianFilter.cpp
   Algorithms/mitkDiffImageApplier.cpp
   Algorithms/mitkDopplerToStrainRateFilter.cpp
-  Algorithms/mitkExtractDirectedPlaneImageFilter.cpp
-  Algorithms/mitkExtractDirectedPlaneImageFilterNew.cpp
-  Algorithms/mitkExtractImageFilter.cpp
   Algorithms/mitkGeometryClipImageFilter.cpp
   Algorithms/mitkGeometryDataSource.cpp
   Algorithms/mitkHeightFieldSurfaceClipImageFilter.cpp
@@ -193,14 +189,6 @@ IF(WIN32 AND NOT MINGW)
     ${CPP_FILES}
   )
 ENDIF(WIN32 AND NOT MINGW)
-
-IF ( ${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION} VERSION_LESS 5.8 )
-  MESSAGE(STATUS "Using VTK 5.8 classes from MITK respository")
-  SET(CPP_FILES ${CPP_FILES}
-    Algorithms/vtkImageStencilRaster.cxx
-    Algorithms/vtkLassoStencilSource.cxx
-    )
-ENDIF ( ${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION} VERSION_LESS 5.8 )
 
 
 

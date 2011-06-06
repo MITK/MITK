@@ -3,6 +3,8 @@ SET(LIBPOSTFIX "Ext")
 SET(module_dirs
     SceneSerializationBase
     PlanarFigure
+    ImageExtraction
+    ImageStatistics
     MitkExt
     SceneSerialization
     QmitkExt
@@ -16,8 +18,6 @@ SET(module_dirs
     DeformableRegistrationUI
     OpenCVVideoSupport
     Overlays
-    ImageExtraction
-    ImageStatistics
     InputDevices
     ToFHardware
     ToFProcessing

@@ -1,6 +1,6 @@
 MITK_CREATE_MODULE( ImageExtraction
-               DEPENDS Mitk ipSegmentation PlanarFigure
-               DEPENDS_INTERNAL pic2vtk IIL4MITK
+               DEPENDS Mitk PlanarFigure
+               DEPENDS_INTERNAL pic2vtk
                PROVIDES ImageExtraction
 )
 

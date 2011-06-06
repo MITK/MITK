@@ -27,7 +27,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkPoints.h>
 
 #include "pic2vtk.h"
-#include "picimage.h"
 
 
 

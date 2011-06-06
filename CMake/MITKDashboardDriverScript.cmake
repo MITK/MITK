@@ -162,6 +162,24 @@ MACRO(run_ctest)
   endif()
   
   set(force_build ${initial_force_build})
+  
+  # Check if a forced run was requested
+  set(cdash_remove_rerun_url )
+  if(NOT MITK_NO_CDASH_WEBADMIN)
+    set(cdash_rerun_url "http://mbits/rerun/${CTEST_BUILD_NAME}")
+    set(cdash_remove_rerun_url "http://mbits/rerun/rerun.php?name=${CTEST_BUILD_NAME}&remove=1")
+    file(DOWNLOAD
+         "${cdash_rerun_url}"
+         "${CTEST_BINARY_DIRECTORY}/tmp.txt"
+         STATUS status
+         )
+    list(GET status 0 error_code)
+    file(READ "${CTEST_BINARY_DIRECTORY}/tmp.txt" rerun_content LIMIT 1)
+    if(NOT error_code AND NOT rerun_content)
+      set(force_build 1)
+    endif()
+  endif()
+  
   if(COMMAND MITK_OVERRIDE_FORCE_BUILD)
     MITK_OVERRIDE_FORCE_BUILD(force_build)
   endif()
@@ -185,6 +203,12 @@ ${INITIAL_CMAKECACHE_OPTIONS}
   endif()
   
   if(res GREATER 0 OR force_build)
+  
+    # Clear the forced rerun request
+    if(NOT MITK_NO_CDASH_WEBADMIN AND cdash_remove_rerun_url)
+      file(DOWNLOAD "${cdash_remove_rerun_url}" "${CTEST_BINARY_DIRECTORY}/tmp.txt")
+      file(REMOVE "${CTEST_BINARY_DIRECTORY}/tmp.txt")
+    endif()
     
     if(CTEST_PROJECT_NAME_SUPERBUILD)
       set(ctest_project_name_orig ${CTEST_PROJECT_NAME})

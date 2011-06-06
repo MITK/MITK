@@ -9,9 +9,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-//TODO remove these if possible
-#include <mitkSurface.h>
-
 //MITK
 #include <mitkAbstractTransformGeometry.h>
 #include <mitkDataNode.h>
@@ -116,7 +113,7 @@ void mitk::ImageVtkMapper2D::AdjustCamera(mitk::BaseRenderer* renderer)
     camera->SetFocalPoint( viewPlaneCenter ); //set the focal point to the center of the textured plane
     camera->SetViewUp( cameraUp ); //set the view-up for the camera
   }
-  //reset the clipping range TODO why? really needed if everything is correct?
+  //reset the clipping range
   renderer->GetVtkRenderer()->ResetCameraClippingRange();
 }
 
@@ -211,12 +208,6 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
   // check if there is something to display. TODO: Move to Update()?
   if ( !input->IsVolumeSet( this->GetTimestep() ) ) return;
 
-  //TODO what it this?
-  //  Image::RegionType requestedRegion = input->GetLargestPossibleRegion();
-  //  requestedRegion.SetIndex( 3, this->GetTimestep() );
-  //  requestedRegion.SetSize( 3, 1 );
-  //  requestedRegion.SetSize( 4, 1 );
-  //  input->SetRequestedRegion( &requestedRegion );
   input->Update();
 
   vtkImageData* inputData = input->GetVtkImageData( this->GetTimestep() );
@@ -231,18 +222,16 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
   // where we want to sample
   Point3D origin;
   Vector3D right, bottom, normal;
-  Vector3D rightInIndex, bottomInIndex;
 
   // take transform of input image into account
   const TimeSlicedGeometry *inputTimeGeometry = input->GetTimeSlicedGeometry();
   const Geometry3D* inputGeometry = inputTimeGeometry->GetGeometry3D( this->GetTimestep() );
 
-  //Spacing of the slice
+  //World spacing
   ScalarType mmPerPixel[2];
 
   // Bounds information for reslicing (only reuqired if reference geometry 
   // is present)
-  // TODO: we dont have to calculate the bounds if we reslice axis-parallel
   vtkFloatingPointType bounds[6];
   bool boundsInitialized = false;
   for ( int i = 0; i < 6; ++i )
@@ -255,9 +244,8 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
   const PlaneGeometry *planeGeometry = dynamic_cast< const PlaneGeometry * >( worldGeometry );
   if ( planeGeometry != NULL )
   {
-    //TODO Can getCornerPoint be used instead?
     origin = planeGeometry->GetOrigin();
-    right  = planeGeometry->GetAxisVector( 0 );
+    right  = planeGeometry->GetAxisVector( 0 ); // right = Extent of Image in mm (worldspace)
     bottom = planeGeometry->GetAxisVector( 1 );
     normal = planeGeometry->GetNormal();
 
@@ -278,6 +266,8 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
       // the spacing of the output 2D image is directly derived from the
       // associated input image, regardless of the currently selected world
       // geometry.
+      //TODO use new method instead of deprecated
+      Vector3D rightInIndex, bottomInIndex;
       inputGeometry->WorldToIndex( origin, right, rightInIndex );
       inputGeometry->WorldToIndex( origin, bottom, bottomInIndex );
       rendererInfo.m_Extent[0] = rightInIndex.GetNorm();
@@ -296,11 +286,10 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
     bottom.Normalize();
     normal.Normalize();
 
+    //Translate the origin from center based to corner based
+    //by adding (mm per pixel)/2 in the corresponding direction (right/bottom).
     origin += right * ( mmPerPixel[0] * 0.5 );
     origin += bottom * ( mmPerPixel[1] * 0.5 );
-
-    widthInMM -= mmPerPixel[0];
-    heightInMM -= mmPerPixel[1];
 
     // Use inverse transform of the input geometry for reslicing the 3D image
     rendererInfo.m_Reslicer->SetResliceTransform(
@@ -309,22 +298,11 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
     // Set background level to TRANSLUCENT (see Geometry2DDataVtkMapper3D)
     rendererInfo.m_Reslicer->SetBackgroundLevel( -32768 ); //TODO why -32768 and not 0.0???
 
-    // If a reference geometry does exist (as would usually be the case for
-    // PlaneGeometry), store it in rendererInfo so that we have access to it
-    // in Paint.
-    //
-    // Note: this is currently not strictly required, but could facilitate
-    // correct plane clipping.
-    if ( worldGeometry->HasReferenceGeometry() ) //TODO wurde vorher schon geprüft ...
-    {
-      rendererInfo.m_ReferenceGeometry = worldGeometry->GetReferenceGeometry();
-
-      // Calculate the actual bounds of the transformed plane clipped by the
-      // dataset bounding box; this is required for drawing the texture at the
-      // correct position during 3D mapping.
-      boundsInitialized = this->CalculateClippedPlaneBounds(
-          rendererInfo.m_ReferenceGeometry, planeGeometry, bounds ); //TODO braucht man nicht immer
-    }
+    // Calculate the actual bounds of the transformed plane clipped by the
+    // dataset bounding box; this is required for drawing the texture at the
+    // correct position during 3D mapping.
+    boundsInitialized = this->CalculateClippedPlaneBounds(
+        worldGeometry->GetReferenceGeometry(), planeGeometry, bounds ); //TODO braucht man nicht immer
   }
   else
   {
@@ -472,8 +450,6 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
 
   rendererInfo.m_Reslicer->SetResliceAxesDirectionCosines( cosines );
 
-
-
   int xMin, xMax, yMin, yMax;
   if ( boundsInitialized )
   {
@@ -572,7 +548,7 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
 
   //TODO image is stored 2x. Do we still need that?
   rendererInfo.m_Image->DeepCopy( reslicedImage );
-//  rendererInfo.m_Image->Update();
+  //  rendererInfo.m_Image->Update();
 
   //TODO how does the reslicer know for which render window it is reslicing for?
   //set the current slice for the localStorage
@@ -608,20 +584,20 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
   this->AdjustCamera( renderer );
 
   //TODO remove this later
-  static int counter = 0;
-  if(counter < 3)
-  {
-    mitk::Surface::Pointer surf = mitk::Surface::New();
-    surf->SetVtkPolyData(localStorage->m_Mapper->GetInput());
-    surf->Update();
+//  static int counter = 0;
+//  if(counter < 3)
+//  {
+//    mitk::Surface::Pointer surf = mitk::Surface::New();
+//    surf->SetVtkPolyData(localStorage->m_Mapper->GetInput());
+//    surf->Update();
 
-    mitk::DataNode::Pointer node = mitk::DataNode::New();
-    node->SetData(surf);
-    renderer->GetDataStorage()->Add(node);
-    counter++;
-  }
-  //TODO remove this later
-  renderer->GetVtkRenderer()->SetBackground(1, 1, 1);
+//    mitk::DataNode::Pointer node = mitk::DataNode::New();
+//    node->SetData(surf);
+//    renderer->GetDataStorage()->Add(node);
+//    counter++;
+//  }
+//  //TODO remove this later
+//  renderer->GetVtkRenderer()->SetBackground(1, 1, 1);
 
   //Transform the camera to the current position (transveral, coronal and saggital plane).
   //This is necessary, because the vtkTransformFilter does not manipulate the vtkCamera.
@@ -668,9 +644,8 @@ bool mitk::ImageVtkMapper2D::CalculateClippedPlaneBounds( const Geometry3D *boun
 
   mitk::BoundingBox::PointType bbMin = boundingBox->GetMinimum();
   mitk::BoundingBox::PointType bbMax = boundingBox->GetMaximum();
-  mitk::BoundingBox::PointType bbCenter = boundingBox->GetCenter();
 
-  vtkPoints *points = vtkPoints::New();
+  vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
   if(boundingGeometry->GetImageGeometry())
   {
     points->InsertPoint( 0, bbMin[0]-0.5, bbMin[1]-0.5, bbMin[2]-0.5 );
@@ -694,13 +669,11 @@ bool mitk::ImageVtkMapper2D::CalculateClippedPlaneBounds( const Geometry3D *boun
     points->InsertPoint( 7, bbMax[0], bbMax[1], bbMin[2] );
   }
 
-  vtkPoints *newPoints = vtkPoints::New();
+  vtkSmartPointer<vtkPoints> newPoints = vtkSmartPointer<vtkPoints>::New();
 
-  vtkTransform *transform = vtkTransform::New();
+  vtkSmartPointer<vtkTransform> transform = vtkSmartPointer<vtkTransform>::New();
   transform->Identity();
-  transform->Concatenate(
-      planeGeometry->GetVtkTransform()->GetLinearInverse()
-      );
+  transform->Concatenate( planeGeometry->GetVtkTransform()->GetLinearInverse() );
 
   transform->Concatenate( boundingGeometry->GetVtkTransform() );
 
@@ -722,11 +695,6 @@ bool mitk::ImageVtkMapper2D::CalculateClippedPlaneBounds( const Geometry3D *boun
   this->LineIntersectZero( newPoints, 5, 6, bounds );
   this->LineIntersectZero( newPoints, 6, 7, bounds );
   this->LineIntersectZero( newPoints, 7, 4, bounds );
-
-  // clean up vtk data
-  points->Delete();
-  newPoints->Delete();
-  transform->Delete();
 
   if ( (bounds[0] > 9999999.0) || (bounds[2] > 9999999.0)
     || (bounds[1] < -9999999.0) || (bounds[3] < -9999999.0) )
@@ -922,7 +890,7 @@ void mitk::ImageVtkMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
       localStorage->m_Texture->SetLookupTable(LookupTableProp->GetLookupTable()->GetVtkLookupTable());
       return; //User-defined lut is used. We can return here.
     }
-  } //END PROPERTY user-defined lut
+  }//END PROPERTY user-defined lut
 
   //If lookup table use is NOT requested (or we have a binary image)
   //we use the internal lookuptable for binary images or level window
@@ -995,7 +963,6 @@ mitk::ImageVtkMapper2D::RendererInfo::RendererInfo()
   m_Reslicer( NULL ),
   m_TSFilter( NULL ),
   m_Image(NULL),
-  m_ReferenceGeometry(NULL),
   m_TextureInterpolation(true),
   m_ObserverID( 0 )
 {

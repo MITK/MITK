@@ -183,9 +183,6 @@ namespace mitk {
       /** \brief Extracted image for 3D rendering */
       vtkImageData *m_Image;
 
-      /** \brief Reference geometry associated with the world geometry */
-      const Geometry3D *m_ReferenceGeometry;
-
       bool m_TextureInterpolation;
 
       /** \brief stores the id of the observer for delete event of renderer */

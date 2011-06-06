@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define _MITK_IMAGESTATISTICSCALCULATOR_H
 
 #include <itkObject.h>
-#include "MitkExtExports.h"
+#include "ImageStatisticsExports.h"
 #include <itkImage.h>
 #include <itkTimeStamp.h>
 
@@ -54,7 +54,7 @@ namespace mitk
  * Note: currently time-resolved and multi-channel pictures are not properly
  * supported.
  */
-class MitkExt_EXPORT ImageStatisticsCalculator : public itk::Object
+class ImageStatistics_EXPORT ImageStatisticsCalculator : public itk::Object
 {
 public:
 
@@ -103,7 +103,7 @@ public:
   void SetImageMask( const mitk::Image *imageMask );
 
   /** \brief Set planar figure for masking. */
-  void SetPlanarFigure( mitk::PlanarFigure *planarFigure );
+  void SetPlanarFigure( const mitk::PlanarFigure *planarFigure );
 
 
   /** \brief Set/Get operation mode for masking */
@@ -257,7 +257,7 @@ protected:
 
   mitk::Image::ConstPointer m_ImageMask;
 
-  mitk::PlanarFigure::Pointer m_PlanarFigure;
+  mitk::PlanarFigure::ConstPointer m_PlanarFigure;
 
   HistogramVectorType m_ImageHistogramVector;
   HistogramVectorType m_MaskedImageHistogramVector;

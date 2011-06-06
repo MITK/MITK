@@ -6,7 +6,6 @@ SET(MODULE_TESTS
   mitkCoreExtObjectFactoryTest
   mitkDataNodeExtTest.cpp
   mitkExternalToolsTest.cpp
-  mitkImageStatisticsCalculatorTest.cpp
   mitkMeshTest.cpp
   mitkMultiStepperTest.cpp
   mitkOrganTypePropertyTest.cpp
@@ -21,7 +20,7 @@ SET(MODULE_IMAGE_TESTS
   mitkUnstructuredGridVtkWriterTest.cpp
   mitkCompressedImageContainerTest.cpp  
   mitkCylindricToCartesianFilterTest.cpp
-  mitkExtractImageFilterTest.cpp  
+  #mitkExtractImageFilterTest.cpp  
   mitkManualSegmentationToSurfaceFilterTest.cpp
   mitkOverwriteSliceImageFilterTest.cpp  
   mitkSurfaceToImageFilterTest.cpp

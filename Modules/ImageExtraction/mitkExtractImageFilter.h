@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define mitkExtractImageFilter_h_Included
 
 #include "mitkCommon.h"
-#include "MitkExtExports.h"
+#include "ImageExtractionExports.h"
 #include "mitkImageToImageFilter.h"
 
 #include "itkImage.h"
@@ -47,7 +47,7 @@ namespace mitk
 
   Last contributor: $Author$
 */
-class MitkExt_EXPORT ExtractImageFilter : public ImageToImageFilter
+class ImageExtraction_EXPORT ExtractImageFilter : public ImageToImageFilter
 {
   public:
 

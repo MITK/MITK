@@ -3,6 +3,8 @@ SET(LIBPOSTFIX "Ext")
 SET(module_dirs
     SceneSerializationBase
     PlanarFigure
+    ImageExtraction
+    ImageStatistics
     MitkExt
     SceneSerialization
     QmitkExt

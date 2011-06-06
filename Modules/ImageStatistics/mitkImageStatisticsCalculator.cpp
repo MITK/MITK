@@ -37,6 +37,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkPoints.h>
 #include <vtkCellArray.h>
 #include <vtkPolyData.h>
+#include <vtkLinearExtrusionFilter.h>
+#include <vtkPolyDataToImageStencil.h>
 #include <vtkImageStencil.h>
 #include <vtkImageImport.h>
 #include <vtkImageExport.h>
@@ -140,7 +142,7 @@ void ImageStatisticsCalculator::SetImageMask( const mitk::Image *imageMask )
 }
 
 
-void ImageStatisticsCalculator::SetPlanarFigure( mitk::PlanarFigure *planarFigure )
+void ImageStatisticsCalculator::SetPlanarFigure( const mitk::PlanarFigure *planarFigure )
 {
   if ( m_Image.IsNull() )
   {

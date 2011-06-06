@@ -92,7 +92,9 @@ bool mitk::PlanarFigure::AddControlPoint( const mitk::Point2D& point, int positi
   if ( m_NumberOfControlPoints < this->GetMaximumNumberOfControlPoints() )
   {
     // if position has not been defined or position would be the last control point, just append the new one
-    if ( position == -1 || position > m_NumberOfControlPoints-1 )
+    // we also append a new point if we click onto the line between the first two control-points if the second control-point is selected
+    // -> special case for PlanarCross
+    if ( position == -1 || position > m_NumberOfControlPoints-1 || (position == 1 && m_SelectedControlPoint == 2) )
     {
       if ( m_ControlPoints.size() > this->GetMaximumNumberOfControlPoints()-1 )
       {
@@ -106,7 +108,7 @@ bool mitk::PlanarFigure::AddControlPoint( const mitk::Point2D& point, int positi
     {
       // insert the point at the given position
       ControlPointListType::iterator iter = m_ControlPoints.begin() + position;
-      m_ControlPoints.insert( iter, this->ApplyControlPointConstraints( m_NumberOfControlPoints, point ) );
+      m_ControlPoints.insert( iter, this->ApplyControlPointConstraints( position, point ) );
       m_SelectedControlPoint = m_NumberOfControlPoints;
     }
 
@@ -363,6 +365,26 @@ bool mitk::PlanarFigure::IsFeatureActive( unsigned int index ) const
   else
   {
     return false;
+  }
+}
+
+bool mitk::PlanarFigure::IsFeatureVisible( unsigned int index ) const
+{
+  if ( index < m_Features.size() )
+  {
+    return m_Features[index].Visible;
+  }
+  else
+  {
+    return false;
+  }
+}
+
+void mitk::PlanarFigure::SetFeatureVisible( unsigned int index, bool visible )
+{
+  if ( index < m_Features.size() )
+  {
+    m_Features[index].Visible = visible;
   }
 }
 
@@ -661,3 +683,4 @@ void mitk::PlanarFigure::AppendPointToHelperPolyLine( unsigned int index, PolyLi
     MITK_ERROR << "Tried to add point to HelperPolyLine " << index+1 << ", although only " << m_HelperPolyLines.size() << " exists";
   }
 }
+

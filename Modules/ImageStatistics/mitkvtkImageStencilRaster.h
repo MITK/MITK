@@ -26,7 +26,7 @@
 
 #include "vtkImageStencilData.h"
 #include "vtkDataObject.h"
-#include "MitkExtExports.h"
+#include "ImageStatisticsExports.h"
 
 
 //BTX
@@ -35,7 +35,7 @@
 // infinite resolution in the X direction (approximately, since it uses
 // double precision).  Lines that represent polygon edges can be drawn
 // into this raster, and then filled given a tolerance.
-class MitkExt_EXPORT vtkImageStencilRaster
+class ImageStatistics_EXPORT vtkImageStencilRaster
 {
 public:
   // Description:

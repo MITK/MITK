@@ -28,13 +28,13 @@
 
 
 #include "vtkImageStencilSource.h"
-#include "MitkExtExports.h"
+#include "ImageStatisticsExports.h"
 
 class vtkPoints;
 class vtkSpline;
 class vtkLSSPointMap;
 
-class MitkExt_EXPORT vtkLassoStencilSource : public vtkImageStencilSource
+class ImageStatistics_EXPORT vtkLassoStencilSource : public vtkImageStencilSource
 {
 public:
   static vtkLassoStencilSource *New();

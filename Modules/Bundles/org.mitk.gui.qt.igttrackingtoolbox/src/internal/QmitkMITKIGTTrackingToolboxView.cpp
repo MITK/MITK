@@ -31,7 +31,13 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkNavigationToolStorageDeserializer.h>
 #include <mitkTrackingDeviceSourceConfigurator.h>
 #include <mitkTrackingVolumeGenerator.h>
+#include <mitkNDITrackingDevice.h>
+#include <mitkEllipsoid.h>
+#include <mitkNodePredicateNot.h>
+#include <mitkNodePredicateProperty.h>
 
+// vtk
+#include <vtkSphereSource.h>
 
 
 const std::string QmitkMITKIGTTrackingToolboxView::VIEW_ID = "org.mitk.views.mitkigttrackingtoolbox";
@@ -70,6 +76,8 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl( QWidget *parent )
     connect( m_Controls->m_ChooseFile, SIGNAL(clicked()), this, SLOT(OnChooseFileClicked()));
     connect( m_Controls->m_StartLogging, SIGNAL(clicked()), this, SLOT(StartLogging()));
     connect( m_Controls->m_StopLogging, SIGNAL(clicked()), this, SLOT(StopLogging()));
+    connect( m_Controls->m_configurationWidget, SIGNAL(TrackingDeviceSelectionChanged()), this, SLOT(OnTrackingDeviceChanged()));
+    connect( m_Controls->m_AutoDetectTools, SIGNAL(clicked()), this, SLOT(OnAutoDetectTools()));
 
     //initialize widgets
     m_Controls->m_configurationWidget->EnableAdvancedUserControl(false);
@@ -77,12 +85,13 @@ void QmitkMITKIGTTrackingToolboxView::CreateQtPartControl( QWidget *parent )
     m_Controls->m_TrackingToolsStatusWidget->SetTextAlignment(Qt::AlignLeft);
 
     //initialize tracking volume node
-    TrackingVolumeNode = mitk::DataNode::New();
-    TrackingVolumeNode->SetName("TrackingVolume");
-    this->GetDataStorage()->Add(TrackingVolumeNode);
+    m_TrackingVolumeNode = mitk::DataNode::New();
+    m_TrackingVolumeNode->SetName("TrackingVolume");
+    this->GetDataStorage()->Add(m_TrackingVolumeNode);
 
     //initialize buttons
     m_Controls->m_StopTracking->setEnabled(false);
+    m_Controls->m_AutoDetectTools->setVisible(false); //only visible if tracking device is Aurora
   }
 }
 
@@ -182,23 +191,24 @@ this->m_Controls->m_configurationWidget->ConfigurationFinished();
 //show tracking volume
 if (m_Controls->m_ShowTrackingVolume->isChecked())
   {
-  mitk::TrackingVolumeGenerator::Pointer volumeGenerator= mitk::TrackingVolumeGenerator::New();
+  mitk::TrackingVolumeGenerator::Pointer volumeGenerator = mitk::TrackingVolumeGenerator::New();
   volumeGenerator->SetTrackingDeviceType(m_TrackingDeviceSource->GetTrackingDevice()->GetType());
   volumeGenerator->Update();
 
   mitk::Surface::Pointer volumeSurface = volumeGenerator->GetOutput();
 
-  TrackingVolumeNode->SetData(volumeSurface);
-  TrackingVolumeNode->SetOpacity(0.25);
+  m_TrackingVolumeNode->SetData(volumeSurface);
+  m_TrackingVolumeNode->SetOpacity(0.25);
   mitk::Color red;
   red.SetRed(1);
-  TrackingVolumeNode->SetColor(red);
+  m_TrackingVolumeNode->SetColor(red);
   }
 
 m_tracking = true;
 m_Controls->m_StopTracking->setEnabled(true);
 m_Controls->m_StartTracking->setEnabled(false);
 
+this->GlobalReinit();
 }
 
 void QmitkMITKIGTTrackingToolboxView::OnStopTracking()
@@ -213,10 +223,63 @@ if (m_logging) StopLogging();
 this->m_Controls->m_LoadTools->setEnabled(true);
 m_Controls->m_TrackingToolsStatusWidget->RemoveStatusLabels();
 m_Controls->m_TrackingToolsStatusWidget->PreShowTools(m_toolStorage);
-TrackingVolumeNode->SetData(NULL);
+m_TrackingVolumeNode->SetData(NULL);
 m_tracking = false;
 m_Controls->m_StopTracking->setEnabled(false);
 m_Controls->m_StartTracking->setEnabled(true);
+}
+
+void QmitkMITKIGTTrackingToolboxView::OnTrackingDeviceChanged()
+{
+if (m_Controls->m_configurationWidget->GetTrackingDevice()->GetType() == mitk::NDIAurora)
+  {m_Controls->m_AutoDetectTools->setVisible(true);}
+else
+  {m_Controls->m_AutoDetectTools->setVisible(false);}
+}
+
+void QmitkMITKIGTTrackingToolboxView::OnAutoDetectTools()
+{
+if (m_Controls->m_configurationWidget->GetTrackingDevice()->GetType() == mitk::NDIAurora)
+    {
+    mitk::NDITrackingDevice::Pointer currentDevice = dynamic_cast<mitk::NDITrackingDevice*>(m_Controls->m_configurationWidget->GetTrackingDevice().GetPointer());  
+    currentDevice->OpenConnection();
+    currentDevice->StartTracking();
+    mitk::NavigationToolStorage::Pointer autoDetectedStorage = mitk::NavigationToolStorage::New();
+    for (int i=0; i<currentDevice->GetToolCount(); i++)
+      {
+      //create a navigation tool with sphere as surface
+      std::stringstream toolname;
+      toolname << "AutoDetectedTool" << i;
+      mitk::NavigationTool::Pointer newTool = mitk::NavigationTool::New();
+      newTool->SetSerialNumber(dynamic_cast<mitk::NDIPassiveTool*>(currentDevice->GetTool(i))->GetSerialNumber());
+      newTool->SetIdentifier(toolname.str());
+      newTool->SetTrackingDeviceType(mitk::NDIAurora);
+      mitk::DataNode::Pointer newNode = mitk::DataNode::New();
+      mitk::Ellipsoid::Pointer mySphere = mitk::Ellipsoid::New();
+      vtkSphereSource *vtkData = vtkSphereSource::New();
+      vtkData->SetRadius(3.0f);
+      vtkData->SetCenter(0.0, 0.0, 0.0);
+      vtkData->Update();
+      mySphere->SetVtkPolyData(vtkData->GetOutput());
+      vtkData->Delete();
+      newNode->SetData(mySphere);
+      newNode->SetName(toolname.str());
+      newTool->SetDataNode(newNode);
+      this->GetDataStorage()->Add(newNode);
+      //add tool to navigation tool storage
+      autoDetectedStorage->AddTool(newTool);
+      }
+    //save detected tools
+    m_toolStorage = autoDetectedStorage;
+    //update label
+    QString toolLabel = QString("Loaded Tools: ") + QString::number(m_toolStorage->GetToolCount()) + " Tools (Auto Detected)";
+    m_Controls->m_toolLabel->setText(toolLabel);
+    //update tool preview
+    m_Controls->m_TrackingToolsStatusWidget->RemoveStatusLabels();
+    m_Controls->m_TrackingToolsStatusWidget->PreShowTools(m_toolStorage);
+    currentDevice->StopTracking();
+    currentDevice->CloseConnection();
+    }  
 }
 
 void QmitkMITKIGTTrackingToolboxView::MessageBox(std::string s)
@@ -282,6 +345,19 @@ void QmitkMITKIGTTrackingToolboxView::StopLogging()
   m_loggingFilter->StopRecording();
   m_logging = false;
   }
+
+void QmitkMITKIGTTrackingToolboxView::GlobalReinit()
+{
+// get all nodes that have not set "includeInBoundingBox" to false
+  mitk::NodePredicateNot::Pointer pred = mitk::NodePredicateNot::New(mitk::NodePredicateProperty::New("includeInBoundingBox", mitk::BoolProperty::New(false)));
+
+  mitk::DataStorage::SetOfObjects::ConstPointer rs = this->GetDataStorage()->GetSubset(pred);
+  // calculate bounding geometry of these nodes
+  mitk::TimeSlicedGeometry::Pointer bounds = this->GetDataStorage()->ComputeBoundingGeometry3D(rs, "visible");
+
+  // initialize the views to the bounding geometry
+  mitk::RenderingManager::GetInstance()->InitializeViews(bounds);
+}
 
 
 

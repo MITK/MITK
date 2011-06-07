@@ -97,8 +97,8 @@ void mitk::CameraIntrinsics::SetIntrinsics( const cv::Mat& _CameraMatrix
       _DistorsionCoeffs.rows == 1, "Wrong format of distorsion coefficients"
                                   " vector. Should be 5x1 double.");
 
-    m_CameraMatrix = _CameraMatrix;
-    m_DistorsionCoeffs = _DistorsionCoeffs;
+    m_CameraMatrix = _CameraMatrix.clone();
+    m_DistorsionCoeffs = _DistorsionCoeffs.clone();
 
     m_Valid = true;
   }
@@ -236,7 +236,7 @@ void mitk::CameraIntrinsics::FromGMLCalibrationXML(TiXmlElement* elem)
   assert( elem->ValueStr() == "results" );
   cv::Mat CameraMatrix = cv::Mat::zeros(3, 3, cv::DataType<double>::type);
   CameraMatrix.at<double>(2,2) = 1.0;
-  cv::Mat DistorsionCoeffs = cv::Mat::zeros(1, 4, cv::DataType<double>::type);
+  cv::Mat DistorsionCoeffs = cv::Mat::zeros(1, 5, cv::DataType<double>::type);
 
   TiXmlElement* focus_lenXElem = elem->FirstChildElement("focus_lenX");
   endoAssert( focus_lenXElem != 0 );
@@ -331,7 +331,8 @@ void mitk::CameraIntrinsics::FromXML(TiXmlElement* elem)
     err << "cy, ";
 
   // DISTORSION COEFFS
-  cv::Mat DistorsionCoeffs = cv::Mat::zeros(1, 4, cv::DataType<double>::type);
+  endodebug( "creating DistorsionCoeffs from XML file")
+  cv::Mat DistorsionCoeffs = cv::Mat::zeros(1, 5, cv::DataType<double>::type);
   if(elem->QueryFloatAttribute("k1", &val) == TIXML_SUCCESS)
     DistorsionCoeffs.at<double>(0,0) = val;
   else
@@ -351,6 +352,8 @@ void mitk::CameraIntrinsics::FromXML(TiXmlElement* elem)
     DistorsionCoeffs.at<double>(0,3) = val;
   else
     err << "p2, ";
+
+  DistorsionCoeffs.at<double>(0,4) = 0.0;
 
   /*if(elem->QueryFloatAttribute("k3", &val) == TIXML_SUCCESS)
     DistorsionCoeffs.at<double>(4,0) = val;

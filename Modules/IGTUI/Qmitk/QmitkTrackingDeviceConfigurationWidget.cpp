@@ -117,7 +117,6 @@ switch(style)
 
 }
 
-
 QmitkTrackingDeviceConfigurationWidget::~QmitkTrackingDeviceConfigurationWidget()
 {
 }
@@ -155,6 +154,9 @@ void QmitkTrackingDeviceConfigurationWidget::CreateConnections()
     m_Controls->m_portSpinBoxAurora->setPrefix("");
     m_Controls->m_portSpinBoxPolaris->setPrefix("");
     #endif
+
+    //disable unused UI component
+    m_Controls->m_polarisTrackingModeBox->setVisible(false); //don't delete this component, because it is used in the MBI part of MITK
   }
 }
 

@@ -73,6 +73,10 @@ class QmitkMITKIGTTrackingToolboxView : public QObject, public QmitkFunctionalit
 
     void StopLogging();
 
+    void OnTrackingDeviceChanged();
+
+    void OnAutoDetectTools();
+
     /** @brief Slot for tracking timer */
     void UpdateTrackingTimer();
   
@@ -91,9 +95,9 @@ class QmitkMITKIGTTrackingToolboxView : public QObject, public QmitkFunctionalit
 
     int m_loggedFrames;
 
-    
+    mitk::DataNode::Pointer m_TrackingVolumeNode;
 
-    mitk::DataNode::Pointer TrackingVolumeNode;
+    void GlobalReinit();
 
 	  //stores the loaded tools
 	  mitk::NavigationToolStorage::Pointer m_toolStorage;

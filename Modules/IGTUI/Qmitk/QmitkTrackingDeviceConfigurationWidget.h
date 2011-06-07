@@ -109,6 +109,9 @@ class MitkIGTUI_EXPORT QmitkTrackingDeviceConfigurationWidget : public QWidget
      */
     void TrackingDeviceConfigurationReseted();
 
+    /* @brief This signal is sent if the tracking device was changed. */
+    void TrackingDeviceSelectionChanged();
+
   protected:
     
     /// \brief Creation of the connections

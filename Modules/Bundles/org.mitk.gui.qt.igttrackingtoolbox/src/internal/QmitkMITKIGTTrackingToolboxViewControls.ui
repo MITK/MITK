@@ -72,11 +72,35 @@ p, li { white-space: pre-wrap; }
            </widget>
           </item>
           <item>
-           <widget class="QLabel" name="m_toolLabel">
-            <property name="text">
-             <string>Loaded Tools: &lt;none&gt;</string>
-            </property>
-           </widget>
+           <layout class="QHBoxLayout" name="horizontalLayout_8">
+            <item>
+             <widget class="QLabel" name="m_toolLabel">
+              <property name="text">
+               <string>Loaded Tools: &lt;none&gt;</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_7">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QPushButton" name="m_AutoDetectTools">
+              <property name="text">
+               <string>Auto Detection</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
           </item>
           <item>
            <widget class="QmitkToolTrackingStatusWidget" name="m_TrackingToolsStatusWidget" native="true"/>

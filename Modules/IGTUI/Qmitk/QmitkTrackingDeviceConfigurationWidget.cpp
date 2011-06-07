@@ -173,6 +173,8 @@ void QmitkTrackingDeviceConfigurationWidget::TrackingDeviceChanged()
   if (m_Controls->m_trackingDeviceChooser->currentIndex()==0) AddOutput("<br>NDI Polaris selected");        //NDI Polaris
   else if (m_Controls->m_trackingDeviceChooser->currentIndex()==1) AddOutput("<br>NDI Aurora selected");    //NDI Aurora
   else if (m_Controls->m_trackingDeviceChooser->currentIndex()==2) AddOutput("<br>Microntracker selected"); //ClaronTechnology MicronTracker 2
+
+  emit TrackingDeviceSelectionChanged();
 }
 
 void QmitkTrackingDeviceConfigurationWidget::EnableUserReset(bool enable)

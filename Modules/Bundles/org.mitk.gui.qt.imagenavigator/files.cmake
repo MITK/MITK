@@ -4,7 +4,7 @@ SET(SRC_CPP_FILES
 
 SET(INTERNAL_CPP_FILES
   QmitkImageNavigatorView.cpp
-
+  mitkImageNavigatorPluginActivator.cpp
 )
 
 SET(UI_FILES
@@ -12,18 +12,19 @@ SET(UI_FILES
 )
 
 SET(MOC_H_FILES
+  src/internal/mitkImageNavigatorPluginActivator.h
   src/internal/QmitkImageNavigatorView.h
 )
 
-SET(RESOURCE_FILES
+SET(CACHED_RESOURCE_FILES
   resources/Slider.png
+  plugin.xml
 )
 
-SET(RES_FILES
+SET(QRC_FILES
   resources/QmitkImageNavigatorView.qrc
 )
 
-SET(CPP_FILES manifest.cpp)
 
 foreach(file ${SRC_CPP_FILES})
   SET(CPP_FILES ${CPP_FILES} src/${file})

@@ -3,8 +3,8 @@
 Program:   Medical Imaging & Interaction Toolkit
 Language:  C++
 Date:      $Date$
-Version:   $Revision$ 
- 
+Version:   $Revision$
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
@@ -34,7 +34,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <QTimer>
 
 /*!
-  \brief QmitkMITKIGTTrackingToolboxView 
+  \brief QmitkMITKIGTTrackingToolboxView
 
   \warning  This application module is not yet documented. Use "svn blame/praise/annotate" and ask the author to provide basic documentation.
 
@@ -42,16 +42,21 @@ PURPOSE.  See the above copyright notices for more information.
   \ingroup Functionalities
 */
 class QmitkMITKIGTTrackingToolboxView : public QmitkFunctionality
-{  
+{
   // this is needed for all Qt objects that should have a Qt meta-object
   // (everything that derives from QObject and wants to have signal/slots)
   Q_OBJECT
-  
-  public:  
+
+  public:
 
     static const std::string VIEW_ID;
 
     QmitkMITKIGTTrackingToolboxView();
+    QmitkMITKIGTTrackingToolboxView(const QmitkMITKIGTTrackingToolboxView& other)
+  	{
+    	Q_UNUSED(other)
+    	throw std::runtime_error("Copy constructor not implemented");
+  	}
     virtual ~QmitkMITKIGTTrackingToolboxView();
 
     virtual void CreateQtPartControl(QWidget *parent);
@@ -68,7 +73,7 @@ class QmitkMITKIGTTrackingToolboxView : public QmitkFunctionality
 	  void OnStopTracking();
 
     void OnChooseFileClicked();
-    
+
     void StartLogging();
 
     void StopLogging();
@@ -79,8 +84,8 @@ class QmitkMITKIGTTrackingToolboxView : public QmitkFunctionality
 
     /** @brief Slot for tracking timer */
     void UpdateTrackingTimer();
-  
-   
+
+
   protected:
 
     Ui::QmitkMITKIGTTrackingToolboxViewControls* m_Controls;
@@ -108,10 +113,9 @@ class QmitkMITKIGTTrackingToolboxView : public QmitkFunctionality
 	  mitk::NavigationDataRecorder::Pointer m_loggingFilter;
 
     QTimer* m_TrackingTimer;
-	
+
 };
 
 
 
 #endif // _QMITKMITKIGTTRACKINGTOOLBOXVIEW_H_INCLUDED
-

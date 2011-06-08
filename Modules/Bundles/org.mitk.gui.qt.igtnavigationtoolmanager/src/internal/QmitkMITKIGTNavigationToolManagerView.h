@@ -3,8 +3,8 @@
 Program:   Medical Imaging & Interaction Toolkit
 Language:  C++
 Date:      $Date$
-Version:   $Revision$ 
- 
+Version:   $Revision$
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
@@ -27,7 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 /*!
-  \brief QmitkMITKIGTNavigationToolManagerView 
+  \brief QmitkMITKIGTNavigationToolManagerView
 
   \warning  This application module is not yet documented. Use "svn blame/praise/annotate" and ask the author to provide basic documentation.
 
@@ -35,16 +35,21 @@ PURPOSE.  See the above copyright notices for more information.
   \ingroup Functionalities
 */
 class QmitkMITKIGTNavigationToolManagerView : public QmitkFunctionality
-{  
+{
   // this is needed for all Qt objects that should have a Qt meta-object
   // (everything that derives from QObject and wants to have signal/slots)
   Q_OBJECT
-  
-  public:  
+
+  public:
 
     static const std::string VIEW_ID;
 
     QmitkMITKIGTNavigationToolManagerView();
+    QmitkMITKIGTNavigationToolManagerView(const QmitkMITKIGTNavigationToolManagerView& other)
+  	{
+    	Q_UNUSED(other)
+    	throw std::runtime_error("Copy constructor not implemented");
+  	}
     virtual ~QmitkMITKIGTNavigationToolManagerView();
 
     virtual void CreateQtPartControl(QWidget *parent);
@@ -53,7 +58,7 @@ class QmitkMITKIGTNavigationToolManagerView : public QmitkFunctionality
     virtual void StdMultiWidgetNotAvailable();
 
   protected slots:
-  
+
   protected:
 
     Ui::QmitkMITKIGTNavigationToolManagerViewControls* m_Controls;
@@ -64,4 +69,3 @@ class QmitkMITKIGTNavigationToolManagerView : public QmitkFunctionality
 
 
 #endif // _QMITKMITKIGTNAVIGATIONTOOLMANAGERVIEW_H_INCLUDED
-

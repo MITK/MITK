@@ -3,7 +3,7 @@
 #-----------------------------------------------------------------------------
 
 IF(MITK_USE_OpenCV)
-if (UNIX)
+if (UNIX AND NOT APPLE)
 
   include(${MITK_SOURCE_DIR}/CMake/mitkMacroGetLinuxDistribution.cmake)
   GetLinuxDistribution()

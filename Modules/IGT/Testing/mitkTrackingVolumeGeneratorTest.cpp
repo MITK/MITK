@@ -87,8 +87,8 @@ public:
     {
         MITK_TEST_OUTPUT(<< "---- Testing Invalid Inputs (errors should occure) ----");
         mitk::TrackingVolumeGenerator::Pointer myTVGenerator = mitk::TrackingVolumeGenerator::New ();
-        myTVGenerator->SetTrackingDeviceType(mitk::AscensionMicroBird); //MicroBird not implemented yet, so using as test dummy
-        MITK_TEST_CONDITION((myTVGenerator->GetTrackingDeviceType() == mitk::AscensionMicroBird),"testing device type");
+        myTVGenerator->SetTrackingDeviceType(mitk::TrackingSystemInvalid); //MicroBird not implemented yet, so using as test dummy
+        MITK_TEST_CONDITION((myTVGenerator->GetTrackingDeviceType() == mitk::TrackingSystemInvalid),"testing device type");
         myTVGenerator->Update();
         MITK_TEST_CONDITION(myTVGenerator->GetOutput()->GetVtkPolyData()->GetNumberOfVerts()==0,"testing (invalid) output");   
     }

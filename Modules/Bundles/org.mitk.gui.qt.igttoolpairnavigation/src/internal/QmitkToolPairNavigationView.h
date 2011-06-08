@@ -55,6 +55,12 @@ class QmitkToolPairNavigationView : public QmitkFunctionality
   static const std::string VIEW_ID;
 
   QmitkToolPairNavigationView();
+  QmitkToolPairNavigationView(const QmitkToolPairNavigationView& other)
+  {
+    Q_UNUSED(other)
+    throw std::runtime_error("Copy constructor not implemented");
+  }
+  
   virtual ~QmitkToolPairNavigationView();
 
   virtual void CreateQtPartControl(QWidget *parent);

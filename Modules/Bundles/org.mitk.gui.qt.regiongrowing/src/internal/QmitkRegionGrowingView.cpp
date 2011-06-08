@@ -44,6 +44,11 @@ QmitkRegionGrowingView::QmitkRegionGrowingView()
 , m_MultiWidget( NULL )
 {
 }
+QmitkRegionGrowingView::QmitkRegionGrowingView(const QmitkRegionGrowingView& other)
+{
+  Q_UNUSED(other)
+  throw std::runtime_error("Copy constructor not implemented");
+}
 
 QmitkRegionGrowingView::~QmitkRegionGrowingView()
 {

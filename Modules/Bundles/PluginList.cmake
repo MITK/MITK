@@ -9,4 +9,5 @@ SET(MITK_EXT_PLUGINS
   org.mitk.gui.qt.datamanager:ON
   org.mitk.gui.qt.igtnavigationtoolmanager:OFF
   org.mitk.gui.qt.igttrackingtoolbox:OFF
+  org.mitk.gui.qt.regiongrowing:OFF
   )

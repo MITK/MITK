@@ -137,6 +137,7 @@ const mitk::Image* mitk::ImageVtkMapper2D::GetInput( void )
 
 vtkProp* mitk::ImageVtkMapper2D::GetVtkProp(mitk::BaseRenderer* renderer)
 {
+  this->Update(renderer);
   //return the actor corresponding to the renderer
   return m_LSH.GetLocalStorage(renderer)->m_Actor;
 }

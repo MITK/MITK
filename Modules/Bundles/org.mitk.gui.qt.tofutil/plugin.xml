@@ -5,7 +5,7 @@
   <extension point="org.blueberry.ui.views">
     <view id="org.mitk.views.tofutil"
           name="ToFUtil"
-          class="::QmitkToFUtilView" 
+          class="QmitkToFUtilView" 
           icon="resources/icon.xpm" />
   </extension>
 

@@ -12,4 +12,6 @@ SET(MITK_EXT_PLUGINS
   org.mitk.gui.qt.igttrackingtoolbox:OFF
   org.mitk.gui.qt.regiongrowing:OFF
   org.mitk.gui.qt.navigationdataplayer:ON
+  org.mitk.gui.qt.basicimageprocessing:OFF
+  org.mitk.gui.qt.colourimageprocessing:OFF
   )

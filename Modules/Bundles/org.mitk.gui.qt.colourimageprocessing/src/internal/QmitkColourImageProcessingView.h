@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define _QMITKCOLOURIMAGEPROCESSINGVIEW_H_INCLUDED
 
 #include <QmitkFunctionality.h>
-
+#include <org_mitk_gui_qt_colourimageprocessing_Export.h>
 #include <string>
 #include <mitkWeakPointer.h>
 
@@ -42,6 +42,13 @@ public:
   static const std::string VIEW_ID;
 
   QmitkColourImageProcessingView();
+  
+   QmitkColourImageProcessingView(const QmitkColourImageProcessingView& other)
+  {
+    Q_UNUSED(other)
+    throw std::runtime_error("Copy constructor not implemented");
+  }
+  
   virtual ~QmitkColourImageProcessingView();
 
   virtual void CreateQtPartControl(QWidget *parent);

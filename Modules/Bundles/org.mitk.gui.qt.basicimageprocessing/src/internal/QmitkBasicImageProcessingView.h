@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define QmitkBasicImageProcessingView_H__INCLUDED
 
 #include "QmitkFunctionality.h"
-#include "../BasicimageprocessingDll.h"
+#include <org_mitk_gui_qt_basicimageprocessing_Export.h>
 #include "ui_QmitkBasicImageProcessingViewControls.h"
 
 #include "QmitkStepperAdapter.h"
@@ -60,6 +60,11 @@ public:
   \brief default constructor  
   */  
   QmitkBasicImageProcessing();
+  QmitkBasicImageProcessing(const QmitkBasicImageProcessing& other)
+  {
+    Q_UNUSED(other)
+      throw std::runtime_error("Copy constructor not implemented");
+  }
 
   /*!  
   \brief default destructor  

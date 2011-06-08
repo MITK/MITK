@@ -129,7 +129,7 @@ public:
     mitk::TrackingDevice::Pointer testDevice = dynamic_cast<mitk::TrackingDevice*>(mitk::ClaronTrackingDevice::New().GetPointer());
 
     testInstance = mitk::TrackingDeviceSourceConfigurator::New(claronStorage,testDevice);
-
+    
     mitk::TrackingDeviceSource::Pointer testSource = testInstance->CreateTrackingDeviceSource();
     
     MITK_TEST_CONDITION_REQUIRED(testSource->GetNumberOfOutputs()==2,"testing number of outputs");
@@ -173,6 +173,52 @@ public:
     MITK_TEST_CONDITION_REQUIRED(testSource->GetNumberOfOutputs()==1,"..testing number of outputs");
     MITK_TEST_CONDITION_REQUIRED(testSource->GetTrackingDevice()->GetToolCount()==1,"..testing tracking device");
   }
+
+  static void TestAdditionalMethods()
+  {
+    MITK_TEST_OUTPUT(<<"Testing additional methods of TrackingDeviceSourceCOnfigurator");
+    MITK_TEST_OUTPUT(<<"..using claron tracking device for testing");
+    std::string toolFileName = mitk::StandardFileLocations::GetInstance()->FindFile("ClaronTool", "Modules/IGT/Testing/Data");
+    MITK_TEST_CONDITION(toolFileName.empty() == false, "..check if tool calibration of claron tool file exists");
+
+    mitk::TrackingDeviceSourceConfigurator::Pointer testInstance;
+
+    mitk::NavigationToolStorage::Pointer claronStorage = mitk::NavigationToolStorage::New();
+
+    //create valid tool 1
+    mitk::NavigationTool::Pointer firstTool = mitk::NavigationTool::New();
+    firstTool->SetTrackingDeviceType(mitk::ClaronMicron);
+    mitk::DataNode::Pointer firstNode = mitk::DataNode::New();
+    firstNode->SetName("Tool1");
+    firstTool->SetDataNode(firstNode);
+    firstTool->SetCalibrationFile(toolFileName);
+    firstTool->SetIdentifier("Tool#1");
+    claronStorage->AddTool(firstTool);
+
+    //create valid tool 2
+    mitk::NavigationTool::Pointer secondTool = mitk::NavigationTool::New();
+    secondTool->SetTrackingDeviceType(mitk::ClaronMicron);
+    mitk::DataNode::Pointer secondNode = mitk::DataNode::New();
+    secondNode->SetName("Tool2");
+    secondTool->SetDataNode(secondNode);
+    secondTool->SetCalibrationFile(toolFileName);
+    secondTool->SetIdentifier("Tool#2");
+    claronStorage->AddTool(secondTool);
+    
+    mitk::TrackingDevice::Pointer testDevice = dynamic_cast<mitk::TrackingDevice*>(mitk::ClaronTrackingDevice::New().GetPointer());
+
+    testInstance = mitk::TrackingDeviceSourceConfigurator::New(claronStorage,testDevice);
+    
+    mitk::TrackingDeviceSource::Pointer testSource = testInstance->CreateTrackingDeviceSource();
+
+    //numbers must be the same in case of MicronTracker
+    MITK_TEST_CONDITION_REQUIRED(testInstance->GetToolNumberInToolStorage(0)==0,"..testing method GetToolNumberInToolStorage()");
+    MITK_TEST_CONDITION_REQUIRED(testInstance->GetToolIdentifierInToolStorage(0)=="Tool#1","..testing method GetToolIdentifierInToolStorage()");
+    MITK_TEST_CONDITION_REQUIRED(testInstance->GetToolNumbersInToolStorage().at(0)==0,"..testing method GetToolNumbersInToolStorage()");
+    MITK_TEST_CONDITION_REQUIRED(testInstance->GetToolIdentifiersInToolStorage().at(0)=="Tool#1","..testing method GetToolIdentifiersInToolStorage()");
+    
+  
+  }
 };
 
 int mitkTrackingDeviceSourceConfiguratorTest(int /* argc */, char* /*argv*/[])
@@ -182,6 +228,7 @@ int mitkTrackingDeviceSourceConfiguratorTest(int /* argc */, char* /*argv*/[])
   mitkTrackingDeviceSourceConfiguratorTestClass::TestInstantiation();
   mitkTrackingDeviceSourceConfiguratorTestClass::TestInvalidClaronTrackingDevice();
   mitkTrackingDeviceSourceConfiguratorTestClass::TestValidClaronTrackingDevice();
+  mitkTrackingDeviceSourceConfiguratorTestClass::TestAdditionalMethods();
   
   MITK_TEST_END();
 }

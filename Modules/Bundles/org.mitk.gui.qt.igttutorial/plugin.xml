@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <plugin>
-  
+
   <extension point="org.blueberry.ui.views">
     <view id="org.mitk.views.imageguidedtherapytutorial"
           name="Image Guided Therapy Tutorial"
-          class="::QmitkImageGuidedTherapyTutorialView"
+          class="QmitkImageGuidedTherapyTutorialView"
           icon="resources/ImageGuidedTherapyTutorial.png"/>
   </extension>
 

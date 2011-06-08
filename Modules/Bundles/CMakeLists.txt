@@ -28,6 +28,7 @@ IF(MITK_USE_BLUEBERRY)
     org.mitk.planarfigure
     org.mitk.gui.qt.igtnavigationtoolmanager
     org.mitk.gui.qt.igttrackingtoolbox
+    org.mitk.gui.qt.igttutorial
   )
 
   MACRO_COLLECT_PLUGINS(OUTPUT_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/ExtBundles

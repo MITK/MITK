@@ -24,6 +24,7 @@ IF(MITK_USE_BLUEBERRY)
     org.mitk.gui.qt.ext
     org.mitk.gui.qt.extapplication
     org.mitk.gui.qt.datamanager
+    org.mitk.gui.qt.regiongrowing
     org.mitk.planarfigure
   )
 

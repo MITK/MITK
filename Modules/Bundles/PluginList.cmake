@@ -7,4 +7,5 @@ SET(MITK_EXT_PLUGINS
   org.mitk.gui.qt.extapplication:ON
   org.mitk.planarfigure:ON
   org.mitk.gui.qt.datamanager:ON
+  org.mitk.gui.qt.regiongrowing:OFF
   )

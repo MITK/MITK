@@ -9,7 +9,7 @@
 #include "mitkDataStorage.h"
 #include "mitkToolManager.h"
 
-#include "mitkQtSegmentationDll.h"
+#include "org_mitk_gui_qt_segmentation_Export.h"
 
 #include <QObject>
 #include <QDialog>
@@ -18,34 +18,39 @@ class MITK_QT_SEGMENTATION QmitkThresholdAction: public QObject, public mitk::IC
 {
   Q_OBJECT
 
-  public:
+public:
 
-    QmitkThresholdAction();
-    virtual ~QmitkThresholdAction();
+  QmitkThresholdAction();
+  QmitkThresholdAction(const QmitkThresholdAction& other)
+  {
+    Q_UNUSED(other)
+    throw std::runtime_error("Copy constructor not implemented");
+  }
+  virtual ~QmitkThresholdAction();
 
-    //interface methods
-    void Run( const std::vector<mitk::DataNode*>& selectedNodes );
-    void SetDataStorage(mitk::DataStorage* dataStorage);
-    void SetSmoothed(bool smoothed);
-    void SetDecimated(bool decimated);
-    void SetFunctionality(berry::QtViewPart* functionality);
+  //interface methods
+  void Run( const std::vector<mitk::DataNode*>& selectedNodes );
+  void SetDataStorage(mitk::DataStorage* dataStorage);
+  void SetSmoothed(bool smoothed);
+  void SetDecimated(bool decimated);
+  void SetFunctionality(berry::QtViewPart* functionality);
 
-    // for receiving messages
-    void OnThresholdingToolManagerToolModified();
+  // for receiving messages
+  void OnThresholdingToolManagerToolModified();
 
-  protected:
+protected:
 
-     typedef std::vector<mitk::DataNode*> NodeList;
+  typedef std::vector<mitk::DataNode*> NodeList;
 
-     mitk::DataStorage::Pointer m_DataStorage;
-     mitk::ToolManager::Pointer m_ThresholdingToolManager;
+  mitk::DataStorage::Pointer m_DataStorage;
+  mitk::ToolManager::Pointer m_ThresholdingToolManager;
 
-     QDialog* m_ThresholdingDialog;
+  QDialog* m_ThresholdingDialog;
 
-  protected slots:
+protected slots:
 
-    // class internal slot
-    void ThresholdingDone(int);
+  // class internal slot
+  void ThresholdingDone(int);
 };
 
 #endif // QMITK_THRESHOLDACTION_H

@@ -5,6 +5,7 @@ SET(MITK_EXT_PLUGINS
   org.mitk.gui.qt.diffusionimaging:OFF
   org.mitk.gui.qt.ext:ON
   org.mitk.gui.qt.extapplication:ON
+  org.mitk.gui.qt.segmentation:OFF
   org.mitk.planarfigure:ON
   org.mitk.gui.qt.datamanager:ON
   )

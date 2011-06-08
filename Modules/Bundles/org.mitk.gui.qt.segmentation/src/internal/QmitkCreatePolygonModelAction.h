@@ -4,15 +4,21 @@
 #include "berryQtViewPart.h"
 #include "mitkIContextMenuAction.h"
 
-#include "mitkQtSegmentationDll.h"
+#include "org_mitk_gui_qt_segmentation_Export.h"
 
 #include "mitkDataNode.h"
 
-class MITK_QT_SEGMENTATION QmitkCreatePolygonModelAction: public mitk::IContextMenuAction
+class MITK_QT_SEGMENTATION QmitkCreatePolygonModelAction: public QObject, public mitk::IContextMenuAction
 {
+  Q_OBJECT
 
 public:
   QmitkCreatePolygonModelAction();
+  QmitkCreatePolygonModelAction(const QmitkCreatePolygonModelAction& other)
+  {
+    Q_UNUSED(other)
+    throw std::runtime_error("Copy constructor not implemented");
+  }
   virtual ~QmitkCreatePolygonModelAction();
 
   //interface methods

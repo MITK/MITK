@@ -184,6 +184,7 @@ else {m_Controls->m_TrackingToolsStatusWidget->SetShowQuaternions(false);}
 
 //disable loading new tools
 this->m_Controls->m_LoadTools->setEnabled(false);
+this->m_Controls->m_AutoDetectTools->setEnabled(false);
 
 //set configuration finished
 this->m_Controls->m_configurationWidget->ConfigurationFinished();
@@ -221,6 +222,7 @@ this->m_Controls->m_configurationWidget->Reset();
 m_Controls->m_TrackingControlLabel->setText("Status: stopped");
 if (m_logging) StopLogging();
 this->m_Controls->m_LoadTools->setEnabled(true);
+this->m_Controls->m_AutoDetectTools->setEnabled(true);
 m_Controls->m_TrackingToolsStatusWidget->RemoveStatusLabels();
 m_Controls->m_TrackingToolsStatusWidget->PreShowTools(m_toolStorage);
 m_TrackingVolumeNode->SetData(NULL);

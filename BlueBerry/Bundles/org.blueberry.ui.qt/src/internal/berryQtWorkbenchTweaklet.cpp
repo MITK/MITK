@@ -33,6 +33,16 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace berry {
 
+QtWorkbenchTweaklet::QtWorkbenchTweaklet()
+{
+
+}
+
+QtWorkbenchTweaklet::QtWorkbenchTweaklet(const QtWorkbenchTweaklet& other)
+{
+
+}
+
 Display* QtWorkbenchTweaklet::CreateDisplay()
 {
   return new QtDisplay();

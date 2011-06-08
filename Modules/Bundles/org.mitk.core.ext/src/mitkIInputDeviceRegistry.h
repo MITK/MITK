@@ -18,12 +18,14 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKIINPUTDEVICEREGISTRY_H_
 #define MITKIINPUTDEVICEREGISTRY_H_
 
-#include "mitkCoreExtDll.h"
+#include <org_mitk_core_ext_Export.h>
 
 #include <berryService.h>
 
 #include <vector>
 #include <string>
+
+#include <QtPlugin>
 
 #include "mitkIInputDeviceDescriptor.h"
 
@@ -69,5 +71,7 @@ namespace mitk
 
 	}; // end struct IInputDeviceRegistry
 } // end namespace mitk
+
+Q_DECLARE_INTERFACE(mitk::IInputDeviceRegistry, "org.mitk.service.IInputDeviceRegistry")
 
 #endif /*MITKIINPUTDEVICEREGISTRY_H_*/

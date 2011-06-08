@@ -23,8 +23,15 @@
 namespace berry
 {
 
-class QtMessageDialogTweaklet: public MessageDialogTweaklet
+class QtMessageDialogTweaklet: public QObject, public MessageDialogTweaklet
 {
+  Q_OBJECT
+  Q_INTERFACES(berry::MessageDialogTweaklet)
+
+public:
+
+  QtMessageDialogTweaklet();
+  QtMessageDialogTweaklet(const QtMessageDialogTweaklet& other);
 
   bool OpenConfirm(Shell::Pointer, const std::string& title,
       const std::string& message);

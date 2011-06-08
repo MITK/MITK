@@ -6,6 +6,7 @@ SET(SRC_CPP_FILES
 )
 
 SET(INTERNAL_CPP_FILES
+  mitkPluginActivator.cpp
   QmitkPropertyListView.cpp
   QmitkNodeTableViewKeyFilter.cpp 
   QmitkInfoDialog.cpp 
@@ -13,18 +14,23 @@ SET(INTERNAL_CPP_FILES
 
 SET(MOC_H_FILES
   src/QmitkDataManagerView.h
+  src/QmitkDataManagerPreferencePage.h
+  src/QmitkDataManagerHotkeysPrefPage.h
   src/internal/QmitkNodeTableViewKeyFilter.h
+  src/internal/QmitkPropertyListView.h
   src/internal/QmitkInfoDialog.h
+  src/internal/mitkPluginActivator.h
 )
 
-SET(CPP_FILES manifest.cpp)
+SET(CPP_FILES )
 
-SET(RESOURCE_FILES
+SET(CACHED_RESOURCE_FILES
+  plugin.xml
   resources/DataManager_48.png
   resources/propertylist.png
 )
 
-SET(RES_FILES
+SET(QRC_FILES
   resources/datamanager.qrc
 )
 

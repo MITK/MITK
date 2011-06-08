@@ -23,9 +23,15 @@
 
 namespace berry {
 
-class QtDnDTweaklet : public DnDTweaklet
+class QtDnDTweaklet : public QObject, public DnDTweaklet
 {
+  Q_OBJECT
+  Q_INTERFACES(berry::DnDTweaklet)
+
 public:
+
+  QtDnDTweaklet();
+  QtDnDTweaklet(const QtDnDTweaklet& other);
 
   ITracker* CreateTracker();
 };

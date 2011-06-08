@@ -35,6 +35,14 @@ mitk::IInputDevice::Pointer mitk::InputDeviceDescriptor::CreateInputDevice()
     // "class" refers to xml attribute in a xml tag
     this->m_InputDevice = this->m_InputDeviceExtensionPoint
       ->CreateExecutableExtension<mitk::IInputDevice>(mitk::CoreExtConstants::INPUTDEVICE_XMLATTRIBUTE_CLASS);
+    if (this->m_InputDevice == 0)
+    {
+      // support legacy BlueBerry extensions
+      this->m_InputDevice = this->m_InputDeviceExtensionPoint
+          ->CreateExecutableExtension<IInputDevice>(
+            mitk::CoreExtConstants::INPUTDEVICE_XMLATTRIBUTE_CLASS,
+            IInputDevice::GetManifestName());
+    }
   }
   return this->m_InputDevice;
 }

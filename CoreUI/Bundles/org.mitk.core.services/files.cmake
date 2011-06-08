@@ -1,14 +1,19 @@
+SET(MOC_H_FILES
+  src/internal/mitkPluginActivator.h
+  src/internal/mitkDataStorageService.h
+)
+
 SET(SRC_CPP_FILES
-  mitkCoreServicesPlugin.cpp
   mitkIDataStorageService.cpp
 )
 
 SET(INTERNAL_CPP_FILES
+  mitkPluginActivator.cpp
   mitkDataStorageReference.cpp
   mitkDataStorageService.cpp
 )
 
-SET(CPP_FILES manifest.cpp)
+SET(CPP_FILES )
 
 foreach(file ${SRC_CPP_FILES})
   SET(CPP_FILES ${CPP_FILES} src/${file})

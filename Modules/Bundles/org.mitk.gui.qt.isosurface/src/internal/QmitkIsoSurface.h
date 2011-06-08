@@ -32,7 +32,7 @@ PURPOSE.  See the above copyright notices for more information.
   \sa QmitkFunctionality
   \ingroup org_mitk_gui_qt_isosurface_internal
   */
-class QmitkIsoSurface : public QObject, public QmitkFunctionality
+class QmitkIsoSurface : public QmitkFunctionality
 {
   Q_OBJECT
 

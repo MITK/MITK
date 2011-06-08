@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <string>
 
-#include "berryRuntimeDll.h"
+#include <org_blueberry_core_runtime_Export.h>
 
 namespace berry {
 

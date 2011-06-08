@@ -18,6 +18,15 @@
 #include "QmitkExtDefaultPerspective.h"
 #include "berryIViewLayout.h"
 
+QmitkExtDefaultPerspective::QmitkExtDefaultPerspective()
+{
+}
+ 
+QmitkExtDefaultPerspective::QmitkExtDefaultPerspective(const QmitkExtDefaultPerspective& other)
+{
+  Q_UNUSED(other)
+  throw std::runtime_error("Copy constructor not implemented");
+}
 
 void QmitkExtDefaultPerspective::CreateInitialLayout(berry::IPageLayout::Pointer layout)
 {

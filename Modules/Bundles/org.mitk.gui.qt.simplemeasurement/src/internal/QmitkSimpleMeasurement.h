@@ -41,7 +41,7 @@ Allows to measure distances, angles, etc.
 \sa QmitkFunctionality
 \ingroup org_mitk_gui_qt_simplemeasurement_internal
 */
-class QmitkSimpleMeasurement : public QObject, public QmitkFunctionality
+class QmitkSimpleMeasurement : public QmitkFunctionality
 {
   Q_OBJECT
 

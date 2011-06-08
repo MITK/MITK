@@ -22,9 +22,15 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkQtExtAppDll.h"
 
-class MITK_QT_EXTAPP QmitkExtApplication : public berry::IApplication
+class MITK_QT_EXTAPP QmitkExtApplication : public QObject, public berry::IApplication
 {
+  Q_OBJECT
+  Q_INTERFACES(berry::IApplication)
+
 public:
+
+  QmitkExtApplication();
+  QmitkExtApplication(const QmitkExtApplication& other);
   
   int Start();
   void Stop();

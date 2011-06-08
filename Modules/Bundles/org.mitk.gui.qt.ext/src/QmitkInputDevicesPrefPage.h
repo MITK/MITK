@@ -29,8 +29,10 @@ PURPOSE.  See the above copyright notices for more information.
 class QWidget;
 class QCheckBox;
 
-class QmitkInputDevicesPrefPage : public berry::IQtPreferencePage
+class QmitkInputDevicesPrefPage : public QObject, public berry::IQtPreferencePage
 {
+  Q_OBJECT
+  Q_INTERFACES(berry::IPreferencePage)
 
 public:
 
@@ -38,6 +40,8 @@ public:
   * Default constructor
   */
   QmitkInputDevicesPrefPage();
+
+  QmitkInputDevicesPrefPage(const QmitkInputDevicesPrefPage& other);
 
   /**
   * @see berry::IPreferencePage::Init(berry::IWorkbench::Pointer workbench)

@@ -37,7 +37,7 @@ namespace mitk
   {
   public:
 
-    bool IsA(const std::type_info& type);
+    bool IsA(const std::type_info& type) const;
     const std::type_info& GetType() const;
 
     // easier maintenance

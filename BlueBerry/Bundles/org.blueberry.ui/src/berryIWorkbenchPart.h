@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef IWORKBENCHPART_H_
 #define IWORKBENCHPART_H_
 
-#include "berryUiDll.h"
+#include <org_blueberry_ui_Export.h>
 
 #include "berryIPropertyChangeListener.h"
 

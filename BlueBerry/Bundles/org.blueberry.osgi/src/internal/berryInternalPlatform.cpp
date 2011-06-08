@@ -27,6 +27,12 @@ PURPOSE.  See the above copyright notices for more information.
 #include <Poco/Util/HelpFormatter.h>
 #include <Poco/Util/OptionException.h>
 
+#include <ctkPluginFrameworkLauncher.h>
+#include <ctkPluginFrameworkFactory.h>
+#include <ctkPluginFramework.h>
+#include <ctkPluginContext.h>
+#include <ctkPlugin.h>
+
 #include <iostream>
 
 #include "../berryPlatform.h"
@@ -38,6 +44,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include "berryCodeCache.h"
 #include "../berryBundleLoader.h"
 #include "berrySystemBundle.h"
+#include "berryBundleDirectory.h"
+#include "berryProvisioningInfo.h"
+
+#include <QDebug>
 
 namespace berry {
 
@@ -46,6 +56,7 @@ Poco::Mutex InternalPlatform::m_Mutex;
 InternalPlatform::InternalPlatform() : m_Initialized(false), m_Running(false),
   m_ConsoleLog(false), m_ServiceRegistry(0),
   m_CodeCache(0), m_BundleLoader(0), m_SystemBundle(0), m_PlatformLogger(0),
+  m_ctkPluginFrameworkFactory(0),
   m_EventStarted(PlatformEvent::EV_PLATFORM_STARTED)
 {
 }
@@ -65,6 +76,15 @@ InternalPlatform* InternalPlatform::GetInstance()
 bool InternalPlatform::ConsoleLog() const
 {
   return m_ConsoleLog;
+}
+
+ctkPluginContext* InternalPlatform::GetCTKPluginFrameworkContext() const
+{
+  if (m_ctkPluginFrameworkFactory)
+  {
+    return m_ctkPluginFrameworkFactory->getFramework()->getPluginContext();
+  }
+  return 0;
 }
 
 ServiceRegistry& InternalPlatform::GetServiceRegistry()
@@ -148,6 +168,41 @@ void InternalPlatform::Initialize(int& argc, char** argv, Poco::Util::AbstractCo
   }
   m_BundleLoader = new BundleLoader(m_CodeCache, *m_PlatformLogger);
 
+  // Initialize the CTK Plugin Framework
+  ctkProperties fwProps;
+  fwProps.insert(ctkPluginConstants::FRAMEWORK_STORAGE, QString::fromStdString(userFile.path()));
+  m_ctkPluginFrameworkFactory = new ctkPluginFrameworkFactory(fwProps);
+  QSharedPointer<ctkPluginFramework> pfw = m_ctkPluginFrameworkFactory->getFramework();
+  pfw->init();
+  ctkPluginContext* pfwContext = pfw->getPluginContext();
+
+  std::string provisioningFile = this->GetConfiguration().getString(Platform::ARG_PROVISIONING);
+  if (!provisioningFile.empty())
+  {
+    ProvisioningInfo provInfo(QString::fromStdString(provisioningFile));
+    foreach(QString pluginPath, provInfo.getPluginDirs())
+    {
+      ctkPluginFrameworkLauncher::addSearchPath(pluginPath);
+    }
+
+    QList<QUrl> pluginsToStart = provInfo.getPluginsToStart();
+    foreach(QUrl pluginUrl, provInfo.getPluginsToInstall())
+    {
+      QSharedPointer<ctkPlugin> plugin = pfwContext->installPlugin(pluginUrl);
+      if (pluginsToStart.contains(pluginUrl))
+      {
+        m_CTKPluginsToStart << plugin->getPluginId();
+      }
+    }
+  }
+
+  // tell the BundleLoader about the installed CTK plug-ins
+  QStringList installedCTKPlugins;
+  foreach(QSharedPointer<ctkPlugin> plugin, pfwContext->getPlugins())
+  {
+    installedCTKPlugins << plugin->getSymbolicName();
+  }
+  m_BundleLoader->SetCTKPlugins(installedCTKPlugins);
 
   m_Initialized = true;
 
@@ -161,7 +216,7 @@ void InternalPlatform::Initialize(int& argc, char** argv, Poco::Util::AbstractCo
     // the real plugins as directories)
     std::vector<std::string> pluginBaseDirs;
 
-    Poco::StringTokenizer tokenizer(this->GetConfiguration().getString(Platform::ARG_PLUGIN_DIRS), ";",
+    Poco::StringTokenizer tokenizer(this->GetConfiguration().getString(Platform::ARG_PLUGIN_DIRS, ""), ";",
                                     Poco::StringTokenizer::TOK_IGNORE_EMPTY | Poco::StringTokenizer::TOK_TRIM);
 
     for (Poco::StringTokenizer::Iterator token = tokenizer.begin();
@@ -206,7 +261,10 @@ void InternalPlatform::Initialize(int& argc, char** argv, Poco::Util::AbstractCo
       try
       {
       Bundle::Pointer bundle = m_BundleLoader->LoadBundle(*pathIter);
-      BERRY_INFO(m_ConsoleLog) << "Bundle state (" << pathIter->toString() << "): " << bundle->GetStateString() << std::endl;
+      if (bundle)
+      {
+        BERRY_INFO(m_ConsoleLog) << "Bundle state (" << pathIter->toString() << "): " << bundle->GetStateString() << std::endl;
+      }
       }
       catch (const BundleStateException& exc)
       {
@@ -329,6 +387,11 @@ IBundle::Pointer InternalPlatform::GetBundle(const std::string& id)
   return m_BundleLoader->FindBundle(id);
 }
 
+std::vector<IBundle::Pointer> InternalPlatform::GetBundles() const
+{
+  return m_BundleLoader->GetBundles();
+}
+
 Poco::Logger* InternalPlatform::GetLogger()
 {
   return m_PlatformLogger;
@@ -384,9 +447,22 @@ int InternalPlatform::main(const std::vector<std::string>& args)
   m_FilteredArgs = args;
   m_FilteredArgs.insert(m_FilteredArgs.begin(), this->config().getString("application.argv[0]"));
 
-  SystemBundle::Pointer systemBundle = m_BundleLoader->FindBundle("system.bundle").Cast<SystemBundle>();
+  ctkPluginContext* context = GetCTKPluginFrameworkContext();
+  QFileInfo storageDir = context->getDataFile("");
+  BundleDirectory::Pointer bundleStorage(new BundleDirectory(Poco::Path(storageDir.absolutePath().toStdString())));
+  SystemBundle::Pointer systemBundle(new SystemBundle(*m_BundleLoader, bundleStorage));
   if (systemBundle == 0)
     throw PlatformException("Could not find the system bundle");
+  m_BundleLoader->m_SystemBundle = systemBundle;
+  m_BundleLoader->LoadBundle(systemBundle);
+
+  m_ctkPluginFrameworkFactory->getFramework()->start();
+  foreach(long pluginId, m_CTKPluginsToStart)
+  {
+    // do not change the autostart setting of this plugin
+    context->getPlugin(pluginId)->start(ctkPlugin::START_TRANSIENT | ctkPlugin::START_ACTIVATION_POLICY);
+  }
+
   m_BundleLoader->StartSystemBundle(systemBundle);
 
   systemBundle->Resume();

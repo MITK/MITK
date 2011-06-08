@@ -23,10 +23,11 @@
 
 #include <QString>
 #include <QList>
+#include <QtPlugin>
 
 #include <Poco/Exception.h>
 
-#include "berryUiQtDll.h"
+#include <org_blueberry_ui_qt_Export.h>
 
 namespace berry {
 
@@ -83,5 +84,7 @@ struct BERRY_UI_QT IQtStyleManager : public Service
 };
 
 }
+
+Q_DECLARE_INTERFACE(berry::IQtStyleManager, "org.blueberry.service.IQtStyleManager")
 
 #endif /* BERRYIQTSTYLEMANAGER_H_ */

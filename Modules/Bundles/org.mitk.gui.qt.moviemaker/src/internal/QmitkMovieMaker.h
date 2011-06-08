@@ -135,7 +135,7 @@ class QTime;
  *   function keyframes between which an animation interpolates.
  *
  */
-class QmitkMovieMaker: public QObject, public QmitkFunctionality
+class QmitkMovieMaker: public QmitkFunctionality
 {
   Q_OBJECT
 

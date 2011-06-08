@@ -19,13 +19,23 @@
 #ifndef QMITKCOMMONEXTPLUGIN_H_
 #define QMITKCOMMONEXTPLUGIN_H_
 
-#include <berryPlugin.h>
+#include <ctkPluginActivator.h>
 
-class QmitkCommonExtPlugin : public berry::Plugin
+class QmitkCommonExtPlugin : public QObject, public ctkPluginActivator
 {
+  Q_OBJECT
+  Q_INTERFACES(ctkPluginActivator)
+
 public:
 
-  void Start(berry::IBundleContext::Pointer context);
+  void start(ctkPluginContext* context);
+  void stop(ctkPluginContext* context);
+
+  static ctkPluginContext* getContext();
+
+private:
+
+  static ctkPluginContext* _context;
 
 };
 

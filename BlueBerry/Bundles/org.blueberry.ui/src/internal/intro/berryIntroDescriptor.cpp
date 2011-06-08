@@ -47,6 +47,11 @@ SmartPointer<IIntroPart> IntroDescriptor::CreateIntro() throw (CoreException)
 {
   IIntroPart::Pointer intro(element->CreateExecutableExtension<IIntroPart>(
       WorkbenchRegistryConstants::ATT_CLASS));
+  if (intro.IsNull())
+  {
+    intro = element->CreateExecutableExtension<IIntroPart>(
+          WorkbenchRegistryConstants::ATT_CLASS, IIntroPart::GetManifestName());
+  }
   return intro;
 }
 
@@ -62,6 +67,12 @@ IntroContentDetector::Pointer IntroDescriptor::GetIntroContentDetector()
   IntroContentDetector::Pointer detector(
     element->CreateExecutableExtension<IntroContentDetector>(
       WorkbenchRegistryConstants::ATT_CONTENT_DETECTOR));
+  if (detector.IsNull())
+  {
+    // support legacy BlueBerry extensions
+    detector = element->CreateExecutableExtension<IntroContentDetector>(
+          WorkbenchRegistryConstants::ATT_CONTENT_DETECTOR, IntroContentDetector::GetManifestName());
+  }
   return detector;
 }
 

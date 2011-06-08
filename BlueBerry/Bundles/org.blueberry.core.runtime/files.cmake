@@ -1,3 +1,8 @@
+SET(MOC_H_FILES
+  src/internal/berryPluginActivator.h
+  src/internal/berryPreferencesService.h
+)
+
 SET(SRC_CPP_FILES
   berryIAdaptable.cpp
   berryIAdapterManager.cpp
@@ -9,13 +14,14 @@ SET(SRC_CPP_FILES
 )
 
 SET(INTERNAL_CPP_FILES
-  berryPreferencesService.cpp
-  berryAbstractPreferencesStorage.cpp  
+  berryAbstractPreferencesStorage.cpp
+  berryPluginActivator.cpp
   berryPreferences.cpp
+  berryPreferencesService.cpp
   berryXMLPreferencesStorage.cpp
 )
 
-SET(CPP_FILES manifest.cpp)
+SET(CPP_FILES )
 
 foreach(file ${SRC_CPP_FILES})
   SET(CPP_FILES ${CPP_FILES} src/${file})

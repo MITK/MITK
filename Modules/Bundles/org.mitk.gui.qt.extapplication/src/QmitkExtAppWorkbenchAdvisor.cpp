@@ -31,18 +31,13 @@ QmitkExtAppWorkbenchAdvisor::Initialize(berry::IWorkbenchConfigurer::Pointer con
 
   configurer->SetSaveAndRestore(true);
 
-  QString collectionFile = QmitkExtApplicationPlugin::GetDefault()->GetQtHelpCollectionFile();
-  if (!collectionFile.isEmpty())
+  if (!berry::QtAssistantUtil::GetHelpCollectionFile().isEmpty())
   {
-    berry::IBundleContext::Pointer context = QmitkExtApplicationPlugin::GetDefault()->GetBundleContext();
     typedef std::vector<berry::IBundle::Pointer> BundleContainer;
-    BundleContainer bundles;
-    context->ListBundles(bundles);
-    berry::QtAssistantUtil::RegisterQCHFiles(collectionFile, bundles);
+    BundleContainer bundles = berry::Platform::GetBundles();
+    berry::QtAssistantUtil::RegisterQCHFiles(bundles);
   }
 
-  berry::QtAssistantUtil::SetHelpColletionFile(collectionFile);
-  berry::QtAssistantUtil::SetDefaultHelpUrl("qthelp://org.mitk.gui.qt.extapplication/bundle/index.html");
 }
 
 berry::WorkbenchWindowAdvisor*

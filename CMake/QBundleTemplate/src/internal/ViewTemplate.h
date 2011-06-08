@@ -19,7 +19,7 @@
   \sa QmitkFunctionality
   \ingroup Functionalities
 */
-class @VIEW_CLASS@ : public QObject, public QmitkFunctionality
+class @VIEW_CLASS@ : public QmitkFunctionality
 {  
   // this is needed for all Qt objects that should have a Qt meta-object
   // (everything that derives from QObject and wants to have signal/slots)

@@ -20,18 +20,14 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "QmitkNodeDescriptorManager.h"
 #include "mitkNodePredicateDataType.h"
-//#include "mitkDataNodeObject.h"
-//
-//#include "berryISelectionService.h"
-//#include "berryIStructuredSelection.h"
-//#include "berryPlatformUI.h"
-//
-//#include <QLabel>
-//#include <QHBoxLayout>
+
+#include <QtPlugin>
 
 void
-mitk::DiffusionImagingActivator::Start(berry::IBundleContext::Pointer /*context*/)
+mitk::DiffusionImagingActivator::start(ctkPluginContext* context)
 {
+  Q_UNUSED(context)
+  
   RegisterDiffusionImagingObjectFactory();
 
   QmitkNodeDescriptorManager* manager = 
@@ -47,70 +43,12 @@ mitk::DiffusionImagingActivator::Start(berry::IBundleContext::Pointer /*context*
   mitk::NodePredicateDataType::Pointer isQBallImage = mitk::NodePredicateDataType::New("QBallImage");
   manager->AddDescriptor(new QmitkNodeDescriptor(QObject::tr("QBallImage"), QString(":/QmitkDiffusionImaging/reconodf.png"), isQBallImage, manager));
 
-  //m_OpacitySlider = new QSlider;
-  //m_OpacitySlider->setMinimum(0);
-  //m_OpacitySlider->setMaximum(100);
-  //m_OpacitySlider->setOrientation(Qt::Horizontal);
-  //QObject::connect( m_OpacitySlider, SIGNAL( valueChanged(int) )
-  //  , this, SLOT( OpactiyChanged(int) ) );
-
-  //QLabel* _OpacityLabel = new QLabel("Channel: ");
-  //QHBoxLayout* _OpacityWidgetLayout = new QHBoxLayout;
-  //_OpacityWidgetLayout->addWidget(_OpacityLabel);
-  //_OpacityWidgetLayout->addWidget(m_OpacitySlider);
-  //QWidget* _OpacityWidget = new QWidget;
-  //_OpacityWidget->setLayout(_OpacityWidgetLayout);
-
-  //QWidgetAction* m_OpacityAction = new QWidgetAction(this);
-  //m_OpacityAction->setDefaultWidget(_OpacityWidget);
-  //QObject::connect( m_OpacityAction, SIGNAL( changed() )
-  //  , this, SLOT( OpactiyActionChanged() ) );
-
-  //  desc->AddAction(m_OpacityAction, false);
-
 }
 
-//void mitk::DiffusionImagingActivator::OpactiyChanged(int value)
-//{
-//  berry::ISelection::ConstPointer sel(
-//    berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetSelectionService()->GetSelection("org.mitk.views.datamanager"));
-//  berry::IStructuredSelection::ConstPointer ssel = sel.Cast<const berry::IStructuredSelection>();
-//
-//  if (ssel)
-//  {
-//    if (mitk::DataNodeObject::Pointer nodeObj = ssel->Begin()->Cast<mitk::DataNodeObject>())
-//    {
-//      mitk::DataNode::Pointer node = nodeObj->GetDataNode();
-//      if(QString("DiffusionImage").compare(node->GetData()->GetNameOfClass())==0)
-//      {
-//        node->SetIntProperty("DisplayChannel", value);
-//        mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-//      }
-//    }
-//  }
-//}
-//
-//void mitk::DiffusionImagingActivator::OpactiyActionChanged()
-//{
-//  berry::ISelection::ConstPointer sel(
-//    berry::PlatformUI::GetWorkbench()->GetActiveWorkbenchWindow()->GetSelectionService()->GetSelection("org.mitk.views.datamanager"));
-//  berry::IStructuredSelection::ConstPointer ssel = sel.Cast<const berry::IStructuredSelection>();
-// 
-//  if (ssel)
-//  {
-//    if (mitk::DataNodeObject::Pointer nodeObj = ssel->Begin()->Cast<mitk::DataNodeObject>())
-//    {
-//      mitk::DataNode::Pointer node = nodeObj->GetDataNode();
-//      if(QString("DiffusionImage").compare(node->GetData()->GetNameOfClass())==0)
-//      {
-//        int displayChannel = 0.0;
-//        if(node->GetIntProperty("DisplayChannel", displayChannel))
-//        {
-//          m_OpacitySlider->setValue(displayChannel);
-//        }
-//      }
-//    }
-//  }
-//
-//  MITK_INFO << "changed";
-//}
+void
+mitk::DiffusionImagingActivator::stop(ctkPluginContext* context)
+{
+  Q_UNUSED(context)
+}
+
+Q_EXPORT_PLUGIN2(org_mitk_diffusionimaging, mitk::DiffusionImagingActivator)

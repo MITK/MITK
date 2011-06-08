@@ -20,7 +20,7 @@
 
 #include <berryIPerspectiveFactory.h>
 
-#include "../berryUITestDll.h"
+#include <org_blueberry_uitest_Export.h>
 
 namespace berry
 {
@@ -29,14 +29,18 @@ namespace berry
  * This perspective is used for testing api.  It defines an initial
  * layout with no parts, just an editor area.
  */
-class BERRY_UITEST_EXPORT EmptyPerspective: public IPerspectiveFactory
+class BERRY_UITEST_EXPORT EmptyPerspective: public QObject, public IPerspectiveFactory
 {
+  Q_OBJECT
+  Q_INTERFACES(berry::IPerspectiveFactory)
 
 private:
 
   static std::string LastPerspective;
 
 public:
+
+  EmptyPerspective(const EmptyPerspective& other);
 
   /**
    * The perspective id for the empty perspective.

@@ -110,6 +110,12 @@ IPerspectiveFactory::Pointer PerspectiveDescriptor::CreateFactory()
       IPerspectiveFactory::Pointer factory(
           configElement ->CreateExecutableExtension<IPerspectiveFactory> (
               WorkbenchRegistryConstants::ATT_CLASS));
+      if (factory.IsNull())
+      {
+        // support legacy BlueBerry extensions
+        factory = configElement ->CreateExecutableExtension<IPerspectiveFactory> (
+              WorkbenchRegistryConstants::ATT_CLASS, IPerspectiveFactory::GetManifestName());
+      }
       return factory;
     } catch (CoreException& /*e*/)
     {
@@ -163,7 +169,7 @@ ImageDescriptor::Pointer PerspectiveDescriptor::GetImageDescriptor() const
     configElement->GetAttribute(WorkbenchRegistryConstants::ATT_ICON, icon);
     if (!icon.empty())
     {
-      imageDescriptor = AbstractUIPlugin::ImageDescriptorFromPlugin(
+      imageDescriptor = AbstractUICTKPlugin::ImageDescriptorFromPlugin(
           configElement->GetContributor(), icon);
     }
 

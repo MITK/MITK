@@ -17,18 +17,18 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "berryExpressions.h"
 
-#include "berryPlatform.h"
-#include "berryPlatformException.h"
-#include "service/berryServiceRegistry.h"
+#include <berryPlatform.h>
+#include <berryPlatformException.h>
+#include <service/berryServiceRegistry.h>
 
-#include "berryIAdapterManager.h"
+#include <berryIAdapterManager.h>
 
 #include <berryObjects.h>
 #include <berryObjectString.h>
 #include <berryObjectVector.h>
 
-#include "Poco/String.h"
-#include "Poco/NumberParser.h"
+#include <Poco/String.h>
+#include <Poco/NumberParser.h>
 
 #include <deque>
 

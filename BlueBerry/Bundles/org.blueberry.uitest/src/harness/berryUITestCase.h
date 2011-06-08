@@ -24,7 +24,7 @@
 #include <berryIWorkbench.h>
 #include <berryIWorkbenchPage.h>
 
-#include "../berryUITestDll.h"
+#include <org_blueberry_uitest_Export.h>
 
 #include <list>
 

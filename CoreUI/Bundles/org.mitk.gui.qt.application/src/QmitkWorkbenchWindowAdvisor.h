@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <berryWorkbenchWindowAdvisor.h>
 
-#include "mitkQtAppDll.h"
+#include <org_mitk_gui_qt_application_Export.h>
 
 class MITK_QT_APP QmitkWorkbenchWindowAdvisor : public berry::WorkbenchWindowAdvisor
 {

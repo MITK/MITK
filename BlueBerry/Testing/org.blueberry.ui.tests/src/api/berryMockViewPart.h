@@ -27,8 +27,11 @@
 namespace berry
 {
 
-class MockViewPart: public MockWorkbenchPart, public IViewPart
+class MockViewPart: public QObject, public MockWorkbenchPart, public IViewPart
 {
+  Q_OBJECT
+  Q_INTERFACES(berry::IExecutableExtension berry::IViewPart)
+
 public:
 
   berryObjectMacro(MockViewPart)
@@ -40,6 +43,8 @@ public:
   static const std::string IDMULT; // = ID + "Mult";
   static const std::string NAME; // = "Mock View 1";
 
+  MockViewPart();
+  MockViewPart(const MockViewPart& other);
 
   /**
    * @see IViewPart#getViewSite()

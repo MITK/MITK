@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef BERRYIOBJECTWITHSTATE_H_
 #define BERRYIOBJECTWITHSTATE_H_
 
-#include "berryCommandsDll.h"
+#include <org_blueberry_core_commands_Export.h>
 #include "berryState.h"
 
 #include <vector>

@@ -32,7 +32,7 @@ class QmitkRenderWindow;
  * \ingroup org_mitk_gui_qt_segmentation_internal
  * \warning Implementation of this class is split up into two .cpp files to make things more compact. Check both this file and QmitkSegmentationOrganNamesHandling.cpp
  */
-class QmitkSegmentationView : public QObject, public QmitkFunctionality
+class QmitkSegmentationView : public QmitkFunctionality
 {
   Q_OBJECT
 

@@ -27,7 +27,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <set>
 
 //TODO should be removed
-#include "../berryUiDll.h"
+#include <org_blueberry_ui_Export.h>
 #include "../berryImageDescriptor.h"
 
 namespace berry {

@@ -409,7 +409,13 @@ void QmitkPreferencesDialog::OnPreferencesTreeItemSelectionChanged()
         m_Headline->setText(QString::fromStdString(it->name));
         if(it->prefPage == 0)
         {
-          it->prefPage = dynamic_cast<berry::IQtPreferencePage*>(it->confElem->CreateExecutableExtension<berry::IPreferencePage>("class"));
+          berry::IPreferencePage* page = it->confElem->CreateExecutableExtension<berry::IPreferencePage>("class");
+          if (page == 0)
+          {
+            // support legacy BlueBerry extensions
+            page = it->confElem->CreateExecutableExtension<berry::IPreferencePage>("class", berry::IPreferencePage::GetManifestName());
+          }
+          it->prefPage = dynamic_cast<berry::IQtPreferencePage*>(page);
           it->prefPage->CreateQtControl(m_PreferencesPanel);
           m_PreferencesPanel->addWidget(it->prefPage->GetQtControl());
         }

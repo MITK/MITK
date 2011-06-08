@@ -35,8 +35,10 @@ public:
   
   berryObjectMacro(Bundle);
   
-  Bundle(BundleLoader& loader, IBundleStorage::Pointer storage);
+  Bundle(BundleLoader& loader, IBundleStorage::Pointer storage, bool init = true);
    ~Bundle();
+
+  void init();
   
   IBundleActivator* GetActivator() const;
   const std::string& GetActivatorClass() const;
@@ -75,7 +77,7 @@ public:
   
   const std::string& GetSymbolicName() const;
   
-  void LoadManifest();
+  virtual void LoadManifest();
   void SetActivator(IBundleActivator* activator);
   
   bool operator==(const Object* o) const;

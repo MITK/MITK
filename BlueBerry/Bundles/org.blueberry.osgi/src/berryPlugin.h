@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef BERRYPLUGIN_H_
 #define BERRYPLUGIN_H_
 
-#include "berryOSGiDll.h"
+#include <org_blueberry_osgi_Export.h>
 
 #include "berryIBundleActivator.h"
 #include "berryIBundleContext.h"

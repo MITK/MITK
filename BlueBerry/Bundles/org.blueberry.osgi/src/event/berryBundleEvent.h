@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef BERRYBUNDLEEVENT_H_
 #define BERRYBUNDLEEVENT_H_
 
-#include "../berryOSGiDll.h"
+#include <org_blueberry_osgi_Export.h>
 
 #include "../berrySmartPointer.h"
 

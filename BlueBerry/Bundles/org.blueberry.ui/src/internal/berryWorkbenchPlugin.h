@@ -24,7 +24,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <berryIExtensionPointService.h>
 #include <berryPlatform.h>
 
-#include "../berryAbstractUIPlugin.h"
+#include "../berryAbstractUICTKPlugin.h"
 #include "../berryPlatformUI.h"
 #include "../presentations/berryIPresentationFactory.h"
 
@@ -57,7 +57,10 @@ namespace berry {
  *      calls createExecutableExtension to create an executable
  *      instance of our workbench class.
  */
-class WorkbenchPlugin : public AbstractUIPlugin {
+class WorkbenchPlugin : public QObject, public AbstractUICTKPlugin {
+
+  Q_OBJECT
+  Q_INTERFACES(ctkPluginActivator)
 
 private:
 
@@ -73,7 +76,7 @@ private:
     EditorRegistry* editorRegistry;
 
     // The context within which this plugin was started.
-    IBundleContext::Pointer bundleContext;
+    ctkPluginContext* bundleContext;
 
     // Other data.
     //WorkbenchPreferenceManager preferenceManager;
@@ -220,7 +223,7 @@ public:
   /**
      * Return the default instance of the receiver. This represents the runtime plugin.
      * @return WorkbenchPlugin
-     * @see AbstractUIPlugin for the typical implementation pattern for plugin classes.
+     * @see AbstractUICTKPlugin for the typical implementation pattern for plugin classes.
      */
     static WorkbenchPlugin* GetDefault();
 
@@ -308,7 +311,13 @@ private:
 
         // Create the extension.
         try {
-            return targetElement->CreateExecutableExtension<C>("class"); //$NON-NLS-1$
+            C* impl = targetElement->CreateExecutableExtension<C>("class"); //$NON-NLS-1$
+            if (impl == 0)
+            {
+              // support legacy BlueBerry extensions
+              impl = targetElement->CreateExecutableExtension<C>("class", C::GetManifestName());
+            }
+            return impl;
         } catch (CoreException e) {
             // log it since we cannot safely display a dialog.
             WorkbenchPlugin::Log("Unable to create extension: " + targetID //$NON-NLS-1$
@@ -418,7 +427,7 @@ public:
      *  (non-Javadoc)
      * @see org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext)
      */
-    void Start(IBundleContext::Pointer context);
+    void start(ctkPluginContext* context);
 
 
   /**
@@ -435,13 +444,13 @@ public:
      * @return the bundle context
      * @since 3.1
      */
-    IBundleContext::Pointer GetBundleContext();
+    ctkPluginContext* GetPluginContext();
 
 
     /* (non-Javadoc)
-     * @see org.blueberry.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
+     * @see org.blueberry.ui.plugin.AbstractUICTKPlugin#stop(org.osgi.framework.BundleContext)
      */
-    void Stop(IBundleContext::Pointer context);
+    void stop(ctkPluginContext* context);
 
 
     /**

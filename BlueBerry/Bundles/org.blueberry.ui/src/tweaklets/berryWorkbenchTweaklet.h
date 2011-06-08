@@ -50,4 +50,6 @@ struct BERRY_UI WorkbenchTweaklet : public Object
 
 }
 
+Q_DECLARE_INTERFACE(berry::WorkbenchTweaklet, "org.blueberry.WorkbenchTweaklet")
+
 #endif /* BERRYWORKBENCHTWEAKLET_H_ */

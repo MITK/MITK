@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef BERRYEDITORPART_H_
 #define BERRYEDITORPART_H_
 
-#include "berryUiDll.h"
+#include <org_blueberry_ui_Export.h>
 #include "berryIEditorPart.h"
 #include "berryIEditorInput.h"
 #include "berryIEditorSite.h"
@@ -75,6 +75,9 @@ namespace berry {
  * </p>
  */
 class BERRY_UI EditorPart : public WorkbenchPart , public IEditorPart {
+
+  Q_OBJECT
+  Q_INTERFACES(berry::IEditorPart)
 
 public:
   berryObjectMacro(EditorPart);

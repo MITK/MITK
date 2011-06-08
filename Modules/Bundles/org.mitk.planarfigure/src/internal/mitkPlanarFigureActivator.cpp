@@ -23,9 +23,10 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkNodePredicateProperty.h"
 #include "mitkNodePredicateAnd.h"
 
+#include <QtPlugin>
 
 void
-mitk::PlanarFigureActivator::Start(berry::IBundleContext::Pointer /*context*/)
+mitk::PlanarFigureActivator::start(ctkPluginContext* /*context*/)
 {
   RegisterPlanarFigureObjectFactory();
 
@@ -61,3 +62,10 @@ mitk::PlanarFigureActivator::Start(berry::IBundleContext::Pointer /*context*/)
   descriptorManager->AddDescriptor(new QmitkNodeDescriptor(QObject::tr("PlanarPath"), QString(":/QmitkExt/PlanarPath_48.png"), isPlanarPath, descriptorManager));
 
 }
+
+void
+mitk::PlanarFigureActivator::stop(ctkPluginContext* /*context*/)
+{
+}
+
+Q_EXPORT_PLUGIN2(org_mitk_planarfigure, mitk::PlanarFigureActivator)

@@ -18,12 +18,14 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef BERRYIVIEWPART_H_
 #define BERRYIVIEWPART_H_
 
-#include "berryUiDll.h"
+#include <org_blueberry_ui_Export.h>
 #include "berryMacros.h"
 
 #include "berryIMemento.h"
 #include "berryIWorkbenchPart.h"
 #include "berryIViewSite.h"
+
+#include <QObject>
 
 namespace berry {
 
@@ -117,5 +119,7 @@ struct BERRY_UI IViewPart : public virtual IWorkbenchPart {
 };
 
 }
+
+Q_DECLARE_INTERFACE(berry::IViewPart, "org.blueberry.IViewPart")
 
 #endif /*BERRYIVIEWPART_H_*/

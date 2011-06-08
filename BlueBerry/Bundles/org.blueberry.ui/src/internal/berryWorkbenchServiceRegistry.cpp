@@ -103,6 +103,12 @@ WorkbenchServiceRegistry::ServiceFactoryHandle::Pointer WorkbenchServiceRegistry
         IServiceFactory::Pointer f(
                 serviceFactories[i]->CreateExecutableExtension<IServiceFactory>(
                     WorkbenchRegistryConstants::ATTR_FACTORY_CLASS));
+        if (f.IsNull())
+        {
+          // support legacy BlueBerry extensions
+          f = serviceFactories[i]->CreateExecutableExtension<IServiceFactory>(
+                WorkbenchRegistryConstants::ATTR_FACTORY_CLASS, IServiceFactory::GetManifestName());
+        }
         ServiceFactoryHandle::Pointer handle(new ServiceFactoryHandle(f));
 //        PlatformUI.getWorkbench().getExtensionTracker().registerObject(
 //            serviceFactories[i].getDeclaringExtension(), handle,
@@ -238,6 +244,12 @@ std::vector<ISourceProvider::Pointer> WorkbenchServiceRegistry::GetSourceProvide
       {
         ISourceProvider::Pointer provider(elements[i]->CreateExecutableExtension<ISourceProvider>(
             WorkbenchRegistryConstants::ATTR_PROVIDER));
+        if (provider.IsNull())
+        {
+          // support legacy BlueBerry extensions
+          provider = elements[i]->CreateExecutableExtension<ISourceProvider>(
+                WorkbenchRegistryConstants::ATTR_PROVIDER, ISourceProvider::GetManifestName());
+        }
         providers.push_back(provider);
         this->ProcessVariables(elements[i]->GetChildren(
             WorkbenchRegistryConstants::TAG_VARIABLE));

@@ -1,3 +1,7 @@
+SET(MOC_H_FILES
+  src/internal/mitkPluginActivator.h
+)
+
 SET(SRC_CPP_FILES
   mitkDataStorageEditorInput.cpp
   mitkDataNodeObject.cpp
@@ -5,7 +9,7 @@ SET(SRC_CPP_FILES
 )
 
 SET(INTERNAL_CPP_FILES
-  
+  mitkPluginActivator.cpp
 )
 
 

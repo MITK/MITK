@@ -25,6 +25,8 @@
 
 class QmitkMockFunctionality : public QmitkFunctionality
 {
+  Q_OBJECT
+  
 public:
 
   berryObjectMacro(QmitkMockFunctionality)
@@ -32,6 +34,7 @@ public:
   static const std::string ID; // = "org.mitk.gui.qt.common.tests.api.MockFunctionality";
 
   QmitkMockFunctionality();
+  QmitkMockFunctionality(const QmitkMockFunctionality& other);
 
   ~QmitkMockFunctionality();
 

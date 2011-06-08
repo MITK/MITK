@@ -15,7 +15,7 @@
 
  =========================================================================*/
 
-#include "berryLog.h"
+#include <berryLog.h>
 
 #include "berryAbstractSourceProvider.h"
 #include "services/berryIServiceLocator.h"

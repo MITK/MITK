@@ -24,8 +24,11 @@
 
 #include <vector>
 #include <berryIBundle.h>
+#include <ctkPlugin.h>
 
-#include "berryUiQtDll.h"
+#include <QSharedPointer>
+
+#include <org_blueberry_ui_qt_Export.h>
 
 namespace berry {
 
@@ -42,9 +45,14 @@ public:
      */
   static void OpenActivePartHelp();
 
-  static bool RegisterQCHFiles(const QString& collectionFile, const std::vector<IBundle::Pointer>& bundles);
+  // for legacy BlueBerry bundle support
+  static bool RegisterQCHFiles(const std::vector<IBundle::Pointer>& bundles);
 
-  static void SetHelpColletionFile(const QString& file);
+  static bool RegisterQCHFiles(const QStringList& qchFiles);
+  static bool UnregisterQCHFiles(const QStringList& qchFiles);
+
+  static void SetHelpCollectionFile(const QString& file);
+  static QString GetHelpCollectionFile();
   static void SetDefaultHelpUrl(const QString& defaultUrl);
 
 private:
@@ -56,6 +64,8 @@ private:
   static QStringList registeredBundles;
 
   static QString GetAssistantExecutable();
+  static QStringList ExtractQCHFiles(const std::vector<IBundle::Pointer>& bundles);
+  static bool CallQtAssistant(const QStringList& qchFiles, bool registerFile = true);
 
 };
 

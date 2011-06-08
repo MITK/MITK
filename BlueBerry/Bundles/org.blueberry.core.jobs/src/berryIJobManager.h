@@ -20,7 +20,7 @@
 
 #include<string>
 
-#include "berryJobsDll.h"
+#include <org_blueberry_core_jobs_Export.h>
 
 #include "berryJob.h"
 #include "berryProgressProvider.h"

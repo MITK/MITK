@@ -22,7 +22,7 @@
 #include <Poco/Thread.h>
 #include <Poco/Timestamp.h>
 
-#include "../berryJobsDll.h"
+#include <org_blueberry_core_jobs_Export.h>
 
 #include "../berryJobExceptions.h"
 #include "../berryISchedulingRule.h"

@@ -35,6 +35,7 @@ private:
 public:
 
   QtIconImageDescriptor(void* img);
+  ~QtIconImageDescriptor();
 
   virtual void* CreateImage(bool returnMissingImageOnError = true);
 

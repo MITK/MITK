@@ -29,16 +29,21 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <set>
 
+#include <QObject>
+
 namespace berry {
 
 class Bundle;
 class BundleLoader;
 
-class ExtensionPointService : public IExtensionPointService
+class ExtensionPointService : public QObject, public IExtensionPointService
 {
-  berryObjectMacro(ExtensionPointService);
+  Q_OBJECT
+  Q_INTERFACES(berry::IExtensionPointService)
   
 public:
+
+  berryObjectMacro(ExtensionPointService);
   
   bool IsA(const std::type_info& type);
   const std::type_info& GetType() const;

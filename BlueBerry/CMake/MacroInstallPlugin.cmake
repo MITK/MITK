@@ -13,11 +13,16 @@ MACRO(MACRO_INSTALL_PLUGIN _plugin_dir)
   
   # Check if target names have been specified
   IF(NOT _INSTALL_TARGETS)
-    # no targets specified. get the main target from the plug-ins manifest
-    MACRO_PARSE_MANIFEST("${_plugin_dir}/META-INF/MANIFEST.MF")
-  STRING(REPLACE "." "_" _INSTALL_TARGETS ${BUNDLE-SYMBOLICNAME})
+    # no targets specified. get the main target from the plug-ins manifest if it exists
+    IF(EXISTS "${_plugin_dir}/META-INF/MANIFEST.MF")
+      MACRO_PARSE_MANIFEST("${_plugin_dir}/META-INF/MANIFEST.MF")
+      STRING(REPLACE "." "_" _INSTALL_TARGETS ${BUNDLE-SYMBOLICNAME})
+    ENDIF()
   ENDIF()
  
+  # Only continue if _INSTALL_TARGETS is set
+  IF(_INSTALL_TARGETS)
+
   IF(NOT _INSTALL_DESTINATION)
     SET(_INSTALL_DESTINATION "bin/")
   ELSE()
@@ -41,13 +46,15 @@ MACRO(MACRO_INSTALL_PLUGIN _plugin_dir)
   SET(_target_install_rpath ${CMAKE_INSTALL_RPATH})
   FOREACH(_dep ${_plugin_dependencies})
     SET(_linklib_path "${${_dep}_OUT_DIR}")
-    IF(BLUEBERRY_INSTALL_RPATH_RELATIVE)
-      #MESSAGE("replace ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} with \".\" in ${_linklib_path} ")
-      STRING(REPLACE "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}" "." _linklib_path "${_linklib_path}")
-    ELSE()
-      STRING(REPLACE "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}" "${CMAKE_INSTALL_PREFIX}/bin" _linklib_path "${_linklib_path}")
+    IF(_linklib_path)
+      IF(BLUEBERRY_INSTALL_RPATH_RELATIVE)
+        #MESSAGE("replace ${CMAKE_RUNTIME_OUTPUT_DIRECTORY} with \".\" in ${_linklib_path} ")
+        STRING(REPLACE "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}" "." _linklib_path "${_linklib_path}")
+      ELSE()
+        STRING(REPLACE "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}" "${CMAKE_INSTALL_PREFIX}/bin" _linklib_path "${_linklib_path}")
+      ENDIF()
+      LIST(APPEND _target_install_rpath "${_linklib_path}/bin")
     ENDIF()
-    LIST(APPEND _target_install_rpath "${_linklib_path}/bin")
   ENDFOREACH()
   SET_TARGET_PROPERTIES(${_INSTALL_TARGETS}
                         PROPERTIES INSTALL_RPATH "${_target_install_rpath}")
@@ -71,5 +78,7 @@ MACRO(MACRO_INSTALL_PLUGIN _plugin_dir)
               )
     ENDIF()
   ENDFOREACH()
+
+  ENDIF() # _INSTALL_TARGETS
   
 ENDMACRO()

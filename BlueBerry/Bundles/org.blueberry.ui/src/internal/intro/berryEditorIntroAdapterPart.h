@@ -34,6 +34,7 @@ namespace berry
  */
 class EditorIntroAdapterPart: public EditorPart
 {
+  Q_OBJECT
 
 private:
 
@@ -95,6 +96,7 @@ private:
 public:
 
   EditorIntroAdapterPart();
+  EditorIntroAdapterPart(const EditorIntroAdapterPart& other);
 
   /**
    * Forces the standby state of the intro part.

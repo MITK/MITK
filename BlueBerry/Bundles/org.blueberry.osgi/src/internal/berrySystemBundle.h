@@ -38,6 +38,10 @@ public:
   void Resume();
   
   BundleLoader& GetBundleLoader();
+
+protected:
+
+  void LoadManifest();
 };
 
 }

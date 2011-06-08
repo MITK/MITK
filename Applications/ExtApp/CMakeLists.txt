@@ -3,15 +3,16 @@ FIND_PACKAGE(BlueBerry REQUIRED)
 # TODO: this can be removed after resolving factory issues, it's only necessary for the registration call in main()
 MITK_USE_MODULE(MitkExt)
 
+INCLUDE(${QT_USE_FILE})
+
 INCLUDE_DIRECTORIES(
   ${BLUEBERRY_PLUGIN_SOURCE_DIRS} 
-  ${org.blueberry.osgi_BIN_DIR} # needed for generated berryConfig.h 
+  ${org_blueberry_osgi_INCLUDE_DIRS}
   ${Poco_INCLUDE_DIRS}
   ${ALL_INCLUDE_DIRECTORIES}
 )
-LINK_DIRECTORIES(${Poco_LIBRARY_DIRS}
-                 ${BLUEBERRY_PLUGINS_OUTPUT_DIR}/org.blueberry.osgi/bin
-                )
+
+LINK_DIRECTORIES(${Poco_LIBRARY_DIRS})
   
 IF(MITK_SHOW_CONSOLE_WINDOW)
   ADD_EXECUTABLE(ExtApp MACOSX_BUNDLE ExtApp.cpp)
@@ -27,12 +28,16 @@ ENDIF(WIN32)
 TARGET_LINK_LIBRARIES(ExtApp 
                       optimized PocoFoundation      debug PocoFoundationd 
                       optimized PocoUtil            debug PocoUtild 
-                      optimized org_blueberry_osgi debug org_blueberry_osgi${BLUEBERRY_DEBUG_POSTFIX}
+                      org_blueberry_osgi
                       ${ALL_LIBRARIES})
 
-SET_TARGET_PROPERTIES(ExtApp PROPERTIES INSTALL_RPATH "${CMAKE_INSTALL_RPATH};${CMAKE_INSTALL_RPATH}/BlueBerry/org.blueberry.osgi/bin")
+SET_TARGET_PROPERTIES(ExtApp PROPERTIES INSTALL_RPATH "${CMAKE_INSTALL_RPATH};${CMAKE_INSTALL_RPATH}/plugins")
 
-SET(_plugin_deps ${BLUEBERRY_ENABLED_PLUGINS} ${MITK_CORE_ENABLED_PLUGINS} ${MITK_MODULES_ENABLED_PLUGINS})
+SET(_plugin_deps
+    ${BLUEBERRY_ENABLED_PLUGINS}
+    ${MITK_EXT_ENABLED_PLUGINS}
+    ${MITK_MODULES_ENABLED_PLUGINS}
+   )
 
 IF(_plugin_deps)
   # Make sure all enabled plug-ins are up to date
@@ -53,6 +58,7 @@ IF(WIN32)
 ENDIF(WIN32)
 
 MITK_INSTALL_TARGETS(EXECUTABLES ExtApp GLOB_PLUGINS )
+mitkFunctionInstallProvisioningFiles(${BLUEBERRY_PLUGIN_PROVISIONING_FILE} ${MITK_EXTAPP_PROVISIONING_FILE})
 
 IF(UNIX AND MITK_INSTALL_RPATH_RELATIVE AND NOT APPLE)
   INSTALL(PROGRAMS "${MITK_SOURCE_DIR}/CMake/RunInstalledApp.sh" DESTINATION "." RENAME ExtApp.sh)

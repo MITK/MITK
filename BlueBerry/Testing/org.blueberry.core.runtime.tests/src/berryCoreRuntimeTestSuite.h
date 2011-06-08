@@ -21,13 +21,21 @@
 
 #include <CppUnit/TestSuite.h>
 
+#include <QObject>
+
+Q_DECLARE_INTERFACE(CppUnit::Test, "CppUnit.Test")
+
 namespace berry {
 
-class CoreRuntimeTestSuite : public CppUnit::TestSuite
+class CoreRuntimeTestSuite : public QObject, public CppUnit::TestSuite
 {
+  Q_OBJECT
+  Q_INTERFACES(CppUnit::Test)
+  
 public:
 
   CoreRuntimeTestSuite();
+  CoreRuntimeTestSuite(const CoreRuntimeTestSuite& other);
 };
 
 }

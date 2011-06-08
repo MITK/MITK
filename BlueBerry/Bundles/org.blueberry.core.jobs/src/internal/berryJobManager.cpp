@@ -61,7 +61,11 @@ JobManager::JobManager() :
 // DEBUG VARIABLES 
 
 
-const std::string JobManager::PI_JOBS = "org.blueberry.core.jobs";
+const std::string& JobManager::PI_JOBS()
+{
+  static std::string id("org.blueberry.core.jobs");
+  return id;
+}
 
 bool JobManager::DEBUG = false;
 
@@ -287,7 +291,7 @@ void JobManager::ReportBlocked(IProgressMonitor::Pointer sptr_monitor, InternalJ
   
   if (sptr_blockingJob == 0 || sptr_blockingJob->IsSystem()) 
     {
-   Status::Pointer sptr_reason( new Status(IStatus::INFO_TYPE, JobManager::PI_JOBS, 1, "the user operation is waiting for  background work to complete" ) );
+   Status::Pointer sptr_reason( new Status(IStatus::INFO_TYPE, JobManager::PI_JOBS(), 1, "the user operation is waiting for  background work to complete" ) );
 
     } 
   else 

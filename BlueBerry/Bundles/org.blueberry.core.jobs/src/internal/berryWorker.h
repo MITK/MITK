@@ -20,7 +20,7 @@
 
 #include <Poco/Thread.h>
 #include "berryObject.h"
-#include "berryJobsDll.h"
+#include <org_blueberry_core_jobs_Export.h>
 #include <Poco/Thread.h>
 #include <Poco/Runnable.h>
 #include "berryInternalJob.h"

@@ -135,6 +135,12 @@ m_MultiWidget(NULL)
 {
 }
 
+QmitkPreprocessingView::QmitkPreprocessingView(const QmitkPreprocessingView& other)
+{
+  Q_UNUSED(other)
+  throw std::runtime_error("Copy constructor not implemented");
+}
+
 QmitkPreprocessingView::~QmitkPreprocessingView()
 {
   this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->RemovePostSelectionListener(/*"org.mitk.views.datamanager",*/ m_SelListener);

@@ -22,7 +22,7 @@
 #include <berryObject.h>
 #include <berryMacros.h>
 
-#include "../berryUiDll.h"
+#include <org_blueberry_ui_Export.h>
 
 namespace berry
 {
@@ -136,7 +136,7 @@ public:
    */
   bool doit;
 
-  std::string ToString();
+  std::string ToString() const;
 
 };
 

@@ -24,6 +24,16 @@
 
 namespace berry {
 
+CoreTestApplication::CoreTestApplication()
+{
+
+}
+
+CoreTestApplication::CoreTestApplication(const CoreTestApplication& other)
+{
+  Q_UNUSED(other)
+}
+
 int CoreTestApplication::Start() {
   std::string testPlugin;
   try {

@@ -4,6 +4,8 @@
 #include "../berryObject.h"
 #include "../berrySmartPointer.h"
 
+#include <QObject>
+
 namespace berry
 {
 
@@ -120,5 +122,7 @@ struct IExecutableExtension {
 };
 
 }
+
+Q_DECLARE_INTERFACE(berry::IExecutableExtension, "org.blueberry.IExecutableExtension")
 
 #endif /*BERRYIEXECUTABLEEXTENSION_H_*/

@@ -7,17 +7,21 @@ SET(SRC_CPP_FILES
 )
 
 SET(INTERNAL_CPP_FILES
-  
-)
-
-SET(INTERNAL_MOC_H_FILES
+  mitkPluginActivator.cpp
 )
 
 SET(MOC_H_FILES
-  
+  src/QmitkApplication.h
+  src/QmitkDefaultPerspective.h
+
+  src/internal/mitkPluginActivator.h
 )
 
-SET(CPP_FILES manifest.cpp)
+SET(CACHED_RESOURCE_FILES
+  plugin.xml
+)
+
+SET(CPP_FILES )
 
 foreach(file ${SRC_CPP_FILES})
   SET(CPP_FILES ${CPP_FILES} src/${file})

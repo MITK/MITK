@@ -157,7 +157,7 @@ PURPOSE.  See the above copyright notices for more information.
 #endif
 
 
-#include "berryOSGiDll.h"
+#include <org_blueberry_osgi_Export.h>
 
 #include "event/berryPlatformEvents.h"
 #include "service/berryServiceRegistry.h"
@@ -222,6 +222,7 @@ public:
   static std::string ARG_HOME;
   static std::string ARG_PLUGIN_CACHE;
   static std::string ARG_PLUGIN_DIRS;
+  static std::string ARG_PROVISIONING;
 
   static std::string ARG_CONSOLELOG;
   static std::string ARG_TESTPLUGIN;
@@ -329,6 +330,10 @@ public:
    * highest version, or <tt>null</tt> if no bundle is found.
    */
   static IBundle::Pointer GetBundle(const std::string& id);
+
+  static std::vector<IBundle::Pointer> GetBundles();
+
+  static QSharedPointer<ctkPlugin> GetCTKPlugin(const QString& symbolicName);
 
 private:
   Platform();

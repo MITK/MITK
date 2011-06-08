@@ -21,9 +21,16 @@
 
 #include <berryIPerspectiveFactory.h>
 
-struct QmitkExtDefaultPerspective : public berry::IPerspectiveFactory
+class QmitkExtDefaultPerspective : public QObject, public berry::IPerspectiveFactory
 {
+  Q_OBJECT
+  Q_INTERFACES(berry::IPerspectiveFactory)
+  
+public:
 
+  QmitkExtDefaultPerspective();
+  QmitkExtDefaultPerspective(const QmitkExtDefaultPerspective& other);
+  
   void CreateInitialLayout(berry::IPageLayout::Pointer layout);
 
 };

@@ -20,7 +20,7 @@
 #define BERRYFILEEDITORINPUT_H_
 
 #include "berryIPathEditorInput.h"
-#include "berryUiDll.h"
+#include <org_blueberry_ui_Export.h>
 
 
 namespace berry {

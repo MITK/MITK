@@ -25,7 +25,7 @@
 #include <set>
 #include <vector>
 
-#include "berryUiDll.h"
+#include <org_blueberry_ui_Export.h>
 #include "berryImageDescriptor.h"
 
 namespace berry {

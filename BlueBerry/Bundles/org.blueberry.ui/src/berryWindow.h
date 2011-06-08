@@ -18,7 +18,7 @@
 #ifndef BERRYWINDOW_H_
 #define BERRYWINDOW_H_
 
-#include "berryUiDll.h"
+#include <org_blueberry_ui_Export.h>
 
 #include "berryIShellProvider.h"
 #include "berryIShellListener.h"

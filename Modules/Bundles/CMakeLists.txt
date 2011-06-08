@@ -32,6 +32,7 @@ IF(MITK_USE_BLUEBERRY)
     org.mitk.gui.qt.basicimageprocessing
     org.mitk.gui.qt.colourimageprocessing
     org.mitk.gui.qt.navigationdataplayer
+    org.mitk.gui.qt.tofutil
   )
 
   MACRO_COLLECT_PLUGINS(OUTPUT_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/ExtBundles

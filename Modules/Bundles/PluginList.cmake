@@ -14,4 +14,5 @@ SET(MITK_EXT_PLUGINS
   org.mitk.gui.qt.navigationdataplayer:ON
   org.mitk.gui.qt.basicimageprocessing:OFF
   org.mitk.gui.qt.colourimageprocessing:OFF
+  org.mitk.gui.qt.tofutil:OFF
   )

@@ -58,7 +58,12 @@ class QmitkToFUtilView : public QmitkFunctionality
     static const std::string VIEW_ID;
 
     QmitkToFUtilView();
-    virtual ~QmitkToFUtilView();
+    QmitkToFUtilView(const QmitkToFUtilView& other)
+	{
+	  Q_UNUSED(other)
+	  throw std::runtime_error("Copy constructor not implemented");
+	}
+    ~QmitkToFUtilView();
 
     virtual void CreateQtPartControl(QWidget *parent);
     /// \brief Called when the functionality is activated

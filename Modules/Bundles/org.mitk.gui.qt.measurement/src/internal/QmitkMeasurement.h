@@ -54,7 +54,7 @@ class vtkCornerAnnotation;
 /// 2. A textbrowser which shows details for the selected PlanarFigures
 /// 3. A button for copying all details to the clipboard
 ///
-class QmitkMeasurement : public QObject, public QmitkFunctionality
+class QmitkMeasurement : public QmitkFunctionality
 {
   Q_OBJECT
 

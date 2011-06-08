@@ -18,9 +18,10 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef BERRYIEXTENSIONPOINT_H_
 #define BERRYIEXTENSIONPOINT_H_
 
-#include "../berryOSGiDll.h"
+#include <org_blueberry_osgi_Export.h>
 
 #include "berryIExtension.h"
+#include "berryIConfigurationElement.h"
 
 #include <vector>
 

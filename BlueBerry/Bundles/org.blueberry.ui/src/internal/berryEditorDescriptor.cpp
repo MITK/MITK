@@ -97,6 +97,12 @@ IEditorPart::Pointer EditorDescriptor::CreateEditor()
   IEditorPart::Pointer extension(
       configurationElement->CreateExecutableExtension<IEditorPart> (
           WorkbenchRegistryConstants::ATT_CLASS));
+  if (extension.IsNull())
+  {
+    // support legacy BlueBerry extensions
+    extension = configurationElement->CreateExecutableExtension<IEditorPart> (
+          WorkbenchRegistryConstants::ATT_CLASS, IEditorPart::GetManifestName());
+  }
   return extension;
 }
 
@@ -142,7 +148,7 @@ SmartPointer<ImageDescriptor> EditorDescriptor::GetImageDescriptor() const
       std::string command(this->GetFileName());
       if (!imageFileName.empty() && configurationElement)
       {
-        imageDesc = AbstractUIPlugin::ImageDescriptorFromPlugin(
+        imageDesc = AbstractUICTKPlugin::ImageDescriptorFromPlugin(
             configurationElement->GetContributor(), imageFileName);
       }
       else if (!command.empty())
@@ -421,6 +427,14 @@ IEditorMatchingStrategy::Pointer EditorDescriptor::GetEditorMatchingStrategy()
           matchingStrategy = configurationElement->CreateExecutableExtension<
               IEditorMatchingStrategy> (
               WorkbenchRegistryConstants::ATT_MATCHING_STRATEGY);
+          if (matchingStrategy.IsNull())
+          {
+            // support legacy BlueBerry extensions
+            matchingStrategy = configurationElement->CreateExecutableExtension<
+                IEditorMatchingStrategy> (
+                WorkbenchRegistryConstants::ATT_MATCHING_STRATEGY,
+                IEditorMatchingStrategy::GetManifestName());
+          }
         } catch (CoreException e)
         {
           WorkbenchPlugin::Log(

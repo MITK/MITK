@@ -47,7 +47,7 @@ typedef itk::Image<float, 2> ItkImageType2D;
   \sa QmitkFunctionality
   \ingroup Functionalities
 */
-class QmitkToFUtilView : public QObject, public QmitkFunctionality
+class QmitkToFUtilView : public QmitkFunctionality
 {  
   // this is needed for all Qt objects that should have a Qt meta-object
   // (everything that derives from QObject and wants to have signal/slots)

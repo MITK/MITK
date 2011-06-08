@@ -27,6 +27,17 @@ const std::string MockViewPart::ID4 = MockViewPart::ID + "4";
 const std::string MockViewPart::IDMULT = MockViewPart::ID + "Mult";
 const std::string MockViewPart::NAME = "Mock View 1";
 
+MockViewPart::MockViewPart()
+{
+
+}
+
+MockViewPart::MockViewPart(const MockViewPart& other)
+{
+  Q_UNUSED(other)
+  throw std::runtime_error("Copy constructor not implemented");
+}
+
 IViewSite::Pointer MockViewPart::GetViewSite()
 {
   return GetSite().Cast<IViewSite> ();

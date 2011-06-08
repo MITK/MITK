@@ -20,11 +20,19 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <berryIApplication.h>
 
-#include "mitkQtAppDll.h"
+#include <QObject>
 
-class MITK_QT_APP QmitkApplication : public berry::IApplication
+#include <org_mitk_gui_qt_application_Export.h>
+
+class MITK_QT_APP QmitkApplication : public QObject, public berry::IApplication
 {
+  Q_OBJECT
+  Q_INTERFACES(berry::IApplication)
+  
 public:
+  
+  QmitkApplication();
+  QmitkApplication(const QmitkApplication& other);
   
   int Start();
   void Stop();

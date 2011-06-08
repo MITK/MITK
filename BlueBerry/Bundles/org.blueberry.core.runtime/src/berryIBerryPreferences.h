@@ -1,7 +1,7 @@
 #ifndef BERRYIBERRYPREFERENCES_H_
 #define BERRYIBERRYPREFERENCES_H_
 
-#include "berryRuntimeDll.h"
+#include <org_blueberry_core_runtime_Export.h>
 #include "berryIPreferences.h"
 #include "berryMessage.h"
 

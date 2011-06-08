@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <berryMacros.h>
 #include <berryMessage.h>
 
-#include "berryUiDll.h"
+#include <org_blueberry_ui_Export.h>
 #include "berryIWorkbenchPartReference.h"
 
 namespace berry {

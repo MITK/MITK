@@ -21,6 +21,17 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "QmitkWorkbenchAdvisor.h"
 
+QmitkApplication::QmitkApplication()
+{
+
+}
+ 
+QmitkApplication::QmitkApplication(const QmitkApplication& other)
+{
+  Q_UNUSED(other)
+  throw std::runtime_error("Copy constructor not implemented");
+}
+
 int QmitkApplication::Start()
 {
   berry::Display* display = berry::PlatformUI::CreateDisplay();

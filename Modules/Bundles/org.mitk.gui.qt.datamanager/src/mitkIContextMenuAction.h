@@ -34,4 +34,6 @@ namespace mitk
   };
 }
 
+Q_DECLARE_INTERFACE(mitk::IContextMenuAction, "org.mitk.datamanager.IContextMenuAction")
+
 #endif // mitkIContextMenuAction_H_ 

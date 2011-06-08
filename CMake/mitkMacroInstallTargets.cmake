@@ -7,7 +7,7 @@ MACRO(MITK_INSTALL_TARGETS)
   MACRO_PARSE_ARGUMENTS(_install "TARGETS;EXECUTABLES;PLUGINS;LIBRARY_DIRS" "GLOB_PLUGINS" ${ARGN})
   LIST(APPEND _install_TARGETS ${_install_DEFAULT_ARGS})
 
-  # TODO: how to supply to correct intermediate directory??
+  # TODO: how to supply the correct intermediate directory??
   # CMAKE_CFG_INTDIR is not expanded to actual values inside the INSTALL(CODE "...") macro ...
   SET(intermediate_dir )
   IF(WIN32 AND NOT MINGW)
@@ -19,9 +19,25 @@ MACRO(MITK_INSTALL_TARGETS)
     ${ITK_LIBRARY_DIRS}/${intermediate_dir}
     ${QT_LIBRARY_DIR} 
     ${QT_LIBRARY_DIR}/../bin
-    ${MITK_BINARY_DIR}/bin/${intermediate_dir} 
-    ${_install_LIBRARY_DIRS}
+    ${MITK_BINARY_DIR}/bin/${intermediate_dir}
+    ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${intermediate_dir}
     )
+
+  FOREACH(_lib_dir ${_install_LIBRARY_DIRS})
+    LIST(APPEND DIRS ${_lib_dir}/${intermediate_dir})
+  ENDFOREACH()
+  
+  IF(GDCM_DIR)
+    LIST(APPEND DIRS ${GDCM_DIR}/bin/${intermediate_dir})
+  ENDIF()
+  IF(OpenCV_DIR)
+    LIST(APPEND DIRS ${OpenCV_DIR}/bin/${intermediate_dir})
+  ENDIF()
+  IF(MITK_USE_BLUEBERRY)
+    LIST(APPEND DIRS ${CTK_RUNTIME_LIBRARY_DIRS}/${intermediate_dir})
+  ENDIF()
+
+  LIST(REMOVE_DUPLICATES DIRS)
 
   if(QT_LIBRARY_DIR MATCHES "^(/lib/|/lib32/|/lib64/|/usr/lib/|/usr/lib32/|/usr/lib64/|/usr/X11R6/)")
     set(_qt_is_system_qt 1)

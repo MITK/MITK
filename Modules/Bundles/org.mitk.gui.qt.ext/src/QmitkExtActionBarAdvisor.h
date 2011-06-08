@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <berryActionBarAdvisor.h>
 
-#include "mitkQtCommonExtDll.h"
+#include <org_mitk_gui_qt_ext_Export.h>
 
 class MITK_QT_COMMON_EXT_EXPORT QmitkExtActionBarAdvisor : public berry::ActionBarAdvisor
 {

@@ -81,8 +81,19 @@ class CLASS_NAME ## RegistrationMethod \
     CLASS_NAME ## RegistrationMethod() \
     { \
       /*MITK_INFO("tools") << "Registered " #CLASS_NAME; */ \
-      itk::ObjectFactoryBase::RegisterFactory( CLASS_NAME ## Factory::New() ); \
+      m_Factory = CLASS_NAME ## Factory::New(); \
+      itk::ObjectFactoryBase::RegisterFactory( m_Factory ); \
     } \
+ \
+    ~CLASS_NAME ## RegistrationMethod() \
+    { \
+      /*MITK_INFO("tools") << "UnRegistered " #CLASS_NAME; */ \
+      itk::ObjectFactoryBase::UnRegisterFactory( m_Factory ); \
+    } \
+ \
+    private: \
+ \
+    CLASS_NAME ## Factory::Pointer m_Factory; \
   }; \
  \
 static mitk::CLASS_NAME ## RegistrationMethod somestaticinitializer_ ## CLASS_NAME ;
@@ -197,8 +208,19 @@ class CLASS_NAME ## RegistrationMethod \
     CLASS_NAME ## RegistrationMethod() \
     { \
       /*MITK_INFO("tools") << "Registered " #CLASS_NAME; */ \
-      itk::ObjectFactoryBase::RegisterFactory( CLASS_NAME ## Factory::New() ); \
+      m_Factory = CLASS_NAME ## Factory::New(); \
+      itk::ObjectFactoryBase::RegisterFactory( m_Factory ); \
     } \
+ \
+    ~CLASS_NAME ## RegistrationMethod() \
+     { \
+       /*MITK_INFO("tools") << "UnRegistered " #CLASS_NAME; */ \
+       itk::ObjectFactoryBase::UnRegisterFactory( m_Factory ); \
+     } \
+ \
+     private: \
+ \
+     CLASS_NAME ## Factory::Pointer m_Factory; \
   }; \
  \
 static CLASS_NAME ## RegistrationMethod somestaticinitializer_ ## CLASS_NAME ;

@@ -22,7 +22,7 @@
 #include <berryMacros.h>
 #include <berryObject.h>
 
-#include "berryUiDll.h"
+#include <org_blueberry_ui_Export.h>
 
 namespace berry {
 

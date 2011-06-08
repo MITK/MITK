@@ -35,6 +35,12 @@ QmitkStdMultiWidgetEditor::QmitkStdMultiWidgetEditor()
 
 }
 
+QmitkStdMultiWidgetEditor::QmitkStdMultiWidgetEditor(const QmitkStdMultiWidgetEditor& other)
+{
+  Q_UNUSED(other)
+  throw std::runtime_error("Copy constructor not implemented");
+}
+
 QmitkStdMultiWidgetEditor::~QmitkStdMultiWidgetEditor()
 {
   // we need to wrap the RemovePartListener call inside a

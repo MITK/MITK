@@ -1,8 +1,8 @@
 #ifndef BERRYABSTRACTPREFERENCESSTORAGE_H_
 #define BERRYABSTRACTPREFERENCESSTORAGE_H_
 
-#include "../berryRuntimeDll.h"
-#include "berryIPreferences.h"
+#include <org_blueberry_core_runtime_Export.h>
+#include "../berryIPreferences.h"
 
 #include "Poco/File.h"
 

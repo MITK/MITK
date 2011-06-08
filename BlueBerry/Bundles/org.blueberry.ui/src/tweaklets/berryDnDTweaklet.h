@@ -20,7 +20,7 @@
 
 #include <berryMacros.h>
 
-#include "../berryUiDll.h"
+#include <org_blueberry_ui_Export.h>
 #include "../internal/berryTweaklets.h"
 
 namespace berry
@@ -64,5 +64,7 @@ struct BERRY_UI DnDTweaklet : public Object
 };
 
 }
+
+Q_DECLARE_INTERFACE(berry::DnDTweaklet, "org.blueberry.DnDTweaklet")
 
 #endif /* BERRYDNDTWEAKLET_H_ */

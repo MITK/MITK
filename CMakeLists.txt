@@ -105,7 +105,7 @@ option(MITK_BUILD_ALL_PLUGINS "Build all MITK plugins" OFF)
 option(MITK_BUILD_TUTORIAL "Build the MITK tutorial" ON)
 option(MITK_USE_Boost "Use the Boost C++ library" OFF)
 option(MITK_USE_BLUEBERRY "Build the BlueBerry platform" ON)
-option(MITK_USE_CTK "EXEPERIMENTAL, superbuild only: Use CTK in MITK" OFF)
+option(MITK_USE_CTK "Use CTK in MITK" ${MITK_USE_BLUEBERRY})
 option(MITK_USE_DCMTK "EXEPERIMENTAL, superbuild only: Use DCMTK in MITK" OFF)
 option(MITK_USE_OpenCV "Use Intel's OpenCV library" OFF)
   
@@ -114,6 +114,11 @@ mark_as_advanced(MITK_INSTALL_RPATH_RELATIVE
                  MITK_USE_CTK
                  MITK_USE_DCMTK
                  )
+                 
+# consistency checks
+if(MITK_USE_BLUEBERRY AND NOT MITK_USE_CTK)
+  MESSAGE(FATAL_ERROR "BlueBerry depends on CTK. Please set MITK_USE_CTK to ON.")
+endif()
 
 #-----------------------------------------------------------------------------
 # Additional CXX/C Flags
@@ -184,6 +189,7 @@ include(mitkFunctionSuppressWarnings) # includes several functions
 include(mitkFunctionOrganizeSources)
 include(mitkFunctionGetVersion)
 include(mitkFunctionCreateWindowsBatchScript)
+include(mitkFunctionInstallProvisioningFiles)
 include(mitkMacroCreateModuleConf)
 include(mitkMacroCreateModule)
 include(mitkMacroCheckModule)
@@ -393,6 +399,114 @@ foreach(subproject ${CTEST_PROJECT_SUBPROJECTS})
 endforeach()
 
 #-----------------------------------------------------------------------------
+# Add subdirectories
+#-----------------------------------------------------------------------------
+
+link_directories(${MITK_LINK_DIRECTORIES})
+
+add_subdirectory(Core)
+
+if(MITK_USE_QT AND QT4_FOUND)
+  add_subdirectory(CoreUI/Qmitk)
+endif()
+
+add_subdirectory(Modules)
+
+if(MITK_USE_BLUEBERRY)
+
+  set(MITK_DEFAULT_SUBPROJECTS MITK-Plugins)
+
+  include("${CMAKE_CURRENT_SOURCE_DIR}/CoreUI/Bundles/PluginList.cmake")
+  set(mitk_core_plugins_fullpath )
+  foreach(core_plugin ${MITK_CORE_PLUGINS})
+    list(APPEND mitk_core_plugins_fullpath CoreUI/Bundles/${core_plugin})
+  endforeach()
+
+  if(BUILD_TESTING)
+    include(berryTestingHelpers)
+
+    include("${CMAKE_CURRENT_SOURCE_DIR}/CoreUI/BundleTesting/PluginList.cmake")
+    set(mitk_core_test_plugins_fullpath )
+    foreach(core_test_plugin ${MITK_CORE_TEST_PLUGINS})
+    #  list(APPEND mitk_core_test_plugins_fullpath CoreUI/BundleTesting/${core_test_plugin})
+    endforeach()
+
+    set(BLUEBERRY_UI_TEST_APP "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/CoreApp")
+    get_target_property(_is_macosx_bundle CoreApp MACOSX_BUNDLE)
+    if(APPLE AND _is_macosx_bundle)
+      set(BLUEBERRY_UI_TEST_APP "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/CoreApp.app/Contents/MacOS/CoreApp")
+    endif()
+
+    set(BLUEBERRY_TEST_APP_ID "org.mitk.qt.application")
+  endif()
+
+  include("${CMAKE_CURRENT_SOURCE_DIR}/Modules/Bundles/PluginList.cmake")
+  set(mitk_ext_plugins_fullpath )
+  foreach(ext_plugin ${MITK_EXT_PLUGINS})
+    list(APPEND mitk_ext_plugins_fullpath Modules/Bundles/${ext_plugin})
+  endforeach()
+
+  ctkMacroSetupExternalPlugins(${mitk_core_plugins_fullpath} ${mitk_core_test_plugins_fullpath} ${mitk_ext_plugins_fullpath}
+                               BUILD_OPTION_PREFIX MITK_BUILD_
+                               BUILD_ALL ${MITK_BUILD_ALL_PLUGINS}
+                               COMPACT_OPTIONS)
+
+  ctkFunctionExtractPluginTargets("${mitk_core_plugins_fullpath}" ON MITK_CORE_ENABLED_PLUGINS)
+  ctkFunctionExtractPluginTargets("${mitk_ext_plugins_fullpath}" ON MITK_EXT_ENABLED_PLUGINS)
+  list(APPEND MITK_EXT_ENABLED_PLUGINS ${MITK_CORE_ENABLED_PLUGINS})
+
+  set(MITK_COREAPP_PROVISIONING_FILE "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/CoreApp.provisioning")
+  FunctionCreateProvisioningFile(
+    FILE ${MITK_COREAPP_PROVISIONING_FILE}
+    INCLUDE "${BLUEBERRY_PLUGIN_PROVISIONING_FILE}"
+    PLUGIN_DIR "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/plugins"
+    PLUGINS ${mitk_core_plugins_fullpath}
+  )
+
+  set(MITK_EXTAPP_PROVISIONING_FILE "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/ExtApp.provisioning")
+  FunctionCreateProvisioningFile(
+    FILE ${MITK_EXTAPP_PROVISIONING_FILE}
+    INCLUDE "${BLUEBERRY_PLUGIN_PROVISIONING_FILE}"
+    PLUGIN_DIR "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/plugins"
+    PLUGINS ${mitk_core_plugins_fullpath} ${mitk_ext_plugins_fullpath}
+  )
+
+  set(MITK_PLUGIN_USE_FILE "${MITK_BINARY_DIR}/MitkPluginUseFile.cmake")
+  ctkFunctionGeneratePluginUseFile(${MITK_PLUGIN_USE_FILE})
+
+  # Used in the export command further below
+  GetMyTargetLibraries("${CTK_PLUGIN_LIBRARIES}" MITK_PLUGIN_TARGETS)
+
+  # add legacy BlueBerry bundles
+  add_subdirectory(Modules/Bundles)
+endif()
+
+# Construct a list of paths containing runtime directories
+# for MITK applications on Windows
+set(MITK_RUNTIME_PATH 
+    "${VTK_LIBRARY_DIRS}/@VS_BUILD_TYPE@;${ITK_LIBRARY_DIRS}/@VS_BUILD_TYPE@;${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/@VS_BUILD_TYPE@"
+    )
+if(QT4_FOUND)
+  set(MITK_RUNTIME_PATH "${MITK_RUNTIME_PATH};${QT_LIBRARY_DIR}/../bin")
+endif()
+if(MITK_USE_BLUEBERRY)
+  set(MITK_RUNTIME_PATH "${MITK_RUNTIME_PATH};${CTK_RUNTIME_LIBRARY_DIRS}/@VS_BUILD_TYPE@;${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/plugins/@VS_BUILD_TYPE@")
+endif()
+if(GDCM_DIR)
+  set(MITK_RUNTIME_PATH "${MITK_RUNTIME_PATH};${GDCM_DIR}/bin/@VS_BUILD_TYPE@")
+endif()
+if(OpenCV_DIR)
+  set(MITK_RUNTIME_PATH "${MITK_RUNTIME_PATH};${OpenCV_DIR}/bin/@VS_BUILD_TYPE@")
+endif()
+# DCMTK is statically build
+#if(DCMTK_DIR)
+#  set(MITK_RUNTIME_PATH "${MITK_RUNTIME_PATH};${DCMTK_DIR}/bin/@VS_BUILD_TYPE@")
+#endif()
+
+# Add applications directory
+add_subdirectory(Applications)
+
+#-----------------------------------------------------------------------------
 # Python Wrapping
 #-----------------------------------------------------------------------------
 
@@ -402,17 +516,6 @@ option(MITK_USE_PYTHON "Build cswig Python wrapper support (requires CableSwig).
 if(MITK_USE_PYTHON)
   add_subdirectory(Wrapping)
 endif()
-
-#-----------------------------------------------------------------------------
-# Add subdirectories
-#-----------------------------------------------------------------------------
-
-link_directories(${MITK_LINK_DIRECTORIES})
-
-add_subdirectory(Core)
-add_subdirectory(CoreUI)
-add_subdirectory(Modules)
-add_subdirectory(Applications)
 
 #-----------------------------------------------------------------------------
 # Documentation
@@ -455,8 +558,8 @@ file(REMOVE ${MITK_EXPORTS_FILE})
 
 if(MITK_USE_BLUEBERRY)
   set(enabled_plugins
-    ${BLUEBERRY_ENABLED_PLUGINS}
-    ${MITK_CORE_ENABLED_PLUGINS}
+    ${BLUEBERRY_PLUGIN_TARGETS}
+    ${MITK_PLUGIN_TARGETS}
     ${MITK_MODULES_ENABLED_PLUGINS}
     )
 
@@ -489,6 +592,15 @@ set(UTILITIES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Utilities)
 configure_file(mitkConfig.h.in ${MITK_BINARY_DIR}/mitkConfig.h)
 configure_file(MITKConfig.cmake.in ${MITK_BINARY_DIR}/MITKConfig.cmake @ONLY)
 
-
-
-
+# If we are under Windows, create two batch files which correctly
+# set up the environment for the application and for Visual Studio
+if(WIN32)
+  include(mitkFunctionCreateWindowsBatchScript)
+  
+  set(VS_SOLUTION_FILE "${PROJECT_BINARY_DIR}/${PROJECT_NAME}.sln")
+  foreach(VS_BUILD_TYPE debug release)
+    mitkFunctionCreateWindowsBatchScript("${MITK_SOURCE_DIR}/CMake/StartVS.bat.in"
+      ${PROJECT_BINARY_DIR}/StartVS_${VS_BUILD_TYPE}.bat
+      ${VS_BUILD_TYPE})
+  endforeach()
+endif(WIN32)

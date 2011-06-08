@@ -22,8 +22,11 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace mitk {
 
-class DataStorageService : public IDataStorageService
+class DataStorageService : public QObject, public IDataStorageService
 {
+  Q_OBJECT
+  Q_INTERFACES(mitk::IDataStorageService)
+
 public:
   
   DataStorageService();

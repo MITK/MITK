@@ -27,7 +27,7 @@
 #include <Poco/HashMap.h>
 #include <Poco/Path.h>
 
-#include "berryOSGiDll.h"
+#include <org_blueberry_osgi_Export.h>
 
 namespace berry {
 

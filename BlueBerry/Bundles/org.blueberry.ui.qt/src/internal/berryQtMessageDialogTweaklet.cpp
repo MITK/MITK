@@ -69,6 +69,16 @@ public:
   }
 };
 
+QtMessageDialogTweaklet::QtMessageDialogTweaklet()
+{
+
+}
+
+QtMessageDialogTweaklet::QtMessageDialogTweaklet(const QtMessageDialogTweaklet& other)
+{
+
+}
+
 bool QtMessageDialogTweaklet::OpenConfirm(Shell::Pointer,
     const std::string& title, const std::string& message)
 {

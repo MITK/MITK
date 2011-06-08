@@ -18,7 +18,7 @@
 #ifndef _BERRY_LOCKLISTENER_H_
 #define _BERRY_LOCKLISTENER_H_
 
-#include "berryJobsDll.h"
+#include <org_blueberry_core_jobs_Export.h>
 #include <Poco/Thread.h>
 #include <berryObject.h>
 

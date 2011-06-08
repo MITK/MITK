@@ -2,8 +2,8 @@
 <QHelpCollectionProject version="1.0">
      <assistant>
          <title>MITK Help</title>
-		 <startPage>qthelp://org.mitk.gui.qt.extapplication/bundle/index.html</startPage>
-		 <enableFilterFunctionality>false</enableFilterFunctionality>
+         <startPage>qthelp://org.mitk.gui.qt.extapplication/bundle/index.html</startPage>
+         <enableFilterFunctionality>false</enableFilterFunctionality>
          <enableDocumentationManager>false</enableDocumentationManager>
          <enableAddressBar visible="false">true</enableAddressBar>
          <cacheDirectory>MitkExt</cacheDirectory>

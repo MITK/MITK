@@ -17,6 +17,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "QmitkCommonActivator.h"
 
+#include "../QmitkStdMultiWidgetEditor.h"
+
 #include <mitkGlobalInteraction.h>
 #include <QmitkRegisterClasses.h>
 
@@ -24,8 +26,12 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 void
-QmitkCommonActivator::Start(berry::IBundleContext::Pointer)
+QmitkCommonActivator::start(ctkPluginContext* context)
 { 
+  Q_UNUSED(context)
+  
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkStdMultiWidgetEditor, context)
+  
   QFile file(":/org.mitk.gui.qt.common/StateMachine.xml");
   if(file.exists() && file.open(QIODevice::ReadOnly | QIODevice::Text) )
   {
@@ -40,3 +46,10 @@ QmitkCommonActivator::Start(berry::IBundleContext::Pointer)
 
 }
 
+void
+QmitkCommonActivator::stop(ctkPluginContext* context)
+{
+  Q_UNUSED(context)
+}
+
+Q_EXPORT_PLUGIN2(org_mitk_gui_qt_common, QmitkCommonActivator)

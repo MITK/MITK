@@ -23,7 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <berryIWindowListener.h>
 #include <berryIWorkbenchWindow.h>
 #include <set>
-#include "mitkQtCommonDll.h"
+#include <org_mitk_gui_qt_common_Export.h>
 class QmitkFunctionality;
 
 ///

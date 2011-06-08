@@ -19,7 +19,7 @@
 #ifndef BERRYIPERSPECTIVELISTENER_H_
 #define BERRYIPERSPECTIVELISTENER_H_
 
-#include "berryUiDll.h"
+#include <org_blueberry_ui_Export.h>
 #include "berryIPerspectiveDescriptor.h"
 #include "berryIWorkbenchPartReference.h"
 

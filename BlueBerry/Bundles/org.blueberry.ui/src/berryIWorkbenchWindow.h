@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <berryMacros.h>
 #include <berryIAdaptable.h>
 
-#include "berryUiDll.h"
+#include <org_blueberry_ui_Export.h>
 
 #include "berryIPageService.h"
 #include "berryShell.h"

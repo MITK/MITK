@@ -22,7 +22,7 @@
 #include <berryObject.h>
 #include <berryMacros.h>
 
-#include "../berryUiDll.h"
+#include <org_blueberry_ui_Export.h>
 
 namespace berry {
 
@@ -52,5 +52,7 @@ struct BERRY_UI IntroContentDetector : public Object {
 };
 
 }
+
+Q_DECLARE_INTERFACE(berry::IntroContentDetector, "org.blueberr.IntroContentDetector")
 
 #endif /* BERRYINTROCONTENTDETECTOR_H_ */

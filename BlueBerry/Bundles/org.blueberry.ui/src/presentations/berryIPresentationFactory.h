@@ -23,6 +23,8 @@
 
 #include "berryStackPresentation.h"
 
+#include <QObject>
+
 namespace berry
 {
 
@@ -180,5 +182,7 @@ public:
 };
 
 }
+
+Q_DECLARE_INTERFACE(berry::IPresentationFactory, "org.blueberry.IPresentationFactory")
 
 #endif /* BERRYABSTRACTPRESENTATIONFACTORY_H_ */

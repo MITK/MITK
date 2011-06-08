@@ -19,9 +19,61 @@ PURPOSE.  See the above copyright notices for more information.
 #include <Poco/Util/MapConfiguration.h>
 #include <mitkCoreExtObjectFactory.h>
 
+#include <QApplication>
+#include <QMessageBox>
+
+class QtSafeApplication : public QApplication
+{
+
+public:
+
+  QtSafeApplication(int& argc, char** argv) : QApplication(argc, argv)
+  {}
+
+  /**
+   * Reimplement notify to catch unhandled exceptions and open an error message.
+   *
+   * @param receiver
+   * @param event
+   * @return
+   */
+  bool notify(QObject* receiver, QEvent* event)
+  {
+    QString msg;
+    try
+    {
+      return QApplication::notify(receiver, event);
+    }
+    catch (Poco::Exception& e)
+    {
+      msg = QString::fromStdString(e.displayText());
+    }
+    catch (std::exception& e)
+    {
+      msg = e.what();
+    }
+    catch (...)
+    {
+      msg = "Unknown exception";
+    }
+
+    QString text("An error occurred. You should save all data and quit the program to "
+                 "prevent possible data loss.\nSee the error log for details.\n\n");
+    text += msg;
+
+    QMessageBox::critical(0, "Error", text);
+    return false;
+  }
+
+};
+
 int main(int argc, char** argv)
 {
-  
+  // Create a QApplication instance first
+  QtSafeApplication qSafeApp(argc, argv);
+  qSafeApp.setApplicationName("ExtApp");
+  qSafeApp.setOrganizationName("DKFZ");
+
   RegisterCoreExtObjectFactory();
   // These paths replace the .ini file and are tailored for installation
   // packages created with CPack. If a .ini file is presented, it will
@@ -29,19 +81,17 @@ int main(int argc, char** argv)
   Poco::Path basePath(argv[0]);
   basePath.setFileName("");
   
-  Poco::Path BlueBerryPath(basePath);
-  BlueBerryPath.pushDirectory("BlueBerry");
-
-  Poco::Path corePath(basePath);
-  corePath.pushDirectory("CoreBundles");
+  Poco::Path provFile(basePath);
+  provFile.setFileName("ExtApp.provisioning");
 
   Poco::Path extPath(basePath);
   extPath.pushDirectory("ExtBundles");
 
-  std::string pluginDirs = BlueBerryPath.toString() + ";" + corePath.toString() + ";" + extPath.toString();
+  std::string pluginDirs = extPath.toString();
 
   Poco::Util::MapConfiguration* extConfig(new Poco::Util::MapConfiguration());
   extConfig->setString(berry::Platform::ARG_PLUGIN_DIRS, pluginDirs);
+  extConfig->setString(berry::Platform::ARG_PROVISIONING, provFile.toString());
   extConfig->setString(berry::Platform::ARG_APPLICATION, "org.mitk.qt.extapplication");
   return berry::Starter::Run(argc, argv, extConfig);
 }

@@ -19,7 +19,7 @@
 #ifndef BERRYISHELLLISTENER_H_
 #define BERRYISHELLLISTENER_H_
 
-#include "berryUiDll.h"
+#include <org_blueberry_ui_Export.h>
 
 #include "berryShellEvent.h"
 

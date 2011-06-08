@@ -26,7 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 #endif
 
 #include <QWidget>
-#include "mitkQtCommonDll.h"
+#include <org_mitk_gui_qt_common_Export.h>
 //drag&drop
 class QDragEnterEvent;
 class QDropEvent;

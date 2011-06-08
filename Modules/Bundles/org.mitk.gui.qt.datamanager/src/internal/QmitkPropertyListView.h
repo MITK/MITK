@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 // Own includes
 
-#include "../mitkQtDataManagerDll.h"
+#include <org_mitk_gui_qt_datamanager_Export.h>
 #include <mitkDataNodeSelection.h>
 #include <QmitkFunctionality.h>
 #include <QmitkDataNodeSelectionProvider.h>
@@ -32,6 +32,8 @@ class QmitkPropertiesTableEditor;
 ///
 class MITK_QT_DATAMANAGER QmitkPropertyListView : public QmitkFunctionality
 {  
+  Q_OBJECT
+
 public: 
   berryObjectMacro(QmitkPropertyListView)
 
@@ -43,6 +45,9 @@ public:
   /// \brief Standard ctor.
   ///
   QmitkPropertyListView();
+
+  QmitkPropertyListView(const QmitkPropertyListView& other);
+
   ///
   /// \brief Standard dtor.
   ///

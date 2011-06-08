@@ -25,6 +25,7 @@
 
 #include "../berryImageDescriptor.h"
 #include "../berryAbstractUIPlugin.h"
+#include "../berryAbstractUICTKPlugin.h"
 #include "../berryImageDescriptor.h"
 #include "../handlers/berryIHandlerActivation.h"
 
@@ -44,6 +45,12 @@ IViewPart::Pointer ViewDescriptor::CreateView()
 {
   IViewPart::Pointer part(configElement->CreateExecutableExtension<IViewPart> (
       WorkbenchRegistryConstants::ATT_CLASS));
+  if (part.IsNull())
+  {
+    // support legacy BlueBerry extensions
+    part = configElement->CreateExecutableExtension<IViewPart> (
+          WorkbenchRegistryConstants::ATT_CLASS, IViewPart::GetManifestName());
+  }
   return part;
 }
 
@@ -92,8 +99,15 @@ ImageDescriptor::Pointer ViewDescriptor::GetImageDescriptor() const
   }
   const IExtension* extension(configElement->GetDeclaringExtension());
   const std::string extendingPluginId(extension->GetNamespace());
-  imageDescriptor = AbstractUIPlugin::ImageDescriptorFromPlugin(
+  imageDescriptor = AbstractUICTKPlugin::ImageDescriptorFromPlugin(
       extendingPluginId, iconName);
+  if (!imageDescriptor)
+  {
+    // Try legacy BlueBerry method
+    imageDescriptor = AbstractUIPlugin::ImageDescriptorFromPlugin(
+      extendingPluginId, iconName);
+  }
+
   // If the icon attribute was invalid, use the error icon
   if (!imageDescriptor)
   {

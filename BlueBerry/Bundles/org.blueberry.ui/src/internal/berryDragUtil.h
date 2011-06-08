@@ -19,7 +19,7 @@
 #ifndef BERRYDRAGUTIL_H_
 #define BERRYDRAGUTIL_H_
 
-#include "../berryUiDll.h"
+#include <org_blueberry_ui_Export.h>
 #include "../berryRectangle.h"
 #include "../guitk/berryGuiTkIControlListener.h"
 

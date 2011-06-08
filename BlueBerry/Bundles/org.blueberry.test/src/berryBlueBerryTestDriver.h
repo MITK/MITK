@@ -19,7 +19,7 @@
 #ifndef BERRYBLUEBERRYTESTDRIVER_H_
 #define BERRYBLUEBERRYTESTDRIVER_H_
 
-#include "berryTestDll.h"
+#include <org_blueberry_test_Export.h>
 
 #include "berryITestDescriptor.h"
 

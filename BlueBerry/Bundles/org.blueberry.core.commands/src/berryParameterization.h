@@ -19,7 +19,7 @@
 #ifndef BERRYPARAMETERIZATION_H_
 #define BERRYPARAMETERIZATION_H_
 
-#include "berryCommandsDll.h"
+#include <org_blueberry_core_commands_Export.h>
 #include "common/berryCommandExceptions.h"
 
 #include <string>

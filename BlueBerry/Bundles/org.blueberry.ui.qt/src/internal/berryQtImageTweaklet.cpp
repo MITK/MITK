@@ -24,6 +24,16 @@
 
 namespace berry {
 
+QtImageTweaklet::QtImageTweaklet()
+{
+
+}
+
+QtImageTweaklet::QtImageTweaklet(const QtImageTweaklet& other)
+{
+  Q_UNUSED(other)
+}
+
 SmartPointer<ImageDescriptor> QtImageTweaklet::CreateFromFile(const std::string& filename, const std::string& pluginid)
 {
   ImageDescriptor::Pointer descriptor(new QtFileImageDescriptor(filename, pluginid));

@@ -18,7 +18,7 @@
 #ifndef  BERRY_IPROGRESS_MONITOR_H
 #define  BERRY_IPROGRESS_MONITOR_H
 
-#include "berryJobsDll.h"
+#include <org_blueberry_core_jobs_Export.h>
 #include "berryObject.h"
 #include <string>
 

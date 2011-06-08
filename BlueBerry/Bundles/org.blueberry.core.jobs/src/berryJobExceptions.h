@@ -18,7 +18,7 @@
 #ifndef BERRYJOBSEXCEPTIONS_H_
 #define BERRYJOBSEXCEPTIONS_H_
 
-#include "berryJobsDll.h"
+#include <org_blueberry_core_jobs_Export.h>
 #include <Poco/Exception.h>
 
 namespace berry

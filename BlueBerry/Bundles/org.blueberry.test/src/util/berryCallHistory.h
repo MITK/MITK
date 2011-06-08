@@ -19,7 +19,7 @@
 #ifndef BERRYCALLHISTORY_H_
 #define BERRYCALLHISTORY_H_
 
-#include "../berryTestDll.h"
+#include <org_blueberry_test_Export.h>
 
 #include <berryObject.h>
 #include <berryMacros.h>

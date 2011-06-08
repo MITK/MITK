@@ -21,7 +21,7 @@
 
 #include <CppUnit/TestCase.h>
 
-#include "berryTestDll.h"
+#include <org_blueberry_test_Export.h>
 
 namespace berry {
 

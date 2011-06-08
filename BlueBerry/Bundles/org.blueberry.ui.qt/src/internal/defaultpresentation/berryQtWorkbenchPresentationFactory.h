@@ -27,8 +27,10 @@ namespace berry
  * The default presentation factory for the Workbench.
  *
  */
-class QtWorkbenchPresentationFactory: public IPresentationFactory
+class QtWorkbenchPresentationFactory: public QObject, public IPresentationFactory
 {
+  Q_OBJECT
+  Q_INTERFACES(berry::IPresentationFactory)
 
   //  // don't reset these dynamically, so just keep the information static.
   //  // see bug:
@@ -40,6 +42,9 @@ class QtWorkbenchPresentationFactory: public IPresentationFactory
   //      .getInt(IWorkbenchPreferenceConstants.VIEW_TAB_POSITION);
 
 public:
+
+  QtWorkbenchPresentationFactory();
+  QtWorkbenchPresentationFactory(const QtWorkbenchPresentationFactory& other);
 
   /*
    * (non-Javadoc)

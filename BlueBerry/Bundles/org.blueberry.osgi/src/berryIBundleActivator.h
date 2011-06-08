@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef BERRYIBUNDLEACTIVATOR_
 #define BERRYIBUNDLEACTIVATOR_
 
-#include "berryOSGiDll.h"
+#include <org_blueberry_osgi_Export.h>
 
 #include "berrySmartPointer.h"
 

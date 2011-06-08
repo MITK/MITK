@@ -23,7 +23,7 @@
 #include <berryMacros.h>
 #include <berryMessage.h>
 
-#include "berryCommandsDll.h"
+#include <org_blueberry_core_commands_Export.h>
 #include "common/berryCommandExceptions.h"
 
 namespace berry {

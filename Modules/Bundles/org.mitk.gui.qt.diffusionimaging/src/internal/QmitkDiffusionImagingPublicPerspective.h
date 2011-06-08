@@ -21,9 +21,15 @@
 
 #include <berryIPerspectiveFactory.h>
 
-class QmitkDiffusionImagingPublicPerspective : public berry::IPerspectiveFactory
+class QmitkDiffusionImagingPublicPerspective : public QObject, public berry::IPerspectiveFactory
 {
+  Q_OBJECT
+  Q_INTERFACES(berry::IPerspectiveFactory)
+
 public:
+
+  QmitkDiffusionImagingPublicPerspective();
+  QmitkDiffusionImagingPublicPerspective(const QmitkDiffusionImagingPublicPerspective& other);
 
   void CreateInitialLayout(berry::IPageLayout::Pointer layout);
 };

@@ -34,8 +34,12 @@ class QtStylePreferencePage : public QObject, public IQtPreferencePage
 {
 
   Q_OBJECT
+  Q_INTERFACES(berry::IPreferencePage)
 
 public:
+
+  QtStylePreferencePage();
+  QtStylePreferencePage(const QtStylePreferencePage& other);
 
   void Init(IWorkbench::Pointer workbench);
 

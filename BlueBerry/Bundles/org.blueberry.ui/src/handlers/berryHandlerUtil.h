@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <berryObjectVector.h>
 #include <berryObjectString.h>
 
-#include "../berryUiDll.h"
+#include <org_blueberry_ui_Export.h>
 #include "../berryIWorkbenchPart.h"
 #include "../berryIWorkbenchPartSite.h"
 #include "../berryISelection.h"

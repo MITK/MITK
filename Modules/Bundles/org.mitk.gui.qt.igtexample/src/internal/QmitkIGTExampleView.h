@@ -43,7 +43,7 @@ Example functionality that shows the usage of the MITK-IGT component
 \sa QmitkFunctionality
 \ingroup Functionalities
 */
-class QmitkIGTExampleView : public QObject, public QmitkFunctionality
+class QmitkIGTExampleView : public QmitkFunctionality
 {  
   Q_OBJECT
   

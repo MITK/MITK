@@ -44,7 +44,7 @@ Registration results will directly be applied to the Moving Image.
 \author Daniel Stein
 */
 
-class RIGIDREGISTRATION_EXPORT QmitkRigidRegistrationView : public QObject, public QmitkFunctionality
+class RIGIDREGISTRATION_EXPORT QmitkRigidRegistrationView : public QmitkFunctionality
 {
 
   friend struct SelListenerRigidRegistration;

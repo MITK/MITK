@@ -20,7 +20,7 @@
 #define QmitkSegmentationPreferencePage_h_included
 
 #include "berryIQtPreferencePage.h"
-#include "mitkQtSegmentationDll.h"
+#include "org_mitk_gui_qt_segmentation_Export.h"
 #include <berryIPreferences.h>
 
 class QWidget;
@@ -34,6 +34,12 @@ class MITK_QT_SEGMENTATION QmitkSegmentationPreferencePage : public QObject, pub
 public:
 
   QmitkSegmentationPreferencePage();
+  QmitkSegmentationPreferencePage(const QmitkSegmentationPreferencePage& other)
+  {
+    Q_UNUSED(other)
+    throw std::runtime_error("Copy constructor not implemented");
+  }
+  ~QmitkSegmentationPreferencePage();
 
   void Init(berry::IWorkbench::Pointer workbench);
 

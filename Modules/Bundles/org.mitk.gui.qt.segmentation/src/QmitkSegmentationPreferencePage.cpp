@@ -35,6 +35,11 @@ QmitkSegmentationPreferencePage::QmitkSegmentationPreferencePage()
 
 }
 
+QmitkSegmentationPreferencePage::~QmitkSegmentationPreferencePage()
+{
+
+}
+
 void QmitkSegmentationPreferencePage::Init(berry::IWorkbench::Pointer )
 {
 

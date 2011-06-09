@@ -42,7 +42,6 @@ QmitkSegmentationView::QmitkSegmentationView()
 :m_Parent(NULL)
 ,m_Controls(NULL)
 ,m_MultiWidget(NULL)
-// ,m_PostProcessing(NULL)
 ,m_RenderingManagerObserverTag(0)
 {
 }

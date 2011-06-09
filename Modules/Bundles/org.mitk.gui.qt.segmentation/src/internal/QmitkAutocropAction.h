@@ -3,17 +3,24 @@
 
 #include "mitkIContextMenuAction.h"
 
-#include "mitkQtSegmentationDll.h"
+#include "org_mitk_gui_qt_segmentation_Export.h"
 
 #include "vector"
 #include "mitkDataNode.h"
 #include "mitkImage.h"
 
-class MITK_QT_SEGMENTATION QmitkAutocropAction : public mitk::IContextMenuAction
+class MITK_QT_SEGMENTATION QmitkAutocropAction : public QObject, public mitk::IContextMenuAction
 {
+  Q_OBJECT
+
 public:
 
   QmitkAutocropAction();
+  QmitkAutocropAction(const QmitkAutocropAction& other)
+  {
+    Q_UNUSED(other)
+    throw std::runtime_error("Copy constructor not implemented");
+  }
   virtual ~QmitkAutocropAction();
 
   //interface methods

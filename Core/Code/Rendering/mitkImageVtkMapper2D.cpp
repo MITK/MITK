@@ -585,20 +585,20 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
   this->AdjustCamera( renderer );
 
   //TODO remove this later
-//  static int counter = 0;
-//  if(counter < 3)
-//  {
-//    mitk::Surface::Pointer surf = mitk::Surface::New();
-//    surf->SetVtkPolyData(localStorage->m_Mapper->GetInput());
-//    surf->Update();
+  //  static int counter = 0;
+  //  if(counter < 3)
+  //  {
+  //    mitk::Surface::Pointer surf = mitk::Surface::New();
+  //    surf->SetVtkPolyData(localStorage->m_Mapper->GetInput());
+  //    surf->Update();
 
-//    mitk::DataNode::Pointer node = mitk::DataNode::New();
-//    node->SetData(surf);
-//    renderer->GetDataStorage()->Add(node);
-//    counter++;
-//  }
-//  //TODO remove this later
-//  renderer->GetVtkRenderer()->SetBackground(1, 1, 1);
+  //    mitk::DataNode::Pointer node = mitk::DataNode::New();
+  //    node->SetData(surf);
+  //    renderer->GetDataStorage()->Add(node);
+  //    counter++;
+  //  }
+  //  //TODO remove this later
+  //  renderer->GetVtkRenderer()->SetBackground(1, 1, 1);
 
   //Transform the camera to the current position (transveral, coronal and saggital plane).
   //This is necessary, because the vtkTransformFilter does not manipulate the vtkCamera.
@@ -756,7 +756,7 @@ void mitk::ImageVtkMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
   //do not repeat the texture (the image)
   localStorage->m_Texture->RepeatOff();
 
-  float rgba[4]= { 1.0f, 1.0f, 1.0f, 1.0f };
+  float rgb[3]= { 1.0f, 1.0f, 1.0f };
   float opacity = 1.0f;
 
   // check for color prop and use it for rendering if it exists
@@ -771,9 +771,9 @@ void mitk::ImageVtkMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
     mitk::ColorProperty::Pointer colorprop = dynamic_cast<mitk::ColorProperty*>(GetDataNode()->GetProperty
                                                                                 ("binaryimage.hoveringcolor", renderer));
     if(colorprop.IsNotNull())
-      memcpy(rgba, colorprop->GetColor().GetDataPointer(), 3*sizeof(float));
+      memcpy(rgb, colorprop->GetColor().GetDataPointer(), 3*sizeof(float));
     else
-      GetColor( rgba, renderer );
+      GetColor( rgb, renderer );
 
   }
   if(selected)
@@ -781,29 +781,82 @@ void mitk::ImageVtkMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
     mitk::ColorProperty::Pointer colorprop = dynamic_cast<mitk::ColorProperty*>(GetDataNode()->GetProperty
                                                                                 ("binaryimage.selectedcolor", renderer));
     if(colorprop.IsNotNull())
-      memcpy(rgba, colorprop->GetColor().GetDataPointer(), 3*sizeof(float));
+      memcpy(rgb, colorprop->GetColor().GetDataPointer(), 3*sizeof(float));
     else
-      GetColor( rgba, renderer );
+      GetColor( rgb, renderer );
 
   }
   if(!hover && !selected)
   {
-    GetColor( rgba, renderer );
+    GetColor( rgb, renderer );
   }
   //END TODO do we need this?
 
   // check for opacity prop and use it for rendering if it exists
   GetOpacity( opacity, renderer );
-  rgba[3] = opacity;
+  //set the opacity according to the properties
+  localStorage->m_Actor->GetProperty()->SetOpacity(opacity);
 
-  //binary image handling
+  //get the binary property
   bool binary = false;
   this->GetDataNode()->GetBoolProperty( "binary", binary, renderer );
   localStorage->m_Texture->SetMapColorScalarsThroughLookupTable(binary);
+
+  //use color means that we want to use the color from the property list and not a lookuptable
+  bool useColor = true;
+  this->GetDataNode()->GetBoolProperty( "use color", useColor, renderer );
+
+  //the finalLookuptable will be used for the rendering and can either be a user-defined table or the default lut
+  vtkSmartPointer<vtkLookupTable> finalLookuptable = vtkSmartPointer<vtkLookupTable>::New();
+
+  //BEGIN PROPERTY user-defined lut
+  //currently we do not allow a lookuptable if it is a binary image
+  bool useDefaultLut = true;
+  if((!useColor) && (!binary))
+  {
+    // If lookup table use is requested...
+    mitk::LookupTableProperty::Pointer LookupTableProp;
+    LookupTableProp = dynamic_cast<mitk::LookupTableProperty*>
+                      (this->GetDataNode()->GetProperty("LookupTable"));
+    //...check if there is a lookuptable provided by the user
+    if ( LookupTableProp.IsNull() )
+    {
+      MITK_WARN << "The use of a lookuptable is requested, but there is no lookuptable supplied by the user! The default lookuptable will be used instead.";
+    }
+    else
+    {
+      // If lookup table use is requested and supplied by the user:
+      // only update the lut, when the properties have changed...
+      if( LookupTableProp->GetLookupTable()->GetMTime()
+        <= this->GetDataNode()->GetPropertyList()->GetMTime() )
+        {
+        LookupTableProp->GetLookupTable()->ChangeOpacityForAll( opacity );
+        LookupTableProp->GetLookupTable()->ChangeOpacity(0, 0.0);
+      }
+      //we use the user-defined lookuptable
+      finalLookuptable = LookupTableProp->GetLookupTable()->GetVtkLookupTable();
+      //we obtained a user-defined lut and dont have to use the default table
+      useDefaultLut = false;
+    }
+  }//END PROPERTY user-defined lut
+
+  //check if we need the default table
+  if( useDefaultLut )
+  {
+    finalLookuptable = localStorage->m_LookupTable;
+    double rgbConv[3] = {(double)rgb[0], (double)rgb[1], (double)rgb[2]}; //conversion to double for VTK
+    localStorage->m_Actor->GetProperty()->SetColor(rgbConv);
+  }
+  else
+  {
+    //If the user defines a lut, we dont want to use the color and take white instead.
+    localStorage->m_Actor->GetProperty()->SetColor(1.0, 1.0, 1.0);
+  }
+
   if ( binary )
   {
-    localStorage->m_LookupTable->SetAlphaRange(0.0, 1.0);
-    localStorage->m_LookupTable->SetRange(0.0, 1.0);
+    finalLookuptable->SetAlphaRange(0.0, 1.0);
+    finalLookuptable->SetRange(0.0, 1.0);
     //0 is already mapped to transparent.
     //1 is now mapped to the current color and alpha
 
@@ -844,62 +897,21 @@ void mitk::ImageVtkMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
     windowMax = levelWindow.GetUpperWindowBound();
 
     //set up the lookuptable with the level window range
-    localStorage->m_LookupTable->SetRange( windowMin, windowMax );
+    finalLookuptable->SetRange( windowMin, windowMax );
 
     // obtain and apply opacity level window
     mitk::LevelWindow opacLevelWindow;
     if( this->GetLevelWindow( opacLevelWindow, renderer, "opaclevelwindow" ) )
     {
-      localStorage->m_LookupTable->SetAlphaRange(opacLevelWindow.GetLowerWindowBound()/255.0, opacLevelWindow.GetLowerWindowBound()/255.0);
+      finalLookuptable->SetAlphaRange(opacLevelWindow.GetLowerWindowBound()/255.0, opacLevelWindow.GetLowerWindowBound()/255.0);
     }
     else
     {
-      localStorage->m_LookupTable->SetAlphaRange(0.0, 1.0);
+      finalLookuptable->SetAlphaRange(0.0, 1.0);
     }
   }
-
-  //use color means that we want to use the color from the property list and not a lookuptable
-  bool useColor = true;
-  this->GetDataNode()->GetBoolProperty( "use color", useColor, renderer );
-
-  //BEGIN PROPERTY user-defined lut
-  //currently we do not allow a lookuptable if it is a binary image
-  if((!useColor) && (!binary))
-  {
-    // If lookup table use is requested...
-    mitk::LookupTableProperty::Pointer LookupTableProp;
-    LookupTableProp = dynamic_cast<mitk::LookupTableProperty*>
-                      (this->GetDataNode()->GetProperty("LookupTable"));
-    //...check if there is a lookuptable provided by the user
-    if ( LookupTableProp.IsNull() )
-    {
-      MITK_WARN << "The use of a lookuptable is requested, but there is no lookuptable supplied by the user! The default lookuptable will be used instead.";
-    }
-    else
-    {
-      // If lookup table use is requested and supplied by the user:
-      // only update the lut, when the properties have changed...
-      if( LookupTableProp->GetLookupTable()->GetMTime()
-        <= this->GetDataNode()->GetPropertyList()->GetMTime() )
-        {
-        LookupTableProp->GetLookupTable()->ChangeOpacityForAll( opacity );
-        LookupTableProp->GetLookupTable()->ChangeOpacity(0, 0.0);
-      }
-      //    image->setColors(LookupTableProp->GetLookupTable()->GetRawLookupTable());
-      //TODO figure out if this is the same as setting up the table or do we need to set the color and opacity of the actor?
-      //we use the user defined lookuptable
-      localStorage->m_Texture->SetLookupTable(LookupTableProp->GetLookupTable()->GetVtkLookupTable());
-      return; //User-defined lut is used. We can return here.
-    }
-  }//END PROPERTY user-defined lut
-
-  //If lookup table use is NOT requested (or we have a binary image)
-  //we use the internal lookuptable for binary images or level window
-  localStorage->m_Texture->SetLookupTable( localStorage->m_LookupTable );
-  //set the color and the opacity according to the properties
-  double rgbConv[3] = {(double)rgba[0], (double)rgba[1], (double)rgba[2]}; //conversion to double for VTK
-  localStorage->m_Actor->GetProperty()->SetColor(rgbConv);
-  localStorage->m_Actor->GetProperty()->SetOpacity(rgba[3]);
+  //use the finalLookuptable for mapping the colors
+  localStorage->m_Texture->SetLookupTable( finalLookuptable );
 }
 
 void mitk::ImageVtkMapper2D::Update(mitk::BaseRenderer* renderer)

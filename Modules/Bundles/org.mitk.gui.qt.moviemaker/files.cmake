@@ -4,6 +4,7 @@ SET(SRC_CPP_FILES
 
 SET(INTERNAL_CPP_FILES
   QmitkMovieMaker.cpp
+  mitkMovieMakerPluginActivator.cpp
 
 )
 
@@ -12,18 +13,18 @@ SET(UI_FILES
 )
 
 SET(MOC_H_FILES
+  src/internal/mitkMovieMakerPluginActivator.h
   src/internal/QmitkMovieMaker.h
 )
 
-SET(RESOURCE_FILES
+SET(CACHED_RESOURCE_FILES
   resources/icon.xpm
+  plugin.xml
 )
 
 SET(RES_FILES
  resources/QmitkMovieMaker.qrc
 )
-
-SET(CPP_FILES manifest.cpp)
 
 foreach(file ${SRC_CPP_FILES})
   SET(CPP_FILES ${CPP_FILES} src/${file})

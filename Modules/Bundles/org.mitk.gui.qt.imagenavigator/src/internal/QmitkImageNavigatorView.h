@@ -52,6 +52,12 @@ class QmitkImageNavigatorView : public berry::QtViewPart, public berry::ISizePro
   static const std::string VIEW_ID;
 
   QmitkImageNavigatorView();
+  QmitkImageNavigatorView(const QmitkImageNavigatorView& other)
+  {
+     Q_UNUSED(other)
+     throw std::runtime_error("Copy constructor not implemented");
+  }
+
   virtual ~QmitkImageNavigatorView();
 
   virtual void CreateQtPartControl(QWidget *parent);

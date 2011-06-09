@@ -35,6 +35,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkEllipsoid.h>
 #include <mitkNodePredicateNot.h>
 #include <mitkNodePredicateProperty.h>
+#include <mitkNavigationToolStorageSerializer.h>
 
 // vtk
 #include <vtkSphereSource.h>
@@ -281,6 +282,29 @@ if (m_Controls->m_configurationWidget->GetTrackingDevice()->GetType() == mitk::N
     m_Controls->m_TrackingToolsStatusWidget->PreShowTools(m_toolStorage);
     currentDevice->StopTracking();
     currentDevice->CloseConnection();
+
+    if (m_toolStorage->GetToolCount()>0)
+      {
+      //ask the user if he wants to save the detected tools
+      QMessageBox msgBox;
+      msgBox.setText("Found " + QString::number(m_toolStorage->GetToolCount()) + " tools!");
+      msgBox.setInformativeText("Do you want to save this tools as tool storage, so you can load them again?");
+      msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+      msgBox.setDefaultButton(QMessageBox::No);
+      int ret = msgBox.exec();
+      if (ret == 16384) //yes
+        {
+        //ask the user for a filename
+        QString fileName = QFileDialog::getSaveFileName(NULL, tr("Save File"),"",tr("*.*"));
+        mitk::NavigationToolStorageSerializer::Pointer mySerializer = mitk::NavigationToolStorageSerializer::New();
+        if (!mySerializer->Serialize(fileName.toStdString(),m_toolStorage)) MessageBox(mySerializer->GetErrorMessage());
+        return;
+        }
+      else if (ret == 65536) //no
+        {
+        return;
+        }
+      }
     }  
 }
 

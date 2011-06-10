@@ -1,2 +1,8 @@
+PROJECT(org_mitk_gui_qt_rigidregistration)
 
-MACRO_CREATE_MITK_PLUGIN(QmitkExt MitkRigidRegistration MitkRigidRegistrationUI)
+MACRO_CREATE_MITK_CTK_PLUGIN(
+  EXPORT_DIRECTIVE RIGIDREGISTRATION_EXPORT
+  EXPORTED_INCLUDE_SUFFIXES src
+  MODULE_DEPENDENCIES QmitkExt MitkRigidRegistration MitkRigidRegistrationUI
+)
+

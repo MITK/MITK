@@ -18,4 +18,6 @@ SET(MITK_EXT_PLUGINS
   org.mitk.gui.qt.tofutil:OFF
   org.mitk.gui.qt.imagenavigator:ON
   org.mitk.gui.qt.moviemaker:ON
+  org.mitk.gui.qt.deformableregistration:ON
+  org.mitk.gui.qt.rigidregistration:ON
   )

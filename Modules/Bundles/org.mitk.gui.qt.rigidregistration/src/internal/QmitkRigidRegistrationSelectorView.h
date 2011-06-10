@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkDataStorage.h"
 #include "ui_QmitkRigidRegistrationSelector.h"
 #include "qobject.h"
-#include "../RigidregistrationDll.h"
+#include <org_mitk_gui_qt_rigidregistration_Export.h>
 #include "QmitkRigidRegistrationTransformsGUIBase.h"
 #include "QmitkRigidRegistrationMetricsGUIBase.h"
 #include "QmitkRigidRegistrationOptimizerGUIBase.h"

@@ -223,7 +223,7 @@ namespace mitk {
 
   protected:
     //Generate a plane with size of the image in mm
-    void GeneratePlane(mitk::BaseRenderer* renderer, mitk::ScalarType spacing[2]);
+    void GeneratePlane(mitk::BaseRenderer* renderer, vtkFloatingPointType planeBounds[6]);
 
     //set the camera to view the textured plane
     void AdjustCamera(mitk::BaseRenderer* renderer);

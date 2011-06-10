@@ -43,6 +43,12 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkTexture.h>
 #include <vtkCamera.h>
 #include <vtkTransformPolyDataFilter.h>
+#include <vtkMarchingSquares.h>
+#include <vtkMarchingContourFilter.h>
+
+#include <vtkRenderWindowInteractor.h>
+#include <vtkRenderWindow.h>
+#include <vtkRenderer.h>
 
 //ITK
 #include <itkRGBAPixel.h>
@@ -103,7 +109,7 @@ void mitk::ImageVtkMapper2D::AdjustCamera(mitk::BaseRenderer* renderer)
   double cameraPosition[3];
   cameraPosition[0] = viewPlaneCenter[0];
   cameraPosition[1] = viewPlaneCenter[1];
-  cameraPosition[2] = viewPlaneCenter[2] + 1000.0; //Reason for 1000 => VTK seems to calculate the clipping planes wrong for Z=1
+  cameraPosition[2] = viewPlaneCenter[2] + 2000.0; //Reason for 2000 => VTK seems to calculate the clipping planes wrong for Z=1
 
   //set the camera corresponding to the textured plane
   vtkSmartPointer<vtkCamera> camera = renderer->GetVtkRenderer()->GetActiveCamera();
@@ -118,16 +124,17 @@ void mitk::ImageVtkMapper2D::AdjustCamera(mitk::BaseRenderer* renderer)
 }
 
 //set the two points defining the textured plane according to the dimension and spacing
-void mitk::ImageVtkMapper2D::GeneratePlane(mitk::BaseRenderer* renderer, mitk::ScalarType spacing[2])
+void mitk::ImageVtkMapper2D::GeneratePlane(mitk::BaseRenderer* renderer, vtkFloatingPointType planeBounds[6])
 {
   LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
-  //set the origin to (0; 0; 0), because the default origin can be anywhere
-  localStorage->m_Plane->SetOrigin(0.0, 0.0, 0.0);
-  //These two points define the axes of the plane in combination with the origin (0/0/0).
+  //Set the origin to (xMin; yMin; 0) of the plane. This is necessary for obtaining the correct
+  //plane size in crosshair rotation and swivel mode.
+  localStorage->m_Plane->SetOrigin(planeBounds[0], planeBounds[2], 0.0);
+  //These two points define the axes of the plane in combination with the origin.
   //Point 1 is the x-axis and point 2 the y-axis.
   //Each plane is transformed according to the view (transversal, coronal and saggital) afterwards.
-  localStorage->m_Plane->SetPoint1((localStorage->m_ReslicedImage->GetDimensions()[0])*spacing[0], 0.0, 0.0);
-  localStorage->m_Plane->SetPoint2(0.0, (localStorage->m_ReslicedImage->GetDimensions()[1])*spacing[1], 0.0);
+  localStorage->m_Plane->SetPoint1(planeBounds[1], planeBounds[2], 0.0); //P1: (xMax, yMin, 0)
+  localStorage->m_Plane->SetPoint2(planeBounds[0], planeBounds[3], 0.0); //P2: (xMin, yMax, 0)
 }
 
 const mitk::Image* mitk::ImageVtkMapper2D::GetInput( void )
@@ -233,11 +240,11 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
 
   // Bounds information for reslicing (only reuqired if reference geometry 
   // is present)
-  vtkFloatingPointType bounds[6];
+  vtkFloatingPointType sliceBounds[6];
   bool boundsInitialized = false;
   for ( int i = 0; i < 6; ++i )
   {
-    bounds[i] = 0.0;
+    sliceBounds[i] = 0.0;
   }
 
   // Do we have a simple PlaneGeometry?
@@ -303,7 +310,7 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
     // dataset bounding box; this is required for drawing the texture at the
     // correct position during 3D mapping.
     boundsInitialized = this->CalculateClippedPlaneBounds(
-        worldGeometry->GetReferenceGeometry(), planeGeometry, bounds ); //TODO braucht man nicht immer
+        worldGeometry->GetReferenceGeometry(), planeGeometry, sliceBounds ); //TODO braucht man nicht immer
   }
   else
   {
@@ -455,10 +462,10 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
   if ( boundsInitialized )
   {
     // Calculate output extent (integer values)
-    xMin = static_cast< int >( bounds[0] / mmPerPixel[0] + 0.5 );
-    xMax = static_cast< int >( bounds[1] / mmPerPixel[0] + 0.5 );
-    yMin = static_cast< int >( bounds[2] / mmPerPixel[1] + 0.5 );
-    yMax = static_cast< int >( bounds[3] / mmPerPixel[1] + 0.5 );
+    xMin = static_cast< int >( sliceBounds[0] / mmPerPixel[0] + 0.5 );
+    xMax = static_cast< int >( sliceBounds[1] / mmPerPixel[0] + 0.5 );
+    yMin = static_cast< int >( sliceBounds[2] / mmPerPixel[1] + 0.5 );
+    yMax = static_cast< int >( sliceBounds[3] / mmPerPixel[1] + 0.5 );
 
     // Calculate the extent by which the maximal plane (due to plane rotation)
     // overlaps the regular plane size.
@@ -561,7 +568,7 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
   //apply the properties after the slice was set
   this->ApplyProperties( renderer );
   //set the size textured plane
-  this->GeneratePlane( renderer, mmPerPixel );
+  this->GeneratePlane( renderer, sliceBounds );
 
   //turn the light out in the scene in order to render correct grey values. TODO How to turn it on if you need it?
   renderer->GetVtkRenderer()->RemoveAllLights();
@@ -585,20 +592,20 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
   this->AdjustCamera( renderer );
 
   //TODO remove this later
-  //  static int counter = 0;
-  //  if(counter < 3)
-  //  {
-  //    mitk::Surface::Pointer surf = mitk::Surface::New();
-  //    surf->SetVtkPolyData(localStorage->m_Mapper->GetInput());
-  //    surf->Update();
+  //    static int counter = 0;
+  //    if(counter < 3)
+  //    {
+  //      mitk::Surface::Pointer surf = mitk::Surface::New();
+  //      surf->SetVtkPolyData(localStorage->m_Mapper->GetInput());
+  //      surf->Update();
 
-  //    mitk::DataNode::Pointer node = mitk::DataNode::New();
-  //    node->SetData(surf);
-  //    renderer->GetDataStorage()->Add(node);
-  //    counter++;
-  //  }
-  //  //TODO remove this later
-  //  renderer->GetVtkRenderer()->SetBackground(1, 1, 1);
+  //      mitk::DataNode::Pointer node = mitk::DataNode::New();
+  //      node->SetData(surf);
+  //      renderer->GetDataStorage()->Add(node);
+  //      counter++;
+  //    }
+  //    //TODO remove this later
+  //    renderer->GetVtkRenderer()->SetBackground(1, 1, 1);
 
   //Transform the camera to the current position (transveral, coronal and saggital plane).
   //This is necessary, because the vtkTransformFilter does not manipulate the vtkCamera.
@@ -866,6 +873,79 @@ void mitk::ImageVtkMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
     {
       if (binaryOutline)
       {
+//        localStorage->m_ReslicedImage->Print(std::cout);
+
+//        int points = localStorage->m_ReslicedImage->GetNumberOfPoints();
+//               MITK_INFO << "############################# ANFANG";
+//        int* dims = localStorage->m_ReslicedImage->GetDimensions();
+
+        // Fill every entry of the image data with "2.0"
+//        for (int z = 0; z < dims[2]; z++)
+//          {
+//          for (int y = 0; y < dims[1]/2; y++)
+//            {
+//            for (int x = 0; x < dims[0]/2; x++)
+//              {
+//              double* pixel = static_cast<double*>(localStorage->m_ReslicedImage->GetScalarPointer(x,y,z));
+//              pixel[0] = 1.0;
+//              }
+//            }
+//          }
+
+        // Retrieve the entries from the image data and print them to the screen
+//        for (int z = 0; z < dims[2]; z++)
+//          {
+//          for (int y = 0; y < dims[1]; y++)
+//            {
+//            for (int x = 0; x < dims[0]; x++)
+//              {
+//              char* pixel = static_cast<char*>(localStorage->m_ReslicedImage->GetScalarPointer(x,y,z));
+//              // do something with v
+//              std::cout << (int)pixel[0] << " ";
+//              }
+//            std::cout << std::endl;
+//            }
+//          std::cout << std::endl;
+//          }
+        vtkSmartPointer<vtkImageData> img = vtkSmartPointer<vtkImageData>::New();
+        img->SetScalarTypeToDouble();
+        img->DeepCopy(localStorage->m_ReslicedImage);
+
+        vtkSmartPointer<vtkMarchingContourFilter> contourFilter = vtkSmartPointer<vtkMarchingContourFilter>::New();
+
+//        contourFilter->SetInput(localStorage->m_ReslicedImage);
+        contourFilter->SetInput(img);
+        contourFilter->GenerateValues(1, 1.0, 1.0);
+        contourFilter->Update();
+
+//        MITK_INFO << "############################# ENDE";
+
+
+        vtkSmartPointer<vtkPolyDataMapper> mapper =
+            vtkSmartPointer<vtkPolyDataMapper>::New();
+        mapper->SetInputConnection(contourFilter->GetOutputPort());
+
+//        localStorage->m_Mapper->SetInputConnection(contourFilter->GetOutputPort());
+
+        vtkSmartPointer<vtkActor> actor =
+            vtkSmartPointer<vtkActor>::New();
+        actor->SetMapper(mapper);
+
+        vtkSmartPointer<vtkRenderer> ren =
+          vtkSmartPointer<vtkRenderer>::New();
+        vtkSmartPointer<vtkRenderWindow> renderWindow =
+          vtkSmartPointer<vtkRenderWindow>::New();
+        renderWindow->AddRenderer(ren);
+        vtkSmartPointer<vtkRenderWindowInteractor> renderWindowInteractor =
+            vtkSmartPointer<vtkRenderWindowInteractor>::New();
+        renderWindowInteractor->SetRenderWindow(renderWindow);
+        ren->AddActor(actor);
+
+        renderWindow->Render();
+        renderWindowInteractor->Start();
+
+
+
         float binaryOutlineWidth(1.0);
         if (this->GetDataNode()->GetFloatProperty( "outline width", binaryOutlineWidth, renderer ))
         {

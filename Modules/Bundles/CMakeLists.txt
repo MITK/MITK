@@ -26,6 +26,7 @@ IF(MITK_USE_BLUEBERRY)
     org.mitk.gui.qt.datamanager
     org.mitk.planarfigure
     org.mitk.gui.qt.simpleexample
+    org.mitk.gui.qt.ugvisualization
   )
 
   MACRO_COLLECT_PLUGINS(OUTPUT_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/ExtBundles

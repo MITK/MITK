@@ -8,4 +8,5 @@ SET(MITK_EXT_PLUGINS
   org.mitk.planarfigure:ON
   org.mitk.gui.qt.datamanager:ON
   org.mitk.gui.qt.simpleexample:OFF
+  org.mitk.gui.qt.ugvisualization:OFF
   )

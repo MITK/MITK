@@ -34,7 +34,7 @@ PURPOSE.  See the above copyright notices for more information.
 //#include "QmitkMessageBoxHelper.h"
 #include "ui_QmitkPointBasedRegistrationViewControls.h"
 
-#include "../PointbasedregistrationDll.h"
+#include <org_mitk_gui_qt_pointbasedregistration_Export.h>
 
 /*!
 \brief The PointBasedRegistration functionality is used to perform point based registration.
@@ -66,6 +66,13 @@ public:
   \brief Default constructor
   */
   QmitkPointBasedRegistrationView(QObject *parent=0, const char *name=0);
+
+  QmitkPointBasedRegistrationView(const QmitkPointBasedRegistrationView& other)
+  {
+    Q_UNUSED(other)
+    throw std::runtime_error("Copy constructor not implemented");
+  }
+
 
   /*!
   \brief Default destructor

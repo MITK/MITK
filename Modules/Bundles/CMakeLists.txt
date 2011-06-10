@@ -38,6 +38,7 @@ IF(MITK_USE_BLUEBERRY)
     org.mitk.gui.qt.moviemaker
     org.mitk.gui.qt.deformableregistration
     org.mitk.gui.qt.rigidregistration
+    org.mitk.gui.qt.pointbasedregistration
   )
 
   MACRO_COLLECT_PLUGINS(OUTPUT_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/ExtBundles

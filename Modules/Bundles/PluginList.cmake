@@ -20,4 +20,5 @@ SET(MITK_EXT_PLUGINS
   org.mitk.gui.qt.moviemaker:ON
   org.mitk.gui.qt.deformableregistration:ON
   org.mitk.gui.qt.rigidregistration:ON
+  org.mitk.gui.qt.pointbasedregistration:ON
   )

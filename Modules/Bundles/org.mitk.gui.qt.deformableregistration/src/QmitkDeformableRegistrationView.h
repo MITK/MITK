@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "QmitkFunctionality.h"
 #include "ui_QmitkDeformableRegistrationViewControls.h"
 
-#include "../DeformableregistrationDll.h"
+#include <org_mitk_gui_qt_deformableregistration_Export.h>
 
 #include "berryISelectionListener.h"
 #include "berryIStructuredSelection.h"
@@ -57,6 +57,13 @@ class DEFORMABLEREGISTRATION_EXPORT QmitkDeformableRegistrationView : public Qmi
     \brief default constructor  
     */  
     QmitkDeformableRegistrationView(QObject *parent=0, const char *name=0);
+
+    QmitkDeformableRegistrationView(const QmitkDeformableRegistrationView& other)
+    {
+      Q_UNUSED(other)
+      throw std::runtime_error("Copy constructor not implemented");
+    }
+
 
     /*!  
     \brief default destructor  

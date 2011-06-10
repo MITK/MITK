@@ -4,7 +4,7 @@
   <extension point="org.blueberry.ui.views">
     <view id="org.mitk.views.deformableregistration"
           name="DeformableRegistration"
-          class="::QmitkDeformableRegistrationView"
+          class="QmitkDeformableRegistrationView"
           icon="resources/DeformableRegistration.xpm" />
   </extension>
 

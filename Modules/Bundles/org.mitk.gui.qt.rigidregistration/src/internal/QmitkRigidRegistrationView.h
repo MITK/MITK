@@ -25,7 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "berryISelectionListener.h"
 #include "berryIStructuredSelection.h"
 
-#include "../RigidregistrationDll.h"
+#include <org_mitk_gui_qt_rigidregistration_Export.h>
 
 // Time Slider related
 #include <QmitkStepperAdapter.h>
@@ -59,6 +59,15 @@ class RIGIDREGISTRATION_EXPORT QmitkRigidRegistrationView : public QmitkFunction
     \brief default constructor
     */
     QmitkRigidRegistrationView(QObject *parent=0, const char *name=0);
+
+
+    QmitkRigidRegistrationView(const QmitkRigidRegistrationView& other)
+    {
+      Q_UNUSED(other)
+      throw std::runtime_error("Copy constructor not implemented");
+    }
+
+
 
     /*!
     \brief default destructor

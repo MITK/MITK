@@ -40,7 +40,7 @@ Nevertheless, MITK provides a way to access an MITK image as if it was an ITK im
 To do so, first define an access method, which is templated as an ITK image is:
 
 \code
-template<TPixel, VImageDimension>
+template<typename TPixel, unsigned int VImageDimension>
 MyAccessMethod(itk::Image<TPixel, VImageDimension>* itkImage)
 {
 ...

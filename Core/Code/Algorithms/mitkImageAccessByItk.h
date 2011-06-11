@@ -81,24 +81,20 @@ PURPOSE.  See the above copyright notices for more information.
  * within which the mitk-image (@a mitkImage) is accessed:
  * \code
  *   template < typename TPixel, unsigned int VImageDimension > 
- *   void ExampleFunction( itk::Image<TPixel, VImageDimension>* itkImage, TPixel* dummy = NULL );
- * \endcode
- * Instantiate the function using
- * \code
- *   InstantiateAccessFunction(ExampleFunction);
+ *   void ExampleFunction( itk::Image<TPixel, VImageDimension>* itkImage );
  * \endcode
  * Within the itk::Image passed to the function/method has the same
  * data-pointer as the mitk-image. So you have full read- and write-
  * access to the data vector of the mitk-image using the itk-image.
  * Call by:
  * \code
- *   inputMitkImage being of type mitk::Image*
+ *   mitk::Image* inputMitkImage = ...
  *   AccessByItk(inputMitkImage, ExampleFunction);
  * \endcode
  * @note If your inputMitkImage is an mitk::Image::Pointer, use 
  * inputMitkImage.GetPointer()
  * @note If you need to pass an additional parameter to your 
- * access-function (@a itkImageTypeFunction), use AccessByItk.
+ * access-function (@a itkImageTypeFunction), use AccessByItk_1.
  * @note If you know the dimension of your input mitk-image,
  * it is better to use AccessFixedDimensionByItk (less code
  * is generated).

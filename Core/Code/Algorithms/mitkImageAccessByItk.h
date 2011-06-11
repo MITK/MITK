@@ -262,6 +262,7 @@ PURPOSE.  See the above copyright notices for more information.
    const mitk::Image* constImage = mitkImage;                                                    \
   const_cast<mitk::Image*>(constImage)->Update();                                                \
   assert((mitkImage)->GetDimension()==dimension);                                                \
+  assert(pixelType == typeid(pixeltype));                                                        \
   _accessByItk(mitkImage, itkImageTypeFunction, pixeltype, dimension) else                       \
   _accessByItkWarning                                                                            \
 }
@@ -287,6 +288,7 @@ PURPOSE.  See the above copyright notices for more information.
   const mitk::Image* constImage = mitkImage;                                                     \
   const_cast<mitk::Image*>(constImage)->Update();                                                \
   assert((mitkImage)->GetDimension()>=2 && (mitkImage)->GetDimension()<=3);                      \
+  assert(pixelType == typeid(pixeltype));                                                        \
   if((mitkImage)->GetDimension()==2)                                                             \
   {                                                                                              \
     _accessByItk(mitkImage, itkImageTypeFunction, pixeltype, 2) else                             \
@@ -486,6 +488,7 @@ PURPOSE.  See the above copyright notices for more information.
   const mitk::Image* constImage = mitkImage;                                                     \
   const_cast<mitk::Image*>(constImage)->Update();                                                \
   assert(mitkImage->GetDimension()==dimension);                                                  \
+  assert(pixelType == typeid(pixeltype));                                                        \
   _accessByItk_1(mitkImage, itkImageTypeFunction, pixeltype, dimension, param1) else             \
   _accessByItkWarning                                                                            \
 }
@@ -512,6 +515,7 @@ PURPOSE.  See the above copyright notices for more information.
   const mitk::Image* constImage = mitkImage;                                                     \
   const_cast<mitk::Image*>(constImage)->Update();                                                \
   assert(mitkImage->GetDimension()>=2 && mitkImage->GetDimension()<=3);                          \
+  assert(pixelType == typeid(pixeltype));                                                        \
   if(mitkImage->GetDimension()==2)                                                               \
   {                                                                                              \
     _accessByItk_1(mitkImage, itkImageTypeFunction, pixeltype, 2, param1) else                   \
@@ -711,6 +715,7 @@ PURPOSE.  See the above copyright notices for more information.
   const mitk::Image* constImage = mitkImage;                                                           \
   const_cast<mitk::Image*>(constImage)->Update();                                                      \
   assert(mitkImage->GetDimension()==dimension);                                                        \
+  assert(pixelType == typeid(pixeltype));                                                              \
   _accessByItk_2(mitkImage, itkImageTypeFunction, pixeltype, dimension, param1, param2) else           \
   _accessByItkWarning                                                                                  \
 }
@@ -737,6 +742,7 @@ PURPOSE.  See the above copyright notices for more information.
   const mitk::Image* constImage = mitkImage;                                                     \
   const_cast<mitk::Image*>(constImage)->Update();                                                \
   assert(mitkImage->GetDimension()>=2 && mitkImage->GetDimension()<=3);                          \
+  assert(pixelType == typeid(pixeltype));                                                        \
   if(mitkImage->GetDimension()==2)                                                               \
   {                                                                                              \
     _accessByItk_2(mitkImage, itkImageTypeFunction, pixeltype, 2, param1, param2) else           \
@@ -976,6 +982,7 @@ PURPOSE.  See the above copyright notices for more information.
   const mitk::Image* constImage = mitkImage;                                                           \
   const_cast<mitk::Image*>(constImage)->Update();                                                      \
   assert(mitkImage->GetDimension()==dimension);                                                        \
+  assert(pixelType == typeid(pixeltype));                                                              \
   _accessByItk_3(mitkImage, itkImageTypeFunction, pixeltype, dimension, param1, param2, param3) else   \
   _accessByItkWarning                                                                                  \
 }
@@ -1002,6 +1009,7 @@ PURPOSE.  See the above copyright notices for more information.
   const mitk::Image* constImage = mitkImage;                                                     \
   const_cast<mitk::Image*>(constImage)->Update();                                                \
   assert(mitkImage->GetDimension()>=2 && mitkImage->GetDimension()<=3);                          \
+  assert(pixelType == typeid(pixeltype));                                                        \
   if(mitkImage->GetDimension()==2)                                                               \
   {                                                                                              \
   _accessByItk_3(mitkImage, itkImageTypeFunction, pixeltype, 2, param1, param2, param3) else     \

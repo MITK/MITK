@@ -20,6 +20,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "berryWeakPointer.h"
 
+#include "berryExtensionType.h"
+
 #define berryNameMacro(className) \
   virtual const char* GetClassName() const \
   { return #className; }\
@@ -107,11 +109,12 @@ typedef uint _Flags;
 
 #endif /* BERRY_NO_TYPESAFE_FLAGS */
 
+
 #define BERRY_REGISTER_EXTENSION_CLASS(_ClassType, _PluginContext)\
 {\
   QString typeName = _PluginContext->getPlugin()->getSymbolicName();\
   typeName = (typeName + "_") + _ClassType::staticMetaObject.className();\
-  qRegisterMetaType<_ClassType>(typeName.toAscii().data());\
+  ::berry::registerExtensionType<_ClassType>(typeName.toAscii().data());\
 }
 
 #endif /*__BERRY_MACROS_H__*/

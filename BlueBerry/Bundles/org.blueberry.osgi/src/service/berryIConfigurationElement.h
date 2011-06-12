@@ -25,6 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "../berryBundleLoader.h"
 #include "../berryPlatformException.h"
 
+#include "berryExtensionType.h"
 #include "berryIExecutableExtension.h"
 #include "berryIExtension.h"
 
@@ -92,15 +93,15 @@ public:
         plugin->start(ctkPlugin::START_TRANSIENT);
 
         QString typeName = plugin->getSymbolicName() + "_" + QString::fromStdString(className);
-        int metaTypeId = QMetaType::type(typeName.toAscii().data());
-        if (metaTypeId == 0)
+        int extensionTypeId = ExtensionType::type(typeName.toAscii().data());
+        if (extensionTypeId == 0)
         {
-          BERRY_WARN << "The class " << className << " was not registered as a Qt MetaType using BERRY_REGISTER_EXTENSION_CLASS(type, pluginContext) or you forgot to run Qt's moc on the header file. "
+          BERRY_WARN << "The class " << className << " was not registered as an Extension Type using BERRY_REGISTER_EXTENSION_CLASS(type, pluginContext) or you forgot to run Qt's moc on the header file. "
                         "Legacy BlueBerry bundles should use CreateExecutableExtension<C>(propertyName, C::GetManifestName()) instead.";
         }
         else
         {
-          QObject* obj = static_cast<QObject*>(QMetaType::construct(metaTypeId));
+          QObject* obj = ExtensionType::construct(extensionTypeId);
           // check if we have extension adapter and initialize
           if (IExecutableExtension* execExt = qobject_cast<IExecutableExtension*>(obj))
           {

@@ -152,11 +152,11 @@ template<typename X, int VDimension, typename T1 = EmptyType, typename T2 = Empt
 struct AccessItkImageFunctor
 {
 
-  AccessItkImageFunctor(X* cl, mitk::Image::Pointer mitkImage, const T1& t1 = T1(), const T2& t2 = T2(), const T3& t3 = T3())
+  AccessItkImageFunctor(X* cl, const mitk::Image* mitkImage, const T1& t1 = T1(), const T2& t2 = T2(), const T3& t3 = T3())
     : cl(cl), mitkImage(mitkImage), pixelType(mitkImage->GetPixelType()),
       t1(t1), t2(t2), t3(t3)
   {
-    mitkImage->Update();
+    const_cast<mitk::Image*>(mitkImage)->Update();
     assert(mitkImage->GetDimension() == VDimension);
   }
 
@@ -201,7 +201,7 @@ private:
   };
 
   X* cl;
-  const mitk::Image::Pointer mitkImage;
+  const mitk::Image* mitkImage;
   const mitk::PixelType& pixelType;
   T1 t1;
   T2 t2;

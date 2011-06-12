@@ -47,8 +47,8 @@ public:
   void testAccessByItk()
   {
     mitk::Image::Pointer mitkIntImage2D = createMitkImage<IntImage2D>();
-    mitk::Image::Pointer mitkIntImage3D = createMitkImage<IntImage3D>();
-    mitk::Image::Pointer mitkFloatImage2D = createMitkImage<FloatImage2D>();
+    mitk::Image::ConstPointer mitkIntImage3D(createMitkImage<IntImage3D>());
+    mitk::Image::ConstPointer mitkFloatImage2D(createMitkImage<FloatImage2D>());
     mitk::Image::Pointer mitkFloatImage3D = createMitkImage<FloatImage3D>();
 
     AccessByItk(mitkIntImage2D, AccessItkImage);
@@ -75,8 +75,8 @@ public:
   void testAccessFixedDimensionByItk()
   {
     mitk::Image::Pointer mitkIntImage2D = createMitkImage<IntImage2D>();
-    mitk::Image::Pointer mitkIntImage3D = createMitkImage<IntImage3D>();
-    mitk::Image::Pointer mitkFloatImage2D = createMitkImage<FloatImage2D>();
+    mitk::Image::ConstPointer mitkIntImage3D(createMitkImage<IntImage3D>());
+    mitk::Image::ConstPointer mitkFloatImage2D(createMitkImage<FloatImage2D>());
     mitk::Image::Pointer mitkFloatImage3D = createMitkImage<FloatImage3D>();
 
     AccessFixedDimensionByItk(mitkIntImage2D, AccessItkImage, 2);
@@ -120,8 +120,8 @@ public:
   void testAccessFixedPixelTypeByItk()
   {
     mitk::Image::Pointer mitkIntImage2D = createMitkImage<IntImage2D>();
-    mitk::Image::Pointer mitkIntImage3D = createMitkImage<IntImage3D>();
-    mitk::Image::Pointer mitkFloatImage2D = createMitkImage<FloatImage2D>();
+    mitk::Image::ConstPointer mitkIntImage3D(createMitkImage<IntImage3D>());
+    mitk::Image::ConstPointer mitkFloatImage2D(createMitkImage<FloatImage2D>());
     mitk::Image::Pointer mitkFloatImage3D = createMitkImage<FloatImage3D>();
 
     AccessFixedPixelTypeByItk(mitkIntImage2D, AccessItkImage, int);
@@ -165,8 +165,8 @@ public:
   void testAccessFixedTypeByItk()
   {
     mitk::Image::Pointer mitkIntImage2D = createMitkImage<IntImage2D>();
-    mitk::Image::Pointer mitkIntImage3D = createMitkImage<IntImage3D>();
-    mitk::Image::Pointer mitkFloatImage2D = createMitkImage<FloatImage2D>();
+    mitk::Image::ConstPointer mitkIntImage3D(createMitkImage<IntImage3D>());
+    mitk::Image::ConstPointer mitkFloatImage2D(createMitkImage<FloatImage2D>());
     mitk::Image::Pointer mitkFloatImage3D = createMitkImage<FloatImage3D>();
 
     AccessFixedTypeByItk(mitkIntImage2D, AccessItkImage, int, 2);
@@ -227,8 +227,8 @@ public:
   void testAccessSpecificPixelTypesByItk()
   {
     mitk::Image::Pointer mitkIntImage2D = createMitkImage<IntImage2D>();
-    mitk::Image::Pointer mitkIntImage3D = createMitkImage<IntImage3D>();
-    mitk::Image::Pointer mitkFloatImage2D = createMitkImage<FloatImage2D>();
+    mitk::Image::ConstPointer mitkIntImage3D(createMitkImage<IntImage3D>());
+    mitk::Image::ConstPointer mitkFloatImage2D(createMitkImage<FloatImage2D>());
     mitk::Image::Pointer mitkFloatImage3D = createMitkImage<FloatImage3D>();
 
     AccessIntegralTypesByItk(mitkIntImage2D);

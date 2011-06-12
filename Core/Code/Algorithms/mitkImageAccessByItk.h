@@ -220,7 +220,6 @@ public:
 #define AccessSpecificTypesByItk(mitkImage, ...)                                       \
 {                                                                                      \
   const mitk::PixelType& pixelType = mitkImage->GetPixelType();                        \
-  mitkImage->Update();                                                                 \
   _checkValidDimension(mitkImage);                                                     \
   if((mitkImage)->GetDimension()==2)                                                   \
   {                                                                                    \
@@ -242,7 +241,6 @@ public:
 #define AccessIntegralTypesByItk(mitkImage)                                            \
 {                                                                                      \
   const mitk::PixelType& pixelType = mitkImage->GetPixelType();                        \
-  mitkImage->Update();                                                                 \
   _checkValidDimension(mitkImage);                                                     \
   if((mitkImage)->GetDimension()==2)                                                   \
   {                                                                                    \
@@ -264,7 +262,6 @@ public:
 #define AccessFloatingTypesByItk(mitkImage)                                            \
 {                                                                                      \
   const mitk::PixelType& pixelType = mitkImage->GetPixelType();                        \
-  mitkImage->Update();                                                                 \
   _checkValidDimension(mitkImage);                                                     \
   if((mitkImage)->GetDimension()==2)                                                   \
   {                                                                                    \
@@ -435,7 +432,6 @@ public:
 #define AccessSpecificTypesByItk_1(mitkImage, paramType1, param1, ...)                 \
 {                                                                                      \
   const mitk::PixelType& pixelType = mitkImage->GetPixelType();                        \
-  mitkImage->Update();                                                                 \
   _checkValidDimension(mitkImage);                                                     \
   if((mitkImage)->GetDimension()==2)                                                   \
   {                                                                                    \
@@ -458,7 +454,6 @@ public:
 #define AccessIntegralTypesByItk_1(mitkImage, paramType1, param1)                      \
 {                                                                                      \
   const mitk::PixelType& pixelType = mitkImage->GetPixelType();                        \
-  mitkImage->Update();                                                                 \
   _checkValidDimension(mitkImage);                                                     \
   if((mitkImage)->GetDimension()==2)                                                   \
   {                                                                                    \
@@ -481,7 +476,6 @@ public:
 #define AccessFloatingTypesByItk_1(mitkImage, paramType1, param1)                      \
 {                                                                                      \
   const mitk::PixelType& pixelType = mitkImage->GetPixelType();                        \
-  mitkImage->Update();                                                                 \
   _checkValidDimension(mitkImage);                                                     \
   if((mitkImage)->GetDimension()==2)                                                   \
   {                                                                                    \
@@ -659,7 +653,6 @@ public:
 #define AccessSpecificTypesByItk_2(mitkImage, paramType1, param1, paramType2, param2, ...)          \
 {                                                                                                   \
   const mitk::PixelType& pixelType = mitkImage->GetPixelType();                                     \
-  mitkImage->Update();                                                                              \
   _checkValidDimension(mitkImage);                                                                  \
   if((mitkImage)->GetDimension()==2)                                                                \
   {                                                                                                 \
@@ -682,7 +675,6 @@ public:
 #define AccessIntegralTypesByItk_2(mitkImage, paramType1, param1, paramType2, param2)               \
 {                                                                                                   \
   const mitk::PixelType& pixelType = mitkImage->GetPixelType();                                     \
-  mitkImage->Update();                                                                              \
   _checkValidDimension(mitkImage);                                                                  \
   if((mitkImage)->GetDimension()==2)                                                                \
   {                                                                                                 \
@@ -705,7 +697,6 @@ public:
 #define AccessFloatingTypesByItk_2(mitkImage, paramType1, param1, paramType2, param2)                 \
 {                                                                                                     \
   const mitk::PixelType& pixelType = mitkImage->GetPixelType();                                       \
-  mitkImage->Update();                                                                                \
   _checkValidDimension(mitkImage);                                                                    \
   if((mitkImage)->GetDimension()==2)                                                                  \
   {                                                                                                   \
@@ -924,7 +915,6 @@ public:
 #define AccessSpecificTypesByItk_3(mitkImage, paramType1, param1, paramType2, param2, paramType3, param3, ...) \
 {                                                                                      \
   const mitk::PixelType& pixelType = mitkImage->GetPixelType();                        \
-  mitkImage->Update();                                                                 \
   _checkValidDimension(mitkImage);                                                     \
   if((mitkImage)->GetDimension()==2)                                                   \
   {                                                                                    \
@@ -947,7 +937,6 @@ public:
 #define AccessIntegralTypesByItk_3(mitkImage, paramType1, param1, paramType2, param2, paramType3, param3) \
 {                                                                                                         \
   const mitk::PixelType& pixelType = mitkImage->GetPixelType();                                           \
-  mitkImage->Update();                                                                                    \
   _checkValidDimension(mitkImage);                                                                        \
   if((mitkImage)->GetDimension()==2)                                                                      \
   {                                                                                                       \
@@ -970,7 +959,6 @@ public:
 #define AccessFloatingTypesByItk_3(mitkImage, paramType1, param1, paramType2, param2, paramType3, param3) \
 {                                                                                                         \
   const mitk::PixelType& pixelType = mitkImage->GetPixelType();                                           \
-  mitkImage->Update();                                                                                    \
   _checkValidDimension(mitkImage);                                                                        \
   if((mitkImage)->GetDimension()==2)                                                                      \
   {                                                                                                       \
@@ -1000,11 +988,11 @@ public:
 //## @ingroup Adaptor
 #define AccessFixedDimensionByItk_3(mitkImage, itkImageTypeFunction, dimension, param1, param2, param3)  \
 {                                                                                                        \
-  const mitk::PixelType& pixelType = mitkImage->GetPixelType();                                  \
-  const mitk::Image* constImage = mitkImage;                                                     \
-  const_cast<mitk::Image*>(constImage)->Update();                                                \
-  _checkSpecificDimension(mitkImage, dimension);                                 \
-  _accessAllTypesByItk_3(mitkImage, itkImageTypeFunction, dimension, param1, param2, param3)     \
+  const mitk::PixelType& pixelType = mitkImage->GetPixelType();                                          \
+  const mitk::Image* constImage = mitkImage;                                                             \
+  const_cast<mitk::Image*>(constImage)->Update();                                                        \
+  _checkSpecificDimension(mitkImage, dimension);                                                         \
+  _accessAllTypesByItk_3(mitkImage, itkImageTypeFunction, dimension, param1, param2, param3)             \
 }
 
 //##Documentation
@@ -1028,7 +1016,7 @@ public:
   const mitk::PixelType& pixelType = mitkImage->GetPixelType();                                        \
   const mitk::Image* constImage = mitkImage;                                                           \
   const_cast<mitk::Image*>(constImage)->Update();                                                      \
-  _checkSpecificDimension(mitkImage, dimension);                                       \
+  _checkSpecificDimension(mitkImage, dimension);                                                       \
   _checkValidPixelType(pixelType == typeid(pixeltype), pixelType, pixeltype);                          \
   _accessByItk_3(mitkImage, itkImageTypeFunction, pixeltype, dimension, param1, param2, param3)        \
 }

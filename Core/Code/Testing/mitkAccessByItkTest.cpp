@@ -20,9 +20,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkTestingMacros.h"
 
 #include <mitkITKImageImport.h>
-
-#define assert(a) if(!(a)) throw std::runtime_error("Assertion " #a " failed");
-
 #include <mitkImageAccessByItk.h>
 
 #define TestImageType(type, dim) \
@@ -103,21 +100,21 @@ public:
     AccessFixedDimensionByItk_3(mitkFloatImage3D, AccessItkImage, 3, Float3D, 2, 3);
 
     // Test for wrong dimension
-    MITK_TEST_FOR_EXCEPTION_BEGIN(const std::runtime_error&)
+    MITK_TEST_FOR_EXCEPTION_BEGIN(const mitk::AccessByItkException&)
     AccessFixedDimensionByItk(mitkFloatImage3D, AccessItkImage, 2);
-    MITK_TEST_FOR_EXCEPTION_END(const std::runtime_error&)
+    MITK_TEST_FOR_EXCEPTION_END(const mitk::AccessByItkException&)
 
-    MITK_TEST_FOR_EXCEPTION_BEGIN(const std::runtime_error&)
+    MITK_TEST_FOR_EXCEPTION_BEGIN(const mitk::AccessByItkException&)
     AccessFixedDimensionByItk_1(mitkFloatImage3D, AccessItkImage, 2, Float3D);
-    MITK_TEST_FOR_EXCEPTION_END(const std::runtime_error&)
+    MITK_TEST_FOR_EXCEPTION_END(const mitk::AccessByItkException&)
 
-    MITK_TEST_FOR_EXCEPTION_BEGIN(const std::runtime_error&)
+    MITK_TEST_FOR_EXCEPTION_BEGIN(const mitk::AccessByItkException&)
     AccessFixedDimensionByItk_2(mitkFloatImage3D, AccessItkImage, 2, Float3D, 2);
-    MITK_TEST_FOR_EXCEPTION_END(const std::runtime_error&)
+    MITK_TEST_FOR_EXCEPTION_END(const mitk::AccessByItkException&)
 
-    MITK_TEST_FOR_EXCEPTION_BEGIN(const std::runtime_error&)
+    MITK_TEST_FOR_EXCEPTION_BEGIN(const mitk::AccessByItkException&)
     AccessFixedDimensionByItk_3(mitkFloatImage3D, AccessItkImage, 2, Float3D, 2, 3);
-    MITK_TEST_FOR_EXCEPTION_END(const std::runtime_error&)
+    MITK_TEST_FOR_EXCEPTION_END(const mitk::AccessByItkException&)
   }
 
   void testAccessFixedPixelTypeByItk()
@@ -148,21 +145,21 @@ public:
     AccessFixedPixelTypeByItk_3(mitkFloatImage3D, AccessItkImage, float, Float3D, 2, 3);
 
     // Test for wrong dimension
-    MITK_TEST_FOR_EXCEPTION_BEGIN(const std::runtime_error&)
+    MITK_TEST_FOR_EXCEPTION_BEGIN(const mitk::AccessByItkException&)
     AccessFixedPixelTypeByItk(mitkFloatImage3D, AccessItkImage, int);
-    MITK_TEST_FOR_EXCEPTION_END(const std::runtime_error&)
+    MITK_TEST_FOR_EXCEPTION_END(const mitk::AccessByItkException&)
 
-    MITK_TEST_FOR_EXCEPTION_BEGIN(const std::runtime_error&)
+    MITK_TEST_FOR_EXCEPTION_BEGIN(const mitk::AccessByItkException&)
     AccessFixedPixelTypeByItk_1(mitkFloatImage3D, AccessItkImage, int, Float3D);
-    MITK_TEST_FOR_EXCEPTION_END(const std::runtime_error&)
+    MITK_TEST_FOR_EXCEPTION_END(const mitk::AccessByItkException&)
 
-    MITK_TEST_FOR_EXCEPTION_BEGIN(const std::runtime_error&)
+    MITK_TEST_FOR_EXCEPTION_BEGIN(const mitk::AccessByItkException&)
     AccessFixedPixelTypeByItk_2(mitkFloatImage3D, AccessItkImage, int, Float3D, 2);
-    MITK_TEST_FOR_EXCEPTION_END(const std::runtime_error&)
+    MITK_TEST_FOR_EXCEPTION_END(const mitk::AccessByItkException&)
 
-    MITK_TEST_FOR_EXCEPTION_BEGIN(const std::runtime_error&)
+    MITK_TEST_FOR_EXCEPTION_BEGIN(const mitk::AccessByItkException&)
     AccessFixedPixelTypeByItk_3(mitkFloatImage3D, AccessItkImage, int, Float3D, 2, 3);
-    MITK_TEST_FOR_EXCEPTION_END(const std::runtime_error&)
+    MITK_TEST_FOR_EXCEPTION_END(const mitk::AccessByItkException&)
   }
 
   void testAccessFixedTypeByItk()
@@ -193,38 +190,38 @@ public:
     AccessFixedTypeByItk_3(mitkFloatImage3D, AccessItkImage, float, 3, Float3D, 2, 3);
 
     // Test for wrong dimension
-    MITK_TEST_FOR_EXCEPTION_BEGIN(const std::runtime_error&)
+    MITK_TEST_FOR_EXCEPTION_BEGIN(const mitk::AccessByItkException&)
     AccessFixedTypeByItk(mitkFloatImage3D, AccessItkImage, float, 2);
-    MITK_TEST_FOR_EXCEPTION_END(const std::runtime_error&)
+    MITK_TEST_FOR_EXCEPTION_END(const mitk::AccessByItkException&)
 
-    MITK_TEST_FOR_EXCEPTION_BEGIN(const std::runtime_error&)
+    MITK_TEST_FOR_EXCEPTION_BEGIN(const mitk::AccessByItkException&)
     AccessFixedTypeByItk_1(mitkFloatImage3D, AccessItkImage, float, 2, Float3D);
-    MITK_TEST_FOR_EXCEPTION_END(const std::runtime_error&)
+    MITK_TEST_FOR_EXCEPTION_END(const mitk::AccessByItkException&)
 
-    MITK_TEST_FOR_EXCEPTION_BEGIN(const std::runtime_error&)
+    MITK_TEST_FOR_EXCEPTION_BEGIN(const mitk::AccessByItkException&)
     AccessFixedTypeByItk_2(mitkFloatImage3D, AccessItkImage, float, 2, Float3D, 2);
-    MITK_TEST_FOR_EXCEPTION_END(const std::runtime_error&)
+    MITK_TEST_FOR_EXCEPTION_END(const mitk::AccessByItkException&)
 
-    MITK_TEST_FOR_EXCEPTION_BEGIN(const std::runtime_error&)
+    MITK_TEST_FOR_EXCEPTION_BEGIN(const mitk::AccessByItkException&)
     AccessFixedTypeByItk_3(mitkFloatImage3D, AccessItkImage, float, 2, Float3D, 2, 3);
-    MITK_TEST_FOR_EXCEPTION_END(const std::runtime_error&)
+    MITK_TEST_FOR_EXCEPTION_END(const mitk::AccessByItkException&)
 
     // Test for wrong type
-    MITK_TEST_FOR_EXCEPTION_BEGIN(const std::runtime_error&)
+    MITK_TEST_FOR_EXCEPTION_BEGIN(const mitk::AccessByItkException&)
     AccessFixedTypeByItk(mitkFloatImage3D, AccessItkImage, int, 3);
-    MITK_TEST_FOR_EXCEPTION_END(const std::runtime_error&)
+    MITK_TEST_FOR_EXCEPTION_END(const mitk::AccessByItkException&)
 
-    MITK_TEST_FOR_EXCEPTION_BEGIN(const std::runtime_error&)
+    MITK_TEST_FOR_EXCEPTION_BEGIN(const mitk::AccessByItkException&)
     AccessFixedTypeByItk_1(mitkFloatImage3D, AccessItkImage, int, 3, Float3D);
-    MITK_TEST_FOR_EXCEPTION_END(const std::runtime_error&)
+    MITK_TEST_FOR_EXCEPTION_END(const mitk::AccessByItkException&)
 
-    MITK_TEST_FOR_EXCEPTION_BEGIN(const std::runtime_error&)
+    MITK_TEST_FOR_EXCEPTION_BEGIN(const mitk::AccessByItkException&)
     AccessFixedTypeByItk_2(mitkFloatImage3D, AccessItkImage, int, 3, Float3D, 2);
-    MITK_TEST_FOR_EXCEPTION_END(const std::runtime_error&)
+    MITK_TEST_FOR_EXCEPTION_END(const mitk::AccessByItkException&)
 
-    MITK_TEST_FOR_EXCEPTION_BEGIN(const std::runtime_error&)
+    MITK_TEST_FOR_EXCEPTION_BEGIN(const mitk::AccessByItkException&)
     AccessFixedTypeByItk_3(mitkFloatImage3D, AccessItkImage, int, 3, Float3D, 2, 3);
-    MITK_TEST_FOR_EXCEPTION_END(const std::runtime_error&)
+    MITK_TEST_FOR_EXCEPTION_END(const mitk::AccessByItkException&)
   }
 
   void testAccessSpecificPixelTypesByItk()
@@ -261,44 +258,44 @@ public:
     AccessSpecificTypesByItk_3(mitkIntImage2D, EImageType, Int2D, int, 2, int, 3, short, unsigned int, float, int, char);
     AccessSpecificTypesByItk_3(mitkFloatImage3D, EImageType, Float3D, int, 2, int, 3, short, unsigned int, float, int, char);
 
-    MITK_TEST_FOR_EXCEPTION_BEGIN(const std::runtime_error&)
+    MITK_TEST_FOR_EXCEPTION_BEGIN(const mitk::AccessByItkException&)
     AccessIntegralTypesByItk(mitkFloatImage3D);
-    MITK_TEST_FOR_EXCEPTION_END(const std::runtime_error&)
-    MITK_TEST_FOR_EXCEPTION_BEGIN(const std::runtime_error&)
+    MITK_TEST_FOR_EXCEPTION_END(const mitk::AccessByItkException&)
+    MITK_TEST_FOR_EXCEPTION_BEGIN(const mitk::AccessByItkException&)
     AccessIntegralTypesByItk_1(mitkFloatImage3D, EImageType, Float3D);
-    MITK_TEST_FOR_EXCEPTION_END(const std::runtime_error&)
-    MITK_TEST_FOR_EXCEPTION_BEGIN(const std::runtime_error&)
+    MITK_TEST_FOR_EXCEPTION_END(const mitk::AccessByItkException&)
+    MITK_TEST_FOR_EXCEPTION_BEGIN(const mitk::AccessByItkException&)
     AccessIntegralTypesByItk_2(mitkFloatImage2D, EImageType, Float2D, int, 2);
-    MITK_TEST_FOR_EXCEPTION_END(const std::runtime_error&)
-    MITK_TEST_FOR_EXCEPTION_BEGIN(const std::runtime_error&)
+    MITK_TEST_FOR_EXCEPTION_END(const mitk::AccessByItkException&)
+    MITK_TEST_FOR_EXCEPTION_BEGIN(const mitk::AccessByItkException&)
     AccessIntegralTypesByItk_3(mitkFloatImage3D, EImageType, Float3D, int, 2, int, 3);
-    MITK_TEST_FOR_EXCEPTION_END(const std::runtime_error&)
+    MITK_TEST_FOR_EXCEPTION_END(const mitk::AccessByItkException&)
 
-    MITK_TEST_FOR_EXCEPTION_BEGIN(const std::runtime_error&)
+    MITK_TEST_FOR_EXCEPTION_BEGIN(const mitk::AccessByItkException&)
     AccessFloatingTypesByItk(mitkIntImage3D);
-    MITK_TEST_FOR_EXCEPTION_END(const std::runtime_error&)
-    MITK_TEST_FOR_EXCEPTION_BEGIN(const std::runtime_error&)
+    MITK_TEST_FOR_EXCEPTION_END(const mitk::AccessByItkException&)
+    MITK_TEST_FOR_EXCEPTION_BEGIN(const mitk::AccessByItkException&)
     AccessFloatingTypesByItk_1(mitkIntImage3D, EImageType, Int3D);
-    MITK_TEST_FOR_EXCEPTION_END(const std::runtime_error&)
-    MITK_TEST_FOR_EXCEPTION_BEGIN(const std::runtime_error&)
+    MITK_TEST_FOR_EXCEPTION_END(const mitk::AccessByItkException&)
+    MITK_TEST_FOR_EXCEPTION_BEGIN(const mitk::AccessByItkException&)
     AccessFloatingTypesByItk_2(mitkIntImage2D, EImageType, Int2D, int, 2);
-    MITK_TEST_FOR_EXCEPTION_END(const std::runtime_error&)
-    MITK_TEST_FOR_EXCEPTION_BEGIN(const std::runtime_error&)
+    MITK_TEST_FOR_EXCEPTION_END(const mitk::AccessByItkException&)
+    MITK_TEST_FOR_EXCEPTION_BEGIN(const mitk::AccessByItkException&)
     AccessFloatingTypesByItk_3(mitkIntImage3D, EImageType, Int3D, int, 2, int, 3);
-    MITK_TEST_FOR_EXCEPTION_END(const std::runtime_error&)
+    MITK_TEST_FOR_EXCEPTION_END(const mitk::AccessByItkException&)
 
-    MITK_TEST_FOR_EXCEPTION_BEGIN(const std::runtime_error&)
+    MITK_TEST_FOR_EXCEPTION_BEGIN(const mitk::AccessByItkException&)
     AccessSpecificTypesByItk(mitkIntImage3D, float, double, short);
-    MITK_TEST_FOR_EXCEPTION_END(const std::runtime_error&)
-    MITK_TEST_FOR_EXCEPTION_BEGIN(const std::runtime_error&)
+    MITK_TEST_FOR_EXCEPTION_END(const mitk::AccessByItkException&)
+    MITK_TEST_FOR_EXCEPTION_BEGIN(const mitk::AccessByItkException&)
     AccessSpecificTypesByItk_1(mitkIntImage3D, EImageType, Int3D, float, double, short);
-    MITK_TEST_FOR_EXCEPTION_END(const std::runtime_error&)
-    MITK_TEST_FOR_EXCEPTION_BEGIN(const std::runtime_error&)
+    MITK_TEST_FOR_EXCEPTION_END(const mitk::AccessByItkException&)
+    MITK_TEST_FOR_EXCEPTION_BEGIN(const mitk::AccessByItkException&)
     AccessSpecificTypesByItk_2(mitkIntImage2D, EImageType, Int2D, int, 2, float, double, short);
-    MITK_TEST_FOR_EXCEPTION_END(const std::runtime_error&)
-    MITK_TEST_FOR_EXCEPTION_BEGIN(const std::runtime_error&)
+    MITK_TEST_FOR_EXCEPTION_END(const mitk::AccessByItkException&)
+    MITK_TEST_FOR_EXCEPTION_BEGIN(const mitk::AccessByItkException&)
     AccessSpecificTypesByItk_3(mitkIntImage3D, EImageType, Int3D, int, 2, int, 3, float, double, short);
-    MITK_TEST_FOR_EXCEPTION_END(const std::runtime_error&)
+    MITK_TEST_FOR_EXCEPTION_END(const mitk::AccessByItkException&)
   }
 
   template<typename TPixel, unsigned int VDimension>

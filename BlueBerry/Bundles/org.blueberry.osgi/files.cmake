@@ -42,6 +42,7 @@ SET(SERVICE_CPP_FILES
 SET(SRC_CPP_FILES
   berryDebugBreakpointManager.cpp
   berryException.cpp
+  berryExtensionType.cpp
   berryIBundleManifest.cpp
   berryIDebugObjectListener.cpp
   berryBundleLoader.cpp

@@ -110,31 +110,11 @@ typedef uint _Flags;
 #endif /* BERRY_NO_TYPESAFE_FLAGS */
 
 
-template <typename T>
-void *berryMetaTypeQObjectConstructHelper(const T *t)
-{
-    if (!t)
-        return static_cast<QObject*>(new T);
-    return static_cast<QObject*>(new T(*static_cast<const T*>(t)));
-}
-
-template <typename T>
-int berryRegisterQObjectMetaType(const char *typeName)
-{
-  typedef void*(*ConstructPtr)(const T*);
-  ConstructPtr cptr = berryMetaTypeQObjectConstructHelper<T>;
-  typedef void(*DeletePtr)(T*);
-  DeletePtr dptr = qMetaTypeDeleteHelper<T>;
-
-  return QMetaType::registerType(typeName, reinterpret_cast<QMetaType::Destructor>(dptr),
-                                 reinterpret_cast<QMetaType::Constructor>(cptr));
-}
-
 #define BERRY_REGISTER_EXTENSION_CLASS(_ClassType, _PluginContext)\
 {\
   QString typeName = _PluginContext->getPlugin()->getSymbolicName();\
   typeName = (typeName + "_") + _ClassType::staticMetaObject.className();\
-  berryRegisterQObjectMetaType<_ClassType>(typeName.toAscii().data());\
+  berry::registerExtensionType<_ClassType>(typeName.toAscii().data());\
 }
 
 #endif /*__BERRY_MACROS_H__*/

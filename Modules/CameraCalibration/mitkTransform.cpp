@@ -1,7 +1,7 @@
 #include "mitkTransform.h"
 #include <fstream>
 #include <vnl/vnl_inverse.h>
-#include <mitkVnlVectorCaster.h>
+#include <mitkVnlVectorFixedCaster.h>
 #include <mitkVnlVectorFromCvMat.h>
 #include <mitkVnlMatrixFromCvMat.h>
 #include <mitkCvMatFromVnlVector.h>
@@ -99,7 +99,7 @@ namespace mitk
   void Transform::SetOrientation( const vnl_quaternion<double>& orientation)
   {
     vnl_vector_fixed<mitk::ScalarType, 4> qvec;
-    VnlVectorCaster<double, mitk::ScalarType, 4> caster( &orientation, &qvec );
+    VnlVectorFixedCaster<double, mitk::ScalarType, 4> caster( &orientation, &qvec );
     caster.Update();
 
     mitk::Quaternion p( qvec );
@@ -111,7 +111,7 @@ namespace mitk
   {
     vnl_vector_fixed<mitk::ScalarType, 3> vecFloat = this->GetVnlTranslation();
     vnl_vector_fixed<double, 3> vecDouble;
-    VnlVectorCaster<mitk::ScalarType, double, 3> caster( &vecFloat, &vecDouble );
+    VnlVectorFixedCaster<mitk::ScalarType, double, 3> caster( &vecFloat, &vecDouble );
     caster.Update();
 
     return vecDouble;
@@ -121,7 +121,7 @@ namespace mitk
   {
     vnl_vector_fixed<double, 3> dTransl(transl);
     vnl_vector_fixed<mitk::ScalarType, 3> fTransl;
-    VnlVectorCaster<double, mitk::ScalarType, 3> caster( &dTransl, &fTransl );
+    VnlVectorFixedCaster<double, mitk::ScalarType, 3> caster( &dTransl, &fTransl );
     caster.Update();
 
     this->SetTranslation( fTransl );
@@ -131,7 +131,7 @@ namespace mitk
   {
     mitk::Quaternion fOrientation = this->GetOrientation();
     vnl_quaternion<double> dOrientation;
-    VnlVectorCaster<mitk::ScalarType, double, 4> caster( &fOrientation, &dOrientation );
+    VnlVectorFixedCaster<mitk::ScalarType, double, 4> caster( &fOrientation, &dOrientation );
     caster.Update();
 
     return dOrientation;

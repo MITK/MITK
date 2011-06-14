@@ -81,9 +81,18 @@ namespace mitk
       requiredImageSequence, this->m_ImageSequence );
     capturedImageSequence = this->m_ImageSequence;
 
-    distanceImage->SetSlice(this->m_DistanceArray, 0, 0, 0);
-    amplitudeImage->SetSlice(this->m_AmplitudeArray, 0, 0, 0);
-    intensityImage->SetSlice(this->m_IntensityArray, 0, 0, 0);
+    if (m_DistanceArray)
+    {
+      distanceImage->SetSlice(this->m_DistanceArray, 0, 0, 0);
+    }
+    if (m_AmplitudeArray)
+    {
+      amplitudeImage->SetSlice(this->m_AmplitudeArray, 0, 0, 0);
+    }
+    if (m_IntensityArray)
+    {
+      intensityImage->SetSlice(this->m_IntensityArray, 0, 0, 0);
+    }
   }
 
   bool ToFImageGrabber::ConnectCamera()

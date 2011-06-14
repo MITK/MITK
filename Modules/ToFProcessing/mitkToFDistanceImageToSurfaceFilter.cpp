@@ -128,6 +128,11 @@ void mitk::ToFDistanceImageToSurfaceFilter::GenerateData()
   float* inputFloatData = (float*)(input->GetSliceData(0, 0, 0)->GetData());
 
   //calculate world coordinates
+  mitk::ToFProcessingCommon::ToFScalarType focalLength = (m_CameraIntrinsics->GetFocalLengthX()*m_InterPixelDistance[0]+m_CameraIntrinsics->GetFocalLengthY()*m_InterPixelDistance[1])/2.0;
+  mitk::ToFProcessingCommon::ToFPoint2D principalPoint;
+  principalPoint[0] = m_CameraIntrinsics->GetPrincipalPointX();
+  principalPoint[1] = m_CameraIntrinsics->GetPrincipalPointY();
+
   for (int j=0; j<yDimension; j++)
   {
     for (int i=0; i<xDimension; i++)
@@ -141,11 +146,6 @@ void mitk::ToFDistanceImageToSurfaceFilter::GenerateData()
       unsigned int pixelID = pixel[0]+pixel[1]*yDimension;
 
       mitk::ToFProcessingCommon::ToFScalarType distance = (double)inputFloatData[pixelID];
-
-      mitk::ToFProcessingCommon::ToFScalarType focalLength = (m_CameraIntrinsics->GetFocalLengthX()*m_InterPixelDistance[0]+m_CameraIntrinsics->GetFocalLengthY()*m_InterPixelDistance[1])/2.0;
-      mitk::ToFProcessingCommon::ToFPoint2D principalPoint;
-      principalPoint[0] = m_CameraIntrinsics->GetPrincipalPointX();
-      principalPoint[1] = m_CameraIntrinsics->GetPrincipalPointY();
 
       mitk::ToFProcessingCommon::ToFPoint3D cartesianCoordinates =
           mitk::ToFProcessingCommon::IndexToCartesianCoordinates(i,j,distance,focalLength,m_InterPixelDistance,principalPoint);

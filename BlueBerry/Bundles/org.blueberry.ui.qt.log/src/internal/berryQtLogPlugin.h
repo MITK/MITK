@@ -18,21 +18,24 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef BERRYLOGPLUGIN_H_
 #define BERRYLOGPLUGIN_H_
 
-#include <berryPlugin.h>
+#include <ctkPluginActivator.h>
 
 #include "berryQtPlatformLogModel.h"
 
 
 namespace berry {
 
-class QtLogPlugin : public Plugin
+class QtLogPlugin : public QObject, public ctkPluginActivator
 {
+  Q_OBJECT
+  Q_INTERFACES(ctkPluginActivator)
+
 public:
 
   QtLogPlugin();
 
-  void Start(IBundleContext::Pointer context);
-  void Stop(IBundleContext::Pointer context);
+  void start(ctkPluginContext* context);
+  void stop(ctkPluginContext* context);
 
   static QtLogPlugin* GetInstance();
 

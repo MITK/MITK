@@ -22,7 +22,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <berryIBundleContext.h>
 #include <berryPlatformEvent.h>
 
-#include "berryRuntimeDll.h"
+#include <org_blueberry_core_runtime_Export.h>
 #include "internal/berryPreferencesService.h"
 
 namespace berry {

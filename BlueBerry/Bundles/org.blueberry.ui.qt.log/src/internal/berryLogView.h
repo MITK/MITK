@@ -26,7 +26,12 @@ namespace berry {
 
 class LogView : public QtViewPart
 {
+  Q_OBJECT
+
 public:
+
+  LogView();
+  LogView(const LogView& other);
 
   void SetFocus();
 

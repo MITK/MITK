@@ -28,6 +28,8 @@
 
 #include "berryIIntroSite.h"
 
+#include <QObject>
+
 namespace berry {
 
 /**
@@ -205,5 +207,7 @@ struct BERRY_UI IIntroPart : public virtual Object { // IAdaptable {
 };
 
 }
+
+Q_DECLARE_INTERFACE(berry::IIntroPart, "org.blueberry.IIntroPart")
 
 #endif /* BERRYIINTROPART_H_ */

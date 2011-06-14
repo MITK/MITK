@@ -1,3 +1,4 @@
+PROJECT(org_blueberry_core_expressions)
 
-MACRO_CREATE_PLUGIN()
-TARGET_LINK_LIBRARIES(${PLUGIN_TARGET} optimized PocoXML debug PocoXMLd)
+MACRO_CREATE_CTK_PLUGIN(EXPORT_DIRECTIVE BERRY_EXPRESSIONS
+                        EXPORTED_INCLUDE_SUFFIXES src src/common)

@@ -19,10 +19,12 @@
 #ifndef BERRYISERVICEFACTORY_H_
 #define BERRYISERVICEFACTORY_H_
 
-#include "../berryUiDll.h"
+#include <org_blueberry_ui_Export.h>
 
 #include <berryObject.h>
 #include <berryMacros.h>
+
+#include <QObject>
 
 namespace berry {
 
@@ -67,5 +69,7 @@ struct BERRY_UI IServiceFactory : public virtual Object {
 };
 
 }
+
+Q_DECLARE_INTERFACE(berry::IServiceFactory, "org.blueberry.IServiceFactory")
 
 #endif /* BERRYISERVICEFACTORY_H_ */

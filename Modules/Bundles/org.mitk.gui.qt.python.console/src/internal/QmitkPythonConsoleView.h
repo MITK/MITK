@@ -52,7 +52,7 @@ PURPOSE.  See the above copyright notices for more information.
 */
 
 
-class QmitkPythonConsoleView : public QObject, public QmitkFunctionality, public QmitkPythonClient
+class QmitkPythonConsoleView : public QmitkFunctionality, public QmitkPythonClient
 {  
   // this is needed for all Qt objects that should have a Qt meta-object
   // (everything that derives from QObject and wants to have signal/slots)

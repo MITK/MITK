@@ -31,6 +31,12 @@ QmitkPropertyListView::QmitkPropertyListView()
 {
 }
 
+QmitkPropertyListView::QmitkPropertyListView(const QmitkPropertyListView& other)
+{
+  Q_UNUSED(other)
+  throw std::runtime_error("Copy constructor not implemented");
+}
+
 QmitkPropertyListView::~QmitkPropertyListView()
 {
 }

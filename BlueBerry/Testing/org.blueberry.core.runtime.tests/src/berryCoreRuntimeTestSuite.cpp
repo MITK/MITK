@@ -27,6 +27,11 @@
 
 namespace berry {
 
+CoreRuntimeTestSuite::CoreRuntimeTestSuite(const CoreRuntimeTestSuite& other)
+{
+
+}
+
 CoreRuntimeTestSuite::CoreRuntimeTestSuite()
 : CppUnit::TestSuite("CoreRuntimeTestSuite")
 {

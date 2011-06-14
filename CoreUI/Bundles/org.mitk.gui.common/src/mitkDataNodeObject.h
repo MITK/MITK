@@ -22,7 +22,7 @@
 #include <berryObject.h>
 #include <berryMacros.h>
 
-#include "mitkGUICommonPluginDll.h"
+#include <org_mitk_gui_common_Export.h>
 
 #include <mitkDataNode.h>
 

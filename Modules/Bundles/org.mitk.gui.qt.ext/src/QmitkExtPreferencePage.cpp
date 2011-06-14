@@ -36,6 +36,12 @@ QmitkExtPreferencePage::QmitkExtPreferencePage()
   
 }
 
+QmitkExtPreferencePage::QmitkExtPreferencePage(const QmitkExtPreferencePage& other)
+{
+  Q_UNUSED(other)
+  throw std::runtime_error("Copy constructor not implemented");
+}
+
 void QmitkExtPreferencePage::Init(berry::IWorkbench::Pointer )
 {
 }

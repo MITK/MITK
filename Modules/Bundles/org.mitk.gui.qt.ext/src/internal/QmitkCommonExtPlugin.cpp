@@ -19,7 +19,33 @@
 
 #include <QmitkExtRegisterClasses.h>
 
-void QmitkCommonExtPlugin::Start(berry::IBundleContext::Pointer /*context*/)
+#include "../QmitkExtPreferencePage.h"
+#include "../QmitkInputDevicesPrefPage.h"
+
+#include <QtPlugin>
+
+ctkPluginContext* QmitkCommonExtPlugin::_context = 0;
+
+void QmitkCommonExtPlugin::start(ctkPluginContext* context)
 {
-   QmitkExtRegisterClasses();
+  this->_context = context;
+
+  QmitkExtRegisterClasses();
+  
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkExtPreferencePage, context)
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkInputDevicesPrefPage, context)
 }
+
+void QmitkCommonExtPlugin::stop(ctkPluginContext* context)
+{
+  Q_UNUSED(context)
+
+  this->_context = 0;
+}
+
+ctkPluginContext* QmitkCommonExtPlugin::getContext()
+{
+  return _context;
+}
+
+Q_EXPORT_PLUGIN2(org_mitk_gui_qt_ext, QmitkCommonExtPlugin)

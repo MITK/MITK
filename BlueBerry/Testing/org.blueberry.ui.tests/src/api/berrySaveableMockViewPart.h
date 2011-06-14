@@ -33,6 +33,8 @@ namespace berry
  */
 class SaveableMockViewPart: public MockViewPart, public ISaveablePart
 {
+  Q_OBJECT
+  Q_INTERFACES(berry::ISaveablePart)
 
 public:
 
@@ -41,6 +43,7 @@ public:
   static const std::string ID; // = "org.blueberry.ui.tests.api.SaveableMockViewPart";
 
   SaveableMockViewPart();
+  SaveableMockViewPart(const SaveableMockViewPart& other);
 
   void CreatePartControl(void* parent);
 

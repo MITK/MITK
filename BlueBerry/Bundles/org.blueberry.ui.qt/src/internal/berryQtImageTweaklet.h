@@ -23,9 +23,15 @@
 
 namespace berry {
 
-class QtImageTweaklet : public ImageTweaklet
+class QtImageTweaklet : public QObject, public ImageTweaklet
 {
+  Q_OBJECT
+  Q_INTERFACES(berry::ImageTweaklet)
+
 public:
+
+  QtImageTweaklet();
+  QtImageTweaklet(const QtImageTweaklet& other);
 
   virtual SmartPointer<ImageDescriptor> CreateFromFile(const std::string& filename, const std::string& pluginid);
   virtual SmartPointer<ImageDescriptor> CreateFromImage(void* img);

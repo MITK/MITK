@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <berryEditorPart.h>
 #include <QWidget>
 
-#include "berryUiQtDll.h"
+#include <org_blueberry_ui_qt_Export.h>
 
 namespace berry
 {

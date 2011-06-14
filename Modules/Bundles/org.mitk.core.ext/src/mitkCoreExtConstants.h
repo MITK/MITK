@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <string>
 
-#include "mitkCoreExtDll.h"
+#include <org_mitk_core_ext_Export.h>
 
 namespace mitk 
 {

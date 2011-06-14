@@ -20,7 +20,7 @@
 #define BERRYHANDLEREVENT_H_
 
 #include "common/berryAbstractBitSetEvent.h"
-#include "berryCommandsDll.h"
+#include <org_blueberry_core_commands_Export.h>
 
 namespace berry {
 

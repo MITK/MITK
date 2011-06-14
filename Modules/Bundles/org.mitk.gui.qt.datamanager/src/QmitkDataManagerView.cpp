@@ -92,6 +92,12 @@ QmitkDataManagerView::QmitkDataManagerView()
 {
 }
 
+QmitkDataManagerView::QmitkDataManagerView(const QmitkDataManagerView& other)
+{
+  Q_UNUSED(other)
+  throw std::runtime_error("Copy constructor not implemented");
+}
+
 
 QmitkDataManagerView::~QmitkDataManagerView()
 {
@@ -362,8 +368,12 @@ void QmitkDataManagerView::ContextMenuActionTriggered( bool )
     return;
   }
   berry::IConfigurationElement::Pointer confElem = it->second;
-  mitk::IContextMenuAction* contextMenuAction = dynamic_cast<mitk::IContextMenuAction*>
-    (confElem->CreateExecutableExtension<mitk::IContextMenuAction>("class") );
+  mitk::IContextMenuAction* contextMenuAction = confElem->CreateExecutableExtension<mitk::IContextMenuAction>("class");
+  if (contextMenuAction == 0)
+  {
+    // support legacy BlueBerry extensions
+    contextMenuAction = confElem->CreateExecutableExtension<mitk::IContextMenuAction>("class", mitk::IContextMenuAction::GetManifestName());
+  }
   std::string className;
   std::string smoothed;
   confElem->GetAttribute("class", className);

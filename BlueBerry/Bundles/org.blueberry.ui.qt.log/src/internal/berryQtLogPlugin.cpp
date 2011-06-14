@@ -17,6 +17,10 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "berryQtLogPlugin.h"
 
+#include "berryLogView.h"
+
+#include <QtPlugin>
+
 namespace berry {
 
 QtLogPlugin* QtLogPlugin::instance = 0;
@@ -27,13 +31,15 @@ QtLogPlugin::QtLogPlugin()
 }
 
 void 
-QtLogPlugin::Start(IBundleContext::Pointer /*context*/)
+QtLogPlugin::start(ctkPluginContext* context)
 {
+  BERRY_REGISTER_EXTENSION_CLASS(berry::LogView, context)
+
   m_LogModel = new QtPlatformLogModel();
 }
 
 void 
-QtLogPlugin::Stop(IBundleContext::Pointer /*context*/)
+QtLogPlugin::stop(ctkPluginContext* /*context*/)
 {
   delete m_LogModel;
 }
@@ -51,3 +57,5 @@ QtLogPlugin::GetLogModel()
 }
 
 }
+
+Q_EXPORT_PLUGIN2(org_blueberry_ui_qt_log, berry::QtLogPlugin)

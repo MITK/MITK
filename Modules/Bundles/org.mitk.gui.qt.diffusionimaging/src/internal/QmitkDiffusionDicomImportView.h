@@ -29,7 +29,7 @@ PURPOSE.  See the above copyright notices for more information.
 \sa QmitkFunctionality
 \ingroup Functionalities
 */
-class QmitkDiffusionDicomImport : public QObject, public QmitkFunctionality
+class QmitkDiffusionDicomImport : public QmitkFunctionality
 {  
   Q_OBJECT
 
@@ -48,6 +48,7 @@ public:
   \brief default constructor  
   */  
   QmitkDiffusionDicomImport(QObject *parent=0, const char *name=0);
+  QmitkDiffusionDicomImport(const QmitkDiffusionDicomImport& other);
 
   /*!  
   \brief default destructor  

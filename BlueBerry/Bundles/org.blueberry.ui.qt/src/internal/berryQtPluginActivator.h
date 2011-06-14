@@ -19,15 +19,29 @@
 #ifndef BERRYQTPLUGINACTIVATOR_H_
 #define BERRYQTPLUGINACTIVATOR_H_
 
-#include <berryAbstractUIPlugin.h>
+#include <berryAbstractUICTKPlugin.h>
+
+#include <berryIQtStyleManager.h>
 
 namespace berry {
 
-class QtPluginActivator : public AbstractUIPlugin
+class QtPluginActivator : public QObject, public AbstractUICTKPlugin
 {
+  Q_OBJECT
+  Q_INTERFACES(ctkPluginActivator)
+
 public:
 
-  void Start(IBundleContext::Pointer context);
+  QtPluginActivator();
+  ~QtPluginActivator();
+
+  void start(ctkPluginContext* context);
+  void stop(ctkPluginContext* context);
+
+private:
+
+  IQtStyleManager::Pointer styleManager;
+
 };
 
 }

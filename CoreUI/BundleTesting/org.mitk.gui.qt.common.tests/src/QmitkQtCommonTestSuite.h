@@ -20,12 +20,19 @@
 
 #include <CppUnit/TestSuite.h>
 
-class QmitkQtCommonTestSuite : public CppUnit::TestSuite
-{
+#include <QObject>
 
+Q_DECLARE_INTERFACE(CppUnit::Test, "CppUnit.Test")
+
+class QmitkQtCommonTestSuite : public QObject, public CppUnit::TestSuite
+{
+  Q_OBJECT
+  Q_INTERFACES(CppUnit::Test)
+  
 public:
 
   QmitkQtCommonTestSuite();
+  QmitkQtCommonTestSuite(const QmitkQtCommonTestSuite& other);
 };
 
 #endif /* QMITKQTCOMMONTESTSUITE_H_ */

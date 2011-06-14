@@ -7,7 +7,7 @@
 #include <berryIBundleContext.h>
 #include <event/berryPlatformEvent.h>
 
-#include "berryRuntimeDll.h"
+#include <org_blueberry_core_runtime_Export.h>
 
 namespace berry {
 

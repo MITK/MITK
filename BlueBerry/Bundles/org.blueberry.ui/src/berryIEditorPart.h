@@ -21,6 +21,8 @@
 #include "berryIWorkbenchPart.h"
 #include "berryISaveablePart.h"
 
+#include <QObject>
+
 namespace berry
 {
 
@@ -125,5 +127,7 @@ struct BERRY_UI IEditorPart : public virtual IWorkbenchPart,
 };
 
 }
+
+Q_DECLARE_INTERFACE(berry::IEditorPart, "org.blueberry.IEditorPart")
 
 #endif /*BERRYIEDITORPART_H_*/

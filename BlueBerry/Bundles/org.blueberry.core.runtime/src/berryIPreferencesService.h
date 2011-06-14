@@ -2,11 +2,13 @@
 #define BERRYIPREFERENCESSERVICE_H_
 
 #include "service/berryService.h"
-#include "berryRuntimeDll.h"
+#include <org_blueberry_core_runtime_Export.h>
 #include "berryIPreferences.h"
 
 #include <vector>
 #include <string>
+
+#include <QtPlugin>
 
 namespace berry 
 {
@@ -32,7 +34,7 @@ namespace berry
     ///
     static const std::string ID;
 
-    berryInterfaceMacro(IPreferencesService, berry)      
+    berryInterfaceMacro(IPreferencesService, berry)
 
     /**
      * Returns the root system node for the calling bundle.
@@ -57,5 +59,7 @@ namespace berry
     virtual std::vector<std::string> GetUsers() const = 0;
   };
 }  // namespace berry
+
+Q_DECLARE_INTERFACE(berry::IPreferencesService, "org.blueberry.service.IPreferencesService")
 
 #endif /*BERRYIPREFERENCESSERVICE_H_*/

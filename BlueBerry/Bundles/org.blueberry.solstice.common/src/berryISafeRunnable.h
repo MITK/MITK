@@ -21,7 +21,7 @@
 #include <berryObject.h>
 #include <berryMacros.h>
 
-#include "berryCommonRuntimeDll.h"
+#include <org_blueberry_solstice_common_Export.h>
 
 namespace berry
 {

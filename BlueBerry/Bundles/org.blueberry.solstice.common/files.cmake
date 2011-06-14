@@ -1,3 +1,7 @@
+SET(MOC_H_FILES
+  src/internal/berryPluginActivator.h
+)
+
 SET(SRC_CPP_FILES
   berryMultiStatus.cpp
   berrySafeRunner.cpp
@@ -7,6 +11,7 @@ SET(SRC_CPP_FILES
 
 SET(INTERNAL_CPP_FILES
   berryIRuntimeConstants.cpp
+  berryPluginActivator.cpp
 )
 
 #SET(CPP_FILES manifest.cpp)

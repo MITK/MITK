@@ -30,6 +30,17 @@ PURPOSE.  See the above copyright notices for more information.
 
 namespace berry {
 
+LogView::LogView()
+{
+
+}
+
+LogView::LogView(const LogView& other)
+{
+  Q_UNUSED(other)
+  throw std::runtime_error("Copy constructor not implemented");
+}
+
 void LogView::CreateQtPartControl(QWidget* parent)
 {
   QHBoxLayout* layout = new QHBoxLayout(parent);

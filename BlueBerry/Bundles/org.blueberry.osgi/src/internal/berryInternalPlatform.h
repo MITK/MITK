@@ -30,6 +30,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <map>
 
+class ctkPluginFrameworkFactory;
+class ctkPluginContext;
+
 namespace berry {
 
 struct IBundle;
@@ -67,6 +70,9 @@ private:
   Poco::AutoPtr<PlatformLogChannel> m_PlatformLogChannel;
   Poco::Logger* m_PlatformLogger;
 
+  ctkPluginFrameworkFactory* m_ctkPluginFrameworkFactory;
+  QList<long> m_CTKPluginsToStart;
+
   PlatformEvents m_Events;
   PlatformEvent m_EventStarted;
 
@@ -94,6 +100,8 @@ public:
   void Initialize(int& argc, char** argv, Poco::Util::AbstractConfiguration* config = 0);
   void Launch();
   void Shutdown();
+
+  ctkPluginContext* GetCTKPluginFrameworkContext() const;
 
   /// Returns a ServiceRegistry object for registering
   /// and accessing services from different plugins
@@ -127,6 +135,8 @@ public:
   int& GetRawApplicationArgs(char**& argv);
 
   IBundle::Pointer GetBundle(const std::string& id);
+
+  std::vector<IBundle::Pointer> GetBundles() const;
 
   Poco::Logger* GetLogger();
 };

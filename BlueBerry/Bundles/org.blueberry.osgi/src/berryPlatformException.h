@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef BERRYPLATFORMEXCEPTION_H_
 #define BERRYPLATFORMEXCEPTION_H_
 
-#include "berryOSGiDll.h"
+#include <org_blueberry_osgi_Export.h>
 #include "Poco/Exception.h"
 
 namespace berry {

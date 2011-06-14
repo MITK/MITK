@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef BERRYISELECTIONSERVICE_H_
 #define BERRYISELECTIONSERVICE_H_
 
-#include "berryUiDll.h"
+#include <org_blueberry_ui_Export.h>
 
 #include "berryISelection.h"
 #include "berryISelectionListener.h"

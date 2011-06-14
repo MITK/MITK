@@ -52,6 +52,11 @@ BundleLoader::~BundleLoader()
 
 }
 
+void BundleLoader::SetCTKPlugins(const QStringList& installedCTKPlugins)
+{
+  this->installedCTKPlugins = installedCTKPlugins;
+}
+
 Poco::Logger&
 BundleLoader::GetLogger() const
 {
@@ -70,6 +75,14 @@ BundleLoader::CreateBundle(const Poco::Path& path)
 {
   BundleDirectory::Pointer bundleStorage(new BundleDirectory(path));
   Bundle::Pointer bundle(new Bundle(*this, bundleStorage));
+
+  if (bundle->GetState() == IBundle::BUNDLE_INSTALLED &&
+      installedCTKPlugins.contains(QString::fromStdString(bundle->GetSymbolicName())))
+  {
+    BERRY_WARN << "Ignoring legacy BlueBerry bundle " << bundle->GetSymbolicName()
+               << " because a CTK plug-in with the same name already exists.";
+    return Bundle::Pointer(0);
+  }
 
   if (bundle->GetState() == IBundle::BUNDLE_INSTALLED &&
       bundle->IsSystemBundle()) {
@@ -101,11 +114,22 @@ BundleLoader::FindBundle(const std::string& symbolicName)
   return iter->second.m_Bundle;
 }
 
+std::vector<IBundle::Pointer> BundleLoader::GetBundles() const
+{
+  std::vector<IBundle::Pointer> result;
+  BundleMap::const_iterator end = m_BundleMap.end();
+  for (BundleMap::const_iterator it = m_BundleMap.begin(); it != end; ++it)
+  {
+    result.push_back(it->second.m_Bundle);
+  }
+  return result;
+}
+
 Bundle::Pointer
 BundleLoader::LoadBundle(const Poco::Path& path)
 {
   Bundle::Pointer bundle = this->CreateBundle(path);
-  this->LoadBundle(bundle);
+  if (bundle) this->LoadBundle(bundle);
   return bundle;
 }
 
@@ -314,7 +338,7 @@ void BundleLoader::ReadAllContributions()
   BundleMap::iterator iter;
   for (iter = m_BundleMap.begin(); iter != m_BundleMap.end(); ++iter)
   {
-    if (iter->second.m_Bundle->IsResolved())
+    if (iter->second.m_Bundle && iter->second.m_Bundle->IsResolved())
       this->ReadContributions(iter->second.m_Bundle);
   }
 }
@@ -342,7 +366,15 @@ void BundleLoader::ReadDependentContributions(IBundle::Pointer bundle)
   IBundleManifest::Dependencies::const_iterator iter;
   for (iter = deps.begin(); iter != deps.end(); ++iter)
   {
-    this->ReadContributions(m_BundleMap[iter->symbolicName].m_Bundle);
+    BundleMap::const_iterator depIter = m_BundleMap.find(iter->symbolicName);
+    if (depIter != m_BundleMap.end())
+    {
+      // only read contributions from legacy BlueBerry bundles
+      if (IBundle::Pointer depBundle = depIter->second.m_Bundle)
+      {
+        this->ReadContributions(depBundle);
+      }
+    }
   }
 
 }
@@ -356,7 +388,7 @@ BundleLoader::StartAllBundles()
   {
     try
     {
-      if  (iter->second.m_Bundle->GetActivationPolicy() == IBundleManifest::EAGER  &&
+      if  (iter->second.m_Bundle && iter->second.m_Bundle->GetActivationPolicy() == IBundleManifest::EAGER  &&
         !iter->second.m_Bundle->IsSystemBundle())
         this->StartBundle(iter->second.m_Bundle);
     }
@@ -411,9 +443,28 @@ BundleLoader::StartDependencies(Bundle::Pointer bundle)
   const IBundleManifest::Dependencies& deps = bundle->GetRequiredBundles();
 
   IBundleManifest::Dependencies::const_iterator iter;
+  QList<QSharedPointer<ctkPlugin> > ctkPlugins = CTKPluginActivator::getPluginContext()->getPlugins();
   for (iter = deps.begin(); iter != deps.end(); ++iter)
   {
-    this->StartBundle(m_BundleMap[iter->symbolicName].m_Bundle);
+    BundleMap::const_iterator depIter = m_BundleMap.find(iter->symbolicName);
+    if (depIter != m_BundleMap.end())
+    {
+      if (Bundle::Pointer depBundle = depIter->second.m_Bundle)
+      {
+        this->StartBundle(depBundle);
+      }
+    }
+    else
+    {
+      foreach (QSharedPointer<ctkPlugin> ctkPlugin, ctkPlugins)
+      {
+        if (ctkPlugin->getSymbolicName() == QString::fromStdString(iter->symbolicName))
+        {
+          ctkPlugin->start(0);
+          break;
+        }
+      }
+    }
   }
 }
 

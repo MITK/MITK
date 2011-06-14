@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 // Own includes
 #include "berryISelection.h"
 /// Qmitk
-#include "mitkQtDataManagerDll.h"
+#include <org_mitk_gui_qt_datamanager_Export.h>
 
 //# forward declarations
 namespace mitk

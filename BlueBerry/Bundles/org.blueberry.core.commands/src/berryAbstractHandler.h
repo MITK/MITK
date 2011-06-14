@@ -19,7 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #define BERRYABSTRACTHANDLER_H_
 
 #include "berryIHandler.h"
-#include "berryCommandsDll.h"
+#include <org_blueberry_core_commands_Export.h>
 
 namespace berry {
 

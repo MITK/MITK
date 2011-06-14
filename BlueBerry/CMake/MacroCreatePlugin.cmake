@@ -93,6 +93,12 @@ MACRO(MACRO_CREATE_PLUGIN)
 
 
   INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/src ${CMAKE_CURRENT_BINARY_DIR})
+  IF(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/includes.cmake")
+    INCLUDE(${CMAKE_CURRENT_SOURCE_DIR}/includes.cmake)
+    FOREACH(_added_incldir ${ADDITIONAL_INCLUDE_DIRECTORIES})
+      INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/${_added_incldir})
+    ENDFOREACH()
+   ENDIF()
   _MACRO_SETUP_PLUGIN_DEPENDENCIES(_linklibs)
 
   MACRO_ORGANIZE_SOURCES(SOURCE ${PLUGIN_CPP_FILES}
@@ -145,7 +151,13 @@ MACRO(MACRO_CREATE_PLUGIN)
   # to lib1, instead of lib1d in debug configurations
   SET(_debug_linklibs "")
   FOREACH(_linklib ${PLUGIN_LINK_LIBRARIES})
-    SET(_debug_linklibs ${_debug_linklibs} optimized "${_linklib}" debug "${_linklib}${BLUEBERRY_DEBUG_POSTFIX}")
+    # Use a hack to test if the dependency is a BlueBerry bundle
+    STRING(REPLACE . _ _symbolic_name ${_linklib})
+    IF(EXISTS "${${_symbolic_name}_OUT_DIR}")
+      SET(_debug_linklibs ${_debug_linklibs} optimized "${_linklib}" debug "${_linklib}${BLUEBERRY_DEBUG_POSTFIX}")
+    ELSE()
+      SET(_debug_linklibs ${_debug_linklibs} ${_linklib})
+    ENDIF()
   ENDFOREACH(_linklib)
   
   TARGET_LINK_LIBRARIES(${PLUGIN_TARGET} ${_debug_linklibs})

@@ -115,7 +115,7 @@ IStatus::Pointer Worker::JobRunnable::HandleException(InternalJob::Pointer sptr_
   {
    std::stringstream ss;
    ss << "An internal error occurred while executing the job: " <<  sptr_job->GetName()   ; 
-    IStatus::Pointer sptr_errorStatus(new Status(IStatus::ERROR_TYPE, JobManager::PI_JOBS, JobManager::PLUGIN_ERROR, ss.str(), exception) ) ; 
+    IStatus::Pointer sptr_errorStatus(new Status(IStatus::ERROR_TYPE, JobManager::PI_JOBS(), JobManager::PLUGIN_ERROR, ss.str(), exception) ) ; 
     return sptr_errorStatus ; 
   }
 

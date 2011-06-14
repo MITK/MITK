@@ -20,6 +20,10 @@
 
 #include <berryIBundle.h>
 
+#include <ctkPlugin.h>
+
+#include <QSharedPointer>
+
 namespace berry
 {
 
@@ -38,13 +42,19 @@ public:
   // TODO: needs a better name
   static bool IsReady(IBundle::Pointer bundle);
 
+  static bool IsReady(QSharedPointer<ctkPlugin> plugin);
+
   static bool IsReady(IBundle::State bundleState);
+
+  static bool IsReady(ctkPlugin::State pluginState);
 
   static bool IsActive(const std::string& bundleId);
 
   static bool IsActivated(const std::string& bundleId);
 
   static bool IsReady(const std::string& bundleId);
+
+  static QSharedPointer<ctkPlugin> FindPlugin(const QString& symbName);
 
   //    static URL find(Bundle bundle, String path) {
   //        if (bundle == null) {

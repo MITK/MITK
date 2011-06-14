@@ -42,6 +42,12 @@ QmitkInputDevicesPrefPage::QmitkInputDevicesPrefPage()
   this->m_InputDevicesPrefNode = prefService->GetSystemPreferences()->Node(mitk::CoreExtConstants::INPUTDEVICE_PREFERENCES);
 }
 
+QmitkInputDevicesPrefPage::QmitkInputDevicesPrefPage(const QmitkInputDevicesPrefPage& other)
+{
+  Q_UNUSED(other)
+  throw std::runtime_error("Copy constructor not implemented");
+}
+
 void QmitkInputDevicesPrefPage::Init(berry::IWorkbench::Pointer )
 {
 }

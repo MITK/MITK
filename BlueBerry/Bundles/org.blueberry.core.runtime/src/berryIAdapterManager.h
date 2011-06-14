@@ -20,12 +20,13 @@
 
 #include <berryMacros.h>
 
-#include "berryRuntimeDll.h"
+#include <org_blueberry_core_runtime_Export.h>
 
 #include "berryPlatformObject.h"
 #include "berryIAdapterFactory.h"
 
 #include <Poco/Any.h>
+#include <QtPlugin>
 
 #include <typeinfo>
 
@@ -272,5 +273,7 @@ protected:
 };
 
 } // namespace berry
+
+Q_DECLARE_INTERFACE(berry::IAdapterManager, "org.blueberry.service.IAdapterManager")
 
 #endif /*BERRYIADAPTERMANAGER_H_*/

@@ -21,6 +21,16 @@
 
 namespace berry {
 
+QtDnDTweaklet::QtDnDTweaklet()
+{
+
+}
+
+QtDnDTweaklet::QtDnDTweaklet(const QtDnDTweaklet& other)
+{
+  Q_UNUSED(other)
+}
+
 ITracker* QtDnDTweaklet::CreateTracker()
 {
   return new QtTracker();

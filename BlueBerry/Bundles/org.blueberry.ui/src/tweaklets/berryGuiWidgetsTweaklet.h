@@ -210,4 +210,6 @@ struct BERRY_UI GuiWidgetsTweaklet : public Object
 
 }
 
+Q_DECLARE_INTERFACE(berry::GuiWidgetsTweaklet, "org.blueberry.GuiWidgetsTweaklet")
+
 #endif /* BERRYGUIWIDGETSTWEAKLET_H_ */

@@ -18,8 +18,10 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef BERRYIAPPLICATION_H_
 #define BERRYIAPPLICATION_H_
 
-#include "../berryOSGiDll.h"
+#include <org_blueberry_osgi_Export.h>
 #include "../berryMacros.h"
+
+#include <QObject>
 
 namespace berry {
 
@@ -95,5 +97,7 @@ struct BERRY_OSGI IApplication {
 };
 
 }
+
+Q_DECLARE_INTERFACE(berry::IApplication, "org.blueberry.IApplication")
 
 #endif /*BERRYIAPPLICATION_H_*/

@@ -51,7 +51,7 @@ For more informations see: \ref QmitkPointBasedRegistrationUserManual
 \ingroup PointBasedRegistration
 */
 
-class POINTBASEDREGISTRATION_EXPORT QmitkPointBasedRegistrationView : public QObject, public QmitkFunctionality
+class POINTBASEDREGISTRATION_EXPORT QmitkPointBasedRegistrationView : public QmitkFunctionality
 {
 
   friend struct SelListenerPointBasedRegistration;

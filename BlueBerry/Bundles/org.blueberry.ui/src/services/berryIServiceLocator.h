@@ -19,7 +19,7 @@
 #ifndef BERRYISERVICELOCATOR_H_
 #define BERRYISERVICELOCATOR_H_
 
-#include "../berryUiDll.h"
+#include <org_blueberry_ui_Export.h>
 
 #include <berryObject.h>
 #include <berryMacros.h>

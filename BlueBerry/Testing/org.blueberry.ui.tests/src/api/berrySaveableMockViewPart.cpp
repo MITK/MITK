@@ -29,6 +29,12 @@ SaveableMockViewPart::SaveableMockViewPart() :
 
 }
 
+SaveableMockViewPart::SaveableMockViewPart(const SaveableMockViewPart& other)
+{
+  Q_UNUSED(other)
+  throw std::runtime_error("Copy constructor not implemented");
+}
+
 void SaveableMockViewPart::CreatePartControl(void* parent)
 {
   MockViewPart::CreatePartControl(parent);

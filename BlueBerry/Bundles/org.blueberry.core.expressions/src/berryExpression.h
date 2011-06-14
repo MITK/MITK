@@ -21,7 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "berryExpressionInfo.h"
 #include "berryIEvaluationContext.h"
 #include "berryEvaluationResult.h"
-#include "berryExpressionsDll.h"
+#include <org_blueberry_core_expressions_Export.h>
 
 #include <berryMacros.h>
 #include <berryObject.h>

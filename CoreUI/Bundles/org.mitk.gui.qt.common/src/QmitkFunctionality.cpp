@@ -16,19 +16,19 @@
  =========================================================================*/
 
 #include "QmitkFunctionality.h"
+#include "internal/QmitkFunctionalityUtil.h"
 
 // other includes
-#include "mitkLogMacros.h"
+#include <mitkLogMacros.h>
 
 // mitk Includes
-#include "mitkMessage.h"
-#include "mitkIDataStorageService.h"
-#include "mitkDataStorageEditorInput.h"
-#include <mitkDataNodeObject.h>
+#include <mitkIDataStorageService.h>
+#include <mitkDataStorageEditorInput.h>
 
 // berry Includes
-#include <berryPlatform.h>
 #include <berryIWorkbenchPage.h>
+#include <berryIBerryPreferences.h>
+#include <berryIEditorPart.h>
 
 // Qmitk Includes
 #include <QmitkStdMultiWidgetEditor.h>
@@ -76,7 +76,6 @@ QmitkFunctionality::GetDataStorage() const
   
   return 0;
 }
-
 
 mitk::DataStorage::Pointer QmitkFunctionality::GetDefaultDataStorage() const
 {
@@ -144,8 +143,8 @@ void QmitkFunctionality::AfterCreateQtPartControl()
   this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->AddPostSelectionListener(/*"org.mitk.views.datamanager",*/ m_BlueBerrySelectionListener);
 
   // REGISTER A SELECTION PROVIDER
-  QmitkFunctionality::SelectionProvider::Pointer _SelectionProvider
-    = QmitkFunctionality::SelectionProvider::New(this);
+  QmitkFunctionalitySelectionProvider::Pointer _SelectionProvider
+    = QmitkFunctionalitySelectionProvider::New(this);
   m_SelectionProvider = _SelectionProvider.GetPointer();
   this->GetSite()->SetSelectionProvider(berry::ISelectionProvider::Pointer(m_SelectionProvider));
   
@@ -204,27 +203,7 @@ QmitkFunctionality::~QmitkFunctionality()
   this->UnRegister(false);
 }
 
-std::vector<mitk::DataNode*> QmitkFunctionality::GetCurrentSelection() const
-{
-  berry::ISelection::ConstPointer selection( this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection());
-  // buffer for the data manager selection
-  mitk::DataNodeSelection::ConstPointer currentSelection = selection.Cast<const mitk::DataNodeSelection>();
-  return this->DataNodeSelectionToVector(currentSelection);
-}
-
-std::vector<mitk::DataNode*> QmitkFunctionality::GetDataManagerSelection() const
-{
-  berry::ISelection::ConstPointer selection( this->GetSite()->GetWorkbenchWindow()->GetSelectionService()->GetSelection("org.mitk.views.datamanager"));
-    // buffer for the data manager selection
-  mitk::DataNodeSelection::ConstPointer currentSelection = selection.Cast<const mitk::DataNodeSelection>();
-  return this->DataNodeSelectionToVector(currentSelection);
-}
-
 void QmitkFunctionality::OnPreferencesChanged( const berry::IBerryPreferences* )
-{
-}
-
-void QmitkFunctionality::OnSelectionChanged(std::vector<mitk::DataNode*> /*nodes*/)
 {
 }
 
@@ -236,32 +215,6 @@ void QmitkFunctionality::BlueBerrySelectionChanged(berry::IWorkbenchPart::Pointe
   mitk::DataNodeSelection::ConstPointer _DataNodeSelection 
     = selection.Cast<const mitk::DataNodeSelection>();
   this->OnSelectionChanged(this->DataNodeSelectionToVector(_DataNodeSelection));
-}
-
-
-std::vector<mitk::DataNode*> QmitkFunctionality::DataNodeSelectionToVector(mitk::DataNodeSelection::ConstPointer currentSelection) const
-{
-
-  std::vector<mitk::DataNode*> selectedNodes;
-  if(currentSelection.IsNull())
-    return selectedNodes;
-
-  mitk::DataNodeObject* _DataNodeObject = 0;
-  mitk::DataNode* _DataNode = 0;
-
-  for(mitk::DataNodeSelection::iterator it = currentSelection->Begin();
-    it != currentSelection->End(); ++it)
-  {
-    _DataNodeObject = dynamic_cast<mitk::DataNodeObject*>((*it).GetPointer());
-    if(_DataNodeObject)
-    {
-      _DataNode = _DataNodeObject->GetDataNode();
-      if(_DataNode)
-        selectedNodes.push_back(_DataNode);
-    }
-  }
-
-  return selectedNodes;
 }
 
 bool QmitkFunctionality::IsVisible() const
@@ -286,41 +239,6 @@ void QmitkFunctionality::StdMultiWidgetAvailable( QmitkStdMultiWidget&  /*stdMul
 }
 void QmitkFunctionality::StdMultiWidgetNotAvailable()
 {
-}
-
-void QmitkFunctionality::NodeAddedProxy( const mitk::DataNode* node )
-{
-  // garantuee no recursions when a new node event is thrown in NodeAdded()
-  if(!m_InDataStorageChanged)
-  {
-    m_InDataStorageChanged = true;
-    this->NodeAdded(node);
-    this->DataStorageChanged();
-    m_InDataStorageChanged = false;
-  }
-
-}
-
-void QmitkFunctionality::NodeAdded( const mitk::DataNode*  /*node*/ )
-{
-
-}
-
-void QmitkFunctionality::NodeRemovedProxy( const mitk::DataNode* node )
-{
-  // garantuee no recursions when a new node event is thrown in NodeAdded()
-  if(!m_InDataStorageChanged)
-  {
-    m_InDataStorageChanged = true;
-    this->NodeRemoved(node);
-    this->DataStorageChanged();
-    m_InDataStorageChanged = false;
-  }
-}
-
-void QmitkFunctionality::NodeRemoved( const mitk::DataNode*  /*node*/ )
-{
-
 }
 
 void QmitkFunctionality::DataStorageChanged()
@@ -359,7 +277,6 @@ void QmitkFunctionality::HandleException( const char* str, QWidget* parent, bool
     QMessageBox::critical ( parent, "Exception caught!", str );
   }
 }
-
 
 void QmitkFunctionality::HandleException( std::exception& e, QWidget* parent, bool showDialog ) const
 {
@@ -414,23 +331,6 @@ void QmitkFunctionality::Hidden()
 
 }
 
-void QmitkFunctionality::NodeChanged( const mitk::DataNode* /*node*/ )
-{
-
-}
-
-void QmitkFunctionality::NodeChangedProxy( const mitk::DataNode* node )
-{
-  // garantuee no recursions when a new node event is thrown in NodeAdded()
-  if(!m_InDataStorageChanged)
-  {
-    m_InDataStorageChanged = true;
-    this->NodeChanged(node);
-    this->DataStorageChanged();
-    m_InDataStorageChanged = false;
-  }
-}
-
 bool QmitkFunctionality::IsExclusiveFunctionality() const
 {
   return true;
@@ -451,66 +351,3 @@ bool QmitkFunctionality::IsActivated() const
   return m_Active;
 }
 
-QmitkFunctionality::SelectionProvider::SelectionProvider( QmitkFunctionality* _Functionality )
-: m_Functionality(_Functionality)
-{
-
-}
-
-QmitkFunctionality::SelectionProvider::~SelectionProvider()
-{
-  m_Functionality = 0;
-}
-
-void QmitkFunctionality::SelectionProvider::AddSelectionChangedListener( berry::ISelectionChangedListener::Pointer listener )
-{
-  m_SelectionEvents.AddListener(listener);
-}
-
-
-berry::ISelection::ConstPointer QmitkFunctionality::SelectionProvider::GetSelection() const
-{
-  return m_CurrentSelection;
-}
-
-void QmitkFunctionality::SelectionProvider::RemoveSelectionChangedListener( berry::ISelectionChangedListener::Pointer listener )
-{
-  m_SelectionEvents.RemoveListener(listener);
-}
-
-void QmitkFunctionality::SelectionProvider::SetSelection( berry::ISelection::Pointer selection )
-{
-  m_CurrentSelection = selection.Cast<mitk::DataNodeSelection>();
-}
-
-void QmitkFunctionality::SelectionProvider::FireNodesSelected( std::vector<mitk::DataNode::Pointer> nodes )
-{
-  mitk::DataNodeSelection::Pointer sel(new mitk::DataNodeSelection(nodes));
-  m_CurrentSelection = sel;
-  berry::SelectionChangedEvent::Pointer event(new berry::SelectionChangedEvent(berry::ISelectionProvider::Pointer(this)
-    , m_CurrentSelection));
-  m_SelectionEvents.selectionChanged(event);
-
-}
-
-void QmitkFunctionality::FireNodeSelected( mitk::DataNode* node )
-{
-  std::vector<mitk::DataNode*> nodes;
-  nodes.push_back(node);
-  this->FireNodesSelected(nodes);
-}
-
-void QmitkFunctionality::FireNodesSelected( std::vector<mitk::DataNode*> nodes )
-{
-  if( !m_SelectionProvider )
-    return;
-
-  std::vector<mitk::DataNode::Pointer> nodesSmartPointers;
-  for (std::vector<mitk::DataNode*>::iterator it = nodes.begin()
-    ; it != nodes.end(); it++)
-  {
-    nodesSmartPointers.push_back( *it );
-  }
-  m_SelectionProvider->FireNodesSelected(nodesSmartPointers);
-
-}

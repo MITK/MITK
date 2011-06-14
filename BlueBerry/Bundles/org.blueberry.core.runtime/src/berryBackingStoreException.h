@@ -1,7 +1,7 @@
 #ifndef BERRYBACKINGSTOREEXCEPTION_H_
 #define BERRYBACKINGSTOREEXCEPTION_H_
 
-#include "berryRuntimeDll.h"
+#include <org_blueberry_core_runtime_Export.h>
 #include <Poco/Exception.h>
 
 namespace berry 

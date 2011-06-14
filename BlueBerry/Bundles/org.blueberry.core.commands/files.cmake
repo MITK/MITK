@@ -1,3 +1,7 @@
+SET(MOC_H_FILES
+  src/internal/berryPluginActivator.h
+)
+
 SET(SRC_CPP_FILES
   berryAbstractHandler.cpp
   berryCommand.cpp
@@ -39,6 +43,7 @@ SET(COMMON_CPP_FILES
 
 SET(INTERNAL_CPP_FILES
   berryCommandUtils.cpp
+  berryPluginActivator.cpp
 )
 
 foreach(file ${SRC_CPP_FILES})

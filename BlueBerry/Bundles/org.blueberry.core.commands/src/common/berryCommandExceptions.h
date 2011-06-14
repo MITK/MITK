@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef BERRYCOMMANDEXCEPTIONS_H_
 #define BERRYCOMMANDEXCEPTIONS_H_
 
-#include "../berryCommandsDll.h"
+#include <org_blueberry_core_commands_Export.h>
 
 #include <Poco/Exception.h>
 

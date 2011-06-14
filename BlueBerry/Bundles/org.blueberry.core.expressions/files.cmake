@@ -1,3 +1,11 @@
+SET(MOC_H_FILES
+  src/internal/berryPluginActivator.h
+)
+
+SET(CACHED_RESOURCE_FILES
+  plugin.xml
+)
+
 SET(SRC_CPP_FILES
   berryElementHandler.cpp
   berryEvaluationContext.cpp
@@ -23,6 +31,7 @@ SET(INTERNAL_CPP_FILES
   berryIterateExpression.cpp
   berryNotExpression.cpp
   berryOrExpression.cpp
+  berryPluginActivator.cpp
   berryProperty.cpp
   berryPropertyTesterDescriptor.cpp
   berryReferenceExpression.cpp

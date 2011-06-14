@@ -26,10 +26,15 @@
 namespace berry {
 
 
-class QtWidgetsTweaklet : public GuiWidgetsTweaklet
+class QtWidgetsTweaklet : public QObject, public GuiWidgetsTweaklet
 {
+  Q_OBJECT
+  Q_INTERFACES(berry::GuiWidgetsTweaklet)
 
 public:
+
+  QtWidgetsTweaklet();
+  QtWidgetsTweaklet(const QtWidgetsTweaklet& other);
 
   void AddSelectionListener(void* widget, GuiTk::ISelectionListener::Pointer listener);
   void RemoveSelectionListener(void* widget, GuiTk::ISelectionListener::Pointer listener);

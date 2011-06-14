@@ -32,7 +32,7 @@ text(""), doit(true)
 
 }
 
-std::string Event::ToString()
+std::string Event::ToString() const
 {
   std::stringstream stream;
   stream << "GUI SelectionEvent: " << " item=" << item << " detail=" << detail

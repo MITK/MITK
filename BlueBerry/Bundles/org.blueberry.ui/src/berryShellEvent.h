@@ -19,7 +19,7 @@
 #ifndef BERRYSHELLEVENT_H_
 #define BERRYSHELLEVENT_H_
 
-#include "berryUiDll.h"
+#include <org_blueberry_ui_Export.h>
 
 #include <berryMacros.h>
 #include <berryObject.h>

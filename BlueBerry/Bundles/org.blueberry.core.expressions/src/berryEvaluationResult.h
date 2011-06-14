@@ -20,7 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <string>
 
-#include "berryExpressionsDll.h"
+#include <org_blueberry_core_expressions_Export.h>
 
 namespace berry {
 

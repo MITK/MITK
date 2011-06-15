@@ -36,12 +36,19 @@ m_CalculateBoundingBox( false )
 mitk::Surface::Surface(const mitk::Surface& other) : m_CalculateBoundingBox(other.m_CalculateBoundingBox), m_RequestedRegion(other.m_RequestedRegion),
 m_LargestPossibleRegion(other.m_LargestPossibleRegion)
 {
-  m_PolyDataSeries = std::vector<vtkPolyData*>();
-  for ( VTKPolyDataSeries::const_iterator it = other.m_PolyDataSeries.begin(); it != other.m_PolyDataSeries.end(); ++it )
+  if(other.m_PolyDataSeries.at(0) != NULL)
   {
-    vtkSmartPointer<vtkPolyData> poly = vtkSmartPointer<vtkPolyData>::New();
-    poly->DeepCopy(*it);
-    m_PolyDataSeries.push_back(poly.GetPointer());   
+    m_PolyDataSeries = std::vector<vtkPolyData*>();
+    for ( VTKPolyDataSeries::const_iterator it = other.m_PolyDataSeries.begin(); it != other.m_PolyDataSeries.end(); ++it )
+    {
+      vtkSmartPointer<vtkPolyData> poly = vtkSmartPointer<vtkPolyData>::New();
+      poly->DeepCopy(*it);
+      m_PolyDataSeries.push_back(poly.GetPointer());   
+    }
+  }
+  else
+  {
+    this->InitializeEmpty();
   }
 }
 

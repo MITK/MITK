@@ -24,9 +24,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "ipFunc/mitkIpFunc.h"
 #include "mitkIpPicTypeMultiplex.h"
 
-#include <itkSmartPointerForwardReference.txx>
-
 #include <vtkImageData.h>
+#include <itkSmartPointerForwardReference.txx>
 
 
 template class MITK_CORE_EXPORT itk::SmartPointerForwardReference<mitk::ImageDataItem>;

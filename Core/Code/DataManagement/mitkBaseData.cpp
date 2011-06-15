@@ -34,6 +34,15 @@ mitk::BaseData::BaseData() :
   m_PropertyList = PropertyList::New(); 
 }
 
+  mitk::BaseData::BaseData( const BaseData &other ): m_RequestedRegionInitialized(other.m_RequestedRegionInitialized), 
+    m_SmartSourcePointer(other.m_SmartSourcePointer), m_SourceOutputIndexDuplicate(other.m_SourceOutputIndexDuplicate),
+    m_Initialized(other.m_Initialized), m_Unregistering(other.m_Unregistering),
+    m_CalculatingExternalReferenceCount(other.m_CalculatingExternalReferenceCount),
+    m_ExternalReferenceCount(other.m_ExternalReferenceCount)
+  {
+    m_TimeSlicedGeometry = other.m_TimeSlicedGeometry->CloneCopy();
+    m_PropertyList = other.m_PropertyList->Clone(); 
+  }
 mitk::BaseData::~BaseData() 
 {
   m_SmartSourcePointer = NULL;

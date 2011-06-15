@@ -149,7 +149,7 @@ public:
   //##Documentation
   //## @brief duplicates the geometry
   virtual AffineGeometryFrame3D::Pointer Clone() const;
-
+  TimeSlicedGeometry::Pointer CloneCopy() const;
   virtual void ExecuteOperation(Operation* operation);
 protected:
   TimeSlicedGeometry();

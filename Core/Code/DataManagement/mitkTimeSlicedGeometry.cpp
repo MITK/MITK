@@ -367,6 +367,14 @@ mitk::AffineGeometryFrame3D::Pointer mitk::TimeSlicedGeometry::Clone() const
   return newGeometry.GetPointer();
 }
 
+mitk::TimeSlicedGeometry::Pointer mitk::TimeSlicedGeometry::CloneCopy() const
+{
+  Self::Pointer newGeometry = Self::New();
+  newGeometry->Initialize(m_TimeSteps);
+  InitializeGeometry(newGeometry);
+  return newGeometry.GetPointer();
+}
+
 void mitk::TimeSlicedGeometry::InitializeGeometry(Self * newGeometry) const
 {
   Superclass::InitializeGeometry(newGeometry);

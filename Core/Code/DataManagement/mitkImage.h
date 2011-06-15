@@ -25,6 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkBaseData.h"
 #include "mitkLevelWindow.h"
 #include "mitkPlaneGeometry.h"
+#include "mitkImageDataItem.h"
 
 #ifndef __itkHistogram_h
 #include <itkHistogram.h>
@@ -35,7 +36,7 @@ class vtkImageData;
 namespace mitk {
 
 class SubImageSelector;
-class ImageDataItem;
+//class ImageDataItem;
 class ImageTimeSelector;
 
 //##Documentation

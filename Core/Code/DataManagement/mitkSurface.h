@@ -38,9 +38,7 @@ namespace mitk {
     typedef itk::ImageRegion< 5 >  RegionType;  
 
     mitkClassMacro(Surface, BaseData);
-
     itkNewMacro(Self);
-
     mitkCloneMacro(Surface);
 
     virtual void SetVtkPolyData(vtkPolyData* polydata, unsigned int t = 0);
@@ -106,13 +104,11 @@ namespace mitk {
 
     virtual void InitializeEmpty();
 
-    VTKPolyDataSeries m_PolyDataSeries;
-
-    mutable RegionType m_LargestPossibleRegion;
-
+    //member variables
+    VTKPolyDataSeries m_PolyDataSeries;           /// variable holds the poly datas of the surface
+    mutable RegionType m_LargestPossibleRegion;   /// variable holds the largest possible region the surface is contained in
     RegionType m_RequestedRegion;
-
-    bool m_CalculateBoundingBox;
+    bool m_CalculateBoundingBox;                 /// flag to calculate the bounding box
   };
 
 } // namespace mitk

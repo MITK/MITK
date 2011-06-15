@@ -80,8 +80,8 @@ void mitk::ImageVtkMapper2D::AdjustCamera(mitk::BaseRenderer* renderer)
   //  double zoomFactor = displayHeightInMM/imageHeightInMM; //determine how much of the image can be displayed
   double zoomFactor = imageHeightInMM/displayHeightInMM; //determine how much of the image can be displayed
 
-  Vector2D displayGeometryOriginInMM = displayGeometry->GetOriginInMM();  //top left of the render window
-  Vector2D displayGeometryCenterInMM = displayGeometryOriginInMM + displayGeometry->GetSizeInMM()/2; //center of the render window
+  Vector2D displayGeometryOriginInMM = displayGeometry->GetOriginInMM();  //top left of the render window (Origin)
+  Vector2D displayGeometryCenterInMM = displayGeometryOriginInMM + displayGeometry->GetSizeInMM()*0.5; //center of the render window: (Origin + Size/2)
 
   //Scale the rendered object:
   //The image is scaled by a single factor, because in an orthographic projection sizes
@@ -89,7 +89,7 @@ void mitk::ImageVtkMapper2D::AdjustCamera(mitk::BaseRenderer* renderer)
   //parameter sets the size of the total display-volume. If you set this to the image
   //height, the image plus a border with the size of the image will be rendered.
   //Therefore, the size is imageHeightInMM / 2.
-  renderer->GetVtkRenderer()->GetActiveCamera()->SetParallelScale(imageHeightInMM / 2);
+  renderer->GetVtkRenderer()->GetActiveCamera()->SetParallelScale(imageHeightInMM*0.5 );
   //zooming with the factor calculated by dividing displayHeight through imegeHeight. The factor is inverse, because the VTK zoom method is working inversely.
   renderer->GetVtkRenderer()->GetActiveCamera()->Zoom(zoomFactor);
 
@@ -196,7 +196,7 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
 {
   LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
 
-  mitk::Image *input = const_cast< mitk::Image * >( this->GetInput() ); //TODO WTF CONST CAST?!?!?111
+  mitk::Image *input = const_cast< mitk::Image * >( this->GetInput() ); //TODO WTF CONST CAST?!?!?111 => Error in class design?
 
   if ( input == NULL )
   {
@@ -565,8 +565,6 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
   //set the current slice as texture for the plane
   localStorage->m_Texture->SetInput(localStorage->m_ReslicedImage);
 
-  //apply the properties after the slice was set
-  this->ApplyProperties( renderer );
   //set the size textured plane
   this->GeneratePlane( renderer, sliceBounds );
 
@@ -582,29 +580,12 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
 
   trans->SetMatrix(matrix);
 
-  //transform the plane to the corresponding view (transversal, coronal or saggital)
-  localStorage->m_TransformFilter->SetTransform(trans);
-  localStorage->m_TransformFilter->SetInputConnection(localStorage->m_Plane->GetOutputPort());
-  localStorage->m_TransformFilter->Update();
-  localStorage->m_Mapper->SetInputConnection(localStorage->m_TransformFilter->GetOutputPort());
+  //apply the properties after the slice was set
+  this->ApplyProperties( renderer, trans );
 
   //set up the camera to view the transformed plane
   this->AdjustCamera( renderer );
 
-  //TODO remove this later
-  //    static int counter = 0;
-  //    if(counter < 3)
-  //    {
-  //      mitk::Surface::Pointer surf = mitk::Surface::New();
-  //      surf->SetVtkPolyData(localStorage->m_Mapper->GetInput());
-  //      surf->Update();
-
-  //      mitk::DataNode::Pointer node = mitk::DataNode::New();
-  //      node->SetData(surf);
-  //      renderer->GetDataStorage()->Add(node);
-  //      counter++;
-  //    }
-  //    //TODO remove this later
   //    renderer->GetVtkRenderer()->SetBackground(1, 1, 1);
 
   //Transform the camera to the current position (transveral, coronal and saggital plane).
@@ -745,7 +726,7 @@ void mitk::ImageVtkMapper2D::Clear()
   m_RendererInfo.clear();
 }
 
-void mitk::ImageVtkMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
+void mitk::ImageVtkMapper2D::ApplyProperties(mitk::BaseRenderer* renderer, vtkSmartPointer<vtkTransform> transform)
 {
   //get the current localStorage for the corresponding renderer
   LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
@@ -860,6 +841,12 @@ void mitk::ImageVtkMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
     localStorage->m_Actor->GetProperty()->SetColor(1.0, 1.0, 1.0);
   }
 
+  bool binaryOutline = false;
+  this->GetDataNode()->GetBoolProperty( "outline binary", binaryOutline, renderer );
+  localStorage->m_Mapper->ScalarVisibilityOn();
+
+  vtkSmartPointer<vtkMarchingSquares> contourFilter = vtkSmartPointer<vtkMarchingSquares>::New();
+
   if ( binary )
   {
     finalLookuptable->SetAlphaRange(0.0, 1.0);
@@ -867,89 +854,18 @@ void mitk::ImageVtkMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
     //0 is already mapped to transparent.
     //1 is now mapped to the current color and alpha
 
-    bool binaryOutline = false;
-    this->GetDataNode()->GetBoolProperty( "outline binary", binaryOutline, renderer );
     if ( this->GetInput()->GetPixelType().GetBpe() <= 8 )
     {
       if (binaryOutline)
       {
-//        localStorage->m_ReslicedImage->Print(std::cout);
-
-//        int points = localStorage->m_ReslicedImage->GetNumberOfPoints();
-//               MITK_INFO << "############################# ANFANG";
-//        int* dims = localStorage->m_ReslicedImage->GetDimensions();
-
-        // Fill every entry of the image data with "2.0"
-//        for (int z = 0; z < dims[2]; z++)
-//          {
-//          for (int y = 0; y < dims[1]/2; y++)
-//            {
-//            for (int x = 0; x < dims[0]/2; x++)
-//              {
-//              double* pixel = static_cast<double*>(localStorage->m_ReslicedImage->GetScalarPointer(x,y,z));
-//              pixel[0] = 1.0;
-//              }
-//            }
-//          }
-
-        // Retrieve the entries from the image data and print them to the screen
-//        for (int z = 0; z < dims[2]; z++)
-//          {
-//          for (int y = 0; y < dims[1]; y++)
-//            {
-//            for (int x = 0; x < dims[0]; x++)
-//              {
-//              char* pixel = static_cast<char*>(localStorage->m_ReslicedImage->GetScalarPointer(x,y,z));
-//              // do something with v
-//              std::cout << (int)pixel[0] << " ";
-//              }
-//            std::cout << std::endl;
-//            }
-//          std::cout << std::endl;
-//          }
-        vtkSmartPointer<vtkImageData> img = vtkSmartPointer<vtkImageData>::New();
-        img->SetScalarTypeToDouble();
-        img->DeepCopy(localStorage->m_ReslicedImage);
-
-        vtkSmartPointer<vtkMarchingContourFilter> contourFilter = vtkSmartPointer<vtkMarchingContourFilter>::New();
-
-//        contourFilter->SetInput(localStorage->m_ReslicedImage);
-        contourFilter->SetInput(img);
-        contourFilter->GenerateValues(1, 1.0, 1.0);
+        contourFilter->SetInput(localStorage->m_ReslicedImage);
+        contourFilter->SetValue(1, 1.0);
         contourFilter->Update();
-
-//        MITK_INFO << "############################# ENDE";
-
-
-        vtkSmartPointer<vtkPolyDataMapper> mapper =
-            vtkSmartPointer<vtkPolyDataMapper>::New();
-        mapper->SetInputConnection(contourFilter->GetOutputPort());
-
-//        localStorage->m_Mapper->SetInputConnection(contourFilter->GetOutputPort());
-
-        vtkSmartPointer<vtkActor> actor =
-            vtkSmartPointer<vtkActor>::New();
-        actor->SetMapper(mapper);
-
-        vtkSmartPointer<vtkRenderer> ren =
-          vtkSmartPointer<vtkRenderer>::New();
-        vtkSmartPointer<vtkRenderWindow> renderWindow =
-          vtkSmartPointer<vtkRenderWindow>::New();
-        renderWindow->AddRenderer(ren);
-        vtkSmartPointer<vtkRenderWindowInteractor> renderWindowInteractor =
-            vtkSmartPointer<vtkRenderWindowInteractor>::New();
-        renderWindowInteractor->SetRenderWindow(renderWindow);
-        ren->AddActor(actor);
-
-        renderWindow->Render();
-        renderWindowInteractor->Start();
-
-
 
         float binaryOutlineWidth(1.0);
         if (this->GetDataNode()->GetFloatProperty( "outline width", binaryOutlineWidth, renderer ))
         {
-          //          image->setOutlineWidth(binaryOutlineWidth);
+          localStorage->m_Actor->GetProperty()->SetLineWidth(binaryOutlineWidth);
         }
       }
     }
@@ -968,16 +884,8 @@ void mitk::ImageVtkMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
       this->GetLevelWindow( levelWindow, renderer );
     }
 
-    ScalarType windowMin = 0.0;
-    ScalarType windowMax = 255.0;
-
-    //get the level window
-    //  GetLevelWindow(levelWindow, renderer);
-    windowMin = levelWindow.GetLowerWindowBound();
-    windowMax = levelWindow.GetUpperWindowBound();
-
     //set up the lookuptable with the level window range
-    finalLookuptable->SetRange( windowMin, windowMax );
+    finalLookuptable->SetRange( levelWindow.GetLowerWindowBound(), levelWindow.GetUpperWindowBound() );
 
     // obtain and apply opacity level window
     mitk::LevelWindow opacLevelWindow;
@@ -992,6 +900,44 @@ void mitk::ImageVtkMapper2D::ApplyProperties(mitk::BaseRenderer* renderer)
   }
   //use the finalLookuptable for mapping the colors
   localStorage->m_Texture->SetLookupTable( finalLookuptable );
+
+  //transform the plane to the corresponding view (transversal, coronal or saggital)
+  localStorage->m_TransformFilter->SetTransform(transform);
+  if(binaryOutline && binary)
+  {
+    localStorage->m_TransformFilter->SetInputConnection(contourFilter->GetOutputPort());
+    localStorage->m_Actor->SetTexture(NULL);
+  }
+  else
+  {
+    //transform the plane to the corresponding view (transversal, coronal or saggital)
+    localStorage->m_TransformFilter->SetInputConnection(localStorage->m_Plane->GetOutputPort());
+    //set the texture for the actor
+    localStorage->m_Actor->SetTexture(localStorage->m_Texture);
+//    vtkSmartPointer<vtkPolyDataMapper> mapper =
+//        vtkSmartPointer<vtkPolyDataMapper>::New();
+//    mapper->SetInputConnection(localStorage->m_TransformFilter->GetOutputPort());
+////        mapper->SetScalarRange(scalarRange);
+//    mapper->ScalarVisibilityOff();
+//            vtkSmartPointer<vtkActor> actor =
+//                vtkSmartPointer<vtkActor>::New();
+//            actor->SetMapper(mapper);
+//    //        actor->GetProperty()->SetLineWidth(1.0);
+//            vtkSmartPointer<vtkRenderer> ren =
+//              vtkSmartPointer<vtkRenderer>::New();
+//            vtkSmartPointer<vtkRenderWindow> renderWindow =
+//              vtkSmartPointer<vtkRenderWindow>::New();
+//            renderWindow->AddRenderer(ren);
+//            vtkSmartPointer<vtkRenderWindowInteractor> renderWindowInteractor =
+//                vtkSmartPointer<vtkRenderWindowInteractor>::New();
+//            renderWindowInteractor->SetRenderWindow(renderWindow);
+//            ren->AddActor(actor);
+//            renderWindow->Render();
+//            renderWindowInteractor->Start();
+  }
+  localStorage->m_TransformFilter->Update();
+  localStorage->m_Mapper->SetInputConnection(localStorage->m_TransformFilter->GetOutputPort());
+  localStorage->m_Mapper->ScalarVisibilityOff();
 }
 
 void mitk::ImageVtkMapper2D::Update(mitk::BaseRenderer* renderer)
@@ -1255,6 +1201,4 @@ mitk::ImageVtkMapper2D::LocalStorage::LocalStorage()
 
   //set the mapper for the actor
   m_Actor->SetMapper(m_Mapper);
-  //set the texture for the actor
-  m_Actor->SetTexture(m_Texture);
 }

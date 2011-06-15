@@ -109,7 +109,7 @@ namespace mitk {
    * data. */
     virtual void Update(mitk::BaseRenderer * renderer);
 
-    virtual void ApplyProperties(mitk::BaseRenderer* renderer);
+    virtual void ApplyProperties(mitk::BaseRenderer* renderer, vtkSmartPointer<vtkTransform> transform);
 
     virtual vtkProp* GetVtkProp(mitk::BaseRenderer* renderer);
 

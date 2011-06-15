@@ -216,6 +216,8 @@ int mitk::VtkPropRenderer::Render(mitk::VtkPropRenderer::RenderType type)
     //Workarround for bug GL_TEXTURE_2D
     GLboolean mode;
     GLenum bit = GL_TEXTURE_2D;
+    GLfloat lineWidth;
+    glGetFloatv(GL_LINE_WIDTH, &lineWidth);
     glGetBooleanv(bit, &mode);
 
     switch(type)
@@ -232,6 +234,9 @@ int mitk::VtkPropRenderer::Render(mitk::VtkPropRenderer::RenderType type)
       glEnable(bit);
     else
       glDisable(bit);
+
+    glLineWidth(lineWidth);
+
   }
   
   if (lastVtkBased == false)

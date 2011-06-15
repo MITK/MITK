@@ -65,7 +65,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkImageWriterFactory.h"
 #include "mitkPointSetWriterFactory.h"
 #include "mitkSurfaceVtkWriterFactory.h"
-#include "mitkImageVtkMapper2D.h"
 
 mitk::CoreObjectFactory::FileWriterList mitk::CoreObjectFactory::m_FileWriters;
 
@@ -205,18 +204,9 @@ mitk::Mapper::Pointer mitk::CoreObjectFactory::CreateMapper(mitk::DataNode* node
       else if((dynamic_cast<PointSet*>(data)!=NULL))
       {
         newMapper = mitk::PointSetVtkMapper3D::New();
-        //newMapper = mitk::EnhancedPointSetVtkMapper3D::New(); // <-- use this if you want to try the new work in progres point set mapper
         newMapper->SetDataNode(node);
       }
     }
-//    else if ( id == mitk::BaseRenderer::Extended2D )
-//    {
-//      if((dynamic_cast<Image*>(data)!=NULL))
-//      {
-//        newMapper = mitk::ImageVtkMapper2D::New();
-//        newMapper->SetDataNode(node);
-//      }
-//    }
   }
 
   return newMapper;

@@ -22,4 +22,5 @@ SET(MITK_EXT_PLUGINS
   org.mitk.gui.qt.rigidregistration:ON
   org.mitk.gui.qt.imagestatistics:OFF
   org.mitk.gui.qt.volumetry:OFF
+  org.mitk.gui.qt.materialeditor:OFF
   )

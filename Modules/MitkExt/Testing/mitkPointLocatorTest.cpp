@@ -97,7 +97,7 @@ int mitkPointLocatorTest(int /*argc*/, char* /*argv*/[])
   // verify, that the point ids are the same.
   vtkFloatingPointType p[3], x, y, z;
   mitk::PointSet::PointType pointType;
-  for ( unsigned int i = 0 ; i < 1000 ; ++i )
+  for ( unsigned int i = 0 ; i < 100 ; ++i )
   {
     GenerateRandomPoint( x, y, z );
     p[0] = x;
@@ -140,16 +140,25 @@ int mitkPointLocatorTest(int /*argc*/, char* /*argv*/[])
     mitk::PointLocator::DistanceType minimalDistanceVtk = mitkPointLocatorInitializedByVtkPointSet->GetMinimalDistance(pointType);
     mitk::PointLocator::DistanceType minimalDistanceItk = mitkPointLocatorInitializedByITKPointSet->GetMinimalDistance(pointType);
     mitk::PointLocator::DistanceType minimalDistanceMITK = mitkPointLocatorInitializedByMITKPointSet->GetMinimalDistance(pointType);
-    MITK_INFO << minimalDistanceReference;
-    MITK_INFO << minimalDistanceVtk;
-    MITK_INFO << minimalDistanceItk;
-    MITK_INFO << minimalDistanceMITK;
     MITK_TEST_CONDITION_REQUIRED(mitk::Equal(minimalDistanceReference,minimalDistanceVtk), "Test GetMinimalDistance() using a PointLocator initialized with a vtkPointSet" );
     MITK_TEST_CONDITION_REQUIRED(mitk::Equal(minimalDistanceReference,minimalDistanceItk), "Test GetMinimalDistance() using a PointLocator initialized with a itkPointSet" );
     MITK_TEST_CONDITION_REQUIRED(mitk::Equal(minimalDistanceReference,minimalDistanceMITK), "Test GetMinimalDistance() using a PointLocator initialized with a MITKPointSet" );
-    //MITK_TEST_CONDITION_REQUIRED((fabs(minimalDistanceReference-minimalDistanceVtk)<0.0001), "Test GetMinimalDistance() using a PointLocator initialized with a vtkPointSet" );
-    //MITK_TEST_CONDITION_REQUIRED((fabs(minimalDistanceReference-minimalDistanceItk)<0.0001), "Test GetMinimalDistance() using a PointLocator initialized with a itkPointSet" );
-    //MITK_TEST_CONDITION_REQUIRED((fabs(minimalDistanceReference-minimalDistanceMITK)<0.0001), "Test GetMinimalDistance() using a PointLocator initialized with a MITKPointSet" );
+
+    int closestPointCombinedVtk;
+    mitk::PointLocator::DistanceType minimalDistanceCombinedVtk;
+    mitkPointLocatorInitializedByVtkPointSet->FindClosestPointAndDistance(pointType,&closestPointCombinedVtk,&minimalDistanceCombinedVtk);
+    int closestPointCombinedITK;
+    mitk::PointLocator::DistanceType minimalDistanceCombinedITK;
+    mitkPointLocatorInitializedByITKPointSet->FindClosestPointAndDistance(pointType,&closestPointCombinedITK,&minimalDistanceCombinedITK);
+    int closestPointCombinedMITK;
+    mitk::PointLocator::DistanceType minimalDistanceCombinedMITK;
+    mitkPointLocatorInitializedByMITKPointSet->FindClosestPointAndDistance(pointType,&closestPointCombinedMITK,&minimalDistanceCombinedMITK);
+    MITK_TEST_CONDITION_REQUIRED(mitk::Equal(minimalDistanceReference,minimalDistanceCombinedVtk), "Test distance returned by FindClosestPointAndDistance() using a PointLocator initialized with a vtkPointSet" );
+    MITK_TEST_CONDITION_REQUIRED(mitk::Equal(minimalDistanceReference,minimalDistanceCombinedITK), "Test distance returned by FindClosestPointAndDistance() using a PointLocator initialized with a itkPointSet" );
+    MITK_TEST_CONDITION_REQUIRED(mitk::Equal(minimalDistanceReference,minimalDistanceCombinedMITK), "Test distance returned by FindClosestPointAndDistance() using a PointLocator initialized with a MITKPointSet" );
+    MITK_TEST_CONDITION_REQUIRED(closestPointReference==closestPointCombinedVtk,"Test closest point returned by FindClosestPointAndDistance() using a point array with a PointLocator initialized with a vtkPointSet");
+    MITK_TEST_CONDITION_REQUIRED(closestPointReference==closestPointCombinedITK,"Test closest point returned by FindClosestPointAndDistance() using a point array with a PointLocator initialized with a itkPointSet");
+    MITK_TEST_CONDITION_REQUIRED(closestPointReference==closestPointCombinedMITK,"Test closest point returned by FindClosestPointAndDistance() using a point array with a PointLocator initialized with a MITKPointSet");
   }  
 
   vtkPointLoc->Delete();

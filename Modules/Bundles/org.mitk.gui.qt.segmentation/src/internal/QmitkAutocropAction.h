@@ -12,6 +12,7 @@
 class MITK_QT_SEGMENTATION QmitkAutocropAction : public QObject, public mitk::IContextMenuAction
 {
   Q_OBJECT
+  Q_INTERFACES(mitk::IContextMenuAction)
 
 public:
 

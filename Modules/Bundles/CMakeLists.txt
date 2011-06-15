@@ -39,6 +39,7 @@ IF(MITK_USE_BLUEBERRY)
     org.mitk.gui.qt.deformableregistration
     org.mitk.gui.qt.rigidregistration
     org.mitk.gui.qt.imagestatistics
+    org.mitk.gui.qt.materialeditor
   )
 
   MACRO_COLLECT_PLUGINS(OUTPUT_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/ExtBundles

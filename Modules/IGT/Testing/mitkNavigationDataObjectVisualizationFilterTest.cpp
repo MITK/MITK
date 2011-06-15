@@ -293,11 +293,13 @@ int mitkNavigationDataObjectVisualizationFilterTest(int /* argc */, char* /*argv
   mitk::AffineTransform3D::OutputVectorType updatedOffset2 = updatedAffineTransform2->GetOffset();
   MITK_TEST_CONDITION(mitk::Equal(updatedOffset2.Get_vnl_vector(),zero.Get_vnl_vector()), "Testing updated position 2");
 
-  //mitk::AffineTransform3D::Pointer identityTransform = mitk::AffineTransform3D::New();
-  //identityTransform->SetIdentity();
-  //mitk::AffineTransform3D::MatrixType::InternalMatrixType identityMatrix = identityTransform->GetMatrix().GetVnlMatrix();
-  //mitk::AffineTransform3D::MatrixType::InternalMatrixType uM1 = updatedAffineTransform1->GetMatrix().GetVnlMatrix();
-  //MITK_TEST_CONDITION(mitk::Equal(uM1,identityMatrix), "Testing updated orientation 1");  
+  mitk::AffineTransform3D::Pointer identityTransform = mitk::AffineTransform3D::New();
+  identityTransform->SetIdentity();
+  mitk::AffineTransform3D::MatrixType identityMatrix = identityTransform->GetMatrix();
+  mitk::AffineTransform3D::MatrixType uM1 = updatedAffineTransform1->GetMatrix();
+  MITK_TEST_CONDITION(mitk::Equal(uM1,identityMatrix), "Testing updated orientation 1");  
+  mitk::AffineTransform3D::MatrixType::InternalMatrixType uM2 = updatedAffineTransform2->GetMatrix().GetVnlMatrix();
+  MITK_TEST_CONDITION(mitk::Equal(uM2,updatedOri2.rotation_matrix_transpose().transpose()), "Testing updated orientation 2");  
 
   // always end with this!
   MITK_TEST_END();

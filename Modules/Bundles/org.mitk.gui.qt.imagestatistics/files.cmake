@@ -4,7 +4,7 @@ SET(SRC_CPP_FILES
 
 SET(INTERNAL_CPP_FILES
   QmitkImageStatisticsView.cpp
-
+  mitkImageStatisticsPluginActivator.cpp
 )
 
 SET(UI_FILES
@@ -12,20 +12,21 @@ SET(UI_FILES
 )
 
 SET(MOC_H_FILES
+  src/internal/mitkImageStatisticsPluginActivator.h
   src/internal/QmitkImageStatisticsView.h
 )
 
-SET(RESOURCE_FILES
+SET(CACHED_RESOURCE_FILES
   resources/stats.png
   resources/ImageStatistic_24.png
+  plugin.xml
 )
 
-SET(RES_FILES
+SET(QRC_FILES
 # uncomment the following line if you want to use Qt resources
   resources/QmitkImageStatisticsView.qrc
 )
 
-SET(CPP_FILES manifest.cpp)
 
 foreach(file ${SRC_CPP_FILES})
   SET(CPP_FILES ${CPP_FILES} src/${file})
@@ -34,4 +35,3 @@ endforeach(file ${SRC_CPP_FILES})
 foreach(file ${INTERNAL_CPP_FILES})
   SET(CPP_FILES ${CPP_FILES} src/internal/${file})
 endforeach(file ${INTERNAL_CPP_FILES})
-

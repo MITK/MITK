@@ -17,6 +17,9 @@
 
 #include "berryLog.h"
 
+#include "../tweaklets/berryGuiWidgetsTweaklet.h"
+#include "../tweaklets/berryWorkbenchPageTweaklet.h"
+
 #include "berryWorkbenchPage.h"
 #include "berryPartSite.h"
 #include "berryWorkbenchRegistryConstants.h"
@@ -34,8 +37,6 @@
 #include "intro/berryIntroConstants.h"
 #include "intro/berryViewIntroAdapterPart.h"
 
-#include "../tweaklets/berryGuiWidgetsTweaklet.h"
-#include "../tweaklets/berryWorkbenchPageTweaklet.h"
 #include "../dialogs/berryMessageDialog.h"
 
 #include "berryWorkbenchWindow.h"

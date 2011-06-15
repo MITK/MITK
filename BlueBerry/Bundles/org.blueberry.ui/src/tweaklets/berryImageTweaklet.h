@@ -31,11 +31,8 @@ namespace berry
 /**
  * Provides the set of cursors used for drag-and-drop.
  */
-struct BERRY_UI ImageTweaklet : public Object
+struct BERRY_UI ImageTweaklet
 {
-
-  berryInterfaceMacro(ImageTweaklet, berry);
-
   static Tweaklets::TweakKey<ImageTweaklet> KEY;
 
   virtual SmartPointer<ImageDescriptor> CreateFromFile(const std::string& filename, const std::string& pluginid) = 0;
@@ -47,6 +44,6 @@ struct BERRY_UI ImageTweaklet : public Object
 
 }
 
-Q_DECLARE_INTERFACE(berry::ImageTweaklet, "orb.blueberry.ImageTweaklet")
+Q_DECLARE_INTERFACE(berry::ImageTweaklet, "org.blueberry.ImageTweaklet")
 
 #endif /* BERRYIMAGETWEAKLET_H_ */

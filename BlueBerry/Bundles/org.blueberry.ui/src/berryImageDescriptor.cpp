@@ -15,9 +15,9 @@
 
  =========================================================================*/
 
-#include "berryImageDescriptor.h"
-
 #include "tweaklets/berryImageTweaklet.h"
+
+#include "berryImageDescriptor.h"
 
 namespace berry {
 

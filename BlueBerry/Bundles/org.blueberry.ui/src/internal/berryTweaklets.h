@@ -18,65 +18,40 @@
 #ifndef BERRYTWEAKLETS_H_
 #define BERRYTWEAKLETS_H_
 
-#include <string>
-#include <vector>
-#include <map>
+#include <org_blueberry_ui_Export.h>
 
-#include <berryObject.h>
+#include <QString>
+
+namespace berry {
+
+struct BERRY_UI TweakKey_base
+{
+  QString tweakClass;
+
+  /**
+   * @param tweakClass
+   */
+  TweakKey_base(const QString& _tweakClass);
+
+  bool operator==(const TweakKey_base& obj) const;
+  bool operator<(const TweakKey_base& obj) const;
+};
+
+}
+
+BERRY_UI uint qHash(const berry::TweakKey_base& key);
+
 #include <berryIConfigurationElement.h>
 #include <berryIExtensionPointService.h>
 #include <berryPlatform.h>
 
-#include <org_blueberry_ui_Export.h>
 
-namespace berry
-{
+namespace berry {
 
 class BERRY_UI Tweaklets
 {
 
 public:
-
-  struct TweakKey_base
-  {
-    std::string tweakClass;
-
-    /**
-     * @param tweakClass
-     */
-    TweakKey_base(const std::string& _tweakClass) :
-      tweakClass(_tweakClass)
-    {
-
-    }
-
-    /* (non-Javadoc)
-     * @see java.lang.Object#hashCode()
-     */
-    //    int hashCode() {
-    //      final int prime = 31;
-    //      int result = 1;
-    //      result = prime * result
-    //          + ((tweakClass == null) ? 0 : tweakClass.hashCode());
-    //      return result;
-    //    }
-
-    /* (non-Javadoc)
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
-    bool operator==(const TweakKey_base& obj) const
-    {
-      if (this == &obj)
-        return true;
-
-      return tweakClass == obj.tweakClass;
-    }
-
-    bool operator<(const TweakKey_base& obj) const
-    {
-      return tweakClass < obj.tweakClass;
-    }
-  };
 
   template<typename I>
   struct TweakKey: public TweakKey_base
@@ -84,51 +59,44 @@ public:
     TweakKey() :
       TweakKey_base("")
     {
-      tweakClass = I::GetManifestName();
+
+      tweakClass = QString(qobject_interface_iid<I*>());
     }
 
-    TweakKey(const std::string& _tweakClass) :
+    TweakKey(const QString& _tweakClass) :
       TweakKey_base(_tweakClass)
     {
     }
   };
 
   static void SetDefault(const TweakKey_base& definition,
-      Object::Pointer implementation)
-  {
-    defaults.insert(std::make_pair(definition, implementation));
-  }
+                         QObject* implementation);
 
-  static void Clear()
-  {
-    std::cout << "Clearing tweaklets\n";
-    tweaklets.clear();
-    defaults.clear();
-  }
+  static void Clear();
 
   template<typename I>
-  static typename I::Pointer Get(const TweakKey<I>& definition)
+  static I* Get(const TweakKey<I>& definition)
   {
     TweakletMap::const_iterator iter = tweaklets.find(definition);
-    typename I::Pointer result;
+    QObject* result;
     if (iter == tweaklets.end())
     {
       result = CreateTweaklet(definition);
-      if (result.IsNull())
+      if (result == 0)
       {
         result = GetDefault(definition);
       }
-      poco_assert(result.IsNotNull());
-      tweaklets.insert(std::make_pair(definition, result));
-      return result;
+      Q_ASSERT(result != 0);
+      tweaklets.insert(definition, result);
+      return qobject_cast<I*>(result);
     }
 
-    return iter->second.Cast<I>();
+    return qobject_cast<I*>(iter.value());
   }
 
 private:
 
-  typedef std::map<TweakKey_base, Object::Pointer> TweakletMap;
+  typedef QHash<TweakKey_base, QObject*> TweakletMap;
 
   static TweakletMap defaults;
   static TweakletMap tweaklets;
@@ -138,13 +106,13 @@ private:
    * @return
    */
   template<typename I>
-  static typename I::Pointer GetDefault(const TweakKey<I>& definition)
+  static QObject* GetDefault(const TweakKey<I>& definition)
   {
     TweakletMap::const_iterator iter = defaults.find(definition);
     if (iter == defaults.end())
-    return typename I::Pointer(0);
+      return 0;
 
-    return iter->second.Cast<I>();
+    return iter.value();
   }
 
   /**
@@ -152,21 +120,21 @@ private:
    * @return
    */
   template<typename I>
-  static typename I::Pointer CreateTweaklet(const TweakKey<I>& definition)
+  static QObject* CreateTweaklet(const TweakKey<I>& definition)
   {
-    std::vector<IConfigurationElement::Pointer> elements = Platform
-    ::GetExtensionPointService()
-    ->GetConfigurationElementsFor("org.blueberry.ui.tweaklets"); //$NON-NLS-1$
+    std::vector<IConfigurationElement::Pointer> elements =
+        Platform::GetExtensionPointService()
+        ->GetConfigurationElementsFor("org.blueberry.ui.tweaklets"); //$NON-NLS-1$
     for (unsigned int i = 0; i < elements.size(); i++)
     {
       std::string attr;
       if (elements[i]->GetAttribute("definition", attr) &&
-          definition.tweakClass == attr)
+          definition.tweakClass == QString::fromStdString(attr))
       {
         try
         {
-          typename I::Pointer tweaklet(elements[i]->CreateExecutableExtension<I>("implementation")); //$NON-NLS-1$
-          tweaklets.insert(std::make_pair(definition, tweaklet));
+          QObject* tweaklet = elements[i]->CreateExecutableExtension<QObject>("implementation");
+          tweaklets.insert(definition, tweaklet);
           return tweaklet;
         }
         catch (CoreException e)
@@ -178,11 +146,12 @@ private:
         }
       }
     }
-    return typename I::Pointer(0);
+    return 0;
   }
 
 };
 
 }
+
 
 #endif /* BERRYTWEAKLETS_H_ */

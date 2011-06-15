@@ -15,8 +15,9 @@
 
  =========================================================================*/
 
-#include "berryMessageDialog.h"
 #include "../tweaklets/berryMessageDialogTweaklet.h"
+
+#include "berryMessageDialog.h"
 
 namespace berry
 {

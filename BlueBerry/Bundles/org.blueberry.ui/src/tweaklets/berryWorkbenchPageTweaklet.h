@@ -25,9 +25,8 @@
 namespace berry
 {
 
-struct BERRY_UI WorkbenchPageTweaklet : public Object
+struct BERRY_UI WorkbenchPageTweaklet
 {
-  berryInterfaceMacro(WorkbenchPageTweaklet, berry);
 
   static Tweaklets::TweakKey<WorkbenchPageTweaklet> KEY;
 

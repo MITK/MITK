@@ -15,6 +15,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
+#include "../tweaklets/berryGuiWidgetsTweaklet.h"
+
 #include "berryPerspective.h"
 
 #include "berryPerspectiveHelper.h"
@@ -28,8 +30,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "intro/berryIntroConstants.h"
 #include "../dialogs/berryMessageDialog.h"
 #include "berryWorkbenchWindow.h"
-
-#include "../tweaklets/berryGuiWidgetsTweaklet.h"
 
 #include "../presentations/berryIStackPresentationSite.h"
 

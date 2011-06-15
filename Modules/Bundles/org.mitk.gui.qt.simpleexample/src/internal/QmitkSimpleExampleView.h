@@ -46,6 +46,7 @@ class QmitkSimpleExampleView : public QmitkFunctionality
   static const std::string VIEW_ID;
 
   QmitkSimpleExampleView();
+  QmitkSimpleExampleView(const QmitkSimpleExampleView& other);
   virtual ~QmitkSimpleExampleView();
 
   virtual void CreateQtPartControl(QWidget *parent);

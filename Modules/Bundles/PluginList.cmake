@@ -25,4 +25,6 @@ SET(MITK_EXT_PLUGINS
   org.mitk.gui.qt.imagestatistics:OFF
   org.mitk.gui.qt.volumetry:OFF
   org.mitk.gui.qt.materialeditor:OFF
+  org.mitk.gui.qt.simpleexample:OFF
+  org.mitk.gui.qt.ugvisualization:OFF
   )

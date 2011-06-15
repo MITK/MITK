@@ -42,6 +42,8 @@ IF(MITK_USE_BLUEBERRY)
     org.mitk.gui.qt.rigidregistration
     org.mitk.gui.qt.imagestatistics
     org.mitk.gui.qt.materialeditor
+    org.mitk.gui.qt.simpleexample
+    org.mitk.gui.qt.ugvisualization
   )
 
   MACRO_COLLECT_PLUGINS(OUTPUT_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/ExtBundles

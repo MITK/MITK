@@ -11,6 +11,7 @@
 class MITK_QT_SEGMENTATION QmitkStatisticsAction: public QObject, public mitk::IContextMenuAction
 {
   Q_OBJECT
+  Q_INTERFACES(mitk::IContextMenuAction)
 
 public:
 

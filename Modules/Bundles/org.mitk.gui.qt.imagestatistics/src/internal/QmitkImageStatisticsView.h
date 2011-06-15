@@ -40,7 +40,7 @@ PURPOSE.  See the above copyright notices for more information.
 \sa QmitkFunctionality
 \ingroup Functionalities
 */
-class QmitkImageStatistics : public QmitkFunctionality
+class IMAGESTATISTICS_EXPORT QmitkImageStatistics : public QmitkFunctionality
 {
   Q_OBJECT
 

@@ -84,6 +84,25 @@ class mitkNavigationToolStorageTestClass
     MITK_TEST_CONDITION_REQUIRED(myStorage->GetToolCount()==0,"Testing: Delete 100 tools.");
     }
 
+    static void TestAddAndDelete100ToolsAtOnce()
+    {
+    mitk::NavigationToolStorage::Pointer myStorage = mitk::NavigationToolStorage::New();
+    for(int i=0; i<100; i++)
+      {
+      mitk::NavigationTool::Pointer myTool = mitk::NavigationTool::New();
+      std::stringstream str;
+      str << i;
+      myTool->SetIdentifier(str.str());
+      myStorage->AddTool(myTool);
+      }
+    MITK_TEST_CONDITION_REQUIRED(myStorage->GetToolCount()==100,"Testing: Adding 100 tools.");
+    MITK_TEST_CONDITION_REQUIRED(!myStorage->isEmpty(),"Testing: method isEmpty() with non empty storage.");
+    MITK_TEST_CONDITION_REQUIRED(myStorage->DeleteAllTools(),"Testing: Delete method.");
+    MITK_TEST_CONDITION_REQUIRED(myStorage->isEmpty(),"Testing: method isEmpty() with empty storage.");
+     
+    MITK_TEST_CONDITION_REQUIRED(myStorage->GetToolCount()==0,"Testing: Delete 100 tools at once.");
+    }
+
     static void TestGetTool()
     {
     //let's create an object of our class
@@ -94,6 +113,9 @@ class mitkNavigationToolStorageTestClass
     mitk::NavigationTool::Pointer myTool1 = mitk::NavigationTool::New();
     myTool1->SetSerialNumber("0815");
     myTool1->SetIdentifier("001");
+    mitk::DataNode::Pointer toolNode = mitk::DataNode::New();
+    toolNode->SetName("Tool1");
+    myTool1->SetDataNode(toolNode);
     myStorage->AddTool(myTool1);
         
     //second tool
@@ -107,6 +129,12 @@ class mitkNavigationToolStorageTestClass
     MITK_TEST_CONDITION_REQUIRED(myToolGet==myTool1,"Testing GetTool() by number.");
     myToolGet = myStorage->GetTool("001");
     MITK_TEST_CONDITION_REQUIRED(myToolGet==myTool1,"Testing GetTool() by identifier.");
+    myToolGet = myStorage->GetToolByName("Tool1");
+    MITK_TEST_CONDITION_REQUIRED(myToolGet==myTool1,"Testing GetTool() by name.");
+
+    //let's try to get a tool which doesn't exist
+    myToolGet = myStorage->GetToolByName("quatsch");
+    MITK_TEST_CONDITION_REQUIRED(myToolGet.IsNull(),"Testing GetTool() with wrong name.");
     }
   };
 
@@ -118,6 +146,7 @@ int mitkNavigationToolStorageTest(int /* argc */, char* /*argv*/[])
   mitkNavigationToolStorageTestClass::TestInstantiation();
   mitkNavigationToolStorageTestClass::TestAddAndDelete();
   mitkNavigationToolStorageTestClass::TestAddAndDelete100Tools();
+  mitkNavigationToolStorageTestClass::TestAddAndDelete100ToolsAtOnce();
   mitkNavigationToolStorageTestClass::TestGetTool();
 
   MITK_TEST_END()

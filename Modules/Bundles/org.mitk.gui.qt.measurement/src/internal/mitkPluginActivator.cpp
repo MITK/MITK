@@ -1,4 +1,5 @@
 #include "mitkPluginActivator.h"
+#include "QmitkMeasurement.h"
 
 #include <QtPlugin>
 
@@ -6,7 +7,7 @@ namespace mitk {
 
 void PluginActivator::start(ctkPluginContext* context)
 {
-  Q_UNUSED(context)
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkMeasurement, context)
 }
 
 void PluginActivator::stop(ctkPluginContext* context)

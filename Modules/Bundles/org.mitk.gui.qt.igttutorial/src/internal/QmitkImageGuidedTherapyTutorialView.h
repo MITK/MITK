@@ -23,7 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <string>
 
 #include "ui_QmitkImageGuidedTherapyTutorialViewControls.h"
-#include "../IgttutorialDll.h"
+//#include "../IgttutorialDll.h"
 
 #include "mitkTrackingDeviceSource.h"
 #include "mitkNavigationDataObjectVisualizationFilter.h"
@@ -41,7 +41,7 @@ PURPOSE.  See the above copyright notices for more information.
 * \sa QmitkFunctionality
 * \ingroup Functionalities
 */
-class IGTTUTORIAL_EXPORT QmitkImageGuidedTherapyTutorialView : public QmitkFunctionality
+class QmitkImageGuidedTherapyTutorialView : public QmitkFunctionality
 {
 
   // this is needed for all Qt objects that should have a MOC object (everything that derives from QObject)

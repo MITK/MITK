@@ -275,8 +275,89 @@ template <class T, unsigned int NVectorDimension>
   return vector;
 }
 
+/*!
+\brief Check for matrix equality with a user defined accuracy. As an equality metric the root mean squared error (RMS) of all elements is calculated.
+\param matrix1 first vnl matrix
+\param matrix2 second vnl matrix
+\epsilon user defined accuracy bounds
+*/
+template <typename TCoordRep, unsigned int NRows, unsigned int NCols>
+inline bool MatrixEqualRMS(const vnl_matrix_fixed<TCoordRep,NRows,NCols>& matrix1,const vnl_matrix_fixed<TCoordRep,NRows,NCols>& matrix2,mitk::ScalarType epsilon=mitk::eps) 
+{
+  if ( (matrix1.rows() == matrix2.rows()) && (matrix1.cols() == matrix2.cols()) )
+  {
+    vnl_matrix_fixed<TCoordRep,NRows,NCols> differenceMatrix = matrix1-matrix2;
+    if (differenceMatrix.rms()<epsilon)
+    {
+      return true;
+    }
+    else
+    {
+      return false;
+    }
+  }
+  else 
+  {
+    return false;
+  }
+}
+
+/*!
+\brief Check for matrix equality with a user defined accuracy. As an equality metric the root mean squared error (RMS) of all elements is calculated.
+\param matrix1 first itk matrix
+\param matrix2 second itk matrix
+\epsilon user defined accuracy bounds
+*/
+template <typename TCoordRep, unsigned int NRows, unsigned int NCols>
+inline bool MatrixEqualRMS(const itk::Matrix<TCoordRep, NRows, NCols>& matrix1,const itk::Matrix<TCoordRep, NRows, NCols>& matrix2,mitk::ScalarType epsilon=mitk::eps) 
+{
+  return mitk::MatrixEqualRMS(matrix1.GetVnlMatrix(),matrix2.GetVnlMatrix(),epsilon);
+}
+
+/*!
+\brief Check for element-wise matrix equality with a user defined accuracy.
+\param matrix1 first vnl matrix
+\param matrix2 second vnl matrix
+\epsilon user defined accuracy bounds
+*/
+template <typename TCoordRep, unsigned int NRows, unsigned int NCols>
+inline bool MatrixEqualElementWise(const vnl_matrix_fixed<TCoordRep,NRows,NCols>& matrix1,const vnl_matrix_fixed<TCoordRep,NRows,NCols>& matrix2,mitk::ScalarType epsilon=mitk::eps) 
+{
+  if ( (matrix1.rows() == matrix2.rows()) && (matrix1.cols() == matrix2.cols()) )
+  {
+    for( unsigned int r=0; r<NRows; r++)
+    {
+      for( unsigned int c=0; c<NCols; c++ )
+      {
+        TCoordRep difference =  fabs(matrix1(r,c)-matrix2(r,c));
+        if (difference>epsilon)
+        {
+          return false;
+        }
+      }
+    }
+    return true;   
+  }
+  else 
+  {
+    return false;
+  }
+}
+
+/*!
+\brief Check for element-wise matrix equality with a user defined accuracy.
+\param matrix1 first itk matrix
+\param matrix2 second itk matrix
+\epsilon user defined accuracy bounds
+*/
+template <typename TCoordRep, unsigned int NRows, unsigned int NCols>
+inline bool MatrixEqualElementWise(const itk::Matrix<TCoordRep, NRows, NCols>& matrix1,const itk::Matrix<TCoordRep, NRows, NCols>& matrix2,mitk::ScalarType epsilon=mitk::eps) 
+{
+  return mitk::MatrixEqualElementWise(matrix1.GetVnlMatrix(),matrix2.GetVnlMatrix(),epsilon);
+}
+
 template <typename TCoordRep, unsigned int NPointDimension>
-  inline bool Equal(const itk::Vector<TCoordRep, NPointDimension>& vector1, const itk::Vector<TCoordRep, NPointDimension>& vector2) 
+inline bool Equal(const itk::Vector<TCoordRep, NPointDimension>& vector1, const itk::Vector<TCoordRep, NPointDimension>& vector2) 
 {
   typename itk::Vector<TCoordRep, NPointDimension>::VectorType diff = vector1-vector2;
   return diff.GetSquaredNorm() < mitk::eps; 

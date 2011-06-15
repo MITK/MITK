@@ -14,9 +14,9 @@ Where can they be accessed?
 
 TODO:
 \subsection FileManagement File Management
-  path - The physical path the file was loaded from
-  name - The node name in the datamanager
-  selected - Whether the node is selected in the datamanager
+path - The physical path the file was loaded from
+name - The node name in the datamanager
+selected - Whether the node is selected in the datamanager
 
 \subsection GenericRenderingProperty Generic Rendering Properties
 color - Color the surface, grey value image, whatever should be rendered in
@@ -33,25 +33,51 @@ GetColor( rgb, BaseRenderer );
 \endinfo
 \warning
 This property will not effect images if you set the property "use color" 
-to true. In that case a user-defined lookuptable will be used.
+to false. In that case a user-defined lookuptable will be used.
 
 in plane resample extent by geometry - Toggles:
-         Resampling grid corresponds to the current world geometry. This
-         means that the spacing of the output 2D image depends on the
-         currently selected world geometry, and *not* on the image itself.
+Resampling grid corresponds to the current world geometry. This
+means that the spacing of the output 2D image depends on the
+currently selected world geometry, and *not* on the image itself.
 
-         Resampling grid corresponds to the input geometry. This means that
-         the spacing of the output 2D image is directly derived from the
-         associated input image, regardless of the currently selected world
-         geometry.
+Resampling grid corresponds to the input geometry. This means that
+the spacing of the output 2D image is directly derived from the
+associated input image, regardless of the currently selected world
+geometry.
 
 layer - Controls which image is considered "on top" of another. In the case 
 that two should inhabit the same space, the higher layer occludes lower layer.
-TODO Does this also apply for surfaces, points, etc.?
+So far it works for images and pointsets. The layer property applies only for similar datatypes. Pointsets are always rendered in front of images and the layer will not have any effect.
 
-levelwindow - contains the level window of the image
+levelwindow - In general, grayscale images contain values between 0 and 255. Therefore, the default window boundaries are set respectively. For displaying the image within a certain range, ie. 50 - 200, this property can be used to adjust the minimum and maximum boundary.
 
-LookupTable - contains lookuptable for use in coloring image
+LookupTable - This property contains a user defined lookuptable, which can be used to map scalar values to color values. Example: If an image contains a value of 128, in the resulting image the passed lookuptable could map this value to red (255, 0, 0).
+\warning
+This property will not effect images if you set the property "use color" 
+to true. In that case color properties and a default lookuptable are used.
+Example for setting up a lookuptable in MITK:
+\code
+#include <vtkSmartPointer.h>
+#include <vtkLookupTable.h>
+#include <mitkLookupTable.h>
+#include <mitkLookupTableProperty.h>
+
+[...]
+
+vtkSmartPointer<vtkLookupTable> vtkLUT = vtkSmartPointer<vtkLookupTable>::New();
+vtkLUT->SetRange(100,200); //define your table here
+vtkLUT->Build();
+
+//pass the table to MITK
+mitk::LookupTable::Pointer mitkLookupTable = mitk::LookupTable::New();
+mitkLookupTable->SetVtkLookupTable(vtkLUT);
+mitk::LookupTableProperty::Pointer LookupTableProp = mitk::LookupTableProperty::New( mitkLookupTable );
+
+result->SetProperty( "LookupTable", LookupTableProp );
+result->SetBoolProperty("use color", false);
+result->Update();
+\endcode
+
 
 opacity - Alpha (or transparency) value of the node/image/surface etc.. The
 range of the opacity is between 0.0 and 1.0. 
@@ -64,15 +90,35 @@ GetOpacity( opacity, BaseRenderer );
 (The BaseRenderer is usually known inside a mapper).
 \endinfo
 
-reslice interpolation - Select interpolation mode (Nearest, Linear, Cubic)
+reslice interpolation - This property takes effect in swivel mode or crosshair rotaiton  only. The interpolation modes "Nearest", "Linear", and "Cubic" are available and  effect the pixel outcome along the rotated plane.
 
-texture interpolation - toggle interpolation
+texture interpolation - This property toggles interpolation of the texture. If enabled, edges between image pixels are blurred. If disabled, edges remain sharp.
 
-TransferFunction - contains transfer function for use in coloring image
 
 use color - This property toggles the use of a user-defined lookuptable 
-for the rendering. True: use the LUT; False: use the color propery
-TODO Provide an example how to set a lookuptable.
+for the rendering. True: use the LUT; False: use the color propery.
+Example for setting up a lookuptable in MITK:
+\code
+#include <vtkSmartPointer.h>
+#include <vtkLookupTable.h>
+#include <mitkLookupTable.h>
+#include <mitkLookupTableProperty.h>
+
+[...]
+
+vtkSmartPointer<vtkLookupTable> vtkLUT = vtkSmartPointer<vtkLookupTable>::New();
+vtkLUT->SetRange(100,200); //define your table here
+vtkLUT->Build();
+
+//pass the table to MITK
+mitk::LookupTable::Pointer mitkLookupTable = mitk::LookupTable::New();
+mitkLookupTable->SetVtkLookupTable(vtkLUT);
+mitk::LookupTableProperty::Pointer LookupTableProp = mitk::LookupTableProperty::New( mitkLookupTable );
+
+result->SetProperty( "LookupTable", LookupTableProp );
+result->SetBoolProperty("use color", false);
+result->Update();
+\endcode
 TODO Should be redone and renamed, this is counterintuitive
 
 visible - toggle node/image/surface being rendered at all
@@ -107,6 +153,7 @@ shader - which shader to use for surface rendering, currently the options are
 "fixed" and "mitkShaderLightning"
 
 \subsection VolumeRenderingProperties Volume Rendering Properties
+TransferFunction - contains transfer function for use in coloring image
 volumerendering - Boolean: Should the volume be rendered or not
 volumerendering configuration - Choice between Composite und MIP - ???
 volumerendering.cpu.ambient - ambient lighting

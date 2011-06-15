@@ -3,8 +3,8 @@
 Program:   Medical Imaging & Interaction Toolkit
 Language:  C++
 Date:      $Date: 2009-03-21 19:27:37 +0100 (Sa, 21 Mrz 2009) $
-Version:   $Revision: 16719 $ 
- 
+Version:   $Revision: 16719 $
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
@@ -23,7 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <string>
 
 #include "ui_QmitkImageGuidedTherapyTutorialViewControls.h"
-#include "../IgttutorialDll.h"
+//#include "../IgttutorialDll.h"
 
 #include "mitkTrackingDeviceSource.h"
 #include "mitkNavigationDataObjectVisualizationFilter.h"
@@ -31,44 +31,49 @@ PURPOSE.  See the above copyright notices for more information.
 /**
 * \brief QmitkIGTTutorial shows a small typically navigation MITK functionality.
 *
-* Any kind of navigation application will start with the connection to a tracking system 
+* Any kind of navigation application will start with the connection to a tracking system
 * and as we do image guided procedures we want to show something on the screen. In this
 * tutorial we connect to the NDI Polaris tracking system (or alternatively use a virtual tracking device)
 * and we will show the movement of a tool as cone in the StdMultiWidget editor.
-* 
-* \sa also take a look at the CMakeLists.txt of this functionality to see how to 
+*
+* \sa also take a look at the CMakeLists.txt of this functionality to see how to
 *     link to the mitkIGT library.
 * \sa QmitkFunctionality
 * \ingroup Functionalities
 */
-class IGTTUTORIAL_EXPORT QmitkImageGuidedTherapyTutorialView : public QmitkFunctionality
-{  
+class QmitkImageGuidedTherapyTutorialView : public QmitkFunctionality
+{
 
   // this is needed for all Qt objects that should have a MOC object (everything that derives from QObject)
   Q_OBJECT
-  
-  public: 
+
+  public:
 
   static const std::string VIEW_ID;
 
   QmitkImageGuidedTherapyTutorialView();
+  QmitkImageGuidedTherapyTutorialView(const QmitkImageGuidedTherapyTutorialView& other)
+  {
+    Q_UNUSED(other)
+    throw std::runtime_error("Copy constructor not implemented");
+  }
   virtual ~QmitkImageGuidedTherapyTutorialView();
 
   virtual void CreateQtPartControl(QWidget *parent);
 
-  /// \brief Creation of the connections of main and control widget  
+  /// \brief Creation of the connections of main and control widget
   virtual void CreateConnections();
 
   /// \brief Called when the functionality is activated
   virtual void Activated();
-  
+
   virtual void Deactivated();
 
   virtual void StdMultiWidgetAvailable (QmitkStdMultiWidget &stdMultiWidget);
   virtual void StdMultiWidgetNotAvailable();
 
-protected slots:  
-  
+protected slots:
+
   /**
   * \brief Execute MITK-IGT Tutorial
   */
@@ -83,9 +88,9 @@ protected slots:
   * \brief timer based update of IGT scene
   */
   void OnTimer();
-  
-protected:  
-  
+
+protected:
+
   Ui::QmitkImageGuidedTherapyTutorialViewControls* m_Controls;
 
   QmitkStdMultiWidget* m_MultiWidget; ///< our display widget
@@ -99,4 +104,3 @@ protected:
 
 
 #endif // _QMITKIMAGEGUIDEDTHERAPYTUTORIALVIEW_H_INCLUDED
-

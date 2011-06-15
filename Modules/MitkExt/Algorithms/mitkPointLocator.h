@@ -195,7 +195,7 @@ protected:
    * no distance is found, since as a precondition at least one point has to be contained
    * in the point set.
    * @param point the query point, for whom the minimal distance to a point in the previously defined point set will be determined
-   * @returns the distance in world coordinates between the given point and the nearest neighbour. 
+   * @returns the squared distance in world coordinates between the given point and the nearest neighbour. 
    */
   DistanceType GetMinimalDistance( const MyANNpoint& point);
   

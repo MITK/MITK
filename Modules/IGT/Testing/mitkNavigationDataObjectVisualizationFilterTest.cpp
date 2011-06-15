@@ -297,9 +297,9 @@ int mitkNavigationDataObjectVisualizationFilterTest(int /* argc */, char* /*argv
   identityTransform->SetIdentity();
   mitk::AffineTransform3D::MatrixType identityMatrix = identityTransform->GetMatrix();
   mitk::AffineTransform3D::MatrixType uM1 = updatedAffineTransform1->GetMatrix();
-  MITK_TEST_CONDITION(mitk::Equal(uM1,identityMatrix), "Testing updated orientation 1");  
+  MITK_TEST_CONDITION(mitk::MatrixEqualElementWise(uM1,identityMatrix), "Testing updated orientation 1");  
   mitk::AffineTransform3D::MatrixType::InternalMatrixType uM2 = updatedAffineTransform2->GetMatrix().GetVnlMatrix();
-  MITK_TEST_CONDITION(mitk::Equal(uM2,updatedOri2.rotation_matrix_transpose().transpose()), "Testing updated orientation 2");  
+  MITK_TEST_CONDITION(mitk::MatrixEqualElementWise(uM2,updatedOri2.rotation_matrix_transpose().transpose()), "Testing updated orientation 2");  
 
   // always end with this!
   MITK_TEST_END();

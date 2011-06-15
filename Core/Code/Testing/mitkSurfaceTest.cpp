@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkSurface.h"
 #include "mitkCommon.h"
 #include "mitkVector.h"
+#include "mitkTestingMacros.h"
 #include "mitkTimeSlicedGeometry.h"
 
 #include "vtkPolyData.h"
@@ -28,20 +29,14 @@ PURPOSE.  See the above copyright notices for more information.
 
 int mitkSurfaceTest(int /*argc*/, char* /*argv*/[])
 {
-  mitk::Surface::Pointer surface;
-  std::cout << "Testing mitk::Surface::New(): ";
-  surface = mitk::Surface::New();
-  if (surface.IsNull()) {
-    std::cout<<"[FAILED]"<<std::endl;
-    return EXIT_FAILURE;
-  }
-  else {
-  std::cout<<"[PASSED]"<<std::endl;
-  } 
+  mitk::Surface::Pointer surface = mitk::Surface::New();
+  MITK_TEST_CONDITION_REQUIRED(surface.GetPointer(), "Testing initialization!");
 
-  std::cout << "Testing mitk::Surface::PrintSelf() for empty surface: ";
-  surface->PrintSelf(std::cout, 0);
-  std::cout<<"[PASSED]"<<std::endl;
+  std::filebuf fb;
+  std::ostream s = std::ostream(&fb);
+  surface->PrintSelf( s, 0);
+  
+  MITK_TEST_CONDITION_REQUIRED(s.width()!= 0, "Testing PrintSelf method!");
 
   vtkSphereSource* sphereSource = vtkSphereSource::New();
   sphereSource->SetCenter(0,0,0);
@@ -51,16 +46,18 @@ int mitkSurfaceTest(int /*argc*/, char* /*argv*/[])
   sphereSource->Update();
 
   vtkPolyData* polys = sphereSource->GetOutput();
+  MITK_TEST_CONDITION_REQUIRED(surface->GetVtkPolyData() == NULL, "Testing initial state of vtkPolyData");
   surface->SetVtkPolyData( polys );
   sphereSource->Delete();
-  std::cout << "Testing mitk::Surface::SetVtkPolyData(): ";
-  if (surface->GetVtkPolyData() ==  NULL ) {
-    std::cout<<"[FAILED]"<<std::endl;
-    return EXIT_FAILURE;
-  }
-  else {
-  std::cout<<"[PASSED]"<<std::endl;
-  } 
+  MITK_TEST_CONDITION_REQUIRED(surface->GetVtkPolyData()!= NULL, "Testing set vtkPolyData");
+  //std::cout << "Testing mitk::Surface::SetVtkPolyData(): ";
+  //if (surface->GetVtkPolyData() ==  NULL ) {
+  //  std::cout<<"[FAILED]"<<std::endl;
+  //  return EXIT_FAILURE;
+  //}
+  //else {
+  //std::cout<<"[PASSED]"<<std::endl;
+  //} 
 
   {
     vtkFloatingPointType bounds[6] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};

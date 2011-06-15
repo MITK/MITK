@@ -157,6 +157,7 @@ mitk::TrackingDeviceSource::Pointer mitk::TrackingDeviceSourceConfigurator::Crea
               {
               //add tool in right order
               newToolStorageInRightOrder->AddTool(navigationTools->GetTool(j));
+              m_ToolCorrespondencesInToolStorage.push_back(j);
               //adapt name of tool
               dynamic_cast<mitk::NDIPassiveTool*>(thisDevice->GetTool(i))->SetToolName(navigationTools->GetTool(j)->GetToolName());
               //rember that this tool was already found

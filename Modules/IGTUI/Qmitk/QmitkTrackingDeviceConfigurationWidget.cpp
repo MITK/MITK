@@ -292,21 +292,24 @@ mitk::TrackingDevice::Pointer QmitkTrackingDeviceConfigurationWidget::ConfigureN
 mitk::TrackingDevice::Pointer QmitkTrackingDeviceConfigurationWidget::ConfigureNDI6DTrackingDevice()
   {
   mitk::NDITrackingDevice::Pointer tempTrackingDevice = mitk::NDITrackingDevice::New();
-    
-  //build prefix (depends on linux/win)
-  QString prefix = "";
-  #ifdef WIN32
-  prefix ="COM";
-  #else
-  if (m_Controls->m_trackingDeviceChooser->currentIndex()==1) //Aurora
-    prefix = m_Controls->portTypeAurora->currentText();  
-  else //Polaris
-    prefix = m_Controls->portTypePolaris->currentText();
-  #endif
+  
   //get port
   int port = 0;
   if (m_Controls->m_trackingDeviceChooser->currentIndex()==1) port = m_Controls->m_portSpinBoxAurora->value();
   else port = m_Controls->m_portSpinBoxPolaris->value();
+
+  //build prefix (depends on linux/win)
+  QString prefix = "";
+  #ifdef WIN32
+  prefix ="COM";
+  tempTrackingDevice->SetPortNumber(static_cast<mitk::SerialCommunication::PortNumber>(port)); //also set the com port for compatibility
+  #else
+  if (m_Controls->m_trackingDeviceChooser->currentIndex()==1) //Aurora
+    prefix = m_Controls->portTypeAurora->currentText();
+  else //Polaris
+    prefix = m_Controls->portTypePolaris->currentText();
+  #endif
+  
   //build port name string
   QString portName = prefix + QString::number(port);
 

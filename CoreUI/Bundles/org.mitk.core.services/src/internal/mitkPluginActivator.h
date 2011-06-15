@@ -21,13 +21,12 @@ PURPOSE.  See the above copyright notices for more information.
 #include <berryPlugin.h>
 #include <berryIBundleContext.h>
 
-#include "mitkCoreServicesPluginDll.h"
 #include "mitkIDataStorageService.h"
 
 namespace mitk
 {
 
-class MITK_CORE_SERVICES_PLUGIN org_mitk_core_services_Activator : public QObject, public ctkPluginActivator
+class org_mitk_core_services_Activator : public QObject, public ctkPluginActivator
 {
   Q_OBJECT
   Q_INTERFACES(ctkPluginActivator)

@@ -28,4 +28,5 @@ SET(MITK_EXT_PLUGINS
   org.mitk.gui.qt.simpleexample:OFF
   org.mitk.gui.qt.ugvisualization:OFF
   org.mitk.gui.qt.measurement:OFF
+  org.mitk.gui.qt.simplemeasurement:OFF
   )

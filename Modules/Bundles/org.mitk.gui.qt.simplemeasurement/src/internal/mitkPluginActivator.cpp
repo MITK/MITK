@@ -1,0 +1,20 @@
+#include "mitkPluginActivator.h"
+#include "QmitkSimpleMeasurement.h"
+
+#include <QtPlugin>
+
+namespace mitk {
+
+void PluginActivator::start(ctkPluginContext* context)
+{
+  BERRY_REGISTER_EXTENSION_CLASS(QmitkSimpleMeasurement, context)
+}
+
+void PluginActivator::stop(ctkPluginContext* context)
+{
+  Q_UNUSED(context)
+}
+
+}
+
+Q_EXPORT_PLUGIN2(org.mitk.gui.qt.simplemeasurement, mitk::PluginActivator)

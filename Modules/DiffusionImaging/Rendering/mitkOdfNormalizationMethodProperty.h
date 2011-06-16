@@ -24,6 +24,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkBasePropertyDeserializer.h"
 #include "mitkBasePropertySerializer.h"
 
+#include "mitkSerializerMacros.h"
+
 namespace mitk
 {
 
@@ -152,6 +154,7 @@ class MitkDiffusionImaging_EXPORT OdfNormalizationMethodPropertySerializer : pub
     OdfNormalizationMethodPropertySerializer () {}
     virtual ~OdfNormalizationMethodPropertySerializer () {}
 };
+
 
 } // end of namespace mitk
 

@@ -21,6 +21,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include "MitkDiffusionImagingExports.h"
 #include "mitkEnumerationProperty.h"
 
+#include "mitkBasePropertyDeserializer.h"
+#include "mitkBasePropertySerializer.h"
+
 namespace mitk
 {
 
@@ -83,6 +86,54 @@ protected:
    * enumeration values.
    */
   virtual void AddInterpolationTypes();
+};
+
+class MitkDiffusionImaging_EXPORT OdfScaleByPropertyDeserializer : public BasePropertyDeserializer
+{
+  public:
+
+    mitkClassMacro( OdfScaleByPropertyDeserializer, BasePropertyDeserializer );
+    itkNewMacro(Self);
+
+    virtual BaseProperty::Pointer Deserialize(TiXmlElement* element)
+    {
+      if (!element) return NULL;
+      const char* sa( element->Attribute("value") );
+      std::string s(sa?sa:"");
+      OdfScaleByProperty::Pointer property = OdfScaleByProperty::New();
+      property->SetValue( s );
+      return property.GetPointer();
+    }
+
+
+  protected:
+
+    OdfScaleByPropertyDeserializer () {}
+    virtual ~OdfScaleByPropertyDeserializer () {}
+};
+
+class MitkDiffusionImaging_EXPORT OdfScaleByPropertySerializer : public BasePropertySerializer
+{
+  public:
+
+    mitkClassMacro( OdfScaleByPropertySerializer, BasePropertySerializer );
+    itkNewMacro(Self);
+
+    virtual BaseProperty::Pointer Deserialize(TiXmlElement* element)
+    {
+      if (!element) return NULL;
+      const char* sa( element->Attribute("value") );
+      std::string s(sa?sa:"");
+      OdfScaleByProperty::Pointer property = OdfScaleByProperty::New();
+      property->SetValue( s );
+      return property.GetPointer();
+    }
+
+
+  protected:
+
+    OdfScaleByPropertySerializer () {}
+    virtual ~OdfScaleByPropertySerializer () {}
 };
 
 } // end of namespace mitk

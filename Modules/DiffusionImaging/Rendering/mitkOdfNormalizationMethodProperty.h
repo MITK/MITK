@@ -21,6 +21,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkEnumerationProperty.h"
 #include "MitkDiffusionImagingExports.h"
 
+#include "mitkBasePropertyDeserializer.h"
+#include "mitkBasePropertySerializer.h"
+
 namespace mitk
 {
 
@@ -100,6 +103,54 @@ protected:
    * enumeration values.
    */
   virtual void AddInterpolationTypes();
+};
+
+class MitkDiffusionImaging_EXPORT OdfNormalizationMethodPropertyDeserializer : public BasePropertyDeserializer
+{
+  public:
+
+    mitkClassMacro( OdfNormalizationMethodPropertyDeserializer, BasePropertyDeserializer );
+    itkNewMacro(Self);
+
+    virtual BaseProperty::Pointer Deserialize(TiXmlElement* element)
+    {
+      if (!element) return NULL;
+      const char* sa( element->Attribute("value") );
+      std::string s(sa?sa:"");
+      OdfNormalizationMethodProperty::Pointer property = OdfNormalizationMethodProperty::New();
+      property->SetValue( s );
+      return property.GetPointer();
+    }
+
+
+  protected:
+
+    OdfNormalizationMethodPropertyDeserializer () {}
+    virtual ~OdfNormalizationMethodPropertyDeserializer () {}
+};
+
+class MitkDiffusionImaging_EXPORT OdfNormalizationMethodPropertySerializer : public BasePropertySerializer
+{
+  public:
+
+    mitkClassMacro( OdfNormalizationMethodPropertySerializer, BasePropertySerializer );
+    itkNewMacro(Self);
+
+    virtual BaseProperty::Pointer Deserialize(TiXmlElement* element)
+    {
+      if (!element) return NULL;
+      const char* sa( element->Attribute("value") );
+      std::string s(sa?sa:"");
+      OdfNormalizationMethodProperty::Pointer property = OdfNormalizationMethodProperty::New();
+      property->SetValue( s );
+      return property.GetPointer();
+    }
+
+
+  protected:
+
+    OdfNormalizationMethodPropertySerializer () {}
+    virtual ~OdfNormalizationMethodPropertySerializer () {}
 };
 
 } // end of namespace mitk

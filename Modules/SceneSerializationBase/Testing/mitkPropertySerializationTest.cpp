@@ -217,7 +217,7 @@ void TestAllProperties(const mitk::PropertyList* propList)
   /* try to serialize each property in the list, then deserialize again and check for equality */
   for (mitk::PropertyList::PropertyMap::const_iterator it = propList->GetMap()->begin(); it != propList->GetMap()->end(); ++it)
   {
-    const mitk::BaseProperty* prop = it->second.first;
+    const mitk::BaseProperty* prop = it->second;
     // construct name of serializer class
     std::string serializername = std::string(prop->GetNameOfClass()) + "Serializer";
     std::list<itk::LightObject::Pointer> allSerializers = itk::ObjectFactoryBase::CreateAllInstance(serializername.c_str());

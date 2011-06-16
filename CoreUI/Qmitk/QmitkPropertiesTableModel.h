@@ -43,12 +43,11 @@ class QMITK_EXPORT QmitkPropertiesTableModel : public QAbstractTableModel
 public:
   static const int PROPERTY_NAME_COLUMN = 0;
   static const int PROPERTY_VALUE_COLUMN = 1;
-  static const int PROPERTY_ACTIVE_COLUMN = 2;
   ///
   /// Typedef for the complete Property Datastructure, which may be written as follows:
-  /// Name->(mitk::BaseProperty::Pointer->ActiveFlag)
+  /// Name->(mitk::BaseProperty::Pointer)
   ///
-  typedef std::pair<std::string,std::pair<mitk::BaseProperty::Pointer,bool> > PropertyDataSet;
+  typedef std::pair<std::string, mitk::BaseProperty::Pointer> PropertyDataSet;
 
   ///
   /// Constructs a new QmitkDataStorageTableModel 
@@ -139,8 +138,7 @@ protected:
     ///
     enum CompareCriteria {
       CompareByName = 0,
-      CompareByValue,
-      CompareByActivity
+      CompareByValue
     };
 
     ///

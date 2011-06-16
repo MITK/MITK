@@ -271,7 +271,7 @@ int mitkSceneIOTest(int  argc, char* argv[])
             iter != propmap->end();
             ++iter )
       {
-        MITK_TEST_OUTPUT( << " - " << iter->second.first->GetNameOfClass() << " associated to key '" << iter->first << "'");
+        MITK_TEST_OUTPUT( << " - " << iter->second->GetNameOfClass() << " associated to key '" << iter->first << "'");
         // \TODO: should we fail the test case if failed properties exist?
       }
     }
@@ -318,7 +318,7 @@ int mitkSceneIOTest(int  argc, char* argv[])
             iter != propmap->end();
             ++iter )
       {
-        MITK_TEST_OUTPUT( << " - " << iter->second.first->GetNameOfClass() << " associated to key '" << iter->first << "'");
+        MITK_TEST_OUTPUT( << " - " << iter->second->GetNameOfClass() << " associated to key '" << iter->first << "'");
         // \TODO: should we fail the test case if failed properties exist?
       }
     }

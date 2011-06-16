@@ -82,7 +82,7 @@ void mitk::PlanarFigureWriter::GenerateData()
     for ( it = propertyList->GetMap()->begin(); it != propertyList->GetMap()->end(); ++it )
     {
       // Create seralizer for this property
-      const mitk::BaseProperty* prop = it->second.first;
+      const mitk::BaseProperty* prop = it->second;
       std::string serializerName = std::string( prop->GetNameOfClass() ) + "Serializer";
       std::list< itk::LightObject::Pointer > allSerializers = itk::ObjectFactoryBase::CreateAllInstance(
         serializerName.c_str() );

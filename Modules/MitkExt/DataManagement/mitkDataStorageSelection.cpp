@@ -257,7 +257,7 @@ namespace mitk
         = (*it)->GetPropertyList()->GetMap()->begin()
         ; it2 != (*it)->GetPropertyList()->GetMap()->end(); ++it2)
       {
-        if(it2->second.first == prop)
+        if(it2->second == prop)
         {
           node = *it;
           break;
@@ -327,7 +327,7 @@ namespace mitk
       ; it!=propList->GetMap()->end()
       ; ++it)
     {
-      prop = it->second.first;
+      prop = it->second;
       prop->RemoveObserver(m_PropertyModifiedObserverTags[prop]);
       m_PropertyModifiedObserverTags.erase(prop);
       prop->RemoveObserver(m_PropertyDeletedObserverTags[prop]);
@@ -358,7 +358,7 @@ namespace mitk
       ; it!=propList->GetMap()->end()
       ; ++it)
     {
-      prop = it->second.first;
+      prop = it->second;
       m_PropertyModifiedObserverTags[prop] = prop->AddObserver(itk::ModifiedEvent()
         , ObjectChangedCommand);
       m_PropertyDeletedObserverTags[prop] = prop->AddObserver(itk::ModifiedEvent()

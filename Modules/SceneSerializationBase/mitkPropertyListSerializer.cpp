@@ -78,7 +78,7 @@ std::string mitk::PropertyListSerializer::Serialize()
         ++iter )
   {
     std::string key = iter->first;
-    const BaseProperty* property = iter->second.first;
+    const BaseProperty* property = iter->second;
     TiXmlElement* element = SerializeOneProperty( key, property );
     if (element)
     {

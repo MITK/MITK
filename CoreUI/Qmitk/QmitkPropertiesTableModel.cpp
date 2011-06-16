@@ -69,11 +69,6 @@ Qt::ItemFlags QmitkPropertiesTableModel::flags(const QModelIndex& index) const
       flags |= Qt::ItemIsUserCheckable;
   }
 
-  if (index.column() == PROPERTY_ACTIVE_COLUMN)
-  {
-    flags |= Qt::ItemIsUserCheckable;
-  }
-
   return flags;
 }
 
@@ -90,9 +85,6 @@ QVariant QmitkPropertiesTableModel::headerData(int section, Qt::Orientation orie
 
     case PROPERTY_VALUE_COLUMN:
       return tr("Value");
-
-    case PROPERTY_ACTIVE_COLUMN:
-      return tr("Active");
 
     default:
       return QVariant();
@@ -120,7 +112,7 @@ QVariant QmitkPropertiesTableModel::data(const QModelIndex& index, int role) con
   // the real properties value
   else if(index.column() == PROPERTY_VALUE_COLUMN)
   {
-    mitk::BaseProperty* baseProp = m_SelectedProperties[index.row()].second.first;
+    mitk::BaseProperty* baseProp = m_SelectedProperties[index.row()].second;
 
     if (const mitk::ColorProperty* colorProp 
       = dynamic_cast<const mitk::ColorProperty*>(baseProp))
@@ -184,15 +176,8 @@ QVariant QmitkPropertiesTableModel::data(const QModelIndex& index, int role) con
     else
     {
       if(role == Qt::DisplayRole)
-        data.setValue<QString>(QString::fromStdString(m_SelectedProperties[index.row()].second.first->GetValueAsString()));
+        data.setValue<QString>(QString::fromStdString(m_SelectedProperties[index.row()].second->GetValueAsString()));
     }
-  }
-
-  // enabled/disabled value
-  else if(index.column() == PROPERTY_ACTIVE_COLUMN)
-  {
-    if (role == Qt::CheckStateRole)
-      data = (m_SelectedProperties[index.row()].second.second) ? Qt::Checked : Qt::Unchecked;
   }
 
   return data;
@@ -206,7 +191,7 @@ int QmitkPropertiesTableModel::rowCount(const QModelIndex&  /*parent*/) const
 
 int QmitkPropertiesTableModel::columnCount(const QModelIndex & /*parent*/)const
 {
-  return 3;
+  return 2;
 }
 
 //# PUBLIC SETTER
@@ -283,7 +268,7 @@ bool QmitkPropertiesTableModel::setData(const QModelIndex &index, const QVariant
     // the properties name
     if(index.column() == PROPERTY_VALUE_COLUMN)
     {
-      mitk::BaseProperty* baseProp = m_SelectedProperties[index.row()].second.first;
+      mitk::BaseProperty* baseProp = m_SelectedProperties[index.row()].second;
 
       if (mitk::ColorProperty* colorProp 
         = dynamic_cast<mitk::ColorProperty*>(baseProp))
@@ -364,18 +349,6 @@ bool QmitkPropertiesTableModel::setData(const QModelIndex &index, const QVariant
       }
     }
 
-    // enabled/disabled value
-    else if(index.column() == PROPERTY_ACTIVE_COLUMN)
-    {
-      bool active = value.toInt() == Qt::Checked;
-      std::string propertyName = m_SelectedProperties[index.row()].first;
-
-      m_PropertyList->SetEnabled(propertyName, active);
-      m_SelectedProperties[index.row()].second.second = active;
-
-      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
-    }
-
     // property was changed by us, now we can accept property changes triggered by someone else 
     m_BlockEvents = false;
     emit dataChanged(index, index);
@@ -404,10 +377,6 @@ void QmitkPropertiesTableModel::sort( int column, Qt::SortOrder order /*= Qt::As
     if(column == PROPERTY_VALUE_COLUMN)
       _CompareCriteria = PropertyDataSetCompareFunction::CompareByValue;
 
-    else if(column == PROPERTY_ACTIVE_COLUMN)
-      _CompareCriteria = PropertyDataSetCompareFunction::CompareByActivity;
-
-
     PropertyDataSetCompareFunction compareFunc(_CompareCriteria, _CompareOperator);
     std::sort(m_SelectedProperties.begin(), m_SelectedProperties.end(), compareFunc);
 
@@ -429,7 +398,7 @@ int QmitkPropertiesTableModel::FindProperty( const mitk::BaseProperty* _Property
     for( propertyIterator=m_SelectedProperties.begin(); propertyIterator!=m_SelectedProperties.end()
       ; propertyIterator++)
     {
-      if(propertyIterator->second.first == _Property)
+      if(propertyIterator->second == _Property)
         break;
     }
 
@@ -447,13 +416,13 @@ void QmitkPropertiesTableModel::AddSelectedProperty( PropertyDataSet& _PropertyD
   itk::MemberCommand<QmitkPropertiesTableModel>::Pointer _PropertyDataSetModifiedCommand =
     itk::MemberCommand<QmitkPropertiesTableModel>::New();
   _PropertyDataSetModifiedCommand->SetCallbackFunction(this, &QmitkPropertiesTableModel::PropertyModified);
-  m_PropertyModifiedObserverTags.push_back(_PropertyDataSet.second.first->AddObserver(itk::ModifiedEvent(), _PropertyDataSetModifiedCommand));
+  m_PropertyModifiedObserverTags.push_back(_PropertyDataSet.second->AddObserver(itk::ModifiedEvent(), _PropertyDataSetModifiedCommand));
 
   // subscribe for delete event
   itk::MemberCommand<QmitkPropertiesTableModel>::Pointer _PropertyDataSetDeleteCommand =
     itk::MemberCommand<QmitkPropertiesTableModel>::New();
   _PropertyDataSetDeleteCommand->SetCallbackFunction(this, &QmitkPropertiesTableModel::PropertyDelete);
-  m_PropertyDeleteObserverTags.push_back(_PropertyDataSet.second.first->AddObserver(itk::DeleteEvent(), _PropertyDataSetDeleteCommand));
+  m_PropertyDeleteObserverTags.push_back(_PropertyDataSet.second->AddObserver(itk::DeleteEvent(), _PropertyDataSetDeleteCommand));
 
   // add to the selection
   m_SelectedProperties.push_back(_PropertyDataSet);
@@ -464,10 +433,10 @@ void QmitkPropertiesTableModel::RemoveSelectedProperty( unsigned int _Index )
   PropertyDataSet& _PropertyDataSet = m_SelectedProperties.at(_Index);
 
   // remove modified event listener
-  _PropertyDataSet.second.first->RemoveObserver(m_PropertyModifiedObserverTags[_Index]);
+  _PropertyDataSet.second->RemoveObserver(m_PropertyModifiedObserverTags[_Index]);
   m_PropertyModifiedObserverTags.erase(m_PropertyModifiedObserverTags.begin()+_Index);
   // remove delete event listener
-  _PropertyDataSet.second.first->RemoveObserver(m_PropertyDeleteObserverTags[_Index]);
+  _PropertyDataSet.second->RemoveObserver(m_PropertyDeleteObserverTags[_Index]);
   m_PropertyDeleteObserverTags.erase(m_PropertyDeleteObserverTags.begin()+_Index);
   // remove from selection
   m_SelectedProperties.erase(m_SelectedProperties.begin()+_Index);
@@ -489,7 +458,7 @@ void QmitkPropertiesTableModel::Reset()
       ; it!=m_PropertyList->GetMap()->end()
       ; it++)
     {
-      allPredicates.push_back(*it);
+      allPredicates.push_back(*it); //% TODO
     }      
   }
   // make a subselection if a keyword is specified
@@ -547,16 +516,9 @@ bool QmitkPropertiesTableModel::PropertyDataSetCompareFunction::operator()
   {
     case CompareByValue:
       if(m_CompareOperator == Less)
-        return (_Left.second.first->GetValueAsString() < _Right.second.first->GetValueAsString());
+        return (_Left.second->GetValueAsString() < _Right.second->GetValueAsString());
       else
-        return (_Left.second.first->GetValueAsString() > _Right.second.first->GetValueAsString());
-    break;
-
-    case CompareByActivity:
-      if(m_CompareOperator == Less)
-        return (_Left.second.second < _Right.second.second);
-      else
-        return (_Left.second.second > _Right.second.second);
+        return (_Left.second->GetValueAsString() > _Right.second->GetValueAsString());
     break;
 
     // CompareByName:

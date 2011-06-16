@@ -28,8 +28,8 @@ mitk::BaseProperty* mitk::PropertyList::GetProperty(const std::string& propertyK
     PropertyMap::const_iterator it;
     
     it=m_Properties.find( propertyKey );
-    if(it!=m_Properties.end() &&  it->second.second )
-      return it->second.first;
+    if(it!=m_Properties.end())
+      return it->second;
     else 
         return NULL;
 }
@@ -51,24 +51,24 @@ void mitk::PropertyList::SetProperty(const std::string& propertyKey, BasePropert
   {
     // yes
     //is the property contained in the list identical to the new one?
-    if( it->second.first == property) 
+    if( it->second == property) 
     {
       // yes? do nothing and return.
       return;
     }
 
     // compatible? then use operator= to assign value
-    if (it->second.first->Assignable( *property ))
+    if (it->second->Assignable( *property ))
     {
-      bool changed = (it->second.first->GetValueAsString() != property->GetValueAsString());
-      *(static_cast<BaseProperty*>(it->second.first.GetPointer())) = *property;
+      bool changed = (it->second->GetValueAsString() != property->GetValueAsString());
+      *(static_cast<BaseProperty*>(it->second.GetPointer())) = *property;
       // muellerm,20.10: added modified event
       if(changed)
         this->Modified();
       return;
     }
     
-    if ( typeid( *(it->second.first.GetPointer()) ) != typeid( *property ) )
+    if ( typeid( *(it->second.GetPointer()) ) != typeid( *property ) )
     {
       // Accept only if the two types are matching. For replacing, use 
       // ReplaceProperty.
@@ -81,14 +81,14 @@ void mitk::PropertyList::SetProperty(const std::string& propertyKey, BasePropert
 
     // If types are identical, but the property has no operator= (s.a.),
     // overwrite the pointer.
-    it->second.first = property;
+    it->second = property;
     return;
   }
 
   //no? add/replace it.
   PropertyMapElementType newProp;
   newProp.first = propertyKey;
-  newProp.second = std::pair<BaseProperty::Pointer,bool>(property,true);
+  newProp.second = property;
   m_Properties.insert ( newProp );
   this->Modified();
 }
@@ -103,14 +103,14 @@ void mitk::PropertyList::ReplaceProperty(const std::string& propertyKey, BasePro
   // Is a property with key @a propertyKey contained in the list?
   if( it != m_Properties.end() )
   {
-    it->second.first=NULL;
+    it->second=NULL;
     m_Properties.erase(it);
   }
 
   //no? add/replace it.
   PropertyMapElementType newProp;
   newProp.first = propertyKey;
-  newProp.second = std::pair<BaseProperty::Pointer,bool>(property,true);
+  newProp.second = property;
   m_Properties.insert ( newProp );
   Modified();
 }
@@ -136,12 +136,12 @@ unsigned long mitk::PropertyList::GetMTime() const
         it != m_Properties.end();
         ++it )
   {
-    if( it->second.first.IsNull() )
+    if( it->second.IsNull() )
     {
       itkWarningMacro(<< "Property '" << it->first <<"' contains nothing (NULL).");
       continue;
     }
-    if( Superclass::GetMTime() < it->second.first->GetMTime() )
+    if( Superclass::GetMTime() < it->second->GetMTime() )
     {
       Modified();
       break;
@@ -159,7 +159,7 @@ bool mitk::PropertyList::DeleteProperty(const std::string& propertyKey)
 
   if(it!=m_Properties.end())
   {
-    it->second.first=NULL;
+    it->second=NULL;
     m_Properties.erase(it);
     Modified();
     return true;
@@ -184,34 +184,10 @@ void mitk::PropertyList::Clear()
   PropertyMap::iterator it = m_Properties.begin(), end = m_Properties.end();
   while(it!=end)
   {
-    it->second.first = NULL;
+    it->second = NULL;
     ++it;
   }
   m_Properties.clear();
-}
-
-bool mitk::PropertyList::IsEnabled(const std::string& propertyKey) 
-{
-  PropertyMap::iterator it = m_Properties.find( propertyKey );
-  if (it != m_Properties.end() && it->second.second) 
-  {
-   return true;
-  } 
-  else 
-  {
-    return false;
-  }
-}
-
-
-void mitk::PropertyList::SetEnabled(const std::string& propertyKey, bool enabled) 
-{
-  PropertyMap::iterator it = m_Properties.find( propertyKey );
-  if (it != m_Properties.end() && it->second.second != enabled) 
-  {
-    it->second.second = enabled;
-    this->Modified();
-  }
 }
 
 
@@ -226,7 +202,7 @@ void mitk::PropertyList::ConcatenatePropertyList(PropertyList *pList, bool repla
           ++iter )
     {
       const std::string key = iter->first;
-      BaseProperty* value = iter->second.first;
+      BaseProperty* value = iter->second;
       if (replace)
       {
         ReplaceProperty( key.c_str(), value );

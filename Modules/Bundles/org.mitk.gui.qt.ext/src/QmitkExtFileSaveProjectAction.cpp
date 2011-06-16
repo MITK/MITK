@@ -126,7 +126,7 @@ void QmitkExtFileSaveProjectAction::Run()
         iter != propmap->end();
         ++iter )
       {
-        ss << " - " << iter->second.first->GetNameOfClass() << " associated to key '" << iter->first << "'" << std::endl;
+        ss << " - " << iter->second->GetNameOfClass() << " associated to key '" << iter->first << "'" << std::endl;
       }
 
       MITK_WARN << ss.str();

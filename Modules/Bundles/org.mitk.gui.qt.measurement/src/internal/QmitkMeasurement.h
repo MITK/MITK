@@ -68,6 +68,13 @@ class QmitkMeasurement : public QmitkFunctionality
     /// Initialize pointers to 0. The rest is done in CreateQtPartControl()
     ///
     QmitkMeasurement();
+
+	QmitkMeasurement(const QmitkMeasurement& other)
+	{
+		Q_UNUSED(other)
+		throw std::runtime_error("Copy constructor not implemented");
+	}
+
     ///
     /// Remove all event listener from DataStorage, DataStorageSelection, Selection Service
     ///

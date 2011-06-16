@@ -60,7 +60,8 @@ public:
     void SetPerspectiveExcludeList(std::vector<std::string> v);
     std::vector<std::string> GetPerspectiveExcludeList();
 
-
+    void SetViewExcludeList(std::vector<std::string> v);
+    std::vector<std::string> GetViewExcludeList();
 
 private:
 
@@ -109,6 +110,9 @@ private:
 
   // stringlist for excluding perspectives from the perspective menu entry (e.g. Welcome Perspective)
   std::vector<std::string> perspectiveExcludeList;
+
+  // stringlist for excluding views from the menu entry
+  std::vector<std::string> viewExcludeList;
 
   // maps perspective ids to QAction objects
   std::map<std::string, QAction*> mapPerspIdToAction;

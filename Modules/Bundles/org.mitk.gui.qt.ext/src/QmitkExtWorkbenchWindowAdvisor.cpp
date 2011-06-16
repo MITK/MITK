@@ -522,12 +522,34 @@ void QmitkExtWorkbenchWindowAdvisor::PostWindowCreate()
  std::vector<berry::IViewDescriptor::Pointer>::const_iterator iter;
  std::map<std::string, berry::IViewDescriptor::Pointer> VDMap;
 
+ skip = false;
  for (iter = viewDescriptors.begin(); iter != viewDescriptors.end(); ++iter)
  {
+
+   // if viewExcludeList is set, it contains the id-strings of view, which
+   // should not appear as an menu-entry in the menu
+   if (viewExcludeList.size() > 0)
+   {
+     for (unsigned int i=0; i<viewExcludeList.size(); i++)
+     {
+       if (viewExcludeList.at(i) == (*iter)->GetId())
+       {
+         skip = true;
+         break;
+       }
+     }
+     if (skip)
+     {
+       skip = false;
+       continue;
+     }
+   }
+
   if ((*iter)->GetId() == "org.blueberry.ui.internal.introview")
    continue;
   if ((*iter)->GetId() == "org.mitk.views.imagenavigator")
    continue;
+
   std::pair<std::string, berry::IViewDescriptor::Pointer> p(
    (*iter)->GetLabel(), (*iter));
   VDMap.insert(p);
@@ -947,12 +969,22 @@ void QmitkExtWorkbenchWindowAdvisor::PropertyChange(berry::Object::Pointer /*sou
 
 void QmitkExtWorkbenchWindowAdvisor::SetPerspectiveExcludeList(std::vector<std::string> v)
 {
-  this->perspectiveExcludeList = v;    
+  this->perspectiveExcludeList = v;
 }
 
 std::vector<std::string> QmitkExtWorkbenchWindowAdvisor::GetPerspectiveExcludeList()
 {
   return this->perspectiveExcludeList;
+}
+
+void QmitkExtWorkbenchWindowAdvisor::SetViewExcludeList(std::vector<std::string> v)
+{
+  this->viewExcludeList = v;
+}
+
+std::vector<std::string> QmitkExtWorkbenchWindowAdvisor::GetViewExcludeList()
+{
+  return this->viewExcludeList;
 }
 
 void QmitkExtWorkbenchWindowAdvisor::PostWindowClose()

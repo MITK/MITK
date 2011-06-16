@@ -111,9 +111,12 @@ function(func_build_target target build_dir)
 endfunction()
 
 function(func_test label build_dir)
+  if (NOT TESTING_PARALLEL_LEVEL)
+    set(TESTING_PARALLEL_LEVEL 8)
+  endif()
   ctest_test(BUILD "${build_dir}"
              INCLUDE_LABEL ${label}
-             PARALLEL_LEVEL 8
+             PARALLEL_LEVEL ${TESTING_PARALLEL_LEVEL}
              EXCLUDE ${TEST_TO_EXCLUDE_REGEX}
              RETURN_VALUE res
             )

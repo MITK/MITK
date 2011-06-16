@@ -35,10 +35,8 @@ namespace berry {
 /**
  * A dialog for showing messages to the user.
  */
-struct BERRY_UI MessageDialogTweaklet : public Object
+struct BERRY_UI MessageDialogTweaklet
 {
-
-  berryInterfaceMacro(MessageDialogTweaklet, berry);
 
   static Tweaklets::TweakKey<MessageDialogTweaklet> KEY;
 

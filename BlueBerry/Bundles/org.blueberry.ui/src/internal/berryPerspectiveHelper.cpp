@@ -15,9 +15,10 @@
 
  =========================================================================*/
 
+#include "../tweaklets/berryGuiWidgetsTweaklet.h"
+
 #include "berryPerspectiveHelper.h"
 
-#include "../tweaklets/berryGuiWidgetsTweaklet.h"
 #include "berryLayoutTree.h"
 #include "berryEditorSashContainer.h"
 #include "berryDragUtil.h"

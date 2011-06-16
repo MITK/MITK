@@ -33,9 +33,8 @@
 
 namespace berry {
 
-struct BERRY_UI GuiWidgetsTweaklet : public Object
+struct BERRY_UI GuiWidgetsTweaklet
 {
-  berryInterfaceMacro(GuiWidgetsTweaklet, berry);
 
   static Tweaklets::TweakKey<GuiWidgetsTweaklet> KEY;
 

@@ -46,7 +46,7 @@ void StackablePart::Reparent(void* newParent)
 {
   void* control = this->GetControl();
 
-  GuiWidgetsTweaklet::Pointer guiTweaklet = Tweaklets::Get(GuiWidgetsTweaklet::KEY);
+  GuiWidgetsTweaklet* guiTweaklet = Tweaklets::Get(GuiWidgetsTweaklet::KEY);
   if ((control == 0) || (guiTweaklet->GetParent(control) == newParent))
   {
     return;

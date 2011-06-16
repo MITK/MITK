@@ -20,6 +20,8 @@
 
 #include <ctkPlugin.h>
 
+#include <QSet>
+
 const QString berry::CTKPluginListener::PLUGIN_MANIFEST = "plugin.xml";
 
 namespace berry {
@@ -47,10 +49,13 @@ QList<QSharedPointer<ctkPlugin> >
 CTKPluginListener::sortPlugins(const QList<QSharedPointer<ctkPlugin> >& plugins)
 {
   QList<QSharedPointer<ctkPlugin> > sortedPlugins(plugins);
+  QSet<QString> installedSymbolicNames;
 
   QHash<long, QStringList> mapPluginIdToDeps;
   foreach(QSharedPointer<ctkPlugin> plugin, sortedPlugins)
   {
+    installedSymbolicNames.insert((plugin->getSymbolicName()));
+
     QString requirePlugin = plugin->getHeaders()[ctkPluginConstants::REQUIRE_PLUGIN];
     QStringList requiredList = requirePlugin.split(QRegExp("\\s*,\\s*"), QString::SkipEmptyParts);
 
@@ -62,14 +67,14 @@ CTKPluginListener::sortPlugins(const QList<QSharedPointer<ctkPlugin> >& plugins)
     mapPluginIdToDeps[plugin->getPluginId()] = requiredSymbolicNames;
   }
 
-  QStringList symbolicNames;
+  QStringList stableSymbolicNames;
   for (int i = 0; i < sortedPlugins.size();)
   {
     QStringList currDeps = mapPluginIdToDeps[sortedPlugins.at(i)->getPluginId()];
     bool moved = false;
     foreach(QString currDep, currDeps)
     {
-      if (!symbolicNames.contains(currDep))
+      if (!stableSymbolicNames.contains(currDep) && installedSymbolicNames.contains(currDep))
       {
         sortedPlugins.move(i, sortedPlugins.size()-1);
         moved = true;
@@ -78,7 +83,7 @@ CTKPluginListener::sortPlugins(const QList<QSharedPointer<ctkPlugin> >& plugins)
     }
     if (!moved)
     {
-      symbolicNames.append(sortedPlugins.at(i)->getSymbolicName());
+      stableSymbolicNames.append(sortedPlugins.at(i)->getSymbolicName());
       ++i;
     }
   }

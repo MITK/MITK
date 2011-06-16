@@ -20,10 +20,10 @@
 // std::numeric_limits<>::max()
 #define NOMINMAX
 
+#include "tweaklets/berryGuiWidgetsTweaklet.h"
+
 #include "berryGeometry.h"
 #include "berryConstants.h"
-
-#include "tweaklets/berryGuiWidgetsTweaklet.h"
 
 #include <limits>
 

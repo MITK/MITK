@@ -176,7 +176,7 @@ void QtShell::Close()
 
 std::vector<Shell::Pointer> QtShell::GetShells()
 {
-  GuiWidgetsTweaklet::Pointer widgetTweaklet = Tweaklets::Get(GuiWidgetsTweaklet::KEY);
+  GuiWidgetsTweaklet* widgetTweaklet = Tweaklets::Get(GuiWidgetsTweaklet::KEY);
   std::vector<Shell::Pointer> allShells(widgetTweaklet->GetShells());
   std::vector<Shell::Pointer> descendants;
 

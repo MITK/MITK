@@ -31,10 +31,8 @@ struct ITracker;
 /**
  * Provides the set of cursors used for drag-and-drop.
  */
-struct BERRY_UI DnDTweaklet : public Object
+struct BERRY_UI DnDTweaklet
 {
-
-  berryInterfaceMacro(DnDTweaklet, berry);
 
   static Tweaklets::TweakKey<DnDTweaklet> KEY;
 

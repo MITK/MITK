@@ -7,42 +7,42 @@
          id="org.blueberry.ui.qt.tweaklets.WorkbenchTweaklet" 
          name="Qt Workbench Tweaklet" 
          description="Qt specific Workbench tweaks" 
-         definition="berryWorkbenchTweaklet" 
+         definition="org.blueberry.WorkbenchTweaklet" 
          implementation="berry::QtWorkbenchTweaklet" />
          
       <tweaklet 
          id="org.blueberry.ui.qt.tweaklets.WorkbenchPageTweaklet" 
          name="Qt WorkbenchPage Tweaklet" 
          description="Qt specific WorkbenchPage tweaks" 
-         definition="berryWorkbenchPageTweaklet" 
+         definition="org.blueberry.WorkbenchPageTweaklet" 
          implementation="berry::QtWorkbenchPageTweaklet" />
          
       <tweaklet 
          id="org.blueberry.ui.qt.tweaklets.GuiWidgetsTweaklet" 
          name="Qt Widgets Tweaklet" 
          description="Qt specific widget tweaks" 
-         definition="berryGuiWidgetsTweaklet" 
+         definition="org.blueberry.GuiWidgetsTweaklet" 
          implementation="berry::QtWidgetsTweaklet" />
          
        <tweaklet 
          id="org.blueberry.ui.qt.tweaklets.DnDTweaklet" 
          name="Qt DnD Tweaklet" 
          description="Qt specific DnD tweaks" 
-         definition="berryDnDTweaklet" 
+         definition="org.blueberry.DnDTweaklet" 
          implementation="berry::QtDnDTweaklet" />
          
        <tweaklet 
          id="org.blueberry.ui.qt.tweaklets.ImageTweaklet" 
          name="Qt Image Tweaklet" 
          description="Qt specific image tweaks" 
-         definition="berryImageTweaklet" 
+         definition="org.blueberry.ImageTweaklet" 
          implementation="berry::QtImageTweaklet" />
          
        <tweaklet 
          id="org.blueberry.ui.qt.tweaklets.MessageDialogTweaklet" 
          name="Qt Message Dialog Tweaklet" 
          description="Qt specific message dialogs" 
-         definition="berryMessageDialogTweaklet" 
+         definition="org.blueberry.MessageDialogTweaklet" 
          implementation="berry::QtMessageDialogTweaklet" />
    </extension>
    

@@ -17,6 +17,8 @@
 
 #include "berryEditorReference.h"
 
+#include "../tweaklets/berryWorkbenchPageTweaklet.h"
+
 #include "berryEditorManager.h"
 #include "berryEditorDescriptor.h"
 #include "berryEditorRegistry.h"
@@ -26,7 +28,6 @@
 #include "berryWorkbenchPage.h"
 #include "berryNullEditorInput.h"
 #include "berryPartTester.h"
-#include "../tweaklets/berryWorkbenchPageTweaklet.h"
 
 #include "../berryImageDescriptor.h"
 #include "../berryPlatformUI.h"

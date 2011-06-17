@@ -119,7 +119,7 @@ namespace mitk {
     virtual void MitkRenderVolumetricGeometry(BaseRenderer* renderer);
 
     /** \brief Internal class holding the mapper, actor, etc. for each of the 3 2D render windows */
-    class LocalStorage : public mitk::Mapper::BaseLocalStorage
+    class MITK_CORE_EXPORT LocalStorage : public mitk::Mapper::BaseLocalStorage
     {
     public:
       /** \brief Actor of a 2D render window. */
@@ -136,9 +136,12 @@ namespace mitk {
       vtkSmartPointer<vtkLookupTable> m_LookupTable;
       /** \brief transform the plane */
       vtkSmartPointer<vtkTransformPolyDataFilter> m_TransformFilter;
-
       /** \brief The actual reslicer (one per renderer) */
       vtkSmartPointer<vtkImageReslice> m_Reslicer;
+      /** \brief Thickslices post filtering */
+      vtkSmartPointer<vtkMitkThickSlicesFilter> m_TSFilter;
+      /** \brief Using unit spacing for resampling makes life easier TODO improve docu ...*/
+      vtkSmartPointer<vtkImageChangeInformation> m_UnitSpacingImageFilter;
 
       /** \brief timestamp of last update of stored data */
       itk::TimeStamp m_LastUpdateTime;
@@ -165,17 +168,10 @@ namespace mitk {
       mitk::BaseRenderer* m_Renderer;
 
     public:
-      /** \brief Using unit spacing for resampling makes life easier */
-      vtkImageChangeInformation *m_UnitSpacingImageFilter;
-
-      /** \brief Thickslices post filtering */
-      vtkMitkThickSlicesFilter *m_TSFilter;
-
-      /** \brief Extracted image for 3D rendering */
-      vtkImageData *m_Image;
-
       /** \brief stores the id of the observer for delete event of renderer */
       unsigned long m_ObserverID;
+
+      vtkImageData* m_Image;
 
       RendererInfo();
 
@@ -196,7 +192,6 @@ namespace mitk {
 
       void RemoveObserver();
 
-      void Squeeze();
     }; // RendererInfo
 
     /** \brief Get the RendererInfo for \a renderer */

@@ -215,7 +215,6 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
   }
 
   RendererInfo &rendererInfo = this->AccessRendererInfo( renderer );
-  rendererInfo.Squeeze();
 
   //check if there is a valid worldGeometry TODO: Move to Update()?
   const Geometry2D *worldGeometry = renderer->GetCurrentWorldGeometry2D();
@@ -447,8 +446,8 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
     }
   }
 
-  rendererInfo.m_UnitSpacingImageFilter->SetInput( inputData );
-  localStorage->m_Reslicer->SetInput( rendererInfo.m_UnitSpacingImageFilter->GetOutput() );
+  localStorage->m_UnitSpacingImageFilter->SetInput( inputData );
+  localStorage->m_Reslicer->SetInput( localStorage->m_UnitSpacingImageFilter->GetOutput() );
 
   //number of pixels per mm in x- and y-direction of the resampled
   Vector2D pixelsPerMM;
@@ -538,11 +537,11 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
 
   if(thickSlicesMode>0)
   {
-    rendererInfo.m_TSFilter->SetThickSliceMode( thickSlicesMode-1 );
-    rendererInfo.m_TSFilter->SetInput( localStorage->m_Reslicer->GetOutput() );
-    rendererInfo.m_TSFilter->Modified();
-    rendererInfo.m_TSFilter->Update();
-    reslicedImage = rendererInfo.m_TSFilter->GetOutput();
+    localStorage->m_TSFilter->SetThickSliceMode( thickSlicesMode-1 );
+    localStorage->m_TSFilter->SetInput( localStorage->m_Reslicer->GetOutput() );
+    localStorage->m_TSFilter->Modified();
+    localStorage->m_TSFilter->Update();
+    reslicedImage = localStorage->m_TSFilter->GetOutput();
   }
   else
   {
@@ -558,14 +557,15 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
   }
 
   // Store the result in a VTK image
-  if ( rendererInfo.m_Image == NULL )
+  if ( localStorage->m_ReslicedImage == NULL )
   {
-    rendererInfo.m_Image = vtkImageData::New();
+    localStorage->m_ReslicedImage = vtkImageData::New();
+    MITK_INFO << "drin";
   }
 
   //TODO image is stored 2x. Do we still need that?
   rendererInfo.m_Image->DeepCopy( reslicedImage );
-  //  rendererInfo.m_Image->Update();
+//    localStorage->m_ReslicedImage->Update();
 
   //TODO how does the reslicer know for which render window it is reslicing for?
   //set the current slice for the localStorage
@@ -730,7 +730,6 @@ void mitk::ImageVtkMapper2D::Clear()
   for ( it = m_RendererInfo.begin(); it != end; ++it )
   {
     it->second.RemoveObserver();
-    it->second.Squeeze();
   }
   m_RendererInfo.clear();
 }
@@ -1008,8 +1007,6 @@ void mitk::ImageVtkMapper2D::DeleteRendererCallback( itk::Object *object, const 
 mitk::ImageVtkMapper2D::RendererInfo::RendererInfo()
   : m_RendererID(-1),
   m_Renderer(NULL),
-  m_UnitSpacingImageFilter( NULL ),
-  m_TSFilter( NULL ),
   m_Image(NULL),
   m_ObserverID( 0 )
 {
@@ -1017,28 +1014,9 @@ mitk::ImageVtkMapper2D::RendererInfo::RendererInfo()
 
 mitk::ImageVtkMapper2D::RendererInfo::~RendererInfo()
 {
-  this->Squeeze();
-
-  if ( m_UnitSpacingImageFilter != NULL )
-  {
-    m_UnitSpacingImageFilter->Delete();
-  }
-  if ( m_TSFilter != NULL )
-  {
-    m_TSFilter->Delete();
-  }
   if ( m_Image != NULL )
   {
     m_Image->Delete();
-  }
-}
-
-void mitk::ImageVtkMapper2D::RendererInfo::Squeeze()
-{
-  if ( m_Image != NULL )
-  {
-    m_Image->Delete();
-    m_Image = NULL;
   }
 }
 
@@ -1060,17 +1038,10 @@ void mitk::ImageVtkMapper2D::RendererInfo::Initialize( int rendererID, mitk::Bas
   assert(rendererID>=0);
   assert(m_RendererID<0);
 
-  m_RendererID = rendererID;
-  m_Renderer = renderer;
-
   m_Image = vtkImageData::New();
 
-  m_TSFilter = vtkMitkThickSlicesFilter::New();
-
-  m_TSFilter->ReleaseDataFlagOn();
-
-  m_UnitSpacingImageFilter = vtkImageChangeInformation::New();
-  m_UnitSpacingImageFilter->SetOutputSpacing( 1.0, 1.0, 1.0 );
+  m_RendererID = rendererID;
+  m_Renderer = renderer;
 }
 
 void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite)
@@ -1181,6 +1152,7 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::Ba
 
 mitk::ImageVtkMapper2D::LocalStorage::LocalStorage()
 {
+  //TODO initialize everything with NULL in the list ???
   m_ReslicedImage = vtkSmartPointer<vtkImageData>::New();
   m_Plane = vtkSmartPointer<vtkPlaneSource>::New();
   m_Texture = vtkSmartPointer<vtkTexture>::New();
@@ -1189,11 +1161,16 @@ mitk::ImageVtkMapper2D::LocalStorage::LocalStorage()
   m_Actor = vtkSmartPointer<vtkActor>::New();
   m_TransformFilter = vtkSmartPointer<vtkTransformPolyDataFilter>::New();
   m_Reslicer = vtkSmartPointer<vtkImageReslice>::New();
+  m_TSFilter = vtkSmartPointer<vtkMitkThickSlicesFilter>::New();
+  m_UnitSpacingImageFilter = vtkSmartPointer<vtkImageChangeInformation>::New();
 
   //the following actions are always the same and thus can be performed
   //in the constructor for each image (i.e. the image-corresponding local storage)
 
+  m_TSFilter->ReleaseDataFlagOn();
   m_Reslicer->ReleaseDataFlagOn();
+
+  m_UnitSpacingImageFilter->SetOutputSpacing( 1.0, 1.0, 1.0 );
 
   //built a default lookuptable
   m_LookupTable->SetSaturationRange( 0.0, 0.0 );

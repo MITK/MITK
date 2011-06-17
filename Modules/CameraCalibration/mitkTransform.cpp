@@ -441,7 +441,7 @@ namespace mitk
   cv::Mat Transform::GetCvMatrix() const
   {
     cv::Mat mat;
-    vnl_matrix<mitk::ScalarType> vec = this->GetVnlRotationMatrix().as_matrix();
+    vnl_matrix<mitk::ScalarType> vec = this->GetMatrix().as_matrix();
     CvMatFromVnlMatrix<mitk::ScalarType> _CvMatFromVnlMatrix(&vec, &mat);
     _CvMatFromVnlMatrix.Update();
     return mat;

@@ -45,6 +45,14 @@ SET(CPP_FILES
   IODataStructures/TensorImages/mitkNrrdTensorImageWriterFactory.cpp
   IODataStructures/TensorImages/mitkTensorImage.cpp
 
+  # DataStructures -> FiberBundle
+  DataStructures/FiberBundle/mitkFiberBundle.cpp
+  DataStructures/FiberBundle/mitkFiberBundleWriter.cpp
+  DataStructures/FiberBundle/mitkFiberBundleReader.cpp
+  DataStructures/FiberBundle/mitkFiberBundleIOFactory.cpp
+  DataStructures/FiberBundle/mitkFiberBundleWriterFactory.cpp
+  DataStructures/FiberBundle/mitkFiberBundleSerializer.cpp
+
   # Rendering
   Rendering/vtkMaskedProgrammableGlyphFilter.cpp
   Rendering/mitkCompositeMapper.cpp
@@ -53,6 +61,8 @@ SET(CPP_FILES
   Rendering/vtkThickPlane.cxx
   Rendering/mitkOdfNormalizationMethodProperty.cpp
   Rendering/mitkOdfScaleByProperty.cpp
+  Rendering/mitkFiberBundleMapper3D.cpp
+  
 )
 
 SET(H_FILES 

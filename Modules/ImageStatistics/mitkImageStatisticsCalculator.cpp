@@ -142,7 +142,7 @@ void ImageStatisticsCalculator::SetImageMask( const mitk::Image *imageMask )
 }
 
 
-void ImageStatisticsCalculator::SetPlanarFigure( const mitk::PlanarFigure *planarFigure )
+void ImageStatisticsCalculator::SetPlanarFigure( mitk::PlanarFigure *planarFigure )
 {
   if ( m_Image.IsNull() )
   {

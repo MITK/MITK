@@ -46,6 +46,7 @@ IF(MITK_USE_BLUEBERRY)
     org.mitk.gui.qt.ugvisualization
     org.mitk.gui.qt.measurement
     org.mitk.gui.qt.simplemeasurement
+    org.mitk.gui.qt.imagecropper
   )
 
   MACRO_COLLECT_PLUGINS(OUTPUT_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/ExtBundles

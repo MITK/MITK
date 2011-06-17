@@ -2,7 +2,6 @@
 #define mitkCvMatCompare_h
 
 #include <mitkEpsilon.h>
-#include <mitkEndoTrackingExports.h>
 #include <mitkObservable.h>
 #include <mitkAlgorithm.h>
 #include <mitkEndoDebug.h>

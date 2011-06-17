@@ -15,8 +15,8 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
-#ifndef mitkNrrdTensorImageSerializer_h_included
-#define mitkNrrdTensorImageSerializer_h_included
+#ifndef mitkTensorImageSerializer_h_included
+#define mitkTensorImageSerializer_h_included
 
 #include "MitkDiffusionImagingExports.h"
 #include "mitkBaseDataSerializer.h"
@@ -26,15 +26,15 @@ namespace mitk
 /**
   \brief Serializes mitk::Surface for mitk::SceneIO
 */
-class MitkDiffusionImaging_EXPORT NrrdTensorImageSerializer : public BaseDataSerializer
+class MitkDiffusionImaging_EXPORT TensorImageSerializer : public BaseDataSerializer
 {
   public:
-    mitkClassMacro( NrrdTensorImageSerializer, BaseDataSerializer );
+    mitkClassMacro( TensorImageSerializer, BaseDataSerializer );
     itkNewMacro(Self);
     virtual std::string Serialize();
   protected:
-    NrrdTensorImageSerializer();
-    virtual ~NrrdTensorImageSerializer();
+    TensorImageSerializer();
+    virtual ~TensorImageSerializer();
 };
 } // namespace
 #endif

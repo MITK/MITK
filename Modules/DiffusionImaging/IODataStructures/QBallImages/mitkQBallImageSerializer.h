@@ -15,8 +15,8 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
-#ifndef mitkNrrdQBallImageSerializer_h_included
-#define mitkNrrdQBallImageSerializer_h_included
+#ifndef mitkQBallImageSerializer_h_included
+#define mitkQBallImageSerializer_h_included
 
 #include "MitkDiffusionImagingExports.h"
 #include "mitkBaseDataSerializer.h"
@@ -26,15 +26,15 @@ namespace mitk
 /**
   \brief Serializes mitk::Surface for mitk::SceneIO
 */
-class MitkDiffusionImaging_EXPORT NrrdQBallImageSerializer : public BaseDataSerializer
+class MitkDiffusionImaging_EXPORT QBallImageSerializer : public BaseDataSerializer
 {
   public:
-    mitkClassMacro( NrrdQBallImageSerializer, BaseDataSerializer );
+    mitkClassMacro( QBallImageSerializer, BaseDataSerializer );
     itkNewMacro(Self);
     virtual std::string Serialize();
   protected:
-    NrrdQBallImageSerializer();
-    virtual ~NrrdQBallImageSerializer();
+    QBallImageSerializer();
+    virtual ~QBallImageSerializer();
 };
 } // namespace
 #endif

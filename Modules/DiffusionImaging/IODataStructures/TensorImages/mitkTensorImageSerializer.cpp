@@ -15,40 +15,40 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
-#include "mitkNrrdQBallImageSerializer.h"
-#include "mitkQBallImage.h"
-#include "mitkNrrdQBallImageWriter.h"
+#include "mitkTensorImageSerializer.h"
+#include "mitkTensorImage.h"
+#include "mitkNrrdTensorImageWriter.h"
 
 #include <itksys/SystemTools.hxx>
 
 
-MITK_REGISTER_SERIALIZER(NrrdQBallImageSerializer)
+MITK_REGISTER_SERIALIZER(TensorImageSerializer)
 
 
-mitk::NrrdQBallImageSerializer::NrrdQBallImageSerializer()
+mitk::TensorImageSerializer::TensorImageSerializer()
 {
 }
 
 
-mitk::NrrdQBallImageSerializer::~NrrdQBallImageSerializer()
+mitk::TensorImageSerializer::~TensorImageSerializer()
 {
 }
 
 
-std::string mitk::NrrdQBallImageSerializer::Serialize()
+std::string mitk::TensorImageSerializer::Serialize()
 {
-  const QBallImage* image = dynamic_cast<const QBallImage*>( m_Data.GetPointer() );
+  const TensorImage* image = dynamic_cast<const TensorImage*>( m_Data.GetPointer() );
   if (image == NULL)
   {
     MITK_ERROR << " Object at " << (const void*) this->m_Data
-              << " is not an mitk::NrrdQBallImage. Cannot serialize as NrrdQBallImage.";
+              << " is not an mitk::NrrdTensorImage. Cannot serialize as NrrdTensorImage.";
     return "";
   }
 
   std::string filename( this->GetUniqueFilenameInWorkingDirectory() );
   filename += "_";
   filename += m_FilenameHint;
-  filename += ".dwi";
+  filename += ".dti";
 
   std::string fullname(m_WorkingDirectory);
   fullname += "/";
@@ -56,9 +56,9 @@ std::string mitk::NrrdQBallImageSerializer::Serialize()
 
   try
   {
-    NrrdQBallImageWriter::Pointer writer = NrrdQBallImageWriter::New();
+    NrrdTensorImageWriter::Pointer writer = NrrdTensorImageWriter::New();
     writer->SetFileName(fullname);
-    writer->SetInput(const_cast<QBallImage*>(image));
+    writer->SetInput(const_cast<TensorImage*>(image));
     writer->Write();
   }
   catch (std::exception& e)

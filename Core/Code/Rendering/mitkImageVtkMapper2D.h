@@ -137,6 +137,12 @@ namespace mitk {
       /** \brief transform the plane */
       vtkSmartPointer<vtkTransformPolyDataFilter> m_TransformFilter;
 
+      /** \brief The actual reslicer (one per renderer) */
+      vtkSmartPointer<vtkImageReslice> m_Reslicer;
+
+      /** \brief timestamp of last update of stored data */
+      itk::TimeStamp m_LastUpdateTime;
+
       /** \brief Constructor of the local storage. Do as much actions as possible in here to avoid double executions. */
       LocalStorage();
 
@@ -159,31 +165,14 @@ namespace mitk {
       mitk::BaseRenderer* m_Renderer;
 
     public:
-      /** \brief timestamp of last update of stored data */
-      itk::TimeStamp m_LastUpdateTime;
-
-      /** \brief number of pixels per mm in x- and y-direction of the resampled */
-      Vector2D m_PixelsPerMM;
-
-      /** \brief Extent (in pixels) of the image */
-      Vector2D m_Extent;
-
-      /** \brief Overlap (in pixels) to ensure coverage of rotated images also */
-      Vector2D m_Overlap;
-
       /** \brief Using unit spacing for resampling makes life easier */
       vtkImageChangeInformation *m_UnitSpacingImageFilter;
-
-      /** \brief The actual reslicer (one per renderer) */
-      vtkImageReslice *m_Reslicer;
 
       /** \brief Thickslices post filtering */
       vtkMitkThickSlicesFilter *m_TSFilter;
 
       /** \brief Extracted image for 3D rendering */
       vtkImageData *m_Image;
-
-      bool m_TextureInterpolation;
 
       /** \brief stores the id of the observer for delete event of renderer */
       unsigned long m_ObserverID;

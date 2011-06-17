@@ -167,6 +167,17 @@ void mitk::ImageVtkMapper2D::MitkRenderOpaqueGeometry(BaseRenderer* renderer)
 
   if ( this->GetVtkProp(renderer)->GetVisibility() )
   {
+//    vtkSmartPointer<vtkRenderer> ren =
+//      vtkSmartPointer<vtkRenderer>::New();
+//    vtkSmartPointer<vtkRenderWindow> renderWindow =
+//      vtkSmartPointer<vtkRenderWindow>::New();
+//    renderWindow->AddRenderer(ren);
+//    vtkSmartPointer<vtkRenderWindowInteractor> renderWindowInteractor =
+//        vtkSmartPointer<vtkRenderWindowInteractor>::New();
+//    renderWindowInteractor->SetRenderWindow(renderWindow);
+//    ren->AddActor(m_LSH.GetLocalStorage(renderer)->m_Actor);
+//    renderWindow->Render();
+//    renderWindowInteractor->Start();
     this->GetVtkProp(renderer)->RenderOpaqueGeometry( renderer->GetVtkRenderer() );
   }
 }
@@ -247,6 +258,9 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
     sliceBounds[i] = 0.0;
   }
 
+  //Extent (in pixels) of the image
+  Vector2D extent;
+
   // Do we have a simple PlaneGeometry?
   // This is the "regular" case (e.g. slicing through an image axis-parallel or even oblique)
   const PlaneGeometry *planeGeometry = dynamic_cast< const PlaneGeometry * >( worldGeometry );
@@ -265,8 +279,8 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
       // Resampling grid corresponds to the current world geometry. This
       // means that the spacing of the output 2D image depends on the
       // currently selected world geometry, and *not* on the image itself.
-      rendererInfo.m_Extent[0] = worldGeometry->GetExtent( 0 );
-      rendererInfo.m_Extent[1] = worldGeometry->GetExtent( 1 );
+      extent[0] = worldGeometry->GetExtent( 0 );
+      extent[1] = worldGeometry->GetExtent( 1 );
     }
     else
     {
@@ -278,8 +292,8 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
       Vector3D rightInIndex, bottomInIndex;
       inputGeometry->WorldToIndex( origin, right, rightInIndex );
       inputGeometry->WorldToIndex( origin, bottom, bottomInIndex );
-      rendererInfo.m_Extent[0] = rightInIndex.GetNorm();
-      rendererInfo.m_Extent[1] = bottomInIndex.GetNorm();
+      extent[0] = rightInIndex.GetNorm();
+      extent[1] = bottomInIndex.GetNorm();
     }
     
     // Get the extent of the current world geometry and calculate resampling
@@ -287,8 +301,8 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
     widthInMM = worldGeometry->GetExtentInMM( 0 );
     heightInMM = worldGeometry->GetExtentInMM( 1 );
 
-    mmPerPixel[0] = widthInMM / rendererInfo.m_Extent[0];
-    mmPerPixel[1] = heightInMM / rendererInfo.m_Extent[1];
+    mmPerPixel[0] = widthInMM / extent[0];
+    mmPerPixel[1] = heightInMM / extent[1];
 
     right.Normalize();
     bottom.Normalize();
@@ -300,11 +314,11 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
     origin += bottom * ( mmPerPixel[1] * 0.5 );
 
     // Use inverse transform of the input geometry for reslicing the 3D image
-    rendererInfo.m_Reslicer->SetResliceTransform(
+    localStorage->m_Reslicer->SetResliceTransform(
         inputGeometry->GetVtkTransform()->GetLinearInverse() );
 
     // Set background level to TRANSLUCENT (see Geometry2DDataVtkMapper3D)
-    rendererInfo.m_Reslicer->SetBackgroundLevel( -32768 ); //TODO why -32768 and not 0.0???
+   localStorage->m_Reslicer->SetBackgroundLevel( -32768 ); //TODO why -32768 and not 0.0???
 
     // Calculate the actual bounds of the transformed plane clipped by the
     // dataset bounding box; this is required for drawing the texture at the
@@ -322,14 +336,14 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
     if(abstractGeometry != NULL)
     {
 
-      rendererInfo.m_Extent[0] = abstractGeometry->GetParametricExtent(0);
-      rendererInfo.m_Extent[1] = abstractGeometry->GetParametricExtent(1);
+      extent[0] = abstractGeometry->GetParametricExtent(0);
+      extent[1] = abstractGeometry->GetParametricExtent(1);
 
       widthInMM = abstractGeometry->GetParametricExtentInMM(0);
       heightInMM = abstractGeometry->GetParametricExtentInMM(1);
 
-      mmPerPixel[0] = widthInMM / rendererInfo.m_Extent[0];
-      mmPerPixel[1] = heightInMM / rendererInfo.m_Extent[1];
+      mmPerPixel[0] = widthInMM / extent[0];
+      mmPerPixel[1] = heightInMM / extent[1];
 
       origin = abstractGeometry->GetPlane()->GetOrigin();
 
@@ -352,12 +366,12 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
           abstractGeometry->GetVtkAbstractTransform()
           );
 
-      rendererInfo.m_Reslicer->SetResliceTransform( composedResliceTransform );
+      localStorage->m_Reslicer->SetResliceTransform( composedResliceTransform );
       composedResliceTransform->UnRegister( NULL ); // decrease RC
 
       // Set background level to BLACK instead of translucent, to avoid
       // boundary artifacts (see Geometry2DDataVtkMapper3D)
-      rendererInfo.m_Reslicer->SetBackgroundLevel( -1023 );
+      localStorage->m_Reslicer->SetBackgroundLevel( -1023 );
     }
     else
     {
@@ -367,7 +381,7 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
   }
 
   // Make sure that the image to display has a certain minimum size.
-  if ( (rendererInfo.m_Extent[0] <= 2) && (rendererInfo.m_Extent[1] <= 2) )
+  if ( (extent[0] <= 2) && (extent[1] <= 2) )
   {
     return;
   }
@@ -389,19 +403,19 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
     switch ( interpolationMode )
     {
     case VTK_RESLICE_NEAREST:
-      rendererInfo.m_Reslicer->SetInterpolationModeToNearestNeighbor();
+      localStorage->m_Reslicer->SetInterpolationModeToNearestNeighbor();
       break;
     case VTK_RESLICE_LINEAR:
-      rendererInfo.m_Reslicer->SetInterpolationModeToLinear();
+      localStorage->m_Reslicer->SetInterpolationModeToLinear();
       break;
     case VTK_RESLICE_CUBIC:
-      rendererInfo.m_Reslicer->SetInterpolationModeToCubic();
+      localStorage->m_Reslicer->SetInterpolationModeToCubic();
       break;
     }
   }
   else
   {
-    rendererInfo.m_Reslicer->SetInterpolationModeToNearestNeighbor();
+    localStorage->m_Reslicer->SetInterpolationModeToNearestNeighbor();
   }
 
   //Begin Thickslicing
@@ -434,16 +448,18 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
   }
 
   rendererInfo.m_UnitSpacingImageFilter->SetInput( inputData );
-  rendererInfo.m_Reslicer->SetInput( rendererInfo.m_UnitSpacingImageFilter->GetOutput() );
+  localStorage->m_Reslicer->SetInput( rendererInfo.m_UnitSpacingImageFilter->GetOutput() );
 
-  rendererInfo.m_PixelsPerMM[0] = 1.0 / mmPerPixel[0];
-  rendererInfo.m_PixelsPerMM[1] = 1.0 / mmPerPixel[1];
+  //number of pixels per mm in x- and y-direction of the resampled
+  Vector2D pixelsPerMM;
+  pixelsPerMM[0] = 1.0 / mmPerPixel[0];
+  pixelsPerMM[1] = 1.0 / mmPerPixel[1];
 
   //calulate the originArray and the orientations for the reslice-filter
   double originArray[3];
   itk2vtk( origin, originArray );
 
-  rendererInfo.m_Reslicer->SetResliceAxesOrigin( originArray );
+  localStorage->m_Reslicer->SetResliceAxesOrigin( originArray );
 
   double cosines[9];
 
@@ -456,7 +472,7 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
   // normal of the plane
   vnl2vtk( normal.Get_vnl_vector(), cosines + 6 );//fill the last 3 elements
 
-  rendererInfo.m_Reslicer->SetResliceAxesDirectionCosines( cosines );
+  localStorage->m_Reslicer->SetResliceAxesDirectionCosines( cosines );
 
   int xMin, xMax, yMin, yMax;
   if ( boundsInitialized )
@@ -466,23 +482,16 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
     xMax = static_cast< int >( sliceBounds[1] / mmPerPixel[0] + 0.5 );
     yMin = static_cast< int >( sliceBounds[2] / mmPerPixel[1] + 0.5 );
     yMax = static_cast< int >( sliceBounds[3] / mmPerPixel[1] + 0.5 );
-
-    // Calculate the extent by which the maximal plane (due to plane rotation)
-    // overlaps the regular plane size.
-    rendererInfo.m_Overlap[0] = -xMin;
-    rendererInfo.m_Overlap[1] = -yMin;
   }
   else
   {
     // If no reference geometry is available, we also don't know about the
-    // maximum plane size; so the overlap is just ignored
-    rendererInfo.m_Overlap.Fill( 0.0 );
-
+    // maximum plane size;
     xMin = yMin = 0;
-    xMax = static_cast< int >( rendererInfo.m_Extent[0]
-                               - rendererInfo.m_PixelsPerMM[0] + 0.5);
-    yMax = static_cast< int >( rendererInfo.m_Extent[1]
-                               - rendererInfo.m_PixelsPerMM[1] + 0.5);
+    xMax = static_cast< int >( extent[0]
+                               - pixelsPerMM[0] + 0.5);
+    yMax = static_cast< int >( extent[1]
+                               - pixelsPerMM[1] + 0.5);
   }
 
   // Disallow huge dimensions
@@ -501,17 +510,17 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
   if(thickSlicesMode > 0)
   {
     dataZSpacing = 1.0 / normInIndex.GetNorm();
-    rendererInfo.m_Reslicer->SetOutputDimensionality( 3 );
-    rendererInfo.m_Reslicer->SetOutputExtent( xMin, xMax-1, yMin, yMax-1, -thickSlicesNum, 0+thickSlicesNum );
+    localStorage->m_Reslicer->SetOutputDimensionality( 3 );
+    localStorage->m_Reslicer->SetOutputExtent( xMin, xMax-1, yMin, yMax-1, -thickSlicesNum, 0+thickSlicesNum );
   }
   else
   {
-    rendererInfo.m_Reslicer->SetOutputDimensionality( 2 );
-    rendererInfo.m_Reslicer->SetOutputExtent( xMin, xMax-1, yMin, yMax-1, 0, 0 );
+    localStorage->m_Reslicer->SetOutputDimensionality( 2 );
+    localStorage->m_Reslicer->SetOutputExtent( xMin, xMax-1, yMin, yMax-1, 0, 0 );
   }
 
-  rendererInfo.m_Reslicer->SetOutputOrigin( 0.0, 0.0, 0.0 );
-  rendererInfo.m_Reslicer->SetOutputSpacing( mmPerPixel[0], mmPerPixel[1], dataZSpacing );
+  localStorage->m_Reslicer->SetOutputOrigin( 0.0, 0.0, 0.0 );
+  localStorage->m_Reslicer->SetOutputSpacing( mmPerPixel[0], mmPerPixel[1], dataZSpacing );
 
   // xMax and yMax are meant exclusive until now, whereas
   // SetOutputExtent wants an inclusive bound. Thus, we need
@@ -530,16 +539,16 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
   if(thickSlicesMode>0)
   {
     rendererInfo.m_TSFilter->SetThickSliceMode( thickSlicesMode-1 );
-    rendererInfo.m_TSFilter->SetInput( rendererInfo.m_Reslicer->GetOutput() );
+    rendererInfo.m_TSFilter->SetInput( localStorage->m_Reslicer->GetOutput() );
     rendererInfo.m_TSFilter->Modified();
     rendererInfo.m_TSFilter->Update();
     reslicedImage = rendererInfo.m_TSFilter->GetOutput();
   }
   else
   {
-    rendererInfo.m_Reslicer->Modified();
-    rendererInfo.m_Reslicer->Update();
-    reslicedImage = rendererInfo.m_Reslicer->GetOutput();
+    localStorage->m_Reslicer->Modified();
+    localStorage->m_Reslicer->Update();
+    reslicedImage = localStorage->m_Reslicer->GetOutput();
   }
 
   if((reslicedImage == NULL) || (reslicedImage->GetDataDimension() < 1))
@@ -576,7 +585,7 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
 
   //get the transformation matrix of the reslicer in order to render the slice as transversal, coronal or saggital
   vtkSmartPointer<vtkTransform> trans = vtkSmartPointer<vtkTransform>::New();
-  vtkSmartPointer<vtkMatrix4x4> matrix = rendererInfo.m_Reslicer->GetResliceAxes();
+  vtkSmartPointer<vtkMatrix4x4> matrix = localStorage->m_Reslicer->GetResliceAxes();
 
   trans->SetMatrix(matrix);
 
@@ -586,7 +595,7 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
   //set up the camera to view the transformed plane
   this->AdjustCamera( renderer );
 
-  //    renderer->GetVtkRenderer()->SetBackground(1, 1, 1);
+      renderer->GetVtkRenderer()->SetBackground(1, 1, 1);
 
   //Transform the camera to the current position (transveral, coronal and saggital plane).
   //This is necessary, because the vtkTransformFilter does not manipulate the vtkCamera.
@@ -594,7 +603,7 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
   renderer->GetVtkRenderer()->GetActiveCamera()->ApplyTransform(trans);
 
   // We have been modified
-  rendererInfo.m_LastUpdateTime.Modified();
+  localStorage->m_LastUpdateTime.Modified();
 }
 
 bool mitk::ImageVtkMapper2D::LineIntersectZero( vtkPoints *points, int p1, int p2,
@@ -736,7 +745,6 @@ void mitk::ImageVtkMapper2D::ApplyProperties(mitk::BaseRenderer* renderer, vtkSm
   // check for interpolation properties
   bool textureInterpolation = false;
   GetDataNode()->GetBoolProperty( "texture interpolation", textureInterpolation, renderer );
-  rendererInfo.m_TextureInterpolation = textureInterpolation;
 
   //set the interpolation modus according to the property
   localStorage->m_Texture->SetInterpolate(textureInterpolation);
@@ -914,30 +922,32 @@ void mitk::ImageVtkMapper2D::ApplyProperties(mitk::BaseRenderer* renderer, vtkSm
     localStorage->m_TransformFilter->SetInputConnection(localStorage->m_Plane->GetOutputPort());
     //set the texture for the actor
     localStorage->m_Actor->SetTexture(localStorage->m_Texture);
-//    vtkSmartPointer<vtkPolyDataMapper> mapper =
-//        vtkSmartPointer<vtkPolyDataMapper>::New();
-//    mapper->SetInputConnection(localStorage->m_TransformFilter->GetOutputPort());
-////        mapper->SetScalarRange(scalarRange);
-//    mapper->ScalarVisibilityOff();
-//            vtkSmartPointer<vtkActor> actor =
-//                vtkSmartPointer<vtkActor>::New();
-//            actor->SetMapper(mapper);
-//    //        actor->GetProperty()->SetLineWidth(1.0);
-//            vtkSmartPointer<vtkRenderer> ren =
-//              vtkSmartPointer<vtkRenderer>::New();
-//            vtkSmartPointer<vtkRenderWindow> renderWindow =
-//              vtkSmartPointer<vtkRenderWindow>::New();
-//            renderWindow->AddRenderer(ren);
-//            vtkSmartPointer<vtkRenderWindowInteractor> renderWindowInteractor =
-//                vtkSmartPointer<vtkRenderWindowInteractor>::New();
-//            renderWindowInteractor->SetRenderWindow(renderWindow);
-//            ren->AddActor(actor);
-//            renderWindow->Render();
-//            renderWindowInteractor->Start();
   }
   localStorage->m_TransformFilter->Update();
   localStorage->m_Mapper->SetInputConnection(localStorage->m_TransformFilter->GetOutputPort());
   localStorage->m_Mapper->ScalarVisibilityOff();
+
+//      vtkSmartPointer<vtkPolyDataMapper> mapper =
+//          vtkSmartPointer<vtkPolyDataMapper>::New();
+//      mapper->SetInputConnection(localStorage->m_TransformFilter->GetOutputPort());
+//  //        mapper->SetScalarRange(scalarRange);
+//      mapper->ScalarVisibilityOff();
+//              vtkSmartPointer<vtkActor> actor =
+//                  vtkSmartPointer<vtkActor>::New();
+//              actor->SetMapper(mapper);
+//              actor->SetTexture(localStorage->m_Texture);
+//      //        actor->GetProperty()->SetLineWidth(1.0);
+//              vtkSmartPointer<vtkRenderer> ren =
+//                vtkSmartPointer<vtkRenderer>::New();
+//              vtkSmartPointer<vtkRenderWindow> renderWindow =
+//                vtkSmartPointer<vtkRenderWindow>::New();
+//              renderWindow->AddRenderer(ren);
+//              vtkSmartPointer<vtkRenderWindowInteractor> renderWindowInteractor =
+//                  vtkSmartPointer<vtkRenderWindowInteractor>::New();
+//              renderWindowInteractor->SetRenderWindow(renderWindow);
+//              ren->AddActor(actor);
+//              renderWindow->Render();
+//              renderWindowInteractor->Start();
 }
 
 void mitk::ImageVtkMapper2D::Update(mitk::BaseRenderer* renderer)
@@ -966,24 +976,24 @@ void mitk::ImageVtkMapper2D::Update(mitk::BaseRenderer* renderer)
   }
 
   const DataNode *node = this->GetDataNode();
-  RendererInfo& rendererInfo = AccessRendererInfo( renderer );
   data->UpdateOutputInformation();
+  LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
 
   //check if something important has changed and we need to rerender
-  if ( (rendererInfo.m_LastUpdateTime < node->GetMTime()) //was the node modified?
-    || (rendererInfo.m_LastUpdateTime < data->GetPipelineMTime()) //Was the data modified?
-    || (rendererInfo.m_LastUpdateTime < renderer->GetCurrentWorldGeometry2DUpdateTime()) //was the geometry modified?
-    || (rendererInfo.m_LastUpdateTime < renderer->GetDisplayGeometryUpdateTime()) // TODO this does not work
-    || (rendererInfo.m_LastUpdateTime < renderer->GetDisplayGeometry()->GetMTime()) //was the display geometry modified? e.g. zooming, panning
-    || (rendererInfo.m_LastUpdateTime < renderer->GetCurrentWorldGeometry2D()->GetMTime())
-    || (rendererInfo.m_LastUpdateTime < node->GetPropertyList()->GetMTime()) //was a property modified?
-    || (rendererInfo.m_LastUpdateTime < node->GetPropertyList(renderer)->GetMTime()) )
+  if ( (localStorage->m_LastUpdateTime < node->GetMTime()) //was the node modified?
+    || (localStorage->m_LastUpdateTime < data->GetPipelineMTime()) //Was the data modified?
+    || (localStorage->m_LastUpdateTime < renderer->GetCurrentWorldGeometry2DUpdateTime()) //was the geometry modified?
+    || (localStorage->m_LastUpdateTime < renderer->GetDisplayGeometryUpdateTime()) // TODO this does not work
+    || (localStorage->m_LastUpdateTime < renderer->GetDisplayGeometry()->GetMTime()) //was the display geometry modified? e.g. zooming, panning
+    || (localStorage->m_LastUpdateTime < renderer->GetCurrentWorldGeometry2D()->GetMTime())
+    || (localStorage->m_LastUpdateTime < node->GetPropertyList()->GetMTime()) //was a property modified?
+    || (localStorage->m_LastUpdateTime < node->GetPropertyList(renderer)->GetMTime()) )
     {
     this->GenerateData( renderer );
   }
   // since we have checked that nothing important has changed, we can set
   // m_LastUpdateTime to the current time
-  rendererInfo.m_LastUpdateTime.Modified();
+  localStorage->m_LastUpdateTime.Modified();
 }
 
 void mitk::ImageVtkMapper2D::DeleteRendererCallback( itk::Object *object, const itk::EventObject & )
@@ -999,13 +1009,10 @@ mitk::ImageVtkMapper2D::RendererInfo::RendererInfo()
   : m_RendererID(-1),
   m_Renderer(NULL),
   m_UnitSpacingImageFilter( NULL ),
-  m_Reslicer( NULL ),
   m_TSFilter( NULL ),
   m_Image(NULL),
-  m_TextureInterpolation(true),
   m_ObserverID( 0 )
 {
-  m_PixelsPerMM.Fill(0);
 };
 
 mitk::ImageVtkMapper2D::RendererInfo::~RendererInfo()
@@ -1015,10 +1022,6 @@ mitk::ImageVtkMapper2D::RendererInfo::~RendererInfo()
   if ( m_UnitSpacingImageFilter != NULL )
   {
     m_UnitSpacingImageFilter->Delete();
-  }
-  if ( m_Reslicer != NULL )
-  {
-    m_Reslicer->Delete();
   }
   if ( m_TSFilter != NULL )
   {
@@ -1062,10 +1065,8 @@ void mitk::ImageVtkMapper2D::RendererInfo::Initialize( int rendererID, mitk::Bas
 
   m_Image = vtkImageData::New();
 
-  m_Reslicer = vtkImageReslice::New();
   m_TSFilter = vtkMitkThickSlicesFilter::New();
 
-  m_Reslicer->ReleaseDataFlagOn();
   m_TSFilter->ReleaseDataFlagOn();
 
   m_UnitSpacingImageFilter = vtkImageChangeInformation::New();
@@ -1187,9 +1188,12 @@ mitk::ImageVtkMapper2D::LocalStorage::LocalStorage()
   m_Mapper = vtkSmartPointer<vtkPolyDataMapper>::New();
   m_Actor = vtkSmartPointer<vtkActor>::New();
   m_TransformFilter = vtkSmartPointer<vtkTransformPolyDataFilter>::New();
+  m_Reslicer = vtkSmartPointer<vtkImageReslice>::New();
 
   //the following actions are always the same and thus can be performed
   //in the constructor for each image (i.e. the image-corresponding local storage)
+
+  m_Reslicer->ReleaseDataFlagOn();
 
   //built a default lookuptable
   m_LookupTable->SetSaturationRange( 0.0, 0.0 );

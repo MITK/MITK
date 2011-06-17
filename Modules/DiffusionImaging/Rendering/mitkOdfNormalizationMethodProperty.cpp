@@ -98,3 +98,4 @@ bool mitk::OdfNormalizationMethodProperty::AddEnum( const std::string& name, con
 }
 
 MITK_REGISTER_SERIALIZER( OdfNormalizationMethodPropertySerializer )
+MITK_REGISTER_SERIALIZER( OdfNormalizationMethodPropertyDeserializer )

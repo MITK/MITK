@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "MitkDiffusionImagingExports.h"
 #include "mitkEnumerationProperty.h"
+#include "mitkEnumerationPropertySerializer.h"
 
 #include "mitkBasePropertyDeserializer.h"
 #include "mitkBasePropertySerializer.h"
@@ -112,23 +113,12 @@ class MitkDiffusionImaging_EXPORT OdfScaleByPropertyDeserializer : public BasePr
     virtual ~OdfScaleByPropertyDeserializer () {}
 };
 
-class MitkDiffusionImaging_EXPORT OdfScaleByPropertySerializer : public BasePropertySerializer
+class MitkDiffusionImaging_EXPORT OdfScaleByPropertySerializer : public EnumerationPropertySerializer
 {
   public:
 
-    mitkClassMacro( OdfScaleByPropertySerializer, BasePropertySerializer );
+    mitkClassMacro( OdfScaleByPropertySerializer, EnumerationPropertySerializer );
     itkNewMacro(Self);
-
-    virtual BaseProperty::Pointer Deserialize(TiXmlElement* element)
-    {
-      if (!element) return NULL;
-      const char* sa( element->Attribute("value") );
-      std::string s(sa?sa:"");
-      OdfScaleByProperty::Pointer property = OdfScaleByProperty::New();
-      property->SetValue( s );
-      return property.GetPointer();
-    }
-
 
   protected:
 

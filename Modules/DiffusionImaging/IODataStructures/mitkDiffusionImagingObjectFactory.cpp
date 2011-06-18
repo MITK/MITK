@@ -40,7 +40,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkFiberBundle.h"
 #include "mitkFiberBundleMapper3D.h"
-#include "mitkFiberBundleMapper2D.h"
 
 #include "mitkFiberBundleIOFactory.h"
 #include "mitkFiberBundleWriterFactory.h"

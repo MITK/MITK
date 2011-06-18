@@ -46,12 +46,15 @@ SET(CPP_FILES
   IODataStructures/TensorImages/mitkTensorImage.cpp
 
   # DataStructures -> FiberBundle
-  DataStructures/FiberBundle/mitkFiberBundle.cpp
-  DataStructures/FiberBundle/mitkFiberBundleWriter.cpp
-  DataStructures/FiberBundle/mitkFiberBundleReader.cpp
-  DataStructures/FiberBundle/mitkFiberBundleIOFactory.cpp
-  DataStructures/FiberBundle/mitkFiberBundleWriterFactory.cpp
-  DataStructures/FiberBundle/mitkFiberBundleSerializer.cpp
+  IODataStructures/FiberBundle/mitkFiberBundle.cpp
+  IODataStructures/FiberBundle/mitkFiberBundleWriter.cpp
+  IODataStructures/FiberBundle/mitkFiberBundleReader.cpp
+  IODataStructures/FiberBundle/mitkFiberBundleIOFactory.cpp
+  IODataStructures/FiberBundle/mitkFiberBundleWriterFactory.cpp
+  IODataStructures/FiberBundle/mitkFiberBundleSerializer.cpp
+
+  # DataStructures -> PlanarFigureComposite
+  IODataStructures/PlanarFigureComposite/mitkPlanarFigureComposite.cpp
 
   # Rendering
   Rendering/vtkMaskedProgrammableGlyphFilter.cpp
@@ -72,7 +75,8 @@ SET(H_FILES
   Reconstruction/itkAnalyticalDiffusionQballReconstructionImageFilter.h
   Reconstruction/itkPointShell.h
   Reconstruction/itkOrientationDistributionFunction.h
-  IODataStructures/DiffusionWeightedImages/mitkDiffusionImage.h 
+  IODataStructures/DiffusionWeightedImages/mitkDiffusionImage.h
+  IODataStructures/FiberBundle/itkSlowPolyLineParametricPath.h 
   Rendering/mitkOdfVtkMapper2D.h
 )
 

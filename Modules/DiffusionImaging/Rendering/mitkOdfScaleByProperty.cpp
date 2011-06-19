@@ -84,3 +84,6 @@ bool mitk::OdfScaleByProperty::AddEnum( const std::string& name, const IdType& i
 {
   return Superclass::AddEnum( name, id );  
 }
+
+MITK_REGISTER_SERIALIZER( OdfScaleByPropertySerializer )
+MITK_REGISTER_SERIALIZER( OdfScaleByPropertyDeserializer )

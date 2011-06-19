@@ -96,3 +96,6 @@ bool mitk::OdfNormalizationMethodProperty::AddEnum( const std::string& name, con
 {
   return Superclass::AddEnum( name, id );  
 }
+
+MITK_REGISTER_SERIALIZER( OdfNormalizationMethodPropertySerializer )
+MITK_REGISTER_SERIALIZER( OdfNormalizationMethodPropertyDeserializer )

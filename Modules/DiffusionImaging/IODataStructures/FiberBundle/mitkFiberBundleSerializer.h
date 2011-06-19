@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef mitkFiberBundleSerializer_h_included
 #define mitkFiberBundleSerializer_h_included
 
-#include "MitkDiffusionImagingMBIExports.h"
+#include "MitkDiffusionImagingExports.h"
 #include "mitkBaseDataSerializer.h"
 
 namespace mitk
@@ -26,7 +26,7 @@ namespace mitk
 /**
   \brief Serializes mitk::Surface for mitk::SceneIO
 */
-class MitkDiffusionImagingMBI_EXPORT FiberBundleSerializer : public BaseDataSerializer
+class MitkDiffusionImaging_EXPORT FiberBundleSerializer : public BaseDataSerializer
 {
   public:
     mitkClassMacro( FiberBundleSerializer, BaseDataSerializer );

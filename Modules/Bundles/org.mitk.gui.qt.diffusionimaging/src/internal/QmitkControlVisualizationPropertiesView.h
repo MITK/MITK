@@ -104,6 +104,11 @@ protected slots:
   void OnTSNumChanged(int num);
   void OnMenuAboutToShow ();
 
+  void BundleRepresentationWire();
+  void BundleRepresentationTube();
+  void BundleRepresentationColor();
+  void PlanarFigureFocus();
+
 protected:
 
   Ui::QmitkControlVisualizationPropertiesViewControls* m_Controls;
@@ -133,6 +138,9 @@ protected:
   int currentThickSlicesMode;
   QLabel* m_TSLabel;
   QMenu* m_MyMenu;
+
+  // for planarfigure and bundle handling:
+  mitk::DataNode* m_SelectedNode;
 };
 
 

@@ -25,7 +25,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkFiberBundle.h"
 #include <vtkSmartPointer.h>
 #include "mitkVtkMapper3D.h"
-#include "MitkDiffusionImagingMBIExports.h"
+#include "MitkDiffusionImagingExports.h"
 #include "mitkBaseData.h"
 #include "vtkAppendPolyData.h"
 #include "vtkOpenGLPolyDataMapper.h"
@@ -42,7 +42,7 @@ namespace mitk {
   //## @brief Mapper for FiberBundles
   //## @ingroup Mapper
 //  template<class TPixelType>
-  class MitkDiffusionImagingMBI_EXPORT FiberBundleMapper3D : public VtkMapper3D
+  class MitkDiffusionImaging_EXPORT FiberBundleMapper3D : public VtkMapper3D
   {
   public:
 

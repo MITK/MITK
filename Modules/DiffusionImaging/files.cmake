@@ -28,6 +28,7 @@ SET(CPP_FILES
   IODataStructures/DiffusionWeightedImages/mitkNrrdDiffusionImageWriter.cpp
   IODataStructures/DiffusionWeightedImages/mitkNrrdDiffusionImageIOFactory.cpp
   IODataStructures/DiffusionWeightedImages/mitkNrrdDiffusionImageWriterFactory.cpp
+  IODataStructures/DiffusionWeightedImages/mitkDiffusionImageSerializer.cpp
 
   # DataStructures -> QBall
   IODataStructures/QBallImages/mitkQBallImageSource.cpp
@@ -36,6 +37,7 @@ SET(CPP_FILES
   IODataStructures/QBallImages/mitkNrrdQBallImageIOFactory.cpp
   IODataStructures/QBallImages/mitkNrrdQBallImageWriterFactory.cpp
   IODataStructures/QBallImages/mitkQBallImage.cpp
+  IODataStructures/QBallImages/mitkQBallImageSerializer.cpp
 
   # DataStructures -> Tensor
   IODataStructures/TensorImages/mitkTensorImageSource.cpp
@@ -44,6 +46,7 @@ SET(CPP_FILES
   IODataStructures/TensorImages/mitkNrrdTensorImageIOFactory.cpp
   IODataStructures/TensorImages/mitkNrrdTensorImageWriterFactory.cpp
   IODataStructures/TensorImages/mitkTensorImage.cpp
+  IODataStructures/TensorImages/mitkTensorImageSerializer.cpp
 
   # Rendering
   Rendering/vtkMaskedProgrammableGlyphFilter.cpp

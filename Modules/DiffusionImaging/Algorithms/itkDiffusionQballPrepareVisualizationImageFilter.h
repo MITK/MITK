@@ -17,7 +17,7 @@
 #ifndef __itkDiffusionQballPrepareVisualizationImageFilter_h_
 #define __itkDiffusionQballPrepareVisualizationImageFilter_h_
 
-#include "MitkDiffusionImagingMBIExports.h"
+#include "MitkDiffusionImagingExports.h"
 #include "itkImageToImageFilter.h"
 //#include "vnl/vnl_matrix.h"
 #include "vnl/vnl_vector_fixed.h"
@@ -33,7 +33,7 @@ namespace itk{
 
 template< class TOdfPixelType, 
           int NrOdfDirections>
-class MitkDiffusionImagingMBI_EXPORT DiffusionQballPrepareVisualizationImageFilter :
+class MitkDiffusionImaging_EXPORT DiffusionQballPrepareVisualizationImageFilter :
   public ImageToImageFilter< Image< Vector< TOdfPixelType, NrOdfDirections >, 3 >, 
                               Image< Vector< TOdfPixelType, NrOdfDirections >, 3 > >
 {

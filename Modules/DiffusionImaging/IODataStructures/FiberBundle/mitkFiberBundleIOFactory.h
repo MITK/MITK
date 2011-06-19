@@ -23,7 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "itkObjectFactoryBase.h"
 #include "mitkBaseData.h"
-#include "MitkDiffusionImagingMBIExports.h"
+#include "MitkDiffusionImagingExports.h"
 
 //NOTE>umbenennen in internal FiberBundleIOFactory
 
@@ -34,7 +34,7 @@ namespace mitk
 //## @brief Create instances of NrrdQBallImageReader objects using an object factory.
 //##
 //## @ingroup IO
-class MitkDiffusionImagingMBI_EXPORT FiberBundleIOFactory : public itk::ObjectFactoryBase
+class MitkDiffusionImaging_EXPORT FiberBundleIOFactory : public itk::ObjectFactoryBase
 {
 public:  
   /** Standard class typedefs. */

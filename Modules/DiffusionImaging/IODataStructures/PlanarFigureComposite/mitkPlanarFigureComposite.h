@@ -12,7 +12,7 @@
 
 #include "mitkCommon.h"
 #include "mitkBaseData.h"
-#include "MitkDiffusionImagingMBIExports.h"
+#include "MitkDiffusionImagingExports.h"
 #include "mitkPlanarFigure.h"
 #include "itkVectorContainer.h"
 #include "mitkDataNode.h"
@@ -29,7 +29,7 @@ namespace mitk {
 
 
   
-  class MitkDiffusionImagingMBI_EXPORT PlanarFigureComposite : public PlanarFigure 
+  class MitkDiffusionImaging_EXPORT PlanarFigureComposite : public PlanarFigure
   {
     
     typedef itk::VectorContainer<unsigned int, PlanarFigure::Pointer> CompositionContainer;

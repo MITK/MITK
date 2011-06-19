@@ -20,12 +20,12 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "itkObjectFactoryBase.h"
 #include "mitkBaseData.h"
-#include "MitkDiffusionImagingMBIExports.h"
+#include "MitkDiffusionImagingExports.h"
 
 namespace mitk
 {
 
-class MitkDiffusionImagingMBI_EXPORT FiberBundleWriterFactory : public itk::ObjectFactoryBase
+class MitkDiffusionImaging_EXPORT FiberBundleWriterFactory : public itk::ObjectFactoryBase
 {
 public:
 

@@ -22,7 +22,7 @@
 #define _MITK_FiberBundle_H
 
 #include "mitkBaseData.h"
-#include "MitkDiffusionImagingMBIExports.h"
+#include "MitkDiffusionImagingExports.h"
 #include "mitkPlanarFigure.h"
 
 /* This Class represents a bunch of FiberTracts as a Bundle. 
@@ -41,7 +41,7 @@ namespace mitk {
   
   /**
    * \brief Base Class for Fiber Bundles;   */
-  class  MitkDiffusionImagingMBI_EXPORT FiberBundle : public BaseData
+  class  MitkDiffusionImaging_EXPORT FiberBundle : public BaseData
   {
     
     /* friend classes wanna access typedefs 

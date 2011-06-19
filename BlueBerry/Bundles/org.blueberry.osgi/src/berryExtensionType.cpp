@@ -68,7 +68,7 @@ static int extensionTypeCustomType_unlocked(const char *typeName, int length)
     {
       if (customInfo.alias >= 0)
         return customInfo.alias;
-      return v;
+      return v+1;
     }
   }
   return 0;
@@ -147,8 +147,8 @@ bool ExtensionType::isRegistered(int type)
 {
   QReadLocker locker(customTypesLock());
   const QVector<CustomTypeInfo>* const ct = customTypes();
-  return ((ct && ct->count() > type) &&
-          !ct->at(type).typeName.isEmpty());
+  return ((type > 0) && (ct && ct->count() > type - 1) &&
+          !ct->at(type - 1).typeName.isEmpty());
 }
 
 int ExtensionType::type(const char *typeName)
@@ -175,11 +175,11 @@ QObject* ExtensionType::construct(int type)
   Constructor constr = 0;
 
   QReadLocker locker(customTypesLock());
-  if (!ct || ct->count() <= type)
+  if (!ct || ct->count() <= type - 1)
     return 0;
-  if (ct->at(type).typeName.isEmpty())
+  if (ct->at(type - 1).typeName.isEmpty())
     return 0;
-  constr = ct->at(type).constr;
+  constr = ct->at(type - 1).constr;
   return constr();
 }
 
@@ -188,14 +188,14 @@ void ExtensionType::destroy(int type, QObject* data)
   if (!data) return;
 
   const QVector<CustomTypeInfo> * const ct = customTypes();
-  if (!ct) return;
+  if (!ct || ct->count() <= type - 1) return;
 
   Destructor destr = 0;
 
   QReadLocker locker(customTypesLock());
-  if (ct->at(type).typeName.isEmpty())
+  if (ct->at(type - 1).typeName.isEmpty())
     return;
-  destr = ct->at(type).destr;
+  destr = ct->at(type - 1).destr;
   destr(data);
 }
 

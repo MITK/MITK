@@ -24,7 +24,7 @@ IF(EXISTS ${DCMTK_config_INCLUDE_DIR}/osconfig.h)
 
 FILE(READ ${DCMTK_config_INCLUDE_DIR}/osconfig.h _osconfig_h)
   IF(NOT _osconfig_h MATCHES "PACKAGE_VERSION_NUMBER \"354\"")
-  MESSAGE(STATUS "Found DCMTK newer that 3.5.4 ...")
+  # MESSAGE(STATUS "Found DCMTK newer that 3.5.4 ...")
   SET(MITK_USE_DCMTK_NEWER_THAN_3_5_4 TRUE)
   # assume the new oflog library is located next to the others
   # this can be removed if FindDCMTK is adapted for 3.5.5 

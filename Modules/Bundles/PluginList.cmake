@@ -30,9 +30,5 @@ SET(MITK_EXT_PLUGINS
   org.mitk.gui.qt.measurement:OFF
   org.mitk.gui.qt.simplemeasurement:OFF
   org.mitk.gui.qt.imagecropper:OFF
-  org.mitk.gui.qt.imagenavigator:ON
-  org.mitk.gui.qt.moviemaker:ON
-  org.mitk.gui.qt.deformableregistration:ON
-  org.mitk.gui.qt.rigidregistration:ON
   org.mitk.gui.qt.pointbasedregistration:ON
   )

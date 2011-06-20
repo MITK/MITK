@@ -147,18 +147,22 @@ void QmitkToFConnectionWidget::OnConnectCamera()
       this->m_ToFImageGrabber = mitk::ToFImageGrabberCreator::GetInstance()->GetPMDO3ImageGrabber();
     }
     else if (selectedCamera == 3)
+    {//MESA SR4000
+      this->m_ToFImageGrabber = mitk::ToFImageGrabberCreator::GetInstance()->GetMESASR4000ImageGrabber();
+    }
+    else if (selectedCamera == 4)
     {//PMD player
       playerMode = true;
       fileFilter.append("PMD Files (*.pmd)");
       this->m_ToFImageGrabber = mitk::ToFImageGrabberCreator::GetInstance()->GetPMDPlayerImageGrabber();
     }
-    else if (selectedCamera == 4)
+    else if (selectedCamera == 5)
     {//PMD MITK player
       playerMode = true;
       fileFilter.append("MITK Images (*.pic)");
       this->m_ToFImageGrabber = mitk::ToFImageGrabberCreator::GetInstance()->GetPMDMITKPlayerImageGrabber();
     }
-    else if (selectedCamera == 5)
+    else if (selectedCamera == 6)
     {//MITK player
       playerMode = true;
       fileFilter.append("MITK Images (*.pic)");
@@ -179,11 +183,11 @@ void QmitkToFConnectionWidget::OnConnectCamera()
         QMessageBox::information( this, "Template functionality", "Please select a valid image before starting some action.");
         return;
       }
-      if(selectedCamera == 3)
+      if(selectedCamera == 4)
       { //set the PMD file name
         this->m_ToFImageGrabber->SetStringProperty("PMDFileName", tmpFileName.toStdString().c_str() );
       }
-      if (selectedCamera == 4 || selectedCamera == 5)
+      if (selectedCamera == 5 || selectedCamera == 6)
       {
         std::string msg = "";
         try

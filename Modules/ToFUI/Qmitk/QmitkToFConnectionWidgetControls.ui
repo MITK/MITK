@@ -77,6 +77,11 @@
      </item>
      <item>
       <property name="text">
+       <string>MESA SR4000</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
        <string>PMD Player</string>
       </property>
      </item>

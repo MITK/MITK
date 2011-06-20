@@ -11,6 +11,8 @@ SET(CPP_FILES
   mitkToFCameraPMDO3Device.cpp
   mitkToFCameraPMDCamCubeDevice.cpp
   mitkToFCameraPMDCamBoardDevice.cpp
+  mitkToFCameraMESADevice.cpp
+  mitkToFCameraMESASR4000Device.cpp
   mitkToFImageRecorder.cpp
   mitkToFImageRecorderFilter.cpp
   mitkToFImageWriter.cpp
@@ -62,5 +64,16 @@ SET(CPP_FILES ${CPP_FILES}
   mitkToFCameraPMDCamBoardControllerStub.cpp
 )
 ENDIF(MITK_USE_TOF_PMDCAMBOARD)
+
+IF(MITK_USE_TOF_MESASR4000)
+SET(CPP_FILES ${CPP_FILES}
+  mitkToFCameraMESASR4000Controller.cpp
+  mitkToFCameraMESAController.cpp
+)
+ELSE()
+SET(CPP_FILES ${CPP_FILES}
+  mitkToFCameraMESASR4000ControllerStub.cpp
+)
+ENDIF(MITK_USE_TOF_MESASR4000)
 
 

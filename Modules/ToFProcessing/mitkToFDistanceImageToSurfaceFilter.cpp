@@ -35,11 +35,18 @@ PURPOSE.  See the above copyright notices for more information.
 mitk::ToFDistanceImageToSurfaceFilter::ToFDistanceImageToSurfaceFilter(): m_CameraIntrinsics(),
 m_TextureImageWidth(0), m_TextureImageHeight(0), m_IplScalarImage(NULL), m_InterPixelDistance()
 {
-  m_InterPixelDistance.Fill(0.045);
+  //m_InterPixelDistance.Fill(0.045);
+  //m_CameraIntrinsics = mitk::CameraIntrinsics::New();
+  //m_CameraIntrinsics->SetFocalLength(295.78960196187319,296.1255427948447);
+  //m_CameraIntrinsics->SetPrincipalPoint(113.29063841714108,97.243216122015184);
+  //m_CameraIntrinsics->SetDistorsionCoeffs(-0.36874385358645773f,-0.14339503290129013,0.0033210108720361795,-0.004277703352074105);
+
+  // MESA SW4000
+  m_InterPixelDistance.Fill(0.04);
   m_CameraIntrinsics = mitk::CameraIntrinsics::New();
-  m_CameraIntrinsics->SetFocalLength(295.78960196187319,296.1255427948447);
-  m_CameraIntrinsics->SetPrincipalPoint(113.29063841714108,97.243216122015184);
-  m_CameraIntrinsics->SetDistorsionCoeffs(-0.36874385358645773f,-0.14339503290129013,0.0033210108720361795,-0.004277703352074105);
+  m_CameraIntrinsics->SetFocalLength(250.0, 250.0);
+  m_CameraIntrinsics->SetPrincipalPoint(88.0, 72.0);
+  m_CameraIntrinsics->SetDistorsionCoeffs(0.0, 0.0, 0.0, 0.0);
 }
 
 mitk::ToFDistanceImageToSurfaceFilter::~ToFDistanceImageToSurfaceFilter()
@@ -126,6 +133,10 @@ void mitk::ToFDistanceImageToSurfaceFilter::GenerateData()
   }
 
   float* inputFloatData = (float*)(input->GetSliceData(0, 0, 0)->GetData());
+  mitk::ToFProcessingCommon::ToFScalarType focalLength = (m_CameraIntrinsics->GetFocalLengthX()*m_InterPixelDistance[0]+m_CameraIntrinsics->GetFocalLengthY()*m_InterPixelDistance[1])/2.0;
+  mitk::ToFProcessingCommon::ToFPoint2D principalPoint;
+  principalPoint[0] = m_CameraIntrinsics->GetPrincipalPointX();
+  principalPoint[1] = m_CameraIntrinsics->GetPrincipalPointY();
 
   //calculate world coordinates
   for (int j=0; j<yDimension; j++)
@@ -138,17 +149,19 @@ void mitk::ToFDistanceImageToSurfaceFilter::GenerateData()
       pixel[1] = j;
       pixel[2] = 0;
 
-      unsigned int pixelID = pixel[0]+pixel[1]*yDimension;
+      unsigned int pixelID = pixel[0]+pixel[1]*xDimension;
 
       mitk::ToFProcessingCommon::ToFScalarType distance = (double)inputFloatData[pixelID];
-
-      mitk::ToFProcessingCommon::ToFScalarType focalLength = (m_CameraIntrinsics->GetFocalLengthX()*m_InterPixelDistance[0]+m_CameraIntrinsics->GetFocalLengthY()*m_InterPixelDistance[1])/2.0;
-      mitk::ToFProcessingCommon::ToFPoint2D principalPoint;
-      principalPoint[0] = m_CameraIntrinsics->GetPrincipalPointX();
-      principalPoint[1] = m_CameraIntrinsics->GetPrincipalPointY();
+      //distance = 100.0;
 
       mitk::ToFProcessingCommon::ToFPoint3D cartesianCoordinates =
           mitk::ToFProcessingCommon::IndexToCartesianCoordinates(i,j,distance,focalLength,m_InterPixelDistance,principalPoint);
+
+      //cartesianCoordinates[0] = i + 0.0;
+      //cartesianCoordinates[1] = j + 0.0;
+      //cartesianCoordinates[2] = (double)inputFloatData[pixelID];
+      //cartesianCoordinates[2] = 100.0;
+
 
       //TODO: why epsilon here and what value should it have?
 //      if (cartesianCoordinates[2] == 0)
@@ -169,6 +182,12 @@ void mitk::ToFDistanceImageToSurfaceFilter::GenerateData()
           vtkIdType xy_1 = i+(j-1)*xDimension;
           vtkIdType x_1y_1 = (i-1)+(j-1)*xDimension;
 
+          //vtkIdType xy = i+j*yDimension;
+          //vtkIdType x_1y = i-1+j*yDimension;
+          //vtkIdType xy_1 = i+(j-1)*yDimension;
+          //vtkIdType x_1y_1 = (i-1)+(j-1)*yDimension;
+
+
           if (isPointValid[xy]&&isPointValid[x_1y]&&isPointValid[x_1y_1]&&isPointValid[xy_1]) // check if points of cell are valid
           {
             polys->InsertNextCell(3);
@@ -185,7 +204,8 @@ void mitk::ToFDistanceImageToSurfaceFilter::GenerateData()
 
         if (scalarFloatData)
         {          
-          scalarArray->InsertTuple1(pixelID, scalarFloatData[pixel[0]+pixel[1]*xDimension]);
+          //scalarArray->InsertTuple1(pixelID, scalarFloatData[pixel[0]+pixel[1]*xDimension]);
+          scalarArray->InsertTuple1(pixelID, scalarFloatData[pixelID]);
         }
         if (this->m_TextureImageHeight > 0.0 && this->m_TextureImageWidth > 0.0)
         {

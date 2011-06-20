@@ -35,6 +35,7 @@ class vtkImageReslice;
 class vtkImageChangeInformation;
 class vtkPoints;
 class vtkMitkThickSlicesFilter;
+class vtkPolyData;
 
 namespace mitk {
 
@@ -211,6 +212,8 @@ namespace mitk {
 
     //set the camera to view the textured plane
     void AdjustCamera(mitk::BaseRenderer* renderer);
+
+    vtkSmartPointer<vtkPolyData> CreateOutlinePolyData(vtkSmartPointer<vtkImageData> binarySlice);
 
     ImageVtkMapper2D();
 

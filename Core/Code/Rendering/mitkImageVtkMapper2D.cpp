@@ -45,10 +45,11 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkTransformPolyDataFilter.h>
 #include <vtkMarchingSquares.h>
 #include <vtkMarchingContourFilter.h>
-
+#include <vtkLine.h>
 #include <vtkRenderWindowInteractor.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderer.h>
+#include <vtkCellArray.h>
 
 //ITK
 #include <itkRGBAPixel.h>
@@ -854,6 +855,8 @@ void mitk::ImageVtkMapper2D::ApplyProperties(mitk::BaseRenderer* renderer, vtkSm
 
   vtkSmartPointer<vtkMarchingSquares> contourFilter = vtkSmartPointer<vtkMarchingSquares>::New();
 
+  vtkSmartPointer<vtkPolyData> outlineBinary = vtkSmartPointer<vtkPolyData>::New();
+
   if ( binary )
   {
     finalLookuptable->SetAlphaRange(0.0, 1.0);
@@ -865,9 +868,12 @@ void mitk::ImageVtkMapper2D::ApplyProperties(mitk::BaseRenderer* renderer, vtkSm
     {
       if (binaryOutline)
       {
-        contourFilter->SetInput(localStorage->m_ReslicedImage);
-        contourFilter->SetValue(1, 1.0);
-        contourFilter->Update();
+
+//        contourFilter->SetInput(localStorage->m_ReslicedImage);
+//        contourFilter->SetValue(1, 1.0);
+//        contourFilter->Update();
+
+        outlineBinary = CreateOutlinePolyData(localStorage->m_ReslicedImage);
 
         float binaryOutlineWidth(1.0);
         if (this->GetDataNode()->GetFloatProperty( "outline width", binaryOutlineWidth, renderer ))
@@ -912,7 +918,7 @@ void mitk::ImageVtkMapper2D::ApplyProperties(mitk::BaseRenderer* renderer, vtkSm
   localStorage->m_TransformFilter->SetTransform(transform);
   if(binaryOutline && binary)
   {
-    localStorage->m_TransformFilter->SetInputConnection(contourFilter->GetOutputPort());
+    localStorage->m_TransformFilter->SetInput(outlineBinary);
     localStorage->m_Actor->SetTexture(NULL);
   }
   else
@@ -1148,6 +1154,94 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::Ba
     }
   }
   Superclass::SetDefaultProperties(node, renderer, overwrite);
+}
+
+vtkSmartPointer<vtkPolyData> mitk::ImageVtkMapper2D::CreateOutlinePolyData(vtkSmartPointer<vtkImageData> binarySlice){
+	int* dims = binarySlice->GetDimensions();
+	int line = dims[0];
+	int x = 0;
+	int y = 0;
+	char* current;
+	int nn = dims[0]*dims[1]; //max pixel(n,n)
+
+	vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
+	for (int ii = 0; ii<nn; ii++) { //current pixel(i,i)
+		current = static_cast<char*>(binarySlice->GetScalarPointer(x, y, 0));
+		if (*current != 0) {
+			if (ii >= line && *(current-line) == 0) {
+//				std::cout << "-";
+				points->InsertNextPoint(x, y, 0);
+				points->InsertNextPoint(x+1, y, 0);
+				//				glVertex3f( x,     y, 0.0 );
+				//				glVertex3f( x+1.0, y, 0.0 );
+			}
+			if (ii <= nn-line && *(current+line) == 0) {
+				points->InsertNextPoint(x, y+1, 0);
+				points->InsertNextPoint(x+1, y+1, 0);
+//				std::cout << "-";
+				//				glVertex3f( x,     y+1.0, 0.0 );
+				//				glVertex3f( x+1.0, y+1.0, 0.0 );
+			}
+			if (ii > 1 && *(current-1) == 0) {
+				points->InsertNextPoint(x, y, 0);
+				points->InsertNextPoint(x, y+1, 0);
+//				std::cout << "|";
+				//				glVertex3f( x, y,     0.0 );
+				//				glVertex3f( x, y+1.0, 0.0 );
+			}
+			if (ii < nn-1 && *(current+1) == 0) {
+				points->InsertNextPoint(x+1, y, 0);
+				points->InsertNextPoint(x+1, y+1, 0);
+//				std::cout << "|";
+				//				glVertex3f( x+1.0, y,     0.0 );
+				//				glVertex3f( x+1.0, y+1.0, 0.0 );
+			}
+		}
+
+		//reached end of line
+		x++;
+		if (x >= line) {
+			x = 0;
+			y++;
+			std::cout << std::endl;
+		}
+	}
+
+  vtkSmartPointer<vtkCellArray> lines =
+    vtkSmartPointer<vtkCellArray>::New();
+  for(unsigned int i = 0; i < points->GetNumberOfPoints(); i++)
+    {
+    //Create the first line (between Origin and P0)
+    vtkSmartPointer<vtkLine> line =
+      vtkSmartPointer<vtkLine>::New();
+    line->GetPointIds()->SetId(0,i);
+    line->GetPointIds()->SetId(1,i+1);
+    lines->InsertNextCell(line);
+    }
+
+
+//	vtkSmartPointer<vtkPolyLine> polyLine = vtkSmartPointer<vtkPolyLine>::New();
+//	polyLine->GetPointIds()->SetNumberOfIds(points->GetNumberOfPoints());
+//	for(unsigned int i = 0; i < points->GetNumberOfPoints(); i++)
+//		{
+//		polyLine->GetPointIds()->SetId(i,i);
+//		}
+
+  // Create a cell array to store the lines in and add the lines to it
+
+//  lines->InsertNextCell(polyLine);
+
+  // Create a polydata to store everything in
+  vtkSmartPointer<vtkPolyData> polyData =
+    vtkSmartPointer<vtkPolyData>::New();
+
+  // Add the points to the dataset
+  polyData->SetPoints(points);
+
+  // Add the lines to the dataset
+  polyData->SetLines(lines);
+
+  return polyData;
 }
 
 mitk::ImageVtkMapper2D::LocalStorage::LocalStorage()

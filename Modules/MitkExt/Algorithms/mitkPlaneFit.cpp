@@ -130,18 +130,6 @@ void mitk::PlaneFit::CalculateCentroid( int t )
   
   m_Centroids[t][0] = m_Centroids[t][1] = m_Centroids[t][2] = 0.0;
 
-  //// sum of all points
-  //mitk::PointSet::PointsContainer::Iterator pit, end;
-  //pit = m_PointSet->GetPointSet( t )->GetPoints()->Begin();
-  //end = m_PointSet->GetPointSet( t )->GetPoints()->End();
-  //for ( ; pit!=end; ++pit )
-  //{
-  //  mitk::Point3D p3d = pit.Value();
-  //  m_Centroids[t][0] += p3d[0]; 
-  //  m_Centroids[t][1] += p3d[1];
-  //  m_Centroids[t][2] += p3d[2];
-  //}
-
   for (int i=0; i<ps_total; i++)
   {
     mitk::Point3D p3d = m_PointSet->GetPoint(i,t);
@@ -163,20 +151,6 @@ void mitk::PlaneFit::ProcessPointSet( int t )
 
   // int matrix with POINTS x (X,Y,Z)
   vnl_matrix<mitk::ScalarType> dataM( m_PointSet->GetSize( t ), 3);
-
-  //// calculate point distance to centroid and inserting it in the matrix
-  //mitk::PointSet::PointsContainer::Iterator pit, end;
-  //pit = m_PointSet->GetPointSet( t )->GetPoints()->Begin();
-  //end = m_PointSet->GetPointSet( t )->GetPoints()->End();
-  //
-  //for (int p=0; pit!=end; pit++, p++)
-  //{
-  //  mitk::Point3D p3d = pit.Value();
-  //  dataM[p][0] = p3d[0] - m_Centroids[t][0];
-  //  dataM[p][1] = p3d[1] - m_Centroids[t][1];
-  //  dataM[p][2] = p3d[2] - m_Centroids[t][2];
-  //}
-
 
   int ps_total = m_PointSet->GetSize( t );
   for (int i=0; i<ps_total; i++)

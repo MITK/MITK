@@ -14,6 +14,10 @@ MITK_CREATE_MODULE( mitkDICOMTesting
   DEPENDS Mitk # mitkCore.so
 )
 
+MITK_CHECK_MODULE(_RESULT mitkDICOMTesting)
+IF(_RESULT)
+  MESSAGE(STATUS "mitkDICOMTesting application won't be built. Missing: ${_RESULT}")
+ELSE(_RESULT)
 
 # add helpful applications
 MITK_USE_MODULE( mitkDICOMTesting )
@@ -28,6 +32,7 @@ add_executable(VerifyDICOMMitkImageDump VerifyDICOMMitkImageDump.cpp)
 target_link_libraries(VerifyDICOMMitkImageDump ${ALL_LIBRARIES})
 
 add_subdirectory(Testing)
+ENDIF()
 
 endif()
 endif()

@@ -19,6 +19,11 @@ MITK_CREATE_MODULE(MitkIGT
   ADDITIONAL_LIBS "${ADDITIONAL_LIBS}"
 )
 
+
+MITK_CHECK_MODULE(_RESULT MitkIGT)
+IF(_RESULT)
+  MESSAGE(STATUS "IGTTutorialStep1 won't be built. Missing: ${_RESULT}")
+ELSE(_RESULT)
 ## create IGT config
 CONFIGURE_FILE(mitkIGTConfig.h.in ${PROJECT_BINARY_DIR}/mitkIGTConfig.h @ONLY)
 
@@ -28,3 +33,5 @@ ADD_EXECUTABLE (IGTTutorialStep1 IGTTutorial/IGTTutorialStep1.cpp)
 TARGET_LINK_LIBRARIES(IGTTutorialStep1 mitkIGT mitkCore tinyxml PocoXML)
 
 ADD_SUBDIRECTORY(Testing)
+ENDIF(_RESULT)
+

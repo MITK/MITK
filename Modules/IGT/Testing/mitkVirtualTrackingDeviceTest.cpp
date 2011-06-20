@@ -115,7 +115,7 @@ int mitkVirtualTrackingDeviceTest(int /* argc */, char* /*argv*/[])
     //hence the tool was not modified, the position has to be equal
       MITK_TEST_CONDITION( mitk::Equal(posBefore0, posAfter0) == true, "Testing if the position values for the 'while running' tool remain the same.");
   }
-  else //tool was modified => position should be changed
+  else //tool was modified => position should have changed
   {
       MITK_TEST_CONDITION( mitk::Equal(posBefore0, posAfter0) == false, "Testing if tracking is producing new position values for 'while running' tool.");
   }

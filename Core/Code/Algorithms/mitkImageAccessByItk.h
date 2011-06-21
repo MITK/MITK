@@ -116,7 +116,7 @@ public:
       _accessByItk(mitkImage, itkImageTypeFunction, unsigned short, dimension) else    \
       _accessByItk(mitkImage, itkImageTypeFunction, char, dimension) else              \
       _accessByItk(mitkImage, itkImageTypeFunction, unsigned char,  dimension) else    \
-      _accessByItkTypeException(mitkImage->GetPixelType(), double, float, int, unsigned int, shor, unsigned short, char, unsigned char)
+      _accessByItkTypeException(mitkImage->GetPixelType(), double, float, int, unsigned int, short, unsigned short, char, unsigned char)
 
 #define _accessSpecificTypesByItk(mitkImage, dimension, ...)                            \
 {                                                                                       \

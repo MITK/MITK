@@ -30,7 +30,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 //--------------------------------- instantiation functions  ------------------------------
 //##Documentation
-//## @brief Instantiate access function without additional parammeters
+//## @deprecated Use InstantiateAccessItkImageFunction instead
+//## @brief Instantiate access function without additional parameters
 //## for all datatypes and dimensions
 //##
 //## Use this macro once after the definition of your access function.
@@ -50,8 +51,24 @@ PURPOSE.  See the above copyright notices for more information.
   InstantiateAccessFunctionForFixedDimension(itkImgFunc, 2)         \
   InstantiateAccessFunctionForFixedDimension(itkImgFunc, 3)         
 
+/**
+ * \brief Instantiate access function without additional parameters
+ *        for all datatypes listed MITK_ACCESSBYITK_PIXEL_TYPES and dimensions.
+ *
+ * Use this macro once after the definition of your class containing the
+ * templated AccessItkImage function.
+ * Some compilers have memory problems without the explicit instantiation.
+ * You may need to move the class containing the access function to a separate file.
+ * The CMake macro MITK_MULTIPLEX_PICTYPE can help you with that.
+ * See CMake::mitkMacroMultiplexPicType for documentation.
+ */
+#define InstantiateAccessItkImageFunction(className)                \
+  InstantiateAccessItkImageFunctionForFixedDimension(className, 2)  \
+  InstantiateAccessItkImageFunctionForFixedDimension(itkImgFunc, 3)
+
 //##Documentation
-//## @brief Instantiate access function with one additional parammeter
+//## @deprecated Use InstantiateAccessItkImageFunction_1 instead
+//## @brief Instantiate access function with one additional parameter
 //## for all datatypes and dimensions
 //##
 //## Use this macro once after the definition of your access function.
@@ -68,8 +85,24 @@ PURPOSE.  See the above copyright notices for more information.
   InstantiateAccessFunctionForFixedDimension_1(itkImgFunc, 2, param1Type)         \
   InstantiateAccessFunctionForFixedDimension_1(itkImgFunc, 3, param1Type)         
 
+/**
+ * \brief Instantiate access function with one additional parameter
+ *        for all datatypes listed MITK_ACCESSBYITK_PIXEL_TYPES and dimensions.
+ *
+ * Use this macro once after the definition of your class containing the
+ * templated AccessItkImage function.
+ * Some compilers have memory problems without the explicit instantiation.
+ * You may need to move the class containing the access function to a separate file.
+ * The CMake macro MITK_MULTIPLEX_PICTYPE can help you with that.
+ * See CMake::mitkMacroMultiplexPicType for documentation.
+ */
+#define InstantiateAccessItkImageFunction_1(className, param1Type, param1)                \
+  InstantiateAccessItkImageFunctionForFixedDimension_1(className, 2, param1Type, param1)  \
+  InstantiateAccessItkImageFunctionForFixedDimension_1(className, 3, param1Type, param1)
+
 //##Documentation
-//## @brief Instantiate access function with two additional parammeters
+//## @deprecated Use InstantiateAccessItkImageFunction_2 instead
+//## @brief Instantiate access function with two additional parameters
 //## for all datatypes and dimensions
 //##
 //## Use this macro once after the definition of your access function.
@@ -82,7 +115,23 @@ PURPOSE.  See the above copyright notices for more information.
   InstantiateAccessFunctionForFixedDimension_2(itkImgFunc, 2, param1Type, param2Type)  \
   InstantiateAccessFunctionForFixedDimension_2(itkImgFunc, 3, param1Type, param2Type)
 
+/**
+ * \brief Instantiate access function with two additional parameters
+ *        for all datatypes listed MITK_ACCESSBYITK_PIXEL_TYPES and dimensions.
+ *
+ * Use this macro once after the definition of your class containing the
+ * templated AccessItkImage function.
+ * Some compilers have memory problems without the explicit instantiation.
+ * You may need to move the class containing the access function to a separate file.
+ * The CMake macro MITK_MULTIPLEX_PICTYPE can help you with that.
+ * See CMake::mitkMacroMultiplexPicType for documentation.
+ */
+#define InstantiateAccessItkImageFunction_2(className, param1Type, param1, param2Type, param2) \
+  InstantiateAccessItkImageFunctionForFixedDimension_1(className, 2, param1Type, param1, param2Type, param2) \
+  InstantiateAccessItkImageFunctionForFixedDimension_1(className, 3, param1Type, param1, param2Type, param2)
+
 //##Documentation
+//## @deprecated Use InstantiateAccessItkImageFunctionForFixedDimension
 //## @brief Instantiate access function without additional parammeters
 //## for all datatypes, but fixed dimension
 //##
@@ -106,7 +155,33 @@ template void itkImgFunc<unsigned short,  dimension>(itk::Image<unsigned short, 
 template void itkImgFunc<char,  dimension>(itk::Image<char, dimension>*);                       \
 template void itkImgFunc<unsigned char,  dimension>(itk::Image<unsigned char, dimension>*);
 
+/**
+ * \brief Instantiate access function without additional parameters
+ *        for all datatypes listed MITK_ACCESSBYITK_PIXEL_TYPES and a fixed dimension.
+ *
+ * Use this macro once after the definition of your class containing the
+ * templated AccessItkImage function.
+ * Some compilers have memory problems without the explicit instantiation.
+ * You may need to move the class containing the access function to a separate file.
+ * The CMake macro MITK_MULTIPLEX_PICTYPE can help you with that.
+ * See CMake::mitkMacroMultiplexPicType for documentation.
+ */
+#define InstantiateAccessItkImageFunctionForFixedDimension(className, dimension)                \
+namespace {                                                                                     \
+void instantiate_ ## className ## dimension ()                                                  \
+{                                                                                               \
+  typedef mitk::PixelTypeList<MITK_ACCESSBYITK_PIXEL_TYPES> MyTypes;                            \
+  mitk::PixelTypeSwitch<MyTypes> typeSwitch;                                                    \
+  mitk::AccessItkImageFunctor<className,dimension> memberFunctor(0, 0);                         \
+  int typeCount = mitk::PixelTypeLength<MyTypes>::value;                                        \
+  for(int i = 0; i < typeCount; ++i)                                                            \
+  {                                                                                             \
+    typeSwitch(i, memberFunctor);                                                               \
+  }                                                                                             \
+}
+
 //##Documentation
+//## @deprecated UseInstantiateAccessFunctionForFixedDimension_1 instead
 //## @brief Instantiate access function with one additional parammeter
 //## for all datatypes, but fixed dimension
 //##
@@ -130,7 +205,34 @@ template void itkImgFunc<unsigned short,  dimension>(itk::Image<unsigned short, 
 template void itkImgFunc<char,  dimension>(itk::Image<char, dimension>*, param1Type);                     \
 template void itkImgFunc<unsigned char,  dimension>(itk::Image<unsigned char, dimension>*, param1Type);
 
+/**
+ * \brief Instantiate access function with one additional parameters
+ *        for all datatypes listed MITK_ACCESSBYITK_PIXEL_TYPES and a fixed dimension.
+ *
+ * Use this macro once after the definition of your class containing the
+ * templated AccessItkImage function.
+ * Some compilers have memory problems without the explicit instantiation.
+ * You may need to move the class containing the access function to a separate file.
+ * The CMake macro MITK_MULTIPLEX_PICTYPE can help you with that.
+ * See CMake::mitkMacroMultiplexPicType for documentation.
+ */
+#define InstantiateAccessItkImageFunctionForFixedDimension_1(className, dimension, param1Type, param1)    \
+namespace {                                                                                               \
+void instantiate1_ ## className ## dimension ()                                                           \
+{                                                                                                         \
+  typedef mitk::PixelTypeList<MITK_ACCESSBYITK_PIXEL_TYPES> MyTypes;                                      \
+  mitk::PixelTypeSwitch<MyTypes> typeSwitch;                                                              \
+  mitk::AccessItkImageFunctor<className,dimension,param1Type> memberFunctor(0, 0, param1);                \
+  int typeCount = mitk::PixelTypeLength<MyTypes>::value;                                                  \
+  for(int i = 0; i < typeCount; ++i)                                                                      \
+  {                                                                                                       \
+    typeSwitch(i, memberFunctor);                                                                         \
+  }                                                                                                       \
+}                                                                                                         \
+}
+
 //##Documentation
+//## @deprecated Use InstantiateAccessItkImageFunctionForFixedDimension_2 instead
 //## @brief Instantiate access function with two additional parammeters
 //## for all datatypes, but fixed dimension
 //##
@@ -154,7 +256,34 @@ template void itkImgFunc<unsigned short,  dimension>(itk::Image<unsigned short, 
 template void itkImgFunc<char,  dimension>(itk::Image<char, dimension>*, param1Type, param2Type);                     \
 template void itkImgFunc<unsigned char,  dimension>(itk::Image<unsigned char, dimension>*, param1Type, param2Type);
 
+/**
+ * \brief Instantiate access function with two additional parameters
+ *        for all datatypes listed MITK_ACCESSBYITK_PIXEL_TYPES and a fixed dimension.
+ *
+ * Use this macro once after the definition of your class containing the
+ * templated AccessItkImage function.
+ * Some compilers have memory problems without the explicit instantiation.
+ * You may need to move the class containing the access function to a separate file.
+ * The CMake macro MITK_MULTIPLEX_PICTYPE can help you with that.
+ * See CMake::mitkMacroMultiplexPicType for documentation.
+ */
+#define InstantiateAccessItkImageFunctionForFixedDimension_2(className, dimension, param1Type, param1, param2Type, param2) \
+namespace {                                                                                                   \
+void instantiate2_ ## className ## dimension ()                                                               \
+{                                                                                                             \
+  typedef mitk::PixelTypeList<MITK_ACCESSBYITK_PIXEL_TYPES> MyTypes;                                          \
+  mitk::PixelTypeSwitch<MyTypes> typeSwitch;                                                                  \
+  mitk::AccessItkImageFunctor<className,dimension,param1Type,param2Type> memberFunctor(0, 0, param1, param2); \
+  int typeCount = mitk::PixelTypeLength<MyTypes>::value;                                                      \
+  for(int i = 0; i < typeCount; ++i)                                                                          \
+  {                                                                                                           \
+    typeSwitch(i, memberFunctor);                                                                             \
+  }                                                                                                           \
+}                                                                                                             \
+}
+
 //##Documentation
+//## @deprecated Use InstantiateAccessItkImageFunctionForFixedPixelType instead
 //## @brief Instantiate access function without additional parammeters
 //## for a fixed datatype, but all dimensions
 //##
@@ -172,7 +301,64 @@ template void itkImgFunc<unsigned char,  dimension>(itk::Image<unsigned char, di
 template void itkImgFunc<pixelType,  2>(itk::Image<pixelType, 2>*);                                \
 template void itkImgFunc<pixelType,  3>(itk::Image<pixelType, 3>*);
 
+/**
+ * \brief Instantiate access function without additional parameters
+ *        for all listed datatypes and all dimensions.
+ *
+ * Use this macro once after the definition of your class containing the
+ * templated AccessItkImage function.
+ * Some compilers have memory problems without the explicit instantiation.
+ * You may need to move the class containing the access function to a separate file.
+ * The CMake macro MITK_MULTIPLEX_PICTYPE can help you with that.
+ * See CMake::mitkMacroMultiplexPicType for documentation.
+ */
+#define InstantiateAccessItkImageFunctionForSpecificPixelTypes(className, ...)                                \
+namespace {                                                                                                   \
+void instantiate_ ## className ## Types ()                                                                    \
+{                                                                                                             \
+  typedef mitk::PixelTypeList<__VA_ARGS__> MyTypes;                                                           \
+  mitk::PixelTypeSwitch<MyTypes> typeSwitch;                                                                  \
+  mitk::AccessItkImageFunctor<className,2> memberFunctor2(0, 0);                                              \
+  mitk::AccessItkImageFunctor<className,3> memberFunctor3(0, 0);                                              \
+  int typeCount = mitk::PixelTypeLength<MyTypes>::value;                                                      \
+  for(int i = 0; i < typeCount; ++i)                                                                          \
+  {                                                                                                           \
+    typeSwitch(i, memberFunctor2);                                                                            \
+    typeSwitch(i, memberFunctor3);                                                                            \
+  }                                                                                                           \
+}                                                                                                             \
+}
+
+/**
+ * \brief Instantiate access function without additional parameters
+ *        for integral datatypes and all dimensions.
+ *
+ * Use this macro once after the definition of your class containing the
+ * templated AccessItkImage function.
+ * Some compilers have memory problems without the explicit instantiation.
+ * You may need to move the class containing the access function to a separate file.
+ * The CMake macro MITK_MULTIPLEX_PICTYPE can help you with that.
+ * See CMake::mitkMacroMultiplexPicType for documentation.
+ */
+#define InstantiateAccessItkImageFunctionForIntegralPixelTypes(className)                                \
+InstantiateAccessItkImageFunctionForSpecificPixelTypes(className, int, unsigned int, short, unsigned short, char, unsigned char)
+
+/**
+ * \brief Instantiate access function without additional parameters
+ *        for floating point datatypes and all dimensions.
+ *
+ * Use this macro once after the definition of your class containing the
+ * templated AccessItkImage function.
+ * Some compilers have memory problems without the explicit instantiation.
+ * You may need to move the class containing the access function to a separate file.
+ * The CMake macro MITK_MULTIPLEX_PICTYPE can help you with that.
+ * See CMake::mitkMacroMultiplexPicType for documentation.
+ */
+#define InstantiateAccessItkImageFunctionForFloatingPixelTypes(className)                                \
+InstantiateAccessItkImageFunctionForSpecificPixelTypes(className, float, double)
+
 //##Documentation
+//## @deprecated Use InstantiateAccessItkImageFunctionForFixedPixelType_1
 //## @brief Instantiate access function with one additional parammeter
 //## for a fixed datatype, but all dimensions
 //##
@@ -190,7 +376,64 @@ template void itkImgFunc<pixelType,  3>(itk::Image<pixelType, 3>*);
 template void itkImgFunc<pixelType,  2>(itk::Image<pixelType, 2>*, param1Type);                    \
 template void itkImgFunc<pixelType,  3>(itk::Image<pixelType, 3>*, param1Type);
 
+/**
+ * \brief Instantiate access function with one additional parameter
+ *        for all listed datatypes and all dimensions.
+ *
+ * Use this macro once after the definition of your class containing the
+ * templated AccessItkImage function.
+ * Some compilers have memory problems without the explicit instantiation.
+ * You may need to move the class containing the access function to a separate file.
+ * The CMake macro MITK_MULTIPLEX_PICTYPE can help you with that.
+ * See CMake::mitkMacroMultiplexPicType for documentation.
+ */
+#define InstantiateAccessItkImageFunctionForSpecificPixelTypes_1(className, param1Type, param1, ...)          \
+namespace {                                                                                                   \
+void instantiate1_ ## className ## Types ()                                                                   \
+{                                                                                                             \
+  typedef mitk::PixelTypeList<__VA_ARGS__> MyTypes;                                                           \
+  mitk::PixelTypeSwitch<MyTypes> typeSwitch;                                                                  \
+  mitk::AccessItkImageFunctor<className,2,param1Type> memberFunctor2(0, 0, param1);                           \
+  mitk::AccessItkImageFunctor<className,3,param1Type> memberFunctor3(0, 0, param1);                           \
+  int typeCount = mitk::PixelTypeLength<MyTypes>::value;                                                      \
+  for(int i = 0; i < typeCount; ++i)                                                                          \
+  {                                                                                                           \
+    typeSwitch(i, memberFunctor2);                                                                            \
+    typeSwitch(i, memberFunctor3);                                                                            \
+  }                                                                                                           \
+}                                                                                                             \
+}
+
+/**
+ * \brief Instantiate access function with one additional parameter
+ *        for integral datatypes and all dimensions.
+ *
+ * Use this macro once after the definition of your class containing the
+ * templated AccessItkImage function.
+ * Some compilers have memory problems without the explicit instantiation.
+ * You may need to move the class containing the access function to a separate file.
+ * The CMake macro MITK_MULTIPLEX_PICTYPE can help you with that.
+ * See CMake::mitkMacroMultiplexPicType for documentation.
+ */
+#define InstantiateAccessItkImageFunctionForIntegralPixelTypes_1(className, param1Type, param1) \
+InstantiateAccessItkImageFunctionForSpecificPixelTypes_1(className, param1Type, param1, int, unsigned int, short, unsigned short, char, unsigned char)
+
+/**
+ * \brief Instantiate access function with one additional parameter
+ *        for floating point datatypes and all dimensions.
+ *
+ * Use this macro once after the definition of your class containing the
+ * templated AccessItkImage function.
+ * Some compilers have memory problems without the explicit instantiation.
+ * You may need to move the class containing the access function to a separate file.
+ * The CMake macro MITK_MULTIPLEX_PICTYPE can help you with that.
+ * See CMake::mitkMacroMultiplexPicType for documentation.
+ */
+#define InstantiateAccessItkImageFunctionForFloatingPixelTypes_1(className, param1Type, param1) \
+InstantiateAccessItkImageFunctionForSpecificPixelTypes_1(className, param1Type, param1, float, double)
+
 //##Documentation
+//## @deprecated Use InstantiateAccessItkImageFunctionForSpecificPixelTypes_2 instead
 //## @brief Instantiate access function with two additional parammeters
 //## for a fixed datatype, but all dimensions
 //##
@@ -207,5 +450,61 @@ template void itkImgFunc<pixelType,  3>(itk::Image<pixelType, 3>*, param1Type);
 #define InstantiateAccessFunctionForFixedPixelType_2(itkImgFunc, pixelType, param1Type, param2Type)\
 template void itkImgFunc<pixelType,  2>(itk::Image<pixelType, 2>*, param1Type, param2Type);        \
 template void itkImgFunc<pixelType,  3>(itk::Image<pixelType, 3>*, param1Type, param2Type);
+
+/**
+ * \brief Instantiate access function with two additional parameters
+ *        for all listed datatypes and all dimensions.
+ *
+ * Use this macro once after the definition of your class containing the
+ * templated AccessItkImage function.
+ * Some compilers have memory problems without the explicit instantiation.
+ * You may need to move the class containing the access function to a separate file.
+ * The CMake macro MITK_MULTIPLEX_PICTYPE can help you with that.
+ * See CMake::mitkMacroMultiplexPicType for documentation.
+ */
+#define InstantiateAccessItkImageFunctionForSpecificPixelTypes_2(className, param1Type, param1, param2Type, param2, ...) \
+namespace {                                                                                                   \
+void instantiate2_ ## className ## Types ()                                                                   \
+{                                                                                                             \
+  typedef mitk::PixelTypeList<__VA_ARGS__> MyTypes;                                                           \
+  mitk::PixelTypeSwitch<MyTypes> typeSwitch;                                                                  \
+  mitk::AccessItkImageFunctor<className,2,param1Type,param2Type> memberFunctor2(0, 0, param1, param2);        \
+  mitk::AccessItkImageFunctor<className,3,param1Type,param2Type> memberFunctor3(0, 0, param1, param2);        \
+  int typeCount = mitk::PixelTypeLength<MyTypes>::value;                                                      \
+  for(int i = 0; i < typeCount; ++i)                                                                          \
+  {                                                                                                           \
+    typeSwitch(i, memberFunctor2);                                                                            \
+    typeSwitch(i, memberFunctor3);                                                                            \
+  }                                                                                                           \
+}                                                                                                             \
+}
+
+/**
+ * \brief Instantiate access function with two additional parameters
+ *        for integral datatypes and all dimensions.
+ *
+ * Use this macro once after the definition of your class containing the
+ * templated AccessItkImage function.
+ * Some compilers have memory problems without the explicit instantiation.
+ * You may need to move the class containing the access function to a separate file.
+ * The CMake macro MITK_MULTIPLEX_PICTYPE can help you with that.
+ * See CMake::mitkMacroMultiplexPicType for documentation.
+ */
+#define InstantiateAccessItkImageFunctionForIntegralPixelTypes_2(className, param1Type, param1, param2Type, param2) \
+InstantiateAccessItkImageFunctionForSpecificPixelTypes_2(className, param1Type, param1, param2Type, param2, int, unsigned int, short, unsigned short, char, unsigned char)
+
+/**
+ * \brief Instantiate access function with two additional parameters
+ *        for floating point datatypes and all dimensions.
+ *
+ * Use this macro once after the definition of your class containing the
+ * templated AccessItkImage function.
+ * Some compilers have memory problems without the explicit instantiation.
+ * You may need to move the class containing the access function to a separate file.
+ * The CMake macro MITK_MULTIPLEX_PICTYPE can help you with that.
+ * See CMake::mitkMacroMultiplexPicType for documentation.
+ */
+#define InstantiateAccessItkImageFunctionForFloatingPixelTypes_2(className, param1Type, param1, param2Type, param2) \
+InstantiateAccessItkImageFunctionForSpecificPixelTypes_2(className, param1Type, param1, param2Type, param2, float, double)
 
 #endif // of MITKINSTANTIATEACCESSFUNCTIONS_H_HEADER_INCLUDED

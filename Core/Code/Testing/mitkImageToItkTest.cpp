@@ -17,7 +17,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkImage.h"
-#include "mitkImageAccessByItk.h"
 #include "mitkITKImageImport.h"
 #include "mitkReferenceCountWatcher.h"
 #include "itkDiffusionTensor3D.h"

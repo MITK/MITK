@@ -117,6 +117,51 @@ public:
     MITK_TEST_FOR_EXCEPTION_END(const mitk::AccessByItkException&)
   }
 
+  void testAccessFixedDimensionDefaultPixelTypesByItk()
+  {
+    mitk::Image::Pointer mitkIntImage2D = createMitkImage<IntImage2D>();
+    mitk::Image::ConstPointer mitkIntImage3D(createMitkImage<IntImage3D>());
+    mitk::Image::ConstPointer mitkFloatImage2D(createMitkImage<FloatImage2D>());
+    mitk::Image::Pointer mitkFloatImage3D = createMitkImage<FloatImage3D>();
+
+    AccessFixedDimensionDefaultPixelTypesByItk(mitkIntImage2D, 2);
+    AccessFixedDimensionDefaultPixelTypesByItk(mitkIntImage3D, 3);
+    AccessFixedDimensionDefaultPixelTypesByItk(mitkFloatImage2D, 2);
+    AccessFixedDimensionDefaultPixelTypesByItk(mitkFloatImage3D, 3);
+
+    AccessFixedDimensionDefaultPixelTypesByItk_1(mitkIntImage2D, 2, EImageType, Int2D);
+    AccessFixedDimensionDefaultPixelTypesByItk_1(mitkIntImage3D, 3, EImageType, Int3D);
+    AccessFixedDimensionDefaultPixelTypesByItk_1(mitkFloatImage2D, 2, EImageType, Float2D);
+    AccessFixedDimensionDefaultPixelTypesByItk_1(mitkFloatImage3D, 3, EImageType, Float3D);
+
+    AccessFixedDimensionDefaultPixelTypesByItk_2(mitkIntImage2D, 2, EImageType, Int2D, int, 2);
+    AccessFixedDimensionDefaultPixelTypesByItk_2(mitkIntImage3D, 3, EImageType, Int3D, int, 2);
+    AccessFixedDimensionDefaultPixelTypesByItk_2(mitkFloatImage2D, 2, EImageType, Float2D, int, 2);
+    AccessFixedDimensionDefaultPixelTypesByItk_2(mitkFloatImage3D, 3, EImageType, Float3D, int, 2);
+
+    AccessFixedDimensionDefaultPixelTypesByItk_3(mitkIntImage2D, 2, EImageType, Int2D, int, 2, int, 3);
+    AccessFixedDimensionDefaultPixelTypesByItk_3(mitkIntImage3D, 3, EImageType, Int3D, int, 2, int, 3);
+    AccessFixedDimensionDefaultPixelTypesByItk_3(mitkFloatImage2D, 2, EImageType, Float2D, int, 2, int, 3);
+    AccessFixedDimensionDefaultPixelTypesByItk_3(mitkFloatImage3D, 3, EImageType, Float3D, int, 2, int, 3);
+
+    // Test for wrong dimension
+    MITK_TEST_FOR_EXCEPTION_BEGIN(const mitk::AccessByItkException&)
+    AccessFixedDimensionDefaultPixelTypesByItk(mitkFloatImage3D, 2);
+    MITK_TEST_FOR_EXCEPTION_END(const mitk::AccessByItkException&)
+
+    MITK_TEST_FOR_EXCEPTION_BEGIN(const mitk::AccessByItkException&)
+    AccessFixedDimensionDefaultPixelTypesByItk_1(mitkFloatImage3D, 2, EImageType, Float3D);
+    MITK_TEST_FOR_EXCEPTION_END(const mitk::AccessByItkException&)
+
+    MITK_TEST_FOR_EXCEPTION_BEGIN(const mitk::AccessByItkException&)
+    AccessFixedDimensionDefaultPixelTypesByItk_2(mitkFloatImage3D, 2, EImageType, Float3D, int, 2);
+    MITK_TEST_FOR_EXCEPTION_END(const mitk::AccessByItkException&)
+
+    MITK_TEST_FOR_EXCEPTION_BEGIN(const mitk::AccessByItkException&)
+    AccessFixedDimensionDefaultPixelTypesByItk_3(mitkFloatImage3D, 2, EImageType, Float3D, int, 2, int, 3);
+    MITK_TEST_FOR_EXCEPTION_END(const mitk::AccessByItkException&)
+  }
+
   void testAccessFixedPixelTypeByItk()
   {
     mitk::Image::Pointer mitkIntImage2D = createMitkImage<IntImage2D>();
@@ -384,6 +429,9 @@ int mitkAccessByItkTest(int /*argc*/, char* /*argv*/[])
   MITK_TEST_OUTPUT(<< "Testing AccessFixedDimensionByItk macro")
   accessTest.testAccessFixedDimensionByItk();
 
+  MITK_TEST_OUTPUT(<< "Testing AccessFixedDimensionDefaultPixelTypesByItk macro")
+  accessTest.testAccessFixedDimensionDefaultPixelTypesByItk();
+
   MITK_TEST_OUTPUT(<< "Testing AccessFixedTypeByItk macro")
   accessTest.testAccessFixedTypeByItk();
 
@@ -391,9 +439,8 @@ int mitkAccessByItkTest(int /*argc*/, char* /*argv*/[])
   accessTest.testAccessFixedPixelTypeByItk();
 
   MITK_TEST_OUTPUT(<< "Testing AccessSpecificPixelTypesByItk macro")
-      accessTest.testAccessSpecificPixelTypesByItk();
+  accessTest.testAccessSpecificPixelTypesByItk();
 
   MITK_TEST_END()
 
-  return 0;
 }

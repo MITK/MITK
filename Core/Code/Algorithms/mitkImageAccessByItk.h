@@ -345,7 +345,28 @@ public:
   }                                                                                    \
 }
 
+/**
+ * \brief Access an mitk-image with known dimension by an itk-image
+ *
+ * For usage, see AccessDefaultPixelTypesByItk.
+ * \param dimension dimension of the mitk-image.
+ *
+ * If the image has a different dimension, a mitk::AccessByItkException exception is thrown.
+ *
+ * If you do not know the dimension for sure, use AccessDefaultPixelTypesByItk.
+ * \sa AccessDefaultPixelTypesByItk
+ * \sa AccessFixedTypeByItk
+ * \sa AccessSpecificPixelTypesByItk
+ * \ingroup Adaptor
+ */
+#define AccessFixedDimensionDefaultPixelTypesByItk(mitkImage, dimension)               \
+{                                                                                      \
+  _checkSpecificDimension(mitkImage, dimension);                                       \
+  _accessSpecificPixelTypesByItk(mitkImage, dimension, MITK_ACCESSBYITK_PIXEL_TYPES);  \
+}
+
 //##Documentation
+//## @deprecated Use AccessFixedDimensionDefaultPixelTypesByItk instead
 //## @brief Access an mitk-image with known dimension by an itk-image
 //## 
 //## For usage, see AccessByItk.
@@ -577,7 +598,29 @@ public:
   }                                                                                    \
 }
 
+/**
+ * \brief Access an mitk-image with known dimension by an itk-image
+ *        and pass one additional parameter.
+ *
+ * For usage, see AccessDefaultPixelTypesByItk.
+ * \param dimension dimension of the mitk-image.
+ *
+ * If the image has a different dimension, a mitk::AccessByItkException exception is thrown.
+ *
+ * If you do not know the dimension for sure, use AccessDefaultPixelTypesByItk_1.
+ * \sa AccessDefaultPixelTypesByItk_1
+ * \sa AccessFixedTypeByItk_1
+ * \sa AccessSpecificPixelTypesByItk_1
+ * \ingroup Adaptor
+ */
+#define AccessFixedDimensionDefaultPixelTypesByItk_1(mitkImage, dimension, paramType1, param1) \
+{                                                                                              \
+  _checkSpecificDimension(mitkImage, dimension);                                               \
+  _accessSpecificPixelTypesByItk_1(mitkImage, paramType1, param1, dimension, MITK_ACCESSBYITK_PIXEL_TYPES); \
+}
+
 //##Documentation
+//## @deprecated Use AccessFixedDimensionDefaultPixelTypesByItk_1 instead
 //## @brief Access an mitk-image with known dimension by an itk-image 
 //## and pass one additional parameter to the access-function
 //## 
@@ -816,7 +859,29 @@ public:
   }                                                                                                   \
 }
 
+/**
+ * \brief Access an mitk-image with known dimension by an itk-image
+ *        and pass two additional parameter.
+ *
+ * For usage, see AccessDefaultPixelTypesByItk.
+ * \param dimension dimension of the mitk-image.
+ *
+ * If the image has a different dimension, a mitk::AccessByItkException exception is thrown.
+ *
+ * If you do not know the dimension for sure, use AccessDefaultPixelTypesByItk_2.
+ * \sa AccessDefaultPixelTypesByItk_2
+ * \sa AccessFixedTypeByItk_2
+ * \sa AccessSpecificPixelTypesByItk_2
+ * \ingroup Adaptor
+ */
+#define AccessFixedDimensionDefaultPixelTypesByItk_2(mitkImage, dimension, paramType1, param1, paramType2, param2) \
+{                                                                                              \
+  _checkSpecificDimension(mitkImage, dimension);                                               \
+  _accessSpecificPixelTypesByItk_2(mitkImage, paramType1, param1, paramType2, param2, dimension, MITK_ACCESSBYITK_PIXEL_TYPES); \
+}
+
 //##Documentation
+//## @deprecated Use AccessFixedDimensionDefaultPixelTypesByItk_2 instead
 //## @brief Access an mitk-image with known dimension by an itk-image 
 //## and pass two additional parameters to the access-function
 //## 
@@ -1096,7 +1161,29 @@ public:
   }                                                                                                       \
 }
 
+/**
+ * \brief Access an mitk-image with known dimension by an itk-image
+ *        and pass one additional parameter.
+ *
+ * For usage, see AccessDefaultPixelTypesByItk.
+ * \param dimension dimension of the mitk-image.
+ *
+ * If the image has a different dimension, a mitk::AccessByItkException exception is thrown.
+ *
+ * If you do not know the dimension for sure, use AccessDefaultPixelTypesByItk_3.
+ * \sa AccessDefaultPixelTypesByItk_3
+ * \sa AccessFixedTypeByItk_3
+ * \sa AccessSpecificPixelTypesByItk_3
+ * \ingroup Adaptor
+ */
+#define AccessFixedDimensionDefaultPixelTypesByItk_3(mitkImage, dimension, paramType1, param1, paramType2, param2, paramType3, param3) \
+{                                                                                              \
+  _checkSpecificDimension(mitkImage, dimension);                                               \
+  _accessSpecificPixelTypesByItk_3(mitkImage, paramType1, param1, paramType2, param2, paramType3, param3, dimension, MITK_ACCESSBYITK_PIXEL_TYPES); \
+}
+
 //##Documentation
+//## @deprecated Use AccessFixedDimensionDefaultPixelTypesByItk_3 instead
 //## @brief Access an mitk-image with known dimension by an itk-image 
 //## and pass three additional parameters to the access-function
 //## 

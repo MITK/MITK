@@ -110,7 +110,7 @@ namespace mitk {
    * data. */
     virtual void Update(mitk::BaseRenderer * renderer);
 
-    virtual void ApplyProperties(mitk::BaseRenderer* renderer, vtkSmartPointer<vtkTransform> transform);
+    virtual void ApplyProperties(mitk::BaseRenderer* renderer, vtkSmartPointer<vtkTransform> transform, ScalarType mmPerPixel[2]);
 
     virtual vtkProp* GetVtkProp(mitk::BaseRenderer* renderer);
 
@@ -142,7 +142,9 @@ namespace mitk {
       /** \brief Thickslices post filtering */
       vtkSmartPointer<vtkMitkThickSlicesFilter> m_TSFilter;
       /** \brief Using unit spacing for resampling makes life easier TODO improve docu ...*/
-      vtkSmartPointer<vtkImageChangeInformation> m_UnitSpacingImageFilter;
+      vtkSmartPointer<vtkImageChangeInformation> m_UnitSpacingImageFilter;      
+      /** \brief PolyData object containg all lines/points needed for outlining the contour.*/
+      vtkSmartPointer<vtkPolyData> m_OutlinePolyData;
 
       /** \brief timestamp of last update of stored data */
       itk::TimeStamp m_LastUpdateTime;
@@ -213,7 +215,7 @@ namespace mitk {
     //set the camera to view the textured plane
     void AdjustCamera(mitk::BaseRenderer* renderer);
 
-    vtkSmartPointer<vtkPolyData> CreateOutlinePolyData(vtkSmartPointer<vtkImageData> binarySlice);
+    vtkSmartPointer<vtkPolyData> CreateOutlinePolyData(vtkSmartPointer<vtkImageData> binarySlice, ScalarType mmPerPixel[2]);
 
     ImageVtkMapper2D();
 

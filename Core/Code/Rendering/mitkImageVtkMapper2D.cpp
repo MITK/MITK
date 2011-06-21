@@ -110,7 +110,7 @@ void mitk::ImageVtkMapper2D::AdjustCamera(mitk::BaseRenderer* renderer)
   double cameraPosition[3];
   cameraPosition[0] = viewPlaneCenter[0];
   cameraPosition[1] = viewPlaneCenter[1];
-  cameraPosition[2] = viewPlaneCenter[2] + 2000.0; //Reason for 2000 => VTK seems to calculate the clipping planes wrong for Z=1
+  cameraPosition[2] = viewPlaneCenter[2] + 5000.0; //Reason for 5000 => VTK seems to calculate the clipping planes wrong for Z=1
 
   //set the camera corresponding to the textured plane
   vtkSmartPointer<vtkCamera> camera = renderer->GetVtkRenderer()->GetActiveCamera();
@@ -168,17 +168,17 @@ void mitk::ImageVtkMapper2D::MitkRenderOpaqueGeometry(BaseRenderer* renderer)
 
   if ( this->GetVtkProp(renderer)->GetVisibility() )
   {
-//    vtkSmartPointer<vtkRenderer> ren =
-//      vtkSmartPointer<vtkRenderer>::New();
-//    vtkSmartPointer<vtkRenderWindow> renderWindow =
-//      vtkSmartPointer<vtkRenderWindow>::New();
-//    renderWindow->AddRenderer(ren);
-//    vtkSmartPointer<vtkRenderWindowInteractor> renderWindowInteractor =
-//        vtkSmartPointer<vtkRenderWindowInteractor>::New();
-//    renderWindowInteractor->SetRenderWindow(renderWindow);
-//    ren->AddActor(m_LSH.GetLocalStorage(renderer)->m_Actor);
-//    renderWindow->Render();
-//    renderWindowInteractor->Start();
+    //    vtkSmartPointer<vtkRenderer> ren =
+    //      vtkSmartPointer<vtkRenderer>::New();
+    //    vtkSmartPointer<vtkRenderWindow> renderWindow =
+    //      vtkSmartPointer<vtkRenderWindow>::New();
+    //    renderWindow->AddRenderer(ren);
+    //    vtkSmartPointer<vtkRenderWindowInteractor> renderWindowInteractor =
+    //        vtkSmartPointer<vtkRenderWindowInteractor>::New();
+    //    renderWindowInteractor->SetRenderWindow(renderWindow);
+    //    ren->AddActor(m_LSH.GetLocalStorage(renderer)->m_Actor);
+    //    renderWindow->Render();
+    //    renderWindowInteractor->Start();
     this->GetVtkProp(renderer)->RenderOpaqueGeometry( renderer->GetVtkRenderer() );
   }
 }
@@ -318,7 +318,7 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
         inputGeometry->GetVtkTransform()->GetLinearInverse() );
 
     // Set background level to TRANSLUCENT (see Geometry2DDataVtkMapper3D)
-   localStorage->m_Reslicer->SetBackgroundLevel( -32768 ); //TODO why -32768 and not 0.0???
+    localStorage->m_Reslicer->SetBackgroundLevel( -32768 ); //TODO why -32768 and not 0.0???
 
     // Calculate the actual bounds of the transformed plane clipped by the
     // dataset bounding box; this is required for drawing the texture at the
@@ -561,12 +561,11 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
   if ( localStorage->m_ReslicedImage == NULL )
   {
     localStorage->m_ReslicedImage = vtkImageData::New();
-    MITK_INFO << "drin";
   }
 
   //TODO image is stored 2x. Do we still need that?
   rendererInfo.m_Image->DeepCopy( reslicedImage );
-//    localStorage->m_ReslicedImage->Update();
+  //    localStorage->m_ReslicedImage->Update();
 
   //TODO how does the reslicer know for which render window it is reslicing for?
   //set the current slice for the localStorage
@@ -591,12 +590,12 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
   trans->SetMatrix(matrix);
 
   //apply the properties after the slice was set
-  this->ApplyProperties( renderer, trans );
+  this->ApplyProperties( renderer, trans, mmPerPixel );
 
   //set up the camera to view the transformed plane
   this->AdjustCamera( renderer );
 
-      renderer->GetVtkRenderer()->SetBackground(1, 1, 1);
+  renderer->GetVtkRenderer()->SetBackground(1, 1, 1);
 
   //Transform the camera to the current position (transveral, coronal and saggital plane).
   //This is necessary, because the vtkTransformFilter does not manipulate the vtkCamera.
@@ -735,12 +734,10 @@ void mitk::ImageVtkMapper2D::Clear()
   m_RendererInfo.clear();
 }
 
-void mitk::ImageVtkMapper2D::ApplyProperties(mitk::BaseRenderer* renderer, vtkSmartPointer<vtkTransform> transform)
+void mitk::ImageVtkMapper2D::ApplyProperties(mitk::BaseRenderer* renderer, vtkSmartPointer<vtkTransform> transform, mitk::ScalarType mmPerPixel[2])
 {
   //get the current localStorage for the corresponding renderer
   LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
-
-  RendererInfo &rendererInfo = this->AccessRendererInfo( renderer );
 
   // check for interpolation properties
   bool textureInterpolation = false;
@@ -853,10 +850,6 @@ void mitk::ImageVtkMapper2D::ApplyProperties(mitk::BaseRenderer* renderer, vtkSm
   this->GetDataNode()->GetBoolProperty( "outline binary", binaryOutline, renderer );
   localStorage->m_Mapper->ScalarVisibilityOn();
 
-  vtkSmartPointer<vtkMarchingSquares> contourFilter = vtkSmartPointer<vtkMarchingSquares>::New();
-
-  vtkSmartPointer<vtkPolyData> outlineBinary = vtkSmartPointer<vtkPolyData>::New();
-
   if ( binary )
   {
     finalLookuptable->SetAlphaRange(0.0, 1.0);
@@ -868,12 +861,8 @@ void mitk::ImageVtkMapper2D::ApplyProperties(mitk::BaseRenderer* renderer, vtkSm
     {
       if (binaryOutline)
       {
-
-//        contourFilter->SetInput(localStorage->m_ReslicedImage);
-//        contourFilter->SetValue(1, 1.0);
-//        contourFilter->Update();
-
-        outlineBinary = CreateOutlinePolyData(localStorage->m_ReslicedImage);
+        //generate ontours/outlines TODO: not always necessary
+        localStorage->m_OutlinePolyData = CreateOutlinePolyData(localStorage->m_ReslicedImage, mmPerPixel);
 
         float binaryOutlineWidth(1.0);
         if (this->GetDataNode()->GetFloatProperty( "outline width", binaryOutlineWidth, renderer ))
@@ -890,12 +879,8 @@ void mitk::ImageVtkMapper2D::ApplyProperties(mitk::BaseRenderer* renderer, vtkSm
   } //END binary image handling
   else
   {
-    //TODO this is stupid and should be removed (we only need "levelwindow")
     LevelWindow levelWindow;
-    if( !this->GetLevelWindow( levelWindow, renderer, "levelWindow" ) )
-    {
-      this->GetLevelWindow( levelWindow, renderer );
-    }
+    this->GetLevelWindow( levelWindow, renderer );
 
     //set up the lookuptable with the level window range
     finalLookuptable->SetRange( levelWindow.GetLowerWindowBound(), levelWindow.GetUpperWindowBound() );
@@ -918,7 +903,7 @@ void mitk::ImageVtkMapper2D::ApplyProperties(mitk::BaseRenderer* renderer, vtkSm
   localStorage->m_TransformFilter->SetTransform(transform);
   if(binaryOutline && binary)
   {
-    localStorage->m_TransformFilter->SetInput(outlineBinary);
+    localStorage->m_TransformFilter->SetInput(localStorage->m_OutlinePolyData);
     localStorage->m_Actor->SetTexture(NULL);
   }
   else
@@ -931,75 +916,6 @@ void mitk::ImageVtkMapper2D::ApplyProperties(mitk::BaseRenderer* renderer, vtkSm
   localStorage->m_TransformFilter->Update();
   localStorage->m_Mapper->SetInputConnection(localStorage->m_TransformFilter->GetOutputPort());
   localStorage->m_Mapper->ScalarVisibilityOff();
-
-  double origin[3] = {0.0, 0.0, 0.0};
-    double p0[3] = {1.0, 0.0, 0.0};
-    double p1[3] = {0.0, 1.0, 0.0};
-    double p2[3] = {0.0, 1.0, 2.0};
-    double p3[3] = {1.0, 2.0, 3.0};
-
-    // Create a vtkPoints object and store the points in it
-//    vtkSmartPointer<vtkPoints> points =
-//      vtkSmartPointer<vtkPoints>::New();
-//    points->InsertNextPoint(origin);
-//    points->InsertNextPoint(p0);
-//    points->InsertNextPoint(p1);
-//    points->InsertNextPoint(p2);
-//    points->InsertNextPoint(p3);
-
-    // Create a cell array to store the lines in and add the lines to it
-//    vtkSmartPointer<vtkCellArray> lines =
-//      vtkSmartPointer<vtkCellArray>::New();
-
-//      //Create the first line (between Origin and P0)
-//      vtkSmartPointer<vtkPolyLine> polyline =
-//        vtkSmartPointer<vtkPolyLine>::New();
-//      polyline->GetPoints()->InsertNextPoint(origin);
-//      polyline->GetPoints()->InsertNextPoint(p0);
-//      polyline->GetPoints()->InsertNextPoint(p1);
-//      polyline->GetPoints()->InsertNextPoint(p2);
-//      polyline->GetPoints()->InsertNextPoint(p3);
-////      polyline->GetPointIds()->SetNumberOfIds(6);
-//      polyline->GetPointIds()->SetId(0,0);
-//      polyline->GetPointIds()->SetId(1,1);
-//      polyline->
-////      line->GetPointIds()->SetId(2,2);
-////      line->GetPointIds()->SetId(3,3);
-//      polyline->GetPointIds()->SetId(2,4);
-//      polyline->GetPointIds()->SetId(5,0);
-//      lines->InsertNextCell(polyline);
-
-//    // Create a polydata to store everything in
-//    vtkSmartPointer<vtkPolyData> linesPolyData =
-//      vtkSmartPointer<vtkPolyData>::New();
-
-//    // Add the points to the dataset
-//    linesPolyData->SetPoints(points);
-
-//    // Add the lines to the dataset
-//    linesPolyData->SetLines(lines);
-
-//      vtkSmartPointer<vtkPolyDataMapper> mapper =
-//          vtkSmartPointer<vtkPolyDataMapper>::New();
-//      mapper->SetInput(linesPolyData);
-//  //        mapper->SetScalarRange(scalarRange);
-//      mapper->ScalarVisibilityOff();
-//              vtkSmartPointer<vtkActor> actor =
-//                  vtkSmartPointer<vtkActor>::New();
-//              actor->SetMapper(mapper);
-////              actor->SetTexture(localStorage->m_Texture);
-//      //        actor->GetProperty()->SetLineWidth(1.0);
-//              vtkSmartPointer<vtkRenderer> ren =
-//                vtkSmartPointer<vtkRenderer>::New();
-//              vtkSmartPointer<vtkRenderWindow> renderWindow =
-//                vtkSmartPointer<vtkRenderWindow>::New();
-//              renderWindow->AddRenderer(ren);
-//              vtkSmartPointer<vtkRenderWindowInteractor> renderWindowInteractor =
-//                  vtkSmartPointer<vtkRenderWindowInteractor>::New();
-//              renderWindowInteractor->SetRenderWindow(renderWindow);
-//              ren->AddActor(actor);
-//              renderWindow->Render();
-//              renderWindowInteractor->Start();
 }
 
 void mitk::ImageVtkMapper2D::Update(mitk::BaseRenderer* renderer)
@@ -1203,79 +1119,47 @@ void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::Ba
   Superclass::SetDefaultProperties(node, renderer, overwrite);
 }
 
-vtkSmartPointer<vtkPolyData> mitk::ImageVtkMapper2D::CreateOutlinePolyData(vtkSmartPointer<vtkImageData> binarySlice){
-	int* dims = binarySlice->GetDimensions();
-	int line = dims[0];
-	int x = 0;
-	int y = 0;
-	char* current;
+vtkSmartPointer<vtkPolyData> mitk::ImageVtkMapper2D::CreateOutlinePolyData(vtkSmartPointer<vtkImageData> binarySlice, mitk::ScalarType mmPerPixel[2]){
+	int* dims = binarySlice->GetDimensions(); //dimensions of the image
+	int line = dims[0]; //how many pixels per line?
+	int x = 0; //pixel index x
+	int y = 0; //pixel index y
+	char* currentPixel;
 	int nn = dims[0]*dims[1]; //max pixel(n,n)
 
-	vtkSmartPointer<vtkCellArray> lines = vtkSmartPointer<vtkCellArray>::New();
-	vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
+	vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New(); //the points to draw
+	vtkSmartPointer<vtkCellArray> lines = vtkSmartPointer<vtkCellArray>::New(); //the lines to connect the points
 	for (int ii = 0; ii<nn; ii++) { //current pixel(i,i)
-		current = static_cast<char*>(binarySlice->GetScalarPointer(x, y, 0));
-		if (*current != 0) {
-			if (ii >= line && *(current-line) == 0) {
-				vtkIdType p1 = points->InsertNextPoint(x, y, 0);
-				vtkIdType p2 = points->InsertNextPoint(x+1, y, 0);
-				//				glVertex3f( x,     y, 0.0 );
-				//				glVertex3f( x+1.0, y, 0.0 );
-//				vtkSmartPointer<vtkPolyLine> line =
-//					vtkSmartPointer<vtkPolyLine>::New();
-//				line->GetPoints()->SetNumberOfPoints(2);
-//				line->GetPoints()->SetPoint(0, x, y, 0);
-//				line->GetPoints()->SetPoint(1, x+1, y, 0);
-//				line->GetPointIds()->SetId(0,p1);
-//				line->GetPointIds()->SetId(1,p2);
+		currentPixel = static_cast<char*>(binarySlice->GetScalarPointer(x, y, 0));
+		//if the current pixel value is set to something
+		if (*currentPixel != 0) {
+			//check in which direction a line is necessary
+			if (ii >= line && *(currentPixel-line) == 0) { //x direction - bottom edge of the pixel
+				//add the 2 points
+				vtkIdType p1 = points->InsertNextPoint(x*mmPerPixel[0], y*mmPerPixel[1], 0);
+				vtkIdType p2 = points->InsertNextPoint((x+1)*mmPerPixel[0], y*mmPerPixel[1], 0);
+				//add the line between both points
 				lines->InsertNextCell(2);
 				lines->InsertCellPoint(p1);
 				lines->InsertCellPoint(p2);
 			}
-			if (ii <= nn-line && *(current+line) == 0) {
-				vtkIdType p1 = points->InsertNextPoint(x, y+1, 0);
-				vtkIdType p2 = points->InsertNextPoint(x+1, y+1, 0);
-				//				glVertex3f( x,     y+1.0, 0.0 );
-				//				glVertex3f( x+1.0, y+1.0, 0.0 );
-//				vtkSmartPointer<vtkPolyLine> line =
-//					vtkSmartPointer<vtkPolyLine>::New();
-//				line->GetPoints()->SetNumberOfPoints(2);
-//				line->GetPoints()->SetPoint(0, x, y+1, 0);
-//				line->GetPoints()->SetPoint(1, x+1, y+1, 0);
-//				line->GetPointIds()->SetId(0,p1);
-//				line->GetPointIds()->SetId(1,p2);
+			if (ii <= nn-line && *(currentPixel+line) == 0) { //x direction - top edge of the pixel
+				vtkIdType p1 = points->InsertNextPoint(x*mmPerPixel[0], (y+1)*mmPerPixel[1], 0);
+				vtkIdType p2 = points->InsertNextPoint((x+1)*mmPerPixel[0], (y+1)*mmPerPixel[1], 0);
 				lines->InsertNextCell(2);
 				lines->InsertCellPoint(p1);
 				lines->InsertCellPoint(p2);
 			}
-			if (ii > 1 && *(current-1) == 0) {
-				vtkIdType p1 = points->InsertNextPoint(x, y, 0);
-				vtkIdType p2 = points->InsertNextPoint(x, y+1, 0);
-				//				glVertex3f( x, y,     0.0 );
-				//				glVertex3f( x, y+1.0, 0.0 );
-//				vtkSmartPointer<vtkPolyLine> line =
-//					vtkSmartPointer<vtkPolyLine>::New();
-//				line->GetPoints()->SetNumberOfPoints(2);
-//				line->GetPoints()->SetPoint(0, x, y, 0);
-//				line->GetPoints()->SetPoint(1, x, y+1, 0);
-//				line->GetPointIds()->SetId(0,p1);
-//				line->GetPointIds()->SetId(1,p2);
+			if (ii > 1 && *(currentPixel-1) == 0) { //y direction - left edge of the pixel
+				vtkIdType p1 = points->InsertNextPoint(x*mmPerPixel[0], y*mmPerPixel[1], 0);
+				vtkIdType p2 = points->InsertNextPoint(x*mmPerPixel[0], (y+1)*mmPerPixel[1], 0);
 				lines->InsertNextCell(2);
 				lines->InsertCellPoint(p1);
 				lines->InsertCellPoint(p2);
 			}
-			if (ii < nn-1 && *(current+1) == 0) {
-				vtkIdType p1 = points->InsertNextPoint(x+1, y, 0);
-				vtkIdType p2 = points->InsertNextPoint(x+1, y+1, 0);
-				//				glVertex3f( x+1.0, y,     0.0 );
-				//				glVertex3f( x+1.0, y+1.0, 0.0 );
-//				vtkSmartPointer<vtkPolyLine> line =
-//					vtkSmartPointer<vtkPolyLine>::New();
-//				line->GetPoints()->SetNumberOfPoints(2);
-//				line->GetPoints()->SetPoint(0, x+1, y, 0);
-//				line->GetPoints()->SetPoint(1, x+1, y+1, 0);
-//				line->GetPointIds()->SetId(0,p1);
-//				line->GetPointIds()->SetId(1,p2);
+			if (ii < nn-1 && *(currentPixel+1) == 0) { //y direction - right edge of the pixel
+				vtkIdType p1 = points->InsertNextPoint((x+1)*mmPerPixel[0], y*mmPerPixel[1], 0);
+				vtkIdType p2 = points->InsertNextPoint((x+1)*mmPerPixel[0], (y+1)*mmPerPixel[1], 0);
 				lines->InsertNextCell(2);
 				lines->InsertCellPoint(p1);
 				lines->InsertCellPoint(p2);
@@ -1290,15 +1174,11 @@ vtkSmartPointer<vtkPolyData> mitk::ImageVtkMapper2D::CreateOutlinePolyData(vtkSm
 		}
 	}
   // Create a polydata to store everything in
-  vtkSmartPointer<vtkPolyData> polyData =
-    vtkSmartPointer<vtkPolyData>::New();
-
+  vtkSmartPointer<vtkPolyData> polyData = vtkSmartPointer<vtkPolyData>::New();
   // Add the points to the dataset
   polyData->SetPoints(points);
-
   // Add the lines to the dataset
   polyData->SetLines(lines);
-
   return polyData;
 }
 
@@ -1314,7 +1194,8 @@ mitk::ImageVtkMapper2D::LocalStorage::LocalStorage()
   m_TransformFilter = vtkSmartPointer<vtkTransformPolyDataFilter>::New();
   m_Reslicer = vtkSmartPointer<vtkImageReslice>::New();
   m_TSFilter = vtkSmartPointer<vtkMitkThickSlicesFilter>::New();
-  m_UnitSpacingImageFilter = vtkSmartPointer<vtkImageChangeInformation>::New();
+  m_UnitSpacingImageFilter = vtkSmartPointer<vtkImageChangeInformation>::New();  
+  m_OutlinePolyData = vtkSmartPointer<vtkPolyData>::New();
 
   //the following actions are always the same and thus can be performed
   //in the constructor for each image (i.e. the image-corresponding local storage)

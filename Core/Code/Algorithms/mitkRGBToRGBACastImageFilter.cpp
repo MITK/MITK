@@ -27,6 +27,62 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkImageIOBase.h>
 #include <itkRGBAPixel.h>
 
+namespace mitk {
+
+struct AccessRGBImageFunctor {
+
+  typedef AccessRGBImageFunctor Self;
+
+  template<typename PixelType>
+  void operator()(mitk::Image* img, mitk::RGBToRGBACastImageFilter* addComponentFilter, typename PixelType::ComponentType defaultAlpha)
+  {
+    typedef typename PixelType::ComponentType ComponentType;
+    AccessSpecificPixelTypesByItk_2(img, mitk::RGBToRGBACastImageFilter*, addComponentFilter, ComponentType, defaultAlpha, PixelType)
+  }
+
+  template < typename TPixel, unsigned int VImageDimension >
+  void AccessItkImage(
+    itk::Image< TPixel, VImageDimension > *inputItkImage,
+    mitk::RGBToRGBACastImageFilter *addComponentFilter,
+    typename TPixel::ComponentType defaultAlpha )
+  {
+    typedef TPixel InputPixelType;
+    typedef itk::RGBAPixel< typename TPixel::ComponentType > OutputPixelType;
+    typedef itk::Image< InputPixelType, VImageDimension > InputImageType;
+    typedef itk::Image< OutputPixelType, VImageDimension > OutputImageType;
+
+    typedef itk::ImageRegionConstIterator< InputImageType > InputImageIteratorType;
+    typedef itk::ImageRegionIteratorWithIndex< OutputImageType > OutputImageIteratorType;
+
+    typename mitk::ImageToItk< OutputImageType >::Pointer outputimagetoitk =
+        mitk::ImageToItk< OutputImageType >::New();
+    outputimagetoitk->SetInput(addComponentFilter->m_OutputTimeSelector->GetOutput());
+    outputimagetoitk->Update();
+    typename OutputImageType::Pointer outputItkImage = outputimagetoitk->GetOutput();
+
+    // create the iterators
+    typename InputImageType::RegionType inputRegionOfInterest =
+        inputItkImage->GetLargestPossibleRegion();
+    InputImageIteratorType  inputIt( inputItkImage, inputRegionOfInterest );
+    OutputImageIteratorType outputIt( outputItkImage, inputRegionOfInterest );
+
+    for ( inputIt.GoToBegin(), outputIt.GoToBegin();
+          !inputIt.IsAtEnd();
+          ++inputIt, ++outputIt )
+    {
+      typename InputPixelType::Iterator pixelInputIt = inputIt.Get().Begin();
+      typename OutputPixelType::Iterator pixelOutputIt = outputIt.Get().Begin();
+
+      *pixelOutputIt++ = *pixelInputIt++;
+      *pixelOutputIt++ = *pixelInputIt++;
+      *pixelOutputIt++ = *pixelInputIt++;
+      *pixelOutputIt = defaultAlpha;
+    }
+  }
+};
+
+}
+
 
 mitk::RGBToRGBACastImageFilter::RGBToRGBACastImageFilter()
 {
@@ -152,22 +208,23 @@ void mitk::RGBToRGBACastImageFilter::GenerateData()
 
     const mitk::PixelType &pixelType = image->GetPixelType();
 
+    AccessRGBImageFunctor accessFunctor;
     // Check if the pixel type is supported
     if ( pixelType == typeid( UCRGBPixelType ) )
     {
-      AccessFixedPixelTypeByItk_2( image, InternalCast, UCRGBPixelType, this, 255 );
+      accessFunctor.operator()<UCRGBPixelType>( image, this, 255 );
     }
     else if ( pixelType == typeid( USRGBPixelType ) )
     {
-      AccessFixedPixelTypeByItk_2( image, InternalCast, USRGBPixelType, this, 65535 );
+      accessFunctor.operator()<USRGBPixelType>( image, this, 65535 );
     }
     else if ( pixelType == typeid( FloatRGBPixelType ) )
     {
-      AccessFixedPixelTypeByItk_2( image, InternalCast, FloatRGBPixelType, this, 1.0 );
+      accessFunctor.operator()<FloatRGBPixelType>( image, this, 1.0 );
     }
     else if ( pixelType == typeid( DoubleRGBPixelType ) )
     {
-      AccessFixedPixelTypeByItk_2( image, InternalCast, DoubleRGBPixelType, this, 1.0 );
+      accessFunctor.operator()<DoubleRGBPixelType>( image, this, 1.0 );
     }
     else
     {
@@ -181,43 +238,3 @@ void mitk::RGBToRGBACastImageFilter::GenerateData()
   m_TimeOfHeaderInitialization.Modified();
 }
 
-
-template < typename TPixel, unsigned int VImageDimension >
-void mitk::RGBToRGBACastImageFilter::InternalCast( 
-  itk::Image< TPixel, VImageDimension > *inputItkImage, 
-  mitk::RGBToRGBACastImageFilter *addComponentFilter,
-  typename TPixel::ComponentType defaultAlpha )
-{
-  typedef TPixel InputPixelType;
-  typedef itk::RGBAPixel< typename TPixel::ComponentType > OutputPixelType;
-  typedef itk::Image< InputPixelType, VImageDimension > InputImageType;
-  typedef itk::Image< OutputPixelType, VImageDimension > OutputImageType;
-
-  typedef itk::ImageRegionConstIterator< InputImageType > InputImageIteratorType;
-  typedef itk::ImageRegionIteratorWithIndex< OutputImageType > OutputImageIteratorType;
-
-  typename mitk::ImageToItk< OutputImageType >::Pointer outputimagetoitk = 
-    mitk::ImageToItk< OutputImageType >::New();
-  outputimagetoitk->SetInput(addComponentFilter->m_OutputTimeSelector->GetOutput());
-  outputimagetoitk->Update();
-  typename OutputImageType::Pointer outputItkImage = outputimagetoitk->GetOutput();
-
-  // create the iterators
-  typename InputImageType::RegionType inputRegionOfInterest = 
-    inputItkImage->GetLargestPossibleRegion();
-  InputImageIteratorType  inputIt( inputItkImage, inputRegionOfInterest );
-  OutputImageIteratorType outputIt( outputItkImage, inputRegionOfInterest );
-
-  for ( inputIt.GoToBegin(), outputIt.GoToBegin();
-        !inputIt.IsAtEnd(); 
-        ++inputIt, ++outputIt )
-  {
-    typename InputPixelType::Iterator pixelInputIt = inputIt.Get().Begin();
-    typename OutputPixelType::Iterator pixelOutputIt = outputIt.Get().Begin();
-
-    *pixelOutputIt++ = *pixelInputIt++;
-    *pixelOutputIt++ = *pixelInputIt++;
-    *pixelOutputIt++ = *pixelInputIt++;
-    *pixelOutputIt = defaultAlpha;
-  }
-}

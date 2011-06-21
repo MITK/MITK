@@ -24,9 +24,26 @@ namespace mitk
 {
 
 #ifndef DOXYGEN_SKIP
+  template<typename ItkOutputImageType>
+  struct CastToItkImageFunctor
+  {
+    typedef CastToItkImageFunctor Self;
+
+    void operator()(const mitk::Image* mitkImage, itk::SmartPointer<ItkOutputImageType>& itkOutputImage)
+    {
+      AccessFixedDimensionDefaultPixelTypesByItk_1(mitkImage, ::itk::GetImageDimension<ItkOutputImageType>::ImageDimension, itk::SmartPointer<ItkOutputImageType>&, itkOutputImage);
+    }
+
+    template < typename TPixel, unsigned int VImageDimension>
+    void AccessItkImage( itk::Image<TPixel, VImageDimension>* itkInputImage, itk::SmartPointer<ItkOutputImageType>& itkOutputImage)
+    {
+      _CastToItkImage2Access(itkInputImage, itkOutputImage);
+    }
+  };
+
   template <typename ItkOutputImageType> void CastToItkImage(const mitk::Image * mitkImage, itk::SmartPointer<ItkOutputImageType>& itkOutputImage)
   {
-    AccessFixedDimensionByItk_1(mitkImage, _CastToItkImage2Access, ::itk::GetImageDimension<ItkOutputImageType>::ImageDimension, itkOutputImage);
+    CastToItkImageFunctor<ItkOutputImageType>()(mitkImage, itkOutputImage);
   }
 #endif //DOXYGEN_SKIP
 

@@ -19,9 +19,21 @@ PURPOSE.  See the above copyright notices for more information.
 #ifndef MITKITKPICTUREWRITE_H
 #define MITKITKPICTUREWRITE_H
 
- #include <itkImage.h>
+#include <itkImage.h>
+#include <mitkImageAccessByItk.h>
 
-template < typename TPixel, unsigned int VImageDimension > 
-void _mitkItkPictureWrite(itk::Image< TPixel, VImageDimension >* itkImage, const std::string& fileName);
+struct _mitkItkPictureWriteFunctor
+{
+  typedef _mitkItkPictureWriteFunctor Self;
+
+  void operator()(mitk::Image* img, const std::string& fileName)
+  {
+    AccessDefaultPixelTypesByItk_1(img, const std::string&, fileName)
+  }
+
+  template < typename TPixel, unsigned int VImageDimension >
+  void AccessItkImage(itk::Image< TPixel, VImageDimension >* itkImage, const std::string& fileName);
+
+};
 
 #endif /* MITKITKPICTUREWRITE_H */

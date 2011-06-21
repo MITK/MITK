@@ -18,29 +18,45 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkVolumeCalculator.h"
 #include "mitkImageAccessByItk.h" 
 #include <itkImageRegionConstIterator.h> 
-  
-template < typename TPixel, unsigned int VImageDimension >
-void mitk::VolumeCalculator::InternalCompute(itk::Image< TPixel, VImageDimension >* itkImage)
-{
-  itk::ImageRegionConstIterator<itk::Image < TPixel, VImageDimension > > imageIt(itkImage, itkImage->GetLargestPossibleRegion() );
-  unsigned long int count = 0;
 
-  for (imageIt.GoToBegin(); !imageIt.IsAtEnd(); ++imageIt)
+namespace mitk {
+
+template<int Dimension>
+struct InternalCompute
+{
+  typedef InternalCompute Self;
+
+  void operator()(const mitk::Image* img, VolumeCalculator* volCalc)
   {
-    if ( (int)(imageIt.Get()) >= m_Threshold )
+    AccessFixedDimensionDefaultPixelTypesByItk_1(img, Dimension, VolumeCalculator*, volCalc)
+  }
+
+  template < typename TPixel, unsigned int VImageDimension >
+  void AccessItkImage(itk::Image< TPixel, VImageDimension >* itkImage, VolumeCalculator* volCalc)
+  {
+    itk::ImageRegionConstIterator<itk::Image < TPixel, VImageDimension > > imageIt(itkImage, itkImage->GetLargestPossibleRegion() );
+    unsigned long int count = 0;
+
+    for (imageIt.GoToBegin(); !imageIt.IsAtEnd(); ++imageIt)
     {
-      count++;
+      if ( (int)(imageIt.Get()) >= volCalc->m_Threshold )
+      {
+        count++;
+      }
     }
+    if (itkImage->GetLargestPossibleRegion().GetImageDimension() == 3)
+    {
+      volCalc->m_Volume = count / 1000.0 * itkImage->GetSpacing()[0] * itkImage->GetSpacing()[1] * itkImage->GetSpacing()[2];
+    }
+    else if (itkImage->GetLargestPossibleRegion().GetImageDimension() == 2)
+    {
+      volCalc->m_Volume = count / 100.0 * itkImage->GetSpacing()[0] * itkImage->GetSpacing()[1];
+    }
+    volCalc->m_VoxelCount = count;
   }
-  if (itkImage->GetLargestPossibleRegion().GetImageDimension() == 3) 
-  {
-    m_Volume = count / 1000.0 * itkImage->GetSpacing()[0] * itkImage->GetSpacing()[1] * itkImage->GetSpacing()[2];
-  } 
-  else if (itkImage->GetLargestPossibleRegion().GetImageDimension() == 2) 
-  {
-    m_Volume = count / 100.0 * itkImage->GetSpacing()[0] * itkImage->GetSpacing()[1];
-  }
-  m_VoxelCount = count;
+
+};
+
 }
 
 mitk::VolumeCalculator::VolumeCalculator() 
@@ -71,19 +87,19 @@ void mitk::VolumeCalculator::ComputeVolume()
     {
       m_TimeSelector->SetTimeNr(timeStep);
       m_TimeSelector->Update();
-      AccessFixedDimensionByItk(m_TimeSelector->GetOutput(),InternalCompute,3);
+      InternalCompute<3>()(m_TimeSelector->GetOutput(), this);
       m_Volumes[timeStep] = m_Volume;
     }
   }
   else if (m_Image->GetDimension() == 3) 
   {
     const_cast<Image*>(m_Image.GetPointer())->Update();
-    AccessFixedDimensionByItk(m_Image,InternalCompute,3);
+    InternalCompute<3>()(m_Image, this);
   } 
   else if (m_Image->GetDimension() == 2) 
   {
     const_cast<Image*>(m_Image.GetPointer())->Update();
-    AccessFixedDimensionByItk(m_Image,InternalCompute,2);
+    InternalCompute<2>()(m_Image, this);
   }
 }
 

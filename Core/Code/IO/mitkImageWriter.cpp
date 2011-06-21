@@ -63,7 +63,7 @@ void mitk::ImageWriter::WriteByITK(mitk::Image* image, const std::string& fileNa
   // So, they are still multiplexed and thus not support vector images.
   if (fileName.find(".png") != std::string::npos || fileName.find(".tif") != std::string::npos || fileName.find(".jpg") != std::string::npos)
   {
-    AccessByItk_1( image, _mitkItkPictureWrite, fileName );
+    _mitkItkPictureWriteFunctor()(image, fileName);
     return;
   }
 

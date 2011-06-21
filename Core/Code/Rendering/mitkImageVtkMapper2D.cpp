@@ -45,7 +45,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkTransformPolyDataFilter.h>
 #include <vtkMarchingSquares.h>
 #include <vtkMarchingContourFilter.h>
-#include <vtkLine.h>
+#include <vtkPolyLine.h>
 #include <vtkRenderWindowInteractor.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderer.h>
@@ -932,15 +932,62 @@ void mitk::ImageVtkMapper2D::ApplyProperties(mitk::BaseRenderer* renderer, vtkSm
   localStorage->m_Mapper->SetInputConnection(localStorage->m_TransformFilter->GetOutputPort());
   localStorage->m_Mapper->ScalarVisibilityOff();
 
+  double origin[3] = {0.0, 0.0, 0.0};
+    double p0[3] = {1.0, 0.0, 0.0};
+    double p1[3] = {0.0, 1.0, 0.0};
+    double p2[3] = {0.0, 1.0, 2.0};
+    double p3[3] = {1.0, 2.0, 3.0};
+
+    // Create a vtkPoints object and store the points in it
+//    vtkSmartPointer<vtkPoints> points =
+//      vtkSmartPointer<vtkPoints>::New();
+//    points->InsertNextPoint(origin);
+//    points->InsertNextPoint(p0);
+//    points->InsertNextPoint(p1);
+//    points->InsertNextPoint(p2);
+//    points->InsertNextPoint(p3);
+
+    // Create a cell array to store the lines in and add the lines to it
+//    vtkSmartPointer<vtkCellArray> lines =
+//      vtkSmartPointer<vtkCellArray>::New();
+
+//      //Create the first line (between Origin and P0)
+//      vtkSmartPointer<vtkPolyLine> polyline =
+//        vtkSmartPointer<vtkPolyLine>::New();
+//      polyline->GetPoints()->InsertNextPoint(origin);
+//      polyline->GetPoints()->InsertNextPoint(p0);
+//      polyline->GetPoints()->InsertNextPoint(p1);
+//      polyline->GetPoints()->InsertNextPoint(p2);
+//      polyline->GetPoints()->InsertNextPoint(p3);
+////      polyline->GetPointIds()->SetNumberOfIds(6);
+//      polyline->GetPointIds()->SetId(0,0);
+//      polyline->GetPointIds()->SetId(1,1);
+//      polyline->
+////      line->GetPointIds()->SetId(2,2);
+////      line->GetPointIds()->SetId(3,3);
+//      polyline->GetPointIds()->SetId(2,4);
+//      polyline->GetPointIds()->SetId(5,0);
+//      lines->InsertNextCell(polyline);
+
+//    // Create a polydata to store everything in
+//    vtkSmartPointer<vtkPolyData> linesPolyData =
+//      vtkSmartPointer<vtkPolyData>::New();
+
+//    // Add the points to the dataset
+//    linesPolyData->SetPoints(points);
+
+//    // Add the lines to the dataset
+//    linesPolyData->SetLines(lines);
+
 //      vtkSmartPointer<vtkPolyDataMapper> mapper =
 //          vtkSmartPointer<vtkPolyDataMapper>::New();
-//      mapper->SetInputConnection(localStorage->m_TransformFilter->GetOutputPort());
+//      mapper->SetInput(linesPolyData);
 //  //        mapper->SetScalarRange(scalarRange);
 //      mapper->ScalarVisibilityOff();
 //              vtkSmartPointer<vtkActor> actor =
 //                  vtkSmartPointer<vtkActor>::New();
 //              actor->SetMapper(mapper);
-//              actor->SetTexture(localStorage->m_Texture);
+////              actor->SetTexture(localStorage->m_Texture);
 //      //        actor->GetProperty()->SetLineWidth(1.0);
 //              vtkSmartPointer<vtkRenderer> ren =
 //                vtkSmartPointer<vtkRenderer>::New();
@@ -1164,37 +1211,74 @@ vtkSmartPointer<vtkPolyData> mitk::ImageVtkMapper2D::CreateOutlinePolyData(vtkSm
 	char* current;
 	int nn = dims[0]*dims[1]; //max pixel(n,n)
 
+	vtkSmartPointer<vtkCellArray> lines = vtkSmartPointer<vtkCellArray>::New();
 	vtkSmartPointer<vtkPoints> points = vtkSmartPointer<vtkPoints>::New();
 	for (int ii = 0; ii<nn; ii++) { //current pixel(i,i)
 		current = static_cast<char*>(binarySlice->GetScalarPointer(x, y, 0));
 		if (*current != 0) {
 			if (ii >= line && *(current-line) == 0) {
-//				std::cout << "-";
-				points->InsertNextPoint(x, y, 0);
-				points->InsertNextPoint(x+1, y, 0);
+				vtkIdType p1 = points->InsertNextPoint(x, y, 0);
+				vtkIdType p2 = points->InsertNextPoint(x+1, y, 0);
 				//				glVertex3f( x,     y, 0.0 );
 				//				glVertex3f( x+1.0, y, 0.0 );
+//				vtkSmartPointer<vtkPolyLine> line =
+//					vtkSmartPointer<vtkPolyLine>::New();
+//				line->GetPoints()->SetNumberOfPoints(2);
+//				line->GetPoints()->SetPoint(0, x, y, 0);
+//				line->GetPoints()->SetPoint(1, x+1, y, 0);
+//				line->GetPointIds()->SetId(0,p1);
+//				line->GetPointIds()->SetId(1,p2);
+				lines->InsertNextCell(2);
+				lines->InsertCellPoint(p1);
+				lines->InsertCellPoint(p2);
 			}
 			if (ii <= nn-line && *(current+line) == 0) {
-				points->InsertNextPoint(x, y+1, 0);
-				points->InsertNextPoint(x+1, y+1, 0);
-//				std::cout << "-";
+				vtkIdType p1 = points->InsertNextPoint(x, y+1, 0);
+				vtkIdType p2 = points->InsertNextPoint(x+1, y+1, 0);
 				//				glVertex3f( x,     y+1.0, 0.0 );
 				//				glVertex3f( x+1.0, y+1.0, 0.0 );
+//				vtkSmartPointer<vtkPolyLine> line =
+//					vtkSmartPointer<vtkPolyLine>::New();
+//				line->GetPoints()->SetNumberOfPoints(2);
+//				line->GetPoints()->SetPoint(0, x, y+1, 0);
+//				line->GetPoints()->SetPoint(1, x+1, y+1, 0);
+//				line->GetPointIds()->SetId(0,p1);
+//				line->GetPointIds()->SetId(1,p2);
+				lines->InsertNextCell(2);
+				lines->InsertCellPoint(p1);
+				lines->InsertCellPoint(p2);
 			}
 			if (ii > 1 && *(current-1) == 0) {
-				points->InsertNextPoint(x, y, 0);
-				points->InsertNextPoint(x, y+1, 0);
-//				std::cout << "|";
+				vtkIdType p1 = points->InsertNextPoint(x, y, 0);
+				vtkIdType p2 = points->InsertNextPoint(x, y+1, 0);
 				//				glVertex3f( x, y,     0.0 );
 				//				glVertex3f( x, y+1.0, 0.0 );
+//				vtkSmartPointer<vtkPolyLine> line =
+//					vtkSmartPointer<vtkPolyLine>::New();
+//				line->GetPoints()->SetNumberOfPoints(2);
+//				line->GetPoints()->SetPoint(0, x, y, 0);
+//				line->GetPoints()->SetPoint(1, x, y+1, 0);
+//				line->GetPointIds()->SetId(0,p1);
+//				line->GetPointIds()->SetId(1,p2);
+				lines->InsertNextCell(2);
+				lines->InsertCellPoint(p1);
+				lines->InsertCellPoint(p2);
 			}
 			if (ii < nn-1 && *(current+1) == 0) {
-				points->InsertNextPoint(x+1, y, 0);
-				points->InsertNextPoint(x+1, y+1, 0);
-//				std::cout << "|";
+				vtkIdType p1 = points->InsertNextPoint(x+1, y, 0);
+				vtkIdType p2 = points->InsertNextPoint(x+1, y+1, 0);
 				//				glVertex3f( x+1.0, y,     0.0 );
 				//				glVertex3f( x+1.0, y+1.0, 0.0 );
+//				vtkSmartPointer<vtkPolyLine> line =
+//					vtkSmartPointer<vtkPolyLine>::New();
+//				line->GetPoints()->SetNumberOfPoints(2);
+//				line->GetPoints()->SetPoint(0, x+1, y, 0);
+//				line->GetPoints()->SetPoint(1, x+1, y+1, 0);
+//				line->GetPointIds()->SetId(0,p1);
+//				line->GetPointIds()->SetId(1,p2);
+				lines->InsertNextCell(2);
+				lines->InsertCellPoint(p1);
+				lines->InsertCellPoint(p2);
 			}
 		}
 
@@ -1203,34 +1287,8 @@ vtkSmartPointer<vtkPolyData> mitk::ImageVtkMapper2D::CreateOutlinePolyData(vtkSm
 		if (x >= line) {
 			x = 0;
 			y++;
-			std::cout << std::endl;
 		}
 	}
-
-  vtkSmartPointer<vtkCellArray> lines =
-    vtkSmartPointer<vtkCellArray>::New();
-  for(unsigned int i = 0; i < points->GetNumberOfPoints(); i++)
-    {
-    //Create the first line (between Origin and P0)
-    vtkSmartPointer<vtkLine> line =
-      vtkSmartPointer<vtkLine>::New();
-    line->GetPointIds()->SetId(0,i);
-    line->GetPointIds()->SetId(1,i+1);
-    lines->InsertNextCell(line);
-    }
-
-
-//	vtkSmartPointer<vtkPolyLine> polyLine = vtkSmartPointer<vtkPolyLine>::New();
-//	polyLine->GetPointIds()->SetNumberOfIds(points->GetNumberOfPoints());
-//	for(unsigned int i = 0; i < points->GetNumberOfPoints(); i++)
-//		{
-//		polyLine->GetPointIds()->SetId(i,i);
-//		}
-
-  // Create a cell array to store the lines in and add the lines to it
-
-//  lines->InsertNextCell(polyLine);
-
   // Create a polydata to store everything in
   vtkSmartPointer<vtkPolyData> polyData =
     vtkSmartPointer<vtkPolyData>::New();

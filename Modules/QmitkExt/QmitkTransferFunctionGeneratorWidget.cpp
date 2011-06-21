@@ -25,7 +25,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <SceneSerializationExports.h>
 #include <mitkTransferFunctionPropertySerializer.h>
-#include <mitkTransferFunctionPropertyDeserializer.h>
 
 #include <vtkUnstructuredGrid.h>
 
@@ -178,7 +177,7 @@ void QmitkTransferFunctionGeneratorWidget::OnLoadPreset( )
   
   fileNameOutput= ReduceFileName(fileName);
 
-  mitk::TransferFunction::Pointer tf = mitk::TransferFunctionPropertyDeserializer::DeserializeTransferFunction(fileName.c_str());
+  mitk::TransferFunction::Pointer tf = mitk::TransferFunctionPropertySerializer::DeserializeTransferFunction(fileName.c_str());
 
   if(tf.IsNotNull())
   {

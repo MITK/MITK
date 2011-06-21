@@ -45,6 +45,21 @@ class SceneSerializationBase_EXPORT IntPropertySerializer : public BasePropertyS
       else return NULL;
     }
 
+    virtual BaseProperty::Pointer Deserialize(TiXmlElement* element)
+    {
+      if (!element) return NULL;
+
+      int integer;
+      if ( element->QueryIntAttribute( "value", &integer ) == TIXML_SUCCESS )
+      {
+        return IntProperty::New(integer).GetPointer();
+      }
+      else
+      {
+        return NULL;
+      }
+    }
+
   protected:
 
     IntPropertySerializer() {}

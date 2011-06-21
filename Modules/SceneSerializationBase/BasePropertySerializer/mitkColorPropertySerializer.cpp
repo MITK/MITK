@@ -48,6 +48,18 @@ class SceneSerializationBase_EXPORT ColorPropertySerializer : public BasePropert
       else return NULL;
     }
 
+    virtual BaseProperty::Pointer Deserialize(TiXmlElement* element)
+    {
+      if (!element) return NULL;
+
+      Color c;
+      if ( element->QueryFloatAttribute( "r", &c[0] ) != TIXML_SUCCESS ) return NULL;
+      if ( element->QueryFloatAttribute( "g", &c[1] ) != TIXML_SUCCESS ) return NULL;
+      if ( element->QueryFloatAttribute( "b", &c[2] ) != TIXML_SUCCESS ) return NULL;
+
+      return ColorProperty::New( c ).GetPointer();
+    }
+
   protected:
 
     ColorPropertySerializer() {}

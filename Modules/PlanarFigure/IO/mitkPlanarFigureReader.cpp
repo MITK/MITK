@@ -28,7 +28,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkPlanarRectangle.h"
 #include "mitkPlaneGeometry.h"
 
-#include "mitkBasePropertyDeserializer.h"
+#include "mitkBasePropertySerializer.h"
 
 #include <tinyxml.h>
 #include <itksys/SystemTools.hxx>
@@ -193,7 +193,7 @@ void mitk::PlanarFigureReader::GenerateData()
 
       // hand propertyElement to specific reader
       std::stringstream propertyDeserializerClassName;
-      propertyDeserializerClassName << type << "Deserializer";
+      propertyDeserializerClassName << type << "Serializer";
 
       std::list<itk::LightObject::Pointer> readers =
         itk::ObjectFactoryBase::CreateAllInstance(propertyDeserializerClassName.str().c_str());
@@ -210,7 +210,7 @@ void mitk::PlanarFigureReader::GenerateData()
         iter != readers.end();
         ++iter )
       {
-        if (BasePropertyDeserializer* reader = dynamic_cast<BasePropertyDeserializer*>( iter->GetPointer() ) )
+        if (BasePropertySerializer* reader = dynamic_cast<BasePropertySerializer*>( iter->GetPointer() ) )
         {
           BaseProperty::Pointer property = reader->Deserialize( propertyElement->FirstChildElement() );
           if (property.IsNotNull())

@@ -50,11 +50,20 @@ class SceneSerializationBase_EXPORT BasePropertySerializer : public itk::Object
 
     /**
       \brief Serializes given BaseProperty object.
-      \return the filename of the newly created file.
+      \return The filename of the newly created file.
       
       This should be overwritten by specific sub-classes. 
-      */
+    */
     virtual TiXmlElement* Serialize();
+
+    /**
+      \brief Deserializes given TiXmlElement.
+      \return The deserialized Property.
+
+      This should be overwritten by specific sub-classes.
+    */
+
+    virtual BaseProperty::Pointer Deserialize(TiXmlElement*);
 
   protected:
 

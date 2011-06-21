@@ -30,8 +30,10 @@ namespace mitk
       itkNewMacro(Self);
 
       virtual TiXmlElement* Serialize();
+      virtual BaseProperty::Pointer Deserialize(TiXmlElement* element);
+
       static bool SerializeTransferFunction( const char * filename, TransferFunction::Pointer tf );
-      
+      static TransferFunction::Pointer DeserializeTransferFunction( const char *filePath );
     
     protected:
     

@@ -57,6 +57,25 @@ class SceneSerializationBase_EXPORT BoolLookupTablePropertySerializer : public B
         }
         return element;
     }
+
+    virtual BaseProperty::Pointer Deserialize(TiXmlElement* element)
+    {
+      if (!element) 
+        return NULL;
+
+      BoolLookupTable lut;
+      for( TiXmlElement* child = element->FirstChildElement("LUTValue"); child != NULL; child = child->NextSiblingElement("LUTValue"))
+      {
+
+        int xmlID;
+        if (child->QueryIntAttribute("id", &xmlID) == TIXML_WRONG_TYPE)
+          return NULL; // TODO: can we do a better error handling?
+        BoolLookupTable::IdentifierType id = static_cast<BoolLookupTable::IdentifierType>(xmlID);
+        BoolLookupTable::ValueType val = std::string(child->Attribute("value")) == std::string("true");
+        lut.SetTableValue(id, val);
+      }
+      return BoolLookupTableProperty::New(lut).GetPointer();
+    }
   protected:
     BoolLookupTablePropertySerializer() {}
     virtual ~BoolLookupTablePropertySerializer() {}

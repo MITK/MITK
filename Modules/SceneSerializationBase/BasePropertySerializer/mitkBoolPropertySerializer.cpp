@@ -15,47 +15,59 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
-#ifndef mitkColorPropertyDeserializer_h_included
-#define mitkColorPropertyDeserializer_h_included
+#ifndef mitkBoolPropertySerializer_h_included
+#define mitkBoolPropertySerializer_h_included
 
-#include "mitkBasePropertyDeserializer.h"
+#include "mitkBasePropertySerializer.h"
 
-#include "mitkColorProperty.h"
+#include "mitkProperties.h"
 
 #include "SceneSerializationBaseExports.h"
 
 namespace mitk
 {
 
-class SceneSerializationBase_EXPORT ColorPropertyDeserializer : public BasePropertyDeserializer
+class SceneSerializationBase_EXPORT BoolPropertySerializer : public BasePropertySerializer
 {
   public:
     
-    mitkClassMacro( ColorPropertyDeserializer, BasePropertyDeserializer );
+    mitkClassMacro( BoolPropertySerializer, BasePropertySerializer );
     itkNewMacro(Self);
+
+    virtual TiXmlElement* Serialize()
+    {
+      if (const BoolProperty* prop = dynamic_cast<const BoolProperty*>(m_Property.GetPointer()))
+      {
+        TiXmlElement* element = new TiXmlElement("bool");
+        if (prop->GetValue() == true)
+        {
+          element->SetAttribute("value", "true");
+        }
+        else
+        {
+          element->SetAttribute("value", "false");
+        }
+        return element;
+      }
+      else return NULL;
+    }
 
     virtual BaseProperty::Pointer Deserialize(TiXmlElement* element)
     {
       if (!element) return NULL;
-
-      Color c;
-      if ( element->QueryFloatAttribute( "r", &c[0] ) != TIXML_SUCCESS ) return NULL;
-      if ( element->QueryFloatAttribute( "g", &c[1] ) != TIXML_SUCCESS ) return NULL;
-      if ( element->QueryFloatAttribute( "b", &c[2] ) != TIXML_SUCCESS ) return NULL;
-
-      return ColorProperty::New( c ).GetPointer();
+      return BoolProperty::New( std::string(element->Attribute("value")) == "true" ).GetPointer();
     }
 
   protected:
 
-    ColorPropertyDeserializer() {}
-    virtual ~ColorPropertyDeserializer() {}
+    BoolPropertySerializer() {}
+    virtual ~BoolPropertySerializer() {}
 };
 
 } // namespace
 
 // important to put this into the GLOBAL namespace (because it starts with 'namespace mitk')
-MITK_REGISTER_SERIALIZER(ColorPropertyDeserializer);
+MITK_REGISTER_SERIALIZER(BoolPropertySerializer);
 
 #endif
 

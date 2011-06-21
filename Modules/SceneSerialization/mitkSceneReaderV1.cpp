@@ -36,9 +36,9 @@ bool mitk::SceneReaderV1::LoadScene( TiXmlDocument& document, const std::string&
   for( TiXmlElement* element = document.FirstChildElement("node"); element != NULL; element = element->NextSiblingElement("node") )
   {
     //   1. if there is a <data type="..." file="..."> element,
-    //        - construct a name for the appropriate deserializer
-    //        - try to instantiate this deserializer via itk object factory
-    //        - if deserializer could be created, use it to read the file into a BaseData object
+    //        - construct a name for the appropriate serializer
+    //        - try to instantiate this serializer via itk object factory
+    //        - if serializer could be created, use it to read the file into a BaseData object
     //        - if successful, call the new node's SetData(..)
     DataNode::Pointer node = LoadBaseDataFromDataTag( element->FirstChildElement("data"), workingDirectory, error );
    

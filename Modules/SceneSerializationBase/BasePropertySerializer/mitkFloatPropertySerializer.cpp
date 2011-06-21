@@ -45,6 +45,21 @@ class SceneSerializationBase_EXPORT FloatPropertySerializer : public BasePropert
       else return NULL;
     }
 
+    virtual BaseProperty::Pointer Deserialize(TiXmlElement* element)
+    {
+      if (!element) return NULL;
+
+      float f;
+      if ( element->QueryFloatAttribute( "value", &f ) == TIXML_SUCCESS )
+      {
+        return FloatProperty::New(f).GetPointer();
+      }
+      else
+      {
+        return NULL;
+      }
+    }
+
   protected:
 
     FloatPropertySerializer() {}

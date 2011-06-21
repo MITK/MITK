@@ -48,6 +48,18 @@ class SceneSerializationBase_EXPORT Point3dPropertySerializer : public BasePrope
       else return NULL;
     }
 
+    virtual BaseProperty::Pointer Deserialize(TiXmlElement* element)
+    {
+      if (!element) return NULL;
+
+      Point3D v;
+      if ( element->QueryFloatAttribute( "x", &v[0] ) != TIXML_SUCCESS ) return NULL;
+      if ( element->QueryFloatAttribute( "y", &v[1] ) != TIXML_SUCCESS ) return NULL;
+      if ( element->QueryFloatAttribute( "z", &v[2] ) != TIXML_SUCCESS ) return NULL;
+
+     return Point3dProperty::New( v ).GetPointer();
+    }
+
   protected:
 
     Point3dPropertySerializer() {}

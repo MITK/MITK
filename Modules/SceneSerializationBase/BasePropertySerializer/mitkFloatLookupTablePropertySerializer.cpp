@@ -54,6 +54,28 @@ class SceneSerializationBase_EXPORT FloatLookupTablePropertySerializer : public 
         }
         return element;
     }
+
+    virtual BaseProperty::Pointer Deserialize(TiXmlElement* element)
+    {
+      if (!element) 
+        return NULL;
+
+      FloatLookupTable lut;
+      for( TiXmlElement* child = element->FirstChildElement("LUTValue"); child != NULL; child = child->NextSiblingElement("LUTValue"))
+      {
+
+        int tempID;
+        if (child->QueryIntAttribute("id", &tempID) == TIXML_WRONG_TYPE)
+          return NULL; // TODO: can we do a better error handling?
+        FloatLookupTable::IdentifierType id = static_cast<FloatLookupTable::IdentifierType>(tempID);
+        float tempVal = -1.0;
+        if (child->QueryFloatAttribute("value", &tempVal) == TIXML_WRONG_TYPE)
+          return NULL; // TODO: can we do a better error handling?
+        FloatLookupTable::ValueType val = static_cast<FloatLookupTable::ValueType>(tempVal);        
+        lut.SetTableValue(id, val);
+      }
+      return FloatLookupTableProperty::New(lut).GetPointer();
+    }
   protected:
     FloatLookupTablePropertySerializer() {}
     virtual ~FloatLookupTablePropertySerializer() {}

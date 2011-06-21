@@ -114,6 +114,10 @@ mark_as_advanced(MITK_INSTALL_RPATH_RELATIVE
                  MITK_USE_CTK
                  MITK_USE_DCMTK
                  )
+
+set(MITK_ACCESSBYITK_PIXEL_TYPES
+    "double, float, int, unsigned int, short, unsigned short, char, unsigned char"
+    CACHE STRING "List of pixel types used in AccessByItk macros")
                  
 # consistency checks
 if(MITK_USE_BLUEBERRY AND NOT MITK_USE_CTK)

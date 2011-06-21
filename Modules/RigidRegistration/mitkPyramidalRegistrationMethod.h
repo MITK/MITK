@@ -123,8 +123,7 @@ namespace mitk
     PyramidalRegistrationMethod();
     virtual ~PyramidalRegistrationMethod();
 
-    template < typename TPixel, unsigned int VImageDimension >
-      void GenerateData2( itk::Image<TPixel, VImageDimension>* itkImage1);
+    friend class PyramidalRegistrationMethodAccessFunctor;
 
     RigidRegistrationObserver::Pointer m_Observer;
     int m_Interpolator;

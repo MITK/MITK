@@ -16,7 +16,7 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include "mitkImageRegistrationMethod.h"
-
+#include "mitkImageRegistrationMethodAccessFunctor.h"
 
 namespace mitk {
 
@@ -36,7 +36,7 @@ namespace mitk {
   {
     if (this->GetInput())
     {
-      AccessByItk(this->GetInput(), GenerateData2);
+      ImageRegistrationMethodAccessFunctor()(this->GetInput(), this);
     }
   }
 

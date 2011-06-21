@@ -1,0 +1,12 @@
+<RCC>
+    <qresource prefix="/org.mitk.gui.qt.welcomescreen">
+        <file>style.css</file>
+        <file>function.js</file>
+        <file>pics/background.jpg</file>
+        <file>pics/popup_bttn_close.png</file>
+        <file>pics/dti.jpg</file>
+        <file>pics/dti_animated.gif</file>
+        <file>pics/experimental.png</file>
+        <file>mitkdiffusionimagingappwelcomeview.html</file>
+    </qresource>
+</RCC>

@@ -8,6 +8,7 @@ SET(MITK_EXT_PLUGINS
   org.mitk.gui.qt.datamanager:ON
   org.mitk.gui.qt.segmentation:OFF
   org.mitk.gui.qt.diffusionimaging:OFF
+  org.mitk.gui.qt.diffusionimagingapp:OFF
   org.mitk.gui.qt.igtnavigationtoolmanager:OFF
   org.mitk.gui.qt.igttoolpairnavigation:OFF
   org.mitk.gui.qt.igttrackingtoolbox:OFF

@@ -53,8 +53,11 @@ namespace berry
  * </ul>
  * </p>
  */
-class BERRY_UI IntroPart: public IIntroPart, public IExecutableExtension
+class BERRY_UI IntroPart: public QObject, public IIntroPart, public IExecutableExtension
 {
+
+  Q_OBJECT
+  Q_INTERFACES(berry::IIntroPart berry::IExecutableExtension)
 
 private:
 

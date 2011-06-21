@@ -4,6 +4,7 @@ SET(MOC_H_FILES
   src/berryWorkbenchPart.h
   src/berryEditorPart.h
   src/berryViewPart.h
+  src/intro/berryIntroPart.h
 )
 
 SET(CACHED_RESOURCE_FILES

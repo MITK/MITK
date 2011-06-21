@@ -124,6 +124,12 @@ if(MITK_USE_BLUEBERRY AND NOT MITK_USE_CTK)
   MESSAGE(FATAL_ERROR "BlueBerry depends on CTK. Please set MITK_USE_CTK to ON.")
 endif()
 
+if(NOT MITK_ACCESSBYITK_PIXEL_TYPES)
+  set(MITK_ACCESSBYITK_PIXEL_TYPES
+      "double, float, int, unsigned int, short, unsigned short, char, unsigned char"
+      CACHE STRING "List of pixel types used in AccessByItk macros" FORCE)
+endif()
+
 #-----------------------------------------------------------------------------
 # Additional CXX/C Flags
 #-----------------------------------------------------------------------------

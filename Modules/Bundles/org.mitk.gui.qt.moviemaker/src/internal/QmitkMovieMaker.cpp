@@ -736,17 +736,17 @@ void QmitkMovieMaker::TakeScreenshot(vtkRenderer* renderer, unsigned int magnifi
   m_MultiWidget->DisableGradientBackground();
 
   m_MultiWidget->mitkWidget1->ActivateMenuWidget( false );
-  m_MultiWidget->mitkWidget1->ActivateMenuWidget( false );
-  m_MultiWidget->mitkWidget1->ActivateMenuWidget( false );
-  m_MultiWidget->mitkWidget1->ActivateMenuWidget( false );
+  m_MultiWidget->mitkWidget2->ActivateMenuWidget( false );
+  m_MultiWidget->mitkWidget3->ActivateMenuWidget( false );
+  m_MultiWidget->mitkWidget4->ActivateMenuWidget( false );
 
   fileWriter->Write();
   fileWriter->Delete();
 
   m_MultiWidget->mitkWidget1->ActivateMenuWidget( true );
-  m_MultiWidget->mitkWidget1->ActivateMenuWidget( true );
-  m_MultiWidget->mitkWidget1->ActivateMenuWidget( true );
-  m_MultiWidget->mitkWidget1->ActivateMenuWidget( true );
+  m_MultiWidget->mitkWidget2->ActivateMenuWidget( true );
+  m_MultiWidget->mitkWidget3->ActivateMenuWidget( true );
+  m_MultiWidget->mitkWidget4->ActivateMenuWidget( true );
 
   m_MultiWidget->EnableColoredRectangles();
   m_MultiWidget->EnableDepartmentLogo();

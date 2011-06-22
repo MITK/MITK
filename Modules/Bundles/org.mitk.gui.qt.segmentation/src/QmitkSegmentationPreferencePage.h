@@ -30,6 +30,7 @@ class QRadioButton;
 class MITK_QT_SEGMENTATION QmitkSegmentationPreferencePage : public QObject, public berry::IQtPreferencePage
 {
   Q_OBJECT
+  Q_INTERFACES(berry::IPreferencePage)
 
 public:
 

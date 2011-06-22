@@ -1,0 +1,174 @@
+@charset "utf-8";
+
+body{
+	margin:0px 0px;
+	padding: 0px 0px;
+}
+
+h1{
+	margin:0px 0px;
+	padding: 0px 0px;
+	font-family:"Times New Roman", Times, serif;	
+	color:#333;
+}
+
+img{border:none;}
+
+#screen{
+	width:100%;
+	min-height:1060px;
+	height:100%;
+	padding-top:15px;
+	background-color:#888888;
+	background-image:url(pics/background.jpg);
+	background-repeat:repeat-x;
+}
+
+#welcome{
+	min-width:150px;
+	max-width:690px;
+	margin: 0 auto;
+	padding-left:5px;
+	font-family:"Times New Roman", Times, serif;
+	color:#333;
+}
+
+#welcomeText{
+	margin-top:15px;
+	margin-bottom:15px;
+	z-index:1;
+}
+
+#bttnField{
+	min-width:150px;
+	max-width:690px;
+	margin: 0 auto;
+	padding-left:5px;
+}
+
+.bttnWrap{
+	position:relative;
+	float:left;
+	width:140px;
+	height:190px;
+	margin-right:32px;
+	margin-top:5px;
+	z-index:2;
+}
+
+.modBttn{
+	margin-bottom:8px;
+	border: solid 2px #000;
+ -webkit-box-shadow: 5px 5px 6px rgba(0,0,0,0.6);
+}
+
+.modBttn:hover{
+	border: solid 2px #FFF;
+	cursor:pointer;
+ -webkit-box-shadow: none;
+}
+
+.modBttnHover{
+	margin-bottom:8px;
+	border: solid 2px #FFF;
+	cursor:pointer;
+ -webkit-box-shadow: none;
+}
+
+.txtLink{
+	font-family:"Times New Roman", Times, serif;
+	font-size:16px;
+	font-weight:bold;
+	text-decoration:none;
+	cursor:pointer;
+	color:#333;
+}
+
+.txtLink:hover{
+	text-decoration:underline;
+}
+
+.popUpLink{
+	font-family:"Times New Roman", Times, serif;
+	font-size:14px;
+	font-weight:normal;
+	line-height:16px;
+	color:#333;
+}
+
+.popUpLink:hover{
+	text-decoration:underline;
+	cursor:pointer;
+}
+
+#popup{
+	position:fixed;
+	max-width:690px;
+	min-width:150px;
+	background-color:#000000;
+	opacity: 0.8;
+	-webkit-border-radius: 1em;
+	z-index:3;
+	font-family:Arial, Helvetica, sans-serif;	
+	color:#FFF;
+}
+
+#bttnClose{
+	position:relative;
+	right:10px;
+	top:10px;
+	cursor:pointer;
+}
+
+#contHeadline{
+	max-width:690px;
+	min-width:150px;
+	margin-left:10px;
+	margin-right:10px;
+	font-weight:bold;
+	font-size:14px;
+	text-align:left;
+}
+
+#contDescription{
+	max-width:690px;
+	min-width:150px;
+	margin-top:15px;
+	margin-bottom:15px;
+	margin-left:10px;
+	margin-right:10px;
+	line-height:21px;
+	font-family:Arial, Helvetica, sans-serif;	
+	font-weight:normal;
+	font-size:14px;
+	text-align:left;
+}
+
+#contModLink{
+	max-width:690px;
+	min-width:150px;
+	height:50px;
+	margin-left:10px;
+	margin-right:10px;
+	text-align:left;
+}
+
+.moduleLink{
+	font-family:Arial, Helvetica, sans-serif;	
+	color:#FFF;
+}
+
+.expPic{
+	margin-top:-126px;	
+}
+
+.clearfloat{clear:both;}
+
+
+
+
+
+
+
+
+

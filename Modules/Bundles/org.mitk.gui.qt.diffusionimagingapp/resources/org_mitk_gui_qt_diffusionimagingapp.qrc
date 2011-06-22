@@ -1,0 +1,6 @@
+<!DOCTYPE RCC><RCC version="1.0">
+ <qresource prefix="/org.mitk.gui.qt.diffusionimagingapp">
+     <file>app-icon.png</file>	 
+	 <file>mintLogo.png</file>
+ </qresource>
+ </RCC>

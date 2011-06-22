@@ -146,6 +146,8 @@ namespace mitk {
       /** \brief PolyData object containg all lines/points needed for outlining the contour.*/
       vtkSmartPointer<vtkPolyData> m_OutlinePolyData;
 
+      bool m_flag;
+
       /** \brief timestamp of last update of stored data */
       itk::TimeStamp m_LastUpdateTime;
 

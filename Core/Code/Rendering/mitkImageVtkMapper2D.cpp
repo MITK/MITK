@@ -43,9 +43,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkTexture.h>
 #include <vtkCamera.h>
 #include <vtkTransformPolyDataFilter.h>
-#include <vtkMarchingSquares.h>
-#include <vtkMarchingContourFilter.h>
-#include <vtkPolyLine.h>
 #include <vtkRenderWindowInteractor.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderer.h>
@@ -110,7 +107,7 @@ void mitk::ImageVtkMapper2D::AdjustCamera(mitk::BaseRenderer* renderer)
   double cameraPosition[3];
   cameraPosition[0] = viewPlaneCenter[0];
   cameraPosition[1] = viewPlaneCenter[1];
-  cameraPosition[2] = viewPlaneCenter[2] + 5000.0; //Reason for 5000 => VTK seems to calculate the clipping planes wrong for Z=1
+  cameraPosition[2] = 1.0; //Reason for 5000 => VTK seems to calculate the clipping planes wrong for Z=1
 
   //set the camera corresponding to the textured plane
   vtkSmartPointer<vtkCamera> camera = renderer->GetVtkRenderer()->GetActiveCamera();
@@ -121,7 +118,8 @@ void mitk::ImageVtkMapper2D::AdjustCamera(mitk::BaseRenderer* renderer)
     camera->SetViewUp( cameraUp ); //set the view-up for the camera
   }
   //reset the clipping range
-  renderer->GetVtkRenderer()->ResetCameraClippingRange();
+//    renderer->GetVtkRenderer()->ResetCameraClippingRange();
+  camera->SetClippingRange(0.5, 100.5);
 }
 
 //set the two points defining the textured plane according to the dimension and spacing
@@ -592,7 +590,11 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
   //apply the properties after the slice was set
   this->ApplyProperties( renderer, trans, mmPerPixel );
 
+  vtkCamera* cam = renderer->GetVtkRenderer()->GetActiveCamera();
   //set up the camera to view the transformed plane
+  MITK_INFO << "######################### vor";
+  cam->Print(std::cout);
+
   this->AdjustCamera( renderer );
 
   renderer->GetVtkRenderer()->SetBackground(1, 1, 1);
@@ -600,9 +602,12 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
   //Transform the camera to the current position (transveral, coronal and saggital plane).
   //This is necessary, because the vtkTransformFilter does not manipulate the vtkCamera.
   //(Without not all three planes would be visible).
-  renderer->GetVtkRenderer()->GetActiveCamera()->ApplyTransform(trans);
+//  renderer->GetVtkRenderer()->GetActiveCamera()->ApplyTransform(trans);
 
   // We have been modified
+  MITK_INFO << "######################### nach";
+  cam->Print(std::cout);
+
   localStorage->m_LastUpdateTime.Modified();
 }
 
@@ -914,7 +919,7 @@ void mitk::ImageVtkMapper2D::ApplyProperties(mitk::BaseRenderer* renderer, vtkSm
     localStorage->m_Actor->SetTexture(localStorage->m_Texture);
   }
   localStorage->m_TransformFilter->Update();
-  localStorage->m_Mapper->SetInputConnection(localStorage->m_TransformFilter->GetOutputPort());
+  localStorage->m_Mapper->SetInputConnection(localStorage->m_Plane->GetOutputPort());
   localStorage->m_Mapper->ScalarVisibilityOff();
 }
 
@@ -1197,6 +1202,7 @@ mitk::ImageVtkMapper2D::LocalStorage::LocalStorage()
   m_UnitSpacingImageFilter = vtkSmartPointer<vtkImageChangeInformation>::New();  
   m_OutlinePolyData = vtkSmartPointer<vtkPolyData>::New();
 
+  m_flag = true;
   //the following actions are always the same and thus can be performed
   //in the constructor for each image (i.e. the image-corresponding local storage)
 

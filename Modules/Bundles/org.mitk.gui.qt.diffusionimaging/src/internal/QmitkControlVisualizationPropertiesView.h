@@ -109,6 +109,8 @@ protected slots:
   void BundleRepresentationColor();
   void PlanarFigureFocus();
 
+  void SetInteractor();
+
 protected:
 
   Ui::QmitkControlVisualizationPropertiesViewControls* m_Controls;

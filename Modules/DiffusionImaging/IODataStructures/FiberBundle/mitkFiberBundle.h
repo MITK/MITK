@@ -135,6 +135,8 @@ namespace mitk {
     mitk::FiberBundle::Pointer SubstractBundle(mitk::FiberBundle::Pointer bundle);
     void InsertBundle(mitk::FiberBundle::Pointer bundle);
 
+//    int SearchFiber(worldPoint, tolerance, resultDistance);
+
   protected:
     FiberBundle();
     virtual ~FiberBundle();

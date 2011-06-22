@@ -117,6 +117,10 @@
       <event NAME="EV_NEW_LANDMARK" ID="5551009" />
       <event NAME="EV_REMOVE_LANDMARK" ID="5551010" />
     </eventCategory>
+    <eventCategory NAME="FiberBundles">
+      <event NAME="EIDFIGUREHOVER" ID="12340" />
+      <event NAME="EIDNOFIGUREHOVER" ID="12341" />
+    </eventCategory>
   </events>
   <actions>
     <actionCategory NAME="DoNothing">

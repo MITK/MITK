@@ -3671,6 +3671,37 @@
       </transition>
     </state>
   </stateMachine>
+  <stateMachine NAME="FiberBundleInteractor">
+    <!-- working with mitk::FiberBundles -->
+    <state NAME="Start" ID="123451" START_STATE="TRUE" X_POS="1368" Y_POS="736" WIDTH="100" HEIGHT="50">
+      <transition NAME="name" EVENT_ID="520" NEXT_STATE_ID="123451">
+        <!-- on EIDMOUSEMOVE keep in state and do AcCHECKHOVERING (which throws EIDFIGUREHOVER or EIDNOFIGUREHOVER if applicable) -->
+        <action ID="341" />
+      </transition>
+      <transition NAME="name" EVENT_ID="12340" NEXT_STATE_ID="123452">
+        <!-- on EIDFIGUREHOVER go to HoverFiber and do AcSELECTPICKEDOBJECT -->
+        <action ID="60" />
+      </transition>
+    </state>
+    <state NAME="HoverFiber" ID="123452" X_POS="340" Y_POS="170" WIDTH="100" HEIGHT="50">
+      <transition NAME="name" EVENT_ID="520" NEXT_STATE_ID="123452">
+        <!-- on EIDMOUSEMOVE keep state and do AcCHECKHOVERING (which throws EIDFIGUREHOVER or EIDNOFIGUREHOVER if applicable) -->
+        <action ID="341" />
+      </transition>
+      <transition NAME="name" EVENT_ID="12340" NEXT_STATE_ID="123452">
+        <!-- on EIDFIGUREHOVER keep state and do AcSELECTPICKEDOBJECT -->
+        <action ID="60" />
+      </transition>
+      <transition NAME="name" EVENT_ID="12341" NEXT_STATE_ID="123451">
+        <!-- on EIDNOFIGUREHOVER go to Start and do AcDESELECTALL -->
+        <action ID="72" />
+      </transition>
+      <transition NAME="name" EVENT_ID="1" NEXT_STATE_ID="123452">
+        <!-- on EIDLEFTMOUSEBTN keep state and do AcREMOVE -->
+        <action ID="101" />
+      </transition>
+    </state>
+  </stateMachine>
 </mitkInteraktionStates>
 <!-- DOCUMENTATION -->
 <!-- This is StateMachine.xml. Includes Information about different StateMachines and Events. Used by EventMapper and StateMachineFactory -->

@@ -201,7 +201,7 @@ class mitkNavigationToolReaderAndWriterTestClass
     std::remove((mitk::StandardFileLocations::GetInstance()->GetOptionDirectory()+Poco::Path::separator()+".."+Poco::Path::separator()+"TestTool2.tool").c_str());
     }
 
-    static void mitkNavigationToolReaderAndWriterTestClass::TestReadInvalidData()
+    static void TestReadInvalidData()
     {
     mitk::DataStorage::Pointer testStorage = dynamic_cast<mitk::DataStorage*>(mitk::StandaloneDataStorage::New().GetPointer());
     mitk::NavigationToolReader::Pointer myReader = mitk::NavigationToolReader::New(testStorage);
@@ -211,7 +211,7 @@ class mitkNavigationToolReaderAndWriterTestClass
     MITK_TEST_CONDITION_REQUIRED(myReader->GetErrorMessage() == "Cannot open 'invalidTool' for reading", "Testing error message in this case");
     }
 
-    static void mitkNavigationToolReaderAndWriterTestClass::TestWriteInvalidData()
+    static void TestWriteInvalidData()
     {
     mitk::NavigationTool::Pointer myNavigationTool = mitk::NavigationTool::New();
     myNavigationTool->SetIdentifier("ClaronTool#1");

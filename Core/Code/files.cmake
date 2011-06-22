@@ -2,6 +2,37 @@ SET(H_FILES
   Algorithms/itkLocalVariationImageFilter.h
   Algorithms/itkTotalVariationDenoisingImageFilter.h
   Algorithms/itkTotalVariationSingleIterationImageFilter.h
+
+  # Preprocessor macros taken from Boost
+  Algorithms/mitkPPArithmeticDec.h
+  Algorithms/mitkPPCat.h
+  Algorithms/mitkPPConfig.h
+  Algorithms/mitkPPControlExprIIf.h
+  Algorithms/mitkPPControlIf.h
+  Algorithms/mitkPPControlIIf.h
+  Algorithms/mitkPPDebugError.h
+  Algorithms/mitkPPDetailAutoRec.h
+  Algorithms/mitkPPDetailDMCAutoRec.h
+  Algorithms/mitkPPExpand.h
+  Algorithms/mitkPPFacilitiesEmpty.h
+  Algorithms/mitkPPFacilitiesExpand.h
+  Algorithms/mitkPPLogicalBool.h
+  Algorithms/mitkPPRepetitionDetailDMCFor.h
+  Algorithms/mitkPPRepetitionDetailEDGFor.h
+  Algorithms/mitkPPRepetitionDetailFor.h
+  Algorithms/mitkPPRepetitionDetailMSVCFor.h
+  Algorithms/mitkPPRepetitionFor.h
+  Algorithms/mitkPPSeqElem.h
+  Algorithms/mitkPPSeqForEach.h
+  Algorithms/mitkPPSeqForEachProduct.h
+  Algorithms/mitkPPSeq.h
+  Algorithms/mitkPPSeqEnum.h
+  Algorithms/mitkPPSeqSize.h
+  Algorithms/mitkPPSeqToTuple.h
+  Algorithms/mitkPPTupleEat.h
+  Algorithms/mitkPPTupleElem.h
+  Algorithms/mitkPPTupleRem.h
+
   DataManagement/mitkCommon.h
   Interactions/mitkEventMapperAddOn.h
 )

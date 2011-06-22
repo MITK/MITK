@@ -201,6 +201,34 @@ class mitkNavigationToolReaderAndWriterTestClass
     std::remove((mitk::StandardFileLocations::GetInstance()->GetOptionDirectory()+Poco::Path::separator()+".."+Poco::Path::separator()+"TestTool2.tool").c_str());
     }
 
+    static void mitkNavigationToolReaderAndWriterTestClass::TestReadInvalidData()
+    {
+    mitk::DataStorage::Pointer testStorage = dynamic_cast<mitk::DataStorage*>(mitk::StandaloneDataStorage::New().GetPointer());
+    mitk::NavigationToolReader::Pointer myReader = mitk::NavigationToolReader::New(testStorage);
+    mitk::NavigationTool::Pointer readTool = myReader->DoRead("invalidTool");
+
+    MITK_TEST_CONDITION_REQUIRED(readTool.IsNull(), "Testing return value if filename is invalid");
+    MITK_TEST_CONDITION_REQUIRED(myReader->GetErrorMessage() == "Cannot open 'invalidTool' for reading", "Testing error message in this case");
+    }
+
+    static void mitkNavigationToolReaderAndWriterTestClass::TestWriteInvalidData()
+    {
+    mitk::NavigationTool::Pointer myNavigationTool = mitk::NavigationTool::New();
+    myNavigationTool->SetIdentifier("ClaronTool#1");
+    myNavigationTool->SetSerialNumber("0815");
+    myNavigationTool->SetTrackingDeviceType(mitk::ClaronMicron);
+    myNavigationTool->SetType(mitk::NavigationTool::Fiducial);
+
+    //now create a writer and write it to the harddisc
+    mitk::NavigationToolWriter::Pointer myWriter = mitk::NavigationToolWriter::New();
+    std::string filename = "NH:/sfdsfsdsf.&%%%";
+    
+    MITK_TEST_OUTPUT(<<"---- Testing write invalid file ----");
+    bool test = myWriter->DoWrite(filename,myNavigationTool);
+    MITK_TEST_CONDITION_REQUIRED(!test,"testing write");
+    MITK_TEST_CONDITION_REQUIRED(myWriter->GetErrorMessage() == "Could not open a zip file for writing: 'NH:/sfdsfsdsf.&%%%'","testing error message"); 
+    }
+
   };
 
 mitk::Surface::Pointer mitkNavigationToolReaderAndWriterTestClass::testSurface = NULL;
@@ -215,7 +243,10 @@ int mitkNavigationToolReaderAndWriterTest(int /* argc */, char* /*argv*/[])
   mitkNavigationToolReaderAndWriterTestClass::TestRead();
   mitkNavigationToolReaderAndWriterTestClass::TestWrite2();
   mitkNavigationToolReaderAndWriterTestClass::TestRead2();
+  mitkNavigationToolReaderAndWriterTestClass::TestReadInvalidData();
+  mitkNavigationToolReaderAndWriterTestClass::TestWriteInvalidData();
   mitkNavigationToolReaderAndWriterTestClass::CleanUp();
+
 
   MITK_TEST_END()
 }

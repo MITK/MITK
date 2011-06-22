@@ -926,23 +926,64 @@ std::string DicomSeriesReader::GetConfigurationString()
 
   return configuration.str();
 }
+
+void DicomSeriesReader::CopyMetaDataToImageProperties(StringContainer filenames, const gdcm::Scanner::MappingType &tagValueMappings_, DcmIoType *io, Image *image)
+{
+  std::list<StringContainer> imageBlock;
+  imageBlock.push_back(filenames);
+  CopyMetaDataToImageProperties(imageBlock, tagValueMappings_, io, image);
+}
   
-void DicomSeriesReader::CopyMetaDataToImageProperties( const StringContainer& files, DcmIoType* io, Image* image )
+void DicomSeriesReader::CopyMetaDataToImageProperties( std::list<StringContainer> imageBlock, const gdcm::Scanner::MappingType& tagValueMappings_,  DcmIoType* io, Image* image)
 {
   if (!io || !image) return;
 
   StringLookupTable filesForSlices;
+  StringLookupTable sliceLocationForSlices;
+  StringLookupTable instanceNumberForSlices;
+  StringLookupTable SOPInstanceNumberForSlices;
 
-  unsigned int slice(0);
-  for ( StringContainer::const_iterator fIter = files.begin();
-        fIter != files.end();
-        ++fIter, ++slice )
+  gdcm::Scanner::MappingType& tagValueMappings = const_cast<gdcm::Scanner::MappingType&>(tagValueMappings_);
+
+  //DICOM tags which should be added to the image properties
+  const gdcm::Tag tagSliceLocation(0x0020, 0x1041); // slice location
+
+  const gdcm::Tag tagInstanceNumber(0x0020, 0x0013); // (image) instance number
+
+  const gdcm::Tag tagSOPInstanceNumber(0x0008, 0x0018); // SOP instance number
+  unsigned int timeStep(0);
+
+  std::string propertyKeySliceLocation = "dicom.image.0020.1041";
+  std::string propertyKeyInstanceNumber = "dicom.image.0020.0013";
+  std::string propertyKeySOPInstanceNumber = "dicom.image.0008.0018";
+
+  for ( std::list<StringContainer>::iterator i = imageBlock.begin(); i != imageBlock.end(); i++, timeStep++ )
   {
-    filesForSlices.SetTableValue( slice, *fIter );
+
+    const StringContainer& files = (*i);
+    unsigned int slice(0);
+    for ( StringContainer::const_iterator fIter = files.begin();
+          fIter != files.end();
+          ++fIter, ++slice )
+    {
+      filesForSlices.SetTableValue( slice, *fIter );
+      sliceLocationForSlices.SetTableValue(slice, tagValueMappings[fIter->c_str()][tagSliceLocation]);
+      instanceNumberForSlices.SetTableValue(slice, tagValueMappings[fIter->c_str()][tagInstanceNumber]);
+      SOPInstanceNumberForSlices.SetTableValue(slice, tagValueMappings[fIter->c_str()][tagSOPInstanceNumber]);
+    }
+
+    image->SetProperty( "files", StringLookupTableProperty::New( filesForSlices ) );
+
+    if(timeStep != 0)
+    {
+      propertyKeySliceLocation.append(".t" + timeStep);
+      propertyKeyInstanceNumber.append(".t" + timeStep);
+      propertyKeySOPInstanceNumber.append(".t" + timeStep);
+    }
+    image->SetProperty( "dicom.image.0020.1041", StringLookupTableProperty::New( sliceLocationForSlices ) );
+    image->SetProperty( "dicom.image.0020.0013", StringLookupTableProperty::New( instanceNumberForSlices ) );
+    image->SetProperty( "dicom.image.0008.0018", StringLookupTableProperty::New( SOPInstanceNumberForSlices ) );
   }
-
-  image->SetProperty( "files", StringLookupTableProperty::New( filesForSlices ) );
-
   /*
      TODO
 

@@ -302,7 +302,7 @@ protected:
   */
   static
   TwoStringContainers
-  AnalyzeFileForITKImageSeriesReaderSpacingAssumption(const StringContainer& files, const gdcm::Scanner::MappingType& tagValueMappings);
+  AnalyzeFileForITKImageSeriesReaderSpacingAssumption(const StringContainer& files, const gdcm::Scanner::MappingType& tagValueMappings_);
 
   /**
     \brief Sort a set of file names in an order that is meaningful for loading them into an mitk::Image.
@@ -380,6 +380,11 @@ protected:
   };
 
   /**
+   \brief Scan for slice image information
+  */
+  static gdcm::Scanner ScanForSliceInformation( const StringContainer &filenames );
+
+  /**
    \brief Performs actual loading of a series and creates an image having the specified pixel type.
   */
   template <typename PixelType>
@@ -412,7 +417,7 @@ protected:
   */
   static 
   std::list<StringContainer> 
-  SortIntoBlocksFor3DplusT( const StringContainer& presortedFilenames, bool sort, bool& canLoadAs4D );
+  SortIntoBlocksFor3DplusT( const StringContainer& presortedFilenames, const gdcm::Scanner::MappingType& tagValueMappings_, bool sort, bool& canLoadAs4D);
 
   /**
    \brief Defines spatial sorting for sorting by GDCM 2.
@@ -430,7 +435,8 @@ protected:
            and from the list of input files to the PropertyList of mitk::Image.
     \todo Tag copy must follow; image level will cause some additional files parsing, probably.
   */
-  static void CopyMetaDataToImageProperties( const StringContainer& files, DcmIoType* io, Image* image );
+  static void CopyMetaDataToImageProperties( StringContainer filenames, const gdcm::Scanner::MappingType& tagValueMappings_, DcmIoType* io, Image* image);
+  static void CopyMetaDataToImageProperties( std::list<StringContainer> imageBlock, const gdcm::Scanner::MappingType& tagValueMappings_, DcmIoType* io, Image* image);
 };
 
 }

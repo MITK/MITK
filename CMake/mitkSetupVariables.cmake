@@ -101,4 +101,12 @@ if(MITK_BUILD_ALL_PLUGINS)
   set(MITK_BUILD_ALL_PLUGINS_OPTION "FORCE_BUILD_ALL")
 endif()
 
+# create a list of types for template instantiations of itk image access functions
+set(MITK_ACCESSBYITK_PIXEL_TYPES_SEQ)
+set(MITK_ACCESSBYITK_TYPES_DIMN_SEQ)
+string(REPLACE "," ";" _pixeltypes ${MITK_ACCESSBYITK_PIXEL_TYPES})
+foreach(_pixeltype ${_pixeltypes})
+  set(MITK_ACCESSBYITK_PIXEL_TYPES_SEQ "${MITK_ACCESSBYITK_PIXEL_TYPES_SEQ}(${_pixeltype})")
+  set(MITK_ACCESSBYITK_TYPES_DIMN_SEQ "${MITK_ACCESSBYITK_TYPES_DIMN_SEQ}((${_pixeltype},dim))")
+endforeach()
 

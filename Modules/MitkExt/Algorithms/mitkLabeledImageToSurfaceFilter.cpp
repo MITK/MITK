@@ -328,7 +328,10 @@ template < typename TPixel, unsigned int VImageDimension >
   }
 }
 
-InstantiateAccessFunctionForFixedDimension_1(GetAvailableLabelsInternal, 3, mitk::LabeledImageToSurfaceFilter::LabelMapType&);
+#define InstantiateAccessFunction_GetAvailableLabelsInternal(pixelType, dim) \
+template void GetAvailableLabelsInternal(itk::Image<pixelType, dim>*, mitk::LabeledImageToSurfaceFilter::LabelMapType&);
+
+InstantiateAccessFunctionForFixedDimension(GetAvailableLabelsInternal, 3);
 
 
 mitk::LabeledImageToSurfaceFilter::LabelMapType mitk::LabeledImageToSurfaceFilter::GetAvailableLabels()

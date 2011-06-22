@@ -54,7 +54,10 @@ void _mitkItkPictureWriteFunctor::AccessItkImage(itk::Image< TPixel, VImageDimen
   writer->Update();
 }
 
-InstantiateAccessItkImageFunction_1(_mitkItkPictureWriteFunctor, const std::string&, 0)
+#define InstantiateAccessFunction__ItkPictureWriteFunctor(pixelType, dim) \
+  template MITK_CORE_EXPORT void _mitkItkPictureWriteFunctor::AccessItkImage(itk::Image<pixelType,dim>*, const std::string&);
+
+InstantiateAccessFunction(_ItkPictureWriteFunctor)
 
 // typedef itk::Image<itk::RGBPixel<unsigned char>, 2>  itkImageRGBUC2;
 // template <> void _mitkItkImageWrite<itk::RGBPixel<unsigned char>, 2>(itkImageRGBUC2* itkImage, const std::string& fileName)

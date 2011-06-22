@@ -17,8 +17,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <mitkPyramidalRegistrationMethodAccessFunctor.txx>
 
-namespace mitk {
+#define InstantiateAccessFunction_PyramidalAccessItkImage(pixelType, dim) \
+  template void mitk::PyramidalRegistrationMethodAccessFunctor::AccessItkImage(itk::Image<pixelType, dim>* itkImage1, mitk::PyramidalRegistrationMethod* method);
 
-InstantiateAccessItkImageFunctionForSpecificPixelTypes_1(PyramidalRegistrationMethodAccessFunctor, PyramidalRegistrationMethod*, 0, @TYPE@)
+InstantiateAccessFunctionForFixedPixelType(PyramidalAccessItkImage, @TYPE@)
 
-}

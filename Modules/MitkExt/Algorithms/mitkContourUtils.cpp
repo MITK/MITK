@@ -19,8 +19,11 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkImageCast.h"
 #include "ipSegmentation.h"
 
+#define InstantiateAccessFunction_ItkCopyFilledContourToSlice(pixelType, dim) \
+  template void mitk::ContourUtils::ItkCopyFilledContourToSlice(itk::Image<pixelType,dim>*, const mitk::Image*, int);
+
 // explicitly instantiate the 2D version of this method
-InstantiateAccessFunctionForFixedDimension_2( mitk::ContourUtils::ItkCopyFilledContourToSlice, 2, const mitk::Image*, int );
+InstantiateAccessFunctionForFixedDimension(ItkCopyFilledContourToSlice, 2);
     
 mitk::ContourUtils::ContourUtils()
 {

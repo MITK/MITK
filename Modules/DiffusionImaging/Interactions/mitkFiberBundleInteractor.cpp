@@ -20,18 +20,18 @@ PURPOSE.  See the above copyright notices for more information.
 #include <mitkPointOperation.h>
 #include <mitkPositionEvent.h>
 #include <mitkOperationEvent.h>
-//#include "mitkStatusBar.h"
 #include <mitkDataNode.h>
 #include <mitkPointSet.h>
 #include <mitkInteractionConst.h>
 #include <mitkAction.h>
 #include <mitkProperties.h>
-#include <vtkLinearTransform.h>
 #include <mitkUndoController.h>
 #include <mitkStateEvent.h>
 #include <mitkState.h>
 #include <mitkFiberBundle.h>
 #include "mitkBaseRenderer.h"
+
+#include <vtkLinearTransform.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderWindowInteractor.h>
 #include <vtkRenderer.h>
@@ -106,8 +106,6 @@ void mitk::FiberBundleInteractor::DeselectAllFibers()
 float mitk::FiberBundleInteractor::CanHandleEvent(StateEvent const* stateEvent) const
     //go through all points and check, if the given Point lies near a line
 {
-  MITK_INFO << "mitk::FiberBundleInteractor::CanHandleEvent ";
-
   float returnValue = 0;
 
   mitk::PositionEvent const  *posEvent = dynamic_cast <const mitk::PositionEvent *> (stateEvent->GetEvent());
@@ -150,8 +148,6 @@ float mitk::FiberBundleInteractor::CanHandleEvent(StateEvent const* stateEvent) 
 
 bool mitk::FiberBundleInteractor::ExecuteAction( Action* action, mitk::StateEvent const* stateEvent )
 {
-  MITK_INFO << "mitk::FiberBundleInteractor::ExecuteAction ";
-
   bool ok = false;//for return type bool
 
   //checking corresponding Data; has to be a PointSet or a subclass
@@ -189,15 +185,6 @@ bool mitk::FiberBundleInteractor::ExecuteAction( Action* action, mitk::StateEven
     }
   }
 
-  // Check if we have a DisplayPositionEvent
-  const DisplayPositionEvent *dpe =
-      dynamic_cast< const DisplayPositionEvent * >( stateEvent->GetEvent() );
-  if ( dpe != NULL )
-  {
-    m_CurrentPickedPoint = dpe->GetWorldPosition();
-    m_CurrentPickedDisplayPoint = dpe->GetDisplayPosition();
-  }
-
   MITK_INFO << "FiberBundleInteractor Got Action " << action->GetActionId();
   /*Each case must watch the type of the event!*/
   switch (action->GetActionId())
@@ -212,45 +199,66 @@ bool mitk::FiberBundleInteractor::ExecuteAction( Action* action, mitk::StateEven
         renderWindowInteractor->Enable();
       }
 
-      // Check if we have a DisplayPositionEvent
       const DisplayPositionEvent *dpe =
           dynamic_cast< const DisplayPositionEvent * >( stateEvent->GetEvent() );
-      if ( dpe == NULL )
-      {
-        ok = true;
-        break;
-      }
 
-      // Check if an object is present at the current mouse position
-      DataNode *pickedNode = dpe->GetPickedObjectNode();
-      StateEvent *newStateEvent;
-      if ( pickedNode == m_DataNode )
+      // Check if we have a DisplayPositionEvent
+      if ( dpe != NULL )
       {
-        // Yes: object will be selected
+
+        // Check if an object is present at the current mouse position
+        DataNode *pickedNode = dpe->GetPickedObjectNode();
+        if ( pickedNode != m_DataNode )
+        {
+          MITK_INFO << "NO Hovering";
+          this->HandleEvent( new StateEvent( EIDNOFIGUREHOVER ) );
+
+          ok = true;
+          break;
+        }
+
+        m_CurrentPickedPoint = dpe->GetWorldPosition();
+        m_CurrentPickedDisplayPoint = dpe->GetDisplayPosition();
+
         MITK_INFO << "YES Hovering";
-        newStateEvent = new StateEvent( EIDYES );
-      }
-      else
-      {
-        // No: back to start state
-        MITK_INFO << "NO Hovering";
-        newStateEvent = new StateEvent( EIDNO );
-      }
+        this->HandleEvent( new StateEvent( EIDFIGUREHOVER ) );
 
-      this->HandleEvent( newStateEvent );
+      }
 
       ok = true;
       break;
     }
     break;
-  case AcSELECTPICKEDOBJECT:
-    MITK_INFO << "FiberBundleInteractor AcSELECTPICKEDOBJECT";
-    break;
-  case AcDESELECTALL:
-    MITK_INFO << "FiberBundleInteractor AcDESELECTALL";
-    break;
+    //  case AcSELECTPICKEDOBJECT:
+    //    MITK_INFO << "FiberBundleInteractor AcSELECTPICKEDOBJECT";
+
+    //    break;
+    //  case AcDESELECTALL:
+    //    MITK_INFO << "FiberBundleInteractor AcDESELECTALL";
+    //    break;
   case AcREMOVE:
-    MITK_INFO << "FiberBundleInteractor AcREMOVE";
+    {
+      MITK_INFO << "FiberBundleInteractor AcREMOVE";
+
+      MITK_INFO << "removing fiber at " << m_CurrentPickedPoint;
+
+//      QmitkStdMultiWidgetEditor::Pointer multiWidgetEditor;
+//      multiWidgetEditor->GetStdMultiWidget()->GetRenderWindow1()->GetRenderer()->GetSliceNavigationController()->SelectSliceByPoint(
+//          m_CurrentPickedPoint);
+
+      BaseRenderer* renderer = mitk::BaseRenderer::GetByName("stdmulti.widget1");
+      renderer->GetSliceNavigationController()->SelectSliceByPoint(
+          m_CurrentPickedPoint);
+
+      renderer = mitk::BaseRenderer::GetByName("stdmulti.widget2");
+      renderer->GetSliceNavigationController()->SelectSliceByPoint(
+          m_CurrentPickedPoint);
+
+      renderer = mitk::BaseRenderer::GetByName("stdmulti.widget3");
+      renderer->GetSliceNavigationController()->SelectSliceByPoint(
+          m_CurrentPickedPoint);
+//      mitk::RenderingManager::GetInstance()->RequestUpdateAll();
+    }
     break;
   default:
     MITK_INFO << "FiberBundleInteractor NO ACTION";

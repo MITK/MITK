@@ -3679,8 +3679,8 @@
         <action ID="341" />
       </transition>
       <transition NAME="name" EVENT_ID="12340" NEXT_STATE_ID="123452">
-        <!-- on EIDFIGUREHOVER go to HoverFiber and do AcSELECTPICKEDOBJECT -->
-        <action ID="60" />
+        <!-- on EIDFIGUREHOVER go to HoverFiber and do nothing --> <!-- previously: AcSELECTPICKEDOBJECT -->
+        <action ID="0" />
       </transition>
     </state>
     <state NAME="HoverFiber" ID="123452" X_POS="340" Y_POS="170" WIDTH="100" HEIGHT="50">
@@ -3689,12 +3689,12 @@
         <action ID="341" />
       </transition>
       <transition NAME="name" EVENT_ID="12340" NEXT_STATE_ID="123452">
-        <!-- on EIDFIGUREHOVER keep state and do AcSELECTPICKEDOBJECT -->
-        <action ID="60" />
+        <!-- on EIDFIGUREHOVER keep state and do nothing --> <!-- previously: AcSELECTPICKEDOBJECT -->
+        <action ID="0" />
       </transition>
       <transition NAME="name" EVENT_ID="12341" NEXT_STATE_ID="123451">
-        <!-- on EIDNOFIGUREHOVER go to Start and do AcDESELECTALL -->
-        <action ID="72" />
+        <!-- on EIDNOFIGUREHOVER go to Start and do nothing --> <!-- previously: AcDESELECTALL -->
+        <action ID="0" />
       </transition>
       <transition NAME="name" EVENT_ID="1" NEXT_STATE_ID="123452">
         <!-- on EIDLEFTMOUSEBTN keep state and do AcREMOVE -->

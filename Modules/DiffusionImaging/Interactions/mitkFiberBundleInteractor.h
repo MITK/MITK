@@ -86,13 +86,14 @@ namespace mitk
     //## @brief to store a position
     unsigned int m_LastPosition;
 
-    Point3D m_InitialPickedPoint;
-    Point2D m_InitialPickedDisplayPoint;
-    vtkFloatingPointType m_InitialPickedPointWorld[4];
+//    Point3D m_InitialPickedPoint;
+//    Point2D m_InitialPickedDisplayPoint;
+//    vtkFloatingPointType m_InitialPickedPointWorld[4];
 
     Point3D m_CurrentPickedPoint;
     Point2D m_CurrentPickedDisplayPoint;
     vtkFloatingPointType m_CurrentPickedPointWorld[4];
+
   };
 }
 #endif /* MITKFiberBundleInteractor_H_HEADER_INCLUDED */

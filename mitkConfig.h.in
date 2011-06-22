@@ -2,6 +2,10 @@
   mitkConfig.h
   this file is generated. Do not change!
 */
+
+#ifndef MITKCONFIG_H
+#define MITKCONFIG_H
+
 #define MITK_ROOT "${PROJECT_SOURCE_DIR}/"
 #cmakedefine MITK_BUILD_SHARED_CORE
 #cmakedefine USE_ITKZLIB
@@ -22,3 +26,4 @@
 #define MITK_VERSION_PATCH @MITK_VERSION_PATCH@
 #define MITK_VERSION_STRING "@MITK_VERSION_STRING@"
 
+#endif // MITKCONFIG_H

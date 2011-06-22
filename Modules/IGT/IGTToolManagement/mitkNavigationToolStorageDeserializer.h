@@ -43,7 +43,7 @@ namespace mitk {
     /**
      * @brief    Loads a collection of navigation tools represented by a mitk::NavigationToolStorage
      *           from a file. 
-     * @return   Returns the storage which was loaded or NULL if there was an error in the loading process.
+     * @return   Returns the storage which was loaded or an empty storage if there was an error in the loading process.
      * 
      */
     mitk::NavigationToolStorage::Pointer Deserialize(std::string filename);

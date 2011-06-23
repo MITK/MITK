@@ -17,6 +17,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "QmitkScaleSkewVersor3DTransformView.h"
 #include "mitkImageAccessByItk.h"
+#include <mitkImageCast.h>
 #include <itkScaleSkewVersor3DTransform.h>
 #include <itkCenteredTransformInitializer.h>
 #include <QValidator>

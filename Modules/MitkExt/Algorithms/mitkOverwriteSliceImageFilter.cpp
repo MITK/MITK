@@ -17,6 +17,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkOverwriteSliceImageFilter.h"
 #include "mitkImageCast.h"
+#include "mitkImageAccessByItk.h"
 #include "mitkSegmentationInterpolationController.h"
 #include "mitkApplyDiffImageOperation.h"
 #include "mitkOperationEvent.h"

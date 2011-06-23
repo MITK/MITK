@@ -17,6 +17,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkShapeBasedInterpolationAlgorithm.h"
 #include "mitkImageCast.h"
+#include "mitkImageDataItem.h"
 
 #include "ipSegmentation.h"
 

@@ -18,6 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkSegmentationInterpolationController.h"
 
 #include "mitkImageCast.h"
+#include "mitkImageAccessByItk.h"
 #include "mitkExtractImageFilter.h"
 #include "mitkImageTimeSelector.h"
 

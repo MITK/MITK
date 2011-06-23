@@ -17,6 +17,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkContourUtils.h"
 #include "mitkImageCast.h"
+#include "mitkImageAccessByItk.h"
+#include "mitkInstantiateAccessFunctions.h"
 #include "ipSegmentation.h"
 
 #define InstantiateAccessFunction_ItkCopyFilledContourToSlice(pixelType, dim) \

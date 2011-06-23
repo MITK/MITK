@@ -26,6 +26,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "itkBinaryThresholdImageFilter.h"
 #include "itkConnectedAdaptiveThresholdImageFilter.h"
 #include "mitkImageCast.h"
+#include "mitkImageAccessByItk.h"
 #include "mitkMaskAndCutRoiImageFilter.h"
 #include "mitkPadImageFilter.h"
 

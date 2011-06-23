@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkToolManager.h"
 
 #include "mitkImageCast.h"
+#include "mitkImageAccessByItk.h"
 #include "mitkProperties.h"
 #include "mitkBoundingObjectToSegmentationFilter.h"
 #include <itkImageRegionIterator.h>

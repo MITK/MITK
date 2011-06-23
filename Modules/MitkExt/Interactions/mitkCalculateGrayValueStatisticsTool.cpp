@@ -19,6 +19,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkCalculateGrayValueStatisticsTool.xpm"
 
+#include "mitkImageAccessByItk.h"
 #include "mitkProgressBar.h"
 #include "mitkStatusBar.h"
 #include "mitkImageTimeSelector.h"

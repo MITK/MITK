@@ -31,6 +31,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkMatrix4x4.h>
 
 #include <mitkImageAccessByItk.h>
+#include <mitkInstantiateAccessFunctions.h>
 #include <itkImageRegionIterator.h>
 #include <itkNumericTraits.h>
 

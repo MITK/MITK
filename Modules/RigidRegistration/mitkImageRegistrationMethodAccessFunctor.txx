@@ -18,6 +18,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkImageRegistrationMethodAccessFunctor.h"
 #include "mitkImageRegistrationMethod.h"
 
+#include <mitkImageCast.h>
+
 #include <itkLinearInterpolateImageFunction.h>
 
 namespace mitk {

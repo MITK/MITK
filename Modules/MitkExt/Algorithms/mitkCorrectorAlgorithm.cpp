@@ -17,6 +17,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkCorrectorAlgorithm.h"
 #include "mitkImageCast.h"
+#include "mitkImageAccessByItk.h"
+#include "mitkImageDataItem.h"
 #include "mitkContourUtils.h"
 
 mitk::CorrectorAlgorithm::CorrectorAlgorithm()

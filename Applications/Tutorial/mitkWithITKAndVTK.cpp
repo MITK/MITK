@@ -4,6 +4,7 @@
 
 #include <mitkPicFileReader.h>
 #include <mitkStandaloneDataStorage.h>
+#include <mitkImageCast.h>
 #include <mitkImageAccessByItk.h>
 
 #include <vtkImageViewer.h>

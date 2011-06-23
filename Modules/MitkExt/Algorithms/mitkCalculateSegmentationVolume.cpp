@@ -15,6 +15,8 @@ PURPOSE.  See the above copyright notices for more information.
  
 =========================================================================*/
 
+#include <mitkImageAccessByItk.h>
+
 #include "mitkCalculateSegmentationVolume.h"
 #include "itkImageRegionConstIteratorWithIndex.h"
 

@@ -17,6 +17,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "Step6RegionGrowing.txx"
 
+#include <mitkInstantiateAccessFunctions.h>
+
 #define InstantiateAccessFunction_RegionGrowing(pixelType, dim) \
 template void RegionGrowing(itk::Image<pixelType, dim>*, Step6*);
 

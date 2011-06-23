@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkToolManager.h"
 #include "mitkOverwriteSliceImageFilter.h"
 #include "mitkBaseRenderer.h"
+#include "mitkImageDataItem.h"
 #include "ipSegmentation.h"
 
 #define ROUND(a)     ((a)>0 ? (int)((a)+0.5) : -(int)(0.5-(a)))

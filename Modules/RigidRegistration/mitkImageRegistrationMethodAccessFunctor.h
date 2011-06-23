@@ -30,7 +30,7 @@ namespace mitk
 
     void operator()(const mitk::Image* img, ImageRegistrationMethod* method)
     {
-      AccessDefaultPixelTypesByItk_1(img, ImageRegistrationMethod*, method)
+      AccessByItk_1(img, AccessItkImage, method)
     }
 
     template < typename TPixel, unsigned int VImageDimension >

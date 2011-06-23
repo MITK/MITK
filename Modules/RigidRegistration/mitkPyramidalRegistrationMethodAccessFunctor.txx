@@ -18,6 +18,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkPyramidalRegistrationMethodAccessFunctor.h"
 #include "mitkPyramidalRegistrationMethod.h"
 
+#include <mitkImageCast.h>
+
 #include <itkLinearInterpolateImageFunction.h>
 #include <itkMultiResolutionImageRegistrationMethod.h>
 #include <itkRescaleIntensityImageFilter.h>

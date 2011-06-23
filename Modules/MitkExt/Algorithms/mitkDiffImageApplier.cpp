@@ -18,6 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkDiffImageApplier.h"
 
 #include "mitkImageCast.h"
+#include "mitkImageAccessByItk.h"
 #include "mitkApplyDiffImageOperation.h"
 #include "mitkRenderingManager.h"
 #include "mitkSegmentationInterpolationController.h"

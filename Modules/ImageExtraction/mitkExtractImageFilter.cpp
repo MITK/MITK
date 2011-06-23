@@ -21,6 +21,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkITKImageImport.h"
 #include "mitkImageTimeSelector.h"
 
+#include <mitkImageAccessByItk.h>
+
 #include <itkExtractImageFilter.h>
 
 mitk::ExtractImageFilter::ExtractImageFilter()

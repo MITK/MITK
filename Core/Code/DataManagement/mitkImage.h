@@ -554,7 +554,8 @@ public:
   //## @warning for internal use only
   virtual ImageDataItemPointer GetChannelData(int n = 0, void *data = NULL, ImportMemoryManagementType importMemoryManagement = CopyMemory);
 
-  friend class _ComputeExtremaInItkImage;
+  template < typename ItkImageType >
+    friend void _ComputeExtremaInItkImage(ItkImageType* itkImage, mitk::Image * mitkImage, int t);
 
 protected:
   

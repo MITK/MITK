@@ -15,12 +15,12 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-
+#include <mitkConfig.h>
 #include <mitkImageCast.h>
+#include <mitkInstantiateAccessFunctions.h>
+
 #include <itkImage.h>
 #include <itkCastImageFilter.h>
-
-#include <mitkConfig.h>
 
 namespace mitk 
 {

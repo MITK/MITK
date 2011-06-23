@@ -22,53 +22,6 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include <itksys/SystemTools.hxx>
 
-struct PicFileAccessFunctor
-{
-  typedef PicFileAccessFunctor Self;
-
-  void operator()(mitk::Image* inputImage, mitk::Image* mitkImage, bool& identical)
-  {
-    AccessFixedDimensionDefaultPixelTypesByItk_2(inputImage, mitk::Image*, mitkImage, bool&, identical)
-  }
-
-  template < typename TPixel, unsigned int VImageDimension >
-  void AccessItkImage( itk::Image< TPixel, VImageDimension >* itkImage, mitk::Image* mitkImage, bool& identical )
-  {
-    typename itk::Image< TPixel, VImageDimension >::Pointer itkImage2;
-
-    mitk::CastToItkImage( mitkImage, itkImage2 );
-
-    if (!itkImage2 || !itkImage2.GetPointer())
-    {
-      identical = false;
-      return;
-    }
-
-    itk::ImageRegionConstIterator<itk::Image<TPixel, VImageDimension> > iterItkImage1( itkImage, itkImage->GetLargestPossibleRegion() );
-    itk::ImageRegionConstIterator<itk::Image<TPixel, VImageDimension> > iterItkImage2( itkImage, itkImage2->GetLargestPossibleRegion() );
-
-    iterItkImage1.GoToBegin();
-    iterItkImage2.GoToBegin();
-
-    while (!iterItkImage1.IsAtEnd())
-    {
-      if (iterItkImage1.Get() != iterItkImage2.Get())
-      {
-        std::cout << iterItkImage1.Get() << " != " << iterItkImage2.Get() << std::endl;
-        identical = false;
-        return;
-      }
-
-      ++iterItkImage1;
-      ++iterItkImage2;
-    }
-
-    // if we reach this point, all pixel are the same
-    identical = true;
-  }
-
-};
-
 unsigned int numberOfTestImages = 3;
 
 // create one test image
@@ -125,6 +78,42 @@ mitk::Image::Pointer CreateTestImage(unsigned int which)
 
   return image;
 
+}
+
+template < typename TPixel, unsigned int VImageDimension >
+void ItkImageProcessing( itk::Image< TPixel, VImageDimension >* itkImage, mitk::Image* mitkImage, bool& identical ) 
+{
+  typename itk::Image< TPixel, VImageDimension >::Pointer itkImage2;
+
+  mitk::CastToItkImage( mitkImage, itkImage2 );
+
+  if (!itkImage2 || !itkImage2.GetPointer())
+  {
+    identical = false;
+    return;
+  }
+
+  itk::ImageRegionConstIterator<itk::Image<TPixel, VImageDimension> > iterItkImage1( itkImage, itkImage->GetLargestPossibleRegion() );
+  itk::ImageRegionConstIterator<itk::Image<TPixel, VImageDimension> > iterItkImage2( itkImage, itkImage2->GetLargestPossibleRegion() );
+
+  iterItkImage1.GoToBegin();
+  iterItkImage2.GoToBegin();
+
+  while (!iterItkImage1.IsAtEnd())
+  {
+    if (iterItkImage1.Get() != iterItkImage2.Get())
+    {
+      std::cout << iterItkImage1.Get() << " != " << iterItkImage2.Get() << std::endl;
+      identical = false;
+      return;
+    }
+
+    ++iterItkImage1;
+    ++iterItkImage2;
+  }
+
+  // if we reach this point, all pixel are the same
+  identical = true;
 }
  
 int mitkPicFileIOTest(int, char*[])
@@ -184,7 +173,7 @@ int mitkPicFileIOTest(int, char*[])
     // compare
   
     bool identical(false);
-    PicFileAccessFunctor()( secondImage.GetPointer(), 3, originalImage.GetPointer(), identical );
+    AccessFixedDimensionByItk_2( secondImage.GetPointer(), ItkImageProcessing, 3, originalImage.GetPointer(), identical );
 
     if (!identical)
     {

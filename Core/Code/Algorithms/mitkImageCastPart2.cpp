@@ -17,6 +17,9 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include <mitkImageCast.h>
+#include <mitkImageAccessByItk.h>
+#include <mitkInstantiateAccessFunctions.h>
+
 #include <itkImage.h>
 #include <itkCastImageFilter.h>
 
@@ -24,26 +27,9 @@ namespace mitk
 {
 
 #ifndef DOXYGEN_SKIP
-  template<typename ItkOutputImageType>
-  struct CastToItkImageFunctor
-  {
-    typedef CastToItkImageFunctor Self;
-
-    void operator()(const mitk::Image* mitkImage, itk::SmartPointer<ItkOutputImageType>& itkOutputImage)
-    {
-      AccessFixedDimensionDefaultPixelTypesByItk_1(mitkImage, ::itk::GetImageDimension<ItkOutputImageType>::ImageDimension, itk::SmartPointer<ItkOutputImageType>&, itkOutputImage);
-    }
-
-    template < typename TPixel, unsigned int VImageDimension>
-    void AccessItkImage( itk::Image<TPixel, VImageDimension>* itkInputImage, itk::SmartPointer<ItkOutputImageType>& itkOutputImage)
-    {
-      _CastToItkImage2Access(itkInputImage, itkOutputImage);
-    }
-  };
-
   template <typename ItkOutputImageType> void CastToItkImage(const mitk::Image * mitkImage, itk::SmartPointer<ItkOutputImageType>& itkOutputImage)
   {
-    CastToItkImageFunctor<ItkOutputImageType>()(mitkImage, itkOutputImage);
+    AccessFixedDimensionByItk_n(mitkImage, _CastToItkImage2Access, ::itk::GetImageDimension<ItkOutputImageType>::ImageDimension, itkOutputImage);
   }
 #endif //DOXYGEN_SKIP
 

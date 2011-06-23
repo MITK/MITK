@@ -44,41 +44,29 @@ mitk::HistogramGenerator::~HistogramGenerator()
 {
 }
 
-struct InternalCompute
+template < typename TPixel, unsigned int VImageDimension > 
+void InternalCompute(itk::Image< TPixel, VImageDimension >* itkImage, const mitk::HistogramGenerator* mitkHistoGenerator, mitk::HistogramGenerator::HistogramType::ConstPointer& histogram)
 {
-  typedef InternalCompute Self;
+  
+#if !defined(ITK_USE_REVIEW_STATISTICS)
+  typedef itk::Statistics::MITKScalarImageToHistogramGenerator< 
+                                              itk::Image< TPixel, VImageDimension >,
+                                              double            >   HistogramGeneratorType;
+#else
+  typedef itk::Statistics::ScalarImageToHistogramGenerator< itk::Image< TPixel, VImageDimension > >
+  HistogramGeneratorType;
+                                               
+#endif
+  typename HistogramGeneratorType::Pointer histogramGenerator = HistogramGeneratorType::New();
 
-  void operator()(mitk::Image* img, mitk::HistogramGenerator* histoGen, mitk::HistogramGenerator::HistogramType::ConstPointer& histogram)
-  {
-    AccessDefaultPixelTypesByItk_2(img, mitk::HistogramGenerator*, histoGen, mitk::HistogramGenerator::HistogramType::ConstPointer&, histogram)
-  }
+  histogramGenerator->SetInput( itkImage );
 
-  template < typename TPixel, unsigned int VImageDimension >
-  void AccessItkImage(itk::Image< TPixel, VImageDimension >* itkImage, mitk::HistogramGenerator* histoGen, mitk::HistogramGenerator::HistogramType::ConstPointer& histogram)
-  {
-
-  #if !defined(ITK_USE_REVIEW_STATISTICS)
-    typedef itk::Statistics::MITKScalarImageToHistogramGenerator<
-                                                itk::Image< TPixel, VImageDimension >,
-                                                double            >   HistogramGeneratorType;
-  #else
-    typedef itk::Statistics::ScalarImageToHistogramGenerator< itk::Image< TPixel, VImageDimension > >
-    HistogramGeneratorType;
-
-  #endif
-    typename HistogramGeneratorType::Pointer histogramGenerator = HistogramGeneratorType::New();
-
-    histogramGenerator->SetInput( itkImage );
-
-    histogramGenerator->SetNumberOfBins( histoGen->GetSize() );
-  //  histogramGenerator->SetMarginalScale( 10.0 );
-    histogramGenerator->Compute();
-
-    histogram = histogramGenerator->GetOutput();
-  }
-
-};
-
+  histogramGenerator->SetNumberOfBins( mitkHistoGenerator->GetSize() );
+//  histogramGenerator->SetMarginalScale( 10.0 );
+  histogramGenerator->Compute();
+  
+  histogram = histogramGenerator->GetOutput();
+}
 
 void mitk::HistogramGenerator::ComputeHistogram()
 {
@@ -90,7 +78,7 @@ void mitk::HistogramGenerator::ComputeHistogram()
     timeSelector->SetInput(m_Image);
     timeSelector->SetTimeNr( 0 );
     timeSelector->UpdateLargestPossibleRegion();
-    InternalCompute()(timeSelector->GetOutput(), this, m_Histogram);
+    AccessByItk_n( timeSelector->GetOutput() , InternalCompute, this, m_Histogram);
   }
 
 // debug code

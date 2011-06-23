@@ -17,14 +17,14 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkItkPictureWrite.h"
-//#include "mitkImageAccessByItk.h"
+#include <mitkInstantiateAccessFunctions.h>
 
 #include <itkNumericSeriesFileNames.h>
 #include <itkImageSeriesWriter.h>
 #include <itkRescaleIntensityImageFilter.h>
 
 template < typename TPixel, unsigned int VImageDimension > 
-void _mitkItkPictureWriteFunctor::AccessItkImage(itk::Image< TPixel, VImageDimension >* itkImage, const std::string& fileName)
+void _mitkItkPictureWrite(itk::Image< TPixel, VImageDimension >* itkImage, const std::string& fileName)
 {
   typedef itk::Image< TPixel, VImageDimension > TImageType;
 
@@ -54,10 +54,10 @@ void _mitkItkPictureWriteFunctor::AccessItkImage(itk::Image< TPixel, VImageDimen
   writer->Update();
 }
 
-#define InstantiateAccessFunction__ItkPictureWriteFunctor(pixelType, dim) \
-  template MITK_CORE_EXPORT void _mitkItkPictureWriteFunctor::AccessItkImage(itk::Image<pixelType,dim>*, const std::string&);
+#define InstantiateAccessFunction__mitkItkPictureWrite(pixelType, dim) \
+  template MITK_CORE_EXPORT void _mitkItkPictureWrite(itk::Image<pixelType,dim>*, const std::string&);
 
-InstantiateAccessFunction(_ItkPictureWriteFunctor)
+InstantiateAccessFunction(_mitkItkPictureWrite)
 
 // typedef itk::Image<itk::RGBPixel<unsigned char>, 2>  itkImageRGBUC2;
 // template <> void _mitkItkImageWrite<itk::RGBPixel<unsigned char>, 2>(itkImageRGBUC2* itkImage, const std::string& fileName)

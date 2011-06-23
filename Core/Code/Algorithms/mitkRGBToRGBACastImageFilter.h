@@ -66,14 +66,17 @@ protected:
 
   virtual void GenerateData();
 
+  template < typename TPixel, unsigned int VImageDimension >
+  void InternalCast( itk::Image< TPixel, VImageDimension > *itkImage, 
+    mitk::RGBToRGBACastImageFilter *addComponentFilter,
+    typename TPixel::ComponentType defaultAlpha );
+
   mitk::ImageTimeSelector::Pointer m_InputTimeSelector;
   mitk::ImageTimeSelector::Pointer m_OutputTimeSelector;
 
   //##Description 
   //## @brief Time when Header was last initialized
   itk::TimeStamp m_TimeOfHeaderInitialization;
-
-  friend class AccessRGBImageFunctor;
 };
 
 } // namespace mitk

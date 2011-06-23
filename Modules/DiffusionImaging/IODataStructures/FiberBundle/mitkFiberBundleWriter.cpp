@@ -1,22 +1,21 @@
 /*=========================================================================
- 
+
 Program:   Medical Imaging & Interaction Toolkit
 Language:  C++
 Date:      $Date: 2008-12-10 18:05:13 +0100 (Mi, 10 Dez 2008) $
 Version:   $Revision: 15922 $
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #include "mitkFiberBundleWriter.h"
-
 #include <tinyxml.h>
 
 const char* mitk::FiberBundleWriter::XML_GEOMETRY = "geometry";
@@ -81,6 +80,10 @@ const char* mitk::FiberBundleWriter::XML_FILE_VERSION = "file_version" ;
 
 const char* mitk::FiberBundleWriter::VERSION_STRING = "0.1" ;
 
+const char* mitk::FiberBundleWriter::ASCII_FILE = "ascii_file" ;
+
+const char* mitk::FiberBundleWriter::FILE_NAME = "file_name" ;
+
 mitk::FiberBundleWriter::FiberBundleWriter()
     : m_FileName(""), m_FilePrefix(""), m_FilePattern(""), m_Success(false)
 {
@@ -95,32 +98,30 @@ mitk::FiberBundleWriter::~FiberBundleWriter()
 void mitk::FiberBundleWriter::GenerateData()
 {
   MITK_INFO << "Writing fiber bundle";
-    m_Success = false;
-    InputType* input = this->GetInput();
-    if (input == NULL)
-    {
-        itkWarningMacro(<<"Sorry, input to FiberBundleWriter is NULL!");
-        return;
-    }
-    if ( m_FileName == "" )
-    {
-        itkWarningMacro( << "Sorry, filename has not been set!" );
-        return ;
-    }
-//    const char* name = m_FileName.c_str();
-/* might be more helpful to use the typdefs directly of mitk::FiberBundle instead of copy paste
-    typedef itk::Point<float,3>                                       ContainerPointType; //no need to init
-    typedef std::vector<ContainerPointType>                           ContainerTractType; //no need to init, NOTE provides NO index-output while iterating
-  typedef itk::VectorContainer< unsigned int, ContainerTractType::Pointer >  ContainerType; //init via smartpointer
-*/
-  
-  /* direct linked includes of mitkFiberBundle DataStructure */
-  typedef mitk::FiberBundle::ContainerPointType   ContainerPointType; 
-  typedef mitk::FiberBundle::ContainerTractType   ContainerTractType; 
-  typedef mitk::FiberBundle::ContainerType        ContainerType;
-  
-  
-  ContainerType::Pointer tractContainer = input->GetTractContainer();
+  m_Success = false;
+  InputType* input = this->GetInput();
+  if (input == NULL)
+  {
+      itkWarningMacro(<<"Sorry, input to FiberBundleWriter is NULL!");
+      return;
+  }
+  if ( m_FileName == "" )
+  {
+      itkWarningMacro( << "Sorry, filename has not been set!" );
+      return ;
+  }
+
+  std::string ext = itksys::SystemTools::GetFilenameLastExtension(m_FileName);
+  ext = itksys::SystemTools::LowerCase(ext);
+
+  if (ext == ".fib")
+  {
+    /* direct linked includes of mitkFiberBundle DataStructure */
+    typedef mitk::FiberBundle::ContainerPointType   ContainerPointType;
+    typedef mitk::FiberBundle::ContainerTractType   ContainerTractType;
+    typedef mitk::FiberBundle::ContainerType        ContainerType;
+
+    ContainerType::Pointer tractContainer = input->GetTractContainer();
     mitk::Geometry3D* geometry = input->GetGeometry();
 
     TiXmlDocument documentXML;
@@ -153,7 +154,7 @@ void mitk::FiberBundleWriter::GenerateData()
     geometryXML->SetDoubleAttribute(mitk::FiberBundleWriter::XML_SIZE_X, input->GetBounds()[0]);
     geometryXML->SetDoubleAttribute(mitk::FiberBundleWriter::XML_SIZE_Y, input->GetBounds()[1]);
     geometryXML->SetDoubleAttribute(mitk::FiberBundleWriter::XML_SIZE_Z, input->GetBounds()[2]);
-  
+
     mainXML->LinkEndChild(geometryXML);
 
     TiXmlElement* fiberBundleXML = new TiXmlElement(mitk::FiberBundleWriter::XML_FIBER_BUNDLE);
@@ -182,8 +183,22 @@ void mitk::FiberBundleWriter::GenerateData()
     mainXML->LinkEndChild(fiberBundleXML);
 
     documentXML.SaveFile( m_FileName );
+
     m_Success = true;
+
     MITK_INFO << "Fiber bundle written";
+
+  }else if (ext == ".afib" || ext == ".vtk") {
+    vtkPolyDataWriter* writer = vtkPolyDataWriter::New();
+    writer->SetInput(input->GeneratePolydata());
+    writer->SetFileName(m_FileName.c_str());
+    writer->SetFileTypeToASCII();
+    writer->Write();
+
+    m_Success = true;
+    MITK_INFO << "Fiber bundle written as polydata";
+  }
+
 }
 
 
@@ -210,5 +225,7 @@ std::vector<std::string> mitk::FiberBundleWriter::GetPossibleFileExtensions()
 {
   std::vector<std::string> possibleFileExtensions;
   possibleFileExtensions.push_back(".fib");
+  possibleFileExtensions.push_back(".afib");
+  possibleFileExtensions.push_back(".vtk");
   return possibleFileExtensions;
 }

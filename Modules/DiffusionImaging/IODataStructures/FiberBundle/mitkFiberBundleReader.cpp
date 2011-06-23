@@ -16,13 +16,18 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include "mitkFiberBundleReader.h"
-#include "itkMetaDataObject.h"
+#include <itkMetaDataObject.h>
 #include <vtkMatrix4x4.h>
 #include <tinyxml.h>
-#include "itkAffineGeometryFrame.h"
-#include "mitkSlicedGeometry3D.h"
-#include "mitkPlaneGeometry.h"
-#include "mitkGeometry2D.h"
+#include <itkAffineGeometryFrame.h>
+#include <mitkSlicedGeometry3D.h>
+#include <mitkPlaneGeometry.h>
+#include <mitkGeometry2D.h>
+#include <vtkPolyData.h>
+#include <vtkDataReader.h>
+#include <vtkPolyDataReader.h>
+#include <vtkCellArray.h>
+#include <mitkSurface.h>
 
 const char* mitk::FiberBundleReader::XML_GEOMETRY = "geometry";
 
@@ -91,7 +96,7 @@ namespace mitk
 
   void FiberBundleReader
     ::GenerateData()
-  {    
+  {
     MITK_INFO << "Reading fiber bundle";
     if ( ( ! m_OutputCache ) )
     {
@@ -110,14 +115,17 @@ namespace mitk
   }
 
   void FiberBundleReader::GenerateOutputInformation()
-  {  
+  {
     m_OutputCache = OutputType::New();
+
+    std::string ext = itksys::SystemTools::GetFilenameLastExtension(m_FileName);
+    ext = itksys::SystemTools::LowerCase(ext);
 
     if ( m_FileName == "")
     {
 
     }
-    else
+    else if (ext == ".fib")
     {
       try
       {
@@ -208,7 +216,7 @@ namespace mitk
 
         // generate tract container
         ContainerType::Pointer tractContainer = ContainerType::New();
-        
+
         int fiberID = 0;
         pElem = hRoot.FirstChildElement(FiberBundleReader::XML_FIBER_BUNDLE).FirstChild().Element();
         for( pElem; pElem; pElem=pElem->NextSiblingElement())
@@ -243,57 +251,124 @@ namespace mitk
         MITK_INFO << "Could not read file ";
       }
     }
+    else if (ext == ".afib")
+    {
+      // generate tract container
+      ContainerType::Pointer tractContainer = ContainerType::New();
+      mitk::Geometry3D::Pointer geometry = mitk::Geometry3D::New();
+
+      ///We create a Generic Reader to test de .vtk/
+      vtkDataReader *chooser=vtkDataReader::New();
+      chooser->SetFileName(m_FileName.c_str() );
+      if( chooser->IsFilePolyData())
+      {
+        vtkPolyDataReader *reader = vtkPolyDataReader::New();
+        reader->SetFileName( m_FileName.c_str() );
+        reader->Update();
+
+        if ( reader->GetOutput() != NULL )
+        {
+          vtkPolyData* output = reader->GetOutput();
+          output->ComputeBounds();
+          double bounds[3];
+          output->GetBounds(bounds);
+          double center[3];
+          output->GetCenter(center);
+          Point3D origin;
+          origin.SetElement(0, -center[0]);
+          origin.SetElement(1, -center[1]);
+          origin.SetElement(2, -center[2]);
+          MITK_INFO << origin;
+
+          mitk::Surface::Pointer surf = mitk::Surface::New();
+          surf->SetVtkPolyData(output);
+          mitk::Geometry3D* geom  = surf->GetGeometry();
+          //geom->SetOrigin(origin);
+          geom->SetImageGeometry(true);
+          m_OutputCache->SetBounds(bounds);
+          m_OutputCache->SetGeometry(geom);
+          vtkCellArray* cells = output->GetLines();
+
+          cells->InitTraversal();
+
+          for (int i=0; i<output->GetNumberOfCells(); i++)
+          {
+            ContainerTractType::Pointer tract = ContainerTractType::New();
+            vtkCell* cell = output->GetCell(i);
+            int p = cell->GetNumberOfPoints();
+            vtkPoints* points = cell->GetPoints();
+            for (int j=0; j<p; j++)
+            {
+              double p[3];
+              points->GetPoint(j, p);
+              ContainerPointType point;
+              point[0] = p[0];
+              point[1] = p[1];
+              point[2] = p[2];
+              tract->InsertElement(tract->Size(), point);
+            }
+            tractContainer->InsertElement(i, tract);
+          }
+        }
+        reader->Delete();
+      }
+      chooser->Delete();
+
+      m_OutputCache->addTractContainer(tractContainer);
+      m_OutputCache->initFiberGroup();
+      MITK_INFO << "Fiber bundle read";
+    }
   }
 
   void FiberBundleReader::Update()
   {
     this->GenerateData();
   }
-  
+
   const char* FiberBundleReader
     ::GetFileName() const
   {
     return m_FileName.c_str();
   }
 
-  
+
   void FiberBundleReader
     ::SetFileName(const char* aFileName)
   {
     m_FileName = aFileName;
   }
 
-  
+
   const char* FiberBundleReader
     ::GetFilePrefix() const
   {
     return m_FilePrefix.c_str();
   }
 
-  
+
   void FiberBundleReader
     ::SetFilePrefix(const char* aFilePrefix)
   {
     m_FilePrefix = aFilePrefix;
   }
 
-  
+
   const char* FiberBundleReader
     ::GetFilePattern() const
   {
     return m_FilePattern.c_str();
   }
 
-  
+
   void FiberBundleReader
     ::SetFilePattern(const char* aFilePattern)
   {
     m_FilePattern = aFilePattern;
   }
 
-  
+
   bool FiberBundleReader
-    ::CanReadFile(const std::string filename, const std::string /*filePrefix*/, const std::string /*filePattern*/) 
+    ::CanReadFile(const std::string filename, const std::string /*filePrefix*/, const std::string /*filePattern*/)
   {
     // First check the extension
     if(  filename == "" )
@@ -303,7 +378,7 @@ namespace mitk
     std::string ext = itksys::SystemTools::GetFilenameLastExtension(filename);
     ext = itksys::SystemTools::LowerCase(ext);
 
-    if (ext == ".fib" )
+    if (ext == ".fib" || ext == ".afib")
     {
       return true;
     }

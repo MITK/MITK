@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   Medical Imaging & Interaction Toolkit
 Language:  C++
 Date:      $Date: 2008-08-27 17:18:46 +0200 (Mi, 27 Aug 2008) $
 Version:   $Revision: 15096 $
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 #ifndef __mitkFiberBundleWriter_h
@@ -21,6 +21,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <itkProcessObject.h>
 #include <mitkFileWriterWithInformation.h>
 #include "mitkFiberBundle.h"
+#include <vtkPolyDataWriter.h>
 
 
 namespace mitk
@@ -58,9 +59,9 @@ public:
     }
 
     itkNewMacro( Self );
-    
+
     typedef mitk::FiberBundle InputType;
-    
+
     /**
      * Sets the filename of the file to write.
      * @param FileName the name of the file to write.
@@ -107,7 +108,7 @@ public:
      * Returns false if an error happened during writing
      */
     itkGetMacro( Success, bool );
-   
+
     /**
     * @return possible file extensions for the data type associated with the writer
     */
@@ -115,13 +116,13 @@ public:
 
     // FileWriterWithInformation methods
     virtual const char * GetDefaultFilename() { return "FiberBundle.fib"; }
-    virtual const char * GetFileDialogPattern() { return "Fiber Bundle (*.fib"; }
+    virtual const char * GetFileDialogPattern() { return "Fiber Bundle (*.fib *.afib *.vtk)"; }
     virtual const char * GetDefaultExtension() { return ".fib"; }
     virtual bool CanWriteDataType(BaseData::Pointer data) { return (dynamic_cast<mitk::FiberBundle*>(data.GetPointer()) != NULL); };
-    virtual void DoWrite(BaseData::Pointer data) { 
+    virtual void DoWrite(BaseData::Pointer data) {
       if (CanWriteDataType(data)) {
         this->SetInput(dynamic_cast<mitk::FiberBundle*>(data.GetPointer()));
-        this->Update(); 
+        this->Update();
       }
     };
 
@@ -187,24 +188,28 @@ public:
 
     static const char* XML_NUM_PARTICLES;
 
+    static const char* ASCII_FILE;
+
+    static const char* FILE_NAME;
+
 protected:
-        
+
     FiberBundleWriter();
 
     virtual ~FiberBundleWriter();
 
     virtual void GenerateData();
-    
+
     std::string m_FileName;
 
     std::string m_FilePrefix;
 
     std::string m_FilePattern;
-    
+
     bool m_Success;
-            
-};    
-       
+
+};
+
 
 } // end of namespace mitk
 

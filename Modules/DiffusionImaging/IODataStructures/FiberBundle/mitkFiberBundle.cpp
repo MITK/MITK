@@ -69,14 +69,18 @@ void mitk::FiberBundle::SetBounds(float* b)
   m_boundsFB[0] = b[0];
   m_boundsFB[1] = b[1];
   m_boundsFB[2] = b[2];
+}
 
+void mitk::FiberBundle::SetBounds(double* b)
+{
+  m_boundsFB[0] = b[0];
+  m_boundsFB[1] = b[1];
+  m_boundsFB[2] = b[2];
 }
 
 float* mitk::FiberBundle::GetBounds()
 {
-
   return m_boundsFB;
-
 }
 
 void mitk::FiberBundle::PushPoint(int fiberIndex, ContainerPointType point)
@@ -1565,6 +1569,200 @@ void mitk::FiberBundle::debug_members()
     ++itLst;
   }
 
+}
+
+vtkPolyData* mitk::FiberBundle::GeneratePolydata()
+{
+  MITK_INFO << "writing polydata";
+  //extractn single fibers
+  //in the groupFiberBundle all smartPointers to single fibers are stored in in a ChildrenList
+  mitk::FiberBundle::ChildrenListType * FiberList;
+  FiberList =  this->m_GroupFiberBundle->GetChildren();
+
+  /* ######## FIBER PREPARATION END ######### */
+
+  /* ######## VTK FIBER REPRESENTATION  ######## */
+  //create a vtkPoints object and store the all the brainFiber points in it
+  vtkPoints *vtkpoints =  vtkPoints::New();
+
+  //in vtkcells all polylines are stored, actually all id's of them are stored
+  vtkCellArray *vtkcells = vtkCellArray::New();
+
+  //in some cases a fiber includes just 1 point, so put it in here
+  vtkCellArray *vtkVrtxs = vtkCellArray::New();
+
+  //colors and alpha value for each single point, RGBA = 4 components
+  vtkUnsignedCharArray *colorsT = vtkUnsignedCharArray::New();
+  colorsT->SetNumberOfComponents(4);
+  colorsT->SetName("ColorValues");
+
+  vtkDoubleArray *faColors = vtkDoubleArray::New();
+  faColors->SetName("FaColors");
+
+  //vtkDoubleArray *tubeRadius = vtkDoubleArray::New();
+  //tubeRadius->SetName("TubeRadius");
+
+
+  // iterate through FiberList
+  for(mitk::FiberBundle::ChildrenListType::iterator itLst = FiberList->begin();
+      itLst != FiberList->end();
+      ++itLst)
+  {
+    //all points are stored in one vtkpoints list, soooooooo that the lines find their point id to start and end we need some kind of helper index who monitors the current ids for a polyline
+    unsigned long pntIdxHelper = vtkpoints->GetNumberOfPoints();
+
+    // lists output is SpatialObject, we know we have DTITubeSpacialObjects
+    // dynamic cast only likes pointers, no smartpointers, so each dsmartpointer has membermethod .GetPointer()
+    itk::SpatialObject<3>::Pointer tmp_fbr;
+    tmp_fbr = *itLst;
+    mitk::FiberBundle::DTITubeType::Pointer dtiTract = dynamic_cast< mitk::FiberBundle::DTITubeType * > (tmp_fbr.GetPointer());
+    if (dtiTract.IsNull()) {
+      return NULL; }
+
+    //get list of points
+    int fibrNrPnts = dtiTract->GetNumberOfPoints();
+    mitk::FiberBundle::DTITubeType::PointListType dtiPntList = dtiTract->GetPoints();
+
+    //create a new polyline for a dtiTract
+    //smartpointer
+    vtkPolyLine *polyLine = vtkPolyLine::New();
+    polyLine->GetPointIds()->SetNumberOfIds(fibrNrPnts);
+    unsigned char rgba[4] = {255,255,255,255};
+
+    //tubeRadius->SetNumberOfTuples(fibrNrPnts);
+    //double tbradius = 1;//default value for radius
+
+    if (fibrNrPnts <= 0) { //this should never occour! but who knows
+      MITK_INFO << "HyperERROR in fiberBundleMapper3D.cpp ...no point in fiberBundle!!! .. check ur trackingAlgorithm";
+      continue;
+    }
+
+
+    for (int i=0; i<fibrNrPnts; ++i)
+    {
+      mitk::FiberBundle::DTITubePointType tmpFiberPntLst = dtiPntList.at(i);
+      mitk::FiberBundle::DTITubePointType::PointType tmpFiberPnt = tmpFiberPntLst.GetPosition();
+
+      float tmpvtkPnt[3] = {(float)tmpFiberPnt[0], (float)tmpFiberPnt[1], (float)tmpFiberPnt[2]};
+
+      mitk::Point3D indexPnt(tmpvtkPnt);
+      mitk::Point3D worldPnt;
+
+     // MITK_INFO << tmpFiberPnt[0] << " " << tmpFiberPnt[1] << " " << tmpFiberPnt[2];
+     // MITK_INFO << worldPnt[0] << " " << worldPnt[1] << " " << worldPnt[2];
+
+      this->GetGeometry()->IndexToWorld(indexPnt, worldPnt);
+      double worldFbrPnt[3] = {worldPnt[0], worldPnt[1], worldPnt[2]};
+      vtkpoints->InsertNextPoint(worldFbrPnt);
+
+     // tubeRadius->SetTuple1(i,tbradius); //tuple with 1 argument
+
+
+      if (fibrNrPnts == 1) {
+        // if there ist just 1 point in a fiber...wtf, but however represent it as a point
+        vtkVertex *vrtx = vtkVertex::New();
+        vrtx->GetPointIds()->SetNumberOfIds(1);
+        vrtx->GetPointIds()->SetId(i,i+pntIdxHelper);
+        colorsT->InsertNextTupleValue(rgba);
+        vtkVrtxs->InsertNextCell(vrtx);
+
+      } else {
+
+        polyLine->GetPointIds()->SetId(i,i+pntIdxHelper);
+
+        //colorcoding orientation based
+        if (i<fibrNrPnts-1 && i>0)
+        {
+        //nimm nur diff1
+        mitk::FiberBundle::DTITubePointType nxttmpFiberPntLst = dtiPntList.at(i+1);
+        mitk::FiberBundle::DTITubePointType::PointType nxttmpFiberPnt = nxttmpFiberPntLst.GetPosition();
+        //double nxttmpvtkPnt[3] = {nxttmpFiberPnt[0], nxttmpFiberPnt[1], nxttmpFiberPnt[2]};
+
+        vnl_vector_fixed< double, 3 > tmpPntvtk((double)tmpvtkPnt[0], (double)tmpvtkPnt[1],(double)tmpvtkPnt[2]);
+        vnl_vector_fixed< double, 3 > nxttmpPntvtk(nxttmpFiberPnt[0], nxttmpFiberPnt[1], nxttmpFiberPnt[2]);
+
+        vnl_vector_fixed< double, 3 > diff;
+        diff = tmpPntvtk - nxttmpPntvtk;
+        diff.normalize();
+
+       rgba[0] = (unsigned char) (255.0 * std::abs(diff[0]));
+        rgba[1] = (unsigned char) (255.0 * std::abs(diff[1]));
+        rgba[2] = (unsigned char) (255.0 * std::abs(diff[2]));
+        rgba[3] = (unsigned char) (255.0);
+
+
+
+      } else if(i==0) {
+        //explicit handling of startpoint of line
+
+        //nimm nur diff1
+        mitk::FiberBundle::DTITubePointType nxttmpFiberPntLst = dtiPntList.at(i+1);
+        mitk::FiberBundle::DTITubePointType::PointType nxttmpFiberPnt = nxttmpFiberPntLst.GetPosition();
+        //double nxttmpvtkPnt[3] = {nxttmpFiberPnt[0], nxttmpFiberPnt[1], nxttmpFiberPnt[2]};
+
+        vnl_vector_fixed< double, 3 > tmpPntvtk((double)tmpvtkPnt[0], (double)tmpvtkPnt[1],(double)tmpvtkPnt[2]);
+        vnl_vector_fixed< double, 3 > nxttmpPntvtk(nxttmpFiberPnt[0], nxttmpFiberPnt[1], nxttmpFiberPnt[2]);
+
+        vnl_vector_fixed< double, 3 > diff;
+        diff = tmpPntvtk - nxttmpPntvtk;
+        diff.normalize();
+
+        rgba[0] = (unsigned char) (255.0 * std::abs(diff[0]));
+         rgba[1] = (unsigned char) (255.0 * std::abs(diff[1]));
+         rgba[2] = (unsigned char) (255.0 * std::abs(diff[2]));
+         rgba[3] = (unsigned char) (255.0);
+
+
+
+
+      } else if(i==fibrNrPnts) {
+        // nimm nur diff2
+        mitk::FiberBundle::DTITubePointType nxttmpFiberPntLst = dtiPntList.at(i-1);
+        mitk::FiberBundle::DTITubePointType::PointType nxttmpFiberPnt = nxttmpFiberPntLst.GetPosition();
+
+        vnl_vector_fixed< double, 3 > tmpPntvtk((double)tmpvtkPnt[0], (double)tmpvtkPnt[1],(double)tmpvtkPnt[2]);
+        vnl_vector_fixed< double, 3 > nxttmpPntvtk(nxttmpFiberPnt[0], nxttmpFiberPnt[1], nxttmpFiberPnt[2]);
+
+        vnl_vector_fixed< double, 3 > diff;
+        diff = tmpPntvtk - nxttmpPntvtk;
+        diff.normalize();
+
+         rgba[0] = (unsigned char) (255.0 * std::abs(diff[0]));
+         rgba[1] = (unsigned char) (255.0 * std::abs(diff[1]));
+         rgba[2] = (unsigned char) (255.0 * std::abs(diff[2]));
+         rgba[3] = (unsigned char) (255.0);
+
+
+
+
+      }
+
+        colorsT->InsertNextTupleValue(rgba);
+
+        //get FA value
+        float faVal = tmpFiberPntLst.GetField(mitk::FiberBundle::DTITubePointType::FA);
+        //use insertNextValue cuz FA Values are reperesented as a single number (1 Tuple containing 1 parameter)
+        faColors->InsertNextValue((double) faVal);
+
+
+      }
+    }
+      vtkcells->InsertNextCell(polyLine);
+
+  }
+
+  //vtkcells->InitTraversal();
+
+  // Put points and lines together in one polyData structure
+  m_PolyData = vtkPolyData::New();
+  m_PolyData->SetPoints(vtkpoints);
+  m_PolyData->SetLines(vtkcells);
+  if (vtkVrtxs->GetSize() > 0) {
+    m_PolyData->SetVerts(vtkVrtxs);
+  }
+  m_PolyData->GetPointData()->AddArray(colorsT);
+  m_PolyData->GetPointData()->AddArray(faColors);
+  return m_PolyData;
 }
 
 /* NECESSARY IMPLEMENTATION OF SUPERCLASS METHODS */

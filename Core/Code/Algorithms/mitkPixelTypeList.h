@@ -151,56 +151,37 @@ struct PixelTypeSwitch<TypeList, Index, true>
 template<typename X, int VDimension, typename T1 = EmptyType, typename T2 = EmptyType, typename T3 = EmptyType>
 struct AccessItkImageFunctor
 {
+  typedef void (*CallBack)(T1,T2,T3);
 
-  AccessItkImageFunctor(X* cl, const mitk::Image* mitkImage, const T1& t1 = T1(), const T2& t2 = T2(), const T3& t3 = T3())
-    : cl(cl), mitkImage(mitkImage), pixelType(mitkImage->GetPixelType()),
+  AccessItkImageFunctor(X* cl, CallBack callBack, const mitk::Image* mitkImage, T1 t1 = T1(), T2 t2 = T2(), T3 t3 = T3())
+    : cl(cl), callBack(callBack), mitkImage(mitkImage), pixelType(mitkImage->GetPixelType()),
       t1(t1), t2(t2), t3(t3)
   {
-    const_cast<mitk::Image*>(mitkImage)->Update();
-    assert(mitkImage->GetDimension() == VDimension);
+
   }
 
   template<typename PixelType>
   bool operator() ()
   {
     if (pixelType != typeid(PixelType)) return false;
+    if (mitkImage->GetDimension() != VDimension) return false;
+
+    const_cast<mitk::Image*>(mitkImage)->Update();
 
     typedef itk::Image<PixelType, VDimension> ImageType;
     typedef mitk::ImageToItk<ImageType> ImageToItkType;
     itk::SmartPointer<ImageToItkType> imagetoitk = ImageToItkType::New();
     imagetoitk->SetInput(mitkImage);
     imagetoitk->Update();
-    callMember<ImageType, T1, T2, T3>()(imagetoitk->GetOutput(), cl, t1, t2, t3);
+    cl->*callBack(imagetoitk->GetOutput(), t1, t2, t3);
     return true;
   }
 
 private:
 
-  template<typename ImageType, typename A, typename B, typename C>
-  struct callMember
-  {
-    void operator()(ImageType* img, X* cl, A& a, B& b, C& c) { cl->AccessItkImage(img, a, b, c); }
-  };
-
-  template<typename ImageType, typename A, typename B>
-  struct callMember<ImageType, A, B, EmptyType>
-  {
-    void operator()(ImageType* img, X* cl, A& a, B& b, EmptyType&) { cl->AccessItkImage(img, a, b); }
-  };
-
-  template<typename ImageType, typename A>
-  struct callMember<ImageType, A, EmptyType, EmptyType>
-  {
-    void operator()(ImageType* img, X* cl, A& a, EmptyType&, EmptyType&) { cl->AccessItkImage(img, a); }
-  };
-
-  template<typename ImageType>
-  struct callMember<ImageType, EmptyType, EmptyType, EmptyType>
-  {
-    void operator()(ImageType* img, X* cl, EmptyType&, EmptyType&, EmptyType&) { cl->AccessItkImage(img); }
-  };
-
   X* cl;
+  CallBack callBack;
+
   const mitk::Image* mitkImage;
   const mitk::PixelType& pixelType;
   T1 t1;

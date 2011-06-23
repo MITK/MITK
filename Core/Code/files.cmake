@@ -29,6 +29,7 @@ SET(H_FILES
   Algorithms/mitkPPSeqEnum.h
   Algorithms/mitkPPSeqSize.h
   Algorithms/mitkPPSeqToTuple.h
+  Algorithms/mitkPPStringize.h
   Algorithms/mitkPPTupleEat.h
   Algorithms/mitkPPTupleElem.h
   Algorithms/mitkPPTupleRem.h

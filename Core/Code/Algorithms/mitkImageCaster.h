@@ -15,11 +15,16 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
+#ifndef MITKIMAGECASTER_H
+#define MITKIMAGECASTER_H
+
 #include <mitkImageCast.h>
 #include <itkImage.h>
 #include <itkCastImageFilter.h>
 #include <vtkRenderWindow.h>
 #include <mitkSurface.h>
+
+#include <mitkPPSeqForEach.h>
 
 #define DeclareMitkImageCasterMethods(r, data, type) \
   static void CastToItkImage(const mitk::Image*, itk::SmartPointer<itk::Image<MITK_PP_TUPLE_REM(2)type> >&); \
@@ -58,3 +63,5 @@ namespace mitk
     static vtkRenderer* m_3DRenderer;
   };
 }
+
+#endif // MITKIMAGECASTER_H

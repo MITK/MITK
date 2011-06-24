@@ -102,11 +102,36 @@ if(MITK_BUILD_ALL_PLUGINS)
 endif()
 
 # create a list of types for template instantiations of itk image access functions
-set(MITK_ACCESSBYITK_PIXEL_TYPES_SEQ)
-set(MITK_ACCESSBYITK_TYPES_DIMN_SEQ)
-string(REPLACE "," ";" _pixeltypes ${MITK_ACCESSBYITK_PIXEL_TYPES})
-foreach(_pixeltype ${_pixeltypes})
-  set(MITK_ACCESSBYITK_PIXEL_TYPES_SEQ "${MITK_ACCESSBYITK_PIXEL_TYPES_SEQ}(${_pixeltype})")
-  set(MITK_ACCESSBYITK_TYPES_DIMN_SEQ "${MITK_ACCESSBYITK_TYPES_DIMN_SEQ}((${_pixeltype},dim))")
+function(_create_type_seq TYPES seq_var seqdim_var)
+  set(_seq )
+  set(_seq_dim )
+  string(REPLACE "," ";" _pixeltypes "${TYPES}")
+  foreach(_pixeltype ${_pixeltypes})
+    set(_seq "${_seq}(${_pixeltype})")
+    set(_seq_dim "${_seq_dim}((${_pixeltype},dim))")
+  endforeach()
+  set(${seq_var} "${_seq}" PARENT_SCOPE)
+  set(${seqdim_var} "${_seq_dim}" PARENT_SCOPE)
+endfunction()
+
+set(MITK_ACCESSBYITK_PIXEL_TYPES )
+set(MITK_ACCESSBYITK_PIXEL_TYPES_SEQ )
+set(MITK_ACCESSBYITK_TYPES_DIMN_SEQ )
+foreach(_type INTEGRAL FLOATING COMPOSITE)
+  set(_typelist "${MITK_ACCESSBYITK_${_type}_PIXEL_TYPES}")
+  if(_typelist)
+    if(MITK_ACCESSBYITK_PIXEL_TYPES)
+      set(MITK_ACCESSBYITK_PIXEL_TYPES "${MITK_ACCESSBYITK_PIXEL_TYPES},${_typelist}")
+    else()
+      set(MITK_ACCESSBYITK_PIXEL_TYPES "${_typelist}")
+    endif()
+  endif()
+
+  _create_type_seq("${_typelist}"
+                   MITK_ACCESSBYITK_${_type}_PIXEL_TYPES_SEQ
+                   MITK_ACCESSBYITK_${_type}_TYPES_DIMN_SEQ)
+  set(MITK_ACCESSBYITK_PIXEL_TYPES_SEQ "${MITK_ACCESSBYITK_PIXEL_TYPES_SEQ}${MITK_ACCESSBYITK_${_type}_PIXEL_TYPES_SEQ}")
+  set(MITK_ACCESSBYITK_TYPES_DIMN_SEQ "${MITK_ACCESSBYITK_TYPES_DIMN_SEQ}${MITK_ACCESSBYITK_${_type}_TYPES_DIMN_SEQ}")
 endforeach()
+
 

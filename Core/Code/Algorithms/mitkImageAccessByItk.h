@@ -261,8 +261,8 @@ public:
   const mitk::Image* constImage = mitkImage;                                           \
   const_cast<mitk::Image*>(constImage)->Update();                                      \
   _checkValidDimension(mitkImage);                                                     \
-  _accessFixedTypeByItk(itkImageTypeFunction, (int)(unsigned int)(short)(unsigned short)(char)(unsigned char), (2)(3)) \
-  _accessByItkPixelTypeException(mitkImage->GetPixelType(), (int)(unsigned int)(short)(unsigned short)(char)(unsigned char)) \
+  _accessFixedTypeByItk(itkImageTypeFunction, MITK_ACCESSBYITK_INTEGRAL_PIXEL_TYPES_SEQ, (2)(3)) \
+  _accessByItkPixelTypeException(mitkImage->GetPixelType(), MITK_ACCESSBYITK_INTEGRAL_PIXEL_TYPES_SEQ) \
 }
 
 /**
@@ -280,8 +280,8 @@ public:
   const mitk::Image* constImage = mitkImage;                                           \
   const_cast<mitk::Image*>(constImage)->Update();                                      \
   _checkValidDimension(mitkImage);                                                     \
-  _accessFixedTypeByItk(itkImageTypeFunction, (float)(double), (2)(3))                 \
-  _accessByItkPixelTypeException(mitkImage->GetPixelType(), (float)(double))           \
+  _accessFixedTypeByItk(itkImageTypeFunction, MITK_ACCESSBYITK_FLOATING_PIXEL_TYPES_SEQ, (2)(3)) \
+  _accessByItkPixelTypeException(mitkImage->GetPixelType(), MITK_ACCESSBYITK_FLOATING_PIXEL_TYPES_SEQ) \
 }
 
 

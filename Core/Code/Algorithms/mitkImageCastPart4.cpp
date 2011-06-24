@@ -30,7 +30,7 @@ namespace mitk
 #ifndef DOXYGEN_SKIP
   template <typename ItkOutputImageType> void CastToItkImage(const mitk::Image * mitkImage, itk::SmartPointer<ItkOutputImageType>& itkOutputImage)
   {
-    AccessFixedDimensionByItk_n(mitkImage, _CastToItkImage2Access, ::itk::GetImageDimension<ItkOutputImageType>::ImageDimension, itkOutputImage);
+    AccessFixedDimensionByItk_1(mitkImage, _CastToItkImage2Access, ::itk::GetImageDimension<ItkOutputImageType>::ImageDimension, itkOutputImage);
   }
 #endif //DOXYGEN_SKIP
 
@@ -41,7 +41,7 @@ typedef itk::Image<itk::DiffusionTensor3D<double>, 2>  itkImageDTID2;
 template <> void MITK_CORE_EXPORT CastToItkImage<itkImageRGBUC2>(const mitk::Image * mitkImage, itk::SmartPointer<itkImageRGBUC2>& itkOutputImage)
 {
   typedef itkImageRGBUC2 ItkOutputImageType;
-  AccessFixedTypeByItk_n(mitkImage, _CastToItkImage2Access, (itk::RGBPixel<unsigned char>), (::itk::GetImageDimension<ItkOutputImageType>::ImageDimension), itkOutputImage);
+  AccessFixedTypeByItk_1(mitkImage, _CastToItkImage2Access, (itk::RGBPixel<unsigned char>), (::itk::GetImageDimension<ItkOutputImageType>::ImageDimension), itkOutputImage);
 }
 template <> void MITK_CORE_EXPORT CastToItkImage<itkImageDTIF2>(const mitk::Image * mitkImage, itk::SmartPointer<itkImageDTIF2>& itkOutputImage)
 {

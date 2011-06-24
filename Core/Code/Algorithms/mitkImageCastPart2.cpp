@@ -29,7 +29,7 @@ namespace mitk
 #ifndef DOXYGEN_SKIP
   template <typename ItkOutputImageType> void CastToItkImage(const mitk::Image * mitkImage, itk::SmartPointer<ItkOutputImageType>& itkOutputImage)
   {
-    AccessFixedDimensionByItk_n(mitkImage, _CastToItkImage2Access, ::itk::GetImageDimension<ItkOutputImageType>::ImageDimension, itkOutputImage);
+    AccessFixedDimensionByItk_1(mitkImage, _CastToItkImage2Access, ::itk::GetImageDimension<ItkOutputImageType>::ImageDimension, itkOutputImage);
   }
 #endif //DOXYGEN_SKIP
 

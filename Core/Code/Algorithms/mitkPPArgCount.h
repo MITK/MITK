@@ -20,10 +20,10 @@ PURPOSE.  See the above copyright notices for more information.
 #define MITKPPARGCOUNT_H
 
 #define MITK_PP_ARG_COUNT(...) \
-  MITK_PP_ARG_COUNT_(__VA_ARGS__, MITK_PP_RSEQ_N())
+  MITK_PP_ARG_COUNT_((__VA_ARGS__, MITK_PP_RSEQ_N()))
 
-#define MITK_PP_ARG_COUNT_(...) \
-  MITK_PP_ARG_N(__VA_ARGS__)
+#define MITK_PP_ARG_COUNT_(tuple) \
+  MITK_PP_ARG_N tuple
 
 #define MITK_PP_ARG_N( \
   _1, _2, _3, _4, _5, _6, _7, _8, _9,_10, \

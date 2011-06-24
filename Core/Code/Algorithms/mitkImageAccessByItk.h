@@ -77,9 +77,11 @@ public:
 #define _checkSpecificDimensionIter(r, mitkImage, dim)                                 \
   if (mitkImage->GetDimension() == dim); else
 
-#define _checkSpecificDimension(mitkImage, dimSeq) \
-  MITK_PP_SEQ_FOR_EACH(_checkSpecificDimensionIter, mitkImage, dimSeq) \
+#define _checkSpecificDimension(mitkImage, dimSeq)                                     \
+  MITK_PP_SEQ_FOR_EACH(_checkSpecificDimensionIter, mitkImage, dimSeq)                 \
   _accessByItkDimensionException(mitkImage->GetDimension(), MITK_PP_STRINGIZE(dimSeq))
+
+#define _msvc_expand_bug(macro, arg) MITK_PP_EXPAND(macro arg)
 
 //-------------------------------- 0-Arg Versions --------------------------------------
 
@@ -97,22 +99,32 @@ public:
 #define _accessByItkArgs(itkImageTypeFunction, type)                                   \
   (itkImageTypeFunction, MITK_PP_TUPLE_REM(2)type)
 
+#ifdef _MSC_VER
+#define _accessByItkIter(r, itkImageTypeFunction, type)                                \
+  _msvc_expand_bug(_accessByItk, (itkImageTypeFunction, MITK_PP_TUPLE_REM(2)type))
+#else
 #define _accessByItkIter(r, itkImageTypeFunction, type)                                \
   MITK_PP_EXPAND(_accessByItk _accessByItkArgs(itkImageTypeFunction, type))
+#endif
 
 #define _accessAllTypesByItk(itkImageTypeFunction, dimension)                          \
   MITK_PP_SEQ_FOR_EACH(_accessByItkIter, itkImageTypeFunction, MITK_ACCESSBYITK_TYPES_DIMN_SEQ(dimension))
 
 // product will be of the form (itkImageTypeFunction)(short)(2) for pixel type short and dimension 2
+#ifdef _MSC_VER
+#define _accessByItkProductIter(r, product)                                          \
+  _msvc_expand_bug(_accessByItk, _msvc_expand_bug(_accessByItkArgs, (MITK_PP_SEQ_HEAD(product), MITK_PP_SEQ_TO_TUPLE(MITK_PP_SEQ_TAIL(product)))))
+#else
 #define _accessByItkProductIter(r, product)                                            \
   MITK_PP_EXPAND(_accessByItk _accessByItkArgs(MITK_PP_SEQ_HEAD(product), MITK_PP_SEQ_TO_TUPLE(MITK_PP_SEQ_TAIL(product))))
+#endif
 
 #define _accessFixedTypeByItk(itkImageTypeFunction, pixelTypeSeq, dimSeq)              \
   MITK_PP_SEQ_FOR_EACH_PRODUCT(_accessByItkProductIter, ((itkImageTypeFunction))(pixelTypeSeq)(dimSeq))
 
 //-------------------------------- n-Arg Versions --------------------------------------
 
-#define _accessByItk_n(itkImageTypeFunction, pixeltype, dimension, ...)                \
+#define _accessByItk_n(itkImageTypeFunction, pixeltype, dimension, args)               \
   if ( pixelType == typeid(pixeltype) && constImage->GetDimension() == dimension)      \
   {                                                                                    \
     typedef itk::Image<pixeltype, dimension> ImageType;                                \
@@ -120,27 +132,37 @@ public:
     itk::SmartPointer<ImageToItkType> imagetoitk = ImageToItkType::New();              \
     imagetoitk->SetInput(constImage);                                                  \
     imagetoitk->Update();                                                              \
-    itkImageTypeFunction(imagetoitk->GetOutput(), __VA_ARGS__);                        \
-  } else                                                                               \
+    itkImageTypeFunction(imagetoitk->GetOutput(), MITK_PP_TUPLE_REM(MITK_PP_SEQ_HEAD(args))MITK_PP_SEQ_TAIL(args)); \
+  } else                                                                               
 
 #define _accessByItkArgs_n(itkImageTypeFunction, type, args)                           \
-  (itkImageTypeFunction, MITK_PP_TUPLE_REM(2)type, MITK_PP_TUPLE_REM(MITK_PP_SEQ_HEAD(args))MITK_PP_SEQ_TAIL(args))
+  (itkImageTypeFunction, MITK_PP_TUPLE_REM(2) type, args)
 
 // data will be of the form (itkImageTypeFunction)(3)(a,b,c) for the variable argument list a,b,c
+#ifdef _MSC_VER
+#define _accessByItkIter_n(r, data, type)                                              \
+  _msvc_expand_bug(_accessByItk_n, (MITK_PP_SEQ_HEAD(data), MITK_PP_TUPLE_REM(2)type, MITK_PP_SEQ_TAIL(data)))
+#else
 #define _accessByItkIter_n(r, data, type)                                              \
   MITK_PP_EXPAND(_accessByItk_n _accessByItkArgs_n(MITK_PP_SEQ_HEAD(data), type, MITK_PP_SEQ_TAIL(data)))
+#endif
 
-#define _accessAllTypesByItk_n(itkImageTypeFunction, dimension, ...)                   \
-  MITK_PP_SEQ_FOR_EACH(_accessByItkIter_n, (itkImageTypeFunction)(MITK_PP_ARG_COUNT(__VA_ARGS__))(__VA_ARGS__), MITK_ACCESSBYITK_TYPES_DIMN_SEQ(dimension))
+#define _accessAllTypesByItk_n(itkImageTypeFunction, dimension, va_tuple)              \
+  MITK_PP_SEQ_FOR_EACH(_accessByItkIter_n, (itkImageTypeFunction)(MITK_PP_ARG_COUNT va_tuple) va_tuple, MITK_ACCESSBYITK_TYPES_DIMN_SEQ(dimension))
 
 
 // product will be of the form ((itkImageTypeFunction)(3)(a,b,c))(short)(2)
 // for the variable argument list a,b,c and for pixel type short and dimension 2
+#ifdef _MSC_VER
+#define _accessByItkProductIter_n(r, product)                                          \
+  _msvc_expand_bug(_accessByItk_n, _msvc_expand_bug(_accessByItkArgs_n, (MITK_PP_SEQ_HEAD(MITK_PP_SEQ_HEAD(product)), MITK_PP_SEQ_TO_TUPLE(MITK_PP_SEQ_TAIL(product)), MITK_PP_SEQ_TAIL(MITK_PP_SEQ_HEAD(product)))))
+#else
 #define _accessByItkProductIter_n(r, product)                                          \
   MITK_PP_EXPAND(_accessByItk_n _accessByItkArgs_n(MITK_PP_SEQ_HEAD(MITK_PP_SEQ_HEAD(product)), MITK_PP_SEQ_TO_TUPLE(MITK_PP_SEQ_TAIL(product)), MITK_PP_SEQ_TAIL(MITK_PP_SEQ_HEAD(product))))
+#endif
 
-#define _accessFixedTypeByItk_n(itkImageTypeFunction, pixelTypeSeq, dimSeq, ...)       \
-  MITK_PP_SEQ_FOR_EACH_PRODUCT(_accessByItkProductIter_n, (((itkImageTypeFunction)(MITK_PP_ARG_COUNT(__VA_ARGS__))(__VA_ARGS__)))(pixelTypeSeq)(dimSeq))
+#define _accessFixedTypeByItk_n(itkImageTypeFunction, pixelTypeSeq, dimSeq, va_tuple)  \
+  MITK_PP_SEQ_FOR_EACH_PRODUCT(_accessByItkProductIter_n, (((itkImageTypeFunction)(MITK_PP_ARG_COUNT va_tuple) va_tuple))(pixelTypeSeq)(dimSeq))
 
 
 #endif //DOXYGEN_SKIP
@@ -369,14 +391,14 @@ public:
  *
  * \ingroup Adaptor
  */
-#define AccessByItk_n(mitkImage, itkImageTypeFunction, ...)                            \
+#define AccessByItk_n(mitkImage, itkImageTypeFunction, va_tuple)                       \
 {                                                                                      \
   const mitk::PixelType& pixelType = mitkImage->GetPixelType();                        \
   const mitk::Image* constImage = mitkImage;                                           \
   const_cast<mitk::Image*>(constImage)->Update();                                      \
   _checkValidDimension(mitkImage);                                                     \
-  _accessAllTypesByItk_n(itkImageTypeFunction, 2, __VA_ARGS__)                         \
-  _accessAllTypesByItk_n(itkImageTypeFunction, 3, __VA_ARGS__)                         \
+  _accessAllTypesByItk_n(itkImageTypeFunction, 2, va_tuple)                            \
+  _accessAllTypesByItk_n(itkImageTypeFunction, 3, va_tuple)                            \
   _accessByItkPixelTypeException(mitkImage->GetPixelType(), MITK_ACCESSBYITK_PIXEL_TYPES_SEQ) \
 }
 
@@ -398,13 +420,13 @@ public:
  *
  * \ingroup Adaptor
  */
-#define AccessFixedPixelTypeByItk_n(mitkImage, itkImageTypeFunction, pixelTypeSeq, ...)\
+#define AccessFixedPixelTypeByItk_n(mitkImage, itkImageTypeFunction, pixelTypeSeq, va_tuple) \
 {                                                                                      \
   const mitk::PixelType& pixelType = mitkImage->GetPixelType();                        \
   const mitk::Image* constImage = mitkImage;                                           \
   const_cast<mitk::Image*>(constImage)->Update();                                      \
   _checkValidDimension(mitkImage);                                                     \
-  _accessFixedTypeByItk_n(itkImageTypeFunction, pixelTypeSeq, (2)(3), __VA_ARGS__)     \
+  _accessFixedTypeByItk_n(itkImageTypeFunction, pixelTypeSeq, (2)(3), va_tuple)        \
   _accessByItkPixelTypeException(mitkImage->GetPixelType(), pixelTypeSeq)              \
 }
 
@@ -418,13 +440,13 @@ public:
  * \sa AccessByItk_n
  * \sa AccessIntegralPixelTypeByItk
  */
-#define AccessIntegralPixelTypeByItk_n(mitkImage, itkImageTypeFunction, ...)           \
+#define AccessIntegralPixelTypeByItk_n(mitkImage, itkImageTypeFunction, va_tuple)      \
 {                                                                                      \
   const mitk::PixelType& pixelType = mitkImage->GetPixelType();                        \
   const mitk::Image* constImage = mitkImage;                                           \
   const_cast<mitk::Image*>(constImage)->Update();                                      \
   _checkValidDimension(mitkImage);                                                     \
-  _accessFixedTypeByItk_n(itkImageTypeFunction, (int)(unsigned int)(short)(unsigned short)(char)(unsigned char), (2)(3), __VA_ARGS__) \
+  _accessFixedTypeByItk_n(itkImageTypeFunction, (int)(unsigned int)(short)(unsigned short)(char)(unsigned char), (2)(3), va_tuple) \
   _accessByItkPixelTypeException(mitkImage->GetPixelType(), (int)(unsigned int)(short)(unsigned short)(char)(unsigned char)) \
 }
 
@@ -438,13 +460,13 @@ public:
  * \sa AccessByItk_n
  * \sa AccessFloatingPixelTypeByItk
  */
-#define AccessFloatingPixelTypeByItk_n(mitkImage, itkImageTypeFunction, ...)           \
+#define AccessFloatingPixelTypeByItk_n(mitkImage, itkImageTypeFunction, va_tuple)      \
 {                                                                                      \
   const mitk::PixelType& pixelType = mitkImage->GetPixelType();                        \
   const mitk::Image* constImage = mitkImage;                                           \
   const_cast<mitk::Image*>(constImage)->Update();                                      \
   _checkValidDimension(mitkImage);                                                     \
-  _accessFixedTypeByItk_n(itkImageTypeFunction, (float)(double), (2)(3), __VA_ARGS__)  \
+  _accessFixedTypeByItk_n(itkImageTypeFunction, (float)(double), (2)(3), va_tuple)     \
   _accessByItkPixelTypeException(mitkImage->GetPixelType(), (float)(double))           \
 }
 
@@ -466,13 +488,13 @@ public:
  *
  * \ingroup Adaptor
  */
-#define AccessFixedDimensionByItk_n(mitkImage, itkImageTypeFunction, dimension, ...)   \
+#define AccessFixedDimensionByItk_n(mitkImage, itkImageTypeFunction, dimension, va_tuple) \
 {                                                                                      \
   const mitk::PixelType& pixelType = mitkImage->GetPixelType();                        \
   const mitk::Image* constImage = mitkImage;                                           \
   const_cast<mitk::Image*>(constImage)->Update();                                      \
   _checkSpecificDimension(mitkImage, (dimension));                                     \
-  _accessAllTypesByItk_n(itkImageTypeFunction, dimension, __VA_ARGS__)                 \
+  _accessAllTypesByItk_n(itkImageTypeFunction, dimension, va_tuple)                    \
   _accessByItkPixelTypeException(mitkImage->GetPixelType(), MITK_ACCESSBYITK_PIXEL_TYPES_SEQ) \
 }
 
@@ -497,32 +519,32 @@ public:
  *
  * \ingroup Adaptor
  */
-#define AccessFixedTypeByItk_n(mitkImage, itkImageTypeFunction, pixelTypeSeq, dimSeq, ...) \
+#define AccessFixedTypeByItk_n(mitkImage, itkImageTypeFunction, pixelTypeSeq, dimSeq, va_tuple) \
 {                                                                                          \
   const mitk::PixelType& pixelType = mitkImage->GetPixelType();                            \
   const mitk::Image* constImage = mitkImage;                                               \
   const_cast<mitk::Image*>(constImage)->Update();                                          \
   _checkSpecificDimension(mitkImage, dimSeq);                                              \
-  _accessFixedTypeByItk_n(itkImageTypeFunction, pixelTypeSeq, dimSeq, __VA_ARGS__)         \
+  _accessFixedTypeByItk_n(itkImageTypeFunction, pixelTypeSeq, dimSeq, va_tuple)            \
   _accessByItkPixelTypeException(mitkImage->GetPixelType(), pixelTypeSeq)                  \
 }
 
 //------------------------- For back-wards compatibility -------------------------------
 
-#define AccessByItk_1 AccessByItk_n
-#define AccessFixedPixelTypeByItk_1 AccessFixedPixelTypeByItk_n
-#define AccessFixedDimensionByItk_1 AccessFixedDimensionByItk_n
-#define AccessFixedTypeByItk_1 AccessFixedTypeByItk_n
+#define AccessByItk_1(mitkImage, itkImageTypeFunction, arg1) AccessByItk_n(mitkImage, itkImageTypeFunction, (arg1))
+#define AccessFixedPixelTypeByItk_1(mitkImage, itkImageTypeFunction, pixelTypeSeq, arg1) AccessFixedPixelTypeByItk_n(mitkImage, itkImageTypeFunction, pixelTypeSeq, (arg1))
+#define AccessFixedDimensionByItk_1(mitkImage, itkImageTypeFunction, dimension, arg1) AccessFixedDimensionByItk_n(mitkImage, itkImageTypeFunction, dimension, (arg1))
+#define AccessFixedTypeByItk_1(mitkImage, itkImageTypeFunction, pixelTypeSeq, dimSeq, arg1) AccessFixedTypeByItk_n(mitkImage, itkImageTypeFunction, pixelTypeSeq, dimSeq, (arg1))
 
-#define AccessByItk_2 AccessByItk_n
-#define AccessFixedPixelTypeByItk_2 AccessFixedPixelTypeByItk_n
-#define AccessFixedDimensionByItk_2 AccessFixedDimensionByItk_n
-#define AccessFixedTypeByItk_2 AccessFixedTypeByItk_n
+#define AccessByItk_2(mitkImage, itkImageTypeFunction, arg1, arg2) AccessByItk_n(mitkImage, itkImageTypeFunction, (arg1,arg2))
+#define AccessFixedPixelTypeByItk_2(mitkImage, itkImageTypeFunction, pixelTypeSeq, arg1, arg2) AccessFixedPixelTypeByItk_n(mitkImage, itkImageTypeFunction, pixelTypeSeq, (arg1,arg2))
+#define AccessFixedDimensionByItk_2(mitkImage, itkImageTypeFunction, dimension, arg1, arg2) AccessFixedDimensionByItk_n(mitkImage, itkImageTypeFunction, dimension, (arg1,arg2))
+#define AccessFixedTypeByItk_2(mitkImage, itkImageTypeFunction, pixelTypeSeq, dimSeq, arg1, arg2) AccessFixedTypeByItk_n(mitkImage, itkImageTypeFunction, pixelTypeSeq, dimSeq, (arg1,arg2))
 
-#define AccessByItk_3 AccessByItk_n
-#define AccessFixedPixelTypeByItk_3 AccessFixedPixelTypeByItk_n
-#define AccessFixedDimensionByItk_3 AccessFixedDimensionByItk_n
-#define AccessFixedTypeByItk_3 AccessFixedTypeByItk_n
+#define AccessByItk_3(mitkImage, itkImageTypeFunction, arg1, arg2, arg3) AccessByItk_n(mitkImage, itkImageTypeFunction, (arg1,arg2,arg3))
+#define AccessFixedPixelTypeByItk_3(mitkImage, itkImageTypeFunction, pixelTypeSeq, arg1, arg2, arg3) AccessFixedPixelTypeByItk_n(mitkImage, itkImageTypeFunction, pixelTypeSeq, (arg1,arg2,arg3))
+#define AccessFixedDimensionByItk_3(mitkImage, itkImageTypeFunction, dimension, arg1, arg2, arg3) AccessFixedDimensionByItk_n(mitkImage, itkImageTypeFunction, dimension, (arg1,arg2,arg3))
+#define AccessFixedTypeByItk_3(mitkImage, itkImageTypeFunction, pixelTypeSeq, dimSeq, arg1, arg2, arg3) AccessFixedTypeByItk_n(mitkImage, itkImageTypeFunction, pixelTypeSeq, dimSeq, (arg1,arg2,arg3))
 
 
 //----------------------------- Access two MITK Images ---------------------------------

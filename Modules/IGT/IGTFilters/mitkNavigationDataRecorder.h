@@ -67,6 +67,11 @@ public:
 
 
     /**
+    * \brief If true the recorder will never overwrite a file
+    */
+    itkSetMacro(DoNotOverwriteFiles,bool);
+
+    /**
     * \brief Returns whether the NavigationDataRecorder is recording or not
     */
     itkGetMacro(Recording,bool);
@@ -178,6 +183,8 @@ protected:
     unsigned int m_NumberOfRecordedFiles; ///< necessary for the naming of the file if there is more than one start-stop cycle
 
     mitk::RealTimeClock::Pointer m_SystemTimeClock;  ///< system time clock for system time tag in output xml file
+
+    bool m_DoNotOverwriteFiles; ///< do not overwrite any files if true
 
 };
 

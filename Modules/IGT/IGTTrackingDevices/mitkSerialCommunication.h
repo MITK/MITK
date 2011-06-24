@@ -63,7 +63,11 @@ namespace mitk
       COM6 = 6,
       COM7 = 7,
       COM8 = 8,
-      COM9 = 9
+      COM9 = 9,
+      COM10 = 10,
+      COM11 = 11,
+      COM12 = 12,
+      COM13 = 13
     };
 
     enum BaudRate

@@ -66,9 +66,9 @@ int mitk::SerialCommunication::OpenConnection()
 #ifdef WIN32
   std::stringstream ss;
   if (m_DeviceName.empty())
-    ss << "COM" << static_cast<unsigned int>(m_PortNumber); // use m_PortNumber
+    ss << "\\\\.\\COM" << static_cast<unsigned int>(m_PortNumber); // use m_PortNumber
   else
-    ss << m_DeviceName; // use m_DeviceName
+    ss << "\\\\.\\" << m_DeviceName; // use m_DeviceName
 
   m_ComPortHandle = CreateFile(ss.str().c_str(), GENERIC_READ | GENERIC_WRITE,
     NULL,    /* no sharing */

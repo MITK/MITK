@@ -42,6 +42,7 @@ mitk::NavigationDataRecorder::NavigationDataRecorder()
   m_OutputFormat = mitk::NavigationDataRecorder::xml;
   m_RecordCounter = 0;
   m_RecordCountLimit = -1;
+  m_DoNotOverwriteFiles = false;
 
   //To get a start time
   mitk::TimeStamp::GetInstance()->Start(this);
@@ -227,8 +228,23 @@ void mitk::NavigationDataRecorder::StartRecording()
     //An existing extension will be cut and replaced with .xml
     std::string tmpPath = itksys::SystemTools::GetFilenamePath(m_FileName);
     m_FileName = itksys::SystemTools::GetFilenameWithoutExtension(m_FileName);
-    if (m_OutputFormat == mitk::NavigationDataRecorder::csv) ss << tmpPath << "/" <<  m_FileName << "-" << m_NumberOfRecordedFiles << ".csv";
-    else ss << tmpPath << "/" <<  m_FileName << "-" << m_NumberOfRecordedFiles << ".xml";
+    std::string extension = ".xml";
+    if (m_OutputFormat == mitk::NavigationDataRecorder::csv) 
+      extension = ".csv";
+
+    ss << tmpPath << "/" <<  m_FileName << "-" << m_NumberOfRecordedFiles << extension;
+
+    if( m_DoNotOverwriteFiles )
+    {
+      unsigned int index = m_NumberOfRecordedFiles+1;
+      while( itksys::SystemTools::FileExists( ss.str().c_str() ) )
+      {
+        ss.str("");
+        ss << tmpPath << "/" <<  m_FileName << "-" << index  << extension;
+        index++;
+      }
+    }
+
     switch(m_RecordingMode)
     {
       case Console:

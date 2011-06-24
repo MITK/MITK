@@ -123,7 +123,7 @@ namespace mitk
     PyramidalRegistrationMethod();
     virtual ~PyramidalRegistrationMethod();
 
-    friend class PyramidalRegistrationMethodAccessFunctor;
+    friend struct PyramidalRegistrationMethodAccessFunctor;
 
     RigidRegistrationObserver::Pointer m_Observer;
     int m_Interpolator;

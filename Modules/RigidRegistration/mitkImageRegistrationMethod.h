@@ -78,7 +78,7 @@ namespace mitk
     ImageRegistrationMethod();
     virtual ~ImageRegistrationMethod();
 
-    friend class ImageRegistrationMethodAccessFunctor;
+    friend struct ImageRegistrationMethodAccessFunctor;
 
     RigidRegistrationObserver::Pointer m_Observer;
     int m_Interpolator;

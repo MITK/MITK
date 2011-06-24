@@ -370,7 +370,7 @@ public:
  *   mitk::Image* inputMitkImage = ...
  *   try
  *   {
- *     AccessByItk_n(inputMitkImage, ExampleFunction, param);
+ *     AccessByItk_n(inputMitkImage, ExampleFunction, (param));
  *   }
  *   catch (const mitk::AccessByItkException& e)
  *   {
@@ -378,6 +378,9 @@ public:
  *     // insert error handling here
  *   }
  * \endcode
+ *
+ * \param va_tuple A variable length tuple containing the arguments to be passed
+ *        to the access function, e.g. ("first", 2, THIRD)
  *
  * \note If your inputMitkImage is an mitk::Image::Pointer, use
  * inputMitkImage.GetPointer()

@@ -46,8 +46,9 @@ void _CastToItkImage2Access( itk::Image<TPixel, VImageDimension>* itkInputImage,
 #define InstantiateAccessFunction__CastToItkImage2Access(type1, type2) \
   template MITK_CORE_EXPORT void _CastToItkImage2Access(itk::Image<MITK_PP_TUPLE_REM(2)type1>*, itk::SmartPointer<itk::Image<MITK_PP_TUPLE_REM(2)type2> >&);
 
-InstantiateAccessFunctionProduct(_CastToItkImage2Access, (MITK_ACCESSBYITK_TYPES_DIMN_SEQ(2))(MITK_ACCESSBYITK_TYPES_DIMN_SEQ(2)))
-InstantiateAccessFunctionProduct(_CastToItkImage2Access, (MITK_ACCESSBYITK_TYPES_DIMN_SEQ(3))(MITK_ACCESSBYITK_TYPES_DIMN_SEQ(3)))
+#define InstantiateCastToItkImage2Access(r, data, dim) \
+  MITK_PP_SEQ_FOR_EACH_PRODUCT(InstantiateAccessFunctionProductImpl, ((_CastToItkImage2Access))(MITK_ACCESSBYITK_TYPES_DIMN_SEQ(dim))(MITK_ACCESSBYITK_TYPES_DIMN_SEQ(dim)))
 
+MITK_PP_SEQ_FOR_EACH(InstantiateCastToItkImage2Access, _, MITK_ACCESSBYITK_DIMENSIONS_SEQ)
 
 }

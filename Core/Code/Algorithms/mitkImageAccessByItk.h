@@ -554,46 +554,83 @@ public:
 
 #ifndef DOXYGEN_SKIP
 
-#define _accessTwoImagesByItkCheckType(pixeltype1, dim1, pixeltype2, dim2)             \
-  if (pixelType1 == typeid(pixeltype1) && pixelType2 == typeid(pixeltype2) &&          \
-      mitkImage1->GetDimension() == dim1 && mitkImage2->GetDimension() == dim2)        \
-
-#define _accessTwoImagesByItk2(type1, type2) \
-  _accessTwoImagesByItkCheckType(MITK_PP_TUPLE_REM(2)type1, MITK_PP_TUPLE_REM(2)type2) \
-  {                                                                                    \
-    typedef itk::Image<MITK_PP_TUPLE_REM(2)type1> ImageType1;                          \
-    typedef itk::Image<MITK_PP_TUPLE_REM(2)type2> ImageType2;                          \
-    typedef mitk::ImageToItk<ImageType1> ImageToItkType1;                              \
-    typedef mitk::ImageToItk<ImageType2> ImageToItkType2;                              \
-    itk::SmartPointer<ImageToItkType1> imagetoitk1 = ImageToItkType1::New();           \
-    imagetoitk1->SetInput(mitkImage1);                                                 \
-    imagetoitk1->Update();                                                             \
-    itk::SmartPointer<ImageToItkType2> imagetoitk2 = ImageToItkType2::New();           \
-    imagetoitk2->SetInput(mitkImage2);                                                 \
-    imagetoitk2->Update();                                                             \
-    itkImageTypeFunction(imagetoitk1->GetOutput(), imagetoitk2->GetOutput());          \
+#define _accessTwoImagesByItk(itkImageTypeFunction, pixeltype1, dim1, pixeltype2, dim2) \
+  if (pixelType1 == typeid(pixeltype1) && pixelType2 == typeid(pixeltype2) &&           \
+      constImage1->GetDimension() == dim1 && constImage2->GetDimension() == dim2)       \
+  {                                                                                     \
+    typedef itk::Image<pixeltype1,dim1> ImageType1;                                     \
+    typedef itk::Image<pixeltype2,dim2> ImageType2;                                     \
+    typedef mitk::ImageToItk<ImageType1> ImageToItkType1;                               \
+    typedef mitk::ImageToItk<ImageType2> ImageToItkType2;                               \
+    itk::SmartPointer<ImageToItkType1> imagetoitk1 = ImageToItkType1::New();            \
+    imagetoitk1->SetInput(constImage1);                                                 \
+    imagetoitk1->Update();                                                              \
+    itk::SmartPointer<ImageToItkType2> imagetoitk2 = ImageToItkType2::New();            \
+    imagetoitk2->SetInput(constImage2);                                                 \
+    imagetoitk2->Update();                                                              \
+    itkImageTypeFunction(imagetoitk1->GetOutput(), imagetoitk2->GetOutput());           \
   } else
 
-// product is of the form ((short,2))((char,3))
-#define _accessTwoImagesByItk(r, product)                                              \
-  _accessTwoImagesByItk2 MITK_PP_SEQ_TO_TUPLE(product)
+#define _accessTwoImagesByItkArgs2(itkImageTypeFunction, type1, type2)                  \
+  (itkImageTypeFunction, MITK_PP_TUPLE_REM(2) type1, MITK_PP_TUPLE_REM(2) type2)
+
+#define _accessTwoImagesByItkArgs(product)                                              \
+  MITK_PP_EXPAND(_accessTwoImagesByItkArgs2 MITK_PP_EXPAND((MITK_PP_SEQ_HEAD(product), MITK_PP_TUPLE_REM(2) MITK_PP_SEQ_TO_TUPLE(MITK_PP_SEQ_TAIL(product)))))
+
+// product is of the form (itkImageTypeFunction)((short,2))((char,2))
+#ifdef _MSC_VER
+#define _accessTwoImagesByItkIter(r, product)                                           \
+  MITK_PP_EXPAND(_accessTwoImagesByItk _msvc_expand_bug(_accessTwoImagesByItkArgs2, (MITK_PP_SEQ_HEAD(product), _msvc_expand_bug(MITK_PP_TUPLE_REM(2), MITK_PP_EXPAND(MITK_PP_SEQ_TO_TUPLE (MITK_PP_SEQ_TAIL(product)))))))
+#else
+#define _accessTwoImagesByItkIter(r, product)                                           \
+  MITK_PP_EXPAND(_accessTwoImagesByItk _accessTwoImagesByItkArgs(product))
+#endif
+
+#define _accessTwoImagesByItkForEach(itkImageTypeFunction, tseq1, tseq2)                \
+  MITK_PP_SEQ_FOR_EACH_PRODUCT(_accessTwoImagesByItkIter, ((itkImageTypeFunction))(tseq1)(tseq2))
 
 #endif // DOXYGEN_SKIP
 
-//##Documentation
-//## @brief Access two mitk-images with known dimension by itk-images
-//## 
-//## For usage, see AccessByItk.
-//## @param dimension dimension of the mitk-image. 
-//##
-//## If one of the images has a different dimension, a mitk::AccessByItkException exception is thrown.
-//##
-//## If you do not know the dimension for sure, use AccessByItk.
-//## \sa AccessByItk
-//## \sa AccessFixedDimensionByItk
-//## \sa AccessFixedTypeByItk
-//## \sa AccessFixedPixelTypeByItk
-//## @ingroup Adaptor
+/**
+ * \brief Access two mitk-images with known dimension by itk-images
+ *
+ * Define a templated function or method (\a itkImageTypeFunction)
+ * within which the mitk-images (\a mitkImage1 and \a mitkImage2) are accessed:
+ * \code
+ *   template <typename TPixel1, unsigned int VImageDimension1, typename TPixel2, unsigned int VImageDimension2>
+ *   void ExampleFunctionTwoImages(itk::Image<TPixel1, VImageDimension1>* itkImage1, itk::Image<TPixel2, VImageDimension2>* itkImage2);
+ * \endcode
+ *
+ * The itk::Image passed to the function/method has the same
+ * data-pointer as the mitk-image. So you have full read- and write-
+ * access to the data vector of the mitk-image using the itk-image.
+ * Call by:
+ * \code
+ *   mitk::Image* inputMitkImage1 = ...
+ *   mitk::Image* inputMitkImage2 = ...
+ *   try
+ *   {
+ *     AccessTwoImagesFixedDimensionByItk(inputMitkImage1, inputMitkImage2, ExampleFunctionTwoImages, 3);
+ *   }
+ *   catch (const mitk::AccessByItkException& e)
+ *   {
+ *     // mitk::Image arguments are of wrong pixel type or dimension,
+ *     // insert error handling here
+ *   }
+ * \endcode
+ *
+ * If one of the images has a different dimension, a mitk::AccessByItkException exception is thrown.
+ *
+ * \note If your inputMitkImage1 or inputMitkImage2 is a mitk::Image::Pointer, use
+ * inputMitkImage1.GetPointer().
+ *
+ * \param itkImageTypeFunction The name of the template function to be called.
+ * \param dimension Dimension of the two mitk-images.
+ *
+ * \sa AccessByItk
+ *
+ * \ingroup Adaptor
+ */
 #define AccessTwoImagesFixedDimensionByItk(mitkImage1, mitkImage2, itkImageTypeFunction, dimension) \
 {                                                                                                   \
   const mitk::PixelType& pixelType1 = mitkImage1->GetPixelType();                                   \
@@ -604,8 +641,15 @@ public:
   const_cast<mitk::Image*>(constImage2)->Update();                                                  \
   _checkSpecificDimension(mitkImage1, (dimension));                                                 \
   _checkSpecificDimension(mitkImage2, (dimension));                                                 \
-  MITK_PP_FOR_EACH_PRODUCT(_accessTwoImagesByItk, (MITK_ACCESSBYITK_TYPES_DIMN_SEQ(dimension))(MITK_ACCESSBYITK_TYPES_DIMN_SEQ(dimension)) \
+  _accessTwoImagesByItkForEach(itkImageTypeFunction, MITK_ACCESSBYITK_TYPES_DIMN_SEQ(dimension), MITK_ACCESSBYITK_TYPES_DIMN_SEQ(dimension)) \
+  {                                                                                                 \
+    std::string msg("Pixel type ");                                                                 \
+    msg.append(pixelType1.GetItkTypeAsString());                                                    \
+    msg.append(" or pixel type ");                                                                  \
+    msg.append(pixelType2.GetItkTypeAsString());                                                    \
+    msg.append(" is not in " MITK_PP_STRINGIZE(MITK_ACCESSBYITK_TYPES_DIMN_SEQ(dimension)));        \
+    throw mitk::AccessByItkException(msg);                                                          \
+  }                                                                                                 \
 }
-
 
 #endif // of MITKIMAGEACCESSBYITK_H_HEADER_INCLUDED

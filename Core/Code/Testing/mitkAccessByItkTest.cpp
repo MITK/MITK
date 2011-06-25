@@ -153,6 +153,13 @@ public:
     MITK_TEST_FOR_EXCEPTION_END(const mitk::AccessByItkException&)
   }
 
+  void testAccessTwoImagesFixedDimensionByItk()
+  {
+    mitk::Image::Pointer mitkIntImage2D = createMitkImage<IntImage2D>();
+    mitk::Image::ConstPointer mitkFloatImage2D(createMitkImage<FloatImage2D>());
+
+    AccessTwoImagesFixedDimensionByItk(mitkIntImage2D, mitkFloatImage2D, AccessTwoItkImages, 2);
+  }
 
   template<typename TPixel, unsigned int VDimension>
   void AccessItkImage(itk::Image<TPixel, VDimension>*,
@@ -177,23 +184,33 @@ public:
     }
   }
 
-  private:
+private:
 
-    template<typename ImageType>
-    mitk::Image::Pointer createMitkImage()
+  template<typename TPixel1, unsigned int VDimension1, typename TPixel2, unsigned int VDimension2>
+  void AccessTwoItkImages(itk::Image<TPixel1,VDimension1>* itkImage1, itk::Image<TPixel2,VDimension2>* itkImage2)
+  {
+    if (!(typeid(int) == typeid(TPixel1) && typeid(float) == typeid(TPixel2) &&
+          VDimension1 == 2 && VDimension2 == 2))
     {
-      typename ImageType::Pointer itkImage = ImageType::New();
-      typename ImageType::IndexType start;
-      start.Fill(0);
-      typename ImageType::SizeType size;
-      size.Fill(3);
-      typename ImageType::RegionType region;
-      region.SetSize(size);
-      region.SetIndex(start);
-      itkImage->SetRegions(region);
-      itkImage->Allocate();
-      return mitk::GrabItkImageMemory(itkImage);
+      throw std::runtime_error("Image type mismatch");
     }
+  }
+
+  template<typename ImageType>
+  mitk::Image::Pointer createMitkImage()
+  {
+    typename ImageType::Pointer itkImage = ImageType::New();
+    typename ImageType::IndexType start;
+    start.Fill(0);
+    typename ImageType::SizeType size;
+    size.Fill(3);
+    typename ImageType::RegionType region;
+    region.SetSize(size);
+    region.SetIndex(start);
+    itkImage->SetRegions(region);
+    itkImage->Allocate();
+    return mitk::GrabItkImageMemory(itkImage);
+  }
 };
 
 int mitkAccessByItkTest(int /*argc*/, char* /*argv*/[])
@@ -214,6 +231,9 @@ int mitkAccessByItkTest(int /*argc*/, char* /*argv*/[])
 
   MITK_TEST_OUTPUT(<< "Testing AccessFixedPixelTypeByItk macro")
   accessTest.testAccessFixedPixelTypeByItk();
+
+  MITK_TEST_OUTPUT(<< "Testing AccessTwoImagesFixedDimensionByItk macro")
+  accessTest.testAccessTwoImagesFixedDimensionByItk();
 
   MITK_TEST_END()
 

@@ -109,8 +109,12 @@ int vtkMitkRenderProp::HasTranslucentPolygonalGeometry()
         propAssembly->InitPathTraversal(); //TODO why is this called here???
       }
 
-      if (vtkMapper2D->GetVtkProp(m_VtkPropRenderer)->HasTranslucentPolygonalGeometry()==1)
+      if (vtkMapper2D->GetVtkProp(m_VtkPropRenderer)->HasTranslucentPolygonalGeometry()==1) {
+        MITK_INFO << "1";
         return 1;
+      }else{
+      MITK_INFO << "0";
+    }
     }
 
 

@@ -51,8 +51,6 @@ PURPOSE.  See the above copyright notices for more information.
 //ITK
 #include <itkRGBAPixel.h>
 
-int mitk::ImageVtkMapper2D::numRenderer = 0; //Number of renderers data is stored for.
-
 mitk::ImageVtkMapper2D::ImageVtkMapper2D()
 {
   m_VtkBased = true;
@@ -60,7 +58,6 @@ mitk::ImageVtkMapper2D::ImageVtkMapper2D()
 
 mitk::ImageVtkMapper2D::~ImageVtkMapper2D()
 {
-  this->Clear();
   this->InvokeEvent( itk::DeleteEvent() ); //TODO <- what is this doing exactly?
 }
 
@@ -75,7 +72,6 @@ void mitk::ImageVtkMapper2D::AdjustCamera(mitk::BaseRenderer* renderer)
 
   double imageHeightInMM = localStorage->m_ReslicedImage->GetDimensions()[1]; //the height of the current slice in mm
   double displayHeightInMM = displayGeometry->GetSizeInMM()[1]; //the display height in mm (gets smaller when you zoom in)
-  //  double zoomFactor = displayHeightInMM/imageHeightInMM; //determine how much of the image can be displayed
   double zoomFactor = imageHeightInMM/displayHeightInMM; //determine how much of the image can be displayed
 
   Vector2D displayGeometryOriginInMM = displayGeometry->GetOriginInMM();  //top left of the render window (Origin)
@@ -107,7 +103,7 @@ void mitk::ImageVtkMapper2D::AdjustCamera(mitk::BaseRenderer* renderer)
   double cameraPosition[3];
   cameraPosition[0] = viewPlaneCenter[0];
   cameraPosition[1] = viewPlaneCenter[1];
-  cameraPosition[2] = 1.0; //Reason for 5000 => VTK seems to calculate the clipping planes wrong for Z=1
+  cameraPosition[2] = 500000000.0; //Reason for 500000000 => VTK seems to calculate the clipping planes wrong for Z=1
 
   //set the camera corresponding to the textured plane
   vtkSmartPointer<vtkCamera> camera = renderer->GetVtkRenderer()->GetActiveCamera();
@@ -118,8 +114,7 @@ void mitk::ImageVtkMapper2D::AdjustCamera(mitk::BaseRenderer* renderer)
     camera->SetViewUp( cameraUp ); //set the view-up for the camera
   }
   //reset the clipping range
-//    renderer->GetVtkRenderer()->ResetCameraClippingRange();
-  camera->SetClippingRange(0.5, 100.5);
+  renderer->GetVtkRenderer()->ResetCameraClippingRange();
 }
 
 //set the two points defining the textured plane according to the dimension and spacing
@@ -166,17 +161,6 @@ void mitk::ImageVtkMapper2D::MitkRenderOpaqueGeometry(BaseRenderer* renderer)
 
   if ( this->GetVtkProp(renderer)->GetVisibility() )
   {
-    //    vtkSmartPointer<vtkRenderer> ren =
-    //      vtkSmartPointer<vtkRenderer>::New();
-    //    vtkSmartPointer<vtkRenderWindow> renderWindow =
-    //      vtkSmartPointer<vtkRenderWindow>::New();
-    //    renderWindow->AddRenderer(ren);
-    //    vtkSmartPointer<vtkRenderWindowInteractor> renderWindowInteractor =
-    //        vtkSmartPointer<vtkRenderWindowInteractor>::New();
-    //    renderWindowInteractor->SetRenderWindow(renderWindow);
-    //    ren->AddActor(m_LSH.GetLocalStorage(renderer)->m_Actor);
-    //    renderWindow->Render();
-    //    renderWindowInteractor->Start();
     this->GetVtkProp(renderer)->RenderOpaqueGeometry( renderer->GetVtkRenderer() );
   }
 }
@@ -187,7 +171,19 @@ void mitk::ImageVtkMapper2D::MitkRenderTranslucentGeometry(BaseRenderer* rendere
     return;
 
   //TODO is it possible to have a visible BaseRenderer AND an invisible VtkRenderer???
-  if ( this->GetVtkProp(renderer)->GetVisibility() ) {
+  if ( this->GetVtkProp(renderer)->GetVisibility() )
+  {
+    //        vtkSmartPointer<vtkRenderer> ren =
+    //          vtkSmartPointer<vtkRenderer>::New();
+    //        vtkSmartPointer<vtkRenderWindow> renderWindow =
+    //          vtkSmartPointer<vtkRenderWindow>::New();
+    //        renderWindow->AddRenderer(ren);
+    //        vtkSmartPointer<vtkRenderWindowInteractor> renderWindowInteractor =
+    //            vtkSmartPointer<vtkRenderWindowInteractor>::New();
+    //        renderWindowInteractor->SetRenderWindow(renderWindow);
+    //        ren->AddActor(m_LSH.GetLocalStorage(renderer)->m_Actor);
+    //        renderWindow->Render();
+    //        renderWindowInteractor->Start();
     this->GetVtkProp(renderer)->RenderTranslucentPolygonalGeometry(renderer->GetVtkRenderer());
   }
 }
@@ -204,6 +200,7 @@ void mitk::ImageVtkMapper2D::MitkRenderVolumetricGeometry(BaseRenderer* renderer
 
 void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
 {
+  //  MITK_INFO << "GenerateData";
   LocalStorage *localStorage = m_LSH.GetLocalStorage(renderer);
 
   mitk::Image *input = const_cast< mitk::Image * >( this->GetInput() ); //TODO WTF CONST CAST?!?!?111 => Error in class design?
@@ -212,8 +209,6 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
   {
     return;
   }
-
-  RendererInfo &rendererInfo = this->AccessRendererInfo( renderer );
 
   //check if there is a valid worldGeometry TODO: Move to Update()?
   const Geometry2D *worldGeometry = renderer->GetCurrentWorldGeometry2D();
@@ -562,12 +557,8 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
   }
 
   //TODO image is stored 2x. Do we still need that?
-  rendererInfo.m_Image->DeepCopy( reslicedImage );
-  //    localStorage->m_ReslicedImage->Update();
-
-  //TODO how does the reslicer know for which render window it is reslicing for?
   //set the current slice for the localStorage
-  localStorage->m_ReslicedImage = reslicedImage;
+  localStorage->m_ReslicedImage->DeepCopy( reslicedImage );
 
   //set the current slice as texture for the plane
   localStorage->m_Texture->SetInput(localStorage->m_ReslicedImage);
@@ -592,8 +583,8 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
 
   vtkCamera* cam = renderer->GetVtkRenderer()->GetActiveCamera();
   //set up the camera to view the transformed plane
-  MITK_INFO << "######################### vor";
-  cam->Print(std::cout);
+  //  MITK_INFO << "######################### vor";
+  //  cam->Print(std::cout);
 
   this->AdjustCamera( renderer );
 
@@ -602,11 +593,17 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
   //Transform the camera to the current position (transveral, coronal and saggital plane).
   //This is necessary, because the vtkTransformFilter does not manipulate the vtkCamera.
   //(Without not all three planes would be visible).
-//  renderer->GetVtkRenderer()->GetActiveCamera()->ApplyTransform(trans);
+  renderer->GetVtkRenderer()->GetActiveCamera()->ApplyTransform(trans);
+
+  //  MITK_INFO << "pos Z:" << cam->GetPosition()[2];
+  //  MITK_INFO << "foc Z:" << cam->GetFocalPoint()[2];
+  //  MITK_INFO << "pla Z:" << localStorage->m_Plane->GetCenter()[2];
+
+  //  renderer->GetVtkRenderer()->ResetCameraClippingRange();
 
   // We have been modified
-  MITK_INFO << "######################### nach";
-  cam->Print(std::cout);
+  //  MITK_INFO << "######################### nach";
+  //  cam->Print(std::cout);
 
   localStorage->m_LastUpdateTime.Modified();
 }
@@ -719,26 +716,6 @@ bool mitk::ImageVtkMapper2D::CalculateClippedPlaneBounds( const Geometry3D *boun
   }
 }
 
-void mitk::ImageVtkMapper2D::GenerateAllData()
-{
-  RendererInfoMap::iterator it, end = m_RendererInfo.end();
-
-  for ( it = m_RendererInfo.begin(); it != end; ++it)
-  {
-    this->Update( it->first );
-  }
-}
-
-void mitk::ImageVtkMapper2D::Clear()
-{
-  RendererInfoMap::iterator it, end = m_RendererInfo.end();
-  for ( it = m_RendererInfo.begin(); it != end; ++it )
-  {
-    it->second.RemoveObserver();
-  }
-  m_RendererInfo.clear();
-}
-
 void mitk::ImageVtkMapper2D::ApplyProperties(mitk::BaseRenderer* renderer, vtkSmartPointer<vtkTransform> transform, mitk::ScalarType mmPerPixel[2])
 {
   //get the current localStorage for the corresponding renderer
@@ -757,9 +734,13 @@ void mitk::ImageVtkMapper2D::ApplyProperties(mitk::BaseRenderer* renderer, vtkSm
   float rgb[3]= { 1.0f, 1.0f, 1.0f };
   float opacity = 1.0f;
 
+  // check for opacity prop and use it for rendering if it exists
+  GetOpacity( opacity, renderer );
+  //set the opacity according to the properties
+  localStorage->m_Actor->GetProperty()->SetOpacity(opacity);
+
   // check for color prop and use it for rendering if it exists
   // binary image hovering & binary image selection
-  //TODO do we need this?
   bool hover    = false;
   bool selected = false;
   GetDataNode()->GetBoolProperty("binaryimage.ishovering", hover, renderer);
@@ -788,12 +769,6 @@ void mitk::ImageVtkMapper2D::ApplyProperties(mitk::BaseRenderer* renderer, vtkSm
   {
     GetColor( rgb, renderer );
   }
-  //END TODO do we need this?
-
-  // check for opacity prop and use it for rendering if it exists
-  GetOpacity( opacity, renderer );
-  //set the opacity according to the properties
-  localStorage->m_Actor->GetProperty()->SetOpacity(opacity);
 
   //get the binary property
   bool binary = false;
@@ -919,12 +894,13 @@ void mitk::ImageVtkMapper2D::ApplyProperties(mitk::BaseRenderer* renderer, vtkSm
     localStorage->m_Actor->SetTexture(localStorage->m_Texture);
   }
   localStorage->m_TransformFilter->Update();
-  localStorage->m_Mapper->SetInputConnection(localStorage->m_Plane->GetOutputPort());
+  localStorage->m_Mapper->SetInputConnection(localStorage->m_TransformFilter->GetOutputPort());
   localStorage->m_Mapper->ScalarVisibilityOff();
 }
 
 void mitk::ImageVtkMapper2D::Update(mitk::BaseRenderer* renderer)
 {
+  //  MITK_INFO << "Update";
   if ( !this->IsVisible( renderer ) )
   {
     return;
@@ -967,55 +943,6 @@ void mitk::ImageVtkMapper2D::Update(mitk::BaseRenderer* renderer)
   // since we have checked that nothing important has changed, we can set
   // m_LastUpdateTime to the current time
   localStorage->m_LastUpdateTime.Modified();
-}
-
-void mitk::ImageVtkMapper2D::DeleteRendererCallback( itk::Object *object, const itk::EventObject & )
-{
-  mitk::BaseRenderer *renderer = dynamic_cast< mitk::BaseRenderer* >( object );
-  if ( renderer )
-  {
-    m_RendererInfo.erase( renderer );
-  }
-}
-
-mitk::ImageVtkMapper2D::RendererInfo::RendererInfo()
-  : m_RendererID(-1),
-  m_Renderer(NULL),
-  m_Image(NULL),
-  m_ObserverID( 0 )
-{
-};
-
-mitk::ImageVtkMapper2D::RendererInfo::~RendererInfo()
-{
-  if ( m_Image != NULL )
-  {
-    m_Image->Delete();
-  }
-}
-
-void mitk::ImageVtkMapper2D::RendererInfo::RemoveObserver()
-{
-  if ( m_ObserverID != 0 )
-  {
-    // m_ObserverID has to be decreased by one. Was incremented by one after creation to make the test m_ObserverID != 0 possible.
-    m_Renderer->RemoveObserver( m_ObserverID-1 );
-  }
-}
-
-void mitk::ImageVtkMapper2D::RendererInfo::Initialize( int rendererID, mitk::BaseRenderer *renderer,
-                                                       unsigned long observerID )
-{
-  // increase ID by one to avoid 0 ID, has to be decreased before remove of the observer
-  m_ObserverID = observerID+1;
-
-  assert(rendererID>=0);
-  assert(m_RendererID<0);
-
-  m_Image = vtkImageData::New();
-
-  m_RendererID = rendererID;
-  m_Renderer = renderer;
 }
 
 void mitk::ImageVtkMapper2D::SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer, bool overwrite)
@@ -1202,10 +1129,8 @@ mitk::ImageVtkMapper2D::LocalStorage::LocalStorage()
   m_UnitSpacingImageFilter = vtkSmartPointer<vtkImageChangeInformation>::New();  
   m_OutlinePolyData = vtkSmartPointer<vtkPolyData>::New();
 
-  m_flag = true;
   //the following actions are always the same and thus can be performed
   //in the constructor for each image (i.e. the image-corresponding local storage)
-
   m_TSFilter->ReleaseDataFlagOn();
   m_Reslicer->ReleaseDataFlagOn();
 

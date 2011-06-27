@@ -665,20 +665,17 @@ void Geometry2DDataVtkMapper3D::ProcessNode( DataNode * node, BaseRenderer* rend
           // RendererInfo for renderer. By calling GetRendererInfo
           // a RendererInfo will be created for renderer (if it does not
           // exist yet).
-          imageMapper->GetRendererInfo( planeRenderer );
-
-          imageMapper->GenerateAllData();
 
           // ensure the right openGL context, as 3D widgets may render and take their plane texture from 2D image mappers
           renderer->GetRenderWindow()->MakeCurrent();
 
           // Retrieve and update image to be mapped
-          const ImageVtkMapper2D::RendererInfo *rit =
-            imageMapper->GetRendererInfo( planeRenderer );
-          if(rit->m_Image != NULL)
+          const ImageVtkMapper2D::LocalStorage* localStorage = imageMapper->m_LSH.GetLocalStorage(planeRenderer);
+
+          if(localStorage->m_ReslicedImage != NULL)
           {
-            rit->m_Image->Update();
-            texture->SetInput( rit->m_Image );
+            localStorage->m_ReslicedImage->Update();
+            texture->SetInput( localStorage->m_ReslicedImage );
             // check for level-window-prop and use it if it exists
             ScalarType windowMin = 0.0;
             ScalarType windowMax = 255.0;

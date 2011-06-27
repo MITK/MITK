@@ -103,9 +103,6 @@ namespace mitk {
     /** \brief Get the Image to map */
     const mitk::Image *GetInput(void);
 
-    /** \brief Calls Update() for all associated renderers. */
-    virtual void GenerateAllData();
-
     /** \brief Checks whether this mapper needs to update itself and generate
    * data. */
     virtual void Update(mitk::BaseRenderer * renderer);
@@ -146,8 +143,6 @@ namespace mitk {
       /** \brief PolyData object containg all lines/points needed for outlining the contour.*/
       vtkSmartPointer<vtkPolyData> m_OutlinePolyData;
 
-      bool m_flag;
-
       /** \brief timestamp of last update of stored data */
       itk::TimeStamp m_LastUpdateTime;
 
@@ -159,54 +154,8 @@ namespace mitk {
       }
     };
 
-    /** \brief This member holds all three LocalStorages for the three 2D render windows. */
+    /** \brief This member holds all (three) LocalStorages for the three 2D render windows. */
     mitk::Mapper::LocalStorageHandler<LocalStorage> m_LSH;
-
-    /** \brief Internal storage class for data needed for rendering into a
-   * renderer
-   */
-    class MITK_CORE_EXPORT RendererInfo
-    {
-      /** \brief internal id of the renderer the data is stored for */
-      int m_RendererID;
-
-      mitk::BaseRenderer* m_Renderer;
-
-    public:
-      /** \brief stores the id of the observer for delete event of renderer */
-      unsigned long m_ObserverID;
-
-      vtkImageData* m_Image;
-
-      RendererInfo();
-
-      ~RendererInfo();
-
-      inline bool IsInitialized() const
-      {
-        return m_RendererID >= 0;
-      }
-
-      void Initialize( int rendererID, mitk::BaseRenderer *renderer,
-                       unsigned long observerID );
-
-      inline int GetRendererID() const
-      {
-        return m_RendererID;
-      }
-
-      void RemoveObserver();
-
-    }; // RendererInfo
-
-    /** \brief Get the RendererInfo for \a renderer */
-    const RendererInfo *GetRendererInfo( mitk::BaseRenderer *renderer )
-    {
-      return &this->AccessRendererInfo(renderer);
-    }
-
-    /** \brief Release memory allocated for buffering */
-    virtual void Clear();
 
     static void SetDefaultProperties(mitk::DataNode* node, mitk::BaseRenderer* renderer = NULL, bool overwrite = false);
 
@@ -226,56 +175,11 @@ namespace mitk {
     /** Does the actual resampling, without rendering the image yet. */
     virtual void GenerateData(mitk::BaseRenderer *renderer);
 
-    /** \brief Get the RendererInfo for @a renderer */
-    inline RendererInfo & AccessRendererInfo( mitk::BaseRenderer* renderer )
-    {
-      RendererInfo& rendererInfo = m_RendererInfo[renderer];
-      if(rendererInfo.IsInitialized()==false)
-      {
-        // Add observer for renderer reset events (RendererInfo will
-        // automatically be removed from list when a Renderer is deleted)
-        //
-        // Note: observer ID is passed to rendererInfo, which will take
-        // responsiblity to remove the observer upon its destruction
-        typedef itk::MemberCommand< ImageVtkMapper2D > MemberCommandType;
-        MemberCommandType::Pointer deleteRendererCommand =
-            MemberCommandType::New();
-
-        deleteRendererCommand->SetCallbackFunction(
-            this, &ImageVtkMapper2D::DeleteRendererCallback );
-
-        unsigned long observerID = renderer->AddObserver(
-            BaseRenderer::RendererResetEvent(), deleteRendererCommand );
-
-        // Initialize RendererInfo
-        rendererInfo.Initialize( ImageVtkMapper2D::numRenderer++, renderer, observerID );
-      }
-
-      return rendererInfo;
-    }
-
-    void DeleteRendererCallback( itk::Object *object, const itk::EventObject & );
-
     bool LineIntersectZero( vtkPoints *points, int p1, int p2,
                             vtkFloatingPointType *bounds );
 
     bool CalculateClippedPlaneBounds( const Geometry3D *boundingGeometry,
                                       const PlaneGeometry *planeGeometry, vtkFloatingPointType *bounds );
-
-    /** \brief Number of renderers data is stored for
-   * \todo General concept for keeping data for rendering required
-   * \todo static?
-   */
-    static int numRenderer;
-
-  protected:
-    typedef std::map<BaseRenderer*,RendererInfo> RendererInfoMap;
-
-    /** \brief Map of instances of RendererInfo
-   * \sa RendererInfo
-   */
-    RendererInfoMap m_RendererInfo;
-
   };
 
 } // namespace mitk

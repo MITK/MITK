@@ -18,7 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkSerializerMacros.h"
 #include "mitkPropertyListDeserializerV1.h"
-#include "mitkBasePropertyDeserializer.h"
+#include "mitkBasePropertySerializer.h"
 #include <tinyxml.h>
 
 MITK_REGISTER_SERIALIZER(PropertyListDeserializerV1)
@@ -54,7 +54,7 @@ bool mitk::PropertyListDeserializerV1::Deserialize()
 
     // hand propertyElement to specific reader
     std::stringstream propertyDeserializerClassName;
-    propertyDeserializerClassName << type << "Deserializer";
+    propertyDeserializerClassName << type << "Serializer";
 
     std::list<itk::LightObject::Pointer> readers = itk::ObjectFactoryBase::CreateAllInstance(propertyDeserializerClassName.str().c_str());
     if (readers.size() < 1)
@@ -71,7 +71,7 @@ bool mitk::PropertyListDeserializerV1::Deserialize()
           iter != readers.end();
           ++iter )
     {
-      if (BasePropertyDeserializer* reader = dynamic_cast<BasePropertyDeserializer*>( iter->GetPointer() ) )
+      if (BasePropertySerializer* reader = dynamic_cast<BasePropertySerializer*>( iter->GetPointer() ) )
       {
         BaseProperty::Pointer property = reader->Deserialize( propertyElement->FirstChildElement() );
         if (property.IsNotNull())

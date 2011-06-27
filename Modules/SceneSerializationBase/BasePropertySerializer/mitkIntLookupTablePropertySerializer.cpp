@@ -54,6 +54,27 @@ class SceneSerializationBase_EXPORT IntLookupTablePropertySerializer : public Ba
         }
         return element;
     }
+
+    virtual BaseProperty::Pointer Deserialize(TiXmlElement* element)
+    {
+      if (!element) 
+        return NULL;
+
+      IntLookupTable lut;
+      for( TiXmlElement* child = element->FirstChildElement("LUTValue"); child != NULL; child = child->NextSiblingElement("LUTValue"))
+      {
+
+        int temp;
+        if (child->QueryIntAttribute("id", &temp) == TIXML_WRONG_TYPE)
+          return NULL; // TODO: can we do a better error handling?
+        IntLookupTable::IdentifierType id = static_cast<IntLookupTable::IdentifierType>(temp);
+        if (child->QueryIntAttribute("value", &temp) == TIXML_WRONG_TYPE)
+          return NULL; // TODO: can we do a better error handling?
+        IntLookupTable::ValueType val = static_cast<IntLookupTable::ValueType>(temp);        
+        lut.SetTableValue(id, val);
+      }
+      return IntLookupTableProperty::New(lut).GetPointer();
+    }
   protected:
     IntLookupTablePropertySerializer() {}
     virtual ~IntLookupTablePropertySerializer() {}

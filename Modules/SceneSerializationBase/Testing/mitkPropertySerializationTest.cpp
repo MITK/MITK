@@ -50,7 +50,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkPropertyList.h"
 #include "mitkPropertyListSerializer.h"
 #include "mitkBasePropertySerializer.h"
-#include "mitkBasePropertyDeserializer.h"
 
 #include <mitkPointSet.h>
 #include <mitkImage.h>
@@ -73,14 +72,14 @@ PURPOSE.  See the above copyright notices for more information.
 void TestAllProperties(const mitk::PropertyList* propList);
 
 /**Documentation
-* \brief Test for all PropertySerializer and PropertyDeserializer classes. 
+* \brief Test for all PropertySerializer classes. 
 *
 */
 int mitkPropertySerializationTest(int /* argc */, char* /*argv*/[])
 {
   MITK_TEST_BEGIN("PropertySerializationTest");
 
-  mitk::PropertyListSerializer::Pointer serializer = mitk::PropertyListSerializer::New(); // make sure something from the lib is actually used (registration of serializers/deserializers)
+  mitk::PropertyListSerializer::Pointer serializer = mitk::PropertyListSerializer::New(); // make sure something from the lib is actually used (registration of serializers)
 
   /* build list of properties that will be serialized and deserialized */
   mitk::PropertyList::Pointer propList = mitk::PropertyList::New();
@@ -251,30 +250,14 @@ void TestAllProperties(const mitk::PropertyList* propList)
         MITK_TEST_OUTPUT( << "serialization failed, skipping deserialization");
         continue;
       }
-      /* build deserializer and try to deserialize property */
-      std::string deserializerName = std::string(prop->GetNameOfClass()) + std::string("Deserializer");
-      std::list<itk::LightObject::Pointer> allDeserializers = itk::ObjectFactoryBase::CreateAllInstance(deserializerName.c_str());
-      MITK_TEST_CONDITION(allDeserializers.size() > 0, std::string("Creating deserializers for ") + deserializerName);
-      if (allDeserializers.size() == 0)
+      
+      mitk::BaseProperty::Pointer deserializedProp = serializer->Deserialize( valueelement );
+      MITK_TEST_CONDITION(deserializedProp.IsNotNull(), "serializer created valid property");
+      if (deserializedProp.IsNotNull())
       {
-        MITK_TEST_OUTPUT( << "deserialization not possible, skipping deserialization of " << prop->GetNameOfClass());
-        continue;
+        MITK_TEST_CONDITION(*(deserializedProp.GetPointer()) == *prop, "deserialized property equals initial property for type " << prop->GetNameOfClass());
       }
-      if (allDeserializers.size() > 1)
-      {
-        MITK_TEST_OUTPUT (<< "Warning: " << allDeserializers.size() << " deserializers found for " << prop->GetNameOfClass() << "testing only the first one.");
-      }
-      mitk::BasePropertyDeserializer* deserializer = dynamic_cast<mitk::BasePropertyDeserializer*>( allDeserializers.begin()->GetPointer());
-      MITK_TEST_CONDITION(deserializer != NULL, deserializerName + std::string(" is valid"));
-      if (deserializer != NULL)
-      {
-        mitk::BaseProperty::Pointer deserializedProp = deserializer->Deserialize( valueelement );
-        MITK_TEST_CONDITION(deserializedProp.IsNotNull(), "deserializer created valid property");
-        if (deserializedProp.IsNotNull())
-        {
-          MITK_TEST_CONDITION(*(deserializedProp.GetPointer()) == *prop, "deserialized property equals initial property for type " << prop->GetNameOfClass());
-        }
-      }
+      
     }
     else
     {

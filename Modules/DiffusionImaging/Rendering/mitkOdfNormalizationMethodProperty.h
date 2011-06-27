@@ -22,9 +22,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkEnumerationPropertySerializer.h"
 #include "MitkDiffusionImagingExports.h"
 
-#include "mitkBasePropertyDeserializer.h"
-#include "mitkBasePropertySerializer.h"
-
 #include "mitkSerializerMacros.h"
 
 namespace mitk
@@ -108,11 +105,11 @@ protected:
   virtual void AddInterpolationTypes();
 };
 
-class MitkDiffusionImaging_EXPORT OdfNormalizationMethodPropertyDeserializer : public BasePropertyDeserializer
+class MitkDiffusionImaging_EXPORT OdfNormalizationMethodPropertySerializer : public EnumerationPropertySerializer
 {
   public:
 
-    mitkClassMacro( OdfNormalizationMethodPropertyDeserializer, BasePropertyDeserializer );
+    mitkClassMacro( OdfNormalizationMethodPropertySerializer, EnumerationPropertySerializer );
     itkNewMacro(Self);
 
     virtual BaseProperty::Pointer Deserialize(TiXmlElement* element)
@@ -124,20 +121,6 @@ class MitkDiffusionImaging_EXPORT OdfNormalizationMethodPropertyDeserializer : p
       property->SetValue( s );
       return property.GetPointer();
     }
-
-
-  protected:
-
-    OdfNormalizationMethodPropertyDeserializer () {}
-    virtual ~OdfNormalizationMethodPropertyDeserializer () {}
-};
-
-class MitkDiffusionImaging_EXPORT OdfNormalizationMethodPropertySerializer : public EnumerationPropertySerializer
-{
-  public:
-
-    mitkClassMacro( OdfNormalizationMethodPropertySerializer, EnumerationPropertySerializer );
-    itkNewMacro(Self);
 
   protected:
 

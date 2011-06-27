@@ -112,7 +112,7 @@ PURPOSE.  See the above copyright notices for more information.
  * \ingroup Adaptor
  */
 #define InstantiateAccessFunctionForFixedDimension(itkImgFunc, dim)                                       \
-  MITK_PP_SEQ_FOR_EACH(InstantiateAccessFunctionImpl, itkImgFunc, MITK_ACCESSBYITK_TYPES_DIMN_SEQ(dim))
+  InstantiateAccessFunctionForFixedType(itkImgFunc, MITK_ACCESSBYITK_TYPES_SEQ, (dim))
 
 /**
  * \brief Instantiate access function for all given pixel types and all dimensions.
@@ -122,7 +122,7 @@ PURPOSE.  See the above copyright notices for more information.
  * \ingroup Adaptor
  */
 #define InstantiateAccessFunctionForFixedPixelType(itkImgFunc, pixelTypeSeq)                              \
-  InstantiateAccessFunctionForFixedType(itkImgFunc, pixelTypeSeq, (2)(3))
+  InstantiateAccessFunctionForFixedType(itkImgFunc, pixelTypeSeq, MITK_ACCESSBYITK_DIMENSIONS_SEQ)
 
 /**
  * \brief Instantiate access function for integral datatypes and all dimensions.
@@ -132,7 +132,7 @@ PURPOSE.  See the above copyright notices for more information.
  * \ingroup Adaptor
  */
 #define InstantiateAccessFunctionForIntegralPixelTypes(itkImgFunc)                                        \
-  InstantiateAccessFunctionForFixedType(itkImgFunc, MITK_ACCESSBYITK_INTEGRAL_PIXEL_TYPES_SEQ, (2)(3))
+  InstantiateAccessFunctionForFixedType(itkImgFunc, MITK_ACCESSBYITK_INTEGRAL_PIXEL_TYPES_SEQ, MITK_ACCESSBYITK_DIMENSIONS_SEQ)
 
 /**
  * \brief Instantiate access function for floating point datatypes and all dimensions.
@@ -142,7 +142,7 @@ PURPOSE.  See the above copyright notices for more information.
  * \ingroup Adaptor
  */
 #define InstantiateAccessFunctionForFloatingPixelTypes(itkImgFunc)                                        \
-  InstantiateAccessFunctionForFixedType(itkImgFunc, MITK_ACCESSBYITK_FLOATING_PIXEL_TYPES_SEQ, (2)(3))
+  InstantiateAccessFunctionForFixedType(itkImgFunc, MITK_ACCESSBYITK_FLOATING_PIXEL_TYPES_SEQ, MITK_ACCESSBYITK_DIMENSIONS_SEQ)
 
 
 #endif // of MITKINSTANTIATEACCESSFUNCTIONS_H_HEADER_INCLUDED

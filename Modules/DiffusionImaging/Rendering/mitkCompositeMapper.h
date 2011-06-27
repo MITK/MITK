@@ -49,17 +49,13 @@ namespace mitk {
 
     virtual void MitkRenderOverlay(BaseRenderer* renderer)
     {
-      Enable2DOpenGL();
       m_ImgMapper->MitkRenderOverlay(renderer);
-      Disable2DOpenGL();
       m_OdfMapper->MitkRenderOverlay(renderer);
     }
 
     virtual void MitkRenderOpaqueGeometry(BaseRenderer* renderer)
     {
-      Enable2DOpenGL();
       m_ImgMapper->MitkRenderOpaqueGeometry(renderer);
-      Disable2DOpenGL();
       m_OdfMapper->MitkRenderOpaqueGeometry(renderer);
       if( mitk::RenderingManager::GetInstance()->GetNextLOD( renderer ) == 0 )
       {
@@ -69,18 +65,14 @@ namespace mitk {
 
     virtual void MitkRenderTranslucentGeometry(BaseRenderer* renderer)
     {
-      Enable2DOpenGL();
       m_ImgMapper->MitkRenderTranslucentGeometry(renderer);
-      Disable2DOpenGL();
       m_OdfMapper->MitkRenderTranslucentGeometry(renderer);
     }
 
 #if ( ( VTK_MAJOR_VERSION >= 5 ) && ( VTK_MINOR_VERSION>=2)  )
     virtual void MitkRenderVolumetricGeometry(BaseRenderer* renderer)
     {
-      Enable2DOpenGL();
       m_ImgMapper->MitkRenderVolumetricGeometry(renderer);
-      Disable2DOpenGL();
       m_OdfMapper->MitkRenderVolumetricGeometry(renderer);
     }
 #endif
@@ -141,9 +133,6 @@ namespace mitk {
       m_ImgMapper->SetGeometry3D(aGeometry3D);
       m_OdfMapper->SetGeometry3D(aGeometry3D);
     }
-
-    void Enable2DOpenGL();
-    void Disable2DOpenGL();
 
   protected:
 

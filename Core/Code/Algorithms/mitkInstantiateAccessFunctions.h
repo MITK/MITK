@@ -59,9 +59,9 @@ PURPOSE.  See the above copyright notices for more information.
  *
  * A call to InstantiateAccessFunctionForFixedPixelType(T, (a)(b), (d)(e)) results in calls
  *
- *   InstantiateAccessFunction_T(a, d)
- *   InstantiateAccessFunction_T(a, e)
- *   InstantiateAccessFunction_T(b, d)
+ *   InstantiateAccessFunction_T(a, d) <br>
+ *   InstantiateAccessFunction_T(a, e) <br>
+ *   InstantiateAccessFunction_T(b, d) <br>
  *   InstantiateAccessFunction_T(b, e)
  *
  * That is, InstantiateAccessFunction_T is called for the cartesian product of the sequences pixelTypeSeq
@@ -73,7 +73,7 @@ PURPOSE.  See the above copyright notices for more information.
  * void MyImageAccessFunction(itk::Image<TPixel, VImageDimension>* itkImage)
  * { ... }
  *
- * #define InstantiateAccessFunction_MyImageAccessFunction(pixelType, dim) \\
+ * #define InstantiateAccessFunction_MyImageAccessFunction(pixelType, dim) \
  *   template void MyImageAccessFunction(itk::Image<pixelType,dim>*);
  *
  * InstantiateAccessFunctionForFixedPixelType(MyImageAccessFunction, (int), (3))
@@ -85,6 +85,7 @@ PURPOSE.  See the above copyright notices for more information.
  * MITK_MULTIPLEX_PICTYPE can help you with that. See \c mitk/CMake/mitkMacroMultiplexPicType.cmake
  * for documentation.
  *
+ * \param itkImgFunc The custom part of the name of the macro to be called.
  * \param pixelTypeSeq a sequence of types, like (int)(short)(char).
  * \param dimSeq a sequence of dimensions, like (2)(3).
  *
@@ -109,6 +110,9 @@ PURPOSE.  See the above copyright notices for more information.
  *
  * \sa InstantiateAccessFunctionForFixedType
  *
+ * \param itkImgFunc The custom part of the name of the macro to be called.
+ * \param dimSeq a sequence of dimensions, like (2)(3).
+ *
  * \ingroup Adaptor
  */
 #define InstantiateAccessFunctionForFixedDimension(itkImgFunc, dim)                                       \
@@ -118,6 +122,9 @@ PURPOSE.  See the above copyright notices for more information.
  * \brief Instantiate access function for all given pixel types and all dimensions.
  *
  * \sa InstantiateAccessFunctionForFixedType
+ *
+ * \param itkImgFunc The custom part of the name of the macro to be called.
+ * \param pixelTypeSeq a sequence of types, like (int)(short)(char).
  *
  * \ingroup Adaptor
  */
@@ -129,6 +136,8 @@ PURPOSE.  See the above copyright notices for more information.
  *
  * \sa InstantiateAccessFunctionForFixedType
  *
+ * \param itkImgFunc The custom part of the name of the macro to be called.
+ *
  * \ingroup Adaptor
  */
 #define InstantiateAccessFunctionForIntegralPixelTypes(itkImgFunc)                                        \
@@ -138,6 +147,8 @@ PURPOSE.  See the above copyright notices for more information.
  * \brief Instantiate access function for floating point datatypes and all dimensions.
  *
  * \sa InstantiateAccessFunctionForFixedType
+ *
+ * \param itkImgFunc The custom part of the name of the macro to be called.
  *
  * \ingroup Adaptor
  */

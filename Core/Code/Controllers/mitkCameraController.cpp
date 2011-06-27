@@ -1,18 +1,18 @@
 /*=========================================================================
- 
+
 Program:   Medical Imaging & Interaction Toolkit
 Language:  C++
 Date:      $Date$
 Version:   $Revision$
- 
+
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
- 
+
 This software is distributed WITHOUT ANY WARRANTY; without even
 the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
- 
+
 =========================================================================*/
 
 
@@ -104,64 +104,66 @@ void mitk::CameraController::SetStandardView( mitk::CameraController::StandardVi
   else
     return;
 
-  mitk::Point3D middle = bb->GetCenter();
-//  vtkRenderer->GetActiveCamera()->SetFocalPoint(middle[0], middle[1], middle[2]);
-  switch(view)
+  if(m_Renderer->GetRenderWindow() == m_Renderer->GetRenderWindowByName("stdmulti.widget4"))
   {
-  case ANTERIOR:
-  case POSTERIOR:
-  case SINISTER:
-  case DEXTER:
-//    vtkRenderer->GetActiveCamera()->SetViewUp(0,0,1);
-    break;
-  case CRANIAL:
-  case CAUDAL:
-//    vtkRenderer->GetActiveCamera()->SetViewUp(0,-1,0);
-    break;
-  }
-  switch(view)
-  {
-  case ANTERIOR:
-//    vtkRenderer->GetActiveCamera()->SetPosition(middle[0],-100000,middle[2]);
-    break;
-  case POSTERIOR:
-//    vtkRenderer->GetActiveCamera()->SetPosition(middle[0],+100000,middle[2]);
-    break;
-  case SINISTER:
-//    vtkRenderer->GetActiveCamera()->SetPosition(+100000,middle[1],middle[2]);
-    break;
-  case DEXTER:
-//    vtkRenderer->GetActiveCamera()->SetPosition(-100000,middle[1],middle[2]);
-    break;
-  case CRANIAL:
-//    vtkRenderer->GetActiveCamera()->SetPosition(middle[0],middle[1],100000);
-    break;
-  case CAUDAL:
-//    vtkRenderer->GetActiveCamera()->SetPosition(middle[0],middle[1],-100000);
-    break;
-  }
-//  vtkRenderer->ResetCamera();
-//  double *cameraPosition = vtkRenderer->GetActiveCamera()->GetPosition();
-  switch(view)
-  {
-  case ANTERIOR:
-  case POSTERIOR:
-//    vtkRenderer->GetActiveCamera()->SetPosition(cameraPosition[0],cameraPosition[1] / m_ZoomFactor,cameraPosition[2]);
-    break;
+    //set up the view for the 3D render window. The views for 2D are set up in the mitkImageVtkMapper2D
+    mitk::Point3D middle = bb->GetCenter();
+    vtkRenderer->GetActiveCamera()->SetFocalPoint(middle[0], middle[1], middle[2]);
+    switch(view)
+    {
+    case ANTERIOR:
+    case POSTERIOR:
+    case SINISTER:
+    case DEXTER:
+      vtkRenderer->GetActiveCamera()->SetViewUp(0,0,1);
+      break;
+    case CRANIAL:
+    case CAUDAL:
+      vtkRenderer->GetActiveCamera()->SetViewUp(0,-1,0);
+      break;
+    }
+    switch(view)
+    {
+    case ANTERIOR:
+      vtkRenderer->GetActiveCamera()->SetPosition(middle[0],-100000,middle[2]);
+      break;
+    case POSTERIOR:
+      vtkRenderer->GetActiveCamera()->SetPosition(middle[0],+100000,middle[2]);
+      break;
+    case SINISTER:
+      vtkRenderer->GetActiveCamera()->SetPosition(+100000,middle[1],middle[2]);
+      break;
+    case DEXTER:
+      vtkRenderer->GetActiveCamera()->SetPosition(-100000,middle[1],middle[2]);
+      break;
+    case CRANIAL:
+      vtkRenderer->GetActiveCamera()->SetPosition(middle[0],middle[1],100000);
+      break;
+    case CAUDAL:
+      vtkRenderer->GetActiveCamera()->SetPosition(middle[0],middle[1],-100000);
+      break;
+    }
+    vtkRenderer->ResetCamera();
+    double *cameraPosition = vtkRenderer->GetActiveCamera()->GetPosition();
+    switch(view)
+    {
+    case ANTERIOR:
+    case POSTERIOR:
+      vtkRenderer->GetActiveCamera()->SetPosition(cameraPosition[0],cameraPosition[1] / m_ZoomFactor,cameraPosition[2]);
+      break;
 
-  case SINISTER:
-  case DEXTER:
-//    vtkRenderer->GetActiveCamera()->SetPosition(cameraPosition[0] / m_ZoomFactor,cameraPosition[1],cameraPosition[2]);
-    break;
+    case SINISTER:
+    case DEXTER:
+      vtkRenderer->GetActiveCamera()->SetPosition(cameraPosition[0] / m_ZoomFactor,cameraPosition[1],cameraPosition[2]);
+      break;
 
-  case CRANIAL:
-  case CAUDAL:
-//    vtkRenderer->GetActiveCamera()->SetPosition(cameraPosition[0],cameraPosition[1],cameraPosition[2] / m_ZoomFactor);
-    break;
+    case CRANIAL:
+    case CAUDAL:
+      vtkRenderer->GetActiveCamera()->SetPosition(cameraPosition[0],cameraPosition[1],cameraPosition[2] / m_ZoomFactor);
+      break;
+    }
+    vtkRenderer->ResetCameraClippingRange();
   }
-//  vtkRenderer->ResetCameraClippingRange();
-  MITK_INFO << "view: " << view;
-  MITK_INFO << "mitkCameraController.cpp";
 
   mitk::RenderingManager* rm = m_Renderer->GetRenderingManager();
   rm->RequestUpdateAll();

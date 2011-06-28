@@ -588,7 +588,7 @@ void mitk::ImageVtkMapper2D::GenerateData( mitk::BaseRenderer *renderer )
 
   this->AdjustCamera( renderer );
 
-  renderer->GetVtkRenderer()->SetBackground(1, 1, 1);
+//  renderer->GetVtkRenderer()->SetBackground(1, 1, 1);
 
   //Transform the camera to the current position (transveral, coronal and saggital plane).
   //This is necessary, because the vtkTransformFilter does not manipulate the vtkCamera.

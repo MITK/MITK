@@ -1,10 +1,9 @@
 /*=========================================================================
-
 Program:   Medical Imaging & Interaction Toolkit
 Language:  C++
 Date:      $Date: 2007-08-17 16:41:18 +0200 (Fr, 17 Aug 2007) $
 Version:   $Revision: 11618 $
-
+  
 Copyright (c) German Cancer Research Center, Division of Medical and
 Biological Informatics. All rights reserved.
 See MITKCopyright.txt or http://www.mitk.org/copyright.html for details.
@@ -85,16 +84,16 @@ int vtkMitkRenderProp::HasTranslucentPolygonalGeometry()
       // manually (see issue #8186 committed to VTK's Mantis issue tracker)
       // --> VTK bug resolved on 2008-12-01
       vtkPropAssembly *propAssembly = dynamic_cast< vtkPropAssembly * >(
-        vtkMapper3D->GetVtkProp(m_VtkPropRenderer) );
+          vtkMapper3D->GetVtkProp(m_VtkPropRenderer) );
       if ( propAssembly )
       {
         propAssembly->InitPathTraversal();
       }
-
+      
       if (vtkMapper3D->GetVtkProp(m_VtkPropRenderer)->HasTranslucentPolygonalGeometry()==1)
         return 1;
     }
-
+    
     //TODO bad solution.
     mitk::VtkMapper2D::Pointer vtkMapper2D = dynamic_cast<mitk::VtkMapper2D*>(mapper);
     if(vtkMapper2D)
@@ -103,21 +102,16 @@ int vtkMitkRenderProp::HasTranslucentPolygonalGeometry()
       // manually (see issue #8186 committed to VTK's Mantis issue tracker)
       // --> VTK bug resolved on 2008-12-01
       vtkPropAssembly *propAssembly = dynamic_cast< vtkPropAssembly * >(
-        vtkMapper2D->GetVtkProp(m_VtkPropRenderer) );
+          vtkMapper2D->GetVtkProp(m_VtkPropRenderer) );
       if ( propAssembly )
       {
         propAssembly->InitPathTraversal(); //TODO why is this called here???
       }
-
+      
       if (vtkMapper2D->GetVtkProp(m_VtkPropRenderer)->HasTranslucentPolygonalGeometry()==1) {
-        MITK_INFO << "1";
         return 1;
-      }else{
-      MITK_INFO << "0";
+      }
     }
-    }
-
-
   }
   return 0;
 }

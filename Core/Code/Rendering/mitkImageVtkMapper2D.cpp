@@ -103,7 +103,7 @@ void mitk::ImageVtkMapper2D::AdjustCamera(mitk::BaseRenderer* renderer)
   double cameraPosition[3];
   cameraPosition[0] = viewPlaneCenter[0];
   cameraPosition[1] = viewPlaneCenter[1];
-  cameraPosition[2] = 500000000.0; //Reason for 500000000 => VTK seems to calculate the clipping planes wrong for Z=1
+  cameraPosition[2] = 900.0; //Reason for 500000000 => VTK seems to calculate the clipping planes wrong for Z=1
 
   //set the camera corresponding to the textured plane
   vtkSmartPointer<vtkCamera> camera = renderer->GetVtkRenderer()->GetActiveCamera();
@@ -114,7 +114,8 @@ void mitk::ImageVtkMapper2D::AdjustCamera(mitk::BaseRenderer* renderer)
     camera->SetViewUp( cameraUp ); //set the view-up for the camera
   }
   //reset the clipping range
-  renderer->GetVtkRenderer()->ResetCameraClippingRange();
+//  renderer->GetVtkRenderer()->ResetCameraClippingRange();
+  renderer->GetVtkRenderer()->GetActiveCamera()->SetClippingRange(0.1, 1000);
 }
 
 //set the two points defining the textured plane according to the dimension and spacing

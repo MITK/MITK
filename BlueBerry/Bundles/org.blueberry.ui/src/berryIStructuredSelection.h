@@ -22,14 +22,14 @@
 #include "berryISelection.h"
 
 #include <berryObjectVector.h>
-
+#include <org_blueberry_ui_Export.h>
 namespace berry
 {
 
 /**
  * A selection containing elements.
  */
-struct IStructuredSelection : public ISelection {
+struct BERRY_UI IStructuredSelection : public ISelection {
 
   typedef ObjectVector<Object::Pointer> ContainerType;
   typedef ContainerType::const_iterator iterator;

@@ -58,6 +58,7 @@ std::string Platform::ARG_APPLICATION = "BlueBerry.application";
 std::string Platform::ARG_HOME = "BlueBerry.home";
 std::string Platform::ARG_PLUGIN_CACHE = "BlueBerry.plugin_cache_dir";
 std::string Platform::ARG_PLUGIN_DIRS = "BlueBerry.plugin_dirs";
+std::string Platform::ARG_FORCE_PLUGIN_INSTALL = "BlueBerry.forcePlugins";
 std::string Platform::ARG_PROVISIONING = "BlueBerry.provisioning";
 std::string Platform::ARG_CONSOLELOG = "BlueBerry.consoleLog";
 std::string Platform::ARG_TESTPLUGIN = "BlueBerry.testplugin";

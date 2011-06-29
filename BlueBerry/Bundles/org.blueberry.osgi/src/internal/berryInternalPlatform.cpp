@@ -47,6 +47,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "berryBundleDirectory.h"
 #include "berryProvisioningInfo.h"
 
+#include <QDesktopServices>
 #include <QDebug>
 
 namespace berry {
@@ -130,13 +131,12 @@ void InternalPlatform::Initialize(int& argc, char** argv, Poco::Util::AbstractCo
     m_InstallPath.assign(m_InstancePath);
   }
 
-  m_UserPath.assign(Poco::Path::home());
-  m_UserPath.pushDirectory("." + this->commandName());
-  Poco::File userFile(m_UserPath); 
+  m_UserPath.assign(QDesktopServices::storageLocation(QDesktopServices::DataLocation).toStdString() + '/');
+  Poco::File userFile(m_UserPath);
   
   try
   {
-    userFile.createDirectory();
+    userFile.createDirectories();
     userFile.canWrite();
   }
   catch(const Poco::IOException& e)
@@ -146,27 +146,6 @@ void InternalPlatform::Initialize(int& argc, char** argv, Poco::Util::AbstractCo
     m_UserPath.pushDirectory("." + this->commandName());
     userFile = m_UserPath;
   }
-   
-  m_BaseStatePath = m_UserPath;
-  m_BaseStatePath.pushDirectory(".metadata");
-  m_BaseStatePath.pushDirectory(".plugins");
-
-  Poco::Path logPath(m_UserPath);
-  logPath.setFileName(this->commandName() + ".log");
-  m_PlatformLogChannel = new PlatformLogChannel(logPath.toString());
-  m_PlatformLogger = &Poco::Logger::create("PlatformLogger", m_PlatformLogChannel, Poco::Message::PRIO_TRACE);
-
-  try
-  {
-    m_CodeCache = new CodeCache(this->GetConfiguration().getString(Platform::ARG_PLUGIN_CACHE));
-  }
-  catch (Poco::NotFoundException&)
-  {
-    Poco::Path cachePath(m_UserPath);
-    cachePath.pushDirectory("plugin_cache");
-    m_CodeCache = new CodeCache(cachePath.toString());
-  }
-  m_BundleLoader = new BundleLoader(m_CodeCache, *m_PlatformLogger);
 
   // Initialize the CTK Plugin Framework
   ctkProperties fwProps;
@@ -174,6 +153,10 @@ void InternalPlatform::Initialize(int& argc, char** argv, Poco::Util::AbstractCo
 #if defined(Q_CC_GNU) && ((__GNUC__ < 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ < 5)))
   fwProps.insert(ctkPluginConstants::FRAMEWORK_PLUGIN_LOAD_HINTS, QVariant::fromValue<QLibrary::LoadHints>(QLibrary::ExportExternalSymbolsHint));
 #endif
+  if (this->GetConfiguration().hasProperty(Platform::ARG_CLEAN))
+  {
+    fwProps.insert(ctkPluginConstants::FRAMEWORK_STORAGE_CLEAN, ctkPluginConstants::FRAMEWORK_STORAGE_CLEAN_ONFIRSTINIT);
+  }
   m_ctkPluginFrameworkFactory = new ctkPluginFrameworkFactory(fwProps);
   QSharedPointer<ctkPluginFramework> pfw = m_ctkPluginFrameworkFactory->getFramework();
   pfw->init();
@@ -188,9 +171,14 @@ void InternalPlatform::Initialize(int& argc, char** argv, Poco::Util::AbstractCo
       ctkPluginFrameworkLauncher::addSearchPath(pluginPath);
     }
 
+    bool forcePluginOverwrite = this->GetConfiguration().hasOption(Platform::ARG_FORCE_PLUGIN_INSTALL);
     QList<QUrl> pluginsToStart = provInfo.getPluginsToStart();
     foreach(QUrl pluginUrl, provInfo.getPluginsToInstall())
     {
+      if (forcePluginOverwrite)
+      {
+        uninstallPugin(pluginUrl, pfwContext);
+      }
       QSharedPointer<ctkPlugin> plugin = pfwContext->installPlugin(pluginUrl);
       if (pluginsToStart.contains(pluginUrl))
       {
@@ -198,6 +186,27 @@ void InternalPlatform::Initialize(int& argc, char** argv, Poco::Util::AbstractCo
       }
     }
   }
+
+  m_BaseStatePath = m_UserPath;
+  m_BaseStatePath.pushDirectory("bb-metadata");
+  m_BaseStatePath.pushDirectory("bb-plugins");
+
+  Poco::Path logPath(m_UserPath);
+  logPath.setFileName(this->commandName() + ".log");
+  m_PlatformLogChannel = new PlatformLogChannel(logPath.toString());
+  m_PlatformLogger = &Poco::Logger::create("PlatformLogger", m_PlatformLogChannel, Poco::Message::PRIO_TRACE);
+
+  try
+  {
+    m_CodeCache = new CodeCache(this->GetConfiguration().getString(Platform::ARG_PLUGIN_CACHE));
+  }
+  catch (Poco::NotFoundException&)
+  {
+    Poco::Path cachePath(m_UserPath);
+    cachePath.pushDirectory("bb-plugin_cache");
+    m_CodeCache = new CodeCache(cachePath.toString());
+  }
+  m_BundleLoader = new BundleLoader(m_CodeCache, *m_PlatformLogger);
 
   // tell the BundleLoader about the installed CTK plug-ins
   QStringList installedCTKPlugins;
@@ -287,6 +296,29 @@ void InternalPlatform::Initialize(int& argc, char** argv, Poco::Util::AbstractCo
   DebugUtil::RestoreState();
 #endif
 
+}
+
+void InternalPlatform::uninstallPugin(const QUrl& pluginUrl, ctkPluginContext* pfwContext)
+{
+  QFileInfo libInfo(pluginUrl.toLocalFile());
+  QString libName = libInfo.baseName();
+  if (libName.startsWith("lib"))
+  {
+    libName = libName.mid(3);
+  }
+  QString symbolicName = libName.replace('_', '.');
+
+  foreach(QSharedPointer<ctkPlugin> plugin, pfwContext->getPlugins())
+  {
+    if (plugin->getSymbolicName() == symbolicName &&
+        plugin->getLocation() != pluginUrl.toString())
+    {
+      BERRY_WARN << "A plug-in with the symbolic name " << symbolicName.toStdString() <<
+                    " but different location is already installed. Trying to uninstall " << plugin->getLocation().toStdString();
+      plugin->uninstall();
+      return;
+    }
+  }
 }
 
 void InternalPlatform::Launch()
@@ -433,6 +465,10 @@ void InternalPlatform::defineOptions(Poco::Util::OptionSet& options)
   Poco::Util::Option consoleLogOption(Platform::ARG_CONSOLELOG, "", "log messages to the console");
   consoleLogOption.binding(Platform::ARG_CONSOLELOG);
   options.addOption(consoleLogOption);
+
+  Poco::Util::Option forcePluginOption(Platform::ARG_FORCE_PLUGIN_INSTALL, "", "force installing plug-ins with same symbolic name");
+  forcePluginOption.binding(Platform::ARG_FORCE_PLUGIN_INSTALL);
+  options.addOption(forcePluginOption);
 
   Poco::Util::Option testPluginOption(Platform::ARG_TESTPLUGIN, "", "the plug-in to be tested");
   testPluginOption.argument("<id>").binding(Platform::ARG_TESTPLUGIN);

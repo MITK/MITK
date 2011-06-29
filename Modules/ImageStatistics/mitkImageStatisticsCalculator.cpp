@@ -485,10 +485,17 @@ void ImageStatisticsCalculator::ExtractImageAndMask( unsigned int timeStep )
 
       if(m_DoIgnorePixelValue)
       {
-        CastToItkImage( timeSliceImage, m_InternalImageMask3D );
-        m_InternalImageMask3D->FillBuffer(1);
+        if( m_InternalImage->GetDimension() == 3 )
+        {
+          CastToItkImage( timeSliceImage, m_InternalImageMask3D );
+          m_InternalImageMask3D->FillBuffer(1);
+        }
+        if( m_InternalImage->GetDimension() == 2 )
+        {
+          CastToItkImage( timeSliceImage, m_InternalImageMask2D );
+          m_InternalImageMask2D->FillBuffer(1);
+        }
       }
-
       break;
     }
 

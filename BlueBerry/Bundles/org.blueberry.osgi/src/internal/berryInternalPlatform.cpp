@@ -171,6 +171,10 @@ void InternalPlatform::Initialize(int& argc, char** argv, Poco::Util::AbstractCo
   // Initialize the CTK Plugin Framework
   ctkProperties fwProps;
   fwProps.insert(ctkPluginConstants::FRAMEWORK_STORAGE, QString::fromStdString(userFile.path()));
+  if (this->GetConfiguration().hasProperty(Platform::ARG_CLEAN))
+  {
+    fwProps.insert(ctkPluginConstants::FRAMEWORK_STORAGE_CLEAN, ctkPluginConstants::FRAMEWORK_STORAGE_CLEAN_ONFIRSTINIT);
+  }
   m_ctkPluginFrameworkFactory = new ctkPluginFrameworkFactory(fwProps);
   QSharedPointer<ctkPluginFramework> pfw = m_ctkPluginFrameworkFactory->getFramework();
   pfw->init();

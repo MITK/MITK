@@ -110,6 +110,10 @@ int mitkVirtualTrackingDeviceTest(int /* argc */, char* /*argv*/[])
   unsigned long tmpMTime = tracker->GetToolByName("while Running")->GetMTime();
   itksys::SystemTools::Delay(100); // wait for tracking thread to start generating positions
   tracker->GetToolByName("while Running")->GetPosition(posAfter0);
+  MITK_INFO << std::setprecision(16) << "Value of posBefore0 " << posBefore0;
+  MITK_INFO << std::setprecision(16) << "Value of posAfter0 " << posAfter0;
+  MITK_INFO << std::setprecision(16) << "tmpTime " << tmpMTime;
+  MITK_INFO << std::setprecision(16) << "current time " << tracker->GetToolByName("while Running")->GetMTime();
   if(tracker->GetToolByName("while Running")->GetMTime() == tmpMTime) //tool not modified yet
   {
     //hence the tool was not modified, the position has to be equal

@@ -90,6 +90,8 @@ private:
   void defineOptions(Poco::Util::OptionSet& options);
   int main(const std::vector<std::string>& args);
 
+  void uninstallPugin(const QUrl& pluginUrl, ctkPluginContext* pfwContext);
+
 public:
   virtual ~InternalPlatform();
 

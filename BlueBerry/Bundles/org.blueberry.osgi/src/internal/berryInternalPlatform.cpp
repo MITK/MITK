@@ -185,9 +185,14 @@ void InternalPlatform::Initialize(int& argc, char** argv, Poco::Util::AbstractCo
       ctkPluginFrameworkLauncher::addSearchPath(pluginPath);
     }
 
+    bool forcePluginOverwrite = this->GetConfiguration().hasOption(Platform::ARG_FORCE_PLUGIN_INSTALL);
     QList<QUrl> pluginsToStart = provInfo.getPluginsToStart();
     foreach(QUrl pluginUrl, provInfo.getPluginsToInstall())
     {
+      if (forcePluginOverwrite)
+      {
+        uninstallPugin(pluginUrl, pfwContext);
+      }
       QSharedPointer<ctkPlugin> plugin = pfwContext->installPlugin(pluginUrl);
       if (pluginsToStart.contains(pluginUrl))
       {
@@ -284,6 +289,29 @@ void InternalPlatform::Initialize(int& argc, char** argv, Poco::Util::AbstractCo
   DebugUtil::RestoreState();
 #endif
 
+}
+
+void InternalPlatform::uninstallPugin(const QUrl& pluginUrl, ctkPluginContext* pfwContext)
+{
+  QFileInfo libInfo(pluginUrl.toLocalFile());
+  QString libName = libInfo.baseName();
+  if (libName.startsWith("lib"))
+  {
+    libName = libName.mid(3);
+  }
+  QString symbolicName = libName.replace('_', '.');
+
+  foreach(QSharedPointer<ctkPlugin> plugin, pfwContext->getPlugins())
+  {
+    if (plugin->getSymbolicName() == symbolicName &&
+        plugin->getLocation() != pluginUrl.toString())
+    {
+      BERRY_WARN << "A plug-in with the symbolic name " << symbolicName.toStdString() <<
+                    " but different location is already installed. Trying to uninstall " << plugin->getLocation().toStdString();
+      plugin->uninstall();
+      return;
+    }
+  }
 }
 
 void InternalPlatform::Launch()
@@ -430,6 +458,10 @@ void InternalPlatform::defineOptions(Poco::Util::OptionSet& options)
   Poco::Util::Option consoleLogOption(Platform::ARG_CONSOLELOG, "", "log messages to the console");
   consoleLogOption.binding(Platform::ARG_CONSOLELOG);
   options.addOption(consoleLogOption);
+
+  Poco::Util::Option forcePluginOption(Platform::ARG_FORCE_PLUGIN_INSTALL, "", "force installing plug-ins with same symbolic name");
+  forcePluginOption.binding(Platform::ARG_FORCE_PLUGIN_INSTALL);
+  options.addOption(forcePluginOption);
 
   Poco::Util::Option testPluginOption(Platform::ARG_TESTPLUGIN, "", "the plug-in to be tested");
   testPluginOption.argument("<id>").binding(Platform::ARG_TESTPLUGIN);

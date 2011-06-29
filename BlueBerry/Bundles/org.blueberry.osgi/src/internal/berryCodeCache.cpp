@@ -47,12 +47,15 @@ CodeCache::~CodeCache()
 void
 CodeCache::Clear()
 {
-  BERRY_INFO(InternalPlatform::GetInstance()->ConsoleLog()) << "Clearing code cache\n";
-  std::vector<Poco::File> files;
-  m_CachePath.list(files);
-  for (std::vector<Poco::File>::iterator iter = files.begin(); iter != files.end(); ++iter)
+  if (m_CachePath.exists())
   {
-    iter->remove(true);
+    BERRY_INFO(InternalPlatform::GetInstance()->ConsoleLog()) << "Clearing code cache\n";
+    std::vector<Poco::File> files;
+    m_CachePath.list(files);
+    for (std::vector<Poco::File>::iterator iter = files.begin(); iter != files.end(); ++iter)
+    {
+      iter->remove(true);
+    }
   }
 }
 

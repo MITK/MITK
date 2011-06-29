@@ -28,7 +28,7 @@ org_blueberry_core_runtime_Activator::org_blueberry_core_runtime_Activator()
 
 void org_blueberry_core_runtime_Activator::start(ctkPluginContext* context)
 {
-  m_PreferencesService = new PreferencesService();
+  m_PreferencesService = new PreferencesService(context->getDataFile("").absolutePath().toStdString());
   m_PrefServiceReg = context->registerService<IPreferencesService>(m_PreferencesService.GetPointer());
 }
 

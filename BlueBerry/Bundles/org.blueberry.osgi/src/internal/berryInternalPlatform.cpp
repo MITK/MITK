@@ -131,7 +131,7 @@ void InternalPlatform::Initialize(int& argc, char** argv, Poco::Util::AbstractCo
     m_InstallPath.assign(m_InstancePath);
   }
 
-  m_UserPath.assign(QDesktopServices::storageLocation(QDesktopServices::DataLocation).toStdString());
+  m_UserPath.assign(QDesktopServices::storageLocation(QDesktopServices::DataLocation).toStdString() + '/');
   Poco::File userFile(m_UserPath);
   
   try
@@ -146,27 +146,6 @@ void InternalPlatform::Initialize(int& argc, char** argv, Poco::Util::AbstractCo
     m_UserPath.pushDirectory("." + this->commandName());
     userFile = m_UserPath;
   }
-   
-  m_BaseStatePath = m_UserPath;
-  m_BaseStatePath.pushDirectory(".metadata");
-  m_BaseStatePath.pushDirectory(".plugins");
-
-  Poco::Path logPath(m_UserPath);
-  logPath.setFileName(this->commandName() + ".log");
-  m_PlatformLogChannel = new PlatformLogChannel(logPath.toString());
-  m_PlatformLogger = &Poco::Logger::create("PlatformLogger", m_PlatformLogChannel, Poco::Message::PRIO_TRACE);
-
-  try
-  {
-    m_CodeCache = new CodeCache(this->GetConfiguration().getString(Platform::ARG_PLUGIN_CACHE));
-  }
-  catch (Poco::NotFoundException&)
-  {
-    Poco::Path cachePath(m_UserPath);
-    cachePath.pushDirectory("plugin_cache");
-    m_CodeCache = new CodeCache(cachePath.toString());
-  }
-  m_BundleLoader = new BundleLoader(m_CodeCache, *m_PlatformLogger);
 
   // Initialize the CTK Plugin Framework
   ctkProperties fwProps;
@@ -204,6 +183,27 @@ void InternalPlatform::Initialize(int& argc, char** argv, Poco::Util::AbstractCo
       }
     }
   }
+
+  m_BaseStatePath = m_UserPath;
+  m_BaseStatePath.pushDirectory("bb-metadata");
+  m_BaseStatePath.pushDirectory("bb-plugins");
+
+  Poco::Path logPath(m_UserPath);
+  logPath.setFileName(this->commandName() + ".log");
+  m_PlatformLogChannel = new PlatformLogChannel(logPath.toString());
+  m_PlatformLogger = &Poco::Logger::create("PlatformLogger", m_PlatformLogChannel, Poco::Message::PRIO_TRACE);
+
+  try
+  {
+    m_CodeCache = new CodeCache(this->GetConfiguration().getString(Platform::ARG_PLUGIN_CACHE));
+  }
+  catch (Poco::NotFoundException&)
+  {
+    Poco::Path cachePath(m_UserPath);
+    cachePath.pushDirectory("bb-plugin_cache");
+    m_CodeCache = new CodeCache(cachePath.toString());
+  }
+  m_BundleLoader = new BundleLoader(m_CodeCache, *m_PlatformLogger);
 
   // tell the BundleLoader about the installed CTK plug-ins
   QStringList installedCTKPlugins;

@@ -110,6 +110,7 @@ int mitkVirtualTrackingDeviceTest(int /* argc */, char* /*argv*/[])
   unsigned long tmpMTime = tracker->GetToolByName("while Running")->GetMTime();
   itksys::SystemTools::Delay(100); // wait for tracking thread to start generating positions
   tracker->GetToolByName("while Running")->GetPosition(posAfter0);
+  MITK_INFO << "If this test fails, please reopen bug 8033 and commit this output: ";
   MITK_INFO << std::setprecision(16) << "Value of posBefore0 " << posBefore0;
   MITK_INFO << std::setprecision(16) << "Value of posAfter0 " << posAfter0;
   MITK_INFO << std::setprecision(16) << "tmpTime " << tmpMTime;
@@ -117,11 +118,11 @@ int mitkVirtualTrackingDeviceTest(int /* argc */, char* /*argv*/[])
   if(tracker->GetToolByName("while Running")->GetMTime() == tmpMTime) //tool not modified yet
   {
     //hence the tool was not modified, the position has to be equal
-      MITK_TEST_CONDITION( mitk::Equal(posBefore0, posAfter0) == true, "Testing if the position values for the 'while running' tool remain the same.");
+    MITK_TEST_CONDITION( mitk::Equal(posBefore0, posAfter0) == true, "Testing if the position values for the 'while running' tool remain the same.");
   }
   else //tool was modified => position should have changed
   {
-      MITK_TEST_CONDITION( mitk::Equal(posBefore0, posAfter0) == false, "Testing if tracking is producing new position values for 'while running' tool.");
+    MITK_TEST_CONDITION( mitk::Equal(posBefore0, posAfter0) == false, "Testing if tracking is producing new position values for 'while running' tool.");
   }
 
   // always end with this!

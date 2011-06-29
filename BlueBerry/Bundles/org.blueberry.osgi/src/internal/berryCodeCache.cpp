@@ -34,7 +34,7 @@ CodeCache::CodeCache(const std::string& path) : m_CachePath(path)
   BERRY_INFO(InternalPlatform::GetInstance()->ConsoleLog()) << "Creating CodeCache with path: " << path << std::endl;
   if (!m_CachePath.exists())
   {
-    m_CachePath.createDirectory();
+    m_CachePath.createDirectories();
   }
 
 }

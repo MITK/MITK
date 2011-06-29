@@ -47,6 +47,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "berryBundleDirectory.h"
 #include "berryProvisioningInfo.h"
 
+#include <QDesktopServices>
 #include <QDebug>
 
 namespace berry {
@@ -130,13 +131,12 @@ void InternalPlatform::Initialize(int& argc, char** argv, Poco::Util::AbstractCo
     m_InstallPath.assign(m_InstancePath);
   }
 
-  m_UserPath.assign(Poco::Path::home());
-  m_UserPath.pushDirectory("." + this->commandName());
-  Poco::File userFile(m_UserPath); 
+  m_UserPath.assign(QDesktopServices::storageLocation(QDesktopServices::DataLocation).toStdString());
+  Poco::File userFile(m_UserPath);
   
   try
   {
-    userFile.createDirectory();
+    userFile.createDirectories();
     userFile.canWrite();
   }
   catch(const Poco::IOException& e)

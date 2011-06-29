@@ -36,6 +36,7 @@ namespace mitk {
     mitkClassMacro(BaseDataTestImplementation, BaseData);
 
     itkNewMacro(Self);
+    mitkCloneMacro(BaseDataTestImplementation);
 
     virtual void InitializeTimeSlicedGeometry( unsigned int timeSteps /* = 1 */ )
     {

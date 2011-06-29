@@ -69,6 +69,8 @@ public:
 
   itkNewMacro(Self);
 
+  mitkCloneMacro(Image);
+
   /** Smart Pointer type to a ImageDataItem. */
   typedef itk::SmartPointerForwardReference<ImageDataItem> ImageDataItemPointer;
 
@@ -581,6 +583,8 @@ protected:
   virtual ImageDataItemPointer AllocateChannelData(int n = 0, void *data = NULL, ImportMemoryManagementType importMemoryManagement = CopyMemory);
 
   Image();
+
+  Image(const Image &other);
 
   virtual ~Image();
 

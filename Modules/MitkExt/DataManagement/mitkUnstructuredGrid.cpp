@@ -101,6 +101,22 @@ mitk::UnstructuredGrid::UnstructuredGrid() : m_CalculateBoundingBox( false )
   this->InitializeEmpty();
 }
 
+mitk::UnstructuredGrid::UnstructuredGrid(const mitk::UnstructuredGrid & other) : 
+m_CalculateBoundingBox( other.m_CalculateBoundingBox ) 
+{
+  if(!other.m_Initialized)
+  {
+    this->InitializeEmpty();
+  }
+  else
+  {
+    m_GridSeries = other.m_GridSeries;
+    m_Initialized = other.m_Initialized;
+  }
+  this->SetRequestedRegion( const_cast<mitk::UnstructuredGrid*>(&other) );
+  m_LargestPossibleRegion = other.m_LargestPossibleRegion;
+}
+
 mitk::UnstructuredGrid::~UnstructuredGrid()
 {
   this->ClearData();

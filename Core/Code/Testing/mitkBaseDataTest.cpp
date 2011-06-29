@@ -27,7 +27,7 @@ int mitkBaseDataTest(int /*argc*/, char* /*argv*/[])
   MITK_TEST_BEGIN("BaseData")
 
   //Create a BaseData implementation
-  std::cout << "Creating a base data instance..." << std::endl;
+  MITK_INFO << "Creating a base data instance...";
   mitk::BaseDataTestImplementation::Pointer baseDataImpl = mitk::BaseDataTestImplementation::New();
 
   MITK_TEST_CONDITION_REQUIRED(baseDataImpl.IsNotNull(),"Testing instantiation");
@@ -35,9 +35,13 @@ int mitkBaseDataTest(int /*argc*/, char* /*argv*/[])
   MITK_TEST_CONDITION(baseDataImpl->IsEmpty(), "BaseDataTestImplementation is initialized and empty");
   MITK_TEST_CONDITION(baseDataImpl->GetExternalReferenceCount()== baseDataImpl->GetReferenceCount(), "Checks external reference count!");
   
+  mitk::BaseDataTestImplementation::Pointer cloneBaseData = baseDataImpl->Clone();
+  MITK_TEST_CONDITION_REQUIRED(cloneBaseData.IsNotNull(),"Testing instantiation of base data clone");
+  MITK_TEST_CONDITION(cloneBaseData->IsInitialized(), "Clone of BaseDataTestImplementation is initialized");
+  MITK_TEST_CONDITION(cloneBaseData->IsEmpty(), "Clone of BaseDataTestImplementation is initialized and empty");
+  MITK_TEST_CONDITION(cloneBaseData->GetExternalReferenceCount()== cloneBaseData->GetReferenceCount(), "Checks external reference count of base data clone!");
 
-
-  std::cout << "Testing setter and getter for geometries..." << std::endl;
+  MITK_INFO << "Testing setter and getter for geometries...";
 
   //test method GetTimeSlicedGeometry()
   MITK_TEST_CONDITION(baseDataImpl->GetTimeSlicedGeometry(), "Testing creation of TimeSlicedGeometry");
@@ -50,7 +54,6 @@ int mitkBaseDataTest(int /*argc*/, char* /*argv*/[])
   mitk::TimeSlicedGeometry::Pointer geo2 = mitk::TimeSlicedGeometry::New();
   baseDataImpl->SetGeometry(geo2);
   baseDataImpl->InitializeTimeSlicedGeometry(2);
-
   MITK_TEST_CONDITION(baseDataImpl->GetTimeSlicedGeometry() == geo2, "Correct Reinit of TimeslicedGeometry");
   
   //test method GetGeometry(int timeStep)  
@@ -77,6 +80,9 @@ int mitkBaseDataTest(int /*argc*/, char* /*argv*/[])
   geo3->SetOrigin(p3d);
 
   MITK_TEST_CONDITION(baseDataImpl->GetGeometry(1)->GetOrigin() == geo3->GetOrigin(), "Testing Origin set");
+  
+  cloneBaseData = baseDataImpl->Clone();
+  MITK_TEST_CONDITION(cloneBaseData->GetGeometry(1)->GetOrigin() == geo3->GetOrigin(), "Testing origin set in clone!");
 
   MITK_TEST_CONDITION(!baseDataImpl->IsEmpty(1), "Is not empty before clear()!");
   baseDataImpl->Clear();
@@ -85,6 +91,9 @@ int mitkBaseDataTest(int /*argc*/, char* /*argv*/[])
   baseDataImpl->SetProperty("property38", mitk::StringProperty::New("testproperty"));
   //baseDataImpl->SetProperty("visibility", mitk::BoolProperty::New());
   MITK_TEST_CONDITION(baseDataImpl->GetProperty("property38")->GetValueAsString() == "testproperty","Check if base property is set correctly!");
+  
+  cloneBaseData = baseDataImpl->Clone();
+  MITK_TEST_CONDITION(cloneBaseData->GetProperty("property38")->GetValueAsString() == "testproperty", "Testing origin set in clone!");
 
   //test method Set-/GetPropertyList
   mitk::PropertyList::Pointer propertyList = mitk::PropertyList::New();
@@ -102,7 +111,7 @@ int mitkBaseDataTest(int /*argc*/, char* /*argv*/[])
   //Test method CopyInformation()
   mitk::BaseDataTestImplementation::Pointer newBaseData =  mitk::BaseDataTestImplementation::New();
   newBaseData->CopyInformation(baseDataImpl);
-  MITK_TEST_CONDITION(  newBaseData->GetTimeSlicedGeometry()->GetTimeSteps() == 5, "Check copying of of Basedata Data Object!");
- 
+  MITK_TEST_CONDITION_REQUIRED(  newBaseData->GetTimeSlicedGeometry()->GetTimeSteps() == 5, "Check copying of of Basedata Data Object!");
+  
   MITK_TEST_END()
 }

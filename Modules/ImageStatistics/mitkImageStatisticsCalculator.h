@@ -252,7 +252,7 @@ protected:
   void MaskedStatisticsProgressUpdate();
 
 
-
+  /** m_Image contains the input image (e.g. 2D, 3D, 3D+t)*/
   mitk::Image::ConstPointer m_Image;
 
   mitk::Image::ConstPointer m_ImageMask;
@@ -275,7 +275,7 @@ protected:
   unsigned int m_MaskingMode;
   bool m_MaskingModeChanged;
 
-  
+  /** m_InternalImage contains a image volume at one time step (e.g. 2D, 3D)*/
   mitk::Image::ConstPointer m_InternalImage;
   MaskImage3DType::Pointer m_InternalImageMask3D;
   MaskImage2DType::Pointer m_InternalImageMask2D;

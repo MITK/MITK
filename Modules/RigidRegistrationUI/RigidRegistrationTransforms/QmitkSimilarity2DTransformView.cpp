@@ -17,6 +17,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "QmitkSimilarity2DTransformView.h"
 #include "mitkImageAccessByItk.h"
+#include <mitkImageCast.h>
 #include <itkSimilarity2DTransform.h>
 #include <itkCenteredTransformInitializer.h>
 #include <QValidator>

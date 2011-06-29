@@ -32,6 +32,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkRenderingManager.h"
 
 #include "mitkImageCast.h"
+#include "mitkImageAccessByItk.h"
 #include "mitkImageTimeSelector.h"
 #include <itkImageRegionIterator.h>
 #include <itkBinaryThresholdImageFilter.h>

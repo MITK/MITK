@@ -15,11 +15,20 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
+#ifndef MITKIMAGECASTER_H
+#define MITKIMAGECASTER_H
+
 #include <mitkImageCast.h>
 #include <itkImage.h>
 #include <itkCastImageFilter.h>
 #include <vtkRenderWindow.h>
 #include <mitkSurface.h>
+
+#include <mitkPPSeqForEach.h>
+
+#define DeclareMitkImageCasterMethods(r, data, type) \
+  static void CastToItkImage(const mitk::Image*, itk::SmartPointer<itk::Image<MITK_PP_TUPLE_REM(2)type> >&); \
+  static void CastToMitkImage(const itk::Image<MITK_PP_TUPLE_REM(2)type>*, itk::SmartPointer<mitk::Image>&);
 
 namespace mitk
 {
@@ -31,43 +40,11 @@ namespace mitk
   class MITK_CORE_EXPORT ImageCaster
   {
   public:
-      // short
-      static void CastToItkImage(const mitk::Image*, itk::SmartPointer<itk::Image<short, 2> >&);
-      static void CastToMitkImage(const itk::Image<short, 2>*, itk::SmartPointer<mitk::Image>&);
-      static void CastToItkImage(const mitk::Image*, itk::SmartPointer<itk::Image<short, 3> >&);
-      static void CastToMitkImage(const itk::Image<short, 3>*, itk::SmartPointer<mitk::Image>&);
 
-      // unsigned short
-      static void CastToItkImage(const mitk::Image*, itk::SmartPointer<itk::Image<unsigned short, 2> >&);
-      static void CastToMitkImage(const itk::Image<unsigned short, 2>*, itk::SmartPointer<mitk::Image>&);
-      static void CastToItkImage(const mitk::Image*, itk::SmartPointer<itk::Image<unsigned short, 3> >&);
-      static void CastToMitkImage(const itk::Image<unsigned short, 3>*, itk::SmartPointer<mitk::Image>&);
+    MITK_PP_SEQ_FOR_EACH(DeclareMitkImageCasterMethods, _, MITK_ACCESSBYITK_TYPES_DIMN_SEQ(2))
+    MITK_PP_SEQ_FOR_EACH(DeclareMitkImageCasterMethods, _, MITK_ACCESSBYITK_TYPES_DIMN_SEQ(3))
 
-      // char
-      static void CastToItkImage(const mitk::Image*, itk::SmartPointer<itk::Image<char, 2> >&);
-      static void CastToMitkImage(const itk::Image<char, 2>*, itk::SmartPointer<mitk::Image>&);
-      static void CastToItkImage(const mitk::Image*, itk::SmartPointer<itk::Image<char, 3> >&);
-      static void CastToMitkImage(const itk::Image<char, 3>*, itk::SmartPointer<mitk::Image>&);
-
-      // unsigned char
-      static void CastToItkImage(const mitk::Image*, itk::SmartPointer<itk::Image<unsigned char, 2> >&);
-      static void CastToMitkImage(const itk::Image<unsigned char, 2>*, itk::SmartPointer<mitk::Image>&);
-      static void CastToItkImage(const mitk::Image*, itk::SmartPointer<itk::Image<unsigned char, 3> >&);
-      static void CastToMitkImage(const itk::Image<unsigned char, 3>*, itk::SmartPointer<mitk::Image>&);
-
-      static void CastToItkImage(const mitk::Image*, itk::SmartPointer<itk::Image<int, 3> >&);
-      static void CastToMitkImage(const itk::Image<int, 3>*, itk::SmartPointer<mitk::Image>&);
-
-      static void CastToItkImage(const mitk::Image*, itk::SmartPointer<itk::Image<unsigned int, 3> >&);
-      static void CastToMitkImage(const itk::Image<unsigned int, 3>*, itk::SmartPointer<mitk::Image>&);
-
-      static void CastToItkImage(const mitk::Image*, itk::SmartPointer<itk::Image<float, 3> >&);
-      static void CastToMitkImage(const itk::Image<float, 3>*, itk::SmartPointer<mitk::Image>&);
-
-      static void CastToItkImage(const mitk::Image*, itk::SmartPointer<itk::Image<double, 3> >&);
-      static void CastToMitkImage(const itk::Image<double, 3>*, itk::SmartPointer<mitk::Image>&);
-
-      static void CastBaseData(mitk::BaseData* const, itk::SmartPointer<mitk::Image>&);
+    static void CastBaseData(mitk::BaseData* const, itk::SmartPointer<mitk::Image>&);
 
   };
 
@@ -86,3 +63,5 @@ namespace mitk
     static vtkRenderer* m_3DRenderer;
   };
 }
+
+#endif // MITKIMAGECASTER_H

@@ -18,6 +18,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkImageStatisticsCalculator.h"
 #include "mitkImageAccessByItk.h"
+#include "mitkImageCast.h"
 #include "mitkExtractImageFilter.h"
 
 #include <itkScalarImageToHistogramGenerator.h>

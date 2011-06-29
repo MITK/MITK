@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 
 #include "mitkImageCast.h"
+#include "mitkImageAccessByItk.h"
 #include <itkImageSliceConstIteratorWithIndex.h>
 #include <itkImageRegionConstIterator.h>
 
@@ -111,7 +112,8 @@ static void ItkImageSwitch( itk::Image<TPixel,VImageDimension>* itkImage )
 {
   const std::type_info& typeId=*(m_SliceImage->GetPixelType().GetTypeId());
 
-  myMITKOverwriteSliceImageFilterAccessAllTypesByItk( m_SliceImage, ItkImageCompare, 2, itkImage );
+  //myMITKOverwriteSliceImageFilterAccessAllTypesByItk( m_SliceImage, ItkImageCompare, 2, itkImage );
+  AccessFixedDimensionByItk_1(m_SliceImage, ItkImageCompare, 2, itkImage)
 }
 
 

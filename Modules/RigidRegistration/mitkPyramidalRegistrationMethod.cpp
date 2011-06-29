@@ -16,7 +16,7 @@ PURPOSE.  See the above copyright notices for more information.
 =========================================================================*/
 
 #include "mitkPyramidalRegistrationMethod.h"
-
+#include "mitkPyramidalRegistrationMethodAccessFunctor.h"
 
 namespace mitk {
 
@@ -53,7 +53,7 @@ namespace mitk {
   {
     if (this->GetInput())
     {
-      AccessByItk(this->GetInput(), GenerateData2);
+      PyramidalRegistrationMethodAccessFunctor()(this->GetInput(), this);
     }
   }
 

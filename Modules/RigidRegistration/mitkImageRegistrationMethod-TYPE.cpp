@@ -15,6 +15,10 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
-#include <mitkImageRegistrationMethod.txx>
+#include <mitkImageRegistrationMethodAccessFunctor.txx>
+#include <mitkInstantiateAccessFunctions.h>
 
-InstantiateAccessFunctionForFixedPixelType( mitk::ImageRegistrationMethod::GenerateData2, @TYPE@);
+#define InstantiateAccessFunction_RegistrationAccessItkImage(pixelType, dim) \
+  template void mitk::ImageRegistrationMethodAccessFunctor::AccessItkImage(itk::Image<pixelType, dim>* itkImage1, mitk::ImageRegistrationMethod* method);
+
+InstantiateAccessFunctionForFixedPixelType(RegistrationAccessItkImage, (@TYPE@))

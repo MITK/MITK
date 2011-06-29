@@ -1,7 +1,56 @@
 SET(H_FILES
+  Algorithms/itkImportMitkImageContainer.h
+  Algorithms/itkImportMitkImageContainer.txx
   Algorithms/itkLocalVariationImageFilter.h
+  Algorithms/itkLocalVariationImageFilter.txx
+  Algorithms/itkMITKScalarImageToHistogramGenerator.h
+  Algorithms/itkMITKScalarImageToHistogramGenerator.txx
   Algorithms/itkTotalVariationDenoisingImageFilter.h
+  Algorithms/itkTotalVariationDenoisingImageFilter.txx
   Algorithms/itkTotalVariationSingleIterationImageFilter.h
+  Algorithms/itkTotalVariationSingleIterationImageFilter.txx
+
+  Algorithms/mitkImageAccessByItk.h
+  Algorithms/mitkImageCast.h
+  Algorithms/mitkImageToItk.h
+  Algorithms/mitkImageToItk.txx
+  Algorithms/mitkInstantiateAccessFunctions.h
+  Algorithms/mitkITKImageImport.h
+  Algorithms/mitkITKImageImport.txx
+  Algorithms/mitkPixelTypeList.h
+
+  # Preprocessor macros taken from Boost
+  Algorithms/mitkPPArithmeticDec.h
+  Algorithms/mitkPPArgCount.h
+  Algorithms/mitkPPCat.h
+  Algorithms/mitkPPConfig.h
+  Algorithms/mitkPPControlExprIIf.h
+  Algorithms/mitkPPControlIf.h
+  Algorithms/mitkPPControlIIf.h
+  Algorithms/mitkPPDebugError.h
+  Algorithms/mitkPPDetailAutoRec.h
+  Algorithms/mitkPPDetailDMCAutoRec.h
+  Algorithms/mitkPPExpand.h
+  Algorithms/mitkPPFacilitiesEmpty.h
+  Algorithms/mitkPPFacilitiesExpand.h
+  Algorithms/mitkPPLogicalBool.h
+  Algorithms/mitkPPRepetitionDetailDMCFor.h
+  Algorithms/mitkPPRepetitionDetailEDGFor.h
+  Algorithms/mitkPPRepetitionDetailFor.h
+  Algorithms/mitkPPRepetitionDetailMSVCFor.h
+  Algorithms/mitkPPRepetitionFor.h
+  Algorithms/mitkPPSeqElem.h
+  Algorithms/mitkPPSeqForEach.h
+  Algorithms/mitkPPSeqForEachProduct.h
+  Algorithms/mitkPPSeq.h
+  Algorithms/mitkPPSeqEnum.h
+  Algorithms/mitkPPSeqSize.h
+  Algorithms/mitkPPSeqToTuple.h
+  Algorithms/mitkPPStringize.h
+  Algorithms/mitkPPTupleEat.h
+  Algorithms/mitkPPTupleElem.h
+  Algorithms/mitkPPTupleRem.h
+
   DataManagement/mitkCommon.h
   Interactions/mitkEventMapperAddOn.h
 )

@@ -15,6 +15,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
 
+#include <mitkImageCast.h>
+
 #include "itkImageFileWriter.h"
 #include "itkWarpImageFilter.h"
 #include "itkInverseDeformationFieldImageFilter.h"

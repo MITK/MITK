@@ -17,6 +17,7 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "QmitkVersorTransformView.h"
 #include "mitkImageAccessByItk.h"
+#include <mitkImageCast.h>
 #include <itkVersorTransform.h>
 #include <itkCenteredTransformInitializer.h>
 #include <QValidator>

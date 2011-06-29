@@ -114,10 +114,50 @@ mark_as_advanced(MITK_INSTALL_RPATH_RELATIVE
                  MITK_USE_CTK
                  MITK_USE_DCMTK
                  )
-                 
+
+set(MITK_ACCESSBYITK_INTEGRAL_PIXEL_TYPES
+    "int, unsigned int, short, unsigned short, char, unsigned char"
+    CACHE STRING "List of integral pixel types used in AccessByItk and InstantiateAccessFunction macros")
+
+set(MITK_ACCESSBYITK_FLOATING_PIXEL_TYPES
+    "double, float"
+    CACHE STRING "List of floating pixel types used in AccessByItk and InstantiateAccessFunction macros")
+
+set(MITK_ACCESSBYITK_COMPOSITE_PIXEL_TYPES
+    ""
+    CACHE STRING "List of composite pixel types used in AccessByItk and InstantiateAccessFunction macros")
+
+set(MITK_ACCESSBYITK_DIMENSIONS
+    "2,3"
+    CACHE STRING "List of dimensions used in AccessByItk and InstantiateAccessFunction macros")
+
+mark_as_advanced(MITK_ACCESSBYITK_INTEGRAL_PIXEL_TYPES
+                 MITK_ACCESSBYITK_FLOATING_PIXEL_TYPES
+                 MITK_ACCESSBYITK_COMPOSITE_PIXEL_TYPES
+                 MITK_ACCESSBYITK_DIMENSIONS
+                )
+
 # consistency checks
 if(MITK_USE_BLUEBERRY AND NOT MITK_USE_CTK)
   MESSAGE(FATAL_ERROR "BlueBerry depends on CTK. Please set MITK_USE_CTK to ON.")
+endif()
+
+if(NOT MITK_ACCESSBYITK_INTEGRAL_PIXEL_TYPES)
+  set(MITK_ACCESSBYITK_INTEGRAL_PIXEL_TYPES
+      "int, unsigned int, short, unsigned short, char, unsigned char"
+      CACHE STRING "List of integral pixel types used in AccessByItk and InstantiateAccessFunction macros" FORCE)
+endif()
+
+if(NOT MITK_ACCESSBYITK_FLOATING_PIXEL_TYPES)
+  set(MITK_ACCESSBYITK_FLOATING_PIXEL_TYPES
+      "double, float"
+      CACHE STRING "List of floating pixel types used in AccessByItk and InstantiateAccessFunction macros" FORCE)
+endif()
+
+if(NOT MITK_ACCESSBYITK_DIMENSIONS)
+  set(MITK_ACCESSBYITK_DIMENSIONS
+      "2,3"
+      CACHE STRING "List of dimensions used in AccessByItk and InstantiateAccessFunction macros")
 endif()
 
 #-----------------------------------------------------------------------------

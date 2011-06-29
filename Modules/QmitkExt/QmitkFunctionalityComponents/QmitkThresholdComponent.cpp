@@ -36,6 +36,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include <qcheckbox.h>
 #include <QIntValidator>
 
+#include <mitkImageCast.h>
 #include <mitkImageAccessByItk.h>
 //#include <mitkIpPicTypeMultiplex.h>
 #include <itkImageConstIteratorWithIndex.h>

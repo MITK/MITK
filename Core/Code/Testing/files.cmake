@@ -1,6 +1,7 @@
 
 # tests with no extra command line parameter
 SET(MODULE_TESTS
+  mitkAccessByItkTest.cpp
   mitkCoreObjectFactoryTest.cpp
   mitkPointSetWriterTest.cpp
   mitkMaterialTest.cpp
@@ -17,6 +18,7 @@ SET(MODULE_TESTS
   mitkImageGeneratorTest.cpp
   mitkBaseDataTest.cpp
   #mitkImageToItkTest.cpp
+  mitkInstantiateAccessFunctionTest.cpp
   mitkInteractorTest.cpp
   mitkITKThreadingTest.cpp
   # mitkLevelWindowManagerTest.cpp

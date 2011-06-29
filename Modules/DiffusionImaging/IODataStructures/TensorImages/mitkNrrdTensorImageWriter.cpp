@@ -20,6 +20,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "itkMetaDataObject.h"
 #include "itkNrrdImageIO.h"
 #include "itkImageFileWriter.h"
+#include "itkDiffusionTensor3D.h"
 #include "mitkImageCast.h"
 
 

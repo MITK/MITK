@@ -17,6 +17,8 @@ PURPOSE.  See the above copyright notices for more information.
 
 #include "mitkHistogramMatching.h"
 
+#include <mitkImageCast.h>
+
 namespace mitk {
 
   HistogramMatching::HistogramMatching()

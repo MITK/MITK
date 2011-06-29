@@ -104,7 +104,7 @@ void QmitkSliderLevelWindowWidget::OnPropertyModified(const itk::EventObject& )
   }
 }
 
-void QmitkSliderLevelWindowWidget::paintEvent( QPaintEvent* itkNotUsed(e) ) 
+void QmitkSliderLevelWindowWidget::paintEvent( QPaintEvent* itkNotUsed(e) )
 {
   QPixmap pm(width(), height());
   //pm.fill( static_cast<QWidget*>(parent())->paletteBackgroundColor() );
@@ -114,7 +114,7 @@ void QmitkSliderLevelWindowWidget::paintEvent( QPaintEvent* itkNotUsed(e) )
   painter.setFont( m_Font );
   //painter.setPen(static_cast<QWidget*>(parent())->paletteForegroundColor());
   painter.setPen(this->palette().color(this->foregroundRole()));
-  
+
   QColor c(93,144,169);
   QColor cl = c.light();
   QColor cd = c.dark();
@@ -126,7 +126,7 @@ void QmitkSliderLevelWindowWidget::paintEvent( QPaintEvent* itkNotUsed(e) )
 
   if ( mr < 1 )
     mr = 1;
- 
+
   float fact = (float) m_MoveHeight / mr;
 
   //begin draw scale
@@ -147,20 +147,23 @@ void QmitkSliderLevelWindowWidget::paintEvent( QPaintEvent* itkNotUsed(e) )
     bool enoughSpace = false;
     bool enoughSpace2 = false;
 
-    for(int i = m_MoveHeight + (int)(minRange*fact); i < m_MoveHeight;)
+    double dStepSize = pow10(floor(log10(mr/100))+1);
+
+    for(int i = m_MoveHeight + (int)(minRange*fact); i < m_MoveHeight;)//negative
     {
-      if (-count*20 < minRange)
+      if (-count*dStepSize < minRange)
         break;
-      yValue = m_MoveHeight + (int)((minRange + count*20)*fact);
-      s = QString::number(-count*20);
-      if (count % k && ((20*fact) > 2.5))
+      yValue = m_MoveHeight + (int)((minRange + count*dStepSize)*fact);
+
+      s = QString::number(-count*dStepSize);
+      if (count % k && ((dStepSize*fact) > 2.5))
       {
         painter.drawLine( 8, yValue, 12, yValue);
         enoughSpace = true;
       }
       else if (!(count % k))
       {
-        if ((k*20*fact) > 7)
+        if ((k*dStepSize*fact) > 7)
         {
           painter.drawLine( 5, yValue, 15, yValue);
           painter.drawText( 21, yValue + 3, s );
@@ -194,21 +197,22 @@ void QmitkSliderLevelWindowWidget::paintEvent( QPaintEvent* itkNotUsed(e) )
 
     for(int i = m_MoveHeight + (int)(minRange*fact); i >= 0;)
     {
-      if (count*20 > maxRange)
+      if (count*dStepSize > maxRange)
         break;
-      yValue = m_MoveHeight + (int)((minRange - count*20)*fact);
-      s = QString::number(count*20);
-      if(count % k && ((20*fact) > 2.5))
+      yValue = m_MoveHeight + (int)((minRange - count*dStepSize)*fact);
+
+      s = QString::number(count*dStepSize);
+      if(count % k && ((dStepSize*fact) > 2.5))
       {
-        if (!(minRange > 0 && (count*20) < minRange))
+        if (!(minRange > 0 && (count*dStepSize) < minRange))
           painter.drawLine( 8, yValue, 12, yValue);
         enoughSpace = true;
       }
       else if (!(count % k))
       {
-        if ((k*20*fact) > 7)
+        if ((k*dStepSize*fact) > 7)
         {
-          if (!(minRange > 0 && (count*20) < minRange))
+          if (!(minRange > 0 && (count*dStepSize) < minRange))
           {
             painter.drawLine( 5, yValue, 15, yValue);
             painter.drawText( 21, yValue + 3, s );
@@ -241,7 +245,7 @@ void QmitkSliderLevelWindowWidget::paintEvent( QPaintEvent* itkNotUsed(e) )
   painter.setPen (cl);
   painter.drawLine(m_Rect.topLeft(),m_Rect.topRight());
   painter.drawLine(m_Rect.topLeft(),m_Rect.bottomLeft());
-  
+
   painter.setPen (cd);
   painter.drawLine(m_Rect.topRight(),m_Rect.bottomRight());
   painter.drawLine(m_Rect.bottomRight(),m_Rect.bottomLeft());

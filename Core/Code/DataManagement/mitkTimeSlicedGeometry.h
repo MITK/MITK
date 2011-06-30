@@ -153,6 +153,7 @@ public:
   virtual void ExecuteOperation(Operation* operation);
 protected:
   TimeSlicedGeometry();
+  TimeSlicedGeometry(const TimeSlicedGeometry& other);
 
   virtual ~TimeSlicedGeometry();
 

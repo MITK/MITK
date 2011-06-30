@@ -294,6 +294,24 @@ mitk::TimeSlicedGeometry::TimeSlicedGeometry() : m_TimeSteps(0), m_EvenlyTimed(f
 {
 }
 
+mitk::TimeSlicedGeometry::TimeSlicedGeometry(const TimeSlicedGeometry& other) : Geometry3D(other), m_TimeSteps(other.m_TimeSteps), m_EvenlyTimed(other.m_EvenlyTimed)
+{
+  m_Geometry3Ds.resize(m_TimeSteps);
+  unsigned int t;
+  for(t=0; t<m_TimeSteps; ++t)
+  {
+    if(other.m_Geometry3Ds[t].IsNull())
+    {
+      assert(other.m_EvenlyTimed);
+      SetGeometry3D(NULL,t);
+    }
+    else
+    {
+      SetGeometry3D(dynamic_cast<Geometry3D*>(other.m_Geometry3Ds[t]->Clone().GetPointer()), t);
+    }
+  }
+}
+
 mitk::TimeSlicedGeometry::~TimeSlicedGeometry()
 {
 
@@ -361,9 +379,7 @@ void mitk::TimeSlicedGeometry::CopyTimes(const mitk::TimeSlicedGeometry* timesli
 
 mitk::AffineGeometryFrame3D::Pointer mitk::TimeSlicedGeometry::Clone() const
 {
-  Self::Pointer newGeometry = Self::New();
-  newGeometry->Initialize(m_TimeSteps);
-  InitializeGeometry(newGeometry);
+  Self::Pointer newGeometry = new TimeSlicedGeometry(*this);
   return newGeometry.GetPointer();
 }
 

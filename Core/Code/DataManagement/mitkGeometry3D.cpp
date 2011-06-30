@@ -37,6 +37,30 @@ mitk::Geometry3D::Geometry3D()
   m_VtkIndexToWorldTransform->SetInput(m_VtkMatrix);
   Initialize();
 }
+mitk::Geometry3D::Geometry3D(const Geometry3D& other) : Superclass(),  m_ParametricBoundingBox(other.m_ParametricBoundingBox),m_TimeBounds(other.m_TimeBounds), 
+  m_ImageGeometry(other.m_ImageGeometry), m_Valid(other.m_Valid), m_FrameOfReferenceID(other.m_FrameOfReferenceID), m_IndexToWorldTransformLastModified(other.m_IndexToWorldTransformLastModified), m_RotationQuaternion( other.m_RotationQuaternion ) , m_Origin(other.m_Origin)
+{
+  // AffineGeometryFrame
+  SetBounds(other.GetBounds());
+  //SetIndexToObjectTransform(other.GetIndexToObjectTransform());
+  //SetObjectToNodeTransform(other.GetObjectToNodeTransform());
+  //SetIndexToWorldTransform(other.GetIndexToWorldTransform());
+  // this is not used in AffineGeometryFrame of ITK, thus there are not Get and Set methods
+  // m_IndexToNodeTransform = other.m_IndexToNodeTransform;
+  // m_InvertedTransform = TransformType::New();
+  // m_InvertedTransform = TransformType::New();
+  // m_InvertedTransform->DeepCopy(other.m_InvertedTransform);
+  m_VtkMatrix = vtkMatrix4x4::New();
+  m_VtkMatrix->DeepCopy(other.m_VtkMatrix);
+  if (other.m_ParametricBoundingBox.IsNotNull())
+  {
+    m_ParametricBoundingBox = other.m_ParametricBoundingBox->DeepCopy();
+  }
+  FillVector3D(m_FloatSpacing,other.m_FloatSpacing[0],other.m_FloatSpacing[1],other.m_FloatSpacing[2]);
+  m_VtkIndexToWorldTransform = vtkMatrixToLinearTransform::New();
+  m_VtkIndexToWorldTransform->DeepCopy(other.m_VtkIndexToWorldTransform);
+  other.InitializeGeometry(this);
+}
 
 mitk::Geometry3D::~Geometry3D()
 {
@@ -183,12 +207,10 @@ void mitk::Geometry3D::SetIndexToWorldTransform(mitk::AffineTransform3D* transfo
 
 mitk::AffineGeometryFrame3D::Pointer mitk::Geometry3D::Clone() const
 {
-  Self::Pointer newGeometry = Self::New();
-  newGeometry->Initialize();
-  InitializeGeometry(newGeometry);
+  Self::Pointer newGeometry = new Self(*this);
   return newGeometry.GetPointer();
 }
-
+/*
 void mitk::Geometry3D::InitializeGeometry(Geometry3D * newGeometry) const
 {
   Superclass::InitializeGeometry(newGeometry);
@@ -201,7 +223,7 @@ void mitk::Geometry3D::InitializeGeometry(Geometry3D * newGeometry) const
   newGeometry->SetFrameOfReferenceID(GetFrameOfReferenceID());
   newGeometry->m_ImageGeometry = m_ImageGeometry;
 }
-
+*/
 void mitk::Geometry3D::SetExtentInMM(int direction, ScalarType extentInMM)
 {
   ScalarType len = GetExtentInMM(direction);

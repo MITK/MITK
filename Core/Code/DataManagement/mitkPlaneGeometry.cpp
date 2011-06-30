@@ -744,13 +744,6 @@ PlaneGeometry::ExecuteOperation( Operation *operation )
   transform->Delete();
 }
 
-
-void PlaneGeometry::InitializeGeometry( Self *newGeometry ) const
-{
-  Superclass::InitializeGeometry(newGeometry);
-}
-
-
 void PlaneGeometry::PrintSelf( std::ostream& os, itk::Indent indent ) const
 {
   Superclass::PrintSelf(os,indent);

@@ -691,12 +691,9 @@ PlaneGeometry::ProjectPointOntoPlane( const Point3D& pt ) const
 AffineGeometryFrame3D::Pointer
 PlaneGeometry::Clone() const
 {
-  Self::Pointer newGeometry = Self::New();
-  newGeometry->Initialize();
-  InitializeGeometry(newGeometry);
+  Self::Pointer newGeometry = new PlaneGeometry(*this);
   return newGeometry.GetPointer();
 }
-
 
 void 
 PlaneGeometry::ExecuteOperation( Operation *operation )

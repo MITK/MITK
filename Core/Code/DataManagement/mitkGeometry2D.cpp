@@ -27,6 +27,14 @@ mitk::Geometry2D::Geometry2D()
 {
 }
 
+mitk::Geometry2D::Geometry2D(const Geometry2D& other)
+  : Geometry3D(other), m_ScaleFactorMMPerUnitX( other.m_ScaleFactorMMPerUnitX),
+    m_ScaleFactorMMPerUnitY( other.m_ScaleFactorMMPerUnitY),
+    m_ReferenceGeometry( other.m_ReferenceGeometry )
+{
+}
+
+
 
 mitk::Geometry2D::~Geometry2D()
 {
@@ -228,22 +236,11 @@ mitk::Geometry2D::IsAbove(const mitk::Point3D& pt3d_mm) const
   return (pt3d_units[2] > m_BoundingBox->GetBounds()[4]);
 }
 
-mitk::AffineGeometryFrame3D::Pointer 
+mitk::AffineGeometryFrame3D::Pointer
 mitk::Geometry2D::Clone() const
 {
-  Self::Pointer newGeometry = Self::New();
-  newGeometry->Initialize();
-  InitializeGeometry(newGeometry);
+  Self::Pointer newGeometry = new Geometry2D(*this);
   return newGeometry.GetPointer();
-}
-
-
-void 
-mitk::Geometry2D::InitializeGeometry(Self * newGeometry) const
-{
-  Superclass::InitializeGeometry(newGeometry);
-
-  newGeometry->SetReferenceGeometry( m_ReferenceGeometry );
 }
 
 void 

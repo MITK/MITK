@@ -102,8 +102,7 @@ PURPOSE.  See the above copyright notices for more information.
  * \ingroup Adaptor
  */
 #define InstantiateAccessFunction(itkImgFunc)                                                             \
-  InstantiateAccessFunctionForFixedDimension(itkImgFunc, 2)                                               \
-  InstantiateAccessFunctionForFixedDimension(itkImgFunc, 3)
+  InstantiateAccessFunctionForFixedType(itkImgFunc, MITK_ACCESSBYITK_PIXEL_TYPES_SEQ, MITK_ACCESSBYITK_DIMENSIONS_SEQ)
 
 /**
  * \brief Instantiate access function for all datatypes and a specific dimension.
@@ -116,7 +115,7 @@ PURPOSE.  See the above copyright notices for more information.
  * \ingroup Adaptor
  */
 #define InstantiateAccessFunctionForFixedDimension(itkImgFunc, dim)                                       \
-  InstantiateAccessFunctionForFixedType(itkImgFunc, MITK_ACCESSBYITK_TYPES_SEQ, (dim))
+  InstantiateAccessFunctionForFixedType(itkImgFunc, MITK_ACCESSBYITK_PIXEL_TYPES_SEQ, (dim))
 
 /**
  * \brief Instantiate access function for all given pixel types and all dimensions.

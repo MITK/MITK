@@ -145,6 +145,8 @@ namespace mitk {
     void InsertBundle(mitk::FiberBundle::Pointer bundle);
     vtkPolyData* GeneratePolydata();
 
+//    int SearchFiber(worldPoint, tolerance, resultDistance);
+
   protected:
     FiberBundle();
     virtual ~FiberBundle();

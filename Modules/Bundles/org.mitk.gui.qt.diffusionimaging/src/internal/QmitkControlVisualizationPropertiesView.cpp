@@ -30,6 +30,9 @@ PURPOSE.  See the above copyright notices for more information.
 #include "mitkFiberBundle.h"
 #include "QmitkDataStorageComboBox.h"
 #include "QmitkStdMultiWidget.h"
+#include "mitkFiberBundleInteractor.h"
+
+#include "mitkGlobalInteraction.h"
 
 #include "berryIWorkbenchWindow.h"
 #include "berryIWorkbenchPage.h"
@@ -625,6 +628,8 @@ void QmitkControlVisualizationPropertiesView::CreateConnections()
     connect((QObject*) m_Controls->m_Tube, SIGNAL(clicked()), (QObject*) this, SLOT(BundleRepresentationTube()));
     connect((QObject*) m_Controls->m_Color, SIGNAL(clicked()), (QObject*) this, SLOT(BundleRepresentationColor()));
     connect((QObject*) m_Controls->m_Focus, SIGNAL(clicked()), (QObject*) this, SLOT(PlanarFigureFocus()));
+
+    connect((QObject*) m_Controls->m_SetInteractor, SIGNAL(clicked()), (QObject*) this, SLOT(SetInteractor()));
 
   }
 }
@@ -1229,5 +1234,32 @@ void QmitkControlVisualizationPropertiesView::PlanarFigureFocus()
       }
     }
 
+  }
+}
+
+void QmitkControlVisualizationPropertiesView::SetInteractor()
+{
+
+  mitk::DataStorage::SetOfObjects::ConstPointer _NodeSet = this->GetDefaultDataStorage()->GetAll();
+  mitk::DataNode* node = 0;
+  mitk::FiberBundle* bundle = 0;
+  mitk::FiberBundleInteractor::Pointer bundleInteractor = 0;
+
+  // finally add all nodes to the model
+  for(mitk::DataStorage::SetOfObjects::ConstIterator it=_NodeSet->Begin(); it!=_NodeSet->End()
+    ; it++)
+    {
+    node = const_cast<mitk::DataNode*>(it->Value().GetPointer());
+    bundle = dynamic_cast<mitk::FiberBundle*>(node->GetData());
+
+    if(bundle)
+    {
+      bundleInteractor = dynamic_cast<mitk::FiberBundleInteractor*>(node->GetInteractor());
+
+      if(bundleInteractor.IsNull())
+        bundleInteractor = mitk::FiberBundleInteractor::New("FiberBundleInteractor", node);
+
+      mitk::GlobalInteraction::GetInstance()->AddInteractor(bundleInteractor);
+    }
   }
 }

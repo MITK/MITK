@@ -69,6 +69,8 @@ SET(CPP_FILES
   Rendering/mitkOdfScaleByProperty.cpp
   Rendering/mitkFiberBundleMapper3D.cpp
   
+  # Interactions
+  Interactions/mitkFiberBundleInteractor.cpp
 )
 
 SET(H_FILES 

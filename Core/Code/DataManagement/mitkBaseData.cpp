@@ -114,12 +114,6 @@ if(aGeometry3D!=NULL)
   return;
 }
 
-void mitk::BaseData::SetGeometry(Geometry3D* aGeometry3D, unsigned int time)
-{
-  if ( m_TimeSlicedGeometry )
-    m_TimeSlicedGeometry->SetGeometry3D(aGeometry3D, time);
-}
-
 void mitk::BaseData::SetClonedGeometry(const Geometry3D* aGeometry3D)
 {
   SetGeometry(static_cast<mitk::Geometry3D*>(aGeometry3D->Clone().GetPointer()));
@@ -127,7 +121,10 @@ void mitk::BaseData::SetClonedGeometry(const Geometry3D* aGeometry3D)
 
 void mitk::BaseData::SetClonedGeometry(const Geometry3D* aGeometry3D, unsigned int time)
 {
-  SetGeometry(static_cast<mitk::Geometry3D*>(aGeometry3D->Clone().GetPointer()), time);
+  if (m_TimeSlicedGeometry)
+  {
+    m_TimeSlicedGeometry->SetGeometry3D(static_cast<mitk::Geometry3D*>(aGeometry3D->Clone().GetPointer()), time);
+  }
 }
 
 bool mitk::BaseData::IsEmpty(unsigned int) const

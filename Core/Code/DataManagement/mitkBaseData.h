@@ -246,14 +246,6 @@ public:
   virtual void SetGeometry(Geometry3D* aGeometry3D);
 
   //##Documentation
-  //## @brief Set the Geometry3D of a given time step, which will be referenced (not copied!). 
-  //## 
-  //## @warning This method will normally be called internally by the sub-class of BaseData 
-  //## during initialization.
-  //## \sa SetClonedGeometry
-  virtual void SetGeometry(Geometry3D* aGeometry3D, unsigned int time);
-
-  //##Documentation
   //## @brief Set a clone of the provided geometry as Geometry3D of the data. 
   //## Assumes the data object has only 1 time step ( is a 3D object )
   //## 

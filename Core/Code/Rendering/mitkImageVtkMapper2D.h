@@ -107,7 +107,7 @@ namespace mitk {
    * data. */
     virtual void Update(mitk::BaseRenderer * renderer);
 
-    virtual void ApplyProperties(mitk::BaseRenderer* renderer, vtkSmartPointer<vtkTransform> transform, ScalarType mmPerPixel[2]);
+    virtual void ApplyProperties(mitk::BaseRenderer* renderer, ScalarType mmPerPixel[2]);
 
     virtual vtkProp* GetVtkProp(mitk::BaseRenderer* renderer);
 
@@ -132,8 +132,6 @@ namespace mitk {
       vtkSmartPointer<vtkTexture> m_Texture;
       /** \brief The lookuptable for colors and level window */
       vtkSmartPointer<vtkLookupTable> m_LookupTable;
-      /** \brief transform the plane */
-      vtkSmartPointer<vtkTransformPolyDataFilter> m_TransformFilter;
       /** \brief The actual reslicer (one per renderer) */
       vtkSmartPointer<vtkImageReslice> m_Reslicer;
       /** \brief Thickslices post filtering */

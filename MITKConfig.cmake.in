@@ -18,6 +18,7 @@ include(mitkMacroInstall)
 include(mitkMacroInstallHelperApp)
 include(mitkMacroInstallTargets)
 include(mitkMacroGenerateToolsLibrary)
+include(mitkMacroCreateCTKPlugin)
 
 # The MITK version number
 SET(MITK_VERSION_MAJOR "@MITK_VERSION_MAJOR@")

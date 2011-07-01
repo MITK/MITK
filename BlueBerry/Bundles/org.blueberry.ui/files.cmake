@@ -35,6 +35,7 @@ SET(SRC_CPP_FILES
   berryISizeProvider.cpp
   berryISourceProviderListener.cpp
   berryISources.cpp
+  berryIStructuredSelection.cpp
   berryIWindowListener.cpp
   berryIWorkbenchListener.cpp
   berryIWorkbenchPage.cpp

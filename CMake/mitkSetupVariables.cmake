@@ -73,6 +73,10 @@ set(MITK_LIBRARIES
     ipSegmentation
     ann 
    )
+   
+# variables used in CMake macros which are called from external projects
+set(MITK_VTK_LIBRARY_DIRS ${VTK_LIBRARY_DIRS})
+set(MITK_ITK_LIBRARY_DIRS ${ITK_LIBRARY_DIRS})
 
 # variables containing link directories
 set(MITK_LIBRARY_DIRS ${CMAKE_LIBRARY_OUTPUT_DIRECTORY})                                                                                                              

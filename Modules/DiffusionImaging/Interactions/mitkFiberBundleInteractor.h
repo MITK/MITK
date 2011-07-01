@@ -23,6 +23,7 @@ PURPOSE.  See the above copyright notices for more information.
 #include "MitkExtExports.h"
 #include <mitkInteractor.h>
 #include <mitkVector.h>
+#include "MitkDiffusionImagingExports.h"
 
 #include <vtkType.h>
 
@@ -37,7 +38,7 @@ namespace mitk
   //## All Set-operations would be done through the method "ExecuteAction", if there would be anyone.
   //## the identificationnumber of this point is set by this points and evalued from an empty place in the DataStructure
   //## @ingroup Interaction
-  class MitkExt_EXPORT FiberBundleInteractor : public Interactor
+  class MitkDiffusionImaging_EXPORT FiberBundleInteractor : public Interactor
   {
   public:
     mitkClassMacro(FiberBundleInteractor, Interactor);

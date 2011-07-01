@@ -72,6 +72,15 @@ struct BERRY_UI IStructuredSelection : public ISelection {
    */
   virtual ContainerType::Pointer ToVector() const = 0;
 
+  /*
+   * We need to define at least the destructor in this compilation unit
+   * because of the export macro above. Otherwise Windows throws
+   * a linker error in dependent librraies. The export macro is needed
+   * for gcc < 4.5 to correctly mark the type_info object of this class
+   * as visible (we have default visibility 'hidden') so that dynamic_cast calls work.
+   */
+  virtual ~IStructuredSelection();
+
 };
 
 }

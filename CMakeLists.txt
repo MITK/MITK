@@ -100,7 +100,6 @@ if(MITK_USE_QT)
   find_package(Qt4 4.6.0 REQUIRED)
 endif()
 
-option(MITK_INSTALL_RPATH_RELATIVE "Use relative rpath entries for installation packages" OFF)
 option(MITK_BUILD_ALL_PLUGINS "Build all MITK plugins" OFF)
 option(MITK_BUILD_TUTORIAL "Build the MITK tutorial" ON)
 option(MITK_USE_Boost "Use the Boost C++ library" OFF)
@@ -109,8 +108,7 @@ option(MITK_USE_CTK "Use CTK in MITK" ${MITK_USE_BLUEBERRY})
 option(MITK_USE_DCMTK "EXEPERIMENTAL, superbuild only: Use DCMTK in MITK" OFF)
 option(MITK_USE_OpenCV "Use Intel's OpenCV library" OFF)
   
-mark_as_advanced(MITK_INSTALL_RPATH_RELATIVE
-                 MITK_BUILD_ALL_PLUGINS
+mark_as_advanced(MITK_BUILD_ALL_PLUGINS
                  MITK_USE_CTK
                  MITK_USE_DCMTK
                  )
@@ -273,12 +271,6 @@ mitkFunctionGetVersion(${MITK_SOURCE_DIR} MITK)
 #
 # These should be set before any MITK install macros are used
 #-----------------------------------------------------------------------------
-
-if(MITK_INSTALL_RPATH_RELATIVE)
-  set(CMAKE_INSTALL_RPATH ".")
-else()
-  set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/bin")
-endif()
 
 # on Mac OSX all BlueBerry plugins get copied into every
 # application bundle (.app directory) specified here

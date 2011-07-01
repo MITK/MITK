@@ -75,12 +75,6 @@ MACRO(_fixup_target)
         GET_FILENAME_COMPONENT(_file_name \"\${file}\" NAME)
         IF(_file_path MATCHES \"^\${CMAKE_INSTALL_PREFIX}\")
           SET(\${type} \"local\")
-          # On linux, rpaths are removed from the plugins
-          # if installing more than on application. This override
-          # should prevent this.
-          IF(_file_name MATCHES \"^liborg\")
-            SET(\${type} \"system\")
-          ENDIF()
         ENDIF()
         IF(_file_name MATCHES gdiplus)
             SET(\${type} \"system\")
@@ -88,8 +82,7 @@ MACRO(_fixup_target)
       ENDIF()
     ENDMACRO(gp_resolved_file_type_override)
 
-    SET(_rpath_relative ${MITK_INSTALL_RPATH_RELATIVE})
-    IF(_rpath_relative AND NOT APPLE)
+    IF(NOT APPLE)
       IF(UNIX OR MINGW)
         MACRO(gp_resolve_item_override context item exepath dirs resolved_item_var resolved_var)
           IF(\${item} MATCHES \"blueberry_osgi\")

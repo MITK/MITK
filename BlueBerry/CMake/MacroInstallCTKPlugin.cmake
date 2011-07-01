@@ -13,12 +13,24 @@ MACRO(MACRO_INSTALL_CTK_PLUGIN)
     IF(_is_imported)
       GET_TARGET_PROPERTY(_import_loc_debug ${_install_target} IMPORTED_LOCATION_DEBUG)
       GET_TARGET_PROPERTY(_import_loc_release ${_install_target} IMPORTED_LOCATION_RELEASE)
+      GET_FILENAME_COMPONENT(_target_filename_debug "${_import_loc_debug}" NAME)
+      GET_FILENAME_COMPONENT(_target_filename_release "${_import_loc_release}" NAME)
       INSTALL(FILES ${_import_loc_debug}
               DESTINATION ${_INSTALL_DESTINATION}
               CONFIGURATIONS Debug)
       INSTALL(FILES ${_import_loc_release}
               DESTINATION ${_INSTALL_DESTINATION}
               CONFIGURATIONS Release)
+      IF(UNIX)
+        IF(_target_filename_debug)
+          INSTALL(CODE "FILE(RPATH_REMOVE
+                             FILE \"\${CMAKE_INSTALL_PREFIX}/${_INSTALL_DESTINATION}/${_target_filename_debug}\")")
+        ENDIF()
+        IF(_target_filename_release)
+          INSTALL(CODE "FILE(RPATH_CHANGE
+                             FILE \"\${CMAKE_INSTALL_PREFIX}/${_INSTALL_DESTINATION}/${_target_filename_release}\")")
+        ENDIF()
+      ENDIF()
     ELSE()
       INSTALL(TARGETS ${_install_target}
               RUNTIME DESTINATION ${_INSTALL_DESTINATION}

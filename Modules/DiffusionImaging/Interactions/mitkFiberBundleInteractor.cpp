@@ -38,6 +38,8 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkCamera.h>
 #include <vtkInteractorObserver.h>
 
+#include <qapplication.h>
+
 mitk::FiberBundleInteractor::FiberBundleInteractor(const char * type, DataNode* dataNode)
   : Interactor(type, dataNode), m_LastPosition(0)
 {
@@ -190,6 +192,9 @@ bool mitk::FiberBundleInteractor::ExecuteAction( Action* action, mitk::StateEven
   {
   case AcCHECKHOVERING:
     {
+
+      QApplication::restoreOverrideCursor();
+
       // Re-enable VTK interactor (may have been disabled previously)
       if ( renderWindowInteractor != NULL )
       {
@@ -206,7 +211,7 @@ bool mitk::FiberBundleInteractor::ExecuteAction( Action* action, mitk::StateEven
         // Check if an object is present at the current mouse position
         DataNode *pickedNode = dpe->GetPickedObjectNode();
         if ( pickedNode != m_DataNode )
-        {
+        {          
 //          if(pickedNode == 0)
 //            MITK_INFO << "picked node is NULL, no hovering";
 //          else
@@ -221,7 +226,7 @@ bool mitk::FiberBundleInteractor::ExecuteAction( Action* action, mitk::StateEven
         m_CurrentPickedPoint = dpe->GetWorldPosition();
         m_CurrentPickedDisplayPoint = dpe->GetDisplayPosition();
 
-//        MITK_INFO << "YES Hovering";
+        QApplication::setOverrideCursor(Qt::UpArrowCursor);
         this->HandleEvent( new StateEvent( EIDFIGUREHOVER ) );
 
       }
@@ -239,9 +244,7 @@ bool mitk::FiberBundleInteractor::ExecuteAction( Action* action, mitk::StateEven
     //    break;
   case AcREMOVE:
     {
-      MITK_INFO << "FiberBundleInteractor AcREMOVE";
-
-      MITK_INFO << "removing fiber at " << m_CurrentPickedPoint;
+      MITK_INFO << "picking fiber at " << m_CurrentPickedPoint;
 
 //      QmitkStdMultiWidgetEditor::Pointer multiWidgetEditor;
 //      multiWidgetEditor->GetStdMultiWidget()->GetRenderWindow1()->GetRenderer()->GetSliceNavigationController()->SelectSliceByPoint(
@@ -262,7 +265,6 @@ bool mitk::FiberBundleInteractor::ExecuteAction( Action* action, mitk::StateEven
     }
     break;
   default:
-    MITK_INFO << "FiberBundleInteractor NO ACTION";
     return Superclass::ExecuteAction( action, stateEvent );
   }
 

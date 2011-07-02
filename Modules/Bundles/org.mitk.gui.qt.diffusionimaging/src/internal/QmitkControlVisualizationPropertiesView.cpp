@@ -171,13 +171,17 @@ struct CvpSelListener : ISelectionListener
 
         if(dynamic_cast<mitk::FiberBundle*>(node->GetData()) != 0)
         {
-          MITK_INFO << "Node " << node;
+          MITK_INFO << "Node " << node.GetPointer();
           MITK_INFO << "pick " << m_View->m_CurrentPickingNode;
           m_View->m_Controls->m_BundleControlsFrame->setVisible(true);
           m_View->m_SelectedNode = node;
-          if(m_View->m_CurrentPickingNode != 0 && node != m_View->m_CurrentPickingNode)
+          if(m_View->m_CurrentPickingNode != 0 && node.GetPointer() != m_View->m_CurrentPickingNode)
           {
             m_View->m_Controls->m_SetInteractor->setEnabled(false);
+          }
+          else
+          {
+            m_View->m_Controls->m_SetInteractor->setEnabled(true);
           }
         }
       }
@@ -1246,17 +1250,17 @@ void QmitkControlVisualizationPropertiesView::PlanarFigureFocus()
 
 void QmitkControlVisualizationPropertiesView::SetInteractor()
 {
-  MITK_INFO << "halo";
-  mitk::DataStorage::SetOfObjects::ConstPointer _NodeSet = this->GetDefaultDataStorage()->GetAll();
+  typedef std::vector<mitk::DataNode*> Container;
+  Container _NodeSet = this->GetDataManagerSelection();
   mitk::DataNode* node = 0;
   mitk::FiberBundle* bundle = 0;
   mitk::FiberBundleInteractor::Pointer bundleInteractor = 0;
 
   // finally add all nodes to the model
-  for(mitk::DataStorage::SetOfObjects::ConstIterator it=_NodeSet->Begin(); it!=_NodeSet->End()
+  for(Container::const_iterator it=_NodeSet.begin(); it!=_NodeSet.end()
     ; it++)
     {
-    node = const_cast<mitk::DataNode*>(it->Value().GetPointer());
+    node = const_cast<mitk::DataNode*>(*it);
     bundle = dynamic_cast<mitk::FiberBundle*>(node->GetData());
 
     if(bundle)

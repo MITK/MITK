@@ -175,6 +175,7 @@ struct CvpSelListener : ISelectionListener
           MITK_INFO << "pick " << m_View->m_CurrentPickingNode;
           m_View->m_Controls->m_BundleControlsFrame->setVisible(true);
           m_View->m_SelectedNode = node;
+
           if(m_View->m_CurrentPickingNode != 0 && node.GetPointer() != m_View->m_CurrentPickingNode)
           {
             m_View->m_Controls->m_SetInteractor->setEnabled(false);
@@ -183,6 +184,20 @@ struct CvpSelListener : ISelectionListener
           {
             m_View->m_Controls->m_SetInteractor->setEnabled(true);
           }
+
+          mitk::ColorProperty* nodecolor= mitk::ColorProperty::New();
+          node->GetProperty<mitk::ColorProperty>(nodecolor,"color");
+          m_View->m_Controls->m_Color->setAutoFillBackground(true);
+          QString styleSheet = "background-color:rgb(";
+          styleSheet.append(QString::number(nodecolor->GetColor().GetRed()*255.0));
+          styleSheet.append(",");
+          styleSheet.append(QString::number(nodecolor->GetColor().GetGreen()*255.0));
+          styleSheet.append(",");
+          styleSheet.append(QString::number(nodecolor->GetColor().GetBlue()*255.0));
+          styleSheet.append(")");
+          m_View->m_Controls->m_Color->setStyleSheet(styleSheet);
+
+
         }
       }
     }
@@ -1159,6 +1174,17 @@ void QmitkControlVisualizationPropertiesView::BundleRepresentationColor()
   if(m_SelectedNode)
   {
     QColor color = QColorDialog::getColor();
+
+    m_Controls->m_Color->setAutoFillBackground(true);
+    QString styleSheet = "background-color:rgb(";
+    styleSheet.append(QString::number(color.red()));
+    styleSheet.append(",");
+    styleSheet.append(QString::number(color.green()));
+    styleSheet.append(",");
+    styleSheet.append(QString::number(color.blue()));
+    styleSheet.append(")");
+    m_Controls->m_Color->setStyleSheet(styleSheet);
+
     m_SelectedNode->SetProperty("color",mitk::ColorProperty::New(color.red()/255.0, color.green()/255.0, color.blue()/255.0));
     m_SelectedNode->SetProperty("ColorCoding",mitk::IntProperty::New(14));
     mitk::RenderingManager::GetInstance()->ForceImmediateUpdateAll();

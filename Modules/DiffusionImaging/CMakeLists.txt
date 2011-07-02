@@ -10,7 +10,7 @@ ENDIF(ITK_GDCM_DIR)
 MITK_CREATE_MODULE( MitkDiffusionImaging
   SUBPROJECTS MITK-DTI
   INCLUDE_DIRS Algorithms DicomImport Interactions IODataStructures/DiffusionWeightedImages IODataStructures/QBallImages IODataStructures/TensorImages IODataStructures/FiberBundle IODataStructures/PlanarFigureComposite IODataStructures Reconstruction Tractography Rendering  ${CMAKE_CURRENT_BINARY_DIR}
-  DEPENDS MitkExt SceneSerializationBase
+  DEPENDS MitkExt SceneSerializationBase QmitkExt
   PACKAGE_DEPENDS Boost
 )
 

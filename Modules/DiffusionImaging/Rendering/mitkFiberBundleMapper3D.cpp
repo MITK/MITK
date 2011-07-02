@@ -1101,13 +1101,7 @@ void mitk::FiberBundleMapper3D::SetDefaultProperties(mitk::DataNode* node, mitk:
   node->AddProperty( "TubeRadius", mitk::FloatProperty::New( 0.15 ), renderer, overwrite);
   node->AddProperty( "TubeOpacity", mitk::FloatProperty::New( 1.0 ), renderer, overwrite);
   
-
   node->AddProperty( "pickable", mitk::BoolProperty::New( true ), renderer, overwrite);
-
-  mitk::FiberBundleInteractor::Pointer bundleInteractor = dynamic_cast<mitk::FiberBundleInteractor*>(node->GetInteractor());
-  if(bundleInteractor.IsNull())
-    bundleInteractor = mitk::FiberBundleInteractor::New("FiberBundleInteractor", node);
-  mitk::GlobalInteraction::GetInstance()->AddInteractor(bundleInteractor);
 
   Superclass::SetDefaultProperties(node, renderer, overwrite);
   
